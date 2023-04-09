@@ -99,7 +99,7 @@ Status ShapeInferenceTestutil::InferShapes(ShapeInferenceTestOp op,
       }
     }
 
-    if (absl::StartsWith(expected, "in")) {
+    if (abslx::StartsWith(expected, "in")) {
       if (in_index == -1) {
         return Unknown(err_prefix,
                        " should have matched an input shape by "
@@ -134,7 +134,7 @@ Status ShapeInferenceTestutil::InferShapes(ShapeInferenceTestOp op,
     }
 
     // Verify the dimensions.
-    CHECK(absl::StartsWith(expected, "[") && str_util::EndsWith(expected, "]"))
+    CHECK(abslx::StartsWith(expected, "[") && str_util::EndsWith(expected, "]"))
         << expected;
     expected.remove_prefix(1);
     expected.remove_suffix(1);
@@ -176,7 +176,7 @@ Status ShapeInferenceTestutil::InferShapes(ShapeInferenceTestOp op,
           return Unknown(err_prefix, " expected to be unknown but was ",
                          c.Value(out_dim), err_suffix);
         }
-      } else if (absl::StartsWith(expected_dim, "d")) {
+      } else if (abslx::StartsWith(expected_dim, "d")) {
         // Compare the dimension values.
         auto v = str_util::Split(expected_dim, '|');
         if (in_dim_idx.first == -1) {

@@ -55,7 +55,7 @@ float Distance(const NormalizedLandmark& lm_a, const NormalizedLandmark& lm_b,
                    std::pow((lm_a.y() - lm_b.y()) * height, 2));
 }
 
-absl::StatusOr<std::vector<float>> Distances(const NormalizedLandmarkList& a,
+abslx::StatusOr<std::vector<float>> Distances(const NormalizedLandmarkList& a,
                                              const NormalizedLandmarkList& b,
                                              int width, int height) {
   const int num = a.landmark_size();
@@ -110,7 +110,7 @@ absl::StatusOr<std::vector<float>> Distances(const NormalizedLandmarkList& a,
 //                      ^
 //                      |
 //                   /Wrist/
-absl::StatusOr<float> HandBaselineDistance(
+abslx::StatusOr<float> HandBaselineDistance(
     const NormalizedLandmarkList& landmarks, int width, int height) {
   RET_CHECK_EQ(landmarks.landmark_size(), 21);  // Num of hand landmarks.
   constexpr int kWrist = 0;
@@ -164,11 +164,11 @@ class HandDuplicatesFinder : public DuplicatesFinder {
   explicit HandDuplicatesFinder(bool start_from_the_end)
       : start_from_the_end_(start_from_the_end) {}
 
-  absl::StatusOr<absl::flat_hash_set<int>> FindDuplicates(
+  abslx::StatusOr<abslx::flat_hash_set<int>> FindDuplicates(
       const std::vector<NormalizedLandmarkList>& multi_landmarks,
       int input_width, int input_height) override {
-    absl::flat_hash_set<int> retained_indices;
-    absl::flat_hash_set<int> suppressed_indices;
+    abslx::flat_hash_set<int> retained_indices;
+    abslx::flat_hash_set<int> suppressed_indices;
 
     const int num = multi_landmarks.size();
     std::vector<float> baseline_distances;
@@ -197,7 +197,7 @@ class HandDuplicatesFinder : public DuplicatesFinder {
         ASSIGN_OR_RETURN(const std::vector<float> distances,
                          Distances(multi_landmarks[i], multi_landmarks[j],
                                    input_width, input_height));
-        const int num_matched_landmarks = absl::c_count_if(
+        const int num_matched_landmarks = abslx::c_count_if(
             distances,
             [&](float distance) { return distance < distance_threshold; });
 
@@ -226,35 +226,35 @@ class HandDuplicatesFinder : public DuplicatesFinder {
 };
 
 template <typename InputPortT>
-absl::StatusOr<absl::optional<typename InputPortT::PayloadT>>
+abslx::StatusOr<abslx::optional<typename InputPortT::PayloadT>>
 VerifyNumAndMaybeInitOutput(const InputPortT& port, CalculatorContext* cc,
                             int num_expected_size) {
-  absl::optional<typename InputPortT::PayloadT> output;
+  abslx::optional<typename InputPortT::PayloadT> output;
   if (port(cc).IsConnected() && !port(cc).IsEmpty()) {
     RET_CHECK_EQ(port(cc).Get().size(), num_expected_size);
     typename InputPortT::PayloadT result;
     return {{result}};
   }
-  return {absl::nullopt};
+  return {abslx::nullopt};
 }
 }  // namespace
 
 std::unique_ptr<DuplicatesFinder> CreateHandDuplicatesFinder(
     bool start_from_the_end) {
-  return absl::make_unique<HandDuplicatesFinder>(start_from_the_end);
+  return abslx::make_unique<HandDuplicatesFinder>(start_from_the_end);
 }
 
-absl::Status HandLandmarksDeduplicationCalculator::Process(
+abslx::Status HandLandmarksDeduplicationCalculator::Process(
     mediapipe::CalculatorContext* cc) {
-  if (kInLandmarks(cc).IsEmpty()) return absl::OkStatus();
-  if (kInSize(cc).IsEmpty()) return absl::OkStatus();
+  if (kInLandmarks(cc).IsEmpty()) return abslx::OkStatus();
+  if (kInSize(cc).IsEmpty()) return abslx::OkStatus();
 
   const std::vector<NormalizedLandmarkList>& in_landmarks = *kInLandmarks(cc);
   const std::pair<int, int>& image_size = *kInSize(cc);
 
   std::unique_ptr<DuplicatesFinder> duplicates_finder =
       CreateHandDuplicatesFinder(/*start_from_the_end=*/false);
-  ASSIGN_OR_RETURN(absl::flat_hash_set<int> indices_to_remove,
+  ASSIGN_OR_RETURN(abslx::flat_hash_set<int> indices_to_remove,
                    duplicates_finder->FindDuplicates(
                        in_landmarks, image_size.first, image_size.second));
 
@@ -267,13 +267,13 @@ absl::Status HandLandmarksDeduplicationCalculator::Process(
     std::vector<NormalizedLandmarkList> out_landmarks;
     const int num = in_landmarks.size();
 
-    ASSIGN_OR_RETURN(absl::optional<std::vector<NormalizedRect>> out_rois,
+    ASSIGN_OR_RETURN(abslx::optional<std::vector<NormalizedRect>> out_rois,
                      VerifyNumAndMaybeInitOutput(kInRois, cc, num));
     ASSIGN_OR_RETURN(
-        absl::optional<std::vector<LandmarkList>> out_world_landmarks,
+        abslx::optional<std::vector<LandmarkList>> out_world_landmarks,
         VerifyNumAndMaybeInitOutput(kInWorldLandmarks, cc, num));
     ASSIGN_OR_RETURN(
-        absl::optional<std::vector<ClassificationList>> out_classifications,
+        abslx::optional<std::vector<ClassificationList>> out_classifications,
         VerifyNumAndMaybeInitOutput(kInClassifications, cc, num));
 
     for (int i = 0; i < num; ++i) {
@@ -304,7 +304,7 @@ absl::Status HandLandmarksDeduplicationCalculator::Process(
       kOutClassifications(cc).Send(std::move(out_classifications.value()));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 MEDIAPIPE_REGISTER_NODE(HandLandmarksDeduplicationCalculator);
 

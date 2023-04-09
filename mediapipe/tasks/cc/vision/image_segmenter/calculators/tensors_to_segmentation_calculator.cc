@@ -54,8 +54,8 @@ using ::mediapipe::tasks::vision::GetImageLikeTensorShape;
 using ::mediapipe::tasks::vision::Shape;
 using ::mediapipe::tasks::vision::image_segmenter::proto::SegmenterOptions;
 
-void StableSoftmax(absl::Span<const float> values,
-                   absl::Span<float> activated_values) {
+void StableSoftmax(abslx::Span<const float> values,
+                   abslx::Span<float> activated_values) {
   float max_value = *std::max_element(values.begin(), values.end());
   float denominator = 0.f;
   std::transform(values.begin(), values.end(), activated_values.begin(),
@@ -69,8 +69,8 @@ void StableSoftmax(absl::Span<const float> values,
                  [&denominator](float val) { return val / denominator; });
 }
 
-void Sigmoid(absl::Span<const float> values,
-             absl::Span<float> activated_values) {
+void Sigmoid(abslx::Span<const float> values,
+             abslx::Span<float> activated_values) {
   std::transform(values.begin(), values.end(), activated_values.begin(),
                  [](float value) { return 1. / (1 + std::exp(-value)); });
 }
@@ -118,8 +118,8 @@ class TensorsToSegmentationCalculator : public Node {
   static constexpr Output<Image>::Multiple kSegmentationOut{"SEGMENTATION"};
   MEDIAPIPE_NODE_CONTRACT(kTensorsIn, kOutputSizeIn, kSegmentationOut);
 
-  absl::Status Open(CalculatorContext* cc);
-  absl::Status Process(CalculatorContext* cc);
+  abslx::Status Open(CalculatorContext* cc);
+  abslx::Status Process(CalculatorContext* cc);
 
  private:
   std::vector<Image> GetSegmentationResult(const Shape& input_shape,
@@ -129,16 +129,16 @@ class TensorsToSegmentationCalculator : public Node {
   TensorsToSegmentationCalculatorOptions options_;
 };
 
-absl::Status TensorsToSegmentationCalculator::Open(
+abslx::Status TensorsToSegmentationCalculator::Open(
     mediapipe::CalculatorContext* cc) {
   options_ = cc->Options<TensorsToSegmentationCalculatorOptions>();
   RET_CHECK_NE(options_.segmenter_options().output_type(),
                SegmenterOptions::UNSPECIFIED)
       << "Must specify output_type as one of [CONFIDENCE_MASK|CATEGORY_MASK].";
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorsToSegmentationCalculator::Process(
+abslx::Status TensorsToSegmentationCalculator::Process(
     mediapipe::CalculatorContext* cc) {
   RET_CHECK_EQ(kTensorsIn(cc).Get().size(), 1)
       << "Expect a vector of single Tensor.";
@@ -172,14 +172,14 @@ absl::Status TensorsToSegmentationCalculator::Process(
   for (int i = 0; i < segmented_masks.size(); ++i) {
     kSegmentationOut(cc)[i].Send(std::move(segmented_masks[i]));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 std::vector<Image> TensorsToSegmentationCalculator::GetSegmentationResult(
     const Shape& input_shape, const Shape& output_shape,
     const float* tensors_buffer) {
-  std::function<void(absl::Span<const float> values,
-                     absl::Span<float> activated_values)>
+  std::function<void(abslx::Span<const float> values,
+                     abslx::Span<float> activated_values)>
       activation_fn;
   switch (options_.segmenter_options().activation()) {
     case SegmenterOptions::SIGMOID:
@@ -190,8 +190,8 @@ std::vector<Image> TensorsToSegmentationCalculator::GetSegmentationResult(
       break;
     case SegmenterOptions::NONE:
       // Just copying for NONE activation.
-      activation_fn = [](absl::Span<const float> values,
-                         absl::Span<float> activated_values) {
+      activation_fn = [](abslx::Span<const float> values,
+                         abslx::Span<float> activated_values) {
         std::copy(values.begin(), values.end(), activated_values.begin());
       };
       break;
@@ -214,7 +214,7 @@ std::vector<Image> TensorsToSegmentationCalculator::GetSegmentationResult(
   const int tensor_size = input_shape.height * input_shape.width;
   if (is_category_mask) {
     for (int i = 0; i < tensor_size; ++i) {
-      absl::Span<const float> confidence_scores(
+      abslx::Span<const float> confidence_scores(
           &tensors_buffer[i * input_shape.channels], input_shape.channels);
       const int maximum_category_idx =
           std::max_element(confidence_scores.begin(), confidence_scores.end()) -
@@ -224,10 +224,10 @@ std::vector<Image> TensorsToSegmentationCalculator::GetSegmentationResult(
     }
   } else {
     std::vector<float> activated_values(input_shape.channels);
-    absl::Span<float> activated_values_span(activated_values);
+    abslx::Span<float> activated_values_span(activated_values);
     for (int i = 0; i < tensor_size; ++i) {
       activation_fn(
-          absl::MakeConstSpan(&tensors_buffer[i * input_shape.channels],
+          abslx::MakeConstSpan(&tensors_buffer[i * input_shape.channels],
                               input_shape.channels),
           activated_values_span);
       for (int j = 0; j < input_shape.channels; ++j) {

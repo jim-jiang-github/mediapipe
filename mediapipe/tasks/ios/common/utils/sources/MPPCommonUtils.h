@@ -52,14 +52,14 @@ extern NSString *const MPPTasksErrorDomain;
               description:(NSString *)description;
 
 /**
- * Converts an absl::Status to an NSError.
+ * Converts an abslx::Status to an NSError.
  *
- * @param status absl::Status.
+ * @param status abslx::Status.
  * @param error Pointer to the memory location where the created error should be saved. If `nil`,
  * no error will be saved.
  * @return YES when there is no error, NO otherwise.
  */
-+ (BOOL)checkCppError:(const absl::Status &)status toError:(NSError **)error;
++ (BOOL)checkCppError:(const abslx::Status &)status toError:(NSError **)error;
 
 /**
  * Allocates a block of memory with the specified size and returns a pointer to it. If memory

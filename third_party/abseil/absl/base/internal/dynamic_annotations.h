@@ -347,7 +347,7 @@
 #ifdef __cplusplus
 // ANNOTATE_UNPROTECTED_READ is the preferred way to annotate racey reads.
 #define ANNOTATE_UNPROTECTED_READ(x) \
-  absl::base_internal::AnnotateUnprotectedRead(x)
+  abslx::base_internal::AnnotateUnprotectedRead(x)
 
 #endif
 

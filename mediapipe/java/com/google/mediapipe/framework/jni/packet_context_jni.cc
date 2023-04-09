@@ -58,7 +58,7 @@ jobject CreateJavaPacket(JNIEnv* env, jclass packet_cls, jlong packet) {
   std::string create_method_name = class_registry.GetMethodName(
       mediapipe::android::ClassRegistry::kPacketClassName, "create");
 
-  std::string signature = absl::StrFormat("(J)L%s;", packet_class_name);
+  std::string signature = abslx::StrFormat("(J)L%s;", packet_class_name);
   jmethodID createMethod = env->GetStaticMethodID(
       packet_cls, create_method_name.c_str(), signature.c_str());
   return env->CallStaticObjectMethod(packet_cls, createMethod, packet);

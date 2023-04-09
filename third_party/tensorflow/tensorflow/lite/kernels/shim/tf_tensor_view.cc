@@ -38,18 +38,18 @@ namespace shim {
 
 TfTensorView::TfTensorView(TfTensorView &&o) noexcept
     : TensorView(std::move(o)), shape_data_(std::move(o.shape_data_)) {
-  shape_ = absl::Span<int>(shape_data_);
+  shape_ = abslx::Span<int>(shape_data_);
 }
 
 TfTensorView::TfTensorView(const TfTensorView &o)
     : TensorView(o), shape_data_(o.shape_data_) {
-  shape_ = absl::Span<int>(shape_data_);
+  shape_ = abslx::Span<int>(shape_data_);
 }
 
 TfTensorView &TfTensorView::operator=(TfTensorView &&o) noexcept {
   shape_data_ = std::move(o.shape_data_);
   TensorView::operator=(std::move(o));
-  shape_ = absl::Span<int>(shape_data_);
+  shape_ = abslx::Span<int>(shape_data_);
   return *this;
 }
 
@@ -57,12 +57,12 @@ TfTensorView &TfTensorView::operator=(const TfTensorView &o) {
   if (&o == this) return *this;
   TensorView::operator=(o);
   shape_data_ = o.shape_data_;
-  shape_ = absl::Span<int>(shape_data_);
+  shape_ = abslx::Span<int>(shape_data_);
   return *this;
 }
 
 template <typename TfTensorType>
-absl::StatusOr<typename MatchConstNess<TfTensorType, TfTensorView>::Type>
+abslx::StatusOr<typename MatchConstNess<TfTensorType, TfTensorView>::Type>
 TfTensorViewTemplatizedNew(TfTensorType *wrapped_tensor) {
   switch (wrapped_tensor->dtype()) {
     CASE_FOR_DTYPE(::tensorflow::DT_BOOL);
@@ -77,20 +77,20 @@ TfTensorViewTemplatizedNew(TfTensorType *wrapped_tensor) {
     CASE_FOR_DTYPE(::tensorflow::DT_DOUBLE);
     CASE_FOR_DTYPE(::tensorflow::DT_STRING);
     default: {
-      return absl::UnimplementedError(
-          absl::StrCat("Unsupported data type: ", wrapped_tensor->dtype()));
+      return abslx::UnimplementedError(
+          abslx::StrCat("Unsupported data type: ", wrapped_tensor->dtype()));
     }
   }
 }
 
 template <>
-absl::StatusOr<TfTensorView> TensorView::New<::tensorflow::Tensor>(
+abslx::StatusOr<TfTensorView> TensorView::New<::tensorflow::Tensor>(
     ::tensorflow::Tensor *wrapped_tensor) {
   return TfTensorViewTemplatizedNew(wrapped_tensor);
 }
 
 template <>
-absl::StatusOr<const TfTensorView> TensorView::New<const ::tensorflow::Tensor>(
+abslx::StatusOr<const TfTensorView> TensorView::New<const ::tensorflow::Tensor>(
     const ::tensorflow::Tensor *wrapped_tensor) {
   return TfTensorViewTemplatizedNew(wrapped_tensor);
 }

@@ -44,7 +44,7 @@ using ::tensorflow::serving::BatchOpRewriteConfig;
 // Add batch op in both GraphDef.node and GraphDef.library.function.node_def.
 void AddBatchOp(
     GraphDef* graph, int num_batch_threads,
-    const absl::flat_hash_map<string, int>& reserved_int_attrs = {}) {
+    const abslx::flat_hash_map<string, int>& reserved_int_attrs = {}) {
   auto set_batch_node_attribute = [&](const int32_t num_batch_threads,
                                       NodeDef* batch_op) {
     batch_op->set_name("cond/batch/BatchFunction");
@@ -82,7 +82,7 @@ RewriterConfig_CustomGraphOptimizer MakeConfig(
     const BatchOpRewriteConfig& config) {
   RewriterConfig_CustomGraphOptimizer rewriter_config;
   (*rewriter_config.mutable_parameter_map())["batch_op_rewrite_config"].set_s(
-      absl::Base64Escape(config.SerializeAsString()));
+      abslx::Base64Escape(config.SerializeAsString()));
   return rewriter_config;
 }
 

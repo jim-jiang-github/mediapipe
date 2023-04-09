@@ -29,34 +29,34 @@ namespace mangling_util {
 enum class MangledKind { kUnknown, kDataType, kTensorShape, kTensor };
 
 // Mangles an attribute name, marking the attribute as a TensorFlow attribute.
-std::string MangleAttributeName(absl::string_view str);
+std::string MangleAttributeName(abslx::string_view str);
 
 // Returns true if 'str' was mangled with MangleAttributeName.
-bool IsMangledAttributeName(absl::string_view str);
+bool IsMangledAttributeName(abslx::string_view str);
 
 // Demangles an attribute name that was manged with MangleAttributeName.
 // REQUIRES: IsMangledAttributeName returns true.
-absl::string_view DemangleAttributeName(absl::string_view str);
+abslx::string_view DemangleAttributeName(abslx::string_view str);
 
 // Returns the type of a mangled string, or kUnknown.
-MangledKind GetMangledKind(absl::string_view str);
+MangledKind GetMangledKind(abslx::string_view str);
 
 // Return a TensorShapeProto mangled as a string.
 std::string MangleShape(const tensorflow::TensorShapeProto& shape);
 // Demangle a string mangled with MangleShape.
-tensorflow::Status DemangleShape(absl::string_view str,
+tensorflow::Status DemangleShape(abslx::string_view str,
                                  tensorflow::TensorShapeProto* proto);
 
 // Return a TensorProto mangled as a string.
 std::string MangleTensor(const tensorflow::TensorProto& tensor);
 // Demangle a string mangled with MangleTensor.
-tensorflow::Status DemangleTensor(absl::string_view str,
+tensorflow::Status DemangleTensor(abslx::string_view str,
                                   tensorflow::TensorProto* proto);
 
 // Return a DataType mangled as a string.
 std::string MangleDataType(const tensorflow::DataType& dtype);
 // Demangle a string mangled with MangleDataType.
-tensorflow::Status DemangleDataType(absl::string_view str,
+tensorflow::Status DemangleDataType(abslx::string_view str,
                                     tensorflow::DataType* proto);
 
 }  // namespace mangling_util

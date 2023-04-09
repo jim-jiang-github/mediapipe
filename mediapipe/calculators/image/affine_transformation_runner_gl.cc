@@ -79,8 +79,8 @@ class GlTextureWarpAffineRunner
   GlTextureWarpAffineRunner(std::shared_ptr<GlCalculatorHelper> gl_helper,
                             GpuOrigin::Mode gpu_origin)
       : gl_helper_(gl_helper), gpu_origin_(gpu_origin) {}
-  absl::Status Init() {
-    return gl_helper_->RunInGlContext([this]() -> absl::Status {
+  abslx::Status Init() {
+    return gl_helper_->RunInGlContext([this]() -> abslx::Status {
       const GLint attr_location[kNumAttributes] = {
           kAttribVertex,
           kAttribTexturePosition,
@@ -128,7 +128,7 @@ class GlTextureWarpAffineRunner
 
       // Create program and set parameters.
       auto create_fn = [&](const std::string& vs,
-                           const std::string& fs) -> absl::StatusOr<Program> {
+                           const std::string& fs) -> abslx::StatusOr<Program> {
         GLuint program = 0;
         GlhCreateProgram(vs.c_str(), fs.c_str(), kNumAttributes, &attr_name[0],
                          attr_location, &program);
@@ -141,19 +141,19 @@ class GlTextureWarpAffineRunner
       };
 
       const std::string vert_src =
-          absl::StrCat(mediapipe::kMediaPipeVertexShaderPreamble, kVertShader);
+          abslx::StrCat(mediapipe::kMediaPipeVertexShaderPreamble, kVertShader);
 
-      const std::string frag_src = absl::StrCat(
+      const std::string frag_src = abslx::StrCat(
           mediapipe::kMediaPipeFragmentShaderPreamble, kFragShader);
 
       ASSIGN_OR_RETURN(program_, create_fn(vert_src, frag_src));
 
-      auto create_custom_zero_fn = [&]() -> absl::StatusOr<Program> {
+      auto create_custom_zero_fn = [&]() -> abslx::StatusOr<Program> {
         std::string custom_zero_border_mode_def = R"(
           #define CUSTOM_ZERO_BORDER_MODE
         )";
         const std::string frag_custom_zero_src =
-            absl::StrCat(mediapipe::kMediaPipeFragmentShaderPreamble,
+            abslx::StrCat(mediapipe::kMediaPipeFragmentShaderPreamble,
                          custom_zero_border_mode_def, kFragShader);
         return create_fn(vert_src, frag_custom_zero_src);
       };
@@ -183,18 +183,18 @@ class GlTextureWarpAffineRunner
 
       glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-      return absl::OkStatus();
+      return abslx::OkStatus();
     });
   }
 
-  absl::StatusOr<std::unique_ptr<GpuBuffer>> Run(
+  abslx::StatusOr<std::unique_ptr<GpuBuffer>> Run(
       const GpuBuffer& input, const std::array<float, 16>& matrix,
       const AffineTransformation::Size& size,
       AffineTransformation::BorderMode border_mode) override {
     std::unique_ptr<GpuBuffer> gpu_buffer;
     MP_RETURN_IF_ERROR(
         gl_helper_->RunInGlContext([this, &input, &matrix, &size, &border_mode,
-                                    &gpu_buffer]() -> absl::Status {
+                                    &gpu_buffer]() -> abslx::Status {
           auto input_texture = gl_helper_->CreateSourceTexture(input);
           auto output_texture = gl_helper_->CreateDestinationTexture(
               size.width, size.height, input.format());
@@ -202,13 +202,13 @@ class GlTextureWarpAffineRunner
           MP_RETURN_IF_ERROR(
               RunInternal(input_texture, matrix, border_mode, &output_texture));
           gpu_buffer = output_texture.GetFrame<GpuBuffer>();
-          return absl::OkStatus();
+          return abslx::OkStatus();
         }));
 
     return gpu_buffer;
   }
 
-  absl::Status RunInternal(const GlTexture& texture,
+  abslx::Status RunInternal(const GlTexture& texture,
                            const std::array<float, 16>& matrix,
                            AffineTransformation::BorderMode border_mode,
                            GlTexture* output) {
@@ -307,7 +307,7 @@ class GlTextureWarpAffineRunner
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   ~GlTextureWarpAffineRunner() override {
@@ -341,12 +341,12 @@ class GlTextureWarpAffineRunner
 
 }  // namespace
 
-absl::StatusOr<std::unique_ptr<
+abslx::StatusOr<std::unique_ptr<
     AffineTransformation::Runner<GpuBuffer, std::unique_ptr<GpuBuffer>>>>
 CreateAffineTransformationGlRunner(
     std::shared_ptr<GlCalculatorHelper> gl_helper, GpuOrigin::Mode gpu_origin) {
   auto runner =
-      absl::make_unique<GlTextureWarpAffineRunner>(gl_helper, gpu_origin);
+      abslx::make_unique<GlTextureWarpAffineRunner>(gl_helper, gpu_origin);
   MP_RETURN_IF_ERROR(runner->Init());
   return runner;
 }

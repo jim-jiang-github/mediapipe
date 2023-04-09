@@ -37,7 +37,7 @@ namespace tasks {
 namespace vision {
 namespace {
 
-using ::absl::StatusCode;
+using ::abslx::StatusCode;
 using ::mediapipe::tasks::metadata::ModelMetadataExtractor;
 using ::tflite::ColorSpaceType_RGB;
 using ::tflite::ContentProperties;
@@ -47,7 +47,7 @@ using ::tflite::ImageProperties;
 using ::tflite::TensorMetadata;
 using ::tflite::TensorType;
 
-absl::StatusOr<const ImageProperties*> GetImagePropertiesIfAny(
+abslx::StatusOr<const ImageProperties*> GetImagePropertiesIfAny(
     const TensorMetadata& tensor_metadata) {
   if (tensor_metadata.content() == nullptr ||
       tensor_metadata.content()->content_properties() == nullptr) {
@@ -59,7 +59,7 @@ absl::StatusOr<const ImageProperties*> GetImagePropertiesIfAny(
   if (type != ContentProperties_ImageProperties) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        absl::StrCat(
+        abslx::StrCat(
             "Expected ImageProperties for tensor ",
             tensor_metadata.name() ? tensor_metadata.name()->str() : "#0",
             ", got ", EnumNameContentProperties(type), "."),
@@ -69,14 +69,14 @@ absl::StatusOr<const ImageProperties*> GetImagePropertiesIfAny(
   return tensor_metadata.content()->content_properties_as_ImageProperties();
 }
 
-absl::StatusOr<absl::optional<NormalizationOptions>>
+abslx::StatusOr<abslx::optional<NormalizationOptions>>
 GetNormalizationOptionsIfAny(const TensorMetadata& tensor_metadata) {
   ASSIGN_OR_RETURN(
       const tflite::ProcessUnit* normalization_process_unit,
       ModelMetadataExtractor::FindFirstProcessUnit(
           tensor_metadata, tflite::ProcessUnitOptions_NormalizationOptions));
   if (normalization_process_unit == nullptr) {
-    return {absl::nullopt};
+    return {abslx::nullopt};
   }
   const tflite::NormalizationOptions* tf_normalization_options =
       normalization_process_unit->options_as_NormalizationOptions();
@@ -85,12 +85,12 @@ GetNormalizationOptionsIfAny(const TensorMetadata& tensor_metadata) {
   if (mean_values.size() != std_values.size()) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        absl::StrCat("NormalizationOptions: expected mean and std of same "
+        abslx::StrCat("NormalizationOptions: expected mean and std of same "
                      "dimension, got ",
                      mean_values.size(), " and ", std_values.size(), "."),
         MediaPipeTasksStatus::kMetadataInvalidProcessUnitsError);
   }
-  absl::optional<NormalizationOptions> normalization_options;
+  abslx::optional<NormalizationOptions> normalization_options;
   if (mean_values.size() == 1) {
     normalization_options = NormalizationOptions{
         /* mean_values= */ {mean_values[0], mean_values[0], mean_values[0]},
@@ -104,7 +104,7 @@ GetNormalizationOptionsIfAny(const TensorMetadata& tensor_metadata) {
   } else {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        absl::StrCat("NormalizationOptions: only 1 or 3 mean and std "
+        abslx::StrCat("NormalizationOptions: only 1 or 3 mean and std "
                      "values are supported, got ",
                      mean_values.size(), "."),
         MediaPipeTasksStatus::kMetadataInvalidProcessUnitsError);
@@ -114,7 +114,7 @@ GetNormalizationOptionsIfAny(const TensorMetadata& tensor_metadata) {
 
 }  // namespace
 
-absl::StatusOr<const TensorMetadata*> GetImageTensorMetadataIfAny(
+abslx::StatusOr<const TensorMetadata*> GetImageTensorMetadataIfAny(
     const ModelMetadataExtractor& metadata_extractor, int tensor_index) {
   if (metadata_extractor.GetModelMetadata() == nullptr ||
       metadata_extractor.GetModelMetadata()->subgraph_metadata() == nullptr) {
@@ -138,11 +138,11 @@ absl::StatusOr<const TensorMetadata*> GetImageTensorMetadataIfAny(
   return metadata;
 }
 
-absl::StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
+abslx::StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
     const tflite::Tensor& image_tensor,
     const tflite::TensorMetadata* image_tensor_metadata) {
   const ImageProperties* props = nullptr;
-  absl::optional<NormalizationOptions> normalization_options;
+  abslx::optional<NormalizationOptions> normalization_options;
   if (image_tensor_metadata != nullptr) {
     ASSIGN_OR_RETURN(props, GetImagePropertiesIfAny(*image_tensor_metadata));
     ASSIGN_OR_RETURN(normalization_options,
@@ -159,10 +159,10 @@ absl::StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
   static constexpr TensorType valid_types[] = {tflite::TensorType_UINT8,
                                                tflite::TensorType_FLOAT32};
   TensorType tensor_type = image_tensor.type();
-  if (!absl::c_linear_search(valid_types, tensor_type)) {
+  if (!abslx::c_linear_search(valid_types, tensor_type)) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        absl::StrCat("Type mismatch for input tensor ",
+        abslx::StrCat("Type mismatch for input tensor ",
                      image_tensor.name()->str(),
                      ". Requested one of these types: uint8/float32, got ",
                      tflite::EnumNameTensorType(tensor_type), "."),
@@ -185,7 +185,7 @@ absl::StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
   if (batch != 1 || depth != 3) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        absl::StrCat("The input tensor should have dimensions 1 x height x "
+        abslx::StrCat("The input tensor should have dimensions 1 x height x "
                      "width x 3. Got ",
                      batch, " x ", height, " x ", width, " x ", depth, "."),
         MediaPipeTasksStatus::kInvalidInputTensorDimensionsError);
@@ -198,7 +198,7 @@ absl::StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
   if (tensor_type == tflite::TensorType_FLOAT32) {
     if (!normalization_options.has_value()) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kNotFound,
+          abslx::StatusCode::kNotFound,
           "Input tensor has type float32: it requires specifying "
           "NormalizationOptions metadata to preprocess input images.",
           MediaPipeTasksStatus::kMetadataMissingNormalizationOptionsError);

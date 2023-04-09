@@ -24,8 +24,8 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::base_internal
-    absl::compressed_tuple
+    abslx::base_internal
+    abslx::compressed_tuple
   PUBLIC
 )
 
@@ -37,8 +37,8 @@ absl_cc_test(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::bind_front
-    absl::memory
+    abslx::bind_front
+    abslx::memory
     gmock_main
 )
 
@@ -52,8 +52,8 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::base_internal
-    absl::meta
+    abslx::base_internal
+    abslx::meta
   PUBLIC
 )
 
@@ -65,8 +65,8 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::function_ref
-    absl::memory
-    absl::test_instance_tracker
+    abslx::function_ref
+    abslx::memory
+    abslx::test_instance_tracker
     gmock_main
 )

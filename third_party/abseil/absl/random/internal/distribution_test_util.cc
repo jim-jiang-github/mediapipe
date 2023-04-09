@@ -24,7 +24,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_format.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 namespace {
@@ -37,7 +37,7 @@ inline double fma(double x, double y, double z) { return (x * y) + z; }
 }  // namespace
 
 DistributionMoments ComputeDistributionMoments(
-    absl::Span<const double> data_points) {
+    abslx::Span<const double> data_points) {
   DistributionMoments result;
 
   // Compute m1
@@ -72,7 +72,7 @@ DistributionMoments ComputeDistributionMoments(
 }
 
 std::ostream& operator<<(std::ostream& os, const DistributionMoments& moments) {
-  return os << absl::StrFormat("mean=%f, stddev=%f, skewness=%f, kurtosis=%f",
+  return os << abslx::StrFormat("mean=%f, stddev=%f, skewness=%f, kurtosis=%f",
                                moments.mean, std::sqrt(moments.variance),
                                moments.skewness, moments.kurtosis);
 }
@@ -80,17 +80,17 @@ std::ostream& operator<<(std::ostream& os, const DistributionMoments& moments) {
 double InverseNormalSurvival(double x) {
   // inv_sf(u) = -sqrt(2) * erfinv(2u-1)
   static constexpr double kSqrt2 = 1.4142135623730950488;
-  return -kSqrt2 * absl::random_internal::erfinv(2 * x - 1.0);
+  return -kSqrt2 * abslx::random_internal::erfinv(2 * x - 1.0);
 }
 
-bool Near(absl::string_view msg, double actual, double expected, double bound) {
+bool Near(abslx::string_view msg, double actual, double expected, double bound) {
   assert(bound > 0.0);
   double delta = fabs(expected - actual);
   if (delta < bound) {
     return true;
   }
 
-  std::string formatted = absl::StrCat(
+  std::string formatted = abslx::StrCat(
       msg, " actual=", actual, " expected=", expected, " err=", delta / bound);
   ABSL_RAW_LOG(INFO, "%s", formatted.c_str());
   return false;
@@ -415,4 +415,4 @@ double MaxErrorTolerance(double acceptance_probability) {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

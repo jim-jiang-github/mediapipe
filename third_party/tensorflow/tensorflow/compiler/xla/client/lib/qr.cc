@@ -90,10 +90,10 @@ XlaOp ProductOfElementaryHouseholderReflectors(XlaOp a, XlaOp taus) {
           "reflectors must have m >= n, got shape %s",
           a_shape.ToString());
     }
-    absl::Span<const int64_t> a_batch_dims =
-        absl::MakeConstSpan(a_shape.dimensions().begin(),
+    abslx::Span<const int64_t> a_batch_dims =
+        abslx::MakeConstSpan(a_shape.dimensions().begin(),
                             a_shape.dimensions().begin() + a_shape.rank() - 2);
-    absl::Span<const int64_t> taus_batch_dims = absl::MakeConstSpan(
+    abslx::Span<const int64_t> taus_batch_dims = abslx::MakeConstSpan(
         taus_shape.dimensions().begin(),
         taus_shape.dimensions().begin() + taus_shape.rank() - 1);
     const int64_t k = ShapeUtil::GetDimension(taus_shape, -1);

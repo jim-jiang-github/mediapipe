@@ -41,7 +41,7 @@ zlib_filefunc64_def& ZipWritableMemFile::GetFileFunc64Def() {
   return zlib_filefunc64_def_;
 }
 
-absl::string_view ZipWritableMemFile::GetFileContent() const { return data_; }
+abslx::string_view ZipWritableMemFile::GetFileContent() const { return data_; }
 
 /* static */
 voidpf ZipWritableMemFile::OpenFile(voidpf opaque, const void* filename,

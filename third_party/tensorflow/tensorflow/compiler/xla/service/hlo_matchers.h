@@ -436,7 +436,7 @@ inline ::testing::Matcher<const ::xla::HloInstruction*> Shape(
   return ::testing::MakeMatcher(new ::xla::testing::HloShapeMatcher(shape));
 }
 inline ::testing::Matcher<const ::xla::HloInstruction*> Shape(
-    absl::string_view shape) {
+    abslx::string_view shape) {
   return ::testing::MakeMatcher(
       new ::xla::testing::HloShapeMatcher(ParseShape(shape).ValueOrDie()));
 }
@@ -446,7 +446,7 @@ inline ::testing::Matcher<const ::xla::HloInstruction*> ShapeWithLayout(
       new ::xla::testing::HloShapeAndLayoutMatcher(shape));
 }
 inline ::testing::Matcher<const ::xla::HloInstruction*> ShapeWithLayout(
-    absl::string_view shape, bool minor_to_major_only = false) {
+    abslx::string_view shape, bool minor_to_major_only = false) {
   return ::testing::MakeMatcher(new ::xla::testing::HloShapeAndLayoutMatcher(
       ParseShape(shape).ValueOrDie(), minor_to_major_only));
 }
@@ -459,7 +459,7 @@ inline ::testing::Matcher<const ::xla::HloInstruction*> Sharding(
 }
 // Matcher for Sharding from sharding string
 inline ::testing::Matcher<const ::xla::HloInstruction*> Sharding(
-    absl::string_view sharding) {
+    abslx::string_view sharding) {
   return ::testing::MakeMatcher(new ::xla::testing::HloShardingMatcher(
       ParseSharding(sharding).ValueOrDie()));
 }

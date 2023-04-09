@@ -194,7 +194,7 @@ class CudnnRnnParameters {
         std::to_string(static_cast<int>(rnn_mode_)),
         std::to_string(static_cast<int>(rnn_input_mode_)),
         std::to_string(static_cast<int>(dtype_))};
-    return absl::StrJoin(fields, ", ");
+    return abslx::StrJoin(fields, ", ");
   }
 
  private:
@@ -530,7 +530,7 @@ struct CudnnRnnModelShapes {
 // key.
 struct CudnnRnnConfigHasher {
   uint64 operator()(
-      const std::pair<CudnnRnnModelShapes, absl::optional<AlgorithmDesc>>&
+      const std::pair<CudnnRnnModelShapes, abslx::optional<AlgorithmDesc>>&
           to_hash) const {
     auto& shapes = to_hash.first;
     auto& algo_desc = to_hash.second;
@@ -549,8 +549,8 @@ struct CudnnRnnConfigHasher {
 // table key.
 struct CudnnRnnConfigComparator {
   bool operator()(
-      const std::pair<CudnnRnnModelShapes, absl::optional<AlgorithmDesc>>& lhs,
-      const std::pair<CudnnRnnModelShapes, absl::optional<AlgorithmDesc>>& rhs)
+      const std::pair<CudnnRnnModelShapes, abslx::optional<AlgorithmDesc>>& lhs,
+      const std::pair<CudnnRnnModelShapes, abslx::optional<AlgorithmDesc>>& rhs)
       const {
     return lhs.first.IsCompatibleWith(rhs.first) && lhs.second == rhs.second;
   }
@@ -697,7 +697,7 @@ Status CreateForwardAndBackwardIODescriptors(
     std::unique_ptr<RnnStateTensorDescriptor>* h_state_desc,
     std::unique_ptr<RnnStateTensorDescriptor>* c_state_desc,
     std::unique_ptr<RnnSequenceTensorDescriptor>* output_desc,
-    const absl::Span<const int> seq_lengths, bool time_major) {
+    const abslx::Span<const int> seq_lengths, bool time_major) {
   StreamExecutor* executor = context->op_device_context()->stream()->parent();
   se::dnn::DataType data_type = ToDataType<T>::value;
 
@@ -804,9 +804,9 @@ Status DoForward(OpKernelContext* context, const RnnDescriptor& rnn_desc,
   std::unique_ptr<RnnStateTensorDescriptor> c_state_desc;
   std::unique_ptr<RnnSequenceTensorDescriptor> output_desc;
 
-  absl::Span<const int> seq_lengths;
+  abslx::Span<const int> seq_lengths;
   if (sequence_lengths != nullptr) {
-    seq_lengths = absl::Span<const int>(
+    seq_lengths = abslx::Span<const int>(
         sequence_lengths->template flat<int>().data(), model_shapes.batch_size);
   }
   TF_RETURN_IF_ERROR(CreateForwardAndBackwardIODescriptors<T>(
@@ -887,9 +887,9 @@ Status DoBackward(
   std::unique_ptr<RnnStateTensorDescriptor> c_state_desc;
   std::unique_ptr<RnnSequenceTensorDescriptor> output_desc;
 
-  absl::Span<const int> seq_lengths;
+  abslx::Span<const int> seq_lengths;
   if (sequence_lengths != nullptr) {
-    seq_lengths = absl::Span<const int>(
+    seq_lengths = abslx::Span<const int>(
         sequence_lengths->template flat<int>().data(), model_shapes.batch_size);
   }
   TF_RETURN_IF_ERROR(CreateForwardAndBackwardIODescriptors<T>(
@@ -1115,7 +1115,7 @@ class CudnnRNNKernelCommon : public OpKernel {
   }
 
   using RnnStateCache = gtl::FlatMap<
-      std::pair<CudnnRnnModelShapes, absl::optional<AlgorithmDesc>>,
+      std::pair<CudnnRnnModelShapes, abslx::optional<AlgorithmDesc>>,
       RnnScratchSpace, CudnnRnnConfigHasher, CudnnRnnConfigComparator>;
   // Returns a raw rnn descriptor pointer. The cache owns the rnn descriptor and
   // should outlive the returned pointer.
@@ -1538,7 +1538,7 @@ class CudnnRNNForwardOp<GPUDevice, T> : public CudnnRNNKernelCommon {
 
     if (is_debug_mode_) {
       AlgorithmDesc algo_desc(debug_cudnn_rnn_algo_, debug_use_tensor_ops_,
-                              absl::nullopt);
+                              abslx::nullopt);
       output_algo_config->set_algorithm(algo_desc);
     } else {
       OP_REQUIRES_OK(context,
@@ -2094,7 +2094,7 @@ class CudnnRNNBackwardOpV2<GPUDevice, T>
 
     auto host_reserved_int8 = host_reserved->vec<int8>();
     const AlgorithmDesc algo_desc(host_reserved_int8(0), host_reserved_int8(1),
-                                  absl::nullopt);
+                                  abslx::nullopt);
     algo_config->set_algorithm(algo_desc);
     return OkStatus();
   }

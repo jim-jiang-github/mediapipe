@@ -63,14 +63,14 @@ class BFloat16Propagation : public HloModulePass {
 
   ~BFloat16Propagation() override = default;
 
-  absl::string_view name() const override { return "bfloat16-propagation"; }
+  abslx::string_view name() const override { return "bfloat16-propagation"; }
 
   // Runs the pass on the given module. Returns whether the module was changed
   // (precision reductions were added).
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
   // Returns whether we should avoid changing the precision of inst regardless
   // of the producers and users.
@@ -87,7 +87,7 @@ class BFloat16Propagation : public HloModulePass {
 
   // The set of instructions to consider using bfloat16, computed in the forward
   // pass.
-  absl::flat_hash_set<const HloInstruction*> consider_using_bfloat16_;
+  abslx::flat_hash_set<const HloInstruction*> consider_using_bfloat16_;
 
   // ***************************
   // Functions called and state produced by the backward pass (from root to
@@ -121,12 +121,12 @@ class BFloat16Propagation : public HloModulePass {
 
   // The set of HloInstructions that have been visited in the
   // opportunity-finding pass.
-  absl::flat_hash_set<const HloInstruction*>
+  abslx::flat_hash_set<const HloInstruction*>
       instructions_visited_in_backward_pass_;
 
   // The set of HloComputations that have been visited in the
   // opportunity-finding pass.
-  absl::flat_hash_set<const HloComputation*>
+  abslx::flat_hash_set<const HloComputation*>
       computations_visited_in_backward_pass_;
 
   // ***************************
@@ -137,14 +137,14 @@ class BFloat16Propagation : public HloModulePass {
   // same precision.
   void ResolveInconsistencyOfAliasingBuffers(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads);
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads);
 
   // Resolves inconsistency of aliasing buffers for the given computation, and
   // recursively runs on a while instruction's condition and body until a fixed
   // point is reached.
   bool ResolveInconsistencyOfAliasingBuffersHelper(
       HloComputation* computation,
-      absl::flat_hash_set<const HloComputation*>* visited_computations);
+      abslx::flat_hash_set<const HloComputation*>* visited_computations);
 
   // Makes the parameters of called computations match how they are called by
   // the given HLO.
@@ -161,19 +161,19 @@ class BFloat16Propagation : public HloModulePass {
   // tuple-type output.
   Status ResolveInconsistentFusions(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads);
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads);
 
   // Converts the literals in kConstant HLOs which have their types changed to
   // BF16 by this pass.
   Status ResolveConvertedConstants(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads);
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads);
 
   // Skips no-op conversions (same source and target shapes) that can be
   // produced this pass, i.e., replaces them in their uses with their operands.
   Status SkipNoopConversions(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads);
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads);
 
   // ***************************
   // Functions called and state used by two or more passes.
@@ -201,11 +201,11 @@ class BFloat16Propagation : public HloModulePass {
                                       PrimitiveType target_type);
 
   // The set of F32 HLO values that must be kept in F32.
-  absl::flat_hash_set<const HloValue*> values_that_must_be_kept_as_f32_;
+  abslx::flat_hash_set<const HloValue*> values_that_must_be_kept_as_f32_;
 
   // Mapping from each HloComputation to the number of callers to it in the
   // module. Populated at the beginning of this pass.
-  absl::flat_hash_map<const HloComputation*, int64_t> caller_counts_;
+  abslx::flat_hash_map<const HloComputation*, int64_t> caller_counts_;
 
   // We first store the potential F32-to-BF16 changes to changes_to_bf16_, which
   // are subject to further adjustment, then finally applied to the HLOs. This
@@ -214,7 +214,7 @@ class BFloat16Propagation : public HloModulePass {
   //
   // For each HloInstruction, changes_to_bf16_ stores the affected buffers in
   // the output as a map from in-place pointers to subshapes to shape indices.
-  absl::flat_hash_map<HloInstruction*, absl::flat_hash_map<Shape*, ShapeIndex>>
+  abslx::flat_hash_map<HloInstruction*, abslx::flat_hash_map<Shape*, ShapeIndex>>
       changes_to_bf16_;
 
   // Whether the last processed HLO module has been changed by this pass.

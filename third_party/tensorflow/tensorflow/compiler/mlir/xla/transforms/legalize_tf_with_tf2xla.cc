@@ -581,7 +581,7 @@ LogicalResult Tf2XlaRewriter::LegalizeOp() {
            << "failed to create tf2xla kernel: " << status.ToString();
   }
   // Transfer ownership of the kernel to a local smart pointer.
-  auto op_kernel = absl::WrapUnique(op_kernel_raw);
+  auto op_kernel = abslx::WrapUnique(op_kernel_raw);
 
   std::vector<int> required_constants;
   status = tensorflow::XlaOpRegistry::CompileTimeConstantInputs(

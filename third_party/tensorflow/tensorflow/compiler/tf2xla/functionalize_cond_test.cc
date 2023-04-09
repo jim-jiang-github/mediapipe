@@ -148,7 +148,7 @@ TEST(FunctionalizeCond, DuplicateConstNodes) {
 
   FunctionDefLibrary flib_def_proto = flib_def.ToProto();
   for (const auto& fdef : flib_def_proto.function()) {
-    absl::flat_hash_set<absl::string_view> node_names;
+    abslx::flat_hash_set<abslx::string_view> node_names;
     for (const auto& node : fdef.node_def()) {
       EXPECT_TRUE(node_names.insert(node.name()).second)
           << node.op() << " with duplicate node name '" << node.name()

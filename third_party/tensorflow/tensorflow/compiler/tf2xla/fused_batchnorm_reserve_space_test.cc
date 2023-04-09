@@ -46,11 +46,11 @@ Status GetTestDevice(Session* session, string* test_device) {
   std::vector<DeviceAttributes> devices;
   TF_RETURN_IF_ERROR(session->ListDevices(&devices));
 
-  bool found_cpu = absl::c_any_of(devices, [&](const DeviceAttributes& device) {
+  bool found_cpu = abslx::c_any_of(devices, [&](const DeviceAttributes& device) {
     return device.device_type() == "CPU";
   });
 
-  bool found_gpu = absl::c_any_of(devices, [&](const DeviceAttributes& device) {
+  bool found_gpu = abslx::c_any_of(devices, [&](const DeviceAttributes& device) {
     return device.device_type() == "GPU";
   });
 
@@ -108,8 +108,8 @@ TEST(FusedBatchnormReserveSpaceTest, Test) {
   Output variance =
       Const(root.WithOpName("variance"), Input::Initializer(variance_data));
 
-  string tf_device = absl::StrCat("/device:", test_device, ":0");
-  string xla_device = absl::StrCat("/device:XLA_", test_device, ":0");
+  string tf_device = abslx::StrCat("/device:", test_device, ":0");
+  string xla_device = abslx::StrCat("/device:XLA_", test_device, ":0");
 
   FusedBatchNorm fused_batch_norm_tf(
       root.WithOpName("fused_batch_norm_tf").WithDevice(tf_device), input,

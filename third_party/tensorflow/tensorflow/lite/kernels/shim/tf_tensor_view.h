@@ -47,7 +47,7 @@ class TfTensorView : public TensorView {
 
   // Let the factory implementation use private constructors
   template <typename TfTensorType>
-  friend absl::StatusOr<
+  friend abslx::StatusOr<
       typename MatchConstNess<TfTensorType, TfTensorView>::Type>
   TfTensorViewTemplatizedNew(TfTensorType *wrapped_tensor);
 
@@ -69,12 +69,12 @@ struct TensorViewSubType<const ::tensorflow::Tensor> {
 
 // Specialization of New() factory
 template <>
-absl::StatusOr<TfTensorView> TensorView::New<::tensorflow::Tensor>(
+abslx::StatusOr<TfTensorView> TensorView::New<::tensorflow::Tensor>(
     ::tensorflow::Tensor *wrapped_tensor);
 
 // Specialization of New() factory
 template <>
-absl::StatusOr<const TfTensorView> TensorView::New<const ::tensorflow::Tensor>(
+abslx::StatusOr<const TfTensorView> TensorView::New<const ::tensorflow::Tensor>(
     const ::tensorflow::Tensor *wrapped_tensor);
 
 /////////////////////// Implementation
@@ -90,7 +90,7 @@ TfTensorView::TfTensorView(const ::tensorflow::Tensor *wrapped_tensor,
   for (int dim = 0; dim < wrapped_tensor->shape().dims(); ++dim) {
     shape_data_[dim] = wrapped_tensor->shape().dim_size(dim);
   }
-  shape_ = absl::Span<int>(shape_data_);
+  shape_ = abslx::Span<int>(shape_data_);
 }
 
 }  // namespace shim

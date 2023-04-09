@@ -95,8 +95,8 @@ LogicalResult EvaluateOperation(tensorflow::DeviceBase *cpu_device,
     return failure();
   }
 
-  absl::InlinedVector<tensorflow::Tensor, 4> input_tensors(operands.size());
-  absl::InlinedVector<tensorflow::TensorValue, 4> input_tensor_values(
+  abslx::InlinedVector<tensorflow::Tensor, 4> input_tensors(operands.size());
+  abslx::InlinedVector<tensorflow::TensorValue, 4> input_tensor_values(
       operands.size());
   // For each operand, convert its ElementsAttr to a Tensor and the Tensor will
   // be referenced by a TensorValue. To ensure Tensor/TensorValue have thier
@@ -126,7 +126,7 @@ LogicalResult EvaluateOperation(tensorflow::DeviceBase *cpu_device,
   params.op_kernel = op_kernel.get();
   params.resource_manager = resource_mgr;
 
-  absl::InlinedVector<tensorflow::AllocatorAttributes, 4> output_attrs(
+  abslx::InlinedVector<tensorflow::AllocatorAttributes, 4> output_attrs(
       op_kernel->num_outputs());
   for (auto &attr : output_attrs) attr.set_on_host(true);
   params.output_attr_array = output_attrs.data();

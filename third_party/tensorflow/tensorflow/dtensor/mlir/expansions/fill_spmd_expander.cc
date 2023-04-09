@@ -44,7 +44,7 @@ StatusOr<mlir::Operation*> FillSPMDExpander::ExpandOp(mlir::Operation* op) {
         "Expected the layout for fill's `dims` argument to be fully "
         "replicated.");
   }
-  TF_ASSIGN_OR_RETURN(absl::optional<Layout> output_layout,
+  TF_ASSIGN_OR_RETURN(abslx::optional<Layout> output_layout,
                       ExtractSingleLayoutFromOp(op));
   if (!output_layout.has_value())
     return errors::Internal(

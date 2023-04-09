@@ -38,32 +38,32 @@ class VisibilityFilter {
  public:
   virtual ~VisibilityFilter() = default;
 
-  virtual absl::Status Reset() { return absl::OkStatus(); }
+  virtual abslx::Status Reset() { return abslx::OkStatus(); }
 
-  virtual absl::Status Apply(const LandmarkList& in_landmarks,
-                             const absl::Duration& timestamp,
+  virtual abslx::Status Apply(const LandmarkList& in_landmarks,
+                             const abslx::Duration& timestamp,
                              LandmarkList* out_landmarks) = 0;
 
-  virtual absl::Status Apply(const NormalizedLandmarkList& in_landmarks,
-                             const absl::Duration& timestamp,
+  virtual abslx::Status Apply(const NormalizedLandmarkList& in_landmarks,
+                             const abslx::Duration& timestamp,
                              NormalizedLandmarkList* out_landmarks) = 0;
 };
 
 // Returns visibility as is without smoothing.
 class NoFilter : public VisibilityFilter {
  public:
-  absl::Status Apply(const NormalizedLandmarkList& in_landmarks,
-                     const absl::Duration& timestamp,
+  abslx::Status Apply(const NormalizedLandmarkList& in_landmarks,
+                     const abslx::Duration& timestamp,
                      NormalizedLandmarkList* out_landmarks) override {
     *out_landmarks = in_landmarks;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Apply(const LandmarkList& in_landmarks,
-                     const absl::Duration& timestamp,
+  abslx::Status Apply(const LandmarkList& in_landmarks,
+                     const abslx::Duration& timestamp,
                      LandmarkList* out_landmarks) override {
     *out_landmarks = in_landmarks;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
@@ -72,19 +72,19 @@ class LowPassVisibilityFilter : public VisibilityFilter {
  public:
   LowPassVisibilityFilter(float alpha) : alpha_(alpha) {}
 
-  absl::Status Reset() override {
+  abslx::Status Reset() override {
     visibility_filters_.clear();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Apply(const LandmarkList& in_landmarks,
-                     const absl::Duration& timestamp,
+  abslx::Status Apply(const LandmarkList& in_landmarks,
+                     const abslx::Duration& timestamp,
                      LandmarkList* out_landmarks) override {
     return ApplyImpl<LandmarkList>(in_landmarks, timestamp, out_landmarks);
   }
 
-  absl::Status Apply(const NormalizedLandmarkList& in_landmarks,
-                     const absl::Duration& timestamp,
+  abslx::Status Apply(const NormalizedLandmarkList& in_landmarks,
+                     const abslx::Duration& timestamp,
                      NormalizedLandmarkList* out_landmarks) override {
     return ApplyImpl<NormalizedLandmarkList>(in_landmarks, timestamp,
                                              out_landmarks);
@@ -92,8 +92,8 @@ class LowPassVisibilityFilter : public VisibilityFilter {
 
  private:
   template <class LandmarksType>
-  absl::Status ApplyImpl(const LandmarksType& in_landmarks,
-                         const absl::Duration& timestamp,
+  abslx::Status ApplyImpl(const LandmarksType& in_landmarks,
+                         const abslx::Duration& timestamp,
                          LandmarksType* out_landmarks) {
     // Initializes filters for the first time or after Reset. If initialized
     // then check the size.
@@ -114,7 +114,7 @@ class LowPassVisibilityFilter : public VisibilityFilter {
           visibility_filters_[i].Apply(in_landmark.visibility()));
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   float alpha_;
@@ -154,16 +154,16 @@ class LowPassVisibilityFilter : public VisibilityFilter {
 //
 class VisibilitySmoothingCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   std::unique_ptr<VisibilityFilter> visibility_filter_;
 };
 REGISTER_CALCULATOR(VisibilitySmoothingCalculator);
 
-absl::Status VisibilitySmoothingCalculator::GetContract(
+abslx::Status VisibilitySmoothingCalculator::GetContract(
     CalculatorContract* cc) {
   RET_CHECK(cc->Inputs().HasTag(kNormalizedLandmarksTag) ^
             cc->Inputs().HasTag(kLandmarksTag))
@@ -182,28 +182,28 @@ absl::Status VisibilitySmoothingCalculator::GetContract(
     cc->Outputs().Tag(kFilteredLandmarksTag).Set<LandmarkList>();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status VisibilitySmoothingCalculator::Open(CalculatorContext* cc) {
+abslx::Status VisibilitySmoothingCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
   // Pick visibility filter.
   const auto& options = cc->Options<VisibilitySmoothingCalculatorOptions>();
   if (options.has_no_filter()) {
-    visibility_filter_ = absl::make_unique<NoFilter>();
+    visibility_filter_ = abslx::make_unique<NoFilter>();
   } else if (options.has_low_pass_filter()) {
-    visibility_filter_ = absl::make_unique<LowPassVisibilityFilter>(
+    visibility_filter_ = abslx::make_unique<LowPassVisibilityFilter>(
         options.low_pass_filter().alpha());
   } else {
     RET_CHECK_FAIL()
         << "Visibility filter is either not specified or not supported";
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status VisibilitySmoothingCalculator::Process(CalculatorContext* cc) {
+abslx::Status VisibilitySmoothingCalculator::Process(CalculatorContext* cc) {
   // Check that landmarks are not empty and reset the filter if so.
   // Don't emit an empty packet for this timestamp.
   if ((cc->Inputs().HasTag(kNormalizedLandmarksTag) &&
@@ -211,16 +211,16 @@ absl::Status VisibilitySmoothingCalculator::Process(CalculatorContext* cc) {
       (cc->Inputs().HasTag(kLandmarksTag) &&
        cc->Inputs().Tag(kLandmarksTag).IsEmpty())) {
     MP_RETURN_IF_ERROR(visibility_filter_->Reset());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   const auto& timestamp =
-      absl::Microseconds(cc->InputTimestamp().Microseconds());
+      abslx::Microseconds(cc->InputTimestamp().Microseconds());
 
   if (cc->Inputs().HasTag(kNormalizedLandmarksTag)) {
     const auto& in_landmarks =
         cc->Inputs().Tag(kNormalizedLandmarksTag).Get<NormalizedLandmarkList>();
-    auto out_landmarks = absl::make_unique<NormalizedLandmarkList>();
+    auto out_landmarks = abslx::make_unique<NormalizedLandmarkList>();
     MP_RETURN_IF_ERROR(visibility_filter_->Apply(in_landmarks, timestamp,
                                                  out_landmarks.get()));
     cc->Outputs()
@@ -229,7 +229,7 @@ absl::Status VisibilitySmoothingCalculator::Process(CalculatorContext* cc) {
   } else {
     const auto& in_landmarks =
         cc->Inputs().Tag(kLandmarksTag).Get<LandmarkList>();
-    auto out_landmarks = absl::make_unique<LandmarkList>();
+    auto out_landmarks = abslx::make_unique<LandmarkList>();
     MP_RETURN_IF_ERROR(visibility_filter_->Apply(in_landmarks, timestamp,
                                                  out_landmarks.get()));
     cc->Outputs()
@@ -237,7 +237,7 @@ absl::Status VisibilitySmoothingCalculator::Process(CalculatorContext* cc) {
         .Add(out_landmarks.release(), cc->InputTimestamp());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

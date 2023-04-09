@@ -163,9 +163,9 @@ class Node {
       std::list<std::pair<std::shared_ptr<Node>, std::shared_ptr<Node>>>;
   using ModelParameters =
       std::vector<std::pair<string, std::shared_ptr<Parameter>>>;
-  using NodeValues = absl::flat_hash_map<string, double>;
+  using NodeValues = abslx::flat_hash_map<string, double>;
   using ParameterGradients =
-      absl::flat_hash_map<std::pair<string, string>, double>;
+      abslx::flat_hash_map<std::pair<string, string>, double>;
 
   explicit Node(Args args)
       : id_(args.id),
@@ -486,7 +486,7 @@ class Node {
 
   // Collects buffer parameters of this node that should be upsized.
   void CollectBufferParametersToUpsize(
-      absl::flat_hash_map<Node*, Parameter*>& node_parameters);
+      abslx::flat_hash_map<Node*, Parameter*>& node_parameters);
 
  protected:
   // Used for (incrementally) recording metrics. The class is thread-safe.
@@ -633,7 +633,7 @@ class Node {
       TF_SHARED_LOCKS_REQUIRED(mu_);
 
   // Build up debug string for the node and store in the debug strings map.
-  void DebugStringHelper(absl::flat_hash_map<string, string>* debug_strings)
+  void DebugStringHelper(abslx::flat_hash_map<string, string>* debug_strings)
       const TF_SHARED_LOCKS_REQUIRED(mu_);
 
   // Copy the node and add the (input, copy) pairs to the NodePairList.
@@ -689,7 +689,7 @@ class Node {
   std::atomic<int64_t> processing_time_;
   std::atomic<bool> record_metrics_;
   Metrics metrics_;
-  absl::flat_hash_map<string, std::shared_ptr<Parameter>> parameters_
+  abslx::flat_hash_map<string, std::shared_ptr<Parameter>> parameters_
       TF_GUARDED_BY(mu_);
 
   // Statistic of inputs processing time history.
@@ -877,7 +877,7 @@ class Model {
 
   // Collects buffer parameters of all nodes in the model that should be
   // upsized.
-  absl::flat_hash_map<Node*, Parameter*> CollectBufferParametersToUpsize(
+  abslx::flat_hash_map<Node*, Parameter*> CollectBufferParametersToUpsize(
       std::shared_ptr<Node> snapshot);
 
   // Flushes metrics recorded by the model.
@@ -975,7 +975,7 @@ class Model {
       nullptr;
   // Time use for rate limitting the recomputation of human-readable string
   // represention of the model.
-  absl::Time cache_until_ = absl::InfinitePast();
+  abslx::Time cache_until_ = abslx::InfinitePast();
   // Cached result of the `DebugString()` invocation used to implement rate
   // limitting of the computation.
   std::string cached_debug_string_ = "";
@@ -1048,7 +1048,7 @@ class ModelTiming {
   std::shared_ptr<Node> root_;
 
   // Holds a mapping from node to its timing node.
-  absl::flat_hash_map<const Node*, NodeTiming> timing_nodes_;
+  abslx::flat_hash_map<const Node*, NodeTiming> timing_nodes_;
 };
 
 }  // namespace model

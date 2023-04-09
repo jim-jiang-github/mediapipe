@@ -263,7 +263,7 @@ void LogConvAutotuneResults(se::dnn::ConvolutionKind kind,
                             const se::dnn::BatchDescriptor& output_desc,
                             const se::dnn::ConvolutionDescriptor& conv_desc,
                             se::StreamExecutor* stream_exec,
-                            absl::Span<const AutotuneResult> results);
+                            abslx::Span<const AutotuneResult> results);
 
 // Logs fused convolution results to customized back-storage.
 void LogFusedConvForwardAutotuneResults(
@@ -275,7 +275,7 @@ void LogFusedConvForwardAutotuneResults(
     const se::dnn::BatchDescriptor& output_desc,
     const se::dnn::ConvolutionDescriptor& conv_desc, double conv_scale,
     double side_value_scale, se::dnn::ActivationMode activation_mode,
-    se::StreamExecutor* stream_exec, absl::Span<const AutotuneResult> results);
+    se::StreamExecutor* stream_exec, abslx::Span<const AutotuneResult> results);
 
 // Autotuning map entry for cuDNN-frontend-capable APIs.
 //
@@ -299,7 +299,7 @@ class AutotuneEntry {
   // Initialize from config data, without pre-cached runners, such as when
   // loading AoT autotuning maps.
   AutotuneEntry(se::dnn::AlgorithmDesc primary,
-                absl::optional<se::dnn::AlgorithmDesc> no_scratch_fallback)
+                abslx::optional<se::dnn::AlgorithmDesc> no_scratch_fallback)
       : AutotuneEntry(std::make_shared<se::dnn::LazyOpRunner<Op>>(primary),
                       no_scratch_fallback
                           ? std::make_shared<se::dnn::LazyOpRunner<Op>>(
@@ -380,7 +380,7 @@ class AutotuneEntry {
     if (is_algorithm_config_) {
       return algorithm_config_.ToString();
     }
-    return absl::StrCat("{", op_runners_.primary->ToString(), ", ",
+    return abslx::StrCat("{", op_runners_.primary->ToString(), ", ",
                         (op_runners_.no_scratch_fallback
                              ? op_runners_.no_scratch_fallback->ToString()
                              : "(op_runners have no fallback)"),
@@ -388,7 +388,7 @@ class AutotuneEntry {
   }
 
  private:
-  // NVCC is broken, so we can't use absl::variant here.  Just fake it with a
+  // NVCC is broken, so we can't use abslx::variant here.  Just fake it with a
   // bool and both fields.
   bool is_algorithm_config_;
   se::dnn::AlgorithmConfig algorithm_config_;
@@ -397,14 +397,14 @@ class AutotuneEntry {
 
 namespace internal {
 StatusOr<std::tuple<int, int>> BestCudnnConvAlgorithmIndices(
-    absl::Span<const AutotuneResult> results);
+    abslx::Span<const AutotuneResult> results);
 }  // namespace internal
 
 // Returns the best algorithms for the config, one is the fastest, the other is
 // other is fastest with 0 scratch space. Unsuccessful autotuning results are
 // allowed and ignored.
 StatusOr<se::dnn::AlgorithmConfig> BestCudnnConvAlgorithm(
-    absl::Span<const AutotuneResult> results);
+    abslx::Span<const AutotuneResult> results);
 
 // Explicitly-instantiated with ConvOp and FusedConvOp.
 //
@@ -412,7 +412,7 @@ StatusOr<se::dnn::AlgorithmConfig> BestCudnnConvAlgorithm(
 // headers is forbidden.
 template <typename Op>
 StatusOr<AutotuneEntry<Op>> BestCudnnConvAlgorithm(
-    absl::Span<const AutotuneResult> results,
+    abslx::Span<const AutotuneResult> results,
     std::vector<
         std::unique_ptr<const se::dnn::OpRunner<typename Op::Signature>>>
         runners);

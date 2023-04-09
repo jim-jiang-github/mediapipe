@@ -301,7 +301,7 @@ class GpuExecutor : public internal::StreamExecutorInterface {
   }
 
   Stream* FindAllocatedStream(void* gpu_stream) override {
-    absl::MutexLock lock(&alive_gpu_streams_mu_);
+    abslx::MutexLock lock(&alive_gpu_streams_mu_);
     auto it = alive_gpu_streams_.find(gpu_stream);
     if (it == alive_gpu_streams_.end()) {
       return nullptr;
@@ -315,16 +315,16 @@ class GpuExecutor : public internal::StreamExecutorInterface {
   // looking for "foo.ptx" will check to see if "foo.ptx.cc30.ptx" is present if
   // we're on a compute capability 3.0 machine.
   // (supported on CUDA only)
-  bool FindOnDiskForComputeCapability(absl::string_view filename,
-                                      absl::string_view canonical_suffix,
+  bool FindOnDiskForComputeCapability(abslx::string_view filename,
+                                      abslx::string_view canonical_suffix,
                                       std::string* found_filename) const;
 
   // Attempts to find a more specific version of the file indicated by
   // filename by looking for AMDGPU ISA-specific suffixed versions.
   // (supported on ROCm only)
 
-  bool FindOnDiskForISAVersion(absl::string_view filename,
-                               absl::string_view canonical_suffix,
+  bool FindOnDiskForISAVersion(abslx::string_view filename,
+                               abslx::string_view canonical_suffix,
                                std::string* found_filename) const;
 
   // Host callback landing routine invoked by CUDA.
@@ -360,7 +360,7 @@ class GpuExecutor : public internal::StreamExecutorInterface {
       TF_EXCLUSIVE_LOCKS_REQUIRED(in_memory_modules_mu_);
 
   // Guards the on-disk-module mapping.
-  absl::Mutex disk_modules_mu_;
+  abslx::Mutex disk_modules_mu_;
 
   // Mapping from filename to GPUModuleHandle, if it was already retrieved.
   // Multiple GPUFunctionHandle are usually obtained from a single
@@ -370,16 +370,16 @@ class GpuExecutor : public internal::StreamExecutorInterface {
       TF_GUARDED_BY(disk_modules_mu_);
 
   // Guards the in-memory-module mapping.
-  absl::Mutex in_memory_modules_mu_;
+  abslx::Mutex in_memory_modules_mu_;
 
   std::map<const char*, GpuModuleHandle> in_memory_modules_
       TF_GUARDED_BY(in_memory_modules_mu_);
 
-  absl::Mutex shared_constants_mu_;
+  abslx::Mutex shared_constants_mu_;
   // On-device constants that can be shared between multiple executables. A
   // pointer for a given constant will expire when no executables require use
   // of that constant anymore.
-  std::map<const absl::uint128, std::weak_ptr<DeviceMemoryBase>>
+  std::map<const abslx::uint128, std::weak_ptr<DeviceMemoryBase>>
       shared_constants_ ABSL_GUARDED_BY(shared_constants_mu_);
 
   // Kernel -> loaded GPU binary. Many kernels may load the same binary.
@@ -390,7 +390,7 @@ class GpuExecutor : public internal::StreamExecutorInterface {
       gpu_binary_to_module_ TF_GUARDED_BY(in_memory_modules_mu_);
 
   // Guards the launched kernel set.
-  absl::Mutex launched_kernels_mu_;
+  abslx::Mutex launched_kernels_mu_;
 
   // Keeps track of the set of launched kernels. Currently used to suppress the
   // occupancy check on subsequent launches.
@@ -423,10 +423,10 @@ class GpuExecutor : public internal::StreamExecutorInterface {
   // Type erased XLA specific state attached to GpuExecutor.
   Object xla_state_;
 
-  absl::Mutex alive_gpu_streams_mu_;
+  abslx::Mutex alive_gpu_streams_mu_;
 
   // Lookup map for alive streams, from raw stream pointers.
-  absl::flat_hash_map<void*, Stream*> alive_gpu_streams_
+  abslx::flat_hash_map<void*, Stream*> alive_gpu_streams_
       TF_GUARDED_BY(alive_gpu_streams_mu_);
 
   SE_DISALLOW_COPY_AND_ASSIGN(GpuExecutor);

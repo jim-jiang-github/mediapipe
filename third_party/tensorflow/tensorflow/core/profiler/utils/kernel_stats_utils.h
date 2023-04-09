@@ -27,17 +27,17 @@ namespace tensorflow {
 namespace profiler {
 
 // Populates kernel launch information from a kKernelDetails XStat.
-void ParseKernelLaunchParams(absl::string_view xstat_kernel_details,
+void ParseKernelLaunchParams(abslx::string_view xstat_kernel_details,
                              KernelReport* kernel);
 
 // Returns true if kernel uses TensorCores.
-bool IsKernelUsingTensorCore(absl::string_view kernel_name);
+bool IsKernelUsingTensorCore(abslx::string_view kernel_name);
 
 // Returns true if operation is eligible to use TensorCores.
-bool IsOpTensorCoreEligible(absl::string_view tf_op_name);
+bool IsOpTensorCoreEligible(abslx::string_view tf_op_name);
 
 // Returns true if Einsum equation is eligible to use TensorCores.
-bool IsEinsumTensorCoreEligible(absl::string_view equation);
+bool IsEinsumTensorCoreEligible(abslx::string_view equation);
 
 // Less than comparator for Kernel Reports.
 struct KernelReportLessThanComparator {
@@ -89,12 +89,12 @@ struct KernelKeyWrap {
 
 struct KernelHash {
   size_t operator()(const KernelReport& key) const {
-    return absl::Hash<KernelKeyWrap>()(KernelKeyWrap{&key});
+    return abslx::Hash<KernelKeyWrap>()(KernelKeyWrap{&key});
   }
 };
 
 using KernelReportMap =
-    absl::flat_hash_map<KernelReport, KernelReportValue, KernelHash,
+    abslx::flat_hash_map<KernelReport, KernelReportValue, KernelHash,
                         KernelReportEqualToComparator>;
 
 // Copies the top kernel reports with long kernel duration into the given
@@ -123,7 +123,7 @@ struct OpLevelKernelStats {
 };
 
 using KernelStatsByOpName =
-    absl::flat_hash_map<absl::string_view, OpLevelKernelStats>;
+    abslx::flat_hash_map<abslx::string_view, OpLevelKernelStats>;
 
 // Groups KernelReport in <kernel_stats_db> by tensorflow operation name.
 KernelStatsByOpName GroupKernelReportsByOpName(

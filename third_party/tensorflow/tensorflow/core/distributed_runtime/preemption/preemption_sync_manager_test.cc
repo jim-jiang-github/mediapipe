@@ -56,7 +56,7 @@ class FakePreemptionNotifier : public PreemptionNotifier {
         errors::Cancelled("~FakePreemptionNotifier() was called."));
   }
 
-  void AnnounceDeath(absl::Time death_time) {
+  void AnnounceDeath(abslx::Time death_time) {
     LOG(WARNING) << "Received preemption notice with death time: "
                  << death_time;
     NotifyRegisteredListeners(death_time);
@@ -94,7 +94,7 @@ class PreemptionSyncManagerTest : public ::testing::Test {
   }
 
   // `to_task1` toggles which of the two tasks receives preemption notice.
-  void SendPreemptionNotice(absl::Time death_time = absl::Now(),
+  void SendPreemptionNotice(abslx::Time death_time = abslx::Now(),
                             bool to_task1 = true) {
     if (to_task1) {
       preempt_notifier_->AnnounceDeath(death_time);
@@ -104,7 +104,7 @@ class PreemptionSyncManagerTest : public ::testing::Test {
     // Block main thread for a short while to allow preemption sync manager to
     // process the notice.
     Env::Default()->SleepForMicroseconds(
-        absl::ToInt64Microseconds(absl::Seconds(1)));
+        abslx::ToInt64Microseconds(abslx::Seconds(1)));
   }
 
   // Report to coordiation service that task two is unhealthy.
@@ -133,7 +133,7 @@ class PreemptionSyncManagerTest : public ::testing::Test {
     coord_rpc_service_ = std::make_unique<GrpcCoordinationServiceImpl>(
         coord_compute_pool_.get(), &builder);
     grpc_server_ = builder.BuildAndStart();
-    coord_rpc_thread_ = absl::WrapUnique(Env::Default()->StartThread(
+    coord_rpc_thread_ = abslx::WrapUnique(Env::Default()->StartThread(
         /*thread_options=*/{}, /*name=*/"CoordinationServiceHandleRPCsLoop",
         [service = coord_rpc_service_.get()]() { service->HandleRPCsLoop(); }));
   }
@@ -155,10 +155,10 @@ class PreemptionSyncManagerTest : public ::testing::Test {
   }
   void InitializeAndConnectCoordinationAgents() {
     std::unique_ptr<CoordinationClient> coord_client =
-        absl::WrapUnique(NewGrpcCoordinationClient(
+        abslx::WrapUnique(NewGrpcCoordinationClient(
             grpc_server_->InProcessChannel(::grpc::ChannelArguments())));
     std::unique_ptr<CoordinationClient> coord_client2 =
-        absl::WrapUnique(NewGrpcCoordinationClient(
+        abslx::WrapUnique(NewGrpcCoordinationClient(
             grpc_server_->InProcessChannel(::grpc::ChannelArguments())));
     auto error_fn = [](const Status& status) {
       LOG(ERROR) << "Coordination service agent in error status: " << status;
@@ -219,7 +219,7 @@ TEST_F(PreemptionSyncManagerTest, DelayedPreemption_NoSyncPointYet) {
   EXPECT_FALSE(preempt_sync_mgr_->ReachedSyncPoint(step_counter++));
   EXPECT_FALSE(preempt_sync_mgr_->ReachedSyncPoint(step_counter++));
   // Send notice about scheduled preemption in an hour.
-  SendPreemptionNotice(absl::Now() + absl::Hours(1));
+  SendPreemptionNotice(abslx::Now() + abslx::Hours(1));
 
   // Protocol didn't trigger yet, so there should be no sync point.
   EXPECT_FALSE(preempt_sync_mgr_->ReachedSyncPoint(step_counter++));
@@ -282,7 +282,7 @@ TEST_F(PreemptionSyncManagerTest, PreemptFastTask) {
   EXPECT_FALSE(preempt_sync_mgr2_->ReachedSyncPoint(step_counter2++));
   EXPECT_FALSE(preempt_sync_mgr2_->ReachedSyncPoint(step_counter2++));
   EXPECT_FALSE(preempt_sync_mgr2_->ReachedSyncPoint(step_counter2++));
-  SendPreemptionNotice(absl::Now(), /*=to_task1=*/false);
+  SendPreemptionNotice(abslx::Now(), /*=to_task1=*/false);
 
   // Sync point should be set at call #4.
   EXPECT_FALSE(preempt_sync_mgr_->ReachedSyncPoint(step_counter0++));

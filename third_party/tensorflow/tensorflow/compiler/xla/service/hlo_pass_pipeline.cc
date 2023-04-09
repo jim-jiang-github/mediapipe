@@ -124,8 +124,8 @@ void SetInstructionMetadata(HloModuleGroup& module_group) {
 
 template <typename HloT>
 Status HloPassPipeline::RunInvariantCheckers(
-    HloT* hlo, absl::string_view after_pass_name,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    HloT* hlo, abslx::string_view after_pass_name,
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   for (auto& invariant_checker : invariant_checkers_) {
     VLOG(1) << "    Invariant checker " << invariant_checker->name();
     StatusOr<bool> changed_status =
@@ -136,7 +136,7 @@ Status HloPassPipeline::RunInvariantCheckers(
       XLA_VLOG_LINES(2, hlo->ToString());
       return tensorflow::errors::CreateWithUpdatedMessage(
           changed_status.status(),
-          absl::StrCat(changed_status.status().error_message(),
+          abslx::StrCat(changed_status.status().error_message(),
                        "\n\nFailed after ", after_pass_name));
     }
     TF_RET_CHECK(!changed_status.ValueOrDie())
@@ -148,13 +148,13 @@ Status HloPassPipeline::RunInvariantCheckers(
 template <typename HloT>
 StatusOr<bool> HloPassPipeline::RunPassesInternal(
     HloT* hlo, const DebugOptions& debug_options,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   auto passes = GetEnabledPasses(debug_options);
   // Copy string by value since debug options could get clobbered in an hlo
   // module group pass.
   std::string dump_regex = debug_options.xla_dump_hlo_pass_re();
-  static constexpr absl::string_view kPipelineStart = "pipeline-start";
-  static constexpr absl::string_view kPipelineEnd = "pipeline-end";
+  static constexpr abslx::string_view kPipelineStart = "pipeline-start";
+  static constexpr abslx::string_view kPipelineEnd = "pipeline-end";
   std::string pipeline_name = std::string(name());
 
   TF_RETURN_IF_ERROR(RunInvariantCheckers(hlo, kPipelineStart));
@@ -172,10 +172,10 @@ StatusOr<bool> HloPassPipeline::RunPassesInternal(
   bool changed = false;
   for (int i = 0; i < passes.size(); i++) {
     HloPassInterface* pass = passes[i];
-    XLA_SCOPED_LOGGING_TIMER(absl::StrCat("HLO pass: ", pass->name()));
+    XLA_SCOPED_LOGGING_TIMER(abslx::StrCat("HLO pass: ", pass->name()));
     std::string pass_name = std::string(pass->name());
     VLOG(1) << "  HLO pass " << pass_name;
-    VLOG(2) << "  Module hash " << absl::HashOf(*hlo);
+    VLOG(2) << "  Module hash " << abslx::HashOf(*hlo);
     if (!pass->IsPassPipeline()) {
       compilation_stats_->StartPass(pass_name);
     }
@@ -210,22 +210,22 @@ std::vector<HloPassInterface*> HloPassPipeline::GetEnabledPasses(
     return {};
   }
 
-  absl::flat_hash_set<std::string> disabled_pass_names(
+  abslx::flat_hash_set<std::string> disabled_pass_names(
       debug_options.xla_disable_hlo_passes().begin(),
       debug_options.xla_disable_hlo_passes().end());
 
-  absl::flat_hash_set<std::string> enabled_pass_names(
+  abslx::flat_hash_set<std::string> enabled_pass_names(
       debug_options.xla_enable_hlo_passes_only().begin(),
       debug_options.xla_enable_hlo_passes_only().end());
 
   if (!disabled_pass_names.empty()) {
     VLOG(1) << "Passes disabled by --xla_disable_hlo_passes: "
-            << absl::StrJoin(disabled_pass_names, ", ");
+            << abslx::StrJoin(disabled_pass_names, ", ");
   }
 
   if (!enabled_pass_names.empty()) {
     VLOG(1) << "Passes enabled by --xla_enable_hlo_passes_only: "
-            << absl::StrJoin(enabled_pass_names, ", ");
+            << abslx::StrJoin(enabled_pass_names, ", ");
   }
 
   CHECK(disabled_pass_names.empty() || enabled_pass_names.empty());
@@ -248,8 +248,8 @@ std::vector<HloPassInterface*> HloPassPipeline::GetEnabledPasses(
 }
 
 void HloPassPipeline::MaybeDumpHloAndSaveFilenames(
-    HloModule& module, absl::string_view after_pass_name,
-    absl::string_view before_pass_name) {
+    HloModule& module, abslx::string_view after_pass_name,
+    abslx::string_view before_pass_name) {
   for (const std::string& filename : DumpHloModuleBetweenPassesIfEnabled(
            name(), before_pass_name, after_pass_name, module)) {
     Status status = module.metadata()->add_current_pass_dump_filename(filename);
@@ -260,8 +260,8 @@ void HloPassPipeline::MaybeDumpHloAndSaveFilenames(
 }
 
 void HloPassPipeline::MaybeDumpHloAndSaveFilenames(
-    HloModuleGroup& module_group, absl::string_view after_pass_name,
-    absl::string_view before_pass_name) {
+    HloModuleGroup& module_group, abslx::string_view after_pass_name,
+    abslx::string_view before_pass_name) {
   for (HloModule* module : module_group.modules()) {
     MaybeDumpHloAndSaveFilenames(*module, after_pass_name, before_pass_name);
   }
@@ -269,7 +269,7 @@ void HloPassPipeline::MaybeDumpHloAndSaveFilenames(
 
 StatusOr<bool> HloPassPipeline::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   run_called_ = true;
 
   VLOG(1) << "Running HLO pass pipeline on module " << module->name() << ": "
@@ -281,7 +281,7 @@ StatusOr<bool> HloPassPipeline::Run(
 
 StatusOr<bool> HloPassPipeline::RunOnModuleGroup(
     HloModuleGroup* module_group,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   run_called_ = true;
 
   VLOG(1) << "Running HLO pass pipeline on module group "

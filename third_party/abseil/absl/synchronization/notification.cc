@@ -21,7 +21,7 @@
 #include "absl/synchronization/mutex.h"
 #include "absl/time/time.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 void Notification::Notify() {
@@ -54,7 +54,7 @@ void Notification::WaitForNotification() const {
 }
 
 bool Notification::WaitForNotificationWithTimeout(
-    absl::Duration timeout) const {
+    abslx::Duration timeout) const {
   bool notified = HasBeenNotifiedInternal(&this->notified_yet_);
   if (!notified) {
     notified = this->mutex_.LockWhenWithTimeout(
@@ -64,7 +64,7 @@ bool Notification::WaitForNotificationWithTimeout(
   return notified;
 }
 
-bool Notification::WaitForNotificationWithDeadline(absl::Time deadline) const {
+bool Notification::WaitForNotificationWithDeadline(abslx::Time deadline) const {
   bool notified = HasBeenNotifiedInternal(&this->notified_yet_);
   if (!notified) {
     notified = this->mutex_.LockWhenWithDeadline(
@@ -75,4 +75,4 @@ bool Notification::WaitForNotificationWithDeadline(absl::Time deadline) const {
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

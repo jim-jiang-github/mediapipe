@@ -60,7 +60,7 @@ Status GetTfrtExecutionContext(OpKernelContext* c,
   const Tensor* tensor;
   TF_RETURN_IF_ERROR(c->input("tfrt_exec_ctx", &tensor));
   int64_t exec_ctx_intptr = *reinterpret_cast<const int64_t*>(tensor->data());
-  *exec_ctx = absl::bit_cast<const tfrt::ExecutionContext*>(exec_ctx_intptr);
+  *exec_ctx = abslx::bit_cast<const tfrt::ExecutionContext*>(exec_ctx_intptr);
   return OkStatus();
 }
 
@@ -201,7 +201,7 @@ class FallbackBatchResource : public tensorflow::serving::BatchResourceBase {
         bef_func_(std::move(bef_func)) {}
 
   void ProcessFuncBatchImpl(
-      const BatchTask& last_task, absl::Span<const Tensor> inputs,
+      const BatchTask& last_task, abslx::Span<const Tensor> inputs,
       std::vector<Tensor>* combined_outputs,
       std::function<void(const Status&)> done) const override;
 
@@ -268,8 +268,8 @@ class BatchFunctionFallbackKernel : public AsyncOpKernel {
     int32 max_in_flight_batches_limit = kMaxInflightBatches;
     int32 batches_to_average_over = kBatchesToAverageOver;
   };
-  absl::optional<AdaptiveBatchSchedulerOptions>
-      adaptive_batch_scheduler_options_ = absl::nullopt;
+  abslx::optional<AdaptiveBatchSchedulerOptions>
+      adaptive_batch_scheduler_options_ = abslx::nullopt;
 };
 
 BatchFunctionFallbackKernel::BatchFunctionFallbackKernel(
@@ -289,7 +289,7 @@ BatchFunctionFallbackKernel::BatchFunctionFallbackKernel(
     int64_t bef_func_intptr;
     OP_REQUIRES_OK(c, c->GetAttr("tfrt_bef_func", &bef_func_intptr));
     bef_func_ =
-        tfrt::FormRef(absl::bit_cast<const tfrt::Function*>(bef_func_intptr));
+        tfrt::FormRef(abslx::bit_cast<const tfrt::Function*>(bef_func_intptr));
   }
 
   DCHECK(!shared_name_.empty());
@@ -329,7 +329,7 @@ void BatchFunctionFallbackKernel::ComputeAsync(OpKernelContext* c,
                                                DoneCallback done) {
   FallbackBatchResource* br;
   std::function<Status(FallbackBatchResource**)> creator;
-  if (adaptive_batch_scheduler_options_ != absl::nullopt) {
+  if (adaptive_batch_scheduler_options_ != abslx::nullopt) {
     creator = [this, c](FallbackBatchResource** r) {
       serving::AdaptiveSharedBatchScheduler<
           serving::BatchResourceBase::BatchTask>::Options
@@ -532,7 +532,7 @@ StatusOr<RCReference<tfrt::RequestContext>> SetUpRequestContext(
 }
 
 void FallbackBatchResource::ProcessFuncBatchImpl(
-    const BatchTask& last_task, absl::Span<const Tensor> inputs,
+    const BatchTask& last_task, abslx::Span<const Tensor> inputs,
     std::vector<Tensor>* combined_outputs,
     std::function<void(const Status&)> done) const {
   llvm::SmallVector<AsyncValue*, 8> arguments;

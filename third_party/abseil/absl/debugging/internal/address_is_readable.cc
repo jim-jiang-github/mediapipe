@@ -19,7 +19,7 @@
 
 #if !defined(__linux__) || defined(__ANDROID__)
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace debugging_internal {
 
@@ -28,7 +28,7 @@ bool AddressIsReadable(const void* /* addr */) { return true; }
 
 }  // namespace debugging_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #else
 
@@ -43,7 +43,7 @@ ABSL_NAMESPACE_END
 #include "absl/base/internal/errno_saver.h"
 #include "absl/base/internal/raw_logging.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace debugging_internal {
 
@@ -70,7 +70,7 @@ static void Unpack(uint64_t x, int *pid, int *read_fd, int *write_fd) {
 static std::atomic<uint64_t> pid_and_fds;  // initially 0, an invalid pid.
 
 bool AddressIsReadable(const void *addr) {
-  absl::base_internal::ErrnoSaver errno_saver;
+  abslx::base_internal::ErrnoSaver errno_saver;
   // We test whether a byte is readable by using write().  Normally, this would
   // be done via a cached file descriptor to /dev/null, but linux fails to
   // check whether the byte is readable when the destination is /dev/null, so
@@ -134,6 +134,6 @@ bool AddressIsReadable(const void *addr) {
 
 }  // namespace debugging_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif

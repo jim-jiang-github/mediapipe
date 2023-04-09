@@ -43,7 +43,7 @@ Status Mul(AbstractContext* ctx, AbstractTensorHandle* const x,
   TF_RETURN_IF_ERROR(op_ptr->AddInput(x));
   TF_RETURN_IF_ERROR(op_ptr->AddInput(y));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(z, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(z, 1), &num_retvals);
 }
 
 // Op: Conj()
@@ -72,7 +72,7 @@ Status Conj(AbstractContext* ctx, AbstractTensorHandle* const input,
   TF_RETURN_IF_ERROR(MaybeSetOpName(op_ptr.get(), name));
   TF_RETURN_IF_ERROR(op_ptr->AddInput(input));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(output, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(output, 1), &num_retvals);
 }
 
 // Op: AddV2()
@@ -91,7 +91,7 @@ Status AddV2(AbstractContext* ctx, AbstractTensorHandle* const x,
   TF_RETURN_IF_ERROR(op_ptr->AddInput(x));
   TF_RETURN_IF_ERROR(op_ptr->AddInput(y));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(z, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(z, 1), &num_retvals);
 }
 
 // Op: MatMul()
@@ -117,7 +117,7 @@ Status MatMul(AbstractContext* ctx, AbstractTensorHandle* const a,
   TF_RETURN_IF_ERROR(op_ptr->SetAttrBool("transpose_a", transpose_a));
   TF_RETURN_IF_ERROR(op_ptr->SetAttrBool("transpose_b", transpose_b));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(product, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(product, 1), &num_retvals);
 }
 
 // Op: Neg()
@@ -133,7 +133,7 @@ Status Neg(AbstractContext* ctx, AbstractTensorHandle* const x,
   TF_RETURN_IF_ERROR(MaybeSetOpName(op_ptr.get(), name));
   TF_RETURN_IF_ERROR(op_ptr->AddInput(x));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(y, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(y, 1), &num_retvals);
 }
 
 // Op: Sum()
@@ -155,7 +155,7 @@ Status Sum(AbstractContext* ctx, AbstractTensorHandle* const input,
   TF_RETURN_IF_ERROR(op_ptr->AddInput(reduction_indices));
   TF_RETURN_IF_ERROR(op_ptr->SetAttrBool("keep_dims", keep_dims));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(output, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(output, 1), &num_retvals);
 }
 
 // Op: Sub()
@@ -173,7 +173,7 @@ Status Sub(AbstractContext* ctx, AbstractTensorHandle* const x,
   TF_RETURN_IF_ERROR(op_ptr->AddInput(x));
   TF_RETURN_IF_ERROR(op_ptr->AddInput(y));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(z, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(z, 1), &num_retvals);
 }
 
 // Op: Div()
@@ -191,7 +191,7 @@ Status Div(AbstractContext* ctx, AbstractTensorHandle* const x,
   TF_RETURN_IF_ERROR(op_ptr->AddInput(x));
   TF_RETURN_IF_ERROR(op_ptr->AddInput(y));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(z, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(z, 1), &num_retvals);
 }
 
 // Op: DivNoNan()
@@ -210,7 +210,7 @@ Status DivNoNan(AbstractContext* ctx, AbstractTensorHandle* const x,
   TF_RETURN_IF_ERROR(op_ptr->AddInput(x));
   TF_RETURN_IF_ERROR(op_ptr->AddInput(y));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(z, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(z, 1), &num_retvals);
 }
 
 // Op: Exp()
@@ -251,7 +251,7 @@ Status Exp(AbstractContext* ctx, AbstractTensorHandle* const x,
   TF_RETURN_IF_ERROR(MaybeSetOpName(op_ptr.get(), name));
   TF_RETURN_IF_ERROR(op_ptr->AddInput(x));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(y, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(y, 1), &num_retvals);
 }
 
 // Op: Sqrt()
@@ -267,7 +267,7 @@ Status Sqrt(AbstractContext* ctx, AbstractTensorHandle* const x,
   TF_RETURN_IF_ERROR(MaybeSetOpName(op_ptr.get(), name));
   TF_RETURN_IF_ERROR(op_ptr->AddInput(x));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(y, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(y, 1), &num_retvals);
 }
 
 // Op: SqrtGrad()
@@ -285,7 +285,7 @@ Status SqrtGrad(AbstractContext* ctx, AbstractTensorHandle* const y,
   TF_RETURN_IF_ERROR(op_ptr->AddInput(y));
   TF_RETURN_IF_ERROR(op_ptr->AddInput(dy));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(z, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(z, 1), &num_retvals);
 }
 
 // Op: Log1p()
@@ -308,7 +308,7 @@ Status Log1p(AbstractContext* ctx, AbstractTensorHandle* const x,
   TF_RETURN_IF_ERROR(MaybeSetOpName(op_ptr.get(), name));
   TF_RETURN_IF_ERROR(op_ptr->AddInput(x));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(y, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(y, 1), &num_retvals);
 }
 
 }  // namespace ops

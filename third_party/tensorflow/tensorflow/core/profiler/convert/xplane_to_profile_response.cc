@@ -47,16 +47,16 @@ namespace tensorflow {
 namespace profiler {
 namespace {
 
-const absl::string_view kTraceViewer = "trace_viewer";
-const absl::string_view kTensorflowStats = "tensorflow_stats";
-const absl::string_view kInputPipeline = "input_pipeline";
-const absl::string_view kOverviewPage = "overview_page";
-const absl::string_view kKernelStats = "kernel_stats";
-const absl::string_view kMemoryProfile = "memory_profile";
-const absl::string_view kXPlanePb = "xplane.pb";
+const abslx::string_view kTraceViewer = "trace_viewer";
+const abslx::string_view kTensorflowStats = "tensorflow_stats";
+const abslx::string_view kInputPipeline = "input_pipeline";
+const abslx::string_view kOverviewPage = "overview_page";
+const abslx::string_view kKernelStats = "kernel_stats";
+const abslx::string_view kMemoryProfile = "memory_profile";
+const abslx::string_view kXPlanePb = "xplane.pb";
 
 template <typename Proto>
-void AddToolData(absl::string_view tool_name, const Proto& tool_output,
+void AddToolData(abslx::string_view tool_name, const Proto& tool_output,
                  ProfileResponse* response) {
   auto* tool_data = response->add_tool_data();
   tool_data->set_name(string(tool_name));
@@ -64,10 +64,10 @@ void AddToolData(absl::string_view tool_name, const Proto& tool_output,
 }
 
 // Returns the tool name with extension.
-std::string ToolName(absl::string_view tool) {
+std::string ToolName(abslx::string_view tool) {
   if (tool == kTraceViewer) return "trace.json.gz";
   if (tool == kMemoryProfile) return "memory_profile.json.gz";
-  return absl::StrCat(tool, ".pb");
+  return abslx::StrCat(tool, ".pb");
 }
 
 }  // namespace
@@ -75,7 +75,7 @@ std::string ToolName(absl::string_view tool) {
 Status ConvertXSpaceToProfileResponse(const XSpace& xspace,
                                       const ProfileRequest& req,
                                       ProfileResponse* response) {
-  absl::flat_hash_set<absl::string_view> tools(req.tools().begin(),
+  abslx::flat_hash_set<abslx::string_view> tools(req.tools().begin(),
                                                req.tools().end());
   if (tools.empty()) return OkStatus();
   if (tools.contains(kXPlanePb)) {

@@ -173,7 +173,7 @@ TEST_F(GatherOpTest, Error_IndexOutOfRange) {
   AddInputFromArray<int32>(TensorShape({}), {0});
   Status s = RunOpKernel();
   EXPECT_TRUE(
-      absl::StrContains(s.ToString(), "indices[2] = 99 is not in [0, 5)"))
+      abslx::StrContains(s.ToString(), "indices[2] = 99 is not in [0, 5)"))
       << s;
 }
 
@@ -186,7 +186,7 @@ TEST_F(GatherOpTest, Error_BatchDimsOutOfRange) {
   AddInputFromArray<int32>(TensorShape({4}), {0, 4, 99, 2});
   AddInputFromArray<int32>(TensorShape({}), {0});
   Status s = RunOpKernel();
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.ToString(), "Expected batch_dims in the range [-1, 1], but got 10"))
       << s;
 }

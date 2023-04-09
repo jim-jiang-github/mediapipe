@@ -22,14 +22,14 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status MeanStddevNormSeparateBatchesTest(float mean, float diff,
+abslx::Status MeanStddevNormSeparateBatchesTest(float mean, float diff,
                                                float tolerance,
                                                TestExecutionEnvironment* env);
 
-absl::Status MeanStddevNormalizationAllBatchesTest(
+abslx::Status MeanStddevNormalizationAllBatchesTest(
     TestExecutionEnvironment* env);
 
-absl::Status MeanStddevNormalizationLargeVectorTest(
+abslx::Status MeanStddevNormalizationLargeVectorTest(
     TestExecutionEnvironment* env);
 
 }  // namespace gpu

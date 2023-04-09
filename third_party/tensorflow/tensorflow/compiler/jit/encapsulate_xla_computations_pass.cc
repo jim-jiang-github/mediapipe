@@ -86,7 +86,7 @@ DataType EdgeType(const Edge* edge) {
 }
 
 // Adds the control inputs of `node` to `*deps`.
-void AddControlInputs(const Node& node, absl::flat_hash_set<Node*>* deps) {
+void AddControlInputs(const Node& node, abslx::flat_hash_set<Node*>* deps) {
   for (const Edge* edge : node.in_edges()) {
     if (edge->IsControlEdge()) {
       deps->insert(edge->src());
@@ -95,7 +95,7 @@ void AddControlInputs(const Node& node, absl::flat_hash_set<Node*>* deps) {
 }
 
 // Adds the control outputs of `node` to `*deps`.
-void AddControlOutputs(const Node& node, absl::flat_hash_set<Node*>* deps) {
+void AddControlOutputs(const Node& node, abslx::flat_hash_set<Node*>* deps) {
   for (const Edge* edge : node.out_edges()) {
     if (edge->IsControlEdge()) {
       deps->insert(edge->dst());
@@ -188,7 +188,7 @@ Status RewriteSubgraph(const std::vector<OutputTensor>& arg_source_tensors,
   // may cause spurious cache misses.
   TF_ASSIGN_OR_RETURN(uint64 fingerprint, FingerprintGraph(*graph));
   VLOG(1) << "Subgraph fingerprint:" << fingerprint;
-  call_def->set_op(absl::StrCat(call_def->op(), "_", fingerprint));
+  call_def->set_op(abslx::StrCat(call_def->op(), "_", fingerprint));
   return OkStatus();
 }
 
@@ -262,7 +262,7 @@ Status RewriteSubgraph(const std::vector<OutputTensor>& arg_source_tensors,
 
     // Data and control inputs to the new XlaLaunch node.
     std::vector<std::pair<Node*, int>> data_inputs(num_inputs);
-    absl::flat_hash_set<Node*> control_inputs;
+    abslx::flat_hash_set<Node*> control_inputs;
     DataTypeVector arg_types(num_args);
 
     AddControlInputs(*launch, &control_inputs);
@@ -282,7 +282,7 @@ Status RewriteSubgraph(const std::vector<OutputTensor>& arg_source_tensors,
 
     // Outputs.
     const int num_outputs = launch->output_types().size();
-    absl::flat_hash_set<Node*> control_outputs;
+    abslx::flat_hash_set<Node*> control_outputs;
     std::vector<std::vector<std::pair<Node*, int>>> data_outputs(num_outputs);
     DataTypeVector output_types(num_outputs);
 

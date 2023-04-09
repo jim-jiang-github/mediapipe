@@ -219,7 +219,7 @@ class FusedBatchMatMulMkl
       OP_REQUIRES(
           context, false,
           errors::Unimplemented("Fusion is not implemented: [",
-                                absl::StrJoin(this->fused_ops_, ","), "]"));
+                                abslx::StrJoin(this->fused_ops_, ","), "]"));
     }
   }
 

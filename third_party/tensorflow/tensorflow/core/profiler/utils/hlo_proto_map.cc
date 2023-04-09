@@ -59,7 +59,7 @@ ParseHloProtosFromXSpace(const XSpace& space) {
       plane.ForEachStat([&](const XStatVisitor& stat) {
         if (stat.ValueCase() != XStat::kBytesValue) return;
         auto hlo_proto = std::make_unique<xla::HloProto>();
-        absl::string_view byte_value = stat.BytesValue();
+        abslx::string_view byte_value = stat.BytesValue();
         if (hlo_proto->ParseFromArray(byte_value.data(), byte_value.size())) {
           hlo_protos.emplace_back(stat.Id(), std::move(hlo_proto));
         }
@@ -80,7 +80,7 @@ ParseHloProtosFromXSpace(const XSpace& space) {
               if (!hlo_proto_stat) return;
               if (hlo_proto_stat->ValueCase() != XStat::kBytesValue) return;
               auto hlo_proto = std::make_unique<xla::HloProto>();
-              absl::string_view byte_value = hlo_proto_stat->BytesValue();
+              abslx::string_view byte_value = hlo_proto_stat->BytesValue();
               if (hlo_proto->ParseFromArray(byte_value.data(),
                                             byte_value.size())) {
                 hlo_protos.emplace_back(event_metadata.Id(),
@@ -97,7 +97,7 @@ bool HloProtoMap::AddHloProto(uint64_t program_id,
                               const xla::HloProto* hlo_proto) {
   bool new_program_id =
       hlo_protos_by_program_id_.try_emplace(program_id, hlo_proto).second;
-  absl::string_view hlo_module_name = hlo_proto->hlo_module().name();
+  abslx::string_view hlo_module_name = hlo_proto->hlo_module().name();
   bool new_module_name =
       hlo_protos_by_name_
           .try_emplace(HloModuleNameWithProgramId(hlo_module_name, program_id),
@@ -120,8 +120,8 @@ void HloProtoMap::AddHloProtosFromXSpace(const XSpace& space) {
   }
 }
 
-std::vector<absl::string_view> HloProtoMap::GetModuleList() const {
-  std::vector<absl::string_view> module_list;
+std::vector<abslx::string_view> HloProtoMap::GetModuleList() const {
+  std::vector<abslx::string_view> module_list;
   module_list.reserve(hlo_protos_by_name_.size());
   for (const auto& [name, hlo_proto] : hlo_protos_by_name_) {
     module_list.push_back(name);
@@ -129,26 +129,26 @@ std::vector<absl::string_view> HloProtoMap::GetModuleList() const {
   return module_list;
 }
 
-std::vector<absl::string_view> HloProtoMap::GetSortedModuleList() const {
-  std::vector<absl::string_view> module_list = GetModuleList();
-  absl::c_sort(module_list);
+std::vector<abslx::string_view> HloProtoMap::GetSortedModuleList() const {
+  std::vector<abslx::string_view> module_list = GetModuleList();
+  abslx::c_sort(module_list);
   return module_list;
 }
 
-std::vector<absl::string_view> HloProtoMap::GetSortedModuleListByHeapTraceSize()
+std::vector<abslx::string_view> HloProtoMap::GetSortedModuleListByHeapTraceSize()
     const {
-  std::vector<std::pair<absl::string_view, const xla::HloProto*>> hlo_protos(
+  std::vector<std::pair<abslx::string_view, const xla::HloProto*>> hlo_protos(
       hlo_protos_by_name_.begin(), hlo_protos_by_name_.end());
 
   // Sort the hlo protos by heap trace size and then by hlo module name.
   // This way trivial computations will be on the bottom of the list.
-  absl::c_stable_sort(hlo_protos, [](const auto& a, const auto& b) {
+  abslx::c_stable_sort(hlo_protos, [](const auto& a, const auto& b) {
     int num_a = NumHeapSimulatorTraceEvents(a.second);
     int num_b = NumHeapSimulatorTraceEvents(b.second);
     return std::tie(num_a, b.first) > std::tie(num_b, a.first);
   });
 
-  std::vector<absl::string_view> module_list;
+  std::vector<abslx::string_view> module_list;
   module_list.reserve(hlo_protos.size());
   for (const auto& [name, hlo_proto] : hlo_protos) {
     module_list.push_back(name);
@@ -156,14 +156,14 @@ std::vector<absl::string_view> HloProtoMap::GetSortedModuleListByHeapTraceSize()
   return module_list;
 }
 
-absl::StatusOr<const xla::HloProto*> HloProtoMap::GetHloProtoByModuleName(
-    absl::string_view module_name) const {
+abslx::StatusOr<const xla::HloProto*> HloProtoMap::GetHloProtoByModuleName(
+    abslx::string_view module_name) const {
   auto iter = hlo_protos_by_name_.find(module_name);
   if (iter != hlo_protos_by_name_.end()) {
     return iter->second;
   }
-  return absl::NotFoundError(
-      absl::StrCat("Module name: ", module_name, " is not found."));
+  return abslx::NotFoundError(
+      abslx::StrCat("Module name: ", module_name, " is not found."));
 }
 
 }  // namespace profiler

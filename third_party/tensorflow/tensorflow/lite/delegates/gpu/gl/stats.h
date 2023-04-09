@@ -52,7 +52,7 @@ struct RuntimeStats {
 };
 
 inline std::string ToString(const ObjectStats& stats) {
-  return absl::StrCat("count = ", stats.count,
+  return abslx::StrCat("count = ", stats.count,
                       ", total bytes = ", stats.total_bytes);
 }
 

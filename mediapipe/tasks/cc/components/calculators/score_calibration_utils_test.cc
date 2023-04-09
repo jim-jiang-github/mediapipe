@@ -31,7 +31,7 @@ using ::testing::HasSubstr;
 TEST(ConfigureScoreCalibrationTest, SucceedsWithoutTrailingNewline) {
   ScoreCalibrationCalculatorOptions options;
   std::string score_calibration_file =
-      absl::StrCat("\n", "0.1,0.2,0.3\n", "0.4,0.5,0.6,0.7");
+      abslx::StrCat("\n", "0.1,0.2,0.3\n", "0.4,0.5,0.6,0.7");
 
   MP_ASSERT_OK(ConfigureScoreCalibration(
       tflite::ScoreTransformationType_IDENTITY,
@@ -51,7 +51,7 @@ TEST(ConfigureScoreCalibrationTest, SucceedsWithoutTrailingNewline) {
 TEST(ConfigureScoreCalibrationTest, SucceedsWithTrailingNewline) {
   ScoreCalibrationCalculatorOptions options;
   std::string score_calibration_file =
-      absl::StrCat("\n", "0.1,0.2,0.3\n", "0.4,0.5,0.6,0.7\n");
+      abslx::StrCat("\n", "0.1,0.2,0.3\n", "0.4,0.5,0.6,0.7\n");
 
   MP_ASSERT_OK(ConfigureScoreCalibration(tflite::ScoreTransformationType_LOG,
                                          /*default_score=*/0.5,
@@ -77,20 +77,20 @@ TEST(ConfigureScoreCalibrationTest, FailsWithEmptyFile) {
                                 /*default_score=*/0.5,
                                 /*score_calibration_file=*/"", &options);
 
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(),
               HasSubstr("Expected non-empty score calibration file"));
 }
 
 TEST(ConfigureScoreCalibrationTest, FailsWithInvalidNumParameters) {
   ScoreCalibrationCalculatorOptions options;
-  std::string score_calibration_file = absl::StrCat("0.1,0.2,0.3\n", "0.1,0.2");
+  std::string score_calibration_file = abslx::StrCat("0.1,0.2,0.3\n", "0.1,0.2");
 
   auto status = ConfigureScoreCalibration(tflite::ScoreTransformationType_LOG,
                                           /*default_score=*/0.5,
                                           score_calibration_file, &options);
 
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(),
               HasSubstr("Expected 3 or 4 parameters per line"));
 }
@@ -98,13 +98,13 @@ TEST(ConfigureScoreCalibrationTest, FailsWithInvalidNumParameters) {
 TEST(ConfigureScoreCalibrationTest, FailsWithNonParseableParameter) {
   ScoreCalibrationCalculatorOptions options;
   std::string score_calibration_file =
-      absl::StrCat("0.1,0.2,0.3\n", "0.1,foo,0.3\n");
+      abslx::StrCat("0.1,0.2,0.3\n", "0.1,foo,0.3\n");
 
   auto status = ConfigureScoreCalibration(tflite::ScoreTransformationType_LOG,
                                           /*default_score=*/0.5,
                                           score_calibration_file, &options);
 
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       status.message(),
       HasSubstr("Could not parse score calibration parameter as float"));
@@ -113,13 +113,13 @@ TEST(ConfigureScoreCalibrationTest, FailsWithNonParseableParameter) {
 TEST(ConfigureScoreCalibrationTest, FailsWithNegativeScaleParameter) {
   ScoreCalibrationCalculatorOptions options;
   std::string score_calibration_file =
-      absl::StrCat("0.1,0.2,0.3\n", "-0.1,0.2,0.3\n");
+      abslx::StrCat("0.1,0.2,0.3\n", "-0.1,0.2,0.3\n");
 
   auto status = ConfigureScoreCalibration(tflite::ScoreTransformationType_LOG,
                                           /*default_score=*/0.5,
                                           score_calibration_file, &options);
 
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       status.message(),
       HasSubstr("The scale parameter of the sigmoids must be positive"));

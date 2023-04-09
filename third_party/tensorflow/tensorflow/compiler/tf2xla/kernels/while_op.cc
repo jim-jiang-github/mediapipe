@@ -159,12 +159,12 @@ Status ConvertLoopInvariantsToConst(
            (body_must_be_const_nodes[body->arg_nodes[arg_idx]->id()] ||
             cond_must_be_const_nodes[cond->arg_nodes[arg_idx]->id()]);
   };
-  absl::InlinedVector<int, 5> converted_constants =
+  abslx::InlinedVector<int, 5> converted_constants =
       ConvertCompileTimeConstArgumentsToConst(ctx, args,
                                               /*xla_expression_offset=*/0,
                                               should_convert_to_const);
   VLOG(2) << "Converted args to constants: {"
-          << absl::StrJoin(converted_constants, ",") << "}";
+          << abslx::StrJoin(converted_constants, ",") << "}";
   for (int arg_idx : converted_constants) {
     compile_time_const_arg_indices->at(arg_idx) = true;
     (*num_compile_time_const_args)++;

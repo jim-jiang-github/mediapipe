@@ -30,10 +30,10 @@ constexpr char kNodeName[] = "assert_prev_dataset";
 
 // Returns a stringified `NameAttrList`, the input to `AssertPrevDatasetOp`.
 std::string GetTransformation(
-    absl::string_view name,
+    abslx::string_view name,
     std::initializer_list<std::pair<std::string, bool>> attrs = {}) {
   NameAttrList message;
-  message.set_name(absl::StrCat(name, "Dataset"));
+  message.set_name(abslx::StrCat(name, "Dataset"));
   for (const auto& attr : attrs) {
     AttrValue value;
     value.set_b(attr.second);

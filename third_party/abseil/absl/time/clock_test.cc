@@ -28,9 +28,9 @@
 namespace {
 
 TEST(Time, Now) {
-  const absl::Time before = absl::FromUnixNanos(absl::GetCurrentTimeNanos());
-  const absl::Time now = absl::Now();
-  const absl::Time after = absl::FromUnixNanos(absl::GetCurrentTimeNanos());
+  const abslx::Time before = abslx::FromUnixNanos(abslx::GetCurrentTimeNanos());
+  const abslx::Time now = abslx::Now();
+  const abslx::Time after = abslx::FromUnixNanos(abslx::GetCurrentTimeNanos());
   EXPECT_GE(now, before);
   EXPECT_GE(after, now);
 }
@@ -49,25 +49,25 @@ void AlarmHandler(int signo) {
 // Does SleepFor(d) take between lower_bound and upper_bound at least
 // once between now and (now + timeout)?  If requested (and supported),
 // add an alarm for the middle of the sleep period and expect it to fire.
-bool SleepForBounded(absl::Duration d, absl::Duration lower_bound,
-                     absl::Duration upper_bound, absl::Duration timeout,
+bool SleepForBounded(abslx::Duration d, abslx::Duration lower_bound,
+                     abslx::Duration upper_bound, abslx::Duration timeout,
                      AlarmPolicy alarm_policy, int* attempts) {
-  const absl::Time deadline = absl::Now() + timeout;
-  while (absl::Now() < deadline) {
+  const abslx::Time deadline = abslx::Now() + timeout;
+  while (abslx::Now() < deadline) {
 #if defined(ABSL_HAVE_ALARM)
     sig_t old_alarm = SIG_DFL;
     if (alarm_policy == AlarmPolicy::kWithAlarm) {
       alarm_handler_invoked = false;
       old_alarm = signal(SIGALRM, AlarmHandler);
-      alarm(absl::ToInt64Seconds(d / 2));
+      alarm(abslx::ToInt64Seconds(d / 2));
     }
 #else
     EXPECT_EQ(alarm_policy, AlarmPolicy::kWithoutAlarm);
 #endif
     ++*attempts;
-    absl::Time start = absl::Now();
-    absl::SleepFor(d);
-    absl::Duration actual = absl::Now() - start;
+    abslx::Time start = abslx::Now();
+    abslx::SleepFor(d);
+    abslx::Duration actual = abslx::Now() - start;
 #if defined(ABSL_HAVE_ALARM)
     if (alarm_policy == AlarmPolicy::kWithAlarm) {
       signal(SIGALRM, old_alarm);
@@ -81,13 +81,13 @@ bool SleepForBounded(absl::Duration d, absl::Duration lower_bound,
   return false;
 }
 
-testing::AssertionResult AssertSleepForBounded(absl::Duration d,
-                                               absl::Duration early,
-                                               absl::Duration late,
-                                               absl::Duration timeout,
+testing::AssertionResult AssertSleepForBounded(abslx::Duration d,
+                                               abslx::Duration early,
+                                               abslx::Duration late,
+                                               abslx::Duration timeout,
                                                AlarmPolicy alarm_policy) {
-  const absl::Duration lower_bound = d - early;
-  const absl::Duration upper_bound = d + late;
+  const abslx::Duration lower_bound = d - early;
+  const abslx::Duration upper_bound = d + late;
   int attempts = 0;
   if (SleepForBounded(d, lower_bound, upper_bound, timeout, alarm_policy,
                       &attempts)) {
@@ -103,10 +103,10 @@ testing::AssertionResult AssertSleepForBounded(absl::Duration d,
 
 // Tests that SleepFor() returns neither too early nor too late.
 TEST(SleepFor, Bounded) {
-  const absl::Duration d = absl::Milliseconds(2500);
-  const absl::Duration early = absl::Milliseconds(100);
-  const absl::Duration late = absl::Milliseconds(300);
-  const absl::Duration timeout = 48 * d;
+  const abslx::Duration d = abslx::Milliseconds(2500);
+  const abslx::Duration early = abslx::Milliseconds(100);
+  const abslx::Duration late = abslx::Milliseconds(300);
+  const abslx::Duration timeout = 48 * d;
   EXPECT_TRUE(AssertSleepForBounded(d, early, late, timeout,
                                     AlarmPolicy::kWithoutAlarm));
 #if defined(ABSL_HAVE_ALARM)

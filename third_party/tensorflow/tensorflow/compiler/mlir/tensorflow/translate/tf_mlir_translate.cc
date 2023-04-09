@@ -42,7 +42,7 @@ limitations under the License.
 namespace tensorflow {
 
 static StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> GraphdefToMlirImport(
-    llvm::StringRef input, absl::string_view debug_info_file,
+    llvm::StringRef input, abslx::string_view debug_info_file,
     const std::vector<std::string>& input_arrays,
     const std::vector<std::string>& input_dtypes,
     const std::vector<llvm::Optional<std::vector<int>>>& input_shapes,
@@ -102,7 +102,7 @@ static StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> GraphdefToMlirImport(
 }
 
 StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> GraphdefToMlirTranslateFunction(
-    llvm::StringRef input, absl::string_view debug_info_file,
+    llvm::StringRef input, abslx::string_view debug_info_file,
     const std::vector<std::string>& input_arrays,
     const std::vector<std::string>& input_dtypes,
     const std::vector<llvm::Optional<std::vector<int>>>& input_shapes,
@@ -123,10 +123,10 @@ StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> GraphdefToMlirTranslateFunction(
 }
 
 StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> GraphdefToMlirTranslateFunction(
-    llvm::StringRef input, absl::string_view debug_info_file,
-    absl::string_view input_arrays, absl::string_view input_dtypes,
-    absl::string_view input_shapes, absl::string_view output_arrays,
-    absl::string_view control_output_arrays, bool prune_unused_nodes,
+    llvm::StringRef input, abslx::string_view debug_info_file,
+    abslx::string_view input_arrays, abslx::string_view input_dtypes,
+    abslx::string_view input_shapes, abslx::string_view output_arrays,
+    abslx::string_view control_output_arrays, bool prune_unused_nodes,
     bool convert_legacy_fed_inputs, bool graph_as_function, bool upgrade_legacy,
     bool enable_shape_inference, bool unconditionally_use_set_output_shapes,
     mlir::MLIRContext* context) {
@@ -150,9 +150,9 @@ StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> GraphdefToMlirTranslateFunction(
 }
 
 StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> SavedModelObjectGraphToMlirImport(
-    absl::string_view saved_model_dir,
+    abslx::string_view saved_model_dir,
     const std::unordered_set<std::string>& tags,
-    absl::Span<std::string> exported_names, mlir::MLIRContext* context,
+    abslx::Span<std::string> exported_names, mlir::MLIRContext* context,
     bool unconditionally_use_set_output_shapes) {
   tensorflow::SavedModelV2Bundle bundle;
   auto load_status = tensorflow::SavedModelV2Bundle::Load(
@@ -174,9 +174,9 @@ StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> SavedModelObjectGraphToMlirImport(
 }
 
 StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> SavedModelSignatureDefsToMlirImport(
-    absl::string_view saved_model_dir,
+    abslx::string_view saved_model_dir,
     const std::unordered_set<std::string>& tags,
-    absl::Span<std::string> exported_names, mlir::MLIRContext* context,
+    abslx::Span<std::string> exported_names, mlir::MLIRContext* context,
     MLIRImportOptions options, bool lift_variables,
     std::unique_ptr<tensorflow::SavedModelBundle>* saved_model_bundle) {
   // Create local bundle if no one is provided to use.
@@ -211,9 +211,9 @@ StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> SavedModelSignatureDefsToMlirImport(
 
 StatusOr<mlir::OwningOpRef<mlir::ModuleOp>>
 SavedModelSignatureDefsToMlirImportLite(
-    absl::string_view saved_model_dir,
+    abslx::string_view saved_model_dir,
     const std::unordered_set<std::string>& tags,
-    absl::Span<std::string> exported_names, mlir::MLIRContext* context,
+    abslx::Span<std::string> exported_names, mlir::MLIRContext* context,
     MLIRImportOptions options) {
   MetaGraphDef meta_graph_def;
   auto status = ReadMetaGraphDefFromSavedModel(std::string(saved_model_dir),
@@ -224,7 +224,7 @@ SavedModelSignatureDefsToMlirImportLite(
     return status;
   }
 
-  std::optional<absl::Span<const std::string>> optional_exported_names;
+  std::optional<abslx::Span<const std::string>> optional_exported_names;
   if (!exported_names.empty()) optional_exported_names = exported_names;
 
   // TODO(b/186898924): debug info in the savedmodel should not be ignored and
@@ -240,7 +240,7 @@ SavedModelSignatureDefsToMlirImportLite(
 
 StatusOr<mlir::OwningOpRef<mlir::ModuleOp>>
 GraphdefToSplattedMlirTranslateFunction(
-    llvm::StringRef input, absl::string_view debug_info_file,
+    llvm::StringRef input, abslx::string_view debug_info_file,
     const std::vector<std::string>& input_arrays,
     const std::vector<std::string>& input_dtypes,
     const std::vector<llvm::Optional<std::vector<int>>>& input_shapes,
@@ -292,10 +292,10 @@ GraphdefToSplattedMlirTranslateFunction(
 
 StatusOr<mlir::OwningOpRef<mlir::ModuleOp>>
 GraphdefToSplattedMlirTranslateFunction(
-    llvm::StringRef input, absl::string_view debug_info_file,
-    absl::string_view input_arrays, absl::string_view input_dtypes,
-    absl::string_view input_shapes, absl::string_view output_arrays,
-    absl::string_view control_output_arrays, bool prune_unused_nodes,
+    llvm::StringRef input, abslx::string_view debug_info_file,
+    abslx::string_view input_arrays, abslx::string_view input_dtypes,
+    abslx::string_view input_shapes, abslx::string_view output_arrays,
+    abslx::string_view control_output_arrays, bool prune_unused_nodes,
     bool convert_legacy_fed_inputs, bool graph_as_function, bool upgrade_legacy,
     bool enable_shape_inference, bool unconditionally_use_set_output_shapes,
     mlir::MLIRContext* context) {

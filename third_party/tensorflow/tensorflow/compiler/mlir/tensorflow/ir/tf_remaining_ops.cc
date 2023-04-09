@@ -150,7 +150,7 @@ std::string GetRendezvousKey(const std::string& send_device,
                              const uint64_t send_device_incarnation,
                              const std::string& recv_device,
                              const std::string& tensor_name) {
-  return absl::StrCat(send_device, ";", send_device_incarnation, ";",
+  return abslx::StrCat(send_device, ";", send_device_incarnation, ";",
                       recv_device, ";", tensor_name);
 }
 }  // namespace

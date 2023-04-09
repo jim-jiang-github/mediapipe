@@ -26,7 +26,7 @@ namespace tflite {
 namespace gpu {
 namespace cl {
 namespace {
-absl::Status CreateEnvironment(Environment* result, bool shared,
+abslx::Status CreateEnvironment(Environment* result, bool shared,
                                cl_context_properties egl_context,
                                cl_context_properties egl_display) {
   CLDevice gpu;
@@ -110,7 +110,7 @@ Environment& Environment::operator=(Environment&& environment) {
   return *this;
 }
 
-absl::Status Environment::Init() {
+abslx::Status Environment::Init() {
   if (device().GetInfo().IsAdreno() &&
       device().GetInfo().SupportsTextureArray()) {
     const auto& adreno_info = device().info_.adreno_info;
@@ -124,7 +124,7 @@ absl::Status Environment::Init() {
       GetDevicePtr()->DisableOneLayerTextureArray();
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void Environment::SetHighPerformance() const {
@@ -268,7 +268,7 @@ bool CanUseSubBufferForImage2d(const GpuInfo& gpu_info) {
   return true;
 }
 
-absl::Status CreateEnvironment(Environment* result) {
+abslx::Status CreateEnvironment(Environment* result) {
   CLDevice gpu;
   RETURN_IF_ERROR(CreateDefaultGPUDevice(&gpu));
 

@@ -68,7 +68,7 @@ class ImageFramePool : public std::enable_shared_from_this<ImageFramePool> {
   const ImageFormat::Format format_;
   const int keep_count_;
 
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
   int in_use_count_ ABSL_GUARDED_BY(mutex_) = 0;
   std::vector<std::unique_ptr<ImageFrame>> available_ ABSL_GUARDED_BY(mutex_);
 };

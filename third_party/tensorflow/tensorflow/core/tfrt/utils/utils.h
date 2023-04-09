@@ -58,7 +58,7 @@ DType ConvertTfDTypeToTfrtDType(tensorflow::DataType dtype);
 // letting compiler to handle it.
 tensorflow::Status RunRuntimeInitializer(const tfrt::ExecutionContext& exec_ctx,
                                          tfrt::BEFFile* bef_file,
-                                         absl::string_view fallback_init_func);
+                                         abslx::string_view fallback_init_func);
 
 // Creates dummy TF devices from the input device names. Currently this method
 // is used to create the TPU_SYSTEM device for worker server.

@@ -40,9 +40,9 @@ GraphDef SimpleTestGraphForMutation() {
       /*funcs=*/{});
 }
 
-absl::flat_hash_map<absl::string_view, int> GetUpdatedNodeNames(
+abslx::flat_hash_map<abslx::string_view, int> GetUpdatedNodeNames(
     const MutableGraphView* graph_view) {
-  absl::flat_hash_map<absl::string_view, int> updated_node_names;
+  abslx::flat_hash_map<abslx::string_view, int> updated_node_names;
   updated_node_names.reserve(graph_view->NumNodes());
   for (const auto& node_view : graph_view->GetNodes()) {
     updated_node_names.emplace(node_view.GetName(), -1);

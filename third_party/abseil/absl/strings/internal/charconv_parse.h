@@ -20,7 +20,7 @@
 #include "absl/base/config.h"
 #include "absl/strings/charconv.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace strings_internal {
 
@@ -86,14 +86,14 @@ struct ParsedFloat {
 // *not* consumed.  The `hex` bit from format_flags is ignored by ParseFloat.
 template <int base>
 ParsedFloat ParseFloat(const char* begin, const char* end,
-                       absl::chars_format format_flags);
+                       abslx::chars_format format_flags);
 
 extern template ParsedFloat ParseFloat<10>(const char* begin, const char* end,
-                                           absl::chars_format format_flags);
+                                           abslx::chars_format format_flags);
 extern template ParsedFloat ParseFloat<16>(const char* begin, const char* end,
-                                           absl::chars_format format_flags);
+                                           abslx::chars_format format_flags);
 
 }  // namespace strings_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 #endif  // ABSL_STRINGS_INTERNAL_CHARCONV_PARSE_H_

@@ -36,7 +36,7 @@ namespace mediapipe {
 namespace {
 
 // The type LambdaCalculator takes.
-typedef std::function<absl::Status(const InputStreamShardSet&,
+typedef std::function<abslx::Status(const InputStreamShardSet&,
                                    OutputStreamShardSet*)>
     ProcessFunction;
 
@@ -50,7 +50,7 @@ std::tuple<std::string, Timestamp, std::vector<std::string>> CommandTuple(
 // Function to take the inputs and produce a diagnostic output string
 // and output a packet with a diagnostic output string which includes
 // the input timestamp and the ids of each input which is present.
-absl::Status InputsToDebugString(const InputStreamShardSet& inputs,
+abslx::Status InputsToDebugString(const InputStreamShardSet& inputs,
                                  OutputStreamShardSet* outputs) {
   std::string output;
   Timestamp output_timestamp;
@@ -62,24 +62,24 @@ absl::Status InputsToDebugString(const InputStreamShardSet& inputs,
           output = output_timestamp.DebugString();
         } else {
           output =
-              absl::StrCat("Timestamp(", output_timestamp.DebugString(), ")");
+              abslx::StrCat("Timestamp(", output_timestamp.DebugString(), ")");
         }
       }
-      absl::StrAppend(&output, ",", id.value());
+      abslx::StrAppend(&output, ",", id.value());
     }
   }
   Packet output_packet;
-  ABSL_CONST_INIT static absl::Mutex mu(absl::kConstInit);
+  ABSL_CONST_INIT static abslx::Mutex mu(abslx::kConstInit);
   static Timestamp static_timestamp = Timestamp(0);
   {
-    absl::MutexLock lock(&mu);
+    abslx::MutexLock lock(&mu);
     output_packet = MakePacket<std::string>(output).At(static_timestamp);
     ++static_timestamp;
   }
   // TODO Output at output_timestamp once unordered output stream
   // handlers are allowed.
   outputs->Index(0).AddPacket(output_packet);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 TEST(SyncSetInputStreamHandlerTest, OrdinaryOperation) {
@@ -190,20 +190,20 @@ TEST(SyncSetInputStreamHandlerTest, OrdinaryOperation) {
       temp_commands;
   for (Timestamp t = Timestamp(-350); t < Timestamp(350); t += 35) {
     temp_commands.push_back(CommandTuple(
-        "f", t, {absl::StrCat("Timestamp(", t.DebugString(), "),5")}));
+        "f", t, {abslx::StrCat("Timestamp(", t.DebugString(), "),5")}));
   }
   temp_commands.push_back(CommandTuple("f", Timestamp::Done(), {}));
   command_sets.push_back(temp_commands);
 
   command_sets.push_back(
       {CommandTuple("g", Timestamp::PreStream(),
-                    {absl::StrCat(Timestamp::PreStream().DebugString(), ",6")}),
+                    {abslx::StrCat(Timestamp::PreStream().DebugString(), ",6")}),
        CommandTuple("g", Timestamp::Done(), {})});
 
   command_sets.push_back(
       {CommandTuple(
            "h", Timestamp::PostStream(),
-           {absl::StrCat(Timestamp::PostStream().DebugString(), ",7")}),
+           {abslx::StrCat(Timestamp::PostStream().DebugString(), ",7")}),
        CommandTuple("h", Timestamp::Done(), {})});
 
   int num_commands = 0;
@@ -273,7 +273,7 @@ TEST(SyncSetInputStreamHandlerTest, OrdinaryOperation) {
     MP_ASSERT_OK(
         graph.ObserveOutputStream("output", [&outputs](const Packet& packet) {
           outputs.push_back(packet);
-          return absl::OkStatus();
+          return abslx::OkStatus();
         }));
     MP_ASSERT_OK(graph.StartRun({}));
     for (int command_index = 0; command_index < shuffled_commands.size();

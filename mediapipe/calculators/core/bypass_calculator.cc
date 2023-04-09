@@ -66,7 +66,7 @@ class BypassCalculator : public Node {
   using IdMap = std::map<CollectionItemId, CollectionItemId>;
 
   // Returns the map of passthrough input and output stream ids.
-  static absl::StatusOr<IdMap> GetPassMap(
+  static abslx::StatusOr<IdMap> GetPassMap(
       const BypassCalculatorOptions& options, const tool::TagMap& input_map,
       const tool::TagMap& output_map) {
     IdMap result;
@@ -88,7 +88,7 @@ class BypassCalculator : public Node {
 
   // Identifies all specified streams as "Any" packet type.
   // Identifies passthrough streams as "Same" packet type.
-  static absl::Status UpdateContract(CalculatorContract* cc) {
+  static abslx::Status UpdateContract(CalculatorContract* cc) {
     auto options = cc->Options<BypassCalculatorOptions>();
     RET_CHECK_EQ(options.pass_input_stream().size(),
                  options.pass_output_stream().size());
@@ -115,20 +115,20 @@ class BypassCalculator : public Node {
          id != cc->InputSidePackets().EndId(); ++id) {
       cc->InputSidePackets().Get(id).SetAny();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Saves the map of passthrough input and output stream ids.
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     auto options = cc->Options<BypassCalculatorOptions>();
     ASSIGN_OR_RETURN(pass_streams_, GetPassMap(options, *cc->Inputs().TagMap(),
                                                *cc->Outputs().TagMap()));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Copies packets between passthrough input and output streams.
   // Updates timestamp bounds on all output streams.
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     std::set<CollectionItemId> pass_out;
     for (auto entry : pass_streams_) {
       pass_out.insert(entry.second);
@@ -144,15 +144,15 @@ class BypassCalculator : public Node {
             std::max(cc->Outputs().Get(id).NextTimestampBound(), bound));
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Close all output streams.
-  absl::Status Close(CalculatorContext* cc) override {
+  abslx::Status Close(CalculatorContext* cc) override {
     for (auto id = cc->Outputs().BeginId(); id != cc->Outputs().EndId(); ++id) {
       cc->Outputs().Get(id).Close();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

@@ -34,7 +34,7 @@ class CalculatorBaseFactoryFor<
     typename std::enable_if<std::is_base_of<mediapipe::api2::Node, T>{}>::type>
     : public CalculatorBaseFactory {
  public:
-  absl::Status GetContract(CalculatorContract* cc) final {
+  abslx::Status GetContract(CalculatorContract* cc) final {
     auto status = T::Contract::GetContract(cc);
     if (status.ok()) {
       status = UpdateContract<T>(cc);
@@ -44,7 +44,7 @@ class CalculatorBaseFactoryFor<
 
   std::unique_ptr<CalculatorBase> CreateCalculator(
       CalculatorContext* calculator_context) final {
-    return absl::make_unique<T>();
+    return abslx::make_unique<T>();
   }
 
  private:
@@ -54,7 +54,7 @@ class CalculatorBaseFactoryFor<
     return U::UpdateContract(cc);
   }
   template <typename U>
-  absl::Status UpdateContract(...) {
+  abslx::Status UpdateContract(...) {
     return {};
   }
 };
@@ -88,7 +88,7 @@ struct NodeRegistrationStatic {
   static mediapipe::RegistrationToken Make() {
     return mediapipe::CalculatorBaseRegistry::Register(
         T::kCalculatorName,
-        absl::make_unique<mediapipe::internal::CalculatorBaseFactoryFor<T>>);
+        abslx::make_unique<mediapipe::internal::CalculatorBaseFactoryFor<T>>);
   }
 
   using RequireStatics = ForceStaticInstantiation<&registration>;
@@ -105,7 +105,7 @@ struct SubgraphRegistrationImpl {
 
   static mediapipe::RegistrationToken Make() {
     return mediapipe::SubgraphRegistry::Register(T::kCalculatorName,
-                                                 absl::make_unique<T>);
+                                                 abslx::make_unique<T>);
   }
 
   using RequireStatics = ForceStaticInstantiation<&registration>;
@@ -142,7 +142,7 @@ class RegisteredNode<void> : public Node {};
 
 template <class Impl>
 struct FunctionNode : public RegisteredNode<Impl> {
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     return internal::ProcessFnCallers(cc, Impl::kContract.process_items());
   }
 };
@@ -228,7 +228,7 @@ class SubgraphImpl : public Subgraph, public Intf {
   REGISTRY_STATIC_VAR(calculator_registration,                               \
                       __LINE__)(mediapipe::CalculatorBaseRegistry::Register( \
       Impl::kCalculatorName,                                                 \
-      absl::make_unique<mediapipe::internal::CalculatorBaseFactoryFor<Impl>>))
+      abslx::make_unique<mediapipe::internal::CalculatorBaseFactoryFor<Impl>>))
 
 // This macro is used to register a non-split-contract calculator. Deprecated.
 #define MEDIAPIPE_REGISTER_NODE(name) REGISTER_CALCULATOR(name)
@@ -239,7 +239,7 @@ class SubgraphImpl : public Subgraph, public Intf {
   static mediapipe::NoDestructor<mediapipe::RegistrationToken>         \
   REGISTRY_STATIC_VAR(subgraph_registration,                           \
                       __LINE__)(mediapipe::SubgraphRegistry::Register( \
-      Impl::kCalculatorName, absl::make_unique<Impl>))
+      Impl::kCalculatorName, abslx::make_unique<Impl>))
 
 }  // namespace api2
 }  // namespace mediapipe

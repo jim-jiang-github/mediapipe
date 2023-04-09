@@ -30,7 +30,7 @@ struct CudnnVersion {
       : major_version(major), minor_version(minor), patch_level(patch) {}
 
   std::string ToString() const {
-    return absl::StrCat(major_version, ".", minor_version, ".", patch_level);
+    return abslx::StrCat(major_version, ".", minor_version, ".", patch_level);
   }
 
   int major_version;

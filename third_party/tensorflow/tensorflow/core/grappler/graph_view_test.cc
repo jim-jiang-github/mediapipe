@@ -161,18 +161,18 @@ TEST_F(GraphViewTest, BasicGraph) {
   const NodeDef* add_node = graph.GetNode("AddN");
   EXPECT_NE(add_node, nullptr);
 
-  absl::flat_hash_set<string> fanouts;
-  absl::flat_hash_set<string> expected_fanouts = {"AddN_2:0", "AddN_3:0"};
+  abslx::flat_hash_set<string> fanouts;
+  abslx::flat_hash_set<string> expected_fanouts = {"AddN_2:0", "AddN_3:0"};
   for (const auto& fo : graph.GetFanouts(*add_node, false)) {
-    fanouts.insert(absl::StrCat(fo.node->name(), ":", fo.port_id));
+    fanouts.insert(abslx::StrCat(fo.node->name(), ":", fo.port_id));
   }
   EXPECT_EQ(graph.NumFanouts(*add_node, false), 2);
   EXPECT_EQ(fanouts, expected_fanouts);
 
-  absl::flat_hash_set<string> fanins;
-  absl::flat_hash_set<string> expected_fanins = {"Sign_1:0", "Sign:0"};
+  abslx::flat_hash_set<string> fanins;
+  abslx::flat_hash_set<string> expected_fanins = {"Sign_1:0", "Sign:0"};
   for (const auto& fi : graph.GetFanins(*add_node, false)) {
-    fanins.insert(absl::StrCat(fi.node->name(), ":", fi.port_id));
+    fanins.insert(abslx::StrCat(fi.node->name(), ":", fi.port_id));
   }
   EXPECT_EQ(graph.NumFanins(*add_node, false), 2);
   EXPECT_EQ(fanins, expected_fanins);

@@ -18,16 +18,16 @@
 namespace tflite {
 namespace gpu {
 
-absl::Status TransformTensorBilinearOperationParser::IsSupported(
+abslx::Status TransformTensorBilinearOperationParser::IsSupported(
     const TfLiteContext* context, const TfLiteNode* tflite_node,
     const TfLiteRegistration* registration) {
   RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 2));
   RETURN_IF_ERROR(CheckInputsOutputs(context, tflite_node,
                                      /*runtime_inputs=*/2, /*outputs=*/1));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TransformTensorBilinearOperationParser::Parse(
+abslx::Status TransformTensorBilinearOperationParser::Parse(
     const TfLiteNode* tflite_node, const TfLiteRegistration* registration,
     GraphFloat32* graph, ObjectReader* reader) {
   Node* node = graph->NewNode();
@@ -50,7 +50,7 @@ absl::Status TransformTensorBilinearOperationParser::Parse(
         &attr, &output_shape));
     node->operation.attributes = attr;
   } else {
-    return absl::UnimplementedError(
+    return abslx::UnimplementedError(
         "Transform Tensor Bilinear operation can be of version 1 or 2 only.");
   }
 
@@ -59,10 +59,10 @@ absl::Status TransformTensorBilinearOperationParser::Parse(
   output_value->tensor.shape =
       BHWC(1, output_shape.h, output_shape.w,
            graph->FindInputs(node->id)[0]->tensor.shape.c);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ParseTransformTensorBilinearV1Attributes(
+abslx::Status ParseTransformTensorBilinearV1Attributes(
     const void* data, uint32_t data_size,
     TransformTensorBilinearAttributes* attr, BHWC* output_shape) {
   attr->version = 1;
@@ -77,7 +77,7 @@ absl::Status ParseTransformTensorBilinearV1Attributes(
     const auto value = m[key];
     if (key == "mode") {
       if (value.AsString().str() != "bilinear") {
-        return absl::UnimplementedError(
+        return abslx::UnimplementedError(
             "TransformTensor operation supports only bilinear interpolation.");
       }
     }
@@ -89,10 +89,10 @@ absl::Status ParseTransformTensorBilinearV1Attributes(
   }
   attr->align_corners = false;
   *output_shape = BHWC(1, attr->output_size.h, attr->output_size.w, 1);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ParseTransformTensorBilinearV2Attributes(
+abslx::Status ParseTransformTensorBilinearV2Attributes(
     const void* data, uint32_t data_size,
     TransformTensorBilinearAttributes* attr, BHWC* output_shape) {
   attr->version = 2;
@@ -115,7 +115,7 @@ absl::Status ParseTransformTensorBilinearV2Attributes(
   attr->output_size = std::move(output_size);
   attr->align_corners = true;
   *output_shape = BHWC(1, attr->output_size.h, attr->output_size.w, 1);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 TransformResult TransformTensorBilinearV2ToV1::ApplyToNode(
@@ -124,7 +124,7 @@ TransformResult TransformTensorBilinearV2ToV1::ApplyToNode(
     return {TransformStatus::SKIPPED, ""};
   }
   TransformTensorBilinearAttributes transform_tensor_attr =
-      absl::any_cast<TransformTensorBilinearAttributes>(
+      abslx::any_cast<TransformTensorBilinearAttributes>(
           node->operation.attributes);
 
   if (transform_tensor_attr.version != 2) {

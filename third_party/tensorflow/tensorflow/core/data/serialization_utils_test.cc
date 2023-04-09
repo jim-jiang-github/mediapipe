@@ -48,7 +48,7 @@ namespace {
 class TestContext {
  public:
   static Status Create(std::unique_ptr<TestContext>* result) {
-    *result = absl::WrapUnique<TestContext>(new TestContext());
+    *result = abslx::WrapUnique<TestContext>(new TestContext());
 
     SessionOptions options;
     auto* device_count = options.config.mutable_device_count();

@@ -33,11 +33,11 @@ class PjRtDeviceTopology {
   virtual PjRtPlatformId platform_id() const = 0;
 
   // Returns a string that identifies the platform (CPU/GPU/TPU).
-  virtual absl::string_view platform_name() const = 0;
+  virtual abslx::string_view platform_name() const = 0;
 
   // Returns a string containing human-readable, platform-specific version info
   // (e.g. the CUDA version on GPU or libtpu version on Cloud TPU).
-  virtual absl::string_view platform_version() const = 0;
+  virtual abslx::string_view platform_version() const = 0;
 };
 
 // Abstract interface that all registered compilers must implement.
@@ -56,7 +56,7 @@ class PjRtCompiler {
 // Takes ownership of 'compiler'.
 //
 // REQUIRES: No compiler has been registered for the platform yet.
-void PjRtRegisterCompiler(absl::string_view platform_name,
+void PjRtRegisterCompiler(abslx::string_view platform_name,
                           std::unique_ptr<PjRtCompiler> compiler);
 
 // Compiles a 'computation' and generates a 'PjRtExecutable' using the compiler

@@ -35,9 +35,9 @@ class CostMeasurement {
 
   virtual ~CostMeasurement() {}
 
-  virtual absl::Duration GetTotalCost() = 0;
+  virtual abslx::Duration GetTotalCost() = 0;
 
-  virtual absl::string_view GetCostType() const = 0;
+  virtual abslx::string_view GetCostType() const = 0;
 };
 
 }  // namespace tensorflow

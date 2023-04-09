@@ -58,7 +58,7 @@ void CalculatorState::SetOutputSidePackets(
 
 Counter* CalculatorState::GetCounter(const std::string& name) {
   CHECK(counter_factory_);
-  return counter_factory_->GetCounter(absl::StrCat(NodeName(), "-", name));
+  return counter_factory_->GetCounter(abslx::StrCat(NodeName(), "-", name));
 }
 
 CounterFactory* CalculatorState::GetCounterFactory() {

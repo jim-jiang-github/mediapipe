@@ -62,7 +62,7 @@ class DnnScratchAllocator : public se::ScratchAllocator {
     }
     if (byte_size > memory_limit_) {
       return se::port::Status{se::port::error::UNAVAILABLE,
-                              absl::StrCat("Requested memory size (", byte_size,
+                              abslx::StrCat("Requested memory size (", byte_size,
                                            ") exceeds the max memory limit (",
                                            memory_limit_, ").")};
     }
@@ -74,7 +74,7 @@ class DnnScratchAllocator : public se::ScratchAllocator {
     if (!allocation_status.ok()) {
       return se::port::Status{
           se::port::error::UNAVAILABLE,
-          absl::StrCat("Failed to allocate the requested memory size (",
+          abslx::StrCat("Failed to allocate the requested memory size (",
                        byte_size, ").")};
     }
     // Hold the reference of the allocated tensors until the end of the

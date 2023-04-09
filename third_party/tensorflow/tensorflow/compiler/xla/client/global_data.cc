@@ -28,7 +28,7 @@ namespace {
 // Releases a set of global data handles owned by the parent service
 // interface.
 void ReleaseHandles(ServiceInterface* parent,
-                    const absl::Span<const GlobalDataHandle> handles) {
+                    const abslx::Span<const GlobalDataHandle> handles) {
   UnregisterRequest request;
   for (auto& handle : handles) {
     VLOG(1) << "Requesting to unregister " << handle.ShortDebugString();
@@ -56,7 +56,7 @@ GlobalData::~GlobalData() {
 
 /* static */ void GlobalData::Release(
     std::vector<std::unique_ptr<GlobalData>> instances) {
-  absl::flat_hash_map<ServiceInterface*, std::vector<GlobalDataHandle>>
+  abslx::flat_hash_map<ServiceInterface*, std::vector<GlobalDataHandle>>
       parent_handles_map;
   for (auto& instance : instances) {
     if (instance->parent_ != nullptr) {

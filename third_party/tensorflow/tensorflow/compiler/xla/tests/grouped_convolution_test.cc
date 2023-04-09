@@ -128,20 +128,20 @@ std::string GroupedConvolution2DTestDataToString(
         ::testing::tuple<GroupedConvolution2DSpec, bool>>& data) {
   const auto& spec = ::testing::get<0>(data.param);
   const std::string data_type = GetFloatDataType(::testing::get<1>(data.param));
-  std::string str = absl::StrCat(
-      "activation_dims_", absl::StrJoin(spec.activation_dims, "x"),
-      "_activation_layout_", absl::StrJoin(spec.activation_layout, "_"),
-      "_kernel_dims_", absl::StrJoin(spec.kernel_dims, "x"), "_kernel_layout_",
-      absl::StrJoin(spec.kernel_layout, "_"), "_output_dims_",
-      absl::StrJoin(spec.output_dims, "x"), "_output_layout_",
-      absl::StrJoin(spec.output_layout, "_"), data_type);
+  std::string str = abslx::StrCat(
+      "activation_dims_", abslx::StrJoin(spec.activation_dims, "x"),
+      "_activation_layout_", abslx::StrJoin(spec.activation_layout, "_"),
+      "_kernel_dims_", abslx::StrJoin(spec.kernel_dims, "x"), "_kernel_layout_",
+      abslx::StrJoin(spec.kernel_layout, "_"), "_output_dims_",
+      abslx::StrJoin(spec.output_dims, "x"), "_output_layout_",
+      abslx::StrJoin(spec.output_layout, "_"), data_type);
   // -1 indicates non-existence.
   if (spec.stride != -1) {
-    absl::StrAppend(&str, "_lhs_dilation_", spec.lhs_dilate, "x1");
+    abslx::StrAppend(&str, "_lhs_dilation_", spec.lhs_dilate, "x1");
   }
 
   // Test names are not allowed to contain the '-' character.
-  absl::c_replace(str, '-', 'n');
+  abslx::c_replace(str, '-', 'n');
   return str;
 }
 
@@ -150,7 +150,7 @@ std::string BuildHloTextGroupedConvolution2D(
   const std::string data_type = GetFloatDataType(use_bfloat16);
   if (spec.activation_dims[1] == 1 && spec.kernel_dims[1] == 2) {
     // Check for outer dim.
-    return absl::StrFormat(
+    return abslx::StrFormat(
         R"(
     HloModule TensorFlowDepthwiseConv
 
@@ -162,21 +162,21 @@ std::string BuildHloTextGroupedConvolution2D(
           feature_group_count=%d
     }
     )",
-        data_type, absl::StrJoin(spec.activation_dims, ","),
-        absl::StrJoin(spec.activation_layout, ","), data_type,
-        absl::StrJoin(spec.kernel_dims, ","),
-        absl::StrJoin(spec.kernel_layout, ","), data_type,
-        absl::StrJoin(spec.output_dims, ","),
-        absl::StrJoin(spec.output_layout, ","), data_type,
-        absl::StrJoin(spec.activation_dims, ","),
-        absl::StrJoin(spec.activation_layout, ","), data_type,
-        absl::StrJoin(spec.kernel_dims, ","),
-        absl::StrJoin(spec.kernel_layout, ","), spec.window, spec.window,
+        data_type, abslx::StrJoin(spec.activation_dims, ","),
+        abslx::StrJoin(spec.activation_layout, ","), data_type,
+        abslx::StrJoin(spec.kernel_dims, ","),
+        abslx::StrJoin(spec.kernel_layout, ","), data_type,
+        abslx::StrJoin(spec.output_dims, ","),
+        abslx::StrJoin(spec.output_layout, ","), data_type,
+        abslx::StrJoin(spec.activation_dims, ","),
+        abslx::StrJoin(spec.activation_layout, ","), data_type,
+        abslx::StrJoin(spec.kernel_dims, ","),
+        abslx::StrJoin(spec.kernel_layout, ","), spec.window, spec.window,
         spec.window, spec.window, spec.window, spec.group_count);
 
   } else if (spec.stride == -1) {
     // Check for basic, non-dilated cases.
-    return absl::StrFormat(
+    return abslx::StrFormat(
         R"(
       HloModule TensorFlowDepthwiseConv
 
@@ -188,20 +188,20 @@ std::string BuildHloTextGroupedConvolution2D(
             feature_group_count=%d
       }
       )",
-        data_type, absl::StrJoin(spec.activation_dims, ","),
-        absl::StrJoin(spec.activation_layout, ","), data_type,
-        absl::StrJoin(spec.kernel_dims, ","),
-        absl::StrJoin(spec.kernel_layout, ","), data_type,
-        absl::StrJoin(spec.output_dims, ","),
-        absl::StrJoin(spec.output_layout, ","), data_type,
-        absl::StrJoin(spec.activation_dims, ","),
-        absl::StrJoin(spec.activation_layout, ","), data_type,
-        absl::StrJoin(spec.kernel_dims, ","),
-        absl::StrJoin(spec.kernel_layout, ","), spec.window, spec.window,
+        data_type, abslx::StrJoin(spec.activation_dims, ","),
+        abslx::StrJoin(spec.activation_layout, ","), data_type,
+        abslx::StrJoin(spec.kernel_dims, ","),
+        abslx::StrJoin(spec.kernel_layout, ","), data_type,
+        abslx::StrJoin(spec.output_dims, ","),
+        abslx::StrJoin(spec.output_layout, ","), data_type,
+        abslx::StrJoin(spec.activation_dims, ","),
+        abslx::StrJoin(spec.activation_layout, ","), data_type,
+        abslx::StrJoin(spec.kernel_dims, ","),
+        abslx::StrJoin(spec.kernel_layout, ","), spec.window, spec.window,
         spec.group_count);
   } else {
     // Check for base dilations.
-    return absl::StrFormat(
+    return abslx::StrFormat(
         R"(
     HloModule TensorFlowDepthwiseConv
 
@@ -213,16 +213,16 @@ std::string BuildHloTextGroupedConvolution2D(
           dim_labels=b01f_01io->b01f, feature_group_count=%d
     }
     )",
-        data_type, absl::StrJoin(spec.activation_dims, ","),
-        absl::StrJoin(spec.activation_layout, ","), data_type,
-        absl::StrJoin(spec.kernel_dims, ","),
-        absl::StrJoin(spec.kernel_layout, ","), data_type,
-        absl::StrJoin(spec.output_dims, ","),
-        absl::StrJoin(spec.output_layout, ","), data_type,
-        absl::StrJoin(spec.activation_dims, ","),
-        absl::StrJoin(spec.activation_layout, ","), data_type,
-        absl::StrJoin(spec.kernel_dims, ","),
-        absl::StrJoin(spec.kernel_layout, ","), spec.window, spec.window,
+        data_type, abslx::StrJoin(spec.activation_dims, ","),
+        abslx::StrJoin(spec.activation_layout, ","), data_type,
+        abslx::StrJoin(spec.kernel_dims, ","),
+        abslx::StrJoin(spec.kernel_layout, ","), data_type,
+        abslx::StrJoin(spec.output_dims, ","),
+        abslx::StrJoin(spec.output_layout, ","), data_type,
+        abslx::StrJoin(spec.activation_dims, ","),
+        abslx::StrJoin(spec.activation_layout, ","), data_type,
+        abslx::StrJoin(spec.kernel_dims, ","),
+        abslx::StrJoin(spec.kernel_layout, ","), spec.window, spec.window,
         spec.stride, 0, 0, spec.lhs_dilate, spec.group_count);
   }
 }
@@ -271,7 +271,7 @@ ENTRY convolution {
                     .ValueOrDie();
   TF_ASSERT_OK_AND_ASSIGN(auto fake_arguments, MakeFakeArguments(module.get()));
   std::vector<Literal*> fake_argument_ptrs;
-  absl::c_transform(
+  abslx::c_transform(
       fake_arguments, std::back_inserter(fake_argument_ptrs),
       [](const Literal& literal) { return &const_cast<Literal&>(literal); });
   EXPECT_TRUE(RunAndCompare(std::move(module), fake_argument_ptrs,

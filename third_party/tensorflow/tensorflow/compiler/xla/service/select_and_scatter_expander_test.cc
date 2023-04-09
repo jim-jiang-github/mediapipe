@@ -24,7 +24,7 @@ limitations under the License.
 namespace xla {
 namespace {
 
-constexpr absl::string_view kModuleStr =
+constexpr abslx::string_view kModuleStr =
     R"(HloModule R4F32OverlapSmall_module, entry_computation_layout={()->f32[4,5,1,1]{3,2,1,0}}
   %ge_F32.v3 (lhs: f32[], rhs: f32[]) -> pred[] {
     %lhs = f32[] parameter(0)
@@ -49,7 +49,7 @@ class SelectAndScatterExpanderTest : public HloTestBase {
  protected:
   // The HLO parser changes all no layout shapes from the input to have a
   // default layout. Clear the layout of the scatter operand for testing.
-  void ClearInstructionLayout(HloModule* module, absl::string_view inst_name) {
+  void ClearInstructionLayout(HloModule* module, abslx::string_view inst_name) {
     HloInstruction* inst = FindInstruction(module, inst_name);
     inst->mutable_shape()->clear_layout();
   }

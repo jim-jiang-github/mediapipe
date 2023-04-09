@@ -32,7 +32,7 @@ namespace profiler {
 // displayed. If it is set to -1, then HLOProto.heap_simulator_traces will not
 // be considered during the preprocess.
 // By default the memory color is 0, which is HBM.
-absl::StatusOr<PreprocessResult> ConvertHloProtoToPreprocessResult(
+abslx::StatusOr<PreprocessResult> ConvertHloProtoToPreprocessResult(
     const xla::HloProto& hlo_proto, int64_t small_buffer_size,
     int64_t heap_simulator_trace_id, int64_t memory_color = 0);
 

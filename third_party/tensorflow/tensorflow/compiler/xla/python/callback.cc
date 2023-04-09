@@ -31,8 +31,8 @@ namespace py = pybind11;
 namespace xla {
 
 Status CpuCallback::PrepareAndCallInternal(void* result, void** arg_ptrs) {
-  absl::Span<void* const> inputs(arg_ptrs, args_.size());
-  absl::Span<void* const> outputs(reinterpret_cast<void**>(result),
+  abslx::Span<void* const> inputs(arg_ptrs, args_.size());
+  abslx::Span<void* const> outputs(reinterpret_cast<void**>(result),
                                   results_.size());
 
   py::gil_scoped_acquire gil;
@@ -53,9 +53,9 @@ Status CpuCallback::PrepareAndCallInternal(void* result, void** arg_ptrs) {
     py::object output = py::reinterpret_borrow<py::object>(
         PyTuple_GetItem(result_tuple.ptr(), i));
     py::array array = py::cast<py::array>(std::move(output));
-    absl::Span<int64_t const> dims(
+    abslx::Span<int64_t const> dims(
         reinterpret_cast<const int64_t*>(array.shape()), array.ndim());
-    absl::Span<int64_t const> strides(
+    abslx::Span<int64_t const> strides(
         reinterpret_cast<const int64_t*>(array.strides()), array.ndim());
     if (strides == results_[i].expected_strides) {
       std::memcpy(outputs[i], array.data(), results_[i].size_in_bytes);
@@ -122,14 +122,14 @@ StatusOr<py::tuple> CpuCallback::CallInternal(py::tuple args) {
     py::array array = py::cast<py::array>(std::move(output));
     static_assert(sizeof(ssize_t) == sizeof(int64_t),
                   "Expected ssize_t to be of equal size to int64_t");
-    absl::Span<int64_t const> dims(
+    abslx::Span<int64_t const> dims(
         reinterpret_cast<const int64_t*>(array.shape()), array.ndim());
     if (dims != results_[i].expected_dims) {
       return InternalError(
           "Mismatched result shape for %d-th return value from CPU callback; "
           "expected array with dimensions %s, got %s",
-          i, absl::StrJoin(results_[i].expected_dims, ","),
-          absl::StrJoin(dims, ","));
+          i, abslx::StrJoin(results_[i].expected_dims, ","),
+          abslx::StrJoin(dims, ","));
     }
   }
   return result_tuple;
@@ -154,7 +154,7 @@ std::optional<py::tuple> CpuCallback::Call(py::tuple args,
 void XlaPythonCpuCallback(void* output, void** inputs,
                           XlaCustomCallStatus* status) {
   CpuCallback* callback =
-      absl::bit_cast<CpuCallback*>(*static_cast<uintptr_t*>(inputs[0]));
+      abslx::bit_cast<CpuCallback*>(*static_cast<uintptr_t*>(inputs[0]));
   callback->PrepareAndCall(output, inputs + 1, status);
 }
 

@@ -21,7 +21,7 @@
 #include "gtest/gtest.h"
 #include "absl/strings/cord.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace {
 
@@ -39,7 +39,7 @@ TEST(InvokeFlush, Stream) {
 }
 
 TEST(InvokeFlush, Cord) {
-  absl::Cord str("ABC");
+  abslx::Cord str("ABC");
   str_format_internal::InvokeFlush(&str, "DEF");
   EXPECT_EQ(str, "ABCDEF");
 }
@@ -76,4 +76,4 @@ TEST(BufferRawSink, Limits) {
 
 }  // namespace
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

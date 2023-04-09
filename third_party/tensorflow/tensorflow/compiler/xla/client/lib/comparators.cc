@@ -32,7 +32,7 @@ limitations under the License.
 namespace xla {
 namespace {
 
-using XlaCompareOp = XlaOp (*)(XlaOp, XlaOp, absl::Span<const int64_t>);
+using XlaCompareOp = XlaOp (*)(XlaOp, XlaOp, abslx::Span<const int64_t>);
 
 XlaComputation CreateScalarComparisonComputation(
     const std::string& name, const std::vector<PrimitiveType>& operand_types,
@@ -71,9 +71,9 @@ XlaComputation CreateScalarComparisonComputation(
   for (auto operand_type : operand_types) {
     auto scalar_shape = ShapeUtil::MakeShape(operand_type, {});
     auto lhs_param = Parameter(b.get(), parameter_count * 2, scalar_shape,
-                               absl::StrCat("p.", parameter_count, ".lhs"));
+                               abslx::StrCat("p.", parameter_count, ".lhs"));
     auto rhs_param = Parameter(b.get(), parameter_count * 2 + 1, scalar_shape,
-                               absl::StrCat("p.", parameter_count, ".rhs"));
+                               abslx::StrCat("p.", parameter_count, ".rhs"));
     lhs_params.emplace_back(lhs_param);
     rhs_params.emplace_back(rhs_param);
     if (generators[parameter_count].has_value()) {

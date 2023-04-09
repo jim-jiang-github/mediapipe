@@ -27,7 +27,7 @@ namespace tflite {
 namespace gpu {
 namespace cl {
 
-absl::Status ClExecutionEnvironment::Init() { return CreateEnvironment(&env_); }
+abslx::Status ClExecutionEnvironment::Init() { return CreateEnvironment(&env_); }
 
 std::vector<CalculationsPrecision>
 ClExecutionEnvironment::GetSupportedPrecisions() const {
@@ -47,7 +47,7 @@ const GpuInfo& ClExecutionEnvironment::GetGpuInfo() const {
   return env_.GetDevicePtr()->GetInfo();
 }
 
-absl::Status ClExecutionEnvironment::ExecuteGpuOperationInternal(
+abslx::Status ClExecutionEnvironment::ExecuteGpuOperationInternal(
     const std::vector<TensorDescriptor*>& src_cpu,
     const std::vector<TensorDescriptor*>& dst_cpu,
     std::unique_ptr<GPUOperation>&& operation) {
@@ -85,7 +85,7 @@ absl::Status ClExecutionEnvironment::ExecuteGpuOperationInternal(
   for (int i = 0; i < dst_cpu.size(); ++i) {
     RETURN_IF_ERROR(dst[i].ToDescriptor(dst_cpu[i], env_.queue()));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace cl

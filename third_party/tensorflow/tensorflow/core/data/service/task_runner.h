@@ -246,8 +246,8 @@ class RoundRobinTaskRunner : public TaskRunner {
   // Condition variable notified whenever we start a new round of round-robin.
   condition_variable new_round_cv_;
   // Outstanding requests, indexed by round number and then consumer index.
-  absl::flat_hash_map<int64_t,
-                      absl::flat_hash_map<int64_t, const GetElementRequest*>>
+  abslx::flat_hash_map<int64_t,
+                      abslx::flat_hash_map<int64_t, const GetElementRequest*>>
       requests_ TF_GUARDED_BY(mu_);
   // Index of the first round we plan to serve. At startup, this is the minimum
   // of all requested element indices.

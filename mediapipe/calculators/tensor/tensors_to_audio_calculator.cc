@@ -38,7 +38,7 @@ std::vector<float> HannWindow(int window_size, bool sqrt_hann) {
   std::vector<float> hann_window(window_size);
   audio_dsp::HannWindow().GetPeriodicSamples(window_size, &hann_window);
   if (sqrt_hann) {
-    absl::c_transform(hann_window, hann_window.begin(),
+    abslx::c_transform(hann_window, hann_window.begin(),
                       [](double x) { return std::sqrt(x); });
   }
   return hann_window;
@@ -49,10 +49,10 @@ std::vector<float> InvHannWindow(int window_size, bool sqrt_hann) {
   std::vector<float> window = HannWindow(window_size, sqrt_hann);
   std::vector<float> inv_window(window.size());
   if (sqrt_hann) {
-    absl::c_copy(window, inv_window.begin());
+    abslx::c_copy(window, inv_window.begin());
   } else {
     const int kHalfWindowSize = window.size() / 2;
-    absl::c_transform(window, inv_window.begin(),
+    abslx::c_transform(window, inv_window.begin(),
                       [](double x) { return x * x; });
     for (int i = 0; i < kHalfWindowSize; ++i) {
       double sum = inv_window[i] + inv_window[kHalfWindowSize + i];
@@ -120,9 +120,9 @@ class TensorsToAudioCalculator : public Node {
   static constexpr Output<Matrix> kAudioOut{"AUDIO"};
   MEDIAPIPE_NODE_CONTRACT(kTensorsIn, kDcAndNyquistIn, kAudioOut);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
   // The internal state of the FFT library.
@@ -137,7 +137,7 @@ class TensorsToAudioCalculator : public Node {
   std::vector<float, Eigen::aligned_allocator<float>> fft_output_;
 };
 
-absl::Status TensorsToAudioCalculator::Open(CalculatorContext* cc) {
+abslx::Status TensorsToAudioCalculator::Open(CalculatorContext* cc) {
   const auto& options =
       cc->Options<mediapipe::TensorsToAudioCalculatorOptions>();
   RET_CHECK(options.has_fft_size()) << "FFT size must be specified.";
@@ -153,12 +153,12 @@ absl::Status TensorsToAudioCalculator::Open(CalculatorContext* cc) {
   fft_input_buffer_.resize(fft_size_);
   fft_workplace_.resize(fft_size_);
   fft_output_.resize(fft_size_);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorsToAudioCalculator::Process(CalculatorContext* cc) {
+abslx::Status TensorsToAudioCalculator::Process(CalculatorContext* cc) {
   if (kTensorsIn(cc).IsEmpty() || kDcAndNyquistIn(cc).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   const auto& input_tensors = *kTensorsIn(cc);
   RET_CHECK_EQ(input_tensors.size(), 1);
@@ -181,14 +181,14 @@ absl::Status TensorsToAudioCalculator::Process(CalculatorContext* cc) {
       [this](float a, float b) { return a * b * inverse_fft_size_; });
   Matrix matrix = Eigen::Map<Matrix>(fft_output_.data(), 1, fft_output_.size());
   kAudioOut(cc).Send(std::move(matrix));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorsToAudioCalculator::Close(CalculatorContext* cc) {
+abslx::Status TensorsToAudioCalculator::Close(CalculatorContext* cc) {
   if (fft_state_) {
     pffft_destroy_setup(fft_state_);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 MEDIAPIPE_REGISTER_NODE(TensorsToAudioCalculator);

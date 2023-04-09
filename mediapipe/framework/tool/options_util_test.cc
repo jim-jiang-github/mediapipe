@@ -46,13 +46,13 @@ using ::testing::HasSubstr;
 // A test Calculator using DeclareOptions and DefineOptions.
 class NightLightCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
-    return absl::OkStatus();
+  static abslx::Status GetContract(CalculatorContract* cc) {
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final { return absl::OkStatus(); }
+  abslx::Status Open(CalculatorContext* cc) final { return abslx::OkStatus(); }
 
-  absl::Status Process(CalculatorContext* cc) final { return absl::OkStatus(); }
+  abslx::Status Process(CalculatorContext* cc) final { return abslx::OkStatus(); }
 
  private:
   NightLightCalculatorOptions options_;
@@ -203,7 +203,7 @@ TEST_F(OptionsUtilTest, OptionsSyntaxUtil) {
 
 TEST_F(OptionsUtilTest, OptionFieldPath) {
   tool::OptionsSyntaxUtil syntax_util;
-  std::vector<absl::string_view> split;
+  std::vector<abslx::string_view> split;
   split = syntax_util.StrSplitTags("a/graph/option:a/node/option");
   EXPECT_EQ(2, split.size());
   EXPECT_EQ(split[0], "a/graph/option");
@@ -230,7 +230,7 @@ TEST_F(OptionsUtilTest, OptionFieldPath) {
 
 TEST_F(OptionsUtilTest, FindOptionsMessage) {
   tool::OptionsSyntaxUtil syntax_util;
-  std::vector<absl::string_view> split;
+  std::vector<abslx::string_view> split;
   split =
       syntax_util.StrSplitTags("chain_length:options/sub_options/num_lights");
   EXPECT_EQ(2, split.size());
@@ -314,9 +314,9 @@ FieldData AsFieldData(int v) {
 
 // Equality comparison for field contents.
 template <typename T>
-absl::Status Equals(const T& v1, const T& v2) {
+abslx::Status Equals(const T& v1, const T& v2) {
   RET_CHECK_EQ(v1, v2);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Equality comparison for protobuf field contents.
@@ -324,17 +324,17 @@ absl::Status Equals(const T& v1, const T& v2) {
 // The protobuf comparison is performed using testing::EqualsProto.
 using LightBundle = NightLightCalculatorOptions::LightBundle;
 template <>
-absl::Status Equals<LightBundle>(const LightBundle& v1, const LightBundle& v2) {
+abslx::Status Equals<LightBundle>(const LightBundle& v1, const LightBundle& v2) {
   std::string s_1, s_2;
   v1.SerializeToString(&s_1);
   v2.SerializeToString(&s_2);
   RET_CHECK(s_1 == s_2);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Equality comparison for FieldData vectors.
 template <typename FieldType>
-absl::Status Equals(std::vector<FieldData> b1, std::vector<FieldData> b2) {
+abslx::Status Equals(std::vector<FieldData> b1, std::vector<FieldData> b2) {
   using tool::options_field_util::AsPacket;
   RET_CHECK_EQ(b1.size(), b2.size());
   for (int i = 0; i < b1.size(); ++i) {
@@ -342,7 +342,7 @@ absl::Status Equals(std::vector<FieldData> b1, std::vector<FieldData> b2) {
     ASSIGN_OR_RETURN(Packet p2, AsPacket(b2.at(i)));
     MP_RETURN_IF_ERROR(Equals(p1.Get<FieldType>(), p2.Get<FieldType>()));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Unit-tests for graph options field accessors from options_field_util.
@@ -477,9 +477,9 @@ TEST_F(OptionsFieldUtilTest, SetFieldValuesInt) {
 
   // Replace a missing field index with new values.
   path = MakeFieldPath("OPTIONS/sub_options/num_lights/1", node_data);
-  absl::Status status =
+  abslx::Status status =
       SetFieldValues(node_data, path, {AsFieldData(55), AsFieldData(66)});
-  EXPECT_EQ(status.code(), absl::StatusCode::kInternal);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInternal);
   // TODO: status.message() appears empty on KokoroGCPDocker.
   // EXPECT_THAT(status.message(),
   //     HasSubstr("index >= 0 && index <= v.size()"));
@@ -577,9 +577,9 @@ TEST_F(OptionsFieldUtilTest, MergeFieldValuesInt) {
 
   // Replace a missing field index with new values.
   path = MakeFieldPath("OPTIONS/sub_options/num_lights/1", node_data);
-  absl::Status status =
+  abslx::Status status =
       MergeFieldValues(node_data, path, {AsFieldData(55), AsFieldData(66)});
-  EXPECT_EQ(status.code(), absl::StatusCode::kOutOfRange);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kOutOfRange);
   EXPECT_THAT(status.message(),
               HasSubstr("Missing field value: num_lights at index: 1"));
 }

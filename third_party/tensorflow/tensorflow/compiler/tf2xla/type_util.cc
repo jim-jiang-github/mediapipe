@@ -81,8 +81,8 @@ Status DataTypeToPrimitiveType(DataType data_type, xla::PrimitiveType* type) {
 }
 
 StatusOr<DataType> EncodePrimitiveTypeAsDataType(xla::PrimitiveType type) {
-  static const absl::flat_hash_map<xla::PrimitiveType, DataType>&
-      data_type_map = *new absl::flat_hash_map<xla::PrimitiveType, DataType>({
+  static const abslx::flat_hash_map<xla::PrimitiveType, DataType>&
+      data_type_map = *new abslx::flat_hash_map<xla::PrimitiveType, DataType>({
           {xla::PRED, DT_BOOL},
           {xla::BF16, DT_BFLOAT16},
           {xla::F16, DT_HALF},

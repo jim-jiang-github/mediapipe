@@ -91,14 +91,14 @@ mlir::LogicalResult CreateSendRecvOpsToTransferProgramKey(
     mlir::Value* program_key_output) {
   mlir::OpBuilder builder(module.getContext());
   mlir::Value compilation_key = *compile_op.program().begin();
-  absl::Span<const std::string> local_devices = mesh.local_devices();
+  abslx::Span<const std::string> local_devices = mesh.local_devices();
 
   // Create tensor name mapping for each send/recv pair.
   llvm::SmallDenseMap<int, std::string> device_key_map;
   const int num_tpu_devices = local_devices.size();
   device_key_map.reserve(num_tpu_devices);
   for (int i = 0; i < num_tpu_devices; ++i) {
-    std::string tensor_name = absl::StrCat(kSendRecvKeyPrefix, *num_send_recv);
+    std::string tensor_name = abslx::StrCat(kSendRecvKeyPrefix, *num_send_recv);
     *num_send_recv += 1;
     device_key_map.try_emplace(i, std::move(tensor_name));
   }

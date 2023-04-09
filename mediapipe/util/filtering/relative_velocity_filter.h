@@ -66,7 +66,7 @@ class RelativeVelocityFilter {
   //                to different resolution, you should come up with an
   //                appropriate parameter for your particular use case)
   // @value - value to filter
-  float Apply(absl::Duration timestamp, float value_scale, float value);
+  float Apply(abslx::Duration timestamp, float value_scale, float value);
 
  private:
   struct WindowElement {

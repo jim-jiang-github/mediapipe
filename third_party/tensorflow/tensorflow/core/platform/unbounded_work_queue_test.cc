@@ -27,7 +27,7 @@ class UnboundedWorkQueueTest : public ::testing::Test {
  protected:
   UnboundedWorkQueueTest()
       : work_queue_(
-            absl::make_unique<UnboundedWorkQueue>(Env::Default(), "test")) {}
+            abslx::make_unique<UnboundedWorkQueue>(Env::Default(), "test")) {}
   ~UnboundedWorkQueueTest() override = default;
 
   void RunMultipleCopiesOfClosure(const int num_closures,

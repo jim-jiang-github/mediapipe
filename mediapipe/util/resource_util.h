@@ -38,11 +38,11 @@ namespace mediapipe {
 // accepts file paths. Code that can access data as a stream or as a buffer
 // should read from an asset directly on Android; an API for this will be
 // provided later. TODO.
-absl::StatusOr<std::string> PathToResourceAsFile(const std::string& path);
+abslx::StatusOr<std::string> PathToResourceAsFile(const std::string& path);
 
 // Reads the entire contents of a resource. The search path is as in
 // PathToResourceAsFile.
-absl::Status GetResourceContents(const std::string& path, std::string* output,
+abslx::Status GetResourceContents(const std::string& path, std::string* output,
                                  bool read_as_binary = true);
 
 }  // namespace mediapipe

@@ -43,7 +43,7 @@ ParallelLoopEmitter::ParallelLoopEmitter(
 
 ParallelLoopEmitter::ParallelLoopEmitter(
     const llvm_ir::ElementGenerator& target_element_generator,
-    absl::Span<const llvm_ir::IrArray> target_arrays,
+    abslx::Span<const llvm_ir::IrArray> target_arrays,
     const LaunchDimensions& launch_dimensions, llvm::IRBuilder<>* b,
 
     LaunchDimensionsConfig launch_config)
@@ -145,7 +145,7 @@ ParallelLoopEmitter::EmitLinearBaseAndThreadIdx(llvm::Type* index_type,
 
 std::vector<llvm_ir::IrArray::Index>
 ParallelLoopEmitter::EmitLogicalIndexAndSetExitBasicBlock(
-    absl::string_view loop_name, llvm::Type* index_type,
+    abslx::string_view loop_name, llvm::Type* index_type,
     llvm::Value* base_index) {
   std::vector<llvm_ir::IrArray::Index> array_indices;
 
@@ -162,7 +162,7 @@ ParallelLoopEmitter::EmitLogicalIndexAndSetExitBasicBlock(
       llvm::Value* addend = llvm::ConstantInt::get(
           index_type, launch_dimensions_.total_nb_threads());
       linear_base =
-          b_->CreateAdd(linear_base, addend, absl::StrCat("linear_index", i),
+          b_->CreateAdd(linear_base, addend, abslx::StrCat("linear_index", i),
                         /*HasNUW=*/true, /*HasNSW=*/true);
     }
     auto dims = shape_.dimensions();
@@ -199,7 +199,7 @@ ParallelLoopEmitter::EmitLogicalIndexAndSetExitBasicBlock(
 }
 
 std::vector<llvm_ir::IrArray::Index>
-ParallelLoopEmitter::EmitIndexAndSetExitBasicBlock(absl::string_view loop_name,
+ParallelLoopEmitter::EmitIndexAndSetExitBasicBlock(abslx::string_view loop_name,
                                                    llvm::Type* index_type,
                                                    llvm::Value* base_index) {
   // Emit the following code in LLVM IR:
@@ -266,7 +266,7 @@ ParallelLoopEmitter::EmitIndexAndSetExitBasicBlock(absl::string_view loop_name,
   for (int i = 1; i < launch_config_.unroll_factor; ++i) {
     llvm::Value* linear_index =
         b_->CreateAdd(linear_index_base, llvm::ConstantInt::get(index_type, i),
-                      absl::StrCat("linear_index", i),
+                      abslx::StrCat("linear_index", i),
                       /*HasNUW=*/true, /*HasNSW=*/true);
     if (!launch_config_.row_vectorized) {
       array_indices.emplace_back(linear_index, shape_, b_);
@@ -274,7 +274,7 @@ ParallelLoopEmitter::EmitIndexAndSetExitBasicBlock(absl::string_view loop_name,
       std::vector<llvm::Value*> multidim(shape_.rank(), nullptr);
       multidim.back() = b_->CreateAdd(
           row_index, llvm::ConstantInt::get(index_type, i),
-          absl::StrCat("row_index_plus", i), /*HasNUW=*/true, /*HasNSW=*/true);
+          abslx::StrCat("row_index_plus", i), /*HasNUW=*/true, /*HasNSW=*/true);
       array_indices.emplace_back(linear_index, multidim, shape_, b_);
     }
   }
@@ -295,7 +295,7 @@ ParallelLoopEmitter::EmitIndexAndSetExitBasicBlock(absl::string_view loop_name,
   return array_indices;
 }
 
-Status ParallelLoopEmitter::EmitSerialLoop(absl::string_view loop_name,
+Status ParallelLoopEmitter::EmitSerialLoop(abslx::string_view loop_name,
                                            llvm::Type* index_type,
                                            llvm::Value* base_indvar) {
   for (const llvm_ir::IrArray::Index& array_index :
@@ -305,7 +305,7 @@ Status ParallelLoopEmitter::EmitSerialLoop(absl::string_view loop_name,
   return OkStatus();
 }
 
-Status ParallelLoopEmitter::EmitLoop(absl::string_view loop_name,
+Status ParallelLoopEmitter::EmitLoop(abslx::string_view loop_name,
                                      llvm::Type* index_type) {
   if (index_type == nullptr) {
     index_type = b_->getInt64Ty();

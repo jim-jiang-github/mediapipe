@@ -25,7 +25,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status QuantAndDequant_Dim2Bits8Test(TestExecutionEnvironment* env) {
+abslx::Status QuantAndDequant_Dim2Bits8Test(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 3, 2, 1);
   src_tensor.data = {0.0f, 1.0f, 0.25f, 0.50f, 0.4444444f, 0.00001f};
@@ -58,10 +58,10 @@ absl::Status QuantAndDequant_Dim2Bits8Test(TestExecutionEnvironment* env) {
                         dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status QuantAndDequant_Dim3Bits8_NegativeRangeTest(
+abslx::Status QuantAndDequant_Dim3Bits8_NegativeRangeTest(
     TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 3, 1, 2);
@@ -95,10 +95,10 @@ absl::Status QuantAndDequant_Dim3Bits8_NegativeRangeTest(
           dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status QuantAndDequant_Dim3Bits16Test(TestExecutionEnvironment* env) {
+abslx::Status QuantAndDequant_Dim3Bits16Test(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 3, 1, 2);
   src_tensor.data = {0.0f, 1.0f, 0.25f, 0.50f, 0.4444444f, 0.00001f};
@@ -131,10 +131,10 @@ absl::Status QuantAndDequant_Dim3Bits16Test(TestExecutionEnvironment* env) {
           dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status QuantAndDequant_Dim2Bits16_NegativeRangeTest(
+abslx::Status QuantAndDequant_Dim2Bits16_NegativeRangeTest(
     TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 3, 2, 1);
@@ -168,7 +168,7 @@ absl::Status QuantAndDequant_Dim2Bits16_NegativeRangeTest(
           dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

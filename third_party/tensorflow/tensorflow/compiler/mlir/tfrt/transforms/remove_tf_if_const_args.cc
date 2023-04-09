@@ -82,7 +82,7 @@ class RemoveTfIfConstArgs
                                  llvm::ArrayRef<mlir::TF::ConstOp> const_args,
                                  llvm::ArrayRef<unsigned> const_arg_indices,
                                  llvm::ArrayRef<mlir::Value> remaining_args) {
-    auto branch_suffix = absl::StrCat("_removed_const_args_", id_++);
+    auto branch_suffix = abslx::StrCat("_removed_const_args_", id_++);
 
     // Create wrapper functions with the new arguments (as const args are
     // removed) for both then function and else function.
@@ -104,7 +104,7 @@ class RemoveTfIfConstArgs
 
   llvm::StringRef CreateBranchFunction(
       mlir::OpBuilder &builder, mlir::func::FuncOp branch,
-      absl::string_view branch_suffix,
+      abslx::string_view branch_suffix,
       llvm::ArrayRef<mlir::TF::ConstOp> const_args,
       llvm::ArrayRef<unsigned> const_arg_indices) {
     // Get the new function type as const args are removed.
@@ -113,7 +113,7 @@ class RemoveTfIfConstArgs
     auto new_branch_type = branch.getFunctionType().getWithoutArgsAndResults(
         const_arg_indices_bv, {});
     std::string new_branch_name =
-        absl::StrCat(branch.getSymName().str(), branch_suffix);
+        abslx::StrCat(branch.getSymName().str(), branch_suffix);
     // Create the wrapper function with the new arguments that calls the
     // original branch.
     auto new_branch = builder.create<mlir::func::FuncOp>(

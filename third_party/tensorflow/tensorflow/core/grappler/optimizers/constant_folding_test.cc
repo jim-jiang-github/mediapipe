@@ -3495,7 +3495,7 @@ TEST_F(ConstantFoldingTest, PartialFolding_AssociativeAndCommutative) {
         EXPECT_EQ("ConstantFolding/acc6_partial_split_2", node.input(1));
         EXPECT_EQ("y", node.input(2));
       }
-      if (absl::StartsWith(node.name(), "ConstantFolding/")) {
+      if (abslx::StartsWith(node.name(), "ConstantFolding/")) {
         EXPECT_EQ("Const", node.op());
       }
     }
@@ -3580,7 +3580,7 @@ TEST_F(ConstantFoldingTest, PartialFolding_Concat) {
       EXPECT_EQ("x", node.input(1));
       EXPECT_EQ("y", node.input(2));
       EXPECT_EQ("axis", node.input(3));
-    } else if (absl::StartsWith(node.name(), "ConstantFolding/")) {
+    } else if (abslx::StartsWith(node.name(), "ConstantFolding/")) {
       EXPECT_EQ("Const", node.op());
     } else {
       EXPECT_EQ(item.graph.node(i).DebugString(), node.DebugString());

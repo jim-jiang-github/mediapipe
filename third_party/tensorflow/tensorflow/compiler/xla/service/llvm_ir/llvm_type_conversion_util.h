@@ -27,16 +27,16 @@ limitations under the License.
 namespace xla {
 namespace llvm_ir {
 
-// Convert a absl::string_view to a llvm::StringRef. Note: both
-// absl::string_view and llvm::StringRef are non-owning pointers into a
+// Convert a abslx::string_view to a llvm::StringRef. Note: both
+// abslx::string_view and llvm::StringRef are non-owning pointers into a
 // string in memory. This method is used to feed strings to LLVM
 // & Clang APIs that expect llvm::StringRef.
-inline llvm::StringRef AsStringRef(absl::string_view str) {
+inline llvm::StringRef AsStringRef(abslx::string_view str) {
   return llvm::StringRef(str.data(), str.size());
 }
 
-inline absl::string_view AsStringView(llvm::StringRef str) {
-  return absl::string_view(str.data(), str.size());
+inline abslx::string_view AsStringView(llvm::StringRef str) {
+  return abslx::string_view(str.data(), str.size());
 }
 
 template <typename T>
@@ -45,7 +45,7 @@ llvm::ArrayRef<T> AsArrayRef(const std::vector<T>& vec) {
 }
 
 template <typename T>
-llvm::ArrayRef<T> AsArrayRef(const absl::Span<const T> slice) {
+llvm::ArrayRef<T> AsArrayRef(const abslx::Span<const T> slice) {
   return llvm::ArrayRef<T>(slice.data(), slice.size());
 }
 

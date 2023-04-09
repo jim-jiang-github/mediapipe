@@ -25,10 +25,10 @@ namespace tensorflow {
 namespace gtl {
 
 template <typename T>
-using ArraySlice = absl::Span<const T>;
+using ArraySlice = abslx::Span<const T>;
 
 template <typename T>
-using MutableArraySlice = absl::Span<T>;
+using MutableArraySlice = abslx::Span<T>;
 
 }  // namespace gtl
 }  // namespace tensorflow

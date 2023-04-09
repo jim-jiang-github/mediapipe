@@ -43,11 +43,11 @@ const int Graph::kControlSlot = -1;
 
 // Node
 Node::NodeClass Node::GetNodeClassForOp(const std::string& ts) {
-  static const absl::flat_hash_map<std::string, Node::NodeClass>*
+  static const abslx::flat_hash_map<std::string, Node::NodeClass>*
       kNodeClassTable =
 #define REF_CLASS(key, value) \
   {key, value}, { "Ref" key, value }
-          new absl::flat_hash_map<std::string, Node::NodeClass>({
+          new abslx::flat_hash_map<std::string, Node::NodeClass>({
               // Keep in same order as NodeClass values
               REF_CLASS("Switch", NC_SWITCH),
               REF_CLASS("_SwitchN", NC_SWITCH),

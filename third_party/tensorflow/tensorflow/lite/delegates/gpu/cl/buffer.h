@@ -55,16 +55,16 @@ class Buffer : public GPUObject {
   // Writes data to a buffer. Data should point to a region that
   // has exact size in bytes as size_in_bytes(constructor parameter).
   template <typename T>
-  absl::Status WriteData(CLCommandQueue* queue, const absl::Span<T> data);
+  abslx::Status WriteData(CLCommandQueue* queue, const abslx::Span<T> data);
 
   // Reads data from Buffer into CPU memory.
   template <typename T>
-  absl::Status ReadData(CLCommandQueue* queue, std::vector<T>* result) const;
+  abslx::Status ReadData(CLCommandQueue* queue, std::vector<T>* result) const;
 
-  absl::Status GetGPUResources(const GPUObjectDescriptor* obj_ptr,
+  abslx::Status GetGPUResources(const GPUObjectDescriptor* obj_ptr,
                                GPUResourcesWithValue* resources) const override;
 
-  absl::Status CreateFromBufferDescriptor(const BufferDescriptor& desc,
+  abslx::Status CreateFromBufferDescriptor(const BufferDescriptor& desc,
                                           CLContext* context);
 
  private:
@@ -75,36 +75,36 @@ class Buffer : public GPUObject {
   bool is_sub_buffer_ = false;
 };
 
-absl::Status CreateReadOnlyBuffer(size_t size_in_bytes, CLContext* context,
+abslx::Status CreateReadOnlyBuffer(size_t size_in_bytes, CLContext* context,
                                   Buffer* result);
 
-absl::Status CreateReadOnlyBuffer(size_t size_in_bytes, const void* data,
+abslx::Status CreateReadOnlyBuffer(size_t size_in_bytes, const void* data,
                                   CLContext* context, Buffer* result);
 
-absl::Status CreateReadWriteBuffer(size_t size_in_bytes, CLContext* context,
+abslx::Status CreateReadWriteBuffer(size_t size_in_bytes, CLContext* context,
                                    Buffer* result);
 
-absl::Status CreateReadWriteSubBuffer(const Buffer& parent,
+abslx::Status CreateReadWriteSubBuffer(const Buffer& parent,
                                       size_t origin_in_bytes,
                                       size_t size_in_bytes, CLContext* context,
                                       Buffer* result);
 
 template <typename T>
-absl::Status Buffer::WriteData(CLCommandQueue* queue,
-                               const absl::Span<T> data) {
+abslx::Status Buffer::WriteData(CLCommandQueue* queue,
+                               const abslx::Span<T> data) {
   if (size_ != sizeof(T) * data.size()) {
-    return absl::InvalidArgumentError(
-        "absl::Span<T> data size is different from buffer allocated size.");
+    return abslx::InvalidArgumentError(
+        "abslx::Span<T> data size is different from buffer allocated size.");
   }
   RETURN_IF_ERROR(queue->EnqueueWriteBuffer(buffer_, size_, data.data()));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <typename T>
-absl::Status Buffer::ReadData(CLCommandQueue* queue,
+abslx::Status Buffer::ReadData(CLCommandQueue* queue,
                               std::vector<T>* result) const {
   if (size_ % sizeof(T) != 0) {
-    return absl::UnknownError("Wrong element size(typename T is not correct?");
+    return abslx::UnknownError("Wrong element size(typename T is not correct?");
   }
 
   const int elements_count = size_ / sizeof(T);

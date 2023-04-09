@@ -138,7 +138,7 @@ TEST(ResamplerQTest, TimeAlignment) {
         continue;
       }
 
-      SCOPED_TRACE(absl::StrFormat("Resampling from %gHz to %gHz",
+      SCOPED_TRACE(abslx::StrFormat("Resampling from %gHz to %gHz",
                                    input_sample_rate, output_sample_rate));
       const double max_frequency = 0.45 * std::min<double>(input_sample_rate,
                                                            output_sample_rate);
@@ -191,7 +191,7 @@ TEST(ResamplerQTest, FullyPrimed) {
         continue;
       }
 
-      SCOPED_TRACE(absl::StrFormat("Resampling from %dHz to %dHz",
+      SCOPED_TRACE(abslx::StrFormat("Resampling from %dHz to %dHz",
                                    input_sample_rate, output_sample_rate));
       int factor_numerator = input_sample_rate;
       int factor_denominator = output_sample_rate;
@@ -224,7 +224,7 @@ TEST(ResamplerQTest, NextNumInputToProduce) {
         continue;
       }
 
-      SCOPED_TRACE(absl::StrFormat("Resampling from %gHz to %gHz",
+      SCOPED_TRACE(abslx::StrFormat("Resampling from %gHz to %gHz",
                                    input_sample_rate, output_sample_rate));
       QResampler<float> resampler(input_sample_rate, output_sample_rate);
       ASSERT_TRUE(resampler.Valid());
@@ -235,7 +235,7 @@ TEST(ResamplerQTest, NextNumInputToProduce) {
       // Pad beginning of the stream with `pad` frames, 0 <= pad < denominator,
       // to test size formulas for every possible phase.
       for (int pad = 0; pad < resampler.factor_denominator(); ++pad) {
-        SCOPED_TRACE(absl::StrFormat("pad: %d", pad));
+        SCOPED_TRACE(abslx::StrFormat("pad: %d", pad));
 
         resampler.Reset();
         resampler.ProcessSamples(Eigen::ArrayXf::Zero(pad), &output);
@@ -326,17 +326,17 @@ TYPED_TEST(ResamplerQTypedTest, CompareWithReferenceResampler) {
   EXPECT_FALSE(resampler.Valid());
 
   for (int num_channels : {1, 3}) {
-    SCOPED_TRACE(absl::StrFormat("num_channels: %d", num_channels));
+    SCOPED_TRACE(abslx::StrFormat("num_channels: %d", num_channels));
 
     for (double input_sample_rate : kTestRates) {
       for (double output_sample_rate : kTestRates) {
         if (input_sample_rate == output_sample_rate) {
           continue;
         }
-        SCOPED_TRACE(absl::StrFormat("Resampling from %gHz to %gHz",
+        SCOPED_TRACE(abslx::StrFormat("Resampling from %gHz to %gHz",
                                      input_sample_rate, output_sample_rate));
         for (double radius_factor : {4, 5, 17}) {
-          SCOPED_TRACE(absl::StrFormat("radius_factor: %g", radius_factor));
+          SCOPED_TRACE(abslx::StrFormat("radius_factor: %g", radius_factor));
 
           QResamplerParams params;
           params.filter_radius_factor = radius_factor;
@@ -413,7 +413,7 @@ TEST(ResamplerQTest, ResampleSineWave) {
         continue;
       }
 
-      SCOPED_TRACE(absl::StrFormat("Resampling from %gHz to %gHz",
+      SCOPED_TRACE(abslx::StrFormat("Resampling from %gHz to %gHz",
                                    input_sample_rate, output_sample_rate));
       std::vector<float> input;
       ComputeSineWaveVector(kFrequency, input_sample_rate, 0.0, 100, &input);
@@ -455,7 +455,7 @@ TYPED_TEST(ResamplerQTypedTest, StreamingRandomBlockSizes) {
   QResampler<ValueType> resampler;
 
   for (int num_channels : {1, 3}) {
-    SCOPED_TRACE(absl::StrFormat("num_channels: %d", num_channels));
+    SCOPED_TRACE(abslx::StrFormat("num_channels: %d", num_channels));
     Buffer input = Buffer::Random(num_channels, 400);  // 400 input frames.
 
     for (double input_sample_rate : kTestRates) {
@@ -464,7 +464,7 @@ TYPED_TEST(ResamplerQTypedTest, StreamingRandomBlockSizes) {
           continue;
         }
 
-        SCOPED_TRACE(absl::StrFormat("Resampling from %gHz to %gHz",
+        SCOPED_TRACE(abslx::StrFormat("Resampling from %gHz to %gHz",
                                      input_sample_rate, output_sample_rate));
         resampler.Init(input_sample_rate, output_sample_rate, num_channels);
         ASSERT_TRUE(resampler.Valid());
@@ -510,7 +510,7 @@ TYPED_TEST(ResamplerQTypedTest, ArgTypes) {
   QResampler<ValueType> resampler;
 
   for (int num_channels : {1, 3}) {
-    SCOPED_TRACE(absl::StrFormat("num_channels: %d", num_channels));
+    SCOPED_TRACE(abslx::StrFormat("num_channels: %d", num_channels));
     Buffer input = Buffer::Random(num_channels, kNumInputFrames);
 
     for (double input_sample_rate : kTestRates) {
@@ -519,7 +519,7 @@ TYPED_TEST(ResamplerQTypedTest, ArgTypes) {
           continue;
         }
 
-        SCOPED_TRACE(absl::StrFormat("Resampling from %gHz to %gHz",
+        SCOPED_TRACE(abslx::StrFormat("Resampling from %gHz to %gHz",
                                      input_sample_rate, output_sample_rate));
 
         resampler.Init(input_sample_rate, output_sample_rate, num_channels);
@@ -536,7 +536,7 @@ TYPED_TEST(ResamplerQTypedTest, ArgTypes) {
           resampler.Reset();
           std::vector<ValueType> output;
           Eigen::internal::set_is_malloc_allowed(false);
-          resampler.ProcessSamples(absl::MakeConstSpan(input), &output);
+          resampler.ProcessSamples(abslx::MakeConstSpan(input), &output);
           Eigen::internal::set_is_malloc_allowed(true);
           EXPECT_THAT(output, FloatArrayNear(expected, 5e-7));
         }
@@ -544,9 +544,9 @@ TYPED_TEST(ResamplerQTypedTest, ArgTypes) {
         {
           resampler.Reset();
           std::vector<ValueType> output(num_channels * num_output_frames);
-          absl::Span<ValueType> out_span(output);
+          abslx::Span<ValueType> out_span(output);
           Eigen::internal::set_is_malloc_allowed(false);
-          resampler.ProcessSamples(absl::MakeConstSpan(input), out_span);
+          resampler.ProcessSamples(abslx::MakeConstSpan(input), out_span);
           Eigen::internal::set_is_malloc_allowed(true);
           EXPECT_THAT(output, FloatArrayNear(expected, 5e-7));
         }
@@ -591,7 +591,7 @@ TYPED_TEST(ResamplerQTypedTest, ArgTypes) {
           Resampler<ValueType>* base_ptr = &resampler;
           base_ptr->Reset();
           std::vector<ValueType> output;
-          base_ptr->ProcessSamples(absl::MakeConstSpan(input), &output);
+          base_ptr->ProcessSamples(abslx::MakeConstSpan(input), &output);
           EXPECT_THAT(output, FloatArrayNear(expected, 5e-7));
         }
       }
@@ -622,11 +622,11 @@ struct MockResamplerImpl {
     EXPECT_EQ(output.rows(), num_channels);
     EXPECT_EQ(output.cols(), *expected_num_output_frames);
 
-    EXPECT_EQ(absl::decay_t<DelayedInput>::RowsAtCompileTime,
+    EXPECT_EQ(abslx::decay_t<DelayedInput>::RowsAtCompileTime,
               expected_rows_at_compile_time);
-    EXPECT_EQ(absl::decay_t<Input>::RowsAtCompileTime,
+    EXPECT_EQ(abslx::decay_t<Input>::RowsAtCompileTime,
               expected_rows_at_compile_time);
-    EXPECT_EQ(absl::decay_t<Output>::RowsAtCompileTime,
+    EXPECT_EQ(abslx::decay_t<Output>::RowsAtCompileTime,
               expected_rows_at_compile_time);
   }
 
@@ -636,7 +636,7 @@ struct MockResamplerImpl {
 int* MockResamplerImpl::expected_num_output_frames;
 int MockResamplerImpl::expected_rows_at_compile_time;
 
-// Test passing absl::Spans and std::vectors to ProcessSamples and Flush() into
+// Test passing abslx::Spans and std::vectors to ProcessSamples and Flush() into
 // MockResamplerImpl.
 TEST(ResamplerQTest, MockResamplerImpl) {
   constexpr int kNumInputFrames = 15;
@@ -647,11 +647,11 @@ TEST(ResamplerQTest, MockResamplerImpl) {
       if (input_sample_rate == output_sample_rate) {
         continue;
       }
-      SCOPED_TRACE(absl::StrFormat("Resampling from %gHz to %gHz",
+      SCOPED_TRACE(abslx::StrFormat("Resampling from %gHz to %gHz",
                                    input_sample_rate, output_sample_rate));
 
       for (int num_channels : {1, 3}) {
-        SCOPED_TRACE(absl::StrFormat("num_channels: %d", num_channels));
+        SCOPED_TRACE(abslx::StrFormat("num_channels: %d", num_channels));
 
         ASSERT_TRUE(
             mock.Init(input_sample_rate, output_sample_rate, num_channels));
@@ -663,26 +663,26 @@ TEST(ResamplerQTest, MockResamplerImpl) {
         MockResamplerImpl::expected_rows_at_compile_time =
             (num_channels == 1) ? 1 : Eigen::Dynamic;
 
-        // Test std::vector and absl::Span args.
+        // Test std::vector and abslx::Span args.
         std::vector<float> input_vector(num_channels * kNumInputFrames);
         std::vector<float> output_vector;
-        absl::Span<const float> input_span(absl::MakeConstSpan(input_vector));
+        abslx::Span<const float> input_span(abslx::MakeConstSpan(input_vector));
         std::vector<float> output_buffer(num_channels * num_output_frames);
-        absl::Span<float> output_span(absl::MakeSpan(output_buffer));
+        abslx::Span<float> output_span(abslx::MakeSpan(output_buffer));
         {
           SCOPED_TRACE("ProcessSamples(const std::vector&, std::vector*)");
           mock.ProcessSamples(input_vector, &output_vector);
         }
         {
-          SCOPED_TRACE("ProcessSamples(absl::Span, std::vector*)");
+          SCOPED_TRACE("ProcessSamples(abslx::Span, std::vector*)");
           mock.ProcessSamples(input_span, &output_vector);
         }
         {
-          SCOPED_TRACE("ProcessSamples(const std::vector&, absl::Span)");
+          SCOPED_TRACE("ProcessSamples(const std::vector&, abslx::Span)");
           mock.ProcessSamples(input_vector, output_span);
         }
         {
-          SCOPED_TRACE("ProcessSamples(absl::Span, absl::Span)");
+          SCOPED_TRACE("ProcessSamples(abslx::Span, abslx::Span)");
           mock.ProcessSamples(input_span, output_span);
         }
 
@@ -694,9 +694,9 @@ TEST(ResamplerQTest, MockResamplerImpl) {
         {
           std::vector<float> flush_output_buffer(
               num_channels * num_output_frames);
-          absl::Span<float> flush_output_span(
-              absl::MakeSpan(flush_output_buffer));
-          SCOPED_TRACE("Flush(absl::Span)");
+          abslx::Span<float> flush_output_span(
+              abslx::MakeSpan(flush_output_buffer));
+          SCOPED_TRACE("Flush(abslx::Span)");
           mock.Flush(flush_output_span);
         }
 
@@ -764,7 +764,7 @@ TEST(ResamplerQTest, MockResamplerImpl) {
       // Test that number of rows is statically inferred when possible.
       {
         constexpr int kNumChannels = 3;
-        SCOPED_TRACE(absl::StrFormat("kNumChannels: %d", kNumChannels));
+        SCOPED_TRACE(abslx::StrFormat("kNumChannels: %d", kNumChannels));
         ASSERT_TRUE(
             mock.Init(input_sample_rate, output_sample_rate, kNumChannels));
         int num_output_frames = mock.NextNumOutputFrames(kNumInputFrames);

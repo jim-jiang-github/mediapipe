@@ -91,34 +91,34 @@ static std::string RandomLowercaseString(RandomEngine* rng, size_t length) {
   return result;
 }
 
-static void DoNothing(absl::string_view /* data */, void* /* arg */) {}
+static void DoNothing(abslx::string_view /* data */, void* /* arg */) {}
 
-static void DeleteExternalString(absl::string_view data, void* arg) {
+static void DeleteExternalString(abslx::string_view data, void* arg) {
   std::string* s = reinterpret_cast<std::string*>(arg);
   EXPECT_EQ(data, *s);
   delete s;
 }
 
 // Add "s" to *dst via `MakeCordFromExternal`
-static void AddExternalMemory(absl::string_view s, absl::Cord* dst) {
+static void AddExternalMemory(abslx::string_view s, abslx::Cord* dst) {
   std::string* str = new std::string(s.data(), s.size());
-  dst->Append(absl::MakeCordFromExternal(*str, [str](absl::string_view data) {
+  dst->Append(abslx::MakeCordFromExternal(*str, [str](abslx::string_view data) {
     DeleteExternalString(data, str);
   }));
 }
 
 static void DumpGrowth() {
-  absl::Cord str;
+  abslx::Cord str;
   for (int i = 0; i < 1000; i++) {
     char c = 'a' + i % 26;
-    str.Append(absl::string_view(&c, 1));
+    str.Append(abslx::string_view(&c, 1));
   }
 }
 
 // Make a Cord with some number of fragments.  Return the size (in bytes)
 // of the smallest fragment.
 static size_t AppendWithFragments(const std::string& s, RandomEngine* rng,
-                                  absl::Cord* cord) {
+                                  abslx::Cord* cord) {
   size_t j = 0;
   const size_t max_size = s.size() / 5;  // Make approx. 10 fragments
   size_t min_size = max_size;            // size of smallest fragment
@@ -134,9 +134,9 @@ static size_t AppendWithFragments(const std::string& s, RandomEngine* rng,
     std::bernoulli_distribution coin_flip(0.5);
     if (coin_flip(*rng)) {
       // Grow by adding an external-memory.
-      AddExternalMemory(absl::string_view(s.data() + j, N), cord);
+      AddExternalMemory(abslx::string_view(s.data() + j, N), cord);
     } else {
-      cord->Append(absl::string_view(s.data() + j, N));
+      cord->Append(abslx::string_view(s.data() + j, N));
     }
     j += N;
   }
@@ -144,25 +144,25 @@ static size_t AppendWithFragments(const std::string& s, RandomEngine* rng,
 }
 
 // Add an external memory that contains the specified std::string to cord
-static void AddNewStringBlock(const std::string& str, absl::Cord* dst) {
+static void AddNewStringBlock(const std::string& str, abslx::Cord* dst) {
   char* data = new char[str.size()];
   memcpy(data, str.data(), str.size());
-  dst->Append(absl::MakeCordFromExternal(
-      absl::string_view(data, str.size()),
-      [](absl::string_view s) { delete[] s.data(); }));
+  dst->Append(abslx::MakeCordFromExternal(
+      abslx::string_view(data, str.size()),
+      [](abslx::string_view s) { delete[] s.data(); }));
 }
 
 // Make a Cord out of many different types of nodes.
-static absl::Cord MakeComposite() {
-  absl::Cord cord;
+static abslx::Cord MakeComposite() {
+  abslx::Cord cord;
   cord.Append("the");
   AddExternalMemory(" quick brown", &cord);
   AddExternalMemory(" fox jumped", &cord);
 
-  absl::Cord full(" over");
+  abslx::Cord full(" over");
   AddExternalMemory(" the lazy", &full);
   AddNewStringBlock(" dog slept the whole day away", &full);
-  absl::Cord substring = full.Subcord(0, 18);
+  abslx::Cord substring = full.Subcord(0, 18);
 
   // Make substring long enough to defeat the copying fast path in Append.
   substring.Append(std::string(1000, '.'));
@@ -172,13 +172,13 @@ static absl::Cord MakeComposite() {
   return cord;
 }
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 class CordTestPeer {
  public:
   static void ForEachChunk(
-      const Cord& c, absl::FunctionRef<void(absl::string_view)> callback) {
+      const Cord& c, abslx::FunctionRef<void(abslx::string_view)> callback) {
     c.ForEachChunk(callback);
   }
 
@@ -202,10 +202,10 @@ class CordTestPeer {
 };
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 TEST(Cord, AllFlatSizes) {
-  using absl::strings_internal::CordTestAccess;
+  using abslx::strings_internal::CordTestAccess;
 
   for (size_t s = 0; s < CordTestAccess::MaxFlatLength(); s++) {
     // Make a string of length s.
@@ -214,7 +214,7 @@ TEST(Cord, AllFlatSizes) {
       src.push_back('a' + (src.size() % 26));
     }
 
-    absl::Cord dst(src);
+    abslx::Cord dst(src);
     EXPECT_EQ(std::string(dst), src) << s;
   }
 }
@@ -229,16 +229,16 @@ TEST(GigabyteCord, FromExternal) {
 
   size_t length = 128 * 1024;
   char* data = new char[length];
-  absl::Cord from = absl::MakeCordFromExternal(
-      absl::string_view(data, length),
-      [](absl::string_view sv) { delete[] sv.data(); });
+  abslx::Cord from = abslx::MakeCordFromExternal(
+      abslx::string_view(data, length),
+      [](abslx::string_view sv) { delete[] sv.data(); });
 
   // This loop may seem odd due to its combination of exponential doubling of
   // size and incremental size increases.  We do it incrementally to be sure the
   // Cord will need rebalancing and will exercise code that, in the past, has
   // caused crashes in production.  We grow exponentially so that the code will
   // execute in a reasonable amount of time.
-  absl::Cord c;
+  abslx::Cord c;
   ABSL_RAW_LOG(INFO, "Made a Cord with %zu bytes!", c.size());
   c.Append(from);
   while (c.size() < max_size) {
@@ -257,13 +257,13 @@ TEST(GigabyteCord, FromExternal) {
   // Note: on a 64-bit build, this comes out to 171,932,385,280 bytes.
 }
 
-static absl::Cord MakeExternalCord(int size) {
+static abslx::Cord MakeExternalCord(int size) {
   char* buffer = new char[size];
   memset(buffer, 'x', size);
-  absl::Cord cord;
-  cord.Append(absl::MakeCordFromExternal(
-      absl::string_view(buffer, size),
-      [](absl::string_view s) { delete[] s.data(); }));
+  abslx::Cord cord;
+  cord.Append(abslx::MakeCordFromExternal(
+      abslx::string_view(buffer, size),
+      [](abslx::string_view s) { delete[] s.data(); }));
   return cord;
 }
 
@@ -273,15 +273,15 @@ extern bool my_unique_true_boolean;
 bool my_unique_true_boolean = true;
 
 TEST(Cord, Assignment) {
-  absl::Cord x(absl::string_view("hi there"));
-  absl::Cord y(x);
+  abslx::Cord x(abslx::string_view("hi there"));
+  abslx::Cord y(x);
   ASSERT_EQ(std::string(x), "hi there");
   ASSERT_EQ(std::string(y), "hi there");
   ASSERT_TRUE(x == y);
   ASSERT_TRUE(x <= y);
   ASSERT_TRUE(y <= x);
 
-  x = absl::string_view("foo");
+  x = abslx::string_view("foo");
   ASSERT_EQ(std::string(x), "foo");
   ASSERT_EQ(std::string(y), "hi there");
   ASSERT_TRUE(x < y);
@@ -294,15 +294,15 @@ TEST(Cord, Assignment) {
   ASSERT_EQ(x, "foo");
 
   // Test that going from inline rep to tree we don't leak memory.
-  std::vector<std::pair<absl::string_view, absl::string_view>>
+  std::vector<std::pair<abslx::string_view, abslx::string_view>>
       test_string_pairs = {{"hi there", "foo"},
                            {"loooooong coooooord", "short cord"},
                            {"short cord", "loooooong coooooord"},
                            {"loooooong coooooord1", "loooooong coooooord2"}};
-  for (std::pair<absl::string_view, absl::string_view> test_strings :
+  for (std::pair<abslx::string_view, abslx::string_view> test_strings :
        test_string_pairs) {
-    absl::Cord tmp(test_strings.first);
-    absl::Cord z(std::move(tmp));
+    abslx::Cord tmp(test_strings.first);
+    abslx::Cord z(std::move(tmp));
     ASSERT_EQ(std::string(z), test_strings.first);
     tmp = test_strings.second;
     z = std::move(tmp);
@@ -311,12 +311,12 @@ TEST(Cord, Assignment) {
   {
     // Test that self-move assignment doesn't crash/leak.
     // Do not write such code!
-    absl::Cord my_small_cord("foo");
-    absl::Cord my_big_cord("loooooong coooooord");
+    abslx::Cord my_small_cord("foo");
+    abslx::Cord my_big_cord("loooooong coooooord");
     // Bypass clang's warning on self move-assignment.
-    absl::Cord* my_small_alias =
+    abslx::Cord* my_small_alias =
         my_unique_true_boolean ? &my_small_cord : &my_big_cord;
-    absl::Cord* my_big_alias =
+    abslx::Cord* my_big_alias =
         !my_unique_true_boolean ? &my_small_cord : &my_big_cord;
 
     *my_small_alias = std::move(my_small_cord);
@@ -327,22 +327,22 @@ TEST(Cord, Assignment) {
 }
 
 TEST(Cord, StartsEndsWith) {
-  absl::Cord x(absl::string_view("abcde"));
-  absl::Cord empty("");
+  abslx::Cord x(abslx::string_view("abcde"));
+  abslx::Cord empty("");
 
-  ASSERT_TRUE(x.StartsWith(absl::Cord("abcde")));
-  ASSERT_TRUE(x.StartsWith(absl::Cord("abc")));
-  ASSERT_TRUE(x.StartsWith(absl::Cord("")));
-  ASSERT_TRUE(empty.StartsWith(absl::Cord("")));
-  ASSERT_TRUE(x.EndsWith(absl::Cord("abcde")));
-  ASSERT_TRUE(x.EndsWith(absl::Cord("cde")));
-  ASSERT_TRUE(x.EndsWith(absl::Cord("")));
-  ASSERT_TRUE(empty.EndsWith(absl::Cord("")));
+  ASSERT_TRUE(x.StartsWith(abslx::Cord("abcde")));
+  ASSERT_TRUE(x.StartsWith(abslx::Cord("abc")));
+  ASSERT_TRUE(x.StartsWith(abslx::Cord("")));
+  ASSERT_TRUE(empty.StartsWith(abslx::Cord("")));
+  ASSERT_TRUE(x.EndsWith(abslx::Cord("abcde")));
+  ASSERT_TRUE(x.EndsWith(abslx::Cord("cde")));
+  ASSERT_TRUE(x.EndsWith(abslx::Cord("")));
+  ASSERT_TRUE(empty.EndsWith(abslx::Cord("")));
 
-  ASSERT_TRUE(!x.StartsWith(absl::Cord("xyz")));
-  ASSERT_TRUE(!empty.StartsWith(absl::Cord("xyz")));
-  ASSERT_TRUE(!x.EndsWith(absl::Cord("xyz")));
-  ASSERT_TRUE(!empty.EndsWith(absl::Cord("xyz")));
+  ASSERT_TRUE(!x.StartsWith(abslx::Cord("xyz")));
+  ASSERT_TRUE(!empty.StartsWith(abslx::Cord("xyz")));
+  ASSERT_TRUE(!x.EndsWith(abslx::Cord("xyz")));
+  ASSERT_TRUE(!empty.EndsWith(abslx::Cord("xyz")));
 
   ASSERT_TRUE(x.StartsWith("abcde"));
   ASSERT_TRUE(x.StartsWith("abc"));
@@ -363,7 +363,7 @@ TEST(Cord, Subcord) {
   RandomEngine rng(testing::GTEST_FLAG(random_seed));
   const std::string s = RandomLowercaseString(&rng, 1024);
 
-  absl::Cord a;
+  abslx::Cord a;
   AppendWithFragments(s, &rng, &a);
   ASSERT_EQ(s.size(), a.size());
 
@@ -382,8 +382,8 @@ TEST(Cord, Subcord) {
     if (pos > a.size()) continue;
     for (size_t end_pos : positions) {
       if (end_pos < pos || end_pos > a.size()) continue;
-      absl::Cord sa = a.Subcord(pos, end_pos - pos);
-      ASSERT_EQ(absl::string_view(s).substr(pos, end_pos - pos),
+      abslx::Cord sa = a.Subcord(pos, end_pos - pos);
+      ASSERT_EQ(abslx::string_view(s).substr(pos, end_pos - pos),
                 std::string(sa))
           << a;
     }
@@ -391,16 +391,16 @@ TEST(Cord, Subcord) {
 
   // Do the same thing for an inline cord.
   const std::string sh = "short";
-  absl::Cord c(sh);
+  abslx::Cord c(sh);
   for (size_t pos = 0; pos <= sh.size(); ++pos) {
     for (size_t n = 0; n <= sh.size() - pos; ++n) {
-      absl::Cord sc = c.Subcord(pos, n);
+      abslx::Cord sc = c.Subcord(pos, n);
       ASSERT_EQ(sh.substr(pos, n), std::string(sc)) << c;
     }
   }
 
   // Check subcords of subcords.
-  absl::Cord sa = a.Subcord(0, a.size());
+  abslx::Cord sa = a.Subcord(0, a.size());
   std::string ss = s.substr(0, s.size());
   while (sa.size() > 1) {
     sa = sa.Subcord(1, sa.size() - 2);
@@ -421,27 +421,27 @@ TEST(Cord, Subcord) {
 }
 
 TEST(Cord, Swap) {
-  absl::string_view a("Dexter");
-  absl::string_view b("Mandark");
-  absl::Cord x(a);
-  absl::Cord y(b);
+  abslx::string_view a("Dexter");
+  abslx::string_view b("Mandark");
+  abslx::Cord x(a);
+  abslx::Cord y(b);
   swap(x, y);
-  ASSERT_EQ(x, absl::Cord(b));
-  ASSERT_EQ(y, absl::Cord(a));
+  ASSERT_EQ(x, abslx::Cord(b));
+  ASSERT_EQ(y, abslx::Cord(a));
   x.swap(y);
-  ASSERT_EQ(x, absl::Cord(a));
-  ASSERT_EQ(y, absl::Cord(b));
+  ASSERT_EQ(x, abslx::Cord(a));
+  ASSERT_EQ(y, abslx::Cord(b));
 }
 
-static void VerifyCopyToString(const absl::Cord& cord) {
+static void VerifyCopyToString(const abslx::Cord& cord) {
   std::string initially_empty;
-  absl::CopyCordToString(cord, &initially_empty);
+  abslx::CopyCordToString(cord, &initially_empty);
   EXPECT_EQ(initially_empty, cord);
 
   constexpr size_t kInitialLength = 1024;
   std::string has_initial_contents(kInitialLength, 'x');
   const char* address_before_copy = has_initial_contents.data();
-  absl::CopyCordToString(cord, &has_initial_contents);
+  abslx::CopyCordToString(cord, &has_initial_contents);
   EXPECT_EQ(has_initial_contents, cord);
 
   if (cord.size() <= kInitialLength) {
@@ -453,64 +453,64 @@ static void VerifyCopyToString(const absl::Cord& cord) {
 }
 
 TEST(Cord, CopyToString) {
-  VerifyCopyToString(absl::Cord());
-  VerifyCopyToString(absl::Cord("small cord"));
+  VerifyCopyToString(abslx::Cord());
+  VerifyCopyToString(abslx::Cord("small cord"));
   VerifyCopyToString(
-      absl::MakeFragmentedCord({"fragmented ", "cord ", "to ", "test ",
+      abslx::MakeFragmentedCord({"fragmented ", "cord ", "to ", "test ",
                                 "copying ", "to ", "a ", "string."}));
 }
 
 TEST(TryFlat, Empty) {
-  absl::Cord c;
+  abslx::Cord c;
   EXPECT_EQ(c.TryFlat(), "");
 }
 
 TEST(TryFlat, Flat) {
-  absl::Cord c("hello");
+  abslx::Cord c("hello");
   EXPECT_EQ(c.TryFlat(), "hello");
 }
 
 TEST(TryFlat, SubstrInlined) {
-  absl::Cord c("hello");
+  abslx::Cord c("hello");
   c.RemovePrefix(1);
   EXPECT_EQ(c.TryFlat(), "ello");
 }
 
 TEST(TryFlat, SubstrFlat) {
-  absl::Cord c("longer than 15 bytes");
-  absl::Cord sub = absl::CordTestPeer::MakeSubstring(c, 1, c.size() - 1);
+  abslx::Cord c("longer than 15 bytes");
+  abslx::Cord sub = abslx::CordTestPeer::MakeSubstring(c, 1, c.size() - 1);
   EXPECT_EQ(sub.TryFlat(), "onger than 15 bytes");
 }
 
 TEST(TryFlat, Concat) {
-  absl::Cord c = absl::MakeFragmentedCord({"hel", "lo"});
-  EXPECT_EQ(c.TryFlat(), absl::nullopt);
+  abslx::Cord c = abslx::MakeFragmentedCord({"hel", "lo"});
+  EXPECT_EQ(c.TryFlat(), abslx::nullopt);
 }
 
 TEST(TryFlat, External) {
-  absl::Cord c = absl::MakeCordFromExternal("hell", [](absl::string_view) {});
+  abslx::Cord c = abslx::MakeCordFromExternal("hell", [](abslx::string_view) {});
   EXPECT_EQ(c.TryFlat(), "hell");
 }
 
 TEST(TryFlat, SubstrExternal) {
-  absl::Cord c = absl::MakeCordFromExternal("hell", [](absl::string_view) {});
-  absl::Cord sub = absl::CordTestPeer::MakeSubstring(c, 1, c.size() - 1);
+  abslx::Cord c = abslx::MakeCordFromExternal("hell", [](abslx::string_view) {});
+  abslx::Cord sub = abslx::CordTestPeer::MakeSubstring(c, 1, c.size() - 1);
   EXPECT_EQ(sub.TryFlat(), "ell");
 }
 
 TEST(TryFlat, SubstrConcat) {
-  absl::Cord c = absl::MakeFragmentedCord({"hello", " world"});
-  absl::Cord sub = absl::CordTestPeer::MakeSubstring(c, 1, c.size() - 1);
-  EXPECT_EQ(sub.TryFlat(), absl::nullopt);
+  abslx::Cord c = abslx::MakeFragmentedCord({"hello", " world"});
+  abslx::Cord sub = abslx::CordTestPeer::MakeSubstring(c, 1, c.size() - 1);
+  EXPECT_EQ(sub.TryFlat(), abslx::nullopt);
   c.RemovePrefix(1);
-  EXPECT_EQ(c.TryFlat(), absl::nullopt);
+  EXPECT_EQ(c.TryFlat(), abslx::nullopt);
 }
 
 TEST(TryFlat, CommonlyAssumedInvariants) {
   // The behavior tested below is not part of the API contract of Cord, but it's
   // something we intend to be true in our current implementation.  This test
   // exists to detect and prevent accidental breakage of the implementation.
-  absl::string_view fragments[] = {"A fragmented test",
+  abslx::string_view fragments[] = {"A fragmented test",
                                    " cord",
                                    " to test subcords",
                                    " of ",
@@ -519,14 +519,14 @@ TEST(TryFlat, CommonlyAssumedInvariants) {
                                    " each chunk "
                                    "returned by the ",
                                    "iterator"};
-  absl::Cord c = absl::MakeFragmentedCord(fragments);
+  abslx::Cord c = abslx::MakeFragmentedCord(fragments);
   int fragment = 0;
   int offset = 0;
-  absl::Cord::CharIterator itc = c.char_begin();
-  for (absl::string_view sv : c.Chunks()) {
-    absl::string_view expected = fragments[fragment];
-    absl::Cord subcord1 = c.Subcord(offset, sv.length());
-    absl::Cord subcord2 = absl::Cord::AdvanceAndRead(&itc, sv.size());
+  abslx::Cord::CharIterator itc = c.char_begin();
+  for (abslx::string_view sv : c.Chunks()) {
+    abslx::string_view expected = fragments[fragment];
+    abslx::Cord subcord1 = c.Subcord(offset, sv.length());
+    abslx::Cord subcord2 = abslx::Cord::AdvanceAndRead(&itc, sv.size());
     EXPECT_EQ(subcord1.TryFlat(), expected);
     EXPECT_EQ(subcord2.TryFlat(), expected);
     ++fragment;
@@ -534,18 +534,18 @@ TEST(TryFlat, CommonlyAssumedInvariants) {
   }
 }
 
-static bool IsFlat(const absl::Cord& c) {
+static bool IsFlat(const abslx::Cord& c) {
   return c.chunk_begin() == c.chunk_end() || ++c.chunk_begin() == c.chunk_end();
 }
 
-static void VerifyFlatten(absl::Cord c) {
+static void VerifyFlatten(abslx::Cord c) {
   std::string old_contents(c);
-  absl::string_view old_flat;
+  abslx::string_view old_flat;
   bool already_flat_and_non_empty = IsFlat(c) && !c.empty();
   if (already_flat_and_non_empty) {
     old_flat = *c.chunk_begin();
   }
-  absl::string_view new_flat = c.Flatten();
+  abslx::string_view new_flat = c.Flatten();
 
   // Verify that the contents of the flattened Cord are correct.
   EXPECT_EQ(new_flat, old_contents);
@@ -563,14 +563,14 @@ static void VerifyFlatten(absl::Cord c) {
 }
 
 TEST(Cord, Flatten) {
-  VerifyFlatten(absl::Cord());
-  VerifyFlatten(absl::Cord("small cord"));
-  VerifyFlatten(absl::Cord("larger than small buffer optimization"));
-  VerifyFlatten(absl::MakeFragmentedCord({"small ", "fragmented ", "cord"}));
+  VerifyFlatten(abslx::Cord());
+  VerifyFlatten(abslx::Cord("small cord"));
+  VerifyFlatten(abslx::Cord("larger than small buffer optimization"));
+  VerifyFlatten(abslx::MakeFragmentedCord({"small ", "fragmented ", "cord"}));
 
   // Test with a cord that is longer than the largest flat buffer
   RandomEngine rng(testing::GTEST_FLAG(random_seed));
-  VerifyFlatten(absl::Cord(RandomLowercaseString(&rng, 8192)));
+  VerifyFlatten(abslx::Cord(RandomLowercaseString(&rng, 8192)));
 }
 
 // Test data
@@ -622,24 +622,24 @@ TEST(Cord, MultipleLengths) {
     std::string a = d.data(i);
 
     {  // Construct from Cord
-      absl::Cord tmp(a);
-      absl::Cord x(tmp);
+      abslx::Cord tmp(a);
+      abslx::Cord x(tmp);
       EXPECT_EQ(a, std::string(x)) << "'" << a << "'";
     }
 
-    {  // Construct from absl::string_view
-      absl::Cord x(a);
+    {  // Construct from abslx::string_view
+      abslx::Cord x(a);
       EXPECT_EQ(a, std::string(x)) << "'" << a << "'";
     }
 
     {  // Append cord to self
-      absl::Cord self(a);
+      abslx::Cord self(a);
       self.Append(self);
       EXPECT_EQ(a + a, std::string(self)) << "'" << a << "' + '" << a << "'";
     }
 
     {  // Prepend cord to self
-      absl::Cord self(a);
+      abslx::Cord self(a);
       self.Prepend(self);
       EXPECT_EQ(a + a, std::string(self)) << "'" << a << "' + '" << a << "'";
     }
@@ -649,40 +649,40 @@ TEST(Cord, MultipleLengths) {
       std::string b = d.data(j);
 
       {  // CopyFrom Cord
-        absl::Cord x(a);
-        absl::Cord y(b);
+        abslx::Cord x(a);
+        abslx::Cord y(b);
         x = y;
         EXPECT_EQ(b, std::string(x)) << "'" << a << "' + '" << b << "'";
       }
 
-      {  // CopyFrom absl::string_view
-        absl::Cord x(a);
+      {  // CopyFrom abslx::string_view
+        abslx::Cord x(a);
         x = b;
         EXPECT_EQ(b, std::string(x)) << "'" << a << "' + '" << b << "'";
       }
 
       {  // Cord::Append(Cord)
-        absl::Cord x(a);
-        absl::Cord y(b);
+        abslx::Cord x(a);
+        abslx::Cord y(b);
         x.Append(y);
         EXPECT_EQ(a + b, std::string(x)) << "'" << a << "' + '" << b << "'";
       }
 
-      {  // Cord::Append(absl::string_view)
-        absl::Cord x(a);
+      {  // Cord::Append(abslx::string_view)
+        abslx::Cord x(a);
         x.Append(b);
         EXPECT_EQ(a + b, std::string(x)) << "'" << a << "' + '" << b << "'";
       }
 
       {  // Cord::Prepend(Cord)
-        absl::Cord x(a);
-        absl::Cord y(b);
+        abslx::Cord x(a);
+        abslx::Cord y(b);
         x.Prepend(y);
         EXPECT_EQ(b + a, std::string(x)) << "'" << b << "' + '" << a << "'";
       }
 
-      {  // Cord::Prepend(absl::string_view)
-        absl::Cord x(a);
+      {  // Cord::Prepend(abslx::string_view)
+        abslx::Cord x(a);
         x.Prepend(b);
         EXPECT_EQ(b + a, std::string(x)) << "'" << b << "' + '" << a << "'";
       }
@@ -693,8 +693,8 @@ TEST(Cord, MultipleLengths) {
 namespace {
 
 TEST(Cord, RemoveSuffixWithExternalOrSubstring) {
-  absl::Cord cord = absl::MakeCordFromExternal(
-      "foo bar baz", [](absl::string_view s) { DoNothing(s, nullptr); });
+  abslx::Cord cord = abslx::MakeCordFromExternal(
+      "foo bar baz", [](abslx::string_view s) { DoNothing(s, nullptr); });
 
   EXPECT_EQ("foo bar baz", std::string(cord));
 
@@ -708,10 +708,10 @@ TEST(Cord, RemoveSuffixWithExternalOrSubstring) {
 }
 
 TEST(Cord, RemoveSuffixMakesZeroLengthNode) {
-  absl::Cord c;
-  c.Append(absl::Cord(std::string(100, 'x')));
-  absl::Cord other_ref = c;  // Prevent inplace appends
-  c.Append(absl::Cord(std::string(200, 'y')));
+  abslx::Cord c;
+  c.Append(abslx::Cord(std::string(100, 'x')));
+  abslx::Cord other_ref = c;  // Prevent inplace appends
+  c.Append(abslx::Cord(std::string(200, 'y')));
   c.RemoveSuffix(200);
   EXPECT_EQ(std::string(100, 'x'), std::string(c));
 }
@@ -722,71 +722,71 @@ TEST(Cord, RemoveSuffixMakesZeroLengthNode) {
 namespace {
 
 // Create a cord with an external memory block filled with 'z'
-absl::Cord CordWithZedBlock(size_t size) {
+abslx::Cord CordWithZedBlock(size_t size) {
   char* data = new char[size];
   if (size > 0) {
     memset(data, 'z', size);
   }
-  absl::Cord cord = absl::MakeCordFromExternal(
-      absl::string_view(data, size),
-      [](absl::string_view s) { delete[] s.data(); });
+  abslx::Cord cord = abslx::MakeCordFromExternal(
+      abslx::string_view(data, size),
+      [](abslx::string_view s) { delete[] s.data(); });
   return cord;
 }
 
 // Establish that ZedBlock does what we think it does.
 TEST(CordSpliceTest, ZedBlock) {
-  absl::Cord blob = CordWithZedBlock(10);
+  abslx::Cord blob = CordWithZedBlock(10);
   EXPECT_EQ(10, blob.size());
   std::string s;
-  absl::CopyCordToString(blob, &s);
+  abslx::CopyCordToString(blob, &s);
   EXPECT_EQ("zzzzzzzzzz", s);
 }
 
 TEST(CordSpliceTest, ZedBlock0) {
-  absl::Cord blob = CordWithZedBlock(0);
+  abslx::Cord blob = CordWithZedBlock(0);
   EXPECT_EQ(0, blob.size());
   std::string s;
-  absl::CopyCordToString(blob, &s);
+  abslx::CopyCordToString(blob, &s);
   EXPECT_EQ("", s);
 }
 
 TEST(CordSpliceTest, ZedBlockSuffix1) {
-  absl::Cord blob = CordWithZedBlock(10);
+  abslx::Cord blob = CordWithZedBlock(10);
   EXPECT_EQ(10, blob.size());
-  absl::Cord suffix(blob);
+  abslx::Cord suffix(blob);
   suffix.RemovePrefix(9);
   EXPECT_EQ(1, suffix.size());
   std::string s;
-  absl::CopyCordToString(suffix, &s);
+  abslx::CopyCordToString(suffix, &s);
   EXPECT_EQ("z", s);
 }
 
 // Remove all of a prefix block
 TEST(CordSpliceTest, ZedBlockSuffix0) {
-  absl::Cord blob = CordWithZedBlock(10);
+  abslx::Cord blob = CordWithZedBlock(10);
   EXPECT_EQ(10, blob.size());
-  absl::Cord suffix(blob);
+  abslx::Cord suffix(blob);
   suffix.RemovePrefix(10);
   EXPECT_EQ(0, suffix.size());
   std::string s;
-  absl::CopyCordToString(suffix, &s);
+  abslx::CopyCordToString(suffix, &s);
   EXPECT_EQ("", s);
 }
 
-absl::Cord BigCord(size_t len, char v) {
+abslx::Cord BigCord(size_t len, char v) {
   std::string s(len, v);
-  return absl::Cord(s);
+  return abslx::Cord(s);
 }
 
 // Splice block into cord.
-absl::Cord SpliceCord(const absl::Cord& blob, int64_t offset,
-                      const absl::Cord& block) {
+abslx::Cord SpliceCord(const abslx::Cord& blob, int64_t offset,
+                      const abslx::Cord& block) {
   ABSL_RAW_CHECK(offset >= 0, "");
   ABSL_RAW_CHECK(offset + block.size() <= blob.size(), "");
-  absl::Cord result(blob);
+  abslx::Cord result(blob);
   result.RemoveSuffix(blob.size() - offset);
   result.Append(block);
-  absl::Cord suffix(blob);
+  abslx::Cord suffix(blob);
   suffix.RemovePrefix(offset + block.size());
   result.Append(suffix);
   ABSL_RAW_CHECK(blob.size() == result.size(), "");
@@ -795,26 +795,26 @@ absl::Cord SpliceCord(const absl::Cord& blob, int64_t offset,
 
 // Taking an empty suffix of a block breaks appending.
 TEST(CordSpliceTest, RemoveEntireBlock1) {
-  absl::Cord zero = CordWithZedBlock(10);
-  absl::Cord suffix(zero);
+  abslx::Cord zero = CordWithZedBlock(10);
+  abslx::Cord suffix(zero);
   suffix.RemovePrefix(10);
-  absl::Cord result;
+  abslx::Cord result;
   result.Append(suffix);
 }
 
 TEST(CordSpliceTest, RemoveEntireBlock2) {
-  absl::Cord zero = CordWithZedBlock(10);
-  absl::Cord prefix(zero);
+  abslx::Cord zero = CordWithZedBlock(10);
+  abslx::Cord prefix(zero);
   prefix.RemoveSuffix(10);
-  absl::Cord suffix(zero);
+  abslx::Cord suffix(zero);
   suffix.RemovePrefix(10);
-  absl::Cord result(prefix);
+  abslx::Cord result(prefix);
   result.Append(suffix);
 }
 
 TEST(CordSpliceTest, RemoveEntireBlock3) {
-  absl::Cord blob = CordWithZedBlock(10);
-  absl::Cord block = BigCord(10, 'b');
+  abslx::Cord blob = CordWithZedBlock(10);
+  abslx::Cord block = BigCord(10, 'b');
   blob = SpliceCord(blob, 0, block);
 }
 
@@ -823,8 +823,8 @@ struct CordCompareTestCase {
   CordCompareTestCase(const LHS& lhs, const RHS& rhs)
       : lhs_cord(lhs), rhs_cord(rhs) {}
 
-  absl::Cord lhs_cord;
-  absl::Cord rhs_cord;
+  abslx::Cord lhs_cord;
+  abslx::Cord rhs_cord;
 };
 
 const auto sign = [](int x) { return x == 0 ? 0 : (x > 0 ? 1 : -1); };
@@ -844,16 +844,16 @@ void VerifyComparison(const CordCompareTestCase& test_case) {
 }
 
 TEST(Cord, Compare) {
-  absl::Cord subcord("aaaaaBBBBBcccccDDDDD");
+  abslx::Cord subcord("aaaaaBBBBBcccccDDDDD");
   subcord = subcord.Subcord(3, 10);
 
-  absl::Cord tmp("aaaaaaaaaaaaaaaa");
+  abslx::Cord tmp("aaaaaaaaaaaaaaaa");
   tmp.Append("BBBBBBBBBBBBBBBB");
-  absl::Cord concat = absl::Cord("cccccccccccccccc");
+  abslx::Cord concat = abslx::Cord("cccccccccccccccc");
   concat.Append("DDDDDDDDDDDDDDDD");
   concat.Prepend(tmp);
 
-  absl::Cord concat2("aaaaaaaaaaaaa");
+  abslx::Cord concat2("aaaaaaaaaaaaa");
   concat2.Append("aaaBBBBBBBBBBBBBBBBccccc");
   concat2.Append("cccccccccccDDDDDDDDDDDDDD");
   concat2.Append("DD");
@@ -907,8 +907,8 @@ TEST(Cord, Compare) {
 }
 
 TEST(Cord, CompareAfterAssign) {
-  absl::Cord a("aaaaaa1111111");
-  absl::Cord b("aaaaaa2222222");
+  abslx::Cord a("aaaaaa1111111");
+  abslx::Cord b("aaaaaa2222222");
   a = "cccccc";
   b = "cccccc";
   EXPECT_EQ(a, b);
@@ -924,7 +924,7 @@ TEST(Cord, CompareAfterAssign) {
 
 // Test CompareTo() and ComparePrefix() against string and substring
 // comparison methods from basic_string.
-static void TestCompare(const absl::Cord& c, const absl::Cord& d,
+static void TestCompare(const abslx::Cord& c, const abslx::Cord& d,
                         RandomEngine* rng) {
   typedef std::basic_string<uint8_t> ustring;
   ustring cs(reinterpret_cast<const uint8_t*>(std::string(c).data()), c.size());
@@ -940,8 +940,8 @@ TEST(Compare, ComparisonIsUnsigned) {
   std::uniform_int_distribution<uint32_t> uniform_uint8(0, 255);
   char x = static_cast<char>(uniform_uint8(rng));
   TestCompare(
-      absl::Cord(std::string(GetUniformRandomUpTo(&rng, 100), x)),
-      absl::Cord(std::string(GetUniformRandomUpTo(&rng, 100), x ^ 0x80)), &rng);
+      abslx::Cord(std::string(GetUniformRandomUpTo(&rng, 100), x)),
+      abslx::Cord(std::string(GetUniformRandomUpTo(&rng, 100), x ^ 0x80)), &rng);
 }
 
 TEST(Compare, RandomComparisons) {
@@ -949,26 +949,26 @@ TEST(Compare, RandomComparisons) {
   RandomEngine rng(testing::GTEST_FLAG(random_seed));
 
   int n = GetUniformRandomUpTo(&rng, 5000);
-  absl::Cord a[] = {MakeExternalCord(n),
-                    absl::Cord("ant"),
-                    absl::Cord("elephant"),
-                    absl::Cord("giraffe"),
-                    absl::Cord(std::string(GetUniformRandomUpTo(&rng, 100),
+  abslx::Cord a[] = {MakeExternalCord(n),
+                    abslx::Cord("ant"),
+                    abslx::Cord("elephant"),
+                    abslx::Cord("giraffe"),
+                    abslx::Cord(std::string(GetUniformRandomUpTo(&rng, 100),
                                            GetUniformRandomUpTo(&rng, 100))),
-                    absl::Cord(""),
-                    absl::Cord("x"),
-                    absl::Cord("A"),
-                    absl::Cord("B"),
-                    absl::Cord("C")};
+                    abslx::Cord(""),
+                    abslx::Cord("x"),
+                    abslx::Cord("A"),
+                    abslx::Cord("B"),
+                    abslx::Cord("C")};
   for (int i = 0; i < kIters; i++) {
-    absl::Cord c, d;
+    abslx::Cord c, d;
     for (int j = 0; j < (i % 7) + 1; j++) {
       c.Append(a[GetUniformRandomUpTo(&rng, ABSL_ARRAYSIZE(a))]);
       d.Append(a[GetUniformRandomUpTo(&rng, ABSL_ARRAYSIZE(a))]);
     }
     std::bernoulli_distribution coin_flip(0.5);
-    TestCompare(coin_flip(rng) ? c : absl::Cord(std::string(c)),
-                coin_flip(rng) ? d : absl::Cord(std::string(d)), &rng);
+    TestCompare(coin_flip(rng) ? c : abslx::Cord(std::string(c)),
+                coin_flip(rng) ? d : abslx::Cord(std::string(d)), &rng);
   }
 }
 
@@ -1003,48 +1003,48 @@ void CompareOperators() {
 }
 
 TEST(ComparisonOperators, Cord_Cord) {
-  CompareOperators<absl::Cord, absl::Cord>();
+  CompareOperators<abslx::Cord, abslx::Cord>();
 }
 
 TEST(ComparisonOperators, Cord_StringPiece) {
-  CompareOperators<absl::Cord, absl::string_view>();
+  CompareOperators<abslx::Cord, abslx::string_view>();
 }
 
 TEST(ComparisonOperators, StringPiece_Cord) {
-  CompareOperators<absl::string_view, absl::Cord>();
+  CompareOperators<abslx::string_view, abslx::Cord>();
 }
 
 TEST(ComparisonOperators, Cord_string) {
-  CompareOperators<absl::Cord, std::string>();
+  CompareOperators<abslx::Cord, std::string>();
 }
 
 TEST(ComparisonOperators, string_Cord) {
-  CompareOperators<std::string, absl::Cord>();
+  CompareOperators<std::string, abslx::Cord>();
 }
 
 TEST(ComparisonOperators, stdstring_Cord) {
-  CompareOperators<std::string, absl::Cord>();
+  CompareOperators<std::string, abslx::Cord>();
 }
 
 TEST(ComparisonOperators, Cord_stdstring) {
-  CompareOperators<absl::Cord, std::string>();
+  CompareOperators<abslx::Cord, std::string>();
 }
 
 TEST(ComparisonOperators, charstar_Cord) {
-  CompareOperators<const char*, absl::Cord>();
+  CompareOperators<const char*, abslx::Cord>();
 }
 
 TEST(ComparisonOperators, Cord_charstar) {
-  CompareOperators<absl::Cord, const char*>();
+  CompareOperators<abslx::Cord, const char*>();
 }
 
 TEST(ConstructFromExternal, ReleaserInvoked) {
   // Empty external memory means the releaser should be called immediately.
   {
     bool invoked = false;
-    auto releaser = [&invoked](absl::string_view) { invoked = true; };
+    auto releaser = [&invoked](abslx::string_view) { invoked = true; };
     {
-      auto c = absl::MakeCordFromExternal("", releaser);
+      auto c = abslx::MakeCordFromExternal("", releaser);
       EXPECT_TRUE(invoked);
     }
   }
@@ -1056,9 +1056,9 @@ TEST(ConstructFromExternal, ReleaserInvoked) {
   std::string large_dummy(2048, 'c');
   {
     bool invoked = false;
-    auto releaser = [&invoked](absl::string_view) { invoked = true; };
+    auto releaser = [&invoked](abslx::string_view) { invoked = true; };
     {
-      auto c = absl::MakeCordFromExternal(large_dummy, releaser);
+      auto c = abslx::MakeCordFromExternal(large_dummy, releaser);
       EXPECT_FALSE(invoked);
     }
     EXPECT_TRUE(invoked);
@@ -1066,11 +1066,11 @@ TEST(ConstructFromExternal, ReleaserInvoked) {
 
   {
     bool invoked = false;
-    auto releaser = [&invoked](absl::string_view) { invoked = true; };
+    auto releaser = [&invoked](abslx::string_view) { invoked = true; };
     {
-      absl::Cord copy;
+      abslx::Cord copy;
       {
-        auto c = absl::MakeCordFromExternal(large_dummy, releaser);
+        auto c = abslx::MakeCordFromExternal(large_dummy, releaser);
         copy = c;
         EXPECT_FALSE(invoked);
       }
@@ -1087,7 +1087,7 @@ TEST(ConstructFromExternal, CompareContents) {
     std::string data = RandomLowercaseString(&rng, length);
     auto* external = new std::string(data);
     auto cord =
-        absl::MakeCordFromExternal(*external, [external](absl::string_view sv) {
+        abslx::MakeCordFromExternal(*external, [external](abslx::string_view sv) {
           EXPECT_EQ(external->data(), sv.data());
           EXPECT_EQ(external->size(), sv.size());
           delete external;
@@ -1103,28 +1103,28 @@ TEST(ConstructFromExternal, LargeReleaser) {
   std::array<char, kLength> data_array;
   for (size_t i = 0; i < kLength; ++i) data_array[i] = data[i];
   bool invoked = false;
-  auto releaser = [data_array, &invoked](absl::string_view data) {
-    EXPECT_EQ(data, absl::string_view(data_array.data(), data_array.size()));
+  auto releaser = [data_array, &invoked](abslx::string_view data) {
+    EXPECT_EQ(data, abslx::string_view(data_array.data(), data_array.size()));
     invoked = true;
   };
-  (void)absl::MakeCordFromExternal(data, releaser);
+  (void)abslx::MakeCordFromExternal(data, releaser);
   EXPECT_TRUE(invoked);
 }
 
 TEST(ConstructFromExternal, FunctionPointerReleaser) {
-  static absl::string_view data("hello world");
+  static abslx::string_view data("hello world");
   static bool invoked;
   auto* releaser =
-      static_cast<void (*)(absl::string_view)>([](absl::string_view sv) {
+      static_cast<void (*)(abslx::string_view)>([](abslx::string_view sv) {
         EXPECT_EQ(data, sv);
         invoked = true;
       });
   invoked = false;
-  (void)absl::MakeCordFromExternal(data, releaser);
+  (void)abslx::MakeCordFromExternal(data, releaser);
   EXPECT_TRUE(invoked);
 
   invoked = false;
-  (void)absl::MakeCordFromExternal(data, *releaser);
+  (void)abslx::MakeCordFromExternal(data, *releaser);
   EXPECT_TRUE(invoked);
 }
 
@@ -1132,26 +1132,26 @@ TEST(ConstructFromExternal, MoveOnlyReleaser) {
   struct Releaser {
     explicit Releaser(bool* invoked) : invoked(invoked) {}
     Releaser(Releaser&& other) noexcept : invoked(other.invoked) {}
-    void operator()(absl::string_view) const { *invoked = true; }
+    void operator()(abslx::string_view) const { *invoked = true; }
 
     bool* invoked;
   };
 
   bool invoked = false;
-  (void)absl::MakeCordFromExternal("dummy", Releaser(&invoked));
+  (void)abslx::MakeCordFromExternal("dummy", Releaser(&invoked));
   EXPECT_TRUE(invoked);
 }
 
 TEST(ConstructFromExternal, NoArgLambda) {
   bool invoked = false;
-  (void)absl::MakeCordFromExternal("dummy", [&invoked]() { invoked = true; });
+  (void)abslx::MakeCordFromExternal("dummy", [&invoked]() { invoked = true; });
   EXPECT_TRUE(invoked);
 }
 
 TEST(ConstructFromExternal, StringViewArgLambda) {
   bool invoked = false;
-  (void)absl::MakeCordFromExternal(
-      "dummy", [&invoked](absl::string_view) { invoked = true; });
+  (void)abslx::MakeCordFromExternal(
+      "dummy", [&invoked](abslx::string_view) { invoked = true; });
   EXPECT_TRUE(invoked);
 }
 
@@ -1159,21 +1159,21 @@ TEST(ConstructFromExternal, NonTrivialReleaserDestructor) {
   struct Releaser {
     explicit Releaser(bool* destroyed) : destroyed(destroyed) {}
     ~Releaser() { *destroyed = true; }
-    void operator()(absl::string_view) const {}
+    void operator()(abslx::string_view) const {}
 
     bool* destroyed;
   };
 
   bool destroyed = false;
   Releaser releaser(&destroyed);
-  (void)absl::MakeCordFromExternal("dummy", releaser);
+  (void)abslx::MakeCordFromExternal("dummy", releaser);
   EXPECT_TRUE(destroyed);
 }
 
 TEST(ConstructFromExternal, ReferenceQualifierOverloads) {
   struct Releaser {
-    void operator()(absl::string_view) & { *lvalue_invoked = true; }
-    void operator()(absl::string_view) && { *rvalue_invoked = true; }
+    void operator()(abslx::string_view) & { *lvalue_invoked = true; }
+    void operator()(abslx::string_view) && { *rvalue_invoked = true; }
 
     bool* lvalue_invoked;
     bool* rvalue_invoked;
@@ -1182,18 +1182,18 @@ TEST(ConstructFromExternal, ReferenceQualifierOverloads) {
   bool lvalue_invoked = false;
   bool rvalue_invoked = false;
   Releaser releaser = {&lvalue_invoked, &rvalue_invoked};
-  (void)absl::MakeCordFromExternal("", releaser);
+  (void)abslx::MakeCordFromExternal("", releaser);
   EXPECT_FALSE(lvalue_invoked);
   EXPECT_TRUE(rvalue_invoked);
   rvalue_invoked = false;
 
-  (void)absl::MakeCordFromExternal("dummy", releaser);
+  (void)abslx::MakeCordFromExternal("dummy", releaser);
   EXPECT_FALSE(lvalue_invoked);
   EXPECT_TRUE(rvalue_invoked);
   rvalue_invoked = false;
 
   // NOLINTNEXTLINE: suppress clang-tidy std::move on trivially copyable type.
-  (void)absl::MakeCordFromExternal("dummy", std::move(releaser));
+  (void)abslx::MakeCordFromExternal("dummy", std::move(releaser));
   EXPECT_FALSE(lvalue_invoked);
   EXPECT_TRUE(rvalue_invoked);
 }
@@ -1201,7 +1201,7 @@ TEST(ConstructFromExternal, ReferenceQualifierOverloads) {
 TEST(ExternalMemory, BasicUsage) {
   static const char* strings[] = {"", "hello", "there"};
   for (const char* str : strings) {
-    absl::Cord dst("(prefix)");
+    abslx::Cord dst("(prefix)");
     AddExternalMemory(str, &dst);
     dst.Append("(suffix)");
     EXPECT_EQ((std::string("(prefix)") + str + std::string("(suffix)")),
@@ -1211,11 +1211,11 @@ TEST(ExternalMemory, BasicUsage) {
 
 TEST(ExternalMemory, RemovePrefixSuffix) {
   // Exhaustively try all sub-strings.
-  absl::Cord cord = MakeComposite();
+  abslx::Cord cord = MakeComposite();
   std::string s = std::string(cord);
   for (int offset = 0; offset <= s.size(); offset++) {
     for (int length = 0; length <= s.size() - offset; length++) {
-      absl::Cord result(cord);
+      abslx::Cord result(cord);
       result.RemovePrefix(offset);
       result.RemoveSuffix(result.size() - length);
       EXPECT_EQ(s.substr(offset, length), std::string(result))
@@ -1225,7 +1225,7 @@ TEST(ExternalMemory, RemovePrefixSuffix) {
 }
 
 TEST(ExternalMemory, Get) {
-  absl::Cord cord("hello");
+  abslx::Cord cord("hello");
   AddExternalMemory(" world!", &cord);
   AddExternalMemory(" how are ", &cord);
   cord.Append(" you?");
@@ -1244,25 +1244,25 @@ TEST(ExternalMemory, Get) {
 // the layout and size of empty and inlined cords, and flat nodes.
 
 TEST(CordMemoryUsage, Empty) {
-  EXPECT_EQ(sizeof(absl::Cord), absl::Cord().EstimatedMemoryUsage());
+  EXPECT_EQ(sizeof(abslx::Cord), abslx::Cord().EstimatedMemoryUsage());
 }
 
 TEST(CordMemoryUsage, Embedded) {
-  absl::Cord a("hello");
-  EXPECT_EQ(a.EstimatedMemoryUsage(), sizeof(absl::Cord));
+  abslx::Cord a("hello");
+  EXPECT_EQ(a.EstimatedMemoryUsage(), sizeof(abslx::Cord));
 }
 
 TEST(CordMemoryUsage, EmbeddedAppend) {
-  absl::Cord a("a");
-  absl::Cord b("bcd");
-  EXPECT_EQ(b.EstimatedMemoryUsage(), sizeof(absl::Cord));
+  abslx::Cord a("a");
+  abslx::Cord b("bcd");
+  EXPECT_EQ(b.EstimatedMemoryUsage(), sizeof(abslx::Cord));
   a.Append(b);
-  EXPECT_EQ(a.EstimatedMemoryUsage(), sizeof(absl::Cord));
+  EXPECT_EQ(a.EstimatedMemoryUsage(), sizeof(abslx::Cord));
 }
 
 TEST(CordMemoryUsage, ExternalMemory) {
   static const int kLength = 1000;
-  absl::Cord cord;
+  abslx::Cord cord;
   AddExternalMemory(std::string(kLength, 'x'), &cord);
   EXPECT_GT(cord.EstimatedMemoryUsage(), kLength);
   EXPECT_LE(cord.EstimatedMemoryUsage(), kLength * 1.5);
@@ -1270,14 +1270,14 @@ TEST(CordMemoryUsage, ExternalMemory) {
 
 TEST(CordMemoryUsage, Flat) {
   static const int kLength = 125;
-  absl::Cord a(std::string(kLength, 'a'));
+  abslx::Cord a(std::string(kLength, 'a'));
   EXPECT_GT(a.EstimatedMemoryUsage(), kLength);
   EXPECT_LE(a.EstimatedMemoryUsage(), kLength * 1.5);
 }
 
 TEST(CordMemoryUsage, AppendFlat) {
-  using absl::strings_internal::CordTestAccess;
-  absl::Cord a(std::string(CordTestAccess::MaxFlatLength(), 'a'));
+  using abslx::strings_internal::CordTestAccess;
+  abslx::Cord a(std::string(CordTestAccess::MaxFlatLength(), 'a'));
   size_t length = a.EstimatedMemoryUsage();
   a.Append(std::string(CordTestAccess::MaxFlatLength(), 'b'));
   size_t delta = a.EstimatedMemoryUsage() - length;
@@ -1290,9 +1290,9 @@ TEST(CordMemoryUsage, AppendFlat) {
 TEST(CordMemoryUsage, InlineRep) {
   constexpr size_t kMaxInline = 15;  // Cord::InlineRep::N
   const std::string small_string(kMaxInline, 'x');
-  absl::Cord c1(small_string);
+  abslx::Cord c1(small_string);
 
-  absl::Cord c2;
+  abslx::Cord c2;
   c2.Append(small_string);
   EXPECT_EQ(c1, c2);
   EXPECT_EQ(c1.EstimatedMemoryUsage(), c2.EstimatedMemoryUsage());
@@ -1303,12 +1303,12 @@ TEST(CordMemoryUsage, InlineRep) {
 // Regtest for 7510292 (fix a bug introduced by 7465150)
 TEST(Cord, Concat_Append) {
   // Create a rep of type CONCAT
-  absl::Cord s1("foobarbarbarbarbar");
+  abslx::Cord s1("foobarbarbarbarbar");
   s1.Append("abcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefg");
   size_t size = s1.size();
 
   // Create a copy of s1 and append to it.
-  absl::Cord s2 = s1;
+  abslx::Cord s2 = s1;
   s2.Append("x");
 
   // 7465150 modifies s1 when it shouldn't.
@@ -1324,21 +1324,21 @@ TEST(Cord, DiabolicalGrowth) {
   // source cord into a mutable copy for updates in CordRepRing.
   RandomEngine rng(testing::GTEST_FLAG(random_seed));
   const std::string expected = RandomLowercaseString(&rng, 5000);
-  absl::Cord cord;
+  abslx::Cord cord;
   for (char c : expected) {
-    absl::Cord shared(cord);
-    cord.Append(absl::string_view(&c, 1));
+    abslx::Cord shared(cord);
+    cord.Append(abslx::string_view(&c, 1));
   }
   std::string value;
-  absl::CopyCordToString(cord, &value);
+  abslx::CopyCordToString(cord, &value);
   EXPECT_EQ(value, expected);
   ABSL_RAW_LOG(INFO, "Diabolical size allocated = %zu",
                cord.EstimatedMemoryUsage());
 }
 
 TEST(MakeFragmentedCord, MakeFragmentedCordFromInitializerList) {
-  absl::Cord fragmented =
-      absl::MakeFragmentedCord({"A ", "fragmented ", "Cord"});
+  abslx::Cord fragmented =
+      abslx::MakeFragmentedCord({"A ", "fragmented ", "Cord"});
 
   EXPECT_EQ("A fragmented Cord", fragmented);
 
@@ -1357,8 +1357,8 @@ TEST(MakeFragmentedCord, MakeFragmentedCordFromInitializerList) {
 }
 
 TEST(MakeFragmentedCord, MakeFragmentedCordFromVector) {
-  std::vector<absl::string_view> chunks = {"A ", "fragmented ", "Cord"};
-  absl::Cord fragmented = absl::MakeFragmentedCord(chunks);
+  std::vector<abslx::string_view> chunks = {"A ", "fragmented ", "Cord"};
+  abslx::Cord fragmented = abslx::MakeFragmentedCord(chunks);
 
   EXPECT_EQ("A fragmented Cord", fragmented);
 
@@ -1377,45 +1377,45 @@ TEST(MakeFragmentedCord, MakeFragmentedCordFromVector) {
 }
 
 TEST(CordChunkIterator, Traits) {
-  static_assert(std::is_copy_constructible<absl::Cord::ChunkIterator>::value,
+  static_assert(std::is_copy_constructible<abslx::Cord::ChunkIterator>::value,
                 "");
-  static_assert(std::is_copy_assignable<absl::Cord::ChunkIterator>::value, "");
+  static_assert(std::is_copy_assignable<abslx::Cord::ChunkIterator>::value, "");
 
   // Move semantics to satisfy swappable via std::swap
-  static_assert(std::is_move_constructible<absl::Cord::ChunkIterator>::value,
+  static_assert(std::is_move_constructible<abslx::Cord::ChunkIterator>::value,
                 "");
-  static_assert(std::is_move_assignable<absl::Cord::ChunkIterator>::value, "");
+  static_assert(std::is_move_assignable<abslx::Cord::ChunkIterator>::value, "");
 
   static_assert(
       std::is_same<
-          std::iterator_traits<absl::Cord::ChunkIterator>::iterator_category,
+          std::iterator_traits<abslx::Cord::ChunkIterator>::iterator_category,
           std::input_iterator_tag>::value,
       "");
   static_assert(
-      std::is_same<std::iterator_traits<absl::Cord::ChunkIterator>::value_type,
-                   absl::string_view>::value,
+      std::is_same<std::iterator_traits<abslx::Cord::ChunkIterator>::value_type,
+                   abslx::string_view>::value,
       "");
   static_assert(
       std::is_same<
-          std::iterator_traits<absl::Cord::ChunkIterator>::difference_type,
+          std::iterator_traits<abslx::Cord::ChunkIterator>::difference_type,
           ptrdiff_t>::value,
       "");
   static_assert(
-      std::is_same<std::iterator_traits<absl::Cord::ChunkIterator>::pointer,
-                   const absl::string_view*>::value,
+      std::is_same<std::iterator_traits<abslx::Cord::ChunkIterator>::pointer,
+                   const abslx::string_view*>::value,
       "");
   static_assert(
-      std::is_same<std::iterator_traits<absl::Cord::ChunkIterator>::reference,
-                   absl::string_view>::value,
+      std::is_same<std::iterator_traits<abslx::Cord::ChunkIterator>::reference,
+                   abslx::string_view>::value,
       "");
 }
 
-static void VerifyChunkIterator(const absl::Cord& cord,
+static void VerifyChunkIterator(const abslx::Cord& cord,
                                 size_t expected_chunks) {
   EXPECT_EQ(cord.chunk_begin() == cord.chunk_end(), cord.empty()) << cord;
   EXPECT_EQ(cord.chunk_begin() != cord.chunk_end(), !cord.empty());
 
-  absl::Cord::ChunkRange range = cord.Chunks();
+  abslx::Cord::ChunkRange range = cord.Chunks();
   EXPECT_EQ(range.begin() == range.end(), cord.empty());
   EXPECT_EQ(range.begin() != range.end(), !cord.empty());
 
@@ -1433,13 +1433,13 @@ static void VerifyChunkIterator(const absl::Cord& cord,
     EXPECT_EQ(pre_iter->data(), (*pre_iter).data());
     EXPECT_EQ(pre_iter->size(), (*pre_iter).size());
 
-    absl::string_view chunk = *pre_iter;
+    abslx::string_view chunk = *pre_iter;
     EXPECT_FALSE(chunk.empty());
     EXPECT_LE(pos + chunk.size(), content.size());
-    EXPECT_EQ(absl::string_view(content.c_str() + pos, chunk.size()), chunk);
+    EXPECT_EQ(abslx::string_view(content.c_str() + pos, chunk.size()), chunk);
 
     int n_equal_iterators = 0;
-    for (absl::Cord::ChunkIterator it = range.begin(); it != range.end();
+    for (abslx::Cord::ChunkIterator it = range.begin(); it != range.end();
          ++it) {
       n_equal_iterators += static_cast<int>(it == pre_iter);
     }
@@ -1458,23 +1458,23 @@ static void VerifyChunkIterator(const absl::Cord& cord,
 }
 
 TEST(CordChunkIterator, Operations) {
-  absl::Cord empty_cord;
+  abslx::Cord empty_cord;
   VerifyChunkIterator(empty_cord, 0);
 
-  absl::Cord small_buffer_cord("small cord");
+  abslx::Cord small_buffer_cord("small cord");
   VerifyChunkIterator(small_buffer_cord, 1);
 
-  absl::Cord flat_node_cord("larger than small buffer optimization");
+  abslx::Cord flat_node_cord("larger than small buffer optimization");
   VerifyChunkIterator(flat_node_cord, 1);
 
   VerifyChunkIterator(
-      absl::MakeFragmentedCord({"a ", "small ", "fragmented ", "cord ", "for ",
+      abslx::MakeFragmentedCord({"a ", "small ", "fragmented ", "cord ", "for ",
                                 "testing ", "chunk ", "iterations."}),
       8);
 
-  absl::Cord reused_nodes_cord(std::string(40, 'c'));
-  reused_nodes_cord.Prepend(absl::Cord(std::string(40, 'b')));
-  reused_nodes_cord.Prepend(absl::Cord(std::string(40, 'a')));
+  abslx::Cord reused_nodes_cord(std::string(40, 'c'));
+  reused_nodes_cord.Prepend(abslx::Cord(std::string(40, 'b')));
+  reused_nodes_cord.Prepend(abslx::Cord(std::string(40, 'a')));
   size_t expected_chunks = 3;
   for (int i = 0; i < 8; ++i) {
     reused_nodes_cord.Prepend(reused_nodes_cord);
@@ -1483,57 +1483,57 @@ TEST(CordChunkIterator, Operations) {
   }
 
   RandomEngine rng(testing::GTEST_FLAG(random_seed));
-  absl::Cord flat_cord(RandomLowercaseString(&rng, 256));
-  absl::Cord subcords;
+  abslx::Cord flat_cord(RandomLowercaseString(&rng, 256));
+  abslx::Cord subcords;
   for (int i = 0; i < 128; ++i) subcords.Prepend(flat_cord.Subcord(i, 128));
   VerifyChunkIterator(subcords, 128);
 }
 
 TEST(CordCharIterator, Traits) {
-  static_assert(std::is_copy_constructible<absl::Cord::CharIterator>::value,
+  static_assert(std::is_copy_constructible<abslx::Cord::CharIterator>::value,
                 "");
-  static_assert(std::is_copy_assignable<absl::Cord::CharIterator>::value, "");
+  static_assert(std::is_copy_assignable<abslx::Cord::CharIterator>::value, "");
 
   // Move semantics to satisfy swappable via std::swap
-  static_assert(std::is_move_constructible<absl::Cord::CharIterator>::value,
+  static_assert(std::is_move_constructible<abslx::Cord::CharIterator>::value,
                 "");
-  static_assert(std::is_move_assignable<absl::Cord::CharIterator>::value, "");
+  static_assert(std::is_move_assignable<abslx::Cord::CharIterator>::value, "");
 
   static_assert(
       std::is_same<
-          std::iterator_traits<absl::Cord::CharIterator>::iterator_category,
+          std::iterator_traits<abslx::Cord::CharIterator>::iterator_category,
           std::input_iterator_tag>::value,
       "");
   static_assert(
-      std::is_same<std::iterator_traits<absl::Cord::CharIterator>::value_type,
+      std::is_same<std::iterator_traits<abslx::Cord::CharIterator>::value_type,
                    char>::value,
       "");
   static_assert(
       std::is_same<
-          std::iterator_traits<absl::Cord::CharIterator>::difference_type,
+          std::iterator_traits<abslx::Cord::CharIterator>::difference_type,
           ptrdiff_t>::value,
       "");
   static_assert(
-      std::is_same<std::iterator_traits<absl::Cord::CharIterator>::pointer,
+      std::is_same<std::iterator_traits<abslx::Cord::CharIterator>::pointer,
                    const char*>::value,
       "");
   static_assert(
-      std::is_same<std::iterator_traits<absl::Cord::CharIterator>::reference,
+      std::is_same<std::iterator_traits<abslx::Cord::CharIterator>::reference,
                    const char&>::value,
       "");
 }
 
-static void VerifyCharIterator(const absl::Cord& cord) {
+static void VerifyCharIterator(const abslx::Cord& cord) {
   EXPECT_EQ(cord.char_begin() == cord.char_end(), cord.empty());
   EXPECT_EQ(cord.char_begin() != cord.char_end(), !cord.empty());
 
-  absl::Cord::CharRange range = cord.Chars();
+  abslx::Cord::CharRange range = cord.Chars();
   EXPECT_EQ(range.begin() == range.end(), cord.empty());
   EXPECT_EQ(range.begin() != range.end(), !cord.empty());
 
   size_t i = 0;
-  absl::Cord::CharIterator pre_iter = cord.char_begin();
-  absl::Cord::CharIterator post_iter = cord.char_begin();
+  abslx::Cord::CharIterator pre_iter = cord.char_begin();
+  abslx::Cord::CharIterator post_iter = cord.char_begin();
   std::string content(cord);
   while (pre_iter != cord.char_end() && post_iter != cord.char_end()) {
     EXPECT_FALSE(pre_iter == cord.char_end());   // NOLINT: explicitly test ==
@@ -1549,30 +1549,30 @@ static void VerifyCharIterator(const absl::Cord& cord) {
     EXPECT_EQ(&*pre_iter, pre_iter.operator->());
 
     const char* character_address = &*pre_iter;
-    absl::Cord::CharIterator copy = pre_iter;
+    abslx::Cord::CharIterator copy = pre_iter;
     ++copy;
     EXPECT_EQ(character_address, &*pre_iter);
 
     int n_equal_iterators = 0;
-    for (absl::Cord::CharIterator it = range.begin(); it != range.end(); ++it) {
+    for (abslx::Cord::CharIterator it = range.begin(); it != range.end(); ++it) {
       n_equal_iterators += static_cast<int>(it == pre_iter);
     }
     EXPECT_EQ(n_equal_iterators, 1);
 
-    absl::Cord::CharIterator advance_iter = range.begin();
-    absl::Cord::Advance(&advance_iter, i);
+    abslx::Cord::CharIterator advance_iter = range.begin();
+    abslx::Cord::Advance(&advance_iter, i);
     EXPECT_EQ(pre_iter, advance_iter);
 
     advance_iter = range.begin();
-    EXPECT_EQ(absl::Cord::AdvanceAndRead(&advance_iter, i), cord.Subcord(0, i));
+    EXPECT_EQ(abslx::Cord::AdvanceAndRead(&advance_iter, i), cord.Subcord(0, i));
     EXPECT_EQ(pre_iter, advance_iter);
 
     advance_iter = pre_iter;
-    absl::Cord::Advance(&advance_iter, cord.size() - i);
+    abslx::Cord::Advance(&advance_iter, cord.size() - i);
     EXPECT_EQ(range.end(), advance_iter);
 
     advance_iter = pre_iter;
-    EXPECT_EQ(absl::Cord::AdvanceAndRead(&advance_iter, cord.size() - i),
+    EXPECT_EQ(abslx::Cord::AdvanceAndRead(&advance_iter, cord.size() - i),
               cord.Subcord(i, cord.size() - i));
     EXPECT_EQ(range.end(), advance_iter);
 
@@ -1584,14 +1584,14 @@ static void VerifyCharIterator(const absl::Cord& cord) {
   EXPECT_TRUE(pre_iter == cord.char_end());   // NOLINT: explicitly test ==
   EXPECT_TRUE(post_iter == cord.char_end());  // NOLINT
 
-  absl::Cord::CharIterator zero_advanced_end = cord.char_end();
-  absl::Cord::Advance(&zero_advanced_end, 0);
+  abslx::Cord::CharIterator zero_advanced_end = cord.char_end();
+  abslx::Cord::Advance(&zero_advanced_end, 0);
   EXPECT_EQ(zero_advanced_end, cord.char_end());
 
-  absl::Cord::CharIterator it = cord.char_begin();
-  for (absl::string_view chunk : cord.Chunks()) {
+  abslx::Cord::CharIterator it = cord.char_begin();
+  for (abslx::string_view chunk : cord.Chunks()) {
     while (!chunk.empty()) {
-      EXPECT_EQ(absl::Cord::ChunkRemaining(it), chunk);
+      EXPECT_EQ(abslx::Cord::ChunkRemaining(it), chunk);
       chunk.remove_prefix(1);
       ++it;
     }
@@ -1599,37 +1599,37 @@ static void VerifyCharIterator(const absl::Cord& cord) {
 }
 
 TEST(CordCharIterator, Operations) {
-  absl::Cord empty_cord;
+  abslx::Cord empty_cord;
   VerifyCharIterator(empty_cord);
 
-  absl::Cord small_buffer_cord("small cord");
+  abslx::Cord small_buffer_cord("small cord");
   VerifyCharIterator(small_buffer_cord);
 
-  absl::Cord flat_node_cord("larger than small buffer optimization");
+  abslx::Cord flat_node_cord("larger than small buffer optimization");
   VerifyCharIterator(flat_node_cord);
 
   VerifyCharIterator(
-      absl::MakeFragmentedCord({"a ", "small ", "fragmented ", "cord ", "for ",
+      abslx::MakeFragmentedCord({"a ", "small ", "fragmented ", "cord ", "for ",
                                 "testing ", "character ", "iteration."}));
 
-  absl::Cord reused_nodes_cord("ghi");
-  reused_nodes_cord.Prepend(absl::Cord("def"));
-  reused_nodes_cord.Prepend(absl::Cord("abc"));
+  abslx::Cord reused_nodes_cord("ghi");
+  reused_nodes_cord.Prepend(abslx::Cord("def"));
+  reused_nodes_cord.Prepend(abslx::Cord("abc"));
   for (int i = 0; i < 4; ++i) {
     reused_nodes_cord.Prepend(reused_nodes_cord);
     VerifyCharIterator(reused_nodes_cord);
   }
 
   RandomEngine rng(testing::GTEST_FLAG(random_seed));
-  absl::Cord flat_cord(RandomLowercaseString(&rng, 256));
-  absl::Cord subcords;
+  abslx::Cord flat_cord(RandomLowercaseString(&rng, 256));
+  abslx::Cord subcords;
   for (int i = 0; i < 4; ++i) subcords.Prepend(flat_cord.Subcord(16 * i, 128));
   VerifyCharIterator(subcords);
 }
 
 TEST(Cord, StreamingOutput) {
-  absl::Cord c =
-      absl::MakeFragmentedCord({"A ", "small ", "fragmented ", "Cord", "."});
+  abslx::Cord c =
+      abslx::MakeFragmentedCord({"A ", "small ", "fragmented ", "Cord", "."});
   std::stringstream output;
   output << c;
   EXPECT_EQ("A small fragmented Cord.", output.str());
@@ -1640,13 +1640,13 @@ TEST(Cord, ForEachChunk) {
     SCOPED_TRACE(num_elements);
     std::vector<std::string> cord_chunks;
     for (int i = 0; i < num_elements; ++i) {
-      cord_chunks.push_back(absl::StrCat("[", i, "]"));
+      cord_chunks.push_back(abslx::StrCat("[", i, "]"));
     }
-    absl::Cord c = absl::MakeFragmentedCord(cord_chunks);
+    abslx::Cord c = abslx::MakeFragmentedCord(cord_chunks);
 
     std::vector<std::string> iterated_chunks;
-    absl::CordTestPeer::ForEachChunk(c,
-                                     [&iterated_chunks](absl::string_view sv) {
+    abslx::CordTestPeer::ForEachChunk(c,
+                                     [&iterated_chunks](abslx::string_view sv) {
                                        iterated_chunks.emplace_back(sv);
                                      });
     EXPECT_EQ(iterated_chunks, cord_chunks);
@@ -1659,8 +1659,8 @@ TEST(Cord, SmallBufferAssignFromOwnData) {
   EXPECT_EQ(contents.size(), kMaxInline);
   for (size_t pos = 0; pos < contents.size(); ++pos) {
     for (size_t count = contents.size() - pos; count > 0; --count) {
-      absl::Cord c(contents);
-      absl::string_view flat = c.Flatten();
+      abslx::Cord c(contents);
+      abslx::string_view flat = c.Flatten();
       c = flat.substr(pos, count);
       EXPECT_EQ(c, contents.substr(pos, count))
           << "pos = " << pos << "; count = " << count;
@@ -1669,15 +1669,15 @@ TEST(Cord, SmallBufferAssignFromOwnData) {
 }
 
 TEST(Cord, Format) {
-  absl::Cord c;
-  absl::Format(&c, "There were %04d little %s.", 3, "pigs");
+  abslx::Cord c;
+  abslx::Format(&c, "There were %04d little %s.", 3, "pigs");
   EXPECT_EQ(c, "There were 0003 little pigs.");
-  absl::Format(&c, "And %-3llx bad wolf!", 1);
+  abslx::Format(&c, "And %-3llx bad wolf!", 1);
   EXPECT_EQ(c, "There were 0003 little pigs.And 1   bad wolf!");
 }
 
 TEST(CordDeathTest, Hardening) {
-  absl::Cord cord("hello");
+  abslx::Cord cord("hello");
   // These statement should abort the program in all builds modes.
   EXPECT_DEATH_IF_SUPPORTED(cord.RemovePrefix(6), "");
   EXPECT_DEATH_IF_SUPPORTED(cord.RemoveSuffix(6), "");
@@ -1698,7 +1698,7 @@ TEST(CordDeathTest, Hardening) {
 
 class AfterExitCordTester {
  public:
-  bool Set(absl::Cord* cord, absl::string_view expected) {
+  bool Set(abslx::Cord* cord, abslx::string_view expected) {
     cord_ = cord;
     expected_ = expected;
     return true;
@@ -1708,8 +1708,8 @@ class AfterExitCordTester {
     EXPECT_EQ(*cord_, expected_);
   }
  private:
-  absl::Cord* cord_;
-  absl::string_view expected_;
+  abslx::Cord* cord_;
+  abslx::string_view expected_;
 };
 
 template <typename Str>
@@ -1717,14 +1717,14 @@ void TestConstinitConstructor(Str) {
   const auto expected = Str::value;
   // Defined before `cord` to be destroyed after it.
   static AfterExitCordTester exit_tester;  // NOLINT
-  ABSL_CONST_INIT static absl::Cord cord(Str{});  // NOLINT
+  ABSL_CONST_INIT static abslx::Cord cord(Str{});  // NOLINT
   static bool init_exit_tester = exit_tester.Set(&cord, expected);
   (void)init_exit_tester;
 
   EXPECT_EQ(cord, expected);
   // Copy the object and test the copy, and the original.
   {
-    absl::Cord copy = cord;
+    abslx::Cord copy = cord;
     EXPECT_EQ(copy, expected);
   }
   // The original still works
@@ -1732,22 +1732,22 @@ void TestConstinitConstructor(Str) {
 
   // Try making adding more structure to the tree.
   {
-    absl::Cord copy = cord;
+    abslx::Cord copy = cord;
     std::string expected_copy(expected);
     for (int i = 0; i < 10; ++i) {
       copy.Append(cord);
-      absl::StrAppend(&expected_copy, expected);
+      abslx::StrAppend(&expected_copy, expected);
       EXPECT_EQ(copy, expected_copy);
     }
   }
 
   // Make sure we are using the right branch during constant evaluation.
-  EXPECT_EQ(absl::CordTestPeer::IsTree(cord), cord.size() >= 16);
+  EXPECT_EQ(abslx::CordTestPeer::IsTree(cord), cord.size() >= 16);
 
   for (int i = 0; i < 10; ++i) {
     // Make a few more Cords from the same global rep.
     // This tests what happens when the refcount for it gets below 1.
-    EXPECT_EQ(expected, absl::Cord(Str{}));
+    EXPECT_EQ(expected, abslx::Cord(Str{}));
   }
 }
 
@@ -1756,14 +1756,14 @@ constexpr int SimpleStrlen(const char* p) {
 }
 
 struct ShortView {
-  constexpr absl::string_view operator()() const {
-    return absl::string_view("SSO string", SimpleStrlen("SSO string"));
+  constexpr abslx::string_view operator()() const {
+    return abslx::string_view("SSO string", SimpleStrlen("SSO string"));
   }
 };
 
 struct LongView {
-  constexpr absl::string_view operator()() const {
-    return absl::string_view("String that does not fit SSO.",
+  constexpr abslx::string_view operator()() const {
+    return abslx::string_view("String that does not fit SSO.",
                              SimpleStrlen("String that does not fit SSO."));
   }
 };
@@ -1771,7 +1771,7 @@ struct LongView {
 
 TEST(Cord, ConstinitConstructor) {
   TestConstinitConstructor(
-      absl::strings_internal::MakeStringConstant(ShortView{}));
+      abslx::strings_internal::MakeStringConstant(ShortView{}));
   TestConstinitConstructor(
-      absl::strings_internal::MakeStringConstant(LongView{}));
+      abslx::strings_internal::MakeStringConstant(LongView{}));
 }

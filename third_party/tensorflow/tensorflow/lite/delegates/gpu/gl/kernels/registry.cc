@@ -134,26 +134,26 @@ class Registry : public NodeShader {
 
   ~Registry() final = default;
 
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     auto it = shaders_.find(ctx.op_type);
     if (it == shaders_.end()) {
-      return absl::NotFoundError(
-          absl::StrCat("No shader implementation for ", ctx.op_type));
+      return abslx::NotFoundError(
+          abslx::StrCat("No shader implementation for ", ctx.op_type));
     }
     std::vector<std::string> errors;
     for (const auto& shader : it->second) {
       const auto status = shader->GenerateCode(ctx, generated_code);
       // Return the first suitable shader.
-      if (status.ok()) return absl::OkStatus();
+      if (status.ok()) return abslx::OkStatus();
       errors.push_back(std::string(status.message()));
     }
-    return errors.empty() ? absl::OkStatus()
-                          : absl::UnknownError(absl::StrJoin(errors, ", "));
+    return errors.empty() ? abslx::OkStatus()
+                          : abslx::UnknownError(abslx::StrJoin(errors, ", "));
   }
 
  private:
-  absl::flat_hash_map<std::string, std::vector<std::unique_ptr<NodeShader>>>
+  abslx::flat_hash_map<std::string, std::vector<std::unique_ptr<NodeShader>>>
       shaders_;
 };
 

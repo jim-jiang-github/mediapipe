@@ -41,12 +41,12 @@ StatusOr<GpuSolverContext*> GetContext(se::Stream* stream) {
   // TODO(b/214454412): This global hashtable is incorrect (ABA bug if a Stream
   // is added to the hasthable, then deleted, and then a new Stream is created
   // at the same address).  It also leaks memory!
-  static absl::Mutex mu(absl::kConstInit);
+  static abslx::Mutex mu(abslx::kConstInit);
   static auto contexts =
-      new absl::flat_hash_map<se::Stream*, GpuSolverContext> ABSL_GUARDED_BY(
+      new abslx::flat_hash_map<se::Stream*, GpuSolverContext> ABSL_GUARDED_BY(
           mu);
 
-  absl::MutexLock lock(&mu);
+  abslx::MutexLock lock(&mu);
   auto result = contexts->emplace(stream, GpuSolverContext());
   if (result.second) {
     TF_ASSIGN_OR_RETURN(result.first->second, GpuSolverContext::Create(stream));

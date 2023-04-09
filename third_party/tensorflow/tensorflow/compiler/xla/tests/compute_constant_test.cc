@@ -145,7 +145,7 @@ TEST_F(ComputeConstantTest, DirectParamMissing) {
 
     auto value = ComputeConstantScalar<float>(client, computation, &b);
     EXPECT_TRUE(
-        absl::StrContains(value.status().ToString(), "depends on a parameter"))
+        abslx::StrContains(value.status().ToString(), "depends on a parameter"))
         << value.status();
   }
 }

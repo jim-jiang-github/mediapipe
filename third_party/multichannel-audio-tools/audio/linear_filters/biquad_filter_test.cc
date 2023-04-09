@@ -690,7 +690,7 @@ TYPED_TEST_SUITE(BiquadFilterTypedTest, TestTypes);
 TYPED_TEST(BiquadFilterTypedTest, BiquadFilter) {
   using SampleType = TypeParam;
   SCOPED_TRACE(
-      absl::StrFormat("SampleType: %s", GetTypeName<SampleType>().c_str()));
+      abslx::StrFormat("SampleType: %s", GetTypeName<SampleType>().c_str()));
 
   constexpr int kNumSamples = 20;
   const BiquadFilterCoefficients coeffs = {{-0.2, 1.9, 0.4}, {0.5, -0.2, 0.1}};
@@ -733,7 +733,7 @@ TYPED_TEST(BiquadFilterTypedTest, BiquadFilter) {
 TYPED_TEST(BiquadFilterTypedTest, BiquadFilterCascade) {
   using SampleType = TypeParam;
   SCOPED_TRACE(
-      absl::StrFormat("SampleType: %s", GetTypeName<SampleType>().c_str()));
+      abslx::StrFormat("SampleType: %s", GetTypeName<SampleType>().c_str()));
 
   constexpr int kNumSamples = 20;
   const BiquadFilterCoefficients coeffs = {{-0.2, 1.9, 0.4}, {0.5, -0.2, 0.1}};
@@ -753,7 +753,7 @@ TYPED_TEST(BiquadFilterTypedTest, BiquadFilterCascade) {
           kNumChannelsAtCompileTime != num_channels) {
         continue;  // Skip if SampleType is incompatible with num_channels.
       }
-      SCOPED_TRACE(absl::StrFormat("num_channels: %d  num_stages: %d",
+      SCOPED_TRACE(abslx::StrFormat("num_channels: %d  num_stages: %d",
                                    num_channels, num_stages));
 
       std::vector<BiquadFilterCoefficients> all_coeffs(num_stages, coeffs);

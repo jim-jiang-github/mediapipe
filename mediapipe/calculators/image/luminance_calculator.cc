@@ -26,9 +26,9 @@ namespace mediapipe {
 // See GlSimpleCalculatorBase for inputs, outputs and input side packets.
 class LuminanceCalculator : public GlSimpleCalculator {
  public:
-  absl::Status GlSetup() override;
-  absl::Status GlRender(const GlTexture& src, const GlTexture& dst) override;
-  absl::Status GlTeardown() override;
+  abslx::Status GlSetup() override;
+  abslx::Status GlRender(const GlTexture& src, const GlTexture& dst) override;
+  abslx::Status GlTeardown() override;
 
  private:
   GLuint program_ = 0;
@@ -36,7 +36,7 @@ class LuminanceCalculator : public GlSimpleCalculator {
 };
 REGISTER_CALCULATOR(LuminanceCalculator);
 
-absl::Status LuminanceCalculator::GlSetup() {
+abslx::Status LuminanceCalculator::GlSetup() {
   // Load vertex and fragment shaders
   const GLint attr_location[NUM_ATTRIBUTES] = {
       ATTRIB_VERTEX,
@@ -82,10 +82,10 @@ absl::Status LuminanceCalculator::GlSetup() {
                    (const GLchar**)&attr_name[0], attr_location, &program_);
   RET_CHECK(program_) << "Problem initializing the program.";
   frame_ = glGetUniformLocation(program_, "video_frame");
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LuminanceCalculator::GlRender(const GlTexture& src,
+abslx::Status LuminanceCalculator::GlRender(const GlTexture& src,
                                            const GlTexture& dst) {
   static const GLfloat square_vertices[] = {
       -1.0f, -1.0f,  // bottom left
@@ -136,15 +136,15 @@ absl::Status LuminanceCalculator::GlRender(const GlTexture& src,
   glDeleteVertexArrays(1, &vao);
   glDeleteBuffers(2, vbo);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LuminanceCalculator::GlTeardown() {
+abslx::Status LuminanceCalculator::GlTeardown() {
   if (program_) {
     glDeleteProgram(program_);
     program_ = 0;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

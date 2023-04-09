@@ -27,18 +27,18 @@ absl_cc_library(
   LINKOPTS
     ${ABSL_DEFAULT_LINKOPTS}
   DEPS
-    absl::container_common
-    absl::compare
-    absl::compressed_tuple
-    absl::container_memory
-    absl::cord
-    absl::core_headers
-    absl::layout
-    absl::memory
-    absl::strings
-    absl::throw_delegate
-    absl::type_traits
-    absl::utility
+    abslx::container_common
+    abslx::compare
+    abslx::compressed_tuple
+    abslx::container_memory
+    abslx::cord
+    abslx::core_headers
+    abslx::layout
+    abslx::memory
+    abslx::strings
+    abslx::throw_delegate
+    abslx::type_traits
+    abslx::utility
 )
 
 absl_cc_library(
@@ -51,11 +51,11 @@ absl_cc_library(
   LINKOPTS
     ${ABSL_DEFAULT_LINKOPTS}
   DEPS
-    absl::btree
-    absl::cord
-    absl::flat_hash_set
-    absl::strings
-    absl::time
+    abslx::btree
+    abslx::cord
+    abslx::flat_hash_set
+    abslx::strings
+    abslx::time
   TESTONLY
 )
 
@@ -69,17 +69,17 @@ absl_cc_test(
   LINKOPTS
     ${ABSL_DEFAULT_LINKOPTS}
   DEPS
-    absl::btree
-    absl::btree_test_common
-    absl::compare
-    absl::core_headers
-    absl::counting_allocator
-    absl::flags
-    absl::hash_testing
-    absl::raw_logging_internal
-    absl::strings
-    absl::test_instance_tracker
-    absl::type_traits
+    abslx::btree
+    abslx::btree_test_common
+    abslx::compare
+    abslx::core_headers
+    abslx::counting_allocator
+    abslx::flags
+    abslx::hash_testing
+    abslx::raw_logging_internal
+    abslx::strings
+    abslx::test_instance_tracker
+    abslx::type_traits
     gmock_main
 )
 
@@ -91,7 +91,7 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::utility
+    abslx::utility
   PUBLIC
 )
 
@@ -103,12 +103,12 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::any
-    absl::compressed_tuple
-    absl::memory
-    absl::optional
-    absl::test_instance_tracker
-    absl::utility
+    abslx::any
+    abslx::compressed_tuple
+    abslx::memory
+    abslx::optional
+    abslx::test_instance_tracker
+    abslx::utility
     gmock_main
 )
 
@@ -120,13 +120,13 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::compressed_tuple
-    absl::algorithm
-    absl::config
-    absl::core_headers
-    absl::dynamic_annotations
-    absl::throw_delegate
-    absl::memory
+    abslx::compressed_tuple
+    abslx::algorithm
+    abslx::config
+    abslx::core_headers
+    abslx::dynamic_annotations
+    abslx::throw_delegate
+    abslx::memory
   PUBLIC
 )
 
@@ -138,12 +138,12 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::fixed_array
-    absl::counting_allocator
-    absl::config
-    absl::exception_testing
-    absl::hash_testing
-    absl::memory
+    abslx::fixed_array
+    abslx::counting_allocator
+    abslx::config
+    abslx::exception_testing
+    abslx::hash_testing
+    abslx::memory
     gmock_main
 )
 
@@ -155,9 +155,9 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::fixed_array
-    absl::config
-    absl::exception_safety_testing
+    abslx::fixed_array
+    abslx::config
+    abslx::exception_safety_testing
     gmock_main
 )
 
@@ -169,11 +169,11 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::compressed_tuple
-    absl::core_headers
-    absl::memory
-    absl::span
-    absl::type_traits
+    abslx::compressed_tuple
+    abslx::core_headers
+    abslx::memory
+    abslx::span
+    abslx::type_traits
   PUBLIC
 )
 
@@ -185,11 +185,11 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::algorithm
-    absl::core_headers
-    absl::inlined_vector_internal
-    absl::throw_delegate
-    absl::memory
+    abslx::algorithm
+    abslx::core_headers
+    abslx::inlined_vector_internal
+    abslx::throw_delegate
+    abslx::memory
   PUBLIC
 )
 
@@ -201,7 +201,7 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::config
+    abslx::config
 )
 
 absl_cc_test(
@@ -212,16 +212,16 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::counting_allocator
-    absl::inlined_vector
-    absl::test_instance_tracker
-    absl::config
-    absl::core_headers
-    absl::exception_testing
-    absl::hash_testing
-    absl::memory
-    absl::raw_logging_internal
-    absl::strings
+    abslx::counting_allocator
+    abslx::inlined_vector
+    abslx::test_instance_tracker
+    abslx::config
+    abslx::core_headers
+    abslx::exception_testing
+    abslx::hash_testing
+    abslx::memory
+    abslx::raw_logging_internal
+    abslx::strings
     gmock_main
 )
 
@@ -233,9 +233,9 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::inlined_vector
-    absl::config
-    absl::exception_safety_testing
+    abslx::inlined_vector
+    abslx::config
+    abslx::exception_safety_testing
     gmock_main
 )
 
@@ -249,7 +249,7 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::compare
+    abslx::compare
   TESTONLY
 )
 
@@ -261,7 +261,7 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::test_instance_tracker
+    abslx::test_instance_tracker
     gmock_main
 )
 
@@ -273,11 +273,11 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::container_memory
-    absl::hash_function_defaults
-    absl::raw_hash_map
-    absl::algorithm_container
-    absl::memory
+    abslx::container_memory
+    abslx::hash_function_defaults
+    abslx::raw_hash_map
+    abslx::algorithm_container
+    abslx::memory
   PUBLIC
 )
 
@@ -289,14 +289,14 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::flat_hash_map
-    absl::hash_generator_testing
-    absl::unordered_map_constructor_test
-    absl::unordered_map_lookup_test
-    absl::unordered_map_members_test
-    absl::unordered_map_modifiers_test
-    absl::any
-    absl::raw_logging_internal
+    abslx::flat_hash_map
+    abslx::hash_generator_testing
+    abslx::unordered_map_constructor_test
+    abslx::unordered_map_lookup_test
+    abslx::unordered_map_members_test
+    abslx::unordered_map_modifiers_test
+    abslx::any
+    abslx::raw_logging_internal
     gmock_main
 )
 
@@ -308,12 +308,12 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::container_memory
-    absl::hash_function_defaults
-    absl::raw_hash_set
-    absl::algorithm_container
-    absl::core_headers
-    absl::memory
+    abslx::container_memory
+    abslx::hash_function_defaults
+    abslx::raw_hash_set
+    abslx::algorithm_container
+    abslx::core_headers
+    abslx::memory
   PUBLIC
 )
 
@@ -326,15 +326,15 @@ absl_cc_test(
     ${ABSL_TEST_COPTS}
     "-DUNORDERED_SET_CXX17"
   DEPS
-    absl::flat_hash_set
-    absl::hash_generator_testing
-    absl::unordered_set_constructor_test
-    absl::unordered_set_lookup_test
-    absl::unordered_set_members_test
-    absl::unordered_set_modifiers_test
-    absl::memory
-    absl::raw_logging_internal
-    absl::strings
+    abslx::flat_hash_set
+    abslx::hash_generator_testing
+    abslx::unordered_set_constructor_test
+    abslx::unordered_set_lookup_test
+    abslx::unordered_set_members_test
+    abslx::unordered_set_modifiers_test
+    abslx::memory
+    abslx::raw_logging_internal
+    abslx::strings
     gmock_main
 )
 
@@ -346,12 +346,12 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::container_memory
-    absl::hash_function_defaults
-    absl::node_hash_policy
-    absl::raw_hash_map
-    absl::algorithm_container
-    absl::memory
+    abslx::container_memory
+    abslx::hash_function_defaults
+    abslx::node_hash_policy
+    abslx::raw_hash_map
+    abslx::algorithm_container
+    abslx::memory
   PUBLIC
 )
 
@@ -363,13 +363,13 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::hash_generator_testing
-    absl::node_hash_map
-    absl::tracked
-    absl::unordered_map_constructor_test
-    absl::unordered_map_lookup_test
-    absl::unordered_map_members_test
-    absl::unordered_map_modifiers_test
+    abslx::hash_generator_testing
+    abslx::node_hash_map
+    abslx::tracked
+    abslx::unordered_map_constructor_test
+    abslx::unordered_map_lookup_test
+    abslx::unordered_map_members_test
+    abslx::unordered_map_modifiers_test
     gmock_main
 )
 
@@ -381,11 +381,11 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::hash_function_defaults
-    absl::node_hash_policy
-    absl::raw_hash_set
-    absl::algorithm_container
-    absl::memory
+    abslx::hash_function_defaults
+    abslx::node_hash_policy
+    abslx::raw_hash_set
+    abslx::algorithm_container
+    abslx::memory
   PUBLIC
 )
 
@@ -398,12 +398,12 @@ absl_cc_test(
     ${ABSL_TEST_COPTS}
     "-DUNORDERED_SET_CXX17"
   DEPS
-    absl::hash_generator_testing
-    absl::node_hash_set
-    absl::unordered_set_constructor_test
-    absl::unordered_set_lookup_test
-    absl::unordered_set_members_test
-    absl::unordered_set_modifiers_test
+    abslx::hash_generator_testing
+    abslx::node_hash_set
+    abslx::unordered_set_constructor_test
+    abslx::unordered_set_lookup_test
+    abslx::unordered_set_members_test
+    abslx::unordered_set_modifiers_test
     gmock_main
 )
 
@@ -415,10 +415,10 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::config
-    absl::memory
-    absl::type_traits
-    absl::utility
+    abslx::config
+    abslx::memory
+    abslx::type_traits
+    abslx::utility
   PUBLIC
 )
 
@@ -430,9 +430,9 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::container_memory
-    absl::strings
-    absl::test_instance_tracker
+    abslx::container_memory
+    abslx::strings
+    abslx::test_instance_tracker
     gmock_main
 )
 
@@ -444,10 +444,10 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::config
-    absl::cord
-    absl::hash
-    absl::strings
+    abslx::config
+    abslx::cord
+    abslx::hash
+    abslx::strings
   PUBLIC
 )
 
@@ -459,12 +459,12 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::cord
-    absl::cord_test_helpers
-    absl::hash_function_defaults
-    absl::hash
-    absl::random_random
-    absl::strings
+    abslx::cord
+    abslx::cord_test_helpers
+    abslx::hash_function_defaults
+    abslx::hash
+    abslx::random_random
+    abslx::strings
     gmock_main
 )
 
@@ -478,10 +478,10 @@ absl_cc_library(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::hash_policy_testing
-    absl::memory
-    absl::meta
-    absl::strings
+    abslx::hash_policy_testing
+    abslx::memory
+    abslx::meta
+    abslx::strings
   TESTONLY
 )
 
@@ -493,8 +493,8 @@ absl_cc_library(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::hash
-    absl::strings
+    abslx::hash
+    abslx::strings
   TESTONLY
 )
 
@@ -506,7 +506,7 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::hash_policy_testing
+    abslx::hash_policy_testing
     gmock_main
 )
 
@@ -518,7 +518,7 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::meta
+    abslx::meta
   PUBLIC
 )
 
@@ -530,7 +530,7 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::hash_policy_traits
+    abslx::hash_policy_traits
     gmock_main
 )
 
@@ -545,10 +545,10 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::base
-    absl::exponential_biased
-    absl::have_sse
-    absl::synchronization
+    abslx::base
+    abslx::exponential_biased
+    abslx::have_sse
+    abslx::synchronization
 )
 
 absl_cc_test(
@@ -559,8 +559,8 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::hashtablez_sampler
-    absl::have_sse
+    abslx::hashtablez_sampler
+    abslx::have_sse
     gmock_main
 )
 
@@ -572,7 +572,7 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::hashtable_debug_hooks
+    abslx::hashtable_debug_hooks
 )
 
 absl_cc_library(
@@ -583,7 +583,7 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::config
+    abslx::config
   PUBLIC
 )
 
@@ -604,7 +604,7 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::config
+    abslx::config
   PUBLIC
 )
 
@@ -616,8 +616,8 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::hash_policy_traits
-    absl::node_hash_policy
+    abslx::hash_policy_traits
+    abslx::node_hash_policy
     gmock_main
 )
 
@@ -629,9 +629,9 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::container_memory
-    absl::raw_hash_set
-    absl::throw_delegate
+    abslx::container_memory
+    abslx::raw_hash_set
+    abslx::throw_delegate
   PUBLIC
 )
 
@@ -643,7 +643,7 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::type_traits
+    abslx::type_traits
 )
 
 absl_cc_library(
@@ -656,22 +656,22 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::bits
-    absl::compressed_tuple
-    absl::config
-    absl::container_common
-    absl::container_memory
-    absl::core_headers
-    absl::endian
-    absl::hash_policy_traits
-    absl::hashtable_debug_hooks
-    absl::have_sse
-    absl::layout
-    absl::memory
-    absl::meta
-    absl::optional
-    absl::utility
-    absl::hashtablez_sampler
+    abslx::bits
+    abslx::compressed_tuple
+    abslx::config
+    abslx::container_common
+    abslx::container_memory
+    abslx::core_headers
+    abslx::endian
+    abslx::hash_policy_traits
+    abslx::hashtable_debug_hooks
+    abslx::have_sse
+    abslx::layout
+    abslx::memory
+    abslx::meta
+    abslx::optional
+    abslx::utility
+    abslx::hashtablez_sampler
   PUBLIC
 )
 
@@ -683,16 +683,16 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::container_memory
-    absl::hash_function_defaults
-    absl::hash_policy_testing
-    absl::hashtable_debug
-    absl::raw_hash_set
-    absl::base
-    absl::config
-    absl::core_headers
-    absl::raw_logging_internal
-    absl::strings
+    abslx::container_memory
+    abslx::hash_function_defaults
+    abslx::hash_policy_testing
+    abslx::hashtable_debug
+    abslx::raw_hash_set
+    abslx::base
+    abslx::config
+    abslx::core_headers
+    abslx::raw_logging_internal
+    abslx::strings
     gmock_main
 )
 
@@ -704,9 +704,9 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::raw_hash_set
-    absl::tracked
-    absl::core_headers
+    abslx::raw_hash_set
+    abslx::tracked
+    abslx::core_headers
     gmock_main
 )
 
@@ -718,12 +718,12 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::config
-    absl::core_headers
-    absl::meta
-    absl::strings
-    absl::span
-    absl::utility
+    abslx::config
+    abslx::core_headers
+    abslx::meta
+    abslx::strings
+    abslx::span
+    abslx::utility
   PUBLIC
 )
 
@@ -735,11 +735,11 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::layout
-    absl::config
-    absl::core_headers
-    absl::raw_logging_internal
-    absl::span
+    abslx::layout
+    abslx::config
+    abslx::core_headers
+    abslx::raw_logging_internal
+    abslx::span
     gmock_main
 )
 
@@ -751,7 +751,7 @@ absl_cc_library(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::config
+    abslx::config
   TESTONLY
 )
 
@@ -763,8 +763,8 @@ absl_cc_library(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::hash_generator_testing
-    absl::hash_policy_testing
+    abslx::hash_generator_testing
+    abslx::hash_policy_testing
     gmock
   TESTONLY
 )
@@ -777,8 +777,8 @@ absl_cc_library(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::hash_generator_testing
-    absl::hash_policy_testing
+    abslx::hash_generator_testing
+    abslx::hash_policy_testing
     gmock
   TESTONLY
 )
@@ -791,7 +791,7 @@ absl_cc_library(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::type_traits
+    abslx::type_traits
     gmock
   TESTONLY
 )
@@ -804,8 +804,8 @@ absl_cc_library(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::hash_generator_testing
-    absl::hash_policy_testing
+    abslx::hash_generator_testing
+    abslx::hash_policy_testing
     gmock
   TESTONLY
 )
@@ -818,8 +818,8 @@ absl_cc_library(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::hash_generator_testing
-    absl::hash_policy_testing
+    abslx::hash_generator_testing
+    abslx::hash_policy_testing
     gmock
   TESTONLY
 )
@@ -832,8 +832,8 @@ absl_cc_library(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::hash_generator_testing
-    absl::hash_policy_testing
+    abslx::hash_generator_testing
+    abslx::hash_policy_testing
     gmock
   TESTONLY
 )
@@ -846,7 +846,7 @@ absl_cc_library(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::type_traits
+    abslx::type_traits
     gmock
   TESTONLY
 )
@@ -859,8 +859,8 @@ absl_cc_library(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::hash_generator_testing
-    absl::hash_policy_testing
+    abslx::hash_generator_testing
+    abslx::hash_policy_testing
     gmock
   TESTONLY
 )
@@ -873,10 +873,10 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::unordered_set_constructor_test
-    absl::unordered_set_lookup_test
-    absl::unordered_set_members_test
-    absl::unordered_set_modifiers_test
+    abslx::unordered_set_constructor_test
+    abslx::unordered_set_lookup_test
+    abslx::unordered_set_members_test
+    abslx::unordered_set_modifiers_test
     gmock_main
 )
 
@@ -888,9 +888,9 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::unordered_map_constructor_test
-    absl::unordered_map_lookup_test
-    absl::unordered_map_members_test
-    absl::unordered_map_modifiers_test
+    abslx::unordered_map_constructor_test
+    abslx::unordered_map_lookup_test
+    abslx::unordered_map_members_test
+    abslx::unordered_map_modifiers_test
     gmock_main
 )

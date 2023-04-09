@@ -23,23 +23,23 @@ limitations under the License.
 namespace mediapipe {
 namespace tasks {
 
-absl::Status CreateStatusWithPayload(
-    absl::StatusCode canonical_code, absl::string_view message,
+abslx::Status CreateStatusWithPayload(
+    abslx::StatusCode canonical_code, abslx::string_view message,
     MediaPipeTasksStatus mediapipe_tasks_code) {
   // NOTE: Ignores `message` if the canonical code is ok.
-  absl::Status status = absl::Status(canonical_code, message);
+  abslx::Status status = abslx::Status(canonical_code, message);
   // NOTE: Does nothing if the canonical code is ok.
   status.SetPayload(kMediaPipeTasksPayload,
-                    absl::Cord(absl::StrCat(mediapipe_tasks_code)));
+                    abslx::Cord(abslx::StrCat(mediapipe_tasks_code)));
   return status;
 }
 
-absl::Status AddPayload(absl::Status status, absl::string_view message,
+abslx::Status AddPayload(abslx::Status status, abslx::string_view message,
                         MediaPipeTasksStatus mediapipe_tasks_code) {
   if (status.ok()) return status;
   // Attaches a new payload with the MediaPipeTasksStatus key to the status.
   status.SetPayload(kMediaPipeTasksPayload,
-                    absl::Cord(absl::StrCat(mediapipe_tasks_code)));
+                    abslx::Cord(abslx::StrCat(mediapipe_tasks_code)));
   return status;
 }
 

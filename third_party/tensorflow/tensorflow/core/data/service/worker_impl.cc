@@ -179,10 +179,10 @@ Status DataServiceWorkerImpl::Start(const std::string& worker_address,
   }
   LOG(INFO) << "Worker registered with dispatcher running at "
             << config_.dispatcher_address();
-  task_completion_thread_ = absl::WrapUnique(
+  task_completion_thread_ = abslx::WrapUnique(
       Env::Default()->StartThread({}, "data-service-worker-task-completion",
                                   [this]() { TaskCompletionThread(); }));
-  heartbeat_thread_ = absl::WrapUnique(Env::Default()->StartThread(
+  heartbeat_thread_ = abslx::WrapUnique(Env::Default()->StartThread(
       {}, "data-service-worker-heartbeat", [this]() { HeartbeatThread(); }));
   mutex_lock l(mu_);
   registered_ = true;
@@ -212,13 +212,13 @@ void DataServiceWorkerImpl::Stop() {
 }
 
 Status DataServiceWorkerImpl::ValidateWorkerConfig() const {
-  const bool any_tag_is_empty = absl::c_any_of(
+  const bool any_tag_is_empty = abslx::c_any_of(
       config_.worker_tags(),
       [](const std::string& worker_tag) { return worker_tag.empty(); });
   if (any_tag_is_empty) {
     return errors::FailedPrecondition(
         "Worker tags cannot be empty. Got tags {",
-        absl::StrJoin(config_.worker_tags().begin(),
+        abslx::StrJoin(config_.worker_tags().begin(),
                       config_.worker_tags().end(), ", "),
         "}");
   }
@@ -306,7 +306,7 @@ Status DataServiceWorkerImpl::ProcessTaskInternal(const TaskDef& task_def)
 Status DataServiceWorkerImpl::EnsureTaskInitialized(
     DataServiceWorkerImpl::Task& task) {
   if (task.task_def.worker_address() != worker_address_) {
-    return errors::Internal(absl::Substitute(
+    return errors::Internal(abslx::Substitute(
         "Dispatcher's worker address $0 does not match worker's address $1.",
         task.task_def.worker_address(), worker_address_));
   }
@@ -601,7 +601,7 @@ WorkerStateExport DataServiceWorkerImpl::ExportState() const {
   return worker_state_export;
 }
 
-void LocalWorkers::Add(absl::string_view worker_address,
+void LocalWorkers::Add(abslx::string_view worker_address,
                        std::shared_ptr<DataServiceWorkerImpl> worker) {
   DCHECK(worker != nullptr) << "Adding a nullptr local worker is disallowed.";
   VLOG(1) << "Register local worker at address " << worker_address;
@@ -610,7 +610,7 @@ void LocalWorkers::Add(absl::string_view worker_address,
 }
 
 std::shared_ptr<DataServiceWorkerImpl> LocalWorkers::Get(
-    absl::string_view worker_address) {
+    abslx::string_view worker_address) {
   tf_shared_lock l(mu_);
   AddressToWorkerMap::const_iterator it = local_workers_->find(worker_address);
   if (it == local_workers_->end()) {
@@ -624,7 +624,7 @@ bool LocalWorkers::Empty() {
   return local_workers_->empty();
 }
 
-void LocalWorkers::Remove(absl::string_view worker_address) {
+void LocalWorkers::Remove(abslx::string_view worker_address) {
   VLOG(1) << "Remove local worker at address " << worker_address;
   mutex_lock l(mu_);
   local_workers_->erase(worker_address);

@@ -52,7 +52,7 @@ GraphDef CreateTestProto() {
 }
 
 static void ExpectHasSubstr(StringPiece s, StringPiece expected) {
-  EXPECT_TRUE(absl::StrContains(s, expected))
+  EXPECT_TRUE(abslx::StrContains(s, expected))
       << "'" << s << "' does not contain '" << expected << "'";
 }
 
@@ -382,7 +382,7 @@ TEST_F(DefaultEnvTest, LocalTempFilename) {
   TF_CHECK_OK(env->NewWritableFile(filename, &file_to_write));
 #if defined(PLATFORM_GOOGLE)
   TF_CHECK_OK(file_to_write->Append("Nu"));
-  TF_CHECK_OK(file_to_write->Append(absl::Cord("ll")));
+  TF_CHECK_OK(file_to_write->Append(abslx::Cord("ll")));
 #else
   // TODO(ebrevdo): Remove this version.
   TF_CHECK_OK(file_to_write->Append("Null"));
@@ -422,7 +422,7 @@ TEST_F(DefaultEnvTest, CreateUniqueFileName) {
 
   EXPECT_TRUE(env->CreateUniqueFileName(&filename, suffix));
 
-  EXPECT_TRUE(absl::StartsWith(filename, prefix));
+  EXPECT_TRUE(abslx::StartsWith(filename, prefix));
   EXPECT_TRUE(str_util::EndsWith(filename, suffix));
 }
 

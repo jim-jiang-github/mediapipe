@@ -501,7 +501,7 @@ std::string ConvolutionTransposed::GenerateConvolutionTransposedCode(
     }
   } else {
     for (int s = 0; s < block_size.w; ++s) {
-      c += absl::Substitute(
+      c += abslx::Substitute(
           R"(        FLT4 f$1 = args.weights0.Read(dst_s + $0, x_c);
         FLT4 f$2 = args.weights1.Read(dst_s + $0, x_c);
         FLT4 f$3 = args.weights2.Read(dst_s + $0, x_c);
@@ -579,14 +579,14 @@ std::string ConvolutionTransposed::GenerateConvolutionTransposedCode(
   return c;
 }
 
-absl::Status ConvolutionTransposed::BindArguments(ArgumentsBinder* args) {
+abslx::Status ConvolutionTransposed::BindArguments(ArgumentsBinder* args) {
   if (definition_.src_tensors[0].HasAxis(Axis::DEPTH)) {
     const int aligned_h =
         AlignByN(dst_[0]->Height(), stride_.y * block_size_.y);
     RETURN_IF_ERROR(
         args->SetInt("grid_size_y", DivideRoundUp(aligned_h, block_size_.y)));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 int3 ConvolutionTransposed::GetGridSize() const {

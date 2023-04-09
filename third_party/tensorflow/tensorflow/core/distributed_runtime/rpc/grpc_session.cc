@@ -478,7 +478,7 @@ Status GrpcSession::ReleaseCallable(CallableHandle handle) {
 class GrpcSessionFactory : public SessionFactory {
  public:
   bool AcceptsOptions(const SessionOptions& options) override {
-    return absl::StartsWith(options.target, kSchemePrefix);
+    return abslx::StartsWith(options.target, kSchemePrefix);
   }
 
   Status NewSession(const SessionOptions& options,

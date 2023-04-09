@@ -36,7 +36,7 @@ namespace metadata {
 namespace {
 constexpr char kMetadataBufferName[] = "TFLITE_METADATA";
 
-using ::absl::StatusCode;
+using ::abslx::StatusCode;
 using ::mediapipe::tasks::CreateStatusWithPayload;
 using ::mediapipe::tasks::MediaPipeTasksStatus;
 
@@ -47,7 +47,7 @@ ModelMetadataPopulator::ModelMetadataPopulator(const tflite::Model& model) {
 }
 
 /* static */
-absl::StatusOr<std::unique_ptr<ModelMetadataPopulator>>
+abslx::StatusOr<std::unique_ptr<ModelMetadataPopulator>>
 ModelMetadataPopulator::CreateFromModelBuffer(const char* buffer_data,
                                               size_t buffer_size) {
   // Rely on the simplest, base flatbuffers verifier. Here is not the place to
@@ -61,9 +61,9 @@ ModelMetadataPopulator::CreateFromModelBuffer(const char* buffer_data,
         "The model is not a valid FlatBuffer buffer.",
         MediaPipeTasksStatus::kInvalidFlatBufferError);
   }
-  // Use absl::WrapUnique() to call private constructor:
+  // Use abslx::WrapUnique() to call private constructor:
   // https://abseil.io/tips/126.
-  return absl::WrapUnique(
+  return abslx::WrapUnique(
       new ModelMetadataPopulator(*tflite::GetModel(buffer_data)));
 }
 
@@ -91,11 +91,11 @@ void ModelMetadataPopulator::LoadMetadata(const char* metadata_buffer_data,
 }
 
 void ModelMetadataPopulator::LoadAssociatedFiles(
-    const absl::flat_hash_map<std::string, std::string>& associated_files) {
+    const abslx::flat_hash_map<std::string, std::string>& associated_files) {
   associated_files_ = associated_files;
 }
 
-absl::StatusOr<std::string> ModelMetadataPopulator::AppendAssociatedFiles(
+abslx::StatusOr<std::string> ModelMetadataPopulator::AppendAssociatedFiles(
     const char* model_buffer_data, size_t model_buffer_size) {
   // Create in-memory writable zip file.
   ZipWritableMemFile mem_file =
@@ -139,7 +139,7 @@ absl::StatusOr<std::string> ModelMetadataPopulator::AppendAssociatedFiles(
   return std::string(mem_file.GetFileContent());
 }
 
-absl::StatusOr<std::string> ModelMetadataPopulator::Populate() {
+abslx::StatusOr<std::string> ModelMetadataPopulator::Populate() {
   // Build model.
   flatbuffers::FlatBufferBuilder model_fbb;
   model_fbb.Finish(tflite::Model::Pack(model_fbb, &model_t_),

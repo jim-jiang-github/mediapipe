@@ -24,7 +24,7 @@ namespace mediapipe {
 //
 // This interface allows decoupling code that uses time from the code that
 // creates a point in time.  You can use this to your advantage by injecting
-// Clocks into interfaces rather than having implementations call absl::Now()
+// Clocks into interfaces rather than having implementations call abslx::Now()
 // directly.
 //
 // The Clock::RealClock() function returns a pointer (that you do not own)
@@ -33,7 +33,7 @@ namespace mediapipe {
 // Example:
 //
 //   bool IsWeekend(Clock* clock) {
-//     absl::Time now = clock->TimeNow();
+//     abslx::Time now = clock->TimeNow();
 //     // ... code to check if 'now' is a weekend.
 //   }
 //
@@ -54,13 +54,13 @@ class Clock {
   virtual ~Clock();
 
   // Returns the current time.
-  virtual absl::Time TimeNow() = 0;
+  virtual abslx::Time TimeNow() = 0;
 
   // Sleeps for the specified duration.
-  virtual void Sleep(absl::Duration d) = 0;
+  virtual void Sleep(abslx::Duration d) = 0;
 
   // Sleeps until the specified time.
-  virtual void SleepUntil(absl::Time wakeup_time) = 0;
+  virtual void SleepUntil(abslx::Time wakeup_time) = 0;
 };
 
 }  // namespace mediapipe

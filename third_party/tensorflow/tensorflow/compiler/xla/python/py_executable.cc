@@ -81,7 +81,7 @@ std::vector<ClientAndPtr<PjRtDevice>> PyExecutable::AddressableDevices() const {
 
 StatusOr<std::pair<std::vector<PyBuffer::object>, PyToken>>
 PyExecutable::ExecuteInternal(
-    absl::Span<PyBuffer::object const> args,
+    abslx::Span<PyBuffer::object const> args,
     std::optional<std::vector<PjRtFuture<Status>>>& returned_futures) {
   std::vector<std::vector<std::unique_ptr<PjRtBuffer>>> output_buffers;
   {
@@ -109,7 +109,7 @@ PyExecutable::ExecuteInternal(
 
     py::gil_scoped_release gil_release;
     std::vector<PjRtBuffer*> arg_buffers(args.size());
-    absl::c_transform(
+    abslx::c_transform(
         args, arg_buffers.begin(),
         [](const PyBuffer::object& buf) { return buf.buf()->buffer(); });
     TF_ASSIGN_OR_RETURN(
@@ -143,14 +143,14 @@ PyExecutable::ExecuteInternal(
 }
 
 StatusOr<std::pair<std::vector<PyBuffer::object>, PyToken>>
-PyExecutable::ExecuteWithToken(absl::Span<PyBuffer::object const> args) {
+PyExecutable::ExecuteWithToken(abslx::Span<PyBuffer::object const> args) {
   std::optional<std::vector<PjRtFuture<Status>>> returned_futures;
   if (executable_->IsReturnedFutureSupported()) returned_futures.emplace();
   return ExecuteInternal(args, returned_futures);
 }
 
 StatusOr<std::vector<PyBuffer::object>> PyExecutable::Execute(
-    absl::Span<PyBuffer::object const> args) {
+    abslx::Span<PyBuffer::object const> args) {
   std::optional<std::vector<PjRtFuture<Status>>> returned_futures;
   TF_ASSIGN_OR_RETURN(auto outputs_and_token,
                       ExecuteInternal(args, returned_futures));
@@ -160,7 +160,7 @@ StatusOr<std::vector<PyBuffer::object>> PyExecutable::Execute(
 StatusOr<
     std::pair<std::vector<std::vector<PyBuffer::object>>, std::vector<PyToken>>>
 PyExecutable::ExecuteShardedOnLocalDevicesInternal(
-    absl::Span<const std::vector<PyBuffer::object>> args,
+    abslx::Span<const std::vector<PyBuffer::object>> args,
     std::optional<std::vector<PjRtFuture<Status>>>& returned_futures) {
   std::vector<std::vector<std::unique_ptr<PjRtBuffer>>> output_buffers;
   int num_computations = executable_->addressable_devices().size();
@@ -196,7 +196,7 @@ PyExecutable::ExecuteShardedOnLocalDevicesInternal(
             "Expected args to execute_sharded_on_local_devices to have %d "
             "shards, got: [%s]",
             num_computations,
-            absl::StrJoin(
+            abslx::StrJoin(
                 args, ", ",
                 [](std::string* out, const std::vector<PyBuffer::object>& arg) {
                   out->append(std::to_string(arg.size()));
@@ -207,7 +207,7 @@ PyExecutable::ExecuteShardedOnLocalDevicesInternal(
     const int num_args = args.size();
     for (int computation = 0; computation < num_computations; ++computation) {
       arg_buffers[computation].resize(num_args);
-      absl::c_transform(args, arg_buffers[computation].begin(),
+      abslx::c_transform(args, arg_buffers[computation].begin(),
                         [&](const std::vector<PyBuffer::object>& arg) {
                           return arg[computation].buf()->buffer();
                         });
@@ -262,7 +262,7 @@ PyExecutable::ExecuteShardedOnLocalDevicesInternal(
 
 StatusOr<std::vector<std::vector<PyBuffer::object>>>
 PyExecutable::ExecuteShardedOnLocalDevices(
-    absl::Span<const std::vector<PyBuffer::object>> args) {
+    abslx::Span<const std::vector<PyBuffer::object>> args) {
   std::optional<std::vector<PjRtFuture<Status>>> returned_futures;
   TF_ASSIGN_OR_RETURN(
       auto outputs_and_tokens,
@@ -273,7 +273,7 @@ PyExecutable::ExecuteShardedOnLocalDevices(
 StatusOr<
     std::pair<std::vector<std::vector<PyBuffer::object>>, std::vector<PyToken>>>
 PyExecutable::ExecuteShardedOnLocalDevicesWithTokens(
-    absl::Span<const std::vector<PyBuffer::object>> args) {
+    abslx::Span<const std::vector<PyBuffer::object>> args) {
   std::optional<std::vector<PjRtFuture<Status>>> returned_futures;
   if (executable_->IsReturnedFutureSupported()) returned_futures.emplace();
   return ExecuteShardedOnLocalDevicesInternal(args, returned_futures);

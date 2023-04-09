@@ -43,14 +43,14 @@ limitations under the License.
 namespace tensorflow {
 namespace {
 
-constexpr absl::string_view kNumSplitsAttrName = "num_splits";
-constexpr absl::string_view kNumConcatsAttrName = "num_concats";
+constexpr abslx::string_view kNumSplitsAttrName = "num_splits";
+constexpr abslx::string_view kNumConcatsAttrName = "num_concats";
 
 Status GetAndValidateAttributes(bool split, OpKernelConstruction* ctx,
                                 std::vector<int32>& num_partitions,
                                 int& num_slices, std::vector<int32>& paddings,
                                 bool& has_paddings) {
-  absl::string_view num_partitions_attr_name =
+  abslx::string_view num_partitions_attr_name =
       split ? kNumSplitsAttrName : kNumConcatsAttrName;
   TF_RETURN_IF_ERROR(ctx->GetAttr(num_partitions_attr_name, &num_partitions));
 
@@ -102,14 +102,14 @@ Status GetAndValidateAttributes(bool split, OpKernelConstruction* ctx,
   return OkStatus();
 }
 
-absl::string_view kHandle = "handle";
-absl::string_view kTensor = "tensor";
+abslx::string_view kHandle = "handle";
+abslx::string_view kTensor = "tensor";
 
 template <bool Handle>
 Status CreateResourceInvalidDTypeError(const ResourceHandle& handle,
                                        DataType actual_dtype,
                                        DataType expected_dtype) {
-  absl::string_view resource_component = Handle ? kHandle : kTensor;
+  abslx::string_view resource_component = Handle ? kHandle : kTensor;
   return errors::InvalidArgument(
       "'T' must match 'resource' variable ", resource_component, " ('",
       handle.name(), "') container ('", handle.container(), "') dtype ",
@@ -121,52 +121,52 @@ Status CreateResourceInvalidDTypeError(const ResourceHandle& handle,
 // for determining where to start a slice in the input tensor.
 template <int Rank>
 Eigen::DSizes<Eigen::DenseIndex, Rank> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, Rank>& slice_shape, const int index);
 template <>
 Eigen::DSizes<Eigen::DenseIndex, 1> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, 1>& slice_shape,
     const int index) TF_ATTRIBUTE_NOINLINE;
 template <>
 Eigen::DSizes<Eigen::DenseIndex, 2> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, 2>& slice_shape,
     const int index) TF_ATTRIBUTE_NOINLINE;
 template <>
 Eigen::DSizes<Eigen::DenseIndex, 3> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, 3>& slice_shape,
     const int index) TF_ATTRIBUTE_NOINLINE;
 template <>
 Eigen::DSizes<Eigen::DenseIndex, 4> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, 4>& slice_shape,
     const int index) TF_ATTRIBUTE_NOINLINE;
 template <>
 Eigen::DSizes<Eigen::DenseIndex, 5> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, 5>& slice_shape,
     const int index) TF_ATTRIBUTE_NOINLINE;
 template <>
 Eigen::DSizes<Eigen::DenseIndex, 6> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, 6>& slice_shape,
     const int index) TF_ATTRIBUTE_NOINLINE;
 template <>
 Eigen::DSizes<Eigen::DenseIndex, 7> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, 7>& slice_shape,
     const int index) TF_ATTRIBUTE_NOINLINE;
 template <>
 Eigen::DSizes<Eigen::DenseIndex, 8> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, 8>& slice_shape,
     const int index) TF_ATTRIBUTE_NOINLINE;
 
 template <int Rank>
 Eigen::DSizes<Eigen::DenseIndex, Rank> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, Rank>& slice_shape,
     const int index) {
   return Eigen::DSizes<Eigen::DenseIndex, Rank>();
@@ -174,7 +174,7 @@ Eigen::DSizes<Eigen::DenseIndex, Rank> GetSliceIndices(
 
 template <>
 Eigen::DSizes<Eigen::DenseIndex, 1> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, 1>& slice_shape, const int index) {
   Eigen::DSizes<Eigen::DenseIndex, 1> subscript;
   subscript[0] = index * slice_shape[0];
@@ -183,7 +183,7 @@ Eigen::DSizes<Eigen::DenseIndex, 1> GetSliceIndices(
 
 template <>
 Eigen::DSizes<Eigen::DenseIndex, 2> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, 2>& slice_shape, const int index) {
   Eigen::DSizes<Eigen::DenseIndex, 2> subscript;
   subscript[1] = (index % num_partitions[1]) * slice_shape[1];
@@ -193,7 +193,7 @@ Eigen::DSizes<Eigen::DenseIndex, 2> GetSliceIndices(
 
 template <>
 Eigen::DSizes<Eigen::DenseIndex, 3> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, 3>& slice_shape, const int index) {
   Eigen::DSizes<Eigen::DenseIndex, 3> subscript;
   subscript[2] = (index % num_partitions[2]) * slice_shape[2];
@@ -206,7 +206,7 @@ Eigen::DSizes<Eigen::DenseIndex, 3> GetSliceIndices(
 
 template <>
 Eigen::DSizes<Eigen::DenseIndex, 4> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, 4>& slice_shape, const int index) {
   Eigen::DSizes<Eigen::DenseIndex, 4> subscript;
   subscript[3] = (index % num_partitions[3]) * slice_shape[3];
@@ -223,7 +223,7 @@ Eigen::DSizes<Eigen::DenseIndex, 4> GetSliceIndices(
 
 template <>
 Eigen::DSizes<Eigen::DenseIndex, 5> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, 5>& slice_shape, const int index) {
   Eigen::DSizes<Eigen::DenseIndex, 5> subscript;
   subscript[4] = (index % num_partitions[4]) * slice_shape[4];
@@ -244,7 +244,7 @@ Eigen::DSizes<Eigen::DenseIndex, 5> GetSliceIndices(
 
 template <>
 Eigen::DSizes<Eigen::DenseIndex, 6> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, 6>& slice_shape, const int index) {
   Eigen::DSizes<Eigen::DenseIndex, 6> subscript;
   subscript[5] = (index % num_partitions[5]) * slice_shape[5];
@@ -270,7 +270,7 @@ Eigen::DSizes<Eigen::DenseIndex, 6> GetSliceIndices(
 
 template <>
 Eigen::DSizes<Eigen::DenseIndex, 7> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, 7>& slice_shape, const int index) {
   Eigen::DSizes<Eigen::DenseIndex, 7> subscript;
   subscript[6] = (index % num_partitions[6]) * slice_shape[6];
@@ -301,7 +301,7 @@ Eigen::DSizes<Eigen::DenseIndex, 7> GetSliceIndices(
 
 template <>
 Eigen::DSizes<Eigen::DenseIndex, 8> GetSliceIndices(
-    absl::Span<const int32> num_partitions,
+    abslx::Span<const int32> num_partitions,
     const Eigen::DSizes<Eigen::DenseIndex, 8>& slice_shape, const int index) {
   Eigen::DSizes<Eigen::DenseIndex, 8> subscript;
   subscript[7] = (index % num_partitions[7]) * slice_shape[7];
@@ -336,8 +336,8 @@ Eigen::DSizes<Eigen::DenseIndex, 8> GetSliceIndices(
   return subscript;
 }
 
-constexpr absl::string_view kTensorName = "'input' tensor";
-constexpr absl::string_view kResourceName = "'resource' variable tensor";
+constexpr abslx::string_view kTensorName = "'input' tensor";
+constexpr abslx::string_view kResourceName = "'resource' variable tensor";
 
 template <typename Device, typename T>
 class XlaSplitNDBaseOp : public OpKernel {
@@ -353,7 +353,7 @@ class XlaSplitNDBaseOp : public OpKernel {
       bool resource, OpKernelContext* ctx,
       const std::function<Status(const Tensor&)>& assign_or_copy_value_fn,
       const Tensor* input) {
-    absl::string_view input_name = resource ? kResourceName : kTensorName;
+    abslx::string_view input_name = resource ? kResourceName : kTensorName;
     const int rank = input->shape().dims();
 
     OP_REQUIRES(ctx, rank > 0 && rank <= 8,

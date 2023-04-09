@@ -58,8 +58,8 @@ class CppTests : public ::testing::TestWithParam<const char*> {
 // Computes `inputs[0] + inputs[1]` and records it on the tape.
 tensorflow::Status Add(
     tensorflow::AbstractContext* ctx,
-    absl::Span<tensorflow::AbstractTensorHandle* const> inputs,
-    absl::Span<tensorflow::AbstractTensorHandle*> outputs) {
+    abslx::Span<tensorflow::AbstractTensorHandle* const> inputs,
+    abslx::Span<tensorflow::AbstractTensorHandle*> outputs) {
   tensorflow::AbstractOperationPtr add_op(ctx->CreateOperation());
 
   TF_RETURN_IF_ERROR(add_op.get()->Reset("Add", /*raw_device_name=*/nullptr));
@@ -80,11 +80,11 @@ tensorflow::Status Add(
 // return inputs[0] + inputs[1]
 tensorflow::Status AddModel(
     tensorflow::AbstractContext* ctx,
-    absl::Span<tensorflow::AbstractTensorHandle* const> inputs,
-    absl::Span<tensorflow::AbstractTensorHandle*> outputs) {
+    abslx::Span<tensorflow::AbstractTensorHandle* const> inputs,
+    abslx::Span<tensorflow::AbstractTensorHandle*> outputs) {
   std::vector<tensorflow::AbstractTensorHandle*> add_outputs(1);
   // Compute x+y.
-  TF_RETURN_IF_ERROR(Add(ctx, inputs, absl::MakeSpan(add_outputs)));
+  TF_RETURN_IF_ERROR(Add(ctx, inputs, abslx::MakeSpan(add_outputs)));
 
   outputs[0] = add_outputs[0];
   return ::tensorflow::OkStatus();
@@ -99,7 +99,7 @@ tensorflow::AbstractContext* BuildFunction(const char* fn_name) {
 
 tensorflow::Status CreateParamsForInputs(
     tensorflow::AbstractContext* ctx,
-    absl::Span<tensorflow::AbstractTensorHandle* const> inputs,
+    abslx::Span<tensorflow::AbstractTensorHandle* const> inputs,
     std::vector<tensorflow::AbstractTensorHandle*>* params) {
   tensorflow::tracing::TracingTensorHandle* handle = nullptr;
   for (auto input : inputs) {
@@ -115,13 +115,13 @@ tensorflow::Status CreateParamsForInputs(
 
 using Model = std::function<tensorflow::Status(
     tensorflow::AbstractContext*,
-    absl::Span<tensorflow::AbstractTensorHandle* const>,
-    absl::Span<tensorflow::AbstractTensorHandle*>)>;
+    abslx::Span<tensorflow::AbstractTensorHandle* const>,
+    abslx::Span<tensorflow::AbstractTensorHandle*>)>;
 
 tensorflow::Status PrepareFunction(
     Model model, tensorflow::AbstractContext* ctx,
-    absl::Span<tensorflow::AbstractTensorHandle* const> inputs,
-    absl::Span<tensorflow::AbstractTensorHandle*> outputs) {
+    abslx::Span<tensorflow::AbstractTensorHandle* const> inputs,
+    abslx::Span<tensorflow::AbstractTensorHandle*> outputs) {
   tensorflow::core::RefCountPtr<tensorflow::AbstractFunction> scoped_func;
 
   tensorflow::AbstractContextPtr func_ctx(BuildFunction(kFunctionName));
@@ -132,8 +132,8 @@ tensorflow::Status PrepareFunction(
   tensorflow::OutputList output_list;
   output_list.expected_num_outputs = outputs.size();
   output_list.outputs.resize(outputs.size());
-  TF_RETURN_IF_ERROR(model(func_ctx.get(), absl::MakeSpan(func_inputs),
-                           absl::MakeSpan(output_list.outputs)));
+  TF_RETURN_IF_ERROR(model(func_ctx.get(), abslx::MakeSpan(func_inputs),
+                           abslx::MakeSpan(output_list.outputs)));
   for (auto func_input : func_inputs) {
     func_input->Unref();
   }
@@ -208,7 +208,7 @@ TEST_P(CppTests, TestFunctionCacheWithAdd) {
   tensorflow::Status s;
   std::vector<tensorflow::AbstractTensorHandle*> outputs(1);
   s = PrepareFunction(AddModel, ctx.get(), {x.get(), y.get()},
-                      absl::MakeSpan(outputs));
+                      abslx::MakeSpan(outputs));
 
   ::tfrt::tf::FunctionCache cache;
   ::tfrt::tf::ContextInterface* tfrt_ctx =

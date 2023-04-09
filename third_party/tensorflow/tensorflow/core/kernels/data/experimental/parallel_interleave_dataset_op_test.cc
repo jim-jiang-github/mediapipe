@@ -70,7 +70,7 @@ class ParallelInterleaveDatasetParams : public DatasetParams {
     input_names->emplace_back(ParallelInterleaveDatasetOp::kInputDataset);
     for (int i = 0; i < other_arguments_.size(); ++i) {
       input_names->emplace_back(
-          absl::StrCat(ParallelInterleaveDatasetOp::kOtherArguments, "_", i));
+          abslx::StrCat(ParallelInterleaveDatasetOp::kOtherArguments, "_", i));
     }
     input_names->emplace_back(ParallelInterleaveDatasetOp::kCycleLength);
     input_names->emplace_back(ParallelInterleaveDatasetOp::kBlockLength);

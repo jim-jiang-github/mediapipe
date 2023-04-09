@@ -34,7 +34,7 @@ TEST(TopologyTest, BuildGlobalTopology) {
   d3->set_local_device_ordinal(1);
 
   GlobalTopologyProto global;
-  BuildGlobalTopology(absl::Span<LocalTopologyProto>(locals), &global);
+  BuildGlobalTopology(abslx::Span<LocalTopologyProto>(locals), &global);
   EXPECT_EQ(global.nodes_size(), 2);
   EXPECT_EQ(global.nodes()[0].devices_size(), 2);
   EXPECT_EQ(global.nodes()[1].devices_size(), 2);

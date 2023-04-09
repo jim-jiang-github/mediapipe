@@ -184,7 +184,7 @@ class BatchInputTask
 
   const InputSplitMetadata input_split_metadata_;
 
-  mutable absl::once_flag once_;
+  mutable abslx::once_flag once_;
 
   std::vector<std::unique_ptr<TaskType>> task_splits_;
   Status split_status_;
@@ -228,7 +228,7 @@ template <typename TaskType>
 void BatchInputTask<TaskType>::ToTaskHandles(
     std::vector<std::unique_ptr<BatchInputTaskHandle<TaskType>>>*
         task_handles) {
-  const absl::FixedArray<int>& task_sizes = input_split_metadata_.task_sizes();
+  const abslx::FixedArray<int>& task_sizes = input_split_metadata_.task_sizes();
   task_handles->resize(task_sizes.size());
   for (int i = 0; i < task_handles->size(); i++) {
     (*task_handles)[i] = std::make_unique<BatchInputTaskHandle<TaskType>>(
@@ -238,7 +238,7 @@ void BatchInputTask<TaskType>::ToTaskHandles(
 
 template <typename TaskType>
 std::unique_ptr<TaskType> BatchInputTask<TaskType>::GetSplitTask(int split_id) {
-  absl::call_once(once_,
+  abslx::call_once(once_,
                   [this]() { split_status_ = SplitBatches(&task_splits_); });
   if (!split_status_.ok()) {
     LOG_EVERY_N_SEC(WARNING, 60 /* seconds */)

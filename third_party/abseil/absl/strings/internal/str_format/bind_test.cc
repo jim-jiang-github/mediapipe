@@ -19,7 +19,7 @@
 
 #include "gtest/gtest.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace str_format_internal {
 namespace {
@@ -141,12 +141,12 @@ TEST_F(FormatBindTest, FormatPack) {
       {__LINE__, "a%1$.*5$db", "a{10:d}b"},
   };
   for (const Expectation &e : kExpect) {
-    absl::string_view fmt = e.fmt;
+    abslx::string_view fmt = e.fmt;
     SCOPED_TRACE(e.line);
     SCOPED_TRACE(e.fmt);
     UntypedFormatSpecImpl format(fmt);
     EXPECT_EQ(e.summary,
-              str_format_internal::Summarize(format, absl::MakeSpan(args)))
+              str_format_internal::Summarize(format, abslx::MakeSpan(args)))
         << "line:" << e.line;
   }
 }
@@ -154,4 +154,4 @@ TEST_F(FormatBindTest, FormatPack) {
 }  // namespace
 }  // namespace str_format_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

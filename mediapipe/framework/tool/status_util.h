@@ -29,30 +29,30 @@ namespace tool {
 // be called on it again).  When returned from a non-source Calculator
 // it signals that the graph should be cancelled (which is handled by
 // closing all source Calculators and waiting for the graph to finish).
-absl::Status StatusStop();
+abslx::Status StatusStop();
 
 // Return a status which signals an invalid initial condition (for
 // example an InputSidePacket does not include all necessary fields).
-ABSL_DEPRECATED("Use absl::InvalidArgumentError(error_message) instead.")
-absl::Status StatusInvalid(const std::string& error_message);
+ABSL_DEPRECATED("Use abslx::InvalidArgumentError(error_message) instead.")
+abslx::Status StatusInvalid(const std::string& error_message);
 
 // Return a status which signals that something unexpectedly failed.
-ABSL_DEPRECATED("Use absl::UnknownError(error_message) instead.")
-absl::Status StatusFail(const std::string& error_message);
+ABSL_DEPRECATED("Use abslx::UnknownError(error_message) instead.")
+abslx::Status StatusFail(const std::string& error_message);
 
 // Prefixes the given string to the error message in status.
 // This function should be considered internal to the framework.
 // TODO Replace usage of AddStatusPrefix with util::Annotate().
-absl::Status AddStatusPrefix(const std::string& prefix,
-                             const absl::Status& status);
+abslx::Status AddStatusPrefix(const std::string& prefix,
+                             const abslx::Status& status);
 
-// Combine a vector of absl::Status into a single composite status.
-// If statuses is empty or all statuses are OK then absl::OkStatus()
+// Combine a vector of abslx::Status into a single composite status.
+// If statuses is empty or all statuses are OK then abslx::OkStatus()
 // will be returned.
 // This function should be considered internal to the framework.
 // TODO Move this function to somewhere with less visibility.
-absl::Status CombinedStatus(const std::string& general_comment,
-                            const std::vector<absl::Status>& statuses);
+abslx::Status CombinedStatus(const std::string& general_comment,
+                            const std::vector<abslx::Status>& statuses);
 
 }  // namespace tool
 }  // namespace mediapipe

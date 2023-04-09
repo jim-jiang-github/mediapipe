@@ -34,7 +34,7 @@ const char* ToString(cublasStatus_t status) {
 port::Status ToStatus(cublasStatus_t status, const char* prefix) {
   if (status != CUBLAS_STATUS_SUCCESS) {
     return port::Status(port::error::INTERNAL,
-                        absl::StrCat(prefix, ": ", ToString(status)));
+                        abslx::StrCat(prefix, ": ", ToString(status)));
   }
   return port::Status::OK();
 }

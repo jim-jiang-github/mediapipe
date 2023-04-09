@@ -38,13 +38,13 @@ endif()
 # COPTS: List of private compile options
 # DEFINES: List of public defines
 # LINKOPTS: List of link options
-# PUBLIC: Add this so that this library will be exported under absl::
+# PUBLIC: Add this so that this library will be exported under abslx::
 # Also in IDE, target will appear in Abseil folder while non PUBLIC will be in Abseil/internal.
 # TESTONLY: When added, this target will only be built if BUILD_TESTING=ON.
 #
 # Note:
 # By default, absl_cc_library will always create a library named absl_${NAME},
-# and alias target absl::${NAME}.  The absl:: form should always be used.
+# and alias target abslx::${NAME}.  The abslx:: form should always be used.
 # This is to reduce namespace pollution.
 #
 # absl_cc_library(
@@ -61,7 +61,7 @@ endif()
 #   SRCS
 #     "b.cc"
 #   DEPS
-#     absl::awesome # not "awesome" !
+#     abslx::awesome # not "awesome" !
 #   PUBLIC
 # )
 #
@@ -70,7 +70,7 @@ endif()
 #     main_lib
 #   ...
 #   DEPS
-#     absl::fantastic_lib
+#     abslx::fantastic_lib
 # )
 #
 # TODO: Implement "ALWAYSLINK"
@@ -149,7 +149,7 @@ function(absl_cc_library)
         set(PC_VERSION "head")
       endif()
       foreach(dep ${ABSL_CC_LIB_DEPS})
-        if(${dep} MATCHES "^absl::(.*)")
+        if(${dep} MATCHES "^abslx::(.*)")
 	  # Join deps with commas.
           if(PC_DEPS)
             set(PC_DEPS "${PC_DEPS},")
@@ -298,7 +298,7 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
     )
   endif()
 
-    add_library(absl::${ABSL_CC_LIB_NAME} ALIAS ${_NAME})
+    add_library(abslx::${ABSL_CC_LIB_NAME} ALIAS ${_NAME})
 endfunction()
 
 # absl_cc_test()
@@ -334,7 +334,7 @@ endfunction()
 #   SRCS
 #     "awesome_test.cc"
 #   DEPS
-#     absl::awesome
+#     abslx::awesome
 #     gmock
 #     gtest_main
 # )

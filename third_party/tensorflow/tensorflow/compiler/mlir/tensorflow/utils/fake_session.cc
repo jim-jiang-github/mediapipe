@@ -170,7 +170,7 @@ Status FakeSession::Run(
       t.scalar<tensorflow::ResourceHandle>()().set_device("invalid_device");
 
       outputs->push_back(t);
-    } else if (absl::StartsWith(output_name, "var")) {
+    } else if (abslx::StartsWith(output_name, "var")) {
       return Status(tensorflow::error::NOT_FOUND,
                     "Can't find variable " + output_name + " in session");
     } else {

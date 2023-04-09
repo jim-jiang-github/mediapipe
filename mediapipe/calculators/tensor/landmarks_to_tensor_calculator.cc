@@ -96,7 +96,7 @@ Tensor ConvertLandmarksToTensor(
 class LandmarksToTensorCalculatorImpl
     : public NodeImpl<LandmarksToTensorCalculator> {
  public:
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     options_ = cc->Options<LandmarksToTensorCalculatorOptions>();
     RET_CHECK(options_.attributes_size() > 0)
         << "At least one attribute must be specified";
@@ -108,10 +108,10 @@ class LandmarksToTensorCalculatorImpl
                  kImageSize(cc).IsConnected())
         << "Image size should be provided only for normalized landmarks";
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     // Get attribute scales depending on whether landmarks are normalized or
     // not.
     std::vector<float> attribute_scales;
@@ -132,14 +132,14 @@ class LandmarksToTensorCalculatorImpl
     auto result = std::vector<Tensor>();
     if (kInLandmarkList(cc).IsConnected()) {
       if (kInLandmarkList(cc).IsEmpty()) {
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
       Tensor tensor = ConvertLandmarksToTensor(kInLandmarkList(cc).Get(),
                                                attribute_scales, options_);
       result.push_back(std::move(tensor));
     } else {
       if (kInNormLandmarkList(cc).IsEmpty()) {
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
       Tensor tensor = ConvertLandmarksToTensor(kInNormLandmarkList(cc).Get(),
                                                attribute_scales, options_);
@@ -148,7 +148,7 @@ class LandmarksToTensorCalculatorImpl
 
     kOutTensors(cc).Send(std::move(result));
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

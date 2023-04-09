@@ -32,13 +32,13 @@ namespace {
 // gMock matcher to test approximate equality with a relative error tolerance,
 //   | actual - expected | / |expected| <= relative_tolerance.
 MATCHER_P2(IsApprox, expected, relative_tolerance,
-           absl::Substitute("is approximately $0 with relative tolerance $1",
+           abslx::Substitute("is approximately $0 with relative tolerance $1",
                             expected, relative_tolerance)) {
   const double actual = arg;  // arg is passed by gMock.
   const double relative_error =
       std::abs(actual - expected) / std::abs(expected);
   if (relative_error > relative_tolerance) {
-    *result_listener << absl::Substitute(
+    *result_listener << abslx::Substitute(
         "where actual = $0 with relative error = $1", actual, relative_error);
     return false;
   }

@@ -263,7 +263,7 @@ static Status CheckReplicaGroups(HloInstruction* hlo,
                                  CollectiveOpGroupMode group_mode,
                                  bool uniform_replica_group_size = true) {
   if (!hlo->replica_groups().empty()) {
-    absl::flat_hash_set<int64_t> replicas_seen;
+    abslx::flat_hash_set<int64_t> replicas_seen;
     for (const ReplicaGroup& g : hlo->replica_groups()) {
       if (g.replica_ids().empty()) {
         return InternalError(
@@ -526,10 +526,10 @@ Status CheckBufferOffset(const Shape& buffer_shape,
     return InternalError("Buffer offset is not tuple.");
   }
   bool all_is_array =
-      absl::c_all_of(buffer_offset_shape.tuple_shapes(),
+      abslx::c_all_of(buffer_offset_shape.tuple_shapes(),
                      [](const Shape& shape) { return shape.IsArray(); });
   bool all_is_tuple =
-      absl::c_all_of(buffer_offset_shape.tuple_shapes(),
+      abslx::c_all_of(buffer_offset_shape.tuple_shapes(),
                      [](const Shape& shape) { return shape.IsTuple(); });
   if (!all_is_array && !all_is_tuple) {
     return InternalError(
@@ -538,7 +538,7 @@ Status CheckBufferOffset(const Shape& buffer_shape,
   }
 
   if (all_is_tuple) {
-    if (absl::c_any_of(buffer_offset_shape.tuple_shapes(),
+    if (abslx::c_any_of(buffer_offset_shape.tuple_shapes(),
                        [&buffer_shape](const Shape& shape) {
                          return ShapeUtil::TupleElementCount(shape) !=
                                 buffer_shape.rank();
@@ -631,8 +631,8 @@ Status CheckDuplicatedSourceOrTarget(HloInstruction* hlo,
   const int64_t limit = group_mode == CollectiveOpGroupMode::kCrossReplica
                             ? config.replica_count()
                             : config.num_partitions();
-  absl::flat_hash_map<int64_t, std::vector<int64_t>> seen_source_to_targets;
-  absl::flat_hash_map<int64_t, std::vector<int64_t>> seen_target_to_sources;
+  abslx::flat_hash_map<int64_t, std::vector<int64_t>> seen_source_to_targets;
+  abslx::flat_hash_map<int64_t, std::vector<int64_t>> seen_target_to_sources;
   int allowed_seen_count = 1;
   if (hlo->operand_count() == 4) {
     if (hlo->operand(0)->shape().IsArray()) {
@@ -708,7 +708,7 @@ Status ShapeVerifier::HandleCollectivePermute(HloInstruction* hlo) {
   TF_RETURN_IF_ERROR(CheckInplaceCollectivePermute(hlo));
   TF_RETURN_IF_ERROR(CheckDuplicatedSourceOrTarget(hlo, group_mode));
   std::vector<const Shape*> operand_shapes;
-  absl::c_transform(
+  abslx::c_transform(
       hlo->operands(), std::back_inserter(operand_shapes),
       [](const HloInstruction* operand) { return &(operand->shape()); });
   return CheckShape(
@@ -723,7 +723,7 @@ Status ShapeVerifier::HandleCollectivePermuteStart(HloInstruction* hlo) {
   TF_RETURN_IF_ERROR(CheckInplaceCollectivePermute(hlo));
   TF_RETURN_IF_ERROR(CheckDuplicatedSourceOrTarget(hlo, group_mode));
   std::vector<const Shape*> operand_shapes;
-  absl::c_transform(
+  abslx::c_transform(
       hlo->operands(), std::back_inserter(operand_shapes),
       [](const HloInstruction* operand) { return &(operand->shape()); });
   return CheckShape(
@@ -1370,9 +1370,9 @@ Status CheckAsyncOpOperand(const HloInstruction* async_op) {
     return InternalError(
         "%s expects its operand to have the same group id (%s vs %s).",
         HloOpcodeString(async_op->opcode()),
-        async_op->async_group_id() ? absl::StrCat(*async_op->async_group_id())
+        async_op->async_group_id() ? abslx::StrCat(*async_op->async_group_id())
                                    : "none",
-        operand->async_group_id() ? absl::StrCat(*operand->async_group_id())
+        operand->async_group_id() ? abslx::StrCat(*operand->async_group_id())
                                   : "none");
   }
   return OkStatus();
@@ -1409,14 +1409,14 @@ Status CheckAsyncOpComputationShapes(const HloInstruction* async_op,
 }
 
 Status CheckAsyncOpComputationThreadName(const HloInstruction* async_op) {
-  std::optional<absl::string_view> async_execution_thread =
+  std::optional<abslx::string_view> async_execution_thread =
       async_op->async_execution_thread();
   if (async_execution_thread !=
       async_op->async_wrapped_computation()->execution_thread()) {
     return InternalError(
         "async-start expects same async thread name as wrapped computation's "
         "thread name (%s vs %s).",
-        async_execution_thread ? absl::StrCat(*async_execution_thread) : "none",
+        async_execution_thread ? abslx::StrCat(*async_execution_thread) : "none",
         async_op->async_wrapped_computation()->execution_thread());
   }
   return CheckNestedComputationThreadNameEqual(
@@ -1653,7 +1653,7 @@ Status ShapeVerifier::HandleGather(HloInstruction* gather) {
 }
 
 Status ShapeVerifier::HandleScatter(HloInstruction* scatter) {
-  absl::InlinedVector<const Shape*, 3> arg_shapes;
+  abslx::InlinedVector<const Shape*, 3> arg_shapes;
   arg_shapes.reserve(scatter->operand_count());
   for (const HloInstruction* operand : scatter->operands()) {
     arg_shapes.push_back(&operand->shape());
@@ -1841,8 +1841,8 @@ Status ShapeVerifier::VerifyEntryComputationLayout(const HloModule& module) {
 }
 
 std::string ComputationsToString(
-    absl::Span<HloComputation* const> computations) {
-  return absl::StrJoin(computations, ",",
+    abslx::Span<HloComputation* const> computations) {
+  return abslx::StrJoin(computations, ",",
                        [](std::string* s, const HloComputation* computation) {
                          s->append(computation->name());
                        });
@@ -1972,7 +1972,7 @@ Status CheckSameIsHostTransfer(const HloInstruction* instr1,
 }
 
 Status VerifySingleUser(const HloInstruction* instruction,
-                        const absl::flat_hash_set<HloOpcode>& expected_users) {
+                        const abslx::flat_hash_set<HloOpcode>& expected_users) {
   TF_RET_CHECK(instruction->users().size() == 1)
       << "The " << HloOpcodeString(instruction->opcode())
       << " instruction requires one consumer, found "
@@ -1982,7 +1982,7 @@ Status VerifySingleUser(const HloInstruction* instruction,
   TF_RET_CHECK(expected_users.contains(user->opcode()))
       << "The consumer of a " << HloOpcodeString(instruction->opcode())
       << " instruction needs to be one of ("
-      << absl::StrJoin(expected_users, ", ",
+      << abslx::StrJoin(expected_users, ", ",
                        [](std::string* out, HloOpcode opcode) {
                          out->append(HloOpcodeString(opcode));
                        })
@@ -1998,11 +1998,11 @@ Status VerifySingleOperand(const HloInstruction* instruction,
       << instruction->users().size();
 
   const HloInstruction* operand = instruction->operand(0);
-  TF_RET_CHECK(absl::c_find(expected_operands, operand->opcode()) !=
+  TF_RET_CHECK(abslx::c_find(expected_operands, operand->opcode()) !=
                expected_operands.end())
       << "The operand of a " << HloOpcodeString(instruction->opcode())
       << " instruction needs to be "
-      << absl::StrJoin(expected_operands, " or ",
+      << abslx::StrJoin(expected_operands, " or ",
                        [](std::string* out, HloOpcode opcode) {
                          out->append(HloOpcodeString(opcode));
                        })
@@ -2098,7 +2098,7 @@ Status VerifyLayoutConstrainedAllReduce(const HloModule& module) {
 // Checks various invariants of channel instructions (send/recv and
 // collectives).
 Status VerifyChannels(const HloModule& module) {
-  absl::flat_hash_map<int64_t, std::vector<const HloInstruction*>>
+  abslx::flat_hash_map<int64_t, std::vector<const HloInstruction*>>
       channel_instructions;
 
   // Send/Recv instruction must have a single user: the corresponding
@@ -2148,7 +2148,7 @@ Status VerifyChannels(const HloModule& module) {
     const HloInstruction* first = instructions[0];
     auto sendrecv = DynCast<HloSendRecvInstruction>(first);
     if (sendrecv) {
-      absl::flat_hash_set<HloOpcode> opcodes;
+      abslx::flat_hash_set<HloOpcode> opcodes;
       for (const HloInstruction* instr : instructions) {
         opcodes.insert(instr->opcode());
         auto cast = DynCast<HloSendRecvInstruction>(instr);
@@ -2282,7 +2282,7 @@ Status CheckFusionInstruction(HloInstruction* fusion) {
   }
 
   TF_RET_CHECK(fusion->called_computations() ==
-               absl::Span<HloComputation* const>(
+               abslx::Span<HloComputation* const>(
                    {fusion->fused_instructions_computation()}))
       << "Fusion HLO calls computations other than the "
          "fused_instructions_computation: "
@@ -2374,7 +2374,7 @@ class InstructionVerifier : public DfsHloVisitorWithDefault {
         << broadcast->dimensions().size()
         << " != " << broadcast->operand(0)->shape().rank();
     if (opts_.verify_broadcast_dimensions_order) {
-      TF_RET_CHECK(absl::c_is_sorted(broadcast->dimensions()))
+      TF_RET_CHECK(abslx::c_is_sorted(broadcast->dimensions()))
           << "Broadcast dimensions should be ordered, got: "
           << broadcast->ToString();
     }
@@ -2455,7 +2455,7 @@ class InstructionVerifier : public DfsHloVisitorWithDefault {
         Permute(operand->shape().dimensions(), transpose->dimensions())
             .begin()))
         << "shape: " << shape << ", operand->shape(): " << shape
-        << ", dimensions: {" << absl::StrJoin(transpose->dimensions(), ", ")
+        << ", dimensions: {" << abslx::StrJoin(transpose->dimensions(), ", ")
         << "}";
     return OkStatus();
   }
@@ -2513,7 +2513,7 @@ class InstructionVerifier : public DfsHloVisitorWithDefault {
   }
 
  private:
-  absl::flat_hash_map<std::string, const HloInstruction*> instructions_by_name_;
+  abslx::flat_hash_map<std::string, const HloInstruction*> instructions_by_name_;
   const HloVerifierOpts& opts_;
 };
 
@@ -2521,7 +2521,7 @@ class InstructionVerifier : public DfsHloVisitorWithDefault {
 
 StatusOr<bool> HloVerifier::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   auto disabled = module->config().debug_options().xla_disable_hlo_passes();
   if (std::find(disabled.begin(), disabled.end(), name()) != disabled.end()) {
     return false;
@@ -2572,7 +2572,7 @@ StatusOr<bool> HloVerifier::Run(
     return status_or_changed.ValueOrDie();
   }
   return Status(status_or_changed.status().code(),
-                absl::StrCat("during context [", context_, "]: ",
+                abslx::StrCat("during context [", context_, "]: ",
                              status_or_changed.status().error_message()));
 }
 

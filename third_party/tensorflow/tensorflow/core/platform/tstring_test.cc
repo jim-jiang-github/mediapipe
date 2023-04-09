@@ -180,13 +180,13 @@ TEST(TF_TStringTest, Assignment) {
   EXPECT_EQ(kLongString, s32.c_str());
 
 #ifdef PLATFORM_GOOGLE
-  s33 = absl::Cord(kLongString);
+  s33 = abslx::Cord(kLongString);
 
   EXPECT_EQ(kLongString, s33);
   EXPECT_EQ(tstring::Type::LARGE, s33.type());
   EXPECT_EQ(kLongStringLen, s33.size());
 
-  tstring s34((absl::Cord(kLongString)));
+  tstring s34((abslx::Cord(kLongString)));
 
   EXPECT_EQ(kLongString, s34);
   EXPECT_EQ(tstring::Type::LARGE, s34.type());
@@ -262,7 +262,7 @@ TEST(TF_TStringTest, Conversion) {
   EXPECT_EQ(kLongStringLen, s52.size());
 
 #ifdef PLATFORM_GOOGLE
-  absl::AlphaNum s53(s50);
+  abslx::AlphaNum s53(s50);
 
   EXPECT_STREQ(kLongString, s53.data());
   EXPECT_EQ(kLongStringLen, s53.size());

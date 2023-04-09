@@ -235,7 +235,7 @@ std::string GetDumpDirFromEnvVar() {
 
   std::string result = prefix_env;
 
-  if (absl::EqualsIgnoreCase(result, "sponge") &&
+  if (abslx::EqualsIgnoreCase(result, "sponge") &&
       !io::GetTestUndeclaredOutputsDir(&result)) {
     LOG(WARNING) << "TF_DUMP_GRAPH_PREFIX=sponge but "
                     "TEST_UNDECLARED_OUTPUT_DIRS is not set";
@@ -273,7 +273,7 @@ void SetCrashReproducer(mlir::PassManager& pm, llvm::StringRef dir_path) {
   // Output dirs "sponge" (case-insensitive) have a special meaning: Dump into
   // the directory specified by the environment variable
   // TEST_UNDECLARED_OUTPUTS_DIR.
-  string lower_path = absl::AsciiStrToLower(path);
+  string lower_path = abslx::AsciiStrToLower(path);
   if (lower_path == "sponge") {
     if (!tensorflow::io::GetTestUndeclaredOutputsDir(&path)) {
       LOG(ERROR) << "MLIR crash reproducer is set to '" << dir_path.str()
@@ -317,7 +317,7 @@ void SetCrashReproducer(mlir::PassManager& pm, llvm::StringRef dir_path) {
     std::unique_ptr<WritableFile> file;
     Status status = tensorflow::Env::Default()->NewWritableFile(path, &file);
     if (!status.ok()) {
-      error = absl::StrCat("Failed to create file '", path,
+      error = abslx::StrCat("Failed to create file '", path,
                            "': ", status.error_message());
       return nullptr;
     }

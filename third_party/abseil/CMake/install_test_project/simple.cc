@@ -18,6 +18,6 @@
 
 int main(int argc, char** argv) {
   for (int i = 0; i < argc; ++i) {
-    std::cout << absl::Substitute("Arg $0: $1\n", i, argv[i]);
+    std::cout << abslx::Substitute("Arg $0: $1\n", i, argv[i]);
   }
 }

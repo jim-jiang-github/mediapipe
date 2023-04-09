@@ -90,23 +90,23 @@ std::unique_ptr<MessageLite> CloneMessage(const MessageLite& message) {
 // The parsed entry is appended to `result` and removed from `path`.
 // ProtoPathEntry::key_value stores map key text.  Use SetMapKeyTypes
 // to serialize the key text to protobuf wire format.
-absl::Status ParseEntry(absl::string_view& path, ProtoPath* result) {
+abslx::Status ParseEntry(abslx::string_view& path, ProtoPath* result) {
   bool ok = true;
   int sb = path.find('[');
   int eb = path.find(']');
   int field_id = -1;
-  ok &= absl::SimpleAtoi(path.substr(0, sb), &field_id);
+  ok &= abslx::SimpleAtoi(path.substr(0, sb), &field_id);
   auto selector = path.substr(sb + 1, eb - 1 - sb);
-  if (absl::StartsWith(selector, "@")) {
+  if (abslx::StartsWith(selector, "@")) {
     int eq = selector.find('=');
     int key_id = -1;
-    ok &= absl::SimpleAtoi(selector.substr(1, eq - 1), &key_id);
+    ok &= abslx::SimpleAtoi(selector.substr(1, eq - 1), &key_id);
     auto key_text = selector.substr(eq + 1);
     FieldType key_type = FieldType::TYPE_STRING;
     result->push_back({field_id, key_id, key_type, std::string(key_text)});
   } else {
     int index = 0;
-    ok &= absl::SimpleAtoi(selector, &index);
+    ok &= abslx::SimpleAtoi(selector, &index);
     result->push_back({field_id, index});
   }
   int end = path.find('/', eb);
@@ -115,15 +115,15 @@ absl::Status ParseEntry(absl::string_view& path, ProtoPath* result) {
   } else {
     path = path.substr(end + 1);
   }
-  return ok ? absl::OkStatus()
-            : absl::InvalidArgumentError(
-                  absl::StrCat("Failed to parse ProtoPath entry: ", path));
+  return ok ? abslx::OkStatus()
+            : abslx::InvalidArgumentError(
+                  abslx::StrCat("Failed to parse ProtoPath entry: ", path));
 }
 
 // Specifies the FieldTypes for protobuf map keys in a ProtoPath.
 // Each ProtoPathEntry::key_value is converted from text to the protobuf
 // wire format for its key type.
-absl::Status SetMapKeyTypes(const std::vector<FieldType>& key_types,
+abslx::Status SetMapKeyTypes(const std::vector<FieldType>& key_types,
                             ProtoPath* result) {
   int i = 0;
   for (ProtoPathEntry& entry : *result) {
@@ -136,26 +136,26 @@ absl::Status SetMapKeyTypes(const std::vector<FieldType>& key_types,
       entry.key_value = key_value.front();
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Returns the (tag, index) pairs in a field path.
 // For example, returns {{1, 1}, {2, 1}, {3, 1}} for "/1[1]/2[1]/3[1]",
 // returns {{1, 1}, {2, 1, "INPUT_FRAMES"}} for "/1[1]/2[@1=INPUT_FRAMES]".
-absl::Status ProtoPathSplit(const std::string& path, ProtoPath* result) {
+abslx::Status ProtoPathSplit(const std::string& path, ProtoPath* result) {
   result->clear();
-  absl::string_view rest = path;
-  if (absl::StartsWith(rest, "/")) {
+  abslx::string_view rest = path;
+  if (abslx::StartsWith(rest, "/")) {
     rest = rest.substr(1);
   }
   while (!rest.empty()) {
     MP_RETURN_IF_ERROR(ParseEntry(rest, result));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Parse the TemplateExpression.path field into a ProtoPath struct.
-absl::Status ParseProtoPath(const TemplateExpression& rule,
+abslx::Status ParseProtoPath(const TemplateExpression& rule,
                             std::string base_path, ProtoPath* result) {
   ProtoPath base_entries;
   MP_RETURN_IF_ERROR(ProtoPathSplit(base_path, &base_entries));
@@ -166,12 +166,12 @@ absl::Status ParseProtoPath(const TemplateExpression& rule,
   }
   MP_RETURN_IF_ERROR(SetMapKeyTypes(key_types, result));
   result->erase(result->begin(), result->begin() + base_entries.size());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Returns true if one proto path is prefix by another.
 bool ProtoPathStartsWith(const std::string& path, const std::string& prefix) {
-  return absl::StartsWith(path, prefix);
+  return abslx::StartsWith(path, prefix);
 }
 
 // Returns the target ProtoUtilLite::FieldType of a rule.
@@ -193,7 +193,7 @@ int FieldCount(const FieldValue& base, ProtoPath field_path,
 // The default implementation for the mediapipe template rule interpreter.
 class TemplateExpanderImpl {
  public:
-  explicit TemplateExpanderImpl(std::vector<absl::Status>* errors)
+  explicit TemplateExpanderImpl(std::vector<abslx::Status>* errors)
       : errors_(errors) {}
 
   // Applies the rules specified in a CalculatorGraphTemplate to a
@@ -262,18 +262,18 @@ class TemplateExpanderImpl {
   }
 
   // Return the field values addressed by a template rule.
-  absl::Status GetBaseValue(const std::string& base_path,
+  abslx::Status GetBaseValue(const std::string& base_path,
                             const TemplateExpression& rule,
                             const FieldValue& output,
                             std::vector<FieldValue>* base) {
     if (!rule.has_path()) {
       base->push_back(output);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     if (rule.has_field_value()) {
       // For a non-repeated field, the field value is stored only in the rule.
       base->push_back(rule.field_value());
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     ProtoPath field_path;
     MP_RETURN_IF_ERROR(ParseProtoPath(rule, base_path, &field_path));
@@ -282,7 +282,7 @@ class TemplateExpanderImpl {
   }
 
   // Replace the field values addressed by a template rule.
-  absl::Status ReplaceBaseValue(const std::string& base_path,
+  abslx::Status ReplaceBaseValue(const std::string& base_path,
                                 const TemplateExpression& rule,
                                 const std::vector<FieldValue>& field_values,
                                 FieldValue* output) {
@@ -290,7 +290,7 @@ class TemplateExpanderImpl {
       if (!field_values.empty()) {
         *output = field_values[0];
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     ProtoPath field_path;
     MP_RETURN_IF_ERROR(ParseProtoPath(rule, base_path, &field_path));
@@ -299,7 +299,7 @@ class TemplateExpanderImpl {
       // For a non-repeated field, only one value can be specified.
       if (!field_values.empty() &&
           FieldCount(*output, field_path, GetFieldType(rule)) > 0) {
-        return absl::InvalidArgumentError(absl::StrCat(
+        return abslx::InvalidArgumentError(abslx::StrCat(
             "Multiple values specified for non-repeated field: ", rule.path()));
       }
       // For a non-repeated field, the field value is stored only in the rule.
@@ -314,7 +314,7 @@ class TemplateExpanderImpl {
   bool ExpandNestedRules(int base_index, const std::string& base_path,
                          const FieldValue& base_message,
                          std::vector<FieldValue>* result) {
-    absl::Status status;
+    abslx::Status status;
     FieldValue output = base_message;
 
     // Evaluate the rules nested below base_path in lexical order.
@@ -327,7 +327,7 @@ class TemplateExpanderImpl {
       if (!status.ok()) break;
       std::vector<FieldValue> values;
       if (!ExpandTemplateRule(rules[i], base[0], &values)) {
-        status = absl::InternalError("ExpandTemplateRule failed");
+        status = abslx::InternalError("ExpandTemplateRule failed");
         break;
       }
       edits.push_back(values);
@@ -395,7 +395,7 @@ class TemplateExpanderImpl {
     // Retrieve the var param and the range expression.
     const TemplateExpression& rule = template_rules_.rule().Get(base_index);
     if (rule.arg().empty() || rule.arg().size() > 2) {
-      RecordError(absl::InvalidArgumentError(
+      RecordError(abslx::InvalidArgumentError(
           "Param declaration must specify a parameter name and "
           "may specify a single default value."));
     }
@@ -433,7 +433,7 @@ class TemplateExpanderImpl {
     const TemplateExpression& rule = template_rules_.rule().Get(base_index);
     TemplateArgument item = EvalExpression(rule);
     std::vector<FieldValue> values;
-    absl::Status status = AsFieldValues(std::vector<TemplateArgument>{item},
+    abslx::Status status = AsFieldValues(std::vector<TemplateArgument>{item},
                                         GetFieldType(rule), &values);
     if (!status.ok()) {
       RecordError(status);
@@ -447,7 +447,7 @@ class TemplateExpanderImpl {
   TemplateArgument EvalParam(const TemplateExpression& expr) {
     TemplateArgument* result = GetItem(&environment_, expr.param());
     if (result == nullptr) {
-      RecordError(absl::NotFoundError(absl::StrCat("param: ", expr.param())));
+      RecordError(abslx::NotFoundError(abslx::StrCat("param: ", expr.param())));
       return AsArgument(0.0);
     }
     return *result;
@@ -458,8 +458,8 @@ class TemplateExpanderImpl {
     TemplateArgument lhs = EvalExpression(expr.arg(0));
     TemplateArgument* result = GetItem(lhs.mutable_dict(), expr.arg(1).param());
     if (result == nullptr) {
-      RecordError(absl::NotFoundError(
-          absl::StrCat("param field: ", expr.arg(1).param())));
+      RecordError(abslx::NotFoundError(
+          abslx::StrCat("param field: ", expr.arg(1).param())));
       return AsArgument(0.0);
     }
     return *result;
@@ -472,8 +472,8 @@ class TemplateExpanderImpl {
       result = value.num();
     }
     if (value.has_str()) {
-      if (!absl::SimpleAtod(value.str(), &result)) {
-        RecordError(absl::InvalidArgumentError(value.str()));
+      if (!abslx::SimpleAtod(value.str(), &result)) {
+        RecordError(abslx::InvalidArgumentError(value.str()));
       }
     }
     return result;
@@ -483,7 +483,7 @@ class TemplateExpanderImpl {
   std::string AsString(const TemplateArgument& value) {
     std::string result;
     if (value.has_num()) {
-      result = absl::StrCat(value.num());
+      result = abslx::StrCat(value.num());
     }
     if (value.has_str()) {
       result = value.str();
@@ -497,8 +497,8 @@ class TemplateExpanderImpl {
     if (value.has_num()) {
       return value.num() != 0;
     } else if (value.has_str()) {
-      if (!absl::SimpleAtob(value.str(), &result)) {
-        RecordError(absl::InvalidArgumentError(value.str()));
+      if (!abslx::SimpleAtob(value.str(), &result)) {
+        RecordError(abslx::InvalidArgumentError(value.str()));
       }
     }
     return result;
@@ -508,7 +508,7 @@ class TemplateExpanderImpl {
   TemplateArgument AsDict(const std::vector<TemplateArgument>& args) {
     TemplateArgument result;
     if (args.size() % 2 != 0) {
-      RecordError(absl::InvalidArgumentError(absl::StrCat(
+      RecordError(abslx::InvalidArgumentError(abslx::StrCat(
           "Dict requires an even number of arguments, got: ", args.size())));
       return result;
     }
@@ -542,7 +542,7 @@ class TemplateExpanderImpl {
   // Returns true if a TemplateArgument represents a number.
   bool IsNum(const TemplateArgument& value) {
     double r = 0;
-    return value.has_num() || absl::SimpleAtod(value.str(), &r);
+    return value.has_num() || abslx::SimpleAtod(value.str(), &r);
   }
 
   // Returns 0 if v1 == v1, positive if v1 > v2, negative if v1 < v2.
@@ -606,9 +606,9 @@ class TemplateExpanderImpl {
     } else if (expr.op() == "concat") {
       result = AsArgument(AsString(args[0]) + AsString(args[1]));
     } else if (expr.op() == "lowercase") {
-      result = AsArgument(absl::AsciiStrToLower(AsString(args[0])));
+      result = AsArgument(abslx::AsciiStrToLower(AsString(args[0])));
     } else if (expr.op() == "uppercase") {
-      result = AsArgument(absl::AsciiStrToUpper(AsString(args[0])));
+      result = AsArgument(abslx::AsciiStrToUpper(AsString(args[0])));
     } else if (expr.op() == "dict") {
       result = AsDict(args);
     } else if (expr.op() == "list") {
@@ -641,7 +641,7 @@ class TemplateExpanderImpl {
   }
 
   // Convert between a proto field value and a template argument.
-  absl::Status AsFieldValues(const std::vector<TemplateArgument>& args,
+  abslx::Status AsFieldValues(const std::vector<TemplateArgument>& args,
                              FieldType field_type,
                              std::vector<FieldValue>* result) {
     for (int i = 0; i < args.size(); ++i) {
@@ -659,11 +659,11 @@ class TemplateExpanderImpl {
         result->push_back(r[0]);
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Record a Status if it indicates an error.
-  void RecordError(const absl::Status& status) {
+  void RecordError(const abslx::Status& status) {
     if (!status.ok()) {
       errors_->push_back(status);
     }
@@ -677,23 +677,23 @@ class TemplateExpanderImpl {
   TemplateDict environment_;
 
   // List of errors found in template parameters.
-  std::vector<absl::Status>* errors_;
+  std::vector<abslx::Status>* errors_;
 };
 
 TemplateExpander::TemplateExpander() {}
 
 // Expands template rules within a proto message.
 // Replaces template rules with expanded sub-messages.
-absl::Status TemplateExpander::ExpandTemplates(
+abslx::Status TemplateExpander::ExpandTemplates(
     const TemplateDict& args, const CalculatorGraphTemplate& templ,
     CalculatorGraphConfig* output) {
   errors_.clear();
   TemplateExpanderImpl expander(&errors_);
   if (!expander.ExpandTemplates(args, templ, output)) {
-    errors_.push_back(absl::InternalError("ExpandTemplates failed"));
+    errors_.push_back(abslx::InternalError("ExpandTemplates failed"));
   }
-  absl::Status status;
-  for (const absl::Status& error : errors_) {
+  abslx::Status status;
+  for (const abslx::Status& error : errors_) {
     LOG(ERROR) << error;
     status.Update(error);
   }

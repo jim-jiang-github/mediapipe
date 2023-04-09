@@ -65,10 +65,10 @@ class XlaBroadcastHelperOp : public XlaOpKernel {
         errors::InvalidArgument(
             "broadcast_dims must have size equal to the smaller argument rank; "
             "broadcast_dims: [",
-            absl::StrJoin(broadcast_dims, ","), "]; argument shapes: ",
+            abslx::StrJoin(broadcast_dims, ","), "]; argument shapes: ",
             lhs_shape.DebugString(), " and ", rhs_shape.DebugString()));
     std::vector<int64_t> sorted_broadcast_dims = broadcast_dims;
-    absl::c_sort(sorted_broadcast_dims);
+    abslx::c_sort(sorted_broadcast_dims);
     std::set<int64_t> dims_set(broadcast_dims.begin(), broadcast_dims.end());
     OP_REQUIRES(context,
                 dims_set.size() == broadcast_dims.size() &&
@@ -76,7 +76,7 @@ class XlaBroadcastHelperOp : public XlaOpKernel {
                 errors::InvalidArgument(
                     "Duplicate or nonmonotonic dimension in broadcast_dims; "
                     "broadcast_dims: [",
-                    absl::StrJoin(broadcast_dims, ","), "]"));
+                    abslx::StrJoin(broadcast_dims, ","), "]"));
 
     std::vector<int64_t> broadcast_shape(max_rank_shape->dims(), 1LL);
     for (int i = 0; i < broadcast_dims.size(); ++i) {
@@ -85,7 +85,7 @@ class XlaBroadcastHelperOp : public XlaOpKernel {
           context, dim >= 0 && dim < broadcast_shape.size(),
           errors::InvalidArgument(
               "Invalid broadcast dimension (", dim, "); broadcast_dims: [",
-              absl::StrJoin(broadcast_dims, ","), "]; argument shapes: ",
+              abslx::StrJoin(broadcast_dims, ","), "]; argument shapes: ",
               lhs_shape.DebugString(), " and ", rhs_shape.DebugString()));
       broadcast_shape[dim] = min_rank_shape->dim_size(i);
     }

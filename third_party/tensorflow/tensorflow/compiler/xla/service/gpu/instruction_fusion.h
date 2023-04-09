@@ -33,7 +33,7 @@ class GpuInstructionFusion : public InstructionFusion {
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(HloModule* module,
-                     const absl::flat_hash_set<absl::string_view>&
+                     const abslx::flat_hash_set<abslx::string_view>&
                          execution_threads) override {
     fusion_node_evaluations_.clear();
     return InstructionFusion::Run(module, execution_threads);
@@ -57,7 +57,7 @@ class GpuInstructionFusion : public InstructionFusion {
 
   // Keep track of the number of times each instruction inside a fusion node is
   // indexed with different index vectors.
-  absl::flat_hash_map<const HloInstruction*, FusionNodeIndexingEvaluation>
+  abslx::flat_hash_map<const HloInstruction*, FusionNodeIndexingEvaluation>
       fusion_node_evaluations_;
 };
 

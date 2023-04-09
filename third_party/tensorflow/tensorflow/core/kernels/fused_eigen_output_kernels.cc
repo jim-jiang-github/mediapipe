@@ -53,7 +53,7 @@ Status InitializeFusedComputation(
   }
   if (*fused_computation == FusedComputationType::kUndefined) {
     return errors::Unimplemented("Fusion is not implemented: [",
-                                 absl::StrJoin(fused_ops, ","), "]");
+                                 abslx::StrJoin(fused_ops, ","), "]");
   }
 
   // Depending on a picked fusion type validate fusion-specific arguments.

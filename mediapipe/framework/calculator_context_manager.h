@@ -45,8 +45,8 @@ class CalculatorContextManager {
   // Sets the callback that can setup the input and output stream shards in a
   // newly constructed calculator context. Then, initializes the default
   // calculator context.
-  absl::Status PrepareForRun(
-      std::function<absl::Status(CalculatorContext*)> setup_shards_callback);
+  abslx::Status PrepareForRun(
+      std::function<abslx::Status(CalculatorContext*)> setup_shards_callback);
 
   // Invoked by CalculatorNode::CleanupAfterRun().
   void CleanupAfterRun() ABSL_LOCKS_EXCLUDED(contexts_mutex_);
@@ -107,7 +107,7 @@ class CalculatorContextManager {
   }
 
   void SetGraphStatusInContext(CalculatorContext* calculator_context,
-                               const absl::Status& status) {
+                               const abslx::Status& status) {
     CHECK(calculator_context);
     calculator_context->SetGraphStatus(status);
   }
@@ -123,7 +123,7 @@ class CalculatorContextManager {
   // NOTE: This callback invokes input/output stream handler methods.
   // The callback is used to break the circular dependency between
   // calculator context manager and input/output stream handlers.
-  std::function<absl::Status(CalculatorContext*)> setup_shards_callback_;
+  std::function<abslx::Status(CalculatorContext*)> setup_shards_callback_;
 
   // The default calculator context that is always reused for sequential
   // execution. It is also used by Open() and Close() method of a parallel
@@ -131,7 +131,7 @@ class CalculatorContextManager {
   std::unique_ptr<CalculatorContext> default_context_;
   // The mutex for synchronizing the operations on active_contexts_ and
   // idle_contexts_ during parallel execution.
-  absl::Mutex contexts_mutex_;
+  abslx::Mutex contexts_mutex_;
   // A map from input timestamps to calculator contexts.
   std::map<Timestamp, std::unique_ptr<CalculatorContext>> active_contexts_
       ABSL_GUARDED_BY(contexts_mutex_);

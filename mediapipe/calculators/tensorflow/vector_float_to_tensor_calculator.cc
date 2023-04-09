@@ -44,17 +44,17 @@ namespace tf = ::tensorflow;
 // }
 class VectorFloatToTensorCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   VectorFloatToTensorCalculatorOptions options_;
 };
 REGISTER_CALCULATOR(VectorFloatToTensorCalculator);
 
-absl::Status VectorFloatToTensorCalculator::GetContract(
+abslx::Status VectorFloatToTensorCalculator::GetContract(
     CalculatorContract* cc) {
   const auto& options = cc->Options<VectorFloatToTensorCalculatorOptions>();
   // Start with only one input packet.
@@ -75,16 +75,16 @@ absl::Status VectorFloatToTensorCalculator::GetContract(
   cc->Outputs().Index(0).Set<tf::Tensor>(
       // Output stream with data as tf::Tensor and the same TimeSeriesHeader.
   );
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status VectorFloatToTensorCalculator::Open(CalculatorContext* cc) {
+abslx::Status VectorFloatToTensorCalculator::Open(CalculatorContext* cc) {
   options_ = cc->Options<VectorFloatToTensorCalculatorOptions>();
   cc->SetOffset(0);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status VectorFloatToTensorCalculator::Process(CalculatorContext* cc) {
+abslx::Status VectorFloatToTensorCalculator::Process(CalculatorContext* cc) {
   tf::TensorShape tensor_shape;
   if (options_.input_size() == INPUT_2D) {
     const std::vector<std::vector<float>>& input =
@@ -102,7 +102,7 @@ absl::Status VectorFloatToTensorCalculator::Process(CalculatorContext* cc) {
     } else {
       tensor_shape = tf::TensorShape({rows, cols});
     }
-    auto output = ::absl::make_unique<tf::Tensor>(tf::DT_FLOAT, tensor_shape);
+    auto output = ::abslx::make_unique<tf::Tensor>(tf::DT_FLOAT, tensor_shape);
     for (int r = 0; r < rows; ++r) {
       for (int c = 0; c < cols; ++c) {
         if (options_.transpose()) {
@@ -119,7 +119,7 @@ absl::Status VectorFloatToTensorCalculator::Process(CalculatorContext* cc) {
     RET_CHECK_GE(input.size(), 1);
     const int32 length = input.size();
     tensor_shape = tf::TensorShape({length});
-    auto output = ::absl::make_unique<tf::Tensor>(tf::DT_FLOAT, tensor_shape);
+    auto output = ::abslx::make_unique<tf::Tensor>(tf::DT_FLOAT, tensor_shape);
     for (int i = 0; i < length; ++i) {
       output->tensor<float, 1>()(i) = input.at(i);
     }
@@ -127,7 +127,7 @@ absl::Status VectorFloatToTensorCalculator::Process(CalculatorContext* cc) {
   } else {
     LOG(FATAL) << "input size not supported";
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

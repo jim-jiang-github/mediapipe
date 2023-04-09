@@ -916,7 +916,7 @@ class CollectiveGroupResource : public ResourceBase {
         timeout_seconds_(timeout_seconds) {}
 
   std::string DebugString() const override {
-    return absl::StrFormat(
+    return abslx::StrFormat(
         "Collective Group with group_key = %d, group_size = %d, rank = %d",
         group_key_, group_size_, rank_);
   }
@@ -986,7 +986,7 @@ class CollectiveInitializeCommunicatorOpKernel : public AsyncOpKernel {
     ResourceHandle resource_handle =
         MakeResourceHandle<CollectiveGroupResource>(
             c, "collective_op_group",
-            absl::StrFormat("%d:r%04d", group_key, rank));
+            abslx::StrFormat("%d:r%04d", group_key, rank));
 
     Tensor* output_handle = nullptr;
     OP_REQUIRES_OK_ASYNC(

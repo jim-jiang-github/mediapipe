@@ -41,31 +41,31 @@ class ProgramCache {
   ProgramCache(const ProgramCache&) = delete;
   ProgramCache& operator=(const ProgramCache&) = delete;
 
-  absl::Status GetOrCreateCLKernel(
+  abslx::Status GetOrCreateCLKernel(
       const std::string& code, const std::string& function_name,
       const std::vector<CompilerOptions>& compiler_options,
       const CLContext& context, const CLDevice& device, CLKernel* result,
       uint64_t* kernel_fingerprint = nullptr);
 
-  absl::Status GetOrCreateCLKernel(const std::string& code,
+  abslx::Status GetOrCreateCLKernel(const std::string& code,
                                    const std::string& function_name,
                                    const CLContext& context,
                                    const CLDevice& device, CLKernel* result,
                                    uint64_t* kernel_fingerprint = nullptr);
 
-  absl::Status GetKernel(uint64_t fingerprint, const std::string& function_name,
+  abslx::Status GetKernel(uint64_t fingerprint, const std::string& function_name,
                          CLKernel* result) const;
 
-  absl::Status AddProgramBinary(const CLContext& context,
+  abslx::Status AddProgramBinary(const CLContext& context,
                                 const CLDevice& device, uint64_t fingerprint,
-                                absl::Span<const uint8_t> binary);
-  absl::Status GetProgramBinary(uint64_t fingerprint,
+                                abslx::Span<const uint8_t> binary);
+  abslx::Status GetProgramBinary(uint64_t fingerprint,
                                 std::vector<uint8_t>* program_binary) const;
 
-  absl::Status AddSerializedCache(const CLContext& context,
+  abslx::Status AddSerializedCache(const CLContext& context,
                                   const CLDevice& device,
-                                  absl::Span<const uint8_t> serialized_cache);
-  absl::Status GetSerializedCache(const CLDevice& device,
+                                  abslx::Span<const uint8_t> serialized_cache);
+  abslx::Status GetSerializedCache(const CLDevice& device,
                                   std::vector<uint8_t>* serialized_cache) const;
 
  private:
@@ -89,7 +89,7 @@ class ProgramCache {
     }
   };
 
-  absl::flat_hash_map<ProgramDescriptor, CLProgram, ProgramDescriptorHasher,
+  abslx::flat_hash_map<ProgramDescriptor, CLProgram, ProgramDescriptorHasher,
                       ProgramDescriptorEqual>
       programs_;
 };

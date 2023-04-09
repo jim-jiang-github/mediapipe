@@ -128,7 +128,7 @@ namespace nvinfer1 {
 // printing requirements, this must be in the nvinfer1 namespace.
 inline std::ostream& operator<<(std::ostream& os, const nvinfer1::Dims& v) {
   os << "nvinfer1::Dims[";
-  os << absl::StrJoin(std::vector<int>(v.d, v.d + v.nbDims), ",");
+  os << abslx::StrJoin(std::vector<int>(v.d, v.d + v.nbDims), ",");
   os << "]";
   return os;
 }
@@ -157,7 +157,7 @@ inline std::ostream& operator<<(std::ostream& os,
   os << "nvinfer1::INetworkDefinition{\n";
   std::vector<int> layer_idxs(n->getNbLayers());
   std::iota(layer_idxs.begin(), layer_idxs.end(), 0);
-  os << absl::StrJoin(layer_idxs, "\n ",
+  os << abslx::StrJoin(layer_idxs, "\n ",
                       [n](std::string* out, const int layer_idx) {
                         out->append(n->getLayer(layer_idx)->getName());
                       });

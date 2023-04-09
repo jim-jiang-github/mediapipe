@@ -61,10 +61,10 @@ namespace cpu {
 namespace runtime {
 
 XfeedManager* GetXfeedManager(int device_ordinal) {
-  static auto* managers = new absl::flat_hash_map<int, XfeedManager*>();
-  static absl::Mutex* mutex = new absl::Mutex();
+  static auto* managers = new abslx::flat_hash_map<int, XfeedManager*>();
+  static abslx::Mutex* mutex = new abslx::Mutex();
 
-  absl::MutexLock lock(mutex);
+  abslx::MutexLock lock(mutex);
   auto it = managers->find(device_ordinal);
   if (it == managers->end()) {
     it = managers->emplace(device_ordinal, new XfeedManager()).first;
@@ -185,12 +185,12 @@ struct CollectivePermuteParticipantData : xla::ParticipantData {
   std::vector<int> replica_ids_to_copy_to;
 
   std::string ToString() const override {
-    return absl::StrFormat(
+    return abslx::StrFormat(
         "CollectivePermuteParticipantData{replica_id=%d, "
         "source_data=%p, destination_data=%p, byte_size=%d, "
         "replica_ids_to_copy_to=[%s], device_ordinal=%d, stream=%p}",
         replica_id, source_data.opaque(), destination_data.opaque(), byte_size,
-        absl::StrJoin(replica_ids_to_copy_to, ", "), device_ordinal, stream);
+        abslx::StrJoin(replica_ids_to_copy_to, ", "), device_ordinal, stream);
   }
 };
 
@@ -214,20 +214,20 @@ struct AllToAllParticipantData : xla::ParticipantData {
   std::string ToString() const override {
     auto addr_formatter = [](std::string* out,
                              const se::DeviceMemoryBase& mem) {
-      absl::StrAppend(out, absl::StrFormat("%p", mem.opaque()));
+      abslx::StrAppend(out, abslx::StrFormat("%p", mem.opaque()));
     };
     auto device_formatter = [](std::string* out,
                                const xla::GlobalDeviceId& device) {
-      absl::StrAppend(out, device.value());
+      abslx::StrAppend(out, device.value());
     };
-    return absl::StrFormat(
+    return abslx::StrFormat(
         "AllToAllParticipantData{replica_id=%d, "
         "replica_ids_to_copy_to=[%s], source_buffers=[%s], "
         "destination_buffers=[%s], device_ordinal=%d, stream=%p}",
         device_id.value(),
-        absl::StrJoin(devices_to_copy_to, ", ", device_formatter),
-        absl::StrJoin(source_buffers, ", ", addr_formatter),
-        absl::StrJoin(destination_buffers, ", ", addr_formatter),
+        abslx::StrJoin(devices_to_copy_to, ", ", device_formatter),
+        abslx::StrJoin(source_buffers, ", ", addr_formatter),
+        abslx::StrJoin(destination_buffers, ", ", addr_formatter),
         device_ordinal, stream);
   }
 };
@@ -392,14 +392,14 @@ class CpuAllToAllRendezvous
     bool is_primary = InitializationBarrier();
 
     if (is_primary) {
-      absl::MutexLock lock(&mu_);
+      abslx::MutexLock lock(&mu_);
 
       CHECK(!participants_.empty());
       CHECK(!participants_[0].source_buffers.empty());
       int expected_buffer_size = participants_[0].source_buffers[0].size();
 
       // Device id -> position in participants_.
-      absl::flat_hash_map<xla::GlobalDeviceId, int> device_map;
+      abslx::flat_hash_map<xla::GlobalDeviceId, int> device_map;
 
       for (int pos = 0; pos < participants_.size(); pos++) {
         const AllToAllParticipantData& p = participants_[pos];
@@ -416,7 +416,7 @@ class CpuAllToAllRendezvous
           participants_[0].devices_to_copy_to;
 
       // Device id -> rank
-      absl::flat_hash_map<xla::GlobalDeviceId, int> device_ranks;
+      abslx::flat_hash_map<xla::GlobalDeviceId, int> device_ranks;
       for (int rank = 0; rank < devices_to_copy_to.size(); ++rank) {
         auto device_id = devices_to_copy_to[rank];
         device_ranks[device_id] = rank;
@@ -454,7 +454,7 @@ class CpuCollectivePermuteRendezvous
 
     // Perform all copies from the primary thread.
     if (primary) {
-      absl::MutexLock lock(&mu_);
+      abslx::MutexLock lock(&mu_);
 
       std::map<int, int> replica_idx_to_participant_idx;
       for (int p_idx = 0; p_idx < participants_.size(); p_idx++) {
@@ -541,7 +541,7 @@ class CpuAllReduceRendezvous
   template <xla::PrimitiveType PT>
   void DoAllReduce(xla::AllReduceParticipantData participant) {
     using T = typename xla::primitive_util::PrimitiveTypeToNative<PT>::type;
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     CHECK(!participants_.empty());
     xla::ReductionKind reduction_kind = participant.reduction_kind;
     for (const auto& p : participants_) {
@@ -550,8 +550,8 @@ class CpuAllReduceRendezvous
     int num_participants = participants_.size();
 
     // participant_idx -> buffer_idx -> buffer.
-    std::vector<std::vector<absl::Span<T>>> input_buffers;
-    std::vector<std::vector<absl::Span<T>>> output_buffers;
+    std::vector<std::vector<abslx::Span<T>>> input_buffers;
+    std::vector<std::vector<abslx::Span<T>>> output_buffers;
     input_buffers.reserve(num_participants);
     output_buffers.reserve(num_participants);
     const xla::AllReduceParticipantData& first_participant =
@@ -563,9 +563,9 @@ class CpuAllReduceRendezvous
 
       input_buffers.emplace_back();
       output_buffers.emplace_back();
-      std::vector<absl::Span<T>>& participant_input_buffers =
+      std::vector<abslx::Span<T>>& participant_input_buffers =
           input_buffers.back();
-      std::vector<absl::Span<T>>& participant_output_buffers =
+      std::vector<abslx::Span<T>>& participant_output_buffers =
           output_buffers.back();
       participant_input_buffers.reserve(p.buffers.size());
       participant_output_buffers.reserve(p.buffers.size());
@@ -634,13 +634,13 @@ class CpuAllReduceRendezvous
         T, std::is_integral<T>::value && std::is_signed<T>::value>::type;
     switch (reduction_kind) {
       case xla::ReductionKind::SUM:
-        return absl::bit_cast<T>(
-            static_cast<SumProductType>(absl::bit_cast<SumProductType>(a) +
-                                        absl::bit_cast<SumProductType>(b)));
+        return abslx::bit_cast<T>(
+            static_cast<SumProductType>(abslx::bit_cast<SumProductType>(a) +
+                                        abslx::bit_cast<SumProductType>(b)));
       case xla::ReductionKind::PRODUCT:
-        return absl::bit_cast<T>(
-            static_cast<SumProductType>(absl::bit_cast<SumProductType>(a) *
-                                        absl::bit_cast<SumProductType>(b)));
+        return abslx::bit_cast<T>(
+            static_cast<SumProductType>(abslx::bit_cast<SumProductType>(a) *
+                                        abslx::bit_cast<SumProductType>(b)));
       case xla::ReductionKind::MIN:
         return std::min(a, b);
       case xla::ReductionKind::MAX:
@@ -655,13 +655,13 @@ class CpuAllReduceRendezvous
         T, std::is_integral<T>::value && std::is_signed<T>::value>::type;
     switch (reduction_kind) {
       case xla::ReductionKind::SUM:
-        return absl::bit_cast<T>(
-            static_cast<SumProductType>(absl::bit_cast<SumProductType>(a) +
-                                        absl::bit_cast<SumProductType>(b)));
+        return abslx::bit_cast<T>(
+            static_cast<SumProductType>(abslx::bit_cast<SumProductType>(a) +
+                                        abslx::bit_cast<SumProductType>(b)));
       case xla::ReductionKind::PRODUCT:
-        return absl::bit_cast<T>(
-            static_cast<SumProductType>(absl::bit_cast<SumProductType>(a) *
-                                        absl::bit_cast<SumProductType>(b)));
+        return abslx::bit_cast<T>(
+            static_cast<SumProductType>(abslx::bit_cast<SumProductType>(a) *
+                                        abslx::bit_cast<SumProductType>(b)));
       case xla::ReductionKind::MIN:
       case xla::ReductionKind::MAX:
         LOG(FATAL) << "min/max not valid for complex types";
@@ -721,7 +721,7 @@ ABSL_ATTRIBUTE_NO_SANITIZE_MEMORY void __xla_cpu_runtime_AllToAll(
     int32_t replica_groups_str_size, int32_t num_buffers, int64_t buffer_size,
     void** source_buffers, void** destination_buffers) {
   int device_ordinal = GetDeviceOrdinal(run_options);
-  absl::string_view replica_groups_serialized(
+  abslx::string_view replica_groups_serialized(
       static_cast<const char*>(replica_groups_str), replica_groups_str_size);
   std::vector<xla::ReplicaGroup> group =
       xla::ParseReplicaGroupsOnly(replica_groups_serialized).ValueOrDie();
@@ -764,7 +764,7 @@ ABSL_ATTRIBUTE_NO_SANITIZE_MEMORY void __xla_cpu_runtime_AllReduce(
     int32_t reduction_kind, const void* shape_ptr, int32_t shape_length,
     int32_t num_buffers, void** input_buffers, void** output_buffers) {
   int device_ordinal = GetDeviceOrdinal(run_options);
-  absl::string_view replica_groups_serialized(
+  abslx::string_view replica_groups_serialized(
       static_cast<const char*>(replica_groups_str), replica_groups_str_size);
   std::vector<xla::ReplicaGroup> group =
       xla::ParseReplicaGroupsOnly(replica_groups_serialized).ValueOrDie();
@@ -832,9 +832,9 @@ ABSL_ATTRIBUTE_NO_SANITIZE_MEMORY void __xla_cpu_runtime_CollectivePermute(
     int64_t op_id, int32_t byte_size, void* input_buffer, void* output_buffer,
     const void* source_target_pairs, int32_t source_target_pairs_size) {
   int device_ordinal = GetDeviceOrdinal(run_options);
-  absl::string_view source_target_pairs_serialized(
+  abslx::string_view source_target_pairs_serialized(
       static_cast<const char*>(source_target_pairs), source_target_pairs_size);
-  auto pairs = absl::StrSplit(source_target_pairs_serialized, ',');
+  auto pairs = abslx::StrSplit(source_target_pairs_serialized, ',');
   const xla::DeviceAssignment::LogicalID logical_id =
       run_options->device_assignment()
           ->LogicalIdForDevice(xla::GlobalDeviceId(device_ordinal))
@@ -844,7 +844,7 @@ ABSL_ATTRIBUTE_NO_SANITIZE_MEMORY void __xla_cpu_runtime_CollectivePermute(
 
   std::vector<int> copy_to;
   for (auto& p : pairs) {
-    std::vector<std::string> mapping = absl::StrSplit(p, '=');
+    std::vector<std::string> mapping = abslx::StrSplit(p, '=');
     CHECK_EQ(mapping.size(), 2);
     int from = std::stoi(mapping[0]);
     int to = std::stoi(mapping[1]);

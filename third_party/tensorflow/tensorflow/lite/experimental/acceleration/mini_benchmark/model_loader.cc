@@ -105,32 +105,32 @@ MinibenchmarkStatus PipeModelLoader::InitInternal() {
 
 #endif  // !_WIN32
 
-std::unique_ptr<ModelLoader> CreateModelLoaderFromPath(absl::string_view path) {
-  if (absl::StartsWith(path, "fd:")) {
+std::unique_ptr<ModelLoader> CreateModelLoaderFromPath(abslx::string_view path) {
+  if (abslx::StartsWith(path, "fd:")) {
 #ifdef _WIN32
     return kMinibenchmarkUnsupportedPlatform;
 #endif  // _WIN32
-    std::vector<std::string> parts = absl::StrSplit(path, ':');
+    std::vector<std::string> parts = abslx::StrSplit(path, ':');
     int model_fd;
     size_t model_offset, model_size;
-    if (parts.size() != 4 || !absl::SimpleAtoi(parts[1], &model_fd) ||
-        !absl::SimpleAtoi(parts[2], &model_offset) ||
-        !absl::SimpleAtoi(parts[3], &model_size)) {
+    if (parts.size() != 4 || !abslx::SimpleAtoi(parts[1], &model_fd) ||
+        !abslx::SimpleAtoi(parts[2], &model_offset) ||
+        !abslx::SimpleAtoi(parts[3], &model_size)) {
       return nullptr;
     }
     return std::make_unique<MmapModelLoader>(model_fd, model_offset,
                                              model_size);
   }
-  if (absl::StartsWith(path, "pipe:")) {
+  if (abslx::StartsWith(path, "pipe:")) {
 #ifdef _WIN32
     return kMinibenchmarkUnsupportedPlatform;
 #endif  // _WIN32
-    std::vector<std::string> parts = absl::StrSplit(path, ':');
+    std::vector<std::string> parts = abslx::StrSplit(path, ':');
     int read_fd, write_fd;
     size_t model_size;
-    if (parts.size() != 4 || !absl::SimpleAtoi(parts[1], &read_fd) ||
-        !absl::SimpleAtoi(parts[2], &write_fd) ||
-        !absl::SimpleAtoi(parts[3], &model_size)) {
+    if (parts.size() != 4 || !abslx::SimpleAtoi(parts[1], &read_fd) ||
+        !abslx::SimpleAtoi(parts[2], &write_fd) ||
+        !abslx::SimpleAtoi(parts[3], &model_size)) {
       return nullptr;
     }
     // Close the write pipe for the read process / thread.

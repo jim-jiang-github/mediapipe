@@ -121,8 +121,8 @@ class GraphCycles {
 
   // Warning: Do not use these if iterating over the span and modifying the
   // GraphCycles at the same time. Instead use SuccessorsCopy/PredecessorsCopy.
-  absl::Span<const int32_t> Successors(int32_t node) const;
-  absl::Span<const int32_t> Predecessors(int32_t node) const;
+  abslx::Span<const int32_t> Successors(int32_t node) const;
+  abslx::Span<const int32_t> Predecessors(int32_t node) const;
 
   // Return a copy of the successors set. This is needed for code using the
   // collection while modifying the GraphCycles.

@@ -24,31 +24,31 @@ template <typename T>
 void Use(T) {}
 
 TEST(Examples, Basic) {
-  absl::BitGen gen;
+  abslx::BitGen gen;
   std::vector<int> objs = {10, 20, 30, 40, 50};
 
   // Choose an element from a set.
-  auto elem = objs[absl::Uniform(gen, 0u, objs.size())];
+  auto elem = objs[abslx::Uniform(gen, 0u, objs.size())];
   Use(elem);
 
   // Generate a uniform value between 1 and 6.
-  auto dice_roll = absl::Uniform<int>(absl::IntervalClosedClosed, gen, 1, 6);
+  auto dice_roll = abslx::Uniform<int>(abslx::IntervalClosedClosed, gen, 1, 6);
   Use(dice_roll);
 
   // Generate a random byte.
-  auto byte = absl::Uniform<uint8_t>(gen);
+  auto byte = abslx::Uniform<uint8_t>(gen);
   Use(byte);
 
   // Generate a fractional value from [0f, 1f).
-  auto fraction = absl::Uniform<float>(gen, 0, 1);
+  auto fraction = abslx::Uniform<float>(gen, 0, 1);
   Use(fraction);
 
   // Toss a fair coin; 50/50 probability.
-  bool coin_toss = absl::Bernoulli(gen, 0.5);
+  bool coin_toss = abslx::Bernoulli(gen, 0.5);
   Use(coin_toss);
 
   // Select a file size between 1k and 10MB, biased towards smaller file sizes.
-  auto file_size = absl::LogUniform<size_t>(gen, 1000, 10 * 1000 * 1000);
+  auto file_size = abslx::LogUniform<size_t>(gen, 1000, 10 * 1000 * 1000);
   Use(file_size);
 
   // Randomize (shuffle) a collection.
@@ -57,30 +57,30 @@ TEST(Examples, Basic) {
 
 TEST(Examples, CreateingCorrelatedVariateSequences) {
   // Unexpected PRNG correlation is often a source of bugs,
-  // so when using absl::BitGen it must be an intentional choice.
+  // so when using abslx::BitGen it must be an intentional choice.
   // NOTE: All of these only exhibit process-level stability.
 
   // Create a correlated sequence from system entropy.
   {
-    auto my_seed = absl::MakeSeedSeq();
+    auto my_seed = abslx::MakeSeedSeq();
 
-    absl::BitGen gen_1(my_seed);
-    absl::BitGen gen_2(my_seed);  // Produces same variates as gen_1.
+    abslx::BitGen gen_1(my_seed);
+    abslx::BitGen gen_2(my_seed);  // Produces same variates as gen_1.
 
-    EXPECT_EQ(absl::Bernoulli(gen_1, 0.5), absl::Bernoulli(gen_2, 0.5));
-    EXPECT_EQ(absl::Uniform<uint32_t>(gen_1), absl::Uniform<uint32_t>(gen_2));
+    EXPECT_EQ(abslx::Bernoulli(gen_1, 0.5), abslx::Bernoulli(gen_2, 0.5));
+    EXPECT_EQ(abslx::Uniform<uint32_t>(gen_1), abslx::Uniform<uint32_t>(gen_2));
   }
 
   // Create a correlated sequence from an existing URBG.
   {
-    absl::BitGen gen;
+    abslx::BitGen gen;
 
-    auto my_seed = absl::CreateSeedSeqFrom(&gen);
-    absl::BitGen gen_1(my_seed);
-    absl::BitGen gen_2(my_seed);
+    auto my_seed = abslx::CreateSeedSeqFrom(&gen);
+    abslx::BitGen gen_1(my_seed);
+    abslx::BitGen gen_2(my_seed);
 
-    EXPECT_EQ(absl::Bernoulli(gen_1, 0.5), absl::Bernoulli(gen_2, 0.5));
-    EXPECT_EQ(absl::Uniform<uint32_t>(gen_1), absl::Uniform<uint32_t>(gen_2));
+    EXPECT_EQ(abslx::Bernoulli(gen_1, 0.5), abslx::Bernoulli(gen_2, 0.5));
+    EXPECT_EQ(abslx::Uniform<uint32_t>(gen_1), abslx::Uniform<uint32_t>(gen_2));
   }
 
   // An alternate construction which uses user-supplied data
@@ -89,11 +89,11 @@ TEST(Examples, CreateingCorrelatedVariateSequences) {
     const char kData[] = "A simple seed string";
     std::seed_seq my_seed(std::begin(kData), std::end(kData));
 
-    absl::BitGen gen_1(my_seed);
-    absl::BitGen gen_2(my_seed);
+    abslx::BitGen gen_1(my_seed);
+    abslx::BitGen gen_2(my_seed);
 
-    EXPECT_EQ(absl::Bernoulli(gen_1, 0.5), absl::Bernoulli(gen_2, 0.5));
-    EXPECT_EQ(absl::Uniform<uint32_t>(gen_1), absl::Uniform<uint32_t>(gen_2));
+    EXPECT_EQ(abslx::Bernoulli(gen_1, 0.5), abslx::Bernoulli(gen_2, 0.5));
+    EXPECT_EQ(abslx::Uniform<uint32_t>(gen_1), abslx::Uniform<uint32_t>(gen_2));
   }
 }
 

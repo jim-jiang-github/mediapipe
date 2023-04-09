@@ -17,7 +17,7 @@
 #include "absl/base/internal/raw_logging.h"
 #include "absl/synchronization/mutex.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // Return whether int *arg is zero.
@@ -49,4 +49,4 @@ bool Barrier::Block() {
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

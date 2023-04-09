@@ -93,7 +93,7 @@ struct ImageEmbedderOutputStreams {
 // }
 class ImageEmbedderGraph : public core::ModelTaskGraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     ASSIGN_OR_RETURN(
         const auto* model_resources,
@@ -125,7 +125,7 @@ class ImageEmbedderGraph : public core::ModelTaskGraph {
   // norm_rect_in: (mediapipe::NormalizedRect) optional region-of-interest to
   // perform embedding extraction on.
   // graph: the mediapipe builder::Graph instance to be updated.
-  absl::StatusOr<ImageEmbedderOutputStreams> BuildImageEmbedderTask(
+  abslx::StatusOr<ImageEmbedderOutputStreams> BuildImageEmbedderTask(
       const proto::ImageEmbedderGraphOptions& task_options,
       const core::ModelResources& model_resources, Source<Image> image_in,
       Source<NormalizedRect> norm_rect_in, Graph& graph) {

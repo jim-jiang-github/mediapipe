@@ -33,7 +33,7 @@ extern const GraphService<NoDefaultConstructor> kNoDefaultService;
 
 class NeedsCreateMethod {
  public:
-  static absl::StatusOr<std::shared_ptr<NeedsCreateMethod>> Create() {
+  static abslx::StatusOr<std::shared_ptr<NeedsCreateMethod>> Create() {
     return std::shared_ptr<NeedsCreateMethod>(new NeedsCreateMethod());
   }
 
@@ -45,9 +45,9 @@ extern const GraphService<NeedsCreateMethod> kNeedsCreateService;
 // Use a service.
 class TestServiceCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) final;
-  absl::Status Process(CalculatorContext* cc) final;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) final;
+  abslx::Status Process(CalculatorContext* cc) final;
 
  private:
   int optional_bias_ = 0;

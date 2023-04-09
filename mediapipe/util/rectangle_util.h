@@ -23,13 +23,13 @@
 namespace mediapipe {
 
 // Converts a NormalizedRect into a Rectangle_f.
-absl::StatusOr<Rectangle_f> ToRectangle(const mediapipe::NormalizedRect& input);
+abslx::StatusOr<Rectangle_f> ToRectangle(const mediapipe::NormalizedRect& input);
 
 // If the new_rect overlaps with any of the rectangles in
 // existing_rects, then return true. Otherwise, return false.
-absl::StatusOr<bool> DoesRectOverlap(
+abslx::StatusOr<bool> DoesRectOverlap(
     const mediapipe::NormalizedRect& new_rect,
-    absl::Span<const mediapipe::NormalizedRect> existing_rects,
+    abslx::Span<const mediapipe::NormalizedRect> existing_rects,
     float min_similarity_threshold);
 
 // Computes the Intersection over Union (IoU) between two rectangles.

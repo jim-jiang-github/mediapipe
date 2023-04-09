@@ -22,7 +22,7 @@
 #include "gtest/gtest.h"
 #include "absl/base/internal/raw_logging.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace debugging_internal {
 namespace {
@@ -45,6 +45,6 @@ TEST(SignalHandlerStackConsumptionTest, MeasuresStackConsumption) {
 }  // namespace
 }  // namespace debugging_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION

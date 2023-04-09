@@ -34,10 +34,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     assert(host == "");
     assert(scheme == "");
   } else {
-    assert(absl::StrContains(uri, host));
-    assert(absl::StrContains(uri, scheme));
-    assert(absl::StrContains(uri, path));
-    assert(absl::StrContains(uri, "://"));
+    assert(abslx::StrContains(uri, host));
+    assert(abslx::StrContains(uri, scheme));
+    assert(abslx::StrContains(uri, path));
+    assert(abslx::StrContains(uri, "://"));
   }
 
   return 0;

@@ -31,7 +31,7 @@ namespace cl {
 namespace {
 
 template <DataType T>
-absl::Status TensorBHWCTest(const BHWC& shape,
+abslx::Status TensorBHWCTest(const BHWC& shape,
                             const TensorDescriptor& descriptor,
                             Environment* env) {
   tflite::gpu::Tensor<BHWC, T> tensor_cpu;
@@ -71,14 +71,14 @@ absl::Status TensorBHWCTest(const BHWC& shape,
 
   for (int i = 0; i < tensor_gpu.data.size(); ++i) {
     if (tensor_gpu.data[i] != tensor_cpu.data[i]) {
-      return absl::InternalError("Wrong value.");
+      return abslx::InternalError("Wrong value.");
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <DataType T>
-absl::Status TensorBHWDCTest(const BHWDC& shape,
+abslx::Status TensorBHWDCTest(const BHWDC& shape,
                              const TensorDescriptor& descriptor,
                              Environment* env) {
   tflite::gpu::Tensor<BHWDC, T> tensor_cpu;
@@ -118,14 +118,14 @@ absl::Status TensorBHWDCTest(const BHWDC& shape,
 
   for (int i = 0; i < tensor_gpu.data.size(); ++i) {
     if (tensor_gpu.data[i] != tensor_cpu.data[i]) {
-      return absl::InternalError("Wrong value.");
+      return abslx::InternalError("Wrong value.");
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <DataType T>
-absl::Status TensorTests(DataType data_type, TensorStorageType storage_type,
+abslx::Status TensorTests(DataType data_type, TensorStorageType storage_type,
                          Environment* env) {
   RETURN_IF_ERROR(TensorBHWCTest<T>(
       BHWC(1, 6, 7, 3), {data_type, storage_type, Layout::HWC}, env));
@@ -161,7 +161,7 @@ absl::Status TensorTests(DataType data_type, TensorStorageType storage_type,
       BHWDC(7, 6, 1, 3, 7), {data_type, storage_type, Layout::BHWDC}, env));
   RETURN_IF_ERROR(TensorBHWDCTest<T>(
       BHWDC(13, 7, 3, 4, 3), {data_type, storage_type, Layout::BHWDC}, env));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 TEST_F(OpenCLTest, BufferF32) {

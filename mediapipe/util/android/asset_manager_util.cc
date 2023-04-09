@@ -151,12 +151,12 @@ bool AssetManager::ReadFile(const std::string& filename, std::string* output) {
   return true;
 }
 
-absl::StatusOr<std::string> AssetManager::CachedFileFromAsset(
+abslx::StatusOr<std::string> AssetManager::CachedFileFromAsset(
     const std::string& asset_path) {
   RET_CHECK(cache_dir_path_.size()) << "asset manager not initialized";
 
   std::string file_path =
-      absl::StrCat(cache_dir_path_, "/mediapipe_asset_cache/", asset_path);
+      abslx::StrCat(cache_dir_path_, "/mediapipe_asset_cache/", asset_path);
 
   // TODO: call the Java AssetCache, or make it call us.
   // For now, since we don't know the app version, we overwrite the cache file
@@ -178,7 +178,7 @@ absl::StatusOr<std::string> AssetManager::CachedFileFromAsset(
   return file_path;
 }
 
-absl::Status AssetManager::ReadContentUri(const std::string& content_uri,
+abslx::Status AssetManager::ReadContentUri(const std::string& content_uri,
                                           std::string* output) {
   RET_CHECK(mediapipe::java::HasJavaVM()) << "JVM instance not set";
   JNIEnv* env = mediapipe::java::GetJNIEnv();
@@ -250,7 +250,7 @@ absl::Status AssetManager::ReadContentUri(const std::string& content_uri,
                           reinterpret_cast<jbyte*>(&output->at(0)));
   RET_CHECK(!ExceptionPrintClear(env)) << "failed to copy array data";
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

@@ -103,9 +103,9 @@ string AttrSlice::DebugString() const {
     const string& name = it.first;
     const AttrValue& attr_value = it.second;
     attr_key_vals.push_back(
-        absl::StrCat(name, "=", SummarizeAttrValue(attr_value)));
+        abslx::StrCat(name, "=", SummarizeAttrValue(attr_value)));
   }
-  return absl::StrJoin(attr_key_vals, ", ");
+  return abslx::StrJoin(attr_key_vals, ", ");
 }
 
 string SummarizeNodeDef(const NodeDef& node_def, int max_inputs_in_summary) {
@@ -190,7 +190,7 @@ Status AttrSlice::CheckFind(StringPiece attr_name,
   // Skip AttachDef for internal attrs since it is a little bit
   // expensive and it is common for them to correctly not be included
   // in a NodeDef.
-  if (!absl::StartsWith(attr_name, "_") && ndef_ != nullptr) {
+  if (!abslx::StartsWith(attr_name, "_") && ndef_ != nullptr) {
     s = AttachDef(s, *ndef_);
   }
   return s;
@@ -641,7 +641,7 @@ Status ValidateNodeDef(const NodeDef& node_def, const OpDef& op_def) {
   size_t num_inputs = 0;
   // TODO(josh11b): Unify the input field validation.
   for (const string& input : node_def.input()) {
-    if (absl::StartsWith(input, "^")) {
+    if (abslx::StartsWith(input, "^")) {
       seen_control = true;
       if (input.find(':') != string::npos) {
         return errors::InvalidArgument("Control input '", input,
@@ -667,7 +667,7 @@ Status ValidateNodeDef(const NodeDef& node_def, const OpDef& op_def) {
   }
   for (const auto& attr : node_def.attr()) {
     // Allow internal optional attributes with names starting with "_".
-    if (absl::StartsWith(attr.first, "_")) {
+    if (abslx::StartsWith(attr.first, "_")) {
       continue;
     }
     auto iter = op_attrs.find(attr.first);
@@ -1003,7 +1003,7 @@ Status MaybeAddPrefixToColocationConstraints(
   auto constraints_size = constraints_list->s_size();
   for (size_t i = 0; i < constraints_size; ++i) {
     StringPiece original(constraints_list->s(i));
-    if (absl::ConsumePrefix(&original, kColocationGroupPrefixStringPiece)) {
+    if (abslx::ConsumePrefix(&original, kColocationGroupPrefixStringPiece)) {
       if (match.find(string(original)) != match.end()) {
         (*constraints_list->mutable_s(i)) =
             strings::StrCat(kColocationGroupPrefix, prefix, original);
@@ -1014,7 +1014,7 @@ Status MaybeAddPrefixToColocationConstraints(
 }
 
 Status MaybeUpdateColocationConstraintsWithMap(
-    const std::map<absl::string_view, absl::string_view>& node_name_map,
+    const std::map<abslx::string_view, abslx::string_view>& node_name_map,
     NodeDef* node_def) {
   auto attr = node_def->mutable_attr()->find(kColocationAttrName);
   if (attr == node_def->mutable_attr()->end()) {
@@ -1024,7 +1024,7 @@ Status MaybeUpdateColocationConstraintsWithMap(
   auto constraints_size = constraints_list->s_size();
   for (size_t i = 0; i < constraints_size; ++i) {
     StringPiece original(constraints_list->s(i));
-    if (absl::ConsumePrefix(&original, kColocationGroupPrefixStringPiece)) {
+    if (abslx::ConsumePrefix(&original, kColocationGroupPrefixStringPiece)) {
       if (node_name_map.find(original) != node_name_map.end()) {
         (*constraints_list->mutable_s(i)) =
             strings::StrCat(kColocationGroupPrefix, node_name_map.at(original));

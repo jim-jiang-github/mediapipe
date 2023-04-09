@@ -852,7 +852,7 @@ std::string ExpectedString(const char* type) {
   }
 }
 )str";
-  return absl::StrFormat(format_str, type, type);
+  return abslx::StrFormat(format_str, type, type);
 }
 
 #define TEST_KERNEL_TYPE_CONSTRAINT(tf_type, dtype)                          \

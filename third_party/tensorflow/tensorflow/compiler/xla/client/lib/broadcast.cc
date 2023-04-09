@@ -26,10 +26,10 @@ limitations under the License.
 namespace xla {
 
 StatusOr<XlaOp> BroadcastTo(XlaOp input,
-                            absl::Span<int64_t const> output_dims) {
+                            abslx::Span<int64_t const> output_dims) {
   XlaBuilder* builder = input.builder();
   TF_ASSIGN_OR_RETURN(Shape input_shape, builder->GetShape(input));
-  absl::Span<int64_t const> input_dims = input_shape.dimensions();
+  abslx::Span<int64_t const> input_dims = input_shape.dimensions();
 
   if (input_dims == output_dims) {
     return input;
@@ -39,7 +39,7 @@ StatusOr<XlaOp> BroadcastTo(XlaOp input,
     return tensorflow::errors::InvalidArgument(
         "Input shape (", ShapeUtil::HumanString(input_shape),
         ") must have rank less than or equal to the output shape [",
-        absl::StrJoin(output_dims, ","), "]");
+        abslx::StrJoin(output_dims, ","), "]");
   }
 
   std::vector<int64_t> broadcast_dims;
@@ -53,7 +53,7 @@ StatusOr<XlaOp> BroadcastTo(XlaOp input,
         return tensorflow::errors::InvalidArgument(
             "Invalid shape broadcast from ",
             ShapeUtil::HumanString(input_shape), " to [",
-            absl::StrJoin(output_dims, ","), "]");
+            abslx::StrJoin(output_dims, ","), "]");
       }
 
       broadcast_dims.push_back(broadcast_shape.size());
@@ -73,12 +73,12 @@ StatusOr<XlaOp> BroadcastTo(XlaOp input,
   }
   TF_RET_CHECK(input_it == input_dims.rend());
 
-  absl::c_reverse(broadcast_dims);
+  abslx::c_reverse(broadcast_dims);
   int broadcast_shape_size = broadcast_shape.size();
   for (int64_t& broadcast_dim : broadcast_dims) {
     broadcast_dim = broadcast_shape_size - broadcast_dim - 1;
   }
-  absl::c_reverse(broadcast_shape);
+  abslx::c_reverse(broadcast_shape);
   XlaOp output = BroadcastInDim(input, broadcast_shape, broadcast_dims);
   if (broadcast_shape != output_dims) {
     output = Reshape(output, output_dims);

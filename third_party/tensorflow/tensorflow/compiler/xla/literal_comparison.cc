@@ -27,15 +27,15 @@ limitations under the License.
 #include "tensorflow/compiler/xla/util.h"
 #include "tensorflow/core/platform/env.h"
 
-using absl::StrAppend;
-using absl::StrAppendFormat;
-using absl::StrCat;
+using abslx::StrAppend;
+using abslx::StrAppendFormat;
+using abslx::StrCat;
 
 namespace xla {
 namespace literal_comparison {
 namespace {
 
-// Since Eigen::half doesn't satisfy the absl::bit_cast contract, we need to be
+// Since Eigen::half doesn't satisfy the abslx::bit_cast contract, we need to be
 // able to transparently access the raw 16-bit value contained within.
 template <typename T>
 T GetRawValue(T val) {
@@ -50,9 +50,9 @@ uint16_t GetRawValue(Eigen::half val) {
 // -- on miscompare, a nice error message is given in the AssertionFailure.
 template <typename FloatT, typename UnsignedT>
 bool CompareFloatsBitwiseEqual(FloatT lhs, FloatT rhs,
-                               absl::Span<const int64_t> multi_index) {
-  auto ulhs = absl::bit_cast<UnsignedT>(GetRawValue(lhs));
-  auto urhs = absl::bit_cast<UnsignedT>(GetRawValue(rhs));
+                               abslx::Span<const int64_t> multi_index) {
+  auto ulhs = abslx::bit_cast<UnsignedT>(GetRawValue(lhs));
+  auto urhs = abslx::bit_cast<UnsignedT>(GetRawValue(rhs));
   return ulhs == urhs;
 }
 
@@ -61,7 +61,7 @@ bool CompareFloatsBitwiseEqual(FloatT lhs, FloatT rhs,
 // default gunit implementation).
 template <typename NativeT>
 bool CompareEqual(NativeT lhs, NativeT rhs,
-                  absl::Span<const int64_t> multi_index) {
+                  abslx::Span<const int64_t> multi_index) {
   return lhs == rhs;
 }
 
@@ -69,56 +69,56 @@ bool CompareEqual(NativeT lhs, NativeT rhs,
 // comparison is requested.
 template <>
 bool CompareEqual<bfloat16>(bfloat16 lhs, bfloat16 rhs,
-                            absl::Span<const int64_t> multi_index) {
+                            abslx::Span<const int64_t> multi_index) {
   return CompareFloatsBitwiseEqual<bfloat16, uint16_t>(lhs, rhs, multi_index);
 }
 template <>
 bool CompareEqual<Eigen::half>(Eigen::half lhs, Eigen::half rhs,
-                               absl::Span<const int64_t> multi_index) {
+                               abslx::Span<const int64_t> multi_index) {
   return CompareFloatsBitwiseEqual<Eigen::half, uint16_t>(lhs, rhs,
                                                           multi_index);
 }
 template <>
 bool CompareEqual<float>(float lhs, float rhs,
-                         absl::Span<const int64_t> multi_index) {
+                         abslx::Span<const int64_t> multi_index) {
   return CompareFloatsBitwiseEqual<float, uint32_t>(lhs, rhs, multi_index);
 }
 template <>
 bool CompareEqual<double>(double lhs, double rhs,
-                          absl::Span<const int64_t> multi_index) {
+                          abslx::Span<const int64_t> multi_index) {
   return CompareFloatsBitwiseEqual<double, uint64_t>(lhs, rhs, multi_index);
 }
 template <>
 bool CompareEqual<complex64>(complex64 lhs, complex64 rhs,
-                             absl::Span<const int64_t> multi_index) {
+                             abslx::Span<const int64_t> multi_index) {
   return CompareEqual<float>(lhs.real(), rhs.real(), multi_index) &&
          CompareEqual<float>(lhs.imag(), rhs.imag(), multi_index);
 }
 template <>
 bool CompareEqual<complex128>(complex128 lhs, complex128 rhs,
-                              absl::Span<const int64_t> multi_index) {
+                              abslx::Span<const int64_t> multi_index) {
   return CompareEqual<double>(lhs.real(), rhs.real(), multi_index) &&
          CompareEqual<double>(lhs.imag(), rhs.imag(), multi_index);
 }
 
 template <typename NativeT, typename UnsignedT>
 Status MakeBitwiseErrorStatus(NativeT lhs, NativeT rhs,
-                              absl::Span<const int64_t> multi_index) {
-  auto ulhs = absl::bit_cast<UnsignedT>(GetRawValue(lhs));
-  auto urhs = absl::bit_cast<UnsignedT>(GetRawValue(rhs));
+                              abslx::Span<const int64_t> multi_index) {
+  auto ulhs = abslx::bit_cast<UnsignedT>(GetRawValue(lhs));
+  auto urhs = abslx::bit_cast<UnsignedT>(GetRawValue(rhs));
   auto lhs_double = static_cast<double>(lhs);
   auto rhs_double = static_cast<double>(rhs);
   return InvalidArgument(
       "floating values are not bitwise-equal; and equality testing "
       "was requested: %s=%s=%a vs %s=%s=%a at array index %s",
-      StrCat(absl::Hex(ulhs)), RoundTripFpToString(lhs), lhs_double,
-      StrCat(absl::Hex(urhs)), RoundTripFpToString(rhs), rhs_double,
+      StrCat(abslx::Hex(ulhs)), RoundTripFpToString(lhs), lhs_double,
+      StrCat(abslx::Hex(urhs)), RoundTripFpToString(rhs), rhs_double,
       LiteralUtil::MultiIndexAsString(multi_index));
 }
 
 template <typename NativeT>
 Status MakeErrorStatus(NativeT lhs, NativeT rhs,
-                       absl::Span<const int64_t> multi_index) {
+                       abslx::Span<const int64_t> multi_index) {
   return InvalidArgument(
       "first mismatch at array index %s:\n  expected value: %s\n  actual "
       "value:   %s",
@@ -127,27 +127,27 @@ Status MakeErrorStatus(NativeT lhs, NativeT rhs,
 
 template <>
 Status MakeErrorStatus(bfloat16 lhs, bfloat16 rhs,
-                       absl::Span<const int64_t> multi_index) {
+                       abslx::Span<const int64_t> multi_index) {
   return MakeBitwiseErrorStatus<bfloat16, uint16_t>(lhs, rhs, multi_index);
 }
 template <>
 Status MakeErrorStatus(Eigen::half lhs, Eigen::half rhs,
-                       absl::Span<const int64_t> multi_index) {
+                       abslx::Span<const int64_t> multi_index) {
   return MakeBitwiseErrorStatus<Eigen::half, uint16_t>(lhs, rhs, multi_index);
 }
 template <>
 Status MakeErrorStatus(float lhs, float rhs,
-                       absl::Span<const int64_t> multi_index) {
+                       abslx::Span<const int64_t> multi_index) {
   return MakeBitwiseErrorStatus<float, uint32_t>(lhs, rhs, multi_index);
 }
 template <>
 Status MakeErrorStatus(double lhs, double rhs,
-                       absl::Span<const int64_t> multi_index) {
+                       abslx::Span<const int64_t> multi_index) {
   return MakeBitwiseErrorStatus<double, uint64_t>(lhs, rhs, multi_index);
 }
 template <>
 Status MakeErrorStatus(complex64 lhs, complex64 rhs,
-                       absl::Span<const int64_t> multi_index) {
+                       abslx::Span<const int64_t> multi_index) {
   if (!CompareEqual<float>(lhs.real(), rhs.real(), multi_index)) {
     return MakeErrorStatus(lhs.real(), rhs.real(), multi_index);
   }
@@ -155,7 +155,7 @@ Status MakeErrorStatus(complex64 lhs, complex64 rhs,
 }
 template <>
 Status MakeErrorStatus(complex128 lhs, complex128 rhs,
-                       absl::Span<const int64_t> multi_index) {
+                       abslx::Span<const int64_t> multi_index) {
   if (!CompareEqual<double>(lhs.real(), rhs.real(), multi_index)) {
     return MakeErrorStatus(lhs.real(), rhs.real(), multi_index);
   }
@@ -172,7 +172,7 @@ Status MakeErrorStatus(complex128 lhs, complex128 rhs,
 //      found between expected and actual.
 template <typename NativeT>
 Status Equal(LiteralSlice expected, LiteralSlice actual,
-             absl::Span<int64_t> multi_index, int64_t dimension,
+             abslx::Span<int64_t> multi_index, int64_t dimension,
              Literal* mismatched = nullptr) {
   if (dimension == expected.shape().dimensions_size()) {
     NativeT expected_value = expected.Get<NativeT>(multi_index);
@@ -231,28 +231,28 @@ bool IsNan(NativeT value) {
 
 // Converts the given floating-point value to a string.
 std::string FpValueToString(bfloat16 value) {
-  return absl::StrFormat("%10.4g", static_cast<double>(value));
+  return abslx::StrFormat("%10.4g", static_cast<double>(value));
 }
 
 std::string FpValueToString(half value) {
-  return absl::StrFormat("%11.5g", static_cast<double>(value));
+  return abslx::StrFormat("%11.5g", static_cast<double>(value));
 }
 
 std::string FpValueToString(float value) {
-  return absl::StrFormat("%15.9g", static_cast<double>(value));
+  return abslx::StrFormat("%15.9g", static_cast<double>(value));
 }
 
 std::string FpValueToString(double value) {
-  return absl::StrFormat("%24.17g", value);
+  return abslx::StrFormat("%24.17g", value);
 }
 
 std::string FpValueToString(complex64 value) {
-  return absl::StrCat(FpValueToString(value.real()), " + ",
+  return abslx::StrCat(FpValueToString(value.real()), " + ",
                       FpValueToString(value.imag()));
 }
 
 std::string FpValueToString(complex128 value) {
-  return absl::StrCat(FpValueToString(value.real()), " + ",
+  return abslx::StrCat(FpValueToString(value.real()), " + ",
                       FpValueToString(value.imag()));
 }
 
@@ -308,7 +308,7 @@ class NearComparator {
     }
 
     std::string ToString(const Shape& shape) const {
-      return absl::StrFormat(
+      return abslx::StrFormat(
           "actual %s, expected %s, index %s, rel error %8.3g, abs error %8.3g",
           FpValueToString(actual), FpValueToString(expected),
           LiteralUtil::MultiIndexAsString(
@@ -379,7 +379,7 @@ class NearComparator {
   }
 
   // Insert the given error into the given error bucket vector.
-  void UpdateErrorBucket(double error, absl::Span<int64_t> error_buckets) {
+  void UpdateErrorBucket(double error, abslx::Span<int64_t> error_buckets) {
     CHECK_EQ(error_buckets.size(), kErrorBucketBounds.size());
     for (int i = 0; i < error_buckets.size(); ++i) {
       if (error >= kErrorBucketBounds[i]) {
@@ -450,11 +450,11 @@ class NearComparator {
     // bound is exceeded and vice versa.
     if (is_abs_mismatch) {
       num_abs_mismatches_++;
-      UpdateErrorBucket(rel_error, absl::MakeSpan(rel_error_buckets_));
+      UpdateErrorBucket(rel_error, abslx::MakeSpan(rel_error_buckets_));
     }
     if (is_rel_mismatch) {
       num_rel_mismatches_++;
-      UpdateErrorBucket(abs_error, absl::MakeSpan(abs_error_buckets_));
+      UpdateErrorBucket(abs_error, abslx::MakeSpan(abs_error_buckets_));
     }
 
     UpdateAbsValueBucket(actual, is_mismatch);
@@ -513,8 +513,8 @@ class NearComparator {
     // Fast path optimization for the case were layouts match.
     if (LayoutUtil::Equal(actual_.shape().layout(),
                           expected_.shape().layout())) {
-      absl::Span<const NativeT> expected_data = expected_.data<NativeT>();
-      absl::Span<const NativeT> actual_data = actual_.data<NativeT>();
+      abslx::Span<const NativeT> expected_data = expected_.data<NativeT>();
+      abslx::Span<const NativeT> actual_data = actual_.data<NativeT>();
       const int64_t len = expected_data.size();
       for (int64_t i = 0; i < len; ++i) {
         CompareValues(expected_data[i], actual_data[i], i);
@@ -551,7 +551,7 @@ class NearComparator {
 
     auto percent_string = [](float a, float b) {
       float pct = b == 0.0 ? 0.0 : 100.0 * a / b;
-      return absl::StrFormat("%0.4f%%", pct);
+      return abslx::StrFormat("%0.4f%%", pct);
     };
 
     StrAppendFormat(
@@ -581,7 +581,7 @@ class NearComparator {
       const int64_t bucket_mismatches = abs_value_buckets_[i].second;
       std::string mismatch_str =
           bucket_mismatches > 0
-              ? absl::StrFormat(", mismatches %d", bucket_mismatches)
+              ? abslx::StrFormat(", mismatches %d", bucket_mismatches)
               : "";
       StrAppendFormat(&out, "  %-6g <= x < %-6g : %7d (%9s)%s\n",
                       kAbsValueBucketBounds[i], kAbsValueBucketBounds[i + 1],
@@ -590,7 +590,7 @@ class NearComparator {
     }
 
     auto print_accum_buckets = [&](const std::string& header, int64_t total,
-                                   absl::Span<const int64_t> buckets) {
+                                   abslx::Span<const int64_t> buckets) {
       StrAppend(&out, header, ":\n");
       StrAppendFormat(&out, "  <  %-6g : %7d (%s)\n", kErrorBucketBounds[0],
                       total - buckets[0],
@@ -703,7 +703,7 @@ Status EqualHelper(const LiteralSlice& expected, const LiteralSlice& actual,
     }
   } else {
     std::vector<int64_t> multi_index(expected.shape().dimensions_size(), 0);
-    auto index = absl::MakeSpan(multi_index);
+    auto index = abslx::MakeSpan(multi_index);
 
     Shape unequal_shape = ShapeUtil::MakeShape(PrimitiveType::PRED,
                                                expected.shape().dimensions());

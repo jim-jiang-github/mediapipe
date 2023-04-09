@@ -161,7 +161,7 @@ class CoordinationServiceAgent {
   //   - errors::DeadlineExceeded: timed out waiting for key.
   virtual StatusOr<std::string> GetKeyValue(const std::string& key) = 0;
   virtual StatusOr<std::string> GetKeyValue(const std::string& key,
-                                            absl::Duration timeout) = 0;
+                                            abslx::Duration timeout) = 0;
   // Note: Cancel the underlying RPC call with `call_opts->StartCancel()` and
   // `call_opts->ClearCancelCallback()`.
   virtual std::shared_ptr<CallOptions> GetKeyValueAsync(
@@ -236,11 +236,11 @@ class CoordinationServiceAgent {
   //   - FailedPrecondition: Agent is in UNINITIALIZED or ERROR state. Or the
   //       same barrier_id was already used previously.
   virtual Status WaitAtBarrier(const std::string& barrier_id,
-                               absl::Duration timeout,
+                               abslx::Duration timeout,
                                const std::vector<CoordinatedTask>& tasks) = 0;
 
   virtual void WaitAtBarrierAsync(const std::string& barrier_id,
-                                  absl::Duration timeout,
+                                  abslx::Duration timeout,
                                   const std::vector<CoordinatedTask>& tasks,
                                   StatusCallback done) = 0;
 

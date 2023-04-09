@@ -40,16 +40,16 @@ class VectorStringToTensorCalculatorTest : public ::testing::Test {
         VectorStringToTensorCalculatorOptions::ext);
     options->set_input_size(input_size);
     options->set_transpose(transpose);
-    runner_ = ::absl::make_unique<CalculatorRunner>(config);
+    runner_ = ::abslx::make_unique<CalculatorRunner>(config);
   }
 
   void TestConvertFromVectoVectorString(const bool transpose) {
     SetUpRunner(VectorStringToTensorCalculatorOptions::INPUT_2D, transpose);
-    auto input = ::absl::make_unique<std::vector<std::vector<std::string>>>(
+    auto input = ::abslx::make_unique<std::vector<std::vector<std::string>>>(
         2, std::vector<std::string>(2));
     for (int i = 0; i < 2; ++i) {
       for (int j = 0; j < 2; ++j) {
-        input->at(i).at(j) = absl::StrCat(i, j);
+        input->at(i).at(j) = abslx::StrCat(i, j);
       }
     }
 
@@ -72,9 +72,9 @@ class VectorStringToTensorCalculatorTest : public ::testing::Test {
     for (int i = 0; i < 2; ++i) {
       for (int j = 0; j < 2; ++j) {
         if (!transpose) {
-          EXPECT_EQ(absl::StrCat(i, j), matrix(i, j));
+          EXPECT_EQ(abslx::StrCat(i, j), matrix(i, j));
         } else {
-          EXPECT_EQ(absl::StrCat(j, i), matrix(i, j));
+          EXPECT_EQ(abslx::StrCat(j, i), matrix(i, j));
         }
       }
     }
@@ -85,9 +85,9 @@ class VectorStringToTensorCalculatorTest : public ::testing::Test {
 
 TEST_F(VectorStringToTensorCalculatorTest, ConvertsFromVectorString) {
   SetUpRunner(VectorStringToTensorCalculatorOptions::INPUT_1D, false);
-  auto input = ::absl::make_unique<std::vector<std::string>>(5);
+  auto input = ::abslx::make_unique<std::vector<std::string>>(5);
   for (int i = 0; i < 5; ++i) {
-    input->at(i) = absl::StrCat(i);
+    input->at(i) = abslx::StrCat(i);
   }
   const int64 time = 1234;
   runner_->MutableInputs()->Index(0).packets.push_back(
@@ -106,7 +106,7 @@ TEST_F(VectorStringToTensorCalculatorTest, ConvertsFromVectorString) {
   const auto vec = output_tensor.vec<tf::tstring>();
 
   for (int i = 0; i < 5; ++i) {
-    EXPECT_EQ(absl::StrCat(i), vec(i));
+    EXPECT_EQ(abslx::StrCat(i), vec(i));
   }
 }
 

@@ -114,10 +114,10 @@ class InferenceCalculator : public NodeIntf {
   using TfLiteDelegatePtr =
       std::unique_ptr<TfLiteDelegate, std::function<void(TfLiteDelegate*)>>;
 
-  static absl::StatusOr<Packet<TfLiteModelPtr>> GetModelAsPacket(
+  static abslx::StatusOr<Packet<TfLiteModelPtr>> GetModelAsPacket(
       CalculatorContext* cc);
 
-  static absl::StatusOr<Packet<tflite::OpResolver>> GetOpResolverAsPacket(
+  static abslx::StatusOr<Packet<tflite::OpResolver>> GetOpResolverAsPacket(
       CalculatorContext* cc);
 };
 

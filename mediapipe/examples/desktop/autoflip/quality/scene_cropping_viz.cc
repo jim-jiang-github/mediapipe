@@ -46,7 +46,7 @@ const cv::Scalar kOrange =
     cv::Scalar(255.0, 165.0, 0.0);  // ica object detector
 const cv::Scalar kWhite = cv::Scalar(255.0, 255.0, 255.0);  // others
 
-absl::Status DrawDetectionsAndCropRegions(
+abslx::Status DrawDetectionsAndCropRegions(
     const std::vector<cv::Mat>& scene_frames,
     const std::vector<bool>& is_key_frames,
     const std::vector<KeyFrameInfo>& key_frame_infos,
@@ -70,7 +70,7 @@ absl::Status DrawDetectionsAndCropRegions(
   int key_frame_idx = 0;
   for (int i = 0; i < num_frames; ++i) {
     const auto& scene_frame = scene_frames[i];
-    auto viz_frame = absl::make_unique<ImageFrame>(
+    auto viz_frame = abslx::make_unique<ImageFrame>(
         image_format, scene_frame.cols, scene_frame.rows);
     cv::Mat viz_mat = formats::MatView(viz_frame.get());
     scene_frame.copyTo(viz_mat);
@@ -130,7 +130,7 @@ absl::Status DrawDetectionsAndCropRegions(
     }
     viz_frames->push_back(std::move(viz_frame));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 namespace {
@@ -147,14 +147,14 @@ cv::Rect LimitBounds(const cv::Rect& rect, const int max_width,
 }
 }  // namespace
 
-absl::Status DrawDetectionAndFramingWindow(
+abslx::Status DrawDetectionAndFramingWindow(
     const std::vector<cv::Mat>& org_scene_frames,
     const std::vector<cv::Rect>& crop_from_locations,
     const ImageFormat::Format image_format, const float overlay_opacity,
     std::vector<std::unique_ptr<ImageFrame>>* viz_frames) {
   for (int i = 0; i < org_scene_frames.size(); i++) {
     const auto& scene_frame = org_scene_frames[i];
-    auto viz_frame = absl::make_unique<ImageFrame>(
+    auto viz_frame = abslx::make_unique<ImageFrame>(
         image_format, scene_frame.cols, scene_frame.rows);
     cv::Mat darkened = formats::MatView(viz_frame.get());
     scene_frame.copyTo(darkened);
@@ -166,10 +166,10 @@ absl::Status DrawDetectionAndFramingWindow(
     scene_frame(crop_from_bounded).copyTo(darkened(crop_from_bounded));
     viz_frames->push_back(std::move(viz_frame));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status DrawFocusPointAndCropWindow(
+abslx::Status DrawFocusPointAndCropWindow(
     const std::vector<cv::Mat>& scene_frames,
     const std::vector<FocusPointFrame>& focus_point_frames,
     const float overlay_opacity, const int crop_window_width,
@@ -185,7 +185,7 @@ absl::Status DrawFocusPointAndCropWindow(
 
   for (int i = 0; i < num_frames; ++i) {
     const auto& scene_frame = scene_frames[i];
-    auto viz_frame = absl::make_unique<ImageFrame>(
+    auto viz_frame = abslx::make_unique<ImageFrame>(
         image_format, scene_frame.cols, scene_frame.rows);
     cv::Mat darkened = formats::MatView(viz_frame.get());
     scene_frame.copyTo(darkened);
@@ -215,7 +215,7 @@ absl::Status DrawFocusPointAndCropWindow(
     }
     viz_frames->push_back(std::move(viz_frame));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace autoflip

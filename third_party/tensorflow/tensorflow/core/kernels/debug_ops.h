@@ -402,7 +402,7 @@ class DebugIdentityV2Op : public OpKernel {
     std::vector<string> debug_urls;
     OP_REQUIRES_OK(context, context->GetAttr("debug_urls", &debug_urls));
     for (const string& debug_url : debug_urls) {
-      if (absl::StartsWith(debug_url, DebugIO::kFileURLScheme)) {
+      if (abslx::StartsWith(debug_url, DebugIO::kFileURLScheme)) {
         dump_roots_.emplace_back(
             debug_url.substr(strlen(DebugIO::kFileURLScheme)));
       } else {

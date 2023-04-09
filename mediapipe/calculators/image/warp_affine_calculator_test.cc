@@ -41,7 +41,7 @@
 namespace mediapipe {
 namespace {
 
-cv::Mat GetRgb(absl::string_view path) {
+cv::Mat GetRgb(abslx::string_view path) {
   cv::Mat bgr = cv::imread(file::JoinPath("./", path));
   cv::Mat rgb(bgr.rows, bgr.cols, CV_8UC3);
   int from_to[] = {0, 2, 1, 1, 2, 0};
@@ -49,7 +49,7 @@ cv::Mat GetRgb(absl::string_view path) {
   return rgb;
 }
 
-cv::Mat GetRgba(absl::string_view path) {
+cv::Mat GetRgba(abslx::string_view path) {
   cv::Mat bgr = cv::imread(file::JoinPath("./", path));
   cv::Mat rgba(bgr.rows, bgr.cols, CV_8UC4, cv::Scalar(0, 0, 0, 0));
   int from_to[] = {0, 2, 1, 1, 2, 0};
@@ -63,7 +63,7 @@ void RunTest(const std::string& graph_text, const std::string& tag,
              const cv::Mat& input, cv::Mat expected_result,
              float similarity_threshold, std::array<float, 16> matrix,
              int out_width, int out_height,
-             absl::optional<AffineTransformation::BorderMode> border_mode) {
+             abslx::optional<AffineTransformation::BorderMode> border_mode) {
   std::string border_mode_str;
   if (border_mode) {
     switch (*border_mode) {
@@ -76,7 +76,7 @@ void RunTest(const std::string& graph_text, const std::string& tag,
     }
   }
   auto graph_config = mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(
-      absl::Substitute(graph_text, /*$0=*/border_mode_str));
+      abslx::Substitute(graph_text, /*$0=*/border_mode_str));
 
   std::vector<Packet> output_packets;
   tool::AddVectorSink("output_image", &graph_config, &output_packets);
@@ -132,7 +132,7 @@ struct SimilarityConfig {
 void RunTest(cv::Mat input, cv::Mat expected_result,
              const SimilarityConfig& similarity, std::array<float, 16> matrix,
              int out_width, int out_height,
-             absl::optional<AffineTransformation::BorderMode> border_mode) {
+             abslx::optional<AffineTransformation::BorderMode> border_mode) {
   RunTest(R"(
         input_stream: "input_image"
         input_stream: "output_size"

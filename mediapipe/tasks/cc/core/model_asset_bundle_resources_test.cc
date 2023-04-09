@@ -127,13 +127,13 @@ TEST(ModelAssetBundleResourcesTest, CreateFromInvalidFile) {
       kTestModelBundleResourcesTag, std::move(model_file));
 
   EXPECT_EQ(status_or_model_bundle_resources.status().code(),
-            absl::StatusCode::kNotFound);
+            abslx::StatusCode::kNotFound);
   EXPECT_THAT(status_or_model_bundle_resources.status().message(),
               testing::HasSubstr("Unable to open file"));
   EXPECT_THAT(status_or_model_bundle_resources.status().GetPayload(
                   kMediaPipeTasksPayload),
-              testing::Optional(absl::Cord(
-                  absl::StrCat(MediaPipeTasksStatus::kFileNotFoundError))));
+              testing::Optional(abslx::Cord(
+                  abslx::StrCat(MediaPipeTasksStatus::kFileNotFoundError))));
 }
 
 TEST(ModelAssetBundleResourcesTest, ExtractValidModelBundleFile) {
@@ -199,14 +199,14 @@ TEST(ModelAssetBundleResourcesTest, ExtractInvalidModelFile) {
       ModelAssetBundleResources::Create(kTestModelBundleResourcesTag,
                                         std::move(model_file)));
   auto status = model_bundle_resources->GetModelFile("not_found.task").status();
-  EXPECT_EQ(status.code(), absl::StatusCode::kNotFound);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kNotFound);
   EXPECT_THAT(status.message(),
               testing::HasSubstr(
                   "No model file with name: not_found.task. All model files in "
                   "the model asset bundle are: "));
   EXPECT_THAT(status.GetPayload(kMediaPipeTasksPayload),
-              testing::Optional(absl::Cord(
-                  absl::StrCat(MediaPipeTasksStatus::kFileNotFoundError))));
+              testing::Optional(abslx::Cord(
+                  abslx::StrCat(MediaPipeTasksStatus::kFileNotFoundError))));
 }
 
 TEST(ModelAssetBundleResourcesTest, ListModelFiles) {

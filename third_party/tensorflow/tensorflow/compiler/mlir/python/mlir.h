@@ -49,10 +49,10 @@ std::string ImportFunction(const std::string &functiondef_proto,
 // types of its inputs and the output nodes as parameters to MLIR.
 std::string ImportGraphDef(const std::string &proto,
                            const std::string &pass_pipeline,
-                           bool show_debug_info, absl::string_view(input_names),
-                           absl::string_view(input_data_types),
-                           absl::string_view(input_data_shapes),
-                           absl::string_view(output_names), TF_Status *status);
+                           bool show_debug_info, abslx::string_view(input_names),
+                           abslx::string_view(input_data_types),
+                           abslx::string_view(input_data_shapes),
+                           abslx::string_view(output_names), TF_Status *status);
 
 // Load a SavedModel and return a textual MLIR string corresponding to it.
 //

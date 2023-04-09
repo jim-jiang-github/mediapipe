@@ -75,23 +75,23 @@ class HloLiveRange {
   }
 
   // Returns the map from instruction to the end time of that instruction.
-  const absl::flat_hash_map<const HloInstruction*, LogicalTime>&
+  const abslx::flat_hash_map<const HloInstruction*, LogicalTime>&
   instruction_schedule() const {
     return instruction_schedule_;
   }
 
   // Returns the map from a hlo value to the definition time of that hlo value.
-  const absl::flat_hash_map<const HloValue*, TimeBound>& buffer_live_ranges()
+  const abslx::flat_hash_map<const HloValue*, TimeBound>& buffer_live_ranges()
       const {
     return buffer_live_ranges_;
   }
 
-  absl::flat_hash_map<const HloValue*, TimeBound>& buffer_live_ranges() {
+  abslx::flat_hash_map<const HloValue*, TimeBound>& buffer_live_ranges() {
     return buffer_live_ranges_;
   }
 
   // Returns the map from a computation and its time span in the schedule.
-  const absl::flat_hash_map<const HloComputation*, TimeBound>&
+  const abslx::flat_hash_map<const HloComputation*, TimeBound>&
   computation_span_times() const {
     return computation_span_times_;
   }
@@ -222,10 +222,10 @@ class HloLiveRange {
   bool total_order_scheduled_ = true;
 
   HloInstructionSequence flattened_instruction_sequence_;
-  absl::flat_hash_map<const HloInstruction*, LogicalTime> instruction_schedule_;
-  absl::flat_hash_map<const HloComputation*, TimeBound> computation_span_times_;
-  absl::flat_hash_map<const HloValue*, TimeBound> buffer_live_ranges_;
-  absl::flat_hash_map<const HloComputation*, const HloComputation*>
+  abslx::flat_hash_map<const HloInstruction*, LogicalTime> instruction_schedule_;
+  abslx::flat_hash_map<const HloComputation*, TimeBound> computation_span_times_;
+  abslx::flat_hash_map<const HloValue*, TimeBound> buffer_live_ranges_;
+  abslx::flat_hash_map<const HloComputation*, const HloComputation*>
       computations_in_async_context_;
 };
 

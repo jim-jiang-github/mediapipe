@@ -35,14 +35,14 @@ void GlCalculatorHelper::InitializeInternal(CalculatorContext* cc,
   gl_context_ = gpu_resources_->gl_context(cc);
 }
 
-absl::Status GlCalculatorHelper::Open(CalculatorContext* cc) {
+abslx::Status GlCalculatorHelper::Open(CalculatorContext* cc) {
   CHECK(cc);
   auto gpu_service = cc->Service(kGpuService);
   RET_CHECK(gpu_service.IsAvailable())
       << "GPU service not available. Did you forget to call "
          "GlCalculatorHelper::UpdateContract?";
   InitializeInternal(cc, &gpu_service.GetObject());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void GlCalculatorHelper::InitializeForTest(GpuSharedData* gpu_shared) {
@@ -54,7 +54,7 @@ void GlCalculatorHelper::InitializeForTest(GpuResources* gpu_resources) {
 }
 
 // static
-absl::Status GlCalculatorHelper::UpdateContract(CalculatorContract* cc) {
+abslx::Status GlCalculatorHelper::UpdateContract(CalculatorContract* cc) {
   cc->UseService(kGpuService);
   // Allow the legacy side packet to be provided, too, for backwards
   // compatibility with existing graphs. It will just be ignored.
@@ -63,11 +63,11 @@ absl::Status GlCalculatorHelper::UpdateContract(CalculatorContract* cc) {
   if (id.IsValid()) {
     input_side_packets.Get(id).Set<GpuSharedData*>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // static
-absl::Status GlCalculatorHelper::SetupInputSidePackets(
+abslx::Status GlCalculatorHelper::SetupInputSidePackets(
     PacketTypeSet* input_side_packets) {
   auto cc = LegacyCalculatorSupport::Scoped<CalculatorContract>::current();
   if (cc) {
@@ -84,11 +84,11 @@ absl::Status GlCalculatorHelper::SetupInputSidePackets(
   RET_CHECK(id.IsValid()) << "A " << mediapipe::kGpuSharedTagName
                           << " input side packet is required here.";
   input_side_packets->Get(id).Set<GpuSharedData*>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GlCalculatorHelper::RunInGlContext(
-    std::function<absl::Status(void)> gl_func,
+abslx::Status GlCalculatorHelper::RunInGlContext(
+    std::function<abslx::Status(void)> gl_func,
     CalculatorContext* calculator_context) {
   if (calculator_context) {
     return gl_context_->Run(std::move(gl_func), calculator_context->NodeId(),
@@ -98,9 +98,9 @@ absl::Status GlCalculatorHelper::RunInGlContext(
   }
 }
 
-absl::Status GlCalculatorHelper::RunInGlContext(
-    std::function<absl::Status(void)> gl_func) {
-  if (!Initialized()) return absl::InternalError("helper not initialized");
+abslx::Status GlCalculatorHelper::RunInGlContext(
+    std::function<abslx::Status(void)> gl_func) {
+  if (!Initialized()) return abslx::InternalError("helper not initialized");
   // TODO: Remove LegacyCalculatorSupport from MediaPipe OSS.
   auto calculator_context =
       LegacyCalculatorSupport::Scoped<CalculatorContext>::current();
@@ -183,8 +183,8 @@ GpuBuffer GlCalculatorHelper::GpuBufferCopyingImageFrame(
     const ImageFrame& image_frame) {
 #if MEDIAPIPE_GPU_BUFFER_USE_CV_PIXEL_BUFFER
   auto maybe_buffer = CreateCVPixelBufferCopyingImageFrame(image_frame);
-  // Converts absl::StatusOr to absl::Status since CHECK_OK() currently only
-  // deals with absl::Status in MediaPipe OSS.
+  // Converts abslx::StatusOr to abslx::Status since CHECK_OK() currently only
+  // deals with abslx::Status in MediaPipe OSS.
   CHECK_OK(maybe_buffer.status());
   return GpuBuffer(std::move(maybe_buffer).value());
 #else
@@ -221,7 +221,7 @@ std::unique_ptr<ImageFrame> GlTexture::GetFrame<ImageFrame>() const {
   view_->DoneWriting();
   std::shared_ptr<const ImageFrame> view =
       gpu_buffer_.GetReadView<ImageFrame>();
-  auto copy = absl::make_unique<ImageFrame>();
+  auto copy = abslx::make_unique<ImageFrame>();
   copy->CopyFrom(*view, ImageFrame::kDefaultAlignmentBoundary);
   return copy;
 }
@@ -229,14 +229,14 @@ std::unique_ptr<ImageFrame> GlTexture::GetFrame<ImageFrame>() const {
 template <>
 std::unique_ptr<GpuBuffer> GlTexture::GetFrame<GpuBuffer>() const {
   view_->DoneWriting();
-  return absl::make_unique<GpuBuffer>(gpu_buffer_);
+  return abslx::make_unique<GpuBuffer>(gpu_buffer_);
 }
 
 template <>
 std::unique_ptr<mediapipe::Image> GlTexture::GetFrame<mediapipe::Image>()
     const {
   std::unique_ptr<GpuBuffer> buf = GetFrame<GpuBuffer>();
-  auto output = absl::make_unique<mediapipe::Image>(*buf);
+  auto output = abslx::make_unique<mediapipe::Image>(*buf);
   return output;
 }
 

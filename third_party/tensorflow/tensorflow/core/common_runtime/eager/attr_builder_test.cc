@@ -88,9 +88,9 @@ TEST(AttrTypeMap, CacheKey) {
 string ToString(const AttrValueMap& m) {
   std::vector<string> strs;
   for (const auto& e : m) {
-    strs.push_back(absl::StrCat(e.first, " -> ", e.second.DebugString()));
+    strs.push_back(abslx::StrCat(e.first, " -> ", e.second.DebugString()));
   }
-  return absl::StrJoin(strs, "\n");
+  return abslx::StrJoin(strs, "\n");
 }
 
 TEST(AttrBuilder, FillAttrValueMapWithoutDefaults_MatMul) {
@@ -133,7 +133,7 @@ TEST(AttrBuilder, GetTypeAndNumber) {
 TEST(AttrBuilder, GetTypeList) {
   AttrBuilder a("IdentityN");
   a.Set("T", gtl::ArraySlice<DataType>({DT_FLOAT, DT_INT64}));
-  absl::InlinedVector<DataType, 4> type_list;
+  abslx::InlinedVector<DataType, 4> type_list;
   Status s = a.GetTypeList("T", &type_list);
   ASSERT_TRUE(s.ok()) << s;
   ASSERT_EQ(2, type_list.size()) << type_list.size();

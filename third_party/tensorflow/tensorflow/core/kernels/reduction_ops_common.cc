@@ -151,9 +151,9 @@ Status ReductionHelper::Simplify(const Tensor& data, const Tensor& axis,
     }
   }
 
-  VLOG(1) << "data reshape: " << absl::StrJoin(data_reshape_, ",");
-  VLOG(1) << "out  reshape: " << absl::StrJoin(out_reshape_, ",");
-  VLOG(1) << "out    shape: " << absl::StrJoin(out_shape_, ",");
+  VLOG(1) << "data reshape: " << abslx::StrJoin(data_reshape_, ",");
+  VLOG(1) << "out  reshape: " << abslx::StrJoin(out_reshape_, ",");
+  VLOG(1) << "out    shape: " << abslx::StrJoin(out_shape_, ",");
   return OkStatus();
 }
 

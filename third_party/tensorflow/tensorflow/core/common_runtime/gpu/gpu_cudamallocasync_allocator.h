@@ -79,7 +79,7 @@ class GpuCudaMallocAsyncAllocator : public Allocator {
 
   size_t AllocatedSize(const void* ptr) const override;
 
-  absl::optional<AllocatorStats> GetStats() override;
+  abslx::optional<AllocatorStats> GetStats() override;
 
   bool ClearStats() override;
 
@@ -128,7 +128,7 @@ class GpuCudaMallocAsyncAllocator : public Allocator {
   // Structures mutable after construction
   mutable mutex lock_;
   std::unique_ptr<AllocatorStats> stats_ TF_PT_GUARDED_BY(lock_);
-  absl::flat_hash_map<const void*, size_t> size_map_ TF_GUARDED_BY(lock_);
+  abslx::flat_hash_map<const void*, size_t> size_map_ TF_GUARDED_BY(lock_);
 };
 
 }  // namespace tensorflow

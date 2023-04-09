@@ -25,7 +25,7 @@ namespace stream_executor {
 namespace internal {
 
 void TemporaryMemoryManager::ForceDeallocateAll() {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   VLOG(1) << "force-deallocating " << records_.size() << " remaining records";
   for (auto it = records_.begin(); it != records_.end(); ++it) {
     DeviceMemoryBase device_memory = it->first;
@@ -36,7 +36,7 @@ void TemporaryMemoryManager::ForceDeallocateAll() {
 void TemporaryMemoryManager::MarkFinalized(
     const DeviceMemoryBase& device_memory, uint64_t generation,
     bool must_exist) {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   auto it = records_.find(device_memory);
   if (it == records_.end()) {
     if (must_exist) {
@@ -49,7 +49,7 @@ void TemporaryMemoryManager::MarkFinalized(
 }
 
 void TemporaryMemoryManager::DeallocateFinalizedTemporaries() {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   int deallocated_count = 0;
   for (auto it = records_.begin(); it != records_.end();) {
     if (it->second.finalized) {
@@ -66,7 +66,7 @@ void TemporaryMemoryManager::DeallocateFinalizedTemporaries() {
 
 bool TemporaryMemoryManager::IsFinalized(const DeviceMemoryBase& device_memory,
                                          uint64_t allocation_generation) const {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   auto it = records_.find(device_memory);
   if (it == records_.end()) {
     return true;  // If there's no record present it's vacuously finalized.
@@ -82,7 +82,7 @@ bool TemporaryMemoryManager::IsFinalized(const DeviceMemoryBase& device_memory,
 
 bool TemporaryMemoryManager::HasAllocated(const DeviceMemoryBase& device_memory,
                                           uint64_t generation) const {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   auto it = records_.find(device_memory);
   if (it == records_.end()) {
     return false;
@@ -98,7 +98,7 @@ TemporaryMemoryManager::AllocateArrayBase(uint64_t element_count,
       stream_->parent()->AllocateArray<uint8>(byte_size);
   if (device_memory == nullptr) {
     return port::Status(port::error::RESOURCE_EXHAUSTED,
-                        absl::StrCat("could not allocate temporary memory of ",
+                        abslx::StrCat("could not allocate temporary memory of ",
                                      byte_size, " bytes"));
   }
 
@@ -107,14 +107,14 @@ TemporaryMemoryManager::AllocateArrayBase(uint64_t element_count,
   // Add the record before instantiating the device memory instance so we can
   // check the allocation invariant at TemporaryDeviceMemory construction time.
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     generation = ++generation_;
     DCHECK(records_.find(device_memory) == records_.end());
     records_[device_memory] = {generation,
                                /*finalized=*/false};
   }
 
-  VLOG(1) << absl::StreamFormat(
+  VLOG(1) << abslx::StreamFormat(
       "stream %p allocated temporary device memory at %p (size %u) in "
       "generation %u",
       stream_, device_memory.opaque(), byte_size, generation);

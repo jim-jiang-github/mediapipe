@@ -79,7 +79,7 @@ class ForLoop {
   // `unroll_mode` specifies the desired LLVM unrolling behavior for generated
   //  loop.
   static std::unique_ptr<ForLoop> EmitForLoop(
-      absl::string_view prefix, llvm::Value* start_index,
+      abslx::string_view prefix, llvm::Value* start_index,
       llvm::Value* end_index, llvm::Value* step, llvm::IRBuilder<>* b,
       UnrollMode unroll_mode = llvm_ir::UnrollMode::kDefaultUnroll,
       bool prevent_vectorization = false);
@@ -134,18 +134,18 @@ class ForLoop {
   // Allow ForLoopNest to call this private constructor.
   friend class ForLoopNest;
 
-  ForLoop(absl::string_view prefix, absl::string_view suffix,
+  ForLoop(abslx::string_view prefix, abslx::string_view suffix,
           llvm::Value* start_index, llvm::Value* end_index, llvm::Value* step,
           UnrollMode unroll_mode, bool prevent_vectorization);
 
   // Emit the loop at the insert point of the builder.
   void Emit(llvm::IRBuilder<>* b);
 
-  llvm::BasicBlock* CreateLoopBB(absl::string_view name, llvm::IRBuilder<>* b);
+  llvm::BasicBlock* CreateLoopBB(abslx::string_view name, llvm::IRBuilder<>* b);
 
   // Creates a name for an LLVM construct, appending prefix_ and suffix_, if
   // they are set.
-  std::string GetQualifiedName(absl::string_view name);
+  std::string GetQualifiedName(abslx::string_view name);
 
   // Return a list of metadata nodes that should be associated with the
   // llvm::Loop for this `ForLoop`.
@@ -175,7 +175,7 @@ class ForLoop {
 // A simple class for constructing nested for-loops.
 class ForLoopNest {
  public:
-  ForLoopNest(absl::string_view name, llvm::IRBuilder<>* b,
+  ForLoopNest(abslx::string_view name, llvm::IRBuilder<>* b,
               llvm::Type* index_ty = nullptr)
       : name_(name),
         outer_loop_preheader_bb_(nullptr),
@@ -192,14 +192,14 @@ class ForLoopNest {
   // been added then emit loop inside the body of the last added loop.
   // unroll_mode is used to emit metadata that controls LLVM unrolling.
   std::unique_ptr<ForLoop> AddLoop(
-      absl::string_view suffix, llvm::Value* start_index,
+      abslx::string_view suffix, llvm::Value* start_index,
       llvm::Value* end_index, llvm::Value* stride,
       UnrollMode unroll_mode = xla::llvm_ir::UnrollMode::kDefaultUnroll,
       bool prevent_vectorization = false);
 
   // Like the above, except that it defaults to a stride of one.
   std::unique_ptr<ForLoop> AddLoop(
-      absl::string_view suffix, llvm::Value* start_index,
+      abslx::string_view suffix, llvm::Value* start_index,
       llvm::Value* end_index,
       UnrollMode unroll_mode = xla::llvm_ir::UnrollMode::kDefaultUnroll,
       bool prevent_vectorization = false);
@@ -208,13 +208,13 @@ class ForLoopNest {
   // end index are constant.
   std::unique_ptr<ForLoop> AddLoop(
       int64_t start_index, int64_t end_index, int64_t stride,
-      absl::string_view suffix,
+      abslx::string_view suffix,
       UnrollMode unroll_mode = xla::llvm_ir::UnrollMode::kDefaultUnroll,
       bool prevent_vectorization = false);
 
   // Like the above, except that it defaults to a stride of one.
   std::unique_ptr<ForLoop> AddLoop(
-      int64_t start_index, int64_t end_index, absl::string_view suffix,
+      int64_t start_index, int64_t end_index, abslx::string_view suffix,
       UnrollMode unroll_mode = xla::llvm_ir::UnrollMode::kDefaultUnroll,
       bool prevent_vectorization = false);
 
@@ -229,7 +229,7 @@ class ForLoopNest {
   // within the shape. One possible order for that sequence would be:
   //
   //   (0,0), (0,1), (0,2), (1,0), (1,1), (1,2)
-  IrArray::Index AddLoopsForShape(const Shape& shape, absl::string_view suffix);
+  IrArray::Index AddLoopsForShape(const Shape& shape, abslx::string_view suffix);
 
   // Add a loop for each dimension in "dimensions". "suffix" is the
   // name suffix of the indvar and basic blocks in this new loop nest.
@@ -238,8 +238,8 @@ class ForLoopNest {
   // size equals the rank of shape and there is a null for each
   // dimension that is not in "dimensions".
   std::vector<llvm::Value*> AddLoopsForShapeOnDimensions(
-      const Shape& shape, absl::Span<const int64_t> dimensions,
-      absl::string_view suffix);
+      const Shape& shape, abslx::Span<const int64_t> dimensions,
+      abslx::string_view suffix);
 
   // Emits a series of nested loops for iterating over an operand array. Loops
   // are constructed in major to minor dimension layout order. No loop is
@@ -250,7 +250,7 @@ class ForLoopNest {
   // basic blocks) constructed by this method.
   std::vector<llvm::Value*> EmitOperandArrayLoopNest(
       const llvm_ir::IrArray& operand_array, int64_t dimension_to_skip,
-      absl::string_view name_suffix);
+      abslx::string_view name_suffix);
 
   // Convenience methods which return particular basic blocks of the outermost
   // or innermost loops. These methods return nullptr if no loops have been

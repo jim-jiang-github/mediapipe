@@ -45,7 +45,7 @@ Rectangle_i MaskToRectangle(const LocationData& location_data) {
 }
 
 std::unique_ptr<cv::Mat> MaskToMat(const LocationData::BinaryMask& mask) {
-  auto image = absl::make_unique<cv::Mat>();
+  auto image = abslx::make_unique<cv::Mat>();
   *image = cv::Mat::zeros(cv::Size(mask.width(), mask.height()), CV_32FC1);
   for (const auto& interval : mask.rasterization().interval()) {
     for (int x = interval.left_x(); x <= interval.right_x(); ++x) {
@@ -54,20 +54,20 @@ std::unique_ptr<cv::Mat> MaskToMat(const LocationData::BinaryMask& mask) {
   }
   return image;
 }
-absl::StatusOr<std::unique_ptr<cv::Mat>> RectangleToMat(
+abslx::StatusOr<std::unique_ptr<cv::Mat>> RectangleToMat(
     int image_width, int image_height, const Rectangle_i& rect) {
   // These checks prevent undefined behavior caused when setting memory for
   // rectangles whose edges lie outside image edges.
   if (rect.ymin() < 0 || rect.xmin() < 0 || rect.xmax() > image_width ||
       rect.ymax() > image_height) {
-    return absl::InvalidArgumentError(absl::Substitute(
+    return abslx::InvalidArgumentError(abslx::Substitute(
         "Rectangle must be bounded by image boundaries.\nImage Width: "
         "$0\nImage Height: $1\nRectangle: [($2, $3), ($4, $5)]",
         image_width, image_height, rect.xmin(), rect.ymin(), rect.xmax(),
         rect.ymax()));
   }
   // Allocate image and set pixels of foreground mask.
-  auto image = absl::make_unique<cv::Mat>();
+  auto image = abslx::make_unique<cv::Mat>();
   *image = cv::Mat::zeros(cv::Size(image_width, image_height), CV_32FC1);
   for (int y = rect.ymin(); y < rect.ymax(); ++y) {
     for (int x = rect.xmin(); x < rect.xmax(); ++x) {

@@ -82,11 +82,11 @@ class UnpackMediaSequenceCalculatorTest : public ::testing::Test {
       *config.mutable_options() = *options;
     }
     LOG(INFO) << config.DebugString();
-    runner_ = absl::make_unique<CalculatorRunner>(config);
+    runner_ = abslx::make_unique<CalculatorRunner>(config);
   }
 
   void SetUp() override {
-    sequence_ = absl::make_unique<tf::SequenceExample>();
+    sequence_ = abslx::make_unique<tf::SequenceExample>();
     mpms::SetClipMediaId(video_id_, sequence_.get());
     mpms::SetClipDataPath(data_path_, sequence_.get());
     mpms::SetClipStartTimestamp(start_time_, sequence_.get());
@@ -110,7 +110,7 @@ class UnpackMediaSequenceCalculatorTest : public ::testing::Test {
 
 TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksOneImage) {
   SetUpCalculator({"IMAGE:images"}, {});
-  auto input_sequence = absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
 
@@ -139,7 +139,7 @@ TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksOneImage) {
 
 TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksTwoImages) {
   SetUpCalculator({"IMAGE:images"}, {});
-  auto input_sequence = absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
 
@@ -169,7 +169,7 @@ TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksTwoImages) {
 TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksTwoPrefixedImages) {
   std::string prefix = "PREFIX";
   SetUpCalculator({"IMAGE_PREFIX:images"}, {});
-  auto input_sequence = absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
 
@@ -198,7 +198,7 @@ TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksTwoPrefixedImages) {
 
 TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksOneForwardFlowImage) {
   SetUpCalculator({"FORWARD_FLOW_ENCODED:flow_images"}, {});
-  auto input_sequence = absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = abslx::make_unique<tf::SequenceExample>();
   const std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
 
@@ -226,7 +226,7 @@ TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksOneForwardFlowImage) {
 
 TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksTwoForwardFlowImages) {
   SetUpCalculator({"FORWARD_FLOW_ENCODED:flow_images"}, {});
-  auto input_sequence = absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = abslx::make_unique<tf::SequenceExample>();
   const std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
 
@@ -255,7 +255,7 @@ TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksTwoForwardFlowImages) {
 
 TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksBBoxes) {
   SetUpCalculator({"BBOX:test", "FLOAT_FEATURE_OTHER:other"}, {});
-  auto input_sequence = absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = abslx::make_unique<tf::SequenceExample>();
 
   std::vector<std::vector<Location>> bboxes = {
       {Location::CreateRelativeBBoxLocation(0.1, 0.2, 0.7, 0.7),
@@ -289,7 +289,7 @@ TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksBBoxes) {
 TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksPrefixedBBoxes) {
   std::string prefix = "PREFIX";
   SetUpCalculator({"BBOX_PREFIX:test", "FLOAT_FEATURE_OTHER:other"}, {});
-  auto input_sequence = absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = abslx::make_unique<tf::SequenceExample>();
 
   std::vector<std::vector<Location>> bboxes = {
       {Location::CreateRelativeBBoxLocation(0.1, 0.2, 0.7, 0.7),
@@ -322,7 +322,7 @@ TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksPrefixedBBoxes) {
 
 TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksTwoFloatLists) {
   SetUpCalculator({"FLOAT_FEATURE_TEST:test", "FLOAT_FEATURE_OTHER:other"}, {});
-  auto input_sequence = absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = abslx::make_unique<tf::SequenceExample>();
 
   int num_float_lists = 2;
   for (int i = 0; i < num_float_lists; ++i) {
@@ -362,7 +362,7 @@ TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksTwoFloatLists) {
 
 TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksNonOverlappingTimestamps) {
   SetUpCalculator({"IMAGE:images", "FLOAT_FEATURE_OTHER:other"}, {});
-  auto input_sequence = absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
 
@@ -407,7 +407,7 @@ TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksNonOverlappingTimestamps) {
 TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksTwoPostStreamFloatLists) {
   SetUpCalculator(
       {"FLOAT_FEATURE_FDENSE_AVG:avg", "FLOAT_FEATURE_FDENSE_MAX:max"}, {});
-  auto input_sequence = absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = abslx::make_unique<tf::SequenceExample>();
   mpms::AddFeatureFloats("FDENSE_AVG", {1.0f, 2.0f}, input_sequence.get());
   mpms::AddFeatureTimestamp("FDENSE_AVG", Timestamp::PostStream().Value(),
                             input_sequence.get());
@@ -441,7 +441,7 @@ TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksTwoPostStreamFloatLists) {
 
 TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksImageWithPostStreamFloatList) {
   SetUpCalculator({"IMAGE:images"}, {});
-  auto input_sequence = absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
 
@@ -474,7 +474,7 @@ TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksImageWithPostStreamFloatList) {
 
 TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksPostStreamFloatListWithImage) {
   SetUpCalculator({"FLOAT_FEATURE_FDENSE_MAX:max"}, {});
-  auto input_sequence = absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
 
@@ -510,7 +510,7 @@ TEST_F(UnpackMediaSequenceCalculatorTest, UnpacksPostStreamFloatListAtPre) {
   options.MutableExtension(UnpackMediaSequenceCalculatorOptions::ext)
       ->set_output_poststream_as_prestream(true);
   SetUpCalculator({"FLOAT_FEATURE_FDENSE_MAX:max"}, {}, {}, &options);
-  auto input_sequence = absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
 

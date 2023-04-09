@@ -48,7 +48,7 @@ StatusOr<HloComputation*> WidenComputation(HloComputation* narrow_comp,
     return narrow_comp;
   }
   HloComputation* wide_comp = [&]() {
-    HloComputation::Builder builder(absl::StrCat("wide.", narrow_comp->name()));
+    HloComputation::Builder builder(abslx::StrCat("wide.", narrow_comp->name()));
     builder.AddInstruction(
         HloInstruction::CreateParameter(0, wide_shape, "wide_param"));
     return narrow_comp->parent()->AddEmbeddedComputation(builder.Build());
@@ -324,7 +324,7 @@ Status DynamicDimensionInferenceVisitor::HandleCustomCall(HloInstruction* hlo) {
         // dimensions.
         if (hlo->custom_call_target() == "SliceToDynamic" ||
             hlo->custom_call_target() == "Sharding" ||
-            (absl::StartsWith(hlo->custom_call_target(), "Resize") &&
+            (abslx::StartsWith(hlo->custom_call_target(), "Resize") &&
              (dimension == 0 || dimension == 3))) {
           parent_->SetDynamicSize(hlo, {}, dimension, dynamic_size);
           return OkStatus();
@@ -452,7 +452,7 @@ Status DynamicDimensionInferenceVisitor::HandleReduce(HloInstruction* hlo) {
           // Init values doesn't have dynamic size.
           return OkStatus();
         }
-        if ((absl::c_count(reduce->dimensions(), dimension) != 0)) {
+        if ((abslx::c_count(reduce->dimensions(), dimension) != 0)) {
           // Dimension is to be reduced, stop tracing.
           return OkStatus();
         }
@@ -479,7 +479,7 @@ Status DynamicDimensionInferenceVisitor::HandleReduce(HloInstruction* hlo) {
 
             return OkStatus();
           }
-          if (absl::c_count(reduce->dimensions(), i) == 0) {
+          if (abslx::c_count(reduce->dimensions(), i) == 0) {
             dimensions_not_reduced_count++;
           }
         }
@@ -510,7 +510,7 @@ Status DynamicDimensionInferenceVisitor::HandleDot(HloInstruction* hlo) {
     HloInstruction* dot = hlo;
     const DotDimensionNumbers& dimension_numbers = dot->dot_dimension_numbers();
     // A map from the operand dimensions to result dimension.
-    absl::flat_hash_map<int64_t, int64_t> result_dim_mapping;
+    abslx::flat_hash_map<int64_t, int64_t> result_dim_mapping;
     int64_t current_result_dims = 0;
 
     bool lhs = operand_index == 0;
@@ -530,11 +530,11 @@ Status DynamicDimensionInferenceVisitor::HandleDot(HloInstruction* hlo) {
     // Handle dimensions in the lhs.
     for (int64_t i = 0; i < dot->operand(0)->shape().rank(); i++) {
       // Look for non-contracting and non-batching dimension.
-      if (absl::c_linear_search(dimension_numbers.lhs_contracting_dimensions(),
+      if (abslx::c_linear_search(dimension_numbers.lhs_contracting_dimensions(),
                                 i)) {
         continue;
       }
-      if (absl::c_linear_search(dimension_numbers.lhs_batch_dimensions(), i)) {
+      if (abslx::c_linear_search(dimension_numbers.lhs_batch_dimensions(), i)) {
         continue;
       }
       if (lhs) {
@@ -546,11 +546,11 @@ Status DynamicDimensionInferenceVisitor::HandleDot(HloInstruction* hlo) {
     // Handle dimensions in the rhs.
     for (int64_t i = 0; i < dot->operand(1)->shape().rank(); i++) {
       // Look for non-contracting and non-batching dimension.
-      if (absl::c_linear_search(dimension_numbers.rhs_contracting_dimensions(),
+      if (abslx::c_linear_search(dimension_numbers.rhs_contracting_dimensions(),
                                 i)) {
         continue;
       }
-      if (absl::c_linear_search(dimension_numbers.rhs_batch_dimensions(), i)) {
+      if (abslx::c_linear_search(dimension_numbers.rhs_batch_dimensions(), i)) {
         continue;
       }
       if (!lhs) {
@@ -1402,7 +1402,7 @@ Status DynamicDimensionInferenceVisitor::HandleGather(HloInstruction* hlo) {
         int64_t indices_dim = 0;
         // Find the corresponding batch dimension in the output.
         for (int64_t output_dim = 0; output_dim < output_rank; ++output_dim) {
-          if (!absl::c_linear_search(gather_dims.offset_dims(), output_dim)) {
+          if (!abslx::c_linear_search(gather_dims.offset_dims(), output_dim)) {
             // Skips index vector dimension.
             if (indices_dim == gather_dims.index_vector_dim()) {
               indices_dim++;
@@ -1434,7 +1434,7 @@ Status DynamicDimensionInferenceVisitor::HandleConditional(
   // index as output index and a int64_t dimension number) to output index
   // (represented by an int64_t) is tracked for the conditional intsruction (all
   // branches should have the same mapping).
-  ShapeTree<absl::flat_hash_map<int64_t, int64_t>> dynamic_output_mapping(
+  ShapeTree<abslx::flat_hash_map<int64_t, int64_t>> dynamic_output_mapping(
       hlo->shape());
 
   bool need_rewrite = false;
@@ -1442,7 +1442,7 @@ Status DynamicDimensionInferenceVisitor::HandleConditional(
        ++branch_index) {
     std::vector<HloInstruction*> operands_to_add;
 
-    absl::flat_hash_map<HloInstruction*, int64_t>
+    abslx::flat_hash_map<HloInstruction*, int64_t>
         dynamic_size_to_operand_id_index_map;
     // Only look at branch_index + 1, the correct operand index for a
     // given branch.
@@ -1597,7 +1597,7 @@ Status DynamicDimensionInferenceVisitor::HandleConditional(
   // Now set the dynamic dimensions of the newly created conditional.
   dynamic_output_mapping.ForEachElement(
       [&](const ShapeIndex& index,
-          const absl::flat_hash_map<int64_t, int64_t>& dim_to_output) {
+          const abslx::flat_hash_map<int64_t, int64_t>& dim_to_output) {
         for (auto iter : dim_to_output) {
           int64_t dim = iter.first;
           int64_t output_index = iter.second;
@@ -1636,13 +1636,13 @@ Status DynamicDimensionInferenceVisitor::HandleScatter(HloInstruction* hlo) {
         const ScatterDimensionNumbers& scatter_dims =
             hlo->scatter_dimension_numbers();
         if (operand_index == 2 &&
-            absl::c_linear_search(scatter_dims.update_window_dims(),
+            abslx::c_linear_search(scatter_dims.update_window_dims(),
                                   dimension)) {
           // Dynamic update window dimension is only allowed if it is exactly
           // the same as the corresponding operand dimension.
           std::vector<int64_t> update_window_dims_in_operand;
           for (int64_t i = 0; i < hlo->operand(0)->shape().rank(); ++i) {
-            if (absl::c_linear_search(scatter_dims.inserted_window_dims(), i)) {
+            if (abslx::c_linear_search(scatter_dims.inserted_window_dims(), i)) {
               continue;
             }
             update_window_dims_in_operand.push_back(i);
@@ -1689,7 +1689,7 @@ Status DynamicDimensionInferenceVisitor::HandleWhile(HloInstruction* hlo) {
   // (represented by a shape index as output index and an int64_t dimension
   // number) to output index (represented by an int64_t) is tracked for the
   // while instruction.
-  ShapeTree<absl::flat_hash_map<int64_t, int64_t>> dynamic_output_mapping(
+  ShapeTree<abslx::flat_hash_map<int64_t, int64_t>> dynamic_output_mapping(
       hlo->shape());
   std::vector<HloInstruction*> operands_to_add;
   const int original_tuple_count = hlo->shape().tuple_shapes_size();
@@ -1743,7 +1743,7 @@ Status DynamicDimensionInferenceVisitor::HandleWhile(HloInstruction* hlo) {
     // for running inference in the while loop.
     TF_RETURN_IF_ERROR(dynamic_output_mapping.ForEachElementWithStatus(
         [&](const ShapeIndex& index,
-            const absl::flat_hash_map<int64_t, int64_t>& dim_to_size) {
+            const abslx::flat_hash_map<int64_t, int64_t>& dim_to_size) {
           for (auto key : dim_to_size) {
             int64_t dimension = key.first;
             const int64_t output_dynamic_size_index = key.second;
@@ -1958,13 +1958,13 @@ std::string DynamicDimensionInference::ToString() const {
   pieces.push_back("DynamicDimensionInference: ");
   for (const auto& mapping : dynamic_mapping_) {
     const DynamicDimension& dynamic_dimension = mapping.first;
-    pieces.push_back(absl::StrFormat(
+    pieces.push_back(abslx::StrFormat(
         " -- instruction %s at %s has dim %lld as dynamic"
         " dimension, which is represented by instruction %s",
         dynamic_dimension.inst->ToString(), dynamic_dimension.index.ToString(),
         dynamic_dimension.dim, mapping.second->ToString()));
   }
-  return absl::StrJoin(pieces, "\n");
+  return abslx::StrJoin(pieces, "\n");
 }
 
 DynamicDimensionInference::DynamicDimensionInference(

@@ -26,7 +26,7 @@ namespace xla {
 StatusOr<std::unique_ptr<HloModuleConfig>>
 CompileOnlyClient::CreateModuleConfig(
     const ProgramShape& program_shape,
-    absl::Span<const Shape* const> argument_shapes,
+    abslx::Span<const Shape* const> argument_shapes,
     const ExecutionOptions* execution_options) {
   return compiler_service_->CreateModuleConfig(program_shape, argument_shapes,
                                                execution_options);
@@ -34,7 +34,7 @@ CompileOnlyClient::CreateModuleConfig(
 
 StatusOr<std::vector<std::unique_ptr<AotCompilationResult>>>
 CompileOnlyClient::CompileAheadOfTime(
-    const absl::Span<const AotXlaComputationInstance> computations,
+    const abslx::Span<const AotXlaComputationInstance> computations,
     const AotCompilationOptions& options,
     std::unique_ptr<AotCompilationMetadata>* metadata) {
   std::vector<CompileOnlyService::AotXlaComputationInstance> service_instances;
@@ -52,7 +52,7 @@ CompileOnlyClient::CompileAheadOfTime(
                                                metadata);
 }
 
-int64_t CompileOnlyClient::PointerSizeForTriple(absl::string_view triple) {
+int64_t CompileOnlyClient::PointerSizeForTriple(abslx::string_view triple) {
   llvm::Triple llvm_triple(
       llvm::Triple::normalize(llvm::StringRef(triple.data(), triple.size())));
   if (llvm_triple.isArch64Bit()) {

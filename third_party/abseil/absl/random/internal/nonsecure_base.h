@@ -32,7 +32,7 @@
 #include "absl/types/optional.h"
 #include "absl/types/span.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -53,7 +53,7 @@ class NonsecureURBGBase {
   NonsecureURBGBase& operator=(NonsecureURBGBase&&) = default;
 
   // Constructor using a seed
-  template <class SSeq, typename = typename absl::enable_if_t<
+  template <class SSeq, typename = typename abslx::enable_if_t<
                             !std::is_same<SSeq, NonsecureURBGBase>::value>>
   explicit NonsecureURBGBase(SSeq&& seq)
       : urbg_(ConstructURBG(std::forward<SSeq>(seq))) {}
@@ -110,8 +110,8 @@ class NonsecureURBGBase {
     template <typename RandomAccessIterator>
     void generate_impl(std::integral_constant<bool, true>,
                        RandomAccessIterator begin, RandomAccessIterator end) {
-      auto buffer = absl::MakeSpan(begin, end);
-      auto target = absl::MakeSpan(reinterpret_cast<uint32_t*>(buffer.data()),
+      auto buffer = abslx::MakeSpan(begin, end);
+      auto target = abslx::MakeSpan(reinterpret_cast<uint32_t*>(buffer.data()),
                                    buffer.size());
       RandenPool<uint32_t>::Fill(target);
     }
@@ -122,8 +122,8 @@ class NonsecureURBGBase {
     void generate_impl(std::integral_constant<bool, false>,
                        RandomAccessIterator begin, RandomAccessIterator end) {
       const size_t n = std::distance(begin, end);
-      absl::InlinedVector<uint32_t, 8> data(n, 0);
-      RandenPool<uint32_t>::Fill(absl::MakeSpan(data.begin(), data.end()));
+      abslx::InlinedVector<uint32_t, 8> data(n, 0);
+      RandenPool<uint32_t>::Fill(abslx::MakeSpan(data.begin(), data.end()));
       std::copy(std::begin(data), std::end(data), begin);
     }
   };
@@ -145,6 +145,6 @@ class NonsecureURBGBase {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_INTERNAL_NONSECURE_BASE_H_

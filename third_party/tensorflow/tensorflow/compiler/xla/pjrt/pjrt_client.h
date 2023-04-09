@@ -78,7 +78,7 @@ inline PjRtPlatformId TpuId() {
 }
 
 enum PjRtRuntimeType { kStreamExecutor, kTfrt };
-inline constexpr absl::string_view PjRtRuntimeTypeString(PjRtRuntimeType type) {
+inline constexpr abslx::string_view PjRtRuntimeTypeString(PjRtRuntimeType type) {
   switch (type) {
     case kStreamExecutor:
       return "stream_executor";
@@ -122,15 +122,15 @@ class PjRtDevice {
   // A vendor-dependent string that uniquely identifies the kind of device,
   // e.g., "Tesla V100-SXM2-16GB". May be used to determine whether two GPUs are
   // compatible compilation.
-  virtual absl::string_view device_kind() const = 0;
+  virtual abslx::string_view device_kind() const = 0;
 
   // Debug string suitable for logging when errors occur. Should be verbose
   // enough to describe the current device unambiguously.
-  virtual absl::string_view DebugString() const = 0;
+  virtual abslx::string_view DebugString() const = 0;
 
   // Debug string suitable for reading by end users, should be reasonably terse,
   // for example: "CpuDevice(id=0)".
-  virtual absl::string_view ToString() const = 0;
+  virtual abslx::string_view ToString() const = 0;
 
   // Returns a scoped event that the caller uses to tell the PjRtClient that
   // there is asynchronous work happening that depends on activity on the
@@ -139,7 +139,7 @@ class PjRtDevice {
   // Only some PjRtDevice implementations support ScopedAsyncTrackingEvent, and
   // those that do not will return nullptr.
   virtual std::unique_ptr<ScopedAsyncTrackingEvent> CreateAsyncTrackingEvent(
-      absl::string_view description) const = 0;
+      abslx::string_view description) const = 0;
 
   // Transfer the given literal to the infeed queue.
   virtual Status TransferToInfeed(const LiteralSlice& literal) = 0;
@@ -150,7 +150,7 @@ class PjRtDevice {
   // Returns vendor specific attributes about the device. For example the model
   // number of a GPU, or the mesh coordinates of a TPU device. The returned
   // reference will remain valid for the lifetime of the PjRtDevice.
-  virtual const absl::flat_hash_map<std::string, PjRtDeviceAttribute>&
+  virtual const abslx::flat_hash_map<std::string, PjRtDeviceAttribute>&
   Attributes() const = 0;
 };
 
@@ -165,7 +165,7 @@ struct PjRtCrossHostRecvDescriptors {
   // single descriptor if the buffer is returned from a call to
   // MakeCrossHostReceiveBuffers). The descriptor should be transmitted to the
   // sender(s) and passed to a call to src_buffer->CopyToRemoteDevice.
-  absl::InlinedVector<std::string, 1> serialized_descriptors;
+  abslx::InlinedVector<std::string, 1> serialized_descriptors;
 };
 // Function that the client should call at the receiver if it needs to cancel a
 // cross-host send, for example because the buffer that the remote host wanted
@@ -181,7 +181,7 @@ struct PjRtCrossHostRecvDescriptors {
 // undefined state. If there is no send or cancellation then the system will
 // hang indefinitely.
 using PjRtCrossHostSendCancelNotifier =
-    std::function<void(absl::string_view serialized_descriptor, Status reason,
+    std::function<void(abslx::string_view serialized_descriptor, Status reason,
                        std::function<void(Status)> on_canceled)>;
 // State asynchronously returned by MakeCrossHostReceiveBuffers. "descriptors"
 // will match the returned PjRtBuffer objects 1:1. Specifically, each PjRtBuffer
@@ -212,7 +212,7 @@ class MultiSliceConfig {
   virtual int32_t SliceId() const = 0;
 
   // Returns the number of devices on each slice indexed by SliceId.
-  virtual absl::flat_hash_map<int32_t, int32_t> NumDevicesPerSlice() const = 0;
+  virtual abslx::flat_hash_map<int32_t, int32_t> NumDevicesPerSlice() const = 0;
 };
 
 struct CompileOptions {
@@ -321,14 +321,14 @@ class CopyToDeviceStream {
   // Returns the amount of data the stream currently has either transferred or
   // has buffered to transfer.
   int64_t current_bytes() const {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     return current_bytes_;
   }
 
   // Returns true if the stream is complete; all expected bytes have been
   // transferred or are buffered to transfer.
   bool IsComplete() const {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     return current_bytes_ == total_bytes_;
   }
 
@@ -345,7 +345,7 @@ class CopyToDeviceStream {
   int64_t granule_bytes_;
   int64_t current_bytes_ ABSL_GUARDED_BY(mu_) = 0;
   std::deque<PjRtChunk> buffered_chunks_ ABSL_GUARDED_BY(mu_);
-  mutable absl::Mutex mu_;
+  mutable abslx::Mutex mu_;
 };
 
 class PjRtHostMemoryForDeviceManager {
@@ -442,10 +442,10 @@ class PjRtClient {
 
   // Return all devices known to the client, including addressable and
   // non-addressable devices.
-  virtual absl::Span<PjRtDevice* const> devices() const = 0;
+  virtual abslx::Span<PjRtDevice* const> devices() const = 0;
 
   // Return only addressable devices. The devices are in no particular order.
-  virtual absl::Span<PjRtDevice* const> addressable_devices() const = 0;
+  virtual abslx::Span<PjRtDevice* const> addressable_devices() const = 0;
 
   // Lookup any PjRtDevice for a given PjRtDevice::id().
   virtual StatusOr<PjRtDevice*> LookupDevice(int device_id) const = 0;
@@ -459,11 +459,11 @@ class PjRtClient {
   virtual PjRtPlatformId platform_id() const = 0;
 
   // Returns a string that identifies the platform (CPU/GPU/TPU).
-  virtual absl::string_view platform_name() const = 0;
+  virtual abslx::string_view platform_name() const = 0;
 
   // Returns a string containing human-readable, platform-specific version info
   // (e.g. the CUDA version on GPU or libtpu version on Cloud TPU).
-  virtual absl::string_view platform_version() const = 0;
+  virtual abslx::string_view platform_version() const = 0;
 
   // Returns an enum that identifies the type of runtime being used under this
   // client.
@@ -511,7 +511,7 @@ class PjRtClient {
   // SerializeExecutable(). `serialized` must have been produced by a client of
   // the same platform and version as this one.
   virtual StatusOr<std::unique_ptr<PjRtLoadedExecutable>> DeserializeExecutable(
-      absl::string_view serialized, CompileOptions options) = 0;
+      abslx::string_view serialized, CompileOptions options) = 0;
 
   // LoadSerializedExecutable takes the serialized output of PjRtExecutable. The
   // returned executable is loaded by this client. The same checks are made as
@@ -520,7 +520,7 @@ class PjRtClient {
   // serialized executable unlike 'DeserializeExecutable' above that accepts
   // CompileOptions.
   virtual StatusOr<std::unique_ptr<PjRtLoadedExecutable>>
-  LoadSerializedExecutable(absl::string_view serialized) const {
+  LoadSerializedExecutable(abslx::string_view serialized) const {
     return Unimplemented("Loading serialized executable not supported.");
   }
 
@@ -598,7 +598,7 @@ class PjRtClient {
     // before the buffers are made available to their consumers. 'data' must
     // remain in scope until on_done is called.
     virtual Status TransferRawDataToBuffer(int buffer_index,
-                                           absl::string_view data,
+                                           abslx::string_view data,
                                            std::function<void()> on_done) = 0;
 
     // Transfers 'data' into a sub-buffer of buffer_index starting at offset, of
@@ -628,14 +628,14 @@ class PjRtClient {
     // Adds the specified key/value metadata for the transfer operation.
     // This is typically used for debugging purposes, such as adding a handle
     // that can be used to identify transfer operations.
-    using TransferMetadata = absl::flat_hash_map<std::string, std::string>;
+    using TransferMetadata = abslx::flat_hash_map<std::string, std::string>;
     virtual void AddTransferMetadata(const TransferMetadata& metadata) = 0;
   };
 
   // Returns a manager for async transfers into a set of buffers with on-host
   // shapes 'shapes'.
   virtual StatusOr<std::unique_ptr<AsyncBufferTransferManager>>
-  CreateBuffersForAsyncTransfer(absl::Span<const Shape> shapes,
+  CreateBuffersForAsyncTransfer(abslx::Span<const Shape> shapes,
                                 PjRtDevice* device) = 0;
 
   // Describes the semantics the caller to BufferFromHostBuffer expects from the
@@ -676,8 +676,8 @@ class PjRtClient {
   // If byte_strides is omitted, the array is assumed to have a dense layout
   // with dimensions in major-to-minor order.
   virtual StatusOr<std::unique_ptr<PjRtBuffer>> BufferFromHostBuffer(
-      const void* data, PrimitiveType type, absl::Span<int64_t const> dims,
-      std::optional<absl::Span<int64_t const>> byte_strides,
+      const void* data, PrimitiveType type, abslx::Span<int64_t const> dims,
+      std::optional<abslx::Span<int64_t const>> byte_strides,
       HostBufferSemantics host_buffer_semantics,
       std::function<void()> on_done_with_host_buffer, PjRtDevice* device) = 0;
 
@@ -722,7 +722,7 @@ class PjRtClient {
   // See note on semantics of cross-device copies in the class definition
   // comment for PjRtClient.
   virtual StatusOr<std::vector<std::unique_ptr<PjRtBuffer>>>
-  MakeCrossHostReceiveBuffers(absl::Span<const Shape> shapes,
+  MakeCrossHostReceiveBuffers(abslx::Span<const Shape> shapes,
                               PjRtDevice* device,
                               PjRtCrossHostRecvNotifier notifier) = 0;
 
@@ -746,7 +746,7 @@ class PjRtClient {
     // dimensions in the layout, and dimensions = {0, 1}, then the buffer is
     // treated as if it were shape [12, 128, 128] and the indices in
     // slice_boundaries range in [0, 12].
-    absl::InlinedVector<int, 3> dimensions;
+    abslx::InlinedVector<int, 3> dimensions;
     // The cumulative indices in dimension of the slices. For example, if
     // shape.dimensions(dimension)==10, setting slice_boundaries to {2, 5, 10}
     // would correspond to 3 slices of sizes {2, 3, 5} respectively. If the last
@@ -757,7 +757,7 @@ class PjRtClient {
   };
   virtual StatusOr<std::vector<std::unique_ptr<PjRtBuffer>>>
   MakeCrossHostReceiveBuffersForGather(
-      absl::Span<const Shape> shapes, std::vector<GatherDetails> gather_details,
+      abslx::Span<const Shape> shapes, std::vector<GatherDetails> gather_details,
       PjRtDevice* device, PjRtCrossHostRecvNotifier notifier) = 0;
 
   // Create ChannelHandles for XLA send/recv.
@@ -841,7 +841,7 @@ class PjRtBuffer {
 
   // Synchronous overload of ToLiteral, as a convenience.
   Status ToLiteralSync(MutableLiteralBase* literal) {
-    absl::Notification done;
+    abslx::Notification done;
     Status status;
     ToLiteral(literal, [&](Status s) {
       status = std::move(s);
@@ -936,7 +936,7 @@ class PjRtBuffer {
   // comment for PjRtClient.
   using RemoteSendCallback =
       std::function<void(Status status, bool sends_were_enqueued)>;
-  virtual void CopyToRemoteDevice(absl::string_view serialized_descriptor,
+  virtual void CopyToRemoteDevice(abslx::string_view serialized_descriptor,
                                   RemoteSendCallback on_done) = 0;
   struct ScatterDetails {
     // The dimensions of the corresponding buffer that the scatter slices
@@ -951,12 +951,12 @@ class PjRtBuffer {
     // dimensions in the layout, and dimensions = {0, 1}, then the buffer is
     // treated as if it were shape [12, 128, 128] and the indices in slices
     // range in [0, 12].
-    absl::InlinedVector<int, 3> dimensions;
+    abslx::InlinedVector<int, 3> dimensions;
     // The start and end indices of the slices.
     std::vector<std::pair<int64_t, int64_t>> slices;
   };
   virtual void CopyToRemoteDeviceScattered(
-      absl::Span<const std::pair<std::string, RemoteSendCallback>>
+      abslx::Span<const std::pair<std::string, RemoteSendCallback>>
           serialized_descriptors_and_callbacks,
       const ScatterDetails& scatter_details) = 0;
 
@@ -1081,8 +1081,8 @@ struct ExecuteOptions {
   // callbacks for all send/recv ops in the executable. These callbacks can be
   // stateful and the user code is responsible for managing the states here.
   // These callbacks must outlive the execution.
-  absl::Span<const std::vector<SendCallback>> send_callbacks;
-  absl::Span<const std::vector<RecvCallback>> recv_callbacks;
+  abslx::Span<const std::vector<SendCallback>> send_callbacks;
+  abslx::Span<const std::vector<RecvCallback>> recv_callbacks;
 
   // The `execution_mode` decides whether the execution will be invoked in the
   // caller thread or launched to a separate thread. By default, the
@@ -1113,13 +1113,13 @@ class PjRtLoadedExecutable : public PjRtExecutable {
     int replica;
     int partition;
   };
-  virtual absl::Span<const LogicalDeviceIds> addressable_device_logical_ids()
+  virtual abslx::Span<const LogicalDeviceIds> addressable_device_logical_ids()
       const = 0;
 
   // An addressable_device is one which the client can issue commands to.
   // addressable_devices()[i] is the Device to which
   // addressable_device_logical_ids()[i] is assigned.
-  virtual absl::Span<PjRtDevice* const> addressable_devices() const = 0;
+  virtual abslx::Span<PjRtDevice* const> addressable_devices() const = 0;
 
   // Donation Semantics:
   //
@@ -1150,12 +1150,12 @@ class PjRtLoadedExecutable : public PjRtExecutable {
   // The caller is *NOT* required to ensure that PjRtLoadedExecutable stays
   // alive until futures are ready.
   virtual StatusOr<std::vector<std::vector<std::unique_ptr<PjRtBuffer>>>>
-  Execute(absl::Span<const std::vector<PjRtBuffer*>> argument_handles,
+  Execute(abslx::Span<const std::vector<PjRtBuffer*>> argument_handles,
           const ExecuteOptions& options,
           std::optional<std::vector<PjRtFuture<Status>>>& returned_futures) = 0;
   // Convenience wrapper for Execute that never returns futures.
   StatusOr<std::vector<std::vector<std::unique_ptr<PjRtBuffer>>>> Execute(
-      absl::Span<const std::vector<PjRtBuffer*>> argument_handles,
+      abslx::Span<const std::vector<PjRtBuffer*>> argument_handles,
       const ExecuteOptions& options) {
     std::optional<std::vector<PjRtFuture<Status>>> returned_futures;
     return Execute(std::move(argument_handles), options, returned_futures);
@@ -1172,12 +1172,12 @@ class PjRtLoadedExecutable : public PjRtExecutable {
   //    else:
   //     returned_future will not be modified.
   virtual StatusOr<std::vector<std::unique_ptr<PjRtBuffer>>> ExecuteSharded(
-      absl::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
+      abslx::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
       const ExecuteOptions& options,
       std::optional<PjRtFuture<Status>>& returned_future, bool fill_future) = 0;
   // Convenience wrapper for ExecuteSharded that always returns a future.
   StatusOr<std::vector<std::unique_ptr<PjRtBuffer>>> ExecuteSharded(
-      absl::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
+      abslx::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
       const ExecuteOptions& options,
       std::optional<PjRtFuture<Status>>& returned_future) {
     return ExecuteSharded(std::move(argument_handles), device, options,
@@ -1185,7 +1185,7 @@ class PjRtLoadedExecutable : public PjRtExecutable {
   }
   // Convenience wrapper for ExecuteSharded that never returns a future.
   StatusOr<std::vector<std::unique_ptr<PjRtBuffer>>> ExecuteSharded(
-      absl::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
+      abslx::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
       const ExecuteOptions& options) {
     std::optional<PjRtFuture<Status>> returned_future;
     return ExecuteSharded(std::move(argument_handles), device, options,
@@ -1203,12 +1203,12 @@ class PjRtLoadedExecutable : public PjRtExecutable {
   //    else:
   //     returned_future will not be modified.
   virtual StatusOr<std::vector<std::unique_ptr<PjRtBuffer>>> ExecutePortable(
-      absl::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
+      abslx::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
       const ExecuteOptions& options,
       std::optional<PjRtFuture<Status>>& returned_future, bool fill_future) = 0;
   // Convenience wrapper for ExecutePortable that always returns a future.
   StatusOr<std::vector<std::unique_ptr<PjRtBuffer>>> ExecutePortable(
-      absl::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
+      abslx::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
       const ExecuteOptions& options,
       std::optional<PjRtFuture<Status>>& returned_future) {
     return ExecutePortable(std::move(argument_handles), device, options,
@@ -1216,7 +1216,7 @@ class PjRtLoadedExecutable : public PjRtExecutable {
   }
   // Convenience wrapper for ExecutePortable that never returns a future.
   StatusOr<std::vector<std::unique_ptr<PjRtBuffer>>> ExecutePortable(
-      absl::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
+      abslx::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
       const ExecuteOptions& options) {
     std::optional<PjRtFuture<Status>> returned_future;
     return ExecutePortable(std::move(argument_handles), device, options,

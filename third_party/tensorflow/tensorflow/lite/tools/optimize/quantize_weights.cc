@@ -210,7 +210,7 @@ bool CheckAllOpInputsQuantized(const SubGraphT* subgraph, const OperatorT* op,
 TfLiteStatus InsertQuantizableInputTensorsFromOperator(
     const ModelT* model, OperatorT* op, uint64_t weights_min_num_elements,
     const CustomOpMap& custom_op_map,
-    absl::flat_hash_map<int32_t, TensorPerChannel>* tensor_map,
+    abslx::flat_hash_map<int32_t, TensorPerChannel>* tensor_map,
     int subgraph_index, bool use_updated_hybrid_scheme) {
   SubGraphT* subgraph = model->subgraphs.at(subgraph_index).get();
   const OperatorCodeT* op_code = model->operator_codes[op->opcode_index].get();
@@ -404,7 +404,7 @@ TfLiteStatus QuantizeWeightsInt8(
        subgraph_index < end; ++subgraph_index) {
     SubGraphT* subgraph = model->subgraphs.at(subgraph_index).get();
 
-    absl::flat_hash_map<int32_t, TensorPerChannel> tensor_map;
+    abslx::flat_hash_map<int32_t, TensorPerChannel> tensor_map;
     for (int i = 0; i < subgraph->operators.size(); ++i) {
       OperatorT* op = subgraph->operators[i].get();
       TF_LITE_ENSURE_STATUS(InsertQuantizableInputTensorsFromOperator(
@@ -529,7 +529,7 @@ TfLiteStatus QuantizeWeightsFloat16(flatbuffers::FlatBufferBuilder* builder,
        subgraph_index < end; ++subgraph_index) {
     SubGraphT* subgraph = model->subgraphs.at(subgraph_index).get();
 
-    absl::flat_hash_map<int32_t, TensorT*> tensor_map;
+    abslx::flat_hash_map<int32_t, TensorT*> tensor_map;
     for (int i = 0, sub_end = subgraph->operators.size(); i < sub_end; ++i) {
       OperatorT* op = subgraph->operators[i].get();
       for (auto tensor_idx : op->inputs) {

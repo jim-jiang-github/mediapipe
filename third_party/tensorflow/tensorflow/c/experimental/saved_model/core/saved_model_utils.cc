@@ -202,7 +202,7 @@ Status ValidateSingleConcreteFunction(const SavedFunction& saved_function) {
 
 Status LoadSavedAsset(ImmediateExecutionContext* ctx, const SavedAsset& asset,
                       const std::string& saved_model_dir,
-                      absl::Span<const AssetFileDef> assets,
+                      abslx::Span<const AssetFileDef> assets,
                       std::unique_ptr<Asset>* output) {
   int asset_index = asset.asset_file_def_index();
   if (asset_index >= assets.size()) {
@@ -331,11 +331,11 @@ Status FlattenSignature(const StructuredValue& signature,
   }
 }
 
-absl::optional<int> FindNodeAtPath(StringPiece path,
+abslx::optional<int> FindNodeAtPath(StringPiece path,
                                    const SavedObjectGraph& object_graph) {
   const auto& nodes = object_graph.nodes();
   if (nodes.empty()) {
-    return absl::nullopt;
+    return abslx::nullopt;
   }
 
   // Starting from the root, iterate through the saved object graph, matching
@@ -343,7 +343,7 @@ absl::optional<int> FindNodeAtPath(StringPiece path,
   int node_id = 0;
   const SavedObject* current_node = &nodes.Get(node_id);
 
-  for (absl::string_view object_name : absl::StrSplit(path, '.')) {
+  for (abslx::string_view object_name : abslx::StrSplit(path, '.')) {
     auto child_node_iter = std::find_if(
         current_node->children().begin(), current_node->children().end(),
         [object_name](
@@ -351,7 +351,7 @@ absl::optional<int> FindNodeAtPath(StringPiece path,
           return object_name == obj.local_name();
         });
     if (child_node_iter == current_node->children().end()) {
-      return absl::nullopt;
+      return abslx::nullopt;
     }
 
     node_id = child_node_iter->node_id();

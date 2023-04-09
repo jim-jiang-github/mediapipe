@@ -75,7 +75,7 @@ int main(int argc, char** argv) {
 
   tensorflow::string usage = tensorflow::tfcompile::kUsageHeader;
   usage += tensorflow::Flags::Usage(argv[0], flag_list);
-  if (argc > 1 && absl::string_view(argv[1]) == "--help") {
+  if (argc > 1 && abslx::string_view(argv[1]) == "--help") {
     std::cerr << usage << "\n";
     return 0;
   }

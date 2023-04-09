@@ -25,7 +25,7 @@
 
 namespace chrono = std::chrono;
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
@@ -92,7 +92,7 @@ TEST(Format, TimePointResolution) {
   EXPECT_EQ(
       "03:04:05",
       format(kFmt,
-             chrono::time_point_cast<absl::time_internal::cctz::seconds>(t0),
+             chrono::time_point_cast<abslx::time_internal::cctz::seconds>(t0),
              utc));
   EXPECT_EQ("03:04:00",
             format(kFmt, chrono::time_point_cast<chrono::minutes>(t0), utc));
@@ -103,8 +103,8 @@ TEST(Format, TimePointResolution) {
 TEST(Format, TimePointExtendedResolution) {
   const char kFmt[] = "%H:%M:%E*S";
   const time_zone utc = utc_time_zone();
-  const time_point<absl::time_internal::cctz::seconds> tp =
-      chrono::time_point_cast<absl::time_internal::cctz::seconds>(
+  const time_point<abslx::time_internal::cctz::seconds> tp =
+      chrono::time_point_cast<abslx::time_internal::cctz::seconds>(
           chrono::system_clock::from_time_t(0)) +
       chrono::hours(12) + chrono::minutes(34) + chrono::seconds(56);
 
@@ -431,7 +431,7 @@ TEST(Format, CompareExtendSecondsVsSubseconds) {
 TEST(Format, ExtendedOffset) {
   const auto tp = chrono::system_clock::from_time_t(0);
 
-  auto tz = fixed_time_zone(absl::time_internal::cctz::seconds::zero());
+  auto tz = fixed_time_zone(abslx::time_internal::cctz::seconds::zero());
   TestFormatSpecifier(tp, tz, "%z", "+0000");
   TestFormatSpecifier(tp, tz, "%:z", "+00:00");
   TestFormatSpecifier(tp, tz, "%Ez", "+00:00");
@@ -512,7 +512,7 @@ TEST(Format, ExtendedOffset) {
 TEST(Format, ExtendedSecondOffset) {
   const auto tp = chrono::system_clock::from_time_t(0);
 
-  auto tz = fixed_time_zone(absl::time_internal::cctz::seconds::zero());
+  auto tz = fixed_time_zone(abslx::time_internal::cctz::seconds::zero());
   TestFormatSpecifier(tp, tz, "%E*z", "+00:00:00");
   TestFormatSpecifier(tp, tz, "%::z", "+00:00:00");
   TestFormatSpecifier(tp, tz, "%:::z", "+00");
@@ -756,7 +756,7 @@ TEST(Parse, TimePointExtendedResolution) {
   const char kFmt[] = "%H:%M:%E*S";
   const time_zone utc = utc_time_zone();
 
-  time_point<absl::time_internal::cctz::seconds> tp;
+  time_point<abslx::time_internal::cctz::seconds> tp;
   detail::femtoseconds fs;
   EXPECT_TRUE(detail::parse(kFmt, "12:34:56.123456789012345", utc, &tp, &fs));
   EXPECT_EQ("12:34:56.123456789012345", detail::format(kFmt, tp, fs, utc));
@@ -1293,7 +1293,7 @@ TEST(Parse, ExtendedSubecondsScan) {
 
 TEST(Parse, ExtendedOffset) {
   const time_zone utc = utc_time_zone();
-  time_point<absl::time_internal::cctz::seconds> tp;
+  time_point<abslx::time_internal::cctz::seconds> tp;
 
   EXPECT_TRUE(parse("%Ez", "+00:00", utc, &tp));
   EXPECT_EQ(convert(civil_second(1970, 1, 1, 0, 0, 0), utc), tp);
@@ -1324,7 +1324,7 @@ TEST(Parse, ExtendedOffset) {
 
 TEST(Parse, ExtendedSecondOffset) {
   const time_zone utc = utc_time_zone();
-  time_point<absl::time_internal::cctz::seconds> tp;
+  time_point<abslx::time_internal::cctz::seconds> tp;
 
   for (auto fmt : {"%Ez", "%E*z", "%:z", "%::z", "%:::z"}) {
     EXPECT_TRUE(parse(fmt, "+00:00:00", utc, &tp));
@@ -1372,7 +1372,7 @@ TEST(Parse, ExtendedSecondOffset) {
 TEST(Parse, ExtendedYears) {
   const time_zone utc = utc_time_zone();
   const char e4y_fmt[] = "%E4Y%m%d";  // no separators
-  time_point<absl::time_internal::cctz::seconds> tp;
+  time_point<abslx::time_internal::cctz::seconds> tp;
 
   // %E4Y consumes exactly four chars, including any sign.
   EXPECT_TRUE(parse(e4y_fmt, "-9991127", utc, &tp));
@@ -1425,7 +1425,7 @@ TEST(Parse, RFC3339Format) {
 
 TEST(Parse, Week) {
   const time_zone utc = utc_time_zone();
-  time_point<absl::time_internal::cctz::seconds> tp;
+  time_point<abslx::time_internal::cctz::seconds> tp;
 
   auto exp = convert(civil_second(2017, 1, 1, 0, 0, 0), utc);
   EXPECT_TRUE(parse("%Y-%U-%u", "2017-01-7", utc, &tp));
@@ -1468,7 +1468,7 @@ TEST(Parse, WeekYearShift) {
   // %U/%W conversions with week values in {0, 52, 53} can slip
   // into the previous/following calendar years.
   const time_zone utc = utc_time_zone();
-  time_point<absl::time_internal::cctz::seconds> tp;
+  time_point<abslx::time_internal::cctz::seconds> tp;
 
   auto exp = convert(civil_second(2019, 12, 31, 0, 0, 0), utc);
   EXPECT_TRUE(parse("%Y-%U-%u", "2020-00-2", utc, &tp));
@@ -1490,33 +1490,33 @@ TEST(Parse, WeekYearShift) {
 
 TEST(Parse, MaxRange) {
   const time_zone utc = utc_time_zone();
-  time_point<absl::time_internal::cctz::seconds> tp;
+  time_point<abslx::time_internal::cctz::seconds> tp;
 
   // tests the upper limit using +00:00 offset
   EXPECT_TRUE(
       parse(RFC3339_sec, "292277026596-12-04T15:30:07+00:00", utc, &tp));
-  EXPECT_EQ(tp, time_point<absl::time_internal::cctz::seconds>::max());
+  EXPECT_EQ(tp, time_point<abslx::time_internal::cctz::seconds>::max());
   EXPECT_FALSE(
       parse(RFC3339_sec, "292277026596-12-04T15:30:08+00:00", utc, &tp));
 
   // tests the upper limit using -01:00 offset
   EXPECT_TRUE(
       parse(RFC3339_sec, "292277026596-12-04T14:30:07-01:00", utc, &tp));
-  EXPECT_EQ(tp, time_point<absl::time_internal::cctz::seconds>::max());
+  EXPECT_EQ(tp, time_point<abslx::time_internal::cctz::seconds>::max());
   EXPECT_FALSE(
       parse(RFC3339_sec, "292277026596-12-04T15:30:07-01:00", utc, &tp));
 
   // tests the lower limit using +00:00 offset
   EXPECT_TRUE(
       parse(RFC3339_sec, "-292277022657-01-27T08:29:52+00:00", utc, &tp));
-  EXPECT_EQ(tp, time_point<absl::time_internal::cctz::seconds>::min());
+  EXPECT_EQ(tp, time_point<abslx::time_internal::cctz::seconds>::min());
   EXPECT_FALSE(
       parse(RFC3339_sec, "-292277022657-01-27T08:29:51+00:00", utc, &tp));
 
   // tests the lower limit using +01:00 offset
   EXPECT_TRUE(
       parse(RFC3339_sec, "-292277022657-01-27T09:29:52+01:00", utc, &tp));
-  EXPECT_EQ(tp, time_point<absl::time_internal::cctz::seconds>::min());
+  EXPECT_EQ(tp, time_point<abslx::time_internal::cctz::seconds>::min());
   EXPECT_FALSE(
       parse(RFC3339_sec, "-292277022657-01-27T08:29:51+01:00", utc, &tp));
 
@@ -1579,20 +1579,20 @@ TEST(FormatParse, RoundTrip) {
 
 TEST(FormatParse, RoundTripDistantFuture) {
   const time_zone utc = utc_time_zone();
-  const time_point<absl::time_internal::cctz::seconds> in =
-      time_point<absl::time_internal::cctz::seconds>::max();
+  const time_point<abslx::time_internal::cctz::seconds> in =
+      time_point<abslx::time_internal::cctz::seconds>::max();
   const std::string s = format(RFC3339_full, in, utc);
-  time_point<absl::time_internal::cctz::seconds> out;
+  time_point<abslx::time_internal::cctz::seconds> out;
   EXPECT_TRUE(parse(RFC3339_full, s, utc, &out)) << s;
   EXPECT_EQ(in, out);
 }
 
 TEST(FormatParse, RoundTripDistantPast) {
   const time_zone utc = utc_time_zone();
-  const time_point<absl::time_internal::cctz::seconds> in =
-      time_point<absl::time_internal::cctz::seconds>::min();
+  const time_point<abslx::time_internal::cctz::seconds> in =
+      time_point<abslx::time_internal::cctz::seconds>::min();
   const std::string s = format(RFC3339_full, in, utc);
-  time_point<absl::time_internal::cctz::seconds> out;
+  time_point<abslx::time_internal::cctz::seconds> out;
   EXPECT_TRUE(parse(RFC3339_full, s, utc, &out)) << s;
   EXPECT_EQ(in, out);
 }
@@ -1600,4 +1600,4 @@ TEST(FormatParse, RoundTripDistantPast) {
 }  // namespace cctz
 }  // namespace time_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

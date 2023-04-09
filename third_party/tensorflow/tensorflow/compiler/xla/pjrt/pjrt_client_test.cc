@@ -219,7 +219,7 @@ TEST_P(PjRtClientTest, ExecuteWithConcurrentUsage) {
       tensorflow::Env::Default(), "ExecuteWithConcurrentUsage", kNumThreads);
 
   constexpr int kConcurrency = 16;
-  absl::BlockingCounter blocking_counter(kConcurrency);
+  abslx::BlockingCounter blocking_counter(kConcurrency);
   std::vector<std::unique_ptr<PjRtBuffer>> results(kConcurrency);
   for (int i = 0; i < kConcurrency; ++i) {
     thread_pool.Schedule([&, &result = results[i]]() {
@@ -267,7 +267,7 @@ TEST_P(PjRtClientTest, ExecuteWithConcurrentUsageAndDonation) {
       kNumThreads);
 
   constexpr int kConcurrentUsage = 16;
-  absl::BlockingCounter blocking_counter(kConcurrentUsage + 1);
+  abslx::BlockingCounter blocking_counter(kConcurrentUsage + 1);
 
   for (int i = 0; i < kConcurrentUsage; ++i) {
     thread_pool.Schedule([&]() {

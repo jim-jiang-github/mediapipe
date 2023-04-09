@@ -16,7 +16,7 @@
 
 #include "absl/base/config.h"
 
-// This test is a no-op when absl::any is an alias for std::any and when
+// This test is a no-op when abslx::any is an alias for std::any and when
 // exceptions are not enabled.
 #if !defined(ABSL_USES_STD_ANY) && defined(ABSL_HAVE_EXCEPTIONS)
 
@@ -36,7 +36,7 @@ using ThrowingThrowerVec = std::vector<Thrower, ThrowingAlloc>;
 
 namespace {
 
-testing::AssertionResult AnyInvariants(absl::any* a) {
+testing::AssertionResult AnyInvariants(abslx::any* a) {
   using testing::AssertionFailure;
   using testing::AssertionSuccess;
 
@@ -64,77 +64,77 @@ testing::AssertionResult AnyInvariants(absl::any* a) {
                               << a->type().name();
   }
   try {
-    auto unused = absl::any_cast<Thrower>(*a);
+    auto unused = abslx::any_cast<Thrower>(*a);
     static_cast<void>(unused);
     return AssertionFailure()
            << "A reset `any` should not be able to be any_cast";
-  } catch (const absl::bad_any_cast&) {
+  } catch (const abslx::bad_any_cast&) {
   } catch (...) {
     return AssertionFailure()
-           << "Unexpected exception thrown from absl::any_cast";
+           << "Unexpected exception thrown from abslx::any_cast";
   }
   return AssertionSuccess();
 }
 
-testing::AssertionResult AnyIsEmpty(absl::any* a) {
+testing::AssertionResult AnyIsEmpty(abslx::any* a) {
   if (!a->has_value()) {
     return testing::AssertionSuccess();
   }
   return testing::AssertionFailure()
          << "a should be empty, but instead has value "
-         << absl::any_cast<Thrower>(*a).Get();
+         << abslx::any_cast<Thrower>(*a).Get();
 }
 
 TEST(AnyExceptionSafety, Ctors) {
   Thrower val(1);
-  testing::TestThrowingCtor<absl::any>(val);
+  testing::TestThrowingCtor<abslx::any>(val);
 
   Thrower copy(val);
-  testing::TestThrowingCtor<absl::any>(copy);
+  testing::TestThrowingCtor<abslx::any>(copy);
 
-  testing::TestThrowingCtor<absl::any>(absl::in_place_type_t<Thrower>(), 1);
+  testing::TestThrowingCtor<abslx::any>(abslx::in_place_type_t<Thrower>(), 1);
 
-  testing::TestThrowingCtor<absl::any>(absl::in_place_type_t<ThrowerVec>(),
+  testing::TestThrowingCtor<abslx::any>(abslx::in_place_type_t<ThrowerVec>(),
                                        ThrowerList{val});
 
-  testing::TestThrowingCtor<absl::any,
-                            absl::in_place_type_t<ThrowingThrowerVec>,
+  testing::TestThrowingCtor<abslx::any,
+                            abslx::in_place_type_t<ThrowingThrowerVec>,
                             ThrowerList, ThrowingAlloc>(
-      absl::in_place_type_t<ThrowingThrowerVec>(), {val}, ThrowingAlloc());
+      abslx::in_place_type_t<ThrowingThrowerVec>(), {val}, ThrowingAlloc());
 }
 
 TEST(AnyExceptionSafety, Assignment) {
   auto original =
-      absl::any(absl::in_place_type_t<Thrower>(), 1, testing::nothrow_ctor);
-  auto any_is_strong = [original](absl::any* ap) {
+      abslx::any(abslx::in_place_type_t<Thrower>(), 1, testing::nothrow_ctor);
+  auto any_is_strong = [original](abslx::any* ap) {
     return testing::AssertionResult(ap->has_value() &&
-                                    absl::any_cast<Thrower>(original) ==
-                                        absl::any_cast<Thrower>(*ap));
+                                    abslx::any_cast<Thrower>(original) ==
+                                        abslx::any_cast<Thrower>(*ap));
   };
   auto any_strong_tester = testing::MakeExceptionSafetyTester()
                                .WithInitialValue(original)
                                .WithContracts(AnyInvariants, any_is_strong);
 
   Thrower val(2);
-  absl::any any_val(val);
+  abslx::any any_val(val);
   NoThrowMoveThrower mv_val(2);
 
-  auto assign_any = [&any_val](absl::any* ap) { *ap = any_val; };
-  auto assign_val = [&val](absl::any* ap) { *ap = val; };
-  auto move = [&val](absl::any* ap) { *ap = std::move(val); };
-  auto move_movable = [&mv_val](absl::any* ap) { *ap = std::move(mv_val); };
+  auto assign_any = [&any_val](abslx::any* ap) { *ap = any_val; };
+  auto assign_val = [&val](abslx::any* ap) { *ap = val; };
+  auto move = [&val](abslx::any* ap) { *ap = std::move(val); };
+  auto move_movable = [&mv_val](abslx::any* ap) { *ap = std::move(mv_val); };
 
   EXPECT_TRUE(any_strong_tester.Test(assign_any));
   EXPECT_TRUE(any_strong_tester.Test(assign_val));
   EXPECT_TRUE(any_strong_tester.Test(move));
   EXPECT_TRUE(any_strong_tester.Test(move_movable));
 
-  auto empty_any_is_strong = [](absl::any* ap) {
+  auto empty_any_is_strong = [](abslx::any* ap) {
     return testing::AssertionResult{!ap->has_value()};
   };
   auto strong_empty_any_tester =
       testing::MakeExceptionSafetyTester()
-          .WithInitialValue(absl::any{})
+          .WithInitialValue(abslx::any{})
           .WithContracts(AnyInvariants, empty_any_is_strong);
 
   EXPECT_TRUE(strong_empty_any_tester.Test(assign_any));
@@ -144,17 +144,17 @@ TEST(AnyExceptionSafety, Assignment) {
 
 TEST(AnyExceptionSafety, Emplace) {
   auto initial_val =
-      absl::any{absl::in_place_type_t<Thrower>(), 1, testing::nothrow_ctor};
+      abslx::any{abslx::in_place_type_t<Thrower>(), 1, testing::nothrow_ctor};
   auto one_tester = testing::MakeExceptionSafetyTester()
                         .WithInitialValue(initial_val)
                         .WithContracts(AnyInvariants, AnyIsEmpty);
 
-  auto emp_thrower = [](absl::any* ap) { ap->emplace<Thrower>(2); };
-  auto emp_throwervec = [](absl::any* ap) {
+  auto emp_thrower = [](abslx::any* ap) { ap->emplace<Thrower>(2); };
+  auto emp_throwervec = [](abslx::any* ap) {
     std::initializer_list<Thrower> il{Thrower(2, testing::nothrow_ctor)};
     ap->emplace<ThrowerVec>(il);
   };
-  auto emp_movethrower = [](absl::any* ap) {
+  auto emp_movethrower = [](abslx::any* ap) {
     ap->emplace<NoThrowMoveThrower>(2);
   };
 
@@ -162,7 +162,7 @@ TEST(AnyExceptionSafety, Emplace) {
   EXPECT_TRUE(one_tester.Test(emp_throwervec));
   EXPECT_TRUE(one_tester.Test(emp_movethrower));
 
-  auto empty_tester = one_tester.WithInitialValue(absl::any{});
+  auto empty_tester = one_tester.WithInitialValue(abslx::any{});
 
   EXPECT_TRUE(empty_tester.Test(emp_thrower));
   EXPECT_TRUE(empty_tester.Test(emp_throwervec));

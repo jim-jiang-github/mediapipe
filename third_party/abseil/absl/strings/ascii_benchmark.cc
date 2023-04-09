@@ -69,41 +69,41 @@ inline char Noop(unsigned char b) { return static_cast<char>(b); }
 
 BENCHMARK_TEMPLATE(BM_Ascii, Noop);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isalpha);
-BENCHMARK_TEMPLATE(BM_Ascii, absl::ascii_isalpha);
+BENCHMARK_TEMPLATE(BM_Ascii, abslx::ascii_isalpha);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isdigit);
-BENCHMARK_TEMPLATE(BM_Ascii, absl::ascii_isdigit);
+BENCHMARK_TEMPLATE(BM_Ascii, abslx::ascii_isdigit);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isalnum);
-BENCHMARK_TEMPLATE(BM_Ascii, absl::ascii_isalnum);
+BENCHMARK_TEMPLATE(BM_Ascii, abslx::ascii_isalnum);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isspace);
-BENCHMARK_TEMPLATE(BM_Ascii, absl::ascii_isspace);
+BENCHMARK_TEMPLATE(BM_Ascii, abslx::ascii_isspace);
 BENCHMARK_TEMPLATE(BM_Ascii, std::ispunct);
-BENCHMARK_TEMPLATE(BM_Ascii, absl::ascii_ispunct);
+BENCHMARK_TEMPLATE(BM_Ascii, abslx::ascii_ispunct);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isblank);
-BENCHMARK_TEMPLATE(BM_Ascii, absl::ascii_isblank);
+BENCHMARK_TEMPLATE(BM_Ascii, abslx::ascii_isblank);
 BENCHMARK_TEMPLATE(BM_Ascii, std::iscntrl);
-BENCHMARK_TEMPLATE(BM_Ascii, absl::ascii_iscntrl);
+BENCHMARK_TEMPLATE(BM_Ascii, abslx::ascii_iscntrl);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isxdigit);
-BENCHMARK_TEMPLATE(BM_Ascii, absl::ascii_isxdigit);
+BENCHMARK_TEMPLATE(BM_Ascii, abslx::ascii_isxdigit);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isprint);
-BENCHMARK_TEMPLATE(BM_Ascii, absl::ascii_isprint);
+BENCHMARK_TEMPLATE(BM_Ascii, abslx::ascii_isprint);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isgraph);
-BENCHMARK_TEMPLATE(BM_Ascii, absl::ascii_isgraph);
+BENCHMARK_TEMPLATE(BM_Ascii, abslx::ascii_isgraph);
 BENCHMARK_TEMPLATE(BM_Ascii, std::isupper);
-BENCHMARK_TEMPLATE(BM_Ascii, absl::ascii_isupper);
+BENCHMARK_TEMPLATE(BM_Ascii, abslx::ascii_isupper);
 BENCHMARK_TEMPLATE(BM_Ascii, std::islower);
-BENCHMARK_TEMPLATE(BM_Ascii, absl::ascii_islower);
+BENCHMARK_TEMPLATE(BM_Ascii, abslx::ascii_islower);
 BENCHMARK_TEMPLATE(BM_Ascii, isascii);
-BENCHMARK_TEMPLATE(BM_Ascii, absl::ascii_isascii);
+BENCHMARK_TEMPLATE(BM_Ascii, abslx::ascii_isascii);
 BENCHMARK_TEMPLATE(BM_Ascii, std::tolower);
-BENCHMARK_TEMPLATE(BM_Ascii, absl::ascii_tolower);
+BENCHMARK_TEMPLATE(BM_Ascii, abslx::ascii_tolower);
 BENCHMARK_TEMPLATE(BM_Ascii, std::toupper);
-BENCHMARK_TEMPLATE(BM_Ascii, absl::ascii_toupper);
+BENCHMARK_TEMPLATE(BM_Ascii, abslx::ascii_toupper);
 
 static void BM_StrToLower(benchmark::State& state) {
   const int size = state.range(0);
   std::string s(size, 'X');
   for (auto _ : state) {
-    benchmark::DoNotOptimize(absl::AsciiStrToLower(s));
+    benchmark::DoNotOptimize(abslx::AsciiStrToLower(s));
   }
 }
 BENCHMARK(BM_StrToLower)->Range(1, 1 << 20);
@@ -112,7 +112,7 @@ static void BM_StrToUpper(benchmark::State& state) {
   const int size = state.range(0);
   std::string s(size, 'x');
   for (auto _ : state) {
-    benchmark::DoNotOptimize(absl::AsciiStrToUpper(s));
+    benchmark::DoNotOptimize(abslx::AsciiStrToUpper(s));
   }
 }
 BENCHMARK(BM_StrToUpper)->Range(1, 1 << 20);

@@ -205,13 +205,13 @@ TEST(PacketTest, GetProtoBase) {
 }
 
 TEST(PacketTest, ValidateAsProtoMessageLite) {
-  auto proto_ptr = absl::make_unique<::mediapipe::PacketTestProto>();
+  auto proto_ptr = abslx::make_unique<::mediapipe::PacketTestProto>();
   proto_ptr->add_x(123);
   Packet packet = Adopt(proto_ptr.release());
   MP_EXPECT_OK(packet.ValidateAsProtoMessageLite());
   Packet packet2 = MakePacket<int>(3);
-  absl::Status status = packet2.ValidateAsProtoMessageLite();
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  abslx::Status status = packet2.ValidateAsProtoMessageLite();
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
 }
 
 TEST(PacketTest, GetVectorOfProtos) {
@@ -298,10 +298,10 @@ TEST(PacketTest, TestPacketMoveConstructor) {
 TEST(PacketTest, TestPacketConsume) {
   Packet packet1 = MakePacket<int>(33);
   Packet packet_copy = packet1;
-  absl::StatusOr<std::unique_ptr<int>> result1 = packet_copy.Consume<int>();
+  abslx::StatusOr<std::unique_ptr<int>> result1 = packet_copy.Consume<int>();
   // Both packet1 and packet_copy own the data, Consume() should return error.
-  absl::Status status1 = result1.status();
-  EXPECT_EQ(status1.code(), absl::StatusCode::kFailedPrecondition);
+  abslx::Status status1 = result1.status();
+  EXPECT_EQ(status1.code(), abslx::StatusCode::kFailedPrecondition);
   EXPECT_THAT(status1.message(),
               testing::HasSubstr("isn't the sole owner of the holder"));
   ASSERT_FALSE(packet1.IsEmpty());
@@ -311,7 +311,7 @@ TEST(PacketTest, TestPacketConsume) {
 
   Packet packet2 = MakePacket<int>(33);
   // Types don't match (int vs float).
-  absl::StatusOr<std::unique_ptr<float>> result2 = packet2.Consume<float>();
+  abslx::StatusOr<std::unique_ptr<float>> result2 = packet2.Consume<float>();
   EXPECT_THAT(
       result2.status().message(),
       testing::AllOf(testing::HasSubstr("int"), testing::HasSubstr("float")));
@@ -320,7 +320,7 @@ TEST(PacketTest, TestPacketConsume) {
 
   // packet3 is the sole owner of the data.
   Packet packet3 = MakePacket<int>(42);
-  absl::StatusOr<std::unique_ptr<int>> result3 = packet3.Consume<int>();
+  abslx::StatusOr<std::unique_ptr<int>> result3 = packet3.Consume<int>();
   // After Consume(), packet3 should be empty and result3 owns the data.
   EXPECT_TRUE(result3.ok());
   ASSERT_NE(nullptr, result3.value());
@@ -332,7 +332,7 @@ TEST(PacketTest, TestPacketConsumeOrCopy) {
   Packet packet1 = MakePacket<int>(33);
   Packet packet_copy = packet1;
   bool was_copied1 = false;
-  absl::StatusOr<std::unique_ptr<int>> result1 =
+  abslx::StatusOr<std::unique_ptr<int>> result1 =
       packet_copy.ConsumeOrCopy<int>(&was_copied1);
   // Both packet1 and packet_copy own the data, ConsumeOrCopy() returns a copy
   // of the data and sets packet_copy to empty.
@@ -347,7 +347,7 @@ TEST(PacketTest, TestPacketConsumeOrCopy) {
 
   Packet packet2 = MakePacket<int>(33);
   // Types don't match (int vs float).
-  absl::StatusOr<std::unique_ptr<float>> result2 =
+  abslx::StatusOr<std::unique_ptr<float>> result2 =
       packet2.ConsumeOrCopy<float>();
   EXPECT_THAT(
       result2.status().message(),
@@ -359,7 +359,7 @@ TEST(PacketTest, TestPacketConsumeOrCopy) {
   bool was_copied3 = false;
   // packet3 is the sole owner of the data. ConsumeOrCopy() transfers the
   // ownership to result3 and makes packet3 empty.
-  absl::StatusOr<std::unique_ptr<int>> result3 =
+  abslx::StatusOr<std::unique_ptr<int>> result3 =
       packet3.ConsumeOrCopy<int>(&was_copied3);
   EXPECT_FALSE(was_copied3);
   EXPECT_TRUE(result3.ok());
@@ -371,9 +371,9 @@ TEST(PacketTest, TestPacketConsumeOrCopy) {
 TEST(PacketTest, TestConsumeForeignHolder) {
   std::unique_ptr<int> data(new int(33));
   Packet packet = PointToForeign(data.get());
-  absl::StatusOr<std::unique_ptr<int>> result = packet.Consume<int>();
+  abslx::StatusOr<std::unique_ptr<int>> result = packet.Consume<int>();
   EXPECT_FALSE(result.ok());
-  EXPECT_EQ(result.status().code(), absl::StatusCode::kFailedPrecondition);
+  EXPECT_EQ(result.status().code(), abslx::StatusCode::kFailedPrecondition);
   EXPECT_EQ(result.status().message(),
             "Packet isn't the sole owner of the holder.");
   ASSERT_FALSE(packet.IsEmpty());
@@ -385,7 +385,7 @@ TEST(PacketTest, TestForeignHolderConsumeOrCopy) {
   Packet packet1 = PointToForeign(data1.get());
   Packet packet_copy = packet1;
   bool was_copied1 = false;
-  absl::StatusOr<std::unique_ptr<int>> result1 =
+  abslx::StatusOr<std::unique_ptr<int>> result1 =
       packet_copy.ConsumeOrCopy<int>(&was_copied1);
   // After ConsumeOrCopy(), result1 gets the copy of packet_copy's data and
   // packet_copy is set to empty.
@@ -401,7 +401,7 @@ TEST(PacketTest, TestForeignHolderConsumeOrCopy) {
   std::unique_ptr<int> data2(new int(33));
   Packet packet2 = PointToForeign(data2.get());
   bool was_copied2 = false;
-  absl::StatusOr<std::unique_ptr<int>> result2 =
+  abslx::StatusOr<std::unique_ptr<int>> result2 =
       packet2.ConsumeOrCopy<int>(&was_copied2);
   // After ConsumeOrCopy(), result2 gets the copy of packet2's data and packet2
   // is set to empty.
@@ -415,11 +415,11 @@ TEST(PacketTest, TestForeignHolderConsumeOrCopy) {
 TEST(PacketTest, TestConsumeBoundedArray) {
   Packet packet1 = MakePacket<int[3]>(10, 20, 30);
   Packet packet_copy = packet1;
-  absl::StatusOr<std::unique_ptr<int[3]>> result1 =
+  abslx::StatusOr<std::unique_ptr<int[3]>> result1 =
       packet_copy.Consume<int[3]>();
   // Both packet1 and packet_copy own the data, Consume() should return error.
-  absl::Status status1 = result1.status();
-  EXPECT_EQ(status1.code(), absl::StatusCode::kFailedPrecondition);
+  abslx::Status status1 = result1.status();
+  EXPECT_EQ(status1.code(), abslx::StatusCode::kFailedPrecondition);
   EXPECT_THAT(status1.message(),
               testing::HasSubstr("isn't the sole owner of the holder"));
   ASSERT_FALSE(packet1.IsEmpty());
@@ -435,7 +435,7 @@ TEST(PacketTest, TestConsumeBoundedArray) {
 
   Packet packet2 = MakePacket<int[3]>(40, 50, 60);
   // After Consume(), packet2 should be empty and result2 owns the data.
-  absl::StatusOr<std::unique_ptr<int[3]>> result2 = packet2.Consume<int[3]>();
+  abslx::StatusOr<std::unique_ptr<int[3]>> result2 = packet2.Consume<int[3]>();
   ASSERT_NE(nullptr, result2.value());
   auto value3 = result2.value().get();
   EXPECT_EQ(40, (*value3)[0]);
@@ -448,7 +448,7 @@ TEST(PacketTest, TestConsumeOrCopyBoundedArray) {
   Packet packet1 = MakePacket<int[3]>(10, 20, 30);
   Packet packet_copy = packet1;
   bool was_copied1 = false;
-  absl::StatusOr<std::unique_ptr<int[3]>> result1 =
+  abslx::StatusOr<std::unique_ptr<int[3]>> result1 =
       packet_copy.ConsumeOrCopy<int[3]>(&was_copied1);
   // Both packet1 and packet_copy own the data, ConsumeOrCopy() returns a copy
   // of the data and sets packet_copy to empty.
@@ -471,7 +471,7 @@ TEST(PacketTest, TestConsumeOrCopyBoundedArray) {
   bool was_copied2 = false;
   // packet2 is the sole owner of the data. ConsumeOrCopy() transfers the
   // ownership to result2 and makes packet2 empty.
-  absl::StatusOr<std::unique_ptr<int[3]>> result2 =
+  abslx::StatusOr<std::unique_ptr<int[3]>> result2 =
       packet2.ConsumeOrCopy<int[3]>(&was_copied2);
   EXPECT_TRUE(result2.ok());
   EXPECT_FALSE(was_copied2);

@@ -70,7 +70,7 @@ constexpr char kLetterboxPaddingTag[] = "LETTERBOX_PADDING";
 // }
 class DetectionLetterboxRemovalCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     RET_CHECK(cc->Inputs().HasTag(kDetectionsTag) &&
               cc->Inputs().HasTag(kLetterboxPaddingTag))
         << "Missing one or more input streams.";
@@ -80,19 +80,19 @@ class DetectionLetterboxRemovalCalculator : public CalculatorBase {
 
     cc->Outputs().Tag(kDetectionsTag).Set<std::vector<Detection>>();
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     // Only process if there's input detections.
     if (cc->Inputs().Tag(kDetectionsTag).IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     const auto& input_detections =
@@ -105,7 +105,7 @@ class DetectionLetterboxRemovalCalculator : public CalculatorBase {
     const float left_and_right = letterbox_padding[0] + letterbox_padding[2];
     const float top_and_bottom = letterbox_padding[1] + letterbox_padding[3];
 
-    auto output_detections = absl::make_unique<std::vector<Detection>>();
+    auto output_detections = abslx::make_unique<std::vector<Detection>>();
     for (const auto& detection : input_detections) {
       Detection new_detection;
       new_detection.CopyFrom(detection);
@@ -146,7 +146,7 @@ class DetectionLetterboxRemovalCalculator : public CalculatorBase {
     cc->Outputs()
         .Tag(kDetectionsTag)
         .Add(output_detections.release(), cc->InputTimestamp());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(DetectionLetterboxRemovalCalculator);

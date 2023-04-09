@@ -79,7 +79,7 @@ class ScopedWallTimer {
     // Accumulates passed_time into accumulators. Returns total time and number
     // of calls made.
     void Accumulate(double passed_time, double* accum_time, int* count) {
-      absl::MutexLock lock(&mutex_);
+      abslx::MutexLock lock(&mutex_);
       accum_time_ += passed_time;
       ++count_;
       *accum_time = accum_time_;
@@ -89,7 +89,7 @@ class ScopedWallTimer {
    private:
     double accum_time_;
     int count_;
-    absl::Mutex mutex_;
+    abslx::Mutex mutex_;
   };
 
   // Creates a new ScopedWallTimer for current file and line. LogMessage is only
@@ -135,7 +135,7 @@ class ScopedWallTimer {
   int64 start_time_;
   Accumulator* accumulator_;
 
-  int64 GetWallTime() { return absl::GetCurrentTimeNanos(); }
+  int64 GetWallTime() { return abslx::GetCurrentTimeNanos(); }
 };
 
 class MeasureTimeFilter {
@@ -159,7 +159,7 @@ class MeasureTimeFilter {
  private:
   explicit MeasureTimeFilter() {}
   explicit MeasureTimeFilter(const std::string& filter) {
-    match_items_ = absl::StrSplit(filter, absl::ByChar(','));
+    match_items_ = abslx::StrSplit(filter, abslx::ByChar(','));
   }
   std::vector<std::string> match_items_;
 };

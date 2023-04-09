@@ -66,7 +66,7 @@ struct GetElementResult {
 class DataTransferClient {
  public:
   struct Config {
-    absl::string_view protocol;
+    abslx::string_view protocol;
     std::string address;
   };
   using FactoryT =

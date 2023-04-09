@@ -23,7 +23,7 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::core_headers
+    abslx::core_headers
   PUBLIC
 )
 
@@ -35,9 +35,9 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::bits
-    absl::core_headers
-    absl::random_random
+    abslx::bits
+    abslx::core_headers
+    abslx::random_random
     gmock_main
 )
 
@@ -53,9 +53,9 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::config
-    absl::core_headers
-    absl::bits
+    abslx::config
+    abslx::core_headers
+    abslx::bits
   PUBLIC
 )
 
@@ -68,11 +68,11 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::int128
-    absl::base
-    absl::core_headers
-    absl::hash_testing
-    absl::type_traits
+    abslx::int128
+    abslx::base
+    abslx::core_headers
+    abslx::hash_testing
+    abslx::type_traits
     gmock_main
 )
 
@@ -83,7 +83,7 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::int128
+    abslx::int128
   PUBLIC
 )
 
@@ -95,6 +95,6 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::config
+    abslx::config
   PUBLIC
 )

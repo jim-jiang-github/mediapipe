@@ -170,7 +170,7 @@ class GraphProperties {
   // queue, and schedule the reprocessing of the queue if needed.
   static Status UpdateEnqueue(
       const NodeDef* enqueue_node,
-      const absl::flat_hash_map<const NodeDef*, const NodeDef*>&
+      const abslx::flat_hash_map<const NodeDef*, const NodeDef*>&
           resource_handles,
       SymbolicShapeRefiner* shape_refiner, bool* new_shapes);
 
@@ -189,22 +189,22 @@ class GraphProperties {
   // Update the shapes for node 'n'. If output shapes for n have changed,
   // enqueue its fanout in 'new_shapes'.
   Status UpdateShapes(SymbolicShapeRefiner* shape_refiner,
-                      const absl::flat_hash_map<const NodeDef*, const NodeDef*>&
+                      const abslx::flat_hash_map<const NodeDef*, const NodeDef*>&
                           resource_handles,
                       const NodeDef* n, bool* new_shapes) const;
   // Propagate the shapes for the nodes enqueued in new_shapes and their
   // transitive fanout until a fixed point is reached.
   Status PropagateShapes(
       SymbolicShapeRefiner* shape_refiner, TopoQueue* new_shapes,
-      const absl::flat_hash_map<const NodeDef*, const NodeDef*>&
+      const abslx::flat_hash_map<const NodeDef*, const NodeDef*>&
           resource_handles,
       int num_loops) const;
 
   // Data members
   const GrapplerItem& item_;
-  absl::flat_hash_map<string, std::vector<OpInfo::TensorProperties>>
+  abslx::flat_hash_map<string, std::vector<OpInfo::TensorProperties>>
       input_properties_;
-  absl::flat_hash_map<string, std::vector<OpInfo::TensorProperties>>
+  abslx::flat_hash_map<string, std::vector<OpInfo::TensorProperties>>
       output_properties_;
   const std::vector<OpInfo::TensorProperties> missing_properties_;
 

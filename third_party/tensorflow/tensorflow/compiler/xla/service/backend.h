@@ -140,7 +140,7 @@ class Backend {
 
   // Return a string identifier for the given device, eg: "GPU:3".
   std::string device_name(int device_ordinal) const {
-    return absl::StrCat(platform_->Name(), ":", device_ordinal);
+    return abslx::StrCat(platform_->Name(), ":", device_ordinal);
   }
 
   // Returns true if the devices with the given ordinals are equivalent from
@@ -158,7 +158,7 @@ class Backend {
 
  private:
   Backend(se::Platform* platform, Compiler* compiler,
-          absl::Span<se::StreamExecutor* const> stream_executors,
+          abslx::Span<se::StreamExecutor* const> stream_executors,
           TransferManager* transfer_manager,
           ComputationPlacer* computation_placer,
           int intra_op_parallelism_threads);
@@ -173,10 +173,10 @@ class Backend {
   // Vector of stream executors. stream_executors_[0] is the default executor.
   std::vector<se::StreamExecutor*> stream_executors_;
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
 
   // Mapping from stream executor to stream pools, used by `BorrowStream` above.
-  absl::flat_hash_map<se::StreamExecutor*, std::unique_ptr<StreamPool>>
+  abslx::flat_hash_map<se::StreamExecutor*, std::unique_ptr<StreamPool>>
       stream_pools_ ABSL_GUARDED_BY(mu_);
 
   // The default memory allocator to use.

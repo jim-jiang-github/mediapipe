@@ -334,7 +334,7 @@ class TileVariable {
                std::vector<llvm::Value*> initial_value);
 
   std::vector<llvm::Value*> Get() const;
-  void Set(absl::Span<llvm::Value* const> value);
+  void Set(abslx::Span<llvm::Value* const> value);
 
  private:
   std::vector<VectorVariable> storage_;

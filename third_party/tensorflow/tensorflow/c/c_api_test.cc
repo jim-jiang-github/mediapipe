@@ -63,7 +63,7 @@ Status TF_TensorToTensor(const TF_Tensor* src, Tensor* dst);
 namespace {
 
 static void ExpectHasSubstr(StringPiece s, StringPiece expected) {
-  EXPECT_TRUE(absl::StrContains(s, expected))
+  EXPECT_TRUE(abslx::StrContains(s, expected))
       << "'" << s << "' does not contain '" << expected << "'";
 }
 
@@ -2380,12 +2380,12 @@ TEST_F(CApiAttributesTest, StringTensor) {
   ASSERT_EQ(TF_TensorByteSize(t_in.get()), TF_TensorByteSize(t_out));
   TF_TString* t_in_tstr = static_cast<TF_TString*>(TF_TensorData(t_in.get()));
   TF_TString* t_out_tstr = static_cast<TF_TString*>(TF_TensorData(t_out));
-  EXPECT_EQ(absl::string_view(test_string),
-            absl::string_view(TF_TString_GetDataPointer(t_out_tstr),
+  EXPECT_EQ(abslx::string_view(test_string),
+            abslx::string_view(TF_TString_GetDataPointer(t_out_tstr),
                               TF_TString_GetSize(t_out_tstr)));
-  EXPECT_EQ(absl::string_view(TF_TString_GetDataPointer(t_in_tstr),
+  EXPECT_EQ(abslx::string_view(TF_TString_GetDataPointer(t_in_tstr),
                               TF_TString_GetSize(t_in_tstr)),
-            absl::string_view(TF_TString_GetDataPointer(t_out_tstr),
+            abslx::string_view(TF_TString_GetDataPointer(t_out_tstr),
                               TF_TString_GetSize(t_out_tstr)));
   TF_DeleteTensor(t_out);
   TF_TString_Dealloc(&tstr[0]);

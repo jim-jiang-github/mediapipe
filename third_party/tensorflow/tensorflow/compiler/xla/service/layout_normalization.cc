@@ -124,7 +124,7 @@ class LayoutNormalizationVisitor : public DfsHloRewriteVisitor {
 
     auto l = ToTransposeDimensions(s.layout());
     int64_t normalized_concat_dim = FindIndex(l, orig_concat_dim);
-    auto degen_delta = absl::c_count_if(
+    auto degen_delta = abslx::c_count_if(
         normalized_w_degen.dimensions().subspan(0, normalized_concat_dim),
         [&](int dim) { return dim == 1; });
     auto normalized_concat = hlo->AddInstruction(
@@ -163,7 +163,7 @@ class LayoutNormalizationVisitor : public DfsHloRewriteVisitor {
     for (int64_t& d : br_dimensions) {
       d = FindIndex(orig_output_layout_as_permutation, d);
     }
-    absl::c_sort(br_dimensions);
+    abslx::c_sort(br_dimensions);
     auto normalized_broadcast =
         MakeBroadcastHlo(normalized_input, br_dimensions, normalized_shape);
     VLOG(3) << "Generated broadcast: " << normalized_broadcast->ToString();
@@ -455,20 +455,20 @@ class LayoutNormalizationVisitor : public DfsHloRewriteVisitor {
           skip_degen_dims ? DegenDimsUpTo(normalized_shape_w_degen, tr_dim) : 0;
       new_dimensions.push_back(tr_dim - degen_delta);
     }
-    absl::c_sort(new_dimensions);
+    abslx::c_sort(new_dimensions);
     return new_dimensions;
   }
 
   // Returns number of degenerate dimensions in `shape` up to (exclusive) a
   // `dim`.
   int DegenDimsUpTo(const Shape& shape, int dim) {
-    return absl::c_count_if(shape.dimensions().subspan(0, dim),
+    return abslx::c_count_if(shape.dimensions().subspan(0, dim),
                             [&](int d) { return d == 1; });
   }
 
   // Drops items from `dimensions` corresponding to degenerate dimensions in
   // `input_shape`.
-  std::vector<int64_t> NoDegenerateDims(absl::Span<int64_t const> dimensions,
+  std::vector<int64_t> NoDegenerateDims(abslx::Span<int64_t const> dimensions,
                                         const Shape& input_shape,
                                         const Shape& output_shape) {
     std::vector<int64_t> out;
@@ -495,7 +495,7 @@ class LayoutNormalizationVisitor : public DfsHloRewriteVisitor {
   std::vector<int64_t> ToTransposeDimensions(const Layout& l) {
     std::vector<int64_t> out(l.minor_to_major().begin(),
                              l.minor_to_major().end());
-    absl::c_reverse(out);
+    abslx::c_reverse(out);
     return out;
   }
 
@@ -523,7 +523,7 @@ class LayoutNormalizationVisitor : public DfsHloRewriteVisitor {
 
 StatusOr<bool> LayoutNormalization::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   return LayoutNormalizationVisitor{}.RunOnModule(module, execution_threads);
 }
 

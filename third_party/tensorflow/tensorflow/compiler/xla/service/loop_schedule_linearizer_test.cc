@@ -82,7 +82,7 @@ class LoopScheduleLinearizerTest : public HloTestBase {
 };
 
 TEST_F(LoopScheduleLinearizerTest, NoExtraCopiesRequired) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 while_body {

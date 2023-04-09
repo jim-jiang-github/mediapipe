@@ -71,7 +71,7 @@ constexpr char kOptionsTag[] = "OPTIONS";
 //
 class FlowLimiterCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     auto& side_inputs = cc->InputSidePackets();
     side_inputs.Tag(kOptionsTag).Set<FlowLimiterCalculatorOptions>().Optional();
     cc->Inputs()
@@ -88,10 +88,10 @@ class FlowLimiterCalculator : public CalculatorBase {
     cc->Outputs().Tag(kAllowTag).Set<bool>().Optional();
     cc->SetInputStreamHandler("ImmediateInputStreamHandler");
     cc->SetProcessTimestampBounds(true);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     options_ = cc->Options<FlowLimiterCalculatorOptions>();
     options_ = tool::RetrieveOptions(options_, cc->InputSidePackets());
     if (cc->InputSidePackets().HasTag(kMaxInFlightTag)) {
@@ -101,11 +101,11 @@ class FlowLimiterCalculator : public CalculatorBase {
     input_queues_.resize(cc->Inputs().NumEntries(""));
     allowed_[Timestamp::Unset()] = true;
     RET_CHECK_OK(CopyInputHeadersToOutputs(cc->Inputs(), &(cc->Outputs())));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Releases input packets allowed by the max_in_flight constraint.
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     options_ = tool::RetrieveOptions(options_, cc->Inputs());
 
     // Process the FINISHED input stream.
@@ -175,7 +175,7 @@ class FlowLimiterCalculator : public CalculatorBase {
     Timestamp input_bound = InputTimestampBound(cc);
     auto first_range = std::prev(allowed_.upper_bound(input_bound));
     allowed_.erase(allowed_.begin(), first_range);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   int LedgerSize() {

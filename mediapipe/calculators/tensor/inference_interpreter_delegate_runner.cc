@@ -81,7 +81,7 @@ class InferenceInterpreterDelegateRunner : public InferenceRunner {
         interpreter_(std::move(interpreter)),
         delegate_(std::move(delegate)) {}
 
-  absl::StatusOr<std::vector<Tensor>> Run(
+  abslx::StatusOr<std::vector<Tensor>> Run(
       CalculatorContext* cc, const std::vector<Tensor>& input_tensors) override;
 
  private:
@@ -90,7 +90,7 @@ class InferenceInterpreterDelegateRunner : public InferenceRunner {
   TfLiteDelegatePtr delegate_;
 };
 
-absl::StatusOr<std::vector<Tensor>> InferenceInterpreterDelegateRunner::Run(
+abslx::StatusOr<std::vector<Tensor>> InferenceInterpreterDelegateRunner::Run(
     CalculatorContext* cc, const std::vector<Tensor>& input_tensors) {
   // Read CPU input into tensors.
   RET_CHECK_EQ(interpreter_->inputs().size(), input_tensors.size());
@@ -128,8 +128,8 @@ absl::StatusOr<std::vector<Tensor>> InferenceInterpreterDelegateRunner::Run(
         // No current use-case for copying MediaPipe Tensors with bool type to
         // TfLiteTensors.
       default:
-        return absl::InvalidArgumentError(
-            absl::StrCat("Unsupported input tensor type:", input_tensor_type));
+        return abslx::InvalidArgumentError(
+            abslx::StrCat("Unsupported input tensor type:", input_tensor_type));
     }
   }
 
@@ -184,15 +184,15 @@ absl::StatusOr<std::vector<Tensor>> InferenceInterpreterDelegateRunner::Run(
         // No current use-case for copying TfLiteTensors with string type to
         // MediaPipe Tensors.
       default:
-        return absl::InvalidArgumentError(
-            absl::StrCat("Unsupported output tensor type:",
+        return abslx::InvalidArgumentError(
+            abslx::StrCat("Unsupported output tensor type:",
                          TfLiteTypeGetName(tensor->type)));
     }
   }
   return output_tensors;
 }
 
-absl::StatusOr<std::unique_ptr<InferenceRunner>>
+abslx::StatusOr<std::unique_ptr<InferenceRunner>>
 CreateInferenceInterpreterDelegateRunner(
     api2::Packet<TfLiteModelPtr> model,
     api2::Packet<tflite::OpResolver> op_resolver, TfLiteDelegatePtr delegate,

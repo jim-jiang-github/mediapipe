@@ -35,7 +35,7 @@
 #include "absl/strings/string_view.h"
 #include "absl/types/optional.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace flags_internal {
 class PrivateHandleAccessor;
@@ -47,14 +47,14 @@ class PrivateHandleAccessor;
 // holds reflection information pertaining to that flag. Use CommandLineFlag to
 // access a flag's name, location, help string etc.
 //
-// To obtain an absl::CommandLineFlag, invoke `absl::FindCommandLineFlag()`
+// To obtain an abslx::CommandLineFlag, invoke `abslx::FindCommandLineFlag()`
 // passing it the flag name string.
 //
 // Example:
 //
 //   // Obtain reflection handle for a flag named "flagname".
-//   const absl::CommandLineFlag* my_flag_data =
-//        absl::FindCommandLineFlag("flagname");
+//   const abslx::CommandLineFlag* my_flag_data =
+//        abslx::FindCommandLineFlag("flagname");
 //
 //   // Now you can get flag info from that reflection handle.
 //   std::string flag_location = my_flag_data->Filename();
@@ -67,7 +67,7 @@ class CommandLineFlag {
   CommandLineFlag(const CommandLineFlag&) = delete;
   CommandLineFlag& operator=(const CommandLineFlag&) = delete;
 
-  // absl::CommandLineFlag::IsOfType()
+  // abslx::CommandLineFlag::IsOfType()
   //
   // Return true iff flag has type T.
   template <typename T>
@@ -75,14 +75,14 @@ class CommandLineFlag {
     return TypeId() == base_internal::FastTypeId<T>();
   }
 
-  // absl::CommandLineFlag::TryGet()
+  // abslx::CommandLineFlag::TryGet()
   //
   // Attempts to retrieve the flag value. Returns value on success,
-  // absl::nullopt otherwise.
+  // abslx::nullopt otherwise.
   template <typename T>
-  absl::optional<T> TryGet() const {
+  abslx::optional<T> TryGet() const {
     if (IsRetired() || !IsOfType<T>()) {
-      return absl::nullopt;
+      return abslx::nullopt;
     }
 
     // Implementation notes:
@@ -110,47 +110,47 @@ class CommandLineFlag {
     Read(&u.value);
     // allow retired flags to be "read", so we can report invalid access.
     if (IsRetired()) {
-      return absl::nullopt;
+      return abslx::nullopt;
     }
     return std::move(u.value);
   }
 
-  // absl::CommandLineFlag::Name()
+  // abslx::CommandLineFlag::Name()
   //
   // Returns name of this flag.
-  virtual absl::string_view Name() const = 0;
+  virtual abslx::string_view Name() const = 0;
 
-  // absl::CommandLineFlag::Filename()
+  // abslx::CommandLineFlag::Filename()
   //
   // Returns name of the file where this flag is defined.
   virtual std::string Filename() const = 0;
 
-  // absl::CommandLineFlag::Help()
+  // abslx::CommandLineFlag::Help()
   //
   // Returns help message associated with this flag.
   virtual std::string Help() const = 0;
 
-  // absl::CommandLineFlag::IsRetired()
+  // abslx::CommandLineFlag::IsRetired()
   //
   // Returns true iff this object corresponds to retired flag.
   virtual bool IsRetired() const;
 
-  // absl::CommandLineFlag::DefaultValue()
+  // abslx::CommandLineFlag::DefaultValue()
   //
   // Returns the default value for this flag.
   virtual std::string DefaultValue() const = 0;
 
-  // absl::CommandLineFlag::CurrentValue()
+  // abslx::CommandLineFlag::CurrentValue()
   //
   // Returns the current value for this flag.
   virtual std::string CurrentValue() const = 0;
 
-  // absl::CommandLineFlag::ParseFrom()
+  // abslx::CommandLineFlag::ParseFrom()
   //
   // Sets the value of the flag based on specified string `value`. If the flag
   // was successfully set to new value, it returns true. Otherwise, sets `error`
   // to indicate the error, leaves the flag unchanged, and returns false.
-  bool ParseFrom(absl::string_view value, std::string* error);
+  bool ParseFrom(abslx::string_view value, std::string* error);
 
  protected:
   ~CommandLineFlag() = default;
@@ -166,7 +166,7 @@ class CommandLineFlag {
   //  * Update the flag's default value
   //  * Update the current flag value if it was never set before
   // The mode is selected based on `set_mode` parameter.
-  virtual bool ParseFrom(absl::string_view value,
+  virtual bool ParseFrom(abslx::string_view value,
                          flags_internal::FlagSettingMode set_mode,
                          flags_internal::ValueSource source,
                          std::string& error) = 0;
@@ -187,7 +187,7 @@ class CommandLineFlag {
   virtual bool IsSpecifiedOnCommandLine() const = 0;
 
   // Validates supplied value usign validator or parseflag routine
-  virtual bool ValidateInputValue(absl::string_view value) const = 0;
+  virtual bool ValidateInputValue(abslx::string_view value) const = 0;
 
   // Checks that flags default value can be converted to string and back to the
   // flag's value type.
@@ -195,6 +195,6 @@ class CommandLineFlag {
 };
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_FLAGS_COMMANDLINEFLAG_H_

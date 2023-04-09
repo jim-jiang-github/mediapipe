@@ -96,7 +96,7 @@ struct TestParam {
   static std::string TestNameSuffix(
       const ::testing::TestParamInfo<TestParamTuple>& info) {
     const TestParam param(info.param);
-    return absl::Substitute(
+    return abslx::Substitute(
         "invocation_$0_quantization_$1_stride_$2_pad_$3_depth_mult_$4",
         static_cast<int>(param.forced_invocation),
         static_cast<int>(param.quantization_type), param.test_stride,

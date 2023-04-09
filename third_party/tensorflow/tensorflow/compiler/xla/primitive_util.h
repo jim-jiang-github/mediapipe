@@ -365,10 +365,10 @@ const std::string& LowercasePrimitiveTypeName(PrimitiveType s);
 
 // Returns the PrimitiveType matching the given name. The given name is expected
 // to be lower-case.
-StatusOr<PrimitiveType> StringToPrimitiveType(absl::string_view name);
+StatusOr<PrimitiveType> StringToPrimitiveType(abslx::string_view name);
 
 // Returns true if the given name is a primitive type string (lower-case).
-bool IsPrimitiveTypeName(absl::string_view name);
+bool IsPrimitiveTypeName(abslx::string_view name);
 
 // Returns whether `type` can be expressed as an instance of T.
 // For example,

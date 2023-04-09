@@ -28,7 +28,7 @@
 #include "absl/base/internal/thread_identity.h"
 #include "absl/base/port.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
@@ -55,6 +55,6 @@ inline base_internal::ThreadIdentity* GetOrCreateCurrentThreadIdentity() {
 
 }  // namespace synchronization_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_SYNCHRONIZATION_INTERNAL_CREATE_THREAD_IDENTITY_H_

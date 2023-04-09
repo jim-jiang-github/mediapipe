@@ -29,12 +29,12 @@
 #include "absl/base/internal/raw_logging.h"
 #include "absl/types/span.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
 
-using ::absl::Span;
+using ::abslx::Span;
 using ::testing::ElementsAre;
 
 size_t Distance(const void* from, const void* to) {
@@ -1239,7 +1239,7 @@ class TupleMatcher {
                        testing::MatchResultListener* /* listener */) const {
     static_assert(std::tuple_size<Tuple>::value == sizeof...(M), "");
     return MatchAndExplainImpl(
-        p, absl::make_index_sequence<std::tuple_size<Tuple>::value>{});
+        p, abslx::make_index_sequence<std::tuple_size<Tuple>::value>{});
   }
 
   // For the matcher concept. Left empty as we don't really need the diagnostics
@@ -1249,7 +1249,7 @@ class TupleMatcher {
 
  private:
   template <typename Tuple, size_t... Is>
-  bool MatchAndExplainImpl(const Tuple& p, absl::index_sequence<Is...>) const {
+  bool MatchAndExplainImpl(const Tuple& p, abslx::index_sequence<Is...>) const {
     // Using std::min as a simple variadic "and".
     return std::min(
         {true, testing::SafeMatcherCast<
@@ -1632,4 +1632,4 @@ TEST(CompactString, Works) {
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

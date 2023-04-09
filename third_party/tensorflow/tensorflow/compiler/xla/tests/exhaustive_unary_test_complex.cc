@@ -66,7 +66,7 @@ class ExhaustiveComplexUnaryTestBase
             << ", range " << real_values.ToString() << " "
             << imag_values.ToString();
 
-    absl::Span<NativeT> input_arr = (*input_literal)[0].data<NativeT>();
+    abslx::Span<NativeT> input_arr = (*input_literal)[0].data<NativeT>();
 
     uint64_t i = 0;
     for (auto real : real_values) {

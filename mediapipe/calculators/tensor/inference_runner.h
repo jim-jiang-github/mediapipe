@@ -11,7 +11,7 @@ namespace mediapipe {
 class InferenceRunner {
  public:
   virtual ~InferenceRunner() = default;
-  virtual absl::StatusOr<std::vector<Tensor>> Run(
+  virtual abslx::StatusOr<std::vector<Tensor>> Run(
       CalculatorContext* cc, const std::vector<Tensor>& inputs) = 0;
 };
 

@@ -203,7 +203,7 @@ string Signature::ToString() const {
   string result;
   for (size_t n = 0; n < nodes.size(); ++n) {
     // TODO(babkin): add attributes too.
-    result += absl::StrFormat("%d:%s", n, nodes[n]->opcode());
+    result += abslx::StrFormat("%d:%s", n, nodes[n]->opcode());
     for (const auto& entry : nodes[n]->hashed_peers_) {
       const auto& link = nodes[n]->hash_to_link_[entry.link_hash];
 
@@ -211,7 +211,7 @@ string Signature::ToString() const {
       // node ranks.
       if (link.tag.local.IsInbound()) {
         result +=
-            absl::StrFormat("[%s:%s:%d]", string(link.tag.local),
+            abslx::StrFormat("[%s:%s:%d]", string(link.tag.local),
                             string(link.tag.remote), entry.peer->unique_rank_);
       }
     }
@@ -224,7 +224,7 @@ Status Signature::Compute() {
   if (map.size() > kMaxGraphSize) {
     return Status(
         error::INVALID_ARGUMENT,
-        absl::StrFormat(
+        abslx::StrFormat(
             "A graph of %d nodes is too big for signature computation, "
             "the maximal supported node count is %d.",
             map.size(), kMaxGraphSize));

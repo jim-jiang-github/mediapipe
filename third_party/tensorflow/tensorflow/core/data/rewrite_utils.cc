@@ -137,8 +137,8 @@ Status ApplyRewrites(OpKernelContext* ctx,
 }  // anonymous namespace
 
 RewriterConfig CreateRewriterConfig(
-    const absl::flat_hash_set<tstring>& optimizations,
-    const absl::flat_hash_set<tstring>& optimizations_configs) {
+    const abslx::flat_hash_set<tstring>& optimizations,
+    const abslx::flat_hash_set<tstring>& optimizations_configs) {
   RewriterConfig rewriter_config;
   rewriter_config.add_optimizers(kOptimizerName);
   rewriter_config.set_meta_optimizer_iterations(RewriterConfig::ONE);
@@ -296,12 +296,12 @@ std::unique_ptr<tensorflow::grappler::GrapplerItem> GetGrapplerItem(
   return grappler_item;
 }
 
-absl::flat_hash_set<tstring> SelectOptimizations(
-    const absl::flat_hash_set<string>& experiments,
-    const absl::flat_hash_set<tstring>& optimizations_enabled,
-    const absl::flat_hash_set<tstring>& optimizations_disabled,
-    const absl::flat_hash_set<tstring>& optimizations_default) {
-  absl::flat_hash_set<tstring> optimizations;
+abslx::flat_hash_set<tstring> SelectOptimizations(
+    const abslx::flat_hash_set<string>& experiments,
+    const abslx::flat_hash_set<tstring>& optimizations_enabled,
+    const abslx::flat_hash_set<tstring>& optimizations_disabled,
+    const abslx::flat_hash_set<tstring>& optimizations_default) {
+  abslx::flat_hash_set<tstring> optimizations;
 
   // Add the enabled optimizations.
   optimizations.insert(optimizations_enabled.begin(),
@@ -337,7 +337,7 @@ StatusOr<std::string> GetDatasetNode(const GraphDef& graph_def) {
     }
   }
   return errors::NotFound(
-      absl::Substitute("Dataset node for graph is not found:\n$0",
+      abslx::Substitute("Dataset node for graph is not found:\n$0",
                        graph_def.ShortDebugString()));
 }
 
@@ -349,7 +349,7 @@ StatusOr<NodeDef> GetDatasetNodeDef(const GraphDef& graph_def) {
     }
   }
   return errors::NotFound(
-      absl::Substitute("Dataset node for graph is not found:\n$0",
+      abslx::Substitute("Dataset node for graph is not found:\n$0",
                        graph_def.ShortDebugString()));
 }
 

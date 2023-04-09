@@ -109,9 +109,9 @@ class AllocationTracker {
 
   // A map from device memory opaque value to allocation. One such map is
   // maintained per device ordinal.
-  using AllocationMap = absl::flat_hash_map<const void*, Allocation>;
+  using AllocationMap = abslx::flat_hash_map<const void*, Allocation>;
 
-  mutable absl::Mutex mutex_;
+  mutable abslx::Mutex mutex_;
 
   // Backend to use with this tracker. The backend supplies the memory allocator
   // to use when deallocating memory.
@@ -122,7 +122,7 @@ class AllocationTracker {
   int64_t next_handle_ ABSL_GUARDED_BY(mutex_);
 
   // A map from device ordinal to AllocationMap.
-  absl::flat_hash_map<int, AllocationMap> opaque_to_allocation_map_
+  abslx::flat_hash_map<int, AllocationMap> opaque_to_allocation_map_
       ABSL_GUARDED_BY(mutex_);
 
   // A map from data handle to a vector of shaped buffers that represent the
@@ -142,7 +142,7 @@ class AllocationTracker {
   // non-owning "view" into a tuple's sub-buffers.  The sub-buffers are then
   // free'd when both the view *and* the original tuple are Unregistered.  This
   // refcounting is managed in opaque_to_allocation_map_.
-  absl::flat_hash_map<int64_t, std::vector<std::unique_ptr<ShapedBuffer>>>
+  abslx::flat_hash_map<int64_t, std::vector<std::unique_ptr<ShapedBuffer>>>
       handle_to_shaped_buffers_ ABSL_GUARDED_BY(mutex_);
 
   AllocationTracker(const AllocationTracker&) = delete;

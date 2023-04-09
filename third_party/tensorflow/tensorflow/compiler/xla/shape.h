@@ -39,8 +39,8 @@ class Shape {
   // Construct a shape from a ShapeProto.
   explicit Shape(const ShapeProto& shape_proto);
 
-  Shape(PrimitiveType element_type, absl::Span<const int64_t> dimensions,
-        absl::Span<const bool> dynamic_dimensions,
+  Shape(PrimitiveType element_type, abslx::Span<const int64_t> dimensions,
+        abslx::Span<const bool> dynamic_dimensions,
         std::vector<Shape> tuple_shapes)
       : element_type_(element_type),
         dimensions_(dimensions.begin(), dimensions.end()),
@@ -88,12 +88,12 @@ class Shape {
     dynamic_dimensions_[dimension] = is_dynamic;
   }
 
-  absl::Span<const bool> dynamic_dimensions() const {
+  abslx::Span<const bool> dynamic_dimensions() const {
     return dynamic_dimensions_;
   }
 
-  absl::Span<bool> mutable_dynamic_dimensions() {
-    return absl::MakeSpan(dynamic_dimensions_);
+  abslx::Span<bool> mutable_dynamic_dimensions() {
+    return abslx::MakeSpan(dynamic_dimensions_);
   }
 
   // Add dimension_upper_bound().
@@ -134,9 +134,9 @@ class Shape {
     dimensions_.clear();
     dynamic_dimensions_.clear();
   }
-  absl::Span<const int64_t> dimensions() const { return dimensions_; }
-  absl::Span<int64_t> mutable_dimensions() {
-    return absl::MakeSpan(dimensions_);
+  abslx::Span<const int64_t> dimensions() const { return dimensions_; }
+  abslx::Span<int64_t> mutable_dimensions() {
+    return abslx::MakeSpan(dimensions_);
   }
 
   // Methods for accessing the tuple subshapes. This field only non-empty for
@@ -290,7 +290,7 @@ class Shape {
 
   // This vector is the same size as 'dimensions_' and indicates whether the
   // respective dimension is dynamically sized.
-  absl::InlinedVector<bool, InlineRank()> dynamic_dimensions_;
+  abslx::InlinedVector<bool, InlineRank()> dynamic_dimensions_;
 
   // The tuple element subshapes. This is nonempty only for tuple shapes.
   std::vector<Shape> tuple_shapes_;

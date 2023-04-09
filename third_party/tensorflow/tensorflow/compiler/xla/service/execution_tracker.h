@@ -89,7 +89,7 @@ class ExecutionTracker {
   std::map<int64_t, std::unique_ptr<AsyncExecution>> handle_to_execution_
       ABSL_GUARDED_BY(execution_mutex_);
 
-  absl::Mutex execution_mutex_;  // Guards the execution mapping.
+  abslx::Mutex execution_mutex_;  // Guards the execution mapping.
 
   ExecutionTracker(const ExecutionTracker&) = delete;
   ExecutionTracker& operator=(const ExecutionTracker&) = delete;

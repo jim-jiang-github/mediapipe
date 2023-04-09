@@ -21,13 +21,13 @@
 // combination with an Abseil random bit generator to produce random values
 // according to the rules of the distribution.
 //
-// `absl::uniform_real_distribution` is a drop-in replacement for the C++11
+// `abslx::uniform_real_distribution` is a drop-in replacement for the C++11
 // `std::uniform_real_distribution` [rand.dist.uni.real] but is considerably
 // faster than the libstdc++ implementation.
 //
 // Note: the standard-library version may occasionally return `1.0` when
 // default-initialized. See https://bugs.llvm.org//show_bug.cgi?id=18767
-// `absl::uniform_real_distribution` does not exhibit this behavior.
+// `abslx::uniform_real_distribution` does not exhibit this behavior.
 
 #ifndef ABSL_RANDOM_UNIFORM_REAL_DISTRIBUTION_H_
 #define ABSL_RANDOM_UNIFORM_REAL_DISTRIBUTION_H_
@@ -44,21 +44,21 @@
 #include "absl/random/internal/generate_real.h"
 #include "absl/random/internal/iostream_state_saver.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
-// absl::uniform_real_distribution<T>
+// abslx::uniform_real_distribution<T>
 //
 // This distribution produces random floating-point values uniformly distributed
 // over the half-open interval [a, b).
 //
 // Example:
 //
-//   absl::BitGen gen;
+//   abslx::BitGen gen;
 //
 //   // Use the distribution to produce a value between 0.0 (inclusive)
 //   // and 1.0 (exclusive).
-//   double value = absl::uniform_real_distribution<double>(0, 1)(gen);
+//   double value = abslx::uniform_real_distribution<double>(0, 1)(gen);
 //
 template <typename RealType = double>
 class uniform_real_distribution {
@@ -97,7 +97,7 @@ class uniform_real_distribution {
     result_type lo_, hi_, range_;
 
     static_assert(std::is_floating_point<RealType>::value,
-                  "Class-template absl::uniform_real_distribution<> must be "
+                  "Class-template abslx::uniform_real_distribution<> must be "
                   "parameterized using a floating-point type.");
   };
 
@@ -157,7 +157,7 @@ uniform_real_distribution<RealType>::operator()(
   using random_internal::GeneratePositiveTag;
   using random_internal::GenerateRealFromBits;
   using real_type =
-      absl::conditional_t<std::is_same<RealType, float>::value, float, double>;
+      abslx::conditional_t<std::is_same<RealType, float>::value, float, double>;
 
   while (true) {
     const result_type sample =
@@ -197,6 +197,6 @@ std::basic_istream<CharT, Traits>& operator>>(
   return is;
 }
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_UNIFORM_REAL_DISTRIBUTION_H_

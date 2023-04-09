@@ -37,7 +37,7 @@ namespace {
 
 class FullyConnectedBuffers : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     const auto& attr =
         std::any_cast<const FullyConnectedAttributes&>(ctx.op_attr);
@@ -115,7 +115,7 @@ class FullyConnectedBuffers : public NodeShader {
         /*input=*/IOStructure::ONLY_DEFINITIONS,
         /*output=*/IOStructure::ONLY_DEFINITIONS,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

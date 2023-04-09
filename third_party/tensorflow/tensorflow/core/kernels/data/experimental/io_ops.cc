@@ -128,7 +128,7 @@ Status SaveDatasetOp::WriteData(OpKernelContext* ctx, DatasetBase* dataset,
 
   mutex mu;
   Status status;
-  absl::flat_hash_map<int64_t, std::unique_ptr<snapshot_util::AsyncWriter>>
+  abslx::flat_hash_map<int64_t, std::unique_ptr<snapshot_util::AsyncWriter>>
       writers;
   while (true) {
     if (ctx->cancellation_manager()->IsCancelled()) {
@@ -499,7 +499,7 @@ class SaveDatasetV2Op::Dataset : public DatasetBase {
     std::unique_ptr<IteratorBase> input_impl_ TF_GUARDED_BY(mu_);
     int64_t num_elements_;
 
-    absl::flat_hash_map<int64_t, std::unique_ptr<snapshot_util::AsyncWriter>>
+    abslx::flat_hash_map<int64_t, std::unique_ptr<snapshot_util::AsyncWriter>>
         writers_ TF_GUARDED_BY(mu_);
     Status writer_status_ TF_GUARDED_BY(writer_status_mu_);
     bool writers_closed_ TF_GUARDED_BY(mu_);

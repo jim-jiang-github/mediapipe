@@ -22,16 +22,16 @@ namespace stream_executor {
 namespace port {
 namespace internal {
 
-static bool IsAbsolutePath(absl::string_view path) {
+static bool IsAbsolutePath(abslx::string_view path) {
   return !path.empty() && path[0] == '/';
 }
 
 // For an array of paths of length count, append them all together,
 // ensuring that the proper path separators are inserted between them.
-std::string JoinPathImpl(std::initializer_list<absl::string_view> paths) {
+std::string JoinPathImpl(std::initializer_list<abslx::string_view> paths) {
   std::string result;
 
-  for (absl::string_view path : paths) {
+  for (abslx::string_view path : paths) {
     if (path.empty()) continue;
 
     if (result.empty()) {
@@ -41,15 +41,15 @@ std::string JoinPathImpl(std::initializer_list<absl::string_view> paths) {
 
     if (result[result.size() - 1] == '/') {
       if (IsAbsolutePath(path)) {
-        absl::StrAppend(&result, path.substr(1));
+        abslx::StrAppend(&result, path.substr(1));
       } else {
-        absl::StrAppend(&result, path);
+        abslx::StrAppend(&result, path);
       }
     } else {
       if (IsAbsolutePath(path)) {
-        absl::StrAppend(&result, path);
+        abslx::StrAppend(&result, path);
       } else {
-        absl::StrAppend(&result, "/", path);
+        abslx::StrAppend(&result, "/", path);
       }
     }
   }

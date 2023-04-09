@@ -335,12 +335,12 @@ class CPUIDInfo {
   int model_num_;
 };
 
-absl::once_flag cpuid_once_flag;
+abslx::once_flag cpuid_once_flag;
 
 void InitCPUIDInfo() {
   // This ensures that CPUIDInfo::Initialize() is called exactly
   // once regardless of how many threads concurrently call us
-  absl::call_once(cpuid_once_flag, CPUIDInfo::Initialize);
+  abslx::call_once(cpuid_once_flag, CPUIDInfo::Initialize);
 }
 
 #endif  // PLATFORM_IS_X86

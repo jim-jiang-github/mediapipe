@@ -46,7 +46,7 @@ struct UDT {
   UDT() = default;
   UDT(const UDT&) = default;
 };
-bool AbslParseFlag(absl::string_view, UDT*, std::string*) { return true; }
+bool AbslParseFlag(abslx::string_view, UDT*, std::string*) { return true; }
 std::string AbslUnparseFlag(const UDT&) { return "UDT{}"; }
 
 ABSL_FLAG(UDT, usage_reporting_test_flag_05, {},
@@ -62,9 +62,9 @@ ABSL_FLAG(
 
 namespace {
 
-namespace flags = absl::flags_internal;
+namespace flags = abslx::flags_internal;
 
-static std::string NormalizeFileName(absl::string_view fname) {
+static std::string NormalizeFileName(abslx::string_view fname) {
 #ifdef _WIN32
   std::string normalized(fname);
   std::replace(normalized.begin(), normalized.end(), '\\', '/');
@@ -72,7 +72,7 @@ static std::string NormalizeFileName(absl::string_view fname) {
 #endif
 
   auto absl_pos = fname.rfind("absl/");
-  if (absl_pos != absl::string_view::npos) {
+  if (absl_pos != abslx::string_view::npos) {
     fname = fname.substr(absl_pos);
   }
   return std::string(fname);
@@ -83,9 +83,9 @@ class UsageReportingTest : public testing::Test {
   UsageReportingTest() {
     // Install default config for the use on this unit test.
     // Binary may install a custom config before tests are run.
-    absl::FlagsUsageConfig default_config;
+    abslx::FlagsUsageConfig default_config;
     default_config.normalize_filename = &NormalizeFileName;
-    absl::SetFlagsUsageConfig(default_config);
+    abslx::SetFlagsUsageConfig(default_config);
   }
   ~UsageReportingTest() override {
     flags::SetFlagsHelpMode(flags::HelpMode::kNone);
@@ -94,7 +94,7 @@ class UsageReportingTest : public testing::Test {
   }
 
  private:
-  absl::FlagSaver flag_saver_;
+  abslx::FlagSaver flag_saver_;
 };
 
 // --------------------------------------------------------------------
@@ -102,12 +102,12 @@ class UsageReportingTest : public testing::Test {
 using UsageReportingDeathTest = UsageReportingTest;
 
 TEST_F(UsageReportingDeathTest, TestSetProgramUsageMessage) {
-  EXPECT_EQ(absl::ProgramUsageMessage(), kTestUsageMessage);
+  EXPECT_EQ(abslx::ProgramUsageMessage(), kTestUsageMessage);
 
 #ifndef _WIN32
   // TODO(rogeeff): figure out why this does not work on Windows.
   EXPECT_DEATH_IF_SUPPORTED(
-      absl::SetProgramUsageMessage("custom usage message"),
+      abslx::SetProgramUsageMessage("custom usage message"),
       ".*SetProgramUsageMessage\\(\\) called twice.*");
 #endif
 }
@@ -115,7 +115,7 @@ TEST_F(UsageReportingDeathTest, TestSetProgramUsageMessage) {
 // --------------------------------------------------------------------
 
 TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_01) {
-  const auto* flag = absl::FindCommandLineFlag("usage_reporting_test_flag_01");
+  const auto* flag = abslx::FindCommandLineFlag("usage_reporting_test_flag_01");
   std::stringstream test_buf;
 
   flags::FlagHelp(test_buf, *flag, flags::HelpFormat::kHumanReadable);
@@ -127,7 +127,7 @@ TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_01) {
 }
 
 TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_02) {
-  const auto* flag = absl::FindCommandLineFlag("usage_reporting_test_flag_02");
+  const auto* flag = abslx::FindCommandLineFlag("usage_reporting_test_flag_02");
   std::stringstream test_buf;
 
   flags::FlagHelp(test_buf, *flag, flags::HelpFormat::kHumanReadable);
@@ -139,7 +139,7 @@ TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_02) {
 }
 
 TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_03) {
-  const auto* flag = absl::FindCommandLineFlag("usage_reporting_test_flag_03");
+  const auto* flag = abslx::FindCommandLineFlag("usage_reporting_test_flag_03");
   std::stringstream test_buf;
 
   flags::FlagHelp(test_buf, *flag, flags::HelpFormat::kHumanReadable);
@@ -151,7 +151,7 @@ TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_03) {
 }
 
 TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_04) {
-  const auto* flag = absl::FindCommandLineFlag("usage_reporting_test_flag_04");
+  const auto* flag = abslx::FindCommandLineFlag("usage_reporting_test_flag_04");
   std::stringstream test_buf;
 
   flags::FlagHelp(test_buf, *flag, flags::HelpFormat::kHumanReadable);
@@ -163,7 +163,7 @@ TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_04) {
 }
 
 TEST_F(UsageReportingTest, TestFlagHelpHRF_on_flag_05) {
-  const auto* flag = absl::FindCommandLineFlag("usage_reporting_test_flag_05");
+  const auto* flag = abslx::FindCommandLineFlag("usage_reporting_test_flag_05");
   std::stringstream test_buf;
 
   flags::FlagHelp(test_buf, *flag, flags::HelpFormat::kHumanReadable);
@@ -234,13 +234,13 @@ path.
   flags::FlagsHelp(test_buf_05, "", flags::HelpFormat::kHumanReadable,
                    kTestUsageMessage);
   std::string test_out = test_buf_05.str();
-  absl::string_view test_out_str(test_out);
+  abslx::string_view test_out_str(test_out);
   EXPECT_TRUE(
-      absl::StartsWith(test_out_str, "usage_test: Custom usage message"));
-  EXPECT_TRUE(absl::StrContains(
+      abslx::StartsWith(test_out_str, "usage_test: Custom usage message"));
+  EXPECT_TRUE(abslx::StrContains(
       test_out_str, "Flags from absl/flags/internal/usage_test.cc:"));
   EXPECT_TRUE(
-      absl::StrContains(test_out_str, "-usage_reporting_test_flag_01 "));
+      abslx::StrContains(test_out_str, "-usage_reporting_test_flag_01 "));
 }
 
 // --------------------------------------------------------------------
@@ -484,9 +484,9 @@ path.
 }  // namespace
 
 int main(int argc, char* argv[]) {
-  (void)absl::GetFlag(FLAGS_undefok);  // Force linking of parse.cc
+  (void)abslx::GetFlag(FLAGS_undefok);  // Force linking of parse.cc
   flags::SetProgramInvocationName("usage_test");
-  absl::SetProgramUsageMessage(kTestUsageMessage);
+  abslx::SetProgramUsageMessage(kTestUsageMessage);
   ::testing::InitGoogleTest(&argc, argv);
 
   return RUN_ALL_TESTS();

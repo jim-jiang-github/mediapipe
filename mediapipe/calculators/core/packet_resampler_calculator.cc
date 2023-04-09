@@ -52,7 +52,7 @@ TimestampDiff TimestampDiffFromSeconds(double seconds) {
 }
 }  // namespace
 
-absl::Status PacketResamplerCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status PacketResamplerCalculator::GetContract(CalculatorContract* cc) {
   const auto& resampler_options =
       cc->Options<PacketResamplerCalculatorOptions>();
   if (cc->InputSidePackets().HasTag(kOptionsTag)) {
@@ -82,10 +82,10 @@ absl::Status PacketResamplerCalculator::GetContract(CalculatorContract* cc) {
     RET_CHECK(cc->InputSidePackets().HasTag(kSeedTag));
     cc->InputSidePackets().Tag(kSeedTag).Set<std::string>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PacketResamplerCalculator::Open(CalculatorContext* cc) {
+abslx::Status PacketResamplerCalculator::Open(CalculatorContext* cc) {
   const auto resampler_options =
       tool::RetrieveOptions(cc->Options<PacketResamplerCalculatorOptions>(),
                             cc->InputSidePackets(), "OPTIONS");
@@ -146,14 +146,14 @@ absl::Status PacketResamplerCalculator::Open(CalculatorContext* cc) {
   return strategy_->Open(cc);
 }
 
-absl::Status PacketResamplerCalculator::Process(CalculatorContext* cc) {
+abslx::Status PacketResamplerCalculator::Process(CalculatorContext* cc) {
   if (cc->InputTimestamp() == Timestamp::PreStream() &&
       cc->Inputs().UsesTags() && cc->Inputs().HasTag(kVideoHeaderTag) &&
       !cc->Inputs().Tag(kVideoHeaderTag).IsEmpty()) {
     video_header_ = cc->Inputs().Tag(kVideoHeaderTag).Get<VideoHeader>();
     video_header_.frame_rate = frame_rate_;
     if (cc->Inputs().Get(input_data_id_).IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
   }
 
@@ -161,12 +161,12 @@ absl::Status PacketResamplerCalculator::Process(CalculatorContext* cc) {
 
   last_packet_ = cc->Inputs().Get(input_data_id_).Value();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PacketResamplerCalculator::Close(CalculatorContext* cc) {
+abslx::Status PacketResamplerCalculator::Close(CalculatorContext* cc) {
   if (!cc->GraphStatus().ok()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   return strategy_->Close(cc);
@@ -183,19 +183,19 @@ PacketResamplerCalculator::GetSamplingStrategy(
           << "reproducible_sampling always uses jitter with reflection, "
           << "Ignoring jitter_with_reflection setting.";
     }
-    return absl::make_unique<ReproducibleJitterWithReflectionStrategy>(this);
+    return abslx::make_unique<ReproducibleJitterWithReflectionStrategy>(this);
   }
 
   if (options.jitter() == 0) {
-    return absl::make_unique<NoJitterStrategy>(this);
+    return abslx::make_unique<NoJitterStrategy>(this);
   }
 
   if (options.jitter_with_reflection()) {
-    return absl::make_unique<LegacyJitterWithReflectionStrategy>(this);
+    return abslx::make_unique<LegacyJitterWithReflectionStrategy>(this);
   }
 
   // With jitter and no reflection.
-  return absl::make_unique<JitterWithoutReflectionStrategy>(this);
+  return abslx::make_unique<JitterWithoutReflectionStrategy>(this);
 }
 
 Timestamp PacketResamplerCalculator::PeriodIndexToTimestamp(int64 index) const {
@@ -221,7 +221,7 @@ void PacketResamplerCalculator::OutputWithinLimits(CalculatorContext* cc,
   }
 }
 
-absl::Status LegacyJitterWithReflectionStrategy::Open(CalculatorContext* cc) {
+abslx::Status LegacyJitterWithReflectionStrategy::Open(CalculatorContext* cc) {
   const auto resampler_options =
       tool::RetrieveOptions(cc->Options<PacketResamplerCalculatorOptions>(),
                             cc->InputSidePackets(), "OPTIONS");
@@ -240,7 +240,7 @@ absl::Status LegacyJitterWithReflectionStrategy::Open(CalculatorContext* cc) {
   const auto& seed = cc->InputSidePackets().Tag(kSeedTag).Get<std::string>();
   random_ = CreateSecureRandom(seed);
   if (random_ == nullptr) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "SecureRandom is not available.  With \"jitter\" specified, "
         "PacketResamplerCalculator processing cannot proceed.");
   }
@@ -249,16 +249,16 @@ absl::Status LegacyJitterWithReflectionStrategy::Open(CalculatorContext* cc) {
   packet_reservoir_ =
       std::make_unique<PacketReservoir>(packet_reservoir_random_.get());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
-absl::Status LegacyJitterWithReflectionStrategy::Close(CalculatorContext* cc) {
+abslx::Status LegacyJitterWithReflectionStrategy::Close(CalculatorContext* cc) {
   if (!packet_reservoir_->IsEmpty()) {
     LOG(INFO) << "Emitting pack from reservoir.";
     calculator_->OutputWithinLimits(cc, packet_reservoir_->GetSample());
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
-absl::Status LegacyJitterWithReflectionStrategy::Process(
+abslx::Status LegacyJitterWithReflectionStrategy::Process(
     CalculatorContext* cc) {
   RET_CHECK_GT(cc->InputTimestamp(), Timestamp::PreStream());
 
@@ -279,7 +279,7 @@ absl::Status LegacyJitterWithReflectionStrategy::Process(
                                               .At(next_output_timestamp_));
       UpdateNextOutputTimestampWithJitter();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   if (calculator_->frame_time_usec_ <
@@ -315,7 +315,7 @@ absl::Status LegacyJitterWithReflectionStrategy::Process(
         .Get(calculator_->output_data_id_)
         .SetNextTimestampBound(timestamp_bound);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void LegacyJitterWithReflectionStrategy::
@@ -343,7 +343,7 @@ void LegacyJitterWithReflectionStrategy::UpdateNextOutputTimestampWithJitter() {
   CHECK_LT(next_output_timestamp_, next_output_timestamp_max_);
 }
 
-absl::Status ReproducibleJitterWithReflectionStrategy::Open(
+abslx::Status ReproducibleJitterWithReflectionStrategy::Open(
     CalculatorContext* cc) {
   const auto resampler_options =
       tool::RetrieveOptions(cc->Options<PacketResamplerCalculatorOptions>(),
@@ -363,14 +363,14 @@ absl::Status ReproducibleJitterWithReflectionStrategy::Open(
   const auto& seed = cc->InputSidePackets().Tag(kSeedTag).Get<std::string>();
   random_ = CreateSecureRandom(seed);
   if (random_ == nullptr) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "SecureRandom is not available.  With \"jitter\" specified, "
         "PacketResamplerCalculator processing cannot proceed.");
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
-absl::Status ReproducibleJitterWithReflectionStrategy::Close(
+abslx::Status ReproducibleJitterWithReflectionStrategy::Close(
     CalculatorContext* cc) {
   // If last packet is non-empty and a packet hasn't been emitted for this
   // period, emit the last packet.
@@ -378,9 +378,9 @@ absl::Status ReproducibleJitterWithReflectionStrategy::Close(
     calculator_->OutputWithinLimits(
         cc, calculator_->last_packet_.At(next_output_timestamp_));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
-absl::Status ReproducibleJitterWithReflectionStrategy::Process(
+abslx::Status ReproducibleJitterWithReflectionStrategy::Process(
     CalculatorContext* cc) {
   RET_CHECK_GT(cc->InputTimestamp(), Timestamp::PreStream());
 
@@ -400,7 +400,7 @@ absl::Status ReproducibleJitterWithReflectionStrategy::Process(
       packet_emitted_this_period_ = true;
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Last packet is set, so we are mid-stream.
@@ -449,7 +449,7 @@ absl::Status ReproducibleJitterWithReflectionStrategy::Process(
         .Get(calculator_->output_data_id_)
         .SetNextTimestampBound(next_output_timestamp_);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void ReproducibleJitterWithReflectionStrategy::InitializeNextOutputTimestamp(
@@ -491,7 +491,7 @@ void ReproducibleJitterWithReflectionStrategy::UpdateNextOutputTimestamp(
   }
 }
 
-absl::Status JitterWithoutReflectionStrategy::Open(CalculatorContext* cc) {
+abslx::Status JitterWithoutReflectionStrategy::Open(CalculatorContext* cc) {
   const auto resampler_options =
       tool::RetrieveOptions(cc->Options<PacketResamplerCalculatorOptions>(),
                             cc->InputSidePackets(), "OPTIONS");
@@ -510,24 +510,24 @@ absl::Status JitterWithoutReflectionStrategy::Open(CalculatorContext* cc) {
   const auto& seed = cc->InputSidePackets().Tag(kSeedTag).Get<std::string>();
   random_ = CreateSecureRandom(seed);
   if (random_ == nullptr) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "SecureRandom is not available.  With \"jitter\" specified, "
         "PacketResamplerCalculator processing cannot proceed.");
   }
 
   packet_reservoir_random_ = CreateSecureRandom(seed);
   packet_reservoir_ =
-      absl::make_unique<PacketReservoir>(packet_reservoir_random_.get());
+      abslx::make_unique<PacketReservoir>(packet_reservoir_random_.get());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
-absl::Status JitterWithoutReflectionStrategy::Close(CalculatorContext* cc) {
+abslx::Status JitterWithoutReflectionStrategy::Close(CalculatorContext* cc) {
   if (!packet_reservoir_->IsEmpty()) {
     calculator_->OutputWithinLimits(cc, packet_reservoir_->GetSample());
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
-absl::Status JitterWithoutReflectionStrategy::Process(CalculatorContext* cc) {
+abslx::Status JitterWithoutReflectionStrategy::Process(CalculatorContext* cc) {
   RET_CHECK_GT(cc->InputTimestamp(), Timestamp::PreStream());
 
   // Packet reservior is used to make sure there's an output for every period,
@@ -549,7 +549,7 @@ absl::Status JitterWithoutReflectionStrategy::Process(CalculatorContext* cc) {
                                               .At(next_output_timestamp_));
       UpdateNextOutputTimestamp();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   if (calculator_->frame_time_usec_ <
@@ -578,7 +578,7 @@ absl::Status JitterWithoutReflectionStrategy::Process(CalculatorContext* cc) {
         .Get(calculator_->output_data_id_)
         .SetNextTimestampBound(next_output_timestamp_);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void JitterWithoutReflectionStrategy::InitializeNextOutputTimestamp() {
@@ -595,7 +595,7 @@ void JitterWithoutReflectionStrategy::UpdateNextOutputTimestamp() {
                              2.0 * calculator_->jitter_ * random_->RandFloat());
 }
 
-absl::Status NoJitterStrategy::Open(CalculatorContext* cc) {
+abslx::Status NoJitterStrategy::Open(CalculatorContext* cc) {
   const auto resampler_options =
       tool::RetrieveOptions(cc->Options<PacketResamplerCalculatorOptions>(),
                             cc->InputSidePackets(), "OPTIONS");
@@ -605,9 +605,9 @@ absl::Status NoJitterStrategy::Open(CalculatorContext* cc) {
 
   period_count_ = 0;
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
-absl::Status NoJitterStrategy::Close(CalculatorContext* cc) {
+abslx::Status NoJitterStrategy::Close(CalculatorContext* cc) {
   // Emit the last packet received if we have at least one packet, but
   // haven't sent anything for its period.
   if (calculator_->first_timestamp_ != Timestamp::Unset() &&
@@ -618,9 +618,9 @@ absl::Status NoJitterStrategy::Close(CalculatorContext* cc) {
         cc, calculator_->last_packet_.At(
                 calculator_->PeriodIndexToTimestamp(period_count_)));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
-absl::Status NoJitterStrategy::Process(CalculatorContext* cc) {
+abslx::Status NoJitterStrategy::Process(CalculatorContext* cc) {
   RET_CHECK_GT(cc->InputTimestamp(), Timestamp::PreStream());
 
   if (calculator_->first_timestamp_ == Timestamp::Unset()) {
@@ -693,7 +693,7 @@ absl::Status NoJitterStrategy::Process(CalculatorContext* cc) {
         .SetNextTimestampBound(
             calculator_->PeriodIndexToTimestamp(period_count_));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

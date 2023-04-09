@@ -40,8 +40,8 @@ TEST(DerivedTimelineTest, EmptySpaceTest) {
 
 // Checks that HLO module events are expanded.
 TEST(DerivedTimelineTest, HloModuleNameTest) {
-  const absl::string_view kHloModuleName = "hlo_module";
-  const absl::string_view kKernelDetails = "kernel_details";
+  const abslx::string_view kHloModuleName = "hlo_module";
+  const abslx::string_view kKernelDetails = "kernel_details";
   XSpace space;
   GroupMetadataMap group_metadata_map;
   XPlane* plane = GetOrCreateGpuXPlane(&space, /*device_ordinal=*/0);
@@ -70,8 +70,8 @@ TEST(DerivedTimelineTest, HloModuleNameTest) {
 
 // Checks that the TF op events are expanded.
 TEST(DerivedTimelineTest, TfOpLineTest) {
-  const absl::string_view kTfOpName = "mul:Mul";
-  const absl::string_view kKernelDetails = "kernel_details";
+  const abslx::string_view kTfOpName = "mul:Mul";
+  const abslx::string_view kKernelDetails = "kernel_details";
   XSpace space;
   GroupMetadataMap group_metadata_map;
   XPlane* plane = GetOrCreateGpuXPlane(&space, /*device_ordinal=*/0);
@@ -105,8 +105,8 @@ TEST(DerivedTimelineTest, DependencyTest) {
   constexpr int64_t kFirstGroupId = 0;
   constexpr int64_t kSecondGroupId = 1;
 
-  const absl::string_view kTfOpName = "mul:Mul";
-  const absl::string_view kKernelDetails = "kernel_details";
+  const abslx::string_view kTfOpName = "mul:Mul";
+  const abslx::string_view kKernelDetails = "kernel_details";
   XSpace space;
   GroupMetadataMap group_metadata_map({{0, {"train 0"}}, {1, {"train 1"}}});
   XPlane* plane = GetOrCreateGpuXPlane(&space, /*device_ordinal=*/0);
@@ -134,8 +134,8 @@ TEST(DerivedTimelineTest, DependencyTest) {
 
 // Checks that the TF op events are expanded.
 TEST(DerivedTimelineTest, TfOpNameScopeTest) {
-  const absl::string_view kTfOpName = "scope1/scope2/mul:Mul";
-  const absl::string_view kKernelDetails = "kernel_details";
+  const abslx::string_view kTfOpName = "scope1/scope2/mul:Mul";
+  const abslx::string_view kKernelDetails = "kernel_details";
   XSpace space;
   GroupMetadataMap group_metadata_map;
   XPlane* plane = GetOrCreateGpuXPlane(&space, /*device_ordinal=*/0);

@@ -25,7 +25,7 @@
 #include "absl/container/internal/hash_policy_testing.h"
 #include "absl/meta/type_traits.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 
@@ -108,7 +108,7 @@ using has_cxx14_std_apis = std::false_type;
 
 template <typename T>
 using expect_cxx14_apis =
-    absl::disjunction<absl::negation<is_std_unordered_set<T>>,
+    abslx::disjunction<abslx::negation<is_std_unordered_set<T>>,
                       has_cxx14_std_apis>;
 
 template <typename TypeParam>
@@ -158,7 +158,7 @@ using has_alloc_std_constructors = std::false_type;
 
 template <typename T>
 using expect_alloc_constructors =
-    absl::disjunction<absl::negation<is_std_unordered_set<T>>,
+    abslx::disjunction<abslx::negation<is_std_unordered_set<T>>,
                       has_alloc_std_constructors>;
 
 template <typename TypeParam>
@@ -491,6 +491,6 @@ REGISTER_TYPED_TEST_CASE_P(
 
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_CONTAINER_INTERNAL_UNORDERED_SET_CONSTRUCTOR_TEST_H_

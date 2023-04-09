@@ -51,8 +51,8 @@ namespace shim {
 enum class Runtime { kTf, kTfLite };
 
 // TensorView or error
-using TensorViewOr = absl::StatusOr<std::unique_ptr<TensorView>>;
-using ConstTensorViewOr = absl::StatusOr<std::unique_ptr<const TensorView>>;
+using TensorViewOr = abslx::StatusOr<std::unique_ptr<TensorView>>;
+using ConstTensorViewOr = abslx::StatusOr<std::unique_ptr<const TensorView>>;
 
 // Below are the interfaces for various "Context" objects to abstract away the
 // TF and TFLite differences.
@@ -61,7 +61,7 @@ using ConstTensorViewOr = absl::StatusOr<std::unique_ptr<const TensorView>>;
 // methods.
 
 // The attribute dictionary passed to the op
-using AttrValue = absl::variant<bool, int64_t, float, absl::string_view>;
+using AttrValue = abslx::variant<bool, int64_t, float, abslx::string_view>;
 
 // The interface for available methods during an op kernel initialization
 template <typename SubType>
@@ -69,11 +69,11 @@ class InitContext {
  public:
   // Read the given attribute and populate the given value.
   template <typename AttrType>
-  absl::Status GetAttr(const std::string& attr_name, AttrType* value) const;
+  abslx::Status GetAttr(const std::string& attr_name, AttrType* value) const;
 
  protected:
   // Read a given attribute or return error
-  absl::StatusOr<AttrValue> GetAttr(const std::string& attr_name) const {
+  abslx::StatusOr<AttrValue> GetAttr(const std::string& attr_name) const {
     return static_cast<const SubType&>(*this).GetAttr(attr_name);
   }
 };
@@ -109,7 +109,7 @@ class ShapeInferenceContext {
     return static_cast<const SubType&>(*this).GetInputShape(idx);
   }
   // Set an output tensor shape
-  absl::Status SetOutputShape(const int idx, const Shape& shape) {
+  abslx::Status SetOutputShape(const int idx, const Shape& shape) {
     return static_cast<SubType&>(*this).SetOutputShape(idx, shape);
   }
   // Read an input tensor during shape inference
@@ -126,11 +126,11 @@ class ShapeInferenceContext {
   }
   // Read the given attribute and populate the given value.
   template <typename AttrType>
-  absl::Status GetAttr(const std::string& attr_name, AttrType* value) const;
+  abslx::Status GetAttr(const std::string& attr_name, AttrType* value) const;
 
  protected:
   // Read a given attribute or return error
-  absl::StatusOr<AttrValue> GetAttr(const std::string& attr_name) const {
+  abslx::StatusOr<AttrValue> GetAttr(const std::string& attr_name) const {
     return static_cast<const SubType&>(*this).GetAttr(attr_name);
   }
 };
@@ -166,13 +166,13 @@ struct ContextTypeForRuntime {
 //     static std::vector<std::string> Outputs();
 //
 //     // Initializes the op
-//     absl::Status Init(InitContext* ctx);
+//     abslx::Status Init(InitContext* ctx);
 //
 //     // Runs the operation
-//     absl::Status Invoke(InvokeContext* ctx);
+//     abslx::Status Invoke(InvokeContext* ctx);
 //
 //     // Shape inference
-//     static absl::Status ShapeInference(ShapeInferenceContext* ctx);
+//     static abslx::Status ShapeInference(ShapeInferenceContext* ctx);
 //
 //   };
 //
@@ -193,17 +193,17 @@ class OpKernelShim {
   virtual ~OpKernelShim() = default;
 
   // If the operation has any attributes they are passed here.
-  absl::Status Init(InitContext* ctx) {
+  abslx::Status Init(InitContext* ctx) {
     return static_cast<SubType<Rt>&>(*this).Init(ctx);
   }
 
   // The actual computations of the operation
-  absl::Status Invoke(InvokeContext* ctx) {
+  abslx::Status Invoke(InvokeContext* ctx) {
     return static_cast<SubType<Rt>&>(*this).Invoke(ctx);
   }
 
   // Shape inference
-  static absl::Status ShapeInference(ShapeInferenceContext* ctx) {
+  static abslx::Status ShapeInference(ShapeInferenceContext* ctx) {
     return SubType<Rt>::ShapeInference(ctx);
   }
 
@@ -216,25 +216,25 @@ class OpKernelShim {
 namespace internal {
 // Extract the given AttrType from the AttrValue variant or returns error.
 template <typename AttrType>
-absl::Status GetAttr(const std::string& attr_name,
-                     const absl::StatusOr<AttrValue> attr_value_or,
+abslx::Status GetAttr(const std::string& attr_name,
+                     const abslx::StatusOr<AttrValue> attr_value_or,
                      AttrType* value) {
   if (!attr_value_or.ok()) return attr_value_or.status();
   const AttrValue& attr_value = attr_value_or.value();
-  if (!absl::holds_alternative<AttrType>(attr_value)) {
-    return absl::InternalError(
-        absl::StrCat("The attribute type does not match the provided "
+  if (!abslx::holds_alternative<AttrType>(attr_value)) {
+    return abslx::InternalError(
+        abslx::StrCat("The attribute type does not match the provided "
                      "type: attr_name: ",
                      attr_name));
   }
-  *value = absl::get<AttrType>(attr_value);
-  return absl::OkStatus();
+  *value = abslx::get<AttrType>(attr_value);
+  return abslx::OkStatus();
 }
 }  // namespace internal
 
 template <typename SubType>
 template <typename AttrType>
-absl::Status InitContext<SubType>::GetAttr(const std::string& attr_name,
+abslx::Status InitContext<SubType>::GetAttr(const std::string& attr_name,
                                            AttrType* value) const {
   const auto attr_value_or = GetAttr(attr_name);
   return internal::GetAttr<AttrType>(attr_name, attr_value_or, value);
@@ -242,7 +242,7 @@ absl::Status InitContext<SubType>::GetAttr(const std::string& attr_name,
 
 template <typename SubType>
 template <typename AttrType>
-absl::Status ShapeInferenceContext<SubType>::GetAttr(
+abslx::Status ShapeInferenceContext<SubType>::GetAttr(
     const std::string& attr_name, AttrType* value) const {
   const auto attr_value_or = GetAttr(attr_name);
   return internal::GetAttr<AttrType>(attr_name, attr_value_or, value);

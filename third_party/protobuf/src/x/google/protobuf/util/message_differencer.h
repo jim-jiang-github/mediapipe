@@ -75,7 +75,7 @@ class DefaultFieldComparator;
 class FieldContext;  // declared below MessageDifferencer
 
 // Defines a collection of field descriptors.
-// In case of internal google codebase we are using absl::FixedArray instead
+// In case of internal google codebase we are using abslx::FixedArray instead
 // of vector. It significantly speeds up proto comparison (by ~30%) by
 // reducing the number of malloc/free operations
 typedef std::vector<const FieldDescriptor*> FieldDescriptorArray;

@@ -75,11 +75,11 @@ class ArCrsCombiner : public HloModulePass {
   ArCrsCombiner(int num_spatial_partitions, bool spmd_partition)
       : num_spatial_partitions_(num_spatial_partitions),
         spmd_partition_(spmd_partition) {}
-  absl::string_view name() const override { return "ar-crs-combiner"; }
+  abslx::string_view name() const override { return "ar-crs-combiner"; }
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
   // Helper method to allow testing of InstructionsComputeSameValue.
   static bool TestInstructionsComputeSameValue(HloInstruction* i1,
@@ -114,7 +114,7 @@ class ArCrsCombiner : public HloModulePass {
       pieces.push_back(",dist:");
       pieces.push_back(std::to_string(distance));
       pieces.push_back("]");
-      return absl::StrJoin(pieces, "");
+      return abslx::StrJoin(pieces, "");
     }
   };
 
@@ -138,13 +138,13 @@ class ArCrsCombiner : public HloModulePass {
   // is already in the visited set.
   std::optional<std::vector<HloInstruction*>> GetAllTuples(
       HloInstruction* instruction,
-      absl::flat_hash_set<HloInstruction*>* visited);
+      abslx::flat_hash_set<HloInstruction*>* visited);
 
   // Checks whether two different elements in the same tuple compute the same
   // value.
   bool TupleElementsComputeSameValue(
       HloInstruction* tuple_shaped_instruction, int64_t i1, int64_t i2,
-      absl::flat_hash_map<int64_t, int64_t>* visited_pairs);
+      abslx::flat_hash_map<int64_t, int64_t>* visited_pairs);
 
   // Returns whether the instructions i1 and i2 can be shown to evaluate to the
   // same value. Handling WHILE requires recursion, which may cause us to visit
@@ -152,7 +152,7 @@ class ArCrsCombiner : public HloModulePass {
   // visited instruction pairs.
   bool InstructionsComputeSameValue(
       HloInstruction* i1, HloInstruction* i2,
-      absl::flat_hash_map<int64_t, int64_t>* visited_pairs);
+      abslx::flat_hash_map<int64_t, int64_t>* visited_pairs);
 
   // Populates all_reduce_map_.
   void GroupAllReducesById(HloModule* module);
@@ -180,12 +180,12 @@ class ArCrsCombiner : public HloModulePass {
   bool spmd_partition_;
 
   // Map from all-reduce ids to the AR/CRS pairs.
-  absl::flat_hash_map<int64_t, std::vector<ArCrsPair>> all_reduce_map_;
+  abslx::flat_hash_map<int64_t, std::vector<ArCrsPair>> all_reduce_map_;
 
   // Map from a CRS instruction to the all-reduce ID of the AR paired with the
   // CRS. Sometimes, several ARs in the code could be paired with the same CRS.
   // We use this map to pick a single AR/CRS path to rewrite.
-  absl::flat_hash_map<HloInstruction*, int64_t> crs_reserved_map_;
+  abslx::flat_hash_map<HloInstruction*, int64_t> crs_reserved_map_;
 
   std::unique_ptr<CallGraph> call_graph_;
 };

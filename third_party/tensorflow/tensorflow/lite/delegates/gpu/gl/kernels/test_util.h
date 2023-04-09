@@ -48,8 +48,8 @@ class SingleOpModel {
 
   bool PopulateTensor(int index, std::vector<float>&& data);
 
-  absl::Status Invoke(const NodeShader& shader);
-  absl::Status Invoke(const CompilationOptions& compile_options,
+  abslx::Status Invoke(const NodeShader& shader);
+  abslx::Status Invoke(const CompilationOptions& compile_options,
                       const RuntimeOptions& runtime_options,
                       const NodeShader& shader);
 

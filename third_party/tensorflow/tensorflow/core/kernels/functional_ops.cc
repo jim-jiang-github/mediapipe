@@ -908,7 +908,7 @@ class DeviceIndexOp : public OpKernel {
     int index = device_names_.size();
     if (DeviceNameUtils::ParseFullName(ctx->device()->name(), &parsed_name) &&
         parsed_name.has_type) {
-      auto it = absl::c_find(device_names_, parsed_name.type);
+      auto it = abslx::c_find(device_names_, parsed_name.type);
       if (it != device_names_.end()) {
         index = it - device_names_.begin();
       }

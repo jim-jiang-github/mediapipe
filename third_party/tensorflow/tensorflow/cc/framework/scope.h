@@ -119,7 +119,7 @@ class Scope {
   /// names of the form `name/StrCat(fragments...)[_suffix]`
   template <typename... Ty>
   Scope WithOpName(Ty... fragments) const {
-    return WithOpNameImpl(absl::StrCat(fragments...));
+    return WithOpNameImpl(abslx::StrCat(fragments...));
   }
 
   /// Return a new scope. All ops created within the returned scope will have as
@@ -259,7 +259,7 @@ struct CompositeOpScopes {
 // result to output. This does not support the ability to add additional
 // attributes.
 Status CreateOutputWithScope(string op_name,
-                             absl::Span<const ::tensorflow::Input> inputs,
+                             abslx::Span<const ::tensorflow::Input> inputs,
                              const Scope& scope, Output* output);
 /// @}
 

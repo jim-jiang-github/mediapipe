@@ -100,33 +100,33 @@ std::unique_ptr<StringListDecoder> NewStringListDecoder(const string& in);
 // Store src contents in *out.  If backing memory for src is shared with *out,
 // will ref obj during the call and will arrange to unref obj when no
 // longer needed.
-void AssignRefCounted(StringPiece src, core::RefCounted* obj, absl::Cord* out);
+void AssignRefCounted(StringPiece src, core::RefCounted* obj, abslx::Cord* out);
 
 // TODO(kmensah): Macro guard this with a check for Cord support.
-inline void CopyToArray(const absl::Cord& src, char* dst) {
+inline void CopyToArray(const abslx::Cord& src, char* dst) {
   src.CopyToArray(dst);
 }
 
 // Copy n bytes of src to dst. If pos >= src.size() the result is empty.
 // If pos + n > src.size() the subrange [pos, size()) is copied.
-inline void CopySubrangeToArray(const absl::Cord& src, int64_t pos, int64_t n,
+inline void CopySubrangeToArray(const abslx::Cord& src, int64_t pos, int64_t n,
                                 char* dst) {
   src.Subcord(pos, n).CopyToArray(dst);
 }
 
 // Store encoding of strings[0..n-1] in *out.
-void EncodeStringList(const tstring* strings, int64_t n, absl::Cord* out);
+void EncodeStringList(const tstring* strings, int64_t n, abslx::Cord* out);
 
 // Decode n strings from src and store in strings[0..n-1].
 // Returns true if successful, false on parse error.
-bool DecodeStringList(const absl::Cord& src, std::string* strings, int64_t n);
-bool DecodeStringList(const absl::Cord& src, tstring* strings, int64_t n);
+bool DecodeStringList(const abslx::Cord& src, std::string* strings, int64_t n);
+bool DecodeStringList(const abslx::Cord& src, tstring* strings, int64_t n);
 
 // Assigns base[0..bytes-1] to *c
-void CopyFromArray(absl::Cord* c, const char* base, size_t bytes);
+void CopyFromArray(abslx::Cord* c, const char* base, size_t bytes);
 
-std::unique_ptr<StringListEncoder> NewStringListEncoder(absl::Cord* out);
-std::unique_ptr<StringListDecoder> NewStringListDecoder(const absl::Cord& in);
+std::unique_ptr<StringListEncoder> NewStringListEncoder(abslx::Cord* out);
+std::unique_ptr<StringListDecoder> NewStringListDecoder(const abslx::Cord& in);
 #endif  // defined(TENSORFLOW_PROTOBUF_USES_CORD)
 
 }  // namespace port

@@ -72,14 +72,14 @@ class GroupAssignment {
                                                         int slice_size);
 
     // Constructs a map directly, checking it's valid.
-    explicit ReplicaToDeviceMap(absl::flat_hash_map<ReplicaId, DeviceId> map);
+    explicit ReplicaToDeviceMap(abslx::flat_hash_map<ReplicaId, DeviceId> map);
 
     int num_slices() { return num_slices_; }
     int num_cores() { return map_.size(); }
     DeviceId device_id(ReplicaId replica_id) { return map_[replica_id]; }
 
    private:
-    absl::flat_hash_map<ReplicaId, DeviceId> map_;
+    abslx::flat_hash_map<ReplicaId, DeviceId> map_;
     int num_slices_;
   };
 

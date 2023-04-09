@@ -17,7 +17,7 @@
 
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -28,6 +28,6 @@ bool CPUSupportsRandenHwAes();
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_INTERNAL_RANDEN_DETECT_H_

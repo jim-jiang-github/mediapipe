@@ -38,7 +38,7 @@ namespace tflite {
 namespace gpu {
 
 namespace {
-bool IsReady(const absl::flat_hash_set<ValueId>& ready_tensors,
+bool IsReady(const abslx::flat_hash_set<ValueId>& ready_tensors,
              const GpuNode& node) {
   for (const ValueId in_id : node.inputs) {
     if (ready_tensors.find(in_id) == ready_tensors.end()) {
@@ -48,7 +48,7 @@ bool IsReady(const absl::flat_hash_set<ValueId>& ready_tensors,
   return true;
 }
 
-absl::Status MergeGpuNodes(const GpuInfo& gpu_info, GpuNode* src,
+abslx::Status MergeGpuNodes(const GpuInfo& gpu_info, GpuNode* src,
                            GpuNode* dst) {
   for (int j = 1; j < src->inputs.size(); ++j) {
     dst->inputs.push_back(src->inputs[j]);
@@ -90,7 +90,7 @@ flatbuffers::Offset<data::GpuNode> Encode(
   return node_builder.Finish();
 }
 
-absl::Status Decode(const data::GpuNode* fb_node, GpuNode* node) {
+abslx::Status Decode(const data::GpuNode* fb_node, GpuNode* node) {
   GPUOperation op;
   RETURN_IF_ERROR(Decode(fb_node->gpu_op(), &op));
   node->gpu_operation = std::make_unique<GPUOperation>(std::move(op));
@@ -102,7 +102,7 @@ absl::Status Decode(const data::GpuNode* fb_node, GpuNode* node) {
   }
   node->name = std::string(fb_node->name()->c_str(), fb_node->name()->size());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 bool IsAssociativeLinkableOp(const Node& node,
@@ -135,32 +135,32 @@ bool IsAssociativeLinkableOp(const Node& node,
   return true;
 }
 
-absl::Status CheckExternalTensorDescription(const GpuInfo& gpu_info,
+abslx::Status CheckExternalTensorDescription(const GpuInfo& gpu_info,
                                             const TensorDescriptor& tensor_desc,
                                             const BHWC& shape,
                                             DataType data_type) {
   if (tensor_desc.GetDataType() != data_type) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "Global precision and precision of predefined/external tensors must be "
         "synchronized.");
   }
   if (tensor_desc.HasAxis(Axis::DEPTH)) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "Currently no support of Depth dimension in predefined/external "
         "tensors.");
   }
   if (tensor_desc.HasAxis(Axis::BATCH) && shape.b == 1) {
-    return absl::InvalidArgumentError("Wrong layout, batch mismatch.");
+    return abslx::InvalidArgumentError("Wrong layout, batch mismatch.");
   }
   if (!tensor_desc.HasAxis(Axis::BATCH) && shape.b != 1) {
-    return absl::InvalidArgumentError("Wrong layout, batch mismatch.");
+    return abslx::InvalidArgumentError("Wrong layout, batch mismatch.");
   }
   if (!tensor_desc.CanCreateTensorWithShape(gpu_info, shape).ok()) {
-    return absl::UnavailableError(
+    return abslx::UnavailableError(
         "Current device can not allocate tensor with this shape for "
         "predefined/external descriptor.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Helper class for creating descriptors for appropriate tensors from
@@ -182,11 +182,11 @@ class TensorReserver {
   TensorDescriptor Get(ValueId id) { return reservations_[id]; }
 
  public:
-  absl::flat_hash_map<ValueId, TensorDescriptor> reservations_;
+  abslx::flat_hash_map<ValueId, TensorDescriptor> reservations_;
   ValueId next_;
 };
 
-absl::Status ReserveGraphTensors(const CreateGpuModelInfo& create_info,
+abslx::Status ReserveGraphTensors(const CreateGpuModelInfo& create_info,
                                  const GpuInfo& gpu_info,
                                  const GraphFloat32& graph,
                                  TensorReserver* tensor_reserver) {
@@ -218,13 +218,13 @@ absl::Status ReserveGraphTensors(const CreateGpuModelInfo& create_info,
       tensor_desc = it_mutable_external->second;
     }
     if (external_categories_count > 1) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Tensors ids from predefined / external_immutable_tensors / "
           "external_mutable_tensors should not intersect.");
     }
     if (external_categories_count == 1) {
       if (!(graph.IsGraphInput(t->id) || graph.IsGraphOutput(t->id))) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "Currently external can be used only for graph inputs/outputs");
       }
       RETURN_IF_ERROR(CheckExternalTensorDescription(gpu_info, tensor_desc,
@@ -256,10 +256,10 @@ absl::Status ReserveGraphTensors(const CreateGpuModelInfo& create_info,
     max_id = std::max(max_id, t->id);
   }
   tensor_reserver->SetNext(max_id + 1);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConvertOperations(const GpuInfo& gpu_info,
+abslx::Status ConvertOperations(const GpuInfo& gpu_info,
                                const GraphFloat32& graph,
                                const CreateGpuModelInfo& create_info,
                                TensorReserver* tensor_reserver,
@@ -290,7 +290,7 @@ absl::Status ConvertOperations(const GpuInfo& gpu_info,
     auto op_type = OperationTypeFromString(node.operation.type);
     if (op_type == OperationType::CONSTANT) {
       auto attr =
-          absl::any_cast<ConstTensorAttributes>(node.operation.attributes);
+          abslx::any_cast<ConstTensorAttributes>(node.operation.attributes);
       auto outputs = graph.FindOutputs(node.id);
       gpu_model->const_tensors[outputs[0]->id] =
           tensor_reserver->Get(outputs[0]->id);
@@ -335,7 +335,7 @@ absl::Status ConvertOperations(const GpuInfo& gpu_info,
           gpu_info, op_def, create_info.hints, inputs, outputs, node,
           shared_conv_weights_ptr, &gpu_subgraph));
     }
-    absl::flat_hash_map<int, ValueId> mapping_to_global_ids;
+    abslx::flat_hash_map<int, ValueId> mapping_to_global_ids;
     for (int j = 0; j < gpu_subgraph.new_tensors.size(); ++j) {
       const auto& t = gpu_subgraph.new_tensors[j];
       if (!t.GetData().empty()) {  // constant tensor
@@ -378,11 +378,11 @@ absl::Status ConvertOperations(const GpuInfo& gpu_info,
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MergeNodes(const GpuInfo& gpu_info, GpuModel* gpu_model) {
-  absl::flat_hash_set<ValueId> ready_tensors;
+abslx::Status MergeNodes(const GpuInfo& gpu_info, GpuModel* gpu_model) {
+  abslx::flat_hash_set<ValueId> ready_tensors;
   for (const auto& input : gpu_model->input_ids_and_refs) {
     ready_tensors.insert(input.first);
   }
@@ -418,7 +418,7 @@ absl::Status MergeNodes(const GpuInfo& gpu_info, GpuModel* gpu_model) {
     nodes.erase(nodes.begin() + next_nodes[0]);
     i -= 1;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void CopyExternals(const GraphFloat32& graph, GpuModel* gpu_model) {
@@ -440,7 +440,7 @@ void CopyExternals(const GraphFloat32& graph, GpuModel* gpu_model) {
 
 // Removing tensors that was fused in complex operations
 void RemoveUnusedTensors(GpuModel* gpu_model) {
-  absl::flat_hash_set<ValueId> used_tensors;
+  abslx::flat_hash_set<ValueId> used_tensors;
   for (const auto& node : gpu_model->nodes) {
     for (const auto& id : node.inputs) {
       used_tensors.insert(id);
@@ -468,7 +468,7 @@ void RemoveUnusedTensors(GpuModel* gpu_model) {
 // Here we will retrieve some information needed for generic execution of
 // GpuOperations. Specifically, BindArguments and RecalculateGridSize must be
 // executed.
-absl::Status ResolvePolymorphicArgs(GpuModel* gpu_model) {
+abslx::Status ResolvePolymorphicArgs(GpuModel* gpu_model) {
   class DummySpatialTensor : public GpuSpatialTensor {
    public:
     DummySpatialTensor() = default;
@@ -510,12 +510,12 @@ absl::Status ResolvePolymorphicArgs(GpuModel* gpu_model) {
         node.gpu_operation->BindArguments(&node.gpu_operation->args_));
     node.gpu_operation->RecalculateGridSize();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace
 
-absl::Status GraphToGpuModel(const GraphFloat32& graph,
+abslx::Status GraphToGpuModel(const GraphFloat32& graph,
                              const CreateGpuModelInfo& create_info,
                              const GpuInfo& gpu_info, GpuModel* gpu_model) {
   TensorReserver tensor_reserver;
@@ -599,7 +599,7 @@ flatbuffers::Offset<data::GpuModel> Encode(
   return gpu_model_builder.Finish();
 }
 
-absl::Status Decode(const data::GpuModel* fb_gpu_model, GpuModel* gpu_model) {
+abslx::Status Decode(const data::GpuModel* fb_gpu_model, GpuModel* gpu_model) {
   gpu_model->nodes.resize(fb_gpu_model->nodes()->size());
   int counter = 0;
   for (auto node_fb : *fb_gpu_model->nodes()) {
@@ -630,25 +630,25 @@ absl::Status Decode(const data::GpuModel* fb_gpu_model, GpuModel* gpu_model) {
     gpu_model->variable_ids_and_refs.push_back(
         {variable_id->first(), variable_id->second()});
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RunGraphTransformsForGpuModel(GraphFloat32* graph) {
+abslx::Status RunGraphTransformsForGpuModel(GraphFloat32* graph) {
   auto merge_padding_transform = NewMergePaddingWithAdd();
   auto add_bias_transform = NewAddBias();
   auto pooling_to_reduce_op = NewGlobalPoolingToReduceOp();
   ModelTransformer transformer(graph);
   if (!transformer.Apply("add_bias", add_bias_transform.get())) {
-    return absl::InternalError("Invalid add_bias transform");
+    return abslx::InternalError("Invalid add_bias transform");
   }
   if (!transformer.Apply("merge_padding", merge_padding_transform.get())) {
-    return absl::InternalError("Invalid merge_padding transform");
+    return abslx::InternalError("Invalid merge_padding transform");
   }
   if (!transformer.Apply("global pooling to mean",
                          pooling_to_reduce_op.get())) {
-    return absl::InternalError("Invalid global pooling to mean transform");
+    return abslx::InternalError("Invalid global pooling to mean transform");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

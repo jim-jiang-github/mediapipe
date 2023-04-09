@@ -84,7 +84,7 @@ std::vector<bool> GetDynamicInputInfo(
 
 xla::StatusOr<std::vector<RefPtr<XRTTupleAllocation>>> GetChainedOpInputs(
     const xrt::XRTChainedExecuteOp& op,
-    absl::Span<const RefPtr<XRTTupleAllocation>> op_inputs,
+    abslx::Span<const RefPtr<XRTTupleAllocation>> op_inputs,
     const TPUExecutableInfoProto& executable_proto) {
   if (op.inputs_size() != executable_proto.input_shapes_size()) {
     return errors::InvalidArgument(
@@ -136,7 +136,7 @@ xla::StatusOr<xla::HloInputOutputAliasConfig> GetExecutableAliasConfig(
 
 xla::StatusOr<RefPtr<XRTTupleAllocation>> AllocateOutputTuple(
     tpu::TpuNodeContext* node_context, se::Stream* stream,
-    absl::Span<const RefPtr<XRTTupleAllocation>> input_tuples,
+    abslx::Span<const RefPtr<XRTTupleAllocation>> input_tuples,
     const xla::HloInputOutputAliasConfig& input_output_alias,
     xla::ScopedShapedBuffer output_scoped_buffer, int device_ordinal) {
   auto output_shaped_buffer = output_scoped_buffer.release();
@@ -173,7 +173,7 @@ Status AllocateOutputTensors(
     tpu::TpuNodeContext* node_context, se::Stream* stream,
     const xrt::XRTExecutionConfig& config_proto,
     const TPUExecutableInfoProto& executable_proto,
-    absl::Span<const RefPtr<XRTTupleAllocation>> input_tuples,
+    abslx::Span<const RefPtr<XRTTupleAllocation>> input_tuples,
     const xla::HloInputOutputAliasConfig& input_output_alias,
     xla::ScopedShapedBuffer output_scoped_buffer, int device_ordinal) {
   TF_ASSIGN_OR_RETURN(
@@ -428,7 +428,7 @@ Status XRTExecuteChainedOp::DoWork(OpKernelContext* context) {
   core::ScopedUnref lookup_unref(proto_lookup);
   RefPtr<XRTMemoryManager> memory_manager = XRTMemoryManager::Get(rm);
   auto execute_op = [&](const xrt::XRTChainedExecuteOp& op,
-                        absl::Span<const RefPtr<XRTTupleAllocation>> op_inputs)
+                        abslx::Span<const RefPtr<XRTTupleAllocation>> op_inputs)
       -> xla::StatusOr<RefPtr<XRTTupleAllocation>> {
     std::unique_ptr<CompilationCacheEntryRef> entry;
     TF_RETURN_IF_ERROR(proto_lookup->Lookup(

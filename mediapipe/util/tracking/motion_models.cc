@@ -32,8 +32,8 @@ namespace mediapipe {
 
 std::string ModelAdapter<TranslationModel>::ToString(
     const TranslationModel& model) {
-  return absl::StrFormat("%7f", model.dx()) + " " +
-         absl::StrFormat("%7f", model.dy());
+  return abslx::StrFormat("%7f", model.dx()) + " " +
+         abslx::StrFormat("%7f", model.dy());
 }
 
 AffineModel ModelAdapter<TranslationModel>::ToAffine(
@@ -226,10 +226,10 @@ float ModelAdapter<SimilarityModel>::GetParameter(const SimilarityModel& model,
 
 std::string ModelAdapter<SimilarityModel>::ToString(
     const SimilarityModel& model) {
-  return absl::StrFormat("%7f", model.dx()) + " " +
-         absl::StrFormat("%7f", model.dy()) + " " +
-         absl::StrFormat("%7f", model.scale()) + " " +
-         absl::StrFormat("%7f", model.rotation());
+  return abslx::StrFormat("%7f", model.dx()) + " " +
+         abslx::StrFormat("%7f", model.dy()) + " " +
+         abslx::StrFormat("%7f", model.scale()) + " " +
+         abslx::StrFormat("%7f", model.rotation());
 }
 
 SimilarityModel ModelAdapter<SimilarityModel>::NormalizationTransform(
@@ -248,10 +248,10 @@ TranslationModel ModelAdapter<SimilarityModel>::ProjectToTranslation(
 
 std::string ModelAdapter<LinearSimilarityModel>::ToString(
     const LinearSimilarityModel& model) {
-  return absl::StrFormat("%7f", model.dx()) + " " +
-         absl::StrFormat("%7f", model.dy()) + " " +
-         absl::StrFormat("%7f", model.a()) + " " +
-         absl::StrFormat("%7f", model.b());
+  return abslx::StrFormat("%7f", model.dx()) + " " +
+         abslx::StrFormat("%7f", model.dy()) + " " +
+         abslx::StrFormat("%7f", model.a()) + " " +
+         abslx::StrFormat("%7f", model.b());
 }
 
 AffineModel ModelAdapter<LinearSimilarityModel>::ToAffine(
@@ -357,12 +357,12 @@ TranslationModel ModelAdapter<LinearSimilarityModel>::ProjectToTranslation(
 }
 
 std::string ModelAdapter<AffineModel>::ToString(const AffineModel& model) {
-  return absl::StrFormat("%7f", model.dx()) + " " +
-         absl::StrFormat("%7f", model.dy()) + " " +
-         absl::StrFormat("%7f", model.a()) + " " +
-         absl::StrFormat("%7f", model.b()) + " " +
-         absl::StrFormat("%7f", model.c()) + " " +
-         absl::StrFormat("%7f", model.d());
+  return abslx::StrFormat("%7f", model.dx()) + " " +
+         abslx::StrFormat("%7f", model.dy()) + " " +
+         abslx::StrFormat("%7f", model.a()) + " " +
+         abslx::StrFormat("%7f", model.b()) + " " +
+         abslx::StrFormat("%7f", model.c()) + " " +
+         abslx::StrFormat("%7f", model.d());
 }
 
 AffineModel ModelAdapter<AffineModel>::NormalizationTransform(
@@ -571,14 +571,14 @@ Homography ModelAdapter<Homography>::InvertChecked(const Homography& model,
 }
 
 std::string ModelAdapter<Homography>::ToString(const Homography& model) {
-  return absl::StrFormat("%7f", model.h_00()) + " " +
-         absl::StrFormat("%7f", model.h_01()) + " " +
-         absl::StrFormat("%7f", model.h_02()) + " " +
-         absl::StrFormat("%7f", model.h_10()) + " " +
-         absl::StrFormat("%7f", model.h_11()) + " " +
-         absl::StrFormat("%7f", model.h_12()) + " " +
-         absl::StrFormat("%7f", model.h_20()) + " " +
-         absl::StrFormat("%7f", model.h_21());
+  return abslx::StrFormat("%7f", model.h_00()) + " " +
+         abslx::StrFormat("%7f", model.h_01()) + " " +
+         abslx::StrFormat("%7f", model.h_02()) + " " +
+         abslx::StrFormat("%7f", model.h_10()) + " " +
+         abslx::StrFormat("%7f", model.h_11()) + " " +
+         abslx::StrFormat("%7f", model.h_12()) + " " +
+         abslx::StrFormat("%7f", model.h_20()) + " " +
+         abslx::StrFormat("%7f", model.h_21());
 }
 
 AffineModel ModelAdapter<Homography>::ToAffine(const Homography& model) {

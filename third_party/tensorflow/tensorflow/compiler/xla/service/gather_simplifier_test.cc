@@ -29,7 +29,7 @@ TEST_F(GatherSimplifierTest, TransformsStartIndices) {
   // - Makes the index_vector_dim dimensions explicit
   // - Flattens start_indices into a 2d tensor.
   // - Undoes the flattening in the output.
-  constexpr absl::string_view kModuleStr = R"(
+  constexpr abslx::string_view kModuleStr = R"(
     HloModule gather_simplifier
 
     ENTRY kernel_entry {
@@ -60,7 +60,7 @@ TEST_F(GatherSimplifierTest, TransformsStartIndices) {
 TEST_F(GatherSimplifierTest, RemovesCollapsedSliceDims) {
   // Verifies that GatherSimplifier sets the collapsed_slice_dims parameter to
   // the empty list.
-  constexpr absl::string_view kModuleStr = R"(
+  constexpr abslx::string_view kModuleStr = R"(
     HloModule gather_simplifier
 
     ENTRY kernel_entry {
@@ -84,7 +84,7 @@ TEST_F(GatherSimplifierTest, RemovesCollapsedSliceDims) {
 
 TEST_F(GatherSimplifierTest, MakesStartIndexMapIdentity) {
   // Verifies that GatherSimplifier ensures start_index_map is {0, 1, ...}.
-  constexpr absl::string_view kModuleStr = R"(
+  constexpr abslx::string_view kModuleStr = R"(
     HloModule gather_simplifier
 
     ENTRY kernel_entry {
@@ -109,7 +109,7 @@ TEST_F(GatherSimplifierTest, MakesStartIndexMapIdentity) {
 
 TEST_F(GatherSimplifierTest, CollapsesSomeDims) {
   // Verifies that GatherSimplifier can collapse only some dimensions.
-  constexpr absl::string_view kModuleStr = R"(
+  constexpr abslx::string_view kModuleStr = R"(
     HloModule gather_simplifier
 
     ENTRY kernel_entry {
@@ -134,7 +134,7 @@ TEST_F(GatherSimplifierTest, CollapsesSomeDims) {
 TEST_F(GatherSimplifierTest, ZeroDimStartIndices) {
   // Verifies that a zero-dimensional start indices tensor doesn't contribute
   // any dimensions to the output.
-  constexpr absl::string_view kModuleStr = R"(
+  constexpr abslx::string_view kModuleStr = R"(
     HloModule gather_simplifier
 
     ENTRY kernel_entry {
@@ -157,7 +157,7 @@ TEST_F(GatherSimplifierTest, ZeroDimStartIndices) {
 
 TEST_F(GatherSimplifierTest, ZeroSizeSlice) {
   // Verifies that slices of size zero result in a constant result.
-  constexpr absl::string_view kModuleStr = R"(
+  constexpr abslx::string_view kModuleStr = R"(
     HloModule gather_simplifier
 
     ENTRY kernel_entry {

@@ -2132,7 +2132,7 @@ void TF_AddGradientsWithPrefix(TF_Graph* g, const char* prefix, TF_Output* y,
       // used in this graph
       for (const auto& pair : g->name_map) {
         const string& name = pair.first;
-        if ((name == prefix) || absl::StartsWith(name, prefix_cmp)) {
+        if ((name == prefix) || abslx::StartsWith(name, prefix_cmp)) {
           status->status = InvalidArgument(
               "prefix [", prefix,
               "] conflicts with existing node in the graph named [", name, "]");
@@ -2162,7 +2162,7 @@ void TF_AddGradientsWithPrefix(TF_Graph* g, const char* prefix, TF_Output* y,
       // Adding the gradients to the graph can alter the prefix to prevent
       // name collisions only if this prefix has not been provided explicitly
       // by the user. If it was provided, assert that it remained intact.
-      if (prefix != nullptr && !absl::StartsWith(n->name(), prefix_cmp)) {
+      if (prefix != nullptr && !abslx::StartsWith(n->name(), prefix_cmp)) {
         status->status = tensorflow::errors::Internal(
             "BUG: The gradients prefix have been unexpectedly altered when "
             "adding the nodes to the graph. This is a bug. Please file an "

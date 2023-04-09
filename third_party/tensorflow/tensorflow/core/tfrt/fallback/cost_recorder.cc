@@ -28,7 +28,7 @@ limitations under the License.
 namespace tensorflow {
 namespace tfrt_stub {
 
-void CostRecorder::RecordCost(absl::string_view op_name,
+void CostRecorder::RecordCost(abslx::string_view op_name,
                               const uint64_t execution_time) {
   mutex_lock l(op_cost_map_mutex_);
   op_cost_map_[op_name].first += execution_time;

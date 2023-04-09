@@ -31,7 +31,7 @@ StatusOr<std::string> NcclIdStore::GetNcclUniqueId(
   // The caller must ensure that threads calling this method concurrently have
   // unique keys, otherwise the global key-value store may hold the wrong value.
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     auto it = cache_.find(key);
     if (it != cache_.end()) {
       return it->second;
@@ -51,9 +51,9 @@ StatusOr<std::string> NcclIdStore::GetNcclUniqueId(
 #endif
   } else {
     TF_ASSIGN_OR_RETURN(id_string, client_->BlockingKeyValueGet(
-                                       key.ToString(), absl::Minutes(5)));
+                                       key.ToString(), abslx::Minutes(5)));
   }
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   auto result = cache_.emplace(key, std::move(id_string));
   TF_RET_CHECK(result.second) << "Unique ID already in cache.";
   return result.first->second;

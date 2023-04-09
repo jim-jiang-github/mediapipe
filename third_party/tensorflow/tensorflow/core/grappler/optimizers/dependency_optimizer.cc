@@ -123,8 +123,8 @@ bool DependencyOptimizer::SafeToConvertToNoOp(const NodeDef& node) const {
   }
   // Ops reading variables are marked as stateful, but are safe to remove if
   // redundant.
-  static const absl::flat_hash_set<string>* gather_ops =
-      new absl::flat_hash_set<string>{"Gather", "GatherV2", "GatherNd",
+  static const abslx::flat_hash_set<string>* gather_ops =
+      new abslx::flat_hash_set<string>{"Gather", "GatherV2", "GatherNd",
                                       "ResourceGather", "ResourceGatherNd"};
   const bool is_variable_read =
       IsReadVariableOp(node) || IsReadVariablesOp(node) ||
@@ -581,7 +581,7 @@ Status DependencyOptimizer::TransitiveReduction() {
   // such that when we swap them out so we don't clobber the
   // node(target).input() repeated field.
   typedef std::pair<int, int> InputSlotAndSource;
-  absl::flat_hash_map<
+  abslx::flat_hash_map<
       int, std::set<InputSlotAndSource, std::greater<InputSlotAndSource>>>
       control_edges_to_remove;
   for (int source = 0; source < num_nodes; ++source) {

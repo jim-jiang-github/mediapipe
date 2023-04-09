@@ -133,7 +133,7 @@ std::optional<EvaluationStageMetrics> CocoObjectDetection::RunImpl() {
   inference_params->set_delegate(ParseStringToDelegateType(delegate_));
 
   // Get ground truth data.
-  absl::flat_hash_map<std::string, ObjectDetectionResult> ground_truth_map;
+  abslx::flat_hash_map<std::string, ObjectDetectionResult> ground_truth_map;
   if (!ground_truth_proto_file_.empty()) {
     PopulateGroundTruth(ground_truth_proto_file_, &ground_truth_map);
   }

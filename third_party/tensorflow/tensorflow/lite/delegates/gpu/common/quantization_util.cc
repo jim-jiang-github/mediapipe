@@ -31,7 +31,7 @@ namespace gpu {
 namespace {
 void DequantizeInput(
     TfLiteContext* context, int input_index,
-    const absl::flat_hash_map<int, int>& quant_conversion_map) {
+    const abslx::flat_hash_map<int, int>& quant_conversion_map) {
   if (quant_conversion_map.find(input_index) == quant_conversion_map.end()) {
     return;
   }
@@ -58,7 +58,7 @@ void DequantizeInput(
 }
 
 void QuantizeOutput(TfLiteContext* context, int output_index,
-                    const absl::flat_hash_map<int, int>& quant_conversion_map) {
+                    const abslx::flat_hash_map<int, int>& quant_conversion_map) {
   if (quant_conversion_map.find(output_index) == quant_conversion_map.end()) {
     return;
   }
@@ -86,42 +86,42 @@ void QuantizeOutput(TfLiteContext* context, int output_index,
 }
 }  // namespace
 
-absl::Status DequantizeInputs(
+abslx::Status DequantizeInputs(
     TfLiteContext* context, const std::vector<uint32_t>& input_indices,
-    const absl::flat_hash_map<int, int>& quant_conversion_map) {
+    const abslx::flat_hash_map<int, int>& quant_conversion_map) {
   for (auto index : input_indices) {
     DequantizeInput(context, static_cast<int>(index), quant_conversion_map);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status DequantizeInputs(
+abslx::Status DequantizeInputs(
     TfLiteContext* context, const std::vector<int64_t>& input_indices,
-    const absl::flat_hash_map<int, int>& quant_conversion_map) {
+    const abslx::flat_hash_map<int, int>& quant_conversion_map) {
   for (auto index : input_indices) {
     DequantizeInput(context, static_cast<int>(index), quant_conversion_map);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status QuantizeOutputs(
+abslx::Status QuantizeOutputs(
     TfLiteContext* context, const std::vector<uint32_t>& output_indices,
-    const absl::flat_hash_map<int, int>& quant_conversion_map) {
+    const abslx::flat_hash_map<int, int>& quant_conversion_map) {
   for (auto index : output_indices) {
     QuantizeOutput(context, static_cast<int>(index), quant_conversion_map);
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status QuantizeOutputs(
+abslx::Status QuantizeOutputs(
     TfLiteContext* context, const std::vector<int64_t>& output_indices,
-    const absl::flat_hash_map<int, int>& quant_conversion_map) {
+    const abslx::flat_hash_map<int, int>& quant_conversion_map) {
   for (auto index : output_indices) {
     QuantizeOutput(context, static_cast<int>(index), quant_conversion_map);
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

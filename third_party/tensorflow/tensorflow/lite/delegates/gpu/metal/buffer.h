@@ -51,16 +51,16 @@ class Buffer : public GPUObject {
   // Writes data to a buffer. Data should point to a region that
   // has exact size in bytes as size_in_bytes(constructor parameter).
   template <typename T>
-  absl::Status WriteData(const absl::Span<T> data);
+  abslx::Status WriteData(const abslx::Span<T> data);
 
   // Reads data from Buffer into CPU memory.
   template <typename T>
-  absl::Status ReadData(std::vector<T>* result) const;
+  abslx::Status ReadData(std::vector<T>* result) const;
 
-  absl::Status GetGPUResources(const GPUObjectDescriptor* obj_ptr,
+  abslx::Status GetGPUResources(const GPUObjectDescriptor* obj_ptr,
                                GPUResourcesWithValue* resources) const override;
 
-  absl::Status CreateFromBufferDescriptor(const BufferDescriptor& desc, id<MTLDevice> device);
+  abslx::Status CreateFromBufferDescriptor(const BufferDescriptor& desc, id<MTLDevice> device);
 
  private:
   void Release();
@@ -69,30 +69,30 @@ class Buffer : public GPUObject {
   size_t size_;
 };
 
-absl::Status CreateBuffer(size_t size_in_bytes, const void* data, id<MTLDevice> device,
+abslx::Status CreateBuffer(size_t size_in_bytes, const void* data, id<MTLDevice> device,
                           Buffer* result);
 
 template <typename T>
-absl::Status Buffer::WriteData(const absl::Span<T> data) {
+abslx::Status Buffer::WriteData(const abslx::Span<T> data) {
   if (size_ != sizeof(T) * data.size()) {
-    return absl::InvalidArgumentError(
-        "absl::Span<T> data size is different from buffer allocated size.");
+    return abslx::InvalidArgumentError(
+        "abslx::Span<T> data size is different from buffer allocated size.");
   }
   std::memcpy([buffer_ contents], data.data(), size_);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <typename T>
-absl::Status Buffer::ReadData(std::vector<T>* result) const {
+abslx::Status Buffer::ReadData(std::vector<T>* result) const {
   if (size_ % sizeof(T) != 0) {
-    return absl::UnknownError("Wrong element size(typename T is not correct?");
+    return abslx::UnknownError("Wrong element size(typename T is not correct?");
   }
 
   const int elements_count = size_ / sizeof(T);
   result->resize(elements_count);
   std::memcpy(result->data(), [buffer_ contents], size_);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace metal

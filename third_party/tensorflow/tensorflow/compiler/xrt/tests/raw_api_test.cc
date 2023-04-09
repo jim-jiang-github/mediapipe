@@ -148,10 +148,10 @@ string* xla_platform_ptr;     // initial value set in main()
 
 string DeviceFromFlag() {
   string xla_test_device = *xla_test_device_ptr;
-  return absl::StrCat("/device:", xla_test_device, ":0");
+  return abslx::StrCat("/device:", xla_test_device, ":0");
 }
 
-std::vector<int> GetAttrLayout(absl::Span<const int64_t> minor_to_mayor) {
+std::vector<int> GetAttrLayout(abslx::Span<const int64_t> minor_to_mayor) {
   std::vector<int> layout;
   for (auto dim : minor_to_mayor) {
     layout.push_back(static_cast<int>(dim));
@@ -198,7 +198,7 @@ xla::LiteralProto MakeTuple0() {
   return nested1.ToProto();
 }
 
-xla::LiteralProto FloatVector(absl::Span<const float> v) {
+xla::LiteralProto FloatVector(abslx::Span<const float> v) {
   auto array = xla::LiteralUtil::CreateR1<float>(v);
   return array.ToProto();
 }
@@ -332,7 +332,7 @@ xla::XlaComputation AddAndSubTuple() {
 }
 
 xla::XlaComputation BroadcastComputation(const xla::Shape& shape,
-                                         absl::Span<const int64_t> dimensions) {
+                                         abslx::Span<const int64_t> dimensions) {
   xla::XlaBuilder builder("BroadcastComputation");
   auto p0 = xla::Parameter(&builder, 0, shape, "P0");
   xla::Broadcast(p0, dimensions);

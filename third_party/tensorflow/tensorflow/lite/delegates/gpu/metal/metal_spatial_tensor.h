@@ -48,7 +48,7 @@ class MetalSpatialTensor : public GPUObject, public GpuSpatialTensor {
 
   ~MetalSpatialTensor() override { Release(); }
 
-  absl::Status GetGPUResources(const GPUObjectDescriptor* obj_ptr,
+  abslx::Status GetGPUResources(const GPUObjectDescriptor* obj_ptr,
                                GPUResourcesWithValue* resources) const override;
 
   int Width() const override { return descriptor_.GetBHWDCShape().w; }
@@ -69,27 +69,27 @@ class MetalSpatialTensor : public GPUObject, public GpuSpatialTensor {
     return descriptor_.GetMemorySizeInBytes();
   }
 
-  absl::Status CreateFromDescriptor(const TensorDescriptor& desc,
+  abslx::Status CreateFromDescriptor(const TensorDescriptor& desc,
                                     id<MTLDevice> device);
-  absl::Status UploadDescriptorData(const TensorDescriptor& desc,
+  abslx::Status UploadDescriptorData(const TensorDescriptor& desc,
                                     id<MTLDevice> device);
-  absl::Status ToDescriptor(TensorDescriptor* desc, id<MTLDevice> device) const;
+  abslx::Status ToDescriptor(TensorDescriptor* desc, id<MTLDevice> device) const;
 
-  absl::Status SetBufferHandle(id<MTLBuffer> buffer);
+  abslx::Status SetBufferHandle(id<MTLBuffer> buffer);
   id<MTLBuffer> GetBufferHandle() const;
 
  private:
-  friend absl::Status CreateTensorSharedBuffer(
+  friend abslx::Status CreateTensorSharedBuffer(
       id<MTLBuffer> buffer, const TensorDescriptor& descriptor,
       MetalSpatialTensor* result, uint64_t buffer_offset);
 
-  friend absl::Status CreateTensorSharedImage2DBuffer(
+  friend abslx::Status CreateTensorSharedImage2DBuffer(
       id<MTLBuffer> buffer, const TensorDescriptor& descriptor,
       int row_bytes_alignment, MetalSpatialTensor* result,
       uint64_t buffer_offset);
 
-  absl::Status WriteData(id<MTLDevice> device, const void* ptr);
-  absl::Status ReadData(id<MTLDevice> device, void* ptr) const;
+  abslx::Status WriteData(id<MTLDevice> device, const void* ptr);
+  abslx::Status ReadData(id<MTLDevice> device, void* ptr) const;
 
   void Release();
 
@@ -104,16 +104,16 @@ class MetalSpatialTensor : public GPUObject, public GpuSpatialTensor {
   uint64_t buffer_offset_ = 0;
 };
 
-absl::Status CreateTensor(id<MTLDevice> device,
+abslx::Status CreateTensor(id<MTLDevice> device,
                           const TensorDescriptor& descriptor,
                           MetalSpatialTensor* result);
 
-absl::Status CreateTensorSharedBuffer(id<MTLBuffer> buffer,
+abslx::Status CreateTensorSharedBuffer(id<MTLBuffer> buffer,
                                       const TensorDescriptor& descriptor,
                                       MetalSpatialTensor* result,
                                       uint64_t buffer_offset = 0);
 
-absl::Status CreateTensorSharedImage2DBuffer(id<MTLBuffer> buffer,
+abslx::Status CreateTensorSharedImage2DBuffer(id<MTLBuffer> buffer,
                                              const TensorDescriptor& descriptor,
                                              int row_bytes_alignment,
                                              MetalSpatialTensor* result,

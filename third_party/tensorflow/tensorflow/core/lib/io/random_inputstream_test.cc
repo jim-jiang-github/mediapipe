@@ -60,10 +60,10 @@ TEST(RandomInputStream, ReadNBytesWithCords) {
 
   std::unique_ptr<RandomAccessFile> file;
   TF_ASSERT_OK(env->NewRandomAccessFile(fname, &file));
-  absl::Cord read;
+  abslx::Cord read;
   RandomAccessInputStream in(file.get());
 
-  // Reading into `absl::Cord`s does not clear existing data from the cord.
+  // Reading into `abslx::Cord`s does not clear existing data from the cord.
   TF_ASSERT_OK(in.ReadNBytes(3, &read));
   EXPECT_EQ(read, "012");
   EXPECT_EQ(3, in.Tell());

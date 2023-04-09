@@ -29,7 +29,7 @@ namespace gl {
 
 // Registers custom operations.
 void RegisterCustomOps(
-    absl::flat_hash_map<std::string, std::vector<std::unique_ptr<NodeShader>>>*
+    abslx::flat_hash_map<std::string, std::vector<std::unique_ptr<NodeShader>>>*
         shaders_);
 
 }  // namespace gl

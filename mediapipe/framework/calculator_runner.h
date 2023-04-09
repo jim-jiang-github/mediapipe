@@ -109,11 +109,11 @@ class CalculatorRunner {
 
   // Runs the calculator, by calling Open(), Process() with the
   // inputs provided via mutable_inputs(), and Close(). Returns the
-  // absl::Status from CalculatorGraph::Run().  Internally, Run()
+  // abslx::Status from CalculatorGraph::Run().  Internally, Run()
   // constructs a CalculatorGraph in the first call, and calls
   // CalculatorGraph::Run().  A single instance of CalculatorRunner
   // uses the same instance of CalculatorGraph for all runs.
-  absl::Status Run();
+  abslx::Status Run();
 
   // Returns the vector of contents of the output streams. The .header
   // field contains the stream header and the .packets field contains
@@ -135,11 +135,11 @@ class CalculatorRunner {
   static const char kSinkPrefix[];
 
   // Initialize using a node config (does the constructor's work).
-  absl::Status InitializeFromNodeConfig(
+  abslx::Status InitializeFromNodeConfig(
       const CalculatorGraphConfig::Node& node_config);
 
   // Builds the graph if one does not already exist.
-  absl::Status BuildGraph();
+  abslx::Status BuildGraph();
 
   CalculatorGraphConfig::Node node_config_;
 

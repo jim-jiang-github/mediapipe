@@ -2490,7 +2490,7 @@ void ProcessScatterNdOperator(Model* model, ScatterNdOperator* op) {
     if (model->GetArray(output).has_shape() &&
         (old_output_dims[output] != model->GetArray(output).shape().dims())) {
       AddMessageF("Set shape of %s to [%s]", output,
-                  absl::StrJoin(model->GetArray(output).shape().dims(), ","));
+                  abslx::StrJoin(model->GetArray(output).shape().dims(), ","));
       *modified = true;
       return ::tensorflow::OkStatus();
     }

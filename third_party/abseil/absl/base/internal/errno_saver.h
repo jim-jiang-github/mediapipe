@@ -19,7 +19,7 @@
 
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -38,6 +38,6 @@ class ErrnoSaver {
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_BASE_INTERNAL_ERRNO_SAVER_H_

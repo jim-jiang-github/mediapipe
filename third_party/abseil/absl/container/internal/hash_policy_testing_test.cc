@@ -16,7 +16,7 @@
 
 #include "gtest/gtest.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
@@ -42,4 +42,4 @@ TEST(_, Hash) {
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -21,14 +21,14 @@
 #include "absl/flags/internal/commandlineflag.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 bool CommandLineFlag::IsRetired() const { return false; }
-bool CommandLineFlag::ParseFrom(absl::string_view value, std::string* error) {
+bool CommandLineFlag::ParseFrom(abslx::string_view value, std::string* error) {
   return ParseFrom(value, flags_internal::SET_FLAGS_VALUE,
                    flags_internal::kProgrammaticChange, *error);
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

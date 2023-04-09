@@ -25,11 +25,11 @@ namespace tensorflow {
 // Local Tensor Handle: Handle to a Tensor present on the local host.
 class LocalTensorHandleData {
  public:
-  LocalTensorHandleData() : ctrl_(absl::in_place_type<BlockingControl>) {}
+  LocalTensorHandleData() : ctrl_(abslx::in_place_type<BlockingControl>) {}
   explicit LocalTensorHandleData(tensorflow::Tensor&& t)
       : tensor_(std::move(t)),
         forwarding_protection_tensor_(tensor_),
-        ctrl_(absl::in_place_type<NonBlockingControl>) {}
+        ctrl_(abslx::in_place_type<NonBlockingControl>) {}
 
   // A local tensor handle should be able to satisfy all of these requests.
   Status Tensor(const tensorflow::Tensor** t) const;
@@ -41,18 +41,18 @@ class LocalTensorHandleData {
   Status Unprotect();
 
   bool IsReady() const {
-    return absl::visit([](auto& data) { return data.IsReady(); }, ctrl_);
+    return abslx::visit([](auto& data) { return data.IsReady(); }, ctrl_);
   }
 
   Status WaitReady(const char* caller) const {
-    return absl::visit([caller](auto& data) { return data.WaitReady(caller); },
+    return abslx::visit([caller](auto& data) { return data.WaitReady(caller); },
                        ctrl_);
   }
   void Poison(Status status) {
-    return absl::visit([status](auto& data) { data.Poison(status); }, ctrl_);
+    return abslx::visit([status](auto& data) { data.Poison(status); }, ctrl_);
   }
   Status IsPoisoned() const {
-    return absl::visit([](auto& data) { return data.IsPoisoned(); }, ctrl_);
+    return abslx::visit([](auto& data) { return data.IsPoisoned(); }, ctrl_);
   }
 
   Status SetTensor(tensorflow::Tensor&& t);
@@ -102,7 +102,7 @@ class LocalTensorHandleData {
     Status is_poisoned_ TF_GUARDED_BY(mu_);
   };
 
-  absl::variant<NonBlockingControl, BlockingControl> ctrl_;
+  abslx::variant<NonBlockingControl, BlockingControl> ctrl_;
 };
 
 }  // namespace tensorflow

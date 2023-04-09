@@ -29,12 +29,12 @@ namespace {
 template <typename T>
 void BM_FastIntToBuffer(benchmark::State& state) {
   const int inc = state.range(0);
-  char buf[absl::numbers_internal::kFastToBufferSize];
+  char buf[abslx::numbers_internal::kFastToBufferSize];
   // Use the unsigned type to increment to take advantage of well-defined
   // modular arithmetic.
   typename std::make_unsigned<T>::type x = 0;
   for (auto _ : state) {
-    absl::numbers_internal::FastIntToBuffer(static_cast<T>(x), buf);
+    abslx::numbers_internal::FastIntToBuffer(static_cast<T>(x), buf);
     x += inc;
   }
 }
@@ -57,7 +57,7 @@ void BM_safe_strto32_string(benchmark::State& state) {
   int32_t value = 0;
   for (auto _ : state) {
     benchmark::DoNotOptimize(
-        absl::numbers_internal::safe_strto32_base(str, &value, base));
+        abslx::numbers_internal::safe_strto32_base(str, &value, base));
   }
   ABSL_RAW_CHECK(value == RepeatedSevens(digits, base), "");
 }
@@ -84,7 +84,7 @@ void BM_safe_strto64_string(benchmark::State& state) {
   int64_t value = 0;
   for (auto _ : state) {
     benchmark::DoNotOptimize(
-        absl::numbers_internal::safe_strto64_base(str, &value, base));
+        abslx::numbers_internal::safe_strto64_base(str, &value, base));
   }
   ABSL_RAW_CHECK(value == RepeatedSevens(digits, base), "");
 }
@@ -112,7 +112,7 @@ void BM_safe_strtou32_string(benchmark::State& state) {
   uint32_t value = 0;
   for (auto _ : state) {
     benchmark::DoNotOptimize(
-        absl::numbers_internal::safe_strtou32_base(str, &value, base));
+        abslx::numbers_internal::safe_strtou32_base(str, &value, base));
   }
   ABSL_RAW_CHECK(value == RepeatedSevens(digits, base), "");
 }
@@ -139,7 +139,7 @@ void BM_safe_strtou64_string(benchmark::State& state) {
   uint64_t value = 0;
   for (auto _ : state) {
     benchmark::DoNotOptimize(
-        absl::numbers_internal::safe_strtou64_base(str, &value, base));
+        abslx::numbers_internal::safe_strtou64_base(str, &value, base));
   }
   ABSL_RAW_CHECK(value == RepeatedSevens(digits, base), "");
 }
@@ -212,11 +212,11 @@ void BM_SimpleAtof(benchmark::State& state) {
   float value;
   for (auto _ : state) {
     for (const T& input : inputs) {
-      benchmark::DoNotOptimize(absl::SimpleAtof(input, &value));
+      benchmark::DoNotOptimize(abslx::SimpleAtof(input, &value));
     }
   }
 }
-BENCHMARK_TEMPLATE(BM_SimpleAtof, absl::string_view)
+BENCHMARK_TEMPLATE(BM_SimpleAtof, abslx::string_view)
     ->ArgPair(10, 1)
     ->ArgPair(10, 2)
     ->ArgPair(10, 4)
@@ -242,11 +242,11 @@ void BM_SimpleAtod(benchmark::State& state) {
   double value;
   for (auto _ : state) {
     for (const T& input : inputs) {
-      benchmark::DoNotOptimize(absl::SimpleAtod(input, &value));
+      benchmark::DoNotOptimize(abslx::SimpleAtod(input, &value));
     }
   }
 }
-BENCHMARK_TEMPLATE(BM_SimpleAtod, absl::string_view)
+BENCHMARK_TEMPLATE(BM_SimpleAtod, abslx::string_view)
     ->ArgPair(10, 1)
     ->ArgPair(10, 2)
     ->ArgPair(10, 4)
@@ -263,19 +263,19 @@ BENCHMARK_TEMPLATE(BM_SimpleAtod, std::string)
     ->ArgPair(10, 8);
 
 void BM_FastHexToBufferZeroPad16(benchmark::State& state) {
-  absl::BitGen rng;
+  abslx::BitGen rng;
   std::vector<uint64_t> nums;
   nums.resize(1000);
   auto min = std::numeric_limits<uint64_t>::min();
   auto max = std::numeric_limits<uint64_t>::max();
   for (auto& num : nums) {
-    num = absl::LogUniform(rng, min, max);
+    num = abslx::LogUniform(rng, min, max);
   }
 
   char buf[16];
   while (state.KeepRunningBatch(nums.size())) {
     for (auto num : nums) {
-      auto digits = absl::numbers_internal::FastHexToBufferZeroPad16(num, buf);
+      auto digits = abslx::numbers_internal::FastHexToBufferZeroPad16(num, buf);
       benchmark::DoNotOptimize(digits);
       benchmark::DoNotOptimize(buf);
     }

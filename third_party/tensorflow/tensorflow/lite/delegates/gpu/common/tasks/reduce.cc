@@ -458,7 +458,7 @@ std::string Reduce::GetReduceKernelCode(const OperationDef& op_def,
   const std::string conversion = GetTypeConversion(
       gpu_info, accum_type, op_def.src_tensors[0].GetDataType(), 4);
   c += "  args.src_tensor::type result = " +
-       absl::Substitute(conversion, "reducer") + ";\n";
+       abslx::Substitute(conversion, "reducer") + ";\n";
   std::string dst_coordinates;
   for (const auto& a : all_axis) {
     if (op_def.dst_tensors[0].HasAxis(a)) {
@@ -477,7 +477,7 @@ std::string Reduce::GetReduceKernelCode(const OperationDef& op_def,
   return c;
 }
 
-absl::Status Reduce::BindArguments(ArgumentsBinder* args) {
+abslx::Status Reduce::BindArguments(ArgumentsBinder* args) {
   const double total_src_elements = 1.0 * src_[0]->Batch() * src_[0]->Width() *
                                     src_[0]->Height() * src_[0]->Depth() *
                                     src_[0]->Channels();
@@ -495,7 +495,7 @@ absl::Status Reduce::BindArguments(ArgumentsBinder* args) {
     RETURN_IF_ERROR(args->SetFloat("inv_multiplier_1", 1.0 / reduction_size));
     RETURN_IF_ERROR(args->SetFloat("inv_multiplier_2", 1.0));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 int3 Reduce::GetGridSize() const {

@@ -73,7 +73,7 @@ StatusOr<std::unique_ptr<Executable>> MlirGpuTestBase::CompileMlirModule(
 
 StatusOr<ExecutionOutput> MlirGpuTestBase::RunMlirModule(
     mlir::ModuleOp module, se::Stream* stream,
-    absl::Span<const se::DeviceMemoryBase> arguments) {
+    abslx::Span<const se::DeviceMemoryBase> arguments) {
   TF_ASSIGN_OR_RETURN(auto executable, CompileMlirModule(module, stream));
 
   ExecutableRunOptions executable_run_options;
@@ -103,7 +103,7 @@ StatusOr<ExecutionOutput> MlirGpuTestBase::RunMlirModule(
 
 StatusOr<std::vector<std::vector<uint8_t>>>
 MlirGpuTestBase::RunMlirModuleWithHostBuffers(
-    mlir::ModuleOp module, std::vector<absl::Span<uint8_t>> arguments) {
+    mlir::ModuleOp module, std::vector<abslx::Span<uint8_t>> arguments) {
   auto* allocator = backend_->memory_allocator();
   std::vector<se::OwningDeviceMemory> owning_memory;
   owning_memory.reserve(arguments.size());
@@ -137,7 +137,7 @@ MlirGpuTestBase::RunMlirModuleWithHostBuffers(
 }
 
 StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> MlirGpuTestBase::ParseMlirModule(
-    absl::string_view module_text, mlir::MLIRContext& context) {
+    abslx::string_view module_text, mlir::MLIRContext& context) {
   mlir::DialectRegistry registry;
   xla::gpu::IrEmitterUnnested::GetDependentDialects(registry);
   context.appendDialectRegistry(registry);
@@ -157,7 +157,7 @@ StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> MlirGpuTestBase::ParseMlirModule(
 
 StatusOr<std::vector<std::vector<uint8_t>>>
 MlirGpuTestBase::RunMlirTextWithHostBuffers(
-    absl::string_view module_text, std::vector<absl::Span<uint8_t>> arguments) {
+    abslx::string_view module_text, std::vector<abslx::Span<uint8_t>> arguments) {
   mlir::MLIRContext context;
   TF_ASSIGN_OR_RETURN(mlir::OwningOpRef<mlir::ModuleOp> module,
                       ParseMlirModule(module_text, context));
@@ -165,7 +165,7 @@ MlirGpuTestBase::RunMlirTextWithHostBuffers(
 }
 
 StatusOr<std::unique_ptr<Executable>> MlirGpuTestBase::CompileMlirText(
-    absl::string_view module_text) {
+    abslx::string_view module_text) {
   mlir::MLIRContext context;
   TF_ASSIGN_OR_RETURN(mlir::OwningOpRef<mlir::ModuleOp> module,
                       ParseMlirModule(module_text, context));

@@ -84,7 +84,7 @@ BEGIN NODE: name = %s
         dump.append(R"MSG(
       BEGIN EMBEDDED STRING
 )MSG");
-        const auto& lines = absl::StrSplit(attr.second.s(), '\n');
+        const auto& lines = abslx::StrSplit(attr.second.s(), '\n');
         for (const auto& line : lines) {
           toco::port::AppendF(&dump, "      %s\n", line);
         }

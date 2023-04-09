@@ -21,13 +21,13 @@
 using audio_dsp::Resampler;
 
 namespace mediapipe {
-absl::Status RationalFactorResampleCalculator::Process(CalculatorContext* cc) {
+abslx::Status RationalFactorResampleCalculator::Process(CalculatorContext* cc) {
   return ProcessInternal(cc->Inputs().Index(0).Get<Matrix>(), false, cc);
 }
 
-absl::Status RationalFactorResampleCalculator::Close(CalculatorContext* cc) {
+abslx::Status RationalFactorResampleCalculator::Close(CalculatorContext* cc) {
   if (initial_timestamp_ == Timestamp::Unstarted()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   Matrix empty_input_frame(num_channels_, 0);
   return ProcessInternal(empty_input_frame, true, cc);
@@ -53,7 +53,7 @@ void CopyVectorToChannel(const std::vector<float>& vec, Matrix* matrix,
 }
 }  // namespace
 
-absl::Status RationalFactorResampleCalculator::Open(CalculatorContext* cc) {
+abslx::Status RationalFactorResampleCalculator::Open(CalculatorContext* cc) {
   RationalFactorResampleCalculatorOptions resample_options =
       cc->Options<RationalFactorResampleCalculatorOptions>();
 
@@ -78,7 +78,7 @@ absl::Status RationalFactorResampleCalculator::Open(CalculatorContext* cc) {
                                resample_options);
       if (!r) {
         LOG(ERROR) << "Failed to initialize resampler.";
-        return absl::UnknownError("Failed to initialize resampler.");
+        return abslx::UnknownError("Failed to initialize resampler.");
       }
     }
   }
@@ -96,10 +96,10 @@ absl::Status RationalFactorResampleCalculator::Open(CalculatorContext* cc) {
   initial_timestamp_ = Timestamp::Unstarted();
   check_inconsistent_timestamps_ =
       resample_options.check_inconsistent_timestamps();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RationalFactorResampleCalculator::ProcessInternal(
+abslx::Status RationalFactorResampleCalculator::ProcessInternal(
     const Matrix& input_frame, bool should_flush, CalculatorContext* cc) {
   if (initial_timestamp_ == Timestamp::Unstarted()) {
     initial_timestamp_ = cc->InputTimestamp();
@@ -121,7 +121,7 @@ absl::Status RationalFactorResampleCalculator::ProcessInternal(
     *output_frame = input_frame;
   } else {
     if (!Resample(input_frame, output_frame.get(), should_flush)) {
-      return absl::UnknownError("Resample() failed.");
+      return abslx::UnknownError("Resample() failed.");
     }
   }
   cumulative_output_samples_ += output_frame->cols();
@@ -129,7 +129,7 @@ absl::Status RationalFactorResampleCalculator::ProcessInternal(
   if (output_frame->cols() > 0) {
     cc->Outputs().Index(0).Add(output_frame.release(), output_timestamp);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 bool RationalFactorResampleCalculator::Resample(const Matrix& input_frame,
@@ -177,7 +177,7 @@ RationalFactorResampleCalculator::ResamplerFromOptions(
 
   // NOTE: QResampler supports multichannel resampling, so the code might be
   // simplified using a single instance rather than one per channel.
-  resampler = absl::make_unique<audio_dsp::QResampler<float>>(
+  resampler = abslx::make_unique<audio_dsp::QResampler<float>>(
       source_sample_rate, target_sample_rate, /*num_channels=*/1, params);
   if (resampler != nullptr && !resampler->Valid()) {
     resampler = std::unique_ptr<Resampler<float>>();

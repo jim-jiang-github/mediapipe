@@ -34,9 +34,9 @@ class GpuDevice : public PjRtStreamExecutorDevice {
   GpuDevice(int id, std::unique_ptr<LocalDeviceState> local_device_state,
             std::string device_kind, std::string device_vendor, int node_id);
 
-  absl::string_view device_vendor();
+  abslx::string_view device_vendor();
 
-  absl::string_view ToString() const override;
+  abslx::string_view ToString() const override;
 
  private:
   std::string device_vendor_;

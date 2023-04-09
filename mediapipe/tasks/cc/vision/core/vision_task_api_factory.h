@@ -45,7 +45,7 @@ class VisionTaskApiFactory {
 
   template <typename T, typename Options,
             EnableIfBaseVisionTaskApiSubclass<T> = nullptr>
-  static absl::StatusOr<std::unique_ptr<T>> Create(
+  static abslx::StatusOr<std::unique_ptr<T>> Create(
       CalculatorGraphConfig graph_config,
       std::unique_ptr<tflite::OpResolver> resolver, RunningMode running_mode,
       tasks::core::PacketsCallback packets_callback = nullptr) {
@@ -56,14 +56,14 @@ class VisionTaskApiFactory {
       }
       if (found_task_subgraph) {
         return CreateStatusWithPayload(
-            absl::StatusCode::kInvalidArgument,
+            abslx::StatusCode::kInvalidArgument,
             "Task graph config should only contain one task subgraph node.",
             MediaPipeTasksStatus::kInvalidTaskGraphConfigError);
       } else {
         if (!node.options().HasExtension(Options::ext)) {
           return CreateStatusWithPayload(
-              absl::StatusCode::kInvalidArgument,
-              absl::StrCat(node.calculator(),
+              abslx::StatusCode::kInvalidArgument,
+              abslx::StrCat(node.calculator(),
                            " is missing the required task options field."),
               MediaPipeTasksStatus::kInvalidTaskGraphConfigError);
         }
@@ -73,14 +73,14 @@ class VisionTaskApiFactory {
     if (running_mode == RunningMode::LIVE_STREAM) {
       if (packets_callback == nullptr) {
         return CreateStatusWithPayload(
-            absl::StatusCode::kInvalidArgument,
+            abslx::StatusCode::kInvalidArgument,
             "The vision task is in live stream mode, a user-defined result "
             "callback must be provided.",
             MediaPipeTasksStatus::kInvalidTaskGraphConfigError);
       }
     } else if (packets_callback) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
+          abslx::StatusCode::kInvalidArgument,
           "The vision task is in image or video mode, a user-defined result "
           "callback shouldn't be provided.",
           MediaPipeTasksStatus::kInvalidTaskGraphConfigError);

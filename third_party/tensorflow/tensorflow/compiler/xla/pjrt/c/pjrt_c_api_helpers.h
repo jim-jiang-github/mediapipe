@@ -46,7 +46,7 @@ PJRT_BufferDeleter MakeBufferDeleter(const PJRT_Api* api);
 // and frees the PJRT_Error passed in.
 void LogFatalIfPjrtError(PJRT_Error* error, const PJRT_Api* api);
 
-absl::string_view GetPjrtErrorMessage(const PJRT_Error* error,
+abslx::string_view GetPjrtErrorMessage(const PJRT_Error* error,
                                       const PJRT_Api* api);
 
 xla::Status PjrtErrorToStatus(const PJRT_Error* error, const PJRT_Api* api);

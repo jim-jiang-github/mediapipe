@@ -86,7 +86,7 @@ class SplitEventTracker {
 
   // Start events are collected from each ThreadLocalRecorder::Consume() call.
   // Their data is merged into end_events.
-  absl::flat_hash_map<int64_t, TraceMeRecorder::Event> start_events_;
+  abslx::flat_hash_map<int64_t, TraceMeRecorder::Event> start_events_;
 
   // End events are stored in the output of TraceMeRecorder::Consume().
   std::vector<TraceMeRecorder::Event*> end_events_;

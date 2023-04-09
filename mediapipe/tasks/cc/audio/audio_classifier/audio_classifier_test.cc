@@ -45,7 +45,7 @@ namespace audio {
 namespace audio_classifier {
 namespace {
 
-using ::absl::StatusOr;
+using ::abslx::StatusOr;
 using ::mediapipe::file::JoinPath;
 using ::testing::HasSubstr;
 using ::testing::Optional;
@@ -62,7 +62,7 @@ constexpr char k44kTestWavForTwoHeadsFilename[] = "two_heads_44100_hz_mono.wav";
 constexpr int kMilliSecondsPerSecond = 1000;
 constexpr int kYamnetNumOfAudioSamples = 15600;
 
-Matrix GetAudioData(absl::string_view filename) {
+Matrix GetAudioData(abslx::string_view filename) {
   std::string wav_file_path = JoinPath("./", kTestDataDirectory, filename);
   int buffer_size;
   auto audio_data = internal::ReadWavFile(wav_file_path, &buffer_size);
@@ -173,13 +173,13 @@ TEST_F(CreateFromOptionsTest, FailsWithMissingModel) {
       AudioClassifier::Create(std::make_unique<AudioClassifierOptions>());
 
   EXPECT_EQ(audio_classifier_or.status().code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       audio_classifier_or.status().message(),
       HasSubstr("ExternalFile must specify at least one of 'file_content', "
                 "'file_name', 'file_pointer_meta' or 'file_descriptor_meta'."));
   EXPECT_THAT(audio_classifier_or.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInitializationError))));
 }
 
@@ -192,11 +192,11 @@ TEST_F(CreateFromOptionsTest, FailsWithInvalidMaxResults) {
       AudioClassifier::Create(std::move(options));
 
   EXPECT_EQ(audio_classifier_or.status().code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(audio_classifier_or.status().message(),
               HasSubstr("Invalid `max_results` option"));
   EXPECT_THAT(audio_classifier_or.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInitializationError))));
 }
 
@@ -210,11 +210,11 @@ TEST_F(CreateFromOptionsTest, FailsWithCombinedAllowlistAndDenylist) {
       AudioClassifier::Create(std::move(options));
 
   EXPECT_EQ(audio_classifier_or.status().code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(audio_classifier_or.status().message(),
               HasSubstr("mutually exclusive options"));
   EXPECT_THAT(audio_classifier_or.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInitializationError))));
 }
 
@@ -226,11 +226,11 @@ TEST_F(CreateFromOptionsTest, FailsWithMissingMetadata) {
       AudioClassifier::Create(std::move(options));
 
   EXPECT_EQ(audio_classifier_or.status().code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(audio_classifier_or.status().message(),
               HasSubstr("require TFLite Model Metadata"));
   EXPECT_THAT(audio_classifier_or.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInitializationError))));
 }
 
@@ -243,11 +243,11 @@ TEST_F(CreateFromOptionsTest, FailsWithMissingCallback) {
       AudioClassifier::Create(std::move(options));
 
   EXPECT_EQ(audio_classifier_or.status().code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(audio_classifier_or.status().message(),
               HasSubstr("a user-defined result callback must be provided"));
   EXPECT_THAT(audio_classifier_or.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kInvalidTaskGraphConfigError))));
 }
 
@@ -256,17 +256,17 @@ TEST_F(CreateFromOptionsTest, FailsWithUnnecessaryCallback) {
   options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithoutMetadata);
   options->result_callback =
-      [](absl::StatusOr<AudioClassifierResult> status_or_result) {};
+      [](abslx::StatusOr<AudioClassifierResult> status_or_result) {};
   StatusOr<std::unique_ptr<AudioClassifier>> audio_classifier_or =
       AudioClassifier::Create(std::move(options));
 
   EXPECT_EQ(audio_classifier_or.status().code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       audio_classifier_or.status().message(),
       HasSubstr("a user-defined result callback shouldn't be provided"));
   EXPECT_THAT(audio_classifier_or.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kInvalidTaskGraphConfigError))));
 }
 
@@ -480,7 +480,7 @@ TEST_F(ClassifyAsyncTest, Succeeds) {
   options->running_mode = core::RunningMode::AUDIO_STREAM;
   std::vector<AudioClassifierResult> outputs;
   options->result_callback =
-      [&outputs](absl::StatusOr<AudioClassifierResult> status_or_result) {
+      [&outputs](abslx::StatusOr<AudioClassifierResult> status_or_result) {
         MP_ASSERT_OK_AND_ASSIGN(outputs.emplace_back(), status_or_result);
       };
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<AudioClassifier> audio_classifier,
@@ -509,7 +509,7 @@ TEST_F(ClassifyAsyncTest, SucceedsWithNonDeterministicNumAudioSamples) {
   options->running_mode = core::RunningMode::AUDIO_STREAM;
   std::vector<AudioClassifierResult> outputs;
   options->result_callback =
-      [&outputs](absl::StatusOr<AudioClassifierResult> status_or_result) {
+      [&outputs](abslx::StatusOr<AudioClassifierResult> status_or_result) {
         MP_ASSERT_OK_AND_ASSIGN(outputs.emplace_back(), status_or_result);
       };
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<AudioClassifier> audio_classifier,

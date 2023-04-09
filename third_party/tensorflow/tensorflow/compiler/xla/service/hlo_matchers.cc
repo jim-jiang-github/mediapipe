@@ -233,7 +233,7 @@ bool HloDotWithContractingDimsMatcher::MatchAndExplain(
   if (dim_nums.lhs_contracting_dimensions_size() != 1 ||
       dim_nums.lhs_contracting_dimensions(0) != lhs_contracting_dim_) {
     *listener << " has wrong lhs_contracting_dimensions (got {"
-              << absl::StrJoin(dim_nums.lhs_contracting_dimensions(), ",")
+              << abslx::StrJoin(dim_nums.lhs_contracting_dimensions(), ",")
               << "} want {" << lhs_contracting_dim_ << "})";
     return false;
   }
@@ -241,7 +241,7 @@ bool HloDotWithContractingDimsMatcher::MatchAndExplain(
   if (dim_nums.rhs_contracting_dimensions_size() != 1 ||
       dim_nums.rhs_contracting_dimensions(0) != rhs_contracting_dim_) {
     *listener << " has wrong rhs_contracting_dimensions (got {"
-              << absl::StrJoin(dim_nums.rhs_contracting_dimensions(), ",")
+              << abslx::StrJoin(dim_nums.rhs_contracting_dimensions(), ",")
               << "} want {" << rhs_contracting_dim_ << "})";
     return false;
   }
@@ -329,9 +329,9 @@ bool HloReplicaGroupsMatcher::MatchAndExplain(
     return false;
   }
 
-  if (absl::c_equal(collective->replica_groups(), replica_groups_,
+  if (abslx::c_equal(collective->replica_groups(), replica_groups_,
                     [](const ReplicaGroup& a, const std::vector<int64_t>& b) {
-                      return absl::c_equal(a.replica_ids(), b);
+                      return abslx::c_equal(a.replica_ids(), b);
                     })) {
     return true;
   }
@@ -349,9 +349,9 @@ void HloReplicaGroupsMatcher::DescribeTo(std::ostream* os) const {
   replica_group_strs.reserve(replica_groups_.size());
   for (const std::vector<int64_t>& replica_group : replica_groups_) {
     replica_group_strs.push_back(
-        absl::StrCat("{", absl::StrJoin(replica_group, ","), "}"));
+        abslx::StrCat("{", abslx::StrJoin(replica_group, ","), "}"));
   }
-  *os << "{" << absl::StrJoin(replica_group_strs, ",") << "}";
+  *os << "{" << abslx::StrJoin(replica_group_strs, ",") << "}";
 }
 
 }  // namespace testing

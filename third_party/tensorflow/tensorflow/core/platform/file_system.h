@@ -777,9 +777,9 @@ class RandomAccessFile {
 #if defined(TF_CORD_SUPPORT)
   /// \brief Read up to `n` bytes from the file starting at `offset`.
   virtual tensorflow::Status Read(uint64 offset, size_t n,
-                                  absl::Cord* cord) const {
+                                  abslx::Cord* cord) const {
     return errors::Unimplemented(
-        "Read(uint64, size_t, absl::Cord*) is not "
+        "Read(uint64, size_t, abslx::Cord*) is not "
         "implemented");
   }
 #endif
@@ -802,7 +802,7 @@ class WritableFile {
 
 #if defined(TF_CORD_SUPPORT)
   // \brief Append 'data' to the file.
-  virtual tensorflow::Status Append(const absl::Cord& cord) {
+  virtual tensorflow::Status Append(const abslx::Cord& cord) {
     for (StringPiece chunk : cord.Chunks()) {
       TF_RETURN_IF_ERROR(Append(chunk));
     }

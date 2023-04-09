@@ -100,7 +100,7 @@ TEST(DetectionsToRectsCalculatorTest, DetectionToRect) {
     output_stream: "RECT:rect"
   )pb"));
 
-  auto detection = absl::make_unique<Detection>(
+  auto detection = abslx::make_unique<Detection>(
       DetectionWithLocationData(100, 200, 300, 400));
 
   runner.MutableInputs()
@@ -115,7 +115,7 @@ TEST(DetectionsToRectsCalculatorTest, DetectionToRect) {
   EXPECT_THAT(rect, RectEq(250, 400, 300, 400));
 }
 
-absl::StatusOr<Rect> RunDetectionKeyPointsToRectCalculation(
+abslx::StatusOr<Rect> RunDetectionKeyPointsToRectCalculation(
     Detection detection, std::pair<int, int> image_size) {
   CalculatorRunner runner(ParseTextProtoOrDie<CalculatorGraphConfig::Node>(R"pb(
     calculator: "DetectionsToRectsCalculator"
@@ -182,7 +182,7 @@ TEST(DetectionsToRectsCalculatorTest, DetectionToNormalizedRect) {
     output_stream: "NORM_RECT:rect"
   )pb"));
 
-  auto detection = absl::make_unique<Detection>(
+  auto detection = abslx::make_unique<Detection>(
       DetectionWithRelativeLocationData(0.1, 0.2, 0.3, 0.4));
 
   runner.MutableInputs()
@@ -198,7 +198,7 @@ TEST(DetectionsToRectsCalculatorTest, DetectionToNormalizedRect) {
   EXPECT_THAT(rect, NormRectEq(0.25f, 0.4f, 0.3f, 0.4f));
 }
 
-absl::StatusOr<NormalizedRect> RunDetectionKeyPointsToNormRectCalculation(
+abslx::StatusOr<NormalizedRect> RunDetectionKeyPointsToNormRectCalculation(
     Detection detection) {
   CalculatorRunner runner(ParseTextProtoOrDie<CalculatorGraphConfig::Node>(R"pb(
     calculator: "DetectionsToRectsCalculator"
@@ -255,7 +255,7 @@ TEST(DetectionsToRectsCalculatorTest, DetectionsToRect) {
     output_stream: "RECT:rect"
   )pb"));
 
-  auto detections(absl::make_unique<std::vector<Detection>>());
+  auto detections(abslx::make_unique<std::vector<Detection>>());
   detections->push_back(DetectionWithLocationData(100, 200, 300, 400));
   detections->push_back(DetectionWithLocationData(200, 300, 400, 500));
 
@@ -278,7 +278,7 @@ TEST(DetectionsToRectsCalculatorTest, DetectionsToNormalizedRect) {
     output_stream: "NORM_RECT:rect"
   )pb"));
 
-  auto detections(absl::make_unique<std::vector<Detection>>());
+  auto detections(abslx::make_unique<std::vector<Detection>>());
   detections->push_back(DetectionWithRelativeLocationData(0.1, 0.2, 0.3, 0.4));
   detections->push_back(DetectionWithRelativeLocationData(0.2, 0.3, 0.4, 0.5));
 
@@ -302,7 +302,7 @@ TEST(DetectionsToRectsCalculatorTest, DetectionsToRects) {
     output_stream: "RECTS:rect"
   )pb"));
 
-  auto detections(absl::make_unique<std::vector<Detection>>());
+  auto detections(abslx::make_unique<std::vector<Detection>>());
   detections->push_back(DetectionWithLocationData(100, 200, 300, 400));
   detections->push_back(DetectionWithLocationData(200, 300, 400, 500));
 
@@ -327,7 +327,7 @@ TEST(DetectionsToRectsCalculatorTest, DetectionsToNormalizedRects) {
     output_stream: "NORM_RECTS:rect"
   )pb"));
 
-  auto detections(absl::make_unique<std::vector<Detection>>());
+  auto detections(abslx::make_unique<std::vector<Detection>>());
   detections->push_back(DetectionWithRelativeLocationData(0.1, 0.2, 0.3, 0.4));
   detections->push_back(DetectionWithRelativeLocationData(0.2, 0.3, 0.4, 0.5));
 
@@ -353,7 +353,7 @@ TEST(DetectionsToRectsCalculatorTest, DetectionToRects) {
     output_stream: "RECTS:rect"
   )pb"));
 
-  auto detection = absl::make_unique<Detection>(
+  auto detection = abslx::make_unique<Detection>(
       DetectionWithLocationData(100, 200, 300, 400));
 
   runner.MutableInputs()
@@ -376,7 +376,7 @@ TEST(DetectionsToRectsCalculatorTest, DetectionToNormalizedRects) {
     output_stream: "NORM_RECTS:rect"
   )pb"));
 
-  auto detection = absl::make_unique<Detection>(
+  auto detection = abslx::make_unique<Detection>(
       DetectionWithRelativeLocationData(0.1, 0.2, 0.3, 0.4));
 
   runner.MutableInputs()
@@ -400,7 +400,7 @@ TEST(DetectionsToRectsCalculatorTest, WrongInputToRect) {
     output_stream: "RECT:rect"
   )pb"));
 
-  auto detections(absl::make_unique<std::vector<Detection>>());
+  auto detections(abslx::make_unique<std::vector<Detection>>());
   detections->push_back(DetectionWithRelativeLocationData(0.1, 0.2, 0.3, 0.4));
 
   runner.MutableInputs()
@@ -420,7 +420,7 @@ TEST(DetectionsToRectsCalculatorTest, WrongInputToNormalizedRect) {
     output_stream: "NORM_RECT:rect"
   )pb"));
 
-  auto detections(absl::make_unique<std::vector<Detection>>());
+  auto detections(abslx::make_unique<std::vector<Detection>>());
   detections->push_back(DetectionWithLocationData(100, 200, 300, 400));
 
   runner.MutableInputs()

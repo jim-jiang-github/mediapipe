@@ -28,7 +28,7 @@ limitations under the License.
 
 namespace tflite {
 namespace optimize {
-using absl::flat_hash_set;
+using abslx::flat_hash_set;
 
 // Supported resulting types from quantization process.
 enum class BufferType { QUANTIZED_INT8, QUANTIZED_FLOAT16 };

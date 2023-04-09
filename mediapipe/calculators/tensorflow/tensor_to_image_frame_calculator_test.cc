@@ -37,7 +37,7 @@ class TensorToImageFrameCalculatorTest : public ::testing::Test {
     config.set_calculator("TensorToImageFrameCalculator");
     config.add_input_stream("TENSOR:input_tensor");
     config.add_output_stream("IMAGE:output_image");
-    runner_ = absl::make_unique<CalculatorRunner>(config);
+    runner_ = abslx::make_unique<CalculatorRunner>(config);
   }
 
   std::unique_ptr<CalculatorRunner> runner_;
@@ -54,7 +54,7 @@ TYPED_TEST(TensorToImageFrameCalculatorTest, Converts3DTensorToImageFrame) {
   constexpr int kWidth = 16;
   constexpr int kHeight = 8;
   const tf::TensorShape tensor_shape{kHeight, kWidth, 3};
-  auto tensor = absl::make_unique<tf::Tensor>(
+  auto tensor = abslx::make_unique<tf::Tensor>(
       tf::DataTypeToEnum<TypeParam>::v(), tensor_shape);
   auto tensor_vec = tensor->template flat<TypeParam>().data();
 
@@ -90,7 +90,7 @@ TYPED_TEST(TensorToImageFrameCalculatorTest, Converts3DTensorToImageFrameGray) {
   constexpr int kWidth = 16;
   constexpr int kHeight = 8;
   const tf::TensorShape tensor_shape{kHeight, kWidth, 1};
-  auto tensor = absl::make_unique<tf::Tensor>(
+  auto tensor = abslx::make_unique<tf::Tensor>(
       tf::DataTypeToEnum<TypeParam>::v(), tensor_shape);
   auto tensor_vec = tensor->template flat<TypeParam>().data();
 
@@ -127,7 +127,7 @@ TYPED_TEST(TensorToImageFrameCalculatorTest,
   constexpr int kWidth = 16;
   constexpr int kHeight = 8;
   const tf::TensorShape tensor_shape{kHeight, kWidth};
-  auto tensor = absl::make_unique<tf::Tensor>(
+  auto tensor = abslx::make_unique<tf::Tensor>(
       tf::DataTypeToEnum<TypeParam>::v(), tensor_shape);
   auto tensor_vec = tensor->template flat<TypeParam>().data();
 

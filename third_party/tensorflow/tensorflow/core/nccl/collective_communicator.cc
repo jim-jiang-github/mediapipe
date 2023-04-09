@@ -75,7 +75,7 @@ std::unique_ptr<NcclCommunicatorInterface> MaybeCreateNcclCommunicator(
   if (item != device_count.end() && item->second == 0) {
     return nullptr;
   }
-  return absl::make_unique<NcclCommunicator>();
+  return abslx::make_unique<NcclCommunicator>();
 }
 
 void NcclCommunicator::Enqueue(std::shared_ptr<CollectiveContext> col_ctx,
@@ -89,7 +89,7 @@ void NcclCommunicator::Enqueue(std::shared_ptr<CollectiveContext> col_ctx,
   auto* compute_stream = col_ctx->op_ctx->op_device_context()->stream();
   auto* gpu_info =
       col_ctx->op_ctx->device()->tensorflow_accelerator_device_info();
-  auto participant = absl::make_unique<NcclManager::Participant>(
+  auto participant = abslx::make_unique<NcclManager::Participant>(
       compute_stream->parent(), compute_stream, gpu_info, col_ctx->input,
       col_ctx->output, col_ctx->col_params->default_rank,
       /*done_callback=*/nullptr);

@@ -217,7 +217,7 @@ bool InstructionFusion::EffectivelyAtMostUnary(HloInstruction* hlo) {
           output_rank = std::max(output_rank, ShapeUtil::TrueRank(subshape));
         }
       });
-  return absl::c_count_if(
+  return abslx::c_count_if(
              hlo->operands(), [output_rank](HloInstruction* operand) {
                if (operand->opcode() == HloOpcode::kBroadcast ||
                    operand->opcode() == HloOpcode::kIota) {
@@ -235,7 +235,7 @@ bool InstructionFusion::CanFuseOnAllPaths(
     HloInstruction* producer, HloInstruction* consumer,
     const HloInstructionSet& do_not_fuse,
     const HloReachabilityMap& reachability,
-    absl::flat_hash_map<std::pair<HloInstruction*, HloInstruction*>, bool>*
+    abslx::flat_hash_map<std::pair<HloInstruction*, HloInstruction*>, bool>*
         result_cache) {
   if (consumer == producer) {
     return true;
@@ -276,7 +276,7 @@ bool InstructionFusion::CanFuseOnAllPaths(
 
 InstructionFusion::HloInstructionSet
 InstructionFusion::ComputeGloballyUnfusible(
-    absl::Span<HloInstruction* const> post_order,
+    abslx::Span<HloInstruction* const> post_order,
     const HloReachabilityMap& reachability) {
   // Forbid fusion of producers that:
   // a) Need to be duplicated, unless they can be fused into all consumers
@@ -288,7 +288,7 @@ InstructionFusion::ComputeGloballyUnfusible(
   // fusing operations that require duplication later depending on
   // is_expensive_().
   HloInstructionSet do_not_duplicate;
-  absl::flat_hash_map<std::pair<HloInstruction*, HloInstruction*>, bool>
+  abslx::flat_hash_map<std::pair<HloInstruction*, HloInstruction*>, bool>
       can_fuse_on_all_paths_result_cache;
   for (auto it = post_order.rbegin(); it != post_order.rend(); ++it) {
     HloInstruction* producer = *it;
@@ -340,7 +340,7 @@ InstructionFusion::ComputeGloballyUnfusible(
     // A will be not allowed to be fused into B, as it cannot be fused via
     // all paths.
     if (producer->IsFusible() &&
-        absl::c_all_of(producer->users(), [&](HloInstruction* consumer) {
+        abslx::c_all_of(producer->users(), [&](HloInstruction* consumer) {
           return CanFuseOnAllPaths(producer, consumer, do_not_duplicate,
                                    reachability,
                                    &can_fuse_on_all_paths_result_cache);
@@ -446,7 +446,7 @@ class ReversePostOrderFusionQueue : public FusionQueue {
       }
       sorted_operand_numbers.push_back(i);
     }
-    absl::c_sort(sorted_operand_numbers, [&](int64_t i, int64_t j) {
+    abslx::c_sort(sorted_operand_numbers, [&](int64_t i, int64_t j) {
       // Instructions with higher priority in the queue come first.
       return (FindOrDie(post_order_index_, instruction->mutable_operand(i)) >
               FindOrDie(post_order_index_, instruction->mutable_operand(j)));
@@ -475,7 +475,7 @@ class ReversePostOrderFusionQueue : public FusionQueue {
 
  private:
   std::vector<HloInstruction*> post_order_;
-  absl::flat_hash_map<HloInstruction*, int> post_order_index_;
+  abslx::flat_hash_map<HloInstruction*, int> post_order_index_;
   std::vector<bool> fusion_config_;
 };
 
@@ -483,7 +483,7 @@ class ReversePostOrderFusionQueue : public FusionQueue {
 
 std::vector<HloComputation*> InstructionFusion::GetFusionComputations(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   // Use sorted computations because fusion configuration is order-sensitive.
   return module->MakeNonfusionComputationsSorted(execution_threads);
 }
@@ -495,7 +495,7 @@ std::unique_ptr<FusionQueue> InstructionFusion::GetFusionQueue(
 
 StatusOr<bool> InstructionFusion::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   int64_t fuse_count = 0;
   std::vector<std::vector<bool>>* fusion_config = nullptr;
@@ -556,7 +556,7 @@ StatusOr<bool> InstructionFusion::Run(
         // continue with the transformation.
         auto consume_fuel = [&] {
           return ConsumeFuel(name(), /*ran_out_of_fuel_msg=*/[&] {
-            return absl::StrFormat("Not fusing operand %d of %s, namely, %s", i,
+            return abslx::StrFormat("Not fusing operand %d of %s, namely, %s", i,
                                    instruction->ToString(),
                                    operand->ToString());
           });
@@ -575,7 +575,7 @@ StatusOr<bool> InstructionFusion::Run(
             if (dump_fusion) {
               RegisterFusionState(
                   *computation,
-                  absl::StrCat("About to fuse |", operand->name(), "| into |",
+                  abslx::StrCat("About to fuse |", operand->name(), "| into |",
                                instruction->name(),
                                "| inside InstructionFusion with may_duplicate=",
                                may_duplicate_),
@@ -602,7 +602,7 @@ StatusOr<bool> InstructionFusion::Run(
               if (dump_fusion) {
                 RegisterFusionState(
                     *computation,
-                    absl::StrCat(
+                    abslx::StrCat(
                         "About to MOF-fuse |", operand->name(), "| into |",
                         instruction->name(),
                         "| inside InstructionFusion with may_duplicate=",
@@ -630,7 +630,7 @@ StatusOr<bool> InstructionFusion::Run(
             if (operand->opcode() != HloOpcode::kGetTupleElement &&
                 instruction->opcode() != HloOpcode::kGetTupleElement) {
               RegisterFusionState(*computation,
-                                  absl::StrCat("Not fusing |", operand->name(),
+                                  abslx::StrCat("Not fusing |", operand->name(),
                                                "| into |", instruction->name(),
                                                "| as ", should_fuse.Explain()),
                                   /*consumer=*/*instruction,
@@ -660,7 +660,7 @@ StatusOr<bool> InstructionFusion::Run(
         if (dump_fusion) {
           RegisterFusionState(
               *computation,
-              absl::StrCat("Fused |", producer_name, "| into |",
+              abslx::StrCat("Fused |", producer_name, "| into |",
                            fusion_instruction->name(),
                            "| inside InstructionFusion with may_duplicate=",
                            may_duplicate_),
@@ -731,7 +731,7 @@ void InstructionFusion::UpdateReusedOperandsForFusion(
   // state *before* the current fusion has taken place, although if we have
   // replaced the consumer with a new single-element fusion, we will compute
   // the new single-element fusion's reused operands here.
-  absl::flat_hash_set<const HloInstruction*>& fusion_reused_operands =
+  abslx::flat_hash_set<const HloInstruction*>& fusion_reused_operands =
       ReusedOperandsOf(fusion_instruction);
 
   // If the producer is reused, replace it with its operands.
@@ -739,7 +739,7 @@ void InstructionFusion::UpdateReusedOperandsForFusion(
     fusion_reused_operands.insert(producer->operands().begin(),
                                   producer->operands().end());
   } else {
-    const absl::flat_hash_set<const HloInstruction*>& producer_reused_operands =
+    const abslx::flat_hash_set<const HloInstruction*>& producer_reused_operands =
         ReusedOperandsOf(producer);
     // Otherwise add the producer's reused operands to the set.
     fusion_reused_operands.insert(producer_reused_operands.begin(),
@@ -777,7 +777,7 @@ HloInstruction* InstructionFusion::FuseIntoMultiOutput(
 bool InstructionFusion::MultiOutputFusionCreatesCycle(
     HloInstruction* producer, HloInstruction* consumer,
     const HloReachabilityMap& reachability) {
-  absl::flat_hash_set<int> operands;
+  abslx::flat_hash_set<int> operands;
   for (const HloInstruction* operand : consumer->operands()) {
     if (operand == producer) {
       continue;
@@ -798,7 +798,7 @@ bool InstructionFusion::MultiOutputFusionCreatesCycle(
   // Do a DFS on the producer to see if any of the other consumer operands are
   // reachable in the current state of the graph.
   std::vector<HloInstruction*> worklist = producer->users();
-  absl::flat_hash_set<int> visits;
+  abslx::flat_hash_set<int> visits;
   while (!worklist.empty()) {
     const HloInstruction* user = worklist.back();
     worklist.pop_back();
@@ -859,7 +859,7 @@ bool IsSafeToFuseSliceIntoDusFusion(const HloInstruction* producer,
   CHECK_NE(dus, nullptr);
 
   // Use a memoization map to avoid exponential runtime.
-  absl::flat_hash_map<const HloInstruction*, bool> nonelementwise_memo;
+  abslx::flat_hash_map<const HloInstruction*, bool> nonelementwise_memo;
   // Recursively check if the instruction or its users (or their users) are
   // non-elementwise with the exception of the DUS. We have already verified
   // that the slice and DUS are compatible since their indices match.
@@ -877,7 +877,7 @@ bool IsSafeToFuseSliceIntoDusFusion(const HloInstruction* producer,
             instruction->opcode() != HloOpcode::kParameter) {
           return record_and_return(true);
         }
-        return record_and_return(absl::c_any_of(
+        return record_and_return(abslx::c_any_of(
             instruction->users(), has_nonelementwise_uses_except_dus));
       };
   for (int i = 0; i < consumer->operand_count(); ++i) {
@@ -917,7 +917,7 @@ bool IsSafeToFuseSliceIntoDusFusion(const HloInstruction* producer,
       }
     }
     if (!producer->IsElementwise() &&
-        absl::c_find(producer->operands(), consumer->operand(operand_number)) !=
+        abslx::c_find(producer->operands(), consumer->operand(operand_number)) !=
             producer->operands().end()) {
       VLOG(4) << "Found non-elementwise operand that uses the same operand of "
                  "an in-place consumer";
@@ -1026,15 +1026,15 @@ HloInstruction::FusionKind InstructionFusion::ChooseKind(
   return HloInstruction::FusionKind::kLoop;
 }
 
-absl::flat_hash_set<const HloInstruction*>& InstructionFusion::ReusedOperandsOf(
+abslx::flat_hash_set<const HloInstruction*>& InstructionFusion::ReusedOperandsOf(
     const HloInstruction* instruction) {
-  std::unique_ptr<absl::flat_hash_set<const HloInstruction*>>& reused_operands =
+  std::unique_ptr<abslx::flat_hash_set<const HloInstruction*>>& reused_operands =
       reused_fusion_operands_[instruction];
   if (reused_operands != nullptr) {
     return *reused_operands;
   }
   reused_operands =
-      std::make_unique<absl::flat_hash_set<const HloInstruction*>>();
+      std::make_unique<abslx::flat_hash_set<const HloInstruction*>>();
 
   for (int64_t i = 0; i < instruction->operand_count(); ++i) {
     bool reuses = instruction->ReusesOperandElements(i);

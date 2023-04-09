@@ -237,7 +237,7 @@ std::vector<std::unique_ptr<Operator>>::iterator FindOperator(
     pack_op->axis = axis;
     pack_op->values_count = scale;
     const std::string& pack_output_array_name =
-        AvailableArrayName(*model, absl::StrCat("pack_at_", axis));
+        AvailableArrayName(*model, abslx::StrCat("pack_at_", axis));
 
     // We need to copy the quantization/minmax params if applicable.
     Array& pack_output_array = model->GetOrCreateArray(pack_output_array_name);

@@ -23,7 +23,7 @@
 
 #include "absl/strings/internal/memutil.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 namespace {
@@ -230,6 +230,6 @@ ABSL_STRING_VIEW_SELECTANY
 constexpr string_view::size_type string_view::kMaxSize;
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_USES_STD_STRING_VIEW

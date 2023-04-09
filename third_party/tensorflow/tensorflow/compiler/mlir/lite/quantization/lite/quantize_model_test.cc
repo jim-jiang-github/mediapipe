@@ -49,8 +49,8 @@ TfLiteStatus QuantizeModel(
     bool allow_float, const std::unordered_set<string>& operator_names,
     const TensorType& activations_type, ErrorReporter* error_reporter,
     bool disable_per_channel = false,
-    const absl::flat_hash_set<std::string>& blocked_ops = {},
-    const absl::flat_hash_set<std::string>& blocked_nodes = {}) {
+    const abslx::flat_hash_set<std::string>& blocked_ops = {},
+    const abslx::flat_hash_set<std::string>& blocked_nodes = {}) {
   TensorType inference_tensor_type = activations_type;
   bool fully_quantize = !allow_float;
   auto status = mlir::lite::QuantizeModel(

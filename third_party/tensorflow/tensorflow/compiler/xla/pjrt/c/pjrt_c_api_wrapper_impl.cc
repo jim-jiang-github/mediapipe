@@ -29,7 +29,7 @@ limitations under the License.
 
 namespace pjrt {
 
-xla::Status CheckMatchingStructSizes(absl::string_view struct_name,
+xla::Status CheckMatchingStructSizes(abslx::string_view struct_name,
                                      size_t expected_size, size_t actual_size) {
   if (expected_size != actual_size) {
     return tensorflow::errors::InvalidArgument(
@@ -38,9 +38,9 @@ xla::Status CheckMatchingStructSizes(absl::string_view struct_name,
   return tensorflow::OkStatus();
 }
 
-std::string StructSizeErrorMsg(absl::string_view struct_name,
+std::string StructSizeErrorMsg(abslx::string_view struct_name,
                                size_t expected_size, size_t actual_size) {
-  return absl::StrCat("Unexpected ", struct_name, " size: expected ",
+  return abslx::StrCat("Unexpected ", struct_name, " size: expected ",
                       expected_size, ", got ", actual_size,
                       ". Check installed software versions.");
 }
@@ -104,7 +104,7 @@ PJRT_Error* PJRT_Client_PlatformName(PJRT_Client_PlatformName_Args* args) {
   PJRT_RETURN_IF_ERROR(CheckMatchingStructSizes(
       "PJRT_Client_PlatformName_Args",
       PJRT_Client_PlatformName_Args_STRUCT_SIZE, args->struct_size));
-  absl::string_view platform_name = args->client->client->platform_name();
+  abslx::string_view platform_name = args->client->client->platform_name();
   args->platform_name = platform_name.data();
   args->platform_name_size = platform_name.size();
   return nullptr;
@@ -115,7 +115,7 @@ PJRT_Error* PJRT_Client_PlatformVersion(
   PJRT_RETURN_IF_ERROR(CheckMatchingStructSizes(
       "PJRT_CLient_PlatformVersion_Args",
       PJRT_Client_PlatformVersion_Args_STRUCT_SIZE, args->struct_size));
-  absl::string_view platform_version = args->client->client->platform_version();
+  abslx::string_view platform_version = args->client->client->platform_version();
   args->platform_version = platform_version.data();
   args->platform_version_size = platform_version.size();
   return nullptr;
@@ -154,7 +154,7 @@ PJRT_Error* PJRT_Client_LookupDevice(PJRT_Client_LookupDevice_Args* args) {
 // `xla::PjRtDevice *` (`cpp_device`). If a match is found, that PJRT_Device* is
 // returned. Otherwise, returns nullptr.
 static PJRT_Device* FindDeviceWrapper(
-    xla::PjRtDevice* cpp_device, absl::Span<PJRT_Device* const> device_list) {
+    xla::PjRtDevice* cpp_device, abslx::Span<PJRT_Device* const> device_list) {
   for (PJRT_Device* device : device_list) {
     if (device->device == cpp_device) {
       return device;
@@ -166,7 +166,7 @@ static PJRT_Device* FindDeviceWrapper(
 static void PopulatePjrtExecutableAddressableDevices(
     PJRT_Executable* executable) {
   CHECK(executable->client != nullptr) << ": client was null";
-  absl::Span<xla::PjRtDevice* const> cpp_devices =
+  abslx::Span<xla::PjRtDevice* const> cpp_devices =
       executable->executable->addressable_devices();
   const size_t num_addressable_devices = cpp_devices.size();
   std::vector<PJRT_Device*>& exec_devices = executable->addressable_devices;
@@ -204,7 +204,7 @@ ConvertCCompileOptionstoCppCompileOptions(PJRT_CompileOptions* c_option) {
   ret.executable_build_options.set_allow_spmd_sharding_propagation_to_output(
       c_option->allow_spmd_sharding_propagation_to_output);
   if (c_option->device_assignment_size > 0) {
-    absl::string_view device_assignment_sv(c_option->device_assignment,
+    abslx::string_view device_assignment_sv(c_option->device_assignment,
                                            c_option->device_assignment_size);
     std::string device_assignment_str(device_assignment_sv);
     xla::DeviceAssignmentProto proto;
@@ -227,7 +227,7 @@ PJRT_Error* PJRT_Client_Compile(PJRT_Client_Compile_Args* args) {
   PJRT_ASSIGN_OR_RETURN(
       xla::CompileOptions options,
       ConvertCCompileOptionstoCppCompileOptions(args->options));
-  absl::string_view module_str(args->module, args->module_size);
+  abslx::string_view module_str(args->module, args->module_size);
   mlir::MLIRContext context;
   PJRT_ASSIGN_OR_RETURN(mlir::OwningOpRef<mlir::ModuleOp> module,
                         xla::ParseMlirModuleString(module_str, context));
@@ -332,7 +332,7 @@ PJRT_Error* PJRT_Executable_Name(PJRT_Executable_Name_Args* args) {
   PJRT_RETURN_IF_ERROR(CheckMatchingStructSizes(
       "PJRT_Executable_Name_Args", PJRT_Executable_Name_Args_STRUCT_SIZE,
       args->struct_size));
-  absl::string_view executable_name = args->executable->executable->name();
+  abslx::string_view executable_name = args->executable->executable->name();
   args->executable_name = executable_name.data();
   args->executable_name_size = executable_name.size();
   return nullptr;

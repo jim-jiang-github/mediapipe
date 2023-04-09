@@ -73,14 +73,14 @@ class ChannelTracker {
       ABSL_EXCLUSIVE_LOCKS_REQUIRED(channel_mutex_);
 
   // Guards the channel mapping.
-  absl::Mutex channel_mutex_;
+  abslx::Mutex channel_mutex_;
 
   // The next sequence number to assign to a channel.
   int64_t next_channel_ ABSL_GUARDED_BY(channel_mutex_);
 
   // Mapping from ChannelHandle value to the corresponding registered
   // Channel object.
-  absl::flat_hash_map<int64_t, Channel> opaque_to_channel_
+  abslx::flat_hash_map<int64_t, Channel> opaque_to_channel_
       ABSL_GUARDED_BY(channel_mutex_);
 
   ChannelTracker(const ChannelTracker&) = delete;

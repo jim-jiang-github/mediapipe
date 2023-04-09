@@ -118,7 +118,7 @@ XlaOp GetAverageAbsoluteError(XlaOp m1, XlaOp m2, XlaBuilder* builder) {
 
 XlaOp ComputeMatmulVWVt(SelfAdjointEigResult result, XlaBuilder* builder) {
   Shape shape = builder->GetShape(result.v).ValueOrDie();
-  absl::Span<const int64_t> out_dims = shape.dimensions();
+  abslx::Span<const int64_t> out_dims = shape.dimensions();
   std::vector<int64_t> broadcast_dims(shape.rank() - 1);
   std::iota(broadcast_dims.begin(), broadcast_dims.end(), 0);
 
@@ -295,7 +295,7 @@ INSTANTIATE_TEST_SUITE_P(
                       513, 1000),
     [](const ::testing::TestParamInfo<EighTestCase>& info) {
       const int64_t size = info.param;
-      return absl::StrCat(size);
+      return abslx::StrCat(size);
     });
 #else
 INSTANTIATE_TEST_SUITE_P(
@@ -304,7 +304,7 @@ INSTANTIATE_TEST_SUITE_P(
                       512),
     [](const ::testing::TestParamInfo<EighTestCase>& info) {
       const int64_t size = info.param;
-      return absl::StrCat(size);
+      return abslx::StrCat(size);
     });
 #endif  // XLA_TEST_BACKEND_CPU
 

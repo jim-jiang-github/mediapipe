@@ -42,22 +42,22 @@ REGISTER_CALCULATOR(BeginLoopIntegerCalculator);
 
 class IncrementCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<int>();
     cc->Outputs().Index(0).Set<int>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     const int& input_int = cc->Inputs().Index(0).Get<int>();
-    auto output_int = absl::make_unique<int>(input_int + 1);
+    auto output_int = abslx::make_unique<int>(input_int + 1);
     cc->Outputs().Index(0).Add(output_int.release(), cc->InputTimestamp());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
@@ -166,19 +166,19 @@ TEST_F(BeginEndLoopCalculatorGraphTest, MultipleVectors) {
 // bound update.
 class PassThroughOrEmptyVectorCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->SetProcessTimestampBounds(true);
     cc->Inputs().Index(0).Set<std::vector<int>>();
     cc->Outputs().Index(0).Set<std::vector<int>>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     if (!cc->Inputs().Index(0).IsEmpty()) {
       cc->Outputs().Index(0).AddPacket(cc->Inputs().Index(0).Value());
     } else {
@@ -186,7 +186,7 @@ class PassThroughOrEmptyVectorCalculator : public CalculatorBase {
           MakePacket<std::vector<int>>(std::vector<int>())
               .At(cc->InputTimestamp()));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
@@ -311,24 +311,24 @@ TEST_F(BeginEndLoopCalculatorGraphProcessingEmptyPacketsTest, MultipleVectors) {
 
 class MultiplierCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<int>();
     cc->Inputs().Index(1).Set<int>();
     cc->Outputs().Index(0).Set<int>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     const int& input_int = cc->Inputs().Index(0).Get<int>();
     const int& multiplier_int = cc->Inputs().Index(1).Get<int>();
-    auto output_int = absl::make_unique<int>(input_int * multiplier_int);
+    auto output_int = abslx::make_unique<int>(input_int * multiplier_int);
     cc->Outputs().Index(0).Add(output_int.release(), cc->InputTimestamp());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

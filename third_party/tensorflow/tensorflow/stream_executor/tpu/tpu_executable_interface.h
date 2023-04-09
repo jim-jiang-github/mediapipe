@@ -71,12 +71,12 @@ class TpuExecutableInterface : public Executable {
 
   virtual Status LoadProgramAndEnqueueToStream(
       const ServiceExecutableRunOptions& run_options,
-      absl::Span<const stream_executor::DeviceMemoryBase> arguments,
+      abslx::Span<const stream_executor::DeviceMemoryBase> arguments,
       stream_executor::DeviceMemoryBase result,
       std::optional<stream_executor::DeviceMemoryBase>
           cross_program_prefetch_addr) = 0;
 
-  virtual absl::string_view fingerprint() const = 0;
+  virtual abslx::string_view fingerprint() const = 0;
 
  protected:
   virtual Shape HostShapeToDeviceShape(const Shape& host_shape) = 0;

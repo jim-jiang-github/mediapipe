@@ -34,10 +34,10 @@ namespace mediapipe {
 //   packet_cloner_calculator.cc: Repeats last-seen packets from empty inputs.
 class PacketInnerJoinCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   int num_streams_;
@@ -45,7 +45,7 @@ class PacketInnerJoinCalculator : public CalculatorBase {
 
 REGISTER_CALCULATOR(PacketInnerJoinCalculator);
 
-absl::Status PacketInnerJoinCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status PacketInnerJoinCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK(cc->Inputs().NumEntries() == cc->Outputs().NumEntries())
       << "The number of input and output streams must match.";
   const int num_streams = cc->Inputs().NumEntries();
@@ -53,25 +53,25 @@ absl::Status PacketInnerJoinCalculator::GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(i).SetAny();
     cc->Outputs().Index(i).SetSameAs(&cc->Inputs().Index(i));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PacketInnerJoinCalculator::Open(CalculatorContext* cc) {
+abslx::Status PacketInnerJoinCalculator::Open(CalculatorContext* cc) {
   num_streams_ = cc->Inputs().NumEntries();
   cc->SetOffset(TimestampDiff(0));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PacketInnerJoinCalculator::Process(CalculatorContext* cc) {
+abslx::Status PacketInnerJoinCalculator::Process(CalculatorContext* cc) {
   for (int i = 0; i < num_streams_; ++i) {
     if (cc->Inputs().Index(i).Value().IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
   }
   for (int i = 0; i < num_streams_; ++i) {
     cc->Outputs().Index(i).AddPacket(cc->Inputs().Index(i).Value());
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

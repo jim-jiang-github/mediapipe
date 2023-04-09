@@ -34,7 +34,7 @@ class GatherOperationTest : public HloTestBase {
     RunTest(hlo_text, {operand, start_indices});
   }
 
-  void RunTest(const std::string& hlo_text, absl::Span<Literal* const> args) {
+  void RunTest(const std::string& hlo_text, abslx::Span<Literal* const> args) {
     HloModuleConfig config;
     config.set_debug_options(GetDebugOptionsForTest());
     TF_ASSERT_OK_AND_ASSIGN(std::unique_ptr<HloModule> module,

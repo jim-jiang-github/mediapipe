@@ -105,7 +105,7 @@ Status GpuLaunchKernel(void (*function)(Ts...), dim3 grid_dim, dim3 block_dim,
   static_assert(detail::NoneIsReference<Ts...>(),
                 "Kernels with reference arguments have undefined behaviour.");
 #if GOOGLE_CUDA
-  auto func_ptr = absl::bit_cast<const void*>(function);
+  auto func_ptr = abslx::bit_cast<const void*>(function);
   // Cast arguments and forward them as an array of pointers.
   auto args_tuple = std::tuple<Ts...>(arguments...);
   auto arg_ptrs = detail::GetArrayOfElementPointers(&args_tuple);

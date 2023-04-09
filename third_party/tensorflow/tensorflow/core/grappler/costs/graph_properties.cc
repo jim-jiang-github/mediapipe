@@ -206,7 +206,7 @@ class DisjointSet {
 
  private:
   Processor<Handle> processor_;
-  absl::flat_hash_map<Handle, Rep*, HashHandle<Handle>, CompareHandle<Handle>>
+  abslx::flat_hash_map<Handle, Rep*, HashHandle<Handle>, CompareHandle<Handle>>
       nodes_;
 };
 
@@ -302,9 +302,9 @@ bool HasAnyUnknownDimensions(const TensorShapeProto& proto) {
 // This really should be done in an external debugging tool
 void VerboseLogUnknownDimensionSources(
     const GraphDef& graph,
-    const absl::flat_hash_map<string, std::vector<OpInfo::TensorProperties>>&
+    const abslx::flat_hash_map<string, std::vector<OpInfo::TensorProperties>>&
         input_properties_map,
-    const absl::flat_hash_map<string, std::vector<OpInfo::TensorProperties>>&
+    const abslx::flat_hash_map<string, std::vector<OpInfo::TensorProperties>>&
         output_properties_map) {
   if (!VLOG_IS_ON(2)) {
     return;
@@ -549,9 +549,9 @@ class TopoQueue {
     }
   };
 
-  const absl::flat_hash_map<const NodeDef*, int> TopoOrder(
+  const abslx::flat_hash_map<const NodeDef*, int> TopoOrder(
       const std::vector<const NodeDef*>& topo_order) const {
-    absl::flat_hash_map<const NodeDef*, int> map;
+    abslx::flat_hash_map<const NodeDef*, int> map;
     map.reserve(topo_order.size());
     for (int i = 0, topo_order_size = topo_order.size(); i < topo_order_size;
          ++i) {
@@ -560,7 +560,7 @@ class TopoQueue {
     return map;
   }
 
-  const absl::flat_hash_map<const NodeDef*, int> topo_order_;
+  const abslx::flat_hash_map<const NodeDef*, int> topo_order_;
   std::set<NodeAndId, OrderByIdAscending> queue_;
 };
 
@@ -644,7 +644,7 @@ class SymbolicShapeRefiner {
  public:
   explicit SymbolicShapeRefiner(
       const GraphView& graph,
-      const absl::flat_hash_map<string, absl::flat_hash_set<int>>& fed_ports,
+      const abslx::flat_hash_map<string, abslx::flat_hash_set<int>>& fed_ports,
       const bool aggressive_shape_inference)
       : graph_(graph),
         function_library_(OpRegistry::Global(), graph.graph()->library()),
@@ -686,7 +686,7 @@ class SymbolicShapeRefiner {
             vals.push_back(ic->DebugString(d));
           }
         }
-        return strings::StrCat("[", absl::StrJoin(vals, ","), "]");
+        return strings::StrCat("[", abslx::StrJoin(vals, ","), "]");
       } else {
         return "?";
       }
@@ -695,17 +695,17 @@ class SymbolicShapeRefiner {
     std::string DebugString(const NodeDef& node) {
       std::string output;
       auto* ic = inference_context.get();
-      absl::StrAppend(
+      abslx::StrAppend(
           &output, node.name(), " [", node.op(), "] has ", ic->num_inputs(),
           (ic->num_inputs() > 1 ? " inputs and " : " input and "),
           ic->num_outputs(), (ic->num_outputs() > 1 ? " outputs" : " output"));
       if (op_data->is_function_op) {
-        absl::StrAppend(&output, " (function op)");
+        abslx::StrAppend(&output, " (function op)");
       }
-      absl::StrAppend(&output, ": \n");
+      abslx::StrAppend(&output, ": \n");
 
       for (int i = 0; i < ic->num_inputs(); i++) {
-        absl::StrAppend(&output, " input [", i, "] ", node.input(i),
+        abslx::StrAppend(&output, " input [", i, "] ", node.input(i),
                         " -- type: ", DataTypeString(input_types.at(i)),
                         ", shape: ", ic->DebugString(ic->input(i)),
                         ", tensor: ");
@@ -714,23 +714,23 @@ class SymbolicShapeRefiner {
         if (input_tensor_protos_size > i &&
             input_tensor_protos.at(i) != nullptr &&
             t1.FromProto(*input_tensor_protos.at(i))) {
-          absl::StrAppend(&output, t1.DebugString(), ", tensor_as_shape: ");
+          abslx::StrAppend(&output, t1.DebugString(), ", tensor_as_shape: ");
         } else {
-          absl::StrAppend(&output, " null, tensor_as_shape: ");
+          abslx::StrAppend(&output, " null, tensor_as_shape: ");
         }
         int input_tensors_as_shapes_to_propagate_size =
             input_tensors_as_shapes_to_propagate.size();
         if (input_tensors_as_shapes_to_propagate_size > i) {
-          absl::StrAppend(
+          abslx::StrAppend(
               &output,
               StringifyShapeHandle(input_tensors_as_shapes_to_propagate.at(i)),
               "\n");
         } else {
-          absl::StrAppend(&output, " null\n");
+          abslx::StrAppend(&output, " null\n");
         }
       }
       for (int i = 0; i < ic->num_outputs(); i++) {
-        absl::StrAppend(&output, " output [", i,
+        abslx::StrAppend(&output, " output [", i,
                         "] -- type: ", DataTypeString(output_types.at(i)),
                         ", shape: ", ic->DebugString(ic->output(i)),
                         ", tensor: ");
@@ -739,17 +739,17 @@ class SymbolicShapeRefiner {
         if (output_tensor_protos_size > i &&
             output_tensor_protos.at(i) != nullptr &&
             t2.FromProto(*output_tensor_protos.at(i))) {
-          absl::StrAppend(&output, t2.DebugString(), ", tensor_as_shape: ");
+          abslx::StrAppend(&output, t2.DebugString(), ", tensor_as_shape: ");
         } else {
-          absl::StrAppend(&output, " null, tensor_as_shape: ");
+          abslx::StrAppend(&output, " null, tensor_as_shape: ");
         }
         int output_tensors_as_shapes_size = output_tensors_as_shapes.size();
         if (output_tensors_as_shapes_size > i) {
-          absl::StrAppend(&output,
+          abslx::StrAppend(&output,
                           StringifyShapeHandle(output_tensors_as_shapes.at(i)),
                           "\n");
         } else {
-          absl::StrAppend(&output, " null\n");
+          abslx::StrAppend(&output, " null\n");
         }
       }
       return output;
@@ -792,7 +792,7 @@ class SymbolicShapeRefiner {
           " was not previously added to SymbolicShapeRefiner.");
     }
 
-    const absl::optional<GrapplerFunctionItem>& maybe_grappler_function_item =
+    const abslx::optional<GrapplerFunctionItem>& maybe_grappler_function_item =
         it->second;
     if (!maybe_grappler_function_item.has_value()) {
       VLOG(3) << "Skip failed to instantiate function call: function_name="
@@ -887,7 +887,7 @@ class SymbolicShapeRefiner {
     // structure; hence, we separately build node name to NodeDef* map, for the
     // output nodes (before GraphView becomes invalid). Note that we use string,
     // not string_view.
-    absl::flat_hash_map<std::string, NodeDef*> output_nodes;
+    abslx::flat_hash_map<std::string, NodeDef*> output_nodes;
     for (const auto& output_arg : grappler_function_item.outputs()) {
       output_nodes[output_arg.node_name] = gv.GetNode(output_arg.node_name);
     }
@@ -1322,7 +1322,7 @@ class SymbolicShapeRefiner {
       VLOG(3) << "Failed to instantiate a function. Error: "
               << function_instantiated.error_message();
       fun_to_grappler_function_item_[function_def->signature().name()] =
-          absl::nullopt;
+          abslx::nullopt;
       return OkStatus();
     }
 
@@ -2042,15 +2042,15 @@ class SymbolicShapeRefiner {
 
   const GraphView& graph_;
   int graph_def_version_;
-  absl::flat_hash_map<const NodeDef*, NodeContext> node_to_context_;
-  absl::flat_hash_map<ShapeId, ShapeHandle, HashShapeId> unknown_shapes_;
-  absl::flat_hash_map<DimId, DimensionHandle, HashDimId> unknown_dims_;
+  abslx::flat_hash_map<const NodeDef*, NodeContext> node_to_context_;
+  abslx::flat_hash_map<ShapeId, ShapeHandle, HashShapeId> unknown_shapes_;
+  abslx::flat_hash_map<DimId, DimensionHandle, HashDimId> unknown_dims_;
   // Store function instantiations only for valid function. If function
-  // instantiation failed it will have an `absl::nullopt`.
-  absl::flat_hash_map<string, absl::optional<GrapplerFunctionItem>>
+  // instantiation failed it will have an `abslx::nullopt`.
+  abslx::flat_hash_map<string, abslx::optional<GrapplerFunctionItem>>
       fun_to_grappler_function_item_;
   FunctionLibraryDefinition function_library_;
-  const absl::flat_hash_map<string, absl::flat_hash_set<int>>& fed_ports_;
+  const abslx::flat_hash_map<string, abslx::flat_hash_set<int>>& fed_ports_;
   // Store TensorProtos for tensor value propagation. Note that we use deque,
   // not vector, as we use pointers to the TensorProtos in this container.
   // Vector may resize and copy the objects into a new buffer, then the existing
@@ -2190,7 +2190,7 @@ Status VerboseShapeInferenceLogging(const GraphDef& graph_def,
   // As logging all the nodes would generate too many lines, we by default
   // skip this detailed logging. Users may add nodes of interest to
   // node_names_for_logging to enable detailed logging.
-  absl::flat_hash_set<std::string> node_names_for_logging = {};
+  abslx::flat_hash_set<std::string> node_names_for_logging = {};
   if (!VLOG_IS_ON(3) || node_names_for_logging.empty()) {
     return OkStatus();
   }
@@ -2213,13 +2213,13 @@ Status VerboseShapeInferenceLogging(const GraphDef& graph_def,
     VLOG(3) << ctx->DebugString(node);
     std::string merged_shapes = "Merged shapes from SymbolicShapManager:\n";
     for (int i = 0; i < ic->num_inputs(); ++i) {
-      absl::StrAppend(
+      abslx::StrAppend(
           &merged_shapes, " input[", i, "] -- ",
           ic->DebugString(shape_manager->GetMergedShape(ic, ic->input(i))),
           "\n");
     }
     for (int i = 0; i < ic->num_outputs(); ++i) {
-      absl::StrAppend(
+      abslx::StrAppend(
           &merged_shapes, " output[", i, "] -- ",
           ic->DebugString(shape_manager->GetMergedShape(ic, ic->output(i))),
           "\n");
@@ -2339,7 +2339,7 @@ Status GraphProperties::UpdateEnter(SymbolicShapeRefiner* shape_refiner,
 
 Status GraphProperties::UpdateShapes(
     SymbolicShapeRefiner* shape_refiner,
-    const absl::flat_hash_map<const NodeDef*, const NodeDef*>& resource_handles,
+    const abslx::flat_hash_map<const NodeDef*, const NodeDef*>& resource_handles,
     const NodeDef* n, bool* new_shapes) const {
   if (IsEnter(*n)) {
     // The Enter shape function always forwards an UnknownShape, so do the right
@@ -2368,7 +2368,7 @@ Status GraphProperties::UpdateShapes(
 // Propagates the shapes in the transitive fan-out of <new_shapes>.
 Status GraphProperties::PropagateShapes(
     SymbolicShapeRefiner* shape_refiner, TopoQueue* new_shapes,
-    const absl::flat_hash_map<const NodeDef*, const NodeDef*>& resource_handles,
+    const abslx::flat_hash_map<const NodeDef*, const NodeDef*>& resource_handles,
     int num_loops) const {
   // Limit the number of iterations to prevent infinite loops in the presence of
   // incorrect shape functions. The algorithm should converge in at most
@@ -2467,7 +2467,7 @@ Status GraphProperties::UpdateQueue(const NodeDef* queue_node,
 
 Status GraphProperties::UpdateEnqueue(
     const NodeDef* enqueue_node,
-    const absl::flat_hash_map<const NodeDef*, const NodeDef*>& resource_handles,
+    const abslx::flat_hash_map<const NodeDef*, const NodeDef*>& resource_handles,
     SymbolicShapeRefiner* shape_refiner, bool* new_shapes) {
   auto ctx = shape_refiner->GetNodeContext(enqueue_node);
   if (!ctx) {
@@ -2518,7 +2518,7 @@ Status GraphProperties::InferStatically(bool assume_valid_feeds,
                                         bool include_output_tensor_values) {
   FunctionLibraryDefinition function_library(OpRegistry::Global(),
                                              item_.graph.library());
-  absl::flat_hash_map<string, absl::flat_hash_set<int>> fed_ports;
+  abslx::flat_hash_map<string, abslx::flat_hash_set<int>> fed_ports;
   if (!assume_valid_feeds) {
     for (const auto& feed : item_.feed) {
       SafeTensorId tensor_id = ParseTensorName(feed.first);
@@ -2530,13 +2530,13 @@ Status GraphProperties::InferStatically(bool assume_valid_feeds,
 
   // List the resources and the nodes using them. Also collect the Merge nodes,
   // fed nodes, and primary inputs.
-  absl::flat_hash_map<const NodeDef*,
-                      std::pair<absl::flat_hash_set<const NodeDef*>,
-                                absl::flat_hash_set<const NodeDef*>>>
+  abslx::flat_hash_map<const NodeDef*,
+                      std::pair<abslx::flat_hash_set<const NodeDef*>,
+                                abslx::flat_hash_set<const NodeDef*>>>
       resources;
-  absl::flat_hash_set<const NodeDef*> merge_nodes;
-  absl::flat_hash_set<const NodeDef*> fed_nodes;
-  absl::flat_hash_set<const NodeDef*> primary_inputs;
+  abslx::flat_hash_set<const NodeDef*> merge_nodes;
+  abslx::flat_hash_set<const NodeDef*> fed_nodes;
+  abslx::flat_hash_set<const NodeDef*> primary_inputs;
   int num_loops = 0;
   for (const NodeDef& node : item_.graph.node()) {
     if (IsQueue(node)) {
@@ -2573,7 +2573,7 @@ Status GraphProperties::InferStatically(bool assume_valid_feeds,
     }
   }
 
-  absl::flat_hash_map<const NodeDef*, const NodeDef*> resource_handles;
+  abslx::flat_hash_map<const NodeDef*, const NodeDef*> resource_handles;
   std::vector<TopologicalDependency> extra_deps;
   for (const auto& resource : resources) {
     for (const NodeDef* src : resource.second.first) {

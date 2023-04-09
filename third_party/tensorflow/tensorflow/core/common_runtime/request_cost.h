@@ -32,17 +32,17 @@ class RequestCost {
   // Records costs. The inputs should be pairs of cost type and cost.
   // It's thread-safe, and can be called from different threads.
   void RecordCost(
-      const std::vector<std::pair<absl::string_view, absl::Duration>>& costs);
+      const std::vector<std::pair<abslx::string_view, abslx::Duration>>& costs);
 
   // Gets all types of costs for processing an rpc request.
   // It's thread-safe. It's expected to be called at the end of processing an
   // rpc request, when all the costs have been collected.
-  absl::flat_hash_map<std::string, absl::Duration> GetCosts() const;
+  abslx::flat_hash_map<std::string, abslx::Duration> GetCosts() const;
 
  private:
-  mutable absl::Mutex mutex_;
+  mutable abslx::Mutex mutex_;
   // Map from cost type to cost.
-  absl::flat_hash_map<std::string, absl::Duration> cost_map_
+  abslx::flat_hash_map<std::string, abslx::Duration> cost_map_
       ABSL_GUARDED_BY(mutex_);
 };
 

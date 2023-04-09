@@ -60,7 +60,7 @@ bool tfjs::MlirToJSONTranslateFunction(ModuleOp module,
   confs.export_library = true;
   tensorflow::FunctionLibraryDefinition flib_def(
       tensorflow::OpRegistry::Global(), tensorflow::FunctionDefLibrary());
-  absl::flat_hash_set<tensorflow::Node*> control_ret_nodes;
+  abslx::flat_hash_set<tensorflow::Node*> control_ret_nodes;
   auto graph = std::make_unique<tensorflow::Graph>(flib_def);
   auto status = tensorflow::ConvertMlirToGraph(module, confs, &graph, &flib_def,
                                                &control_ret_nodes);

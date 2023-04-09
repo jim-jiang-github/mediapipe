@@ -57,7 +57,7 @@ namespace mediapipe {
 //   packet_inner_join_calculator.cc: Don't output unless all inputs are new.
 class PacketClonerCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->SetProcessTimestampBounds(true);
     const Ids ids = GetIds(*cc);
     for (const auto& in_out : ids.inputs_outputs) {
@@ -66,10 +66,10 @@ class PacketClonerCalculator : public CalculatorBase {
       cc->Outputs().Get(in_out.out).SetSameAs(&input);
     }
     cc->Inputs().Get(ids.tick_id).SetAny();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     // Load options.
     const auto calculator_options =
         cc->Options<mediapipe::PacketClonerCalculatorOptions>();
@@ -90,10 +90,10 @@ class PacketClonerCalculator : public CalculatorBase {
         cc->Outputs().Get(in_out.out).SetHeader(input.Header());
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     // Store input signals.
     for (int i = 0; i < ids_.inputs_outputs.size(); ++i) {
       const auto& input = cc->Inputs().Get(ids_.inputs_outputs[i].in);
@@ -126,7 +126,7 @@ class PacketClonerCalculator : public CalculatorBase {
       SetAllNextTimestampBounds(cc);
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -142,9 +142,9 @@ class PacketClonerCalculator : public CalculatorBase {
   template <typename CC>
   static Ids GetIds(CC& cc) {
     Ids ids;
-    static constexpr absl::string_view kEmptyTag = "";
+    static constexpr abslx::string_view kEmptyTag = "";
     int num_inputs_to_clone = cc.Inputs().NumEntries(kEmptyTag);
-    static constexpr absl::string_view kTickTag = "TICK";
+    static constexpr abslx::string_view kTickTag = "TICK";
     if (cc.Inputs().HasTag(kTickTag)) {
       ids.tick_id = cc.Inputs().GetId(kTickTag, 0);
     } else {

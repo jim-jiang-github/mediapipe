@@ -22,21 +22,21 @@ namespace {
 
 TEST(LeakCheckTest, DetectLeakSanitizer) {
 #ifdef ABSL_EXPECT_LEAK_SANITIZER
-  EXPECT_TRUE(absl::HaveLeakSanitizer());
-  EXPECT_TRUE(absl::LeakCheckerIsActive());
+  EXPECT_TRUE(abslx::HaveLeakSanitizer());
+  EXPECT_TRUE(abslx::LeakCheckerIsActive());
 #else
-  EXPECT_FALSE(absl::HaveLeakSanitizer());
-  EXPECT_FALSE(absl::LeakCheckerIsActive());
+  EXPECT_FALSE(abslx::HaveLeakSanitizer());
+  EXPECT_FALSE(abslx::LeakCheckerIsActive());
 #endif
 }
 
 TEST(LeakCheckTest, IgnoreLeakSuppressesLeakedMemoryErrors) {
-  auto foo = absl::IgnoreLeak(new std::string("some ignored leaked string"));
+  auto foo = abslx::IgnoreLeak(new std::string("some ignored leaked string"));
   ABSL_RAW_LOG(INFO, "Ignoring leaked string %s", foo->c_str());
 }
 
 TEST(LeakCheckTest, LeakCheckDisablerIgnoresLeak) {
-  absl::LeakCheckDisabler disabler;
+  abslx::LeakCheckDisabler disabler;
   auto foo = new std::string("some string leaked while checks are disabled");
   ABSL_RAW_LOG(INFO, "Ignoring leaked string %s", foo->c_str());
 }

@@ -446,8 +446,8 @@ void IdentifyXlaShardingForTPUComputation(
   // partition (sharded or replicated). If any of the inputs/outputs have
   // maximal sharding, then fallback to MPMD. Also fall back if any of the
   // shardings aren't compatible with the rank of their tensor.
-  if ((use_spmd && (absl::c_any_of(sharding_for_args, has_maximal_sharding) ||
-                    absl::c_any_of(sharding_for_rets, has_maximal_sharding))) ||
+  if ((use_spmd && (abslx::c_any_of(sharding_for_args, has_maximal_sharding) ||
+                    abslx::c_any_of(sharding_for_rets, has_maximal_sharding))) ||
       failed(VerifyShardings(func, sharding_for_args, sharding_for_rets))) {
     LOG(WARNING) << "XLA SPMD only supports cases where all inputs/outputs "
                     "exist on every partition (sharded or replicated). If any "

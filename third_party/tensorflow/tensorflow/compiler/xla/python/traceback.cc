@@ -51,14 +51,14 @@ Traceback::~Traceback() {
 }
 
 Traceback::Traceback(Traceback&& other) : frames_(std::move(other.frames_)) {
-  // absl::InlinedVector does not always clear itself if moved. Since we rely on
+  // abslx::InlinedVector does not always clear itself if moved. Since we rely on
   // its empty() method to destroy Traceback differently, we explicitly clear
   // here.
   other.frames_.clear();
 }
 
 std::string Traceback::Frame::ToString() const {
-  return absl::StrFormat("%s:%d (%s)", file_name, line_num, function_name);
+  return abslx::StrFormat("%s:%d (%s)", file_name, line_num, function_name);
 }
 
 std::string Traceback::ToString() const {
@@ -67,7 +67,7 @@ std::string Traceback::ToString() const {
   for (const Frame& frame : Frames()) {
     frame_strs.push_back(frame.ToString());
   }
-  return absl::StrJoin(frame_strs, "\n");
+  return abslx::StrJoin(frame_strs, "\n");
 }
 
 std::vector<Traceback::Frame> Traceback::Frames() const {
@@ -129,7 +129,7 @@ void BuildTracebackSubmodule(py::module& m) {
                     &Traceback::Frame::function_start_line)
       .def_readonly("line_num", &Traceback::Frame::line_num)
       .def("__repr__", [](const Traceback::Frame& frame) {
-        return absl::StrFormat("%s;%s:%d", frame.function_name, frame.file_name,
+        return abslx::StrFormat("%s;%s:%d", frame.function_name, frame.file_name,
                                frame.line_num);
       });
 
@@ -169,7 +169,7 @@ void BuildTracebackSubmodule(py::module& m) {
   traceback.def("__eq__",
                 [](const Traceback& a, const Traceback& b) { return a == b; });
   traceback.def("__hash__",
-                [](const Traceback& tb) { return absl::HashOf(tb); });
+                [](const Traceback& tb) { return abslx::HashOf(tb); });
   traceback.def("as_python_traceback", &Traceback::AsPythonTraceback);
 
   traceback.def_static(

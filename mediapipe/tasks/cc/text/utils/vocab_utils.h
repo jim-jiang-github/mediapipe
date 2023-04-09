@@ -35,12 +35,12 @@ std::vector<std::string> LoadVocabFromBuffer(const char* vocab_buffer_data,
 
 // Read a vocab file with one vocabulary and its corresponding index on each
 // line separated by space, create a map of <vocab, index>.
-absl::node_hash_map<std::string, int> LoadVocabAndIndexFromFile(
+abslx::node_hash_map<std::string, int> LoadVocabAndIndexFromFile(
     const std::string& path_to_vocab);
 
 // Read a vocab buffer with one vocabulary and its corresponding index on each
 // line separated by space, create a map of <vocab, index>.
-absl::node_hash_map<std::string, int> LoadVocabAndIndexFromBuffer(
+abslx::node_hash_map<std::string, int> LoadVocabAndIndexFromBuffer(
     const char* vocab_buffer_data, const size_t vocab_buffer_size);
 
 }  // namespace text

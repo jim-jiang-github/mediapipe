@@ -36,7 +36,7 @@ class DotMergerTest : public HloTestBase {
 };
 
 TEST_F(DotMergerTest, MergeRHS) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -65,7 +65,7 @@ TEST_F(DotMergerTest, MergeRHS) {
 }
 
 TEST_F(DotMergerTest, MergeLHS) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -86,7 +86,7 @@ TEST_F(DotMergerTest, MergeLHS) {
 }
 
 TEST_F(DotMergerTest, MergeThree) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -128,7 +128,7 @@ TEST_F(DotMergerTest, MergeThree) {
 }
 
 TEST_F(DotMergerTest, NoMergeThreeDueToCycle) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -169,7 +169,7 @@ TEST_F(DotMergerTest, NoMergeThreeDueToCycle) {
 }
 
 TEST_F(DotMergerTest, NoMergeDataDependency) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -189,7 +189,7 @@ TEST_F(DotMergerTest, NoMergeDataDependency) {
 }
 
 TEST_F(DotMergerTest, MergeSameContractingDimsOnBothSides) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -210,7 +210,7 @@ TEST_F(DotMergerTest, MergeSameContractingDimsOnBothSides) {
 }
 
 TEST_F(DotMergerTest, MergeWithBatchDims) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -233,7 +233,7 @@ TEST_F(DotMergerTest, MergeWithBatchDims) {
 }
 
 TEST_F(DotMergerTest, MergeWithUnsortedBatchDims) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -256,7 +256,7 @@ TEST_F(DotMergerTest, MergeWithUnsortedBatchDims) {
 }
 
 TEST_F(DotMergerTest, NoMergeDueToIsMergeCandidate) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -299,7 +299,7 @@ TEST_F(DotMergerTest, NoMergeDueToIsMergeCandidate) {
 }
 
 TEST_F(DotMergerTest, NoMergeNonCanonicalLhsBatch) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -318,7 +318,7 @@ TEST_F(DotMergerTest, NoMergeNonCanonicalLhsBatch) {
 }
 
 TEST_F(DotMergerTest, NoMergeNonCanonicalRhsBatch) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -337,7 +337,7 @@ TEST_F(DotMergerTest, NoMergeNonCanonicalRhsBatch) {
 }
 
 TEST_F(DotMergerTest, NoMergeMultipleContractingDims) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -356,7 +356,7 @@ TEST_F(DotMergerTest, NoMergeMultipleContractingDims) {
 }
 
 TEST_F(DotMergerTest, NoMergeMultipleOuterDims) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -375,7 +375,7 @@ TEST_F(DotMergerTest, NoMergeMultipleOuterDims) {
 }
 
 TEST_F(DotMergerTest, NoMergeDifferentLhsContractingDims) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -394,7 +394,7 @@ TEST_F(DotMergerTest, NoMergeDifferentLhsContractingDims) {
 }
 
 TEST_F(DotMergerTest, NoMergeDifferentRhsContractingDims) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -414,7 +414,7 @@ TEST_F(DotMergerTest, NoMergeDifferentRhsContractingDims) {
 
 TEST_F(DotMergerTest, NoMergeControlPredecessor) {
   // Don't evem merge dot0 and dot1, because dot1 has a control *successor*.
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -434,7 +434,7 @@ TEST_F(DotMergerTest, NoMergeControlPredecessor) {
 }
 
 TEST_F(DotMergerTest, NoMergeDifferentLhsTypes) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -453,7 +453,7 @@ TEST_F(DotMergerTest, NoMergeDifferentLhsTypes) {
 }
 
 TEST_F(DotMergerTest, NoMergeDifferentRhsTypes) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -472,7 +472,7 @@ TEST_F(DotMergerTest, NoMergeDifferentRhsTypes) {
 }
 
 TEST_F(DotMergerTest, NoMergeDifferentReturnTypes) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -491,7 +491,7 @@ TEST_F(DotMergerTest, NoMergeDifferentReturnTypes) {
 }
 
 TEST_F(DotMergerTest, MergeWithTypeUpgrade) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {

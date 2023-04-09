@@ -38,7 +38,7 @@ enum class OutputStyle { kRegular, kBenchmark };
 // This is populated from main().
 // When run in "benchmark" mode, we have different output. This allows
 // A/B comparisons with tools like `benchy`.
-absl::string_view benchmarks;
+abslx::string_view benchmarks;
 
 OutputStyle output() {
   return !benchmarks.empty() ? OutputStyle::kBenchmark : OutputStyle::kRegular;
@@ -70,8 +70,8 @@ struct Policy {
   }
 };
 
-absl::BitGen& GlobalBitGen() {
-  static auto* value = new absl::BitGen;
+abslx::BitGen& GlobalBitGen() {
+  static auto* value = new abslx::BitGen;
   return *value;
 }
 
@@ -95,7 +95,7 @@ class RandomizedAllocator {
     }
 
     // Choose a random one.
-    size_t i = absl::Uniform<size_t>(GlobalBitGen(), 0, pointers.size());
+    size_t i = abslx::Uniform<size_t>(GlobalBitGen(), 0, pointers.size());
     T* result = pointers[i];
     pointers[i] = pointers.back();
     pointers.pop_back();
@@ -112,23 +112,23 @@ class RandomizedAllocator {
   static constexpr size_t kRandomPool = 20;
 
   static std::vector<T*>& GetPointers(size_t n) {
-    static auto* m = new absl::flat_hash_map<size_t, std::vector<T*>>();
+    static auto* m = new abslx::flat_hash_map<size_t, std::vector<T*>>();
     return (*m)[n];
   }
 };
 
 template <class T>
 struct DefaultHash {
-  using type = absl::container_internal::hash_default_hash<T>;
+  using type = abslx::container_internal::hash_default_hash<T>;
 };
 
 template <class T>
 using DefaultHashT = typename DefaultHash<T>::type;
 
 template <class T>
-struct Table : absl::container_internal::raw_hash_set<
+struct Table : abslx::container_internal::raw_hash_set<
                    Policy<T>, DefaultHashT<T>,
-                   absl::container_internal::hash_default_eq<T>,
+                   abslx::container_internal::hash_default_eq<T>,
                    RandomizedAllocator<T>> {};
 
 struct LoadSizes {
@@ -181,16 +181,16 @@ Ratios CollectMeanProbeLengths() {
   Ratios result;
   while (t.size() < min_max_sizes.min_load) t.insert(elem());
   result.min_load =
-      absl::container_internal::GetHashtableDebugProbeSummary(t).mean;
+      abslx::container_internal::GetHashtableDebugProbeSummary(t).mean;
 
   while (t.size() < (min_max_sizes.min_load + min_max_sizes.max_load) / 2)
     t.insert(elem());
   result.avg_load =
-      absl::container_internal::GetHashtableDebugProbeSummary(t).mean;
+      abslx::container_internal::GetHashtableDebugProbeSummary(t).mean;
 
   while (t.size() < min_max_sizes.max_load) t.insert(elem());
   result.max_load =
-      absl::container_internal::GetHashtableDebugProbeSummary(t).mean;
+      abslx::container_internal::GetHashtableDebugProbeSummary(t).mean;
 
   return result;
 }
@@ -244,7 +244,7 @@ template <bool small>
 struct String {
   std::string value;
   static std::string Make(uint32_t v) {
-    return {small ? absl::StrCat(v) : absl::StrFormat(kStringFormat, v)};
+    return {small ? abslx::StrCat(v) : abslx::StrFormat(kStringFormat, v)};
   }
 };
 
@@ -325,7 +325,7 @@ struct AlmostSequential {
   mutable Sequential<T> current;
 
   auto operator()() const -> decltype(current()) {
-    while (absl::Uniform(GlobalBitGen(), 0.0, 1.0) <= percent_skip / 100.)
+    while (abslx::Uniform(GlobalBitGen(), 0.0, 1.0) <= percent_skip / 100.)
       current();
     return current();
   }
@@ -334,7 +334,7 @@ struct AlmostSequential {
 struct Uniform {
   template <typename T>
   T operator()(T) const {
-    return absl::Uniform<T>(absl::IntervalClosed, GlobalBitGen(), T{0}, ~T{0});
+    return abslx::Uniform<T>(abslx::IntervalClosed, GlobalBitGen(), T{0}, ~T{0});
   }
 };
 
@@ -343,7 +343,7 @@ struct Gaussian {
   T operator()(T) const {
     double d;
     do {
-      d = absl::Gaussian<double>(GlobalBitGen(), 1e6, 1e4);
+      d = abslx::Gaussian<double>(GlobalBitGen(), 1e6, 1e4);
     } while (d <= 0 || d > std::numeric_limits<T>::max() / 2);
     return static_cast<T>(d);
   }
@@ -352,7 +352,7 @@ struct Gaussian {
 struct Zipf {
   template <typename T>
   T operator()(T) const {
-    return absl::Zipf<T>(GlobalBitGen(), std::numeric_limits<T>::max(), 1.6);
+    return abslx::Zipf<T>(GlobalBitGen(), std::numeric_limits<T>::max(), 1.6);
   }
 };
 
@@ -406,12 +406,12 @@ std::string Name(IntIdentity*) { return "IntIdentity"; }
 
 template <int Align>
 std::string Name(Ptr<Align>**) {
-  return absl::StrCat("Ptr", Align);
+  return abslx::StrCat("Ptr", Align);
 }
 
 template <int Align>
 std::string Name(PtrIdentity<Align>*) {
-  return absl::StrCat("PtrIdentity", Align);
+  return abslx::StrCat("PtrIdentity", Align);
 }
 
 template <bool small>
@@ -422,8 +422,8 @@ std::string Name(String<small>*) {
 template <class T, class U>
 std::string Name(std::pair<T, U>*) {
   if (output() == OutputStyle::kBenchmark)
-    return absl::StrCat("P_", Name<T>(), "_", Name<U>());
-  return absl::StrCat("P<", Name<T>(), ",", Name<U>(), ">");
+    return abslx::StrCat("P_", Name<T>(), "_", Name<U>());
+  return abslx::StrCat("P<", Name<T>(), ",", Name<U>(), ">");
 }
 
 template <class T>
@@ -433,7 +433,7 @@ std::string Name(Sequential<T>*) {
 
 template <class T, int P>
 std::string Name(AlmostSequential<T, P>*) {
-  return absl::StrCat("AlmostSeq_", P);
+  return abslx::StrCat("AlmostSeq_", P);
 }
 
 template <class T>
@@ -459,7 +459,7 @@ std::string Name() {
 constexpr int kNameWidth = 15;
 constexpr int kDistWidth = 16;
 
-bool CanRunBenchmark(absl::string_view name) {
+bool CanRunBenchmark(abslx::string_view name) {
   static std::regex* const filter = []() -> std::regex* {
     return benchmarks.empty() || benchmarks == "all"
                ? nullptr
@@ -476,12 +476,12 @@ struct Result {
 
 template <typename T, typename Dist>
 void RunForTypeAndDistribution(std::vector<Result>& results) {
-  std::string name = absl::StrCat(Name<T>(), "/", Name<Dist>());
+  std::string name = abslx::StrCat(Name<T>(), "/", Name<Dist>());
   // We have to check against all three names (min/avg/max) before we run it.
   // If any of them is enabled, we run it.
-  if (!CanRunBenchmark(absl::StrCat(name, "/min")) &&
-      !CanRunBenchmark(absl::StrCat(name, "/avg")) &&
-      !CanRunBenchmark(absl::StrCat(name, "/max"))) {
+  if (!CanRunBenchmark(abslx::StrCat(name, "/min")) &&
+      !CanRunBenchmark(abslx::StrCat(name, "/avg")) &&
+      !CanRunBenchmark(abslx::StrCat(name, "/max"))) {
     return;
   }
   results.push_back({Name<T>(), Name<Dist>(), CollectMeanProbeLengths<Dist>()});
@@ -505,21 +505,21 @@ void RunForType(std::vector<Result>& results) {
 int main(int argc, char** argv) {
   // Parse the benchmark flags. Ignore all of them except the regex pattern.
   for (int i = 1; i < argc; ++i) {
-    absl::string_view arg = argv[i];
+    abslx::string_view arg = argv[i];
     const auto next = [&] { return argv[std::min(i + 1, argc - 1)]; };
 
-    if (absl::ConsumePrefix(&arg, "--benchmark_filter")) {
+    if (abslx::ConsumePrefix(&arg, "--benchmark_filter")) {
       if (arg == "") {
         // --benchmark_filter X
         benchmarks = next();
-      } else if (absl::ConsumePrefix(&arg, "=")) {
+      } else if (abslx::ConsumePrefix(&arg, "=")) {
         // --benchmark_filter=X
         benchmarks = arg;
       }
     }
 
     // Any --benchmark flag turns on the mode.
-    if (absl::ConsumePrefix(&arg, "--benchmark")) {
+    if (abslx::ConsumePrefix(&arg, "--benchmark")) {
       if (benchmarks.empty()) benchmarks="all";
     }
   }
@@ -545,43 +545,43 @@ int main(int argc, char** argv) {
 
   switch (output()) {
     case OutputStyle::kRegular:
-      absl::PrintF("%-*s%-*s       Min       Avg       Max\n%s\n", kNameWidth,
+      abslx::PrintF("%-*s%-*s       Min       Avg       Max\n%s\n", kNameWidth,
                    "Type", kDistWidth, "Distribution",
                    std::string(kNameWidth + kDistWidth + 10 * 3, '-'));
       for (const auto& result : results) {
-        absl::PrintF("%-*s%-*s  %8.4f  %8.4f  %8.4f\n", kNameWidth, result.name,
+        abslx::PrintF("%-*s%-*s  %8.4f  %8.4f  %8.4f\n", kNameWidth, result.name,
                      kDistWidth, result.dist_name, result.ratios.min_load,
                      result.ratios.avg_load, result.ratios.max_load);
       }
       break;
     case OutputStyle::kBenchmark: {
-      absl::PrintF("{\n");
-      absl::PrintF("  \"benchmarks\": [\n");
-      absl::string_view comma;
+      abslx::PrintF("{\n");
+      abslx::PrintF("  \"benchmarks\": [\n");
+      abslx::string_view comma;
       for (const auto& result : results) {
-        auto print = [&](absl::string_view stat, double Ratios::*val) {
+        auto print = [&](abslx::string_view stat, double Ratios::*val) {
           std::string name =
-              absl::StrCat(result.name, "/", result.dist_name, "/", stat);
+              abslx::StrCat(result.name, "/", result.dist_name, "/", stat);
           // Check the regex again. We might had have enabled only one of the
           // stats for the benchmark.
           if (!CanRunBenchmark(name)) return;
-          absl::PrintF("    %s{\n", comma);
-          absl::PrintF("      \"cpu_time\": %f,\n", 1e9 * result.ratios.*val);
-          absl::PrintF("      \"real_time\": %f,\n", 1e9 * result.ratios.*val);
-          absl::PrintF("      \"iterations\": 1,\n");
-          absl::PrintF("      \"name\": \"%s\",\n", name);
-          absl::PrintF("      \"time_unit\": \"ns\"\n");
-          absl::PrintF("    }\n");
+          abslx::PrintF("    %s{\n", comma);
+          abslx::PrintF("      \"cpu_time\": %f,\n", 1e9 * result.ratios.*val);
+          abslx::PrintF("      \"real_time\": %f,\n", 1e9 * result.ratios.*val);
+          abslx::PrintF("      \"iterations\": 1,\n");
+          abslx::PrintF("      \"name\": \"%s\",\n", name);
+          abslx::PrintF("      \"time_unit\": \"ns\"\n");
+          abslx::PrintF("    }\n");
           comma = ",";
         };
         print("min", &Ratios::min_load);
         print("avg", &Ratios::avg_load);
         print("max", &Ratios::max_load);
       }
-      absl::PrintF("  ],\n");
-      absl::PrintF("  \"context\": {\n");
-      absl::PrintF("  }\n");
-      absl::PrintF("}\n");
+      abslx::PrintF("  ],\n");
+      abslx::PrintF("  \"context\": {\n");
+      abslx::PrintF("  }\n");
+      abslx::PrintF("}\n");
       break;
     }
   }

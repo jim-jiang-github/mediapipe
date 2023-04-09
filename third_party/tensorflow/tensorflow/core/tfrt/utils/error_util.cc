@@ -59,7 +59,7 @@ tensorflow::Status ToTfStatus(const tfrt::AsyncValue* av) {
   return ::tensorflow::OkStatus();
 }
 
-tensorflow::Status TfStatusFromAbslStatus(absl::Status status) {
+tensorflow::Status TfStatusFromAbslStatus(abslx::Status status) {
   if (status.ok()) return tensorflow::OkStatus();
   return tensorflow::Status(
       static_cast<tensorflow::error::Code>(status.raw_code()),

@@ -28,14 +28,14 @@ namespace scale_image {
 
 namespace {
 double ParseRational(const std::string& rational) {
-  const std::vector<std::string> v = absl::StrSplit(rational, '/');
+  const std::vector<std::string> v = abslx::StrSplit(rational, '/');
   const double numerator = std::strtod(v[0].c_str(), nullptr);
   const double denominator = std::strtod(v[1].c_str(), nullptr);
   return numerator / denominator;
 }
 }  // namespace
 
-absl::Status FindCropDimensions(int input_width, int input_height,    //
+abslx::Status FindCropDimensions(int input_width, int input_height,    //
                                 const std::string& min_aspect_ratio,  //
                                 const std::string& max_aspect_ratio,  //
                                 int* crop_width, int* crop_height,    //
@@ -85,10 +85,10 @@ absl::Status FindCropDimensions(int input_width, int input_height,    //
 
   CHECK_LE(*crop_width, input_width);
   CHECK_LE(*crop_height, input_height);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FindOutputDimensions(int input_width,             //
+abslx::Status FindOutputDimensions(int input_width,             //
                                   int input_height,            //
                                   int target_width,            //
                                   int target_height,           //
@@ -131,7 +131,7 @@ absl::Status FindOutputDimensions(int input_width,             //
     *output_width = target_width;
     *output_height = target_height;
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   if (target_width > 0) {
@@ -151,7 +151,7 @@ absl::Status FindOutputDimensions(int input_width,             //
       // was within the image, so use these dimensions.
       *output_width = try_width;
       *output_height = try_height;
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
   }
 
@@ -172,14 +172,14 @@ absl::Status FindOutputDimensions(int input_width,             //
       // was within the image, so use these dimensions.
       *output_width = try_width;
       *output_height = try_height;
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
   }
   RET_CHECK_FAIL()
       << "Unable to set output dimensions based on target dimensions.";
 }
 
-absl::Status FindOutputDimensions(int input_width,             //
+abslx::Status FindOutputDimensions(int input_width,             //
                                   int input_height,            //
                                   int target_width,            //
                                   int target_height,           //

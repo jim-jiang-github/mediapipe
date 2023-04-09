@@ -102,7 +102,7 @@ ENTRY main {
   entry->set_root_instruction(sub);
 
   auto in_schedule = [&](const HloInstruction* hlo) {
-    return absl::c_linear_search(schedule.sequence(entry).instructions(), hlo);
+    return abslx::c_linear_search(schedule.sequence(entry).instructions(), hlo);
   };
 
   EXPECT_EQ(schedule.sequence(entry).size(), 6);

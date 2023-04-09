@@ -34,28 +34,28 @@ const char kOutputDetectionsTag[] = "OUTPUT_DETECTIONS";
 //
 class FilterDetectionsCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     RET_CHECK(cc->Inputs().HasTag(kInputDetectionsTag));
     RET_CHECK(cc->Outputs().HasTag(kOutputDetectionsTag));
 
     cc->Inputs().Tag(kInputDetectionsTag).Set<std::vector<Detection>>();
     cc->Outputs().Tag(kOutputDetectionsTag).Set<std::vector<Detection>>();
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
     options_ = cc->Options<mediapipe::FilterDetectionsCalculatorOptions>();
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     const auto& input_detections =
         cc->Inputs().Tag(kInputDetectionsTag).Get<std::vector<Detection>>();
 
-    auto output_detections = absl::make_unique<std::vector<Detection>>();
+    auto output_detections = abslx::make_unique<std::vector<Detection>>();
 
     for (const Detection& detection : input_detections) {
       RET_CHECK_GT(detection.score_size(), 0);
@@ -69,7 +69,7 @@ class FilterDetectionsCalculator : public CalculatorBase {
         .Tag(kOutputDetectionsTag)
         .Add(output_detections.release(), cc->InputTimestamp());
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

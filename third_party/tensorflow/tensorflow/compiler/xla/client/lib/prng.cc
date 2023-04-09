@@ -25,9 +25,9 @@ limitations under the License.
 namespace xla {
 
 xla::XlaOp ConcatScalars(xla::XlaBuilder* builder,
-                         absl::Span<const xla::XlaOp> scalars) {
+                         abslx::Span<const xla::XlaOp> scalars) {
   std::vector<xla::XlaOp> vectors;
-  absl::c_transform(scalars, std::back_inserter(vectors),
+  abslx::c_transform(scalars, std::back_inserter(vectors),
                     [](xla::XlaOp x) { return xla::Reshape(x, {1}); });
   return ConcatInDim(builder, vectors, 0);
 }
@@ -217,7 +217,7 @@ SplitShapePair SplitShapeIntoHalves(const Shape& shape) {
 }
 
 // Combines a pair of split shapes. It works with scalar and non-scalar shapes.
-XlaOp CombineShapePair(absl::Span<const XlaOp> pair,
+XlaOp CombineShapePair(abslx::Span<const XlaOp> pair,
                        const SplitShapePair& shape_pair,
                        const Shape& original_shape) {
   if (original_shape.rank() == 0) {
@@ -339,7 +339,7 @@ std::pair<Philox4x32State, Philox4x32Key> ScramblePhiloxKey(Philox4x32Key key) {
 // dimensions prepended to its shape.
 std::array<XlaOp, 2> Uint128AddUint64(
     const std::array<XlaOp, 2>& u128, XlaOp u64,
-    absl::Span<const int64_t> broadcast_sizes = {}) {
+    abslx::Span<const int64_t> broadcast_sizes = {}) {
   auto u128_low = u128[0];
   auto u128_high = u128[1];
   XlaOp new_u128_low = u128_low + u64;

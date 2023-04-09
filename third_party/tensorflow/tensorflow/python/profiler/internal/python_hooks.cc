@@ -52,7 +52,7 @@ std::string GetEventName(PyObject* co_filename, PyObject* co_name,
     function = py::reinterpret_borrow<py::str>(co_name);
   }
 
-  return absl::StrCat("$", io::Basename(filename), ":", co_firstlineno, " ",
+  return abslx::StrCat("$", io::Basename(filename), ":", co_firstlineno, " ",
                       function);
 }
 
@@ -72,7 +72,7 @@ string GetEventName(PyMethodDef* method, PyObject* module) {
     filename = "<unknown>";
   }
 
-  return absl::StrCat("$", filename, " ", method->ml_name);
+  return abslx::StrCat("$", filename, " ", method->ml_name);
 }
 
 void AddEventToXLine(const PythonTraceEntry& event, XLineBuilder* line,
@@ -239,9 +239,9 @@ void PythonHookContext::Finalize(XSpace* space) {
 void PythonHooks::ProfileSlow(const py::object& frame, const string& event,
                               const py::object& arg) {
   int what;
-  absl::string_view event_name(event);
+  abslx::string_view event_name(event);
 
-  if (absl::ConsumePrefix(&event_name, "c_")) {
+  if (abslx::ConsumePrefix(&event_name, "c_")) {
     if (event_name == "call") {
       what = PyTrace_C_CALL;
     } else if (event_name == "return") {

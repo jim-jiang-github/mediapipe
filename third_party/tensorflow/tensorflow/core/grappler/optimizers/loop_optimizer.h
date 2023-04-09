@@ -62,7 +62,7 @@ class LoopOptimizer : public GraphOptimizer {
 
   Status RemoveDeadBranches(const std::unordered_set<string>& nodes_to_preserve,
                             NodeMap& node_map,
-                            const absl::flat_hash_set<string>& feed_nodes,
+                            const abslx::flat_hash_set<string>& feed_nodes,
                             GraphDef* optimized_graph);
 
   RewriterConfig::Toggle opt_level_;

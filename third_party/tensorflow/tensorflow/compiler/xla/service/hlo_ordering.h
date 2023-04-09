@@ -79,7 +79,7 @@ class HloOrdering {
   // to be false when result will be used to remove unnecessary copy
   // instructions, due to additional buffer sharing constraints.
   bool UsesBeforeValueDefinition(
-      absl::Span<const HloUse* const> uses, const HloValue& value,
+      abslx::Span<const HloUse* const> uses, const HloValue& value,
       const HloDataflowAnalysis& dataflow,
       bool use_is_always_before_def_in_same_instr = false) const;
   // Returns whether the given values interfere. Two values interfere if they
@@ -151,7 +151,7 @@ class PredecessorHloOrdering : public HloOrdering {
   // predecessors. An instruction is an element of its own predecessor set.
   //
   // Subclasses should fill this in to define the desired ordering.
-  absl::flat_hash_map<const HloComputation*,
+  abslx::flat_hash_map<const HloComputation*,
                       std::unique_ptr<HloReachabilityMap>>
       predecessors_;
 };
@@ -235,7 +235,7 @@ class SequentialHloOrdering : public HloOrdering {
   // this map so more than one instruction may have the same position
   // value. This is not a problem because ExecutesBefore also verifies
   // instructions are in the same computation.
-  absl::flat_hash_map<const HloInstruction*, int> order_position_;
+  abslx::flat_hash_map<const HloInstruction*, int> order_position_;
 };
 
 }  // namespace xla

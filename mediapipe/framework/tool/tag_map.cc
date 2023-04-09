@@ -37,7 +37,7 @@ void TagMap::InitializeNames(
   }
 }
 
-absl::Status TagMap::Initialize(
+abslx::Status TagMap::Initialize(
     const proto_ns::RepeatedPtrField<ProtoString>& tag_index_names) {
   std::map<std::string, std::vector<std::string>> tag_to_names;
   for (const auto& tag_index_name : tag_index_names) {
@@ -100,10 +100,10 @@ absl::Status TagMap::Initialize(
   num_entries_ = current_index;
 
   InitializeNames(tag_to_names);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TagMap::Initialize(const TagAndNameInfo& info) {
+abslx::Status TagMap::Initialize(const TagAndNameInfo& info) {
   if (info.tags.empty()) {
     if (!info.names.empty()) {
       mapping_.emplace(
@@ -115,7 +115,7 @@ absl::Status TagMap::Initialize(const TagAndNameInfo& info) {
   } else {
     std::map<std::string, std::vector<std::string>> tag_to_names;
     if (info.tags.size() != info.names.size()) {
-      return absl::FailedPreconditionError(
+      return abslx::FailedPreconditionError(
           "Expected info.tags.size() == info.names.size()");
     }
 
@@ -139,7 +139,7 @@ absl::Status TagMap::Initialize(const TagAndNameInfo& info) {
     // Now create the names_ array in the correctly sorted order.
     InitializeNames(tag_to_names);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 proto_ns::RepeatedPtrField<ProtoString> TagMap::CanonicalEntries() const {
@@ -154,12 +154,12 @@ proto_ns::RepeatedPtrField<ProtoString> TagMap::CanonicalEntries() const {
       }
     } else if (tag_data.count <= 1) {
       // "ONLY_ONE_INDEX:name"
-      *fields.Add() = absl::StrCat(tag, ":", names_[tag_data.id.value()]);
+      *fields.Add() = abslx::StrCat(tag, ":", names_[tag_data.id.value()]);
     } else {
       // "TAG:0:name0", "TAG:1:name1"
       for (int i = 0; i < tag_data.count; ++i) {
         *fields.Add() =
-            absl::StrCat(tag, ":", i, ":", names_[tag_data.id.value() + i]);
+            abslx::StrCat(tag, ":", i, ":", names_[tag_data.id.value() + i]);
       }
     }
   }
@@ -183,7 +183,7 @@ std::string TagMap::DebugString() const {
   if (num_entries_ == 0) {
     return "empty";
   }
-  return absl::StrJoin(CanonicalEntries(), "\n");
+  return abslx::StrJoin(CanonicalEntries(), "\n");
 }
 
 // Note, this is also currently used internally to check for equivalence.
@@ -203,28 +203,28 @@ std::string TagMap::ShortDebugString() const {
   std::string output;
   for (const auto& item : mapping_) {
     if (!output.empty()) {
-      absl::StrAppend(&output, ", ");
+      abslx::StrAppend(&output, ", ");
     }
     if (item.second.count == 0) {
-      absl::StrAppend(&output, "\"", item.first, "\"");
+      abslx::StrAppend(&output, "\"", item.first, "\"");
     } else {
-      absl::StrAppend(&output, "{\"", item.first, "\", ", item.second.count,
+      abslx::StrAppend(&output, "{\"", item.first, "\", ", item.second.count,
                       "}");
     }
   }
   return output;
 }
 
-bool TagMap::HasTag(const absl::string_view tag) const {
+bool TagMap::HasTag(const abslx::string_view tag) const {
   return mapping_.contains(tag);
 }
 
-int TagMap::NumEntries(const absl::string_view tag) const {
+int TagMap::NumEntries(const abslx::string_view tag) const {
   const auto it = mapping_.find(tag);
   return it != mapping_.end() ? it->second.count : 0;
 }
 
-CollectionItemId TagMap::GetId(const absl::string_view tag, int index) const {
+CollectionItemId TagMap::GetId(const abslx::string_view tag, int index) const {
   const auto it = mapping_.find(tag);
   if (it == mapping_.end()) {
     return CollectionItemId::GetInvalid();
@@ -245,11 +245,11 @@ std::pair<std::string, int> TagMap::TagAndIndexFromId(
   return {"", -1};
 }
 
-CollectionItemId TagMap::BeginId(const absl::string_view tag) const {
+CollectionItemId TagMap::BeginId(const abslx::string_view tag) const {
   return GetId(tag, 0);
 }
 
-CollectionItemId TagMap::EndId(const absl::string_view tag) const {
+CollectionItemId TagMap::EndId(const abslx::string_view tag) const {
   const auto it = mapping_.find(tag);
   if (it == mapping_.end()) {
     return CollectionItemId::GetInvalid();

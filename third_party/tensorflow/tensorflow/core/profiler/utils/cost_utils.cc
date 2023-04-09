@@ -47,22 +47,22 @@ namespace {
 // Returns an empty TensorProperties if error or input is "".
 // See OpKernel::TraceString() to see when the shape is encoded as "".
 // Input format is <DTYPE>[<dim1>, <dim2>,...]
-static OpInfo::TensorProperties GetTensorProperties(absl::string_view info) {
+static OpInfo::TensorProperties GetTensorProperties(abslx::string_view info) {
   OpInfo::TensorProperties tensor_prop;
-  std::vector<absl::string_view> parts = absl::StrSplit(info, '[');
+  std::vector<abslx::string_view> parts = abslx::StrSplit(info, '[');
   if (parts.size() != 2) return tensor_prop;
   DataType data_type = DT_INVALID;
   if (!DataTypeFromString(parts[0], &data_type)) return tensor_prop;
   tensor_prop.set_dtype(data_type);
-  absl::ConsumeSuffix(&parts[1], "]");
+  abslx::ConsumeSuffix(&parts[1], "]");
   if (parts[1].empty()) {  // Scalar type.
     tensor_prop.mutable_shape()->add_dim()->set_size(1);
     return tensor_prop;
   }
-  std::vector<absl::string_view> dims = absl::StrSplit(parts[1], ',');
+  std::vector<abslx::string_view> dims = abslx::StrSplit(parts[1], ',');
   for (const auto dim : dims) {
     int size;
-    if (!absl::SimpleAtoi(dim, &size)) return OpInfo::TensorProperties();
+    if (!abslx::SimpleAtoi(dim, &size)) return OpInfo::TensorProperties();
     tensor_prop.mutable_shape()->add_dim()->set_size(size);
   }
   return tensor_prop;
@@ -73,7 +73,7 @@ static OpInfo::TensorProperties GetTensorProperties(absl::string_view info) {
 TfOpRoofLineCostEstimator::~TfOpRoofLineCostEstimator() {
   if (!unsupported_ops_.empty()) {
     LOG(ERROR) << "Unsupported Op for Roofline Cost Analysis are:"
-               << absl::StrJoin(unsupported_ops_, ",");
+               << abslx::StrJoin(unsupported_ops_, ",");
   }
 }
 
@@ -87,7 +87,7 @@ grappler::DeviceInfo TfOpRoofLineCostEstimator::GetDeviceInfo(
 TfOpRoofLineCostEstimator::OpRoofLineStats TfOpRoofLineCostEstimator::Predict(
     const XEventVisitor& event) {
   TfOp tf_op;
-  absl::string_view tensor_shapes;
+  abslx::string_view tensor_shapes;
   event.ForEachStat([&](const XStatVisitor& stat) {
     if (!stat.Type().has_value()) return;
     switch (stat.Type().value()) {
@@ -108,7 +108,7 @@ TfOpRoofLineCostEstimator::OpRoofLineStats TfOpRoofLineCostEstimator::Predict(
   grappler::OpContext op_context;
   op_context.name = std::string(tf_op.type);
   op_context.op_info.set_op(op_context.name);
-  for (absl::string_view tensor : ParseTensorShapes(tensor_shapes)) {
+  for (abslx::string_view tensor : ParseTensorShapes(tensor_shapes)) {
     *op_context.op_info.add_inputs() = GetTensorProperties(tensor);
   }
   grappler::Costs costs = PredictCosts(op_context);

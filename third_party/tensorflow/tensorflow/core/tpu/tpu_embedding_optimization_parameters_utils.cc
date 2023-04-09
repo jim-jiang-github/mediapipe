@@ -225,7 +225,7 @@ Status UseGradientAccumulation(const OptimizationParameters& params,
     }
     default:
       return errors::Internal(
-          absl::StrCat("Unsupported gradient accumulation status ",
+          abslx::StrCat("Unsupported gradient accumulation status ",
                        GradientAccumulationStatus_Status_Name(
                            params.gradient_accumulation_status())));
   }
@@ -357,7 +357,7 @@ Status GetOptimizationAlgorithmStateVariables(
       int num_slots = -1;
       TF_RETURN_IF_ERROR(GetBaseAuxiliaryParameterCount(params, &num_slots));
       for (int i = 0; i < num_slots; ++i) {
-        add_state_variable(absl::StrCat("Slot_", i));
+        add_state_variable(abslx::StrCat("Slot_", i));
       }
       break;
     }

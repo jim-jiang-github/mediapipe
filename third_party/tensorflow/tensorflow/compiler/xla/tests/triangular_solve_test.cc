@@ -414,7 +414,7 @@ XLA_TEST_F(TriangularSolveTest, BatchedLeftUpper) {
 
   // Set avals to the upper triangle of bvals.
   Array3D<float> avals = bvals;
-  avals.Each([](absl::Span<const int64_t> indices, float* value) {
+  avals.Each([](abslx::Span<const int64_t> indices, float* value) {
     if (indices[1] > indices[2]) {
       *value = 0;
     }
@@ -455,7 +455,7 @@ XLA_TEST_P(TriangularSolveParametricTest, Random) {
   a_dims.back() = a_dims.at(a_dims.size() - 2);
   Array<float> avals(a_dims);
   avals.FillRandom(1.0);
-  avals.Each([](absl::Span<const int64_t> dims, float* v) {
+  avals.Each([](abslx::Span<const int64_t> dims, float* v) {
     if (dims.back() == dims.at(dims.size() - 2)) {
       *v += 30;
     }
@@ -516,10 +516,10 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::ValuesIn(TriangularSolveTests()),
     [](const ::testing::TestParamInfo<TriangularSolveTestSpec>& info) {
       const TriangularSolveTestSpec& spec = info.param;
-      std::string name = absl::StrCat(
-          absl::StrJoin(spec.dims, "_"), "_", spec.left_side ? "left" : "right",
+      std::string name = abslx::StrCat(
+          abslx::StrJoin(spec.dims, "_"), "_", spec.left_side ? "left" : "right",
           "_", spec.lower ? "lower" : "upper", "_",
-          absl::AsciiStrToLower(
+          abslx::AsciiStrToLower(
               TriangularSolveOptions_Transpose_Name(spec.transpose_a)));
       return name;
     });

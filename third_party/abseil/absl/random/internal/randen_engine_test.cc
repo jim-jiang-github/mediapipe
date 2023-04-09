@@ -28,9 +28,9 @@
 
 #define UPDATE_GOLDEN 0
 
-using randen_u64 = absl::random_internal::randen_engine<uint64_t>;
-using randen_u32 = absl::random_internal::randen_engine<uint32_t>;
-using absl::random_internal::ExplicitSeedSeq;
+using randen_u64 = abslx::random_internal::randen_engine<uint64_t>;
+using randen_u32 = abslx::random_internal::randen_engine<uint32_t>;
+using abslx::random_internal::ExplicitSeedSeq;
 
 namespace {
 
@@ -42,7 +42,7 @@ using UIntTypes = ::testing::Types<uint8_t, uint16_t, uint32_t, uint64_t>;
 TYPED_TEST_SUITE(RandenEngineTypedTest, UIntTypes);
 
 TYPED_TEST(RandenEngineTypedTest, VerifyReseedChangesAllValues) {
-  using randen = typename absl::random_internal::randen_engine<TypeParam>;
+  using randen = typename abslx::random_internal::randen_engine<TypeParam>;
   using result_type = typename randen::result_type;
 
   const size_t kNumOutputs = (sizeof(randen) * 2 / sizeof(TypeParam)) + 1;
@@ -103,7 +103,7 @@ TYPED_TEST(RandenEngineTypedTest, VerifyReseedChangesAllValues) {
 constexpr size_t kTwoBufferValues = sizeof(randen_u64) / sizeof(uint16_t) + 1;
 
 TYPED_TEST(RandenEngineTypedTest, VerifyDiscard) {
-  using randen = typename absl::random_internal::randen_engine<TypeParam>;
+  using randen = typename abslx::random_internal::randen_engine<TypeParam>;
 
   for (size_t num_used = 0; num_used < kTwoBufferValues; ++num_used) {
     randen engine_used;
@@ -129,7 +129,7 @@ TYPED_TEST(RandenEngineTypedTest, VerifyDiscard) {
 }
 
 TYPED_TEST(RandenEngineTypedTest, StreamOperatorsResult) {
-  using randen = typename absl::random_internal::randen_engine<TypeParam>;
+  using randen = typename abslx::random_internal::randen_engine<TypeParam>;
   std::wostringstream os;
   std::wistringstream is;
   randen engine;
@@ -139,7 +139,7 @@ TYPED_TEST(RandenEngineTypedTest, StreamOperatorsResult) {
 }
 
 TYPED_TEST(RandenEngineTypedTest, StreamSerialization) {
-  using randen = typename absl::random_internal::randen_engine<TypeParam>;
+  using randen = typename abslx::random_internal::randen_engine<TypeParam>;
 
   for (size_t discard = 0; discard < kTwoBufferValues; ++discard) {
     ExplicitSeedSeq seed_sequence{12, 34, 56};
@@ -162,7 +162,7 @@ constexpr size_t kNumGoldenOutputs = 127;
 // This test is checking if randen_engine is meets interface requirements
 // defined in [rand.req.urbg].
 TYPED_TEST(RandenEngineTypedTest, RandomNumberEngineInterface) {
-  using randen = typename absl::random_internal::randen_engine<TypeParam>;
+  using randen = typename abslx::random_internal::randen_engine<TypeParam>;
 
   using E = randen;
   using T = typename E::result_type;
@@ -170,13 +170,13 @@ TYPED_TEST(RandenEngineTypedTest, RandomNumberEngineInterface) {
   static_assert(std::is_copy_constructible<E>::value,
                 "randen_engine must be copy constructible");
 
-  static_assert(absl::is_copy_assignable<E>::value,
+  static_assert(abslx::is_copy_assignable<E>::value,
                 "randen_engine must be copy assignable");
 
   static_assert(std::is_move_constructible<E>::value,
                 "randen_engine must be move constructible");
 
-  static_assert(absl::is_move_assignable<E>::value,
+  static_assert(abslx::is_move_assignable<E>::value,
                 "randen_engine must be move assignable");
 
   static_assert(std::is_same<decltype(std::declval<E>()()), T>::value,
@@ -233,7 +233,7 @@ TYPED_TEST(RandenEngineTypedTest, RandomNumberEngineInterface) {
 }
 
 TYPED_TEST(RandenEngineTypedTest, RandenEngineSFINAETest) {
-  using randen = typename absl::random_internal::randen_engine<TypeParam>;
+  using randen = typename abslx::random_internal::randen_engine<TypeParam>;
   using result_type = typename randen::result_type;
 
   {
@@ -639,13 +639,13 @@ TEST(RandenTest, IsFastOrSlow) {
   static constexpr size_t kCount = 100000;
   randen_u64 engine;
   randen_u64::result_type sum = 0;
-  auto start = absl::GetCurrentTimeNanos();
+  auto start = abslx::GetCurrentTimeNanos();
   for (int i = 0; i < kCount; i++) {
     sum += engine();
   }
-  auto duration = absl::GetCurrentTimeNanos() - start;
+  auto duration = abslx::GetCurrentTimeNanos() - start;
 
-  ABSL_INTERNAL_LOG(INFO, absl::StrCat(static_cast<double>(duration) /
+  ABSL_INTERNAL_LOG(INFO, abslx::StrCat(static_cast<double>(duration) /
                                            static_cast<double>(kCount),
                                        "ns"));
 

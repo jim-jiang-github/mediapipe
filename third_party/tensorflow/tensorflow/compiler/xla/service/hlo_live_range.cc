@@ -42,7 +42,7 @@ StatusOr<std::unique_ptr<HloLiveRange>> HloLiveRange::Run(
 }
 
 void HloLiveRange::NormalizeAliasedBuffers() {
-  absl::flat_hash_map<HloBuffer::Id, std::vector<TimeBound*>>
+  abslx::flat_hash_map<HloBuffer::Id, std::vector<TimeBound*>>
       live_ranges_by_buffer;
   for (auto& entry : buffer_live_ranges_) {
     const HloValue& value = *entry.first;
@@ -52,7 +52,7 @@ void HloLiveRange::NormalizeAliasedBuffers() {
 
   for (auto& entry : live_ranges_by_buffer) {
     std::vector<TimeBound*>& aliased_live_ranges = entry.second;
-    absl::c_sort(aliased_live_ranges,
+    abslx::c_sort(aliased_live_ranges,
                  [](const TimeBound* a, const TimeBound* b) {
                    return std::forward_as_tuple(a->start, a->end) <
                           std::forward_as_tuple(b->start, b->end);
@@ -126,7 +126,7 @@ HloLiveRange::TimeBound HloLiveRange::GetLastPosition(
   const HloPosition* end_position = &value.defining_position();
   // Loop over the non-defining positions to find the final one.
   for (const HloPosition& position :
-       absl::Span<const HloPosition>(value.positions()).subspan(1)) {
+       abslx::Span<const HloPosition>(value.positions()).subspan(1)) {
     const HloInstruction* position_inst = position.instruction;
     LogicalTime position_time;
     if (position_inst->IsRoot()) {  // See comment above.
@@ -199,7 +199,7 @@ void HloLiveRange::CalculateBufferStartEndMap() {
     if (async_context_it != computations_in_async_context_.end()) {
       const HloComputation* async_context = async_context_it->second;
       CHECK(async_context->IsAsyncComputation());
-      auto async_done_it = absl::c_find_if(
+      auto async_done_it = abslx::c_find_if(
           async_context->AsyncInstructions(),
           [](const HloInstruction* instruction) {
             return instruction->opcode() == HloOpcode::kAsyncDone;
@@ -278,20 +278,20 @@ int64_t HloLiveRange::ComputePeakMemoryMoment() const {
 
 std::string HloLiveRange::ToString() const {
   std::string output;
-  absl::StrAppendFormat(&output, "HloLiveRange (max %d):\n",
+  abslx::StrAppendFormat(&output, "HloLiveRange (max %d):\n",
                         schedule_end_time());
-  absl::StrAppendFormat(&output, "  InstructionSequence:\n");
+  abslx::StrAppendFormat(&output, "  InstructionSequence:\n");
   auto& instructions = flattened_instruction_sequence().instructions();
   for (int64_t i = 0; i < instructions.size(); ++i) {
-    absl::StrAppendFormat(&output, "    %d:%s\n", i, instructions[i]->name());
+    abslx::StrAppendFormat(&output, "    %d:%s\n", i, instructions[i]->name());
   }
 
-  absl::StrAppendFormat(&output, "  BufferLiveRange:\n");
+  abslx::StrAppendFormat(&output, "  BufferLiveRange:\n");
 
   for (const HloValue* value : alias_analysis_.dataflow_analysis().values()) {
     auto it = buffer_live_ranges_.find(value);
     if (it != buffer_live_ranges_.end()) {
-      absl::StrAppendFormat(
+      abslx::StrAppendFormat(
           &output, "    %s%s:%d-%d\n", value->instruction()->name(),
           value->index().ToString(), it->second.start, it->second.end);
     }
@@ -299,14 +299,14 @@ std::string HloLiveRange::ToString() const {
 
   int64_t peak_moment = ComputePeakMemoryMoment();
 
-  absl::StrAppendFormat(&output, "  Live ranges at %lld (peak):\n",
+  abslx::StrAppendFormat(&output, "  Live ranges at %lld (peak):\n",
                         peak_moment);
   for (const HloValue* value : alias_analysis_.dataflow_analysis().values()) {
     auto it = buffer_live_ranges_.find(value);
     if (it != buffer_live_ranges_.end()) {
       if (it->second.start <= peak_moment && peak_moment <= it->second.end) {
         int64_t bytes = ShapeUtil::ByteSizeOf(value->instruction()->shape(), 8);
-        absl::StrAppendFormat(&output, "    %s: %lld bytes\n",
+        abslx::StrAppendFormat(&output, "    %s: %lld bytes\n",
                               value->instruction()->name(), bytes);
       }
     }

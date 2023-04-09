@@ -44,7 +44,7 @@ namespace {
 //
 class LstmNodeShader : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     std::string code = R"(
       vec4 prev_state  = $input_data_1[gid.x, gid.y, gid.z]$;
@@ -81,7 +81,7 @@ class LstmNodeShader : public NodeShader {
         /*input=*/IOStructure::ONLY_DEFINITIONS,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

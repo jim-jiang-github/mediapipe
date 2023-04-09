@@ -101,25 +101,25 @@ DebugOptions DefaultDebugOptionsIgnoringFlags() {
   return opts;
 }
 
-static absl::once_flag flags_init;
+static abslx::once_flag flags_init;
 static DebugOptions* flag_values;
 static std::vector<tensorflow::Flag>* flag_objects;
 
 // Maps pass -> initial fuel values (parsed when AllocateFlags was run).
-static absl::flat_hash_map<std::string, int64_t>* initial_fuel;
+static abslx::flat_hash_map<std::string, int64_t>* initial_fuel;
 
 // Maps pass -> whether fuel was ever consumed for that pass.
-static absl::node_hash_map<std::string, std::atomic<bool>>* fuel_ever_consumed;
+static abslx::node_hash_map<std::string, std::atomic<bool>>* fuel_ever_consumed;
 
 // Maps pass -> remaining fuel.
 //
 // All threads start off using this global fuel pool, but ResetThreadLocalFuel()
 // switches them to a thread-local fuel pool.
-static absl::node_hash_map<std::string, std::atomic<int64_t>>* global_fuel;
+static abslx::node_hash_map<std::string, std::atomic<int64_t>>* global_fuel;
 
 // If we're using thread-local fuel, this stores it.
 static thread_local std::unique_ptr<
-    absl::node_hash_map<std::string, std::atomic<int64_t>>>
+    abslx::node_hash_map<std::string, std::atomic<int64_t>>>
     thread_fuel;  // NOLINT (global variable with nontrivial destructor)
 
 // Logs a warning if a pass's fuel was never consumed, on the theory that this
@@ -127,10 +127,10 @@ static thread_local std::unique_ptr<
 static void WarnIfFuelWasNeverConsumed() {
   CHECK(fuel_ever_consumed != nullptr);
   for (const auto& kv : *fuel_ever_consumed) {
-    absl::string_view pass = kv.first;
+    abslx::string_view pass = kv.first;
     bool was_consumed = kv.second;
     if (!was_consumed) {
-      LOG(ERROR) << absl::StreamFormat(
+      LOG(ERROR) << abslx::StreamFormat(
           "Compiler fuel for \"%s\" was never consumed. This may be a typo in "
           "the --xla_fuel flag you passed.",
           pass);
@@ -180,7 +180,7 @@ static void AllocateFlags() {
   auto setter_for_xla_disable_hlo_passes =
       [](std::string comma_separated_values) {
         for (const auto& passname : std::vector<std::string>(
-                 absl::StrSplit(comma_separated_values, ','))) {
+                 abslx::StrSplit(comma_separated_values, ','))) {
           flag_values->add_xla_disable_hlo_passes(passname);
         }
         return true;
@@ -190,7 +190,7 @@ static void AllocateFlags() {
   auto setter_for_xla_enable_hlo_passes_only =
       [](std::string comma_separated_values) {
         for (const auto& passname : std::vector<std::string>(
-                 absl::StrSplit(comma_separated_values, ','))) {
+                 abslx::StrSplit(comma_separated_values, ','))) {
           flag_values->add_xla_enable_hlo_passes_only(passname);
         }
         return true;
@@ -222,19 +222,19 @@ static void AllocateFlags() {
   // locking on the fuel global variables.  This means that it's
   // illegal/undefined behavior to modify this flag value while the compiler is
   // running.
-  initial_fuel = new absl::flat_hash_map<std::string, int64_t>();
+  initial_fuel = new abslx::flat_hash_map<std::string, int64_t>();
   fuel_ever_consumed =
-      new absl::node_hash_map<std::string, std::atomic<bool>>();
-  global_fuel = new absl::node_hash_map<std::string, std::atomic<int64_t>>();
+      new abslx::node_hash_map<std::string, std::atomic<bool>>();
+  global_fuel = new abslx::node_hash_map<std::string, std::atomic<int64_t>>();
   auto setter_for_xla_fuel = [](std::string xla_fuel_value) {
     initial_fuel->clear();
     global_fuel->clear();
     fuel_ever_consumed->clear();
 
-    for (const auto& kv : absl::StrSplit(xla_fuel_value, ',')) {
-      std::vector<std::string> pass_and_fuel = absl::StrSplit(kv, '=');
+    for (const auto& kv : abslx::StrSplit(xla_fuel_value, ',')) {
+      std::vector<std::string> pass_and_fuel = abslx::StrSplit(kv, '=');
       if (pass_and_fuel.size() != 2) {
-        LOG(ERROR) << absl::StreamFormat(
+        LOG(ERROR) << abslx::StreamFormat(
             "Illegal value for --xla_fuel. Saw %s, but expected token %s to "
             "have format X=INTEGER.",
             xla_fuel_value, kv);
@@ -243,8 +243,8 @@ static void AllocateFlags() {
       const auto& pass = pass_and_fuel[0];
       const auto& fuel_str = pass_and_fuel[1];
       int64_t fuel;
-      if (!absl::SimpleAtoi(fuel_str, &fuel)) {
-        LOG(ERROR) << absl::StreamFormat(
+      if (!abslx::SimpleAtoi(fuel_str, &fuel)) {
+        LOG(ERROR) << abslx::StreamFormat(
             "Illegal value for --xla_fuel. Saw %s, but expected token %s to be "
             "an integer.",
             xla_fuel_value, fuel_str);
@@ -259,8 +259,8 @@ static void AllocateFlags() {
     // warning if a pass was specified but never consumed any fuel, on the
     // theory that this is may be a typo.
     if (!initial_fuel->empty()) {
-      static absl::once_flag register_atexit_once;
-      absl::call_once(
+      static abslx::once_flag register_atexit_once;
+      abslx::call_once(
           register_atexit_once,
           +[] { std::atexit(WarnIfFuelWasNeverConsumed); });
     }
@@ -781,29 +781,29 @@ static void AllocateFlags() {
 }  // NOLINT(readability/fn_size)
 
 void AppendDebugOptionsFlags(std::vector<tensorflow::Flag>* flag_list) {
-  absl::call_once(flags_init, &AllocateFlags);
+  abslx::call_once(flags_init, &AllocateFlags);
   flag_list->insert(flag_list->end(), flag_objects->begin(),
                     flag_objects->end());
 }
 
 xla::DebugOptions GetDebugOptionsFromFlags() {
-  absl::call_once(flags_init, &AllocateFlags);
+  abslx::call_once(flags_init, &AllocateFlags);
   return *flag_values;
 }
 
 void ResetThreadLocalFuel() {
-  absl::call_once(flags_init, &AllocateFlags);
+  abslx::call_once(flags_init, &AllocateFlags);
 
   thread_fuel.reset(
-      new absl::node_hash_map<std::string, std::atomic<int64_t>>());
+      new abslx::node_hash_map<std::string, std::atomic<int64_t>>());
   CHECK(initial_fuel != nullptr);
   for (const auto& kv : *initial_fuel) {
     thread_fuel->emplace(kv.first, kv.second);
   }
 }
 
-bool ConsumeFuel(absl::string_view pass, bool* just_ran_out) {
-  absl::call_once(flags_init, &AllocateFlags);
+bool ConsumeFuel(abslx::string_view pass, bool* just_ran_out) {
+  abslx::call_once(flags_init, &AllocateFlags);
   if (just_ran_out != nullptr) {
     *just_ran_out = false;
   }

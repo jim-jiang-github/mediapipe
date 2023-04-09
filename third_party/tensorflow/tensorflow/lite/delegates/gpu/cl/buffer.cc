@@ -26,7 +26,7 @@ namespace gpu {
 namespace cl {
 namespace {
 
-absl::Status CreateBuffer(size_t size_in_bytes, bool gpu_read_only,
+abslx::Status CreateBuffer(size_t size_in_bytes, bool gpu_read_only,
                           const void* data, CLContext* context,
                           Buffer* result) {
   cl_mem buffer;
@@ -35,15 +35,15 @@ absl::Status CreateBuffer(size_t size_in_bytes, bool gpu_read_only,
                                  &buffer));
   *result = Buffer(buffer, size_in_bytes);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CreateSubBuffer(const Buffer& parent, size_t origin_in_bytes,
+abslx::Status CreateSubBuffer(const Buffer& parent, size_t origin_in_bytes,
                              size_t size_in_bytes, bool gpu_read_only,
                              CLContext* context, Buffer* result) {
   cl_mem buffer;
   if (parent.IsSubBuffer()) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "Cannot create a sub-buffer from a sub-buffer!");
   }
   RETURN_IF_ERROR(CreateCLSubBuffer(context->context(), parent.GetMemoryPtr(),
@@ -51,7 +51,7 @@ absl::Status CreateSubBuffer(const Buffer& parent, size_t origin_in_bytes,
                                     gpu_read_only, &buffer));
   *result = Buffer(buffer, size_in_bytes, /*is_sub_buffer=*/true);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 }  // namespace
 
@@ -86,18 +86,18 @@ void Buffer::Release() {
   }
 }
 
-absl::Status Buffer::GetGPUResources(const GPUObjectDescriptor* obj_ptr,
+abslx::Status Buffer::GetGPUResources(const GPUObjectDescriptor* obj_ptr,
                                      GPUResourcesWithValue* resources) const {
   const auto* buffer_desc = dynamic_cast<const BufferDescriptor*>(obj_ptr);
   if (!buffer_desc) {
-    return absl::InvalidArgumentError("Expected BufferDescriptor on input.");
+    return abslx::InvalidArgumentError("Expected BufferDescriptor on input.");
   }
 
   resources->buffers.push_back({"buffer", buffer_});
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Buffer::CreateFromBufferDescriptor(const BufferDescriptor& desc,
+abslx::Status Buffer::CreateFromBufferDescriptor(const BufferDescriptor& desc,
                                                 CLContext* context) {
   bool read_only = desc.memory_type == MemoryType::CONSTANT;
   uint8_t* data_ptr = desc.data.empty()
@@ -108,22 +108,22 @@ absl::Status Buffer::CreateFromBufferDescriptor(const BufferDescriptor& desc,
                         &buffer_);
 }
 
-absl::Status CreateReadOnlyBuffer(size_t size_in_bytes, CLContext* context,
+abslx::Status CreateReadOnlyBuffer(size_t size_in_bytes, CLContext* context,
                                   Buffer* result) {
   return CreateBuffer(size_in_bytes, true, nullptr, context, result);
 }
 
-absl::Status CreateReadOnlyBuffer(size_t size_in_bytes, const void* data,
+abslx::Status CreateReadOnlyBuffer(size_t size_in_bytes, const void* data,
                                   CLContext* context, Buffer* result) {
   return CreateBuffer(size_in_bytes, true, data, context, result);
 }
 
-absl::Status CreateReadWriteBuffer(size_t size_in_bytes, CLContext* context,
+abslx::Status CreateReadWriteBuffer(size_t size_in_bytes, CLContext* context,
                                    Buffer* result) {
   return CreateBuffer(size_in_bytes, false, nullptr, context, result);
 }
 
-absl::Status CreateReadWriteSubBuffer(const Buffer& parent,
+abslx::Status CreateReadWriteSubBuffer(const Buffer& parent,
                                       size_t origin_in_bytes,
                                       size_t size_in_bytes, CLContext* context,
                                       Buffer* result) {

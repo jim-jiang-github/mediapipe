@@ -52,7 +52,7 @@ bool IsCustomCallToDnnConvolution(const HloInstruction& hlo) {
 
 StatusOr<CudnnConvKind> GetCudnnConvKind(
     const HloCustomCallInstruction* instr) {
-  absl::string_view target = instr->custom_call_target();
+  abslx::string_view target = instr->custom_call_target();
   if (target == kCudnnConvForwardCallTarget) {
     return CudnnConvKind::kForward;
   }

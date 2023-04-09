@@ -8,7 +8,7 @@ namespace mediapipe {
 
 class PacketGeneratorWrapperCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     const auto& options =
         cc->Options<::mediapipe::PacketGeneratorWrapperCalculatorOptions>();
     ASSIGN_OR_RETURN(auto static_access,
@@ -20,10 +20,10 @@ class PacketGeneratorWrapperCalculator : public CalculatorBase {
                            &cc->OutputSidePackets()))
             .SetPrepend()
         << options.packet_generator() << "::FillExpectations() failed: ";
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     const auto& options =
         cc->Options<::mediapipe::PacketGeneratorWrapperCalculatorOptions>();
     ASSIGN_OR_RETURN(auto static_access,
@@ -40,11 +40,11 @@ class PacketGeneratorWrapperCalculator : public CalculatorBase {
          ++id) {
       cc->OutputSidePackets().Get(id).Set(output_packets.Get(id));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
-    return absl::OkStatus();
+  abslx::Status Process(CalculatorContext* cc) override {
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(PacketGeneratorWrapperCalculator);

@@ -32,7 +32,7 @@ namespace api2 {
 
 namespace {
 
-absl::StatusOr<int> GetNumberOfRefinedLandmarks(
+abslx::StatusOr<int> GetNumberOfRefinedLandmarks(
     const proto_ns::RepeatedPtrField<
         LandmarksRefinementCalculatorOptions::Refinement>& refinements) {
   // Gather all used indexes.
@@ -110,7 +110,7 @@ void RefineZ(
 
 class LandmarksRefinementCalculatorImpl
     : public NodeImpl<LandmarksRefinementCalculator> {
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     options_ = cc->Options<LandmarksRefinementCalculatorOptions>();
 
     // Validate refinements.
@@ -143,19 +143,19 @@ class LandmarksRefinementCalculatorImpl
         << "There are " << options_.refinement_size() << " refinements while "
         << kLandmarks(cc).Count() << " landmark streams";
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     // If any of the refinement landmarks is missing - refinement won't happen.
     for (const auto& landmarks_stream : kLandmarks(cc)) {
       if (landmarks_stream.IsEmpty()) {
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
     }
 
     // Initialize refined landmarks list.
-    auto refined_landmarks = absl::make_unique<NormalizedLandmarkList>();
+    auto refined_landmarks = abslx::make_unique<NormalizedLandmarkList>();
     for (int i = 0; i < n_refined_landmarks_; ++i) {
       refined_landmarks->add_landmark();
     }
@@ -183,7 +183,7 @@ class LandmarksRefinementCalculatorImpl
     }
 
     kRefinedLandmarks(cc).Send(std::move(refined_landmarks));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

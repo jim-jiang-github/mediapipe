@@ -101,7 +101,7 @@ class NodeShader {
 
     // Information extracted & copied from compiled graph.
     const std::string& op_type;
-    const absl::any& op_attr;
+    const abslx::any& op_attr;
     // Do NOT use StrongShape<Layout::BHWC> in preparation for
     // RankedTensorType::getShape() which returns ArrayRef<int64_t>.
     std::vector<std::array<int64_t, 4>> input_shapes;
@@ -109,7 +109,7 @@ class NodeShader {
   };
 
   // Generates shader code for a node. The code should be just a function body.
-  virtual absl::Status GenerateCode(const GenerationContext& ctx,
+  virtual abslx::Status GenerateCode(const GenerationContext& ctx,
                                     GeneratedCode* generated_code) const = 0;
 
   // Limit the size of the const offsets array

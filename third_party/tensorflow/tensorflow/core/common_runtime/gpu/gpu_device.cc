@@ -510,7 +510,7 @@ Status BaseGPUDevice::Init(const SessionOptions& options) {
   string gpu_thread_mode;
   TF_RETURN_IF_ERROR(
       ReadStringFromEnvVar("TF_GPU_THREAD_MODE", "global", &gpu_thread_mode));
-  gpu_thread_mode = absl::AsciiStrToLower(gpu_thread_mode);
+  gpu_thread_mode = abslx::AsciiStrToLower(gpu_thread_mode);
   if (gpu_thread_mode != "global") {
     int64_t gpu_thread_count = -1;
     // Default to two threads. One for device compute and another for memory
@@ -562,16 +562,16 @@ string BaseGPUDevice::ComputeOpKernelDebugString(const OpKernel& op_kernel,
 }
 
 namespace {
-const absl::flat_hash_set<std::string>* GetOpsToLogFromEnv() {
-  auto* result = new absl::flat_hash_set<std::string>;
+const abslx::flat_hash_set<std::string>* GetOpsToLogFromEnv() {
+  auto* result = new abslx::flat_hash_set<std::string>;
   const char* env = getenv("TF_GPU_DEBUG_OPS_TO_LOG");
   if (!env) {
     return result;
   }
 
-  std::vector<absl::string_view> ops = absl::StrSplit(env, ',');
+  std::vector<abslx::string_view> ops = abslx::StrSplit(env, ',');
   LOG(INFO) << "Will log inputs & outputs from the following ops: ";
-  for (absl::string_view op : ops) {
+  for (abslx::string_view op : ops) {
     result->insert(std::string(op));
     LOG(INFO) << "  |" << op << "|";
   }
@@ -580,7 +580,7 @@ const absl::flat_hash_set<std::string>* GetOpsToLogFromEnv() {
 }
 
 bool ShouldLogInputsAndOutputs(OpKernel* op_kernel) {
-  static const absl::flat_hash_set<std::string>& ops_to_log =
+  static const abslx::flat_hash_set<std::string>& ops_to_log =
       *GetOpsToLogFromEnv();
   return ops_to_log.count(op_kernel->type_string());
 }
@@ -1596,7 +1596,7 @@ Status BaseGPUDeviceFactory::CreateGPUDevice(
                             tf_device_id.value(), " with ", memory_limit,
                             " bytes of memory.");
   }
-  absl::optional<AllocatorStats> stats = gpu_allocator->GetStats();
+  abslx::optional<AllocatorStats> stats = gpu_allocator->GetStats();
   if (!stats) {
     return errors::Internal("No allocator statistics");
   }
@@ -2038,7 +2038,7 @@ Status BaseGPUDeviceFactory::GetValidDeviceIds(
     std::vector<int> raw_ids(ids->size());
     std::transform(ids->begin(), ids->end(), raw_ids.begin(),
                    [](PlatformDeviceId id) -> int { return id.value(); });
-    VLOG(1) << "Adding visible gpu devices: " << absl::StrJoin(raw_ids, ", ");
+    VLOG(1) << "Adding visible gpu devices: " << abslx::StrJoin(raw_ids, ", ");
   }
 
   return OkStatus();

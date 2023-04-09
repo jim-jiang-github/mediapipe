@@ -29,7 +29,7 @@ using ::tensorflow::string;
 string MatMulFunction(const string& matmul_device) {
   tensorflow::FunctionDef def;
   CHECK(tensorflow::protobuf::TextFormat::ParseFromString(
-      absl::StrCat("    signature {"
+      abslx::StrCat("    signature {"
                    "      name: 'MatMulFunction'"
                    "      input_arg {"
                    "        name: 'a'"

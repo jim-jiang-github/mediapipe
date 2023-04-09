@@ -27,7 +27,7 @@ namespace gpu {
 struct ProfilingInfo {
   struct DispatchInfo {
     std::string label;
-    absl::Duration duration;
+    abslx::Duration duration;
     uint64_t read_mem_size = 0;
     uint64_t write_mem_size = 0;
     uint64_t flops = 0;
@@ -35,7 +35,7 @@ struct ProfilingInfo {
 
   std::vector<DispatchInfo> dispatches;
 
-  absl::Duration GetTotalTime() const;
+  abslx::Duration GetTotalTime() const;
 
   // Returns report (string of lines delimited by \n)
   // This method uses GPU counters and measure GPU time only.

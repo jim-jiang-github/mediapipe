@@ -358,7 +358,7 @@ class Harness : public ::testing::Test {
           string key = PickRandomKey(rnd, keys);
           model_iter = data.lower_bound(key);
           if (kVerbose)
-            fprintf(stderr, "Seek '%s'\n", absl::CEscape(key).c_str());
+            fprintf(stderr, "Seek '%s'\n", abslx::CEscape(key).c_str());
           iter->Seek(StringPiece(key));
           ASSERT_EQ(ToStringPiecePair(data, model_iter),
                     ToStringPiecePair(iter));

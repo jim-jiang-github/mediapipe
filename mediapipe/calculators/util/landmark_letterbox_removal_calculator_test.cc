@@ -46,7 +46,7 @@ CalculatorGraphConfig::Node GetDefaultNode() {
 TEST(LandmarkLetterboxRemovalCalculatorTest, PaddingLeftRight) {
   CalculatorRunner runner(GetDefaultNode());
 
-  auto landmarks = absl::make_unique<NormalizedLandmarkList>();
+  auto landmarks = abslx::make_unique<NormalizedLandmarkList>();
   *landmarks->add_landmark() = CreateLandmark(0.5f, 0.5f);
   *landmarks->add_landmark() = CreateLandmark(0.2f, 0.2f);
   *landmarks->add_landmark() = CreateLandmark(0.7f, 0.7f);
@@ -55,7 +55,7 @@ TEST(LandmarkLetterboxRemovalCalculatorTest, PaddingLeftRight) {
       .packets.push_back(
           Adopt(landmarks.release()).At(Timestamp::PostStream()));
 
-  auto padding = absl::make_unique<std::array<float, 4>>(
+  auto padding = abslx::make_unique<std::array<float, 4>>(
       std::array<float, 4>{0.2f, 0.f, 0.3f, 0.f});
   runner.MutableInputs()
       ->Tag(kLetterboxPaddingTag)
@@ -80,7 +80,7 @@ TEST(LandmarkLetterboxRemovalCalculatorTest, PaddingLeftRight) {
 TEST(LandmarkLetterboxRemovalCalculatorTest, PaddingTopBottom) {
   CalculatorRunner runner(GetDefaultNode());
 
-  auto landmarks = absl::make_unique<NormalizedLandmarkList>();
+  auto landmarks = abslx::make_unique<NormalizedLandmarkList>();
   NormalizedLandmark* landmark = landmarks->add_landmark();
   *landmark = CreateLandmark(0.5f, 0.5f);
   landmark = landmarks->add_landmark();
@@ -92,7 +92,7 @@ TEST(LandmarkLetterboxRemovalCalculatorTest, PaddingTopBottom) {
       .packets.push_back(
           Adopt(landmarks.release()).At(Timestamp::PostStream()));
 
-  auto padding = absl::make_unique<std::array<float, 4>>(
+  auto padding = abslx::make_unique<std::array<float, 4>>(
       std::array<float, 4>{0.0f, 0.2f, 0.0f, 0.3f});
   runner.MutableInputs()
       ->Tag(kLetterboxPaddingTag)

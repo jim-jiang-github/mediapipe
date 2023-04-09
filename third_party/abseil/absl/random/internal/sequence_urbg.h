@@ -23,7 +23,7 @@
 
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -55,6 +55,6 @@ class sequence_urbg {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_INTERNAL_SEQUENCE_URBG_H_

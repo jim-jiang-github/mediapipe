@@ -23,7 +23,7 @@
 #include "absl/flags/internal/commandlineflag.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace flags_internal {
 
@@ -42,7 +42,7 @@ bool PrivateHandleAccessor::IsSpecifiedOnCommandLine(
 }
 
 bool PrivateHandleAccessor::ValidateInputValue(const CommandLineFlag& flag,
-                                               absl::string_view value) {
+                                               abslx::string_view value) {
   return flag.ValidateInputValue(value);
 }
 
@@ -52,7 +52,7 @@ void PrivateHandleAccessor::CheckDefaultValueParsingRoundtrip(
 }
 
 bool PrivateHandleAccessor::ParseFrom(CommandLineFlag& flag,
-                                      absl::string_view value,
+                                      abslx::string_view value,
                                       flags_internal::FlagSettingMode set_mode,
                                       flags_internal::ValueSource source,
                                       std::string& error) {
@@ -61,5 +61,5 @@ bool PrivateHandleAccessor::ParseFrom(CommandLineFlag& flag,
 
 }  // namespace flags_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 

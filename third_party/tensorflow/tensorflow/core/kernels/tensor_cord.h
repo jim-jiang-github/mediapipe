@@ -51,8 +51,8 @@ class TensorCord {
   //   delete static_cast<TensorProto*>(ptr);
   // }
   //
-  // auto p = absl::MakeUnique<TensorProto>(...);
-  // absl::string_view content(p->tensor_content());
+  // auto p = abslx::MakeUnique<TensorProto>(...);
+  // abslx::string_view content(p->tensor_content());
   // TensorCord tc(content, TensorProtoDeleter, p.release());
   //
 
@@ -74,7 +74,7 @@ class TensorCord {
   // to the underlying data (while ensuring that the data will not be deleted
   // until `releaser(memory)` is called).  Otherwise the TensorCord may
   // outlive the data backing `view`.
-  TensorCord(absl::string_view view, CordRepReleaser releaser,
+  TensorCord(abslx::string_view view, CordRepReleaser releaser,
              void* memory = nullptr)
       : chunks_({new CordRep(view, releaser, memory)}) {}
 
@@ -84,12 +84,12 @@ class TensorCord {
   //      of `tensor`.  Furthermore, the associated tstring is not expected
   //      to be modified in such a way that the underlying memory will
   //      be changed after this TensorCord is created.
-  TensorCord(absl::string_view view, Tensor* tensor)
+  TensorCord(abslx::string_view view, Tensor* tensor)
       : chunks_({NewCordRepFromTensor(view, tensor)}) {}
 
   // Disallow construction with empty callback or empty tensor.
-  TensorCord(absl::string_view view, std::nullptr_t, void* memory) = delete;
-  TensorCord(absl::string_view view, std::nullptr_t) = delete;
+  TensorCord(abslx::string_view view, std::nullptr_t, void* memory) = delete;
+  TensorCord(abslx::string_view view, std::nullptr_t) = delete;
 
   TensorCord(const TensorCord& other);
 
@@ -101,14 +101,14 @@ class TensorCord {
 
   void Append(const TensorCord& other);
 
-  void Append(absl::string_view view, CordRepReleaser releaser,
+  void Append(abslx::string_view view, CordRepReleaser releaser,
               void* memory = nullptr);
 
-  void Append(absl::string_view view, Tensor* tensor);
+  void Append(abslx::string_view view, Tensor* tensor);
 
   // Disallow Appends with empty callbacks or empty tensors.
-  void Append(absl::string_view view, std::nullptr_t, void* memory) = delete;
-  void Append(absl::string_view view, std::nullptr_t) = delete;
+  void Append(abslx::string_view view, std::nullptr_t, void* memory) = delete;
+  void Append(abslx::string_view view, std::nullptr_t) = delete;
 
   size_t size() const;
   bool empty() const { return size() == 0; }
@@ -119,7 +119,7 @@ class TensorCord {
   class ChunkIterator {
    public:
     using iterator_category = std::input_iterator_tag;
-    using value_type = absl::string_view;
+    using value_type = abslx::string_view;
     using difference_type = ptrdiff_t;
     using pointer = const value_type*;
     using reference = value_type;
@@ -156,7 +156,7 @@ class TensorCord {
 
     const TensorCord* const cord_;
     int chunk_index_;
-    absl::string_view view_;
+    abslx::string_view view_;
   };
 
   class ChunkRange {
@@ -176,7 +176,7 @@ class TensorCord {
   // Note that the ordinary caveats of temporary lifetime extension apply:
   //
   //   void Process() {
-  //     for (absl::string_view chunk : CordFactory().Chunks()) {
+  //     for (abslx::string_view chunk : CordFactory().Chunks()) {
   //       // The temporary Cord returned by CordFactory has been destroyed!
   //     }
   //   }
@@ -191,7 +191,7 @@ class TensorCord {
   static string TypeName() { return kTypeName; }
 
   string DebugString() const {
-    return absl::StrCat("<TensorCord size=", size(), ">");
+    return abslx::StrCat("<TensorCord size=", size(), ">");
   }
 
   void Encode(VariantTensorData* data) const;
@@ -203,19 +203,19 @@ class TensorCord {
 
   class CordRep : public core::RefCounted {
    public:
-    CordRep(absl::string_view view, CordRepReleaser releaser,
+    CordRep(abslx::string_view view, CordRepReleaser releaser,
             void* arg = nullptr)
         : is_inline_(false), rep_(view, releaser, arg) {}
 
     // **WARNING** Only use this constructor if
     //    view.size() < CordRep::kMaxInlineSize.
-    explicit CordRep(absl::string_view view) : is_inline_(true), rep_(view) {}
+    explicit CordRep(abslx::string_view view) : is_inline_(true), rep_(view) {}
 
     ~CordRep() override;
 
-    absl::string_view view() const {
+    abslx::string_view view() const {
       if (is_inline_) {
-        return absl::string_view(
+        return abslx::string_view(
             rep_.internal.data() + 1,
             *reinterpret_cast<const uint8*>(rep_.internal.data()));
       } else {
@@ -227,11 +227,11 @@ class TensorCord {
     friend class TensorCord;
 
     struct ExternalRep {
-      absl::string_view view;
+      abslx::string_view view;
       CordRepReleaser releaser;
       void* arg;
 
-      ExternalRep(absl::string_view view_, CordRepReleaser releaser_,
+      ExternalRep(abslx::string_view view_, CordRepReleaser releaser_,
                   void* arg_)
           : view(view_), releaser(releaser_), arg(arg_) {}
     };
@@ -251,10 +251,10 @@ class TensorCord {
       InlineRep internal;
       ExternalRep external;
 
-      _rep_union(absl::string_view view, CordRepReleaser releaser, void* arg)
+      _rep_union(abslx::string_view view, CordRepReleaser releaser, void* arg)
           : external(view, releaser, arg) {}
 
-      explicit _rep_union(absl::string_view view) {
+      explicit _rep_union(abslx::string_view view) {
         DCHECK_LT(view.size(), kMaxInlineSize);
         *reinterpret_cast<uint8*>(internal.data()) = view.size();
         std::memcpy(static_cast<char*>(internal.data() + 1), view.data(),
@@ -266,9 +266,9 @@ class TensorCord {
   static TensorBuffer* TensorBufWithRef(Tensor* tensor);
   static void TensorBufReleaser(void* tensor_buffer);
   static void StringReleaser(void* str_ptr);
-  static CordRep* NewCordRepFromTensor(absl::string_view view, Tensor* tensor);
+  static CordRep* NewCordRepFromTensor(abslx::string_view view, Tensor* tensor);
 
-  absl::InlinedVector<CordRep*, 2> chunks_;
+  abslx::InlinedVector<CordRep*, 2> chunks_;
 };
 
 inline TensorCord::TensorCord(const TensorCord& other)
@@ -305,12 +305,12 @@ inline void TensorCord::Append(const TensorCord& other) {
   }
 }
 
-inline void TensorCord::Append(absl::string_view view, CordRepReleaser releaser,
+inline void TensorCord::Append(abslx::string_view view, CordRepReleaser releaser,
                                void* memory) {
   chunks_.push_back(new CordRep(view, releaser, memory));
 }
 
-inline void TensorCord::Append(absl::string_view view, Tensor* tensor) {
+inline void TensorCord::Append(abslx::string_view view, Tensor* tensor) {
   chunks_.push_back(NewCordRepFromTensor(view, tensor));
 }
 
@@ -318,7 +318,7 @@ inline size_t TensorCord::size() const {
   return (chunks_.empty())
              ? 0
              : std::accumulate(chunk_begin(), chunk_end(), 0,
-                               [](size_t acc, absl::string_view b) {
+                               [](size_t acc, abslx::string_view b) {
                                  return acc + b.size();
                                });
 }
@@ -342,7 +342,7 @@ inline TensorCord::ChunkIterator::ChunkIterator(const TensorCord* cord,
 }
 
 inline TensorCord::CordRep* TensorCord::NewCordRepFromTensor(
-    absl::string_view view, Tensor* tensor) {
+    abslx::string_view view, Tensor* tensor) {
   if (view.size() <= TensorCord::CordRep::kMaxInlineSize) {
     return new CordRep(view);
   } else {

@@ -39,14 +39,14 @@ namespace xla {
 namespace gpu {
 
 StatusOr<std::vector<int64_t>> GetNonContractingDims(
-    const Shape& shape, absl::Span<const int64_t> batch_dims,
-    absl::Span<const int64_t> contracting_dims);
+    const Shape& shape, abslx::Span<const int64_t> batch_dims,
+    abslx::Span<const int64_t> contracting_dims);
 
 // Normalize shape to (batch, rows, columns) logical dimensions.
 StatusOr<Shape> GetBatchRowColumnShape(const Shape& shape,
-                                       absl::Span<const int64_t> batch_dims,
-                                       absl::Span<const int64_t> row_dims,
-                                       absl::Span<const int64_t> col_dims);
+                                       abslx::Span<const int64_t> batch_dims,
+                                       abslx::Span<const int64_t> row_dims,
+                                       abslx::Span<const int64_t> col_dims);
 
 struct MatrixLayout {
   enum class Order {
@@ -58,9 +58,9 @@ struct MatrixLayout {
   static StatusOr<MatrixLayout> For(const Shape& shape);
   // Returns the matrix layout with the given batch, row, col dimensions.
   static StatusOr<MatrixLayout> For(const Shape& shape,
-                                    absl::Span<const int64_t> batch_dims,
-                                    absl::Span<const int64_t> row_dims,
-                                    absl::Span<const int64_t> col_dims);
+                                    abslx::Span<const int64_t> batch_dims,
+                                    abslx::Span<const int64_t> row_dims,
+                                    abslx::Span<const int64_t> col_dims);
   // Returns the matrix layout for the output.
   static StatusOr<MatrixLayout> For(const Shape& shape,
                                     size_t lhs_num_batch_dims,
@@ -91,10 +91,10 @@ struct GemmConfig {
   static StatusOr<GemmConfig> For(mlir::lmhlo_gpu::GEMMOp op);
 
   static StatusOr<GemmConfig> For(
-      const Shape& lhs_shape, absl::Span<const int64_t> lhs_batch_dims,
-      absl::Span<const int64_t> lhs_contracting_dims, const Shape& rhs_shape,
-      absl::Span<const int64_t> rhs_batch_dims,
-      absl::Span<const int64_t> rhs_contracting_dims, const Shape& output_shape,
+      const Shape& lhs_shape, abslx::Span<const int64_t> lhs_batch_dims,
+      abslx::Span<const int64_t> lhs_contracting_dims, const Shape& rhs_shape,
+      abslx::Span<const int64_t> rhs_batch_dims,
+      abslx::Span<const int64_t> rhs_contracting_dims, const Shape& output_shape,
       double alpha_real, double alpha_imag, double beta,
       std::optional<int64_t> algorithm, int64_t compute_precision);
 

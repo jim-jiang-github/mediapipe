@@ -350,7 +350,7 @@ TEST_F(ExtractOutsideCompilationForFunctionTest, Basic) {
   Node *key_placeholder = nullptr, *sequencer = nullptr;
   for (Node *n : host_graph->nodes()) {
     if (n->type_string() == "Placeholder" &&
-        absl::EndsWith(n->name(), "_key_placeholder")) {
+        abslx::EndsWith(n->name(), "_key_placeholder")) {
       EXPECT_EQ(key_placeholder, nullptr);
       key_placeholder = n;
     } else if (HasNodeAttr(n->def(), "_xla_host_transfer_sequencer")) {

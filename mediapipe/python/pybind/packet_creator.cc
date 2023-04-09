@@ -46,7 +46,7 @@ Packet CreateImageFramePacket(mediapipe::ImageFormat::Format format,
     return Adopt(CreateImageFrame<float>(format, data, copy).release());
   }
   throw RaisePyError(PyExc_RuntimeError,
-                     absl::StrCat("Unsupported ImageFormat: ", format).c_str());
+                     abslx::StrCat("Unsupported ImageFormat: ", format).c_str());
   return Packet();
 }
 
@@ -68,7 +68,7 @@ Packet CreateImagePacket(mediapipe::ImageFormat::Format format,
         CreateImageFrame<float>(format, data, copy)));
   }
   throw RaisePyError(PyExc_RuntimeError,
-                     absl::StrCat("Unsupported ImageFormat: ", format).c_str());
+                     abslx::StrCat("Unsupported ImageFormat: ", format).c_str());
   return Packet();
 }
 
@@ -647,7 +647,7 @@ void InternalPacketCreators(pybind11::module* m) {
   m->def(
       "_create_image_frame_from_image_frame",
       [](ImageFrame& image_frame) {
-        auto image_frame_copy = absl::make_unique<ImageFrame>();
+        auto image_frame_copy = abslx::make_unique<ImageFrame>();
         // Set alignment_boundary to kGlDefaultAlignmentBoundary so that
         // both GPU and CPU can process it.
         image_frame_copy->CopyFrom(image_frame,
@@ -659,7 +659,7 @@ void InternalPacketCreators(pybind11::module* m) {
   m->def(
       "_create_image_from_image",
       [](Image& image) {
-        auto image_frame_copy = absl::make_unique<ImageFrame>();
+        auto image_frame_copy = abslx::make_unique<ImageFrame>();
         // Set alignment_boundary to kGlDefaultAlignmentBoundary so that
         // both GPU and CPU can process it.
         image_frame_copy->CopyFrom(*image.GetImageFrameSharedPtr(),
@@ -674,12 +674,12 @@ void InternalPacketCreators(pybind11::module* m) {
       "_create_proto",
       [](const std::string& type_name, const py::bytes& serialized_proto) {
         using packet_internal::HolderBase;
-        absl::StatusOr<std::unique_ptr<HolderBase>> maybe_holder =
+        abslx::StatusOr<std::unique_ptr<HolderBase>> maybe_holder =
             packet_internal::MessageHolderRegistry::CreateByName(type_name);
         if (!maybe_holder.ok()) {
           throw RaisePyError(
               PyExc_RuntimeError,
-              absl::StrCat("Unregistered proto message type: ", type_name)
+              abslx::StrCat("Unregistered proto message type: ", type_name)
                   .c_str());
         }
         // Creates a Packet with the concrete C++ payload type.

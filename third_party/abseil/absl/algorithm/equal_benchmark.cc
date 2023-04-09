@@ -41,7 +41,7 @@ void BM_absl_equal_benchmark(benchmark::State& state) {
   std::vector<T> xs(state.range(0), T(0));
   std::vector<T> ys = xs;
   while (state.KeepRunning()) {
-    const bool same = absl::equal(xs.begin(), xs.end(), ys.begin(), ys.end());
+    const bool same = abslx::equal(xs.begin(), xs.end(), ys.begin(), ys.end());
     benchmark::DoNotOptimize(same);
   }
 }
@@ -73,7 +73,7 @@ template <typename T>
 void BM_absl_equal_self_benchmark(benchmark::State& state) {
   std::vector<T> xs(state.range(0), T(0));
   while (state.KeepRunning()) {
-    const bool same = absl::equal(xs.begin(), xs.end(), xs.begin(), xs.end());
+    const bool same = abslx::equal(xs.begin(), xs.end(), xs.begin(), xs.end());
     benchmark::DoNotOptimize(same);
   }
 }

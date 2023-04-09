@@ -32,7 +32,7 @@ static const char* kLandmarksOutputStream = "iris_landmarks";
   [self.mediapipeGraph addFrameOutputStream:kLandmarksOutputStream
                            outputPacketType:MPPPacketTypeRaw];
   _focal_length_side_packet =
-      mediapipe::MakePacket<std::unique_ptr<float>>(absl::make_unique<float>(0.0));
+      mediapipe::MakePacket<std::unique_ptr<float>>(abslx::make_unique<float>(0.0));
   _input_side_packets = {
       {"focal_length_pixel", _focal_length_side_packet},
   };

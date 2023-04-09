@@ -144,7 +144,7 @@ std::string TfliteTensorDebugStringImpl(const ::TfLiteTensor* tensor,
     if (idx == max_values && ret_list.size() < dim_size) {
       ret_list.push_back("...");
     }
-    return absl::StrCat("[", absl::StrJoin(ret_list, ", "), "]");
+    return abslx::StrCat("[", abslx::StrJoin(ret_list, ", "), "]");
   } else {
     std::vector<std::string> ret_list;
     ret_list.reserve(dim_size);
@@ -152,7 +152,7 @@ std::string TfliteTensorDebugStringImpl(const ::TfLiteTensor* tensor,
       ret_list.push_back(
           TfliteTensorDebugStringImpl(tensor, axis + 1, max_values, start_idx));
     }
-    return absl::StrCat("[", absl::StrJoin(ret_list, ", "), "]");
+    return abslx::StrCat("[", abslx::StrJoin(ret_list, ", "), "]");
   }
 }
 

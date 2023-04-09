@@ -179,7 +179,7 @@ PrimitiveType ComplexComponentType(PrimitiveType complex_type) {
 }
 
 // Class to memoize the computation of
-//   absl::AsciiStrToLower(PrimitiveType_Name(p))
+//   abslx::AsciiStrToLower(PrimitiveType_Name(p))
 // for all PrimitiveType values "p"
 //
 // xla::OPAQUE_TYPE canonically maps to the string "opaque" -- the only reason
@@ -191,7 +191,7 @@ class PrimitiveTypeNameGenerator {
       if (i == static_cast<int>(OPAQUE_TYPE)) {
         lowercase_name_[i] = "opaque";
       } else if (PrimitiveType_IsValid(i)) {
-        lowercase_name_[i] = absl::AsciiStrToLower(
+        lowercase_name_[i] = abslx::AsciiStrToLower(
             PrimitiveType_Name(static_cast<PrimitiveType>(i)));
       }
     }
@@ -215,10 +215,10 @@ namespace {
 //
 // Due to Postel's Law considerations, both "opaque" and "opaque_type" map to
 // the xla::OPAQUE_TYPE enumerator.
-const absl::flat_hash_map<std::string, PrimitiveType>&
+const abslx::flat_hash_map<std::string, PrimitiveType>&
 GetPrimitiveTypeStringMap() {
-  static absl::flat_hash_map<std::string, PrimitiveType>* name_to_type = [] {
-    static auto* map = new absl::flat_hash_map<std::string, PrimitiveType>;
+  static abslx::flat_hash_map<std::string, PrimitiveType>* name_to_type = [] {
+    static auto* map = new abslx::flat_hash_map<std::string, PrimitiveType>;
     for (int i = 0; i < PrimitiveType_ARRAYSIZE; i++) {
       if (PrimitiveType_IsValid(i) && i != PRIMITIVE_TYPE_INVALID) {
         auto value = static_cast<PrimitiveType>(i);
@@ -233,7 +233,7 @@ GetPrimitiveTypeStringMap() {
 
 }  // namespace
 
-StatusOr<PrimitiveType> StringToPrimitiveType(absl::string_view name) {
+StatusOr<PrimitiveType> StringToPrimitiveType(abslx::string_view name) {
   const auto& map = GetPrimitiveTypeStringMap();
   auto found = map.find(std::string(name));
   if (found == map.end()) {
@@ -242,7 +242,7 @@ StatusOr<PrimitiveType> StringToPrimitiveType(absl::string_view name) {
   return found->second;
 }
 
-bool IsPrimitiveTypeName(absl::string_view name) {
+bool IsPrimitiveTypeName(abslx::string_view name) {
   const auto& map = GetPrimitiveTypeStringMap();
   auto found = map.find(std::string(name));
   return found != map.end();

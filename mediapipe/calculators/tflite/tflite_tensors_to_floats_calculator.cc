@@ -42,15 +42,15 @@ constexpr char kTensorsTag[] = "TENSORS";
 // }
 class TfLiteTensorsToFloatsCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
 
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 };
 REGISTER_CALCULATOR(TfLiteTensorsToFloatsCalculator);
 
-absl::Status TfLiteTensorsToFloatsCalculator::GetContract(
+abslx::Status TfLiteTensorsToFloatsCalculator::GetContract(
     CalculatorContract* cc) {
   RET_CHECK(cc->Inputs().HasTag(kTensorsTag));
   RET_CHECK(cc->Outputs().HasTag(kFloatsTag) ||
@@ -64,16 +64,16 @@ absl::Status TfLiteTensorsToFloatsCalculator::GetContract(
     cc->Outputs().Tag(kFloatTag).Set<float>();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteTensorsToFloatsCalculator::Open(CalculatorContext* cc) {
+abslx::Status TfLiteTensorsToFloatsCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteTensorsToFloatsCalculator::Process(CalculatorContext* cc) {
+abslx::Status TfLiteTensorsToFloatsCalculator::Process(CalculatorContext* cc) {
   RET_CHECK(!cc->Inputs().Tag(kTensorsTag).IsEmpty());
 
   const auto& input_tensors =
@@ -95,13 +95,13 @@ absl::Status TfLiteTensorsToFloatsCalculator::Process(CalculatorContext* cc) {
         MakePacket<float>(raw_floats[0]).At(cc->InputTimestamp()));
   }
   if (cc->Outputs().HasTag(kFloatsTag)) {
-    auto output_floats = absl::make_unique<std::vector<float>>(
+    auto output_floats = abslx::make_unique<std::vector<float>>(
         raw_floats, raw_floats + num_values);
     cc->Outputs()
         .Tag(kFloatsTag)
         .Add(output_floats.release(), cc->InputTimestamp());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 }  // namespace mediapipe

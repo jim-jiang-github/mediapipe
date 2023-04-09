@@ -29,7 +29,7 @@
 #include "absl/meta/type_traits.h"
 #include "absl/types/span.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace inlined_vector_internal {
 
@@ -46,17 +46,17 @@ using IsAtLeastForwardIterator = std::is_convertible<
 
 template <typename AllocatorType,
           typename ValueType =
-              typename absl::allocator_traits<AllocatorType>::value_type>
+              typename abslx::allocator_traits<AllocatorType>::value_type>
 using IsMemcpyOk =
-    absl::conjunction<std::is_same<AllocatorType, std::allocator<ValueType>>,
-                      absl::is_trivially_copy_constructible<ValueType>,
-                      absl::is_trivially_copy_assignable<ValueType>,
-                      absl::is_trivially_destructible<ValueType>>;
+    abslx::conjunction<std::is_same<AllocatorType, std::allocator<ValueType>>,
+                      abslx::is_trivially_copy_constructible<ValueType>,
+                      abslx::is_trivially_copy_assignable<ValueType>,
+                      abslx::is_trivially_destructible<ValueType>>;
 
 template <typename AllocatorType, typename Pointer, typename SizeType>
 void DestroyElements(AllocatorType* alloc_ptr, Pointer destroy_first,
                      SizeType destroy_size) {
-  using AllocatorTraits = absl::allocator_traits<AllocatorType>;
+  using AllocatorTraits = abslx::allocator_traits<AllocatorType>;
 
   if (destroy_first != nullptr) {
     for (auto i = destroy_size; i != 0;) {
@@ -123,7 +123,7 @@ void AssignElements(Pointer assign_first, ValueAdapter* values_ptr,
 
 template <typename AllocatorType>
 struct StorageView {
-  using AllocatorTraits = absl::allocator_traits<AllocatorType>;
+  using AllocatorTraits = abslx::allocator_traits<AllocatorType>;
   using Pointer = typename AllocatorTraits::pointer;
   using SizeType = typename AllocatorTraits::size_type;
 
@@ -134,7 +134,7 @@ struct StorageView {
 
 template <typename AllocatorType, typename Iterator>
 class IteratorValueAdapter {
-  using AllocatorTraits = absl::allocator_traits<AllocatorType>;
+  using AllocatorTraits = abslx::allocator_traits<AllocatorType>;
   using Pointer = typename AllocatorTraits::pointer;
 
  public:
@@ -156,7 +156,7 @@ class IteratorValueAdapter {
 
 template <typename AllocatorType>
 class CopyValueAdapter {
-  using AllocatorTraits = absl::allocator_traits<AllocatorType>;
+  using AllocatorTraits = abslx::allocator_traits<AllocatorType>;
   using ValueType = typename AllocatorTraits::value_type;
   using Pointer = typename AllocatorTraits::pointer;
   using ConstPointer = typename AllocatorTraits::const_pointer;
@@ -176,7 +176,7 @@ class CopyValueAdapter {
 
 template <typename AllocatorType>
 class DefaultValueAdapter {
-  using AllocatorTraits = absl::allocator_traits<AllocatorType>;
+  using AllocatorTraits = abslx::allocator_traits<AllocatorType>;
   using ValueType = typename AllocatorTraits::value_type;
   using Pointer = typename AllocatorTraits::pointer;
 
@@ -192,7 +192,7 @@ class DefaultValueAdapter {
 
 template <typename AllocatorType>
 class AllocationTransaction {
-  using AllocatorTraits = absl::allocator_traits<AllocatorType>;
+  using AllocatorTraits = abslx::allocator_traits<AllocatorType>;
   using Pointer = typename AllocatorTraits::pointer;
   using SizeType = typename AllocatorTraits::size_type;
 
@@ -232,7 +232,7 @@ class AllocationTransaction {
 
 template <typename AllocatorType>
 class ConstructionTransaction {
-  using AllocatorTraits = absl::allocator_traits<AllocatorType>;
+  using AllocatorTraits = abslx::allocator_traits<AllocatorType>;
   using Pointer = typename AllocatorTraits::pointer;
   using SizeType = typename AllocatorTraits::size_type;
 
@@ -275,7 +275,7 @@ class ConstructionTransaction {
 template <typename T, size_t N, typename A>
 class Storage {
  public:
-  using AllocatorTraits = absl::allocator_traits<A>;
+  using AllocatorTraits = abslx::allocator_traits<A>;
   using allocator_type = typename AllocatorTraits::allocator_type;
   using value_type = typename AllocatorTraits::value_type;
   using pointer = typename AllocatorTraits::pointer;
@@ -573,9 +573,9 @@ auto Storage<T, N, A>::Assign(ValueAdapter values, size_type new_size) -> void {
 
   AllocationTransaction allocation_tx(GetAllocPtr());
 
-  absl::Span<value_type> assign_loop;
-  absl::Span<value_type> construct_loop;
-  absl::Span<value_type> destroy_loop;
+  abslx::Span<value_type> assign_loop;
+  abslx::Span<value_type> construct_loop;
+  abslx::Span<value_type> destroy_loop;
 
   if (new_size > storage_view.capacity) {
     size_type new_capacity = ComputeCapacity(storage_view.capacity, new_size);
@@ -700,19 +700,19 @@ auto Storage<T, N, A>::Insert(const_iterator pos, ValueAdapter values,
     IteratorValueAdapter<MoveIterator> move_construction_values(
         MoveIterator(storage_view.data +
                      (move_construction_destination_index - insert_count)));
-    absl::Span<value_type> move_construction = {
+    abslx::Span<value_type> move_construction = {
         storage_view.data + move_construction_destination_index,
         new_size - move_construction_destination_index};
 
     pointer move_assignment_values = storage_view.data + insert_index;
-    absl::Span<value_type> move_assignment = {
+    abslx::Span<value_type> move_assignment = {
         storage_view.data + insert_end_index,
         move_construction_destination_index - insert_end_index};
 
-    absl::Span<value_type> insert_assignment = {move_assignment_values,
+    abslx::Span<value_type> insert_assignment = {move_assignment_values,
                                                 move_construction.size()};
 
-    absl::Span<value_type> insert_construction = {
+    abslx::Span<value_type> insert_construction = {
         insert_assignment.data() + insert_assignment.size(),
         insert_count - insert_assignment.size()};
 
@@ -962,6 +962,6 @@ auto Storage<T, N, A>::Swap(Storage* other_storage_ptr) -> void {
 
 }  // namespace inlined_vector_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_CONTAINER_INTERNAL_INLINED_VECTOR_INTERNAL_H_

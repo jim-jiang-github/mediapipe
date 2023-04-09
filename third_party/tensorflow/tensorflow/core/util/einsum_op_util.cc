@@ -29,14 +29,14 @@ Status ValidateEinsumEquation(const string& equation,
                               gtl::InlinedVector<string, 2>* input_subscripts,
                               string* output_subscript) {
   gtl::InlinedVector<string, 2> inputs_and_output_subscripts =
-      absl::StrSplit(equation, "->");
+      abslx::StrSplit(equation, "->");
   if (inputs_and_output_subscripts.size() != 2) {
     return errors::InvalidArgument(
         "Expecting exactly one '->' in einsum equation: ", equation);
   }
   *output_subscript = std::move(inputs_and_output_subscripts[1]);
   *input_subscripts =
-      absl::StrSplit(std::move(inputs_and_output_subscripts[0]), ',');
+      abslx::StrSplit(std::move(inputs_and_output_subscripts[0]), ',');
   if (input_subscripts->size() != 1 && input_subscripts->size() != 2) {
     return errors::InvalidArgument(
         "Expecting 1 or 2 input subscripts in equation '", equation,
@@ -62,7 +62,7 @@ EinsumDimensionType GetDimensionType(bool is_removed, bool is_unique) {
 
 // Maps the character labels to consecutive integers.
 void MapToLabels(const string& subscript, Labels* labels,
-                 absl::flat_hash_map<char, int>* label_mapping) {
+                 abslx::flat_hash_map<char, int>* label_mapping) {
   for (int i = 0; i < subscript.size(); ++i) {
     const char label_char = subscript[i];
     if (label_char == '.') {
@@ -91,7 +91,7 @@ Status ParseEinsumEquation(const string& equation, OperandLabels* input_labels,
   TF_RETURN_IF_ERROR(ValidateEinsumEquation(equation, &input_str, &output_str));
 
   // Temporary map from single character labels to (consecutive) integer labels.
-  absl::flat_hash_map<char, int> label_mapping;
+  abslx::flat_hash_map<char, int> label_mapping;
   int num_inputs = input_str.size();
   input_labels->resize(num_inputs);
 

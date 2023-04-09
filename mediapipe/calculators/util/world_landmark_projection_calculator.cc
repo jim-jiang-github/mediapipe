@@ -59,28 +59,28 @@ constexpr char kRectTag[] = "NORM_RECT";
 //
 class WorldLandmarkProjectionCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Tag(kLandmarksTag).Set<LandmarkList>();
     if (cc->Inputs().HasTag(kRectTag)) {
       cc->Inputs().Tag(kRectTag).Set<NormalizedRect>();
     }
     cc->Outputs().Tag(kLandmarksTag).Set<LandmarkList>();
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     // Check that landmarks and rect are not empty.
     if (cc->Inputs().Tag(kLandmarksTag).IsEmpty() ||
         (cc->Inputs().HasTag(kRectTag) &&
          cc->Inputs().Tag(kRectTag).IsEmpty())) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     const auto& in_landmarks =
@@ -97,7 +97,7 @@ class WorldLandmarkProjectionCalculator : public CalculatorBase {
       };
     }
 
-    auto out_landmarks = absl::make_unique<LandmarkList>();
+    auto out_landmarks = abslx::make_unique<LandmarkList>();
     for (int i = 0; i < in_landmarks.landmark_size(); ++i) {
       const auto& in_landmark = in_landmarks.landmark(i);
 
@@ -113,7 +113,7 @@ class WorldLandmarkProjectionCalculator : public CalculatorBase {
         .Tag(kLandmarksTag)
         .Add(out_landmarks.release(), cc->InputTimestamp());
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(WorldLandmarkProjectionCalculator);

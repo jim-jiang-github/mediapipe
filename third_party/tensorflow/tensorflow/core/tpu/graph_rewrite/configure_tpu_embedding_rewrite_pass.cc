@@ -46,8 +46,8 @@ constexpr char kEmbeddingConfigurationAttr[] = "config";
 
 Status AddSynchronizationNode(
     const NodeDef& sync_node_def, const string& device_name,
-    absl::Span<Node* const> end_nodes,
-    absl::Span<const DistributedTPURewriteHelpers::OutputDependency>
+    abslx::Span<Node* const> end_nodes,
+    abslx::Span<const DistributedTPURewriteHelpers::OutputDependency>
         output_dependencies,
     Graph* graph) {
   NodeDef sync_def;
@@ -79,7 +79,7 @@ Status AddSynchronizationNode(
 Status AddSetupPropagationEmbeddingNode(const string& device_name,
                                         const string& node_name,
                                         const string& op_name,
-                                        absl::Span<Node* const> input_nodes,
+                                        abslx::Span<Node* const> input_nodes,
                                         Graph* graph, Node** node) {
   NodeDef node_def;
   node_def.set_name(node_name);
@@ -101,7 +101,7 @@ Status AddSetupPropagationEmbeddingNode(const string& device_name,
 
 Status AddExecutePartitionerNode(const string& configuration_device_name,
                                  const string& config,
-                                 absl::Span<Node* const> input_dependencies,
+                                 abslx::Span<Node* const> input_dependencies,
                                  Graph* graph, Node** partitioner_node) {
   NodeDef partitioner_def;
   partitioner_def.set_name(graph->NewName("execute_embedding_partitioner"));
@@ -134,7 +134,7 @@ Status AddConfigureMemoryNode(const string& host_device_name,
 }
 
 Status AddCollateMemoryNode(const string& configuration_device_name,
-                            absl::Span<Node* const> memory_nodes, Graph* graph,
+                            abslx::Span<Node* const> memory_nodes, Graph* graph,
                             Node** embedding_node) {
   return AddSetupPropagationEmbeddingNode(
       /*device_name=*/configuration_device_name,
@@ -164,7 +164,7 @@ Status AddConfigureHostNode(const string& host_device_name,
 }
 
 Status AddConnectHostsNode(const string& host_device_name,
-                           absl::Span<Node* const> configure_host_nodes,
+                           abslx::Span<Node* const> configure_host_nodes,
                            Graph* graph, Node** connect_node) {
   return AddSetupPropagationEmbeddingNode(
       /*device_name=*/host_device_name,
@@ -223,7 +223,7 @@ Status ConfigureTPUEmbeddingRewritePass::Run(
             TF_RET_CHECK(!host_devices.empty());
 
             auto get_updated_device_name =
-                [](absl::string_view initial_device_name)
+                [](abslx::string_view initial_device_name)
                 -> xla::StatusOr<std::string> {
               DeviceNameUtils::ParsedName device_spec;
               TF_RET_CHECK(DeviceNameUtils::ParseFullName(initial_device_name,

@@ -22,7 +22,7 @@
 // with different flags from other targets, using different levels of
 // optimization, potentially introducing ODR violations.
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -45,6 +45,6 @@ bool HasRandenHwAesImplementation();
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_INTERNAL_RANDEN_HWAES_H_

@@ -38,7 +38,7 @@ class InlineRewrite {
  public:
   virtual ~InlineRewrite() = default;
 
-  virtual RewriteStatus Rewrite(absl::string_view input,
+  virtual RewriteStatus Rewrite(abslx::string_view input,
                                 std::string* output) = 0;
 };
 
@@ -58,7 +58,7 @@ class TextPreprocessor {
   }
 
   // input and output may point to the same object.
-  absl::Status Rewrite(const std::string& input, std::string* output);
+  abslx::Status Rewrite(const std::string& input, std::string* output);
 
  private:
   const char inline_delimiter_;

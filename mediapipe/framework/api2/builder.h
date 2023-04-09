@@ -31,7 +31,7 @@ T& GetWithAutoGrow(std::vector<std::unique_ptr<T>>* vecp, int index) {
     vec.resize(index + 1);
   }
   if (vec[index] == nullptr) {
-    vec[index] = absl::make_unique<T>();
+    vec[index] = abslx::make_unique<T>();
   }
   return *vec[index];
 }
@@ -45,7 +45,7 @@ struct TagIndexLocation {
 template <typename T>
 class TagIndexMap {
  public:
-  std::vector<std::unique_ptr<T>>& operator[](absl::string_view tag) {
+  std::vector<std::unique_ptr<T>>& operator[](abslx::string_view tag) {
     return map_[tag];
   }
 
@@ -70,8 +70,8 @@ class TagIndexMap {
   }
 
   // Note: entries are held by a unique_ptr to ensure pointers remain valid.
-  // Should use absl::flat_hash_map but ordering keys for now.
-  absl::btree_map<std::string, std::vector<std::unique_ptr<T>>> map_;
+  // Should use abslx::flat_hash_map but ordering keys for now.
+  abslx::btree_map<std::string, std::vector<std::unique_ptr<T>>> map_;
 };
 
 class Graph;
@@ -318,19 +318,19 @@ class NodeBase {
   // of its entries by index. However, for nodes without visible contracts we
   // can't know whether a tag is indexable or not, so we would need the
   // multi-port to also be usable as a port directly (representing index 0).
-  MultiSource<> Out(absl::string_view tag) {
+  MultiSource<> Out(abslx::string_view tag) {
     return MultiSource<>(&out_streams_[tag]);
   }
 
-  MultiDestination<> In(absl::string_view tag) {
+  MultiDestination<> In(abslx::string_view tag) {
     return MultiDestination<>(&in_streams_[tag]);
   }
 
-  MultiSideSource<> SideOut(absl::string_view tag) {
+  MultiSideSource<> SideOut(abslx::string_view tag) {
     return MultiSideSource<>(&out_sides_[tag]);
   }
 
-  MultiSideDestination<> SideIn(absl::string_view tag) {
+  MultiSideDestination<> SideIn(abslx::string_view tag) {
     return MultiSideDestination<>(&in_sides_[tag]);
   }
 
@@ -472,11 +472,11 @@ class PacketGenerator {
  public:
   PacketGenerator(std::string type) : type_(std::move(type)) {}
 
-  MultiSideSource<> SideOut(absl::string_view tag) {
+  MultiSideSource<> SideOut(abslx::string_view tag) {
     return MultiSideSource<>(&out_sides_[tag]);
   }
 
-  MultiSideDestination<> SideIn(absl::string_view tag) {
+  MultiSideDestination<> SideIn(abslx::string_view tag) {
     return MultiSideDestination<>(&in_sides_[tag]);
   }
 
@@ -547,7 +547,7 @@ class Graph {
   // Creates a node of a specific type. Should be used for pure interfaces,
   // which do not have a built-in type string.
   template <class Calc>
-  Node<Calc>& AddNode(absl::string_view type) {
+  Node<Calc>& AddNode(abslx::string_view type) {
     auto node =
         std::make_unique<Node<Calc>>(std::string(type.data(), type.size()));
     auto node_p = node.get();
@@ -557,7 +557,7 @@ class Graph {
 
   // Creates a generic node, with no compile-time checking of inputs and
   // outputs. This can be used for calculators whose contract is not visible.
-  GenericNode& AddNode(absl::string_view type) {
+  GenericNode& AddNode(abslx::string_view type) {
     auto node =
         std::make_unique<GenericNode>(std::string(type.data(), type.size()));
     auto node_p = node.get();
@@ -566,7 +566,7 @@ class Graph {
   }
 
   // For legacy PacketGenerators.
-  PacketGenerator& AddPacketGenerator(absl::string_view type) {
+  PacketGenerator& AddPacketGenerator(abslx::string_view type) {
     auto node = std::make_unique<PacketGenerator>(
         std::string(type.data(), type.size()));
     auto node_p = node.get();
@@ -575,19 +575,19 @@ class Graph {
   }
 
   // Graph ports, non-typed.
-  MultiSource<> In(absl::string_view graph_input) {
+  MultiSource<> In(abslx::string_view graph_input) {
     return graph_boundary_.Out(graph_input);
   }
 
-  MultiDestination<> Out(absl::string_view graph_output) {
+  MultiDestination<> Out(abslx::string_view graph_output) {
     return graph_boundary_.In(graph_output);
   }
 
-  MultiSideSource<> SideIn(absl::string_view graph_input) {
+  MultiSideSource<> SideIn(abslx::string_view graph_input) {
     return graph_boundary_.SideOut(graph_input);
   }
 
-  MultiSideDestination<> SideOut(absl::string_view graph_output) {
+  MultiSideDestination<> SideOut(abslx::string_view graph_output) {
     return graph_boundary_.SideIn(graph_output);
   }
 
@@ -683,12 +683,12 @@ class Graph {
   void FixUnnamedConnections(NodeBase* node, int* unnamed_count) {
     node->out_streams_.Visit([&](const TagIndexLocation&, SourceBase* source) {
       if (source->name_.empty()) {
-        source->name_ = absl::StrCat("__stream_", (*unnamed_count)++);
+        source->name_ = abslx::StrCat("__stream_", (*unnamed_count)++);
       }
     });
     node->out_sides_.Visit([&](const TagIndexLocation&, SourceBase* source) {
       if (source->name_.empty()) {
-        source->name_ = absl::StrCat("__side_packet_", (*unnamed_count)++);
+        source->name_ = abslx::StrCat("__side_packet_", (*unnamed_count)++);
       }
     });
   }
@@ -702,7 +702,7 @@ class Graph {
     for (std::unique_ptr<PacketGenerator>& node : packet_gens_) {
       node->out_sides_.Visit([&](const TagIndexLocation&, SourceBase* source) {
         if (source->name_.empty()) {
-          source->name_ = absl::StrCat("__side_packet_", unnamed_count++);
+          source->name_ = abslx::StrCat("__side_packet_", unnamed_count++);
         }
       });
     }
@@ -716,14 +716,14 @@ class Graph {
       return name;
     } else {
       if (loc.count <= 1) {
-        return absl::StrCat(loc.tag, ":", name);
+        return abslx::StrCat(loc.tag, ":", name);
       } else {
-        return absl::StrCat(loc.tag, ":", loc.index, ":", name);
+        return abslx::StrCat(loc.tag, ":", loc.index, ":", name);
       }
     }
   }
 
-  absl::Status UpdateNodeConfig(const NodeBase& node,
+  abslx::Status UpdateNodeConfig(const NodeBase& node,
                                 CalculatorGraphConfig::Node* config) {
     config->set_calculator(node.type_);
     node.in_streams_.Visit(
@@ -750,7 +750,7 @@ class Graph {
     return {};
   }
 
-  absl::Status UpdateNodeConfig(const PacketGenerator& node,
+  abslx::Status UpdateNodeConfig(const PacketGenerator& node,
                                 PacketGeneratorConfig* config) {
     config->set_packet_generator(node.type_);
     node.in_sides_.Visit([&](const TagIndexLocation& loc,
@@ -769,7 +769,7 @@ class Graph {
   }
 
   // For special boundary node.
-  absl::Status UpdateBoundaryConfig(CalculatorGraphConfig* config) {
+  abslx::Status UpdateBoundaryConfig(CalculatorGraphConfig* config) {
     graph_boundary_.in_streams_.Visit(
         [&](const TagIndexLocation& loc, const DestinationBase& endpoint) {
           CHECK(endpoint.source != nullptr);

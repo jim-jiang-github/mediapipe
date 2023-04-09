@@ -82,18 +82,18 @@ class BilateralFilterCalculator : public CalculatorBase {
   BilateralFilterCalculator() = default;
   ~BilateralFilterCalculator() override = default;
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
   // From Calculator.
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
-  absl::Status RenderGpu(CalculatorContext* cc);
-  absl::Status RenderCpu(CalculatorContext* cc);
+  abslx::Status RenderGpu(CalculatorContext* cc);
+  abslx::Status RenderCpu(CalculatorContext* cc);
 
-  absl::Status GlSetup(CalculatorContext* cc);
+  abslx::Status GlSetup(CalculatorContext* cc);
   void GlRender(CalculatorContext* cc);
 
   mediapipe::BilateralFilterCalculatorOptions options_;
@@ -111,16 +111,16 @@ class BilateralFilterCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(BilateralFilterCalculator);
 
-absl::Status BilateralFilterCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status BilateralFilterCalculator::GetContract(CalculatorContract* cc) {
   CHECK_GE(cc->Inputs().NumEntries(), 1);
 
   if (cc->Inputs().HasTag(kInputFrameTag) &&
       cc->Inputs().HasTag(kInputFrameTagGpu)) {
-    return absl::InternalError("Cannot have multiple input images.");
+    return abslx::InternalError("Cannot have multiple input images.");
   }
   if (cc->Inputs().HasTag(kInputFrameTagGpu) !=
       cc->Outputs().HasTag(kOutputFrameTagGpu)) {
-    return absl::InternalError("GPU output must have GPU input.");
+    return abslx::InternalError("GPU output must have GPU input.");
   }
 
   bool use_gpu = false;
@@ -164,10 +164,10 @@ absl::Status BilateralFilterCalculator::GetContract(CalculatorContract* cc) {
 #endif  // !MEDIAPIPE_DISABLE_GPU
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status BilateralFilterCalculator::Open(CalculatorContext* cc) {
+abslx::Status BilateralFilterCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
   options_ = cc->Options<mediapipe::BilateralFilterCalculatorOptions>();
@@ -193,29 +193,29 @@ absl::Status BilateralFilterCalculator::Open(CalculatorContext* cc) {
 #endif  // !MEDIAPIPE_DISABLE_GPU
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status BilateralFilterCalculator::Process(CalculatorContext* cc) {
+abslx::Status BilateralFilterCalculator::Process(CalculatorContext* cc) {
   if (use_gpu_) {
 #if !MEDIAPIPE_DISABLE_GPU
-    MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext([this, cc]() -> absl::Status {
+    MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext([this, cc]() -> abslx::Status {
       if (!gpu_initialized_) {
         MP_RETURN_IF_ERROR(GlSetup(cc));
         gpu_initialized_ = true;
       }
       MP_RETURN_IF_ERROR(RenderGpu(cc));
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }));
 #endif  // !MEDIAPIPE_DISABLE_GPU
   } else {
     MP_RETURN_IF_ERROR(RenderCpu(cc));
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status BilateralFilterCalculator::Close(CalculatorContext* cc) {
+abslx::Status BilateralFilterCalculator::Close(CalculatorContext* cc) {
 #if !MEDIAPIPE_DISABLE_GPU
   gpu_helper_.RunInGlContext([this] {
     if (program_) glDeleteProgram(program_);
@@ -228,12 +228,12 @@ absl::Status BilateralFilterCalculator::Close(CalculatorContext* cc) {
   });
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status BilateralFilterCalculator::RenderCpu(CalculatorContext* cc) {
+abslx::Status BilateralFilterCalculator::RenderCpu(CalculatorContext* cc) {
   if (cc->Inputs().Tag(kInputFrameTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   const auto& input_frame = cc->Inputs().Tag(kInputFrameTag).Get<ImageFrame>();
@@ -241,18 +241,18 @@ absl::Status BilateralFilterCalculator::RenderCpu(CalculatorContext* cc) {
 
   // Only 1 or 3 channel images supported by OpenCV.
   if (!(input_mat.channels() == 1 || input_mat.channels() == 3)) {
-    return absl::InternalError(
+    return abslx::InternalError(
         "CPU filtering supports only 1 or 3 channel input images.");
   }
 
-  auto output_frame = absl::make_unique<ImageFrame>(
+  auto output_frame = abslx::make_unique<ImageFrame>(
       input_frame.Format(), input_mat.cols, input_mat.rows);
   const bool has_guide_image = cc->Inputs().HasTag(kInputGuideTag) &&
                                !cc->Inputs().Tag(kInputGuideTag).IsEmpty();
 
   if (has_guide_image) {
     // cv::jointBilateralFilter() is in contrib module 'ximgproc'.
-    return absl::UnimplementedError(
+    return abslx::UnimplementedError(
         "CPU joint filtering support is not implemented yet.");
   } else {
     auto output_mat = mediapipe::formats::MatView(output_frame.get());
@@ -264,12 +264,12 @@ absl::Status BilateralFilterCalculator::RenderCpu(CalculatorContext* cc) {
   cc->Outputs()
       .Tag(kOutputFrameTag)
       .Add(output_frame.release(), cc->InputTimestamp());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status BilateralFilterCalculator::RenderGpu(CalculatorContext* cc) {
+abslx::Status BilateralFilterCalculator::RenderGpu(CalculatorContext* cc) {
   if (cc->Inputs().Tag(kInputFrameTagGpu).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 #if !MEDIAPIPE_DISABLE_GPU
   const auto& input_frame =
@@ -281,7 +281,7 @@ absl::Status BilateralFilterCalculator::RenderGpu(CalculatorContext* cc) {
 
   // Setup textures and Update image in GPU shader.
   if (has_guide_image) {
-    if (cc->Inputs().Tag(kInputGuideTagGpu).IsEmpty()) return absl::OkStatus();
+    if (cc->Inputs().Tag(kInputGuideTagGpu).IsEmpty()) return abslx::OkStatus();
     // joint bilateral filter
     glUseProgram(program_);
     const auto& guide_image =
@@ -329,7 +329,7 @@ absl::Status BilateralFilterCalculator::RenderGpu(CalculatorContext* cc) {
   output_texture.Release();
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void BilateralFilterCalculator::GlRender(CalculatorContext* cc) {
@@ -345,7 +345,7 @@ void BilateralFilterCalculator::GlRender(CalculatorContext* cc) {
 #endif  // !MEDIAPIPE_DISABLE_GPU
 }
 
-absl::Status BilateralFilterCalculator::GlSetup(CalculatorContext* cc) {
+abslx::Status BilateralFilterCalculator::GlSetup(CalculatorContext* cc) {
 #if !MEDIAPIPE_DISABLE_GPU
   const GLint attr_location[NUM_ATTRIBUTES] = {
       ATTRIB_VERTEX,
@@ -358,7 +358,7 @@ absl::Status BilateralFilterCalculator::GlSetup(CalculatorContext* cc) {
 
   // Common functions and settings for both shaders.
   const std::string common_string =
-      absl::StrReplaceAll(R"(
+      abslx::StrReplaceAll(R"(
     const float sigma_space = $space;
     const float sigma_color = $color;
 
@@ -512,7 +512,7 @@ absl::Status BilateralFilterCalculator::GlSetup(CalculatorContext* cc) {
 
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

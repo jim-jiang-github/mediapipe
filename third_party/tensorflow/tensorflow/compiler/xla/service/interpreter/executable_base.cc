@@ -146,7 +146,7 @@ StatusOr<ExecutionOutput> InterpreterExecutableBase::ExecuteAsyncOnStream(
     const double nanoseconds = (end_micros - start_micros) * 1000.0;
     profile->set_compute_time_ns(std::max(nanoseconds, 1.0));
   }
-  MarkToBeReleasedArguments(absl::MakeSpan(arguments), result);
+  MarkToBeReleasedArguments(abslx::MakeSpan(arguments), result);
   return std::move(result);
 }
 

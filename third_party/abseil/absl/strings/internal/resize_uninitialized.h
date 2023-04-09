@@ -24,7 +24,7 @@
 #include "absl/base/port.h"
 #include "absl/meta/type_traits.h"  //  for void_t
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace strings_internal {
 
@@ -39,7 +39,7 @@ struct ResizeUninitializedTraits {
 // __resize_default_init is provided by libc++ >= 8.0
 template <typename string_type>
 struct ResizeUninitializedTraits<
-    string_type, absl::void_t<decltype(std::declval<string_type&>()
+    string_type, abslx::void_t<decltype(std::declval<string_type&>()
                                            .__resize_default_init(237))> > {
   using HasMember = std::true_type;
   static void Resize(string_type* s, size_t new_size) {
@@ -68,6 +68,6 @@ inline void STLStringResizeUninitialized(string_type* s, size_t new_size) {
 
 }  // namespace strings_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_INTERNAL_RESIZE_UNINITIALIZED_H_

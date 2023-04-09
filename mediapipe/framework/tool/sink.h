@@ -172,10 +172,10 @@ class CallbackCalculator : public CalculatorBase {
 
   ~CallbackCalculator() override {}
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   std::function<void(const Packet&)> callback_;
@@ -191,10 +191,10 @@ class CallbackWithHeaderCalculator : public CalculatorBase {
 
   ~CallbackWithHeaderCalculator() override {}
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   std::function<void(const Packet&, const Packet&)> callback_;

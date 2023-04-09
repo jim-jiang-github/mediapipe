@@ -63,7 +63,7 @@ class FrameView {
 
   bool is_inferred_;  // true if it was inferred from the graph
   int num_frames_;    // number of frames present in a graph
-  absl::flat_hash_map<const NodeDef*, std::vector<int>> node_to_frames_;
+  abslx::flat_hash_map<const NodeDef*, std::vector<int>> node_to_frames_;
 
   // We return a reference to this vector if node has no frames.
   const std::vector<int> node_has_no_frames_;

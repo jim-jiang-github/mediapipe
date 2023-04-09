@@ -56,17 +56,17 @@ constexpr char kFloatTag[] = "FLOAT";
 // }
 class ThresholdingCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
 
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   double threshold_{};
 };
 REGISTER_CALCULATOR(ThresholdingCalculator);
 
-absl::Status ThresholdingCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status ThresholdingCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK(cc->Inputs().HasTag(kFloatTag));
   cc->Inputs().Tag(kFloatTag).Set<float>();
 
@@ -89,10 +89,10 @@ absl::Status ThresholdingCalculator::GetContract(CalculatorContract* cc) {
            "supported.";
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ThresholdingCalculator::Open(CalculatorContext* cc) {
+abslx::Status ThresholdingCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
   const auto& options =
@@ -109,10 +109,10 @@ absl::Status ThresholdingCalculator::Open(CalculatorContext* cc) {
   if (cc->InputSidePackets().HasTag(kThresholdTag)) {
     threshold_ = cc->InputSidePackets().Tag(kThresholdTag).Get<double>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ThresholdingCalculator::Process(CalculatorContext* cc) {
+abslx::Status ThresholdingCalculator::Process(CalculatorContext* cc) {
   if (cc->Inputs().HasTag(kThresholdTag) &&
       !cc->Inputs().Tag(kThresholdTag).IsEmpty()) {
     threshold_ = cc->Inputs().Tag(kThresholdTag).Get<double>();
@@ -139,6 +139,6 @@ absl::Status ThresholdingCalculator::Process(CalculatorContext* cc) {
         .AddPacket(MakePacket<bool>(false).At(cc->InputTimestamp()));
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 }  // namespace mediapipe

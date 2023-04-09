@@ -110,7 +110,7 @@ GainBiasModel ToneModelAdapter<GainBiasModel>::ScaleParameters(
 
 std::string ToneModelAdapter<GainBiasModel>::ToString(
     const GainBiasModel& model) {
-  return absl::StrFormat("%f %f | %f %f | %f %f", model.gain_c1(),
+  return abslx::StrFormat("%f %f | %f %f | %f %f", model.gain_c1(),
                          model.bias_c1(), model.gain_c2(), model.bias_c2(),
                          model.gain_c3(), model.bias_c3());
 }

@@ -34,7 +34,7 @@ namespace audio_dsp {
 
 using ::Eigen::ArrayXf;
 using ::Eigen::ArrayXXf;
-using ::absl::Span;
+using ::abslx::Span;
 
 namespace {
 

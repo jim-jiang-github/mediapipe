@@ -250,7 +250,7 @@ TEST(AppendFeatureValuesTest, FloatValuesFromContainerWithStringViewKey) {
   Example example;
 
   std::vector<double> values{1.1, 2.2, 3.3};
-  absl::string_view key("tag");
+  abslx::string_view key("tag");
   AppendFeatureValues(values, key, &example);
 
   auto tag_ro = GetFeatureValues<float>("tag", example);
@@ -275,7 +275,7 @@ TEST(AppendFeatureValuesTest, FloatValuesUsingInitializerList) {
 TEST(AppendFeatureValuesTest,
      FloatValuesUsingInitializerListWithStringViewKey) {
   Example example;
-  absl::string_view key("tag");
+  abslx::string_view key("tag");
   AppendFeatureValues({1.1, 2.2, 3.3}, key, &example);
 
   auto tag_ro = GetFeatureValues<float>("tag", example);
@@ -299,7 +299,7 @@ TEST(AppendFeatureValuesTest, FloatValuesUsingIterators) {
 
 TEST(AppendFeatureValuesTest, FloatValuesUsingIteratorsWithStringViewKey) {
   Example example;
-  absl::string_view key("tag");
+  abslx::string_view key("tag");
   std::vector<double> values{1.1, 2.2, 3.3};
   AppendFeatureValues(values.begin(), values.end(), key, &example);
 
@@ -328,7 +328,7 @@ TEST(SetFeatureValuesTest, ContainerOfStringView) {
   Example example;
 
   std::vector<std::string> values = {"hello", "world"};
-  std::vector<absl::string_view> values_string_view(values.begin(),
+  std::vector<abslx::string_view> values_string_view(values.begin(),
                                                     values.end());
 
   SetFeatureValues(values_string_view, "tag", &example);

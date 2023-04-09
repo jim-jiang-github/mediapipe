@@ -25,26 +25,26 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status CheckMaxSupportedOpVersion(const TfLiteRegistration* registration,
+abslx::Status CheckMaxSupportedOpVersion(const TfLiteRegistration* registration,
                                         int max_version) {
   const int op_version = registration->version;
   if (op_version > max_version) {
-    return absl::UnimplementedError(
-        absl::StrCat("Max version supported: ", max_version,
+    return abslx::UnimplementedError(
+        abslx::StrCat("Max version supported: ", max_version,
                      ". Requested version ", op_version, "."));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 HW ToHW(int32_t h, int32_t w) { return HW(h > 0 ? h : 1, w > 0 ? w : 1); }
 
-absl::Status ParsePoolingAttributes(const TfLitePoolParams* tf_options,
+abslx::Status ParsePoolingAttributes(const TfLitePoolParams* tf_options,
                                     const BHWC& input_shape,
                                     Pooling2DAttributes* attr) {
   attr->kernel = ToHW(tf_options->filter_height, tf_options->filter_width);
   attr->strides = ToHW(tf_options->stride_height, tf_options->stride_width);
   UpdatePadding(tf_options->padding, input_shape, attr);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

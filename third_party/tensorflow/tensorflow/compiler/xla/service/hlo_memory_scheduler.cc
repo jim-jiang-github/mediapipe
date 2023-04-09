@@ -81,7 +81,7 @@ class ListScheduler {
       HloComputation* computation,
       const TuplePointsToAnalysis& points_to_analysis,
       const BufferValue::SizeFunction& size_function,
-      const absl::flat_hash_map<const HloComputation*, int64_t>&
+      const abslx::flat_hash_map<const HloComputation*, int64_t>&
           memory_by_computation) {
     ListScheduler scheduler(computation, points_to_analysis, size_function,
                             memory_by_computation);
@@ -106,7 +106,7 @@ class ListScheduler {
   ListScheduler(HloComputation* computation,
                 const TuplePointsToAnalysis& points_to_analysis,
                 const BufferValue::SizeFunction& size_function,
-                const absl::flat_hash_map<const HloComputation*, int64_t>&
+                const abslx::flat_hash_map<const HloComputation*, int64_t>&
                     memory_by_computation)
       : computation_(computation),
         points_to_analysis_(points_to_analysis),
@@ -117,7 +117,7 @@ class ListScheduler {
     // LogicalBuffer is in an operand of the instruction as indicated by
     // points-to analysis.
     for (auto* instruction : computation->instructions()) {
-      absl::flat_hash_set<const LogicalBuffer*> instr_uses;
+      abslx::flat_hash_set<const LogicalBuffer*> instr_uses;
       for (auto* operand : instruction->operands()) {
         points_to_analysis.GetPointsToSet(operand).ForEachElement(
             [&](const ShapeIndex& /*index*/,
@@ -274,7 +274,7 @@ class ListScheduler {
 
     // Populate the ready list with instructions which have no operands or
     // control predecessors.
-    absl::flat_hash_map<const HloInstruction*, int64_t> unscheduled_pred_count;
+    abslx::flat_hash_map<const HloInstruction*, int64_t> unscheduled_pred_count;
     for (auto* instruction : computation_->instructions()) {
       // TODO(b/34466113): Replace this and above with successors() or
       // predecessors() when these methods are added to HloInstruction.
@@ -290,7 +290,7 @@ class ListScheduler {
     std::multimap<Priority, ReadyListEntry> ready_queue;
 
     // Map of ready instructions to their iterators in ready_queue.
-    absl::flat_hash_map<const HloInstruction*,
+    abslx::flat_hash_map<const HloInstruction*,
                         std::multimap<Priority, ReadyListEntry>::iterator>
         ready_instructions;
 
@@ -385,19 +385,19 @@ class ListScheduler {
   // Computations are analyzed in post-order. When scheduling an instruction
   // that includes subcomputations, such as a while loop, we use this map to
   // look up the memory needed by subcomputations.
-  const absl::flat_hash_map<const HloComputation*, int64_t>&
+  const abslx::flat_hash_map<const HloComputation*, int64_t>&
       memory_by_computation_;
 
   // A map containing the LogicalBuffers that each instruction uses.
-  absl::flat_hash_map<const HloInstruction*, std::vector<const LogicalBuffer*>>
+  abslx::flat_hash_map<const HloInstruction*, std::vector<const LogicalBuffer*>>
       buffer_uses_;
 
   // A map containing the count of unscheduled HLOs which using a particular
   // LogicalBuffer.
-  absl::flat_hash_map<const LogicalBuffer*, int64_t> unscheduled_use_count_;
+  abslx::flat_hash_map<const LogicalBuffer*, int64_t> unscheduled_use_count_;
 
   // Set of instructions which have been scheduled.
-  absl::flat_hash_set<const HloInstruction*> scheduled_instructions_;
+  abslx::flat_hash_set<const HloInstruction*> scheduled_instructions_;
 };
 
 int64_t SumLogicalBufferSizes(
@@ -416,7 +416,7 @@ StatusOr<HloInstructionSequence> ScheduleComputationHelper(
     const HloAliasAnalysis& alias_analysis,
     const BufferValue::SizeFunction& size_function,
     const MemorySchedulerAlgorithm& algorithm,
-    const absl::flat_hash_map<const HloComputation*, int64_t>&
+    const abslx::flat_hash_map<const HloComputation*, int64_t>&
         memory_by_computation,
     const MemorySchedulerPostprocessor& postprocessor, int64_t* peak_memory) {
   VLOG(2) << "Computation: " << computation->name();
@@ -438,7 +438,7 @@ StatusOr<HloInstructionSequence> DFSMemoryScheduler(
     const TuplePointsToAnalysis& points_to_analysis,
     const HloAliasAnalysis& alias_analysis,
     const BufferValue::SizeFunction& size_function,
-    const absl::flat_hash_map<const HloComputation*, int64_t>&
+    const abslx::flat_hash_map<const HloComputation*, int64_t>&
         memory_by_computation,
     const MemorySchedulerPostprocessor& postprocessor, int64_t* peak_memory) {
   // These variables are a hack to prevent overflows.
@@ -450,7 +450,7 @@ StatusOr<HloInstructionSequence> DFSMemoryScheduler(
     // Transitively includes the sizes of all nodes that lead to it.
     int64_t total_sizes = 0;
   };
-  absl::flat_hash_map<const HloInstruction*, Stats> stats_map;
+  abslx::flat_hash_map<const HloInstruction*, Stats> stats_map;
   stats_map.reserve(computation->instruction_count());
 
   for (const HloInstruction* hlo : computation->MakeInstructionPostOrder()) {
@@ -468,7 +468,7 @@ StatusOr<HloInstructionSequence> DFSMemoryScheduler(
         points_to_analysis.GetBuffersDefinedByInstruction(hlo), size_function);
     stats.total_sizes = logical_buffer_size;
     cumulative_total_size += logical_buffer_size;
-    absl::flat_hash_set<const HloInstruction*> unique_operands(
+    abslx::flat_hash_set<const HloInstruction*> unique_operands(
         hlo->operands().begin(), hlo->operands().end());
     for (const HloInstruction* operand : unique_operands) {
       auto& operand_stats = stats_map.at(operand);
@@ -531,10 +531,10 @@ ModuleSchedulerAlgorithm ComputationSchedulerToModuleScheduler(
              const TuplePointsToAnalysis& points_to_analysis,
              const HloAliasAnalysis& alias_analysis,
              const LogicalBuffer::SizeFunction& size_func,
-             const absl::flat_hash_set<absl::string_view>& execution_threads,
+             const abslx::flat_hash_set<abslx::string_view>& execution_threads,
              int64_t* peak_memory) -> StatusOr<HloSchedule> {
     HloSchedule schedule(module);
-    absl::flat_hash_map<const HloComputation*, int64_t> memory_by_computation;
+    abslx::flat_hash_map<const HloComputation*, int64_t> memory_by_computation;
     for (auto* computation :
          module->MakeComputationPostOrder(execution_threads)) {
       if (!computation->IsFusionComputation()) {
@@ -560,7 +560,7 @@ StatusOr<HloInstructionSequence> ListMemoryScheduler(
     const TuplePointsToAnalysis& points_to_analysis,
     const HloAliasAnalysis& alias_analysis,
     const BufferValue::SizeFunction& size_function,
-    const absl::flat_hash_map<const HloComputation*, int64_t>&
+    const abslx::flat_hash_map<const HloComputation*, int64_t>&
         memory_by_computation,
     const MemorySchedulerPostprocessor& postprocessor, int64_t* peak_memory) {
   TF_ASSIGN_OR_RETURN(HloInstructionSequence sequence,
@@ -583,7 +583,7 @@ StatusOr<HloInstructionSequence> PostOrderMemoryScheduler(
     const TuplePointsToAnalysis& points_to_analysis,
     const HloAliasAnalysis& alias_analysis,
     const BufferValue::SizeFunction& size_function,
-    const absl::flat_hash_map<const HloComputation*, int64_t>&
+    const abslx::flat_hash_map<const HloComputation*, int64_t>&
         memory_by_computation,
     const MemorySchedulerPostprocessor& postprocessor, int64_t* peak_memory) {
   HloInstructionSequence sequence(computation->MakeInstructionPostOrder());
@@ -604,7 +604,7 @@ StatusOr<HloInstructionSequence> DefaultMemoryScheduler(
     const TuplePointsToAnalysis& points_to_analysis,
     const HloAliasAnalysis& alias_analysis,
     const BufferValue::SizeFunction& size_function,
-    const absl::flat_hash_map<const HloComputation*, int64_t>&
+    const abslx::flat_hash_map<const HloComputation*, int64_t>&
         memory_by_computation,
     const MemorySchedulerPostprocessor& postprocessor, int64_t* peak_memory) {
   // We try a few schedulers and choose whichever returns a lower min-memory,
@@ -664,7 +664,7 @@ StatusOr<HloSchedule> DefaultModuleScheduler(
     const HloModule* module, const TuplePointsToAnalysis& points_to_analysis,
     const HloAliasAnalysis& alias_analysis,
     const BufferValue::SizeFunction& size_function,
-    const absl::flat_hash_set<absl::string_view>& execution_threads,
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads,
     int64_t* peak_memory) {
   // We try a few schedulers and choose whichever returns a lower min-memory,
   // not accounting for fragmentation.
@@ -723,7 +723,7 @@ StatusOr<HloSchedule> DefaultModuleScheduler(
 StatusOr<HloSchedule> ScheduleModule(
     const HloModule* module, const BufferValue::SizeFunction& size_function,
     const ModuleSchedulerAlgorithm& algorithm,
-    const absl::flat_hash_set<absl::string_view>& execution_threads,
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads,
     int64_t* peak_memory) {
   TF_ASSIGN_OR_RETURN(std::unique_ptr<TuplePointsToAnalysis> points_to_analysis,
                       TuplePointsToAnalysis::Run(module));
@@ -748,7 +748,7 @@ StatusOr<HloInstructionSequence> ScheduleComputation(
                       TuplePointsToAnalysis::Run(computation->parent()));
   TF_ASSIGN_OR_RETURN(std::unique_ptr<HloAliasAnalysis> alias_analysis,
                       HloAliasAnalysis::Run(computation->parent()));
-  absl::flat_hash_map<const HloComputation*, int64_t> empty_map;
+  abslx::flat_hash_map<const HloComputation*, int64_t> empty_map;
   return ScheduleComputationHelper(
       computation, *points_to_analysis, *alias_analysis, size_function,
       /*algorithm=*/nullptr, empty_map, postprocessor,
@@ -762,7 +762,7 @@ HloMemoryScheduler::HloMemoryScheduler(
 
 StatusOr<bool> HloMemoryScheduler::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   TF_ASSIGN_OR_RETURN(
       HloSchedule schedule,
       ScheduleModule(module, size_function_, algorithm_, execution_threads));
@@ -772,7 +772,7 @@ StatusOr<bool> HloMemoryScheduler::Run(
 
 StatusOr<bool> HloTrivialScheduler::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   HloSchedule schedule(module);
   for (HloComputation* computation :
        module->MakeComputationPostOrder(execution_threads)) {
@@ -794,7 +794,7 @@ StatusOr<bool> HloTrivialScheduler::Run(
 
 StatusOr<bool> HloDescheduler::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = module->has_schedule();
   module->clear_schedule();
   return changed;

@@ -29,10 +29,10 @@ namespace grappler {
 
 namespace {
 
-void CheckSameTransposerForOps(absl::Span<const string> ops,
+void CheckSameTransposerForOps(abslx::Span<const string> ops,
                                TransposerFactory* factory,
-                               absl::flat_hash_set<Transposer*>* transposers) {
-  absl::flat_hash_set<Transposer*> created_transposers;
+                               abslx::flat_hash_set<Transposer*>* transposers) {
+  abslx::flat_hash_set<Transposer*> created_transposers;
   for (int i = 0; i < ops.size(); i++) {
     NodeDef node;
     node.set_op(ops[i]);
@@ -57,7 +57,7 @@ void CheckSameTransposerForOps(absl::Span<const string> ops,
 
 TEST(TransposerFactoryTest, SanityCheck) {
   TransposerFactory factory;
-  absl::flat_hash_set<Transposer*> transposers;
+  abslx::flat_hash_set<Transposer*> transposers;
 
   CheckSameTransposerForOps(
       {"Conv2D", "FusedBatchNorm", "DepthwiseConv2dNative"}, &factory,

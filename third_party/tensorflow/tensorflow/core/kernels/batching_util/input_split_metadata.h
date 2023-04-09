@@ -36,17 +36,17 @@ class InputSplitMetadata {
                      int batch_size_limit);
 
   // Returns underlying task sizes.
-  const absl::FixedArray<int>& task_sizes() const;
+  const abslx::FixedArray<int>& task_sizes() const;
 
   // Serializes task split metadata into a string for debugging.
   std::string DebugString() const;
 
  private:
-  absl::FixedArray<int> generate_task_sizes(int input_task_size,
+  abslx::FixedArray<int> generate_task_sizes(int input_task_size,
                                             int open_batch_remaining_slot,
                                             int batch_size_limit) const;
 
-  const absl::FixedArray<int> task_sizes_;
+  const abslx::FixedArray<int> task_sizes_;
 };
 }  // namespace internal
 }  // namespace serving

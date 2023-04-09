@@ -36,8 +36,8 @@ limitations under the License.
 namespace tensorflow {
 
 namespace {
-constexpr absl::Duration kListenInterval = absl::Seconds(1);
-constexpr absl::Time kUnsetDeathTime = absl::InfinitePast();
+constexpr abslx::Duration kListenInterval = abslx::Seconds(1);
+constexpr abslx::Time kUnsetDeathTime = abslx::InfinitePast();
 static std::atomic_bool sigterm_received(false);
 
 class SigtermNotifier : public PreemptionNotifier {
@@ -50,7 +50,7 @@ class SigtermNotifier : public PreemptionNotifier {
 
  private:
   void StartListenerThread();
-  absl::Notification shutdown_notification_;
+  abslx::Notification shutdown_notification_;
   std::unique_ptr<Thread> preempt_listener_thread_;
 };
 
@@ -86,7 +86,7 @@ void SigtermNotifier::StartListenerThread() {
             return;
           }
         }
-        const absl::Time death_time = absl::Now();
+        const abslx::Time death_time = abslx::Now();
         LOG(WARNING) << "SIGTERM caught at " << death_time;
         // Notify registered listeners.
         NotifyRegisteredListeners(death_time);
@@ -95,10 +95,10 @@ void SigtermNotifier::StartListenerThread() {
 
 }  // namespace
 
-StatusOr<absl::Time> PreemptionNotifier::WillBePreemptedAt() {
-  absl::Notification n;
-  StatusOr<absl::Time> result;
-  WillBePreemptedAtAsync([&n, &result](StatusOr<absl::Time> async_result) {
+StatusOr<abslx::Time> PreemptionNotifier::WillBePreemptedAt() {
+  abslx::Notification n;
+  StatusOr<abslx::Time> result;
+  WillBePreemptedAtAsync([&n, &result](StatusOr<abslx::Time> async_result) {
     result = async_result;
     n.Notify();
   });
@@ -118,7 +118,7 @@ void PreemptionNotifier::WillBePreemptedAtAsync(PreemptTimeCallback callback) {
 }
 
 void PreemptionNotifier::NotifyRegisteredListeners(
-    StatusOr<absl::Time> death_time) {
+    StatusOr<abslx::Time> death_time) {
   mutex_lock l(mu_);
   if (death_time.ok()) {
     death_time_ = death_time.value();

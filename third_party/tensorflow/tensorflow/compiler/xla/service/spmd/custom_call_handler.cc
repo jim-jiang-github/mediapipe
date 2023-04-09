@@ -42,11 +42,11 @@ namespace spmd {
 
 namespace {
 
-StatusOr<absl::flat_hash_map<std::string, int64_t>> ParseOpaqueAsAttributes(
+StatusOr<abslx::flat_hash_map<std::string, int64_t>> ParseOpaqueAsAttributes(
     const HloInstruction* hlo) {
-  absl::string_view opaque = Cast<HloCustomCallInstruction>(hlo)->opaque();
+  abslx::string_view opaque = Cast<HloCustomCallInstruction>(hlo)->opaque();
   HloLexer lexer(opaque);
-  absl::flat_hash_map<std::string, int64_t> result;
+  abslx::flat_hash_map<std::string, int64_t> result;
   while (lexer.Lex() != TokKind::kEof) {
     if (lexer.GetKind() != TokKind::kAttributeName) {
       return InvalidArgument("Expects attribute name, %s", opaque);
@@ -302,7 +302,7 @@ Status SpmdPartitioningVisitor::HandleCustomCallSPMDInternal_RotateRight(
       if (shard_distance != 0) {
         std::vector<std::pair<int64_t, int64_t>> pairs;
         hlo->sharding().tile_assignment().Each(
-            [&](absl::Span<const int64_t> indices, int64_t device) {
+            [&](abslx::Span<const int64_t> indices, int64_t device) {
               if (indices[dim] >= participating_shards) {
                 return;
               }
@@ -368,7 +368,7 @@ Status SpmdPartitioningVisitor::HandleCustomCallSPMDInternal_RotateRight(
 
 std::unique_ptr<HloInstruction> CreateCustomCallSPMDInternal_RotateRight(
     HloInstruction* input, int64_t dim, int64_t amount) {
-  std::string opaque = absl::StrCat("dimension=", dim, ",amount=", amount);
+  std::string opaque = abslx::StrCat("dimension=", dim, ",amount=", amount);
   return HloInstruction::CreateCustomCall(input->shape(), {input},
                                           kSPMDOpRotateRight, opaque);
 }

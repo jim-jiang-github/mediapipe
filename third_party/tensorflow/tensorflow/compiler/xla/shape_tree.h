@@ -59,7 +59,7 @@ class IndexTable {
  private:
   void CreateEntry(Entry& entry, const Shape& shape, size_t& next_node_id);
 
-  absl::InlinedVector<Entry, 1> entries_;
+  abslx::InlinedVector<Entry, 1> entries_;
 };
 
 }  // namespace internal
@@ -91,7 +91,7 @@ class ShapeTree {
  public:
   // TODO(cjfj): Don't store ShapeIndex with data. Generate it or cache it?
   using Node = std::pair<ShapeIndex, T>;
-  using Nodes = absl::InlinedVector<Node, 1>;
+  using Nodes = abslx::InlinedVector<Node, 1>;
   using IndexTable = internal::IndexTable;
 
   template <typename Iterator, typename ValueType>
@@ -214,14 +214,14 @@ class ShapeTree {
   // Recursively traverses the shape and calls the given function at each
   // element.
   void ForEachElement(
-      absl::FunctionRef<void(const ShapeIndex&, const T&)> func) const {
+      abslx::FunctionRef<void(const ShapeIndex&, const T&)> func) const {
     for (const Node& node : nodes_) {
       func(node.first, node.second);
     }
   }
 
   void ForEachMutableElement(
-      absl::FunctionRef<void(const ShapeIndex&, T*)> func) {
+      abslx::FunctionRef<void(const ShapeIndex&, T*)> func) {
     for (Node& node : nodes_) {
       func(node.first, &node.second);
     }
@@ -230,7 +230,7 @@ class ShapeTree {
   // Like ForEach(Mutable)Element, but the callable returns a Status instead of
   // void.  The first non-OK return value is returned by the ForEach* function.
   Status ForEachElementWithStatus(
-      absl::FunctionRef<Status(const ShapeIndex&, const T&)> func) const {
+      abslx::FunctionRef<Status(const ShapeIndex&, const T&)> func) const {
     for (const Node& node : nodes_) {
       TF_RETURN_IF_ERROR(func(node.first, node.second));
     }
@@ -238,7 +238,7 @@ class ShapeTree {
   }
 
   Status ForEachMutableElementWithStatus(
-      absl::FunctionRef<Status(const ShapeIndex&, T*)> func) {
+      abslx::FunctionRef<Status(const ShapeIndex&, T*)> func) {
     for (Node& node : nodes_) {
       TF_RETURN_IF_ERROR(func(node.first, &node.second));
     }
@@ -247,7 +247,7 @@ class ShapeTree {
 
   // Maps each element to generate a new tree with the same shape.
   template <typename U>
-  ShapeTree<U> Map(absl::FunctionRef<U(const T&)> func) {
+  ShapeTree<U> Map(abslx::FunctionRef<U(const T&)> func) {
     typename ShapeTree<U>::Nodes result_nodes;
     result_nodes.reserve(nodes_.size());
     for (const Node& node : nodes_) {

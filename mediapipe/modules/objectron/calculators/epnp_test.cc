@@ -152,7 +152,7 @@ TEST_F(SolveEpnpTest, BadInput2dPoints) {
   std::vector<Vector3f> output_3d_points;
   EXPECT_THAT(SolveEpnp(kFocalX, kFocalY, kCenterX, kCenterY,
                         /*portrait*/ false, input_2d_points, &output_3d_points),
-              StatusIs(absl::StatusCode::kInvalidArgument,
+              StatusIs(abslx::StatusCode::kInvalidArgument,
                        HasSubstr("Input must has")));
 }
 
@@ -161,7 +161,7 @@ TEST_F(SolveEpnpTest, BadOutput3dPoints) {
   std::vector<Vector3f>* output_3d_points = nullptr;
   EXPECT_THAT(SolveEpnp(kFocalX, kFocalY, kCenterX, kCenterY,
                         /*portrait*/ false, input_2d_points_, output_3d_points),
-              StatusIs(absl::StatusCode::kInvalidArgument,
+              StatusIs(abslx::StatusCode::kInvalidArgument,
                        "Output pointer output_points_3d is Null."));
 }
 

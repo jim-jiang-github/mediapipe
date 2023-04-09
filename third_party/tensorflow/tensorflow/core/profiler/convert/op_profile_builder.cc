@@ -54,7 +54,7 @@ void PopulateSymbolNode(const OpMetrics& op_metrics, Node* node) {
       auto* dim = xla.mutable_layout()->add_dimensions();
       dim->set_size(dimension.size());
       dim->set_alignment(dimension.alignment());
-      dim->set_semantics(absl::AsciiStrToLower(
+      dim->set_semantics(abslx::AsciiStrToLower(
           LayoutDimensionSemantics_Name(dimension.semantics())));
     }
   }
@@ -80,7 +80,7 @@ Node TopKChildren(const Node* root, int k, Cmp cmp) {
 void CopySymbolDetailsToDeduplicatedNode(Node* top_child_node,
                                          Node* deduplicated_node) {
   deduplicated_node->set_name(
-      absl::StrCat(top_child_node->name(), " and its duplicate(s)"));
+      abslx::StrCat(top_child_node->name(), " and its duplicate(s)"));
   Node::XLAInstruction& xla = *deduplicated_node->mutable_xla();
   const Node::XLAInstruction& top_child_node_xla = top_child_node->xla();
   xla.set_expression(top_child_node_xla.expression());

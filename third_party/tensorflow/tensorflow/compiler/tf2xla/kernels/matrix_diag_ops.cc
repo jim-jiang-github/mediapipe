@@ -159,7 +159,7 @@ xla::XlaOp SetMatrixDiag(const xla::XlaOp input, const xla::XlaOp diag,
   //              [0, 0, 0, 0]]                 [x, x, x, x]],
   //    where x denotes the existing input contents.
   std::vector<int64_t> broadcast_dimensions(input_rank - 1);
-  absl::c_iota(broadcast_dimensions, 0);
+  abslx::c_iota(broadcast_dimensions, 0);
   auto output = input;
   for (int64_t diag_index = lower_diag_index; diag_index <= upper_diag_index;
        ++diag_index) {

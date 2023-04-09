@@ -107,7 +107,7 @@ int32_t MatMulF32(const void* run_options_ptr, float* out, float* lhs,
     return -1;
   }
 
-  static absl::once_flag flag_once;
+  static abslx::once_flag flag_once;
   const xla::ExecutableRunOptions* run_options =
       static_cast<const xla::ExecutableRunOptions*>(run_options_ptr);
   XLA_LIGHTWEIGHT_CHECK(run_options->intra_op_thread_pool() != nullptr);
@@ -118,7 +118,7 @@ int32_t MatMulF32(const void* run_options_ptr, float* out, float* lhs,
 
   // arm_compute::Scheduler does not support concurrent access thus a
   // workaround here restricts it to only one call
-  absl::call_once(flag_once, [&]() {
+  abslx::call_once(flag_once, [&]() {
     arm_compute::Scheduler::get().set_num_threads(max_threads);
   });
 

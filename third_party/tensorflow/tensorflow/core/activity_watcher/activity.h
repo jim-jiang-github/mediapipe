@@ -59,7 +59,7 @@ static tensorflow::string ToString(ActivityCategory category) {
 // An activity to be recorded.
 struct Activity {
   using Attributes =
-      absl::flat_hash_map<tensorflow::string, tensorflow::string>;
+      abslx::flat_hash_map<tensorflow::string, tensorflow::string>;
   // A human readable title of the activity.
   tensorflow::string title;
   // The category of the activity.

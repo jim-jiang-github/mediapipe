@@ -50,8 +50,8 @@ EIGEN_DEVICE_FUNC EIGEN_DONT_INLINE bool UseCustomContractionKernels() {
 // This subroutine should not be used in GPU. In case it is, a custom kernel
 // should always be used
 #if !defined __NVCC__ && !defined __HIP_DEVICE_COMPILE__
-  static absl::once_flag initialized;
-  absl::call_once(initialized, [&] {
+  static abslx::once_flag initialized;
+  abslx::call_once(initialized, [&] {
     char* flag = std::getenv("TENSORFLOW_USE_CUSTOM_CONTRACTION_KERNEL");
     if (flag && (strcmp(flag, "false") == 0 || strcmp(flag, "0") == 0)) {
       use_custom_contraction_kernel = false;

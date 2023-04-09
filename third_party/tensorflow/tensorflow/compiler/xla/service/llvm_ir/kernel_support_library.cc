@@ -20,7 +20,7 @@ limitations under the License.
 
 namespace xla {
 Status KernelSupportLibrary::ForWithStatus(
-    absl::string_view name, llvm::Value* start, llvm::Value* end,
+    abslx::string_view name, llvm::Value* start, llvm::Value* end,
     llvm::Value* step,
     const std::function<Status(llvm::Value*, bool)>& for_body_generator) {
   return IfWithStatus(b_->CreateICmpSLT(start, end), [&]() -> Status {
@@ -32,7 +32,7 @@ Status KernelSupportLibrary::ForWithStatus(
 }
 
 Status KernelSupportLibrary::ForWithStatus(
-    absl::string_view name, llvm::Value* start, llvm::Value* end,
+    abslx::string_view name, llvm::Value* start, llvm::Value* end,
     llvm::Value* step, bool peel_first_iteration,
     const std::function<Status(llvm::Value*, llvm::Value*)>&
         for_body_generator) {
@@ -58,7 +58,7 @@ Status KernelSupportLibrary::ForWithStatus(
 }
 
 Status KernelSupportLibrary::IfWithStatus(
-    absl::string_view name, llvm::Value* condition,
+    abslx::string_view name, llvm::Value* condition,
     const std::function<Status()>& true_block_generator,
     const std::function<Status()>& false_block_generator) {
   llvm_ir::LlvmIfData if_data =
@@ -76,7 +76,7 @@ Status KernelSupportLibrary::IfWithStatus(
 
 void KernelSupportLibrary::EmitAndCallOutlinedKernel(
     const HloModuleConfig& module_config, llvm::IRBuilder<>* b,
-    absl::string_view kernel_name,
+    abslx::string_view kernel_name,
     KernelSupportLibrary::ArgumentVector arguments,
     const std::function<void(KernelSupportLibrary::ArgumentVector)>&
         kernel_body_generator) {

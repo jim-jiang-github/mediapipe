@@ -68,7 +68,7 @@ namespace {
 
 bool AreAllParentsGuaranteedConst(
     const Node& n,
-    const absl::flat_hash_set<const Node*>& runtime_const_nodes) {
+    const abslx::flat_hash_set<const Node*>& runtime_const_nodes) {
   if (n.type_string() == "GuaranteeConst") {
     // If the current node is itself a cast-to-const, no need
     // to look at the incoming edges.
@@ -91,7 +91,7 @@ bool AreAllParentsGuaranteedConst(
 void MarkGuaranteedConstants(
     const Graph& graph,
     const std::vector<std::pair<const Node*, Node*>>& src_arg_pairs) {
-  absl::flat_hash_set<const Node*> guaranteed_const_nodes;
+  abslx::flat_hash_set<const Node*> guaranteed_const_nodes;
   std::vector<const Node*> srcs;
   srcs.reserve(src_arg_pairs.size());
   for (const auto& src_arg : src_arg_pairs) {
@@ -272,7 +272,7 @@ class Encapsulator {
     // Set of node names that are the source of a control output of the
     // subgraph. We store strings here so that we can tolerate nodes being
     // removed from the graph.
-    absl::flat_hash_set<string> control_output_nodes_;
+    abslx::flat_hash_set<string> control_output_nodes_;
 
     // NoOp node in the output graph that is sequenced after the call node.
     Node* sequencer_ = nullptr;
@@ -459,7 +459,7 @@ Status Encapsulator::Subgraph::RecordArg(
   if (inserted) {
     NodeDef arg_def;
     NodeDefBuilder builder(
-        absl::StrCat(src_node->name(), "_", src_slot, "_arg"), kArgOp,
+        abslx::StrCat(src_node->name(), "_", src_slot, "_arg"), kArgOp,
         NodeDebugInfo(src_node->def()));
     DataType dtype = edge->dst()->input_type(edge->dst_input());
     builder.Attr("T", dtype);
@@ -502,7 +502,7 @@ Status Encapsulator::Subgraph::RecordResult(
   if (inserted) {
     NodeDef ret_def;
     NodeDefBuilder builder(
-        absl::StrCat(src_node->name(), "_", src_slot, "_retval"), kRetValOp,
+        abslx::StrCat(src_node->name(), "_", src_slot, "_retval"), kRetValOp,
         NodeDebugInfo(src_node->def()));
     DataType dtype = src_node->output_type(src_slot);
     builder.Attr("T", dtype);
@@ -521,7 +521,7 @@ Status Encapsulator::Subgraph::MakeSequencingNode(const string& subgraph_name,
   if (sequencer_ == nullptr) {
     NodeDef seq_def;
     // TODO(shikharagarwal): What source node should we use for errors?
-    NodeDefBuilder builder(absl::StrCat(subgraph_name, "_sequencer"), "NoOp");
+    NodeDefBuilder builder(abslx::StrCat(subgraph_name, "_sequencer"), "NoOp");
     builder.Attr(kXlaHostTransferSequencerAttr, subgraph_name);
     builder.Device(device_);
     Status s = builder.Finalize(&seq_def);
@@ -592,7 +592,7 @@ Status Encapsulator::Subgraph::BuildFunctionDef(
   FunctionDef fdef;
   auto lookup = [this](const Node* node) -> std::optional<string> {
     if (control_output_nodes_.contains(node->name())) {
-      return absl::make_optional(node->name());
+      return abslx::make_optional(node->name());
     }
     return std::nullopt;
   };
@@ -603,9 +603,9 @@ Status Encapsulator::Subgraph::BuildFunctionDef(
 
   if (VLOG_IS_ON(1)) {
     VLOG(2) << "Build function def " << name;
-    DumpGraphToFile(absl::StrCat("encapsulate_fdef_graph_", name), *graph_,
+    DumpGraphToFile(abslx::StrCat("encapsulate_fdef_graph_", name), *graph_,
                     library);
-    DumpFunctionDefToFile(absl::StrCat("encapsulate_fdef_", name), fdef);
+    DumpFunctionDefToFile(abslx::StrCat("encapsulate_fdef_", name), fdef);
   }
 
   const FunctionDef* original_fdef = library->Find(name);
@@ -626,9 +626,9 @@ Status Encapsulator::Subgraph::ReplaceFunctionDef(
 
   if (VLOG_IS_ON(1)) {
     VLOG(2) << "Replace function def " << name;
-    DumpGraphToFile(absl::StrCat("replace_encapsulate_fdef_graph_", name),
+    DumpGraphToFile(abslx::StrCat("replace_encapsulate_fdef_graph_", name),
                     *graph_, library);
-    DumpFunctionDefToFile(absl::StrCat("replace_encapsulate_fdef_", name),
+    DumpFunctionDefToFile(abslx::StrCat("replace_encapsulate_fdef_", name),
                           fdef);
   }
 
@@ -773,7 +773,7 @@ Status Encapsulator::SplitIntoSubgraphs(FunctionLibraryDefinition* library) {
     // Dump subgraphs.
     for (auto& entry : subgraphs_) {
       DumpGraphToFile(
-          absl::StrCat("encapsulate_subgraphs_subgraph_", entry.first),
+          abslx::StrCat("encapsulate_subgraphs_subgraph_", entry.first),
           *entry.second.GetGraph(), library);
     }
   }
@@ -1299,7 +1299,7 @@ Status EncapsulateSubgraphsPass::Run(
 
   *options.graph = std::move(graph_out);
 
-  TF_ASSIGN_OR_RETURN(absl::flat_hash_set<Node*> ref_related_nodes,
+  TF_ASSIGN_OR_RETURN(abslx::flat_hash_set<Node*> ref_related_nodes,
                       GetNodesRelatedToRefVariables(**options.graph, flr));
   for (Node* node : (*options.graph)->nodes()) {
     bool has_ref_vars = ref_related_nodes.contains(node);

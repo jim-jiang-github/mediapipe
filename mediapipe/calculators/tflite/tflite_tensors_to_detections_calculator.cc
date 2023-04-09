@@ -143,24 +143,24 @@ void ConvertAnchorsToRawValues(const std::vector<Anchor>& anchors,
 // }
 class TfLiteTensorsToDetectionsCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
-  absl::Status ProcessCPU(CalculatorContext* cc,
+  abslx::Status ProcessCPU(CalculatorContext* cc,
                           std::vector<Detection>* output_detections);
-  absl::Status ProcessGPU(CalculatorContext* cc,
+  abslx::Status ProcessGPU(CalculatorContext* cc,
                           std::vector<Detection>* output_detections);
 
-  absl::Status LoadOptions(CalculatorContext* cc);
-  absl::Status GpuInit(CalculatorContext* cc);
-  absl::Status DecodeBoxes(const float* raw_boxes,
+  abslx::Status LoadOptions(CalculatorContext* cc);
+  abslx::Status GpuInit(CalculatorContext* cc);
+  abslx::Status DecodeBoxes(const float* raw_boxes,
                            const std::vector<Anchor>& anchors,
                            std::vector<float>* boxes);
-  absl::Status ConvertToDetections(const float* detection_boxes,
+  abslx::Status ConvertToDetections(const float* detection_boxes,
                                    const float* detection_scores,
                                    const int* detection_classes,
                                    std::vector<Detection>* output_detections);
@@ -190,7 +190,7 @@ class TfLiteTensorsToDetectionsCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(TfLiteTensorsToDetectionsCalculator);
 
-absl::Status TfLiteTensorsToDetectionsCalculator::GetContract(
+abslx::Status TfLiteTensorsToDetectionsCalculator::GetContract(
     CalculatorContract* cc) {
   RET_CHECK(!cc->Inputs().GetTags().empty());
   RET_CHECK(!cc->Outputs().GetTags().empty());
@@ -224,10 +224,10 @@ absl::Status TfLiteTensorsToDetectionsCalculator::GetContract(
 #endif  // MEDIAPIPE_TFLITE_GL_INFERENCE
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteTensorsToDetectionsCalculator::Open(CalculatorContext* cc) {
+abslx::Status TfLiteTensorsToDetectionsCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
   if (cc->Inputs().HasTag(kTensorsGpuTag)) {
@@ -247,17 +247,17 @@ absl::Status TfLiteTensorsToDetectionsCalculator::Open(CalculatorContext* cc) {
     MP_RETURN_IF_ERROR(GpuInit(cc));
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteTensorsToDetectionsCalculator::Process(
+abslx::Status TfLiteTensorsToDetectionsCalculator::Process(
     CalculatorContext* cc) {
   if ((!gpu_input_ && cc->Inputs().Tag(kTensorsTag).IsEmpty()) ||
       (gpu_input_ && cc->Inputs().Tag(kTensorsGpuTag).IsEmpty())) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  auto output_detections = absl::make_unique<std::vector<Detection>>();
+  auto output_detections = abslx::make_unique<std::vector<Detection>>();
 
   if (gpu_input_) {
     MP_RETURN_IF_ERROR(ProcessGPU(cc, output_detections.get()));
@@ -272,10 +272,10 @@ absl::Status TfLiteTensorsToDetectionsCalculator::Process(
         .Add(output_detections.release(), cc->InputTimestamp());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteTensorsToDetectionsCalculator::ProcessCPU(
+abslx::Status TfLiteTensorsToDetectionsCalculator::ProcessCPU(
     CalculatorContext* cc, std::vector<Detection>* output_detections) {
   const auto& input_tensors =
       cc->Inputs().Tag(kTensorsTag).Get<std::vector<TfLiteTensor>>();
@@ -313,7 +313,7 @@ absl::Status TfLiteTensorsToDetectionsCalculator::ProcessCPU(
         anchors_ =
             cc->InputSidePackets().Tag("ANCHORS").Get<std::vector<Anchor>>();
       } else {
-        return absl::UnavailableError("No anchor data available.");
+        return abslx::UnavailableError("No anchor data available.");
       }
       anchors_init_ = true;
     }
@@ -390,9 +390,9 @@ absl::Status TfLiteTensorsToDetectionsCalculator::ProcessCPU(
                                            detection_classes.data(),
                                            output_detections));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
-absl::Status TfLiteTensorsToDetectionsCalculator::ProcessGPU(
+abslx::Status TfLiteTensorsToDetectionsCalculator::ProcessGPU(
     CalculatorContext* cc, std::vector<Detection>* output_detections) {
 #if MEDIAPIPE_TFLITE_GL_INFERENCE
   const auto& input_tensors =
@@ -401,7 +401,7 @@ absl::Status TfLiteTensorsToDetectionsCalculator::ProcessGPU(
 
   MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext([this, &input_tensors, &cc,
                                                  &output_detections]()
-                                                    -> absl::Status {
+                                                    -> abslx::Status {
     // Copy inputs.
     MP_RETURN_IF_ERROR(
         CopyBuffer(input_tensors[0], gpu_data_->raw_boxes_buffer));
@@ -415,7 +415,7 @@ absl::Status TfLiteTensorsToDetectionsCalculator::ProcessGPU(
         std::vector<float> raw_anchors(num_boxes_ * kNumCoordsPerBox);
         ConvertAnchorsToRawValues(anchors, num_boxes_, raw_anchors.data());
         MP_RETURN_IF_ERROR(gpu_data_->raw_anchors_buffer.Write<float>(
-            absl::MakeSpan(raw_anchors)));
+            abslx::MakeSpan(raw_anchors)));
       } else {
         CHECK_EQ(input_tensors.size(), kNumInputTensorsWithAnchors);
         MP_RETURN_IF_ERROR(
@@ -441,10 +441,10 @@ absl::Status TfLiteTensorsToDetectionsCalculator::ProcessGPU(
     // Copy decoded boxes from GPU to CPU.
     std::vector<float> boxes(num_boxes_ * num_coords_);
     MP_RETURN_IF_ERROR(
-        gpu_data_->decoded_boxes_buffer.Read(absl::MakeSpan(boxes)));
+        gpu_data_->decoded_boxes_buffer.Read(abslx::MakeSpan(boxes)));
     std::vector<float> score_class_id_pairs(num_boxes_ * 2);
     MP_RETURN_IF_ERROR(gpu_data_->scored_boxes_buffer.Read(
-        absl::MakeSpan(score_class_id_pairs)));
+        abslx::MakeSpan(score_class_id_pairs)));
 
     // TODO: b/138851969. Is it possible to output a float vector
     // for score and an int vector for class so that we can avoid copying twice?
@@ -458,7 +458,7 @@ absl::Status TfLiteTensorsToDetectionsCalculator::ProcessGPU(
         ConvertToDetections(boxes.data(), detection_scores.data(),
                             detection_classes.data(), output_detections));
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
 #elif MEDIAPIPE_TFLITE_METAL_INFERENCE
 
@@ -543,20 +543,20 @@ absl::Status TfLiteTensorsToDetectionsCalculator::ProcessGPU(
 #else
   LOG(ERROR) << "GPU input on non-Android not supported yet.";
 #endif  // MEDIAPIPE_TFLITE_GL_INFERENCE
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteTensorsToDetectionsCalculator::Close(CalculatorContext* cc) {
+abslx::Status TfLiteTensorsToDetectionsCalculator::Close(CalculatorContext* cc) {
 #if MEDIAPIPE_TFLITE_GL_INFERENCE
   gpu_helper_.RunInGlContext([this] { gpu_data_.reset(); });
 #elif MEDIAPIPE_TFLITE_METAL_INFERENCE
   gpu_data_.reset();
 #endif  // MEDIAPIPE_TFLITE_GL_INFERENCE
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteTensorsToDetectionsCalculator::LoadOptions(
+abslx::Status TfLiteTensorsToDetectionsCalculator::LoadOptions(
     CalculatorContext* cc) {
   // Get calculator options specified in the graph.
   options_ =
@@ -578,10 +578,10 @@ absl::Status TfLiteTensorsToDetectionsCalculator::LoadOptions(
     ignore_classes_.insert(options_.ignore_classes(i));
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteTensorsToDetectionsCalculator::DecodeBoxes(
+abslx::Status TfLiteTensorsToDetectionsCalculator::DecodeBoxes(
     const float* raw_boxes, const std::vector<Anchor>& anchors,
     std::vector<float>* boxes) {
   for (int i = 0; i < num_boxes_; ++i) {
@@ -642,10 +642,10 @@ absl::Status TfLiteTensorsToDetectionsCalculator::DecodeBoxes(
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteTensorsToDetectionsCalculator::ConvertToDetections(
+abslx::Status TfLiteTensorsToDetectionsCalculator::ConvertToDetections(
     const float* detection_boxes, const float* detection_scores,
     const int* detection_classes, std::vector<Detection>* output_detections) {
   for (int i = 0; i < num_boxes_; ++i) {
@@ -683,7 +683,7 @@ absl::Status TfLiteTensorsToDetectionsCalculator::ConvertToDetections(
     }
     output_detections->emplace_back(detection);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 Detection TfLiteTensorsToDetectionsCalculator::ConvertToDetection(
@@ -706,14 +706,14 @@ Detection TfLiteTensorsToDetectionsCalculator::ConvertToDetection(
   return detection;
 }
 
-absl::Status TfLiteTensorsToDetectionsCalculator::GpuInit(
+abslx::Status TfLiteTensorsToDetectionsCalculator::GpuInit(
     CalculatorContext* cc) {
 #if MEDIAPIPE_TFLITE_GL_INFERENCE
-  MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext([this]() -> absl::Status {
-    gpu_data_ = absl::make_unique<GPUData>();
+  MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext([this]() -> abslx::Status {
+    gpu_data_ = abslx::make_unique<GPUData>();
 
     // A shader to decode detection boxes.
-    const std::string decode_src = absl::Substitute(
+    const std::string decode_src = abslx::Substitute(
         R"( #version 310 es
 
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
@@ -831,7 +831,7 @@ void main() {
                 options_.h_scale());
 
     // A shader to score detection boxes.
-    const std::string score_src = absl::Substitute(
+    const std::string score_src = abslx::Substitute(
         R"( #version 310 es
 
 layout(local_size_x = 1, local_size_y = $0, local_size_z = 1) in;
@@ -917,16 +917,16 @@ void main() {
     MP_RETURN_IF_ERROR(CreateReadWriteShaderStorageBuffer<float>(
         raw_scores_length, &gpu_data_->raw_scores_buffer));
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
 
 #elif MEDIAPIPE_TFLITE_METAL_INFERENCE
 
-  gpu_data_ = absl::make_unique<GPUData>();
+  gpu_data_ = abslx::make_unique<GPUData>();
   id<MTLDevice> device = gpu_helper_.mtlDevice;
 
   // A shader to decode detection boxes.
-  std::string decode_src = absl::Substitute(
+  std::string decode_src = abslx::Substitute(
       R"(
 #include <metal_stdlib>
 
@@ -951,7 +951,7 @@ kernel void decodeKernel(
       options_.apply_exponential_on_box_size() ? 1 : 0,
       options_.box_coord_offset(), options_.num_keypoints(),
       options_.keypoint_coord_offset(), options_.num_values_per_keypoint());
-  decode_src += absl::Substitute(
+  decode_src += abslx::Substitute(
       R"(
   float4 scale = float4(($0),($1),($2),($3));
 )",
@@ -1055,7 +1055,7 @@ kernel void decodeKernel(
   }
 
   // A shader to score detection boxes.
-  const std::string score_src = absl::Substitute(
+  const std::string score_src = abslx::Substitute(
       R"(
 #include <metal_stdlib>
 
@@ -1152,7 +1152,7 @@ kernel void scoreKernel(
 
 #endif  // MEDIAPIPE_TFLITE_GL_INFERENCE
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

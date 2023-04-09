@@ -32,7 +32,7 @@
 
 namespace linear_filters {
 
-using ::absl::StrFormat;
+using ::abslx::StrFormat;
 using ::audio_dsp::AmplitudeRatioToDecibels;
 using ::std::complex;
 using ::std::vector;
@@ -510,7 +510,7 @@ TEST(BiquadFilterDesignTest, AllpassCoefficients_PhaseResponseTest) {
 }
 
 std::string ToString(const complex<double>& value) {
-  return absl::StrFormat("%.12g+%.12gj", value.real(), value.imag());
+  return abslx::StrFormat("%.12g+%.12gj", value.real(), value.imag());
 }
 
 // Check that a complex value is within 1e-9 of expected value.

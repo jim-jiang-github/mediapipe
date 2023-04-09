@@ -40,7 +40,7 @@ namespace {
 
 namespace m = ::xla::match;
 
-using ::absl::string_view;
+using ::abslx::string_view;
 using ::testing::ElementsAre;
 using ::testing::HasSubstr;
 
@@ -2343,8 +2343,8 @@ TEST_P(HloNonRoundtripParserTest, Run) {
       ShapeUtil::ByteSizeOfElements);
   TF_ASSERT_OK(
       module->ParseHloStringAndVerifyModule(GetParam().input_module_string));
-  EXPECT_EQ(absl::StripAsciiWhitespace(GetParam().output_module_string),
-            absl::StripAsciiWhitespace(
+  EXPECT_EQ(abslx::StripAsciiWhitespace(GetParam().output_module_string),
+            abslx::StripAsciiWhitespace(
                 module->ToString(HloPrintOptions::ShortParsable())));
 }
 
@@ -2356,11 +2356,11 @@ INSTANTIATE_TEST_SUITE_P(HloParserTestSuccessInstantiation,
 class HloParserTest : public ::testing::Test {
  protected:
   static void ExpectHasSubstr(string_view s, string_view expected) {
-    EXPECT_TRUE(absl::StrContains(s, expected))
+    EXPECT_TRUE(abslx::StrContains(s, expected))
         << "'" << s << "' does not contain '" << expected << "'";
   }
   StatusOr<std::unique_ptr<VerifiedHloModule>> ParseAndReturnVerifiedModule(
-      absl::string_view hlo_text) {
+      abslx::string_view hlo_text) {
     auto module = std::make_unique<VerifiedHloModule>(
         ::testing::UnitTest::GetInstance()->current_test_info()->name(),
         HloModuleConfig(),
@@ -2728,19 +2728,19 @@ ENTRY %Convolve1D1Window_0.v3 (input: f32[1,2,1], filter: f32[1,1,1]) -> f32[1,2
 )";
 
   ExpectHasSubstr(ParseAndReturnUnverifiedModule(
-                      absl::StrCat(prefix, ",dim_labels=00_01->10", suffix))
+                      abslx::StrCat(prefix, ",dim_labels=00_01->10", suffix))
                       .status()
                       .error_message(),
                   "expects unique");
 
   ExpectHasSubstr(ParseAndReturnUnverifiedModule(
-                      absl::StrCat(prefix, ",dim_labels=012_0123->210", suffix))
+                      abslx::StrCat(prefix, ",dim_labels=012_0123->210", suffix))
                       .status()
                       .error_message(),
                   "must have same number of spatial dimensions");
 
   ExpectHasSubstr(ParseAndReturnUnverifiedModule(
-                      absl::StrCat(prefix, ",dim_labels=013_0123->210", suffix))
+                      abslx::StrCat(prefix, ",dim_labels=013_0123->210", suffix))
                       .status()
                       .error_message(),
                   "expects [0-2bf?]");

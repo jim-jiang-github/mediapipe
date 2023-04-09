@@ -30,7 +30,7 @@
 #include "absl/random/internal/traits.h"
 #include "absl/random/uniform_int_distribution.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // log_uniform_int_distribution:
@@ -114,7 +114,7 @@ class log_uniform_int_distribution {
     int log_range_;        // ceil(logN(range_))
 
     static_assert(std::is_integral<IntType>::value,
-                  "Class-template absl::log_uniform_int_distribution<> must be "
+                  "Class-template abslx::log_uniform_int_distribution<> must be "
                   "parameterized using an integral type.");
   };
 
@@ -179,7 +179,7 @@ log_uniform_int_distribution<IntType>::Generate(
   // 1 => [1, b-1]
   // 2 => [b, (b^2)-1]
   // n => [b^(n-1)..(b^n)-1]
-  const int e = absl::uniform_int_distribution<int>(0, p.log_range())(g);
+  const int e = abslx::uniform_int_distribution<int>(0, p.log_range())(g);
   if (e == 0) {
     return 0;
   }
@@ -211,7 +211,7 @@ log_uniform_int_distribution<IntType>::Generate(
   const unsigned_type hi = (top_e >= p.range()) ? p.range() : top_e;
 
   // choose uniformly over [lo, hi]
-  return absl::uniform_int_distribution<result_type>(lo, hi)(g);
+  return abslx::uniform_int_distribution<result_type>(lo, hi)(g);
 }
 
 template <typename CharT, typename Traits, typename IntType>
@@ -252,6 +252,6 @@ std::basic_istream<CharT, Traits>& operator>>(
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_LOG_UNIFORM_INT_DISTRIBUTION_H_

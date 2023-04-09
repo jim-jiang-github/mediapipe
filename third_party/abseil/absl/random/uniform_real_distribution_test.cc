@@ -40,14 +40,14 @@
 //   the closed range [a, b]. Unfortunately, that technique is not universally
 //   reliable due to floating point quantization.
 //
-// * absl::uniform_real_distribution<float> generates between 2^28 and 2^29
+// * abslx::uniform_real_distribution<float> generates between 2^28 and 2^29
 //   distinct floating point values in the range [0, 1).
 //
-// * absl::uniform_real_distribution<float> generates at least 2^23 distinct
+// * abslx::uniform_real_distribution<float> generates at least 2^23 distinct
 //   floating point values in the range [1, 2). This should be the same as
 //   any other range covered by a single exponent in IEEE 754.
 //
-// * absl::uniform_real_distribution<double> generates more than 2^52 distinct
+// * abslx::uniform_real_distribution<double> generates more than 2^52 distinct
 //   values in the range [0, 1), and should generate at least 2^52 distinct
 //   values in the range of [1, 2).
 //
@@ -63,7 +63,7 @@ class UniformRealDistributionTest : public ::testing::Test {};
 // https://bugs.llvm.org/show_bug.cgi?id=49132. Don't bother running these tests
 // with double doubles until compiler support is better.
 using RealTypes =
-    std::conditional<absl::numeric_internal::IsDoubleDouble(),
+    std::conditional<abslx::numeric_internal::IsDoubleDouble(),
                      ::testing::Types<float, double>,
                      ::testing::Types<float, double, long double>>::type;
 
@@ -71,12 +71,12 @@ TYPED_TEST_SUITE(UniformRealDistributionTest, RealTypes);
 
 TYPED_TEST(UniformRealDistributionTest, ParamSerializeTest) {
   using param_type =
-      typename absl::uniform_real_distribution<TypeParam>::param_type;
+      typename abslx::uniform_real_distribution<TypeParam>::param_type;
 
   constexpr const TypeParam a{1152921504606846976};
 
   constexpr int kCount = 1000;
-  absl::InsecureBitGen gen;
+  abslx::InsecureBitGen gen;
   for (const auto& param : {
            param_type(),
            param_type(TypeParam(2.0), TypeParam(2.0)),  // Same
@@ -112,18 +112,18 @@ TYPED_TEST(UniformRealDistributionTest, ParamSerializeTest) {
     // Validate parameters.
     const auto a = param.a();
     const auto b = param.b();
-    absl::uniform_real_distribution<TypeParam> before(a, b);
+    abslx::uniform_real_distribution<TypeParam> before(a, b);
     EXPECT_EQ(before.a(), param.a());
     EXPECT_EQ(before.b(), param.b());
 
     {
-      absl::uniform_real_distribution<TypeParam> via_param(param);
+      abslx::uniform_real_distribution<TypeParam> via_param(param);
       EXPECT_EQ(via_param, before);
     }
 
     std::stringstream ss;
     ss << before;
-    absl::uniform_real_distribution<TypeParam> after(TypeParam(1.0),
+    abslx::uniform_real_distribution<TypeParam> after(TypeParam(1.0),
                                                      TypeParam(3.1));
 
     EXPECT_NE(before.a(), after.a());
@@ -161,7 +161,7 @@ TYPED_TEST(UniformRealDistributionTest, ParamSerializeTest) {
 
     if (!std::is_same<TypeParam, long double>::value) {
       // static_cast<double>(long double) can overflow.
-      std::string msg = absl::StrCat("Range: ", static_cast<double>(sample_min),
+      std::string msg = abslx::StrCat("Range: ", static_cast<double>(sample_min),
                                      ", ", static_cast<double>(sample_max));
       ABSL_RAW_LOG(INFO, "%s", msg.c_str());
     }
@@ -176,12 +176,12 @@ TYPED_TEST(UniformRealDistributionTest, ViolatesPreconditionsDeathTest) {
 #if GTEST_HAS_DEATH_TEST
   // Hi < Lo
   EXPECT_DEBUG_DEATH(
-      { absl::uniform_real_distribution<TypeParam> dist(10.0, 1.0); }, "");
+      { abslx::uniform_real_distribution<TypeParam> dist(10.0, 1.0); }, "");
 
   // Hi - Lo > numeric_limits<>::max()
   EXPECT_DEBUG_DEATH(
       {
-        absl::uniform_real_distribution<TypeParam> dist(
+        abslx::uniform_real_distribution<TypeParam> dist(
             std::numeric_limits<TypeParam>::lowest(),
             std::numeric_limits<TypeParam>::max());
       },
@@ -190,14 +190,14 @@ TYPED_TEST(UniformRealDistributionTest, ViolatesPreconditionsDeathTest) {
 #if defined(NDEBUG)
   // opt-mode, for invalid parameters, will generate a garbage value,
   // but should not enter an infinite loop.
-  absl::InsecureBitGen gen;
+  abslx::InsecureBitGen gen;
   {
-    absl::uniform_real_distribution<TypeParam> dist(10.0, 1.0);
+    abslx::uniform_real_distribution<TypeParam> dist(10.0, 1.0);
     auto x = dist(gen);
     EXPECT_FALSE(std::isnan(x)) << x;
   }
   {
-    absl::uniform_real_distribution<TypeParam> dist(
+    abslx::uniform_real_distribution<TypeParam> dist(
         std::numeric_limits<TypeParam>::lowest(),
         std::numeric_limits<TypeParam>::max());
     auto x = dist(gen);
@@ -217,15 +217,15 @@ TYPED_TEST(UniformRealDistributionTest, TestMoments) {
   // We use a fixed bit generator for distribution accuracy tests.  This allows
   // these tests to be deterministic, while still testing the qualify of the
   // implementation.
-  absl::random_internal::pcg64_2018_engine rng{0x2B7E151628AED2A6};
+  abslx::random_internal::pcg64_2018_engine rng{0x2B7E151628AED2A6};
 
-  absl::uniform_real_distribution<TypeParam> dist;
+  abslx::uniform_real_distribution<TypeParam> dist;
   for (int i = 0; i < kSize; i++) {
     values[i] = dist(rng);
   }
 
   const auto moments =
-      absl::random_internal::ComputeDistributionMoments(values);
+      abslx::random_internal::ComputeDistributionMoments(values);
   EXPECT_NEAR(0.5, moments.mean, 0.01);
   EXPECT_NEAR(1 / 12.0, moments.variance, 0.015);
   EXPECT_NEAR(0.0, moments.skewness, 0.02);
@@ -233,9 +233,9 @@ TYPED_TEST(UniformRealDistributionTest, TestMoments) {
 }
 
 TYPED_TEST(UniformRealDistributionTest, ChiSquaredTest50) {
-  using absl::random_internal::kChiSquared;
+  using abslx::random_internal::kChiSquared;
   using param_type =
-      typename absl::uniform_real_distribution<TypeParam>::param_type;
+      typename abslx::uniform_real_distribution<TypeParam>::param_type;
 
   constexpr size_t kTrials = 100000;
   constexpr int kBuckets = 50;
@@ -246,12 +246,12 @@ TYPED_TEST(UniformRealDistributionTest, ChiSquaredTest50) {
   // in this file. And the test could fail for other reasons.
   // Empirically validated with --runs_per_test=10000.
   const int kThreshold =
-      absl::random_internal::ChiSquareValue(kBuckets - 1, 0.999999);
+      abslx::random_internal::ChiSquareValue(kBuckets - 1, 0.999999);
 
   // We use a fixed bit generator for distribution accuracy tests.  This allows
   // these tests to be deterministic, while still testing the qualify of the
   // implementation.
-  absl::random_internal::pcg64_2018_engine rng{0x2B7E151628AED2A6};
+  abslx::random_internal::pcg64_2018_engine rng{0x2B7E151628AED2A6};
 
   for (const auto& param : {param_type(0, 1), param_type(5, 12),
                             param_type(-5, 13), param_type(-5, -2)}) {
@@ -260,26 +260,26 @@ TYPED_TEST(UniformRealDistributionTest, ChiSquaredTest50) {
     const double factor = kBuckets / (max_val - min_val);
 
     std::vector<int32_t> counts(kBuckets, 0);
-    absl::uniform_real_distribution<TypeParam> dist(param);
+    abslx::uniform_real_distribution<TypeParam> dist(param);
     for (size_t i = 0; i < kTrials; i++) {
       auto x = dist(rng);
       auto bucket = static_cast<size_t>((x - min_val) * factor);
       counts[bucket]++;
     }
 
-    double chi_square = absl::random_internal::ChiSquareWithExpected(
+    double chi_square = abslx::random_internal::ChiSquareWithExpected(
         std::begin(counts), std::end(counts), kExpected);
     if (chi_square > kThreshold) {
       double p_value =
-          absl::random_internal::ChiSquarePValue(chi_square, kBuckets);
+          abslx::random_internal::ChiSquarePValue(chi_square, kBuckets);
 
       // Chi-squared test failed. Output does not appear to be uniform.
       std::string msg;
       for (const auto& a : counts) {
-        absl::StrAppend(&msg, a, "\n");
+        abslx::StrAppend(&msg, a, "\n");
       }
-      absl::StrAppend(&msg, kChiSquared, " p-value ", p_value, "\n");
-      absl::StrAppend(&msg, "High ", kChiSquared, " value: ", chi_square, " > ",
+      abslx::StrAppend(&msg, kChiSquared, " p-value ", p_value, "\n");
+      abslx::StrAppend(&msg, "High ", kChiSquared, " value: ", chi_square, " > ",
                       kThreshold);
       ABSL_RAW_LOG(INFO, "%s", msg.c_str());
       FAIL() << msg;
@@ -288,9 +288,9 @@ TYPED_TEST(UniformRealDistributionTest, ChiSquaredTest50) {
 }
 
 TYPED_TEST(UniformRealDistributionTest, StabilityTest) {
-  // absl::uniform_real_distribution stability relies only on
+  // abslx::uniform_real_distribution stability relies only on
   // random_internal::RandU64ToDouble and random_internal::RandU64ToFloat.
-  absl::random_internal::sequence_urbg urbg(
+  abslx::random_internal::sequence_urbg urbg(
       {0x0003eb76f6f7f755ull, 0xFFCEA50FDB2F953Bull, 0xC332DDEFBE6C5AA5ull,
        0x6558218568AB9702ull, 0x2AEF7DAD5B6E2F84ull, 0x1521B62829076170ull,
        0xECDD4775619F1510ull, 0x13CCA830EB61BD96ull, 0x0334FE1EAA0363CFull,
@@ -298,7 +298,7 @@ TYPED_TEST(UniformRealDistributionTest, StabilityTest) {
 
   std::vector<int> output(12);
 
-  absl::uniform_real_distribution<TypeParam> dist;
+  abslx::uniform_real_distribution<TypeParam> dist;
   std::generate(std::begin(output), std::end(output), [&] {
     return static_cast<int>(TypeParam(1000000) * dist(urbg));
   });
@@ -310,37 +310,37 @@ TYPED_TEST(UniformRealDistributionTest, StabilityTest) {
 }
 
 TEST(UniformRealDistributionTest, AlgorithmBounds) {
-  absl::uniform_real_distribution<double> dist;
+  abslx::uniform_real_distribution<double> dist;
 
   {
-    // This returns the smallest value >0 from absl::uniform_real_distribution.
-    absl::random_internal::sequence_urbg urbg({0x0000000000000001ull});
+    // This returns the smallest value >0 from abslx::uniform_real_distribution.
+    abslx::random_internal::sequence_urbg urbg({0x0000000000000001ull});
     double a = dist(urbg);
     EXPECT_EQ(a, 5.42101086242752217004e-20);
   }
 
   {
-    // This returns a value very near 0.5 from absl::uniform_real_distribution.
-    absl::random_internal::sequence_urbg urbg({0x7fffffffffffffefull});
+    // This returns a value very near 0.5 from abslx::uniform_real_distribution.
+    abslx::random_internal::sequence_urbg urbg({0x7fffffffffffffefull});
     double a = dist(urbg);
     EXPECT_EQ(a, 0.499999999999999944489);
   }
   {
-    // This returns a value very near 0.5 from absl::uniform_real_distribution.
-    absl::random_internal::sequence_urbg urbg({0x8000000000000000ull});
+    // This returns a value very near 0.5 from abslx::uniform_real_distribution.
+    abslx::random_internal::sequence_urbg urbg({0x8000000000000000ull});
     double a = dist(urbg);
     EXPECT_EQ(a, 0.5);
   }
 
   {
-    // This returns the largest value <1 from absl::uniform_real_distribution.
-    absl::random_internal::sequence_urbg urbg({0xFFFFFFFFFFFFFFEFull});
+    // This returns the largest value <1 from abslx::uniform_real_distribution.
+    abslx::random_internal::sequence_urbg urbg({0xFFFFFFFFFFFFFFEFull});
     double a = dist(urbg);
     EXPECT_EQ(a, 0.999999999999999888978);
   }
   {
     // This *ALSO* returns the largest value <1.
-    absl::random_internal::sequence_urbg urbg({0xFFFFFFFFFFFFFFFFull});
+    abslx::random_internal::sequence_urbg urbg({0xFFFFFFFFFFFFFFFFull});
     double a = dist(urbg);
     EXPECT_EQ(a, 0.999999999999999888978);
   }

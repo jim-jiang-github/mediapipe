@@ -26,18 +26,18 @@ limitations under the License.
 
 namespace xla {
 
-Status VerifiedHloModule::ParseHloStringAndVerifyModule(absl::string_view str) {
+Status VerifiedHloModule::ParseHloStringAndVerifyModule(abslx::string_view str) {
   TF_RET_CHECK(computation_count() == 0);
   auto parser = HloParser::CreateHloParserForTests(str);
   TF_RETURN_IF_ERROR(parser->Run(this));
   return Verify();
 }
 
-void VerifiedHloModule::VerifyOrAddFailure(absl::string_view message) {
+void VerifiedHloModule::VerifyOrAddFailure(abslx::string_view message) {
   Status status = Verify();
   if (!status.ok()) {
     ADD_FAILURE() << "HloVerifier failed on module " << name()
-                  << (message.empty() ? "" : absl::StrCat(" (", message, ")"))
+                  << (message.empty() ? "" : abslx::StrCat(" (", message, ")"))
                   << ": " << status;
     LOG(ERROR) << "Contents of bad module:";
     XLA_LOG_LINES(tensorflow::ERROR, ToString());

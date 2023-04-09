@@ -59,7 +59,7 @@ bool GrpcResponseCache::QueueRequest(int64_t request_id, int64_t step_id,
 void GrpcResponseCache::OnRequestFinished(int64_t request_id,
                                           const Tensor& tensor, bool is_dead,
                                           const Status& status) {
-  absl::optional<ResponseCacheEntry> entry_copy;
+  abslx::optional<ResponseCacheEntry> entry_copy;
 
   {
     mutex_lock m(mu_);

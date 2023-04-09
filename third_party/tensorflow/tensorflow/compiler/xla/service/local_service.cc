@@ -98,7 +98,7 @@ std::optional<const OpMetadata*> ParameterMetadata(
 
 StatusOr<std::unique_ptr<HloModuleConfig>> LocalService::GetHloModuleConfig(
     const XlaComputation& computation,
-    const absl::Span<const Shape* const> argument_layouts,
+    const abslx::Span<const Shape* const> argument_layouts,
     const ExecutableBuildOptions& build_options) {
   const HloModuleProto& proto = computation.proto();
   TF_RET_CHECK(proto.has_host_program_shape());
@@ -125,7 +125,7 @@ StatusOr<std::unique_ptr<HloModuleConfig>> LocalService::GetHloModuleConfig(
         CHECK(metadata.value() != nullptr);
         const OpMetadata& m = *metadata.value();
         if (!m.source_file().empty()) {
-          return absl::StrFormat(" (%s:%d)", m.source_file(), m.source_line());
+          return abslx::StrFormat(" (%s:%d)", m.source_file(), m.source_line());
         }
         return "";
       };
@@ -151,7 +151,7 @@ StatusOr<std::unique_ptr<HloModuleConfig>> LocalService::GetHloModuleConfig(
 StatusOr<std::vector<std::unique_ptr<Executable>>>
 LocalService::CompileExecutables(
     const XlaComputation& computation,
-    const absl::Span<const Shape* const> argument_layouts,
+    const abslx::Span<const Shape* const> argument_layouts,
     const ExecutableBuildOptions& build_options) {
   TF_ASSIGN_OR_RETURN(
       std::unique_ptr<HloModuleConfig> module_config,
@@ -198,7 +198,7 @@ LocalService::CompileExecutables(
 StatusOr<std::vector<std::unique_ptr<AotCompilationResult>>>
 LocalService::CompileAotResults(
     const XlaComputation& computation,
-    const absl::Span<const Shape* const> argument_layouts,
+    const abslx::Span<const Shape* const> argument_layouts,
     const ExecutableBuildOptions& build_options) {
   TF_ASSIGN_OR_RETURN(
       std::unique_ptr<HloModuleConfig> module_config,

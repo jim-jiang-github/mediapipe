@@ -320,7 +320,7 @@ class ConstTensorSkipTestCase {
   void RunTestAndValidate() const {
     LOG(INFO) << "Run Const tensor skip test: "
               << "data_type: " << data_type_ << ", shape: {"
-              << absl::StrJoin(shape_, ",") << "}, value: " << value_
+              << abslx::StrJoin(shape_, ",") << "}, value: " << value_
               << ", expected: " << expected_;
     // Build a graph with Const --> Identity --> Detect.
     GrapplerItem item;

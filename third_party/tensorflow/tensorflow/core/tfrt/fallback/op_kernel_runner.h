@@ -40,14 +40,14 @@ namespace tfrt_stub {
 class OpKernelRunner {
  public:
   static StatusOr<OpKernelRunner> Create(
-      absl::string_view op_name, absl::string_view device_name, int num_args,
+      abslx::string_view op_name, abslx::string_view device_name, int num_args,
       const std::function<Status(tensorflow::AttrValueMap*)>& attr_builder,
       const tensorflow::DeviceMgr& device_manager,
       const tensorflow::ProcessFunctionLibraryRuntime&
           process_function_library_runtime);
 
   static StatusOr<OpKernelRunner> Create(
-      absl::string_view op_name, int num_args,
+      abslx::string_view op_name, int num_args,
       const std::function<Status(tensorflow::AttrValueMap*)>& attr_builder,
       const tensorflow::ProcessFunctionLibraryRuntime&
           process_function_library_runtime,
@@ -166,7 +166,7 @@ class OpKernelRunnerTable {
   }
 
  private:
-  std::vector<absl::optional<OpKernelRunner>> runners_;
+  std::vector<abslx::optional<OpKernelRunner>> runners_;
 };
 
 }  // namespace tfrt_stub

@@ -35,7 +35,7 @@ namespace xla {
 // aot_options is optional; if not given a default is used.
 StatusOr<std::unique_ptr<HloModuleConfig>> CreateModuleConfig(
     const ProgramShape& program_shape,
-    absl::Span<const Shape* const> argument_shapes,
+    abslx::Span<const Shape* const> argument_shapes,
     const ExecutionOptions* execution_options, int default_num_replicas,
     std::optional<int> num_threads = std::nullopt,
     const AotCompilationOptions* aot_options = nullptr);

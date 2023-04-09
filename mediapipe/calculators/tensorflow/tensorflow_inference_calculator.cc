@@ -85,8 +85,8 @@ class SimpleSemaphore {
 
  private:
   uint32 count_;
-  absl::Mutex mutex_;
-  absl::CondVar cond_;
+  abslx::Mutex mutex_;
+  abslx::CondVar cond_;
 };
 
 class InferenceState {
@@ -236,7 +236,7 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
         mediapipe::MonotonicClock::CreateSynchronizedMonotonicClock());
   }
 
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     const auto& options = cc->Options<TensorFlowInferenceCalculatorOptions>();
     RET_CHECK(!cc->Inputs().GetTags().empty());
     for (const std::string& tag : cc->Inputs().GetTags()) {
@@ -263,13 +263,13 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
           .Tag(kRecurrentInitTensorsTag)
           .Set<std::unique_ptr<std::map<std::string, tf::Tensor>>>();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   std::unique_ptr<InferenceState> CreateInferenceState(CalculatorContext* cc)
       ABSL_EXCLUSIVE_LOCKS_REQUIRED(mutex_) {
     std::unique_ptr<InferenceState> inference_state =
-        absl::make_unique<InferenceState>();
+        abslx::make_unique<InferenceState>();
     if (cc->InputSidePackets().HasTag(kRecurrentInitTensorsTag) &&
         !cc->InputSidePackets().Tag(kRecurrentInitTensorsTag).IsEmpty()) {
       std::map<std::string, tf::Tensor>* init_tensor_map;
@@ -282,7 +282,7 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
     return inference_state;
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     options_ = cc->Options<TensorFlowInferenceCalculatorOptions>();
 
     RET_CHECK(cc->InputSidePackets().HasTag(kSessionTag));
@@ -303,11 +303,11 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
 
     // Helper for StrJoin. Prints key (tag) of map<string, string>.
     auto TagFormatter =
-        absl::PairFormatter(absl::StreamFormatter(), "",
+        abslx::PairFormatter(abslx::StreamFormatter(), "",
                             [](std::string* out, const std::string& second) {});
 
     for (const auto& tag_pair : options_.recurrent_tag_pair()) {
-      const std::vector<std::string> tags = absl::StrSplit(tag_pair, ':');
+      const std::vector<std::string> tags = abslx::StrSplit(tag_pair, ':');
       RET_CHECK_EQ(tags.size(), 2) << "recurrent_tag_pair must be a colon "
                                       "separated string with two components: "
                                    << tag_pair;
@@ -315,11 +315,11 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
       RET_CHECK(mediapipe::ContainsKey(tag_to_tensor_map_, tags[0]))
           << "Can't find tag '" << tags[0] << "' in signature "
           << options_.signature_name() << "; instead found tags "
-          << absl::StrJoin(tag_to_tensor_map_, ", ", TagFormatter);
+          << abslx::StrJoin(tag_to_tensor_map_, ", ", TagFormatter);
       RET_CHECK(mediapipe::ContainsKey(tag_to_tensor_map_, tags[1]))
           << "Can't find tag '" << tags[1] << "' in signature "
           << options_.signature_name() << " ; instead found tags "
-          << absl::StrJoin(tag_to_tensor_map_, ", ", TagFormatter);
+          << abslx::StrJoin(tag_to_tensor_map_, ", ", TagFormatter);
       recurrent_feed_tags_.insert(tags[0]);
       recurrent_fetch_tags_to_feed_tags_[tags[1]] = tags[0];
     }
@@ -329,17 +329,17 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
       RET_CHECK(mediapipe::ContainsKey(tag_to_tensor_map_, tag))
           << "Can't find tag '" << tag << "' in signature "
           << options_.signature_name() << "; instead found tags "
-          << absl::StrJoin(tag_to_tensor_map_, ", ", TagFormatter);
+          << abslx::StrJoin(tag_to_tensor_map_, ", ", TagFormatter);
     }
     for (const std::string& tag : cc->Outputs().GetTags()) {
       RET_CHECK(mediapipe::ContainsKey(tag_to_tensor_map_, tag))
           << "Can't find tag '" << tag << "' in signature "
           << options_.signature_name() << "; instead found tags "
-          << absl::StrJoin(tag_to_tensor_map_, ", ", TagFormatter);
+          << abslx::StrJoin(tag_to_tensor_map_, ", ", TagFormatter);
     }
 
     {
-      absl::WriterMutexLock l(&mutex_);
+      abslx::WriterMutexLock l(&mutex_);
       inference_state_ = std::unique_ptr<InferenceState>();
     }
 
@@ -347,12 +347,12 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
       cc->SetOffset(0);
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Adds a batch dimension to the input tensor if specified in the calculator
   // options.
-  absl::Status AddBatchDimension(tf::Tensor* input_tensor) {
+  abslx::Status AddBatchDimension(tf::Tensor* input_tensor) {
     if (options_.add_batch_dim_to_tensors()) {
       tf::TensorShape new_shape(input_tensor->shape());
       new_shape.InsertDim(0, 1);
@@ -360,10 +360,10 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
           << "Could not add 0th dimension to tensor without changing its shape."
           << " Current shape: " << input_tensor->shape().DebugString();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status AggregateTensorPacket(
+  abslx::Status AggregateTensorPacket(
       const std::string& tag_name, const Packet& packet,
       std::map<Timestamp, std::map<std::string, tf::Tensor>>*
           input_tensors_by_tag_by_timestamp,
@@ -378,12 +378,12 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
     }
     (*input_tensors_by_tag_by_timestamp)[packet.Timestamp()].insert(
         std::make_pair(tag_name, input_tensor));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Removes the batch dimension of the output tensor if specified in the
   // calculator options.
-  absl::Status RemoveBatchDimension(tf::Tensor* output_tensor) {
+  abslx::Status RemoveBatchDimension(tf::Tensor* output_tensor) {
     if (options_.add_batch_dim_to_tensors()) {
       tf::TensorShape new_shape(output_tensor->shape());
       new_shape.RemoveDim(0);
@@ -392,13 +392,13 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
           << "shape. Current shape: " << output_tensor->shape().DebugString()
           << " (The expected first dimension is 1 for a batch element.)";
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     std::unique_ptr<InferenceState> inference_state_to_process;
     {
-      absl::WriterMutexLock l(&mutex_);
+      abslx::WriterMutexLock l(&mutex_);
       if (inference_state_ == nullptr) {
         inference_state_ = CreateInferenceState(cc);
       }
@@ -409,9 +409,9 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
           // Recurrent tensors can be empty.
           if (!mediapipe::ContainsKey(recurrent_feed_tags_, tag_as_node_name)) {
             if (options_.skip_on_missing_features()) {
-              return absl::OkStatus();
+              return abslx::OkStatus();
             } else {
-              return absl::InvalidArgumentError(absl::StrCat(
+              return abslx::InvalidArgumentError(abslx::StrCat(
                   "Tag ", tag_as_node_name,
                   " not present at timestamp: ", cc->InputTimestamp().Value()));
             }
@@ -420,7 +420,7 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
           const auto& tensor_packets =
               cc->Inputs().Tag(tag_as_node_name).Get<std::vector<Packet>>();
           if (tensor_packets.size() > options_.batch_size()) {
-            return absl::InvalidArgumentError(absl::StrCat(
+            return abslx::InvalidArgumentError(abslx::StrCat(
                 "Batch for tag ", tag_as_node_name,
                 " has more packets than batch capacity. batch_size: ",
                 options_.batch_size(), " packets: ", tensor_packets.size()));
@@ -458,13 +458,13 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
           OutputBatch(cc, std::move(inference_state_to_process)));
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Close(CalculatorContext* cc) override {
+  abslx::Status Close(CalculatorContext* cc) override {
     std::unique_ptr<InferenceState> inference_state_to_process = nullptr;
     {
-      absl::WriterMutexLock l(&mutex_);
+      abslx::WriterMutexLock l(&mutex_);
       if (cc->GraphStatus().ok() && inference_state_ != nullptr &&
           !inference_state_->batch_timestamps_.empty()) {
         inference_state_to_process = std::move(inference_state_);
@@ -475,7 +475,7 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
       MP_RETURN_IF_ERROR(
           OutputBatch(cc, std::move(inference_state_to_process)));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // When a batch of input tensors is ready to be run, runs TensorFlow and
@@ -486,9 +486,9 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
   // memory buffer. Therefore, copies are cheap and should not cause the memory
   // buffer to fall out of scope. In contrast, concat is only used where
   // necessary.
-  absl::Status OutputBatch(CalculatorContext* cc,
+  abslx::Status OutputBatch(CalculatorContext* cc,
                            std::unique_ptr<InferenceState> inference_state) {
-    const int64 start_time = absl::ToUnixMicros(clock_->TimeNow());
+    const int64 start_time = abslx::ToUnixMicros(clock_->TimeNow());
     std::vector<std::pair<mediapipe::ProtoString, tf::Tensor>> input_tensors;
 
     for (auto& keyed_tensors : inference_state->input_tensor_batches_) {
@@ -544,11 +544,11 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
           get_session_run_throttle(options_.max_concurrent_session_runs());
       session_run_throttle->Acquire(1);
     }
-    const int64 run_start_time = absl::ToUnixMicros(clock_->TimeNow());
+    const int64 run_start_time = abslx::ToUnixMicros(clock_->TimeNow());
     tf::Status tf_status;
     {
 #if !defined(MEDIAPIPE_MOBILE) && !defined(__APPLE__)
-      tensorflow::profiler::TraceMe trace(absl::string_view(cc->NodeName()));
+      tensorflow::profiler::TraceMe trace(abslx::string_view(cc->NodeName()));
 #endif
       tf_status = session_->Run(input_tensors, output_tensor_names,
                                 {} /* target_node_names */, &outputs);
@@ -562,7 +562,7 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
     // informative error message.
     RET_CHECK(tf_status.ok()) << "Run failed: " << tf_status.ToString();
 
-    const int64 run_end_time = absl::ToUnixMicros(clock_->TimeNow());
+    const int64 run_end_time = abslx::ToUnixMicros(clock_->TimeNow());
     cc->GetCounter(kTotalSessionRunsTimeUsecsCounterSuffix)
         ->IncrementBy(run_end_time - run_start_time);
     cc->GetCounter(kTotalNumSessionRunsCounterSuffix)->Increment();
@@ -576,7 +576,7 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
           outputs[pos]);
     }
 
-    absl::WriterMutexLock l(&mutex_);
+    abslx::WriterMutexLock l(&mutex_);
     // Set that we want to split on each index of the 0th dimension.
     std::vector<tf::int64> split_vector(
         options_.pad_to_batch_size()
@@ -611,7 +611,7 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
     }
 
     // Get end time and report.
-    const int64 end_time = absl::ToUnixMicros(clock_->TimeNow());
+    const int64 end_time = abslx::ToUnixMicros(clock_->TimeNow());
     cc->GetCounter(kTotalUsecsCounterSuffix)
         ->IncrementBy(end_time - start_time);
     cc->GetCounter(kTotalProcessedTimestampsCounterSuffix)
@@ -623,7 +623,7 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
       inference_state_->batch_timestamps_.clear();
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -635,7 +635,7 @@ class TensorFlowInferenceCalculator : public CalculatorBase {
   // A mapping between stream tags and the tensor names they are bound to.
   std::map<std::string, std::string> tag_to_tensor_map_;
 
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
   std::unique_ptr<InferenceState> inference_state_ ABSL_GUARDED_BY(mutex_);
 
   // The options for the calculator.

@@ -41,7 +41,7 @@ using ::testing::HasSubstr;
 
 DataServiceMetadata GetDefaultMetadata() {
   // Fills the Tensor shape with a shuffled range of 1, 2, ..., 10.
-  static absl::BitGen bitgen;
+  static abslx::BitGen bitgen;
   std::vector<int64_t> dims(10);
   std::iota(dims.begin(), dims.end(), 1);
   std::shuffle(dims.begin(), dims.end(), bitgen);
@@ -50,7 +50,7 @@ DataServiceMetadata GetDefaultMetadata() {
     TensorShapeProto::Dim* dim =
         decoded_spec.mutable_tensor_shape_value()->add_dim();
     dim->set_size(dims[i]);
-    dim->set_name(absl::StrCat("dim", dims[i]));
+    dim->set_name(abslx::StrCat("dim", dims[i]));
   }
 
   DataServiceMetadata metadata;

@@ -264,7 +264,7 @@ class ExpandDimsOp : public XlaOpKernel {
     std::vector<int64_t> dims;
     OP_REQUIRES_OK(ctx, ctx->ConstantInputReshapedToIntVector("dim", &dims));
     OP_REQUIRES(ctx, dims.size() == 1,
-                errors::InvalidArgument(absl::StrCat(
+                errors::InvalidArgument(abslx::StrCat(
                     "dim input to ExpandDims must be a scalar; got ",
                     dim_shape.DebugString())));
     int dim = dims[0];

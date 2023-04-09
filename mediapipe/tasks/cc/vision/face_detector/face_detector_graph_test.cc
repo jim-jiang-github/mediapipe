@@ -88,8 +88,8 @@ constexpr char kDetectionsName[] = "detections";
 constexpr float kFaceDetectionMaxDiff = 0.01;
 
 // Helper function to create a TaskRunner.
-absl::StatusOr<std::unique_ptr<TaskRunner>> CreateTaskRunner(
-    absl::string_view model_name) {
+abslx::StatusOr<std::unique_ptr<TaskRunner>> CreateTaskRunner(
+    abslx::string_view model_name) {
   Graph graph;
 
   auto& face_detector_graph =
@@ -115,7 +115,7 @@ absl::StatusOr<std::unique_ptr<TaskRunner>> CreateTaskRunner(
       graph.GetConfig(), std::make_unique<core::MediaPipeBuiltinOpResolver>());
 }
 
-Detection GetExpectedFaceDetectionResult(absl::string_view file_name) {
+Detection GetExpectedFaceDetectionResult(abslx::string_view file_name) {
   Detection detection;
   CHECK_OK(GetTextProto(file::JoinPath("./", kTestDataDirectory, file_name),
                         &detection, Defaults()))

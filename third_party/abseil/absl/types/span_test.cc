@@ -36,7 +36,7 @@
 namespace {
 
 MATCHER_P(DataIs, data,
-          absl::StrCat("data() ", negation ? "isn't " : "is ",
+          abslx::StrCat("data() ", negation ? "isn't " : "is ",
                        testing::PrintToString(data))) {
   return arg.data() == data;
 }
@@ -59,57 +59,57 @@ std::vector<int> MakeRamp(int len, int offset = 0) {
 }
 
 TEST(IntSpan, EmptyCtors) {
-  absl::Span<int> s;
+  abslx::Span<int> s;
   EXPECT_THAT(s, SpanIs(nullptr, 0));
 }
 
 TEST(IntSpan, PtrLenCtor) {
   int a[] = {1, 2, 3};
-  absl::Span<int> s(&a[0], 2);
+  abslx::Span<int> s(&a[0], 2);
   EXPECT_THAT(s, SpanIs(a, 2));
 }
 
 TEST(IntSpan, ArrayCtor) {
   int a[] = {1, 2, 3};
-  absl::Span<int> s(a);
+  abslx::Span<int> s(a);
   EXPECT_THAT(s, SpanIs(a, 3));
 
-  EXPECT_TRUE((std::is_constructible<absl::Span<const int>, int[3]>::value));
+  EXPECT_TRUE((std::is_constructible<abslx::Span<const int>, int[3]>::value));
   EXPECT_TRUE(
-      (std::is_constructible<absl::Span<const int>, const int[3]>::value));
-  EXPECT_FALSE((std::is_constructible<absl::Span<int>, const int[3]>::value));
-  EXPECT_TRUE((std::is_convertible<int[3], absl::Span<const int>>::value));
+      (std::is_constructible<abslx::Span<const int>, const int[3]>::value));
+  EXPECT_FALSE((std::is_constructible<abslx::Span<int>, const int[3]>::value));
+  EXPECT_TRUE((std::is_convertible<int[3], abslx::Span<const int>>::value));
   EXPECT_TRUE(
-      (std::is_convertible<const int[3], absl::Span<const int>>::value));
+      (std::is_convertible<const int[3], abslx::Span<const int>>::value));
 }
 
 template <typename T>
-void TakesGenericSpan(absl::Span<T>) {}
+void TakesGenericSpan(abslx::Span<T>) {}
 
 TEST(IntSpan, ContainerCtor) {
   std::vector<int> empty;
-  absl::Span<int> s_empty(empty);
+  abslx::Span<int> s_empty(empty);
   EXPECT_THAT(s_empty, SpanIs(empty));
 
   std::vector<int> filled{1, 2, 3};
-  absl::Span<int> s_filled(filled);
+  abslx::Span<int> s_filled(filled);
   EXPECT_THAT(s_filled, SpanIs(filled));
 
-  absl::Span<int> s_from_span(filled);
+  abslx::Span<int> s_from_span(filled);
   EXPECT_THAT(s_from_span, SpanIs(s_filled));
 
-  absl::Span<const int> const_filled = filled;
+  abslx::Span<const int> const_filled = filled;
   EXPECT_THAT(const_filled, SpanIs(filled));
 
-  absl::Span<const int> const_from_span = s_filled;
+  abslx::Span<const int> const_from_span = s_filled;
   EXPECT_THAT(const_from_span, SpanIs(s_filled));
 
   EXPECT_TRUE(
-      (std::is_convertible<std::vector<int>&, absl::Span<const int>>::value));
+      (std::is_convertible<std::vector<int>&, abslx::Span<const int>>::value));
   EXPECT_TRUE(
-      (std::is_convertible<absl::Span<int>&, absl::Span<const int>>::value));
+      (std::is_convertible<abslx::Span<int>&, abslx::Span<const int>>::value));
 
-  TakesGenericSpan(absl::Span<int>(filled));
+  TakesGenericSpan(abslx::Span<int>(filled));
 }
 
 // A struct supplying shallow data() const.
@@ -121,7 +121,7 @@ struct ContainerWithShallowConstData {
 
 TEST(IntSpan, ShallowConstness) {
   const ContainerWithShallowConstData c{MakeRamp(20)};
-  absl::Span<int> s(
+  abslx::Span<int> s(
       c);  // We should be able to do this even though data() is const.
   s[0] = -1;
   EXPECT_EQ(c.storage[0], -1);
@@ -129,32 +129,32 @@ TEST(IntSpan, ShallowConstness) {
 
 TEST(CharSpan, StringCtor) {
   std::string empty = "";
-  absl::Span<char> s_empty(empty);
+  abslx::Span<char> s_empty(empty);
   EXPECT_THAT(s_empty, SpanIs(empty));
 
   std::string abc = "abc";
-  absl::Span<char> s_abc(abc);
+  abslx::Span<char> s_abc(abc);
   EXPECT_THAT(s_abc, SpanIs(abc));
 
-  absl::Span<const char> s_const_abc = abc;
+  abslx::Span<const char> s_const_abc = abc;
   EXPECT_THAT(s_const_abc, SpanIs(abc));
 
-  EXPECT_FALSE((std::is_constructible<absl::Span<int>, std::string>::value));
+  EXPECT_FALSE((std::is_constructible<abslx::Span<int>, std::string>::value));
   EXPECT_FALSE(
-      (std::is_constructible<absl::Span<const int>, std::string>::value));
+      (std::is_constructible<abslx::Span<const int>, std::string>::value));
   EXPECT_TRUE(
-      (std::is_convertible<std::string, absl::Span<const char>>::value));
+      (std::is_convertible<std::string, abslx::Span<const char>>::value));
 }
 
 TEST(IntSpan, FromConstPointer) {
-  EXPECT_TRUE((std::is_constructible<absl::Span<const int* const>,
+  EXPECT_TRUE((std::is_constructible<abslx::Span<const int* const>,
                                      std::vector<int*>>::value));
-  EXPECT_TRUE((std::is_constructible<absl::Span<const int* const>,
+  EXPECT_TRUE((std::is_constructible<abslx::Span<const int* const>,
                                      std::vector<const int*>>::value));
   EXPECT_FALSE((
-      std::is_constructible<absl::Span<const int*>, std::vector<int*>>::value));
+      std::is_constructible<abslx::Span<const int*>, std::vector<int*>>::value));
   EXPECT_FALSE((
-      std::is_constructible<absl::Span<int*>, std::vector<const int*>>::value));
+      std::is_constructible<abslx::Span<int*>, std::vector<const int*>>::value));
 }
 
 struct TypeWithMisleadingData {
@@ -171,9 +171,9 @@ struct TypeWithMisleadingSize {
 
 TEST(IntSpan, EvilTypes) {
   EXPECT_FALSE(
-      (std::is_constructible<absl::Span<int>, TypeWithMisleadingData&>::value));
+      (std::is_constructible<abslx::Span<int>, TypeWithMisleadingData&>::value));
   EXPECT_FALSE(
-      (std::is_constructible<absl::Span<int>, TypeWithMisleadingSize&>::value));
+      (std::is_constructible<abslx::Span<int>, TypeWithMisleadingSize&>::value));
 }
 
 struct Base {
@@ -184,14 +184,14 @@ struct Base {
 struct Derived : Base {};
 
 TEST(IntSpan, SpanOfDerived) {
-  EXPECT_TRUE((std::is_constructible<absl::Span<int>, Base&>::value));
-  EXPECT_TRUE((std::is_constructible<absl::Span<int>, Derived&>::value));
+  EXPECT_TRUE((std::is_constructible<abslx::Span<int>, Base&>::value));
+  EXPECT_TRUE((std::is_constructible<abslx::Span<int>, Derived&>::value));
   EXPECT_FALSE(
-      (std::is_constructible<absl::Span<Base>, std::vector<Derived>>::value));
+      (std::is_constructible<abslx::Span<Base>, std::vector<Derived>>::value));
 }
 
-void TestInitializerList(absl::Span<const int> s, const std::vector<int>& v) {
-  EXPECT_TRUE(absl::equal(s.begin(), s.end(), v.begin(), v.end()));
+void TestInitializerList(abslx::Span<const int> s, const std::vector<int>& v) {
+  EXPECT_TRUE(abslx::equal(s.begin(), s.end(), v.begin(), v.end()));
 }
 
 TEST(ConstIntSpan, InitializerListConversion) {
@@ -199,26 +199,26 @@ TEST(ConstIntSpan, InitializerListConversion) {
   TestInitializerList({1}, {1});
   TestInitializerList({1, 2, 3}, {1, 2, 3});
 
-  EXPECT_FALSE((std::is_constructible<absl::Span<int>,
+  EXPECT_FALSE((std::is_constructible<abslx::Span<int>,
                                       std::initializer_list<int>>::value));
   EXPECT_FALSE((
-      std::is_convertible<absl::Span<int>, std::initializer_list<int>>::value));
+      std::is_convertible<abslx::Span<int>, std::initializer_list<int>>::value));
 }
 
 TEST(IntSpan, Data) {
   int i;
-  absl::Span<int> s(&i, 1);
+  abslx::Span<int> s(&i, 1);
   EXPECT_EQ(&i, s.data());
 }
 
 TEST(IntSpan, SizeLengthEmpty) {
-  absl::Span<int> empty;
+  abslx::Span<int> empty;
   EXPECT_EQ(empty.size(), 0);
   EXPECT_TRUE(empty.empty());
   EXPECT_EQ(empty.size(), empty.length());
 
   auto v = MakeRamp(10);
-  absl::Span<int> s(v);
+  abslx::Span<int> s(v);
   EXPECT_EQ(s.size(), 10);
   EXPECT_FALSE(s.empty());
   EXPECT_EQ(s.size(), s.length());
@@ -226,7 +226,7 @@ TEST(IntSpan, SizeLengthEmpty) {
 
 TEST(IntSpan, ElementAccess) {
   auto v = MakeRamp(10);
-  absl::Span<int> s(v);
+  abslx::Span<int> s(v);
   for (int i = 0; i < s.size(); ++i) {
     EXPECT_EQ(s[i], s.at(i));
   }
@@ -242,7 +242,7 @@ TEST(IntSpan, ElementAccess) {
 
 TEST(IntSpan, AtThrows) {
   auto v = MakeRamp(10);
-  absl::Span<int> s(v);
+  abslx::Span<int> s(v);
 
   EXPECT_EQ(s.at(9), 9);
   ABSL_BASE_INTERNAL_EXPECT_FAIL(s.at(10), std::out_of_range,
@@ -251,7 +251,7 @@ TEST(IntSpan, AtThrows) {
 
 TEST(IntSpan, RemovePrefixAndSuffix) {
   auto v = MakeRamp(20, 1);
-  absl::Span<int> s(v);
+  abslx::Span<int> s(v);
   EXPECT_EQ(s.size(), 20);
 
   s.remove_suffix(0);
@@ -276,136 +276,136 @@ TEST(IntSpan, RemovePrefixAndSuffix) {
   EXPECT_EQ(v, MakeRamp(20, 1));
 
 #if !defined(NDEBUG) || ABSL_OPTION_HARDENED
-  absl::Span<int> prefix_death(v);
+  abslx::Span<int> prefix_death(v);
   EXPECT_DEATH_IF_SUPPORTED(prefix_death.remove_prefix(21), "");
-  absl::Span<int> suffix_death(v);
+  abslx::Span<int> suffix_death(v);
   EXPECT_DEATH_IF_SUPPORTED(suffix_death.remove_suffix(21), "");
 #endif
 }
 
 TEST(IntSpan, Subspan) {
   std::vector<int> empty;
-  EXPECT_EQ(absl::MakeSpan(empty).subspan(), empty);
-  EXPECT_THAT(absl::MakeSpan(empty).subspan(0, 0), SpanIs(empty));
-  EXPECT_THAT(absl::MakeSpan(empty).subspan(0, absl::Span<const int>::npos),
+  EXPECT_EQ(abslx::MakeSpan(empty).subspan(), empty);
+  EXPECT_THAT(abslx::MakeSpan(empty).subspan(0, 0), SpanIs(empty));
+  EXPECT_THAT(abslx::MakeSpan(empty).subspan(0, abslx::Span<const int>::npos),
               SpanIs(empty));
 
   auto ramp = MakeRamp(10);
-  EXPECT_THAT(absl::MakeSpan(ramp).subspan(), SpanIs(ramp));
-  EXPECT_THAT(absl::MakeSpan(ramp).subspan(0, 10), SpanIs(ramp));
-  EXPECT_THAT(absl::MakeSpan(ramp).subspan(0, absl::Span<const int>::npos),
+  EXPECT_THAT(abslx::MakeSpan(ramp).subspan(), SpanIs(ramp));
+  EXPECT_THAT(abslx::MakeSpan(ramp).subspan(0, 10), SpanIs(ramp));
+  EXPECT_THAT(abslx::MakeSpan(ramp).subspan(0, abslx::Span<const int>::npos),
               SpanIs(ramp));
-  EXPECT_THAT(absl::MakeSpan(ramp).subspan(0, 3), SpanIs(ramp.data(), 3));
-  EXPECT_THAT(absl::MakeSpan(ramp).subspan(5, absl::Span<const int>::npos),
+  EXPECT_THAT(abslx::MakeSpan(ramp).subspan(0, 3), SpanIs(ramp.data(), 3));
+  EXPECT_THAT(abslx::MakeSpan(ramp).subspan(5, abslx::Span<const int>::npos),
               SpanIs(ramp.data() + 5, 5));
-  EXPECT_THAT(absl::MakeSpan(ramp).subspan(3, 3), SpanIs(ramp.data() + 3, 3));
-  EXPECT_THAT(absl::MakeSpan(ramp).subspan(10, 5), SpanIs(ramp.data() + 10, 0));
+  EXPECT_THAT(abslx::MakeSpan(ramp).subspan(3, 3), SpanIs(ramp.data() + 3, 3));
+  EXPECT_THAT(abslx::MakeSpan(ramp).subspan(10, 5), SpanIs(ramp.data() + 10, 0));
 
 #ifdef ABSL_HAVE_EXCEPTIONS
-  EXPECT_THROW(absl::MakeSpan(ramp).subspan(11, 5), std::out_of_range);
+  EXPECT_THROW(abslx::MakeSpan(ramp).subspan(11, 5), std::out_of_range);
 #else
-  EXPECT_DEATH_IF_SUPPORTED(absl::MakeSpan(ramp).subspan(11, 5), "");
+  EXPECT_DEATH_IF_SUPPORTED(abslx::MakeSpan(ramp).subspan(11, 5), "");
 #endif
 }
 
 TEST(IntSpan, First) {
   std::vector<int> empty;
-  EXPECT_THAT(absl::MakeSpan(empty).first(0), SpanIs(empty));
+  EXPECT_THAT(abslx::MakeSpan(empty).first(0), SpanIs(empty));
 
   auto ramp = MakeRamp(10);
-  EXPECT_THAT(absl::MakeSpan(ramp).first(0), SpanIs(ramp.data(), 0));
-  EXPECT_THAT(absl::MakeSpan(ramp).first(10), SpanIs(ramp));
-  EXPECT_THAT(absl::MakeSpan(ramp).first(3), SpanIs(ramp.data(), 3));
+  EXPECT_THAT(abslx::MakeSpan(ramp).first(0), SpanIs(ramp.data(), 0));
+  EXPECT_THAT(abslx::MakeSpan(ramp).first(10), SpanIs(ramp));
+  EXPECT_THAT(abslx::MakeSpan(ramp).first(3), SpanIs(ramp.data(), 3));
 
 #ifdef ABSL_HAVE_EXCEPTIONS
-  EXPECT_THROW(absl::MakeSpan(ramp).first(11), std::out_of_range);
+  EXPECT_THROW(abslx::MakeSpan(ramp).first(11), std::out_of_range);
 #else
-  EXPECT_DEATH_IF_SUPPORTED(absl::MakeSpan(ramp).first(11), "");
+  EXPECT_DEATH_IF_SUPPORTED(abslx::MakeSpan(ramp).first(11), "");
 #endif
 }
 
 TEST(IntSpan, Last) {
   std::vector<int> empty;
-  EXPECT_THAT(absl::MakeSpan(empty).last(0), SpanIs(empty));
+  EXPECT_THAT(abslx::MakeSpan(empty).last(0), SpanIs(empty));
 
   auto ramp = MakeRamp(10);
-  EXPECT_THAT(absl::MakeSpan(ramp).last(0), SpanIs(ramp.data() + 10, 0));
-  EXPECT_THAT(absl::MakeSpan(ramp).last(10), SpanIs(ramp));
-  EXPECT_THAT(absl::MakeSpan(ramp).last(3), SpanIs(ramp.data() + 7, 3));
+  EXPECT_THAT(abslx::MakeSpan(ramp).last(0), SpanIs(ramp.data() + 10, 0));
+  EXPECT_THAT(abslx::MakeSpan(ramp).last(10), SpanIs(ramp));
+  EXPECT_THAT(abslx::MakeSpan(ramp).last(3), SpanIs(ramp.data() + 7, 3));
 
 #ifdef ABSL_HAVE_EXCEPTIONS
-  EXPECT_THROW(absl::MakeSpan(ramp).last(11), std::out_of_range);
+  EXPECT_THROW(abslx::MakeSpan(ramp).last(11), std::out_of_range);
 #else
-  EXPECT_DEATH_IF_SUPPORTED(absl::MakeSpan(ramp).last(11), "");
+  EXPECT_DEATH_IF_SUPPORTED(abslx::MakeSpan(ramp).last(11), "");
 #endif
 }
 
 TEST(IntSpan, MakeSpanPtrLength) {
   std::vector<int> empty;
-  auto s_empty = absl::MakeSpan(empty.data(), empty.size());
+  auto s_empty = abslx::MakeSpan(empty.data(), empty.size());
   EXPECT_THAT(s_empty, SpanIs(empty));
 
   std::array<int, 3> a{{1, 2, 3}};
-  auto s = absl::MakeSpan(a.data(), a.size());
+  auto s = abslx::MakeSpan(a.data(), a.size());
   EXPECT_THAT(s, SpanIs(a));
 
-  EXPECT_THAT(absl::MakeConstSpan(empty.data(), empty.size()), SpanIs(s_empty));
-  EXPECT_THAT(absl::MakeConstSpan(a.data(), a.size()), SpanIs(s));
+  EXPECT_THAT(abslx::MakeConstSpan(empty.data(), empty.size()), SpanIs(s_empty));
+  EXPECT_THAT(abslx::MakeConstSpan(a.data(), a.size()), SpanIs(s));
 }
 
 TEST(IntSpan, MakeSpanTwoPtrs) {
   std::vector<int> empty;
-  auto s_empty = absl::MakeSpan(empty.data(), empty.data());
+  auto s_empty = abslx::MakeSpan(empty.data(), empty.data());
   EXPECT_THAT(s_empty, SpanIs(empty));
 
   std::vector<int> v{1, 2, 3};
-  auto s = absl::MakeSpan(v.data(), v.data() + 1);
+  auto s = abslx::MakeSpan(v.data(), v.data() + 1);
   EXPECT_THAT(s, SpanIs(v.data(), 1));
 
-  EXPECT_THAT(absl::MakeConstSpan(empty.data(), empty.data()), SpanIs(s_empty));
-  EXPECT_THAT(absl::MakeConstSpan(v.data(), v.data() + 1), SpanIs(s));
+  EXPECT_THAT(abslx::MakeConstSpan(empty.data(), empty.data()), SpanIs(s_empty));
+  EXPECT_THAT(abslx::MakeConstSpan(v.data(), v.data() + 1), SpanIs(s));
 }
 
 TEST(IntSpan, MakeSpanContainer) {
   std::vector<int> empty;
-  auto s_empty = absl::MakeSpan(empty);
+  auto s_empty = abslx::MakeSpan(empty);
   EXPECT_THAT(s_empty, SpanIs(empty));
 
   std::vector<int> v{1, 2, 3};
-  auto s = absl::MakeSpan(v);
+  auto s = abslx::MakeSpan(v);
   EXPECT_THAT(s, SpanIs(v));
 
-  EXPECT_THAT(absl::MakeConstSpan(empty), SpanIs(s_empty));
-  EXPECT_THAT(absl::MakeConstSpan(v), SpanIs(s));
+  EXPECT_THAT(abslx::MakeConstSpan(empty), SpanIs(s_empty));
+  EXPECT_THAT(abslx::MakeConstSpan(v), SpanIs(s));
 
-  EXPECT_THAT(absl::MakeSpan(s), SpanIs(s));
-  EXPECT_THAT(absl::MakeConstSpan(s), SpanIs(s));
+  EXPECT_THAT(abslx::MakeSpan(s), SpanIs(s));
+  EXPECT_THAT(abslx::MakeConstSpan(s), SpanIs(s));
 }
 
 TEST(CharSpan, MakeSpanString) {
   std::string empty = "";
-  auto s_empty = absl::MakeSpan(empty);
+  auto s_empty = abslx::MakeSpan(empty);
   EXPECT_THAT(s_empty, SpanIs(empty));
 
   std::string str = "abc";
-  auto s_str = absl::MakeSpan(str);
+  auto s_str = abslx::MakeSpan(str);
   EXPECT_THAT(s_str, SpanIs(str));
 
-  EXPECT_THAT(absl::MakeConstSpan(empty), SpanIs(s_empty));
-  EXPECT_THAT(absl::MakeConstSpan(str), SpanIs(s_str));
+  EXPECT_THAT(abslx::MakeConstSpan(empty), SpanIs(s_empty));
+  EXPECT_THAT(abslx::MakeConstSpan(str), SpanIs(s_str));
 }
 
 TEST(IntSpan, MakeSpanArray) {
   int a[] = {1, 2, 3};
-  auto s = absl::MakeSpan(a);
+  auto s = abslx::MakeSpan(a);
   EXPECT_THAT(s, SpanIs(a, 3));
 
   const int ca[] = {1, 2, 3};
-  auto s_ca = absl::MakeSpan(ca);
+  auto s_ca = abslx::MakeSpan(ca);
   EXPECT_THAT(s_ca, SpanIs(ca, 3));
 
-  EXPECT_THAT(absl::MakeConstSpan(a), SpanIs(s));
-  EXPECT_THAT(absl::MakeConstSpan(ca), SpanIs(s_ca));
+  EXPECT_THAT(abslx::MakeConstSpan(a), SpanIs(s));
+  EXPECT_THAT(abslx::MakeConstSpan(ca), SpanIs(s_ca));
 }
 
 // Compile-asserts that the argument has the expected decayed type.
@@ -423,20 +423,20 @@ TEST(IntSpan, MakeSpanTypes) {
   const int* cip = ca;
   std::string s = "";
   const std::string cs = "";
-  CheckType<absl::Span<int>>(absl::MakeSpan(vec));
-  CheckType<absl::Span<const int>>(absl::MakeSpan(cvec));
-  CheckType<absl::Span<int>>(absl::MakeSpan(ip, ip + 1));
-  CheckType<absl::Span<int>>(absl::MakeSpan(ip, 1));
-  CheckType<absl::Span<const int>>(absl::MakeSpan(cip, cip + 1));
-  CheckType<absl::Span<const int>>(absl::MakeSpan(cip, 1));
-  CheckType<absl::Span<int>>(absl::MakeSpan(a));
-  CheckType<absl::Span<int>>(absl::MakeSpan(a, a + 1));
-  CheckType<absl::Span<int>>(absl::MakeSpan(a, 1));
-  CheckType<absl::Span<const int>>(absl::MakeSpan(ca));
-  CheckType<absl::Span<const int>>(absl::MakeSpan(ca, ca + 1));
-  CheckType<absl::Span<const int>>(absl::MakeSpan(ca, 1));
-  CheckType<absl::Span<char>>(absl::MakeSpan(s));
-  CheckType<absl::Span<const char>>(absl::MakeSpan(cs));
+  CheckType<abslx::Span<int>>(abslx::MakeSpan(vec));
+  CheckType<abslx::Span<const int>>(abslx::MakeSpan(cvec));
+  CheckType<abslx::Span<int>>(abslx::MakeSpan(ip, ip + 1));
+  CheckType<abslx::Span<int>>(abslx::MakeSpan(ip, 1));
+  CheckType<abslx::Span<const int>>(abslx::MakeSpan(cip, cip + 1));
+  CheckType<abslx::Span<const int>>(abslx::MakeSpan(cip, 1));
+  CheckType<abslx::Span<int>>(abslx::MakeSpan(a));
+  CheckType<abslx::Span<int>>(abslx::MakeSpan(a, a + 1));
+  CheckType<abslx::Span<int>>(abslx::MakeSpan(a, 1));
+  CheckType<abslx::Span<const int>>(abslx::MakeSpan(ca));
+  CheckType<abslx::Span<const int>>(abslx::MakeSpan(ca, ca + 1));
+  CheckType<abslx::Span<const int>>(abslx::MakeSpan(ca, 1));
+  CheckType<abslx::Span<char>>(abslx::MakeSpan(s));
+  CheckType<abslx::Span<const char>>(abslx::MakeSpan(cs));
 }
 
 TEST(ConstIntSpan, MakeConstSpanTypes) {
@@ -448,16 +448,16 @@ TEST(ConstIntSpan, MakeConstSpanTypes) {
   const int* cptr = carray;
   std::string s = "";
   std::string cs = "";
-  CheckType<absl::Span<const int>>(absl::MakeConstSpan(vec));
-  CheckType<absl::Span<const int>>(absl::MakeConstSpan(cvec));
-  CheckType<absl::Span<const int>>(absl::MakeConstSpan(ptr, ptr + 1));
-  CheckType<absl::Span<const int>>(absl::MakeConstSpan(ptr, 1));
-  CheckType<absl::Span<const int>>(absl::MakeConstSpan(cptr, cptr + 1));
-  CheckType<absl::Span<const int>>(absl::MakeConstSpan(cptr, 1));
-  CheckType<absl::Span<const int>>(absl::MakeConstSpan(array));
-  CheckType<absl::Span<const int>>(absl::MakeConstSpan(carray));
-  CheckType<absl::Span<const char>>(absl::MakeConstSpan(s));
-  CheckType<absl::Span<const char>>(absl::MakeConstSpan(cs));
+  CheckType<abslx::Span<const int>>(abslx::MakeConstSpan(vec));
+  CheckType<abslx::Span<const int>>(abslx::MakeConstSpan(cvec));
+  CheckType<abslx::Span<const int>>(abslx::MakeConstSpan(ptr, ptr + 1));
+  CheckType<abslx::Span<const int>>(abslx::MakeConstSpan(ptr, 1));
+  CheckType<abslx::Span<const int>>(abslx::MakeConstSpan(cptr, cptr + 1));
+  CheckType<abslx::Span<const int>>(abslx::MakeConstSpan(cptr, 1));
+  CheckType<abslx::Span<const int>>(abslx::MakeConstSpan(array));
+  CheckType<abslx::Span<const int>>(abslx::MakeConstSpan(carray));
+  CheckType<abslx::Span<const char>>(abslx::MakeConstSpan(s));
+  CheckType<abslx::Span<const char>>(abslx::MakeConstSpan(cs));
 }
 
 TEST(IntSpan, Equality) {
@@ -469,8 +469,8 @@ TEST(IntSpan, Equality) {
   // These two slices are from different vectors, but have the same size and
   // have the same elements (right now).  They should compare equal. Test both
   // == and !=.
-  const absl::Span<const int> from1 = vec1;
-  const absl::Span<const int> from2 = vec2;
+  const abslx::Span<const int> from1 = vec1;
+  const abslx::Span<const int> from2 = vec2;
   EXPECT_EQ(from1, from1);
   EXPECT_FALSE(from1 != from1);
   EXPECT_EQ(from1, from2);
@@ -478,7 +478,7 @@ TEST(IntSpan, Equality) {
 
   // These two slices have different underlying vector values. They should be
   // considered not equal. Test both == and !=.
-  const absl::Span<const int> from_other = other_vec;
+  const abslx::Span<const int> from_other = other_vec;
   EXPECT_NE(from1, from_other);
   EXPECT_FALSE(from1 == from_other);
 
@@ -489,10 +489,10 @@ TEST(IntSpan, Equality) {
   EXPECT_EQ(from1, vec1);
   EXPECT_FALSE(from1 != vec1);
 
-  // This verifies that absl::Span<T> can be compared freely with
-  // absl::Span<const T>.
-  const absl::Span<int> mutable_from1(vec1);
-  const absl::Span<int> mutable_from2(vec2);
+  // This verifies that abslx::Span<T> can be compared freely with
+  // abslx::Span<const T>.
+  const abslx::Span<int> mutable_from1(vec1);
+  const abslx::Span<int> mutable_from2(vec2);
   EXPECT_EQ(from1, mutable_from1);
   EXPECT_EQ(mutable_from1, from1);
   EXPECT_EQ(mutable_from1, mutable_from2);
@@ -521,7 +521,7 @@ TEST(IntSpan, Equality) {
   EXPECT_FALSE(from1 != arr2);
 
   // With a different size, the array slices should not be equal.
-  EXPECT_NE(from1, absl::Span<const int>(from1).subspan(0, from1.size() - 1));
+  EXPECT_NE(from1, abslx::Span<const int>(from1).subspan(0, from1.size() - 1));
 
   // With different contents, the array slices should not be equal.
   ++vec2.back();
@@ -545,8 +545,8 @@ class IntSpanOrderComparisonTest : public testing::Test {
   int arr_before_[3], arr_after_[3];
   const int carr_after_[3];
   std::vector<int> vec_before_, vec_after_;
-  absl::Span<int> before_, after_;
-  absl::Span<const int> cbefore_, cafter_;
+  abslx::Span<int> before_, after_;
+  abslx::Span<const int> cbefore_, cafter_;
 };
 
 TEST_F(IntSpanOrderComparisonTest, CompareSpans) {
@@ -630,7 +630,7 @@ TEST_F(IntSpanOrderComparisonTest, Subspans) {
 }
 
 TEST_F(IntSpanOrderComparisonTest, EmptySpans) {
-  absl::Span<int> empty;
+  abslx::Span<int> empty;
   EXPECT_FALSE(empty < empty);
   EXPECT_TRUE(empty <= empty);
   EXPECT_FALSE(empty > empty);
@@ -646,42 +646,42 @@ TEST_F(IntSpanOrderComparisonTest, EmptySpans) {
 }
 
 TEST(IntSpan, ExposesContainerTypesAndConsts) {
-  absl::Span<int> slice;
-  CheckType<absl::Span<int>::iterator>(slice.begin());
+  abslx::Span<int> slice;
+  CheckType<abslx::Span<int>::iterator>(slice.begin());
   EXPECT_TRUE((std::is_convertible<decltype(slice.begin()),
-                                   absl::Span<int>::const_iterator>::value));
-  CheckType<absl::Span<int>::const_iterator>(slice.cbegin());
+                                   abslx::Span<int>::const_iterator>::value));
+  CheckType<abslx::Span<int>::const_iterator>(slice.cbegin());
   EXPECT_TRUE((std::is_convertible<decltype(slice.end()),
-                                   absl::Span<int>::const_iterator>::value));
-  CheckType<absl::Span<int>::const_iterator>(slice.cend());
-  CheckType<absl::Span<int>::reverse_iterator>(slice.rend());
+                                   abslx::Span<int>::const_iterator>::value));
+  CheckType<abslx::Span<int>::const_iterator>(slice.cend());
+  CheckType<abslx::Span<int>::reverse_iterator>(slice.rend());
   EXPECT_TRUE(
       (std::is_convertible<decltype(slice.rend()),
-                           absl::Span<int>::const_reverse_iterator>::value));
-  CheckType<absl::Span<int>::const_reverse_iterator>(slice.crend());
-  testing::StaticAssertTypeEq<int, absl::Span<int>::value_type>();
-  testing::StaticAssertTypeEq<int, absl::Span<const int>::value_type>();
-  testing::StaticAssertTypeEq<int*, absl::Span<int>::pointer>();
-  testing::StaticAssertTypeEq<const int*, absl::Span<const int>::pointer>();
-  testing::StaticAssertTypeEq<int&, absl::Span<int>::reference>();
-  testing::StaticAssertTypeEq<const int&, absl::Span<const int>::reference>();
-  testing::StaticAssertTypeEq<const int&, absl::Span<int>::const_reference>();
+                           abslx::Span<int>::const_reverse_iterator>::value));
+  CheckType<abslx::Span<int>::const_reverse_iterator>(slice.crend());
+  testing::StaticAssertTypeEq<int, abslx::Span<int>::value_type>();
+  testing::StaticAssertTypeEq<int, abslx::Span<const int>::value_type>();
+  testing::StaticAssertTypeEq<int*, abslx::Span<int>::pointer>();
+  testing::StaticAssertTypeEq<const int*, abslx::Span<const int>::pointer>();
+  testing::StaticAssertTypeEq<int&, abslx::Span<int>::reference>();
+  testing::StaticAssertTypeEq<const int&, abslx::Span<const int>::reference>();
+  testing::StaticAssertTypeEq<const int&, abslx::Span<int>::const_reference>();
   testing::StaticAssertTypeEq<const int&,
-                              absl::Span<const int>::const_reference>();
-  EXPECT_EQ(static_cast<absl::Span<int>::size_type>(-1), absl::Span<int>::npos);
+                              abslx::Span<const int>::const_reference>();
+  EXPECT_EQ(static_cast<abslx::Span<int>::size_type>(-1), abslx::Span<int>::npos);
 }
 
 TEST(IntSpan, IteratorsAndReferences) {
   auto accept_pointer = [](int*) {};
   auto accept_reference = [](int&) {};
-  auto accept_iterator = [](absl::Span<int>::iterator) {};
-  auto accept_const_iterator = [](absl::Span<int>::const_iterator) {};
-  auto accept_reverse_iterator = [](absl::Span<int>::reverse_iterator) {};
+  auto accept_iterator = [](abslx::Span<int>::iterator) {};
+  auto accept_const_iterator = [](abslx::Span<int>::const_iterator) {};
+  auto accept_reverse_iterator = [](abslx::Span<int>::reverse_iterator) {};
   auto accept_const_reverse_iterator =
-      [](absl::Span<int>::const_reverse_iterator) {};
+      [](abslx::Span<int>::const_reverse_iterator) {};
 
   int a[1];
-  absl::Span<int> s = a;
+  abslx::Span<int> s = a;
 
   accept_pointer(s.data());
   accept_iterator(s.begin());
@@ -706,14 +706,14 @@ TEST(IntSpan, IteratorsAndReferences) {
 TEST(IntSpan, IteratorsAndReferences_Const) {
   auto accept_pointer = [](int*) {};
   auto accept_reference = [](int&) {};
-  auto accept_iterator = [](absl::Span<int>::iterator) {};
-  auto accept_const_iterator = [](absl::Span<int>::const_iterator) {};
-  auto accept_reverse_iterator = [](absl::Span<int>::reverse_iterator) {};
+  auto accept_iterator = [](abslx::Span<int>::iterator) {};
+  auto accept_const_iterator = [](abslx::Span<int>::const_iterator) {};
+  auto accept_reverse_iterator = [](abslx::Span<int>::reverse_iterator) {};
   auto accept_const_reverse_iterator =
-      [](absl::Span<int>::const_reverse_iterator) {};
+      [](abslx::Span<int>::const_reverse_iterator) {};
 
   int a[1];
-  const absl::Span<int> s = a;
+  const abslx::Span<int> s = a;
 
   accept_pointer(s.data());
   accept_iterator(s.begin());
@@ -738,22 +738,22 @@ TEST(IntSpan, IteratorsAndReferences_Const) {
 TEST(IntSpan, NoexceptTest) {
   int a[] = {1, 2, 3};
   std::vector<int> v;
-  EXPECT_TRUE(noexcept(absl::Span<const int>()));
-  EXPECT_TRUE(noexcept(absl::Span<const int>(a, 2)));
-  EXPECT_TRUE(noexcept(absl::Span<const int>(a)));
-  EXPECT_TRUE(noexcept(absl::Span<const int>(v)));
-  EXPECT_TRUE(noexcept(absl::Span<int>(v)));
-  EXPECT_TRUE(noexcept(absl::Span<const int>({1, 2, 3})));
-  EXPECT_TRUE(noexcept(absl::MakeSpan(v)));
-  EXPECT_TRUE(noexcept(absl::MakeSpan(a)));
-  EXPECT_TRUE(noexcept(absl::MakeSpan(a, 2)));
-  EXPECT_TRUE(noexcept(absl::MakeSpan(a, a + 1)));
-  EXPECT_TRUE(noexcept(absl::MakeConstSpan(v)));
-  EXPECT_TRUE(noexcept(absl::MakeConstSpan(a)));
-  EXPECT_TRUE(noexcept(absl::MakeConstSpan(a, 2)));
-  EXPECT_TRUE(noexcept(absl::MakeConstSpan(a, a + 1)));
+  EXPECT_TRUE(noexcept(abslx::Span<const int>()));
+  EXPECT_TRUE(noexcept(abslx::Span<const int>(a, 2)));
+  EXPECT_TRUE(noexcept(abslx::Span<const int>(a)));
+  EXPECT_TRUE(noexcept(abslx::Span<const int>(v)));
+  EXPECT_TRUE(noexcept(abslx::Span<int>(v)));
+  EXPECT_TRUE(noexcept(abslx::Span<const int>({1, 2, 3})));
+  EXPECT_TRUE(noexcept(abslx::MakeSpan(v)));
+  EXPECT_TRUE(noexcept(abslx::MakeSpan(a)));
+  EXPECT_TRUE(noexcept(abslx::MakeSpan(a, 2)));
+  EXPECT_TRUE(noexcept(abslx::MakeSpan(a, a + 1)));
+  EXPECT_TRUE(noexcept(abslx::MakeConstSpan(v)));
+  EXPECT_TRUE(noexcept(abslx::MakeConstSpan(a)));
+  EXPECT_TRUE(noexcept(abslx::MakeConstSpan(a, 2)));
+  EXPECT_TRUE(noexcept(abslx::MakeConstSpan(a, a + 1)));
 
-  absl::Span<int> s(v);
+  abslx::Span<int> s(v);
   EXPECT_TRUE(noexcept(s.data()));
   EXPECT_TRUE(noexcept(s.size()));
   EXPECT_TRUE(noexcept(s.length()));
@@ -795,18 +795,18 @@ TEST(ConstIntSpan, ConstexprTest) {
   static constexpr int a[] = {1, 2, 3};
   static constexpr int sized_arr[2] = {1, 2};
   static constexpr ContainerWithConstexprMethods c{1};
-  ABSL_TEST_CONSTEXPR(absl::Span<const int>());
-  ABSL_TEST_CONSTEXPR(absl::Span<const int>(a, 2));
-  ABSL_TEST_CONSTEXPR(absl::Span<const int>(sized_arr));
-  ABSL_TEST_CONSTEXPR(absl::Span<const int>(c));
-  ABSL_TEST_CONSTEXPR(absl::MakeSpan(&a[0], 1));
-  ABSL_TEST_CONSTEXPR(absl::MakeSpan(c));
-  ABSL_TEST_CONSTEXPR(absl::MakeSpan(a));
-  ABSL_TEST_CONSTEXPR(absl::MakeConstSpan(&a[0], 1));
-  ABSL_TEST_CONSTEXPR(absl::MakeConstSpan(c));
-  ABSL_TEST_CONSTEXPR(absl::MakeConstSpan(a));
+  ABSL_TEST_CONSTEXPR(abslx::Span<const int>());
+  ABSL_TEST_CONSTEXPR(abslx::Span<const int>(a, 2));
+  ABSL_TEST_CONSTEXPR(abslx::Span<const int>(sized_arr));
+  ABSL_TEST_CONSTEXPR(abslx::Span<const int>(c));
+  ABSL_TEST_CONSTEXPR(abslx::MakeSpan(&a[0], 1));
+  ABSL_TEST_CONSTEXPR(abslx::MakeSpan(c));
+  ABSL_TEST_CONSTEXPR(abslx::MakeSpan(a));
+  ABSL_TEST_CONSTEXPR(abslx::MakeConstSpan(&a[0], 1));
+  ABSL_TEST_CONSTEXPR(abslx::MakeConstSpan(c));
+  ABSL_TEST_CONSTEXPR(abslx::MakeConstSpan(a));
 
-  constexpr absl::Span<const int> span = c;
+  constexpr abslx::Span<const int> span = c;
   ABSL_TEST_CONSTEXPR(span.data());
   ABSL_TEST_CONSTEXPR(span.size());
   ABSL_TEST_CONSTEXPR(span.length());
@@ -824,15 +824,15 @@ struct BigStruct {
 };
 
 TEST(Span, SpanSize) {
-  EXPECT_LE(sizeof(absl::Span<int>), 2 * sizeof(void*));
-  EXPECT_LE(sizeof(absl::Span<BigStruct>), 2 * sizeof(void*));
+  EXPECT_LE(sizeof(abslx::Span<int>), 2 * sizeof(void*));
+  EXPECT_LE(sizeof(abslx::Span<BigStruct>), 2 * sizeof(void*));
 }
 
 TEST(Span, Hash) {
   int array[] = {1, 2, 3, 4};
   int array2[] = {1, 2, 3};
-  using T = absl::Span<const int>;
-  EXPECT_TRUE(absl::VerifyTypeImplementsAbslHashCorrectly(
+  using T = abslx::Span<const int>;
+  EXPECT_TRUE(abslx::VerifyTypeImplementsAbslHashCorrectly(
       {// Empties
        T(), T(nullptr, 0), T(array, 0), T(array2, 0),
        // Different array with same value

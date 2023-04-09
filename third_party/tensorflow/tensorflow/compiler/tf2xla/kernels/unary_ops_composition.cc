@@ -32,7 +32,7 @@ namespace tensorflow {
 namespace {
 
 using XlaUnaryOpGenerator = std::function<xla::XlaOp(xla::XlaOp)>;
-using XlaOpGeneratorMap = absl::flat_hash_map<string, XlaUnaryOpGenerator>;
+using XlaOpGeneratorMap = abslx::flat_hash_map<string, XlaUnaryOpGenerator>;
 
 void PopulateXlaOpGeneratorMap(XlaOpGeneratorMap* op_generator_map) {
   auto add_xla_op_generator = [&](std::string name,
@@ -96,7 +96,7 @@ class UnaryOpsCompositionOp : public XlaOpKernel {
     OP_REQUIRES_OK(ctx, ctx->GetAttr("op_names", &op_names_));
 
     const XlaOpGeneratorMap& op_generator_map = GetXlaOpGeneratorMap();
-    for (absl::string_view op_name : op_names_) {
+    for (abslx::string_view op_name : op_names_) {
       OP_REQUIRES(ctx, op_generator_map.contains(op_name),
                   errors::Unimplemented(
                       op_name, " not supported in _UnaryOpsComposition"));
@@ -106,7 +106,7 @@ class UnaryOpsCompositionOp : public XlaOpKernel {
   void Compile(XlaOpKernelContext* ctx) override {
     xla::XlaOp x = ctx->Input(0);
     const XlaOpGeneratorMap& op_generator_map = GetXlaOpGeneratorMap();
-    for (absl::string_view op_name : op_names_) {
+    for (abslx::string_view op_name : op_names_) {
       x = op_generator_map.find(op_name)->second(x);
     }
     ctx->SetOutput(0, x);

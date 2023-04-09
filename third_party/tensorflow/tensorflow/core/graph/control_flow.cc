@@ -67,8 +67,8 @@ Status ValidateControlFlowInfo(const Graph* graph,
       // BackPropLoopCounter runs in the same frame as the backprop loop. They
       // are the only cases that multiple loops share the same frame.
       if (frame.loop_cond &&
-          !absl::StrContains(frame.loop_cond->name(), "LoopCounter") &&
-          !absl::StrContains(node->name(), "LoopCounter")) {
+          !abslx::StrContains(frame.loop_cond->name(), "LoopCounter") &&
+          !abslx::StrContains(node->name(), "LoopCounter")) {
         return errors::InvalidArgument(
             "Invalid loop structure: Loop \"", cf.frame_name,
             "\" has more than one LoopCond node: ", FormatNodeForError(*node),

@@ -25,13 +25,13 @@ ArgTypeView::ArgTypeView(ArgType arg_type) : arg_type_(arg_type) {}
 string ArgTypeView::TypeName() const {
   if (arg_type_.is_read_only()) {
     if (arg_type_.is_list()) {
-      return "absl::Span<AbstractTensorHandle* const>";
+      return "abslx::Span<AbstractTensorHandle* const>";
     } else {
       return "AbstractTensorHandle* const";
     }
   } else {
     if (arg_type_.is_list()) {
-      return "absl::Span<AbstractTensorHandle*>";
+      return "abslx::Span<AbstractTensorHandle*>";
     } else {
       return "AbstractTensorHandle**";
     }

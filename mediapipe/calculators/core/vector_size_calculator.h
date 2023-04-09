@@ -49,12 +49,12 @@ class VectorSizeCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kIn, kOut);
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     if (kIn(cc).IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     kOut(cc).Send(kIn(cc).Get().size());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

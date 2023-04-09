@@ -41,17 +41,17 @@ using ::tflite::GetOutput;
 using ::tflite::GetString;
 using ::tflite::StringRef;
 
-constexpr absl::string_view kInputStr = "hello";
+constexpr abslx::string_view kInputStr = "hello";
 constexpr bool kBooleanData[] = {true, true, false};
 constexpr size_t kBooleanDataSize = std::size(kBooleanData);
 
 // Checks and returns type of a tensor, fails if tensor type is not T.
 template <typename T>
-absl::StatusOr<T*> AssertAndReturnTypedTensor(const TfLiteTensor* tensor) {
+abslx::StatusOr<T*> AssertAndReturnTypedTensor(const TfLiteTensor* tensor) {
   if (!tensor->data.raw) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInternal,
-        absl::StrFormat("Tensor (%s) has no raw data.", tensor->name));
+        abslx::StatusCode::kInternal,
+        abslx::StrFormat("Tensor (%s) has no raw data.", tensor->name));
   }
 
   // Checks if data type of tensor is T and returns the pointer casted to T if
@@ -61,8 +61,8 @@ absl::StatusOr<T*> AssertAndReturnTypedTensor(const TfLiteTensor* tensor) {
     return reinterpret_cast<T*>(tensor->data.raw);
   }
   return CreateStatusWithPayload(
-      absl::StatusCode::kInternal,
-      absl::StrFormat("Type mismatch for tensor %s. Required %d, got %d.",
+      abslx::StatusCode::kInternal,
+      abslx::StrFormat("Type mismatch for tensor %s. Required %d, got %d.",
                       tensor->name, tflite::typeToTfLiteType<T>(),
                       tensor->bytes));
 }
@@ -71,18 +71,18 @@ absl::StatusOr<T*> AssertAndReturnTypedTensor(const TfLiteTensor* tensor) {
 // type or they don't have the same number of elements.
 template <typename T, typename = std::enable_if_t<
                           std::negation_v<std::is_same<T, std::string>>>>
-absl::Status PopulateTensor(const T* data, int num_elements,
+abslx::Status PopulateTensor(const T* data, int num_elements,
                             TfLiteTensor* tensor) {
   ASSIGN_OR_RETURN(T * v, AssertAndReturnTypedTensor<T>(tensor));
   size_t bytes = num_elements * sizeof(T);
   if (tensor->bytes != bytes) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInternal,
-        absl::StrFormat("tensor->bytes (%d) != bytes (%d)", tensor->bytes,
+        abslx::StatusCode::kInternal,
+        abslx::StrFormat("tensor->bytes (%d) != bytes (%d)", tensor->bytes,
                         bytes));
   }
   std::memcpy(v, data, bytes);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 TfLiteStatus PrepareStringToBool(TfLiteContext* context, TfLiteNode* node) {

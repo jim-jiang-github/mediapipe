@@ -23,7 +23,7 @@
 #include "absl/meta/type_traits.h"
 #include "absl/random/internal/traits.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 template <typename IntType>
@@ -72,11 +72,11 @@ namespace random_internal {
 // compile-time logic for deciding if such a conversion is possible.
 //
 // If no such conversion between {A, B} exists, then the overload for
-// absl::Uniform() will be discarded, and the call will be ill-formed.
-// Return-type for absl::Uniform() when the return-type is inferred.
+// abslx::Uniform() will be discarded, and the call will be ill-formed.
+// Return-type for abslx::Uniform() when the return-type is inferred.
 template <typename A, typename B>
 using uniform_inferred_return_t =
-    absl::enable_if_t<absl::disjunction<is_widening_convertible<A, B>,
+    abslx::enable_if_t<abslx::disjunction<is_widening_convertible<A, B>,
                                         is_widening_convertible<B, A>>::value,
                       typename std::conditional<
                           is_widening_convertible<A, B>::value, B, A>::type>;
@@ -85,7 +85,7 @@ using uniform_inferred_return_t =
 //    uniform_lower_bound(tag, a, b)
 // and
 //    uniform_upper_bound(tag, a, b)
-// are used as implementation-details for absl::Uniform().
+// are used as implementation-details for abslx::Uniform().
 //
 // Conceptually,
 //    [a, b] == [uniform_lower_bound(IntervalClosedClosed, a, b),
@@ -98,10 +98,10 @@ using uniform_inferred_return_t =
 //               uniform_upper_bound(IntervalOpenClosed, a, b)]
 //
 template <typename IntType, typename Tag>
-typename absl::enable_if_t<
-    absl::conjunction<
+typename abslx::enable_if_t<
+    abslx::conjunction<
         std::is_integral<IntType>,
-        absl::disjunction<std::is_same<Tag, IntervalOpenClosedTag>,
+        abslx::disjunction<std::is_same<Tag, IntervalOpenClosedTag>,
                           std::is_same<Tag, IntervalOpenOpenTag>>>::value,
     IntType>
 uniform_lower_bound(Tag, IntType a, IntType) {
@@ -109,10 +109,10 @@ uniform_lower_bound(Tag, IntType a, IntType) {
 }
 
 template <typename FloatType, typename Tag>
-typename absl::enable_if_t<
-    absl::conjunction<
+typename abslx::enable_if_t<
+    abslx::conjunction<
         std::is_floating_point<FloatType>,
-        absl::disjunction<std::is_same<Tag, IntervalOpenClosedTag>,
+        abslx::disjunction<std::is_same<Tag, IntervalOpenClosedTag>,
                           std::is_same<Tag, IntervalOpenOpenTag>>>::value,
     FloatType>
 uniform_lower_bound(Tag, FloatType a, FloatType b) {
@@ -120,8 +120,8 @@ uniform_lower_bound(Tag, FloatType a, FloatType b) {
 }
 
 template <typename NumType, typename Tag>
-typename absl::enable_if_t<
-    absl::disjunction<std::is_same<Tag, IntervalClosedClosedTag>,
+typename abslx::enable_if_t<
+    abslx::disjunction<std::is_same<Tag, IntervalClosedClosedTag>,
                       std::is_same<Tag, IntervalClosedOpenTag>>::value,
     NumType>
 uniform_lower_bound(Tag, NumType a, NumType) {
@@ -129,10 +129,10 @@ uniform_lower_bound(Tag, NumType a, NumType) {
 }
 
 template <typename IntType, typename Tag>
-typename absl::enable_if_t<
-    absl::conjunction<
+typename abslx::enable_if_t<
+    abslx::conjunction<
         std::is_integral<IntType>,
-        absl::disjunction<std::is_same<Tag, IntervalClosedOpenTag>,
+        abslx::disjunction<std::is_same<Tag, IntervalClosedOpenTag>,
                           std::is_same<Tag, IntervalOpenOpenTag>>>::value,
     IntType>
 uniform_upper_bound(Tag, IntType, IntType b) {
@@ -140,10 +140,10 @@ uniform_upper_bound(Tag, IntType, IntType b) {
 }
 
 template <typename FloatType, typename Tag>
-typename absl::enable_if_t<
-    absl::conjunction<
+typename abslx::enable_if_t<
+    abslx::conjunction<
         std::is_floating_point<FloatType>,
-        absl::disjunction<std::is_same<Tag, IntervalClosedOpenTag>,
+        abslx::disjunction<std::is_same<Tag, IntervalClosedOpenTag>,
                           std::is_same<Tag, IntervalOpenOpenTag>>>::value,
     FloatType>
 uniform_upper_bound(Tag, FloatType, FloatType b) {
@@ -151,10 +151,10 @@ uniform_upper_bound(Tag, FloatType, FloatType b) {
 }
 
 template <typename IntType, typename Tag>
-typename absl::enable_if_t<
-    absl::conjunction<
+typename abslx::enable_if_t<
+    abslx::conjunction<
         std::is_integral<IntType>,
-        absl::disjunction<std::is_same<Tag, IntervalClosedClosedTag>,
+        abslx::disjunction<std::is_same<Tag, IntervalClosedClosedTag>,
                           std::is_same<Tag, IntervalOpenClosedTag>>>::value,
     IntType>
 uniform_upper_bound(Tag, IntType, IntType b) {
@@ -162,10 +162,10 @@ uniform_upper_bound(Tag, IntType, IntType b) {
 }
 
 template <typename FloatType, typename Tag>
-typename absl::enable_if_t<
-    absl::conjunction<
+typename abslx::enable_if_t<
+    abslx::conjunction<
         std::is_floating_point<FloatType>,
-        absl::disjunction<std::is_same<Tag, IntervalClosedClosedTag>,
+        abslx::disjunction<std::is_same<Tag, IntervalClosedClosedTag>,
                           std::is_same<Tag, IntervalOpenClosedTag>>>::value,
     FloatType>
 uniform_upper_bound(Tag, FloatType, FloatType b) {
@@ -195,27 +195,27 @@ uniform_upper_bound(Tag, FloatType, FloatType b) {
 // (0, 0] is not legal, but (0, 0+epsilon] is.
 //
 template <typename FloatType>
-absl::enable_if_t<std::is_floating_point<FloatType>::value, bool>
+abslx::enable_if_t<std::is_floating_point<FloatType>::value, bool>
 is_uniform_range_valid(FloatType a, FloatType b) {
   return a <= b && std::isfinite(b - a);
 }
 
 template <typename IntType>
-absl::enable_if_t<std::is_integral<IntType>::value, bool>
+abslx::enable_if_t<std::is_integral<IntType>::value, bool>
 is_uniform_range_valid(IntType a, IntType b) {
   return a <= b;
 }
 
-// UniformDistribution selects either absl::uniform_int_distribution
-// or absl::uniform_real_distribution depending on the NumType parameter.
+// UniformDistribution selects either abslx::uniform_int_distribution
+// or abslx::uniform_real_distribution depending on the NumType parameter.
 template <typename NumType>
 using UniformDistribution =
     typename std::conditional<std::is_integral<NumType>::value,
-                              absl::uniform_int_distribution<NumType>,
-                              absl::uniform_real_distribution<NumType>>::type;
+                              abslx::uniform_int_distribution<NumType>,
+                              abslx::uniform_real_distribution<NumType>>::type;
 
 // UniformDistributionWrapper is used as the underlying distribution type
-// by the absl::Uniform template function. It selects the proper Abseil
+// by the abslx::Uniform template function. It selects the proper Abseil
 // uniform distribution and provides constructor overloads that match the
 // expected parameter order as well as adjusting distribtuion bounds based
 // on the tag.
@@ -239,6 +239,6 @@ struct UniformDistributionWrapper : public UniformDistribution<NumType> {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_INTERNAL_UNIFORM_HELPER_H_

@@ -421,8 +421,8 @@ TEST(GroupEventsTest, SemanticArgTest) {
         num_events += line.NumEvents();
         line.ForEachEvent(
             [&](const tensorflow::profiler::XEventVisitor& event) {
-              absl::optional<int64_t> group_id;
-              if (absl::optional<XStatVisitor> stat =
+              abslx::optional<int64_t> group_id;
+              if (abslx::optional<XStatVisitor> stat =
                       event.GetStat(StatType::kGroupId)) {
                 group_id = stat->IntValue();
               }
@@ -462,8 +462,8 @@ TEST(GroupEventsTest, SemanticIntArgNoMatchTest) {
         num_events += line.NumEvents();
         line.ForEachEvent(
             [&](const tensorflow::profiler::XEventVisitor& event) {
-              absl::optional<int64_t> group_id;
-              if (absl::optional<XStatVisitor> stat =
+              abslx::optional<int64_t> group_id;
+              if (abslx::optional<XStatVisitor> stat =
                       event.GetStat(StatType::kGroupId)) {
                 group_id = stat->IntValue();
               }
@@ -507,8 +507,8 @@ TEST(GroupEventsTest, SemanticUintArgNoMatchTest) {
         num_events += line.NumEvents();
         line.ForEachEvent(
             [&](const tensorflow::profiler::XEventVisitor& event) {
-              absl::optional<int64_t> group_id;
-              if (absl::optional<XStatVisitor> stat =
+              abslx::optional<int64_t> group_id;
+              if (abslx::optional<XStatVisitor> stat =
                       event.GetStat(StatType::kGroupId)) {
                 group_id = stat->IntValue();
               }
@@ -526,9 +526,9 @@ TEST(GroupEventsTest, SemanticUintArgNoMatchTest) {
 TEST(GroupEventsTest, AsyncEventTest) {
   constexpr int64_t kIsRoot = 1;
   constexpr int64_t kIsAsync = 1;
-  constexpr absl::string_view kParent = "parent";
-  constexpr absl::string_view kAsync = "async";
-  constexpr absl::string_view kChild = "child";
+  constexpr abslx::string_view kParent = "parent";
+  constexpr abslx::string_view kAsync = "async";
+  constexpr abslx::string_view kChild = "child";
 
   XSpace raw_space;
   XPlane* raw_plane = raw_space.add_planes();
@@ -546,8 +546,8 @@ TEST(GroupEventsTest, AsyncEventTest) {
         EXPECT_EQ(line.NumEvents(), 3);
         line.ForEachEvent(
             [&](const tensorflow::profiler::XEventVisitor& event) {
-              absl::optional<int64_t> group_id;
-              if (absl::optional<XStatVisitor> stat =
+              abslx::optional<int64_t> group_id;
+              if (abslx::optional<XStatVisitor> stat =
                       event.GetStat(StatType::kGroupId)) {
                 group_id = stat->IntValue();
               }
@@ -599,8 +599,8 @@ TEST(GroupEventsTest, WorkerTest) {
         EXPECT_EQ(line.NumEvents(), 6);
         line.ForEachEvent(
             [&](const tensorflow::profiler::XEventVisitor& event) {
-              absl::optional<int64_t> group_id;
-              if (absl::optional<XStatVisitor> stat =
+              abslx::optional<int64_t> group_id;
+              if (abslx::optional<XStatVisitor> stat =
                       event.GetStat(StatType::kGroupId)) {
                 group_id = stat->IntValue();
               }
@@ -619,7 +619,7 @@ TEST(GroupEventsTest, WorkerTest) {
 }
 
 TEST(GroupEventsTest, BatchingSessionTest) {
-  constexpr absl::string_view kSchedule = "Schedule";
+  constexpr abslx::string_view kSchedule = "Schedule";
   constexpr int64_t kBatchContextType =
       static_cast<int64_t>(ContextType::kSharedBatchScheduler);
   constexpr int64_t kBatchContextId = 123;
@@ -667,8 +667,8 @@ TEST(GroupEventsTest, BatchingSessionTest) {
       [&](const tensorflow::profiler::XLineVisitor& line) {
         line.ForEachEvent(
             [&](const tensorflow::profiler::XEventVisitor& event) {
-              absl::optional<int64_t> group_id;
-              if (absl::optional<XStatVisitor> stat =
+              abslx::optional<int64_t> group_id;
+              if (abslx::optional<XStatVisitor> stat =
                       event.GetStat(StatType::kGroupId)) {
                 group_id = stat->IntValue();
               }

@@ -24,7 +24,7 @@ limitations under the License.
 
 namespace xla {
 
-/* static */ absl::Mutex Compiler::platform_compiler_mutex_(absl::kConstInit);
+/* static */ abslx::Mutex Compiler::platform_compiler_mutex_(abslx::kConstInit);
 
 std::vector<std::unique_ptr<tensorflow::protobuf::Message>>
 Compiler::ComputeBackendConfigs(const HloInstruction& hlo,
@@ -70,7 +70,7 @@ Compiler::GetPlatformCompilers() {
 /* static */ void Compiler::RegisterCompilerFactory(
     se::Platform::Id platform_id,
     std::function<std::unique_ptr<Compiler>()> compiler_factory) {
-  absl::MutexLock lock(&platform_compiler_mutex_);
+  abslx::MutexLock lock(&platform_compiler_mutex_);
   auto* factories = GetPlatformCompilerFactories();
   CHECK(factories->find(platform_id) == factories->end())
       << "Compiler factory already registered for platform";
@@ -79,7 +79,7 @@ Compiler::GetPlatformCompilers() {
 
 /* static */ StatusOr<Compiler*> Compiler::GetForPlatform(
     const se::Platform* platform) {
-  absl::MutexLock lock(&platform_compiler_mutex_);
+  abslx::MutexLock lock(&platform_compiler_mutex_);
 
   auto* compilers = GetPlatformCompilers();
   // See if we already instantiated a compiler for this platform.

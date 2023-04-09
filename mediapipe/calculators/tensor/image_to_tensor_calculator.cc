@@ -130,7 +130,7 @@ class ImageToTensorCalculator : public Node {
   MEDIAPIPE_NODE_CONTRACT(kIn, kInGpu, kInNormRect, kOutTensors,
                           kOutLetterboxPadding, kOutMatrix);
 
-  static absl::Status UpdateContract(CalculatorContract* cc) {
+  static abslx::Status UpdateContract(CalculatorContract* cc) {
     const auto& options =
         cc->Options<mediapipe::ImageToTensorCalculatorOptions>();
 
@@ -140,7 +140,7 @@ class ImageToTensorCalculator : public Node {
 
 #if MEDIAPIPE_DISABLE_GPU
     if (kInGpu(cc).IsConnected()) {
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "GPU processing is disabled in build flags");
     }
 #else  // !MEDIAPIPE_DISABLE_GPU
@@ -151,27 +151,27 @@ class ImageToTensorCalculator : public Node {
 #endif  // MEDIAPIPE_METAL_ENABLED
 #endif  // MEDIAPIPE_DISABLE_GPU
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) {
+  abslx::Status Open(CalculatorContext* cc) {
     options_ = cc->Options<mediapipe::ImageToTensorCalculatorOptions>();
     params_ = GetOutputTensorParams(options_);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) {
+  abslx::Status Process(CalculatorContext* cc) {
     if ((kIn(cc).IsConnected() && kIn(cc).IsEmpty()) ||
         (kInGpu(cc).IsConnected() && kInGpu(cc).IsEmpty())) {
       // Timestamp bound update happens automatically.
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
-    absl::optional<mediapipe::NormalizedRect> norm_rect;
+    abslx::optional<mediapipe::NormalizedRect> norm_rect;
     if (kInNormRect(cc).IsConnected()) {
       if (kInNormRect(cc).IsEmpty()) {
         // Timestamp bound update happens automatically. (See Open().)
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
       norm_rect = *kInNormRect(cc);
       if (norm_rect->width() == 0 && norm_rect->height() == 0) {
@@ -182,7 +182,7 @@ class ImageToTensorCalculator : public Node {
         // NOTE: usage of sentinel rects should be avoided.
         DLOG(WARNING)
             << "Updating timestamp bound in response to a sentinel rect";
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
     }
 
@@ -226,16 +226,16 @@ class ImageToTensorCalculator : public Node {
     result->push_back(std::move(tensor));
     kOutTensors(cc).Send(std::move(result));
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
-  absl::Status InitConverterIfNecessary(CalculatorContext* cc,
+  abslx::Status InitConverterIfNecessary(CalculatorContext* cc,
                                         const Image& image) {
     // Lazy initialization of the GPU or CPU converter.
     if (image.UsesGpu()) {
       if (!params_.is_float_output) {
-        return absl::UnimplementedError(
+        return abslx::UnimplementedError(
             "ImageToTensorConverter for the input GPU image currently doesn't "
             "support quantization.");
       }
@@ -258,7 +258,7 @@ class ImageToTensorCalculator : public Node {
                                GetBorderMode(options_.border_mode())));
         }
         if (!gpu_converter_) {
-          return absl::UnimplementedError(
+          return abslx::UnimplementedError(
               "ImageToTensorConverter for the input GPU image is unavailable.");
         }
 #endif  // MEDIAPIPE_METAL_ENABLED
@@ -277,7 +277,7 @@ class ImageToTensorCalculator : public Node {
 #endif  // !MEDIAPIPE_DISABLE_OPENCV
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   std::unique_ptr<ImageToTensorConverter> gpu_converter_;

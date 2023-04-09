@@ -38,13 +38,13 @@ std::string MakeTestString(int desired_length) {
 void BM_Split2StringView(benchmark::State& state) {
   std::string test = MakeTestString(state.range(0));
   for (auto _ : state) {
-    std::vector<absl::string_view> result = absl::StrSplit(test, ';');
+    std::vector<abslx::string_view> result = abslx::StrSplit(test, ';');
     benchmark::DoNotOptimize(result);
   }
 }
 BENCHMARK_RANGE(BM_Split2StringView, 0, 1 << 20);
 
-static const absl::string_view kDelimiters = ";:,.";
+static const abslx::string_view kDelimiters = ";:,.";
 
 std::string MakeMultiDelimiterTestString(int desired_length) {
   static const int kAverageValueLen = 25;
@@ -60,8 +60,8 @@ std::string MakeMultiDelimiterTestString(int desired_length) {
 void BM_Split2StringViewByAnyChar(benchmark::State& state) {
   std::string test = MakeMultiDelimiterTestString(state.range(0));
   for (auto _ : state) {
-    std::vector<absl::string_view> result =
-        absl::StrSplit(test, absl::ByAnyChar(kDelimiters));
+    std::vector<abslx::string_view> result =
+        abslx::StrSplit(test, abslx::ByAnyChar(kDelimiters));
     benchmark::DoNotOptimize(result);
   }
 }
@@ -69,9 +69,9 @@ BENCHMARK_RANGE(BM_Split2StringViewByAnyChar, 0, 1 << 20);
 
 void BM_Split2StringViewLifted(benchmark::State& state) {
   std::string test = MakeTestString(state.range(0));
-  std::vector<absl::string_view> result;
+  std::vector<abslx::string_view> result;
   for (auto _ : state) {
-    result = absl::StrSplit(test, ';');
+    result = abslx::StrSplit(test, ';');
   }
   benchmark::DoNotOptimize(result);
 }
@@ -80,7 +80,7 @@ BENCHMARK_RANGE(BM_Split2StringViewLifted, 0, 1 << 20);
 void BM_Split2String(benchmark::State& state) {
   std::string test = MakeTestString(state.range(0));
   for (auto _ : state) {
-    std::vector<std::string> result = absl::StrSplit(test, ';');
+    std::vector<std::string> result = abslx::StrSplit(test, ';');
     benchmark::DoNotOptimize(result);
   }
 }
@@ -93,7 +93,7 @@ void BM_Split2SplitStringUsing(benchmark::State& state) {
   std::string test = MakeTestString(state.range(0));
   for (auto _ : state) {
     std::vector<std::string> result =
-        absl::StrSplit(test, ';', absl::SkipEmpty());
+        abslx::StrSplit(test, ';', abslx::SkipEmpty());
     benchmark::DoNotOptimize(result);
   }
 }
@@ -107,7 +107,7 @@ void BM_SplitStringToUnorderedSet(benchmark::State& state) {
   }
   for (auto _ : state) {
     std::unordered_set<std::string> result =
-        absl::StrSplit(test, ':', absl::SkipEmpty());
+        abslx::StrSplit(test, ':', abslx::SkipEmpty());
     benchmark::DoNotOptimize(result);
   }
 }
@@ -121,7 +121,7 @@ void BM_SplitStringToUnorderedMap(benchmark::State& state) {
   }
   for (auto _ : state) {
     std::unordered_map<std::string, std::string> result =
-        absl::StrSplit(test, ':', absl::SkipEmpty());
+        abslx::StrSplit(test, ':', abslx::SkipEmpty());
     benchmark::DoNotOptimize(result);
   }
 }
@@ -134,7 +134,7 @@ void BM_SplitStringAllowEmpty(benchmark::State& state) {
     test[i] = ';';
   }
   for (auto _ : state) {
-    std::vector<std::string> result = absl::StrSplit(test, ';');
+    std::vector<std::string> result = abslx::StrSplit(test, ';');
     benchmark::DoNotOptimize(result);
   }
 }
@@ -151,10 +151,10 @@ struct OneCharStringLiteral {
 template <typename DelimiterFactory>
 void BM_SplitStringWithOneChar(benchmark::State& state) {
   const auto delimiter = DelimiterFactory()();
-  std::vector<absl::string_view> pieces;
+  std::vector<abslx::string_view> pieces;
   size_t v = 0;
   for (auto _ : state) {
-    pieces = absl::StrSplit("The quick brown fox jumps over the lazy dog",
+    pieces = abslx::StrSplit("The quick brown fox jumps over the lazy dog",
                             delimiter);
     v += pieces.size();
   }
@@ -168,7 +168,7 @@ void BM_SplitStringWithOneCharNoVector(benchmark::State& state) {
   const auto delimiter = DelimiterFactory()();
   size_t v = 0;
   for (auto _ : state) {
-    auto splitter = absl::StrSplit(
+    auto splitter = abslx::StrSplit(
         "The quick brown fox jumps over the lazy dog", delimiter);
     v += std::distance(splitter.begin(), splitter.end());
   }

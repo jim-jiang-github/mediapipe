@@ -29,13 +29,13 @@ bool IsResourceArgDef(const OpDef::ArgDef& arg_def) {
 }
 
 bool HasResourceInputOrOutput(const OpDef& op_def) {
-  return absl::c_any_of(op_def.input_arg(), IsResourceArgDef) ||
-         absl::c_any_of(op_def.output_arg(), IsResourceArgDef);
+  return abslx::c_any_of(op_def.input_arg(), IsResourceArgDef) ||
+         abslx::c_any_of(op_def.output_arg(), IsResourceArgDef);
 }
 
 TEST(ResourceOperationTableTest, HaveAllResourceOps) {
-  absl::flat_hash_map<string, bool> known_resource_ops;
-  for (absl::string_view known_resource_op :
+  abslx::flat_hash_map<string, bool> known_resource_ops;
+  for (abslx::string_view known_resource_op :
        resource_op_table_internal::GetKnownResourceOps()) {
     ASSERT_TRUE(
         known_resource_ops.insert({string(known_resource_op), false}).second);
@@ -61,7 +61,7 @@ TEST(ResourceOperationTableTest, HaveAllResourceOps) {
 
   EXPECT_TRUE(unnecessary_resource_ops.empty())
       << "Stale resource ops:\n"
-      << absl::StrJoin(unnecessary_resource_ops, "\n");
+      << abslx::StrJoin(unnecessary_resource_ops, "\n");
 }
 }  // namespace
 }  // namespace tensorflow

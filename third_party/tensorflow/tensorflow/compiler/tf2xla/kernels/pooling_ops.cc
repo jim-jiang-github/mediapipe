@@ -147,7 +147,7 @@ xla::TensorFormat XlaTensorFormat(tensorflow::TensorFormat data_format,
   int num_dims = num_spatial_dims + 2;
   int batch_dimension = GetTensorBatchDimIndex(num_dims, data_format);
   int feature_dimension = GetTensorFeatureDimIndex(num_dims, data_format);
-  absl::InlinedVector<int64_t, 4> spatial_dimensions(num_spatial_dims);
+  abslx::InlinedVector<int64_t, 4> spatial_dimensions(num_spatial_dims);
   for (int spatial_dim = 0; spatial_dim < num_spatial_dims; ++spatial_dim) {
     spatial_dimensions[spatial_dim] =
         GetTensorSpatialDimIndex(num_dims, data_format, spatial_dim);
@@ -220,7 +220,7 @@ class MaxPoolOp : public PoolingOp {
                                      "channels multiple of ",
                                      *vect_width, ", but was ", num_channels));
 
-      absl::InlinedVector<int64, 5> new_dims(result_shape->dimensions().begin(),
+      abslx::InlinedVector<int64, 5> new_dims(result_shape->dimensions().begin(),
                                              result_shape->dimensions().end());
       new_dims[1] /= *vect_width;
       new_dims.insert(new_dims.begin() + 2, *vect_width);

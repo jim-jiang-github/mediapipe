@@ -98,7 +98,7 @@ Status ShardingSplitProvider::Save(
   mutex_lock l(mu_);
   TF_RETURN_IF_ERROR(split_provider_->Save(
       [&](const std::string& key) {
-        return full_name(absl::StrCat(kSplitProvider, kSlash, key));
+        return full_name(abslx::StrCat(kSplitProvider, kSlash, key));
       },
       writer));
   return writer->WriteScalar(full_name(kNumToSkip), num_to_skip_);
@@ -110,7 +110,7 @@ Status ShardingSplitProvider::Restore(
   mutex_lock l(mu_);
   TF_RETURN_IF_ERROR(split_provider_->Restore(
       [&](const std::string& key) {
-        return full_name(absl::StrCat(kSplitProvider, kSlash, key));
+        return full_name(abslx::StrCat(kSplitProvider, kSlash, key));
       },
       reader));
   TF_RETURN_IF_ERROR(reader->ReadScalar(full_name(kNumToSkip), &num_to_skip_));

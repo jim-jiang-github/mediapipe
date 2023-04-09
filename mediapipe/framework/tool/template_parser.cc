@@ -128,7 +128,7 @@ class Tokenizer {
     tokenizer_.Next();
     if (IsAdjacent(current_, tokenizer_.current())) {
       std::string double_token =
-          absl::StrCat(current_.text, tokenizer_.current().text);
+          abslx::StrCat(current_.text, tokenizer_.current().text);
       if (kDoubleTokens->count(double_token) > 0) {
         current_.text = double_token;
         current_.end_column = tokenizer_.current().end_column;
@@ -165,11 +165,11 @@ TemplateParser::ParseInfoTree*
 TemplateParser::ParseInfoTree::CreateNested(  // NOLINT
     const FieldDescriptor* field) {
   // Owned by us in the map.
-  auto instance = absl::make_unique<TemplateParser::ParseInfoTree>();
+  auto instance = abslx::make_unique<TemplateParser::ParseInfoTree>();
   std::vector<std::unique_ptr<TemplateParser::ParseInfoTree>>* trees =
       &nested_[field];
   instance->path_ =
-      absl::StrCat(path_, "/", field->number(), "[", trees->size(), "]");
+      abslx::StrCat(path_, "/", field->number(), "[", trees->size(), "]");
   trees->push_back(std::move(instance));
   return trees->back().get();
 }
@@ -223,7 +223,7 @@ TemplateParser::ParseInfoTree* TemplateParser::ParseInfoTree::GetTreeForNested(
 std::string TemplateParser::ParseInfoTree::GetLastPath(
     const FieldDescriptor* field) {
   int index = locations_[field].size();
-  return absl::StrCat(path_, "/", field->number(), "[", index, "]");
+  return abslx::StrCat(path_, "/", field->number(), "[", index, "]");
 }
 
 std::string TemplateParser::ParseInfoTree::GetPath() { return path_; }
@@ -330,7 +330,7 @@ class TemplateParser::Parser::ParserImpl {
     return suc && LookingAtType(io::Tokenizer::TYPE_END);
   }
 
-  void ReportError(int line, int col, absl::string_view message) {
+  void ReportError(int line, int col, abslx::string_view message) {
     had_errors_ = true;
     if (error_collector_ == NULL) {
       if (line >= 0) {
@@ -346,7 +346,7 @@ class TemplateParser::Parser::ParserImpl {
     }
   }
 
-  void ReportWarning(int line, int col, absl::string_view message) {
+  void ReportWarning(int line, int col, abslx::string_view message) {
     if (error_collector_ == NULL) {
       if (line >= 0) {
         LOG(WARNING) << "Warning parsing text-format "
@@ -364,14 +364,14 @@ class TemplateParser::Parser::ParserImpl {
  protected:
   // Reports an error with the given message with information indicating
   // the position (as derived from the current token).
-  void ReportError(absl::string_view message) {
+  void ReportError(abslx::string_view message) {
     ReportError(tokenizer_.current().line, tokenizer_.current().column,
                 message);
   }
 
   // Reports a warning with the given message with information indicating
   // the position (as derived from the current token).
-  void ReportWarning(absl::string_view message) {
+  void ReportWarning(abslx::string_view message) {
     ReportWarning(tokenizer_.current().line, tokenizer_.current().column,
                   message);
   }
@@ -379,7 +379,7 @@ class TemplateParser::Parser::ParserImpl {
   // Consumes the specified message with the given starting delimiter.
   // This method checks to see that the end delimiter at the conclusion of
   // the consumption matches the starting delimiter passed in here.
-  bool ConsumeMessage(Message* message, absl::string_view delimiter) {
+  bool ConsumeMessage(Message* message, abslx::string_view delimiter) {
     while (!LookingAt(">") && !LookingAt("}")) {
       if (LookingAt("%")) {
         DO(ConsumeFieldTemplate(message));
@@ -407,7 +407,7 @@ class TemplateParser::Parser::ParserImpl {
 #ifndef PROTO2_OPENSOURCE
   // Consumes a string value and parses it as a packed repeated field into
   // the given field of the given message.
-  bool ConsumePackedFieldAsString(absl::string_view field_name,
+  bool ConsumePackedFieldAsString(abslx::string_view field_name,
                                   const FieldDescriptor* field,
                                   Message* message) {
     std::string packed;
@@ -431,7 +431,7 @@ class TemplateParser::Parser::ParserImpl {
     io::ArrayInputStream array_input(tagged.data(), tagged.size());
     io::CodedInputStream coded_input(&array_input);
     if (!message->MergePartialFromCodedStream(&coded_input)) {
-      ReportError(absl::StrCat("Could not parse packed field \"", field_name,
+      ReportError(abslx::StrCat("Could not parse packed field \"", field_name,
                                "\" as wire-encoded string."));
       return false;
     }
@@ -526,7 +526,7 @@ class TemplateParser::Parser::ParserImpl {
         // field names.
         if (field == NULL) {
           std::string lower_field_name = field_name;
-          absl::AsciiStrToLower(&lower_field_name);
+          abslx::AsciiStrToLower(&lower_field_name);
           field = descriptor->FindFieldByName(lower_field_name);
           // If the case-insensitive match worked but the field is NOT a group,
           if (field != NULL && field->type() != FieldDescriptor::TYPE_GROUP) {
@@ -541,7 +541,7 @@ class TemplateParser::Parser::ParserImpl {
 
         if (field == NULL && allow_case_insensitive_field_) {
           std::string lower_field_name = field_name;
-          absl::AsciiStrToLower(&lower_field_name);
+          abslx::AsciiStrToLower(&lower_field_name);
           field = descriptor->FindFieldByLowercaseName(lower_field_name);
         }
 
@@ -848,7 +848,7 @@ class TemplateParser::Parser::ParserImpl {
         } else if (LookingAt("-") ||
                    LookingAtType(io::Tokenizer::TYPE_INTEGER)) {
           DO(ConsumeSignedInteger(&int_value, kint32max));
-          value = absl::StrCat(int_value);  // for error reporting
+          value = abslx::StrCat(int_value);  // for error reporting
           enum_value = enum_type->FindValueByNumber(int_value);
         } else {
           ReportError("Expected integer or identifier, got: " +
@@ -949,7 +949,7 @@ class TemplateParser::Parser::ParserImpl {
     //   inf, inff, infinity, nan
     if (has_minus && LookingAtType(io::Tokenizer::TYPE_IDENTIFIER)) {
       std::string text = tokenizer_.current().text;
-      absl::AsciiStrToLower(&text);
+      abslx::AsciiStrToLower(&text);
       if (text != "inf" &&
 #ifndef PROTO2_OPENSOURCE
           text != "inff" &&
@@ -1061,7 +1061,7 @@ class TemplateParser::Parser::ParserImpl {
   bool ConsumeSignedInteger(int64* value, uint64 max_value) {
     bool negative = false;
 #ifndef PROTO2_OPENSOURCE
-    if (absl::StartsWith(tokenizer_.current().text, "0x")) {
+    if (abslx::StartsWith(tokenizer_.current().text, "0x")) {
       // proto1 text format allows negative numbers be printed as large positive
       // hex values. We accept these values for backward compatibility.
       max_value = (max_value << 1) + 1;
@@ -1143,7 +1143,7 @@ class TemplateParser::Parser::ParserImpl {
       tokenizer_.Next();
     } else if (LookingAtType(io::Tokenizer::TYPE_IDENTIFIER)) {
       std::string text = tokenizer_.current().text;
-      absl::AsciiStrToLower(&text);
+      abslx::AsciiStrToLower(&text);
       if (text == "inf" ||
 #ifndef PROTO2_OPENSOURCE
           text == "inff" ||
@@ -1219,11 +1219,11 @@ class TemplateParser::Parser::ParserImpl {
   // Consumes a token and confirms that it matches that specified in the
   // value parameter. Returns false if the token found does not match that
   // which was specified.
-  bool Consume(absl::string_view value) {
+  bool Consume(abslx::string_view value) {
     const std::string& current_value = tokenizer_.current().text;
 
     if (current_value != value) {
-      ReportError(absl::StrCat("Expected \"", value, "\", found \"",
+      ReportError(abslx::StrCat("Expected \"", value, "\", found \"",
                                current_value, "\"."));
       return false;
     }
@@ -1335,31 +1335,31 @@ bool IsFunctionOperator(const std::string& token) {
 // by the DynamicMessageFactory ("output").  These two Messages have
 // different Descriptors so Message::MergeFrom cannot be applied directly,
 // but they are expected to be equivalent.
-absl::Status MergeFields(const Message& source, Message* dest) {
+abslx::Status MergeFields(const Message& source, Message* dest) {
   std::unique_ptr<Message> temp(dest->New());
   std::string temp_str;
   RET_CHECK(TextFormat::PrintToString(source, &temp_str));
   RET_CHECK(TextFormat::ParseFromString(temp_str, temp.get()));
   dest->MergeFrom(*temp);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Returns the (tag, index) pairs in a field path.
 // For example, returns {{1, 1}, {2, 1}, {3, 1}} for path "/1[1]/2[1]/3[1]".
-absl::Status ProtoPathSplit(const std::string& path,
+abslx::Status ProtoPathSplit(const std::string& path,
                             ProtoUtilLite::ProtoPath* result) {
-  absl::Status status;
-  std::vector<std::string> ids = absl::StrSplit(path, '/');
+  abslx::Status status;
+  std::vector<std::string> ids = abslx::StrSplit(path, '/');
   for (const std::string& id : ids) {
     if (id.length() > 0) {
       std::pair<std::string, std::string> id_pair =
-          absl::StrSplit(id, absl::ByAnyChar("[]"));
+          abslx::StrSplit(id, abslx::ByAnyChar("[]"));
       int tag = 0;
       int index = 0;
-      bool ok = absl::SimpleAtoi(id_pair.first, &tag) &&
-                absl::SimpleAtoi(id_pair.second, &index);
+      bool ok = abslx::SimpleAtoi(id_pair.first, &tag) &&
+                abslx::SimpleAtoi(id_pair.second, &index);
       if (!ok) {
-        status.Update(absl::InvalidArgumentError(path));
+        status.Update(abslx::InvalidArgumentError(path));
       }
       result->push_back({tag, index});
     }
@@ -1393,9 +1393,9 @@ std::string ProtoPathJoin(ProtoPath path) {
   std::string result;
   for (ProtoUtilLite::ProtoPathEntry& e : path) {
     if (e.field_id >= 0) {
-      absl::StrAppend(&result, "/", e.field_id, "[", e.index, "]");
+      abslx::StrAppend(&result, "/", e.field_id, "[", e.index, "]");
     } else if (e.map_id >= 0) {
-      absl::StrAppend(&result, "/", e.map_id, "[@", e.key_id, "=", e.key_value,
+      abslx::StrAppend(&result, "/", e.map_id, "[@", e.key_id, "=", e.key_value,
                       "]");
     }
   }
@@ -1541,9 +1541,9 @@ std::string GetMapKey(const Message& map_entry) {
   if (key_field->type() == FieldDescriptor::TYPE_STRING) {
     return reflection->GetString(map_entry, key_field);
   } else if (key_field->type() == FieldDescriptor::TYPE_INT32) {
-    return absl::StrCat(reflection->GetInt32(map_entry, key_field));
+    return abslx::StrCat(reflection->GetInt32(map_entry, key_field));
   } else if (key_field->type() == FieldDescriptor::TYPE_INT64) {
-    return absl::StrCat(reflection->GetInt64(map_entry, key_field));
+    return abslx::StrCat(reflection->GetInt64(map_entry, key_field));
   }
   return "";
 }
@@ -1570,7 +1570,7 @@ const Message* GetNestedMessage(const Message& message,
 
 // Adjusts map-entries from indexes to keys.
 // Protobuf map-entry order is intentionally not preserved.
-absl::Status KeyProtoMapEntries(Message* source, MessageMap* stowed_messages) {
+abslx::Status KeyProtoMapEntries(Message* source, MessageMap* stowed_messages) {
   // Copy the rules from the source CalculatorGraphTemplate.
   mediapipe::CalculatorGraphTemplate rules;
   rules.ParsePartialFromString(source->SerializePartialAsString());
@@ -1615,7 +1615,7 @@ absl::Status KeyProtoMapEntries(Message* source, MessageMap* stowed_messages) {
   for (auto& rule : rules.rule()) {
     source_rules.Add(rule);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace
@@ -1946,7 +1946,7 @@ bool TemplateParser::Parser::MergeUsingImpl(
     output->FindInitializationErrors(&missing_fields);
     parser_impl->ReportError(-1, 0,
                              "Message missing required fields: " +
-                                 absl::StrJoin(missing_fields, ", "));
+                                 abslx::StrJoin(missing_fields, ", "));
     return false;
   }
   return true;

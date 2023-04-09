@@ -19,7 +19,7 @@
 #include "absl/base/config.h"
 #include "absl/base/internal/fast_type_id.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace flags_internal {
 
@@ -28,7 +28,7 @@ namespace flags_internal {
 // cases this id is enough to uniquely identify the flag's value type. In a few
 // cases we'll have to resort to using actual RTTI implementation if it is
 // available.
-using FlagFastTypeId = absl::base_internal::FastTypeIdType;
+using FlagFastTypeId = abslx::base_internal::FastTypeIdType;
 
 // Options that control SetCommandLineOptionWithMode.
 enum FlagSettingMode {
@@ -63,6 +63,6 @@ class FlagStateInterface {
 
 }  // namespace flags_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_FLAGS_INTERNAL_COMMANDLINEFLAG_H_

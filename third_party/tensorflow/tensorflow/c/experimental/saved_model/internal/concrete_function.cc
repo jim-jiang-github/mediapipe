@@ -38,7 +38,7 @@ TFE_Op* TF_ConcreteFunctionMakeCallOp(TF_ConcreteFunction* func,
                                       TFE_TensorHandle** inputs, int num_inputs,
                                       TF_Status* status) {
   tensorflow::ImmediateOpPtr call_op;
-  absl::Span<tensorflow::AbstractTensorHandle* const> input_span(
+  abslx::Span<tensorflow::AbstractTensorHandle* const> input_span(
       reinterpret_cast<tensorflow::AbstractTensorHandle**>(
           tensorflow::unwrap(inputs)),
       static_cast<size_t>(num_inputs));

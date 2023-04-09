@@ -74,12 +74,12 @@ const ShowNode* TFGraph::ShowInternal(const Options& opts, Timeline* timeline) {
   root_->show_children.clear();
 
   if (opts.output_type == kOutput[3]) {
-    absl::FPrintF(stderr, "Only 'code' view supports pprof output now.\n");
+    abslx::FPrintF(stderr, "Only 'code' view supports pprof output now.\n");
     return root_;
   }
   if (timeline && timeline->step() < 0) {
     // TODO(xpan): Maybe pick a default step for users.
-    absl::FPrintF(
+    abslx::FPrintF(
         stderr,
         "Must specify -step option to generate timeline in graph view.\n");
     return root_;
@@ -189,7 +189,7 @@ std::vector<GraphNode*> TFGraph::PrintGraph(const std::vector<GraphNode*> roots,
           node->AggregateTotalStats(sc);
         }
       }
-      node->formatted_str = absl::StrFormat(
+      node->formatted_str = abslx::StrFormat(
           "%s%s\n", std::string(last_ident, ' '), FormatNode(node, opts));
 
       if (opts.select.find(kShown[4]) != opts.select.end()) {

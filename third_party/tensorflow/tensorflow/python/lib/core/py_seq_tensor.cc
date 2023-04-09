@@ -322,7 +322,7 @@ struct ConverterTraits<int64_t> {
   }
 
   static AbstractTensorInterface* CreateTensor(
-      TFE_Context* ctx, absl::Span<const int64_t> dim_sizes) {
+      TFE_Context* ctx, abslx::Span<const int64_t> dim_sizes) {
     return tensorflow::unwrap(ctx)->CreateTensor(DT_INT64, dim_sizes);
   }
 
@@ -362,7 +362,7 @@ struct ConverterTraits<uint64> {
   }
 
   static AbstractTensorInterface* CreateTensor(
-      TFE_Context* ctx, absl::Span<const int64_t> dim_sizes) {
+      TFE_Context* ctx, abslx::Span<const int64_t> dim_sizes) {
     return tensorflow::unwrap(ctx)->CreateTensor(DT_UINT64, dim_sizes);
   }
 
@@ -400,7 +400,7 @@ struct ConverterTraits<int32> {
   }
 
   static AbstractTensorInterface* CreateTensor(
-      TFE_Context* ctx, absl::Span<const int64_t> dim_sizes) {
+      TFE_Context* ctx, abslx::Span<const int64_t> dim_sizes) {
     return tensorflow::unwrap(ctx)->CreateTensor(DT_INT32, dim_sizes);
   }
 
@@ -506,7 +506,7 @@ struct ConverterTraits<float> {
   }
 
   static AbstractTensorInterface* CreateTensor(
-      TFE_Context* ctx, absl::Span<const int64_t> dim_sizes) {
+      TFE_Context* ctx, abslx::Span<const int64_t> dim_sizes) {
     return tensorflow::unwrap(ctx)->CreateTensor(DT_FLOAT, dim_sizes);
   }
 
@@ -522,7 +522,7 @@ struct ConverterTraits<double> {
   }
 
   static AbstractTensorInterface* CreateTensor(
-      TFE_Context* ctx, absl::Span<const int64_t> dim_sizes) {
+      TFE_Context* ctx, abslx::Span<const int64_t> dim_sizes) {
     return tensorflow::unwrap(ctx)->CreateTensor(DT_DOUBLE, dim_sizes);
   }
 
@@ -542,7 +542,7 @@ struct ConverterTraits<Eigen::half> {
   }
 
   static AbstractTensorInterface* CreateTensor(
-      TFE_Context* ctx, absl::Span<const int64_t> dim_sizes) {
+      TFE_Context* ctx, abslx::Span<const int64_t> dim_sizes) {
     return tensorflow::unwrap(ctx)->CreateTensor(DT_HALF, dim_sizes);
   }
 
@@ -563,7 +563,7 @@ struct ConverterTraits<tstring> {
   }
 
   static AbstractTensorInterface* CreateTensor(
-      TFE_Context* ctx, absl::Span<const int64_t> dim_sizes) {
+      TFE_Context* ctx, abslx::Span<const int64_t> dim_sizes) {
     return tensorflow::unwrap(ctx)->CreateTensor(DT_STRING, dim_sizes);
   }
 
@@ -630,7 +630,7 @@ struct ConverterTraits<complex128> {
   }
 
   static AbstractTensorInterface* CreateTensor(
-      TFE_Context* ctx, absl::Span<const int64_t> dim_sizes) {
+      TFE_Context* ctx, abslx::Span<const int64_t> dim_sizes) {
     return tensorflow::unwrap(ctx)->CreateTensor(DT_COMPLEX128, dim_sizes);
   }
 
@@ -662,7 +662,7 @@ struct ConverterTraits<bool> {
   }
 
   static AbstractTensorInterface* CreateTensor(
-      TFE_Context* ctx, absl::Span<const int64_t> dim_sizes) {
+      TFE_Context* ctx, abslx::Span<const int64_t> dim_sizes) {
     return tensorflow::unwrap(ctx)->CreateTensor(DT_BOOL, dim_sizes);
   }
 

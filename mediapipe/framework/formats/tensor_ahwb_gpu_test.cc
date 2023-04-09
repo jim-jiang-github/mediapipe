@@ -115,7 +115,7 @@ TEST_F(TensorAhwbGpuTest, TestGpuToCpuFloat32) {
   for (int i = 0; i < num_elements; i++) {
     reference[i] = static_cast<float>(i) / 10.0f;
   }
-  EXPECT_THAT(absl::Span<const float>(ptr, num_elements),
+  EXPECT_THAT(abslx::Span<const float>(ptr, num_elements),
               testing::Pointwise(testing::FloatEq(), reference));
 }
 
@@ -143,7 +143,7 @@ TEST_F(TensorAhwbGpuTest, TestGpuToCpuFloat16) {
     reference[i] = static_cast<float>(i) / 10.0f;
   }
   // Precision is set to a reasonable value for Float16.
-  EXPECT_THAT(absl::Span<const Float16>(ptr, num_elements),
+  EXPECT_THAT(abslx::Span<const Float16>(ptr, num_elements),
               testing::Pointwise(NearWithPrecision(0.001), reference));
 }
 
@@ -171,7 +171,7 @@ TEST_F(TensorAhwbGpuTest, TestReplacingCpuByAhwb) {
   for (int i = 0; i < num_elements; i++) {
     reference[i] = static_cast<float>(i) / 10.0f;
   }
-  EXPECT_THAT(absl::Span<const float>(ptr, num_elements),
+  EXPECT_THAT(abslx::Span<const float>(ptr, num_elements),
               testing::Pointwise(testing::FloatEq(), reference));
 }
 
@@ -199,7 +199,7 @@ TEST_F(TensorAhwbGpuTest, TestReplacingGpuByAhwb) {
   for (int i = 0; i < num_elements; i++) {
     reference[i] = static_cast<float>(i) / 10.0f;
   }
-  EXPECT_THAT(absl::Span<const float>(ptr, num_elements),
+  EXPECT_THAT(abslx::Span<const float>(ptr, num_elements),
               testing::Pointwise(testing::FloatEq(), reference));
 }
 

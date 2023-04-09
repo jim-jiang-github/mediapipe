@@ -71,7 +71,7 @@ class EagerOperation : public ImmediateExecutionOperation {
 
   void SetDevice(VariantDevice device) {
     device_ = device;
-    device_name_ = absl::visit(
+    device_name_ = abslx::visit(
         [](auto* device) { return device == nullptr ? "" : device->name(); },
         device);
     DeviceNameUtils::ParseFullName(device_name_, &device_parsed_name_);
@@ -84,13 +84,13 @@ class EagerOperation : public ImmediateExecutionOperation {
   Status SetAttrValue(const char* attr_name, const AttrValue& value);
 
   Status AddInput(AbstractTensorHandle* input) override;
-  Status AddInputList(absl::Span<AbstractTensorHandle* const> inputs) override;
+  Status AddInputList(abslx::Span<AbstractTensorHandle* const> inputs) override;
   Status SetInput(size_t index, ImmediateExecutionTensorHandle* input) override;
-  absl::Span<ImmediateExecutionTensorHandle* const> GetInputs() const override;
+  abslx::Span<ImmediateExecutionTensorHandle* const> GetInputs() const override;
   bool HasCustomDeviceInput() const override {
     return custom_device_tensor_handles_count_ > 0;
   }
-  Status Execute(absl::Span<AbstractTensorHandle*> retvals,
+  Status Execute(abslx::Span<AbstractTensorHandle*> retvals,
                  int* num_retvals) override;
   const tensorflow::OpDef* OpDef() const override { return op_def_; };
 
@@ -122,7 +122,7 @@ class EagerOperation : public ImmediateExecutionOperation {
                           const int* num_dims, int num_values) override;
   Status SetAttrFunctionList(
       const char* attr_name,
-      absl::Span<const AbstractOperation*> values) override;
+      abslx::Span<const AbstractOperation*> values) override;
 
   Status InputLength(const char* input_name, int* length) override;
   Status OutputLength(const char* output_name, int* length) override;
@@ -134,14 +134,14 @@ class EagerOperation : public ImmediateExecutionOperation {
     stack_trace_ = stack_trace;
   }
 
-  absl::optional<ManagedStackTrace> GetStackTrace() override {
+  abslx::optional<ManagedStackTrace> GetStackTrace() override {
     return stack_trace_;
   }
 
   Status Reset(const char* op, const char* device_name, bool remote,
                EagerExecutor* executor,
-               const absl::optional<EagerFunctionParams> remote_func_params =
-                   absl::nullopt);
+               const abslx::optional<EagerFunctionParams> remote_func_params =
+                   abslx::nullopt);
 
   bool is_function() const { return is_function_; }
   bool colocation_exempt() const { return colocation_exempt_; }
@@ -155,11 +155,11 @@ class EagerOperation : public ImmediateExecutionOperation {
   // inputs are TensorHandles, i.e. that there are no custom device inputs. They
   // return a bad status otherwise.
   Status TensorHandleInputs(
-      const absl::InlinedVector<TensorHandle*, 4>** inputs) const;
+      const abslx::InlinedVector<TensorHandle*, 4>** inputs) const;
   Status MutableTensorHandleInputs(
-      absl::InlinedVector<TensorHandle*, 4>** inputs);
+      abslx::InlinedVector<TensorHandle*, 4>** inputs);
 
-  const absl::InlinedVector<ImmediateExecutionTensorHandle*, 4>& Inputs()
+  const abslx::InlinedVector<ImmediateExecutionTensorHandle*, 4>& Inputs()
       const {
     return inputs_;
   }
@@ -209,7 +209,7 @@ class EagerOperation : public ImmediateExecutionOperation {
 
   string DebugString() const;
 
-  const absl::optional<EagerFunctionParams>& eager_func_params() const {
+  const abslx::optional<EagerFunctionParams>& eager_func_params() const {
     return eager_func_params_;
   }
 
@@ -248,7 +248,7 @@ class EagerOperation : public ImmediateExecutionOperation {
   // The number of custom device TensorHandle inputs. These inputs need to be
   // processed by CustomDeviceOpHandler first.
   int custom_device_tensor_handles_count_ = 0;
-  absl::InlinedVector<ImmediateExecutionTensorHandle*, 4> inputs_;
+  abslx::InlinedVector<ImmediateExecutionTensorHandle*, 4> inputs_;
 
   // The last device name given to SetDeviceName.
   // This is used to avoid having to re-process the same device in repeated
@@ -271,13 +271,13 @@ class EagerOperation : public ImmediateExecutionOperation {
   // updated accordingly.
   VariantDevice device_;
 
-  absl::optional<ManagedStackTrace> stack_trace_;
+  abslx::optional<ManagedStackTrace> stack_trace_;
   bool is_function_;  // Conceptually const, but can't be because of Reset
   bool colocation_exempt_;
   CancellationManager* cancellation_manager_ = nullptr;  // Not owned.
   EagerExecutor* executor_;                              // Not owned.
 
-  absl::optional<EagerFunctionParams> eager_func_params_;
+  abslx::optional<EagerFunctionParams> eager_func_params_;
 
   // Inference information
   const tensorflow::OpDef* op_def_;  // op definition from protobuf

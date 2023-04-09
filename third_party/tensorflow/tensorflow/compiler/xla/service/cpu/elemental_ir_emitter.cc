@@ -35,7 +35,7 @@ namespace cpu {
 
 StatusOr<llvm::Value*> CpuElementalIrEmitter::EmitAtan2(
     PrimitiveType prim_type, llvm::Value* lhs, llvm::Value* rhs,
-    absl::string_view /*name*/) {
+    abslx::string_view /*name*/) {
   std::string function_name;
   bool cast_result_to_fp16 = false;
   switch (prim_type) {

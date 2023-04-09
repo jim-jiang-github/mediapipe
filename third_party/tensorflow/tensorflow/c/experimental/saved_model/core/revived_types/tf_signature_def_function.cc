@@ -57,7 +57,7 @@ TFSignatureDefFunction::GetFunctionMetadata() const {
 }
 
 Status TFSignatureDefFunction::MakeCallOp(
-    absl::Span<AbstractTensorHandle* const> inputs, ImmediateOpPtr* out) const {
+    abslx::Span<AbstractTensorHandle* const> inputs, ImmediateOpPtr* out) const {
   return func_->MakeCallOp(inputs, out);
 }
 

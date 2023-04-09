@@ -57,7 +57,7 @@ class ReductionRewriterVisitor : public DfsHloRewriteVisitor {
 
     // All of the reduced dimensions is smaller than the window size,
     // do not perform the rewrite.
-    if (absl::c_all_of(hlo->dimensions(), [&](int64_t reduced_dim) {
+    if (abslx::c_all_of(hlo->dimensions(), [&](int64_t reduced_dim) {
           return input_shape.dimensions(reduced_dim) <= reduce_window_size_;
         })) {
       VLOG(1) << "Skipping tree reduction rewrite: all reduced dimensions are "
@@ -69,7 +69,7 @@ class ReductionRewriterVisitor : public DfsHloRewriteVisitor {
     std::vector<int64_t> window_dimensions;
     std::vector<int64_t> window_strides;
     for (int64_t dim_idx = 0; dim_idx < input_shape.rank(); dim_idx++) {
-      if (!absl::c_linear_search(hlo->dimensions(), dim_idx)) {
+      if (!abslx::c_linear_search(hlo->dimensions(), dim_idx)) {
         window_dimensions.push_back(1);
         window_strides.push_back(1);
         continue;
@@ -112,7 +112,7 @@ class ReductionRewriterVisitor : public DfsHloRewriteVisitor {
 
 StatusOr<bool> TreeReductionRewriter::Run(
     HloModule *module,
-    const absl::flat_hash_set<absl::string_view> &execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view> &execution_threads) {
   ReductionRewriterVisitor visitor(reduce_window_size_);
   bool changed = false;
   for (const auto &computation :

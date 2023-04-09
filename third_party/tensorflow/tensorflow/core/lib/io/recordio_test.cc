@@ -63,7 +63,7 @@ class StringDest : public WritableFile {
     return OkStatus();
   }
 #if defined(TF_CORD_SUPPORT)
-  Status Append(const absl::Cord& data) override {
+  Status Append(const abslx::Cord& data) override {
     contents_->append(std::string(data));
     return OkStatus();
   }
@@ -137,7 +137,7 @@ class RecordioTest : public ::testing::Test {
   }
 
 #if defined(TF_CORD_SUPPORT)
-  void Write(const absl::Cord& msg) {
+  void Write(const abslx::Cord& msg) {
     ASSERT_TRUE(!reading_) << "Write() after starting to read";
     TF_ASSERT_OK(writer_->WriteRecord(msg));
   }
@@ -206,10 +206,10 @@ TEST_F(RecordioTest, ReadWrite) {
 
 #if defined(TF_CORD_SUPPORT)
 TEST_F(RecordioTest, ReadWriteCords) {
-  Write(absl::Cord("foo"));
-  Write(absl::Cord("bar"));
-  Write(absl::Cord(""));
-  Write(absl::Cord("xxxx"));
+  Write(abslx::Cord("foo"));
+  Write(abslx::Cord("bar"));
+  Write(abslx::Cord(""));
+  Write(abslx::Cord("xxxx"));
   ASSERT_EQ("foo", Read());
   ASSERT_EQ("bar", Read());
   ASSERT_EQ("", Read());
@@ -300,7 +300,7 @@ TEST_F(RecordioTest, NonSequentialReadsWithCompression) {
 
 // Tests of all the error paths in log_reader.cc follow:
 void AssertHasSubstr(StringPiece s, StringPiece expected) {
-  EXPECT_TRUE(absl::StrContains(s, expected))
+  EXPECT_TRUE(abslx::StrContains(s, expected))
       << s << " does not contain " << expected;
 }
 

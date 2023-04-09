@@ -64,7 +64,7 @@ constexpr char kDefaultShardingValue[] = "";
 constexpr char kMirroredVariableIndicesAttr[] = "_mirrored_variable_indices";
 
 std::string GetRandomStateVariableName() {
-  return absl::StrCat("VariablesFormatState_", tensorflow::random::New64());
+  return abslx::StrCat("VariablesFormatState_", tensorflow::random::New64());
 }
 
 struct TPUVariableRuntimeReformattingPass

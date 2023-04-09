@@ -74,7 +74,7 @@ class CompilationEnvironments {
   void Clear() { environments_.clear(); }
 
  private:
-  absl::flat_hash_map<const tensorflow::protobuf::Descriptor*,
+  abslx::flat_hash_map<const tensorflow::protobuf::Descriptor*,
                       std::unique_ptr<tensorflow::protobuf::Message>>
       environments_;
 };

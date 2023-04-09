@@ -28,22 +28,22 @@ namespace profiler {
 // <metadata> is a comma-separated list of "<key>=<value>" pairs.
 // If the format does not match, the result will be empty.
 struct Annotation {
-  absl::string_view name;
+  abslx::string_view name;
   struct Metadata {
-    absl::string_view key;
-    absl::string_view value;
+    abslx::string_view key;
+    abslx::string_view value;
   };
   std::vector<Metadata> metadata;
 };
-Annotation ParseAnnotation(absl::string_view annotation);
+Annotation ParseAnnotation(abslx::string_view annotation);
 
-inline bool HasMetadata(absl::string_view annotation) {
+inline bool HasMetadata(abslx::string_view annotation) {
   constexpr char kUserMetadataMarker = '#';
   return !annotation.empty() && annotation.back() == kUserMetadataMarker;
 }
 
 std::vector<Annotation> ParseAnnotationStack(
-    absl::string_view annotation_stack);
+    abslx::string_view annotation_stack);
 
 }  // namespace profiler
 }  // namespace tensorflow

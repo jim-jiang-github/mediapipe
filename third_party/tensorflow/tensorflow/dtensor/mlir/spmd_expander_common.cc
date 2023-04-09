@@ -203,8 +203,8 @@ StatusOr<Layout> GetBroadcastLayoutForElementWise(
   const int rank_b = layout_b.rank();
   const int rank_offset_a = std::max(0, rank_b - rank_a);
   const int rank_offset_b = std::max(0, rank_a - rank_b);
-  absl::flat_hash_map<std::string, int> mesh_dim_map_a;
-  absl::flat_hash_map<std::string, int> mesh_dim_map_b;
+  abslx::flat_hash_map<std::string, int> mesh_dim_map_a;
+  abslx::flat_hash_map<std::string, int> mesh_dim_map_b;
   std::vector<string> output_layout_specs;
 
   auto unsharded_specs = [](const int new_size) -> std::vector<std::string> {
@@ -274,10 +274,10 @@ StatusOr<Layout> GetBroadcastLayoutForElementWise(
   return Layout::GetLayout(output_layout_specs, layout_a.mesh());
 }
 
-StatusOr<absl::optional<Layout>> GetMergedOperandLayout(
+StatusOr<abslx::optional<Layout>> GetMergedOperandLayout(
     const llvm::DenseMap<int, Layout>& operand_layouts, mlir::Operation* op) {
   // Represents list of Layouts and it's operand index where layout value is
-  // defined (i.e. layout is not absl::nullopt).
+  // defined (i.e. layout is not abslx::nullopt).
   llvm::SmallVector<std::pair<const Layout&, llvm::ArrayRef<int64_t>>, 4>
       filtered_preferred_operand_layouts;
   filtered_preferred_operand_layouts.reserve(op->getNumOperands());
@@ -291,7 +291,7 @@ StatusOr<absl::optional<Layout>> GetMergedOperandLayout(
   }
 
   if (filtered_preferred_operand_layouts.empty())
-    return absl::optional<Layout>();
+    return abslx::optional<Layout>();
 
   // Merged all operands and it's layouts to a single broadcasted layout.
   Layout merged_operand_layout = filtered_preferred_operand_layouts[0].first;
@@ -315,7 +315,7 @@ StatusOr<absl::optional<Layout>> GetMergedOperandLayout(
                             merged_shape, shape_to_merge,
                             /*dims_to_ignore=*/0, left_splits, right_splits));
   }
-  return absl::optional<Layout>(merged_operand_layout);
+  return abslx::optional<Layout>(merged_operand_layout);
 }
 
 mlir::Value GetForwardedDTensorLayoutInput(mlir::Value value) {
@@ -636,7 +636,7 @@ mlir::StringAttr GetUniqueControlflowFnName(const std::string& prefix,
                                             mlir::OpBuilder& builder) {
   int32 unique_id = dtensor_controlflow_function_counter++;
   return builder.getStringAttr(
-      absl::StrCat(prefix, "_dtensor_function_", unique_id));
+      abslx::StrCat(prefix, "_dtensor_function_", unique_id));
 }
 
 Status SetBuilderInsertionAfterValue(mlir::Value value,
@@ -664,7 +664,7 @@ Status PrintTensor(mlir::Value value, const std::string& format_string = "%s") {
   mlir::OpBuilder builder(value.getContext());
   builder.setInsertionPointAfterValue(value);
   TF_ASSIGN_OR_RETURN(mlir::Value device_id, DeviceId(value));
-  std::string all_format = absl::StrCat("Core %s: ", format_string);
+  std::string all_format = abslx::StrCat("Core %s: ", format_string);
   // Scalar string type
   mlir::RankedTensorType scalar_string =
       mlir::RankedTensorType::get({}, builder.getType<mlir::TF::StringType>());
@@ -701,11 +701,11 @@ StatusOr<std::string> ExtractConstScalarStringFromValue(mlir::Value value) {
     return errors::Internal("Unable get constant value from block argument.");
   mlir::DenseStringElementsAttr attr;
   if (!matchPattern(value, m_Constant(&attr))) {
-    return errors::Internal(absl::StrCat("required constant value for ",
+    return errors::Internal(abslx::StrCat("required constant value for ",
                                          OpName(value.getDefiningOp())));
   }
   if (attr.size() != 1) {
-    return errors::Internal(absl::StrCat("expected 1 element, got ",
+    return errors::Internal(abslx::StrCat("expected 1 element, got ",
                                          attr.size(), " for ",
                                          OpName(value.getDefiningOp())));
   }
@@ -727,7 +727,7 @@ mlir::Operation* TopologicalIterator::next() {
 
   // If this is a function call op, push the first op of the function body so
   // that the function body is converted before the call site.
-  absl::optional<mlir::func::FuncOp> func = MaybeFindFunction(op);
+  abslx::optional<mlir::func::FuncOp> func = MaybeFindFunction(op);
   if (func.has_value()) {
     mlir::StringRef func_name = func->getName();
 

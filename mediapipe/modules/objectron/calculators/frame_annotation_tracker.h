@@ -45,7 +45,7 @@ class FrameAnnotationTracker {
   // that field.
   FrameAnnotation ConsolidateTrackingResult(
       const TimedBoxProtoList& tracked_boxes,
-      absl::flat_hash_set<int>* cancel_object_ids);
+      abslx::flat_hash_set<int>* cancel_object_ids);
 
  private:
   float iou_threshold_;
@@ -53,7 +53,7 @@ class FrameAnnotationTracker {
   float img_height_;
   // Cached detection results over time.
   // Key is timestamp_us + object_id.
-  absl::btree_map<int64, ObjectAnnotation, std::greater<int64>>
+  abslx::btree_map<int64, ObjectAnnotation, std::greater<int64>>
       detected_objects_;
 };
 

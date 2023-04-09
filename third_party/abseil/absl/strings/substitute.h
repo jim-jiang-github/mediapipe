@@ -49,7 +49,7 @@
 //   EXPECT_EQ("Hi. My name is Bob and I am 5 years old.", s);
 //
 // Supported types:
-//   * absl::string_view, std::string, const char* (null is equivalent to "")
+//   * abslx::string_view, std::string, const char* (null is equivalent to "")
 //   * int32_t, int64_t, uint32_t, uint64_t
 //   * float, double
 //   * bool (Printed as "true" or "false")
@@ -85,14 +85,14 @@
 #include "absl/strings/string_view.h"
 #include "absl/strings/strip.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace substitute_internal {
 
 // Arg
 //
-// This class provides an argument type for `absl::Substitute()` and
-// `absl::SubstituteAndAppend()`. `Arg` handles implicit conversion of various
+// This class provides an argument type for `abslx::Substitute()` and
+// `abslx::SubstituteAndAppend()`. `Arg` handles implicit conversion of various
 // types to a string. (`Arg` is very similar to the `AlphaNum` class in
 // `StrCat()`.)
 //
@@ -103,13 +103,13 @@ class Arg {
   //
   // Explicitly overload `const char*` so the compiler doesn't cast to `bool`.
   Arg(const char* value)  // NOLINT(runtime/explicit)
-      : piece_(absl::NullSafeStringView(value)) {}
+      : piece_(abslx::NullSafeStringView(value)) {}
   template <typename Allocator>
   Arg(  // NOLINT
       const std::basic_string<char, std::char_traits<char>, Allocator>&
           value) noexcept
       : piece_(value) {}
-  Arg(absl::string_view value)  // NOLINT(runtime/explicit)
+  Arg(abslx::string_view value)  // NOLINT(runtime/explicit)
       : piece_(value) {}
 
   // Overloads for primitives
@@ -162,7 +162,7 @@ class Arg {
   // vector<bool>::reference and const_reference require special help to
   // convert to `AlphaNum` because it requires two user defined conversions.
   template <typename T,
-            absl::enable_if_t<
+            abslx::enable_if_t<
                 std::is_class<T>::value &&
                 (std::is_same<T, std::vector<bool>::reference>::value ||
                  std::is_same<T, std::vector<bool>::const_reference>::value)>* =
@@ -177,17 +177,17 @@ class Arg {
   Arg(const Arg&) = delete;
   Arg& operator=(const Arg&) = delete;
 
-  absl::string_view piece() const { return piece_; }
+  abslx::string_view piece() const { return piece_; }
 
  private:
-  absl::string_view piece_;
+  abslx::string_view piece_;
   char scratch_[numbers_internal::kFastToBufferSize];
 };
 
 // Internal helper function. Don't call this from outside this implementation.
 // This interface may change without notice.
-void SubstituteAndAppendArray(std::string* output, absl::string_view format,
-                              const absl::string_view* args_array,
+void SubstituteAndAppendArray(std::string* output, abslx::string_view format,
+                              const abslx::string_view* args_array,
                               size_t num_args);
 
 #if defined(ABSL_BAD_CALL_IF)
@@ -232,76 +232,76 @@ constexpr int PlaceholderBitmask(const char* format) {
 //
 // Example:
 //  template <typename... Args>
-//  void VarMsg(std::string* boilerplate, absl::string_view format,
+//  void VarMsg(std::string* boilerplate, abslx::string_view format,
 //      const Args&... args) {
-//    absl::SubstituteAndAppend(boilerplate, format, args...);
+//    abslx::SubstituteAndAppend(boilerplate, format, args...);
 //  }
 //
-inline void SubstituteAndAppend(std::string* output, absl::string_view format) {
+inline void SubstituteAndAppend(std::string* output, abslx::string_view format) {
   substitute_internal::SubstituteAndAppendArray(output, format, nullptr, 0);
 }
 
-inline void SubstituteAndAppend(std::string* output, absl::string_view format,
+inline void SubstituteAndAppend(std::string* output, abslx::string_view format,
                                 const substitute_internal::Arg& a0) {
-  const absl::string_view args[] = {a0.piece()};
+  const abslx::string_view args[] = {a0.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
                                                 ABSL_ARRAYSIZE(args));
 }
 
-inline void SubstituteAndAppend(std::string* output, absl::string_view format,
+inline void SubstituteAndAppend(std::string* output, abslx::string_view format,
                                 const substitute_internal::Arg& a0,
                                 const substitute_internal::Arg& a1) {
-  const absl::string_view args[] = {a0.piece(), a1.piece()};
+  const abslx::string_view args[] = {a0.piece(), a1.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
                                                 ABSL_ARRAYSIZE(args));
 }
 
-inline void SubstituteAndAppend(std::string* output, absl::string_view format,
+inline void SubstituteAndAppend(std::string* output, abslx::string_view format,
                                 const substitute_internal::Arg& a0,
                                 const substitute_internal::Arg& a1,
                                 const substitute_internal::Arg& a2) {
-  const absl::string_view args[] = {a0.piece(), a1.piece(), a2.piece()};
+  const abslx::string_view args[] = {a0.piece(), a1.piece(), a2.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
                                                 ABSL_ARRAYSIZE(args));
 }
 
-inline void SubstituteAndAppend(std::string* output, absl::string_view format,
+inline void SubstituteAndAppend(std::string* output, abslx::string_view format,
                                 const substitute_internal::Arg& a0,
                                 const substitute_internal::Arg& a1,
                                 const substitute_internal::Arg& a2,
                                 const substitute_internal::Arg& a3) {
-  const absl::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
+  const abslx::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                     a3.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
                                                 ABSL_ARRAYSIZE(args));
 }
 
-inline void SubstituteAndAppend(std::string* output, absl::string_view format,
+inline void SubstituteAndAppend(std::string* output, abslx::string_view format,
                                 const substitute_internal::Arg& a0,
                                 const substitute_internal::Arg& a1,
                                 const substitute_internal::Arg& a2,
                                 const substitute_internal::Arg& a3,
                                 const substitute_internal::Arg& a4) {
-  const absl::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
+  const abslx::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                     a3.piece(), a4.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
                                                 ABSL_ARRAYSIZE(args));
 }
 
-inline void SubstituteAndAppend(std::string* output, absl::string_view format,
+inline void SubstituteAndAppend(std::string* output, abslx::string_view format,
                                 const substitute_internal::Arg& a0,
                                 const substitute_internal::Arg& a1,
                                 const substitute_internal::Arg& a2,
                                 const substitute_internal::Arg& a3,
                                 const substitute_internal::Arg& a4,
                                 const substitute_internal::Arg& a5) {
-  const absl::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
+  const abslx::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                     a3.piece(), a4.piece(), a5.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
                                                 ABSL_ARRAYSIZE(args));
 }
 
-inline void SubstituteAndAppend(std::string* output, absl::string_view format,
+inline void SubstituteAndAppend(std::string* output, abslx::string_view format,
                                 const substitute_internal::Arg& a0,
                                 const substitute_internal::Arg& a1,
                                 const substitute_internal::Arg& a2,
@@ -309,7 +309,7 @@ inline void SubstituteAndAppend(std::string* output, absl::string_view format,
                                 const substitute_internal::Arg& a4,
                                 const substitute_internal::Arg& a5,
                                 const substitute_internal::Arg& a6) {
-  const absl::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
+  const abslx::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                     a3.piece(), a4.piece(), a5.piece(),
                                     a6.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
@@ -317,12 +317,12 @@ inline void SubstituteAndAppend(std::string* output, absl::string_view format,
 }
 
 inline void SubstituteAndAppend(
-    std::string* output, absl::string_view format,
+    std::string* output, abslx::string_view format,
     const substitute_internal::Arg& a0, const substitute_internal::Arg& a1,
     const substitute_internal::Arg& a2, const substitute_internal::Arg& a3,
     const substitute_internal::Arg& a4, const substitute_internal::Arg& a5,
     const substitute_internal::Arg& a6, const substitute_internal::Arg& a7) {
-  const absl::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
+  const abslx::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                     a3.piece(), a4.piece(), a5.piece(),
                                     a6.piece(), a7.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
@@ -330,13 +330,13 @@ inline void SubstituteAndAppend(
 }
 
 inline void SubstituteAndAppend(
-    std::string* output, absl::string_view format,
+    std::string* output, abslx::string_view format,
     const substitute_internal::Arg& a0, const substitute_internal::Arg& a1,
     const substitute_internal::Arg& a2, const substitute_internal::Arg& a3,
     const substitute_internal::Arg& a4, const substitute_internal::Arg& a5,
     const substitute_internal::Arg& a6, const substitute_internal::Arg& a7,
     const substitute_internal::Arg& a8) {
-  const absl::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
+  const abslx::string_view args[] = {a0.piece(), a1.piece(), a2.piece(),
                                     a3.piece(), a4.piece(), a5.piece(),
                                     a6.piece(), a7.piece(), a8.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
@@ -344,13 +344,13 @@ inline void SubstituteAndAppend(
 }
 
 inline void SubstituteAndAppend(
-    std::string* output, absl::string_view format,
+    std::string* output, abslx::string_view format,
     const substitute_internal::Arg& a0, const substitute_internal::Arg& a1,
     const substitute_internal::Arg& a2, const substitute_internal::Arg& a3,
     const substitute_internal::Arg& a4, const substitute_internal::Arg& a5,
     const substitute_internal::Arg& a6, const substitute_internal::Arg& a7,
     const substitute_internal::Arg& a8, const substitute_internal::Arg& a9) {
-  const absl::string_view args[] = {
+  const abslx::string_view args[] = {
       a0.piece(), a1.piece(), a2.piece(), a3.piece(), a4.piece(),
       a5.piece(), a6.piece(), a7.piece(), a8.piece(), a9.piece()};
   substitute_internal::SubstituteAndAppendArray(output, format, args,
@@ -479,24 +479,24 @@ void SubstituteAndAppend(
 //
 // Example:
 //  template <typename... Args>
-//  void VarMsg(absl::string_view format, const Args&... args) {
-//    std::string s = absl::Substitute(format, args...);
+//  void VarMsg(abslx::string_view format, const Args&... args) {
+//    std::string s = abslx::Substitute(format, args...);
 
-ABSL_MUST_USE_RESULT inline std::string Substitute(absl::string_view format) {
+ABSL_MUST_USE_RESULT inline std::string Substitute(abslx::string_view format) {
   std::string result;
   SubstituteAndAppend(&result, format);
   return result;
 }
 
 ABSL_MUST_USE_RESULT inline std::string Substitute(
-    absl::string_view format, const substitute_internal::Arg& a0) {
+    abslx::string_view format, const substitute_internal::Arg& a0) {
   std::string result;
   SubstituteAndAppend(&result, format, a0);
   return result;
 }
 
 ABSL_MUST_USE_RESULT inline std::string Substitute(
-    absl::string_view format, const substitute_internal::Arg& a0,
+    abslx::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1) {
   std::string result;
   SubstituteAndAppend(&result, format, a0, a1);
@@ -504,7 +504,7 @@ ABSL_MUST_USE_RESULT inline std::string Substitute(
 }
 
 ABSL_MUST_USE_RESULT inline std::string Substitute(
-    absl::string_view format, const substitute_internal::Arg& a0,
+    abslx::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1, const substitute_internal::Arg& a2) {
   std::string result;
   SubstituteAndAppend(&result, format, a0, a1, a2);
@@ -512,7 +512,7 @@ ABSL_MUST_USE_RESULT inline std::string Substitute(
 }
 
 ABSL_MUST_USE_RESULT inline std::string Substitute(
-    absl::string_view format, const substitute_internal::Arg& a0,
+    abslx::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1, const substitute_internal::Arg& a2,
     const substitute_internal::Arg& a3) {
   std::string result;
@@ -521,7 +521,7 @@ ABSL_MUST_USE_RESULT inline std::string Substitute(
 }
 
 ABSL_MUST_USE_RESULT inline std::string Substitute(
-    absl::string_view format, const substitute_internal::Arg& a0,
+    abslx::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1, const substitute_internal::Arg& a2,
     const substitute_internal::Arg& a3, const substitute_internal::Arg& a4) {
   std::string result;
@@ -530,7 +530,7 @@ ABSL_MUST_USE_RESULT inline std::string Substitute(
 }
 
 ABSL_MUST_USE_RESULT inline std::string Substitute(
-    absl::string_view format, const substitute_internal::Arg& a0,
+    abslx::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1, const substitute_internal::Arg& a2,
     const substitute_internal::Arg& a3, const substitute_internal::Arg& a4,
     const substitute_internal::Arg& a5) {
@@ -540,7 +540,7 @@ ABSL_MUST_USE_RESULT inline std::string Substitute(
 }
 
 ABSL_MUST_USE_RESULT inline std::string Substitute(
-    absl::string_view format, const substitute_internal::Arg& a0,
+    abslx::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1, const substitute_internal::Arg& a2,
     const substitute_internal::Arg& a3, const substitute_internal::Arg& a4,
     const substitute_internal::Arg& a5, const substitute_internal::Arg& a6) {
@@ -550,7 +550,7 @@ ABSL_MUST_USE_RESULT inline std::string Substitute(
 }
 
 ABSL_MUST_USE_RESULT inline std::string Substitute(
-    absl::string_view format, const substitute_internal::Arg& a0,
+    abslx::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1, const substitute_internal::Arg& a2,
     const substitute_internal::Arg& a3, const substitute_internal::Arg& a4,
     const substitute_internal::Arg& a5, const substitute_internal::Arg& a6,
@@ -561,7 +561,7 @@ ABSL_MUST_USE_RESULT inline std::string Substitute(
 }
 
 ABSL_MUST_USE_RESULT inline std::string Substitute(
-    absl::string_view format, const substitute_internal::Arg& a0,
+    abslx::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1, const substitute_internal::Arg& a2,
     const substitute_internal::Arg& a3, const substitute_internal::Arg& a4,
     const substitute_internal::Arg& a5, const substitute_internal::Arg& a6,
@@ -572,7 +572,7 @@ ABSL_MUST_USE_RESULT inline std::string Substitute(
 }
 
 ABSL_MUST_USE_RESULT inline std::string Substitute(
-    absl::string_view format, const substitute_internal::Arg& a0,
+    abslx::string_view format, const substitute_internal::Arg& a0,
     const substitute_internal::Arg& a1, const substitute_internal::Arg& a2,
     const substitute_internal::Arg& a3, const substitute_internal::Arg& a4,
     const substitute_internal::Arg& a5, const substitute_internal::Arg& a6,
@@ -691,6 +691,6 @@ std::string Substitute(
 #endif  // ABSL_BAD_CALL_IF
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_SUBSTITUTE_H_

@@ -34,8 +34,8 @@ TEST(TfLiteInferenceCalculatorTpuTest, SmokeTest) {
     }
   )";
   DoSmokeTest<uint8>(
-      /*graph_proto=*/absl::StrReplaceAll(graph_proto, {{"$delegate", ""}}));
-  DoSmokeTest<uint8>(/*graph_proto=*/absl::StrReplaceAll(
+      /*graph_proto=*/abslx::StrReplaceAll(graph_proto, {{"$delegate", ""}}));
+  DoSmokeTest<uint8>(/*graph_proto=*/abslx::StrReplaceAll(
       graph_proto, {{"$delegate", "delegate { tflite {} }"}}));
 }
 

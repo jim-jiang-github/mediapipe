@@ -244,19 +244,19 @@ class HloComputation {
   // Overload which accepts an order to emit the instructions in.
   std::string ToString(
       const HloPrintOptions& options,
-      absl::Span<const HloInstruction* const> instruction_order) const;
+      abslx::Span<const HloInstruction* const> instruction_order) const;
 
   // Returns a Cord representation of the computation.
   //
   // (We express the default options using an overload rather than a default
   // param because gdb ignores default params, but does resolve overloads.)
-  absl::Cord ToCord() const { return ToCord(HloPrintOptions()); }
-  absl::Cord ToCord(const HloPrintOptions& options) const;
+  abslx::Cord ToCord() const { return ToCord(HloPrintOptions()); }
+  abslx::Cord ToCord(const HloPrintOptions& options) const;
 
   // Overload which accepts an order to emit the instructions in.
-  absl::Cord ToCord(
+  abslx::Cord ToCord(
       const HloPrintOptions& options,
-      absl::Span<const HloInstruction* const> instruction_order) const;
+      abslx::Span<const HloInstruction* const> instruction_order) const;
 
   // Returns a serialized representation of this computation.
   HloComputationProto ToProto() const;
@@ -269,7 +269,7 @@ class HloComputation {
   //     calls.
   static StatusOr<std::unique_ptr<HloComputation>> CreateFromProto(
       const HloComputationProto& proto,
-      const absl::flat_hash_map<int64_t, HloComputation*>& computation_map,
+      const abslx::flat_hash_map<int64_t, HloComputation*>& computation_map,
       bool prohibit_empty_literal = true);
 
   // Generates a hash value of an HLO computation. Hash considers
@@ -329,7 +329,7 @@ class HloComputation {
   // removed if they have no uses after fusion (this is necessarily true for at
   // least the root).
   HloInstruction* CreateFusionInstruction(
-      absl::Span<HloInstruction* const> instructions_to_fuse,
+      abslx::Span<HloInstruction* const> instructions_to_fuse,
       HloInstruction::FusionKind fusion_kind);
 
   // Creates a call instruction containing the given instructions.  Instructions
@@ -338,7 +338,7 @@ class HloComputation {
   // instruction. The original instructions are removed if they have no uses
   // after creating the call (this is necessarily true for at least the root).
   HloInstruction* CreateCallInstruction(
-      absl::Span<HloInstruction* const> instructions_to_call);
+      abslx::Span<HloInstruction* const> instructions_to_call);
 
   // Creates an async start/done instruction pair where instruction is wrapped
   // inside an asynchronous computation. The context shapes are appended to the
@@ -348,8 +348,8 @@ class HloComputation {
   // present, `async_execution_thread` will be attached to the
   // async-start/update/done instructions as well as wrapped computations.
   StatusOr<HloInstruction*> CreateAsyncInstructions(
-      HloInstruction* instruction, absl::Span<const Shape> context_shapes,
-      absl::string_view async_execution_thread =
+      HloInstruction* instruction, abslx::Span<const Shape> context_shapes,
+      abslx::string_view async_execution_thread =
           HloInstruction::kMainExecutionThread);
 
   // Create a deep copy of the given instruction and return the instruction
@@ -476,7 +476,7 @@ class HloComputation {
   // be a topological sort of all instructions in the computation.
   template <typename HloInstructionPtr>
   Status AcceptOrdered(DfsHloVisitorBase<HloInstructionPtr>* visitor,
-                       absl::Span<HloInstruction* const> order) const;
+                       abslx::Span<HloInstruction* const> order) const;
 
   // Returns a deep copy of this computation including all instructions.
   // If the clone context is specified, it will be populated with the cloned
@@ -500,9 +500,9 @@ class HloComputation {
   // All relevant instructions are cloned, *including* unique_ptr in the
   // `replacements` map.
   std::unique_ptr<HloComputation> CloneWithReplacements(
-      const absl::flat_hash_map<const HloInstruction*,
+      const abslx::flat_hash_map<const HloInstruction*,
                                 std::unique_ptr<HloInstruction>>* replacements,
-      absl::Span<const HloInstruction* const> extra_parameters = {},
+      abslx::Span<const HloInstruction* const> extra_parameters = {},
       HloCloneContext* context = nullptr, const std::string& suffix = "clone",
       const HloInstruction* new_root = nullptr);
 
@@ -546,7 +546,7 @@ class HloComputation {
   // dependency purposes. Send and RecvDone are in the group, and AllReduces
   // with the same channel id are in the group.
   using ChannelDependencyGroup =
-      absl::flat_hash_map<int64_t, absl::InlinedVector<HloInstruction*, 1>>;
+      abslx::flat_hash_map<int64_t, abslx::InlinedVector<HloInstruction*, 1>>;
   ChannelDependencyGroup ComputeChannelDependencies() const;
 
   // Returns true if this computation has a side effect. A computation has a
@@ -635,15 +635,15 @@ class HloComputation {
 
   // Returns the instruction in this computation that has name `name`.  Returns
   // null if there is no such computation.
-  HloInstruction* GetInstructionWithName(absl::string_view name);
+  HloInstruction* GetInstructionWithName(abslx::string_view name);
 
   int64_t unique_id() const { return unique_id_; }
 
-  void SetExecutionThread(absl::string_view execution_thread) {
+  void SetExecutionThread(abslx::string_view execution_thread) {
     execution_thread_ = std::string(execution_thread);
   }
 
-  absl::string_view execution_thread() const { return execution_thread_; }
+  abslx::string_view execution_thread() const { return execution_thread_; }
   // Returns true if this computation is annotated on "main" execution thread.
   bool IsMainThread() const {
     return execution_thread_ == HloInstruction::kMainExecutionThread;
@@ -676,7 +676,7 @@ class HloComputation {
   // Appends (fuses) HLOs in instructions_to_append into the called computation
   // of the caller.
   void AppendInstructionsIntoCalledComputation(
-      absl::Span<HloInstruction* const> instructions_to_append,
+      abslx::Span<HloInstruction* const> instructions_to_append,
       HloInstruction* caller);
 
   // Internal helper for recursive copying of an instruction. Creates and
@@ -694,7 +694,7 @@ class HloComputation {
   void ComputeInstructionPostOrder(
       HloInstruction* root,
       HloComputation::ChannelDependencyGroup& channel_dependencies,
-      absl::flat_hash_map<HloInstruction*, VisitState>& visited,
+      abslx::flat_hash_map<HloInstruction*, VisitState>& visited,
       std::vector<HloInstruction*>& post_order) const;
 
   Status RemoveUnusedParametersImpl(bool allow_non_fusion);
@@ -741,7 +741,7 @@ class HloComputation {
   // arbitrarily and we want a stable iteration order. Keep a map from
   // instruction pointer to location in the list for fast lookup.
   InstructionList instructions_;
-  absl::flat_hash_map<const HloInstruction*, InstructionList::iterator>
+  abslx::flat_hash_map<const HloInstruction*, InstructionList::iterator>
       instruction_iterators_;
 
   // Removed instructions are moved into to_be_deleted_ first and then
@@ -776,13 +776,13 @@ template Status HloComputation::Accept(ConstDfsHloVisitor* visitor) const;
 template <typename HloInstructionPtr>
 Status HloComputation::AcceptOrdered(
     DfsHloVisitorBase<HloInstructionPtr>* visitor,
-    absl::Span<HloInstruction* const> order) const {
+    abslx::Span<HloInstruction* const> order) const {
   VLOG(3) << "Accepting visitor with order.";
   for (HloInstruction* root : CollectUnreachableRoots()) {
-    TF_RET_CHECK(absl::c_linear_search(order, root)) << root->ToString();
+    TF_RET_CHECK(abslx::c_linear_search(order, root)) << root->ToString();
   }
   TF_RET_CHECK(order.size() == instruction_count());
-  absl::flat_hash_set<const HloInstruction*> visited;
+  abslx::flat_hash_set<const HloInstruction*> visited;
   for (const HloInstruction* instruction : order) {
     VLOG(3) << "Visiting ordered: " << instruction->ToString();
     TF_RET_CHECK(instruction_iterators_.contains(instruction))
@@ -805,9 +805,9 @@ Status HloComputation::AcceptOrdered(
 
 // Explicit instantiations.
 template Status HloComputation::AcceptOrdered(
-    DfsHloVisitor*, absl::Span<HloInstruction* const>) const;
+    DfsHloVisitor*, abslx::Span<HloInstruction* const>) const;
 template Status HloComputation::AcceptOrdered(
-    ConstDfsHloVisitor*, absl::Span<HloInstruction* const>) const;
+    ConstDfsHloVisitor*, abslx::Span<HloInstruction* const>) const;
 
 }  // namespace xla
 

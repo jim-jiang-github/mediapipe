@@ -28,7 +28,7 @@ limitations under the License.
 namespace xla {
 
 StatusOr<bool> RunFileCheck(const std::string& input,
-                            absl::string_view pattern) {
+                            abslx::string_view pattern) {
   // Generate an input file for the FileCheck pattern.
   std::string pattern_path;
   auto env = tensorflow::Env::Default();

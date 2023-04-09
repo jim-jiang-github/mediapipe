@@ -49,12 +49,12 @@ class StatusLogSink : public TFLogSink {
   }
 
   void enable() {
-    absl::call_once(flag_, [this] {
+    abslx::call_once(flag_, [this] {
       num_messages_ = 5;  // default to 5 messages
 
       if (const char* num_msgs_str =
               getenv("TF_WORKER_NUM_FORWARDED_LOG_MESSAGES")) {
-        if (!absl::SimpleAtoi(num_msgs_str, &num_messages_)) {
+        if (!abslx::SimpleAtoi(num_msgs_str, &num_messages_)) {
           LOG(WARNING) << "Failed to parse env variable "
                           "TF_WORKER_NUM_WARNING_ERROR_LOG_IN_STATUS="
                        << num_msgs_str << " as int. Using the default value "
@@ -77,7 +77,7 @@ class StatusLogSink : public TFLogSink {
   }
 
   void Send(const TFLogEntry& entry) override TF_LOCKS_EXCLUDED(mu_) {
-    if (entry.log_severity() < absl::LogSeverity::kWarning) return;
+    if (entry.log_severity() < abslx::LogSeverity::kWarning) return;
 
     mutex_lock lock(mu_);
     messages_.emplace_back(entry.ToString());
@@ -89,7 +89,7 @@ class StatusLogSink : public TFLogSink {
  private:
   mutex mu_;
   // for allowing repeated/concurrent calls to enable()
-  absl::once_flag flag_;
+  abslx::once_flag flag_;
   int num_messages_ = 0;
   std::deque<std::string> messages_ TF_GUARDED_BY(mu_);
 };
@@ -118,9 +118,9 @@ void Status::SetStackTrace(std::vector<StackFrame> stack_trace) {
 
 std::vector<StackFrame> Status::GetStackTrace() const { return stack_trace_; }
 
-absl::Span<const SourceLocation> Status::GetSourceLocations() const {
+abslx::Span<const SourceLocation> Status::GetSourceLocations() const {
   return state_ != nullptr ? state_->source_locations
-                           : absl::Span<const SourceLocation>();
+                           : abslx::Span<const SourceLocation>();
 }
 
 void Status::MaybeAddSourceLocation(SourceLocation loc) {
@@ -139,7 +139,7 @@ void Status::MaybeAddSourceLocation(SourceLocation loc) {
   state_->source_locations.push_back(loc);
 }
 
-Status::Status(tensorflow::error::Code code, absl::string_view msg,
+Status::Status(tensorflow::error::Code code, abslx::string_view msg,
                SourceLocation loc) {
   assert(code != tensorflow::error::OK);
   state_ = std::make_unique<State>();
@@ -240,8 +240,8 @@ std::string Status::ToString() const {
 
     for (const std::pair<const std::string, std::string>& element :
          state_->payloads) {
-      absl::StrAppend(&result, " [", element.first, "='",
-                      absl::CHexEscape(element.second), "']");
+      abslx::StrAppend(&result, " [", element.first, "='",
+                      abslx::CHexEscape(element.second), "']");
     }
 
     return result;
@@ -252,20 +252,20 @@ void Status::IgnoreError() const {
   // no-op
 }
 
-void Status::SetPayload(absl::string_view type_url, absl::string_view payload) {
+void Status::SetPayload(abslx::string_view type_url, abslx::string_view payload) {
   if (ok()) return;
   state_->payloads[std::string(type_url)] = std::string(payload);
 }
 
-absl::optional<absl::Cord> Status::GetPayload(
-    absl::string_view type_url) const {
-  if (ok()) return absl::nullopt;
+abslx::optional<abslx::Cord> Status::GetPayload(
+    abslx::string_view type_url) const {
+  if (ok()) return abslx::nullopt;
   auto payload_iter = state_->payloads.find(std::string(type_url));
-  if (payload_iter == state_->payloads.end()) return absl::nullopt;
-  return absl::Cord(payload_iter->second);
+  if (payload_iter == state_->payloads.end()) return abslx::nullopt;
+  return abslx::Cord(payload_iter->second);
 }
 
-bool Status::ErasePayload(absl::string_view type_url) {
+bool Status::ErasePayload(abslx::string_view type_url) {
   if (ok()) return false;
   auto payload_iter = state_->payloads.find(std::string(type_url));
   if (payload_iter == state_->payloads.end()) return false;
@@ -274,7 +274,7 @@ bool Status::ErasePayload(absl::string_view type_url) {
 }
 
 void Status::ForEachPayload(
-    const std::function<void(absl::string_view, absl::string_view)>& visitor)
+    const std::function<void(abslx::string_view, abslx::string_view)>& visitor)
     const {
   if (ok()) return;
   for (const auto& payload : state_->payloads) {
@@ -349,8 +349,8 @@ static constexpr int kMaxAttachedLogMessageSize = 512;
 
 std::unordered_map<std::string, std::string> StatusGroup::GetPayloads() const {
   std::unordered_map<std::string, std::string> payloads;
-  auto capture_payload = [&payloads](absl::string_view key,
-                                     absl::string_view value) {
+  auto capture_payload = [&payloads](abslx::string_view key,
+                                     abslx::string_view value) {
     payloads[std::string(key)] = std::string(value);
   };
 
@@ -370,7 +370,7 @@ std::unordered_map<std::string, std::string> StatusGroup::GetPayloads() const {
 }
 
 Status MakeStatus(
-    tensorflow::error::Code code, absl::string_view message,
+    tensorflow::error::Code code, abslx::string_view message,
     const std::unordered_map<std::string, std::string>& payloads) {
   Status status(code, message);
   for (const auto& payload : payloads) {
@@ -380,7 +380,7 @@ Status MakeStatus(
 }
 
 std::string MakeString(const Status& status) {
-  return absl::StrCat(error_name(status.code()), ": ", status.error_message());
+  return abslx::StrCat(error_name(status.code()), ": ", status.error_message());
 }
 
 // Summarize all the status objects in the StatusGroup. This is used when
@@ -399,7 +399,7 @@ Status StatusGroup::as_summary_status() const {
         // Add an indentation to make it look nicer.
         fmt.push_back("  " + log.substr(0, kMaxAttachedLogMessageSize));
       }
-      return absl::StrJoin(fmt, "\n");
+      return abslx::StrJoin(fmt, "\n");
     } else {
       return "";
     }
@@ -437,7 +437,7 @@ Status StatusGroup::as_summary_status() const {
         strings::Printf("%zu derived errors ignored.", derived_.size()));
 
     std::string error_msg =
-        absl::StrJoin(fmt, "\n").substr(0, kMaxAggregatedStatusMessageSize);
+        abslx::StrJoin(fmt, "\n").substr(0, kMaxAggregatedStatusMessageSize);
 
     return MakeStatus(code, strings::StrCat(error_msg, get_recent_logs()),
                       GetPayloads());
@@ -471,7 +471,7 @@ Status StatusGroup::as_concatenated_status() const {
     fmt.emplace_back("=====================\n");
     return MakeStatus(
         non_derived_.begin()->code(),
-        absl::StrJoin(fmt, "\n").substr(0, kMaxAggregatedStatusMessageSize),
+        abslx::StrJoin(fmt, "\n").substr(0, kMaxAggregatedStatusMessageSize),
         GetPayloads());
   } else {
     // All statuses are derived. Pick the first available status to return.

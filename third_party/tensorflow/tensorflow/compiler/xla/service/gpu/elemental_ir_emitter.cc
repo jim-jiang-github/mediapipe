@@ -51,7 +51,7 @@ limitations under the License.
 namespace xla {
 namespace gpu {
 
-using absl::StrAppend;
+using abslx::StrAppend;
 using llvm_ir::IrArray;
 using llvm_ir::IrName;
 using llvm_ir::SetToFirstInsertPoint;
@@ -76,9 +76,9 @@ GpuElementalIrEmitter::GpuElementalIrEmitter(
       compute_nested_(std::move(compute_nested)) {}
 
 StatusOr<llvm::Value*> GpuElementalIrEmitter::EmitDeviceMathCall(
-    TargetDeviceFunctionID funcid, absl::Span<llvm::Value* const> operands,
-    absl::Span<const PrimitiveType> input_types, PrimitiveType output_type,
-    absl::string_view name) {
+    TargetDeviceFunctionID funcid, abslx::Span<llvm::Value* const> operands,
+    abslx::Span<const PrimitiveType> input_types, PrimitiveType output_type,
+    abslx::string_view name) {
   // Device functions dont have f16 math functions, so we convert the operands
   // to f32 before calling the function and then convert the result back to f16.
   bool cast_result_to_fp16 = false;
@@ -118,8 +118,8 @@ StatusOr<llvm::Value*> GpuElementalIrEmitter::EmitDeviceMathCall(
 }
 
 StatusOr<llvm::Value*> GpuElementalIrEmitter::EmitLlvmIntrinsicMathCall(
-    const std::string& callee_name, absl::Span<llvm::Value* const> operands,
-    absl::Span<const PrimitiveType> input_types, PrimitiveType output_type) {
+    const std::string& callee_name, abslx::Span<llvm::Value* const> operands,
+    abslx::Span<const PrimitiveType> input_types, PrimitiveType output_type) {
   // llvm intrinsics differentiate between half/float/double functions via
   // the suffixes ".f16", ".f32" and ".f64".
   std::string munged_callee = callee_name;
@@ -141,9 +141,9 @@ StatusOr<llvm::Value*> GpuElementalIrEmitter::EmitLlvmIntrinsicMathCall(
 }
 
 StatusOr<llvm::Value*> GpuElementalIrEmitter::EmitMathCall(
-    const std::string& callee_name, absl::Span<llvm::Value* const> operands,
-    absl::Span<const PrimitiveType> input_types, PrimitiveType output_type,
-    absl::string_view name) {
+    const std::string& callee_name, abslx::Span<llvm::Value* const> operands,
+    abslx::Span<const PrimitiveType> input_types, PrimitiveType output_type,
+    abslx::string_view name) {
   // Binary math functions transform are of type [T] -> T.
   for (PrimitiveType input_type : input_types) {
     if (output_type != input_type) {
@@ -240,7 +240,7 @@ StatusOr<llvm::Value*> GpuElementalIrEmitter::EmitCos(PrimitiveType prim_type,
 }
 
 StatusOr<llvm::Value*> GpuElementalIrEmitter::EmitExp(
-    PrimitiveType prim_type, llvm::Value* value, absl::string_view /*name*/) {
+    PrimitiveType prim_type, llvm::Value* value, abslx::string_view /*name*/) {
   return EmitDeviceMathCall(TargetDeviceFunctionID::kExp, {value}, {prim_type},
                             prim_type);
 }
@@ -254,7 +254,7 @@ StatusOr<llvm::Value*> GpuElementalIrEmitter::EmitExpm1(PrimitiveType prim_type,
 StatusOr<llvm::Value*> GpuElementalIrEmitter::EmitPow(PrimitiveType prim_type,
                                                       llvm::Value* lhs,
                                                       llvm::Value* rhs,
-                                                      absl::string_view name) {
+                                                      abslx::string_view name) {
   return EmitDeviceMathCall(TargetDeviceFunctionID::kPow, {lhs, rhs},
                             {prim_type, prim_type}, prim_type, name);
 }
@@ -273,7 +273,7 @@ StatusOr<llvm::Value*> GpuElementalIrEmitter::EmitRsqrt(PrimitiveType prim_type,
 
 StatusOr<llvm::Value*> GpuElementalIrEmitter::EmitAtan2(
     PrimitiveType prim_type, llvm::Value* lhs, llvm::Value* rhs,
-    absl::string_view name) {
+    abslx::string_view name) {
   return EmitDeviceMathCall(TargetDeviceFunctionID::kAtan2, {lhs, rhs},
                             {prim_type, prim_type}, prim_type, name);
 }

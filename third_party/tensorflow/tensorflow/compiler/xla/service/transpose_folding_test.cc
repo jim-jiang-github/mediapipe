@@ -46,7 +46,7 @@ using ::tensorflow::testing::IsOkAndHolds;
 using TransposeFoldingTest = HloTestBase;
 
 TEST_F(TransposeFoldingTest, FoldDotTranspose) {
-  constexpr absl::string_view kHloString = R"(
+  constexpr abslx::string_view kHloString = R"(
 HloModule FoldDotTranspose
 
 ENTRY entry_computation {
@@ -66,7 +66,7 @@ ENTRY entry_computation {
 }
 
 TEST_F(TransposeFoldingTest, DontFoldTransposeOfBatchDimByDefault) {
-  constexpr absl::string_view kHloString = R"(
+  constexpr abslx::string_view kHloString = R"(
 HloModule FoldDotTranspose
 
 ENTRY entry_computation {
@@ -83,7 +83,7 @@ ENTRY entry_computation {
 }
 
 TEST_F(TransposeFoldingTest, FoldTransposeOfBatchWhenPermitted) {
-  constexpr absl::string_view kHloString = R"(
+  constexpr abslx::string_view kHloString = R"(
 HloModule FoldDotTranspose
 
 ENTRY entry_computation {
@@ -108,7 +108,7 @@ ENTRY entry_computation {
 }
 
 TEST_F(TransposeFoldingTest, DontFoldTransposeOfRank1Dot) {
-  constexpr absl::string_view kHloString = R"(
+  constexpr abslx::string_view kHloString = R"(
 HloModule FoldDotTranspose
 
 ENTRY entry_computation {
@@ -125,7 +125,7 @@ ENTRY entry_computation {
 }
 
 TEST_F(TransposeFoldingTest, DontFoldTransposeOfDotWithoutContractingDims) {
-  constexpr absl::string_view kHloString = R"(
+  constexpr abslx::string_view kHloString = R"(
 HloModule FoldDotTranspose
 
 ENTRY entry_computation {
@@ -142,7 +142,7 @@ ENTRY entry_computation {
 }
 
 TEST_F(TransposeFoldingTest, FoldDotTransposeConstant) {
-  constexpr absl::string_view kHloString = R"(
+  constexpr abslx::string_view kHloString = R"(
 HloModule FoldDotTransposeConstant
 
 ENTRY entry_computation {
@@ -194,7 +194,7 @@ TEST_F(TransposeFoldingTest, FuseDotWithConstantOperands) {
 }
 
 TEST_F(TransposeFoldingTest, FoldDotTransposeInCall) {
-  constexpr absl::string_view kHloString = R"(
+  constexpr abslx::string_view kHloString = R"(
 HloModule FoldDotTransposeInCall
 
 callee {
@@ -263,7 +263,7 @@ TEST_F(TransposeFoldingTest, FoldConvDimSwapTransposeRhs) {
   EXPECT_THAT(TransposeFolding().Run(module.get()), IsOkAndHolds(true));
 
   // Instructions after folding: x, y, and the convolution.
-  absl::flat_hash_set<HloInstruction*> instruction_set(
+  abslx::flat_hash_set<HloInstruction*> instruction_set(
       entry_computation->instructions().begin(),
       entry_computation->instructions().end());
   CHECK_EQ(1, instruction_set.erase(x)) << "x is not in entry_computation.";
@@ -321,7 +321,7 @@ TEST_F(TransposeFoldingTest, FoldConvComplexTransposeRhs) {
   EXPECT_THAT(TransposeFolding().Run(module.get()), IsOkAndHolds(true));
 
   // Instructions after folding: x, y, and the convolution.
-  absl::flat_hash_set<HloInstruction*> instruction_set(
+  abslx::flat_hash_set<HloInstruction*> instruction_set(
       entry_computation->instructions().begin(),
       entry_computation->instructions().end());
   CHECK_EQ(1, instruction_set.erase(x)) << "x is not in entry_computation.";
@@ -384,7 +384,7 @@ TEST_F(TransposeFoldingTest, FoldConvTransposeLhs) {
   EXPECT_THAT(TransposeFolding().Run(module.get()), IsOkAndHolds(true));
 
   // Instructions after folding: x, y, and the convolution.
-  absl::flat_hash_set<HloInstruction*> instruction_set(
+  abslx::flat_hash_set<HloInstruction*> instruction_set(
       entry_computation->instructions().begin(),
       entry_computation->instructions().end());
   EXPECT_EQ(1, instruction_set.erase(x)) << "x is not in entry_computation.";
@@ -453,7 +453,7 @@ TEST_F(TransposeFoldingTest, FoldConvComplexTransposeLhs) {
   EXPECT_THAT(TransposeFolding().Run(module.get()), IsOkAndHolds(true));
 
   // Instructions after folding: x, y, and the convolution.
-  absl::flat_hash_set<HloInstruction*> instruction_set(
+  abslx::flat_hash_set<HloInstruction*> instruction_set(
       entry_computation->instructions().begin(),
       entry_computation->instructions().end());
   EXPECT_EQ(1, instruction_set.erase(x)) << "x is not in entry_computation.";
@@ -482,7 +482,7 @@ TEST_F(TransposeFoldingTest, FoldConvComplexTransposeLhs) {
 }
 
 TEST_F(TransposeFoldingTest, FoldBatchDotTranspose) {
-  constexpr absl::string_view kHloString = R"(
+  constexpr abslx::string_view kHloString = R"(
 HloModule FoldBatchDotTranspose
 
 ENTRY entry_computation {
@@ -503,7 +503,7 @@ ENTRY entry_computation {
 }
 
 TEST_F(TransposeFoldingTest, NoFoldBatchDotTransposeBatch) {
-  constexpr absl::string_view kHloString = R"(
+  constexpr abslx::string_view kHloString = R"(
 HloModule NoFoldBatchDotTransposeBatch
 
 ENTRY entry_computation {
@@ -521,7 +521,7 @@ ENTRY entry_computation {
 }
 
 TEST_F(TransposeFoldingTest, FoldBatchDotTransposeNonContiguousBatch) {
-  constexpr absl::string_view kHloString = R"(
+  constexpr abslx::string_view kHloString = R"(
 HloModule FoldBatchDotTransposeNonContiguousBatch
 
 ENTRY entry_computation {
@@ -542,7 +542,7 @@ ENTRY entry_computation {
 }
 
 TEST_F(TransposeFoldingTest, NoFoldBatchDotTransposeIdentity) {
-  constexpr absl::string_view kHloString = R"(
+  constexpr abslx::string_view kHloString = R"(
 HloModule NoFoldBatchDotTransposeIdentity
 
 ENTRY entry_computation {

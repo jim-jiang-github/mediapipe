@@ -35,13 +35,13 @@ StatusOr<std::uintptr_t> PjRtClient::UnsafeBufferPointer(PjRtBuffer* buffer) {
       std::unique_ptr<PjRtBuffer::ExternalReference> external_reference_hold,
       buffer->AcquireExternalReference());
   const void* ptr = external_reference_hold->OpaqueDeviceMemoryDataPointer();
-  return absl::bit_cast<std::uintptr_t>(ptr);
+  return abslx::bit_cast<std::uintptr_t>(ptr);
 }
 
 MultiSliceConfig::~MultiSliceConfig() {}
 
 std::string CompiledMemoryStats::DebugString() const {
-  return absl::Substitute(
+  return abslx::Substitute(
       "CompiledMemoryStats("
       "generated_code_size_in_bytes=$0, "
       "argument_size_in_bytes=$1, "
@@ -53,7 +53,7 @@ std::string CompiledMemoryStats::DebugString() const {
 }
 
 Status CopyToDeviceStream::AddChunk(PjRtChunk chunk) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   if (current_bytes_ >= total_bytes_) {
     return xla::Status(tensorflow::error::Code::FAILED_PRECONDITION,
                        "Stream is already complete");
@@ -61,7 +61,7 @@ Status CopyToDeviceStream::AddChunk(PjRtChunk chunk) {
   current_bytes_ += chunk.size();
   if (current_bytes_ > total_bytes_) {
     return xla::Status(tensorflow::error::Code::FAILED_PRECONDITION,
-                       absl::StrCat("Stream byte size mismatch: ",
+                       abslx::StrCat("Stream byte size mismatch: ",
                                     current_bytes_, " > ", total_bytes_));
   }
 
@@ -70,11 +70,11 @@ Status CopyToDeviceStream::AddChunk(PjRtChunk chunk) {
 }
 
 std::optional<PjRtChunk> CopyToDeviceStream::ConsumeNextChunk() {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   if (buffered_chunks_.empty() && current_bytes_ >= total_bytes_) {
     return std::nullopt;
   }
-  mu_.Await(absl::Condition(
+  mu_.Await(abslx::Condition(
       +[](std::deque<PjRtChunk>* buffered_chunks) {
         return !buffered_chunks->empty();
       },

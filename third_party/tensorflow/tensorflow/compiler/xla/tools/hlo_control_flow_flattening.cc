@@ -270,7 +270,7 @@ Status HloControlFlowFlattening::RemoveInfeed(
 
 Status HloControlFlowFlattening::RemoveRecvDone(
     HloInstruction* recv_done,
-    absl::flat_hash_set<HloInstruction*>* additional_removed) const {
+    abslx::flat_hash_set<HloInstruction*>* additional_removed) const {
   CHECK_EQ(recv_done->opcode(), HloOpcode::kRecvDone);
   CHECK_EQ(recv_done->operand_count(), 1);
   HloInstruction* recv = recv_done->mutable_operand(0);
@@ -313,7 +313,7 @@ Status HloControlFlowFlattening::RemoveOutfeed(
 
 Status HloControlFlowFlattening::RemoveSendDone(
     HloInstruction* send_done,
-    absl::flat_hash_set<HloInstruction*>* additional_removed) const {
+    abslx::flat_hash_set<HloInstruction*>* additional_removed) const {
   CHECK_EQ(send_done->opcode(), HloOpcode::kSendDone);
   CHECK_EQ(send_done->operand_count(), 1);
   HloInstruction* send = send_done->mutable_operand(0);
@@ -359,10 +359,10 @@ Status HloControlFlowFlattening::RemovePartitionOrReplicaId(
 
 StatusOr<bool> HloControlFlowFlattening::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   auto call_graph = CallGraph::Build(module);
   bool changed = false;
-  absl::flat_hash_set<HloInstruction*> removed;
+  abslx::flat_hash_set<HloInstruction*> removed;
   for (HloComputation* computation : module->computations(execution_threads)) {
     for (HloInstruction* instruction :
          computation->MakeInstructionPostOrder()) {

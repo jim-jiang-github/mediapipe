@@ -494,8 +494,8 @@ template <typename Fp, typename Uint, int kNumTestcases, int kNumInputs>
 void ReducedPrecisionAccuracyTest::DoIt(
     int exponent_bits, int mantissa_bits,
     const Uint (&test_values)[kNumInputs][kNumTestcases], int operation_index) {
-  SCOPED_TRACE(absl::StrFormat("operation_index %d", operation_index));
-  SCOPED_TRACE(absl::StrFormat("%d exponent bits, %d mantissa bits",
+  SCOPED_TRACE(abslx::StrFormat("operation_index %d", operation_index));
+  SCOPED_TRACE(abslx::StrFormat("%d exponent bits, %d mantissa bits",
                                exponent_bits, mantissa_bits));
 
   std::vector<Fp> input_values;
@@ -504,10 +504,10 @@ void ReducedPrecisionAccuracyTest::DoIt(
   const Uint sign_bit = Uint{1} << (sizeof(Fp) * 8 - 1);
   for (const auto& test_value : test_values) {
     // Add positive values.
-    input_values.push_back(absl::bit_cast<Fp>(test_value[0]));
+    input_values.push_back(abslx::bit_cast<Fp>(test_value[0]));
     // Add negative values.  We do this in the bitwise representation so as to
     // avoid problems with NaN handling.
-    input_values.push_back(absl::bit_cast<Fp, Uint>(test_value[0] ^ sign_bit));
+    input_values.push_back(abslx::bit_cast<Fp, Uint>(test_value[0] ^ sign_bit));
   }
 
   XlaBuilder builder(TestName());

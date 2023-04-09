@@ -34,9 +34,9 @@ limitations under the License.
 namespace xla {
 namespace {
 
-absl::Mutex mu(absl::kConstInit);
-absl::CondVar* ready;
-absl::once_flag init_flag;
+abslx::Mutex mu(abslx::kConstInit);
+abslx::CondVar* ready;
+abslx::once_flag init_flag;
 std::list<SlowOperationAlarm*>* outstanding_alarms ABSL_PT_GUARDED_BY(mu) =
     nullptr;
 
@@ -44,10 +44,10 @@ std::list<SlowOperationAlarm*>* outstanding_alarms ABSL_PT_GUARDED_BY(mu) =
 
 void SlowOperationAlarm::AlarmLoop() {
   while (true) {
-    absl::MutexLock lock(&mu);
+    abslx::MutexLock lock(&mu);
 
     // Fire any alarms which are ready.
-    absl::Time now = absl::Now();
+    abslx::Time now = abslx::Now();
     for (auto it = outstanding_alarms->begin();
          it != outstanding_alarms->end();) {
       auto next = std::next(it);
@@ -58,7 +58,7 @@ void SlowOperationAlarm::AlarmLoop() {
         const int64_t count =
             alarm->counter() == nullptr ? 0 : alarm->counter()->fetch_add(1);
         // If the alarm has a counter, only fire if the count is a power of 2.
-        if (count == 0 || absl::has_single_bit<uint64_t>(count) == 0) {
+        if (count == 0 || abslx::has_single_bit<uint64_t>(count) == 0) {
           alarm->fired_.store(true);
           // We fire alarms with LOG(ERROR) because otherwise it might not show
           // up without --logtostderr.
@@ -68,54 +68,54 @@ void SlowOperationAlarm::AlarmLoop() {
       it = next;
     }
 
-    auto next_alarm = absl::c_min_element(
+    auto next_alarm = abslx::c_min_element(
         *outstanding_alarms,
         [](const SlowOperationAlarm* a, const SlowOperationAlarm* b) {
           return a->deadline() < b->deadline();
         });
-    const absl::Time deadline = next_alarm != outstanding_alarms->end()
+    const abslx::Time deadline = next_alarm != outstanding_alarms->end()
                                     ? (*next_alarm)->deadline()
-                                    : absl::InfiniteFuture();
+                                    : abslx::InfiniteFuture();
 
     ready->WaitWithDeadline(&mu, deadline);
   }
 }
 
 void SlowOperationAlarm::ScheduleAlarm(SlowOperationAlarm* alarm) {
-  absl::call_once(init_flag, [] {
-    ready = new absl::CondVar();
+  abslx::call_once(init_flag, [] {
+    ready = new abslx::CondVar();
     outstanding_alarms = new std::list<SlowOperationAlarm*>();
     (void)tensorflow::Env::Default()->StartThread(
         tensorflow::ThreadOptions(), "SlowOperationAlarm", [] { AlarmLoop(); });
   });
 
-  absl::MutexLock lock(&mu);
+  abslx::MutexLock lock(&mu);
   outstanding_alarms->push_back(alarm);
   ready->Signal();
 }
 
 void SlowOperationAlarm::UnscheduleAlarm(const SlowOperationAlarm* alarm) {
-  absl::MutexLock lock(&mu);
+  abslx::MutexLock lock(&mu);
   CHECK(outstanding_alarms != nullptr);
-  auto it = absl::c_find(*outstanding_alarms, alarm);
+  auto it = abslx::c_find(*outstanding_alarms, alarm);
   if (it != outstanding_alarms->end()) {
     outstanding_alarms->erase(it);
   }
 }
 SlowOperationAlarm::SlowOperationAlarm(
-    absl::Duration timeout, std::string msg,
+    abslx::Duration timeout, std::string msg,
     std::atomic<int64_t>* counter /*=nullptr*/,
-    absl::string_view context /*=""*/)
+    abslx::string_view context /*=""*/)
     : SlowOperationAlarm(
           timeout,                                 //
           [msg = std::move(msg)] { return msg; },  //
           counter, std::move(context)) {}
 
 SlowOperationAlarm::SlowOperationAlarm(
-    absl::Duration timeout, std::function<std::string()> msg_fn,
+    abslx::Duration timeout, std::function<std::string()> msg_fn,
     std::atomic<int64_t>* counter /*=nullptr*/,
-    absl::string_view context /*=""*/)
-    : start_(absl::Now()),
+    abslx::string_view context /*=""*/)
+    : start_(abslx::Now()),
       deadline_(start_ + timeout),
       context_(std::move(context)),
       msg_fn_(std::move(msg_fn)),
@@ -126,23 +126,23 @@ SlowOperationAlarm::SlowOperationAlarm(
 SlowOperationAlarm::~SlowOperationAlarm() {
   UnscheduleAlarm(this);
 
-  absl::Time now = absl::Now();
+  abslx::Time now = abslx::Now();
   if (deadline() <= now) {
-    absl::Duration duration = now - start_;
+    abslx::Duration duration = now - start_;
     if (context_.empty()) {
-      LOG(ERROR) << "The operation took " << absl::FormatDuration(duration)
+      LOG(ERROR) << "The operation took " << abslx::FormatDuration(duration)
                  << "\n"
                  << msg_fn_();
     } else {
       LOG(ERROR) << "[" << context_ << "] The operation took "
-                 << absl::FormatDuration(duration) << "\n"
+                 << abslx::FormatDuration(duration) << "\n"
                  << msg_fn_();
     }
   }
 }
 
 std::unique_ptr<SlowOperationAlarm> SlowCompilationAlarm(
-    absl::string_view context) {
+    abslx::string_view context) {
   // Pass a counter to these alarms so they only log once every power-of-two
   // occurrences.
   static auto* counter = new std::atomic<int64_t>(0);
@@ -151,13 +151,13 @@ std::unique_ptr<SlowOperationAlarm> SlowCompilationAlarm(
 
   std::string context_msg;
   if (!context.empty()) {
-    context_msg = absl::StrCat("[", context, "] ");
+    context_msg = abslx::StrCat("[", context, "] ");
   }
 
 #if NDEBUG
   return std::make_unique<SlowOperationAlarm>(
-      absl::Duration(absl::Minutes(2)),
-      absl::StrCat(
+      abslx::Duration(abslx::Minutes(2)),
+      abslx::StrCat(
           separator, "\n", context_msg,
           "Very slow compile?  If you want to file a bug, run with envvar "
           "XLA_FLAGS=--xla_dump_to=/tmp/foo and attach the results.",
@@ -165,8 +165,8 @@ std::unique_ptr<SlowOperationAlarm> SlowCompilationAlarm(
       counter);
 #else
   return std::make_unique<SlowOperationAlarm>(
-      absl::Duration(absl::Seconds(10)),
-      absl::StrCat(
+      abslx::Duration(abslx::Seconds(10)),
+      abslx::StrCat(
           separator, "\n", context_msg,
           "Slow compile?  XLA was built without compiler optimizations, "
           "which can be slow.  Try rebuilding with -c opt.",

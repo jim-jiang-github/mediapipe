@@ -34,7 +34,7 @@ TEST(TestUtil, InverseErf) {
   };
 
   for (const auto& data : kErfInvTable) {
-    auto value = absl::random_internal::erfinv(data.z);
+    auto value = abslx::random_internal::erfinv(data.z);
 
     // Log using the Wolfram-alpha function name & parameters.
     EXPECT_NEAR(value, data.value, 1e-8)
@@ -118,7 +118,7 @@ const struct {
 
 TEST(BetaTest, BetaIncomplete) {
   for (const auto& data : kBetaTable) {
-    auto value = absl::random_internal::BetaIncomplete(data.x, data.p, data.q);
+    auto value = abslx::random_internal::BetaIncomplete(data.x, data.p, data.q);
 
     // Log using the Wolfram-alpha function name & parameters.
     EXPECT_NEAR(value, data.alpha, 1e-12)
@@ -130,7 +130,7 @@ TEST(BetaTest, BetaIncomplete) {
 TEST(BetaTest, BetaIncompleteInv) {
   for (const auto& data : kBetaTable) {
     auto value =
-        absl::random_internal::BetaIncompleteInv(data.p, data.q, data.alpha);
+        abslx::random_internal::BetaIncompleteInv(data.p, data.q, data.alpha);
 
     // Log using the Wolfram-alpha function name & parameters.
     EXPECT_NEAR(value, data.x, 1e-6)
@@ -150,44 +150,44 @@ TEST(MaxErrorTolerance, MaxErrorTolerance) {
       {0.999999944, 3.8403850690566985 * 1.41421356237},
       {0.999999999, 4.3200053849134452 * 1.41421356237}};
   for (auto entry : cases) {
-    EXPECT_NEAR(absl::random_internal::MaxErrorTolerance(entry.first),
+    EXPECT_NEAR(abslx::random_internal::MaxErrorTolerance(entry.first),
                 entry.second, 1e-8);
   }
 }
 
 TEST(ZScore, WithSameMean) {
-  absl::random_internal::DistributionMoments m;
+  abslx::random_internal::DistributionMoments m;
   m.n = 100;
   m.mean = 5;
   m.variance = 1;
-  EXPECT_NEAR(absl::random_internal::ZScore(5, m), 0, 1e-12);
+  EXPECT_NEAR(abslx::random_internal::ZScore(5, m), 0, 1e-12);
 
   m.n = 1;
   m.mean = 0;
   m.variance = 1;
-  EXPECT_NEAR(absl::random_internal::ZScore(0, m), 0, 1e-12);
+  EXPECT_NEAR(abslx::random_internal::ZScore(0, m), 0, 1e-12);
 
   m.n = 10000;
   m.mean = -5;
   m.variance = 100;
-  EXPECT_NEAR(absl::random_internal::ZScore(-5, m), 0, 1e-12);
+  EXPECT_NEAR(abslx::random_internal::ZScore(-5, m), 0, 1e-12);
 }
 
 TEST(ZScore, DifferentMean) {
-  absl::random_internal::DistributionMoments m;
+  abslx::random_internal::DistributionMoments m;
   m.n = 100;
   m.mean = 5;
   m.variance = 1;
-  EXPECT_NEAR(absl::random_internal::ZScore(4, m), 10, 1e-12);
+  EXPECT_NEAR(abslx::random_internal::ZScore(4, m), 10, 1e-12);
 
   m.n = 1;
   m.mean = 0;
   m.variance = 1;
-  EXPECT_NEAR(absl::random_internal::ZScore(-1, m), 1, 1e-12);
+  EXPECT_NEAR(abslx::random_internal::ZScore(-1, m), 1, 1e-12);
 
   m.n = 10000;
   m.mean = -5;
   m.variance = 100;
-  EXPECT_NEAR(absl::random_internal::ZScore(-4, m), -10, 1e-12);
+  EXPECT_NEAR(abslx::random_internal::ZScore(-4, m), -10, 1e-12);
 }
 }  // namespace

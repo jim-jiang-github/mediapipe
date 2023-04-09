@@ -29,7 +29,7 @@ namespace autoflip {
 // Packs detected features and timestamp (ms) into a KeyFrameInfo object. Scales
 // features back to the original frame size if features have been detected on a
 // different frame size.
-absl::Status PackKeyFrameInfo(const int64 frame_timestamp_ms,
+abslx::Status PackKeyFrameInfo(const int64 frame_timestamp_ms,
                               const DetectionSet& detections,
                               const int original_frame_width,
                               const int original_frame_height,
@@ -38,21 +38,21 @@ absl::Status PackKeyFrameInfo(const int64 frame_timestamp_ms,
                               KeyFrameInfo* key_frame_info);
 
 // Sorts required and non-required salient regions given a detection set.
-absl::Status SortDetections(const DetectionSet& detections,
+abslx::Status SortDetections(const DetectionSet& detections,
                             std::vector<SalientRegion>* required_regions,
                             std::vector<SalientRegion>* non_required_regions);
 
 // Sets the target crop size in KeyFrameCropOptions based on frame size and
 // target aspect ratio so that the target crop size covers the biggest area
 // possible in the frame.
-absl::Status SetKeyFrameCropTarget(const int frame_width,
+abslx::Status SetKeyFrameCropTarget(const int frame_width,
                                    const int frame_height,
                                    const double target_aspect_ratio,
                                    KeyFrameCropOptions* crop_options);
 
 // Aggregates information from KeyFrameInfos and KeyFrameCropResults into
 // SceneKeyFrameCropSummary.
-absl::Status AggregateKeyFrameResults(
+abslx::Status AggregateKeyFrameResults(
     const KeyFrameCropOptions& key_frame_crop_options,
     const std::vector<KeyFrameCropResult>& key_frame_crop_results,
     const int scene_frame_width, const int scene_frame_height,
@@ -60,7 +60,7 @@ absl::Status AggregateKeyFrameResults(
 
 // Computes the static top and border size across a scene given a vector of
 // StaticFeatures over frames.
-absl::Status ComputeSceneStaticBordersSize(
+abslx::Status ComputeSceneStaticBordersSize(
     const std::vector<StaticFeatures>& static_features, int* top_border_size,
     int* bottom_border_size);
 
@@ -69,7 +69,7 @@ absl::Status ComputeSceneStaticBordersSize(
 // background color exceeds given threshold, i.e.,
 // min_fraction_solid_background_color. Builds the background color
 // interpolation functions in Lab space using input timestamps.
-absl::Status FindSolidBackgroundColor(
+abslx::Status FindSolidBackgroundColor(
     const std::vector<StaticFeatures>& static_features,
     const std::vector<int64>& static_features_timestamps,
     const double min_fraction_solid_background_color,
@@ -92,12 +92,12 @@ void NormalizedRectToRect(const RectF& normalized_location, const int width,
 
 // Clamps a rectangle to lie within [x0, y0] and [x1, y1]. Returns true if the
 // rectangle has any overlapping with the target window.
-absl::Status ClampRect(const int x0, const int y0, const int x1, const int y1,
+abslx::Status ClampRect(const int x0, const int y0, const int x1, const int y1,
                        Rect* location);
 
 // Convenience function to clamp a rectangle to lie within [0, 0] and
 // [width, height].
-absl::Status ClampRect(const int width, const int height, Rect* location);
+abslx::Status ClampRect(const int width, const int height, Rect* location);
 
 // Enlarges a given rectangle to cover a new rectangle to be added.
 void RectUnion(const Rect& rect_to_add, Rect* rect);
@@ -105,7 +105,7 @@ void RectUnion(const Rect& rect_to_add, Rect* rect);
 // Performs an affine retarget on a list of input images.  Output vector
 // cropped_frames must be filled with Mats of the same size as output_size and
 // type.
-absl::Status AffineRetarget(const cv::Size& output_size,
+abslx::Status AffineRetarget(const cv::Size& output_size,
                             const std::vector<cv::Mat>& frames,
                             const std::vector<cv::Mat>& affine_projection,
                             std::vector<cv::Mat>* cropped_frames);

@@ -114,7 +114,7 @@ std::string ExecutableBuildOptions::ToString() const {
   if (result_layout_set_) {
     result_layout = ShapeUtil::HumanStringWithLayout(result_layout_);
   }
-  return absl::StrFormat(
+  return abslx::StrFormat(
       "ExecutableBuildOptions{device_ordinal=%d, result_layout=%s, "
       "num_replicas=%d}",
       device_ordinal_, result_layout, num_replicas_);

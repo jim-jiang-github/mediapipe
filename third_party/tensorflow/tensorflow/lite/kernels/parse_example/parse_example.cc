@@ -124,7 +124,7 @@ Status FastParseSerializedExample(
     SeededHasher* hasher, std::vector<TfLiteTensor*>* output_dense,
     std::vector<SparseBuffer>* output_varlen_dense,
     std::vector<SparseBuffer>* output_sparse,
-    std::map<absl::string_view, int>& stats, TfLiteResult* result) {
+    std::map<abslx::string_view, int>& stats, TfLiteResult* result) {
   DCHECK(output_dense != nullptr);
   tensorflow::example::parsed::Example parsed_example;
   if (!ParseExample(serialized_example, &parsed_example)) {
@@ -173,7 +173,7 @@ Status FastParseSerializedExample(
       dense_feature_last_example[d] = example_index;
 
       if (example_dtype != config.dense[d].dtype) {
-        return example_error(absl::StrCat(
+        return example_error(abslx::StrCat(
             "Data types don't match. Data type: ",
             DataTypeString(example_dtype),
             " but expected type: ", DataTypeString(config.dense[d].dtype)));
@@ -185,7 +185,7 @@ Status FastParseSerializedExample(
         const std::size_t offset = example_index * num_elements;
 
         auto shape_error = [&](size_t size, StringPiece type_str) {
-          return example_error(absl::StrCat(
+          return example_error(abslx::StrCat(
               "Number of ", type_str,
               " values != expected.  "
               "Values size:",
@@ -233,14 +233,14 @@ Status FastParseSerializedExample(
 
         if (example_dtype != tf::DT_INVALID &&
             example_dtype != config.dense[d].dtype) {
-          return example_error(absl::StrCat(
+          return example_error(abslx::StrCat(
               "Data types don't match. ",
               "Expected type: ", DataTypeString(config.dense[d].dtype)));
         }
 
         auto shape_error = [&](size_t size, StringPiece type_str) {
           return example_error(
-              absl::StrCat("Number of ", type_str,
+              abslx::StrCat("Number of ", type_str,
                            " values is not a multiple of stride length. Saw ",
                            size, " values but output shape is: ",
                            config.dense[d].shape.DebugString()));
@@ -457,7 +457,7 @@ Status FastParseExampleLite(
     tf::gtl::ArraySlice<tstring> example_names, bool* quick_filter,
     int quick_filter_size, const std::unique_ptr<ConfigIndex>& config_index,
     int config_index_size, SeededHasher* hasher, TfLiteResult* result,
-    std::map<absl::string_view, int>& stats, TfLiteContext* context) {
+    std::map<abslx::string_view, int>& stats, TfLiteContext* context) {
   if (result == nullptr) {
     return tf::errors::Internal("Result is null");
   }
@@ -965,7 +965,7 @@ TfLiteStatus EvalParseExample(TfLiteContext* context, TfLiteNode* node) {
 
   const TfLiteTensor* serialized = GetInput(context, node, kExampleTensor);
 
-  std::map<absl::string_view, int> stats;
+  std::map<abslx::string_view, int> stats;
   const auto status = FastParseExampleLite(
       data->config, serialized, {}, data->quick_filter, data->quick_filter_size,
       data->config_index, data->config_index_size, &data->hasher, &data->got,

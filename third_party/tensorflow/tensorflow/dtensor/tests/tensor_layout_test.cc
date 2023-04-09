@@ -139,7 +139,7 @@ TEST_F(LayoutTest, IsReplicated) {
 
 TEST_F(LayoutTest, LayoutDimLocations) {
   Layout layout = BatchLayout();
-  absl::InlinedVector<int64, 4> offset = {1, 2};
+  abslx::InlinedVector<int64, 4> offset = {1, 2};
   EXPECT_EQ(layout.device_location(10).ValueOrDie(), offset);
   offset = {2, 2};
   EXPECT_EQ(layout.device_location(18).ValueOrDie(), offset);

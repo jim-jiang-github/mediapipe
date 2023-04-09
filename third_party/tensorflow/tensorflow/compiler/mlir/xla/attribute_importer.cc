@@ -71,7 +71,7 @@ mlir::mhlo::ScatterDimensionNumbersAttr ConvertScatterDimensionNumbers(
 
 mlir::mhlo::DotDimensionNumbersAttr ConvertDotDimensionNumbers(
     const DotDimensionNumbers& dnums, mlir::Builder* builder) {
-  auto arrayref = [](absl::Span<const int64_t> array) {
+  auto arrayref = [](abslx::Span<const int64_t> array) {
     return llvm::ArrayRef<int64_t>{array.data(), array.size()};
   };
   return mlir::mhlo::DotDimensionNumbersAttr::get(
@@ -83,7 +83,7 @@ mlir::mhlo::DotDimensionNumbersAttr ConvertDotDimensionNumbers(
 
 mlir::mhlo::ConvDimensionNumbersAttr ConvertConvDimensionNumbers(
     const xla::ConvolutionDimensionNumbers& dnums, mlir::Builder* builder) {
-  auto arrayref = [](absl::Span<const int64_t> array) {
+  auto arrayref = [](abslx::Span<const int64_t> array) {
     return llvm::ArrayRef<int64_t>{array.data(), array.size()};
   };
   llvm::SmallVector<int64_t, 4> input_spatial_dims(
@@ -157,7 +157,7 @@ StatusOr<mlir::mhlo::CustomCallApiVersion> ConvertCustomCallApiVersion(
 }
 
 StatusOr<mlir::ArrayAttr> ExtractLayoutsFromShapes(
-    const absl::Span<const Shape> shapes_with_layouts, mlir::Builder* builder) {
+    const abslx::Span<const Shape> shapes_with_layouts, mlir::Builder* builder) {
   std::vector<mlir::Attribute> layouts;
   for (auto& shape_and_layout : shapes_with_layouts) {
     if (shape_and_layout.IsTuple())

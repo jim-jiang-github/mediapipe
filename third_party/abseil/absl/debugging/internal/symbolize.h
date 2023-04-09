@@ -37,7 +37,7 @@
 #include <functional>
 #include <string>
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace debugging_internal {
 
@@ -48,7 +48,7 @@ namespace debugging_internal {
 //
 // This is not async-signal-safe.
 bool ForEachSection(int fd,
-                    const std::function<bool(absl::string_view name,
+                    const std::function<bool(abslx::string_view name,
                                              const ElfW(Shdr) &)>& callback);
 
 // Gets the section header for the given name, if it exists. Returns true on
@@ -58,7 +58,7 @@ bool GetSectionHeaderByName(int fd, const char *name, size_t name_len,
 
 }  // namespace debugging_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_INTERNAL_HAVE_ELF_SYMBOLIZE
 
@@ -68,7 +68,7 @@ ABSL_NAMESPACE_END
 #define ABSL_INTERNAL_HAVE_DARWIN_SYMBOLIZE 1
 #endif
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace debugging_internal {
 
@@ -130,7 +130,7 @@ bool GetFileMappingHint(const void** start, const void** end, uint64_t* offset,
 
 }  // namespace debugging_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // __cplusplus
 

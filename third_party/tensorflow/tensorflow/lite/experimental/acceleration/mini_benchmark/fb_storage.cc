@@ -40,7 +40,7 @@ limitations under the License.
 
 namespace tflite {
 namespace acceleration {
-FileStorage::FileStorage(absl::string_view path, ErrorReporter* error_reporter)
+FileStorage::FileStorage(abslx::string_view path, ErrorReporter* error_reporter)
     : path_(path), error_reporter_(error_reporter) {}
 
 MinibenchmarkStatus FileStorage::ReadFileIntoBuffer() {
@@ -97,7 +97,7 @@ MinibenchmarkStatus FileStorage::ReadFileIntoBuffer() {
 #endif
 }
 
-MinibenchmarkStatus FileStorage::AppendDataToFile(absl::string_view data) {
+MinibenchmarkStatus FileStorage::AppendDataToFile(abslx::string_view data) {
 #ifndef _WIN32
   // We use a file descriptor (as opposed to FILE* or C++ streams) for writing
   // because we want to be able to use fsync and flock.
@@ -119,7 +119,7 @@ MinibenchmarkStatus FileStorage::AppendDataToFile(absl::string_view data) {
                          path_.c_str(), std::strerror(lock_error_no));
     return kMinibenchmarkFlockingStorageFileFailed;
   }
-  absl::string_view bytes = data;
+  abslx::string_view bytes = data;
   while (!bytes.empty()) {
     ssize_t bytes_written =
         TEMP_FAILURE_RETRY(write(fd, bytes.data(), bytes.size()));

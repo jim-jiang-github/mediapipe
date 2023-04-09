@@ -101,7 +101,7 @@ mlir::Operation* NextTFOp(mlir::Operation* op) {
 // this function is an no-op.
 mlir::LogicalResult UpdateResourceArgumentType(
     const int arg_index, mlir::func::FuncOp function,
-    absl::optional<mlir::RankedTensorType> new_subtype = absl::nullopt) {
+    abslx::optional<mlir::RankedTensorType> new_subtype = abslx::nullopt) {
   auto resource_arg = function.getArgument(arg_index);
   if (new_subtype) {
     auto new_var_type = mlir::RankedTensorType::get(
@@ -317,7 +317,7 @@ mlir::LogicalResult ConductSPMDExpansion(mlir::ModuleOp module) {
   TopologicalIterator iterator(main_func);
   while (iterator.hasNext()) {
     mlir::Operation* op = iterator.next();
-    absl::optional<mlir::func::FuncOp> func = MaybeFindFunction(op);
+    abslx::optional<mlir::func::FuncOp> func = MaybeFindFunction(op);
     if (func.has_value()) {
       if (mlir::failed(
               UpdateFunctionWithLocalInputShapes(op->getOpOperands(), *func)))

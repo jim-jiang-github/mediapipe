@@ -182,12 +182,12 @@ class GenericLayoutOptimizerTest : public GrapplerTest {
       gpu_device.set_type("GPU");
       gpu_device.mutable_environment()->insert({"architecture", "6"});
       virtual_cluster_ =
-          absl::WrapUnique(new VirtualCluster({{"/CPU:0", cpu_device},
+          abslx::WrapUnique(new VirtualCluster({{"/CPU:0", cpu_device},
                                                { "/GPU:1",
                                                  gpu_device }}));
 #else
       virtual_cluster_ =
-          absl::WrapUnique(new VirtualCluster({{"/CPU:0", cpu_device}}));
+          abslx::WrapUnique(new VirtualCluster({{"/CPU:0", cpu_device}}));
 #endif  // (GOOGLE_CUDA || TENSORFLOW_USE_ROCM)
     }
     TF_ASSERT_OK(virtual_cluster_->Provision());
@@ -199,7 +199,7 @@ class GenericLayoutOptimizerTest : public GrapplerTest {
 };
 
 void VerifyRegularFaninMatch(const utils::NodeView* node, int port,
-                             absl::string_view fanin_name, int fanin_port) {
+                             abslx::string_view fanin_name, int fanin_port) {
   ASSERT_GE(node->NumRegularFanins(), port);
   const auto& fanin = node->GetRegularFanin(port);
   EXPECT_EQ(fanin.node_view()->GetName(), fanin_name);
@@ -207,7 +207,7 @@ void VerifyRegularFaninMatch(const utils::NodeView* node, int port,
 }
 
 void VerifyRegularFanoutMatch(const utils::NodeView* node, int port,
-                              absl::string_view fanout_name, int fanout_port) {
+                              abslx::string_view fanout_name, int fanout_port) {
   bool found = false;
   for (const auto& regular_fanout : node->GetRegularFanout(port)) {
     if (regular_fanout.node_view()->GetName() == fanout_name &&
@@ -219,7 +219,7 @@ void VerifyRegularFanoutMatch(const utils::NodeView* node, int port,
 }
 
 void VerifyDataFormatAttributeMatch(const utils::NodeView* node,
-                                    absl::string_view attr_value) {
+                                    abslx::string_view attr_value) {
   const auto* attr = node->GetAttr("data_format");
   ASSERT_NE(attr, nullptr);
   EXPECT_EQ(attr->s(), attr_value);
@@ -361,7 +361,7 @@ TEST_F(GenericLayoutOptimizerTest, NoOptimizeIntegerConvolution) {
 TEST_F(GenericLayoutOptimizerTest, Connectivity) {
   Scope scope = Scope::NewRootScope();
   auto conv = SimpleConv2D(&scope, 4, 2, "VALID",
-                           absl::StrCat("/device:", DEVICE, ":0"));
+                           abslx::StrCat("/device:", DEVICE, ":0"));
   auto i1 = ops::Identity(scope.WithOpName("i1"), conv);
   auto i2 = ops::Identity(scope.WithOpName("i2"), i1);
   auto i3 = ops::Identity(scope.WithOpName("i3"), i2);
@@ -418,9 +418,9 @@ TEST_F(GenericLayoutOptimizerTest, Conv2DBackpropInputNonConstInputSizes) {
 
 TEST_F(GenericLayoutOptimizerTest, Conv2DDataFormatVecPermuteCollapse) {
   Scope scope =
-      Scope::NewRootScope().WithDevice(absl::StrCat("/device:", DEVICE, ":0"));
+      Scope::NewRootScope().WithDevice(abslx::StrCat("/device:", DEVICE, ":0"));
   auto conv = SimpleConv2D(&scope, 4, 2, "VALID",
-                           absl::StrCat("/device:", DEVICE, ":0"));
+                           abslx::StrCat("/device:", DEVICE, ":0"));
   auto shape = ops::Shape(scope.WithOpName("shape"), conv);
   auto value = ops::Const(scope.WithOpName("value"), 0, {});
   auto fill = ops::Fill(scope.WithOpName("fill"), shape, value);
@@ -448,7 +448,7 @@ TEST_F(GenericLayoutOptimizerTest, Conv2DDataFormatVecPermuteCollapse) {
   ASSERT_EQ(conv2d_node->NumRegularFanins(), 2);
   VerifyRegularFaninMatch(
       conv2d_node, 0,
-      absl::StrCat("Conv2D-0-Transpose", SRC_DATA_FORMAT, "To", DST_DATA_FORMAT,
+      abslx::StrCat("Conv2D-0-Transpose", SRC_DATA_FORMAT, "To", DST_DATA_FORMAT,
                    "-LayoutOptimizer"),
       0);
 
@@ -463,7 +463,7 @@ TEST_F(GenericLayoutOptimizerTest, Conv2DDataFormatVecPermuteCollapse) {
   VerifyRegularFaninMatch(fill_node, 0, shape_node->GetName(), 0);
   VerifyRegularFanoutMatch(
       fill_node, 0,
-      absl::StrCat("fill-0-0-Transpose", DST_DATA_FORMAT, "To", SRC_DATA_FORMAT,
+      abslx::StrCat("fill-0-0-Transpose", DST_DATA_FORMAT, "To", SRC_DATA_FORMAT,
                    "-LayoutOptimizer"),
       0);
 
@@ -472,7 +472,7 @@ TEST_F(GenericLayoutOptimizerTest, Conv2DDataFormatVecPermuteCollapse) {
   ASSERT_EQ(graph_output->NumRegularFanins(), 1);
   VerifyRegularFaninMatch(
       graph_output, 0,
-      absl::StrCat("fill-0-0-Transpose", DST_DATA_FORMAT, "To", SRC_DATA_FORMAT,
+      abslx::StrCat("fill-0-0-Transpose", DST_DATA_FORMAT, "To", SRC_DATA_FORMAT,
                    "-LayoutOptimizer"),
       0);
 }
@@ -481,7 +481,7 @@ TEST_F(GenericLayoutOptimizerTest, DoNotPruneNonAddedCancellableTransposes) {
   GrapplerItem item;
   {
     Scope scope = Scope::NewRootScope().WithDevice(
-        absl::StrCat("/device:", DEVICE, ":0"));
+        abslx::StrCat("/device:", DEVICE, ":0"));
     auto input = ops::RandomUniform(scope.WithOpName("input"),
                                     DIMS(kBatchSize, kHeight, kWidth, kDepthIn),
                                     DT_FLOAT);
@@ -536,7 +536,7 @@ TEST_F(GenericLayoutOptimizerTest, DoNotPruneNonAddedCancellableTransposes) {
                           input_in_transpose_node->GetName(), 0);
 
   auto* bias_add_in_transpose_node = graph_view.GetNode(
-      absl::StrCat("bias_add-0-Transpose", SRC_DATA_FORMAT, "To",
+      abslx::StrCat("bias_add-0-Transpose", SRC_DATA_FORMAT, "To",
                    DST_DATA_FORMAT, "-LayoutOptimizer"));
   ASSERT_NE(bias_add_in_transpose_node, nullptr);
   ASSERT_EQ(bias_add_in_transpose_node->NumRegularFanins(), 2);
@@ -550,7 +550,7 @@ TEST_F(GenericLayoutOptimizerTest, DoNotPruneNonAddedCancellableTransposes) {
                           bias_add_in_transpose_node->GetName(), 0);
 
   auto* bias_add_out_transpose_node = graph_view.GetNode(
-      absl::StrCat("bias_add-0-0-Transpose", DST_DATA_FORMAT, "To",
+      abslx::StrCat("bias_add-0-0-Transpose", DST_DATA_FORMAT, "To",
                    SRC_DATA_FORMAT, "-LayoutOptimizer"));
   ASSERT_NE(bias_add_out_transpose_node, nullptr);
   ASSERT_EQ(bias_add_out_transpose_node->NumRegularFanins(), 2);

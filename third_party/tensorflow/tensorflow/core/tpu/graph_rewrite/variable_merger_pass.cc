@@ -37,16 +37,16 @@ namespace {
 // The name of a stateful op is semantically meaningful because ops with the
 // same name will share the same kernel. We therefore form new op names using a
 // deterministic function (a fingerprint) of the old names.
-uint64 MergedOpFingerprint(absl::Span<Node* const> ops) {
+uint64 MergedOpFingerprint(abslx::Span<Node* const> ops) {
   std::vector<string> op_names;
   op_names.reserve(ops.size());
   for (const Node* node : ops) {
     op_names.push_back(node->name());
   }
-  return Fingerprint64(absl::StrJoin(op_names, ","));
+  return Fingerprint64(abslx::StrJoin(op_names, ","));
 }
 
-Status MergeVarHandleOps(const string& device, absl::Span<Node* const> nodes,
+Status MergeVarHandleOps(const string& device, abslx::Span<Node* const> nodes,
                          Graph* graph) {
   int num_var_handles(nodes.size());
   if (num_var_handles <= 1) return OkStatus();
@@ -92,7 +92,7 @@ Status MergeVarHandleOps(const string& device, absl::Span<Node* const> nodes,
 }
 
 Status MergeReadVariableOps(Node* handle_op, Node* control_node,
-                            absl::Span<Node* const> nodes, Graph* graph) {
+                            abslx::Span<Node* const> nodes, Graph* graph) {
   int num_reads(nodes.size());
   if (num_reads <= 1) return OkStatus();
 
@@ -136,8 +136,8 @@ Status VariableMergerPass::Run(const GraphOptimizationPassOptions& options) {
 
   // Find VarHandleOps that are graph roots and group them by assigned device.
   // Also find any ReadVariableOps that are consumers of those handles.
-  absl::flat_hash_map<string, std::vector<Node*>> var_handle_ops_by_device;
-  absl::flat_hash_set<Node*> read_variable_ops;
+  abslx::flat_hash_map<string, std::vector<Node*>> var_handle_ops_by_device;
+  abslx::flat_hash_set<Node*> read_variable_ops;
 
   for (Node* m : graph->source_node()->out_nodes()) {
     // We check that the VarHandleOp has no control edges, other than the one we
@@ -167,7 +167,7 @@ Status VariableMergerPass::Run(const GraphOptimizationPassOptions& options) {
 
   // ReadVariableOps by a pair of <VarHandleOp, ControlDependencyNode>.
   // ControlDependencyNode could be nullptr.
-  absl::flat_hash_map<std::pair<Node*, Node*>, std::vector<Node*>> read_var_ops;
+  abslx::flat_hash_map<std::pair<Node*, Node*>, std::vector<Node*>> read_var_ops;
 
   for (Node* n : read_variable_ops) {
     Node* control_node = nullptr;

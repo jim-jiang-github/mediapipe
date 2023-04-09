@@ -28,7 +28,7 @@
 #include "absl/base/port.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace str_format_internal {
 
@@ -91,6 +91,6 @@ auto InvokeFlush(T* out, string_view s) -> decltype(AbslFormatFlush(out, s)) {
 
 }  // namespace str_format_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_INTERNAL_STR_FORMAT_OUTPUT_H_

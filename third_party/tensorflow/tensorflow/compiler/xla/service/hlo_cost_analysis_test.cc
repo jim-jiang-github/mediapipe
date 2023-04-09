@@ -500,7 +500,7 @@ TEST_F(HloCostAnalysisTest, ReduceWindowVariadic) {
   auto p3 = Parameter(&builder, 1, elem_shape, "x1");
   auto p4 = Parameter(&builder, 2, elem_shape, "y0");
   auto p5 = Parameter(&builder, 3, elem_shape, "y1");
-  absl::InlinedVector<XlaOp, 2> compute_vec = {Min(p2, p4), Min(p3, p5)};
+  abslx::InlinedVector<XlaOp, 2> compute_vec = {Min(p2, p4), Min(p3, p5)};
   Tuple(&builder, compute_vec);
   TF_ASSERT_OK_AND_ASSIGN(auto compute_tuple, builder.Build());
   auto input1 =
@@ -862,7 +862,7 @@ TEST_F(FusionCostAnalysis, NoLayout) {
 }
 
 TEST_F(FusionCostAnalysis, NonTupleWithTupleParamBytesAccessed) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module, is_scheduled=true
 
 fused_computation {
@@ -895,7 +895,7 @@ ENTRY entry {
 }
 
 TEST_F(FusionCostAnalysis, TupleBytesAccessed) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module, is_scheduled=true
 
 fused_computation {
@@ -930,7 +930,7 @@ ENTRY entry {
 }
 
 TEST_F(FusionCostAnalysis, InfeedOutfeed) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module, is_scheduled=true
 
 ENTRY entry {
@@ -967,7 +967,7 @@ ENTRY entry {
 }
 
 TEST_F(FusionCostAnalysis, AllReduceTupleBytesAccessed) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module, is_scheduled=true
 
 sum {
@@ -1096,7 +1096,7 @@ TEST_F(HloCostAnalysisTest, DynamicSlice) {
   // Test the analysis on a slice.
   XlaBuilder builder("dynamic-slice");
   auto x = Parameter(&builder, 0, ShapeUtil::MakeShape(F32, {2}), "x");
-  DynamicSlice(x, absl::Span<const XlaOp>({ConstantR0<int32_t>(&builder, 1)}),
+  DynamicSlice(x, abslx::Span<const XlaOp>({ConstantR0<int32_t>(&builder, 1)}),
                {1});
   auto hlo_module = BuildHloGraph(&builder);
 
@@ -1119,7 +1119,7 @@ TEST_F(HloCostAnalysisTest, DynamicUpdateSlice) {
   auto x = Parameter(&builder, 0, ShapeUtil::MakeShape(F32, {2}), "x");
   DynamicUpdateSlice(
       x, ConstantR1<float>(&builder, {1.0}),
-      absl::Span<const XlaOp>({ConstantR0<int32_t>(&builder, 1)}));
+      abslx::Span<const XlaOp>({ConstantR0<int32_t>(&builder, 1)}));
   auto hlo_module = BuildHloGraph(&builder);
 
   // Run HLO cost analysis.

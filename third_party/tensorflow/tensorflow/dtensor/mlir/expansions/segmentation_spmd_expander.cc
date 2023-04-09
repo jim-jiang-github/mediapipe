@@ -105,7 +105,7 @@ StatusOr<mlir::Operation*> UnsortedSegmentSumSPMDExpander::ExpandOp(
 
   Layout new_segment_ids_layout = data_layout.Truncate(segment_ids_rank);
 
-  absl::flat_hash_set<std::string> reduce_dimensions;
+  abslx::flat_hash_set<std::string> reduce_dimensions;
   for (int i = 0; i < segment_ids_rank; i++)
     if (new_segment_ids_layout.sharding_spec(i) != Layout::kUnshardedDim)
       reduce_dimensions.insert(new_segment_ids_layout.sharding_spec(i));

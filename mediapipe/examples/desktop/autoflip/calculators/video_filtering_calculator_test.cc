@@ -38,7 +38,7 @@ constexpr char kInputFramesTag[] = "INPUT_FRAMES";
 CalculatorGraphConfig::Node GetCalculatorNode(
     const std::string& fail_if_any, const std::string& extra_options = "") {
   return ParseTextProtoOrDie<CalculatorGraphConfig::Node>(
-      absl::Substitute(R"(
+      abslx::Substitute(R"(
         calculator: "VideoFilteringCalculator"
         input_stream: "INPUT_FRAMES:frames"
         output_stream: "OUTPUT_FRAMES:output_frames"
@@ -61,10 +61,10 @@ TEST(VideoFilterCalculatorTest, UpperBoundNoPass) {
     }
   )");
 
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   const int kFixedWidth = 1000;
   const double kAspectRatio = 5.0 / 1.0;
-  auto input_frame = ::absl::make_unique<ImageFrame>(
+  auto input_frame = ::abslx::make_unique<ImageFrame>(
       ImageFormat::SRGB, kFixedWidth,
       static_cast<int>(kFixedWidth / kAspectRatio), 16);
   runner->MutableInputs()
@@ -84,12 +84,12 @@ TEST(VerticalFrameRemovalCalculatorTest, UpperBoundPass) {
     }
   )");
 
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   const int kWidth = 1000;
   const double kAspectRatio = 1.0 / 5.0;
   const double kHeight = static_cast<int>(kWidth / kAspectRatio);
   auto input_frame =
-      ::absl::make_unique<ImageFrame>(ImageFormat::SRGB, kWidth, kHeight, 16);
+      ::abslx::make_unique<ImageFrame>(ImageFormat::SRGB, kWidth, kHeight, 16);
   runner->MutableInputs()
       ->Tag(kInputFramesTag)
       .packets.push_back(Adopt(input_frame.release()).At(Timestamp(1000)));
@@ -110,10 +110,10 @@ TEST(VideoFilterCalculatorTest, LowerBoundNoPass) {
     }
   )");
 
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   const int kFixedWidth = 1000;
   const double kAspectRatio = 1.0 / 1.0;
-  auto input_frame = ::absl::make_unique<ImageFrame>(
+  auto input_frame = ::abslx::make_unique<ImageFrame>(
       ImageFormat::SRGB, kFixedWidth,
       static_cast<int>(kFixedWidth / kAspectRatio), 16);
   runner->MutableInputs()
@@ -133,12 +133,12 @@ TEST(VerticalFrameRemovalCalculatorTest, LowerBoundPass) {
     }
   )");
 
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   const int kWidth = 1000;
   const double kAspectRatio = 5.0 / 1.0;
   const double kHeight = static_cast<int>(kWidth / kAspectRatio);
   auto input_frame =
-      ::absl::make_unique<ImageFrame>(ImageFormat::SRGB, kWidth, kHeight, 16);
+      ::abslx::make_unique<ImageFrame>(ImageFormat::SRGB, kWidth, kHeight, 16);
   runner->MutableInputs()
       ->Tag(kInputFramesTag)
       .packets.push_back(Adopt(input_frame.release()).At(Timestamp(1000)));
@@ -160,17 +160,17 @@ TEST(VerticalFrameRemovalCalculatorTest, OutputError) {
     }
   )");
 
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   const int kFixedWidth = 1000;
   const double kAspectRatio = 1.0 / 1.0;
-  auto input_frame = ::absl::make_unique<ImageFrame>(
+  auto input_frame = ::abslx::make_unique<ImageFrame>(
       ImageFormat::SRGB, kFixedWidth,
       static_cast<int>(kFixedWidth / kAspectRatio), 16);
   runner->MutableInputs()
       ->Tag(kInputFramesTag)
       .packets.push_back(Adopt(input_frame.release()).At(Timestamp(1000)));
-  absl::Status status = runner->Run();
-  EXPECT_EQ(status.code(), absl::StatusCode::kUnknown);
+  abslx::Status status = runner->Run();
+  EXPECT_EQ(status.code(), abslx::StatusCode::kUnknown);
   EXPECT_THAT(status.ToString(),
               ::testing::HasSubstr("Failing due to aspect ratio"));
 }

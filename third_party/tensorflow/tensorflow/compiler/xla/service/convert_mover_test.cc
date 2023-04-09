@@ -49,7 +49,7 @@ auto MatchConvertToC64(T&& operand) {
 }
 
 TEST_F(ConvertMoverTest, MoveDownThroughConcat) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -69,7 +69,7 @@ TEST_F(ConvertMoverTest, MoveDownThroughConcat) {
 }
 
 TEST_F(ConvertMoverTest, NoMoveDownThroughConcatWithDifferentSrcTypes) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -86,7 +86,7 @@ TEST_F(ConvertMoverTest, NoMoveDownThroughConcatWithDifferentSrcTypes) {
 }
 
 TEST_F(ConvertMoverTest, MoveUpReshape) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -103,7 +103,7 @@ TEST_F(ConvertMoverTest, MoveUpReshape) {
 }
 
 TEST_F(ConvertMoverTest, MoveUpTwoTransposes) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -123,7 +123,7 @@ TEST_F(ConvertMoverTest, MoveUpTwoTransposes) {
 }
 
 TEST_F(ConvertMoverTest, MoveDownTwoSlices) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -142,7 +142,7 @@ TEST_F(ConvertMoverTest, MoveDownTwoSlices) {
 }
 
 TEST_F(ConvertMoverTest, MoveDownC64) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -164,7 +164,7 @@ TEST_F(ConvertMoverTest, MoveDownC64) {
 }
 
 TEST_F(ConvertMoverTest, MoveDownC64Constant) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -182,7 +182,7 @@ TEST_F(ConvertMoverTest, MoveDownC64Constant) {
 }
 
 TEST_F(ConvertMoverTest, MoveUpPad) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -204,7 +204,7 @@ TEST_F(ConvertMoverTest, MoveUpPad) {
 // The out-of-range constant shouldn't prevent us from moving the narrowing
 // conversion above the pad op.
 TEST_F(ConvertMoverTest, MoveUpPadWithOutOfRangeConstant) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -224,7 +224,7 @@ TEST_F(ConvertMoverTest, MoveUpPadWithOutOfRangeConstant) {
 }
 
 TEST_F(ConvertMoverTest, MoveDownPad) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -244,7 +244,7 @@ TEST_F(ConvertMoverTest, MoveDownPad) {
 }
 
 TEST_F(ConvertMoverTest, NoMoveDownPadBecauseConstantIsOutOfRange) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {

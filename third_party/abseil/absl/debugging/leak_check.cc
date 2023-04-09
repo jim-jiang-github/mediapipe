@@ -21,7 +21,7 @@
 
 #ifndef LEAK_SANITIZER
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 bool HaveLeakSanitizer() { return false; }
 bool LeakCheckerIsActive() { return false; }
@@ -31,7 +31,7 @@ void UnRegisterLivePointers(const void*, size_t) { }
 LeakCheckDisabler::LeakCheckDisabler() { }
 LeakCheckDisabler::~LeakCheckDisabler() { }
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #else
 
@@ -41,7 +41,7 @@ ABSL_NAMESPACE_END
 extern "C" ABSL_ATTRIBUTE_WEAK int __lsan_is_turned_off();
 #endif
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 bool HaveLeakSanitizer() { return true; }
 
@@ -64,6 +64,6 @@ void UnRegisterLivePointers(const void* ptr, size_t size) {
 LeakCheckDisabler::LeakCheckDisabler() { __lsan_disable(); }
 LeakCheckDisabler::~LeakCheckDisabler() { __lsan_enable(); }
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // LEAK_SANITIZER

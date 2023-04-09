@@ -129,7 +129,7 @@ TfLiteStatus StripWeightsFromFlatbuffer(
   // This indicates to reconstitute_weights_into_fb that random data should be
   // generated for them.
   // 2. Mark that buffer for not getting carried into the output flatbuffer.
-  absl::flat_hash_set<uint32_t> erased_buffers;
+  abslx::flat_hash_set<uint32_t> erased_buffers;
   const int num_buffers = input_model->buffers()->size();
   int i = 0;
   for (auto& tensor : mutable_subgraph->tensors) {
@@ -197,7 +197,7 @@ TfLiteStatus StripWeightsFromFlatbuffer(
   return kTfLiteOk;
 }
 
-string StripWeightsFromFlatbuffer(const absl::string_view input_flatbuffer) {
+string StripWeightsFromFlatbuffer(const abslx::string_view input_flatbuffer) {
   auto input_model = FlatBufferModel::BuildFromBuffer(input_flatbuffer.data(),
                                                       input_flatbuffer.size());
 
@@ -334,7 +334,7 @@ TfLiteStatus ReconstituteConstantTensorsIntoFlatbuffer(
 }
 
 string ReconstituteConstantTensorsIntoFlatbuffer(
-    const absl::string_view input_flatbuffer) {
+    const abslx::string_view input_flatbuffer) {
   auto input_model = FlatBufferModel::BuildFromBuffer(input_flatbuffer.data(),
                                                       input_flatbuffer.size());
 

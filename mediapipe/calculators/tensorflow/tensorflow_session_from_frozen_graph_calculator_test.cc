@@ -104,7 +104,7 @@ class TensorFlowSessionFromFrozenGraphCalculatorTest : public ::testing::Test {
 
 TEST_F(TensorFlowSessionFromFrozenGraphCalculatorTest,
        CreatesPacketWithGraphAndBindings) {
-  CalculatorRunner runner(absl::Substitute(R"(
+  CalculatorRunner runner(abslx::Substitute(R"(
         calculator: "TensorFlowSessionFromFrozenGraphCalculator"
         output_side_packet: "SESSION:tf_model"
         options {
@@ -126,7 +126,7 @@ TEST_F(TensorFlowSessionFromFrozenGraphCalculatorTest,
        ProducesPacketUsableByTensorFlowInferenceCalculator) {
   CalculatorGraphConfig config =
       mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(
-          absl::Substitute(R"(
+          abslx::Substitute(R"(
       node {
         calculator: "TensorFlowInferenceCalculator"
         input_side_packet: "SESSION:session"
@@ -180,7 +180,7 @@ TEST_F(TensorFlowSessionFromFrozenGraphCalculatorTest,
 TEST_F(TensorFlowSessionFromFrozenGraphCalculatorTest,
        CreatesPacketWithGraphAndBindingsFromInputSidePacket) {
   calculator_options_->clear_graph_proto_path();
-  CalculatorRunner runner(absl::Substitute(R"(
+  CalculatorRunner runner(abslx::Substitute(R"(
         calculator: "TensorFlowSessionFromFrozenGraphCalculator"
         input_side_packet: "STRING_MODEL:model"
         output_side_packet: "SESSION:session"
@@ -207,7 +207,7 @@ TEST_F(
     TensorFlowSessionFromFrozenGraphCalculatorTest,
     CreatesPacketWithGraphAndBindingsFromInputSidePacketStringModelFilePath) {
   calculator_options_->clear_graph_proto_path();
-  CalculatorRunner runner(absl::Substitute(R"(
+  CalculatorRunner runner(abslx::Substitute(R"(
         calculator: "TensorFlowSessionFromFrozenGraphCalculator"
         input_side_packet: "STRING_MODEL_FILE_PATH:file_path"
         output_side_packet: "SESSION:session"
@@ -228,7 +228,7 @@ TEST_F(
 
 TEST_F(TensorFlowSessionFromFrozenGraphCalculatorTest,
        CheckFailureForOptionsAndInputsProvideGraphDefProto) {
-  CalculatorRunner runner(absl::Substitute(R"(
+  CalculatorRunner runner(abslx::Substitute(R"(
         calculator: "TensorFlowSessionFromFrozenGraphCalculator"
         input_side_packet: "STRING_MODEL_FILE_PATH:file_path"
         output_side_packet: "SESSION:session"
@@ -248,7 +248,7 @@ TEST_F(TensorFlowSessionFromFrozenGraphCalculatorTest,
 
 TEST_F(TensorFlowSessionFromFrozenGraphCalculatorTest,
        CheckFailureForAllInputsProvideGraphDefProto) {
-  CalculatorRunner runner(absl::Substitute(R"(
+  CalculatorRunner runner(abslx::Substitute(R"(
         calculator: "TensorFlowSessionFromFrozenGraphCalculator"
         input_side_packet: "STRING_MODEL_FILE_PATH:file_path"
         input_side_packet: "STRING_MODEL:model"
@@ -275,7 +275,7 @@ TEST_F(TensorFlowSessionFromFrozenGraphCalculatorTest,
 TEST_F(TensorFlowSessionFromFrozenGraphCalculatorTest,
        CheckFailureForOnlyBothInputSidePacketsProvideGraphDefProto) {
   calculator_options_->clear_graph_proto_path();
-  CalculatorRunner runner(absl::Substitute(R"(
+  CalculatorRunner runner(abslx::Substitute(R"(
         calculator: "TensorFlowSessionFromFrozenGraphCalculator"
         input_side_packet: "STRING_MODEL_FILE_PATH:file_path"
         input_side_packet: "STRING_MODEL:model"
@@ -302,7 +302,7 @@ TEST_F(TensorFlowSessionFromFrozenGraphCalculatorTest,
 TEST_F(TensorFlowSessionFromFrozenGraphCalculatorTest,
        CheckInitializationOpName) {
   calculator_options_->add_initialization_op_names("multiplied:0");
-  CalculatorRunner runner(absl::Substitute(R"(
+  CalculatorRunner runner(abslx::Substitute(R"(
         calculator: "TensorFlowSessionFromFrozenGraphCalculator"
         output_side_packet: "SESSION:session"
         options {

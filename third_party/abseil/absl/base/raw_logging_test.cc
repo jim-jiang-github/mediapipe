@@ -63,7 +63,7 @@ TEST(InternalLog, CompilationTest) {
   ABSL_INTERNAL_LOG(INFO, log_msg + " 2");
 
   float d = 1.1f;
-  ABSL_INTERNAL_LOG(INFO, absl::StrCat("Internal log ", 3, " + ", d));
+  ABSL_INTERNAL_LOG(INFO, abslx::StrCat("Internal log ", 3, " + ", d));
 }
 
 TEST(InternalLogDeathTest, FailingCheck) {

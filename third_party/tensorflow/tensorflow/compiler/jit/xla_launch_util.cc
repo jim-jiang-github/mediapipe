@@ -60,7 +60,7 @@ se::Platform::Id XlaPlatformInfoFromDevice(DeviceBase* device_base) {
 }  // anonymous namespace
 
 VariableInfo::VariableInfo(
-    int index, absl::string_view name, Var* var,
+    int index, abslx::string_view name, Var* var,
     const std::optional<ManagedStackTrace>& definition_stack_trace)
     : index_(index),
       name_(name),
@@ -103,8 +103,8 @@ VariableInfo::~VariableInfo() {
 }
 
 Status GetVariableInfosFromInputs(ResourceMgr* rm, DeviceBase* dev,
-                                  absl::Span<const Tensor* const> inputs,
-                                  absl::Span<const int> variable_indices,
+                                  abslx::Span<const Tensor* const> inputs,
+                                  abslx::Span<const int> variable_indices,
                                   std::vector<VariableInfo>* result) {
   result->clear();
   result->reserve(variable_indices.size());
@@ -143,7 +143,7 @@ std::vector<const Tensor*> InputsFromContext(OpKernelContext* ctx) {
   return inputs;
 }
 
-Status LockVariables(absl::Span<VariableInfo*> variables) {
+Status LockVariables(abslx::Span<VariableInfo*> variables) {
   std::vector<int> lock_order(variables.size());
   std::iota(lock_order.begin(), lock_order.end(), 0);
 
@@ -152,7 +152,7 @@ Status LockVariables(absl::Span<VariableInfo*> variables) {
   // deterministic order between the empty VariableInfo instances.  However
   // since we're sorting by pointer value the sort is pretty non-deterministic
   // anyway so we don't bother using std::stable_sort for now.
-  absl::c_sort(lock_order, [&](int a, int b) {
+  abslx::c_sort(lock_order, [&](int a, int b) {
     if (variables[a]->var() && variables[b]->var()) {
       return variables[a]->var()->mu() < variables[b]->var()->mu();
     }
@@ -188,23 +188,23 @@ Status LockVariables(absl::Span<VariableInfo*> variables) {
   return OkStatus();
 }
 
-Status LockVariables(absl::Span<VariableInfo> variables) {
+Status LockVariables(abslx::Span<VariableInfo> variables) {
   std::vector<VariableInfo*> variable_ptrs;
   variable_ptrs.reserve(variables.size());
   for (auto& var : variables) {
     variable_ptrs.push_back(&var);
   }
-  return LockVariables(absl::MakeSpan(variable_ptrs));
+  return LockVariables(abslx::MakeSpan(variable_ptrs));
 }
 
 Status SnapshotResourceVariables(OpKernelContext* ctx,
-                                 absl::Span<const int> variable_indices,
-                                 absl::Span<VariableInfo const> variable_infos,
+                                 abslx::Span<const int> variable_indices,
+                                 abslx::Span<VariableInfo const> variable_infos,
                                  ResourceVarsSnapshot* result) {
   for (int i = 0, end = variable_indices.size(); i < end; i++) {
     Var* var = variable_infos[i].var();
     (*result)[variable_indices[i]] =
-        var ? absl::make_optional(*var->tensor()) : std::nullopt;
+        var ? abslx::make_optional(*var->tensor()) : std::nullopt;
   }
   return OkStatus();
 }
@@ -264,7 +264,7 @@ XlaComputationLaunchContext::PopulateInputs(
     bool is_resource_variable = resource_vars.count(arg_num);
     bool is_updated_resource_variable =
         is_resource_variable &&
-        absl::c_any_of(compilation_result->resource_updates,
+        abslx::c_any_of(compilation_result->resource_updates,
                        [&](const XlaCompiler::ResourceUpdate& update) {
                          // XlaCompiler records `arg_num` (instead of kernel
                          // parameters) in `resource_updates`.
@@ -321,7 +321,7 @@ static StatusOr<Tensor> GetOrCreateTensorForOutput(
     xla::ScopedShapedBuffer& output, int output_num, OpKernelContext* ctx,
     int missing_ctx_input_prefix,
     const xla::HloInputOutputAliasConfig& input_output_alias,
-    absl::Span<const int> input_mapping,
+    abslx::Span<const int> input_mapping,
     const std::map<int, const Tensor*>& resource_vars_snapshots,
     DataType output_dtype, const TensorShape& output_shape,
     Allocator* output_allocator, bool allocate_xla_tensors, se::Stream* stream,
@@ -457,7 +457,7 @@ Status XlaComputationLaunchContext::PopulateOutputs(
     OpKernelContext* ctx,
     const XlaCompiler::CompilationResult* compilation_result,
     ScopedShapedBuffer output, int missing_ctx_input_prefix,
-    absl::Span<VariableInfo> variable_infos,
+    abslx::Span<VariableInfo> variable_infos,
     const xla::HloInputOutputAliasConfig& input_output_alias,
     const std::map<int, const Tensor*>& resource_vars) {
   se::Stream* stream =
@@ -567,7 +567,7 @@ Status XlaComputationLaunchContext::PopulateOutputs(
   }
 
   // input_index -> index into variable_infos.
-  absl::flat_hash_map<int, int> variable_info_lookup;
+  abslx::flat_hash_map<int, int> variable_info_lookup;
   for (int i = 0; i < variable_infos.size(); i++) {
     variable_info_lookup.emplace(variable_infos[i].index(), i);
   }
@@ -609,12 +609,12 @@ Status XlaComputationLaunchContext::PopulateOutputs(
 
 StatusOr<std::vector<XlaCompiler::Argument>>
 XlaComputationLaunchContext::BuildXlaCompilerArguments(
-    absl::Span<int const> must_be_constant_idxs,
-    absl::Span<const Tensor* const> inputs,
-    absl::Span<VariableInfo const> variable_args, Device* device) {
-  CHECK(absl::c_is_sorted(must_be_constant_idxs));
+    abslx::Span<int const> must_be_constant_idxs,
+    abslx::Span<const Tensor* const> inputs,
+    abslx::Span<VariableInfo const> variable_args, Device* device) {
+  CHECK(abslx::c_is_sorted(must_be_constant_idxs));
   VLOG(2) << "Must be const args: {"
-          << absl::StrJoin(must_be_constant_idxs, ",") << "} out of "
+          << abslx::StrJoin(must_be_constant_idxs, ",") << "} out of "
           << inputs.size() << " args";
   std::vector<XlaCompiler::Argument> out;
   out.resize(inputs.size());
@@ -623,7 +623,7 @@ XlaComputationLaunchContext::BuildXlaCompilerArguments(
   DeviceContext* device_context = nullptr;
   TF_RETURN_IF_ERROR(device->TryGetDeviceContext(&device_context));
   bool using_default_context = false;
-  auto cleanup = absl::MakeCleanup([&] {
+  auto cleanup = abslx::MakeCleanup([&] {
     if (device_context != nullptr && !using_default_context) {
       device_context->Unref();
     }
@@ -634,7 +634,7 @@ XlaComputationLaunchContext::BuildXlaCompilerArguments(
     if (dev_info) device_context = dev_info->default_context;
   }
 
-  absl::flat_hash_map<int, const VariableInfo*> variable_info_lookup;
+  abslx::flat_hash_map<int, const VariableInfo*> variable_info_lookup;
   for (const VariableInfo& info : variable_args) {
     CHECK(!info.var() || info.lock_held())
         << "Need to hold the lock on resource variables "
@@ -669,7 +669,7 @@ XlaComputationLaunchContext::BuildXlaCompilerArguments(
         arg.shape = TensorShape();
       }
 
-      if (absl::c_binary_search(must_be_constant_idxs, input_num)) {
+      if (abslx::c_binary_search(must_be_constant_idxs, input_num)) {
         TF_RET_CHECK(variable.var() && variable.var()->is_initialized);
         const Tensor* value = variable.var()->tensor();
         Tensor value_on_host(value->dtype(), value->shape());
@@ -682,7 +682,7 @@ XlaComputationLaunchContext::BuildXlaCompilerArguments(
         arg.kind = XlaCompiler::Argument::kConstantResource;
         arg.constant_value = value_on_host;
       }
-    } else if (absl::c_binary_search(must_be_constant_idxs, input_num)) {
+    } else if (abslx::c_binary_search(must_be_constant_idxs, input_num)) {
       arg.kind = XlaCompiler::Argument::kConstant;
       arg.type = input->dtype();
       arg.shape = input->shape();

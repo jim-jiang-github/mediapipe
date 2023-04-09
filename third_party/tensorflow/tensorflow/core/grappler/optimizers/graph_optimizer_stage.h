@@ -206,10 +206,10 @@ class GraphOptimizerStage {
   const GraphOptimizerContext& ctx() const { return ctx_; }
 
  private:
-  const string UniqueNodeName(absl::string_view name) {
+  const string UniqueNodeName(abslx::string_view name) {
     string node_name = string(name);
     while (ctx_.node_map->NodeExists(node_name)) {
-      node_name = absl::StrCat(name, "_unique",
+      node_name = abslx::StrCat(name, "_unique",
                                optimized_node_name_counter_.fetch_add(1));
     }
 

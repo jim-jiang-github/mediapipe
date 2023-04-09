@@ -78,7 +78,7 @@ constexpr float kLandmarksAbsMargin = 0.03;
 constexpr float kHandednessMargin = 0.05;
 
 LandmarksDetectionResult GetLandmarksDetectionResult(
-    absl::string_view landmarks_file_name) {
+    abslx::string_view landmarks_file_name) {
   LandmarksDetectionResult result;
   MP_EXPECT_OK(GetTextProto(
       file::JoinPath("./", kTestDataDirectory, landmarks_file_name), &result,
@@ -94,7 +94,7 @@ LandmarksDetectionResult GetLandmarksDetectionResult(
 }
 
 HandLandmarkerResult GetExpectedHandLandmarkerResult(
-    const std::vector<absl::string_view>& landmarks_file_names) {
+    const std::vector<abslx::string_view>& landmarks_file_names) {
   HandLandmarkerResult expected_results;
   for (const auto& file_name : landmarks_file_names) {
     const auto landmarks_detection_result =
@@ -193,19 +193,19 @@ TEST_F(ImageModeTest, FailsWithCallingWrongMethod) {
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<HandLandmarker> hand_landmarker,
                           HandLandmarker::Create(std::move(options)));
   auto results = hand_landmarker->DetectForVideo(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the video mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
 
   results = hand_landmarker->DetectAsync(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the live stream mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
   MP_ASSERT_OK(hand_landmarker->Close());
 }
@@ -224,12 +224,12 @@ TEST_F(ImageModeTest, FailsWithRegionOfInterest) {
   ImageProcessingOptions image_processing_options{roi, /*rotation_degrees=*/0};
 
   auto results = hand_landmarker->Detect(image, image_processing_options);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("This task doesn't support region-of-interest"));
   EXPECT_THAT(
       results.status().GetPayload(kMediaPipeTasksPayload),
-      Optional(absl::Cord(absl::StrCat(
+      Optional(abslx::Cord(abslx::StrCat(
           MediaPipeTasksStatus::kImageProcessingInvalidArgumentError))));
 }
 
@@ -313,19 +313,19 @@ TEST_F(VideoModeTest, FailsWithCallingWrongMethod) {
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<HandLandmarker> hand_landmarker,
                           HandLandmarker::Create(std::move(options)));
   auto results = hand_landmarker->Detect(image);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the image mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
 
   results = hand_landmarker->DetectAsync(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the live stream mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
   MP_ASSERT_OK(hand_landmarker->Close());
 }
@@ -410,25 +410,25 @@ TEST_F(LiveStreamModeTest, FailsWithCallingWrongMethod) {
   options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kHandLandmarkerBundleAsset);
   options->running_mode = core::RunningMode::LIVE_STREAM;
-  options->result_callback = [](absl::StatusOr<HandLandmarkerResult> results,
+  options->result_callback = [](abslx::StatusOr<HandLandmarkerResult> results,
                                 const Image& image, int64 timestamp_ms) {};
 
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<HandLandmarker> hand_landmarker,
                           HandLandmarker::Create(std::move(options)));
   auto results = hand_landmarker->Detect(image);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the image mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
 
   results = hand_landmarker->DetectForVideo(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the video mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
   MP_ASSERT_OK(hand_landmarker->Close());
 }
@@ -447,7 +447,7 @@ TEST_P(LiveStreamModeTest, Succeeds) {
   std::vector<int64> timestamps;
   options->result_callback = [&hand_landmarker_results, &image_sizes,
                               &timestamps](
-                                 absl::StatusOr<HandLandmarkerResult> results,
+                                 abslx::StatusOr<HandLandmarkerResult> results,
                                  const Image& image, int64 timestamp_ms) {
     MP_ASSERT_OK(results.status());
     hand_landmarker_results.push_back(std::move(results.value()));

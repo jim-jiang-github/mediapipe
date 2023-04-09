@@ -42,14 +42,14 @@ namespace {
 
 class OpenClConverterImpl : public TensorObjectConverter {
  public:
-  virtual absl::Status Init(const TensorObjectDef& input_def,
+  virtual abslx::Status Init(const TensorObjectDef& input_def,
                             const TensorObjectDef& output_def,
                             Environment* environment) = 0;
 
   void SetGpuInfo(const GpuInfo& info) { gpu_info_ = info; }
 
  protected:
-  absl::Status DispatchKernel(cl_mem buffer_mem, Tensor* tensor) {
+  abslx::Status DispatchKernel(cl_mem buffer_mem, Tensor* tensor) {
     kernel_.ResetBindingCounter();
     RETURN_IF_ERROR(kernel_.SetMemoryAuto(buffer_mem));
     RETURN_IF_ERROR(cl_args_.SetObjectRef("tensor", tensor));
@@ -102,7 +102,7 @@ bool IsOpenCLTensor(const ObjectDef& def) {
           is_single_image_tensor);
 }
 
-absl::Status GetOpenCLMemory(const TensorObject& obj, cl_mem* memory) {
+abslx::Status GetOpenCLMemory(const TensorObject& obj, cl_mem* memory) {
   auto texture = std::get_if<OpenClTexture>(&obj);
   auto buffer = std::get_if<OpenClBuffer>(&obj);
   if (texture && texture->memobj) {
@@ -110,9 +110,9 @@ absl::Status GetOpenCLMemory(const TensorObject& obj, cl_mem* memory) {
   } else if (buffer && buffer->memobj) {
     *memory = buffer->memobj;
   } else {
-    return absl::InvalidArgumentError("Missing OpenCL object.");
+    return abslx::InvalidArgumentError("Missing OpenCL object.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Implements conversion from OpenCL tensor to another OpenCL tensor.
@@ -122,7 +122,7 @@ class TensorToTensorConverter : public OpenClConverterImpl {
     return IsOpenCLTensor(input) && IsOpenCLTensor(output);
   }
 
-  absl::Status Init(const TensorObjectDef& input_def,
+  abslx::Status Init(const TensorObjectDef& input_def,
                     const TensorObjectDef& output_def,
                     Environment* environment) final {
     src_tensor_descriptor_ =
@@ -178,7 +178,7 @@ class TensorToTensorConverter : public OpenClConverterImpl {
         environment->device(), &kernel_);
   }
 
-  absl::Status Convert(const TensorObject& input_obj,
+  abslx::Status Convert(const TensorObject& input_obj,
                        const TensorObject& output_obj) override {
     cl_mem in_memory;
     RETURN_IF_ERROR(GetOpenCLMemory(input_obj, &in_memory));
@@ -218,7 +218,7 @@ class TensorToBHWCBufferConverter : public OpenClConverterImpl {
     return IsOpenCLTensor(input) && IsBHWCOpenCLBuffer(output);
   }
 
-  absl::Status Init(const TensorObjectDef& input_def,
+  abslx::Status Init(const TensorObjectDef& input_def,
                     const TensorObjectDef& output_def,
                     Environment* environment) final {
     TensorStorageType src_tensor_type = ToTensorStorageType(
@@ -283,11 +283,11 @@ class TensorToBHWCBufferConverter : public OpenClConverterImpl {
         environment->device(), &kernel_);
   }
 
-  absl::Status Convert(const TensorObject& input_obj,
+  abslx::Status Convert(const TensorObject& input_obj,
                        const TensorObject& output_obj) override {
     auto output = std::get_if<OpenClBuffer>(&output_obj);
     if (!output || !output->memobj) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Missing output in tensor_to_bhwc converter");
     }
 
@@ -324,7 +324,7 @@ class BHWCBufferToTensorConverter : public OpenClConverterImpl {
 )");
   }
 
-  absl::Status Init(const TensorObjectDef& input_def,
+  abslx::Status Init(const TensorObjectDef& input_def,
                     const TensorObjectDef& output_def,
                     Environment* environment) final {
     auto params_kernel = GetFromBhwcKernel(input_def, output_def);
@@ -388,11 +388,11 @@ class BHWCBufferToTensorConverter : public OpenClConverterImpl {
         environment->device(), &kernel_);
   }
 
-  absl::Status Convert(const TensorObject& input_obj,
+  abslx::Status Convert(const TensorObject& input_obj,
                        const TensorObject& output_obj) override {
     auto input = std::get_if<OpenClBuffer>(&input_obj);
     if (!input || !input->memobj) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Missing input in bhwc_to_tensor converter");
     }
     cl_mem out_memory;
@@ -445,7 +445,7 @@ class TrivialCopier : public OpenClConverterImpl {
            input.data_layout == output.data_layout;
   }
 
-  absl::Status Init(const TensorObjectDef& input_def,
+  abslx::Status Init(const TensorObjectDef& input_def,
                     const TensorObjectDef& output_def,
                     Environment* environment) final {
     shape_ = BHWC(input_def.dimensions.b, input_def.dimensions.h,
@@ -453,10 +453,10 @@ class TrivialCopier : public OpenClConverterImpl {
     data_type_ = input_def.object_def.data_type;
     queue_ = environment->queue();
     region_ = CalculateTextureRegion(output_def);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Convert(const TensorObject& input_obj,
+  abslx::Status Convert(const TensorObject& input_obj,
                        const TensorObject& output_obj) override {
     auto texture_input = std::get_if<OpenClTexture>(&input_obj);
     auto texture_output = std::get_if<OpenClTexture>(&output_obj);
@@ -468,12 +468,12 @@ class TrivialCopier : public OpenClConverterImpl {
     if (buffer_input && buffer_output) {
       return Copy(*buffer_input, *buffer_output);
     }
-    return absl::InternalError("Unexpected object");
+    return abslx::InternalError("Unexpected object");
   }
 
-  absl::Status Copy(const OpenClBuffer& input, const OpenClBuffer& output) {
+  abslx::Status Copy(const OpenClBuffer& input, const OpenClBuffer& output) {
     if (input.memobj == output.memobj) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     return GetOpenCLError(
         clEnqueueCopyBuffer(queue_->queue(), input.memobj, output.memobj, 0, 0,
@@ -482,9 +482,9 @@ class TrivialCopier : public OpenClConverterImpl {
                             0, nullptr, nullptr));
   }
 
-  absl::Status Copy(const OpenClTexture& input, const OpenClTexture& output) {
+  abslx::Status Copy(const OpenClTexture& input, const OpenClTexture& output) {
     if (input.memobj == output.memobj) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     size_t origin[3] = {0, 0, 0};
     return GetOpenCLError(
@@ -510,7 +510,7 @@ class CpuCopier : public OpenClConverterImpl {
              IsOpenClTextureOrBuffer(input.object_type)));
   }
 
-  absl::Status Init(const TensorObjectDef& input_def,
+  abslx::Status Init(const TensorObjectDef& input_def,
                     const TensorObjectDef& output_def,
                     Environment* environment) final {
     region_ = CalculateTextureRegion(
@@ -519,10 +519,10 @@ class CpuCopier : public OpenClConverterImpl {
     input_data_type_ = input_def.object_def.data_type;
     output_data_type_ = output_def.object_def.data_type;
     queue_ = environment->queue();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Convert(const TensorObject& input_obj,
+  abslx::Status Convert(const TensorObject& input_obj,
                        const TensorObject& output_obj) override {
     auto cpu_input = std::get_if<CpuMemory>(&input_obj);
     auto cpu_output = std::get_if<CpuMemory>(&output_obj);
@@ -559,11 +559,11 @@ class CpuCopier : public OpenClConverterImpl {
                                          cpu_output->data, async_);
       }
     }
-    return absl::InternalError("Unexpected object");
+    return abslx::InternalError("Unexpected object");
   }
 
  private:
-  absl::Status CopyToBoolCpu(const TensorObject& tensor_obj,
+  abslx::Status CopyToBoolCpu(const TensorObject& tensor_obj,
                              const CpuMemory* cpu_memory) {
     const size_t num_elements = cpu_memory->size_bytes;
     std::vector<uint8_t> tmp_data(num_elements);
@@ -575,7 +575,7 @@ class CpuCopier : public OpenClConverterImpl {
     } else {
       auto buffer_input = std::get_if<OpenClBuffer>(&tensor_obj);
       if (!buffer_input) {
-        return absl::InternalError("Unexpected object");
+        return abslx::InternalError("Unexpected object");
       }
       RETURN_IF_ERROR(queue_->EnqueueReadBuffer(
           buffer_input->memobj, tmp_data.size(), tmp_data.data(), false));
@@ -584,10 +584,10 @@ class CpuCopier : public OpenClConverterImpl {
     for (int i = 0; i < num_elements; ++i) {
       output_data[i] = tmp_data[i];
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status CopyFromBoolCpu(const CpuMemory* cpu_memory,
+  abslx::Status CopyFromBoolCpu(const CpuMemory* cpu_memory,
                                const TensorObject& tensor_obj) {
     const size_t num_elements = cpu_memory->size_bytes;
     const bool* bool_data = reinterpret_cast<bool*>(cpu_memory->data);
@@ -606,7 +606,7 @@ class CpuCopier : public OpenClConverterImpl {
       return queue_->EnqueueWriteBuffer(buffer_output->memobj, tmp_data.size(),
                                         tmp_data.data(), async_);
     }
-    return absl::InternalError("Unexpected object");
+    return abslx::InternalError("Unexpected object");
   }
 
   std::array<size_t, 3> region_;
@@ -632,7 +632,7 @@ class OpenClTensorConverterBuilder : public TensorObjectConverterBuilder {
             BHWCBufferToTensorConverter::IsSupported(input_def, output_def));
   }
 
-  absl::Status MakeConverter(
+  abslx::Status MakeConverter(
       const TensorObjectDef& input, const TensorObjectDef& output,
       std::unique_ptr<TensorObjectConverter>* converter) final {
     std::unique_ptr<OpenClConverterImpl> impl;
@@ -651,12 +651,12 @@ class OpenClTensorConverterBuilder : public TensorObjectConverterBuilder {
                                                         output_def)) {
       impl = std::make_unique<BHWCBufferToTensorConverter>();
     } else {
-      return absl::UnimplementedError("Unsupported conversion");
+      return abslx::UnimplementedError("Unsupported conversion");
     }
     RETURN_IF_ERROR(impl->Init(input, output, environment_));
     impl->SetGpuInfo(environment_->GetDevicePtr()->GetInfo());
     *converter = std::move(impl);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   Environment* environment_;

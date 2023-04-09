@@ -29,18 +29,18 @@ using Eigen::Vector3f;
 
 }  // namespace
 
-absl::Status SolveEpnp(const float focal_x, const float focal_y,
+abslx::Status SolveEpnp(const float focal_x, const float focal_y,
                        const float center_x, const float center_y,
                        const bool portrait,
                        const std::vector<Vector2f>& input_points_2d,
                        std::vector<Vector3f>* output_points_3d) {
   if (input_points_2d.size() != kNumKeypoints) {
-    return absl::InvalidArgumentError(
-        absl::StrFormat("Input must has %d 2D points.", kNumKeypoints));
+    return abslx::InvalidArgumentError(
+        abslx::StrFormat("Input must has %d 2D points.", kNumKeypoints));
   }
 
   if (output_points_3d == nullptr) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "Output pointer output_points_3d is Null.");
   }
 
@@ -124,7 +124,7 @@ absl::Status SolveEpnp(const float focal_x, const float focal_y,
   Matrix<float, 12, 12> mt_m = m.transpose() * m;
   Eigen::SelfAdjointEigenSolver<Matrix<float, 12, 12>> eigen_solver(mt_m);
   if (eigen_solver.info() != Eigen::Success) {
-    return absl::AbortedError("Eigen decomposition failed.");
+    return abslx::AbortedError("Eigen decomposition failed.");
   }
   CHECK_EQ(12, eigen_solver.eigenvalues().size());
 
@@ -149,10 +149,10 @@ absl::Status SolveEpnp(const float focal_x, const float focal_y,
     output_points_3d->emplace_back(vertices(i, 0), vertices(i, 1),
                                    vertices(i, 2));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SolveEpnp(const Eigen::Matrix4f& projection_matrix,
+abslx::Status SolveEpnp(const Eigen::Matrix4f& projection_matrix,
                        const bool portrait,
                        const std::vector<Vector2f>& input_points_2d,
                        std::vector<Vector3f>* output_points_3d) {

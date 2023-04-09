@@ -24,9 +24,9 @@
 namespace mediapipe {
 ABSL_MUST_USE_RESULT inline std::string SimpleDtoa(double d) {
   if (static_cast<double>(static_cast<int64>(d)) == d) {
-    return absl::StrCat(static_cast<int64>(d));
+    return abslx::StrCat(static_cast<int64>(d));
   } else {
-    return absl::StrCat(d);
+    return abslx::StrCat(d);
   }
 }
 }  // namespace mediapipe

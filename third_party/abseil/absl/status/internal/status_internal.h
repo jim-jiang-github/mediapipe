@@ -21,16 +21,16 @@
 
 #ifndef SWIG
 // Disabled for SWIG as it doesn't parse attributes correctly.
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 // Returned Status objects may not be ignored. Codesearch doesn't handle ifdefs
 // as part of a class definitions (b/6995610), so we use a forward declaration.
 class ABSL_MUST_USE_RESULT Status;
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 #endif  // !SWIG
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 enum class StatusCode : int;
@@ -40,14 +40,14 @@ namespace status_internal {
 // Container for status payloads.
 struct Payload {
   std::string type_url;
-  absl::Cord payload;
+  abslx::Cord payload;
 };
 
-using Payloads = absl::InlinedVector<Payload, 1>;
+using Payloads = abslx::InlinedVector<Payload, 1>;
 
 // Reference-counted representation of Status data.
 struct StatusRep {
-  StatusRep(absl::StatusCode code, absl::string_view message,
+  StatusRep(abslx::StatusCode code, abslx::string_view message,
             std::unique_ptr<status_internal::Payloads> payloads)
       : ref(int32_t{1}),
         code(code),
@@ -55,15 +55,15 @@ struct StatusRep {
         payloads(std::move(payloads)) {}
 
   std::atomic<int32_t> ref;
-  absl::StatusCode code;
+  abslx::StatusCode code;
   std::string message;
   std::unique_ptr<status_internal::Payloads> payloads;
 };
 
-absl::StatusCode MapToLocalCode(int value);
+abslx::StatusCode MapToLocalCode(int value);
 }  // namespace status_internal
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STATUS_INTERNAL_STATUS_INTERNAL_H_

@@ -53,7 +53,7 @@ StatusOr<mlir::StringAttr> GetPaddingAttr(TfLitePadding pad_params,
     padding = tflite::Padding_VALID;
   } else {
     return InvalidArgument(
-        absl::StrCat("Invalid padding type", std::to_string(pad_params)));
+        abslx::StrCat("Invalid padding type", std::to_string(pad_params)));
   }
 
   const char* option_name = tflite::EnumNamePadding(padding);

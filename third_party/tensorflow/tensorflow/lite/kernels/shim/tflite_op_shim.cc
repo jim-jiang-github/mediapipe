@@ -30,12 +30,12 @@ namespace tflite {
 namespace shim {
 
 namespace internal {
-absl::StatusOr<AttrValue> GetAttr(const flexbuffers::Map* attr_map,
+abslx::StatusOr<AttrValue> GetAttr(const flexbuffers::Map* attr_map,
                                   const std::string& attr_name) {
   const auto value = (*attr_map)[attr_name.data()];
   if (value.IsNull())
-    return absl::InvalidArgumentError(
-        absl::StrCat("Non-existent attribute: ", attr_name));
+    return abslx::InvalidArgumentError(
+        abslx::StrCat("Non-existent attribute: ", attr_name));
   AttrValue ret;
   switch (value.GetType()) {
     case ::flexbuffers::FBT_BOOL: {
@@ -52,12 +52,12 @@ absl::StatusOr<AttrValue> GetAttr(const flexbuffers::Map* attr_map,
     }
     case ::flexbuffers::FBT_STRING: {
       const auto str_val = value.AsString();
-      ret = absl::string_view(str_val.c_str(), str_val.length());
+      ret = abslx::string_view(str_val.c_str(), str_val.length());
       break;
     }
     default: {
-      return absl::FailedPreconditionError(
-          absl::StrCat("Unsupported type for attribute: ", attr_name,
+      return abslx::FailedPreconditionError(
+          abslx::StrCat("Unsupported type for attribute: ", attr_name,
                        " with value: ", value.ToString()));
     }
   }
@@ -69,7 +69,7 @@ TfLiteInitContext::TfLiteInitContext(const TfLiteContext* context,
                                      const flexbuffers::Map* attr_map)
     : attr_map_(attr_map) {}
 
-absl::StatusOr<AttrValue> TfLiteInitContext::GetAttr(
+abslx::StatusOr<AttrValue> TfLiteInitContext::GetAttr(
     const std::string& attr_name) const {
   return internal::GetAttr(attr_map_, attr_name);
 }
@@ -82,8 +82,8 @@ ConstTensorViewOr TfLiteInvokeContext::GetInput(const int idx) const {
   // Scope is used to ensure tensor_view string contents are flushed
   const auto* tflite_tensor = ::tflite::GetInput(context_, node_, idx);
   if (tflite_tensor == nullptr)
-    return absl::InternalError(
-        absl::StrCat("input tensor is null during invocation. idx: ", idx));
+    return abslx::InternalError(
+        abslx::StrCat("input tensor is null during invocation. idx: ", idx));
   SH_ASSIGN_OR_RETURN(const TfLiteTensorView& tensor_view,
                       TensorView::New(tflite_tensor));
   return std::make_unique<const TfLiteTensorView>(tensor_view);
@@ -92,13 +92,13 @@ ConstTensorViewOr TfLiteInvokeContext::GetInput(const int idx) const {
 TensorViewOr TfLiteInvokeContext::GetOutput(const int idx,
                                             const Shape& output_shape) const {
   if (!output_shape.has_value()) {
-    return absl::InvalidArgumentError(
-        absl::StrCat("output_shape value should be populated. idx: ", idx));
+    return abslx::InvalidArgumentError(
+        abslx::StrCat("output_shape value should be populated. idx: ", idx));
   }
   auto* tflite_tensor = ::tflite::GetOutput(context_, node_, idx);
   if (tflite_tensor == nullptr)
-    return absl::InternalError(
-        absl::StrCat("output tensor is null during invocation. idx: ", idx));
+    return abslx::InternalError(
+        abslx::StrCat("output tensor is null during invocation. idx: ", idx));
   if (tflite_tensor->data.raw == nullptr ||
       tflite_tensor->allocation_type == kTfLiteDynamic) {
     TfLiteIntArray* output_shape_array =
@@ -131,21 +131,21 @@ TfLiteShapeInferenceContext::TfLiteShapeInferenceContext(
 ShapeOr TfLiteShapeInferenceContext::GetInputShape(const int idx) const {
   auto* tflite_tensor = ::tflite::GetInput(context_, node_, idx);
   if (tflite_tensor == nullptr)
-    return absl::InternalError(absl::StrCat(
+    return abslx::InternalError(abslx::StrCat(
         "input tensor is null during shape inference. idx: ", idx));
   return TfLiteShapeToShape(tflite_tensor->dims);
 }
 
 // A function object to set output shape information from a Shape
 // object
-absl::Status TfLiteShapeInferenceContext::SetOutputShape(const int idx,
+abslx::Status TfLiteShapeInferenceContext::SetOutputShape(const int idx,
                                                          const Shape& shape) {
   if (idx >= inferred_shapes_->size()) {
-    return absl::InternalError(absl::StrCat("output idx out of bounds: ", idx,
+    return abslx::InternalError(abslx::StrCat("output idx out of bounds: ", idx,
                                             " >= ", inferred_shapes_->size()));
   }
   (*inferred_shapes_)[idx] = shape;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // A function object to read input tensor during shape inference as a TensorView
@@ -153,19 +153,19 @@ ConstTensorViewOr TfLiteShapeInferenceContext::GetInputTensor(
     const int idx) const {
   const auto* tflite_tensor = ::tflite::GetInput(context_, node_, idx);
   if (tflite_tensor == nullptr)
-    return absl::InternalError(absl::StrCat(
+    return abslx::InternalError(abslx::StrCat(
         "input tensor is null during shape inference. idx: ", idx));
   if (::tflite::IsConstantTensor(tflite_tensor)) {
     SH_ASSIGN_OR_RETURN(const TfLiteTensorView& tensor_view,
                         TensorView::New(tflite_tensor));
     return std::make_unique<const TfLiteTensorView>(tensor_view);
   } else {
-    return absl::FailedPreconditionError(absl::StrCat(
+    return abslx::FailedPreconditionError(abslx::StrCat(
         "input tensor is unavailable during shape inference. idx: ", idx));
   }
 }
 
-absl::StatusOr<AttrValue> TfLiteShapeInferenceContext::GetAttr(
+abslx::StatusOr<AttrValue> TfLiteShapeInferenceContext::GetAttr(
     const std::string& attr_name) const {
   return internal::GetAttr(attr_map_, attr_name);
 }
@@ -179,7 +179,7 @@ int TfLiteShapeInferenceContext::NumOutputs() const {
 }
 
 TfLiteStatus StatusToTfLiteStatus(TfLiteContext* context,
-                                  const absl::Status& status) {
+                                  const abslx::Status& status) {
   if (status.ok()) return kTfLiteOk;
   const auto error_string = std::string(status.message());
   TF_LITE_KERNEL_LOG(context, "error: %s", error_string.c_str());

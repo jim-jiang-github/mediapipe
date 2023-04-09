@@ -43,7 +43,7 @@ bool IsCanonicalDot(HloInstruction* dot) {
   auto is_permutation_of_iota =
       [](const tensorflow::protobuf::RepeatedField<int64_t>& vals) {
         DimensionVector copy(vals.begin(), vals.end());
-        absl::c_sort(copy);
+        abslx::c_sort(copy);
         for (int i = 0; i < copy.size(); i++) {
           if (copy[i] != i) {
             return false;
@@ -107,32 +107,32 @@ StatusOr<HloInstruction*> TryMergeSameOperand(HloInstruction* a,
 
   const DotDimensionNumbers& dnums_a = a->dot_dimension_numbers();
   const DotDimensionNumbers& dnums_b = b->dot_dimension_numbers();
-  if (!absl::c_equal(dnums_a.lhs_batch_dimensions(),
+  if (!abslx::c_equal(dnums_a.lhs_batch_dimensions(),
                      dnums_b.lhs_batch_dimensions()) ||
-      !absl::c_equal(dnums_a.rhs_batch_dimensions(),
+      !abslx::c_equal(dnums_a.rhs_batch_dimensions(),
                      dnums_b.rhs_batch_dimensions()) ||
-      !absl::c_equal(dnums_a.lhs_contracting_dimensions(),
+      !abslx::c_equal(dnums_a.lhs_contracting_dimensions(),
                      dnums_b.lhs_contracting_dimensions()) ||
-      !absl::c_equal(dnums_a.rhs_contracting_dimensions(),
+      !abslx::c_equal(dnums_a.rhs_contracting_dimensions(),
                      dnums_b.rhs_contracting_dimensions())) {
     VLOG(3) << "Can't merge dots because they have mismatching dnums.\n"
             << "\t" << a->ToString() << "\n"
             << "\t" << b->ToString() << "\n"
-            << absl::c_equal(dnums_a.lhs_batch_dimensions(),
+            << abslx::c_equal(dnums_a.lhs_batch_dimensions(),
                              dnums_b.lhs_batch_dimensions())
             << ", "
-            << absl::c_equal(dnums_a.rhs_batch_dimensions(),
+            << abslx::c_equal(dnums_a.rhs_batch_dimensions(),
                              dnums_b.rhs_batch_dimensions())
             << ", "
-            << absl::c_equal(dnums_a.lhs_contracting_dimensions(),
+            << abslx::c_equal(dnums_a.lhs_contracting_dimensions(),
                              dnums_b.lhs_contracting_dimensions())
             << ", "
-            << absl::c_equal(dnums_a.rhs_contracting_dimensions(),
+            << abslx::c_equal(dnums_a.rhs_contracting_dimensions(),
                              dnums_b.rhs_contracting_dimensions());
     return nullptr;
   }
 
-  if (!absl::c_equal(a->precision_config().operand_precision(),
+  if (!abslx::c_equal(a->precision_config().operand_precision(),
                      b->precision_config().operand_precision())) {
     VLOG(3) << "Can't merge dots because they have mismatching operand "
                "precisions:\n"
@@ -233,7 +233,7 @@ StatusOr<bool> MergeDots(HloComputation* comp, int64_t max_size_to_merge) {
   // a member of two equivalence classes (because it has two operands), but if
   // it's merged with a dot from one equivalence class, it won't also be merged
   // in another class.
-  absl::flat_hash_map<HloInstruction*, absl::flat_hash_set<HloInstruction*>>
+  abslx::flat_hash_map<HloInstruction*, abslx::flat_hash_set<HloInstruction*>>
       equivalence_classes;
   for (HloInstruction* instr : comp->instructions()) {
     // Cowardly skip instructions with control dependencies.
@@ -252,12 +252,12 @@ StatusOr<bool> MergeDots(HloComputation* comp, int64_t max_size_to_merge) {
   //  - there are zero instructions marked as mergeable.  (Our contract is that
   //    at least one instruction of the pair needs to be mergeable in order for
   //    us to merge.)
-  absl::erase_if(
+  abslx::erase_if(
       equivalence_classes,
       [&](const std::pair<const HloInstruction*,
-                          absl::flat_hash_set<HloInstruction*>>& kv) {
+                          abslx::flat_hash_set<HloInstruction*>>& kv) {
         const auto& v = kv.second;
-        return v.size() < 2 || absl::c_none_of(v, is_merge_candidate);
+        return v.size() < 2 || abslx::c_none_of(v, is_merge_candidate);
       });
 
   // Are there any possible optimization opportunities?
@@ -272,7 +272,7 @@ StatusOr<bool> MergeDots(HloComputation* comp, int64_t max_size_to_merge) {
   // otherwise not adding them to the graph in the first place?
   tensorflow::GraphCycles graph;
 
-  absl::flat_hash_map<HloInstruction*, int32_t> graph_ids_map;
+  abslx::flat_hash_map<HloInstruction*, int32_t> graph_ids_map;
   auto graph_id = [&](HloInstruction* instr) {
     auto it_and_inserted = graph_ids_map.emplace(instr, -1);
     auto it = it_and_inserted.first;
@@ -298,12 +298,12 @@ StatusOr<bool> MergeDots(HloComputation* comp, int64_t max_size_to_merge) {
   // remove these dead instructions at the end of the pass.  (We can't remove
   // them earlier because removing an instruction deletes it; we'd then have
   // dangling pointers in our hashtable!)
-  absl::flat_hash_set<HloInstruction*> dead_instrs;
+  abslx::flat_hash_set<HloInstruction*> dead_instrs;
   for (auto& kv : equivalence_classes) {
     // For determinism, iterate in order of the instructions' IDs.
-    absl::InlinedVector<HloInstruction*, 16> dots(kv.second.begin(),
+    abslx::InlinedVector<HloInstruction*, 16> dots(kv.second.begin(),
                                                   kv.second.end());
-    absl::c_sort(dots, [](const HloInstruction* a, const HloInstruction* b) {
+    abslx::c_sort(dots, [](const HloInstruction* a, const HloInstruction* b) {
       return a->unique_id() < b->unique_id();
     });
 
@@ -361,7 +361,7 @@ StatusOr<bool> MergeDots(HloComputation* comp, int64_t max_size_to_merge) {
 
 StatusOr<bool> DotMerger::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   for (HloComputation* comp :
        module->MakeNonfusionComputations(execution_threads)) {

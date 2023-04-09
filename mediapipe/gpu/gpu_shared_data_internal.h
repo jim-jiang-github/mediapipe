@@ -42,7 +42,7 @@ class MetalSharedResources;
 // TODO: rename to GpuService or GpuManager or something.
 class GpuResources {
  public:
-  using StatusOrGpuResources = absl::StatusOr<std::shared_ptr<GpuResources>>;
+  using StatusOrGpuResources = abslx::StatusOr<std::shared_ptr<GpuResources>>;
 
   static StatusOrGpuResources Create();
   static StatusOrGpuResources Create(PlatformGlContext external_context);
@@ -66,7 +66,7 @@ class GpuResources {
   MetalSharedResources& metal_shared() { return *metal_shared_; }
 #endif  // defined(__APPLE__)§
 
-  absl::Status PrepareGpuNode(CalculatorNode* node);
+  abslx::Status PrepareGpuNode(CalculatorNode* node);
 
   // If the node requires custom GPU executors in the current configuration,
   // returns the executor's names and the executors themselves.

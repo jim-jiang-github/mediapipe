@@ -52,7 +52,7 @@ namespace dtensor {
 // [x:4, y:3, z:2]
 //
 // Must consist of 24 devices placed densely into the corresponding 3D space.
-using DeviceLocation = absl::InlinedVector<int64, 4>;
+using DeviceLocation = abslx::InlinedVector<int64, 4>;
 
 // A shard refers to a partition of a tensor. Shards are arranged in
 // ShardVectors that contains a list of Shards and a list of integers
@@ -152,8 +152,8 @@ class Mesh {
 
   // Convert to given device type.
   StatusOr<Mesh> ToDeviceType(const std::string& device_type) const;
-  absl::Span<const std::string> local_devices() const { return local_devices_; }
-  absl::Span<const int64_t> local_device_ids() const {
+  abslx::Span<const std::string> local_devices() const { return local_devices_; }
+  abslx::Span<const int64_t> local_device_ids() const {
     return local_device_ids_;
   }
 
@@ -163,7 +163,7 @@ class Mesh {
                              global_device_ids_.end());
   }
 
-  absl::Span<const int64_t> global_device_ids() const {
+  abslx::Span<const int64_t> global_device_ids() const {
     return global_device_ids_;
   }
 
@@ -177,10 +177,10 @@ class Mesh {
   }
 
   // Returns index of given dim_name in the mesh.
-  StatusOr<int32> idx_for_dim(absl::string_view dim_name) const;
+  StatusOr<int32> idx_for_dim(abslx::string_view dim_name) const;
 
   // Returns size of mesh dimension.
-  StatusOr<int64> dim_size(absl::string_view name) const;
+  StatusOr<int64> dim_size(abslx::string_view name) const;
 
   // Returns list of mesh dimension sizes.
   std::vector<int64> dim_sizes() const;
@@ -266,10 +266,10 @@ class Layout {
   // that only the last two dimensions are used for matrix computation and all
   // dimensions before are batch dimensions.
   static StatusOr<Layout> Transposed2D(const Layout& layout);
-  static bool IsUnshardedDimension(const absl::string_view name) {
+  static bool IsUnshardedDimension(const abslx::string_view name) {
     return name == kUnshardedDim;
   }
-  static bool IsShardedDimension(const absl::string_view name) {
+  static bool IsShardedDimension(const abslx::string_view name) {
     return !IsUnshardedDimension(name);
   }
   static bool IsUnshardedSpec(const ShardingSpec& spec) {
@@ -286,7 +286,7 @@ class Layout {
   // Makes a new layout from this one dropping the given dimensions.
   // If keep_dims is true, the dimensions are replicated rather than
   // deleted.
-  Layout GetLayoutWithReducedDims(const absl::flat_hash_set<int>& reduced_dims,
+  Layout GetLayoutWithReducedDims(const abslx::flat_hash_set<int>& reduced_dims,
                                   bool keep_dims) const;
 
   // Truncates a layout at the front or back, depending on the value of end.
@@ -310,7 +310,7 @@ class Layout {
       const std::vector<int64_t>& local_shape) const;
 
   std::vector<int64_t> LocalShapeFromGlobalShape(
-      absl::Span<const int64_t> global_shape) const;
+      abslx::Span<const int64_t> global_shape) const;
   PartialTensorShape LocalShapeFromGlobalShape(
       const PartialTensorShape& global_shape) const;
 
@@ -320,7 +320,7 @@ class Layout {
   std::vector<int32> num_shards() const;
 
   const ShardingSpec& dim(int64 idx) const { return sharding_specs_[idx]; }
-  absl::Span<const ShardingSpec> sharding_specs() const {
+  abslx::Span<const ShardingSpec> sharding_specs() const {
     return sharding_specs_;
   }
 

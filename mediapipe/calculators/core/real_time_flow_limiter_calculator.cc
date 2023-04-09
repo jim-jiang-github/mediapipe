@@ -82,7 +82,7 @@ constexpr char kMaxInFlightTag[] = "MAX_IN_FLIGHT";
 class ABSL_DEPRECATED("Use FlowLimiterCalculator instead.")
     RealTimeFlowLimiterCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     int num_data_streams = cc->Inputs().NumEntries("");
     RET_CHECK_GE(num_data_streams, 1);
     RET_CHECK_EQ(cc->Outputs().NumEntries(""), num_data_streams)
@@ -102,10 +102,10 @@ class ABSL_DEPRECATED("Use FlowLimiterCalculator instead.")
 
     cc->SetInputStreamHandler("ImmediateInputStreamHandler");
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     finished_id_ = cc->Inputs().GetId("FINISHED", 0);
     max_in_flight_ = 1;
     if (cc->InputSidePackets().HasTag(kMaxInFlightTag)) {
@@ -120,12 +120,12 @@ class ABSL_DEPRECATED("Use FlowLimiterCalculator instead.")
     num_data_streams_ = cc->Inputs().NumEntries("");
     data_stream_bound_ts_.resize(num_data_streams_);
     RET_CHECK_OK(CopyInputHeadersToOutputs(cc->Inputs(), &(cc->Outputs())));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   bool Allow() { return num_in_flight_ < max_in_flight_; }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     bool old_allow = Allow();
     Timestamp lowest_incomplete_ts = Timestamp::Done();
 
@@ -187,7 +187,7 @@ class ABSL_DEPRECATED("Use FlowLimiterCalculator instead.")
           .Get(allowed_id_)
           .AddPacket(MakePacket<bool>(Allow()).At(++allow_ctr_ts_));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

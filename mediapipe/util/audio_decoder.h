@@ -50,10 +50,10 @@ class BasePacketProcessor {
   virtual ~BasePacketProcessor();
 
   // Opens the codec.
-  virtual absl::Status Open(int id, AVStream* stream) = 0;
+  virtual abslx::Status Open(int id, AVStream* stream) = 0;
 
   // Processes a packet of data.  Caller retains ownership of packet.
-  virtual absl::Status ProcessPacket(AVPacket* packet) = 0;
+  virtual abslx::Status ProcessPacket(AVPacket* packet) = 0;
 
   // Returns true if the processor has data immediately available
   // (without providing more data with ProcessPacket()).
@@ -61,11 +61,11 @@ class BasePacketProcessor {
 
   // Fills packet with the next frame of data.  Returns an empty packet
   // if there is nothing to return.
-  absl::Status GetData(Packet* packet);
+  abslx::Status GetData(Packet* packet);
 
   // Once no more AVPackets are available in the file, each stream must
   // be flushed to get any remaining frames which the codec is buffering.
-  absl::Status Flush();
+  abslx::Status Flush();
 
   // Closes the Processor, this does not close the file.  You may not
   // call ProcessPacket() after calling Close().  Close() may be called
@@ -74,11 +74,11 @@ class BasePacketProcessor {
 
  protected:
   // Decodes frames in a packet.
-  virtual absl::Status Decode(const AVPacket& packet,
+  virtual abslx::Status Decode(const AVPacket& packet,
                               bool ignore_decode_failures);
 
   // Processes a decoded frame.
-  virtual absl::Status ProcessDecodedFrame(const AVPacket& packet) = 0;
+  virtual abslx::Status ProcessDecodedFrame(const AVPacket& packet) = 0;
 
   // Corrects the given PTS for MPEG PTS rollover. Assumed to be called with
   // the PTS of each frame in decode order. We detect a rollover whenever the
@@ -132,15 +132,15 @@ class AudioPacketProcessor : public BasePacketProcessor {
  public:
   explicit AudioPacketProcessor(const AudioStreamOptions& options);
 
-  absl::Status Open(int id, AVStream* stream) override;
+  abslx::Status Open(int id, AVStream* stream) override;
 
-  absl::Status ProcessPacket(AVPacket* packet) override;
+  abslx::Status ProcessPacket(AVPacket* packet) override;
 
-  absl::Status FillHeader(TimeSeriesHeader* header) const;
+  abslx::Status FillHeader(TimeSeriesHeader* header) const;
 
  private:
   // Appends audio in buffer(s) to the output buffer (buffer_).
-  absl::Status AddAudioDataToBuffer(const Timestamp output_timestamp,
+  abslx::Status AddAudioDataToBuffer(const Timestamp output_timestamp,
                                     uint8* const* raw_audio,
                                     int buf_size_bytes);
 
@@ -154,11 +154,11 @@ class AudioPacketProcessor : public BasePacketProcessor {
 
   // Returns an error if the sample format in avformat_ctx_.sample_format
   // is not supported.
-  absl::Status ValidateSampleFormat();
+  abslx::Status ValidateSampleFormat();
 
   // Processes a decoded audio frame.  audio_frame_ must have been filled
   // with the frame before calling this function.
-  absl::Status ProcessDecodedFrame(const AVPacket& packet) override;
+  abslx::Status ProcessDecodedFrame(const AVPacket& packet) override;
 
   // Corrects PTS for rollover if correction is enabled.
   int64 MaybeCorrectPtsForRollover(int64 media_pts);
@@ -194,19 +194,19 @@ class AudioDecoder {
   AudioDecoder();
   ~AudioDecoder();
 
-  absl::Status Initialize(const std::string& input_file,
+  abslx::Status Initialize(const std::string& input_file,
                           const mediapipe::AudioDecoderOptions options);
 
-  absl::Status GetData(int* options_index, Packet* data);
+  abslx::Status GetData(int* options_index, Packet* data);
 
-  absl::Status Close();
+  abslx::Status Close();
 
-  absl::Status FillAudioHeader(const AudioStreamOptions& stream_option,
+  abslx::Status FillAudioHeader(const AudioStreamOptions& stream_option,
                                TimeSeriesHeader* header) const;
 
  private:
-  absl::Status ProcessPacket();
-  absl::Status Flush();
+  abslx::Status ProcessPacket();
+  abslx::Status Flush();
 
   std::map<int, int> stream_id_to_audio_options_index_;
   std::map<int, int> stream_index_to_stream_id_;

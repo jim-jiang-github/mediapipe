@@ -46,7 +46,7 @@ class SavedVariableLoadingTest
     std::vector<std::unique_ptr<Device>> devices;
     TF_CHECK_OK(DeviceFactory::AddDevices(
         options, "/job:localhost/replica:0/task:0", &devices));
-    device_mgr_ = absl::make_unique<StaticDeviceMgr>(std::move(devices));
+    device_mgr_ = abslx::make_unique<StaticDeviceMgr>(std::move(devices));
     ctx_ = testing::CreateTestingEagerContext(device_mgr_.get());
   }
 
@@ -120,7 +120,7 @@ TEST_P(SavedVariableLoadingTest, AssignAndReadVariableSuccesful) {
   Status status;
   std::unique_ptr<Variable> var;
   TF_EXPECT_OK(Variable::CreateUninitialized(context(), dtype, shape,
-                                             absl::nullopt, nullptr, {}, &var));
+                                             abslx::nullopt, nullptr, {}, &var));
 
   // Create a TensorHandle
   ImmediateTensorHandlePtr expected_handle =

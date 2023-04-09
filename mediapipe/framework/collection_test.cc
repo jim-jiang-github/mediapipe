@@ -142,7 +142,7 @@ TEST(CollectionTest, MixedTagAndIndexUsage) {
       // Numbers are in sorted order by tag and then index.
       EXPECT_EQ(100 + i, collection1.Get(id));
       // Initialize the entries of the second collection.
-      collection3.Get(id) = absl::StrCat(i, " ", tag, " ", index_in_tag);
+      collection3.Get(id) = abslx::StrCat(i, " ", tag, " ", index_in_tag);
       ++i;
       ++index_in_tag;
     }
@@ -187,7 +187,7 @@ TEST(CollectionTest, StaticEmptyCollectionHeapCheck) {
 }
 
 template <typename T>
-absl::Status TestCollectionWithPointers(const std::vector<T>& original_values,
+abslx::Status TestCollectionWithPointers(const std::vector<T>& original_values,
                                         const T& inject1, const T& inject2) {
   std::shared_ptr<tool::TagMap> tag_map =
       tool::CreateTagMap({"TAG_A:a", "TAG_B:1:b", "TAG_A:2:c", "TAG_B:d",
@@ -455,7 +455,7 @@ absl::Status TestCollectionWithPointers(const std::vector<T>& original_values,
       ++i;
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 TEST(CollectionTest, TestCollectionWithPointersIntAndString) {

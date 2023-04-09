@@ -26,7 +26,7 @@ namespace gpu {
 namespace {
 std::string ToGlslType(const std::string& scalar_type,
                        const std::string& vec_type, int vec_size) {
-  return vec_size == 1 ? scalar_type : absl::StrCat(vec_type, vec_size);
+  return vec_size == 1 ? scalar_type : abslx::StrCat(vec_type, vec_size);
 }
 
 std::string GetGlslPrecisionModifier(DataType data_type) {

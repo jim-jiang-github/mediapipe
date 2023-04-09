@@ -31,17 +31,17 @@ constexpr char kInTag[] = "IN";
 
 class TestSinkCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Tag(kInTag).Set<mediapipe::InputOnlyProto>();
     cc->Outputs().Tag(kOutTag).Set<int>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     int x = cc->Inputs().Tag(kInTag).Get<mediapipe::InputOnlyProto>().x();
     cc->Outputs().Tag(kOutTag).AddPacket(
         MakePacket<int>(x).At(cc->InputTimestamp()));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(TestSinkCalculator);

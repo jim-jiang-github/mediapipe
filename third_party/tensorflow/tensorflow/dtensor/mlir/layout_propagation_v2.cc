@@ -187,7 +187,7 @@ void FilterkAnySpecs(std::vector<std::string>& proposed_specs) {
 // sharded over is not already sharded over by the producer, then we add that
 // sharding to the producer layout.
 StatusOr<Layout> MergeLayouts(
-    const absl::optional<Layout>& producer,
+    const abslx::optional<Layout>& producer,
     const mlir::DenseMap<mlir::OpOperand*, Layout>& consumers) {
   if (consumers.empty()) return producer.value();
 
@@ -229,7 +229,7 @@ StatusOr<Layout> MergeLayouts(
   }
 
   // Filter over-sharded specs.
-  absl::flat_hash_map<std::string, int> counter;
+  abslx::flat_hash_map<std::string, int> counter;
   for (const std::string& spec : proposed_specs) counter[spec] += 1;
   for (std::string& spec : proposed_specs)
     if (counter[spec] > 1) spec = Layout::kUnshardedDim;
@@ -287,7 +287,7 @@ StatusOr<Layout> MergeLayouts(
 
 mlir::LogicalResult InsertLayoutsForDTensorLayout(
     mlir::ModuleOp& module,
-    llvm::DenseMap<mlir::Value, absl::optional<Layout>>& producer_request,
+    llvm::DenseMap<mlir::Value, abslx::optional<Layout>>& producer_request,
     llvm::DenseSet<mlir::Value>& is_updated,
     llvm::DenseSet<mlir::Value>& is_locked) {
   return mlir::failure(
@@ -315,7 +315,7 @@ mlir::LogicalResult InsertInitialLayoutsFromComputeLayout(
     mlir::ModuleOp module,
     const llvm::DenseMap<mlir::Value, std::vector<mlir::OpOperand*>>& consumers,
     const llvm::DenseMap<mlir::OpOperand*, std::vector<mlir::Value>>& producers,
-    llvm::DenseMap<mlir::Value, absl::optional<Layout>>& producer_request,
+    llvm::DenseMap<mlir::Value, abslx::optional<Layout>>& producer_request,
     llvm::DenseMap<mlir::Value, mlir::DenseMap<mlir::OpOperand*, Layout>>&
         consumer_requests,
     llvm::DenseSet<mlir::Value>& is_updated) {
@@ -404,7 +404,7 @@ mlir::LogicalResult InsertInitialLayouts(
     const llvm::DenseMap<mlir::OpOperand*, std::vector<mlir::Value>>& producers,
     llvm::DenseMap<mlir::Value, mlir::DenseMap<mlir::OpOperand*, Layout>>&
         consumer_request,
-    llvm::DenseMap<mlir::Value, absl::optional<Layout>>& producer_request,
+    llvm::DenseMap<mlir::Value, abslx::optional<Layout>>& producer_request,
     llvm::DenseSet<mlir::Value>& is_updated,
     llvm::DenseSet<mlir::Value>& is_locked) {
   std::queue<mlir::Operation*> operations;
@@ -422,7 +422,7 @@ mlir::LogicalResult InsertInitialLayouts(
 mlir::LogicalResult MergeAndGetUpdatedLayouts(
     const llvm::DenseSet<mlir::Value>& is_locked,
     llvm::DenseSet<mlir::Value>& is_updated,
-    llvm::DenseMap<mlir::Value, absl::optional<Layout>>& producer_request,
+    llvm::DenseMap<mlir::Value, abslx::optional<Layout>>& producer_request,
     llvm::DenseMap<mlir::Value, mlir::DenseMap<mlir::OpOperand*, Layout>>&
         consumer_requests,
     llvm::DenseMap<mlir::Value, Layout>& merged_layouts) {
@@ -461,11 +461,11 @@ mlir::LogicalResult MergeAndGetUpdatedLayouts(
 // Finds the most sharded merged layout given `layouts`.
 mlir::LogicalResult GetMostShardedLayout(llvm::ArrayRef<Layout> layouts,
                                          mlir::Location location,
-                                         absl::optional<Layout>* out) {
+                                         abslx::optional<Layout>* out) {
   // If there are no layouts to merge, leave the output empty.
   if (layouts.empty()) return mlir::success();
 
-  absl::optional<Layout> layout;
+  abslx::optional<Layout> layout;
   std::map<std::string, std::set<int>> layout_map;
   for (const Layout& layout : layouts) {
     for (int i = 0; i < layout.rank(); ++i) {
@@ -528,10 +528,10 @@ mlir::LogicalResult GetMostShardedLayout(llvm::ArrayRef<Layout> layouts,
 mlir::LogicalResult MergeProducerLayouts(
     const llvm::DenseMap<mlir::Value, Layout>& merged_layouts,
     const std::vector<mlir::Value>& producer_values, mlir::Location location,
-    absl::optional<Layout>* layout_out) {
+    abslx::optional<Layout>* layout_out) {
   // If there is a single producer for mlir::Value, then return the layout
   // from the producer.
-  absl::optional<Layout> layout;
+  abslx::optional<Layout> layout;
   if (producer_values.size() == 1) {
     const auto it = merged_layouts.find(producer_values[0]);
     if (it != merged_layouts.end()) *layout_out = it->second;
@@ -561,7 +561,7 @@ mlir::LogicalResult UpdateLayoutsForOp(
     mlir::Operation* op,
     const llvm::DenseMap<mlir::OpOperand*, std::vector<mlir::Value>>& producers,
     const llvm::DenseMap<mlir::Value, Layout>& merged_layouts,
-    llvm::DenseMap<mlir::Value, absl::optional<Layout>>& producer_request,
+    llvm::DenseMap<mlir::Value, abslx::optional<Layout>>& producer_request,
     llvm::DenseMap<mlir::Value, mlir::DenseMap<mlir::OpOperand*, Layout>>&
         consumer_requests,
     llvm::DenseSet<mlir::Value>& is_updated) {
@@ -581,7 +581,7 @@ mlir::LogicalResult UpdateLayoutsForOp(
     if (producer_values == producers.end())
       return op->emitError() << "Unable to find producer for operand " << i;
 
-    absl::optional<Layout> layout;
+    abslx::optional<Layout> layout;
     if (mlir::failed(MergeProducerLayouts(merged_layouts,
                                           producer_values->getSecond(),
                                           op->getLoc(), &layout)))
@@ -980,7 +980,7 @@ void LogLayoutsAndOps(const int stage, const uint64_t module_hash,
     return;
   }
 
-  absl::StrAppend(&prefix, "/layout_propagation_v2_module_", module_hash,
+  abslx::StrAppend(&prefix, "/layout_propagation_v2_module_", module_hash,
                   "_stage_", stage, "_");
   if (!tensorflow::Env::Default()->CreateUniqueFileName(&prefix, ".mlir")) {
     LOG(WARNING) << "cannot create unique filename, won't dump MLIR module.";
@@ -1079,7 +1079,7 @@ mlir::LogicalResult InsertDTensorLayoutForIfRegionOp(
       std::set<Layout> layouts_set{layouts.begin(), layouts.end()};
       if (layouts_set.size() == 1) continue;
 
-      absl::optional<Layout> merged_layout;
+      abslx::optional<Layout> merged_layout;
       if (mlir::failed(
               GetMostShardedLayout(layouts, if_op.getLoc(), &merged_layout)))
         return mlir::failure();
@@ -1332,7 +1332,7 @@ void FindRootsAndEmitError(
 Status RunOneIteration(
     llvm::DenseSet<mlir::Value>& is_locked,
     llvm::DenseSet<mlir::Value>& is_updated,
-    llvm::DenseMap<mlir::Value, absl::optional<Layout>>& producer_request,
+    llvm::DenseMap<mlir::Value, abslx::optional<Layout>>& producer_request,
     llvm::DenseMap<mlir::Value, mlir::DenseMap<mlir::OpOperand*, Layout>>&
         consumer_requests,
     llvm::DenseMap<mlir::OpOperand*, std::vector<mlir::Value>>& producers,
@@ -1428,7 +1428,7 @@ struct DLayoutPropagationPassV2
     llvm::DenseMap<mlir::OpOperand*, std::vector<mlir::Value>> producers;
     // For each mlir::Value this is what the producer would like to have the
     // layout be.
-    llvm::DenseMap<mlir::Value, absl::optional<Layout>> producer_request;
+    llvm::DenseMap<mlir::Value, abslx::optional<Layout>> producer_request;
     // For each mlir::Value this is what the consumers would like to have the
     // layout be. Note the map is in 'parallel' to the consumers map above.
     llvm::DenseMap<mlir::Value, mlir::DenseMap<mlir::OpOperand*, Layout>>

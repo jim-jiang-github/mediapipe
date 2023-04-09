@@ -76,13 +76,13 @@ class GlScalerCalculator : public CalculatorBase {
   GlScalerCalculator() {}
   ~GlScalerCalculator();
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
-  absl::Status GlSetup();
-  absl::Status GlRender(const GlTexture& src, const GlTexture& dst);
+  abslx::Status GlSetup();
+  abslx::Status GlRender(const GlTexture& src, const GlTexture& dst);
   void GetOutputDimensions(int src_width, int src_height, int* dst_width,
                            int* dst_height);
   void GetOutputPadding(int src_width, int src_height, int dst_width,
@@ -108,7 +108,7 @@ class GlScalerCalculator : public CalculatorBase {
 REGISTER_CALCULATOR(GlScalerCalculator);
 
 // static
-absl::Status GlScalerCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status GlScalerCalculator::GetContract(CalculatorContract* cc) {
   if (cc->Inputs().HasTag(kImageTag)) {
     cc->Inputs().Tag(kImageTag).Set<Image>();
   } else {
@@ -145,10 +145,10 @@ absl::Status GlScalerCalculator::GetContract(CalculatorContract* cc) {
     cc->Outputs().Tag(kTopBottomPaddingTag).Set<float>();
     cc->Outputs().Tag(kLeftRightPaddingTag).Set<float>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GlScalerCalculator::Open(CalculatorContext* cc) {
+abslx::Status GlScalerCalculator::Open(CalculatorContext* cc) {
   // Inform the framework that we always output at the same timestamp
   // as we receive a packet at.
   cc->SetOffset(mediapipe::TimestampDiff(0));
@@ -200,14 +200,14 @@ absl::Status GlScalerCalculator::Open(CalculatorContext* cc) {
 
   MP_RETURN_IF_ERROR(FrameRotationFromInt(&rotation_, rotation_ccw));
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GlScalerCalculator::Process(CalculatorContext* cc) {
+abslx::Status GlScalerCalculator::Process(CalculatorContext* cc) {
   if (cc->Inputs().HasTag(kOutputDimensionsTag)) {
     if (cc->Inputs().Tag(kOutputDimensionsTag).IsEmpty()) {
       // OUTPUT_DIMENSIONS input stream is specified, but value is missing.
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     const auto& dimensions =
@@ -216,7 +216,7 @@ absl::Status GlScalerCalculator::Process(CalculatorContext* cc) {
     dst_height_ = dimensions[1];
   }
 
-  return helper_.RunInGlContext([this, cc]() -> absl::Status {
+  return helper_.RunInGlContext([this, cc]() -> abslx::Status {
     const auto& input =
         cc->Inputs().HasTag(kImageTag)
             ? cc->Inputs().Tag(kImageTag).Get<Image>().GetGpuBuffer()
@@ -229,7 +229,7 @@ absl::Status GlScalerCalculator::Process(CalculatorContext* cc) {
     if (input.format() == GpuBufferFormat::kBiPlanar420YpCbCr8VideoRange ||
         input.format() == GpuBufferFormat::kBiPlanar420YpCbCr8FullRange) {
       if (!yuv_renderer_) {
-        yuv_renderer_ = absl::make_unique<QuadRenderer>();
+        yuv_renderer_ = abslx::make_unique<QuadRenderer>();
         MP_RETURN_IF_ERROR(yuv_renderer_->GlSetup(
             kYUV2TexToRGBFragmentShader, {"video_frame_y", "video_frame_uv"}));
       }
@@ -243,7 +243,7 @@ absl::Status GlScalerCalculator::Process(CalculatorContext* cc) {
 #ifdef __ANDROID__
       if (src1.target() == GL_TEXTURE_EXTERNAL_OES) {
         if (!ext_rgb_renderer_) {
-          ext_rgb_renderer_ = absl::make_unique<QuadRenderer>();
+          ext_rgb_renderer_ = abslx::make_unique<QuadRenderer>();
           MP_RETURN_IF_ERROR(ext_rgb_renderer_->GlSetup(
               kBasicTexturedFragmentShaderOES, {"video_frame"}));
         }
@@ -252,7 +252,7 @@ absl::Status GlScalerCalculator::Process(CalculatorContext* cc) {
 #endif        // __ANDROID__
       {
         if (!rgb_renderer_) {
-          rgb_renderer_ = absl::make_unique<QuadRenderer>();
+          rgb_renderer_ = abslx::make_unique<QuadRenderer>();
           MP_RETURN_IF_ERROR(rgb_renderer_->GlSetup());
         }
         renderer = rgb_renderer_.get();
@@ -320,7 +320,7 @@ absl::Status GlScalerCalculator::Process(CalculatorContext* cc) {
           .Add(output.release(), cc->InputTimestamp());
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   });
 }
 

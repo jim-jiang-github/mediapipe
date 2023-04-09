@@ -20,8 +20,8 @@ limitations under the License.
 
 namespace xla {
 
-bool IsPermutation(absl::Span<const int64_t> permutation) {
-  absl::InlinedVector<bool, 8> seen(permutation.size(), false);
+bool IsPermutation(abslx::Span<const int64_t> permutation) {
+  abslx::InlinedVector<bool, 8> seen(permutation.size(), false);
   for (int64_t p : permutation) {
     if (p < 0 || p >= permutation.size() || seen[p]) {
       return false;
@@ -32,7 +32,7 @@ bool IsPermutation(absl::Span<const int64_t> permutation) {
 }
 
 std::vector<int64_t> InversePermutation(
-    absl::Span<const int64_t> input_permutation) {
+    abslx::Span<const int64_t> input_permutation) {
   DCHECK(IsPermutation(input_permutation));
   std::vector<int64_t> output_permutation(input_permutation.size(), -1);
   for (size_t i = 0; i < input_permutation.size(); ++i) {
@@ -41,8 +41,8 @@ std::vector<int64_t> InversePermutation(
   return output_permutation;
 }
 
-std::vector<int64_t> ComposePermutations(absl::Span<const int64_t> p1,
-                                         absl::Span<const int64_t> p2) {
+std::vector<int64_t> ComposePermutations(abslx::Span<const int64_t> p1,
+                                         abslx::Span<const int64_t> p2) {
   CHECK_EQ(p1.size(), p2.size());
   std::vector<int64_t> output;
   output.reserve(p1.size());
@@ -52,7 +52,7 @@ std::vector<int64_t> ComposePermutations(absl::Span<const int64_t> p1,
   return output;
 }
 
-bool IsIdentityPermutation(absl::Span<const int64_t> permutation) {
+bool IsIdentityPermutation(abslx::Span<const int64_t> permutation) {
   for (int64_t i = 0; i < permutation.size(); ++i) {
     if (permutation[i] != i) {
       return false;

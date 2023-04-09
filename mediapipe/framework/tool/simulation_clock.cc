@@ -25,22 +25,22 @@ SimulationClock::~SimulationClock() {
   ThreadFinish();
 }
 
-absl::Time SimulationClock::TimeNow() {
-  absl::MutexLock l(&time_mutex_);
+abslx::Time SimulationClock::TimeNow() {
+  abslx::MutexLock l(&time_mutex_);
   return time_;
 }
 
-void SimulationClock::Sleep(absl::Duration d) {
-  absl::MutexLock l(&time_mutex_);
+void SimulationClock::Sleep(abslx::Duration d) {
+  abslx::MutexLock l(&time_mutex_);
   SleepInternal(time_ + d);
 }
 
-void SimulationClock::SleepUntil(absl::Time wakeup_time) {
-  absl::MutexLock l(&time_mutex_);
+void SimulationClock::SleepUntil(abslx::Time wakeup_time) {
+  abslx::MutexLock l(&time_mutex_);
   SleepInternal(wakeup_time);
 }
 
-void SimulationClock::SleepInternal(absl::Time wakeup_time) {
+void SimulationClock::SleepInternal(abslx::Time wakeup_time) {
   Waiter waiter;
   waiters_.insert({wakeup_time, &waiter});
   num_running_--;
@@ -52,20 +52,20 @@ void SimulationClock::SleepInternal(absl::Time wakeup_time) {
 }
 
 void SimulationClock::ThreadStart() {
-  absl::MutexLock l(&time_mutex_);
+  abslx::MutexLock l(&time_mutex_);
   num_running_++;
 }
 
 void SimulationClock::ThreadFinish() {
-  absl::MutexLock l(&time_mutex_);
+  abslx::MutexLock l(&time_mutex_);
   num_running_--;
   TryAdvanceTime();
 }
 
 void SimulationClock::TryAdvanceTime() {
   if (num_running_ == 0 && !waiters_.empty()) {
-    VLOG(2) << "Advance time from: " << absl::ToUnixMicros(time_)
-            << " to: " << absl::ToUnixMicros(waiters_.begin()->first);
+    VLOG(2) << "Advance time from: " << abslx::ToUnixMicros(time_)
+            << " to: " << abslx::ToUnixMicros(waiters_.begin()->first);
     time_ = waiters_.begin()->first;
     Waiter* waiter = waiters_.begin()->second;
     waiters_.erase(waiters_.begin());

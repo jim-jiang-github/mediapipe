@@ -30,47 +30,47 @@
 namespace {
 using String = std::string;
 using VectorOfStrings = std::vector<std::string>;
-using AbslDuration = absl::Duration;
+using AbslDuration = abslx::Duration;
 
-// We do not want to take over marshalling for the types absl::optional<int>,
-// absl::optional<std::string> which we do not own. Instead we introduce unique
+// We do not want to take over marshalling for the types abslx::optional<int>,
+// abslx::optional<std::string> which we do not own. Instead we introduce unique
 // "aliases" to these types, which we do.
-using AbslOptionalInt = absl::optional<int>;
+using AbslOptionalInt = abslx::optional<int>;
 struct OptionalInt : AbslOptionalInt {
   using AbslOptionalInt::AbslOptionalInt;
 };
 // Next two functions represent Abseil Flags marshalling for OptionalInt.
-bool AbslParseFlag(absl::string_view src, OptionalInt* flag,
+bool AbslParseFlag(abslx::string_view src, OptionalInt* flag,
                    std::string* error) {
   int val;
   if (src.empty())
     flag->reset();
-  else if (!absl::ParseFlag(src, &val, error))
+  else if (!abslx::ParseFlag(src, &val, error))
     return false;
   *flag = val;
   return true;
 }
 std::string AbslUnparseFlag(const OptionalInt& flag) {
-  return !flag ? "" : absl::UnparseFlag(*flag);
+  return !flag ? "" : abslx::UnparseFlag(*flag);
 }
 
-using AbslOptionalString = absl::optional<std::string>;
+using AbslOptionalString = abslx::optional<std::string>;
 struct OptionalString : AbslOptionalString {
   using AbslOptionalString::AbslOptionalString;
 };
 // Next two functions represent Abseil Flags marshalling for OptionalString.
-bool AbslParseFlag(absl::string_view src, OptionalString* flag,
+bool AbslParseFlag(abslx::string_view src, OptionalString* flag,
                    std::string* error) {
   std::string val;
   if (src.empty())
     flag->reset();
-  else if (!absl::ParseFlag(src, &val, error))
+  else if (!abslx::ParseFlag(src, &val, error))
     return false;
   *flag = val;
   return true;
 }
 std::string AbslUnparseFlag(const OptionalString& flag) {
-  return !flag ? "" : absl::UnparseFlag(*flag);
+  return !flag ? "" : abslx::UnparseFlag(*flag);
 }
 
 struct UDT {
@@ -79,7 +79,7 @@ struct UDT {
   UDT& operator=(const UDT&) { return *this; }
 };
 // Next two functions represent Abseil Flags marshalling for UDT.
-bool AbslParseFlag(absl::string_view, UDT*, std::string*) { return true; }
+bool AbslParseFlag(abslx::string_view, UDT*, std::string*) { return true; }
 std::string AbslUnparseFlag(const UDT&) { return ""; }
 
 }  // namespace
@@ -136,7 +136,7 @@ namespace {
 #define BM_GetFlag(T)                                            \
   void BM_GetFlag_##T(benchmark::State& state) {                 \
     for (auto _ : state) {                                       \
-      benchmark::DoNotOptimize(absl::GetFlag(FLAGS_##T##_flag)); \
+      benchmark::DoNotOptimize(abslx::GetFlag(FLAGS_##T##_flag)); \
     }                                                            \
   }                                                              \
   BENCHMARK(BM_GetFlag_##T)->ThreadRange(1, 16);
@@ -148,11 +148,11 @@ void BM_ThreadedFindCommandLineFlag(benchmark::State& state) {
   char* argv[] = {dummy};
   // We need to ensure that flags have been parsed. That is where the registry
   // is finalized.
-  absl::ParseCommandLine(1, argv);
+  abslx::ParseCommandLine(1, argv);
 
   for (auto s : state) {
     benchmark::DoNotOptimize(
-        absl::FindCommandLineFlag("bloat_flag_010101010101"));
+        abslx::FindCommandLineFlag("bloat_flag_010101010101"));
   }
 }
 BENCHMARK(BM_ThreadedFindCommandLineFlag)->ThreadRange(1, 16);
@@ -160,7 +160,7 @@ BENCHMARK(BM_ThreadedFindCommandLineFlag)->ThreadRange(1, 16);
 }  // namespace
 
 #define InvokeGetFlag(T)                                               \
-  T AbslInvokeGetFlag##T() { return absl::GetFlag(FLAGS_##T##_flag); } \
+  T AbslInvokeGetFlag##T() { return abslx::GetFlag(FLAGS_##T##_flag); } \
   int odr##T = (benchmark::DoNotOptimize(AbslInvokeGetFlag##T), 1);
 
 BENCHMARKED_TYPES(InvokeGetFlag)

@@ -282,17 +282,17 @@ Status GpuLayoutAssignment::AddBackendConstraints(
       // dimensions and likewise for the contracting and non-contracting
       // dimensions. Additionally, no batch dimension can be in the most
       // minor physical dimension for inputs or the output.
-      absl::Span<const int64_t> lhs_batch_dims =
+      abslx::Span<const int64_t> lhs_batch_dims =
           dot_dims.lhs_batch_dimensions();
-      absl::Span<const int64_t> lhs_col_dims =
+      abslx::Span<const int64_t> lhs_col_dims =
           dot_dims.lhs_contracting_dimensions();
       TF_ASSIGN_OR_RETURN(
           std::vector<int64_t> lhs_row_dims,
           GetNonContractingDims(lhs_shape, lhs_batch_dims, lhs_col_dims));
 
-      absl::Span<const int64_t> rhs_batch_dims =
+      abslx::Span<const int64_t> rhs_batch_dims =
           dot_dims.rhs_batch_dimensions();
-      absl::Span<const int64_t> rhs_row_dims =
+      abslx::Span<const int64_t> rhs_row_dims =
           dot_dims.rhs_contracting_dimensions();
       TF_ASSIGN_OR_RETURN(
           std::vector<int64_t> rhs_col_dims,
@@ -413,8 +413,8 @@ Status GpuLayoutAssignment::AddBackendConstraints(
 
 Status GpuLayoutAssignment::SetDotOperandLayout(
     const HloInstruction* instruction, int64_t operand,
-    absl::Span<const int64_t> batch_dims, absl::Span<const int64_t> row_dims,
-    absl::Span<const int64_t> col_dims) {
+    abslx::Span<const int64_t> batch_dims, abslx::Span<const int64_t> row_dims,
+    abslx::Span<const int64_t> col_dims) {
   Shape shape = instruction->operand(operand)->shape();
 
   // First, try to use the existing layout, if present.
@@ -435,8 +435,8 @@ Status GpuLayoutAssignment::SetDotOperandLayout(
 
 Status GpuLayoutAssignment::SetOperandBatchRowsColsLayout(
     const HloInstruction* instruction, int64_t operand,
-    absl::Span<const int64_t> batch_dims, absl::Span<const int64_t> row_dims,
-    absl::Span<const int64_t> col_dims) {
+    abslx::Span<const int64_t> batch_dims, abslx::Span<const int64_t> row_dims,
+    abslx::Span<const int64_t> col_dims) {
   std::vector<int64_t> major_to_minor;
   major_to_minor.reserve(batch_dims.size() + row_dims.size() + col_dims.size());
   major_to_minor.insert(major_to_minor.end(), batch_dims.begin(),

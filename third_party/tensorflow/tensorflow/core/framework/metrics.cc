@@ -378,7 +378,7 @@ void RecordTFDataServiceClientIterators(
   const std::string coordinated_read_str =
       is_coordinated_read ? "true" : "false";
   tf_data_service_client_iterators_counter
-      ->GetCell(absl::StrCat(worker_uid), deployment_mode_str,
+      ->GetCell(abslx::StrCat(worker_uid), deployment_mode_str,
                 sharding_policy_str, coordinated_read_str)
       ->IncrementBy(1);
 }
@@ -451,7 +451,7 @@ void RecordGraphOutputTensors(const size_t size) {
 }
 
 void RecordTPUXlaSpmdCoresPerReplica(int64_t cores_per_replica) {
-  xla_tpu_spmd_cores_per_replica->GetCell(absl::StrCat(cores_per_replica))
+  xla_tpu_spmd_cores_per_replica->GetCell(abslx::StrCat(cores_per_replica))
       ->IncrementBy(1);
 }
 

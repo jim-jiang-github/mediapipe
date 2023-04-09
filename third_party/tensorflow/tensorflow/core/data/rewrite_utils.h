@@ -44,8 +44,8 @@ namespace tensorflow {
 namespace data {
 
 RewriterConfig CreateRewriterConfig(
-    const absl::flat_hash_set<tstring>& optimizations,
-    const absl::flat_hash_set<tstring>& optimizations_configs);
+    const abslx::flat_hash_set<tstring>& optimizations,
+    const abslx::flat_hash_set<tstring>& optimizations_configs);
 
 // Rewrites the input dataset using the given config. The rewritten_input
 // stored in the core::RefCountPtr<DatasetBase>* output parameter is owned.
@@ -77,11 +77,11 @@ StatusOr<NodeDef> GetDatasetNodeDef(const GraphDef& graph_def);
 // default optimization that are not explicitly disabled, and any experiment
 // that corresponds to an optimization as long as the optimization is not
 // explicitly disabled.
-absl::flat_hash_set<tstring> SelectOptimizations(
-    const absl::flat_hash_set<string>& experiments,
-    const absl::flat_hash_set<tstring>& optimizations_enabled,
-    const absl::flat_hash_set<tstring>& optimizations_disabled,
-    const absl::flat_hash_set<tstring>& optimizations_default);
+abslx::flat_hash_set<tstring> SelectOptimizations(
+    const abslx::flat_hash_set<string>& experiments,
+    const abslx::flat_hash_set<tstring>& optimizations_enabled,
+    const abslx::flat_hash_set<tstring>& optimizations_disabled,
+    const abslx::flat_hash_set<tstring>& optimizations_default);
 
 }  // namespace data
 }  // namespace tensorflow

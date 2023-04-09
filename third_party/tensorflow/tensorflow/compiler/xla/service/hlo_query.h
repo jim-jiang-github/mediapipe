@@ -52,7 +52,7 @@ bool IsScalarConstant(const HloInstruction* instruction);
 // the given opcodes.  Checks both comp's instructions and the instructions of
 // any computations nested within it.
 bool ContainsInstrWithOpcode(const HloComputation* comp,
-                             const absl::flat_hash_set<HloOpcode>& opcodes);
+                             const abslx::flat_hash_set<HloOpcode>& opcodes);
 
 // Returns an operand of an instruction with the given opcode. If there are
 // multiple matching operands, then the first matching operand is returned. If

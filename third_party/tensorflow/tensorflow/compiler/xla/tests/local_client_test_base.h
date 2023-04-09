@@ -62,7 +62,7 @@ class TestAllocator : public se::StreamExecutorMemoryAllocator {
   int64_t deallocation_count(int device_ordinal) const;
 
  private:
-  mutable absl::Mutex count_mutex_;
+  mutable abslx::Mutex count_mutex_;
 
   // Global counts of allocations and deallocations.
   int64_t allocation_count_ ABSL_GUARDED_BY(count_mutex_) = 0;
@@ -96,27 +96,27 @@ class LocalClientTestBase : public ManifestCheckingTest {
   // options.
   StatusOr<ScopedShapedBuffer> ExecuteLocally(
       const XlaComputation& computation,
-      absl::Span<const ShapedBuffer* const> arguments);
+      abslx::Span<const ShapedBuffer* const> arguments);
   StatusOr<ScopedShapedBuffer> ExecuteLocally(
       const XlaComputation& computation,
-      absl::Span<const ShapedBuffer* const> arguments,
+      abslx::Span<const ShapedBuffer* const> arguments,
       const ExecutableBuildOptions& build_options,
       const ExecutableRunOptions& run_options);
 
   ScopedShapedBuffer ExecuteLocallyOrDie(
       const XlaComputation& computation,
-      absl::Span<const ShapedBuffer* const> arguments);
+      abslx::Span<const ShapedBuffer* const> arguments);
   ScopedShapedBuffer ExecuteLocallyOrDie(
       const XlaComputation& computation,
-      absl::Span<const ShapedBuffer* const> arguments,
+      abslx::Span<const ShapedBuffer* const> arguments,
       const ExecutableBuildOptions& build_options,
       const ExecutableRunOptions& run_options);
 
   // Parses the given string and returns module as a VerifiedHloModule.
   StatusOr<std::unique_ptr<VerifiedHloModule>> ParseAndReturnVerifiedModule(
-      absl::string_view hlo_text);
+      abslx::string_view hlo_text);
   StatusOr<std::unique_ptr<VerifiedHloModule>> ParseAndReturnVerifiedModule(
-      absl::string_view hlo_text, const HloModuleConfig& config);
+      abslx::string_view hlo_text, const HloModuleConfig& config);
 
   // Returns a default set of execute options.
   ExecutableBuildOptions DefaultExecutableBuildOptions() const;

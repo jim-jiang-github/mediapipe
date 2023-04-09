@@ -83,7 +83,7 @@ constexpr char kTensorsTag[] = "TENSORS";
 // }
 class TextClassifierGraph : public core::ModelTaskGraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     ASSIGN_OR_RETURN(
         const ModelResources* model_resources,
@@ -109,7 +109,7 @@ class TextClassifierGraph : public core::ModelTaskGraph {
   //   TextClassifier model file with model metadata.
   // text_in: (std::string) stream to run text classification on.
   // graph: the mediapipe builder::Graph instance to be updated.
-  absl::StatusOr<Source<ClassificationResult>> BuildTextClassifierTask(
+  abslx::StatusOr<Source<ClassificationResult>> BuildTextClassifierTask(
       const proto::TextClassifierGraphOptions& task_options,
       const ModelResources& model_resources, Source<std::string> text_in,
       Graph& graph) {

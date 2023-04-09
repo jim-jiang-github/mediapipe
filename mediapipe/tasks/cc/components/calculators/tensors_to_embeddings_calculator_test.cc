@@ -64,7 +64,7 @@ TEST(TensorsToEmbeddingsCalculatorTest, FailsWithInvalidHeadNamesNumber) {
   BuildGraph(&runner, {{0.1, 0.2}, {0.2, 0.3}});
   auto status = runner.Run();
 
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(),
               HasSubstr("Mismatch between number of provided head names"));
 }

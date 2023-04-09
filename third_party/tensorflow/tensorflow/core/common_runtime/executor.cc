@@ -353,7 +353,7 @@ class ExecutorState {
   int64_t step_id_;
   int64_t start_time_usecs_ = 0;
   // The deadline for the session to complete by. Empty if unspecified.
-  absl::optional<absl::Time> deadline_;
+  abslx::optional<abslx::Time> deadline_;
 
   // Not owned.
   RendezvousInterface* rendezvous_;
@@ -376,7 +376,7 @@ class ExecutorState {
   ExecutorImpl::KernelStats* const kernel_stats_;
   CancellationManager* cancellation_manager_;
   CoordinationServiceAgent* coordination_service_agent_;
-  absl::optional<ManagedStackTrace> stack_trace_ = absl::nullopt;
+  abslx::optional<ManagedStackTrace> stack_trace_ = abslx::nullopt;
   // If not null, use this device to schedule intra-op operation
   std::unique_ptr<DeviceBase> user_device_;
   Executor::Args::Runner runner_;
@@ -778,9 +778,9 @@ void ExecutorState<PropagatorStateType>::Process(TaggedNode tagged_node,
                   activity_watcher::Activity::Attributes{
                       {"node_name", item.kernel->def().name()},
                       {"op", item.kernel->def().op()},
-                      {"iter_num", absl::StrCat(tagged_node.get_iter_num())},
-                      {"step_id", absl::StrCat(params.step_id)},
-                      {"node_id", absl::StrCat(id)},
+                      {"iter_num", abslx::StrCat(tagged_node.get_iter_num())},
+                      {"step_id", abslx::StrCat(params.step_id)},
+                      {"node_id", abslx::StrCat(id)},
                       {"device", device->name()},
                   });
             },

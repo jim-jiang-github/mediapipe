@@ -55,19 +55,19 @@ bool IsApplyMaskSupported(const NodeShader::GenerationContext& ctx) {
          ctx.input_shapes[0][3] == ctx.input_shapes[1][3];
 }
 
-absl::Status GenerateApplyMaskCode(const NodeShader::GenerationContext& ctx,
+abslx::Status GenerateApplyMaskCode(const NodeShader::GenerationContext& ctx,
                                    GeneratedCode* generated_code) {
   std::string source = "value_0 = $input_data_0[gid.x, gid.y, gid.z]$ * ";
   if (ctx.input_shapes[1][3] == 1) {
     // [H, W, C] x [H, W, 0][0]
-    absl::StrAppend(&source, "$input_data_1[gid.x, gid.y, 0]$.x;");
+    abslx::StrAppend(&source, "$input_data_1[gid.x, gid.y, 0]$.x;");
   } else if (ctx.input_shapes[0][1] == ctx.input_shapes[1][1] &&
              ctx.input_shapes[0][2] == ctx.input_shapes[1][2]) {
     // [H, W, C] x [H, W, C]
-    absl::StrAppend(&source, "$input_data_1[gid.x, gid.y, gid.z]$;");
+    abslx::StrAppend(&source, "$input_data_1[gid.x, gid.y, gid.z]$;");
   } else {
     // [H, W, C] x [0, 0, C]
-    absl::StrAppend(&source, "$input_data_1[0, 0, gid.z]$;");
+    abslx::StrAppend(&source, "$input_data_1[0, 0, gid.z]$;");
   }
 
   *generated_code = {
@@ -80,10 +80,10 @@ absl::Status GenerateApplyMaskCode(const NodeShader::GenerationContext& ctx,
       /*input=*/IOStructure::ONLY_DEFINITIONS,
       /*output=*/IOStructure::AUTO,
   };
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GenerateMultiplyScalarCode(
+abslx::Status GenerateMultiplyScalarCode(
     const NodeShader::GenerationContext& ctx, GeneratedCode* generated_code) {
   const auto& attr = std::any_cast<const ElementwiseAttributes&>(ctx.op_attr);
 
@@ -98,7 +98,7 @@ absl::Status GenerateMultiplyScalarCode(
         /*input=*/IOStructure::AUTO,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   if (std::holds_alternative<Tensor<Linear, DataType::FLOAT32>>(attr.param)) {
@@ -119,7 +119,7 @@ absl::Status GenerateMultiplyScalarCode(
         /*input=*/IOStructure::AUTO,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   if (std::holds_alternative<Tensor<HWC, DataType::FLOAT32>>(attr.param)) {
@@ -144,15 +144,15 @@ absl::Status GenerateMultiplyScalarCode(
         /*input=*/IOStructure::AUTO,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  return absl::InvalidArgumentError("Unsupported Multiplication case.");
+  return abslx::InvalidArgumentError("Unsupported Multiplication case.");
 }
 
 class Multiply : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     if (IsApplyMaskSupported(ctx)) {
       return GenerateApplyMaskCode(ctx, generated_code);

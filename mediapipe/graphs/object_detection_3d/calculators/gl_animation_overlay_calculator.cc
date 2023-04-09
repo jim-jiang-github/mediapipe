@@ -128,10 +128,10 @@ class GlAnimationOverlayCalculator : public CalculatorBase {
   GlAnimationOverlayCalculator() {}
   ~GlAnimationOverlayCalculator();
 
-  static absl::Status GetContract(CalculatorContract *cc);
+  static abslx::Status GetContract(CalculatorContract *cc);
 
-  absl::Status Open(CalculatorContext *cc) override;
-  absl::Status Process(CalculatorContext *cc) override;
+  abslx::Status Open(CalculatorContext *cc) override;
+  abslx::Status Process(CalculatorContext *cc) override;
 
  private:
   bool has_video_stream_ = false;
@@ -171,10 +171,10 @@ class GlAnimationOverlayCalculator : public CalculatorBase {
       float *vertical_fov_degrees);
 
   int GetAnimationFrameIndex(Timestamp timestamp);
-  absl::Status GlSetup();
-  absl::Status GlBind(const TriangleMesh &triangle_mesh,
+  abslx::Status GlSetup();
+  abslx::Status GlBind(const TriangleMesh &triangle_mesh,
                       const GlTexture &texture);
-  absl::Status GlRender(const TriangleMesh &triangle_mesh,
+  abslx::Status GlRender(const TriangleMesh &triangle_mesh,
                         const float *model_matrix);
   void InitializePerspectiveMatrix(float aspect_ratio,
                                    float vertical_fov_degrees, float z_near,
@@ -198,7 +198,7 @@ class GlAnimationOverlayCalculator : public CalculatorBase {
 REGISTER_CALCULATOR(GlAnimationOverlayCalculator);
 
 // static
-absl::Status GlAnimationOverlayCalculator::GetContract(CalculatorContract *cc) {
+abslx::Status GlAnimationOverlayCalculator::GetContract(CalculatorContract *cc) {
   MP_RETURN_IF_ERROR(
       GlCalculatorHelper::SetupInputSidePackets(&(cc->InputSidePackets())));
   if (cc->Inputs().HasTag("VIDEO")) {
@@ -235,7 +235,7 @@ absl::Status GlAnimationOverlayCalculator::GetContract(CalculatorContract *cc) {
     cc->InputSidePackets().Tag("MASK_ASSET").Set<std::string>();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void GlAnimationOverlayCalculator::CalculateTriangleMeshNormals(
@@ -514,7 +514,7 @@ void GlAnimationOverlayCalculator::ComputeAspectRatioAndFovFromCameraParameters(
       std::atan(camera_parameters.portrait_height() * 0.5f) * 2 * 180 / M_PI;
 }
 
-absl::Status GlAnimationOverlayCalculator::Open(CalculatorContext *cc) {
+abslx::Status GlAnimationOverlayCalculator::Open(CalculatorContext *cc) {
   cc->SetOffset(TimestampDiff(0));
   MP_RETURN_IF_ERROR(helper_.Open(cc));
 
@@ -561,7 +561,7 @@ absl::Status GlAnimationOverlayCalculator::Open(CalculatorContext *cc) {
     loaded_animation = LoadAnimationAndroid(mask_asset_name, &mask_meshes_);
     if (!loaded_animation) {
       LOG(ERROR) << "Failed to load mask asset.";
-      return absl::UnknownError("Failed to load mask asset.");
+      return abslx::UnknownError("Failed to load mask asset.");
     }
   }
   loaded_animation = LoadAnimationAndroid(asset_name, &triangle_meshes_);
@@ -570,10 +570,10 @@ absl::Status GlAnimationOverlayCalculator::Open(CalculatorContext *cc) {
 #endif
   if (!loaded_animation) {
     LOG(ERROR) << "Failed to load animation asset.";
-    return absl::UnknownError("Failed to load animation asset.");
+    return abslx::UnknownError("Failed to load animation asset.");
   }
 
-  return helper_.RunInGlContext([this, &cc]() -> absl::Status {
+  return helper_.RunInGlContext([this, &cc]() -> abslx::Status {
     if (cc->InputSidePackets().HasTag("MASK_TEXTURE")) {
       const auto &mask_texture =
           cc->InputSidePackets().Tag("MASK_TEXTURE").Get<AssetTextureFormat>();
@@ -590,7 +590,7 @@ absl::Status GlAnimationOverlayCalculator::Open(CalculatorContext *cc) {
     VLOG(2) << "Input texture size: " << texture_.width() << ", "
             << texture_.height() << std::endl;
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   });
 }
 
@@ -623,8 +623,8 @@ void GlAnimationOverlayCalculator::LoadModelMatrices(
   }
 }
 
-absl::Status GlAnimationOverlayCalculator::Process(CalculatorContext *cc) {
-  return helper_.RunInGlContext([this, &cc]() -> absl::Status {
+abslx::Status GlAnimationOverlayCalculator::Process(CalculatorContext *cc) {
+  return helper_.RunInGlContext([this, &cc]() -> abslx::Status {
     if (!initialized_) {
       MP_RETURN_IF_ERROR(GlSetup());
       initialized_ = true;
@@ -677,7 +677,7 @@ absl::Status GlAnimationOverlayCalculator::Process(CalculatorContext *cc) {
       dst = helper_.CreateDestinationTexture(width, height);
     } else {
       // We have an input video stream, but not for this frame. Don't render!
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     helper_.BindFramebuffer(dst);
 
@@ -757,11 +757,11 @@ absl::Status GlAnimationOverlayCalculator::Process(CalculatorContext *cc) {
     TagOrIndex(&(cc->Outputs()), "OUTPUT", 0)
         .Add(output.release(), cc->InputTimestamp());
     GLCHECK(glFrontFace(GL_CCW));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   });
 }
 
-absl::Status GlAnimationOverlayCalculator::GlSetup() {
+abslx::Status GlAnimationOverlayCalculator::GlSetup() {
   // Load vertex and fragment shaders
   const GLint attr_location[NUM_ATTRIBUTES] = {
       ATTRIB_VERTEX,
@@ -879,10 +879,10 @@ absl::Status GlAnimationOverlayCalculator::GlSetup() {
       GLCHECK(glGetUniformLocation(program_, "perspectiveMatrix"));
   model_matrix_uniform_ =
       GLCHECK(glGetUniformLocation(program_, "modelMatrix"));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GlAnimationOverlayCalculator::GlBind(
+abslx::Status GlAnimationOverlayCalculator::GlBind(
     const TriangleMesh &triangle_mesh, const GlTexture &texture) {
   GLCHECK(glUseProgram(program_));
 
@@ -913,16 +913,16 @@ absl::Status GlAnimationOverlayCalculator::GlBind(
 
   GLCHECK(glUniformMatrix4fv(perspective_matrix_uniform_, 1, GL_FALSE,
                              perspective_matrix_));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GlAnimationOverlayCalculator::GlRender(
+abslx::Status GlAnimationOverlayCalculator::GlRender(
     const TriangleMesh &triangle_mesh, const float *model_matrix) {
   GLCHECK(glUniformMatrix4fv(model_matrix_uniform_, 1, GL_FALSE, model_matrix));
   GLCHECK(glDrawElements(GL_TRIANGLES, triangle_mesh.index_count,
                          GL_UNSIGNED_SHORT,
                          triangle_mesh.triangle_indices.get()));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 GlAnimationOverlayCalculator::~GlAnimationOverlayCalculator() {

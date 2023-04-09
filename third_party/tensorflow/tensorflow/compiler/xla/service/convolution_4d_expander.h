@@ -25,7 +25,7 @@ namespace xla {
 
 class Convolution4DExpander : public OpExpanderPass {
  public:
-  absl::string_view name() const override { return "convolution_4d_expander"; }
+  abslx::string_view name() const override { return "convolution_4d_expander"; }
 
  protected:
   bool InstructionMatchesPattern(HloInstruction* instruction) override;

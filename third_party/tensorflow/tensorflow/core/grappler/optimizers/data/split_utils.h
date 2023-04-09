@@ -66,7 +66,7 @@ struct SplitResults {
 // Unimplemented statuses without returning the error to its caller.
 StatusOr<SplitResults> SplitFunction(
     const FunctionDef& function,
-    const absl::flat_hash_set<absl::string_view>& nodes_in_first_function,
+    const abslx::flat_hash_set<abslx::string_view>& nodes_in_first_function,
     int64_t num_captured_inputs, const FunctionLibraryDefinition& library);
 
 }  // namespace split_utils

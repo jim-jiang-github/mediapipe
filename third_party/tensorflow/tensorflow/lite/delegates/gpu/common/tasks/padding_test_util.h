@@ -22,16 +22,16 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status PaddingAppendWidthTest(TestExecutionEnvironment* env);
-absl::Status PaddingPrependWidthTest(TestExecutionEnvironment* env);
-absl::Status PaddingAppendHeightTest(TestExecutionEnvironment* env);
-absl::Status PaddingPrependHeightTest(TestExecutionEnvironment* env);
-absl::Status PaddingAppendChannelsTest(TestExecutionEnvironment* env);
-absl::Status PaddingPrependChannelsTest(TestExecutionEnvironment* env);
-absl::Status PaddingPrependChannelsX4Test(TestExecutionEnvironment* env);
-absl::Status PaddingComplexTest(TestExecutionEnvironment* env);
-absl::Status PaddingReflectWidthTest(TestExecutionEnvironment* env);
-absl::Status PaddingReflectChannelsTest(TestExecutionEnvironment* env);
+abslx::Status PaddingAppendWidthTest(TestExecutionEnvironment* env);
+abslx::Status PaddingPrependWidthTest(TestExecutionEnvironment* env);
+abslx::Status PaddingAppendHeightTest(TestExecutionEnvironment* env);
+abslx::Status PaddingPrependHeightTest(TestExecutionEnvironment* env);
+abslx::Status PaddingAppendChannelsTest(TestExecutionEnvironment* env);
+abslx::Status PaddingPrependChannelsTest(TestExecutionEnvironment* env);
+abslx::Status PaddingPrependChannelsX4Test(TestExecutionEnvironment* env);
+abslx::Status PaddingComplexTest(TestExecutionEnvironment* env);
+abslx::Status PaddingReflectWidthTest(TestExecutionEnvironment* env);
+abslx::Status PaddingReflectChannelsTest(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

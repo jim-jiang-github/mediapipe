@@ -30,7 +30,7 @@ class ComparisonExpander : public OpExpanderPass {
  public:
   explicit ComparisonExpander() = default;
   ~ComparisonExpander() override = default;
-  absl::string_view name() const override { return "comparison-expander"; }
+  abslx::string_view name() const override { return "comparison-expander"; }
 
  private:
   // Returns `true` if `instruction` should be expanded by this pass.

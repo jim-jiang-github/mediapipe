@@ -122,38 +122,38 @@ struct PostProcessingSpecs {
   // default value.
   float score_threshold;
   // Set of category indices to be allowed/denied.
-  absl::flat_hash_set<int> allow_or_deny_categories;
+  abslx::flat_hash_set<int> allow_or_deny_categories;
   // Indicates `allow_or_deny_categories` is an allowlist or a denylist.
   bool is_allowlist;
   // Score calibration options, if any.
   std::optional<ScoreCalibrationCalculatorOptions> score_calibration_options;
 };
 
-absl::Status SanityCheckOptions(const ObjectDetectorOptionsProto& options) {
+abslx::Status SanityCheckOptions(const ObjectDetectorOptionsProto& options) {
   if (options.max_results() == 0) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "Invalid `max_results` option: value must be != 0",
         MediaPipeTasksStatus::kInvalidArgumentError);
   }
   if (options.category_allowlist_size() > 0 &&
       options.category_denylist_size() > 0) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "`category_allowlist` and `category_denylist` are mutually "
         "exclusive options.",
         MediaPipeTasksStatus::kInvalidArgumentError);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::StatusOr<const BoundingBoxProperties*> GetBoundingBoxProperties(
+abslx::StatusOr<const BoundingBoxProperties*> GetBoundingBoxProperties(
     const TensorMetadata& tensor_metadata) {
   if (tensor_metadata.content() == nullptr ||
       tensor_metadata.content()->content_properties() == nullptr) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat(
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrFormat(
             "Expected BoundingBoxProperties for tensor %s, found none.",
             tensor_metadata.name() ? tensor_metadata.name()->str() : "#0"),
         MediaPipeTasksStatus::kMetadataInvalidContentPropertiesError);
@@ -162,8 +162,8 @@ absl::StatusOr<const BoundingBoxProperties*> GetBoundingBoxProperties(
   ContentProperties type = tensor_metadata.content()->content_properties_type();
   if (type != ContentProperties_BoundingBoxProperties) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat(
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrFormat(
             "Expected BoundingBoxProperties for tensor %s, found %s.",
             tensor_metadata.name() ? tensor_metadata.name()->str() : "#0",
             EnumNameContentProperties(type)),
@@ -176,8 +176,8 @@ absl::StatusOr<const BoundingBoxProperties*> GetBoundingBoxProperties(
   // Mobile SSD only supports "BOUNDARIES" bounding box type.
   if (properties->type() != tflite::BoundingBoxType_BOUNDARIES) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat(
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrFormat(
             "Mobile SSD only supports BoundingBoxType BOUNDARIES, found %s",
             tflite::EnumNameBoundingBoxType(properties->type())),
         MediaPipeTasksStatus::kMetadataInvalidContentPropertiesError);
@@ -186,8 +186,8 @@ absl::StatusOr<const BoundingBoxProperties*> GetBoundingBoxProperties(
   // Mobile SSD only supports "RATIO" coordinates type.
   if (properties->coordinate_type() != tflite::CoordinateType_RATIO) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat(
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrFormat(
             "Mobile SSD only supports CoordinateType RATIO, found %s",
             tflite::EnumNameCoordinateType(properties->coordinate_type())),
         MediaPipeTasksStatus::kMetadataInvalidContentPropertiesError);
@@ -196,8 +196,8 @@ absl::StatusOr<const BoundingBoxProperties*> GetBoundingBoxProperties(
   // Index is optional, but must contain 4 values if present.
   if (properties->index() != nullptr && properties->index()->size() != 4) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat(
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrFormat(
             "Expected BoundingBoxProperties index to contain 4 values, found "
             "%d",
             properties->index()->size()),
@@ -207,9 +207,9 @@ absl::StatusOr<const BoundingBoxProperties*> GetBoundingBoxProperties(
   return properties;
 }
 
-absl::StatusOr<LabelItems> GetLabelItemsIfAny(
+abslx::StatusOr<LabelItems> GetLabelItemsIfAny(
     const ModelMetadataExtractor& metadata_extractor,
-    const TensorMetadata& tensor_metadata, absl::string_view locale) {
+    const TensorMetadata& tensor_metadata, abslx::string_view locale) {
   const std::string labels_filename =
       ModelMetadataExtractor::FindFirstAssociatedFileName(
           tensor_metadata, tflite::AssociatedFileType_TENSOR_VALUE_LABELS);
@@ -217,13 +217,13 @@ absl::StatusOr<LabelItems> GetLabelItemsIfAny(
     LabelItems empty_label_items;
     return empty_label_items;
   }
-  ASSIGN_OR_RETURN(absl::string_view labels_file,
+  ASSIGN_OR_RETURN(abslx::string_view labels_file,
                    metadata_extractor.GetAssociatedFile(labels_filename));
   const std::string display_names_filename =
       ModelMetadataExtractor::FindFirstAssociatedFileName(
           tensor_metadata, tflite::AssociatedFileType_TENSOR_VALUE_LABELS,
           locale);
-  absl::string_view display_names_file;
+  abslx::string_view display_names_file;
   if (!display_names_filename.empty()) {
     ASSIGN_OR_RETURN(display_names_file, metadata_extractor.GetAssociatedFile(
                                              display_names_filename));
@@ -231,7 +231,7 @@ absl::StatusOr<LabelItems> GetLabelItemsIfAny(
   return mediapipe::BuildLabelMapFromFiles(labels_file, display_names_file);
 }
 
-absl::StatusOr<float> GetScoreThreshold(
+abslx::StatusOr<float> GetScoreThreshold(
     const ModelMetadataExtractor& metadata_extractor,
     const TensorMetadata& tensor_metadata) {
   ASSIGN_OR_RETURN(
@@ -245,9 +245,9 @@ absl::StatusOr<float> GetScoreThreshold(
       ->global_score_threshold();
 }
 
-absl::StatusOr<absl::flat_hash_set<int>> GetAllowOrDenyCategoryIndicesIfAny(
+abslx::StatusOr<abslx::flat_hash_set<int>> GetAllowOrDenyCategoryIndicesIfAny(
     const ObjectDetectorOptionsProto& config, const LabelItems& label_items) {
-  absl::flat_hash_set<int> category_indices;
+  abslx::flat_hash_set<int> category_indices;
   // Exit early if no denylist/allowlist.
   if (config.category_denylist_size() == 0 &&
       config.category_allowlist_size() == 0) {
@@ -255,7 +255,7 @@ absl::StatusOr<absl::flat_hash_set<int>> GetAllowOrDenyCategoryIndicesIfAny(
   }
   if (label_items.empty()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "Using `category_allowlist` or `category_denylist` requires "
         "labels to be present in the TFLite Model Metadata but none was found.",
         MediaPipeTasksStatus::kMetadataMissingLabelsError);
@@ -280,7 +280,7 @@ absl::StatusOr<absl::flat_hash_set<int>> GetAllowOrDenyCategoryIndicesIfAny(
   return category_indices;
 }
 
-absl::StatusOr<std::optional<ScoreCalibrationCalculatorOptions>>
+abslx::StatusOr<std::optional<ScoreCalibrationCalculatorOptions>>
 GetScoreCalibrationOptionsIfAny(
     const ModelMetadataExtractor& metadata_extractor,
     const TensorMetadata& tensor_metadata) {
@@ -301,13 +301,13 @@ GetScoreCalibrationOptionsIfAny(
           tflite::AssociatedFileType_TENSOR_AXIS_SCORE_CALIBRATION);
   if (score_calibration_filename.empty()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kNotFound,
+        abslx::StatusCode::kNotFound,
         "Found ScoreCalibrationOptions but missing required associated "
         "parameters file with type TENSOR_AXIS_SCORE_CALIBRATION.",
         MediaPipeTasksStatus::kMetadataAssociatedFileNotFoundError);
   }
   ASSIGN_OR_RETURN(
-      absl::string_view score_calibration_file,
+      abslx::string_view score_calibration_file,
       metadata_extractor.GetAssociatedFile(score_calibration_filename));
   ScoreCalibrationCalculatorOptions score_calibration_calculator_options;
   MP_RETURN_IF_ERROR(ConfigureScoreCalibration(
@@ -333,7 +333,7 @@ std::vector<int> GetOutputTensorIndices(
     int output_index = output_indices[i];
     // If tensor name is not found, set the default output indices.
     if (output_index == -1) {
-      LOG(WARNING) << absl::StrFormat(
+      LOG(WARNING) << abslx::StrFormat(
           "You don't seem to be matching tensor names in metadata list. The "
           "tensor name \"%s\" at index %d in the model metadata doesn't "
           "match "
@@ -350,7 +350,7 @@ std::vector<int> GetOutputTensorIndices(
 
 // Builds PostProcessingSpecs from ObjectDetectorOptionsProto and model metadata
 // for configuring the post-processing calculators.
-absl::StatusOr<PostProcessingSpecs> BuildPostProcessingSpecs(
+abslx::StatusOr<PostProcessingSpecs> BuildPostProcessingSpecs(
     const ObjectDetectorOptionsProto& options,
     const ModelMetadataExtractor* metadata_extractor) {
   // Checks output tensor metadata is present and consistent with model.
@@ -358,8 +358,8 @@ absl::StatusOr<PostProcessingSpecs> BuildPostProcessingSpecs(
   if (output_tensors_metadata == nullptr ||
       output_tensors_metadata->size() != 4) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat("Mismatch between number of output tensors (4) and "
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrFormat("Mismatch between number of output tensors (4) and "
                         "output tensors metadata (%d).",
                         output_tensors_metadata == nullptr
                             ? 0
@@ -495,7 +495,7 @@ void ConfigureTensorsToDetectionsCalculator(
 // }
 class ObjectDetectorGraph : public core::ModelTaskGraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     ASSIGN_OR_RETURN(const auto* model_resources,
                      CreateModelResources<ObjectDetectorOptionsProto>(sc));
@@ -525,7 +525,7 @@ class ObjectDetectorGraph : public core::ModelTaskGraph {
   // detection model file with model metadata.
   // image_in: (mediapipe::Image) stream to run object detection on.
   // graph: the mediapipe builder::Graph instance to be updated.
-  absl::StatusOr<ObjectDetectionOutputStreams> BuildObjectDetectionTask(
+  abslx::StatusOr<ObjectDetectionOutputStreams> BuildObjectDetectionTask(
       const ObjectDetectorOptionsProto& task_options,
       const core::ModelResources& model_resources, Source<Image> image_in,
       Source<NormalizedRect> norm_rect_in, Graph& graph) {
@@ -534,15 +534,15 @@ class ObjectDetectorGraph : public core::ModelTaskGraph {
     auto& model = *model_resources.GetTfLiteModel();
     if (model.subgraphs()->size() != 1) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
-          absl::StrFormat("Expected a model with a single subgraph, found %d.",
+          abslx::StatusCode::kInvalidArgument,
+          abslx::StrFormat("Expected a model with a single subgraph, found %d.",
                           model.subgraphs()->size()),
           MediaPipeTasksStatus::kInvalidArgumentError);
     }
     if (model.subgraphs()->Get(0)->outputs()->size() != 4) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
-          absl::StrFormat("Expected a model with 4 output tensors, found %d.",
+          abslx::StatusCode::kInvalidArgument,
+          abslx::StrFormat("Expected a model with 4 output tensors, found %d.",
                           model.subgraphs()->Get(0)->outputs()->size()),
           MediaPipeTasksStatus::kInvalidArgumentError);
     }
@@ -552,7 +552,7 @@ class ObjectDetectorGraph : public core::ModelTaskGraph {
         metadata_extractor->GetModelMetadata()->subgraph_metadata() ==
             nullptr) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
+          abslx::StatusCode::kInvalidArgument,
           "Object detection models require TFLite Model Metadata but none was "
           "found",
           MediaPipeTasksStatus::kMetadataNotFoundError);

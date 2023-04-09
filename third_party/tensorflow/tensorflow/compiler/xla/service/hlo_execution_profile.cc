@@ -30,7 +30,7 @@ limitations under the License.
 
 namespace xla {
 HloProfileIndexMap::HloProfileIndexMap(
-    const HloModule& module, absl::Span<const std::string> extra_metrics) {
+    const HloModule& module, abslx::Span<const std::string> extra_metrics) {
   size_t current_profile_index = 0;
   for (xla::HloComputation* computation : module.MakeComputationPostOrder()) {
     InsertOrDie(&computation_to_profile_idx_, computation,
@@ -75,7 +75,7 @@ std::unique_ptr<HloProfilePrinterData> CreateHloProfilePrinterData(
 
   // The profile indices were computed deterministically in
   // HloProfileIndexMap::HloProfileIndexMap.
-  absl::c_sort(computation_and_profile_idx_list,
+  abslx::c_sort(computation_and_profile_idx_list,
                [](const std::pair<const HloComputation*, int64_t>& left,
                   const std::pair<const HloComputation*, int64_t>& right) {
                  return left.second < right.second;

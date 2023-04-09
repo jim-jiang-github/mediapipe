@@ -56,7 +56,7 @@ class MakeFullyConnectedFromConvolution : public NodeTransformation {
       return {TransformStatus::SKIPPED, ""};
     }
 
-    const auto& conv_attr = absl::any_cast<const Convolution2DAttributes&>(
+    const auto& conv_attr = abslx::any_cast<const Convolution2DAttributes&>(
         node->operation.attributes);
     if (!IsConvEquivalentToFullyConnected(conv_attr)) {
       return {TransformStatus::SKIPPED, ""};
@@ -76,7 +76,7 @@ class MakeFullyConnectedFromConvolution : public NodeTransformation {
 }  // namespace
 
 std::unique_ptr<NodeTransformation> NewMakeFullyConnectedFromConvolution() {
-  return absl::make_unique<MakeFullyConnectedFromConvolution>();
+  return abslx::make_unique<MakeFullyConnectedFromConvolution>();
 }
 
 }  // namespace gpu

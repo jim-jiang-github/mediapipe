@@ -54,7 +54,7 @@ struct GraphExecutionOptions {
 
 // Per-request options for graph execution.
 struct GraphExecutionRunOptions {
-  absl::optional<std::chrono::system_clock::time_point> deadline;
+  abslx::optional<std::chrono::system_clock::time_point> deadline;
 
   // Priority of the request. Larger number means higher priority.
   int priority = 0;

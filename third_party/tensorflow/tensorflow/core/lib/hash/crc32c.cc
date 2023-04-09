@@ -264,8 +264,8 @@ uint32 Extend(uint32 crc, const char *buf, size_t size) {
 }
 
 #if defined(TF_CORD_SUPPORT)
-uint32 Extend(uint32 crc, const absl::Cord &cord) {
-  for (absl::string_view fragment : cord.Chunks()) {
+uint32 Extend(uint32 crc, const abslx::Cord &cord) {
+  for (abslx::string_view fragment : cord.Chunks()) {
     crc = Extend(crc, fragment.data(), fragment.size());
   }
   return crc;

@@ -59,7 +59,7 @@ OffsetsAssignment ObjectsToOffsets(
   return result;
 }
 
-absl::Status BestGreedy(
+abslx::Status BestGreedy(
     const std::vector<TensorUsageRecord<size_t>>& usage_records,
     ObjectsAssignment<size_t>* assignment) {
   RETURN_IF_ERROR(
@@ -69,11 +69,11 @@ absl::Status BestGreedy(
       TotalSize(assignment_by_breadth) < TotalSize(*assignment)) {
     std::swap(*assignment, assignment_by_breadth);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <>
-absl::Status AssignObjectsToTensors(
+abslx::Status AssignObjectsToTensors(
     const std::vector<TensorUsageRecord<size_t>>& usage_records,
     MemoryStrategy strategy, ObjectsAssignment<size_t>* assignment,
     const UsageGraph* reallocation_graph) {
@@ -94,14 +94,14 @@ absl::Status AssignObjectsToTensors(
     case MemoryStrategy::MINCOSTFLOW:
       return MinCostFlowAssignment(usage_records, assignment);
     default:
-      return absl::InternalError(
+      return abslx::InternalError(
           "MemoryStrategy is not supported with current tensor size type.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <>
-absl::Status AssignObjectsToTensors(
+abslx::Status AssignObjectsToTensors(
     const std::vector<TensorUsageRecord<BHWC>>& usage_records,
     MemoryStrategy strategy, ObjectsAssignment<BHWC>* assignment,
     const UsageGraph* reallocation_graph) {
@@ -111,14 +111,14 @@ absl::Status AssignObjectsToTensors(
     case MemoryStrategy::EQUALITY:
       return EqualityAssignmentWithHash(usage_records, assignment);
     default:
-      return absl::InternalError(
+      return abslx::InternalError(
           "MemoryStrategy is not supported with current tensor size type.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <>
-absl::Status AssignObjectsToTensors(
+abslx::Status AssignObjectsToTensors(
     const std::vector<TensorUsageRecord<uint2>>& usage_records,
     MemoryStrategy strategy, ObjectsAssignment<uint2>* assignment,
     const UsageGraph* reallocation_graph) {
@@ -130,14 +130,14 @@ absl::Status AssignObjectsToTensors(
     case MemoryStrategy::GREEDY_IN_ORDER:
       return GreedyInOrderAssignmentMultidimensional(usage_records, assignment);
     default:
-      return absl::InternalError(
+      return abslx::InternalError(
           "MemoryStrategy is not supported with current tensor size type.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <>
-absl::Status AssignObjectsToTensors(
+abslx::Status AssignObjectsToTensors(
     const std::vector<TensorUsageRecord<uint3>>& usage_records,
     MemoryStrategy strategy, ObjectsAssignment<uint3>* assignment,
     const UsageGraph* reallocation_graph) {
@@ -149,13 +149,13 @@ absl::Status AssignObjectsToTensors(
     case MemoryStrategy::GREEDY_IN_ORDER:
       return GreedyInOrderAssignmentMultidimensional(usage_records, assignment);
     default:
-      return absl::InternalError(
+      return abslx::InternalError(
           "MemoryStrategy is not supported with current tensor size type.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AssignOffsetsToTensors(
+abslx::Status AssignOffsetsToTensors(
     const std::vector<TensorUsageRecord<size_t>>& usage_records,
     const MemoryStrategy& strategy, OffsetsAssignment* assignment,
     size_t base_addr_align_bytes, const UsageGraph* reallocation_graph) {
@@ -167,7 +167,7 @@ absl::Status AssignOffsetsToTensors(
   RETURN_IF_ERROR(AssignObjectsToTensors(
       usage_records, strategy, &objects_assignment, reallocation_graph));
   *assignment = ObjectsToOffsets(objects_assignment);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

@@ -71,7 +71,7 @@ static void EnsureEglThreadRelease() {
                       reinterpret_cast<void*>(0xDEADBEEF));
 }
 
-static absl::StatusOr<EGLDisplay> GetInitializedDefaultEglDisplay() {
+static abslx::StatusOr<EGLDisplay> GetInitializedDefaultEglDisplay() {
   EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
   RET_CHECK(display != EGL_NO_DISPLAY)
       << "eglGetDisplay() returned error " << std::showbase << std::hex
@@ -87,7 +87,7 @@ static absl::StatusOr<EGLDisplay> GetInitializedDefaultEglDisplay() {
   return display;
 }
 
-static absl::StatusOr<EGLDisplay> GetInitializedEglDisplay() {
+static abslx::StatusOr<EGLDisplay> GetInitializedEglDisplay() {
   auto status_or_display = GetInitializedDefaultEglDisplay();
   return status_or_display;
 }
@@ -112,7 +112,7 @@ GlContext::StatusOrGlContext GlContext::Create(EGLContext share_context,
   return std::move(context);
 }
 
-absl::Status GlContext::CreateContextInternal(EGLContext share_context,
+abslx::Status GlContext::CreateContextInternal(EGLContext share_context,
                                               int gl_version) {
   CHECK(gl_version == 2 || gl_version == 3);
 
@@ -172,10 +172,10 @@ absl::Status GlContext::CreateContextInternal(EGLContext share_context,
   // GLES 2 does not have them, so let's set the major version here at least.
   gl_major_version_ = gl_version;
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GlContext::CreateContext(EGLContext share_context) {
+abslx::Status GlContext::CreateContext(EGLContext share_context) {
   ASSIGN_OR_RETURN(display_, GetInitializedEglDisplay());
 
   auto status = CreateContextInternal(share_context, 3);
@@ -193,7 +193,7 @@ absl::Status GlContext::CreateContext(EGLContext share_context) {
       << "eglCreatePbufferSurface() returned error " << std::showbase
       << std::hex << eglGetError();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void GlContext::DestroyContext() {
@@ -227,7 +227,7 @@ void GlContext::DestroyContext() {
     thread_
         ->Run([] {
           eglReleaseThread();
-          return absl::OkStatus();
+          return abslx::OkStatus();
         })
         .IgnoreError();
   }
@@ -285,7 +285,7 @@ void GlContext::GetCurrentContextBinding(GlContext::ContextBinding* binding) {
   binding->context = eglGetCurrentContext();
 }
 
-absl::Status GlContext::SetCurrentContextBinding(
+abslx::Status GlContext::SetCurrentContextBinding(
     const ContextBinding& new_binding) {
   EnsureEglThreadRelease();
   EGLDisplay display = new_binding.display;
@@ -300,7 +300,7 @@ absl::Status GlContext::SetCurrentContextBinding(
                      new_binding.read_surface, new_binding.context);
   RET_CHECK(success) << "eglMakeCurrent() returned error " << std::showbase
                      << std::hex << eglGetError();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 bool GlContext::HasContext() const { return context_ != EGL_NO_CONTEXT; }

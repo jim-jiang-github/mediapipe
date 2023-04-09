@@ -68,7 +68,7 @@ GroupAssignment CreateGroupAssignment(
 GroupAssignment CreateGroupAssignment(
     mlir::MLIRContext& context,
     const std::vector<std::vector<int>>& replica_ids,
-    absl::flat_hash_map<GroupAssignment::ReplicaId, GroupAssignment::DeviceId>
+    abslx::flat_hash_map<GroupAssignment::ReplicaId, GroupAssignment::DeviceId>
         map) {
   mlir::DenseIntElementsAttr group_assignment_attr =
       CreateGroupAssignmentAttr(context, replica_ids);

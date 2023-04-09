@@ -56,25 +56,25 @@
 #include "absl/strings/cord.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 
-// The hash of an object of type T is computed by using absl::Hash.
+// The hash of an object of type T is computed by using abslx::Hash.
 template <class T, class E = void>
 struct HashEq {
-  using Hash = absl::Hash<T>;
+  using Hash = abslx::Hash<T>;
   using Eq = std::equal_to<T>;
 };
 
 struct StringHash {
   using is_transparent = void;
 
-  size_t operator()(absl::string_view v) const {
-    return absl::Hash<absl::string_view>{}(v);
+  size_t operator()(abslx::string_view v) const {
+    return abslx::Hash<abslx::string_view>{}(v);
   }
-  size_t operator()(const absl::Cord& v) const {
-    return absl::Hash<absl::Cord>{}(v);
+  size_t operator()(const abslx::Cord& v) const {
+    return abslx::Hash<abslx::Cord>{}(v);
   }
 };
 
@@ -83,16 +83,16 @@ struct StringHashEq {
   using Hash = StringHash;
   struct Eq {
     using is_transparent = void;
-    bool operator()(absl::string_view lhs, absl::string_view rhs) const {
+    bool operator()(abslx::string_view lhs, abslx::string_view rhs) const {
       return lhs == rhs;
     }
-    bool operator()(const absl::Cord& lhs, const absl::Cord& rhs) const {
+    bool operator()(const abslx::Cord& lhs, const abslx::Cord& rhs) const {
       return lhs == rhs;
     }
-    bool operator()(const absl::Cord& lhs, absl::string_view rhs) const {
+    bool operator()(const abslx::Cord& lhs, abslx::string_view rhs) const {
       return lhs == rhs;
     }
-    bool operator()(absl::string_view lhs, const absl::Cord& rhs) const {
+    bool operator()(abslx::string_view lhs, const abslx::Cord& rhs) const {
       return lhs == rhs;
     }
   };
@@ -101,9 +101,9 @@ struct StringHashEq {
 template <>
 struct HashEq<std::string> : StringHashEq {};
 template <>
-struct HashEq<absl::string_view> : StringHashEq {};
+struct HashEq<abslx::string_view> : StringHashEq {};
 template <>
-struct HashEq<absl::Cord> : StringHashEq {};
+struct HashEq<abslx::Cord> : StringHashEq {};
 
 // Supports heterogeneous lookup for pointers and smart pointers.
 template <class T>
@@ -112,7 +112,7 @@ struct HashEq<T*> {
     using is_transparent = void;
     template <class U>
     size_t operator()(const U& ptr) const {
-      return absl::Hash<const T*>{}(HashEq::ToPtr(ptr));
+      return abslx::Hash<const T*>{}(HashEq::ToPtr(ptr));
     }
   };
   struct Eq {
@@ -143,19 +143,19 @@ struct HashEq<std::shared_ptr<T>> : HashEq<T*> {};
 // This header's visibility is restricted.  If you need to access the default
 // hasher please use the container's ::hasher alias instead.
 //
-// Example: typename Hash = typename absl::flat_hash_map<K, V>::hasher
+// Example: typename Hash = typename abslx::flat_hash_map<K, V>::hasher
 template <class T>
 using hash_default_hash = typename container_internal::HashEq<T>::Hash;
 
 // This header's visibility is restricted.  If you need to access the default
 // key equal please use the container's ::key_equal alias instead.
 //
-// Example: typename Eq = typename absl::flat_hash_map<K, V, Hash>::key_equal
+// Example: typename Eq = typename abslx::flat_hash_map<K, V, Hash>::key_equal
 template <class T>
 using hash_default_eq = typename container_internal::HashEq<T>::Eq;
 
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_CONTAINER_INTERNAL_HASH_FUNCTION_DEFAULTS_H_

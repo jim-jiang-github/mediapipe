@@ -376,7 +376,7 @@ TEST_F(DeviceTracerTest, CudaRuntimeResource) {
     line.ForEachEvent([&](const tensorflow::profiler::XEventVisitor& event) {
       VLOG(3) << " Event " << *event.Type() << "\n";
 
-      absl::optional<XStatVisitor> stat =
+      abslx::optional<XStatVisitor> stat =
           event.GetStat(expected_event_stat_type[event_idx]);
       // The stat may not exist if we're looking at the wrong line.
       if (stat.has_value()) {
@@ -405,23 +405,23 @@ TEST_F(DeviceTracerTest, CudaRuntimeResource) {
         VLOG(3) << "  Stat name=" << stat.Name() << " type=" << *stat.Type()
                 << " " << stat.ToString() << "\n";
         // These are the attributes set in cupti_collector::CreateXEvent.
-        auto space_delimited_stats = absl::StrSplit(stat.StrOrRefValue(), " ");
+        auto space_delimited_stats = abslx::StrSplit(stat.StrOrRefValue(), " ");
 
         if (stat.Type() == StatType::kMemoryResidencyDetails) {
           size_t num_bytes = 0;
           size_t addr = 0;
-          absl::string_view kind;
+          abslx::string_view kind;
           for (const auto& detail : space_delimited_stats) {
-            std::vector<absl::string_view> name_value =
-                absl::StrSplit(detail, ":");
+            std::vector<abslx::string_view> name_value =
+                abslx::StrSplit(detail, ":");
             // We allocated 8 bytes of device memory with cudaMalloc/Free.
-            if (absl::StartsWith(detail, "num_bytes:")) {
-              (void)absl::SimpleAtoi(name_value[1], &num_bytes);
-            } else if (absl::StartsWith(detail, "addr:")) {
+            if (abslx::StartsWith(detail, "num_bytes:")) {
+              (void)abslx::SimpleAtoi(name_value[1], &num_bytes);
+            } else if (abslx::StartsWith(detail, "addr:")) {
               std::stringstream hex_string;
               hex_string << std::hex << name_value[1];
               hex_string >> addr;
-            } else if (absl::StartsWith(detail, "kind:")) {
+            } else if (abslx::StartsWith(detail, "kind:")) {
               kind = name_value[1];
             }
           }
@@ -441,14 +441,14 @@ TEST_F(DeviceTracerTest, CudaRuntimeResource) {
           CHECK(!found_activity_memset);
           found_activity_memset = true;
           for (const auto& detail : space_delimited_stats) {
-            std::vector<absl::string_view> name_value =
-                absl::StrSplit(detail, ":");
+            std::vector<abslx::string_view> name_value =
+                abslx::StrSplit(detail, ":");
             // We set 8 bytes of device memory with cudaMemset.
-            if (absl::StartsWith(detail, "num_bytes:")) {
+            if (abslx::StartsWith(detail, "num_bytes:")) {
               size_t num_bytes = 0;
-              (void)absl::SimpleAtoi(name_value[1], &num_bytes);
+              (void)abslx::SimpleAtoi(name_value[1], &num_bytes);
               EXPECT_EQ(num_bytes, 8);
-            } else if (absl::StartsWith(detail, "kind:")) {
+            } else if (abslx::StartsWith(detail, "kind:")) {
               EXPECT_EQ(name_value[1],
                         GetMemoryKindName(CUPTI_ACTIVITY_MEMORY_KIND_DEVICE));
             }
@@ -457,17 +457,17 @@ TEST_F(DeviceTracerTest, CudaRuntimeResource) {
           CHECK(!found_activity_memcpy);
           found_activity_memcpy = true;
           for (const auto& detail : space_delimited_stats) {
-            std::vector<absl::string_view> name_value =
-                absl::StrSplit(detail, ":");
+            std::vector<abslx::string_view> name_value =
+                abslx::StrSplit(detail, ":");
             // We copied 8 bytes from device memory to pinned host memory.
-            if (absl::StartsWith(detail, "num_bytes:")) {
+            if (abslx::StartsWith(detail, "num_bytes:")) {
               size_t num_bytes = 0;
-              (void)absl::SimpleAtoi(name_value[1], &num_bytes);
+              (void)abslx::SimpleAtoi(name_value[1], &num_bytes);
               EXPECT_EQ(num_bytes, 8);
-            } else if (absl::StartsWith(detail, "kind_src:")) {
+            } else if (abslx::StartsWith(detail, "kind_src:")) {
               EXPECT_EQ(name_value[1],
                         GetMemoryKindName(CUPTI_ACTIVITY_MEMORY_KIND_DEVICE));
-            } else if (absl::StartsWith(detail, "kind_dst:")) {
+            } else if (abslx::StartsWith(detail, "kind_dst:")) {
               EXPECT_EQ(name_value[1],
                         GetMemoryKindName(CUPTI_ACTIVITY_MEMORY_KIND_PINNED));
             }

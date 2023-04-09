@@ -69,11 +69,11 @@ struct ImageTensorSpecs {
   // image data into the expected range of floating point values, an error is
   // returned otherwise (see sanity checks below). They should be ignored for
   // other tensor input types, e.g. kTfLiteUInt8.
-  absl::optional<NormalizationOptions> normalization_options;
+  abslx::optional<NormalizationOptions> normalization_options;
 };
 
 // Gets the image tensor metadata from the metadata extractor by tensor index.
-absl::StatusOr<const tflite::TensorMetadata*> GetImageTensorMetadataIfAny(
+abslx::StatusOr<const tflite::TensorMetadata*> GetImageTensorMetadataIfAny(
     const metadata::ModelMetadataExtractor& metadata_extractor,
     int tensor_index);
 
@@ -86,7 +86,7 @@ absl::StatusOr<const tflite::TensorMetadata*> GetImageTensorMetadataIfAny(
 // initialized before calling this function by means of (respectively):
 // - `tflite::GetModel`,
 // - `mediapipe::metadata::ModelMetadataExtractor::CreateFromModelBuffer`.
-absl::StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
+abslx::StatusOr<ImageTensorSpecs> BuildInputImageTensorSpecs(
     const tflite::Tensor& image_tensor,
     const tflite::TensorMetadata* image_tensor_metadata);
 

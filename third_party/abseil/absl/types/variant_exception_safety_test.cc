@@ -16,7 +16,7 @@
 
 #include "absl/base/config.h"
 
-// This test is a no-op when absl::variant is an alias for std::variant and when
+// This test is a no-op when abslx::variant is an alias for std::variant and when
 // exceptions are not enabled.
 #if !defined(ABSL_USES_STD_VARIANT) && defined(ABSL_HAVE_EXCEPTIONS)
 
@@ -33,7 +33,7 @@
 // See comment in absl/base/config.h
 #if !defined(ABSL_INTERNAL_MSVC_2017_DBG_MODE)
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace {
 
@@ -48,7 +48,7 @@ using MoveNothrow = testing::ThrowingValue<testing::TypeSpec::kNoThrowMove>;
 using ThrowingAlloc = testing::ThrowingAllocator<Thrower>;
 using ThrowerVec = std::vector<Thrower, ThrowingAlloc>;
 using ThrowingVariant =
-    absl::variant<Thrower, CopyNothrow, MoveNothrow, ThrowerVec>;
+    abslx::variant<Thrower, CopyNothrow, MoveNothrow, ThrowerVec>;
 
 struct ConversionException {};
 
@@ -75,27 +75,27 @@ testing::AssertionResult VariantInvariants(ThrowingVariant* v) {
   using testing::AssertionSuccess;
 
   // Try using the active alternative
-  if (absl::holds_alternative<Thrower>(*v)) {
-    auto& t = absl::get<Thrower>(*v);
+  if (abslx::holds_alternative<Thrower>(*v)) {
+    auto& t = abslx::get<Thrower>(*v);
     t = Thrower{-100};
     if (t.Get() != -100) {
       return AssertionFailure() << "Thrower should be assigned -100";
     }
-  } else if (absl::holds_alternative<ThrowerVec>(*v)) {
-    auto& tv = absl::get<ThrowerVec>(*v);
+  } else if (abslx::holds_alternative<ThrowerVec>(*v)) {
+    auto& tv = abslx::get<ThrowerVec>(*v);
     tv.clear();
     tv.emplace_back(-100);
     if (tv.size() != 1 || tv[0].Get() != -100) {
       return AssertionFailure() << "ThrowerVec should be {Thrower{-100}}";
     }
-  } else if (absl::holds_alternative<CopyNothrow>(*v)) {
-    auto& t = absl::get<CopyNothrow>(*v);
+  } else if (abslx::holds_alternative<CopyNothrow>(*v)) {
+    auto& t = abslx::get<CopyNothrow>(*v);
     t = CopyNothrow{-100};
     if (t.Get() != -100) {
       return AssertionFailure() << "CopyNothrow should be assigned -100";
     }
-  } else if (absl::holds_alternative<MoveNothrow>(*v)) {
-    auto& t = absl::get<MoveNothrow>(*v);
+  } else if (abslx::holds_alternative<MoveNothrow>(*v)) {
+    auto& t = abslx::get<MoveNothrow>(*v);
     t = MoveNothrow{-100};
     if (t.Get() != -100) {
       return AssertionFailure() << "MoveNothrow should be assigned -100";
@@ -108,23 +108,23 @@ testing::AssertionResult VariantInvariants(ThrowingVariant* v) {
     return AssertionFailure() << "Variant should be valueless_by_exception";
   }
   try {
-    auto unused = absl::get<Thrower>(*v);
+    auto unused = abslx::get<Thrower>(*v);
     static_cast<void>(unused);
     return AssertionFailure() << "Variant should not contain Thrower";
-  } catch (const absl::bad_variant_access&) {
+  } catch (const abslx::bad_variant_access&) {
   } catch (...) {
-    return AssertionFailure() << "Unexpected exception throw from absl::get";
+    return AssertionFailure() << "Unexpected exception throw from abslx::get";
   }
 
   // Try using the variant
   v->emplace<Thrower>(100);
-  if (!absl::holds_alternative<Thrower>(*v) ||
-      absl::get<Thrower>(*v) != Thrower(100)) {
+  if (!abslx::holds_alternative<Thrower>(*v) ||
+      abslx::get<Thrower>(*v) != Thrower(100)) {
     return AssertionFailure() << "Variant should contain Thrower(100)";
   }
   v->emplace<ThrowerVec>({Thrower(100)});
-  if (!absl::holds_alternative<ThrowerVec>(*v) ||
-      absl::get<ThrowerVec>(*v)[0] != Thrower(100)) {
+  if (!abslx::holds_alternative<ThrowerVec>(*v) ||
+      abslx::get<ThrowerVec>(*v)[0] != Thrower(100)) {
     return AssertionFailure()
            << "Variant should contain ThrowerVec{Thrower(100)}";
   }
@@ -189,16 +189,16 @@ TEST(VariantExceptionSafetyTest, ValueConstructor) {
 }
 
 TEST(VariantExceptionSafetyTest, InPlaceTypeConstructor) {
-  TestThrowingCtor<ThrowingVariant>(absl::in_place_type_t<Thrower>{},
+  TestThrowingCtor<ThrowingVariant>(abslx::in_place_type_t<Thrower>{},
                                     ExpectedThrower());
-  TestThrowingCtor<ThrowingVariant>(absl::in_place_type_t<ThrowerVec>{},
+  TestThrowingCtor<ThrowingVariant>(abslx::in_place_type_t<ThrowerVec>{},
                                     ExpectedThrowerVec());
 }
 
 TEST(VariantExceptionSafetyTest, InPlaceIndexConstructor) {
-  TestThrowingCtor<ThrowingVariant>(absl::in_place_index_t<0>{},
+  TestThrowingCtor<ThrowingVariant>(abslx::in_place_index_t<0>{},
                                     ExpectedThrower());
-  TestThrowingCtor<ThrowingVariant>(absl::in_place_index_t<3>{},
+  TestThrowingCtor<ThrowingVariant>(abslx::in_place_index_t<3>{},
                                     ExpectedThrowerVec());
 }
 
@@ -525,7 +525,7 @@ TEST(VariantExceptionSafetyTest, Swap) {
 
 }  // namespace
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // !defined(ABSL_INTERNAL_MSVC_2017_DBG_MODE)
 

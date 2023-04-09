@@ -964,25 +964,25 @@ TEST(DeadnessAnalysisTest, AndRecurrenceNeedsFrameName) {
 
   for (int i : {0, 1}) {
     Output init_enter = ops::internal::Enter(
-        root.WithOpName(absl::StrCat("init_enter_frame_", i)), init,
-        absl::StrCat("frame_", i),
+        root.WithOpName(abslx::StrCat("init_enter_frame_", i)), init,
+        abslx::StrCat("frame_", i),
         ops::internal::Enter::Attrs().IsConstant(true));
     Output step_enter = ops::internal::Enter(
-        root.WithOpName(absl::StrCat("step_enter_frame_", i)), step,
-        absl::StrCat("frame_", i),
+        root.WithOpName(abslx::StrCat("step_enter_frame_", i)), step,
+        abslx::StrCat("frame_", i),
         ops::internal::Enter::Attrs().IsConstant(true));
 
-    ops::Merge iv(root.WithOpName(absl::StrCat("expr_", i)),
+    ops::Merge iv(root.WithOpName(abslx::StrCat("expr_", i)),
                   {init_enter, init_enter});
-    Output add = ops::Add(root.WithOpName(absl::StrCat("add_", i)), iv.output,
+    Output add = ops::Add(root.WithOpName(abslx::StrCat("add_", i)), iv.output,
                           step_enter);
     next_iterations[i] = ops::NextIteration(
-        root.WithOpName(absl::StrCat("expr_", i, "_next_iteration")), add);
+        root.WithOpName(abslx::StrCat("expr_", i, "_next_iteration")), add);
     EXPECT_TRUE(
         root.graph()
             ->UpdateEdge(next_iterations[i].node(), 0, iv.output.node(), 1)
             .ok());
-    exits[i] = ops::internal::Exit(root.WithOpName(absl::StrCat("exit_", i)),
+    exits[i] = ops::internal::Exit(root.WithOpName(abslx::StrCat("exit_", i)),
                                    iv.output);
   }
 

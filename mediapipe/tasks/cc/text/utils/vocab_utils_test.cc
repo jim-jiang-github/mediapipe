@@ -50,7 +50,7 @@ TEST(CommonUtilsTest, TestLoadVocabFromBuffer) {
 }
 
 TEST(CommonUtilsTest, TestLoadVocabAndIndexFromFile) {
-  absl::node_hash_map<std::string, int> vocab =
+  abslx::node_hash_map<std::string, int> vocab =
       LoadVocabAndIndexFromFile(kVocabAndIndexPath);
 
   EXPECT_THAT(vocab, UnorderedElementsAre(Pair("token1", 0), Pair("token2", 1),
@@ -59,7 +59,7 @@ TEST(CommonUtilsTest, TestLoadVocabAndIndexFromFile) {
 
 TEST(CommonUtilsTest, TestLoadVocabAndIndexFromBuffer) {
   std::string buffer = LoadBinaryContent(kVocabAndIndexPath);
-  absl::node_hash_map<std::string, int> vocab =
+  abslx::node_hash_map<std::string, int> vocab =
       LoadVocabAndIndexFromBuffer(buffer.data(), buffer.size());
 
   EXPECT_THAT(vocab, UnorderedElementsAre(Pair("token1", 0), Pair("token2", 1),

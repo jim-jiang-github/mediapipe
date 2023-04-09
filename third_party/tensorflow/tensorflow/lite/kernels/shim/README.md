@@ -106,13 +106,13 @@ class MyOp : public OpKernelShim<MyOp, R> {
   static std::vector<std::string> Outputs();
 
   // Initializes the op
-  absl::Status Init(InitContext* ctx);
+  abslx::Status Init(InitContext* ctx);
 
   // Runs the operation
-  absl::Status Invoke(InvokeContext* ctx);
+  abslx::Status Invoke(InvokeContext* ctx);
 
   // Shape inference
-  static absl::Status ShapeInference(ShapeInferenceContext* ctx);
+  static abslx::Status ShapeInference(ShapeInferenceContext* ctx);
 };
 ```
 
@@ -136,7 +136,7 @@ class InitContext {
  public:
   // Read the given attribute and populate the given value.
   template <typename AttrType>
-  absl::Status GetAttr(const std::string& attr_name, AttrType* value) const;
+  abslx::Status GetAttr(const std::string& attr_name, AttrType* value) const;
 };
 ```
 
@@ -164,7 +164,7 @@ class ShapeInferenceContext {
   // Read an input tensor shape
   ShapeOr GetInputShape(const int idx) const;
   // Set an output tensor shape
-  absl::Status SetOutputShape(const int idx, const Shape& shape);
+  abslx::Status SetOutputShape(const int idx, const Shape& shape);
   // Read an input tensor during shape inference
   ConstTensorViewOr GetInputTensor(const int idx) const;
 };

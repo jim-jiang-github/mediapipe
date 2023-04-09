@@ -242,7 +242,7 @@ class ShardedDeviceArray {
   void Delete();
   const ShardingSpec& GetShardingSpec() const { return sharding_spec_; }
   // Returns an error status iff the object has been deleted.
-  xla::StatusOr<absl::Span<xla::PjRtBuffer* const>> GetPjRtBuffers();
+  xla::StatusOr<abslx::Span<xla::PjRtBuffer* const>> GetPjRtBuffers();
 
   bool is_deleted() const { return is_deleted_; }
   bool weak_type() const { return weak_type_; }

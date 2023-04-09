@@ -27,9 +27,9 @@ limitations under the License.
 
 namespace xla {
 namespace {
-using absl::flat_hash_map;
-using absl::flat_hash_set;
-using absl::InlinedVector;
+using abslx::flat_hash_map;
+using abslx::flat_hash_set;
+using abslx::InlinedVector;
 
 struct InvariantInfo {
   explicit InvariantInfo(int64_t user_count)
@@ -86,7 +86,7 @@ static void CreateLoopInvariantCopy(
         };
 
         InlinedVector<HloInstruction*, 4> new_operands;
-        absl::c_transform(old_instruction->operands(),
+        abslx::c_transform(old_instruction->operands(),
                           std::back_inserter(new_operands), get_new_operand);
 
         HloInstruction* new_instruction = parent_of_while->AddInstruction(
@@ -212,7 +212,7 @@ StatusOr<bool> WhileLoopExpensiveInvariantCodeMotion::
       return invariant_instructions.find(op) != invariant_instructions.end();
     };
 
-    if (!absl::c_all_of(instruction->operands(), is_invariant)) {
+    if (!abslx::c_all_of(instruction->operands(), is_invariant)) {
       continue;
     }
 
@@ -334,14 +334,14 @@ StatusOr<bool> WhileLoopExpensiveInvariantCodeMotion::
 
 StatusOr<bool> WhileLoopExpensiveInvariantCodeMotion::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   VLOG(2) << "HLO module before WhileLoopExpensiveInvariantCodeMotion:";
   XLA_VLOG_LINES(2, module->ToString());
 
   bool changed = false;
   std::vector<HloInstruction*> while_instrs;
   for (auto* comp : module->computations(execution_threads)) {
-    absl::c_copy_if(comp->instructions(), std::back_inserter(while_instrs),
+    abslx::c_copy_if(comp->instructions(), std::back_inserter(while_instrs),
                     [](const HloInstruction* instr) {
                       return instr->opcode() == HloOpcode::kWhile;
                     });

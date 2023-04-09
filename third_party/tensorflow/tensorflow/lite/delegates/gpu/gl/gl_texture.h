@@ -57,16 +57,16 @@ class GlTexture {
   ~GlTexture();
 
   // Binds a texture as an image to the given index.
-  absl::Status BindAsReadonlyImage(uint32_t index) const;
+  abslx::Status BindAsReadonlyImage(uint32_t index) const;
 
   // Bind texture as an image for write access at given index.
-  absl::Status BindAsWriteonlyImage(uint32_t index) const;
+  abslx::Status BindAsWriteonlyImage(uint32_t index) const;
 
   // Bind texture as an image for read-write access at given index.
-  absl::Status BindAsReadWriteImage(uint32_t index) const;
+  abslx::Status BindAsReadWriteImage(uint32_t index) const;
 
   // Binds a texture as a sampler to the given index.
-  absl::Status BindAsSampler2D(uint32_t index) const;
+  abslx::Status BindAsSampler2D(uint32_t index) const;
 
   GLenum target() const { return target_; }
 
@@ -87,7 +87,7 @@ class GlTexture {
  private:
   void Invalidate();
 
-  absl::Status BindImage(uint32_t index, GLenum access) const;
+  abslx::Status BindImage(uint32_t index, GLenum access) const;
 
   GLuint id_;
   GLenum target_;
@@ -101,53 +101,53 @@ class GlTexture {
 // will be used for reading.
 //
 // @param size defines 2D image texture size where each pixel is RGBA.
-absl::Status CreateReadOnlyImageTexture(const uint2& size,
-                                        absl::Span<const float> data,
+abslx::Status CreateReadOnlyImageTexture(const uint2& size,
+                                        abslx::Span<const float> data,
                                         GlTexture* gl_texture);
 
 // Creates new 2D image texture that will be filled with float16 data once which
 // will be used for reading.
 //
 // @param size defines 2D image texture size where each pixel is RGBA.
-absl::Status CreateReadOnlyImageTextureF16(const uint2& size,
-                                           absl::Span<const uint16_t> data,
+abslx::Status CreateReadOnlyImageTextureF16(const uint2& size,
+                                           abslx::Span<const uint16_t> data,
                                            GlTexture* gl_texture);
 
 // Creates new 2D image texture that will be filled with uint8 data once which
 // will be used for reading.
 //
 // @param size defines 2D image texture size where each pixel is RGBA.
-absl::Status CreateReadOnlyImageTextureU8(const uint2& size,
-                                          absl::Span<const uint8_t> data,
+abslx::Status CreateReadOnlyImageTextureU8(const uint2& size,
+                                          abslx::Span<const uint8_t> data,
                                           GlTexture* gl_texture);
 
 // Creates new 3D RGBA image texture that will be filled with float32 data once
 // which will be used for reading.
 //
 // @param size defines 3D image texture size where each pixel is RGBA.
-absl::Status CreateReadOnlyImageTexture(const uint3& size,
-                                        absl::Span<const float> data,
+abslx::Status CreateReadOnlyImageTexture(const uint3& size,
+                                        abslx::Span<const float> data,
                                         GlTexture* gl_texture);
 
 // Creates new 3D RGBA image texture that will be filled with float16 data once
 // which will be used for reading.
 //
 // @param size defines 3D image texture size where each pixel is RGBA.
-absl::Status CreateReadOnlyImageTextureF16(const uint3& size,
-                                           absl::Span<const uint16_t> data,
+abslx::Status CreateReadOnlyImageTextureF16(const uint3& size,
+                                           abslx::Span<const uint16_t> data,
                                            GlTexture* gl_texture);
 
 // Creates new RGBA 2D image texture
 //
 // @param size defines 2D image texture size where each pixel is RGBA.
-absl::Status CreateReadWriteRgbaImageTexture(DataType data_type,
+abslx::Status CreateReadWriteRgbaImageTexture(DataType data_type,
                                              const uint2& size,
                                              GlTexture* gl_texture);
 
 // Creates new RGBA 3D image texture
 //
 // @param size defines 3D image texture size where each pixel is RGBA.
-absl::Status CreateReadWriteRgbaImageTexture(DataType data_type,
+abslx::Status CreateReadWriteRgbaImageTexture(DataType data_type,
                                              const uint3& size,
                                              GlTexture* gl_texture);
 

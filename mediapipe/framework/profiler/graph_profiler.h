@@ -133,9 +133,9 @@ class GraphProfiler : public std::enable_shared_from_this<ProfilingContext> {
   // Process() and does NOT affect information for Open() and Close() methods.
   void Reset() ABSL_LOCKS_EXCLUDED(profiler_mutex_);
   // Begins profiling for a single graph run.
-  absl::Status Start(mediapipe::Executor* executor);
+  abslx::Status Start(mediapipe::Executor* executor);
   // Ends profiling for a single graph run.
-  absl::Status Stop();
+  abslx::Status Stop();
 
   // Record a tracing event.
   void LogEvent(const TraceEvent& event);
@@ -143,7 +143,7 @@ class GraphProfiler : public std::enable_shared_from_this<ProfilingContext> {
   // Collects the runtime profile for Open(), Process(), and Close() of each
   // calculator in the graph. May be called at any time after the graph has been
   // initialized.
-  absl::Status GetCalculatorProfiles(std::vector<CalculatorProfile>*) const
+  abslx::Status GetCalculatorProfiles(std::vector<CalculatorProfile>*) const
       ABSL_LOCKS_EXCLUDED(profiler_mutex_);
 
   // Records recent profiling and tracing data.  Includes events since the
@@ -153,13 +153,13 @@ class GraphProfiler : public std::enable_shared_from_this<ProfilingContext> {
   // will contain canonicalized config of the profiled graph, and
   // `graph_trace.calculator_name` will contain node names referring to that
   // config. Both fields are left empty if the option is set to `kNo`.
-  absl::Status CaptureProfile(
+  abslx::Status CaptureProfile(
       GraphProfile* result,
       PopulateGraphConfig populate_config = PopulateGraphConfig::kNo);
 
   // Writes recent profiling and tracing data to a file specified in the
   // ProfilerConfig.  Includes events since the previous call to WriteProfile.
-  absl::Status WriteProfile();
+  abslx::Status WriteProfile();
 
   // Returns the trace event buffer.
   GraphTracer* tracer() { return packet_tracer_.get(); }
@@ -184,7 +184,7 @@ class GraphProfiler : public std::enable_shared_from_this<ProfilingContext> {
           profiler_(profiler) {
       start_time_usec_ = profiler_->TimeNowUsec();
       if (profiler_->is_tracing_) {
-        absl::Time time_now = absl::FromUnixMicros(start_time_usec_);
+        abslx::Time time_now = abslx::FromUnixMicros(start_time_usec_);
         profiler_->packet_tracer_->LogInputEvents(
             calculator_method_, &calculator_context_, time_now);
       }
@@ -217,7 +217,7 @@ class GraphProfiler : public std::enable_shared_from_this<ProfilingContext> {
         }
       }
       if (profiler_->is_tracing_) {
-        absl::Time time_now = absl::FromUnixMicros(end_time_usec);
+        abslx::Time time_now = abslx::FromUnixMicros(end_time_usec);
         profiler_->packet_tracer_->LogOutputEvents(
             calculator_method_, &calculator_context_, time_now);
       }
@@ -308,7 +308,7 @@ class GraphProfiler : public std::enable_shared_from_this<ProfilingContext> {
   // Helper method to get trace_log_path.  If the trace_log_path is empty and
   // tracing is enabled, this function returns a default platform dependent
   // trace_log_path.
-  absl::StatusOr<std::string> GetTraceLogPath();
+  abslx::StatusOr<std::string> GetTraceLogPath();
 
   // Helper method to get the clock time in microsecond.
   int64 TimeNowUsec() { return ToUnixMicros(clock_->TimeNow()); }
@@ -336,7 +336,7 @@ class GraphProfiler : public std::enable_shared_from_this<ProfilingContext> {
   PacketInfoMap packets_info_;
 
   // Global mutex for the profiler.
-  mutable absl::Mutex profiler_mutex_;
+  mutable abslx::Mutex profiler_mutex_;
 
   // Buffer of recent profile trace events.
   std::unique_ptr<GraphTracer> packet_tracer_;
@@ -348,7 +348,7 @@ class GraphProfiler : public std::enable_shared_from_this<ProfilingContext> {
   std::atomic_bool is_running_;
 
   // The end time of the previous output log.
-  absl::Time previous_log_end_time_;
+  abslx::Time previous_log_end_time_;
 
   // The index number of the previous output log.
   int previous_log_index_;
@@ -423,7 +423,7 @@ class GlContextProfiler {
   // supported.
   bool Initialize();
 
-  absl::Time TimeNow();
+  abslx::Time TimeNow();
 
   // Calibrate the GPU timer w.r.t. the CPU clock. If calibration is fails,
   // timing_measurement_supported_ is set to false.
@@ -431,7 +431,7 @@ class GlContextProfiler {
 
   // Log a TraceEvent object to represent if the GPU calibration period has
   // started or just ended.
-  void LogCalibrationEvent(bool started, absl::Time time);
+  void LogCalibrationEvent(bool started, abslx::Time time);
 
   // Log TraceEvent objects for completed time queries. If the parameter wait is
   // set to true, wait for all time queries to complete before returning.
@@ -439,8 +439,8 @@ class GlContextProfiler {
 
   // Get the TraceEvent object containing the timestamp recorded by the GPU if
   // the provided query was fulfilled. If it is still pending and wait is false,
-  // return absl::nullopt.
-  absl::optional<TraceEvent> GetTimeFromQuery(
+  // return abslx::nullopt.
+  abslx::optional<TraceEvent> GetTimeFromQuery(
       std::unique_ptr<GlTimingInfo>& query, bool wait);
 
   std::shared_ptr<ProfilingContext> profiling_context_;

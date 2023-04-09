@@ -95,12 +95,12 @@ class Array {
   using value_type = T;
 
   // Creates a new array with the specified dimensions and initialized elements.
-  explicit Array(absl::Span<const int64_t> sizes)
+  explicit Array(abslx::Span<const int64_t> sizes)
       : sizes_(sizes.begin(), sizes.end()), values_(new T[num_elements()]()) {}
 
   // Creates a new array with the specified dimensions and specified value for
   // every cell.
-  Array(absl::Span<const int64_t> sizes, T value)
+  Array(abslx::Span<const int64_t> sizes, T value)
       : sizes_(sizes.begin(), sizes.end()), values_(new T[num_elements()]) {
     Fill(value);
   }
@@ -335,7 +335,7 @@ class Array {
 
   // Invokes a callback with the (indices, value_ptr) for each cell in the
   // array.
-  void Each(std::function<void(absl::Span<const int64_t>, T*)> f) {
+  void Each(std::function<void(abslx::Span<const int64_t>, T*)> f) {
     std::vector<int64_t> index(sizes_.size());
     for (int64_t i = 0; i < num_elements(); ++i, next_index(&index)) {
       f(index, &values_[i]);
@@ -343,7 +343,7 @@ class Array {
   }
 
   // Invokes a callback with the (indices, value) for each cell in the array.
-  void Each(std::function<void(absl::Span<const int64_t>, T)> f) const {
+  void Each(std::function<void(abslx::Span<const int64_t>, T)> f) const {
     std::vector<int64_t> index(sizes_.size());
     for (int64_t i = 0; i < num_elements(); ++i, next_index(&index)) {
       f(index, values_[i]);
@@ -353,7 +353,7 @@ class Array {
   // Invokes a callback with the (indices, value_ptr) for each cell in the
   // array. If a callback returns a non-OK status, returns that else returns
   // Status::OK().
-  Status EachStatus(std::function<Status(absl::Span<const int64_t>, T*)> f) {
+  Status EachStatus(std::function<Status(abslx::Span<const int64_t>, T*)> f) {
     std::vector<int64_t> index(sizes_.size());
     for (int64_t i = 0; i < num_elements(); ++i, next_index(&index)) {
       Status s = f(index, &values_[i]);
@@ -368,7 +368,7 @@ class Array {
   // If a callback returns a non-OK status, returns that else returns
   // Status::OK().
   Status EachStatus(
-      std::function<Status(absl::Span<const int64_t>, T)> f) const {
+      std::function<Status(abslx::Span<const int64_t>, T)> f) const {
     std::vector<int64_t> index(sizes_.size());
     for (int64_t i = 0; i < num_elements(); ++i, next_index(&index)) {
       Status s = f(index, values_[i]);
@@ -411,13 +411,13 @@ class Array {
 
   // Returns the value at the cell specified by the indexes. The number of
   // arguments have to match with the number of dimensions for the array.
-  const T& operator()(absl::Span<const int64_t> indexes) const {
+  const T& operator()(abslx::Span<const int64_t> indexes) const {
     return values_[calculate_index(indexes)];
   }
 
   // Returns the value at the cell specified by the indexes. The number of
   // arguments have to match with the number of dimensions for the array.
-  T& operator()(absl::Span<const int64_t> indexes) {
+  T& operator()(abslx::Span<const int64_t> indexes) {
     return values_[calculate_index(indexes)];
   }
 
@@ -473,8 +473,8 @@ class Array {
   bool operator!=(const Array<T>& other) const { return !(*this == other); }
 
   // Performs the equivalent of a slice operation on this array.
-  Array<T> Slice(absl::Span<const int64_t> starts,
-                 absl::Span<const int64_t> limits) const {
+  Array<T> Slice(abslx::Span<const int64_t> starts,
+                 abslx::Span<const int64_t> limits) const {
     CHECK_EQ(starts.size(), num_dimensions());
     CHECK_EQ(limits.size(), num_dimensions());
 
@@ -499,7 +499,7 @@ class Array {
 
   // Performs the equivalent of a DynamicUpdateSlice in-place on this array.
   void UpdateSlice(const Array<T>& from,
-                   absl::Span<const int64_t> start_indices) {
+                   abslx::Span<const int64_t> start_indices) {
     CHECK_EQ(from.num_dimensions(), num_dimensions());
     std::vector<int64_t> limit_indices;
     std::transform(start_indices.begin(), start_indices.end(),
@@ -519,21 +519,21 @@ class Array {
 
   // Performs an in-place reshape, modifying the dimensions but not the
   // underlying data.
-  void Reshape(absl::Span<const int64_t> new_dimensions) {
+  void Reshape(abslx::Span<const int64_t> new_dimensions) {
     int64_t old_num_elements = num_elements();
     sizes_ = std::vector<int64_t>(new_dimensions.begin(), new_dimensions.end());
     CHECK_EQ(num_elements(), old_num_elements);
   }
 
   // Performs a permutation of dimensions.
-  void TransposeDimensions(absl::Span<const int64_t> permutation) {
+  void TransposeDimensions(abslx::Span<const int64_t> permutation) {
     std::vector<int64_t> permuted_dims(permutation.size());
     for (int64_t i = 0; i < permutation.size(); ++i) {
       permuted_dims[i] = this->dim(permutation[i]);
     }
     Array<T> permuted(permuted_dims);
     std::vector<int64_t> src_indices(sizes_.size(), -1);
-    permuted.Each([&](absl::Span<const int64_t> indices, int64_t* value) {
+    permuted.Each([&](abslx::Span<const int64_t> indices, int64_t* value) {
       CHECK_EQ(sizes_.size(), indices.size());
       for (int64_t i = 0; i < sizes_.size(); ++i) {
         src_indices[permutation[i]] = indices[i];
@@ -545,7 +545,7 @@ class Array {
 
   template <typename H>
   friend H AbslHashValue(H h, const Array& array) {
-    return H::combine(std::move(h), absl::MakeSpan(array.begin(), array.end()),
+    return H::combine(std::move(h), abslx::MakeSpan(array.begin(), array.end()),
                       array.dimensions());
   }
 
@@ -570,7 +570,7 @@ class Array {
       }
       int value_index = calculate_index(index);
       if (value_index < num_elements()) {
-        pieces.push_back(absl::StrCat(values_[value_index]));
+        pieces.push_back(abslx::StrCat(values_[value_index]));
       }
 
       // Emit comma if it isn't the last element
@@ -589,7 +589,7 @@ class Array {
         }
       }
     } while (next_index(&index));
-    return absl::StrJoin(pieces, "");
+    return abslx::StrJoin(pieces, "");
   }
 
  private:

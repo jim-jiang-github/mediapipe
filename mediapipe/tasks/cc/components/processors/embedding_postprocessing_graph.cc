@@ -64,11 +64,11 @@ struct EmbeddingPostprocessingOutputStreams {
 
 // Identifies whether or not the model has quantized outputs, and performs
 // sanity checks.
-absl::StatusOr<bool> HasQuantizedOutputs(
+abslx::StatusOr<bool> HasQuantizedOutputs(
     const ModelResources& model_resources) {
   const tflite::Model& model = *model_resources.GetTfLiteModel();
   if (model.subgraphs()->size() != 1) {
-    return CreateStatusWithPayload(absl::StatusCode::kInvalidArgument,
+    return CreateStatusWithPayload(abslx::StatusCode::kInvalidArgument,
                                    "Embedding tflite models are "
                                    "assumed to have a single subgraph.",
                                    MediaPipeTasksStatus::kInvalidArgumentError);
@@ -83,8 +83,8 @@ absl::StatusOr<bool> HasQuantizedOutputs(
     if (tensor->type() != tflite::TensorType_FLOAT32 &&
         tensor->type() != tflite::TensorType_UINT8) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
-          absl::StrFormat("Expected output tensor at index %d to have type "
+          abslx::StatusCode::kInvalidArgument,
+          abslx::StrFormat("Expected output tensor at index %d to have type "
                           "UINT8 or FLOAT32, found %s instead.",
                           i, tflite::EnumNameTensorType(tensor->type())),
           MediaPipeTasksStatus::kInvalidOutputTensorTypeError);
@@ -96,8 +96,8 @@ absl::StatusOr<bool> HasQuantizedOutputs(
   if (num_quantized_tensors != num_output_tensors &&
       num_quantized_tensors != 0) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat(
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrFormat(
             "Expected either all or none of the output tensors to be "
             "quantized, but found %d quantized outputs for %d total outputs.",
             num_quantized_tensors, num_output_tensors),
@@ -109,8 +109,8 @@ absl::StatusOr<bool> HasQuantizedOutputs(
   if (output_tensors_metadata != nullptr &&
       num_output_tensors != output_tensors_metadata->size()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat("Mismatch between number of output tensors (%d) and "
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrFormat("Mismatch between number of output tensors (%d) and "
                         "output tensors metadata (%d).",
                         num_output_tensors, output_tensors_metadata->size()),
         MediaPipeTasksStatus::kMetadataInconsistencyError);
@@ -121,7 +121,7 @@ absl::StatusOr<bool> HasQuantizedOutputs(
 // Extracts head names from model resources. Returns an empty vector if none are
 // available. If partially available, the name for heads that don't specify a
 // metadata name will be set to the empty string.
-absl::StatusOr<std::vector<std::string>> GetHeadNames(
+abslx::StatusOr<std::vector<std::string>> GetHeadNames(
     const ModelResources& model_resources) {
   std::vector<std::string> head_names;
   const auto* output_tensors_metadata =
@@ -147,7 +147,7 @@ absl::StatusOr<std::vector<std::string>> GetHeadNames(
 
 }  // namespace
 
-absl::Status ConfigureEmbeddingPostprocessingGraph(
+abslx::Status ConfigureEmbeddingPostprocessingGraph(
     const ModelResources& model_resources,
     const proto::EmbedderOptions& embedder_options,
     proto::EmbeddingPostprocessingGraphOptions* options) {
@@ -162,7 +162,7 @@ absl::Status ConfigureEmbeddingPostprocessingGraph(
     *tensors_to_embeddings_options->mutable_head_names() = {head_names.begin(),
                                                             head_names.end()};
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // An EmbeddingPostprocessingGraph converts raw tensors into EmbeddingResult
@@ -194,7 +194,7 @@ absl::Status ConfigureEmbeddingPostprocessingGraph(
 // more details.
 class EmbeddingPostprocessingGraph : public mediapipe::Subgraph {
  public:
-  absl::StatusOr<mediapipe::CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<mediapipe::CalculatorGraphConfig> GetConfig(
       mediapipe::SubgraphContext* sc) override {
     Graph graph;
     ASSIGN_OR_RETURN(
@@ -220,7 +220,7 @@ class EmbeddingPostprocessingGraph : public mediapipe::Subgraph {
   // timestamps_in: (std::vector<mediapipe::Timestamp>) optional collection of
   //   timestamps that should be used to aggregate embedding results.
   // graph: the mediapipe builder::Graph instance to be updated.
-  absl::StatusOr<EmbeddingPostprocessingOutputStreams>
+  abslx::StatusOr<EmbeddingPostprocessingOutputStreams>
   BuildEmbeddingPostprocessing(
       const proto::EmbeddingPostprocessingGraphOptions options,
       Source<std::vector<Tensor>> tensors_in,

@@ -91,8 +91,8 @@ StatusOr<pybind11::object> LiteralToPython(std::shared_ptr<Literal> literal);
 struct PythonBufferTree {
   // Holds a reference to the arrays pointed to by `leaves`, since we may
   // need to make a copy if the array is not in a C-style layout.
-  absl::InlinedVector<pybind11::object, 1> arrays;
-  absl::InlinedVector<BorrowingLiteral, 1> leaves;
+  abslx::InlinedVector<pybind11::object, 1> arrays;
+  abslx::InlinedVector<BorrowingLiteral, 1> leaves;
   Shape shape;
 };
 StatusOr<PythonBufferTree> GetPythonBufferTree(
@@ -102,7 +102,7 @@ StatusOr<PythonBufferTree> GetPythonBufferTree(
 // Pybind11 by default converts a std::vector<T> to a Python list;
 // we frequently want a tuple instead e.g. for shapes.
 template <typename T>
-pybind11::tuple SpanToTuple(absl::Span<T const> xs) {
+pybind11::tuple SpanToTuple(abslx::Span<T const> xs) {
   pybind11::tuple out(xs.size());
   for (int i = 0; i < xs.size(); ++i) {
     out[i] = pybind11::cast(xs[i]);
@@ -110,9 +110,9 @@ pybind11::tuple SpanToTuple(absl::Span<T const> xs) {
   return out;
 }
 template <>
-pybind11::tuple SpanToTuple(absl::Span<int const> xs);
+pybind11::tuple SpanToTuple(abslx::Span<int const> xs);
 template <>
-pybind11::tuple SpanToTuple(absl::Span<int64_t const> xs);
+pybind11::tuple SpanToTuple(abslx::Span<int64_t const> xs);
 
 // Converts a Python iterable/sequence of T to std::vector<T>
 template <typename T>
@@ -164,7 +164,7 @@ struct type_caster<xla::BorrowingLiteral> {
   PYBIND11_TYPE_CASTER(xla::BorrowingLiteral, _("xla::BorrowingLiteral"));
 
   // Pybind appears to keep type_casters alive until the callee has run.
-  absl::InlinedVector<pybind11::array, 1> arrays;
+  abslx::InlinedVector<pybind11::array, 1> arrays;
 
   bool load(handle input, bool) {
     // TODO(b/79707221): support nested tuples if/when XLA adds support for

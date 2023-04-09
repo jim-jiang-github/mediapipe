@@ -37,7 +37,7 @@ struct AndroidInfo {
   bool is_emulator;
 };
 
-absl::Status RequestAndroidInfo(AndroidInfo* info_out);
+abslx::Status RequestAndroidInfo(AndroidInfo* info_out);
 
 }  // namespace acceleration
 }  // namespace tflite

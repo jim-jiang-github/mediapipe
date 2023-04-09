@@ -29,14 +29,14 @@ namespace mediapipe {
 std::unique_ptr<GlTextureBuffer> GlTextureBuffer::Wrap(
     GLenum target, GLuint name, int width, int height, GpuBufferFormat format,
     DeletionCallback deletion_callback) {
-  return absl::make_unique<GlTextureBuffer>(target, name, width, height, format,
+  return abslx::make_unique<GlTextureBuffer>(target, name, width, height, format,
                                             deletion_callback);
 }
 
 std::unique_ptr<GlTextureBuffer> GlTextureBuffer::Wrap(
     GLenum target, GLuint name, int width, int height, GpuBufferFormat format,
     std::shared_ptr<GlContext> context, DeletionCallback deletion_callback) {
-  return absl::make_unique<GlTextureBuffer>(target, name, width, height, format,
+  return abslx::make_unique<GlTextureBuffer>(target, name, width, height, format,
                                             deletion_callback, context);
 }
 
@@ -44,7 +44,7 @@ std::unique_ptr<GlTextureBuffer> GlTextureBuffer::Create(int width, int height,
                                                          GpuBufferFormat format,
                                                          const void* data,
                                                          int alignment) {
-  auto buf = absl::make_unique<GlTextureBuffer>(GL_TEXTURE_2D, 0, width, height,
+  auto buf = abslx::make_unique<GlTextureBuffer>(GL_TEXTURE_2D, 0, width, height,
                                                 format, nullptr);
   if (!buf->CreateInternal(data, alignment)) {
     return nullptr;
@@ -186,10 +186,10 @@ void GlTextureBuffer::Reuse() {
   // while holding the mutex.
   std::unique_ptr<GlMultiSyncPoint> old_consumer_sync;
   {
-    absl::MutexLock lock(&consumer_sync_mutex_);
+    abslx::MutexLock lock(&consumer_sync_mutex_);
     // Reset the sync points.
     old_consumer_sync = std::move(consumer_multi_sync_);
-    consumer_multi_sync_ = absl::make_unique<GlMultiSyncPoint>();
+    consumer_multi_sync_ = abslx::make_unique<GlMultiSyncPoint>();
     producer_sync_ = nullptr;
   }
   old_consumer_sync->WaitOnGpu();
@@ -207,7 +207,7 @@ void GlTextureBuffer::Updated(std::shared_ptr<GlSyncPoint> prod_token) {
 }
 
 void GlTextureBuffer::DidRead(std::shared_ptr<GlSyncPoint> cons_token) const {
-  absl::MutexLock lock(&consumer_sync_mutex_);
+  abslx::MutexLock lock(&consumer_sync_mutex_);
   if (cons_token) {
     consumer_multi_sync_->Add(std::move(cons_token));
   } else {
@@ -244,12 +244,12 @@ void GlTextureBuffer::WaitOnGpu() const {
 }
 
 void GlTextureBuffer::WaitForConsumers() {
-  absl::MutexLock lock(&consumer_sync_mutex_);
+  abslx::MutexLock lock(&consumer_sync_mutex_);
   consumer_multi_sync_->Wait();
 }
 
 void GlTextureBuffer::WaitForConsumersOnGpu() {
-  absl::MutexLock lock(&consumer_sync_mutex_);
+  abslx::MutexLock lock(&consumer_sync_mutex_);
   consumer_multi_sync_->WaitOnGpu();
   // TODO: should we clear the consumer_multi_sync_ here?
   // It would mean that WaitForConsumersOnGpu can be called only once, or more
@@ -361,7 +361,7 @@ static std::shared_ptr<GpuBufferStorageImageFrame> ConvertToImageFrame(
   ImageFormat::Format image_format =
       ImageFormatForGpuBufferFormat(buf->format());
   auto output =
-      absl::make_unique<ImageFrame>(image_format, buf->width(), buf->height(),
+      abslx::make_unique<ImageFrame>(image_format, buf->width(), buf->height(),
                                     ImageFrame::kGlDefaultAlignmentBoundary);
   auto ctx = GlContext::GetCurrent();
   if (!ctx) ctx = buf->GetProducerContext();
@@ -391,7 +391,7 @@ static auto kConverterRegistration2 =
 
 static std::shared_ptr<GpuBufferStorageCvPixelBuffer> ConvertToCvPixelBuffer(
     std::shared_ptr<GlTextureBuffer> buf) {
-  auto output = absl::make_unique<GpuBufferStorageCvPixelBuffer>(
+  auto output = abslx::make_unique<GpuBufferStorageCvPixelBuffer>(
       buf->width(), buf->height(), buf->format());
   auto ctx = GlContext::GetCurrent();
   if (!ctx) ctx = buf->GetProducerContext();

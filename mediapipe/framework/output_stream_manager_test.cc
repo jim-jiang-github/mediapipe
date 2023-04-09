@@ -52,14 +52,14 @@ class OutputStreamManagerTest : public ::testing::Test {
         std::bind(&OutputStreamManagerTest::ReportQueueNoOp, this,
                   std::placeholders::_1, std::placeholders::_2);
 
-    output_stream_manager_ = absl::make_unique<OutputStreamManager>();
+    output_stream_manager_ = abslx::make_unique<OutputStreamManager>();
     MP_ASSERT_OK(output_stream_manager_->Initialize("a_test", &packet_type_));
     output_stream_manager_->PrepareForRun(error_callback_);
     output_stream_shard_.SetSpec(output_stream_manager_->Spec());
     output_stream_manager_->ResetShard(&output_stream_shard_);
 
     std::shared_ptr<tool::TagMap> tag_map = tool::CreateTagMap(1).value();
-    absl::StatusOr<std::unique_ptr<mediapipe::InputStreamHandler>>
+    abslx::StatusOr<std::unique_ptr<mediapipe::InputStreamHandler>>
         status_or_handler = InputStreamHandlerRegistry::CreateByName(
             "DefaultInputStreamHandler", tag_map, /*cc_manager=*/nullptr,
             MediaPipeOptions(), /*calculator_run_in_parallel=*/false);
@@ -85,7 +85,7 @@ class OutputStreamManagerTest : public ::testing::Test {
 
   void ScheduleNoOp(CalculatorContext* cc) {}
 
-  void RecordError(const absl::Status& error) { errors_.push_back(error); }
+  void RecordError(const abslx::Status& error) { errors_.push_back(error); }
 
   void ReportQueueNoOp(InputStreamManager* stream, bool* stream_was_full) {}
 
@@ -104,7 +104,7 @@ class OutputStreamManagerTest : public ::testing::Test {
   std::function<void()> headers_ready_callback_;
   std::function<void()> notification_callback_;
   std::function<void(CalculatorContext*)> schedule_callback_;
-  std::function<void(absl::Status)> error_callback_;
+  std::function<void(abslx::Status)> error_callback_;
   InputStreamManager::QueueSizeCallback queue_full_callback_;
   InputStreamManager::QueueSizeCallback queue_not_full_callback_;
 
@@ -114,7 +114,7 @@ class OutputStreamManagerTest : public ::testing::Test {
   InputStreamManager input_stream_manager_;
 
   // Vector of errors encountered while using the stream.
-  std::vector<absl::Status> errors_;
+  std::vector<abslx::Status> errors_;
 };
 
 TEST_F(OutputStreamManagerTest, Init) {}

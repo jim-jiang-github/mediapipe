@@ -79,7 +79,7 @@ tensorflow::Status CreateOpKernel(
 }  // namespace
 
 StatusOr<OpKernelRunner> OpKernelRunner::Create(
-    absl::string_view op_name, absl::string_view device_name, int num_args,
+    abslx::string_view op_name, abslx::string_view device_name, int num_args,
     const std::function<Status(tensorflow::AttrValueMap*)>& attr_builder,
     const tensorflow::DeviceMgr& device_manager,
     const tensorflow::ProcessFunctionLibraryRuntime&
@@ -100,7 +100,7 @@ StatusOr<OpKernelRunner> OpKernelRunner::Create(
 }
 
 StatusOr<OpKernelRunner> OpKernelRunner::Create(
-    absl::string_view op_name, int num_args,
+    abslx::string_view op_name, int num_args,
     const std::function<Status(tensorflow::AttrValueMap*)>& attr_builder,
     const tensorflow::ProcessFunctionLibraryRuntime&
         process_function_library_runtime,

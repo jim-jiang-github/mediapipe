@@ -25,7 +25,7 @@
 
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace strings_internal {
 
@@ -179,6 +179,6 @@ inline const std::array<uint64_test_case, 34>& strtouint64_test_cases() {
 
 }  // namespace strings_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_INTERNAL_NUMBERS_TEST_COMMON_H_

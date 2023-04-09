@@ -42,7 +42,7 @@ TEST(OpenCvImageEncoderCalculatorTest, TestJpegWithQualities) {
   for (int quality : qualities) {
     CalculatorGraphConfig::Node node_config =
         ParseTextProtoOrDie<CalculatorGraphConfig::Node>(
-            absl::Substitute(R"(
+            abslx::Substitute(R"(
         calculator: "OpenCvImageEncoderCalculator"
         input_stream: "image_frames"
         output_stream: "encoded_images"
@@ -66,7 +66,7 @@ TEST(OpenCvImageEncoderCalculatorTest, TestJpegWithQualities) {
     ASSERT_EQ(OpenCvImageEncoderCalculatorResults::RGB, result.colorspace());
 
     cv::Mat expected_output = cv::imread(
-        file::JoinPath("./", absl::Substitute("/mediapipe/calculators/image/"
+        file::JoinPath("./", abslx::Substitute("/mediapipe/calculators/image/"
                                               "testdata/dino_quality_$0.jpg",
                                               quality)));
     const std::vector<char> contents_vector(result.encoded_image().begin(),

@@ -114,12 +114,12 @@ Status CreateTestFiles(const std::vector<tstring>& filenames,
 FixedLengthRecordDatasetParams FixedLengthRecordDatasetParams1() {
   std::vector<tstring> filenames = {LocalTempFilename(), LocalTempFilename()};
   std::vector<string> contents = {
-      absl::StrCat("HHHHH", "111", "222", "333", "FF"),
-      absl::StrCat("HHHHH", "aaa", "bbb", "FF")};
+      abslx::StrCat("HHHHH", "111", "222", "333", "FF"),
+      abslx::StrCat("HHHHH", "aaa", "bbb", "FF")};
   CompressionType compression_type = CompressionType::ZLIB;
   if (!CreateTestFiles(filenames, contents, compression_type).ok()) {
     VLOG(WARNING) << "Failed to create the test files: "
-                  << absl::StrJoin(filenames, ", ");
+                  << abslx::StrJoin(filenames, ", ");
   }
 
   return FixedLengthRecordDatasetParams(filenames,
@@ -135,12 +135,12 @@ FixedLengthRecordDatasetParams FixedLengthRecordDatasetParams1() {
 FixedLengthRecordDatasetParams FixedLengthRecordDatasetParams2() {
   std::vector<tstring> filenames = {LocalTempFilename(), LocalTempFilename()};
   std::vector<string> contents = {
-      absl::StrCat("HHHHH", "111", "222", "333", "FF"),
-      absl::StrCat("HHHHH", "aaa", "bbb", "FF")};
+      abslx::StrCat("HHHHH", "111", "222", "333", "FF"),
+      abslx::StrCat("HHHHH", "aaa", "bbb", "FF")};
   CompressionType compression_type = CompressionType::GZIP;
   if (!CreateTestFiles(filenames, contents, compression_type).ok()) {
     VLOG(WARNING) << "Failed to create the test files: "
-                  << absl::StrJoin(filenames, ", ");
+                  << abslx::StrJoin(filenames, ", ");
   }
   return FixedLengthRecordDatasetParams(filenames,
                                         /*header_bytes=*/5,
@@ -155,12 +155,12 @@ FixedLengthRecordDatasetParams FixedLengthRecordDatasetParams2() {
 FixedLengthRecordDatasetParams FixedLengthRecordDatasetParams3() {
   std::vector<tstring> filenames = {LocalTempFilename(), LocalTempFilename()};
   std::vector<string> contents = {
-      absl::StrCat("HHHHH", "111", "222", "333", "FF"),
-      absl::StrCat("HHHHH", "aaa", "bbb", "FF")};
+      abslx::StrCat("HHHHH", "111", "222", "333", "FF"),
+      abslx::StrCat("HHHHH", "aaa", "bbb", "FF")};
   CompressionType compression_type = CompressionType::UNCOMPRESSED;
   if (!CreateTestFiles(filenames, contents, compression_type).ok()) {
     VLOG(WARNING) << "Failed to create the test files: "
-                  << absl::StrJoin(filenames, ", ");
+                  << abslx::StrJoin(filenames, ", ");
   }
   return FixedLengthRecordDatasetParams(filenames,
                                         /*header_bytes=*/5,

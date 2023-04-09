@@ -21,7 +21,7 @@
 
 namespace {
 
-using absl::random_internal::is_widening_convertible;
+using abslx::random_internal::is_widening_convertible;
 
 // CheckWideningConvertsToSelf<T1, T2, ...>()
 //

@@ -28,12 +28,12 @@ namespace mediapipe {
 // type. The `Value` type must include an unset value, with implicit conversion
 // to bool reflecting set/unset state.
 template <typename Key, typename Value,
-          typename KeyHash = typename absl::flat_hash_map<Key, int>::hasher>
+          typename KeyHash = typename abslx::flat_hash_map<Key, int>::hasher>
 class ResourceCache {
  public:
   Value Lookup(
       const Key& key,
-      absl::FunctionRef<Value(const Key& key, int request_count)> create) {
+      abslx::FunctionRef<Value(const Key& key, int request_count)> create) {
     auto map_it = map_.find(key);
     Entry* entry;
     if (map_it == map_.end()) {
@@ -172,7 +172,7 @@ class ResourceCache {
     size_t size_ = 0;
   };
 
-  absl::flat_hash_map<Key, std::unique_ptr<Entry>, KeyHash> map_;
+  abslx::flat_hash_map<Key, std::unique_ptr<Entry>, KeyHash> map_;
   EntryList entry_list_;
   int total_request_count_ = 0;
 };

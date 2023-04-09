@@ -38,7 +38,7 @@ namespace tflite {
 namespace gpu {
 namespace {
 bool IsWordSymbol(char symbol) {
-  return absl::ascii_isalnum(symbol) || symbol == '_';
+  return abslx::ascii_isalnum(symbol) || symbol == '_';
 }
 
 void ReplaceAllWords(const std::string& old_word, const std::string& new_word,
@@ -84,7 +84,7 @@ bool HasWord(const std::string& word, const std::string& text) {
 std::string RenameArg(const std::vector<std::string>& object_names,
                       const std::string& postfix, const std::string& arg_name) {
   for (const auto& object_name : object_names) {
-    if (absl::StartsWith(arg_name, object_name) &&
+    if (abslx::StartsWith(arg_name, object_name) &&
         arg_name.size() > object_name.size() &&
         arg_name[object_name.size()] == '_') {
       return object_name + postfix +
@@ -127,26 +127,26 @@ size_t FindEnclosingBracket(const std::string& text, size_t first_pos,
   }
 }
 
-absl::Status ParseArgsInsideBrackets(const std::string& text,
+abslx::Status ParseArgsInsideBrackets(const std::string& text,
                                      size_t open_bracket_pos,
                                      size_t* close_bracket_pos,
                                      std::vector<std::string>* args) {
   *close_bracket_pos =
       FindEnclosingBracket(text, open_bracket_pos + 1, text[open_bracket_pos]);
   if (*close_bracket_pos == -1) {
-    return absl::NotFoundError("Not found enclosing bracket");
+    return abslx::NotFoundError("Not found enclosing bracket");
   }
   std::string str_args = text.substr(open_bracket_pos + 1,
                                      *close_bracket_pos - open_bracket_pos - 2);
-  std::vector<absl::string_view> words = absl::StrSplit(str_args, ',');
+  std::vector<abslx::string_view> words = abslx::StrSplit(str_args, ',');
   args->reserve(words.size());
   for (const auto& word : words) {
-    absl::string_view arg = absl::StripAsciiWhitespace(word);
+    abslx::string_view arg = abslx::StripAsciiWhitespace(word);
     if (!arg.empty()) {
       args->push_back(std::string(arg));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 std::string DataTypeToGlType(DataType data_type, int vec_size,
@@ -183,12 +183,12 @@ std::string DataTypeToGlType(DataType data_type, int vec_size,
   return "unsupported_type";
 }
 
-absl::Status BufferToKernelLanguage(const GpuInfo& gpu_info,
+abslx::Status BufferToKernelLanguage(const GpuInfo& gpu_info,
                                     const std::string& buffer_name,
                                     const BufferDescriptor* buffer_desc,
                                     std::string* result) {
   if (buffer_desc->element_size != 1) {
-    return absl::UnimplementedError("No support of vector types.");
+    return abslx::UnimplementedError("No support of vector types.");
   }
   const int elements_count =
       buffer_desc->size /
@@ -214,7 +214,7 @@ absl::Status BufferToKernelLanguage(const GpuInfo& gpu_info,
     *result = "__constant " + cl_type + " " + buffer_name + "_buffer[" +
               std::to_string(elements_count) + "] = {\n";
   } else {
-    return absl::UnimplementedError("Not supported API.");
+    return abslx::UnimplementedError("Not supported API.");
   }
   if (buffer_desc->element_type == DataType::FLOAT16) {
     std::string postfix = "f";
@@ -225,7 +225,7 @@ absl::Status BufferToKernelLanguage(const GpuInfo& gpu_info,
         reinterpret_cast<const half*>(buffer_desc->data.data());
     for (int i = 0; i < elements_count; ++i) {
       *result += "  " +
-                 absl::StrFormat("%.10f", static_cast<float>(data_ptr[i])) +
+                 abslx::StrFormat("%.10f", static_cast<float>(data_ptr[i])) +
                  postfix;
       if (i != elements_count - 1) {
         *result += ",\n";
@@ -235,13 +235,13 @@ absl::Status BufferToKernelLanguage(const GpuInfo& gpu_info,
     const float* data_ptr =
         reinterpret_cast<const float*>(buffer_desc->data.data());
     for (int i = 0; i < elements_count; ++i) {
-      *result += "  " + absl::StrFormat("%.10f", data_ptr[i]) + "f";
+      *result += "  " + abslx::StrFormat("%.10f", data_ptr[i]) + "f";
       if (i != elements_count - 1) {
         *result += ",\n";
       }
     }
   } else {
-    return absl::UnimplementedError("Not supported type.");
+    return abslx::UnimplementedError("Not supported type.");
   }
   if (gpu_info.IsGlsl()) {
     *result += ");\n";
@@ -249,7 +249,7 @@ absl::Status BufferToKernelLanguage(const GpuInfo& gpu_info,
     *result += "};\n";
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace
@@ -267,33 +267,33 @@ void Arguments::AddInt(const std::string& name, int value) {
   int_values_[name].value = value;
 }
 
-absl::Status Arguments::SetInt(const std::string& name, int value) {
+abslx::Status Arguments::SetInt(const std::string& name, int value) {
   auto it = int_values_.find(name);
   if (it == int_values_.end()) {
-    return absl::NotFoundError(
-        absl::StrCat("No int argument with name - ", name));
+    return abslx::NotFoundError(
+        abslx::StrCat("No int argument with name - ", name));
   }
   it->second.value = value;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
-absl::Status Arguments::SetFloat(const std::string& name, float value) {
+abslx::Status Arguments::SetFloat(const std::string& name, float value) {
   auto it = float_values_.find(name);
   if (it == float_values_.end()) {
-    return absl::NotFoundError(
-        absl::StrCat("No float argument with name - ", name));
+    return abslx::NotFoundError(
+        abslx::StrCat("No float argument with name - ", name));
   }
   it->second.value = value;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Arguments::SetHalf(const std::string& name, half value) {
+abslx::Status Arguments::SetHalf(const std::string& name, half value) {
   auto it = half_values_.find(name);
   if (it == half_values_.end()) {
-    return absl::NotFoundError(
-        absl::StrCat("No half argument with name - ", name));
+    return abslx::NotFoundError(
+        abslx::StrCat("No half argument with name - ", name));
   }
   it->second.value = value;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void Arguments::AddObjectRef(const std::string& name, AccessType access_type,
@@ -319,7 +319,7 @@ void Arguments::RenameArgs(const std::string& postfix,
   }
 }
 
-absl::Status Arguments::Merge(Arguments&& args, const std::string& postfix,
+abslx::Status Arguments::Merge(Arguments&& args, const std::string& postfix,
                               const std::vector<std::string>& exception_names) {
   std::vector<std::string> object_names;
   object_names.reserve(args.object_refs_.size() + args.objects_.size());
@@ -331,8 +331,8 @@ absl::Status Arguments::Merge(Arguments&& args, const std::string& postfix,
     object_names.push_back(v.first);
     const std::string name = v.first + postfix;
     if (object_refs_.find(name) != object_refs_.end()) {
-      return absl::InvalidArgumentError(
-          absl::StrCat("Object reference name collision. Name - ", name));
+      return abslx::InvalidArgumentError(
+          abslx::StrCat("Object reference name collision. Name - ", name));
     }
     object_refs_[name] = {std::move(v.second)};
   }
@@ -344,8 +344,8 @@ absl::Status Arguments::Merge(Arguments&& args, const std::string& postfix,
     object_names.push_back(v.first);
     const std::string name = v.first + postfix;
     if (objects_.find(name) != objects_.end()) {
-      return absl::InvalidArgumentError(
-          absl::StrCat("Object name collision. Name - ", name));
+      return abslx::InvalidArgumentError(
+          abslx::StrCat("Object name collision. Name - ", name));
     }
     objects_[name] = {std::move(v.second)};
   }
@@ -358,22 +358,22 @@ absl::Status Arguments::Merge(Arguments&& args, const std::string& postfix,
   for (const auto& v : args.half_values_) {
     AddHalf(RenameArg(object_names, postfix, v.first), v.second.value);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Arguments::GetDescriptor(const std::string& name,
+abslx::Status Arguments::GetDescriptor(const std::string& name,
                                       GPUObjectDescriptor** descriptor) const {
   auto it_ref = object_refs_.find(name);
   if (it_ref != object_refs_.end()) {
     *descriptor = it_ref->second.get();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   auto it = objects_.find(name);
   if (it != objects_.end()) {
     *descriptor = it->second.get();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  return absl::NotFoundError(absl::StrCat("No GPU object with name - ", name));
+  return abslx::NotFoundError(abslx::StrCat("No GPU object with name - ", name));
 }
 
 void Arguments::ReleaseCPURepresentation() {
@@ -426,7 +426,7 @@ void Arguments::SetStateValueForAllObjects(const std::string& key,
   }
 }
 
-absl::Status Arguments::Compile(
+abslx::Status Arguments::Compile(
     const GpuInfo& gpu_info,
     const std::map<std::string, std::string>& linkables, std::string* code) {
   RETURN_IF_ERROR(AddObjectsScalarArgs(gpu_info));
@@ -434,10 +434,10 @@ absl::Status Arguments::Compile(
   RETURN_IF_ERROR(ResolveSelectorsPass(gpu_info, linkables, code));
   GetActiveArguments(*code);
   RETURN_IF_ERROR(ResolveKernelGlobalSpaceBuffers(gpu_info, code));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Arguments::ResolveConstExprPass(const GpuInfo& gpu_info,
+abslx::Status Arguments::ResolveConstExprPass(const GpuInfo& gpu_info,
                                              std::string* code) const {
   std::string result;
   size_t position = 0;
@@ -466,20 +466,20 @@ absl::Status Arguments::ResolveConstExprPass(const GpuInfo& gpu_info,
     }
     next_position = code->find(kArgsPrefix, position);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Arguments::ResolveConstExpr(const GpuInfo& gpu_info,
+abslx::Status Arguments::ResolveConstExpr(const GpuInfo& gpu_info,
                                          const std::string& object_name,
                                          const std::string& const_expr,
                                          std::string* result) const {
   tflite::gpu::GPUObjectDescriptor* desc_ptr;
   RETURN_IF_ERROR(GetDescriptor(object_name, &desc_ptr));
   RETURN_IF_ERROR(desc_ptr->PerformConstExpr(gpu_info, const_expr, result));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Arguments::ResolveSelectorsPass(
+abslx::Status Arguments::ResolveSelectorsPass(
     const GpuInfo& gpu_info,
     const std::map<std::string, std::string>& linkables,
     std::string* code) const {
@@ -505,7 +505,7 @@ absl::Status Arguments::ResolveSelectorsPass(
         next = (*code)[next_position];
       }
       if (next != '(') {
-        return absl::NotFoundError(absl::StrCat(
+        return abslx::NotFoundError(abslx::StrCat(
             "Expected ( after ", object_name, ".", selector_name, " call"));
       }
       std::vector<std::string> function_args;
@@ -526,10 +526,10 @@ absl::Status Arguments::ResolveSelectorsPass(
     }
     next_position = code->find(kArgsPrefix, position);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Arguments::ResolveSelector(
+abslx::Status Arguments::ResolveSelector(
     const GpuInfo& gpu_info,
     const std::map<std::string, std::string>& linkables,
     const std::string& object_name, const std::string& selector,
@@ -545,7 +545,7 @@ absl::Status Arguments::ResolveSelector(
     if (it != linkables.end() && !it->second.empty()) {
       if (desc_ptr->GetAccess() != AccessType::WRITE &&
           desc_ptr->GetAccess() != AccessType::READ_WRITE) {
-        return absl::FailedPreconditionError(absl::StrCat(
+        return abslx::FailedPreconditionError(abslx::StrCat(
             "Object with name - ", object_name, " should have Write access."));
       }
       std::string value_name, x_coord, y_coord, z_coord, s_coord, b_coord;
@@ -557,8 +557,8 @@ absl::Status Arguments::ResolveSelector(
           "\n" + GetTypeDeclaration(gpu_info, tensor_desc->GetDataType(), 4) +
           " " + new_value_name + ";\n";
       *result = "{  // elementwise code with input:" + value_name +
-                absl::Substitute(it->second, out_var_declaration) + "\n";
-      *result = absl::StrReplaceAll(*result, {{"\n", "\n  "}});
+                abslx::Substitute(it->second, out_var_declaration) + "\n";
+      *result = abslx::StrReplaceAll(*result, {{"\n", "\n  "}});
       ReplaceAllWords("in_value", value_name, result);
       ReplaceAllWords("out_value", new_value_name, result);
       ReplaceAllWords("X_COORD", x_coord, result);
@@ -581,7 +581,7 @@ absl::Status Arguments::ResolveSelector(
     // result has elementwise code
     *result += "// write result to tensor\n  " + patch + ";\n}";
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void Arguments::ResolveObjectNames(const std::string& object_name,
@@ -593,26 +593,26 @@ void Arguments::ResolveObjectNames(const std::string& object_name,
   }
 }
 
-absl::Status Arguments::AddObjectsScalarArgs(const GpuInfo& gpu_info) {
+abslx::Status Arguments::AddObjectsScalarArgs(const GpuInfo& gpu_info) {
   for (auto& t : objects_) {
     const auto resources = t.second->GetGPUResources(gpu_info);
     for (const auto& r : resources.ints) {
-      AddInt(absl::StrCat(t.first, "_", r));
+      AddInt(abslx::StrCat(t.first, "_", r));
     }
     for (const auto& r : resources.floats) {
-      AddFloat(absl::StrCat(t.first, "_", r));
+      AddFloat(abslx::StrCat(t.first, "_", r));
     }
   }
   for (auto& t : object_refs_) {
     const auto resources = t.second->GetGPUResources(gpu_info);
     for (const auto& r : resources.ints) {
-      AddInt(absl::StrCat(t.first, "_", r));
+      AddInt(abslx::StrCat(t.first, "_", r));
     }
     for (const auto& r : resources.floats) {
-      AddFloat(absl::StrCat(t.first, "_", r));
+      AddFloat(abslx::StrCat(t.first, "_", r));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void Arguments::ResolveArgsPass(std::string* code) const {
@@ -629,7 +629,7 @@ void Arguments::ResolveArgsPass(std::string* code) const {
   }
 }
 
-absl::Status Arguments::ResolveKernelGlobalSpaceBuffers(const GpuInfo& gpu_info,
+abslx::Status Arguments::ResolveKernelGlobalSpaceBuffers(const GpuInfo& gpu_info,
                                                         std::string* code) {
   for (auto it = objects_.begin(); it != objects_.end();) {
     const auto* buffer_desc =
@@ -658,7 +658,7 @@ absl::Status Arguments::ResolveKernelGlobalSpaceBuffers(const GpuInfo& gpu_info,
     *code = declaration + *code;
     objects_.erase(it++);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

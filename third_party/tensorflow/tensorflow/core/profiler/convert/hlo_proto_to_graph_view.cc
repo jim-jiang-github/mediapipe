@@ -46,16 +46,16 @@ using ::xla::RenderedGraphFormat;
 
 const HloInstruction* FindInstruction(const HloModule& module,
                                       std::string node_name) {
-  if (absl::StartsWith(node_name, "%")) {
+  if (abslx::StartsWith(node_name, "%")) {
     node_name.erase(node_name.begin());
   }
   for (const HloComputation* computation : module.computations()) {
     auto instrs = computation->instructions();
-    auto it = absl::c_find_if(instrs, [&](const HloInstruction* instr) {
+    auto it = abslx::c_find_if(instrs, [&](const HloInstruction* instr) {
       // Try with and without "%" at the beginning of the node name.
-      return absl::EqualsIgnoreCase(instr->name(), node_name) ||
-             absl::EqualsIgnoreCase(instr->name(),
-                                    absl::StrCat("%", node_name));
+      return abslx::EqualsIgnoreCase(instr->name(), node_name) ||
+             abslx::EqualsIgnoreCase(instr->name(),
+                                    abslx::StrCat("%", node_name));
     });
     if (it != instrs.end()) {
       return *it;
@@ -67,7 +67,7 @@ const HloInstruction* FindInstruction(const HloModule& module,
 const HloComputation* FindComputation(const HloModule& module,
                                       const std::string& comp_name) {
   for (const HloComputation* computation : module.computations()) {
-    if (absl::EqualsIgnoreCase(computation->name(), comp_name)) {
+    if (abslx::EqualsIgnoreCase(computation->name(), comp_name)) {
       return computation;
     }
   }
@@ -100,7 +100,7 @@ StatusOr<std::string> Plot(std::unique_ptr<HloModule> module,
   const HloComputation* comp = FindComputation(*module, node_name);
   if (!instr && !comp) {
     return InvalidArgument(
-        absl::StrCat("Couldn't find HloInstruction or HloComputation named ",
+        abslx::StrCat("Couldn't find HloInstruction or HloComputation named ",
                      node_name, "."));
   }
   // Generate the graph and print the resulting string.

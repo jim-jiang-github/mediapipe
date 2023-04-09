@@ -39,8 +39,8 @@ struct MklEinsumHelper {
 
   template <typename Device, typename T>
   static Status MKLContractOperands(
-      OpKernelContext* ctx, absl::Span<const Tensor> inputs,
-      absl::Span<const bool> swap_free_and_contract, Tensor* output) {
+      OpKernelContext* ctx, abslx::Span<const Tensor> inputs,
+      abslx::Span<const bool> swap_free_and_contract, Tensor* output) {
     if (inputs.size() == 1)
       return EinsumHelper::CopyFrom(inputs[0], inputs[0].shape(), output);
     MatMulBCast bcast(inputs[0].shape().dim_sizes(),

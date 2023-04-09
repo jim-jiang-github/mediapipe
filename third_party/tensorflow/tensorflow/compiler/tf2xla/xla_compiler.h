@@ -224,7 +224,7 @@ class XlaCompiler {
 
   Status CompileFunction(const CompileOptions& options,
                          const NameAttrList& fn_name_attrs,
-                         absl::Span<const Argument> args,
+                         abslx::Span<const Argument> args,
                          CompilationResult* result);
 
   // Compiles a tensorflow::Graph into an xla::XlaComputation.
@@ -232,7 +232,7 @@ class XlaCompiler {
   // function.
   Status CompileGraph(
       const CompileOptions& options, string const& name,
-      std::unique_ptr<Graph> graph, absl::Span<const Argument> args,
+      std::unique_ptr<Graph> graph, abslx::Span<const Argument> args,
       CompilationResult* result);
 
   // Returns the shape of the XLA parameter for an argument 'arg'.
@@ -263,8 +263,8 @@ class XlaCompiler {
   // Sets the shapes and types for the device to host transfer associated with
   // 'key'.
   Status SetDeviceToHostMetadata(const string& key,
-                                 absl::Span<const DataType> types,
-                                 absl::Span<const TensorShape> shapes);
+                                 abslx::Span<const DataType> types,
+                                 abslx::Span<const TensorShape> shapes);
 
   // Gets the shapes the device to host transfer associated with 'key'.
   Status GetDeviceToHostShapes(const string& key,
@@ -273,8 +273,8 @@ class XlaCompiler {
   // Sets the shapes and types for the host to device transfer associated with
   // 'key'.
   Status SetHostToDeviceMetadata(const string& key,
-                                 absl::Span<const DataType> types,
-                                 absl::Span<const TensorShape> shapes);
+                                 abslx::Span<const DataType> types,
+                                 abslx::Span<const TensorShape> shapes);
 
   // In order to avoid deadlocks from dependencies in host computations, it can
   // be necessary to enforce a partial order on the execution of HostCompute

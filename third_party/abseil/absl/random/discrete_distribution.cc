@@ -14,7 +14,7 @@
 
 #include "absl/random/discrete_distribution.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -95,4 +95,4 @@ std::vector<std::pair<double, size_t>> InitDiscreteDistribution(
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

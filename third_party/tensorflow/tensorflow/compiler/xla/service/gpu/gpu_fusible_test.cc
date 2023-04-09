@@ -34,7 +34,7 @@ const char kModulePrefix[] = R"(
     })";
 
 TEST_F(GpuFusibleTest, IsPhysicallyTransposing_ElementwiseProducer) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     ENTRY entry {
       p0 = f32[2,2,2]{2,1,0} parameter(0)
       c0 = f32[] constant(0)
@@ -50,7 +50,7 @@ TEST_F(GpuFusibleTest, IsPhysicallyTransposing_ElementwiseProducer) {
 }
 
 TEST_F(GpuFusibleTest, IsPhysicallyTransposing_MixedLayoutProducer) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     mixed_input_layouts_computation {
       p0.1 = f16[128,1024,32,32]{1,3,2,0} parameter(0)
       p1.1 = f16[128,1024,32,32]{3,2,1,0} parameter(1)
@@ -83,7 +83,7 @@ TEST_F(GpuFusibleTest, IsPhysicallyTransposing_MixedLayoutProducer) {
 
 TEST_F(GpuFusibleTest,
        IsPhysicallyTransposing_MixedLayoutProducerWithTrivialDim) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     mixed_input_layouts_computation {
       p0.1 = f16[128,1,32,32]{1,3,2,0} parameter(0)
       p1.1 = f16[128,1,32,32]{3,2,1,0} parameter(1)
@@ -115,7 +115,7 @@ TEST_F(GpuFusibleTest,
 }
 
 TEST_F(GpuFusibleTest, IsPhysicallyTransposing_CopyProducer) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_reduce {
       p0.1 = f32[128,1024,32,32]{1,3,2,0} parameter(0)
       c0.1 = f32[] constant(0)
@@ -135,7 +135,7 @@ TEST_F(GpuFusibleTest, IsPhysicallyTransposing_CopyProducer) {
 }
 
 TEST_F(GpuFusibleTest, IsPhysicallyTransposing_PhysicalTranspose) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_reduce {
       p0.1 = f32[1024,128,32,32]{3,2,1,0} parameter(0)
       c0.1 = f32[] constant(0)
@@ -155,7 +155,7 @@ TEST_F(GpuFusibleTest, IsPhysicallyTransposing_PhysicalTranspose) {
 }
 
 TEST_F(GpuFusibleTest, IsPhysicallyTransposing_LayoutChangingFusionProducer) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     layout_changing_computation {
       p0.1 = f16[128,1024,32,32]{3,2,1,0} parameter(0)
       p1.1 = f16[128,1024,32,32]{3,2,1,0} parameter(1)
@@ -187,7 +187,7 @@ TEST_F(GpuFusibleTest, IsPhysicallyTransposing_LayoutChangingFusionProducer) {
 
 TEST_F(GpuFusibleTest,
        IsPhysicallyTransposing_ConsiderMaximumTrueRanksParamsOnly) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     broadcasting_computation {
       p0.1 = f32[128,1024,32,32]{1,3,2,0} parameter(0)
       p1.1 = f32[1,128,1,1]{3,2,1,0} parameter(1)
@@ -211,7 +211,7 @@ TEST_F(GpuFusibleTest,
 }
 
 TEST_F(GpuFusibleTest, IsReduceInputFusion_ReductionToVector) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     ENTRY entry {
       c0 = f32[] parameter(0)
       p1 = f32[128,512,28,28]{3,2,1,0} parameter(1)
@@ -228,7 +228,7 @@ TEST_F(GpuFusibleTest, IsReduceInputFusion_ReductionToVector) {
 }
 
 TEST_F(GpuFusibleTest, IsReduceInputFusion_ElementalReduction) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     ENTRY entry {
       c0 = f32[] parameter(0)
       p1 = f32[8,512,5,16,1,1]{5,4,3,2,1,0} parameter(1)
@@ -246,7 +246,7 @@ TEST_F(GpuFusibleTest, IsReduceInputFusion_ElementalReduction) {
 }
 
 TEST_F(GpuFusibleTest, IsReduceInputFusion_SingleOutputInputReduceFusion) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_reduction {
       c0 = f32[] constant(0)
       p1 = f32[128,512,28,28]{3,2,1,0} parameter(0)
@@ -265,7 +265,7 @@ TEST_F(GpuFusibleTest, IsReduceInputFusion_SingleOutputInputReduceFusion) {
 }
 
 TEST_F(GpuFusibleTest, IsReduceInputFusion_SingleOutputLoopReduceFusion) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_reduction {
       c0 = f32[] constant(0)
       p1 = f32[8,512,5,16,1,1]{5,4,3,2,1,0} parameter(0)
@@ -284,7 +284,7 @@ TEST_F(GpuFusibleTest, IsReduceInputFusion_SingleOutputLoopReduceFusion) {
 }
 
 TEST_F(GpuFusibleTest, IsReduceInputFusion_MultiOutputInputReduceFusion) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_reduction {
       c0 = f32[] constant(0)
       p1 = f32[128,512,28,28]{3,2,1,0} parameter(0)
@@ -306,7 +306,7 @@ TEST_F(GpuFusibleTest, IsReduceInputFusion_MultiOutputInputReduceFusion) {
 
 TEST_F(GpuFusibleTest,
        IsReduceInputFusion_MultiOutputInputReduceFusionWithExtraOutputs) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_reduction {
       c0 = f32[] constant(0)
       p1 = f32[128,512,28,28]{3,2,1,0} parameter(0)
@@ -327,7 +327,7 @@ TEST_F(GpuFusibleTest,
 }
 
 TEST_F(GpuFusibleTest, IsReduceInputFusion_MultiOutputLoopReduceFusion) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_reduction {
       c0 = f32[] constant(0)
       p1 = f32[128,512,28,28]{3,2,1,0} parameter(0)
@@ -349,7 +349,7 @@ TEST_F(GpuFusibleTest, IsReduceInputFusion_MultiOutputLoopReduceFusion) {
 
 TEST_F(GpuFusibleTest,
        IsReduceInputFusion_MultiOutputLoopFusionReduceAndElementwiseOp) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_reduction {
       c0 = f32[] constant(0)
       p1 = f32[128,512,28,28]{3,2,1,0} parameter(0)
@@ -370,7 +370,7 @@ TEST_F(GpuFusibleTest,
 }
 
 TEST_F(GpuFusibleTest, ShapesCompatibleForMultiOutputFusion_LoopFusions) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_computation_1 {
       p0.1 = f32[6400]{0} parameter(0)
       ROOT mul = f32[6400]{0} multiply(p0.1, p0.1)
@@ -398,7 +398,7 @@ TEST_F(GpuFusibleTest, ShapesCompatibleForMultiOutputFusion_LoopFusions) {
 }
 
 TEST_F(GpuFusibleTest, ShapesCompatibleForMultiOutputFusion_IgnoreFpPrecision) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_computation_1 {
       p0.1 = f32[6400]{0} parameter(0)
       ROOT mul = f32[6400]{0} multiply(p0.1, p0.1)
@@ -424,7 +424,7 @@ TEST_F(GpuFusibleTest, ShapesCompatibleForMultiOutputFusion_IgnoreFpPrecision) {
 }
 
 TEST_F(GpuFusibleTest, ShapesCompatibleForMultiOutputFusion_Reduce) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_computation_1 {
       p0.1 = f32[6400]{0} parameter(0)
       ROOT mul = f32[6400]{0} multiply(p0.1, p0.1)
@@ -446,7 +446,7 @@ TEST_F(GpuFusibleTest, ShapesCompatibleForMultiOutputFusion_Reduce) {
 }
 
 TEST_F(GpuFusibleTest, ShapesCompatibleForMultiOutputFusion_Elementwise) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_computation_1 {
       p0.1 = f32[6400]{0} parameter(0)
       ROOT mul = f32[6400]{0} multiply(p0.1, p0.1)
@@ -470,7 +470,7 @@ TEST_F(GpuFusibleTest, ShapesCompatibleForMultiOutputFusion_Elementwise) {
 
 TEST_F(GpuFusibleTest,
        ShapesCompatibleForMultiOutputFusion_MultiOutputLoopFusion) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_computation_1 {
       p0.1 = f32[8,1,5,16,1,1]{5,4,3,2,1,0} parameter(0)
       mul = f32[8,1,5,16,1,1]{5,4,3,2,1,0} multiply(p0.1, p0.1)
@@ -504,7 +504,7 @@ TEST_F(GpuFusibleTest,
 
 TEST_F(GpuFusibleTest,
        ShapesCompatibleForMultiOutputFusion_DifferentElementType) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_computation_1 {
       p0.1 = f32[8,1,5,16,1,1]{5,4,3,2,1,0} parameter(0)
       mul = f32[8,1,5,16,1,1]{5,4,3,2,1,0} multiply(p0.1, p0.1)
@@ -538,7 +538,7 @@ TEST_F(GpuFusibleTest,
 }
 
 TEST_F(GpuFusibleTest, ShapesCompatibleForMultiOutputFusion_UnfusedOps) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     ENTRY reduce {
       p0 = f32[32,32,32]{2,1,0} parameter(0)
       c0 = f32[] constant(0)
@@ -556,7 +556,7 @@ TEST_F(GpuFusibleTest, ShapesCompatibleForMultiOutputFusion_UnfusedOps) {
 }
 
 TEST_F(GpuFusibleTest, ShapesCompatibleForMultiOutputFusion_DifferentLayouts) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     ENTRY reduce {
       p0 = f32[2,2,2]{2,1,0} parameter(0)
       p1 = f32[2,2,2]{0,1,2} parameter(1)
@@ -575,7 +575,7 @@ TEST_F(GpuFusibleTest, ShapesCompatibleForMultiOutputFusion_DifferentLayouts) {
 
 TEST_F(GpuFusibleTest,
        ShapesCompatibleForMultiOutputFusion_MultiOutputReduceFusion) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_select {
       p1.1 = f32[2,2,2]{2,1,0} parameter(1)
       c0 = f32[] constant(0)
@@ -612,7 +612,7 @@ TEST_F(GpuFusibleTest,
 }
 
 TEST_F(GpuFusibleTest, ShapesCompatibleForMultiOutputFusion_ReduceFusions) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_reduce_1 {
       p0.1 = f32[2,2,2]{2,1,0} parameter(0)
       c0 = f32[] constant(0)
@@ -643,7 +643,7 @@ TEST_F(GpuFusibleTest, ShapesCompatibleForMultiOutputFusion_ReduceFusions) {
 
 TEST_F(GpuFusibleTest,
        ShapesCompatibleForMultiOutputFusion_DifferentReduceDimensions) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_reduce_1 {
       p0.1 = f32[32,32,32]{2,1,0} parameter(0)
       c0 = f32[] constant(0)
@@ -677,7 +677,7 @@ TEST_F(GpuFusibleTest,
 
 TEST_F(GpuFusibleTest,
        ShapesCompatibleForMultiOutputFusion_NoReductionToVector) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_element_wise {
       p0.1 = f32[32,32,32]{2,1,0} parameter(0)
       p1.1 = f32[32,32,32]{2,1,0} parameter(1)
@@ -760,7 +760,7 @@ TEST_F(GpuFusibleTest, ScatterIsNotFusibleAsMultiOutputFusionRoot) {
 }
 
 TEST_F(GpuFusibleTest, ProducerConsumerFusionElementwiseAndReduce) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     ENTRY reduce {
       p0 = f32[32,32,32]{2,1,0} parameter(0)
       c0 = f32[] constant(0)
@@ -777,7 +777,7 @@ TEST_F(GpuFusibleTest, ProducerConsumerFusionElementwiseAndReduce) {
 }
 
 TEST_F(GpuFusibleTest, ProducerConsumerFusionLoopFusionAndReduce) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_add {
       p0.1 = f32[32,32,32]{2,1,0} parameter(0)
       p1.1 = f32[32,32,32]{2,1,0} parameter(1)
@@ -801,7 +801,7 @@ TEST_F(GpuFusibleTest, ProducerConsumerFusionLoopFusionAndReduce) {
 }
 
 TEST_F(GpuFusibleTest, ProducerConsumerFusionLoopFusionAndReduceFusion) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_select {
       p1.1 = f32[32,32,32]{2,1,0} parameter(1)
       c0 = f32[] constant(0)
@@ -840,7 +840,7 @@ TEST_F(GpuFusibleTest, ProducerConsumerFusionLoopFusionAndReduceFusion) {
 }
 
 TEST_F(GpuFusibleTest, ProducerConsumerFusionDoNotFuseLoopReduceFusion) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_element_wise {
       p0.1 = f32[2,2,2]{2,1,0} parameter(0)
       p1.1 = f32[2,2,2]{2,1,0} parameter(1)
@@ -873,7 +873,7 @@ TEST_F(GpuFusibleTest, ProducerConsumerFusionDoNotFuseLoopReduceFusion) {
 }
 
 TEST_F(GpuFusibleTest, ProducerConsumerFusionReduceUnfriendlyLoopFusion) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     mixed_input_layouts_computation {
       p0.1 = f16[128,1024,32,32]{1,3,2,0} parameter(0)
       p1.1 = f16[128,1024,32,32]{3,2,1,0} parameter(1)
@@ -904,7 +904,7 @@ TEST_F(GpuFusibleTest, ProducerConsumerFusionReduceUnfriendlyLoopFusion) {
 }
 
 TEST_F(GpuFusibleTest, ProducerConsumerFusionInPlaceOperation) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     %fusion {
       %param_0 = s32[4,4]{1,0} parameter(0)
       %copy = s32[4,4]{0,1} copy(%param_0)
@@ -1043,7 +1043,7 @@ TEST_F(GpuFusibleTest, FuseLayoutChangingOpWithElementwise) {
 }
 
 TEST_F(GpuFusibleTest, CreatesNestedLoop_NonfusionInstr) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     ENTRY entry {
       p_0 = f32[2,5] parameter(0)
 
@@ -1065,7 +1065,7 @@ TEST_F(GpuFusibleTest, CreatesNestedLoop_NonfusionInstr) {
 }
 
 TEST_F(GpuFusibleTest, DoesNotCreateNestedLoop_NonfusionInstr) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     ENTRY entry {
       p_0 = f32[3,5] parameter(0)
       constant = f32[] constant(1)
@@ -1086,7 +1086,7 @@ TEST_F(GpuFusibleTest, DoesNotCreateNestedLoop_NonfusionInstr) {
 }
 
 TEST_F(GpuFusibleTest, DoesNotCreateNestedLoop_NonoverlappingReduceWindows) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     ENTRY entry {
       p_0 = f32[2,5] parameter(0)
 
@@ -1108,7 +1108,7 @@ TEST_F(GpuFusibleTest, DoesNotCreateNestedLoop_NonoverlappingReduceWindows) {
 }
 
 TEST_F(GpuFusibleTest, CreatesNestedLoop_FusionInstr) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_producer {
       operand = f32[2,2] parameter(0)
       constant = f32[] constant(1)
@@ -1141,7 +1141,7 @@ TEST_F(GpuFusibleTest, CreatesNestedLoop_FusionInstr) {
 }
 
 TEST_F(GpuFusibleTest, DoesNotCreateNestedLoop_FusionInstr) {
-  auto module = ParseAndReturnVerifiedModule(absl::StrCat(kModulePrefix, R"(
+  auto module = ParseAndReturnVerifiedModule(abslx::StrCat(kModulePrefix, R"(
     fused_producer {
       p_0 = f32[2,2] parameter(0)
       constant = f32[] constant(1)

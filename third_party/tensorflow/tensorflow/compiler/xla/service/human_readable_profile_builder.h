@@ -29,7 +29,7 @@ namespace xla {
 // computation, suitable for consumption by humans.
 class HumanReadableProfileBuilder {
  public:
-  explicit HumanReadableProfileBuilder(absl::string_view computation_name,
+  explicit HumanReadableProfileBuilder(abslx::string_view computation_name,
                                        bool is_entry_computation,
                                        int64_t total_cycles,
                                        double clock_rate_ghz)
@@ -45,8 +45,8 @@ class HumanReadableProfileBuilder {
   // Adds an operation to the profile.  If you don't know the number of
   // floating-point ops or bytes touched by the op, or if you don't know how
   // fast it would run optimally, pass -1 for that param.
-  void AddOp(absl::string_view op_name, absl::string_view short_name,
-             absl::string_view category, int64_t cycles, int64_t flop_count,
+  void AddOp(abslx::string_view op_name, abslx::string_view short_name,
+             abslx::string_view category, int64_t cycles, int64_t flop_count,
              int64_t transcendental_count, int64_t bytes_accessed,
              float optimal_seconds) {
     op_infos_.push_back({std::string(op_name), std::string(short_name),

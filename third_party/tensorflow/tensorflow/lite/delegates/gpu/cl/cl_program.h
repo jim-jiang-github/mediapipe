@@ -56,7 +56,7 @@ class CLProgram {
   // was created using clCreateProgramWithBinary.
   cl_device_id GetDeviceId() const { return device_id_; }
 
-  absl::Status GetBinary(std::vector<uint8_t>* result) const;
+  abslx::Status GetBinary(std::vector<uint8_t>* result) const;
 
  private:
   void Release();
@@ -67,14 +67,14 @@ class CLProgram {
   cl_device_id device_id_ = nullptr;
 };
 
-absl::Status CreateCLProgram(const std::string& code,
+abslx::Status CreateCLProgram(const std::string& code,
                              const std::string& compiler_options,
                              const CLContext& context, const CLDevice& device,
                              CLProgram* result);
 
-absl::Status CreateCLProgramFromBinary(const CLContext& context,
+abslx::Status CreateCLProgramFromBinary(const CLContext& context,
                                        const CLDevice& device,
-                                       absl::Span<const uint8_t> binary,
+                                       abslx::Span<const uint8_t> binary,
                                        CLProgram* result);
 
 }  // namespace cl

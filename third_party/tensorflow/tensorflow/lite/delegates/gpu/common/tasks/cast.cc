@@ -32,7 +32,7 @@ GPUOperation CreateCast(const OperationDef& definition,
       GetTypeConversion(gpu_info, definition.src_tensors[0].GetDataType(),
                         definition.dst_tensors[0].GetDataType(), 4);
   op_desc.code =
-      "out_value = " + absl::Substitute(conversion, "in_value") + ";\n";
+      "out_value = " + abslx::Substitute(conversion, "in_value") + ";\n";
   return CreateGpuOperation(definition, std::move(op_desc));
 }
 

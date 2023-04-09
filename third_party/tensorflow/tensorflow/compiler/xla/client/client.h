@@ -59,7 +59,7 @@ class Client {
   // Executable is unloaded, use the LocalClient API.
   StatusOr<ExecutionHandle> Compile(
       const XlaComputation& computation,
-      absl::Span<const Shape> argument_shapes,
+      abslx::Span<const Shape> argument_shapes,
       const ExecutionOptions* execution_options = nullptr);
 
   // Executes the compiled executable for the given handle with the given
@@ -67,7 +67,7 @@ class Client {
   // * If execution_profile is not nullptr then the pointed-to ExecutionProfile
   //   will be filled with profile data from the execution.
   StatusOr<std::unique_ptr<GlobalData>> Execute(
-      const ExecutionHandle& handle, absl::Span<GlobalData* const> arguments,
+      const ExecutionHandle& handle, abslx::Span<GlobalData* const> arguments,
       ExecutionProfile* execution_profile = nullptr);
 
   // Executes the computation with the given arguments and returns the global
@@ -87,7 +87,7 @@ class Client {
   // resulting Executable lives, use the LocalClient API.
   StatusOr<std::unique_ptr<GlobalData>> Execute(
       const XlaComputation& computation,
-      absl::Span<GlobalData* const> arguments,
+      abslx::Span<GlobalData* const> arguments,
       const ExecutionOptions* execution_options = nullptr,
       ExecutionProfile* execution_profile = nullptr);
 
@@ -116,7 +116,7 @@ class Client {
   // from each computation.
   //
   StatusOr<std::vector<std::unique_ptr<GlobalData>>> ExecuteParallel(
-      absl::Span<const XlaComputationInstance> computations);
+      abslx::Span<const XlaComputationInstance> computations);
 
   // Requests device_count device handles available on the target. The returned
   // device handles are used to specify the devices to execute the computations
@@ -168,7 +168,7 @@ class Client {
   // Execute() and Transfer().
   StatusOr<Literal> ExecuteAndTransfer(
       const XlaComputation& computation,
-      absl::Span<GlobalData* const> arguments,
+      abslx::Span<GlobalData* const> arguments,
       const ExecutionOptions* execution_options = nullptr,
       ExecutionProfile* execution_profile = nullptr);
 

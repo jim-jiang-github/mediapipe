@@ -92,7 +92,7 @@ ImageFormat::Format GetImageFormat(int num_channels) {
 //
 class OpenCvVideoDecoderCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->InputSidePackets().Tag(kInputFilePathTag).Set<std::string>();
     cc->Outputs().Tag(kVideoTag).Set<ImageFrame>();
     if (cc->Outputs().HasTag(kVideoPrestreamTag)) {
@@ -101,13 +101,13 @@ class OpenCvVideoDecoderCalculator : public CalculatorBase {
     if (cc->OutputSidePackets().HasTag(kSavedAudioPathTag)) {
       cc->OutputSidePackets().Tag(kSavedAudioPathTag).Set<std::string>();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     const std::string& input_file_path =
         cc->InputSidePackets().Tag(kInputFilePathTag).Get<std::string>();
-    cap_ = absl::make_unique<cv::VideoCapture>(input_file_path);
+    cap_ = abslx::make_unique<cv::VideoCapture>(input_file_path);
     if (!cap_->isOpened()) {
       return mediapipe::InvalidArgumentErrorBuilder(MEDIAPIPE_LOC)
              << "Fail to open video file at " << input_file_path;
@@ -139,7 +139,7 @@ class OpenCvVideoDecoderCalculator : public CalculatorBase {
                 "the video file at "
              << input_file_path;
     }
-    auto header = absl::make_unique<VideoHeader>();
+    auto header = abslx::make_unique<VideoHeader>();
     header->format = format_;
     header->width = width_;
     header->height = height_;
@@ -159,10 +159,10 @@ class OpenCvVideoDecoderCalculator : public CalculatorBase {
 #ifdef HAVE_FFMPEG
       std::string saved_audio_path = std::tmpnam(nullptr);
       std::string ffmpeg_command =
-          absl::StrCat("ffmpeg -nostats -loglevel 0 -i ", input_file_path,
+          abslx::StrCat("ffmpeg -nostats -loglevel 0 -i ", input_file_path,
                        " -vn -f adts ", saved_audio_path);
       system(ffmpeg_command.c_str());
-      int status_code = system(absl::StrCat("ls ", saved_audio_path).c_str());
+      int status_code = system(abslx::StrCat("ls ", saved_audio_path).c_str());
       if (status_code == 0) {
         cc->OutputSidePackets()
             .Tag(kSavedAudioPathTag)
@@ -183,11 +183,11 @@ class OpenCvVideoDecoderCalculator : public CalculatorBase {
                 "config.";
 #endif
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
-    auto image_frame = absl::make_unique<ImageFrame>(format_, width_, height_,
+  abslx::Status Process(CalculatorContext* cc) override {
+    auto image_frame = abslx::make_unique<ImageFrame>(format_, width_, height_,
                                                      /*alignment_boundary=*/1);
     // Use microsecond as the unit of time.
     Timestamp timestamp(cap_->get(cv::CAP_PROP_POS_MSEC) * 1000);
@@ -219,10 +219,10 @@ class OpenCvVideoDecoderCalculator : public CalculatorBase {
       decoded_frames_++;
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Close(CalculatorContext* cc) override {
+  abslx::Status Close(CalculatorContext* cc) override {
     if (cap_ && cap_->isOpened()) {
       cap_->release();
     }
@@ -231,7 +231,7 @@ class OpenCvVideoDecoderCalculator : public CalculatorBase {
                    << frame_count_ << " vs decoded frames: " << decoded_frames_
                    << ").";
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Sometimes an empty frame is returned even though there are more frames.

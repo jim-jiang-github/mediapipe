@@ -29,7 +29,7 @@ namespace gpu {
 
 // Returns a parser for the provided custom op.
 std::unique_ptr<TFLiteOperationParser> NewCustomOperationParser(
-    absl::string_view op_name);
+    abslx::string_view op_name);
 
 }  // namespace gpu
 }  // namespace tflite

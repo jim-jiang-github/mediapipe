@@ -33,11 +33,11 @@ class ReshapeDecomposerTest : public HloTestBase {
   //
   // Check that all generated reshapes are bitcasts.
   void CheckReshapeDecomposer(const char* hlo,
-                              std::optional<absl::string_view> expected) {
+                              std::optional<abslx::string_view> expected) {
     RunAndFilecheckHloRewrite(
         hlo, ReshapeDecomposer{}, expected,
         /*after_pass_checks=*/[&](HloModule* module) {
-          EXPECT_TRUE(absl::c_all_of(
+          EXPECT_TRUE(abslx::c_all_of(
               module->entry_computation()->instructions(),
               [&](const HloInstruction* instr) {
                 return instr->opcode() != HloOpcode::kReshape ||

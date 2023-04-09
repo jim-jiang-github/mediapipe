@@ -36,7 +36,7 @@ void CopyToBuffer(const std::string& src, char* dest) {
 }
 
 #ifdef PLATFORM_GOOGLE
-void CopyToBuffer(const absl::Cord& src, char* dest) { src.CopyToArray(dest); }
+void CopyToBuffer(const abslx::Cord& src, char* dest) { src.CopyToArray(dest); }
 #endif
 }  // namespace port
 }  // namespace toco
@@ -72,7 +72,7 @@ void CheckInitGoogleIsDone(const char* message) {
 namespace file {
 
 // Conversion to our wrapper Status.
-tensorflow::Status ToStatus(const absl::Status& uts) {
+tensorflow::Status ToStatus(const abslx::Status& uts) {
   if (!uts.ok()) {
     return tensorflow::Status(
         tensorflow::errors::Code(::util::RetrieveErrorCode(uts)),

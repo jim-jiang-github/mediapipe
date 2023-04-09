@@ -54,9 +54,9 @@ class MemoryUsageMonitorTest : public ::testing::Test {
       result.max_rss_kb = 5 * ((*sleep_cnt_) + 1) * 1024;
       return result;
     }
-    void SleepFor(const absl::Duration& duration) override {
+    void SleepFor(const abslx::Duration& duration) override {
       (*sleep_cnt_)++;
-      absl::SleepFor(duration);
+      abslx::SleepFor(duration);
     }
 
    private:
@@ -116,7 +116,7 @@ TEST_F(MemoryUsageMonitorTest, StartStopPairs) {
   monitor_->Start();
   // Sleep for at least for a duration that's longer than the sampling interval
   // passed to 'monitor_' (i.e. 50 ms) to simulate the memory usage increase.
-  absl::SleepFor(absl::Milliseconds(100));
+  abslx::SleepFor(abslx::Milliseconds(100));
   monitor_->Stop();
   EXPECT_GE(num_sleeps_, 1);
   EXPECT_FLOAT_EQ(5.0 * (num_sleeps_ + 1), monitor_->GetPeakMemUsageInMB());

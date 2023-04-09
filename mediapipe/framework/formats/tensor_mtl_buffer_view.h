@@ -51,7 +51,7 @@ class MtlBufferView : public Tensor::View {
  protected:
   friend class Tensor;
   static void AllocateMtlBuffer(const Tensor& tensor, id<MTLDevice> device);
-  MtlBufferView(id<MTLBuffer> buffer, std::unique_ptr<absl::MutexLock>&& lock)
+  MtlBufferView(id<MTLBuffer> buffer, std::unique_ptr<abslx::MutexLock>&& lock)
       : Tensor::View(std::move(lock)), buffer_(buffer) {}
   id<MTLBuffer> buffer_;
 };

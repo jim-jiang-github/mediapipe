@@ -26,10 +26,10 @@ struct AsyncGroup {
 
 StatusOr<bool> CreateAsyncGroups(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads,
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads,
     std::vector<AsyncGroup>& async_groups) {
-  absl::flat_hash_map<int64_t, AsyncGroup*> async_groups_by_id;
-  absl::flat_hash_map<const HloInstruction*, AsyncGroup*>
+  abslx::flat_hash_map<int64_t, AsyncGroup*> async_groups_by_id;
+  abslx::flat_hash_map<const HloInstruction*, AsyncGroup*>
       async_groups_by_instruction;
 
   for (const HloComputation* computation :
@@ -92,7 +92,7 @@ StatusOr<bool> CreateAsyncGroups(
 
 StatusOr<bool> AsyncOpCanonicalizer::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   XLA_VLOG_LINES(
       1, module->ToString(HloPrintOptions().set_syntax_sugar_async_ops(false)));
 

@@ -63,7 +63,7 @@ class PyExecutable : public std::enable_shared_from_this<PyExecutable> {
     return executable_;
   }
 
-  absl::Span<const PjRtLoadedExecutable::LogicalDeviceIds>
+  abslx::Span<const PjRtLoadedExecutable::LogicalDeviceIds>
   addressable_device_logical_ids() const {
     return executable_->addressable_device_logical_ids();
   }
@@ -83,10 +83,10 @@ class PyExecutable : public std::enable_shared_from_this<PyExecutable> {
   bool is_deleted() { return executable_->IsDeleted(); }
 
   StatusOr<std::vector<PyBuffer::object>> Execute(
-      absl::Span<PyBuffer::object const> args);
+      abslx::Span<PyBuffer::object const> args);
 
   StatusOr<std::pair<std::vector<PyBuffer::object>, PyToken>> ExecuteWithToken(
-      absl::Span<PyBuffer::object const> args);
+      abslx::Span<PyBuffer::object const> args);
 
   // Takes args indexed by argid then deviceid, transposes them, and passes to
   // PjRtExecutable::Execute. The result is similarly transposed back into the
@@ -94,12 +94,12 @@ class PyExecutable : public std::enable_shared_from_this<PyExecutable> {
   // args is [num_args x num_devices].
   StatusOr<std::vector<std::vector<PyBuffer::object>>>
   ExecuteShardedOnLocalDevices(
-      absl::Span<const std::vector<PyBuffer::object>> args);
+      abslx::Span<const std::vector<PyBuffer::object>> args);
 
   StatusOr<std::pair<std::vector<std::vector<PyBuffer::object>>,
                      std::vector<PyToken>>>
   ExecuteShardedOnLocalDevicesWithTokens(
-      absl::Span<const std::vector<PyBuffer::object>> args);
+      abslx::Span<const std::vector<PyBuffer::object>> args);
 
   StatusOr<std::vector<std::shared_ptr<HloModule>>> HloModules() const;
 
@@ -118,12 +118,12 @@ class PyExecutable : public std::enable_shared_from_this<PyExecutable> {
 
  private:
   StatusOr<std::pair<std::vector<PyBuffer::object>, PyToken>> ExecuteInternal(
-      absl::Span<PyBuffer::object const> args,
+      abslx::Span<PyBuffer::object const> args,
       std::optional<std::vector<PjRtFuture<Status>>>& returned_futures);
   StatusOr<std::pair<std::vector<std::vector<PyBuffer::object>>,
                      std::vector<PyToken>>>
   ExecuteShardedOnLocalDevicesInternal(
-      absl::Span<const std::vector<PyBuffer::object>> args,
+      abslx::Span<const std::vector<PyBuffer::object>> args,
       std::optional<std::vector<PjRtFuture<Status>>>& returned_futures);
 
   friend class PyClient;

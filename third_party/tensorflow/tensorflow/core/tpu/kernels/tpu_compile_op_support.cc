@@ -56,14 +56,14 @@ Status ValidateResultShape(const Shape& client_shape,
 }
 
 StatusOr<std::unique_ptr<HloModuleConfig>> CreateModuleConfig(
-    const ProgramShape& program_shape, absl::Span<const Shape> argument_shapes,
-    absl::optional<const Shape> result_layout,
-    absl::optional<const DeviceAssignment> device_assignment, int replica_count,
+    const ProgramShape& program_shape, abslx::Span<const Shape> argument_shapes,
+    abslx::optional<const Shape> result_layout,
+    abslx::optional<const DeviceAssignment> device_assignment, int replica_count,
     int num_partitions, const DebugOptions* debug_options, const int* seed,
     const int* launch_id, const bool* alias_passthrough_params,
     const xla::FusionConfigCollection* fusion_config_collection,
     const std::vector<std::vector<bool>>* fusion_config) {
-  auto config = absl::make_unique<HloModuleConfig>(program_shape);
+  auto config = abslx::make_unique<HloModuleConfig>(program_shape);
   ComputationLayout* computation_layout =
       config->mutable_entry_computation_layout();
   if (program_shape.parameters_size() != argument_shapes.size()) {
@@ -135,9 +135,9 @@ StatusOr<std::unique_ptr<HloModuleConfig>> CreateModuleConfig(
 
 StatusOr<std::unique_ptr<xla::HloModuleConfig>> CreateModuleConfig(
     const xla::ProgramShape& program_shape,
-    absl::Span<const Shape> argument_shapes,
-    absl::optional<const Shape> result_layout,
-    absl::optional<const DeviceAssignment> device_assignment, int replica_count,
+    abslx::Span<const Shape> argument_shapes,
+    abslx::optional<const Shape> result_layout,
+    abslx::optional<const DeviceAssignment> device_assignment, int replica_count,
     int num_partitions, const DebugOptions* debug_options) {
   return CreateModuleConfig(program_shape, argument_shapes, result_layout,
                             device_assignment, replica_count, num_partitions,
@@ -312,7 +312,7 @@ Status ComputeOutputShapesForEachCore(
 Status CreateHloModules(
     const TPUCompileMetadataProto& metadata,
     const tensorflow::XlaCompiler::CompilationResult& compilation_result,
-    const absl::optional<xla::DeviceAssignment>& device_assignment,
+    const abslx::optional<xla::DeviceAssignment>& device_assignment,
     std::vector<std::unique_ptr<xla::HloModule>>* hlo_modules) {
   TF_RET_CHECK(
       compilation_result.computation->proto().has_host_program_shape());
@@ -340,7 +340,7 @@ Status CreateHloModules(
 }
 
 StatusOr<TpuCompilationRequestProto> CreateTpuCompilationRequest(
-    const absl::variant<MlirToHloArgs, FunctionToHloArgs>& computation,
+    const abslx::variant<MlirToHloArgs, FunctionToHloArgs>& computation,
     const TPUCompileMetadataProto& metadata,
     const std::vector<TensorShape>& arg_shapes) {
   VLOG(1) << "CreateTpuCompilationRequest.";
@@ -349,12 +349,12 @@ StatusOr<TpuCompilationRequestProto> CreateTpuCompilationRequest(
   compilation_request.set_use_mlir(use_mlir);
   if (use_mlir) {
     VLOG(1) << "Serializing MlirModule";
-    const MlirToHloArgs& mlir_computation = absl::get<0>(computation);
+    const MlirToHloArgs& mlir_computation = abslx::get<0>(computation);
     *compilation_request.mutable_mlir_module() =
         string(mlir_computation.mlir_module);
   } else {
     VLOG(1) << "Serializing FunctionDefinitionLibrary";
-    const FunctionToHloArgs& function_computation = absl::get<1>(computation);
+    const FunctionToHloArgs& function_computation = abslx::get<1>(computation);
     *compilation_request.mutable_fdef_lib() =
         function_computation.flib_def->ToProto();
     compilation_request.set_graph_def_version(
@@ -364,15 +364,15 @@ StatusOr<TpuCompilationRequestProto> CreateTpuCompilationRequest(
     // be a perf hit. There is a future work to refactor the compilation layer
     // to avoid passing guaranteed_constants over C_API.
     if (function_computation.guaranteed_constants.index() == 0) {
-      absl::Span<const TensorProto* const> guaranteed_constants =
-          absl::get<0>(function_computation.guaranteed_constants);
+      abslx::Span<const TensorProto* const> guaranteed_constants =
+          abslx::get<0>(function_computation.guaranteed_constants);
       for (const TensorProto* constant : guaranteed_constants) {
         *compilation_request.add_guaranteed_constants() = *constant;
       }
     } else {
       CHECK_EQ(function_computation.guaranteed_constants.index(), 1);
       const OpInputList& guaranteed_constants =
-          *absl::get<1>(function_computation.guaranteed_constants);
+          *abslx::get<1>(function_computation.guaranteed_constants);
       for (const Tensor& constant : guaranteed_constants) {
         constant.AsProtoTensorContent(
             compilation_request.add_guaranteed_constants());

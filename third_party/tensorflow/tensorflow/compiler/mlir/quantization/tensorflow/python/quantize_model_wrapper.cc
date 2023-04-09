@@ -43,7 +43,7 @@ namespace {
 // Serializes GraphDef to python bytes object. Raises python ValueError if
 // serialization fails.
 PyObject* SerializeGraphDefToPyBytes(const GraphDef& graph_def,
-                                     const absl::string_view function_name,
+                                     const abslx::string_view function_name,
                                      const int line_no) {
   const std::string graph_def_serialized = graph_def.SerializeAsString();
 
@@ -52,7 +52,7 @@ PyObject* SerializeGraphDefToPyBytes(const GraphDef& graph_def,
   if (graph_def_serialized.empty()) {
     PyErr_Format(
         PyExc_ValueError,
-        absl::StrFormat(
+        abslx::StrFormat(
             "Failed to serialize GraphDef result from function %s [%s:%d].",
             function_name, __FILE__, line_no)
             .c_str());
@@ -66,11 +66,11 @@ PyObject* SerializeGraphDefToPyBytes(const GraphDef& graph_def,
 
 }  // namespace
 
-PyObject* QuantizeQatModel(const absl::string_view saved_model_path,
-                           const absl::string_view exported_names_str,
-                           const absl::string_view tags,
-                           const absl::string_view quant_opts_serialized) {
-  const absl::StatusOr<GraphDef> graph_def = internal::QuantizeQatModel(
+PyObject* QuantizeQatModel(const abslx::string_view saved_model_path,
+                           const abslx::string_view exported_names_str,
+                           const abslx::string_view tags,
+                           const abslx::string_view quant_opts_serialized) {
+  const abslx::StatusOr<GraphDef> graph_def = internal::QuantizeQatModel(
       saved_model_path, exported_names_str, tags, quant_opts_serialized);
   if (!graph_def.ok()) {
     PyErr_Format(PyExc_ValueError, "Failed to quantize QAT model: %s",
@@ -82,10 +82,10 @@ PyObject* QuantizeQatModel(const absl::string_view saved_model_path,
 }
 
 PyObject* QuantizePtqDynamicRange(
-    const absl::string_view saved_model_path,
-    const absl::string_view exported_names_str, const absl::string_view tags,
-    const absl::string_view quant_opts_serialized) {
-  const absl::StatusOr<GraphDef> graph_def = internal::QuantizePtqDynamicRange(
+    const abslx::string_view saved_model_path,
+    const abslx::string_view exported_names_str, const abslx::string_view tags,
+    const abslx::string_view quant_opts_serialized) {
+  const abslx::StatusOr<GraphDef> graph_def = internal::QuantizePtqDynamicRange(
       saved_model_path, exported_names_str, tags, quant_opts_serialized);
   if (!graph_def.ok()) {
     PyErr_Format(PyExc_ValueError,
@@ -99,9 +99,9 @@ PyObject* QuantizePtqDynamicRange(
 }
 
 PyObject* QuantizePtqModelPreCalibration(
-    const absl::string_view saved_model_path,
-    const absl::string_view exported_names_str, const absl::string_view tags) {
-  const absl::StatusOr<GraphDef> graph_def =
+    const abslx::string_view saved_model_path,
+    const abslx::string_view exported_names_str, const abslx::string_view tags) {
+  const abslx::StatusOr<GraphDef> graph_def =
       internal::QuantizePtqModelPreCalibration(saved_model_path,
                                                exported_names_str, tags);
   if (!graph_def.ok()) {
@@ -115,10 +115,10 @@ PyObject* QuantizePtqModelPreCalibration(
 }
 
 PyObject* QuantizePtqModelPostCalibration(
-    const absl::string_view saved_model_path,
-    const absl::string_view exported_names_str, const absl::string_view tags,
-    const absl::string_view quant_opts_serialized) {
-  const absl::StatusOr<GraphDef> graph_def =
+    const abslx::string_view saved_model_path,
+    const abslx::string_view exported_names_str, const abslx::string_view tags,
+    const abslx::string_view quant_opts_serialized) {
+  const abslx::StatusOr<GraphDef> graph_def =
       internal::QuantizePtqModelPostCalibration(
           saved_model_path, exported_names_str, tags, quant_opts_serialized);
   if (!graph_def.ok()) {
@@ -136,11 +136,11 @@ void ClearCollectedInformationFromCalibrator() {
   calibrator::CalibratorSingleton::ClearCollectedInformation();
 }
 
-void ClearDataFromCalibrator(absl::string_view id) {
+void ClearDataFromCalibrator(abslx::string_view id) {
   calibrator::CalibratorSingleton::ClearData(id);
 }
 
-float GetMinFromCalibrator(absl::string_view id) {
+float GetMinFromCalibrator(abslx::string_view id) {
   std::optional<std::pair<float, float>> min_max =
       calibrator::CalibratorSingleton::GetMinMax(id);
   if (!min_max.has_value()) {
@@ -152,7 +152,7 @@ float GetMinFromCalibrator(absl::string_view id) {
   return min_max->first;
 }
 
-float GetMaxFromCalibrator(absl::string_view id) {
+float GetMaxFromCalibrator(abslx::string_view id) {
   std::optional<std::pair<float, float>> min_max =
       calibrator::CalibratorSingleton::GetMinMax(id);
   if (!min_max.has_value()) {

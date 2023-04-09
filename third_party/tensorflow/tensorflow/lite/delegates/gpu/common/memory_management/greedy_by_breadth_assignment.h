@@ -45,7 +45,7 @@ namespace gpu {
 // tensor’s size, assign current tensor to the smallest of them;
 // - If there are suitable objects only with size less than current tensor’s
 // size, assign current tensor to the largest of them and increase its size.
-absl::Status GreedyByBreadthAssignment(
+abslx::Status GreedyByBreadthAssignment(
     const std::vector<TensorUsageRecord<size_t>>& usage_records,
     ObjectsAssignment<size_t>* assignment);
 

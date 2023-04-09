@@ -293,8 +293,8 @@ void TFRecordDatasetOp::MakeDataset(OpKernelContext* ctx,
   for (int i = 0; i < filenames_tensor->NumElements(); ++i) {
     VLOG(2) << "Reading file: " << filenames_tensor->flat<tstring>()(i);
     filenames.push_back(filenames_tensor->flat<tstring>()(i));
-    is_gcs_fs &= absl::StartsWith(filenames[i], kGcsFsPrefix);
-    is_s3_fs &= absl::StartsWith(filenames[i], kS3FsPrefix);
+    is_gcs_fs &= abslx::StartsWith(filenames[i], kGcsFsPrefix);
+    is_s3_fs &= abslx::StartsWith(filenames[i], kS3FsPrefix);
     metrics::RecordTFDataFilename(kDatasetType, filenames[i]);
   }
 

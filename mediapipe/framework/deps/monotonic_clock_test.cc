@@ -36,9 +36,9 @@ namespace mediapipe {
 using RandomEngine = std::mt19937_64;
 using State = MonotonicClock::State;
 
-// absl::Now() recomputes clock drift approx. every 2 seconds, so run real
+// abslx::Now() recomputes clock drift approx. every 2 seconds, so run real
 // clock tests for at least that long.
-static const absl::Duration kDefaultRealTest = absl::Seconds(2.5);
+static const abslx::Duration kDefaultRealTest = abslx::Seconds(2.5);
 
 class MonotonicClockTest : public testing::Test {
  protected:
@@ -62,17 +62,17 @@ class MonotonicClockTest : public testing::Test {
   // This test produces no time corrections.
   void TestSimulatedForwardTime(SimulationClock* sim_clock,
                                 MonotonicClock* mono_clock) {
-    absl::Time base_time = sim_clock->TimeNow();
+    abslx::Time base_time = sim_clock->TimeNow();
     ASSERT_EQ(base_time, mono_clock->TimeNow());
-    sim_clock->Sleep(absl::Seconds(10));
-    ASSERT_EQ(base_time + absl::Seconds(10), sim_clock->TimeNow());
-    ASSERT_EQ(base_time + absl::Seconds(10), mono_clock->TimeNow());
-    sim_clock->Sleep(absl::Seconds(10));
-    ASSERT_EQ(base_time + absl::Seconds(20), sim_clock->TimeNow());
-    ASSERT_EQ(base_time + absl::Seconds(20), mono_clock->TimeNow());
-    sim_clock->Sleep(absl::Seconds(5));
-    ASSERT_EQ(base_time + absl::Seconds(25), sim_clock->TimeNow());
-    ASSERT_EQ(base_time + absl::Seconds(25), mono_clock->TimeNow());
+    sim_clock->Sleep(abslx::Seconds(10));
+    ASSERT_EQ(base_time + abslx::Seconds(10), sim_clock->TimeNow());
+    ASSERT_EQ(base_time + abslx::Seconds(10), mono_clock->TimeNow());
+    sim_clock->Sleep(abslx::Seconds(10));
+    ASSERT_EQ(base_time + abslx::Seconds(20), sim_clock->TimeNow());
+    ASSERT_EQ(base_time + abslx::Seconds(20), mono_clock->TimeNow());
+    sim_clock->Sleep(abslx::Seconds(5));
+    ASSERT_EQ(base_time + abslx::Seconds(25), sim_clock->TimeNow());
+    ASSERT_EQ(base_time + abslx::Seconds(25), mono_clock->TimeNow());
     VerifyCorrectionMetrics(mono_clock, 0, 0.0);
   }
 
@@ -80,42 +80,42 @@ class MonotonicClockTest : public testing::Test {
   // (50, 100, 100), one with (80, 90, 100), and one with (60, 105, 105).
   void TestSimulatedBackwardTime(SimulationClock* sim_clock,
                                  MonotonicClock* mono_clock) {
-    absl::Time base_time = sim_clock->TimeNow();
-    sim_clock->Sleep(absl::Seconds(100));
-    ASSERT_EQ(base_time + absl::Seconds(100), sim_clock->TimeNow());
-    ASSERT_EQ(base_time + absl::Seconds(100), mono_clock->TimeNow());
+    abslx::Time base_time = sim_clock->TimeNow();
+    sim_clock->Sleep(abslx::Seconds(100));
+    ASSERT_EQ(base_time + abslx::Seconds(100), sim_clock->TimeNow());
+    ASSERT_EQ(base_time + abslx::Seconds(100), mono_clock->TimeNow());
     VerifyCorrectionMetrics(mono_clock, 0, 0.0);
     // Time moves backward -- expect a correction.
-    sim_clock->Sleep(absl::Seconds(-50));
-    ASSERT_EQ(base_time + absl::Seconds(50), sim_clock->TimeNow());
-    ASSERT_EQ(base_time + absl::Seconds(100),  // correction
+    sim_clock->Sleep(abslx::Seconds(-50));
+    ASSERT_EQ(base_time + abslx::Seconds(50), sim_clock->TimeNow());
+    ASSERT_EQ(base_time + abslx::Seconds(100),  // correction
               mono_clock->TimeNow());
     VerifyCorrectionMetrics(mono_clock, 1, 50.0);
     // Time moves forward, but not enough to exceed the last value returned by
     // TimeNow(). No correction in this case.
-    sim_clock->Sleep(absl::Seconds(20));
-    ASSERT_EQ(base_time + absl::Seconds(70), sim_clock->TimeNow());
-    ASSERT_EQ(base_time + absl::Seconds(100), mono_clock->TimeNow());
+    sim_clock->Sleep(abslx::Seconds(20));
+    ASSERT_EQ(base_time + abslx::Seconds(70), sim_clock->TimeNow());
+    ASSERT_EQ(base_time + abslx::Seconds(100), mono_clock->TimeNow());
     VerifyCorrectionMetrics(mono_clock, 1, 50.0);
-    sim_clock->Sleep(absl::Seconds(20));
-    ASSERT_EQ(base_time + absl::Seconds(90), sim_clock->TimeNow());
-    ASSERT_EQ(base_time + absl::Seconds(100), mono_clock->TimeNow());
+    sim_clock->Sleep(abslx::Seconds(20));
+    ASSERT_EQ(base_time + abslx::Seconds(90), sim_clock->TimeNow());
+    ASSERT_EQ(base_time + abslx::Seconds(100), mono_clock->TimeNow());
     VerifyCorrectionMetrics(mono_clock, 1, 50.0);
     // Time moves backwards again -- expect a correction.
-    sim_clock->Sleep(absl::Seconds(-10));
-    ASSERT_EQ(base_time + absl::Seconds(80), sim_clock->TimeNow());
-    ASSERT_EQ(base_time + absl::Seconds(100),  // correction
+    sim_clock->Sleep(abslx::Seconds(-10));
+    ASSERT_EQ(base_time + abslx::Seconds(80), sim_clock->TimeNow());
+    ASSERT_EQ(base_time + abslx::Seconds(100),  // correction
               mono_clock->TimeNow());
     VerifyCorrectionMetrics(mono_clock, 2, 50.0);
     // Time moves forward enough to advance monotonic time.
-    sim_clock->Sleep(absl::Seconds(25));
-    ASSERT_EQ(base_time + absl::Seconds(105), sim_clock->TimeNow());
-    ASSERT_EQ(base_time + absl::Seconds(105), mono_clock->TimeNow());
+    sim_clock->Sleep(abslx::Seconds(25));
+    ASSERT_EQ(base_time + abslx::Seconds(105), sim_clock->TimeNow());
+    ASSERT_EQ(base_time + abslx::Seconds(105), mono_clock->TimeNow());
     VerifyCorrectionMetrics(mono_clock, 2, 50.0);
     // Time moves backward again.
-    sim_clock->Sleep(absl::Seconds(-45));
-    ASSERT_EQ(base_time + absl::Seconds(60), sim_clock->TimeNow());
-    ASSERT_EQ(base_time + absl::Seconds(105),  // correction
+    sim_clock->Sleep(abslx::Seconds(-45));
+    ASSERT_EQ(base_time + abslx::Seconds(60), sim_clock->TimeNow());
+    ASSERT_EQ(base_time + abslx::Seconds(105),  // correction
               mono_clock->TimeNow());
     VerifyCorrectionMetrics(mono_clock, 3, 50.0);
 
@@ -132,23 +132,23 @@ class MonotonicClockTest : public testing::Test {
 
     // Sleep.
     for (int i = 0; i < kNumSamples; i++) {
-      absl::Duration sleep_time = absl::Seconds(
+      abslx::Duration sleep_time = abslx::Seconds(
           std::uniform_real_distribution<float>(0.0f, 0.2f)(random));
-      absl::Time before = mono_clock->TimeNow();
-      absl::Time wakeup_time = before + sleep_time;
+      abslx::Time before = mono_clock->TimeNow();
+      abslx::Time wakeup_time = before + sleep_time;
       mono_clock->Sleep(sleep_time);
-      absl::Time after = mono_clock->TimeNow();
+      abslx::Time after = mono_clock->TimeNow();
       ASSERT_LE(wakeup_time, after);
     }
 
     // SleepUntil.
     for (int i = 0; i < kNumSamples; i++) {
-      absl::Duration sleep_time = absl::Seconds(
+      abslx::Duration sleep_time = abslx::Seconds(
           std::uniform_real_distribution<float>(0.0f, 0.2f)(random));
-      absl::Time before = mono_clock->TimeNow();
-      absl::Time wakeup_time = before + sleep_time;
+      abslx::Time before = mono_clock->TimeNow();
+      abslx::Time wakeup_time = before + sleep_time;
       mono_clock->SleepUntil(wakeup_time);
-      absl::Time after = mono_clock->TimeNow();
+      abslx::Time after = mono_clock->TimeNow();
       ASSERT_LE(wakeup_time, after);
     }
   }
@@ -192,8 +192,8 @@ TEST_F(MonotonicClockTest, SimulatedTime) {
   sim_clock.ThreadStart();
   MonotonicClock* mono_clock = MonotonicClock::CreateMonotonicClock(&sim_clock);
   TestSimulatedBackwardTime(&sim_clock, mono_clock);
-  absl::Time mono_time = mono_clock->TimeNow();
-  sim_clock.Sleep(absl::Seconds(-1));
+  abslx::Time mono_time = mono_clock->TimeNow();
+  sim_clock.Sleep(abslx::Seconds(-1));
   ASSERT_EQ(mono_time, mono_clock->TimeNow());
   sim_clock.ThreadFinish();
   delete mono_clock;
@@ -204,24 +204,24 @@ TEST_F(MonotonicClockTest, SimulatedRandomWalk) {
   SimulationClock sim_clock;
   sim_clock.ThreadStart();
   MonotonicClock* mono_clock = MonotonicClock::CreateMonotonicClock(&sim_clock);
-  sim_clock.Sleep(absl::Now() - sim_clock.TimeNow());
+  sim_clock.Sleep(abslx::Now() - sim_clock.TimeNow());
   ASSERT_EQ(sim_clock.TimeNow(), mono_clock->TimeNow());
 
   // Generate kNumSamples random clock adjustments.
   const int kNumSamples = 5;
   RandomEngine random(testing::UnitTest::GetInstance()->random_seed());
   // Keep track of maximum time on clock and corrections.
-  absl::Time max_time = sim_clock.TimeNow();
+  abslx::Time max_time = sim_clock.TimeNow();
   int num_corrections = 0;
-  absl::Duration max_correction = absl::ZeroDuration();
+  abslx::Duration max_correction = abslx::ZeroDuration();
   for (int i = 0; i < kNumSamples; i++) {
-    absl::Duration jump =
-        absl::Seconds(std::uniform_real_distribution<float>(-0.5, 0.5)(random));
+    abslx::Duration jump =
+        abslx::Seconds(std::uniform_real_distribution<float>(-0.5, 0.5)(random));
     sim_clock.Sleep(jump);
-    absl::Time sim_time = sim_clock.TimeNow();
-    if (jump < absl::ZeroDuration()) {
+    abslx::Time sim_time = sim_clock.TimeNow();
+    if (jump < abslx::ZeroDuration()) {
       ASSERT_LT(sim_time, max_time);
-      absl::Duration correction = max_time - sim_time;
+      abslx::Duration correction = max_time - sim_time;
       if (correction > max_correction) {
         max_correction = correction;
       }
@@ -233,7 +233,7 @@ TEST_F(MonotonicClockTest, SimulatedRandomWalk) {
     ASSERT_EQ(max_time, mono_clock->TimeNow());
   }
   VerifyCorrectionMetrics(mono_clock, num_corrections,
-                          absl::FDivDuration(max_correction, absl::Seconds(1)));
+                          abslx::FDivDuration(max_correction, abslx::Seconds(1)));
   sim_clock.ThreadFinish();
   delete mono_clock;
 }
@@ -242,11 +242,11 @@ TEST_F(MonotonicClockTest, RealTime) {
   MonotonicClock* mono_clock =
       MonotonicClock::CreateMonotonicClock(Clock::RealClock());
   // Call mono_clock->Now() continuously for FLAGS_real_test_secs seconds.
-  absl::Time start = absl::Now();
-  absl::Time time = start;
+  abslx::Time start = abslx::Now();
+  abslx::Time time = start;
   int64 num_calls = 0;
   do {
-    absl::Time last_time = time;
+    abslx::Time last_time = time;
     time = mono_clock->TimeNow();
     ASSERT_LE(last_time, time);
     ++num_calls;
@@ -281,13 +281,13 @@ TEST_F(MonotonicClockTest, SimulatedInsomnia) {
   SimulationClock sim_clock;
   sim_clock.ThreadStart();
   MonotonicClock* mono_clock = MonotonicClock::CreateMonotonicClock(&sim_clock);
-  sim_clock.Sleep(absl::Now() - sim_clock.TimeNow());
+  sim_clock.Sleep(abslx::Now() - sim_clock.TimeNow());
   ASSERT_EQ(sim_clock.TimeNow(), mono_clock->TimeNow());
 
-  sim_clock.Sleep(absl::Seconds(-3.14159));
+  sim_clock.Sleep(abslx::Seconds(-3.14159));
   // Even though sim_clock will never advance, this call will not sleep
   // because monotonic_time has already advanced beyond the wakeup time.
-  mono_clock->SleepUntil(sim_clock.TimeNow() + absl::Seconds(1));
+  mono_clock->SleepUntil(sim_clock.TimeNow() + abslx::Seconds(1));
   // Note that the same test can't be performed with Sleep because the argument
   // to sleep is an offset from monotonic time, not raw time.
   sim_clock.ThreadFinish();
@@ -303,15 +303,15 @@ TEST_F(MonotonicClockTest, SyncedPair) {
   State* state = CreateMonotonicClockState(&sim_clock);
   MonotonicClock* clock1 = CreateMonotonicClock(state);
   MonotonicClock* clock2 = CreateMonotonicClock(state);
-  sim_clock.Sleep(absl::Seconds(1000));
+  sim_clock.Sleep(abslx::Seconds(1000));
   ASSERT_EQ(sim_clock.TimeNow(), clock1->TimeNow());
   ASSERT_EQ(sim_clock.TimeNow(), clock2->TimeNow());
 
-  absl::Time time1, time2;
-  sim_clock.Sleep(absl::Seconds(2));
+  abslx::Time time1, time2;
+  sim_clock.Sleep(abslx::Seconds(2));
   time1 = clock1->TimeNow();
   ASSERT_EQ(sim_clock.TimeNow(), time1);
-  sim_clock.Sleep(absl::Seconds(-5));
+  sim_clock.Sleep(abslx::Seconds(-5));
   time2 = clock2->TimeNow();
   ASSERT_EQ(time1, time2);
   VerifyCorrectionMetrics(clock1, 0, 0.0);
@@ -326,10 +326,10 @@ TEST_F(MonotonicClockTest, SyncedPair) {
   // time goes backward on clock2.  Although clock2 still reports the global
   // monotonic time, it does not report a correction because it never
   // observed a raw clock reading that went backward.
-  sim_clock.Sleep(absl::Seconds(10));
+  sim_clock.Sleep(abslx::Seconds(10));
   time1 = clock1->TimeNow();
   ASSERT_EQ(sim_clock.TimeNow(), time1);
-  sim_clock.Sleep(absl::Seconds(-1));
+  sim_clock.Sleep(abslx::Seconds(-1));
   time2 = clock2->TimeNow();
   ASSERT_EQ(time1, time2);
   VerifyCorrectionMetrics(clock1, 0, 0.0);
@@ -349,10 +349,10 @@ TEST_F(MonotonicClockTest, UnsyncedPair) {
   MonotonicClock* sync_clock =
       MonotonicClock::CreateSynchronizedMonotonicClock();
   MonotonicClock* mono_clock = MonotonicClock::CreateMonotonicClock(&sim_clock);
-  absl::Time before = sync_clock->TimeNow();
+  abslx::Time before = sync_clock->TimeNow();
   sim_clock.Sleep(before - sim_clock.TimeNow());
   ASSERT_EQ(before, mono_clock->TimeNow());
-  sim_clock.Sleep(absl::Seconds(61));
+  sim_clock.Sleep(abslx::Seconds(61));
   ASSERT_LT(sync_clock->TimeNow(), mono_clock->TimeNow());
   sim_clock.ThreadFinish();
   delete sync_clock;
@@ -371,9 +371,9 @@ TEST_F(MonotonicClockTest, CreateSynchronizedMonotonicClock) {
       MonotonicClock::CreateSynchronizedMonotonicClock();
   const int kNumSamples = 100;
   for (int i = 0; i < kNumSamples; ++i) {
-    absl::Time before = real_clock->TimeNow();
-    absl::Time now = mono_clock->TimeNow();
-    absl::Time after = real_clock->TimeNow();
+    abslx::Time before = real_clock->TimeNow();
+    abslx::Time now = mono_clock->TimeNow();
+    abslx::Time after = real_clock->TimeNow();
     if (after < before) {
       // Real clock moved backward -- test is invalid.
       continue;
@@ -413,7 +413,7 @@ class ClockFrenzy {
         if (nclocks == 0) continue;
         SimulationClock* sim_clock = sim_clocks_[UniformRandom(nclocks)];
         // Bias the clock towards forward movement.
-        sim_clock->Sleep(absl::Seconds(RndFloatRandom() - 0.2));
+        sim_clock->Sleep(abslx::Seconds(RndFloatRandom() - 0.2));
       } else if (u < 90) {
         // Pick a monotonic clock and read it.
         const int nclocks = mono_clocks_.size();
@@ -426,9 +426,9 @@ class ClockFrenzy {
 
   // Start Feed-ing threads.
   void Start(int nthreads) {
-    absl::MutexLock l(&lock_);
+    abslx::MutexLock l(&lock_);
     running_ = true;
-    threads_ = absl::make_unique<mediapipe::ThreadPool>("Frenzy", nthreads);
+    threads_ = abslx::make_unique<mediapipe::ThreadPool>("Frenzy", nthreads);
     threads_->StartWorkers();
     for (int i = 0; i < nthreads; ++i) {
       threads_->Schedule([&]() { Feed(); });
@@ -436,12 +436,12 @@ class ClockFrenzy {
   }
 
   void Stop() {
-    absl::MutexLock l(&lock_);
+    abslx::MutexLock l(&lock_);
     running_ = false;
   }
 
   bool Running() {
-    absl::MutexLock l(&lock_);
+    abslx::MutexLock l(&lock_);
     return running_;
   }
 
@@ -455,7 +455,7 @@ class ClockFrenzy {
   std::unique_ptr<mediapipe::ThreadPool> threads_;
 
   // Provide a lock to avoid race conditions in non-threadsafe ACMRandom.
-  mutable absl::Mutex lock_;
+  mutable abslx::Mutex lock_;
   std::unique_ptr<RandomEngine> random_ ABSL_GUARDED_BY(lock_);
 
   // The stopping notification.
@@ -464,12 +464,12 @@ class ClockFrenzy {
   // Thread-safe random number generation functions for use by other class
   // member functions.
   int32 UniformRandom(int32 n) {
-    absl::MutexLock l(&lock_);
+    abslx::MutexLock l(&lock_);
     return std::uniform_int_distribution<int32>(0, n - 1)(*random_);
   }
 
   float RndFloatRandom() {
-    absl::MutexLock l(&lock_);
+    abslx::MutexLock l(&lock_);
     return std::uniform_real_distribution<float>(0.0f, 1.0f)(*random_);
   }
 };
@@ -493,7 +493,7 @@ TEST_F(MonotonicClockTest, SimulatedFrenzy) {
   f.AddMonotonicClock(m21);
   f.AddMonotonicClock(m22);
   f.Start(10);
-  Clock::RealClock()->Sleep(absl::Seconds(1));
+  Clock::RealClock()->Sleep(abslx::Seconds(1));
   f.Stop();
   f.Wait();
   s2.ThreadFinish();

@@ -124,7 +124,7 @@ Status Slack::OptimizeAndCollectStats(Cluster* cluster,
   if (item.fetch.size() != 1) {
     return errors::InvalidArgument(
         "Expected only one fetch node but there were ", item.fetch.size(), ": ",
-        absl::StrJoin(item.fetch, ", "));
+        abslx::StrJoin(item.fetch, ", "));
   }
   // Walks the input pipeline backwards from the fetch node to find the last
   // PrefetchDataset node in the pipeline.

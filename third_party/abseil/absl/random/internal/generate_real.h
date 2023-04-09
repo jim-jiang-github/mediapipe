@@ -28,7 +28,7 @@
 #include "absl/random/internal/fastmath.h"
 #include "absl/random/internal/traits.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -69,7 +69,7 @@ template <typename RealType,  // Real type, either float or double.
           bool IncludeZero = true>
 inline RealType GenerateRealFromBits(uint64_t bits, int exp_bias = 0) {
   using real_type = RealType;
-  using uint_type = absl::conditional_t<std::is_same<real_type, float>::value,
+  using uint_type = abslx::conditional_t<std::is_same<real_type, float>::value,
                                         uint32_t, uint64_t>;
 
   static_assert(
@@ -141,6 +141,6 @@ inline RealType GenerateRealFromBits(uint64_t bits, int exp_bias = 0) {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_INTERNAL_GENERATE_REAL_H_

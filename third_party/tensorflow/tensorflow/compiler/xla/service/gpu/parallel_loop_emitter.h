@@ -44,7 +44,7 @@ class ParallelLoopEmitter {
   // This is used in multi-output fusion.  target_element_generator should
   // produce a struct with N elements, one for each of target_arrays.
   ParallelLoopEmitter(const llvm_ir::ElementGenerator& target_element_generator,
-                      absl::Span<const llvm_ir::IrArray> target_arrays,
+                      abslx::Span<const llvm_ir::IrArray> target_arrays,
                       const LaunchDimensions& launch_dimensions,
                       llvm::IRBuilder<>* b,
                       LaunchDimensionsConfig launch_config = {});
@@ -53,7 +53,7 @@ class ParallelLoopEmitter {
   ParallelLoopEmitter& operator=(const ParallelLoopEmitter&) = delete;
 
   std::vector<llvm_ir::IrArray::Index> EmitIndexAndSetExitBasicBlock(
-      absl::string_view loop_name, llvm::Type* index_type,
+      abslx::string_view loop_name, llvm::Type* index_type,
       llvm::Value* base_index);
 
   // This is similar to EmitIndexAndSetExitBasicBlock except that we
@@ -61,10 +61,10 @@ class ParallelLoopEmitter {
   // threads write to logically adjacent index in output buffer instead of
   // physically adjacent index.
   std::vector<llvm_ir::IrArray::Index> EmitLogicalIndexAndSetExitBasicBlock(
-      absl::string_view loop_name, llvm::Type* index_type,
+      abslx::string_view loop_name, llvm::Type* index_type,
       llvm::Value* base_index);
 
-  Status EmitLoop(absl::string_view loop_name = "",
+  Status EmitLoop(abslx::string_view loop_name = "",
                   llvm::Type* index_type = nullptr);
 
  private:
@@ -75,7 +75,7 @@ class ParallelLoopEmitter {
 
   LinearBaseAndThreadIdx EmitLinearBaseAndThreadIdx(llvm::Type* index_type,
                                                     llvm::Value* base_index);
-  Status EmitSerialLoop(absl::string_view loop_name, llvm::Type* index_type,
+  Status EmitSerialLoop(abslx::string_view loop_name, llvm::Type* index_type,
                         llvm::Value* base_indvar = nullptr);
 
   // The thread and block dimension to parallelize the loop on.

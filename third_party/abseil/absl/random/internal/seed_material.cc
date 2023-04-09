@@ -60,7 +60,7 @@
 // #pragma comment(lib, "bcrypt.lib")
 #endif
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 namespace {
@@ -72,7 +72,7 @@ namespace {
 #if defined(ABSL_RANDOM_USE_BCRYPT)
 
 // On Windows potentially use the BCRYPT CNG API to read available entropy.
-bool ReadSeedMaterialFromOSEntropyImpl(absl::Span<uint32_t> values) {
+bool ReadSeedMaterialFromOSEntropyImpl(abslx::Span<uint32_t> values) {
   BCRYPT_ALG_HANDLE hProvider;
   NTSTATUS ret;
   ret = BCryptOpenAlgorithmProvider(&hProvider, BCRYPT_RNG_ALGORITHM,
@@ -93,7 +93,7 @@ bool ReadSeedMaterialFromOSEntropyImpl(absl::Span<uint32_t> values) {
 #elif defined(ABSL_RANDOM_USE_NACL_SECURE_RANDOM)
 
 // On NaCL use nacl_secure_random to acquire bytes.
-bool ReadSeedMaterialFromOSEntropyImpl(absl::Span<uint32_t> values) {
+bool ReadSeedMaterialFromOSEntropyImpl(abslx::Span<uint32_t> values) {
   auto buffer = reinterpret_cast<uint8_t*>(values.data());
   size_t buffer_size = sizeof(uint32_t) * values.size();
 
@@ -113,7 +113,7 @@ bool ReadSeedMaterialFromOSEntropyImpl(absl::Span<uint32_t> values) {
 
 #elif defined(__Fuchsia__)
 
-bool ReadSeedMaterialFromOSEntropyImpl(absl::Span<uint32_t> values) {
+bool ReadSeedMaterialFromOSEntropyImpl(abslx::Span<uint32_t> values) {
   auto buffer = reinterpret_cast<uint8_t*>(values.data());
   size_t buffer_size = sizeof(uint32_t) * values.size();
   zx_cprng_draw(buffer, buffer_size);
@@ -123,7 +123,7 @@ bool ReadSeedMaterialFromOSEntropyImpl(absl::Span<uint32_t> values) {
 #else
 
 // On *nix, read entropy from /dev/urandom.
-bool ReadSeedMaterialFromOSEntropyImpl(absl::Span<uint32_t> values) {
+bool ReadSeedMaterialFromOSEntropyImpl(abslx::Span<uint32_t> values) {
   const char kEntropyFile[] = "/dev/urandom";
 
   auto buffer = reinterpret_cast<uint8_t*>(values.data());
@@ -154,7 +154,7 @@ bool ReadSeedMaterialFromOSEntropyImpl(absl::Span<uint32_t> values) {
 
 }  // namespace
 
-bool ReadSeedMaterialFromOSEntropy(absl::Span<uint32_t> values) {
+bool ReadSeedMaterialFromOSEntropy(abslx::Span<uint32_t> values) {
   assert(values.data() != nullptr);
   if (values.data() == nullptr) {
     return false;
@@ -165,8 +165,8 @@ bool ReadSeedMaterialFromOSEntropy(absl::Span<uint32_t> values) {
   return ReadSeedMaterialFromOSEntropyImpl(values);
 }
 
-void MixIntoSeedMaterial(absl::Span<const uint32_t> sequence,
-                         absl::Span<uint32_t> seed_material) {
+void MixIntoSeedMaterial(abslx::Span<const uint32_t> sequence,
+                         abslx::Span<uint32_t> seed_material) {
   // Algorithm is based on code available at
   // https://gist.github.com/imneme/540829265469e673d045
   constexpr uint32_t kInitVal = 0x43b0d7e5;
@@ -197,10 +197,10 @@ void MixIntoSeedMaterial(absl::Span<const uint32_t> sequence,
   }
 }
 
-absl::optional<uint32_t> GetSaltMaterial() {
+abslx::optional<uint32_t> GetSaltMaterial() {
   // Salt must be common for all generators within the same process so read it
   // only once and store in static variable.
-  static const auto salt_material = []() -> absl::optional<uint32_t> {
+  static const auto salt_material = []() -> abslx::optional<uint32_t> {
     uint32_t salt_value = 0;
 
     if (random_internal::ReadSeedMaterialFromOSEntropy(
@@ -208,7 +208,7 @@ absl::optional<uint32_t> GetSaltMaterial() {
       return salt_value;
     }
 
-    return absl::nullopt;
+    return abslx::nullopt;
   }();
 
   return salt_material;
@@ -216,4 +216,4 @@ absl::optional<uint32_t> GetSaltMaterial() {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -110,14 +110,14 @@ ConvertImageClassifierOptionsToProto(ImageClassifierOptions* options) {
 
 }  // namespace
 
-absl::StatusOr<std::unique_ptr<ImageClassifier>> ImageClassifier::Create(
+abslx::StatusOr<std::unique_ptr<ImageClassifier>> ImageClassifier::Create(
     std::unique_ptr<ImageClassifierOptions> options) {
   auto options_proto = ConvertImageClassifierOptionsToProto(options.get());
   tasks::core::PacketsCallback packets_callback = nullptr;
   if (options->result_callback) {
     auto result_callback = options->result_callback;
     packets_callback =
-        [=](absl::StatusOr<tasks::core::PacketMap> status_or_packets) {
+        [=](abslx::StatusOr<tasks::core::PacketMap> status_or_packets) {
           if (!status_or_packets.ok()) {
             Image image;
             result_callback(status_or_packets.status(), image,
@@ -146,12 +146,12 @@ absl::StatusOr<std::unique_ptr<ImageClassifier>> ImageClassifier::Create(
       std::move(packets_callback));
 }
 
-absl::StatusOr<ImageClassifierResult> ImageClassifier::Classify(
+abslx::StatusOr<ImageClassifierResult> ImageClassifier::Classify(
     Image image,
     std::optional<core::ImageProcessingOptions> image_processing_options) {
   if (image.UsesGpu()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "GPU input images are currently not supported.",
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }
@@ -166,12 +166,12 @@ absl::StatusOr<ImageClassifierResult> ImageClassifier::Classify(
       output_packets[kClassificationsStreamName].Get<ClassificationResult>());
 }
 
-absl::StatusOr<ImageClassifierResult> ImageClassifier::ClassifyForVideo(
+abslx::StatusOr<ImageClassifierResult> ImageClassifier::ClassifyForVideo(
     Image image, int64 timestamp_ms,
     std::optional<core::ImageProcessingOptions> image_processing_options) {
   if (image.UsesGpu()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "GPU input images are currently not supported.",
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }
@@ -190,12 +190,12 @@ absl::StatusOr<ImageClassifierResult> ImageClassifier::ClassifyForVideo(
       output_packets[kClassificationsStreamName].Get<ClassificationResult>());
 }
 
-absl::Status ImageClassifier::ClassifyAsync(
+abslx::Status ImageClassifier::ClassifyAsync(
     Image image, int64 timestamp_ms,
     std::optional<core::ImageProcessingOptions> image_processing_options) {
   if (image.UsesGpu()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "GPU input images are currently not supported.",
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }

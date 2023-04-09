@@ -81,14 +81,14 @@ string Subgraph::Dump() {
   std::vector<string> nodes;
   for (const auto& n : id_) {
     if (specific_) {
-      nodes.emplace_back(absl::StrFormat("%s(%s)", n->opcode(), n->name()));
+      nodes.emplace_back(abslx::StrFormat("%s(%s)", n->opcode(), n->name()));
     } else {
       nodes.emplace_back(n->opcode());
     }
   }
   std::sort(nodes.begin(), nodes.end());
 
-  return absl::StrFormat("%d: ", collation_count_) + absl::StrJoin(nodes, ", ");
+  return abslx::StrFormat("%d: ", collation_count_) + abslx::StrJoin(nodes, ", ");
 }
 
 void Subgraph::ExtractForSignature(SigNodeMap* result) {

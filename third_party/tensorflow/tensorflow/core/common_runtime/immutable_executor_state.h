@@ -140,7 +140,7 @@ class ImmutableExecutorState {
   // Mapping from frame name to static information about the frame.
   // TODO(yuanbyu): We could cache it along with the graph so to avoid
   // the overhead of constructing it for each executor instance.
-  absl::flat_hash_map<absl::string_view, std::unique_ptr<FrameInfo>>
+  abslx::flat_hash_map<abslx::string_view, std::unique_ptr<FrameInfo>>
       frame_info_;
   const FrameInfo* root_frame_info_;  // Not owned.
 

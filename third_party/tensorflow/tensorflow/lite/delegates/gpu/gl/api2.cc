@@ -47,22 +47,22 @@ namespace gl {
 namespace {
 
 std::string GetShaderHeader(uint3 localsize) {
-  return absl::StrCat("#version 310 es\nlayout(local_size_x = ", localsize.x,
+  return abslx::StrCat("#version 310 es\nlayout(local_size_x = ", localsize.x,
                       ", local_size_y = ", localsize.y,
                       ", local_size_z = ", localsize.z, ") in;\n");
 }
 
 // Wraps given SSBO into GlBuffer object that does not have ownership.
-absl::Status WrapSSBO(OpenGlBuffer ssbo, GlBuffer* buffer) {
+abslx::Status WrapSSBO(OpenGlBuffer ssbo, GlBuffer* buffer) {
   int64_t size_bytes;
   RETURN_IF_ERROR(GetSSBOSize(ssbo.id, &size_bytes));
   *buffer = GlBuffer(GL_SHADER_STORAGE_BUFFER, ssbo.id, size_bytes, 0, false);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MaybeAllocateGlBuffer(const TensorObjectDef& def, GlBuffer* ssbo) {
+abslx::Status MaybeAllocateGlBuffer(const TensorObjectDef& def, GlBuffer* ssbo) {
   if (def.object_def.object_type != gpu::ObjectType::OPENGL_SSBO) {
-    return absl::InvalidArgumentError("Tensor object is not GL SSBO");
+    return abslx::InvalidArgumentError("Tensor object is not GL SSBO");
   }
   const uint32_t num_elements = NumElements(def);
   switch (def.object_def.data_type) {
@@ -71,10 +71,10 @@ absl::Status MaybeAllocateGlBuffer(const TensorObjectDef& def, GlBuffer* ssbo) {
     case DataType::FLOAT16:
       return CreateReadWriteShaderStorageBuffer<uint16_t>(num_elements, ssbo);
     default:
-      return absl::InternalError(
+      return abslx::InternalError(
           "Unable to create new GL SSBO. Unsupported data type.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Does one-step conversion between internal and external objects.
@@ -92,7 +92,7 @@ class DefaultTensorTie : public TensorTie {
            converter_builder.IsSupported(def.external_def, def.internal_def);
   }
 
-  static absl::Status New(const TensorTieDef& def,
+  static abslx::Status New(const TensorTieDef& def,
                           TensorObjectConverterBuilder* converter_builder,
                           ObjectManager* objects,
                           std::unique_ptr<TensorTie>* tie) {
@@ -100,44 +100,44 @@ class DefaultTensorTie : public TensorTie {
         std::make_unique<DefaultTensorTie>(def, TensorObject{}, objects);
     RETURN_IF_ERROR(tie_impl->Init(converter_builder));
     *tie = std::move(tie_impl);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  static absl::Status New(const TensorTieDef& def,
+  static abslx::Status New(const TensorTieDef& def,
                           TensorObjectConverterBuilder* converter_builder,
                           TensorObject internal_object,
                           std::unique_ptr<TensorTie>* tie) {
     if (!IsValid(def.internal_def, internal_object)) {
-      return absl::InternalError("Internal object does not match definition.");
+      return abslx::InternalError("Internal object does not match definition.");
     }
 
     auto tie_impl =
         std::make_unique<DefaultTensorTie>(def, internal_object, nullptr);
     RETURN_IF_ERROR(tie_impl->Init(converter_builder));
     *tie = std::move(tie_impl);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status CopyToExternalObject() final {
+  abslx::Status CopyToExternalObject() final {
     if (!converter_to_) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     return converter_to_->Convert(internal_obj_, GetExternalObject());
   }
 
-  absl::Status CopyFromExternalObject() final {
+  abslx::Status CopyFromExternalObject() final {
     if (!converter_from_) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     return converter_from_->Convert(GetExternalObject(), internal_obj_);
   }
 
-  absl::Status SetExternalObject(TensorObject obj) final {
+  abslx::Status SetExternalObject(TensorObject obj) final {
     if (!def().external_def.object_def.user_provided) {
-      return absl::InvalidArgumentError("External object is read-only");
+      return abslx::InvalidArgumentError("External object is read-only");
     }
     if (!IsValid(def().external_def, obj)) {
-      return absl::InvalidArgumentError("Given object is not valid");
+      return abslx::InvalidArgumentError("Given object is not valid");
     }
     external_obj_ = obj;
 
@@ -154,10 +154,10 @@ class DefaultTensorTie : public TensorTie {
         RETURN_IF_ERROR(WrapSSBO(*ssbo, &buffer));
         RETURN_IF_ERROR(objects_->RegisterBuffer(def().id, std::move(buffer)));
       } else {
-        return absl::InternalError("Unexpected object type.");
+        return abslx::InternalError("Unexpected object type.");
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   TensorObject GetExternalObject() final { return external_obj_; }
@@ -177,7 +177,7 @@ class DefaultTensorTie : public TensorTie {
             def().external_def.dimensions.c == 4);
   }
 
-  absl::Status Init(TensorObjectConverterBuilder* converter_builder) {
+  abslx::Status Init(TensorObjectConverterBuilder* converter_builder) {
     // First check is an object is user provided.
     const auto& external_def = def().external_def.object_def;
 
@@ -202,7 +202,7 @@ class DefaultTensorTie : public TensorTie {
         GlBuffer invalid_buffer;
         RETURN_IF_ERROR(
             objects_->RegisterBuffer(def().id, std::move(invalid_buffer)));
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
       // Object is provided by a user, but runtime expects different object
       // type. Therefore, we have to allocate internal object and convert.
@@ -214,19 +214,19 @@ class DefaultTensorTie : public TensorTie {
         // Object is NOT provided by a user, but it matches definition expected
         // by runtime. Conversion is not needed.
         external_obj_ = internal_obj_;
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
 
       // Object is NOT provided by a user.
       return MaybeAllocateExternalObject();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status MaybeAllocateInternalObject() {
+  abslx::Status MaybeAllocateInternalObject() {
     const TensorObjectDef& d = def().internal_def;
     if (d.object_def.user_provided) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     switch (d.object_def.object_type) {
       case gpu::ObjectType::OPENGL_SSBO: {
@@ -238,12 +238,12 @@ class DefaultTensorTie : public TensorTie {
       }
       // TODO(akulik): support textures as internal object when compiler permits
       default:
-        return absl::InternalError("Unexpected object type");
+        return abslx::InternalError("Unexpected object type");
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status MaybeAllocateExternalObject() {
+  abslx::Status MaybeAllocateExternalObject() {
     const TensorObjectDef& d = def().external_def;
     switch (d.object_def.object_type) {
       case gpu::ObjectType::CPU_MEMORY: {
@@ -260,9 +260,9 @@ class DefaultTensorTie : public TensorTie {
         break;
       }
       default:
-        return absl::InternalError("Unexpected object type");
+        return abslx::InternalError("Unexpected object type");
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   ObjectManager* objects_;
@@ -294,27 +294,27 @@ class TwoStepTensorTie : public TensorTie {
            DefaultTensorTie::IsSupported(defs.second, converter_builder);
   }
 
-  static absl::Status New(const TensorTieDef& def,
+  static abslx::Status New(const TensorTieDef& def,
                           TensorObjectConverterBuilder* converter_builder,
                           ObjectManager* objects,
                           std::unique_ptr<TensorTie>* tie) {
     auto tie_impl = std::make_unique<TwoStepTensorTie>(def);
     RETURN_IF_ERROR(tie_impl->Init(converter_builder, objects));
     *tie = std::move(tie_impl);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status CopyToExternalObject() final {
+  abslx::Status CopyToExternalObject() final {
     RETURN_IF_ERROR(inner_tie_->CopyToExternalObject());
     return outer_tie_->CopyToExternalObject();
   }
 
-  absl::Status CopyFromExternalObject() final {
+  abslx::Status CopyFromExternalObject() final {
     RETURN_IF_ERROR(outer_tie_->CopyFromExternalObject());
     return inner_tie_->CopyFromExternalObject();
   }
 
-  absl::Status SetExternalObject(TensorObject obj) final {
+  abslx::Status SetExternalObject(TensorObject obj) final {
     return outer_tie_->SetExternalObject(obj);
   }
 
@@ -350,7 +350,7 @@ class TwoStepTensorTie : public TensorTie {
     return std::make_pair(outer_def, inner_def);
   }
 
-  absl::Status Init(TensorObjectConverterBuilder* converter_builder,
+  abslx::Status Init(TensorObjectConverterBuilder* converter_builder,
                     ObjectManager* objects) {
     auto defs = MakeOuterInnerDefs(def());
     RETURN_IF_ERROR(DefaultTensorTie::New(defs.second, converter_builder,
@@ -375,7 +375,7 @@ class TensorTieFactory {
             TwoStepTensorTie::IsSupported(def, *converter_builder_));
   }
 
-  absl::Status NewTensorTie(const TensorTieDef& def, ObjectManager* objects,
+  abslx::Status NewTensorTie(const TensorTieDef& def, ObjectManager* objects,
                             std::unique_ptr<TensorTie>* tie) {
     auto converter = converter_builder_.get();
     if (DefaultTensorTie::IsSupported(def, *converter)) {
@@ -384,7 +384,7 @@ class TensorTieFactory {
     if (TwoStepTensorTie::IsSupported(def, *converter)) {
       return TwoStepTensorTie::New(def, converter, objects, tie);
     }
-    return absl::UnimplementedError("Unsupported tensor tie definition.");
+    return abslx::UnimplementedError("Unsupported tensor tie definition.");
   }
 
  private:
@@ -397,7 +397,7 @@ class InferenceRunnerImpl : public InferenceRunner {
                       std::unique_ptr<ObjectManager> objects)
       : runtime_(std::move(runtime)), external_objects_(std::move(objects)) {}
 
-  absl::Status Initialize(const std::vector<TensorTieDef>& input_defs,
+  abslx::Status Initialize(const std::vector<TensorTieDef>& input_defs,
                           const std::vector<TensorTieDef>& output_defs,
                           TensorTieFactory* tie_factory) {
     RETURN_IF_ERROR(LinkTensors(input_defs, tie_factory, &input_tensor_ties_));
@@ -407,7 +407,7 @@ class InferenceRunnerImpl : public InferenceRunner {
       output_to_cpu_ |= output_def.external_def.object_def.object_type ==
                         gpu::ObjectType::CPU_MEMORY;
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   std::vector<TensorObjectDef> inputs() const override {
@@ -418,37 +418,37 @@ class InferenceRunnerImpl : public InferenceRunner {
     return GetExternalDefinitions(output_tensor_ties_);
   }
 
-  absl::Status GetInputObject(int index, TensorObject* object) override {
+  abslx::Status GetInputObject(int index, TensorObject* object) override {
     if (index < 0 || index >= input_tensor_ties_.size()) {
-      return absl::OutOfRangeError("Index is out of range");
+      return abslx::OutOfRangeError("Index is out of range");
     }
     *object = input_tensor_ties_[index]->GetExternalObject();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status GetOutputObject(int index, TensorObject* object) override {
+  abslx::Status GetOutputObject(int index, TensorObject* object) override {
     if (index < 0 || index >= output_tensor_ties_.size()) {
-      return absl::OutOfRangeError("Index is out of range");
+      return abslx::OutOfRangeError("Index is out of range");
     }
     *object = output_tensor_ties_[index]->GetExternalObject();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status SetInputObject(int index, TensorObject object) override {
+  abslx::Status SetInputObject(int index, TensorObject object) override {
     if (index < 0 || index >= input_tensor_ties_.size()) {
-      return absl::OutOfRangeError("Index is out of range");
+      return abslx::OutOfRangeError("Index is out of range");
     }
     return input_tensor_ties_[index]->SetExternalObject(object);
   }
 
-  absl::Status SetOutputObject(int index, TensorObject object) override {
+  abslx::Status SetOutputObject(int index, TensorObject object) override {
     if (index < 0 || index >= output_tensor_ties_.size()) {
-      return absl::OutOfRangeError("Index is out of range");
+      return abslx::OutOfRangeError("Index is out of range");
     }
     return output_tensor_ties_[index]->SetExternalObject(object);
   }
 
-  absl::Status Run() override {
+  abslx::Status Run() override {
     for (auto& obj : input_tensor_ties_) {
       RETURN_IF_ERROR(obj->CopyFromExternalObject());
     }
@@ -460,11 +460,11 @@ class InferenceRunnerImpl : public InferenceRunner {
     if (output_to_cpu_) {
       RETURN_IF_ERROR(runtime_->command_queue()->WaitForCompletion());
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
-  absl::Status LinkTensors(const std::vector<TensorTieDef>& defs,
+  abslx::Status LinkTensors(const std::vector<TensorTieDef>& defs,
                            TensorTieFactory* tie_factory,
                            std::vector<std::unique_ptr<TensorTie>>* objects) {
     objects->reserve(defs.size());
@@ -474,7 +474,7 @@ class InferenceRunnerImpl : public InferenceRunner {
           tie_factory->NewTensorTie(def, external_objects_.get(), &object));
       objects->push_back(std::move(object));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   static std::vector<TensorObjectDef> GetExternalDefinitions(
@@ -505,10 +505,10 @@ class InferenceBuilderImpl : public InferenceBuilder {
         gpu_info_(gpu_info),
         tie_factory_(env_options_) {}
 
-  absl::Status Initialize() {
+  abslx::Status Initialize() {
     inputs_ = LinkTensors(graph_.inputs());
     outputs_ = LinkTensors(graph_.outputs());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   std::vector<TensorObjectDef> inputs() const final {
@@ -519,42 +519,42 @@ class InferenceBuilderImpl : public InferenceBuilder {
     return GetExternalDefinitions(outputs_);
   }
 
-  absl::Status SetInputShape(int index, const Dimensions& dimensions) final {
+  abslx::Status SetInputShape(int index, const Dimensions& dimensions) final {
     if (index < 0 || index >= inputs_.size()) {
-      return absl::OutOfRangeError("Index is out of range");
+      return abslx::OutOfRangeError("Index is out of range");
     }
-    return absl::UnimplementedError("Changing input shapes is not supported");
+    return abslx::UnimplementedError("Changing input shapes is not supported");
   }
 
-  absl::Status SetInputObjectDef(int index, ObjectDef new_def) final {
+  abslx::Status SetInputObjectDef(int index, ObjectDef new_def) final {
     if (index < 0 || index >= inputs_.size()) {
-      return absl::OutOfRangeError("Index is out of range");
+      return abslx::OutOfRangeError("Index is out of range");
     }
     auto def = inputs_[index];
     def.external_def.object_def = new_def;
     if (!tie_factory_.IsSupported(def)) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "New object definition is not supported.");
     }
     inputs_[index] = def;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status SetOutputObjectDef(int index, ObjectDef new_def) final {
+  abslx::Status SetOutputObjectDef(int index, ObjectDef new_def) final {
     if (index < 0 || index >= outputs_.size()) {
-      return absl::OutOfRangeError("Index is out of range");
+      return abslx::OutOfRangeError("Index is out of range");
     }
     auto def = outputs_[index];
     def.external_def.object_def = new_def;
     if (!tie_factory_.IsSupported(def)) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "New object definition is not supported.");
     }
     outputs_[index] = def;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Build(std::unique_ptr<InferenceRunner>* runner) final {
+  abslx::Status Build(std::unique_ptr<InferenceRunner>* runner) final {
     auto kernels = NewNodeShaderRegistry();
     CompilationOptions compiler_options;
     compiler_options.allow_precision_loss =
@@ -574,7 +574,7 @@ class InferenceBuilderImpl : public InferenceBuilder {
     auto workgroup_calculator = NewDefaultWorkgroupsCalculator(*gpu_info_);
     auto external_objects = std::make_unique<ObjectManager>();
     std::vector<GlShader> shaders;
-    absl::flat_hash_map<std::string, size_t> shader_to_index;
+    abslx::flat_hash_map<std::string, size_t> shader_to_index;
     RuntimeOptions runtime_options;
     auto runtime =
         std::make_unique<Runtime>(runtime_options, *gpu_info_,
@@ -584,7 +584,7 @@ class InferenceBuilderImpl : public InferenceBuilder {
         std::move(runtime), std::move(external_objects));
     RETURN_IF_ERROR(runner_impl->Initialize(inputs_, outputs_, &tie_factory_));
     RETURN_IF_ERROR(
-        compiler->Compile(graph_, {}, [&](ShaderCode code) -> absl::Status {
+        compiler->Compile(graph_, {}, [&](ShaderCode code) -> abslx::Status {
           auto workgroup = workgroup_calculator->Calculate(code);
           size_t shader_index;
           std::string shader_src =
@@ -607,7 +607,7 @@ class InferenceBuilderImpl : public InferenceBuilder {
         }));
     RETURN_IF_ERROR(runtime_ptr->PrepareForExecution());
     *runner = std::move(runner_impl);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -664,27 +664,27 @@ class InferenceEnvironmentImpl : public InferenceEnvironment {
   explicit InferenceEnvironmentImpl(const InferenceEnvironmentOptions& options)
       : env_options_(options) {}
 
-  absl::Status Init() {
+  abslx::Status Init() {
     RETURN_IF_ERROR(EglEnvironment::NewEglEnvironment(&egl_env_));
 
     RETURN_IF_ERROR(RequestGpuInfo(&gpu_info_));
     properties_.is_opengl_available = gpu_info_.IsApiOpenGl31OrAbove();
     if (!properties_.is_opengl_available) {
-      return absl::InternalError(
+      return abslx::InternalError(
           "OpenGL ES 3.1 or above is required to use OpenGL inference.");
     }
     if (!env_options_.queue) {
       queue_ = NewCommandQueue(gpu_info_);
       env_options_.queue = queue_.get();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status NewInferenceBuilder(
+  abslx::Status NewInferenceBuilder(
       GraphFloat32&& model, const InferenceOptions& options,
       std::unique_ptr<InferenceBuilder>* builder) final {
     if (!IsValid(options)) {
-      return absl::InvalidArgumentError("InferenceOptions are invalid.");
+      return abslx::InvalidArgumentError("InferenceOptions are invalid.");
     }
     InferenceOptions resolved_options = options;
     ResolveAutoPriority(&resolved_options);
@@ -693,7 +693,7 @@ class InferenceEnvironmentImpl : public InferenceEnvironment {
         env_options_, resolved_options, std::move(model), &gpu_info_);
     RETURN_IF_ERROR(builder_impl->Initialize());
     *builder = std::move(builder_impl);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   const InferenceEnvironmentProperties& properties() const {
@@ -710,18 +710,18 @@ class InferenceEnvironmentImpl : public InferenceEnvironment {
 
 }  // namespace
 
-absl::Status NewInferenceEnvironment(
+abslx::Status NewInferenceEnvironment(
     const InferenceEnvironmentOptions& options,
     std::unique_ptr<InferenceEnvironment>* environment,
     InferenceEnvironmentProperties* properties) {
   auto env_impl = std::make_unique<InferenceEnvironmentImpl>(options);
-  absl::Status status = env_impl->Init();
+  abslx::Status status = env_impl->Init();
   if (properties) {
     *properties = env_impl->properties();
   }
   RETURN_IF_ERROR(status);
   *environment = std::move(env_impl);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gl

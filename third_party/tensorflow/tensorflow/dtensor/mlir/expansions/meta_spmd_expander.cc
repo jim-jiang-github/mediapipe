@@ -130,7 +130,7 @@ StatusOr<llvm::DenseMap<int, Layout>> LayoutFromUnpackedTensors(
 
 StatusOr<mlir::Operation*> PackSPMDExpander::ExpandOp(mlir::Operation* op) {
   auto pack = llvm::cast<mlir::TF::PackOp>(op);
-  TF_ASSIGN_OR_RETURN(const absl::optional<Layout> output_layout,
+  TF_ASSIGN_OR_RETURN(const abslx::optional<Layout> output_layout,
                       ExtractSingleLayoutFromOp(op));
 
   const int output_rank = ValueRank(pack.output());
@@ -148,7 +148,7 @@ StatusOr<mlir::Operation*> PackSPMDExpander::ExpandOp(mlir::Operation* op) {
       output_layout->GetLayoutWithReducedDims({axis}, /*keep_dims=*/false);
 
   for (int i = 0; i < op->getNumOperands(); ++i) {
-    TF_ASSIGN_OR_RETURN(const absl::optional<Layout> layout,
+    TF_ASSIGN_OR_RETURN(const abslx::optional<Layout> layout,
                         ExtractLayoutFromOperand(pack.getOperand(i)));
     if (!layout) return errors::InvalidArgument("missing layout for input ", i);
 
@@ -182,7 +182,7 @@ StatusOr<llvm::DenseMap<int, Layout>> PackSPMDExpander::ComputeLayoutBackward(
 
 StatusOr<mlir::Operation*> UnpackSPMDExpander::ExpandOp(mlir::Operation* op) {
   auto unpack = llvm::cast<mlir::TF::UnpackOp>(op);
-  TF_ASSIGN_OR_RETURN(const absl::optional<Layout> input_layout,
+  TF_ASSIGN_OR_RETURN(const abslx::optional<Layout> input_layout,
                       ExtractLayoutFromOperand(unpack.getOperand()));
   if (!input_layout) {
     return errors::Unimplemented("input must have a layout");
@@ -363,13 +363,13 @@ StatusOr<mlir::Operation*> TileSPMDExpander::ExpandOp(mlir::Operation* op) {
   auto tile_op = llvm::cast<mlir::TF::TileOp>(op);
   // After layout propagation, tile op should already have the proper output
   // layout tagged on itself.
-  TF_ASSIGN_OR_RETURN(absl::optional<Layout> output_layout,
+  TF_ASSIGN_OR_RETURN(abslx::optional<Layout> output_layout,
                       ExtractSingleLayoutFromOp(op));
   if (!output_layout)
     return errors::InvalidArgument(
         "TileOP doesn't have a layout after layout propagation");
 
-  TF_ASSIGN_OR_RETURN(absl::optional<Layout> operand_layout,
+  TF_ASSIGN_OR_RETURN(abslx::optional<Layout> operand_layout,
                       ExtractLayoutFromOperand(tile_op.input()));
   if (!operand_layout)
     return errors::InvalidArgument(
@@ -957,8 +957,8 @@ TransposeSPMDExpander::ComputeLayoutBackward(
 
 namespace {
 
-Status RelayoutOneHotInput(const absl::optional<Layout>& input_layout,
-                           const absl::optional<Layout>& output_layout,
+Status RelayoutOneHotInput(const abslx::optional<Layout>& input_layout,
+                           const abslx::optional<Layout>& output_layout,
                            const int axis, mlir::TF::OneHotOp& one_hot) {
   if (!input_layout || !output_layout)
     return errors::InvalidArgument(

@@ -296,7 +296,7 @@ class DfsHloRewriteVisitor : public DfsHloVisitorWithDefault {
   // Runs a visitor on the module and returns whether the module has changed.
   StatusOr<bool> RunOnModule(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads = {}) {
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads = {}) {
     for (const auto& computation :
          module->MakeNonfusionComputations(execution_threads)) {
       TF_RETURN_IF_ERROR(computation->Accept(this));

@@ -25,14 +25,14 @@ namespace tensorflow {
 namespace profiler {
 
 // Return if a category is fusion.
-inline bool IsFusion(absl::string_view category) {
-  return absl::EndsWith(category, " fusion");
+inline bool IsFusion(abslx::string_view category) {
+  return abslx::EndsWith(category, " fusion");
 }
 
 // Return a concatenation of the program name with program id.
-inline std::string HloModuleNameWithProgramId(absl::string_view hlo_module_name,
+inline std::string HloModuleNameWithProgramId(abslx::string_view hlo_module_name,
                                               uint64_t program_id) {
-  return absl::StrCat(hlo_module_name, "(", program_id, ")");
+  return abslx::StrCat(hlo_module_name, "(", program_id, ")");
 }
 
 }  // namespace profiler

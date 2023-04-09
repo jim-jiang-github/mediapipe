@@ -39,19 +39,19 @@ class XlaDebugInfoManagerTestPeer {
 
   void StartTracing() { return xla_debug_info_manager_.StartTracing(); }
 
-  absl::flat_hash_set<ModuleIdentifier> StopTracing() {
+  abslx::flat_hash_set<ModuleIdentifier> StopTracing() {
     std::vector<std::unique_ptr<HloProto>> module_debug_info;
     xla_debug_info_manager_.StopTracing(&module_debug_info);
-    absl::flat_hash_set<ModuleIdentifier> module_ids;
+    abslx::flat_hash_set<ModuleIdentifier> module_ids;
     for (const auto& hlo_proto : module_debug_info) {
       module_ids.insert(hlo_proto->hlo_module().id());
     }
     return module_ids;
   }
 
-  absl::flat_hash_set<ModuleIdentifier> GetModuleIds() {
-    absl::flat_hash_set<ModuleIdentifier> module_ids;
-    absl::MutexLock lock(&xla_debug_info_manager_.mutex_);
+  abslx::flat_hash_set<ModuleIdentifier> GetModuleIds() {
+    abslx::flat_hash_set<ModuleIdentifier> module_ids;
+    abslx::MutexLock lock(&xla_debug_info_manager_.mutex_);
     for (const auto& it : xla_debug_info_manager_.modules_) {
       module_ids.insert(it.first);
     }
@@ -101,13 +101,13 @@ class XlaDebugInfoManagerTest : public HloTestBase {
     }
   }
 
-  absl::flat_hash_set<ModuleIdentifier> GetModuleIds() {
+  abslx::flat_hash_set<ModuleIdentifier> GetModuleIds() {
     return xla_debug_info_manager_.GetModuleIds();
   }
 
   void StartTrace() { xla_debug_info_manager_.StartTracing(); }
 
-  absl::flat_hash_set<ModuleIdentifier> StopTrace() {
+  abslx::flat_hash_set<ModuleIdentifier> StopTrace() {
     return xla_debug_info_manager_.StopTracing();
   }
 

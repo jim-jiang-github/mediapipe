@@ -138,7 +138,7 @@ class XlaOpRegistry {
   // the device; it may optionally modify the KernelDef.
   typedef bool (*BackendOpFilter)(KernelDef* kdef);
   static void RegisterBackend(const string& compilation_device_name,
-                              absl::Span<const DataType> supported_types,
+                              abslx::Span<const DataType> supported_types,
                               BackendOpFilter op_filter);
 
   // Returns the names of the registered backends.
@@ -333,19 +333,19 @@ class XlaOpRegistry {
 class XlaOpRegistrationBuilder {
  public:
   // Starts an operator registration chain.
-  static XlaOpRegistrationBuilder Name(absl::string_view name);
+  static XlaOpRegistrationBuilder Name(abslx::string_view name);
 
   // Specifies a allowlist of devices on which the operator may run.
-  XlaOpRegistrationBuilder& Device(absl::string_view devices);
-  XlaOpRegistrationBuilder& Device(absl::Span<const absl::string_view> devices);
+  XlaOpRegistrationBuilder& Device(abslx::string_view devices);
+  XlaOpRegistrationBuilder& Device(abslx::Span<const abslx::string_view> devices);
 
   // Specifies a type constraint for a type variable attribute. Each constraint
   // specifies the set of types that the type variable may assume.
-  XlaOpRegistrationBuilder& TypeConstraint(absl::string_view attr_name,
+  XlaOpRegistrationBuilder& TypeConstraint(abslx::string_view attr_name,
                                            DataType allowed);
 
-  XlaOpRegistrationBuilder& TypeConstraint(absl::string_view attr_name,
-                                           absl::Span<const DataType> allowed);
+  XlaOpRegistrationBuilder& TypeConstraint(abslx::string_view attr_name,
+                                           abslx::Span<const DataType> allowed);
 
   // Specifies that a dummy copy of this operator should not be registered on
   // XLA_* devices, but may be used during compilation.
@@ -362,7 +362,7 @@ class XlaOpRegistrationBuilder {
 
   // Mark 'input_name' as an argument whose value must be known at compile-time.
   XlaOpRegistrationBuilder& CompileTimeConstantInput(
-      absl::string_view input_name);
+      abslx::string_view input_name);
 
   // Mark this op as a "metadata" op, one that only looks at the shapes of its
   // operands and not their values.
@@ -375,7 +375,7 @@ class XlaOpRegistrationBuilder {
       XlaOpRegistry::Factory factory);
 
  private:
-  XlaOpRegistrationBuilder(absl::string_view name);
+  XlaOpRegistrationBuilder(abslx::string_view name);
 
   std::unique_ptr<XlaOpRegistry::OpRegistration> registration_;
 };
@@ -403,7 +403,7 @@ class XlaOpRegistrar {
 
 class XlaBackendRegistrar {
  public:
-  XlaBackendRegistrar(absl::string_view name, absl::Span<const DataType> types,
+  XlaBackendRegistrar(abslx::string_view name, abslx::Span<const DataType> types,
                       XlaOpRegistry::BackendOpFilter op_filter = nullptr);
 };
 

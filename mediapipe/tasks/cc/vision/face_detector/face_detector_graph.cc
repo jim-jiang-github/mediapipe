@@ -111,7 +111,7 @@ void ConfigureNonMaxSuppressionCalculator(
 
 class FaceDetectorGraph : public core::ModelTaskGraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     ASSIGN_OR_RETURN(const auto* model_resources,
                      CreateModelResources<FaceDetectorGraphOptions>(sc));
@@ -126,7 +126,7 @@ class FaceDetectorGraph : public core::ModelTaskGraph {
   }
 
  private:
-  absl::StatusOr<Source<std::vector<Detection>>> BuildFaceDetectionSubgraph(
+  abslx::StatusOr<Source<std::vector<Detection>>> BuildFaceDetectionSubgraph(
       const FaceDetectorGraphOptions& subgraph_options,
       const core::ModelResources& model_resources, Source<Image> image_in,
       Source<NormalizedRect> norm_rect_in, Graph& graph) {

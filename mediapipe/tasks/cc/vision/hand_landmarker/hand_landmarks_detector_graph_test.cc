@@ -110,8 +110,8 @@ constexpr float kFullModelFractionDiff = 0.03;  // percentage
 constexpr float kAbsMargin = 0.03;
 
 // Helper function to create a Single Hand Landmark TaskRunner.
-absl::StatusOr<std::unique_ptr<TaskRunner>> CreateSingleHandTaskRunner(
-    absl::string_view model_name) {
+abslx::StatusOr<std::unique_ptr<TaskRunner>> CreateSingleHandTaskRunner(
+    abslx::string_view model_name) {
   Graph graph;
 
   auto& hand_landmark_detection = graph.AddNode(
@@ -146,12 +146,12 @@ absl::StatusOr<std::unique_ptr<TaskRunner>> CreateSingleHandTaskRunner(
 
   return TaskRunner::Create(
       graph.GetConfig(),
-      absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
+      abslx::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
 }
 
 // Helper function to create a Multi Hand Landmark TaskRunner.
-absl::StatusOr<std::unique_ptr<TaskRunner>> CreateMultiHandTaskRunner(
-    absl::string_view model_name) {
+abslx::StatusOr<std::unique_ptr<TaskRunner>> CreateMultiHandTaskRunner(
+    abslx::string_view model_name) {
   Graph graph;
 
   auto& multi_hand_landmark_detection = graph.AddNode(
@@ -188,10 +188,10 @@ absl::StatusOr<std::unique_ptr<TaskRunner>> CreateMultiHandTaskRunner(
 
   return TaskRunner::Create(
       graph.GetConfig(),
-      absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
+      abslx::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
 }
 
-NormalizedLandmarkList GetExpectedLandmarkList(absl::string_view filename) {
+NormalizedLandmarkList GetExpectedLandmarkList(abslx::string_view filename) {
   NormalizedLandmarkList expected_landmark_list;
   MP_EXPECT_OK(GetTextProto(file::JoinPath("./", kTestDataDirectory, filename),
                             &expected_landmark_list, Defaults()));
@@ -199,7 +199,7 @@ NormalizedLandmarkList GetExpectedLandmarkList(absl::string_view filename) {
 }
 
 ClassificationList GetExpectedHandedness(
-    const std::vector<absl::string_view>& handedness_labels) {
+    const std::vector<abslx::string_view>& handedness_labels) {
   ClassificationList expected_handedness;
   for (const auto& handedness_label : handedness_labels) {
     auto& classification = *expected_handedness.add_classification();

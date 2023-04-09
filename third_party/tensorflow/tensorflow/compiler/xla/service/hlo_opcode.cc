@@ -32,7 +32,7 @@ std::string HloOpcodeString(HloOpcode opcode) {
 }
 
 StatusOr<HloOpcode> StringToHloOpcode(const std::string& opcode_name) {
-  static auto* opcode_map = new absl::flat_hash_map<std::string, HloOpcode>({
+  static auto* opcode_map = new abslx::flat_hash_map<std::string, HloOpcode>({
 #define STRING_TO_OPCODE_ENTRY(enum_name, opcode_name, ...) \
   {opcode_name, HloOpcode::enum_name},
       HLO_OPCODE_LIST(STRING_TO_OPCODE_ENTRY)

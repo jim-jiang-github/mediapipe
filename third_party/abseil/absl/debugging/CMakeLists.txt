@@ -32,9 +32,9 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::debugging_internal
-    absl::config
-    absl::core_headers
+    abslx::debugging_internal
+    abslx::config
+    abslx::core_headers
   PUBLIC
 )
 
@@ -56,15 +56,15 @@ absl_cc_library(
     ${ABSL_DEFAULT_LINKOPTS}
     $<$<BOOL:${MINGW}>:"dbghelp">
   DEPS
-    absl::debugging_internal
-    absl::demangle_internal
-    absl::base
-    absl::config
-    absl::core_headers
-    absl::dynamic_annotations
-    absl::malloc_internal
-    absl::raw_logging_internal
-    absl::strings
+    abslx::debugging_internal
+    abslx::demangle_internal
+    abslx::base
+    abslx::config
+    abslx::core_headers
+    abslx::dynamic_annotations
+    abslx::malloc_internal
+    abslx::raw_logging_internal
+    abslx::strings
   PUBLIC
 )
 
@@ -79,14 +79,14 @@ absl_cc_test(
   LINKOPTS
     $<$<BOOL:${MSVC}>:-DEBUG>
   DEPS
-    absl::stack_consumption
-    absl::symbolize
-    absl::base
-    absl::config
-    absl::core_headers
-    absl::memory
-    absl::raw_logging_internal
-    absl::strings
+    abslx::stack_consumption
+    abslx::symbolize
+    abslx::base
+    abslx::config
+    abslx::core_headers
+    abslx::memory
+    abslx::raw_logging_internal
+    abslx::strings
     gmock
 )
 
@@ -100,11 +100,11 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::stacktrace
-    absl::symbolize
-    absl::config
-    absl::core_headers
-    absl::raw_logging_internal
+    abslx::stacktrace
+    abslx::symbolize
+    abslx::config
+    abslx::core_headers
+    abslx::raw_logging_internal
 )
 
 absl_cc_library(
@@ -117,13 +117,13 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::examine_stack
-    absl::stacktrace
-    absl::base
-    absl::config
-    absl::core_headers
-    absl::errno_saver
-    absl::raw_logging_internal
+    abslx::examine_stack
+    abslx::stacktrace
+    abslx::base
+    abslx::config
+    abslx::core_headers
+    abslx::errno_saver
+    abslx::raw_logging_internal
   PUBLIC
 )
 
@@ -135,11 +135,11 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::failure_signal_handler
-    absl::stacktrace
-    absl::symbolize
-    absl::strings
-    absl::raw_logging_internal
+    abslx::failure_signal_handler
+    abslx::stacktrace
+    abslx::symbolize
+    abslx::strings
+    abslx::raw_logging_internal
     Threads::Threads
     gmock
 )
@@ -158,11 +158,11 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::core_headers
-    absl::config
-    absl::dynamic_annotations
-    absl::errno_saver
-    absl::raw_logging_internal
+    abslx::core_headers
+    abslx::config
+    abslx::dynamic_annotations
+    abslx::errno_saver
+    abslx::raw_logging_internal
 )
 
 absl_cc_library(
@@ -175,8 +175,8 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::base
-    absl::core_headers
+    abslx::base
+    abslx::core_headers
   PUBLIC
 )
 
@@ -188,12 +188,12 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::demangle_internal
-    absl::stack_consumption
-    absl::config
-    absl::core_headers
-    absl::memory
-    absl::raw_logging_internal
+    abslx::demangle_internal
+    abslx::stack_consumption
+    abslx::config
+    abslx::core_headers
+    abslx::memory
+    abslx::raw_logging_internal
     gmock_main
 )
 
@@ -207,8 +207,8 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::config
-    absl::core_headers
+    abslx::config
+    abslx::core_headers
   PUBLIC
 )
 
@@ -259,8 +259,8 @@ absl_cc_test(
   LINKOPTS
     "${ABSL_LSAN_LINKOPTS}"
   DEPS
-    absl::leak_check_api_enabled_for_testing
-    absl::base
+    abslx::leak_check_api_enabled_for_testing
+    abslx::base
     gmock_main
 )
 
@@ -273,8 +273,8 @@ absl_cc_test(
     ${ABSL_TEST_COPTS}
     "-UABSL_EXPECT_LEAK_SANITIZER"
   DEPS
-    absl::leak_check_api_disabled_for_testing
-    absl::base
+    abslx::leak_check_api_disabled_for_testing
+    abslx::base
     gmock_main
 )
 
@@ -288,10 +288,10 @@ absl_cc_test(
   LINKOPTS
     "${ABSL_LSAN_LINKOPTS}"
   DEPS
-    absl::leak_check_api_enabled_for_testing
-    absl::leak_check_disable
-    absl::base
-    absl::raw_logging_internal
+    abslx::leak_check_api_enabled_for_testing
+    abslx::leak_check_disable
+    abslx::base
+    abslx::raw_logging_internal
     gmock_main
 )
 
@@ -305,9 +305,9 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::config
-    absl::core_headers
-    absl::raw_logging_internal
+    abslx::config
+    abslx::core_headers
+    abslx::raw_logging_internal
   TESTONLY
 )
 
@@ -319,9 +319,9 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::stack_consumption
-    absl::core_headers
-    absl::raw_logging_internal
+    abslx::stack_consumption
+    abslx::core_headers
+    abslx::raw_logging_internal
     gmock_main
 )
 
@@ -332,7 +332,7 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::stacktrace
-    absl::leak_check
+    abslx::stacktrace
+    abslx::leak_check
   PUBLIC
 )

@@ -66,21 +66,21 @@ class DetectionsDeduplicateCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kIn, kOut);
 
-  absl::Status Open(mediapipe::CalculatorContext* cc) {
+  abslx::Status Open(mediapipe::CalculatorContext* cc) {
     cc->SetOffset(::mediapipe::TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(mediapipe::CalculatorContext* cc) {
+  abslx::Status Process(mediapipe::CalculatorContext* cc) {
     const std::vector<Detection>& raw_detections = kIn(cc).Get();
-    absl::flat_hash_map<LocationData::BoundingBox, Detection*, BoundingBoxHash,
+    abslx::flat_hash_map<LocationData::BoundingBox, Detection*, BoundingBoxHash,
                         BoundingBoxEq>
         bbox_to_detections;
     std::vector<Detection> deduplicated_detections;
     for (const auto& detection : raw_detections) {
       if (!detection.has_location_data() ||
           !detection.location_data().has_bounding_box()) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "The location data of Detections must be BoundingBox.");
       }
       if (bbox_to_detections.contains(
@@ -104,7 +104,7 @@ class DetectionsDeduplicateCalculator : public Node {
       }
     }
     kOut(cc).Send(std::move(deduplicated_detections));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

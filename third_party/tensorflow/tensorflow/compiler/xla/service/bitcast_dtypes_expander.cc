@@ -54,7 +54,7 @@ StatusOr<HloInstruction*> BitcastDtypesExpander::ExpandInstruction(
   }
 
   std::string name =
-      absl::StrFormat("xla.bitcast_convert_%s_2_%s", from_shape.ToString(),
+      abslx::StrFormat("xla.bitcast_convert_%s_2_%s", from_shape.ToString(),
                       to_shape.ToString());
 
   // Note: we are duplicating a hack from `cholesky_expander` to build a

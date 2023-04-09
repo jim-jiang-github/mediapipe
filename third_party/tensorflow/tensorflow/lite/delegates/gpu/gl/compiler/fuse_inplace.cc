@@ -38,7 +38,7 @@ static const char* kInplacePrefix = "inplace_update:\0";
 
 class EmptyInplaceRewrite : public InlineRewrite {
  public:
-  RewriteStatus Rewrite(absl::string_view input, std::string* output) final {
+  RewriteStatus Rewrite(abslx::string_view input, std::string* output) final {
     if (input.compare(0, strlen(kInplacePrefix), kInplacePrefix) == 0) {
       num_rewrites_++;
       return RewriteStatus::SUCCESS;
@@ -61,12 +61,12 @@ class InplaceCodeRewrite : public InlineRewrite {
  public:
   explicit InplaceCodeRewrite(const std::string& code) : code_(code) {}
 
-  RewriteStatus Rewrite(absl::string_view input, std::string* output) final {
+  RewriteStatus Rewrite(abslx::string_view input, std::string* output) final {
     int len = strlen(kInplacePrefix);
     if (input.compare(0, len, kInplacePrefix) == 0) {
       auto variable_name = input.substr(len);
-      absl::StrAppend(output,
-                      absl::StrReplaceAll(code_, {{"value_0", variable_name}}));
+      abslx::StrAppend(output,
+                      abslx::StrReplaceAll(code_, {{"value_0", variable_name}}));
       return RewriteStatus::SUCCESS;
     }
     return RewriteStatus::NOT_RECOGNIZED;

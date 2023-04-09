@@ -294,7 +294,7 @@ Status FillFunctionBody(
 
 Status GraphToFunctionDefHelper(
     const Graph& graph, const string& name,
-    const std::function<absl::optional<string>(const Node*)>& control_ret,
+    const std::function<abslx::optional<string>(const Node*)>& control_ret,
     const std::vector<string>& output_names, FunctionDef* fdef) {
   auto add_arg_or_retval = [](Node* node,
                               std::vector<OutputTensor>* args_or_retvals) {
@@ -433,7 +433,7 @@ Status GraphToFunctionDef(const Graph& fn_body, const string& fn_name,
       // _Arg/Placeholder nodes when this FunctionDef is converted to graph,
       // and normal attributes for nodes cannot be applied to those
       // _Arg/Placeholder nodes.
-      if (absl::StartsWith(attr.first, "_")) {
+      if (abslx::StartsWith(attr.first, "_")) {
         arg_attrs.mutable_attr()->insert(attr);
       } else if (attr.first == "shape" && argdef->type() != DT_RESOURCE) {
         // Preserve known shapes by moving them to the _output_shapes list.
@@ -585,7 +585,7 @@ Status GraphToFunctionDef(const Graph& fn_body, const string& fn_name,
 
 Status GraphToFunctionDef(
     const Graph& graph, const string& name,
-    const std::function<absl::optional<string>(const Node*)>& control_ret,
+    const std::function<abslx::optional<string>(const Node*)>& control_ret,
     FunctionDef* fdef) {
   return GraphToFunctionDefHelper(graph, name, control_ret,
                                   /*output_names=*/{}, fdef);

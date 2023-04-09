@@ -44,7 +44,7 @@ namespace {
 // generator cannot be run given the currently available side packets
 // (and false otherwise).  If an error occurs then unrunnable and
 // input_side_packet_set are undefined.
-absl::Status CreateInputsForGenerator(
+abslx::Status CreateInputsForGenerator(
     const ValidatedGraphConfig& validated_graph, int generator_index,
     const std::map<std::string, Packet>& side_packets,
     PacketSet* input_side_packet_set, bool* unrunnable) {
@@ -55,7 +55,7 @@ absl::Status CreateInputsForGenerator(
                                    .packet_generator();
   // Fill the PacketSet (if possible).
   *unrunnable = false;
-  std::vector<absl::Status> statuses;
+  std::vector<abslx::Status> statuses;
   for (CollectionItemId id = node_type_info.InputSidePacketTypes().BeginId();
        id < node_type_info.InputSidePacketTypes().EndId(); ++id) {
     const std::string& name =
@@ -67,12 +67,12 @@ absl::Status CreateInputsForGenerator(
       continue;
     }
     input_side_packet_set->Get(id) = it->second;
-    absl::Status status =
+    abslx::Status status =
         node_type_info.InputSidePacketTypes().Get(id).Validate(
             input_side_packet_set->Get(id));
     if (!status.ok()) {
       statuses.push_back(tool::AddStatusPrefix(
-          absl::StrCat("Input side packet \"", name,
+          abslx::StrCat("Input side packet \"", name,
                        "\" for PacketGenerator \"", generator_name,
                        "\" is not of the correct type: "),
           status));
@@ -80,14 +80,14 @@ absl::Status CreateInputsForGenerator(
   }
   if (!statuses.empty()) {
     return tool::CombinedStatus(
-        absl::StrCat(generator_name, " had invalid configuration."), statuses);
+        abslx::StrCat(generator_name, " had invalid configuration."), statuses);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Generate the packets from a PacketGenerator, place them in
 // output_side_packet_set, and validate their types.
-absl::Status Generate(const ValidatedGraphConfig& validated_graph,
+abslx::Status Generate(const ValidatedGraphConfig& validated_graph,
                       int generator_index,
                       const PacketSet& input_side_packet_set,
                       PacketSet* output_side_packet_set) {
@@ -113,7 +113,7 @@ absl::Status Generate(const ValidatedGraphConfig& validated_graph,
           .SetPrepend()
       << generator_name
       << "::Generate() output packets were of incorrect type: ";
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // GeneratorScheduler schedules the packet generators in a validated graph for
@@ -149,7 +149,7 @@ class GeneratorScheduler {
   // rather, not executed) in non_scheduled_generators. Returns the combined
   // error status if there were errors while running the packet generators.
   // NOTE: This method should only be called when there are no pending tasks.
-  absl::Status GetNonScheduledGenerators(
+  abslx::Status GetNonScheduledGenerators(
       std::vector<int>* non_scheduled_generators) const;
 
  private:
@@ -163,18 +163,18 @@ class GeneratorScheduler {
   const ValidatedGraphConfig* const validated_graph_;
   mediapipe::Executor* executor_;
 
-  mutable absl::Mutex mutex_;
+  mutable abslx::Mutex mutex_;
   // The number of pending tasks.
   int num_tasks_ ABSL_GUARDED_BY(mutex_) = 0;
   // This condition variable is signaled when num_tasks_ becomes 0.
-  absl::CondVar idle_condvar_;
+  abslx::CondVar idle_condvar_;
   // Accumulates the error statuses while running the packet generators.
-  std::vector<absl::Status> statuses_ ABSL_GUARDED_BY(mutex_);
+  std::vector<abslx::Status> statuses_ ABSL_GUARDED_BY(mutex_);
   // scheduled_generators_[i] is true if the packet generator with index i was
   // scheduled (or rather, executed).
   std::vector<bool> scheduled_generators_ ABSL_GUARDED_BY(mutex_);
 
-  absl::Mutex app_thread_mutex_;
+  abslx::Mutex app_thread_mutex_;
   // Tasks to be executed on the application thread.
   std::deque<std::function<void()>> app_thread_tasks_
       ABSL_GUARDED_BY(app_thread_mutex_);
@@ -190,7 +190,7 @@ GeneratorScheduler::GeneratorScheduler(
                             !initial) {
   if (!executor_) {
     // Run on the application thread.
-    delegating_executor_ = absl::make_unique<internal::DelegatingExecutor>(
+    delegating_executor_ = abslx::make_unique<internal::DelegatingExecutor>(
         std::bind(&GeneratorScheduler::AddApplicationThreadTask, this,
                   std::placeholders::_1));
     executor_ = delegating_executor_.get();
@@ -208,7 +208,7 @@ void GeneratorScheduler::GenerateAndScheduleNext(
     int generator_index, std::map<std::string, Packet>* side_packets,
     std::unique_ptr<PacketSet> input_side_packet_set) {
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     if (!statuses_.empty()) {
       // Return early, don't run the generator if we already have errors.
       return;
@@ -219,12 +219,12 @@ void GeneratorScheduler::GenerateAndScheduleNext(
           .OutputSidePacketTypes()
           .TagMap());
   VLOG(1) << "Running generator " << generator_index;
-  absl::Status status =
+  abslx::Status status =
       Generate(*validated_graph_, generator_index, *input_side_packet_set,
                &output_side_packet_set);
 
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     if (!status.ok()) {
       statuses_.push_back(std::move(status));
       return;
@@ -235,8 +235,8 @@ void GeneratorScheduler::GenerateAndScheduleNext(
       const auto& name = output_side_packet_set.TagMap()->Names()[id.value()];
       auto item = side_packets->emplace(name, output_side_packet_set.Get(id));
       if (!item.second) {
-        statuses_.push_back(absl::AlreadyExistsError(
-            absl::StrCat("Side packet \"", name, "\" was defined twice.")));
+        statuses_.push_back(abslx::AlreadyExistsError(
+            abslx::StrCat("Side packet \"", name, "\" was defined twice.")));
       }
     }
     if (!statuses_.empty()) {
@@ -252,7 +252,7 @@ void GeneratorScheduler::GenerateAndScheduleNext(
 
 void GeneratorScheduler::ScheduleAllRunnableGenerators(
     std::map<std::string, Packet>* side_packets) {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   const auto& generators = validated_graph_->Config().packet_generator();
 
   for (int index = 0; index < generators.size(); ++index) {
@@ -262,11 +262,11 @@ void GeneratorScheduler::ScheduleAllRunnableGenerators(
     bool is_unrunnable = false;
     // TODO Input side packet set should only be created once.
     auto input_side_packet_set =
-        absl::make_unique<PacketSet>(validated_graph_->GeneratorInfos()[index]
+        abslx::make_unique<PacketSet>(validated_graph_->GeneratorInfos()[index]
                                          .InputSidePacketTypes()
                                          .TagMap());
 
-    absl::Status status =
+    abslx::Status status =
         CreateInputsForGenerator(*validated_graph_, index, *side_packets,
                                  input_side_packet_set.get(), &is_unrunnable);
     if (!status.ok()) {
@@ -290,7 +290,7 @@ void GeneratorScheduler::ScheduleAllRunnableGenerators(
               index, side_packets,
               std::unique_ptr<PacketSet>(input_side_packet_set_ptr));
           {
-            absl::MutexLock lock(&mutex_);
+            abslx::MutexLock lock(&mutex_);
             --num_tasks_;
             if (num_tasks_ == 0) {
               idle_condvar_.Signal();
@@ -306,18 +306,18 @@ void GeneratorScheduler::WaitUntilIdle() {
     // Run the tasks on the application thread.
     RunApplicationThreadTasks();
   } else {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     while (num_tasks_ != 0) {
       idle_condvar_.Wait(&mutex_);
     }
   }
 }
 
-absl::Status GeneratorScheduler::GetNonScheduledGenerators(
+abslx::Status GeneratorScheduler::GetNonScheduledGenerators(
     std::vector<int>* non_scheduled_generators) const {
   non_scheduled_generators->clear();
 
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   if (!statuses_.empty()) {
     return tool::CombinedStatus("PacketGeneratorGraph failed.", statuses_);
   }
@@ -326,11 +326,11 @@ absl::Status GeneratorScheduler::GetNonScheduledGenerators(
       non_scheduled_generators->push_back(i);
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void GeneratorScheduler::AddApplicationThreadTask(std::function<void()> task) {
-  absl::MutexLock lock(&app_thread_mutex_);
+  abslx::MutexLock lock(&app_thread_mutex_);
   app_thread_tasks_.push_back(std::move(task));
 }
 
@@ -339,7 +339,7 @@ void GeneratorScheduler::RunApplicationThreadTasks() {
     std::function<void()> task_callback;
     {
       // Get the next task.
-      absl::MutexLock lock(&app_thread_mutex_);
+      abslx::MutexLock lock(&app_thread_mutex_);
       if (app_thread_tasks_.empty()) {
         break;
       }
@@ -356,7 +356,7 @@ void GeneratorScheduler::RunApplicationThreadTasks() {
 
 PacketGeneratorGraph::~PacketGeneratorGraph() {}
 
-absl::Status PacketGeneratorGraph::Initialize(
+abslx::Status PacketGeneratorGraph::Initialize(
     const ValidatedGraphConfig* validated_graph, mediapipe::Executor* executor,
     const std::map<std::string, Packet>& input_side_packets) {
   validated_graph_ = validated_graph;
@@ -368,7 +368,7 @@ absl::Status PacketGeneratorGraph::Initialize(
                            /*initial=*/true);
 }
 
-absl::Status PacketGeneratorGraph::RunGraphSetup(
+abslx::Status PacketGeneratorGraph::RunGraphSetup(
     const std::map<std::string, Packet>& input_side_packets,
     std::map<std::string, Packet>* output_side_packets,
     std::vector<int>* non_scheduled_generators) const {
@@ -376,8 +376,8 @@ absl::Status PacketGeneratorGraph::RunGraphSetup(
   for (const std::pair<const std::string, Packet>& item : input_side_packets) {
     auto iter = output_side_packets->find(item.first);
     if (iter != output_side_packets->end()) {
-      return absl::AlreadyExistsError(
-          absl::StrCat("Side packet \"", iter->first, "\" was defined twice."));
+      return abslx::AlreadyExistsError(
+          abslx::StrCat("Side packet \"", iter->first, "\" was defined twice."));
     }
     output_side_packets->insert(iter, item);
   }
@@ -393,10 +393,10 @@ absl::Status PacketGeneratorGraph::RunGraphSetup(
       validated_graph_->ValidateRequiredSidePackets(*output_side_packets));
   MP_RETURN_IF_ERROR(ExecuteGenerators(
       output_side_packets, non_scheduled_generators, /*initial=*/false));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PacketGeneratorGraph::ExecuteGenerators(
+abslx::Status PacketGeneratorGraph::ExecuteGenerators(
     std::map<std::string, Packet>* output_side_packets,
     std::vector<int>* non_scheduled_generators, bool initial) const {
   VLOG(1) << "ExecuteGenerators initial == " << initial;

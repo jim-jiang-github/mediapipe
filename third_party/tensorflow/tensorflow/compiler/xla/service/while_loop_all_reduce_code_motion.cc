@@ -76,7 +76,7 @@ bool IsZero(const HloInstruction* hlo) {
 bool IsValueReplicatedWithinEachAllReduceGroup(
     const HloInstruction& instruction, const ShapeIndex& index,
     CollectiveOpGroupMode all_reduce_group_mode,
-    absl::Span<const ReplicaGroup> replica_groups, int num_replicas,
+    abslx::Span<const ReplicaGroup> replica_groups, int num_replicas,
     int num_partitions,
     const std::unique_ptr<HloReplicationAnalysis>&
         cross_replica_replication_analysis,
@@ -190,10 +190,10 @@ MovableAllReduceContext IsAllReduceMovable(
     return is_replicated;
   };
   // We only support numerical types.
-  const absl::InlinedVector<PrimitiveType, 12> kSupportedTypes{
+  const abslx::InlinedVector<PrimitiveType, 12> kSupportedTypes{
       BF16, F16, F32, F64, S8, S16, S32, S64, U8, U16, U32, U64};
 
-  if (!absl::c_linear_search(kSupportedTypes,
+  if (!abslx::c_linear_search(kSupportedTypes,
                              all_reduce->shape().element_type()) ||
       !all_reduce_is_summation(all_reduce)) {
     return MovableAllReduceContext{/*is_movable=*/false,
@@ -339,10 +339,10 @@ MovableAllReduceContext IsAllReduceMovable(
   // the parent computation except for forwarding uses.
   auto is_buffer_used =
       [&is_value_replicated_within_replica_group](
-          absl::Span<const AccumulationContext> accumulation_contexts,
+          abslx::Span<const AccumulationContext> accumulation_contexts,
           HloComputation* while_body_computation) -> bool {
     std::vector<HloInstruction*> parameter_instructions;
-    absl::c_copy_if(while_body_computation->instructions(),
+    abslx::c_copy_if(while_body_computation->instructions(),
                     std::back_inserter(parameter_instructions),
                     [](HloInstruction* instruction) -> bool {
                       return instruction->opcode() == HloOpcode::kParameter;
@@ -514,7 +514,7 @@ MovableAllReduceContext IsAllReduceMovable(
             if (!output_buffer_tuple_index.unsupported_operation &&
                 output_buffer_tuple_index.returned_from_computation &&
                 !origin_buffer_tuple_index.tuple_index.empty() &&
-                absl::c_equal(origin_buffer_tuple_index.tuple_index,
+                abslx::c_equal(origin_buffer_tuple_index.tuple_index,
                               output_buffer_tuple_index.tuple_index) &&
                 (origin_buffer_tuple_index.dynamic_slice.has_value() ==
                  output_buffer_tuple_index.dynamic_update_slice.has_value()) &&
@@ -553,7 +553,7 @@ MovableAllReduceContext IsAllReduceMovable(
 
 struct WhileInitContext {
   HloInstruction* while_init{nullptr};
-  absl::flat_hash_map<int, HloInstruction*> tuple_index_to_old_buffer;
+  abslx::flat_hash_map<int, HloInstruction*> tuple_index_to_old_buffer;
 };
 
 // Creates a new while init instruction, which replaces each accumulation buffer
@@ -583,7 +583,7 @@ WhileInitContext CreateNewWhileInit(
       new_while_init_elements[tuple_index] = new_buffer;
     }
   }
-  absl::flat_hash_map<int, HloInstruction*> tuple_index_to_old_buffer;
+  abslx::flat_hash_map<int, HloInstruction*> tuple_index_to_old_buffer;
   for (int i = 0; i < old_while_init->operand_count(); i++) {
     if (!new_while_init_elements[i]) {
       new_while_init_elements[i] = old_while_init->mutable_operand(i);
@@ -599,14 +599,14 @@ WhileInitContext CreateNewWhileInit(
 // Creates all the sinked all-reduce instructions in the while instruction's
 // parent computation. Returns a map that maps a tuple index of an accumulation
 // buffer to it's corresponding all-reduce.
-absl::flat_hash_map<int, HloInstruction*> CreateSinkedAllReduces(
+abslx::flat_hash_map<int, HloInstruction*> CreateSinkedAllReduces(
     HloInstruction* new_while_instruction,
     const HloInstructionMap<std::vector<AccumulationContext>>&
         all_reduce_to_accumulations,
-    const absl::flat_hash_map<int, HloInstruction*>&
+    const abslx::flat_hash_map<int, HloInstruction*>&
         tuple_index_to_old_buffer) {
   HloComputation* while_parent = new_while_instruction->parent();
-  absl::flat_hash_map<int, HloInstruction*> tuple_index_to_new_buffer;
+  abslx::flat_hash_map<int, HloInstruction*> tuple_index_to_new_buffer;
   for (const auto& all_reduce_and_accumulations_pair :
        all_reduce_to_accumulations) {
     HloInstruction* loop_all_reduce = all_reduce_and_accumulations_pair.first;
@@ -665,7 +665,7 @@ absl::flat_hash_map<int, HloInstruction*> CreateSinkedAllReduces(
 // output.
 HloInstruction* CreateNewWhileResult(
     HloInstruction* new_while_instruction,
-    const absl::flat_hash_map<int, HloInstruction*>&
+    const abslx::flat_hash_map<int, HloInstruction*>&
         tuple_index_to_new_buffer) {
   HloComputation* while_parent = new_while_instruction->parent();
   CHECK(new_while_instruction->shape().IsTuple());
@@ -710,7 +710,7 @@ Status AddSinkedAllReducesAndReplaceWhile(
           while_instruction->while_condition(), while_instruction->while_body(),
           new_while_init_context.while_init));
   // Step 3) create the new all-reduce instructions after the while loop.
-  absl::flat_hash_map<int, HloInstruction*> tuple_index_to_new_buffer =
+  abslx::flat_hash_map<int, HloInstruction*> tuple_index_to_new_buffer =
       CreateSinkedAllReduces(new_while_instruction, all_reduce_to_accumulations,
                              new_while_init_context.tuple_index_to_old_buffer);
   // Step 4) create the tuple and replace the old while instruction for all of
@@ -726,7 +726,7 @@ Status AddSinkedAllReducesAndReplaceWhile(
 
 StatusOr<bool> WhileLoopAllReduceCodeMotion::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool is_changed = false;
   bool run_next_pass = true;
   // In case of MPMD, all-reduces might be cross-module and should preserve

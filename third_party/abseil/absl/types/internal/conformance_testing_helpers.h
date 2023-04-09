@@ -46,13 +46,13 @@
 #include <cstdlib>
 #endif
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace types_internal {
 
 // Return a readable name for type T.
 template <class T>
-absl::string_view NameOfImpl() {
+abslx::string_view NameOfImpl() {
 // TODO(calabrese) Investigate using debugging:internal_demangle as a fallback.
 #if ABSL_TYPES_INTERNAL_HAS_CXA_DEMANGLE
   int status = 0;
@@ -79,7 +79,7 @@ absl::string_view NameOfImpl() {
 // because we only use this internally with unqualified object types.
 template <class T>
 std::string NameOf() {
-  static const absl::string_view result = NameOfImpl<T>();
+  static const abslx::string_view result = NameOfImpl<T>();
   return std::string(result);
 }
 
@@ -91,7 +91,7 @@ struct IsNullaryCallableImpl : std::false_type {};
 
 template <class Fun>
 struct IsNullaryCallableImpl<
-    Fun, absl::void_t<decltype(std::declval<const Fun&>()())>>
+    Fun, abslx::void_t<decltype(std::declval<const Fun&>()())>>
     : std::true_type {
   using result_type = decltype(std::declval<const Fun&>()());
 
@@ -191,7 +191,7 @@ struct AreGeneratorsWithTheSameReturnTypeImpl<void> : std::true_type {};
 
 template <class Head, class... Tail>
 struct AreGeneratorsWithTheSameReturnTypeImpl<
-    typename std::enable_if<absl::conjunction<std::is_same<
+    typename std::enable_if<abslx::conjunction<std::is_same<
         ResultOfGeneratorT<Head>, ResultOfGeneratorT<Tail>>...>::value>::type,
     Head, Tail...> : std::true_type {};
 
@@ -261,7 +261,7 @@ template <class HeadHeadFun, class... TailHeadFuns, class HeadNextFun,
 struct AreEquivalenceClassesOfTheSameType<
     EquivalenceClassType<HeadHeadFun, TailHeadFuns...>,
     EquivalenceClassType<HeadNextFun, TailNextFuns...>, TailEqClasses...>
-    : absl::conditional_t<
+    : abslx::conditional_t<
           IsNullaryCallable<HeadNextFun>::template for_type<
               typename IsNullaryCallable<HeadHeadFun>::result_type>::value,
           AreEquivalenceClassesOfTheSameType<
@@ -294,7 +294,7 @@ struct ForEachParameterFun {
 // Execute a function on each element of a tuple.
 template <class Fun, class Tup>
 void ForEachTupleElement(const Fun& fun, const Tup& tup) {
-  absl::apply(ForEachParameterFun<Fun>{fun}, tup);
+  abslx::apply(ForEachParameterFun<Fun>{fun}, tup);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -363,7 +363,7 @@ struct If</*Condition =*/true> {
   template <class Fun, class... P>
   static void Invoke(const Fun& fun, P&&... args) {
     // TODO(calabrese) Use std::invoke equivalent instead of function-call.
-    fun(absl::forward<P>(args)...);
+    fun(abslx::forward<P>(args)...);
   }
 };
 
@@ -386,6 +386,6 @@ struct If</*Condition =*/true> {
 
 }  // namespace types_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_TYPES_INTERNAL_CONFORMANCE_TESTING_HELPERS_H_

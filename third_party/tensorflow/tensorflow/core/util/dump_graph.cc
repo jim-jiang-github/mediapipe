@@ -60,9 +60,9 @@ string MakeUniqueFilename(string name, const string& suffix = ".pbtxt") {
 
   string filename = name;
   if (count > 0) {
-    absl::StrAppend(&filename, "_", count);
+    abslx::StrAppend(&filename, "_", count);
   }
-  absl::StrAppend(&filename, suffix);
+  abslx::StrAppend(&filename, suffix);
   return filename;
 }
 
@@ -138,8 +138,8 @@ Status CreateWritableFile(Env* env, const string& dirname, const string& name,
     return errors::InvalidArgument("TF_DUMP_GRAPH_PREFIX not specified");
   }
 
-  if (absl::EqualsIgnoreCase(dir, "sponge") ||
-      absl::EqualsIgnoreCase(dir, "test_undeclared_outputs_dir")) {
+  if (abslx::EqualsIgnoreCase(dir, "sponge") ||
+      abslx::EqualsIgnoreCase(dir, "test_undeclared_outputs_dir")) {
     if (!io::GetTestUndeclaredOutputsDir(&dir)) {
       LOG(WARNING) << "TF_DUMP_GRAPH_PREFIX=sponge, but "
                       "TEST_UNDECLARED_OUTPUT_DIRS is not set, dumping to log";

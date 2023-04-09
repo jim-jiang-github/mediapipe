@@ -61,7 +61,7 @@ class Environment {
       const;
   bool IsSupported(TensorStorageType storage_type) const;
 
-  absl::Status Init();
+  abslx::Status Init();
 
   void SetHighPerformance() const;
   void SetDefaultPerformance() const;
@@ -82,7 +82,7 @@ TensorStorageType GetStorageTypeWithMinimalMemoryConsumption(
 // Checks if image 2D creation from sub-buffer is supported.
 bool CanUseSubBufferForImage2d(const GpuInfo& gpu_info);
 
-absl::Status CreateEnvironment(Environment* result);
+abslx::Status CreateEnvironment(Environment* result);
 
 }  // namespace cl
 }  // namespace gpu

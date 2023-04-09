@@ -48,7 +48,7 @@ class ResourceUsageAnalysis {
           op_(std::move(op)) {}
 
     std::string DebugString() const {
-      return absl::StrJoin({function_name_.value_or(""), node_name_, op_}, ":");
+      return abslx::StrJoin({function_name_.value_or(""), node_name_, op_}, ":");
     }
 
     bool operator==(const NodeInfo& o) const {
@@ -89,7 +89,7 @@ class ResourceUsageAnalysis {
   // is cleared upon calling this method.
   static Status Analyze(
       const Graph* graph, FunctionLibraryRuntime* lib_runtime,
-      absl::flat_hash_map<NodeInfo, absl::flat_hash_set<NodeInfo>>*
+      abslx::flat_hash_map<NodeInfo, abslx::flat_hash_set<NodeInfo>>*
           source_to_path);
 };
 

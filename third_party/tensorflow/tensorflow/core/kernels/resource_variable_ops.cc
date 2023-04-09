@@ -192,7 +192,7 @@ void ReadVariablesOp::Compute(OpKernelContext* ctx) {
               errors::FailedPrecondition(
                   "In ReadVariablesOp the following variables were "
                   "found uninitialized: ",
-                  absl::StrJoin(uninitialized_vars, ", ")));
+                  abslx::StrJoin(uninitialized_vars, ", ")));
 
   for (size_t i = 0; i < dtypes_.size(); ++i) {
     // We're acquiring a reference to the underlying buffer while

@@ -124,7 +124,7 @@ using CustomOptionsOffset = VectorBufferOffset<uint8_t>;
 namespace error = tensorflow::error;
 namespace tfl = mlir::TFL;
 
-ABSL_CONST_INIT const absl::string_view kFlexOpNamePrefix = "Flex";
+ABSL_CONST_INIT const abslx::string_view kFlexOpNamePrefix = "Flex";
 
 // Use initial buffer size in flatbuffer builder to be same as the initial size
 // used by the TOCO export. (It does not explain rationale for this choice.)
@@ -297,8 +297,8 @@ static std::string GetOpsSummary(
     }
   }
 
-  os << summary_title << " ops: " << absl::StrJoin(keys, ", ") << "\n";
-  os << "Details:\n\t" << absl::StrJoin(values, "\n\t");
+  os << summary_title << " ops: " << abslx::StrJoin(keys, ", ") << "\n";
+  os << "Details:\n\t" << abslx::StrJoin(values, "\n\t");
 
   return os.str();
 }
@@ -654,17 +654,17 @@ class Translator {
 
   std::vector<BufferOffset<tflite::Buffer>> buffers_;
   // Maps subgraph index and tensor name in the graph to the tensor index.
-  absl::flat_hash_map<int, absl::flat_hash_map<std::string, int>>
+  abslx::flat_hash_map<int, abslx::flat_hash_map<std::string, int>>
       tensor_index_map_;
 
   // Maps op name to index of the corresponding OperatorCode in opcodes_ vector.
-  absl::flat_hash_map<std::string, uint32_t> opcode_index_map_;
+  abslx::flat_hash_map<std::string, uint32_t> opcode_index_map_;
   std::vector<BufferOffset<tflite::OperatorCode>> opcodes_;
 
   // Maps function name to index of the corresponding subgraph in the FlatBuffer
   // model.
-  absl::flat_hash_map<std::string, int> subgraph_index_map_;
-  absl::flat_hash_set<OpType> enabled_op_types_;
+  abslx::flat_hash_map<std::string, int> subgraph_index_map_;
+  abslx::flat_hash_set<OpType> enabled_op_types_;
 
   // Points to TensorFlow and TFLite dialects, respectively. nullptr if the
   // dialect is not registered.
@@ -764,7 +764,7 @@ Optional<BufferOffset<tflite::Buffer>> Translator::BuildBuffer(
     return tflite::CreateBuffer(builder_, buffer_data);
   }
 
-  absl::string_view tensor_data = tensor.tensor_data();
+  abslx::string_view tensor_data = tensor.tensor_data();
   auto buffer_data = builder_.CreateVector(
       reinterpret_cast<const uint8_t*>(tensor_data.data()), tensor_data.size());
   return tflite::CreateBuffer(builder_, buffer_data);
@@ -1353,7 +1353,7 @@ void Translator::InitializeNamesFromAttribute(FuncOp fn, bool* has_input_attr) {
 bool Translator::IsStatefulOperand(mlir::Operation* op, int operand_index) {
   std::vector<int> operand_indices;
   if (!mlir::TFL::IsStatefulOp(op, &operand_indices)) return false;
-  return absl::c_find(operand_indices, operand_index) != operand_indices.end();
+  return abslx::c_find(operand_indices, operand_index) != operand_indices.end();
 }
 
 BufferOffset<tflite::QuantizationParameters>
@@ -1444,7 +1444,7 @@ Optional<BufferOffset<tflite::SubGraph>> Translator::BuildSubGraph(
     std::string tensor_name;
     if (has_input_attr)
       tensor_name = std::string(name_mapper_.GetUniqueName(arg));
-    if (tensor_name.empty()) tensor_name = absl::StrCat("arg", i);
+    if (tensor_name.empty()) tensor_name = abslx::StrCat("arg", i);
     if (!build_tensor_and_buffer(arg, index, tensor_name)) return llvm::None;
   }
 
@@ -1968,17 +1968,17 @@ Optional<std::string> Translator::TranslateInternal() {
     std::string flops_str;
     std::string mac_str;
     if (ops_count < 10000) {
-      flops_str = absl::StrFormat("%ld ", ops_count);
-      mac_str = absl::StrFormat("%ld ", ops_count / 2);
+      flops_str = abslx::StrFormat("%ld ", ops_count);
+      mac_str = abslx::StrFormat("%ld ", ops_count / 2);
     } else if (ops_count < billion) {
       flops_str =
-          absl::StrFormat("%.3f M ", static_cast<double>(ops_count) / million);
-      mac_str = absl::StrFormat("%.3f M ",
+          abslx::StrFormat("%.3f M ", static_cast<double>(ops_count) / million);
+      mac_str = abslx::StrFormat("%.3f M ",
                                 static_cast<double>(ops_count / 2) / million);
     } else {
       flops_str =
-          absl::StrFormat("%.3f G ", static_cast<double>(ops_count) / billion);
-      mac_str = absl::StrFormat("%.3f G ",
+          abslx::StrFormat("%.3f G ", static_cast<double>(ops_count) / billion);
+      mac_str = abslx::StrFormat("%.3f G ",
                                 static_cast<double>(ops_count / 2) / billion);
     }
     std::string mac_out_str;

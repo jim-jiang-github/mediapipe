@@ -27,7 +27,7 @@
 #include "absl/synchronization/barrier.h"
 #include "absl/synchronization/mutex.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 namespace {
@@ -108,4 +108,4 @@ TEST(SysinfoTest, LinuxGetTID) {
 }  // namespace
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

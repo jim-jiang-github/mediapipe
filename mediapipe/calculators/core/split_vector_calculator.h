@@ -58,7 +58,7 @@ using IsNotMovable =
 template <typename T, bool move_elements>
 class SplitVectorCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     RET_CHECK(cc->Inputs().NumEntries() == 1);
     RET_CHECK(cc->Outputs().NumEntries() != 0);
 
@@ -79,7 +79,7 @@ class SplitVectorCalculator : public CalculatorBase {
       RET_CHECK_OK(checkRangesDontOverlap(options));
     } else {
       if (cc->Outputs().NumEntries() != options.ranges_size()) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "The number of output streams should match the number of ranges "
             "specified in the CalculatorOptions.");
       }
@@ -88,13 +88,13 @@ class SplitVectorCalculator : public CalculatorBase {
       for (int i = 0; i < cc->Outputs().NumEntries(); ++i) {
         if (options.ranges(i).begin() < 0 || options.ranges(i).end() < 0 ||
             options.ranges(i).begin() >= options.ranges(i).end()) {
-          return absl::InvalidArgumentError(
+          return abslx::InvalidArgumentError(
               "Indices should be non-negative and begin index should be less "
               "than the end index.");
         }
         if (options.element_only()) {
           if (options.ranges(i).end() - options.ranges(i).begin() != 1) {
-            return absl::InvalidArgumentError(
+            return abslx::InvalidArgumentError(
                 "Since element_only is true, all ranges should be of size 1.");
           }
           cc->Outputs().Index(i).Set<T>();
@@ -104,10 +104,10 @@ class SplitVectorCalculator : public CalculatorBase {
       }
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
 
     const auto& options =
@@ -122,11 +122,11 @@ class SplitVectorCalculator : public CalculatorBase {
       total_elements_ += range.end() - range.begin();
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
-    if (cc->Inputs().Index(0).IsEmpty()) return absl::OkStatus();
+  abslx::Status Process(CalculatorContext* cc) override {
+    if (cc->Inputs().Index(0).IsEmpty()) return abslx::OkStatus();
 
     if (move_elements) {
       return ProcessMovableElements<T>(cc);
@@ -136,16 +136,16 @@ class SplitVectorCalculator : public CalculatorBase {
   }
 
   template <typename U, IsCopyable<U> = true>
-  absl::Status ProcessCopyableElements(CalculatorContext* cc) {
+  abslx::Status ProcessCopyableElements(CalculatorContext* cc) {
     // static_assert(std::is_copy_constructible<U>::value,
     //              "Cannot copy non-copyable elements");
     const auto& input = cc->Inputs().Index(0).Get<std::vector<U>>();
     RET_CHECK_GE(input.size(), max_range_end_);
     if (combine_outputs_) {
-      auto output = absl::make_unique<std::vector<U>>();
+      auto output = abslx::make_unique<std::vector<U>>();
       output->reserve(total_elements_);
       for (int i = 0; i < ranges_.size(); ++i) {
-        auto elements = absl::make_unique<std::vector<U>>(
+        auto elements = abslx::make_unique<std::vector<U>>(
             input.begin() + ranges_[i].first,
             input.begin() + ranges_[i].second);
         output->insert(output->end(), elements->begin(), elements->end());
@@ -159,7 +159,7 @@ class SplitVectorCalculator : public CalculatorBase {
         }
       } else {
         for (int i = 0; i < ranges_.size(); ++i) {
-          auto output = absl::make_unique<std::vector<T>>(
+          auto output = abslx::make_unique<std::vector<T>>(
               input.begin() + ranges_[i].first,
               input.begin() + ranges_[i].second);
           cc->Outputs().Index(i).Add(output.release(), cc->InputTimestamp());
@@ -167,17 +167,17 @@ class SplitVectorCalculator : public CalculatorBase {
       }
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   template <typename U, IsNotCopyable<U> = true>
-  absl::Status ProcessCopyableElements(CalculatorContext* cc) {
-    return absl::InternalError("Cannot copy non-copyable elements.");
+  abslx::Status ProcessCopyableElements(CalculatorContext* cc) {
+    return abslx::InternalError("Cannot copy non-copyable elements.");
   }
 
   template <typename U, IsMovable<U> = true>
-  absl::Status ProcessMovableElements(CalculatorContext* cc) {
-    absl::StatusOr<std::unique_ptr<std::vector<U>>> input_status =
+  abslx::Status ProcessMovableElements(CalculatorContext* cc) {
+    abslx::StatusOr<std::unique_ptr<std::vector<U>>> input_status =
         cc->Inputs().Index(0).Value().Consume<std::vector<U>>();
     if (!input_status.ok()) return input_status.status();
     std::unique_ptr<std::vector<U>> input_vector =
@@ -185,7 +185,7 @@ class SplitVectorCalculator : public CalculatorBase {
     RET_CHECK_GE(input_vector->size(), max_range_end_);
 
     if (combine_outputs_) {
-      auto output = absl::make_unique<std::vector<U>>();
+      auto output = abslx::make_unique<std::vector<U>>();
       output->reserve(total_elements_);
       for (int i = 0; i < ranges_.size(); ++i) {
         output->insert(
@@ -203,7 +203,7 @@ class SplitVectorCalculator : public CalculatorBase {
         }
       } else {
         for (int i = 0; i < ranges_.size(); ++i) {
-          auto output = absl::make_unique<std::vector<T>>();
+          auto output = abslx::make_unique<std::vector<T>>();
           output->insert(
               output->end(),
               std::make_move_iterator(input_vector->begin() + ranges_[i].first),
@@ -214,16 +214,16 @@ class SplitVectorCalculator : public CalculatorBase {
       }
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   template <typename U, IsNotMovable<U> = true>
-  absl::Status ProcessMovableElements(CalculatorContext* cc) {
-    return absl::InternalError("Cannot move non-movable elements.");
+  abslx::Status ProcessMovableElements(CalculatorContext* cc) {
+    return abslx::InternalError("Cannot move non-movable elements.");
   }
 
  private:
-  static absl::Status checkRangesDontOverlap(
+  static abslx::Status checkRangesDontOverlap(
       const ::mediapipe::SplitVectorCalculatorOptions& options) {
     for (int i = 0; i < options.ranges_size() - 1; ++i) {
       for (int j = i + 1; j < options.ranges_size(); ++j) {
@@ -233,13 +233,13 @@ class SplitVectorCalculator : public CalculatorBase {
              range_0.begin() < range_1.end()) ||
             (range_1.begin() >= range_0.begin() &&
              range_1.begin() < range_0.end())) {
-          return absl::InvalidArgumentError(
+          return abslx::InvalidArgumentError(
               "Ranges must be non-overlapping when using combine_outputs "
               "option.");
         }
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   std::vector<std::pair<int32, int32>> ranges_;

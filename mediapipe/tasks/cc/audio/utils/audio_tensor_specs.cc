@@ -37,7 +37,7 @@ namespace tasks {
 namespace audio {
 namespace {
 
-using ::absl::StatusCode;
+using ::abslx::StatusCode;
 using ::mediapipe::tasks::metadata::ModelMetadataExtractor;
 using ::tflite::AudioProperties;
 using ::tflite::ContentProperties;
@@ -46,12 +46,12 @@ using ::tflite::EnumNameContentProperties;
 using ::tflite::TensorMetadata;
 using ::tflite::TensorType;
 
-::absl::StatusOr<const AudioProperties*> GetAudioPropertiesIfAny(
+::abslx::StatusOr<const AudioProperties*> GetAudioPropertiesIfAny(
     const TensorMetadata& tensor_metadata) {
   if (tensor_metadata.content() == nullptr ||
       tensor_metadata.content()->content_properties() == nullptr) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInternal,
+        abslx::StatusCode::kInternal,
         "Missing audio metadata in the model metadata.",
         MediaPipeTasksStatus::kMetadataNotFoundError);
   }
@@ -61,7 +61,7 @@ using ::tflite::TensorType;
   if (type != ContentProperties_AudioProperties) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        absl::StrCat(
+        abslx::StrCat(
             "Expected AudioProperties for tensor ",
             tensor_metadata.name() ? tensor_metadata.name()->str() : "#0",
             ", got ", EnumNameContentProperties(type), "."),
@@ -73,7 +73,7 @@ using ::tflite::TensorType;
 
 }  // namespace
 
-absl::StatusOr<const TensorMetadata*> GetAudioTensorMetadataIfAny(
+abslx::StatusOr<const TensorMetadata*> GetAudioTensorMetadataIfAny(
     const ModelMetadataExtractor& metadata_extractor, int tensor_index) {
   if (metadata_extractor.GetModelMetadata() == nullptr ||
       metadata_extractor.GetModelMetadata()->subgraph_metadata() == nullptr) {
@@ -97,12 +97,12 @@ absl::StatusOr<const TensorMetadata*> GetAudioTensorMetadataIfAny(
   return metadata;
 }
 
-absl::StatusOr<AudioTensorSpecs> BuildInputAudioTensorSpecs(
+abslx::StatusOr<AudioTensorSpecs> BuildInputAudioTensorSpecs(
     const tflite::Tensor& audio_tensor,
     const tflite::TensorMetadata* audio_tensor_metadata) {
   if (audio_tensor_metadata == nullptr) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInternal,
+        abslx::StatusCode::kInternal,
         "Missing audio metadata in the model metadata.",
         MediaPipeTasksStatus::kMetadataNotFoundError);
   }
@@ -119,10 +119,10 @@ absl::StatusOr<AudioTensorSpecs> BuildInputAudioTensorSpecs(
   static constexpr TensorType valid_types[] = {tflite::TensorType_FLOAT16,
                                                tflite::TensorType_FLOAT32};
   TensorType tensor_type = audio_tensor.type();
-  if (!absl::c_linear_search(valid_types, tensor_type)) {
+  if (!abslx::c_linear_search(valid_types, tensor_type)) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        absl::StrCat("Type mismatch for input tensor ",
+        abslx::StrCat("Type mismatch for input tensor ",
                      audio_tensor.name()->str(),
                      ". Requested one of these types: float16/float32, got ",
                      tflite::EnumNameTensorType(tensor_type), "."),
@@ -134,8 +134,8 @@ absl::StatusOr<AudioTensorSpecs> BuildInputAudioTensorSpecs(
   for (int i = 0; i < tensor_shape_size; i++) {
     if (tensor_dims[i] < 1) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
-          absl::StrFormat("Invalid size: %d for input tensor dimension: %d.",
+          abslx::StatusCode::kInvalidArgument,
+          abslx::StrFormat("Invalid size: %d for input tensor dimension: %d.",
                           tensor_dims[i], i),
           MediaPipeTasksStatus::kInvalidInputTensorDimensionsError);
     }
@@ -144,8 +144,8 @@ absl::StatusOr<AudioTensorSpecs> BuildInputAudioTensorSpecs(
 
   if (input_buffer_size % props->channels() != 0) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInternal,
-        absl::StrFormat("Model input tensor size (%d) should be a "
+        abslx::StatusCode::kInternal,
+        abslx::StrFormat("Model input tensor size (%d) should be a "
                         "multiplier of the number of channels (%d).",
                         input_buffer_size, props->channels()),
         MediaPipeTasksStatus::kMetadataInconsistencyError);

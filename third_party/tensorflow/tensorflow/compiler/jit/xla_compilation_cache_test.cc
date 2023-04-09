@@ -98,7 +98,7 @@ void BM_BuildSignature(::testing::benchmark::State& state) {
   NameAttrList fn;
   fn.set_name("afunction");
   for (int i = 0; i < n_args; i++) {
-    (*fn.mutable_attr())[absl::StrCat("T", i)].set_type(DT_FLOAT);
+    (*fn.mutable_attr())[abslx::StrCat("T", i)].set_type(DT_FLOAT);
   }
   std::vector<XlaCompiler::Argument> args(n_args);
   for (int i = 0; i < n_args; i++) {

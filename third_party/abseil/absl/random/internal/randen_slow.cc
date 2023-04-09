@@ -304,7 +304,7 @@ AesRound(const Vector128& state, const Vector128& round_key) {
   return result;
 }
 
-using ::absl::random_internal::RandenTraits;
+using ::abslx::random_internal::RandenTraits;
 
 // Randen operates on 128-bit vectors.
 struct alignas(16) u64x2 {
@@ -407,7 +407,7 @@ inline ABSL_RANDOM_INTERNAL_ATTRIBUTE_ALWAYS_INLINE void Permute(
 
 }  // namespace
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -454,4 +454,4 @@ void RandenSlow::Generate(const void* keys_void, void* state_void) {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

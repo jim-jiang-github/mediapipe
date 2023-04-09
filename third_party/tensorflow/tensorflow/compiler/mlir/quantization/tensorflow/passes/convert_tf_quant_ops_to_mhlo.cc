@@ -127,7 +127,7 @@ struct ReplaceConstDotHybridPattern : public RewritePattern {
         this_op.rhs().getType().cast<TensorType>(), rhs_elem_ty);
 
     llvm::StringRef mangled_tensor = tensor_proto_attr.getValue();
-    absl::string_view tensor_view(mangled_tensor.data(), mangled_tensor.size());
+    abslx::string_view tensor_view(mangled_tensor.data(), mangled_tensor.size());
     tensorflow::TensorProto tensor_proto;
     tensorflow::Status status =
         tfg::mangling_util::DemangleTensor(tensor_view, &tensor_proto);

@@ -110,7 +110,7 @@ StatusOr<StreamPool::Ptr> Backend::BorrowStream(int device_ordinal) {
 }
 
 StatusOr<StreamPool::Ptr> Backend::BorrowStream(se::StreamExecutor* executor) {
-  absl::MutexLock l(&mu_);
+  abslx::MutexLock l(&mu_);
   if (!stream_pools_.contains(executor)) {
     stream_pools_.emplace(executor, std::make_unique<StreamPool>());
   }
@@ -118,7 +118,7 @@ StatusOr<StreamPool::Ptr> Backend::BorrowStream(se::StreamExecutor* executor) {
 }
 
 Backend::Backend(se::Platform* platform, Compiler* compiler,
-                 absl::Span<se::StreamExecutor* const> stream_executors,
+                 abslx::Span<se::StreamExecutor* const> stream_executors,
                  TransferManager* transfer_manager,
                  ComputationPlacer* computation_placer,
                  int intra_op_parallelism_threads)

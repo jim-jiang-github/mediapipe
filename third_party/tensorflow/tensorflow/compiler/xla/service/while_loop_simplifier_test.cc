@@ -37,7 +37,7 @@ namespace op = xla::testing::opcode_matchers;
 // Returns the first kWhile instruction within m's entry computation.
 HloInstruction* FindFirstWhile(HloModule* m) {
   const auto& instrs = m->entry_computation()->instructions();
-  return *absl::c_find_if(instrs, [](const HloInstruction* instr) {
+  return *abslx::c_find_if(instrs, [](const HloInstruction* instr) {
     return instr->opcode() == HloOpcode::kWhile;
   });
 }
@@ -83,8 +83,8 @@ WhileLoopSimplifierTest::MakeModuleWithSimpleLoop(int num_iters) {
   }
   )";
 
-  std::string hlo_string = absl::StrReplaceAll(
-      hlo_string_template, {{"{{LOOP_BOUND}}", absl::StrCat(42 + num_iters)}});
+  std::string hlo_string = abslx::StrReplaceAll(
+      hlo_string_template, {{"{{LOOP_BOUND}}", abslx::StrCat(42 + num_iters)}});
   return ParseAndReturnVerifiedModule(hlo_string).ValueOrDie();
 }
 
@@ -121,8 +121,8 @@ WhileLoopSimplifierTest::MakeModuleWithSimpleLoopTupleElementLoopBound(
   }
   )";
 
-  std::string hlo_string = absl::StrReplaceAll(
-      hlo_string_template, {{"{{LOOP_BOUND}}", absl::StrCat(42 + num_iters)}});
+  std::string hlo_string = abslx::StrReplaceAll(
+      hlo_string_template, {{"{{LOOP_BOUND}}", abslx::StrCat(42 + num_iters)}});
   return ParseAndReturnVerifiedModule(hlo_string).ValueOrDie();
 }
 
@@ -459,7 +459,7 @@ TEST_F(WhileLoopSimplifierTest, RemoveUnusedLoopOperands) {
   // while instruction.
   const auto& instrs = m->entry_computation()->instructions();
   HloInstruction* new_while_op =
-      *absl::c_find_if(instrs, [&](const HloInstruction* instr) {
+      *abslx::c_find_if(instrs, [&](const HloInstruction* instr) {
         return (instr->opcode() == HloOpcode::kWhile &&
                 instr->name() != "while");
       });
@@ -514,7 +514,7 @@ TEST_F(WhileLoopSimplifierTest,
   // while instruction.
   const auto& instrs = m->entry_computation()->instructions();
   HloInstruction* new_while_op =
-      *absl::c_find_if(instrs, [&](const HloInstruction* instr) {
+      *abslx::c_find_if(instrs, [&](const HloInstruction* instr) {
         return (instr->opcode() == HloOpcode::kWhile &&
                 instr->name() != "while");
       });
@@ -787,7 +787,7 @@ const char* const kSimpleMergeInductionVariablesModule = R"(
   })";
 
 TEST_F(WhileLoopSimplifierTest, MergeInductionVariables_Simple) {
-  std::string hlo_string = absl::StrReplaceAll(
+  std::string hlo_string = abslx::StrReplaceAll(
       kSimpleMergeInductionVariablesModule, {{"TYPE", "s32"}});
 
   auto m = ParseAndReturnVerifiedModule(hlo_string).ValueOrDie();
@@ -825,7 +825,7 @@ TEST_F(WhileLoopSimplifierTest, MergeInductionVariables_Simple) {
 // We shouldn't merge S16 induction variables; we can't create constants of this
 // type because S16 literals are not implemented.
 TEST_F(WhileLoopSimplifierTest, MergeInductionVariables_SkipS16) {
-  std::string hlo_string = absl::StrReplaceAll(
+  std::string hlo_string = abslx::StrReplaceAll(
       kSimpleMergeInductionVariablesModule, {{"TYPE", "s16"}});
   EXPECT_FALSE(
       WhileLoopSimplifier()

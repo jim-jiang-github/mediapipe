@@ -45,7 +45,7 @@ using mediapipe::LogicCalculatorOptions;
 // }
 class LogicCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     for (int k = 0; k < cc->Inputs().NumEntries(""); ++k) {
       cc->Inputs().Index(k).Set<bool>();
     }
@@ -58,13 +58,13 @@ class LogicCalculator : public CalculatorBase {
                  1);
     RET_CHECK_EQ(cc->Outputs().NumEntries(""), 1);
     cc->Outputs().Index(0).Set<bool>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     options_ = cc->Options<LogicCalculatorOptions>();
     cc->SetOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   bool LogicalOp(bool b1, bool b2) {
@@ -79,7 +79,7 @@ class LogicCalculator : public CalculatorBase {
     return false;
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     bool result = options_.op() == LogicCalculatorOptions::AND ? true : false;
     for (int k = 0; k < options_.input_value_size(); ++k) {
       result = LogicalOp(result, options_.input_value(k));
@@ -94,7 +94,7 @@ class LogicCalculator : public CalculatorBase {
       result = !result;
     }
     cc->Outputs().Index(0).Add(new bool(result), cc->InputTimestamp());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

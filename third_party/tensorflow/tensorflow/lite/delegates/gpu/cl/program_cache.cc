@@ -76,7 +76,7 @@ ProgramCache& ProgramCache::operator=(ProgramCache&& program_cache) {
   return *this;
 }
 
-absl::Status ProgramCache::GetOrCreateCLKernel(
+abslx::Status ProgramCache::GetOrCreateCLKernel(
     const std::string& code, const std::string& function_name,
     const std::vector<CompilerOptions>& compiler_options,
     const CLContext& context, const CLDevice& device, CLKernel* result,
@@ -96,10 +96,10 @@ absl::Status ProgramCache::GetOrCreateCLKernel(
   RETURN_IF_ERROR(CreateCLProgram(code, options, context, device, &program));
   RETURN_IF_ERROR(result->CreateFromProgram(program, function_name));
   programs_.insert(std::make_pair(std::move(desc), std::move(program)));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ProgramCache::GetOrCreateCLKernel(const std::string& code,
+abslx::Status ProgramCache::GetOrCreateCLKernel(const std::string& code,
                                                const std::string& function_name,
                                                const CLContext& context,
                                                const CLDevice& device,
@@ -109,21 +109,21 @@ absl::Status ProgramCache::GetOrCreateCLKernel(const std::string& code,
                              kernel_fingerprint);
 }
 
-absl::Status ProgramCache::GetKernel(uint64_t fingerprint,
+abslx::Status ProgramCache::GetKernel(uint64_t fingerprint,
                                      const std::string& function_name,
                                      CLKernel* result) const {
   ProgramDescriptor desc(fingerprint);
   auto it = programs_.find(desc);
   if (it == programs_.end()) {
-    return absl::NotFoundError("No program with this fingerprint.");
+    return abslx::NotFoundError("No program with this fingerprint.");
   }
   return result->CreateFromProgram(it->second, function_name);
 }
 
-absl::Status ProgramCache::AddProgramBinary(const CLContext& context,
+abslx::Status ProgramCache::AddProgramBinary(const CLContext& context,
                                             const CLDevice& device,
                                             uint64_t fingerprint,
-                                            absl::Span<const uint8_t> binary) {
+                                            abslx::Span<const uint8_t> binary) {
   ProgramDescriptor desc(fingerprint);
   auto it = programs_.find(desc);
   if (it == programs_.end()) {
@@ -132,26 +132,26 @@ absl::Status ProgramCache::AddProgramBinary(const CLContext& context,
         CreateCLProgramFromBinary(context, device, binary, &program));
     programs_.insert(std::make_pair(std::move(desc), std::move(program)));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ProgramCache::GetProgramBinary(
+abslx::Status ProgramCache::GetProgramBinary(
     uint64_t fingerprint, std::vector<uint8_t>* program_binary) const {
   ProgramDescriptor desc(fingerprint);
   auto it = programs_.find(desc);
   if (it == programs_.end()) {
-    return absl::NotFoundError("No program with this fingerprint.");
+    return abslx::NotFoundError("No program with this fingerprint.");
   }
   return it->second.GetBinary(program_binary);
 }
 
-absl::Status ProgramCache::AddSerializedCache(
+abslx::Status ProgramCache::AddSerializedCache(
     const CLContext& context, const CLDevice& device,
-    absl::Span<const uint8_t> serialized_cache) {
+    abslx::Span<const uint8_t> serialized_cache) {
   flatbuffers::Verifier verifier(serialized_cache.data(),
                                  serialized_cache.size());
   if (!data::VerifyCompiledCacheBuffer(verifier)) {
-    return absl::InvalidArgumentError("Serialized model is corrupted.");
+    return abslx::InvalidArgumentError("Serialized model is corrupted.");
   }
 
   auto model = data::GetCompiledCache(serialized_cache.data());
@@ -159,20 +159,20 @@ absl::Status ProgramCache::AddSerializedCache(
                                model->driver_version()->size());
 
   if (GetDriverVersion(device) != platform_version) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "OpenCL driver changed, cache invalid, should be regenerated");
   }
 
   for (auto serialized_program : *model->programs()) {
-    auto binary_span = absl::MakeSpan(serialized_program->binary()->data(),
+    auto binary_span = abslx::MakeSpan(serialized_program->binary()->data(),
                                       serialized_program->binary()->size());
     RETURN_IF_ERROR(AddProgramBinary(
         context, device, serialized_program->fingerprint(), binary_span));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ProgramCache::GetSerializedCache(
+abslx::Status ProgramCache::GetSerializedCache(
     const CLDevice& device, std::vector<uint8_t>* serialized_cache) const {
   ::flatbuffers::FlatBufferBuilder builder;
   std::vector<flatbuffers::Offset<data::Program>> serialized_programs;
@@ -195,7 +195,7 @@ absl::Status ProgramCache::GetSerializedCache(
   serialized_cache->resize(serialized_cache->size() + builder.GetSize());
   std::memcpy(&(*serialized_cache)[next_element], builder.GetBufferPointer(),
               builder.GetSize());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace cl

@@ -32,11 +32,11 @@ namespace {
 using tensorflow::TF_StatusPtr;
 
 Status IdentityNModel(AbstractContext* ctx,
-                      absl::Span<AbstractTensorHandle* const> inputs,
-                      absl::Span<AbstractTensorHandle*> outputs) {
+                      abslx::Span<AbstractTensorHandle* const> inputs,
+                      abslx::Span<AbstractTensorHandle*> outputs) {
   std::vector<AbstractTensorHandle*> temp_outputs(2);
   TF_RETURN_IF_ERROR(
-      ops::IdentityN(ctx, inputs, absl::MakeSpan(temp_outputs), "IdentityN"));
+      ops::IdentityN(ctx, inputs, abslx::MakeSpan(temp_outputs), "IdentityN"));
   // Although, `ops::IdentityN` returns 2 tensors, the first tensor isn't needed
   // for computing gradient so we could safely drop it.
   outputs[0] = temp_outputs[1];
@@ -106,7 +106,7 @@ TEST_P(CppGradients, TestIdentityNGrad) {
   std::vector<AbstractTensorHandle*> outputs(2);
   status_ =
       RunModel(IdentityNGradModel, immediate_execution_ctx_.get(),
-               {x1.get(), x2.get()}, absl::MakeSpan(outputs), UseFunction());
+               {x1.get(), x2.get()}, abslx::MakeSpan(outputs), UseFunction());
   ASSERT_EQ(errors::OK, status_.code()) << status_.error_message();
   EXPECT_EQ(outputs[0], nullptr);
   ASSERT_NO_FATAL_FAILURE(CheckTensorValue(outputs[1], {1.0f}, /*dims*/ {},

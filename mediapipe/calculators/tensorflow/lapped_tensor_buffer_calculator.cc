@@ -84,18 +84,18 @@ namespace tf = tensorflow;
 
 class LappedTensorBufferCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
   // Adds a batch dimension to the input tensor if specified in the
   // calculator options.
-  absl::Status AddBatchDimension(tf::Tensor* input_tensor);
+  abslx::Status AddBatchDimension(tf::Tensor* input_tensor);
   // Sends the current buffer downstream.
-  absl::Status ProcessBuffer(CalculatorContext* cc);
+  abslx::Status ProcessBuffer(CalculatorContext* cc);
 
   int steps_until_output_;
   int buffer_size_;
@@ -110,7 +110,7 @@ class LappedTensorBufferCalculator : public CalculatorBase {
 
 REGISTER_CALCULATOR(LappedTensorBufferCalculator);
 
-absl::Status LappedTensorBufferCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status LappedTensorBufferCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK_EQ(cc->Inputs().NumEntries(), 1)
       << "Only one input stream is supported.";
   cc->Inputs().Index(0).Set<tf::Tensor>(
@@ -140,10 +140,10 @@ absl::Status LappedTensorBufferCalculator::GetContract(CalculatorContract* cc) {
   if (cc->Outputs().NumEntries() > 1) {
     cc->Outputs().Index(1).Set<std::vector<Timestamp>>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LappedTensorBufferCalculator::Open(CalculatorContext* cc) {
+abslx::Status LappedTensorBufferCalculator::Open(CalculatorContext* cc) {
   options_ = cc->Options<LappedTensorBufferCalculatorOptions>();
   if (cc->InputSidePackets().HasTag(kCalculatorOptions)) {
     options_ = cc->InputSidePackets()
@@ -171,14 +171,14 @@ absl::Status LappedTensorBufferCalculator::Open(CalculatorContext* cc) {
   RET_CHECK_LT(options_.padding(), buffer_size_)
       << "padding option must be smaller than buffer size.";
   timestamp_buffer_ =
-      absl::make_unique<CircularBuffer<Timestamp>>(buffer_size_);
-  buffer_ = absl::make_unique<CircularBuffer<tf::Tensor>>(buffer_size_);
+      abslx::make_unique<CircularBuffer<Timestamp>>(buffer_size_);
+  buffer_ = abslx::make_unique<CircularBuffer<tf::Tensor>>(buffer_size_);
   steps_until_output_ = buffer_size_ - options_.padding();
   initialized_ = false;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LappedTensorBufferCalculator::Process(CalculatorContext* cc) {
+abslx::Status LappedTensorBufferCalculator::Process(CalculatorContext* cc) {
   // These are cheap, shallow copies.
   tensorflow::Tensor input_tensor(
       cc->Inputs().Index(0).Get<tensorflow::Tensor>());
@@ -200,12 +200,12 @@ absl::Status LappedTensorBufferCalculator::Process(CalculatorContext* cc) {
     MP_RETURN_IF_ERROR(ProcessBuffer(cc));
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LappedTensorBufferCalculator::Close(CalculatorContext* cc) {
+abslx::Status LappedTensorBufferCalculator::Close(CalculatorContext* cc) {
   if (!initialized_ || options_.padding() == 0) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   int last_frame = buffer_size_ - steps_until_output_ - 1;
   const auto& pad_frame = buffer_->Get(last_frame);
@@ -215,12 +215,12 @@ absl::Status LappedTensorBufferCalculator::Close(CalculatorContext* cc) {
   }
   MP_RETURN_IF_ERROR(ProcessBuffer(cc));
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Adds a batch dimension to the input tensor if specified in the calculator
 // options.
-absl::Status LappedTensorBufferCalculator::AddBatchDimension(
+abslx::Status LappedTensorBufferCalculator::AddBatchDimension(
     tf::Tensor* input_tensor) {
   if (options_.add_batch_dim_to_tensors()) {
     tf::TensorShape new_shape(input_tensor->shape());
@@ -229,13 +229,13 @@ absl::Status LappedTensorBufferCalculator::AddBatchDimension(
         << "Could not add 0th dimension to tensor without changing its shape."
         << " Current shape: " << input_tensor->shape().DebugString();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Process buffer
-absl::Status LappedTensorBufferCalculator::ProcessBuffer(
+abslx::Status LappedTensorBufferCalculator::ProcessBuffer(
     CalculatorContext* cc) {
-  auto concatenated = ::absl::make_unique<tf::Tensor>();
+  auto concatenated = ::abslx::make_unique<tf::Tensor>();
   const tf::Status concat_status = tf::tensor::Concat(
       std::vector<tf::Tensor>(buffer_->begin(), buffer_->end()),
       concatenated.get());
@@ -244,7 +244,7 @@ absl::Status LappedTensorBufferCalculator::ProcessBuffer(
   cc->Outputs().Index(0).Add(concatenated.release(),
                              timestamp_buffer_->Get(timestamp_offset_));
   if (cc->Outputs().NumEntries() > 1) {
-    auto output_timestamp = ::absl::make_unique<std::vector<Timestamp>>();
+    auto output_timestamp = ::abslx::make_unique<std::vector<Timestamp>>();
     // Output timestamp vector.
     *output_timestamp = std::vector<Timestamp>(timestamp_buffer_->begin(),
                                                timestamp_buffer_->end());
@@ -254,7 +254,7 @@ absl::Status LappedTensorBufferCalculator::ProcessBuffer(
                                timestamp_buffer_->Get(timestamp_offset_));
   }
   steps_until_output_ = buffer_size_ - overlap_;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

@@ -86,7 +86,7 @@ struct DeviceOptions {
     if (flags_ & kScheduleBlockingSync) {
       flags_on.push_back("kScheduleBlockingSync");
     }
-    return flags_on.empty() ? "none" : absl::StrJoin(flags_on, "|");
+    return flags_on.empty() ? "none" : abslx::StrJoin(flags_on, "|");
   }
 
   // Platform-specific device options. Expressed as key-value pairs to avoid

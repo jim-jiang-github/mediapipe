@@ -66,7 +66,7 @@ struct ConcatGroup {
         concat_dim(concat_dim),
         inserted_concat_dim(inserted_concat_dim) {
     if (inserted_concat_dim) {
-      absl::c_iota(element_offsets, 0);
+      abslx::c_iota(element_offsets, 0);
     } else {
       for (int64_t i = 0; i < element_sizes.size(); ++i) {
         element_sizes[i] = this->elements[i]->shape().dimensions(concat_dim);
@@ -187,7 +187,7 @@ class ConcatGroups {
   // pair of {whether created, group index}.
   std::pair<bool, int64_t> MaybeCreateNewGroup(ConcatGroup group) {
     int64_t group_id = -1;
-    absl::flat_hash_set<HloInstruction*> elements_dedup;
+    abslx::flat_hash_set<HloInstruction*> elements_dedup;
     for (int64_t i = 0; i < group.elements.size(); ++i) {
       if (!elements_dedup.insert(group.elements[i]).second) {
         VLOG(2) << "Duplicates in group. Element: "
@@ -265,10 +265,10 @@ class ConcatGroups {
 
  private:
   // element -> {group index in groups_, element index in group}.
-  absl::flat_hash_map<const HloInstruction*, std::pair<int64_t, int64_t>>
+  abslx::flat_hash_map<const HloInstruction*, std::pair<int64_t, int64_t>>
       element_to_group_;
   std::vector<ConcatGroup> groups_;
-  absl::flat_hash_set<const HloInstruction*> concat_disallowed_;
+  abslx::flat_hash_set<const HloInstruction*> concat_disallowed_;
 };
 
 // Infers an operand's concat dim and whether it's an inserted dim. For example,
@@ -430,13 +430,13 @@ void ModifyHloPropertiesForConcatShape(const ConcatGroup& group,
 // Main method to assign groups to HLOs, based on a concat.
 bool GroupHlosForConcat(
     HloComputation* body, HloInstruction* concat,
-    absl::flat_hash_map<const HloInstruction*, int64_t> topological_order,
+    abslx::flat_hash_map<const HloInstruction*, int64_t> topological_order,
     ConcatGroups* groups) {
   const int64_t group_size = concat->operand_count();
-  absl::flat_hash_set<int64_t> used_groups;
+  abslx::flat_hash_set<int64_t> used_groups;
   auto root_tuple = body->root_instruction();
   CHECK_EQ(root_tuple->opcode(), HloOpcode::kTuple);
-  absl::flat_hash_map<HloInstruction*, int64_t> root_tuple_element_use_count;
+  abslx::flat_hash_map<HloInstruction*, int64_t> root_tuple_element_use_count;
   for (auto operand : root_tuple->operands()) {
     root_tuple_element_use_count.emplace(operand, 0).first->second++;
   }
@@ -488,7 +488,7 @@ bool GroupHlosForConcat(
     const auto& hlos = group.elements;
     VLOG(2) << "GroupHlosForConcat dequeued " << hlos[0]->ToString();
     bool group_is_param_gtes = false;
-    if (absl::c_all_of(hlos, [&](const HloInstruction* element) {
+    if (abslx::c_all_of(hlos, [&](const HloInstruction* element) {
           return element == hlos[0];
         })) {
       // Shared operand.
@@ -501,7 +501,7 @@ bool GroupHlosForConcat(
       groups->DisallowGroupingOn(hlos[0]);
       continue;
     }
-    if (absl::c_all_of(hlos, [&](const HloInstruction* element) {
+    if (abslx::c_all_of(hlos, [&](const HloInstruction* element) {
           return element->opcode() == HloOpcode::kGetTupleElement &&
                  element->operand(0) == body->parameter_instruction(0);
         })) {
@@ -519,7 +519,7 @@ bool GroupHlosForConcat(
         return fail_and_cleanup();
       }
       // Check if these elements can be concatenated.
-      if (absl::c_any_of(hlos, [&](const HloInstruction* element) {
+      if (abslx::c_any_of(hlos, [&](const HloInstruction* element) {
             auto eq_operand = [](const HloInstruction* a,
                                  const HloInstruction* b) {
               return ShapeUtil::Compatible(a->shape(), b->shape());
@@ -644,7 +644,7 @@ std::vector<bool> TupleElementsUsedInCond(HloInstruction* loop) {
   std::vector<bool> result(loop->shape().tuple_shapes_size(), false);
   for (auto user : loop->while_condition()->parameter_instruction(0)->users()) {
     if (user->opcode() != HloOpcode::kGetTupleElement) {
-      absl::c_fill(result, true);
+      abslx::c_fill(result, true);
       return result;
     }
     result[user->tuple_index()] = true;
@@ -655,7 +655,7 @@ std::vector<bool> TupleElementsUsedInCond(HloInstruction* loop) {
 // Adds copies to returned values to keep RewriteLoopWithConcatGroups simple:
 // the copies do not have other users and only appear once in the root tuple.
 Status AddCopiesToRoot(HloComputation* body,
-                       absl::Span<HloInstruction* const> param_gtes,
+                       abslx::Span<HloInstruction* const> param_gtes,
                        ConcatGroups* groups) {
   auto root = body->root_instruction();
   CHECK_EQ(root->opcode(), HloOpcode::kTuple);
@@ -706,7 +706,7 @@ Status RemoveCopiesFromRoot(HloComputation* body) {
 }
 
 Status RewriteLoopWithConcatGroups(HloInstruction* loop,
-                                   absl::Span<HloInstruction* const> param_gtes,
+                                   abslx::Span<HloInstruction* const> param_gtes,
                                    ConcatGroups& groups) {
   VLOG(1) << "RewriteLoopWithConcatGroups with " << groups.Groups().size()
           << " groups.";
@@ -714,7 +714,7 @@ Status RewriteLoopWithConcatGroups(HloInstruction* loop,
   // shape, and leave the other elements unchagned. Non-grouped users will be
   // have slices of the expanded first element as the new input. Later
   // simplification and DCE passes can remove the other elements.
-  absl::flat_hash_set<int64_t> processed_groups;
+  abslx::flat_hash_set<int64_t> processed_groups;
   auto body = loop->while_body();
   auto param = body->parameter_instruction(0);
   auto cond_param = loop->while_condition()->parameter_instruction(0);
@@ -788,7 +788,7 @@ Status RewriteLoopWithConcatGroups(HloInstruction* loop,
 
   // Now rewrite the loop body.
   std::vector<HloInstruction*> slices_to_remove;
-  absl::flat_hash_set<HloInstruction*> new_reshapes;
+  abslx::flat_hash_set<HloInstruction*> new_reshapes;
   for (auto hlo : body->MakeInstructionPostOrder()) {
     const auto& group_and_index = groups.GetGroupIndex(hlo);
     if (!group_and_index.has_value() || group_and_index->second != 0) {
@@ -863,7 +863,7 @@ Status RewriteLoopWithConcatGroups(HloInstruction* loop,
         }
         // This is a shared operand, we need to broadcast it.
         CHECK(
-            absl::c_all_of(group.elements, [&](const HloInstruction* element) {
+            abslx::c_all_of(group.elements, [&](const HloInstruction* element) {
               return element->operand(i) == hlo->operand(i);
             }));
         VLOG(2) << "Broadcasting shared operand "
@@ -975,7 +975,7 @@ StatusOr<bool> RunOnLoop(HloInstruction* loop,
   }
   std::vector<HloInstruction*> concats;
   auto body_instructions = body->MakeInstructionPostOrder();
-  absl::flat_hash_map<const HloInstruction*, int64_t> topological_order;
+  abslx::flat_hash_map<const HloInstruction*, int64_t> topological_order;
   for (int64_t i = 0; i < body_instructions.size(); ++i) {
     auto hlo = body_instructions[i];
     topological_order[hlo] = i;
@@ -1023,7 +1023,7 @@ StatusOr<bool> RunOnLoop(HloInstruction* loop,
 
 StatusOr<bool> WhileLoopConcatCodeMotion::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   for (HloComputation* comp :
        module->MakeComputationPostOrder(execution_threads)) {

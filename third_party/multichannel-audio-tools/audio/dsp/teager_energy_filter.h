@@ -117,7 +117,7 @@ class TeagerEnergyFilter {
   }
 
   // Process a block of samples in a streaming manner.
-  void ProcessBlock(absl::Span<const float> input,
+  void ProcessBlock(abslx::Span<const float> input,
                     std::vector<float>* output) {
     DCHECK(output != nullptr);
     output->resize(input.size());

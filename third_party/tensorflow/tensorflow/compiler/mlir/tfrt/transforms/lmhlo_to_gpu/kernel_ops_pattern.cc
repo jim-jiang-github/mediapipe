@@ -209,7 +209,7 @@ static llvm::Expected<std::vector<xla::BufferAllocation>> GetAllocations(
 static llvm::Expected<
     std::tuple<std::unique_ptr<ThunkSequence>, std::vector<ConstantInfo>>>
 Emit(mlir::func::FuncOp func_op,
-     absl::Span<const xla::BufferAllocation> allocations,
+     abslx::Span<const xla::BufferAllocation> allocations,
      const stream_executor::CudaComputeCapability& cuda_compute_capability,
      const stream_executor::RocmComputeCapability& rocm_compute_capability,
      const xla::HloModuleConfig& hlo_module_config, llvm::Module* llvm_module) {

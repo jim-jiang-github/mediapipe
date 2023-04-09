@@ -115,7 +115,7 @@ TEST(FrameAnnotationTrackerTest, TestConsolidation) {
   *timed_box_proto = ShiftBox(timed_box_proto_list.box(0), -0.01f, -0.01f);
   timed_box_proto->set_id(2);
   timed_box_proto->set_time_msec(150);
-  absl::flat_hash_set<int> cancel_object_ids;
+  abslx::flat_hash_set<int> cancel_object_ids;
   FrameAnnotation tracked_detection =
       frame_annotation_tracker.ConsolidateTrackingResult(timed_box_proto_list,
                                                          &cancel_object_ids);

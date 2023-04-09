@@ -65,7 +65,7 @@ void HloModuleMetadata::set_prepartitioning_metadata(
 
   // Because HloPassMetadata represents the completion of a pass, metadata for
   // all currently running passes need to be moved over to the new module.
-  absl::flat_hash_set<HloPassMetadata*> running_passes(
+  abslx::flat_hash_set<HloPassMetadata*> running_passes(
       prepartitioning_metadata.running_passes_.begin(),
       prepartitioning_metadata.running_passes_.end());
   for (const HloPassMetadata& pass_metadata :

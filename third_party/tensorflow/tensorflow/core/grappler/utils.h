@@ -47,9 +47,9 @@ namespace grappler {
 // NodeName(input_name) is equal to node_name. Returns -1 for control inputs.
 // Returns -2 if input_name is empty or NodeName(input_name) is not equal to
 // node_name.
-inline int NodePositionIfSameNode(absl::string_view input_name,
-                                  absl::string_view node_name) {
-  bool is_control = absl::StartsWith(input_name, "^");
+inline int NodePositionIfSameNode(abslx::string_view input_name,
+                                  abslx::string_view node_name) {
+  bool is_control = abslx::StartsWith(input_name, "^");
   if (is_control) input_name.remove_prefix(1);
   if (input_name.empty() || node_name.empty() ||
       input_name.size() < node_name.size()) {
@@ -62,9 +62,9 @@ inline int NodePositionIfSameNode(absl::string_view input_name,
 }
 
 // Returns the node name and position in a single call.
-inline StringPiece ParseNodeNameAsStringPiece(absl::string_view name,
+inline StringPiece ParseNodeNameAsStringPiece(abslx::string_view name,
                                               int* position) {
-  const bool is_control = absl::StartsWith(name, "^");
+  const bool is_control = abslx::StartsWith(name, "^");
   TensorId id = ParseTensorName(name);
   if (position) {
     *position = is_control ? -1 : id.second;
@@ -130,7 +130,7 @@ class NodeMapInternal {
 
   // Get unordered list of fanouts from node. Notice, that the order is
   // non-deterministic.
-  const absl::flat_hash_set<NodeDefT*>& GetOutputs(
+  const abslx::flat_hash_set<NodeDefT*>& GetOutputs(
       const string& node_name) const {
     auto it = outputs_.find(node_name);
     if (it == outputs_.end()) {
@@ -145,7 +145,7 @@ class NodeMapInternal {
     std::vector<NodeDefT*> result;
     auto it = outputs_.find(node_name);
     if (it != outputs_.end()) {
-      const absl::flat_hash_set<NodeDefT*>& outputs = it->second;
+      const abslx::flat_hash_set<NodeDefT*>& outputs = it->second;
       result.reserve(outputs.size());
       result.assign(outputs.begin(), outputs.end());
       std::sort(result.begin(), result.end(),
@@ -214,7 +214,7 @@ class NodeMapInternal {
 
   void UpdateOutput(const string& node_name, const string& old_output_name,
                     const string& new_output_name) {
-    absl::flat_hash_set<NodeDef*>& outputs = outputs_[node_name];
+    abslx::flat_hash_set<NodeDef*>& outputs = outputs_[node_name];
     outputs.erase(nodes_[NodeName(old_output_name)]);
     outputs.insert(nodes_[NodeName(new_output_name)]);
   }
@@ -223,9 +223,9 @@ class NodeMapInternal {
   // Helper method to get the NodeDef pointer of i-th node in a graph.
   inline NodeDefT* GetNodeDefFromGraph(GraphDefT* graph, int64_t i) const;
 
-  const absl::flat_hash_set<NodeDefT*> empty_set_;
-  absl::node_hash_map<string, NodeDefT*> nodes_;
-  absl::node_hash_map<string, absl::flat_hash_set<NodeDefT*>> outputs_;
+  const abslx::flat_hash_set<NodeDefT*> empty_set_;
+  abslx::node_hash_map<string, NodeDefT*> nodes_;
+  abslx::node_hash_map<string, abslx::flat_hash_set<NodeDefT*>> outputs_;
 };
 
 // Specialized template class method GetNodeDefFromGraph.
@@ -299,7 +299,7 @@ string SafeTensorIdToString(const SafeTensorId& tensor_id);
 
 // True iff 'name' refers to a control inputs, i.e. a node name prefixed with
 // the ^ character.
-bool IsControlInput(absl::string_view name);
+bool IsControlInput(abslx::string_view name);
 
 // True iff tensor index refers to a control input.
 bool IsControlInput(const TensorId& tensor_id);
@@ -377,7 +377,7 @@ void DedupControlInputs(NodeDef* node);
 Status CheckAttrExists(const NodeDef& node, const string& key);
 
 // Returns an error if attributes with the given keys do not exist in node.
-Status CheckAttrsExist(const NodeDef& node, absl::Span<const string> keys);
+Status CheckAttrsExist(const NodeDef& node, abslx::Span<const string> keys);
 
 // Returns the data type in attribute `attr_name` of `node`. If that attribute
 // doesn't exist, returns DT_INVALID.
@@ -403,9 +403,9 @@ void PermuteNodesInPlace(GraphDef* graph, std::vector<int>* permutation,
 // Returns Status::OK() if a kernel is registered for node.op() on the device
 // type corresponding to node.device().
 Status IsKernelRegisteredForNode(
-    absl::string_view node_name, bool has_experimental_debug_info,
+    abslx::string_view node_name, bool has_experimental_debug_info,
     const NodeDef_ExperimentalDebugInfo& experimental_debug_info,
-    absl::string_view node_op, absl::string_view node_device,
+    abslx::string_view node_op, abslx::string_view node_device,
     AttrSlice node_attrs);
 Status IsKernelRegisteredForNode(const NodeDef& node);
 

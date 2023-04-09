@@ -27,7 +27,7 @@ namespace m = xla::testing::opcode_matchers;
 
 class AllReduceSimplifierTest : public HloTestBase {
  public:
-  StatusOr<std::unique_ptr<HloModule>> RunPass(absl::string_view hlo_module,
+  StatusOr<std::unique_ptr<HloModule>> RunPass(abslx::string_view hlo_module,
                                                bool expect_change) {
     TF_ASSIGN_OR_RETURN(auto module, ParseAndReturnVerifiedModule(hlo_module));
     auto changed = AllReduceReassociate().Run(module.get());
@@ -39,7 +39,7 @@ class AllReduceSimplifierTest : public HloTestBase {
   }
 
   size_t AllReduceCount(std::unique_ptr<HloModule>& module) {
-    return absl::c_count_if(module->entry_computation()->instructions(),
+    return abslx::c_count_if(module->entry_computation()->instructions(),
                             [](const HloInstruction* inst) {
                               return inst->opcode() == HloOpcode::kAllReduce;
                             });
@@ -47,7 +47,7 @@ class AllReduceSimplifierTest : public HloTestBase {
 };
 
 TEST_F(AllReduceSimplifierTest, Simple) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -72,7 +72,7 @@ ENTRY main {
 }
 
 TEST_F(AllReduceSimplifierTest, SimpleWithChannelId) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -99,7 +99,7 @@ ENTRY main {
 // Checks whether a linear chain of adds of ARs is reassociated iin a single
 // pass.
 TEST_F(AllReduceSimplifierTest, SimpleChain) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -134,7 +134,7 @@ ENTRY main {
 
 // Checks whether a tree of add of ARs is reassociated in a single pass.
 TEST_F(AllReduceSimplifierTest, SimpleTree) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -166,7 +166,7 @@ ENTRY main {
 }
 
 TEST_F(AllReduceSimplifierTest, MismatchOp0) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -194,7 +194,7 @@ ENTRY main {
 }
 
 TEST_F(AllReduceSimplifierTest, MismatchOp1) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -222,7 +222,7 @@ ENTRY main {
 }
 
 TEST_F(AllReduceSimplifierTest, MismatchReplicaGroups) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -244,7 +244,7 @@ ENTRY main {
 }
 
 TEST_F(AllReduceSimplifierTest, MismatchHasChannelId) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -266,7 +266,7 @@ ENTRY main {
 }
 
 TEST_F(AllReduceSimplifierTest, MismatchUseGlobalDeviceId) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -288,7 +288,7 @@ ENTRY main {
 }
 
 TEST_F(AllReduceSimplifierTest, NotSingleUser) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -311,7 +311,7 @@ ENTRY main {
 }
 
 TEST_F(AllReduceSimplifierTest, DoubleUse) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {

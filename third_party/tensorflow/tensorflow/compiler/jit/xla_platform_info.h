@@ -85,7 +85,7 @@ class XlaPlatformInfo {
 // nullopt if it is empty. It returns error in case of malformed configuration
 // string.
 StatusOr<std::optional<std::set<int>>> ParseVisibleDeviceList(
-    absl::string_view visible_device_list);
+    abslx::string_view visible_device_list);
 
 // Returns created XLA compilation cache.
 Status BuildXlaCompilationCache(DeviceBase* dev, FunctionLibraryRuntime* flr,

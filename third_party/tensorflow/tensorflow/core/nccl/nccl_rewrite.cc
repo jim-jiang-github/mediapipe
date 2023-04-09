@@ -256,7 +256,7 @@ class NcclReplacePass : public GraphOptimizationPass {
     // Find reduction and broadcast ops and replace them with Send/Recv ops.
     for (Node* node : graph->op_nodes()) {
       StringPiece type = node->type_string();
-      if (!absl::StartsWith(type, "Nccl")) {
+      if (!abslx::StartsWith(type, "Nccl")) {
         continue;
       }
       if (type == "NcclReduce") {

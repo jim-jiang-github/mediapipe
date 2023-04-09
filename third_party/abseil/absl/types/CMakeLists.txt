@@ -21,12 +21,12 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::bad_any_cast
-    absl::config
-    absl::core_headers
-    absl::fast_type_id
-    absl::type_traits
-    absl::utility
+    abslx::bad_any_cast
+    abslx::config
+    abslx::core_headers
+    abslx::fast_type_id
+    abslx::type_traits
+    abslx::utility
   PUBLIC
 )
 
@@ -38,8 +38,8 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::bad_any_cast_impl
-    absl::config
+    abslx::bad_any_cast_impl
+    abslx::config
   PUBLIC
 )
 
@@ -52,8 +52,8 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::config
-    absl::raw_logging_internal
+    abslx::config
+    abslx::raw_logging_internal
 )
 
 absl_cc_test(
@@ -64,11 +64,11 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::any
-    absl::config
-    absl::exception_testing
-    absl::raw_logging_internal
-    absl::test_instance_tracker
+    abslx::any
+    abslx::config
+    abslx::exception_testing
+    abslx::raw_logging_internal
+    abslx::test_instance_tracker
     gmock_main
 )
 
@@ -80,11 +80,11 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::any
-    absl::config
-    absl::exception_testing
-    absl::raw_logging_internal
-    absl::test_instance_tracker
+    abslx::any
+    abslx::config
+    abslx::exception_testing
+    abslx::raw_logging_internal
+    abslx::test_instance_tracker
     gmock_main
 )
 
@@ -96,9 +96,9 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::any
-    absl::config
-    absl::exception_safety_testing
+    abslx::any
+    abslx::config
+    abslx::exception_safety_testing
     gmock_main
 )
 
@@ -112,10 +112,10 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::algorithm
-    absl::core_headers
-    absl::throw_delegate
-    absl::type_traits
+    abslx::algorithm
+    abslx::core_headers
+    abslx::throw_delegate
+    abslx::type_traits
   PUBLIC
 )
 
@@ -127,15 +127,15 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::span
-    absl::base
-    absl::config
-    absl::core_headers
-    absl::exception_testing
-    absl::fixed_array
-    absl::inlined_vector
-    absl::hash_testing
-    absl::strings
+    abslx::span
+    abslx::base
+    abslx::config
+    abslx::core_headers
+    abslx::exception_testing
+    abslx::fixed_array
+    abslx::inlined_vector
+    abslx::hash_testing
+    abslx::strings
     gmock_main
 )
 
@@ -147,15 +147,15 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::span
-    absl::base
-    absl::config
-    absl::core_headers
-    absl::exception_testing
-    absl::fixed_array
-    absl::inlined_vector
-    absl::hash_testing
-    absl::strings
+    abslx::span
+    abslx::base
+    abslx::config
+    abslx::core_headers
+    abslx::exception_testing
+    abslx::fixed_array
+    abslx::inlined_vector
+    abslx::hash_testing
+    abslx::strings
     gmock_main
 )
 
@@ -169,13 +169,13 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::bad_optional_access
-    absl::base_internal
-    absl::config
-    absl::core_headers
-    absl::memory
-    absl::type_traits
-    absl::utility
+    abslx::bad_optional_access
+    abslx::base_internal
+    abslx::config
+    abslx::core_headers
+    abslx::memory
+    abslx::type_traits
+    abslx::utility
   PUBLIC
 )
 
@@ -189,8 +189,8 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::config
-    absl::raw_logging_internal
+    abslx::config
+    abslx::raw_logging_internal
   PUBLIC
 )
 
@@ -204,8 +204,8 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::config
-    absl::raw_logging_internal
+    abslx::config
+    abslx::raw_logging_internal
   PUBLIC
 )
 
@@ -217,11 +217,11 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::optional
-    absl::config
-    absl::raw_logging_internal
-    absl::strings
-    absl::type_traits
+    abslx::optional
+    abslx::config
+    abslx::raw_logging_internal
+    abslx::strings
+    abslx::type_traits
     gmock_main
 )
 
@@ -233,9 +233,9 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::optional
-    absl::config
-    absl::exception_safety_testing
+    abslx::optional
+    abslx::config
+    abslx::exception_safety_testing
     gmock_main
 )
 
@@ -253,11 +253,11 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::algorithm
-    absl::debugging
-    absl::type_traits
-    absl::strings
-    absl::utility
+    abslx::algorithm
+    abslx::debugging
+    abslx::type_traits
+    abslx::strings
+    abslx::utility
     gmock_main
   TESTONLY
 )
@@ -273,8 +273,8 @@ absl_cc_test(
   LINKOPTS
     ${ABSL_EXCEPTIONS_FLAG_LINKOPTS}
   DEPS
-    absl::conformance_testing
-    absl::type_traits
+    abslx::conformance_testing
+    abslx::type_traits
     gmock_main
 )
 
@@ -286,8 +286,8 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::conformance_testing
-    absl::type_traits
+    abslx::conformance_testing
+    abslx::type_traits
     gmock_main
 )
 
@@ -301,12 +301,12 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::bad_variant_access
-    absl::base_internal
-    absl::config
-    absl::core_headers
-    absl::type_traits
-    absl::utility
+    abslx::bad_variant_access
+    abslx::base_internal
+    abslx::config
+    abslx::core_headers
+    abslx::type_traits
+    abslx::utility
   PUBLIC
 )
 
@@ -318,12 +318,12 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::variant
-    absl::config
-    absl::core_headers
-    absl::memory
-    absl::type_traits
-    absl::strings
+    abslx::variant
+    abslx::config
+    abslx::core_headers
+    abslx::memory
+    abslx::type_traits
+    abslx::strings
     gmock_main
 )
 
@@ -335,8 +335,8 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::core_headers
-    absl::type_traits
+    abslx::core_headers
+    abslx::type_traits
   PUBLIC
 )
 
@@ -348,8 +348,8 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::base
-    absl::compare
+    abslx::base
+    abslx::compare
     gmock_main
 )
 
@@ -361,9 +361,9 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::variant
-    absl::config
-    absl::exception_safety_testing
-    absl::memory
+    abslx::variant
+    abslx::config
+    abslx::exception_safety_testing
+    abslx::memory
     gmock_main
 )

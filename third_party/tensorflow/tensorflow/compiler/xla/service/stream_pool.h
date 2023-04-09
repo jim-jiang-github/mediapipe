@@ -54,7 +54,7 @@ class StreamPool {
   // This method is thread-safe.
   void ReturnStream(se::Stream* stream);
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   std::vector<std::unique_ptr<se::Stream>> streams_ ABSL_GUARDED_BY(mu_);
 };
 

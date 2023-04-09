@@ -33,7 +33,7 @@ namespace gpu {
 
 template <DataType S, typename T>
 void RearrangeWeightsForConvConstants(
-    const tflite::gpu::Tensor<OHWI, S>& weights, absl::Span<T> dst) {
+    const tflite::gpu::Tensor<OHWI, S>& weights, abslx::Span<T> dst) {
   const int dst_depth = DivideRoundUp(weights.shape.o, 4);
   const int src_depth = DivideRoundUp(weights.shape.i, 4);
   const int kernel_x = weights.shape.w;
@@ -70,7 +70,7 @@ void RearrangeWeightsForConvConstants(
 
 template <DataType S, typename T>
 void RearrangeWeightsForConvConstantsDot(
-    const tflite::gpu::Tensor<OHWI, S>& weights, absl::Span<T> dst) {
+    const tflite::gpu::Tensor<OHWI, S>& weights, abslx::Span<T> dst) {
   const int dst_depth = DivideRoundUp(weights.shape.o, 4);
   const int src_depth = DivideRoundUp(weights.shape.i, 4);
   const int kernel_x = weights.shape.w;
@@ -136,19 +136,19 @@ void UploadWeightsForConvConstants(const tflite::gpu::Tensor<OHWI, T>& weights,
     float4* ptr = reinterpret_cast<float4*>(desc.data.data());
     if (use_dot_conv) {
       RearrangeWeightsForConvConstantsDot(weights,
-                                          absl::MakeSpan(ptr, float_count / 4));
+                                          abslx::MakeSpan(ptr, float_count / 4));
     } else {
       RearrangeWeightsForConvConstants(weights,
-                                       absl::MakeSpan(ptr, float_count / 4));
+                                       abslx::MakeSpan(ptr, float_count / 4));
     }
   } else {
     half4* ptr = reinterpret_cast<half4*>(desc.data.data());
     if (use_dot_conv) {
       RearrangeWeightsForConvConstantsDot(weights,
-                                          absl::MakeSpan(ptr, float_count / 4));
+                                          abslx::MakeSpan(ptr, float_count / 4));
     } else {
       RearrangeWeightsForConvConstants(weights,
-                                       absl::MakeSpan(ptr, float_count / 4));
+                                       abslx::MakeSpan(ptr, float_count / 4));
     }
   }
 

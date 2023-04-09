@@ -49,7 +49,7 @@ class OperationPass;
 class Type;
 
 namespace TFL {
-using StringSet = absl::flat_hash_set<std::string>;
+using StringSet = abslx::flat_hash_set<std::string>;
 
 // Creates an instance of the TensorFlow Lite dialect LegalizeTF pass.
 // When the given run_tfl_runtime_verification value is true, it will check each

@@ -363,13 +363,13 @@ XLA_TEST_F(TransferManagerTest, TransferDynamicShape) {
                          /*size=*/1048575);
   ASSERT_IS_OK(MutableBorrowingLiteral(&literal, /*view_root=*/{0})
                    .Populate<int64_t>(
-                       [](absl::Span<const int64_t> indices) { return 42; }));
+                       [](abslx::Span<const int64_t> indices) { return 42; }));
   ASSERT_IS_OK(MutableBorrowingLiteral(&literal, /*view_root=*/{1})
-                   .Populate<int32_t>([](absl::Span<const int64_t> indices) {
+                   .Populate<int32_t>([](abslx::Span<const int64_t> indices) {
                      return indices[0] + indices[1];
                    }));
   ASSERT_IS_OK(MutableBorrowingLiteral(&literal, /*view_root=*/{2})
-                   .Populate<float>([](absl::Span<const int64_t> indices) {
+                   .Populate<float>([](abslx::Span<const int64_t> indices) {
                      return indices[0] + indices[1];
                    }));
 

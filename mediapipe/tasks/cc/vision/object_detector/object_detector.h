@@ -84,7 +84,7 @@ struct ObjectDetectorOptions {
   // The user-defined result callback for processing live stream data.
   // The result callback should only be specified when the running mode is set
   // to RunningMode::LIVE_STREAM.
-  std::function<void(absl::StatusOr<ObjectDetectorResult>, const Image&, int64)>
+  std::function<void(abslx::StatusOr<ObjectDetectorResult>, const Image&, int64)>
       result_callback = nullptr;
 };
 
@@ -146,7 +146,7 @@ class ObjectDetector : tasks::vision::core::BaseVisionTaskApi {
   //    data into the ObjectDetector, the detection results along with the input
   //    timestamp and the image that object detector runs on will be available
   //    in the result callback when the object detector finishes the work.
-  static absl::StatusOr<std::unique_ptr<ObjectDetector>> Create(
+  static abslx::StatusOr<std::unique_ptr<ObjectDetector>> Create(
       std::unique_ptr<ObjectDetectorOptions> options);
 
   // Performs object detection on the provided single image.
@@ -169,7 +169,7 @@ class ObjectDetector : tasks::vision::core::BaseVisionTaskApi {
   // underlying image data.
   // TODO: Describes the output bounding boxes for gpu input
   // images after enabling the gpu support in MediaPipe Tasks.
-  absl::StatusOr<ObjectDetectorResult> Detect(
+  abslx::StatusOr<ObjectDetectorResult> Detect(
       mediapipe::Image image,
       std::optional<core::ImageProcessingOptions> image_processing_options =
           std::nullopt);
@@ -192,7 +192,7 @@ class ObjectDetector : tasks::vision::core::BaseVisionTaskApi {
   // unrotated input frame of reference coordinates system, i.e. in `[0,
   // image_width) x [0, image_height)`, which are the dimensions of the
   // underlying image data.
-  absl::StatusOr<ObjectDetectorResult> DetectForVideo(
+  abslx::StatusOr<ObjectDetectorResult> DetectForVideo(
       mediapipe::Image image, int64 timestamp_ms,
       std::optional<core::ImageProcessingOptions> image_processing_options =
           std::nullopt);
@@ -223,12 +223,12 @@ class ObjectDetector : tasks::vision::core::BaseVisionTaskApi {
   //     longer be valid when the callback returns. To access the image data
   //     outside of the callback, callers need to make a copy of the image.
   //   - The input timestamp in milliseconds.
-  absl::Status DetectAsync(mediapipe::Image image, int64 timestamp_ms,
+  abslx::Status DetectAsync(mediapipe::Image image, int64 timestamp_ms,
                            std::optional<core::ImageProcessingOptions>
                                image_processing_options = std::nullopt);
 
   // Shuts down the ObjectDetector when all works are done.
-  absl::Status Close() { return runner_->Close(); }
+  abslx::Status Close() { return runner_->Close(); }
 };
 
 }  // namespace vision

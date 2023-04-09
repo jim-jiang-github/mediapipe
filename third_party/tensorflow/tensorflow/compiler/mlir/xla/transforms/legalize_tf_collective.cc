@@ -46,9 +46,9 @@ namespace mhlo {
 
 namespace {
 
-constexpr absl::string_view kGroupSizeAttrName =
+constexpr abslx::string_view kGroupSizeAttrName =
     "tf2xla.collective_info.group_size";
-constexpr absl::string_view kGroupKeyAttrName =
+constexpr abslx::string_view kGroupKeyAttrName =
     "tf2xla.collective_info.group_key";
 
 class LegalizeTFCollective

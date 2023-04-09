@@ -98,8 +98,8 @@ Status SetPerCoreArgShapes(
 // Function arguments and return values lose their device assignments, so we
 // must recreate them.
 Status AssignDevicesToArgsAndRetvals(
-    absl::Span<const tpu::ShardingAndIndex> arg_core_mapping,
-    absl::Span<const tpu::ShardingAndIndex> retval_core_mapping, Graph* graph) {
+    abslx::Span<const tpu::ShardingAndIndex> arg_core_mapping,
+    abslx::Span<const tpu::ShardingAndIndex> retval_core_mapping, Graph* graph) {
   auto assign = [&](Node* node, const xla::OpSharding& sharding) -> Status {
     if (sharding.type() == xla::OpSharding::MAXIMAL) {
       const string device = CoreDevice(sharding.tile_assignment_devices(0));
@@ -286,23 +286,23 @@ Status BuildComputationArgumentDescriptions(
         arg.kind = XlaCompiler::Argument::kConstant;
         guaranteed_constants_size =
             guaranteed_constants.index() == 0
-                ? absl::get<0>(guaranteed_constants).size()
-                : absl::get<1>(guaranteed_constants)->size();
+                ? abslx::get<0>(guaranteed_constants).size()
+                : abslx::get<1>(guaranteed_constants)->size();
         TF_RET_CHECK(constant_count < guaranteed_constants_size)
             << "More constant args in TPUCompileMetadataProto than constant "
                "tensors.";
         if (guaranteed_constants.index() == 0) {
-          // `guaranteed_constants` is of type `absl::Span<const TensorProto*
+          // `guaranteed_constants` is of type `abslx::Span<const TensorProto*
           // const>`.
           Tensor tensor;
           CHECK(tensor.FromProto(
-              *absl::get<0>(guaranteed_constants)[constant_count++]))
+              *abslx::get<0>(guaranteed_constants)[constant_count++]))
               << "Failed to deserialize invalid `TensorProto` into `Tensor`.";
           arg.constant_value = tensor;
         } else {
           // `guaranteed_constants` is of type `const OpInputList* const`.
           arg.constant_value =
-              (*absl::get<1>(guaranteed_constants))[constant_count++];
+              (*abslx::get<1>(guaranteed_constants))[constant_count++];
         }
         break;
       case tpu::TPUCompileMetadataProto::Arg::INVALID:
@@ -431,7 +431,7 @@ Status CompileTFFunctionToHlo(
 
   // Adds device assignments to _Arg and _Retval nodes.
   TF_RETURN_IF_ERROR(AssignDevicesToArgsAndRetvals(
-      absl::MakeSpan(*arg_core_mapping), absl::MakeSpan(retval_core_mapping),
+      abslx::MakeSpan(*arg_core_mapping), abslx::MakeSpan(retval_core_mapping),
       graph.get()));
 
   VLOG(1) << "Optimizing TensorFlow graph";
@@ -450,7 +450,7 @@ Status CompileTFFunctionToHlo(
 
 Status GetShardingInfo(
     const tpu::TPUCompileMetadataProto& metadata,
-    absl::Span<const TensorShape> arg_shapes,
+    abslx::Span<const TensorShape> arg_shapes,
     const XlaShapeLayoutHelpers::ShapeDeterminationFns shape_determination_fns,
     std::vector<tpu::ShardingAndIndex>* arg_core_mapping,
     std::vector<std::vector<xla::Shape>>* per_core_arg_shapes) {
@@ -466,7 +466,7 @@ Status GetShardingInfo(
     TF_ASSIGN_OR_RETURN(auto arg_sharding,
                         xla::HloSharding::FromProto(proto_arg.sharding()));
     auto layout_preference = shape_determination_fns.layout_preference_fn(
-        arg_shapes[i], proto_arg.dtype(), absl::nullopt);
+        arg_shapes[i], proto_arg.dtype(), abslx::nullopt);
     TF_ASSIGN_OR_RETURN(auto xla_arg_shape,
                         shape_determination_fns.shape_representation_fn(
                             arg_shapes[i], proto_arg.dtype(),

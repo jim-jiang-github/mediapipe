@@ -102,7 +102,7 @@ Status GenerateResourceSharedNameIfEmpty(
             // function as the shared_name. "@" is used as the separator because
             // it is not allowed in the function name or the node name.
             (*node_def.mutable_attr())["shared_name"].set_s(
-                absl::StrCat(node_def.name(), "@", func_name));
+                abslx::StrCat(node_def.name(), "@", func_name));
           }
         }
       }

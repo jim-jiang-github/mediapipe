@@ -74,10 +74,10 @@ struct TFE_TensorHandleCache {
 
   TFE_TensorHandle* Lookup(PyObject* value, tensorflow::DataType dtype,
                            TFE_Context* ctx,
-                           absl::string_view device_name) const;
+                           abslx::string_view device_name) const;
 
   void Insert(PyObject* value, tensorflow::DataType dtype, TFE_Context* ctx,
-              absl::string_view device_name, TFE_TensorHandle* h);
+              abslx::string_view device_name, TFE_TensorHandle* h);
 
   void Clear();
 
@@ -86,7 +86,7 @@ struct TFE_TensorHandleCache {
   // should have TFE_TensorHandleCache instance. Migrate once we Python context
   // object is backed by C++ data structure. b/169790439
   using Key = std::tuple<PyObjectPtr, tensorflow::DataType, TFE_Context*,
-                         absl::string_view>;
+                         abslx::string_view>;
 
   void DecrefUnrefAll() {
     for (const auto& p : cache) {
@@ -97,7 +97,7 @@ struct TFE_TensorHandleCache {
 
   // Not guarded by a mutex because the code is only used while the
   // GIL is held.
-  absl::flat_hash_map<Key, TFE_TensorHandle*> cache;
+  abslx::flat_hash_map<Key, TFE_TensorHandle*> cache;
 };
 
 }  // namespace tensorflow

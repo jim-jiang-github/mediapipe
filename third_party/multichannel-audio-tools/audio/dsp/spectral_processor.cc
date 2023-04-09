@@ -26,7 +26,7 @@
 
 namespace audio_dsp {
 
-using ::absl::Span;
+using ::abslx::Span;
 using ::Eigen::ArrayXf;
 using ::Eigen::ArrayXXcf;
 using ::Eigen::ArrayXXf;

@@ -52,16 +52,16 @@ std::string StripLogHeaders(const std::string& hlo_string) {
   static RE2* matcher = new RE2(
       "[IWEF]\\d{4} "
       "\\d{2}:\\d{2}:\\d{2}\\.\\d+\\s+\\d+\\s+[^:]+:\\d+\\]\\s?(.*)");
-  absl::string_view matches[4];
-  std::vector<std::string> lines = absl::StrSplit(hlo_string, '\n');
+  abslx::string_view matches[4];
+  std::vector<std::string> lines = abslx::StrSplit(hlo_string, '\n');
   for (auto& line : lines) {
     if (matcher->Match(line, 0, line.size(), RE2::ANCHOR_START, matches, 4)) {
       line = std::string(matches[1]);
     }
   }
-  return absl::StrJoin(lines, "\n",
+  return abslx::StrJoin(lines, "\n",
                        [](std::string* out, const std::string& line) {
-                         absl::StrAppend(out, line);
+                         abslx::StrAppend(out, line);
                        });
 }
 

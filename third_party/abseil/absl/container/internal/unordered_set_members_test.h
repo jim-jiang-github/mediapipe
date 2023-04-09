@@ -20,7 +20,7 @@
 #include "gtest/gtest.h"
 #include "absl/meta/type_traits.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 
@@ -35,10 +35,10 @@ void UseType() {}
 TYPED_TEST_P(MembersTest, Typedefs) {
   EXPECT_TRUE((std::is_same<typename TypeParam::key_type,
                             typename TypeParam::value_type>()));
-  EXPECT_TRUE((absl::conjunction<
-               absl::negation<std::is_signed<typename TypeParam::size_type>>,
+  EXPECT_TRUE((abslx::conjunction<
+               abslx::negation<std::is_signed<typename TypeParam::size_type>>,
                std::is_integral<typename TypeParam::size_type>>()));
-  EXPECT_TRUE((absl::conjunction<
+  EXPECT_TRUE((abslx::conjunction<
                std::is_signed<typename TypeParam::difference_type>,
                std::is_integral<typename TypeParam::difference_type>>()));
   EXPECT_TRUE((std::is_convertible<
@@ -81,6 +81,6 @@ REGISTER_TYPED_TEST_SUITE_P(MembersTest, Typedefs, SimpleFunctions, BeginEnd);
 
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_CONTAINER_INTERNAL_UNORDERED_SET_MEMBERS_TEST_H_

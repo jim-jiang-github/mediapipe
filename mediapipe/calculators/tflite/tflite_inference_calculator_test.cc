@@ -34,11 +34,11 @@ TEST(TfLiteInferenceCalculatorTest, SmokeTest) {
     }
   )";
   // Test CPU inference only.
-  DoSmokeTest<float>(/*graph_proto=*/absl::StrReplaceAll(
+  DoSmokeTest<float>(/*graph_proto=*/abslx::StrReplaceAll(
       graph_proto, {{"$delegate", "delegate { tflite {} }"}}));
-  DoSmokeTest<float>(absl::StrReplaceAll(
+  DoSmokeTest<float>(abslx::StrReplaceAll(
       graph_proto, {{"$delegate", "delegate { xnnpack {} }"}}));
-  DoSmokeTest<float>(absl::StrReplaceAll(
+  DoSmokeTest<float>(abslx::StrReplaceAll(
       graph_proto,
       {{"$delegate", "delegate { xnnpack { num_threads: 10 } }"}}));
 }

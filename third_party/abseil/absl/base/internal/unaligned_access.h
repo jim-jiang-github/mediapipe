@@ -31,7 +31,7 @@
 // The unaligned API is C++ only.  The declarations use C++ features
 // (namespaces, inline) which are absent or incompatible in C.
 #if defined(__cplusplus)
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -61,21 +61,21 @@ inline void UnalignedStore64(void *p, uint64_t v) { memcpy(p, &v, sizeof v); }
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #define ABSL_INTERNAL_UNALIGNED_LOAD16(_p) \
-  (absl::base_internal::UnalignedLoad16(_p))
+  (abslx::base_internal::UnalignedLoad16(_p))
 #define ABSL_INTERNAL_UNALIGNED_LOAD32(_p) \
-  (absl::base_internal::UnalignedLoad32(_p))
+  (abslx::base_internal::UnalignedLoad32(_p))
 #define ABSL_INTERNAL_UNALIGNED_LOAD64(_p) \
-  (absl::base_internal::UnalignedLoad64(_p))
+  (abslx::base_internal::UnalignedLoad64(_p))
 
 #define ABSL_INTERNAL_UNALIGNED_STORE16(_p, _val) \
-  (absl::base_internal::UnalignedStore16(_p, _val))
+  (abslx::base_internal::UnalignedStore16(_p, _val))
 #define ABSL_INTERNAL_UNALIGNED_STORE32(_p, _val) \
-  (absl::base_internal::UnalignedStore32(_p, _val))
+  (abslx::base_internal::UnalignedStore32(_p, _val))
 #define ABSL_INTERNAL_UNALIGNED_STORE64(_p, _val) \
-  (absl::base_internal::UnalignedStore64(_p, _val))
+  (abslx::base_internal::UnalignedStore64(_p, _val))
 
 #endif  // defined(__cplusplus), end of unaligned API
 

@@ -43,24 +43,24 @@ class RationalFactorResampleCalculator : public CalculatorBase {
  public:
   struct TestAccess;
 
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<Matrix>(
         // Single input stream with TimeSeriesHeader.
     );
     cc->Outputs().Index(0).Set<Matrix>(
         // Resampled stream with TimeSeriesHeader.
     );
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   // Returns FAIL if the input stream header is invalid or if the
   // resampler cannot be initialized.
-  absl::Status Open(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
   // Resamples a packet of TimeSeries data.  Returns FAIL if the
   // resampler state becomes inconsistent.
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
   // Flushes any remaining state.  Returns FAIL if the resampler state
   // becomes inconsistent.
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  protected:
   typedef audio_dsp::Resampler<float> ResamplerType;
@@ -75,7 +75,7 @@ class RationalFactorResampleCalculator : public CalculatorBase {
   // Does Timestamp bookkeeping and resampling common to Process() and
   // Close().  Returns FAIL if the resampler state becomes
   // inconsistent.
-  absl::Status ProcessInternal(const Matrix& input_frame, bool should_flush,
+  abslx::Status ProcessInternal(const Matrix& input_frame, bool should_flush,
                                CalculatorContext* cc);
 
   // Uses the internal resampler_ objects to actually resample each

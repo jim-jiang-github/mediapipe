@@ -60,7 +60,7 @@ CompileOnlyService::CompileOnlyService(const ServiceOptions& options,
 
 StatusOr<std::vector<std::unique_ptr<AotCompilationResult>>>
 CompileOnlyService::CompileAheadOfTime(
-    absl::Span<const AotXlaComputationInstance> computations,
+    abslx::Span<const AotXlaComputationInstance> computations,
     const AotCompilationOptions& options,
     std::unique_ptr<AotCompilationMetadata>* metadata) {
   std::vector<std::unique_ptr<HloModule>> hlo_modules;
@@ -131,7 +131,7 @@ CompileOnlyService::CompileAheadOfTime(
 
   return compiler_->CompileAheadOfTime(
       std::make_unique<HloModuleGroup>(hlo_modules[0]->name(),
-                                       absl::MakeSpan(hlo_modules)),
+                                       abslx::MakeSpan(hlo_modules)),
       options, metadata);
 }
 

@@ -35,7 +35,7 @@ ShaderCodegen::ShaderCodegen(const CompilationOptions& options,
                              const GpuInfo& gpu_info)
     : options_(options), gpu_type_(gpu_info.vendor) {}
 
-absl::Status ShaderCodegen::Build(CompiledNodeAttributes attr,
+abslx::Status ShaderCodegen::Build(CompiledNodeAttributes attr,
                                   ShaderCode* shader_code) const {
   VariableAccessor variable_accessor(options_.inline_parameters,
                                      options_.vulkan_support);
@@ -44,23 +44,23 @@ absl::Status ShaderCodegen::Build(CompiledNodeAttributes attr,
 
   const auto add_object = [&](const std::string& name, Object&& object) {
     if (!object_accessor.AddObject(name, std::forward<Object>(object))) {
-      return absl::AlreadyExistsError(absl::StrCat("Object \"", name, "\""));
+      return abslx::AlreadyExistsError(abslx::StrCat("Object \"", name, "\""));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   };
 
   const auto add_uniform_parameter = [&](Variable&& variable) {
     const std::string name = variable.name;
     const Variable& const_ref = variable;
     if (variable_accessor.IsEmptyVariableLength(const_ref)) {
-      return absl::InvalidArgumentError(
-          absl::StrCat("Empty uniform vector value \"", name, "\""));
+      return abslx::InvalidArgumentError(
+          abslx::StrCat("Empty uniform vector value \"", name, "\""));
     }
     if (!variable_accessor.AddUniformParameter(std::move(variable))) {
-      return absl::AlreadyExistsError(
-          absl::StrCat("Uniform parameter \"", name, "\""));
+      return abslx::AlreadyExistsError(
+          abslx::StrCat("Uniform parameter \"", name, "\""));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   };
 
   for (auto&& object : attr.code.objects) {
@@ -70,8 +70,8 @@ absl::Status ShaderCodegen::Build(CompiledNodeAttributes attr,
   for (auto&& variable : attr.code.shared_variables) {
     const std::string name = variable.name;
     if (!variable_accessor.AddSharedVariable(std::move(variable))) {
-      return absl::AlreadyExistsError(
-          absl::StrCat("Shared variable \"", name, "\""));
+      return abslx::AlreadyExistsError(
+          abslx::StrCat("Shared variable \"", name, "\""));
     }
   }
 
@@ -82,12 +82,12 @@ absl::Status ShaderCodegen::Build(CompiledNodeAttributes attr,
   int index = 0;
   for (auto&& input : attr.inputs) {
     RETURN_IF_ERROR(
-        add_object(absl::StrCat("input_data_", index++), std::move(input)));
+        add_object(abslx::StrCat("input_data_", index++), std::move(input)));
   }
   index = 0;
   for (auto&& output : attr.outputs) {
     RETURN_IF_ERROR(
-        add_object(absl::StrCat("output_data_", index++), std::move(output)));
+        add_object(abslx::StrCat("output_data_", index++), std::move(output)));
   }
 
   // TODO(akulik): workload params need to go away and be replaced with
@@ -116,13 +116,13 @@ absl::Status ShaderCodegen::Build(CompiledNodeAttributes attr,
   switch (attr.code.input) {
     case IOStructure::ONLY_DEFINITIONS:
       for (int i = 0; i < attr.inputs.size(); ++i) {
-        absl::StrAppend(&main_source_code, "  highp vec4 value_", i,
+        abslx::StrAppend(&main_source_code, "  highp vec4 value_", i,
                         " = vec4(0);\n");
       }
       break;
     case IOStructure::AUTO: {
       for (int i = 0; i < attr.inputs.size(); ++i) {
-        absl::StrAppend(&main_source_code, "  highp vec4 value_", i,
+        abslx::StrAppend(&main_source_code, "  highp vec4 value_", i,
                         " = $input_data_", i, "[gid.x, gid.y, gid.z]$;\n");
       }
       break;
@@ -133,7 +133,7 @@ absl::Status ShaderCodegen::Build(CompiledNodeAttributes attr,
 
   if (attr.code.output == IOStructure::AUTO) {
     for (int i = 0; i < attr.outputs.size(); ++i) {
-      absl::StrAppend(&main_source_code, "  $output_data_", i,
+      abslx::StrAppend(&main_source_code, "  $output_data_", i,
                       "[gid.x, gid.y, gid.z] = value_", i, "$;\n");
     }
   }
@@ -156,7 +156,7 @@ absl::Status ShaderCodegen::Build(CompiledNodeAttributes attr,
   }
 
   if (options_.inline_parameters) {
-    main_source_code = absl::StrCat(variable_accessor.GetConstDeclarations(),
+    main_source_code = abslx::StrCat(variable_accessor.GetConstDeclarations(),
                                     main_source_code);
   }
 
@@ -164,7 +164,7 @@ absl::Status ShaderCodegen::Build(CompiledNodeAttributes attr,
   // #version 310 es
   // layout(local_size_x = ..., local_size_y = ..., local_size_z = ...) in;
   const char* precision = options_.allow_precision_loss ? "mediump" : "highp";
-  const std::string partial_source_code = absl::StrCat(
+  const std::string partial_source_code = abslx::StrCat(
       "layout(std430) buffer;\n",                                 //
       "precision ", precision, " float;\n",                       //
       object_accessor.GetFunctionsDeclarations(), "\n",           //
@@ -178,7 +178,7 @@ absl::Status ShaderCodegen::Build(CompiledNodeAttributes attr,
       ShaderCode(variable_accessor.GetUniformParameters(),
                  object_accessor.GetObjects(), attr.code.workload,
                  attr.code.workgroup, partial_source_code, attr.node_indices);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gl

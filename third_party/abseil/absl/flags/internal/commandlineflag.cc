@@ -15,7 +15,7 @@
 
 #include "absl/flags/internal/commandlineflag.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace flags_internal {
 
@@ -23,4 +23,4 @@ FlagStateInterface::~FlagStateInterface() {}
 
 }  // namespace flags_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

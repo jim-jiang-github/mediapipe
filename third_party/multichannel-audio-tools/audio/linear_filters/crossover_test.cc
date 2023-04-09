@@ -28,7 +28,7 @@
 namespace linear_filters {
 namespace {
 
-using ::absl::StrFormat;
+using ::abslx::StrFormat;
 using ::audio_dsp::AmplitudeRatioToDecibels;
 
 static constexpr float kSampleRate = 48000.0;

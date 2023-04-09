@@ -28,32 +28,32 @@ limitations under the License.
 namespace tensorflow {
 namespace profiler {
 
-const absl::string_view kHostThreadsPlaneName = "/host:CPU";
-const absl::string_view kGpuPlanePrefix = "/device:GPU:";
-const absl::string_view kTpuPlanePrefix = "/device:TPU:";
+const abslx::string_view kHostThreadsPlaneName = "/host:CPU";
+const abslx::string_view kGpuPlanePrefix = "/device:GPU:";
+const abslx::string_view kTpuPlanePrefix = "/device:TPU:";
 const char kTpuPlaneRegex[] = {"/device:TPU:[0-9]*$"};
 // TODO(b/195582092): change it to /device:custom once all literals are
 // migrated.
-const absl::string_view kCustomPlanePrefix = "/device:CUSTOM:";
+const abslx::string_view kCustomPlanePrefix = "/device:CUSTOM:";
 
-const absl::string_view kTpuRuntimePlaneName = "/host:TPU-runtime";
-const absl::string_view kCuptiDriverApiPlaneName = "/host:CUPTI";
-const absl::string_view kRoctracerApiPlaneName = "/host:ROCTRACER";
-const absl::string_view kMetadataPlaneName = "/host:metadata";
-const absl::string_view kTFStreamzPlaneName = "/host:tfstreamz";
-const absl::string_view kPythonTracerPlaneName = "/host:python-tracer";
+const abslx::string_view kTpuRuntimePlaneName = "/host:TPU-runtime";
+const abslx::string_view kCuptiDriverApiPlaneName = "/host:CUPTI";
+const abslx::string_view kRoctracerApiPlaneName = "/host:ROCTRACER";
+const abslx::string_view kMetadataPlaneName = "/host:metadata";
+const abslx::string_view kTFStreamzPlaneName = "/host:tfstreamz";
+const abslx::string_view kPythonTracerPlaneName = "/host:python-tracer";
 
-const absl::string_view kStepLineName = "Steps";
-const absl::string_view kTensorFlowNameScopeLineName = "TensorFlow Name Scope";
-const absl::string_view kTensorFlowOpLineName = "TensorFlow Ops";
-const absl::string_view kXlaModuleLineName = "XLA Modules";
-const absl::string_view kXlaOpLineName = "XLA Ops";
-const absl::string_view kXlaAsyncOpLineName = "Async XLA Ops";
-const absl::string_view kKernelLaunchLineName = "Launch Stats";
-const absl::string_view kSourceLineName = "Source code";
+const abslx::string_view kStepLineName = "Steps";
+const abslx::string_view kTensorFlowNameScopeLineName = "TensorFlow Name Scope";
+const abslx::string_view kTensorFlowOpLineName = "TensorFlow Ops";
+const abslx::string_view kXlaModuleLineName = "XLA Modules";
+const abslx::string_view kXlaOpLineName = "XLA Ops";
+const abslx::string_view kXlaAsyncOpLineName = "Async XLA Ops";
+const abslx::string_view kKernelLaunchLineName = "Launch Stats";
+const abslx::string_view kSourceLineName = "Source code";
 
-const absl::string_view kDeviceVendorNvidia = "Nvidia";
-const absl::string_view kDeviceVendorAMD = "AMD";
+const abslx::string_view kDeviceVendorNvidia = "Nvidia";
+const abslx::string_view kDeviceVendorAMD = "AMD";
 
 namespace {
 
@@ -63,11 +63,11 @@ constexpr int kNumHostEventTypes =
 constexpr int kNumStatTypes =
     StatType::kLastStatType - StatType::kFirstStatType + 1;
 
-using HostEventTypeMap = absl::flat_hash_map<absl::string_view, HostEventType>;
+using HostEventTypeMap = abslx::flat_hash_map<abslx::string_view, HostEventType>;
 using HostEventTypeStrMap =
-    absl::flat_hash_map<HostEventType, absl::string_view>;
-using StatTypeMap = absl::flat_hash_map<absl::string_view, StatType>;
-using StatTypeStrMap = absl::flat_hash_map<StatType, absl::string_view>;
+    abslx::flat_hash_map<HostEventType, abslx::string_view>;
+using StatTypeMap = abslx::flat_hash_map<abslx::string_view, StatType>;
+using StatTypeStrMap = abslx::flat_hash_map<StatType, abslx::string_view>;
 
 const HostEventTypeMap& GetHostEventTypeMap() {
   static auto* host_event_type_map = new HostEventTypeMap({
@@ -306,18 +306,18 @@ const StatTypeStrMap& GetStatTypeStrMap() {
 
 }  // namespace
 
-absl::string_view GetHostEventTypeStr(HostEventType event_type) {
+abslx::string_view GetHostEventTypeStr(HostEventType event_type) {
   return GetHostEventTypeStrMap().at(event_type);
 }
 
-absl::optional<int64_t> FindHostEventType(absl::string_view event_name) {
+abslx::optional<int64_t> FindHostEventType(abslx::string_view event_name) {
   if (auto event_type = gtl::FindOrNull(GetHostEventTypeMap(), event_name)) {
     return *event_type;
   }
-  return absl::nullopt;
+  return abslx::nullopt;
 }
 
-absl::optional<int64_t> FindTfOpEventType(absl::string_view event_name) {
+abslx::optional<int64_t> FindTfOpEventType(abslx::string_view event_name) {
   // TF op names.
   Category category = ParseTfOpFullname(event_name).category;
   switch (category) {
@@ -326,22 +326,22 @@ absl::optional<int64_t> FindTfOpEventType(absl::string_view event_name) {
     case Category::kTfData:
       return HostEventType::kIterator;
     default:
-      return absl::nullopt;
+      return abslx::nullopt;
   }
 }
 
-absl::string_view GetStatTypeStr(StatType stat_type) {
+abslx::string_view GetStatTypeStr(StatType stat_type) {
   return GetStatTypeStrMap().at(stat_type);
 }
 
-absl::optional<int64_t> FindStatType(absl::string_view stat_name) {
+abslx::optional<int64_t> FindStatType(abslx::string_view stat_name) {
   if (auto stat_type = gtl::FindOrNull(GetStatTypeMap(), stat_name)) {
     return *stat_type;
   }
-  return absl::nullopt;
+  return abslx::nullopt;
 }
 
-bool IsInternalEvent(absl::optional<int64_t> event_type) {
+bool IsInternalEvent(abslx::optional<int64_t> event_type) {
   // TODO(b/162102421): Introduce a prefix for internal event names.
   if (!event_type.has_value()) return false;
   switch (*event_type) {
@@ -364,7 +364,7 @@ bool IsInternalEvent(absl::optional<int64_t> event_type) {
   }
 }
 
-bool IsInternalStat(absl::optional<int64_t> stat_type) {
+bool IsInternalStat(abslx::optional<int64_t> stat_type) {
   // TODO(b/162102421): Introduce a prefix for internal stat names.
   if (!stat_type.has_value()) return false;
   switch (*stat_type) {

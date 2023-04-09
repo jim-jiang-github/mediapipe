@@ -29,17 +29,17 @@ class ImageFrameToGpuBufferCalculator
 
   MEDIAPIPE_NODE_INTERFACE(ImageFrameToGpuBufferCalculator, kIn, kOut);
 
-  static absl::Status UpdateContract(CalculatorContract* cc);
+  static abslx::Status UpdateContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   GlCalculatorHelper helper_;
 };
 
 // static
-absl::Status ImageFrameToGpuBufferCalculator::UpdateContract(
+abslx::Status ImageFrameToGpuBufferCalculator::UpdateContract(
     CalculatorContract* cc) {
   // Note: we call this method even on platforms where we don't use the helper,
   // to ensure the calculator's contract is the same. In particular, the helper
@@ -47,12 +47,12 @@ absl::Status ImageFrameToGpuBufferCalculator::UpdateContract(
   return GlCalculatorHelper::UpdateContract(cc);
 }
 
-absl::Status ImageFrameToGpuBufferCalculator::Open(CalculatorContext* cc) {
+abslx::Status ImageFrameToGpuBufferCalculator::Open(CalculatorContext* cc) {
   MP_RETURN_IF_ERROR(helper_.Open(cc));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ImageFrameToGpuBufferCalculator::Process(CalculatorContext* cc) {
+abslx::Status ImageFrameToGpuBufferCalculator::Process(CalculatorContext* cc) {
   auto image_frame = std::const_pointer_cast<ImageFrame>(
       mediapipe::SharedPtrWithPacket<ImageFrame>(kIn(cc).packet()));
   auto gpu_buffer = api2::MakePacket<GpuBuffer>(
@@ -67,7 +67,7 @@ absl::Status ImageFrameToGpuBufferCalculator::Process(CalculatorContext* cc) {
   helper_.RunInGlContext(
       [&gpu_buffer] { auto view = gpu_buffer->GetReadView<GlTextureView>(0); });
   kOut(cc).Send(std::move(gpu_buffer));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace api2

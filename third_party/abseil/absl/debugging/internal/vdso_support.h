@@ -52,7 +52,7 @@
 #define ABSL_HAVE_VDSO_SUPPORT 1
 #endif
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace debugging_internal {
 
@@ -151,7 +151,7 @@ int GetCPU();
 
 }  // namespace debugging_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_HAVE_ELF_MEM_IMAGE
 

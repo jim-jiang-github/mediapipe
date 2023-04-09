@@ -39,14 +39,14 @@ class SubgraphContext {
   // @node and/or @service_manager can be nullptr.
   SubgraphContext(CalculatorGraphConfig::Node* node,
                   const GraphServiceManager* service_manager)
-      : default_node_(node ? absl::nullopt
-                           : absl::optional<CalculatorGraphConfig::Node>(
+      : default_node_(node ? abslx::nullopt
+                           : abslx::optional<CalculatorGraphConfig::Node>(
                                  CalculatorGraphConfig::Node())),
         original_node_(node ? *node : default_node_.value()),
         default_service_manager_(
             service_manager
-                ? absl::nullopt
-                : absl::optional<GraphServiceManager>(GraphServiceManager())),
+                ? abslx::nullopt
+                : abslx::optional<GraphServiceManager>(GraphServiceManager())),
         service_manager_(service_manager ? *service_manager
                                          : default_service_manager_.value()),
         options_map_(
@@ -73,12 +73,12 @@ class SubgraphContext {
 
  private:
   // Populated if node is not provided during construction.
-  absl::optional<CalculatorGraphConfig::Node> default_node_;
+  abslx::optional<CalculatorGraphConfig::Node> default_node_;
 
   CalculatorGraphConfig::Node& original_node_;
 
   // Populated if service manager is not provided during construction.
-  const absl::optional<GraphServiceManager> default_service_manager_;
+  const abslx::optional<GraphServiceManager> default_service_manager_;
 
   const GraphServiceManager& service_manager_;
 
@@ -99,7 +99,7 @@ class Subgraph {
   // the parent graph.
   // Subclasses may use `SubgraphContext*` param to parameterize the config.
   // TODO: make this static?
-  virtual absl::StatusOr<CalculatorGraphConfig> GetConfig(SubgraphContext* sc) {
+  virtual abslx::StatusOr<CalculatorGraphConfig> GetConfig(SubgraphContext* sc) {
     if (sc == nullptr) {
       return GetConfig(SubgraphOptions{});
     }
@@ -108,9 +108,9 @@ class Subgraph {
 
   // Kept for backward compatibility - please override `GetConfig` taking
   // `SubgraphContext*` param.
-  virtual absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  virtual abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       const SubgraphOptions& options) {
-    return absl::UnimplementedError("Not implemented.");
+    return abslx::UnimplementedError("Not implemented.");
   }
 
   // Returns options of a specific type.
@@ -133,14 +133,14 @@ using SubgraphRegistry = GlobalFactoryRegistry<std::unique_ptr<Subgraph>>;
 #define REGISTER_MEDIAPIPE_GRAPH(name)                             \
   REGISTER_FACTORY_FUNCTION_QUALIFIED(mediapipe::SubgraphRegistry, \
                                       subgraph_registration, name, \
-                                      absl::make_unique<name>)
+                                      abslx::make_unique<name>)
 
 // A graph factory holding a literal CalculatorGraphConfig.
 class ProtoSubgraph : public Subgraph {
  public:
   ProtoSubgraph(const CalculatorGraphConfig& config);
   virtual ~ProtoSubgraph();
-  virtual absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  virtual abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       const Subgraph::SubgraphOptions& options);
 
  private:
@@ -152,7 +152,7 @@ class TemplateSubgraph : public Subgraph {
  public:
   TemplateSubgraph(const CalculatorGraphTemplate& templ);
   virtual ~TemplateSubgraph();
-  virtual absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  virtual abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       const Subgraph::SubgraphOptions& options);
 
  private:
@@ -187,8 +187,8 @@ class GraphRegistry {
   bool IsRegistered(const std::string& ns, const std::string& type_name) const;
 
   // Returns the specified graph config.
-  absl::StatusOr<CalculatorGraphConfig> CreateByName(
-      absl::string_view ns, absl::string_view type_name,
+  abslx::StatusOr<CalculatorGraphConfig> CreateByName(
+      abslx::string_view ns, abslx::string_view type_name,
       SubgraphContext* context = nullptr) const;
 
   static GraphRegistry global_graph_registry;

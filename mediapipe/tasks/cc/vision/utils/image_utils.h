@@ -41,13 +41,13 @@ struct Shape {
 //
 // Note: this function is not optimized for speed, and thus shouldn't be used
 // outside of tests or simple CLI demo tools.
-absl::StatusOr<mediapipe::Image> DecodeImageFromFile(const std::string& path);
+abslx::StatusOr<mediapipe::Image> DecodeImageFromFile(const std::string& path);
 
 // Get the shape of a image-like tensor.
 //
 // The tensor should have dimension 2, 3 or 4, representing `[height x width]`,
 // `[height x width x channels]`, or `[batch x height x width x channels]`.
-absl::StatusOr<Shape> GetImageLikeTensorShape(const mediapipe::Tensor& tensor);
+abslx::StatusOr<Shape> GetImageLikeTensorShape(const mediapipe::Tensor& tensor);
 
 }  // namespace vision
 }  // namespace tasks

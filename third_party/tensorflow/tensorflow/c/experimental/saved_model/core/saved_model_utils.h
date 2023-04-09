@@ -60,7 +60,7 @@ Status LoadSavedVariable(ImmediateExecutionContext* ctx,
 
 Status LoadSavedAsset(ImmediateExecutionContext* ctx, const SavedAsset& asset,
                       const std::string& saved_model_dir,
-                      absl::Span<const AssetFileDef> assets,
+                      abslx::Span<const AssetFileDef> assets,
                       std::unique_ptr<Asset>* output);
 
 // Creates a TFConcreteFunction from a SavedConcreteFunction.
@@ -80,8 +80,8 @@ Status FlattenSignature(const StructuredValue& signature,
 
 // Find the node id in `object_graph` at location `path`. `path` must be
 // a dot-delimited string of object names relative to the root object. If no
-// object is found, returns absl::nullopt.
-absl::optional<int> FindNodeAtPath(StringPiece path,
+// object is found, returns abslx::nullopt.
+abslx::optional<int> FindNodeAtPath(StringPiece path,
                                    const SavedObjectGraph& object_graph);
 
 // Maps each node in `graphdef` to its corresponding Attribute Map.

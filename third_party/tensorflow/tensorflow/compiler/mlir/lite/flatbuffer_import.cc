@@ -394,7 +394,7 @@ StatusOr<mlir::ElementsAttr> ConvertFloatBuffer(
         uint32_t bit_repr =
             llvm::support::endian::readNext<uint32_t, llvm::support::little,
                                             llvm::support::unaligned>(data);
-        values.push_back(absl::bit_cast<float>(bit_repr));
+        values.push_back(abslx::bit_cast<float>(bit_repr));
       }
       return mlir::ElementsAttr(
           DenseElementsAttr::get(shaped_type, ArrayRef<float>(values)));
@@ -411,7 +411,7 @@ StatusOr<mlir::ElementsAttr> ConvertFloatBuffer(
         uint64_t bit_repr =
             llvm::support::endian::readNext<uint64_t, llvm::support::little,
                                             llvm::support::unaligned>(data);
-        values.push_back(absl::bit_cast<double>(bit_repr));
+        values.push_back(abslx::bit_cast<double>(bit_repr));
       }
       return mlir::ElementsAttr(
           DenseElementsAttr::get(shaped_type, ArrayRef<double>(values)));
@@ -917,7 +917,7 @@ StatusOr<Operation*> ConvertOp(
 StatusOr<std::vector<int>> GetTensorIndices(
     const tflite::SubGraphT& subgraph,
     const std::vector<std::string>& tensor_names) {
-  absl::flat_hash_map<std::string, int> name_to_index;
+  abslx::flat_hash_map<std::string, int> name_to_index;
   for (const auto& index_and_tensor : llvm::enumerate(subgraph.tensors)) {
     name_to_index[index_and_tensor.value()->name] = index_and_tensor.index();
   }
@@ -952,11 +952,11 @@ mlir::NamedAttribute BuildTFEntryFunctionAttribute(
 
 // Traverses the subgraph from output_indices to input_indices and returns the
 // set of ops that are visited.
-StatusOr<absl::flat_hash_set<const tflite::OperatorT*>> PruneSubgraph(
+StatusOr<abslx::flat_hash_set<const tflite::OperatorT*>> PruneSubgraph(
     const tflite::SubGraphT& subgraph, ArrayRef<int32_t> input_indices,
     ArrayRef<int32_t> output_indices) {
   // Create a map from tensor index to defining op.
-  absl::flat_hash_map<int32_t, const tflite::OperatorT*> defining_op;
+  abslx::flat_hash_map<int32_t, const tflite::OperatorT*> defining_op;
   for (const auto& op : subgraph.operators) {
     for (int32_t output : op->outputs) {
       if (!llvm::is_contained(input_indices, output)) {
@@ -973,7 +973,7 @@ StatusOr<absl::flat_hash_set<const tflite::OperatorT*>> PruneSubgraph(
   }
 
   // Traverse the graph towards inputs.
-  absl::flat_hash_set<const tflite::OperatorT*> visited;
+  abslx::flat_hash_set<const tflite::OperatorT*> visited;
   while (!queue.empty()) {
     const tflite::OperatorT* op = queue.back();
     queue.pop_back();
@@ -1265,7 +1265,7 @@ StatusOr<FuncOp> ConvertSubgraph(
     SetSignature(func, signature, subgraph.tensors);
   }
 
-  absl::flat_hash_set<const tflite::OperatorT*> pruned_subgraph_ops;
+  abslx::flat_hash_set<const tflite::OperatorT*> pruned_subgraph_ops;
   if (experimental_prune_unreachable_nodes_unconditionally) {
     TF_ASSIGN_OR_RETURN(pruned_subgraph_ops,
                         PruneSubgraph(subgraph, func_inputs, func_outputs));
@@ -1418,7 +1418,7 @@ void AddRegionsForTflWhileOp(mlir::ModuleOp module) {
 }  // namespace
 
 OwningOpRef<mlir::ModuleOp> tflite::FlatBufferToMlir(
-    absl::string_view buffer, MLIRContext* context, Location base_loc,
+    abslx::string_view buffer, MLIRContext* context, Location base_loc,
     bool use_external_constant,
     const std::vector<std::string>& ordered_input_arrays,
     const std::vector<std::string>& ordered_output_arrays,
@@ -1459,7 +1459,7 @@ OwningOpRef<mlir::ModuleOp> tflite::FlatBufferToMlir(
                     mlir::UnitAttr::get(builder.getContext()));
   }
 
-  absl::flat_hash_map<uint32_t, tflite::SignatureDefT*>
+  abslx::flat_hash_map<uint32_t, tflite::SignatureDefT*>
       subgraph_to_signature_map;
   for (int i = 0; i < model->signature_defs.size(); i++) {
     auto* signature_def = model->signature_defs[i].get();

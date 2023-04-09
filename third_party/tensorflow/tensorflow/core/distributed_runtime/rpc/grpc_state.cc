@@ -83,7 +83,7 @@ const char* ToString(Exchange::State state) {
 }
 
 string Exchange::DebugString() const {
-  return absl::StrFormat("%p@%s_%s", this, ToString(state_), debug_string_);
+  return abslx::StrFormat("%p@%s_%s", this, ToString(state_), debug_string_);
 }
 
 void ExchangeQueue::Emplace(const ::grpc::ByteBuffer& request_buf,
@@ -149,7 +149,7 @@ void ExchangeQueue::PopFront() {
 }
 
 string ExchangeQueue::DebugString() const {
-  return absl::StrJoin(exchanges_, ", ", [](string* out, const Exchange& e) {
+  return abslx::StrJoin(exchanges_, ", ", [](string* out, const Exchange& e) {
     out->append(e.DebugString());
   });
 }

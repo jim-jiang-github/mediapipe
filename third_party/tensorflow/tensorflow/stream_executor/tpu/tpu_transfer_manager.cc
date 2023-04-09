@@ -117,7 +117,7 @@ Status TpuTransferManager::TransferBuffersToInfeed(
   buffers_array.reserve(buffers.size());
 
   for (int64_t i = 0; i < buffers.size(); ++i) {
-    absl::Span<const uint32_t> span = buffers[i].const_data<uint32_t>();
+    abslx::Span<const uint32_t> span = buffers[i].const_data<uint32_t>();
     buffers_array.push_back(const_cast<uint32_t*>(span.data()));
     buffers_size.push_back(span.size());
   }
@@ -150,7 +150,7 @@ Status TpuTransferManager::TransferLiteralFromOutfeed(
 }
 
 Status TpuTransferManager::ResetDevices(
-    absl::Span<stream_executor::StreamExecutor* const> executor) {
+    abslx::Span<stream_executor::StreamExecutor* const> executor) {
   StatusHelper status;
   std::vector<SE_StreamExecutor*> se;
   se.reserve(executor.size());
@@ -248,7 +248,7 @@ bool TpuTransferManager::CanShapedBufferBeAccessedNow(
   auto* tpu_executor = down_cast<TpuExecutor*>(executor->implementation());
   XLA_ShapedBuffer c_device_buffer;
   ApiConverter::ToC(device_buffer, &c_device_buffer);
-  absl::Cleanup cleanup = [&c_device_buffer]() {
+  abslx::Cleanup cleanup = [&c_device_buffer]() {
     ApiConverter::Destroy(&c_device_buffer);
   };
   return tpu::ExecutorApiFn()
@@ -269,7 +269,7 @@ bool TpuTransferManager::CanBufferBeAccessedNow(
 
 Status TpuTransferManager::WriteSingleTupleIndexTable(
     stream_executor::Stream* stream,
-    absl::Span<const stream_executor::DeviceMemoryBase> elements,
+    abslx::Span<const stream_executor::DeviceMemoryBase> elements,
     const xla::Shape& shape, stream_executor::DeviceMemoryBase* region) {
   CHECK_GT(elements.size(), 0);
   SE_DeviceMemoryBase* elements_bases =

@@ -57,7 +57,7 @@ class InputStreamManager {
   InputStreamManager() = default;
 
   // Initializes the InputStreamManager.
-  absl::Status Initialize(const std::string& name,
+  abslx::Status Initialize(const std::string& name,
                           const PacketType* packet_type, bool back_edge);
 
   // Returns the stream name.
@@ -67,7 +67,7 @@ class InputStreamManager {
   bool BackEdge() const { return back_edge_; }
 
   // Sets the header Packet.
-  absl::Status SetHeader(const Packet& header);
+  abslx::Status SetHeader(const Packet& header);
 
   const Packet& Header() const { return header_; }
 
@@ -87,13 +87,13 @@ class InputStreamManager {
   //   Timestamp::PostStream(), the packet must be the only packet in the
   //   stream.
   // Violation of any of these conditions causes an error status.
-  absl::Status AddPackets(const std::list<Packet>& container, bool* notify)
+  abslx::Status AddPackets(const std::list<Packet>& container, bool* notify)
       ABSL_LOCKS_EXCLUDED(stream_mutex_);
 
   // Move a list of timestamped packets. Sets "notify" to true if the queue
   // becomes non-empty. Does nothing if the input stream is closed. After the
   // move, all packets in the container must be empty.
-  absl::Status MovePackets(std::list<Packet>* container, bool* notify)
+  abslx::Status MovePackets(std::list<Packet>* container, bool* notify)
       ABSL_LOCKS_EXCLUDED(stream_mutex_);
 
   // Closes the input stream.  This function can be called multiple times.
@@ -104,7 +104,7 @@ class InputStreamManager {
   // empty. Returns an error status if this decreases the bound, unless
   // DisableTimestamps() is called. Does nothing if the input stream is
   // closed.
-  absl::Status SetNextTimestampBound(Timestamp bound, bool* notify)
+  abslx::Status SetNextTimestampBound(Timestamp bound, bool* notify)
       ABSL_LOCKS_EXCLUDED(stream_mutex_);
 
   // Returns the smallest timestamp at which we might see an input in
@@ -186,7 +186,7 @@ class InputStreamManager {
   // Otherwise, the caller must be MovePackets() and Container should be
   // non-const reference.
   template <typename Container>
-  absl::Status AddOrMovePacketsInternal(Container container, bool* notify)
+  abslx::Status AddOrMovePacketsInternal(Container container, bool* notify)
       ABSL_LOCKS_EXCLUDED(stream_mutex_);
 
   // Returns true if the next timestamp bound reaches Timestamp::Done().
@@ -195,7 +195,7 @@ class InputStreamManager {
   // Returns the smallest timestamp at which this stream might see an input.
   Timestamp MinTimestampOrBoundHelper() const;
 
-  mutable absl::Mutex stream_mutex_;
+  mutable abslx::Mutex stream_mutex_;
   std::deque<Packet> queue_ ABSL_GUARDED_BY(stream_mutex_);
   // The number of packets added to queue_.  Used to verify a packet at
   // Timestamp::PostStream() is the only Packet in the stream.

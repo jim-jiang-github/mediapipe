@@ -67,7 +67,7 @@ constexpr char kGraphImportSuccess[] = "kGraphImportSuccess";
 constexpr char kRoundTripSuccess[] = "kRoundTripSuccess";
 constexpr char kRoundTripFailure[] = "kRoundTripFailure";
 
-static inline absl::string_view StringRefToView(llvm::StringRef ref) {
+static inline abslx::string_view StringRefToView(llvm::StringRef ref) {
   return {ref.data(), ref.size()};
 }
 
@@ -305,7 +305,7 @@ Status MlirFunctionOptimizationPass::Run(
   }
 
   GraphExportConfig export_config;
-  absl::flat_hash_set<Node*> control_ret_nodes;
+  abslx::flat_hash_set<Node*> control_ret_nodes;
 
   timings.Reset({kTfMlirCategory, "convert_mlir_to_graph"});
   // Some or all passes are enabled. Convert MLIR module and return back

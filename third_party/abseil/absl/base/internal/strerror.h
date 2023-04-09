@@ -19,7 +19,7 @@
 
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -29,11 +29,11 @@ namespace base_internal {
 // multi-threaded application as the returned string may be changed by calls to
 // `strerror` from another thread.  The many non-stdlib alternatives differ
 // enough in their names, availability, and semantics to justify this wrapper
-// around them.  `errno` will not be modified by a call to `absl::StrError`.
+// around them.  `errno` will not be modified by a call to `abslx::StrError`.
 std::string StrError(int errnum);
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_BASE_INTERNAL_STRERROR_H_

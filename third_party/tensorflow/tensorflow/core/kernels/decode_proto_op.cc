@@ -63,7 +63,7 @@ const bool kFailOnDecodeError = true;
 // Used to store the default value of a protocol message field, casted to the
 // type of the output tensor.
 //
-// TODO(paskin): Use absl::variant once TensorFlow gets absl dependencies.
+// TODO(paskin): Use abslx::variant once TensorFlow gets absl dependencies.
 struct DefaultValue {
   DataType dtype = DataType::DT_INVALID;
   union Value {
@@ -630,7 +630,7 @@ class DecodeProtoOp : public OpKernel {
     int field_index = 0;
     std::vector<const FieldDescriptor*> field_descs;
     std::vector<const FieldDescriptor*> exts;
-    absl::flat_hash_map<string, const FieldDescriptor*> ext_name_to_field;
+    abslx::flat_hash_map<string, const FieldDescriptor*> ext_name_to_field;
     std::vector<const FieldDescriptor*>::iterator ext_it = exts.begin();
     for (const string& name : field_names) {
       auto fd = message_desc->FindFieldByName(name);
@@ -845,7 +845,7 @@ class DecodeProtoOp : public OpKernel {
       counters.emplace_back(&field_sizes[i]);
     }
 
-    Status st = Collect(&input, absl::MakeSpan(counters));
+    Status st = Collect(&input, abslx::MakeSpan(counters));
     if (st.ok() && !input.ConsumedEntireMessage()) {
       st = errors::DataLoss("CountFields: Failed to consume entire buffer");
     }
@@ -934,7 +934,7 @@ class DecodeProtoOp : public OpKernel {
       // Fill in output tensors from the wire.
       CodedInputStream input(reinterpret_cast<const uint8*>(buf.c_str()),
                              buf.size());
-      Status st = Collect(&input, absl::MakeSpan(collectors));
+      Status st = Collect(&input, abslx::MakeSpan(collectors));
       if (st.ok() && !input.ConsumedEntireMessage()) {
         st = errors::DataLoss(
             "AccumulateFields: Failed to consume entire buffer");
@@ -959,7 +959,7 @@ class DecodeProtoOp : public OpKernel {
   // Traverses a serialized protobuf, dispatching values to the collectors.
   template <class CollectorClass>
   Status Collect(CodedInputStream* input,
-                 absl::Span<CollectorClass> collectors) {
+                 abslx::Span<CollectorClass> collectors) {
     // At the beginning of each loop, the last field number that was seen,
     // regardless of whether it was collected or not, or -1 if no field has
     // been seen before.

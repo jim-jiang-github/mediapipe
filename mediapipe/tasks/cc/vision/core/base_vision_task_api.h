@@ -49,12 +49,12 @@ class BaseVisionTaskApi : public tasks::core::BaseTaskApi {
   // A synchronous method to process single image inputs.
   // The call blocks the current thread until a failure status or a successful
   // result is returned.
-  absl::StatusOr<tasks::core::PacketMap> ProcessImageData(
+  abslx::StatusOr<tasks::core::PacketMap> ProcessImageData(
       tasks::core::PacketMap inputs) {
     if (running_mode_ != RunningMode::IMAGE) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
-          absl::StrCat("Task is not initialized with the image mode. Current "
+          abslx::StatusCode::kInvalidArgument,
+          abslx::StrCat("Task is not initialized with the image mode. Current "
                        "running mode:",
                        GetRunningModeName(running_mode_)),
           MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError);
@@ -65,12 +65,12 @@ class BaseVisionTaskApi : public tasks::core::BaseTaskApi {
   // A synchronous method to process continuous video frames.
   // The call blocks the current thread until a failure status or a successful
   // result is returned.
-  absl::StatusOr<tasks::core::PacketMap> ProcessVideoData(
+  abslx::StatusOr<tasks::core::PacketMap> ProcessVideoData(
       tasks::core::PacketMap inputs) {
     if (running_mode_ != RunningMode::VIDEO) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
-          absl::StrCat("Task is not initialized with the video mode. Current "
+          abslx::StatusCode::kInvalidArgument,
+          abslx::StrCat("Task is not initialized with the video mode. Current "
                        "running mode:",
                        GetRunningModeName(running_mode_)),
           MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError);
@@ -80,11 +80,11 @@ class BaseVisionTaskApi : public tasks::core::BaseTaskApi {
 
   // An asynchronous method to send live stream data to the runner. The results
   // will be available in the user-defined results callback.
-  absl::Status SendLiveStreamData(tasks::core::PacketMap inputs) {
+  abslx::Status SendLiveStreamData(tasks::core::PacketMap inputs) {
     if (running_mode_ != RunningMode::LIVE_STREAM) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
-          absl::StrCat("Task is not initialized with the live stream mode. "
+          abslx::StatusCode::kInvalidArgument,
+          abslx::StrCat("Task is not initialized with the live stream mode. "
                        "Current running mode:",
                        GetRunningModeName(running_mode_)),
           MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError);
@@ -97,7 +97,7 @@ class BaseVisionTaskApi : public tasks::core::BaseTaskApi {
   // returns a default NormalizedRect covering the whole image with rotation set
   // to 0. If 'roi_allowed' is false, an error will be returned if the input
   // ImageProcessingOptions has its 'region_or_interest' field set.
-  static absl::StatusOr<mediapipe::NormalizedRect> ConvertToNormalizedRect(
+  static abslx::StatusOr<mediapipe::NormalizedRect> ConvertToNormalizedRect(
       std::optional<ImageProcessingOptions> options, bool roi_allowed = true) {
     mediapipe::NormalizedRect normalized_rect;
     normalized_rect.set_rotation(0);
@@ -111,7 +111,7 @@ class BaseVisionTaskApi : public tasks::core::BaseTaskApi {
 
     if (options->rotation_degrees % 90 != 0) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
+          abslx::StatusCode::kInvalidArgument,
           "Expected rotation to be a multiple of 90°.",
           MediaPipeTasksStatus::kImageProcessingInvalidArgumentError);
     }
@@ -121,20 +121,20 @@ class BaseVisionTaskApi : public tasks::core::BaseTaskApi {
     if (options->region_of_interest.has_value()) {
       if (!roi_allowed) {
         return CreateStatusWithPayload(
-            absl::StatusCode::kInvalidArgument,
+            abslx::StatusCode::kInvalidArgument,
             "This task doesn't support region-of-interest.",
             MediaPipeTasksStatus::kImageProcessingInvalidArgumentError);
       }
       auto& roi = *options->region_of_interest;
       if (roi.left >= roi.right || roi.top >= roi.bottom) {
         return CreateStatusWithPayload(
-            absl::StatusCode::kInvalidArgument,
+            abslx::StatusCode::kInvalidArgument,
             "Expected RectF with left < right and top < bottom.",
             MediaPipeTasksStatus::kImageProcessingInvalidArgumentError);
       }
       if (roi.left < 0 || roi.top < 0 || roi.right > 1 || roi.bottom > 1) {
         return CreateStatusWithPayload(
-            absl::StatusCode::kInvalidArgument,
+            abslx::StatusCode::kInvalidArgument,
             "Expected RectF values to be in [0,1].",
             MediaPipeTasksStatus::kImageProcessingInvalidArgumentError);
       }

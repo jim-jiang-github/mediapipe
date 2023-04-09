@@ -2011,7 +2011,7 @@ ENTRY test {
       GmockMatch(
           m::Op(&root).WithOpcode(HloOpcode::kTuple).WithNumOperands(24)));
   for (int i = 0; i < root->operand_count(); i++) {
-    SCOPED_TRACE(absl::StrCat("operand ", i));
+    SCOPED_TRACE(abslx::StrCat("operand ", i));
     const HloInstruction* operand = root->operand(i);
     ASSERT_EQ(operand->opcode(), HloOpcode::kParameter);
     EXPECT_EQ(operand->parameter_number(), i % 12);
@@ -2098,7 +2098,7 @@ ENTRY test {
       GmockMatch(
           m::Op(&root).WithOpcode(HloOpcode::kTuple).WithNumOperands(24)));
   for (int i = 0; i < root->operand_count(); i++) {
-    SCOPED_TRACE(absl::StrCat("operand ", i));
+    SCOPED_TRACE(abslx::StrCat("operand ", i));
     const HloInstruction* operand = root->operand(i);
     ASSERT_EQ(operand->opcode(), HloOpcode::kParameter);
     EXPECT_EQ(operand->parameter_number(), i % 12);
@@ -4205,22 +4205,22 @@ TEST_F(AlgebraicSimplifierTest, OrFalse2) {
 // Used for TEST_Ps that test merging (or not) of a kPad instruction into a
 // convolution's Window.
 struct ConvPaddingTestcase {
-  ConvPaddingTestcase(absl::string_view padding,
-                      absl::string_view orig_conv_window,
-                      absl::string_view expected_conv_window)
+  ConvPaddingTestcase(abslx::string_view padding,
+                      abslx::string_view orig_conv_window,
+                      abslx::string_view expected_conv_window)
       : ConvPaddingTestcase(padding, orig_conv_window, expected_conv_window,
                             /*pad_value=*/0) {}
 
-  ConvPaddingTestcase(absl::string_view padding,
-                      absl::string_view orig_conv_window,
-                      absl::string_view expected_conv_window, float pad_value)
+  ConvPaddingTestcase(abslx::string_view padding,
+                      abslx::string_view orig_conv_window,
+                      abslx::string_view expected_conv_window, float pad_value)
       : padding(padding),
         orig_conv_window(orig_conv_window),
         expected_conv_window(expected_conv_window),
         pad_value(pad_value) {}
 
   std::string ToString() const {
-    return absl::StrFormat(
+    return abslx::StrFormat(
         "padding=%s, orig_conv_window=%s, expected_conv_window=%s, "
         "pad_value=%f",
         padding, orig_conv_window, expected_conv_window, pad_value);
@@ -4314,7 +4314,7 @@ TEST_P(ConvInputPaddingTest, DoTest) {
   ConvolutionDimensionNumbers dnums =
       ParseConvolutionDimensionNumbers("bf01_io01->bf01").ValueOrDie();
   Window window =
-      ParseWindow(absl::StrCat("size=3x3 ", testcase.orig_conv_window))
+      ParseWindow(abslx::StrCat("size=3x3 ", testcase.orig_conv_window))
           .ValueOrDie();
   builder.AddInstruction(HloInstruction::CreateConvolve(
       ShapeInference::InferConvolveShape(
@@ -4338,7 +4338,7 @@ TEST_P(ConvInputPaddingTest, DoTest) {
     ASSERT_THAT(conv,
                 GmockMatch(m::Convolution(m::Parameter(), m::Parameter())));
     EXPECT_EQ(window_util::ToString(conv->window()),
-              absl::StrCat("size=3x3 ", testcase.expected_conv_window));
+              abslx::StrCat("size=3x3 ", testcase.expected_conv_window));
   }
 }
 
@@ -4423,7 +4423,7 @@ TEST_P(ConvFilterPaddingTest, DoIt) {
 
   ConvolutionDimensionNumbers dnums =
       ParseConvolutionDimensionNumbers("bf01_io01->bf01").ValueOrDie();
-  Window window = ParseWindow(absl::StrFormat("size=%dx%d %s",
+  Window window = ParseWindow(abslx::StrFormat("size=%dx%d %s",
                                               rhs_pad->shape().dimensions(2),
                                               rhs_pad->shape().dimensions(3),
                                               testcase.orig_conv_window))
@@ -4458,7 +4458,7 @@ TEST_P(ConvFilterPaddingTest, DoIt) {
     ASSERT_THAT(conv,
                 GmockMatch(m::Convolution(m::Parameter(), m::Parameter())));
     EXPECT_EQ(window_util::ToString(conv->window()),
-              absl::StrFormat("size=%dx%d %s",
+              abslx::StrFormat("size=%dx%d %s",
                               conv->operand(1)->shape().dimensions(2),
                               conv->operand(1)->shape().dimensions(3),
                               testcase.expected_conv_window));
@@ -4569,7 +4569,7 @@ TEST_F(AlgebraicSimplifierTest, ConvertConvToMatmul) {
       }
     }
 
-    auto make_shape = [](absl::Span<const int64_t> dims,
+    auto make_shape = [](abslx::Span<const int64_t> dims,
                          bool minor_to_major_layout) {
       if (minor_to_major_layout) {
         return ShapeUtil::MakeShapeWithLayout(F32, dims, {0, 1, 2, 3});
@@ -4613,8 +4613,8 @@ TEST_F(AlgebraicSimplifierTest, ConvertConvToMatmul) {
         root->operand(0)->opcode() == HloOpcode::kDot) {
       auto lhs_shape = root->operand(0)->operand(0)->shape();
       auto rhs_shape = root->operand(0)->operand(1)->shape();
-      return absl::StrCat(absl::StrJoin(lhs_shape.dimensions(), "x"), " DOT ",
-                          absl::StrJoin(rhs_shape.dimensions(), "x"));
+      return abslx::StrCat(abslx::StrJoin(lhs_shape.dimensions(), "x"), " DOT ",
+                          abslx::StrJoin(rhs_shape.dimensions(), "x"));
     }
     return "UNEXPECTED CHANGE";
   };
@@ -5682,9 +5682,9 @@ struct PadReduceWindowEffectiveBroadcastCase {
   bool should_become_broadcast;
 
   std::string ToTestCaseName() const {
-    return absl::StrCat(absl::StrJoin(input_spatials, ","), ";",
-                        absl::StrJoin(symmetric_pad_spatials, ","), ";",
-                        absl::StrJoin(reduce_window_spatials, ","), ";",
+    return abslx::StrCat(abslx::StrJoin(input_spatials, ","), ";",
+                        abslx::StrJoin(symmetric_pad_spatials, ","), ";",
+                        abslx::StrJoin(reduce_window_spatials, ","), ";",
                         prepend_a, ";", should_become_broadcast);
   }
 };
@@ -5704,7 +5704,7 @@ TEST_P(PadReduceWindowEffectiveBroadcastTest, DoIt) {
 
   // a and b are parallel bounds we can either turn into a B F S0 S1 or
   // `B S0 S1 F` kind of pattern.
-  auto decorate_spatials = [&param](absl::Span<const int64_t> spatials,
+  auto decorate_spatials = [&param](abslx::Span<const int64_t> spatials,
                                     int64_t a, int64_t b) {
     std::vector<int64_t> result;
     if (param.prepend_a) {
@@ -7642,7 +7642,7 @@ TEST_F(AlgebraicSimplifierTest, BroadcastCompareSimplification) {
 
   // Numerically unstable transformation shouldn't be applied to floating types.
   std::string module_string_f32 =
-      absl::StrReplaceAll(module_string, {{"s32", "f32"}});
+      abslx::StrReplaceAll(module_string, {{"s32", "f32"}});
   ASSERT_FALSE(AlgebraicSimplifier(default_options_).Run(m.get()).ValueOrDie());
 }
 
@@ -8022,7 +8022,7 @@ ENTRY %main {
 )";
   TF_ASSERT_OK_AND_ASSIGN(auto m, ParseAndReturnVerifiedModule(kModuleStr));
   ASSERT_TRUE(AlgebraicSimplifier(default_options_).Run(m.get()).ValueOrDie());
-  int64_t reduce_count = absl::c_count_if(
+  int64_t reduce_count = abslx::c_count_if(
       m->entry_computation()->instructions(), [](const HloInstruction* hlo) {
         return hlo->opcode() == HloOpcode::kReduce;
       });
@@ -8083,7 +8083,7 @@ ENTRY %main {
 )";
   TF_ASSERT_OK_AND_ASSIGN(auto m, ParseAndReturnVerifiedModule(kModuleStr));
   ASSERT_TRUE(AlgebraicSimplifier(default_options_).Run(m.get()).ValueOrDie());
-  int64_t reduce_count = absl::c_count_if(
+  int64_t reduce_count = abslx::c_count_if(
       m->entry_computation()->instructions(), [](const HloInstruction* hlo) {
         return hlo->opcode() == HloOpcode::kReduce;
       });

@@ -43,7 +43,7 @@ constexpr float kConvGPUFP16Threshold = 0.5;
 
 struct MutableNodeViewFormatter {
   void operator()(std::string* out, utils::MutableNodeView* node_view) const {
-    absl::StrAppend(out, node_view->node()->name());
+    abslx::StrAppend(out, node_view->node()->name());
   }
 };
 
@@ -70,7 +70,7 @@ inline GpuStats GetNumGPUs(const Cluster& cluster) {
       continue;
     }
     double compute_capability = 0.0;
-    if (absl::SimpleAtod(compute_capability_it->second, &compute_capability)) {
+    if (abslx::SimpleAtod(compute_capability_it->second, &compute_capability)) {
       if (compute_capability >= 7.0) gpu_stats.num_voltas++;
       if (compute_capability >= 8.0) gpu_stats.num_amperes++;
     }
@@ -79,7 +79,7 @@ inline GpuStats GetNumGPUs(const Cluster& cluster) {
 }
 
 inline bool NumConvOnDeviceWithDataTypeOverThreshold(
-    const TransposeContext& context, absl::string_view device,
+    const TransposeContext& context, abslx::string_view device,
     const DataType& data_type) {
   int num_conv_gpu = 0;
   int num_conv_gpu_fp16 = 0;
@@ -93,8 +93,8 @@ inline bool NumConvOnDeviceWithDataTypeOverThreshold(
     string device_type;
     string task;
     if (!DeviceNameUtils::SplitDeviceName(device_name, &task, &device_type) ||
-        !absl::StrContains(absl::AsciiStrToLower(device_type),
-                           absl::AsciiStrToLower(device))) {
+        !abslx::StrContains(abslx::AsciiStrToLower(device_type),
+                           abslx::AsciiStrToLower(device))) {
       continue;
     }
     num_conv_gpu++;
@@ -154,7 +154,7 @@ Status ExpandLayoutSensitiveOp(TransposeContext* context,
       if (transposer == nullptr) {
         return Status(
             error::NOT_FOUND,
-            absl::StrCat(
+            abslx::StrCat(
                 "Layout sensitive operation should have a transposer. Node: ",
                 node_def->DebugString()));
       }
@@ -175,7 +175,7 @@ Status ExpandLayoutAgnosticOp(TransposeContext* context,
       if (transposer == nullptr) {
         return Status(
             error::NOT_FOUND,
-            absl::StrCat(
+            abslx::StrCat(
                 "Layout agnostic operation should have a transposer. Node: ",
                 node_def->DebugString()));
       }
@@ -300,7 +300,7 @@ Status EraseCancellableNodesAroundPad(TransposeContext* context) {
   utils::MutableGraphView* graph_view = context->graph_view.get();
   utils::Mutation* mutation = graph_view->GetMutationBuilder();
 
-  absl::flat_hash_set<utils::MutableNodeView*> cancelled_transposes;
+  abslx::flat_hash_set<utils::MutableNodeView*> cancelled_transposes;
 
   const int num_nodes = graph_view->NumNodes();
   for (int i = 0; i < num_nodes; ++i) {
@@ -370,16 +370,16 @@ Status EraseCancellableNodesAroundPad(TransposeContext* context) {
     VLOG(0) << "Cancel Transpose nodes around Pad:"
             << " transpose_before=" << transpose_before->node()->name()
             << " pad=" << pad->node()->name() << " transpose_after="
-            << absl::StrJoin(pad_fanout_transposes, ",",
+            << abslx::StrJoin(pad_fanout_transposes, ",",
                              MutableNodeViewFormatter());
 
     // Permute paddings in place according to permutation in second transpose.
-    auto permutation_s = absl::Span<int32>(permute_t.flat<int32>().data(),
+    auto permutation_s = abslx::Span<int32>(permute_t.flat<int32>().data(),
                                            permute_t.NumElements());
-    auto paddings_s = absl::Span<int32>(paddings_t.flat<int32>().data(),
+    auto paddings_s = abslx::Span<int32>(paddings_t.flat<int32>().data(),
                                         paddings_t.NumElements());
     TF_RETURN_IF_ERROR(
-        PermuteDouble(absl::StrCat("paddings in ", pad->GetName()),
+        PermuteDouble(abslx::StrCat("paddings in ", pad->GetName()),
                       permutation_s, &paddings_s));
 
     // Update paddings constant value with a permuted tensor.
@@ -398,7 +398,7 @@ Status EraseCancellableNodesAroundPad(TransposeContext* context) {
     };
 
     transpose_to_identity(transpose_before);
-    absl::c_for_each(pad_fanout_transposes, transpose_to_identity);
+    abslx::c_for_each(pad_fanout_transposes, transpose_to_identity);
   }
 
   return mutation->Apply();
@@ -437,7 +437,7 @@ Status GenericLayoutOptimizer::Optimize(Cluster* cluster,
       enforced_layout_ != "NCHW") {
     return Status(
         tensorflow::error::Code::INVALID_ARGUMENT,
-        absl::StrCat("Invalid value for enforced_layout: ", enforced_layout_,
+        abslx::StrCat("Invalid value for enforced_layout: ", enforced_layout_,
                      ". Supported layouts: 'NHWC', 'NCHW'."));
   }
   const auto gpu_stats = GetNumGPUs(*cluster);

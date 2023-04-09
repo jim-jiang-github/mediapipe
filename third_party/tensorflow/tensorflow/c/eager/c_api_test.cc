@@ -554,11 +554,11 @@ TEST(CAPI, TensorHandleDevices) {
   TFE_TensorHandle* hcpu = TestMatrixTensorHandle(ctx);
   const char* device_name = TFE_TensorHandleDeviceName(hcpu, status.get());
   ASSERT_EQ(TF_OK, TF_GetCode(status.get())) << TF_Message(status.get());
-  ASSERT_TRUE(absl::StrContains(device_name, "CPU:0")) << device_name;
+  ASSERT_TRUE(abslx::StrContains(device_name, "CPU:0")) << device_name;
   const char* backing_device_name =
       TFE_TensorHandleBackingDeviceName(hcpu, status.get());
   ASSERT_EQ(TF_OK, TF_GetCode(status.get())) << TF_Message(status.get());
-  ASSERT_TRUE(absl::StrContains(backing_device_name, "CPU:0"))
+  ASSERT_TRUE(abslx::StrContains(backing_device_name, "CPU:0"))
       << backing_device_name;
 
   // Disable the test if no GPU is present.
@@ -579,13 +579,13 @@ TEST(CAPI, TensorHandleDevices) {
     // .device of shape is GPU since the op is executed on GPU
     device_name = TFE_TensorHandleDeviceName(retvals[0], status.get());
     ASSERT_EQ(TF_OK, TF_GetCode(status.get())) << TF_Message(status.get());
-    ASSERT_TRUE(absl::StrContains(device_name, "GPU:0")) << device_name;
+    ASSERT_TRUE(abslx::StrContains(device_name, "GPU:0")) << device_name;
 
     // .backing_device of shape is CPU since the tensor is backed by CPU
     backing_device_name =
         TFE_TensorHandleBackingDeviceName(retvals[0], status.get());
     ASSERT_EQ(TF_OK, TF_GetCode(status.get())) << TF_Message(status.get());
-    ASSERT_TRUE(absl::StrContains(backing_device_name, "CPU:0"))
+    ASSERT_TRUE(abslx::StrContains(backing_device_name, "CPU:0"))
         << backing_device_name;
 
     TFE_DeleteOp(shape_op);

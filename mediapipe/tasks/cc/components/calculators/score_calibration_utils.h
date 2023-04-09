@@ -27,9 +27,9 @@ namespace tasks {
 // transformation type, default threshold and score calibration AssociatedFile
 // contents, as specified in `TENSOR_AXIS_SCORE_CALIBRATION`:
 // https://github.com/google/mediapipe/blob/master/mediapipe/tasks/metadata/metadata_schema.fbs
-absl::Status ConfigureScoreCalibration(
+abslx::Status ConfigureScoreCalibration(
     tflite::ScoreTransformationType score_transformation, float default_score,
-    absl::string_view score_calibration_file,
+    abslx::string_view score_calibration_file,
     ScoreCalibrationCalculatorOptions* options);
 
 }  // namespace tasks

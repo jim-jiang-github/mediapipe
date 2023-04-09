@@ -38,23 +38,23 @@ class TfrtSavedModelMLIRImportInput : public SavedModelMLIRImportInput {
       std::unique_ptr<TfrtGraphExecutionState> graph_execution_state);
 
   StatusOr<const tensorflow::Graph*> GetSubGraph(
-      absl::string_view name, GraphImportConfig& graph_import_config) override;
+      abslx::string_view name, GraphImportConfig& graph_import_config) override;
 
   // Return the time used by grappler.
-  absl::Duration GetGrapplerDuration() const { return grappler_duration_; }
+  abslx::Duration GetGrapplerDuration() const { return grappler_duration_; }
 
   // Return the time used by functionalization.
-  absl::Duration GetFunctionalizationDuration() const {
+  abslx::Duration GetFunctionalizationDuration() const {
     return functionalization_duration_;
   }
 
  private:
   std::unique_ptr<TfrtGraphExecutionState> graph_execution_state_;
-  absl::flat_hash_map<std::string, std::unique_ptr<tensorflow::Graph>>
+  abslx::flat_hash_map<std::string, std::unique_ptr<tensorflow::Graph>>
       optimized_graphs_;
 
-  absl::Duration functionalization_duration_;
-  absl::Duration grappler_duration_;
+  abslx::Duration functionalization_duration_;
+  abslx::Duration grappler_duration_;
 };
 
 }  // namespace tfrt_stub

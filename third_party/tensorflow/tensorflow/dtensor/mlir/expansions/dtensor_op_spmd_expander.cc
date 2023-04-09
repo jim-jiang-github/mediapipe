@@ -62,7 +62,7 @@ Status ValidateSendRecvLayoutConfiguration(mlir::TF::DTensorSend dtensor_send,
   // configuration has already been verified.
   if (!dtensor_send || !dtensor_recv) return OkStatus();
 
-  TF_ASSIGN_OR_RETURN(const absl::optional<Layout> send_layout_or_null,
+  TF_ASSIGN_OR_RETURN(const abslx::optional<Layout> send_layout_or_null,
                       ExtractLayoutFromOperand(dtensor_send.input()));
 
   if (!send_layout_or_null.has_value())
@@ -128,7 +128,7 @@ bool SendRecvOpUsesXla(const Mesh& send_mesh, const Mesh& recv_mesh) {
 // Takes relayout which may have kMatch dimensions and uses it to mask input.
 // Here source_layout
 StatusOr<Layout> MergeLayouts(
-    const absl::flat_hash_set<std::string>& used_mesh_dimensions,
+    const abslx::flat_hash_set<std::string>& used_mesh_dimensions,
     const Layout& mask_layout, const Layout& target_layout) {
   std::vector<std::string> sharding_specs(mask_layout.sharding_spec_strs());
   for (int i = 0; i < target_layout.rank(); ++i) {
@@ -149,7 +149,7 @@ StatusOr<llvm::DenseMap<int, Layout>> ComputeRelayoutLayout(
   TF_ASSIGN_OR_RETURN(const Layout mask_layout,
                       Layout::FromString(layout_attr.str()));
 
-  absl::flat_hash_set<std::string> used_dimensions;
+  abslx::flat_hash_set<std::string> used_dimensions;
   bool match_present = false;
   for (const std::string& sharding_spec : mask_layout.sharding_spec_strs()) {
     if (sharding_spec == Layout::kMatch)
@@ -304,7 +304,7 @@ StatusOr<mlir::Operation*> DTensorSendSPMDExpander::ExpandOp(
   // the tensor data across mesh.
   auto send_cluster =
       dtensor_send->getParentOfType<mlir::tf_device::ClusterOp>();
-  TF_ASSIGN_OR_RETURN(absl::optional<Mesh> mesh,
+  TF_ASSIGN_OR_RETURN(abslx::optional<Mesh> mesh,
                       ExtractDeviceMeshFromOp(send_cluster));
   if (!mesh.has_value())
     return errors::InvalidArgument(
@@ -486,7 +486,7 @@ StatusOr<mlir::Operation*> DTensorRecvSPMDExpander::ExpandOp(
       // Broadcast the received output to all TPU cores.
       mlir::Value if_output = recv_if->getResult(0);
       builder.setInsertionPointAfterValue(if_output);
-      absl::flat_hash_set<std::string> reduced_dims;
+      abslx::flat_hash_set<std::string> reduced_dims;
       for (const auto& mesh_dim : recv_mesh.dims())
         reduced_dims.insert(mesh_dim.name);
 

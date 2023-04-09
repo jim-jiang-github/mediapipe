@@ -524,29 +524,29 @@ int64_t MaxVLogLevelFromEnv();
 // instance will be called from whichever thread is performing a logging
 // operation.
 class TFLogEntry {
-  static absl::LogSeverity AsAbslLogSeverity(int severity) {
-    return static_cast<absl::LogSeverity>(severity);
+  static abslx::LogSeverity AsAbslLogSeverity(int severity) {
+    return static_cast<abslx::LogSeverity>(severity);
   }
 
  public:
-  explicit TFLogEntry(int severity, absl::string_view message)
+  explicit TFLogEntry(int severity, abslx::string_view message)
       : severity_(AsAbslLogSeverity(severity)), message_(message) {}
 
-  explicit TFLogEntry(int severity, absl::string_view fname, int line,
-                      absl::string_view message)
+  explicit TFLogEntry(int severity, abslx::string_view fname, int line,
+                      abslx::string_view message)
       : severity_(AsAbslLogSeverity(severity)),
         fname_(fname),
         line_(line),
         message_(message) {}
 
-  absl::LogSeverity log_severity() const { return severity_; }
+  abslx::LogSeverity log_severity() const { return severity_; }
   std::string FName() const { return fname_; }
   int Line() const { return line_; }
   std::string ToString() const { return message_; }
-  absl::string_view text_message() const { return message_; }
+  abslx::string_view text_message() const { return message_; }
 
  private:
-  const absl::LogSeverity severity_;
+  const abslx::LogSeverity severity_;
   const std::string fname_;
   int line_ = -1;
   const std::string message_;

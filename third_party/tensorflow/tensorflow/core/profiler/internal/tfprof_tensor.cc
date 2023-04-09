@@ -25,7 +25,7 @@ void TFProfTensor::Display(string* formatted_str,
   if (formatted_str) {
     if (formatted_str_.length() >= kTFProfTenosrMaxDisplayLen) {
       *formatted_str =
-          absl::StrCat(formatted_str_, "...omitted from display\n\n");
+          abslx::StrCat(formatted_str_, "...omitted from display\n\n");
     } else {
       *formatted_str = formatted_str_;
     }
@@ -71,7 +71,7 @@ void TFProfTensor::Build() {
       break;
     }
     default: {
-      absl::FPrintF(stderr, "Not Supported type %d\n", tensor_->dtype());
+      abslx::FPrintF(stderr, "Not Supported type %d\n", tensor_->dtype());
       break;
     }
   }

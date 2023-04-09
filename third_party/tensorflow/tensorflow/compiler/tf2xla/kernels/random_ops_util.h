@@ -27,7 +27,7 @@ namespace tensorflow {
 // `bit_generator` and converted to the requested data type and range. This
 // routine requires 2 32-bit integer seeds and currently only supports 'shape's
 // of type F32, S32 and S64.
-xla::XlaOp StatelessRngUniform(absl::string_view device_type_string,
+xla::XlaOp StatelessRngUniform(abslx::string_view device_type_string,
                                xla::XlaOp seeds, const xla::Shape& shape,
                                xla::XlaOp minval, xla::XlaOp maxval);
 

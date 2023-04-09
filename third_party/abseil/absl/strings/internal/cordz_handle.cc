@@ -17,11 +17,11 @@
 
 #include "absl/base/internal/raw_logging.h"  // For ABSL_RAW_CHECK
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 
-ABSL_CONST_INIT CordzHandle::Queue CordzHandle::global_queue_(absl::kConstInit);
+ABSL_CONST_INIT CordzHandle::Queue CordzHandle::global_queue_(abslx::kConstInit);
 
 CordzHandle::CordzHandle(bool is_snapshot) : is_snapshot_(is_snapshot) {
   if (is_snapshot) {
@@ -40,7 +40,7 @@ CordzHandle::~CordzHandle() {
   if (is_snapshot_) {
     std::vector<CordzHandle*> to_delete;
     {
-      absl::MutexLock lock(&queue_->mutex);
+      abslx::MutexLock lock(&queue_->mutex);
       CordzHandle* next = dq_next_;
       if (dq_prev_ == nullptr) {
         // We were head of the queue, delete every CordzHandle until we reach
@@ -128,4 +128,4 @@ CordzHandle::DiagnosticsGetSafeToInspectDeletedHandles() {
 
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -300,7 +300,7 @@ xla::StatusOr<std::vector<RefPtr<XRTTupleAllocation>>> GetInputTupleAllocations(
 
 Status RebuildOutputAliases(
     const RefPtr<XRTTupleAllocation>& output_tuple,
-    absl::Span<const RefPtr<XRTTupleAllocation>> input_tuples,
+    abslx::Span<const RefPtr<XRTTupleAllocation>> input_tuples,
     const xla::HloInputOutputAliasConfig& input_output_alias) {
   auto alias_function =
       [&](const xla::ShapeIndex& output_index,
@@ -314,7 +314,7 @@ Status RebuildOutputAliases(
 
 xla::StatusOr<std::vector<xla::ExecutionInput>> GetArgumentsBuffers(
     const xla::HloInputOutputAliasConfig& input_output_alias,
-    absl::Span<const RefPtr<XRTTupleAllocation>> input_tuples,
+    abslx::Span<const RefPtr<XRTTupleAllocation>> input_tuples,
     const std::vector<bool>& input_is_dynamic, bool release_inputs) {
   auto is_dynamic = [&](size_t arg) {
     return arg < input_is_dynamic.size() && input_is_dynamic[arg];

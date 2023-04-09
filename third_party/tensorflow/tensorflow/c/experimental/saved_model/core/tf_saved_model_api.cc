@@ -77,7 +77,7 @@ namespace {
 const TrackableObjectGraph::TrackableObject::SerializedTensor*
 FindSerializedTensorInTrackable(
     const TrackableObjectGraph::TrackableObject& trackable_object,
-    absl::string_view name) {
+    abslx::string_view name) {
   for (const auto& maybe_serialized_tensor : trackable_object.attributes()) {
     if (maybe_serialized_tensor.name() == name) {
       return &maybe_serialized_tensor;
@@ -175,7 +175,7 @@ Status InitializeAllResources(const RevivedObjects& revived) {
 
 Status TFSavedModelAPI::GetFunction(const std::string& function_path,
                                     ConcreteFunction** function) {
-  absl::optional<int> node =
+  abslx::optional<int> node =
       internal::FindNodeAtPath(function_path, bundle_.saved_object_graph());
   if (!node.has_value()) {
     return errors::NotFound("No saved object found at path ", function_path);
@@ -191,7 +191,7 @@ Status TFSavedModelAPI::GetFunction(const std::string& function_path,
 
 Status TFSavedModelAPI::GetFunctions(
     int node_id,
-    absl::flat_hash_map<std::string, ConcreteFunction*>* functions) {
+    abslx::flat_hash_map<std::string, ConcreteFunction*>* functions) {
   const auto& nodes = bundle_.saved_object_graph().nodes();
   if (node_id >= nodes.size()) {
     return errors::OutOfRange(
@@ -232,7 +232,7 @@ Status TFSavedModelAPI::GetSignatureDefFunction(
 
 Status TFSavedModelAPI::GetVariable(const std::string& variable_path,
                                     Variable** variable) {
-  absl::optional<int> node =
+  abslx::optional<int> node =
       internal::FindNodeAtPath(variable_path, bundle_.saved_object_graph());
   if (!node.has_value()) {
     return errors::NotFound("No saved object found at path ", variable_path);
@@ -258,7 +258,7 @@ TFSavedModelAPI::TFSavedModelAPI(const std::string& directory,
 
 Status TFSavedModelAPI::Load(
     const std::string& directory,
-    const absl::optional<std::unordered_set<std::string>>& tags,
+    const abslx::optional<std::unordered_set<std::string>>& tags,
     ImmediateExecutionContext* context, std::unique_ptr<TFSavedModelAPI>* out) {
   // TODO(bmzhao): Add support for loading a TF1 SavedModel.
   if (tags) {

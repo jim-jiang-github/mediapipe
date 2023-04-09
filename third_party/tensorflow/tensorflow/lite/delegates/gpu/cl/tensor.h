@@ -53,7 +53,7 @@ class Tensor : public GPUObject, public GpuSpatialTensor {
 
   ~Tensor() override { Release(); }
 
-  absl::Status GetGPUResources(const GPUObjectDescriptor* obj_ptr,
+  abslx::Status GetGPUResources(const GPUObjectDescriptor* obj_ptr,
                                GPUResourcesWithValue* resources) const override;
 
   int Width() const override { return descriptor_.GetBHWDCShape().w; }
@@ -80,21 +80,21 @@ class Tensor : public GPUObject, public GpuSpatialTensor {
   // memory ptr.
   cl_mem GetMemoryPtrForWriting() const;
 
-  absl::Status CreateFromDescriptor(const TensorDescriptor& desc,
+  abslx::Status CreateFromDescriptor(const TensorDescriptor& desc,
                                     CLContext* context);
-  absl::Status UploadDescriptorData(const TensorDescriptor& desc,
+  abslx::Status UploadDescriptorData(const TensorDescriptor& desc,
                                     CLCommandQueue* queue);
-  absl::Status ToDescriptor(TensorDescriptor* desc,
+  abslx::Status ToDescriptor(TensorDescriptor* desc,
                             CLCommandQueue* queue) const;
 
  private:
-  friend absl::Status CreateTensorSharedImage2DBuffer(
+  friend abslx::Status CreateTensorSharedImage2DBuffer(
       const CLContext& context, cl_mem memory,
       const TensorDescriptor& descriptor, int width_pixel_alignment,
       Tensor* result);
 
-  absl::Status WriteData(const void* ptr, CLCommandQueue* queue);
-  absl::Status ReadData(void* ptr, CLCommandQueue* queue) const;
+  abslx::Status WriteData(const void* ptr, CLCommandQueue* queue);
+  abslx::Status ReadData(void* ptr, CLCommandQueue* queue) const;
 
   void Release();
 
@@ -109,18 +109,18 @@ class Tensor : public GPUObject, public GpuSpatialTensor {
 
 using TensorPtr = std::shared_ptr<Tensor>;
 
-absl::Status AllocateTensorMemory(const CLContext& context,
+abslx::Status AllocateTensorMemory(const CLContext& context,
                                   const TensorDescriptor& descriptor,
                                   CLMemory* result);
 
-absl::Status CreateTensor(const CLContext& context,
+abslx::Status CreateTensor(const CLContext& context,
                           const TensorDescriptor& descriptor, Tensor* result);
 
-absl::Status CreateTensorShared(const CLContext& context, cl_mem memory,
+abslx::Status CreateTensorShared(const CLContext& context, cl_mem memory,
                                 const TensorDescriptor& descriptor,
                                 Tensor* result);
 
-absl::Status CreateTensorSharedImage2DBuffer(const CLContext& context,
+abslx::Status CreateTensorSharedImage2DBuffer(const CLContext& context,
                                              cl_mem memory,
                                              const TensorDescriptor& descriptor,
                                              int width_pixel_alignment,

@@ -150,32 +150,32 @@ Anchor CalculateAnchorBox(const int y_center, const int x_center,
 // }
 class SsdAnchorsCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->OutputSidePackets().Index(0).Set<std::vector<Anchor>>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
 
     const SsdAnchorsCalculatorOptions& options =
         cc->Options<SsdAnchorsCalculatorOptions>();
 
-    auto anchors = absl::make_unique<std::vector<Anchor>>();
+    auto anchors = abslx::make_unique<std::vector<Anchor>>();
     MP_RETURN_IF_ERROR(GenerateAnchors(anchors.get(), options));
     cc->OutputSidePackets().Index(0).Set(Adopt(anchors.release()));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
-    return absl::OkStatus();
+  abslx::Status Process(CalculatorContext* cc) override {
+    return abslx::OkStatus();
   }
 
  private:
-  static absl::Status GenerateAnchors(
+  static abslx::Status GenerateAnchors(
       std::vector<Anchor>* anchors, const SsdAnchorsCalculatorOptions& options);
 
-  static absl::Status GenerateMultiScaleAnchors(
+  static abslx::Status GenerateMultiScaleAnchors(
       std::vector<Anchor>* anchors, const SsdAnchorsCalculatorOptions& options);
 };
 REGISTER_CALCULATOR(SsdAnchorsCalculator);
@@ -184,7 +184,7 @@ REGISTER_CALCULATOR(SsdAnchorsCalculator);
 // described in:
 // "Focal Loss for Dense Object Detection" (https://arxiv.org/abs/1708.02002)
 // T.-Y. Lin, P. Goyal, R. Girshick, K. He, P. Dollar
-absl::Status SsdAnchorsCalculator::GenerateMultiScaleAnchors(
+abslx::Status SsdAnchorsCalculator::GenerateMultiScaleAnchors(
     std::vector<Anchor>* anchors, const SsdAnchorsCalculatorOptions& options) {
   std::vector<MultiScaleAnchorInfo> anchor_infos;
   for (int i = options.min_level(); i <= options.max_level(); ++i) {
@@ -242,14 +242,14 @@ absl::Status SsdAnchorsCalculator::GenerateMultiScaleAnchors(
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SsdAnchorsCalculator::GenerateAnchors(
+abslx::Status SsdAnchorsCalculator::GenerateAnchors(
     std::vector<Anchor>* anchors, const SsdAnchorsCalculatorOptions& options) {
   // Verify the options.
   if (!options.feature_map_height_size() && !options.strides_size()) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "Both feature map shape and strides are missing. Must provide either "
         "one.");
   }
@@ -359,7 +359,7 @@ absl::Status SsdAnchorsCalculator::GenerateAnchors(
     }
     layer_id = last_same_stride_layer;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

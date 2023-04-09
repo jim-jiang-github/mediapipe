@@ -94,7 +94,7 @@ void WriteInputLayerValueFile(const std::string& file_path,
       bytes = num_elements;
       break;
     default:
-      LOG(WARNING) << absl::StrFormat(
+      LOG(WARNING) << abslx::StrFormat(
           "ModelGraphType(enum_value:%d) is not known.", graph_type);
       LOG(WARNING) << "The size of the ModelGraphType will be 1 byte in tests.";
       bytes = num_elements;
@@ -116,7 +116,7 @@ void CheckInputTensorValue(const TfLiteTensor* input_tensor,
                            int tensor_dim_index,
                            const std::string& expected_value) {
   StringRef tensor_value = GetString(input_tensor, tensor_dim_index);
-  EXPECT_TRUE(absl::equal(tensor_value.str, tensor_value.str + tensor_value.len,
+  EXPECT_TRUE(abslx::equal(tensor_value.str, tensor_value.str + tensor_value.len,
                           expected_value.c_str(),
                           expected_value.c_str() + expected_value.length()));
 }
@@ -253,7 +253,7 @@ TEST(BenchmarkTest, DoesntCrashWithExplicitInputInt8Model) {
   params.Set<std::string>("input_layer", "a");
   params.Set<std::string>("input_layer_shape", "1,8,8,3");
   params.Set<std::string>("input_layer_value_range",
-                          absl::StrFormat("a,%d,%d", a_min, a_max));
+                          abslx::StrFormat("a,%d,%d", a_min, a_max));
   TestBenchmark benchmark(std::move(params));
   benchmark.Run();
 
@@ -439,7 +439,7 @@ TEST(BenchmarkTest, ParametersArePopulatedWhenInputShapeIsNotSpecified) {
 
   // Expect data is not the same.
   EXPECT_EQ(input_bytes.size(), input_tensor->bytes);
-  EXPECT_FALSE(absl::equal(input_bytes.begin(), input_bytes.end(),
+  EXPECT_FALSE(abslx::equal(input_bytes.begin(), input_bytes.end(),
                            input_tensor->data.raw,
                            input_tensor->data.raw + input_tensor->bytes));
 }

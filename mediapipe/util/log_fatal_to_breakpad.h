@@ -8,7 +8,7 @@ namespace mediapipe {
 // Returns a singleton instance of a log sink that sends FATAL log messages to
 // Breakpad. This log sink is enabled by default when this library is included
 // in your binary.
-absl::LogSink* GetBreakpadFatalLogSink();
+abslx::LogSink* GetBreakpadFatalLogSink();
 
 }  // namespace mediapipe
 

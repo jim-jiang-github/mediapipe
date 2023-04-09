@@ -116,12 +116,12 @@ void CalculatorGraph::GraphInputStream::Close() {
 
 CalculatorGraph::CalculatorGraph()
     : profiler_(std::make_shared<ProfilingContext>()), scheduler_(this) {
-  counter_factory_ = absl::make_unique<BasicCounterFactory>();
+  counter_factory_ = abslx::make_unique<BasicCounterFactory>();
 }
 
 CalculatorGraph::CalculatorGraph(CalculatorGraphConfig config)
     : CalculatorGraph() {
-  counter_factory_ = absl::make_unique<BasicCounterFactory>();
+  counter_factory_ = abslx::make_unique<BasicCounterFactory>();
   MEDIAPIPE_CHECK_OK(Initialize(std::move(config)));
 }
 
@@ -130,17 +130,17 @@ CalculatorGraph::CalculatorGraph(CalculatorGraphConfig config)
 // instantiated.
 CalculatorGraph::~CalculatorGraph() {
   // Stop periodic profiler output to ublock Executor destructors.
-  absl::Status status = profiler()->Stop();
+  abslx::Status status = profiler()->Stop();
   if (!status.ok()) {
     LOG(ERROR) << "During graph destruction: " << status;
   }
 }
 
-absl::Status CalculatorGraph::InitializePacketGeneratorGraph(
+abslx::Status CalculatorGraph::InitializePacketGeneratorGraph(
     const std::map<std::string, Packet>& side_packets) {
   // Create and initialize the output side packets.
   if (!validated_graph_->OutputSidePacketInfos().empty()) {
-    output_side_packets_ = absl::make_unique<OutputSidePacketImpl[]>(
+    output_side_packets_ = abslx::make_unique<OutputSidePacketImpl[]>(
         validated_graph_->OutputSidePacketInfos().size());
   }
   for (int index = 0; index < validated_graph_->OutputSidePacketInfos().size();
@@ -165,11 +165,11 @@ absl::Status CalculatorGraph::InitializePacketGeneratorGraph(
                                             default_executor, side_packets);
 }
 
-absl::Status CalculatorGraph::InitializeStreams() {
+abslx::Status CalculatorGraph::InitializeStreams() {
   any_packet_type_.SetAny();
 
   // Create and initialize the input streams.
-  input_stream_managers_ = absl::make_unique<InputStreamManager[]>(
+  input_stream_managers_ = abslx::make_unique<InputStreamManager[]>(
       validated_graph_->InputStreamInfos().size());
   for (int index = 0; index < validated_graph_->InputStreamInfos().size();
        ++index) {
@@ -179,7 +179,7 @@ absl::Status CalculatorGraph::InitializeStreams() {
   }
 
   // Create and initialize the output streams.
-  output_stream_managers_ = absl::make_unique<OutputStreamManager[]>(
+  output_stream_managers_ = abslx::make_unique<OutputStreamManager[]>(
       validated_graph_->OutputStreamInfos().size());
   for (int index = 0; index < validated_graph_->OutputStreamInfos().size();
        ++index) {
@@ -206,7 +206,7 @@ absl::Status CalculatorGraph::InitializeStreams() {
               edge_info.parent_node.type)
         .SetNoLogging();
 
-    graph_input_streams_[stream_name] = absl::make_unique<GraphInputStream>(
+    graph_input_streams_[stream_name] = abslx::make_unique<GraphInputStream>(
         &output_stream_managers_[output_stream_index]);
 
     // Assign a virtual node ID to each graph input stream so we can treat
@@ -218,11 +218,11 @@ absl::Status CalculatorGraph::InitializeStreams() {
 
   // Set the default mode for graph input streams.
   {
-    absl::MutexLock lock(&full_input_streams_mutex_);
+    abslx::MutexLock lock(&full_input_streams_mutex_);
     graph_input_stream_add_mode_ = GraphInputStreamAddMode::WAIT_TILL_NOT_FULL;
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Hack for backwards compatibility with ancient GPU calculators. Can it
@@ -235,13 +235,13 @@ static void MaybeFixupLegacyGpuNodeContract(CalculatorNode& node) {
 #endif  // !MEDIAPIPE_DISABLE_GPU
 }
 
-absl::Status CalculatorGraph::InitializeCalculatorNodes() {
+abslx::Status CalculatorGraph::InitializeCalculatorNodes() {
   // Check if the user has specified a maximum queue size for an input stream.
   max_queue_size_ = validated_graph_->Config().max_queue_size();
   max_queue_size_ = max_queue_size_ ? max_queue_size_ : 100;
 
   // Use a local variable to avoid needing to lock errors_.
-  std::vector<absl::Status> errors;
+  std::vector<abslx::Status> errors;
 
   // Create and initialize all the nodes in the graph.
   for (int node_id = 0; node_id < validated_graph_->CalculatorInfos().size();
@@ -250,8 +250,8 @@ absl::Status CalculatorGraph::InitializeCalculatorNodes() {
     // the graph proto.
     int buffer_size_hint = 0;
     NodeTypeInfo::NodeRef node_ref(NodeTypeInfo::NodeType::CALCULATOR, node_id);
-    nodes_.push_back(absl::make_unique<CalculatorNode>());
-    const absl::Status result = nodes_.back()->Initialize(
+    nodes_.push_back(abslx::make_unique<CalculatorNode>());
+    const abslx::Status result = nodes_.back()->Initialize(
         validated_graph_.get(), node_ref, input_stream_managers_.get(),
         output_stream_managers_.get(), output_side_packets_.get(),
         &buffer_size_hint, profiler_);
@@ -271,25 +271,25 @@ absl::Status CalculatorGraph::InitializeCalculatorNodes() {
 
   VLOG(2) << "Maximum input stream queue size based on graph config: "
           << max_queue_size_;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorGraph::InitializePacketGeneratorNodes(
+abslx::Status CalculatorGraph::InitializePacketGeneratorNodes(
     const std::vector<int>& non_scheduled_generators) {
   // Do not add wrapper nodes again if we are running the graph multiple times.
-  if (packet_generator_nodes_added_) return absl::OkStatus();
+  if (packet_generator_nodes_added_) return abslx::OkStatus();
 
   packet_generator_nodes_added_ = true;
   // Use a local variable to avoid needing to lock errors_.
-  std::vector<absl::Status> errors;
+  std::vector<abslx::Status> errors;
 
   for (int index : non_scheduled_generators) {
     // This is never used by the packet generator wrapper.
     int buffer_size_hint = 0;
     NodeTypeInfo::NodeRef node_ref(NodeTypeInfo::NodeType::PACKET_GENERATOR,
                                    index);
-    nodes_.push_back(absl::make_unique<CalculatorNode>());
-    const absl::Status result = nodes_.back()->Initialize(
+    nodes_.push_back(abslx::make_unique<CalculatorNode>());
+    const abslx::Status result = nodes_.back()->Initialize(
         validated_graph_.get(), node_ref, input_stream_managers_.get(),
         output_stream_managers_.get(), output_side_packets_.get(),
         &buffer_size_hint, profiler_);
@@ -304,15 +304,15 @@ absl::Status CalculatorGraph::InitializePacketGeneratorNodes(
         "CalculatorGraph::InitializePacketGeneratorNodes failed: ", errors);
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorGraph::InitializeProfiler() {
+abslx::Status CalculatorGraph::InitializeProfiler() {
   profiler_->Initialize(*validated_graph_);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorGraph::InitializeExecutors() {
+abslx::Status CalculatorGraph::InitializeExecutors() {
   // If the ExecutorConfig for the default executor leaves the executor type
   // unspecified, default_executor_options points to the
   // ThreadPoolExecutorOptions in that ExecutorConfig. Otherwise,
@@ -369,10 +369,10 @@ absl::Status CalculatorGraph::InitializeExecutors() {
                                                  use_application_thread));
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorGraph::InitializeDefaultExecutor(
+abslx::Status CalculatorGraph::InitializeDefaultExecutor(
     const ThreadPoolExecutorOptions* default_executor_options,
     bool use_application_thread) {
 #ifdef __EMSCRIPTEN__
@@ -385,7 +385,7 @@ absl::Status CalculatorGraph::InitializeDefaultExecutor(
         "", std::make_shared<internal::DelegatingExecutor>(
                 std::bind(&internal::Scheduler::AddApplicationThreadTask,
                           &scheduler_, std::placeholders::_1))));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Check the number of threads specified in the proto.
@@ -404,10 +404,10 @@ absl::Status CalculatorGraph::InitializeDefaultExecutor(
   }
   MP_RETURN_IF_ERROR(
       CreateDefaultThreadPool(default_executor_options, num_threads));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorGraph::Initialize(
+abslx::Status CalculatorGraph::Initialize(
     std::unique_ptr<ValidatedGraphConfig> validated_graph,
     const std::map<std::string, Packet>& side_packets) {
   RET_CHECK(!initialized_).SetNoLogging()
@@ -425,37 +425,37 @@ absl::Status CalculatorGraph::Initialize(
 #endif
 
   initialized_ = true;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorGraph::Initialize(CalculatorGraphConfig input_config) {
+abslx::Status CalculatorGraph::Initialize(CalculatorGraphConfig input_config) {
   return Initialize(std::move(input_config), {});
 }
 
-absl::Status CalculatorGraph::Initialize(
+abslx::Status CalculatorGraph::Initialize(
     CalculatorGraphConfig input_config,
     const std::map<std::string, Packet>& side_packets) {
-  auto validated_graph = absl::make_unique<ValidatedGraphConfig>();
+  auto validated_graph = abslx::make_unique<ValidatedGraphConfig>();
   MP_RETURN_IF_ERROR(validated_graph->Initialize(
       std::move(input_config), /*graph_registry=*/nullptr,
       /*graph_options=*/nullptr, &service_manager_));
   return Initialize(std::move(validated_graph), side_packets);
 }
 
-absl::Status CalculatorGraph::Initialize(
+abslx::Status CalculatorGraph::Initialize(
     const std::vector<CalculatorGraphConfig>& input_configs,
     const std::vector<CalculatorGraphTemplate>& input_templates,
     const std::map<std::string, Packet>& side_packets,
     const std::string& graph_type, const Subgraph::SubgraphOptions* options) {
-  auto validated_graph = absl::make_unique<ValidatedGraphConfig>();
+  auto validated_graph = abslx::make_unique<ValidatedGraphConfig>();
   MP_RETURN_IF_ERROR(validated_graph->Initialize(
       input_configs, input_templates, graph_type, options, &service_manager_));
   return Initialize(std::move(validated_graph), side_packets);
 }
 
-absl::Status CalculatorGraph::ObserveOutputStream(
+abslx::Status CalculatorGraph::ObserveOutputStream(
     const std::string& stream_name,
-    std::function<absl::Status(const Packet&)> packet_callback,
+    std::function<abslx::Status(const Packet&)> packet_callback,
     bool observe_timestamp_bounds) {
   RET_CHECK(initialized_).SetNoLogging()
       << "CalculatorGraph is not initialized.";
@@ -467,15 +467,15 @@ absl::Status CalculatorGraph::ObserveOutputStream(
            << "Unable to attach observer to output stream \"" << stream_name
            << "\" because it doesn't exist.";
   }
-  auto observer = absl::make_unique<internal::OutputStreamObserver>();
+  auto observer = abslx::make_unique<internal::OutputStreamObserver>();
   MP_RETURN_IF_ERROR(observer->Initialize(
       stream_name, &any_packet_type_, std::move(packet_callback),
       &output_stream_managers_[output_stream_index], observe_timestamp_bounds));
   graph_output_streams_.push_back(std::move(observer));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::StatusOr<OutputStreamPoller> CalculatorGraph::AddOutputStreamPoller(
+abslx::StatusOr<OutputStreamPoller> CalculatorGraph::AddOutputStreamPoller(
     const std::string& stream_name, bool observe_timestamp_bounds) {
   RET_CHECK(initialized_).SetNoLogging()
       << "CalculatorGraph is not initialized.";
@@ -496,7 +496,7 @@ absl::StatusOr<OutputStreamPoller> CalculatorGraph::AddOutputStreamPoller(
   return std::move(poller);
 }
 
-absl::StatusOr<Packet> CalculatorGraph::GetOutputSidePacket(
+abslx::StatusOr<Packet> CalculatorGraph::GetOutputSidePacket(
     const std::string& packet_name) {
   int side_packet_index = validated_graph_->OutputSidePacketIndex(packet_name);
   if (side_packet_index < 0) {
@@ -532,7 +532,7 @@ absl::StatusOr<Packet> CalculatorGraph::GetOutputSidePacket(
   return output_packet;
 }
 
-absl::Status CalculatorGraph::Run(
+abslx::Status CalculatorGraph::Run(
     const std::map<std::string, Packet>& extra_side_packets) {
   RET_CHECK(graph_input_streams_.empty()).SetNoLogging()
       << "When using graph input streams, call StartRun() instead of Run() so "
@@ -541,7 +541,7 @@ absl::Status CalculatorGraph::Run(
   return WaitUntilDone();
 }
 
-absl::Status CalculatorGraph::StartRun(
+abslx::Status CalculatorGraph::StartRun(
     const std::map<std::string, Packet>& extra_side_packets,
     const std::map<std::string, Packet>& stream_headers) {
   RET_CHECK(initialized_).SetNoLogging()
@@ -549,11 +549,11 @@ absl::Status CalculatorGraph::StartRun(
   MP_RETURN_IF_ERROR(PrepareForRun(extra_side_packets, stream_headers));
   MP_RETURN_IF_ERROR(profiler_->Start(executors_[""].get()));
   scheduler_.Start();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 #if !MEDIAPIPE_DISABLE_GPU
-absl::Status CalculatorGraph::SetGpuResources(
+abslx::Status CalculatorGraph::SetGpuResources(
     std::shared_ptr<::mediapipe::GpuResources> resources) {
   RET_CHECK_NE(resources, nullptr);
   auto gpu_service = service_manager_.GetServiceObject(kGpuService);
@@ -577,15 +577,15 @@ static Packet GetLegacyGpuSharedSidePacket(
   return legacy_sp_iter->second;
 }
 
-absl::Status CalculatorGraph::MaybeSetUpGpuServiceFromLegacySidePacket(
+abslx::Status CalculatorGraph::MaybeSetUpGpuServiceFromLegacySidePacket(
     Packet legacy_sp) {
-  if (legacy_sp.IsEmpty()) return absl::OkStatus();
+  if (legacy_sp.IsEmpty()) return abslx::OkStatus();
   auto gpu_resources = service_manager_.GetServiceObject(kGpuService);
   if (gpu_resources) {
     LOG(WARNING)
         << "::mediapipe::GpuSharedData provided as a side packet while the "
         << "graph already had one; ignoring side packet";
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   gpu_resources = legacy_sp.Get<::mediapipe::GpuSharedData*>()->gpu_resources;
   return service_manager_.SetServiceObject(kGpuService, gpu_resources);
@@ -600,7 +600,7 @@ std::map<std::string, Packet> CalculatorGraph::MaybeCreateLegacyGpuSidePacket(
        legacy_sp.Get<::mediapipe::GpuSharedData*>()->gpu_resources !=
            gpu_resources)) {
     legacy_gpu_shared_ =
-        absl::make_unique<mediapipe::GpuSharedData>(gpu_resources);
+        abslx::make_unique<mediapipe::GpuSharedData>(gpu_resources);
     additional_side_packets[kGpuSharedSidePacketName] =
         MakePacket<::mediapipe::GpuSharedData*>(legacy_gpu_shared_.get());
   }
@@ -611,9 +611,9 @@ static bool UsesGpu(const CalculatorNode& node) {
   return node.Contract().ServiceRequests().contains(kGpuService.key);
 }
 
-absl::Status CalculatorGraph::PrepareGpu() {
+abslx::Status CalculatorGraph::PrepareGpu() {
   auto gpu_resources = service_manager_.GetServiceObject(kGpuService);
-  if (!gpu_resources) return absl::OkStatus();
+  if (!gpu_resources) return abslx::OkStatus();
   // Set up executors.
   for (auto& node : nodes_) {
     if (UsesGpu(*node)) {
@@ -624,11 +624,11 @@ absl::Status CalculatorGraph::PrepareGpu() {
     MP_RETURN_IF_ERROR(
         SetExecutorInternal(name_executor.first, name_executor.second));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-absl::Status CalculatorGraph::PrepareServices() {
+abslx::Status CalculatorGraph::PrepareServices() {
   for (const auto& node : nodes_) {
     for (const auto& [key, request] : node->Contract().ServiceRequests()) {
       auto packet = service_manager_.GetServicePacket(request.Service());
@@ -640,17 +640,17 @@ absl::Status CalculatorGraph::PrepareServices() {
       } else if (request.IsOptional()) {
         continue;
       } else {
-        return absl::InternalError(absl::StrCat(
+        return abslx::InternalError(abslx::StrCat(
             "Service \"", request.Service().key, "\", required by node ",
             node->DebugName(), ", was not provided and cannot be created: ",
             std::move(packet_or).status().message()));
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorGraph::PrepareForRun(
+abslx::Status CalculatorGraph::PrepareForRun(
     const std::map<std::string, Packet>& extra_side_packets,
     const std::map<std::string, Packet>& stream_headers) {
   if (VLOG_IS_ON(1)) {
@@ -660,7 +660,7 @@ absl::Status CalculatorGraph::PrepareForRun(
   }
 
   {
-    absl::MutexLock lock(&error_mutex_);
+    abslx::MutexLock lock(&error_mutex_);
     errors_.clear();
     has_error_ = false;
   }
@@ -689,7 +689,7 @@ absl::Status CalculatorGraph::PrepareForRun(
 
   current_run_side_packets_.clear();
   std::vector<int> non_scheduled_generators;
-  absl::Status generator_status = packet_generator_graph_.RunGraphSetup(
+  abslx::Status generator_status = packet_generator_graph_.RunGraphSetup(
       *input_side_packets, &current_run_side_packets_,
       &non_scheduled_generators);
 
@@ -701,7 +701,7 @@ absl::Status CalculatorGraph::PrepareForRun(
 
   // If there was an error on the CallStatusHandlers (PRE_RUN), it was stored
   // in the error list. We return immediately notifying this to the caller.
-  absl::Status error_status;
+  abslx::Status error_status;
   if (has_error_) {
     GetCombinedErrors(&error_status);
     LOG(ERROR) << error_status;
@@ -714,7 +714,7 @@ absl::Status CalculatorGraph::PrepareForRun(
       input_side_packet_names.push_back(item.first);
     }
     VLOG(1) << "Final input side packet names are: "
-            << absl::StrJoin(input_side_packet_names, ",");
+            << abslx::StrJoin(input_side_packet_names, ",");
   }
 
   Executor* default_executor = nullptr;
@@ -727,7 +727,7 @@ absl::Status CalculatorGraph::PrepareForRun(
   MP_RETURN_IF_ERROR(InitializePacketGeneratorNodes(non_scheduled_generators));
 
   {
-    absl::MutexLock lock(&full_input_streams_mutex_);
+    abslx::MutexLock lock(&full_input_streams_mutex_);
     // Initialize a count per source node to store the number of input streams
     // that are full and are affected by the source node. A node is considered
     // to be throttled if the count corresponding to this node is non-zero.
@@ -755,7 +755,7 @@ absl::Status CalculatorGraph::PrepareForRun(
     scheduler_.AssignNodeToSchedulerQueue(node.get());
     // TODO: update calculator node to use GraphServiceManager
     // instead of service packets?
-    const absl::Status result = node->PrepareForRun(
+    const abslx::Status result = node->PrepareForRun(
         current_run_side_packets_, service_manager_.ServicePackets(),
         std::bind(&internal::Scheduler::ScheduleNodeForOpen, &scheduler_,
                   node.get()),
@@ -773,13 +773,13 @@ absl::Status CalculatorGraph::PrepareForRun(
   for (auto& graph_output_stream : graph_output_streams_) {
     graph_output_stream->PrepareForRun(
         [&graph_output_stream, this] {
-          absl::Status status = graph_output_stream->Notify();
+          abslx::Status status = graph_output_stream->Notify();
           if (!status.ok()) {
             RecordError(status);
           }
           scheduler_.EmittedObservedOutput();
         },
-        [this](absl::Status status) { RecordError(status); });
+        [this](abslx::Status status) { RecordError(status); });
   }
 
   if (GetCombinedErrors(&error_status)) {
@@ -798,7 +798,7 @@ absl::Status CalculatorGraph::PrepareForRun(
   for (const auto& name_max : graph_input_stream_max_queue_size_) {
     std::unique_ptr<GraphInputStream>* stream =
         mediapipe::FindOrNull(graph_input_streams_, name_max.first);
-    RET_CHECK(stream).SetNoLogging() << absl::Substitute(
+    RET_CHECK(stream).SetNoLogging() << abslx::Substitute(
         "SetInputStreamMaxQueueSize called on \"$0\" which is not a "
         "graph input stream.",
         name_max.first);
@@ -832,20 +832,20 @@ absl::Status CalculatorGraph::PrepareForRun(
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorGraph::WaitUntilIdle() {
+abslx::Status CalculatorGraph::WaitUntilIdle() {
   MP_RETURN_IF_ERROR(scheduler_.WaitUntilIdle());
   VLOG(2) << "Scheduler idle.";
-  absl::Status status = absl::OkStatus();
+  abslx::Status status = abslx::OkStatus();
   if (GetCombinedErrors(&status)) {
     LOG(ERROR) << status;
   }
   return status;
 }
 
-absl::Status CalculatorGraph::WaitUntilDone() {
+abslx::Status CalculatorGraph::WaitUntilDone() {
   VLOG(2) << "Waiting for scheduler to terminate...";
   MP_RETURN_IF_ERROR(scheduler_.WaitUntilDone());
   VLOG(2) << "Scheduler terminated.";
@@ -853,31 +853,31 @@ absl::Status CalculatorGraph::WaitUntilDone() {
   return FinishRun();
 }
 
-absl::Status CalculatorGraph::WaitForObservedOutput() {
+abslx::Status CalculatorGraph::WaitForObservedOutput() {
   return scheduler_.WaitForObservedOutput();
 }
 
-absl::Status CalculatorGraph::AddPacketToInputStream(
+abslx::Status CalculatorGraph::AddPacketToInputStream(
     const std::string& stream_name, const Packet& packet) {
   return AddPacketToInputStreamInternal(stream_name, packet);
 }
 
-absl::Status CalculatorGraph::AddPacketToInputStream(
+abslx::Status CalculatorGraph::AddPacketToInputStream(
     const std::string& stream_name, Packet&& packet) {
   return AddPacketToInputStreamInternal(stream_name, std::move(packet));
 }
 
-absl::Status CalculatorGraph::SetInputStreamTimestampBound(
+abslx::Status CalculatorGraph::SetInputStreamTimestampBound(
     const std::string& stream_name, Timestamp timestamp) {
   std::unique_ptr<GraphInputStream>* stream =
       mediapipe::FindOrNull(graph_input_streams_, stream_name);
-  RET_CHECK(stream).SetNoLogging() << absl::Substitute(
+  RET_CHECK(stream).SetNoLogging() << abslx::Substitute(
       "SetInputStreamTimestampBound called on input stream \"$0\" which is not "
       "a graph input stream.",
       stream_name);
   (*stream)->SetNextTimestampBound(timestamp);
   (*stream)->PropagateUpdatesToMirrors();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // We avoid having two copies of this code for AddPacketToInputStream(
@@ -885,18 +885,18 @@ absl::Status CalculatorGraph::SetInputStreamTimestampBound(
 // internal-only templated version.  T&& is a forwarding reference here, so
 // std::forward will deduce the correct type as we pass along packet.
 template <typename T>
-absl::Status CalculatorGraph::AddPacketToInputStreamInternal(
+abslx::Status CalculatorGraph::AddPacketToInputStreamInternal(
     const std::string& stream_name, T&& packet) {
   std::unique_ptr<GraphInputStream>* stream =
       mediapipe::FindOrNull(graph_input_streams_, stream_name);
-  RET_CHECK(stream).SetNoLogging() << absl::Substitute(
+  RET_CHECK(stream).SetNoLogging() << abslx::Substitute(
       "AddPacketToInputStream called on input stream \"$0\" which is not a "
       "graph input stream.",
       stream_name);
   int node_id = mediapipe::FindOrDie(graph_input_stream_node_ids_, stream_name);
   CHECK_GE(node_id, validated_graph_->CalculatorInfos().size());
   {
-    absl::MutexLock lock(&full_input_streams_mutex_);
+    abslx::MutexLock lock(&full_input_streams_mutex_);
     if (full_input_streams_.empty()) {
       return mediapipe::FailedPreconditionErrorBuilder(MEDIAPIPE_LOC)
              << "CalculatorGraph::AddPacketToInputStream() is called before "
@@ -905,7 +905,7 @@ absl::Status CalculatorGraph::AddPacketToInputStreamInternal(
     if (graph_input_stream_add_mode_ ==
         GraphInputStreamAddMode::ADD_IF_NOT_FULL) {
       if (has_error_) {
-        absl::Status error_status;
+        abslx::Status error_status;
         GetCombinedErrors("Graph has errors: ", &error_status);
         return error_status;
       }
@@ -926,7 +926,7 @@ absl::Status CalculatorGraph::AddPacketToInputStreamInternal(
             &full_input_streams_mutex_);
       }
       if (has_error_) {
-        absl::Status error_status;
+        abslx::Status error_status;
         GetCombinedErrors("Graph has errors: ", &error_status);
         return error_status;
       }
@@ -948,7 +948,7 @@ absl::Status CalculatorGraph::AddPacketToInputStreamInternal(
   // because we don't have the lock over the input stream.
   (*stream)->AddPacket(std::forward<T>(packet));
   if (has_error_) {
-    absl::Status error_status;
+    abslx::Status error_status;
     GetCombinedErrors("Graph has errors: ", &error_status);
     return error_status;
   }
@@ -960,25 +960,25 @@ absl::Status CalculatorGraph::AddPacketToInputStreamInternal(
   // again if the graph is still idle. Unthrottling basically only lets in one
   // packet at a time. TODO: add test.
   scheduler_.AddedPacketToGraphInputStream();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorGraph::SetInputStreamMaxQueueSize(
+abslx::Status CalculatorGraph::SetInputStreamMaxQueueSize(
     const std::string& stream_name, int max_queue_size) {
   // graph_input_streams_ has not been filled in yet, so we'll check this when
   // it is applied when the graph is started.
   graph_input_stream_max_queue_size_[stream_name] = max_queue_size;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 bool CalculatorGraph::HasInputStream(const std::string& stream_name) {
   return mediapipe::FindOrNull(graph_input_streams_, stream_name) != nullptr;
 }
 
-absl::Status CalculatorGraph::CloseInputStream(const std::string& stream_name) {
+abslx::Status CalculatorGraph::CloseInputStream(const std::string& stream_name) {
   std::unique_ptr<GraphInputStream>* stream =
       mediapipe::FindOrNull(graph_input_streams_, stream_name);
-  RET_CHECK(stream).SetNoLogging() << absl::Substitute(
+  RET_CHECK(stream).SetNoLogging() << abslx::Substitute(
       "CloseInputStream called on input stream \"$0\" which is not a graph "
       "input stream.",
       stream_name);
@@ -986,7 +986,7 @@ absl::Status CalculatorGraph::CloseInputStream(const std::string& stream_name) {
   // threads cannot call CloseInputStream() on the same stream_name at the same
   // time.
   if ((*stream)->IsClosed()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   (*stream)->Close();
@@ -995,10 +995,10 @@ absl::Status CalculatorGraph::CloseInputStream(const std::string& stream_name) {
     scheduler_.ClosedAllGraphInputStreams();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorGraph::CloseAllInputStreams() {
+abslx::Status CalculatorGraph::CloseAllInputStreams() {
   for (auto& item : graph_input_streams_) {
     item.second->Close();
   }
@@ -1006,10 +1006,10 @@ absl::Status CalculatorGraph::CloseAllInputStreams() {
   num_closed_graph_input_streams_ = graph_input_streams_.size();
   scheduler_.ClosedAllGraphInputStreams();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorGraph::CloseAllPacketSources() {
+abslx::Status CalculatorGraph::CloseAllPacketSources() {
   for (auto& item : graph_input_streams_) {
     item.second->Close();
   }
@@ -1018,13 +1018,13 @@ absl::Status CalculatorGraph::CloseAllPacketSources() {
   scheduler_.ClosedAllGraphInputStreams();
   scheduler_.CloseAllSourceNodes();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-void CalculatorGraph::RecordError(const absl::Status& error) {
+void CalculatorGraph::RecordError(const abslx::Status& error) {
   VLOG(2) << "RecordError called with " << error;
   {
-    absl::MutexLock lock(&error_mutex_);
+    abslx::MutexLock lock(&error_mutex_);
     errors_.push_back(error);
     has_error_ = true;
     scheduler_.SetHasError(true);
@@ -1032,7 +1032,7 @@ void CalculatorGraph::RecordError(const absl::Status& error) {
       stream->NotifyError();
     }
     if (errors_.size() > kMaxNumAccumulatedErrors) {
-      for (const absl::Status& error : errors_) {
+      for (const abslx::Status& error : errors_) {
         LOG(ERROR) << error;
       }
       LOG(FATAL) << "Forcefully aborting to prevent the framework running out "
@@ -1041,14 +1041,14 @@ void CalculatorGraph::RecordError(const absl::Status& error) {
   }
 }
 
-bool CalculatorGraph::GetCombinedErrors(absl::Status* error_status) {
+bool CalculatorGraph::GetCombinedErrors(abslx::Status* error_status) {
   return GetCombinedErrors("CalculatorGraph::Run() failed in Run: ",
                            error_status);
 }
 
 bool CalculatorGraph::GetCombinedErrors(const std::string& error_prefix,
-                                        absl::Status* error_status) {
-  absl::MutexLock lock(&error_mutex_);
+                                        abslx::Status* error_status) {
+  abslx::MutexLock lock(&error_mutex_);
   if (!errors_.empty()) {
     *error_status = tool::CombinedStatus(error_prefix, errors_);
     return true;
@@ -1057,7 +1057,7 @@ bool CalculatorGraph::GetCombinedErrors(const std::string& error_prefix,
 }
 
 void CalculatorGraph::CallStatusHandlers(GraphRunState graph_run_state,
-                                         const absl::Status& status) {
+                                         const abslx::Status& status) {
   for (int status_handler_index = 0;
        status_handler_index < validated_graph_->Config().status_handler_size();
        ++status_handler_index) {
@@ -1069,7 +1069,7 @@ void CalculatorGraph::CallStatusHandlers(GraphRunState graph_run_state,
         validated_graph_->StatusHandlerInfos()[status_handler_index];
     const PacketTypeSet& packet_type_set =
         status_handler_info.InputSidePacketTypes();
-    absl::StatusOr<std::unique_ptr<PacketSet>> packet_set_statusor =
+    abslx::StatusOr<std::unique_ptr<PacketSet>> packet_set_statusor =
         tool::FillPacketSet(packet_type_set, current_run_side_packets_,
                             nullptr);
     if (!packet_set_statusor.ok()) {
@@ -1079,12 +1079,12 @@ void CalculatorGraph::CallStatusHandlers(GraphRunState graph_run_state,
                   << "Skipping run of " << handler_type << ": ");
       continue;
     }
-    absl::StatusOr<std::unique_ptr<internal::StaticAccessToStatusHandler>>
+    abslx::StatusOr<std::unique_ptr<internal::StaticAccessToStatusHandler>>
         static_access_statusor = internal::StaticAccessToStatusHandlerRegistry::
             CreateByNameInNamespace(validated_graph_->Package(), handler_type);
     CHECK(static_access_statusor.ok()) << handler_type << " is not registered.";
     auto static_access = std::move(static_access_statusor).value();
-    absl::Status handler_result;
+    abslx::Status handler_result;
     if (graph_run_state == GraphRunState::PRE_RUN) {
       handler_result = static_access->HandlePreRunStatus(
           handler_config.options(), *packet_set_statusor.value(), status);
@@ -1113,8 +1113,8 @@ void CalculatorGraph::UpdateThrottledNodes(InputStreamManager* stream,
   // TODO Change the throttling code to use the index directly
   // rather than looking up a stream name.
   int node_index = validated_graph_->OutputStreamToNode(stream->Name());
-  absl::flat_hash_set<int> owned_set;
-  const absl::flat_hash_set<int>* upstream_nodes;
+  abslx::flat_hash_set<int> owned_set;
+  const abslx::flat_hash_set<int>* upstream_nodes;
   if (node_index >= validated_graph_->CalculatorInfos().size()) {
     // TODO just create a NodeTypeInfo object for each virtual node.
     owned_set.insert(node_index);
@@ -1127,7 +1127,7 @@ void CalculatorGraph::UpdateThrottledNodes(InputStreamManager* stream,
   std::vector<CalculatorNode*> nodes_to_schedule;
 
   {
-    absl::MutexLock lock(&full_input_streams_mutex_);
+    abslx::MutexLock lock(&full_input_streams_mutex_);
     // Note that the change in stream status is recomputed here within the
     // MutexLock in order to avoid interference between callbacks arriving
     // out of order.
@@ -1184,7 +1184,7 @@ void CalculatorGraph::UpdateThrottledNodes(InputStreamManager* stream,
 }
 
 bool CalculatorGraph::IsNodeThrottled(int node_id) {
-  absl::MutexLock lock(&full_input_streams_mutex_);
+  abslx::MutexLock lock(&full_input_streams_mutex_);
   return max_queue_size_ != -1 && !full_input_streams_[node_id].empty();
 }
 
@@ -1208,10 +1208,10 @@ bool CalculatorGraph::UnthrottleSources() {
   // This is a sufficient because succesfully growing at least one full input
   // stream during each call to UnthrottleSources will eventually resolve
   // each deadlock.
-  absl::flat_hash_set<InputStreamManager*> full_streams;
+  abslx::flat_hash_set<InputStreamManager*> full_streams;
   {
-    absl::MutexLock lock(&full_input_streams_mutex_);
-    for (absl::flat_hash_set<InputStreamManager*>& s : full_input_streams_) {
+    abslx::MutexLock lock(&full_input_streams_mutex_);
+    for (abslx::flat_hash_set<InputStreamManager*>& s : full_input_streams_) {
       for (auto& stream : s) {
         // The queue size of a graph output stream shouldn't change. Throttling
         // should continue until the caller of the graph output stream consumes
@@ -1224,7 +1224,7 @@ bool CalculatorGraph::UnthrottleSources() {
   }
   for (InputStreamManager* stream : full_streams) {
     if (Config().report_deadlock()) {
-      RecordError(absl::UnavailableError(absl::StrCat(
+      RecordError(abslx::UnavailableError(abslx::StrCat(
           "Detected a deadlock due to input throttling for: \"", stream->Name(),
           "\". All calculators are idle while packet sources remain active "
           "and throttled.  Consider adjusting \"max_queue_size\" or "
@@ -1243,17 +1243,17 @@ bool CalculatorGraph::UnthrottleSources() {
 
 CalculatorGraph::GraphInputStreamAddMode
 CalculatorGraph::GetGraphInputStreamAddMode() const {
-  absl::MutexLock lock(&full_input_streams_mutex_);
+  abslx::MutexLock lock(&full_input_streams_mutex_);
   return graph_input_stream_add_mode_;
 }
 
 void CalculatorGraph::SetGraphInputStreamAddMode(GraphInputStreamAddMode mode) {
-  absl::MutexLock lock(&full_input_streams_mutex_);
+  abslx::MutexLock lock(&full_input_streams_mutex_);
   graph_input_stream_add_mode_ = mode;
 }
 
 void CalculatorGraph::Cancel() {
-  // TODO This function should return absl::Status.
+  // TODO This function should return abslx::Status.
   scheduler_.Cancel();
 }
 
@@ -1261,11 +1261,11 @@ void CalculatorGraph::Pause() { scheduler_.Pause(); }
 
 void CalculatorGraph::Resume() { scheduler_.Resume(); }
 
-absl::Status CalculatorGraph::SetExecutorInternal(
+abslx::Status CalculatorGraph::SetExecutorInternal(
     const std::string& name, std::shared_ptr<Executor> executor) {
   auto [it, inserted] = executors_.emplace(name, executor);
   if (!inserted) {
-    if (it->second == executor) return absl::OkStatus();
+    if (it->second == executor) return abslx::OkStatus();
     return mediapipe::AlreadyExistsErrorBuilder(MEDIAPIPE_LOC)
            << "SetExecutor must be called only once for the executor \"" << name
            << "\"";
@@ -1275,10 +1275,10 @@ absl::Status CalculatorGraph::SetExecutorInternal(
   } else {
     MP_RETURN_IF_ERROR(scheduler_.SetNonDefaultExecutor(name, executor.get()));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorGraph::SetExecutor(const std::string& name,
+abslx::Status CalculatorGraph::SetExecutor(const std::string& name,
                                           std::shared_ptr<Executor> executor) {
   RET_CHECK(!initialized_)
       << "SetExecutor can only be called before Initialize()";
@@ -1289,7 +1289,7 @@ absl::Status CalculatorGraph::SetExecutor(const std::string& name,
   return SetExecutorInternal(name, std::move(executor));
 }
 
-absl::Status CalculatorGraph::CreateDefaultThreadPool(
+abslx::Status CalculatorGraph::CreateDefaultThreadPool(
     const ThreadPoolExecutorOptions* default_executor_options,
     int num_threads) {
   MediaPipeOptions extendable_options;
@@ -1311,16 +1311,16 @@ bool CalculatorGraph::IsReservedExecutorName(const std::string& name) {
   return ValidatedGraphConfig::IsReservedExecutorName(name);
 }
 
-absl::Status CalculatorGraph::FinishRun() {
+abslx::Status CalculatorGraph::FinishRun() {
   // Check for any errors that may have occurred.
-  absl::Status status = absl::OkStatus();
+  abslx::Status status = abslx::OkStatus();
   MP_RETURN_IF_ERROR(profiler_->Stop());
   GetCombinedErrors(&status);
   CleanupAfterRun(&status);
   return status;
 }
 
-void CalculatorGraph::CleanupAfterRun(absl::Status* status) {
+void CalculatorGraph::CleanupAfterRun(abslx::Status* status) {
   for (auto& item : graph_input_streams_) {
     item.second->Close();
   }
@@ -1346,13 +1346,13 @@ void CalculatorGraph::CleanupAfterRun(absl::Status* status) {
   scheduler_.CleanupAfterRun();
 
   {
-    absl::MutexLock lock(&error_mutex_);
+    abslx::MutexLock lock(&error_mutex_);
     errors_.clear();
     has_error_ = false;
   }
 
   {
-    absl::MutexLock lock(&full_input_streams_mutex_);
+    abslx::MutexLock lock(&full_input_streams_mutex_);
     full_input_streams_.clear();
   }
   // Note: output_side_packets_ and current_run_side_packets_ are not cleared
@@ -1374,7 +1374,7 @@ void PrintTimingToInfo(const std::string& label, int64 timer_value) {
   const int64 seconds = total_seconds % 60ll;
   const int64 milliseconds = (timer_value / 1000ll) % 1000ll;
   LOG(INFO) << label << " took "
-            << absl::StrFormat(
+            << abslx::StrFormat(
                    "%02lld days, %02lld:%02lld:%02lld.%03lld (total seconds: "
                    "%lld.%06lld)",
                    days, hours, minutes, seconds, milliseconds, total_seconds,
@@ -1387,7 +1387,7 @@ bool MetricElementComparator(const std::pair<std::string, int64>& e1,
 }
 }  // namespace
 
-absl::Status CalculatorGraph::GetCalculatorProfiles(
+abslx::Status CalculatorGraph::GetCalculatorProfiles(
     std::vector<CalculatorProfile>* profiles) const {
   return profiler_->GetCalculatorProfiles(profiles);
 }

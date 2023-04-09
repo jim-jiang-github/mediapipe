@@ -270,7 +270,7 @@ CVReturn CreateCVPixelBufferWithoutPool(int width, int height, OSType cv_format,
 #endif
 }
 
-absl::StatusOr<CFHolder<CVPixelBufferRef>> CreateCVPixelBufferWithoutPool(
+abslx::StatusOr<CFHolder<CVPixelBufferRef>> CreateCVPixelBufferWithoutPool(
     int width, int height, OSType cv_format) {
   CVPixelBufferRef buffer;
   CVReturn err =
@@ -290,20 +290,20 @@ static void ReleaseSharedPtr(void* refcon, const void* base_address) {
 CVPixelBufferRef CreateCVPixelBufferForImageFramePacket(
     const mediapipe::Packet& image_frame_packet) {
   CFHolder<CVPixelBufferRef> buffer;
-  absl::Status status =
+  abslx::Status status =
       CreateCVPixelBufferForImageFramePacket(image_frame_packet, &buffer);
   MEDIAPIPE_CHECK_OK(status) << "Failed to create CVPixelBufferRef";
   return (CVPixelBufferRef)CFRetain(*buffer);
 }
 
-absl::Status CreateCVPixelBufferForImageFramePacket(
+abslx::Status CreateCVPixelBufferForImageFramePacket(
     const mediapipe::Packet& image_frame_packet,
     CFHolder<CVPixelBufferRef>* out_buffer) {
   return CreateCVPixelBufferForImageFramePacket(image_frame_packet, false,
                                                 out_buffer);
 }
 
-absl::Status CreateCVPixelBufferForImageFramePacket(
+abslx::Status CreateCVPixelBufferForImageFramePacket(
     const mediapipe::Packet& image_frame_packet, bool can_overwrite,
     CFHolder<CVPixelBufferRef>* out_buffer) {
   if (!out_buffer) {
@@ -315,10 +315,10 @@ absl::Status CreateCVPixelBufferForImageFramePacket(
           image_frame_packet));
   ASSIGN_OR_RETURN(*out_buffer, CreateCVPixelBufferForImageFrame(
                                     image_frame, can_overwrite));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::StatusOr<CFHolder<CVPixelBufferRef>> CreateCVPixelBufferForImageFrame(
+abslx::StatusOr<CFHolder<CVPixelBufferRef>> CreateCVPixelBufferForImageFrame(
     std::shared_ptr<mediapipe::ImageFrame> image_frame, bool can_overwrite) {
   CFHolder<CVPixelBufferRef> pixel_buffer;
   const auto& frame = *image_frame;
@@ -377,7 +377,7 @@ absl::StatusOr<CFHolder<CVPixelBufferRef>> CreateCVPixelBufferForImageFrame(
         << "CVPixelBufferUnlockBaseAddress failed: " << status;
   } else {
     CVPixelBufferRef pixel_buffer_temp;
-    auto holder = absl::make_unique<std::shared_ptr<void>>(image_frame);
+    auto holder = abslx::make_unique<std::shared_ptr<void>>(image_frame);
     status = CVPixelBufferCreateWithBytes(
         NULL, frame.Width(), frame.Height(), pixel_format, frame_data,
         frame.WidthStep(), ReleaseSharedPtr, holder.get(),
@@ -391,12 +391,12 @@ absl::StatusOr<CFHolder<CVPixelBufferRef>> CreateCVPixelBufferForImageFrame(
   return pixel_buffer;
 }
 
-absl::StatusOr<CFHolder<CVPixelBufferRef>> CreateCVPixelBufferCopyingImageFrame(
+abslx::StatusOr<CFHolder<CVPixelBufferRef>> CreateCVPixelBufferCopyingImageFrame(
     const mediapipe::ImageFrame& image_frame) {
   CFHolder<CVPixelBufferRef> pixel_buffer;
   OSType pixel_format = 0;
-  std::function<absl::Status(const vImage_Buffer&, vImage_Buffer&)> copy_fun =
-      [](const vImage_Buffer& src, vImage_Buffer& dst) -> absl::Status {
+  std::function<abslx::Status(const vImage_Buffer&, vImage_Buffer&)> copy_fun =
+      [](const vImage_Buffer& src, vImage_Buffer& dst) -> abslx::Status {
     const char* src_row = reinterpret_cast<const char*>(src.data);
     char* dst_row = reinterpret_cast<char*>(dst.data);
     if (src.rowBytes == dst.rowBytes) {
@@ -417,7 +417,7 @@ absl::StatusOr<CFHolder<CVPixelBufferRef>> CreateCVPixelBufferCopyingImageFrame(
     case mediapipe::ImageFormat::SRGBA:
       pixel_format = kCVPixelFormatType_32BGRA;
       copy_fun = [](const vImage_Buffer& src,
-                    vImage_Buffer& dst) -> absl::Status {
+                    vImage_Buffer& dst) -> abslx::Status {
         // Swap R and B channels.
         const uint8_t permute_map[4] = {2, 1, 0, 3};
         vImage_Error vError = vImagePermuteChannels_ARGB8888(
@@ -468,7 +468,7 @@ absl::StatusOr<CFHolder<CVPixelBufferRef>> CreateCVPixelBufferCopyingImageFrame(
   return pixel_buffer;
 }
 
-absl::Status CreateCGImageFromCVPixelBuffer(CVPixelBufferRef image_buffer,
+abslx::Status CreateCGImageFromCVPixelBuffer(CVPixelBufferRef image_buffer,
                                             CFHolder<CGImageRef>* image) {
   CVReturn status =
       CVPixelBufferLockBaseAddress(image_buffer, kCVPixelBufferLock_ReadOnly);
@@ -513,10 +513,10 @@ absl::Status CreateCGImageFromCVPixelBuffer(CVPixelBufferRef image_buffer,
       << "CVPixelBufferUnlockBaseAddress failed: " << status;
 
   *image = cg_image_holder;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CreateCVPixelBufferFromCGImage(
+abslx::Status CreateCVPixelBufferFromCGImage(
     CGImageRef image, CFHolder<CVPixelBufferRef>* out_buffer) {
   size_t width = CGImageGetWidth(image);
   size_t height = CGImageGetHeight(image);
@@ -551,7 +551,7 @@ absl::Status CreateCVPixelBufferFromCGImage(
       << "CVPixelBufferUnlockBaseAddress failed: " << status;
 
   *out_buffer = pixel_buffer;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 std::unique_ptr<mediapipe::ImageFrame> CreateImageFrameForCVPixelBuffer(
@@ -586,7 +586,7 @@ std::unique_ptr<mediapipe::ImageFrame> CreateImageFrameForCVPixelBuffer(
         if (can_overwrite) {
           v_dest = v_image;
         } else {
-          frame = absl::make_unique<mediapipe::ImageFrame>(image_format, width,
+          frame = abslx::make_unique<mediapipe::ImageFrame>(image_format, width,
                                                            height);
           v_dest = vImageForImageFrame(*frame);
         }
@@ -627,7 +627,7 @@ std::unique_ptr<mediapipe::ImageFrame> CreateImageFrameForCVPixelBuffer(
         << "CVPixelBufferUnlockBaseAddress failed: " << status;
     CVPixelBufferRelease(image_buffer);
   } else {
-    frame = absl::make_unique<mediapipe::ImageFrame>(
+    frame = abslx::make_unique<mediapipe::ImageFrame>(
         image_format, width, height, bytes_per_row,
         reinterpret_cast<uint8*>(base_address), [image_buffer](uint8* x) {
           CVPixelBufferUnlockBaseAddress(image_buffer,

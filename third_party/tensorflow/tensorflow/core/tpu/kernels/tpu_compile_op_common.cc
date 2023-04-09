@@ -54,7 +54,7 @@ namespace {
 
 std::string TruncateMessage(const std::string& msg, size_t max_len) {
   if (msg.size() > max_len) {
-    return absl::StrCat(msg.substr(0, max_len), " ... [truncated]");
+    return abslx::StrCat(msg.substr(0, max_len), " ... [truncated]");
   } else {
     return msg;
   }
@@ -136,7 +136,7 @@ void TpuCompileOpKernelCommon::Compute(OpKernelContext* ctx) {
   // doesn't hurt to also deregister the callback in the failure case; the
   // CancellationManager ensures that already-registered callbacks will be run
   // once cancellation has started.
-  auto cancellation_cleanup = absl::MakeCleanup([ctx, token, done] {
+  auto cancellation_cleanup = abslx::MakeCleanup([ctx, token, done] {
     ctx->cancellation_manager()->DeregisterCallback(token);
     done->store(true);
   });
@@ -181,7 +181,7 @@ Status TpuCompileOpKernelCommon::CompileLocallyAndFillHostCacheInternal(
     const std::vector<TensorShape>& dynamic_shapes,
     const OpInputList& guaranteed_constants, const TpuCompilationCacheKey& key,
     TpuProgramGroupInterface* tpu_program_group) {
-  absl::Time start_time = absl::Now();
+  abslx::Time start_time = abslx::Now();
   std::vector<TensorShape> arg_shapes;
   TF_RETURN_IF_ERROR(
       ComputeArgumentShapes(metadata_, dynamic_shapes, &arg_shapes));
@@ -189,8 +189,8 @@ Status TpuCompileOpKernelCommon::CompileLocallyAndFillHostCacheInternal(
   if (use_mlir_) {
     const ConfigProto* config = flib_runtime->config_proto();
     ConfigProto::Experimental::MlirBridgeRollout rollout_state =
-        GetMlirBridgeRolloutState(config ? absl::make_optional(*config)
-                                         : absl::nullopt);
+        GetMlirBridgeRolloutState(config ? abslx::make_optional(*config)
+                                         : abslx::nullopt);
     compile_status =
         Compile(MlirToHloArgs{mlir_module_, rollout_state}, mesh_state->data(),
                 arg_shapes, &key, tpu_program_group);
@@ -203,7 +203,7 @@ Status TpuCompileOpKernelCommon::CompileLocallyAndFillHostCacheInternal(
                 mesh_state->data(), arg_shapes, &key, tpu_program_group);
   }
 
-  absl::Time end_time = absl::Now();
+  abslx::Time end_time = abslx::Now();
   auto duration = end_time - start_time;
 
   const std::string session_name = SessionNameFromMetadata(session_metadata);
@@ -213,7 +213,7 @@ Status TpuCompileOpKernelCommon::CompileLocallyAndFillHostCacheInternal(
   tpu_program_group->LogProgramMemorySummary();
   metrics::UpdateTpuErrorCounter("TpuCompileOp",
                                  error_name(compile_status.code()));
-  metrics::UpdateXlaCompilationTime(absl::ToInt64Microseconds(duration));
+  metrics::UpdateXlaCompilationTime(abslx::ToInt64Microseconds(duration));
   TpuCompilationMetrics::IncrementCompilationCount(session_name);
 
   return compile_status;
@@ -285,7 +285,7 @@ Status TpuCompileOpKernelCommon::ComputeInternal(OpKernelContext* ctx) {
   std::vector<std::string> proto_key;
   std::vector<std::string> sharding_key;
   std::vector<bool> may_modify_variables;
-  absl::Span<const xla::HloProto* const> hlo_metadatas;
+  abslx::Span<const xla::HloProto* const> hlo_metadatas;
   Status status = cache->CompileIfKeyAbsent(
       key, ctx->session_metadata(), ref_holder, &uid, &proto_key, &sharding_key,
       &may_modify_variables, &hlo_metadatas,
@@ -395,7 +395,7 @@ Status TpuCompileOpKernelCommon::ComputeInternal(OpKernelContext* ctx) {
     proto.set_status_code(status.code());
     if (!status.ok()) {
       proto.set_status_error_message(TruncateMessage(
-          absl::StrCat("Compilation failure: ", status.error_message()), 128));
+          abslx::StrCat("Compilation failure: ", status.error_message()), 128));
     }
     if (return_hlo_protos_) {
       // Return the HloProtos as part of compilation status.

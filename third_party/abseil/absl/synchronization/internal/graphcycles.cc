@@ -44,7 +44,7 @@
 
 // Do not use STL.   This module does not use standard memory allocation.
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
@@ -52,8 +52,8 @@ namespace {
 
 // Avoid LowLevelAlloc's default arena since it calls malloc hooks in
 // which people are doing things like acquiring Mutexes.
-ABSL_CONST_INIT static absl::base_internal::SpinLock arena_mu(
-    absl::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
+ABSL_CONST_INIT static abslx::base_internal::SpinLock arena_mu(
+    abslx::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
 ABSL_CONST_INIT static base_internal::LowLevelAlloc::Arena* arena;
 
 static void InitArenaIfNecessary() {
@@ -693,6 +693,6 @@ int GraphCycles::GetStackTrace(GraphId id, void*** ptr) {
 
 }  // namespace synchronization_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_LOW_LEVEL_ALLOC_MISSING

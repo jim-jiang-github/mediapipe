@@ -219,7 +219,7 @@ Status AddShardNode(MutableGraphView* graph, const NodeDef& add_before,
   // Add shapes and other attributes
   NodeDef* add_after = graph->GetNode(add_before.input(0));
 
-  if (absl::StrContains(add_after->op(), "Dataset")) {
+  if (abslx::StrContains(add_after->op(), "Dataset")) {
     // We still may or may not have the right attributes because Datasets like
     // TFRecordDataset doesn't have a output type or shape, and by default we
     // set them to DT_STRING and an unknown shape.
@@ -351,7 +351,7 @@ bool ReaderOpInFunction(const NodeDef& node,
     NodeDef node_in_func = func->node_def(i);
     if (IsDatasetNodeOfType(node_in_func, kReaderDatasetOps) &&
         node_in_func.input_size() > 0 &&
-        absl::StartsWith(node_in_func.input(0), "args_0")) {
+        abslx::StartsWith(node_in_func.input(0), "args_0")) {
       return true;
     }
     if (IsDatasetNodeOfType(func->node_def(i), kFuncDatasetOps) &&
@@ -363,7 +363,7 @@ bool ReaderOpInFunction(const NodeDef& node,
 }
 
 Status RemoveShuffleDataset(MutableGraphView* graph, const NodeDef& node,
-                            absl::flat_hash_set<string>* nodes_to_delete,
+                            abslx::flat_hash_set<string>* nodes_to_delete,
                             string* op_name, string* buffer_size_node,
                             string* seed_node, string* seed2_node,
                             bool* reshuffle_each_iteration) {
@@ -388,7 +388,7 @@ Status RemoveShuffleDataset(MutableGraphView* graph, const NodeDef& node,
 }
 
 Status RemoveShuffleDatasetV2(MutableGraphView* graph, const NodeDef& node,
-                              absl::flat_hash_set<string>* nodes_to_delete,
+                              abslx::flat_hash_set<string>* nodes_to_delete,
                               string* op_name, string* buffer_size_node,
                               string* seed_generator_node) {
   if (node.op() == kShuffleDatasetV2OpName) {
@@ -410,7 +410,7 @@ Status RemoveShuffleDatasetV2(MutableGraphView* graph, const NodeDef& node,
 }
 
 Status RemoveShuffleDatasetV3(MutableGraphView* graph, const NodeDef& node,
-                              absl::flat_hash_set<string>* nodes_to_delete,
+                              abslx::flat_hash_set<string>* nodes_to_delete,
                               string* op_name, string* buffer_size_node,
                               string* seed_node, string* seed2_node,
                               string* seed_generator_node,
@@ -437,7 +437,7 @@ Status RemoveShuffleDatasetV3(MutableGraphView* graph, const NodeDef& node,
 }
 
 Status ProcessDatasetSourceNode(MutableGraphView* graph, const NodeDef& node,
-                                absl::flat_hash_set<string>* nodes_to_delete,
+                                abslx::flat_hash_set<string>* nodes_to_delete,
                                 int64_t num_workers, int64_t index) {
   string shuffle_op_name = "";
   string buffer_size_node = "";
@@ -481,7 +481,7 @@ Status ProcessDatasetSourceNode(MutableGraphView* graph, const NodeDef& node,
 const NodeDef* FindFuncAndTensorSliceDataset(
     const NodeDef* node, int64_t num_workers, int64_t index,
     FunctionLibraryDefinition* flib, MutableGraphView* graph,
-    absl::flat_hash_set<string>* nodes_to_delete) {
+    abslx::flat_hash_set<string>* nodes_to_delete) {
   if (IsDatasetNodeOfType(*node, kFuncDatasetOps)) {
     const NodeDef* input_node = graph_utils::GetInputNode(*node, *graph, 0);
     if (input_node->op() == kTensorSliceDatasetOpName ||
@@ -542,7 +542,7 @@ DropRemainderValue GetDropRemainder(const MutableGraphView& graph,
 Status RecursivelyHandleOp(const NodeDef& node, int64_t num_workers,
                            int64_t index, FunctionLibraryDefinition* flib,
                            MutableGraphView* graph,
-                           absl::flat_hash_set<string>* nodes_to_delete) {
+                           abslx::flat_hash_set<string>* nodes_to_delete) {
   if (node.op() == kAssertCardinalityDatasetOpName) {
     LOG(WARNING) << "The `assert_cardinality` transformation is currently not "
                     "handled by the auto-shard rewrite and will be removed.";
@@ -646,7 +646,7 @@ Status RecursivelyHandleOp(const NodeDef& node, int64_t num_workers,
 // returns a sensible result.
 Status ShardByFile(const NodeDef& sink_node, int64_t num_workers, int64_t index,
                    FunctionLibraryDefinition* flib, MutableGraphView* graph) {
-  absl::flat_hash_set<string> nodes_to_delete;
+  abslx::flat_hash_set<string> nodes_to_delete;
   TF_RETURN_IF_ERROR(RecursivelyHandleOp(sink_node, num_workers, index, flib,
                                          graph, &nodes_to_delete));
   return graph->DeleteNodes(nodes_to_delete);

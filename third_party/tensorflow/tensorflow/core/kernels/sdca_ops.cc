@@ -103,7 +103,7 @@ struct ComputeOptions {
                 static_cast<int64_t>(num_sparse_features) +
                         static_cast<int64_t>(num_dense_features) <=
                     std::numeric_limits<int>::max(),
-                errors::InvalidArgument(absl::StrFormat(
+                errors::InvalidArgument(abslx::StrFormat(
                     "Too many feature groups: %d > %d",
                     static_cast<int64_t>(num_sparse_features) +
                         static_cast<int64_t>(num_dense_features),

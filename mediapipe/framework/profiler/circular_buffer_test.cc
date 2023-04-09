@@ -61,7 +61,7 @@ TEST_F(CircularBufferTest, ParallelWriteAndRead) {
       pool.Schedule([&]() {
         for (int i = 0; i < 300; ++i) {
           buffer.push_back("w5");
-          absl::SleepFor(absl::Microseconds(1));
+          abslx::SleepFor(abslx::Microseconds(1));
         }
       });
     }

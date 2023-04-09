@@ -26,7 +26,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status StridedSliceTest(TestExecutionEnvironment* env) {
+abslx::Status StridedSliceTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 3, 2, 4);
   src_tensor.data = {half(0.1f),  half(0.2f),  half(0.3f),  half(0.4),
@@ -58,7 +58,7 @@ absl::Status StridedSliceTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

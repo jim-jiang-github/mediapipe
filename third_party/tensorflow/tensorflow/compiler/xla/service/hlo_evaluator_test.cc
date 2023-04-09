@@ -58,7 +58,7 @@ class HloEvaluatorTest : public HloTestBase {
   HloEvaluatorTest() : use_bfloat16_(false) { InitializeFftData(); }
 
   StatusOr<Literal> Evaluate(
-      absl::Span<const Literal* const> arg_literals = {}) {
+      abslx::Span<const Literal* const> arg_literals = {}) {
     if (use_bfloat16_) {
       HloElementTypeConverter(F32, BF16).Run(m_.get()).ValueOrDie();
     }
@@ -69,7 +69,7 @@ class HloEvaluatorTest : public HloTestBase {
   // that is in HloTestBase. Once m_ in HloTestBase is
   // removed, this should be the default Evaluate function.
   Literal EvaluateWithModule(
-      HloModule* module, absl::Span<const Literal* const> arg_literals = {}) {
+      HloModule* module, abslx::Span<const Literal* const> arg_literals = {}) {
     if (use_bfloat16_) {
       HloElementTypeConverter(F32, BF16).Run(m_.get()).ValueOrDie();
     }
@@ -546,7 +546,7 @@ TEST_F(HloEvaluatorTest, DoesReshape) {
 
   using NativeT = typename primitive_util::PrimitiveTypeToNative<F32>::type;
   result.EachCell<NativeT>(
-      [&](absl::Span<const int64_t> indices, NativeT value) {
+      [&](abslx::Span<const int64_t> indices, NativeT value) {
         std::vector<int64_t> rindexes = PermuteInverse(indices, permutation);
         EXPECT_NEAR(value, literal_clone.Get<NativeT>(rindexes), 0.031250);
       });
@@ -2933,7 +2933,7 @@ TEST_P(HloEvaluatorBf16Test, Min3In5Stride2Tuple) {
   auto padding = std::pair<int64_t, int64_t>(0, 0);
   TF_ASSERT_OK_AND_ASSIGN(auto window,
                           ShapeInference::InferWindowFromDimensions(
-                              {3}, {2}, absl::MakeSpan(&padding, 1),
+                              {3}, {2}, abslx::MakeSpan(&padding, 1),
                               /*lhs_dilation=*/{},
                               /*rhs_dilation=*/{}));
   std::vector<const Shape*> input_shapes = {&input1->shape(), &input2->shape()};
@@ -2984,7 +2984,7 @@ TEST_P(HloEvaluatorBf16Test, Min3In5Stride2TupleDiffInput) {
   auto padding = std::pair<int64_t, int64_t>(0, 0);
   TF_ASSERT_OK_AND_ASSIGN(auto window,
                           ShapeInference::InferWindowFromDimensions(
-                              {3}, {2}, absl::MakeSpan(&padding, 1),
+                              {3}, {2}, abslx::MakeSpan(&padding, 1),
                               /*lhs_dilation=*/{},
                               /*rhs_dilation=*/{}));
   std::vector<const Shape*> input_shapes = {&input1->shape(), &input2->shape()};
@@ -4296,7 +4296,7 @@ ENTRY main {
 
 TEST_P(HloEvaluatorBf16Test, Bitcast) {
   // Regression test for b/114735354.
-  const absl::string_view hlo_text_base = R"(
+  const abslx::string_view hlo_text_base = R"(
 HloModule Bitcast
 
 ENTRY main {
@@ -4306,24 +4306,24 @@ ENTRY main {
 )";
   std::string hlo_text;
   if (use_bfloat16_) {
-    hlo_text = absl::StrFormat(hlo_text_base, "bf16", "bf16", "bf16");
+    hlo_text = abslx::StrFormat(hlo_text_base, "bf16", "bf16", "bf16");
   } else {
-    hlo_text = absl::StrFormat(hlo_text_base, "f32", "f32", "f32");
+    hlo_text = abslx::StrFormat(hlo_text_base, "f32", "f32", "f32");
   }
   TF_ASSERT_OK_AND_ASSIGN(m_, ParseAndReturnVerifiedModule(hlo_text));
   auto args = MakeFakeArguments(m_.get()).value();
   TF_ASSERT_OK_AND_ASSIGN(Literal actual, Evaluate({&args[0]}));
   if (use_bfloat16_) {
     EXPECT_TRUE(
-        absl::c_equal(args[0].data<bfloat16>(), actual.data<bfloat16>()));
+        abslx::c_equal(args[0].data<bfloat16>(), actual.data<bfloat16>()));
   } else {
-    EXPECT_TRUE(absl::c_equal(args[0].data<float>(), actual.data<float>()));
+    EXPECT_TRUE(abslx::c_equal(args[0].data<float>(), actual.data<float>()));
   }
 }
 
 // Check that s32 under/overflow doesn't trigger a ubsan failure.
 TEST_F(HloEvaluatorTest, Int32Overflow) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
 HloModule Test
 
 ENTRY main {
@@ -4352,7 +4352,7 @@ ENTRY main {
 }
 
 TEST_F(HloEvaluatorTest, GetDimensionSize) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
 HloModule Test
 
 ENTRY main {
@@ -4386,7 +4386,7 @@ ENTRY main {
 
 // Check that we get a useful error if we pass inputs of the wrong shape.
 TEST_F(HloEvaluatorTest, EvaluateWithWrongInputShapes) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
 HloModule Test
 
 ENTRY main {
@@ -4413,7 +4413,7 @@ ENTRY main {
 
 // Check that we get a useful error if we pass too many or too few inputs.
 TEST_F(HloEvaluatorTest, EvaluateWithWrongNumberOfInputs) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
 HloModule Test
 
 ENTRY main {
@@ -4435,7 +4435,7 @@ ENTRY main {
 }
 
 TEST_F(HloEvaluatorTest, PreserveFusionInputLayout) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
     HloModule FusionInputLayout
 
     fused_computation {
@@ -4453,11 +4453,11 @@ TEST_F(HloEvaluatorTest, PreserveFusionInputLayout) {
   auto args = MakeFakeArguments(m_.get()).value();
 
   TF_ASSERT_OK_AND_ASSIGN(Literal actual, Evaluate({&args[0]}));
-  EXPECT_TRUE(absl::c_equal(args[0].data<float>(), actual.data<float>()));
+  EXPECT_TRUE(abslx::c_equal(args[0].data<float>(), actual.data<float>()));
 }
 
 TEST_F(HloEvaluatorTest, PreserveFusionOutputLayout) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
     HloModule FusionOutputLayout
 
     fused_computation {
@@ -4474,11 +4474,11 @@ TEST_F(HloEvaluatorTest, PreserveFusionOutputLayout) {
   TF_ASSERT_OK_AND_ASSIGN(m_, ParseAndReturnVerifiedModule(hlo_text));
   auto args = MakeFakeArguments(m_.get()).value();
   TF_ASSERT_OK_AND_ASSIGN(Literal actual, Evaluate({&args[0]}));
-  EXPECT_TRUE(absl::c_equal(args[0].data<float>(), actual.data<float>()));
+  EXPECT_TRUE(abslx::c_equal(args[0].data<float>(), actual.data<float>()));
 }
 
 TEST_F(HloEvaluatorTest, PreserveMOFusionOutputLayout) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
     HloModule MOFusionOutputLayout
 
     fused_computation {
@@ -4498,12 +4498,12 @@ TEST_F(HloEvaluatorTest, PreserveMOFusionOutputLayout) {
   TF_ASSERT_OK_AND_ASSIGN(Literal actual_tuple, Evaluate({&args[0]}));
   std::vector<Literal> actual_literals = actual_tuple.DecomposeTuple();
   EXPECT_TRUE(
-      absl::c_equal(args[0].data<float>(), actual_literals[0].data<float>()));
+      abslx::c_equal(args[0].data<float>(), actual_literals[0].data<float>()));
 }
 
 // Tests that custom_calls fail to evaluate when no handler is specified.
 TEST_F(HloEvaluatorTest, EvaluateCustomCall_NoHandler) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
     HloModule EvaluateCustomCall_NoHandler
     ENTRY kernel_entry {
       parameter.0 = u32[2,2]{1,0} parameter(0)
@@ -4520,7 +4520,7 @@ TEST_F(HloEvaluatorTest, EvaluateCustomCall_NoHandler) {
 
 // Tests when a custom_call handler returns an error.
 TEST_F(HloEvaluatorTest, EvaluateCustomCall_HandlerError) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
     HloModule EvaluateCustomCall_HandlerError
     ENTRY kernel_entry {
       parameter.0 = u32[2,2]{1,0} parameter(0)
@@ -4533,7 +4533,7 @@ TEST_F(HloEvaluatorTest, EvaluateCustomCall_HandlerError) {
   auto args = MakeFakeArguments(m_.get()).value();
   HloEvaluator evaluator;
   evaluator.set_custom_call_handler(
-      [](HloInstruction* custom_call, absl::Span<const Literal*> operands) {
+      [](HloInstruction* custom_call, abslx::Span<const Literal*> operands) {
         return InternalError("Test error");
       });
   EXPECT_EQ(evaluator.Evaluate(*m_, {&args[0]}).status().code(),
@@ -4544,7 +4544,7 @@ TEST_F(HloEvaluatorTest, EvaluateCustomCall_HandlerError) {
 // We sum the operands so that we can verify the operand and output literals
 // are properly mapped for access.
 TEST_F(HloEvaluatorTest, EvaluateCustomCall_ManyInputs) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
     HloModule EvaluateCustomCall_ManyInputs
     ENTRY kernel_entry {
       parameter.0 = u32[1]{0} parameter(0)
@@ -4558,7 +4558,7 @@ TEST_F(HloEvaluatorTest, EvaluateCustomCall_ManyInputs) {
   auto args = MakeFakeArguments(m_.get()).value();
   HloEvaluator evaluator;
   evaluator.set_custom_call_handler(
-      [](HloInstruction* custom_call, absl::Span<const Literal*> operands) {
+      [](HloInstruction* custom_call, abslx::Span<const Literal*> operands) {
         EXPECT_EQ(HloOpcode::kCustomCall, custom_call->opcode());
         EXPECT_EQ("_my_custom_call", custom_call->custom_call_target());
         EXPECT_EQ(2, custom_call->operand_count());
@@ -4576,11 +4576,11 @@ TEST_F(HloEvaluatorTest, EvaluateCustomCall_ManyInputs) {
   auto arg0_data = args[0].data<uint32_t>();
   auto arg1_data = args[1].data<uint32_t>();
   std::vector<uint32_t> expected_data = {arg0_data[0] + arg1_data[0]};
-  EXPECT_TRUE(absl::c_equal(expected_data, actual_literal.data<uint32_t>()));
+  EXPECT_TRUE(abslx::c_equal(expected_data, actual_literal.data<uint32_t>()));
 }
 
 TEST_F(HloEvaluatorTest, IsFiniteF16) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
   HloModule test
 
   ENTRY IsFiniteTest {
@@ -4597,7 +4597,7 @@ TEST_F(HloEvaluatorTest, IsFiniteF16) {
 }
 
 TEST_F(HloEvaluatorTest, IsFiniteBf16) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
   HloModule test
 
   ENTRY IsFiniteTest {
@@ -4616,7 +4616,7 @@ TEST_F(HloEvaluatorTest, IsFiniteBf16) {
 // Check that evaluating `f32[<huge>, 0] iota` doesn't oom (it's an empty
 // array!).
 TEST_F(HloEvaluatorTest, ZeroSizedIotaWithHugeDimension) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
   HloModule test
   ENTRY t {
     ROOT i = f32[1000000000000, 0] iota(), iota_dimension=0
@@ -4629,7 +4629,7 @@ TEST_F(HloEvaluatorTest, ZeroSizedIotaWithHugeDimension) {
 }
 
 TEST_F(HloEvaluatorTest, CopyStartCopyDone) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
   HloModule test
   ENTRY CopyStartCopyDone {
     init = f32[] constant(42.0)
@@ -4645,7 +4645,7 @@ TEST_F(HloEvaluatorTest, CopyStartCopyDone) {
 }
 
 TEST_F(HloEvaluatorTest, AsyncOps) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
   HloModule test
   ENTRY AsyncOps {
     init = f32[] constant(42.0)
@@ -4662,7 +4662,7 @@ TEST_F(HloEvaluatorTest, AsyncOps) {
 }
 
 TEST_F(HloEvaluatorTest, MapBF16) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
   HloModule test
 
   map_computation {
@@ -4684,7 +4684,7 @@ TEST_F(HloEvaluatorTest, MapBF16) {
 }
 
 TEST_F(HloEvaluatorTest, MapS16) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
   HloModule test
 
   map_computation {
@@ -4706,7 +4706,7 @@ TEST_F(HloEvaluatorTest, MapS16) {
 }
 
 TEST_F(HloEvaluatorTest, MapU16) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
   HloModule test
 
   map_computation {
@@ -4728,7 +4728,7 @@ TEST_F(HloEvaluatorTest, MapU16) {
 }
 
 TEST_F(HloEvaluatorTest, MapMixed) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
   HloModule test
 
   map_computation {
@@ -4752,7 +4752,7 @@ TEST_F(HloEvaluatorTest, MapMixed) {
 }
 
 TEST_F(HloEvaluatorTest, DotUpcast) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
   HloModule test
   ENTRY DotUpcast {
     l = s16[4,3]{1,0} parameter(0)
@@ -4793,7 +4793,7 @@ TEST_F(HloEvaluatorTest, DotUpcast) {
 }
 
 TEST_F(HloEvaluatorTest, SortC64) {
-  const absl::string_view hlo_text = R"(
+  const abslx::string_view hlo_text = R"(
   HloModule m
 
   sort_lt_comparator {
@@ -4968,7 +4968,7 @@ TEST_F(HloEvaluatorTest, GetTupleElementInterleavedWithTupleSucceeds) {
 class PatternMatchParseWhileLoopTest : public HloTestBase {};
 
 TEST_F(PatternMatchParseWhileLoopTest, LoopBoundDefinedInsideOfCond) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %while_condition {
@@ -5015,7 +5015,7 @@ TEST_F(PatternMatchParseWhileLoopTest, LoopBoundDefinedInsideOfCond) {
 }
 
 TEST_F(PatternMatchParseWhileLoopTest, LoopBoundDefinedOutsideOfCond) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %while_condition {
@@ -5064,7 +5064,7 @@ TEST_F(PatternMatchParseWhileLoopTest, LoopBoundDefinedOutsideOfCond) {
 }
 
 TEST_F(PatternMatchParseWhileLoopTest, LoopBoundComputedOutsideOfCond) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %while_condition {
@@ -5115,7 +5115,7 @@ TEST_F(PatternMatchParseWhileLoopTest, LoopBoundComputedOutsideOfCond) {
 }
 
 TEST_F(PatternMatchParseWhileLoopTest, StepSizeNotOne) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %while_condition {
@@ -5167,7 +5167,7 @@ TEST_F(PatternMatchParseWhileLoopTest, StepSizeNotOne) {
 
 // The loop condition comparison is computed by a call to another computation.
 TEST_F(PatternMatchParseWhileLoopTest, RecursiveCond) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %compute_pred {
@@ -5226,7 +5226,7 @@ TEST_F(PatternMatchParseWhileLoopTest, RecursiveCond) {
 // The called computation could be calling another computation and could use
 // get-tuple-element to extract the result.
 TEST_F(PatternMatchParseWhileLoopTest, RecursiveCondGetTupleElement) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %compute_pred {
@@ -5288,7 +5288,7 @@ TEST_F(PatternMatchParseWhileLoopTest, RecursiveCondGetTupleElement) {
 }
 
 TEST_F(PatternMatchParseWhileLoopTest, LoopBoundDependsOnAnotherLoop) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %compute_pred.0 {
@@ -5375,7 +5375,7 @@ TEST_F(PatternMatchParseWhileLoopTest, LoopBoundDependsOnAnotherLoop) {
 }
 
 TEST_F(PatternMatchParseWhileLoopTest, DynamicLoop) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %while_condition {
@@ -5420,7 +5420,7 @@ TEST_F(PatternMatchParseWhileLoopTest, DynamicLoop) {
 
 // The loop condition comparison is computed by a call to another computation.
 TEST_F(PatternMatchParseWhileLoopTest, BooleanCond) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
     %while_condition {
       %param = (pred[], f32[1024, 1024], f32[1024, 1024]) parameter(0)

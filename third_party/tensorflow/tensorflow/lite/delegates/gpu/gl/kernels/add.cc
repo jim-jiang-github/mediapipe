@@ -39,7 +39,7 @@ namespace {
 
 class Add : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     const auto& attr = std::any_cast<const ElementwiseAttributes&>(ctx.op_attr);
     auto adds = std::get_if<Tensor<Linear, DataType::FLOAT32>>(&attr.param);
@@ -53,7 +53,7 @@ class Add : public NodeShader {
       const std::string x_coord = hwc_tensor->shape.w == 1 ? "0" : "gid.x";
       const std::string y_coord = hwc_tensor->shape.h == 1 ? "0" : "gid.y";
       const std::string s_coord = hwc_tensor->shape.c == 1 ? "0" : "gid.z";
-      code = absl::StrCat("vec4 second_val = $hwc_buffer[", x_coord, ", ",
+      code = abslx::StrCat("vec4 second_val = $hwc_buffer[", x_coord, ", ",
                           y_coord, ", ", s_coord, "]$;\n");
       if (hwc_tensor->shape.c == 1) {
         code += "  second_val.y = second_val.x;\n";
@@ -81,7 +81,7 @@ class Add : public NodeShader {
           /*input=*/IOStructure::AUTO,
           /*output=*/IOStructure::AUTO,
       };
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     if (!adds && !scalar) {
@@ -103,17 +103,17 @@ class Add : public NodeShader {
             /*input=*/IOStructure::ONLY_DEFINITIONS,
             /*output=*/IOStructure::AUTO,
         };
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
 
       std::string code = "value_0 = value_0";
       for (int index = 1; index < ctx.input_shapes.size(); ++index) {
         if (ctx.input_shapes[index] != ctx.input_shapes[0]) {
-          return absl::InvalidArgumentError("Shapes are not equal");
+          return abslx::InvalidArgumentError("Shapes are not equal");
         }
-        absl::StrAppend(&code, " + value_", index);
+        abslx::StrAppend(&code, " + value_", index);
       }
-      absl::StrAppend(&code, ";");
+      abslx::StrAppend(&code, ";");
       *generated_code = {
           /*parameters=*/{},
           /*objects=*/{},
@@ -124,7 +124,7 @@ class Add : public NodeShader {
           /*input=*/IOStructure::AUTO,
           /*output=*/IOStructure::AUTO,
       };
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     if (scalar) {
@@ -138,7 +138,7 @@ class Add : public NodeShader {
           /*input=*/IOStructure::AUTO,
           /*output=*/IOStructure::AUTO,
       };
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     *generated_code = {
@@ -154,7 +154,7 @@ class Add : public NodeShader {
         /*input=*/IOStructure::AUTO,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

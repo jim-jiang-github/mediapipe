@@ -27,7 +27,7 @@ using RootInstructionSinkerTest = HloTestBase;
 
 TEST_F(RootInstructionSinkerTest, TupleNoChange) {
   // ROOTS are already sunk, no change performed to the module.
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule While, is_scheduled=true
   While.body {
     loop_var.1 = (s32[], s32[3]{0}) parameter(0)
@@ -68,7 +68,7 @@ TEST_F(RootInstructionSinkerTest, TupleNoChange) {
 
 TEST_F(RootInstructionSinkerTest, Tuple) {
   // Sink tuple return type.
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule While, is_scheduled=true
   While.body {
     loop_var.1 = (s32[], s32[3]{0}) parameter(0)
@@ -112,7 +112,7 @@ TEST_F(RootInstructionSinkerTest, Tuple) {
 
 TEST_F(RootInstructionSinkerTest, NontupleNoChange) {
   // ROOTS are already sunk, no change performed to the module.
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule Call, is_scheduled=true
   Call {
     param = s32[3]{0} parameter(0)
@@ -139,7 +139,7 @@ TEST_F(RootInstructionSinkerTest, NontupleNoChange) {
 
 TEST_F(RootInstructionSinkerTest, Nontuple) {
   // Sink a non-tuple return type.
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule Call, is_scheduled=true
   Call {
     param = s32[3]{0} parameter(0)

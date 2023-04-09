@@ -28,7 +28,7 @@ ABSL_DECLARE_FLAG(std::vector<std::string>, fromenv);
 ABSL_DECLARE_FLAG(std::vector<std::string>, tryfromenv);
 ABSL_DECLARE_FLAG(std::vector<std::string>, undefok);
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace flags_internal {
 
@@ -50,10 +50,10 @@ std::vector<char*> ParseCommandLineImpl(int argc, char* argv[],
 
 // Returns true if flag with specified name was either present on the original
 // command line or specified in flag file present on the original command line.
-bool WasPresentOnCommandLine(absl::string_view flag_name);
+bool WasPresentOnCommandLine(abslx::string_view flag_name);
 
 }  // namespace flags_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_FLAGS_INTERNAL_PARSE_H_

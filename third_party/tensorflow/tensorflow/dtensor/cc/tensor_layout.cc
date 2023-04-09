@@ -157,11 +157,11 @@ std::string ShardVector::ToString() const {
   std::vector<std::string> shard_strs;
   shard_strs.reserve(shards.size());
   for (const Shard& shard : shards)
-    shard_strs.push_back("(" + absl::StrJoin(shard, ",") + ")");
+    shard_strs.push_back("(" + abslx::StrJoin(shard, ",") + ")");
   // Join shards, and append dimensions.
-  absl::StrAppend(&string, absl::StrJoin(shard_strs, ","));
-  absl::StrAppend(&string, "] num_shards_per_dim:(");
-  absl::StrAppend(&string, absl::StrJoin(num_shards_per_dim, ",") + ")");
+  abslx::StrAppend(&string, abslx::StrJoin(shard_strs, ","));
+  abslx::StrAppend(&string, "] num_shards_per_dim:(");
+  abslx::StrAppend(&string, abslx::StrJoin(num_shards_per_dim, ",") + ")");
   return string;
 }
 
@@ -301,7 +301,7 @@ StatusOr<Mesh> Mesh::GetMesh(const std::string& name,
   return mesh;
 }
 
-StatusOr<int64_t> Mesh::dim_size(absl::string_view name) const {
+StatusOr<int64_t> Mesh::dim_size(abslx::string_view name) const {
   for (const auto& mesh_dim : dims()) {
     if (name == mesh_dim.name) {
       return mesh_dim.size;
@@ -313,7 +313,7 @@ StatusOr<int64_t> Mesh::dim_size(absl::string_view name) const {
 
   return errors::NotFound(
       "Dimension ", name, " does not exist in mesh.",
-      "Available dimensions: ", absl::StrJoin(dim_names, ","));
+      "Available dimensions: ", abslx::StrJoin(dim_names, ","));
 }
 
 std::vector<int64_t> Mesh::dim_sizes() const {
@@ -335,7 +335,7 @@ StatusOr<const std::vector<DeviceNameUtils::ParsedName>> Mesh::ParsedDevices()
       local_devices_.size());
   for (std::size_t i = 0; i < local_devices_.size(); ++i)
     if (!DeviceNameUtils::ParseFullOrLocalName(
-            absl::string_view(local_devices_[i]), &parsed_devices[i]))
+            abslx::string_view(local_devices_[i]), &parsed_devices[i]))
       return errors::InvalidArgument("Failed to parse local_devices");
 
   return parsed_devices;
@@ -345,7 +345,7 @@ StatusOr<Mesh> Mesh::ToDeviceType(const std::string& device_type) const {
   std::vector<std::string> to_local_devices;
   DeviceNameUtils::ParsedName parsed_dev;
   for (const std::string& local_dev : local_devices_) {
-    if (!DeviceNameUtils::ParseFullOrLocalName(absl::string_view(local_dev),
+    if (!DeviceNameUtils::ParseFullOrLocalName(abslx::string_view(local_dev),
                                                &parsed_dev)) {
       return errors::InvalidArgument("Failed to parse local devices");
     }
@@ -451,27 +451,27 @@ std::string Mesh::ToString() const {
   if (Mesh::IsEmpty()) return kEmptyMeshString;
 
   // We use "|" to separate name, mesh dimensions and devices.
-  std::string mesh_str = absl::StrCat(Mesh::name(), "|");
+  std::string mesh_str = abslx::StrCat(Mesh::name(), "|");
 
   // Add mesh dimensions
-  absl::InlinedVector<std::string, 4> mesh_dim_lst;
+  abslx::InlinedVector<std::string, 4> mesh_dim_lst;
   for (const auto& dim : mesh_dims_)
-    mesh_dim_lst.push_back(absl::StrCat(dim.name, "=", dim.size));
-  mesh_str += absl::StrJoin(mesh_dim_lst, ",") + "|";
+    mesh_dim_lst.push_back(abslx::StrCat(dim.name, "=", dim.size));
+  mesh_str += abslx::StrJoin(mesh_dim_lst, ",") + "|";
 
   // Add flattened list of global device ids
-  mesh_str += absl::StrJoin(global_device_ids_, ",") + "|";
+  mesh_str += abslx::StrJoin(global_device_ids_, ",") + "|";
 
   // Add flattened list of local device ids
-  mesh_str += absl::StrJoin(local_device_ids_, ",") + "|";
+  mesh_str += abslx::StrJoin(local_device_ids_, ",") + "|";
 
   // Add flattened list of local devices
-  mesh_str += absl::StrJoin(local_devices_, ",");
+  mesh_str += abslx::StrJoin(local_devices_, ",");
 
   if (!global_devices_.empty()) {
     // Add flattened list of global devices
     mesh_str += "|";
-    mesh_str += absl::StrJoin(global_devices_, ",");
+    mesh_str += abslx::StrJoin(global_devices_, ",");
   }
   return mesh_str;
 }
@@ -481,20 +481,20 @@ uint64 Mesh::GlobalFingerprint() const {
 
   std::string mesh_str;
   // Add mesh dimensions
-  absl::InlinedVector<std::string, 4> mesh_dim_lst;
+  abslx::InlinedVector<std::string, 4> mesh_dim_lst;
   for (const auto& dim : mesh_dims_)
-    mesh_dim_lst.push_back(absl::StrCat(dim.name, "=", dim.size));
-  mesh_str += absl::StrJoin(mesh_dim_lst, ",") + "|";
+    mesh_dim_lst.push_back(abslx::StrCat(dim.name, "=", dim.size));
+  mesh_str += abslx::StrJoin(mesh_dim_lst, ",") + "|";
 
   // Ignore local_device_ids_, local_devices and name which might be not global
   // unique.
   // Add flattened list of global device ids
-  mesh_str += absl::StrJoin(global_device_ids_, ",") + "|";
+  mesh_str += abslx::StrJoin(global_device_ids_, ",") + "|";
 
   if (!global_devices_.empty()) {
     // Add flattened list of global devices
     mesh_str += "|";
-    mesh_str += absl::StrJoin(global_devices_, ",");
+    mesh_str += abslx::StrJoin(global_devices_, ",");
   }
   // mesh dims | global device ids (| global devices)
   return Fingerprint64(mesh_str);
@@ -505,7 +505,7 @@ MeshDimension StrToMeshDimension(const std::string& str) {
   MeshDimension mesh_dim;
   if (str.empty()) return mesh_dim;
 
-  std::vector<std::string> mesh_dim_parts = absl::StrSplit(str, '=');
+  std::vector<std::string> mesh_dim_parts = abslx::StrSplit(str, '=');
 
   mesh_dim.name = mesh_dim_parts[0];
   mesh_dim.size = std::stoi(mesh_dim_parts[1]);
@@ -517,7 +517,7 @@ StatusOr<Mesh> GenerateMeshDevicesForTests(
     const std::string& mesh_gen_instruction) {
   // Parse mesh generation instruction.
   std::vector<std::string> instruction_parts =
-      absl::StrSplit(mesh_gen_instruction, '*');
+      abslx::StrSplit(mesh_gen_instruction, '*');
   if (instruction_parts.size() != 2)
     TF_RETURN_WITH_CONTEXT(errors::InvalidArgument(
         "Expected a * in mesh_gen_instructions but found ",
@@ -554,7 +554,7 @@ StatusOr<Mesh> GenerateMeshDevicesForTests(
 StatusOr<Mesh> Mesh::FromString(const std::string& str) {
   if (str == kEmptyMeshString) return Mesh::Empty();
 
-  std::vector<std::string> mesh_parts = absl::StrSplit(str, '|');
+  std::vector<std::string> mesh_parts = abslx::StrSplit(str, '|');
 
   // Check formatting error.
   if (mesh_parts.size() != 3 && mesh_parts.size() != 5 &&
@@ -568,7 +568,7 @@ StatusOr<Mesh> Mesh::FromString(const std::string& str) {
   // Add mesh dimensions.
   std::vector<MeshDimension> mesh_dims;
   if (!mesh_parts[1].empty()) {
-    std::vector<std::string> mesh_dim_strs = absl::StrSplit(mesh_parts[1], ',');
+    std::vector<std::string> mesh_dim_strs = abslx::StrSplit(mesh_parts[1], ',');
     mesh_dims.reserve(mesh_dim_strs.size());
     for (const std::string& mesh_dim_str : mesh_dim_strs)
       mesh_dims.push_back(StrToMeshDimension(mesh_dim_str));
@@ -582,7 +582,7 @@ StatusOr<Mesh> Mesh::FromString(const std::string& str) {
   std::vector<int64_t> global_device_ids;
   if (!mesh_parts[2].empty()) {
     std::vector<std::string> global_device_ids_strs =
-        absl::StrSplit(mesh_parts[2], ',');
+        abslx::StrSplit(mesh_parts[2], ',');
 
     global_device_ids.reserve(global_device_ids_strs.size());
     for (const std::string& id : global_device_ids_strs)
@@ -593,7 +593,7 @@ StatusOr<Mesh> Mesh::FromString(const std::string& str) {
   std::vector<int64_t> local_device_ids;
   if (!mesh_parts[3].empty()) {
     std::vector<std::string> local_device_ids_strs =
-        absl::StrSplit(mesh_parts[3], ',');
+        abslx::StrSplit(mesh_parts[3], ',');
 
     local_device_ids.reserve(local_device_ids_strs.size());
     for (const std::string& id : local_device_ids_strs)
@@ -602,13 +602,13 @@ StatusOr<Mesh> Mesh::FromString(const std::string& str) {
   // Add local devices.
   std::vector<std::string> local_devices;
   if (!mesh_parts[4].empty())
-    local_devices = absl::StrSplit(mesh_parts[4], ',');
+    local_devices = abslx::StrSplit(mesh_parts[4], ',');
 
   std::vector<std::string> global_devices;
   if (mesh_parts.size() == 6) {
     // Add global devices.
     if (!mesh_parts[5].empty())
-      global_devices = absl::StrSplit(mesh_parts[5], ',');
+      global_devices = abslx::StrSplit(mesh_parts[5], ',');
   }
 
   TF_ASSIGN_OR_RETURN(
@@ -650,7 +650,7 @@ int64 Mesh::GetFlattenedCoordinate(const DeviceLocation& loc) const {
   return device_pos;
 }
 
-StatusOr<int32> Mesh::idx_for_dim(absl::string_view dim_name) const {
+StatusOr<int32> Mesh::idx_for_dim(abslx::string_view dim_name) const {
   for (int i = 0; i < mesh_dims_.size(); ++i) {
     if (mesh_dims_[i].name == dim_name) return i;
   }
@@ -896,7 +896,7 @@ std::vector<int32> Layout::num_shards() const {
 }
 
 size_t Layout::num_shards_for_dim(const ShardingSpec& dim) const {
-  absl::string_view name = dim.sharding_spec();
+  abslx::string_view name = dim.sharding_spec();
   if (name == Layout::kUnshardedDim) return 1;
   if (name == Layout::kMatch) return -1;
 
@@ -983,7 +983,7 @@ std::vector<int64_t> Layout::GlobalShapeFromLocalShape(
 }
 
 std::vector<int64_t> Layout::LocalShapeFromGlobalShape(
-    absl::Span<const int64_t> global_shape) const {
+    abslx::Span<const int64_t> global_shape) const {
   if (IsFullyReplicated()) {
     return std::vector<int64_t>(global_shape.begin(), global_shape.end());
   }
@@ -1046,22 +1046,22 @@ StatusOr<Layout> Layout::FromString(std::string layout_str) {
   if (layout_str == kEmptyLayoutString) return Layout::Empty();
 
   // Print sharding specs.
-  std::vector<absl::string_view> layout_parts = absl::StrSplit(layout_str, ' ');
+  std::vector<abslx::string_view> layout_parts = abslx::StrSplit(layout_str, ' ');
   // Check formatting error.
   if (layout_parts.size() != 2) {
     TF_RETURN_WITH_CONTEXT(errors::InvalidArgument(
         "Expected 2 items but found ", layout_parts.size(), layout_parts[0]));
   }
   // Substract prefixes.
-  absl::string_view sharding_spec_str = layout_parts[0];
-  absl::ConsumePrefix(&sharding_spec_str, "sharding_specs:");
+  abslx::string_view sharding_spec_str = layout_parts[0];
+  abslx::ConsumePrefix(&sharding_spec_str, "sharding_specs:");
 
-  absl::string_view mesh_str = layout_parts[1];
-  absl::ConsumePrefix(&mesh_str, "mesh:");
+  abslx::string_view mesh_str = layout_parts[1];
+  abslx::ConsumePrefix(&mesh_str, "mesh:");
 
   // Add sharding specs.
   std::vector<std::string> sharding_spec_strs =
-      absl::StrSplit(sharding_spec_str, ',');
+      abslx::StrSplit(sharding_spec_str, ',');
   sharding_spec_strs.pop_back();
 
   // Add mesh.
@@ -1086,15 +1086,15 @@ std::string Layout::ToString() const {
   // Print sharding specs.
   for (const ShardingSpec& dim : sharding_specs_) {
     std::string dim_name = dim.sharding_spec();
-    absl::StrAppend(&layout_str, dim_name + ",");
+    abslx::StrAppend(&layout_str, dim_name + ",");
   }
   // Append mesh.
-  absl::StrAppend(&layout_str, " mesh:", mesh_.ToString());
+  abslx::StrAppend(&layout_str, " mesh:", mesh_.ToString());
   return layout_str;
 }
 
 Layout Layout::GetLayoutWithReducedDims(
-    const absl::flat_hash_set<int>& reduced_dims, bool keep_dims) const {
+    const abslx::flat_hash_set<int>& reduced_dims, bool keep_dims) const {
   dtensor::LayoutProto output_layout;
   *output_layout.mutable_mesh_config() = mesh().ToProto();
 
@@ -1160,7 +1160,7 @@ StatusOr<Layout> ConcatenateLayouts(const Layout& layout_a,
     return errors::InvalidArgument(
         "unable to concatenate layouts as they are on different meshes.");
 
-  absl::flat_hash_set<std::string> layout_a_mesh_dims;
+  abslx::flat_hash_set<std::string> layout_a_mesh_dims;
   for (int i = 0; i < layout_a.rank(); ++i)
     if (layout_a.sharding_spec(i) != Layout::kUnshardedDim)
       layout_a_mesh_dims.emplace(layout_a.sharding_spec(i));

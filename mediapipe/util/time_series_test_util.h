@@ -105,7 +105,7 @@ class TimeSeriesCalculatorTest : public ::testing::Test {
     std::vector<std::string> base_names;
     std::vector<std::string> ids;
     for (const std::string& tag : tags) {
-      const std::string tagged_base_name = absl::StrCat(tag, ":", base_name);
+      const std::string tagged_base_name = abslx::StrCat(tag, ":", base_name);
       base_names.push_back(tagged_base_name);
 
       std::string id;
@@ -127,7 +127,7 @@ class TimeSeriesCalculatorTest : public ::testing::Test {
     std::vector<std::string> base_names;
     std::vector<std::string> ids;
     for (int i = 0; i < total; ++i) {
-      const std::string id = absl::StrCat(i);
+      const std::string id = abslx::StrCat(i);
       ids.push_back(id);
       base_names.push_back(base_name);
     }
@@ -145,7 +145,7 @@ class TimeSeriesCalculatorTest : public ::testing::Test {
       const std::string name_template = R"($0_$1)";
       const std::string& base_name = base_names[i];
       const std::string& id = ids[i];
-      const std::string name = absl::Substitute(name_template, base_name, id);
+      const std::string name = abslx::Substitute(name_template, base_name, id);
       names.push_back(name);
     }
     return names;
@@ -307,7 +307,7 @@ class TimeSeriesCalculatorTest : public ::testing::Test {
     AppendInputPacket(payload, Timestamp(timestamp), input_tag);
   }
 
-  absl::Status RunGraph() { return runner_->Run(); }
+  abslx::Status RunGraph() { return runner_->Run(); }
 
   bool HasInputHeader(const size_t input_index = 0) const {
     return input(input_index)

@@ -262,7 +262,7 @@ llvm::Error FillAttrValueMapUsingScalar(const OpAttrsRawEntry& entry,
 
 }  // namespace
 
-Status ParseTfDataType(absl::string_view dtype, DataType* data_type) {
+Status ParseTfDataType(abslx::string_view dtype, DataType* data_type) {
   if (dtype == "DT_INT8") {
     *data_type = DataType::DT_INT8;
     return OkStatus();
@@ -424,7 +424,7 @@ tfrt::DType ConvertTfDataTypeToBefAttrType(DataType data_type) {
   }
 }
 
-Status ParseBoolAttrValue(absl::string_view attr_value, bool* bool_val) {
+Status ParseBoolAttrValue(abslx::string_view attr_value, bool* bool_val) {
   if (attr_value == "false") {
     *bool_val = false;
     return OkStatus();
@@ -437,8 +437,8 @@ Status ParseBoolAttrValue(absl::string_view attr_value, bool* bool_val) {
   }
 }
 
-Status ParseIntAttrValue(absl::string_view attr_value, int64_t* int_val) {
-  bool success = absl::SimpleAtoi(attr_value, int_val);
+Status ParseIntAttrValue(abslx::string_view attr_value, int64_t* int_val) {
+  bool success = abslx::SimpleAtoi(attr_value, int_val);
   if (!success) {
     return errors::InvalidArgument("Could not parse int from \"", attr_value,
                                    "\"");
@@ -446,7 +446,7 @@ Status ParseIntAttrValue(absl::string_view attr_value, int64_t* int_val) {
   return OkStatus();
 }
 
-Status ParseTensorAttrValue(absl::string_view attr_value,
+Status ParseTensorAttrValue(abslx::string_view attr_value,
                             tensorflow::Tensor* tensor) {
   if (std::is_base_of<tensorflow::protobuf::Message,
                       tensorflow::TensorProto>()) {
@@ -471,7 +471,7 @@ Status ParseTensorAttrValue(absl::string_view attr_value,
   }
 }
 
-Status ParseTensorShapeAttrValue(absl::string_view attr_value,
+Status ParseTensorShapeAttrValue(abslx::string_view attr_value,
                                  std::vector<int64_t>* shape_val) {
   if (attr_value.size() < 2 || attr_value[0] != '[' ||
       attr_value[attr_value.size() - 1] != ']') {
@@ -480,11 +480,11 @@ Status ParseTensorShapeAttrValue(absl::string_view attr_value,
         "got \"",
         attr_value, "\"");
   }
-  absl::string_view attr_value_trunc =
+  abslx::string_view attr_value_trunc =
       attr_value.substr(1, attr_value.size() - 2);
-  // `container` is an absl::strings_internal::Splitter, which is a
+  // `container` is an abslx::strings_internal::Splitter, which is a
   // lazy-splitting iterable. So we cannot get its size to reserve `dims`.
-  auto container = absl::StrSplit(attr_value_trunc, ',');
+  auto container = abslx::StrSplit(attr_value_trunc, ',');
   for (auto it = container.begin(); it != container.end(); ++it) {
     int64_t int_val;
     if (!ParseIntAttrValue(*it, &int_val).ok()) {
@@ -496,15 +496,15 @@ Status ParseTensorShapeAttrValue(absl::string_view attr_value,
   return OkStatus();
 }
 
-bool IsUnusedAttribute(absl::string_view attr_name) {
+bool IsUnusedAttribute(abslx::string_view attr_name) {
   // These are extra attributes added by TF MLIR dialect, and not needed by
   // current TF runtime.
   //
   // TODO(chky): Consider removing this attribute in tf-to-tfrt
   // lowering.
-  return absl::StrContains(attr_name, "result_segment_sizes") ||
-         absl::StrContains(attr_name, "operand_segment_sizes") ||
-         absl::EndsWith(attr_name, "_tf_data_function");
+  return abslx::StrContains(attr_name, "result_segment_sizes") ||
+         abslx::StrContains(attr_name, "operand_segment_sizes") ||
+         abslx::EndsWith(attr_name, "_tf_data_function");
 }
 
 llvm::Error FillAttrValueMap(const tfrt::OpAttrsRef& attrs,
@@ -532,7 +532,7 @@ llvm::Error FillAttrValueMap(const tfrt::OpAttrsRef& attrs,
 namespace {
 
 tensorflow::Tensor CreateTfTensorFromDenseAttr(tfrt::DenseAttr attr) {
-  tensorflow::TensorShape shape(absl::InlinedVector<int64_t, 4>(
+  tensorflow::TensorShape shape(abslx::InlinedVector<int64_t, 4>(
       attr.shape().begin(), attr.shape().end()));
   tensorflow::DataType dtype = ConvertBefAttrTypeToTfDataType(attr.dtype());
 

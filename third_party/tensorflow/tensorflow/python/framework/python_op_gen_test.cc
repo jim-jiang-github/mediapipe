@@ -24,12 +24,12 @@ namespace tensorflow {
 namespace {
 
 void ExpectHasSubstr(const string& s, const string& expected) {
-  EXPECT_TRUE(absl::StrContains(s, expected))
+  EXPECT_TRUE(abslx::StrContains(s, expected))
       << "'Generated ops does not contain '" << expected << "'";
 }
 
 void ExpectDoesNotHaveSubstr(const string& s, const string& expected) {
-  EXPECT_FALSE(absl::StrContains(s, expected))
+  EXPECT_FALSE(abslx::StrContains(s, expected))
       << "'Generated ops contains '" << expected << "'";
 }
 

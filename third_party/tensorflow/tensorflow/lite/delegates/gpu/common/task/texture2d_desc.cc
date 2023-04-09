@@ -40,30 +40,30 @@ GPUResources Texture2DDescriptor::GetGPUResources(
   return resources;
 }
 
-absl::Status Texture2DDescriptor::PerformSelector(
+abslx::Status Texture2DDescriptor::PerformSelector(
     const GpuInfo& gpu_info, const std::string& selector,
     const std::vector<std::string>& args,
     const std::vector<std::string>& template_args, std::string* result) const {
   if (selector == "Read") {
     return PerformReadSelector(gpu_info, args, result);
   } else {
-    return absl::NotFoundError(absl::StrCat(
+    return abslx::NotFoundError(abslx::StrCat(
         "Texture2DDescriptor don't have selector with name - ", selector));
   }
 }
 
-absl::Status Texture2DDescriptor::PerformReadSelector(
+abslx::Status Texture2DDescriptor::PerformReadSelector(
     const GpuInfo& gpu_info, const std::vector<std::string>& args,
     std::string* result) const {
   if (args.size() != 2) {
-    return absl::NotFoundError(
-        absl::StrCat("Texture2DDescriptor Read require two arguments, but ",
+    return abslx::NotFoundError(
+        abslx::StrCat("Texture2DDescriptor Read require two arguments, but ",
                      args.size(), " was passed"));
   }
   if (gpu_info.IsApiMetal()) {
     *result =
-        absl::StrCat("tex2d.read(ushort2(", args[0], ", " + args[1] + "))");
-    return absl::OkStatus();
+        abslx::StrCat("tex2d.read(ushort2(", args[0], ", " + args[1] + "))");
+    return abslx::OkStatus();
   } else if (gpu_info.IsApiOpenCl()) {
     std::string read;
     switch (element_type) {
@@ -97,25 +97,25 @@ absl::Status Texture2DDescriptor::PerformReadSelector(
         read = "unknown_type";
         break;
     }
-    *result = absl::StrCat(read, "(tex2d, smp_none, (int2)(", args[0],
+    *result = abslx::StrCat(read, "(tex2d, smp_none, (int2)(", args[0],
                            ", " + args[1] + "))");
-    return absl::OkStatus();
+    return abslx::OkStatus();
   } else if (gpu_info.IsGlsl()) {
     if (gpu_info.IsApiOpenGl() && gpu_info.opengl_info.major_version < 3) {
-      *result = absl::StrCat("texture2D(tex2d, vec2(float(", args[0],
+      *result = abslx::StrCat("texture2D(tex2d, vec2(float(", args[0],
                              ") * inv_tex_width, float(", args[1],
                              ") * inv_tex_height))");
-      return absl::OkStatus();
+      return abslx::OkStatus();
     } else {
       *result = "texelFetch(tex2d, ivec2(" + args[0] + ", " + args[1] + "), 0)";
       if (element_type == DataType::FLOAT16 &&
           gpu_info.IsGlslSupportsExplicitFp16()) {
         *result = "f16vec4(" + *result + ")";
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
   } else {
-    return absl::UnimplementedError(
+    return abslx::UnimplementedError(
         "No implementation of Texture2D.Read for this API.");
   }
 }

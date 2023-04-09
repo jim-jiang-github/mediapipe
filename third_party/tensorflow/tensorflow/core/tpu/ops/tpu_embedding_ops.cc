@@ -178,14 +178,14 @@ std::vector<std::string> GetPerTableLoadOptimizationParametersOps() {
   for (tpu::OptimizationAlgorithm alg : tpu::GetOptimizationAlgorithms()) {
     const auto alg_name = tpu::GetOptimizationAlgorithmName(alg);
     const auto op_name =
-        absl::StrCat("LoadTPUEmbedding", alg_name, "Parameters");
+        abslx::StrCat("LoadTPUEmbedding", alg_name, "Parameters");
     result.push_back(op_name);
     // Some of these don't actually exist. Specifically
     // 'CenteredRMSProp.*GradAccumDebug' and
     // 'MDLAdagradLight.*GradAccumDebug''. Its ok to include them here as they
     // are only used to check for ops during re-write passes.
     const auto op_name_debug =
-        absl::StrCat("LoadTPUEmbedding", alg_name, "ParametersGradAccumDebug");
+        abslx::StrCat("LoadTPUEmbedding", alg_name, "ParametersGradAccumDebug");
     result.push_back(op_name_debug);
   }
   return result;
@@ -197,13 +197,13 @@ std::vector<std::string> GetPerTableRetrieveOptimizationParametersOps() {
   for (tpu::OptimizationAlgorithm alg : tpu::GetOptimizationAlgorithms()) {
     const auto alg_name = tpu::GetOptimizationAlgorithmName(alg);
     const auto op_name =
-        absl::StrCat("RetrieveTPUEmbedding", alg_name, "Parameters");
+        abslx::StrCat("RetrieveTPUEmbedding", alg_name, "Parameters");
     result.push_back(op_name);
     // Some of these don't actually exist. Specifically
     // 'CenteredRMSProp.*GradAccumDebug' and
     // 'MDLAdagradLight.*GradAccumDebug'. Its ok to include them here as they
     // are only used to check for ops during re-write passes.
-    const auto op_name_debug = absl::StrCat("RetrieveTPUEmbedding", alg_name,
+    const auto op_name_debug = abslx::StrCat("RetrieveTPUEmbedding", alg_name,
                                             "ParametersGradAccumDebug");
     result.push_back(op_name_debug);
   }
@@ -247,7 +247,7 @@ REGISTER_OP("LoadAllTPUEmbeddingParameters")
       TF_RETURN_IF_ERROR(c->input("parameters", &accumulators[0]));
       for (int i = 1; i <= tpu::kMaxAuxiliaryParameterCount; ++i) {
         TF_RETURN_IF_ERROR(
-            c->input(absl::StrCat("auxiliary", i), &accumulators[i]));
+            c->input(abslx::StrCat("auxiliary", i), &accumulators[i]));
       }
       TF_RET_CHECK(accumulators[0].size() == table_shapes.size());
       // This should be enforced by Tensorflow's type system.
@@ -350,7 +350,7 @@ REGISTER_OP("RetrieveAllTPUEmbeddingParameters")
           TF_RETURN_IF_ERROR(c->set_output("parameters", output_handles));
         } else {
           TF_RETURN_IF_ERROR(
-              c->set_output(absl::StrCat("auxiliary", i), output_handles));
+              c->set_output(abslx::StrCat("auxiliary", i), output_handles));
         }
       }
       return OkStatus();
@@ -387,7 +387,7 @@ REGISTER_OP("XlaRecvTPUEmbeddingActivations")
       int num_tables;
       TF_RETURN_IF_ERROR(c->GetAttr("num_tables", &num_tables));
       if (c->num_outputs() != num_tables) {
-        return errors::InvalidArgument(absl::StrFormat(
+        return errors::InvalidArgument(abslx::StrFormat(
             "Number of outputs: %d of the XlaRecvTPUEmbeddingActivations node "
             "does not match the num_tables attribute: %d.",
             c->num_outputs(), num_tables));
@@ -403,7 +403,7 @@ REGISTER_OP("XlaRecvTPUEmbeddingActivations")
       std::vector<TensorShapeProto> output_shapes;
       TF_RETURN_IF_ERROR(ComputeOutputTensorShapes(config, &output_shapes));
       if (c->num_outputs() != output_shapes.size()) {
-        return errors::InvalidArgument(absl::StrFormat(
+        return errors::InvalidArgument(abslx::StrFormat(
             "Number of outputs: %d of the XlaRecvTPUEmbeddingActivations node "
             "does not match the number of tables or features in the TPU "
             "embedding config: %d.",

@@ -102,7 +102,7 @@ GraphExecutionState::~GraphExecutionState() {
   if (options.session_options->config.graph_options().place_pruned_graph() ||
       !options.session_options->config.experimental()
            .optimize_for_static_graph()) {
-    auto ret = absl::WrapUnique(new GraphExecutionState(
+    auto ret = abslx::WrapUnique(new GraphExecutionState(
         std::make_unique<GraphDef>(std::move(graph_def)), std::move(flib_def),
         options));
 
@@ -117,7 +117,7 @@ GraphExecutionState::~GraphExecutionState() {
     }
     *out_state = std::move(ret);
   } else {
-    auto ret = absl::WrapUnique(
+    auto ret = abslx::WrapUnique(
         new GraphExecutionState(nullptr, std::move(flib_def), options));
     auto base_graph = std::make_unique<Graph>(OpRegistry::Global());
     TF_RETURN_IF_ERROR(
@@ -161,7 +161,7 @@ GraphExecutionState::~GraphExecutionState() {
   auto flib_def = std::make_unique<FunctionLibraryDefinition>(
       OpRegistry::Global(), temp.library());
   TF_RETURN_IF_ERROR(AddDefaultAttrsToGraphDef(&temp, *flib_def, 0));
-  auto ret = absl::WrapUnique(
+  auto ret = abslx::WrapUnique(
       new GraphExecutionState(nullptr, std::move(flib_def), options));
 
   auto base_graph = std::make_unique<Graph>(OpRegistry::Global());
@@ -266,7 +266,7 @@ Status GraphExecutionState::Extend(
   TF_RETURN_IF_ERROR(AddDefaultAttrsToGraphDef(&gdef, *flib_def_, 0));
   auto flib_def = std::make_unique<FunctionLibraryDefinition>(
       OpRegistry::Global(), gdef.library());
-  auto new_execution_state = absl::WrapUnique(
+  auto new_execution_state = abslx::WrapUnique(
       new GraphExecutionState(std::make_unique<GraphDef>(std::move(gdef)),
                               std::move(flib_def), combined_options));
 
@@ -666,7 +666,7 @@ Status GraphExecutionState::OptimizeGraph(
       if (!added_device.ok()) VLOG(3) << added_device.error_message();
     }
     VLOG(3) << "Grappler available devices: "
-            << absl::StrJoin(item.devices(), ", ");
+            << abslx::StrJoin(item.devices(), ", ");
 
     // Add fetches to the GrapplerItem.
     item.fetch.insert(item.fetch.end(),
@@ -682,7 +682,7 @@ Status GraphExecutionState::OptimizeGraph(
     }
 
     // Add feeds to the GrapplerItem if we know them.
-    absl::flat_hash_set<absl::string_view> node_names;
+    abslx::flat_hash_set<abslx::string_view> node_names;
     if (!(options.callable_options.feed().empty() &&
           options.callable_options.tensor_connection().empty())) {
       std::vector<SafeTensorId> feeds;
@@ -697,7 +697,7 @@ Status GraphExecutionState::OptimizeGraph(
 
       // For feeds with tensor index 0 we try to find the corresponding node in
       // the graph to infer feed data type and shape.
-      absl::flat_hash_set<absl::string_view> feed_nodes;
+      abslx::flat_hash_set<abslx::string_view> feed_nodes;
 
       // For feeds with tensor index larger than 0, we can't infer data type or
       // shape from the graph. Currently we only support type and shape

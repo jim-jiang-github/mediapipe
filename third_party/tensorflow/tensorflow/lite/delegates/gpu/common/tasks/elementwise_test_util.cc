@@ -26,7 +26,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status AbsTest(TestExecutionEnvironment* env) {
+abslx::Status AbsTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {half(0.0f), half(-1.0f), half(-0.05f), half(0.045f)};
@@ -49,10 +49,10 @@ absl::Status AbsTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CosTest(TestExecutionEnvironment* env) {
+abslx::Status CosTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {0.0f, -1.0f, -0.05f, 0.045f};
@@ -76,10 +76,10 @@ absl::Status CosTest(TestExecutionEnvironment* env) {
           dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CopyTest(TestExecutionEnvironment* env) {
+abslx::Status CopyTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {half(0.0f), half(-1.0f), half(-0.05f), half(0.045f)};
@@ -100,10 +100,10 @@ absl::Status CopyTest(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear(src_tensor.data, dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status EluTest(TestExecutionEnvironment* env) {
+abslx::Status EluTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 1, 7);
   src_tensor.data = {0.0f, 1.0f, -1.0f, 100.0f, -100.0f, 0.01f, -0.01f};
@@ -128,10 +128,10 @@ absl::Status EluTest(TestExecutionEnvironment* env) {
           dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ExpTest(TestExecutionEnvironment* env) {
+abslx::Status ExpTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 1, 7);
   src_tensor.data = {0.0f, 1.0f, -1.0f, 2.5f, -1.7f, 0.01f, -0.01f};
@@ -156,10 +156,10 @@ absl::Status ExpTest(TestExecutionEnvironment* env) {
           dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FloorTest(TestExecutionEnvironment* env) {
+abslx::Status FloorTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 1, 7);
   src_tensor.data = {-4.5f, -3.0f, -1.5f, 0.0f, 1.5f, 3.0f, 4.5f};
@@ -182,10 +182,10 @@ absl::Status FloorTest(TestExecutionEnvironment* env) {
           {-5.0, -3.0f, -2.0f, 0.0f, 1.0f, 3.0f, 4.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FloorDivTest(TestExecutionEnvironment* env) {
+abslx::Status FloorDivTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 1, 7);
   src_tensor.data = {-4.5f, -3.0f, -1.5f, 0.0f, 1.5f, 3.0f, 4.5f};
@@ -216,10 +216,10 @@ absl::Status FloorDivTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FloorModTest(TestExecutionEnvironment* env) {
+abslx::Status FloorModTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 1, 7);
   src_tensor.data = {-4.5f, -3.0f, -1.5f, 0.0f, 1.5f, 3.0f, 4.5f};
@@ -253,10 +253,10 @@ absl::Status FloorModTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status HardSwishTest(TestExecutionEnvironment* env) {
+abslx::Status HardSwishTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 1, 7);
   src_tensor.data = {-4.5f, -3.0f, -1.5f, 0.0f, 1.5f, 3.0f, 4.5f};
@@ -280,10 +280,10 @@ absl::Status HardSwishTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LogTest(TestExecutionEnvironment* env) {
+abslx::Status LogTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {1.0f, 2.0f, 3.0f, 4.0f};
@@ -307,10 +307,10 @@ absl::Status LogTest(TestExecutionEnvironment* env) {
           dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status NegTest(TestExecutionEnvironment* env) {
+abslx::Status NegTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {1.0f, -2.0f, 0.0f, 4.0f};
@@ -333,10 +333,10 @@ absl::Status NegTest(TestExecutionEnvironment* env) {
           PointWiseNear({-1.0f, 2.0f, 0.0f, -4.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RsqrtTest(TestExecutionEnvironment* env) {
+abslx::Status RsqrtTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {1.0f, 2.0f, 3.0f, 4.0f};
@@ -361,10 +361,10 @@ absl::Status RsqrtTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SigmoidTest(TestExecutionEnvironment* env) {
+abslx::Status SigmoidTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {-std::log(1.0f), -std::log(2.0f), -std::log(3.0f),
@@ -388,10 +388,10 @@ absl::Status SigmoidTest(TestExecutionEnvironment* env) {
                                     dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SinTest(TestExecutionEnvironment* env) {
+abslx::Status SinTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {0.0f, -1.0f, -0.05f, 0.045f};
@@ -415,10 +415,10 @@ absl::Status SinTest(TestExecutionEnvironment* env) {
           dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SqrtTest(TestExecutionEnvironment* env) {
+abslx::Status SqrtTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {1.0f, 2.0f, 3.0f, 4.0f};
@@ -442,10 +442,10 @@ absl::Status SqrtTest(TestExecutionEnvironment* env) {
           dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SquareTest(TestExecutionEnvironment* env) {
+abslx::Status SquareTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {1.0f, -2.0f, 3.0f, 4.0f};
@@ -468,10 +468,10 @@ absl::Status SquareTest(TestExecutionEnvironment* env) {
           PointWiseNear({1.0f, 4.0f, 9.0f, 16.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TanhTest(TestExecutionEnvironment* env) {
+abslx::Status TanhTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {-4.0f, -0.1f, 0.1f, 2.0f};
@@ -495,10 +495,10 @@ absl::Status TanhTest(TestExecutionEnvironment* env) {
                                     dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SubTest(TestExecutionEnvironment* env) {
+abslx::Status SubTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0, src_tensor_1;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
   src_tensor_1.shape = BHWC(1, 2, 1, 2);
@@ -525,10 +525,10 @@ absl::Status SubTest(TestExecutionEnvironment* env) {
           PointWiseNear({0.5f, 1.0f, 0.0f, 0.5f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SquaredDiffTest(TestExecutionEnvironment* env) {
+abslx::Status SquaredDiffTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0, src_tensor_1;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
   src_tensor_1.shape = BHWC(1, 2, 1, 2);
@@ -555,10 +555,10 @@ absl::Status SquaredDiffTest(TestExecutionEnvironment* env) {
           PointWiseNear({0.25f, 1.0f, 0.0f, 0.25f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status DivTest(TestExecutionEnvironment* env) {
+abslx::Status DivTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0, src_tensor_1;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
   src_tensor_1.shape = BHWC(1, 2, 1, 2);
@@ -585,10 +585,10 @@ absl::Status DivTest(TestExecutionEnvironment* env) {
           PointWiseNear({2.0f, 2.0f, 1.0f, 3.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PowTest(TestExecutionEnvironment* env) {
+abslx::Status PowTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0, src_tensor_1;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
   src_tensor_1.shape = BHWC(1, 2, 1, 2);
@@ -615,10 +615,10 @@ absl::Status PowTest(TestExecutionEnvironment* env) {
           PointWiseNear({1.0f, 7.0f, 16.0f, 8.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AddTest(TestExecutionEnvironment* env) {
+abslx::Status AddTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0, src_tensor_1;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
   src_tensor_1.shape = BHWC(1, 2, 1, 2);
@@ -645,10 +645,10 @@ absl::Status AddTest(TestExecutionEnvironment* env) {
           PointWiseNear({1.5f, 3.0f, 6.0f, 6.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MaximumTest(TestExecutionEnvironment* env) {
+abslx::Status MaximumTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0, src_tensor_1;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
   src_tensor_1.shape = BHWC(1, 2, 1, 2);
@@ -675,10 +675,10 @@ absl::Status MaximumTest(TestExecutionEnvironment* env) {
           PointWiseNear({1.0f, 2.0f, 3.0f, -2.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MaximumWithScalarTest(TestExecutionEnvironment* env) {
+abslx::Status MaximumWithScalarTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0;
   src_tensor_0.shape = BHWC(1, 4, 1, 1);
   src_tensor_0.data = {0.0f, -6.2f, 2.0f, -3.0f};
@@ -704,10 +704,10 @@ absl::Status MaximumWithScalarTest(TestExecutionEnvironment* env) {
           PointWiseNear({0.0f, -1.0f, 2.0f, -1.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MaximumWithConstantLinearTensorTest(
+abslx::Status MaximumWithConstantLinearTensorTest(
     TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
@@ -737,10 +737,10 @@ absl::Status MaximumWithConstantLinearTensorTest(
           PointWiseNear({1.0f, 2.0f, 0.5f, 3.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MaximumWithConstantHWCTensorTest(TestExecutionEnvironment* env) {
+abslx::Status MaximumWithConstantHWCTensorTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
   src_tensor_0.data = {1.0f, -6.2f, -2.0f, 3.0f};
@@ -769,9 +769,9 @@ absl::Status MaximumWithConstantHWCTensorTest(TestExecutionEnvironment* env) {
           PointWiseNear({1.0f, 2.0f, 0.7f, 4.7f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
-absl::Status MaximumWithConstantHWCTensorBroadcastChannelsTest(
+abslx::Status MaximumWithConstantHWCTensorBroadcastChannelsTest(
     TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
@@ -801,10 +801,10 @@ absl::Status MaximumWithConstantHWCTensorBroadcastChannelsTest(
           PointWiseNear({1.0f, 0.5f, 2.0f, 3.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MinimumTest(TestExecutionEnvironment* env) {
+abslx::Status MinimumTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0, src_tensor_1;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
   src_tensor_1.shape = BHWC(1, 2, 1, 2);
@@ -831,10 +831,10 @@ absl::Status MinimumTest(TestExecutionEnvironment* env) {
           PointWiseNear({0.0f, -6.2f, 2.0f, -3.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MinimumWithScalarTest(TestExecutionEnvironment* env) {
+abslx::Status MinimumWithScalarTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0;
   src_tensor_0.shape = BHWC(1, 4, 1, 1);
   src_tensor_0.data = {0.0f, -6.2f, 2.0f, -3.0f};
@@ -860,10 +860,10 @@ absl::Status MinimumWithScalarTest(TestExecutionEnvironment* env) {
           PointWiseNear({-1.0f, -6.2f, -1.0f, -3.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MulTest(TestExecutionEnvironment* env) {
+abslx::Status MulTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0, src_tensor_1;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
   src_tensor_1.shape = BHWC(1, 2, 1, 2);
@@ -890,10 +890,10 @@ absl::Status MulTest(TestExecutionEnvironment* env) {
           PointWiseNear({0.5f, 2.0f, 9.0f, 6.75f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MulBroadcastHWTest(TestExecutionEnvironment* env) {
+abslx::Status MulBroadcastHWTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0, src_tensor_1;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
   src_tensor_1.shape = BHWC(1, 1, 1, 2);
@@ -920,10 +920,10 @@ absl::Status MulBroadcastHWTest(TestExecutionEnvironment* env) {
           PointWiseNear({0.5f, 6.0f, 1.5f, 13.5f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MulBroadcastChannelsTest(TestExecutionEnvironment* env) {
+abslx::Status MulBroadcastChannelsTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0, src_tensor_1;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
   src_tensor_1.shape = BHWC(1, 2, 1, 1);
@@ -950,10 +950,10 @@ absl::Status MulBroadcastChannelsTest(TestExecutionEnvironment* env) {
           PointWiseNear({0.5f, 1.0f, 9.0f, 13.5f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SubWithScalarAtFirstPositionTest(TestExecutionEnvironment* env) {
+abslx::Status SubWithScalarAtFirstPositionTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0;
   src_tensor_0.shape = BHWC(1, 4, 1, 1);
   src_tensor_0.data = {0.0f, -6.2f, 2.0f, -3.0f};
@@ -980,10 +980,10 @@ absl::Status SubWithScalarAtFirstPositionTest(TestExecutionEnvironment* env) {
           PointWiseNear({4.0f, 10.2f, 2.0f, 7.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LessTest(TestExecutionEnvironment* env) {
+abslx::Status LessTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0, src_tensor_1;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
   src_tensor_1.shape = BHWC(1, 2, 1, 2);
@@ -1019,14 +1019,14 @@ absl::Status LessTest(TestExecutionEnvironment* env) {
       tflite::gpu::Tensor<BHWC, DataType::BOOL> dst_tensor;
       dst_desc.DownloadData(&dst_tensor);
       if (dst_tensor.data != ref_tensor.data) {
-        return absl::InternalError("not equal");
+        return abslx::InternalError("not equal");
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LessEqualTest(TestExecutionEnvironment* env) {
+abslx::Status LessEqualTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
   src_tensor_0.data = {0.0f, 1.0f, 2.0f, 3.0f};
@@ -1058,14 +1058,14 @@ absl::Status LessEqualTest(TestExecutionEnvironment* env) {
       tflite::gpu::Tensor<BHWC, DataType::BOOL> dst_tensor;
       dst_desc.DownloadData(&dst_tensor);
       if (dst_tensor.data != ref_tensor.data) {
-        return absl::InternalError("not equal");
+        return abslx::InternalError("not equal");
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GreaterTest(TestExecutionEnvironment* env) {
+abslx::Status GreaterTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
   src_tensor_0.data = {0.0f, 1.0f, 2.0f, 3.0f};
@@ -1097,14 +1097,14 @@ absl::Status GreaterTest(TestExecutionEnvironment* env) {
       tflite::gpu::Tensor<BHWC, DataType::BOOL> dst_tensor;
       dst_desc.DownloadData(&dst_tensor);
       if (dst_tensor.data != ref_tensor.data) {
-        return absl::InternalError("not equal");
+        return abslx::InternalError("not equal");
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GreaterEqualTest(TestExecutionEnvironment* env) {
+abslx::Status GreaterEqualTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
   src_tensor_0.data = {0.0f, 1.0f, 2.0f, 3.0f};
@@ -1136,14 +1136,14 @@ absl::Status GreaterEqualTest(TestExecutionEnvironment* env) {
       tflite::gpu::Tensor<BHWC, DataType::BOOL> dst_tensor;
       dst_desc.DownloadData(&dst_tensor);
       if (dst_tensor.data != ref_tensor.data) {
-        return absl::InternalError("not equal");
+        return abslx::InternalError("not equal");
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status EqualTest(TestExecutionEnvironment* env) {
+abslx::Status EqualTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
   src_tensor_0.data = {0.0f, 1.0f, 2.0f, 3.0f};
@@ -1175,14 +1175,14 @@ absl::Status EqualTest(TestExecutionEnvironment* env) {
       tflite::gpu::Tensor<BHWC, DataType::BOOL> dst_tensor;
       dst_desc.DownloadData(&dst_tensor);
       if (dst_tensor.data != ref_tensor.data) {
-        return absl::InternalError("not equal");
+        return abslx::InternalError("not equal");
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status NotEqualTest(TestExecutionEnvironment* env) {
+abslx::Status NotEqualTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor_0;
   src_tensor_0.shape = BHWC(1, 2, 1, 2);
   src_tensor_0.data = {0.0f, 1.0f, 2.0f, 3.0f};
@@ -1214,11 +1214,11 @@ absl::Status NotEqualTest(TestExecutionEnvironment* env) {
       tflite::gpu::Tensor<BHWC, DataType::BOOL> dst_tensor;
       dst_desc.DownloadData(&dst_tensor);
       if (dst_tensor.data != ref_tensor.data) {
-        return absl::InternalError("not equal");
+        return abslx::InternalError("not equal");
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

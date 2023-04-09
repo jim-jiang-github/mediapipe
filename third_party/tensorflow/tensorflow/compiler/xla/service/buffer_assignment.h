@@ -155,7 +155,7 @@ class BufferAllocation {
 
   // Access to the logical buffers assigned to this allocation, and their
   // associated logical offsets and sizes.
-  const absl::flat_hash_map<const HloValue*, OffsetSize>& assigned_buffers()
+  const abslx::flat_hash_map<const HloValue*, OffsetSize>& assigned_buffers()
       const {
     return assigned_buffers_;
   }
@@ -337,7 +337,7 @@ class BufferAllocation {
 
   // Mapping from the set of buffers assigned to this allocation to their
   // logical offsets and sizes.
-  absl::flat_hash_map<const HloValue*, OffsetSize> assigned_buffers_;
+  abslx::flat_hash_map<const HloValue*, OffsetSize> assigned_buffers_;
 
   int64_t fragmentation_bytes_ = 0;
   std::vector<HeapSimulatorTrace> heap_traces_;
@@ -563,7 +563,7 @@ class BufferAssignment {
   uint64_t multiheap_size_constraint_per_heap_;
 
   // Maps Buffers to the index of the BufferAllocation which holds the buffer.
-  absl::flat_hash_map<const HloValue*, BufferAllocation::Index>
+  abslx::flat_hash_map<const HloValue*, BufferAllocation::Index>
       allocation_index_for_value_;
 
   const HloModule* module_;
@@ -652,8 +652,8 @@ class BufferAssigner {
   Status AssignBuffersForComputations(
       const std::vector<const HloComputation*>& computations,
       bool is_thread_local,
-      absl::flat_hash_map<const HloComputation*,
-                          absl::flat_hash_set<const HloValue*>>*
+      abslx::flat_hash_map<const HloComputation*,
+                          abslx::flat_hash_set<const HloValue*>>*
           buffers_to_assign_sequentially,
       BufferAssignment* assignment);
 
@@ -664,14 +664,14 @@ class BufferAssigner {
   // Assigns pre-set assignments, if provided. These assignments will be added
   // to assigned_buffers and skip buffer allocation.
   Status AssignPresetBuffers(
-      absl::flat_hash_set<const HloBuffer*>* assigned_buffers,
+      abslx::flat_hash_set<const HloBuffer*>* assigned_buffers,
       BufferAssignment* assignment);
 
   // Assigns a single hlo buffer to an HLO allocation.
   Status AssignSingleHloBuffer(
       const HloBuffer* hlo_buffer, bool is_thread_local,
-      absl::flat_hash_map<const HloComputation*,
-                          absl::flat_hash_set<const HloValue*>>*
+      abslx::flat_hash_map<const HloComputation*,
+                          abslx::flat_hash_set<const HloValue*>>*
           buffers_to_assign_sequentially,
       std::vector<BufferAllocation::Index>* allocation_indices,
       BufferAssignment* assignment);
@@ -682,8 +682,8 @@ class BufferAssigner {
   // 'run_whole_module_heap_simulation' is true, the heap simulation will be run
   // assuming all global computations are sequentially ordered.
   Status AssignBuffersWithSequentialOrdering(
-      const absl::flat_hash_map<const HloComputation*,
-                                absl::flat_hash_set<const HloValue*>>&
+      const abslx::flat_hash_map<const HloComputation*,
+                                abslx::flat_hash_set<const HloValue*>>&
           buffers_to_assign_sequentially,
       bool run_whole_module_heap_simulation, BufferAssignment* assignment);
 
@@ -700,9 +700,9 @@ class BufferAssigner {
 
   // Split a set of buffers into several sets, each of which contains buffers
   // colored with the same color.
-  absl::flat_hash_map<LogicalBuffer::Color,
-                      absl::flat_hash_set<const HloValue*>>
-  SplitBuffersByColor(const absl::flat_hash_set<const HloValue*>& buffers);
+  abslx::flat_hash_map<LogicalBuffer::Color,
+                      abslx::flat_hash_set<const HloValue*>>
+  SplitBuffersByColor(const abslx::flat_hash_set<const HloValue*>& buffers);
 
   // If true, allocate buffers for constant instructions.
   bool allocate_buffers_for_constants_;

@@ -78,7 +78,7 @@ BufferLayoutConstraint::BufferLayoutConstraint(const Layout& layout,
 }
 
 std::string BufferLayoutConstraint::ToString() const {
-  return absl::StrFormat(
+  return abslx::StrFormat(
       "BufferLayoutConstraint (prioity=%d, mandatory=%d, dfs=%d) %s: %s",
       priority(), mandatory(), dfs(), buffer_->ToString(),
       LayoutUtil::HumanString(layout_));
@@ -117,13 +117,13 @@ OperandLayoutConstraint::OperandLayoutConstraint(
 }
 
 std::string OperandLayoutConstraint::ToString() const {
-  return absl::StrFormat(
+  return abslx::StrFormat(
       "OperandLayoutConstraint (prioity=%d) %s, operand %d: %s", priority(),
       instruction_->name(), operand_no_, shape_layout_.ToString());
 }
 
 std::string ComputationLayoutConstraint::ToString() const {
-  return absl::StrFormat("ComputationLayoutConstraint (status=%d): %s",
+  return abslx::StrFormat("ComputationLayoutConstraint (status=%d): %s",
                          layout_state_, computation_layout_.ToString());
 }
 
@@ -159,7 +159,7 @@ bool LayoutAssignment::AnyOperandBufferForwarded(
   PointsToSet::BufferSet* output_buffers = GetBufferSet(instruction);
   PointsToSet::BufferSet* operand_buffers =
       GetBufferSet(instruction->operand(operand_no));
-  return absl::c_any_of(*output_buffers, [&](const LogicalBuffer* b) {
+  return abslx::c_any_of(*output_buffers, [&](const LogicalBuffer* b) {
     return operand_buffers->count(b) > 0;
   });
 }
@@ -171,7 +171,7 @@ bool LayoutAssignment::AllOperandBuffersForwarded(
   PointsToSet::BufferSet* output_buffers = GetBufferSet(instruction);
   PointsToSet::BufferSet* operand_buffers =
       GetBufferSet(instruction->operand(operand_no));
-  return absl::c_all_of(*output_buffers, [&](const LogicalBuffer* b) {
+  return abslx::c_all_of(*output_buffers, [&](const LogicalBuffer* b) {
     return operand_buffers->count(b) > 0;
   });
 }
@@ -316,7 +316,7 @@ void LayoutAssignment::PushAddedConstraints(
     // Insert a new constraint to the first location where it's strictly greater
     // than all the subsequent constraints. Assumes invariant that the list is
     // sorted.
-    auto it = absl::c_upper_bound(
+    auto it = abslx::c_upper_bound(
         added_constraints_, constraint,
         [&](const LayoutConstraint* a, const LayoutConstraint* b) {
           return a->priority() > b->priority();
@@ -462,14 +462,14 @@ const ShapeLayout* LayoutAssignment::LayoutConstraints::ResultLayout() const {
 std::string LayoutAssignment::ToString(
     const LayoutConstraints& constraints) const {
   std::string output;
-  absl::StrAppend(&output, "LayoutConstraints for computation ",
+  abslx::StrAppend(&output, "LayoutConstraints for computation ",
                   constraints.computation()->name(), "\n");
   for (auto* instruction :
        constraints.computation()->MakeInstructionPostOrder()) {
-    absl::StrAppend(&output, "  ", instruction->ToShortString(), "\n");
+    abslx::StrAppend(&output, "  ", instruction->ToShortString(), "\n");
     for (int64_t i = 0; i < instruction->operand_count(); ++i) {
       if (constraints.OperandLayout(instruction, i) != nullptr) {
-        absl::StrAppend(
+        abslx::StrAppend(
             &output, "    operand (", i,
             "): ", constraints.OperandLayout(instruction, i)->ToString(), "\n");
       }
@@ -478,14 +478,14 @@ std::string LayoutAssignment::ToString(
          points_to_analysis_->GetBuffersDefinedByInstruction(instruction)) {
       auto* buffer_constraint = GetBufferLayoutConstraint(*buffer);
       if (buffer_constraint != nullptr) {
-        absl::StrAppend(&output, "    ", buffer->ToString(), " : ",
+        abslx::StrAppend(&output, "    ", buffer->ToString(), " : ",
                         LayoutUtil::HumanString(buffer_constraint->layout()),
                         "\n");
       }
     }
   }
 
-  absl::StrAppend(&output, "  => ",
+  abslx::StrAppend(&output, "  => ",
                   constraints.computation_constraint().ToString(), "\n");
   return output;
 }
@@ -878,7 +878,7 @@ Status CheckOptimizationBarrierLayout(HloInstruction* inst) {
 
 Status CheckConditionalLayout(
     HloInstruction* instruction,
-    absl::Span<const ComputationLayout> branch_computation_layouts) {
+    abslx::Span<const ComputationLayout> branch_computation_layouts) {
   for (int j = 0; j < instruction->branch_count(); ++j) {
     const HloInstruction* branch_operand = instruction->operand(j + 1);
     TF_RET_CHECK(
@@ -959,7 +959,7 @@ Layout GetBroadcastLayoutFromOutput(const Layout& layout,
   *shape.mutable_layout() = layout;
   shape = ShapeUtil::FilterDimensions(
       [&](int64_t dim) {
-        return absl::c_linear_search(hlo->dimensions(), dim);
+        return abslx::c_linear_search(hlo->dimensions(), dim);
       },
       shape);
   return shape.layout();
@@ -969,7 +969,7 @@ Status CheckBroadcastLayout(HloInstruction* broadcast) {
   CHECK_EQ(broadcast->opcode(), HloOpcode::kBroadcast);
   Shape shape = ShapeUtil::FilterDimensions(
       [&](int64_t dim) {
-        return absl::c_linear_search(broadcast->dimensions(), dim);
+        return abslx::c_linear_search(broadcast->dimensions(), dim);
       },
       broadcast->shape());
   if (!LayoutsInShapesEqual(shape, broadcast->operand(0)->shape())) {
@@ -1124,7 +1124,7 @@ void LayoutAssignment::SetupCopiedInstruction(const HloInstruction& instruction,
 
 Status LayoutAssignment::CheckLayouts(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   TF_ASSIGN_OR_RETURN(auto points_to_analysis,
                       TuplePointsToAnalysis::Run(module));
   for (auto* computation :
@@ -1154,7 +1154,7 @@ Status LayoutAssignment::CheckLayouts(
                   return InternalError(
                       "Layout of instruction %s at index {%s} does not match "
                       "source LogicalBuffer %s: %s vs %s",
-                      instruction->name(), absl::StrJoin(index, ","),
+                      instruction->name(), abslx::StrJoin(index, ","),
                       buffer->ToString(),
                       ShapeUtil::HumanStringWithLayout(instruction_subshape),
                       ShapeUtil::HumanStringWithLayout(buffer->shape()));
@@ -1211,7 +1211,7 @@ Status LayoutAssignment::CheckLayouts(
                     ->computation_layout());
           }
           TF_RETURN_IF_ERROR(CheckConditionalLayout(
-              instruction, absl::MakeSpan(branch_computation_layouts)));
+              instruction, abslx::MakeSpan(branch_computation_layouts)));
           break;
         }
         default:
@@ -1890,7 +1890,7 @@ StatusOr<Layout> LayoutAssignment::InferArrayLayout(
       return FailedPrecondition(
           "Array at index {%s} in instruction %s aliases buffers %s "
           "and %s which have different layouts",
-          absl::StrJoin(index, ","), instruction->name(),
+          abslx::StrJoin(index, ","), instruction->name(),
           source_buffers[0]->ToString(), source_buffer->ToString());
     }
   }
@@ -2097,7 +2097,7 @@ Status LayoutAssignment::CalculateComputationLayout(
 
   auto SetCalleeLayout =
       [this, UpdateLayout](const HloInstruction* result,
-                           absl::Span<const HloInstruction* const> operands,
+                           abslx::Span<const HloInstruction* const> operands,
                            LayoutConstraints* callee, int priority) -> Status {
     CHECK_NE(result, nullptr);
     ComputationLayoutConstraint* callee_constraint =
@@ -2404,7 +2404,7 @@ Status LayoutAssignment::PropagateComputationLayouts(
 
 StatusOr<bool> LayoutAssignment::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   VLOG(2) << "Running layout assignment on module " << module->name();
   TF_RETURN_IF_ERROR(Init(module));
   call_graph_ = CallGraph::Build(module);
@@ -2429,7 +2429,7 @@ StatusOr<bool> LayoutAssignment::Run(
     if (node.caller_callsites().size() == 1) {
       continue;
     }
-    if (absl::c_none_of(node.caller_callsites(), [](CallSite caller) {
+    if (abslx::c_none_of(node.caller_callsites(), [](CallSite caller) {
           return caller.instruction()->opcode() == HloOpcode::kConditional;
         })) {
       continue;
@@ -2481,7 +2481,7 @@ StatusOr<bool> LayoutAssignment::Run(
   // If the reverse_comptation_order_ flag is set, reverse the ordering of
   // traversing computations, to generate an alternative layout assignment.
   if (reverse_computation_order_ && !computations_to_work.empty()) {
-    absl::c_reverse(computations_to_work);
+    abslx::c_reverse(computations_to_work);
 
     VLOG(2) << "reversing traversal order for computation:";
   }
@@ -2662,7 +2662,7 @@ bool LayoutAssignment::IsAtMostRank1(const Shape& shape) {
   if (shape.IsArray()) {
     return shape.rank() <= 1;
   }
-  return absl::c_all_of(shape.tuple_shapes(), [](const Shape& subshape) {
+  return abslx::c_all_of(shape.tuple_shapes(), [](const Shape& subshape) {
     return IsAtMostRank1(subshape);
   });
 }
@@ -2701,7 +2701,7 @@ Status LayoutAssignment::Init(HloModule* module) {
 
 Status LayoutAssignment::ClearPreviousPassSideEffects(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   VLOG(5) << "Clearing previous side effects";
   for (HloComputation* computation : module->computations(execution_threads)) {
     if (computation_layouts_.find(computation) != computation_layouts_.end()) {

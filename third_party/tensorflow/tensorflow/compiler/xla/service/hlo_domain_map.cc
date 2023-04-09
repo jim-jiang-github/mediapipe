@@ -30,14 +30,14 @@ namespace xla {
 
 /* static */ StatusOr<std::unique_ptr<HloDomainMap>> HloDomainMap::Create(
     HloComputation* computation, std::string domain_kind) {
-  auto domain_map = absl::WrapUnique(new HloDomainMap(std::move(domain_kind)));
+  auto domain_map = abslx::WrapUnique(new HloDomainMap(std::move(domain_kind)));
   TF_RETURN_IF_ERROR(domain_map->Populate(computation));
   return std::move(domain_map);
 }
 
 /* static */ StatusOr<std::unique_ptr<HloDomainMap>> HloDomainMap::Create(
     HloModule* module, std::string domain_kind) {
-  auto domain_map = absl::WrapUnique(new HloDomainMap(std::move(domain_kind)));
+  auto domain_map = abslx::WrapUnique(new HloDomainMap(std::move(domain_kind)));
   for (HloComputation* computation : module->computations()) {
     TF_RETURN_IF_ERROR(domain_map->Populate(computation));
   }
@@ -111,7 +111,7 @@ Status HloDomainMap::PopulateDomainMetadataMap() {
   auto equal = [](const DomainMetadata* a, const DomainMetadata* b) {
     return a->Matches(*b);
   };
-  absl::flat_hash_map<const DomainMetadata*, int64_t, decltype(hash),
+  abslx::flat_hash_map<const DomainMetadata*, int64_t, decltype(hash),
                       decltype(equal)>
       domain_metadata(1024, hash, equal);
 
@@ -222,7 +222,7 @@ bool HloDomainMap::IsDomainInstruction(
 
 /* static */ std::vector<HloInstruction*>
 HloDomainMap::MakeNonDomainInstructions(
-    const absl::flat_hash_set<HloInstruction*>& instruction_set,
+    const abslx::flat_hash_set<HloInstruction*>& instruction_set,
     const InstructionOrderMap& instructions_order) {
   std::vector<HloInstruction*> instructions;
   instructions.reserve(instruction_set.size());
@@ -232,7 +232,7 @@ HloDomainMap::MakeNonDomainInstructions(
     }
   }
   // sort instructions according to instructions_order
-  absl::c_sort(instructions,
+  abslx::c_sort(instructions,
                [&instructions_order](HloInstruction* a, HloInstruction* b) {
                  return instructions_order.at(a) < instructions_order.at(b);
                });

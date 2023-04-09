@@ -44,9 +44,9 @@
 #define ABSL_RAW_LOG(severity, ...)                                            \
   do {                                                                         \
     constexpr const char* absl_raw_logging_internal_basename =                 \
-        ::absl::raw_logging_internal::Basename(__FILE__,                       \
+        ::abslx::raw_logging_internal::Basename(__FILE__,                       \
                                                sizeof(__FILE__) - 1);          \
-    ::absl::raw_logging_internal::RawLog(ABSL_RAW_LOGGING_INTERNAL_##severity, \
+    ::abslx::raw_logging_internal::RawLog(ABSL_RAW_LOGGING_INTERNAL_##severity, \
                                          absl_raw_logging_internal_basename,   \
                                          __LINE__, __VA_ARGS__);               \
   } while (0)
@@ -75,10 +75,10 @@
 #define ABSL_INTERNAL_LOG(severity, message)                                 \
   do {                                                                       \
     constexpr const char* absl_raw_logging_internal_filename = __FILE__;     \
-    ::absl::raw_logging_internal::internal_log_function(                     \
+    ::abslx::raw_logging_internal::internal_log_function(                     \
         ABSL_RAW_LOGGING_INTERNAL_##severity,                                \
         absl_raw_logging_internal_filename, __LINE__, message);              \
-    if (ABSL_RAW_LOGGING_INTERNAL_##severity == ::absl::LogSeverity::kFatal) \
+    if (ABSL_RAW_LOGGING_INTERNAL_##severity == ::abslx::LogSeverity::kFatal) \
       ABSL_INTERNAL_UNREACHABLE;                                             \
   } while (0)
 
@@ -91,14 +91,14 @@
     }                                                              \
   } while (0)
 
-#define ABSL_RAW_LOGGING_INTERNAL_INFO ::absl::LogSeverity::kInfo
-#define ABSL_RAW_LOGGING_INTERNAL_WARNING ::absl::LogSeverity::kWarning
-#define ABSL_RAW_LOGGING_INTERNAL_ERROR ::absl::LogSeverity::kError
-#define ABSL_RAW_LOGGING_INTERNAL_FATAL ::absl::LogSeverity::kFatal
+#define ABSL_RAW_LOGGING_INTERNAL_INFO ::abslx::LogSeverity::kInfo
+#define ABSL_RAW_LOGGING_INTERNAL_WARNING ::abslx::LogSeverity::kWarning
+#define ABSL_RAW_LOGGING_INTERNAL_ERROR ::abslx::LogSeverity::kError
+#define ABSL_RAW_LOGGING_INTERNAL_FATAL ::abslx::LogSeverity::kFatal
 #define ABSL_RAW_LOGGING_INTERNAL_LEVEL(severity) \
-  ::absl::NormalizeLogSeverity(severity)
+  ::abslx::NormalizeLogSeverity(severity)
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace raw_logging_internal {
 
@@ -106,7 +106,7 @@ namespace raw_logging_internal {
 // Logs format... at "severity" level, reporting it
 // as called from file:line.
 // This does not allocate memory or acquire locks.
-void RawLog(absl::LogSeverity severity, const char* file, int line,
+void RawLog(abslx::LogSeverity severity, const char* file, int line,
             const char* format, ...) ABSL_PRINTF_ATTRIBUTE(4, 5);
 
 // Writes the provided buffer directly to stderr, in a safe, low-level manner.
@@ -151,7 +151,7 @@ bool RawLoggingFullySupported();
 // 'buffer' and 'buf_size' are pointers to the buffer and buffer size.  If the
 // hook writes a prefix, it must increment *buffer and decrement *buf_size
 // accordingly.
-using LogPrefixHook = bool (*)(absl::LogSeverity severity, const char* file,
+using LogPrefixHook = bool (*)(abslx::LogSeverity severity, const char* file,
                                int line, char** buffer, int* buf_size);
 
 // Function type for a raw_logging customization hook called to abort a process
@@ -170,7 +170,7 @@ using AbortHook = void (*)(const char* file, int line, const char* buf_start,
 //
 // TODO(gfalcon): When string_view no longer depends on base, change this
 // interface to take its message as a string_view instead.
-using InternalLogFunction = void (*)(absl::LogSeverity severity,
+using InternalLogFunction = void (*)(abslx::LogSeverity severity,
                                      const char* file, int line,
                                      const std::string& message);
 
@@ -190,6 +190,6 @@ void RegisterInternalLogFunction(InternalLogFunction func);
 
 }  // namespace raw_logging_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_BASE_INTERNAL_RAW_LOGGING_H_

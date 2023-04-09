@@ -22,46 +22,46 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status AbsTest(TestExecutionEnvironment* env);
-absl::Status CosTest(TestExecutionEnvironment* env);
-absl::Status CopyTest(TestExecutionEnvironment* env);
-absl::Status EluTest(TestExecutionEnvironment* env);
-absl::Status ExpTest(TestExecutionEnvironment* env);
-absl::Status FloorTest(TestExecutionEnvironment* env);
-absl::Status FloorDivTest(TestExecutionEnvironment* env);
-absl::Status FloorModTest(TestExecutionEnvironment* env);
-absl::Status HardSwishTest(TestExecutionEnvironment* env);
-absl::Status LogTest(TestExecutionEnvironment* env);
-absl::Status NegTest(TestExecutionEnvironment* env);
-absl::Status RsqrtTest(TestExecutionEnvironment* env);
-absl::Status SigmoidTest(TestExecutionEnvironment* env);
-absl::Status SinTest(TestExecutionEnvironment* env);
-absl::Status SqrtTest(TestExecutionEnvironment* env);
-absl::Status SquareTest(TestExecutionEnvironment* env);
-absl::Status TanhTest(TestExecutionEnvironment* env);
-absl::Status SubTest(TestExecutionEnvironment* env);
-absl::Status SquaredDiffTest(TestExecutionEnvironment* env);
-absl::Status DivTest(TestExecutionEnvironment* env);
-absl::Status PowTest(TestExecutionEnvironment* env);
-absl::Status AddTest(TestExecutionEnvironment* env);
-absl::Status MaximumTest(TestExecutionEnvironment* env);
-absl::Status MaximumWithScalarTest(TestExecutionEnvironment* env);
-absl::Status MaximumWithConstantLinearTensorTest(TestExecutionEnvironment* env);
-absl::Status MaximumWithConstantHWCTensorTest(TestExecutionEnvironment* env);
-absl::Status MaximumWithConstantHWCTensorBroadcastChannelsTest(
+abslx::Status AbsTest(TestExecutionEnvironment* env);
+abslx::Status CosTest(TestExecutionEnvironment* env);
+abslx::Status CopyTest(TestExecutionEnvironment* env);
+abslx::Status EluTest(TestExecutionEnvironment* env);
+abslx::Status ExpTest(TestExecutionEnvironment* env);
+abslx::Status FloorTest(TestExecutionEnvironment* env);
+abslx::Status FloorDivTest(TestExecutionEnvironment* env);
+abslx::Status FloorModTest(TestExecutionEnvironment* env);
+abslx::Status HardSwishTest(TestExecutionEnvironment* env);
+abslx::Status LogTest(TestExecutionEnvironment* env);
+abslx::Status NegTest(TestExecutionEnvironment* env);
+abslx::Status RsqrtTest(TestExecutionEnvironment* env);
+abslx::Status SigmoidTest(TestExecutionEnvironment* env);
+abslx::Status SinTest(TestExecutionEnvironment* env);
+abslx::Status SqrtTest(TestExecutionEnvironment* env);
+abslx::Status SquareTest(TestExecutionEnvironment* env);
+abslx::Status TanhTest(TestExecutionEnvironment* env);
+abslx::Status SubTest(TestExecutionEnvironment* env);
+abslx::Status SquaredDiffTest(TestExecutionEnvironment* env);
+abslx::Status DivTest(TestExecutionEnvironment* env);
+abslx::Status PowTest(TestExecutionEnvironment* env);
+abslx::Status AddTest(TestExecutionEnvironment* env);
+abslx::Status MaximumTest(TestExecutionEnvironment* env);
+abslx::Status MaximumWithScalarTest(TestExecutionEnvironment* env);
+abslx::Status MaximumWithConstantLinearTensorTest(TestExecutionEnvironment* env);
+abslx::Status MaximumWithConstantHWCTensorTest(TestExecutionEnvironment* env);
+abslx::Status MaximumWithConstantHWCTensorBroadcastChannelsTest(
     TestExecutionEnvironment* env);
-absl::Status MinimumTest(TestExecutionEnvironment* env);
-absl::Status MinimumWithScalarTest(TestExecutionEnvironment* env);
-absl::Status MulTest(TestExecutionEnvironment* env);
-absl::Status MulBroadcastHWTest(TestExecutionEnvironment* env);
-absl::Status MulBroadcastChannelsTest(TestExecutionEnvironment* env);
-absl::Status SubWithScalarAtFirstPositionTest(TestExecutionEnvironment* env);
-absl::Status LessTest(TestExecutionEnvironment* env);
-absl::Status LessEqualTest(TestExecutionEnvironment* env);
-absl::Status GreaterTest(TestExecutionEnvironment* env);
-absl::Status GreaterEqualTest(TestExecutionEnvironment* env);
-absl::Status EqualTest(TestExecutionEnvironment* env);
-absl::Status NotEqualTest(TestExecutionEnvironment* env);
+abslx::Status MinimumTest(TestExecutionEnvironment* env);
+abslx::Status MinimumWithScalarTest(TestExecutionEnvironment* env);
+abslx::Status MulTest(TestExecutionEnvironment* env);
+abslx::Status MulBroadcastHWTest(TestExecutionEnvironment* env);
+abslx::Status MulBroadcastChannelsTest(TestExecutionEnvironment* env);
+abslx::Status SubWithScalarAtFirstPositionTest(TestExecutionEnvironment* env);
+abslx::Status LessTest(TestExecutionEnvironment* env);
+abslx::Status LessEqualTest(TestExecutionEnvironment* env);
+abslx::Status GreaterTest(TestExecutionEnvironment* env);
+abslx::Status GreaterEqualTest(TestExecutionEnvironment* env);
+abslx::Status EqualTest(TestExecutionEnvironment* env);
+abslx::Status NotEqualTest(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

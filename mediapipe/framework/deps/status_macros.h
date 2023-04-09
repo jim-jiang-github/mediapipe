@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 // Helper macros and methods to return and propagate errors with
-// `absl::Status`.
+// `abslx::Status`.
 //
 // The owners of mediapipe do not endorse use of these macros as a good
 // programming practice, and would prefer that you write the equivalent C++
@@ -26,14 +26,14 @@
 #include "mediapipe/framework/deps/status.h"
 #include "mediapipe/framework/deps/status_builder.h"
 
-// Evaluates an expression that produces a `absl::Status`. If the status
+// Evaluates an expression that produces a `abslx::Status`. If the status
 // is not ok, returns it from the current function.
 //
 // For example:
-//   absl::Status MultiStepFunction() {
+//   abslx::Status MultiStepFunction() {
 //     MP_RETURN_IF_ERROR(Function(args...));
 //     MP_RETURN_IF_ERROR(foo.Method(args...));
-//     return absl::OkStatus();
+//     return abslx::OkStatus();
 //   }
 //
 // The macro ends with a `mediapipe::StatusBuilder` which allows the returned
@@ -41,11 +41,11 @@
 // macro will not be evaluated unless there is an error.
 //
 // For example:
-//   absl::Status MultiStepFunction() {
+//   abslx::Status MultiStepFunction() {
 //     MP_RETURN_IF_ERROR(Function(args...)) << "in MultiStepFunction";
 //     MP_RETURN_IF_ERROR(foo.Method(args...)).Log(base_logging::ERROR)
 //         << "while processing query: " << query.DebugString();
-//     return absl::OkStatus();
+//     return abslx::OkStatus();
 //   }
 //
 // `mediapipe::StatusBuilder` supports adapting the builder chain using a
@@ -74,12 +74,12 @@
 //
 // If using this macro inside a lambda, you need to annotate the return type
 // to avoid confusion between a `mediapipe::StatusBuilder` and a
-// `absl::Status` type. E.g.
+// `abslx::Status` type. E.g.
 //
-//   []() -> absl::Status {
+//   []() -> abslx::Status {
 //     MP_RETURN_IF_ERROR(Function(args...));
 //     MP_RETURN_IF_ERROR(foo.Method(args...));
-//     return absl::OkStatus();
+//     return abslx::OkStatus();
 //   }
 #define MP_RETURN_IF_ERROR(expr)                                     \
   STATUS_MACROS_IMPL_ELSE_BLOCKER_                                   \
@@ -88,7 +88,7 @@
   } else /* NOLINT */                                                \
     return status_macro_internal_adaptor.Consume()
 
-// Executes an expression `rexpr` that returns a `absl::StatusOr<T>`. On
+// Executes an expression `rexpr` that returns a `abslx::StatusOr<T>`. On
 // OK, extracts its value into the variable defined by `lhs`, otherwise returns
 // from the current function. By default the error status is returned
 // unchanged, but it may be modified by an `error_expression`. If there is an
@@ -201,10 +201,10 @@ namespace status_macro_internal {
 // that declares a variable.
 class StatusAdaptorForMacros {
  public:
-  StatusAdaptorForMacros(const absl::Status& status, source_location location)
+  StatusAdaptorForMacros(const abslx::Status& status, source_location location)
       : builder_(status, location) {}
 
-  StatusAdaptorForMacros(absl::Status&& status, source_location location)
+  StatusAdaptorForMacros(abslx::Status&& status, source_location location)
       : builder_(std::move(status), location) {}
 
   StatusAdaptorForMacros(const StatusBuilder& builder,

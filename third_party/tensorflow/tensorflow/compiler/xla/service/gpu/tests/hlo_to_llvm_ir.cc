@@ -108,7 +108,7 @@ xla::Status CompileAndPrintLlvmIrFromFile(const std::string& file_name,
                                                   file_name, &full_text));
 
   std::vector<std::string> hlo_module_texts =
-      absl::StrSplit(full_text, "// -----");
+      abslx::StrSplit(full_text, "// -----");
   for (const std::string& hlo_module_text : hlo_module_texts) {
     TF_RETURN_IF_ERROR(CompileAndPrintLlvmIr(hlo_module_text, ptx, sm));
   }
@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
                          "Specify the SM to target (useful only with --ptx).");
   // The usage string includes the message at the top of the file, the
   // DebugOptions flags and the flags defined above.
-  const std::string kUsageString = absl::StrCat(
+  const std::string kUsageString = abslx::StrCat(
       kUsage, "\n\n", tensorflow::Flags::Usage(argv[0], flag_list));
   bool parse_ok = tensorflow::Flags::Parse(&argc, argv, flag_list);
   tensorflow::port::InitMain(kUsageString.c_str(), &argc, &argv);

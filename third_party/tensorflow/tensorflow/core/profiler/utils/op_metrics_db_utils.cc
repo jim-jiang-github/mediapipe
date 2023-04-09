@@ -30,7 +30,7 @@ limitations under the License.
 namespace tensorflow {
 namespace profiler {
 
-const absl::string_view kIdle = "IDLE";
+const abslx::string_view kIdle = "IDLE";
 
 namespace {
 
@@ -40,7 +40,7 @@ class DeviceTfOpMetricsDbBuilder : public OpMetricsDbBuilder {
       : OpMetricsDbBuilder(db) {}
 
   void UpdateTfOpMetricsWithDeviceOpMetrics(
-      absl::string_view tf_op_name, absl::string_view tf_op_type,
+      abslx::string_view tf_op_name, abslx::string_view tf_op_type,
       const OpMetrics& device_op_metrics) {
     OpMetrics* tf_op_metrics = OpMetricsDbBuilder::LookupOrInsertNewOpMetrics(
         /*hlo_module_id=*/0, tf_op_name);
@@ -72,7 +72,7 @@ OpMetricsDbBuilder::OpMetricsDbBuilder(OpMetricsDb* db) : db_(db) {
 }
 
 OpMetrics* OpMetricsDbBuilder::LookupOrInsertNewOpMetrics(
-    uint64 hlo_module_id, absl::string_view name) {
+    uint64 hlo_module_id, abslx::string_view name) {
   OpMetrics*& op_metrics = op_metrics_map_[hlo_module_id][name];
   if (op_metrics == nullptr) {
     op_metrics = db_->add_metrics_db();
@@ -104,14 +104,14 @@ void AddIdleOp(OpMetricsDb& db) {
   SetIdleOp(idle_time_ps, *db.add_metrics_db());
 }
 
-absl::optional<double> HostInfeedEnqueueRatio(const OpMetricsDb& db) {
+abslx::optional<double> HostInfeedEnqueueRatio(const OpMetricsDb& db) {
   if (db.total_host_infeed_enq_start_timestamp_ps_diff() > 0) {
     // We use total_host_infeed_enq_start_timestamp_ps_diff to approximate the
     // total host time.
     return SafeDivide(db.total_host_infeed_enq_duration_ps(),
                       db.total_host_infeed_enq_start_timestamp_ps_diff());
   }
-  return absl::nullopt;
+  return abslx::nullopt;
 }
 
 OpMetricsDb CreateTfMetricsDbFromDeviceOpMetricsDb(

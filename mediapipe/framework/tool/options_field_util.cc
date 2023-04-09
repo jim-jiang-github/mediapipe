@@ -36,7 +36,7 @@ using ::mediapipe::proto_ns::io::StringOutputStream;
 namespace {
 
 // The type name for the proto3 "Any" type.
-constexpr absl::string_view kGoogleProtobufAny = "google.protobuf.Any";
+constexpr abslx::string_view kGoogleProtobufAny = "google.protobuf.Any";
 
 // Converts a FieldDescriptor::Type to the corresponding FieldType.
 FieldType AsFieldType(proto_ns::FieldDescriptorProto::Type type) {
@@ -44,13 +44,13 @@ FieldType AsFieldType(proto_ns::FieldDescriptorProto::Type type) {
 }
 
 // Serializes a packet value.
-absl::Status WriteField(const FieldData& packet, const FieldDescriptor* field,
+abslx::Status WriteField(const FieldData& packet, const FieldDescriptor* field,
                         std::string* result) {
   return ProtoUtilLite::WriteValue(packet, field->type(), result);
 }
 
 // Deserializes a packet from a protobuf field.
-absl::Status ReadField(absl::string_view bytes, const FieldDescriptor& field,
+abslx::Status ReadField(abslx::string_view bytes, const FieldDescriptor& field,
                        FieldData* result) {
   std::string message_type = (field.type() == WireFormatLite::TYPE_MESSAGE)
                                  ? field.message_type()->full_name()
@@ -59,7 +59,7 @@ absl::Status ReadField(absl::string_view bytes, const FieldDescriptor& field,
 }
 
 // Reads all values from a repeated field.
-absl::StatusOr<std::vector<FieldData>> GetFieldValues(
+abslx::StatusOr<std::vector<FieldData>> GetFieldValues(
     const FieldData& message_data, const FieldDescriptor& field) {
   std::vector<FieldData> result;
   const std::string& message_bytes = message_data.message_value().value();
@@ -79,7 +79,7 @@ absl::StatusOr<std::vector<FieldData>> GetFieldValues(
 }
 
 // Reads one value from a field.
-absl::Status GetFieldValue(const FieldData& message_data,
+abslx::Status GetFieldValue(const FieldData& message_data,
                            const FieldPathEntry& entry, FieldData* result) {
   RET_CHECK_NE(entry.field, nullptr);
   const std::string& message_bytes = message_data.message_value().value();
@@ -90,11 +90,11 @@ absl::Status GetFieldValue(const FieldData& message_data,
   MP_RETURN_IF_ERROR(ProtoUtilLite::GetFieldRange(message_bytes, proto_path, 1,
                                                   field_type, &field_values));
   MP_RETURN_IF_ERROR(ReadField(field_values[0], *entry.field, result));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Writes one value to a field.
-absl::Status SetFieldValue(FieldData& result, const FieldPathEntry& entry,
+abslx::Status SetFieldValue(FieldData& result, const FieldPathEntry& entry,
                            const FieldData& value) {
   int index = std::max(0, entry.index);
   ProtoUtilLite::ProtoPath proto_path = {{entry.field->number(), index}};
@@ -103,8 +103,8 @@ absl::Status SetFieldValue(FieldData& result, const FieldPathEntry& entry,
   MP_RETURN_IF_ERROR(ProtoUtilLite::GetFieldCount(
       *message_bytes, proto_path, entry.field->type(), &field_count));
   if (index > field_count) {
-    return absl::OutOfRangeError(
-        absl::StrCat("Option field index out of range: ", index));
+    return abslx::OutOfRangeError(
+        abslx::StrCat("Option field index out of range: ", index));
   }
   int replace_length = index < field_count ? 1 : 0;
   std::string field_value;
@@ -112,16 +112,16 @@ absl::Status SetFieldValue(FieldData& result, const FieldPathEntry& entry,
   MP_RETURN_IF_ERROR(ProtoUtilLite::ReplaceFieldRange(
       message_bytes, proto_path, replace_length, entry.field->type(),
       {field_value}));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Writes several values to a repeated field.
 // The specified |values| replace the specified |entry| index,
 // or if no index is specified all field values are replaced.
-absl::Status SetFieldValues(FieldData& result, const FieldPathEntry& entry,
+abslx::Status SetFieldValues(FieldData& result, const FieldPathEntry& entry,
                             const std::vector<FieldData>& values) {
   if (entry.field == nullptr) {
-    return absl::InvalidArgumentError("Field not found.");
+    return abslx::InvalidArgumentError("Field not found.");
   }
   FieldType field_type = entry.field->type();
   ProtoUtilLite::ProtoPath proto_path = {{entry.field->number(), 0}};
@@ -141,7 +141,7 @@ absl::Status SetFieldValues(FieldData& result, const FieldPathEntry& entry,
   proto_path = {{entry.field->number(), replace_start}};
   MP_RETURN_IF_ERROR(ProtoUtilLite::ReplaceFieldRange(
       message_bytes, proto_path, replace_length, field_type, field_values));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Returns true for a field of type "google.protobuf.Any".
@@ -199,7 +199,7 @@ bool HasField(const FieldPath& field_path, const FieldData& message_data) {
 
 // Returns the extension field containing the specified extension-type.
 const FieldDescriptor* FindExtensionField(const FieldData& message_data,
-                                          absl::string_view extension_type) {
+                                          abslx::string_view extension_type) {
   std::string message_type =
       ParseTypeUrl(message_data.message_value().type_url());
   std::vector<const FieldDescriptor*> extensions;
@@ -235,16 +235,16 @@ void SetOptionsMessage(
 }  // anonymous namespace
 
 // Deserializes a packet containing a MessageLite value.
-absl::StatusOr<Packet> ReadMessage(const std::string& value,
+abslx::StatusOr<Packet> ReadMessage(const std::string& value,
                                    const std::string& type_name) {
   return packet_internal::PacketFromDynamicProto(type_name, value);
 }
 
 // Merge two options FieldData values.
-absl::StatusOr<FieldData> MergeMessages(const FieldData& base,
+abslx::StatusOr<FieldData> MergeMessages(const FieldData& base,
                                         const FieldData& over) {
   FieldData result;
-  absl::Status status;
+  abslx::Status status;
   if (over.value_case() == FieldData::VALUE_NOT_SET) {
     return base;
   }
@@ -252,17 +252,17 @@ absl::StatusOr<FieldData> MergeMessages(const FieldData& base,
     return over;
   }
   if (over.value_case() != base.value_case()) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "Cannot merge field data with data types: ", base.value_case(), ", ",
         over.value_case()));
   }
   if (over.message_value().type_url() != base.message_value().type_url()) {
-    return absl::InvalidArgumentError(
-        absl::StrCat("Cannot merge field data with message types: ",
+    return abslx::InvalidArgumentError(
+        abslx::StrCat("Cannot merge field data with message types: ",
                      base.message_value().type_url(), ", ",
                      over.message_value().type_url()));
   }
-  absl::Cord merged_value;
+  abslx::Cord merged_value;
   merged_value.Append(base.message_value().value());
   merged_value.Append(over.message_value().value());
   result.mutable_message_value()->set_type_url(base.message_value().type_url());
@@ -272,17 +272,17 @@ absl::StatusOr<FieldData> MergeMessages(const FieldData& base,
 
 // Returns either the extension field or the repeated protobuf.Any field index
 // holding the specified extension-type.
-absl::Status FindExtension(const FieldData& message_data,
+abslx::Status FindExtension(const FieldData& message_data,
                            FieldPathEntry* entry) {
   if (entry->extension_type.empty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // For repeated protobufx::Any, find the index for the extension_type.
   ASSIGN_OR_RETURN(int index, FindExtensionIndex(message_data, entry));
   if (index != -1) {
     entry->index = index;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Returns the extension field containing the specified extension-type.
@@ -292,10 +292,10 @@ absl::Status FindExtension(const FieldData& message_data,
   if (field != nullptr) {
     entry->field = field;
     entry->index = 0;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  return absl::NotFoundError(
-      absl::StrCat("Option extension not found: ", extension_type));
+  return abslx::NotFoundError(
+      abslx::StrCat("Option extension not found: ", extension_type));
 }
 
 // Return the FieldPath referencing an extension message.
@@ -321,14 +321,14 @@ FieldPath GetExtensionPath(const std::string& parent_type,
 }
 
 // Returns the requested options protobuf for a graph node.
-absl::StatusOr<FieldData> GetNodeOptions(const FieldData& message_data,
+abslx::StatusOr<FieldData> GetNodeOptions(const FieldData& message_data,
                                          const std::string& extension_type) {
   constexpr char kOptionsName[] = "options";
   constexpr char kNodeOptionsName[] = "node_options";
   std::string parent_type = options_field_util::ParseTypeUrl(
       std::string(message_data.message_value().type_url()));
   FieldPath path;
-  absl::Status status;
+  abslx::Status status;
   path = GetExtensionPath(parent_type, extension_type, kOptionsName, false);
   auto result = GetField(message_data, path);
   if (result.ok()) {
@@ -339,14 +339,14 @@ absl::StatusOr<FieldData> GetNodeOptions(const FieldData& message_data,
 }
 
 // Returns the requested options protobuf for a graph.
-absl::StatusOr<FieldData> GetGraphOptions(const FieldData& message_data,
+abslx::StatusOr<FieldData> GetGraphOptions(const FieldData& message_data,
                                           const std::string& extension_type) {
   constexpr char kOptionsName[] = "options";
   constexpr char kGraphOptionsName[] = "graph_options";
   std::string parent_type = options_field_util::ParseTypeUrl(
       std::string(message_data.message_value().type_url()));
   FieldPath path;
-  absl::Status status;
+  abslx::Status status;
   path = GetExtensionPath(parent_type, extension_type, kOptionsName, false);
   auto result = GetField(message_data, path);
   if (result.ok()) {
@@ -357,7 +357,7 @@ absl::StatusOr<FieldData> GetGraphOptions(const FieldData& message_data,
 }
 
 // Reads the FieldData values from a protobuf field.
-absl::StatusOr<std::vector<FieldData>> GetFieldValues(
+abslx::StatusOr<std::vector<FieldData>> GetFieldValues(
     const FieldData& message_data, const FieldPath& field_path) {
   std::vector<FieldData> results;
   if (field_path.empty()) {
@@ -379,7 +379,7 @@ absl::StatusOr<std::vector<FieldData>> GetFieldValues(
   }
   int index = tail.empty() ? head.index : std::max(0, head.index);
   if ((int)results.size() <= index) {
-    return absl::OutOfRangeError(absl::StrCat(
+    return abslx::OutOfRangeError(abslx::StrCat(
         "Missing field value: ", head.field ? head.field->name() : "#",
         " at index: ", index));
   }
@@ -395,13 +395,13 @@ absl::StatusOr<std::vector<FieldData>> GetFieldValues(
 }
 
 // Reads a FieldData value from a protobuf field.
-absl::StatusOr<FieldData> GetField(const FieldData& message_data,
+abslx::StatusOr<FieldData> GetField(const FieldData& message_data,
                                    const FieldPath& field_path) {
   std::vector<FieldData> results;
   ASSIGN_OR_RETURN(results, GetFieldValues(message_data, field_path));
   if (results.empty()) {
     FieldPathEntry tail = field_path.back();
-    return absl::OutOfRangeError(absl::StrCat(
+    return abslx::OutOfRangeError(abslx::StrCat(
         "Missing field value: ", tail.field ? tail.field->name() : "##",
         " at index: ", tail.index));
   }
@@ -409,15 +409,15 @@ absl::StatusOr<FieldData> GetField(const FieldData& message_data,
 }
 
 // Writes FieldData values into protobuf field.
-absl::Status SetFieldValues(FieldData& message_data,
+abslx::Status SetFieldValues(FieldData& message_data,
                             const FieldPath& field_path,
                             const std::vector<FieldData>& values) {
   if (field_path.empty()) {
     if (values.empty()) {
-      return absl::InvalidArgumentError("Missing field value.");
+      return abslx::InvalidArgumentError("Missing field value.");
     }
     message_data = values[0];
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   FieldPathEntry head = field_path.front();
@@ -428,7 +428,7 @@ absl::Status SetFieldValues(FieldData& message_data,
   }
   if (tail.empty()) {
     MP_RETURN_IF_ERROR(SetFieldValues(message_data, head, values));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   FieldData child;
   MP_RETURN_IF_ERROR(GetFieldValue(message_data, head, &child));
@@ -437,21 +437,21 @@ absl::Status SetFieldValues(FieldData& message_data,
     child = SerializeProtobufAny(child);
   }
   MP_RETURN_IF_ERROR(SetFieldValue(message_data, head, child));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Writes a FieldData value into protobuf field.
-absl::Status SetField(FieldData& message_data, const FieldPath& field_path,
+abslx::Status SetField(FieldData& message_data, const FieldPath& field_path,
                       const FieldData& value) {
   return SetFieldValues(message_data, field_path, {value});
 }
 
 // Merges FieldData values into nested protobuf Message.
 // For each new field index, any previous value is merged with the new value.
-absl::Status MergeFieldValues(FieldData& message_data,
+abslx::Status MergeFieldValues(FieldData& message_data,
                               const FieldPath& field_path,
                               const std::vector<FieldData>& values) {
-  absl::Status status;
+  abslx::Status status;
   FieldType field_type = field_path.empty() ? FieldType::TYPE_MESSAGE
                                             : field_path.back().field->type();
   std::vector<FieldData> results = values;
@@ -491,7 +491,7 @@ struct ProtoEnum {
   int32 value;
 };
 
-absl::StatusOr<Packet> AsPacket(const FieldData& data) {
+abslx::StatusOr<Packet> AsPacket(const FieldData& data) {
   Packet result;
   switch (data.value_case()) {
     case FieldData::ValueCase::kInt32Value:
@@ -537,7 +537,7 @@ absl::StatusOr<Packet> AsPacket(const FieldData& data) {
   return result;
 }
 
-absl::StatusOr<FieldData> AsFieldData(Packet packet) {
+abslx::StatusOr<FieldData> AsFieldData(Packet packet) {
   static const auto* kTypeIds = new std::map<TypeId, int32>{
       {kTypeId<int32>, WireFormatLite::CPPTYPE_INT32},
       {kTypeId<int64>, WireFormatLite::CPPTYPE_INT64},
@@ -556,11 +556,11 @@ absl::StatusOr<FieldData> AsFieldData(Packet packet) {
         packet.GetProtoMessageLite().SerializeAsString());
     result.mutable_message_value()->set_type_url(
         TypeUrl(packet.GetProtoMessageLite().GetTypeName()));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   if (kTypeIds->count(packet.GetTypeId()) == 0) {
-    return absl::UnimplementedError(absl::StrCat(
+    return abslx::UnimplementedError(abslx::StrCat(
         "Cannot construct FieldData for: ", packet.DebugTypeName()));
   }
 
@@ -596,11 +596,11 @@ absl::StatusOr<FieldData> AsFieldData(Packet packet) {
   return result;
 }
 
-std::string TypeUrl(absl::string_view type_name) {
+std::string TypeUrl(abslx::string_view type_name) {
   return ProtoUtilLite::TypeUrl(type_name);
 }
 
-std::string ParseTypeUrl(absl::string_view type_url) {
+std::string ParseTypeUrl(abslx::string_view type_url) {
   return ProtoUtilLite::ParseTypeUrl(type_url);
 }
 

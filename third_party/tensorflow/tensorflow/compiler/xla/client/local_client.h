@@ -49,7 +49,7 @@ class LocalExecutable {
   // Run the compiled computation with the given arguments and options and
   // return the result.
   StatusOr<ScopedShapedBuffer> Run(
-      const absl::Span<const ShapedBuffer* const> arguments,
+      const abslx::Span<const ShapedBuffer* const> arguments,
       ExecutableRunOptions run_options);
 
   // Similar to Run(), but allows for donating argument buffers to the
@@ -60,7 +60,7 @@ class LocalExecutable {
   // Similar to Run(), but need not block the host waiting for the computation
   // to complete before returning.
   StatusOr<ScopedShapedBuffer> RunAsync(
-      const absl::Span<const ShapedBuffer* const> arguments,
+      const abslx::Span<const ShapedBuffer* const> arguments,
       ExecutableRunOptions run_options);
 
   // Similar to RunAsync(), but allows for donating argument buffers to the
@@ -76,7 +76,7 @@ class LocalExecutable {
 
  private:
   StatusOr<ExecutionOutput> RunAsync(
-      absl::Span<Shape const* const> argument_host_shapes,
+      abslx::Span<Shape const* const> argument_host_shapes,
       std::vector<ExecutionInput> arguments, ExecutableRunOptions run_options);
 
   // Validates that the given arguments and options satisfy various constraints
@@ -91,7 +91,7 @@ class LocalExecutable {
   StatusOr<Literal> LiteralFromShapedBuffer(const ShapedBuffer& shaped_buffer);
 
   StatusOr<std::pair<ServiceExecutableRunOptions, StreamPool::Ptr>> RunHelper(
-      const absl::Span<const Shape* const> argument_shapes,
+      const abslx::Span<const Shape* const> argument_shapes,
       ExecutableRunOptions run_options);
 
   // The ordinal of the device which this executable was compiled for. The
@@ -101,7 +101,7 @@ class LocalExecutable {
 
   template <typename T>
   StatusOr<T> AsyncCallAndBlockHostUntilDone(
-      absl::Span<Shape const* const> argument_shapes,
+      abslx::Span<Shape const* const> argument_shapes,
       const ExecutableRunOptions& run_options,
       std::function<StatusOr<T>(const ExecutableRunOptions&)> async_callback) {
     TF_ASSIGN_OR_RETURN(auto options_and_stream,
@@ -143,7 +143,7 @@ class LocalClient : public Client {
   // environment variable.
   StatusOr<std::vector<std::unique_ptr<LocalExecutable>>> Compile(
       const XlaComputation& computation,
-      const absl::Span<const Shape* const> argument_layouts,
+      const abslx::Span<const Shape* const> argument_layouts,
       const ExecutableBuildOptions& options);
 
   // Same as Compile() above, but return AotCompilationResult objects (instead
@@ -151,7 +151,7 @@ class LocalClient : public Client {
   // LocalExecutable(s) using the Load() method below.
   StatusOr<std::vector<std::unique_ptr<AotCompilationResult>>>
   CompileAheadOfTime(const XlaComputation& computation,
-                     const absl::Span<const Shape* const> argument_layouts,
+                     const abslx::Span<const Shape* const> argument_layouts,
                      const ExecutableBuildOptions& options);
 
   // Return a LocalExecutable object loaded from a serialized

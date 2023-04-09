@@ -43,7 +43,7 @@ struct JitState {
       // We likely do not hold the GIL if this JitState is thread-local, so we
       // hand the Python object to the global reference manager to destroy.
       pybind11::object o = std::move(*extra_jit_context);
-      xla::GlobalPyRefManager()->AddGarbage(absl::MakeSpan(&o, 1));
+      xla::GlobalPyRefManager()->AddGarbage(abslx::MakeSpan(&o, 1));
       extra_jit_context = std::nullopt;
     }
   }
@@ -89,18 +89,18 @@ std::optional<pybind11::function> GetPostHook();
 // (a) equality (delegated to Python) of the static arguments.
 struct CallSignature {
   // Not part of the signature, but we need it for error messages.
-  absl::string_view function_name;
+  abslx::string_view function_name;
 
   // A PyTreeDef for each dynamic argument, positional arguments first
   // followed by keyword arguments. Keyword arguments are in the order given
   // by dynamic_arg_names.
-  absl::InlinedVector<xla::PyTreeDef, 2> dynamic_arg_treedefs;
+  abslx::InlinedVector<xla::PyTreeDef, 2> dynamic_arg_treedefs;
   // Dynamic keyword argument names. Interned, and sorted by the keyword
   // name.
   std::vector<pybind11::object> dynamic_arg_names;
   // Shape and dtype for both the dynamic positional arguments and the keyword
   // arguments (sorted by keyword name).
-  absl::InlinedVector<xla::PyArgSignature, 2> dynamic_arg_signatures;
+  abslx::InlinedVector<xla::PyArgSignature, 2> dynamic_arg_signatures;
 
   // Static arguments. Contains the positional arguments sorted in argument
   // order, followed by static keyword arguments in the order given by
@@ -139,7 +139,7 @@ struct ParsedArgumentsAsBuffers {
   CallSignature signature;
   // The concatenation of the dynamic positional arguments and the sorted
   // keyword arguments.
-  absl::InlinedVector<pybind11::object, 2> flat_dynamic_args;
+  abslx::InlinedVector<pybind11::object, 2> flat_dynamic_args;
   std::vector<pybind11::object> keep_alive_objects;
 
   // The following is only valid if the parsing succeeds.
@@ -155,8 +155,8 @@ struct ParsedArgumentsAsBuffers {
 // dynamic positional and keyword arguments), filling `arguments` in place.
 xla::Status ParseArguments(pybind11::handle args,
                            const std::optional<pybind11::kwargs>& py_kwargs,
-                           absl::Span<int const> static_argnums,
-                           absl::Span<pybind11::str const> static_argnames,
+                           abslx::Span<int const> static_argnums,
+                           abslx::Span<pybind11::str const> static_argnames,
                            ParsedArgumentsAsBuffers& arguments);
 
 // The function to call in `xla.cc` to add the bindings for this module.

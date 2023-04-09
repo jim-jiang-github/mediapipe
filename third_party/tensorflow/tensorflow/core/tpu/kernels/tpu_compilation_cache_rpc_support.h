@@ -84,7 +84,7 @@ std::shared_ptr<::grpc::ChannelCredentials> CreateChannelCredentials();
 // `cache_entry` will be instantiated by the function.
 template <typename ResponseType>
 Status DeserializeRpcResponseToCacheEntry(
-    const absl::string_view local_proto_key, ResponseType* response,
+    const abslx::string_view local_proto_key, ResponseType* response,
     std::shared_ptr<CacheEntry>* cache_entry);
 
 // Serializes `TpuCompilationCacheEntry` to gRPC bufer slices.

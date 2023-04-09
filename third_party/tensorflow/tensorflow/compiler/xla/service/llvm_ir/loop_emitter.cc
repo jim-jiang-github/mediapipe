@@ -50,7 +50,7 @@ LoopEmitter::LoopEmitter(const ElementGenerator& target_element_generator,
       b_(b) {}
 
 LoopEmitter::LoopEmitter(const ElementGenerator& target_element_generator,
-                         absl::Span<const IrArray> target_arrays,
+                         abslx::Span<const IrArray> target_arrays,
                          llvm::IRBuilder<>* b)
     : body_emitter_(MakeBodyEmitter(target_element_generator, target_arrays, b,
                                     /*is_tuple=*/true)),
@@ -66,7 +66,7 @@ LoopEmitter::LoopEmitter(const ElementGenerator& target_element_generator,
 }
 
 BodyEmitter MakeBodyEmitter(const ElementGenerator& target_element_generator,
-                            absl::Span<IrArray const> target_arrays,
+                            abslx::Span<IrArray const> target_arrays,
                             llvm::IRBuilder<>* b, bool is_tuple) {
   std::vector<IrArray> target_arrays_vec(target_arrays.begin(),
                                          target_arrays.end());
@@ -111,7 +111,7 @@ IrArray::Index LoopEmitter::EmitStaticIndex(ForLoopNest* loop_nest,
     std::unique_ptr<ForLoop> loop = loop_nest->AddLoop(
         /*start_index=*/0,
         /*end_index=*/shape_.dimensions(dimension),
-        /*suffix=*/absl::StrFormat("dim.%d", dimension));
+        /*suffix=*/abslx::StrFormat("dim.%d", dimension));
     array_multi_index[dimension] = loop->GetIndVarValue();
   }
   return IrArray::Index(array_multi_index, shape_, index_type);
@@ -128,7 +128,7 @@ IrArray::Index LoopEmitter::EmitDynamicIndex(ForLoopNest* loop_nest,
   for (int i = 0; i < LayoutUtil::MinorToMajor(shape_).size(); ++i) {
     int64_t dimension = LayoutUtil::Major(shape_.layout(), i);
     std::unique_ptr<ForLoop> loop = loop_nest->AddLoop(
-        /*suffix=*/absl::StrFormat("dim.%d", dimension),
+        /*suffix=*/abslx::StrFormat("dim.%d", dimension),
         /*start_index=*/llvm::ConstantInt::get(index_type, 0),
         /*end_index=*/dynamic_dims_[dimension]);
     array_multi_index[dimension] = loop->GetIndVarValue();
@@ -137,7 +137,7 @@ IrArray::Index LoopEmitter::EmitDynamicIndex(ForLoopNest* loop_nest,
 }
 
 std::vector<IrArray::Index> LoopEmitter::EmitIndexAndSetExitBasicBlock(
-    absl::string_view loop_name, llvm::Type* index_type,
+    abslx::string_view loop_name, llvm::Type* index_type,
     llvm::Value* base_index) {
   CHECK_NE(index_type, nullptr);
   CHECK_EQ(base_index, nullptr)
@@ -170,7 +170,7 @@ std::vector<IrArray::Index> LoopEmitter::EmitIndexAndSetExitBasicBlock(
   return {array_index};
 }
 
-Status LoopEmitter::EmitLoop(absl::string_view loop_name,
+Status LoopEmitter::EmitLoop(abslx::string_view loop_name,
                              llvm::Type* index_type) {
   if (index_type == nullptr) {
     index_type = b_->getInt64Ty();

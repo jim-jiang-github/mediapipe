@@ -212,7 +212,7 @@ InputPipelineAnalysisResult ComputeGenericInputPipelineAnalysisResult(
     PerGenericStepDetails details;
     details.set_step_number(step_info.step_num());
     if (step_info.step_name().empty()) {
-      details.set_step_name(absl::StrCat(step_info.step_num()));
+      details.set_step_name(abslx::StrCat(step_info.step_num()));
     } else {
       details.set_step_name(step_info.step_name());
     }
@@ -281,7 +281,7 @@ std::string InputOpCategoryString(InputOpCategory category) {
   }
 }
 
-inline bool IsInputOp(absl::string_view category) {
+inline bool IsInputOp(abslx::string_view category) {
   // Do not include "IteratorGetNext*" here, because IteratorGetNext is an Op
   // that experiences the install stall, not an Op that causes the input stall.
   return IsInfeedEnqueueOp(category) || IsDatasetOp(category) ||
@@ -290,23 +290,23 @@ inline bool IsInputOp(absl::string_view category) {
 
 // TODO(ckluk):
 //   Confirm with the tf.data team if the classification below is correct.
-InputOpCategory CategorizeInputOp(absl::string_view name,
-                                  absl::string_view category) {
+InputOpCategory CategorizeInputOp(abslx::string_view name,
+                                  abslx::string_view category) {
   if (IsInfeedEnqueueOp(category) || IsMemcpyHToDOp(category)) {
     // Ops for sending input from host to device.
     return InputOpCategory::kEnqueue;
   }
   DCHECK(IsDatasetOp(category));
-  if (absl::EndsWith(name, "::TFRecord") ||
-      absl::EndsWith(name, "::TextLine") ||
-      absl::EndsWith(name, "::FixedLengthRecord") ||
-      absl::EndsWith(name, "::SSTable") || absl::EndsWith(name, "::RecordIO")) {
+  if (abslx::EndsWith(name, "::TFRecord") ||
+      abslx::EndsWith(name, "::TextLine") ||
+      abslx::EndsWith(name, "::FixedLengthRecord") ||
+      abslx::EndsWith(name, "::SSTable") || abslx::EndsWith(name, "::RecordIO")) {
     // Ops that read files.
-    if (absl::StrContains(name, "::MemoryReader") ||
-        absl::StrContains(name, "::MemoryWriter") ||
-        absl::StrContains(name, "::Interleave") ||
-        absl::StrContains(name, "::Prefetch") ||
-        absl::StrContains(name, "::ParallelMap")) {
+    if (abslx::StrContains(name, "::MemoryReader") ||
+        abslx::StrContains(name, "::MemoryWriter") ||
+        abslx::StrContains(name, "::Interleave") ||
+        abslx::StrContains(name, "::Prefetch") ||
+        abslx::StrContains(name, "::ParallelMap")) {
       // Ops that read files in advance, including caching, interleaving, and
       // prefetching.
       return InputOpCategory::kAdvancedFileRead;
@@ -357,7 +357,7 @@ double RatioOfHostToDeviceTimeToStepTime(
     const OpMetricsDb& host_tf_metrics_db,
     const InputPipelineAnalysisResult& input_pipeline_analysis) {
   // For TPU execution that uses infeed.
-  absl::optional<double> host_infeed_enqueue_ratio =
+  abslx::optional<double> host_infeed_enqueue_ratio =
       HostInfeedEnqueueRatio(host_tf_metrics_db);
   if (host_infeed_enqueue_ratio.has_value()) {
     return host_infeed_enqueue_ratio.value();
@@ -385,14 +385,14 @@ void DeviceCollectivesAnalysis(double device_collectives_percent,
       kHighlyDeviceCollectivesBoundThresholdInPercent) {
     *device_collectives_classification = "high";
     *device_collectives_statement =
-        absl::StrCat(OneDigit(device_collectives_percent),
+        abslx::StrCat(OneDigit(device_collectives_percent),
                      " % of the total step time sampled is spent on 'Device "
                      "Collective Communication'.");
   } else if (device_collectives_percent >=
              kModeratelyDeviceCollectivesBoundThresholdInPercent) {
     *device_collectives_classification = "moderate";
     *device_collectives_statement =
-        absl::StrCat(OneDigit(device_collectives_percent),
+        abslx::StrCat(OneDigit(device_collectives_percent),
                      " % of the total step time sampled is spent on 'Device "
                      "Collective Communication'.");
   } else {
@@ -406,20 +406,20 @@ void KernelLaunchAnalysis(bool tfdata_used, double kernel_launch_percent,
                           std::string* kernel_launch_statement) {
   if (kernel_launch_percent >= kHighlyKernelLaunchBoundThresholdInPercent) {
     *kernel_launch_classification = "high";
-    *kernel_launch_statement = absl::StrCat(
+    *kernel_launch_statement = abslx::StrCat(
         OneDigit(kernel_launch_percent),
         " % of the total step time sampled is spent on 'Kernel Launch'.");
     if (tfdata_used) {
-      absl::StrAppend(kernel_launch_statement, kKernelLaunchTfDataContention);
+      abslx::StrAppend(kernel_launch_statement, kKernelLaunchTfDataContention);
     }
   } else if (kernel_launch_percent >=
              kModeratelyKernelLaunchBoundThresholdInPercent) {
     *kernel_launch_classification = "moderate";
-    *kernel_launch_statement = absl::StrCat(
+    *kernel_launch_statement = abslx::StrCat(
         OneDigit(kernel_launch_percent),
         " % of the total step time sampled is spent on 'Kernel Launch'.");
     if (tfdata_used) {
-      absl::StrAppend(kernel_launch_statement, kKernelLaunchTfDataContention);
+      abslx::StrAppend(kernel_launch_statement, kKernelLaunchTfDataContention);
     }
   } else {
     *kernel_launch_classification = "no";
@@ -438,11 +438,11 @@ void AllOtherAnalysis(bool all_other_reported, double all_other_percent,
   if (all_other_percent >= kHighlyAllOtherBoundThresholdInPercent) {
     *all_other_classification = "high";
     *all_other_statement =
-        absl::StrCat(OneDigit(all_other_percent), kAllOthersPythonExplanation);
+        abslx::StrCat(OneDigit(all_other_percent), kAllOthersPythonExplanation);
   } else if (all_other_percent >= kModeratelyAllOtherBoundThresholdInPercent) {
     *all_other_classification = "moderate";
     *all_other_statement =
-        absl::StrCat(OneDigit(all_other_percent), kAllOthersPythonExplanation);
+        abslx::StrCat(OneDigit(all_other_percent), kAllOthersPythonExplanation);
   } else {
     *all_other_classification = "no";
     *all_other_statement = "";
@@ -459,8 +459,8 @@ bool TfDataInUse(const InputTimeBreakdown& breakdown) {
 }
 
 // Returns a HTML link with the given text.
-std::string MakeDocLink(absl::string_view doc_link, absl::string_view text) {
-  return absl::StrCat("<a href=\"", doc_link, "\" target=\"_blank\">", text,
+std::string MakeDocLink(abslx::string_view doc_link, abslx::string_view text) {
+  return abslx::StrCat("<a href=\"", doc_link, "\" target=\"_blank\">", text,
                       "</a>");
 }
 
@@ -478,7 +478,7 @@ void GenerateHostResult(const OpMetricsDb& host_tf_metrics_db,
   // instrumentation and hence no input ops are found.
   if (input_op_metrics.input_op_metrics.empty()) return;
 
-  absl::flat_hash_map<InputOpCategory, double> aggregated_input_op_times_us;
+  abslx::flat_hash_map<InputOpCategory, double> aggregated_input_op_times_us;
   for (const OpMetrics* op_metrics : input_op_metrics.input_op_metrics) {
     InputOpCategory category =
         CategorizeInputOp(op_metrics->name(), op_metrics->category());
@@ -532,13 +532,13 @@ void GenerateHostResult(const OpMetricsDb& host_tf_metrics_db,
 }
 
 InputPipelineAnalysisRecommendation GenerateRecommendation() {
-  const absl::string_view kDatasetIntro =
+  const abslx::string_view kDatasetIntro =
       "https://www.tensorflow.org/programmers_guide/datasets";
 
-  const absl::string_view kDatasetTopic =
+  const abslx::string_view kDatasetTopic =
       "https://www.tensorflow.org/api_docs/python/tf/data/Dataset#";
 
-  const absl::string_view kTfRecordDataset =
+  const abslx::string_view kTfRecordDataset =
       "https://www.tensorflow.org/api_docs/python/tf/data/"
       "TFRecordDataset#class_tfrecorddataset";
 
@@ -547,25 +547,25 @@ InputPipelineAnalysisRecommendation GenerateRecommendation() {
       "Enqueuing data: you may want to combine small input data chunks "
       "into fewer "
       "but larger chunks.";
-  *recommendation.add_details() = absl::StrCat(
+  *recommendation.add_details() = abslx::StrCat(
       "Data preprocessing: you may increase num_parallel_calls in ",
-      AnchorElement(absl::StrCat(kDatasetTopic, "map"), "Dataset map()"),
+      AnchorElement(abslx::StrCat(kDatasetTopic, "map"), "Dataset map()"),
       " or preprocess the data OFFLINE.");
-  *recommendation.add_details() = absl::StrCat(
+  *recommendation.add_details() = abslx::StrCat(
       "Reading data from files in advance: you may tune parameters in the "
       "following tf.data API (",
-      AnchorElement(absl::StrCat(kDatasetTopic, "prefetch"), "prefetch size"),
+      AnchorElement(abslx::StrCat(kDatasetTopic, "prefetch"), "prefetch size"),
       ", ",
-      AnchorElement(absl::StrCat(kDatasetTopic, "interleave"),
+      AnchorElement(abslx::StrCat(kDatasetTopic, "interleave"),
                     "interleave cycle_length"),
       ", ", AnchorElement(kTfRecordDataset, "reader buffer_size"), ")");
-  *recommendation.add_details() = absl::StrCat(
+  *recommendation.add_details() = abslx::StrCat(
       "Reading data from files on demand: you should read data IN ADVANCE "
       "using the following tf.data API (",
-      AnchorElement(absl::StrCat(kDatasetTopic, "prefetch"), "prefetch"), ", ",
-      AnchorElement(absl::StrCat(kDatasetTopic, "interleave"), "interleave"),
+      AnchorElement(abslx::StrCat(kDatasetTopic, "prefetch"), "prefetch"), ", ",
+      AnchorElement(abslx::StrCat(kDatasetTopic, "interleave"), "interleave"),
       ", ", AnchorElement(kTfRecordDataset, "reader buffer"), ")");
-  *recommendation.add_details() = absl::StrCat(
+  *recommendation.add_details() = abslx::StrCat(
       "Other data reading or processing: you may consider using the ",
       AnchorElement(kDatasetIntro, "tf.data API"),
       " (if you are not using it now)");
@@ -623,17 +623,17 @@ InputPipelineAnalysisResult ConvertOpStatsToInputPipelineAnalysis(
 bool InputAnalysis(double input_percent, double all_other_percent,
                    std::string* input_classification,
                    std::string* input_statement) {
-  absl::string_view non_input_time = "other time";
+  abslx::string_view non_input_time = "other time";
   if (input_percent >= kHighlyInfeedBoundThresholdInPercent) {
     *input_classification = "host";
-    *input_statement = absl::StrCat(
+    *input_statement = abslx::StrCat(
         "Your program is HIGHLY input-bound because ", OneDigit(input_percent),
         "% of the total step time sampled is waiting for input. Therefore, you "
         "should first focus on reducing the input time.");
     return false;
   } else if (input_percent >= kModeratelyInfeedBoundThresholdInPercent) {
     *input_classification = "both";
-    *input_statement = absl::StrCat(
+    *input_statement = abslx::StrCat(
         "Your program is MODERATELY input-bound because ",
         OneDigit(input_percent),
         "% of the total step time sampled is waiting for input. Therefore, "
@@ -644,7 +644,7 @@ bool InputAnalysis(double input_percent, double all_other_percent,
     // Input analysis says it is not input-bound, but "All-Other" time
     // is significant. It could still be input-bound (or Python overhead).
     *input_classification = "both";
-    *input_statement = absl::StrCat(
+    *input_statement = abslx::StrCat(
         "Your program is POTENTIALLY input-bound because ",
         OneDigit(all_other_percent),
         "% of the total step time sampled is spent on 'All Others' time (which "
@@ -654,7 +654,7 @@ bool InputAnalysis(double input_percent, double all_other_percent,
     // Defintely not input-bound.
     *input_classification = "device";
     *input_statement =
-        absl::StrCat("Your program is NOT input-bound because only ",
+        abslx::StrCat("Your program is NOT input-bound because only ",
                      OneDigit(input_percent),
                      "% of the total step time sampled is waiting for "
                      "input. Therefore, you should focus on "
@@ -668,14 +668,14 @@ void OutputAnalysis(double output_percent, std::string* output_classification,
                     std::string* output_statement) {
   if (output_percent >= kHighlyOutfeedBoundThresholdInPercent) {
     *output_classification = "host";
-    *output_statement = absl::StrCat(
+    *output_statement = abslx::StrCat(
         "Your program is HIGHLY output-bound because ",
         OneDigit(output_percent),
         "% of the total step time sampled is spent on output. Therefore, you "
         "should first focus on reducing the output time.");
   } else if (output_percent >= kModeratelyOutfeedBoundThresholdInPercent) {
     *output_classification = "both";
-    *output_statement = absl::StrCat(
+    *output_statement = abslx::StrCat(
         "Your program is MODERATELY output-bound because ",
         OneDigit(output_percent),
         "% of the total step time sampled is spent on output. Therefore, "
@@ -792,12 +792,12 @@ BottleneckAnalysis ComputeBottleneckAnalysis(
   return analysis;
 }
 
-std::string GetSummaryNextStep(absl::string_view input_classification,
+std::string GetSummaryNextStep(abslx::string_view input_classification,
                                const InputTimeBreakdown& breakdown) {
   std::string summary_next_step;
   if (input_classification == "host" || input_classification == "both") {
     if (!TfDataInUse(breakdown)) {
-      summary_next_step = absl::StrCat(
+      summary_next_step = abslx::StrCat(
           "Consider using ", MakeDocLink(DatasetIntroDoc(), "the tf.data API"),
           " to enable profiler's host-side analysis for input pipeline. "
           "Profiler currently does not support custom input pipeline (please "
@@ -806,7 +806,7 @@ std::string GetSummaryNextStep(absl::string_view input_classification,
           kHostAnalysisSectionNumber, " below).");
     } else {
       summary_next_step =
-          absl::StrCat("Look at Section ", kHostAnalysisSectionNumber,
+          abslx::StrCat("Look at Section ", kHostAnalysisSectionNumber,
                        " for the breakdown of input time on the host.");
     }
   } else {

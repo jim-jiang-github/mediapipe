@@ -37,7 +37,7 @@
 constexpr int32_t kNumThreads = 10;
 constexpr int32_t kIters = 1000;
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -59,9 +59,9 @@ static constexpr int kArrayLength = 10;
 static uint32_t values[kArrayLength];
 
 ABSL_CONST_INIT static SpinLock static_cooperative_spinlock(
-    absl::kConstInit, base_internal::SCHEDULE_COOPERATIVE_AND_KERNEL);
+    abslx::kConstInit, base_internal::SCHEDULE_COOPERATIVE_AND_KERNEL);
 ABSL_CONST_INIT static SpinLock static_noncooperative_spinlock(
-    absl::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
+    abslx::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
 
 // Simple integer hash function based on the public domain lookup2 hash.
 // http://burtleburtle.net/bob/c/lookup2.c
@@ -269,4 +269,4 @@ TEST(SpinLockWithThreads, DoesNotDeadlock) {
 }  // namespace
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

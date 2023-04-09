@@ -32,7 +32,7 @@ using tensorflow::TF_StatusPtr;
 
 void CompareNumericalAndManualGradients(
     Model model, AbstractContext* ctx,
-    absl::Span<AbstractTensorHandle* const> inputs, int input_index,
+    abslx::Span<AbstractTensorHandle* const> inputs, int input_index,
     float* expected_grad, int num_grad, bool use_function,
     double abs_error = 1e-2) {
   Status s;
@@ -63,16 +63,16 @@ void CompareNumericalAndManualGradients(
 }
 
 Status MatMulModel(AbstractContext* ctx,
-                   absl::Span<AbstractTensorHandle* const> inputs,
-                   absl::Span<AbstractTensorHandle*> outputs) {
+                   abslx::Span<AbstractTensorHandle* const> inputs,
+                   abslx::Span<AbstractTensorHandle*> outputs) {
   return ops::MatMul(ctx, inputs[0], inputs[1], &outputs[0],
                      /*transpose_a=*/false,
                      /*transpose_b=*/false, "MatMul");
 }
 
 Status MulModel(AbstractContext* ctx,
-                absl::Span<AbstractTensorHandle* const> inputs,
-                absl::Span<AbstractTensorHandle*> outputs) {
+                abslx::Span<AbstractTensorHandle* const> inputs,
+                abslx::Span<AbstractTensorHandle*> outputs) {
   return ops::Mul(ctx, inputs[0], inputs[1], &outputs[0], "Mul");
 }
 

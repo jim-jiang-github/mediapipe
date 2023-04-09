@@ -89,10 +89,10 @@ class HloTestBase : public ManifestCheckingTest {
 
   // Parses the given string and returns module as a VerifiedHloModule.
   StatusOr<std::unique_ptr<VerifiedHloModule>> ParseAndReturnVerifiedModule(
-      absl::string_view hlo_text, int64_t replica_count = 1,
+      abslx::string_view hlo_text, int64_t replica_count = 1,
       int64_t num_partitions = 1);
   StatusOr<std::unique_ptr<VerifiedHloModule>> ParseAndReturnVerifiedModule(
-      absl::string_view hlo_text, const HloModuleConfig& config);
+      abslx::string_view hlo_text, const HloModuleConfig& config);
 
   // Runs the hlo_pass with the provided module and returns the result. This
   // function also verifies that the module remains unchanged when hlo_pass
@@ -131,8 +131,8 @@ class HloTestBase : public ManifestCheckingTest {
   // If the rewrite has changed the module, also runs `additional_checks` on the
   // result.
   void RunAndFilecheckHloRewrite(
-      absl::string_view hlo, HloPassInterface&& hlo_pass,
-      std::optional<absl::string_view> expected,
+      abslx::string_view hlo, HloPassInterface&& hlo_pass,
+      std::optional<abslx::string_view> expected,
       std::function<void(HloModule*)> after_pass_checks = nullptr);
 
   // Populates debug options from command-line flags and adjusts the options for
@@ -155,15 +155,15 @@ class HloTestBase : public ManifestCheckingTest {
 
   // Executes the given module and return the result as a Literal.
   StatusOr<Literal> Execute(std::unique_ptr<HloModule> module,
-                            absl::Span<Literal* const> arguments);
+                            abslx::Span<Literal* const> arguments);
 
   // Same as above, except the module will be executed without running any HLO
   // passes on it.
   Literal ExecuteNoHloPasses(std::unique_ptr<HloModule> module,
-                             absl::Span<Literal* const> arguments);
+                             abslx::Span<Literal* const> arguments);
 
   Literal ExecuteAndTransfer(std::unique_ptr<HloModule> module,
-                             absl::Span<Literal* const> arguments);
+                             abslx::Span<Literal* const> arguments);
 
   // Executes the given module on multiple replicas.
   //
@@ -171,12 +171,12 @@ class HloTestBase : public ManifestCheckingTest {
   // with a thread-per-replica, vs using an implicitly async call such as
   // Executable::ExecuteOnStreams.
   StatusOr<std::vector<Literal>> ExecuteReplicated(
-      std::unique_ptr<HloModule> module, absl::Span<Literal* const> arguments,
+      std::unique_ptr<HloModule> module, abslx::Span<Literal* const> arguments,
       int64_t num_replicas, bool use_threads, bool run_hlo_passes = false);
 
   // Same as above, but uses specified device assignment.
   StatusOr<std::vector<Literal>> ExecuteReplicated(
-      std::unique_ptr<HloModule> module, absl::Span<Literal* const> arguments,
+      std::unique_ptr<HloModule> module, abslx::Span<Literal* const> arguments,
       int64_t num_replicas, DeviceAssignment* device_assignment,
       bool run_hlo_passes, bool use_threads);
 
@@ -201,7 +201,7 @@ class HloTestBase : public ManifestCheckingTest {
   // modified.
   [[nodiscard]] ::testing::AssertionResult RunAndCompare(
       std::unique_ptr<HloModule> module,
-      const absl::Span<Literal* const> arguments,
+      const abslx::Span<Literal* const> arguments,
       const std::optional<ErrorSpec>& error,
       const std::function<void(HloModule*)>& reference_preprocessor = nullptr);
 
@@ -209,7 +209,7 @@ class HloTestBase : public ManifestCheckingTest {
   // optimization.
   [[nodiscard]] ::testing::AssertionResult RunAndCompareNoHloPasses(
       std::unique_ptr<HloModule> module,
-      const absl::Span<Literal* const> arguments,
+      const abslx::Span<Literal* const> arguments,
       const std::optional<ErrorSpec>& error,
       const std::function<void(HloModule*)>& reference_preprocessor = nullptr);
 
@@ -233,17 +233,17 @@ class HloTestBase : public ManifestCheckingTest {
   // input. Module can be passed in directly, or parsed from an hlo_string,
   // or loaded from a file.
   [[nodiscard]] ::testing::AssertionResult RunAndCompare(
-      const absl::string_view hlo_string, const std::optional<ErrorSpec>& error,
+      const abslx::string_view hlo_string, const std::optional<ErrorSpec>& error,
       const std::function<void(HloModule*)>& reference_preprocessor = nullptr);
   [[nodiscard]] ::testing::AssertionResult Run(
-      const absl::string_view hlo_string, bool run_hlo_passes = true,
+      const abslx::string_view hlo_string, bool run_hlo_passes = true,
       ExecutionProfile* profile = nullptr,
       const tensorflow::protobuf::Message* backend_config = nullptr);
 
   // Same as below, except requires passing fake arguments.
   ::testing::AssertionResult RunAndCompareTwoModules(
       std::unique_ptr<HloModule> module_0, std::unique_ptr<HloModule> module_1,
-      const absl::Span<Literal* const> arguments,
+      const abslx::Span<Literal* const> arguments,
       const std::optional<ErrorSpec>& error);
 
   // Same as below, except requires passing the modules.
@@ -254,20 +254,20 @@ class HloTestBase : public ManifestCheckingTest {
   // Convenient wrapper for executing and comparing results of two unoptimized
   // hlo modules with fake input.
   ::testing::AssertionResult RunAndCompareTwoModules(
-      absl::string_view hlo_string_module_0,
-      absl::string_view hlo_string_module_1,
+      abslx::string_view hlo_string_module_0,
+      abslx::string_view hlo_string_module_1,
       const std::optional<ErrorSpec>& error);
 
   // Executes an hlo module with fake inputs on multiple replicas.
   [[nodiscard]] ::testing::AssertionResult RunReplicated(
-      const absl::string_view hlo_string, bool run_hlo_passes = true,
+      const abslx::string_view hlo_string, bool run_hlo_passes = true,
       int64_t num_replicas = 1,
       const tensorflow::protobuf::Message* backend_config = nullptr);
 
   // If assert_determinism is true, the assertion will fail unless all runs
   // produce exactly the same output.
   [[nodiscard]] ::testing::AssertionResult RunMultipleTimes(
-      const absl::string_view hlo_string, bool run_hlo_passes,
+      const abslx::string_view hlo_string, bool run_hlo_passes,
       std::vector<ExecutionProfile>* profiles,
       const tensorflow::protobuf::Message* backend_config = nullptr,
       bool assert_determinism = false);
@@ -275,7 +275,7 @@ class HloTestBase : public ManifestCheckingTest {
       const std::string& filename, const std::optional<ErrorSpec>& error,
       const std::function<void(HloModule*)>& reference_preprocessor = nullptr);
   [[nodiscard]] ::testing::AssertionResult RunAndCompareNoHloPasses(
-      const absl::string_view hlo_string, const std::optional<ErrorSpec>& error,
+      const abslx::string_view hlo_string, const std::optional<ErrorSpec>& error,
       const std::function<void(HloModule*)>& reference_preprocessor = nullptr);
   [[nodiscard]] ::testing::AssertionResult RunAndCompareNoHloPassesFromFile(
       const std::string& filename, const std::optional<ErrorSpec>& error,
@@ -320,8 +320,8 @@ class HloTestBase : public ManifestCheckingTest {
   //
   // This is useful for tests which create HLOs from a string and then want to
   // inspect a particular computation or instruction.
-  HloComputation* FindComputation(HloModule* module, absl::string_view name);
-  HloInstruction* FindInstruction(HloModule* module, absl::string_view name);
+  HloComputation* FindComputation(HloModule* module, abslx::string_view name);
+  HloInstruction* FindInstruction(HloModule* module, abslx::string_view name);
   // Gets the instruction from the given module with the given opcode.
   HloInstruction* FindInstruction(HloModule* module, HloOpcode opcode);
 
@@ -364,7 +364,7 @@ class HloTestBase : public ManifestCheckingTest {
   // error happens before the results are computed, returns the error status.
   StatusOr<::testing::AssertionResult> RunAndCompareInternal(
       std::unique_ptr<HloModule> module,
-      const absl::Span<Literal* const> arguments,
+      const abslx::Span<Literal* const> arguments,
       const std::optional<ErrorSpec>& error, bool run_hlo_passes,
       const std::function<void(HloModule*)>& reference_preprocessor);
 
@@ -373,7 +373,7 @@ class HloTestBase : public ManifestCheckingTest {
   // error happens before the results are computed, returns the error status.
   StatusOr<::testing::AssertionResult> RunAndCompareTwoModulesInternal(
       std::unique_ptr<HloModule> module_0, std::unique_ptr<HloModule> module_1,
-      const absl::Span<Literal* const> arguments,
+      const abslx::Span<Literal* const> arguments,
       const std::optional<ErrorSpec>& error, bool run_hlo_passes);
 };
 

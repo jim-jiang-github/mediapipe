@@ -62,7 +62,7 @@ StatusOr<std::optional<DecomposedReplicaGroups>> TryDecomposeReplicaGroup(
   int group_size = replica_group.replica_ids_size();
   TF_RET_CHECK(group_size > 0);
 
-  absl::btree_map<int, std::vector<int64_t>> replica_ids_by_host;
+  abslx::btree_map<int, std::vector<int64_t>> replica_ids_by_host;
   for (int64_t replica_id : replica_group.replica_ids()) {
     int device_id = device_assignment(replica_id, /*computation_id=*/0);
     TF_RET_CHECK(device_id >= 0);
@@ -73,7 +73,7 @@ StatusOr<std::optional<DecomposedReplicaGroups>> TryDecomposeReplicaGroup(
 
   size_t num_local_devices = replica_ids_by_host.begin()->second.size();
   bool same_num_devices_on_each_host =
-      absl::c_all_of(replica_ids_by_host, [&](const auto& entry) {
+      abslx::c_all_of(replica_ids_by_host, [&](const auto& entry) {
         return entry.second.size() == num_local_devices;
       });
 
@@ -84,7 +84,7 @@ StatusOr<std::optional<DecomposedReplicaGroups>> TryDecomposeReplicaGroup(
   std::vector<int64_t> sorted_replica_group;
   sorted_replica_group.reserve(group_size);
   for (const auto& entry : replica_ids_by_host) {
-    absl::c_copy(entry.second, std::back_inserter(sorted_replica_group));
+    abslx::c_copy(entry.second, std::back_inserter(sorted_replica_group));
   }
 
   size_t scatter_group_size = std::max(num_local_devices, size_t(2));
@@ -112,14 +112,14 @@ StatusOr<std::optional<DecomposedReplicaGroups>> TryDecomposeReplicaGroups(
   const DeviceAssignment& device_assignment =
       all_reduce.parent()->parent()->config().static_device_assignment();
 
-  absl::Span<const ReplicaGroup> replica_groups = all_reduce.replica_groups();
+  abslx::Span<const ReplicaGroup> replica_groups = all_reduce.replica_groups();
 
   ReplicaGroup all_replicas;  // only populated if replica groups not present.
   if (replica_groups.empty()) {
     for (int i = 0; i < device_assignment.replica_count(); ++i) {
       all_replicas.add_replica_ids(i);
     }
-    replica_groups = absl::MakeSpan(&all_replicas, 1);
+    replica_groups = abslx::MakeSpan(&all_replicas, 1);
   }
 
   std::vector<ReplicaGroup> scatter_gather_groups;
@@ -159,9 +159,9 @@ StatusOr<std::optional<DecomposedReplicaGroups>> TryDecomposeReplicaGroups(
       return {std::nullopt};
     }
 
-    absl::c_move(decomposed_groups->scatter_gather_groups,
+    abslx::c_move(decomposed_groups->scatter_gather_groups,
                  std::back_inserter(scatter_gather_groups));
-    absl::c_move(decomposed_groups->new_all_reduce_groups,
+    abslx::c_move(decomposed_groups->new_all_reduce_groups,
                  std::back_inserter(new_all_reduce_groups));
   }
 
@@ -267,7 +267,7 @@ StatusOr<bool> TryDecomposeAllReduce(HloAllReduceInstruction* all_reduce,
 
 StatusOr<bool> AllReduceBlueConnect::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   VLOG(1) << "Running AllReduceBlueConnect";
 
   if (hlo_query::ContainsLayoutConstrainedAllReduce(*module)) {

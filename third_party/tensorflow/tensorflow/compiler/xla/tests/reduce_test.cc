@@ -109,16 +109,16 @@ class ReduceTest : public ClientLibraryTestBase {
       }
     }
     Literal input_literal =
-        LiteralUtil::CreateR1(absl::MakeConstSpan(input_data));
+        LiteralUtil::CreateR1(abslx::MakeConstSpan(input_data));
     std::unique_ptr<GlobalData> input_global_data =
         client_->TransferToServer(input_literal).value();
 
-    float expected = absl::c_accumulate(input_data, 0.0f);
+    float expected = abslx::c_accumulate(input_data, 0.0f);
     ComputeAndCompareR0<float>(&builder, expected, {input_global_data.get()},
                                ErrorSpec(0.001));
   }
 
-  void RunR1ToR0PredTest(bool and_reduce, absl::Span<const int> input_data) {
+  void RunR1ToR0PredTest(bool and_reduce, abslx::Span<const int> input_data) {
     const int element_count = input_data.size();
     XlaBuilder builder(TestName());
     const Shape input_shape = ShapeUtil::MakeShape(S32, {element_count});
@@ -263,8 +263,8 @@ class ReduceTest : public ClientLibraryTestBase {
   void ComputeAndCompareGeneric(
       typename std::enable_if<std::is_floating_point<NativeT>::value,
                               XlaBuilder>::type* builder,
-      absl::Span<const NativeT> expected,
-      absl::Span<GlobalData* const> arguments) {
+      abslx::Span<const NativeT> expected,
+      abslx::Span<GlobalData* const> arguments) {
     ComputeAndCompareR1<NativeT>(builder, expected, arguments,
                                  ErrorSpec(0.01, 1e-4));
   }
@@ -273,8 +273,8 @@ class ReduceTest : public ClientLibraryTestBase {
   void ComputeAndCompareGeneric(
       typename std::enable_if<std::is_integral<NativeT>::value,
                               XlaBuilder>::type* builder,
-      absl::Span<const NativeT> expected,
-      absl::Span<GlobalData* const> arguments) {
+      abslx::Span<const NativeT> expected,
+      abslx::Span<GlobalData* const> arguments) {
     ComputeAndCompareR1<NativeT>(builder, expected, arguments);
   }
 
@@ -317,7 +317,7 @@ class ReduceTest : public ClientLibraryTestBase {
     }
 
     ComputeAndCompareGeneric<NativeT>(
-        &builder, absl::Span<const NativeT>(expected.get(), cols),
+        &builder, abslx::Span<const NativeT>(expected.get(), cols),
         {input_global_data.get()});
   }
 
@@ -558,11 +558,11 @@ struct BoundsLayout {
 };
 
 void PrintTo(const BoundsLayout& spec, std::ostream* os) {
-  *os << absl::StrFormat("R%uToR%u%s_%s_Reduce%s", spec.bounds.size(),
+  *os << abslx::StrFormat("R%uToR%u%s_%s_Reduce%s", spec.bounds.size(),
                          spec.bounds.size() - spec.reduce_dims.size(),
-                         absl::StrJoin(spec.bounds, "x"),
-                         absl::StrJoin(spec.layout, ""),
-                         absl::StrJoin(spec.reduce_dims, ""));
+                         abslx::StrJoin(spec.bounds, "x"),
+                         abslx::StrJoin(spec.layout, ""),
+                         abslx::StrJoin(spec.reduce_dims, ""));
 }
 
 // Add-reduces a broadcasted scalar matrix among dimension 1 and 0.
@@ -1006,7 +1006,7 @@ XLA_TEST_F(ReduceTest, R0ReduceInDisguise) {
   std::unique_ptr<GlobalData> input_global_data =
       client_->TransferToServer(input_literal).value();
 
-  float expected = absl::c_accumulate(input_data, 0.0f);
+  float expected = abslx::c_accumulate(input_data, 0.0f);
   ComputeAndCompareR1<float>(&builder, {expected}, {input_global_data.get()},
                              ErrorSpec(0.001));
 }
@@ -1014,7 +1014,7 @@ XLA_TEST_F(ReduceTest, R0ReduceInDisguise) {
 class ReduceHloTest : public HloTestBase {};
 
 XLA_TEST_F(ReduceHloTest, HandleReductionToVectorAndOtherReduction) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule HandleReductionToVectorAndOtherReduction
 
   add {
@@ -1047,7 +1047,7 @@ XLA_TEST_F(ReduceHloTest, HandleReductionToVectorAndOtherReduction) {
 class VariadicReduceTest : public HloTestBase {};
 
 XLA_TEST_F(VariadicReduceTest, Reduce_R3x2_to_R2x2_simple) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule Reduce_R3x2_to_R1x2_simple
 
   add {
@@ -1075,7 +1075,7 @@ XLA_TEST_F(VariadicReduceTest, Reduce_R3x2_to_R2x2_simple) {
 }
 
 XLA_TEST_F(VariadicReduceTest, Reduce_R3x2_to_R1x2_simple) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule Reduce_R3x2_to_R1x2_simple
 
   add {
@@ -1103,7 +1103,7 @@ XLA_TEST_F(VariadicReduceTest, Reduce_R3x2_to_R1x2_simple) {
 }
 
 XLA_TEST_F(VariadicReduceTest, Reduce_R1x2_to_R0x2_simple) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule Reduce_R1x2_to_R0x2_simple
 
   add {
@@ -1131,7 +1131,7 @@ XLA_TEST_F(VariadicReduceTest, Reduce_R1x2_to_R0x2_simple) {
 }
 
 XLA_TEST_F(VariadicReduceTest, Reduce_R1x2_to_R0x2_argmax) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
     HloModule Reduce_R1x2_to_R0x2_argmax
 
     argmax {
@@ -1168,7 +1168,7 @@ XLA_TEST_F(VariadicReduceTest, Reduce_R1x2_to_R0x2_argmax) {
 }
 
 XLA_TEST_F(VariadicReduceTest, Reduce_R1x2_to_R0x2_argmax_column) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
     HloModule Reduce_R1x2_to_R0x2_argmax
 
     add {
@@ -1211,7 +1211,7 @@ XLA_TEST_F(VariadicReduceTest, Reduce_R1x2_to_R0x2_argmax_column) {
 }
 
 XLA_TEST_F(VariadicReduceTest, ReduceMultiOutputVariadicAnd) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
     HloModule VariadicReduceMultiOutput
 
     VariadicAnd {
@@ -1243,7 +1243,7 @@ XLA_TEST_F(VariadicReduceTest, ReduceMultiOutputVariadicAnd) {
 }
 
 XLA_TEST_F(VariadicReduceTest, ReduceMultiOutputVariadicDifferentLayout) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule ReduceWithLayoutChangeVariadicDifferent
 
 argmax {

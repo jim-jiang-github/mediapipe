@@ -35,7 +35,7 @@ Status ReplaceUsesWhileKeepingLoopInvariance(HloInstruction* old_instr,
 
   std::vector<HloInstruction*> users;
   users.reserve(old_instr->user_count());
-  absl::c_copy(old_instr->users(), std::back_inserter(users));
+  abslx::c_copy(old_instr->users(), std::back_inserter(users));
 
   for (auto* user : users) {
     for (int64_t i = 0, e = user->operand_count(); i < e; i++) {
@@ -76,7 +76,7 @@ StatusOr<bool> WhileLoopConstantSinking::TrySinkingConstantsIntoWhileLoop(
 
   bool changed = false;
 
-  absl::flat_hash_map<int64_t, absl::InlinedVector<HloInstruction*, 1>>
+  abslx::flat_hash_map<int64_t, abslx::InlinedVector<HloInstruction*, 1>>
       conditional_gte_index_to_insts =
           WhileUtil::GetGTEsMapForWhileConditional(*while_cond);
   std::vector<HloInstruction*> invariant_body_gtes =
@@ -128,7 +128,7 @@ StatusOr<bool> WhileLoopConstantSinking::TrySinkingConstantsIntoWhileLoop(
 
 StatusOr<bool> WhileLoopConstantSinking::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   VLOG(2) << "HLO module before WhileLoopConstantSinking:";
   XLA_VLOG_LINES(2, module->ToString());
 
@@ -156,7 +156,7 @@ StatusOr<bool> WhileLoopConstantSinking::Run(
     //
     // This will let us sink the constant into the outer while first and then
     // into the inner while in a single run of this pass.
-    absl::c_copy_if(comp->instructions(), std::back_inserter(while_instrs),
+    abslx::c_copy_if(comp->instructions(), std::back_inserter(while_instrs),
                     [](const HloInstruction* instr) {
                       return instr->opcode() == HloOpcode::kWhile;
                     });

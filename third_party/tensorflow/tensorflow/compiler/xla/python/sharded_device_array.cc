@@ -90,10 +90,10 @@ void ShardedDeviceArray::Delete() {
   is_deleted_ = true;
 }
 
-xla::StatusOr<absl::Span<xla::PjRtBuffer* const>>
+xla::StatusOr<abslx::Span<xla::PjRtBuffer* const>>
 ShardedDeviceArray::GetPjRtBuffers() {
   if (cpp_device_buffers_.has_value()) {
-    return absl::MakeConstSpan(cpp_device_buffers_.value());
+    return abslx::MakeConstSpan(cpp_device_buffers_.value());
   }
 
   if (!device_buffers_.has_value()) {
@@ -111,7 +111,7 @@ ShardedDeviceArray::GetPjRtBuffers() {
     i += 1;
   }
   cpp_device_buffers_ = std::move(cpp_device_buffers);
-  return absl::MakeConstSpan(cpp_device_buffers_.value());
+  return abslx::MakeConstSpan(cpp_device_buffers_.value());
 }
 
 PyObject* ShardedDeviceArray::base_type_ = nullptr;

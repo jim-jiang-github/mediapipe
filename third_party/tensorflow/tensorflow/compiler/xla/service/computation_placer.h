@@ -60,7 +60,7 @@ class DeviceAssignment : public Array2D<int> {
   StatusOr<int> ReplicaIdForDevice(GlobalDeviceId device_id) const;
   // Returns a map from device ID to logical ID. Querying this map is much more
   // efficient than `LogicalIdForDevice` if queried repeatedly.
-  absl::flat_hash_map<GlobalDeviceId, LogicalID> GetDeviceToLogicalIdMap()
+  abslx::flat_hash_map<GlobalDeviceId, LogicalID> GetDeviceToLogicalIdMap()
       const;
 
   // Protocol buffer serialization and deserialization.
@@ -108,7 +108,7 @@ class ComputationPlacer {
 
  private:
   // The mutex that guards the platform-to-computation placer map.
-  static absl::Mutex platform_computation_placer_mutex_;
+  static abslx::Mutex platform_computation_placer_mutex_;
 
   // State kept for each kind of ComputationPlacer. Registration functions set
   // up creation_function, and then we use that to lazily create "placer" the

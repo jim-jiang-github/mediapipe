@@ -64,26 +64,26 @@ std::vector<XPlane*> FindMutablePlanes(XSpace* space, const F& predicate) {
 }
 
 // Returns the plane with the given name or nullptr if not found.
-const XPlane* FindPlaneWithName(const XSpace& space, absl::string_view name);
-XPlane* FindMutablePlaneWithName(XSpace* space, absl::string_view name);
+const XPlane* FindPlaneWithName(const XSpace& space, abslx::string_view name);
+XPlane* FindMutablePlaneWithName(XSpace* space, abslx::string_view name);
 
 // Returns the planes with the given names, if found.
 std::vector<const XPlane*> FindPlanesWithNames(
-    const XSpace& space, const std::vector<absl::string_view>& names);
+    const XSpace& space, const std::vector<abslx::string_view>& names);
 
 // Returns the plane with the given name in the container. If necessary, adds a
 // new plane to the container.
-XPlane* FindOrAddMutablePlaneWithName(XSpace* space, absl::string_view name);
+XPlane* FindOrAddMutablePlaneWithName(XSpace* space, abslx::string_view name);
 
 // Returns all the planes with a given prefix.
 std::vector<const XPlane*> FindPlanesWithPrefix(const XSpace& space,
-                                                absl::string_view prefix);
+                                                abslx::string_view prefix);
 std::vector<XPlane*> FindMutablePlanesWithPrefix(XSpace* space,
-                                                 absl::string_view prefix);
+                                                 abslx::string_view prefix);
 
 // Returns the plane with the given id/name or nullptr if not found.
 const XLine* FindLineWithId(const XPlane& plane, int64_t id);
-const XLine* FindLineWithName(const XPlane& plane, absl::string_view name);
+const XLine* FindLineWithName(const XPlane& plane, abslx::string_view name);
 
 XStat* FindOrAddMutableStat(const XStatMetadata& stat_metadata, XEvent* event);
 
@@ -91,7 +91,7 @@ void RemovePlane(XSpace* space, const XPlane* plane);
 void RemovePlanes(XSpace* space, const std::vector<const XPlane*>& planes);
 void RemoveLine(XPlane* plane, const XLine* line);
 void RemoveEvents(XLine* line,
-                  const absl::flat_hash_set<const XEvent*>& events);
+                  const abslx::flat_hash_set<const XEvent*>& events);
 
 void RemoveEmptyPlanes(XSpace* space);
 void RemoveEmptyLines(XPlane* plane);
@@ -134,7 +134,7 @@ inline std::vector<Event> GetSortedEvents(Plane& plane,
     line.ForEachEvent(
         [&events](auto event) { events.emplace_back(std::move(event)); });
   });
-  absl::c_sort(events);
+  abslx::c_sort(events);
   return events;
 }
 

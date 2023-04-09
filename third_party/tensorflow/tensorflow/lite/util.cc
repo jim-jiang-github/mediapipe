@@ -177,7 +177,7 @@ std::string GetOpNameByRegistration(const TfLiteRegistration& registration) {
 }
 
 bool IsValidationSubgraph(const char* name) {
-  // NOLINTNEXTLINE: can't use absl::StartsWith as absl is not allowed.
+  // NOLINTNEXTLINE: can't use abslx::StartsWith as absl is not allowed.
   return name && std::string(name).find(kValidationSubgraphNamePrefix) == 0;
 }
 

@@ -44,7 +44,7 @@ static bool IsPinnableOp(StringPiece op_name) {
   // XRT ops refer to per-device handles that are not safe to move between
   // devices.
   return unpinnable_ops->find(string(op_name)) == unpinnable_ops->end() &&
-         !absl::StartsWith(op_name, "XRT");
+         !abslx::StartsWith(op_name, "XRT");
 }
 // Validate if the remote device with the given incarnation is valid in the
 // remote device manager of the current eager context.
@@ -79,7 +79,7 @@ bool IsFunction(StringPiece op_name) {
 
 Status MaybePinSmallOpsToCpu(
     bool* result, StringPiece op_name,
-    absl::Span<ImmediateExecutionTensorHandle* const> args,
+    abslx::Span<ImmediateExecutionTensorHandle* const> args,
     StringPiece cpu_device_name) {
   if (IsFunction(op_name) || IsColocationExempt(op_name) ||
       !IsPinnableOp(op_name)) {
@@ -139,11 +139,11 @@ Status MaybePinToResourceDevice(Device** device, const EagerOperation& op) {
     return OkStatus();
   }
   EagerContext& ctx = op.EagerContext();
-  const absl::InlinedVector<TensorHandle*, 4>* inputs;
+  const abslx::InlinedVector<TensorHandle*, 4>* inputs;
   TF_RETURN_IF_ERROR(op.TensorHandleInputs(&inputs));
   Device* op_device = op.Device() == kVariantDeviceNull
                           ? ctx.HostCPU()
-                          : absl::get<Device*>(op.Device());
+                          : abslx::get<Device*>(op.Device());
   for (int i = 0; i < inputs->size(); ++i) {
     TensorHandle* tensor_handle = (*inputs)[i];
     if (tensor_handle->dtype == DT_RESOURCE) {

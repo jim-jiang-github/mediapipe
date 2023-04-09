@@ -73,7 +73,7 @@ tensorflow::StatusOr<Handle> BuildSavedUserObject(
     // TODO(b/191267013): Populate with values.
     return user_object;
   }
-  return tensorflow::errors::Unimplemented(absl::StrCat(
+  return tensorflow::errors::Unimplemented(abslx::StrCat(
       "UserObject with identifier '", identifier, "' not implemented."));
 }
 

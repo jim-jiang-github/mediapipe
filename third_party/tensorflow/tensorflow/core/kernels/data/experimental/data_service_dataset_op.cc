@@ -111,11 +111,11 @@ constexpr const char kParallelEpochs[] = "parallel_epochs";
 constexpr const char kDistributedEpoch[] = "distributed_epoch";
 
 // Same timeout used by the RegisterDatasetOp.
-constexpr absl::Duration kGetMetadataRetryTimeout = absl::Hours(1);
+constexpr abslx::Duration kGetMetadataRetryTimeout = abslx::Hours(1);
 
 bool IsColocatedTask(const TaskInfo& task) {
-  return absl::c_any_of(task.worker_tags(), [](absl::string_view worker_tag) {
-    return absl::AsciiStrToUpper(worker_tag) == kColocatedWorkerTag;
+  return abslx::c_any_of(task.worker_tags(), [](abslx::string_view worker_tag) {
+    return abslx::AsciiStrToUpper(worker_tag) == kColocatedWorkerTag;
   });
 }
 
@@ -124,15 +124,15 @@ StatusOr<DataServiceMetadata> GetDataServiceMetadata(
     const tstring& protocol) {
   DataServiceDispatcherClient client(address, protocol);
   DataServiceMetadata metadata;
-  absl::Time deadline =
-      absl::FromUnixMicros(EnvTime::NowMicros()) + kGetMetadataRetryTimeout;
+  abslx::Time deadline =
+      abslx::FromUnixMicros(EnvTime::NowMicros()) + kGetMetadataRetryTimeout;
 
   Status status = grpc_util::Retry(
       [&]() { return client.GetDataServiceMetadata(dataset_id, metadata); },
-      absl::Substitute("Get data service metadata for dataset $0, "
+      abslx::Substitute("Get data service metadata for dataset $0, "
                        "with dispatcher at $1.",
                        dataset_id, std::string(address)),
-      absl::ToUnixMicros(deadline));
+      abslx::ToUnixMicros(deadline));
   if (errors::IsNotFound(status)) {
     return errors::NotFound(
         "Dataset id ", dataset_id,
@@ -146,7 +146,7 @@ StatusOr<DataServiceMetadata> GetDataServiceMetadata(
 StatusOr<DataServiceMetadata::Compression> GetValidatedCompression(
     const std::string& dataset_id, const DataServiceMetadata& metadata) {
   if (metadata.compression() == DataServiceMetadata::COMPRESSION_UNSPECIFIED) {
-    return errors::Internal(absl::Substitute(
+    return errors::Internal(abslx::Substitute(
         "Got invalid compression $0 for dataset $1. A proper compression "
         "should be registered in `register_dataset`.",
         DataServiceMetadata::Compression_Name(metadata.compression()),
@@ -159,14 +159,14 @@ StatusOr<DataServiceConfig> GetDataServiceConfig(const tstring& address,
                                                  const tstring& protocol) {
   DataServiceDispatcherClient client(address, protocol);
   DataServiceConfig config;
-  absl::Time deadline =
-      absl::FromUnixMicros(EnvTime::NowMicros()) + kGetMetadataRetryTimeout;
+  abslx::Time deadline =
+      abslx::FromUnixMicros(EnvTime::NowMicros()) + kGetMetadataRetryTimeout;
 
   TF_RETURN_IF_ERROR(grpc_util::Retry(
       [&]() { return client.GetDataServiceConfig(config); },
-      absl::Substitute("Get data service config with dispatcher at $0.",
+      abslx::Substitute("Get data service config with dispatcher at $0.",
                        std::string(address)),
-      absl::ToUnixMicros(deadline)));
+      abslx::ToUnixMicros(deadline)));
   return config;
 }
 }  // namespace
@@ -303,7 +303,7 @@ class DataServiceDatasetOp::Dataset : public DatasetBase {
       inputs.push_back(dataset_id);
     } else {
       int64_t dataset_id_int;
-      if (!absl::SimpleAtoi(dataset_id_, &dataset_id_int)) {
+      if (!abslx::SimpleAtoi(dataset_id_, &dataset_id_int)) {
         return errors::Internal("Failed to parse dataset ID: ", dataset_id_,
                                 ". Expect integers.");
       }
@@ -781,7 +781,7 @@ class DataServiceDatasetOp::Dataset : public DatasetBase {
 
     void UpdateTasks(const ClientHeartbeatResponse& resp)
         TF_EXCLUSIVE_LOCKS_REQUIRED(mu_) {
-      absl::flat_hash_map<int64_t, TaskInfo> task_id_to_task;
+      abslx::flat_hash_map<int64_t, TaskInfo> task_id_to_task;
       for (auto& task : resp.task_info()) {
         task_id_to_task[task.task_id()] = task;
       }
@@ -953,7 +953,7 @@ class DataServiceDatasetOp::Dataset : public DatasetBase {
           task_to_process->in_use = false;
           --outstanding_requests_;
           status_ = errors::CreateWithUpdatedMessage(
-              s, absl::StrCat("Failed to get element from worker ",
+              s, abslx::StrCat("Failed to get element from worker ",
                               task_to_process->info.worker_address(), ": ",
                               s.error_message()));
           get_next_cv_.notify_all();
@@ -1176,7 +1176,7 @@ class DataServiceDatasetOp::Dataset : public DatasetBase {
     }
 
     std::string DebugString() const TF_EXCLUSIVE_LOCKS_REQUIRED(mu_) {
-      return absl::Substitute(
+      return abslx::Substitute(
           "results_ { size: $0 front.ready: $1 } iteration_finished_: $2 "
           "tasks { size: $3 } finished_tasks_: $4 "
           "num_running_worker_threads_: $5",
@@ -1246,7 +1246,7 @@ class DataServiceDatasetOp::Dataset : public DatasetBase {
     bool should_finish_iteration_ TF_GUARDED_BY(mu_) = true;
 
     // The set of worker UIDs that we have already recorded metrics for.
-    absl::flat_hash_set<int64_t> worker_uids_ TF_GUARDED_BY(mu_);
+    abslx::flat_hash_set<int64_t> worker_uids_ TF_GUARDED_BY(mu_);
 
     std::vector<std::unique_ptr<Thread>> worker_threads_ TF_GUARDED_BY(mu_);
     std::unique_ptr<Thread> task_thread_manager_ TF_GUARDED_BY(mu_);
@@ -1339,7 +1339,7 @@ void DataServiceDatasetOp::MakeDataset(OpKernelContext* ctx,
   } else {
     int64_t dataset_id_int = 0;
     OP_REQUIRES_OK(ctx, ParseScalarArgument(ctx, kDatasetId, &dataset_id_int));
-    dataset_id = absl::StrCat(dataset_id_int);
+    dataset_id = abslx::StrCat(dataset_id_int);
   }
 
   tstring processing_mode_str;
@@ -1352,7 +1352,7 @@ void DataServiceDatasetOp::MakeDataset(OpKernelContext* ctx,
     processing_mode.set_sharding_policy(ProcessingModeDef::DYNAMIC);
   } else {
     OP_REQUIRES(ctx, processing_mode.ParseFromString(processing_mode_str),
-                errors::InvalidArgument(absl::Substitute(
+                errors::InvalidArgument(abslx::Substitute(
                     "Failed to parse ProcessingModeDef from string: $0",
                     std::string(processing_mode_str))));
   }

@@ -30,17 +30,17 @@ using ResponseType = GetTpuProgramResponseExternal;
 using ResponseType = GetTpuProgramResponse;
 #endif
 
-static constexpr absl::Duration kProtoTimeout = absl::Minutes(15);
-static gpr_timespec TimeToGprTimespec(absl::Time time) {
-  if (time == absl::InfiniteFuture()) {
+static constexpr abslx::Duration kProtoTimeout = abslx::Minutes(15);
+static gpr_timespec TimeToGprTimespec(abslx::Time time) {
+  if (time == abslx::InfiniteFuture()) {
     return gpr_inf_future(GPR_CLOCK_REALTIME);
   }
-  if (time == absl::InfinitePast()) {
+  if (time == abslx::InfinitePast()) {
     return gpr_inf_past(GPR_CLOCK_REALTIME);
   }
 
   gpr_timespec spec;
-  timespec t = absl::ToTimespec(time);
+  timespec t = abslx::ToTimespec(time);
   spec.tv_sec = t.tv_sec;
   spec.tv_nsec = static_cast<int32_t>(t.tv_nsec);
   spec.clock_type = GPR_CLOCK_REALTIME;
@@ -54,7 +54,7 @@ TpuCompilationCacheRpcLookup::TpuCompilationCacheRpcLookup(
   ::grpc::ChannelArguments args;
   args.SetInt(GRPC_ARG_MAX_MESSAGE_LENGTH, std::numeric_limits<int32>::max());
   auto channel =
-      ::grpc::CreateCustomChannel(absl::StrCat("dns:///", server_address),
+      ::grpc::CreateCustomChannel(abslx::StrCat("dns:///", server_address),
                                   CreateChannelCredentials(), args);
   stub_ = tpu::grpc::TpuCompilationCacheService::NewStub(channel);
   VLOG(1) << "Created RPC lookup cache size " << max_cache_size_ << " bytes.";
@@ -72,11 +72,11 @@ Status TpuCompilationCacheRpcLookup::Lookup(
   // potential deletion happens outside the lock upon method exit.
   std::vector<std::shared_ptr<CacheEntry>> removed_entries;
 
-  std::string local_proto_key = absl::StrCat(
+  std::string local_proto_key = abslx::StrCat(
       proto_key, "_", tpu::CompilationCacheFetchTarget_Name(fetch_target));
 
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     auto iter = cache_.find(local_proto_key);
     if (iter == cache_.end()) {
       tpu::GetTpuProgramRequest request;
@@ -114,10 +114,10 @@ Status TpuCompilationCacheRpcLookup::Lookup(
   // same proto could be placed in the cache twice if it is looked up by both
   // methods.
   std::string local_proto_key =
-      absl::StrCat(" _ ", uid, ":", proto_index, "_",
+      abslx::StrCat(" _ ", uid, ":", proto_index, "_",
                    tpu::CompilationCacheFetchTarget_Name(fetch_target));
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     auto iter = cache_.find(local_proto_key);
     if (iter == cache_.end()) {
       tpu::GetTpuProgramRequest request;
@@ -149,7 +149,7 @@ Status TpuCompilationCacheRpcLookup::RemoteLookupLocked(
   // Perform the RPC while holding the lock unless it is demonstrated that
   // this causes a performance problem.
   ::grpc::ClientContext client_context;
-  client_context.set_deadline(TimeToGprTimespec(::absl::Now() + kProtoTimeout));
+  client_context.set_deadline(TimeToGprTimespec(::abslx::Now() + kProtoTimeout));
   client_context.set_compression_algorithm(GRPC_COMPRESS_GZIP);
 
   ResponseType response;

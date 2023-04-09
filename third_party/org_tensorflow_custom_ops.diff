@@ -133,7 +133,7 @@ index 00000000000..52c11b90fc8
 +namespace gpu {
 +
 +std::unique_ptr<TFLiteOperationParser> NewCustomOperationParser(
-+    absl::string_view op_name) {
++    abslx::string_view op_name) {
 +  if (op_name == "Landmarks2TransformMatrix" ||
 +      op_name == "Landmarks2TransformMatrixV2") {
 +    return std::make_unique<LandmarksToTransformMatrixOperationParser>();
@@ -145,7 +145,7 @@ index 00000000000..52c11b90fc8
 +      op_name == "TransformTensorBilinear" /*for version 2*/) {
 +    return std::make_unique<TransformTensorBilinearOperationParser>();
 +  }
-+  return absl::make_unique<UnimplementedOperationParser>(op_name);
++  return abslx::make_unique<UnimplementedOperationParser>(op_name);
 +}
 +
 +}  // namespace gpu
@@ -169,13 +169,13 @@ index 00000000000..1509ea3bcf3
 +bool ApplyCustomTransformations(ModelTransformer* transformer) {
 +  return transformer->Apply(
 +             "transform_landmarks_v2_to_v1",
-+             absl::make_unique<TransformLandmarksV2ToV1>().get()) &&
++             abslx::make_unique<TransformLandmarksV2ToV1>().get()) &&
 +         transformer->Apply(
 +             "transform_tensor_bilinear_v2_to_v1",
-+             absl::make_unique<TransformTensorBilinearV2ToV1>().get()) &&
++             abslx::make_unique<TransformTensorBilinearV2ToV1>().get()) &&
 +         transformer->Apply(
 +             "landmarks_to_transform_matrix_v2_with_mul",
-+             absl::make_unique<LandmarksToTransformMatrixV2ToV2WithMul>()
++             abslx::make_unique<LandmarksToTransformMatrixV2ToV2WithMul>()
 +                 .get());
 +}
 +}  // namespace gpu
@@ -206,7 +206,7 @@ index 00000000000..4e73cf649e6
 +namespace tflite {
 +namespace gpu {
 +
-+absl::Status LandmarksToTransformMatrixOperationParser::IsSupported(
++abslx::Status LandmarksToTransformMatrixOperationParser::IsSupported(
 +    const TfLiteContext* context, const TfLiteNode* tflite_node,
 +    const TfLiteRegistration* registration) {
 +  RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 2));
@@ -214,7 +214,7 @@ index 00000000000..4e73cf649e6
 +                            /*outputs=*/1);
 +}
 +
-+absl::Status LandmarksToTransformMatrixOperationParser::Parse(
++abslx::Status LandmarksToTransformMatrixOperationParser::Parse(
 +    const TfLiteNode* tflite_node, const TfLiteRegistration* registration,
 +    GraphFloat32* graph, ObjectReader* reader) {
 +  Node* node = graph->NewNode();
@@ -236,17 +236,17 @@ index 00000000000..4e73cf649e6
 +        &attr, &output_shape));
 +    node->operation.attributes = attr;
 +  } else {
-+    return absl::UnimplementedError(
++    return abslx::UnimplementedError(
 +        "Landmarks To Transform Matrix operation can be of version 1 or 2 "
 +        "only.");
 +  }
 +
 +  auto output_value = graph->FindOutputs(node->id)[0];
 +  output_value->tensor.shape = output_shape;
-+  return absl::OkStatus();
++  return abslx::OkStatus();
 +}
 +
-+absl::Status ParseLandmarksToTransformMatrixV1Attributes(
++abslx::Status ParseLandmarksToTransformMatrixV1Attributes(
 +    const void* data, uint32_t data_size,
 +    LandmarksToTransformMatrixV1Attributes* attr, BHWC* output_shape) {
 +  const flexbuffers::Map m =
@@ -275,10 +275,10 @@ index 00000000000..4e73cf649e6
 +                              subset[subset.size() - 1].AsInt32());
 +  }
 +  *output_shape = BHWC(1, 1, 4, 4);
-+  return absl::OkStatus();
++  return abslx::OkStatus();
 +}
 +
-+absl::Status ParseLandmarksToTransformMatrixV2Attributes(
++abslx::Status ParseLandmarksToTransformMatrixV2Attributes(
 +    const void* data, uint32_t data_size,
 +    LandmarksToTransformMatrixV2Attributes* attr, BHWC* output_shape) {
 +  const flexbuffers::Map m =
@@ -304,7 +304,7 @@ index 00000000000..4e73cf649e6
 +  attr->scale_y = m["scale_y"].AsFloat();
 +
 +  *output_shape = BHWC(1, 1, 4, 4);
-+  return absl::OkStatus();
++  return abslx::OkStatus();
 +}
 +
 +TransformResult LandmarksToTransformMatrixV2ToV2WithMul::ApplyToNode(
@@ -315,7 +315,7 @@ index 00000000000..4e73cf649e6
 +    return {TransformStatus::SKIPPED, ""};
 +  }
 +  auto* landmarks2tm_attr =
-+      absl::any_cast<LandmarksToTransformMatrixV2Attributes>(
++      abslx::any_cast<LandmarksToTransformMatrixV2Attributes>(
 +          &node->operation.attributes);
 +  if (!landmarks2tm_attr) {
 +    return {TransformStatus::SKIPPED, ""};
@@ -330,12 +330,12 @@ index 00000000000..4e73cf649e6
 +    return {TransformStatus::SKIPPED, ""};
 +  }
 +  const auto& mul_attr =
-+      absl::any_cast<const ElementwiseAttributes&>(mul->operation.attributes);
++      abslx::any_cast<const ElementwiseAttributes&>(mul->operation.attributes);
 +  float scalar = 0.0;
-+  if (!absl::holds_alternative<float>(mul_attr.param)) {
++  if (!abslx::holds_alternative<float>(mul_attr.param)) {
 +    return {TransformStatus::SKIPPED, ""};
 +  } else {
-+    scalar = absl::get<float>(mul_attr.param);
++    scalar = abslx::get<float>(mul_attr.param);
 +  }
 +  auto mul_inputs = graph->FindInputs(mul->id);
 +  if (mul_inputs.size() != 1) {
@@ -348,14 +348,14 @@ index 00000000000..4e73cf649e6
 +  }
 +  // Start modifying the graph.
 +  {
-+    absl::Status status = RemoveSimpleNodeKeepInput(graph, reshape);
++    abslx::Status status = RemoveSimpleNodeKeepInput(graph, reshape);
 +    if (!status.ok()) {
 +      return {TransformStatus::INVALID,
 +              "Unable to remove a node: " + std::string(status.message())};
 +    }
 +  }
 +  {
-+    absl::Status status = RemoveSimpleNodeKeepInput(graph, mul);
++    abslx::Status status = RemoveSimpleNodeKeepInput(graph, mul);
 +    if (!status.ok()) {
 +      return {TransformStatus::INVALID,
 +              "Unable to remove a node: " + std::string(status.message())};
@@ -420,19 +420,19 @@ index 00000000000..78c72aea123
 +
 +class LandmarksToTransformMatrixOperationParser : public TFLiteOperationParser {
 + public:
-+  absl::Status IsSupported(const TfLiteContext* context,
++  abslx::Status IsSupported(const TfLiteContext* context,
 +                           const TfLiteNode* tflite_node,
 +                           const TfLiteRegistration* registration) final;
-+  absl::Status Parse(const TfLiteNode* tflite_node,
++  abslx::Status Parse(const TfLiteNode* tflite_node,
 +                     const TfLiteRegistration* registration,
 +                     GraphFloat32* graph, ObjectReader* reader) final;
 +};
 +
-+absl::Status ParseLandmarksToTransformMatrixV1Attributes(
++abslx::Status ParseLandmarksToTransformMatrixV1Attributes(
 +    const void* data, uint32_t data_size,
 +    LandmarksToTransformMatrixV1Attributes* attr, BHWC* output_shape);
 +
-+absl::Status ParseLandmarksToTransformMatrixV2Attributes(
++abslx::Status ParseLandmarksToTransformMatrixV2Attributes(
 +    const void* data, uint32_t data_size,
 +    LandmarksToTransformMatrixV2Attributes* attr, BHWC* output_shape);
 +
@@ -495,16 +495,16 @@ index 00000000000..fba7e742998
 +namespace tflite {
 +namespace gpu {
 +
-+absl::Status TransformLandmarksOperationParser::IsSupported(
++abslx::Status TransformLandmarksOperationParser::IsSupported(
 +    const TfLiteContext* context, const TfLiteNode* tflite_node,
 +    const TfLiteRegistration* registration) {
 +  RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 2));
 +  RETURN_IF_ERROR(CheckInputsOutputs(context, tflite_node,
 +                                     /*runtime_inputs=*/2, /*outputs=*/1));
-+  return absl::OkStatus();
++  return abslx::OkStatus();
 +}
 +
-+absl::Status TransformLandmarksOperationParser::Parse(
++abslx::Status TransformLandmarksOperationParser::Parse(
 +    const TfLiteNode* tflite_node, const TfLiteRegistration* registration,
 +    GraphFloat32* graph, ObjectReader* reader) {
 +  Node* node = graph->NewNode();
@@ -526,17 +526,17 @@ index 00000000000..fba7e742998
 +        &attr, &output_shape));
 +    node->operation.attributes = attr;
 +  } else {
-+    return absl::UnimplementedError(
++    return abslx::UnimplementedError(
 +        "Transform Landmarks operation can be of version 1 or 2 only.");
 +  }
 +
 +  auto output_value = graph->FindOutputs(node->id)[0];
 +
 +  output_value->tensor.shape = graph->FindInputs(node->id)[0]->tensor.shape;
-+  return absl::OkStatus();
++  return abslx::OkStatus();
 +}
 +
-+absl::Status ParseTransformLandmarksV1Attributes(
++abslx::Status ParseTransformLandmarksV1Attributes(
 +    const void* data, uint32_t data_size, TransformLandmarksAttributes* attr,
 +    BHWC* output_shape) {
 +  attr->version = 1;
@@ -556,17 +556,17 @@ index 00000000000..fba7e742998
 +      attr->scale = value.AsFloat();
 +    }
 +  }
-+  return absl::OkStatus();
++  return abslx::OkStatus();
 +}
 +
-+absl::Status ParseTransformLandmarksV2Attributes(
++abslx::Status ParseTransformLandmarksV2Attributes(
 +    const void* data, uint32_t data_size, TransformLandmarksAttributes* attr,
 +    BHWC* output_shape) {
 +  attr->version = 2;
 +  attr->dimensions = output_shape->c;
 +  attr->scale = 1.0;
 +
-+  return absl::OkStatus();
++  return abslx::OkStatus();
 +}
 +
 +TransformResult TransformLandmarksV2ToV1::ApplyToNode(Node* node,
@@ -576,7 +576,7 @@ index 00000000000..fba7e742998
 +    return {TransformStatus::SKIPPED, ""};
 +  }
 +  TransformLandmarksAttributes transform_landmarks_attr =
-+      absl::any_cast<TransformLandmarksAttributes>(node->operation.attributes);
++      abslx::any_cast<TransformLandmarksAttributes>(node->operation.attributes);
 +  if (transform_landmarks_attr.version != 2) {
 +    return {TransformStatus::SKIPPED,
 +            "Transform Landmarks operation should be of version 2."};
@@ -621,14 +621,14 @@ index 00000000000..fba7e742998
 +  }
 +
 +  // Delete preceding and succeding Reshape operations.
-+  absl::Status removed_preceding =
++  abslx::Status removed_preceding =
 +      RemoveSimpleNodeKeepInput(graph, preceding_reshape);
 +  if (!removed_preceding.ok()) {
 +    return {TransformStatus::INVALID,
 +            "Unable to remove a preceding Reshape node: " +
 +                std::string(removed_preceding.message())};
 +  }
-+  absl::Status removed_succeeding =
++  abslx::Status removed_succeeding =
 +      RemoveSimpleNodeKeepOutput(graph, succeeding_reshape);
 +  if (!removed_succeeding.ok()) {
 +    return {TransformStatus::INVALID,
@@ -677,19 +677,19 @@ index 00000000000..f804e14e55d
 +
 +class TransformLandmarksOperationParser : public TFLiteOperationParser {
 + public:
-+  absl::Status IsSupported(const TfLiteContext* context,
++  abslx::Status IsSupported(const TfLiteContext* context,
 +                           const TfLiteNode* tflite_node,
 +                           const TfLiteRegistration* registration) final;
-+  absl::Status Parse(const TfLiteNode* tflite_node,
++  abslx::Status Parse(const TfLiteNode* tflite_node,
 +                     const TfLiteRegistration* registration,
 +                     GraphFloat32* graph, ObjectReader* reader) final;
 +};
 +
-+absl::Status ParseTransformLandmarksV1Attributes(
++abslx::Status ParseTransformLandmarksV1Attributes(
 +    const void* data, uint32_t data_size, TransformLandmarksAttributes* attr,
 +    BHWC* output_shape);
 +
-+absl::Status ParseTransformLandmarksV2Attributes(
++abslx::Status ParseTransformLandmarksV2Attributes(
 +    const void* data, uint32_t data_size, TransformLandmarksAttributes* attr,
 +    BHWC* output_shape);
 +
@@ -751,16 +751,16 @@ index 00000000000..704ce7d4a47
 +namespace tflite {
 +namespace gpu {
 +
-+absl::Status TransformTensorBilinearOperationParser::IsSupported(
++abslx::Status TransformTensorBilinearOperationParser::IsSupported(
 +    const TfLiteContext* context, const TfLiteNode* tflite_node,
 +    const TfLiteRegistration* registration) {
 +  RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 2));
 +  RETURN_IF_ERROR(CheckInputsOutputs(context, tflite_node,
 +                                     /*runtime_inputs=*/2, /*outputs=*/1));
-+  return absl::OkStatus();
++  return abslx::OkStatus();
 +}
 +
-+absl::Status TransformTensorBilinearOperationParser::Parse(
++abslx::Status TransformTensorBilinearOperationParser::Parse(
 +    const TfLiteNode* tflite_node, const TfLiteRegistration* registration,
 +    GraphFloat32* graph, ObjectReader* reader) {
 +  Node* node = graph->NewNode();
@@ -783,7 +783,7 @@ index 00000000000..704ce7d4a47
 +        &attr, &output_shape));
 +    node->operation.attributes = attr;
 +  } else {
-+    return absl::UnimplementedError(
++    return abslx::UnimplementedError(
 +        "Transform Tensor Bilinear operation can be of version 1 or 2 only.");
 +  }
 +
@@ -792,10 +792,10 @@ index 00000000000..704ce7d4a47
 +  output_value->tensor.shape =
 +      BHWC(1, output_shape.h, output_shape.w,
 +           graph->FindInputs(node->id)[0]->tensor.shape.c);
-+  return absl::OkStatus();
++  return abslx::OkStatus();
 +}
 +
-+absl::Status ParseTransformTensorBilinearV1Attributes(
++abslx::Status ParseTransformTensorBilinearV1Attributes(
 +    const void* data, uint32_t data_size,
 +    TransformTensorBilinearAttributes* attr, BHWC* output_shape) {
 +  attr->version = 1;
@@ -810,7 +810,7 @@ index 00000000000..704ce7d4a47
 +    const auto value = m[key];
 +    if (key == "mode") {
 +      if (value.AsString().str() != "bilinear") {
-+        return absl::UnimplementedError(
++        return abslx::UnimplementedError(
 +            "TransformTensor operation supports only bilinear interpolation.");
 +      }
 +    }
@@ -822,10 +822,10 @@ index 00000000000..704ce7d4a47
 +  }
 +  attr->align_corners = false;
 +  *output_shape = BHWC(1, attr->output_size.h, attr->output_size.w, 1);
-+  return absl::OkStatus();
++  return abslx::OkStatus();
 +}
 +
-+absl::Status ParseTransformTensorBilinearV2Attributes(
++abslx::Status ParseTransformTensorBilinearV2Attributes(
 +    const void* data, uint32_t data_size,
 +    TransformTensorBilinearAttributes* attr, BHWC* output_shape) {
 +  attr->version = 2;
@@ -848,7 +848,7 @@ index 00000000000..704ce7d4a47
 +  attr->output_size = std::move(output_size);
 +  attr->align_corners = true;
 +  *output_shape = BHWC(1, attr->output_size.h, attr->output_size.w, 1);
-+  return absl::OkStatus();
++  return abslx::OkStatus();
 +}
 +
 +TransformResult TransformTensorBilinearV2ToV1::ApplyToNode(
@@ -857,7 +857,7 @@ index 00000000000..704ce7d4a47
 +    return {TransformStatus::SKIPPED, ""};
 +  }
 +  TransformTensorBilinearAttributes transform_tensor_attr =
-+      absl::any_cast<TransformTensorBilinearAttributes>(
++      abslx::any_cast<TransformTensorBilinearAttributes>(
 +          node->operation.attributes);
 +
 +  if (transform_tensor_attr.version != 2) {
@@ -906,19 +906,19 @@ index 00000000000..8a1f840c12f
 +
 +class TransformTensorBilinearOperationParser : public TFLiteOperationParser {
 + public:
-+  absl::Status IsSupported(const TfLiteContext* context,
++  abslx::Status IsSupported(const TfLiteContext* context,
 +                           const TfLiteNode* tflite_node,
 +                           const TfLiteRegistration* registration) final;
-+  absl::Status Parse(const TfLiteNode* tflite_node,
++  abslx::Status Parse(const TfLiteNode* tflite_node,
 +                     const TfLiteRegistration* registration,
 +                     GraphFloat32* graph, ObjectReader* reader) final;
 +};
 +
-+absl::Status ParseTransformTensorBilinearV1Attributes(
++abslx::Status ParseTransformTensorBilinearV1Attributes(
 +    const void* data, uint32_t data_size,
 +    TransformTensorBilinearAttributes* attr, BHWC* output_shape);
 +
-+absl::Status ParseTransformTensorBilinearV2Attributes(
++abslx::Status ParseTransformTensorBilinearV2Attributes(
 +    const void* data, uint32_t data_size,
 +    TransformTensorBilinearAttributes* attr, BHWC* output_shape);
 +
@@ -998,7 +998,7 @@ index 00000000000..9c93149f95b
 +namespace gpu {
 +namespace {
 +
-+absl::Status CustomGPUOperationFromNode(
++abslx::Status CustomGPUOperationFromNode(
 +    const GpuInfo& gpu_info, const OperationDef& op_def, ModelHints hints,
 +    const std::vector<Value*>& inputs, const std::vector<Value*>& outputs,
 +    const Node& node, GPUOperationsSubgraph* gpu_subgraph) {
@@ -1014,12 +1014,12 @@ index 00000000000..9c93149f95b
 +    return CreateTransformTensorBilinearFromNode(op_def, node, gpu_op);
 +  }
 +
-+  return absl::UnimplementedError(
-+      absl::StrCat("No selector for ", node.operation.type));
++  return abslx::UnimplementedError(
++      abslx::StrCat("No selector for ", node.operation.type));
 +}
 +}  // namespace
 +
-+absl::Status SelectDefault(const GpuInfo& gpu_info, const OperationDef& op_def,
++abslx::Status SelectDefault(const GpuInfo& gpu_info, const OperationDef& op_def,
 +                           ModelHints hints, const std::vector<Value*>& inputs,
 +                           const std::vector<Value*>& outputs, const Node& node,
 +                           GPUOperationsSubgraph* gpu_subgraph) {
@@ -1344,26 +1344,26 @@ index 00000000000..18f28b19361
 +
 +}  // namespace
 +
-+absl::Status CreateLandmarksToTransformMatrixFromNode(
++abslx::Status CreateLandmarksToTransformMatrixFromNode(
 +    const OperationDef& op_def, const Node& node,
 +    std::unique_ptr<GPUOperation>* gpu_op) {
-+  auto* attr_v1 = absl::any_cast<LandmarksToTransformMatrixV1Attributes>(
++  auto* attr_v1 = abslx::any_cast<LandmarksToTransformMatrixV1Attributes>(
 +      &node.operation.attributes);
 +  if (attr_v1) {
 +    GPUOperation operation =
 +        CreateLandmarksToTransformMatrixV1(op_def, *attr_v1);
-+    *gpu_op = absl::make_unique<GPUOperation>(std::move(operation));
-+    return absl::OkStatus();
++    *gpu_op = abslx::make_unique<GPUOperation>(std::move(operation));
++    return abslx::OkStatus();
 +  }
-+  auto* attr_v2 = absl::any_cast<LandmarksToTransformMatrixV2Attributes>(
++  auto* attr_v2 = abslx::any_cast<LandmarksToTransformMatrixV2Attributes>(
 +      &node.operation.attributes);
 +  if (attr_v2) {
 +    GPUOperation operation =
 +        CreateLandmarksToTransformMatrixV2(op_def, *attr_v2);
-+    *gpu_op = absl::make_unique<GPUOperation>(std::move(operation));
-+    return absl::OkStatus();
++    *gpu_op = abslx::make_unique<GPUOperation>(std::move(operation));
++    return abslx::OkStatus();
 +  }
-+  return absl::InvalidArgumentError(
++  return abslx::InvalidArgumentError(
 +      "Landmarks To Transform Matrix operation supports only version 1 or "
 +      "2.");
 +}
@@ -1398,7 +1398,7 @@ index 00000000000..18f28b19361
 +  result.args_.AddFloat("output_size_y", attr.output_hw.h);
 +  result.args_.AddInt("subset_size", attr.subset.size());
 +  result.args_.AddObject("subset",
-+                         absl::make_unique<BufferDescriptor>(std::move(desc)));
++                         abslx::make_unique<BufferDescriptor>(std::move(desc)));
 +  result.code_ = GetLandmarksToTransformMatrixV1KernelCode(definition, attr);
 +  result.work_group_size_ = int3(1, 1, 1);
 +  result.tensor_to_grid_ = TensorToGrid::kBToX_YIs1_ZIs1;
@@ -1439,7 +1439,7 @@ index 00000000000..18f28b19361
 +
 +  result.args_.AddInt("subset_idxs_size", attr.subset_idxs.size());
 +  result.args_.AddObject("subset_idxs",
-+                         absl::make_unique<BufferDescriptor>(std::move(desc)));
++                         abslx::make_unique<BufferDescriptor>(std::move(desc)));
 +  result.code_ = GetLandmarksToTransformMatrixV2KernelCode(definition, attr);
 +  result.work_group_size_ = int3(1, 1, 1);
 +  result.tensor_to_grid_ = TensorToGrid::kBToX_YIs1_ZIs1;
@@ -1464,7 +1464,7 @@ index 00000000000..2fd523df7c7
 +namespace tflite {
 +namespace gpu {
 +
-+absl::Status CreateLandmarksToTransformMatrixFromNode(
++abslx::Status CreateLandmarksToTransformMatrixFromNode(
 +    const OperationDef& op_def, const Node& node,
 +    std::unique_ptr<GPUOperation>* gpu_op);
 +
@@ -1573,18 +1573,18 @@ index 00000000000..999917a9251
 +}
 +}  // namespace
 +
-+absl::Status CreateTransformLandmarksFromNode(
++abslx::Status CreateTransformLandmarksFromNode(
 +    const OperationDef& op_def, const Node& node,
 +    std::unique_ptr<GPUOperation>* gpu_op) {
 +  auto attr =
-+      absl::any_cast<TransformLandmarksAttributes>(node.operation.attributes);
++      abslx::any_cast<TransformLandmarksAttributes>(node.operation.attributes);
 +  if (attr.version != 1) {
-+    return absl::InvalidArgumentError(
++    return abslx::InvalidArgumentError(
 +        "Transform Landmarks operation supports only version 1.");
 +  }
 +  GPUOperation operation = CreateTransformLandmarks(op_def, attr);
-+  *gpu_op = absl::make_unique<GPUOperation>(std::move(operation));
-+  return absl::OkStatus();
++  *gpu_op = abslx::make_unique<GPUOperation>(std::move(operation));
++  return abslx::OkStatus();
 +}
 +
 +GPUOperation CreateTransformLandmarks(
@@ -1618,7 +1618,7 @@ index 00000000000..5c0be19033a
 +namespace tflite {
 +namespace gpu {
 +
-+absl::Status CreateTransformLandmarksFromNode(
++abslx::Status CreateTransformLandmarksFromNode(
 +    const OperationDef& op_def, const Node& node,
 +    std::unique_ptr<GPUOperation>* gpu_op);
 +
@@ -1729,18 +1729,18 @@ index 00000000000..2723216f324
 +}
 +}  // namespace
 +
-+absl::Status CreateTransformTensorBilinearFromNode(
++abslx::Status CreateTransformTensorBilinearFromNode(
 +    const OperationDef& op_def, const Node& node,
 +    std::unique_ptr<GPUOperation>* gpu_op) {
-+  auto attr = absl::any_cast<TransformTensorBilinearAttributes>(
++  auto attr = abslx::any_cast<TransformTensorBilinearAttributes>(
 +      node.operation.attributes);
 +  if (attr.version != 1) {
-+    return absl::InvalidArgumentError(
++    return abslx::InvalidArgumentError(
 +        "Transform Tensor Bilinear operation supports only version 1.");
 +  }
 +  GPUOperation operation = CreateTransformTensorBilinear(op_def, attr);
-+  *gpu_op = absl::make_unique<GPUOperation>(std::move(operation));
-+  return absl::OkStatus();
++  *gpu_op = abslx::make_unique<GPUOperation>(std::move(operation));
++  return abslx::OkStatus();
 +}
 +
 +GPUOperation CreateTransformTensorBilinear(
@@ -1774,7 +1774,7 @@ index 00000000000..0251265cdf4
 +namespace tflite {
 +namespace gpu {
 +
-+absl::Status CreateTransformTensorBilinearFromNode(
++abslx::Status CreateTransformTensorBilinearFromNode(
 +    const OperationDef& op_def, const Node& node,
 +    std::unique_ptr<GPUOperation>* gpu_op);
 +
@@ -1973,11 +1973,11 @@ index 00000000000..de75dd7df2e
 +  return attr.dimensions == 3;
 +}
 +
-+absl::Status GenerateCode(const LandmarksToTransformMatrixV1Attributes& attr,
++abslx::Status GenerateCode(const LandmarksToTransformMatrixV1Attributes& attr,
 +                          const NodeShader::GenerationContext& ctx,
 +                          GeneratedCode* generated_code) {
 +  if (!IsSupported(attr)) {
-+    return absl::InvalidArgumentError(
++    return abslx::InvalidArgumentError(
 +        "This case is not supported by LandmarksToTransformMatrix v1");
 +  }
 +
@@ -2079,7 +2079,7 @@ index 00000000000..de75dd7df2e
 +      /*input=*/IOStructure::ONLY_DEFINITIONS,
 +      /*output=*/IOStructure::ONLY_DEFINITIONS,
 +  };
-+  return absl::OkStatus();
++  return abslx::OkStatus();
 +}
 +
 +}  // namespace v1
@@ -2123,11 +2123,11 @@ index 00000000000..de75dd7df2e
 +         ctx.input_shapes[0][2] == 1 && ctx.input_shapes[0][3] % 3 == 0;
 +}
 +
-+absl::Status GenerateCode(const LandmarksToTransformMatrixV2Attributes& attr,
++abslx::Status GenerateCode(const LandmarksToTransformMatrixV2Attributes& attr,
 +                          const NodeShader::GenerationContext& ctx,
 +                          GeneratedCode* generated_code) {
 +  if (!IsSupported(ctx)) {
-+    return absl::InvalidArgumentError(
++    return abslx::InvalidArgumentError(
 +        "This case is not supported by LandmarksToTransformMatrixV2");
 +  }
 +
@@ -2239,31 +2239,31 @@ index 00000000000..de75dd7df2e
 +      /*input=*/IOStructure::ONLY_DEFINITIONS,
 +      /*output=*/IOStructure::ONLY_DEFINITIONS,
 +  };
-+  return absl::OkStatus();
++  return abslx::OkStatus();
 +}
 +
 +}  // namespace v2
 +
 +class LandmarksToTransformMatrix : public NodeShader {
 + public:
-+  absl::Status GenerateCode(const GenerationContext& ctx,
++  abslx::Status GenerateCode(const GenerationContext& ctx,
 +                            GeneratedCode* generated_code) const final {
 +    auto* attr_v1 =
-+        absl::any_cast<LandmarksToTransformMatrixV1Attributes>(&ctx.op_attr);
++        abslx::any_cast<LandmarksToTransformMatrixV1Attributes>(&ctx.op_attr);
 +    if (attr_v1) return v1::GenerateCode(*attr_v1, ctx, generated_code);
 +
 +    auto* attr_v2 =
-+        absl::any_cast<LandmarksToTransformMatrixV2Attributes>(&ctx.op_attr);
++        abslx::any_cast<LandmarksToTransformMatrixV2Attributes>(&ctx.op_attr);
 +    if (attr_v2) return v2::GenerateCode(*attr_v2, ctx, generated_code);
 +
-+    return absl::InvalidArgumentError("Incorrect attributes' type.");
++    return abslx::InvalidArgumentError("Incorrect attributes' type.");
 +  }
 +};
 +
 +}  // namespace
 +
 +std::unique_ptr<NodeShader> NewLandmarksToTransformMatrixNodeShader() {
-+  return absl::make_unique<LandmarksToTransformMatrix>();
++  return abslx::make_unique<LandmarksToTransformMatrix>();
 +}
 +
 +}  // namespace gl
@@ -2335,11 +2335,11 @@ index 00000000000..3e884b643a5
 +  return attr.dimensions == 3;
 +}
 +
-+absl::Status GenerateCode(const LandmarksToTransformMatrixV1Attributes& attr,
++abslx::Status GenerateCode(const LandmarksToTransformMatrixV1Attributes& attr,
 +                          const NodeShader::GenerationContext& ctx,
 +                          GeneratedCode* generated_code) {
 +  if (!IsSupported(attr)) {
-+    return absl::InvalidArgumentError(
++    return abslx::InvalidArgumentError(
 +        "This case is not supported by LandmarksToTransformMatrix v1");
 +  }
 +
@@ -2441,7 +2441,7 @@ index 00000000000..3e884b643a5
 +      /*input=*/IOStructure::ONLY_DEFINITIONS,
 +      /*output=*/IOStructure::ONLY_DEFINITIONS,
 +  };
-+  return absl::OkStatus();
++  return abslx::OkStatus();
 +}
 +
 +}  // namespace v1
@@ -2485,11 +2485,11 @@ index 00000000000..3e884b643a5
 +         ctx.input_shapes[0][2] == 1 && ctx.input_shapes[0][3] % 3 == 0;
 +}
 +
-+absl::Status GenerateCode(const LandmarksToTransformMatrixV2Attributes& attr,
++abslx::Status GenerateCode(const LandmarksToTransformMatrixV2Attributes& attr,
 +                          const NodeShader::GenerationContext& ctx,
 +                          GeneratedCode* generated_code) {
 +  if (!IsSupported(ctx)) {
-+    return absl::InvalidArgumentError(
++    return abslx::InvalidArgumentError(
 +        "This case is not supported by LandmarksToTransformMatrixV2");
 +  }
 +
@@ -2601,31 +2601,31 @@ index 00000000000..3e884b643a5
 +      /*input=*/IOStructure::ONLY_DEFINITIONS,
 +      /*output=*/IOStructure::ONLY_DEFINITIONS,
 +  };
-+  return absl::OkStatus();
++  return abslx::OkStatus();
 +}
 +
 +}  // namespace v2
 +
 +class LandmarksToTransformMatrix : public NodeShader {
 + public:
-+  absl::Status GenerateCode(const GenerationContext& ctx,
++  abslx::Status GenerateCode(const GenerationContext& ctx,
 +                            GeneratedCode* generated_code) const final {
 +    auto* attr_v1 =
-+        absl::any_cast<LandmarksToTransformMatrixV1Attributes>(&ctx.op_attr);
++        abslx::any_cast<LandmarksToTransformMatrixV1Attributes>(&ctx.op_attr);
 +    if (attr_v1) return v1::GenerateCode(*attr_v1, ctx, generated_code);
 +
 +    auto* attr_v2 =
-+        absl::any_cast<LandmarksToTransformMatrixV2Attributes>(&ctx.op_attr);
++        abslx::any_cast<LandmarksToTransformMatrixV2Attributes>(&ctx.op_attr);
 +    if (attr_v2) return v2::GenerateCode(*attr_v2, ctx, generated_code);
 +
-+    return absl::InvalidArgumentError("Incorrect attributes' type.");
++    return abslx::InvalidArgumentError("Incorrect attributes' type.");
 +  }
 +};
 +
 +}  // namespace
 +
 +std::unique_ptr<NodeShader> NewLandmarksToTransformMatrixNodeShader() {
-+  return absl::make_unique<LandmarksToTransformMatrix>();
++  return abslx::make_unique<LandmarksToTransformMatrix>();
 +}
 +
 +}  // namespace gl
@@ -2677,7 +2677,7 @@ index 00000000000..3ef02a248c3
 +namespace gl {
 +
 +void RegisterCustomOps(
-+    absl::flat_hash_map<std::string, std::vector<std::unique_ptr<NodeShader>>>*
++    abslx::flat_hash_map<std::string, std::vector<std::unique_ptr<NodeShader>>>*
 +        shaders) {
 +  (*shaders)["landmarks_to_transform_matrix"].push_back(
 +      NewLandmarksToTransformMatrixNodeShader());
@@ -2720,15 +2720,15 @@ index 00000000000..980e2aa99e6
 +
 +class TransformLandmarks : public NodeShader {
 + public:
-+  absl::Status GenerateCode(const GenerationContext& ctx,
++  abslx::Status GenerateCode(const GenerationContext& ctx,
 +                            GeneratedCode* generated_code) const final {
 +    if (!IsSupported(ctx)) {
-+      return absl::InvalidArgumentError(
++      return abslx::InvalidArgumentError(
 +          "This case is not supported by TransformLandmarks");
 +    }
 +
 +    const auto& attr =
-+        absl::any_cast<const TransformLandmarksAttributes&>(ctx.op_attr);
++        abslx::any_cast<const TransformLandmarksAttributes&>(ctx.op_attr);
 +
 +    // For transformlandmarks v2 scale parameter is set to 1 when operation is
 +    // parsed.
@@ -2799,13 +2799,13 @@ index 00000000000..980e2aa99e6
 +        /*input=*/IOStructure::ONLY_DEFINITIONS,
 +        /*output=*/IOStructure::AUTO,
 +    };
-+    return absl::OkStatus();
++    return abslx::OkStatus();
 +  }
 +
 + private:
 +  static bool IsSupported(const GenerationContext& ctx) {
 +    const auto& attr =
-+        absl::any_cast<const TransformLandmarksAttributes&>(ctx.op_attr);
++        abslx::any_cast<const TransformLandmarksAttributes&>(ctx.op_attr);
 +    return (attr.dimensions == 2 || attr.dimensions == 3) && attr.version == 1;
 +  }
 +};
@@ -2813,7 +2813,7 @@ index 00000000000..980e2aa99e6
 +}  // namespace
 +
 +std::unique_ptr<NodeShader> NewTransformLandmarksNodeShader() {
-+  return absl::make_unique<TransformLandmarks>();
++  return abslx::make_unique<TransformLandmarks>();
 +}
 +
 +}  // namespace gl
@@ -2874,10 +2874,10 @@ index 00000000000..8013b9b3505
 +
 +class TransformTensorBilinear : public NodeShader {
 + public:
-+  absl::Status GenerateCode(const GenerationContext& ctx,
++  abslx::Status GenerateCode(const GenerationContext& ctx,
 +                            GeneratedCode* generated_code) const final {
 +    if (!IsSupported(ctx)) {
-+      return absl::InvalidArgumentError(
++      return abslx::InvalidArgumentError(
 +          "This case is not supported by TransformTensorBilinear.");
 +    }
 +
@@ -2939,13 +2939,13 @@ index 00000000000..8013b9b3505
 +        /*input=*/IOStructure::ONLY_DEFINITIONS,
 +        /*output=*/IOStructure::AUTO,
 +    };
-+    return absl::OkStatus();
++    return abslx::OkStatus();
 +  }
 +
 + private:
-+  std::string SampleFromInput0(absl::string_view variable,
-+                               absl::string_view x_coord,
-+                               absl::string_view y_coord) const {
++  std::string SampleFromInput0(abslx::string_view variable,
++                               abslx::string_view x_coord,
++                               abslx::string_view y_coord) const {
 +    // This function generates code, which samples data from the first input
 +    // tensor and checks the coordinates' bounds:
 +    //
@@ -2957,14 +2957,14 @@ index 00000000000..8013b9b3505
 +
 +    // Create zero initialized variable on stack
 +    std::string result =
-+        absl::Substitute("        vec4 $0 = vec4(0.0);\n", variable);
++        abslx::Substitute("        vec4 $0 = vec4(0.0);\n", variable);
 +    // If coordinates are not out of scope, load value from input_data_0
-+    absl::SubstituteAndAppend(
++    abslx::SubstituteAndAppend(
 +        &result,
 +        "        if ($0 >= 0 && $1 < $$input_data_0_w$$ && "
 +        "$2 >= 0 && $3 < $$input_data_0_h$$) {\n",
 +        x_coord, x_coord, y_coord, y_coord);
-+    absl::SubstituteAndAppend(
++    abslx::SubstituteAndAppend(
 +        &result,
 +        "          $0 = $$input_data_0[$1, $2, gid.z]$$;\n        }\n\n",
 +        variable, x_coord, y_coord);
@@ -2973,7 +2973,7 @@ index 00000000000..8013b9b3505
 +
 +  std::string AlignCornersCorrection(const GenerationContext& ctx) const {
 +    const auto& attr =
-+        absl::any_cast<const TransformTensorBilinearAttributes&>(ctx.op_attr);
++        abslx::any_cast<const TransformTensorBilinearAttributes&>(ctx.op_attr);
 +    // Align corners correction: T -> S * ( T * A ), where T is a
 +    // transformation matrix, and subtruction and addition matrices are:
 +    // S            A
@@ -3004,7 +3004,7 @@ index 00000000000..8013b9b3505
 +      return false;
 +
 +    const auto& attr =
-+        absl::any_cast<const TransformTensorBilinearAttributes&>(ctx.op_attr);
++        abslx::any_cast<const TransformTensorBilinearAttributes&>(ctx.op_attr);
 +    return attr.output_size.h > 0 && attr.output_size.w > 0 &&
 +           attr.version == 1;
 +  }
@@ -3013,7 +3013,7 @@ index 00000000000..8013b9b3505
 +}  // namespace
 +
 +std::unique_ptr<NodeShader> NewTransformTensorBilinearNodeShader() {
-+  return absl::make_unique<TransformTensorBilinear>();
++  return abslx::make_unique<TransformTensorBilinear>();
 +}
 +
 +}  // namespace gl

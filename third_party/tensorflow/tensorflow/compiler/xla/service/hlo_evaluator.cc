@@ -109,7 +109,7 @@ StatusOr<Literal> Compare(const Shape& shape, ComparisonDirection direction,
 
   Literal result(shape);
   TF_RETURN_IF_ERROR(
-      result.Populate<bool>([&](absl::Span<const int64_t> multi_index) {
+      result.Populate<bool>([&](abslx::Span<const int64_t> multi_index) {
         return compare_op(lhs_literal.Get<OperandT>(multi_index),
                           rhs_literal.Get<OperandT>(multi_index));
       }));
@@ -141,7 +141,7 @@ StatusOr<Literal> Compare<complex64>(const Shape& shape,
 
   Literal result(shape);
   TF_RETURN_IF_ERROR(
-      result.Populate<bool>([&](absl::Span<const int64_t> multi_index) {
+      result.Populate<bool>([&](abslx::Span<const int64_t> multi_index) {
         return compare_op(lhs_literal.Get<complex64>(multi_index),
                           rhs_literal.Get<complex64>(multi_index));
       }));
@@ -173,7 +173,7 @@ StatusOr<Literal> Compare<complex128>(const Shape& shape,
 
   Literal result(shape);
   TF_RETURN_IF_ERROR(
-      result.Populate<bool>([&](absl::Span<const int64_t> multi_index) {
+      result.Populate<bool>([&](abslx::Span<const int64_t> multi_index) {
         return compare_op(lhs_literal.Get<complex128>(multi_index),
                           rhs_literal.Get<complex128>(multi_index));
       }));
@@ -394,7 +394,7 @@ struct DynamicOrStaticValue {
   bool is_dynamic() const { return !static_value.has_value(); }
 };
 
-constexpr absl::string_view kEvalErrorDetailUrl = "EvalErrorDetailUrl";
+constexpr abslx::string_view kEvalErrorDetailUrl = "EvalErrorDetailUrl";
 
 // Use this class to represent the precise details of the error to enable
 // special treatment.
@@ -411,7 +411,7 @@ Status MakeEvalErrorDueToParamOrInfeed(const HloInstruction& eval_instruction) {
       eval_instruction.parent()->name(), ").");
   std::string error_payload;
   error_payload.resize(sizeof(EvalErrorDetail));
-  absl::little_endian::Store32(
+  abslx::little_endian::Store32(
       const_cast<char*>(error_payload.data()),
       static_cast<uint32_t>(EvalErrorDetail::kDynamicValueDependence));
   error.SetPayload(kEvalErrorDetailUrl, error_payload);
@@ -424,7 +424,7 @@ std::optional<EvalErrorDetail> ParseEvalErrorDetail(const Status& error) {
     return std::nullopt;
   }
   return static_cast<EvalErrorDetail>(
-      absl::little_endian::Load32(error_detail->Flatten().data()));
+      abslx::little_endian::Load32(error_detail->Flatten().data()));
 }
 
 // A convenience wrapper to compute the while loop's argument's init value at
@@ -770,7 +770,7 @@ HloEvaluator::HloEvaluator(int64_t max_loop_iterations)
 
 StatusOr<Literal> HloEvaluator::Evaluate(
     const HloComputation& computation,
-    absl::Span<const Literal* const> arg_literals) {
+    abslx::Span<const Literal* const> arg_literals) {
   CHECK(computation.parent() != nullptr);
   XLA_VLOG_LINES(
       2, "HloEvaluator::Evaluate computation:\n" + computation.ToString());
@@ -832,7 +832,7 @@ StatusOr<Literal> HloEvaluator::Evaluate(
   arg_literals_.clear();
   evaluated_.clear();
   auto enable_partial_evaluation_cleanup =
-      absl::MakeCleanup([this] { enable_partial_evaluation_ = false; });
+      abslx::MakeCleanup([this] { enable_partial_evaluation_ = false; });
   enable_partial_evaluation_ = recursively_evaluate_nonconstant_operands;
   TF_RETURN_IF_ERROR(
       EvaluateInternal(instruction, /*shape_index=*/{},
@@ -860,7 +860,7 @@ bool HloEvaluator::TryEvaluate(HloInstruction* instruction, Literal* result,
 
 StatusOr<Literal> HloEvaluator::EvaluateWithSubstitutions(
     const HloInstruction* instruction,
-    const absl::flat_hash_map<const HloInstruction*, const Literal*>&
+    const abslx::flat_hash_map<const HloInstruction*, const Literal*>&
         substitutions) {
   std::vector<std::unique_ptr<HloInstruction>> owned_operands;
   for (const HloInstruction* operand : instruction->operands()) {
@@ -1139,7 +1139,7 @@ Status HloEvaluator::HandleTranspose(HloInstruction* transpose) {
 }
 
 Status HloEvaluator::HandleConcatenate(HloInstruction* concatenate) {
-  absl::Span<HloInstruction* const> operands(concatenate->operands());
+  abslx::Span<HloInstruction* const> operands(concatenate->operands());
   // The result concatenate dimension is going to be the sum of all
   // concatenate dimensions of the operands taking part of the operation.
   const Shape& reference_shape = operands[0]->shape();
@@ -1369,7 +1369,7 @@ Status HloEvaluator::HandleComplex(HloInstruction* complex) {
   switch (complex->shape().element_type()) {
     case C64: {
       TF_RETURN_IF_ERROR(result.Populate<complex64>(
-          [&](absl::Span<const int64_t> multi_index) {
+          [&](abslx::Span<const int64_t> multi_index) {
             return std::complex<float>(real.Get<float>(multi_index),
                                        imag.Get<float>(multi_index));
           }));
@@ -1377,7 +1377,7 @@ Status HloEvaluator::HandleComplex(HloInstruction* complex) {
     }
     case C128: {
       TF_RETURN_IF_ERROR(result.Populate<complex128>(
-          [&](absl::Span<const int64_t> multi_index) {
+          [&](abslx::Span<const int64_t> multi_index) {
             return std::complex<double>(real.Get<double>(multi_index),
                                         imag.Get<double>(multi_index));
           }));
@@ -1605,7 +1605,7 @@ class FftTransform {
         fft_rank_(fft->fft_length().size()),
         fft_lengths_(fft->fft_length()) {
     // Make fft_lengths_[0] the minormost dimension.
-    absl::c_reverse(fft_lengths_);
+    abslx::c_reverse(fft_lengths_);
   }
 
   Status ComputeFft(HloInstruction* fft, const Literal& input_literal,
@@ -1630,7 +1630,7 @@ class FftTransform {
       int64_t buffer_size = 0;
       for (auto len : fft_lengths_) {
         int64_t size =
-            absl::has_single_bit(static_cast<uint64_t>(len)) ? len * 2 : len;
+            abslx::has_single_bit(static_cast<uint64_t>(len)) ? len * 2 : len;
         buffer_size = std::max(buffer_size, size);
       }
       std::vector<ComplexType> buffer(buffer_size);
@@ -1655,13 +1655,13 @@ class FftTransform {
           CHECK(within_src_bounds);
           bool input_is_zero = CopyDataFromInput(
               input_literal, input_index, fft_size, fft_lengths_, fft_strides,
-              input_lengths, input_strides, absl::MakeSpan(data));
+              input_lengths, input_strides, abslx::MakeSpan(data));
           if (!input_is_zero) {
             // Make 1D sweeps along each transform axis.
-            Sweep(fft_lengths_, fft_strides, absl::MakeSpan(data),
-                  absl::MakeSpan(buffer));
+            Sweep(fft_lengths_, fft_strides, abslx::MakeSpan(data),
+                  abslx::MakeSpan(buffer));
           }
-          CopyDataToOutput(absl::MakeSpan(data), output_index, fft_lengths_,
+          CopyDataToOutput(abslx::MakeSpan(data), output_index, fft_lengths_,
                            fft_strides, output_lengths, output_strides,
                            output_literal);
           return true;
@@ -1678,9 +1678,9 @@ class FftTransform {
  private:
   // Common code used by 1D implementations, which copies data from the input to
   // the contiguous buffer. Returns true if all copied values are zero.
-  static bool GatherToBuffer(absl::Span<ComplexType> data, int64_t length,
+  static bool GatherToBuffer(abslx::Span<ComplexType> data, int64_t length,
                              int64_t start, int64_t stride, bool expand_input,
-                             absl::Span<ComplexType> buffer) {
+                             abslx::Span<ComplexType> buffer) {
     CHECK_GE(buffer.size(), length);
     bool input_is_zero = true;
     const int64_t ub = expand_input ? length / 2 + 1 : length;
@@ -1721,8 +1721,8 @@ class FftTransform {
   //
   static void NaiveDft1D(int64_t length, int64_t start, int64_t stride,
                          bool inverse, bool contract_output, bool expand_input,
-                         absl::Span<ComplexType> data,
-                         absl::Span<ComplexType> buffer) {
+                         abslx::Span<ComplexType> data,
+                         abslx::Span<ComplexType> buffer) {
     const bool input_is_zero =
         GatherToBuffer(data, length, start, stride, expand_input, buffer);
 
@@ -1748,9 +1748,9 @@ class FftTransform {
   //
   static void Fft1D(int64_t length, int64_t start, int64_t stride, bool inverse,
                     bool contract_output, bool expand_input,
-                    absl::Span<ComplexType> data,
-                    absl::Span<ComplexType> buffer) {
-    CHECK(absl::has_single_bit(static_cast<uint64_t>(length)));
+                    abslx::Span<ComplexType> data,
+                    abslx::Span<ComplexType> buffer) {
+    CHECK(abslx::has_single_bit(static_cast<uint64_t>(length)));
     const bool input_is_zero =
         GatherToBuffer(data, length, start, stride, expand_input, buffer);
 
@@ -1804,9 +1804,9 @@ class FftTransform {
   // Determine, which implementation of 1D transform to use and call it.
   static void Dft1D(int64_t length, int64_t start, int64_t stride, bool inverse,
                     bool contract_output, bool expand_input,
-                    absl::Span<ComplexType> data,
-                    absl::Span<ComplexType> buffer) {
-    if (absl::has_single_bit(static_cast<uint64_t>(length))) {
+                    abslx::Span<ComplexType> data,
+                    abslx::Span<ComplexType> buffer) {
+    if (abslx::has_single_bit(static_cast<uint64_t>(length))) {
       Fft1D(length, start, stride, inverse, contract_output, expand_input, data,
             buffer);
     } else {
@@ -1826,7 +1826,7 @@ class FftTransform {
   // size lengths.size() + 1. The last element of the returned vector at index
   // [lengths.size()] contains the product of all dimension lengths.
   static std::vector<int64_t> ComputeStrides(
-      const absl::Span<const int64_t> lengths, const Layout& layout) {
+      const abslx::Span<const int64_t> lengths, const Layout& layout) {
     const int64_t num_dimensions = lengths.size();
 
     // Make sure that the layout length matches the number of dimensions.
@@ -1849,23 +1849,23 @@ class FftTransform {
 
   // Compute strides as above using the default layout.
   static std::vector<int64_t> ComputeStrides(
-      const absl::Span<const int64_t> lengths) {
+      const abslx::Span<const int64_t> lengths) {
     return ComputeStrides(lengths,
                           LayoutUtil::GetDefaultLayoutForRank(lengths.size()));
   }
 
   // Compute strides as above using the layout from the literal, if available.
   static std::vector<int64_t> ComputeStrides(
-      const absl::Span<const int64_t> lengths, const Literal& literal) {
+      const abslx::Span<const int64_t> lengths, const Literal& literal) {
     return literal.shape().has_layout()
                ? ComputeStrides(lengths, literal.shape().layout())
                : ComputeStrides(lengths);
   }
 
   // Make 1D sweeps along each transform axis.
-  void Sweep(const absl::Span<const int64_t> fft_lengths,
-             const absl::Span<const int64_t> fft_strides,
-             absl::Span<ComplexType> data, absl::Span<ComplexType> buffer) {
+  void Sweep(const abslx::Span<const int64_t> fft_lengths,
+             const abslx::Span<const int64_t> fft_strides,
+             abslx::Span<ComplexType> data, abslx::Span<ComplexType> buffer) {
     const bool inverse =
         fft_type_ == FftType::IFFT || fft_type_ == FftType::IRFFT;
     const bool input_is_truncated = fft_type_ == FftType::IRFFT;
@@ -1935,10 +1935,10 @@ class FftTransform {
   // callback function to handle all values along the X axis.
   //
   template <typename BaseFn>
-  static void GenerateIndices(const absl::Span<const int64_t> dst_lengths,
-                              const absl::Span<const int64_t> dst_strides,
-                              const absl::Span<const int64_t> src_lengths,
-                              const absl::Span<const int64_t> src_strides,
+  static void GenerateIndices(const abslx::Span<const int64_t> dst_lengths,
+                              const abslx::Span<const int64_t> dst_strides,
+                              const abslx::Span<const int64_t> src_lengths,
+                              const abslx::Span<const int64_t> src_strides,
                               int64_t rank, int64_t dst_start,
                               int64_t src_start, BaseFn&& base) {
     CHECK_EQ(dst_lengths.size() + 1, dst_strides.size());
@@ -1982,11 +1982,11 @@ class FftTransform {
   template <typename InputType>
   bool CopyDataFromInput(const Literal& input_literal, int64_t input_start,
                          int64_t fft_size,
-                         const absl::Span<const int64_t> fft_lengths,
-                         const absl::Span<const int64_t> fft_strides,
-                         const absl::Span<const int64_t> input_lengths,
-                         const absl::Span<const int64_t> input_strides,
-                         absl::Span<ComplexType> data) {
+                         const abslx::Span<const int64_t> fft_lengths,
+                         const abslx::Span<const int64_t> fft_strides,
+                         const abslx::Span<const int64_t> input_lengths,
+                         const abslx::Span<const int64_t> input_strides,
+                         abslx::Span<ComplexType> data) {
     CHECK_GE(data.size(), fft_size);
 
     const bool input_is_truncated = fft_type_ == FftType::IRFFT;
@@ -2033,12 +2033,12 @@ class FftTransform {
   // literal to be filled in.
   //
   template <typename OutputType>
-  void CopyDataToOutput(const absl::Span<ComplexType> data,
+  void CopyDataToOutput(const abslx::Span<ComplexType> data,
                         int64_t output_start,
-                        const absl::Span<const int64_t> fft_lengths,
-                        const absl::Span<const int64_t> fft_strides,
-                        const absl::Span<const int64_t> output_lengths,
-                        const absl::Span<const int64_t> output_strides,
+                        const abslx::Span<const int64_t> fft_lengths,
+                        const abslx::Span<const int64_t> fft_strides,
+                        const abslx::Span<const int64_t> output_lengths,
+                        const abslx::Span<const int64_t> output_strides,
                         Literal* output_literal) {
     const bool output_is_truncated = fft_type_ == FftType::RFFT;
 
@@ -2072,11 +2072,11 @@ class FftTransform {
   // Determine the type to use with the CopyDataFromInput<> template above.
   bool CopyDataFromInput(const Literal& input_literal, int64_t input_start,
                          int64_t fft_size,
-                         const absl::Span<const int64_t> fft_lengths,
-                         const absl::Span<const int64_t> fft_strides,
-                         const absl::Span<const int64_t> input_lengths,
-                         const absl::Span<const int64_t> input_strides,
-                         absl::Span<ComplexType> data) {
+                         const abslx::Span<const int64_t> fft_lengths,
+                         const abslx::Span<const int64_t> fft_strides,
+                         const abslx::Span<const int64_t> input_lengths,
+                         const abslx::Span<const int64_t> input_strides,
+                         abslx::Span<ComplexType> data) {
     const bool input_is_float = fft_type_ == FftType::RFFT;
     if (input_is_float) {
       return CopyDataFromInput<float>(input_literal, input_start, fft_size,
@@ -2090,12 +2090,12 @@ class FftTransform {
   }
 
   // Determine the type to use with the CopyDataToOutput<> template above.
-  void CopyDataToOutput(const absl::Span<ComplexType> data,
+  void CopyDataToOutput(const abslx::Span<ComplexType> data,
                         int64_t output_start,
-                        const absl::Span<const int64_t> fft_lengths,
-                        const absl::Span<const int64_t> fft_strides,
-                        const absl::Span<const int64_t> output_lengths,
-                        const absl::Span<const int64_t> output_strides,
+                        const abslx::Span<const int64_t> fft_lengths,
+                        const abslx::Span<const int64_t> fft_strides,
+                        const abslx::Span<const int64_t> output_lengths,
+                        const abslx::Span<const int64_t> output_strides,
                         Literal* output_literal) {
     const bool output_is_float = fft_type_ == FftType::IRFFT;
     if (output_is_float) {
@@ -2113,7 +2113,7 @@ class FftTransform {
     if (fft_rank_ <= 0) {
       return InvalidArgument("Zero or negative FFT rank.");
     }
-    if (*absl::c_min_element(fft_lengths_) < 0) {
+    if (*abslx::c_min_element(fft_lengths_) < 0) {
       return InvalidArgument("Negative FFT length.");
     }
 
@@ -2201,7 +2201,7 @@ ShapeUtil::IndexIterationSpace IterationSpaceForOutputBatchIndices(
   index_count.reserve(output_rank);
   for (int64_t i = 0; i < output_rank; i++) {
     bool is_output_batch_dim =
-        !absl::c_binary_search(dim_numbers.offset_dims(), i);
+        !abslx::c_binary_search(dim_numbers.offset_dims(), i);
     index_count.push_back(is_output_batch_dim ? output_shape.dimensions(i) : 1);
   }
 
@@ -2212,16 +2212,16 @@ ShapeUtil::IndexIterationSpace IterationSpaceForOutputBatchIndices(
 // Return an ShapeUtil::IndexIterationSpace that iterates over the output slice
 // dimensions while keeping the rest of the output dimensions clamped to 0.
 ShapeUtil::IndexIterationSpace IterationSpaceForOutputOffsetIndices(
-    int64_t output_rank, absl::Span<const int64_t> slice_sizes,
+    int64_t output_rank, abslx::Span<const int64_t> slice_sizes,
     const GatherDimensionNumbers& dim_numbers) {
   std::vector<int64_t> index_base(output_rank, 0);
   std::vector<int64_t> index_count(output_rank, 1);
   int64_t slice_sizes_idx = 0;
   for (int64_t i = 0; i < output_rank; i++) {
     bool is_output_window_dim =
-        absl::c_binary_search(dim_numbers.offset_dims(), i);
+        abslx::c_binary_search(dim_numbers.offset_dims(), i);
     if (is_output_window_dim) {
-      while (absl::c_binary_search(dim_numbers.collapsed_slice_dims(),
+      while (abslx::c_binary_search(dim_numbers.collapsed_slice_dims(),
                                    slice_sizes_idx)) {
         slice_sizes_idx++;
       }
@@ -2248,13 +2248,13 @@ class OutputBatchIndexToInputIndex {
       : dim_numbers_(*dim_numbers), start_indices_(*start_indices) {
     for (int64_t i = 0; i < output_shape.dimensions_size(); i++) {
       output_dim_is_batch_dims_.push_back(
-          !absl::c_binary_search(dim_numbers_.offset_dims(), i));
+          !abslx::c_binary_search(dim_numbers_.offset_dims(), i));
     }
 
     for (int64_t i = 0; i < input_shape.dimensions_size(); i++) {
       int64_t index_of_input_dim_in_index_vector =
           std::distance(dim_numbers_.start_index_map().begin(),
-                        absl::c_find(dim_numbers_.start_index_map(), i));
+                        abslx::c_find(dim_numbers_.start_index_map(), i));
       if (index_of_input_dim_in_index_vector ==
           dim_numbers_.start_index_map_size()) {
         input_dim_value_to_index_vector_.push_back(-1);
@@ -2285,12 +2285,12 @@ class OutputBatchIndexToInputIndex {
   //    same storage for all invocations.
   //
   // This returns a Span into memory owned by the class.
-  StatusOr<absl::Span<const int64_t>> operator()(
-      absl::Span<const int64_t> output_index) {
+  StatusOr<abslx::Span<const int64_t>> operator()(
+      abslx::Span<const int64_t> output_index) {
     PropagateOutputIndexGatherDimsToIndexVectorIndex(output_index);
     TF_RETURN_IF_ERROR(FetchIndexVector());
     PropagateIndexVectorToInputIndex();
-    return absl::Span<const int64_t>(input_index_);
+    return abslx::Span<const int64_t>(input_index_);
   }
 
  private:
@@ -2299,7 +2299,7 @@ class OutputBatchIndexToInputIndex {
   // update the dim_numbers.index_vector_dim() dimension -- that's the dimension
   // we iterate over in FetchIndexVector.
   void PropagateOutputIndexGatherDimsToIndexVectorIndex(
-      absl::Span<const int64_t> output_index) {
+      abslx::Span<const int64_t> output_index) {
     int64_t index_vector_index_i = 0;
     for (int64_t i = 0, e = output_index.size(); i < e; i++) {
       if (!output_dim_is_batch_dims_[i]) {
@@ -2376,7 +2376,7 @@ class OutputOffsetIndexToInputIndex {
     std::vector<int64_t> window_index_to_output_index;
     int64_t output_index_count = 0;
     for (int64_t i = 0; i < output_shape.dimensions_size(); i++) {
-      if (absl::c_binary_search(dim_numbers.offset_dims(), i)) {
+      if (abslx::c_binary_search(dim_numbers.offset_dims(), i)) {
         window_index_to_output_index.push_back(output_index_count++);
       } else {
         output_index_count++;
@@ -2385,7 +2385,7 @@ class OutputOffsetIndexToInputIndex {
 
     int64_t window_dim_count = 0;
     for (int64_t i = 0; i < input_shape.dimensions_size(); i++) {
-      if (absl::c_binary_search(dim_numbers.collapsed_slice_dims(), i)) {
+      if (abslx::c_binary_search(dim_numbers.collapsed_slice_dims(), i)) {
         input_dim_value_to_output_index_.push_back(-1);
       } else {
         input_dim_value_to_output_index_.push_back(
@@ -2405,10 +2405,10 @@ class OutputOffsetIndexToInputIndex {
   // result (input_index_), mutating it in place.
   //
   // This returns a Span into memory owned by the class.
-  StatusOr<absl::Span<const int64_t>> operator()(
-      absl::Span<const int64_t> output_index) {
+  StatusOr<abslx::Span<const int64_t>> operator()(
+      abslx::Span<const int64_t> output_index) {
     PropagateOutputIndexWindowDimsToInputIndex(output_index);
-    return absl::Span<const int64_t>(input_index_);
+    return abslx::Span<const int64_t>(input_index_);
   }
 
   // Returns for a given 'input_dim' the corresponding output dimension index,
@@ -2421,7 +2421,7 @@ class OutputOffsetIndexToInputIndex {
   // Propagates window dimensions from the output index to input_index_ by
   // mutating input_index_ in place.
   void PropagateOutputIndexWindowDimsToInputIndex(
-      absl::Span<const int64_t> output_index) {
+      abslx::Span<const int64_t> output_index) {
     for (int64_t i = 0, e = input_index_.size(); i < e; i++) {
       if (input_dim_value_to_output_index_[i] != -1) {
         input_index_[i] = output_index[input_dim_value_to_output_index_[i]];
@@ -2503,11 +2503,11 @@ Status HloEvaluator::HandleGather(HloInstruction* gather) {
   }
 
   auto gather_inner_loop_body =
-      [&](absl::Span<const int64_t> output_window_index,
-          absl::Span<const int64_t> input_gather_index,
-          absl::Span<const int64_t> output_gather_index) -> StatusOr<bool> {
+      [&](abslx::Span<const int64_t> output_window_index,
+          abslx::Span<const int64_t> input_gather_index,
+          abslx::Span<const int64_t> output_gather_index) -> StatusOr<bool> {
     TF_ASSIGN_OR_RETURN(
-        absl::Span<const int64_t> input_window_index,
+        abslx::Span<const int64_t> input_window_index,
         output_offset_index_to_input_index(output_window_index));
     for (int i = 0, e = output_index.size(); i < e; i++) {
       output_index[i] = output_gather_index[i] + output_window_index[i];
@@ -2540,8 +2540,8 @@ Status HloEvaluator::HandleGather(HloInstruction* gather) {
   };
 
   auto gather_outer_loop_body =
-      [&](absl::Span<const int64_t> output_gather_index) -> StatusOr<bool> {
-    TF_ASSIGN_OR_RETURN(absl::Span<const int64_t> input_gather_index,
+      [&](abslx::Span<const int64_t> output_gather_index) -> StatusOr<bool> {
+    TF_ASSIGN_OR_RETURN(abslx::Span<const int64_t> input_gather_index,
                         output_batch_index_to_input_index(output_gather_index));
     TF_RETURN_IF_ERROR(ShapeUtil::ForEachIndexWithStatus(
         shape, offset_indices_iteration_space,
@@ -2576,7 +2576,7 @@ StatusOr<std::reference_wrapper<const Literal>> ReshapedScatterIndices(
 
 template <bool kForUpdateWindowIndices>
 ShapeUtil::IndexIterationSpace GetIterationSpaceImpl(
-    absl::Span<const int64_t> updates_dims,
+    abslx::Span<const int64_t> updates_dims,
     const ScatterDimensionNumbers& dim_numbers) {
   int64_t updates_rank = updates_dims.size();
   std::vector<int64_t> index_base(updates_rank, 0);
@@ -2585,13 +2585,13 @@ ShapeUtil::IndexIterationSpace GetIterationSpaceImpl(
     // Use if constexpr when we can use c++17 or above.
     if (kForUpdateWindowIndices) {
       bool is_update_window_dim =
-          absl::c_binary_search(dim_numbers.update_window_dims(), i);
+          abslx::c_binary_search(dim_numbers.update_window_dims(), i);
       if (is_update_window_dim) {
         index_count[i] = updates_dims[i];
       }
     } else {
       bool is_update_scatter_dim =
-          !absl::c_binary_search(dim_numbers.update_window_dims(), i);
+          !abslx::c_binary_search(dim_numbers.update_window_dims(), i);
       if (is_update_scatter_dim) {
         index_count[i] = updates_dims[i];
       }
@@ -2605,7 +2605,7 @@ ShapeUtil::IndexIterationSpace GetIterationSpaceImpl(
 // scatter dimensions while keeping the rest of the update dimensions clamped
 // to 0.
 ShapeUtil::IndexIterationSpace IterationSpaceForUpdateScatterIndices(
-    absl::Span<const int64_t> updates_dims,
+    abslx::Span<const int64_t> updates_dims,
     const ScatterDimensionNumbers& dim_numbers) {
   return GetIterationSpaceImpl</*kForUpdateWindowIndices=*/false>(updates_dims,
                                                                   dim_numbers);
@@ -2615,7 +2615,7 @@ ShapeUtil::IndexIterationSpace IterationSpaceForUpdateScatterIndices(
 // window dimensions while keeping the rest of the update dimensions clamped
 // to 0.
 ShapeUtil::IndexIterationSpace IterationSpaceForUpdateWindowIndices(
-    absl::Span<const int64_t> updates_dims,
+    abslx::Span<const int64_t> updates_dims,
     const ScatterDimensionNumbers& dim_numbers) {
   return GetIterationSpaceImpl</*kForUpdateWindowIndices=*/true>(updates_dims,
                                                                  dim_numbers);
@@ -2639,7 +2639,7 @@ class UpdateScatterIndexToInputIndex {
       : dim_numbers_(dim_numbers), scatter_indices_(*scatter_indices) {
     for (int64_t i = 0; i < updates_rank; i++) {
       update_dim_is_scatter_dims_.push_back(
-          !absl::c_binary_search(dim_numbers_.update_window_dims(), i));
+          !abslx::c_binary_search(dim_numbers_.update_window_dims(), i));
     }
 
     for (int64_t i = 0; i < input_rank; i++) {
@@ -2675,12 +2675,12 @@ class UpdateScatterIndexToInputIndex {
   //    same storage for all invocations.
   //
   // This returns a Span into memory owned by the class.
-  StatusOr<absl::Span<const int64_t>> operator()(
-      absl::Span<const int64_t> update_index) {
+  StatusOr<abslx::Span<const int64_t>> operator()(
+      abslx::Span<const int64_t> update_index) {
     PropagateUpdateIndexScatterDimsToIndexVectorIndex(update_index);
     TF_RETURN_IF_ERROR(FetchIndexVector());
     PropagateIndexVectorToInputIndex();
-    return absl::Span<const int64_t>(input_index_);
+    return abslx::Span<const int64_t>(input_index_);
   }
 
  private:
@@ -2689,7 +2689,7 @@ class UpdateScatterIndexToInputIndex {
   // update the dim_numbers.index_vector_dim() dimension -- that's the
   // dimension we iterate over in FetchIndexVector.
   void PropagateUpdateIndexScatterDimsToIndexVectorIndex(
-      absl::Span<const int64_t> update_index) {
+      abslx::Span<const int64_t> update_index) {
     int64_t index_vector_index_i = 0;
     for (int64_t i = 0, e = update_index.size(); i < e; i++) {
       if (!update_dim_is_scatter_dims_[i]) {
@@ -2769,7 +2769,7 @@ class UpdateWindowIndexToInputIndex {
     std::vector<int64_t> window_index_to_update_index;
     int64_t update_index_count = 0;
     for (int64_t i = 0; i < update_rank; i++) {
-      if (absl::c_binary_search(dim_numbers.update_window_dims(), i)) {
+      if (abslx::c_binary_search(dim_numbers.update_window_dims(), i)) {
         window_index_to_update_index.push_back(update_index_count++);
       } else {
         update_index_count++;
@@ -2778,7 +2778,7 @@ class UpdateWindowIndexToInputIndex {
 
     int64_t window_dim_count = 0;
     for (int64_t i = 0; i < input_rank; i++) {
-      if (absl::c_binary_search(dim_numbers.inserted_window_dims(), i)) {
+      if (abslx::c_binary_search(dim_numbers.inserted_window_dims(), i)) {
         input_dim_value_to_update_index_.push_back(-1);
       } else {
         input_dim_value_to_update_index_.push_back(
@@ -2798,10 +2798,10 @@ class UpdateWindowIndexToInputIndex {
   // result (input_index_), mutating it in place.
   //
   // This returns a Span into memory owned by the class.
-  StatusOr<absl::Span<const int64_t>> operator()(
-      absl::Span<const int64_t> update_index) {
+  StatusOr<abslx::Span<const int64_t>> operator()(
+      abslx::Span<const int64_t> update_index) {
     PropagateUpdateIndexWindowDimsToInputIndex(update_index);
-    return absl::Span<const int64_t>(input_index_);
+    return abslx::Span<const int64_t>(input_index_);
   }
 
   // Returns for a given 'input_dim' the corresponding update dimension index,
@@ -2814,7 +2814,7 @@ class UpdateWindowIndexToInputIndex {
   // Propagates window dimensions from the update index to input_index_ by
   // mutating input_index_ in place.
   void PropagateUpdateIndexWindowDimsToInputIndex(
-      absl::Span<const int64_t> update_index) {
+      abslx::Span<const int64_t> update_index) {
     for (int64_t i = 0, e = input_index_.size(); i < e; i++) {
       if (input_dim_value_to_update_index_[i] != -1) {
         input_index_[i] = update_index[input_dim_value_to_update_index_[i]];
@@ -2840,7 +2840,7 @@ Status HloEvaluator::HandleScatter(HloInstruction* hlo) {
   auto* scatter = DynCast<HloScatterInstruction>(hlo);
   const ScatterDimensionNumbers& dim_numbers =
       scatter->scatter_dimension_numbers();
-  absl::InlinedVector<const Literal*, 1> operands;
+  abslx::InlinedVector<const Literal*, 1> operands;
   operands.reserve(scatter->scatter_operand_count());
   for (HloInstruction* operand_inst : scatter->scatter_operands()) {
     operands.push_back(&GetEvaluatedLiteralFor(operand_inst));
@@ -2851,7 +2851,7 @@ Status HloEvaluator::HandleScatter(HloInstruction* hlo) {
       ReshapedScatterIndices(dim_numbers.index_vector_dim(),
                              GetEvaluatedLiteralFor(scatter->scatter_indices()),
                              &reshaped_scatter_indices));
-  absl::InlinedVector<const Literal*, 1> updates;
+  abslx::InlinedVector<const Literal*, 1> updates;
   updates.reserve(operands.size());
   for (HloInstruction* updates_inst : scatter->scatter_updates()) {
     updates.push_back(&GetEvaluatedLiteralFor(updates_inst));
@@ -2889,11 +2889,11 @@ Status HloEvaluator::HandleScatter(HloInstruction* hlo) {
 
   HloEvaluator embedded_evaluator;
   auto scatter_inner_loop_body =
-      [&](absl::Span<const int64_t> update_window_index,
-          absl::Span<const int64_t> input_scatter_index,
-          absl::Span<const int64_t> update_scatter_index) -> StatusOr<bool> {
+      [&](abslx::Span<const int64_t> update_window_index,
+          abslx::Span<const int64_t> input_scatter_index,
+          abslx::Span<const int64_t> update_scatter_index) -> StatusOr<bool> {
     TF_ASSIGN_OR_RETURN(
-        absl::Span<const int64_t> input_window_index,
+        abslx::Span<const int64_t> input_window_index,
         update_window_index_to_input_index(update_window_index));
     for (int i = 0, e = update_index.size(); i < e; i++) {
       update_index[i] = update_scatter_index[i] + update_window_index[i];
@@ -2918,7 +2918,7 @@ Status HloEvaluator::HandleScatter(HloInstruction* hlo) {
       input_index[i] = input_scatter_index[i] + input_window_index[i];
     }
 
-    absl::InlinedVector<Literal, 2> to_apply_args;
+    abslx::InlinedVector<Literal, 2> to_apply_args;
     to_apply_args.reserve(operands.size() + updates.size());
     for (int i = 0, n = operands.size(); i < n; ++i) {
       to_apply_args.push_back(
@@ -2943,13 +2943,13 @@ Status HloEvaluator::HandleScatter(HloInstruction* hlo) {
   };
 
   auto scatter_outer_loop_body =
-      [&](absl::Span<const int64_t> update_scatter_index) -> StatusOr<bool> {
+      [&](abslx::Span<const int64_t> update_scatter_index) -> StatusOr<bool> {
     TF_ASSIGN_OR_RETURN(
-        absl::Span<const int64_t> input_scatter_index,
+        abslx::Span<const int64_t> input_scatter_index,
         update_scatter_index_to_input_index(update_scatter_index));
     TF_RETURN_IF_ERROR(ShapeUtil::ForEachIndexWithStatus(
         updates[0]->shape(), window_indices_iteration_space,
-        [&](absl::Span<const int64_t> update_window_index) {
+        [&](abslx::Span<const int64_t> update_window_index) {
           return scatter_inner_loop_body(
               update_window_index, input_scatter_index, update_scatter_index);
         }));
@@ -2977,7 +2977,7 @@ Status HloEvaluator::HandleBroadcast(HloInstruction* broadcast) {
     auto operand_dim_size = operand.shape().dimensions(i);
     auto broadcast_dim_size =
         broadcast->shape().dimensions(broadcast->dimensions(i));
-    TF_RET_CHECK(operand_dim_size == broadcast_dim_size) << absl::StreamFormat(
+    TF_RET_CHECK(operand_dim_size == broadcast_dim_size) << abslx::StreamFormat(
         "Operand dimension %d is broadcast to output dimension %d, but the "
         "sizes of these two dims do not match (%d vs %d): %s",
         i, broadcast->dimensions(i), operand_dim_size, broadcast_dim_size,
@@ -3364,14 +3364,14 @@ Status HloEvaluator::HandleWhile(HloInstruction* while_hlo) {
 namespace {
 template <typename NativeT>
 Literal ExtractLiteralFromIndexPositions(const Literal& from,
-                                         absl::Span<int64_t const> indices,
+                                         abslx::Span<int64_t const> indices,
                                          bool extract_as_scalar) {
   if (extract_as_scalar) {
     return LiteralUtil::CreateR0<NativeT>(from.Get<NativeT>({indices[0]}));
   }
   // We use a InlinedVector here because we need to convert it to an
-  // absl::Span later, and this would not work with std::vector<bool>.
-  absl::InlinedVector<NativeT, 10> values;
+  // abslx::Span later, and this would not work with std::vector<bool>.
+  abslx::InlinedVector<NativeT, 10> values;
   for (int64_t index : indices) {
     values.push_back(from.Get<NativeT>({index}));
   }
@@ -3379,7 +3379,7 @@ Literal ExtractLiteralFromIndexPositions(const Literal& from,
 }
 
 StatusOr<Literal> ExtractFromIndexPositions(const Literal& from,
-                                            absl::Span<int64_t const> indices,
+                                            abslx::Span<int64_t const> indices,
                                             bool extract_as_scalar = false) {
   if (extract_as_scalar) {
     CHECK_EQ(indices.size(), 1);
@@ -3488,11 +3488,11 @@ Status HloEvaluator::HandleSort(HloInstruction* sort) {
   // Iterate through each dimension except 'sort_dim'.
   TF_RETURN_IF_ERROR(ShapeUtil::ForEachIndexWithStatus(
       key_shape, zero_base, key_shape.dimensions(), increment,
-      [&](absl::Span<const int64_t> indices) -> StatusOr<bool> {
+      [&](abslx::Span<const int64_t> indices) -> StatusOr<bool> {
         // Extract a slice from each operand literal that corresponds to
         // exactly the row in dimension 'sort_dim'.
         std::vector<int64_t> limit_indices(indices.begin(), indices.end());
-        absl::c_for_each(limit_indices, [](int64_t& index) { ++index; });
+        abslx::c_for_each(limit_indices, [](int64_t& index) { ++index; });
         limit_indices[sort_dim] = sort_dim_elements;
         std::vector<Literal> literals_to_sort;
         literals_to_sort.reserve(sort->operand_count());
@@ -3528,7 +3528,7 @@ Status HloEvaluator::HandleSort(HloInstruction* sort) {
             literals.push_back(std::move(rhs.ValueOrDie()));
           }
           std::vector<const Literal*> literal_ptrs;
-          absl::c_transform(literals, std::back_inserter(literal_ptrs),
+          abslx::c_transform(literals, std::back_inserter(literal_ptrs),
                             [](const Literal& literal) { return &literal; });
 
           auto computed_result =
@@ -3571,7 +3571,7 @@ Status HloEvaluator::HandleSort(HloInstruction* sort) {
     evaluated_[sort] = std::move(result_literals[0]);
   } else {
     std::vector<const Literal*> literal_ptrs;
-    absl::c_transform(result_literals, std::back_inserter(literal_ptrs),
+    abslx::c_transform(result_literals, std::back_inserter(literal_ptrs),
                       [](const Literal& literal) { return &literal; });
 
     Literal result_tuple = LiteralUtil::MakeTuple(literal_ptrs);
@@ -3601,15 +3601,15 @@ static bool IsScalarAdd(HloComputation* computation) {
 // (until the reduction is completed, the output element is also used as
 // an accumulator).
 static StatusOr<bool> PerformReductionStep(
-    bool is_tuple, absl::Span<const int64_t> input_index,
-    absl::Span<const int64_t> output_index,
-    absl::Span<const Literal* const> input_args, absl::Span<Literal> results,
+    bool is_tuple, abslx::Span<const int64_t> input_index,
+    abslx::Span<const int64_t> output_index,
+    abslx::Span<const Literal* const> input_args, abslx::Span<Literal> results,
     HloComputation* computation, HloEvaluator* embedded_evaluator) {
   int num_args = results.size();
 
-  absl::InlinedVector<Literal, 1> arg_values;
+  abslx::InlinedVector<Literal, 1> arg_values;
   arg_values.reserve(num_args);
-  absl::InlinedVector<Literal, 1> accumulators;
+  abslx::InlinedVector<Literal, 1> accumulators;
   accumulators.reserve(num_args);
   for (int64_t i = 0; i < num_args; ++i) {
     arg_values.emplace_back(
@@ -3624,7 +3624,7 @@ static StatusOr<bool> PerformReductionStep(
   }
 
   // Evaluate computation with specified literal operands.
-  absl::InlinedVector<Literal*, 2> embedded_operands;
+  abslx::InlinedVector<Literal*, 2> embedded_operands;
   for (Literal& accumulator : accumulators) {
     embedded_operands.push_back(&accumulator);
   }
@@ -3655,21 +3655,21 @@ static StatusOr<bool> PerformReductionStep(
 }
 
 static StatusOr<bool> GenerateReduceOutputElement(
-    bool is_tuple, absl::Span<const int64_t> output_index,
+    bool is_tuple, abslx::Span<const int64_t> output_index,
 
-    absl::Span<const Literal* const> init_values,
-    absl::Span<const Literal* const> input_args, absl::Span<Literal> results,
+    abslx::Span<const Literal* const> init_values,
+    abslx::Span<const Literal* const> input_args, abslx::Span<Literal> results,
 
     HloComputation* function, HloEvaluator* embedded_evaluator,
 
-    absl::Span<const int64_t> arg_dim_steps,
-    absl::Span<const int64_t> arg_dim_counts,
-    absl::Span<const int64_t> result_to_arg_index) {
+    abslx::Span<const int64_t> arg_dim_steps,
+    abslx::Span<const int64_t> arg_dim_counts,
+    abslx::Span<const int64_t> result_to_arg_index) {
   bool use_fast_add = ShapeUtil::ElementIsFloating(init_values[0]->shape()) &&
                       IsScalarAdd(function) && !is_tuple;
 
   const Shape& arg_shape = input_args[0]->shape();
-  absl::Span<const int64_t> arg_dimensions = arg_shape.dimensions();
+  abslx::Span<const int64_t> arg_dimensions = arg_shape.dimensions();
   std::vector<int64_t> base(arg_dimensions.size());
   for (int64_t i = 0; i < output_index.size(); ++i) {
     base[result_to_arg_index[i]] = output_index[i];
@@ -3683,7 +3683,7 @@ static StatusOr<bool> GenerateReduceOutputElement(
   if (use_fast_add) {
     double computed_result = *init_values[0]->GetAsDouble({});
     auto reduction_step =
-        [&](absl::Span<const int64_t> input_index) -> StatusOr<bool> {
+        [&](abslx::Span<const int64_t> input_index) -> StatusOr<bool> {
       double argument = *input_args[0]->GetAsDouble(input_index);
       computed_result += argument;
       return true;
@@ -3698,7 +3698,7 @@ static StatusOr<bool> GenerateReduceOutputElement(
   // for all non-reduced dimensions.
   TF_RETURN_IF_ERROR(ShapeUtil::ForEachIndexWithStatus(
       arg_shape, base, arg_dim_counts, arg_dim_steps,
-      [&](absl::Span<const int64_t> input_index) {
+      [&](abslx::Span<const int64_t> input_index) {
         return PerformReductionStep(is_tuple, input_index, output_index,
                                     input_args, results, function,
                                     embedded_evaluator);
@@ -3709,10 +3709,10 @@ static StatusOr<bool> GenerateReduceOutputElement(
 Status HloEvaluator::HandleReduce(HloInstruction* instr) {
   HloReduceInstruction* reduce = Cast<HloReduceInstruction>(instr);
   int64_t num_args = reduce->inputs().size();
-  absl::Span<const int64_t> dimensions_to_reduce(reduce->dimensions());
+  abslx::Span<const int64_t> dimensions_to_reduce(reduce->dimensions());
   HloComputation* function = reduce->to_apply();
 
-  absl::InlinedVector<const Shape*, 1> operand_shapes;
+  abslx::InlinedVector<const Shape*, 1> operand_shapes;
   for (const HloInstruction* operand : reduce->operands()) {
     operand_shapes.push_back(&operand->shape());
   }
@@ -3726,8 +3726,8 @@ Status HloEvaluator::HandleReduce(HloInstruction* instr) {
       << " but is inferred to be: "
       << ShapeUtil::HumanString(inferred_return_shape);
 
-  absl::InlinedVector<const Literal*, 1> input_args(num_args);
-  absl::InlinedVector<const Literal*, 1> init_values(num_args);
+  abslx::InlinedVector<const Literal*, 1> input_args(num_args);
+  abslx::InlinedVector<const Literal*, 1> init_values(num_args);
   for (int64_t i = 0; i < num_args; ++i) {
     input_args[i] = &GetEvaluatedLiteralFor(reduce->inputs()[i]);
     VLOG(3) << "HandleReduce arg_literal: " << input_args[i]->ToString();
@@ -3744,7 +3744,7 @@ Status HloEvaluator::HandleReduce(HloInstruction* instr) {
                                   ? inferred_return_shape.tuple_shapes(0)
                                   : inferred_return_shape;
 
-  absl::Span<const int64_t> arg_dimensions = arg_shape.dimensions();
+  abslx::Span<const int64_t> arg_dimensions = arg_shape.dimensions();
 
   // All increments are set to 0.
   std::vector<int64_t> arg_dim_steps(arg_dimensions.size());
@@ -3771,16 +3771,16 @@ Status HloEvaluator::HandleReduce(HloInstruction* instr) {
 
   std::unique_ptr<HloEvaluator> embedded_evaluator =
       CreateEmbedded(max_loop_iterations_);
-  absl::InlinedVector<Literal, 1> results(num_args);
+  abslx::InlinedVector<Literal, 1> results(num_args);
   for (int64_t i = 0; i < num_args; ++i) {
     results[i] = Literal(is_tuple ? out_shape.tuple_shapes(i) : out_shape);
   }
 
   TF_RETURN_IF_ERROR(ShapeUtil::ForEachIndexWithStatus(
-      output_shape, [&](absl::Span<const int64_t> output_index) {
+      output_shape, [&](abslx::Span<const int64_t> output_index) {
         return GenerateReduceOutputElement(
             is_tuple, output_index, init_values, input_args,
-            absl::Span<Literal>(results), function, embedded_evaluator.get(),
+            abslx::Span<Literal>(results), function, embedded_evaluator.get(),
             arg_dim_steps, arg_dim_counts, result_to_arg_index);
       }));
 
@@ -3833,7 +3833,7 @@ Status HloEvaluator::HandleCustomCall(HloInstruction* custom_call) {
 
   // Synchronously issue the handler to populate the instruction output literal.
   TF_ASSIGN_OR_RETURN(
-      auto output, custom_call_handler_(custom_call, absl::MakeSpan(operands)));
+      auto output, custom_call_handler_(custom_call, abslx::MakeSpan(operands)));
 
   evaluated_[custom_call] = std::move(output);
   return OkStatus();

@@ -54,7 +54,7 @@ class SimpleOp : public OpKernelShim<SimpleOp, Rt> {
 
   // Attributes declaration (syntax: https://www.tensorflow.org/guide/create_op)
   static std::vector<std::string> Attrs() {
-    return {absl::StrCat(kOutput1SizeAttr, ": int"), "output2_suffix: string",
+    return {abslx::StrCat(kOutput1SizeAttr, ": int"), "output2_suffix: string",
             "N: int >= 0"};
   }
   // Input tensors declaration (syntax:
@@ -69,21 +69,21 @@ class SimpleOp : public OpKernelShim<SimpleOp, Rt> {
   }
 
   // Initializes the op
-  absl::Status Init(InitContext* ctx) {
+  abslx::Status Init(InitContext* ctx) {
     SH_RETURN_IF_ERROR(ctx->GetAttr(kOutput1SizeAttr, &output1_size_));
     if (output1_size_ < 1) {
-      return absl::InternalError(
-          absl::StrCat(kOutput1SizeAttr, " should be >= 1"));
+      return abslx::InternalError(
+          abslx::StrCat(kOutput1SizeAttr, " should be >= 1"));
     }
     SH_RETURN_IF_ERROR(ctx->GetAttr("N", &n_));
-    absl::string_view output2_suffix;
+    abslx::string_view output2_suffix;
     SH_RETURN_IF_ERROR(ctx->GetAttr("output2_suffix", &output2_suffix));
     output2_suffix_ = std::string(output2_suffix);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Runs the operation
-  absl::Status Invoke(InvokeContext* ctx) {
+  abslx::Status Invoke(InvokeContext* ctx) {
     using std::int32_t;
     // read input
     SH_ASSIGN_OR_RETURN(const auto input_t, ctx->GetInput(kInput0));
@@ -109,11 +109,11 @@ class SimpleOp : public OpKernelShim<SimpleOp, Rt> {
     // output3 which is a list of length N
     // The values in output3 are element wise equal to input2 + 1.
     if (ctx->NumInputs() < kInput1 + n_) {
-      return absl::InternalError(absl::StrCat(
+      return abslx::InternalError(abslx::StrCat(
           "out of bounds: num_inputs=", ctx->NumInputs(), " N=", n_));
     }
     if (ctx->NumOutputs() < kOutput3 + n_) {
-      return absl::InternalError(absl::StrCat(
+      return abslx::InternalError(abslx::StrCat(
           "out of bounds: num_outputs=", ctx->NumOutputs(), " N=", n_));
     }
     for (int i = 0; i < n_; ++i) {
@@ -127,11 +127,11 @@ class SimpleOp : public OpKernelShim<SimpleOp, Rt> {
       // Increment the values of the output
       for (auto& v : output_t->template Data<int64_t>()) ++v;
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Shape inference
-  static absl::Status ShapeInference(ShapeInferenceContext* ctx) {
+  static abslx::Status ShapeInference(ShapeInferenceContext* ctx) {
     // outpu0
     SH_RETURN_IF_ERROR(ctx->SetOutputShape(kOutput0, Shape({kOutput0Size})));
     // output1
@@ -156,14 +156,14 @@ class SimpleOp : public OpKernelShim<SimpleOp, Rt> {
     int64_t n;
     SH_RETURN_IF_ERROR(ctx->GetAttr("N", &n));
     if (n + 1 != ctx->NumInputs()) {
-      return absl::InternalError(absl::StrCat("n + 1 != num_inputs: ", n + 1,
+      return abslx::InternalError(abslx::StrCat("n + 1 != num_inputs: ", n + 1,
                                               " != ", ctx->NumInputs()));
     }
     if (n + 3 != ctx->NumOutputs()) {
-      return absl::InternalError(absl::StrCat("n + 1 != num_inputs: ", n + 1,
+      return abslx::InternalError(abslx::StrCat("n + 1 != num_inputs: ", n + 1,
                                               " != ", ctx->NumOutputs()));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

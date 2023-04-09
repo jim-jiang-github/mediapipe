@@ -26,7 +26,7 @@ namespace tensorflow::tpu {
 namespace {
 
 StatusOr<std::string> GenerateTFStatusOr(errors::Code code,
-                                         absl::string_view value = "") {
+                                         abslx::string_view value = "") {
   if (code == errors::Code::OK) {
     return std::string(value);
   } else {
@@ -35,7 +35,7 @@ StatusOr<std::string> GenerateTFStatusOr(errors::Code code,
 }
 
 TEST(TpuEmbeddingErrors, StatusOk) {
-  constexpr absl::string_view kValue = "success";
+  constexpr abslx::string_view kValue = "success";
 
   {
     const Status status = AppendTpuEmbeddingErrorPayload(OkStatus());

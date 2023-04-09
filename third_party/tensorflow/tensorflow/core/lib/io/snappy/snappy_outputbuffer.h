@@ -66,7 +66,7 @@ class SnappyOutputBuffer : public WritableFile {
   Status Append(StringPiece data) override;
 
 #if defined(TF_CORD_SUPPORT)
-  Status Append(const absl::Cord& cord) override;
+  Status Append(const abslx::Cord& cord) override;
 #endif
 
   // Compresses any buffered input and writes all output to file. This must be

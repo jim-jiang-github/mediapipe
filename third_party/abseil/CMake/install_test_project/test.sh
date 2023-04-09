@@ -62,7 +62,7 @@ fi
 
 popd
 
-if ! grep absl::strings "/usr/local/lib/cmake/absl/abslTargets.cmake"; then
+if ! grep abslx::strings "/usr/local/lib/cmake/absl/abslTargets.cmake"; then
   cat "/usr/local/lib/cmake/absl/abslTargets.cmake"
   echo "CMake targets named incorrectly"
   exit 1
@@ -75,7 +75,7 @@ cat > hello-abseil.cc << EOF
 #include "absl/strings/str_format.h"
 
 int main(int argc, char **argv) {
-  absl::PrintF("Hello Abseil!\n");
+  abslx::PrintF("Hello Abseil!\n");
   return EXIT_SUCCESS;
 }
 EOF

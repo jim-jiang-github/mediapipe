@@ -134,21 +134,21 @@ struct GPUData {
 //
 class TfLiteConverterCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
-  absl::Status InitGpu(CalculatorContext* cc);
-  absl::Status LoadOptions(CalculatorContext* cc);
+  abslx::Status InitGpu(CalculatorContext* cc);
+  abslx::Status LoadOptions(CalculatorContext* cc);
   template <class T>
-  absl::Status NormalizeImage(const ImageFrame& image_frame,
+  abslx::Status NormalizeImage(const ImageFrame& image_frame,
                               bool flip_vertically, float* tensor_ptr);
-  absl::Status CopyMatrixToTensor(const Matrix& matrix, float* tensor_ptr);
-  absl::Status ProcessCPU(CalculatorContext* cc);
-  absl::Status ProcessGPU(CalculatorContext* cc);
+  abslx::Status CopyMatrixToTensor(const Matrix& matrix, float* tensor_ptr);
+  abslx::Status ProcessCPU(CalculatorContext* cc);
+  abslx::Status ProcessGPU(CalculatorContext* cc);
 
   std::unique_ptr<tflite::Interpreter> interpreter_ = nullptr;
 
@@ -162,7 +162,7 @@ class TfLiteConverterCalculator : public CalculatorBase {
 
   bool initialized_ = false;
   bool use_gpu_ = false;
-  absl::optional<std::pair<float, float>> output_range_;
+  abslx::optional<std::pair<float, float>> output_range_;
   bool flip_vertically_ = false;
   bool row_major_matrix_ = false;
   bool use_quantized_tensors_ = false;
@@ -182,7 +182,7 @@ bool ShouldUseGpu(CC* cc) {
 }
 }  // namespace
 
-absl::Status TfLiteConverterCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status TfLiteConverterCalculator::GetContract(CalculatorContract* cc) {
   // Confirm only one of the input streams is present.
   RET_CHECK(cc->Inputs().HasTag(kImageFrameTag) ^
             cc->Inputs().HasTag(kGpuBufferTag) ^
@@ -222,10 +222,10 @@ absl::Status TfLiteConverterCalculator::GetContract(CalculatorContract* cc) {
   // Assign this calculator's default InputStreamHandler.
   cc->SetInputStreamHandler("FixedSizeInputStreamHandler");
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteConverterCalculator::Open(CalculatorContext* cc) {
+abslx::Status TfLiteConverterCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
   MP_RETURN_IF_ERROR(LoadOptions(cc));
@@ -245,18 +245,18 @@ absl::Status TfLiteConverterCalculator::Open(CalculatorContext* cc) {
     RET_CHECK(gpu_helper_);
 #endif  // MEDIAPIPE_TFLITE_GL_INFERENCE
   } else {
-    interpreter_ = absl::make_unique<tflite::Interpreter>();
+    interpreter_ = abslx::make_unique<tflite::Interpreter>();
     interpreter_->AddTensors(1);
     interpreter_->SetInputs({0});
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteConverterCalculator::Process(CalculatorContext* cc) {
+abslx::Status TfLiteConverterCalculator::Process(CalculatorContext* cc) {
   if (use_gpu_) {
     if (cc->Inputs().Tag(kGpuBufferTag).IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     if (!initialized_) {
       MP_RETURN_IF_ERROR(InitGpu(cc));
@@ -268,23 +268,23 @@ absl::Status TfLiteConverterCalculator::Process(CalculatorContext* cc) {
     // Convert to CPU tensors or Matrix type.
     MP_RETURN_IF_ERROR(ProcessCPU(cc));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteConverterCalculator::Close(CalculatorContext* cc) {
+abslx::Status TfLiteConverterCalculator::Close(CalculatorContext* cc) {
   interpreter_.reset();
 #if MEDIAPIPE_TFLITE_GL_INFERENCE
   gpu_helper_.RunInGlContext([this] { gpu_data_out_.reset(); });
 #elif MEDIAPIPE_TFLITE_METAL_INFERENCE
   gpu_data_out_.reset();
 #endif  // MEDIAPIPE_TFLITE_GL_INFERENCE
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteConverterCalculator::ProcessCPU(CalculatorContext* cc) {
+abslx::Status TfLiteConverterCalculator::ProcessCPU(CalculatorContext* cc) {
   if (cc->Inputs().HasTag(kImageFrameTag)) {
     if (cc->Inputs().Tag(kImageFrameTag).IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     // CPU ImageFrame to TfLiteTensor conversion.
 
@@ -360,19 +360,19 @@ absl::Status TfLiteConverterCalculator::ProcessCPU(CalculatorContext* cc) {
         MP_RETURN_IF_ERROR(NormalizeImage<float>(image_frame, flip_vertically_,
                                                  tensor_buffer));
       } else {
-        return absl::InternalError(
+        return abslx::InternalError(
             "Only byte-based (8 bit) and float (32 bit) images supported.");
       }
     }
 
-    auto output_tensors = absl::make_unique<std::vector<TfLiteTensor>>();
+    auto output_tensors = abslx::make_unique<std::vector<TfLiteTensor>>();
     output_tensors->emplace_back(*tensor);
     cc->Outputs()
         .Tag(kTensorsTag)
         .Add(output_tensors.release(), cc->InputTimestamp());
   } else if (cc->Inputs().HasTag(kMatrixTag)) {
     if (cc->Inputs().Tag(kMatrixTag).IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     // CPU Matrix to TfLiteTensor conversion.
     const auto& matrix = cc->Inputs().Tag(kMatrixTag).Get<Matrix>();
@@ -397,23 +397,23 @@ absl::Status TfLiteConverterCalculator::ProcessCPU(CalculatorContext* cc) {
 
     MP_RETURN_IF_ERROR(CopyMatrixToTensor(matrix, tensor_ptr));
 
-    auto output_tensors = absl::make_unique<std::vector<TfLiteTensor>>();
+    auto output_tensors = abslx::make_unique<std::vector<TfLiteTensor>>();
     output_tensors->emplace_back(*tensor);
     cc->Outputs()
         .Tag(kTensorsTag)
         .Add(output_tensors.release(), cc->InputTimestamp());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteConverterCalculator::ProcessGPU(CalculatorContext* cc) {
+abslx::Status TfLiteConverterCalculator::ProcessGPU(CalculatorContext* cc) {
 #if MEDIAPIPE_TFLITE_GL_INFERENCE
   // GpuBuffer to tflite::gpu::GlBuffer conversion.
   const auto& input =
       cc->Inputs().Tag(kGpuBufferTag).Get<mediapipe::GpuBuffer>();
   MP_RETURN_IF_ERROR(
-      gpu_helper_.RunInGlContext([this, &input]() -> absl::Status {
+      gpu_helper_.RunInGlContext([this, &input]() -> abslx::Status {
         // Convert GL texture into TfLite GlBuffer (SSBO).
         auto src = gpu_helper_.CreateSourceTexture(input);
         glActiveTexture(GL_TEXTURE0 + 0);
@@ -426,13 +426,13 @@ absl::Status TfLiteConverterCalculator::ProcessGPU(CalculatorContext* cc) {
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
         src.Release();
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
 
   // Copy into outputs.
-  auto output_tensors = absl::make_unique<std::vector<GpuTensor>>();
+  auto output_tensors = abslx::make_unique<std::vector<GpuTensor>>();
   MP_RETURN_IF_ERROR(
-      gpu_helper_.RunInGlContext([this, &output_tensors]() -> absl::Status {
+      gpu_helper_.RunInGlContext([this, &output_tensors]() -> abslx::Status {
         output_tensors->resize(1);
         {
           GpuTensor& tensor = output_tensors->at(0);
@@ -440,7 +440,7 @@ absl::Status TfLiteConverterCalculator::ProcessGPU(CalculatorContext* cc) {
               gpu_data_out_->elements, &tensor));
           MP_RETURN_IF_ERROR(CopyBuffer(gpu_data_out_->buffer, tensor));
         }
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
   cc->Outputs()
       .Tag(kTensorsGpuTag)
@@ -468,7 +468,7 @@ absl::Status TfLiteConverterCalculator::ProcessGPU(CalculatorContext* cc) {
 
   // Copy into outputs.
   // TODO Avoid this copy.
-  auto output_tensors = absl::make_unique<std::vector<GpuTensor>>();
+  auto output_tensors = abslx::make_unique<std::vector<GpuTensor>>();
   output_tensors->resize(1);
   id<MTLDevice> device = gpu_helper_.mtlDevice;
   output_tensors->at(0) =
@@ -486,17 +486,17 @@ absl::Status TfLiteConverterCalculator::ProcessGPU(CalculatorContext* cc) {
   RET_CHECK_FAIL() << "GPU processing is not enabled.";
 #endif  // MEDIAPIPE_TFLITE_GL_INFERENCE
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteConverterCalculator::InitGpu(CalculatorContext* cc) {
+abslx::Status TfLiteConverterCalculator::InitGpu(CalculatorContext* cc) {
 #if MEDIAPIPE_TFLITE_GPU_SUPPORTED
   // Get input image sizes.
   const auto& input =
       cc->Inputs().Tag(kGpuBufferTag).Get<mediapipe::GpuBuffer>();
   mediapipe::ImageFormat::Format format =
       mediapipe::ImageFormatForGpuBufferFormat(input.format());
-  gpu_data_out_ = absl::make_unique<GPUData>();
+  gpu_data_out_ = abslx::make_unique<GPUData>();
   gpu_data_out_->elements = input.height() * input.width() * max_num_channels_;
   const bool include_alpha = (max_num_channels_ == 4);
   if (!(format == mediapipe::ImageFormat::GRAY8 ||
@@ -510,7 +510,7 @@ absl::Status TfLiteConverterCalculator::InitGpu(CalculatorContext* cc) {
 #if MEDIAPIPE_TFLITE_GL_INFERENCE
   const bool single_channel = (max_num_channels_ == 1);
   MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext(
-      [this, &include_alpha, &input, &single_channel]() -> absl::Status {
+      [this, &include_alpha, &input, &single_channel]() -> abslx::Status {
         // Device memory.
         MP_RETURN_IF_ERROR(
             ::tflite::gpu::gl::CreateReadWriteShaderStorageBuffer<float>(
@@ -518,7 +518,7 @@ absl::Status TfLiteConverterCalculator::InitGpu(CalculatorContext* cc) {
 
         // Shader to convert GL Texture to Shader Storage Buffer Object (SSBO),
         // with normalization to either: [0,1] or [-1,1].
-        const std::string shader_source = absl::Substitute(
+        const std::string shader_source = abslx::Substitute(
             R"( #version 310 es
           layout(local_size_x = $0, local_size_y = $0) in;
           layout(binding = 0) uniform sampler2D input_texture;
@@ -537,7 +537,7 @@ absl::Status TfLiteConverterCalculator::InitGpu(CalculatorContext* cc) {
             /*$0=*/kWorkgroupSize, /*$1=*/input.width(), /*$2=*/input.height(),
             /*$3=*/
             output_range_.has_value()
-                ? absl::Substitute(
+                ? abslx::Substitute(
                       "pixel = pixel * float($0) + float($1);",
                       (output_range_->second - output_range_->first),
                       output_range_->first)
@@ -556,7 +556,7 @@ absl::Status TfLiteConverterCalculator::InitGpu(CalculatorContext* cc) {
             GL_COMPUTE_SHADER, shader_source, &gpu_data_out_->shader));
         MP_RETURN_IF_ERROR(GlProgram::CreateWithShader(
             gpu_data_out_->shader, &gpu_data_out_->program));
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
 
 #elif MEDIAPIPE_TFLITE_METAL_INFERENCE
@@ -572,7 +572,7 @@ absl::Status TfLiteConverterCalculator::InitGpu(CalculatorContext* cc) {
 
   // Shader to convert GL Texture to Metal Buffer,
   // with normalization to either: [0,1] or [-1,1].
-  const std::string shader_source = absl::Substitute(
+  const std::string shader_source = abslx::Substitute(
       R"(
   #include <metal_stdlib>
 
@@ -598,7 +598,7 @@ absl::Status TfLiteConverterCalculator::InitGpu(CalculatorContext* cc) {
       /*$1=*/include_alpha ? "rgba" : "rgb",
       /*$2=*/
       output_range_.has_value()
-          ? absl::Substitute("pixel = pixel * float($0) + float($1);",
+          ? abslx::Substitute("pixel = pixel * float($0) + float($1);",
                              (output_range_->second - output_range_->first),
                              output_range_->first)
           : "",
@@ -623,10 +623,10 @@ absl::Status TfLiteConverterCalculator::InitGpu(CalculatorContext* cc) {
       << [[error localizedDescription] UTF8String];
 #endif  // MEDIAPIPE_TFLITE_GL_INFERENCE
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteConverterCalculator::LoadOptions(CalculatorContext* cc) {
+abslx::Status TfLiteConverterCalculator::LoadOptions(CalculatorContext* cc) {
   // Get calculator options specified in the graph.
   const auto& options =
       cc->Options<::mediapipe::TfLiteConverterCalculatorOptions>();
@@ -674,11 +674,11 @@ absl::Status TfLiteConverterCalculator::LoadOptions(CalculatorContext* cc) {
   // Get tensor type, float or quantized.
   use_quantized_tensors_ = options.use_quantized_tensors();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <class T>
-absl::Status TfLiteConverterCalculator::NormalizeImage(
+abslx::Status TfLiteConverterCalculator::NormalizeImage(
     const ImageFrame& image_frame, bool flip_vertically, float* tensor_ptr) {
   const int height = image_frame.Height();
   const int width = image_frame.Width();
@@ -722,10 +722,10 @@ absl::Status TfLiteConverterCalculator::NormalizeImage(
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteConverterCalculator::CopyMatrixToTensor(const Matrix& matrix,
+abslx::Status TfLiteConverterCalculator::CopyMatrixToTensor(const Matrix& matrix,
                                                            float* tensor_ptr) {
   if (row_major_matrix_) {
     auto matrix_map =
@@ -737,7 +737,7 @@ absl::Status TfLiteConverterCalculator::CopyMatrixToTensor(const Matrix& matrix,
     matrix_map = matrix;
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

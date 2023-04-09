@@ -43,7 +43,7 @@ class GraphHelper {
       return it->second;
     }
     for (const auto& entry : nodes_by_name_) {
-      if (absl::StartsWith(entry.first, name)) {
+      if (abslx::StartsWith(entry.first, name)) {
         return entry.second;
       }
     }
@@ -74,7 +74,7 @@ class GraphHelper {
  private:
   const Graph& graph_;
   // Maps from a node name to a Node* in the graph.
-  absl::flat_hash_map<string, Node*> nodes_by_name_;
+  abslx::flat_hash_map<string, Node*> nodes_by_name_;
 };
 
 TEST(ReplicatePerReplicaNodesTest, SingleCompositeDevice) {
@@ -87,7 +87,7 @@ TEST(ReplicatePerReplicaNodesTest, SingleCompositeDevice) {
       scope.WithOpName("ret").WithControlDependencies({write}), read, 0);
 
   const std::vector<string> underlying_devices = {"TPU:0", "TPU:1"};
-  const absl::flat_hash_map<string, const std::vector<string>*>
+  const abslx::flat_hash_map<string, const std::vector<string>*>
       composite_devices = {{"TPU_COMPOSITE:0", &underlying_devices}};
 
   Graph graph(OpRegistry::Global());
@@ -132,7 +132,7 @@ TEST(ReplicatePerReplicaNodesTest, SingleCompositeDeviceToSingleDevice) {
   auto ret = ops::_Retval(scope.WithOpName("ret"), read, 0);
 
   const std::vector<string> underlying_devices = {"TPU:0"};
-  const absl::flat_hash_map<string, const std::vector<string>*>
+  const abslx::flat_hash_map<string, const std::vector<string>*>
       composite_devices = {{"TPU_COMPOSITE:0", &underlying_devices}};
 
   Graph graph(OpRegistry::Global());
@@ -173,7 +173,7 @@ TEST(ReplicatePerReplicaNodesTest, MultipleCompositeDevices) {
 
   const std::vector<string> underlying_devices_0 = {"TPU:0", "TPU:1"};
   const std::vector<string> underlying_devices_1 = {"TPU:2", "TPU:3"};
-  const absl::flat_hash_map<string, const std::vector<string>*>
+  const abslx::flat_hash_map<string, const std::vector<string>*>
       composite_devices = {{"TPU_COMPOSITE:0", &underlying_devices_0},
                            {"TPU_COMPOSITE:1", &underlying_devices_1}};
 
@@ -219,7 +219,7 @@ TEST(ReplicatePerReplicaNodesTest, MultipleCompositeDevices) {
 
 TEST(ReplicatePerReplicaNodesTest, NestedFunctions) {
   const std::vector<string> underlying_devices = {"TPU:0", "TPU:1"};
-  const absl::flat_hash_map<string, const std::vector<string>*>
+  const abslx::flat_hash_map<string, const std::vector<string>*>
       composite_devices = {{"TPU_COMPOSITE:0", &underlying_devices}};
 
   FunctionDefLibrary fdef_lib;
@@ -297,7 +297,7 @@ TEST(ReplicatePerReplicaNodesTest, DeadArgNodes) {
   auto ret = ops::_Retval(scope.WithOpName("ret"), read, 0);
 
   const std::vector<string> underlying_devices = {"TPU:0", "TPU:1"};
-  const absl::flat_hash_map<string, const std::vector<string>*>
+  const abslx::flat_hash_map<string, const std::vector<string>*>
       composite_devices = {{"TPU_COMPOSITE:0", &underlying_devices}};
 
   Graph graph(OpRegistry::Global());

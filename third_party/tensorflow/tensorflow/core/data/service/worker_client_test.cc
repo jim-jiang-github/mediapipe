@@ -95,7 +95,7 @@ class WorkerClientTest : public ::testing::Test {
     request.set_iteration_client_id(iteration_client_id);
     TF_RETURN_IF_ERROR(dispatcher_client_->ClientHeartbeat(request, response));
     if (response.task_info().empty()) {
-      return errors::NotFound(absl::Substitute(
+      return errors::NotFound(abslx::Substitute(
           "No task found for iteration $0.", iteration_client_id));
     }
     return response.task_info(0).task_id();

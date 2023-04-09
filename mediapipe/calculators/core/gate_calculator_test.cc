@@ -28,8 +28,8 @@ constexpr char kAllowTag[] = "ALLOW";
 class GateCalculatorTest : public ::testing::Test {
  protected:
   // Helper to run a graph and return status.
-  static absl::Status RunGraph(const std::string& proto) {
-    auto runner = absl::make_unique<CalculatorRunner>(
+  static abslx::Status RunGraph(const std::string& proto) {
+    auto runner = abslx::make_unique<CalculatorRunner>(
         ParseTextProtoOrDie<CalculatorGraphConfig::Node>(proto));
     return runner->Run();
   }
@@ -53,7 +53,7 @@ class GateCalculatorTest : public ::testing::Test {
   }
 
   void SetRunner(const std::string& proto) {
-    runner_ = absl::make_unique<CalculatorRunner>(
+    runner_ = abslx::make_unique<CalculatorRunner>(
         ParseTextProtoOrDie<CalculatorGraphConfig::Node>(proto));
   }
 
@@ -64,7 +64,7 @@ class GateCalculatorTest : public ::testing::Test {
 };
 
 TEST_F(GateCalculatorTest, InvalidInputs) {
-  EXPECT_TRUE(absl::IsInternal(GateCalculatorTest::RunGraph(R"(
+  EXPECT_TRUE(abslx::IsInternal(GateCalculatorTest::RunGraph(R"(
         calculator: "GateCalculator"
         input_stream: "test_input"
         input_stream: "ALLOW:gating_stream"
@@ -72,7 +72,7 @@ TEST_F(GateCalculatorTest, InvalidInputs) {
         output_stream: "test_output"
   )")));
 
-  EXPECT_TRUE(absl::IsInternal(GateCalculatorTest::RunGraph(R"(
+  EXPECT_TRUE(abslx::IsInternal(GateCalculatorTest::RunGraph(R"(
         calculator: "GateCalculator"
         input_stream: "test_input"
         input_side_packet: "ALLOW:gating_stream"
@@ -80,7 +80,7 @@ TEST_F(GateCalculatorTest, InvalidInputs) {
         output_stream: "test_output"
   )")));
 
-  EXPECT_TRUE(absl::IsInternal(GateCalculatorTest::RunGraph(R"(
+  EXPECT_TRUE(abslx::IsInternal(GateCalculatorTest::RunGraph(R"(
         calculator: "GateCalculator"
         input_stream: "test_input"
         input_stream: "ALLOW:gating_stream"
@@ -88,7 +88,7 @@ TEST_F(GateCalculatorTest, InvalidInputs) {
         output_stream: "test_output"
   )")));
 
-  EXPECT_TRUE(absl::IsInternal(GateCalculatorTest::RunGraph(R"(
+  EXPECT_TRUE(abslx::IsInternal(GateCalculatorTest::RunGraph(R"(
         calculator: "GateCalculator"
         input_stream: "test_input"
         input_stream: "DISALLOW:gating_stream"
@@ -96,7 +96,7 @@ TEST_F(GateCalculatorTest, InvalidInputs) {
         output_stream: "test_output"
   )")));
 
-  EXPECT_TRUE(absl::IsInternal(GateCalculatorTest::RunGraph(R"(
+  EXPECT_TRUE(abslx::IsInternal(GateCalculatorTest::RunGraph(R"(
         calculator: "GateCalculator"
         input_stream: "test_input"
         input_stream: "ALLOW:gating_stream"
@@ -104,7 +104,7 @@ TEST_F(GateCalculatorTest, InvalidInputs) {
         output_stream: "test_output"
   )")));
 
-  EXPECT_TRUE(absl::IsInternal(GateCalculatorTest::RunGraph(R"(
+  EXPECT_TRUE(abslx::IsInternal(GateCalculatorTest::RunGraph(R"(
         calculator: "GateCalculator"
         input_stream: "test_input"
         input_stream: "DISALLOW:gating_stream"

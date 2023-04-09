@@ -46,11 +46,11 @@ TYPED_TEST_CASE(LogUniformIntDistributionTypeTest, IntTypes);
 
 TYPED_TEST(LogUniformIntDistributionTypeTest, SerializeTest) {
   using param_type =
-      typename absl::log_uniform_int_distribution<TypeParam>::param_type;
+      typename abslx::log_uniform_int_distribution<TypeParam>::param_type;
   using Limits = std::numeric_limits<TypeParam>;
 
   constexpr int kCount = 1000;
-  absl::InsecureBitGen gen;
+  abslx::InsecureBitGen gen;
   for (const auto& param : {
            param_type(0, 1),                             //
            param_type(0, 2),                             //
@@ -69,13 +69,13 @@ TYPED_TEST(LogUniformIntDistributionTypeTest, SerializeTest) {
     const auto min = param.min();
     const auto max = param.max();
     const auto base = param.base();
-    absl::log_uniform_int_distribution<TypeParam> before(min, max, base);
+    abslx::log_uniform_int_distribution<TypeParam> before(min, max, base);
     EXPECT_EQ(before.min(), param.min());
     EXPECT_EQ(before.max(), param.max());
     EXPECT_EQ(before.base(), param.base());
 
     {
-      absl::log_uniform_int_distribution<TypeParam> via_param(param);
+      abslx::log_uniform_int_distribution<TypeParam> via_param(param);
       EXPECT_EQ(via_param, before);
     }
 
@@ -83,7 +83,7 @@ TYPED_TEST(LogUniformIntDistributionTypeTest, SerializeTest) {
     std::stringstream ss;
     ss << before;
 
-    absl::log_uniform_int_distribution<TypeParam> after(3, 6, 17);
+    abslx::log_uniform_int_distribution<TypeParam> after(3, 6, 17);
 
     EXPECT_NE(before.max(), after.max());
     EXPECT_NE(before.base(), after.base());
@@ -109,11 +109,11 @@ TYPED_TEST(LogUniformIntDistributionTypeTest, SerializeTest) {
       if (sample < sample_min) sample_min = sample;
     }
     ABSL_INTERNAL_LOG(INFO,
-                      absl::StrCat("Range: ", +sample_min, ", ", +sample_max));
+                      abslx::StrCat("Range: ", +sample_min, ", ", +sample_max));
   }
 }
 
-using log_uniform_i32 = absl::log_uniform_int_distribution<int32_t>;
+using log_uniform_i32 = abslx::log_uniform_int_distribution<int32_t>;
 
 class LogUniformIntChiSquaredTest
     : public testing::TestWithParam<log_uniform_i32::param_type> {
@@ -125,11 +125,11 @@ class LogUniformIntChiSquaredTest
   // We use a fixed bit generator for distribution accuracy tests.  This allows
   // these tests to be deterministic, while still testing the qualify of the
   // implementation.
-  absl::random_internal::pcg64_2018_engine rng_{0x2B7E151628AED2A6};
+  abslx::random_internal::pcg64_2018_engine rng_{0x2B7E151628AED2A6};
 };
 
 double LogUniformIntChiSquaredTest::ChiSquaredTestImpl() {
-  using absl::random_internal::kChiSquared;
+  using abslx::random_internal::kChiSquared;
 
   const auto& param = GetParam();
 
@@ -174,20 +174,20 @@ double LogUniformIntChiSquaredTest::ChiSquaredTestImpl() {
   const int dof = buckets.size() - 1;
   const double expected = trials / static_cast<double>(buckets.size());
 
-  const double threshold = absl::random_internal::ChiSquareValue(dof, 0.98);
+  const double threshold = abslx::random_internal::ChiSquareValue(dof, 0.98);
 
-  double chi_square = absl::random_internal::ChiSquareWithExpected(
+  double chi_square = abslx::random_internal::ChiSquareWithExpected(
       std::begin(buckets), std::end(buckets), expected);
 
-  const double p = absl::random_internal::ChiSquarePValue(chi_square, dof);
+  const double p = abslx::random_internal::ChiSquarePValue(chi_square, dof);
 
   if (chi_square > threshold) {
     ABSL_INTERNAL_LOG(INFO, "values");
     for (size_t i = 0; i < buckets.size(); i++) {
-      ABSL_INTERNAL_LOG(INFO, absl::StrCat(i, ": ", buckets[i]));
+      ABSL_INTERNAL_LOG(INFO, abslx::StrCat(i, ": ", buckets[i]));
     }
     ABSL_INTERNAL_LOG(INFO,
-                      absl::StrFormat("trials=%d\n"
+                      abslx::StrFormat("trials=%d\n"
                                       "%s(data, %d) = %f (%f)\n"
                                       "%s @ 0.98 = %f",
                                       trials, kChiSquared, dof, chi_square, p,
@@ -242,19 +242,19 @@ std::string ParamName(
     const ::testing::TestParamInfo<log_uniform_i32::param_type>& info) {
   const auto& p = info.param;
   std::string name =
-      absl::StrCat("min_", p.min(), "__max_", p.max(), "__base_", p.base());
-  return absl::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
+      abslx::StrCat("min_", p.min(), "__max_", p.max(), "__base_", p.base());
+  return abslx::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
 }
 
 INSTANTIATE_TEST_SUITE_P(All, LogUniformIntChiSquaredTest,
                          ::testing::ValuesIn(GenParams()), ParamName);
 
-// NOTE: absl::log_uniform_int_distribution is not guaranteed to be stable.
+// NOTE: abslx::log_uniform_int_distribution is not guaranteed to be stable.
 TEST(LogUniformIntDistributionTest, StabilityTest) {
   using testing::ElementsAre;
-  // absl::uniform_int_distribution stability relies on
-  // absl::random_internal::LeadingSetBit, std::log, std::pow.
-  absl::random_internal::sequence_urbg urbg(
+  // abslx::uniform_int_distribution stability relies on
+  // abslx::random_internal::LeadingSetBit, std::log, std::pow.
+  abslx::random_internal::sequence_urbg urbg(
       {0x0003eb76f6f7f755ull, 0xFFCEA50FDB2F953Bull, 0xC332DDEFBE6C5AA5ull,
        0x6558218568AB9702ull, 0x2AEF7DAD5B6E2F84ull, 0x1521B62829076170ull,
        0xECDD4775619F1510ull, 0x13CCA830EB61BD96ull, 0x0334FE1EAA0363CFull,
@@ -263,14 +263,14 @@ TEST(LogUniformIntDistributionTest, StabilityTest) {
   std::vector<int> output(6);
 
   {
-    absl::log_uniform_int_distribution<int32_t> dist(0, 256);
+    abslx::log_uniform_int_distribution<int32_t> dist(0, 256);
     std::generate(std::begin(output), std::end(output),
                   [&] { return dist(urbg); });
     EXPECT_THAT(output, ElementsAre(256, 66, 4, 6, 57, 103));
   }
   urbg.reset();
   {
-    absl::log_uniform_int_distribution<int32_t> dist(0, 256, 10);
+    abslx::log_uniform_int_distribution<int32_t> dist(0, 256, 10);
     std::generate(std::begin(output), std::end(output),
                   [&] { return dist(urbg); });
     EXPECT_THAT(output, ElementsAre(8, 4, 0, 0, 0, 69));

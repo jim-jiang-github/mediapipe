@@ -77,8 +77,8 @@ CudaPlatform::~CudaPlatform() {}
 void CudaPlatform::InspectNumaNodes() {
   // To get NUMA node information, we need to create all executors, so we can
   // examine their device descriptions to see their bus assignments.
-  static absl::once_flag once;
-  absl::call_once(once, [&] {
+  static abslx::once_flag once;
+  abslx::call_once(once, [&] {
     for (int i = 0; i < VisibleDeviceCount(); i++) {
       StreamExecutor* exec = *ExecutorForDevice(i);
       if (i == 0) {
@@ -118,7 +118,7 @@ port::StatusOr<StreamExecutor*> CudaPlatform::FirstExecutorForBus(
 
   return port::Status(
       port::error::NOT_FOUND,
-      absl::StrFormat("Executor for bus %d not found.", bus_ordinal));
+      abslx::StrFormat("Executor for bus %d not found.", bus_ordinal));
 }
 
 Platform::Id CudaPlatform::id() const { return cuda::kCudaPlatformId; }
@@ -178,7 +178,7 @@ CudaPlatform::GetUncachedExecutor(const StreamExecutorConfig& config) {
   if (!init_status.ok()) {
     return port::Status(
         port::error::INTERNAL,
-        absl::StrFormat(
+        abslx::StrFormat(
             "failed initializing StreamExecutor for CUDA device ordinal %d: %s",
             config.ordinal, init_status.ToString()));
   }

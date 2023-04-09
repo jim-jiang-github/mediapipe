@@ -179,7 +179,7 @@ Status ConvertJaxToTFLiteFlatBuffer(const std::string& input,
     input_names.push_back(input.name());
   }
 
-  const auto& inputs = absl::StrJoin(input_names, ",");
+  const auto& inputs = abslx::StrJoin(input_names, ",");
   mlir::OpBuilder builder(*module);
   llvm::SmallVector<mlir::NamedAttribute> attrs;
   attrs.push_back(

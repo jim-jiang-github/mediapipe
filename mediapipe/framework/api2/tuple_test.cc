@@ -86,7 +86,7 @@ TEST(TupleTest, FilteredIndices2) {
 TEST(TupleTest, ForEach) {
   auto t = std::make_tuple(5.0, 10, "hi");
   std::vector<std::string> s;
-  tuple_for_each([&s](auto&& item) { s.push_back(absl::StrCat(item)); }, t);
+  tuple_for_each([&s](auto&& item) { s.push_back(abslx::StrCat(item)); }, t);
   EXPECT_EQ(s, (std::vector<std::string>{"5", "10", "hi"}));
 }
 
@@ -95,7 +95,7 @@ TEST(TupleTest, ForEachWithIndex) {
   std::vector<std::string> s;
   tuple_for_each(
       [&s](auto&& item, std::size_t i) {
-        s.push_back(absl::StrCat(i, ":", item));
+        s.push_back(abslx::StrCat(i, ":", item));
       },
       t);
   EXPECT_EQ(s, (std::vector<std::string>{"0:5", "1:10", "2:hi"}));
@@ -108,7 +108,7 @@ TEST(TupleTest, ForEachZip) {
   tuple_for_each(
       [&s, &u](auto&& item, auto i_const) {
         constexpr std::size_t i = decltype(i_const)::value;
-        s.push_back(absl::StrCat(i, ":", item, ",", std::get<i>(u)));
+        s.push_back(abslx::StrCat(i, ":", item, ",", std::get<i>(u)));
       },
       t);
   EXPECT_EQ(s, (std::vector<std::string>{"0:5,2", "1:10,3", "2:hi,lo"}));
@@ -117,7 +117,7 @@ TEST(TupleTest, ForEachZip) {
 TEST(TupleTest, Apply) {
   auto t = std::make_tuple(5.0, 10, "hi");
   std::string s = tuple_apply(
-      [](float f, int i, const char* s) { return absl::StrCat(f, i, s); }, t);
+      [](float f, int i, const char* s) { return abslx::StrCat(f, i, s); }, t);
   EXPECT_EQ(s, "510hi");
 }
 

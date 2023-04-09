@@ -47,12 +47,12 @@ bool FLAGS_only_check_args = false;
 bool FLAGS_helpon = false;
 bool FLAGS_helpmatch = false;
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace flags_internal {
 namespace {
 
-using PerFlagFilter = std::function<bool(const absl::CommandLineFlag&)>;
+using PerFlagFilter = std::function<bool(const abslx::CommandLineFlag&)>;
 
 // Maximum length size in a human readable format.
 constexpr size_t kHrfMaxLineLength = 80;
@@ -64,7 +64,7 @@ constexpr size_t kHrfMaxLineLength = 80;
 // prints "<title>Milk &amp; Cookies</title>"
 class XMLElement {
  public:
-  XMLElement(absl::string_view tag, absl::string_view txt)
+  XMLElement(abslx::string_view tag, abslx::string_view txt)
       : tag_(tag), txt_(txt) {}
 
   friend std::ostream& operator<<(std::ostream& out,
@@ -98,8 +98,8 @@ class XMLElement {
   }
 
  private:
-  absl::string_view tag_;
-  absl::string_view txt_;
+  abslx::string_view tag_;
+  abslx::string_view txt_;
 };
 
 // --------------------------------------------------------------------
@@ -118,19 +118,19 @@ class FlagHelpPrettyPrinter {
         line_len_(0),
         first_line_(true) {}
 
-  void Write(absl::string_view str, bool wrap_line = false) {
+  void Write(abslx::string_view str, bool wrap_line = false) {
     // Empty string - do nothing.
     if (str.empty()) return;
 
-    std::vector<absl::string_view> tokens;
+    std::vector<abslx::string_view> tokens;
     if (wrap_line) {
-      for (auto line : absl::StrSplit(str, absl::ByAnyChar("\n\r"))) {
+      for (auto line : abslx::StrSplit(str, abslx::ByAnyChar("\n\r"))) {
         if (!tokens.empty()) {
           // Keep line separators in the input string.
           tokens.push_back("\n");
         }
         for (auto token :
-             absl::StrSplit(line, absl::ByAnyChar(" \t"), absl::SkipEmpty())) {
+             abslx::StrSplit(line, abslx::ByAnyChar(" \t"), abslx::SkipEmpty())) {
           tokens.push_back(token);
         }
       }
@@ -193,10 +193,10 @@ void FlagHelpHumanReadable(const CommandLineFlag& flag, std::ostream& out) {
   FlagHelpPrettyPrinter printer(kHrfMaxLineLength, 4, 2, out);
 
   // Flag name.
-  printer.Write(absl::StrCat("--", flag.Name()));
+  printer.Write(abslx::StrCat("--", flag.Name()));
 
   // Flag help.
-  printer.Write(absl::StrCat("(", flag.Help(), ");"), /*wrap_line=*/true);
+  printer.Write(abslx::StrCat("(", flag.Help(), ");"), /*wrap_line=*/true);
 
   // The listed default value will be the actual default from the flag
   // definition in the originating source file, unless the value has
@@ -207,15 +207,15 @@ void FlagHelpHumanReadable(const CommandLineFlag& flag, std::ostream& out) {
   bool is_modified = curr_val != dflt_val;
 
   if (flag.IsOfType<std::string>()) {
-    dflt_val = absl::StrCat("\"", dflt_val, "\"");
+    dflt_val = abslx::StrCat("\"", dflt_val, "\"");
   }
-  printer.Write(absl::StrCat("default: ", dflt_val, ";"));
+  printer.Write(abslx::StrCat("default: ", dflt_val, ";"));
 
   if (is_modified) {
     if (flag.IsOfType<std::string>()) {
-      curr_val = absl::StrCat("\"", curr_val, "\"");
+      curr_val = abslx::StrCat("\"", curr_val, "\"");
     }
-    printer.Write(absl::StrCat("currently: ", curr_val, ";"));
+    printer.Write(abslx::StrCat("currently: ", curr_val, ";"));
   }
 
   printer.EndLine();
@@ -227,7 +227,7 @@ void FlagHelpHumanReadable(const CommandLineFlag& flag, std::ostream& out) {
 // STRIP_FLAG_HELP 1' then this flag will not be displayed by '--help'
 // and its variants.
 void FlagsHelpImpl(std::ostream& out, PerFlagFilter filter_cb,
-                   HelpFormat format, absl::string_view program_usage_message) {
+                   HelpFormat format, abslx::string_view program_usage_message) {
   if (format == HelpFormat::kHumanReadable) {
     out << flags_internal::ShortProgramInvocationName() << ": "
         << program_usage_message << "\n\n";
@@ -251,10 +251,10 @@ void FlagsHelpImpl(std::ostream& out, PerFlagFilter filter_cb,
   // This map is used to output matching flags grouped by package and file
   // name.
   std::map<std::string,
-           std::map<std::string, std::vector<const absl::CommandLineFlag*>>>
+           std::map<std::string, std::vector<const abslx::CommandLineFlag*>>>
       matching_flags;
 
-  flags_internal::ForEachFlag([&](absl::CommandLineFlag& flag) {
+  flags_internal::ForEachFlag([&](abslx::CommandLineFlag& flag) {
     // Ignore retired flags.
     if (flag.IsRetired()) return;
 
@@ -271,8 +271,8 @@ void FlagsHelpImpl(std::ostream& out, PerFlagFilter filter_cb,
                       .push_back(&flag);
   });
 
-  absl::string_view package_separator;  // controls blank lines between packages
-  absl::string_view file_separator;     // controls blank lines between files
+  abslx::string_view package_separator;  // controls blank lines between packages
+  abslx::string_view file_separator;     // controls blank lines between files
   for (const auto& package : matching_flags) {
     if (format == HelpFormat::kHumanReadable) {
       out << package_separator;
@@ -313,10 +313,10 @@ void FlagsHelpImpl(std::ostream& out, PerFlagFilter filter_cb,
 
 void FlagsHelpImpl(std::ostream& out,
                    flags_internal::FlagKindFilter filename_filter_cb,
-                   HelpFormat format, absl::string_view program_usage_message) {
+                   HelpFormat format, abslx::string_view program_usage_message) {
   FlagsHelpImpl(
       out,
-      [&](const absl::CommandLineFlag& flag) {
+      [&](const abslx::CommandLineFlag& flag) {
         return filename_filter_cb && filename_filter_cb(flag.Filename());
       },
       format, program_usage_message);
@@ -335,10 +335,10 @@ void FlagHelp(std::ostream& out, const CommandLineFlag& flag,
 // --------------------------------------------------------------------
 // Produces the help messages for all flags matching the filename filter.
 // If filter is empty produces help messages for all flags.
-void FlagsHelp(std::ostream& out, absl::string_view filter, HelpFormat format,
-               absl::string_view program_usage_message) {
-  flags_internal::FlagKindFilter filter_cb = [&](absl::string_view filename) {
-    return filter.empty() || filename.find(filter) != absl::string_view::npos;
+void FlagsHelp(std::ostream& out, abslx::string_view filter, HelpFormat format,
+               abslx::string_view program_usage_message) {
+  flags_internal::FlagKindFilter filter_cb = [&](abslx::string_view filename) {
+    return filter.empty() || filename.find(filter) != abslx::string_view::npos;
   };
   flags_internal::FlagsHelpImpl(out, filter_cb, format, program_usage_message);
 }
@@ -347,7 +347,7 @@ void FlagsHelp(std::ostream& out, absl::string_view filter, HelpFormat format,
 // Checks all the 'usage' command line flags to see if any have been set.
 // If so, handles them appropriately.
 int HandleUsageFlags(std::ostream& out,
-                     absl::string_view program_usage_message) {
+                     abslx::string_view program_usage_message) {
   switch (GetFlagsHelpMode()) {
     case HelpMode::kNone:
       break;
@@ -382,10 +382,10 @@ int HandleUsageFlags(std::ostream& out,
         flags_internal::FlagsHelp(out, substr, GetFlagsHelpFormat(),
                                   program_usage_message);
       } else {
-        auto filter_cb = [&substr](const absl::CommandLineFlag& flag) {
-          if (absl::StrContains(flag.Name(), substr)) return true;
-          if (absl::StrContains(flag.Filename(), substr)) return true;
-          if (absl::StrContains(flag.Help(), substr)) return true;
+        auto filter_cb = [&substr](const abslx::CommandLineFlag& flag) {
+          if (abslx::StrContains(flag.Name(), substr)) return true;
+          if (abslx::StrContains(flag.Filename(), substr)) return true;
+          if (abslx::StrContains(flag.Help(), substr)) return true;
 
           return false;
         };
@@ -413,7 +413,7 @@ int HandleUsageFlags(std::ostream& out,
 
 namespace {
 
-ABSL_CONST_INIT absl::Mutex help_attributes_guard(absl::kConstInit);
+ABSL_CONST_INIT abslx::Mutex help_attributes_guard(abslx::kConstInit);
 ABSL_CONST_INIT std::string* match_substr
     ABSL_GUARDED_BY(help_attributes_guard) = nullptr;
 ABSL_CONST_INIT HelpMode help_mode ABSL_GUARDED_BY(help_attributes_guard) =
@@ -424,42 +424,42 @@ ABSL_CONST_INIT HelpFormat help_format ABSL_GUARDED_BY(help_attributes_guard) =
 }  // namespace
 
 std::string GetFlagsHelpMatchSubstr() {
-  absl::MutexLock l(&help_attributes_guard);
+  abslx::MutexLock l(&help_attributes_guard);
   if (match_substr == nullptr) return "";
   return *match_substr;
 }
 
-void SetFlagsHelpMatchSubstr(absl::string_view substr) {
-  absl::MutexLock l(&help_attributes_guard);
+void SetFlagsHelpMatchSubstr(abslx::string_view substr) {
+  abslx::MutexLock l(&help_attributes_guard);
   if (match_substr == nullptr) match_substr = new std::string;
   match_substr->assign(substr.data(), substr.size());
 }
 
 HelpMode GetFlagsHelpMode() {
-  absl::MutexLock l(&help_attributes_guard);
+  abslx::MutexLock l(&help_attributes_guard);
   return help_mode;
 }
 
 void SetFlagsHelpMode(HelpMode mode) {
-  absl::MutexLock l(&help_attributes_guard);
+  abslx::MutexLock l(&help_attributes_guard);
   help_mode = mode;
 }
 
 HelpFormat GetFlagsHelpFormat() {
-  absl::MutexLock l(&help_attributes_guard);
+  abslx::MutexLock l(&help_attributes_guard);
   return help_format;
 }
 
 void SetFlagsHelpFormat(HelpFormat format) {
-  absl::MutexLock l(&help_attributes_guard);
+  abslx::MutexLock l(&help_attributes_guard);
   help_format = format;
 }
 
 // Deduces usage flags from the input argument in a form --name=value or
 // --name. argument is already split into name and value before we call this
 // function.
-bool DeduceUsageFlags(absl::string_view name, absl::string_view value) {
-  if (absl::ConsumePrefix(&name, "help")) {
+bool DeduceUsageFlags(abslx::string_view name, abslx::string_view value) {
+  if (abslx::ConsumePrefix(&name, "help")) {
     if (name == "") {
       if (value.empty()) {
         SetFlagsHelpMode(HelpMode::kImportant);
@@ -478,7 +478,7 @@ bool DeduceUsageFlags(absl::string_view name, absl::string_view value) {
 
     if (name == "on") {
       SetFlagsHelpMode(HelpMode::kMatch);
-      SetFlagsHelpMatchSubstr(absl::StrCat("/", value, "."));
+      SetFlagsHelpMatchSubstr(abslx::StrCat("/", value, "."));
       return true;
     }
 
@@ -515,4 +515,4 @@ bool DeduceUsageFlags(absl::string_view name, absl::string_view value) {
 
 }  // namespace flags_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -41,7 +41,7 @@ HostStream::HostStream(size_t stack_size_in_bytes)
 
 HostStream::~HostStream() {
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     work_queue_.push(nullptr);
   }
   // thread_'s destructor blocks until the thread finishes running.
@@ -57,7 +57,7 @@ bool HostStream::EnqueueTask(std::function<void()> task) {
 
 bool HostStream::EnqueueTaskWithStatus(std::function<port::Status()> task) {
   CHECK(task != nullptr);
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   work_queue_.push(std::move(task));
   return true;
 }
@@ -73,8 +73,8 @@ void HostStream::WorkLoop() {
   while (true) {
     std::queue<std::function<port::Status()>> queue;
     {
-      absl::MutexLock lock(&mu_);
-      mu_.Await(absl::Condition(this, &HostStream::WorkAvailable));
+      abslx::MutexLock lock(&mu_);
+      mu_.Await(abslx::Condition(this, &HostStream::WorkAvailable));
       std::swap(queue, work_queue_);
     }
     while (!queue.empty()) {
@@ -89,7 +89,7 @@ void HostStream::WorkLoop() {
 }
 
 port::Status HostStream::BlockUntilDone() {
-  absl::Notification done;
+  abslx::Notification done;
   port::Status status;
   EnqueueTask([&done, &status, this]() {
     // This task is always executed synchronously before 'status_' is updated

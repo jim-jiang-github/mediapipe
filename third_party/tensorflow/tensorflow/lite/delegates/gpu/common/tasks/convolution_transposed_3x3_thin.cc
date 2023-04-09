@@ -54,7 +54,7 @@ std::string ConvInstr(CalculationsPrecision precision, bool is_i4_o4,
     c += "  $0.z += dot($1, args.weights.Read($4)); \n";
     c += "  $0.w += dot($1, args.weights.Read($5)); \n";
   }
-  return absl::Substitute(c, dst_name, src_name, weights_offset,
+  return abslx::Substitute(c, dst_name, src_name, weights_offset,
                           weights_offset + 1, weights_offset + 2,
                           weights_offset + 3);
 }
@@ -228,7 +228,7 @@ void ConvolutionTransposed3x3Thin::UploadWeights(
   desc.size = flt_count * SizeOf(desc.element_type);
   desc.data.resize(desc.size);
 
-  RearrangeWeights(weights, weights_desc, absl::MakeSpan(desc.data));
+  RearrangeWeights(weights, weights_desc, abslx::MakeSpan(desc.data));
 
   args_.AddObject("weights",
                   std::make_unique<BufferDescriptor>(std::move(desc)));

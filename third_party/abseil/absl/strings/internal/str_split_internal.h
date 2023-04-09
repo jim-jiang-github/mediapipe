@@ -46,11 +46,11 @@
 #include "absl/strings/internal/stl_type_traits.h"
 #endif  // _GLIBCXX_DEBUG
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace strings_internal {
 
-// This class is implicitly constructible from everything that absl::string_view
+// This class is implicitly constructible from everything that abslx::string_view
 // is implicitly constructible from, except for rvalue strings.  This means it
 // can be used as a function parameter in places where passing a temporary
 // string might cause memory lifetime issues.
@@ -59,7 +59,7 @@ class ConvertibleToStringView {
   ConvertibleToStringView(const char* s)  // NOLINT(runtime/explicit)
       : value_(s) {}
   ConvertibleToStringView(char* s) : value_(s) {}  // NOLINT(runtime/explicit)
-  ConvertibleToStringView(absl::string_view s)     // NOLINT(runtime/explicit)
+  ConvertibleToStringView(abslx::string_view s)     // NOLINT(runtime/explicit)
       : value_(s) {}
   ConvertibleToStringView(const std::string& s)  // NOLINT(runtime/explicit)
       : value_(s) {}
@@ -68,10 +68,10 @@ class ConvertibleToStringView {
   ConvertibleToStringView(std::string&& s) = delete;
   ConvertibleToStringView(const std::string&& s) = delete;
 
-  absl::string_view value() const { return value_; }
+  abslx::string_view value() const { return value_; }
 
  private:
-  absl::string_view value_;
+  abslx::string_view value_;
 };
 
 // An iterator that enumerates the parts of a string from a Splitter. The text
@@ -84,7 +84,7 @@ template <typename Splitter>
 class SplitIterator {
  public:
   using iterator_category = std::input_iterator_tag;
-  using value_type = absl::string_view;
+  using value_type = abslx::string_view;
   using difference_type = ptrdiff_t;
   using pointer = const value_type*;
   using reference = const value_type&;
@@ -97,14 +97,14 @@ class SplitIterator {
         delimiter_(splitter->delimiter()),
         predicate_(splitter->predicate()) {
     // Hack to maintain backward compatibility. This one block makes it so an
-    // empty absl::string_view whose .data() happens to be nullptr behaves
-    // *differently* from an otherwise empty absl::string_view whose .data() is
+    // empty abslx::string_view whose .data() happens to be nullptr behaves
+    // *differently* from an otherwise empty abslx::string_view whose .data() is
     // not nullptr. This is an undesirable difference in general, but this
     // behavior is maintained to avoid breaking existing code that happens to
     // depend on this old behavior/bug. Perhaps it will be fixed one day. The
     // difference in behavior is as follows:
-    //   Split(absl::string_view(""), '-');  // {""}
-    //   Split(absl::string_view(), '-');    // {}
+    //   Split(abslx::string_view(""), '-');  // {""}
+    //   Split(abslx::string_view(), '-');    // {}
     if (splitter_->text().data() == nullptr) {
       state_ = kEndState;
       pos_ = splitter_->text().size();
@@ -129,8 +129,8 @@ class SplitIterator {
         state_ = kEndState;
         return *this;
       }
-      const absl::string_view text = splitter_->text();
-      const absl::string_view d = delimiter_.Find(text, pos_);
+      const abslx::string_view text = splitter_->text();
+      const abslx::string_view d = delimiter_.Find(text, pos_);
       if (d.data() == text.data() + text.size()) state_ = kLastState;
       curr_ = text.substr(pos_, d.data() - (text.data() + pos_));
       pos_ += curr_.size() + d.size();
@@ -155,7 +155,7 @@ class SplitIterator {
  private:
   size_t pos_;
   State state_;
-  absl::string_view curr_;
+  abslx::string_view curr_;
   const Splitter* splitter_;
   typename Splitter::DelimiterType delimiter_;
   typename Splitter::PredicateType predicate_;
@@ -165,21 +165,21 @@ class SplitIterator {
 template <typename T, typename = void>
 struct HasMappedType : std::false_type {};
 template <typename T>
-struct HasMappedType<T, absl::void_t<typename T::mapped_type>>
+struct HasMappedType<T, abslx::void_t<typename T::mapped_type>>
     : std::true_type {};
 
 // HasValueType<T>::value is true iff there exists a type T::value_type.
 template <typename T, typename = void>
 struct HasValueType : std::false_type {};
 template <typename T>
-struct HasValueType<T, absl::void_t<typename T::value_type>> : std::true_type {
+struct HasValueType<T, abslx::void_t<typename T::value_type>> : std::true_type {
 };
 
 // HasConstIterator<T>::value is true iff there exists a type T::const_iterator.
 template <typename T, typename = void>
 struct HasConstIterator : std::false_type {};
 template <typename T>
-struct HasConstIterator<T, absl::void_t<typename T::const_iterator>>
+struct HasConstIterator<T, abslx::void_t<typename T::const_iterator>>
     : std::true_type {};
 
 // IsInitializerList<T>::value is true iff T is an std::initializer_list. More
@@ -206,13 +206,13 @@ struct SplitterIsConvertibleToImpl : std::false_type {};
 
 template <typename C>
 struct SplitterIsConvertibleToImpl<C, true, false>
-    : std::is_constructible<typename C::value_type, absl::string_view> {};
+    : std::is_constructible<typename C::value_type, abslx::string_view> {};
 
 template <typename C>
 struct SplitterIsConvertibleToImpl<C, true, true>
-    : absl::conjunction<
-          std::is_constructible<typename C::key_type, absl::string_view>,
-          std::is_constructible<typename C::mapped_type, absl::string_view>> {};
+    : abslx::conjunction<
+          std::is_constructible<typename C::key_type, abslx::string_view>,
+          std::is_constructible<typename C::mapped_type, abslx::string_view>> {};
 
 template <typename C>
 struct SplitterIsConvertibleTo
@@ -227,7 +227,7 @@ struct SplitterIsConvertibleTo
           HasMappedType<C>::value> {
 };
 
-// This class implements the range that is returned by absl::StrSplit(). This
+// This class implements the range that is returned by abslx::StrSplit(). This
 // class has templated conversion operators that allow it to be implicitly
 // converted to a variety of types that the caller may have specified on the
 // left-hand side of an assignment.
@@ -238,11 +238,11 @@ struct SplitterIsConvertibleTo
 // within a range-for loop.
 //
 // Output containers can be collections of any type that is constructible from
-// an absl::string_view.
+// an abslx::string_view.
 //
 // An Predicate functor may be supplied. This predicate will be used to filter
 // the split strings: only strings for which the predicate returns true will be
-// kept. A Predicate object is any unary functor that takes an absl::string_view
+// kept. A Predicate object is any unary functor that takes an abslx::string_view
 // and returns bool.
 //
 // The StringType parameter can be either string_view or string, depending on
@@ -261,11 +261,11 @@ class Splitter {
         delimiter_(std::move(d)),
         predicate_(std::move(p)) {}
 
-  absl::string_view text() const { return text_; }
+  abslx::string_view text() const { return text_; }
   const Delimiter& delimiter() const { return delimiter_; }
   const Predicate& predicate() const { return predicate_; }
 
-  // Range functions that iterate the split substrings as absl::string_view
+  // Range functions that iterate the split substrings as abslx::string_view
   // objects. These methods enable a Splitter to be used in a range-based for
   // loop.
   const_iterator begin() const { return {const_iterator::kInitState, this}; }
@@ -287,7 +287,7 @@ class Splitter {
   // corresponding value.
   template <typename First, typename Second>
   operator std::pair<First, Second>() const {  // NOLINT(runtime/explicit)
-    absl::string_view first, second;
+    abslx::string_view first, second;
     auto it = begin();
     if (it != end()) {
       first = *it;
@@ -318,24 +318,24 @@ class Splitter {
     }
   };
 
-  // Partial specialization for a std::vector<absl::string_view>.
+  // Partial specialization for a std::vector<abslx::string_view>.
   //
   // Optimized for the common case of splitting to a
-  // std::vector<absl::string_view>. In this case we first split the results to
-  // a small array of absl::string_view on the stack, to reduce reallocations.
+  // std::vector<abslx::string_view>. In this case we first split the results to
+  // a small array of abslx::string_view on the stack, to reduce reallocations.
   template <typename A>
-  struct ConvertToContainer<std::vector<absl::string_view, A>,
-                            absl::string_view, false> {
-    std::vector<absl::string_view, A> operator()(
+  struct ConvertToContainer<std::vector<abslx::string_view, A>,
+                            abslx::string_view, false> {
+    std::vector<abslx::string_view, A> operator()(
         const Splitter& splitter) const {
       struct raw_view {
         const char* data;
         size_t size;
-        operator absl::string_view() const {  // NOLINT(runtime/explicit)
+        operator abslx::string_view() const {  // NOLINT(runtime/explicit)
           return {data, size};
         }
       };
-      std::vector<absl::string_view, A> v;
+      std::vector<abslx::string_view, A> v;
       std::array<raw_view, 16> ar;
       for (auto it = splitter.begin(); !it.at_end();) {
         size_t index = 0;
@@ -353,13 +353,13 @@ class Splitter {
   // Partial specialization for a std::vector<std::string>.
   //
   // Optimized for the common case of splitting to a std::vector<std::string>.
-  // In this case we first split the results to a std::vector<absl::string_view>
+  // In this case we first split the results to a std::vector<abslx::string_view>
   // so the returned std::vector<std::string> can have space reserved to avoid
   // std::string moves.
   template <typename A>
   struct ConvertToContainer<std::vector<std::string, A>, std::string, false> {
     std::vector<std::string, A> operator()(const Splitter& splitter) const {
-      const std::vector<absl::string_view> v = splitter;
+      const std::vector<abslx::string_view> v = splitter;
       return std::vector<std::string, A>(v.begin(), v.end());
     }
   };
@@ -425,6 +425,6 @@ class Splitter {
 
 }  // namespace strings_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_INTERNAL_STR_SPLIT_INTERNAL_H_

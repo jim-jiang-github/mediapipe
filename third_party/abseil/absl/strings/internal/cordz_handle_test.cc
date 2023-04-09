@@ -23,7 +23,7 @@
 #include "absl/time/clock.h"
 #include "absl/time/time.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 namespace {
@@ -187,7 +187,7 @@ TEST(CordzHandleTest, MultiThreaded) {
   // manipulating a CordzHandle that might be operated upon in another thread.
   std::vector<std::atomic<CordzHandle*>> handles(kNumHandles);
 
-  absl::synchronization_internal::ThreadPool pool(kNumThreads);
+  abslx::synchronization_internal::ThreadPool pool(kNumThreads);
 
   for (int i = 0; i < kNumThreads; ++i) {
     pool.Schedule([&stop, &handles]() {
@@ -243,11 +243,11 @@ TEST(CordzHandleTest, MultiThreaded) {
 
   // The threads will hammer away.  Give it a little bit of time for tsan to
   // spot errors.
-  absl::SleepFor(absl::Seconds(3));
+  abslx::SleepFor(abslx::Seconds(3));
   stop.Notify();
 }
 
 }  // namespace
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

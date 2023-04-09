@@ -26,7 +26,7 @@ namespace tpu {
 // specific is erroneous, returns an invalid argument error. For correct tag
 // specification, see the comment next to the DynamicLearningRate proto in
 // //third_party/tensorflow/core/protobuf/tpu/optimization_parameters.proto.
-absl::StatusOr<int32_t> ComputeTotalTagCountForDynamicLearningRates(
+abslx::StatusOr<int32_t> ComputeTotalTagCountForDynamicLearningRates(
     const tensorflow::tpu::TPUEmbeddingConfiguration& tpu_embedding_config);
 
 }  // namespace tpu

@@ -44,14 +44,14 @@ class MonotonicClock : public Clock {
   // The Clock interface (see util/time/clock.h).
   //
   // Return a monotonically non-decreasing time.
-  absl::Time TimeNow() override = 0;
+  abslx::Time TimeNow() override = 0;
   // Sleep and SleepUntil guarantee only that the caller will sleep for at
   // least as long as specified in monotonic time.  The caller may sleep for
   // much longer (in monotonic time) if monotonic time jumps far into the
   // future.  Whether or not this happens depends on the behavior of the raw
   // clock.
-  void Sleep(absl::Duration d) override = 0;
-  void SleepUntil(absl::Time wakeup_time) override = 0;
+  void Sleep(abslx::Duration d) override = 0;
+  void SleepUntil(abslx::Time wakeup_time) override = 0;
 
   // Get metrics about time corrections.
   virtual void GetCorrectionMetrics(int* correction_count,

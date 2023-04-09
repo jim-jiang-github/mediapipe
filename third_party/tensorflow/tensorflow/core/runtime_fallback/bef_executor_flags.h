@@ -40,7 +40,7 @@ ABSL_DECLARE_FLAG(tfrt::HostAllocatorTypeWrapper, host_allocator_type);
 
 namespace tfrt {
 
-bool AbslParseFlag(absl::string_view text,
+bool AbslParseFlag(abslx::string_view text,
                    tfrt::HostAllocatorTypeWrapper* host_allocator_type,
                    std::string* error);
 

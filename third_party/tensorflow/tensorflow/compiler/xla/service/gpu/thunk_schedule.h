@@ -52,7 +52,7 @@ class ThunkSchedule {
   ThunkSchedule(
       std::unique_ptr<ThunkSequence> thunks,
       std::unique_ptr<StreamAssignment> stream_assignment,
-      absl::flat_hash_map<const Thunk*, const HloInstruction*> thunk_to_hlo);
+      abslx::flat_hash_map<const Thunk*, const HloInstruction*> thunk_to_hlo);
 
   // Single stream, trivial schedule in the ThunkSequence order.
   explicit ThunkSchedule(std::unique_ptr<ThunkSequence> thunks);
@@ -94,17 +94,17 @@ class ThunkSchedule {
   // thunk.hlo_instruction_.
   void AddDependenciesOnTransitiveOperands(
       const Thunk& thunk, const HloInstruction& operand,
-      const absl::flat_hash_map<const HloInstruction*, Thunk*>& hlo_to_thunk);
+      const abslx::flat_hash_map<const HloInstruction*, Thunk*>& hlo_to_thunk);
 
   std::unique_ptr<ThunkSequence> thunks_;
 
-  absl::flat_hash_map<const Thunk*, std::list<const Thunk*>> depends_on_;
-  absl::flat_hash_set<const Thunk*> depended_by_;
+  abslx::flat_hash_map<const Thunk*, std::list<const Thunk*>> depends_on_;
+  abslx::flat_hash_set<const Thunk*> depended_by_;
   std::list<const Thunk*> empty_thunk_list_;
 
   std::unique_ptr<StreamAssignment> stream_assignment_;
 
-  absl::flat_hash_map<const Thunk*, const HloInstruction*> thunk_to_hlo_;
+  abslx::flat_hash_map<const Thunk*, const HloInstruction*> thunk_to_hlo_;
 };
 
 }  // namespace gpu

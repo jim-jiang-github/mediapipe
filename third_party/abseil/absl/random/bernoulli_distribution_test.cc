@@ -32,17 +32,17 @@ class BernoulliTest : public testing::TestWithParam<std::pair<double, size_t>> {
 
 TEST_P(BernoulliTest, Serialize) {
   const double d = GetParam().first;
-  absl::bernoulli_distribution before(d);
+  abslx::bernoulli_distribution before(d);
 
   {
-    absl::bernoulli_distribution via_param{
-        absl::bernoulli_distribution::param_type(d)};
+    abslx::bernoulli_distribution via_param{
+        abslx::bernoulli_distribution::param_type(d)};
     EXPECT_EQ(via_param, before);
   }
 
   std::stringstream ss;
   ss << before;
-  absl::bernoulli_distribution after(0.6789);
+  abslx::bernoulli_distribution after(0.6789);
 
   EXPECT_NE(before.p(), after.p());
   EXPECT_NE(before.param(), after.param());
@@ -67,10 +67,10 @@ TEST_P(BernoulliTest, Accuracy) {
   // We use a fixed bit generator for distribution accuracy tests.  This allows
   // these tests to be deterministic, while still testing the qualify of the
   // implementation.
-  absl::random_internal::pcg64_2018_engine rng(0x2B7E151628AED2A6);
+  abslx::random_internal::pcg64_2018_engine rng(0x2B7E151628AED2A6);
 
   size_t yes = 0;
-  absl::bernoulli_distribution dist(p);
+  abslx::bernoulli_distribution dist(p);
   for (size_t i = 0; i < trials; ++i) {
     if (dist(rng)) yes++;
   }
@@ -114,11 +114,11 @@ INSTANTIATE_TEST_SUITE_P(
                                       0.0),  // denorm_max
                        1)));
 
-// NOTE: absl::bernoulli_distribution is not guaranteed to be stable.
+// NOTE: abslx::bernoulli_distribution is not guaranteed to be stable.
 TEST(BernoulliTest, StabilityTest) {
-  // absl::bernoulli_distribution stability relies on FastUniformBits and
+  // abslx::bernoulli_distribution stability relies on FastUniformBits and
   // integer arithmetic.
-  absl::random_internal::sequence_urbg urbg({
+  abslx::random_internal::sequence_urbg urbg({
       0x0003eb76f6f7f755ull, 0xFFCEA50FDB2F953Bull, 0xC332DDEFBE6C5AA5ull,
       0x6558218568AB9702ull, 0x2AEF7DAD5B6E2F84ull, 0x1521B62829076170ull,
       0xECDD4775619F1510ull, 0x13CCA830EB61BD96ull, 0x0334FE1EAA0363CFull,
@@ -136,7 +136,7 @@ TEST(BernoulliTest, StabilityTest) {
   });
 
   // Generate a string of '0' and '1' for the distribution output.
-  auto generate = [&urbg](absl::bernoulli_distribution& dist) {
+  auto generate = [&urbg](abslx::bernoulli_distribution& dist) {
     std::string output;
     output.reserve(36);
     urbg.reset();
@@ -148,25 +148,25 @@ TEST(BernoulliTest, StabilityTest) {
 
   const double kP = 0.0331289862362;
   {
-    absl::bernoulli_distribution dist(kP);
+    abslx::bernoulli_distribution dist(kP);
     auto v = generate(dist);
     EXPECT_EQ(35, urbg.invocations());
     EXPECT_EQ(v, "00000000000010000000000010000000000") << dist;
   }
   {
-    absl::bernoulli_distribution dist(kP * 10.0);
+    abslx::bernoulli_distribution dist(kP * 10.0);
     auto v = generate(dist);
     EXPECT_EQ(35, urbg.invocations());
     EXPECT_EQ(v, "00000100010010010010000011000011010") << dist;
   }
   {
-    absl::bernoulli_distribution dist(kP * 20.0);
+    abslx::bernoulli_distribution dist(kP * 20.0);
     auto v = generate(dist);
     EXPECT_EQ(35, urbg.invocations());
     EXPECT_EQ(v, "00011110010110110011011111110111011") << dist;
   }
   {
-    absl::bernoulli_distribution dist(1.0 - kP);
+    abslx::bernoulli_distribution dist(1.0 - kP);
     auto v = generate(dist);
     EXPECT_EQ(35, urbg.invocations());
     EXPECT_EQ(v, "11111111111111111111011111111111111") << dist;
@@ -174,14 +174,14 @@ TEST(BernoulliTest, StabilityTest) {
 }
 
 TEST(BernoulliTest, StabilityTest2) {
-  absl::random_internal::sequence_urbg urbg(
+  abslx::random_internal::sequence_urbg urbg(
       {0x0003eb76f6f7f755ull, 0xFFCEA50FDB2F953Bull, 0xC332DDEFBE6C5AA5ull,
        0x6558218568AB9702ull, 0x2AEF7DAD5B6E2F84ull, 0x1521B62829076170ull,
        0xECDD4775619F1510ull, 0x13CCA830EB61BD96ull, 0x0334FE1EAA0363CFull,
        0xB5735C904C70A239ull, 0xD59E9E0BCBAADE14ull, 0xEECC86BC60622CA7ull});
 
   // Generate a string of '0' and '1' for the distribution output.
-  auto generate = [&urbg](absl::bernoulli_distribution& dist) {
+  auto generate = [&urbg](abslx::bernoulli_distribution& dist) {
     std::string output;
     output.reserve(13);
     urbg.reset();
@@ -195,19 +195,19 @@ TEST(BernoulliTest, StabilityTest2) {
   constexpr double b1 = 2.0 / 13.0 / 0.2;
   constexpr double b3 = (5.0 / 13.0 / 0.2) - ((1 - b0) + (1 - b1) + (1 - b1));
   {
-    absl::bernoulli_distribution dist(b0);
+    abslx::bernoulli_distribution dist(b0);
     auto v = generate(dist);
     EXPECT_EQ(12, urbg.invocations());
     EXPECT_EQ(v, "000011100101") << dist;
   }
   {
-    absl::bernoulli_distribution dist(b1);
+    abslx::bernoulli_distribution dist(b1);
     auto v = generate(dist);
     EXPECT_EQ(12, urbg.invocations());
     EXPECT_EQ(v, "001111101101") << dist;
   }
   {
-    absl::bernoulli_distribution dist(b3);
+    abslx::bernoulli_distribution dist(b3);
     auto v = generate(dist);
     EXPECT_EQ(12, urbg.invocations());
     EXPECT_EQ(v, "001111101111") << dist;

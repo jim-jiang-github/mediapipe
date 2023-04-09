@@ -81,20 +81,20 @@ constexpr char kVideoTag[] = "VIDEO";
 //
 class OpenCvVideoEncoderCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
-  absl::Status SetUpVideoWriter(float frame_rate, int width, int height);
+  abslx::Status SetUpVideoWriter(float frame_rate, int width, int height);
 
   std::string output_file_path_;
   int four_cc_;
   std::unique_ptr<cv::VideoWriter> writer_;
 };
 
-absl::Status OpenCvVideoEncoderCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status OpenCvVideoEncoderCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK(cc->Inputs().HasTag(kVideoTag));
   cc->Inputs().Tag(kVideoTag).Set<ImageFrame>();
   if (cc->Inputs().HasTag(kVideoPrestreamTag)) {
@@ -105,10 +105,10 @@ absl::Status OpenCvVideoEncoderCalculator::GetContract(CalculatorContract* cc) {
   if (cc->InputSidePackets().HasTag(kAudioFilePathTag)) {
     cc->InputSidePackets().Tag(kAudioFilePathTag).Set<std::string>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status OpenCvVideoEncoderCalculator::Open(CalculatorContext* cc) {
+abslx::Status OpenCvVideoEncoderCalculator::Open(CalculatorContext* cc) {
   OpenCvVideoEncoderCalculatorOptions options =
       cc->Options<OpenCvVideoEncoderCalculatorOptions>();
   RET_CHECK(options.has_codec() && options.codec().length() == 4)
@@ -123,7 +123,7 @@ absl::Status OpenCvVideoEncoderCalculator::Open(CalculatorContext* cc) {
   output_file_path_ =
       cc->InputSidePackets().Tag(kOutputFilePathTag).Get<std::string>();
   std::vector<std::string> splited_file_path =
-      absl::StrSplit(output_file_path_, '.');
+      abslx::StrSplit(output_file_path_, '.');
   RET_CHECK(splited_file_path.size() >= 2 &&
             splited_file_path[splited_file_path.size() - 1] ==
                 options.video_format())
@@ -132,12 +132,12 @@ absl::Status OpenCvVideoEncoderCalculator::Open(CalculatorContext* cc) {
   // from the video header directly. The calculator will receive the video
   // header packet at timestamp prestream.
   if (cc->Inputs().HasTag(kVideoPrestreamTag)) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   return SetUpVideoWriter(options.fps(), options.width(), options.height());
 }
 
-absl::Status OpenCvVideoEncoderCalculator::Process(CalculatorContext* cc) {
+abslx::Status OpenCvVideoEncoderCalculator::Process(CalculatorContext* cc) {
   if (cc->InputTimestamp() == Timestamp::PreStream()) {
     const VideoHeader& video_header =
         cc->Inputs().Tag(kVideoPrestreamTag).Get<VideoHeader>();
@@ -175,10 +175,10 @@ absl::Status OpenCvVideoEncoderCalculator::Process(CalculatorContext* cc) {
     }
   }
   writer_->write(frame);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status OpenCvVideoEncoderCalculator::Close(CalculatorContext* cc) {
+abslx::Status OpenCvVideoEncoderCalculator::Close(CalculatorContext* cc) {
   if (writer_ && writer_->isOpened()) {
     writer_->release();
   }
@@ -193,7 +193,7 @@ absl::Status OpenCvVideoEncoderCalculator::Close(CalculatorContext* cc) {
     } else {
       // A temp output file is needed because FFmpeg can't do in-place editing.
       const std::string temp_file_path = std::tmpnam(nullptr);
-      system(absl::StrCat("mv ", output_file_path_, " ", temp_file_path,
+      system(abslx::StrCat("mv ", output_file_path_, " ", temp_file_path,
                           "&& ffmpeg -nostats -loglevel 0 -i ", temp_file_path,
                           " -i ", audio_file_path,
                           "  -c copy -map 0:v:0 -map 1:a:0 ", output_file_path_,
@@ -209,22 +209,22 @@ absl::Status OpenCvVideoEncoderCalculator::Close(CalculatorContext* cc) {
               "config.";
 #endif
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status OpenCvVideoEncoderCalculator::SetUpVideoWriter(float frame_rate,
+abslx::Status OpenCvVideoEncoderCalculator::SetUpVideoWriter(float frame_rate,
                                                             int width,
                                                             int height) {
   RET_CHECK(frame_rate > 0 && width > 0 && height > 0)
       << "Invalid video metadata: frame_rate=" << frame_rate
       << ", width=" << width << ", height=" << height;
-  writer_ = absl::make_unique<cv::VideoWriter>(
+  writer_ = abslx::make_unique<cv::VideoWriter>(
       output_file_path_, four_cc_, frame_rate, cv::Size(width, height));
   if (!writer_->isOpened()) {
     return mediapipe::InvalidArgumentErrorBuilder(MEDIAPIPE_LOC)
            << "Fail to open file at " << output_file_path_;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 REGISTER_CALCULATOR(OpenCvVideoEncoderCalculator);

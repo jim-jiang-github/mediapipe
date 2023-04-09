@@ -16,11 +16,11 @@
 
 @implementation GUSUtilStatusWrapper
 
-+ (instancetype)wrapStatus:(const absl::Status &)status {
++ (instancetype)wrapStatus:(const abslx::Status &)status {
   return [[self alloc] initWithStatus:status];
 }
 
-- (instancetype)initWithStatus:(const absl::Status &)status {
+- (instancetype)initWithStatus:(const abslx::Status &)status {
   self = [super init];
   if (self) {
     _status = status;
@@ -40,7 +40,7 @@
 NSString *const kGUSGoogleUtilStatusErrorDomain = @"GoogleUtilStatusErrorDomain";
 NSString *const kGUSGoogleUtilStatusErrorKey = @"GUSGoogleUtilStatusErrorKey";
 
-+ (NSError *)gus_errorWithStatus:(const absl::Status &)status {
++ (NSError *)gus_errorWithStatus:(const abslx::Status &)status {
   NSDictionary *userInfo = @{
     NSLocalizedDescriptionKey : @(status.message().data()),
     kGUSGoogleUtilStatusErrorKey : [GUSUtilStatusWrapper wrapStatus:status],
@@ -51,7 +51,7 @@ NSString *const kGUSGoogleUtilStatusErrorKey = @"GUSGoogleUtilStatusErrorKey";
   return error;
 }
 
-- (absl::Status)gus_status {
+- (abslx::Status)gus_status {
   NSString *domain = self.domain;
   if ([domain isEqual:kGUSGoogleUtilStatusErrorDomain]) {
     GUSUtilStatusWrapper *wrapper = self.userInfo[kGUSGoogleUtilStatusErrorKey];
@@ -63,7 +63,7 @@ NSString *const kGUSGoogleUtilStatusErrorKey = @"GUSGoogleUtilStatusErrorKey";
     return ::util::PosixErrorToStatus(self.code, self.localizedDescription.UTF8String);
 #endif
   }
-  return absl::Status(absl::StatusCode::kUnknown, self.localizedDescription.UTF8String);
+  return abslx::Status(abslx::StatusCode::kUnknown, self.localizedDescription.UTF8String);
 }
 
 @end

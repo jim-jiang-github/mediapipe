@@ -57,15 +57,15 @@ static void NormalizeTimeStamps(XPlaneBuilder* plane,
 }
 
 std::string GetDeviceXLineName(
-    int64_t stream_id, absl::flat_hash_set<RocmTracerEventType>& event_types) {
-  std::string line_name = absl::StrCat("Stream #", stream_id);
+    int64_t stream_id, abslx::flat_hash_set<RocmTracerEventType>& event_types) {
+  std::string line_name = abslx::StrCat("Stream #", stream_id);
   event_types.erase(RocmTracerEventType::Unsupported);
   if (event_types.empty()) return line_name;
   std::vector<const char*> type_names;
   for (const auto event_type : event_types) {
     type_names.emplace_back(GetRocmTracerEventTypeName(event_type));
   }
-  return absl::StrCat(line_name, "(", absl::StrJoin(type_names, ","), ")");
+  return abslx::StrCat(line_name, "(", abslx::StrJoin(type_names, ","), ")");
 }
 
 }  // namespace
@@ -194,20 +194,20 @@ class RocmTraceCollectorImpl : public profiler::RocmTraceCollector {
   uint64_t start_gputime_ns_;
 
   mutex event_maps_mutex_;
-  absl::flat_hash_map<uint32, RocmTracerEvent> api_events_map_
+  abslx::flat_hash_map<uint32, RocmTracerEvent> api_events_map_
       TF_GUARDED_BY(event_maps_mutex_);
-  absl::flat_hash_map<uint32, RocmTracerEvent> activity_api_events_map_
+  abslx::flat_hash_map<uint32, RocmTracerEvent> activity_api_events_map_
       TF_GUARDED_BY(event_maps_mutex_);
 
   /* Some apis such as MEMSETD32 (based on an observation with ResNet50),
     trigger multiple HIP ops domain activities. We keep them in a vector and
     merge them with api activities at flush time.
   */
-  absl::flat_hash_map<uint32, std::vector<RocmTracerEvent>>
+  abslx::flat_hash_map<uint32, std::vector<RocmTracerEvent>>
       activity_ops_events_map_ TF_GUARDED_BY(event_maps_mutex_);
   // This is for the APIs that we track because we need some information from
   // them to populate the corresponding activity that we actually track.
-  absl::flat_hash_map<uint32, RocmTracerEvent> auxiliary_api_events_map_
+  abslx::flat_hash_map<uint32, RocmTracerEvent> auxiliary_api_events_map_
       TF_GUARDED_BY(event_maps_mutex_);
 
   const std::vector<RocmTracerEvent> ApiActivityInfoExchange() {
@@ -596,7 +596,7 @@ class RocmTraceCollectorImpl : public profiler::RocmTraceCollector {
 
     inline std::string ToXStat(const KernelDetails& kernel_info,
                                double occupancy_pct) {
-      return absl::StrCat(
+      return abslx::StrCat(
           "regs:", kernel_info.registers_per_thread,
           " static_shared:", kernel_info.static_shared_memory_usage,
           " dynamic_shared:", kernel_info.dynamic_shared_memory_usage,
@@ -700,7 +700,7 @@ class RocmTraceCollectorImpl : public profiler::RocmTraceCollector {
       //   xevent.AddStatValue(
       //       *plane->GetOrCreateStatMetadata(
       //           GetStatTypeStr(StatType::kContextId)),
-      //       absl::StrCat("$$", static_cast<uint64>(event.context_id)));
+      //       abslx::StrCat("$$", static_cast<uint64>(event.context_id)));
       // }
 
       if (event.type == RocmTracerEventType::Kernel &&
@@ -746,7 +746,7 @@ class RocmTraceCollectorImpl : public profiler::RocmTraceCollector {
                  event.type == RocmTracerEventType::MemcpyOther) {
         VLOG(7) << "Add Memcpy stat";
         const auto& memcpy_info = event.memcpy_info;
-        std::string memcpy_details = absl::StrCat(
+        std::string memcpy_details = abslx::StrCat(
             // TODO(rocm-profiler): we need to discover the memory kind similar
             // to CUDA
             "kind:", "Unknown", " size:", memcpy_info.num_bytes,
@@ -760,7 +760,7 @@ class RocmTraceCollectorImpl : public profiler::RocmTraceCollector {
         std::string value =
             // TODO(rocm-profiler): we need to discover the memory kind similar
             // to CUDA
-            absl::StrCat("kind:", "Unknown",
+            abslx::StrCat("kind:", "Unknown",
                          " num_bytes:", event.memalloc_info.num_bytes);
         xevent.AddStatValue(*plane->GetOrCreateStatMetadata(
                                 GetStatTypeStr(StatType::kMemallocDetails)),
@@ -770,7 +770,7 @@ class RocmTraceCollectorImpl : public profiler::RocmTraceCollector {
         std::string value =
             // TODO(rocm-profiler): we need to discover the memory kind similar
             // to CUDA
-            absl::StrCat("kind:", "Unknown",
+            abslx::StrCat("kind:", "Unknown",
                          " num_bytes:", event.memalloc_info.num_bytes);
         xevent.AddStatValue(*plane->GetOrCreateStatMetadata(
                                 GetStatTypeStr(StatType::kMemFreeDetails)),
@@ -780,7 +780,7 @@ class RocmTraceCollectorImpl : public profiler::RocmTraceCollector {
         auto value =
             // TODO(rocm-profiler): we need to discover the memory kind similar
             // to CUDA
-            absl::StrCat("kind:", "Unknown",
+            abslx::StrCat("kind:", "Unknown",
                          " num_bytes:", event.memset_info.num_bytes,
                          " async:", event.memset_info.async);
         xevent.AddStatValue(*plane->GetOrCreateStatMetadata(
@@ -790,7 +790,7 @@ class RocmTraceCollectorImpl : public profiler::RocmTraceCollector {
       // TODO(rocm-profiler): we need to support the following event type
       /* else if (event.type == CuptiTracerEventType::MemoryResidency) {
         VLOG(7) << "Add MemoryResidency stat";
-        std::string value = absl::StrCat(
+        std::string value = abslx::StrCat(
             "kind:", GetMemoryKindName(event.memory_residency_info.kind),
             " num_bytes:", event.memory_residency_info.num_bytes,
             " addr:", event.memory_residency_info.address);
@@ -809,7 +809,7 @@ class RocmTraceCollectorImpl : public profiler::RocmTraceCollector {
       // If multiple metadata have the same key name, show the values from the
       // top of the stack (innermost annotation). Concatenate the values from
       // "hlo_op".
-      absl::flat_hash_set<absl::string_view> key_set;
+      abslx::flat_hash_set<abslx::string_view> key_set;
 
       for (auto annotation = annotation_stack.rbegin();
            annotation != annotation_stack.rend(); ++annotation) {
@@ -859,7 +859,7 @@ class RocmTraceCollectorImpl : public profiler::RocmTraceCollector {
       int host_ev_cnt = 0, dev_ev_cnt = 0;
       mutex_lock l(events_mutex);
       // Tracking event types per line.
-      absl::flat_hash_map<int64, absl::flat_hash_set<RocmTracerEventType>>
+      abslx::flat_hash_map<int64, abslx::flat_hash_set<RocmTracerEventType>>
           events_types_per_line;
       for (const RocmTracerEvent& event : events) {
         int64_t line_id = RocmTracerEvent::kInvalidThreadId;
@@ -892,7 +892,7 @@ class RocmTraceCollectorImpl : public profiler::RocmTraceCollector {
             GetDeviceXLineName(line.Id(), events_types_per_line[line.Id()]));
       });
       host_plane->ForEachLine([&](XLineBuilder line) {
-        line.SetName(absl::StrCat("Host Threads/", line.Id()));
+        line.SetName(abslx::StrCat("Host Threads/", line.Id()));
       });
       size_t num_events = events.size();
       events.clear();
@@ -900,14 +900,14 @@ class RocmTraceCollectorImpl : public profiler::RocmTraceCollector {
 
     mutex events_mutex;
     std::vector<RocmTracerEvent> events TF_GUARDED_BY(events_mutex);
-    absl::flat_hash_map<uint32, CorrelationInfo> correlation_info_
+    abslx::flat_hash_map<uint32, CorrelationInfo> correlation_info_
         TF_GUARDED_BY(events_mutex);
-    absl::flat_hash_map<RocmDeviceOccupancyParams, OccupancyStats>
+    abslx::flat_hash_map<RocmDeviceOccupancyParams, OccupancyStats>
         occupancy_cache_;
     hipDeviceProp_t device_properties_;
   };
 
-  absl::FixedArray<PerDeviceCollector> per_device_collector_;
+  abslx::FixedArray<PerDeviceCollector> per_device_collector_;
 };
 
 // GpuTracer for ROCm GPU.

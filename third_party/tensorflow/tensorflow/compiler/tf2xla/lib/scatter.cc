@@ -40,7 +40,7 @@ StatusOr<xla::XlaOp> XlaScatter(
   TF_ASSIGN_OR_RETURN(xla::Shape buffer_shape, builder->GetShape(buffer));
   TF_ASSIGN_OR_RETURN(xla::Shape updates_shape, builder->GetShape(updates));
   TF_ASSIGN_OR_RETURN(xla::Shape indices_shape, builder->GetShape(indices));
-  absl::Span<const int64_t> indices_dims = indices_shape.dimensions();
+  abslx::Span<const int64_t> indices_dims = indices_shape.dimensions();
 
   // If the indices are N-dimensional, the minor dimension of indices contains
   // the indices to update. Otherwise the indices are all scalars.
@@ -192,11 +192,11 @@ StatusOr<xla::XlaOp> XlaScatter(
   VLOG(3) << "  Scatter Dimension Numbers: ";
   VLOG(3) << "    index_vector_dim: " << dim_numbers.index_vector_dim();
   VLOG(3) << "    update_window_dims: ["
-          << absl::StrJoin(dim_numbers.update_window_dims(), ",") << "]";
+          << abslx::StrJoin(dim_numbers.update_window_dims(), ",") << "]";
   VLOG(3) << "    inserted_window_dims: ["
-          << absl::StrJoin(dim_numbers.inserted_window_dims(), ",") << "]";
+          << abslx::StrJoin(dim_numbers.inserted_window_dims(), ",") << "]";
   VLOG(3) << "    scatter_dims_to_operand_dims: ["
-          << absl::StrJoin(dim_numbers.scatter_dims_to_operand_dims(), ",")
+          << abslx::StrJoin(dim_numbers.scatter_dims_to_operand_dims(), ",")
           << "]";
 
   return xla::Scatter(buffer, indices, new_updates, combiner_computation,

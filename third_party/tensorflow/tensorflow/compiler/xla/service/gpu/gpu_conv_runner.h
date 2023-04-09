@@ -176,7 +176,7 @@ struct RunConvOptions {
 // the same conv, you can provide an explicitly preallocated scratch buffer of
 // that size, if you like.
 Status RunGpuConv(const GpuConvConfig& conv_config,
-                  absl::Span<const se::DeviceMemoryBase> operand_buffers,
+                  abslx::Span<const se::DeviceMemoryBase> operand_buffers,
                   se::DeviceMemoryBase result_buffer,
                   se::DeviceMemoryBase scratch_memory, se::Stream* stream,
                   RunConvOptions = {});
@@ -204,12 +204,12 @@ StatusOr<GpuConvConfig> GetGpuConvConfig(
 // and a string representation of the convolution instruction `inst_as_string`
 // (for error reporting).
 StatusOr<GpuConvConfig> GetGpuConvConfig(const GpuConvDescriptor& desc,
-                                         absl::string_view inst_as_string);
+                                         abslx::string_view inst_as_string);
 
 // Implementation details exposed for debugging and log analysis.
 StatusOr<GpuConvParams> GetGpuConvParams(
     const GpuConvConfig& conv_config,
-    absl::Span<const se::DeviceMemoryBase> operand_buffers,
+    abslx::Span<const se::DeviceMemoryBase> operand_buffers,
     se::DeviceMemoryBase result_buffer);
 
 se::dnn::BatchDescriptor GetBiasDescriptor(const GpuConvConfig& config);

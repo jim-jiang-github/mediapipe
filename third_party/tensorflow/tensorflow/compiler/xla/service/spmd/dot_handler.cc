@@ -65,8 +65,8 @@ Status SpmdPartitioningVisitor::HandleDot(HloInstruction* hlo) {
     mapping.contracting_dims.back().output = -1;
   }
   for (int64_t i = 0; i < hlo->operand(0)->shape().rank(); ++i) {
-    if (absl::c_linear_search(dnums.lhs_batch_dimensions(), i) ||
-        absl::c_linear_search(dnums.lhs_contracting_dimensions(), i)) {
+    if (abslx::c_linear_search(dnums.lhs_batch_dimensions(), i) ||
+        abslx::c_linear_search(dnums.lhs_contracting_dimensions(), i)) {
       continue;
     }
     mapping.lhs_non_contracting_dims.emplace_back();
@@ -75,8 +75,8 @@ Status SpmdPartitioningVisitor::HandleDot(HloInstruction* hlo) {
     mapping.lhs_non_contracting_dims.back().output = next_output_dim++;
   }
   for (int64_t i = 0; i < hlo->operand(1)->shape().rank(); ++i) {
-    if (absl::c_linear_search(dnums.rhs_batch_dimensions(), i) ||
-        absl::c_linear_search(dnums.rhs_contracting_dimensions(), i)) {
+    if (abslx::c_linear_search(dnums.rhs_batch_dimensions(), i) ||
+        abslx::c_linear_search(dnums.rhs_contracting_dimensions(), i)) {
       continue;
     }
     mapping.rhs_non_contracting_dims.emplace_back();
@@ -124,7 +124,7 @@ void UpdateDDNums(DotDimensionNumbers* new_ddnums, int64_t reshaped_dim,
   auto update_dims =
       [&reshaped_dim](tensorflow::protobuf::RepeatedField<int64_t>* dims) {
         bool add_reshaped_dim = false;
-        if (absl::c_linear_search(*dims, reshaped_dim)) {
+        if (abslx::c_linear_search(*dims, reshaped_dim)) {
           add_reshaped_dim = true;
         }
         for (int64_t i = 0; i < dims->size(); ++i) {
@@ -384,7 +384,7 @@ DotDimensionIndexMapping ComputeDimensionIndexMapping(
 }
 
 std::vector<std::vector<int64_t>> GetPartitionGroupsForReplication(
-    const HloSharding& sharding, absl::Span<const int64_t> replication_dims) {
+    const HloSharding& sharding, abslx::Span<const int64_t> replication_dims) {
   int64_t group_size = 1;
   for (int64_t i : replication_dims) {
     group_size *= sharding.tile_assignment().dim(i);
@@ -392,10 +392,10 @@ std::vector<std::vector<int64_t>> GetPartitionGroupsForReplication(
   std::vector<std::vector<int64_t>> partition_groups(
       sharding.tile_assignment().num_elements() / group_size);
   sharding.tile_assignment().Each(
-      [&](absl::Span<const int64_t> indices, int64_t partition) {
+      [&](abslx::Span<const int64_t> indices, int64_t partition) {
         int64_t group_id = 0;
         for (int64_t i = 0; i < indices.size(); ++i) {
-          if (!absl::c_linear_search(replication_dims, i)) {
+          if (!abslx::c_linear_search(replication_dims, i)) {
             group_id *= sharding.tile_assignment().dim(i);
             group_id += indices[i];
           }
@@ -715,7 +715,7 @@ std::vector<ReplicaGroup> GetLoopReplicaGroups(HloInstruction* while_loop) {
         source_index[st_pairs[i].first] = i;
       }
 
-      absl::flat_hash_set<int64_t> visited;
+      abslx::flat_hash_set<int64_t> visited;
       for (int64_t i = 0; i < st_pairs.size(); ++i) {
         if (visited.contains(st_pairs[i].first)) {
           continue;
@@ -734,7 +734,7 @@ std::vector<ReplicaGroup> GetLoopReplicaGroups(HloInstruction* while_loop) {
             visited.insert(target);
           }
         }
-        absl::c_sort(replica_group);
+        abslx::c_sort(replica_group);
         groups.emplace_back();
         for (auto id : replica_group) {
           groups.back().add_replica_ids(id);
@@ -2019,7 +2019,7 @@ StatusOr<HloInstruction*> PartitionDotGroupOnBatch(
     SpmdPartitioningVisitor* visitor) {
   std::vector<std::pair<HloInstruction*, HloSharding>>
       top_level_sharding_to_reset;
-  absl::Cleanup cleaner = [&] {
+  abslx::Cleanup cleaner = [&] {
     for (auto& to_reset : top_level_sharding_to_reset) {
       to_reset.first->set_sharding(to_reset.second);
     }
@@ -2104,9 +2104,9 @@ StatusOr<HloInstruction*> PartitionDotGroupOnBatch(
     auto per_group_partitioner_state = CreatePerGroupPartitioningState(
         lhs.state(), output_grouped.device_groups, b);
     auto reshard_to_output_batch =
-        [&](PartitionedHlo operand, absl::Span<const int64_t> batch_dims,
-            absl::Span<const int64_t> contracting_dims,
-            absl::Span<const int64_t> non_contracting_dims,
+        [&](PartitionedHlo operand, abslx::Span<const int64_t> batch_dims,
+            abslx::Span<const int64_t> contracting_dims,
+            abslx::Span<const int64_t> non_contracting_dims,
             int64_t contracting_dim_partitions,
             int64_t non_contracting_dim_partitions,
             int64_t other_contracting_dim_partitions,
@@ -2243,7 +2243,7 @@ StatusOr<HloInstruction*> PartitionDotGroupOnBatch(
 GroupedSharding GetNonContractingPartitionGroupedShardingForMatchedOperand(
     bool lhs_matching, const HloSharding& matching_sharding,
     const HloSharding& output_sharding,
-    absl::Span<const DotConvDimsMapping::DimsMapping> partitioned_dims) {
+    abslx::Span<const DotConvDimsMapping::DimsMapping> partitioned_dims) {
   std::vector<int64_t> matching_sharding_dims =
       matching_sharding.tile_assignment().dimensions();
   std::vector<int64_t> matching_dims;
@@ -2278,10 +2278,10 @@ GetNonContractingPartitionGroupedShardingForOtherOperand(
     int64_t matching_contracting_partitions,
     int64_t output_other_non_contracting_partitions,
     const HloSharding& other_sharding, const HloSharding& output_sharding,
-    absl::Span<const DotConvDimsMapping::DimsMapping> matching_partitioned_dims,
-    absl::Span<const DotConvDimsMapping::DimsMapping>
+    abslx::Span<const DotConvDimsMapping::DimsMapping> matching_partitioned_dims,
+    abslx::Span<const DotConvDimsMapping::DimsMapping>
         other_non_contracting_dims,
-    absl::Span<const DotConvDimsMapping::DimsMapping> other_contracting_dims) {
+    abslx::Span<const DotConvDimsMapping::DimsMapping> other_contracting_dims) {
   int64_t group_count = 1;
   std::vector<int64_t> output_dims;
   output_dims.reserve(matching_partitioned_dims.size());
@@ -2346,7 +2346,7 @@ StatusOr<HloInstruction*> PartitionDotGroupOnNonContracting(
     bool lhs_matching, PartitionedHlo matching, PartitionedHlo other,
     int64_t matching_contracting_partitions,
     int64_t other_contracting_partitions,
-    absl::Span<const DotConvDimsMapping::DimsMapping>
+    abslx::Span<const DotConvDimsMapping::DimsMapping>
         partitioned_non_contracting_dims,
     int64_t other_non_contracting_partitions,
     int64_t output_other_non_contracting_partitions,
@@ -2363,7 +2363,7 @@ StatusOr<HloInstruction*> PartitionDotGroupOnNonContracting(
     SpmdPartitioningVisitor* visitor) {
   std::vector<std::pair<HloInstruction*, HloSharding>>
       top_level_sharding_to_reset;
-  absl::Cleanup cleaner = [&] {
+  abslx::Cleanup cleaner = [&] {
     for (auto& to_reset : top_level_sharding_to_reset) {
       to_reset.first->set_sharding(to_reset.second);
     }
@@ -2522,7 +2522,7 @@ GetDotGroupPartitionContractingOutputShardings(
   }
   if (output_replicate_dim_grouped) {
     *output_replicate_dim_grouped =
-        absl::c_linear_search(output_slice_dims, output_base_shape.rank());
+        abslx::c_linear_search(output_slice_dims, output_base_shape.rank());
   }
   if (output_slice_dims_out) {
     if (output_sharding.ReplicateOnLastTileDim()) {
@@ -2541,7 +2541,7 @@ GetDotGroupPartitionContractingOutputShardings(
 std::pair<HloSharding, HloSharding>
 GetDotGroupPartitionContractingLhsRhsShardings(
     const PartitionedHlo& lhs, const PartitionedHlo& rhs,
-    absl::Span<const DotConvDimsMapping::DimsMapping>
+    abslx::Span<const DotConvDimsMapping::DimsMapping>
         partitioned_contracting_dims) {
   HloSharding lhs_sharding = lhs.sharding();
   HloSharding rhs_sharding = rhs.sharding();
@@ -2574,7 +2574,7 @@ GetDotGroupPartitionContractingLhsRhsShardings(
 
 StatusOr<HloInstruction*> PartitionDotGroupOnContracting(
     PartitionedHlo lhs, PartitionedHlo rhs,
-    absl::Span<const DotConvDimsMapping::DimsMapping>
+    abslx::Span<const DotConvDimsMapping::DimsMapping>
         partitioned_contracting_dims,
     int64_t output_batch_partitions,
     int64_t output_lhs_non_contracting_partitions,
@@ -2592,7 +2592,7 @@ StatusOr<HloInstruction*> PartitionDotGroupOnContracting(
     SpmdPartitioningVisitor* visitor) {
   std::vector<std::pair<HloInstruction*, HloSharding>>
       top_level_sharding_to_reset;
-  absl::Cleanup cleaner = [&] {
+  abslx::Cleanup cleaner = [&] {
     for (auto& to_reset : top_level_sharding_to_reset) {
       to_reset.first->set_sharding(to_reset.second);
     }
@@ -2633,7 +2633,7 @@ StatusOr<HloInstruction*> PartitionDotGroupOnContracting(
   // Mask out invalid data.
   std::vector<int64_t> lhs_skipped_dims;
   for (int64_t i = 0; i < lhs.base_shape().rank(); ++i) {
-    if (absl::c_linear_search(lhs_dims, i)) {
+    if (abslx::c_linear_search(lhs_dims, i)) {
       continue;
     }
     lhs_skipped_dims.push_back(i);
@@ -2642,7 +2642,7 @@ StatusOr<HloInstruction*> PartitionDotGroupOnContracting(
       /*left_padded_dims=*/{}, lhs_skipped_dims);
   std::vector<int64_t> rhs_skipped_dims;
   for (int64_t i = 0; i < rhs.base_shape().rank(); ++i) {
-    if (absl::c_linear_search(rhs_dims, i)) {
+    if (abslx::c_linear_search(rhs_dims, i)) {
       continue;
     }
     rhs_skipped_dims.push_back(i);
@@ -2668,7 +2668,7 @@ StatusOr<HloInstruction*> PartitionDotGroupOnContracting(
   auto get_non_slice_dims = [&] {
     std::vector<int64_t> non_group_dims;
     for (int64_t i = 0; i < output_base_shape.rank(); ++i) {
-      if (!absl::c_linear_search(output_slice_dims, i)) {
+      if (!abslx::c_linear_search(output_slice_dims, i)) {
         non_group_dims.push_back(i);
       }
     }
@@ -3078,7 +3078,7 @@ bool PrioritizeContractingDimensionsPartitioning(
   if (!output_slice_dims.empty()) {
     std::vector<int64_t> non_group_dims;
     for (int64_t i = 0; i < output_base_shape.rank(); ++i) {
-      if (!absl::c_linear_search(output_slice_dims, i)) {
+      if (!abslx::c_linear_search(output_slice_dims, i)) {
         non_group_dims.push_back(i);
       }
     }
@@ -3364,7 +3364,7 @@ StatusOr<HloInstruction*> PartitionDot(
   // lhs_rhs_or_output: 0 lhs, 1 rhs, 2 output.
   auto get_partitions_for_dims =
       [&](const HloSharding& sharding,
-          absl::Span<const DotConvDimsMapping::DimsMapping> dims,
+          abslx::Span<const DotConvDimsMapping::DimsMapping> dims,
           int lhs_rhs_or_output) {
         int64_t partitions = 1;
         if (sharding.IsTileMaximal()) {
@@ -3804,11 +3804,11 @@ namespace {
 //
 // FindInputNodesIfOnlyDependOnSmallOperands(multiply) will return
 //    <{broadcast, iota, constant, add, multiply}, [a]>.
-std::pair<absl::flat_hash_set<HloInstruction*>, std::vector<HloInstruction*>>
+std::pair<abslx::flat_hash_set<HloInstruction*>, std::vector<HloInstruction*>>
 FindInputNodesIfOnlyDependOnSmallOperands(HloInstruction* hlo) {
-  absl::flat_hash_set<HloInstruction*> nodes_found;
+  abslx::flat_hash_set<HloInstruction*> nodes_found;
   std::vector<HloInstruction*> new_operands;
-  absl::flat_hash_set<const HloInstruction*> new_operands_set;
+  abslx::flat_hash_set<const HloInstruction*> new_operands_set;
   std::vector<HloInstruction*> worklist;
   worklist.push_back(hlo);
   while (!worklist.empty()) {
@@ -3828,7 +3828,7 @@ FindInputNodesIfOnlyDependOnSmallOperands(HloInstruction* hlo) {
         }
       }
     } else if (inst->IsElementwise() && !inst->HasSideEffectNoRecurse() &&
-               absl::c_all_of(inst->operands(),
+               abslx::c_all_of(inst->operands(),
                               [inst](const HloInstruction* o) {
                                 return ShapeUtil::CompatibleIgnoringElementType(
                                     o->shape(), inst->shape());
@@ -3900,11 +3900,11 @@ Status SinkInputNodesIntoWindowedDotGeneralLoopOnContractingDimensions(
 
   // Create nodes inside the loop body.
   std::vector<HloInstruction*> worklist;
-  absl::flat_hash_map<const HloInstruction*, HloInstruction*> outside_to_inside;
+  abslx::flat_hash_map<const HloInstruction*, HloInstruction*> outside_to_inside;
   auto add_users_if_available = [&](HloInstruction* inst) {
     for (auto u : inst->users()) {
       if (outside_to_inside.count(u) == 0 && to_sink.count(u) > 0 &&
-          absl::c_all_of(u->operands(), [&](const HloInstruction* o) {
+          abslx::c_all_of(u->operands(), [&](const HloInstruction* o) {
             return outside_to_inside.count(o) > 0;
           })) {
         worklist.push_back(u);
@@ -3925,7 +3925,7 @@ Status SinkInputNodesIntoWindowedDotGeneralLoopOnContractingDimensions(
     }
   }
   // Sort nullaries_to_sink to make it deterministic.
-  absl::c_sort(nullaries_to_sink,
+  abslx::c_sort(nullaries_to_sink,
                [](const HloInstruction* a, const HloInstruction* b) {
                  return a->unique_id() < b->unique_id();
                });
@@ -4008,9 +4008,9 @@ Status MoveUsersIntoWindowedDotGeneralLoopOnNonContractingDimensions(
 
   // Find the reduce outputs and the input nodes they depend on, if input
   // nodes only have small operands.
-  absl::flat_hash_set<HloInstruction*> to_move;
+  abslx::flat_hash_set<HloInstruction*> to_move;
   std::vector<HloInstruction*> new_operands;
-  absl::flat_hash_set<const HloInstruction*> new_operands_set;
+  abslx::flat_hash_set<const HloInstruction*> new_operands_set;
   std::vector<HloInstruction*> reduce_outputs;
   std::vector<HloInstruction*> worklist;
   Shape padded_shape = user_gte->shape();
@@ -4048,7 +4048,7 @@ Status MoveUsersIntoWindowedDotGeneralLoopOnNonContractingDimensions(
     } else if (inst != computation->root_instruction() &&
                inst->user_count() > 0 && inst->IsElementwise() &&
                !inst->HasSideEffectNoRecurse() &&
-               absl::c_all_of(inst->operands(),
+               abslx::c_all_of(inst->operands(),
                               [inst](const HloInstruction* o) {
                                 return ShapeUtil::CompatibleIgnoringElementType(
                                     o->shape(), inst->shape());
@@ -4112,7 +4112,7 @@ Status MoveUsersIntoWindowedDotGeneralLoopOnNonContractingDimensions(
     // When there are only few reduces, we can do traversal to check dependency.
     for (const HloInstruction* reduce : reduce_outputs) {
       auto reduce_outputs_do_not_contain = [&](const HloInstruction* inst) {
-        return !absl::c_linear_search(reduce_outputs, inst);
+        return !abslx::c_linear_search(reduce_outputs, inst);
       };
       if (!CheckOperandsRecursive(reduce, reduce_outputs_do_not_contain)) {
         return OkStatus();
@@ -4127,7 +4127,7 @@ Status MoveUsersIntoWindowedDotGeneralLoopOnNonContractingDimensions(
     int64_t operand_dim = 0;
     int64_t output_dim = 0;
     while (output_dim < padded_out_shape.rank()) {
-      if (absl::c_linear_search(out->dimensions(), operand_dim)) {
+      if (abslx::c_linear_search(out->dimensions(), operand_dim)) {
         // Dimension colapsed.
         ++operand_dim;
         continue;
@@ -4175,7 +4175,7 @@ Status MoveUsersIntoWindowedDotGeneralLoopOnNonContractingDimensions(
   // ops which all need moving.
   struct MotionCluster {
     HloInstruction* dus;
-    absl::flat_hash_map<const HloInstruction*, HloInstruction*>
+    abslx::flat_hash_map<const HloInstruction*, HloInstruction*>
         outside_to_inside;
     std::vector<HloInstruction*> slice_offsets;
   };
@@ -4208,7 +4208,7 @@ Status MoveUsersIntoWindowedDotGeneralLoopOnNonContractingDimensions(
     for (auto* u : inst->users()) {
       if (base_motion_cluster.outside_to_inside.count(u) == 0 &&
           to_move.count(u) > 0 &&
-          absl::c_all_of(u->operands(), [&](const HloInstruction* o) {
+          abslx::c_all_of(u->operands(), [&](const HloInstruction* o) {
             return base_motion_cluster.outside_to_inside.count(o) > 0;
           })) {
         worklist.push_back(u);
@@ -4229,7 +4229,7 @@ Status MoveUsersIntoWindowedDotGeneralLoopOnNonContractingDimensions(
 
   // Now create the moved nodes inside the loop body.
   auto get_slice = [&](HloInstruction* padded,
-                       absl::Span<HloInstruction* const> slice_offsets,
+                       abslx::Span<HloInstruction* const> slice_offsets,
                        HloInstruction* dus) {
     return body->AddInstruction(HloInstruction::CreateDynamicSlice(
         ShapeUtil::ChangeElementType(dus->operand(1)->shape(),
@@ -4296,7 +4296,7 @@ Status MoveUsersIntoWindowedDotGeneralLoopOnNonContractingDimensions(
   while (!worklist.empty()) {
     auto* inst = worklist.back();
     worklist.pop_back();
-    if (absl::c_all_of(
+    if (abslx::c_all_of(
             motion_clusters, [inst](const MotionCluster& motion_cluster) {
               return motion_cluster.outside_to_inside.count(inst) > 0;
             })) {
@@ -4332,9 +4332,9 @@ Status MoveUsersIntoWindowedDotGeneralLoopOnNonContractingDimensions(
         base_motion_cluster.outside_to_inside[new_operands[index_in_operand]];
 
     auto create_inside_reduce =
-        [&](absl::flat_hash_map<const HloInstruction*, HloInstruction*>&
+        [&](abslx::flat_hash_map<const HloInstruction*, HloInstruction*>&
                 outside_to_inside,
-            absl::Span<HloInstruction* const> slice_offsets,
+            abslx::Span<HloInstruction* const> slice_offsets,
             HloInstruction* last_iter_result) -> StatusOr<HloInstruction*> {
       HloInstruction* operand0 = outside_to_inside[reduce_outside->operand(0)];
       HloInstruction* operand1 = outside_to_inside[reduce_outside->operand(1)];
@@ -4352,7 +4352,7 @@ Status MoveUsersIntoWindowedDotGeneralLoopOnNonContractingDimensions(
       bool needs_accumulate = false;
       std::vector<int64_t> dims_to_mask;
       for (int64_t i = 0; i < slice_offsets.size(); ++i) {
-        if (absl::c_linear_search(reduce_outside->dimensions(), i)) {
+        if (abslx::c_linear_search(reduce_outside->dimensions(), i)) {
           if (reduce_outside->operand(0)->shape().dimensions(i) !=
               operand0->shape().dimensions(i)) {
             needs_accumulate = true;

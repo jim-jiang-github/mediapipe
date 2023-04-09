@@ -20,7 +20,7 @@ constexpr char kProjectionMatrixTag[] = "PROJECTION_MATRIX";
 constexpr char kNormRectTag[] = "NORM_RECT";
 constexpr char kNormLandmarksTag[] = "NORM_LANDMARKS";
 
-absl::StatusOr<mediapipe::NormalizedLandmarkList> RunCalculator(
+abslx::StatusOr<mediapipe::NormalizedLandmarkList> RunCalculator(
     mediapipe::NormalizedLandmarkList input, mediapipe::NormalizedRect rect) {
   mediapipe::CalculatorRunner runner(
       ParseTextProtoOrDie<mediapipe::CalculatorGraphConfig::Node>(R"pb(
@@ -98,7 +98,7 @@ TEST(LandmarkProjectionCalculatorTest, ProjectingWithCroppedRect) {
               EqualsProto(GetCroppedRectTestExpectedResult()));
 }
 
-absl::StatusOr<mediapipe::NormalizedLandmarkList> RunCalculator(
+abslx::StatusOr<mediapipe::NormalizedLandmarkList> RunCalculator(
     mediapipe::NormalizedLandmarkList input, std::array<float, 16> matrix) {
   mediapipe::CalculatorRunner runner(
       ParseTextProtoOrDie<mediapipe::CalculatorGraphConfig::Node>(R"pb(

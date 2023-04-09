@@ -135,7 +135,7 @@ class MappedPtrContainerSorter {
     size_t max_partial_order_exclusive_;
     size_t unordered_container_size_;
     std::vector<std::vector<size_t>> mapped_element_indices_by_partial_order_;
-    absl::flat_hash_map<size_t, std::vector<size_t>>
+    abslx::flat_hash_map<size_t, std::vector<size_t>>
         target_index_to_unmapped_element_index_;
   };
 
@@ -254,12 +254,12 @@ std::string MappedPtrContainerSorter<PointedToTy>::SortedIndices::ToString()
   mapped_element_strs.reserve(mapped_element_indices_by_partial_order_.size());
   for (const auto& indices : mapped_element_indices_by_partial_order_) {
     mapped_element_strs.push_back(
-        absl::StrCat("[", absl::StrJoin(indices, ", "), "]"));
+        abslx::StrCat("[", abslx::StrJoin(indices, ", "), "]"));
   }
   std::vector<std::string> unmapped_element_strs;
   unmapped_element_strs.reserve(target_index_to_unmapped_element_index_.size());
   for (const auto& kv : target_index_to_unmapped_element_index_) {
-    std::string key = absl::StrCat(kv.first);
+    std::string key = abslx::StrCat(kv.first);
     if (kv.first == IndexBeforeMappedElements()) {
       key = "before_mapped";
     }
@@ -270,16 +270,16 @@ std::string MappedPtrContainerSorter<PointedToTy>::SortedIndices::ToString()
       key = "invalid";
     }
     unmapped_element_strs.push_back(
-        absl::StrCat(key, ": [", absl::StrJoin(kv.second, ", "), "]"));
+        abslx::StrCat(key, ": [", abslx::StrJoin(kv.second, ", "), "]"));
   }
 
-  return absl::StrCat(
+  return abslx::StrCat(
       "max_partial_order_exclusive_: ", max_partial_order_exclusive_, "\n",
       "unordered_container_size_: ", unordered_container_size_, "\n",
       "mapped_element_indices_by_partial_order_: [",
-      absl::StrJoin(mapped_element_strs, ", "), "]\n",
+      abslx::StrJoin(mapped_element_strs, ", "), "]\n",
       "target_index_to_unmapped_element_index_: {",
-      absl::StrJoin(unmapped_element_strs, ", "), "}\n");
+      abslx::StrJoin(unmapped_element_strs, ", "), "}\n");
 }
 
 template <typename PointedToTy>
@@ -331,7 +331,7 @@ MappedPtrContainerSorter<PointedToTy>::SortedIndices::Flatten() const {
   }
 
   // Ensure that every element in unordered_container has a valid new index.
-  absl::flat_hash_set<size_t> used_indices;
+  abslx::flat_hash_set<size_t> used_indices;
   for (size_t index : result) {
     if (used_indices.contains(index)) {
       return InternalErrorStrCat(
@@ -365,7 +365,7 @@ MappedPtrContainerSorter<PointedToTy>::ComputeNewIndices(
   }
 
   // Step 1: build a set of the ptrs in unordered_container
-  absl::flat_hash_set<const PointedToTy*> unordered_ptrs;
+  abslx::flat_hash_set<const PointedToTy*> unordered_ptrs;
   for (const auto& unordered_element : unordered_container) {
     const PointedToTy* ptr = UnorderedPtrGetter::Get(unordered_element);
     unordered_ptrs.insert(ptr);
@@ -373,7 +373,7 @@ MappedPtrContainerSorter<PointedToTy>::ComputeNewIndices(
 
   // Step 2: for mapped elements (in unordered_container), create a map from
   // mapped ptr -> partial ordering
-  absl::flat_hash_map<const PointedToTy*, std::list<size_t>>
+  abslx::flat_hash_map<const PointedToTy*, std::list<size_t>>
       mapped_ptr_to_partial_order;
   size_t next_partial_order_value = 0;
   for (const auto& ordered_element : ordered_container) {

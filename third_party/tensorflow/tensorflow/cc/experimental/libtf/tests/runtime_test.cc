@@ -43,7 +43,7 @@ TEST_P(RuntimeTest, SimpleModelCallableFloatTest) {
   TF_ASSERT_OK_AND_ASSIGN(Tensor result, fn.Call<Tensor>(Tensor(tensor)));
 
   float out_val[1];
-  TF_ASSERT_OK(result.GetValue(absl::MakeSpan(out_val)));
+  TF_ASSERT_OK(result.GetValue(abslx::MakeSpan(out_val)));
   EXPECT_EQ(out_val[0], 6.0);
 }
 
@@ -66,7 +66,7 @@ TEST_P(RuntimeTest, SimpleModelCallableIntTest) {
   TF_ASSERT_OK_AND_ASSIGN(Tensor tensor, fn.Call<Tensor>(Tensor(host_tensor)));
 
   int out_val[1];
-  TF_ASSERT_OK(tensor.GetValue(absl::MakeSpan(out_val)));
+  TF_ASSERT_OK(tensor.GetValue(abslx::MakeSpan(out_val)));
   EXPECT_EQ(out_val[0], 6);
 }
 
@@ -90,7 +90,7 @@ TEST_P(RuntimeTest, SimpleModelCallableMultipleArgsTest) {
   TF_ASSERT_OK_AND_ASSIGN(Tensor result_tensor,
                           fn.Call<Tensor>(tensor1, tensor2));
   float out_val[1];
-  TF_ASSERT_OK(result_tensor.GetValue(absl::MakeSpan(out_val)));
+  TF_ASSERT_OK(result_tensor.GetValue(abslx::MakeSpan(out_val)));
   EXPECT_EQ(out_val[0], 5.0f);
 }
 
@@ -121,7 +121,7 @@ TEST_P(RuntimeTest, TensorCopyInvalidSize) {
       Tensor tensor, runtime.CreateHostTensor<float>({1}, TF_FLOAT, {2.0f}))
   float val[2];
 
-  EXPECT_THAT(tensor.GetValue(absl::MakeSpan(val)),
+  EXPECT_THAT(tensor.GetValue(abslx::MakeSpan(val)),
               StatusIs(tensorflow::error::INVALID_ARGUMENT,
                        HasSubstr("Mismatched number of elements")));
 }

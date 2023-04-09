@@ -206,7 +206,7 @@ std::vector<tensorflow::Tensor> CreateExpectedOutputs(
     const std::vector<std::pair<std::string, tensorflow::Tensor>>&
         named_outputs) {
   std::vector<tensorflow::Tensor> outputs;
-  absl::flat_hash_map<std::string, tensorflow::Tensor> name_to_outputs;
+  abslx::flat_hash_map<std::string, tensorflow::Tensor> name_to_outputs;
   for (const auto& name_and_output : named_outputs) {
     name_to_outputs[name_and_output.first] = name_and_output.second;
   }
@@ -729,7 +729,7 @@ TEST(ControlFlowTest, CtrlFlow) {
   std::vector<int32_t> x_data = {-1};
   std::vector<tensorflow::Tensor> inputs;
   inputs.push_back(CreateTfTensor<int32_t>(
-      /*shape=*/{}, absl::MakeConstSpan(x_data)));
+      /*shape=*/{}, abslx::MakeConstSpan(x_data)));
 
   std::vector<tensorflow::Tensor> outputs;
   TF_ASSERT_OK(
@@ -765,7 +765,7 @@ TEST(SavedModelTest, ResourceGather) {
   std::vector<int32_t> x_data = {1};
   std::vector<tensorflow::Tensor> inputs;
   inputs.push_back(CreateTfTensor<int32_t>(
-      /*shape=*/{}, absl::MakeConstSpan(x_data)));
+      /*shape=*/{}, abslx::MakeConstSpan(x_data)));
 
   std::vector<tensorflow::Tensor> outputs;
   TF_ASSERT_OK(
@@ -840,7 +840,7 @@ TEST(SavedModelTest, Error) {
 
   EXPECT_EQ(status.code(), tensorflow::error::INVALID_ARGUMENT);
 
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       status.error_message(), "You must feed a value for placeholder tensor"));
 }
 
@@ -871,7 +871,7 @@ TEST_P(SavedModelPowTest, Pow) {
   std::vector<int32_t> data = {2};
   std::vector<tensorflow::Tensor> inputs;
   inputs.push_back(
-      CreateTfTensor<int32_t>(/*shape=*/{}, absl::MakeConstSpan(data)));
+      CreateTfTensor<int32_t>(/*shape=*/{}, abslx::MakeConstSpan(data)));
 
   std::vector<tensorflow::Tensor> outputs;
   TF_ASSERT_OK(saved_model->Run({}, "serving_default", inputs, &outputs));
@@ -904,7 +904,7 @@ TEST(SavedModelPowTest, MapDataset) {
   std::vector<int32_t> data = {2};
   std::vector<tensorflow::Tensor> inputs;
   inputs.push_back(
-      CreateTfTensor<int32_t>(/*shape=*/{}, absl::MakeConstSpan(data)));
+      CreateTfTensor<int32_t>(/*shape=*/{}, abslx::MakeConstSpan(data)));
 
   std::vector<tensorflow::Tensor> outputs;
   TF_ASSERT_OK(saved_model->Run({}, "serving_default", inputs, &outputs));
@@ -954,7 +954,7 @@ TEST(SavedModelTest, WhileLoopV1) {
   std::vector<int32_t> data = {0};
   std::vector<tensorflow::Tensor> inputs;
   inputs.push_back(
-      CreateTfTensor<int32_t>(/*shape=*/{}, absl::MakeConstSpan(data)));
+      CreateTfTensor<int32_t>(/*shape=*/{}, abslx::MakeConstSpan(data)));
 
   std::vector<tensorflow::Tensor> outputs;
   TF_ASSERT_OK(saved_model->Run({}, "serving_default", inputs, &outputs));
@@ -1006,7 +1006,7 @@ TEST(SavedModelTest, DeadlineExceeded) {
   std::vector<tensorflow::Tensor> outputs;
 
   tfrt::SavedModel::RunOptions run_options;
-  run_options.deadline = absl::ToChronoTime(absl::Now());
+  run_options.deadline = abslx::ToChronoTime(abslx::Now());
 
   status = saved_model->Run(run_options, "toy", inputs, &outputs);
 

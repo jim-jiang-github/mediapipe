@@ -47,16 +47,16 @@ class Texture2D : public GPUObject {
   // Writes data to a texture. Data should point to a region that
   // has exact width * height * sizeof(pixel) bytes.
   template <typename T>
-  absl::Status WriteData(id<MTLDevice> device, const absl::Span<T> data);
+  abslx::Status WriteData(id<MTLDevice> device, const abslx::Span<T> data);
 
   // Reads data from Texture2D into CPU memory.
   template <typename T>
-  absl::Status ReadData(id<MTLDevice> device, std::vector<T>* result) const;
+  abslx::Status ReadData(id<MTLDevice> device, std::vector<T>* result) const;
 
-  absl::Status GetGPUResources(const GPUObjectDescriptor* obj_ptr,
+  abslx::Status GetGPUResources(const GPUObjectDescriptor* obj_ptr,
                                GPUResourcesWithValue* resources) const override;
 
-  absl::Status CreateFromTexture2DDescriptor(const Texture2DDescriptor& desc, id<MTLDevice> device);
+  abslx::Status CreateFromTexture2DDescriptor(const Texture2DDescriptor& desc, id<MTLDevice> device);
 
  private:
   void Release();
@@ -68,43 +68,43 @@ class Texture2D : public GPUObject {
 };
 
 // Creates new 4-channel 2D texture with f32 elements
-absl::Status CreateTexture2DRGBA32F(int width, int height, id<MTLDevice> device, Texture2D* result);
+abslx::Status CreateTexture2DRGBA32F(int width, int height, id<MTLDevice> device, Texture2D* result);
 
 // Creates new 4-channel 2D texture with f16 elements
-absl::Status CreateTexture2DRGBA16F(int width, int height, id<MTLDevice> device, Texture2D* result);
+abslx::Status CreateTexture2DRGBA16F(int width, int height, id<MTLDevice> device, Texture2D* result);
 
-absl::Status CreateTexture2DRGBA(DataType type, int width, int height, id<MTLDevice> device,
+abslx::Status CreateTexture2DRGBA(DataType type, int width, int height, id<MTLDevice> device,
                                  Texture2D* result);
 
-absl::Status CreateTexture2DRGBA(DataType type, int width, int height, void* data,
+abslx::Status CreateTexture2DRGBA(DataType type, int width, int height, void* data,
                                  id<MTLDevice> device, Texture2D* result);
 
 template <typename T>
-absl::Status Texture2D::WriteData(id<MTLDevice> device,
-                                  const absl::Span<T> data) {
+abslx::Status Texture2D::WriteData(id<MTLDevice> device,
+                                  const abslx::Span<T> data) {
   const int pixel_size = PixelFormatToSizeInBytes(pixel_format_);
   if (width_ * height_ * pixel_size != data.size() * sizeof(T)) {
-    return absl::InvalidArgumentError(
-        "absl::Span<T> data size is different from texture allocated size.");
+    return abslx::InvalidArgumentError(
+        "abslx::Span<T> data size is different from texture allocated size.");
   }
 
   WriteDataToTexture2D(texture_, device, data.data());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <typename T>
-absl::Status Texture2D::ReadData(id<MTLDevice> device,
+abslx::Status Texture2D::ReadData(id<MTLDevice> device,
                                  std::vector<T>* result) const {
   const int pixel_size = PixelFormatToSizeInBytes(pixel_format_);
   if (pixel_size % sizeof(T) != 0) {
-    return absl::InvalidArgumentError("Pixel format is different.");
+    return abslx::InvalidArgumentError("Pixel format is different.");
   }
   result->resize(width_ * height_ * (pixel_size / sizeof(T)));
 
   ReadDataFromTexture2D(texture_, device, result->data());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace metal

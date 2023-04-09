@@ -168,9 +168,9 @@ Status ReplaceSrcOutputUsageWithNode(Graph* g, Node* src, int src_output,
 // `const_input_index_to_node` with Const nodes.
 Status ReplaceArgUsageWithConstNode(
     Graph* g,
-    const absl::flat_hash_map<int, const Node*>& const_input_index_to_node) {
+    const abslx::flat_hash_map<int, const Node*>& const_input_index_to_node) {
   // Collect all _Arg nodes.
-  absl::flat_hash_map<int, Node*> arg_nodes;
+  abslx::flat_hash_map<int, Node*> arg_nodes;
   for (Node* n : g->op_nodes()) {
     if (n->IsArg()) {
       int index;
@@ -197,9 +197,9 @@ Status ReplaceArgUsageWithConstNode(
 // node.
 Status ReplaceRetvalInputWithArg(
     Graph* g,
-    const absl::flat_hash_map<int, const Node*>& const_input_index_to_node) {
-  absl::flat_hash_map<int, Node*> arg_nodes;
-  absl::flat_hash_map<int, Node*> ret_nodes;
+    const abslx::flat_hash_map<int, const Node*>& const_input_index_to_node) {
+  abslx::flat_hash_map<int, Node*> arg_nodes;
+  abslx::flat_hash_map<int, Node*> ret_nodes;
   for (Node* n : g->op_nodes()) {
     if (n->IsRetval() || n->IsArg()) {
       int index;
@@ -227,7 +227,7 @@ Status ReplaceRetvalInputWithArg(
 // inputs.
 Status PropagateConstIntoFuncAttr(
     Node* n, const string& attr_name,
-    const absl::flat_hash_map<int, const Node*>& const_input_index_to_node,
+    const abslx::flat_hash_map<int, const Node*>& const_input_index_to_node,
     const FunctionLibraryDefinition* lookup_fld, FunctionLibraryDefinition* fld,
     bool passthrough_arg_to_retval = false) {
   VLOG(1) << "Propagate const into " << attr_name << " of node " << n->name();
@@ -255,7 +255,7 @@ Status PropagateConstIntoFuncAttr(
   // Save rewritten function.
   FunctionDef replace_fdef;
   string new_func_name =
-      fld->UniqueFunctionName(absl::StrCat(func_attr.name(), "_const_"));
+      fld->UniqueFunctionName(abslx::StrCat(func_attr.name(), "_const_"));
   TF_RETURN_IF_ERROR(
       GraphToFunctionDef(*func_graph, new_func_name, &replace_fdef));
   TF_RETURN_IF_ERROR(fld->AddFunctionDef(
@@ -283,7 +283,7 @@ Status PropagateConstIntoIfNode(Graph* g, Node* if_node,
                                 FunctionLibraryDefinition* fld) {
   // Notice that first input for If node is predicate; other inputs are function
   // inputs.
-  absl::flat_hash_map<int, const Node*> const_input_index_to_node;
+  abslx::flat_hash_map<int, const Node*> const_input_index_to_node;
   for (int i = 1; i < if_node->num_inputs(); i++) {
     const Node* input_node;
     TF_RETURN_IF_ERROR(if_node->input_node(i, &input_node));
@@ -306,7 +306,7 @@ Status PropagateConstIntoIfNode(Graph* g, Node* if_node,
   return OkStatus();
 }
 
-using GraphCache = absl::flat_hash_map<string, std::unique_ptr<FunctionBody>>;
+using GraphCache = abslx::flat_hash_map<string, std::unique_ptr<FunctionBody>>;
 
 StatusOr<FunctionBody*> FindOrInsert(
     GraphCache* cache, const NameAttrList& body_attr,
@@ -406,8 +406,8 @@ Status PropagateConstIntoAndAroundWhileNode(
   // For "While" node, we should only replace _Arg nodes which are loop
   // invariants. For such _Arg nodes, the return value's input will come
   // directly from the corresponding arg.
-  absl::flat_hash_map<int, const Node*> const_input_index_to_node;
-  absl::flat_hash_map<int, Node*> const_input_index_to_mutable_node;
+  abslx::flat_hash_map<int, const Node*> const_input_index_to_node;
+  abslx::flat_hash_map<int, Node*> const_input_index_to_mutable_node;
   NameAttrList body_attr;
   TF_RETURN_IF_ERROR(GetNodeAttr(while_node->def(), "body", &body_attr));
   const string fn_name = body_attr.name();
@@ -519,7 +519,7 @@ Status AddPlaceholdersForFeeds(
     const string name_port = TensorIdToString(feed->id());
     PlaceholderInfo& info = placeholder_info[name_port];
     info.feed = feed;
-    info.placeholder_name = absl::StrCat("aot_feed_", feed->id().output_index(),
+    info.placeholder_name = abslx::StrCat("aot_feed_", feed->id().output_index(),
                                          "/", feed->id().node_name());
     (*feed_remapping)[name_port] = info.placeholder_name;
   }
@@ -665,7 +665,7 @@ Status PruneGraphDefInto(const tf2xla::Config& config, const GraphDef& in,
 }
 
 string TensorIdToString(const tf2xla::TensorId& id) {
-  return absl::StrCat(id.node_name(), ":", id.output_index());
+  return abslx::StrCat(id.node_name(), ":", id.output_index());
 }
 
 Status SetNodeShardingFromNeighbors(Node* n, bool out_edges) {
@@ -695,7 +695,7 @@ Status SetNodeShardingFromNeighbors(Node* n, bool out_edges) {
   return OkStatus();
 }
 
-void AddDtypeToKernelDefConstraint(absl::string_view name, DataType dtype,
+void AddDtypeToKernelDefConstraint(abslx::string_view name, DataType dtype,
                                    KernelDef* kdef) {
   for (KernelDef::AttrConstraint& constraint : *kdef->mutable_constraint()) {
     if (constraint.name() == name) {
@@ -935,7 +935,7 @@ StatusOr<Node*> BuildIdentityNode(Graph* graph, const string& node_name,
 Status PropagateConstIntoFunctionalNodes(
     Graph* g, const FunctionLibraryDefinition* lookup_fld,
     FunctionLibraryDefinition* fld) {
-  absl::flat_hash_set<int> done_node_ids;
+  abslx::flat_hash_set<int> done_node_ids;
 
   // Because we may propagate Const around a while node as well as into it,
   // we restart the op_nodes() iterator after each pass and keep track of which
@@ -1103,7 +1103,7 @@ Status RewriteTensorListWithConstElement(Graph* g,
     // Add rewritten backward While body function.
     FunctionDef new_fdef;
     string new_name = fld->UniqueFunctionName(
-        absl::StrCat(bwd_body_attr.name(), "_tl_rewrite_"));
+        abslx::StrCat(bwd_body_attr.name(), "_tl_rewrite_"));
     TF_RETURN_IF_ERROR(
         GraphToFunctionDef(*bwd_fbody->graph, new_name, &new_fdef));
     TF_RETURN_IF_ERROR(fld->AddFunctionDef(new_fdef));

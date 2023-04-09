@@ -47,7 +47,7 @@ struct TaskBreadthWithId {
 
 }  // namespace
 
-absl::Status GreedyByBreadthAssignment(
+abslx::Status GreedyByBreadthAssignment(
     const std::vector<TensorUsageRecord<size_t>>& usage_records,
     ObjectsAssignment<size_t>* assignment) {
   std::vector<TaskProfile> task_profiles = CalculateTaskProfiles(usage_records);
@@ -134,10 +134,10 @@ absl::Status GreedyByBreadthAssignment(
   // In the end all tensors must be assigned to some objects.
   for (const auto& obj_id : assignment->object_ids) {
     if (obj_id == kNotAssigned) {
-      return absl::InternalError("Error while calculating the assignment.");
+      return abslx::InternalError("Error while calculating the assignment.");
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

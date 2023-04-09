@@ -48,17 +48,17 @@ namespace mediapipe {
 // TODO: support decoding multiple streams.
 class AudioDecoderCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
   std::unique_ptr<AudioDecoder> decoder_;
 };
 
-absl::Status AudioDecoderCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status AudioDecoderCalculator::GetContract(CalculatorContract* cc) {
   cc->InputSidePackets().Tag("INPUT_FILE_PATH").Set<std::string>();
   if (cc->InputSidePackets().HasTag("OPTIONS")) {
     cc->InputSidePackets().Tag("OPTIONS").Set<mediapipe::AudioDecoderOptions>();
@@ -67,19 +67,19 @@ absl::Status AudioDecoderCalculator::GetContract(CalculatorContract* cc) {
   if (cc->Outputs().HasTag("AUDIO_HEADER")) {
     cc->Outputs().Tag("AUDIO_HEADER").SetNone();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AudioDecoderCalculator::Open(CalculatorContext* cc) {
+abslx::Status AudioDecoderCalculator::Open(CalculatorContext* cc) {
   const std::string& input_file_path =
       cc->InputSidePackets().Tag("INPUT_FILE_PATH").Get<std::string>();
   const auto& decoder_options =
       tool::RetrieveOptions(cc->Options<mediapipe::AudioDecoderOptions>(),
                             cc->InputSidePackets(), "OPTIONS");
-  decoder_ = absl::make_unique<AudioDecoder>();
+  decoder_ = abslx::make_unique<AudioDecoder>();
   MP_RETURN_IF_ERROR(decoder_->Initialize(input_file_path, decoder_options));
   std::unique_ptr<mediapipe::TimeSeriesHeader> header =
-      absl::make_unique<mediapipe::TimeSeriesHeader>();
+      abslx::make_unique<mediapipe::TimeSeriesHeader>();
   if (decoder_->FillAudioHeader(decoder_options.audio_stream(0), header.get())
           .ok()) {
     // Only pass on a header if the decoder could actually produce one.
@@ -87,10 +87,10 @@ absl::Status AudioDecoderCalculator::Open(CalculatorContext* cc) {
     cc->Outputs().Tag("AUDIO_HEADER").SetHeader(Adopt(header.release()));
   }
   cc->Outputs().Tag("AUDIO_HEADER").Close();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AudioDecoderCalculator::Process(CalculatorContext* cc) {
+abslx::Status AudioDecoderCalculator::Process(CalculatorContext* cc) {
   Packet data;
   int options_index = -1;
   auto status = decoder_->GetData(&options_index, &data);
@@ -100,7 +100,7 @@ absl::Status AudioDecoderCalculator::Process(CalculatorContext* cc) {
   return status;
 }
 
-absl::Status AudioDecoderCalculator::Close(CalculatorContext* cc) {
+abslx::Status AudioDecoderCalculator::Close(CalculatorContext* cc) {
   return decoder_->Close();
 }
 

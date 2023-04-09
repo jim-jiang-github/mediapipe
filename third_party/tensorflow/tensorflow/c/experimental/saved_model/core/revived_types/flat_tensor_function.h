@@ -62,7 +62,7 @@ class FlatTensorFunction {
                        std::unique_ptr<FlatTensorFunction>* out);
 
   // This method creates a "Call" Op used to execute the function.
-  Status MakeCallOp(absl::Span<AbstractTensorHandle* const> inputs,
+  Status MakeCallOp(abslx::Span<AbstractTensorHandle* const> inputs,
                     ImmediateOpPtr* out) const;
 
   ~FlatTensorFunction();

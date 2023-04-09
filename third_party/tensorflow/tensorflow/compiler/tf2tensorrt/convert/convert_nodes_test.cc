@@ -123,7 +123,7 @@ string DebugString(const TrtTestMode mode) {
 
 namespace convert {
 
-using absl::StrCat;
+using abslx::StrCat;
 using ::testing::ElementsAre;
 using ::testing::ElementsAreArray;
 using ::testing::HasSubstr;
@@ -163,9 +163,9 @@ void ValidateWeights(const TRT_ShapedWeights& weights,
 // greatly speeds up unit tests and is safe to do.
 void PreventUnloadBuilderResources() {
 #if IS_TRT_VERSION_GE(8, 2, 0, 0)
-  static thread_local absl::once_flag once;
+  static thread_local abslx::once_flag once;
   static TrtUniquePtrType<nvinfer1::IBuilder> hold_builder = nullptr;
-  absl::call_once(
+  abslx::call_once(
       once,
       [](TrtUniquePtrType<nvinfer1::IBuilder>& builder) {
         if (!builder) {
@@ -854,7 +854,7 @@ void TestGetWeightRange(ConverterTest* test, TrtWeightStore* weight_store) {
   TRT_ShapedWeights weights =
       weight_store->GetTempWeights(trt_type, CreateDims({2, 3})).ValueOrDie();
   const std::vector<T> values = {T(3), T(1), T(2), T(6), T(5), T(4)};
-  absl::c_copy(values, weights.GetPointer<T>());
+  abslx::c_copy(values, weights.GetPointer<T>());
   float out_min = 0.0f;
   float out_max = 0.0f;
   TF_EXPECT_OK(test->GetWeightRange(weights, &out_min, &out_max));
@@ -1035,10 +1035,10 @@ class ConvertGraphDefToEngineTest : public ::testing::Test {
     std::vector<PartialTensorShape> input_shapes;
     int batch_size = -1;
     for (const NodeDef& node : gdef.node()) {
-      absl::string_view node_name(node.name());
-      if (absl::ConsumePrefix(&node_name, IONamePrefixes::kInputPHName)) {
+      abslx::string_view node_name(node.name());
+      if (abslx::ConsumePrefix(&node_name, IONamePrefixes::kInputPHName)) {
         int port = -1;
-        EXPECT_TRUE(absl::SimpleAtoi(node_name, &port)) << node.name();
+        EXPECT_TRUE(abslx::SimpleAtoi(node_name, &port)) << node.name();
         if (input_shapes.size() < port + 1) input_shapes.resize(port + 1);
         input_shapes[port] =
             PartialTensorShape(node.attr().at("shape").shape());
@@ -1094,9 +1094,9 @@ Status GetShapeFromDataVec(DataVec input_data,
 }
 
 template <typename T>
-inline absl::Span<const T> GetSpanForData(const InputOutputData& data) {
+inline abslx::Span<const T> GetSpanForData(const InputOutputData& data) {
   const auto& tensor_map = data.tensor.flat<T>();
-  return absl::Span<const T>(tensor_map.data(), tensor_map.size());
+  return abslx::Span<const T>(tensor_map.data(), tensor_map.size());
 }
 
 std::vector<float> GetDataAsFloat(InputOutputData& data) {
@@ -1667,7 +1667,7 @@ class VariableOpConverterTest : public OpConverterTest {
   std::unique_ptr<OpKernel> op_kernel_;
   std::unique_ptr<OpKernelContext> context_;
   std::shared_ptr<const NodeProperties> props_;
-  absl::InlinedVector<TensorValue, 4> inputs_;
+  abslx::InlinedVector<TensorValue, 4> inputs_;
 };
 
 // General test parameters to be used with ops that take a single input tensor.
@@ -1711,12 +1711,12 @@ std::ostream& operator<<(std::ostream& os, const TestParamBase& p) {
 // Printing vector with the numbers of type T which defines tensor or shape.
 template <typename T>
 const std::string get_debug_string_for_vector(const std::vector<T>& vector,
-                                              absl::string_view pComment,
-                                              absl::string_view name,
-                                              absl::string_view type = "") {
-  const std::string t1 = absl::StrCat(pComment, name, " Dims(nbDims=");
-  const std::string t2 = absl::StrJoin(vector, ",");
-  const std::string t3 = type != "" ? absl::StrCat(") of type ", type) : ")";
+                                              abslx::string_view pComment,
+                                              abslx::string_view name,
+                                              abslx::string_view type = "") {
+  const std::string t1 = abslx::StrCat(pComment, name, " Dims(nbDims=");
+  const std::string t2 = abslx::StrJoin(vector, ",");
+  const std::string t3 = type != "" ? abslx::StrCat(") of type ", type) : ")";
   std::stringstream stream;
   stream << t1 << vector.size() << ", d=" << t2 << t3;
   return stream.str();
@@ -2219,7 +2219,7 @@ void TestConvertVariableV2(VariableOpConverterTest* test) {
     // Create node definition.
     NodeDef node_def;
     std::vector<int64_t> dims_64(p.dims.begin(), p.dims.end());
-    TensorShape shape = TensorShape(absl::Span<int64_t>(dims_64));
+    TensorShape shape = TensorShape(abslx::Span<int64_t>(dims_64));
     TF_CHECK_OK(NodeDefBuilder("my_var", "VariableV2")
                     .Attr("dtype", dtype)
                     .Attr("shape", shape)
@@ -7490,7 +7490,7 @@ TEST_P(OpConverter_FP32_FP16_INT32_Test, ConvertReduce) {
                                                expected_output_dims.end(), 0),
                                    expected_output_dims.end());
         VLOG(2) << "out dims "
-                << absl::StrCat("[", absl::StrJoin(expected_output_dims, ","),
+                << abslx::StrCat("[", abslx::StrJoin(expected_output_dims, ","),
                                 "]");
         std::vector<float> expected_values = CalcReduce(
             op.name, p.helper_array, p.stride, op.val_func, op.init_val);
@@ -7588,7 +7588,7 @@ auto get_concat_nodedef = [](DataType dtype, int num_inputs) -> NodeDef {
   }
   auto axis = ops::Placeholder(s.WithOpName("axis"), DT_INT32);
   auto concat = ops::Concat(s.WithOpName("my_concat"),
-                            absl::Span<const Input>(values), axis);
+                            abslx::Span<const Input>(values), axis);
   return concat.operation.node()->def();
 };
 
@@ -8114,7 +8114,7 @@ NodeDef GetPackNodeDef(DataType dtype, int num_inputs, int axis) {
   }
   // Pack op is renamed to Stack in APIs.
   auto pack =
-      ops::Stack(s.WithOpName("my_pack"), absl::Span<const Input>(values),
+      ops::Stack(s.WithOpName("my_pack"), abslx::Span<const Input>(values),
                  ops::Stack::Axis(axis));
   return pack.operation.node()->def();
 }

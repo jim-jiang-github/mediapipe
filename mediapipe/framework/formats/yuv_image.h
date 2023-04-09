@@ -57,9 +57,9 @@ namespace mediapipe {
 //   const size_t y_size = frame.linesize[0] * height;
 //   const size_t u_size = frame.linesize[1] * ((height + 1) / 2);
 //   const size_t v_size = frame.linesize[2] * ((height + 1) / 2);
-//   auto y = absl::make_unique<uint8[]> y(y_size);
-//   auto u = absl::make_unique<uint8[]> u(u_size);
-//   auto v = absl::make_unique<uint8[]> v(v_size);
+//   auto y = abslx::make_unique<uint8[]> y(y_size);
+//   auto u = abslx::make_unique<uint8[]> u(u_size);
+//   auto v = abslx::make_unique<uint8[]> v(v_size);
 //   libyuv::I420Copy(frame.data[0], frame.linesize[0],
 //                    frame.data[1], frame.linesize[1],
 //                    frame.data[2], frame.linesize[2],

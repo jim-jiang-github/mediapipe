@@ -36,7 +36,7 @@
 
 #include "absl/base/internal/raw_logging.h"
 
-using absl::debugging_internal::AddressIsReadable;
+using abslx::debugging_internal::AddressIsReadable;
 
 #if defined(__linux__) && defined(__i386__)
 // Count "push %reg" instructions in VDSO __kernel_vsyscall(),
@@ -174,11 +174,11 @@ static void **NextStackFrame(void **old_fp, const void *uc) {
     static const unsigned char *kernel_vsyscall_address = nullptr;
     if (num_push_instructions == -1) {
 #ifdef ABSL_HAVE_VDSO_SUPPORT
-      absl::debugging_internal::VDSOSupport vdso;
+      abslx::debugging_internal::VDSOSupport vdso;
       if (vdso.IsPresent()) {
-        absl::debugging_internal::VDSOSupport::SymbolInfo
+        abslx::debugging_internal::VDSOSupport::SymbolInfo
             rt_sigreturn_symbol_info;
-        absl::debugging_internal::VDSOSupport::SymbolInfo vsyscall_symbol_info;
+        abslx::debugging_internal::VDSOSupport::SymbolInfo vsyscall_symbol_info;
         if (!vdso.LookupSymbol("__kernel_rt_sigreturn", "LINUX_2.5", STT_FUNC,
                                &rt_sigreturn_symbol_info) ||
             !vdso.LookupSymbol("__kernel_vsyscall", "LINUX_2.5", STT_FUNC,
@@ -333,7 +333,7 @@ static int UnwindImpl(void **result, int *sizes, int max_depth, int skip_count,
   return n;
 }
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace debugging_internal {
 bool StackTraceWorksForTest() {
@@ -341,6 +341,6 @@ bool StackTraceWorksForTest() {
 }
 }  // namespace debugging_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_DEBUGGING_INTERNAL_STACKTRACE_X86_INL_INC_

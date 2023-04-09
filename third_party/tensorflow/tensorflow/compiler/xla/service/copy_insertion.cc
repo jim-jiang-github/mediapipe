@@ -48,7 +48,7 @@ limitations under the License.
 namespace xla {
 namespace {
 
-using absl::StrAppend;
+using abslx::StrAppend;
 
 bool IsReadonlyEntryParameterValue(const HloValue& value) {
   const HloComputation* computation = value.defining_instruction()->parent();
@@ -485,10 +485,10 @@ class LiveRangeRegions {
   // The value-defining and value-use instructions do not have to belong to the
   // same computation, but the value use needs to be nested within the defining
   // computation.
-  typedef absl::flat_hash_map<HloInstruction*, InstructionInfo> InstructionMap;
+  typedef abslx::flat_hash_map<HloInstruction*, InstructionInfo> InstructionMap;
   typedef std::pair<HloInstruction*, InstructionInfo> InstructionEntry;
   // Map each computation to its immediately contained instructions.
-  typedef absl::flat_hash_map<const HloComputation*, InstructionMap>
+  typedef abslx::flat_hash_map<const HloComputation*, InstructionMap>
       ComputationMap;
 
   InstructionMap& operator[](const HloComputation* computation) {
@@ -528,7 +528,7 @@ class LiveRangeRegions {
 
  private:
   ComputationMap computation_map_;
-  absl::InlinedVector<const HloComputation*, 5> computation_vector_;
+  abslx::InlinedVector<const HloComputation*, 5> computation_vector_;
 };
 
 namespace {
@@ -568,7 +568,7 @@ class Relation {
       : intercept_def_use_(that.intercept_def_use_), orders_(that.orders_) {}
   bool operator==(const Relation& that) const {
     return intercept_def_use_ == that.intercept_def_use_ &&
-           absl::c_equal(orders_, that.orders_);
+           abslx::c_equal(orders_, that.orders_);
   }
 
   // Return whether the runtime ordering may imply interception, assuming it
@@ -600,7 +600,7 @@ class Relation {
   }
   // Return whether the current relation implies two overlapping regions.
   bool RuntimeOrderOverlap() const {
-    return absl::c_any_of(orders_, ImpliesOverlap);
+    return abslx::c_any_of(orders_, ImpliesOverlap);
   }
   bool RuntimeOrderIsUnordered() const {
     return orders_.size() == 1 && orders_[0] == kBeforeStartOrAfterEnd;
@@ -615,8 +615,8 @@ class Relation {
     return orders_.size() == 1 && orders_[0] == kAfterEnd;
   }
   std::string ToString() const {
-    return absl::StrCat("Interception = ", intercept_def_use_, ";",
-                        absl::StrJoin(orders_, ","));
+    return abslx::StrCat("Interception = ", intercept_def_use_, ";",
+                        abslx::StrJoin(orders_, ","));
   }
 
   static bool DefinitionImpliesInterception(RuntimeOrder definition) {
@@ -678,7 +678,7 @@ class Relation {
   // first region, if their buffers are combined.
   bool intercept_def_use_;
   // Remember the different runtime orderings of different instructions.
-  absl::InlinedVector<RuntimeOrder, 4> orders_;
+  abslx::InlinedVector<RuntimeOrder, 4> orders_;
 
   static RuntimeOrder Union(RuntimeOrder o1, RuntimeOrder o2) {
     return static_cast<Relation::RuntimeOrder>(o1 | o2);
@@ -853,7 +853,7 @@ class ComputeRelativeLocation {
   // Returns whether it is safe to force the desired_relation ordering between
   // all operations in unordered_ops and entry2. If safe, save the new enforced
   // ordering relations.
-  bool ForceRuntimeOrder(absl::Span<const InstructionEntry> unordered_ops,
+  bool ForceRuntimeOrder(abslx::Span<const InstructionEntry> unordered_ops,
                          const InstructionEntry entry2,
                          Relation::RuntimeOrder desired_relation) {
     if (unordered_ops.empty()) {
@@ -868,7 +868,7 @@ class ComputeRelativeLocation {
       if (in_place.empty()) {
         return false;
       }
-      return absl::c_any_of(
+      return abslx::c_any_of(
           in_place, [&](const std::pair<HloOperandIndex, ShapeIndex>&
                             operand_and_output_index) {
             auto* op2 =
@@ -1071,13 +1071,13 @@ class ComputeRelativeLocation {
         };
         if (!ctrl_deps_.empty()) {
           auto ctrl_deps = ctrl_deps_[instr1->parent()];
-          if (absl::c_any_of(ctrl_deps[instr2], [&](HloInstruction* pred2) {
+          if (abslx::c_any_of(ctrl_deps[instr2], [&](HloInstruction* pred2) {
                 return ControlDependenceBefore(instr1, pred2);
               })) {
             VLOG(2) << "control-dependent: " << instr1->ToString() << "\n";
             VLOG(2) << "vs " << instr2->ToString() << "\n";
             return Save(instr1, instr2, Relation::kBeforeStart);
-          } else if (absl::c_any_of(
+          } else if (abslx::c_any_of(
                          ctrl_deps[instr1], [&](HloInstruction* pred1) {
                            return ControlDependenceBefore(instr2, pred1);
                          })) {
@@ -1094,13 +1094,13 @@ class ComputeRelativeLocation {
   }
 
   HloOrdering* ordering_;
-  absl::flat_hash_map<
+  abslx::flat_hash_map<
       HloInstruction*,
-      absl::flat_hash_map<HloInstruction*, Relation::RuntimeOrder>>
+      abslx::flat_hash_map<HloInstruction*, Relation::RuntimeOrder>>
       saved_relations_;
-  absl::flat_hash_map<
+  abslx::flat_hash_map<
       HloComputation*,
-      absl::flat_hash_map<HloInstruction*, std::vector<HloInstruction*>>>
+      abslx::flat_hash_map<HloInstruction*, std::vector<HloInstruction*>>>
       ctrl_deps_;
 };
 }  // namespace
@@ -1149,7 +1149,7 @@ class CopyRemover {
     // Construct a list for each HLO buffer in the alias analysis. Maintain a
     // map from HloValue to the respective list element representing that
     // value. The map is used to construct the copy info map below.
-    absl::flat_hash_map<const HloValue*, ValueNode*> value_to_node;
+    abslx::flat_hash_map<const HloValue*, ValueNode*> value_to_node;
     // Perform check only if the default dependence-based ordering is used.
     for (const HloBuffer& buffer : alias_analysis.buffers()) {
       // No copies should have been inserted within fused computations, so no
@@ -1185,7 +1185,7 @@ class CopyRemover {
       }
 
       std::vector<const HloValue*> values = buffer.values();
-      absl::c_sort(values, [this](const HloValue* a, const HloValue* b) {
+      abslx::c_sort(values, [this](const HloValue* a, const HloValue* b) {
         return ordering_->IsDefinedBefore(*a, *b);
       });
 
@@ -1206,8 +1206,8 @@ class CopyRemover {
   // 'values' an entry is created in value_to_node which indicates the
   // respective ValueNode representing that value.
   void AddValueList(
-      absl::Span<const HloValue* const> values,
-      absl::flat_hash_map<const HloValue*, ValueNode*>* value_to_node) {
+      abslx::Span<const HloValue* const> values,
+      abslx::flat_hash_map<const HloValue*, ValueNode*>* value_to_node) {
     ValueNode* tail = nullptr;
     ValueNode* head = nullptr;
     for (const HloValue* value : values) {
@@ -1243,7 +1243,7 @@ class CopyRemover {
   // respective ValueNode.
   void CreateCopyMap(
       const HloModule& module,
-      const absl::flat_hash_map<const HloValue*, ValueNode*>& value_to_node) {
+      const abslx::flat_hash_map<const HloValue*, ValueNode*>& value_to_node) {
     for (HloComputation* computation : module.MakeNonfusionComputations()) {
       for (HloInstruction* instruction : computation->instructions()) {
         // Add copies with unambiguous source values to the map. Copies with
@@ -1538,7 +1538,7 @@ class CopyRemover {
     copy_value_node->next->prev = operand_node;
 
     // Patch up uses. Remove use of copy from operand_node uses.
-    auto it = absl::c_find_if(operand_node->uses, [copy_value_node](
+    auto it = abslx::c_find_if(operand_node->uses, [copy_value_node](
                                                       const HloUse* use) {
       return use->instruction == copy_value_node->value->defining_instruction();
     });
@@ -1725,7 +1725,7 @@ class CopyRemover {
   }
 
   std::string ToString() const {
-    std::string out = absl::StrCat("CopyRemover:\n");
+    std::string out = abslx::StrCat("CopyRemover:\n");
     StrAppend(&out, "  Def-use chains in each buffer:\n");
     for (const ValueNode* head : value_lists_) {
       StrAppend(&out, "    Buffer defined by ", head->value->ToShortString(),
@@ -1733,7 +1733,7 @@ class CopyRemover {
       const ValueNode* p = head;
       do {
         StrAppend(&out, "      ", p->value->ToShortString(), ", uses: ",
-                  absl::StrJoin(p->uses, "; ",
+                  abslx::StrJoin(p->uses, "; ",
                                 [](std::string* s, const HloUse* use) {
                                   StrAppend(s, use->ToString());
                                 }),
@@ -1761,7 +1761,7 @@ class CopyRemover {
   // The heads of all the value lists. Each value list represents the HLO
   // values contained in a particular HLO buffer. The values in the list are
   // in dependency order.
-  absl::flat_hash_set<const ValueNode*> value_lists_;
+  abslx::flat_hash_set<const ValueNode*> value_lists_;
 
   // Copy removal requires fast access to the value list elements
   // corresponding to the source and destination values of the kCopy
@@ -1772,7 +1772,7 @@ class CopyRemover {
     ValueNode* src = nullptr;
     ValueNode* dest = nullptr;
   };
-  absl::flat_hash_map<const HloInstruction*, CopyNodes> copy_map_;
+  abslx::flat_hash_map<const HloInstruction*, CopyNodes> copy_map_;
 };
 
 }  // namespace
@@ -1812,7 +1812,7 @@ Status CopyInsertion::AddCopiesForConditional(
 // instructions which have update-in-place semantics.
 Status CopyInsertion::AddCopiesToResolveInterference(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   TF_ASSIGN_OR_RETURN(std::unique_ptr<HloAliasAnalysis> alias_analysis,
                       HloAliasAnalysis::Run(module, can_share_buffer_));
   for (HloComputation* computation :
@@ -1828,7 +1828,7 @@ Status CopyInsertion::AddCopiesToResolveInterference(
         // When an operand is a tuple, we avoid copying the operand multiple
         // times by recording and checking the operand number of operands that
         // have been copied.
-        absl::flat_hash_set<int64_t> copied_operands;
+        abslx::flat_hash_set<int64_t> copied_operands;
         for (const auto& operand_and_output_index :
              HloDataflowAnalysis::GetInPlaceInputOutputPairs(instruction)) {
           const HloOperandIndex& operand_index = operand_and_output_index.first;
@@ -1849,14 +1849,14 @@ Status CopyInsertion::AddCopiesToResolveInterference(
 
 Status CopyInsertion::AddSpecialCaseCopies(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   std::unique_ptr<CallGraph> call_graph = CallGraph::Build(module);
   return AddSpecialCaseCopies(*call_graph, execution_threads, module);
 }
 
 Status CopyInsertion::AddSpecialCaseCopies(
     const CallGraph& call_graph,
-    const absl::flat_hash_set<absl::string_view>& execution_threads,
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads,
     HloModule* module) {
   TF_ASSIGN_OR_RETURN(std::unique_ptr<HloAliasAnalysis> alias_analysis,
                       HloAliasAnalysis::Run(module, can_share_buffer_));
@@ -1937,7 +1937,7 @@ Status CopyInsertion::AddSpecialCaseCopies(
     HloInstruction* root = computation->root_instruction();
 
     // Mark nondistinct/ambiguous indices.
-    absl::flat_hash_map<const HloBuffer*, ShapeIndex> seen;
+    abslx::flat_hash_map<const HloBuffer*, ShapeIndex> seen;
     ShapeUtil::ForEachSubshape(
         root->shape(), [&](const Shape& /*subshape*/, const ShapeIndex& index) {
           std::vector<const HloBuffer*> buffers_at_index =
@@ -2009,7 +2009,7 @@ Status CopyInsertion::AddSpecialCaseCopies(
 
 static int64_t GetNumExistingCopies(
     const HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   int64_t num_existing_copies = 0;
   for (HloComputation* computation : module->computations(execution_threads)) {
     for (HloInstruction* instruction : computation->instructions()) {
@@ -2023,7 +2023,7 @@ static int64_t GetNumExistingCopies(
 
 Status CopyInsertion::RemoveUnnecessaryCopies(
     HloOrdering* ordering, HloModule* module, bool check_live_range_ordering,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   XLA_VLOG_LINES(4, module->ToString());
   TF_ASSIGN_OR_RETURN(std::unique_ptr<HloAliasAnalysis> alias_analysis,
                       HloAliasAnalysis::Run(module, can_share_buffer_));
@@ -2088,7 +2088,7 @@ Status CopyInsertion::RemoveUnnecessaryCopies(
 
 StatusOr<bool> CopyInsertion::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   // Copy insertion is performed in three steps:
   //
   // (1) Add copies conservatively to guarantee that there is no live-range

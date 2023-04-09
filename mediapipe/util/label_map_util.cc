@@ -25,14 +25,14 @@
 
 namespace mediapipe {
 
-absl::StatusOr<proto_ns::Map<int64, LabelMapItem>> BuildLabelMapFromFiles(
-    absl::string_view labels_file_contents,
-    absl::string_view display_names_file) {
+abslx::StatusOr<proto_ns::Map<int64, LabelMapItem>> BuildLabelMapFromFiles(
+    abslx::string_view labels_file_contents,
+    abslx::string_view display_names_file) {
   if (labels_file_contents.empty()) {
-    return absl::InvalidArgumentError("Expected non-empty labels file.");
+    return abslx::InvalidArgumentError("Expected non-empty labels file.");
   }
-  std::vector<absl::string_view> labels =
-      absl::StrSplit(labels_file_contents, '\n');
+  std::vector<abslx::string_view> labels =
+      abslx::StrSplit(labels_file_contents, '\n');
   // In most cases, there is an empty line (i.e. newline character) at the end
   // of the file that needs to be ignored. In such a situation, StrSplit() will
   // produce a vector with an empty string as final element. Also note that in
@@ -53,14 +53,14 @@ absl::StatusOr<proto_ns::Map<int64, LabelMapItem>> BuildLabelMapFromFiles(
 
   if (!display_names_file.empty()) {
     std::vector<std::string> display_names =
-        absl::StrSplit(display_names_file, '\n');
+        abslx::StrSplit(display_names_file, '\n');
     // In most cases, there is an empty line (i.e. newline character) at the end
     // of the file that needs to be ignored. See above.
     if (display_names[display_names.size() - 1].empty()) {
       display_names.pop_back();
     }
     if (display_names.size() != labels.size()) {
-      return absl::InvalidArgumentError(absl::StrFormat(
+      return abslx::InvalidArgumentError(abslx::StrFormat(
           "Mismatch between number of labels (%d) and display names (%d).",
           labels.size(), display_names.size()));
     }

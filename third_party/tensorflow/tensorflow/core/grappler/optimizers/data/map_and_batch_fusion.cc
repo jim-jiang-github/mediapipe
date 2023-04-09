@@ -111,7 +111,7 @@ Status MapAndBatchFusion::OptimizeAndCollectStats(Cluster* cluster,
                                                   OptimizationStats* stats) {
   *output = item.graph;
   MutableGraphView graph(output);
-  absl::flat_hash_set<string> nodes_to_delete;
+  abslx::flat_hash_set<string> nodes_to_delete;
   for (const NodeDef& node : item.graph.node()) {
     if (node.op() != "BatchDataset" && node.op() != "BatchDatasetV2") {
       continue;

@@ -39,8 +39,8 @@ class RecordableQueue {
   RecordableQueue& operator=(const RecordableQueue&) = delete;
 
   virtual bool IsSupported() const { return false; }
-  virtual absl::Status Execute(CLCommandQueue* queue) const {
-    return absl::UnimplementedError("");
+  virtual abslx::Status Execute(CLCommandQueue* queue) const {
+    return abslx::UnimplementedError("");
   }
 };
 

@@ -105,14 +105,14 @@ port::StatusOr<cublasLtEpilogue_t> AsCublasLtEpilogue(
 #if CUDA_VERSION >= 11040
       return CUBLASLT_EPILOGUE_GELU;
 #else
-      return port::InternalError(absl::StrCat(
+      return port::InternalError(abslx::StrCat(
           "CUBLASLT_EPILOGUE_GELU epilog requires cublasLt >= 11.4"));
 #endif
     case BlasLt::Epilogue::kBiasThenGeLUApproximate:
 #if CUDA_VERSION >= 11040
       return CUBLASLT_EPILOGUE_GELU_BIAS;
 #else
-      return port::InternalError(absl::StrCat(
+      return port::InternalError(abslx::StrCat(
           "CUBLASLT_EPILOGUE_GELU_BIAS epilog requires cublasLt >= 11.4"));
 #endif
   }
@@ -123,7 +123,7 @@ port::StatusOr<cublasLtEpilogue_t> AsCublasLtEpilogue(
 port::Status BlasLt::Init() {
   cublasLtHandle_t blas_lt;
   SE_CUBLAS_RETURN_IF_ERROR(cublasLtCreate(&blas_lt));
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   blas_lt_.reset(blas_lt);
   return port::Status::OK();
 }
@@ -230,7 +230,7 @@ BlasLt::GetMatmulAlgorithms(const BlasLt::MatmulPlan& plan,
   max_algorithm_count = std::min(max_algorithm_count, size_t{INT_MAX});
   std::vector<cublasLtMatmulHeuristicResult_t> results(max_algorithm_count);
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     TF_RET_CHECK(blas_lt_ != nullptr);
 
     gpu::ScopedActivateExecutorContext sac{parent_};
@@ -278,7 +278,7 @@ port::Status BlasLt::DoMatmul(Stream* stream, const BlasLt::MatmulPlan& plan,
   }
 
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     TF_RET_CHECK(blas_lt_ != nullptr);
     // We must set the bias pointer while holding the mutex, to avoid a
     // potential race condition from multiple threads sharing the same plan.

@@ -32,7 +32,7 @@ namespace tpu {
 
 using BufferDeallocator = std::function<void(void*)>;
 using OwnedDataPtr = std::unique_ptr<uint8_t[], BufferDeallocator>;
-using BufferAllocator = absl::FunctionRef<OwnedDataPtr(size_t)>;
+using BufferAllocator = abslx::FunctionRef<OwnedDataPtr(size_t)>;
 
 inline OwnedDataPtr DefaultAllocator(size_t size) {
   return {static_cast<uint8_t*>(malloc(size)), free};
@@ -88,18 +88,18 @@ class NoncopyableBuffer {
   // Ensure that the buffer owns the data and returns a mutable view into the
   // owned data for modification.
   template <typename T>
-  absl::Span<T> mutable_data() {
+  abslx::Span<T> mutable_data() {
     static_assert(std::is_arithmetic<T>::value, "Must be arithmetic type.");
     EnsureDataOwned();
     DCHECK_EQ(size_ % sizeof(T), 0);
-    return absl::Span<T>(reinterpret_cast<T*>(data_.get()), size_ / sizeof(T));
+    return abslx::Span<T>(reinterpret_cast<T*>(data_.get()), size_ / sizeof(T));
   }
 
   template <typename T>
-  absl::Span<const T> const_data() const {
+  abslx::Span<const T> const_data() const {
     static_assert(std::is_arithmetic<T>::value, "Must be arithmetic type.");
     DCHECK_EQ(size_ % sizeof(T), 0);
-    return absl::Span<const T>(static_cast<const T*>(buf_), size_ / sizeof(T));
+    return abslx::Span<const T>(static_cast<const T*>(buf_), size_ / sizeof(T));
   }
   // Clone the content to a given buffer.
   void CloneTo(void* buf) { memcpy(buf, buf_, size_); }

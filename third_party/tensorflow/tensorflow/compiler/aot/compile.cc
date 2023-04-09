@@ -119,7 +119,7 @@ Status CompileGraph(GraphDef graph_def, const tf2xla::Config& config,
   bool use_mlir_hlo_lowering = false;
   bool use_mlir_bridge = false;
   if (!flags.mlir_components.empty() && flags.mlir_components != "None") {
-    for (auto component : absl::StrSplit(flags.mlir_components, ',')) {
+    for (auto component : abslx::StrSplit(flags.mlir_components, ',')) {
       if (component == "Bridge") {
         use_mlir_bridge = true;
       } else if (component == "HloLowering") {
@@ -148,12 +148,12 @@ Status CompileGraph(GraphDef graph_def, const tf2xla::Config& config,
     // Serialize the HloSnapshot deterministically so that all the outputs of a
     // tf_library genrule are deterministic.
     const size_t size = module->ByteSizeLong();
-    auto serialized = absl::make_unique<char[]>(size);
+    auto serialized = abslx::make_unique<char[]>(size);
     TF_RET_CHECK(
         SerializeToBufferDeterministic(*module, serialized.get(), size));
     TF_RETURN_IF_ERROR(
         WriteStringToFile(Env::Default(), flags.out_session_module,
-                          absl::string_view(serialized.get(), size)));
+                          abslx::string_view(serialized.get(), size)));
   }
   xla::cpu::CpuAotCompilationOptions aot_opts(
       flags.target_triple, flags.target_cpu, flags.target_features,
@@ -163,22 +163,22 @@ Status CompileGraph(GraphDef graph_def, const tf2xla::Config& config,
 
   if (flags.sanitize_dataflow) {
     aot_opts.set_sanitize_dataflow(flags.sanitize_dataflow);
-    aot_opts.set_sanitize_abilists_dataflow(absl::StrSplit(
-        flags.sanitize_abilists_dataflow, ',', absl::SkipEmpty()));
+    aot_opts.set_sanitize_abilists_dataflow(abslx::StrSplit(
+        flags.sanitize_abilists_dataflow, ',', abslx::SkipEmpty()));
   }
 
   return CompileXla(client, computation, aot_opts, compile_result);
 }
 
 static Status ReadProtoFile(const string& fname, protobuf::Message* proto) {
-  if (absl::EndsWith(fname, ".pbtxt")) {
+  if (abslx::EndsWith(fname, ".pbtxt")) {
     return ReadTextProto(Env::Default(), fname, proto);
   } else {
     return ReadBinaryProto(Env::Default(), fname, proto);
   }
 }
 
-static absl::once_flag targets_init;
+static abslx::once_flag targets_init;
 
 static void InitializeTargets() {
   // Initialize all LLVM targets so we can cross compile.
@@ -226,7 +226,7 @@ static std::string InterpolateErrorMessage(std::string message) {
 }
 
 Status Main(const MainFlags& flags) {
-  absl::call_once(targets_init, &InitializeTargets);
+  abslx::call_once(targets_init, &InitializeTargets);
 
   // Process config.
   tf2xla::Config config;
@@ -240,7 +240,7 @@ Status Main(const MainFlags& flags) {
     for (const tf2xla::Fetch& fetch : config.fetch()) {
       nodes.insert(fetch.id().node_name());
     }
-    std::cout << absl::StrJoin(nodes, ",");
+    std::cout << abslx::StrJoin(nodes, ",");
     return OkStatus();
   }
 
@@ -264,7 +264,7 @@ Status Main(const MainFlags& flags) {
   const std::vector<char>& obj = compile_result.aot->object_file_data();
   TF_RETURN_IF_ERROR(
       WriteStringToFile(env, flags.out_function_object,
-                        absl::string_view(obj.data(), obj.size())));
+                        abslx::string_view(obj.data(), obj.size())));
   CodegenOpts codegen_opts;
   codegen_opts.gen_name_to_index = flags.gen_name_to_index;
   codegen_opts.gen_program_shape = flags.gen_program_shape;

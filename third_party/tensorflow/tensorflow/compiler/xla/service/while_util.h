@@ -61,7 +61,7 @@ class WhileUtil {
   //   that contains `while_instr`.
   static StatusOr<MakeInstructionsLiveInResult> MakeInstructionsLiveIn(
       HloInstruction* while_instr,
-      absl::Span<HloInstruction* const> instructions);
+      abslx::Span<HloInstruction* const> instructions);
 
   using LoopStateTy = std::vector<HloInstruction*>;
   using LoopBodyGeneratorTy = std::function<StatusOr<LoopStateTy>(
@@ -109,7 +109,7 @@ class WhileUtil {
   // `while_conditional` that access elements in the parameter tuple. Assumes
   // `while_conditional` is the conditional computation of the while loop in
   // question.
-  static absl::flat_hash_map<int64_t, absl::InlinedVector<HloInstruction*, 1>>
+  static abslx::flat_hash_map<int64_t, abslx::InlinedVector<HloInstruction*, 1>>
   GetGTEsMapForWhileConditional(const HloComputation& while_conditional);
 };
 }  // namespace xla

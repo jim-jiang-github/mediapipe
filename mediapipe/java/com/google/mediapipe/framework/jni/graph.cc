@@ -148,7 +148,7 @@ Graph::~Graph() {
 }
 
 int64_t Graph::WrapPacketIntoContext(const Packet& packet) {
-  absl::MutexLock lock(&all_packets_mutex_);
+  abslx::MutexLock lock(&all_packets_mutex_);
   auto packet_context = new internal::PacketWithContext(this, packet);
   // Since the value of the all_packets_ map is a unique_ptr, resets it with the
   // new allocated object.
@@ -176,16 +176,16 @@ bool Graph::RemovePacket(int64_t packet_handle) {
   internal::PacketWithContext* packet_with_context =
       reinterpret_cast<internal::PacketWithContext*>(packet_handle);
   Graph* context = packet_with_context->GetContext();
-  absl::MutexLock lock(&(context->all_packets_mutex_));
+  abslx::MutexLock lock(&(context->all_packets_mutex_));
   return context->all_packets_.erase(packet_with_context) != 0;
 }
 
 void Graph::EnsureMinimumExecutorStackSizeForJava() {}
 
-absl::Status Graph::AddCallbackHandler(std::string output_stream_name,
+abslx::Status Graph::AddCallbackHandler(std::string output_stream_name,
                                        jobject java_callback) {
   if (!graph_config()) {
-    return absl::InternalError("Graph is not loaded!");
+    return abslx::InternalError("Graph is not loaded!");
   }
   std::unique_ptr<internal::CallbackHandler> handler(
       new internal::CallbackHandler(this, java_callback));
@@ -198,23 +198,23 @@ absl::Status Graph::AddCallbackHandler(std::string output_stream_name,
       side_packet_name, MakePacket<std::function<void(const Packet&)>>(
                             handler->CreateCallback()));
   callback_handlers_.emplace_back(std::move(handler));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Graph::AddMultiStreamCallbackHandler(
+abslx::Status Graph::AddMultiStreamCallbackHandler(
     std::vector<std::string> output_stream_names, jobject java_callback,
     bool observe_timestamp_bounds) {
   if (!graph_config()) {
-    return absl::InternalError("Graph is not loaded!");
+    return abslx::InternalError("Graph is not loaded!");
   }
   auto handler =
-      absl::make_unique<internal::CallbackHandler>(this, java_callback);
+      abslx::make_unique<internal::CallbackHandler>(this, java_callback);
   tool::AddMultiStreamCallback(
       output_stream_names, handler->CreatePacketListCallback(), graph_config(),
       &side_packets_, observe_timestamp_bounds);
   EnsureMinimumExecutorStackSizeForJava();
   callback_handlers_.emplace_back(std::move(handler));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 int64_t Graph::AddSurfaceOutput(const std::string& output_stream_name) {
@@ -228,15 +228,15 @@ int64_t Graph::AddSurfaceOutput(const std::string& output_stream_name) {
 #else
   CalculatorGraphConfig::Node* sink_node = graph_config()->add_node();
   sink_node->set_name(mediapipe::tool::GetUnusedNodeName(
-      *graph_config(), absl::StrCat("egl_surface_sink_", output_stream_name)));
+      *graph_config(), abslx::StrCat("egl_surface_sink_", output_stream_name)));
   sink_node->set_calculator("GlSurfaceSinkCalculator");
   sink_node->add_input_stream(output_stream_name);
 
   const std::string input_side_packet_name =
       mediapipe::tool::GetUnusedSidePacketName(
-          *graph_config(), absl::StrCat(output_stream_name, "_surface"));
+          *graph_config(), abslx::StrCat(output_stream_name, "_surface"));
   sink_node->add_input_side_packet(
-      absl::StrCat("SURFACE:", input_side_packet_name));
+      abslx::StrCat("SURFACE:", input_side_packet_name));
 
   auto it_inserted = output_surface_side_packets_.emplace(
       input_side_packet_name,
@@ -246,9 +246,9 @@ int64_t Graph::AddSurfaceOutput(const std::string& output_stream_name) {
 #endif  // MEDIAPIPE_DISABLE_GPU
 }
 
-absl::Status Graph::LoadBinaryGraph(std::string path_to_graph) {
+abslx::Status Graph::LoadBinaryGraph(std::string path_to_graph) {
   std::string graph_config_string;
-  absl::Status status =
+  abslx::Status status =
       mediapipe::file::GetContents(path_to_graph, &graph_config_string);
   if (!status.ok()) {
     return status;
@@ -257,39 +257,39 @@ absl::Status Graph::LoadBinaryGraph(std::string path_to_graph) {
                          graph_config_string.length());
 }
 
-absl::Status Graph::LoadBinaryGraph(const char* data, int size) {
+abslx::Status Graph::LoadBinaryGraph(const char* data, int size) {
   CalculatorGraphConfig graph_config;
   if (!graph_config.ParseFromArray(data, size)) {
-    return absl::InvalidArgumentError("Failed to parse the graph");
+    return abslx::InvalidArgumentError("Failed to parse the graph");
   }
   graph_configs_.push_back(graph_config);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Graph::LoadBinaryGraphTemplate(const char* data, int size) {
+abslx::Status Graph::LoadBinaryGraphTemplate(const char* data, int size) {
   CalculatorGraphTemplate graph_template;
   if (!graph_template.ParseFromArray(data, size)) {
-    return absl::InvalidArgumentError("Failed to parse the graph");
+    return abslx::InvalidArgumentError("Failed to parse the graph");
   }
   graph_templates_.push_back(graph_template);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Graph::SetGraphType(std::string graph_type) {
+abslx::Status Graph::SetGraphType(std::string graph_type) {
   graph_type_ = graph_type;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Graph::SetGraphOptions(const char* data, int size) {
+abslx::Status Graph::SetGraphOptions(const char* data, int size) {
   if (!graph_options_.ParseFromArray(data, size)) {
-    return absl::InvalidArgumentError("Failed to parse the graph");
+    return abslx::InvalidArgumentError("Failed to parse the graph");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 CalculatorGraphConfig Graph::GetCalculatorGraphConfig() {
   CalculatorGraph temp_graph;
-  absl::Status status = InitializeGraph(&temp_graph);
+  abslx::Status status = InitializeGraph(&temp_graph);
   if (!status.ok()) {
     LOG(ERROR) << "GetCalculatorGraphConfig failed:\n" << status.message();
   }
@@ -308,7 +308,7 @@ void Graph::CallbackToJava(JNIEnv* env, jobject java_callback_obj,
 
   jmethodID processMethod =
       env->GetMethodID(callback_cls, process_method_name.c_str(),
-                       absl::StrFormat("(L%s;)V", packet_class_name).c_str());
+                       abslx::StrFormat("(L%s;)V", packet_class_name).c_str());
 
   int64_t packet_handle = WrapPacketIntoContext(packet);
   // Creates a Java Packet.
@@ -337,7 +337,7 @@ void Graph::CallbackToJava(JNIEnv* env, jobject java_callback_obj,
 
   jmethodID processMethod = env->GetMethodID(
       callback_cls, process_method_name.c_str(),
-      absl::StrFormat("(L%s;L%s;)V", packet_class_name, packet_class_name)
+      abslx::StrFormat("(L%s;L%s;)V", packet_class_name, packet_class_name)
           .c_str());
 
   int64_t packet_handle = WrapPacketIntoContext(packet);
@@ -407,14 +407,14 @@ void Graph::SetPacketJavaClass(JNIEnv* env) {
   }
 }
 
-absl::Status Graph::RunGraphUntilClose(JNIEnv* env) {
+abslx::Status Graph::RunGraphUntilClose(JNIEnv* env) {
   // Get a global reference to the packet class, so it can be used in other
   // native thread for call back.
   SetPacketJavaClass(env);
   // Running as a synchronized mode, the same Java thread is available through
   // out the run.
   CalculatorGraph calculator_graph;
-  absl::Status status = InitializeGraph(&calculator_graph);
+  abslx::Status status = InitializeGraph(&calculator_graph);
   if (!status.ok()) {
     LOG(ERROR) << status.message();
     running_graph_.reset(nullptr);
@@ -427,9 +427,9 @@ absl::Status Graph::RunGraphUntilClose(JNIEnv* env) {
   return status;
 }
 
-absl::Status Graph::StartRunningGraph(JNIEnv* env) {
+abslx::Status Graph::StartRunningGraph(JNIEnv* env) {
   if (running_graph_) {
-    return absl::InternalError("Graph is already running.");
+    return abslx::InternalError("Graph is already running.");
   }
   // Get a global reference to the packet class, so it can be used in other
   // native thread for call back.
@@ -445,7 +445,7 @@ absl::Status Graph::StartRunningGraph(JNIEnv* env) {
       LOG(INFO) << name;
     }
   }
-  absl::Status status;
+  abslx::Status status;
 #if !MEDIAPIPE_DISABLE_GPU
   if (gpu_resources_) {
     status = running_graph_->SetGpuResources(gpu_resources_);
@@ -481,10 +481,10 @@ absl::Status Graph::StartRunningGraph(JNIEnv* env) {
     running_graph_.reset(nullptr);
     return status;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Graph::SetTimestampAndMovePacketToInputStream(
+abslx::Status Graph::SetTimestampAndMovePacketToInputStream(
     const std::string& stream_name, int64_t packet_handle, int64_t timestamp) {
   internal::PacketWithContext* packet_with_context =
       reinterpret_cast<internal::PacketWithContext*>(packet_handle);
@@ -498,60 +498,60 @@ absl::Status Graph::SetTimestampAndMovePacketToInputStream(
   return AddPacketToInputStream(stream_name, std::move(packet));
 }
 
-absl::Status Graph::AddPacketToInputStream(const std::string& stream_name,
+abslx::Status Graph::AddPacketToInputStream(const std::string& stream_name,
                                            const Packet& packet) {
   if (!running_graph_) {
-    return absl::FailedPreconditionError("Graph must be running.");
+    return abslx::FailedPreconditionError("Graph must be running.");
   }
 
   return running_graph_->AddPacketToInputStream(stream_name, packet);
 }
 
-absl::Status Graph::AddPacketToInputStream(const std::string& stream_name,
+abslx::Status Graph::AddPacketToInputStream(const std::string& stream_name,
                                            Packet&& packet) {
   if (!running_graph_) {
-    return absl::FailedPreconditionError("Graph must be running.");
+    return abslx::FailedPreconditionError("Graph must be running.");
   }
 
   return running_graph_->AddPacketToInputStream(stream_name, std::move(packet));
 }
 
-absl::Status Graph::CloseInputStream(std::string stream_name) {
+abslx::Status Graph::CloseInputStream(std::string stream_name) {
   if (!running_graph_) {
-    return absl::FailedPreconditionError("Graph must be running.");
+    return abslx::FailedPreconditionError("Graph must be running.");
   }
   LOG(INFO) << "Close input stream: " << stream_name;
   return running_graph_->CloseInputStream(stream_name);
 }
 
-absl::Status Graph::CloseAllInputStreams() {
+abslx::Status Graph::CloseAllInputStreams() {
   LOG(INFO) << "Close all input streams.";
   if (!running_graph_) {
-    return absl::FailedPreconditionError("Graph must be running.");
+    return abslx::FailedPreconditionError("Graph must be running.");
   }
   return running_graph_->CloseAllInputStreams();
 }
 
-absl::Status Graph::CloseAllPacketSources() {
+abslx::Status Graph::CloseAllPacketSources() {
   LOG(INFO) << "Close all input streams.";
   if (!running_graph_) {
-    return absl::FailedPreconditionError("Graph must be running.");
+    return abslx::FailedPreconditionError("Graph must be running.");
   }
   return running_graph_->CloseAllPacketSources();
 }
 
-absl::Status Graph::WaitUntilDone(JNIEnv* env) {
+abslx::Status Graph::WaitUntilDone(JNIEnv* env) {
   if (!running_graph_) {
-    return absl::FailedPreconditionError("Graph must be running.");
+    return abslx::FailedPreconditionError("Graph must be running.");
   }
-  absl::Status status = running_graph_->WaitUntilDone();
+  abslx::Status status = running_graph_->WaitUntilDone();
   running_graph_.reset(nullptr);
   return status;
 }
 
-absl::Status Graph::WaitUntilIdle(JNIEnv* env) {
+abslx::Status Graph::WaitUntilIdle(JNIEnv* env) {
   if (!running_graph_) {
-    return absl::FailedPreconditionError("Graph must be running.");
+    return abslx::FailedPreconditionError("Graph must be running.");
   }
   return running_graph_->WaitUntilIdle();
 }
@@ -578,12 +578,12 @@ mediapipe::GpuResources* Graph::GetGpuResources() const {
 }
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-absl::Status Graph::SetParentGlContext(int64 java_gl_context) {
+abslx::Status Graph::SetParentGlContext(int64 java_gl_context) {
 #if MEDIAPIPE_DISABLE_GPU
   LOG(FATAL) << "GPU support has been disabled in this build!";
 #else
   if (gpu_resources_) {
-    return absl::AlreadyExistsError(
+    return abslx::AlreadyExistsError(
         "trying to set the parent GL context, but the gpu shared "
         "data has already been set up.");
   }
@@ -591,7 +591,7 @@ absl::Status Graph::SetParentGlContext(int64 java_gl_context) {
                    mediapipe::GpuResources::Create(
                        reinterpret_cast<EGLContext>(java_gl_context)));
 #endif  // MEDIAPIPE_DISABLE_GPU
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void Graph::SetServicePacket(const GraphServiceBase& service, Packet packet) {
@@ -650,7 +650,7 @@ std::string Graph::graph_type() {
   return "";
 }
 
-absl::Status Graph::InitializeGraph(CalculatorGraph* graph) {
+abslx::Status Graph::InitializeGraph(CalculatorGraph* graph) {
   if (graph_configs_.size() == 1 && graph_templates_.empty()) {
     return graph->Initialize(*graph_config());
   } else {

@@ -42,17 +42,17 @@ limitations under the License.
 
 namespace pybind11 {
 namespace detail {
-// Convert between absl::optional and python.
+// Convert between abslx::optional and python.
 //
-// pybind11 supports std::optional, and absl::optional is meant to be a
+// pybind11 supports std::optional, and abslx::optional is meant to be a
 // drop-in replacement for std::optional, so we can just use the built in
 // implementation.
 #ifndef ABSL_USES_STD_OPTIONAL
 template <typename T>
-struct type_caster<absl::optional<T>>
-    : public optional_caster<absl::optional<T>> {};
+struct type_caster<abslx::optional<T>>
+    : public optional_caster<abslx::optional<T>> {};
 template <>
-struct type_caster<absl::nullopt_t> : public void_caster<absl::nullopt_t> {};
+struct type_caster<abslx::nullopt_t> : public void_caster<abslx::nullopt_t> {};
 #endif
 
 }  // namespace detail
@@ -196,7 +196,7 @@ PYBIND11_MODULE(_pywrap_tf_session, m) {
       "TF_GraphToFunction_wrapper",
       [](const TF_Graph* fn_body, const char* fn_name,
          bool append_hash_to_fn_name,
-         absl::optional<std::vector<TF_Operation*>> opers_opt,
+         abslx::optional<std::vector<TF_Operation*>> opers_opt,
          const std::vector<TF_Output>& inputs,
          const std::vector<TF_Output>& outputs,
          const std::vector<py::bytes> output_names,
@@ -274,7 +274,7 @@ PYBIND11_MODULE(_pywrap_tf_session, m) {
 
   m.def("TF_GraphSetOutputHandleShapesAndTypes_wrapper",
         [](TF_Graph* graph, TF_Output output,
-           const std::vector<absl::optional<std::vector<int64_t>>>& shapes,
+           const std::vector<abslx::optional<std::vector<int64_t>>>& shapes,
            const std::vector<int>& ranks, py::handle& types) {
           tensorflow::Safe_TF_StatusPtr status =
               tensorflow::make_safe(TF_NewStatus());

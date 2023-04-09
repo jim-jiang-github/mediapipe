@@ -48,17 +48,17 @@ class CLKernel {
 
   cl_kernel kernel() const { return kernel_; }
 
-  absl::Status CreateFromProgram(const CLProgram& program,
+  abslx::Status CreateFromProgram(const CLProgram& program,
                                  const std::string& function_name);
 
-  absl::Status SetMemory(int index, cl_mem memory);
-  absl::Status SetMemoryAuto(cl_mem memory);
+  abslx::Status SetMemory(int index, cl_mem memory);
+  abslx::Status SetMemoryAuto(cl_mem memory);
   template <typename T>
-  absl::Status SetBytes(int index, const T& value) const {
+  abslx::Status SetBytes(int index, const T& value) const {
     return SetBytes(index, static_cast<const void*>(&value), sizeof(T));
   }
   template <typename T>
-  absl::Status SetBytesAuto(const T& value) {
+  abslx::Status SetBytesAuto(const T& value) {
     return SetBytesAuto(static_cast<const void*>(&value), sizeof(T));
   }
 
@@ -67,14 +67,14 @@ class CLKernel {
 
   // Do not use this function
   // workaround for Mali memory leak
-  absl::Status ReInit() const;
+  abslx::Status ReInit() const;
 
   KernelInfo info_;
 
  private:
   void Release();
-  absl::Status SetBytes(int index, const void* ptr, int length) const;
-  absl::Status SetBytesAuto(const void* ptr, int length);
+  abslx::Status SetBytes(int index, const void* ptr, int length) const;
+  abslx::Status SetBytesAuto(const void* ptr, int length);
 
   int binding_counter_ = -1;
 

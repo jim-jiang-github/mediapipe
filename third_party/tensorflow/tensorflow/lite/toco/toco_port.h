@@ -82,7 +82,7 @@ tensorflow::Status Exists(const std::string& filename, const Options& options);
 
 // Copy `src` string to `dest`. User must ensure `dest` has enough space.
 #if defined(PLATFORM_GOOGLE)
-void CopyToBuffer(const ::absl::Cord& src, char* dest);
+void CopyToBuffer(const ::abslx::Cord& src, char* dest);
 #endif  // PLATFORM_GOOGLE
 void CopyToBuffer(const std::string& src, char* dest);
 

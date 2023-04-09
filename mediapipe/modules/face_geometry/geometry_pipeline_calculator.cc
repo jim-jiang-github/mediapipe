@@ -72,7 +72,7 @@ static constexpr char kMultiFaceLandmarksTag[] = "MULTI_FACE_LANDMARKS";
 //
 class GeometryPipelineCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->InputSidePackets()
         .Tag(kEnvironmentTag)
         .Set<face_geometry::Environment>();
@@ -84,10 +84,10 @@ class GeometryPipelineCalculator : public CalculatorBase {
         .Tag(kMultiFaceGeometryTag)
         .Set<std::vector<face_geometry::FaceGeometry>>();
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(mediapipe::TimestampDiff(0));
 
 #if 1
@@ -133,16 +133,16 @@ class GeometryPipelineCalculator : public CalculatorBase {
         face_geometry::CreateGeometryPipeline(environment, metadata),
         _ << "Failed to create a geometry pipeline!");
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     // Both the `IMAGE_SIZE` and the `MULTI_FACE_LANDMARKS` streams are required
     // to have a non-empty packet. In case this requirement is not met, there's
     // nothing to be processed at the current timestamp.
     if (cc->Inputs().Tag(kImageSizeTag).IsEmpty() ||
         cc->Inputs().Tag(kMultiFaceLandmarksTag).IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     const auto& image_size =
@@ -153,7 +153,7 @@ class GeometryPipelineCalculator : public CalculatorBase {
             .Get<std::vector<NormalizedLandmarkList>>();
 
     auto multi_face_geometry =
-        absl::make_unique<std::vector<face_geometry::FaceGeometry>>();
+        abslx::make_unique<std::vector<face_geometry::FaceGeometry>>();
 
     ASSIGN_OR_RETURN(
         *multi_face_geometry,
@@ -169,15 +169,15 @@ class GeometryPipelineCalculator : public CalculatorBase {
                        multi_face_geometry.release())
                        .At(cc->InputTimestamp()));
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Close(CalculatorContext* cc) override {
-    return absl::OkStatus();
+  abslx::Status Close(CalculatorContext* cc) override {
+    return abslx::OkStatus();
   }
 
  private:
-  static absl::StatusOr<face_geometry::GeometryPipelineMetadata>
+  static abslx::StatusOr<face_geometry::GeometryPipelineMetadata>
   ReadMetadataFromFile(const std::string& metadata_path) {
     ASSIGN_OR_RETURN(std::string metadata_blob,
                      ReadContentBlobFromFile(metadata_path),
@@ -190,7 +190,7 @@ class GeometryPipelineCalculator : public CalculatorBase {
     return metadata;
   }
 
-  static absl::StatusOr<std::string> ReadContentBlobFromFile(
+  static abslx::StatusOr<std::string> ReadContentBlobFromFile(
       const std::string& unresolved_path) {
     ASSIGN_OR_RETURN(std::string resolved_path,
                      mediapipe::PathToResourceAsFile(unresolved_path),

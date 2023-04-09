@@ -57,7 +57,7 @@ bool ParseFlag(const std::string& arg, int argv_position,
   }
   *value_parsing_ok = true;
   std::string flag_prefix = "--" + flag + "=";
-  if (!absl::StartsWith(arg, flag_prefix)) {
+  if (!abslx::StartsWith(arg, flag_prefix)) {
     return false;
   }
   bool has_value = arg.size() >= flag_prefix.size();

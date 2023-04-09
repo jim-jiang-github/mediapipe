@@ -26,7 +26,7 @@ constexpr const char CompositeTensorVariant::kTypeName[];
 
 CompositeTensorVariant::CompositeTensorVariant(
     const CompositeTensorVariantMetadata& metadata,
-    absl::Span<Tensor> flat_components)
+    abslx::Span<Tensor> flat_components)
     : flat_components_(flat_components.begin(), flat_components.end()),
       metadata_(new CompositeTensorVariantMetadata()) {
   *metadata_ = metadata;

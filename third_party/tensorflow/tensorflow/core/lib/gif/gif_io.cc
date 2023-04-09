@@ -70,12 +70,12 @@ uint8* Decode(const void* srcdata, int datasize,
     }
   });
   if (error_code != D_GIF_SUCCEEDED) {
-    *error_string = absl::StrCat("failed to open gif file: ",
+    *error_string = abslx::StrCat("failed to open gif file: ",
                                  GifErrorStringNonNull(error_code));
     return nullptr;
   }
   if (DGifSlurp(gif_file) != GIF_OK) {
-    *error_string = absl::StrCat("failed to slurp gif file: ",
+    *error_string = abslx::StrCat("failed to slurp gif file: ",
                                  GifErrorStringNonNull(gif_file->Error));
     return nullptr;
   }
@@ -161,7 +161,7 @@ uint8* Decode(const void* srcdata, int datasize,
                                     ? this_image->ImageDesc.ColorMap
                                     : gif_file->SColorMap;
     if (color_map == nullptr) {
-      *error_string = absl::StrCat("missing color map for frame ", k);
+      *error_string = abslx::StrCat("missing color map for frame ", k);
       return nullptr;
     }
 
@@ -173,7 +173,7 @@ uint8* Decode(const void* srcdata, int datasize,
                                    (j - img_desc->Left)];
 
         if (color_index >= color_map->ColorCount) {
-          *error_string = absl::StrCat("found color index ", color_index,
+          *error_string = abslx::StrCat("found color index ", color_index,
                                        " outside of color map range ",
                                        color_map->ColorCount);
           return nullptr;

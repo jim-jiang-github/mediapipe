@@ -52,18 +52,18 @@ namespace mediapipe {
 // }
 class FrameAnnotationTrackerCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
   std::unique_ptr<FrameAnnotationTracker> frame_annotation_tracker_;
 };
 REGISTER_CALCULATOR(FrameAnnotationTrackerCalculator);
 
-absl::Status FrameAnnotationTrackerCalculator::GetContract(
+abslx::Status FrameAnnotationTrackerCalculator::GetContract(
     CalculatorContract* cc) {
   RET_CHECK(!cc->Inputs().GetTags().empty());
   RET_CHECK(!cc->Outputs().GetTags().empty());
@@ -80,17 +80,17 @@ absl::Status FrameAnnotationTrackerCalculator::GetContract(
   if (cc->Outputs().HasTag(kOutputCancelObjectIdTag)) {
     cc->Outputs().Tag(kOutputCancelObjectIdTag).Set<int>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FrameAnnotationTrackerCalculator::Open(CalculatorContext* cc) {
+abslx::Status FrameAnnotationTrackerCalculator::Open(CalculatorContext* cc) {
   const auto& options = cc->Options<FrameAnnotationTrackerCalculatorOptions>();
-  frame_annotation_tracker_ = absl::make_unique<FrameAnnotationTracker>(
+  frame_annotation_tracker_ = abslx::make_unique<FrameAnnotationTracker>(
       options.iou_threshold(), options.img_width(), options.img_height());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FrameAnnotationTrackerCalculator::Process(CalculatorContext* cc) {
+abslx::Status FrameAnnotationTrackerCalculator::Process(CalculatorContext* cc) {
   if (cc->Inputs().HasTag(kInputFrameAnnotationTag) &&
       !cc->Inputs().Tag(kInputFrameAnnotationTag).IsEmpty()) {
     frame_annotation_tracker_->AddDetectionResult(
@@ -99,8 +99,8 @@ absl::Status FrameAnnotationTrackerCalculator::Process(CalculatorContext* cc) {
   if (cc->Inputs().HasTag(kInputTrackedBoxesTag) &&
       !cc->Inputs().Tag(kInputTrackedBoxesTag).IsEmpty() &&
       cc->Outputs().HasTag(kOutputTrackedFrameAnnotationTag)) {
-    absl::flat_hash_set<int> cancel_object_ids;
-    auto output_frame_annotation = absl::make_unique<FrameAnnotation>();
+    abslx::flat_hash_set<int> cancel_object_ids;
+    auto output_frame_annotation = abslx::make_unique<FrameAnnotation>();
     *output_frame_annotation =
         frame_annotation_tracker_->ConsolidateTrackingResult(
             cc->Inputs().Tag(kInputTrackedBoxesTag).Get<TimedBoxProtoList>(),
@@ -124,11 +124,11 @@ absl::Status FrameAnnotationTrackerCalculator::Process(CalculatorContext* cc) {
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FrameAnnotationTrackerCalculator::Close(CalculatorContext* cc) {
-  return absl::OkStatus();
+abslx::Status FrameAnnotationTrackerCalculator::Close(CalculatorContext* cc) {
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

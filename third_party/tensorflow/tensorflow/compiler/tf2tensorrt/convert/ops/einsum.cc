@@ -43,15 +43,15 @@ namespace {
 // construct the permutation sequence for the operand with input labels
 // [array_begin, array_end) to the desired permuted labels [begin, end).
 template <typename T>
-Status FindIndicesoOfAllValuesInSrc(absl::Span<const T> values,
-                                    absl::Span<const T> src,
+Status FindIndicesoOfAllValuesInSrc(abslx::Span<const T> values,
+                                    abslx::Span<const T> src,
                                     std::vector<int>* indices) {
   if (src.size() < values.size()) {
     return errors::Internal(
         "Span 'src' cannot contain all elements of 'values'");
   }
   for (auto i = 0; i < values.size(); i++) {
-    auto iter = absl::c_find(src, values[i]);
+    auto iter = abslx::c_find(src, values[i]);
     if (iter == src.end()) {
       return errors::Internal("Label ", values[i], " not found");
     }
@@ -152,11 +152,11 @@ class EinsumDescriptor {
     } else {
       TF_RETURN_IF_ERROR(
           FindIndicesoOfAllValuesInSrc(/*values=*/
-                                       absl::MakeConstSpan(
+                                       abslx::MakeConstSpan(
                                            other->permuted_labels.begin(),
                                            other->b),
                                        /*src=*/
-                                       absl::MakeConstSpan(input_labels.begin(),
+                                       abslx::MakeConstSpan(input_labels.begin(),
                                                            input_labels.size()),
                                        /*indices=*/&permute));
     }
@@ -166,10 +166,10 @@ class EinsumDescriptor {
         AppendMatchingIndicesToPermute(types, kContract);
       } else {
         TF_RETURN_IF_ERROR(FindIndicesoOfAllValuesInSrc(
-            /*values=*/absl::MakeConstSpan(
+            /*values=*/abslx::MakeConstSpan(
                 other->permuted_labels.begin() + other->offset_c, other->c),
             /*src=*/
-            absl::MakeConstSpan(input_labels.begin(), input_labels.size()),
+            abslx::MakeConstSpan(input_labels.begin(), input_labels.size()),
             /*indices=*/&permute));
       }
       return Status::OK();
@@ -178,9 +178,9 @@ class EinsumDescriptor {
       AppendMatchingIndicesToPermute(types, kContract);
     } else {
       TF_RETURN_IF_ERROR(FindIndicesoOfAllValuesInSrc(
-          /*values=*/absl::MakeConstSpan(
+          /*values=*/abslx::MakeConstSpan(
               other->permuted_labels.begin() + other->offset_c, other->c),
-          /*src=*/absl::MakeConstSpan(input_labels.begin(), input_labels.end()),
+          /*src=*/abslx::MakeConstSpan(input_labels.begin(), input_labels.end()),
           /*indices=*/&permute));
     }
     AppendMatchingIndicesToPermute(types, kFree);
@@ -270,7 +270,7 @@ class EinsumDescriptor {
   const Labels& PermutedLabels() const { return permuted_labels; }
 
   std::string DebugString() const {
-    return absl::StrCat("Descriptor with ",
+    return abslx::StrCat("Descriptor with ",
                         (layout == EinsumLayout::BFC ? "BFC" : "BCF"),
                         " layout, b=", b, ", f=", f, ", c=", c);
   }
@@ -340,7 +340,7 @@ Status GetEinsumNewDynamicShape(TRTNetworkBuilder* builder,
                                 ITensorProxyPtr* new_shape) {
   std::vector<nvinfer1::ITensor*> size;
   size.reserve(desc.b + 2);
-  absl::c_transform(absl::MakeSpan(desc.size_tensors).subspan(0, desc.b + 2),
+  abslx::c_transform(abslx::MakeSpan(desc.size_tensors).subspan(0, desc.b + 2),
                     std::back_inserter(size),
                     [](const ITensorProxyPtr x) { return x->trt_tensor(); });
 
@@ -349,18 +349,18 @@ Status GetEinsumNewDynamicShape(TRTNetworkBuilder* builder,
 
   std::vector<nvinfer1::ITensor*> size_tensors;
   size_tensors.reserve(desc.size_tensors.size());
-  absl::c_transform(desc.size_tensors, std::back_inserter(size_tensors),
+  abslx::c_transform(desc.size_tensors, std::back_inserter(size_tensors),
                     [](const ITensorProxyPtr x) -> nvinfer1::ITensor* {
                       return x->trt_tensor();
                     });
 
   StatusOr<nvinfer1::ILayer*> shape_vol = builder->CumulativeProd(
-      absl::MakeSpan(size_tensors).subspan(desc.offset_f, desc.f));
+      abslx::MakeSpan(size_tensors).subspan(desc.offset_f, desc.f));
   TRT_ENSURE_PTR_OK(shape_vol);
   size[idx_f] = (*shape_vol)->getOutput(0);
 
   shape_vol = builder->CumulativeProd(
-      absl::MakeSpan(size_tensors).subspan(desc.offset_c, desc.c));
+      abslx::MakeSpan(size_tensors).subspan(desc.offset_c, desc.c));
   TRT_ENSURE_PTR_OK(shape_vol);
   size[idx_c] = (*shape_vol)->getOutput(0);
   StatusOr<nvinfer1::IConcatenationLayer*> layer =
@@ -376,7 +376,7 @@ Status GetEinsumNewStaticShape(const EinsumDescriptor& desc,
                                nvinfer1::Dims* new_dims) {
   // Copy the batch dims and append two additional dimensions.
   DimsAdapter adap(
-      absl::MakeSpan(static_cast<const int32_t*>(desc.dims.d), desc.b));
+      abslx::MakeSpan(static_cast<const int32_t*>(desc.dims.d), desc.b));
   adap.Append(1).Append(1);
 
   // Combine free dims and contract dims.
@@ -386,14 +386,14 @@ Status GetEinsumNewStaticShape(const EinsumDescriptor& desc,
   // Find the volume of the free dimensions.
   int64_t vol_f =
       DimsAdapter(
-          absl::MakeSpan(
+          abslx::MakeSpan(
               static_cast<const int32_t*>(desc.dims.d) + desc.offset_f, desc.f))
           .Volume();
 
   // Find the volume of the contracted dimensions.
   int64_t vol_c =
       DimsAdapter(
-          absl::MakeSpan(
+          abslx::MakeSpan(
               static_cast<const int32_t*>(desc.dims.d) + desc.offset_c, desc.c))
           .Volume();
 
@@ -539,7 +539,7 @@ Status ShuffleEinsumOutput(OpConverterParams* params, EinsumDescriptor desc_a,
                                                params->weight_store);
       TRT_ENSURE_OK(builder);
       std::vector<nvinfer1::ITensor*> size_itensors;
-      absl::c_transform(size_tensors, std::back_inserter(size_itensors),
+      abslx::c_transform(size_tensors, std::back_inserter(size_itensors),
                         [](auto x) { return x->trt_tensor(); });
       StatusOr<nvinfer1::IConcatenationLayer*> concat =
           builder->Concat(size_itensors, /*axis=*/0);
@@ -572,10 +572,10 @@ StatusOr<std::vector<int>> GetOutputTranspose(
                  descriptor_b, matmul_output_labels.begin());
   TF_RETURN_IF_ERROR(
       FindIndicesoOfAllValuesInSrc(/*values=*/
-                                   absl::MakeConstSpan(output_labels.begin(),
+                                   abslx::MakeConstSpan(output_labels.begin(),
                                                        output_labels.end()),
                                    /*src=*/
-                                   absl::MakeConstSpan(
+                                   abslx::MakeConstSpan(
                                        matmul_output_labels.begin(),
                                        matmul_output_labels.end()),
                                    /*indices=*/&final_transpose));
@@ -604,7 +604,7 @@ Status ParseEquation(const std::string& equation,
   std::vector<EinsumDimensionType> label_types;
   OperandLabelCounts input_label_counts;
   LabelCounts output_label_counts;
-  absl::InlinedVector<bool, 2> input_has_ellipsis;
+  abslx::InlinedVector<bool, 2> input_has_ellipsis;
   bool output_has_ellipsis;
   TF_RETURN_IF_ERROR(
       ParseEinsumEquation(equation, &input_labels, &output_labels, &label_types,
@@ -619,7 +619,7 @@ Status ParseEquation(const std::string& equation,
     return errors::Unimplemented("No conversion for einsum equation.");
   }
 
-  if (absl::c_any_of(label_types, [](auto l) {
+  if (abslx::c_any_of(label_types, [](auto l) {
         return l == EinsumDimensionType::kReduce ||
                l == EinsumDimensionType::kBroadcasting;
       })) {
@@ -628,7 +628,7 @@ Status ParseEquation(const std::string& equation,
   }
 
   auto no_duplicated_labels = [](const LabelCounts& label_counts) {
-    return absl::c_any_of(label_counts, [](int i) { return i > 1; });
+    return abslx::c_any_of(label_counts, [](int i) { return i > 1; });
   };
   if (no_duplicated_labels(input_label_counts[0]) ||
       no_duplicated_labels(input_label_counts[1]) ||
@@ -819,7 +819,7 @@ class ConvertEinsum : public OpConverterBase<ConvertEinsum> {
     std::vector<EinsumDimensionType> label_types;
     OperandLabelCounts input_label_counts;
     LabelCounts output_label_counts;
-    absl::InlinedVector<bool, 2> input_has_ellipsis;
+    abslx::InlinedVector<bool, 2> input_has_ellipsis;
     bool output_has_ellipsis;
     VLOG(2) << "Parsing equation " << eq;
     TF_RETURN_IF_ERROR(ParseEinsumEquation(

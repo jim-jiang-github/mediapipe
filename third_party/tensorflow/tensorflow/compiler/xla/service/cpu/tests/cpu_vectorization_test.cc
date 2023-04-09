@@ -61,12 +61,12 @@ class CpuVectorizationTest
 
     std::string features = spec.features;
     if (!features.empty()) {
-      absl::c_replace_if(
-          features, [](char c) { return c != '_' && !absl::ascii_isalnum(c); },
+      abslx::c_replace_if(
+          features, [](char c) { return c != '_' && !abslx::ascii_isalnum(c); },
           '_');
     }
 
-    return absl::StrCat(opcode, "_On_", triple,
+    return abslx::StrCat(opcode, "_On_", triple,
                         (features.empty() ? "" : "_With"), features);
   }
 

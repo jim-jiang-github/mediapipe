@@ -28,7 +28,7 @@ namespace llvm_ir {
 
 // A tuple is an array of pointers, one for each operand. Each pointer points to
 // the output buffer of its corresponding operand.
-void EmitTuple(const IrArray& tuple, absl::Span<llvm::Value* const> operands,
+void EmitTuple(const IrArray& tuple, abslx::Span<llvm::Value* const> operands,
                llvm::IRBuilder<>* b);
 
 // Emits one alloca for each element in the tuple of shape tuple_shape,
@@ -39,7 +39,7 @@ std::vector<llvm::Value*> EmitTupleAllocasAtFunctionEntry(
 
 // Similar to EmitTuple above, except that the output buffers are provided in
 // the form of IrArray.
-void EmitTuple(const IrArray& tuple, absl::Span<const IrArray> buffers,
+void EmitTuple(const IrArray& tuple, abslx::Span<const IrArray> buffers,
                llvm::IRBuilder<>* b);
 
 // A tuple is an array of pointers, one for each operand. Each pointer points to

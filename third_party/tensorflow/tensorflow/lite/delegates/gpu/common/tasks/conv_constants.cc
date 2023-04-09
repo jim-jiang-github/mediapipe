@@ -151,10 +151,10 @@ std::string GenerateConvolutionConstantCode(const GpuInfo& gpu_info,
     const int src_ch_count = std::min(4, weights_shape.i - s * 4);
     const std::string s_count =
         src_ch_count == 1 ? "" : std::to_string(src_ch_count);
-    const std::string s_type = absl::StrCat("FLT", s_count);
+    const std::string s_type = abslx::StrCat("FLT", s_count);
     const std::string s_postfix = postfixes[src_ch_count - 1];
     for (int ky = 0; ky < weights_shape.h; ++ky) {
-      std::string s_y = absl::StrCat("(start_y + ", ky, " * args.dilation_y)");
+      std::string s_y = abslx::StrCat("(start_y + ", ky, " * args.dilation_y)");
       c += "  {\n";
       c += "    int y_c = start_y + " + std::to_string(ky) +
            " * args.dilation_y;\n";
@@ -226,7 +226,7 @@ bool IsConvConstantsSupported(const GpuInfo& gpu_info,
     const std::string kBadDriver =
         "OpenCL 2.0 QUALCOMM build: commit #7ff4f54 changeid #I4460aa6217 "
         "Date: 12/30/18";
-    if (absl::StrContains(gpu_info.opencl_info.platform_version, kBadDriver)) {
+    if (abslx::StrContains(gpu_info.opencl_info.platform_version, kBadDriver)) {
       return false;
     }
   }

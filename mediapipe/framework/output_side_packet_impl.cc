@@ -20,21 +20,21 @@
 
 namespace mediapipe {
 
-absl::Status OutputSidePacketImpl::Initialize(const std::string& name,
+abslx::Status OutputSidePacketImpl::Initialize(const std::string& name,
                                               const PacketType* packet_type) {
   name_ = name;
   packet_type_ = packet_type;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void OutputSidePacketImpl::PrepareForRun(
-    std::function<void(absl::Status)> error_callback) {
+    std::function<void(abslx::Status)> error_callback) {
   error_callback_ = std::move(error_callback);
   initialized_ = false;
 }
 
 void OutputSidePacketImpl::Set(const Packet& packet) {
-  absl::Status status = SetInternal(packet);
+  abslx::Status status = SetInternal(packet);
   if (!status.ok()) {
     TriggerErrorCallback(status);
   }
@@ -46,7 +46,7 @@ void OutputSidePacketImpl::AddMirror(
   mirrors_.emplace_back(input_side_packet_handler, id);
 }
 
-absl::Status OutputSidePacketImpl::SetInternal(const Packet& packet) {
+abslx::Status OutputSidePacketImpl::SetInternal(const Packet& packet) {
   if (initialized_) {
     return mediapipe::AlreadyExistsErrorBuilder(MEDIAPIPE_LOC)
            << "Output side packet \"" << name_ << "\" was already set.";
@@ -63,10 +63,10 @@ absl::Status OutputSidePacketImpl::SetInternal(const Packet& packet) {
            << packet.Timestamp().DebugString() << ".";
   }
 
-  absl::Status result = packet_type_->Validate(packet);
+  abslx::Status result = packet_type_->Validate(packet);
   if (!result.ok()) {
     return mediapipe::StatusBuilder(result, MEDIAPIPE_LOC).SetPrepend()
-           << absl::StrCat(
+           << abslx::StrCat(
                   "Packet type mismatch on calculator output side packet \"",
                   name_, "\": ");
   }
@@ -76,11 +76,11 @@ absl::Status OutputSidePacketImpl::SetInternal(const Packet& packet) {
   for (const auto& mirror : mirrors_) {
     mirror.input_side_packet_handler->Set(mirror.id, packet_);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void OutputSidePacketImpl::TriggerErrorCallback(
-    const absl::Status& status) const {
+    const abslx::Status& status) const {
   CHECK(error_callback_);
   error_callback_(status);
 }

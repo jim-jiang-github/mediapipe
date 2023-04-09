@@ -72,7 +72,7 @@ std::vector<std::string> BridgeLoggerConfig::GetFilter(
   std::vector<std::string> filter;
   const char* filter_str = getenv(env_var.c_str());
   if (filter_str) {
-    filter = absl::StrSplit(filter_str, ';', absl::SkipWhitespace());
+    filter = abslx::StrSplit(filter_str, ';', abslx::SkipWhitespace());
   }
   return filter;
 }

@@ -29,7 +29,7 @@ TensorMap::~TensorMap() {
 void TensorMap::Encode(VariantTensorData* data) const {
   data->set_type_name(TypeName());
 
-  absl::flat_hash_map<TensorKey, Tensor>::const_iterator map_it =
+  abslx::flat_hash_map<TensorKey, Tensor>::const_iterator map_it =
       tensors().begin();
   while (map_it != tensors().end()) {
     Tensor k = map_it->first;

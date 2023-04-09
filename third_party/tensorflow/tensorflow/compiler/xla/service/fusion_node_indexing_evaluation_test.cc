@@ -82,7 +82,7 @@ class InstructionFusionForTesting : public InstructionFusion {
   }
 
  private:
-  absl::flat_hash_map<const HloInstruction*, FusionNodeIndexingEvaluation>
+  abslx::flat_hash_map<const HloInstruction*, FusionNodeIndexingEvaluation>
       fusion_node_evaluations_;
 };
 

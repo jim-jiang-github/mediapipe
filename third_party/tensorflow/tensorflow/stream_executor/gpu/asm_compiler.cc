@@ -35,17 +35,17 @@ limitations under the License.
 
 namespace stream_executor {
 
-static port::StatusOr<absl::string_view> GetPtxasVersionString(
+static port::StatusOr<abslx::string_view> GetPtxasVersionString(
     const std::string& binary_path) {
   static tensorflow::mutex mu(tensorflow::LINKER_INITIALIZED);
   static auto* seen_binary_paths TF_GUARDED_BY(mu) =
-      new absl::flat_hash_map<std::string, std::string>();
+      new abslx::flat_hash_map<std::string, std::string>();
 
   tensorflow::mutex_lock lock(mu);
   auto it = seen_binary_paths->find(binary_path);
   if (it != seen_binary_paths->end()) {
     // Already checked this binary, nothing to do.
-    return absl::string_view(it->second);
+    return abslx::string_view(it->second);
   }
 
   tensorflow::SubProcess binary;
@@ -53,18 +53,18 @@ static port::StatusOr<absl::string_view> GetPtxasVersionString(
   binary.SetChannelAction(tensorflow::CHAN_STDOUT, tensorflow::ACTION_PIPE);
   if (!binary.Start()) {
     return port::InternalError(
-        absl::StrFormat("Couldn't invoke %s --version", binary_path));
+        abslx::StrFormat("Couldn't invoke %s --version", binary_path));
   }
 
   std::string out;
   int exit_code = binary.Communicate(/*stdin_input=*/nullptr, &out,
                                      /*stderr_output=*/nullptr);
   if (exit_code != 0) {
-    return port::InternalError(absl::StrFormat(
+    return port::InternalError(abslx::StrFormat(
         "Running %s --version returned %d", binary_path, exit_code));
   }
   auto emplace_it = seen_binary_paths->emplace(binary_path, std::move(out));
-  return absl::string_view(emplace_it.first->second);
+  return abslx::string_view(emplace_it.first->second);
 }
 
 // Prints a warning if the ptxas at ptxas_path has known bugs.
@@ -74,7 +74,7 @@ static port::StatusOr<absl::string_view> GetPtxasVersionString(
 //
 // Locks on entry.
 static void WarnIfBadPtxasVersion(const std::string& ptxas_path) {
-  port::StatusOr<absl::string_view> ptxas_version =
+  port::StatusOr<abslx::string_view> ptxas_version =
       GetPtxasVersionString(ptxas_path);
   if (!ptxas_version.ok()) {
     LOG(WARNING) << "Couldn't get ptxas version string: "
@@ -87,9 +87,9 @@ static void WarnIfBadPtxasVersion(const std::string& ptxas_path) {
   if (!RE2::PartialMatch(ptxas_version.ValueOrDie(),
                          R"(\bV(\d+)\.(\d+)\.(\d+)\b)", &vmaj_str, &vmin_str,
                          &vdot_str) ||
-      !absl::SimpleAtoi(vmaj_str, &vmaj) ||
-      !absl::SimpleAtoi(vmin_str, &vmin) ||
-      !absl::SimpleAtoi(vdot_str, &vdot)) {
+      !abslx::SimpleAtoi(vmaj_str, &vmaj) ||
+      !abslx::SimpleAtoi(vmin_str, &vmin) ||
+      !abslx::SimpleAtoi(vdot_str, &vdot)) {
     LOG(WARNING) << "Couldn't parse ptxas version in output of " << ptxas_path
                  << " --version:\n"
                  << ptxas_version.ValueOrDie();
@@ -118,13 +118,13 @@ static void WarnIfBadPtxasVersion(const std::string& ptxas_path) {
   }
 }
 
-port::StatusOr<absl::Span<const uint8>> CompileGpuAsmOrGetCached(
+port::StatusOr<abslx::Span<const uint8>> CompileGpuAsmOrGetCached(
     int device_ordinal, const char* ptx, GpuAsmOpts compilation_options) {
   using PtxCacheKey = std::tuple<int, std::string, GpuAsmOpts::PtxOptionsTuple>;
   using PtxCompilerResult = port::StatusOr<std::vector<uint8>>;
   static tensorflow::mutex ptx_cache_mutex(tensorflow::LINKER_INITIALIZED);
   static auto& ptx_cache TF_GUARDED_BY(ptx_cache_mutex) =
-      *new absl::flat_hash_map<PtxCacheKey, PtxCompilerResult>();
+      *new abslx::flat_hash_map<PtxCacheKey, PtxCompilerResult>();
 
   tensorflow::mutex_lock lock(ptx_cache_mutex);
   PtxCacheKey cache_key{device_ordinal, std::string(ptx),
@@ -147,7 +147,7 @@ port::StatusOr<absl::Span<const uint8>> CompileGpuAsmOrGetCached(
   }
 
   const std::vector<uint8>& compiled = it->second.ValueOrDie();
-  return absl::MakeSpan(compiled);
+  return abslx::MakeSpan(compiled);
 }
 
 port::StatusOr<std::vector<uint8>> CompileGpuAsm(int device_ordinal,
@@ -166,7 +166,7 @@ static std::string FindCudaExecutable(const std::string binary_name,
                                       const std::string preferred_cuda_dir) {
   static tensorflow::mutex mu(tensorflow::LINKER_INITIALIZED);
   static auto* seen_binary_paths TF_GUARDED_BY(mu) =
-      new absl::flat_hash_map<std::pair<std::string, std::string>,
+      new abslx::flat_hash_map<std::pair<std::string, std::string>,
                               std::string>();
 
 #if defined(PLATFORM_WINDOWS)
@@ -218,12 +218,12 @@ static std::string FindCudaExecutable(const std::string binary_name,
 static void LogPtxasTooOld(const std::string& ptxas_path, int cc_major,
                            int cc_minor) {
   using AlreadyLoggedSetTy =
-      absl::flat_hash_set<std::tuple<std::string, int, int>>;
+      abslx::flat_hash_set<std::tuple<std::string, int, int>>;
 
-  static absl::Mutex* mutex = new absl::Mutex;
+  static abslx::Mutex* mutex = new abslx::Mutex;
   static AlreadyLoggedSetTy* already_logged = new AlreadyLoggedSetTy;
 
-  absl::MutexLock lock(mutex);
+  abslx::MutexLock lock(mutex);
 
   if (already_logged->insert(std::make_tuple(ptxas_path, cc_major, cc_minor))
           .second) {
@@ -261,7 +261,7 @@ port::StatusOr<std::vector<uint8>> CompileGpuAsm(int cc_major, int cc_minor,
       tensorflow::WriteStringToFile(env, ptx_path, ptx_contents));
   VLOG(2) << "ptx written to: " << ptx_path;
 
-  absl::Cleanup ptx_cleaner = [&ptx_path] {
+  abslx::Cleanup ptx_cleaner = [&ptx_path] {
     TF_CHECK_OK(tensorflow::Env::Default()->DeleteFile(ptx_path));
   };
 
@@ -270,7 +270,7 @@ port::StatusOr<std::vector<uint8>> CompileGpuAsm(int cc_major, int cc_minor,
   if (!env->LocalTempFilename(&cubin_path)) {
     return port::InternalError("couldn't get temp CUBIN file name");
   }
-  absl::Cleanup cubin_cleaner = [&cubin_path] {
+  abslx::Cleanup cubin_cleaner = [&cubin_path] {
     // CUBIN file may never be created, so the failure to delete it should not
     // produce TF error.
     tensorflow::Env::Default()->DeleteFile(cubin_path).IgnoreError();
@@ -281,14 +281,14 @@ port::StatusOr<std::vector<uint8>> CompileGpuAsm(int cc_major, int cc_minor,
       ptx_path,
       "-o",
       cubin_path,
-      absl::StrCat("-arch=sm_", cc_major, cc_minor),
+      abslx::StrCat("-arch=sm_", cc_major, cc_minor),
       "--warn-on-spills"};
   if (VLOG_IS_ON(2)) {
     ptxas_args.push_back("-v");
   }
   AppendArgsFromOptions(options, ptxas_args);
   if (VLOG_IS_ON(3)) {
-    VLOG(3) << absl::StrJoin(ptxas_args, " ");
+    VLOG(3) << abslx::StrJoin(ptxas_args, " ");
   }
 
   ptxas_info_dumper.SetProgram(ptxas_path, ptxas_args);
@@ -305,8 +305,8 @@ port::StatusOr<std::vector<uint8>> CompileGpuAsm(int cc_major, int cc_minor,
     //  Example error message associated with this error code:
     //      ptxas fatal   : Value 'sm_80' is not defined for option 'gpu-name'
     // In that case, fallback to the driver for compilation
-    if (absl::StartsWith(stderr_output, "ptxas fatal   : Value '") &&
-        absl::StrContains(stderr_output,
+    if (abslx::StartsWith(stderr_output, "ptxas fatal   : Value '") &&
+        abslx::StrContains(stderr_output,
                           "is not defined for option 'gpu-name'")) {
       LogPtxasTooOld(ptxas_path, cc_major, cc_minor);
       return tensorflow::errors::Unimplemented(
@@ -314,12 +314,12 @@ port::StatusOr<std::vector<uint8>> CompileGpuAsm(int cc_major, int cc_minor,
     }
 
     return port::InternalError(
-        absl::StrFormat("ptxas exited with non-zero error code %d, output: %s",
+        abslx::StrFormat("ptxas exited with non-zero error code %d, output: %s",
                         exit_status, stderr_output));
   }
   // Print the verbose output of ptxas.
   if (!stderr_output.empty()) {
-    if (absl::StrContains(stderr_output, "warning")) {
+    if (abslx::StrContains(stderr_output, "warning")) {
       LOG(INFO) << stderr_output;
     } else {
       VLOG(2) << stderr_output;
@@ -353,7 +353,7 @@ port::StatusOr<std::vector<uint8>> BundleGpuAsm(
     VLOG(2) << "image written to " << img_path;
     image_paths.push_back(std::move(img_path));
   }
-  absl::Cleanup image_files_cleaner = [&image_paths] {
+  abslx::Cleanup image_files_cleaner = [&image_paths] {
     for (const auto& path : image_paths) {
       TF_CHECK_OK(tensorflow::Env::Default()->DeleteFile(path));
     }
@@ -365,7 +365,7 @@ port::StatusOr<std::vector<uint8>> BundleGpuAsm(
     return port::InternalError(
         "Could not get temporary filename for fatbin result.");
   }
-  absl::Cleanup result_file_cleaner = [&result_path] {
+  abslx::Cleanup result_file_cleaner = [&result_path] {
     // This file may never be created, so the failure to delete it should not
     // propagate to TF.
     tensorflow::Env::Default()->DeleteFile(result_path).IgnoreError();
@@ -379,18 +379,18 @@ port::StatusOr<std::vector<uint8>> BundleGpuAsm(
   tensorflow::SubProcess fatbinary;
   std::vector<std::string> fatbinary_args = {
       fatbinary_path, "--64", "--link", "--compress-all",
-      absl::StrCat("--create=", result_path)};
+      abslx::StrCat("--create=", result_path)};
   if (!ptxas_options.empty()) {
-    auto command_line = absl::StrJoin(ptxas_options, " ");
-    fatbinary_args.push_back(absl::StrFormat("--cmdline=%s", command_line));
+    auto command_line = abslx::StrJoin(ptxas_options, " ");
+    fatbinary_args.push_back(abslx::StrFormat("--cmdline=%s", command_line));
   }
   assert(images.size() == image_paths.size());
   for (int i = 0; i < images.size(); i++) {
-    fatbinary_args.push_back(absl::StrFormat(
+    fatbinary_args.push_back(abslx::StrFormat(
         "--image=profile=%s,file=%s", images[i].profile, image_paths[i]));
   }
   if (VLOG_IS_ON(3)) {
-    VLOG(3) << absl::StrJoin(fatbinary_args, " ");
+    VLOG(3) << abslx::StrJoin(fatbinary_args, " ");
   }
   fatbinary.SetProgram(fatbinary_path, fatbinary_args);
   fatbinary.SetChannelAction(tensorflow::CHAN_STDERR, tensorflow::ACTION_PIPE);
@@ -401,7 +401,7 @@ port::StatusOr<std::vector<uint8>> BundleGpuAsm(
   int exit_status = fatbinary.Communicate(
       /*stdin_input=*/nullptr, /*stdout_output=*/nullptr, &stderr_output);
   if (exit_status != 0) {
-    return port::InternalError(absl::StrFormat(
+    return port::InternalError(abslx::StrFormat(
         "fatbinary exited with non-zero error code %d, output: %s", exit_status,
         stderr_output));
   }
@@ -423,7 +423,7 @@ static std::string findRocmExecutable(const std::string& binary_relative_path,
       tensorflow::io::JoinPath(rocm_root_dir, binary_relative_path);
   VLOG(2) << "Looking for " << binary_relative_path << " at " << rocm_root_dir;
   if (!env->FileExists(binary_path).ok()) {
-    binary_path = absl::StrCat("<", binary_path, " - NOT FOUND>");
+    binary_path = abslx::StrCat("<", binary_path, " - NOT FOUND>");
   }
   return binary_path;
 }
@@ -458,7 +458,7 @@ port::StatusOr<std::vector<uint8>> BundleGpuAsm(
     targets_list << ",hip-amdgcn-amd-amdhsa-" << img.gfx_arch;
     image_paths.push_back(std::move(img_path));
   }
-  absl::Cleanup image_files_cleaner = [&image_paths] {
+  abslx::Cleanup image_files_cleaner = [&image_paths] {
     for (const auto& path : image_paths) {
       TF_CHECK_OK(tensorflow::Env::Default()->DeleteFile(path));
     }
@@ -470,7 +470,7 @@ port::StatusOr<std::vector<uint8>> BundleGpuAsm(
     return port::InternalError(
         "Could not get temporary filename for fatbin result.");
   }
-  absl::Cleanup result_file_cleaner = [&result_path] {
+  abslx::Cleanup result_file_cleaner = [&result_path] {
     // This file may never be created, so the failure to delete it should not
     // propagate to TF.
     tensorflow::Env::Default()->DeleteFile(result_path).IgnoreError();
@@ -479,11 +479,11 @@ port::StatusOr<std::vector<uint8>> BundleGpuAsm(
   // Invoke clang_offload_bundler and collect its output.
   tensorflow::SubProcess clang_offload_bundler;
   std::vector<std::string> clang_offload_bundler_args = {
-      clang_offload_bundler_path, absl::StrCat("--inputs=", inputs_list.str()),
-      absl::StrCat("--targets=", targets_list.str()), "--type=o",
-      absl::StrCat("--outputs=", result_path)};
+      clang_offload_bundler_path, abslx::StrCat("--inputs=", inputs_list.str()),
+      abslx::StrCat("--targets=", targets_list.str()), "--type=o",
+      abslx::StrCat("--outputs=", result_path)};
   if (VLOG_IS_ON(3)) {
-    VLOG(3) << absl::StrJoin(clang_offload_bundler_args, " ");
+    VLOG(3) << abslx::StrJoin(clang_offload_bundler_args, " ");
   }
   clang_offload_bundler.SetProgram(clang_offload_bundler_path,
                                    clang_offload_bundler_args);
@@ -496,7 +496,7 @@ port::StatusOr<std::vector<uint8>> BundleGpuAsm(
   int exit_status = clang_offload_bundler.Communicate(
       /*stdin_input=*/nullptr, /*stdout_output=*/nullptr, &stderr_output);
   if (exit_status != 0) {
-    return port::InternalError(absl::StrFormat(
+    return port::InternalError(abslx::StrFormat(
         "clang_offload_bundler exited with non-zero error code %d, output: %s",
         exit_status, stderr_output));
   }

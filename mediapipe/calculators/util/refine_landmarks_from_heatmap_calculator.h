@@ -40,7 +40,7 @@ class RefineLandmarksFromHeatmapCalculator : public NodeIntf {
 }  // namespace api2
 
 // Exposed for testing.
-absl::StatusOr<mediapipe::NormalizedLandmarkList> RefineLandmarksFromHeatMap(
+abslx::StatusOr<mediapipe::NormalizedLandmarkList> RefineLandmarksFromHeatMap(
     const mediapipe::NormalizedLandmarkList& in_lms,
     const float* heatmap_raw_data, const std::vector<int>& heatmap_dims,
     int kernel_size, float min_confidence_to_refine, bool refine_presence,

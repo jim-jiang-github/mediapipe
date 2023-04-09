@@ -200,8 +200,8 @@ DotConvolutionDimsInfo ParseDotGeneralFromDot(const HloInstruction* dot) {
     dnums.contracting_dims.back().spatial_dim = -1;
   }
   for (int64_t i = 0; i < dot->operand(0)->shape().rank(); ++i) {
-    if (!absl::c_linear_search(dot_dim_numbs.lhs_batch_dimensions(), i) &&
-        !absl::c_linear_search(dot_dim_numbs.lhs_contracting_dimensions(), i)) {
+    if (!abslx::c_linear_search(dot_dim_numbs.lhs_batch_dimensions(), i) &&
+        !abslx::c_linear_search(dot_dim_numbs.lhs_contracting_dimensions(), i)) {
       dnums.lhs_non_contracting_dims.emplace_back();
       dnums.lhs_non_contracting_dims.back().lhs = i;
       dnums.lhs_non_contracting_dims.back().rhs = -1;
@@ -212,8 +212,8 @@ DotConvolutionDimsInfo ParseDotGeneralFromDot(const HloInstruction* dot) {
     }
   }
   for (int64_t i = 0; i < dot->operand(1)->shape().rank(); ++i) {
-    if (!absl::c_linear_search(dot_dim_numbs.rhs_batch_dimensions(), i) &&
-        !absl::c_linear_search(dot_dim_numbs.rhs_contracting_dimensions(), i)) {
+    if (!abslx::c_linear_search(dot_dim_numbs.rhs_batch_dimensions(), i) &&
+        !abslx::c_linear_search(dot_dim_numbs.rhs_contracting_dimensions(), i)) {
       dnums.rhs_non_contracting_dims.emplace_back();
       dnums.rhs_non_contracting_dims.back().lhs = -1;
       dnums.rhs_non_contracting_dims.back().rhs = i;

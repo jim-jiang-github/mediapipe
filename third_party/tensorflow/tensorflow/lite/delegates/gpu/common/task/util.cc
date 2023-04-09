@@ -109,7 +109,7 @@ std::string GetXStrideCorrected(const std::string& src_x,
   // int p0 = src_x / batch_size;\n";
   // int b0 = src_x % batch_size;\n";
   // return p0 * stride_x * batch_size + b0 + padding_x;\n";
-  return absl::Substitute("((($0) / $1) * $2 * $1 + (($0) % $1) + $3)", src_x,
+  return abslx::Substitute("((($0) / $1) * $2 * $1 + (($0) % $1) + $3)", src_x,
                           batch_size, stride_x, padding_x);
 }
 
@@ -120,7 +120,7 @@ std::string GetXStrideCorrectedV2(const std::string& src_x,
   // int p0 = src_x / batch_size;\n";
   // int b0 = src_x % batch_size;\n";
   // return (p0 * stride_x + padding_x) * batch_size + b0;\n";
-  return absl::Substitute("(((($0) / $1) * $2 + $3) * $1 + ($0) % $1)", src_x,
+  return abslx::Substitute("(((($0) / $1) * $2 + $3) * $1 + ($0) % $1)", src_x,
                           batch_size, stride_x, padding_x);
 }
 

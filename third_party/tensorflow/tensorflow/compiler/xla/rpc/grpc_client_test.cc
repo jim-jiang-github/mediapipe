@@ -51,7 +51,7 @@ class GRPCClientTestBase : public ::testing::Test {
     int port = tensorflow::internal::PickUnusedPortOrDie();
     subprocess_.SetProgram(
         service_main_path,
-        {service_main_path, absl::StrFormat("--port=%d", port)});
+        {service_main_path, abslx::StrFormat("--port=%d", port)});
     subprocess_.SetChannelAction(tensorflow::CHAN_STDOUT,
                                  tensorflow::ACTION_DUPPARENT);
     subprocess_.SetChannelAction(tensorflow::CHAN_STDERR,
@@ -59,7 +59,7 @@ class GRPCClientTestBase : public ::testing::Test {
     CHECK(subprocess_.Start());
     LOG(INFO) << "Launched subprocess";
 
-    auto channel = ::grpc::CreateChannel(absl::StrFormat("localhost:%d", port),
+    auto channel = ::grpc::CreateChannel(abslx::StrFormat("localhost:%d", port),
                                          ::grpc::InsecureChannelCredentials());
     channel->WaitForConnected(gpr_time_add(
         gpr_now(GPR_CLOCK_REALTIME), gpr_time_from_seconds(10, GPR_TIMESPAN)));

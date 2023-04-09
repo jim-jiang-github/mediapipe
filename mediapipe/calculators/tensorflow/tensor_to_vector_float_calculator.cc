@@ -28,17 +28,17 @@ namespace tf = ::tensorflow;
 
 class TensorToVectorFloatCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   TensorToVectorFloatCalculatorOptions options_;
 };
 REGISTER_CALCULATOR(TensorToVectorFloatCalculator);
 
-absl::Status TensorToVectorFloatCalculator::GetContract(
+abslx::Status TensorToVectorFloatCalculator::GetContract(
     CalculatorContract* cc) {
   // Start with only one input packet.
   RET_CHECK_EQ(cc->Inputs().NumEntries(), 1)
@@ -58,10 +58,10 @@ absl::Status TensorToVectorFloatCalculator::GetContract(
         // Output vector<float>.
     );
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorToVectorFloatCalculator::Open(CalculatorContext* cc) {
+abslx::Status TensorToVectorFloatCalculator::Open(CalculatorContext* cc) {
   options_ = cc->Options<TensorToVectorFloatCalculatorOptions>();
 
   // Inform mediapipe that this calculator produces an output at time t for
@@ -70,10 +70,10 @@ absl::Status TensorToVectorFloatCalculator::Open(CalculatorContext* cc) {
   // mediapipe graphs through this calculator.
   cc->SetOffset(/*offset=*/0);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorToVectorFloatCalculator::Process(CalculatorContext* cc) {
+abslx::Status TensorToVectorFloatCalculator::Process(CalculatorContext* cc) {
   const tf::Tensor& input_tensor =
       cc->Inputs().Index(0).Value().Get<tf::Tensor>();
   RET_CHECK(tf::DT_FLOAT == input_tensor.dtype())
@@ -84,7 +84,7 @@ absl::Status TensorToVectorFloatCalculator::Process(CalculatorContext* cc) {
     RET_CHECK(2 == input_tensor.dims())
         << "Expected 2-dimensional Tensor, but the tensor shape is: "
         << input_tensor.shape().DebugString();
-    auto output = absl::make_unique<std::vector<std::vector<float>>>(
+    auto output = abslx::make_unique<std::vector<std::vector<float>>>(
         input_tensor.dim_size(0), std::vector<float>(input_tensor.dim_size(1)));
     for (int i = 0; i < input_tensor.dim_size(0); ++i) {
       auto& instance_output = output->at(i);
@@ -101,7 +101,7 @@ absl::Status TensorToVectorFloatCalculator::Process(CalculatorContext* cc) {
           << "tensor shape is: " << input_tensor.shape().DebugString();
     }
     auto output =
-        absl::make_unique<std::vector<float>>(input_tensor.NumElements());
+        abslx::make_unique<std::vector<float>>(input_tensor.NumElements());
     const auto& tensor_values = input_tensor.unaligned_flat<float>();
     for (int i = 0; i < input_tensor.NumElements(); ++i) {
       output->at(i) = tensor_values(i);
@@ -109,7 +109,7 @@ absl::Status TensorToVectorFloatCalculator::Process(CalculatorContext* cc) {
     cc->Outputs().Index(0).Add(output.release(), cc->InputTimestamp());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

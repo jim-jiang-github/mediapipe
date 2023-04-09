@@ -33,7 +33,7 @@
 #include "absl/debugging/stacktrace.h"
 #include "absl/debugging/symbolize.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace debugging_internal {
 
@@ -134,7 +134,7 @@ static void DumpPCAndFrameSizeAndSymbol(void (*writerfn)(const char*, void*),
                                         const char* const prefix) {
   char tmp[1024];
   const char* symbol = "(unknown)";
-  if (absl::Symbolize(symbolize_pc, tmp, sizeof(tmp))) {
+  if (abslx::Symbolize(symbolize_pc, tmp, sizeof(tmp))) {
     symbol = tmp;
   }
   char buf[1024];
@@ -200,4 +200,4 @@ void DumpPCAndFrameSizesAndStackTrace(
 
 }  // namespace debugging_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

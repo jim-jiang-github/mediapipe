@@ -39,9 +39,9 @@ stream_executor::port::StatusOr<mlir::OwningOpRef<mlir::ModuleOp>>
 LoadFromGraphdefOrMlirSource(
     const std::string& input_filename, bool input_mlir,
     const std::vector<std::string>& extra_tf_opdefs,
-    absl::string_view debug_info_file, absl::string_view input_arrays,
-    absl::string_view input_dtypes, absl::string_view input_shapes,
-    absl::string_view output_arrays, bool prune_unused_nodes,
+    abslx::string_view debug_info_file, abslx::string_view input_arrays,
+    abslx::string_view input_dtypes, abslx::string_view input_shapes,
+    abslx::string_view output_arrays, bool prune_unused_nodes,
     llvm::SourceMgr* source_mgr, mlir::MLIRContext* context);
 
 // Load Saved model (either v1 or v2) into MLIR.

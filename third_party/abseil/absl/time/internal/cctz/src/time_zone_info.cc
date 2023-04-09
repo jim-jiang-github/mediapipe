@@ -49,7 +49,7 @@
 #include "time_zone_fixed.h"
 #include "time_zone_posix.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
@@ -723,7 +723,7 @@ bool TimeZoneInfo::Load(const std::string& name) {
     return ResetToBuiltinUTC(offset);
   }
 
-  // Find and use a ZoneInfoSource to load the named zone.
+   Find and use a ZoneInfoSource to load the named zone.
   auto zip = cctz_extension::zone_info_source_factory(
       name, [](const std::string& n) -> std::unique_ptr<ZoneInfoSource> {
         if (auto z = FileZoneInfoSource::Open(n)) return z;
@@ -962,4 +962,4 @@ bool TimeZoneInfo::PrevTransition(const time_point<seconds>& tp,
 }  // namespace cctz
 }  // namespace time_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

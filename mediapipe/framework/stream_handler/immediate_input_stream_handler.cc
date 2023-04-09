@@ -44,7 +44,7 @@ class ImmediateInputStreamHandler : public InputStreamHandler {
   void PrepareForRun(std::function<void()> headers_ready_callback,
                      std::function<void()> notification_callback,
                      std::function<void(CalculatorContext*)> schedule_callback,
-                     std::function<void(absl::Status)> error_callback) override;
+                     std::function<void(abslx::Status)> error_callback) override;
 
   // Returns kReadyForProcess whenever a Packet is available at any of
   // the input streams, or any input stream becomes done.
@@ -58,7 +58,7 @@ class ImmediateInputStreamHandler : public InputStreamHandler {
   // Returns the number of sync-sets maintained by this input-handler.
   int SyncSetCount() override;
 
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
   // The packet-set builder for each input stream.
   std::vector<SyncSet> sync_sets_ ABSL_GUARDED_BY(mutex_);
   // The input timestamp for each kReadyForProcess input stream.
@@ -82,9 +82,9 @@ void ImmediateInputStreamHandler::PrepareForRun(
     std::function<void()> headers_ready_callback,
     std::function<void()> notification_callback,
     std::function<void(CalculatorContext*)> schedule_callback,
-    std::function<void(absl::Status)> error_callback) {
+    std::function<void(abslx::Status)> error_callback) {
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     for (int i = 0; i < sync_sets_.size(); ++i) {
       sync_sets_[i].PrepareForRun();
       ready_timestamps_[i] = Timestamp::Unset();
@@ -97,7 +97,7 @@ void ImmediateInputStreamHandler::PrepareForRun(
 
 NodeReadiness ImmediateInputStreamHandler::GetNodeReadiness(
     Timestamp* min_stream_timestamp) {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   Timestamp input_timestamp = Timestamp::Done();
   Timestamp min_bound = Timestamp::Done();
   bool stream_became_done = false;
@@ -160,7 +160,7 @@ NodeReadiness ImmediateInputStreamHandler::GetNodeReadiness(
 
 void ImmediateInputStreamHandler::FillInputSet(Timestamp input_timestamp,
                                                InputStreamShardSet* input_set) {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   for (int i = 0; i < sync_sets_.size(); ++i) {
     if (ready_timestamps_[i] == input_timestamp) {
       sync_sets_[i].FillInputSet(input_timestamp, input_set);
@@ -172,7 +172,7 @@ void ImmediateInputStreamHandler::FillInputSet(Timestamp input_timestamp,
 }
 
 int ImmediateInputStreamHandler::SyncSetCount() {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   return sync_sets_.size();
 }
 

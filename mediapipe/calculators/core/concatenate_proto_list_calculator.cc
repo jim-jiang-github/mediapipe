@@ -38,22 +38,22 @@ class ConcatenateListsCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kIn, kOut);
 
-  static absl::Status UpdateContract(CalculatorContract* cc) {
+  static abslx::Status UpdateContract(CalculatorContract* cc) {
     RET_CHECK_GE(kIn(cc).Count(), 1);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     only_emit_if_all_present_ =
         cc->Options<::mediapipe::ConcatenateVectorCalculatorOptions>()
             .only_emit_if_all_present();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     if (only_emit_if_all_present_) {
       for (const auto& input : kIn(cc)) {
-        if (input.IsEmpty()) return absl::OkStatus();
+        if (input.IsEmpty()) return abslx::OkStatus();
       }
     }
 
@@ -66,7 +66,7 @@ class ConcatenateListsCalculator : public Node {
       }
     }
     kOut(cc).Send(std::move(output));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  protected:

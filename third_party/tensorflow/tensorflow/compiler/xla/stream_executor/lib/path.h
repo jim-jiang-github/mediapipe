@@ -25,7 +25,7 @@ namespace port {
 namespace internal {
 // TODO(rspringer): Move to cc/implementation file.
 // Not part of the public API.
-std::string JoinPathImpl(std::initializer_list<absl::string_view> paths);
+std::string JoinPathImpl(std::initializer_list<abslx::string_view> paths);
 }  // namespace internal
 
 // Join multiple paths together.
@@ -41,7 +41,7 @@ std::string JoinPathImpl(std::initializer_list<absl::string_view> paths);
 // All paths will be treated as relative paths, regardless of whether or not
 // they start with a leading '/'.  That is, all paths will be concatenated
 // together, with the appropriate path separator inserted in between.
-// Arguments must be convertible to absl::string_view.
+// Arguments must be convertible to abslx::string_view.
 //
 // Usage:
 // string path = file::JoinPath("/var/log", dirname, filename);

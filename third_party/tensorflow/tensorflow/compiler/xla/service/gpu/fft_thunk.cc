@@ -68,7 +68,7 @@ std::string FftTypeToString(se::fft::Type type) {
 }  // namespace
 
 FftThunk::FftThunk(ThunkInfo thunk_info, FftType fft_type,
-                   absl::Span<const int64_t> fft_length,
+                   abslx::Span<const int64_t> fft_length,
                    const BufferAllocation::Slice& input_buffer,
                    const BufferAllocation::Slice& output_buffer,
                    const Shape& input_shape, const Shape& output_shape)
@@ -94,7 +94,7 @@ Status FftThunk::ExecuteOnStream(const ExecuteParams& params) {
 
 Status RunFft(se::DeviceMemoryBase input, const Shape& input_shape,
               se::DeviceMemoryBase output, const Shape& output_shape,
-              se::fft::Type fft_type, absl::Span<const int64_t> fft_len,
+              se::fft::Type fft_type, abslx::Span<const int64_t> fft_len,
               int device_ordinal, FftPlanCache* fft_plan_cache,
               se::Stream* stream, se::DeviceMemoryAllocator* memory_allocator) {
   VLOG(3) << "FFT type: " << FftTypeToString(fft_type);
@@ -109,7 +109,7 @@ Status RunFft(se::DeviceMemoryBase input, const Shape& input_shape,
 
   // CuFFT thread-safety requires that separate host threads not share plans;
   // protect each plan with a mutex.
-  absl::MutexLock lock(&fft_plan_ptr->mu);
+  abslx::MutexLock lock(&fft_plan_ptr->mu);
   std::unique_ptr<se::fft::Plan>& fft_plan = fft_plan_ptr->plan;
   if (fft_plan == nullptr) {
     const int64_t fft_rank = fft_len.size();

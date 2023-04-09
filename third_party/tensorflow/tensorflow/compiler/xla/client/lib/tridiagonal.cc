@@ -257,7 +257,7 @@ StatusOr<XlaOp> TridiagonalSolverImpl<kThomas>(XlaOp lower_diagonal,
       UpdateEq(rhs_after_elimination, 0, Coefficient(rhs, 0));
 
   auto preparation_body_fn =
-      [](XlaOp i, absl::Span<const XlaOp> values,
+      [](XlaOp i, abslx::Span<const XlaOp> values,
          XlaBuilder* builder) -> StatusOr<std::vector<XlaOp>> {
     auto upper_diagonal_coeffs = values[0];
     auto upper_diagonal = values[1];
@@ -274,7 +274,7 @@ StatusOr<XlaOp> TridiagonalSolverImpl<kThomas>(XlaOp lower_diagonal,
 
   // Forward transformation.
   auto forward_transformation_fn =
-      [](XlaOp i_minus_one, absl::Span<const XlaOp> values,
+      [](XlaOp i_minus_one, abslx::Span<const XlaOp> values,
          XlaBuilder* builder) -> StatusOr<std::vector<XlaOp>> {
     auto lower_diagonal = values[0];
     auto main_diagonal = values[1];
@@ -332,7 +332,7 @@ StatusOr<XlaOp> TridiagonalSolverImpl<kThomas>(XlaOp lower_diagonal,
                Coefficient(rhs_after_elimination, num_eqs - 1) /
                    Coefficient(main_diag_after_elimination, num_eqs - 1));
   auto bwd_reduction_fn =
-      [num_eqs](XlaOp j, absl::Span<const XlaOp> values,
+      [num_eqs](XlaOp j, abslx::Span<const XlaOp> values,
                 XlaBuilder* builder) -> StatusOr<std::vector<XlaOp>> {
     auto x_coeffs = values[0];
     auto rhs_after_elimination = values[1];

@@ -42,7 +42,7 @@ class DomainMetadata {
     // operand/user pathways, without crossing a kDomain instruction of a given
     // kind. The reach_set can contain kDomain instructions of other kinds, if
     // two domains of different kind intersect each other.
-    absl::flat_hash_set<HloInstruction*> reach_set;
+    abslx::flat_hash_set<HloInstruction*> reach_set;
 
     // The same instructions in reach_set, but purged from kDomain instructions
     // and ordered according to their computation graph post-order, i.e.
@@ -55,8 +55,8 @@ class DomainMetadata {
     // whose dataflow enters the reach set (domain), while the exit_domains
     // contains the set of kDomain instructions whose dataflow exit the reach
     // set.
-    absl::flat_hash_set<HloInstruction*> enter_domains;
-    absl::flat_hash_set<HloInstruction*> exit_domains;
+    abslx::flat_hash_set<HloInstruction*> enter_domains;
+    abslx::flat_hash_set<HloInstruction*> exit_domains;
   };
 
   virtual ~DomainMetadata() = default;
@@ -66,7 +66,7 @@ class DomainMetadata {
 
   // Returns the metadata type. A unique identifier which describes the real
   // metadata type.
-  virtual absl::string_view Kind() const = 0;
+  virtual abslx::string_view Kind() const = 0;
 
   // Compares the metadata object with another one and returns true if the
   // two matches.

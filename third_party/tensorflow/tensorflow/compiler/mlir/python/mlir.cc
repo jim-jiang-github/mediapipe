@@ -197,10 +197,10 @@ std::string ImportGraphDef(const std::string& proto,
 
 std::string ImportGraphDef(const std::string& proto,
                            const std::string& pass_pipeline,
-                           bool show_debug_info, absl::string_view input_names,
-                           absl::string_view input_data_types,
-                           absl::string_view input_data_shapes,
-                           absl::string_view output_names, TF_Status* status) {
+                           bool show_debug_info, abslx::string_view input_names,
+                           abslx::string_view input_data_types,
+                           abslx::string_view input_data_shapes,
+                           abslx::string_view output_names, TF_Status* status) {
   GraphDebugInfo debug_info;
   GraphImportConfig specs;
   auto s = ParseInputArrayInfo(input_names, input_data_types, input_data_shapes,
@@ -210,7 +210,7 @@ std::string ImportGraphDef(const std::string& proto,
     return "// error";
   }
   if (!output_names.empty()) {
-    specs.outputs = absl::StrSplit(output_names, ',');
+    specs.outputs = abslx::StrSplit(output_names, ',');
   }
   return ImportGraphDefImpl(proto, pass_pipeline, show_debug_info, debug_info,
                             specs, status);
@@ -232,10 +232,10 @@ std::string ExperimentalConvertSavedModelToMlir(
   // Convert the SavedModelV2Bundle to an MLIR module.
 
   std::vector<string> exported_names =
-      absl::StrSplit(exported_names_str, ',', absl::SkipEmpty());
+      abslx::StrSplit(exported_names_str, ',', abslx::SkipEmpty());
   mlir::MLIRContext context;
   auto module_or = ConvertSavedModelToMlir(
-      &bundle, &context, absl::Span<std::string>(exported_names));
+      &bundle, &context, abslx::Span<std::string>(exported_names));
   if (!module_or.status().ok()) {
     Set_TF_Status_from_Status(status, module_or.status());
     return "// error";
@@ -249,16 +249,16 @@ std::string ExperimentalConvertSavedModelV1ToMlirLite(
     const std::string& tags, bool upgrade_legacy, bool show_debug_info,
     TF_Status* status) {
   std::unordered_set<string> tag_set =
-      absl::StrSplit(tags, ',', absl::SkipEmpty());
+      abslx::StrSplit(tags, ',', abslx::SkipEmpty());
 
   std::vector<string> exported_names =
-      absl::StrSplit(exported_names_str, ',', absl::SkipEmpty());
+      abslx::StrSplit(exported_names_str, ',', abslx::SkipEmpty());
   mlir::MLIRContext context;
 
   tensorflow::MLIRImportOptions import_options;
   import_options.upgrade_legacy = upgrade_legacy;
   auto module_or = SavedModelSignatureDefsToMlirImportLite(
-      saved_model_path, tag_set, absl::Span<std::string>(exported_names),
+      saved_model_path, tag_set, abslx::Span<std::string>(exported_names),
       &context, import_options);
   if (!module_or.status().ok()) {
     Set_TF_Status_from_Status(status, module_or.status());
@@ -275,7 +275,7 @@ std::string ExperimentalConvertSavedModelV1ToMlir(
   // Load the saved model into a SavedModelBundle.
 
   std::unordered_set<string> tag_set =
-      absl::StrSplit(tags, ',', absl::SkipEmpty());
+      abslx::StrSplit(tags, ',', abslx::SkipEmpty());
 
   tensorflow::SavedModelBundle bundle;
   auto load_status =
@@ -287,12 +287,12 @@ std::string ExperimentalConvertSavedModelV1ToMlir(
 
   // Convert the SavedModelBundle to an MLIR module.
   std::vector<string> exported_names =
-      absl::StrSplit(exported_names_str, ',', absl::SkipEmpty());
+      abslx::StrSplit(exported_names_str, ',', abslx::SkipEmpty());
   mlir::MLIRContext context;
   tensorflow::MLIRImportOptions import_options;
   import_options.upgrade_legacy = upgrade_legacy;
   auto module_or =
-      ConvertSavedModelV1ToMlir(bundle, absl::Span<std::string>(exported_names),
+      ConvertSavedModelV1ToMlir(bundle, abslx::Span<std::string>(exported_names),
                                 &context, import_options, lift_variables);
   if (!module_or.status().ok()) {
     Set_TF_Status_from_Status(status, module_or.status());

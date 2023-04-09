@@ -63,7 +63,7 @@ class MemoryTile {
   // `minor_dim_offset`}.
   //
   // Note: `major_dim_offset` is a parameter to the constructor.
-  void StoreTile(absl::Span<llvm::Value* const> tile,
+  void StoreTile(abslx::Span<llvm::Value* const> tile,
                  llvm::Value* minor_dim_offset) const {
     CHECK_EQ(tile.size(), pointers_.size());
     for (int64_t i = 0; i < pointers_.size(); i++) {
@@ -130,7 +130,7 @@ class GemvConfig {
   bool has_addend() const { return has_addend_; }
 
   std::string GetCacheKey() const {
-    return absl::StrCat(name_, "_", PrimitiveType_Name(scalar_type()), "_",
+    return abslx::StrCat(name_, "_", PrimitiveType_Name(scalar_type()), "_",
                         tile_rows(), "_", tile_cols(), "_", m(), "_", k(),
                         has_addend() ? "_with_addend" : "");
   }
@@ -243,7 +243,7 @@ class ColumnMajorMatrixVectorProductEmitter
         ksl_(b_),
         vsl_(config.scalar_type(), /*vector_size=*/config.tile_rows(), b_, "") {
     CHECK(tile_rows() > 0 &&
-          absl::has_single_bit(static_cast<uint64_t>(tile_rows())));
+          abslx::has_single_bit(static_cast<uint64_t>(tile_rows())));
     CHECK(!has_addend() || addend != nullptr);
   }
 
@@ -470,7 +470,7 @@ class RowMajorMatrixVectorProductEmitter
         ksl_(b_),
         vsl_(scalar_type(), /*vector_size=*/tile_cols(), b_, "") {
     CHECK(tile_cols() > 0 &&
-          absl::has_single_bit(static_cast<uint64_t>(tile_cols())));
+          abslx::has_single_bit(static_cast<uint64_t>(tile_cols())));
     CHECK(!has_addend() || addend != nullptr);
   }
 
@@ -631,7 +631,7 @@ class TiledSmallGemmEmitter {
     int64_t n() const { return n_; }
 
     std::string ToString() const {
-      return absl::StrCat(m(), "x", k(), "x", n());
+      return abslx::StrCat(m(), "x", k(), "x", n());
     }
 
    private:
@@ -675,7 +675,7 @@ class TiledSmallGemmEmitter {
           tile_size_k_(tile_size_k) {}
 
     std::string GetCacheKey() const {
-      return absl::StrCat("gemm_", PrimitiveType_Name(scalar_type()), "_",
+      return abslx::StrCat("gemm_", PrimitiveType_Name(scalar_type()), "_",
                           dims().ToString(), "_", max_vectorization_width(),
                           "_", min_vectorization_width(), "_", tile_size_m(),
                           "_", tile_size_k());
@@ -713,11 +713,11 @@ class TiledSmallGemmEmitter {
         ksl_(b_) {
     CHECK(
         max_vectorization_width() > 0 &&
-        absl::has_single_bit(static_cast<uint64_t>(max_vectorization_width())));
+        abslx::has_single_bit(static_cast<uint64_t>(max_vectorization_width())));
     CHECK_GT(max_vector_count(), 0);
     CHECK(
         min_vectorization_width() > 0 &&
-        absl::has_single_bit(static_cast<uint64_t>(min_vectorization_width())));
+        abslx::has_single_bit(static_cast<uint64_t>(min_vectorization_width())));
     CHECK_GE(max_vectorization_width(), min_vectorization_width());
     CHECK_GT(tile_size_k(), 0);
   }

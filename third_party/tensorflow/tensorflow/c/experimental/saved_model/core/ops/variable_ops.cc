@@ -56,7 +56,7 @@ Status CreateUninitializedResourceVariable(ImmediateExecutionContext* ctx,
   AbstractTensorHandle* var_handle = nullptr;
   int num_retvals = 1;
   TF_RETURN_IF_ERROR(varhandle_op->Execute(
-      absl::MakeSpan(&var_handle, num_retvals), &num_retvals));
+      abslx::MakeSpan(&var_handle, num_retvals), &num_retvals));
   AbstractTensorHandlePtr owned_var_handle(var_handle);
   if (!tensorflow::isa<ImmediateExecutionTensorHandle>(
           owned_var_handle.get())) {
@@ -92,7 +92,7 @@ Status ReadVariable(ImmediateExecutionContext* ctx,
   AbstractTensorHandle* value = nullptr;
   int num_retvals = 1;
   TF_RETURN_IF_ERROR(
-      read_op->Execute(absl::MakeSpan(&value, num_retvals), &num_retvals));
+      read_op->Execute(abslx::MakeSpan(&value, num_retvals), &num_retvals));
   AbstractTensorHandlePtr owned_value(value);
   if (!tensorflow::isa<ImmediateExecutionTensorHandle>(owned_value.get())) {
     return errors::Internal("Unexpected tensor handle kind.");

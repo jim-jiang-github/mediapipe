@@ -43,7 +43,7 @@ class InternalIncrementalBarrier {
     left_.fetch_add(1, std::memory_order_acq_rel);
 
     // std::bind_front is only available ever since C++20.
-    return absl::bind_front(&InternalIncrementalBarrier::operator(), this);
+    return abslx::bind_front(&InternalIncrementalBarrier::operator(), this);
   }
 
  private:

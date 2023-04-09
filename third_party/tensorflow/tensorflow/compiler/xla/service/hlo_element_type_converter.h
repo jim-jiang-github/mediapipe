@@ -32,13 +32,13 @@ class HloElementTypeConverter : public HloModulePass {
   HloElementTypeConverter(PrimitiveType eliminate_type,
                           PrimitiveType replace_with_type);
 
-  absl::string_view name() const override { return "element_type_converter"; }
+  abslx::string_view name() const override { return "element_type_converter"; }
 
   // Returns the pass on the module and returns whether the module was modified.
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   PrimitiveType eliminate_type_;

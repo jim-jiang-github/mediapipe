@@ -59,7 +59,7 @@ constexpr char kTimestampedClassificationsName[] =
     "timestamped_classifications";
 
 ClassificationList MakeClassificationList(int class_index) {
-  return ParseTextProtoOrDie<ClassificationList>(absl::StrFormat(
+  return ParseTextProtoOrDie<ClassificationList>(abslx::StrFormat(
       R"pb(
         classification { index: %d }
       )pb",
@@ -69,7 +69,7 @@ ClassificationList MakeClassificationList(int class_index) {
 class ClassificationAggregationCalculatorTest
     : public tflite_shims::testing::Test {
  protected:
-  absl::StatusOr<OutputStreamPoller> BuildGraph(
+  abslx::StatusOr<OutputStreamPoller> BuildGraph(
       bool connect_timestamps = false) {
     Graph graph;
     auto& calculator = graph.AddNode("ClassificationAggregationCalculator");
@@ -80,10 +80,10 @@ class ClassificationAggregationCalculatorTest
             R"pb(head_names: "foo" head_names: "bar")pb");
     graph[Input<ClassificationList>(kClassificationInput0Tag)].SetName(
         kClassificationInput0Name) >>
-        calculator.In(absl::StrFormat("%s:%d", kClassificationsTag, 0));
+        calculator.In(abslx::StrFormat("%s:%d", kClassificationsTag, 0));
     graph[Input<ClassificationList>(kClassificationInput1Tag)].SetName(
         kClassificationInput1Name) >>
-        calculator.In(absl::StrFormat("%s:%d", kClassificationsTag, 1));
+        calculator.In(abslx::StrFormat("%s:%d", kClassificationsTag, 1));
     if (connect_timestamps) {
       graph[Input<std::vector<Timestamp>>(kTimestampsTag)].SetName(
           kTimestampsName) >>
@@ -110,7 +110,7 @@ class ClassificationAggregationCalculatorTest
     return poller;
   }
 
-  absl::Status Send(
+  abslx::Status Send(
       std::vector<ClassificationList> classifications, int timestamp = 0,
       std::optional<std::vector<int>> aggregation_timestamps = std::nullopt) {
     MP_RETURN_IF_ERROR(calculator_graph_.AddPacketToInputStream(
@@ -129,17 +129,17 @@ class ClassificationAggregationCalculatorTest
       MP_RETURN_IF_ERROR(calculator_graph_.AddPacketToInputStream(
           kTimestampsName, Adopt(packet.release()).At(Timestamp(timestamp))));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   template <typename T>
-  absl::StatusOr<T> GetResult(OutputStreamPoller& poller) {
+  abslx::StatusOr<T> GetResult(OutputStreamPoller& poller) {
     MP_RETURN_IF_ERROR(calculator_graph_.WaitUntilIdle());
     MP_RETURN_IF_ERROR(calculator_graph_.CloseAllInputStreams());
 
     Packet packet;
     if (!poller.Next(&packet)) {
-      return absl::InternalError("Unable to get output packet");
+      return abslx::InternalError("Unable to get output packet");
     }
     auto result = packet.Get<T>();
     MP_RETURN_IF_ERROR(calculator_graph_.WaitUntilDone());

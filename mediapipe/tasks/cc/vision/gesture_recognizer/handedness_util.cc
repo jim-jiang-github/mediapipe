@@ -30,14 +30,14 @@ namespace gesture_recognizer {
 namespace {}  // namespace
 
 bool IsLeftHand(const Classification& c) {
-  return absl::EqualsIgnoreCase(c.label(), "Left");
+  return abslx::EqualsIgnoreCase(c.label(), "Left");
 }
 
 bool IsRightHand(const Classification& c) {
-  return absl::EqualsIgnoreCase(c.label(), "Right");
+  return abslx::EqualsIgnoreCase(c.label(), "Right");
 }
 
-absl::StatusOr<float> GetLeftHandScore(
+abslx::StatusOr<float> GetLeftHandScore(
     const ClassificationList& classification_list) {
   auto classifications = classification_list.classification();
   auto iter_max =

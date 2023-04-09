@@ -116,7 +116,7 @@ tensorflow::StatusOr<const tensorflow::NodeDef*> TFPackage::GetGraphDefNode(
   const auto& iter = graph_def_nodes_by_name_.find(name);
   if (iter == graph_def_nodes_by_name_.end()) {
     return tensorflow::Status(error::INTERNAL,
-                              absl::StrCat("Failed to find node named ", name));
+                              abslx::StrCat("Failed to find node named ", name));
   }
   return iter->second;
 }

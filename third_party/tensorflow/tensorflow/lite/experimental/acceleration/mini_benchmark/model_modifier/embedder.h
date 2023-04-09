@@ -86,12 +86,12 @@ class Embedder {
   // Construct the output model. Calls Finish() on 'fbb'.
   // The 'resolver' must have the call and decode_jpeg ops from this directory
   // registered as 'validation/call' and 'validation/decode_jpeg'.
-  absl::Status CreateModelWithEmbeddedValidation(
+  abslx::Status CreateModelWithEmbeddedValidation(
       flatbuffers::FlatBufferBuilder* fbb,
       ::tflite::ops::builtin::BuiltinOpResolver* resolver);
   // Check that the inputs fulfill the constraints. Called automatically as part
   // of CreateModelWithEmbeddedValidation.
-  absl::Status ValidateInputs();
+  abslx::Status ValidateInputs();
 
  private:
   const Model* main_model_;

@@ -41,14 +41,14 @@ TEST(TraceMeEncodeTest, TwoArgsTest) {
 TEST(TraceMeEncodeTest, ThreeArgsTest) {
   EXPECT_EQ(TraceMeEncode("Hello", {{"context", "World"},
                                     {"request_id", 42},
-                                    {"addr", absl::Hex(0xdeadbeef)}}),
+                                    {"addr", abslx::Hex(0xdeadbeef)}}),
             "Hello#context=World,request_id=42,addr=deadbeef#");
 }
 
 #if !defined(PLATFORM_WINDOWS)
 TEST(TraceMeEncodeTest, TemporaryStringTest) {
   EXPECT_EQ(TraceMeEncode("Hello", {{std::string("context"),
-                                     absl::StrCat("World:", 2020)}}),
+                                     abslx::StrCat("World:", 2020)}}),
             "Hello#context=World:2020#");
 }
 #endif

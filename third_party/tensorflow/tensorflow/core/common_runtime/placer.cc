@@ -59,9 +59,9 @@ string MakeUniqueFilename(string name) {
 
   string filename = name;
   if (count > 0) {
-    absl::StrAppend(&filename, "_", count);
+    abslx::StrAppend(&filename, "_", count);
   }
-  absl::StrAppend(&filename, ".txt");
+  abslx::StrAppend(&filename, ".txt");
   return filename;
 }
 
@@ -74,7 +74,7 @@ Status GetFileName(string base_name, string* fname) {
                             "TF_DUMP_GRAPH_PREFIX environment variable");
   }
   base_name = MakeUniqueFilename(base_name);
-  *fname = absl::StrCat(dir, "/", base_name);
+  *fname = abslx::StrCat(dir, "/", base_name);
   return OkStatus();
 }
 

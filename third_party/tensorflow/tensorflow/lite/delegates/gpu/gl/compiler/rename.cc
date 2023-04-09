@@ -44,10 +44,10 @@ class VariableRewriter : public InlineRewrite {
                    const NameFunctor& name_func)
       : inline_delimiter_(inline_delimiter), name_func_(name_func) {}
 
-  RewriteStatus Rewrite(absl::string_view input, std::string* output) final {
+  RewriteStatus Rewrite(abslx::string_view input, std::string* output) final {
     auto ref = variable_accessor_internal::Parse(input);
     if (ref.name.empty()) {
-      absl::StrAppend(output, "INVALID_SYNTAX");
+      abslx::StrAppend(output, "INVALID_SYNTAX");
       return RewriteStatus::ERROR;
     }
 
@@ -58,11 +58,11 @@ class VariableRewriter : public InlineRewrite {
     }
 
     // reconstruct access using the new name.
-    absl::StrAppend(output, inline_delimiter_, it->second.name);
+    abslx::StrAppend(output, inline_delimiter_, it->second.name);
     if (!ref.index.empty()) {
-      absl::StrAppend(output, "[", ref.index, "]");
+      abslx::StrAppend(output, "[", ref.index, "]");
     }
-    absl::StrAppend(output, ref.field, inline_delimiter_);
+    abslx::StrAppend(output, ref.field, inline_delimiter_);
     return RewriteStatus::SUCCESS;
   }
 
@@ -87,7 +87,7 @@ class VariableRewriter : public InlineRewrite {
   const std::string inline_delimiter_;
   const NameFunctor name_func_;
 
-  absl::flat_hash_map<std::string, Variable> name_to_variable_;
+  abslx::flat_hash_map<std::string, Variable> name_to_variable_;
 };
 
 // Rewrites names of all objects according to returned values from the
@@ -98,19 +98,19 @@ class ObjectRewriter : public InlineRewrite {
                  const NameFunctor& name_func)
       : inline_delimiter_(inline_delimiter), name_func_(name_func) {}
 
-  RewriteStatus Rewrite(absl::string_view input, std::string* output) final {
+  RewriteStatus Rewrite(abslx::string_view input, std::string* output) final {
     // Splits 'a = b' into {'a','b'}.
-    std::pair<absl::string_view, absl::string_view> n =
-        absl::StrSplit(input, absl::MaxSplits('=', 1), absl::SkipWhitespace());
+    std::pair<abslx::string_view, abslx::string_view> n =
+        abslx::StrSplit(input, abslx::MaxSplits('=', 1), abslx::SkipWhitespace());
     if (n.first.empty()) {
       return RewriteStatus::NOT_RECOGNIZED;
     }
 
     if (n.second.empty()) {
-      return RewriteRead(absl::StripAsciiWhitespace(n.first), output);
+      return RewriteRead(abslx::StripAsciiWhitespace(n.first), output);
     }
-    return RewriteWrite(absl::StripAsciiWhitespace(n.first),
-                        absl::StripAsciiWhitespace(n.second), output);
+    return RewriteWrite(abslx::StripAsciiWhitespace(n.first),
+                        abslx::StripAsciiWhitespace(n.second), output);
   }
 
   // Return true if an object was successfully added.
@@ -130,10 +130,10 @@ class ObjectRewriter : public InlineRewrite {
   }
 
  private:
-  RewriteStatus RewriteRead(absl::string_view location, std::string* output) {
+  RewriteStatus RewriteRead(abslx::string_view location, std::string* output) {
     auto element = object_accessor_internal::ParseElement(location);
     if (element.object_name.empty()) {
-      absl::StrAppend(output, "UNABLE_TO_PARSE_INDEXED_ELEMENT");
+      abslx::StrAppend(output, "UNABLE_TO_PARSE_INDEXED_ELEMENT");
       return RewriteStatus::ERROR;
     }
     auto it = name_to_object_.find(
@@ -141,18 +141,18 @@ class ObjectRewriter : public InlineRewrite {
     if (it == name_to_object_.end()) {
       return RewriteStatus::NOT_RECOGNIZED;
     }
-    absl::StrAppend(output, inline_delimiter_, it->second.first, "[",
-                    absl::StrJoin(element.indices, ","), "]",
+    abslx::StrAppend(output, inline_delimiter_, it->second.first, "[",
+                    abslx::StrJoin(element.indices, ","), "]",
                     inline_delimiter_);
     return RewriteStatus::SUCCESS;
   }
 
-  RewriteStatus RewriteWrite(absl::string_view location,
-                             absl::string_view value, std::string* output) {
+  RewriteStatus RewriteWrite(abslx::string_view location,
+                             abslx::string_view value, std::string* output) {
     // name[index1, index2...] = value
     auto element = object_accessor_internal::ParseElement(location);
     if (element.object_name.empty()) {
-      absl::StrAppend(output, "UNABLE_TO_PARSE_INDEXED_ELEMENT");
+      abslx::StrAppend(output, "UNABLE_TO_PARSE_INDEXED_ELEMENT");
       return RewriteStatus::ERROR;
     }
     auto it = name_to_object_.find(
@@ -160,8 +160,8 @@ class ObjectRewriter : public InlineRewrite {
     if (it == name_to_object_.end()) {
       return RewriteStatus::NOT_RECOGNIZED;
     }
-    absl::StrAppend(output, inline_delimiter_, it->second.first, "[",
-                    absl::StrJoin(element.indices, ","), "] = ", value,
+    abslx::StrAppend(output, inline_delimiter_, it->second.first, "[",
+                    abslx::StrJoin(element.indices, ","), "] = ", value,
                     inline_delimiter_);
     return RewriteStatus::SUCCESS;
   }
@@ -169,23 +169,23 @@ class ObjectRewriter : public InlineRewrite {
   const std::string inline_delimiter_;
   const NameFunctor name_func_;
 
-  absl::flat_hash_map<std::string, std::pair<std::string, Object>>
+  abslx::flat_hash_map<std::string, std::pair<std::string, Object>>
       name_to_object_;
 };
 
 }  // namespace
 
-absl::Status Rename(const NameFunctor& name_func, GeneratedCode* code) {
+abslx::Status Rename(const NameFunctor& name_func, GeneratedCode* code) {
   VariableRewriter variable_rewriter("$", name_func);
   ObjectRewriter object_rewriter("$", name_func);
   for (auto&& uniform_parameter : code->parameters) {
     if (!variable_rewriter.AddVariable(std::move(uniform_parameter))) {
-      return absl::InternalError("Variable name already exists");
+      return abslx::InternalError("Variable name already exists");
     }
   }
   for (auto&& object : code->objects) {
     if (!object_rewriter.AddObject(object.first, std::move(object.second))) {
-      return absl::InternalError("Object name already exists");
+      return abslx::InternalError("Object name already exists");
     }
   }
   TextPreprocessor preprocessor('$', /*keep_unknown_rewrites=*/true);
@@ -196,7 +196,7 @@ absl::Status Rename(const NameFunctor& name_func, GeneratedCode* code) {
   code->source_code = source_code;
   code->parameters = variable_rewriter.GetUniformParameters();
   code->objects = object_rewriter.GetObjects();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gl

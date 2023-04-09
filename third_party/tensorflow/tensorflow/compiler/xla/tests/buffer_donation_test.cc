@@ -59,9 +59,9 @@ class BufferDonationTest : public HloTestBase {
   // If `donate_arguments` is `true` gives up ownership of the buffers used for
   // the input allocation.
   void RunAndCheck(std::unique_ptr<HloModule> hlo_module,
-                   absl::Span<Literal const> argument_literals,
-                   absl::Span<bool const> donate_arguments,
-                   absl::Span<bool const> expected_runtime_aliasing,
+                   abslx::Span<Literal const> argument_literals,
+                   abslx::Span<bool const> donate_arguments,
+                   abslx::Span<bool const> expected_runtime_aliasing,
                    const Literal& expected, std::string expected_failure = "") {
     UpdateEntryComputationLayout(hlo_module.get());
     // Create a copy of the output shape because the HLO module is std::moved
@@ -130,7 +130,7 @@ class BufferDonationTest : public HloTestBase {
                                          /*hlo_execution_profile=*/nullptr);
     if (!expected_failure.empty()) {
       ASSERT_FALSE(output_status.ok());
-      ASSERT_TRUE(absl::StrContains(output_status.status().error_message(),
+      ASSERT_TRUE(abslx::StrContains(output_status.status().error_message(),
                                     expected_failure))
           << "got: \n"
           << output_status.status().error_message() << " \nvs want\n"
@@ -222,7 +222,7 @@ class BufferDonationTest : public HloTestBase {
     return builder.Build();
   }
 
-  std::unique_ptr<HloModule> CreateTestModule(absl::string_view module_name) {
+  std::unique_ptr<HloModule> CreateTestModule(abslx::string_view module_name) {
     std::unique_ptr<HloModule> module =
         CreateNewVerifiedModule(std::string(module_name));
     HloComputation* condition =

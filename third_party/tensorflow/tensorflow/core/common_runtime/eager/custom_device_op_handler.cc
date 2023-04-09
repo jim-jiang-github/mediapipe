@@ -89,7 +89,7 @@ Status CustomDeviceOpHandler::Execute(ImmediateExecutionOperation* op,
   }
 
   return op->Execute(
-      absl::MakeSpan(
+      abslx::MakeSpan(
           reinterpret_cast<tensorflow::AbstractTensorHandle**>(retvals),
           *num_retvals),
       num_retvals);
@@ -155,7 +155,7 @@ Status CustomDeviceOpHandler::MaybePinToCustomDevice(
         if (first == nullptr) {
           first = current;
         } else if (first != current) {
-          return errors::InvalidArgument(absl::StrCat(
+          return errors::InvalidArgument(abslx::StrCat(
               "If an operation has one of its inputs in a custom device, then "
               "all inputs should be on that same custom device or another "
               "physical device. Operation ",

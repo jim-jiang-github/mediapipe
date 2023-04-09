@@ -31,7 +31,7 @@ namespace tflite {
 namespace gpu {
 namespace cl {
 
-absl::Status RunPredefinedLayoutSample(const std::string& model_name) {
+abslx::Status RunPredefinedLayoutSample(const std::string& model_name) {
   auto flatbuffer = tflite::FlatBufferModel::BuildFromFile(model_name.c_str());
   GraphFloat32 graph_cl;
   ops::builtin::BuiltinOpResolver op_resolver;
@@ -65,17 +65,17 @@ absl::Status RunPredefinedLayoutSample(const std::string& model_name) {
   // in_ten will have TensorStorageType::BUFFER storage type
   Tensor* in_ten = context.GetTensor(graph_cl.inputs()[0]->id);
   if (in_ten->GetStorageType() != TensorStorageType::BUFFER) {
-    return absl::InternalError("Failed preconditiion");
+    return abslx::InternalError("Failed preconditiion");
   }
 
   RETURN_IF_ERROR(context.AddToQueue(env.queue()));
 
   std::cout << "Finished RunPredefinedLayoutSample." << std::endl;
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RunExternalImmutableSample(const std::string& model_name) {
+abslx::Status RunExternalImmutableSample(const std::string& model_name) {
   auto flatbuffer = tflite::FlatBufferModel::BuildFromFile(model_name.c_str());
   GraphFloat32 graph_cl;
   ops::builtin::BuiltinOpResolver op_resolver;
@@ -124,10 +124,10 @@ absl::Status RunExternalImmutableSample(const std::string& model_name) {
   std::cout << "First tensor data at index 0 - " << cpu_tensor.data[0]
             << std::endl;
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RunSerializedTest(const std::string& model_name) {
+abslx::Status RunSerializedTest(const std::string& model_name) {
   auto flatbuffer = tflite::FlatBufferModel::BuildFromFile(model_name.c_str());
   GraphFloat32 graph_cl;
   ops::builtin::BuiltinOpResolver op_resolver;
@@ -222,14 +222,14 @@ absl::Status RunSerializedTest(const std::string& model_name) {
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RunCommandBufferSample(int num_tests, int num_runs_per_sec,
+abslx::Status RunCommandBufferSample(int num_tests, int num_runs_per_sec,
                                     Environment* env,
                                     InferenceContext* context) {
   if (!env->device().GetInfo().SupportsExtension("cl_khr_command_buffer")) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   cl_command_queue command_queue = env->queue()->queue();
@@ -238,12 +238,12 @@ absl::Status RunCommandBufferSample(int num_tests, int num_runs_per_sec,
   for (auto& cb : cbs) {
     cb = clCreateCommandBufferKHR(1, &command_queue, nullptr, &errcode_ret);
     if (errcode_ret != CL_SUCCESS) {
-      return absl::InternalError("Failed clCreateCommandBufferKHR.");
+      return abslx::InternalError("Failed clCreateCommandBufferKHR.");
     }
     RETURN_IF_ERROR(context->AddToCommanBuffer(cb));
     errcode_ret = clFinalizeCommandBufferKHR(cb);
     if (errcode_ret != CL_SUCCESS) {
-      return absl::InternalError("Failed clFinalizeCommandBufferKHR.");
+      return abslx::InternalError("Failed clFinalizeCommandBufferKHR.");
     }
   }
 
@@ -253,8 +253,8 @@ absl::Status RunCommandBufferSample(int num_tests, int num_runs_per_sec,
       cl_int error_code =
           clEnqueueCommandBufferKHR(1, &command_queue, cb, 0, nullptr, nullptr);
       if (error_code != CL_SUCCESS) {
-        return absl::UnknownError(
-            absl::StrCat("Failed to clEnqueueCommandBufferKHR - ",
+        return abslx::UnknownError(
+            abslx::StrCat("Failed to clEnqueueCommandBufferKHR - ",
                          CLErrorCodeToString(error_code)));
       }
       clFlush(command_queue);
@@ -269,10 +269,10 @@ absl::Status RunCommandBufferSample(int num_tests, int num_runs_per_sec,
   for (auto& cb : cbs) {
     clReleaseCommandBufferKHR(cb);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RunModelSample(const std::string& model_name) {
+abslx::Status RunModelSample(const std::string& model_name) {
   auto flatbuffer = tflite::FlatBufferModel::BuildFromFile(model_name.c_str());
   GraphFloat32 graph_cl;
   ops::builtin::BuiltinOpResolver op_resolver;
@@ -311,7 +311,7 @@ absl::Status RunModelSample(const std::string& model_name) {
             << std::endl;
 
   const int num_runs_per_sec = std::max(
-      1, static_cast<int>(1000.0f / absl::ToDoubleMilliseconds(
+      1, static_cast<int>(1000.0f / abslx::ToDoubleMilliseconds(
                                         profiling_info.GetTotalTime())));
 
   const int kNumRuns = 10;
@@ -330,7 +330,7 @@ absl::Status RunModelSample(const std::string& model_name) {
   RETURN_IF_ERROR(
       RunCommandBufferSample(kNumRuns, num_runs_per_sec, &env, &context));
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace cl

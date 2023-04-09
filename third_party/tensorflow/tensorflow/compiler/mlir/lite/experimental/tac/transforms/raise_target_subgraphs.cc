@@ -186,8 +186,8 @@ void BuildTypes(const SmallVector<Value, 4>& values,
 
 void GetFunctionName(const Subgraph& subgrpah, std::string* function_name,
                      std::string* interface_name) {
-  *interface_name = absl::StrCat("func_", std::to_string(subgrpah.subgraph_id));
-  *function_name = absl::StrCat(
+  *interface_name = abslx::StrCat("func_", std::to_string(subgrpah.subgraph_id));
+  *function_name = abslx::StrCat(
       (*interface_name), "_", subgrpah.inference_device_type.hardware, "_",
       GetInferenceString(subgrpah.inference_device_type.inference_type));
 }

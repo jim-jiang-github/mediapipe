@@ -24,7 +24,7 @@
 #include "absl/base/internal/raw_logging.h"
 #include "absl/base/macros.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
@@ -461,4 +461,4 @@ TEST_F(GraphCyclesTest, ManyEdges) {
 
 }  // namespace synchronization_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

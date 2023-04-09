@@ -51,13 +51,13 @@ std::unique_ptr<llvm::Module> LoadIRModule(const std::string& filename,
   return module;
 }
 
-std::string ReplaceFilenameExtension(absl::string_view filename,
-                                     absl::string_view new_extension) {
+std::string ReplaceFilenameExtension(abslx::string_view filename,
+                                     abslx::string_view new_extension) {
   auto pos = filename.rfind('.');
-  absl::string_view stem = pos == absl::string_view::npos
+  abslx::string_view stem = pos == abslx::string_view::npos
                                ? filename
-                               : absl::string_view(filename.data(), pos);
-  return absl::StrCat(stem, ".", new_extension);
+                               : abslx::string_view(filename.data(), pos);
+  return abslx::StrCat(stem, ".", new_extension);
 }
 
 }  // namespace gpu

@@ -29,7 +29,7 @@ namespace xla {
 
 StatusOr<bool> AllGatherBroadcastReorder::Run(
     HloModule *module,
-    const absl::flat_hash_set<absl::string_view> &execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view> &execution_threads) {
   if (hlo_query::ContainsLayoutConstrainedCollective(*module,
                                                      HloOpcode::kAllGather)) {
     VLOG(1) << "Skip AllGatherBroadcastReorder because the module contains "
@@ -60,7 +60,7 @@ StatusOr<bool> AllGatherBroadcastReorder::Run(
       // uniform. If there are any remaining uniform dims and their size > 1,
       // then doing the broadcast after the all-gather is beneficial as the
       // all-gather will be operating on smaller data.
-      absl::flat_hash_set<int64_t> non_uniform_dims;
+      abslx::flat_hash_set<int64_t> non_uniform_dims;
       non_uniform_dims.insert(bcast->dimensions().begin(),
                               bcast->dimensions().end());
       const bool all_gather_along_uniform_dim =
@@ -137,7 +137,7 @@ StatusOr<bool> AllGatherBroadcastReorder::Run(
 
         // Reshape to add a leading '1' dimension.
         std::vector<int64_t> shape_dims{1};
-        absl::Span<const int64_t> x_dims = x->shape().dimensions();
+        abslx::Span<const int64_t> x_dims = x->shape().dimensions();
         shape_dims.insert(shape_dims.end(), x_dims.begin(), x_dims.end());
         Shape shape =
             ShapeUtil::MakeShape(x->shape().element_type(), shape_dims);

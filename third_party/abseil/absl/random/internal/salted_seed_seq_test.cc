@@ -22,9 +22,9 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-using absl::random_internal::GetSaltMaterial;
-using absl::random_internal::MakeSaltedSeedSeq;
-using absl::random_internal::SaltedSeedSeq;
+using abslx::random_internal::GetSaltMaterial;
+using abslx::random_internal::MakeSaltedSeedSeq;
+using abslx::random_internal::SaltedSeedSeq;
 using testing::Eq;
 using testing::Pointwise;
 

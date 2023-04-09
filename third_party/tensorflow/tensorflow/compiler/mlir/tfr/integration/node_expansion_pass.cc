@@ -52,7 +52,7 @@ Status CompositeOpExpansion::Run(EagerOperation* orig_op,
       "VarHandleOp",       // b/176819198
   };
   for (const char* skip : kOpsToSkip) {
-    if (absl::StartsWith(orig_op->op_name(), skip)) return OkStatus();
+    if (abslx::StartsWith(orig_op->op_name(), skip)) return OkStatus();
   }
 
   tf_core_op_expansion_node_counter->GetCell()->IncrementBy(1);
@@ -68,7 +68,7 @@ Status CompositeOpExpansion::Run(EagerOperation* orig_op,
   // can change and thus affect which kernel is picked.
   auto x = FingerprintCat64(cache_key.high64, cache_key.low64);
   std::string fname =
-      absl::StrCat("_expanded_", ndef.name(), "_", std::to_string(x));
+      abslx::StrCat("_expanded_", ndef.name(), "_", std::to_string(x));
   if (!ctx.FindFunctionByName(fname)) {
     TF_ASSIGN_OR_RETURN(auto func, ExpandNode(ndef, fname));
     TF_RETURN_IF_ERROR(ctx.AddFunctionDef(func));

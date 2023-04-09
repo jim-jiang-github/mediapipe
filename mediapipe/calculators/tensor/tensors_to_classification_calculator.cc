@@ -77,9 +77,9 @@ class TensorsToClassificationCalculator : public Node {
       "CLASSIFICATIONS"};
   MEDIAPIPE_NODE_CONTRACT(kInTensors, kOutClassificationList);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
   int top_k_ = 0;
@@ -91,7 +91,7 @@ class TensorsToClassificationCalculator : public Node {
 
   // Set of allowed or ignored class indices.
   struct ClassIndexSet {
-    absl::flat_hash_set<int> values;
+    abslx::flat_hash_set<int> values;
     bool is_allowlist;
   };
   // Allowed or ignored class indices based on provided options.
@@ -102,7 +102,7 @@ class TensorsToClassificationCalculator : public Node {
 };
 MEDIAPIPE_REGISTER_NODE(TensorsToClassificationCalculator);
 
-absl::Status TensorsToClassificationCalculator::Open(CalculatorContext* cc) {
+abslx::Status TensorsToClassificationCalculator::Open(CalculatorContext* cc) {
   const auto& options = cc->Options<TensorsToClassificationCalculatorOptions>();
 
   top_k_ = options.top_k();
@@ -159,10 +159,10 @@ absl::Status TensorsToClassificationCalculator::Open(CalculatorContext* cc) {
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorsToClassificationCalculator::Process(CalculatorContext* cc) {
+abslx::Status TensorsToClassificationCalculator::Process(CalculatorContext* cc) {
   const auto& input_tensors = *kInTensors(cc);
   RET_CHECK_EQ(input_tensors.size(), 1);
   RET_CHECK(input_tensors[0].element_type() == Tensor::ElementType::kFloat32);
@@ -180,7 +180,7 @@ absl::Status TensorsToClassificationCalculator::Process(CalculatorContext* cc) {
   auto view = input_tensors[0].GetCpuReadView();
   auto raw_scores = view.buffer<float>();
 
-  auto classification_list = absl::make_unique<ClassificationList>();
+  auto classification_list = abslx::make_unique<ClassificationList>();
   if (is_binary_classification_) {
     Classification* class_first = classification_list->add_classification();
     Classification* class_second = classification_list->add_classification();
@@ -234,11 +234,11 @@ absl::Status TensorsToClassificationCalculator::Process(CalculatorContext* cc) {
               });
   }
   kOutClassificationList(cc).Send(std::move(classification_list));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorsToClassificationCalculator::Close(CalculatorContext* cc) {
-  return absl::OkStatus();
+abslx::Status TensorsToClassificationCalculator::Close(CalculatorContext* cc) {
+  return abslx::OkStatus();
 }
 
 bool TensorsToClassificationCalculator::IsClassIndexAllowed(int class_index) {

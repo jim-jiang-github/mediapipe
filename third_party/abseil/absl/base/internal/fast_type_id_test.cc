@@ -21,7 +21,7 @@
 #include "gtest/gtest.h"
 
 namespace {
-namespace bi = absl::base_internal;
+namespace bi = abslx::base_internal;
 
 // NOLINTNEXTLINE
 #define PRIM_TYPES(A)   \

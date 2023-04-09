@@ -30,14 +30,14 @@ namespace {
 Status ValidateBatchSizeAndFeatureCounts(
     const tpu::TPUEmbeddingConfiguration& config) {
   if (config.batch_size_per_tensor_core() <= 0) {
-    return errors::InvalidArgument(absl::StrFormat(
+    return errors::InvalidArgument(abslx::StrFormat(
         "Invalid batch_size_per_tensor_core: %d found in the TPU embedding "
         "configuration. Valid values are >0.",
         config.batch_size_per_tensor_core()));
   }
   for (const auto& table_config : config.table_descriptor()) {
     if (table_config.num_features() <= 0) {
-      return errors::InvalidArgument(absl::StrFormat(
+      return errors::InvalidArgument(abslx::StrFormat(
           "Invalid num_features: %d found for table: %s in the TPU embedding "
           "configuration. Valid values are >0.",
           table_config.num_features(), table_config.name()));
@@ -59,7 +59,7 @@ Status ValidateBatchSizeAndFeatureCountsAreEmpty(
   }
   for (const auto& table_config : config.table_descriptor()) {
     if (table_config.num_features() != 0) {
-      return errors::InvalidArgument(absl::StrFormat(
+      return errors::InvalidArgument(abslx::StrFormat(
           "Invalid TPU embedding configuration. The "
           "TableDescriptor.num_features field must NOT be populated when the "
           "feature_descriptor fields are filled in, num_features is set to %d "
@@ -81,19 +81,19 @@ Status ValidateFeatureDescriptors(
     const int table_id = feature_config.table_id();
     const auto& input_shape = feature_config.input_shape();
     if (table_id < 0 || table_id >= table_count) {
-      return errors::InvalidArgument(absl::StrFormat(
+      return errors::InvalidArgument(abslx::StrFormat(
           "Invalid table_id: %d found in feature_descriptor: %s, all table_ids "
           "must be in the range[0, %d)",
           table_id, feature_config.ShortDebugString(), table_count));
     }
     if (input_shape.empty()) {
-      return errors::InvalidArgument(absl::StrFormat(
+      return errors::InvalidArgument(abslx::StrFormat(
           "The input_shape field cannot be empty in feature_descriptor: %s",
           feature_config.ShortDebugString()));
     }
     for (const int dim_size : input_shape) {
       if (dim_size <= 0) {
-        return errors::InvalidArgument(absl::StrFormat(
+        return errors::InvalidArgument(abslx::StrFormat(
             "The input_shape dimension sizes must all be >0 in "
             "feature_descriptor: %s, found dimension size set to %d",
             feature_config.ShortDebugString(), dim_size));
@@ -104,7 +104,7 @@ Status ValidateFeatureDescriptors(
 
   for (int table_id = 0; table_id < table_count; ++table_id) {
     if (!tables_present[table_id]) {
-      return errors::InvalidArgument(absl::StrFormat(
+      return errors::InvalidArgument(abslx::StrFormat(
           "No feature_descriptor fields found for table: %s (ID: %d) in "
           "the TPU embedding configuration.",
           config.table_descriptor(table_id).name(), table_id));
@@ -135,7 +135,7 @@ std::vector<int> ComputeInputFeatureBatchSizes(
   std::vector<int32> input_feature_batch_sizes;
   for (int i = 0; i < config.feature_descriptor_size(); ++i) {
     const int32 batch_size =
-        absl::c_accumulate(config.feature_descriptor(i).input_shape(),
+        abslx::c_accumulate(config.feature_descriptor(i).input_shape(),
                            /*init=*/1, std::multiplies<>());
     input_feature_batch_sizes.push_back(batch_size);
   }
@@ -145,7 +145,7 @@ std::vector<int> ComputeInputFeatureBatchSizes(
 // Computes the TensorCore batch size as the GCD of all input feature batch
 // sizes.
 int ComputeBatchSizePerTensorCore(
-    absl::Span<const int> input_feature_batch_sizes) {
+    abslx::Span<const int> input_feature_batch_sizes) {
   uint32_t batch_size = input_feature_batch_sizes[0];
   for (const uint32_t input_feature_batch_size : input_feature_batch_sizes) {
     batch_size =
@@ -160,7 +160,7 @@ int ComputeBatchSizePerTensorCore(
 // size per TensorCore.
 std::vector<int> ComputeTpuFeatureCounts(
     const tpu::TPUEmbeddingConfiguration& config,
-    absl::Span<const int> input_feature_batch_sizes,
+    abslx::Span<const int> input_feature_batch_sizes,
     int batch_size_per_tensor_core) {
   DCHECK_EQ(input_feature_batch_sizes.size(), config.feature_descriptor_size());
   std::vector<int> tpu_feature_counts(config.table_descriptor_size(), 0);

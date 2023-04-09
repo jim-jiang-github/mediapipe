@@ -32,7 +32,7 @@ namespace {
 
 class QuantizeAndDequantize : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     std::string code = R"(
 value_0 = clamp(value_0, vec4($quant_min$), vec4($quant_max$));
@@ -55,7 +55,7 @@ value_0 = value_0 * vec4($quant_scale$) + vec4($quant_min$);
         /*input=*/IOStructure::AUTO,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

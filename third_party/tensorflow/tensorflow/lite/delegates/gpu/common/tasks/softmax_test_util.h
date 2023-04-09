@@ -22,11 +22,11 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status SoftmaxTest(TestExecutionEnvironment* env);
-absl::Status SoftmaxBigNumberTest(TestExecutionEnvironment* env);
+abslx::Status SoftmaxTest(TestExecutionEnvironment* env);
+abslx::Status SoftmaxBigNumberTest(TestExecutionEnvironment* env);
 
-absl::Status Softmax1x1Test(TestExecutionEnvironment* env);
-absl::Status Softmax1x1BigNumberTest(TestExecutionEnvironment* env);
+abslx::Status Softmax1x1Test(TestExecutionEnvironment* env);
+abslx::Status Softmax1x1BigNumberTest(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

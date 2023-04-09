@@ -22,12 +22,12 @@
 
 namespace mediapipe {
 
-inline const ::absl::Status& GetStatus(const ::absl::Status& status) {
+inline const ::abslx::Status& GetStatus(const ::abslx::Status& status) {
   return status;
 }
 
 template <typename T>
-inline const ::absl::Status& GetStatus(const ::absl::StatusOr<T>& status) {
+inline const ::abslx::Status& GetStatus(const ::abslx::StatusOr<T>& status) {
   return status.status();
 }
 
@@ -145,7 +145,7 @@ inline IsOkMatcher IsOk() { return IsOkMatcher(); }
 class StatusIsMatcherCommonImpl {
  public:
   StatusIsMatcherCommonImpl(
-      ::testing::Matcher<const absl::StatusCode> code_matcher,
+      ::testing::Matcher<const abslx::StatusCode> code_matcher,
       ::testing::Matcher<const std::string&> message_matcher)
       : code_matcher_(std::move(code_matcher)),
         message_matcher_(std::move(message_matcher)) {}
@@ -164,7 +164,7 @@ class StatusIsMatcherCommonImpl {
     message_matcher_.DescribeNegationTo(os);
   }
 
-  bool MatchAndExplain(const absl::Status& status,
+  bool MatchAndExplain(const abslx::Status& status,
                        ::testing::MatchResultListener* result_listener) const {
     ::testing::StringMatchResultListener inner_listener;
 
@@ -186,7 +186,7 @@ class StatusIsMatcherCommonImpl {
   }
 
  private:
-  const ::testing::Matcher<const absl::StatusCode> code_matcher_;
+  const ::testing::Matcher<const abslx::StatusCode> code_matcher_;
   const ::testing::Matcher<const std::string&> message_matcher_;
 };
 
@@ -220,10 +220,10 @@ class MonoStatusIsMatcherImpl : public ::testing::MatcherInterface<T> {
 // Implements StatusIs() as a polymorphic matcher.
 class StatusIsMatcher {
  public:
-  StatusIsMatcher(::testing::Matcher<const absl::StatusCode> code_matcher,
+  StatusIsMatcher(::testing::Matcher<const abslx::StatusCode> code_matcher,
                   ::testing::Matcher<const std::string&> message_matcher)
       : common_impl_(
-            ::testing::MatcherCast<const absl::StatusCode>(code_matcher),
+            ::testing::MatcherCast<const abslx::StatusCode>(code_matcher),
             ::testing::MatcherCast<const std::string&>(message_matcher)) {}
 
   // Converts this polymorphic matcher to a monomorphic matcher of the given
@@ -254,8 +254,8 @@ StatusIsMatcher StatusIs(CodeMatcher code_matcher) {
 
 }  // namespace mediapipe
 
-// Macros for testing the results of functions that return absl::Status or
-// absl::StatusOr<T> (for any type T).
+// Macros for testing the results of functions that return abslx::Status or
+// abslx::StatusOr<T> (for any type T).
 #define MP_EXPECT_OK(expression) EXPECT_THAT(expression, mediapipe::IsOk())
 #define MP_ASSERT_OK(expression) ASSERT_THAT(expression, mediapipe::IsOk())
 

@@ -52,7 +52,7 @@ class CompileOnlyClient : public Client {
   // code. |metadata|, if provided, is populated during compilation.
   StatusOr<std::vector<std::unique_ptr<AotCompilationResult>>>
   CompileAheadOfTime(
-      const absl::Span<const AotXlaComputationInstance> computations,
+      const abslx::Span<const AotXlaComputationInstance> computations,
       const AotCompilationOptions& options,
       std::unique_ptr<AotCompilationMetadata>* metadata = nullptr);
 
@@ -60,11 +60,11 @@ class CompileOnlyClient : public Client {
   // execution_options is optional; if not given a default is used.
   StatusOr<std::unique_ptr<HloModuleConfig>> CreateModuleConfig(
       const ProgramShape& program_shape,
-      absl::Span<const Shape* const> argument_shapes,
+      abslx::Span<const Shape* const> argument_shapes,
       const ExecutionOptions* execution_options);
 
   // Returns the size of a pointer in bytes for a given triple.
-  static int64_t PointerSizeForTriple(absl::string_view triple);
+  static int64_t PointerSizeForTriple(abslx::string_view triple);
 
  private:
   CompileOnlyService* compiler_service_;

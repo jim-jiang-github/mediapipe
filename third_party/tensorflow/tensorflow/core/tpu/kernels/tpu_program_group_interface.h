@@ -58,7 +58,7 @@ class TpuProgramGroupInterface {
 
   // Hlo metadatas. The pointers can only be used as long as the cache entry is
   // referenced.
-  virtual absl::Span<const xla::HloProto* const> hlo_metadatas() const = 0;
+  virtual abslx::Span<const xla::HloProto* const> hlo_metadatas() const = 0;
 
   // Boolean array to indicate if the modification of variables are
   // allowed.

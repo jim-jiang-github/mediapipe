@@ -178,7 +178,7 @@ class KernelBase {
   // Gets the preferred cache configuration for a kernel.
   KernelCacheConfig GetPreferredCacheConfig() const;
 
-  void set_name(absl::string_view name);
+  void set_name(abslx::string_view name);
   const std::string &name() const { return name_; }
   const std::string &demangled_name() const { return demangled_name_; }
 

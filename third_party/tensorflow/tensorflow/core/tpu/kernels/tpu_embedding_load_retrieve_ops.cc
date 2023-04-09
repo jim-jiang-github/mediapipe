@@ -73,7 +73,7 @@ Status ComputeExpectedTableShardShapes(const TPUEmbeddingConfiguration& config,
 
 // Logs min/max/avg for the specified state_variable array.
 void LogRangeStatistics(int32 table_id, int32 state_variable_index,
-                        absl::Span<const float> state_variable) {
+                        abslx::Span<const float> state_variable) {
   if (VLOG_IS_ON(5)) {
     float min = std::numeric_limits<float>::infinity();
     float max = -std::numeric_limits<float>::infinity();
@@ -119,13 +119,13 @@ LoadAllTPUEmbeddingParametersOp::LoadAllTPUEmbeddingParametersOp(
 
 void LoadAllTPUEmbeddingParametersOp::GetStateVariables(
     OpKernelContext* ctx,
-    std::array<std::vector<absl::Span<const float>>,
+    std::array<std::vector<abslx::Span<const float>>,
                tpu::kMaxAuxiliaryParameterCount + 1> &state_variable_vector) {
     std::array<OpInputList, tpu::kMaxAuxiliaryParameterCount + 1>
       state_variable;
   OP_REQUIRES_OK(ctx, ctx->input_list("parameters", &state_variable[0]));
   for (int i = 1; i <= tpu::kMaxAuxiliaryParameterCount; ++i) {
-    OP_REQUIRES_OK(ctx, ctx->input_list(absl::StrCat("auxiliary", i),
+    OP_REQUIRES_OK(ctx, ctx->input_list(abslx::StrCat("auxiliary", i),
                                         &state_variable[i]));
   }
   const int num_tables = state_variable[0].size();
@@ -183,11 +183,11 @@ void LoadAllTPUEmbeddingParametersOp::GetStateVariables(
               " but config requires count ", num_elements));
       const float* state_variable_i_ptr =
           state_variable[i][table_id].flat<float>().data();
-      state_variable_vector[i].push_back(absl::MakeConstSpan(
+      state_variable_vector[i].push_back(abslx::MakeConstSpan(
           state_variable_i_ptr, static_cast<size_t>(num_elements)));
       LogRangeStatistics(
           table_id, i,
-          absl::MakeConstSpan(state_variable_i_ptr, num_elements));
+          abslx::MakeConstSpan(state_variable_i_ptr, num_elements));
     }
     for (int i = state_variable_specs.size();
          i <= tpu::kMaxAuxiliaryParameterCount; ++i) {
@@ -197,7 +197,7 @@ void LoadAllTPUEmbeddingParametersOp::GetStateVariables(
                       " for table ", table_id, " has element count ",
                       state_variable[i][table_id].NumElements(),
                       " but config requires empty tensor"));
-      state_variable_vector[i].push_back(absl::Span<const float>());
+      state_variable_vector[i].push_back(abslx::Span<const float>());
     }
   }
 }
@@ -205,7 +205,7 @@ void LoadAllTPUEmbeddingParametersOp::GetStateVariables(
 void LoadAllTPUEmbeddingParametersOp::Compute(OpKernelContext* ctx) {
     VLOG(1) << "LoadAllTPUEmbeddingParameters::Compute";
 
-  std::array<std::vector<absl::Span<const float>>,
+  std::array<std::vector<abslx::Span<const float>>,
              tpu::kMaxAuxiliaryParameterCount + 1> state_variable_vector;
 
   GetStateVariables(ctx, state_variable_vector);
@@ -263,14 +263,14 @@ RetrieveAllTPUEmbeddingParametersOp::RetrieveAllTPUEmbeddingParametersOp(
 
 void RetrieveAllTPUEmbeddingParametersOp::GetStateVariables(
     OpKernelContext* ctx,
-    std::array<std::vector<absl::Span<float>>,
+    std::array<std::vector<abslx::Span<float>>,
                tpu::kMaxAuxiliaryParameterCount + 1> &state_variable_vector,
     std::vector<int> & num_state_variables) {
   std::array<OpOutputList, tpu::kMaxAuxiliaryParameterCount + 1>
       state_variable;
   OP_REQUIRES_OK(ctx, ctx->output_list("parameters", &state_variable[0]));
   for (int i = 1; i <= tpu::kMaxAuxiliaryParameterCount; ++i) {
-    OP_REQUIRES_OK(ctx, ctx->output_list(absl::StrCat("auxiliary", i),
+    OP_REQUIRES_OK(ctx, ctx->output_list(abslx::StrCat("auxiliary", i),
                                          &state_variable[i]));
   }
   const int num_tables = state_variable[0].size();
@@ -311,7 +311,7 @@ void RetrieveAllTPUEmbeddingParametersOp::GetStateVariables(
                                           &state_variable_tensor));
       float* state_variable_ptr = state_variable_tensor->flat<float>().data();
       state_variable_vector[i][table_id] =
-          absl::MakeSpan(state_variable_ptr, num_elements);
+          abslx::MakeSpan(state_variable_ptr, num_elements);
     }
     // Fill in auxiliary values after the number actually used for table_id
     // with empty 2-D tensors.
@@ -323,7 +323,7 @@ void RetrieveAllTPUEmbeddingParametersOp::GetStateVariables(
       OP_REQUIRES_OK(ctx, TensorShapeUtils::MakeShape(dims, &shape));
       OP_REQUIRES_OK(ctx, state_variable[i].allocate(table_id, shape,
                                                      &auxiliary_tensor));
-      state_variable_vector[i][table_id] = absl::Span<float>();
+      state_variable_vector[i][table_id] = abslx::Span<float>();
     }
   }
 }
@@ -331,7 +331,7 @@ void RetrieveAllTPUEmbeddingParametersOp::GetStateVariables(
 void RetrieveAllTPUEmbeddingParametersOp::Compute(OpKernelContext* ctx) {
   VLOG(1) << "RetrieveAllTPUEmbeddingParameters::Compute";
 
-  std::array<std::vector<absl::Span<float>>,
+  std::array<std::vector<abslx::Span<float>>,
              tpu::kMaxAuxiliaryParameterCount + 1> state_variable_vector;
   std::vector<int> num_state_variables;
 

@@ -48,25 +48,25 @@ using mediapipe::TimedBoxProtoList;
 // }
 class TimedBoxListIdToLabelCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
-  absl::node_hash_map<int, std::string> label_map_;
+  abslx::node_hash_map<int, std::string> label_map_;
 };
 REGISTER_CALCULATOR(TimedBoxListIdToLabelCalculator);
 
-absl::Status TimedBoxListIdToLabelCalculator::GetContract(
+abslx::Status TimedBoxListIdToLabelCalculator::GetContract(
     CalculatorContract* cc) {
   cc->Inputs().Index(0).Set<TimedBoxProtoList>();
   cc->Outputs().Index(0).Set<TimedBoxProtoList>();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TimedBoxListIdToLabelCalculator::Open(CalculatorContext* cc) {
+abslx::Status TimedBoxListIdToLabelCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
   const auto& options =
@@ -83,12 +83,12 @@ absl::Status TimedBoxListIdToLabelCalculator::Open(CalculatorContext* cc) {
   while (std::getline(stream, line)) {
     label_map_[i++] = line;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TimedBoxListIdToLabelCalculator::Process(CalculatorContext* cc) {
+abslx::Status TimedBoxListIdToLabelCalculator::Process(CalculatorContext* cc) {
   const auto& input_list = cc->Inputs().Index(0).Get<TimedBoxProtoList>();
-  auto output_list = absl::make_unique<TimedBoxProtoList>();
+  auto output_list = abslx::make_unique<TimedBoxProtoList>();
   for (const auto& input_box : input_list.box()) {
     TimedBoxProto* box_ptr = output_list->add_box();
     *box_ptr = input_box;
@@ -98,7 +98,7 @@ absl::Status TimedBoxListIdToLabelCalculator::Process(CalculatorContext* cc) {
     }
   }
   cc->Outputs().Index(0).Add(output_list.release(), cc->InputTimestamp());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

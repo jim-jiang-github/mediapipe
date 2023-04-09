@@ -40,7 +40,7 @@ namespace shim {
 
 TfLiteTensorView::TfLiteTensorView(::TfLiteTensor *wrapped_tensor,
                                    const ::tensorflow::tstring &dtype)
-    : TensorView(absl::Span<int>(wrapped_tensor->dims->data,
+    : TensorView(abslx::Span<int>(wrapped_tensor->dims->data,
                                  wrapped_tensor->dims->size),
                  nullptr, 0, dtype),
       wrapped_tensor_(wrapped_tensor),
@@ -50,7 +50,7 @@ TfLiteTensorView::TfLiteTensorView(::TfLiteTensor *wrapped_tensor,
 
 TfLiteTensorView::TfLiteTensorView(const ::TfLiteTensor *wrapped_tensor,
                                    const ::tensorflow::tstring &dtype)
-    : TensorView(absl::Span<int>(wrapped_tensor->dims->data,
+    : TensorView(abslx::Span<int>(wrapped_tensor->dims->data,
                                  wrapped_tensor->dims->size),
                  nullptr, 0, dtype),
       const_wrapped_tensor_(wrapped_tensor) {
@@ -92,7 +92,7 @@ void TfLiteTensorView::InitForStringDType() {
   if (str_vec_ == nullptr) {
     str_vec_ = std::make_shared<StringBuffer>(this);
   }
-  data_ = absl::Span<::tensorflow::tstring>(str_vec_->buffer);
+  data_ = abslx::Span<::tensorflow::tstring>(str_vec_->buffer);
 }
 
 TfLiteTensorView::StringBuffer::StringBuffer(TfLiteTensorView *t_view)
@@ -119,7 +119,7 @@ TfLiteTensorView::StringBuffer::~StringBuffer() {
 }
 
 template <typename TfLiteTensorType>
-absl::StatusOr<
+abslx::StatusOr<
     typename MatchConstNess<TfLiteTensorType, TfLiteTensorView>::Type>
 TfLiteTensorViewTemplatizedNew(TfLiteTensorType *wrapped_tensor) {
   switch (wrapped_tensor->type) {
@@ -136,20 +136,20 @@ TfLiteTensorViewTemplatizedNew(TfLiteTensorType *wrapped_tensor) {
     // tensorflow::tstring rather than std::string
     CASE_FOR_DTYPE_GIVEN_CPP_DTYPE(kTfLiteString, ::tensorflow::tstring);
     default: {
-      return absl::UnimplementedError(
-          absl::StrCat("Unsupported dtype: ", wrapped_tensor->type));
+      return abslx::UnimplementedError(
+          abslx::StrCat("Unsupported dtype: ", wrapped_tensor->type));
     }
   }
 }
 
 template <>
-absl::StatusOr<TfLiteTensorView> TensorView::New<::TfLiteTensor>(
+abslx::StatusOr<TfLiteTensorView> TensorView::New<::TfLiteTensor>(
     ::TfLiteTensor *wrapped_tensor) {
   return TfLiteTensorViewTemplatizedNew(wrapped_tensor);
 }
 
 template <>
-absl::StatusOr<const TfLiteTensorView> TensorView::New<const ::TfLiteTensor>(
+abslx::StatusOr<const TfLiteTensorView> TensorView::New<const ::TfLiteTensor>(
     const ::TfLiteTensor *wrapped_tensor) {
   return TfLiteTensorViewTemplatizedNew(wrapped_tensor);
 }

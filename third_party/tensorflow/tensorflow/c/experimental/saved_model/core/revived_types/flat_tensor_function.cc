@@ -63,7 +63,7 @@ Status FlatTensorFunction::Create(
 }
 
 Status FlatTensorFunction::MakeCallOp(
-    absl::Span<AbstractTensorHandle* const> inputs, ImmediateOpPtr* out) const {
+    abslx::Span<AbstractTensorHandle* const> inputs, ImmediateOpPtr* out) const {
   out->reset(ctx_->CreateOperation());
   // In eager mode, TF2 python executes functions by constructing an op with
   // the name of the functiondef:
@@ -79,7 +79,7 @@ Status FlatTensorFunction::MakeCallOp(
   // Adding the user-provided inputs to the function.
   TF_RETURN_IF_ERROR((*out)->AddInputList(inputs));
 
-  absl::Span<AbstractTensorHandle* const> captures(
+  abslx::Span<AbstractTensorHandle* const> captures(
       reinterpret_cast<AbstractTensorHandle* const*>(captures_.data()),
       captures_.size());
 

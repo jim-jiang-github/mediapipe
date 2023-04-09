@@ -192,8 +192,8 @@ Status ZlibOutputBuffer::Append(StringPiece data) {
 }
 
 #if defined(TF_CORD_SUPPORT)
-Status ZlibOutputBuffer::Append(const absl::Cord& cord) {
-  for (absl::string_view fragment : cord.Chunks()) {
+Status ZlibOutputBuffer::Append(const abslx::Cord& cord) {
+  for (abslx::string_view fragment : cord.Chunks()) {
     TF_RETURN_IF_ERROR(Append(fragment));
   }
   return OkStatus();

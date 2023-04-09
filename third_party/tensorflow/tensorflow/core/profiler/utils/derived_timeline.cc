@@ -53,8 +53,8 @@ inline std::string HloModuleEventName(const GpuEventStats& stats) {
 
 // Returns a prefix that uniquely identifies the HLO module.
 inline std::string HloOpEventPrefix(const GpuEventStats& stats) {
-  return stats.program_id ? absl::StrCat(*stats.program_id, "/")
-                          : absl::StrCat(stats.hlo_module_name, "/");
+  return stats.program_id ? abslx::StrCat(*stats.program_id, "/")
+                          : abslx::StrCat(stats.hlo_module_name, "/");
 }
 
 std::vector<XEventMetadata*> GetOrCreateHloOpEventsMetadata(
@@ -66,10 +66,10 @@ std::vector<XEventMetadata*> GetOrCreateHloOpEventsMetadata(
   // Prepend an HLO module identifier so HLO operators with the same name but in
   // different modules have different metadata.
   std::string hlo_op_event_prefix = HloOpEventPrefix(stats);
-  for (absl::string_view hlo_op_name : stats.hlo_op_names) {
+  for (abslx::string_view hlo_op_name : stats.hlo_op_names) {
     XEventMetadata* hlo_op_event_metadata =
         plane_builder.GetOrCreateEventMetadata(
-            absl::StrCat(hlo_op_event_prefix, hlo_op_name));
+            abslx::StrCat(hlo_op_event_prefix, hlo_op_name));
     // Display the HLO name without the module name in tools.
     if (hlo_op_event_metadata->display_name().empty()) {
       hlo_op_event_metadata->set_display_name(std::string(hlo_op_name));
@@ -81,7 +81,7 @@ std::vector<XEventMetadata*> GetOrCreateHloOpEventsMetadata(
 
 }  // namespace
 
-void ProcessTfOpEvent(absl::string_view tf_op_full_name, Timespan event_span,
+void ProcessTfOpEvent(abslx::string_view tf_op_full_name, Timespan event_span,
                       std::optional<int64_t> group_id,
                       XPlaneBuilder& plane_builder,
                       DerivedXLineBuilder& tf_name_scope_line_builder,
@@ -121,7 +121,7 @@ void DerivedXEventBuilder::Expand(Timespan event_span) {
 }
 
 DerivedXLineBuilder::DerivedXLineBuilder(
-    XPlaneBuilder* plane, int64_t line_id, absl::string_view name,
+    XPlaneBuilder* plane, int64_t line_id, abslx::string_view name,
     int64_t timestamp_ns, std::vector<DerivedXLineBuilder*> dependent_lines)
     : group_id_stat_metadata_(
           plane->GetOrCreateStatMetadata(GetStatTypeStr(StatType::kGroupId))),
@@ -222,7 +222,7 @@ void DeriveStepEventsFromGroups(const GroupMetadataMap& group_metadata_map,
     if (group_id_stat.has_value()) {
       int64_t group_id = group_id_stat->IntValue();
       steps.ExpandOrAddEvent(
-          *plane_builder.GetOrCreateEventMetadata(absl::StrCat(group_id)),
+          *plane_builder.GetOrCreateEventMetadata(abslx::StrCat(group_id)),
           event_visitor.GetTimespan(), group_id);
     }
   }
@@ -303,7 +303,7 @@ void DeriveEventsFromHostTrace(const XPlane* host_trace,
     }
   };
   using DeviceLaunchInfo =
-      absl::flat_hash_map<int64_t /*group_id*/, GroupLaunchInfo>;
+      abslx::flat_hash_map<int64_t /*group_id*/, GroupLaunchInfo>;
 
   const int num_devices = device_traces.size();
   std::vector<DeviceLaunchInfo> per_device_launch_info(num_devices);
@@ -315,7 +315,7 @@ void DeriveEventsFromHostTrace(const XPlane* host_trace,
       // Filter out API calls for cuEventRecord/cuEventQuery/cuCtxSynchronize
       // etc for now. TODO: find a better way to filter out only the memcpy and
       // kernel launch events.
-      if (absl::StartsWith(event.Name(), "cu")) return;
+      if (abslx::StartsWith(event.Name(), "cu")) return;
       LaunchEventStats stats(&event);
       if (stats.group_id.has_value() && stats.IsLaunch() &&
           0 <= *stats.device_id && *stats.device_id < num_devices) {
@@ -354,7 +354,7 @@ void DeriveEventsFromHostTrace(const XPlane* host_trace,
               gtl::FindOrNull(group_metadata_map, group_id)) {
         XEventBuilder device_event =
             launch_line.AddEvent(*device_plane.GetOrCreateEventMetadata(
-                absl::StrCat("Launch Stats for ", group_metadata->name)));
+                abslx::StrCat("Launch Stats for ", group_metadata->name)));
         device_event.SetTimespan(group_info.timespan);
         device_event.AddStatValue(group_id_stat_metadata, group_id);
         device_event.AddStatValue(num_launches_stat_metadata,
@@ -373,8 +373,8 @@ void GenerateDerivedTimeLines(const GroupMetadataMap& group_metadata_map,
   // TODO(profiler): Once we capture HLO protos for xla/gpu, we should use that
   // to look up tensorflow op name from hlo_module/hlo_op.
   auto dummy_symbol_resolver =
-      [](absl::optional<uint64_t> program_id, absl::string_view hlo_module,
-         absl::string_view hlo_op) { return Symbol(); };
+      [](abslx::optional<uint64_t> program_id, abslx::string_view hlo_module,
+         abslx::string_view hlo_op) { return Symbol(); };
   for (XPlane* plane : FindMutablePlanesWithPrefix(space, kGpuPlanePrefix)) {
     DeriveStepEventsFromGroups(group_metadata_map, plane);
     DeriveEventsFromAnnotations(dummy_symbol_resolver, plane);
@@ -399,8 +399,8 @@ void DeriveLinesFromStats(XPlane* device_trace) {
   for (const XEventVisitor& event :
        GetSortedEvents<XEventVisitor>(plane_visitor, true)) {
     Timespan event_span = event.GetTimespan();
-    std::optional<absl::string_view> tf_op_name;
-    std::optional<absl::string_view> source_info;
+    std::optional<abslx::string_view> tf_op_name;
+    std::optional<abslx::string_view> source_info;
     std::optional<uint64_t> group_id;
     auto for_each_stat = [&](const XStatVisitor& stat) {
       if (stat.Type() == StatType::kTfOp) {

@@ -35,13 +35,13 @@ class OutputSidePacketImpl : public OutputSidePacket {
   ~OutputSidePacketImpl() override = default;
 
   // Initializes the OutputSidePacketImpl.
-  absl::Status Initialize(const std::string& name,
+  abslx::Status Initialize(const std::string& name,
                           const PacketType* packet_type);
 
   // Prepares this for processing. If an error occurs in a user called function
   // (such as Set()) then error_callback will be called before returning
   // control to the user.
-  void PrepareForRun(std::function<void(absl::Status)> error_callback);
+  void PrepareForRun(std::function<void(abslx::Status)> error_callback);
 
   // Gets the output side packet.
   Packet GetPacket() const { return packet_; }
@@ -70,15 +70,15 @@ class OutputSidePacketImpl : public OutputSidePacket {
   };
 
   // Called by Set().
-  absl::Status SetInternal(const Packet& packet);
+  abslx::Status SetInternal(const Packet& packet);
 
-  // Triggers the error callback with absl::Status info when an error
+  // Triggers the error callback with abslx::Status info when an error
   // occurs.
-  void TriggerErrorCallback(const absl::Status& status) const;
+  void TriggerErrorCallback(const abslx::Status& status) const;
 
   std::string name_;
   const PacketType* packet_type_;
-  std::function<void(absl::Status)> error_callback_;
+  std::function<void(abslx::Status)> error_callback_;
   Packet packet_;
   bool initialized_ = false;
 

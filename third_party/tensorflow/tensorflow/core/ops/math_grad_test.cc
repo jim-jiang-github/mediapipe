@@ -413,7 +413,7 @@ class MathGradTest : public ::testing::Test {
 };
 
 void HasError(const Status& s, const string& substr) {
-  EXPECT_TRUE(absl::StrContains(s.ToString(), substr))
+  EXPECT_TRUE(abslx::StrContains(s.ToString(), substr))
       << s << ", expected substring " << substr;
 }
 

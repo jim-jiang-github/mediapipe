@@ -71,7 +71,7 @@ void AddSupportedImageFormats(cl_context context, GpuInfo* info) {
   }
 }
 
-absl::Status CreateCLContext(const CLDevice& device,
+abslx::Status CreateCLContext(const CLDevice& device,
                              cl_context_properties* properties,
                              CLContext* result) {
   int error_code;
@@ -79,14 +79,14 @@ absl::Status CreateCLContext(const CLDevice& device,
   cl_context context =
       clCreateContext(properties, 1, &device_id, nullptr, nullptr, &error_code);
   if (!context) {
-    return absl::UnknownError(
-        absl::StrCat("Failed to create a compute context - ",
+    return abslx::UnknownError(
+        abslx::StrCat("Failed to create a compute context - ",
                      CLErrorCodeToString(error_code)));
   }
   AddSupportedImageFormats(context, &device.info_);
 
   *result = CLContext(context, true);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace
@@ -130,16 +130,16 @@ bool CLContext::IsFloatTexture2DSupported(int num_channels, DataType data_type,
   return false;
 }
 
-absl::Status CreateCLContext(const CLDevice& device, CLContext* result) {
+abslx::Status CreateCLContext(const CLDevice& device, CLContext* result) {
   return CreateCLContext(device, nullptr, result);
 }
 
-absl::Status CreateCLGLContext(const CLDevice& device,
+abslx::Status CreateCLGLContext(const CLDevice& device,
                                cl_context_properties egl_context,
                                cl_context_properties egl_display,
                                CLContext* result) {
   if (!device.GetInfo().SupportsExtension("cl_khr_gl_sharing")) {
-    return absl::UnavailableError("Device doesn't support CL-GL sharing.");
+    return abslx::UnavailableError("Device doesn't support CL-GL sharing.");
   }
   cl_context_properties platform =
       reinterpret_cast<cl_context_properties>(device.platform());

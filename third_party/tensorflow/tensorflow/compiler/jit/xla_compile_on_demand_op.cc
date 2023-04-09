@@ -99,10 +99,10 @@ Status XlaCompileOnDemandOp::Run(OpKernelContext* ctx,
   StatusOr<std::vector<VariableInfo>> variable_infos =
       GatherVariableInfo(ctx, *result, 0);
   TF_RETURN_IF_ERROR(variable_infos.status());
-  TF_RETURN_IF_ERROR(LockVariables(absl::MakeSpan(*variable_infos)));
+  TF_RETURN_IF_ERROR(LockVariables(abslx::MakeSpan(*variable_infos)));
   TF_RETURN_IF_ERROR(launch_context.PopulateOutputs(
       ctx, result, execution_output.ConsumeResult(),
-      /*missing_ctx_input_prefix=*/0, absl::MakeSpan(*variable_infos),
+      /*missing_ctx_input_prefix=*/0, abslx::MakeSpan(*variable_infos),
       input_output_alias, snapshot_ptrs));
   return OkStatus();
 }
@@ -115,7 +115,7 @@ Status XlaCompileOnDemandOp::Compile(
   std::vector<int> constant_input_indices;
   TF_RETURN_IF_ERROR(GetCompileTimeConstInputs(
       &ctx->op_kernel(), &constant_input_indices, ctx->function_library()));
-  if (!absl::c_all_of(constant_input_indices, [&](int idx) {
+  if (!abslx::c_all_of(constant_input_indices, [&](int idx) {
         return ctx->input_memory_type(idx) == HOST_MEMORY;
       })) {
     return errors::Internal("Unexpected device placement for a constant input");
@@ -154,7 +154,7 @@ Status XlaCompileOnDemandOp::Compile(
         GetVariableInfosFromInputs(ctx->resource_manager(), ctx->device(),
                                    inputs, variables_indices, &variable_infos));
 
-    TF_RETURN_IF_ERROR(LockVariables(absl::MakeSpan(variable_infos)));
+    TF_RETURN_IF_ERROR(LockVariables(abslx::MakeSpan(variable_infos)));
     TF_RETURN_IF_ERROR(SnapshotResourceVariables(
         ctx, variables_indices, variable_infos, variable_args));
 

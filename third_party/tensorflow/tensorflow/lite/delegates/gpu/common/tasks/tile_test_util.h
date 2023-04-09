@@ -22,11 +22,11 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status TileChannelsTest(TestExecutionEnvironment* env);
-absl::Status TileChannelsX4Test(TestExecutionEnvironment* env);
-absl::Status TileWidthTest(TestExecutionEnvironment* env);
-absl::Status TileHeightTest(TestExecutionEnvironment* env);
-absl::Status TileHWCTest(TestExecutionEnvironment* env);
+abslx::Status TileChannelsTest(TestExecutionEnvironment* env);
+abslx::Status TileChannelsX4Test(TestExecutionEnvironment* env);
+abslx::Status TileWidthTest(TestExecutionEnvironment* env);
+abslx::Status TileHeightTest(TestExecutionEnvironment* env);
+abslx::Status TileHWCTest(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

@@ -44,7 +44,7 @@ namespace {
 
 void CheckStats(Allocator* a, int64_t num_allocs, int64_t bytes_in_use,
                 int64_t peak_bytes_in_use, int64_t largest_alloc_size) {
-  absl::optional<AllocatorStats> stats = a->GetStats();
+  abslx::optional<AllocatorStats> stats = a->GetStats();
   EXPECT_TRUE(stats);
   if (!stats) {
     return;
@@ -77,7 +77,7 @@ std::unique_ptr<SubAllocator> CreateVirtualMemorySubAllocator(
 
 std::unique_ptr<SubAllocator> CreateGPUMemAllocator(size_t) {
   PlatformDeviceId gpu_id(0);
-  return absl::WrapUnique(new DeviceMemAllocator(
+  return abslx::WrapUnique(new DeviceMemAllocator(
       DeviceIdUtil::ExecutorForPlatformDeviceId(GPUMachineManager(), gpu_id)
           .ValueOrDie(),
       gpu_id, /*use_unified_memory=*/false, {}, {}));
@@ -314,7 +314,7 @@ TEST_P(GPUBFCAllocatorTest, AllocationsAndDeallocationsWithGrowth) {
     a.DeallocateRaw(existing_ptrs[i]);
   }
 
-  absl::optional<AllocatorStats> stats = a.GetStats();
+  abslx::optional<AllocatorStats> stats = a.GetStats();
   if (stats) {
     LOG(INFO) << "Alloc stats: \n" << stats->DebugString();
   }

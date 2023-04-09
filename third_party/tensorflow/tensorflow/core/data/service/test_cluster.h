@@ -115,7 +115,7 @@ class DatasetClient {
   explicit DatasetClient(const TestCluster& cluster);
 
   // Maps a worker address to the data it produces when calling `Read`.
-  using WorkerResultMap = absl::flat_hash_map<std::string, std::vector<T>>;
+  using WorkerResultMap = abslx::flat_hash_map<std::string, std::vector<T>>;
 
   // Processes `dataset` and retrieves the data from workers. Returns the data
   // produced by each worker, keyed by the worker address.
@@ -145,7 +145,7 @@ class DatasetClient {
 
   const TestCluster& cluster_;
   std::unique_ptr<DataServiceDispatcherClient> dispatcher_client_;
-  absl::flat_hash_map<std::string, std::unique_ptr<DataServiceWorkerClient>>
+  abslx::flat_hash_map<std::string, std::unique_ptr<DataServiceWorkerClient>>
       worker_clients_;
 };
 

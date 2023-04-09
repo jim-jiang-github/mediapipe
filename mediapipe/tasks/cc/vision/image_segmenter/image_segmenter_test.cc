@@ -169,7 +169,7 @@ TEST_F(CreateFromOptionsTest, SucceedsWithSelectiveOpResolver) {
   auto options = std::make_unique<ImageSegmenterOptions>();
   options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kDeeplabV3WithMetadata);
-  options->base_options.op_resolver = absl::make_unique<DeepLabOpResolver>();
+  options->base_options.op_resolver = abslx::make_unique<DeepLabOpResolver>();
   MP_ASSERT_OK(ImageSegmenter::Create(std::move(options)));
 }
 
@@ -178,27 +178,27 @@ TEST_F(CreateFromOptionsTest, FailsWithSelectiveOpResolverMissingOps) {
   options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kDeeplabV3WithMetadata);
   options->base_options.op_resolver =
-      absl::make_unique<DeepLabOpResolverMissingOps>();
+      abslx::make_unique<DeepLabOpResolverMissingOps>();
   auto segmenter_or = ImageSegmenter::Create(std::move(options));
   // TODO: Make MediaPipe InferenceCalculator report the detailed
   // interpreter errors (e.g., "Encountered unresolved custom op").
-  EXPECT_EQ(segmenter_or.status().code(), absl::StatusCode::kInternal);
+  EXPECT_EQ(segmenter_or.status().code(), abslx::StatusCode::kInternal);
   EXPECT_THAT(
       segmenter_or.status().message(),
       testing::HasSubstr("interpreter_builder(&interpreter) == kTfLiteOk"));
 }
 
 TEST_F(CreateFromOptionsTest, FailsWithMissingModel) {
-  absl::StatusOr<std::unique_ptr<ImageSegmenter>> segmenter_or =
+  abslx::StatusOr<std::unique_ptr<ImageSegmenter>> segmenter_or =
       ImageSegmenter::Create(std::make_unique<ImageSegmenterOptions>());
 
-  EXPECT_EQ(segmenter_or.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(segmenter_or.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       segmenter_or.status().message(),
       HasSubstr("ExternalFile must specify at least one of 'file_content', "
                 "'file_name', 'file_pointer_meta' or 'file_descriptor_meta'."));
   EXPECT_THAT(segmenter_or.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInitializationError))));
 }
 
@@ -306,12 +306,12 @@ TEST_F(ImageModeTest, FailsWithRegionOfInterest) {
   ImageProcessingOptions image_processing_options{roi, /*rotation_degrees=*/0};
 
   auto results = segmenter->Segment(image, image_processing_options);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("This task doesn't support region-of-interest"));
   EXPECT_THAT(
       results.status().GetPayload(kMediaPipeTasksPayload),
-      Optional(absl::Cord(absl::StrCat(
+      Optional(abslx::Cord(abslx::StrCat(
           MediaPipeTasksStatus::kImageProcessingInvalidArgumentError))));
 }
 
@@ -385,19 +385,19 @@ TEST_F(VideoModeTest, FailsWithCallingWrongMethod) {
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ImageSegmenter> segmenter,
                           ImageSegmenter::Create(std::move(options)));
   auto results = segmenter->Segment(image);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the image mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
 
   results = segmenter->SegmentAsync(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the live stream mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
   MP_ASSERT_OK(segmenter->Close());
 }
@@ -443,25 +443,25 @@ TEST_F(LiveStreamModeTest, FailsWithCallingWrongMethod) {
   options->output_type = ImageSegmenterOptions::OutputType::CATEGORY_MASK;
   options->running_mode = core::RunningMode::LIVE_STREAM;
   options->result_callback =
-      [](absl::StatusOr<std::vector<Image>> segmented_masks, const Image& image,
+      [](abslx::StatusOr<std::vector<Image>> segmented_masks, const Image& image,
          int64 timestamp_ms) {};
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ImageSegmenter> segmenter,
                           ImageSegmenter::Create(std::move(options)));
 
   auto results = segmenter->Segment(image);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the image mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
 
   results = segmenter->SegmentForVideo(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the video mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
   MP_ASSERT_OK(segmenter->Close());
 }
@@ -476,18 +476,18 @@ TEST_F(LiveStreamModeTest, FailsWithOutOfOrderInputTimestamps) {
   options->output_type = ImageSegmenterOptions::OutputType::CATEGORY_MASK;
   options->running_mode = core::RunningMode::LIVE_STREAM;
   options->result_callback =
-      [](absl::StatusOr<std::vector<Image>> segmented_masks, const Image& image,
+      [](abslx::StatusOr<std::vector<Image>> segmented_masks, const Image& image,
          int64 timestamp_ms) {};
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ImageSegmenter> segmenter,
                           ImageSegmenter::Create(std::move(options)));
   MP_ASSERT_OK(segmenter->SegmentAsync(image, 1));
 
   auto status = segmenter->SegmentAsync(image, 0);
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(),
               HasSubstr("timestamp must be monotonically increasing"));
   EXPECT_THAT(status.GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInvalidTimestampError))));
   MP_ASSERT_OK(segmenter->SegmentAsync(image, 2));
   MP_ASSERT_OK(segmenter->Close());
@@ -509,7 +509,7 @@ TEST_F(LiveStreamModeTest, Succeeds) {
   options->running_mode = core::RunningMode::LIVE_STREAM;
   options->result_callback =
       [&segmented_masks_results, &image_sizes, &timestamps](
-          absl::StatusOr<std::vector<Image>> segmented_masks,
+          abslx::StatusOr<std::vector<Image>> segmented_masks,
           const Image& image, int64 timestamp_ms) {
         MP_ASSERT_OK(segmented_masks.status());
         segmented_masks_results.push_back(std::move(segmented_masks).value());

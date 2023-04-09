@@ -61,7 +61,7 @@ std::string Hostname(const XSpace& space) {
   DCHECK_EQ(space.hostnames_size(), 1);
   const std::string& hostname = space.hostnames(0);
   // This shouldn't be a taskname in host:port format.
-  DCHECK(!absl::StrContains(hostname, ':'));
+  DCHECK(!abslx::StrContains(hostname, ':'));
   return hostname;
 }
 
@@ -80,7 +80,7 @@ PerfEnv MakePerfEnv(double peak_tera_flops_per_second,
 
 PerfEnv GetPerfEnvFromXPlane(const XPlane& device_plane) {
   DeviceCapabilities cap = GetDeviceCaps(device_plane);
-  if (!absl::StartsWith(device_plane.name(), kTpuPlanePrefix)) {
+  if (!abslx::StartsWith(device_plane.name(), kTpuPlanePrefix)) {
     return MakePerfEnv(
         GigaToTera(GetFlopMaxThroughputPerSM(cap)) * cap.num_cores(),
         UniToGiga(cap.memory_bandwidth()));
@@ -104,7 +104,7 @@ void SetRunEnvironment(const XSpace& space, RunEnvironment* env) {
   std::vector<const XPlane*> gpu_planes =
       FindPlanesWithPrefix(space, kGpuPlanePrefix);
   if (!gpu_planes.empty()) {
-    absl::string_view gpu_model =
+    abslx::string_view gpu_model =
         GpuModelName(GetDeviceCaps(*gpu_planes.front()));
     if (!gpu_model.empty()) {
       env->set_device_type(std::string(gpu_model));
@@ -130,13 +130,13 @@ void SetRunEnvironment(const XSpace& space, RunEnvironment* env) {
 void PropagateXSpaceDiagnosticsToOpStats(const XSpace& space,
                                          OpStats* op_stats) {
   if (!space.errors().empty()) {
-    absl::flat_hash_set<std::string> unique_errors;
+    abslx::flat_hash_set<std::string> unique_errors;
     unique_errors.insert(space.errors().begin(), space.errors().end());
     *op_stats->mutable_diagnostics()->mutable_errors() = {unique_errors.begin(),
                                                           unique_errors.end()};
   }
   if (!space.warnings().empty()) {
-    absl::flat_hash_set<std::string> unique_warnings;
+    abslx::flat_hash_set<std::string> unique_warnings;
     unique_warnings.insert(space.warnings().begin(), space.warnings().end());
     *op_stats->mutable_diagnostics()->mutable_warnings() = {
         unique_warnings.begin(), unique_warnings.end()};

@@ -72,7 +72,7 @@ class PluggableProfiler : public tensorflow::profiler::ProfilerInterface {
         options.device_type() != ProfileOptions::UNSPECIFIED) {
       return nullptr;
     }
-    return absl::WrapUnique(new PluggableProfiler(profiler_fns, profiler));
+    return abslx::WrapUnique(new PluggableProfiler(profiler_fns, profiler));
   }
 
   Status Start() override {

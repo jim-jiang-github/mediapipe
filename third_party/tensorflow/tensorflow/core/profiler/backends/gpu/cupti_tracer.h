@@ -130,7 +130,7 @@ class CuptiTracer {
                             const CUpti_CallbackData* cbdata);
 
   int num_gpus_;
-  absl::optional<CuptiTracerOptions> option_;
+  abslx::optional<CuptiTracerOptions> option_;
   CuptiInterface* cupti_interface_ = nullptr;
   CuptiTraceCollector* collector_ = nullptr;
 

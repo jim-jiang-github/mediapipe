@@ -38,7 +38,7 @@ class ConvolutionGroupConverter : public HloModulePass {
         convert_batch_groups_only_(convert_batch_groups_only),
         filter_expansion_(filter_expansion) {}
 
-  absl::string_view name() const override {
+  abslx::string_view name() const override {
     return "convolution-group-converter";
   }
 
@@ -47,7 +47,7 @@ class ConvolutionGroupConverter : public HloModulePass {
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
   // Predicate that determines whether this pass should rewrite a given
   // convolution.

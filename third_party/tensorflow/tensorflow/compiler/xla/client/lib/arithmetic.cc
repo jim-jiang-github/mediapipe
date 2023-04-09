@@ -36,7 +36,7 @@ XlaComputation CreateScalarComputation(const std::string& name,
     b = builder->CreateSubBuilder(name);
   } else {
     b = builder->CreateSubBuilder(
-        absl::StrCat(name, "_", PrimitiveType_Name(type)));
+        abslx::StrCat(name, "_", PrimitiveType_Name(type)));
   }
 
   const Shape scalar = ShapeUtil::MakeShape(type, {});

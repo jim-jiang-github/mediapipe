@@ -31,7 +31,7 @@ class TupleSimplifier : public HloModulePass {
   TupleSimplifier() : TupleSimplifier(/*exclude_entry_computation=*/false) {}
   explicit TupleSimplifier(bool exclude_entry_computation);
   ~TupleSimplifier() override {}
-  absl::string_view name() const override { return "tuple-simplifier"; }
+  abslx::string_view name() const override { return "tuple-simplifier"; }
 
   // Run tuple simplification on the given computation. Returns whether the
   // computation was changed.
@@ -39,7 +39,7 @@ class TupleSimplifier : public HloModulePass {
   using HloPassInterface::RunOnModuleGroup;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   // When set, this pipeline stage will perform optimization of all computations

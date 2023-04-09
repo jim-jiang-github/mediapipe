@@ -35,7 +35,7 @@ limitations under the License.
 namespace tensorflow {
 namespace {
 
-AttrValue FuncListAttr(const absl::Span<const char* const> names) {
+AttrValue FuncListAttr(const abslx::Span<const char* const> names) {
   AttrValue attr;
   for (const char* name : names) {
     attr.mutable_list()->add_func()->set_name(name);

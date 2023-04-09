@@ -59,9 +59,9 @@ class FaceToRegionCalculator : public CalculatorBase {
   FaceToRegionCalculator(const FaceToRegionCalculator&) = delete;
   FaceToRegionCalculator& operator=(const FaceToRegionCalculator&) = delete;
 
-  static absl::Status GetContract(mediapipe::CalculatorContract* cc);
-  absl::Status Open(mediapipe::CalculatorContext* cc) override;
-  absl::Status Process(mediapipe::CalculatorContext* cc) override;
+  static abslx::Status GetContract(mediapipe::CalculatorContract* cc);
+  abslx::Status Open(mediapipe::CalculatorContext* cc) override;
+  abslx::Status Process(mediapipe::CalculatorContext* cc) override;
 
  private:
   double NormalizeX(const int pixel);
@@ -82,17 +82,17 @@ REGISTER_CALCULATOR(FaceToRegionCalculator);
 
 FaceToRegionCalculator::FaceToRegionCalculator() {}
 
-absl::Status FaceToRegionCalculator::GetContract(
+abslx::Status FaceToRegionCalculator::GetContract(
     mediapipe::CalculatorContract* cc) {
   if (cc->Inputs().HasTag(kVideoTag)) {
     cc->Inputs().Tag(kVideoTag).Set<ImageFrame>();
   }
   cc->Inputs().Tag(kFacesTag).Set<std::vector<mediapipe::Detection>>();
   cc->Outputs().Tag(kRegionsTag).Set<DetectionSet>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FaceToRegionCalculator::Open(mediapipe::CalculatorContext* cc) {
+abslx::Status FaceToRegionCalculator::Open(mediapipe::CalculatorContext* cc) {
   options_ = cc->Options<FaceToRegionCalculatorOptions>();
   if (!cc->Inputs().HasTag(kVideoTag)) {
     RET_CHECK(!options_.use_visual_scorer())
@@ -105,10 +105,10 @@ absl::Status FaceToRegionCalculator::Open(mediapipe::CalculatorContext* cc) {
            "is set true.";
   }
 
-  scorer_ = absl::make_unique<VisualScorer>(options_.scorer_options());
+  scorer_ = abslx::make_unique<VisualScorer>(options_.scorer_options());
   frame_width_ = -1;
   frame_height_ = -1;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 inline double FaceToRegionCalculator::NormalizeX(const int pixel) {
@@ -149,7 +149,7 @@ void FaceToRegionCalculator::ExtendSalientRegionWithPoint(
   }
 }
 
-absl::Status FaceToRegionCalculator::Process(mediapipe::CalculatorContext* cc) {
+abslx::Status FaceToRegionCalculator::Process(mediapipe::CalculatorContext* cc) {
   if (cc->Inputs().HasTag(kVideoTag) &&
       cc->Inputs().Tag(kVideoTag).Value().IsEmpty()) {
     return mediapipe::UnknownErrorBuilder(MEDIAPIPE_LOC)
@@ -164,7 +164,7 @@ absl::Status FaceToRegionCalculator::Process(mediapipe::CalculatorContext* cc) {
     frame_height_ = frame.rows;
   }
 
-  auto region_set = ::absl::make_unique<DetectionSet>();
+  auto region_set = ::abslx::make_unique<DetectionSet>();
   if (!cc->Inputs().Tag(kFacesTag).Value().IsEmpty()) {
     const auto& input_faces =
         cc->Inputs().Tag(kFacesTag).Get<std::vector<mediapipe::Detection>>();
@@ -284,7 +284,7 @@ absl::Status FaceToRegionCalculator::Process(mediapipe::CalculatorContext* cc) {
       .Tag(kRegionsTag)
       .Add(region_set.release(), cc->InputTimestamp());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace autoflip

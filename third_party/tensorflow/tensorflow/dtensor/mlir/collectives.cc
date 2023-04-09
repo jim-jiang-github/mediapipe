@@ -229,7 +229,7 @@ StatusOr<mlir::Value> EmitRelayout(
         "Attempted to relayout to a different global shape.");
   }
 
-  absl::flat_hash_set<std::string> src_sharding_dims;
+  abslx::flat_hash_set<std::string> src_sharding_dims;
   for (int i = 0; i < src_layout.rank(); ++i)
     src_sharding_dims.emplace(src_layout.sharding_spec(i));
 
@@ -283,8 +283,8 @@ StatusOr<mlir::Value> EmitRelayout(
 
 StatusOr<mlir::Operation*> EmitAllReduce(
     mlir::OpBuilder& builder, const dtensor::Layout& output_layout,
-    const absl::flat_hash_set<std::string>& reduced_dims,
-    mlir::Operation* input, absl::string_view reduce_op) {
+    const abslx::flat_hash_set<std::string>& reduced_dims,
+    mlir::Operation* input, abslx::string_view reduce_op) {
   TF_ASSIGN_OR_RETURN(auto partitions, GetAllReducePartitionsFromReducedDims(
                                            output_layout, reduced_dims));
   const int32 num_partitions = partitions.size();

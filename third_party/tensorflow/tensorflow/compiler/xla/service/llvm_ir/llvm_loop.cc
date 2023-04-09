@@ -31,7 +31,7 @@ limitations under the License.
 namespace xla {
 namespace llvm_ir {
 
-ForLoop::ForLoop(absl::string_view prefix, absl::string_view suffix,
+ForLoop::ForLoop(abslx::string_view prefix, abslx::string_view suffix,
                  llvm::Value* start_index, llvm::Value* end_index,
                  llvm::Value* step, UnrollMode unroll_mode,
                  bool prevent_vectorization)
@@ -45,7 +45,7 @@ ForLoop::ForLoop(absl::string_view prefix, absl::string_view suffix,
       prevent_vectorization_(prevent_vectorization) {}
 
 /* static */ std::unique_ptr<ForLoop> ForLoop::EmitForLoop(
-    absl::string_view prefix, llvm::Value* start_index, llvm::Value* end_index,
+    abslx::string_view prefix, llvm::Value* start_index, llvm::Value* end_index,
     llvm::Value* step, llvm::IRBuilder<>* b, UnrollMode unroll_mode,
     bool prevent_vectorization) {
   std::unique_ptr<ForLoop> loop(new ForLoop(prefix, /*suffix=*/"", start_index,
@@ -166,16 +166,16 @@ std::vector<llvm::Metadata*> ForLoop::GetLoopMetadata(llvm::IRBuilder<>* b) {
   return result;
 }
 
-std::string ForLoop::GetQualifiedName(absl::string_view name) {
+std::string ForLoop::GetQualifiedName(abslx::string_view name) {
   return llvm_ir::IrName(prefix_, llvm_ir::IrName(name, suffix_));
 }
 
-llvm::BasicBlock* ForLoop::CreateLoopBB(absl::string_view name,
+llvm::BasicBlock* ForLoop::CreateLoopBB(abslx::string_view name,
                                         llvm::IRBuilder<>* b) {
   return CreateBasicBlock(insert_before_bb_, GetQualifiedName(name), b);
 }
 
-std::unique_ptr<ForLoop> ForLoopNest::AddLoop(absl::string_view suffix,
+std::unique_ptr<ForLoop> ForLoopNest::AddLoop(abslx::string_view suffix,
                                               llvm::Value* start_index,
                                               llvm::Value* end_index,
                                               UnrollMode unroll_mode,
@@ -185,7 +185,7 @@ std::unique_ptr<ForLoop> ForLoopNest::AddLoop(absl::string_view suffix,
 }
 
 std::unique_ptr<ForLoop> ForLoopNest::AddLoop(
-    absl::string_view suffix, llvm::Value* start_index, llvm::Value* end_index,
+    abslx::string_view suffix, llvm::Value* start_index, llvm::Value* end_index,
     llvm::Value* stride, UnrollMode unroll_mode, bool prevent_vectorization) {
   if (inner_loop_body_bb_ != nullptr) {
     // Create this loop inside the previous one.
@@ -211,7 +211,7 @@ std::unique_ptr<ForLoop> ForLoopNest::AddLoop(
 
 std::unique_ptr<ForLoop> ForLoopNest::AddLoop(int64_t start_index,
                                               int64_t end_index,
-                                              absl::string_view suffix,
+                                              abslx::string_view suffix,
                                               UnrollMode unroll_mode,
                                               bool prevent_vectorization) {
   CHECK_LE(start_index, end_index);
@@ -222,7 +222,7 @@ std::unique_ptr<ForLoop> ForLoopNest::AddLoop(int64_t start_index,
 
 std::unique_ptr<ForLoop> ForLoopNest::AddLoop(int64_t start_index,
                                               int64_t end_index, int64_t stride,
-                                              absl::string_view suffix,
+                                              abslx::string_view suffix,
                                               UnrollMode unroll_mode,
                                               bool prevent_vectorization) {
   CHECK_LE(start_index, end_index);
@@ -233,7 +233,7 @@ std::unique_ptr<ForLoop> ForLoopNest::AddLoop(int64_t start_index,
 }
 
 IrArray::Index ForLoopNest::AddLoopsForShape(const Shape& shape,
-                                             absl::string_view suffix) {
+                                             abslx::string_view suffix) {
   std::vector<int64_t> dimensions(shape.rank());
   std::iota(dimensions.begin(), dimensions.end(), 0);
   return IrArray::Index(AddLoopsForShapeOnDimensions(shape, dimensions, suffix),
@@ -241,15 +241,15 @@ IrArray::Index ForLoopNest::AddLoopsForShape(const Shape& shape,
 }
 
 std::vector<llvm::Value*> ForLoopNest::AddLoopsForShapeOnDimensions(
-    const Shape& shape, absl::Span<const int64_t> dimensions,
-    absl::string_view suffix) {
+    const Shape& shape, abslx::Span<const int64_t> dimensions,
+    abslx::string_view suffix) {
   std::vector<llvm::Value*> multi_index(shape.dimensions_size());
   for (int64_t dimension : dimensions) {
     std::unique_ptr<llvm_ir::ForLoop> loop = AddLoop(
         /*start_index=*/0,
         /*end_index=*/shape.dimensions(dimension),
         /*suffix=*/
-        llvm_ir::IrName(suffix, absl::StrCat(dimension)));
+        llvm_ir::IrName(suffix, abslx::StrCat(dimension)));
     multi_index[dimension] = loop->GetIndVarValue();
   }
   return multi_index;
@@ -257,7 +257,7 @@ std::vector<llvm::Value*> ForLoopNest::AddLoopsForShapeOnDimensions(
 
 std::vector<llvm::Value*> ForLoopNest::EmitOperandArrayLoopNest(
     const llvm_ir::IrArray& operand_array, int64_t dimension_to_skip,
-    absl::string_view name_suffix) {
+    abslx::string_view name_suffix) {
   // Prepares the dimension list we will use to emit the loop nest. Outermost
   // loops are added first. Add loops in major-to-minor order, and skip the
   // 'dimension_to_skip' dimension.
@@ -269,7 +269,7 @@ std::vector<llvm::Value*> ForLoopNest::EmitOperandArrayLoopNest(
       dimensions.push_back(dimension);
     }
   }
-  absl::c_reverse(dimensions);
+  abslx::c_reverse(dimensions);
 
   // Create loop nest with one for-loop for each dimension of the
   // output.

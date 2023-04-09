@@ -138,7 +138,7 @@ class TransformGraphTest : public ::testing::Test {
     TF_ASSERT_OK(root.ToGraphDef(&graph_def));
     Status no_such_status =
         TransformGraph({}, {}, {{"test_no_such_transform", {}}}, &graph_def);
-    EXPECT_TRUE(absl::StrContains(no_such_status.ToString(), "not recognized"));
+    EXPECT_TRUE(abslx::StrContains(no_such_status.ToString(), "not recognized"));
   }
 
   void TestParseTransformParameters() {

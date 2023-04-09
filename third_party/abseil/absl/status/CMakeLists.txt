@@ -26,17 +26,17 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::atomic_hook
-    absl::config
-    absl::core_headers
-    absl::raw_logging_internal
-    absl::inlined_vector
-    absl::stacktrace
-    absl::symbolize
-    absl::strings
-    absl::cord
-    absl::str_format
-    absl::optional
+    abslx::atomic_hook
+    abslx::config
+    abslx::core_headers
+    abslx::raw_logging_internal
+    abslx::inlined_vector
+    abslx::stacktrace
+    abslx::symbolize
+    abslx::strings
+    abslx::cord
+    abslx::str_format
+    abslx::optional
   PUBLIC
 )
 
@@ -48,8 +48,8 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::status
-    absl::strings
+    abslx::status
+    abslx::strings
     gmock_main
 )
 
@@ -64,13 +64,13 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::status
-    absl::core_headers
-    absl::raw_logging_internal
-    absl::type_traits
-    absl::strings
-    absl::utility
-    absl::variant
+    abslx::status
+    abslx::core_headers
+    abslx::raw_logging_internal
+    abslx::type_traits
+    abslx::strings
+    abslx::utility
+    abslx::variant
   PUBLIC
 )
 
@@ -82,7 +82,7 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::status
-    absl::statusor
+    abslx::status
+    abslx::statusor
     gmock_main
 )

@@ -36,7 +36,7 @@ class OptimizationPassRunner {
   // graph that it is able to.
   Status SetJitLevel(OptimizerOptions::GlobalJitLevel jit_level);
 
-  Status Run(absl::string_view pass_to_run, GraphDef input, GraphDef* result);
+  Status Run(abslx::string_view pass_to_run, GraphDef input, GraphDef* result);
 
   Status AddCpus(int count) {
     return AddDevices(tensorflow::DEVICE_CPU, count);
@@ -47,7 +47,7 @@ class OptimizationPassRunner {
   }
 
  private:
-  Status AddDevices(absl::string_view type, int count);
+  Status AddDevices(abslx::string_view type, int count);
 
   OptimizerOptions::GlobalJitLevel jit_level_;
   std::vector<std::unique_ptr<Device>> devices_;

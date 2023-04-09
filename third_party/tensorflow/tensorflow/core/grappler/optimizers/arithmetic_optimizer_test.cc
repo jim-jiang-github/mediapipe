@@ -138,8 +138,8 @@ TEST_F(ArithmeticOptimizerTest, ReplaceMulWithBroadcastByTile) {
 
   NodeMap node_map(&g);
   const string p = "ArithmeticOptimizer/ReplaceMulWithBroadcastByTile";
-  const NodeDef* t = node_map.GetNode(absl::StrCat(p, "_", "Tile_mul"));
-  const NodeDef* c = node_map.GetNode(absl::StrCat(p, "_", "Const_mul"));
+  const NodeDef* t = node_map.GetNode(abslx::StrCat(p, "_", "Tile_mul"));
+  const NodeDef* c = node_map.GetNode(abslx::StrCat(p, "_", "Const_mul"));
   ASSERT_NE(t, nullptr);
   ASSERT_NE(c, nullptr);
   EXPECT_EQ(t->op(), "Tile");
@@ -181,7 +181,7 @@ TEST_F(ArithmeticOptimizerTest, ReplaceMulWithBroadcastByTilePreserveControl) {
 
   NodeMap node_map(&g);
   const string p = "ArithmeticOptimizer/ReplaceMulWithBroadcastByTile";
-  const NodeDef* c = node_map.GetNode(absl::StrCat(p, "_", "Const_mul"));
+  const NodeDef* c = node_map.GetNode(abslx::StrCat(p, "_", "Const_mul"));
   ASSERT_NE(c, nullptr);
   ASSERT_EQ(c->input_size(), 1);
   EXPECT_TRUE(IsControlInput(c->input(0)));
@@ -313,9 +313,9 @@ TEST_F(ArithmeticOptimizerTest, ReduceUpsamplingDims) {
   NodeMap node_map(&g);
   const string p = "ArithmeticOptimizer/ReduceUpsamplingDims";
   const NodeDef* ra =
-      node_map.GetNode(absl::StrCat(p, "_", "Reshape_reshape_b"));
+      node_map.GetNode(abslx::StrCat(p, "_", "Reshape_reshape_b"));
   const NodeDef* rb = node_map.GetNode("reshape_b");
-  const NodeDef* t = node_map.GetNode(absl::StrCat(p, "_", "Tile_reshape_b"));
+  const NodeDef* t = node_map.GetNode(abslx::StrCat(p, "_", "Tile_reshape_b"));
   ASSERT_NE(ra, nullptr);
   ASSERT_NE(rb, nullptr);
   ASSERT_NE(t, nullptr);
@@ -369,7 +369,7 @@ TEST_F(ArithmeticOptimizerTest, ReplaceMulWithSquare) {
 
   NodeMap node_map(&output);
   const string p = "ArithmeticOptimizer/ReplaceMulWithSquare";
-  const NodeDef* square_node = node_map.GetNode(absl::StrCat(p, "_", "mul"));
+  const NodeDef* square_node = node_map.GetNode(abslx::StrCat(p, "_", "mul"));
 
   ASSERT_NE(square_node, nullptr);
   EXPECT_EQ(square_node->op(), "Square");
@@ -378,7 +378,7 @@ TEST_F(ArithmeticOptimizerTest, ReplaceMulWithSquare) {
   EXPECT_EQ(square_node->input(1), "^d");
 
   const NodeDef* square_node2 =
-      node_map.GetNode(absl::StrCat(p, "_", "mul_no_nan"));
+      node_map.GetNode(abslx::StrCat(p, "_", "mul_no_nan"));
   ASSERT_NE(square_node2, nullptr);
   EXPECT_EQ(square_node2->op(), "Square");
   ASSERT_EQ(square_node2->input_size(), 1);
@@ -418,10 +418,10 @@ TEST_F(ArithmeticOptimizerTest, ReplacePackWithTileReshape) {
 
   NodeMap node_map(&g);
   const string p = "ArithmeticOptimizer/ReplacePackWithTileReshape";
-  const NodeDef* t_node = node_map.GetNode(absl::StrCat(p, "_", "Tile_c"));
-  const NodeDef* c_node = node_map.GetNode(absl::StrCat(p, "_", "Multiples_c"));
-  const NodeDef* s_node = node_map.GetNode(absl::StrCat(p, "_", "Shape_c"));
-  const NodeDef* r_node = node_map.GetNode(absl::StrCat(p, "_", "Reshape_c"));
+  const NodeDef* t_node = node_map.GetNode(abslx::StrCat(p, "_", "Tile_c"));
+  const NodeDef* c_node = node_map.GetNode(abslx::StrCat(p, "_", "Multiples_c"));
+  const NodeDef* s_node = node_map.GetNode(abslx::StrCat(p, "_", "Shape_c"));
+  const NodeDef* r_node = node_map.GetNode(abslx::StrCat(p, "_", "Reshape_c"));
   const NodeDef* a_node = node_map.GetNode("a");
   ASSERT_NE(t_node, nullptr);
   ASSERT_NE(c_node, nullptr);
@@ -488,9 +488,9 @@ TEST_F(ArithmeticOptimizerTest, ReplacePackWithTileReshapeControlDeps) {
 
   NodeMap node_map(&g);
   const string p = "ArithmeticOptimizer/ReplacePackWithTileReshape";
-  const NodeDef* t_node = node_map.GetNode(absl::StrCat(p, "_", "Tile_c"));
-  const NodeDef* c_node = node_map.GetNode(absl::StrCat(p, "_", "Multiples_c"));
-  const NodeDef* s_node = node_map.GetNode(absl::StrCat(p, "_", "Shape_c"));
+  const NodeDef* t_node = node_map.GetNode(abslx::StrCat(p, "_", "Tile_c"));
+  const NodeDef* c_node = node_map.GetNode(abslx::StrCat(p, "_", "Multiples_c"));
+  const NodeDef* s_node = node_map.GetNode(abslx::StrCat(p, "_", "Shape_c"));
   const NodeDef* a_node = node_map.GetNode("a");
   ASSERT_NE(t_node, nullptr);
   ASSERT_NE(c_node, nullptr);
@@ -1048,7 +1048,7 @@ TEST_F(ArithmeticOptimizerTest, FuseConjAndTranspose) {
   EXPECT_EQ(output.node_size(), 7);
 
   const string p = "ArithmeticOptimizer/FoldConjugateIntoTranspose";
-  const string optimized_name = absl::StrCat(p, "_", "trans");
+  const string optimized_name = abslx::StrCat(p, "_", "trans");
 
   const NodeDef* trans_fused_node = node_map.GetNode(optimized_name);
   ASSERT_NE(trans_fused_node, nullptr);
@@ -1088,7 +1088,7 @@ TEST_F(ArithmeticOptimizerTest, FuseConjAndConjugateTranspose) {
   EXPECT_EQ(output.node_size(), 7);
 
   const string p = "ArithmeticOptimizer/FoldConjugateIntoTranspose";
-  const string optimized_name = absl::StrCat(p, "_", "conjugate_trans");
+  const string optimized_name = abslx::StrCat(p, "_", "conjugate_trans");
 
   const NodeDef* conjugate_trans_fused_node = node_map.GetNode(optimized_name);
   ASSERT_NE(conjugate_trans_fused_node, nullptr);
@@ -1126,7 +1126,7 @@ TEST_F(ArithmeticOptimizerTest, FuseTransposeAndConj) {
   EXPECT_EQ(output.node_size(), 7);
 
   const string p = "ArithmeticOptimizer/FoldConjugateIntoTranspose";
-  const string optimized_name = absl::StrCat(p, "_", "conj");
+  const string optimized_name = abslx::StrCat(p, "_", "conj");
 
   const NodeDef* conj_fused_node = node_map.GetNode(optimized_name);
   ASSERT_NE(conj_fused_node, nullptr);
@@ -1181,7 +1181,7 @@ TEST_F(ArithmeticOptimizerTest, FoldTransposeIntoMatMul) {
     EXPECT_EQ(output.node_size(), 8);
 
     const string p = "ArithmeticOptimizer/FoldTransposeIntoMatMul";
-    const string optimized_name = absl::StrCat(p, "_", "matmul");
+    const string optimized_name = abslx::StrCat(p, "_", "matmul");
 
     const NodeDef* matmul_fused_node = node_map.GetNode(optimized_name);
     ASSERT_NE(matmul_fused_node, nullptr);
@@ -1242,7 +1242,7 @@ TEST_F(ArithmeticOptimizerTest, FoldConjugateTransposeIntoBatchMatMul) {
   EXPECT_EQ(output.node_size(), 12);
 
   const string p = "ArithmeticOptimizer/FoldTransposeIntoMatMul";
-  const string optimized_name = absl::StrCat(p, "_", "matmul");
+  const string optimized_name = abslx::StrCat(p, "_", "matmul");
 
   const NodeDef* optimized_matmul = node_map.GetNode(optimized_name);
   ASSERT_NE(optimized_matmul, nullptr);
@@ -1851,7 +1851,7 @@ TEST_F(ArithmeticOptimizerTest, RemoveIdentityConjugateTransposes) {
   EXPECT_EQ(output.node_size(), 5);
 
   const string p = "ArithmeticOptimizer/RemoveIdentityTranspose";
-  const string optimized_name = absl::StrCat(p, "_", "trans");
+  const string optimized_name = abslx::StrCat(p, "_", "trans");
 
   const NodeDef* conj = node_map.GetNode(optimized_name);
   ASSERT_NE(conj, nullptr);
@@ -2163,8 +2163,8 @@ TEST_F(ArithmeticOptimizerTest, OptimizeCastMulTransposeConv) {
 
   // Expected names for reordered cast and transpose.
   const string p = "ArithmeticOptimizer/ReorderCastLikeAndValuePreserving_";
-  const string optimized_cast_name = absl::StrCat(p, "float_Cast");
-  const string optimized_transpose_name = absl::StrCat(p, "uint8_Transpose");
+  const string optimized_cast_name = abslx::StrCat(p, "float_Cast");
+  const string optimized_transpose_name = abslx::StrCat(p, "uint8_Transpose");
 
   // Expected names for folded multiply and conv.
   const string optimized_weights =
@@ -2222,7 +2222,7 @@ TEST_F(ArithmeticOptimizerTest, OptimizeMultipleMulTransposeConv) {
 
   NodeMap node_map(&output);
 
-  using absl::StrCat;
+  using abslx::StrCat;
   const string p = "ArithmeticOptimizer/FoldMultiplyIntoConv_";
   const string optimized_weights = StrCat(p, "scaled_Conv2D_weights");
   const string optimized_weights_1 = StrCat(p, "scaled_Conv2D_1_weights_1");
@@ -4076,14 +4076,14 @@ TEST_F(ArithmeticOptimizerTest,
 
 TEST_F(ArithmeticOptimizerTest,
        OptimizeMaxOrMinOfMonotonicElementWiseDoNotChangeSegmentMaxOrMinOps) {
-  constexpr absl::string_view kSegmentMaxOpName = "SegmentMax";
-  constexpr absl::string_view kUnsortedSegmentMaxOpName = "UnsortedSegmentMax";
-  constexpr absl::string_view kSegmentMinOpName = "SegmentMin";
-  constexpr absl::string_view kUnsortedSegmentMinOpName = "UnsortedSegmentMin";
-  constexpr absl::string_view segment_max_or_min_op_names[] = {
+  constexpr abslx::string_view kSegmentMaxOpName = "SegmentMax";
+  constexpr abslx::string_view kUnsortedSegmentMaxOpName = "UnsortedSegmentMax";
+  constexpr abslx::string_view kSegmentMinOpName = "SegmentMin";
+  constexpr abslx::string_view kUnsortedSegmentMinOpName = "UnsortedSegmentMin";
+  constexpr abslx::string_view segment_max_or_min_op_names[] = {
       kSegmentMaxOpName, kUnsortedSegmentMaxOpName, kSegmentMinOpName,
       kUnsortedSegmentMinOpName};
-  for (const absl::string_view segment_op_name : segment_max_or_min_op_names) {
+  for (const abslx::string_view segment_op_name : segment_max_or_min_op_names) {
     tensorflow::Scope s = tensorflow::Scope::NewRootScope();
     Input x = ops::Const(s.WithOpName("x"), {-1.0f, 2.0f, -3.0f, 4.0f}, {2, 2});
     Input segment_ids = ops::Const(s.WithOpName("x"), {0, 2}, {2});
@@ -4499,8 +4499,8 @@ TEST_F(ArithmeticOptimizerTest, RemoveStackStridedSliceSameAxis) {
     } else if (str_util::EndsWith(node.name(), "_out")) {
       ASSERT_EQ(node.input_size(), 1);
       EXPECT_EQ(
-          absl::StrCat(node.input(0), "_out"),
-          absl::StrCat("ArithmeticOptimizer/RemoveStackStridedSliceSameAxis_",
+          abslx::StrCat(node.input(0), "_out"),
+          abslx::StrCat("ArithmeticOptimizer/RemoveStackStridedSliceSameAxis_",
                        node.name()));
     }
   }
@@ -4618,14 +4618,14 @@ TEST_F(ArithmeticOptimizerTest, RemoveStackSimpleSliceSameAxis) {
   for (const auto& node : output.node()) {
     if (node.name() == "pa_slice_out") {
       ASSERT_EQ(node.input_size(), 1);
-      EXPECT_EQ(node.input(0), absl::StrCat(kExpandDimsNamePrefix, "a_slice"));
+      EXPECT_EQ(node.input(0), abslx::StrCat(kExpandDimsNamePrefix, "a_slice"));
     } else if (node.name() == "pb_slice_out") {
       ASSERT_EQ(node.input_size(), 1);
-      EXPECT_EQ(node.input(0), absl::StrCat(kExpandDimsNamePrefix, "b_slice"));
+      EXPECT_EQ(node.input(0), abslx::StrCat(kExpandDimsNamePrefix, "b_slice"));
     } else if (node.name() == "pc_slice_out") {
       ASSERT_EQ(node.input_size(), 1);
-      EXPECT_EQ(node.input(0), absl::StrCat(kExpandDimsNamePrefix, "c_slice"));
-    } else if (absl::StartsWith(node.name(), kExpandDimsNamePrefix)) {
+      EXPECT_EQ(node.input(0), abslx::StrCat(kExpandDimsNamePrefix, "c_slice"));
+    } else if (abslx::StartsWith(node.name(), kExpandDimsNamePrefix)) {
       EXPECT_EQ(node.op(), "ExpandDims");
       // The input is "a", "b", or "c", as appropriate.
       EXPECT_EQ(node.input(0),

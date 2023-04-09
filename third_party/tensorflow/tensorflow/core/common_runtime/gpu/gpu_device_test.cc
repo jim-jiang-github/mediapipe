@@ -54,7 +54,7 @@ se::CudaComputeCapability GetComputeCapability() {
 }
 
 void ExpectErrorMessageSubstr(const Status& s, StringPiece substr) {
-  EXPECT_TRUE(absl::StrContains(s.ToString(), substr))
+  EXPECT_TRUE(abslx::StrContains(s.ToString(), substr))
       << s << ", expected substring " << substr;
 }
 

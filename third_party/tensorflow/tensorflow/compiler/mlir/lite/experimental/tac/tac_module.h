@@ -78,7 +78,7 @@ class TacModule {
   // construction.
   // SetImporter/SetExporter should be called prior to invoking `Run`.
   // Returns Status of the Run.
-  virtual absl::Status Run();
+  virtual abslx::Status Run();
 
   // Returns all available hardware backends registered in this module
   // instance.
@@ -97,7 +97,7 @@ class TacModule {
 
  private:
   // Runs all TAC passes on the provided module.
-  absl::Status RunTacPasses(mlir::ModuleOp* module, bool debug_mode = false);
+  abslx::Status RunTacPasses(mlir::ModuleOp* module, bool debug_mode = false);
 
   // Create instances of all registered hardwares.
   std::vector<std::unique_ptr<tac::TargetHardware>> InstantiateBackends();

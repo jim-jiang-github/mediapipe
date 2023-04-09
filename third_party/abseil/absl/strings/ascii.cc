@@ -14,7 +14,7 @@
 
 #include "absl/strings/ascii.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace ascii_internal {
 
@@ -157,13 +157,13 @@ ABSL_DLL const char kToUpper[256] = {
 
 void AsciiStrToLower(std::string* s) {
   for (auto& ch : *s) {
-    ch = absl::ascii_tolower(ch);
+    ch = abslx::ascii_tolower(ch);
   }
 }
 
 void AsciiStrToUpper(std::string* s) {
   for (auto& ch : *s) {
-    ch = absl::ascii_toupper(ch);
+    ch = abslx::ascii_toupper(ch);
   }
 }
 
@@ -183,10 +183,10 @@ void RemoveExtraAsciiWhitespace(std::string* str) {
   for (; input_it < input_end; ++input_it) {
     if (is_ws) {
       // Consecutive whitespace?  Keep only the last.
-      is_ws = absl::ascii_isspace(*input_it);
+      is_ws = abslx::ascii_isspace(*input_it);
       if (is_ws) --output_it;
     } else {
-      is_ws = absl::ascii_isspace(*input_it);
+      is_ws = abslx::ascii_isspace(*input_it);
     }
 
     *output_it = *input_it;
@@ -197,4 +197,4 @@ void RemoveExtraAsciiWhitespace(std::string* str) {
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

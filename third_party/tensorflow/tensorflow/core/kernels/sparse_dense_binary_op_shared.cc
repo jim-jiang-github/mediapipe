@@ -118,8 +118,8 @@ class SparseDenseBinaryOpShared : public OpKernel {
                 errors::InvalidArgument(
                     "SparseDenseBinaryOpShared broadcasts dense to sparse "
                     "only; got incompatible shapes: [",
-                    absl::StrJoin(lhs_dims, ","), "] vs. [",
-                    absl::StrJoin(rhs_dims, ","), "]"));
+                    abslx::StrJoin(lhs_dims, ","), "] vs. [",
+                    abslx::StrJoin(rhs_dims, ","), "]"));
 
     Tensor *output_values = nullptr;
     Tensor dense_gathered;
@@ -130,7 +130,7 @@ class SparseDenseBinaryOpShared : public OpKernel {
         ctx, ctx->allocate_temp(DataTypeToEnum<T>::value, TensorShape({nnz}),
                                 &dense_gathered));
     bool op_is_div = false;
-    if (absl::StrContains(ctx->op_kernel().type_string_view(), "Div")) {
+    if (abslx::StrContains(ctx->op_kernel().type_string_view(), "Div")) {
       op_is_div = true;
     }
     // Pulls relevant entries from the dense side, with reshape and broadcasting

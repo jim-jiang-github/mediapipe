@@ -69,7 +69,7 @@ void R0F32Add2Succeed(float* out, float** in, XlaCustomCallStatus*) {
 }
 
 void CustomCallFail(float*, float** in, XlaCustomCallStatus* status) {
-  auto msg = absl::StrFormat("Failed: %.1f", in[0][0]);
+  auto msg = abslx::StrFormat("Failed: %.1f", in[0][0]);
   XlaCustomCallStatusSetFailure(status, msg.data(), msg.length());
 }
 
@@ -77,8 +77,8 @@ void CustomCallFailWithBackendConfigStr(float*, float**, const char* opaque,
                                         size_t opaque_len,
                                         XlaCustomCallStatus* status) {
   ABSL_ANNOTATE_MEMORY_IS_INITIALIZED(opaque, opaque_len);
-  auto msg = absl::StrFormat("Fail with raw backend config str: %s.",
-                             absl::string_view(opaque, opaque_len));
+  auto msg = abslx::StrFormat("Fail with raw backend config str: %s.",
+                             abslx::string_view(opaque, opaque_len));
   XlaCustomCallStatusSetFailure(status, msg.data(), msg.length());
 }
 

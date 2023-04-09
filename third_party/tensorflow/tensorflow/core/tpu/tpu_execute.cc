@@ -232,7 +232,7 @@ xla::Status UpdateDynamicInputs(
               ShapeSizeCompact(runtime_shape) / sizeof(uint32));
           stream->ThenMemcpyD2H(
               se::DeviceMemory<int8>(mutable_input_mem->AsDeviceMemoryBase()),
-              absl::MakeSpan(absl::bit_cast<int8*>(raw_input_runtime->data()),
+              abslx::MakeSpan(abslx::bit_cast<int8*>(raw_input_runtime->data()),
                              ShapeSizeCompactRaw(runtime_shape)));
           stream->ThenDoHostCallback([raw_input_runtime, padded_data,
                                       runtime_shape, compile_time_shape]() {
@@ -355,7 +355,7 @@ std::pair<CancellationToken, bool> RegisterCancellation(
       !cancellation_manager->RegisterCallbackWithErrorLogging(
           token,
           [device_ordinal, env]() { TPUCancelExecution(env, device_ordinal); },
-          absl::StrCat("TPUCancellation on device ", device_ordinal));
+          abslx::StrCat("TPUCancellation on device ", device_ordinal));
   return std::pair<CancellationToken, bool>(token, already_cancelled);
 }
 

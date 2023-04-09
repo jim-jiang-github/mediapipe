@@ -100,7 +100,7 @@ class HloRematerialization : public HloModulePass {
         min_remat_size_(min_remat_size) {}
   ~HloRematerialization() override = default;
 
-  absl::string_view name() const override { return "rematerialization"; }
+  abslx::string_view name() const override { return "rematerialization"; }
 
   // Get the next available channel id and increment count.
   int64_t NextChannelId() { return next_channel_id_++; }
@@ -119,7 +119,7 @@ class HloRematerialization : public HloModulePass {
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  protected:
   // Rematerializes instructions within the given computation. 'order' is the
@@ -182,13 +182,13 @@ class HloRematerialization : public HloModulePass {
   // computations called from sequential context
   // (CallContext::kSequential). These values are updated as rematerialization
   // occurs.
-  absl::flat_hash_map<const HloComputation*, int64_t> computation_peak_memory_;
+  abslx::flat_hash_map<const HloComputation*, int64_t> computation_peak_memory_;
 
   std::unique_ptr<TuplePointsToAnalysis> points_to_analysis_;
 
   // Set of computations which have had rematerialization
   // applied. Rematerialization is only applied once per computation.
-  absl::flat_hash_set<const HloComputation*> rematerialized_computations_;
+  abslx::flat_hash_set<const HloComputation*> rematerialized_computations_;
 
   // Count of the total instructions rematerialized.
   int64_t instructions_rematerialized_ = 0;

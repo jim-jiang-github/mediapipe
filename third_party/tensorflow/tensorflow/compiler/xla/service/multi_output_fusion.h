@@ -50,14 +50,14 @@ class MultiOutputFusion : public HloModulePass {
  public:
   MultiOutputFusion() = default;
 
-  absl::string_view name() const override { return "multi_output_fusion"; }
+  abslx::string_view name() const override { return "multi_output_fusion"; }
 
   // Run multi-output fusion on the given module. Returns whether the module
   // was changed.
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  protected:
   // Main entry for the optimization. Returns true if the optimization happens.
@@ -103,7 +103,7 @@ class MultiOutputFusion : public HloModulePass {
   // Update the reachability map after fusing instr1 and instr2.
   void UpdateReachability(
       HloInstruction* instr1, HloInstruction* instr2,
-      absl::Span<const std::pair<HloInstruction*, HloReachabilityMap::Index>>
+      abslx::Span<const std::pair<HloInstruction*, HloReachabilityMap::Index>>
           instrs_to_update,
       const std::function<bool(HloInstruction*)>& skip = nullptr);
 
@@ -201,7 +201,7 @@ class MultiOutputFusion : public HloModulePass {
   WorkList worklist_;
 
   // A map that maps an instruction to the index_.
-  absl::flat_hash_map<HloInstruction*, int> candidates_index_;
+  abslx::flat_hash_map<HloInstruction*, int> candidates_index_;
 
   // The reachability map of current computation.
   std::unique_ptr<HloReachabilityMap> reachability_;

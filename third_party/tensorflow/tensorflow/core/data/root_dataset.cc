@@ -109,7 +109,7 @@ void AddTraceMetadata(const RootDataset::Params& params,
   auto experiments = GetExperiments();
   if (!experiments.empty()) {
     trace_metadata->push_back(
-        std::make_pair(kExperiments, absl::StrJoin(experiments, " ")));
+        std::make_pair(kExperiments, abslx::StrJoin(experiments, " ")));
   }
 }
 }  // namespace
@@ -360,9 +360,9 @@ Status RootDataset::AsGraphDefInternal(SerializationContext* ctx,
 Status FinalizeDataset(OpKernelContext* ctx, const DatasetBase* input,
                        DatasetBase** output) {
   const Options& options = input->options();
-  absl::flat_hash_set<tstring> optimizations_enabled;
-  absl::flat_hash_set<tstring> optimizations_disabled;
-  absl::flat_hash_set<tstring> optimizations_default;
+  abslx::flat_hash_set<tstring> optimizations_enabled;
+  abslx::flat_hash_set<tstring> optimizations_disabled;
+  abslx::flat_hash_set<tstring> optimizations_default;
   GetOptimizations(options, &optimizations_enabled, &optimizations_disabled,
                    &optimizations_default);
   // Disable `enable_gradient_descent` as it assumes presence of ModelDatasetOp.

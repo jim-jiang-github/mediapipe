@@ -274,7 +274,7 @@ Status DotOpEmitter::EmitLinalgMatmul() {
                    /*Align=*/llvm::MaybeAlign(1));
 
   std::string name =
-      absl::StrCat("linalgMatMul_", dot_info_.result_shape.ToString(true), "_",
+      abslx::StrCat("linalgMatMul_", dot_info_.result_shape.ToString(true), "_",
                    dot_info_.lhs_shape.ToString(true), "_",
                    dot_info_.rhs_shape.ToString(true));
 
@@ -1253,14 +1253,14 @@ Status EmitNonBatchDotOperation(
 }
 
 Shape DropFirstDim(const Shape& shape) {
-  absl::Span<int64_t const> array_shape_dims(shape.dimensions());
+  abslx::Span<int64_t const> array_shape_dims(shape.dimensions());
   array_shape_dims.remove_prefix(1);
   return ShapeUtil::MakeShapeWithDescendingLayout(shape.element_type(),
                                                   array_shape_dims);
 }
 
 Shape CollapseFirstNDims(const Shape& shape, int64_t n) {
-  absl::Span<int64_t const> input_shape_dims(shape.dimensions());
+  abslx::Span<int64_t const> input_shape_dims(shape.dimensions());
   int64_t prefix_dim =
       std::accumulate(input_shape_dims.begin(), input_shape_dims.begin() + n,
                       1ll, std::multiplies<int64_t>());
@@ -1292,11 +1292,11 @@ Status ValidateDotDimensionNumbers(const DotDimensionNumbers& dim_numbers) {
   TF_RET_CHECK(dim_numbers.lhs_contracting_dimensions_size() == 1);
   std::vector<int64_t> batch_dim_numbers(
       dim_numbers.lhs_batch_dimensions_size());
-  absl::c_iota(batch_dim_numbers, 0);
+  abslx::c_iota(batch_dim_numbers, 0);
   TF_RET_CHECK(
-      absl::c_equal(batch_dim_numbers, dim_numbers.lhs_batch_dimensions()));
+      abslx::c_equal(batch_dim_numbers, dim_numbers.lhs_batch_dimensions()));
   TF_RET_CHECK(
-      absl::c_equal(batch_dim_numbers, dim_numbers.rhs_batch_dimensions()));
+      abslx::c_equal(batch_dim_numbers, dim_numbers.rhs_batch_dimensions()));
   return OkStatus();
 }
 

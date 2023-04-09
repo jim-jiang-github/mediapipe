@@ -26,7 +26,7 @@ limitations under the License.
 namespace xla {
 namespace window_util {
 
-Window MakeWindow(absl::Span<const int64_t> sizes) {
+Window MakeWindow(abslx::Span<const int64_t> sizes) {
   Window window;
   for (int64_t size : sizes) {
     auto* dimension = window.add_dimensions();
@@ -38,8 +38,8 @@ Window MakeWindow(absl::Span<const int64_t> sizes) {
   return window;
 }
 
-Window MakeWindow(absl::Span<const int64_t> sizes,
-                  absl::Span<const int64_t> strides) {
+Window MakeWindow(abslx::Span<const int64_t> sizes,
+                  abslx::Span<const int64_t> strides) {
   Window window;
   CHECK_EQ(sizes.size(), strides.size());
   for (auto nb = 0; nb < sizes.size(); ++nb) {
@@ -52,7 +52,7 @@ Window MakeWindow(absl::Span<const int64_t> sizes,
   return window;
 }
 
-PaddingConfig MakeSymmetricPadding(absl::Span<const int64_t> sizes) {
+PaddingConfig MakeSymmetricPadding(abslx::Span<const int64_t> sizes) {
   PaddingConfig config;
   for (int64_t size : sizes) {
     auto* dimension = config.add_dimensions();
@@ -63,8 +63,8 @@ PaddingConfig MakeSymmetricPadding(absl::Span<const int64_t> sizes) {
 }
 
 /* static */ std::string ToString(const WindowDimension& dim) {
-  using absl::StrAppend;
-  using absl::StrCat;
+  using abslx::StrAppend;
+  using abslx::StrCat;
   std::string str = StrCat("(size=", dim.size());
   if (dim.stride() != 1) {
     StrAppend(&str, ",stride=", dim.stride());
@@ -89,8 +89,8 @@ PaddingConfig MakeSymmetricPadding(absl::Span<const int64_t> sizes) {
 }
 
 std::string ToString(const Window& window) {
-  using absl::StrAppend;
-  using absl::StrCat;
+  using abslx::StrAppend;
+  using abslx::StrCat;
 
   std::string str;
   const auto add_field =
@@ -154,13 +154,13 @@ bool HasPadding(const Window& window) {
 }
 
 bool HasSymmetricPadding(const Window& window) {
-  return absl::c_all_of(window.dimensions(), [](const WindowDimension& dim) {
+  return abslx::c_all_of(window.dimensions(), [](const WindowDimension& dim) {
     return dim.padding_low() == dim.padding_high();
   });
 }
 
 bool HasSymmetricPadding(const PaddingConfig& padding_config) {
-  return absl::c_all_of(padding_config.dimensions(),
+  return abslx::c_all_of(padding_config.dimensions(),
                         [](const PaddingConfig::PaddingConfigDimension& dim) {
                           return dim.edge_padding_low() ==
                                  dim.edge_padding_high();
@@ -168,7 +168,7 @@ bool HasSymmetricPadding(const PaddingConfig& padding_config) {
 }
 
 bool HasNegativePadding(const Window& window) {
-  return absl::c_any_of(window.dimensions(), [](const WindowDimension& dim) {
+  return abslx::c_any_of(window.dimensions(), [](const WindowDimension& dim) {
     return dim.padding_low() < 0 || dim.padding_high() < 0;
   });
 }
@@ -205,7 +205,7 @@ bool AllOrNoneReversed(const Window& window) {
     return true;
   }
   bool reversed = window.dimensions()[0].window_reversal();
-  return absl::c_all_of(window.dimensions(), [&](const WindowDimension& dim) {
+  return abslx::c_all_of(window.dimensions(), [&](const WindowDimension& dim) {
     return dim.window_reversal() == reversed;
   });
 }

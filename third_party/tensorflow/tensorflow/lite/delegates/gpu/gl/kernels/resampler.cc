@@ -35,7 +35,7 @@ namespace {
 
 class Resampler : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     std::vector<Variable> parameters = {
         {"src_height", static_cast<int>(ctx.input_shapes[0][1])},
@@ -72,7 +72,7 @@ class Resampler : public NodeShader {
         /*input=*/IOStructure::ONLY_DEFINITIONS,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

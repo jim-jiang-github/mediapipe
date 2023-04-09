@@ -19,7 +19,7 @@
 
 #include "absl/strings/cord.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // Creates a multi-segment Cord from an iterable container of strings.  The
@@ -29,7 +29,7 @@ ABSL_NAMESPACE_BEGIN
 //
 // Example:
 //
-//   absl::Cord c = absl::MakeFragmentedCord({"A ", "fragmented ", "Cord"});
+//   abslx::Cord c = abslx::MakeFragmentedCord({"A ", "fragmented ", "Cord"});
 //   EXPECT_FALSE(c.GetFlat(&unused));
 //
 // The mechanism by which this Cord is created is an implementation detail.  Any
@@ -42,19 +42,19 @@ Cord MakeFragmentedCord(const Container& c) {
   Cord result;
   for (const auto& s : c) {
     auto* external = new std::string(s);
-    Cord tmp = absl::MakeCordFromExternal(
-        *external, [external](absl::string_view) { delete external; });
+    Cord tmp = abslx::MakeCordFromExternal(
+        *external, [external](abslx::string_view) { delete external; });
     tmp.Prepend(result);
     result = tmp;
   }
   return result;
 }
 
-inline Cord MakeFragmentedCord(std::initializer_list<absl::string_view> list) {
-  return MakeFragmentedCord<std::initializer_list<absl::string_view>>(list);
+inline Cord MakeFragmentedCord(std::initializer_list<abslx::string_view> list) {
+  return MakeFragmentedCord<std::initializer_list<abslx::string_view>>(list);
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_CORD_TEST_HELPERS_H_

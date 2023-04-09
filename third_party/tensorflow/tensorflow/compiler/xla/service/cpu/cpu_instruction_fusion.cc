@@ -51,7 +51,7 @@ bool IsNonComplexNonBatchedMatrixVectorDot(const HloInstruction* hlo) {
 
 bool HasExactlyOneUse(const HloInstruction& hlo_instr) {
   return hlo_instr.user_count() == 1 &&
-         absl::c_count(hlo_instr.users().front()->operands(), &hlo_instr) == 1;
+         abslx::c_count(hlo_instr.users().front()->operands(), &hlo_instr) == 1;
 }
 
 bool CanBeOutputFused(const HloInstruction* producer,
@@ -165,13 +165,13 @@ FusionDecision CpuInstructionFusion::ShouldFuse(HloInstruction* consumer,
   // Don't fuse reductions over the major dimensions. These have an efficient
   // lowering that's only implemented for the unfused case.
   if (consumer->opcode() == HloOpcode::kReduce &&
-      !absl::c_linear_search(
+      !abslx::c_linear_search(
           consumer->dimensions(),
           LayoutUtil::Minor(consumer->operand(0)->shape().layout(), 0))) {
     return "Not fusing reductions over major dimensions";
   }
   if (producer->opcode() == HloOpcode::kReduce &&
-      !absl::c_linear_search(
+      !abslx::c_linear_search(
           producer->dimensions(),
           LayoutUtil::Minor(producer->operand(0)->shape().layout(), 0))) {
     return "Not fusing reductions over major dimensions";

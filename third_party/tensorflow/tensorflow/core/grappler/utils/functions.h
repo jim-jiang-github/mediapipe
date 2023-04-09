@@ -93,7 +93,7 @@ class GrapplerFunctionItem : public GrapplerItem {
                                          GrapplerFunctionItem*);
   friend Status ReplaceInputWithConst(const NodeDef&, int,
                                       GrapplerFunctionItem*);
-  friend Status RemoveFunctionOutputs(const absl::flat_hash_set<int>&,
+  friend Status RemoveFunctionOutputs(const abslx::flat_hash_set<int>&,
                                       GrapplerFunctionItem*,
                                       std::vector<std::pair<int, int>>*);
 
@@ -136,14 +136,14 @@ bool IsParametrized(const FunctionDef& func);
 // caller node. Return error if type can't be resolved.
 Status InstantiationTypeParameters(
     const FunctionDef& func, const AttrSlice& func_instantiation_attr,
-    absl::flat_hash_map<string, DataType>* type_parameters);
+    abslx::flat_hash_map<string, DataType>* type_parameters);
 
 // Resolve function instantiation body parameters (values for the function body
 // attr placeholders) from the attributes of the caller node. Return error if
 // type can't be resolved.
 Status InstantiationBodyParameters(
     const FunctionDef& func, const AttrSlice& func_instantiation_attr,
-    absl::flat_hash_map<string, AttrValue>* body_parameters);
+    abslx::flat_hash_map<string, AttrValue>* body_parameters);
 
 // Replace one of the function inputs with a constant.
 Status ReplaceInputWithConst(const NodeDef& input_const, int input_index,
@@ -152,7 +152,7 @@ Status ReplaceInputWithConst(const NodeDef& input_const, int input_index,
 // Removes outputs from instantiated grappler function item. For all active
 // function outputs that changed its output index, this function adds an output
 // mapping (std::pair<old index, new index>).
-Status RemoveFunctionOutputs(const absl::flat_hash_set<int>& remove_outputs,
+Status RemoveFunctionOutputs(const abslx::flat_hash_set<int>& remove_outputs,
                              GrapplerFunctionItem* item,
                              std::vector<std::pair<int, int>>* output_mapping);
 

@@ -76,82 +76,82 @@ struct NodeContext {
   std::vector<Value*> outputs;
 };
 
-absl::Status IsNode(const GraphFloat32& graph, OperationType op_type,
+abslx::Status IsNode(const GraphFloat32& graph, OperationType op_type,
                     int inputs_count, int outputs_count, Node* node,
                     NodeContext* node_context) {
   const std::string op_desc = ToString(op_type);
   node_context->node = node;
   if (node_context->node == nullptr) {
-    return absl::NotFoundError(absl::StrCat("Invalid ", op_desc, " node."));
+    return abslx::NotFoundError(abslx::StrCat("Invalid ", op_desc, " node."));
   }
   if (OperationTypeFromString(node_context->node->operation.type) != op_type) {
-    return absl::InternalError(
-        absl::StrCat("Not correct node type. Expected ", op_desc, ", received ",
+    return abslx::InternalError(
+        abslx::StrCat("Not correct node type. Expected ", op_desc, ", received ",
                      node_context->node->operation.type));
   }
   node_context->inputs = graph.FindInputs(node_context->node->id);
   node_context->outputs = graph.FindOutputs(node_context->node->id);
   if (inputs_count != -1) {
     if (node_context->inputs.size() != inputs_count) {
-      return absl::InternalError(
-          absl::StrCat("Expected ", inputs_count, " input in a ", op_desc,
+      return abslx::InternalError(
+          abslx::StrCat("Expected ", inputs_count, " input in a ", op_desc,
                        " node. Node has ", node_context->inputs.size()));
     }
   }
   if (node_context->outputs.size() != outputs_count) {
-    return absl::InternalError(
-        absl::StrCat("Expected ", outputs_count, " output in a ", op_desc,
+    return abslx::InternalError(
+        abslx::StrCat("Expected ", outputs_count, " output in a ", op_desc,
                      " node. Node has ", node_context->outputs.size()));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status IsMeanNode(const GraphFloat32& graph, Node* node,
+abslx::Status IsMeanNode(const GraphFloat32& graph, Node* node,
                         NodeContext* node_context) {
   RETURN_IF_ERROR(IsNode(graph, OperationType::MEAN, 1, 1, node, node_context));
   auto mean_attr =
-      absl::any_cast<MeanAttributes>(node_context->node->operation.attributes);
+      abslx::any_cast<MeanAttributes>(node_context->node->operation.attributes);
   if (mean_attr.dims != std::set<Axis>{Axis::CHANNELS}) {
-    return absl::InternalError("Expected mean node with channels reduction.");
+    return abslx::InternalError("Expected mean node with channels reduction.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status IsMulNode(const GraphFloat32& graph, Node* node,
+abslx::Status IsMulNode(const GraphFloat32& graph, Node* node,
                        NodeContext* node_context) {
   RETURN_IF_ERROR(IsNode(graph, OperationType::MUL, 2, 1, node, node_context));
   if (node_context->inputs[0]->tensor.shape !=
       node_context->inputs[1]->tensor.shape) {
-    return absl::InternalError("Expected mul node with 2 equal tensors.");
+    return abslx::InternalError("Expected mul node with 2 equal tensors.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status IsSliceNode(const GraphFloat32& graph, Node* node,
+abslx::Status IsSliceNode(const GraphFloat32& graph, Node* node,
                          NodeContext* node_context) {
   RETURN_IF_ERROR(
       IsNode(graph, OperationType::SLICE, 1, 1, node, node_context));
   auto slice_attr =
-      absl::any_cast<SliceAttributes>(node_context->node->operation.attributes);
+      abslx::any_cast<SliceAttributes>(node_context->node->operation.attributes);
   if (slice_attr.strides != BHWC(1, 1, 1, 1)) {
-    return absl::InternalError("Not valid attributes in slice node.");
+    return abslx::InternalError("Not valid attributes in slice node.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status IsConcatNode(const GraphFloat32& graph, Node* node,
+abslx::Status IsConcatNode(const GraphFloat32& graph, Node* node,
                           NodeContext* node_context) {
   RETURN_IF_ERROR(
       IsNode(graph, OperationType::CONCAT, -1, 1, node, node_context));
-  auto concat_attr = absl::any_cast<ConcatAttributes>(
+  auto concat_attr = abslx::any_cast<ConcatAttributes>(
       node_context->node->operation.attributes);
   if (concat_attr.axis != Axis::CHANNELS) {
-    return absl::InternalError("Not valid attributes in concat node.");
+    return abslx::InternalError("Not valid attributes in concat node.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GetOffset(const GraphFloat32& graph, NodeId concat_input_node,
+abslx::Status GetOffset(const GraphFloat32& graph, NodeId concat_input_node,
                        NodeId second_commom_input_id, int* offset_x,
                        int* offset_y, std::set<NodeId>* consumed_nodes) {
   NodeContext mean_node, mul_node, slice_node;
@@ -165,13 +165,13 @@ absl::Status GetOffset(const GraphFloat32& graph, NodeId concat_input_node,
   RETURN_IF_ERROR(
       IsSliceNode(graph, graph.FindProducer(slice_output_id), &slice_node));
   auto slice_attr =
-      absl::any_cast<SliceAttributes>(slice_node.node->operation.attributes);
+      abslx::any_cast<SliceAttributes>(slice_node.node->operation.attributes);
   *offset_x = slice_attr.starts.w;
   *offset_y = slice_attr.starts.h;
   consumed_nodes->insert(mean_node.node->id);
   consumed_nodes->insert(mul_node.node->id);
   consumed_nodes->insert(slice_node.node->id);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace
@@ -207,7 +207,7 @@ GPUOperation CreateConvPointwise(const OperationDef& definition,
   return op;
 }
 
-absl::Status TryFusedPointwiseConv(
+abslx::Status TryFusedPointwiseConv(
     const GraphFloat32& graph, NodeId first_node_id,
     CalculationsPrecision precision,
     const std::map<ValueId, TensorDescriptor>& tensor_descriptors,
@@ -218,7 +218,7 @@ absl::Status TryFusedPointwiseConv(
   const auto& first_commom_input = slice_node.inputs[0];
   auto slice_consumers = graph.FindConsumers(slice_node.outputs[0]->id);
   if (slice_consumers.size() != 1) {
-    return absl::NotFoundError("FusedPointwiseConv not suitable.");
+    return abslx::NotFoundError("FusedPointwiseConv not suitable.");
   }
   NodeContext mul_node;
   RETURN_IF_ERROR(IsMulNode(graph, slice_consumers[0], &mul_node));
@@ -227,13 +227,13 @@ absl::Status TryFusedPointwiseConv(
                                                           : mul_node.inputs[0];
   auto mul_consumers = graph.FindConsumers(mul_node.outputs[0]->id);
   if (mul_consumers.size() != 1) {
-    return absl::NotFoundError("FusedPointwiseConv not suitable.");
+    return abslx::NotFoundError("FusedPointwiseConv not suitable.");
   }
   NodeContext mean_node;
   RETURN_IF_ERROR(IsMeanNode(graph, mul_consumers[0], &mean_node));
   auto mean_consumers = graph.FindConsumers(mean_node.outputs[0]->id);
   if (mean_consumers.size() != 1) {
-    return absl::NotFoundError("FusedPointwiseConv not suitable.");
+    return abslx::NotFoundError("FusedPointwiseConv not suitable.");
   }
   NodeContext concat_node;
   RETURN_IF_ERROR(IsConcatNode(graph, mean_consumers[0], &concat_node));
@@ -267,7 +267,7 @@ absl::Status TryFusedPointwiseConv(
                            {concat_node.outputs[0]}, gpu_subgraph);
   auto operation = CreateConvPointwise(op_def, op_attr);
   *gpu_op = std::make_unique<GPUOperation>(std::move(operation));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

@@ -106,11 +106,11 @@ class BoxDetectorCalculator : public CalculatorBase {
  public:
   ~BoxDetectorCalculator() override = default;
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
   BoxDetectorCalculatorOptions options_;
@@ -123,7 +123,7 @@ class BoxDetectorCalculator : public CalculatorBase {
 
 REGISTER_CALCULATOR(BoxDetectorCalculator);
 
-absl::Status BoxDetectorCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status BoxDetectorCalculator::GetContract(CalculatorContract* cc) {
   if (cc->Inputs().HasTag(kTrackingTag)) {
     cc->Inputs().Tag(kTrackingTag).Set<TrackingData>();
   }
@@ -186,10 +186,10 @@ absl::Status BoxDetectorCalculator::GetContract(CalculatorContract* cc) {
     cc->InputSidePackets().Tag(kFrameAlignmentTag).Set<int>();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status BoxDetectorCalculator::Open(CalculatorContext* cc) {
+abslx::Status BoxDetectorCalculator::Open(CalculatorContext* cc) {
   options_ = cc->Options<BoxDetectorCalculatorOptions>();
   box_detector_ = BoxDetectorInterface::Create(options_.detector_options());
 
@@ -225,10 +225,10 @@ absl::Status BoxDetectorCalculator::Open(CalculatorContext* cc) {
         cc->InputSidePackets().Tag(kFrameAlignmentTag).Get<int>();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status BoxDetectorCalculator::Process(CalculatorContext* cc) {
+abslx::Status BoxDetectorCalculator::Process(CalculatorContext* cc) {
   const Timestamp timestamp = cc->InputTimestamp();
   const int64 timestamp_msec = timestamp.Value() / 1000;
 
@@ -261,7 +261,7 @@ absl::Status BoxDetectorCalculator::Process(CalculatorContext* cc) {
   }
 
   if (!detector_switch_) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   InputStream* track_stream = cc->Inputs().HasTag(kTrackingTag)
@@ -290,7 +290,7 @@ absl::Status BoxDetectorCalculator::Process(CalculatorContext* cc) {
   if (track_stream != nullptr) {
     // Detect from tracking data
     if (track_stream->IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     const TrackingData& tracking_data = track_stream->Get<TrackingData>();
@@ -305,7 +305,7 @@ absl::Status BoxDetectorCalculator::Process(CalculatorContext* cc) {
   } else if (video_stream != nullptr) {
     // Detect from input frame
     if (video_stream->IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     TimedBoxProtoList tracked_boxes;
@@ -321,7 +321,7 @@ absl::Status BoxDetectorCalculator::Process(CalculatorContext* cc) {
                                    detected_boxes.get());
   } else {
     if (feature_stream->IsEmpty() || descriptor_stream->IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     const auto& image_size =
@@ -379,7 +379,7 @@ absl::Status BoxDetectorCalculator::Process(CalculatorContext* cc) {
     cv::Mat viz_view;
     std::unique_ptr<ImageFrame> viz_frame;
     if (video_stream != nullptr && !video_stream->IsEmpty()) {
-      viz_frame = absl::make_unique<ImageFrame>();
+      viz_frame = abslx::make_unique<ImageFrame>();
       viz_frame->CopyFrom(video_stream->Get<ImageFrame>(), frame_alignment_);
       viz_view = formats::MatView(viz_frame.get());
     }
@@ -393,17 +393,17 @@ absl::Status BoxDetectorCalculator::Process(CalculatorContext* cc) {
     cc->Outputs().Tag(kBoxesTag).Add(detected_boxes.release(), timestamp);
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status BoxDetectorCalculator::Close(CalculatorContext* cc) {
+abslx::Status BoxDetectorCalculator::Close(CalculatorContext* cc) {
   if (write_index_) {
     BoxDetectorIndex index = box_detector_->ObtainBoxDetectorIndex();
     MEDIAPIPE_CHECK_OK(mediapipe::file::SetContents(
         cc->InputSidePackets().Tag(kOutputIndexFilenameTag).Get<std::string>(),
         index.SerializeAsString()));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

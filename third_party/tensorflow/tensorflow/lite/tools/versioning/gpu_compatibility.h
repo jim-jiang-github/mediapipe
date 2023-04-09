@@ -27,7 +27,7 @@ namespace tflite {
 // WARNING: It's not fully implemented and still under development. Only use the
 // function for an experiemental feature.
 // WARNING: This is an experimental API and subject to change.
-absl::Status CheckGpuDelegateCompatibility(const OperatorCode* op_code,
+abslx::Status CheckGpuDelegateCompatibility(const OperatorCode* op_code,
                                            const Operator* op,
                                            const SubGraph* subgraph,
                                            const Model* model);
@@ -36,7 +36,7 @@ absl::Status CheckGpuDelegateCompatibility(const OperatorCode* op_code,
 // WARNING: It's not fully implemented and still under development. Only use
 // the function for an experiemental feature.
 // WARNING: This is an experimental API and subject to change.
-absl::Status CheckGpuDelegateCompatibility(
+abslx::Status CheckGpuDelegateCompatibility(
     const TfLiteContext* context, const TfLiteNode* node,
     const TfLiteRegistration* registration);
 

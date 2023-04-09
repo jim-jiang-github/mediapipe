@@ -27,7 +27,7 @@ namespace tflite {
 namespace gpu {
 namespace {
 template <DataType T>
-absl::Status TransposeIntTest(TestExecutionEnvironment* env) {
+abslx::Status TransposeIntTest(TestExecutionEnvironment* env) {
   tflite::gpu::Tensor<BHWC, T> src;
   src.shape = BHWC(1, 1, 2, 3);
   src.data = {1, 2, -3, -4, 3, 6};
@@ -55,21 +55,21 @@ absl::Status TransposeIntTest(TestExecutionEnvironment* env) {
     tflite::gpu::Tensor<BHWC, T> dst_tensor;
     dst.DownloadData(&dst_tensor);
     if (dst_tensor.data != ref_tensor.data) {
-      return absl::InternalError("not equal");
+      return abslx::InternalError("not equal");
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-template absl::Status TransposeIntTest<DataType::INT32>(
+template abslx::Status TransposeIntTest<DataType::INT32>(
     TestExecutionEnvironment* env);
-template absl::Status TransposeIntTest<DataType::INT16>(
+template abslx::Status TransposeIntTest<DataType::INT16>(
     TestExecutionEnvironment* env);
-template absl::Status TransposeIntTest<DataType::INT8>(
+template abslx::Status TransposeIntTest<DataType::INT8>(
     TestExecutionEnvironment* env);
 
 template <DataType T>
-absl::Status TransposeUintTest(TestExecutionEnvironment* env) {
+abslx::Status TransposeUintTest(TestExecutionEnvironment* env) {
   tflite::gpu::Tensor<BHWC, T> src;
   src.shape = BHWC(1, 1, 2, 3);
   src.data = {1, 2, 3, 4, 5, 6};
@@ -97,22 +97,22 @@ absl::Status TransposeUintTest(TestExecutionEnvironment* env) {
     tflite::gpu::Tensor<BHWC, T> dst_tensor;
     dst.DownloadData(&dst_tensor);
     if (dst_tensor.data != ref_tensor.data) {
-      return absl::InternalError("not equal");
+      return abslx::InternalError("not equal");
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-template absl::Status TransposeUintTest<DataType::UINT32>(
+template abslx::Status TransposeUintTest<DataType::UINT32>(
     TestExecutionEnvironment* env);
-template absl::Status TransposeUintTest<DataType::UINT16>(
+template abslx::Status TransposeUintTest<DataType::UINT16>(
     TestExecutionEnvironment* env);
-template absl::Status TransposeUintTest<DataType::UINT8>(
+template abslx::Status TransposeUintTest<DataType::UINT8>(
     TestExecutionEnvironment* env);
 
 }  // namespace
 
-absl::Status TransposeTest(TestExecutionEnvironment* env) {
+abslx::Status TransposeTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 2, 3);
   src_tensor.data = {half(1.0f), half(2.0f), half(3.0f),
@@ -145,7 +145,7 @@ absl::Status TransposeTest(TestExecutionEnvironment* env) {
   RETURN_IF_ERROR(TransposeUintTest<DataType::UINT32>(env));
   RETURN_IF_ERROR(TransposeUintTest<DataType::UINT16>(env));
   RETURN_IF_ERROR(TransposeUintTest<DataType::UINT8>(env));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

@@ -79,7 +79,7 @@ MATCHER(TupleFloatEq, "is almost equal to") {
 template <typename T>
 Eigen::Array<T, Eigen::Dynamic, Eigen::Dynamic>
 EigenArray2DFromNestedSpans(
-    absl::Span<const absl::Span<const T>> rows) {
+    abslx::Span<const abslx::Span<const T>> rows) {
   Eigen::Array<T, Eigen::Dynamic, Eigen::Dynamic> result(0, rows.size());
   if (!rows.empty()) {
     result.resize(rows.size(), rows[0].size());
@@ -153,10 +153,10 @@ Eigen::Array<typename EigenType::Scalar, Eigen::Dynamic,
 
 // Wrap a column major Eigen Array as a Span.
 template <typename Scalar>
-absl::Span<const Scalar> EigenArrayAsSpan(
+abslx::Span<const Scalar> EigenArrayAsSpan(
     const Eigen::Array<Scalar, Eigen::Dynamic,
                        Eigen::Dynamic, Eigen::ColMajor>& array) {
-  return absl::Span<const Scalar>(array.data(), array.size());
+  return abslx::Span<const Scalar>(array.data(), array.size());
 }
 
 // Gmock matcher to test whether all elements in an array match expected_array
@@ -228,7 +228,7 @@ MATCHER_P(EigenArrayEq, expected_array,
 
 template <typename T>
 EigenArrayNearMatcherP2<Eigen::Array<T, Eigen::Dynamic, 1>, double>
-EigenArrayNear(absl::Span<const T> data, double tolerance) {
+EigenArrayNear(abslx::Span<const T> data, double tolerance) {
   Eigen::Array<T, Eigen::Dynamic, 1> temp_array =
       Eigen::Map<const Eigen::Array<T, Eigen::Dynamic, 1>>(&data[0],
                                                            data.size());
@@ -237,7 +237,7 @@ EigenArrayNear(absl::Span<const T> data, double tolerance) {
 
 template <typename T>
 EigenArrayNearMatcherP2<Eigen::Array<T, Eigen::Dynamic, Eigen::Dynamic>, double>
-EigenArrayNear(absl::Span<const absl::Span<const T>> rows,
+EigenArrayNear(abslx::Span<const abslx::Span<const T>> rows,
                double tolerance) {
   return EigenArrayNear(internal::EigenArray2DFromNestedSpans(rows),
                         tolerance);
@@ -245,7 +245,7 @@ EigenArrayNear(absl::Span<const absl::Span<const T>> rows,
 
 template <typename T>
 EigenArrayEqMatcherP<Eigen::Array<T, Eigen::Dynamic, 1>> EigenArrayEq(
-    absl::Span<const T> data) {
+    abslx::Span<const T> data) {
   Eigen::Array<T, Eigen::Dynamic, 1> temp_array =
       Eigen::Map<const Eigen::Array<T, Eigen::Dynamic, 1>>(&data[0],
                                                            data.size());
@@ -254,7 +254,7 @@ EigenArrayEqMatcherP<Eigen::Array<T, Eigen::Dynamic, 1>> EigenArrayEq(
 
 template <typename T>
 EigenArrayEqMatcherP<Eigen::Array<T, Eigen::Dynamic, Eigen::Dynamic>>
-EigenArrayEq(absl::Span<const absl::Span<const T>> rows) {
+EigenArrayEq(abslx::Span<const abslx::Span<const T>> rows) {
   return EigenArrayEq(internal::EigenArray2DFromNestedSpans(rows));
 }
 

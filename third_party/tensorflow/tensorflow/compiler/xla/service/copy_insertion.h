@@ -45,7 +45,7 @@ namespace xla {
 //       InstructionAliasSet::IsDistinct return true.
 class CopyInsertion : public HloModulePass {
  public:
-  absl::string_view name() const override { return "copy-insertion"; }
+  abslx::string_view name() const override { return "copy-insertion"; }
   static constexpr int64_t kUseRegionAnalysisLimit = 0;
 
   // backend specific function that decides whether an instruction
@@ -65,7 +65,7 @@ class CopyInsertion : public HloModulePass {
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
   // Try to remove as many copies from the module as possible without
   // introducing live range interference. Only copy instructions that are
@@ -75,7 +75,7 @@ class CopyInsertion : public HloModulePass {
   Status RemoveUnnecessaryCopies(
       HloOrdering* ordering, HloModule* module,
       bool check_live_range_ordering = false,
-      const absl::flat_hash_set<absl::string_view>& execution_threads = {});
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads = {});
 
   // Add copies to address special constraints on the roots of computations not
   // related to live range interference:
@@ -89,13 +89,13 @@ class CopyInsertion : public HloModulePass {
   //
   Status AddSpecialCaseCopies(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads = {});
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads = {});
 
  protected:
   // Override which requires the caller to pass in a call graph.
   virtual Status AddSpecialCaseCopies(
       const CallGraph& call_graph,
-      const absl::flat_hash_set<absl::string_view>& execution_threads,
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads,
       HloModule* module);
 
   // Add copies for conditional instructions.
@@ -109,7 +109,7 @@ class CopyInsertion : public HloModulePass {
  private:
   Status AddCopiesToResolveInterference(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads);
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads);
   int64_t use_region_based_live_range_analysis_;
 };
 

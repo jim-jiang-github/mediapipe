@@ -16,7 +16,7 @@
 // bad_any_cast.h
 // -----------------------------------------------------------------------------
 //
-// This header file defines the `absl::bad_any_cast` type.
+// This header file defines the `abslx::bad_any_cast` type.
 
 #ifndef ABSL_TYPES_BAD_ANY_CAST_H_
 #define ABSL_TYPES_BAD_ANY_CAST_H_
@@ -29,31 +29,31 @@
 
 #include <any>
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 using std::bad_any_cast;
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #else  // ABSL_USES_STD_ANY
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // -----------------------------------------------------------------------------
 // bad_any_cast
 // -----------------------------------------------------------------------------
 //
-// An `absl::bad_any_cast` type is an exception type that is thrown when
-// failing to successfully cast the return value of an `absl::any` object.
+// An `abslx::bad_any_cast` type is an exception type that is thrown when
+// failing to successfully cast the return value of an `abslx::any` object.
 //
 // Example:
 //
-//   auto a = absl::any(65);
-//   absl::any_cast<int>(a);         // 65
+//   auto a = abslx::any(65);
+//   abslx::any_cast<int>(a);         // 65
 //   try {
-//     absl::any_cast<char>(a);
-//   } catch(const absl::bad_any_cast& e) {
+//     abslx::any_cast<char>(a);
+//   } catch(const abslx::bad_any_cast& e) {
 //     std::cout << "Bad any cast: " << e.what() << '\n';
 //   }
 class bad_any_cast : public std::bad_cast {
@@ -68,7 +68,7 @@ namespace any_internal {
 
 }  // namespace any_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_USES_STD_ANY
 

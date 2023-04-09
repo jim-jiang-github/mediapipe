@@ -108,7 +108,7 @@ class PointsToSet {
   // Add a tuple source instruction for the given index.
   void add_tuple_source(const ShapeIndex& index, HloInstruction* tuple);
 
-  using BufferList = absl::InlinedVector<const LogicalBuffer*, 1>;
+  using BufferList = abslx::InlinedVector<const LogicalBuffer*, 1>;
 
   // Return the list of logical buffers for the subshape at index.
   const BufferList& element(const ShapeIndex& index) const {
@@ -203,7 +203,7 @@ class TuplePointsToAnalysis : public DfsHloVisitorWithDefault {
   // logical buffer The buffer alias set is the inverse of the points-to set.
   // That is, LogicalBuffer B is in the points-to set of instruction I at index
   // N iff instruction I, index N is a BufferAlias of B.
-  using BufferAliasVector = absl::InlinedVector<BufferAlias, 1>;
+  using BufferAliasVector = abslx::InlinedVector<BufferAlias, 1>;
   const BufferAliasVector& GetBufferAliases(const LogicalBuffer& buffer) const;
 
   // Returns the number of logical buffers in the module
@@ -226,7 +226,7 @@ class TuplePointsToAnalysis : public DfsHloVisitorWithDefault {
   // instructions produce a single buffer (the top-level buffer), some produce
   // no buffers (eg bitcast), and some produce more than one buffer (eg,
   // tuple-shaped parameters).
-  using BufferDefinitionVector = absl::InlinedVector<const LogicalBuffer*, 1>;
+  using BufferDefinitionVector = abslx::InlinedVector<const LogicalBuffer*, 1>;
   const BufferDefinitionVector& GetBuffersDefinedByInstruction(
       const HloInstruction* instruction) const;
 
@@ -349,7 +349,7 @@ class TuplePointsToAnalysis : public DfsHloVisitorWithDefault {
   const std::unique_ptr<LogicalBufferAnalysis> logical_buffer_analysis_;
 
   // A map from instruction->unique_id() to
-  absl::flat_hash_map<int, std::unique_ptr<PerInstruction>> per_instruction_;
+  abslx::flat_hash_map<int, std::unique_ptr<PerInstruction>> per_instruction_;
 
   // A map from LogicalBuffer->id() to alias information about that logical
   // buffer

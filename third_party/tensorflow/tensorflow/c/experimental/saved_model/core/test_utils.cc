@@ -70,7 +70,7 @@ std::vector<std::vector<int64_t>> InterestingShapes() {
 
 ImmediateTensorHandlePtr CreateTensorHandle(ImmediateExecutionContext* ctx,
                                             DataType dtype,
-                                            absl::Span<const int64_t> shape,
+                                            abslx::Span<const int64_t> shape,
                                             int8_t value) {
   AbstractTensorPtr tensor(ctx->CreateTensor(dtype, shape));
   CHECK_NE(tensor.get(), nullptr)

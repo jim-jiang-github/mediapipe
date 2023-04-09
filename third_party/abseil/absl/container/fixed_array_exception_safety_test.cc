@@ -22,7 +22,7 @@
 #include "gtest/gtest.h"
 #include "absl/base/internal/exception_safety_testing.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 namespace {
@@ -44,12 +44,12 @@ using MoveThrowAlloc =
     testing::ThrowingAllocator<MoveThrower,
                                testing::AllocSpec::kEverythingThrows>;
 
-using FixedArr = absl::FixedArray<Thrower, kInlined>;
-using FixedArrWithAlloc = absl::FixedArray<Thrower, kInlined, ThrowAlloc>;
+using FixedArr = abslx::FixedArray<Thrower, kInlined>;
+using FixedArrWithAlloc = abslx::FixedArray<Thrower, kInlined, ThrowAlloc>;
 
-using MoveFixedArr = absl::FixedArray<MoveThrower, kInlined>;
+using MoveFixedArr = abslx::FixedArray<MoveThrower, kInlined>;
 using MoveFixedArrWithAlloc =
-    absl::FixedArray<MoveThrower, kInlined, MoveThrowAlloc>;
+    abslx::FixedArray<MoveThrower, kInlined, MoveThrowAlloc>;
 
 TEST(FixedArrayExceptionSafety, CopyConstructor) {
   auto small = FixedArr(kSmallSize);
@@ -123,7 +123,7 @@ TEST(FixedArrayExceptionSafety, IteratorConstructorWithAlloc) {
 
 TEST(FixedArrayExceptionSafety, InitListConstructor) {
   constexpr int small_inlined = 3;
-  using SmallFixedArr = absl::FixedArray<Thrower, small_inlined>;
+  using SmallFixedArr = abslx::FixedArray<Thrower, small_inlined>;
 
   TestThrowingCtor<SmallFixedArr>(std::initializer_list<Thrower>{});
   // Test inlined allocation
@@ -137,7 +137,7 @@ TEST(FixedArrayExceptionSafety, InitListConstructor) {
 TEST(FixedArrayExceptionSafety, InitListConstructorWithAlloc) {
   constexpr int small_inlined = 3;
   using SmallFixedArrWithAlloc =
-      absl::FixedArray<Thrower, small_inlined, ThrowAlloc>;
+      abslx::FixedArray<Thrower, small_inlined, ThrowAlloc>;
 
   TestThrowingCtor<SmallFixedArrWithAlloc>(std::initializer_list<Thrower>{});
   // Test inlined allocation
@@ -196,6 +196,6 @@ TEST(FixedArrayExceptionSafety, FillWithAlloc) {
 }  // namespace
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_HAVE_EXCEPTIONS

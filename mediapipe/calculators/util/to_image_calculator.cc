@@ -63,61 +63,61 @@ class ToImageCalculator : public Node {
   static constexpr Output<mediapipe::Image> kOut{"IMAGE"};
   MEDIAPIPE_NODE_CONTRACT(kIn, kInCpu, kInGpu, kOut);
 
-  static absl::Status UpdateContract(CalculatorContract* cc);
+  static abslx::Status UpdateContract(CalculatorContract* cc);
 
   // From Calculator.
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
-  absl::StatusOr<Packet<Image>> GetInputImage(CalculatorContext* cc);
+  abslx::StatusOr<Packet<Image>> GetInputImage(CalculatorContext* cc);
 };
 MEDIAPIPE_REGISTER_NODE(ToImageCalculator);
 
-absl::Status ToImageCalculator::UpdateContract(CalculatorContract* cc) {
+abslx::Status ToImageCalculator::UpdateContract(CalculatorContract* cc) {
   int num_inputs = static_cast<int>(kIn(cc).IsConnected()) +
                    static_cast<int>(kInCpu(cc).IsConnected()) +
                    static_cast<int>(kInGpu(cc).IsConnected());
   if (num_inputs != 1) {
-    return absl::InternalError("Cannot have multiple inputs.");
+    return abslx::InternalError("Cannot have multiple inputs.");
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ToImageCalculator::Process(CalculatorContext* cc) {
+abslx::Status ToImageCalculator::Process(CalculatorContext* cc) {
   ASSIGN_OR_RETURN(auto output, GetInputImage(cc));
   kOut(cc).Send(output.At(cc->InputTimestamp()));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ToImageCalculator::Close(CalculatorContext* cc) {
-  return absl::OkStatus();
+abslx::Status ToImageCalculator::Close(CalculatorContext* cc) {
+  return abslx::OkStatus();
 }
 
 // Wrap ImageFrameSharedPtr; shallow copy.
-absl::StatusOr<Packet<Image>> FromImageFrame(Packet<ImageFrame> packet) {
+abslx::StatusOr<Packet<Image>> FromImageFrame(Packet<ImageFrame> packet) {
   return MakePacket<Image, std::shared_ptr<mediapipe::ImageFrame>>(
       std::const_pointer_cast<mediapipe::ImageFrame>(
           SharedPtrWithPacket<mediapipe::ImageFrame>(packet)));
 }
 
 // Wrap texture pointer; shallow copy.
-absl::StatusOr<Packet<Image>> FromGpuBuffer(Packet<GpuBuffer> packet) {
+abslx::StatusOr<Packet<Image>> FromGpuBuffer(Packet<GpuBuffer> packet) {
 #if !MEDIAPIPE_DISABLE_GPU
   const GpuBuffer& buffer = *packet;
   return MakePacket<Image, const GpuBuffer&>(buffer);
 #else
-  return absl::UnimplementedError("GPU processing is disabled in build flags");
+  return abslx::UnimplementedError("GPU processing is disabled in build flags");
 #endif  // !MEDIAPIPE_DISABLE_GPU
 }
 
-absl::StatusOr<Packet<Image>> ToImageCalculator::GetInputImage(
+abslx::StatusOr<Packet<Image>> ToImageCalculator::GetInputImage(
     CalculatorContext* cc) {
   if (kIn(cc).IsConnected()) {
     return kIn(cc).Visit(
         [&](const mediapipe::Image&) {
-          return absl::StatusOr<Packet<Image>>(kIn(cc).As<Image>());
+          return abslx::StatusOr<Packet<Image>>(kIn(cc).As<Image>());
         },
         [&](const mediapipe::ImageFrame&) {
           return FromImageFrame(kIn(cc).As<ImageFrame>());
@@ -130,7 +130,7 @@ absl::StatusOr<Packet<Image>> ToImageCalculator::GetInputImage(
   } else if (kInGpu(cc).IsConnected()) {
     return FromGpuBuffer(kInGpu(cc).As<GpuBuffer>());
   }
-  return absl::InvalidArgumentError("No input found.");
+  return abslx::InvalidArgumentError("No input found.");
 }
 
 }  // namespace api2

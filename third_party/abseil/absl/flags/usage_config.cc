@@ -35,11 +35,11 @@ extern "C" {
 // Additional report of fatal usage error message before we std::exit. Error is
 // fatal if is_fatal argument to ReportUsageError is true.
 ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(
-    AbslInternalReportFatalUsageError)(absl::string_view) {}
+    AbslInternalReportFatalUsageError)(abslx::string_view) {}
 
 }  // extern "C"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace flags_internal {
 
@@ -49,28 +49,28 @@ namespace {
 // Returns true if flags defined in the filename should be reported with
 // -helpshort flag.
 
-bool ContainsHelpshortFlags(absl::string_view filename) {
+bool ContainsHelpshortFlags(abslx::string_view filename) {
   // By default we only want flags in binary's main. We expect the main
   // routine to reside in <program>.cc or <program>-main.cc or
   // <program>_main.cc, where the <program> is the name of the binary
   // (without .exe on Windows).
   auto suffix = flags_internal::Basename(filename);
   auto program_name = flags_internal::ShortProgramInvocationName();
-  absl::string_view program_name_ref = program_name;
+  abslx::string_view program_name_ref = program_name;
 #if defined(_WIN32)
-  absl::ConsumeSuffix(&program_name_ref, ".exe");
+  abslx::ConsumeSuffix(&program_name_ref, ".exe");
 #endif
-  if (!absl::ConsumePrefix(&suffix, program_name_ref))
+  if (!abslx::ConsumePrefix(&suffix, program_name_ref))
     return false;
-  return absl::StartsWith(suffix, ".") || absl::StartsWith(suffix, "-main.") ||
-         absl::StartsWith(suffix, "_main.");
+  return abslx::StartsWith(suffix, ".") || abslx::StartsWith(suffix, "-main.") ||
+         abslx::StartsWith(suffix, "_main.");
 }
 
 // --------------------------------------------------------------------
 // Returns true if flags defined in the filename should be reported with
 // -helppackage flag.
 
-bool ContainsHelppackageFlags(absl::string_view filename) {
+bool ContainsHelppackageFlags(abslx::string_view filename) {
   // TODO(rogeeff): implement properly when registry is available.
   return ContainsHelpshortFlags(filename);
 }
@@ -93,10 +93,10 @@ std::string VersionString() {
 // --------------------------------------------------------------------
 // Normalizes the filename specific to the build system/filesystem used.
 
-std::string NormalizeFilename(absl::string_view filename) {
+std::string NormalizeFilename(abslx::string_view filename) {
   // Skip any leading slashes
   auto pos = filename.find_first_not_of("\\/");
-  if (pos == absl::string_view::npos) return "";
+  if (pos == abslx::string_view::npos) return "";
 
   filename.remove_prefix(pos);
   return std::string(filename);
@@ -104,14 +104,14 @@ std::string NormalizeFilename(absl::string_view filename) {
 
 // --------------------------------------------------------------------
 
-ABSL_CONST_INIT absl::Mutex custom_usage_config_guard(absl::kConstInit);
+ABSL_CONST_INIT abslx::Mutex custom_usage_config_guard(abslx::kConstInit);
 ABSL_CONST_INIT FlagsUsageConfig* custom_usage_config
     ABSL_GUARDED_BY(custom_usage_config_guard) = nullptr;
 
 }  // namespace
 
 FlagsUsageConfig GetUsageConfig() {
-  absl::MutexLock l(&custom_usage_config_guard);
+  abslx::MutexLock l(&custom_usage_config_guard);
 
   if (custom_usage_config) return *custom_usage_config;
 
@@ -125,7 +125,7 @@ FlagsUsageConfig GetUsageConfig() {
   return default_config;
 }
 
-void ReportUsageError(absl::string_view msg, bool is_fatal) {
+void ReportUsageError(abslx::string_view msg, bool is_fatal) {
   std::cerr << "ERROR: " << msg << std::endl;
 
   if (is_fatal) {
@@ -136,7 +136,7 @@ void ReportUsageError(absl::string_view msg, bool is_fatal) {
 }  // namespace flags_internal
 
 void SetFlagsUsageConfig(FlagsUsageConfig usage_config) {
-  absl::MutexLock l(&flags_internal::custom_usage_config_guard);
+  abslx::MutexLock l(&flags_internal::custom_usage_config_guard);
 
   if (!usage_config.contains_helpshort_flags)
     usage_config.contains_helpshort_flags =
@@ -162,4 +162,4 @@ void SetFlagsUsageConfig(FlagsUsageConfig usage_config) {
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

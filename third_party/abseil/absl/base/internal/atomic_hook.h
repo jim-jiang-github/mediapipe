@@ -35,7 +35,7 @@
 #define ABSL_HAVE_WORKING_ATOMIC_POINTER 1
 #endif
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -195,6 +195,6 @@ class AtomicHook<ReturnType (*)(Args...)> {
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_BASE_INTERNAL_ATOMIC_HOOK_H_

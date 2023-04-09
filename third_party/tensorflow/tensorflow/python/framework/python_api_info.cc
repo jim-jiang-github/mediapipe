@@ -211,11 +211,11 @@ Status PythonAPIInfo::InitializeFromParamSpecs(
   OpDefBuilder op_def_builder(api_name_);
   op_def_builder.AllowAttrTypeAny();
   for (const auto& attr_spec : attr_specs) {
-    op_def_builder.Attr(absl::StrCat(attr_spec.first, ": ", attr_spec.second));
+    op_def_builder.Attr(abslx::StrCat(attr_spec.first, ": ", attr_spec.second));
   }
   for (const auto& input_spec : input_specs) {
     op_def_builder.Input(
-        absl::StrCat(input_spec.first, ": ", input_spec.second));
+        abslx::StrCat(input_spec.first, ": ", input_spec.second));
   }
   OpRegistrationData op_reg_data;
   TF_RETURN_IF_ERROR(op_def_builder.Finalize(&op_reg_data));
@@ -394,113 +394,113 @@ PythonAPIInfo::InputsWithNumberAttr* PythonAPIInfo::FindInputsWithNumberAttr(
 }
 
 string PythonAPIInfo::DebugInfo() const {
-  string s = absl::StrCat("DebugInfo for ", api_name_, ":\n");
-  absl::StrAppend(&s, "  param_names=[", absl::StrJoin(param_names_, ", "),
+  string s = abslx::StrCat("DebugInfo for ", api_name_, ":\n");
+  abslx::StrAppend(&s, "  param_names=[", abslx::StrJoin(param_names_, ", "),
                   "]\n");
   Safe_PyObjectPtr defaults_repr(PyObject_Repr(defaults_tuple_.get()));
-  absl::StrAppend(
+  abslx::StrAppend(
       &s, "  defaults_tuple=", TFE_GetPythonString(defaults_repr.get()), "\n");
   if (!attributes_.empty()) {
-    absl::StrAppend(&s, "  attributes=[");
+    abslx::StrAppend(&s, "  attributes=[");
     for (const auto& attrib : attributes_) {
       if (attrib.index != -1) {
-        absl::StrAppend(&s, "\n    {index=", attrib.index);
+        abslx::StrAppend(&s, "\n    {index=", attrib.index);
         DCHECK_EQ(attrib.inferred_index, -1);
       } else {
-        absl::StrAppend(&s, "\n    {inferred_index=", attrib.inferred_index);
+        abslx::StrAppend(&s, "\n    {inferred_index=", attrib.inferred_index);
       }
-      absl::StrAppend(&s, ", name=", attrib.name,
+      abslx::StrAppend(&s, ", name=", attrib.name,
                       ", type=", AttributeTypeToName(attrib.type), "},");
     }
-    absl::StrAppend(&s, "]\n");
+    abslx::StrAppend(&s, "]\n");
   }
   if (!inputs_.empty()) {
-    absl::StrAppend(&s, "  inputs=[");
+    abslx::StrAppend(&s, "  inputs=[");
     for (const auto& input : inputs_) {
-      absl::StrAppend(&s, "\n    {index=", input.index,
+      abslx::StrAppend(&s, "\n    {index=", input.index,
                       ", name=", param_names_[input.index],
                       ", is_list=", input.is_list, "},");
     }
-    absl::StrAppend(&s, "]\n");
+    abslx::StrAppend(&s, "]\n");
   }
   if (!inputs_with_fixed_dtype_.empty()) {
-    absl::StrAppend(&s, "  inputs_with_fixed_dtype=[");
+    abslx::StrAppend(&s, "  inputs_with_fixed_dtype=[");
     for (const auto& input : inputs_with_fixed_dtype_) {
-      absl::StrAppend(&s, "\n    {index=", input.index,
+      abslx::StrAppend(&s, "\n    {index=", input.index,
                       ", dtype=", DataType_Name(input.dtype),
                       ", is_list=", input.is_list, "},");
     }
-    absl::StrAppend(&s, "]\n");
+    abslx::StrAppend(&s, "]\n");
   }
   if (!inputs_with_type_attrs_.empty()) {
-    absl::StrAppend(&s, "  inputs_with_type_attr=[");
+    abslx::StrAppend(&s, "  inputs_with_type_attr=[");
     for (const auto& input : inputs_with_type_attrs_) {
-      absl::StrAppend(&s, "\n    {type_attr=", input.type_attr->name);
+      abslx::StrAppend(&s, "\n    {type_attr=", input.type_attr->name);
       if (input.default_dtype != DT_INVALID) {
-        absl::StrAppend(&s,
+        abslx::StrAppend(&s,
                         ", default_dtype=", DataType_Name(input.default_dtype));
       }
       if (!input.tensor_params.empty()) {
-        absl::StrAppend(&s, ", tensor_params=[",
-                        absl::StrJoin(input.tensor_params, ", "), "]");
+        abslx::StrAppend(&s, ", tensor_params=[",
+                        abslx::StrJoin(input.tensor_params, ", "), "]");
       }
       if (!input.tensor_list_params.empty()) {
-        absl::StrAppend(&s, ", tensor_list_params=[",
-                        absl::StrJoin(input.tensor_list_params, ", "), "]");
+        abslx::StrAppend(&s, ", tensor_list_params=[",
+                        abslx::StrJoin(input.tensor_list_params, ", "), "]");
       }
       if (!input.ok_dtypes.empty()) {
-        absl::StrAppend(
+        abslx::StrAppend(
             &s, ", ok_dtypes=[",
-            absl::StrJoin(input.ok_dtypes, ", ", DataTypeFormatter()), "]");
+            abslx::StrJoin(input.ok_dtypes, ", ", DataTypeFormatter()), "]");
       }
-      absl::StrAppend(&s, "},");
+      abslx::StrAppend(&s, "},");
     }
-    absl::StrAppend(&s, "]\n");
+    abslx::StrAppend(&s, "]\n");
   }
   if (!inputs_with_type_list_attrs_.empty()) {
-    absl::StrAppend(&s, "  inputs_with_type_list_attrs=[");
+    abslx::StrAppend(&s, "  inputs_with_type_list_attrs=[");
     for (const auto& input : inputs_with_type_list_attrs_) {
-      absl::StrAppend(&s, "\n    {type_list_attr=", input.type_list_attr->name);
+      abslx::StrAppend(&s, "\n    {type_list_attr=", input.type_list_attr->name);
       if (!input.default_dtypes.empty()) {
-        absl::StrAppend(
+        abslx::StrAppend(
             &s, ", default_dtypes=[",
-            absl::StrJoin(input.default_dtypes, ", ", DataTypeFormatter()),
+            abslx::StrJoin(input.default_dtypes, ", ", DataTypeFormatter()),
             "]");
       }
       if (!input.tensor_list_params.empty()) {
-        absl::StrAppend(&s, ", tensor_list_params=[",
-                        absl::StrJoin(input.tensor_list_params, ", "), "]");
+        abslx::StrAppend(&s, ", tensor_list_params=[",
+                        abslx::StrJoin(input.tensor_list_params, ", "), "]");
       }
       if (!input.ok_dtypes.empty()) {
-        absl::StrAppend(
+        abslx::StrAppend(
             &s, ", ok_dtypes=[",
-            absl::StrJoin(input.ok_dtypes, ", ", DataTypeFormatter()), "]");
+            abslx::StrJoin(input.ok_dtypes, ", ", DataTypeFormatter()), "]");
       }
-      absl::StrAppend(&s, "},");
+      abslx::StrAppend(&s, "},");
     }
-    absl::StrAppend(&s, "]\n");
+    abslx::StrAppend(&s, "]\n");
   }
   if (!inputs_with_number_attrs_.empty()) {
-    absl::StrAppend(&s, "  inputs_with_number_attrs=[");
+    abslx::StrAppend(&s, "  inputs_with_number_attrs=[");
     for (const auto& input : inputs_with_number_attrs_) {
-      absl::StrAppend(&s, "\n    {number_attr=", input.number_attr->name,
+      abslx::StrAppend(&s, "\n    {number_attr=", input.number_attr->name,
                       ", default_length=", input.default_length,
                       ", tensor_list_params=[",
-                      absl::StrJoin(input.tensor_list_params, ", "), "],\n");
+                      abslx::StrJoin(input.tensor_list_params, ", "), "],\n");
     }
-    absl::StrAppend(&s, "]\n");
+    abslx::StrAppend(&s, "]\n");
   }
   if (!inferred_type_attrs_.empty()) {
-    absl::StrAppend(&s, "  inferred_type_attrs=[",
-                    absl::StrJoin(inferred_type_attrs_, ", "), "]\n");
+    abslx::StrAppend(&s, "  inferred_type_attrs=[",
+                    abslx::StrJoin(inferred_type_attrs_, ", "), "]\n");
   }
   if (!inferred_type_list_attrs_.empty()) {
-    absl::StrAppend(&s, "  inferred_type_list_attrs=[",
-                    absl::StrJoin(inferred_type_list_attrs_, ", "), "]\n");
+    abslx::StrAppend(&s, "  inferred_type_list_attrs=[",
+                    abslx::StrJoin(inferred_type_list_attrs_, ", "), "]\n");
   }
   if (!inferred_length_attrs_.empty()) {
-    absl::StrAppend(&s, "  inferred_length_attrs=[",
-                    absl::StrJoin(inferred_length_attrs_, ", "), "]\n");
+    abslx::StrAppend(&s, "  inferred_length_attrs=[",
+                    abslx::StrJoin(inferred_length_attrs_, ", "), "]\n");
   }
   return s;
 }

@@ -267,7 +267,7 @@ bool RegisterKnownJITSymbols() {
         reinterpret_cast<void*>(__xla_cpu_runtime_##base_name);              \
     registry->Register(xla::cpu::runtime::k##base_name##SymbolName,          \
                        function_address, "Host");                            \
-    CHECK_EQ(absl::string_view(xla::cpu::runtime::k##base_name##SymbolName), \
+    CHECK_EQ(abslx::string_view(xla::cpu::runtime::k##base_name##SymbolName), \
              "__xla_cpu_runtime_" #base_name);                               \
   } while (false)
 

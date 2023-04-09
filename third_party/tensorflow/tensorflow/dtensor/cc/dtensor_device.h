@@ -34,7 +34,7 @@ namespace dtensor {
 // `device_name` arg should match the `device_name` argument to
 // TFE_RegisterCustomDevice, and is the name of the custom device itself
 // (e.g. pass it to `tf.device` to place operations on it from Python).
-void AllocateDTensorDevice(absl::string_view device_name,
+void AllocateDTensorDevice(abslx::string_view device_name,
                            TFE_CustomDevice* device, void** device_info);
 
 // Add a mesh to the layout propagator indicated by `device_info`.

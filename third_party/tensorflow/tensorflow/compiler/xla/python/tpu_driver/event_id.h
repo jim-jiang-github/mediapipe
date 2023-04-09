@@ -48,7 +48,7 @@ struct EventId {
   }
 
   std::string ToString() const {
-    return absl::StrCat(client_id, ":", operation_id);
+    return abslx::StrCat(client_id, ":", operation_id);
   }
 
   uint64_t AsInt() const { return client_id << 44 | operation_id; }

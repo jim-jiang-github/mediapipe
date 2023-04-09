@@ -85,7 +85,7 @@ std::string ShapeToStringNoSpace(const Shape& shape) {
     return "[]";
   }
 
-  return absl::StrCat("[", absl::StrJoin(shape.dims(), ","), "]");
+  return abslx::StrCat("[", abslx::StrJoin(shape.dims(), ","), "]");
 }
 
 std::string GetOperatorSignature(
@@ -255,7 +255,7 @@ void PopulateConversionLog(const Model& model, TocoConversionLog* log) {
   log->mutable_input_tensor_types()->CopyFrom(input_types);
   log->mutable_output_tensor_types()->CopyFrom(output_types);
 
-  log->set_log_generation_ts(absl::ToUnixMicros(absl::Now()));
+  log->set_log_generation_ts(abslx::ToUnixMicros(abslx::Now()));
 
   log->set_model_size(model.operators.size());
   log->set_tf_lite_version(GetTfLiteVersion());

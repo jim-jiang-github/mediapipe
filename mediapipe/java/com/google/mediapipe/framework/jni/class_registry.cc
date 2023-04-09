@@ -27,7 +27,7 @@ ClassRegistry& ClassRegistry::GetInstance() {
 }
 
 void ClassRegistry::InstallRenamingMap(
-    absl::node_hash_map<std::string, std::string> renaming_map) {
+    abslx::node_hash_map<std::string, std::string> renaming_map) {
   renaming_map_ = renaming_map;
 }
 
@@ -40,7 +40,7 @@ std::string ClassRegistry::GetClassName(std::string cls) {
 }
 
 std::string ClassRegistry::GetMethodName(std::string cls, std::string method) {
-  std::string key = absl::StrFormat("%s#%s", cls, method);
+  std::string key = abslx::StrFormat("%s#%s", cls, method);
   auto match = renaming_map_.find(key);
   if (match != renaming_map_.end()) {
     return match->second;
@@ -49,7 +49,7 @@ std::string ClassRegistry::GetMethodName(std::string cls, std::string method) {
 }
 
 std::string ClassRegistry::GetFieldName(std::string cls, std::string field) {
-  std::string key = absl::StrFormat("%s##%s", cls, field);
+  std::string key = abslx::StrFormat("%s##%s", cls, field);
   auto match = renaming_map_.find(key);
   if (match != renaming_map_.end()) {
     return match->second;

@@ -44,21 +44,21 @@ class PjRtTpuDevice : public PjRtStreamExecutorDevice {
         {"coords", xla::PjRtDeviceAttribute(v_coords)},
         {"core_on_chip", xla::PjRtDeviceAttribute(core_index)},
     };
-    debug_string_ = absl::StrFormat("TPU_%i(process=%i,(%i,%i,%i,%i))",
+    debug_string_ = abslx::StrFormat("TPU_%i(process=%i,(%i,%i,%i,%i))",
                                     core_.Id(), process_index, coords_[0],
                                     coords_[1], coords_[2], core_.index());
-    to_string_ = absl::StrFormat(
+    to_string_ = abslx::StrFormat(
         "TpuDevice(id=%i, process_index=%i, coords=(%s), core_on_chip=%i)",
-        id(), process_index, absl::StrJoin(coords_, ","), core_on_chip());
+        id(), process_index, abslx::StrJoin(coords_, ","), core_on_chip());
   }
 
   const std::array<int, 3>& coords() const { return coords_; }
   int core_on_chip() const { return core_.index(); }
   const tensorflow::tpu::TpuCoreLocationExternal core() const { return core_; }
 
-  absl::string_view ToString() const override { return to_string_; }
+  abslx::string_view ToString() const override { return to_string_; }
 
-  absl::string_view DebugString() const override { return debug_string_; }
+  abslx::string_view DebugString() const override { return debug_string_; }
 
  private:
   const tensorflow::tpu::TpuCoreLocationExternal core_;
@@ -74,7 +74,7 @@ class PjRtTpuClient : public PjRtStreamExecutorClient {
                 int process_index);
   ~PjRtTpuClient() override;
 
-  absl::string_view platform_version() const override {
+  abslx::string_view platform_version() const override {
     return platform_version_;
   }
 
@@ -90,7 +90,7 @@ class PjRtTpuClient : public PjRtStreamExecutorClient {
       const PjRtLoadedExecutable& executable) const override;
 
   StatusOr<std::unique_ptr<PjRtLoadedExecutable>> DeserializeExecutable(
-      absl::string_view serialized, CompileOptions options) override;
+      abslx::string_view serialized, CompileOptions options) override;
 
  private:
   const std::string platform_version_;
@@ -98,7 +98,7 @@ class PjRtTpuClient : public PjRtStreamExecutorClient {
 
 StatusOr<std::shared_ptr<PjRtClient>> GetTpuClient(
     int max_inflight_computations,
-    absl::Duration init_retry_timeout = absl::ZeroDuration());
+    abslx::Duration init_retry_timeout = abslx::ZeroDuration());
 
 }  // namespace xla
 

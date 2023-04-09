@@ -71,7 +71,7 @@ TEST(RedzoneAllocatorTest, WriteToRedzone) {
   DeviceMemoryBase rhs_redzone(buf_addr + kAllocSize, kRedzoneSize);
 
   // Check that the redzones are in fact filled with kRedzonePattern.
-  auto check_redzone = [&](DeviceMemoryBase redzone, absl::string_view name) {
+  auto check_redzone = [&](DeviceMemoryBase redzone, abslx::string_view name) {
     std::vector<uint8> host_buf(kRedzoneSize);
     TF_ASSERT_OK(stream.ThenMemcpy(host_buf.data(), redzone, kRedzoneSize)
                      .BlockHostUntilDone());
@@ -96,8 +96,8 @@ TEST(RedzoneAllocatorTest, WriteToRedzone) {
   // reverts it back to its original value and checks that RedzonesAreUnmodified
   // returns true.
   auto modify_redzone = [&](DeviceMemoryBase redzone, int64_t offset,
-                            absl::string_view name) {
-    SCOPED_TRACE(absl::StrCat(name, ", offset=", offset));
+                            abslx::string_view name) {
+    SCOPED_TRACE(abslx::StrCat(name, ", offset=", offset));
     DeviceMemoryBase redzone_at_offset(
         reinterpret_cast<char*>(redzone.opaque()) + offset, 1);
     char old_redzone_value = 0;

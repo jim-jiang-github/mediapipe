@@ -35,7 +35,7 @@ inline std::string OpName(mlir::Operation* op) {
 }
 
 // Returns FuncOp if `op` is a callable.
-absl::optional<mlir::func::FuncOp> MaybeFindFunction(mlir::Operation* op);
+abslx::optional<mlir::func::FuncOp> MaybeFindFunction(mlir::Operation* op);
 
 // Removes tf.DTensorLayout op and forwards it's input to it's users.
 // For example:

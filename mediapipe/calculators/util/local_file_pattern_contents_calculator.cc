@@ -39,25 +39,25 @@ constexpr char kFileDirectoryTag[] = "FILE_DIRECTORY";
 // }
 class LocalFilePatternContentsCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->InputSidePackets().Tag(kFileDirectoryTag).Set<std::string>();
     cc->InputSidePackets().Tag(kFileSuffixTag).Set<std::string>();
     cc->Outputs().Tag(kContentsTag).Set<std::string>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     MP_RETURN_IF_ERROR(mediapipe::file::MatchFileTypeInDirectory(
         cc->InputSidePackets().Tag(kFileDirectoryTag).Get<std::string>(),
         cc->InputSidePackets().Tag(kFileSuffixTag).Get<std::string>(),
         &filenames_));
     std::sort(filenames_.begin(), filenames_.end());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     if (current_output_ < filenames_.size()) {
-      auto contents = absl::make_unique<std::string>();
+      auto contents = abslx::make_unique<std::string>();
       LOG(INFO) << filenames_[current_output_];
       MP_RETURN_IF_ERROR(mediapipe::file::GetContents(
           filenames_[current_output_], contents.get()));
@@ -68,7 +68,7 @@ class LocalFilePatternContentsCalculator : public CalculatorBase {
     } else {
       return tool::StatusStop();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

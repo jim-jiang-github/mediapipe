@@ -54,7 +54,7 @@ void GPUReportIfError(GPUResult result, tensorflow::OpKernelContext *ctx,
 #endif
 
   if (!name) name = "<unknown>";
-  std::string msg = absl::StrCat("'", expr_str, "' failed with '", name, "'");
+  std::string msg = abslx::StrCat("'", expr_str, "' failed with '", name, "'");
   ReportInternalError(ctx, msg);
 }
 

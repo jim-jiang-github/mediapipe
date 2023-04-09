@@ -32,19 +32,19 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status ObjectReader::ReadNonConstantTensor(
-    TfLiteContext* context, absl::flat_hash_map<int, Value*>* tensor_to_value,
-    absl::flat_hash_map<int, int>* quant_conversion_map, GraphFloat32* graph,
+abslx::Status ObjectReader::ReadNonConstantTensor(
+    TfLiteContext* context, abslx::flat_hash_map<int, Value*>* tensor_to_value,
+    abslx::flat_hash_map<int, int>* quant_conversion_map, GraphFloat32* graph,
     uint32_t tensor_idx, Value** value) {
   if (tensor_idx >= context->tensors_size) {
-    return absl::OutOfRangeError(
-        absl::StrCat("ReadNonConstTensor: input tensor index: ", tensor_idx));
+    return abslx::OutOfRangeError(
+        abslx::StrCat("ReadNonConstTensor: input tensor index: ", tensor_idx));
   }
 
   if (tensor_to_value->find(tensor_idx) == tensor_to_value->end()) {
     TfLiteTensor* tflite_tensor = &context->tensors[tensor_idx];
     if (tflite::IsConstantTensor(tflite_tensor)) {
-      return absl::InvalidArgumentError(absl::StrCat(
+      return abslx::InvalidArgumentError(abslx::StrCat(
           "ReadNonConstantTensor: value is a constant tensor: ", tensor_idx));
     }
 
@@ -61,7 +61,7 @@ absl::Status ObjectReader::ReadNonConstantTensor(
         if (delegates::CreateNewTensorWithDifferentType(
                 context, tensor_idx, kTfLiteFloat32, &fp_tflite_tensor,
                 &fp_tensor_index) != kTfLiteOk) {
-          return absl::InternalError("Could not add new tensor to graph");
+          return abslx::InternalError("Could not add new tensor to graph");
         }
         // `tflite_tensor` value could be invalid when the `context->tensors`
         // is reallocated. Thus reassigning `tflite_tensor` with a fresh value.
@@ -98,18 +98,18 @@ absl::Status ObjectReader::ReadNonConstantTensor(
   if (value) {
     *value = (*tensor_to_value)[tensor_idx];
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ObjectReader::ReadValue(uint32_t idx, Value** value) {
+abslx::Status ObjectReader::ReadValue(uint32_t idx, Value** value) {
   if (idx >= node_->inputs->size) {
-    return absl::OutOfRangeError(
-        absl::StrCat("ReadValue: input tensor index: ", idx));
+    return abslx::OutOfRangeError(
+        abslx::StrCat("ReadValue: input tensor index: ", idx));
   }
   return ReadValueByTensorIdx(node_->inputs->data[idx], value);
 }
 
-absl::Status ObjectReader::ReadValueByTensorIdx(uint32_t tensor_idx,
+abslx::Status ObjectReader::ReadValueByTensorIdx(uint32_t tensor_idx,
                                                 Value** value) {
   // Constant tensors should be handled by ReadTensor.
   return ReadNonConstantTensor(context_, tensor_to_value_,
@@ -121,36 +121,36 @@ int ObjectReader::GetNumberOfRuntimeInputs() const {
   return GetNumberOfRuntimeInputsForNode(context_, node_);
 }
 
-absl::Status ObjectReader::GetTensorId(uint32_t input_id,
+abslx::Status ObjectReader::GetTensorId(uint32_t input_id,
                                        int* tensor_id) const {
   if (input_id >= node_->inputs->size) {
-    return absl::OutOfRangeError(
-        absl::StrCat("Input tensor index: ", input_id));
+    return abslx::OutOfRangeError(
+        abslx::StrCat("Input tensor index: ", input_id));
   }
   *tensor_id = node_->inputs->data[input_id];
   if (*tensor_id < 0 || *tensor_id > context_->tensors_size) {
-    return absl::OutOfRangeError(absl::StrCat("Tensor index: ", *tensor_id));
+    return abslx::OutOfRangeError(abslx::StrCat("Tensor index: ", *tensor_id));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ObjectReader::GetTensorDims(uint32_t idx,
+abslx::Status ObjectReader::GetTensorDims(uint32_t idx,
                                          TfLiteIntArray* dimensions) const {
   if (idx >= node_->inputs->size) {
-    return absl::OutOfRangeError(absl::StrCat("Input tensor index: ", idx));
+    return abslx::OutOfRangeError(abslx::StrCat("Input tensor index: ", idx));
   }
   const int tensor_idx = node_->inputs->data[idx];
   if (tensor_idx < 0 || tensor_idx > context_->tensors_size) {
-    return absl::OutOfRangeError(absl::StrCat("Tensor index: ", tensor_idx));
+    return abslx::OutOfRangeError(abslx::StrCat("Tensor index: ", tensor_idx));
   }
   const TfLiteTensor& tflite_tensor = context_->tensors[tensor_idx];
   *dimensions = *tflite_tensor.dims;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ObjectReader::AddOutput(const Node* node, int id) {
+abslx::Status ObjectReader::AddOutput(const Node* node, int id) {
   if (node_->outputs->size <= id) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "Data id ", id, " must be less than tflite node outputs size ",
         node_->outputs->size));
   }
@@ -158,25 +158,25 @@ absl::Status ObjectReader::AddOutput(const Node* node, int id) {
   Value* value;
   RETURN_IF_ERROR(ReadValueByTensorIdx(output_tensor_idx, &value));
   RETURN_IF_ERROR(graph_->SetProducer(node->id, value->id));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ObjectReader::AddOutputs(const Node* node) {
+abslx::Status ObjectReader::AddOutputs(const Node* node) {
   for (int i = 0; i < node_->outputs->size; ++i) {
     RETURN_IF_ERROR(AddOutput(node, i));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ObjectReader::AddInput(const Node* node, uint32_t idx) {
+abslx::Status ObjectReader::AddInput(const Node* node, uint32_t idx) {
   Value* input;
   RETURN_IF_ERROR(ReadValue(idx, &input));
   return graph_->AddConsumer(node->id, input->id);
 }
 
-absl::Status ObjectReader::AddUpdate(const Node* node, uint32_t idx) {
+abslx::Status ObjectReader::AddUpdate(const Node* node, uint32_t idx) {
   if (node_->inputs->size <= idx) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "Data id ", idx, " must be less than tflite node inputs size ",
         node_->inputs->size));
   }
@@ -184,14 +184,14 @@ absl::Status ObjectReader::AddUpdate(const Node* node, uint32_t idx) {
   int update_tensor_idx = node_->inputs->data[idx];
   TfLiteTensor* update_tensor = context_->tensors + update_tensor_idx;
   if (!update_tensor->is_variable) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "The tensor must be a variable tensor to update it in place");
   }
 
   Value* value;
   RETURN_IF_ERROR(ReadValueByTensorIdx(update_tensor_idx, &value));
   if (!value->tensor.is_variable_input) {
-    return absl::InternalError(
+    return abslx::InternalError(
         "Variable input tensor is not marked as variable");
   }
 
@@ -218,7 +218,7 @@ absl::Status ObjectReader::AddUpdate(const Node* node, uint32_t idx) {
     tensor_to_value_->at(update_tensor_idx) = updated_value;
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 TfLiteTensor* ObjectReader::GetInputTensor(int index) const {
@@ -233,7 +233,7 @@ TfLiteTensor* ObjectReader::GetOutputTensor(int index) const {
              : nullptr;
 }
 
-absl::Status ObjectReader::VerifyInputsConstsOutputs(const TfLiteNode* node,
+abslx::Status ObjectReader::VerifyInputsConstsOutputs(const TfLiteNode* node,
                                                      int runtime_inputs,
                                                      int const_inputs,
                                                      int outputs) {

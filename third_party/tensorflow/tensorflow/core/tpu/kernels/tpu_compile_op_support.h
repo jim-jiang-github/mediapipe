@@ -47,13 +47,13 @@ namespace se = ::stream_executor;
 
 // List of parameters for lowering Mlir to HLO IR.
 struct MlirToHloArgs {
-  absl::string_view mlir_module;
+  abslx::string_view mlir_module;
   ConfigProto::Experimental::MlirBridgeRollout rollout_state =
       ConfigProto::Experimental::MLIR_BRIDGE_ROLLOUT_ENABLED;
 };
 
 // Variant of guaranteed constant tensors types.
-using GuaranteedConsts = absl::variant<absl::Span<const TensorProto* const>,
+using GuaranteedConsts = abslx::variant<abslx::Span<const TensorProto* const>,
                                        const OpInputList* const>;
 
 // List of parameters for lowering function library definition to HLO IR.
@@ -95,9 +95,9 @@ xla::Shape GetPerDeviceShape(const xla::Shape& shape,
 stream_executor::port::StatusOr<std::unique_ptr<xla::HloModuleConfig>>
 CreateModuleConfig(
     const xla::ProgramShape& program_shape,
-    absl::Span<const xla::Shape> argument_shapes,
-    absl::optional<const xla::Shape> result_layout,
-    absl::optional<const xla::DeviceAssignment> device_assignment,
+    abslx::Span<const xla::Shape> argument_shapes,
+    abslx::optional<const xla::Shape> result_layout,
+    abslx::optional<const xla::DeviceAssignment> device_assignment,
     int replica_count, int num_partitions,
     const xla::DebugOptions* debug_options, const int* seed,
     const int* launch_id, const bool* alias_passthrough_params,
@@ -107,9 +107,9 @@ CreateModuleConfig(
 stream_executor::port::StatusOr<std::unique_ptr<xla::HloModuleConfig>>
 CreateModuleConfig(
     const xla::ProgramShape& program_shape,
-    absl::Span<const xla::Shape> argument_shapes,
-    absl::optional<const xla::Shape> result_layout,
-    absl::optional<const xla::DeviceAssignment> device_assignment,
+    abslx::Span<const xla::Shape> argument_shapes,
+    abslx::optional<const xla::Shape> result_layout,
+    abslx::optional<const xla::DeviceAssignment> device_assignment,
     int replica_count,
     int num_partitions, const xla::DebugOptions* debug_options);
 
@@ -136,11 +136,11 @@ se::port::Status ComputeOutputShapesForEachCore(
 se::port::Status CreateHloModules(
     const TPUCompileMetadataProto& metadata,
     const XlaCompiler::CompilationResult& compilation_result,
-    const absl::optional<xla::DeviceAssignment>& device_assignment,
+    const abslx::optional<xla::DeviceAssignment>& device_assignment,
     std::vector<std::unique_ptr<xla::HloModule>>* hlo_modules);
 
 se::port::StatusOr<TpuCompilationRequestProto> CreateTpuCompilationRequest(
-    const absl::variant<MlirToHloArgs, FunctionToHloArgs>& computation,
+    const abslx::variant<MlirToHloArgs, FunctionToHloArgs>& computation,
     const TPUCompileMetadataProto& metadata,
     const std::vector<TensorShape>& arg_shapes);
 

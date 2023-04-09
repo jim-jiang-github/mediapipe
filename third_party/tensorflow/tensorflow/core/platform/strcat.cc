@@ -126,7 +126,7 @@ struct ResizeUninitializedTraits {
 // __resize_default_init is provided by libc++ >= 8.0.
 template <typename string_type>
 struct ResizeUninitializedTraits<
-    string_type, absl::void_t<decltype(std::declval<string_type&>()
+    string_type, abslx::void_t<decltype(std::declval<string_type&>()
                                            .__resize_default_init(237))> > {
   using HasMember = std::true_type;
   static void Resize(string_type* s, size_t new_size) {
@@ -141,7 +141,7 @@ static inline void STLStringResizeUninitialized(string* s, size_t new_size) {
 // Used to ensure exponential growth so that the amortized complexity of
 // increasing the string size by a small amount is O(1), in contrast to
 // O(str->size()) in the case of precise growth.
-// TODO(b/217943845): Would be better to use absl::strings so we don't need to
+// TODO(b/217943845): Would be better to use abslx::strings so we don't need to
 // keep cherry-picking performance fixes.
 template <typename string_type>
 void STLStringReserveAmortized(string_type *s, size_t new_size) {

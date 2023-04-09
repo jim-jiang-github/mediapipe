@@ -25,7 +25,7 @@ namespace xla {
 // "scatter" steps of this operation.
 class SelectAndScatterExpander : public OpExpanderPass {
  public:
-  absl::string_view name() const override {
+  abslx::string_view name() const override {
     return "select_and_scatter_expander";
   }
 

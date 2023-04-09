@@ -35,7 +35,7 @@ class ElementwiseOneArgument : public NodeShader {
  public:
   explicit ElementwiseOneArgument(OperationType operation_type)
       : operation_type_(operation_type) {}
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     std::string source;
     switch (operation_type_) {
@@ -110,7 +110,7 @@ class ElementwiseOneArgument : public NodeShader {
         source = "value_0 = tanh(value_0);";
         break;
       default:
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "Incorrect elementwise operation type.");
     }
     *generated_code = {
@@ -123,7 +123,7 @@ class ElementwiseOneArgument : public NodeShader {
         /*input=*/IOStructure::AUTO,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -146,7 +146,7 @@ class ElementwiseTwoArguments : public NodeShader {
            ctx.input_shapes[0][3] == ctx.input_shapes[1][3];
   }
 
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     std::vector<Variable> parameters;
     std::vector<std::pair<std::string, Object>> objects;
@@ -164,7 +164,7 @@ class ElementwiseTwoArguments : public NodeShader {
           std::get_if<Tensor<Linear, DataType::FLOAT32>>(&attr.param);
       const auto* scalar = std::get_if<float>(&attr.param);
       if (!tensor && !scalar) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "Couldn't read scalar of const vector data from the attributes.");
       }
 
@@ -211,10 +211,10 @@ class ElementwiseTwoArguments : public NodeShader {
         break;
       }
       default:
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "Incorrect elementwise with scalar operation type.");
     }
-    source = absl::Substitute(source, argument0, argument1);
+    source = abslx::Substitute(source, argument0, argument1);
     *generated_code = {
         /*parameters=*/std::move(parameters),
         /*objects=*/std::move(objects),
@@ -225,7 +225,7 @@ class ElementwiseTwoArguments : public NodeShader {
         /*input=*/IOStructure::AUTO,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

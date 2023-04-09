@@ -75,19 +75,19 @@ enum class TransferGuardAction {
 // transfer in a log message or error status.
 // REQUIRES: Python GIL.
 xla::Status ApplyTransferGuardToHostToDevice(
-    absl::FunctionRef<std::string()> formatter);
+    abslx::FunctionRef<std::string()> formatter);
 
 // Guards a device-to-device transfer. formatter is called to describe the
 // transfer in a log message or error status.
 // REQUIRES: Python GIL.
 xla::Status ApplyTransferGuardToDeviceToDevice(
-    absl::FunctionRef<std::string()> formatter);
+    abslx::FunctionRef<std::string()> formatter);
 
 // Guards a device-to-host transfer. formatter is called to describe the
 // transfer in a log message or error status.
 // REQUIRES: Python GIL.
 xla::Status ApplyTransferGuardToDeviceToHost(
-    absl::FunctionRef<std::string()> formatter);
+    abslx::FunctionRef<std::string()> formatter);
 
 // The function to call in `xla.cc` to add the bindings for this module.
 void BuildTransferGuardSubmodule(pybind11::module& m);

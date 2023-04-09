@@ -72,7 +72,7 @@ StatusOr<bool> CombineConstants(HloComputation* computation) {
   // Map from the literal hash of a constant or the shape hash of an iota all
   // equivalent instructions. This avoids extreme quadratic behavior with many
   // scalar constants.
-  absl::flat_hash_set<ConstantKey<kIsLayoutSensitive>> constants;
+  abslx::flat_hash_set<ConstantKey<kIsLayoutSensitive>> constants;
   int64_t combined = 0;
   auto inst_it = computation->instructions().begin();
   while (inst_it != computation->instructions().end()) {
@@ -168,10 +168,10 @@ struct CseKey {
             instruction->dot_dimension_numbers();
         h = H::combine(
             std::move(h),
-            absl::MakeSpan(dot_dimension_numbers.lhs_contracting_dimensions()),
-            absl::MakeSpan(dot_dimension_numbers.rhs_contracting_dimensions()),
-            absl::MakeSpan(dot_dimension_numbers.lhs_batch_dimensions()),
-            absl::MakeSpan(dot_dimension_numbers.rhs_batch_dimensions()));
+            abslx::MakeSpan(dot_dimension_numbers.lhs_contracting_dimensions()),
+            abslx::MakeSpan(dot_dimension_numbers.rhs_contracting_dimensions()),
+            abslx::MakeSpan(dot_dimension_numbers.lhs_batch_dimensions()),
+            abslx::MakeSpan(dot_dimension_numbers.rhs_batch_dimensions()));
         return std::move(h);
       }
       case HloOpcode::kConvolution: {
@@ -180,13 +180,13 @@ struct CseKey {
         h = H::combine(
             std::move(h), conv_dimension_numbers.input_batch_dimension(),
             conv_dimension_numbers.input_feature_dimension(),
-            absl::MakeSpan(conv_dimension_numbers.input_spatial_dimensions()),
+            abslx::MakeSpan(conv_dimension_numbers.input_spatial_dimensions()),
             conv_dimension_numbers.kernel_input_feature_dimension(),
             conv_dimension_numbers.kernel_output_feature_dimension(),
-            absl::MakeSpan(conv_dimension_numbers.kernel_spatial_dimensions()),
+            abslx::MakeSpan(conv_dimension_numbers.kernel_spatial_dimensions()),
             conv_dimension_numbers.output_batch_dimension(),
             conv_dimension_numbers.output_feature_dimension(),
-            absl::MakeSpan(conv_dimension_numbers.output_spatial_dimensions()));
+            abslx::MakeSpan(conv_dimension_numbers.output_spatial_dimensions()));
         return window_hash(std::move(h), instruction->window());
       }
       case HloOpcode::kReduceWindow:
@@ -209,7 +209,7 @@ struct CseKey {
 
 StatusOr<bool> HloCSE::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
 
   const auto eq_instructions = [&](const HloInstruction* a,
@@ -248,9 +248,9 @@ StatusOr<bool> HloCSE::Run(
     // HLO instructions are grouped into equivalency classes by using the
     // cse_equal predicate defined above. This set holds a representative
     // instruction for each class.
-    absl::flat_hash_set<CseKey, absl::Hash<CseKey>, decltype(cse_equal)>
+    abslx::flat_hash_set<CseKey, abslx::Hash<CseKey>, decltype(cse_equal)>
         representatives(/*N=*/computation->instruction_count() + 1,
-                        absl::Hash<CseKey>{}, cse_equal);
+                        abslx::Hash<CseKey>{}, cse_equal);
     for (auto instruction : computation->MakeInstructionPostOrder()) {
       // If the instruction has zero operands (constants, parameters, etc.) skip
       // over it.

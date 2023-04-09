@@ -27,7 +27,7 @@ limitations under the License.
 namespace mlir {
 namespace lite {
 
-using StringSet = absl::flat_hash_set<std::string>;
+using StringSet = abslx::flat_hash_set<std::string>;
 
 // Quantize the `input_model` and write the result to a flatbuffer `builder`.
 // The `input_type`, `output_type` and `inference_type` can be

@@ -23,17 +23,17 @@
 
 namespace {
 
-using absl::base_internal::ThrowStdLogicError;
-using absl::base_internal::ThrowStdInvalidArgument;
-using absl::base_internal::ThrowStdDomainError;
-using absl::base_internal::ThrowStdLengthError;
-using absl::base_internal::ThrowStdOutOfRange;
-using absl::base_internal::ThrowStdRuntimeError;
-using absl::base_internal::ThrowStdRangeError;
-using absl::base_internal::ThrowStdOverflowError;
-using absl::base_internal::ThrowStdUnderflowError;
-using absl::base_internal::ThrowStdBadFunctionCall;
-using absl::base_internal::ThrowStdBadAlloc;
+using abslx::base_internal::ThrowStdLogicError;
+using abslx::base_internal::ThrowStdInvalidArgument;
+using abslx::base_internal::ThrowStdDomainError;
+using abslx::base_internal::ThrowStdLengthError;
+using abslx::base_internal::ThrowStdOutOfRange;
+using abslx::base_internal::ThrowStdRuntimeError;
+using abslx::base_internal::ThrowStdRangeError;
+using abslx::base_internal::ThrowStdOverflowError;
+using abslx::base_internal::ThrowStdUnderflowError;
+using abslx::base_internal::ThrowStdBadFunctionCall;
+using abslx::base_internal::ThrowStdBadAlloc;
 
 constexpr const char* what_arg = "The quick brown fox jumps over the lazy dog";
 

@@ -1232,7 +1232,7 @@ TEST(GcsFileSystemTest, NewWritableFile_ResumeUploadAllAttemptsFail) {
   const auto& status = file->Close();
   EXPECT_TRUE(errors::IsAborted(status));
   EXPECT_TRUE(
-      absl::StrContains(status.error_message(),
+      abslx::StrContains(status.error_message(),
                         "All 10 retry attempts failed. The last failure: "
                         "important HTTP error 503"))
       << status;
@@ -1297,12 +1297,12 @@ TEST(GcsFileSystemTest, NewWritableFile_UploadReturns410) {
     const auto& status = file->Close();
     EXPECT_TRUE(errors::IsUnavailable(status));
     EXPECT_TRUE(
-        absl::StrContains(status.error_message(),
+        abslx::StrContains(status.error_message(),
                           "Upload to gs://bucket/path/writeable.txt failed, "
                           "caused by: important HTTP error 410"))
         << status;
     EXPECT_TRUE(
-        absl::StrContains(status.error_message(),
+        abslx::StrContains(status.error_message(),
                           "when uploading gs://bucket/path/writeable.txt"))
         << status;
   }

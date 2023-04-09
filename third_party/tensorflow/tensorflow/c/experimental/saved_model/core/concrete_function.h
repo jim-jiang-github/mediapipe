@@ -45,7 +45,7 @@ class ConcreteFunction {
   virtual ~ConcreteFunction() = default;
 
   // This method returns the "Call" Op used to execute the function.
-  virtual Status MakeCallOp(absl::Span<AbstractTensorHandle* const> inputs,
+  virtual Status MakeCallOp(abslx::Span<AbstractTensorHandle* const> inputs,
                             ImmediateOpPtr* out) const = 0;
 
   virtual const FunctionMetadata& GetFunctionMetadata() const = 0;

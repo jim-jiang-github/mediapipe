@@ -33,7 +33,7 @@ class RngBitGeneratorExpander : public OpExpanderPass {
     CHECK_NE(default_algorithm_, RandomAlgorithm::RNG_DEFAULT);
   }
 
-  absl::string_view name() const override {
+  abslx::string_view name() const override {
     return "rng-bit-generator-expander";
   }
 
@@ -64,7 +64,7 @@ class RngBitGeneratorExpander : public OpExpanderPass {
                                                     HloModule* module);
 
   const RandomAlgorithm default_algorithm_;
-  absl::flat_hash_map<RngGeneratorKey, HloComputation*> computation_cache_;
+  abslx::flat_hash_map<RngGeneratorKey, HloComputation*> computation_cache_;
 };
 
 }  // namespace xla

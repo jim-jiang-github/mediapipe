@@ -44,7 +44,7 @@ namespace mediapipe {
 namespace tasks {
 namespace core {
 
-using ::absl::StatusCode;
+using ::abslx::StatusCode;
 using ::mediapipe::api2::MakePacket;
 using ::mediapipe::api2::Packet;
 using ::mediapipe::api2::PacketAdopting;
@@ -63,7 +63,7 @@ ModelResources::ModelResources(const std::string& tag,
       op_resolver_packet_(op_resolver_packet) {}
 
 /* static */
-absl::StatusOr<std::unique_ptr<ModelResources>> ModelResources::Create(
+abslx::StatusOr<std::unique_ptr<ModelResources>> ModelResources::Create(
     const std::string& tag, std::unique_ptr<proto::ExternalFile> model_file,
     std::unique_ptr<tflite::OpResolver> op_resolver) {
   return Create(tag, std::move(model_file),
@@ -71,7 +71,7 @@ absl::StatusOr<std::unique_ptr<ModelResources>> ModelResources::Create(
 }
 
 /* static */
-absl::StatusOr<std::unique_ptr<ModelResources>> ModelResources::Create(
+abslx::StatusOr<std::unique_ptr<ModelResources>> ModelResources::Create(
     const std::string& tag, std::unique_ptr<proto::ExternalFile> model_file,
     Packet<tflite::OpResolver> op_resolver_packet) {
   if (model_file == nullptr) {
@@ -84,7 +84,7 @@ absl::StatusOr<std::unique_ptr<ModelResources>> ModelResources::Create(
                                    "The op resolver packet must be non-empty.",
                                    MediaPipeTasksStatus::kInvalidArgumentError);
   }
-  auto model_resources = absl::WrapUnique(
+  auto model_resources = abslx::WrapUnique(
       new ModelResources(tag, std::move(model_file), op_resolver_packet));
   MP_RETURN_IF_ERROR(model_resources->BuildModelFromExternalFileProto());
   return model_resources;
@@ -98,7 +98,7 @@ const tflite::Model* ModelResources::GetTfLiteModel() const {
 #endif
 }
 
-absl::Status ModelResources::BuildModelFromExternalFileProto() {
+abslx::Status ModelResources::BuildModelFromExternalFileProto() {
   if (model_file_->has_file_name()) {
     if (HasCustomGlobalResourceProvider()) {
       // If the model contents are provided via a custom ResourceProviderFn, the
@@ -131,12 +131,12 @@ absl::Status ModelResources::BuildModelFromExternalFileProto() {
         "The model is not a valid Flatbuffer";
     // To be replaced with a proper switch-case when TFLite model builder
     // returns a `MediaPipeTasksStatus` code capturing this type of error.
-    if (absl::StrContains(error_reporter_.message(),
+    if (abslx::StrContains(error_reporter_.message(),
                           kInvalidFlatbufferMessage)) {
       return CreateStatusWithPayload(
           StatusCode::kInvalidArgument, error_reporter_.message(),
           MediaPipeTasksStatus::kInvalidFlatBufferError);
-    } else if (absl::StrContains(error_reporter_.message(),
+    } else if (abslx::StrContains(error_reporter_.message(),
                                  "Error loading model from buffer")) {
       return CreateStatusWithPayload(
           StatusCode::kInvalidArgument, kInvalidFlatbufferMessage,
@@ -144,7 +144,7 @@ absl::Status ModelResources::BuildModelFromExternalFileProto() {
     } else {
       return CreateStatusWithPayload(
           StatusCode::kUnknown,
-          absl::StrCat(
+          abslx::StrCat(
               "Could not build model from the provided pre-loaded flatbuffer: ",
               error_reporter_.message()));
     }
@@ -158,7 +158,7 @@ absl::Status ModelResources::BuildModelFromExternalFileProto() {
                        buffer_data, buffer_size));
   metadata_extractor_packet_ = PacketAdopting<metadata::ModelMetadataExtractor>(
       std::move(model_metadata_extractor));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace core

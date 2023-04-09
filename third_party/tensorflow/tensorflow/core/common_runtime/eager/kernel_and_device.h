@@ -62,7 +62,7 @@ const int64_t kInvalidOpId = -1;
 struct EagerFunctionParams {
   int64_t op_id = kInvalidOpId;
   bool is_component_function;
-  absl::optional<int64_t> step_id = absl::nullopt;
+  abslx::optional<int64_t> step_id = abslx::nullopt;
 };
 
 class EagerKernelArgs : public FunctionArgsInterface {
@@ -91,7 +91,7 @@ class EagerKernelArgs : public FunctionArgsInterface {
   gtl::InlinedVector<TensorValue, 4> tensor_args_;
 };
 
-typedef absl::variant<Tensor, TensorShape> EagerKernelRet;
+typedef abslx::variant<Tensor, TensorShape> EagerKernelRet;
 
 // KernelAndDevice encapsulates the logic needed to run a computation eagerly.
 // The computation can be a single instantiated kernel (implemented by
@@ -138,8 +138,8 @@ class KernelAndDevice : public core::RefCounted {
       ScopedStepContainer* step_container, const EagerKernelArgs& inputs,
       std::vector<EagerKernelRet>* outputs,
       CancellationManager* cancellation_manager,
-      const absl::optional<EagerFunctionParams>& eager_func_params,
-      const absl::optional<ManagedStackTrace>& stack_trace,
+      const abslx::optional<EagerFunctionParams>& eager_func_params,
+      const abslx::optional<ManagedStackTrace>& stack_trace,
       CoordinationServiceAgent* coordination_service_agent) = 0;
 
   // Execute kernel asynchronously when applicable. Different from `Run` which
@@ -154,7 +154,7 @@ class KernelAndDevice : public core::RefCounted {
       ScopedStepContainer* step_container, const EagerKernelArgs& inputs,
       std::vector<EagerKernelRet>* outputs,
       CancellationManager* cancellation_manager,
-      const absl::optional<EagerFunctionParams>& eager_func_params,
+      const abslx::optional<EagerFunctionParams>& eager_func_params,
       CoordinationServiceAgent* coordination_service_agent,
       StatusCallback done) = 0;
 
@@ -216,15 +216,15 @@ class KernelAndDeviceOp final : public KernelAndDevice {
   Status Run(ScopedStepContainer* step_container, const EagerKernelArgs& inputs,
              std::vector<EagerKernelRet>* outputs,
              CancellationManager* cancellation_manager,
-             const absl::optional<EagerFunctionParams>& eager_func_params,
-             const absl::optional<ManagedStackTrace>& stack_trace,
+             const abslx::optional<EagerFunctionParams>& eager_func_params,
+             const abslx::optional<ManagedStackTrace>& stack_trace,
              CoordinationServiceAgent* coordination_service_agent) override;
 
   void RunAsync(ScopedStepContainer* step_container,
                 const EagerKernelArgs& inputs,
                 std::vector<EagerKernelRet>* outputs,
                 CancellationManager* cancellation_manager,
-                const absl::optional<EagerFunctionParams>& eager_func_params,
+                const abslx::optional<EagerFunctionParams>& eager_func_params,
                 CoordinationServiceAgent* coordination_service_agent,
                 StatusCallback done) override {
     // Trivial async implementation on top of the sync version
@@ -270,7 +270,7 @@ class KernelAndDeviceFunc : public KernelAndDevice {
   KernelAndDeviceFunc(
       FunctionLibraryRuntime* flr, ProcessFunctionLibraryRuntime* pflr,
       std::vector<Device*> input_devices,
-      absl::flat_hash_map<string, const std::vector<string>*> composite_devices,
+      abslx::flat_hash_map<string, const std::vector<string>*> composite_devices,
       std::unordered_map<int, DtypeAndPartialTensorShape>
           input_resource_dtypes_and_shapes,
       std::function<void(std::function<void()>)>* runner,
@@ -281,7 +281,7 @@ class KernelAndDeviceFunc : public KernelAndDevice {
       const bool allow_control_flow_sync_execution,
       const bool shape_inference_on_tfe_dialect_import,
       const bool int_args_and_retvals_on_device,
-      absl::optional<string> xla_compile_device_type,
+      abslx::optional<string> xla_compile_device_type,
       std::function<Rendezvous*(const int64_t)> rendezvous_creator,
       std::function<int64_t()> get_op_id)
       : KernelAndDevice(flr, runner, std::move(collective_executor),
@@ -318,15 +318,15 @@ class KernelAndDeviceFunc : public KernelAndDevice {
   Status Run(ScopedStepContainer* step_container, const EagerKernelArgs& inputs,
              std::vector<EagerKernelRet>* outputs,
              CancellationManager* cancellation_manager,
-             const absl::optional<EagerFunctionParams>& eager_func_params,
-             const absl::optional<ManagedStackTrace>& stack_trace,
+             const abslx::optional<EagerFunctionParams>& eager_func_params,
+             const abslx::optional<ManagedStackTrace>& stack_trace,
              CoordinationServiceAgent* coordination_service_agent) override;
 
   void RunAsync(ScopedStepContainer* step_container,
                 const EagerKernelArgs& inputs,
                 std::vector<EagerKernelRet>* outputs,
                 CancellationManager* cancellation_manager,
-                const absl::optional<EagerFunctionParams>& eager_func_params,
+                const abslx::optional<EagerFunctionParams>& eager_func_params,
                 CoordinationServiceAgent* coordination_service_agent,
                 StatusCallback done) override;
 
@@ -348,8 +348,8 @@ class KernelAndDeviceFunc : public KernelAndDevice {
   std::shared_ptr<FunctionLibraryRuntime::Options> PrepareForRun(
       ScopedStepContainer* step_container, std::vector<EagerKernelRet>* outputs,
       CancellationManager* cancellation_manager,
-      const absl::optional<EagerFunctionParams>& eager_func_params,
-      const absl::optional<ManagedStackTrace>& stack_trace,
+      const abslx::optional<EagerFunctionParams>& eager_func_params,
+      const abslx::optional<ManagedStackTrace>& stack_trace,
       CoordinationServiceAgent* coordination_service_agent);
 
   ProcessFunctionLibraryRuntime* const pflr_;  // non-null
@@ -375,7 +375,7 @@ class KernelAndDeviceFunc : public KernelAndDevice {
 
   const bool int_args_and_retvals_on_device_;
 
-  const absl::optional<string> xla_compile_device_type_;
+  const abslx::optional<string> xla_compile_device_type_;
 
   // CPU devices are null. Resource handles' devices are actual backing
   // devices.
@@ -384,7 +384,7 @@ class KernelAndDeviceFunc : public KernelAndDevice {
   // devices.
   std::vector<Device*> input_devices_;
   // Maps from a CompositeDevice name to a list of physical device names.
-  absl::flat_hash_map<string, const std::vector<string>*> composite_devices_;
+  abslx::flat_hash_map<string, const std::vector<string>*> composite_devices_;
   std::unordered_map<int, DtypeAndPartialTensorShape>
       input_resource_dtypes_and_shapes_;
 

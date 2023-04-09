@@ -42,7 +42,7 @@ cv::BorderTypes GetBorderModeForOpenCv(
 class OpenCvRunner
     : public AffineTransformation::Runner<ImageFrame, ImageFrame> {
  public:
-  absl::StatusOr<ImageFrame> Run(
+  abslx::StatusOr<ImageFrame> Run(
       const ImageFrame& input, const std::array<float, 16>& matrix,
       const AffineTransformation::Size& size,
       AffineTransformation::BorderMode border_mode) override {
@@ -151,10 +151,10 @@ class OpenCvRunner
 
 }  // namespace
 
-absl::StatusOr<
+abslx::StatusOr<
     std::unique_ptr<AffineTransformation::Runner<ImageFrame, ImageFrame>>>
 CreateAffineTransformationOpenCvRunner() {
-  return absl::make_unique<OpenCvRunner>();
+  return abslx::make_unique<OpenCvRunner>();
 }
 
 }  // namespace mediapipe

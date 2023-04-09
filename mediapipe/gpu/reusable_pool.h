@@ -30,7 +30,7 @@ namespace mediapipe {
 template <class Item>
 class ReusablePool : public std::enable_shared_from_this<ReusablePool<Item>> {
  public:
-  using ItemFactory = absl::AnyInvocable<std::unique_ptr<Item>() const>;
+  using ItemFactory = abslx::AnyInvocable<std::unique_ptr<Item>() const>;
 
   // Creates a pool. This pool will manage buffers of the specified dimensions,
   // and will keep keep_count buffers around for reuse.
@@ -66,7 +66,7 @@ class ReusablePool : public std::enable_shared_from_this<ReusablePool<Item>> {
   const ItemFactory item_factory_;
   const int keep_count_;
 
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
   int in_use_count_ ABSL_GUARDED_BY(mutex_) = 0;
   std::vector<std::unique_ptr<Item>> available_ ABSL_GUARDED_BY(mutex_);
 };
@@ -77,7 +77,7 @@ inline std::shared_ptr<Item> ReusablePool<Item>::GetBuffer() {
   bool reuse = false;
 
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     if (available_.empty()) {
       buffer = item_factory_();
       if (!buffer) return nullptr;
@@ -102,7 +102,7 @@ inline std::shared_ptr<Item> ReusablePool<Item>::GetBuffer() {
   return std::shared_ptr<Item>(buffer.release(), [weak_pool](Item* buf) {
     auto pool = weak_pool.lock();
     if (pool) {
-      pool->Return(absl::WrapUnique(buf));
+      pool->Return(abslx::WrapUnique(buf));
     } else {
       delete buf;
     }
@@ -111,7 +111,7 @@ inline std::shared_ptr<Item> ReusablePool<Item>::GetBuffer() {
 
 template <class Item>
 inline std::pair<int, int> ReusablePool<Item>::GetInUseAndAvailableCounts() {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   return {in_use_count_, available_.size()};
 }
 
@@ -119,7 +119,7 @@ template <class Item>
 void ReusablePool<Item>::Return(std::unique_ptr<Item> buf) {
   std::vector<std::unique_ptr<Item>> trimmed;
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     --in_use_count_;
     available_.emplace_back(std::move(buf));
     TrimAvailable(&trimmed);

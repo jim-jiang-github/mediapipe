@@ -23,7 +23,7 @@
 #include "absl/base/thread_annotations.h"
 #include "absl/synchronization/mutex.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // BlockingCounter
@@ -94,6 +94,6 @@ class BlockingCounter {
 };
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_SYNCHRONIZATION_BLOCKING_COUNTER_H_

@@ -115,7 +115,7 @@ class SharedBatchScheduler
       std::unique_ptr<Batch<internal::BatchInputTaskHandle<TaskType>>>;
   using BatchTaskUniqueptr = std::unique_ptr<Batch<TaskType>>;
   using BatchUniquePtr =
-      absl::variant<BatchTaskUniqueptr, BatchTaskHandleUniquePtr>;
+      abslx::variant<BatchTaskUniqueptr, BatchTaskHandleUniquePtr>;
   // TODO(b/25089730): Tune defaults based on best practices as they develop.
   struct Options {
     // The name to use for the pool of batch threads.
@@ -653,10 +653,10 @@ SharedBatchScheduler<TaskType>::SharedBatchScheduler(const Options& options)
 template <typename TaskType>
 bool SharedBatchScheduler<TaskType>::BatchExists(
     const BatchUniquePtr& batch_to_process) {
-  if (absl::holds_alternative<BatchTaskUniqueptr>(batch_to_process)) {
-    return absl::get<BatchTaskUniqueptr>(batch_to_process) == nullptr;
+  if (abslx::holds_alternative<BatchTaskUniqueptr>(batch_to_process)) {
+    return abslx::get<BatchTaskUniqueptr>(batch_to_process) == nullptr;
   }
-  return absl::get<BatchTaskHandleUniquePtr>(batch_to_process) == nullptr;
+  return abslx::get<BatchTaskHandleUniquePtr>(batch_to_process) == nullptr;
 }
 
 template <typename TaskType>
@@ -725,11 +725,11 @@ void SharedBatchScheduler<TaskType>::ThreadLogic() {
   }
 
   std::unique_ptr<Batch<TaskType>> batch_to_schedule;
-  if (absl::holds_alternative<BatchTaskHandleUniquePtr>(batch_to_process)) {
+  if (abslx::holds_alternative<BatchTaskHandleUniquePtr>(batch_to_process)) {
     // The corresponding `queue_for_batch` must be created with
     // `enable_lazy_split=true`.
     BatchTaskHandleUniquePtr ptr =
-        std::move(absl::get<BatchTaskHandleUniquePtr>(batch_to_process));
+        std::move(abslx::get<BatchTaskHandleUniquePtr>(batch_to_process));
     batch_to_schedule = std::make_unique<Batch<TaskType>>();
     std::vector<std::unique_ptr<internal::BatchInputTaskHandle<TaskType>>>
         task_handles = ptr->RemoveAllTasks();
@@ -746,7 +746,7 @@ void SharedBatchScheduler<TaskType>::ThreadLogic() {
     // The corresponding `queue_for_batch` must be created with
     // `enable_lazy_split=false`.
     batch_to_schedule =
-        std::move(absl::get<BatchTaskUniqueptr>(batch_to_process));
+        std::move(abslx::get<BatchTaskUniqueptr>(batch_to_process));
   }
 
   queue_for_batch->ProcessBatch(std::move(batch_to_schedule));
@@ -767,7 +767,7 @@ Queue<TaskType>::Queue(
   // Set the higher 32 bits of traceme_context_id_counter_ to be the creation
   // time of the queue. This prevents the batches in different queues to have
   // the same traceme_context_id_counter_.
-  traceme_context_id_counter_ = absl::GetCurrentTimeNanos() << 32;
+  traceme_context_id_counter_ = abslx::GetCurrentTimeNanos() << 32;
   // Create an initial, open batch.
   if (options_.enable_lazy_split) {
     task_handle_batches_.emplace_back(

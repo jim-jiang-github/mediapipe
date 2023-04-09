@@ -56,7 +56,7 @@
 // end result normally has the 53rd bit set.  It represents subnormals by using
 // narrower mantissas.
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace {
 
@@ -124,7 +124,7 @@ struct FloatTraits<double> {
       assert(exponent == kMinNormalExponent);
     }
     dbl += mantissa;
-    return absl::bit_cast<double>(dbl);
+    return abslx::bit_cast<double>(dbl);
 #endif  // ABSL_BIT_PACK_FLOATS
   }
 };
@@ -164,7 +164,7 @@ struct FloatTraits<float> {
       assert(exponent == kMinNormalExponent);
     }
     flt += mantissa;
-    return absl::bit_cast<float>(flt);
+    return abslx::bit_cast<float>(flt);
 #endif  // ABSL_BIT_PACK_FLOATS
   }
 };
@@ -326,7 +326,7 @@ bool HandleEdgeCase(const strings_internal::ParsedFloat& input, bool negative,
 // number is stored in *value.
 template <typename FloatType>
 void EncodeResult(const CalculatedFloat& calculated, bool negative,
-                  absl::from_chars_result* result, FloatType* value) {
+                  abslx::from_chars_result* result, FloatType* value) {
   if (calculated.exponent == kOverflow) {
     result->ec = std::errc::result_out_of_range;
     *value = negative ? -std::numeric_limits<FloatType>::max()
@@ -432,7 +432,7 @@ bool MustRoundUp(uint64_t guess_mantissa, int guess_exponent,
   // better limit dynamically based on the value of parsed_decimal.exponent.
   // This would optimize pathological input cases only.  (Sane inputs won't have
   // hundreds of digits of mantissa.)
-  absl::strings_internal::BigUnsigned<84> exact_mantissa;
+  abslx::strings_internal::BigUnsigned<84> exact_mantissa;
   int exact_exponent = exact_mantissa.ReadFloatMantissa(parsed_decimal, 768);
 
   // Adjust the `guess` arguments to be halfway between A and B.
@@ -446,11 +446,11 @@ bool MustRoundUp(uint64_t guess_mantissa, int guess_exponent,
   //
   // Because we are doing integer math, we can't directly deal with negative
   // exponents.  We instead move these to the other side of the inequality.
-  absl::strings_internal::BigUnsigned<84>& lhs = exact_mantissa;
+  abslx::strings_internal::BigUnsigned<84>& lhs = exact_mantissa;
   int comparison;
   if (exact_exponent >= 0) {
     lhs.MultiplyByFiveToTheNth(exact_exponent);
-    absl::strings_internal::BigUnsigned<84> rhs(guess_mantissa);
+    abslx::strings_internal::BigUnsigned<84> rhs(guess_mantissa);
     // There are powers of 2 on both sides of the inequality; reduce this to
     // a single bit-shift.
     if (exact_exponent > guess_exponent) {
@@ -463,8 +463,8 @@ bool MustRoundUp(uint64_t guess_mantissa, int guess_exponent,
     // Move the power of 5 to the other side of the equation, giving us:
     // lhs = exact_mantissa * 2**exact_exponent
     // rhs = guess_mantissa * 5**(-exact_exponent) * 2**guess_exponent
-    absl::strings_internal::BigUnsigned<84> rhs =
-        absl::strings_internal::BigUnsigned<84>::FiveToTheNth(-exact_exponent);
+    abslx::strings_internal::BigUnsigned<84> rhs =
+        abslx::strings_internal::BigUnsigned<84>::FiveToTheNth(-exact_exponent);
     rhs.MultiplyBy(guess_mantissa);
     if (exact_exponent > guess_exponent) {
       lhs.ShiftLeft(exact_exponent - guess_exponent);
@@ -981,4 +981,4 @@ const int16_t kPower10ExponentTable[] = {
 
 }  // namespace
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

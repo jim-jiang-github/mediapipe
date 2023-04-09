@@ -23,32 +23,32 @@ limitations under the License.
 namespace tensorflow {
 namespace profiler {
 
-const absl::string_view kErrorIncompleteStep =
+const abslx::string_view kErrorIncompleteStep =
     "Incomplete step observed and hence the step time is unknown."
     "Instead, we use the trace duration as the step time. This may happen"
     " if your profiling duration is shorter than the step time. In this"
     " case, you may try to profile longer.";
 
-const absl::string_view kErrorEmptyIntersect =
+const abslx::string_view kErrorEmptyIntersect =
     "Although there are steps observed on some host(s), the intersection of "
     "the steps over all hosts is empty (because the differences among "
     "individual host's step sequences are too big). Consequently, the overall "
     "step time is "
     "unknown.";
 
-const absl::string_view kErrorNoStepMarker =
+const abslx::string_view kErrorNoStepMarker =
     "No step marker observed and hence the step time is unknown."
     " This may happen if (1) training steps are not instrumented (e.g., if"
     " you are not using Keras) or (2) the profiling duration is shorter"
     " than the step time. For (1), you need to add step instrumentation;"
     " for (2), you may try to profile longer.";
 
-const absl::string_view kNoDeviceTraceCollected =
+const abslx::string_view kNoDeviceTraceCollected =
     "No device trace was collected. This might happen if your job hadn't been "
     "run on the device when sampling was turned on. You could try the sampling"
     " again later.";
 
-const absl::string_view kStepsDropped =
+const abslx::string_view kStepsDropped =
     " steps dropped. This might happen when you profile many hosts and/or many "
     "steps. You could try to profile shorter or reduce the number of hosts "
     "you profile.";
@@ -63,13 +63,13 @@ void PopulateStepDiagnostics(const OpStats& op_stats, Diagnostics* diag) {
   }
   if (op_stats.step_db().num_steps_dropped()) {
     *diag->add_warnings() =
-        absl::StrCat(op_stats.step_db().num_steps_dropped(), kStepsDropped);
+        abslx::StrCat(op_stats.step_db().num_steps_dropped(), kStepsDropped);
   }
 }
 
 void PopulateOverviewDiagnostics(const OpStats& op_stats, Diagnostics* diag) {
   *diag->mutable_errors() = op_stats.diagnostics().errors();
-  absl::c_sort(*diag->mutable_errors());
+  abslx::c_sort(*diag->mutable_errors());
   if (diag->errors().empty()) {
     // Shows run-environment error only if there is no other existing error.
     if (op_stats.run_environment().device_type() != "CPU" &&

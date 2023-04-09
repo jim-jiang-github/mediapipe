@@ -122,17 +122,17 @@ using ::tflite::gpu::gl::GlShader;
 //
 class TfLiteTensorsToSegmentationCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
-  absl::Status LoadOptions(CalculatorContext* cc);
-  absl::Status InitGpu(CalculatorContext* cc);
-  absl::Status ProcessGpu(CalculatorContext* cc);
-  absl::Status ProcessCpu(CalculatorContext* cc);
+  abslx::Status LoadOptions(CalculatorContext* cc);
+  abslx::Status InitGpu(CalculatorContext* cc);
+  abslx::Status ProcessGpu(CalculatorContext* cc);
+  abslx::Status ProcessCpu(CalculatorContext* cc);
   void GlRender();
 
   ::mediapipe::TfLiteTensorsToSegmentationCalculatorOptions options_;
@@ -153,7 +153,7 @@ class TfLiteTensorsToSegmentationCalculator : public CalculatorBase {
 REGISTER_CALCULATOR(TfLiteTensorsToSegmentationCalculator);
 
 // static
-absl::Status TfLiteTensorsToSegmentationCalculator::GetContract(
+abslx::Status TfLiteTensorsToSegmentationCalculator::GetContract(
     CalculatorContract* cc) {
   RET_CHECK(!cc->Inputs().GetTags().empty());
   RET_CHECK(!cc->Outputs().GetTags().empty());
@@ -203,10 +203,10 @@ absl::Status TfLiteTensorsToSegmentationCalculator::GetContract(
     MP_RETURN_IF_ERROR(mediapipe::GlCalculatorHelper::UpdateContract(cc));
 #endif  // !MEDIAPIPE_DISABLE_GPU
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteTensorsToSegmentationCalculator::Open(
+abslx::Status TfLiteTensorsToSegmentationCalculator::Open(
     CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
@@ -221,35 +221,35 @@ absl::Status TfLiteTensorsToSegmentationCalculator::Open(
 
   if (use_gpu_) {
 #if !defined(MEDIAPIPE_DISABLE_GL_COMPUTE)
-    MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext([this, cc]() -> absl::Status {
+    MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext([this, cc]() -> abslx::Status {
       MP_RETURN_IF_ERROR(InitGpu(cc));
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }));
 #else
     RET_CHECK_FAIL() << "GPU processing not enabled.";
 #endif  // !MEDIAPIPE_DISABLE_GPU
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteTensorsToSegmentationCalculator::Process(
+abslx::Status TfLiteTensorsToSegmentationCalculator::Process(
     CalculatorContext* cc) {
   if (use_gpu_) {
 #if !defined(MEDIAPIPE_DISABLE_GL_COMPUTE)
-    MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext([this, cc]() -> absl::Status {
+    MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext([this, cc]() -> abslx::Status {
       MP_RETURN_IF_ERROR(ProcessGpu(cc));
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }));
 #endif  // !MEDIAPIPE_DISABLE_GPU
   } else {
     MP_RETURN_IF_ERROR(ProcessCpu(cc));
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteTensorsToSegmentationCalculator::Close(
+abslx::Status TfLiteTensorsToSegmentationCalculator::Close(
     CalculatorContext* cc) {
 #if !defined(MEDIAPIPE_DISABLE_GL_COMPUTE)
   gpu_helper_.RunInGlContext([this] {
@@ -261,13 +261,13 @@ absl::Status TfLiteTensorsToSegmentationCalculator::Close(
   });
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteTensorsToSegmentationCalculator::ProcessCpu(
+abslx::Status TfLiteTensorsToSegmentationCalculator::ProcessCpu(
     CalculatorContext* cc) {
   if (cc->Inputs().Tag(kTensorsTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Get input streams.
@@ -359,23 +359,23 @@ absl::Status TfLiteTensorsToSegmentationCalculator::ProcessCpu(
              cv::Size(output_width, output_height));
 
   // Send out image as CPU packet.
-  std::unique_ptr<ImageFrame> output_mask = absl::make_unique<ImageFrame>(
+  std::unique_ptr<ImageFrame> output_mask = abslx::make_unique<ImageFrame>(
       ImageFormat::SRGBA, output_width, output_height);
   cv::Mat output_mat = formats::MatView(output_mask.get());
   large_mask_mat.copyTo(output_mat);
   cc->Outputs().Tag(kMaskTag).Add(output_mask.release(), cc->InputTimestamp());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Steps:
 // 1. receive tensor and optional previous mask
 // 2. process segmentation tensor into small mask
 // 3. upsample small mask into output mask to be same size as input image
-absl::Status TfLiteTensorsToSegmentationCalculator::ProcessGpu(
+abslx::Status TfLiteTensorsToSegmentationCalculator::ProcessGpu(
     CalculatorContext* cc) {
   if (cc->Inputs().Tag(kTensorsGpuTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 #if !defined(MEDIAPIPE_DISABLE_GL_COMPUTE)
   // Get input streams.
@@ -459,7 +459,7 @@ absl::Status TfLiteTensorsToSegmentationCalculator::ProcessGpu(
   output_texture.Release();
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void TfLiteTensorsToSegmentationCalculator::GlRender() {
@@ -514,7 +514,7 @@ void TfLiteTensorsToSegmentationCalculator::GlRender() {
 #endif  // !MEDIAPIPE_DISABLE_GPU
 }
 
-absl::Status TfLiteTensorsToSegmentationCalculator::LoadOptions(
+abslx::Status TfLiteTensorsToSegmentationCalculator::LoadOptions(
     CalculatorContext* cc) {
   // Get calculator options specified in the graph.
   options_ =
@@ -530,13 +530,13 @@ absl::Status TfLiteTensorsToSegmentationCalculator::LoadOptions(
   RET_CHECK_EQ(tensor_channels_, 2)
       << "Only 2 channel segmentation tensor currently supported";
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteTensorsToSegmentationCalculator::InitGpu(
+abslx::Status TfLiteTensorsToSegmentationCalculator::InitGpu(
     CalculatorContext* cc) {
 #if !defined(MEDIAPIPE_DISABLE_GL_COMPUTE)
-  MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext([this]() -> absl::Status {
+  MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext([this]() -> abslx::Status {
     // A shader to process a segmentation tensor into an output mask,
     // and use an optional previous mask as input.
     // Currently uses 4 channels for output,
@@ -608,11 +608,11 @@ void main() {
   imageStore(output_texture, output_coordinate, out_value);
 })";
 
-    const std::string shader_src_no_previous = absl::Substitute(
+    const std::string shader_src_no_previous = abslx::Substitute(
         shader_src_template, kWorkgroupSize, options_.output_layer_index(),
         options_.combine_with_previous_ratio(), "",
         options_.flip_vertically() ? "out_height - gid.y - 1" : "gid.y");
-    const std::string shader_src_with_previous = absl::Substitute(
+    const std::string shader_src_with_previous = abslx::Substitute(
         shader_src_template, kWorkgroupSize, options_.output_layer_index(),
         options_.combine_with_previous_ratio(), "#define READ_PREVIOUS",
         options_.flip_vertically() ? "out_height - gid.y - 1" : "gid.y");
@@ -621,19 +621,19 @@ void main() {
     GlShader shader_without_previous;
     MP_RETURN_IF_ERROR(GlShader::CompileShader(
         GL_COMPUTE_SHADER, shader_src_no_previous, &shader_without_previous));
-    mask_program_no_prev_ = absl::make_unique<GlProgram>();
+    mask_program_no_prev_ = abslx::make_unique<GlProgram>();
     MP_RETURN_IF_ERROR(GlProgram::CreateWithShader(
         shader_without_previous, mask_program_no_prev_.get()));
     GlShader shader_with_previous;
     MP_RETURN_IF_ERROR(GlShader::CompileShader(
         GL_COMPUTE_SHADER, shader_src_with_previous, &shader_with_previous));
-    mask_program_with_prev_ = absl::make_unique<GlProgram>();
+    mask_program_with_prev_ = abslx::make_unique<GlProgram>();
     MP_RETURN_IF_ERROR(GlProgram::CreateWithShader(
         shader_with_previous, mask_program_with_prev_.get()));
 
     // Buffer storage for input tensor.
     size_t tensor_length = tensor_width_ * tensor_height_ * tensor_channels_;
-    tensor_buffer_ = absl::make_unique<GlBuffer>();
+    tensor_buffer_ = abslx::make_unique<GlBuffer>();
     MP_RETURN_IF_ERROR(CreateReadWriteShaderStorageBuffer<float>(
         tensor_length, tensor_buffer_.get()));
 
@@ -696,11 +696,11 @@ void main() {
     glUseProgram(upsample_program_);
     glUniform1i(glGetUniformLocation(upsample_program_, "input_data"), 1);
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

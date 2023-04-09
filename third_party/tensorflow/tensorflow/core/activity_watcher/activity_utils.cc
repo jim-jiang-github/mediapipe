@@ -28,10 +28,10 @@ std::unique_ptr<Activity> ActivityFromContext(
   if (context) {
     attributes.merge(Activity::Attributes({
         {"node_name", context->op_kernel().def().name()},
-        {"step_id", absl::StrCat(context->step_id())},
+        {"step_id", abslx::StrCat(context->step_id())},
         {"device", context->device()->name()},
         {"op", context->op_kernel().def().op()},
-        {"iter_num", absl::StrCat(context->frame_iter().iter_id)},
+        {"iter_num", abslx::StrCat(context->frame_iter().iter_id)},
     }));
   }
 

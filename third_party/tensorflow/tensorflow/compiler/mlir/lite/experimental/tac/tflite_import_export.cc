@@ -72,7 +72,7 @@ void AttachCostPerDevice(mlir::ModuleOp module,
 }  // namespace
 
 //////////// Importer ////////////
-absl::StatusOr<OwningOpRef<mlir::ModuleOp>> TfLiteImporter::Import() {
+abslx::StatusOr<OwningOpRef<mlir::ModuleOp>> TfLiteImporter::Import() {
   source_mgr_handler_ = std::make_unique<mlir::SourceMgrDiagnosticHandler>(
       source_mgr_, &context_);
   return ImportFlatbufferOrMlir(options_.file_name, options_.input_mlir,
@@ -80,8 +80,8 @@ absl::StatusOr<OwningOpRef<mlir::ModuleOp>> TfLiteImporter::Import() {
 }
 
 //////////// Exporter ////////////
-absl::Status TfLiteExporter::Export(mlir::ModuleOp module) {
-  // return absl::OkStatus();
+abslx::Status TfLiteExporter::Export(mlir::ModuleOp module) {
+  // return abslx::OkStatus();
   if (options_.export_runtime_metadata) {
     // Run the cost model for each device/op.
     AttachCostPerDevice(module, options_.target_hardware_backends);
@@ -95,12 +95,12 @@ absl::Status TfLiteExporter::Export(mlir::ModuleOp module) {
     std::string error_msg;
     auto output = mlir::openOutputFile(metadata_filename, &error_msg);
     if (output == nullptr) {
-      return absl::InvalidArgumentError(
-          absl::StrCat("cannot open output file: ", error_msg));
+      return abslx::InvalidArgumentError(
+          abslx::StrCat("cannot open output file: ", error_msg));
     }
     auto result = tflite::ExportRuntimeMetadata(module);
     if (!result) {
-      return absl::InvalidArgumentError("Cannot export runtime metadata.");
+      return abslx::InvalidArgumentError("Cannot export runtime metadata.");
     }
     output->os() << result;
     output->keep();

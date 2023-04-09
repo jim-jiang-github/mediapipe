@@ -21,7 +21,7 @@
 #include "absl/base/config.h"
 #include "absl/base/internal/raw_logging.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 bad_optional_access::~bad_optional_access() = default;
@@ -43,6 +43,6 @@ void throw_bad_optional_access() {
 
 }  // namespace optional_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_USES_STD_OPTIONAL

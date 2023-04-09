@@ -82,7 +82,7 @@ xla::RngOutput BitGenerator(xla::RandomAlgorithm const& alg, xla::XlaOp key,
 }
 
 std::tuple<xla::XlaOp, xla::XlaOp> GetKeyCounter(
-    absl::string_view device_type_string, xla::XlaOp key) {
+    abslx::string_view device_type_string, xla::XlaOp key) {
   // The Philox algorithm may cause performance regression on other devices.
   // Turn on the Philox algorithm for the CPU and GPU backends only.
   if (device_type_string == DEVICE_GPU_XLA_JIT ||
@@ -97,7 +97,7 @@ std::tuple<xla::XlaOp, xla::XlaOp> GetKeyCounter(
   }
 }
 
-Algorithm DefaultRngAlgForDeviceType(absl::string_view device_type_string) {
+Algorithm DefaultRngAlgForDeviceType(abslx::string_view device_type_string) {
   // The Philox algorithm may cause performance regression on other devices.
   // Turn on the Philox algorithm for the CPU and GPU backends only.
   if (device_type_string == DEVICE_GPU_XLA_JIT ||
@@ -170,7 +170,7 @@ xla::RngOutput StatelessRngUniformFullInt(xla::RandomAlgorithm const& alg,
 }
 
 Status AlgorithmFromInput(XlaOpKernelContext* ctx, int alg_input_idx,
-                          absl::string_view device_type_string,
+                          abslx::string_view device_type_string,
                           xla::RandomAlgorithm* xla_alg) {
   auto alg_shape = ctx->InputShape(alg_input_idx);
   if (alg_shape.dims() != 0) {

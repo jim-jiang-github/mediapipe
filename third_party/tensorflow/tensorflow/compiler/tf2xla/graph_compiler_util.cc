@@ -65,7 +65,7 @@ Status AddArgNodes(Graph* graph, const NodeMap& node_map,
     auto node_it = node_map.find(remap_it->second);
     if (node_it == node_map.end()) {
       // Strip off the aot_feed_#/ prefix.
-      absl::string_view name(remap_it->second);
+      abslx::string_view name(remap_it->second);
       const auto index = name.find('/');
       if (index > 0) name.remove_prefix(index + 1);
       return errors::InvalidArgument(
@@ -80,7 +80,7 @@ Status AddArgNodes(Graph* graph, const NodeMap& node_map,
     Node* arg_node = nullptr;
     TF_RETURN_IF_ERROR(
         NodeBuilder(
-            absl::StrCat("_arg_", arg_index),
+            abslx::StrCat("_arg_", arg_index),
             FunctionLibraryDefinition::FunctionLibraryDefinition::kArgOp)
             .Attr("T", BaseType(feed_node->output_type(output_index)))
             .Attr("index", arg_index)
@@ -129,7 +129,7 @@ Status AddRetvalNodes(Graph* graph, const NodeMap& node_map,
     // Connects fetch_node -> retval_node.
     Node* retval_node = nullptr;
     TF_RETURN_IF_ERROR(
-        NodeBuilder(absl::StrCat("_retval_", ret_index),
+        NodeBuilder(abslx::StrCat("_retval_", ret_index),
                     FunctionLibraryDefinition::kRetOp)
             .Input(fetch_node, id.output_index())
             .Attr("T", BaseType(fetch_node->output_type(id.output_index())))
@@ -189,8 +189,8 @@ Status RewriteAndPruneGraph(
   if (!missing_feeds.empty() || !missing_fetches.empty()) {
     return errors::Aborted(
         "Post graph-pruning",
-        ", missing feeds: ", absl::StrJoin(missing_feeds, ", "),
-        ", missing fetches: ", absl::StrJoin(missing_fetches, ", "));
+        ", missing feeds: ", abslx::StrJoin(missing_feeds, ", "),
+        ", missing fetches: ", abslx::StrJoin(missing_fetches, ", "));
   }
   return OkStatus();
 }

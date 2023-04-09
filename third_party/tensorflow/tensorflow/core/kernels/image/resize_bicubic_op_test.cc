@@ -223,7 +223,7 @@ TEST_F(ResizeBicubicOpTest, TestBicubic2x2To0x0) {
 
   Status s = RunOpKernel();
   EXPECT_EQ(s.code(), error::INVALID_ARGUMENT);
-  EXPECT_TRUE(absl::StrContains(s.error_message(),
+  EXPECT_TRUE(abslx::StrContains(s.error_message(),
                                 "output dimensions must be positive"))
       << s;
 }

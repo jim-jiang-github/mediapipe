@@ -382,11 +382,11 @@ class TensorHandle : public ImmediateExecutionTensorHandle {
   // Does not need synchronization because it can be accessed only after
   // WaitReady() has returned. At that point, data_ is immutable.
 #if !defined(IS_MOBILE_PLATFORM)
-  absl::variant<LocalTensorHandleData, PackedTensorHandleData,
+  abslx::variant<LocalTensorHandleData, PackedTensorHandleData,
                 RemoteTensorHandleData>
       data_;
 #else
-  absl::variant<LocalTensorHandleData, PackedTensorHandleData> data_;
+  abslx::variant<LocalTensorHandleData, PackedTensorHandleData> data_;
 #endif
 
   PartialTensorShape inference_shape_;

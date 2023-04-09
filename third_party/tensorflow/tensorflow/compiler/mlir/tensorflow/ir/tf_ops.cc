@@ -149,7 +149,7 @@ struct TFInlinerInterface : public DialectInlinerInterface {
     if (isa<TPUPartitionedCallOp>(call)) return false;
     // Maintain inlining for  `tf.function`s with jit_compile option.
     if (callable->hasAttr("tf._XlaMustCompile")) return true;
-    auto noinline_attr_name = absl::StrCat("tf.", tensorflow::kNoInlineAttr);
+    auto noinline_attr_name = abslx::StrCat("tf.", tensorflow::kNoInlineAttr);
     if (auto noinline_attr =
             callable->getAttrOfType<BoolAttr>(noinline_attr_name))
       return !noinline_attr.getValue();

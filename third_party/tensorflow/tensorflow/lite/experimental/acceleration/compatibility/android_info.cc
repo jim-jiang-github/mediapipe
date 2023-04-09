@@ -38,9 +38,9 @@ std::string GetPropertyValue(const std::string& property) {
 namespace tflite {
 namespace acceleration {
 
-absl::Status RequestAndroidInfo(AndroidInfo* info_out) {
+abslx::Status RequestAndroidInfo(AndroidInfo* info_out) {
   if (!info_out) {
-    return absl::InvalidArgumentError("info_out may not be null");
+    return abslx::InvalidArgumentError("info_out may not be null");
   }
   info_out->android_sdk_version = GetPropertyValue("ro.build.version.sdk");
   info_out->device = GetPropertyValue("ro.product.device");
@@ -83,7 +83,7 @@ absl::Status RequestAndroidInfo(AndroidInfo* info_out) {
   info_out->is_emulator = false;
 #endif
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace acceleration

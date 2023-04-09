@@ -69,7 +69,7 @@ Status ToConfigMap(
   for (const auto& option_string : options) {
     // The option string has the format
     // <optimizer_name>:<config_key>:<config_value>
-    std::vector<string> split = absl::StrSplit(option_string, ':');
+    std::vector<string> split = abslx::StrSplit(option_string, ':');
     if (split.size() != 3) {
       return errors::Internal(
           "Wrong format for optimizer options. Expect <optimizer name>:<config "

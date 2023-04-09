@@ -186,7 +186,7 @@ class Service : public ServiceInterface {
   // aot_options is optional; if not given a default is used.
   StatusOr<std::unique_ptr<HloModuleConfig>> CreateModuleConfig(
       const ProgramShape& program_shape,
-      absl::Span<const Shape* const> argument_shapes,
+      abslx::Span<const Shape* const> argument_shapes,
       const ExecutionOptions* execution_options,
       const AotCompilationOptions* aot_options = nullptr);
 
@@ -195,7 +195,7 @@ class Service : public ServiceInterface {
   // class.
   StatusOr<std::unique_ptr<HloModuleConfig>> CreateModuleConfig(
       const ProgramShape& program_shape,
-      absl::Span<const ShapedBuffer* const> arguments,
+      abslx::Span<const ShapedBuffer* const> arguments,
       const ExecutionOptions& execution_options,
       const AotCompilationOptions* aot_options = nullptr);
 
@@ -207,7 +207,7 @@ class Service : public ServiceInterface {
   // Prepare the arguments for executing parallel.
   StatusOr<std::vector<std::vector<const ShapedBuffer*>>> GetArguments(
       const ExecutionOptions& execution_options,
-      absl::Span<const GlobalDataHandle* const> arguments) const;
+      abslx::Span<const GlobalDataHandle* const> arguments) const;
 
  protected:
   friend class LocalExecutable;
@@ -223,8 +223,8 @@ class Service : public ServiceInterface {
   // the corresponding replica.
   StatusOr<std::vector<std::vector<const ShapedBuffer*>>>
   ResolveAndValidateArguments(
-      absl::Span<const GlobalDataHandle* const> arguments,
-      absl::Span<se::StreamExecutor* const> stream_executors) const;
+      abslx::Span<const GlobalDataHandle* const> arguments,
+      abslx::Span<se::StreamExecutor* const> stream_executors) const;
 
   // Builds an Executable for the given parameters.
   //
@@ -260,7 +260,7 @@ class Service : public ServiceInterface {
   // ExecutionProfile object which will be filled in with profile data.
   StatusOr<GlobalDataHandle> ExecuteAndRegisterResult(
       Executable* executable,
-      absl::Span<const std::vector<const ShapedBuffer*>> arguments,
+      abslx::Span<const std::vector<const ShapedBuffer*>> arguments,
       Backend* backend, const DeviceHandle& device_handle,
       const std::string& result_tag, ExecutionProfile* profile);
 
@@ -268,10 +268,10 @@ class Service : public ServiceInterface {
   // from each executable in the allocation tracker. The handles of the result
   // from the tracker are returned.
   StatusOr<std::vector<GlobalDataHandle>> ExecuteParallelAndRegisterResult(
-      absl::Span<Executable* const> executables,
-      absl::Span<const std::vector<std::vector<const ShapedBuffer*>>> arguments,
-      Backend* backend, absl::Span<const DeviceHandle> device_handles,
-      absl::Span<const std::string> result_tags, ExecutionProfile* profile);
+      abslx::Span<Executable* const> executables,
+      abslx::Span<const std::vector<std::vector<const ShapedBuffer*>>> arguments,
+      Backend* backend, abslx::Span<const DeviceHandle> device_handles,
+      abslx::Span<const std::string> result_tags, ExecutionProfile* profile);
 
   // Convenience function which checks whether the given client_shape
   // (presumably passed by the client to set the result layout) is valid for the

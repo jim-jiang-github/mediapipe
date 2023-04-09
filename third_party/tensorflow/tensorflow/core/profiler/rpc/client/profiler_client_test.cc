@@ -35,21 +35,21 @@ using ::tensorflow::profiler::test::DurationNear;
 using ::tensorflow::profiler::test::StartServer;
 
 TEST(RemoteProfilerSession, Simple) {
-  absl::Duration duration = absl::Milliseconds(10);
+  abslx::Duration duration = abslx::Milliseconds(10);
   ProfileRequest request;
   std::string service_addr;
   auto server = StartServer(duration, &service_addr, &request);
-  absl::Duration grace = absl::Seconds(1);
-  absl::Duration max_duration = duration + grace;
-  absl::Time approx_start = absl::Now();
-  absl::Time deadline = approx_start + max_duration;
+  abslx::Duration grace = abslx::Seconds(1);
+  abslx::Duration max_duration = duration + grace;
+  abslx::Time approx_start = abslx::Now();
+  abslx::Time deadline = approx_start + max_duration;
 
   auto remote_session =
       RemoteProfilerSession::Create(service_addr, deadline, request);
 
   Status status;
   auto response = remote_session->WaitForCompletion(status);
-  absl::Duration elapsed = absl::Now() - approx_start;
+  abslx::Duration elapsed = abslx::Now() - approx_start;
   // At end of session this evaluates to true still.
   EXPECT_TRUE(status.ok());
   // True because there was no workload traced and subsequently no XEvents.
@@ -60,30 +60,30 @@ TEST(RemoteProfilerSession, Simple) {
 }
 
 TEST(RemoteProfilerSession, WaitNotCalled) {
-  absl::Duration duration = absl::Milliseconds(10);
+  abslx::Duration duration = abslx::Milliseconds(10);
   ProfileRequest request;
   std::string service_addr;
   auto server = StartServer(duration, &service_addr, &request);
-  absl::Duration grace = absl::Seconds(1);
-  absl::Duration max_duration = duration + grace;
-  absl::Time approx_start = absl::Now();
-  absl::Time deadline = approx_start + max_duration;
+  abslx::Duration grace = abslx::Seconds(1);
+  abslx::Duration max_duration = duration + grace;
+  abslx::Time approx_start = abslx::Now();
+  abslx::Time deadline = approx_start + max_duration;
 
   auto remote_session =
       RemoteProfilerSession::Create(service_addr, deadline, request);
-  absl::Duration elapsed = absl::Now() - approx_start;
+  abslx::Duration elapsed = abslx::Now() - approx_start;
 
   EXPECT_THAT(elapsed, DurationApproxLess(max_duration));
 }
 
 TEST(RemoteProfilerSession, Timeout) {
-  absl::Duration duration = absl::Milliseconds(10);
+  abslx::Duration duration = abslx::Milliseconds(10);
   ProfileRequest request;
   std::string service_addr;
   auto server = StartServer(duration, &service_addr, &request);
   // Expect this to fail immediately since deadline was set to the past,
   auto remote_session =
-      RemoteProfilerSession::Create(service_addr, absl::Now(), request);
+      RemoteProfilerSession::Create(service_addr, abslx::Now(), request);
   Status status;
   auto response = remote_session->WaitForCompletion(status);
   // At end of session we will have a timeout error.
@@ -95,21 +95,21 @@ TEST(RemoteProfilerSession, Timeout) {
 }
 
 TEST(RemoteProfilerSession, LongDeadline) {
-  absl::Duration duration = absl::Milliseconds(10);
+  abslx::Duration duration = abslx::Milliseconds(10);
   ProfileRequest request;
   std::string service_addr;
   auto server = StartServer(duration, &service_addr, &request);
 
-  absl::Time approx_start = absl::Now();
-  absl::Duration grace = absl::Seconds(1000);
-  absl::Duration max_duration = duration + grace;
-  const absl::Time deadline = approx_start + max_duration;
+  abslx::Time approx_start = abslx::Now();
+  abslx::Duration grace = abslx::Seconds(1000);
+  abslx::Duration max_duration = duration + grace;
+  const abslx::Time deadline = approx_start + max_duration;
 
   auto remote_session =
       RemoteProfilerSession::Create(service_addr, deadline, request);
   Status status;
   auto response = remote_session->WaitForCompletion(status);
-  absl::Duration elapsed = absl::Now() - approx_start;
+  abslx::Duration elapsed = abslx::Now() - approx_start;
   // At end of session this evaluates to true still.
   EXPECT_TRUE(status.ok());
   // True because there was no workload traced and subsequently no XEvents.
@@ -121,22 +121,22 @@ TEST(RemoteProfilerSession, LongDeadline) {
 }
 
 TEST(RemoteProfilerSession, LongDuration) {
-  absl::Duration duration = absl::Seconds(3);
+  abslx::Duration duration = abslx::Seconds(3);
   ProfileRequest request;
   std::string service_addr;
   auto server = StartServer(duration, &service_addr, &request);
 
-  absl::Time approx_start = absl::Now();
+  abslx::Time approx_start = abslx::Now();
   // Empirically determined value.
-  absl::Duration grace = absl::Seconds(1);
-  absl::Duration max_duration = duration + grace;
-  const absl::Time deadline = approx_start + max_duration;
+  abslx::Duration grace = abslx::Seconds(1);
+  abslx::Duration max_duration = duration + grace;
+  const abslx::Time deadline = approx_start + max_duration;
 
   auto remote_session =
       RemoteProfilerSession::Create(service_addr, deadline, request);
   Status status;
   auto response = remote_session->WaitForCompletion(status);
-  absl::Duration elapsed = absl::Now() - approx_start;
+  abslx::Duration elapsed = abslx::Now() - approx_start;
   // At end of session this evaluates to true still.
   EXPECT_TRUE(status.ok());
   // True because there was no workload traced and subsequently no XEvents.

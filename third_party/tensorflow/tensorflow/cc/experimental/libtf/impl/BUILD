@@ -120,7 +120,7 @@ tf_cc_test(
     size = "small",
     srcs = ["tensor_spec_test.cc"],
     deps = [
-        ":iostream",  # Necessary for absl::VerifyTypeImplementsAbslHashCorrectly.
+        ":iostream",  # Necessary for abslx::VerifyTypeImplementsAbslHashCorrectly.
         ":tensor_spec",
         "//tensorflow/core:test",
         "//tensorflow/core:test_main",

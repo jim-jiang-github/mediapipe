@@ -59,11 +59,11 @@ tensorflow::Var* GetVariableFromSession(mlir::TF::VarHandleOp var_handle_op,
   return var_ptr;
 }
 
-absl::StatusOr<std::vector<tensorflow::Tensor>> GetResourcesFromSession(
+abslx::StatusOr<std::vector<tensorflow::Tensor>> GetResourcesFromSession(
     llvm::ArrayRef<TF::VarHandleOp> var_handle_ops,
     tensorflow::Session* session) {
   if (!session)
-    return absl::Status(absl::StatusCode::kInvalidArgument,
+    return abslx::Status(abslx::StatusCode::kInvalidArgument,
                         "Null Session provided.");
   std::vector<tensorflow::Tensor> resource_tensors;
   auto variable_names = GetVariableNames(var_handle_ops);
@@ -71,7 +71,7 @@ absl::StatusOr<std::vector<tensorflow::Tensor>> GetResourcesFromSession(
 
   auto status = session->Run({}, variable_names, {}, &resource_tensors);
   if (!status.ok())
-    return absl::Status(absl::StatusCode::kInternal, status.error_message());
+    return abslx::Status(abslx::StatusCode::kInternal, status.error_message());
   return resource_tensors;
 }
 }  // namespace tf_saved_model

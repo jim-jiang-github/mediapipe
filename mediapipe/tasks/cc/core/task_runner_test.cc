@@ -54,14 +54,14 @@ CalculatorGraphConfig GetPassThroughGraphConfig() {
 // A calculator to generate runtime errors.
 class ErrorCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).SetAny();
     cc->Outputs().Index(0).SetSameAs(&cc->Inputs().Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
-    return absl::InternalError("An intended error for testing");
+  abslx::Status Process(CalculatorContext* cc) final {
+    return abslx::InternalError("An intended error for testing");
   }
 };
 REGISTER_CALCULATOR(ErrorCalculator);
@@ -80,7 +80,7 @@ CalculatorGraphConfig GetErrorCalculatorGraphConfig() {
 
 CalculatorGraphConfig GetModelSidePacketsToStreamPacketsGraphConfig(
     const std::string& model_resources_tag) {
-  return ParseTextProtoOrDie<CalculatorGraphConfig>(absl::Substitute(
+  return ParseTextProtoOrDie<CalculatorGraphConfig>(abslx::Substitute(
       R"(
     input_stream: "tick"
     output_stream: "model_out"
@@ -152,7 +152,7 @@ TEST_F(TaskRunnerTest, WrongProcessingMode) {
       auto runner2,
       TaskRunner::Create(GetPassThroughGraphConfig(),
                          /*model_resources=*/nullptr,
-                         [](absl::StatusOr<PacketMap> status_or_packets) {}));
+                         [](abslx::StatusOr<PacketMap> status_or_packets) {}));
   auto status_or_result = runner2->Process({{"in", MakePacket<int>(0)}});
   ASSERT_FALSE(status_or_result.ok());
   ASSERT_THAT(status_or_result.status().message(),
@@ -185,8 +185,8 @@ TEST_F(TaskRunnerTest, WrongTimestampOrderInSyncCalls) {
 }
 
 TEST_F(TaskRunnerTest, WrongTimestampOrderInAsyncCalls) {
-  std::function<void(absl::StatusOr<PacketMap>)> callback(
-      [](absl::StatusOr<PacketMap> status_or_packets) {
+  std::function<void(abslx::StatusOr<PacketMap>)> callback(
+      [](abslx::StatusOr<PacketMap> status_or_packets) {
         ASSERT_TRUE(status_or_packets.ok());
         ASSERT_EQ(1, status_or_packets.value().size());
         Packet out_packet = status_or_packets.value()["out"];
@@ -255,8 +255,8 @@ TEST_F(TaskRunnerTest, MultiThreadSyncAPICallsWithoutTimestamp) {
 }
 
 TEST_F(TaskRunnerTest, AsyncAPICalls) {
-  std::function<void(absl::StatusOr<PacketMap>)> callback(
-      [](absl::StatusOr<PacketMap> status_or_packets) {
+  std::function<void(abslx::StatusOr<PacketMap>)> callback(
+      [](abslx::StatusOr<PacketMap> status_or_packets) {
         ASSERT_TRUE(status_or_packets.ok());
         ASSERT_EQ(1, status_or_packets.value().size());
         Packet out_packet = status_or_packets.value()["out"];
@@ -285,8 +285,8 @@ TEST_F(TaskRunnerTest, ReportErrorInSyncAPICall) {
 }
 
 TEST_F(TaskRunnerTest, ReportErrorInAsyncAPICall) {
-  std::function<void(absl::StatusOr<PacketMap>)> callback(
-      [](absl::StatusOr<PacketMap> status_or_packets) {
+  std::function<void(abslx::StatusOr<PacketMap>)> callback(
+      [](abslx::StatusOr<PacketMap> status_or_packets) {
         ASSERT_TRUE(status_or_packets.ok());
         ASSERT_EQ(1, status_or_packets.value().size());
         Packet out_packet = status_or_packets.value()["out"];

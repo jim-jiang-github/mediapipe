@@ -27,7 +27,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status SoftmaxTest(TestExecutionEnvironment* env) {
+abslx::Status SoftmaxTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {std::log(1.0f), std::log(2.0f), std::log(3.0f),
@@ -51,10 +51,10 @@ absl::Status SoftmaxTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SoftmaxBigNumberTest(TestExecutionEnvironment* env) {
+abslx::Status SoftmaxBigNumberTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   double doubles[4] = {1.0, 2.0, 3.0, 100.0};
@@ -65,10 +65,10 @@ absl::Status SoftmaxBigNumberTest(TestExecutionEnvironment* env) {
   src_tensor.data[2] = doubles[2];
   src_tensor.data[3] = doubles[3];
   if (!std::isinf(std::exp(src_tensor.data[3]))) {
-    return absl::InternalError("exp(100.0f) not inf in float (32 bit)");
+    return abslx::InternalError("exp(100.0f) not inf in float (32 bit)");
   }
   if (std::isinf(std::exp(doubles[3]))) {
-    return absl::InternalError("exp(100.0) inf in double (64 bit)");
+    return abslx::InternalError("exp(100.0) inf in double (64 bit)");
   }
   double s0 = std::exp(doubles[0]) + std::exp(doubles[1]);
   double s1 = std::exp(doubles[2]) + std::exp(doubles[3]);
@@ -94,10 +94,10 @@ absl::Status SoftmaxBigNumberTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Softmax1x1Test(TestExecutionEnvironment* env) {
+abslx::Status Softmax1x1Test(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 1, 4);
   src_tensor.data = {std::log(1.0f), std::log(2.0f), std::log(3.0f),
@@ -120,10 +120,10 @@ absl::Status Softmax1x1Test(TestExecutionEnvironment* env) {
           PointWiseNear({0.1f, 0.2f, 0.3f, 0.4f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Softmax1x1BigNumberTest(TestExecutionEnvironment* env) {
+abslx::Status Softmax1x1BigNumberTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 1, 4);
   double doubles[4] = {1.0, 2.0, 3.0, 100.0};
@@ -134,10 +134,10 @@ absl::Status Softmax1x1BigNumberTest(TestExecutionEnvironment* env) {
   src_tensor.data[2] = doubles[2];
   src_tensor.data[3] = doubles[3];
   if (!std::isinf(std::exp(src_tensor.data[3]))) {
-    return absl::InternalError("exp(100.0f) not inf in float (32 bit)");
+    return abslx::InternalError("exp(100.0f) not inf in float (32 bit)");
   }
   if (std::isinf(std::exp(doubles[3]))) {
-    return absl::InternalError("exp(100.0) inf in double (64 bit)");
+    return abslx::InternalError("exp(100.0) inf in double (64 bit)");
   }
   double s0 = std::exp(doubles[0]) + std::exp(doubles[1]) +
               std::exp(doubles[2]) + std::exp(doubles[3]);
@@ -163,7 +163,7 @@ absl::Status Softmax1x1BigNumberTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

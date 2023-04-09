@@ -50,18 +50,18 @@ class GraphOutputStream {
   // input stream and attaches the input stream to an output stream as
   // the mirror for observation/polling.  Ownership of output_stream_manager
   // is not transferred to the graph output stream object.
-  absl::Status Initialize(const std::string& stream_name,
+  abslx::Status Initialize(const std::string& stream_name,
                           const PacketType* packet_type,
                           OutputStreamManager* output_stream_manager,
                           bool observe_timestamp_bounds = false);
 
   // Installs callbacks into its GraphOutputStreamHandler.
   virtual void PrepareForRun(std::function<void()> notification_callback,
-                             std::function<void(absl::Status)> error_callback);
+                             std::function<void(abslx::Status)> error_callback);
 
   // Notifies the graph output stream of new packets emitted by the output
   // stream.
-  virtual absl::Status Notify() = 0;
+  virtual abslx::Status Notify() = 0;
 
   // Notifies the graph output stream of the errors in the calculator graph.
   virtual void NotifyError() = 0;
@@ -101,7 +101,7 @@ class GraphOutputStream {
   };
 
   bool observe_timestamp_bounds_;
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
   bool notifying_ ABSL_GUARDED_BY(mutex_) = false;
   Timestamp last_processed_ts_ = Timestamp::Unstarted();
   std::unique_ptr<InputStreamHandler> input_stream_handler_;
@@ -114,22 +114,22 @@ class OutputStreamObserver : public GraphOutputStream {
  public:
   virtual ~OutputStreamObserver() {}
 
-  absl::Status Initialize(
+  abslx::Status Initialize(
       const std::string& stream_name, const PacketType* packet_type,
-      std::function<absl::Status(const Packet&)> packet_callback,
+      std::function<abslx::Status(const Packet&)> packet_callback,
       OutputStreamManager* output_stream_manager,
       bool observe_timestamp_bounds = false);
 
   // Notifies the observer of new packets emitted by the observed
   // output stream.
-  absl::Status Notify() override;
+  abslx::Status Notify() override;
 
   // Notifies the observer of the errors in the calculator graph.
   void NotifyError() override {}
 
  private:
   // Invoked on every packet emitted by the observed output stream.
-  std::function<absl::Status(const Packet&)> packet_callback_;
+  std::function<abslx::Status(const Packet&)> packet_callback_;
 };
 
 // OutputStreamPollerImpl that returns packets to the caller via
@@ -140,14 +140,14 @@ class OutputStreamPollerImpl : public GraphOutputStream {
   virtual ~OutputStreamPollerImpl() {}
 
   // Initializes an OutputStreamPollerImpl.
-  absl::Status Initialize(
+  abslx::Status Initialize(
       const std::string& stream_name, const PacketType* packet_type,
       std::function<void(InputStreamManager*, bool*)> queue_size_callback,
       OutputStreamManager* output_stream_manager,
       bool observe_timestamp_bounds = false);
 
   void PrepareForRun(std::function<void()> notification_callback,
-                     std::function<void(absl::Status)> error_callback) override;
+                     std::function<void(abslx::Status)> error_callback) override;
 
   // Resets graph_has_error_ and cleans the internal packet queue.
   void Reset();
@@ -158,7 +158,7 @@ class OutputStreamPollerImpl : public GraphOutputStream {
   int QueueSize();
 
   // Notifies the poller of new packets emitted by the output stream.
-  absl::Status Notify() override;
+  abslx::Status Notify() override;
 
   // Notifies the poller of the errors in the calculator graph.
   void NotifyError() override;
@@ -168,8 +168,8 @@ class OutputStreamPollerImpl : public GraphOutputStream {
   ABSL_MUST_USE_RESULT bool Next(Packet* packet);
 
  private:
-  absl::Mutex mutex_;
-  absl::CondVar handler_condvar_ ABSL_GUARDED_BY(mutex_);
+  abslx::Mutex mutex_;
+  abslx::CondVar handler_condvar_ ABSL_GUARDED_BY(mutex_);
   bool graph_has_error_ ABSL_GUARDED_BY(mutex_);
   Timestamp output_timestamp_ ABSL_GUARDED_BY(mutex_) = Timestamp::Min();
 };

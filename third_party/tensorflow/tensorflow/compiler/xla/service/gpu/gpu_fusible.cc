@@ -464,7 +464,7 @@ FusionDecision FusionFitsInBudget(const HloInstruction& instr1,
   }
 
   // Compute the precise number of operands to the new fusion.
-  absl::flat_hash_set<const HloInstruction*> operands(instr1.operands().begin(),
+  abslx::flat_hash_set<const HloInstruction*> operands(instr1.operands().begin(),
                                                       instr1.operands().end());
   operands.insert(instr2.operands().begin(), instr2.operands().end());
   // If there's an edge between `a` and `b`, don't count it: We're fusing that
@@ -530,7 +530,7 @@ bool CreatesNestedLoop(const HloInstruction& producer,
 
     std::stack<const HloInstruction*> dfs;
     dfs.push(root);
-    absl::flat_hash_set<const HloInstruction*> visited;
+    abslx::flat_hash_set<const HloInstruction*> visited;
     while (!dfs.empty()) {
       const HloInstruction* cur = dfs.top();
       dfs.pop();
@@ -574,7 +574,7 @@ HloInstruction::FusionKind ChooseFusionKind(const HloInstruction& /*producer*/,
 
 bool IsConsumerTheOnlyNonRootUser(const HloInstruction& instr,
                                   const HloInstruction& consumer) {
-  return absl::c_all_of(instr.users(), [&](const HloInstruction* user) {
+  return abslx::c_all_of(instr.users(), [&](const HloInstruction* user) {
     if (user->opcode() == HloOpcode::kGetTupleElement) {
       // Skip GTE.
       return IsConsumerTheOnlyNonRootUser(*user, consumer);
@@ -599,7 +599,7 @@ size_t GetInstrCountOfFusible(const HloInstruction& instr) {
   }
 }
 
-absl::InlinedVector<const HloInstruction*, 2> GetOutputsOfFusible(
+abslx::InlinedVector<const HloInstruction*, 2> GetOutputsOfFusible(
     const HloInstruction& instr) {
   if (instr.opcode() != HloOpcode::kFusion) {
     return {&instr};
@@ -610,7 +610,7 @@ absl::InlinedVector<const HloInstruction*, 2> GetOutputsOfFusible(
     return {root};
   } else {
     auto v = root->operands();
-    return absl::InlinedVector<const HloInstruction*, 2>(v.begin(), v.end());
+    return abslx::InlinedVector<const HloInstruction*, 2>(v.begin(), v.end());
   }
 }
 

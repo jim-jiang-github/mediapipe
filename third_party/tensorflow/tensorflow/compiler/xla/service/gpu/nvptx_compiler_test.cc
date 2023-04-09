@@ -28,7 +28,7 @@ namespace gpu {
 using NVPTXCompilerTest = HloTestBase;
 
 TEST_F(NVPTXCompilerTest, AllReducePerformedInplace) {
-  const absl::string_view hlo_string = R"(
+  const abslx::string_view hlo_string = R"(
 HloModule Module, input_output_alias={ {}: (0, {}, may-alias) }
 
 summit {
@@ -56,7 +56,7 @@ ENTRY entry {
 }
 
 TEST_F(NVPTXCompilerTest, AllReducePerformedInplaceTwoOperands) {
-  const absl::string_view hlo_string = R"(
+  const abslx::string_view hlo_string = R"(
 HloModule Module,
   input_output_alias={ {0}: (0, {}, may-alias), {1}: (1, {}, may-alias) }
 

@@ -59,12 +59,12 @@ void PacketSubmodule(pybind11::module* module) {
           "timestamp", &Packet::Timestamp,
           [](Packet* p, int64 ts_value) { *p = p->At(Timestamp(ts_value)); })
       .def("__repr__", [](const Packet& self) {
-        return absl::StrCat(
+        return abslx::StrCat(
             "<mediapipe.Packet with timestamp: ",
             TimestampValueString(self.Timestamp()),
             self.IsEmpty()
                 ? " and no data>"
-                : absl::StrCat(" and C++ type: ", self.DebugTypeName(), ">"));
+                : abslx::StrCat(" and C++ type: ", self.DebugTypeName(), ">"));
       });
 }
 

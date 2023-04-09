@@ -52,7 +52,7 @@ TEST(CalibratorTest, CalibrationStatsAreCollected) {
 
   ASSERT_TRUE(interpreter);
   ASSERT_TRUE(reader);
-  absl::flat_hash_map<std::tuple<int, int>, CalibrationReader::CalibrationStats>
+  abslx::flat_hash_map<std::tuple<int, int>, CalibrationReader::CalibrationStats>
       stats;
   status = reader->GetTensorStatsAsMap(&stats);
   EXPECT_EQ(kTfLiteOk, status);
@@ -150,7 +150,7 @@ TEST(CalibratorTest, MultipleInvokes) {
   ASSERT_EQ(kTfLiteOk, status);
   const float eps = 1e-6f;
   // Verify that min max of tensors.
-  absl::flat_hash_map<std::tuple<int, int>, CalibrationReader::CalibrationStats>
+  abslx::flat_hash_map<std::tuple<int, int>, CalibrationReader::CalibrationStats>
       stats;
   status = reader->GetTensorStatsAsMap(&stats);
   EXPECT_EQ(kTfLiteOk, status);
@@ -310,13 +310,13 @@ TEST(CalibratorTest, LSTM) {
 
   ASSERT_EQ(interpreter->Invoke(), kTfLiteOk);
 
-  absl::flat_hash_map<std::tuple<int, int>, CalibrationReader::CalibrationStats>
+  abslx::flat_hash_map<std::tuple<int, int>, CalibrationReader::CalibrationStats>
       stats;
   EXPECT_EQ(reader->GetTensorStatsAsMap(&stats), kTfLiteOk);
 
   // Check the results.
   const float eps = 1e-6f;
-  const absl::flat_hash_map<std::tuple<int, int>,
+  const abslx::flat_hash_map<std::tuple<int, int>,
                             CalibrationReader::CalibrationStats>
       expected_calibration_result = {
           // Input.
@@ -372,13 +372,13 @@ TEST(CalibratorTest, UnidirectionalSequenceLSTM) {
 
   ASSERT_EQ(interpreter->Invoke(), kTfLiteOk);
 
-  absl::flat_hash_map<std::tuple<int, int>, CalibrationReader::CalibrationStats>
+  abslx::flat_hash_map<std::tuple<int, int>, CalibrationReader::CalibrationStats>
       stats;
   EXPECT_EQ(reader->GetTensorStatsAsMap(&stats), kTfLiteOk);
 
   // Check the results.
   const float eps = 1e-6f;
-  const absl::flat_hash_map<std::tuple<int, int>,
+  const abslx::flat_hash_map<std::tuple<int, int>,
                             CalibrationReader::CalibrationStats>
       expected_calibration_result = {
           // Input.
@@ -434,13 +434,13 @@ TEST(CalibratorTest, CustomLSTM) {
 
   ASSERT_EQ(interpreter->Invoke(), kTfLiteOk);
 
-  absl::flat_hash_map<std::tuple<int, int>, CalibrationReader::CalibrationStats>
+  abslx::flat_hash_map<std::tuple<int, int>, CalibrationReader::CalibrationStats>
       stats;
   EXPECT_EQ(reader->GetTensorStatsAsMap(&stats), kTfLiteOk);
 
   // Check the results.
   const float eps = 1e-6f;
-  const absl::flat_hash_map<std::tuple<int, int>,
+  const abslx::flat_hash_map<std::tuple<int, int>,
                             CalibrationReader::CalibrationStats>
       expected_calibration_result = {
           // input.
@@ -495,7 +495,7 @@ TEST(CalibratorTest, CalibrationWithMultipleSubgraphs) {
 
   ASSERT_TRUE(interpreter);
   ASSERT_TRUE(reader);
-  absl::flat_hash_map<std::tuple<int, int>, CalibrationReader::CalibrationStats>
+  abslx::flat_hash_map<std::tuple<int, int>, CalibrationReader::CalibrationStats>
       stats;
   status = reader->GetTensorStatsAsMap(&stats);
   EXPECT_EQ(kTfLiteOk, status);
@@ -533,7 +533,7 @@ TEST(CalibratorTest, CalibrationWithMultipleSubgraphs) {
 
   // Check the results.
   const float eps = 1e-6f;
-  const absl::flat_hash_map<std::tuple<int, int>,
+  const abslx::flat_hash_map<std::tuple<int, int>,
                             CalibrationReader::CalibrationStats>
       expected_calibration_result = {
           // input.
@@ -564,7 +564,7 @@ TEST(CalibratorTest, CalibrationWithCallOnce) {
 
   ASSERT_TRUE(interpreter);
   ASSERT_TRUE(reader);
-  absl::flat_hash_map<std::tuple<int, int>, CalibrationReader::CalibrationStats>
+  abslx::flat_hash_map<std::tuple<int, int>, CalibrationReader::CalibrationStats>
       stats;
   status = reader->GetTensorStatsAsMap(&stats);
   EXPECT_EQ(kTfLiteOk, status);
@@ -595,7 +595,7 @@ TEST(CalibratorTest, CalibrationWithCallOnce) {
 
   // Check the results.
   const float eps = 1e-6f;
-  const absl::flat_hash_map<std::tuple<int, int>,
+  const abslx::flat_hash_map<std::tuple<int, int>,
                             CalibrationReader::CalibrationStats>
       expected_calibration_result = {// input.
                                      {{0, 0}, {1.0, 1.0}},

@@ -47,7 +47,7 @@ namespace core {
 // packets.
 using PacketMap = std::map<std::string, Packet>;
 // A callback method to get output packets from the task runner.
-using PacketsCallback = std::function<void(absl::StatusOr<PacketMap>)>;
+using PacketsCallback = std::function<void(abslx::StatusOr<PacketMap>)>;
 
 // The mediapipe task runner class.
 // The runner has two processing modes: synchronous mode and asynchronous mode.
@@ -70,7 +70,7 @@ class TaskRunner {
   // asynchronous method, Send(), to provide the input packets. If the packets
   // callback is absent, clients must use the synchronous method, Process(), to
   // provide the input packets and receive the output packets.
-  static absl::StatusOr<std::unique_ptr<TaskRunner>> Create(
+  static abslx::StatusOr<std::unique_ptr<TaskRunner>> Create(
       CalculatorGraphConfig config,
       std::unique_ptr<tflite::OpResolver> op_resolver = nullptr,
       PacketsCallback packets_callback = nullptr);
@@ -90,7 +90,7 @@ class TaskRunner {
   // thread-unsafe and it is the caller's responsibility to synchronize access
   // to this method across multiple threads and to ensure that the input packet
   // timestamps are in order.
-  absl::StatusOr<PacketMap> Process(PacketMap inputs);
+  abslx::StatusOr<PacketMap> Process(PacketMap inputs);
 
   // An asynchronous method that is designed for handling live streaming data
   // such as live camera and microphone data. A user-defined PacketsCallback
@@ -99,16 +99,16 @@ class TaskRunner {
   // increasing. This method is thread-unsafe and it is the caller's
   // responsibility to synchronize access to this method across multiple
   // threads and to ensure that the input packet timestamps are in order.
-  absl::Status Send(PacketMap inputs);
+  abslx::Status Send(PacketMap inputs);
 
   // Shuts down the task runner. After the runner is closed, unless the
   // runner's Start method is called again, any calls that send input data
   // to the runner are illegal and will receive errors.
-  absl::Status Close();
+  abslx::Status Close();
 
   // Resets and restarts the task runner. This can be useful for resetting
   // a stateful task graph to process new data.
-  absl::Status Restart();
+  abslx::Status Restart();
 
   // Returns the canonicalized CalculatorGraphConfig of the underlying graph.
   const CalculatorGraphConfig& GetGraphConfig() { return graph_.Config(); }
@@ -123,14 +123,14 @@ class TaskRunner {
   // runner is ready to start. Otherwise, returns an error status to indicate
   // that the runner isn't initialized successfully. A task runner should
   // be only initialized once.
-  absl::Status Initialize(
+  abslx::Status Initialize(
       CalculatorGraphConfig config,
       std::unique_ptr<tflite::OpResolver> op_resolver = nullptr);
 
   // Starts the task runner. Returns an ok status to indicate that the
   // runner is ready to accept input data. Otherwise, returns an error status to
   // indicate that the runner isn't started successfully.
-  absl::Status Start();
+  abslx::Status Start();
 
   PacketsCallback packets_callback_;
   std::vector<std::string> output_stream_names_;
@@ -138,9 +138,9 @@ class TaskRunner {
   bool initialized_ = false;
   std::atomic_bool is_running_ = false;
 
-  absl::StatusOr<PacketMap> status_or_output_packets_;
+  abslx::StatusOr<PacketMap> status_or_output_packets_;
   Timestamp last_seen_ ABSL_GUARDED_BY(mutex_);
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
 };
 
 }  // namespace core

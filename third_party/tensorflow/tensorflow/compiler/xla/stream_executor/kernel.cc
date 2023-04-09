@@ -90,12 +90,12 @@ KernelCacheConfig KernelBase::GetPreferredCacheConfig() const {
   return implementation_->GetPreferredCacheConfig();
 }
 
-void KernelBase::set_name(absl::string_view name) {
+void KernelBase::set_name(abslx::string_view name) {
   name_ = std::string(name);
 
   // CUDA splitter prefixes stub functions with __device_stub_.
   demangled_name_ =
-      port::Demangle(absl::StripPrefix(name, "__device_stub_").data());
+      port::Demangle(abslx::StripPrefix(name, "__device_stub_").data());
 }
 
 }  // namespace stream_executor

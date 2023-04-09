@@ -20,7 +20,7 @@
 #include "absl/strings/string_view.h"
 #include "absl/types/optional.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace status_internal {
 
@@ -29,13 +29,13 @@ namespace status_internal {
 // extension point, which is a global printer function that can be set by users
 // to specify how to print payloads. The function takes the type URL and the
 // payload as input, and should return a valid human-readable string on success
-// or `absl::nullopt` on failure (in which case it falls back to the default
+// or `abslx::nullopt` on failure (in which case it falls back to the default
 // approach of printing the raw bytes).
 // NOTE: This is an internal API and the design is subject to change in the
 // future in a non-backward-compatible way. Since it's only meant for debugging
 // purpose, you should not rely on it in any critical logic.
-using StatusPayloadPrinter = absl::optional<std::string> (*)(absl::string_view,
-                                                             const absl::Cord&);
+using StatusPayloadPrinter = abslx::optional<std::string> (*)(abslx::string_view,
+                                                             const abslx::Cord&);
 
 // Sets the global payload printer. Only one printer should be set per process.
 // If multiple printers are set, it's undefined which one will be used.
@@ -46,6 +46,6 @@ StatusPayloadPrinter GetStatusPayloadPrinter();
 
 }  // namespace status_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STATUS_STATUS_PAYLOAD_PRINTER_H_

@@ -139,7 +139,7 @@ class DelegateKernel {
   }
   ~DelegateKernel() { --delegate_->num_delegate_kernels_; }
 
-  absl::Status Prepare(TfLiteContext* context,
+  abslx::Status Prepare(TfLiteContext* context,
                        const TfLiteDelegateParams* delegate_params) {
     thread_id_prepare_ = std::this_thread::get_id();
 
@@ -162,7 +162,7 @@ class DelegateKernel {
       RETURN_IF_ERROR(InitializeOpenGlApi(&graph, &builder));
     } else {
       // By default, we try CL first & fall back to GL if that fails.
-      absl::Status status =
+      abslx::Status status =
           InitializeOpenClApi(&graph, &builder, &graph_is_destroyed, context,
                               delegate_params, delegate_->serialization());
       if (!status.ok()) {
@@ -206,9 +206,9 @@ class DelegateKernel {
 
   // This directs the runtime to allocate memory for input/output temporary
   // tensors that require dequantization/quantization.
-  absl::Status GetRequiredTemporaries(TfLiteContext* context, TfLiteNode* node,
+  abslx::Status GetRequiredTemporaries(TfLiteContext* context, TfLiteNode* node,
                                       TfLiteIntArray** temporaries_array_ptr) {
-    if (quant_conversion_map_.empty()) return absl::OkStatus();
+    if (quant_conversion_map_.empty()) return abslx::OkStatus();
 
     std::vector<int> temporary_tensors;
     for (auto index : input_indices_) {
@@ -225,15 +225,15 @@ class DelegateKernel {
     for (int i = 0; i < temporary_tensors.size(); ++i) {
       (*temporaries_array_ptr)->data[i] = temporary_tensors[i];
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Invoke(TfLiteContext* context) {
+  abslx::Status Invoke(TfLiteContext* context) {
     if (thread_id_prepare_ != std::this_thread::get_id()) {
       TFLITE_LOG(tflite::TFLITE_LOG_WARNING,
                  "GpuDelegate invoke thread != prepare thread");
       if (enforce_same_thread_) {
-        return absl::FailedPreconditionError(
+        return abslx::FailedPreconditionError(
             "GpuDelegate must run on the same thread where it was "
             "initialized.");
       }
@@ -250,11 +250,11 @@ class DelegateKernel {
       RETURN_IF_ERROR(
           QuantizeOutputs(context, output_indices_, quant_conversion_map_));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
-  absl::Status SetInputsAndOutputs(TfLiteContext* context) {
+  abslx::Status SetInputsAndOutputs(TfLiteContext* context) {
     for (int i = 0; i < input_indices_.size(); ++i) {
       RETURN_IF_ERROR(runner_->SetInputObject(
           i, GetTensorObject(input_indices_[i], context)));
@@ -263,7 +263,7 @@ class DelegateKernel {
       RETURN_IF_ERROR(runner_->SetOutputObject(
           i, GetTensorObject(output_indices_[i], context)));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   ObjectDef GetObjectDef(int index,
@@ -278,11 +278,11 @@ class DelegateKernel {
 
   TensorObject GetTensorObject(int index, TfLiteContext* context) const {
     auto& tensor = context->tensors[index];
-    return MakeCpuMemory(absl::MakeSpan(tensor.data.raw, tensor.bytes));
+    return MakeCpuMemory(abslx::MakeSpan(tensor.data.raw, tensor.bytes));
   }
 
  private:
-  absl::Status InitializeGraph(TfLiteContext* context,
+  abslx::Status InitializeGraph(TfLiteContext* context,
                                const TfLiteDelegateParams* delegate_params,
                                GraphFloat32* graph,
                                std::vector<uint32_t>* input_refs,
@@ -339,10 +339,10 @@ class DelegateKernel {
       output_refs->push_back(outputs[i]->tensor.ref);
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status InitializeOpenClApi(GraphFloat32* graph,
+  abslx::Status InitializeOpenClApi(GraphFloat32* graph,
                                    std::unique_ptr<InferenceBuilder>* builder,
                                    bool* graph_is_destroyed,
                                    TfLiteContext* context,
@@ -384,7 +384,7 @@ class DelegateKernel {
                                           &options, &env_options, &properties,
                                           serialization)
               .ok()) {
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
 
       RETURN_IF_ERROR(cl::NewInferenceEnvironment(env_options, &cl_environment_,
@@ -402,17 +402,17 @@ class DelegateKernel {
 
     TFLITE_LOG_PROD_ONCE(tflite::TFLITE_LOG_INFO,
                          "Initialized OpenCL-based API.");
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Returns Ok only if serialized data is successsfully found.
-  absl::Status MaybeInitializeSerializedOpenCL(
+  abslx::Status MaybeInitializeSerializedOpenCL(
       TfLiteContext* context, const TfLiteDelegateParams* delegate_params,
       std::unique_ptr<InferenceBuilder>* builder, cl::InferenceOptions* options,
       cl::InferenceEnvironmentOptions* env_options,
       cl::InferenceEnvironmentProperties* properties,
       Serialization* serialization) {
-    if (!serialization) return absl::InvalidArgumentError("No serialization");
+    if (!serialization) return abslx::InvalidArgumentError("No serialization");
     // We use a fingerprint of the options to ensure compatibility.
     std::string options_fingerprint =
         delegates::StrFingerprint(options, sizeof(cl::InferenceOptions));
@@ -423,7 +423,7 @@ class DelegateKernel {
     std::string model_data;
     auto model_data_status = data_key.GetData(context, &model_data);
     if (model_data_status == kTfLiteOk) {
-      absl::Span<const uint8_t> model_span = absl::Span<const uint8_t>{
+      abslx::Span<const uint8_t> model_span = abslx::Span<const uint8_t>{
           reinterpret_cast<const uint8_t*>(model_data.data()),
           model_data.size()};
       RETURN_IF_ERROR(cl::NewInferenceEnvironment(
@@ -433,18 +433,18 @@ class DelegateKernel {
       TFLITE_LOG_PROD_ONCE(
           tflite::TFLITE_LOG_INFO,
           "Initialized OpenCL-based API from serialized data.");
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
-    return absl::NotFoundError("Serialization data not found");
+    return abslx::NotFoundError("Serialization data not found");
   }
 
   // Returns Ok only if serialization happens successfully.
-  absl::Status SaveSerializedOpenCL(
+  abslx::Status SaveSerializedOpenCL(
       TfLiteContext* context, const TfLiteDelegateParams* delegate_params,
       cl::InferenceOptions* options, Serialization* serialization,
       const std::vector<uint8_t>& serialized_model) {
-    if (!serialization) return absl::InvalidArgumentError("No serialization");
+    if (!serialization) return abslx::InvalidArgumentError("No serialization");
     // We use a fingerprint of the options to ensure compatibility.
     std::string options_fingerprint =
         delegates::StrFingerprint(options, sizeof(cl::InferenceOptions));
@@ -457,12 +457,12 @@ class DelegateKernel {
         context, reinterpret_cast<const char*>(serialized_model.data()),
         serialized_model.size());
     if (save_status != kTfLiteOk) {
-      return absl::InvalidArgumentError("Failed to save serialized data");
+      return abslx::InvalidArgumentError("Failed to save serialized data");
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status InitializeOpenGlApi(GraphFloat32* graph,
+  abslx::Status InitializeOpenGlApi(GraphFloat32* graph,
                                    std::unique_ptr<InferenceBuilder>* builder) {
 #ifndef CL_DELEGATE_NO_GL
     gl::InferenceEnvironmentOptions env_options;
@@ -480,9 +480,9 @@ class DelegateKernel {
     enforce_same_thread_ = true;
     TFLITE_LOG_PROD_ONCE(tflite::TFLITE_LOG_INFO,
                          "Initialized OpenGL-based API.");
-    return absl::OkStatus();
+    return abslx::OkStatus();
 #else
-    return absl::UnavailableError("OpenGL-based API disabled");
+    return abslx::UnavailableError("OpenGL-based API disabled");
 #endif
   }
 
@@ -498,7 +498,7 @@ class DelegateKernel {
   // Whenever quantized inference is enabled, this maps the tensor index of each
   // originally quantized (8-bit) tensor to its float version added in
   // model_builder - and vice versa.
-  absl::flat_hash_map<int, int> quant_conversion_map_;
+  abslx::flat_hash_map<int, int> quant_conversion_map_;
   std::thread::id thread_id_prepare_;  // thread id used for Prapare()
   bool enforce_same_thread_ = false;   // flag to enforce same thread for Invoke
 };
@@ -572,7 +572,7 @@ TfLiteStatus DelegatePrepare(TfLiteContext* context, TfLiteDelegate* delegate) {
   };
 
   auto* gpu_delegate = GetDelegate(delegate);
-  absl::flat_hash_set<TfLiteBuiltinOperator> excluded_ops;
+  abslx::flat_hash_set<TfLiteBuiltinOperator> excluded_ops;
   if (!cl::OpenCLSupported()) {
     excluded_ops.insert(kTfLiteBuiltinSplit);
     excluded_ops.insert(kTfLiteBuiltinSplitV);

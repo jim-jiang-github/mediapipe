@@ -192,11 +192,11 @@ class RamFileBlockCache {
     /// The timestamp (seconds since epoch) at which the block was cached.
     uint64_t timestamp;
     /// Mutex to guard state variable
-    absl::Mutex mu;
+    abslx::Mutex mu;
     /// The state of the block.
     FetchState state ABSL_GUARDED_BY(mu) = FetchState::CREATED;
     /// Wait on cond_var if state is FETCHING.
-    absl::CondVar cond_var;
+    abslx::CondVar cond_var;
   };
 
   /// \brief The block map type for the file block cache.
@@ -235,10 +235,10 @@ class RamFileBlockCache {
   std::unique_ptr<TF_Thread, std::function<void(TF_Thread*)>> pruning_thread_;
 
   /// Notification for stopping the cache pruning thread.
-  absl::Notification stop_pruning_thread_;
+  abslx::Notification stop_pruning_thread_;
 
   /// Guards access to the block map, LRU list, and cached byte count.
-  mutable absl::Mutex mu_;
+  mutable abslx::Mutex mu_;
 
   /// The block map (map from Key to Block).
   BlockMap block_map_ ABSL_GUARDED_BY(mu_);

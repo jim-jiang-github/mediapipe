@@ -75,14 +75,14 @@ struct AllocatorStats {
 
   // The upper limit of bytes of user allocatable device memory, if such a limit
   // is known.
-  absl::optional<int64_t> bytes_limit;
+  abslx::optional<int64_t> bytes_limit;
 
   // Stats for reserved memory usage.
   int64_t bytes_reserved;       // Number of bytes reserved.
   int64_t peak_bytes_reserved;  // The peak number of bytes reserved.
   // The upper limit on the number bytes of reservable memory,
   // if such a limit is known.
-  absl::optional<int64_t> bytes_reservable_limit;
+  abslx::optional<int64_t> bytes_reservable_limit;
 
   int64_t largest_free_block_bytes;  // Largest free block's size in heap.
 
@@ -210,7 +210,7 @@ class Allocator {
   }
 
   // Fills in 'stats' with statistics collected by this allocator.
-  virtual absl::optional<AllocatorStats> GetStats() { return absl::nullopt; }
+  virtual abslx::optional<AllocatorStats> GetStats() { return abslx::nullopt; }
 
   // If implemented, clears the internal stats except for the `in_use` fields
   // and sets the `peak_bytes_in_use` to be equal to the `bytes_in_use`. Returns

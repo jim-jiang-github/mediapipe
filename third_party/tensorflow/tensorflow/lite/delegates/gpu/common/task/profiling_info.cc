@@ -21,8 +21,8 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Duration ProfilingInfo::GetTotalTime() const {
-  absl::Duration total_time;
+abslx::Duration ProfilingInfo::GetTotalTime() const {
+  abslx::Duration total_time;
   for (const auto& dispatch : dispatches) {
     total_time += dispatch.duration;
   }
@@ -40,10 +40,10 @@ std::string ProfilingInfo::GetDetailedReport() const {
       "Per kernel timing(" + std::to_string(dispatches.size()) + " kernels):\n";
   for (const auto& dispatch : dispatches) {
     result += "  " + dispatch.label + " - " +
-              std::to_string(absl::ToDoubleMilliseconds(dispatch.duration)) +
+              std::to_string(abslx::ToDoubleMilliseconds(dispatch.duration)) +
               " ms";
     const double times_per_sec =
-        1000.0 / absl::ToDoubleMilliseconds(dispatch.duration);
+        1000.0 / abslx::ToDoubleMilliseconds(dispatch.duration);
     if (dispatch.read_mem_size && dispatch.write_mem_size) {
       const uint64_t total_size =
           dispatch.read_mem_size + dispatch.write_mem_size;
@@ -61,11 +61,11 @@ std::string ProfilingInfo::GetDetailedReport() const {
     if (statistics.find(name) != statistics.end()) {
       statistics[name].count++;
       statistics[name].total_time +=
-          absl::ToDoubleMilliseconds(dispatch.duration);
+          abslx::ToDoubleMilliseconds(dispatch.duration);
     } else {
       statistics[name].count = 1;
       statistics[name].total_time =
-          absl::ToDoubleMilliseconds(dispatch.duration);
+          abslx::ToDoubleMilliseconds(dispatch.duration);
     }
   }
   result += "--------------------\n";
@@ -77,7 +77,7 @@ std::string ProfilingInfo::GetDetailedReport() const {
   }
   result += "--------------------\n";
   result += "Ideal total time: " +
-            std::to_string(absl::ToDoubleMilliseconds(GetTotalTime())) + "\n";
+            std::to_string(abslx::ToDoubleMilliseconds(GetTotalTime())) + "\n";
   result += "--------------------\n";
   return result;
 }

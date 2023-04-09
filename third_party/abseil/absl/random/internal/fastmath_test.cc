@@ -28,7 +28,7 @@
 namespace {
 
 TEST(FastMathTest, IntLog2FloorTest) {
-  using absl::random_internal::IntLog2Floor;
+  using abslx::random_internal::IntLog2Floor;
   constexpr uint64_t kZero = 0;
   EXPECT_EQ(0, IntLog2Floor(0));  // boundary. return 0.
   EXPECT_EQ(0, IntLog2Floor(1));
@@ -54,7 +54,7 @@ TEST(FastMathTest, IntLog2FloorTest) {
 }
 
 TEST(FastMathTest, IntLog2CeilTest) {
-  using absl::random_internal::IntLog2Ceil;
+  using abslx::random_internal::IntLog2Ceil;
   constexpr uint64_t kZero = 0;
   EXPECT_EQ(0, IntLog2Ceil(0));  // boundary. return 0.
   EXPECT_EQ(0, IntLog2Ceil(1));
@@ -82,7 +82,7 @@ TEST(FastMathTest, IntLog2CeilTest) {
 }
 
 TEST(FastMathTest, StirlingLogFactorial) {
-  using absl::random_internal::StirlingLogFactorial;
+  using abslx::random_internal::StirlingLogFactorial;
 
   EXPECT_NEAR(StirlingLogFactorial(1.0), 0, 1e-3);
   EXPECT_NEAR(StirlingLogFactorial(1.50), 0.284683, 1e-3);

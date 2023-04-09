@@ -28,9 +28,9 @@ namespace mediapipe {
 // ignored.
 class PassThroughCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     if (!cc->Inputs().TagMap()->SameAs(*cc->Outputs().TagMap())) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Input and output streams to PassThroughCalculator must use "
           "matching tags and indexes.");
     }
@@ -46,7 +46,7 @@ class PassThroughCalculator : public CalculatorBase {
     if (cc->OutputSidePackets().NumEntries() != 0) {
       if (!cc->InputSidePackets().TagMap()->SameAs(
               *cc->OutputSidePackets().TagMap())) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "Input and output side packets to PassThroughCalculator must use "
             "matching tags and indexes.");
       }
@@ -56,10 +56,10 @@ class PassThroughCalculator : public CalculatorBase {
             &cc->InputSidePackets().Get(id));
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     for (CollectionItemId id = cc->Inputs().BeginId();
          id < cc->Inputs().EndId(); ++id) {
       if (!cc->Inputs().Get(id).Header().IsEmpty()) {
@@ -73,10 +73,10 @@ class PassThroughCalculator : public CalculatorBase {
       }
     }
     cc->SetOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     cc->GetCounter("PassThrough")->Increment();
     if (cc->Inputs().NumEntries() == 0) {
       return tool::StatusStop();
@@ -90,7 +90,7 @@ class PassThroughCalculator : public CalculatorBase {
         cc->Outputs().Get(id).AddPacket(cc->Inputs().Get(id).Value());
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(PassThroughCalculator);

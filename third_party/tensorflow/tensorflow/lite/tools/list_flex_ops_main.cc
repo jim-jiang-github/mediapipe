@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
   };
   tflite::Flags::Parse(&argc, const_cast<const char**>(argv), flag_list);
 
-  std::vector<std::string> models = absl::StrSplit(input_models, ',');
+  std::vector<std::string> models = abslx::StrSplit(input_models, ',');
   tflite::flex::OpKernelSet flex_ops;
   for (const std::string& model_file : models) {
     std::ifstream fin;

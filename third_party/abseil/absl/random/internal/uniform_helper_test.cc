@@ -22,13 +22,13 @@
 
 namespace {
 
-using absl::IntervalClosedClosedTag;
-using absl::IntervalClosedOpenTag;
-using absl::IntervalOpenClosedTag;
-using absl::IntervalOpenOpenTag;
-using absl::random_internal::uniform_inferred_return_t;
-using absl::random_internal::uniform_lower_bound;
-using absl::random_internal::uniform_upper_bound;
+using abslx::IntervalClosedClosedTag;
+using abslx::IntervalClosedOpenTag;
+using abslx::IntervalOpenClosedTag;
+using abslx::IntervalOpenOpenTag;
+using abslx::random_internal::uniform_inferred_return_t;
+using abslx::random_internal::uniform_lower_bound;
+using abslx::random_internal::uniform_upper_bound;
 
 class UniformHelperTest : public testing::Test {};
 
@@ -38,8 +38,8 @@ TEST_F(UniformHelperTest, UniformBoundFunctionsGeneral) {
   constexpr IntervalOpenClosedTag IntervalOpenClosed;
   constexpr IntervalOpenOpenTag IntervalOpenOpen;
 
-  // absl::uniform_int_distribution natively assumes IntervalClosedClosed
-  // absl::uniform_real_distribution natively assumes IntervalClosedOpen
+  // abslx::uniform_int_distribution natively assumes IntervalClosedClosed
+  // abslx::uniform_real_distribution natively assumes IntervalClosedOpen
 
   EXPECT_EQ(uniform_lower_bound(IntervalOpenClosed, 0, 100), 1);
   EXPECT_EQ(uniform_lower_bound(IntervalOpenOpen, 0, 100), 1);
@@ -133,7 +133,7 @@ TEST_F(UniformHelperTest, UniformBoundFunctionsIntBounds) {
 }
 
 TEST_F(UniformHelperTest, UniformBoundFunctionsRealBounds) {
-  // absl::uniform_real_distribution natively assumes IntervalClosedOpen;
+  // abslx::uniform_real_distribution natively assumes IntervalClosedOpen;
   // use the inverse here so each bound has to change.
   constexpr IntervalOpenClosedTag IntervalOpenClosed;
 
@@ -214,7 +214,7 @@ Invalid InferredUniformReturnT(...);
 template <typename A, typename B, typename Expect>
 void CheckArgsInferType() {
   static_assert(
-      absl::conjunction<
+      abslx::conjunction<
           std::is_same<Expect, decltype(InferredUniformReturnT<A, B>(0))>,
           std::is_same<Expect,
                        decltype(InferredUniformReturnT<B, A>(0))>>::value,

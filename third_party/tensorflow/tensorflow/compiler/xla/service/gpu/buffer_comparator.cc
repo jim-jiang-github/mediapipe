@@ -612,7 +612,7 @@ static StatusOr<bool> DeviceCompare(se::Stream* stream,
                                     se::DeviceMemoryBase rhs,
                                     const Shape& buffer_shape,
                                     const HloModuleConfig& config,
-                                    absl::string_view kernel_name) {
+                                    abslx::string_view kernel_name) {
   se::StreamExecutor* executor = stream->parent();
 
   se::ScopedDeviceMemory<uint64_t> out_param =
@@ -628,16 +628,16 @@ static StatusOr<bool> DeviceCompare(se::Stream* stream,
   se::DeviceMemory<ElementT> rhs_typed(rhs);
   uint64_t buffer_size = lhs_typed.ElementCount();
 
-  absl::Span<const uint8_t> compiled_ptx = {};
-  StatusOr<absl::Span<const uint8_t>> compiled_ptx_or =
+  abslx::Span<const uint8_t> compiled_ptx = {};
+  StatusOr<abslx::Span<const uint8_t>> compiled_ptx_or =
       se::CompileGpuAsmOrGetCached(
           executor->device_ordinal(), buffer_compare_ptx,
           PtxOptsFromDebugOptions(config.debug_options()));
   if (compiled_ptx_or.ok()) {
     compiled_ptx = std::move(compiled_ptx_or).value();
   } else {
-    static absl::once_flag ptxas_not_found_logged;
-    absl::call_once(ptxas_not_found_logged, [&]() {
+    static abslx::once_flag ptxas_not_found_logged;
+    abslx::call_once(ptxas_not_found_logged, [&]() {
       LOG(WARNING)
           << compiled_ptx_or.status().ToString()
           << "\nRelying on driver to perform ptx compilation. "
@@ -741,7 +741,7 @@ static StatusOr<bool> CompareEqualParameterized(se::Stream* stream,
                                                 se::DeviceMemoryBase rhs,
                                                 const Shape& shape,
                                                 const HloModuleConfig& config,
-                                                absl::string_view kernel_name) {
+                                                abslx::string_view kernel_name) {
   XLA_SCOPED_LOGGING_TIMER("BufferComparator::CompareEqual");
   TF_ASSIGN_OR_RETURN(
       bool result,

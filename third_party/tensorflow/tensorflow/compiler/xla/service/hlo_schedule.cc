@@ -32,7 +32,7 @@ namespace xla {
 
 /* static */ StatusOr<HloSchedule> HloSchedule::CreateFromProto(
     const HloModule* module, const HloScheduleProto& proto) {
-  absl::flat_hash_map<int64_t, const HloComputation*> id_to_computation;
+  abslx::flat_hash_map<int64_t, const HloComputation*> id_to_computation;
   for (const HloComputation* computation : module->computations()) {
     id_to_computation[computation->unique_id()] = computation;
   }
@@ -49,7 +49,7 @@ namespace xla {
     }
     const HloComputation* computation = comp_it->second;
 
-    absl::flat_hash_map<int64_t, HloInstruction*> id_to_instruction;
+    abslx::flat_hash_map<int64_t, HloInstruction*> id_to_instruction;
     for (HloInstruction* instruction : computation->instructions()) {
       id_to_instruction[instruction->unique_id()] = instruction;
     }
@@ -85,7 +85,7 @@ StatusOr<HloScheduleProto> HloSchedule::ToProto() const {
 }
 
 void HloSchedule::set_sequence(const HloComputation* computation,
-                               absl::Span<HloInstruction* const> sequence) {
+                               abslx::Span<HloInstruction* const> sequence) {
   set_sequence(computation, HloInstructionSequence(sequence));
 }
 
@@ -116,13 +116,13 @@ Status HloSchedule::UpdateComputationSchedule(
     const HloComputation* computation) {
   // Map from unique ID to HloInstruction pointer for instructions in the
   // computation.
-  absl::flat_hash_map<int, HloInstruction*> id_to_instruction;
+  abslx::flat_hash_map<int, HloInstruction*> id_to_instruction;
   for (HloInstruction* instruction : computation->instructions()) {
     InsertOrDie(&id_to_instruction, instruction->unique_id(), instruction);
   }
 
   // Set of all HloInstructions in the schedule.
-  absl::flat_hash_set<int> ids_in_schedule;
+  abslx::flat_hash_set<int> ids_in_schedule;
   for (int id : sequences_.at(computation->unique_id()).ids()) {
     InsertOrDie(&ids_in_schedule, id);
   }
@@ -130,13 +130,13 @@ Status HloSchedule::UpdateComputationSchedule(
   // Map from HloInstruction X to newly added instructions (instruction is in
   // computation, but not in schedule) which use X. If an instruction is not in
   // the map, then it has no users which are newly added instructions.
-  absl::flat_hash_map<const HloInstruction*, std::vector<HloInstruction*>>
+  abslx::flat_hash_map<const HloInstruction*, std::vector<HloInstruction*>>
       new_instruction_uses;
 
   // For each newly added instruction, this is the count of the instruction's
   // operands that have not yet been scheduled. When this value reaches zero,
   // then the instruction may be placed in the schedule.
-  absl::flat_hash_map<const HloInstruction*, int> unscheduled_operand_count;
+  abslx::flat_hash_map<const HloInstruction*, int> unscheduled_operand_count;
 
   // Create a worklist of newly added instructions which are ready to be added
   // to the schedule. Initialize worklist with those that have zero operands.
@@ -213,7 +213,7 @@ Status HloSchedule::Update() {
   if (sequences_.size() > nonfusion_computations.size()) {
     // Schedule contains some computations which have been removed from the
     // HloModule. Remove them from the schedule as well.
-    absl::flat_hash_set<int64_t> nonfusion_computations_ids;
+    abslx::flat_hash_set<int64_t> nonfusion_computations_ids;
     for (const HloComputation* computation : nonfusion_computations) {
       nonfusion_computations_ids.insert(computation->unique_id());
     }
@@ -255,7 +255,7 @@ Status HloSchedule::Verify() const {
   // For each computation verify the set of instructions is the same and that
   // each dependency and control edge is honored.
   for (const HloComputation* computation : nonfusion_computations) {
-    absl::flat_hash_map<const HloInstruction*, int> instruction_position;
+    abslx::flat_hash_map<const HloInstruction*, int> instruction_position;
     int pos = 0;
     for (const HloInstruction* instruction :
          sequence(computation).instructions()) {
@@ -323,20 +323,20 @@ std::string HloSchedule::ToString() const {
       // not safe to dereference any HLO pointers. Just use the HLO unique ids
       // stored in this object.
       pieces.push_back(
-          absl::StrFormat("computation with id %d (no longer in HLO module):",
+          abslx::StrFormat("computation with id %d (no longer in HLO module):",
                           id_sequence.first));
       for (int id : id_sequence.second.ids()) {
-        pieces.push_back(absl::StrCat("  ", id));
+        pieces.push_back(abslx::StrCat("  ", id));
       }
     } else {
-      pieces.push_back(absl::StrFormat("computation %s:", computation->name()));
+      pieces.push_back(abslx::StrFormat("computation %s:", computation->name()));
       for (const HloInstruction* instruction :
            id_sequence.second.instructions()) {
-        pieces.push_back(absl::StrCat("  ", instruction->name()));
+        pieces.push_back(abslx::StrCat("  ", instruction->name()));
       }
     }
   }
-  return absl::StrJoin(pieces, "\n");
+  return abslx::StrJoin(pieces, "\n");
 }
 
 std::ostream& operator<<(std::ostream& out, const HloSchedule& schedule) {

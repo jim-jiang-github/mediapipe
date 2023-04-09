@@ -243,7 +243,7 @@ class LhloDialectEmitter : public xla::ConstDfsHloVisitorWithDefault {
   //
   // `slices_` is populated lazily in the `GetOrCreateView()` helper as we
   // process every instruction.
-  absl::flat_hash_map<std::pair<const xla::HloInstruction*, xla::ShapeIndex>,
+  abslx::flat_hash_map<std::pair<const xla::HloInstruction*, xla::ShapeIndex>,
                       Value>
       slices_;
 
@@ -265,7 +265,7 @@ class LhloDialectEmitter : public xla::ConstDfsHloVisitorWithDefault {
 
   // Map all-reduce-start ops to their LHLO op, so we can connect the
   // all-reduce-done op with the correct token.
-  absl::flat_hash_map<const xla::HloInstruction*, lmhlo_gpu::AllReduceStartOp>
+  abslx::flat_hash_map<const xla::HloInstruction*, lmhlo_gpu::AllReduceStartOp>
       all_reduce_start_ops_;
 };
 

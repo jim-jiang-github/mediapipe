@@ -45,16 +45,16 @@ TpuDevice::TpuDevice(int id, int process_index,
       coords_(coords),
       core_on_chip_(core_on_chip) {
   debug_string_ =
-      absl::StrFormat("TPU_%i(host=%i,(%i,%i,%i,%i))", id_, process_index_,
+      abslx::StrFormat("TPU_%i(host=%i,(%i,%i,%i,%i))", id_, process_index_,
                       coords_[0], coords_[1], coords_[2], core_on_chip_);
-  to_string_ = absl::StrFormat(
+  to_string_ = abslx::StrFormat(
       "TpuDevice(id=%i, process_index=%i, coords=(%s), core_on_chip=%i)", id_,
-      process_index_, absl::StrJoin(coords_, ","), core_on_chip_);
+      process_index_, abslx::StrJoin(coords_, ","), core_on_chip_);
 }
 
-absl::string_view TpuDevice::DebugString() const { return debug_string_; }
+abslx::string_view TpuDevice::DebugString() const { return debug_string_; }
 
-absl::string_view TpuDevice::ToString() const { return to_string_; }
+abslx::string_view TpuDevice::ToString() const { return to_string_; }
 
 xla::StatusOr<std::vector<std::shared_ptr<xla::PjRtDevice>>>
 TpuDevice::GetTpuDevices(const tpu_driver::SystemInfo& system_info) {
@@ -162,7 +162,7 @@ StatusOr<DeviceAssignment> PyTpuClient::GetDefaultDeviceAssignment(
 }
 
 Status PyTpuClient::CheckDeviceId(int device_id,
-                                  absl::string_view caller_name) {
+                                  abslx::string_view caller_name) {
   if (device_id < 0 || device_id >= device_count()) {
     return InvalidArgument("%s got bad device_id: %d (num_devices=%d).",
                            caller_name, device_id, device_count());
@@ -239,7 +239,7 @@ StatusOr<std::unique_ptr<PyTpuBuffer>> PyTpuBuffer::FromLiterals(
 
 /* static */
 StatusOr<std::unique_ptr<PyTpuBuffer>> PyTpuBuffer::MakeTuple(
-    absl::Span<PyTpuBuffer* const> buffers, std::shared_ptr<PyTpuClient> client,
+    abslx::Span<PyTpuBuffer* const> buffers, std::shared_ptr<PyTpuClient> client,
     std::shared_ptr<PjRtDevice> device) {
   std::vector<Shape> child_shapes;
   std::vector<std::shared_ptr<TpuSharedBuffer>> child_device_buffers;
@@ -284,7 +284,7 @@ PyTpuBuffer::PyTpuBuffer(
       child_buffers_(std::move(child_buffers)) {}
 
 void PyTpuBuffer::Delete() {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   device_buffer_ = nullptr;
   child_buffers_.clear();
   host_value_ = nullptr;
@@ -295,7 +295,7 @@ Status PyTpuBuffer::CopyToHostAsync() {
   std::shared_ptr<HostValue> host_value = std::make_shared<HostValue>();
 
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     if (!device_buffer_) {
       return InvalidArgument("CopyToHostAsync() called on invalid buffer.");
     }
@@ -341,7 +341,7 @@ Status PyTpuBuffer::CopyToHostAsync() {
                    status.error_message());
       }
 
-      absl::MutexLock m(&host_value->mutex);
+      abslx::MutexLock m(&host_value->mutex);
       --host_value->pending_ops;
       if (host_value->pending_ops == 0) {
         VLOG(1) << "Host value done: " << host_value->status;
@@ -369,7 +369,7 @@ StatusOr<std::shared_ptr<Literal>> PyTpuBuffer::ToLiteral() {
 }
 
 std::shared_ptr<TpuSharedBuffer> PyTpuBuffer::DeviceBuffer() const {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   return device_buffer_;
 }
 
@@ -386,7 +386,7 @@ PyTpuBuffer::DestructureTuple() {
     return InvalidArgument("Attempted to destructure a deleted buffer.");
   }
 
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   int num_children = ShapeUtil::TupleElementCount(on_host_shape_);
   std::vector<std::unique_ptr<PyTpuBuffer>> results;
   results.reserve(num_children);
@@ -553,8 +553,8 @@ PyTpuExecutable::PyTpuExecutable(
 }
 
 PyTpuExecutable::ExecuteResult PyTpuExecutable::ExecuteHelper(
-    absl::Span<const std::vector<PyTpuBuffer*>> maybe_tupled_args,
-    absl::Span<PyTpuBuffer* const> this_core_arguments, int replica,
+    abslx::Span<const std::vector<PyTpuBuffer*>> maybe_tupled_args,
+    abslx::Span<PyTpuBuffer* const> this_core_arguments, int replica,
     int partition, const RunId& run_id) {
   const int device_id = device_assignment_(replica, partition);
   std::shared_ptr<PjRtDevice> device = LookupDevice(*client_, device_id);
@@ -601,17 +601,17 @@ PyTpuExecutable::ExecuteResult PyTpuExecutable::ExecuteHelper(
 }
 
 // Delay before warning about a slow execute call.
-static const absl::Duration kWarnExecutionDelay = absl::Seconds(10);
+static const abslx::Duration kWarnExecutionDelay = abslx::Seconds(10);
 
 // Delay before terminating a stalled execute call.
-static const absl::Duration kMaxExecutionDelay = absl::Minutes(60);
+static const abslx::Duration kMaxExecutionDelay = abslx::Minutes(60);
 
 Status WaitForExecuteEvent(tpu_driver::Event* event) {
   std::optional<Status> opt_status;
-  auto start_time = absl::Now();
+  auto start_time = abslx::Now();
 
   while (!opt_status.has_value() &&
-         absl::Now() - start_time < kMaxExecutionDelay) {
+         abslx::Now() - start_time < kMaxExecutionDelay) {
     opt_status = event->AwaitWithTimeout(kWarnExecutionDelay);
     if (!opt_status.has_value()) {
       LOG(WARNING)
@@ -622,15 +622,15 @@ Status WaitForExecuteEvent(tpu_driver::Event* event) {
 
   if (!opt_status.has_value()) {
     return tensorflow::errors::DeadlineExceeded(
-        absl::StrFormat("TPU program took more than %d seconds to complete.",
-                        absl::ToInt64Seconds(kMaxExecutionDelay)));
+        abslx::StrFormat("TPU program took more than %d seconds to complete.",
+                        abslx::ToInt64Seconds(kMaxExecutionDelay)));
   }
 
   return opt_status.value();
 }
 
 StatusOr<std::vector<std::unique_ptr<PyTpuBuffer>>> PyTpuExecutable::Execute(
-    absl::Span<PyTpuBuffer* const> argument_handles) {
+    abslx::Span<PyTpuBuffer* const> argument_handles) {
   if (num_replicas() != 1) {
     return InvalidArgument(
         "Attempted to execute computation with %d replicas using Execute().",
@@ -654,7 +654,7 @@ StatusOr<std::vector<std::unique_ptr<PyTpuBuffer>>> PyTpuExecutable::Execute(
                                                   argument_handles.end());
   }
   ExecuteResult result =
-      ExecuteHelper(absl::MakeSpan(&maybe_tupled_args, 1), maybe_tupled_args,
+      ExecuteHelper(abslx::MakeSpan(&maybe_tupled_args, 1), maybe_tupled_args,
                     /*replica=*/0, /*partition=*/0, RunId());
 
   Status status = WaitForExecuteEvent(result.on_execute_finished.get());
@@ -675,7 +675,7 @@ StatusOr<std::vector<std::unique_ptr<PyTpuBuffer>>> PyTpuExecutable::Execute(
 
 StatusOr<std::vector<std::vector<std::unique_ptr<PyTpuBuffer>>>>
 PyTpuExecutable::ExecuteOnLocalDevices(
-    absl::Span<const std::vector<PyTpuBuffer*>> argument_handles) {
+    abslx::Span<const std::vector<PyTpuBuffer*>> argument_handles) {
   tensorflow::profiler::TraceMe traceme(
       "PyTpuExecutable::ExecuteOnLocalDevices");
 
@@ -707,7 +707,7 @@ PyTpuExecutable::ExecuteOnLocalDevices(
     argument_handles = tupled_argument_pointers;
   }
 
-  absl::Mutex results_lock;
+  abslx::Mutex results_lock;
   std::vector<ExecuteResult> results(num_local_devices);
 
   auto* thread_pool = client_->GetThreadPool();
@@ -763,7 +763,7 @@ PyTpuExecutable::ExecuteOnLocalDevices(
 
 StatusOr<std::vector<std::vector<std::unique_ptr<PyTpuBuffer>>>>
 PyTpuExecutable::ExecuteShardedOnLocalDevices(
-    absl::Span<const std::vector<PyTpuBuffer*>> args) {
+    abslx::Span<const std::vector<PyTpuBuffer*>> args) {
   std::vector<std::vector<std::unique_ptr<PyTpuBuffer>>> output_buffers;
   TF_RET_CHECK(!args.empty());
   int num_computations = args.front().size();
@@ -773,7 +773,7 @@ PyTpuExecutable::ExecuteShardedOnLocalDevices(
           "Expected args to execute_sharded_on_local_devices to have %d "
           "shards, got: [%s]",
           num_computations,
-          absl::StrJoin(
+          abslx::StrJoin(
               args, ", ",
               [](std::string* out, const std::vector<PyTpuBuffer*>& arg) {
                 out->append(std::to_string(arg.size()));
@@ -783,7 +783,7 @@ PyTpuExecutable::ExecuteShardedOnLocalDevices(
   std::vector<std::vector<PyTpuBuffer*>> arg_buffers(num_computations);
   for (int computation = 0; computation < num_computations; ++computation) {
     arg_buffers[computation].resize(args.size());
-    absl::c_transform(
+    abslx::c_transform(
         args, arg_buffers[computation].begin(),
         [&](const std::vector<PyTpuBuffer*>& arg) { return arg[computation]; });
   }

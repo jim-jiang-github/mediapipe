@@ -72,7 +72,7 @@ class WholeFileReader : public ReaderBase {
     ReaderBaseState base_state;
     if (!ParseProtoUnlimited(&base_state, state)) {
       return errors::InvalidArgument("Could not parse state for ", name(), ": ",
-                                     absl::CEscape(state));
+                                     abslx::CEscape(state));
     }
     TF_RETURN_IF_ERROR(RestoreBaseState(base_state));
     return OkStatus();

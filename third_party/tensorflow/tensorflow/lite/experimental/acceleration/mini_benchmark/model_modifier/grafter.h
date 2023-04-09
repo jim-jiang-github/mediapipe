@@ -48,7 +48,7 @@ namespace acceleration {
 // - metadata are concatenated
 // - signature_defs are taken from the first model (as they refer to the main
 // subgraph).
-absl::Status CombineModels(flatbuffers::FlatBufferBuilder* fbb,
+abslx::Status CombineModels(flatbuffers::FlatBufferBuilder* fbb,
                            std::vector<const Model*> models,
                            std::vector<std::string> subgraph_names,
                            const reflection::Schema* schema);
@@ -62,23 +62,23 @@ class FlatbufferHelper {
   FlatbufferHelper(flatbuffers::FlatBufferBuilder* fbb,
                    const reflection::Schema* schema);
   template <typename T>
-  absl::Status CopyTableToVector(const std::string& name, const T* o,
+  abslx::Status CopyTableToVector(const std::string& name, const T* o,
                                  std::vector<flatbuffers::Offset<T>>* v) {
     auto copied = CopyTable(name, o);
     if (!copied.ok()) {
       return copied.status();
     }
     v->push_back(*copied);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   template <typename T>
-  absl::StatusOr<flatbuffers::Offset<T>> CopyTable(const std::string& name,
+  abslx::StatusOr<flatbuffers::Offset<T>> CopyTable(const std::string& name,
                                                    const T* o) {
     if (o == nullptr) return 0;
     const reflection::Object* def = FindObject(name);
     if (!def) {
-      return absl::NotFoundError(
-          absl::StrFormat("Type %s not found in schema", name));
+      return abslx::NotFoundError(
+          abslx::StrFormat("Type %s not found in schema", name));
     }
     // We want to use the general copying mechanisms that operate on
     // flatbuffers::Table pointers. Flatbuffer types are not directly

@@ -95,7 +95,7 @@ bool Shape::IsInteger() const {
     case PrimitiveType::U64:
       return true;
     case PrimitiveType::TUPLE:
-      return absl::c_any_of(tuple_shapes_,
+      return abslx::c_any_of(tuple_shapes_,
                             [](const Shape& s) { return s.IsInteger(); });
     default:
       return false;
@@ -110,7 +110,7 @@ bool Shape::is_static() const {
       }
     }
   }
-  return !absl::c_any_of(dynamic_dimensions_, [](bool b) { return b; });
+  return !abslx::c_any_of(dynamic_dimensions_, [](bool b) { return b; });
 }
 
 void Shape::DeleteDimension(int64_t dim_to_delete) {
@@ -138,7 +138,7 @@ void Shape::DeleteDimension(int64_t dim_to_delete) {
 bool Shape::Equal::operator()(const Shape& lhs, const Shape& rhs) {
   if (lhs.IsTuple()) {
     return rhs.IsTuple() &&
-           absl::c_equal(
+           abslx::c_equal(
                lhs.tuple_shapes(), rhs.tuple_shapes(),
                [=](const Shape& l, const Shape& r) { return (*this)(l, r); });
   } else if (!lhs.IsArray()) {
@@ -237,11 +237,11 @@ ProgramShapeProto ProgramShape::ToProto() const {
 std::string ProgramShape::ToString() const {
   std::vector<std::string> parameter_strings(parameters_size());
   for (int i = 0; i < parameters_size(); ++i) {
-    parameter_strings[i] = absl::StrCat(
+    parameter_strings[i] = abslx::StrCat(
         i < parameter_names_size() ? parameter_names(i) : "(unknown)", ": ",
         ShapeUtil::HumanString(parameters(i)));
   }
-  return absl::StrCat("(", absl::StrJoin(parameter_strings, ", "), ") -> ",
+  return abslx::StrCat("(", abslx::StrJoin(parameter_strings, ", "), ") -> ",
                       ShapeUtil::HumanString(result()));
 }
 

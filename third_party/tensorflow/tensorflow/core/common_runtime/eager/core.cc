@@ -172,7 +172,7 @@ Status EagerContext::RegisterFunction(AbstractFunction* f) {
 
 // TODO(b/152902651): Once we move many execute.cc functions into
 // eager_operation.cc we can avoid a circular dependency between them.
-Status EagerOperation::Execute(absl::Span<AbstractTensorHandle*> retvals,
+Status EagerOperation::Execute(abslx::Span<AbstractTensorHandle*> retvals,
                                int* num_retvals) {
   for (ImmediateExecutionTensorHandle* handle : inputs_) {
     if (TensorHandle::classof(handle)) {
@@ -181,7 +181,7 @@ Status EagerOperation::Execute(absl::Span<AbstractTensorHandle*> retvals,
   }
 
   // Run eager placement logic.
-  class Device* device = absl::get<class Device*>(Device());
+  class Device* device = abslx::get<class Device*>(Device());
   if (device == nullptr) {
     TF_RETURN_IF_ERROR(eager::MaybePinToResourceDevice(&device, *this));
   }

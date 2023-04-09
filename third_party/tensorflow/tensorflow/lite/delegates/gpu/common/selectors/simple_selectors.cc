@@ -89,16 +89,16 @@ void SelectAdd(const OperationDef& op_def, const std::vector<int>& channels,
   *ptr = std::make_unique<GPUOperation>(std::move(operation));
 }
 
-absl::Status SelectGather(const GatherAttributes& attr,
+abslx::Status SelectGather(const GatherAttributes& attr,
                           const OperationDef& op_def,
                           std::unique_ptr<GPUOperation>* ptr) {
   if (attr.axis != Axis::WIDTH) {
-    return absl::UnimplementedError(
+    return abslx::UnimplementedError(
         "No gather for this axis. Only Width axis supported.");
   }
   GPUOperation operation = CreateGather(op_def, attr);
   *ptr = std::make_unique<GPUOperation>(std::move(operation));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 std::unique_ptr<GPUOperation> SelectResampler(const OperationDef& op_def,
@@ -107,15 +107,15 @@ std::unique_ptr<GPUOperation> SelectResampler(const OperationDef& op_def,
   return std::make_unique<GPUOperation>(std::move(operation));
 }
 
-absl::Status SelectResize(const Resize2DAttributes& attr,
+abslx::Status SelectResize(const Resize2DAttributes& attr,
                           const OperationDef& op_def,
                           std::unique_ptr<GPUOperation>* ptr) {
   Resize operation = CreateResize(op_def, attr);
   *ptr = std::make_unique<Resize>(std::move(operation));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SelectConcat(const ConcatAttributes& attr,
+abslx::Status SelectConcat(const ConcatAttributes& attr,
                           const std::vector<int>& channels,
                           const OperationDef& op_def, const GpuInfo& gpu_info,
                           std::unique_ptr<GPUOperation>* ptr) {
@@ -123,7 +123,7 @@ absl::Status SelectConcat(const ConcatAttributes& attr,
     case Axis::CHANNELS: {
       GPUOperation operation = CreateConcatZ(op_def, channels, gpu_info);
       *ptr = std::make_unique<GPUOperation>(std::move(operation));
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case Axis::BATCH:
     case Axis::DEPTH:
@@ -131,10 +131,10 @@ absl::Status SelectConcat(const ConcatAttributes& attr,
     case Axis::WIDTH: {
       GPUOperation operation = CreateConcatXY(op_def, attr);
       *ptr = std::make_unique<GPUOperation>(std::move(operation));
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     default:
-      return absl::UnimplementedError("No concat for this axis.");
+      return abslx::UnimplementedError("No concat for this axis.");
   }
 }
 

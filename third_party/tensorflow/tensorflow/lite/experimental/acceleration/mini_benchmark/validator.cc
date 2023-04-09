@@ -275,7 +275,7 @@ MinibenchmarkStatus Validator::CreateInterpreter(int* delegate_error_out,
   // The logic is copy/pasted from benchmark_tflite_model.cc
   // TODO(b/232085640): Replace this logic with Subgraph::IsFullyDelegated()
   // after making that function public.
-  absl::flat_hash_set<int> checked_node_ids;
+  abslx::flat_hash_set<int> checked_node_ids;
   int num_delegated_kernels = 0;
   for (int i = 0; i < interpreter_->execution_plan().size(); ++i) {
     int node_id = interpreter_->execution_plan()[i];

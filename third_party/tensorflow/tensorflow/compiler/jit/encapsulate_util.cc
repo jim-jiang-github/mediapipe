@@ -149,7 +149,7 @@ Status PreprocessDataEdgesBetweenOutsideCompilations(
 
     // Find or create placeholder node.
     string new_name =
-        absl::StrCat(src->name(), "_oc_to_oc_placeholder_", src_output);
+        abslx::StrCat(src->name(), "_oc_to_oc_placeholder_", src_output);
     auto placeholder_index = std::make_pair(src->name(), src_output);
     auto iter = placeholders.find(placeholder_index);
     Node* placeholder_node;
@@ -241,7 +241,7 @@ Status PostprocessDataEdgesBetweenOutsideCompilations(
       NodeDef new_def = dst->def();
       int dst_input = data_edges[i].dst_input;
       *new_def.mutable_input(dst_input) =
-          absl::StrCat(original_node->name(), ":", node_src_output);
+          abslx::StrCat(original_node->name(), ":", node_src_output);
       TF_ASSIGN_OR_RETURN(Node * replace_node, ReplaceNode(g, dst, new_def));
 
       const Edge* edge_to_replace = nullptr;
@@ -341,11 +341,11 @@ Status PerformStaticShapeInferenceBeforeEncapsulation(Graph* g) {
   return OkStatus();
 }
 
-StatusOr<std::unique_ptr<absl::flat_hash_map<string, std::vector<string>>>>
+StatusOr<std::unique_ptr<abslx::flat_hash_map<string, std::vector<string>>>>
 OutsideCompilationClusterDependencies(
     const Graph* g, const string& outside_compilation_attr_name) {
   auto cluster_deps = std::make_unique<
-      absl::flat_hash_map<string, absl::flat_hash_set<string>>>();
+      abslx::flat_hash_map<string, abslx::flat_hash_set<string>>>();
 
   for (const Edge* e : g->edges()) {
     auto src_outside_compilation =
@@ -359,7 +359,7 @@ OutsideCompilationClusterDependencies(
       if (dst_deps_it == cluster_deps->end()) {
         cluster_deps->insert(std::make_pair(
             *dst_outside_compilation,
-            absl::flat_hash_set<string>({*src_outside_compilation})));
+            abslx::flat_hash_set<string>({*src_outside_compilation})));
       } else {
         dst_deps_it->second.insert(*src_outside_compilation);
       }
@@ -367,7 +367,7 @@ OutsideCompilationClusterDependencies(
   }
 
   auto cluster_deps_ordered =
-      std::make_unique<absl::flat_hash_map<string, std::vector<string>>>();
+      std::make_unique<abslx::flat_hash_map<string, std::vector<string>>>();
 
   for (auto it = cluster_deps->begin(); it != cluster_deps->end(); it++) {
     std::vector<string> ordered_deps(it->second.begin(), it->second.end());

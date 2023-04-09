@@ -225,7 +225,7 @@ bool ThinPointwiseFuser::IsNodeSupported(const GpuInfo& gpu_info,
       return false;
     }
     DepthwiseConvolution2DAttributes* dw_attr =
-        absl::any_cast<DepthwiseConvolution2DAttributes>(
+        abslx::any_cast<DepthwiseConvolution2DAttributes>(
             &node->operation.attributes);
     const auto dw_shape = dw_attr->weights.shape;
     bool good_dw = dw_shape.o == 1;
@@ -258,7 +258,7 @@ bool ThinPointwiseFuser::IsNodeSupported(const GpuInfo& gpu_info,
       return false;
     }
     Convolution2DAttributes* conv_attr =
-        absl::any_cast<Convolution2DAttributes>(&node->operation.attributes);
+        abslx::any_cast<Convolution2DAttributes>(&node->operation.attributes);
     const auto conv_shape = conv_attr->weights.shape;
     bool good_conv =
         conv_shape.w == 1 && conv_shape.h == 1 && conv_attr->dilations.w == 1 &&
@@ -319,20 +319,20 @@ void ThinPointwiseFuser::AddNode(const GpuInfo& gpu_info, Node* node) {
   auto op_type = OperationTypeFromString(node->operation.type);
   if (op_type == OperationType::RELU) {
     ReLUAttributes* attr =
-        absl::any_cast<ReLUAttributes>(&node->operation.attributes);
+        abslx::any_cast<ReLUAttributes>(&node->operation.attributes);
     AddReluNode(*attr);
   } else if (op_type == OperationType::PRELU) {
     PReLUAttributes* attr =
-        absl::any_cast<PReLUAttributes>(&node->operation.attributes);
+        abslx::any_cast<PReLUAttributes>(&node->operation.attributes);
     AddPreluNode(*attr);
   } else if (op_type == OperationType::DEPTHWISE_CONVOLUTION) {
     DepthwiseConvolution2DAttributes* attr =
-        absl::any_cast<DepthwiseConvolution2DAttributes>(
+        abslx::any_cast<DepthwiseConvolution2DAttributes>(
             &node->operation.attributes);
     AddDepthwiseConvNode(gpu_info, *attr);
   } else if (op_type == OperationType::CONVOLUTION_2D) {
     Convolution2DAttributes* attr =
-        absl::any_cast<Convolution2DAttributes>(&node->operation.attributes);
+        abslx::any_cast<Convolution2DAttributes>(&node->operation.attributes);
     AddConvNode(gpu_info, *attr);
   }
 }
@@ -434,7 +434,7 @@ void ThinPointwiseFuser::AddElementwiseNode(ElementwiseDescriptor&& op_desc) {
   auto status = args_.Merge(std::move(op_desc.args), "");
   for (int i = 0; i < outputs_.size(); ++i) {
     const std::string elementwise_new_code =
-        absl::StrReplaceAll(op_desc.code, {{"in_value", outputs_[i]},
+        abslx::StrReplaceAll(op_desc.code, {{"in_value", outputs_[i]},
                                            {"out_value", outputs_[i]},
                                            {"X_COORD", "X"},
                                            {"Y_COORD", "Y"},
@@ -570,22 +570,22 @@ Node* GetNextLinearNode(const GraphFloat32& graph, NodeId current_node) {
   return consumers[0];
 }
 
-absl::Status TryDepthwiseConvPlus1x1Conv(
+abslx::Status TryDepthwiseConvPlus1x1Conv(
     const GpuInfo& gpu_info, CalculationsPrecision precision,
     const GraphFloat32& graph, NodeId first_node_id,
     const std::map<ValueId, TensorDescriptor>& tensor_descriptors,
     std::set<NodeId>* consumed_nodes, GPUOperationsSubgraph* gpu_subgraph) {
   if (!(gpu_info.IsAdreno() || gpu_info.IsNvidia() || gpu_info.IsMali() ||
         gpu_info.IsApple() || gpu_info.IsAMD())) {
-    return absl::NotFoundError("DepthwiseConvPlus1x1Conv not suitable.");
+    return abslx::NotFoundError("DepthwiseConvPlus1x1Conv not suitable.");
   }
   if (gpu_info.IsMali() && gpu_info.mali_info.IsMidgard()) {
-    return absl::NotFoundError("DepthwiseConvPlus1x1Conv not suitable.");
+    return abslx::NotFoundError("DepthwiseConvPlus1x1Conv not suitable.");
   }
   auto* node = graph.GetNode(first_node_id);
   if (node == nullptr ||
       consumed_nodes->find(node->id) != consumed_nodes->end()) {
-    return absl::NotFoundError("DepthwiseConvPlus1x1Conv not suitable.");
+    return abslx::NotFoundError("DepthwiseConvPlus1x1Conv not suitable.");
   }
   auto dw_inputs = graph.FindInputs(node->id);
   auto dw_outputs = graph.FindOutputs(node->id);
@@ -604,11 +604,11 @@ absl::Status TryDepthwiseConvPlus1x1Conv(
   }
 
   if (!fuser.Finalize(gpu_info, graph, tensor_descriptors, gpu_subgraph)) {
-    return absl::NotFoundError("DepthwiseConvPlus1x1Conv not suitable.");
+    return abslx::NotFoundError("DepthwiseConvPlus1x1Conv not suitable.");
   }
   consumed_nodes->insert(fuser.GetFusedNodes().begin(),
                          fuser.GetFusedNodes().end());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

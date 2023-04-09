@@ -269,12 +269,12 @@ std::string PrintDotTestParam(
     const ::testing::TestParamInfo<DotTestParam>& test_param) {
   const DotTestParam& param = test_param.param;
   if (param.has_addend) {
-    return absl::StrCat(param.m, "x", param.k, "x", param.n, "_MajorToMinor",
+    return abslx::StrCat(param.m, "x", param.k, "x", param.n, "_MajorToMinor",
                         param.dot_lhs_row_major ? "T" : "F",
                         param.dot_rhs_row_major ? "T" : "F",
                         param.addend_row_major ? "T" : "F");
   } else {
-    return absl::StrCat(param.m, "x", param.k, "x", param.n, "_MajorToMinor",
+    return abslx::StrCat(param.m, "x", param.k, "x", param.n, "_MajorToMinor",
                         param.dot_lhs_row_major ? "T" : "F",
                         param.dot_rhs_row_major ? "T" : "F");
   }
@@ -289,13 +289,13 @@ class ParametricDotTest : public DotOperationTest,
   template <typename NativeT>
   void ComputeAndCompareR2WithError(XlaBuilder* builder,
                                     const Array2D<NativeT>& expected,
-                                    absl::Span<GlobalData* const> arguments);
+                                    abslx::Span<GlobalData* const> arguments);
 };
 
 template <typename NativeT>
 void ParametricDotTest::ComputeAndCompareR2WithError(
     XlaBuilder* builder, const Array2D<NativeT>& expected,
-    absl::Span<GlobalData* const> arguments) {
+    abslx::Span<GlobalData* const> arguments) {
   ErrorSpec error_spec(0.3, 3e-3);
   ComputeAndCompareR2(builder, expected, arguments, error_spec);
 }
@@ -303,7 +303,7 @@ void ParametricDotTest::ComputeAndCompareR2WithError(
 template <>
 void ParametricDotTest::ComputeAndCompareR2WithError<Eigen::half>(
     XlaBuilder* builder, const Array2D<Eigen::half>& expected,
-    absl::Span<GlobalData* const> arguments) {
+    abslx::Span<GlobalData* const> arguments) {
   ErrorSpec error_spec(0.3, 7e-3);
   ComputeAndCompareR2(builder, expected, arguments, error_spec);
 }
@@ -311,7 +311,7 @@ void ParametricDotTest::ComputeAndCompareR2WithError<Eigen::half>(
 template <>
 void ParametricDotTest::ComputeAndCompareR2WithError<int32_t>(
     XlaBuilder* builder, const Array2D<int32_t>& expected,
-    absl::Span<GlobalData* const> arguments) {
+    abslx::Span<GlobalData* const> arguments) {
   ComputeAndCompareR2(builder, expected, arguments);
 }
 
@@ -1330,7 +1330,7 @@ INSTANTIATE_TEST_SUITE_P(BatchDot, BatchDotTest,
 class DotOperationTextTest : public HloTestBase {};
 
 XLA_TEST_F(DotOperationTextTest, DotReorderedDotDims) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule ComplexDotMultipleNonContracting
 
@@ -1345,7 +1345,7 @@ ENTRY %test {
 }
 
 XLA_TEST_F(DotOperationTextTest, DotReorderedDotDimsAndMultipleContracting) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule ComplexDotMultipleNonContracting
 
@@ -1360,7 +1360,7 @@ ENTRY %test {
 }
 
 XLA_TEST_F(DotOperationTextTest, DotWithNoDnums) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule DotWithNoDnums
 
@@ -1375,7 +1375,7 @@ ENTRY %test {
 }
 
 XLA_TEST_F(DotOperationTextTest, Einsum) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule Einsum
 
@@ -1391,7 +1391,7 @@ ENTRY %test {
 
 XLA_TEST_F(DotOperationTextTest, CpuTiledDotEmitterCachingBug_1) {
   // Tests for a caching bug in the XLA CPU backend.
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule CpuTiledDotEmitterCachingBug
 
@@ -1412,7 +1412,7 @@ ENTRY main {
 
 XLA_TEST_F(DotOperationTextTest, CpuTiledDotEmitterCachingBug_2) {
   // Tests for a caching bug in the XLA CPU backend.
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule CpuTiledDotEmitterCachingBug
 
@@ -1436,7 +1436,7 @@ ENTRY main {
 }
 
 XLA_TEST_F(DotOperationTextTest, S32IotaDot) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule SmallIntegerDot
 
@@ -1451,7 +1451,7 @@ ENTRY SmallIntegerDot {
 }
 
 XLA_TEST_F(DotOperationTextTest, S32IotaSquaredDot) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule SmallIntegerDot
 
@@ -1470,7 +1470,7 @@ ENTRY SmallIntegerDot {
 }
 
 XLA_TEST_F(DotOperationTextTest, U16IotaDot) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule SmallIntegerDot
 
@@ -1486,7 +1486,7 @@ ENTRY SmallIntegerDot {
 }
 
 XLA_TEST_F(DotOperationTextTest, U16IotaSquaredDot) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule SmallIntegerDot
 
@@ -1505,7 +1505,7 @@ ENTRY SmallIntegerDot {
 }
 
 XLA_TEST_F(DotOperationTextTest, S16IotaDot) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule SmallIntegerDot
 
@@ -1520,7 +1520,7 @@ ENTRY SmallIntegerDot {
 }
 
 XLA_TEST_F(DotOperationTextTest, S16IotaSquaredDot) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule SmallIntegerDot
 
@@ -1539,7 +1539,7 @@ ENTRY SmallIntegerDot {
 }
 
 XLA_TEST_F(DotOperationTextTest, PREDDot) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule SmallIntegerDot
 
@@ -1554,7 +1554,7 @@ ENTRY SmallIntegerDot {
 }
 
 XLA_TEST_F(DotOperationTextTest, S8Dot) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule SmallIntegerDot
 
@@ -1569,7 +1569,7 @@ ENTRY SmallIntegerDot {
 }
 
 XLA_TEST_F(DotOperationTextTest, S32Dot) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule SmallIntegerDot
 
@@ -1584,7 +1584,7 @@ ENTRY SmallIntegerDot {
 }
 
 XLA_TEST_F(DotOperationTextTest, GpuTransposeOutput) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule TransposeOutput
 
@@ -1600,7 +1600,7 @@ ENTRY TransposeOutput {
 }
 
 XLA_TEST_F(DotOperationTextTest, MatrixVectorComplex) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule MatrixVectorComplex
 
@@ -1619,7 +1619,7 @@ ENTRY MatrixVectorComplex {
 }
 
 XLA_TEST_F(DotOperationTextTest, MatrixVectorBF16) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule MatrixVectorBF16
 
@@ -1639,7 +1639,7 @@ ENTRY MatrixVectorBF16 {
 // fusion where the dot had a batch dimension.  This isn't supported on the CPU
 // backend.
 XLA_TEST_F(DotOperationTextTest, FusedBatchDotRegressionTest) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
 HloModule jaxpr_computation__5.33
 
 jaxpr_computation__6.8 {
@@ -1790,7 +1790,7 @@ XLA_TEST_F(DotOperationTest, ReorderContractingDims_Multipass) {
 }
 
 XLA_TEST_F(DotOperationTextTest, WiderIntegralResultAccumulation) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule WiderIntegralAccumulation
 

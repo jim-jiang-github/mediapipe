@@ -103,7 +103,7 @@ double GetFlopMaxThroughputPerSM(const DeviceCapabilities& device_cap) {
          device_cap.clock_rate_in_ghz();
 }
 
-absl::string_view GpuModelName(const DeviceCapabilities& device_cap) {
+abslx::string_view GpuModelName(const DeviceCapabilities& device_cap) {
   if (device_cap.device_vendor() == kDeviceVendorNvidia) {
     switch (device_cap.compute_capability().major()) {
       case 2:
@@ -142,10 +142,10 @@ absl::string_view GpuModelName(const DeviceCapabilities& device_cap) {
   }
 }
 
-HardwareType ParseHardwareType(absl::string_view device_type) {
-  if (absl::StrContains(device_type, "GPU")) return HardwareType::GPU;
+HardwareType ParseHardwareType(abslx::string_view device_type) {
+  if (abslx::StrContains(device_type, "GPU")) return HardwareType::GPU;
   if (device_type == "CPU") return HardwareType::CPU_ONLY;
-  if (absl::StrContains(device_type, "TPU")) return HardwareType::TPU;
+  if (abslx::StrContains(device_type, "TPU")) return HardwareType::TPU;
   return HardwareType::UNKNOWN_HARDWARE;
 }
 

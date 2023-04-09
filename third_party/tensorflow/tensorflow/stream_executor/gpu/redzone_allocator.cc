@@ -66,7 +66,7 @@ port::StatusOr<DeviceMemory<uint8>> RedzoneAllocator::AllocateBytes(
   if (byte_size > GetMemoryLimitInBytes()) {
     return port::Status(
         port::error::RESOURCE_EXHAUSTED,
-        absl::StrFormat(
+        abslx::StrFormat(
             "Allocating %d bytes exceeds the memory limit of %d bytes.",
             byte_size, GetMemoryLimitInBytes()));
   }
@@ -180,9 +180,9 @@ using ComparisonKernelT =
 // Slower, but gives a more useful error message.
 static port::StatusOr<RedzoneCheckStatus> CheckRedzoneHost(
     DeviceMemoryBase redzone, DeviceMemoryBase user_allocation,
-    absl::string_view name, Stream* stream, uint8 redzone_pattern) {
+    abslx::string_view name, Stream* stream, uint8 redzone_pattern) {
   uint64_t size = redzone.size();
-  auto redzone_data = absl::make_unique<uint8[]>(size);
+  auto redzone_data = abslx::make_unique<uint8[]>(size);
   TF_RETURN_IF_ERROR(stream->ThenMemcpy(redzone_data.get(), redzone, size)
                          .BlockHostUntilDone());
 
@@ -237,7 +237,7 @@ static port::Status RunRedzoneChecker(
 static port::Status ReinitializeRedzone(Stream* stream,
                                         DeviceMemoryBase redzone,
                                         uint8 redzone_pattern) {
-  absl::FixedArray<uint8> redzone_array(redzone.size());
+  abslx::FixedArray<uint8> redzone_array(redzone.size());
   redzone_array.fill(redzone_pattern);
   stream->ThenMemcpy(&redzone, redzone_array.data(), redzone.size());
   TF_RETURN_IF_ERROR(stream->BlockHostUntilDone());
@@ -302,15 +302,15 @@ static port::StatusOr<RedzoneCheckStatus> CheckRedzonesForBuffer(
 port::StatusOr<RedzoneCheckStatus> RedzoneAllocator::CheckRedzones() const {
   StreamExecutor* executor = stream_->parent();
 
-  absl::Span<const uint8> compiled_ptx = {};
-  port::StatusOr<absl::Span<const uint8>> compiled_ptx_or =
+  abslx::Span<const uint8> compiled_ptx = {};
+  port::StatusOr<abslx::Span<const uint8>> compiled_ptx_or =
       CompileGpuAsmOrGetCached(executor->device_ordinal(), redzone_checker_ptx,
                                gpu_compilation_opts_);
   if (compiled_ptx_or.ok()) {
     compiled_ptx = compiled_ptx_or.ValueOrDie();
   } else {
-    static absl::once_flag ptxas_not_found_logged;
-    absl::call_once(ptxas_not_found_logged, [&]() {
+    static abslx::once_flag ptxas_not_found_logged;
+    abslx::call_once(ptxas_not_found_logged, [&]() {
       LOG(WARNING) << compiled_ptx_or.status().ToString()
                    << "\nRelying on driver to perform ptx compilation. "
                    << "\nModify $PATH to customize ptxas location."
@@ -351,7 +351,7 @@ port::StatusOr<RedzoneCheckStatus> RedzoneAllocator::CheckRedzones() const {
 }
 
 std::string RedzoneCheckStatus::RedzoneFailureMsg() const {
-  return absl::StrFormat(
+  return abslx::StrFormat(
       "Redzone mismatch in %s redzone of buffer %p at offset %d; "
       "expected %08x but was %08x.",
       buffer_name, user_buffer_address, offset, expected_value, actual_value);

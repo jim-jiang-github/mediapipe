@@ -49,7 +49,7 @@ std::string SanitizeConstantName(const HloInstruction& instr) {
   return SanitizeConstantName(instr.name());
 }
 
-std::string SanitizeConstantName(absl::string_view name) {
+std::string SanitizeConstantName(abslx::string_view name) {
   std::string instr_name(name);
   // Replace characters which would require the identifier to be quoted and
   // would therefore crash the LLVM PTX backend.
@@ -63,11 +63,11 @@ std::string ConstantHloToGlobalName(const HloInstruction& instr) {
   return ConstantNameToGlobalName(instr.name());
 }
 
-std::string ConstantNameToGlobalName(absl::string_view name) {
+std::string ConstantNameToGlobalName(abslx::string_view name) {
   // Check that names are sanitized and stored in the HLO instructions
   // before constant buffer allocation.
   DCHECK_EQ(name, SanitizeConstantName(name));
-  return absl::StrCat("buffer_for_", name);
+  return abslx::StrCat("buffer_for_", name);
 }
 
 std::string ConstantBufferAllocationToGlobalName(

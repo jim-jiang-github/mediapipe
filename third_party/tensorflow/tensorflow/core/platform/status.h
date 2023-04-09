@@ -81,7 +81,7 @@ class Status {
 
   /// \brief Create a status with the specified error code and msg as a
   /// human-readable string containing more detailed information.
-  Status(tensorflow::error::Code code, absl::string_view msg,
+  Status(tensorflow::error::Code code, abslx::string_view msg,
          SourceLocation loc = SourceLocation::current());
 
   /// Copy the specified status.
@@ -136,7 +136,7 @@ class Status {
   void IgnoreError() const;
 
   //----------------------------------------------------------------------------
-  // Payload Management APIs (Cloned from absl::Status)
+  // Payload Management APIs (Cloned from abslx::Status)
   //----------------------------------------------------------------------------
   // A payload may be attached to a status to provide additional context to an
   // error that may not be satisfied by an existing `tensorflow::error::Code`.
@@ -149,7 +149,7 @@ class Status {
   //
   // A payload consists of a [key,value] pair, where the key is a string
   // referring to a unique "type URL" and the value is an object of type
-  // `absl::Cord` to hold the contextual data.
+  // `abslx::Cord` to hold the contextual data.
   //
   // The "type URL" should be unique and follow the format of a URL
   // (https://en.wikipedia.org/wiki/URL) and, ideally, provide some
@@ -162,28 +162,28 @@ class Status {
   // C++ type if they want to deserialize the payload and read it effectively.
   //
   // To attach a payload to a status object, call `Status::SetPayload()`,
-  // passing it the type URL and an `absl::Cord` of associated data. Similarly,
+  // passing it the type URL and an `abslx::Cord` of associated data. Similarly,
   // to extract the payload from a status, call `Status::GetPayload()`. You
   // may attach multiple payloads (with differing type URLs) to any given
   // status object, provided that the status is currently exhibiting an error
   // code (i.e. is not OK).
-  // TODO(b/197552541): Use absl::Cord for payload value type.
+  // TODO(b/197552541): Use abslx::Cord for payload value type.
 
-  // The Payload-related APIs are cloned from absl::Status.
+  // The Payload-related APIs are cloned from abslx::Status.
   //
   // Returns the payload of a status given its unique `type_url` key, if
   // present.
-  absl::optional<absl::Cord> GetPayload(absl::string_view type_url) const;
+  abslx::optional<abslx::Cord> GetPayload(abslx::string_view type_url) const;
 
   // Sets the payload for a non-ok status using a `type_url` key, overwriting
   // any existing payload for that `type_url`.
   //
   // This function does nothing if the Status is ok.
-  void SetPayload(absl::string_view type_url, absl::string_view payload);
+  void SetPayload(abslx::string_view type_url, abslx::string_view payload);
 
   // Erases the payload corresponding to the `type_url` key.  Returns `true` if
   // the payload was present.
-  bool ErasePayload(absl::string_view type_url);
+  bool ErasePayload(abslx::string_view type_url);
 
   // Iterates over the stored payloads and calls the
   // `visitor(type_key, payload)` callable for each one.
@@ -192,13 +192,13 @@ class Status {
   // any time and any mutation on the same Status object during visitation is
   // forbidden and could result in undefined behavior.
   void ForEachPayload(
-      const std::function<void(absl::string_view, absl::string_view)>& visitor)
+      const std::function<void(abslx::string_view, abslx::string_view)>& visitor)
       const;
 
   void SetStackTrace(std::vector<StackFrame>);
   std::vector<StackFrame> GetStackTrace() const;
 
-  absl::Span<const SourceLocation> GetSourceLocations() const;
+  abslx::Span<const SourceLocation> GetSourceLocations() const;
 
  private:
   void MaybeAddSourceLocation(SourceLocation loc);
@@ -209,7 +209,7 @@ class Status {
     tensorflow::error::Code code;
     std::string msg;
     std::unordered_map<std::string, std::string> payloads;
-    absl::InlinedVector<SourceLocation, 4> source_locations;
+    abslx::InlinedVector<SourceLocation, 4> source_locations;
   };
 
   // OK status has a `NULL` state_.  Otherwise, `state_` points to
@@ -283,7 +283,7 @@ class StatusGroup {
       return a.ToString() > b.ToString();
     }
   };
-  // Using std::set instead of absl::btree_set to keep size for certain
+  // Using std::set instead of abslx::btree_set to keep size for certain
   // dependent libraries under the limit.
   std::set<Status, CompareStatus> derived_;
   std::set<Status, CompareStatus> non_derived_;

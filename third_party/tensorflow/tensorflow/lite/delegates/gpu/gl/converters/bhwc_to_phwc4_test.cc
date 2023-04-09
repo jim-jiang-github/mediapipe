@@ -41,13 +41,13 @@ inline std::vector<float> GenerateFloats(float multiplier, int size) {
   return v;
 }
 
-absl::Status RunTest(const BHWC& shape) {
+abslx::Status RunTest(const BHWC& shape) {
   // Create random input and calculate expected output for it.
   std::vector<float> input = GenerateFloats(0.01, shape.DimensionsProduct());
   std::vector<float> output(GetElementsSizeForPHWC4(shape), 0);
   RETURN_IF_ERROR(
-      ConvertToPHWC4(absl::MakeConstSpan(input.data(), input.size()), shape,
-                     absl::MakeSpan(output.data(), output.size())));
+      ConvertToPHWC4(abslx::MakeConstSpan(input.data(), input.size()), shape,
+                     abslx::MakeSpan(output.data(), output.size())));
 
   std::unique_ptr<EglEnvironment> env;
   RETURN_IF_ERROR(EglEnvironment::NewEglEnvironment(&env));
@@ -55,7 +55,7 @@ absl::Status RunTest(const BHWC& shape) {
   // Create input and output buffers
   GlBuffer input_buffer;
   RETURN_IF_ERROR(CreateReadOnlyShaderStorageBuffer(
-      absl::MakeConstSpan(input.data(), input.size()), &input_buffer));
+      abslx::MakeConstSpan(input.data(), input.size()), &input_buffer));
 
   GlBuffer output_buffer;
   RETURN_IF_ERROR(CreateReadWriteShaderStorageBuffer<float>(
@@ -69,11 +69,11 @@ absl::Status RunTest(const BHWC& shape) {
 
   std::vector<float> converted_output(output.size(), 0);
   RETURN_IF_ERROR(output_buffer.Read(
-      absl::MakeSpan(converted_output.data(), converted_output.size())));
+      abslx::MakeSpan(converted_output.data(), converted_output.size())));
   if (output != converted_output) {
-    return absl::InternalError("Outputs don't match");
+    return abslx::InternalError("Outputs don't match");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 TEST(HwcToPhwc4, Smoke) {

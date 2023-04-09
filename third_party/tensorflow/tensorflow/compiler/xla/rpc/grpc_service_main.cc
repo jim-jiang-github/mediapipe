@@ -57,7 +57,7 @@ int RealMain(int argc, char** argv) {
 
   ::grpc::ServerBuilder builder;
   std::string server_address(
-      absl::StrFormat("%s:%d", any_address ? "[::]" : "localhost", port));
+      abslx::StrFormat("%s:%d", any_address ? "[::]" : "localhost", port));
 
   builder.SetMaxReceiveMessageSize(INT_MAX);
   builder.AddListeningPort(server_address, ::grpc::InsecureServerCredentials());

@@ -200,7 +200,7 @@ llvm::Value* IrFunction::GetDynamicLoopBound(const int64_t offset) {
 }
 
 llvm::Value* EncodeArrayFunctionArguments(
-    absl::Span<llvm::Value* const> arguments, absl::string_view name,
+    abslx::Span<llvm::Value* const> arguments, abslx::string_view name,
     llvm::IRBuilder<>* b) {
   llvm::Value* arguments_buffer;
   llvm::Type* int8ptr_ty = b->getInt8PtrTy();
@@ -209,12 +209,12 @@ llvm::Value* EncodeArrayFunctionArguments(
   } else {
     arguments_buffer = llvm_ir::EmitAllocaAtFunctionEntryWithCount(
         int8ptr_ty, b->getInt32(arguments.size()),
-        absl::StrCat(name, "_parameter_addresses"), b);
+        abslx::StrCat(name, "_parameter_addresses"), b);
 
     for (size_t i = 0; i < arguments.size(); i++) {
       llvm::Value* parameter_as_i8ptr = b->CreateBitCast(
           arguments[i], b->getInt8PtrTy(),
-          absl::StrCat(name, "_parameter_", i, "_address_as_i8ptr"));
+          abslx::StrCat(name, "_parameter_", i, "_address_as_i8ptr"));
       llvm::Value* slot_in_param_addresses =
           b->CreateInBoundsGEP(int8ptr_ty, arguments_buffer, b->getInt64(i));
       b->CreateStore(parameter_as_i8ptr, slot_in_param_addresses);
@@ -228,8 +228,8 @@ llvm::Value* EncodeArrayFunctionArguments(
 // Returns an array of compute function call arguments (including parameter
 // address buffer).
 std::vector<llvm::Value*> GetArrayFunctionCallArguments(
-    absl::Span<llvm::Value* const> parameter_addresses, llvm::IRBuilder<>* b,
-    absl::string_view name, llvm::Value* return_value_buffer,
+    abslx::Span<llvm::Value* const> parameter_addresses, llvm::IRBuilder<>* b,
+    abslx::string_view name, llvm::Value* return_value_buffer,
     llvm::Value* exec_run_options_arg, llvm::Value* buffer_table_arg,
     llvm::Value* status_arg, llvm::Value* profile_counters_arg) {
   llvm::Value* parameter_addresses_buffer =
@@ -333,7 +333,7 @@ Status EmitCallToParallelForkJoin(
       /*Linkage=*/llvm::GlobalValue::PrivateLinkage,
       /*Initializer=*/partitions_array,
       /*Name=*/
-      absl::StrCat(name, "_parallel_dimension_partitions"));
+      abslx::StrCat(name, "_parallel_dimension_partitions"));
 
   // Add argument specifying parallel dimension partitions.
   fork_join_arguments.push_back(

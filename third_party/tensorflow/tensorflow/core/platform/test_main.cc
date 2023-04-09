@@ -30,11 +30,11 @@ GTEST_API_ int main(int argc, char** argv) {
   tensorflow::testing::InstallStacktraceHandler();
 
   for (int i = 1; i < argc; i++) {
-    if (absl::StartsWith(argv[i], "--benchmark_filter=")) {
+    if (abslx::StartsWith(argv[i], "--benchmark_filter=")) {
       ::benchmark::Initialize(&argc, argv);
 
       // XXX: Must be called after benchmark's init because
-      // InitGoogleTest eventually calls absl::ParseCommandLine() which would
+      // InitGoogleTest eventually calls abslx::ParseCommandLine() which would
       // complain that benchmark_filter flag is not known because that flag is
       // defined by the benchmark library via its own command-line flag
       // facility, which is not known to absl flags.

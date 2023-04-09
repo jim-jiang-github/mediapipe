@@ -34,9 +34,9 @@ class CLArguments : public ArgumentsBinder {
  public:
   CLArguments() = default;
 
-  absl::Status Init(const GpuInfo& gpu_info,
+  abslx::Status Init(const GpuInfo& gpu_info,
                     CLContext* context, Arguments* args, std::string* code);
-  absl::Status Init(const GpuInfo& gpu_info, Arguments* args,
+  abslx::Status Init(const GpuInfo& gpu_info, Arguments* args,
                     CLContext* context);
 
   // Move only
@@ -45,16 +45,16 @@ class CLArguments : public ArgumentsBinder {
   CLArguments(const CLArguments&) = delete;
   CLArguments& operator=(const CLArguments&) = delete;
 
-  absl::Status SetInt(const std::string& name, int value) override;
-  absl::Status SetFloat(const std::string& name, float value) override;
-  absl::Status SetHalf(const std::string& name, half value) override;
-  absl::Status SetObjectRef(const std::string& name, const GPUObject* object);
+  abslx::Status SetInt(const std::string& name, int value) override;
+  abslx::Status SetFloat(const std::string& name, float value) override;
+  abslx::Status SetHalf(const std::string& name, half value) override;
+  abslx::Status SetObjectRef(const std::string& name, const GPUObject* object);
 
-  absl::Status Bind(cl_kernel kernel, int offset = 0);
+  abslx::Status Bind(cl_kernel kernel, int offset = 0);
 
  private:
-  absl::Status AllocateObjects(const Arguments& args, CLContext* context);
-  absl::Status AddObjectArgs(const GpuInfo& gpu_info, const Arguments& args);
+  abslx::Status AllocateObjects(const Arguments& args, CLContext* context);
+  abslx::Status AddObjectArgs(const GpuInfo& gpu_info, const Arguments& args);
 
   void CopyArguments(const Arguments& args, bool use_f32_for_halfs);
   void RenameArgumentsInCode(std::string* code);
@@ -70,16 +70,16 @@ class CLArguments : public ArgumentsBinder {
   void AddCustomMemory(const std::string& name,
                        const GPUCustomMemoryDescriptor& desc);
   void AddGPUResources(const std::string& name, const GPUResources& resources);
-  absl::Status SetObjectsResources(const Arguments& args);
-  absl::Status SetGPUResources(const std::string& name,
+  abslx::Status SetObjectsResources(const Arguments& args);
+  abslx::Status SetGPUResources(const std::string& name,
                                const GPUResourcesWithValue& resources);
 
-  absl::Status SetImage2D(const std::string& name, cl_mem memory);
-  absl::Status SetBuffer(const std::string& name, cl_mem memory);
-  absl::Status SetImage2DArray(const std::string& name, cl_mem memory);
-  absl::Status SetImage3D(const std::string& name, cl_mem memory);
-  absl::Status SetImageBuffer(const std::string& name, cl_mem memory);
-  absl::Status SetCustomMemory(const std::string& name, cl_mem memory);
+  abslx::Status SetImage2D(const std::string& name, cl_mem memory);
+  abslx::Status SetBuffer(const std::string& name, cl_mem memory);
+  abslx::Status SetImage2DArray(const std::string& name, cl_mem memory);
+  abslx::Status SetImage3D(const std::string& name, cl_mem memory);
+  abslx::Status SetImageBuffer(const std::string& name, cl_mem memory);
+  abslx::Status SetCustomMemory(const std::string& name, cl_mem memory);
 
   static constexpr char kArgsPrefix[] = "args.";
   struct IntValue {

@@ -41,14 +41,14 @@ using FailureSignalHandlerDeathTest = ::testing::TestWithParam<int>;
 
 // This function runs in a fork()ed process on most systems.
 void InstallHandlerAndRaise(int signo) {
-  absl::InstallFailureSignalHandler(absl::FailureSignalHandlerOptions());
+  abslx::InstallFailureSignalHandler(abslx::FailureSignalHandlerOptions());
   raise(signo);
 }
 
 TEST_P(FailureSignalHandlerDeathTest, AbslFailureSignal) {
   const int signo = GetParam();
-  std::string exit_regex = absl::StrCat(
-      "\\*\\*\\* ", absl::debugging_internal::FailureSignalToString(signo),
+  std::string exit_regex = abslx::StrCat(
+      "\\*\\*\\* ", abslx::debugging_internal::FailureSignalToString(signo),
       " received at time=");
 #ifndef _WIN32
   EXPECT_EXIT(InstallHandlerAndRaise(signo), testing::KilledBySignal(signo),
@@ -88,19 +88,19 @@ std::string GetTmpDir() {
 void InstallHandlerWithWriteToFileAndRaise(const char* file, int signo) {
   error_file = fopen(file, "w");
   ABSL_RAW_CHECK(error_file != nullptr, "Failed create error_file");
-  absl::FailureSignalHandlerOptions options;
+  abslx::FailureSignalHandlerOptions options;
   options.writerfn = WriteToErrorFile;
-  absl::InstallFailureSignalHandler(options);
+  abslx::InstallFailureSignalHandler(options);
   raise(signo);
 }
 
 TEST_P(FailureSignalHandlerDeathTest, AbslFatalSignalsWithWriterFn) {
   const int signo = GetParam();
   std::string tmp_dir = GetTmpDir();
-  std::string file = absl::StrCat(tmp_dir, "/signo_", signo);
+  std::string file = abslx::StrCat(tmp_dir, "/signo_", signo);
 
-  std::string exit_regex = absl::StrCat(
-      "\\*\\*\\* ", absl::debugging_internal::FailureSignalToString(signo),
+  std::string exit_regex = abslx::StrCat(
+      "\\*\\*\\* ", abslx::debugging_internal::FailureSignalToString(signo),
       " received at time=");
 #ifndef _WIN32
   EXPECT_EXIT(InstallHandlerWithWriteToFileAndRaise(file.c_str(), signo),
@@ -118,8 +118,8 @@ TEST_P(FailureSignalHandlerDeathTest, AbslFatalSignalsWithWriterFn) {
   std::getline(error_output, error_line);
   EXPECT_THAT(
       error_line,
-      StartsWith(absl::StrCat(
-          "*** ", absl::debugging_internal::FailureSignalToString(signo),
+      StartsWith(abslx::StrCat(
+          "*** ", abslx::debugging_internal::FailureSignalToString(signo),
           " received at ")));
 
   // On platforms where it is possible to get the current CPU, the
@@ -128,7 +128,7 @@ TEST_P(FailureSignalHandlerDeathTest, AbslFatalSignalsWithWriterFn) {
   EXPECT_THAT(error_line, testing::HasSubstr(" on cpu "));
 #endif
 
-  if (absl::debugging_internal::StackTraceWorksForTest()) {
+  if (abslx::debugging_internal::StackTraceWorksForTest()) {
     std::getline(error_output, error_line);
     EXPECT_THAT(error_line, StartsWith("PC: "));
   }
@@ -143,9 +143,9 @@ constexpr int kFailureSignals[] = {
 
 std::string SignalParamToString(const ::testing::TestParamInfo<int>& info) {
   std::string result =
-      absl::debugging_internal::FailureSignalToString(info.param);
+      abslx::debugging_internal::FailureSignalToString(info.param);
   if (result.empty()) {
-    result = absl::StrCat(info.param);
+    result = abslx::StrCat(info.param);
   }
   return result;
 }
@@ -159,7 +159,7 @@ INSTANTIATE_TEST_SUITE_P(AbslDeathTest, FailureSignalHandlerDeathTest,
 }  // namespace
 
 int main(int argc, char** argv) {
-  absl::InitializeSymbolizer(argv[0]);
+  abslx::InitializeSymbolizer(argv[0]);
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

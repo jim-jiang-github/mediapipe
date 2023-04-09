@@ -134,15 +134,15 @@ namespace {
 
 // Validate that an Einsum subscript contains exactly one or zero ellipsis; and
 // that periods (.) occur only within an ellipses (...).
-Status ValidateEinsumEllipsis(absl::string_view subscript,
+Status ValidateEinsumEllipsis(abslx::string_view subscript,
                               bool* found_ellipsis) {
-  const int num_periods = absl::c_count(subscript, '.');
+  const int num_periods = abslx::c_count(subscript, '.');
   if (num_periods != 0 && num_periods != 3) {
     return errors::InvalidArgument(
         "Expected at most one ellipsis (...), but found ", num_periods,
         " periods (.) in the input subscript: ", subscript);
   }
-  if (num_periods == 3 && !absl::StrContains(subscript, "...")) {
+  if (num_periods == 3 && !abslx::StrContains(subscript, "...")) {
     return errors::InvalidArgument(
         "Periods found outside of ellipsis in subscript: ", subscript);
   }
@@ -176,7 +176,7 @@ Status EinsumShape(shape_inference::InferenceContext* c) {
 
   // Validate input subscripts, build the label to dimension mapping and obtain
   // the broadcast shapes that map to ellipsis.
-  absl::flat_hash_map<char, DimensionHandle> label_to_dimension;
+  abslx::flat_hash_map<char, DimensionHandle> label_to_dimension;
   gtl::InlinedVector<ShapeHandle, 2> input_bcast_shapes(c->num_inputs());
   for (int i = 0, end = c->num_inputs(); i < end; ++i) {
     bool has_ellipsis = false;
@@ -549,7 +549,7 @@ Status DimensionsFromShape(ShapeHandle shape, TensorFormat format,
 Status ShapeFromDimensions(DimensionHandle batch_dim,
                            gtl::ArraySlice<DimensionHandle> spatial_dims,
                            DimensionHandle filter_dim, TensorFormat format,
-                           absl::optional<DimensionHandle> vect_size,
+                           abslx::optional<DimensionHandle> vect_size,
                            InferenceContext* context, ShapeHandle* shape) {
   const int32_t rank =
       GetTensorDimsFromSpatialDims(spatial_dims.size(), format);
@@ -646,7 +646,7 @@ Status Conv2DShapeImpl(shape_inference::InferenceContext* c,
   gtl::InlinedVector<DimensionHandle, 2> input_spatial_dims(2);
   TF_RETURN_IF_ERROR(DimensionsFromShape(
       conv_input_shape, data_format, &batch_size_dim,
-      absl::MakeSpan(input_spatial_dims), &input_depth_dim, c));
+      abslx::MakeSpan(input_spatial_dims), &input_depth_dim, c));
 
   DimensionHandle output_depth_dim = c->Dim(
       filter_shape, GetFilterDimIndex<num_spatial_dims>(filter_format, 'O'));
@@ -741,7 +741,7 @@ Status Conv2DShapeImpl(shape_inference::InferenceContext* c,
       c, input_spatial_dims[1], filter_cols_dim, dilation_cols, stride_cols,
       padding, pad_cols_before, pad_cols_after, &output_cols));
 
-  absl::optional<DimensionHandle> vect_size;
+  abslx::optional<DimensionHandle> vect_size;
   if (data_format == FORMAT_NCHW_VECT_C) {
     vect_size.emplace(c->Dim(conv_input_shape,
                              GetTensorInnerFeatureDimIndex(rank, data_format)));
@@ -905,7 +905,7 @@ Status Conv2DBackpropInputShape(shape_inference::InferenceContext* c) {
   gtl::InlinedVector<DimensionHandle, 2> output_grad_spatial_dims(2);
   TF_RETURN_IF_ERROR(DimensionsFromShape(
       output_grad_shape, data_format, &batch_size_dim,
-      absl::MakeSpan(output_grad_spatial_dims), &output_grad_depth_dim, c));
+      abslx::MakeSpan(output_grad_spatial_dims), &output_grad_depth_dim, c));
   DimensionHandle unused;
   TF_RETURN_IF_ERROR(
       c->Merge(output_grad_depth_dim, c->Dim(filter_shape, 3), &unused));
@@ -929,7 +929,7 @@ Status Conv2DBackpropInputShape(shape_inference::InferenceContext* c) {
     DimensionHandle specified_batch_size_dim;
     TF_RETURN_IF_ERROR(DimensionsFromShape(
         specified_input_grad_shape, data_format, &specified_batch_size_dim,
-        absl::MakeSpan(specified_input_grad_spatial_dims),
+        abslx::MakeSpan(specified_input_grad_spatial_dims),
         &input_grad_depth_dim, c));
     TF_RETURN_IF_ERROR(
         c->Merge(specified_batch_size_dim, batch_size_dim, &unused));
@@ -949,7 +949,7 @@ Status Conv2DBackpropInputShape(shape_inference::InferenceContext* c) {
   ShapeHandle input_grad_shape;
   TF_RETURN_IF_ERROR(ShapeFromDimensions(
       batch_size_dim, specified_input_grad_spatial_dims, input_grad_depth_dim,
-      data_format, /*vect_size=*/absl::nullopt, c, &input_grad_shape));
+      data_format, /*vect_size=*/abslx::nullopt, c, &input_grad_shape));
   c->set_output(0, input_grad_shape);
   return OkStatus();
 }
@@ -2515,7 +2515,7 @@ Status SparseReduceShapeFn(InferenceContext* c) {
     auto axes_vec = axes_tensor->flat<int32>();
 
     int64_t ndims = shape_vec.size();
-    absl::flat_hash_set<int64_t> axes;
+    abslx::flat_hash_set<int64_t> axes;
     if (ndims == 0)
       return errors::InvalidArgument(
           "Number of dims in shape tensor must not be 0");

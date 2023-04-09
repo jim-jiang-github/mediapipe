@@ -111,7 +111,7 @@ GpuExecutor::~GpuExecutor() {
 }
 bool GpuExecutor::UnloadModule(ModuleHandle module_handle) {
   const char* gpu_binary = reinterpret_cast<const char*>(module_handle.id());
-  absl::MutexLock lock{&in_memory_modules_mu_};
+  abslx::MutexLock lock{&in_memory_modules_mu_};
   return UnloadGpuBinary(gpu_binary);
 }
 
@@ -146,7 +146,7 @@ bool GpuExecutor::UnloadGpuBinary(const void* gpu_binary) {
 void GpuExecutor::UnloadKernel(const KernelBase* kernel) {
   VLOG(3) << "Unloading kernel " << kernel << " : " << kernel->name();
 
-  absl::MutexLock lock{&in_memory_modules_mu_};
+  abslx::MutexLock lock{&in_memory_modules_mu_};
   auto gpu_binary_it = kernel_to_gpu_binary_.find(kernel);
   if (kernel_to_gpu_binary_.end() == gpu_binary_it) {
     VLOG(3) << "Kernel " << kernel << " : " << kernel->name()
@@ -183,22 +183,22 @@ port::Status GpuExecutor::Init(int device_ordinal,
 }
 
 bool GpuExecutor::FindOnDiskForComputeCapability(
-    absl::string_view filename, absl::string_view canonical_suffix,
+    abslx::string_view filename, abslx::string_view canonical_suffix,
     string* found_filename) const {
   LOG(FATAL) << "Feature not supported on ROCM platform "
                 "(FindOnDiskForComputeCapability)";
   return false;
 }
 
-bool GpuExecutor::FindOnDiskForISAVersion(absl::string_view filename,
-                                          absl::string_view canonical_suffix,
+bool GpuExecutor::FindOnDiskForISAVersion(abslx::string_view filename,
+                                          abslx::string_view canonical_suffix,
                                           string* found_filename) const {
   if (version_ == 0) {
     return false;
   }
 
   string cc_specific =
-      absl::StrCat(filename, ".cc", version_, canonical_suffix);
+      abslx::StrCat(filename, ".cc", version_, canonical_suffix);
   if (port::FileExists(cc_specific).ok()) {
     VLOG(2) << "found AMDGPU ISA version-specific file, using that: "
             << cc_specific;
@@ -230,9 +230,9 @@ static string GetBinaryDir(bool strip_exe) {
   if (strip_exe) {
     // The exe is the last component of the path, so remove one component.
     string ret = exe_path;
-    std::vector<string> components = absl::StrSplit(exe_path, '/');
+    std::vector<string> components = abslx::StrSplit(exe_path, '/');
     components.pop_back();
-    return absl::StrJoin(components, "/");
+    return abslx::StrJoin(components, "/");
   }
   return exe_path;
 }
@@ -256,7 +256,7 @@ port::Status GpuExecutor::GetKernel(const MultiKernelLoaderSpec& spec,
     kernelname = &spec.cuda_cubin_in_memory().kernelname();
 
     const char* hsaco = spec.cuda_cubin_in_memory().bytes();
-    absl::MutexLock lock{&in_memory_modules_mu_};
+    abslx::MutexLock lock{&in_memory_modules_mu_};
     module = in_memory_modules_[hsaco];
 
     if (module == nullptr) {
@@ -308,7 +308,7 @@ port::Status GpuExecutor::Launch(Stream* stream, const ThreadDim& thread_dims,
   // whether we've done an occupancy check on this kernel before isn't free
   // (because we have to synchronize), so we only do this at -v 2+.
   if (VLOG_IS_ON(2)) {
-    absl::MutexLock lock(&launched_kernels_mu_);
+    abslx::MutexLock lock(&launched_kernels_mu_);
     if (!launched_kernels_.count(hipfunc)) {
       VlogOccupancyInfo(kernel, thread_dims, block_dims);
       // TODO(rspringer): Remove elements from launched_kernels_...if we ever
@@ -373,7 +373,7 @@ port::Status GpuExecutor::LoadModule(const MultiModuleLoaderSpec& spec,
   hipModule_t hip_module = nullptr;
   // TODO(ROCm): Need  generic term instead of cubin/cuda/ptx
   if (spec.has_cuda_cubin_in_memory()) {
-    absl::MutexLock lock{&in_memory_modules_mu_};
+    abslx::MutexLock lock{&in_memory_modules_mu_};
     TF_RETURN_IF_ERROR(LoadModuleFromHsaco(
         reinterpret_cast<const char*>(spec.cuda_cubin_in_memory().data()),
         &hip_module));
@@ -598,7 +598,7 @@ port::Status GpuExecutor::WaitForEvent(Stream* stream, Event* event) {
   } else {
     return port::Status{
         port::error::INTERNAL,
-        absl::StrFormat("error recording waiting for ROCM event on stream %p",
+        abslx::StrFormat("error recording waiting for ROCM event on stream %p",
                         stream)};
   }
 }
@@ -608,7 +608,7 @@ Event::Status GpuExecutor::PollForEventStatus(Event* event) {
 }
 
 bool GpuExecutor::AllocateStream(Stream* stream) {
-  absl::MutexLock l(&alive_gpu_streams_mu_);
+  abslx::MutexLock l(&alive_gpu_streams_mu_);
   bool out = AsGpuStream(stream)->Init();
   alive_gpu_streams_[stream->implementation()->GpuStreamHack()] = stream;
   return out;
@@ -616,7 +616,7 @@ bool GpuExecutor::AllocateStream(Stream* stream) {
 
 void GpuExecutor::DeallocateStream(Stream* stream) {
   GpuStream* rocm_stream = AsGpuStream(stream);
-  absl::MutexLock l(&alive_gpu_streams_mu_);
+  abslx::MutexLock l(&alive_gpu_streams_mu_);
   alive_gpu_streams_.erase(rocm_stream->GpuStreamHack());
   if (!rocm_stream->IsIdle()) {
     LOG(ERROR) << "Deallocating stream with pending work";
@@ -735,7 +735,7 @@ bool GpuExecutor::DeviceMemoryUsage(int64_t* free, int64_t* total) const {
 bool GpuExecutor::GetSymbol(const string& symbol_name,
                             ModuleHandle module_handle, void** mem,
                             size_t* bytes) {
-  absl::MutexLock lock{&in_memory_modules_mu_};
+  abslx::MutexLock lock{&in_memory_modules_mu_};
   if (static_cast<bool>(module_handle)) {
     auto it = gpu_binary_to_module_.find(module_handle.id());
     CHECK(it != gpu_binary_to_module_.end());
@@ -819,7 +819,7 @@ static int TryToReadNumaNode(const string& pci_bus_id, int device_ordinal) {
   }
 
   std::string filename =
-      absl::StrFormat("/sys/bus/pci/devices/%s/numa_node", pci_bus_id);
+      abslx::StrFormat("/sys/bus/pci/devices/%s/numa_node", pci_bus_id);
 
   // We have to use fopen/fread here so that the device properties can be
   // populated before InitGoogle procedure has been completed (at which point we
@@ -884,7 +884,7 @@ GpuExecutor::CreateDeviceDescription(int device_ordinal) {
   {
     int driver_version = 0;
     (void)GpuDriver::GetDriverVersion(&driver_version);
-    string augmented_driver_version = absl::StrFormat(
+    string augmented_driver_version = abslx::StrFormat(
         "%d (%s)", driver_version,
         rocm::DriverVersionStatusToString(Diagnostician::FindDsoVersion())
             .c_str());
@@ -895,7 +895,7 @@ GpuExecutor::CreateDeviceDescription(int device_ordinal) {
     string pci_bus_id = GpuDriver::GetPCIBusID(device);
 
     // Lower the hex characters to match sysfs.
-    pci_bus_id = absl::AsciiStrToLower(pci_bus_id);
+    pci_bus_id = abslx::AsciiStrToLower(pci_bus_id);
     builder.set_pci_bus_id(pci_bus_id);
 
     // Read the NUMA node corresponding to the PCI bus ID out of sysfs.
@@ -947,7 +947,7 @@ GpuExecutor::CreateDeviceDescription(int device_ordinal) {
   }
 
   builder.set_platform_version(
-      absl::StrCat("AMDGPU ISA version: ", gcn_arch_name));
+      abslx::StrCat("AMDGPU ISA version: ", gcn_arch_name));
 
   // TODO(leary) should be a way to query this from the driver, but this is
   // unlikely to change for us any time soon.

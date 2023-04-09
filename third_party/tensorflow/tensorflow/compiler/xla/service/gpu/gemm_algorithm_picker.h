@@ -34,12 +34,12 @@ class GemmAlgorithmPicker : public HloModulePass {
                       se::DeviceMemoryAllocator* allocator)
       : stream_exec_(stream_exec), allocator_(allocator) {}
 
-  absl::string_view name() const override { return "gemm-algorithm-picker"; }
+  abslx::string_view name() const override { return "gemm-algorithm-picker"; }
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   se::StreamExecutor* stream_exec_;

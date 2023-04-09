@@ -89,7 +89,7 @@ struct ResizeConvolutionDims {
   std::vector<int64_t> stride;  // S
 };
 ResizeConvolutionDims ComputeResizeConvolutionParameters(
-    absl::Span<const int64_t> in_size, absl::Span<const int64_t> out_size,
+    abslx::Span<const int64_t> in_size, abslx::Span<const int64_t> out_size,
     bool align_corners) {
   CHECK_EQ(in_size.size(), out_size.size());
   int num_spatial_dims = in_size.size();
@@ -180,7 +180,7 @@ const int64_t kMax2DKernelSize = 16;
 
 xla::XlaOp MakeGeneralResizeKernel(xla::XlaBuilder* builder,
                                    xla::PrimitiveType type,
-                                   absl::Span<const int64_t> kernel_size,
+                                   abslx::Span<const int64_t> kernel_size,
                                    int64_t channels, bool is_kernel_bilinear) {
   auto make_kernel_func =
       is_kernel_bilinear ? MakeBilinear1DKernel : MakeNearestNeighbor1DKernel;
@@ -198,7 +198,7 @@ xla::XlaOp MakeGeneralResizeKernel(xla::XlaBuilder* builder,
 
 xla::XlaOp MakeGeneralResizeKernelInDim(xla::XlaBuilder* builder,
                                         xla::PrimitiveType type,
-                                        absl::Span<const int64_t> kernel_size,
+                                        abslx::Span<const int64_t> kernel_size,
                                         int64_t channels, int64_t dim,
                                         bool is_kernel_bilinear) {
   auto make_kernel_func =
@@ -215,8 +215,8 @@ xla::XlaOp MakeGeneralResizeKernelInDim(xla::XlaBuilder* builder,
 xla::XlaOp BroadcastSpatialDimensions(xla::XlaBuilder* builder,
                                       const xla::XlaOp& input,
                                       int32_t spatial_dimensions_offset,
-                                      absl::Span<const int64_t> in_size,
-                                      absl::Span<const int64_t> out_size) {
+                                      abslx::Span<const int64_t> in_size,
+                                      abslx::Span<const int64_t> out_size) {
   // Add broadcasts to handle expanding from a size == 1 dimension to a
   // size > 1 dimension.
   auto broadcast_shape_or_status = builder->GetShape(input);
@@ -236,8 +236,8 @@ xla::XlaOp BroadcastSpatialDimensions(xla::XlaBuilder* builder,
 
 xla::XlaOp ResizeUsingDilationAndConvolution(
     xla::XlaBuilder* builder, const xla::XlaOp& input, xla::PrimitiveType type,
-    const int num_spatial_dims, absl::Span<const int64_t> in_size,
-    absl::Span<const int64_t> out_size, const int64_t channels,
+    const int num_spatial_dims, abslx::Span<const int64_t> in_size,
+    abslx::Span<const int64_t> out_size, const int64_t channels,
     const bool align_corners, bool is_kernel_bilinear) {
   // Picture for a 1x3 to 1x4 bilinear resize:
   // stride = 2, kernel size = 3
@@ -269,7 +269,7 @@ xla::XlaOp ResizeUsingDilationAndConvolution(
       kMax2DKernelSize * kMax2DKernelSize) {
     BroadcastOptimizationRemark(
         XlaOptimizationRemark::SLOW_IMAGE_RESIZE_DIMENSIONS,
-        absl::StrFormat("%dx%d", dims.kernel_size[0], dims.kernel_size[1]))
+        abslx::StrFormat("%dx%d", dims.kernel_size[0], dims.kernel_size[1]))
         .IgnoreError();
   }
 
@@ -382,8 +382,8 @@ xla::XlaOp ResizeUsingDilationAndConvolution(
 
 xla::XlaOp ResizeUsingDilationAndConvolutionGradOp(
     xla::XlaBuilder* builder, const xla::XlaOp& grad, xla::PrimitiveType type,
-    const int num_spatial_dims, absl::Span<const int64_t> in_size,
-    absl::Span<const int64_t> grad_size, const int64_t channels,
+    const int num_spatial_dims, abslx::Span<const int64_t> in_size,
+    abslx::Span<const int64_t> grad_size, const int64_t channels,
     const bool align_corners, bool is_kernel_bilinear) {
   ResizeConvolutionDims dims =
       ComputeResizeConvolutionParameters(in_size, grad_size, align_corners);
@@ -599,7 +599,7 @@ void GeneralCompile(XlaOpKernelContext* ctx, bool align_corners_,
                        2),
       xla::S32);
 
-  absl::InlinedVector<int64_t, 4> slize_sizes = {batch, h_span_size,
+  abslx::InlinedVector<int64_t, 4> slize_sizes = {batch, h_span_size,
                                                  w_span_size, channels};
   xla::GatherDimensionNumbers dimension_numbers;
   dimension_numbers.add_offset_dims(0);
@@ -662,7 +662,7 @@ void GeneralCompile(XlaOpKernelContext* ctx, bool align_corners_,
       xla::DotGeneral(w_weight, h_weight, xla::DotDimensionNumbers()), input,
       dot_dnum);
 
-  absl::InlinedVector<int64_t, 4> perm = {2, 0, 1, 3};
+  abslx::InlinedVector<int64_t, 4> perm = {2, 0, 1, 3};
   input = xla::Transpose(input, perm);
 
   if (!is_kernel_bilinear_ && original_input_type != input_type) {

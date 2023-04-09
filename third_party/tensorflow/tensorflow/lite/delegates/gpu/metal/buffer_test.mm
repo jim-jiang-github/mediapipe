@@ -40,7 +40,7 @@ using tflite::gpu::half;
   const std::vector<float> data = {1.0f, 2.0f, 3.0f, -4.0f, 5.1f};
   tflite::gpu::metal::Buffer buffer;
   XCTAssertTrue(tflite::gpu::metal::CreateBuffer(sizeof(float) * 5, nullptr, device, &buffer).ok());
-  XCTAssertTrue(buffer.WriteData(absl::MakeConstSpan(data.data(), data.size())).ok());
+  XCTAssertTrue(buffer.WriteData(abslx::MakeConstSpan(data.data(), data.size())).ok());
   std::vector<float> gpu_data;
   XCTAssertTrue(buffer.ReadData<float>(&gpu_data).ok());
 
@@ -57,7 +57,7 @@ using tflite::gpu::half;
   tflite::gpu::metal::Buffer buffer;
   XCTAssertTrue(tflite::gpu::metal::CreateBuffer(
       sizeof(tflite::gpu::half) * 5, nullptr, device, &buffer).ok());
-  XCTAssertTrue(buffer.WriteData(absl::MakeConstSpan(data.data(), data.size())).ok());
+  XCTAssertTrue(buffer.WriteData(abslx::MakeConstSpan(data.data(), data.size())).ok());
   std::vector<half> gpu_data;
   XCTAssertTrue(buffer.ReadData<half>(&gpu_data).ok());
 

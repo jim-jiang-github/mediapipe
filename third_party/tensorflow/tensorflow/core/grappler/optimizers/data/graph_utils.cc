@@ -369,7 +369,7 @@ Status GetFetchNode(const MutableGraphView& graph, const GrapplerItem& item,
   if (item.fetch.size() != 1) {
     return errors::InvalidArgument(
         "Expected only one fetch node but there were ", item.fetch.size(), ": ",
-        absl::StrJoin(item.fetch, ", "));
+        abslx::StrJoin(item.fetch, ", "));
   }
 
   *fetch_node = graph.GetNode(item.fetch.at(0));
@@ -425,18 +425,18 @@ bool CopyShapesAndTypesAttrs(const NodeDef& from, NodeDef* to_node) {
 }
 
 namespace {
-const auto* kSloppyAttrOps = new absl::flat_hash_set<string>{
+const auto* kSloppyAttrOps = new abslx::flat_hash_set<string>{
     "ParallelInterleaveDatasetV2",
     "ParallelMapDataset",
     "ParseExampleDataset",
 };
 
-const auto* kReplicateOnSplitAttrOps = new absl::flat_hash_set<string>{
+const auto* kReplicateOnSplitAttrOps = new abslx::flat_hash_set<string>{
     "TensorSliceDataset",
     "RangeDataset",
 };
 
-const auto* kDeterministicAttrOps = new absl::flat_hash_set<string>{
+const auto* kDeterministicAttrOps = new abslx::flat_hash_set<string>{
     "LegacyParallelInterleaveDatasetV2",
     "ParallelInterleaveDatasetV3",
     "ParallelInterleaveDatasetV4",

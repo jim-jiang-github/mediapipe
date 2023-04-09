@@ -32,17 +32,17 @@ class NoOpErrorCollector : public protobuf::io::ErrorCollector {
 };
 }  // namespace
 
-Status ConsumePrefix(absl::string_view str, absl::string_view prefix,
-                     absl::string_view* output) {
-  if (absl::StartsWith(str, prefix)) {
+Status ConsumePrefix(abslx::string_view str, abslx::string_view prefix,
+                     abslx::string_view* output) {
+  if (abslx::StartsWith(str, prefix)) {
     *output = str.substr(prefix.size());
     return OkStatus();
   }
   return errors::NotFound("No prefix \"", prefix, "\" in \"", str, "\"");
 }
 
-Status ParseTextProto(absl::string_view text_proto,
-                      absl::string_view prefix_to_strip,
+Status ParseTextProto(abslx::string_view text_proto,
+                      abslx::string_view prefix_to_strip,
                       protobuf::Message* parsed_proto) {
   protobuf::TextFormat::Parser parser;
   // Don't produce errors when attempting to parse text format as it would fail
@@ -50,7 +50,7 @@ Status ParseTextProto(absl::string_view text_proto,
   NoOpErrorCollector collector;
   parser.RecordErrorsTo(&collector);
   // Attempt to parse as text.
-  absl::string_view text_proto_without_prefix = text_proto;
+  abslx::string_view text_proto_without_prefix = text_proto;
   if (!prefix_to_strip.empty()) {
     TF_RETURN_IF_ERROR(
         ConsumePrefix(text_proto, prefix_to_strip, &text_proto_without_prefix));

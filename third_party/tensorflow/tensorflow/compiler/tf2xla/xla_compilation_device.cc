@@ -71,9 +71,9 @@ class XlaCompilationAllocator : public Allocator {
 XlaCompilationDevice::XlaCompilationDevice(const SessionOptions& options,
                                            DeviceType type)
     : LocalDevice(options, Device::BuildDeviceAttributes(
-                               absl::StrCat("/device:", type.type(), ":0"),
+                               abslx::StrCat("/device:", type.type(), ":0"),
                                type, Bytes(256 << 20), DeviceLocality(),
-                               absl::StrCat("device: XLA compilation device ",
+                               abslx::StrCat("device: XLA compilation device ",
                                             type.type()))),
       allocator_(new XlaCompilationAllocator()) {}
 

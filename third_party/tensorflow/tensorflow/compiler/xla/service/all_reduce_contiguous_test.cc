@@ -33,7 +33,7 @@ namespace op = xla::testing::opcode_matchers;
 using AllReduceContiguousTest = HloTestBase;
 
 TEST_F(AllReduceContiguousTest, Simple) {
-  const absl::string_view hlo_string = R"(
+  const abslx::string_view hlo_string = R"(
 HloModule module
 
 %add {

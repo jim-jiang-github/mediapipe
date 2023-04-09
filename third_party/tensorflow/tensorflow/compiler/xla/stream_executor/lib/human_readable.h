@@ -39,7 +39,7 @@ class HumanReadableNumBytes {
     // Special case for bytes.
     if (num_bytes < 1024LL) {
       // No fractions for bytes.
-      return absl::StrFormat("%s%dB", neg_str, num_bytes);
+      return abslx::StrFormat("%s%dB", neg_str, num_bytes);
     }
 
     static const char units[] = "KMGTPE";  // int64_t only goes up to E.
@@ -51,9 +51,9 @@ class HumanReadableNumBytes {
     }
 
     if (*unit == 'K') {
-      return absl::StrFormat("%s%.1f%c", neg_str, num_bytes / 1024.0, *unit);
+      return abslx::StrFormat("%s%.1f%c", neg_str, num_bytes / 1024.0, *unit);
     }
-    return absl::StrFormat("%s%.2f%c", neg_str, num_bytes / 1024.0, *unit);
+    return abslx::StrFormat("%s%.2f%c", neg_str, num_bytes / 1024.0, *unit);
   }
 
  private:

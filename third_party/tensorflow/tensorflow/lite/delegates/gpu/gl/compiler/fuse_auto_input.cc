@@ -35,11 +35,11 @@ namespace gl {
 namespace {
 
 std::pair<std::string, std::string> MakeValueReplacement(int n, int k) {
-  return {absl::StrCat("value_", n), absl::StrCat("value_", k)};
+  return {abslx::StrCat("value_", n), abslx::StrCat("value_", k)};
 }
 
 std::pair<std::string, std::string> MakeDataReplacement(int n, int k) {
-  return {absl::StrCat("input_data_", n), absl::StrCat("input_data_", k)};
+  return {abslx::StrCat("input_data_", n), abslx::StrCat("input_data_", k)};
 }
 
 }  // namespace
@@ -103,7 +103,7 @@ TransformResult FuseAutoInput::ApplyToNode(Node* node, GraphFloat32* graph) {
 
   // Skip fusions which will result in duplicate inputs, e.g. diamond shapes.
   {
-    absl::flat_hash_set<ValueId> all_inputs;
+    abslx::flat_hash_set<ValueId> all_inputs;
     for (const auto& node_to_fuse : nodes_to_fuse) {
       for (const auto& input : graph->FindInputs(node_to_fuse.first->id)) {
         if (all_inputs.find(input->id) != all_inputs.end()) {
@@ -192,7 +192,7 @@ TransformResult FuseAutoInput::ApplyToNode(Node* node, GraphFloat32* graph) {
       // Declare input values based on the input structure of the merged node.
       // This code copies what shader_codegen would do automatically.
       if (attr.code.input == IOStructure::AUTO) {
-        absl::StrAppend(&values, "  value_", value_index, " = $input_data_",
+        abslx::StrAppend(&values, "  value_", value_index, " = $input_data_",
                         input_num, "[gid.x, gid.y, gid.z]$;\n");
       }
 
@@ -204,16 +204,16 @@ TransformResult FuseAutoInput::ApplyToNode(Node* node, GraphFloat32* graph) {
 
     // Also rename all _h and _w parameters to the new names.
     for (auto& param : attr.code.parameters) {
-      param.name = absl::StrReplaceAll(param.name, replacements);
+      param.name = abslx::StrReplaceAll(param.name, replacements);
     }
     attr.code.source_code =
-        absl::StrReplaceAll(attr.code.source_code, replacements);
+        abslx::StrReplaceAll(attr.code.source_code, replacements);
 
     // Merge all objects, parameters and source code.
     if (!MergeCode(&attr, &node_attr).ok()) {
       return {TransformStatus::INVALID, "Unable to merge the code"};
     }
-    absl::StrAppend(&node_attr.code.source_code, "{\n", attr.code.source_code,
+    abslx::StrAppend(&node_attr.code.source_code, "{\n", attr.code.source_code,
                     "\n}");
 
     if (!operation_type.empty()) {
@@ -229,7 +229,7 @@ TransformResult FuseAutoInput::ApplyToNode(Node* node, GraphFloat32* graph) {
   // Add back all inputs that are used directly by the fused node.
   for (int i = 0; i < input_values.size(); i++) {
     if (node_code.input == IOStructure::AUTO) {
-      absl::StrAppend(&values, "  value_", input_values[i].second,
+      abslx::StrAppend(&values, "  value_", input_values[i].second,
                       " = $input_data_", input_num,
                       "[gid.x, gid.y, gid.z]$;\n");
     }
@@ -241,9 +241,9 @@ TransformResult FuseAutoInput::ApplyToNode(Node* node, GraphFloat32* graph) {
 
   node_code.input = IOStructure::ONLY_DEFINITIONS;
 
-  absl::StrAppend(&node->operation.type, "(", operation_type, ")");
+  abslx::StrAppend(&node->operation.type, "(", operation_type, ")");
   node_code.source_code =
-      absl::StrCat(values, node_code.source_code, "{//FUSED",
+      abslx::StrCat(values, node_code.source_code, "{//FUSED",
                    node->operation.type, "\n", source_code, "\n}");
 
   return {TransformStatus::APPLIED, ""};

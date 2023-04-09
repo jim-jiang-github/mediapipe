@@ -34,7 +34,7 @@
 #include "absl/base/internal/per_thread_tls.h"
 #include "absl/base/optimization.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 struct SynchLocksHeld;
@@ -45,9 +45,9 @@ namespace base_internal {
 class SpinLock;
 struct ThreadIdentity;
 
-// Used by the implementation of absl::Mutex and absl::CondVar.
+// Used by the implementation of abslx::Mutex and abslx::CondVar.
 struct PerThreadSynch {
-  // The internal representation of absl::Mutex and absl::CondVar rely
+  // The internal representation of abslx::Mutex and abslx::CondVar rely
   // on the alignment of PerThreadSynch. Both store the address of the
   // PerThreadSynch in the high-order bits of their internal state,
   // which means the low kLowZeroBits of the address of PerThreadSynch
@@ -141,7 +141,7 @@ struct ThreadIdentity {
   // ThreadIdentity itself.
   PerThreadSynch per_thread_synch;
 
-  // Private: Reserved for absl::synchronization_internal::Waiter.
+  // Private: Reserved for abslx::synchronization_internal::Waiter.
   struct WaiterState {
     alignas(void*) char data[128];
   } waiter_state;
@@ -255,6 +255,6 @@ inline ThreadIdentity* CurrentThreadIdentityIfPresent() {
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_BASE_INTERNAL_THREAD_IDENTITY_H_

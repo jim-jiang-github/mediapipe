@@ -205,11 +205,11 @@ TFRTOpMetaBuilder::TFRTOpMetaBuilder(StringPiece op_name) : op_name_(op_name) {}
 namespace {
 
 DataType ParseInputOutputSpec(StringPiece spec) {
-  std::vector<absl::string_view> name_type =
-      absl::StrSplit(spec, absl::MaxSplits(':', 2));
+  std::vector<abslx::string_view> name_type =
+      abslx::StrSplit(spec, abslx::MaxSplits(':', 2));
   DataType data_type;
   bool success =
-      DataTypeFromString(absl::StripAsciiWhitespace(name_type[1]), &data_type);
+      DataTypeFromString(abslx::StripAsciiWhitespace(name_type[1]), &data_type);
   assert(success && "Failed to parse DataType");
   (void)success;
   return data_type;

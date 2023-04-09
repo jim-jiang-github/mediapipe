@@ -332,7 +332,7 @@ TEST_F(MetaOptimizerTest, OptimizeFunctionLibrary) {
   // Get a specialized function name.
   const auto specialized_name = [](const string& fn, const string& node,
                                    const string& id) {
-    return absl::Substitute("$0_specialized_for_$1_at_$2", fn, node, id);
+    return abslx::Substitute("$0_specialized_for_$1_at_$2", fn, node, id);
   };
 
   // MyQuadratic should be specialized once:
@@ -476,7 +476,7 @@ TEST_F(MetaOptimizerTest, OptimizeFunctionLibraryPruneUnusedOutputs) {
   // Expected names of the specialized functions.
   const string specialized_my_fwd = "Fwd_specialized_for_fwd_at_tf_graph";
   const string specialized_my_mul =
-      absl::StrCat("MyMul_specialized_for_output_at_", specialized_my_fwd);
+      abslx::StrCat("MyMul_specialized_for_output_at_", specialized_my_fwd);
 
   // Specialized MyMul should have just one output argument.
   FunctionDef expected_my_mul = FunctionDefHelper::Create(
@@ -897,7 +897,7 @@ TEST_F(MetaOptimizerTest, RunPostOptimizationVerifiersOnInvalidGraph) {
   Status status =
       optimizer_with_post_verifiers.Optimize(nullptr, item, &output);
   EXPECT_TRUE(errors::IsInvalidArgument(status));
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       status.error_message(),
       "NodeDef expected inputs 'float' do not match 3 inputs specified"));
 }
@@ -972,7 +972,7 @@ TEST_F(MetaOptimizerTest, RunInterOptimizerVerifiersOnInvalidGraph) {
   Status status =
       optimizer_with_inter_verifiers.Optimize(nullptr, item, &output);
   EXPECT_EQ(status.code(), errors::Code::INVALID_ARGUMENT);
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       status.error_message(),
       "NodeDef expected inputs 'float' do not match 3 inputs specified"));
 }
@@ -1167,7 +1167,7 @@ TEST_F(MetaOptimizerTest, TestTFGControlFlowSink) {
   for (const FunctionDef& func : output.library().function()) {
     if (func.signature().name() == "Foo")
       optimized_foo_func = &func;
-    else if (absl::StartsWith(func.signature().name(), "branch_func"))
+    else if (abslx::StartsWith(func.signature().name(), "branch_func"))
       specialized_branch_func = &func;
   }
   ASSERT_TRUE(optimized_foo_func);

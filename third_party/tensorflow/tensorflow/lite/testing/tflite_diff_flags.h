@@ -83,11 +83,11 @@ inline DiffOptions ParseTfliteDiffFlags(int* argc, char** argv) {
 
   TfLiteDriver::DelegateType delegate = TfLiteDriver::DelegateType::kNone;
   if (!values.delegate_name.empty()) {
-    if (absl::EqualsIgnoreCase(values.delegate_name, "nnapi")) {
+    if (abslx::EqualsIgnoreCase(values.delegate_name, "nnapi")) {
       delegate = TfLiteDriver::DelegateType::kNnapi;
-    } else if (absl::EqualsIgnoreCase(values.delegate_name, "gpu")) {
+    } else if (abslx::EqualsIgnoreCase(values.delegate_name, "gpu")) {
       delegate = TfLiteDriver::DelegateType::kGpu;
-    } else if (absl::EqualsIgnoreCase(values.delegate_name, "flex")) {
+    } else if (abslx::EqualsIgnoreCase(values.delegate_name, "flex")) {
       delegate = TfLiteDriver::DelegateType::kFlex;
     } else {
       fprintf(stderr, "%s", tensorflow::Flags::Usage(argv[0], flags).c_str());

@@ -40,7 +40,7 @@ Handle LoadModule(Object self, String saved_model) {
                       ->cast<mlir::MLIRContext*>();
 
   // Load the saved model into MLIR TF dialect.
-  absl::Span<std::string> exported_names(nullptr, 0);
+  abslx::Span<std::string> exported_names(nullptr, 0);
   auto module_or =
       tensorflow::ConvertSavedModelToMlir(&bundle, context, exported_names);
   if (!module_or.status().ok()) {

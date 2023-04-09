@@ -41,7 +41,7 @@ const char kDefaultInputFilename[] = "-";
 
 // AbslParseFlag/AbslUnparseFlag need to be in tfrt namespace for ADL to work.
 
-bool AbslParseFlag(absl::string_view text,
+bool AbslParseFlag(abslx::string_view text,
                    tfrt::HostAllocatorTypeWrapper* host_allocator_type,
                    std::string* error) {
   if (text == "malloc") {

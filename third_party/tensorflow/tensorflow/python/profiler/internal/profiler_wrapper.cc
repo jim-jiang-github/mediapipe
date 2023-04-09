@@ -36,9 +36,9 @@ namespace {
 // objects require GIL because the objects can be mutated by other Python
 // threads. In addition, Python objects are reference counted; reading py::dict
 // will increase its reference count.
-absl::flat_hash_map<std::string, absl::variant<int>> ConvertDictToMap(
+abslx::flat_hash_map<std::string, abslx::variant<int>> ConvertDictToMap(
     const py::dict& dict) {
-  absl::flat_hash_map<std::string, absl::variant<int>> map;
+  abslx::flat_hash_map<std::string, abslx::variant<int>> map;
   for (const auto& kw : dict) {
     if (!kw.second.is_none()) {
       map.emplace(kw.first.cast<std::string>(), kw.second.cast<int>());
@@ -57,7 +57,7 @@ PYBIND11_MODULE(_pywrap_profiler, m) {
            [](ProfilerSessionWrapper& wrapper, const char* logdir,
               const py::dict& options) {
              tensorflow::Status status;
-             absl::flat_hash_map<std::string, absl::variant<int>> opts =
+             abslx::flat_hash_map<std::string, abslx::variant<int>> opts =
                  ConvertDictToMap(options);
              {
                py::gil_scoped_release release;
@@ -91,7 +91,7 @@ PYBIND11_MODULE(_pywrap_profiler, m) {
 
   m.def("start_server", [](int port) {
     auto profiler_server =
-        absl::make_unique<tensorflow::profiler::ProfilerServer>();
+        abslx::make_unique<tensorflow::profiler::ProfilerServer>();
     profiler_server->StartProfilerServer(port);
     // Intentionally release profiler server. Should transfer ownership to
     // caller instead.
@@ -103,7 +103,7 @@ PYBIND11_MODULE(_pywrap_profiler, m) {
            const char* worker_list, bool include_dataset_ops, int duration_ms,
            int num_tracing_attempts, py::dict options) {
           tensorflow::Status status;
-          absl::flat_hash_map<std::string, absl::variant<int>> opts =
+          abslx::flat_hash_map<std::string, abslx::variant<int>> opts =
               ConvertDictToMap(options);
           {
             py::gil_scoped_release release;

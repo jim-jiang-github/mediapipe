@@ -65,12 +65,12 @@ inline int download_mediapipe_asset_from_GCS(char const* localpath, bool refresh
 
 #define DEFINE_SUBGRAPH(class_name, pbtxt) \
 struct class_name : public Subgraph { \
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(SubgraphOptions const&) override { \
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(SubgraphOptions const&) override { \
     CalculatorGraphConfig config; \
     if (read_config_from_pbtxt(config, pbtxt)) { \
       return config; \
     } \
-    return absl::InternalError("Could not parse subgraph."); \
+    return abslx::InternalError("Could not parse subgraph."); \
   } \
 }; \
 REGISTER_MEDIAPIPE_GRAPH(class_name)

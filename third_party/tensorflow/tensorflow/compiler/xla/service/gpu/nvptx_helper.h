@@ -25,7 +25,7 @@ namespace gpu {
 
 // Logs a warning message that CUDA could not be found in the candidate
 // directories.
-std::string CantFindCudaMessage(absl::string_view msg,
+std::string CantFindCudaMessage(abslx::string_view msg,
                                 const HloModuleConfig& hlo_module_config);
 
 // Returns the directory containing nvvm libdevice files.

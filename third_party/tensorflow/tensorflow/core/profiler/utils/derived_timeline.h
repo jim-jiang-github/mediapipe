@@ -51,7 +51,7 @@ class DerivedXEventBuilder {
 class DerivedXLineBuilder {
  public:
   DerivedXLineBuilder(XPlaneBuilder* plane, int64_t line_id,
-                      absl::string_view name, int64_t timestamp_ns,
+                      abslx::string_view name, int64_t timestamp_ns,
                       std::vector<DerivedXLineBuilder*> dependent_lines);
 
   XLineBuilder& Line() { return line_; }
@@ -88,23 +88,23 @@ class DerivedXLineBuilder {
   const XStatMetadata* group_id_stat_metadata_ = nullptr;
   const XStatMetadata* level_stat_metadata_ = nullptr;
   XLineBuilder line_;
-  absl::flat_hash_map<int, std::optional<DerivedXEventBuilder>>
+  abslx::flat_hash_map<int, std::optional<DerivedXEventBuilder>>
       last_event_by_level_;
   std::vector<DerivedXLineBuilder*> dependent_lines_;
 };
 
 struct Symbol {
-  absl::string_view tf_op_name;
+  abslx::string_view tf_op_name;
   std::string source_info;
 };
 
 using SymbolResolver = std::function<Symbol(std::optional<uint64_t> program_id,
-                                            absl::string_view hlo_module_name,
-                                            absl::string_view hlo_op)>;
+                                            abslx::string_view hlo_module_name,
+                                            abslx::string_view hlo_op)>;
 
 // Derives TF name scope and op events from the TF op's fully qualified name
 // with the name of the originating low-level event.
-void ProcessTfOpEvent(absl::string_view tf_op_full_name, Timespan event_span,
+void ProcessTfOpEvent(abslx::string_view tf_op_full_name, Timespan event_span,
                       std::optional<int64_t> group_id,
                       XPlaneBuilder& plane_builder,
                       DerivedXLineBuilder& tf_name_scope_line_builder,

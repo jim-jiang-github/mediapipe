@@ -46,7 +46,7 @@ Status ParseSequenceNumber(const std::string& journal_file,
 std::string DataServiceJournalFile(const std::string& journal_dir,
                                    int64_t sequence_number) {
   return io::JoinPath(journal_dir,
-                      absl::StrCat(kJournal, "_", sequence_number));
+                      abslx::StrCat(kJournal, "_", sequence_number));
 }
 
 FileJournalWriter::FileJournalWriter(Env* env, const std::string& journal_dir)

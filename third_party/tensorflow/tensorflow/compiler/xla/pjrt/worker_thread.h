@@ -43,7 +43,7 @@ class WorkerThread {
   bool WorkAvailable() ABSL_EXCLUSIVE_LOCKS_REQUIRED(mu_);
   void WorkLoop();
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   std::queue<std::function<void()>> work_queue_ ABSL_GUARDED_BY(mu_);
 
   std::unique_ptr<tensorflow::Thread> thread_;

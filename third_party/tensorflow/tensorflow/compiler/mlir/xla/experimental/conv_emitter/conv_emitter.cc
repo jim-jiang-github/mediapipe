@@ -67,7 +67,7 @@ struct ShapeInfo {
 
 ShapeInfo GetShapeInfo(
     const Shape& shape, int64_t n_dim, int64_t c_dim,
-    absl::Span<const tensorflow::protobuf_int64> spatial_dims,
+    abslx::Span<const tensorflow::protobuf_int64> spatial_dims,
     mlir::Builder builder) {
   ShapeInfo shape_info;
 
@@ -274,18 +274,18 @@ StatusOr<InitialMlirConvAnchors> CreateNaiveMlirConv(
 
   std::vector<mlir::AffineForOp> reduction_loops;
   reduction_loops = CreateNestedSimpleLoops(
-      absl::MakeSpan(filter_shape_info.nchw_dimensions).subspan(1), builder);
+      abslx::MakeSpan(filter_shape_info.nchw_dimensions).subspan(1), builder);
 
   mlir::AffineForOp loop_n = cartesian_product_loops[0];
   mlir::AffineForOp loop_o = cartesian_product_loops[1];
   mlir::AffineForOp loop_c = reduction_loops[0];
 
   std::vector<mlir::Value> output_spatial_indvars;
-  for (auto loop : absl::MakeSpan(cartesian_product_loops).subspan(2)) {
+  for (auto loop : abslx::MakeSpan(cartesian_product_loops).subspan(2)) {
     output_spatial_indvars.push_back(loop.getInductionVar());
   }
   std::vector<mlir::Value> filter_spatial_indvars;
-  for (auto loop : absl::MakeSpan(reduction_loops).subspan(1)) {
+  for (auto loop : abslx::MakeSpan(reduction_loops).subspan(1)) {
     filter_spatial_indvars.push_back(loop.getInductionVar());
   }
   int num_spatial_dims = output_spatial_indvars.size();
@@ -492,7 +492,7 @@ StatusOr<TransformedMlirConvAnchors> TransformMlirConv(
     // not the writeback loops to output buffer.
     llvm::SmallVector<mlir::AffineForOp, 4> all_loops;
     getPerfectlyNestedLoops(all_loops, compute_loop);
-    absl::c_copy_n(all_loops, tiled_cartesian_loops.size(),
+    abslx::c_copy_n(all_loops, tiled_cartesian_loops.size(),
                    tiled_cartesian_loops.data());
   }
 
@@ -527,7 +527,7 @@ StatusOr<TransformedMlirConvAnchors> TransformMlirConv(
 }  // namespace
 
 StatusOr<mlir::func::FuncOp> EmitConvolutionForwardAsMlir(
-    HloInstruction* conv, absl::string_view function_name,
+    HloInstruction* conv, abslx::string_view function_name,
     mlir::MLIRContext* context) {
   OpBuilder builder(context);
 

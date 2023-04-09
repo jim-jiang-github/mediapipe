@@ -325,7 +325,7 @@ bool BFCAllocator::DeallocateFreeRegions(size_t rounded_bytes)
   }
 
   // Searching for free regions.
-  absl::flat_hash_set<void*> free_region_ptrs;
+  abslx::flat_hash_set<void*> free_region_ptrs;
   size_t total_free_bytes = 0;
   for (const AllocationRegion& region : region_manager_.regions()) {
     ChunkHandle h = region_manager_.get_handle(region.ptr());
@@ -374,7 +374,7 @@ bool BFCAllocator::DeallocateFreeRegions(size_t rounded_bytes)
 }
 
 void BFCAllocator::DeallocateRegions(
-    const absl::flat_hash_set<void*>& region_ptrs)
+    const abslx::flat_hash_set<void*>& region_ptrs)
     TF_EXCLUSIVE_LOCKS_REQUIRED(lock_) {
   // Explicitly remove the const qualifier as some compilers disallow passing
   // const_iterator to std::vector::erase(), which is used in
@@ -509,12 +509,12 @@ double BFCAllocator::GetFragmentation() {
          bytes_available;
 }
 
-void BFCAllocator::AddTraceMe(absl::string_view traceme_name, const void* ptr) {
+void BFCAllocator::AddTraceMe(abslx::string_view traceme_name, const void* ptr) {
   BFCAllocator::Chunk* chunk = ChunkFromHandle(region_manager_.get_handle(ptr));
   AddTraceMe(traceme_name, chunk->ptr, chunk->requested_size, chunk->size);
 }
 
-void BFCAllocator::AddTraceMe(absl::string_view traceme_name,
+void BFCAllocator::AddTraceMe(abslx::string_view traceme_name,
                               const void* chunk_ptr, int64_t req_bytes,
                               int64_t alloc_bytes) {
   tensorflow::profiler::TraceMe::InstantActivity(
@@ -1200,7 +1200,7 @@ MemoryDump BFCAllocator::RecordMemoryMapInternal() {
   return md;
 }
 
-absl::optional<AllocatorStats> BFCAllocator::GetStats() {
+abslx::optional<AllocatorStats> BFCAllocator::GetStats() {
   mutex_lock l(lock_);
   return stats_;
 }

@@ -40,52 +40,52 @@
 #include "absl/random/internal/randen_engine.h"
 #include "absl/random/seed_sequences.h"  // IWYU pragma: export
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // -----------------------------------------------------------------------------
-// absl::BitGen
+// abslx::BitGen
 // -----------------------------------------------------------------------------
 //
-// `absl::BitGen` is a general-purpose random bit generator for generating
+// `abslx::BitGen` is a general-purpose random bit generator for generating
 // random values for use within the Abseil random library. Typically, you use a
 // bit generator in combination with a distribution to provide random values.
 //
 // Example:
 //
-//   // Create an absl::BitGen. There is no need to seed this bit generator.
-//   absl::BitGen gen;
+//   // Create an abslx::BitGen. There is no need to seed this bit generator.
+//   abslx::BitGen gen;
 //
 //   // Generate an integer value in the closed interval [1,6]
-//   int die_roll = absl::uniform_int_distribution<int>(1, 6)(gen);
+//   int die_roll = abslx::uniform_int_distribution<int>(1, 6)(gen);
 //
-// `absl::BitGen` is seeded by default with non-deterministic data to produce
+// `abslx::BitGen` is seeded by default with non-deterministic data to produce
 // different sequences of random values across different instances, including
 // different binary invocations. This behavior is different than the standard
 // library bit generators, which use golden values as their seeds. Default
 // construction intentionally provides no stability guarantees, to avoid
 // accidental dependence on such a property.
 //
-// `absl::BitGen` may be constructed with an optional seed sequence type,
+// `abslx::BitGen` may be constructed with an optional seed sequence type,
 // conforming to [rand.req.seed_seq], which will be mixed with additional
 // non-deterministic data.
 //
 // Example:
 //
-//  // Create an absl::BitGen using an std::seed_seq seed sequence
+//  // Create an abslx::BitGen using an std::seed_seq seed sequence
 //  std::seed_seq seq{1,2,3};
-//  absl::BitGen gen_with_seed(seq);
+//  abslx::BitGen gen_with_seed(seq);
 //
 //  // Generate an integer value in the closed interval [1,6]
-//  int die_roll2 = absl::uniform_int_distribution<int>(1, 6)(gen_with_seed);
+//  int die_roll2 = abslx::uniform_int_distribution<int>(1, 6)(gen_with_seed);
 //
-// `absl::BitGen` meets the requirements of the Uniform Random Bit Generator
+// `abslx::BitGen` meets the requirements of the Uniform Random Bit Generator
 // (URBG) concept as per the C++17 standard [rand.req.urng] though differs
 // slightly with [rand.req.eng]. Like its standard library equivalents (e.g.
-// `std::mersenne_twister_engine`) `absl::BitGen` is not cryptographically
+// `std::mersenne_twister_engine`) `abslx::BitGen` is not cryptographically
 // secure.
 //
-// Constructing two `absl::BitGen`s with the same seed sequence in the same
+// Constructing two `abslx::BitGen`s with the same seed sequence in the same
 // binary will produce the same sequence of variates within the same binary, but
 // need not do so across multiple binary invocations.
 //
@@ -96,22 +96,22 @@ ABSL_NAMESPACE_BEGIN
 // This type is thread-compatible, but not thread-safe.
 
 // ---------------------------------------------------------------------------
-// absl::BitGen member functions
+// abslx::BitGen member functions
 // ---------------------------------------------------------------------------
 
-// absl::BitGen::operator()()
+// abslx::BitGen::operator()()
 //
 // Calls the BitGen, returning a generated value.
 
-// absl::BitGen::min()
+// abslx::BitGen::min()
 //
 // Returns the smallest possible value from this bit generator.
 
-// absl::BitGen::max()
+// abslx::BitGen::max()
 //
 // Returns the largest possible value from this bit generator.
 
-// absl::BitGen::discard(num)
+// abslx::BitGen::discard(num)
 //
 // Advances the internal state of this bit generator by `num` times, and
 // discards the intermediate results.
@@ -121,69 +121,69 @@ using BitGen = random_internal::NonsecureURBGBase<
     random_internal::randen_engine<uint64_t>>;
 
 // -----------------------------------------------------------------------------
-// absl::InsecureBitGen
+// abslx::InsecureBitGen
 // -----------------------------------------------------------------------------
 //
-// `absl::InsecureBitGen` is an efficient random bit generator for generating
+// `abslx::InsecureBitGen` is an efficient random bit generator for generating
 // random values, recommended only for performance-sensitive use cases where
-// `absl::BitGen` is not satisfactory when compute-bounded by bit generation
+// `abslx::BitGen` is not satisfactory when compute-bounded by bit generation
 // costs.
 //
 // Example:
 //
-//   // Create an absl::InsecureBitGen
-//   absl::InsecureBitGen gen;
+//   // Create an abslx::InsecureBitGen
+//   abslx::InsecureBitGen gen;
 //   for (size_t i = 0; i < 1000000; i++) {
 //
 //     // Generate a bunch of random values from some complex distribution
 //     auto my_rnd = some_distribution(gen, 1, 1000);
 //   }
 //
-// Like `absl::BitGen`, `absl::InsecureBitGen` is seeded by default with
+// Like `abslx::BitGen`, `abslx::InsecureBitGen` is seeded by default with
 // non-deterministic data to produce different sequences of random values across
 // different instances, including different binary invocations. (This behavior
 // is different than the standard library bit generators, which use golden
 // values as their seeds.)
 //
-// `absl::InsecureBitGen` may be constructed with an optional seed sequence
+// `abslx::InsecureBitGen` may be constructed with an optional seed sequence
 // type, conforming to [rand.req.seed_seq], which will be mixed with additional
 // non-deterministic data. (See std_seed_seq.h for more information.)
 //
-// `absl::InsecureBitGen` meets the requirements of the Uniform Random Bit
+// `abslx::InsecureBitGen` meets the requirements of the Uniform Random Bit
 // Generator (URBG) concept as per the C++17 standard [rand.req.urng] though
 // its implementation differs slightly with [rand.req.eng]. Like its standard
 // library equivalents (e.g. `std::mersenne_twister_engine`)
-// `absl::InsecureBitGen` is not cryptographically secure.
+// `abslx::InsecureBitGen` is not cryptographically secure.
 //
-// Prefer `absl::BitGen` over `absl::InsecureBitGen` as the general type is
+// Prefer `abslx::BitGen` over `abslx::InsecureBitGen` as the general type is
 // often fast enough for the vast majority of applications.
 
 using InsecureBitGen =
     random_internal::NonsecureURBGBase<random_internal::pcg64_2018_engine>;
 
 // ---------------------------------------------------------------------------
-// absl::InsecureBitGen member functions
+// abslx::InsecureBitGen member functions
 // ---------------------------------------------------------------------------
 
-// absl::InsecureBitGen::operator()()
+// abslx::InsecureBitGen::operator()()
 //
 // Calls the InsecureBitGen, returning a generated value.
 
-// absl::InsecureBitGen::min()
+// abslx::InsecureBitGen::min()
 //
 // Returns the smallest possible value from this bit generator.
 
-// absl::InsecureBitGen::max()
+// abslx::InsecureBitGen::max()
 //
 // Returns the largest possible value from this bit generator.
 
-// absl::InsecureBitGen::discard(num)
+// abslx::InsecureBitGen::discard(num)
 //
 // Advances the internal state of this bit generator by `num` times, and
 // discards the intermediate results.
 // ---------------------------------------------------------------------------
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_RANDOM_H_

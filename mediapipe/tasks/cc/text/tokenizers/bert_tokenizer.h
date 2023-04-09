@@ -74,16 +74,16 @@ class FlatHashMapBackedWordpiece : public tensorflow::text::WordpieceVocab {
  public:
   explicit FlatHashMapBackedWordpiece(const std::vector<std::string>& vocab);
 
-  tensorflow::text::LookupStatus Contains(absl::string_view key,
+  tensorflow::text::LookupStatus Contains(abslx::string_view key,
                                           bool* value) const override;
-  bool LookupId(absl::string_view key, int* result) const;
-  bool LookupWord(int vocab_id, absl::string_view* result) const;
+  bool LookupId(abslx::string_view key, int* result) const;
+  bool LookupWord(int vocab_id, abslx::string_view* result) const;
   int VocabularySize() const { return vocab_.size(); }
 
  private:
   // All words indexed position in vocabulary file.
   std::vector<std::string> vocab_;
-  absl::flat_hash_map<absl::string_view, int> index_map_;
+  abslx::flat_hash_map<abslx::string_view, int> index_map_;
 };
 
 // Wordpiece tokenizer for bert models. Initialized with a vocab file or vector.
@@ -119,18 +119,18 @@ class BertTokenizer : public mediapipe::tasks::text::tokenizers::Tokenizer {
   WordpieceTokenizerResult TokenizeWordpiece(const std::string& input) const;
 
   // Check if a certain key is included in the vocab.
-  tensorflow::text::LookupStatus Contains(const absl::string_view key,
+  tensorflow::text::LookupStatus Contains(const abslx::string_view key,
                                           bool* value) const {
     return vocab_.Contains(key, value);
   }
 
   // Find the id of a wordpiece.
-  bool LookupId(absl::string_view key, int* result) const override {
+  bool LookupId(abslx::string_view key, int* result) const override {
     return vocab_.LookupId(key, result);
   }
 
   // Find the wordpiece from an id.
-  bool LookupWord(int vocab_id, absl::string_view* result) const override {
+  bool LookupWord(int vocab_id, abslx::string_view* result) const override {
     return vocab_.LookupWord(vocab_id, result);
   }
 

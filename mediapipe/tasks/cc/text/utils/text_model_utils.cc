@@ -39,14 +39,14 @@ constexpr int kNumInputTensorsForStringPreprocessor = 1;
 // Determines the ModelType for a model with int32 input tensors based
 // on the number of input tensors. Returns an error if there is missing metadata
 // or an invalid number of input tensors.
-absl::StatusOr<TextModelType::ModelType> GetIntTensorModelType(
+abslx::StatusOr<TextModelType::ModelType> GetIntTensorModelType(
     const ModelResources& model_resources, int num_input_tensors) {
   const ModelMetadataExtractor* metadata_extractor =
       model_resources.GetMetadataExtractor();
   if (metadata_extractor->GetModelMetadata() == nullptr ||
       metadata_extractor->GetModelMetadata()->subgraph_metadata() == nullptr) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "Text models with int32 input tensors require TFLite Model "
         "Metadata but none was found",
         MediaPipeTasksStatus::kMetadataNotFoundError);
@@ -61,8 +61,8 @@ absl::StatusOr<TextModelType::ModelType> GetIntTensorModelType(
   }
 
   return CreateStatusWithPayload(
-      absl::StatusCode::kInvalidArgument,
-      absl::Substitute("Models with int32 input tensors should take exactly $0 "
+      abslx::StatusCode::kInvalidArgument,
+      abslx::Substitute("Models with int32 input tensors should take exactly $0 "
                        "or $1 input tensors, but found $2",
                        kNumInputTensorsForBert, kNumInputTensorsForRegex,
                        num_input_tensors),
@@ -72,15 +72,15 @@ absl::StatusOr<TextModelType::ModelType> GetIntTensorModelType(
 // Determines the ModelType for a model with string input tensors based
 // on the number of input tensors. Returns an error if there is an invalid
 // number of input tensors.
-absl::StatusOr<TextModelType::ModelType> GetStringTensorModelType(
+abslx::StatusOr<TextModelType::ModelType> GetStringTensorModelType(
     const ModelResources& model_resources, int num_input_tensors) {
   if (num_input_tensors == kNumInputTensorsForStringPreprocessor) {
     return TextModelType::STRING_MODEL;
   }
 
   return CreateStatusWithPayload(
-      absl::StatusCode::kInvalidArgument,
-      absl::Substitute("Models with string input tensors should take exactly "
+      abslx::StatusCode::kInvalidArgument,
+      abslx::Substitute("Models with string input tensors should take exactly "
                        "$0 tensors, but found $1",
                        kNumInputTensorsForStringPreprocessor,
                        num_input_tensors),
@@ -88,21 +88,21 @@ absl::StatusOr<TextModelType::ModelType> GetStringTensorModelType(
 }
 }  // namespace
 
-absl::StatusOr<TextModelType::ModelType> GetModelType(
+abslx::StatusOr<TextModelType::ModelType> GetModelType(
     const ModelResources& model_resources) {
   const tflite::SubGraph& model_graph =
       *(*model_resources.GetTfLiteModel()->subgraphs())[0];
   bool all_int32_tensors =
-      absl::c_all_of(*model_graph.inputs(), [&model_graph](int i) {
+      abslx::c_all_of(*model_graph.inputs(), [&model_graph](int i) {
         return (*model_graph.tensors())[i]->type() == tflite::TensorType_INT32;
       });
   bool all_string_tensors =
-      absl::c_all_of(*model_graph.inputs(), [&model_graph](int i) {
+      abslx::c_all_of(*model_graph.inputs(), [&model_graph](int i) {
         return (*model_graph.tensors())[i]->type() == tflite::TensorType_STRING;
       });
   if (!all_int32_tensors && !all_string_tensors) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "All input tensors should have type int32 or all should have type "
         "string",
         MediaPipeTasksStatus::kInvalidInputTensorTypeError);

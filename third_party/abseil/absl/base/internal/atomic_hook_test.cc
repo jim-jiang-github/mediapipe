@@ -27,7 +27,7 @@ int value = 0;
 void TestHook(int x) { value = x; }
 
 TEST(AtomicHookTest, NoDefaultFunction) {
-  ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES static absl::base_internal::AtomicHook<
+  ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES static abslx::base_internal::AtomicHook<
       void (*)(int)>
       hook;
   value = 0;
@@ -55,7 +55,7 @@ TEST(AtomicHookTest, NoDefaultFunction) {
 
 TEST(AtomicHookTest, WithDefaultFunction) {
   // Set the default value to TestHook at compile-time.
-  ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES static absl::base_internal::AtomicHook<
+  ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES static abslx::base_internal::AtomicHook<
       void (*)(int)>
       hook(TestHook);
   value = 0;
@@ -77,7 +77,7 @@ TEST(AtomicHookTest, WithDefaultFunction) {
 ABSL_CONST_INIT int override_func_calls = 0;
 void OverrideFunc() { override_func_calls++; }
 static struct OverrideInstaller {
-  OverrideInstaller() { absl::atomic_hook_internal::func.Store(OverrideFunc); }
+  OverrideInstaller() { abslx::atomic_hook_internal::func.Store(OverrideFunc); }
 } override_installer;
 
 TEST(AtomicHookTest, DynamicInitFromAnotherTU) {
@@ -86,12 +86,12 @@ TEST(AtomicHookTest, DynamicInitFromAnotherTU) {
   // after their dynamic init (i.e. overrides), overwriting whatever value was
   // written during dynamic init.  This regression test validates the fix.
   // https://developercommunity.visualstudio.com/content/problem/336946/class-with-constexpr-constructor-not-using-static.html
-  EXPECT_THAT(absl::atomic_hook_internal::default_func_calls, Eq(0));
+  EXPECT_THAT(abslx::atomic_hook_internal::default_func_calls, Eq(0));
   EXPECT_THAT(override_func_calls, Eq(0));
-  absl::atomic_hook_internal::func();
-  EXPECT_THAT(absl::atomic_hook_internal::default_func_calls, Eq(0));
+  abslx::atomic_hook_internal::func();
+  EXPECT_THAT(abslx::atomic_hook_internal::default_func_calls, Eq(0));
   EXPECT_THAT(override_func_calls, Eq(1));
-  EXPECT_THAT(absl::atomic_hook_internal::func.Load(), Eq(OverrideFunc));
+  EXPECT_THAT(abslx::atomic_hook_internal::func.Load(), Eq(OverrideFunc));
 }
 
 }  // namespace

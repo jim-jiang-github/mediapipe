@@ -61,7 +61,7 @@ INSTANTIATE_TEST_SUITE_P(VaryingBufferAndInputSizes, ThreadSafeBufferTest,
 
 TEST_P(ThreadSafeBufferTest, OneReaderAndOneWriter) {
   ThreadSafeBuffer<int> buffer(GetBufferSize());
-  auto thread = absl::WrapUnique(Env::Default()->StartThread(
+  auto thread = abslx::WrapUnique(Env::Default()->StartThread(
       /*thread_options=*/{}, /*name=*/"writer_thread", [this, &buffer]() {
         for (int i = 0; i < GetNumOfElements(); ++i) {
           ASSERT_THAT(buffer.Push(i), IsOk());
@@ -78,8 +78,8 @@ TEST_P(ThreadSafeBufferTest, OneReaderAndMultipleWriters) {
   ThreadSafeBuffer<int> buffer(GetBufferSize());
   std::vector<std::unique_ptr<Thread>> threads;
   for (int i = 0; i < GetNumOfElements(); ++i) {
-    threads.push_back(absl::WrapUnique(Env::Default()->StartThread(
-        /*thread_options=*/{}, /*name=*/absl::StrCat("writer_thread_", i),
+    threads.push_back(abslx::WrapUnique(Env::Default()->StartThread(
+        /*thread_options=*/{}, /*name=*/abslx::StrCat("writer_thread_", i),
         [&buffer, i] { ASSERT_THAT(buffer.Push(i), IsOk()); })));
   }
 
@@ -98,8 +98,8 @@ TEST_P(ThreadSafeBufferTest, MultipleReadersAndOneWriter) {
 
   std::vector<std::unique_ptr<Thread>> threads;
   for (int i = 0; i < GetNumOfElements(); ++i) {
-    threads.push_back(absl::WrapUnique(Env::Default()->StartThread(
-        /*thread_options=*/{}, /*name=*/absl::StrCat("reader_thread_", i),
+    threads.push_back(abslx::WrapUnique(Env::Default()->StartThread(
+        /*thread_options=*/{}, /*name=*/abslx::StrCat("reader_thread_", i),
         [&buffer, &mu, &results]() {
           TF_ASSERT_OK_AND_ASSIGN(int next, buffer.Pop());
           mutex_lock l(mu);
@@ -123,8 +123,8 @@ TEST_P(ThreadSafeBufferTest, MultipleReadersAndWriters) {
 
   std::vector<std::unique_ptr<Thread>> threads;
   for (int i = 0; i < GetNumOfElements(); ++i) {
-    threads.push_back(absl::WrapUnique(Env::Default()->StartThread(
-        /*thread_options=*/{}, /*name=*/absl::StrCat("reader_thread_", i),
+    threads.push_back(abslx::WrapUnique(Env::Default()->StartThread(
+        /*thread_options=*/{}, /*name=*/abslx::StrCat("reader_thread_", i),
         [&buffer, &mu, &results]() {
           TF_ASSERT_OK_AND_ASSIGN(int next, buffer.Pop());
           mutex_lock l(mu);
@@ -133,8 +133,8 @@ TEST_P(ThreadSafeBufferTest, MultipleReadersAndWriters) {
   }
 
   for (int i = 0; i < GetNumOfElements(); ++i) {
-    threads.push_back(absl::WrapUnique(Env::Default()->StartThread(
-        /*thread_options=*/{}, /*name=*/absl::StrCat("writer_thread_", i),
+    threads.push_back(abslx::WrapUnique(Env::Default()->StartThread(
+        /*thread_options=*/{}, /*name=*/abslx::StrCat("writer_thread_", i),
         [&buffer, i]() { ASSERT_THAT(buffer.Push(i), IsOk()); })));
   }
 
@@ -147,7 +147,7 @@ TEST_P(ThreadSafeBufferTest, BlockReaderWhenBufferIsEmpty) {
   ThreadSafeBuffer<Tensor> buffer(GetBufferSize());
 
   // The buffer is empty, blocking the next `Pop` call.
-  auto thread = absl::WrapUnique(Env::Default()->StartThread(
+  auto thread = abslx::WrapUnique(Env::Default()->StartThread(
       /*thread_options=*/{}, /*name=*/"reader_thread", [&buffer]() {
         TF_ASSERT_OK_AND_ASSIGN(Tensor tensor, buffer.Pop());
         test::ExpectEqual(tensor, Tensor("Test tensor"));
@@ -166,7 +166,7 @@ TEST_P(ThreadSafeBufferTest, BlockWriterWhenBufferIsFull) {
   }
 
   uint64 push_time = 0;
-  auto thread = absl::WrapUnique(Env::Default()->StartThread(
+  auto thread = abslx::WrapUnique(Env::Default()->StartThread(
       /*thread_options=*/{}, /*name=*/"writer_thread", [&buffer, &push_time]() {
         ASSERT_THAT(buffer.Push(Tensor("Test tensor")), IsOk());
         push_time = Env::Default()->NowMicros();
@@ -185,8 +185,8 @@ TEST_P(ThreadSafeBufferTest, CancelReaders) {
   std::vector<std::unique_ptr<Thread>> threads;
 
   for (int i = 0; i < GetNumOfElements(); ++i) {
-    threads.push_back(absl::WrapUnique(Env::Default()->StartThread(
-        /*thread_options=*/{}, /*name=*/absl::StrCat("reader_thread_", i),
+    threads.push_back(abslx::WrapUnique(Env::Default()->StartThread(
+        /*thread_options=*/{}, /*name=*/abslx::StrCat("reader_thread_", i),
         [&buffer]() { EXPECT_THAT(buffer.Pop(), StatusIs(error::ABORTED)); })));
   }
   buffer.Cancel(errors::Aborted("Aborted"));
@@ -201,8 +201,8 @@ TEST_P(ThreadSafeBufferTest, CancelWriters) {
 
   std::vector<std::unique_ptr<Thread>> threads;
   for (int i = 0; i < GetNumOfElements(); ++i) {
-    threads.push_back(absl::WrapUnique(Env::Default()->StartThread(
-        /*thread_options=*/{}, /*name=*/absl::StrCat("writer_thread_", i),
+    threads.push_back(abslx::WrapUnique(Env::Default()->StartThread(
+        /*thread_options=*/{}, /*name=*/abslx::StrCat("writer_thread_", i),
         [&buffer]() {
           for (int i = 0; i < 100; ++i) {
             EXPECT_THAT(buffer.Push(Tensor("Test tensor")),

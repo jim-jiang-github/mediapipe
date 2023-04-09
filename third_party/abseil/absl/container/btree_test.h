@@ -28,7 +28,7 @@
 #include "absl/strings/cord.h"
 #include "absl/time/time.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 
@@ -85,10 +85,10 @@ struct Generator {
 };
 
 template <>
-struct Generator<absl::Time> {
+struct Generator<abslx::Time> {
   int maxval;
   explicit Generator(int m) : maxval(m) {}
-  absl::Time operator()(int i) const { return absl::FromUnixMillis(i); }
+  abslx::Time operator()(int i) const { return abslx::FromUnixMillis(i); }
 };
 
 template <>
@@ -130,7 +130,7 @@ inline std::vector<int> GenerateNumbersWithSeed(int n, int maxval, int seed) {
   std::minstd_rand0 rng(seed);
 
   std::vector<int> values;
-  absl::flat_hash_set<int> unique_values;
+  abslx::flat_hash_set<int> unique_values;
   if (values.size() < n) {
     for (int i = values.size(); i < n; i++) {
       int value;
@@ -161,6 +161,6 @@ std::vector<V> GenerateValuesWithSeed(int n, int maxval, int seed) {
 
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_CONTAINER_BTREE_TEST_H_

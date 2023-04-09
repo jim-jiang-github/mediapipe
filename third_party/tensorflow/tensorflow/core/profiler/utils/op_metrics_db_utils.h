@@ -30,7 +30,7 @@ namespace tensorflow {
 namespace profiler {
 
 // The name of OpMetrics to represent the idle time.
-TF_CONST_INIT extern const absl::string_view kIdle;
+TF_CONST_INIT extern const abslx::string_view kIdle;
 
 // Helps build an op metrics database (borrowed).
 // Enables fast lookup of existing ops and prevents the creation of duplicate
@@ -47,15 +47,15 @@ class OpMetricsDbBuilder {
   // Looks up the given OP name. If it is already in the database,
   // return its OpMetrics; otherwise, insert a new one.
   OpMetrics* LookupOrInsertNewOpMetrics(uint64 hlo_module_id,
-                                        absl::string_view name);
+                                        abslx::string_view name);
 
   OpMetricsDb* db() { return db_; }
 
  private:
   // Map op (hlo_module_id, name) to the corresponding metrics in the op
   // database.
-  absl::flat_hash_map<uint64 /*hlo_module_id*/,
-                      absl::flat_hash_map<std::string /*name*/, OpMetrics*>>
+  abslx::flat_hash_map<uint64 /*hlo_module_id*/,
+                      abslx::flat_hash_map<std::string /*name*/, OpMetrics*>>
       op_metrics_map_;
 
   // The op database.
@@ -100,7 +100,7 @@ inline uint64_t ChildrenTimePs(const OpMetrics& metrics) {
 
 // Returns the ratio of time spent sending data from the host to the device
 // relative to the total time the host was active.
-absl::optional<double> HostInfeedEnqueueRatio(const OpMetricsDb& db);
+abslx::optional<double> HostInfeedEnqueueRatio(const OpMetricsDb& db);
 
 // Converts from the device op metrics to Tf-op metrics.
 OpMetricsDb CreateTfMetricsDbFromDeviceOpMetricsDb(

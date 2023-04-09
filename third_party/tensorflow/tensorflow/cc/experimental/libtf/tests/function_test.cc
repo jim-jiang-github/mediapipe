@@ -226,7 +226,7 @@ TEST_P(FunctionTest, UnaryFuncCalledWithMultipleArgsFails) {
   args.tuple().emplace_back(TaggedValue(x));
   StatusOr<TaggedValue> v = tf_function.Execute(ctx_.get(), args);
   ASSERT_TRUE(tensorflow::errors::IsInvalidArgument(v.status()));
-  ASSERT_TRUE(absl::StrContains(v.status().error_message(), "No match"));
+  ASSERT_TRUE(abslx::StrContains(v.status().error_message(), "No match"));
 }
 
 TEST_P(FunctionTest, IncorrectArityOfOutputSignatureFails) {
@@ -254,7 +254,7 @@ TEST_P(FunctionTest, IncorrectArityOfOutputSignatureFails) {
   args.tuple().emplace_back(TaggedValue(y));
   StatusOr<TaggedValue> v = tf_function.Execute(ctx_.get(), args);
   ASSERT_TRUE(tensorflow::errors::IsInvalidArgument(v.status())) << v.status();
-  ASSERT_TRUE(absl::StrContains(v.status().error_message(),
+  ASSERT_TRUE(abslx::StrContains(v.status().error_message(),
                                 "Expecting 2 outputs, but *num_retvals is 1"));
 }
 
@@ -279,9 +279,9 @@ TEST_P(FunctionTest, IncorrectDtypeInOutputSignatureFails) {
   args.tuple().emplace_back(TaggedValue(x));
   StatusOr<TaggedValue> v = tf_function.Execute(ctx_.get(), args);
   ASSERT_TRUE(tensorflow::errors::IsInternal(v.status())) << v.status();
-  ASSERT_TRUE(absl::StrContains(v.status().error_message(),
+  ASSERT_TRUE(abslx::StrContains(v.status().error_message(),
                                 "Shape and dtype of tensor"));
-  ASSERT_TRUE(absl::StrContains(v.status().error_message(),
+  ASSERT_TRUE(abslx::StrContains(v.status().error_message(),
                                 "does not match that in signature"));
 }
 

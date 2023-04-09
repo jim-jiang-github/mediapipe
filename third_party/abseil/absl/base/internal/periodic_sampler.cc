@@ -18,7 +18,7 @@
 
 #include "absl/base/internal/exponential_biased.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -50,4 +50,4 @@ bool PeriodicSamplerBase::SubtleConfirmSample() noexcept {
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -25,7 +25,7 @@ namespace dtensor {
 //
 // Users will typically ignore the key, but use the map values as the group
 // assignment for collective operations. This is intentionally a
-// std::map instead of absl::flat_hash_map to guarantee all hosts in
+// std::map instead of abslx::flat_hash_map to guarantee all hosts in
 // a multi-host cluster will generate the same grouping, and therefore the same
 // XLA program fingerprint, independently. std::map guarantees the same
 // iteration order.
@@ -49,7 +49,7 @@ using AllReducePartitions = std::map<DeviceLocation, std::vector<int32>>;
 // (unique values of `y`). Each key maps to IDs of devices with that `y` value.
 StatusOr<AllReducePartitions> GetAllReducePartitionsFromReducedDims(
     const dtensor::Layout& output_layout,
-    const absl::flat_hash_set<std::string>& reduced_dims) {
+    const abslx::flat_hash_set<std::string>& reduced_dims) {
   AllReducePartitions partitions;
   for (int64 device = 0; device < output_layout.num_devices(); ++device) {
     TF_ASSIGN_OR_RETURN(const DeviceLocation device_loc,

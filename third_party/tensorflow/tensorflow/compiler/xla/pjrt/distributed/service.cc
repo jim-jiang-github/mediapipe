@@ -62,13 +62,13 @@ EnableCoordinationService(
                                  ->mutable_coordination_config();
   coordination_config->set_service_type("standalone");
   coordination_config->set_service_leader(
-      absl::StrCat("/job:", job_name, "/task:0"));
+      abslx::StrCat("/job:", job_name, "/task:0"));
   coordination_config->set_cluster_register_timeout_in_ms(
-      absl::ToInt64Milliseconds(options.enumerate_devices_timeout));
-  coordination_config->set_heartbeat_timeout_in_ms(absl::ToInt64Milliseconds(
+      abslx::ToInt64Milliseconds(options.enumerate_devices_timeout));
+  coordination_config->set_heartbeat_timeout_in_ms(abslx::ToInt64Milliseconds(
       options.heartbeat_interval * options.max_missing_heartbeats));
   coordination_config->set_shutdown_barrier_timeout_in_ms(
-      absl::ToInt64Milliseconds(options.shutdown_timeout));
+      abslx::ToInt64Milliseconds(options.shutdown_timeout));
   return tensorflow::CoordinationServiceInterface::EnableCoordinationService(
       "standalone", options.env, server_def, /*cache=*/nullptr);
 }
@@ -85,7 +85,7 @@ DistributedRuntimeServiceImpl::DistributedRuntimeServiceImpl(
 
 DistributedRuntimeServiceImpl::~DistributedRuntimeServiceImpl() {
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     state_ = State::kClosed;
     service_status_ =
         tensorflow::errors::FailedPrecondition("Service shutting down.");
@@ -96,7 +96,7 @@ DistributedRuntimeServiceImpl::~DistributedRuntimeServiceImpl() {
 }
 
 // Steals the contents of `local_topologies`.
-void BuildGlobalTopology(absl::Span<LocalTopologyProto> local_topologies,
+void BuildGlobalTopology(abslx::Span<LocalTopologyProto> local_topologies,
                          GlobalTopologyProto* global_topology) {
   int next_global_device_id = 0;
   for (LocalTopologyProto& local : local_topologies) {
@@ -138,7 +138,7 @@ xla::Status DistributedRuntimeServiceImpl::ValidateSessionId(
     return xla::ToGrpcStatus(xla::InvalidArgument("Invalid protocol version %d",
                                                   request->protocol_version()));
   }
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   if (state_ != State::kInitializing) {
     // This most likely indicates that a client task was restarted but the
     // old master is still up. Clients should retry on failure.
@@ -161,14 +161,14 @@ xla::Status DistributedRuntimeServiceImpl::ValidateSessionId(
     return num_nodes_present_ == nodes_.size() ||
            nodes_[node_id].client_id != request->client_id();
   };
-  auto connect_timeout = absl::Milliseconds(request->timeout_milliseconds());
+  auto connect_timeout = abslx::Milliseconds(request->timeout_milliseconds());
   if (!mu_.AwaitWithTimeout(
-          absl::Condition(&all_nodes_present_or_duplicate_request),
+          abslx::Condition(&all_nodes_present_or_duplicate_request),
           connect_timeout)) {
     nodes_[node_id].present = false;
     --num_nodes_present_;
     return xla::ToGrpcStatus(tensorflow::errors::DeadlineExceeded(
-        "Timed out after ", absl::FormatDuration(connect_timeout),
+        "Timed out after ", abslx::FormatDuration(connect_timeout),
         " waiting for all nodes to call Connect()"));
   }
 
@@ -198,9 +198,9 @@ xla::Status DistributedRuntimeServiceImpl::ValidateSessionId(
       mu_.AssertHeld();
       return state_ == State::kRunning;
     };
-    mu_.Await(absl::Condition(&running));
+    mu_.Await(abslx::Condition(&running));
   }
-  nodes_[node_id].last_heartbeat = absl::Now();
+  nodes_[node_id].last_heartbeat = abslx::Now();
   response->set_session_id(session_id_);
   return ::grpc::Status::OK;
 }
@@ -213,7 +213,7 @@ xla::Status DistributedRuntimeServiceImpl::ValidateSessionId(
   if (!status.ok()) {
     return xla::ToGrpcStatus(status);
   }
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   if (state_ != State::kRunning) {
     if (!service_status_.ok()) {
       return xla::ToGrpcStatus(service_status_);
@@ -232,11 +232,11 @@ xla::Status DistributedRuntimeServiceImpl::ValidateSessionId(
     mu_.AssertHeld();
     return num_nodes_shutting_down_ == nodes_.size() || !service_status_.ok();
   };
-  if (!mu_.AwaitWithTimeout(absl::Condition(&all_nodes_shutting_down),
+  if (!mu_.AwaitWithTimeout(abslx::Condition(&all_nodes_shutting_down),
                             options_.shutdown_timeout)) {
     state_ = State::kClosed;
     return xla::ToGrpcStatus(tensorflow::errors::DeadlineExceeded(
-        "Timed out after ", absl::FormatDuration(options_.shutdown_timeout),
+        "Timed out after ", abslx::FormatDuration(options_.shutdown_timeout),
         " waiting for all nodes to call Shutdown()"));
   }
   state_ = State::kClosed;
@@ -257,7 +257,7 @@ xla::Status DistributedRuntimeServiceImpl::ValidateSessionId(
   if (!status.ok()) {
     return xla::ToGrpcStatus(status);
   }
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   if (state_ != State::kRunning) {
     if (!service_status_.ok()) {
       return xla::ToGrpcStatus(service_status_);
@@ -277,11 +277,11 @@ xla::Status DistributedRuntimeServiceImpl::ValidateSessionId(
     mu_.AssertHeld();
     return num_topologies_present_ == nodes_.size() || !service_status_.ok();
   };
-  if (!mu_.AwaitWithTimeout(absl::Condition(&all_topologies_present),
+  if (!mu_.AwaitWithTimeout(abslx::Condition(&all_topologies_present),
                             options_.enumerate_devices_timeout)) {
     return xla::ToGrpcStatus(tensorflow::errors::DeadlineExceeded(
         "Timed out after ",
-        absl::FormatDuration(options_.enumerate_devices_timeout),
+        abslx::FormatDuration(options_.enumerate_devices_timeout),
         " waiting for all nodes to call EnumerateDevices()"));
   }
   if (!service_status_.ok()) {
@@ -290,7 +290,7 @@ xla::Status DistributedRuntimeServiceImpl::ValidateSessionId(
 
   if (node_id == 0) {
     topology_.emplace();
-    BuildGlobalTopology(absl::Span<LocalTopologyProto>(local_topologies_),
+    BuildGlobalTopology(abslx::Span<LocalTopologyProto>(local_topologies_),
                         &*topology_);
     local_topologies_.clear();
   } else {
@@ -298,7 +298,7 @@ xla::Status DistributedRuntimeServiceImpl::ValidateSessionId(
       mu_.AssertHeld();
       return topology_.has_value();
     };
-    mu_.Await(absl::Condition(&topology_ready));
+    mu_.Await(abslx::Condition(&topology_ready));
   }
   *response->mutable_global_topology() = *topology_;
   return ::grpc::Status::OK;
@@ -312,7 +312,7 @@ xla::Status DistributedRuntimeServiceImpl::ValidateSessionId(
   if (!status.ok()) {
     return xla::ToGrpcStatus(status);
   }
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   if (state_ != State::kRunning) {
     if (!service_status_.ok()) {
       return xla::ToGrpcStatus(service_status_);
@@ -325,7 +325,7 @@ xla::Status DistributedRuntimeServiceImpl::ValidateSessionId(
   if (!status.ok()) {
     return xla::ToGrpcStatus(status);
   }
-  nodes_[node_id].last_heartbeat = absl::Now();
+  nodes_[node_id].last_heartbeat = abslx::Now();
   return ::grpc::Status::OK;
 }
 
@@ -338,8 +338,8 @@ void DistributedRuntimeServiceImpl::HeartbeatLoop() {
       VLOG(10) << "Heartbeat checking stopped.";
       return;
     }
-    absl::Time now = absl::Now();
-    absl::MutexLock lock(&mu_);
+    abslx::Time now = abslx::Now();
+    abslx::MutexLock lock(&mu_);
     for (size_t i = 0; i < nodes_.size(); ++i) {
       // If we haven't heard from the node for a number of heartbeat intervals,
       // declare that we are unhealthy.
@@ -367,7 +367,7 @@ void DistributedRuntimeServiceImpl::HeartbeatLoop() {
     return xla::ToGrpcStatus(status);
   }
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     if (state_ != State::kRunning) {
       if (!service_status_.ok()) {
         return xla::ToGrpcStatus(service_status_);
@@ -377,7 +377,7 @@ void DistributedRuntimeServiceImpl::HeartbeatLoop() {
     }
   }
   return key_value_store_.Get(
-      request->key(), absl::Milliseconds(request->timeout_milliseconds()),
+      request->key(), abslx::Milliseconds(request->timeout_milliseconds()),
       response->mutable_value());
 }
 
@@ -390,7 +390,7 @@ void DistributedRuntimeServiceImpl::HeartbeatLoop() {
     return xla::ToGrpcStatus(status);
   }
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     if (state_ != State::kRunning) {
       if (!service_status_.ok()) {
         return xla::ToGrpcStatus(service_status_);
@@ -411,7 +411,7 @@ void DistributedRuntimeServiceImpl::HeartbeatLoop() {
   if (!status.ok()) {
     return xla::ToGrpcStatus(status);
   }
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   if (state_ != State::kRunning) {
     if (!service_status_.ok()) {
       return xla::ToGrpcStatus(service_status_);
@@ -442,7 +442,7 @@ void DistributedRuntimeServiceImpl::HeartbeatLoop() {
 
   ++barrier_id_to_num_nodes_[barrier_id];
 
-  absl::Duration timeout = absl::Milliseconds(request->timeout_milliseconds());
+  abslx::Duration timeout = abslx::Milliseconds(request->timeout_milliseconds());
   auto all_nodes_at_barrier = [&]() {
     mu_.AssertHeld();
     return barrier_id_to_num_nodes_[barrier_id] == nodes_.size() ||
@@ -450,7 +450,7 @@ void DistributedRuntimeServiceImpl::HeartbeatLoop() {
   };
   // TODO(yashkatariya,hanyangtay): Do something similar to the coordination
   // service here.
-  if (!mu_.AwaitWithTimeout(absl::Condition(&all_nodes_at_barrier), timeout)) {
+  if (!mu_.AwaitWithTimeout(abslx::Condition(&all_nodes_at_barrier), timeout)) {
     barrier_id_to_num_nodes_[barrier_id] = kBarrierTimedOut;
     return xla::ToGrpcStatus(tensorflow::errors::DeadlineExceeded(
         "Timed out after ", timeout,

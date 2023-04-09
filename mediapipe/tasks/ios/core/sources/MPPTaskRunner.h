@@ -72,14 +72,14 @@ NS_ASSUME_NONNULL_BEGIN
  * caller's responsibility to synchronize access to this method across multiple threads and to
  * ensure that the input packet timestamps are in order.
  */
-- (absl::StatusOr<mediapipe::tasks::core::PacketMap>)process:
+- (abslx::StatusOr<mediapipe::tasks::core::PacketMap>)process:
     (const mediapipe::tasks::core::PacketMap &)packetMap;
 
 /**
  * Shuts down the C++ task runner. After the runner is closed, any calls that send input data to the
  * runner are illegal and will receive errors.
  */
-- (absl::Status)close;
+- (abslx::Status)close;
 
 - (instancetype)init NS_UNAVAILABLE;
 

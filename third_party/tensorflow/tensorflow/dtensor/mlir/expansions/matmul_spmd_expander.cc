@@ -53,7 +53,7 @@ void GetTransposeSettings(mlir::Operation* op, bool* left_transposed,
 }  // namespace
 
 StatusOr<mlir::Operation*> MatMulSPMDExpander::ExpandOp(mlir::Operation* op) {
-  absl::flat_hash_set<std::string> reduced_dims;
+  abslx::flat_hash_set<std::string> reduced_dims;
   bool left_transposed;
   bool right_transposed;
   TF_ASSIGN_OR_RETURN(const Layout left_layout,
@@ -101,8 +101,8 @@ StatusOr<mlir::Operation*> MatMulSPMDExpander::ExpandOp(mlir::Operation* op) {
 
 StatusOr<Layout> MatMulSPMDExpander::OutputLayoutAndReducedDims(
     bool allow_unknown_layouts, mlir::Operation* op,
-    absl::flat_hash_set<std::string>* reduced_dims,
-    absl::optional<Layout>* left, absl::optional<Layout>* right) {
+    abslx::flat_hash_set<std::string>* reduced_dims,
+    abslx::optional<Layout>* left, abslx::optional<Layout>* right) {
   // These layouts are 2d layouts for the non-batch dimensions.
   Layout left_layout;
   Layout right_layout;
@@ -369,14 +369,14 @@ StatusOr<llvm::DenseMap<int, Layout>> MatMulSPMDExpander::ComputeLayoutForward(
   if (input_layouts.empty()) return llvm::DenseMap<int, Layout>();
 
   TF_ASSIGN_OR_RETURN(auto mesh, ExtractDeviceMeshEnclosingCluster(op));
-  absl::flat_hash_set<std::string> reduced_dims;
+  abslx::flat_hash_set<std::string> reduced_dims;
   TF_ASSIGN_OR_RETURN(const auto left_shape,
                       GetShapeOfValue(op->getOperand(0)));
   TF_ASSIGN_OR_RETURN(const auto right_shape,
                       GetShapeOfValue(op->getOperand(1)));
 
   // At least one input is set, calculate an output layout.
-  absl::optional<Layout> left, right;
+  abslx::optional<Layout> left, right;
   if (input_layouts.find(0) != input_layouts.end())
     left.emplace(input_layouts.lookup(0));
   else

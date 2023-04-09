@@ -22,7 +22,7 @@ limitations under the License.
 namespace xla {
 
 HloReachabilityMap::HloReachabilityMap(
-    absl::Span<const HloInstruction* const> instructions)
+    abslx::Span<const HloInstruction* const> instructions)
     : size_(instructions.size()) {
   bit_vectors_.reserve(size_);
   for (const HloInstruction* hlo : instructions) {
@@ -33,7 +33,7 @@ HloReachabilityMap::HloReachabilityMap(
 }
 
 bool HloReachabilityMap::SetReachabilityToUnion(
-    absl::Span<const HloInstruction* const> inputs,
+    abslx::Span<const HloInstruction* const> inputs,
     const HloInstruction* instruction) {
   Index index = GetIndex(instruction);
   BitVector& bit_vector = GetBitVector(index);
@@ -43,20 +43,20 @@ bool HloReachabilityMap::SetReachabilityToUnion(
 }
 
 void HloReachabilityMap::FastSetReachabilityToUnion(
-    absl::Span<const HloInstruction* const> inputs,
+    abslx::Span<const HloInstruction* const> inputs,
     const HloInstruction* instruction) {
   Index index = GetIndex(instruction);
   SetReachabilityToUnionHelper(inputs, index);
 }
 
 void HloReachabilityMap::FastSetReachabilityToUnion(
-    absl::Span<const Index> input_indices, Index index) {
+    abslx::Span<const Index> input_indices, Index index) {
   SetReachabilityToUnionHelper(input_indices, index);
 }
 
 void HloReachabilityMap::SetReachabilityToUnionHelper(
-    absl::Span<const HloInstruction* const> inputs, Index index) {
-  absl::InlinedVector<Index, 16> input_indices;
+    abslx::Span<const HloInstruction* const> inputs, Index index) {
+  abslx::InlinedVector<Index, 16> input_indices;
   input_indices.reserve(inputs.size());
   for (const HloInstruction* input : inputs) {
     input_indices.push_back(GetIndex(input));
@@ -65,10 +65,10 @@ void HloReachabilityMap::SetReachabilityToUnionHelper(
 }
 
 void HloReachabilityMap::SetReachabilityToUnionHelper(
-    absl::Span<const Index> input_indices, Index index) {
+    abslx::Span<const Index> input_indices, Index index) {
   BitVector& bit_vector = GetBitVector(index);
   // If instruction is part of inputs, don't reset the bit_vector.
-  if (!absl::c_linear_search(input_indices, index)) {
+  if (!abslx::c_linear_search(input_indices, index)) {
     bit_vector.SetToZero();
   }
   bit_vector.Set(index.v);
@@ -94,7 +94,7 @@ void HloReachabilityMap::SetReachable(Index a, Index b) {
 
 std::unique_ptr<HloReachabilityMap> HloReachabilityMap::BuildWithRestrictions(
     const HloComputation* computation,
-    absl::FunctionRef<void(const HloInstruction*,
+    abslx::FunctionRef<void(const HloInstruction*,
                            std::vector<HloInstruction*>*)>
         add_dependencies) {
   const auto& all = computation->MakeInstructionPostOrder();

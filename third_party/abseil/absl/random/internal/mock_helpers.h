@@ -22,7 +22,7 @@
 #include "absl/base/internal/fast_type_id.h"
 #include "absl/types/optional.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -38,7 +38,7 @@ namespace random_internal {
 //   result_type(args...)
 //
 class MockHelpers {
-  using IdType = ::absl::base_internal::FastTypeIdType;
+  using IdType = ::abslx::base_internal::FastTypeIdType;
 
   // Given a key signature type used to index the mock, extract the components.
   // KeyT is expected to have the form:
@@ -61,22 +61,22 @@ class MockHelpers {
   // Empty implementation of InvokeMock.
   template <typename KeyT, typename ReturnT, typename ArgTupleT, typename URBG,
             typename... Args>
-  static absl::optional<ReturnT> InvokeMockImpl(char, URBG*, Args&&...) {
-    return absl::nullopt;
+  static abslx::optional<ReturnT> InvokeMockImpl(char, URBG*, Args&&...) {
+    return abslx::nullopt;
   }
 
   // Non-empty implementation of InvokeMock.
   template <typename KeyT, typename ReturnT, typename ArgTupleT, typename URBG,
             typename = invoke_mock_t<URBG>, typename... Args>
-  static absl::optional<ReturnT> InvokeMockImpl(int, URBG* urbg,
+  static abslx::optional<ReturnT> InvokeMockImpl(int, URBG* urbg,
                                                 Args&&... args) {
     ArgTupleT arg_tuple(std::forward<Args>(args)...);
     ReturnT result;
-    if (urbg->InvokeMock(::absl::base_internal::FastTypeId<KeyT>(), &arg_tuple,
+    if (urbg->InvokeMock(::abslx::base_internal::FastTypeId<KeyT>(), &arg_tuple,
                          &result)) {
       return result;
     }
-    return absl::nullopt;
+    return abslx::nullopt;
   }
 
  public:
@@ -99,7 +99,7 @@ class MockHelpers {
   // the underlying mechanism requires a pointer to an argument tuple.
   template <typename KeyT, typename URBG, typename... Args>
   static auto MaybeInvokeMock(URBG* urbg, Args&&... args)
-      -> absl::optional<typename KeySignature<KeyT>::result_type> {
+      -> abslx::optional<typename KeySignature<KeyT>::result_type> {
     // Use function overloading to dispatch to the implemenation since
     // more modern patterns (e.g. require + constexpr) are not supported in all
     // compiler configurations.
@@ -123,12 +123,12 @@ class MockHelpers {
           m, std::declval<IdType>())) {
     return m.template RegisterMock<typename KeySignature<KeyT>::result_type,
                                    typename KeySignature<KeyT>::arg_tuple_type>(
-        m, ::absl::base_internal::FastTypeId<KeyT>());
+        m, ::abslx::base_internal::FastTypeId<KeyT>());
   }
 };
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_INTERNAL_MOCK_HELPERS_H_

@@ -223,7 +223,7 @@ void WaitForDistributedTpuOp::Compute(OpKernelContext* ctx) {
   size_t tpu_topology_output_size;
   char* tpu_topology_output = nullptr;
   TF_Status* status = TF_NewStatus();
-  auto cleanup = absl::MakeCleanup([&status, &tpu_topology_output]() {
+  auto cleanup = abslx::MakeCleanup([&status, &tpu_topology_output]() {
     TF_DeleteStatus(status);
     tpu::OpsApiFn()->TpuConfigurationApi_FreeCharArrayFn(tpu_topology_output);
   });
@@ -322,7 +322,7 @@ void InitializeHostForDistributedTpuOp::Compute(OpKernelContext* ctx) {
   TF_Status* status = TF_NewStatus();
   size_t device_id_output_size;
   int32_t* device_id_output = nullptr;
-  auto cleanup = absl::MakeCleanup([&status, &device_id_output]() {
+  auto cleanup = abslx::MakeCleanup([&status, &device_id_output]() {
     TF_DeleteStatus(status);
     tpu::OpsApiFn()->TpuConfigurationApi_FreeInt32ArrayFn(device_id_output);
   });
@@ -356,7 +356,7 @@ void InitializeHostForDistributedTpuOp::Compute(OpKernelContext* ctx) {
         &cache_size_bytes);
 
     char* server_address_output = nullptr;
-    auto cleanup_server_address = absl::MakeCleanup([&server_address_output]() {
+    auto cleanup_server_address = abslx::MakeCleanup([&server_address_output]() {
       tpu::OpsApiFn()->TpuConfigurationApi_FreeCharArrayFn(
           server_address_output);
     });
@@ -423,7 +423,7 @@ void InitializeHostForDistributedTpuOp::Compute(OpKernelContext* ctx) {
               accelerator_device_info->stream->parent()->device_ordinal();
           if (device_ordinal >= device_id_output_size) {
             OP_REQUIRES_OK(ctx,
-                           errors::Internal(absl::StrCat(
+                           errors::Internal(abslx::StrCat(
                                "TPU core with ordinal ", device_ordinal,
                                " out of range for device ", device->name(),
                                ". Expected ordinals in range [0, ",

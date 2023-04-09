@@ -57,10 +57,10 @@ using ::tensorflow::data::experimental::AutoShardDatasetOp;
 
 // A dynamic port has form %port% or %port_foo% that is to be replaced with the
 // actual port.
-bool HasDynamicPort(absl::string_view address) {
+bool HasDynamicPort(abslx::string_view address) {
   URL url(address);
-  return url.has_port() && absl::StartsWith(url.port(), "%port") &&
-         absl::EndsWith(url.port(), "%");
+  return url.has_port() && abslx::StartsWith(url.port(), "%port") &&
+         abslx::EndsWith(url.port(), "%");
 }
 
 // Returns true if `config_address` has no port or a dynamic port (e.g.: %port%)
@@ -76,8 +76,8 @@ bool HasDynamicPort(absl::string_view address) {
 //  /worker/task/0:%port_worker%      /worker/task/0:10000
 //  localhost                         localhost:10000
 //  localhost:%port%                  localhost:10000
-bool ShouldReplaceDynamicPort(absl::string_view config_address,
-                              absl::string_view worker_address) {
+bool ShouldReplaceDynamicPort(abslx::string_view config_address,
+                              abslx::string_view worker_address) {
   URL config_url(config_address), worker_url(worker_address);
   return (!config_url.has_port() || HasDynamicPort(config_address)) &&
          worker_url.has_port() && config_url.host() == worker_url.host();
@@ -143,27 +143,27 @@ AutoShardRewriter::GetRewriteConfig() const {
 }
 
 Status WorkerIndexResolver::ValidateWorker(
-    absl::string_view worker_address) const {
+    abslx::string_view worker_address) const {
   if (worker_addresses_.empty()) {
     return OkStatus();
   }
 
-  for (absl::string_view config_address : worker_addresses_) {
+  for (abslx::string_view config_address : worker_addresses_) {
     if (config_address == worker_address ||
         ShouldReplaceDynamicPort(config_address, worker_address)) {
       return OkStatus();
     }
   }
 
-  return errors::FailedPrecondition(absl::Substitute(
+  return errors::FailedPrecondition(abslx::Substitute(
       "Failed to assign an index for worker $0. Configured workers list: [$1]. "
       "The worker's address is not configured, or other workers are already "
       "running at the configured host. If your worker has restarted, make sure "
       "it runs at the same address and port.",
-      worker_address, absl::StrJoin(worker_addresses_, ", ")));
+      worker_address, abslx::StrJoin(worker_addresses_, ", ")));
 }
 
-void WorkerIndexResolver::AddWorker(absl::string_view worker_address) {
+void WorkerIndexResolver::AddWorker(abslx::string_view worker_address) {
   for (std::string& config_address : worker_addresses_) {
     if (config_address == worker_address) {
       return;
@@ -176,13 +176,13 @@ void WorkerIndexResolver::AddWorker(absl::string_view worker_address) {
 }
 
 StatusOr<int64_t> WorkerIndexResolver::GetWorkerIndex(
-    absl::string_view worker_address) const {
-  const auto it = absl::c_find(worker_addresses_, worker_address);
+    abslx::string_view worker_address) const {
+  const auto it = abslx::c_find(worker_addresses_, worker_address);
   if (it == worker_addresses_.cend()) {
-    return errors::NotFound(absl::Substitute(
+    return errors::NotFound(abslx::Substitute(
         "Failed to shard dataset in tf.data service: Worker $0 is not in the "
         "workers list. Got workers list $1.",
-        worker_address, absl::StrJoin(worker_addresses_, ",")));
+        worker_address, abslx::StrJoin(worker_addresses_, ",")));
   }
   return std::distance(worker_addresses_.cbegin(), it);
 }

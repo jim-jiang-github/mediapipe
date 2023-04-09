@@ -22,9 +22,9 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status FullyConnectedTest(TestExecutionEnvironment* env);
-absl::Status FullyConnectedLargeTest(TestExecutionEnvironment* env);
-absl::Status FullyConnectedExtraLargeTest(TestExecutionEnvironment* env);
+abslx::Status FullyConnectedTest(TestExecutionEnvironment* env);
+abslx::Status FullyConnectedLargeTest(TestExecutionEnvironment* env);
+abslx::Status FullyConnectedExtraLargeTest(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

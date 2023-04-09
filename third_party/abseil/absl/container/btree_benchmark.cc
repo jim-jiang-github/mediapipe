@@ -41,7 +41,7 @@
 #include "absl/strings/str_format.h"
 #include "absl/time/time.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
@@ -448,12 +448,12 @@ STL_ORDERED_TYPES(Time);
   using stl_unordered_multimap_##value =                                       \
       std::unordered_multimap<value, intptr_t, hash>
 
-STL_UNORDERED_TYPES_CUSTOM_HASH(Cord, absl::Hash<absl::Cord>);
+STL_UNORDERED_TYPES_CUSTOM_HASH(Cord, abslx::Hash<abslx::Cord>);
 
 STL_UNORDERED_TYPES(int32_t);
 STL_UNORDERED_TYPES(int64_t);
 STL_UNORDERED_TYPES(StdString);
-STL_UNORDERED_TYPES_CUSTOM_HASH(Time, absl::Hash<absl::Time>);
+STL_UNORDERED_TYPES_CUSTOM_HASH(Time, abslx::Hash<abslx::Time>);
 
 #define BTREE_TYPES(value)                                            \
   using btree_256_set_##value =                                       \
@@ -559,7 +559,7 @@ struct BigType {
                       other.values.begin());
   }
 
-  // Support absl::Hash.
+  // Support abslx::Hash.
   template <typename State>
   friend State AbslHashValue(State h, const BigType& b) {
     for (int i = 0; i < Size && i < Copies; ++i)
@@ -580,20 +580,20 @@ struct BigType {
       std::multimap<BigType<SIZE, COPIES>, intptr_t>;                         \
   using stl_unordered_set_size##SIZE##copies##COPIES =                        \
       std::unordered_set<BigType<SIZE, COPIES>,                               \
-                         absl::Hash<BigType<SIZE, COPIES>>>;                  \
+                         abslx::Hash<BigType<SIZE, COPIES>>>;                  \
   using stl_unordered_map_size##SIZE##copies##COPIES =                        \
       std::unordered_map<BigType<SIZE, COPIES>, intptr_t,                     \
-                         absl::Hash<BigType<SIZE, COPIES>>>;                  \
+                         abslx::Hash<BigType<SIZE, COPIES>>>;                  \
   using flat_hash_set_size##SIZE##copies##COPIES =                            \
       flat_hash_set<BigType<SIZE, COPIES>>;                                   \
   using flat_hash_map_size##SIZE##copies##COPIES =                            \
       flat_hash_map<BigType<SIZE, COPIES>, intptr_t>;                         \
   using stl_unordered_multiset_size##SIZE##copies##COPIES =                   \
       std::unordered_multiset<BigType<SIZE, COPIES>,                          \
-                              absl::Hash<BigType<SIZE, COPIES>>>;             \
+                              abslx::Hash<BigType<SIZE, COPIES>>>;             \
   using stl_unordered_multimap_size##SIZE##copies##COPIES =                   \
       std::unordered_multimap<BigType<SIZE, COPIES>, intptr_t,                \
-                              absl::Hash<BigType<SIZE, COPIES>>>;             \
+                              abslx::Hash<BigType<SIZE, COPIES>>>;             \
   using btree_256_set_size##SIZE##copies##COPIES =                            \
       btree_set<BigType<SIZE, COPIES>>;                                       \
   using btree_256_map_size##SIZE##copies##COPIES =                            \
@@ -633,14 +633,14 @@ template <int Size>
 struct BigTypePtr {
   BigTypePtr() : BigTypePtr(0) {}
   explicit BigTypePtr(int x) {
-    ptr = absl::make_unique<BigType<Size, Size>>(x);
+    ptr = abslx::make_unique<BigType<Size, Size>>(x);
   }
   BigTypePtr(const BigTypePtr& other) {
-    ptr = absl::make_unique<BigType<Size, Size>>(*other.ptr);
+    ptr = abslx::make_unique<BigType<Size, Size>>(*other.ptr);
   }
   BigTypePtr(BigTypePtr&& other) noexcept = default;
   BigTypePtr& operator=(const BigTypePtr& other) {
-    ptr = absl::make_unique<BigType<Size, Size>>(*other.ptr);
+    ptr = abslx::make_unique<BigType<Size, Size>>(*other.ptr);
   }
   BigTypePtr& operator=(BigTypePtr&& other) noexcept = default;
 
@@ -673,7 +673,7 @@ double ContainerInfo(const btree_map<int, BigTypePtr<Size>>& b) {
       std::map<int, BigType<SIZE, SIZE>>;                                      \
   using stl_unordered_set_size##SIZE##copies##SIZE##ptr =                      \
       std::unordered_set<BigType<SIZE, SIZE>,                                  \
-                         absl::Hash<BigType<SIZE, SIZE>>>;                     \
+                         abslx::Hash<BigType<SIZE, SIZE>>>;                     \
   using stl_unordered_map_size##SIZE##copies##SIZE##ptr =                      \
       std::unordered_map<int, BigType<SIZE, SIZE>>;                            \
   using flat_hash_set_size##SIZE##copies##SIZE##ptr =                          \
@@ -698,4 +698,4 @@ BIG_TYPE_PTR_BENCHMARKS(32);
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

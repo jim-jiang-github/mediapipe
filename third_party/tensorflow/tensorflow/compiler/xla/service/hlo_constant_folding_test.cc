@@ -203,7 +203,7 @@ TEST_F(HloConstantFoldingTest, TransposeConstantFold) {
   using NativeT = typename primitive_util::PrimitiveTypeToNative<F32>::type;
   bool matched = true;
   root->literal().EachCell<NativeT>(
-      [&](absl::Span<const int64_t> indices, NativeT value) {
+      [&](abslx::Span<const int64_t> indices, NativeT value) {
         std::vector<int64_t> rindexes = PermuteInverse(indices, permutation);
         matched = matched && (value == literal_clone.Get<NativeT>(rindexes));
       });
@@ -347,7 +347,7 @@ TEST_F(HloConstantFoldingTest, FoldOpsWhereOneOperandIsBroadcast) {
 }
 
 TEST_F(HloConstantFoldingTest, BigReduceWindow) {
-  constexpr absl::string_view kModuleStr = R"(
+  constexpr abslx::string_view kModuleStr = R"(
     HloModule test
 
     add_bf16 {

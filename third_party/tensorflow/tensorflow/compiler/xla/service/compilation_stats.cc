@@ -30,9 +30,9 @@ class NoopStats : public CompilationStats {
  public:
   NoopStats() = default;
 
-  void StartPass(absl::string_view pass_name) override {}
+  void StartPass(abslx::string_view pass_name) override {}
 
-  void EndPass(absl::string_view pass_name) override {}
+  void EndPass(abslx::string_view pass_name) override {}
 
   void CompilationReport() override {}
 
@@ -43,9 +43,9 @@ class Stats : public CompilationStats {
  public:
   Stats() = default;
 
-  void StartPass(absl::string_view pass_name) override;
+  void StartPass(abslx::string_view pass_name) override;
 
-  void EndPass(absl::string_view pass_name) override;
+  void EndPass(abslx::string_view pass_name) override;
 
   void CompilationReport() override;
 
@@ -53,7 +53,7 @@ class Stats : public CompilationStats {
 
  private:
   struct PassInfo {
-    PassInfo(absl::string_view name, double duration)
+    PassInfo(abslx::string_view name, double duration)
         : name(name), duration_ms(duration) {}
 
     std::string name;
@@ -80,7 +80,7 @@ std::unique_ptr<CompilationStats> CompilationStats::MakeStats() {
   return std::make_unique<Stats>();
 }
 
-void Stats::StartPass(absl::string_view pass_name) {
+void Stats::StartPass(abslx::string_view pass_name) {
   CHECK(!pass_running_) << "Can't start " << pass_name << " while running "
                         << current_pass_;
   pass_running_ = true;
@@ -88,7 +88,7 @@ void Stats::StartPass(absl::string_view pass_name) {
   start_micros_ = tensorflow::Env::Default()->NowMicros();
 }
 
-void Stats::EndPass(absl::string_view pass_name) {
+void Stats::EndPass(abslx::string_view pass_name) {
   CHECK(pass_running_);
   CHECK_EQ(current_pass_, std::string(pass_name));
   pass_running_ = false;
@@ -99,7 +99,7 @@ void Stats::EndPass(absl::string_view pass_name) {
 
 void Stats::CompilationReport() {
   CHECK(!pass_running_) << "EndPass never called for " << current_pass_;
-  absl::flat_hash_map<std::string, PassInfo> summary;
+  abslx::flat_hash_map<std::string, PassInfo> summary;
   double total_duration = 0;
 
   for (auto& pass_run : passes_) {
@@ -119,7 +119,7 @@ void Stats::CompilationReport() {
   for (auto& it : summary) {
     sorted_summary.push_back(it.second);
   }
-  absl::c_sort(sorted_summary, [](const PassInfo& a, const PassInfo& b) {
+  abslx::c_sort(sorted_summary, [](const PassInfo& a, const PassInfo& b) {
     // Sort passes that take the longest first, break ties using pass names.
     return std::make_pair(b.duration_ms, a.name) <
            std::make_pair(a.duration_ms, b.name);

@@ -27,12 +27,12 @@ std::string SessionNameFromMetadata(const SessionMetadata* session_metadata) {
 }
 
 std::string ProtoKeyForComputation(const std::string& key, int core) {
-  return absl::StrCat(key, ":", core);
+  return abslx::StrCat(key, ":", core);
 }
 
 xla::StatusOr<TpuCompilationCacheKey> ParseCompilationCacheKey(
     const std::string& key) {
-  const std::vector<std::string> splits = absl::StrSplit(key, '|');
+  const std::vector<std::string> splits = abslx::StrSplit(key, '|');
   if (splits.size() == 1) {
     // No guaranteed_const.
     return TpuCompilationCacheKey(key);
@@ -100,9 +100,9 @@ Status DynamicShapesToTensorShapes(const InputList& dynamic_shapes,
 
 xla::StatusOr<std::unique_ptr<::grpc::ServerBuilder>> CreateServerBuilder(
     int serving_port) {
-  auto server_builder = absl::make_unique<::grpc::ServerBuilder>();
+  auto server_builder = abslx::make_unique<::grpc::ServerBuilder>();
   server_builder->AddListeningPort(
-      absl::StrFormat("[::]:%d", serving_port),
+      abslx::StrFormat("[::]:%d", serving_port),
       ::grpc::InsecureServerCredentials());  // NOLINT
   return std::move(server_builder);
 }

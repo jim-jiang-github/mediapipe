@@ -21,11 +21,11 @@ limitations under the License.
 
 namespace mlir {
 
-inline absl::string_view StringRefToView(llvm::StringRef ref) {
-  return absl::string_view(ref.data(), ref.size());
+inline abslx::string_view StringRefToView(llvm::StringRef ref) {
+  return abslx::string_view(ref.data(), ref.size());
 }
 
-inline llvm::StringRef StringViewToRef(absl::string_view view) {
+inline llvm::StringRef StringViewToRef(abslx::string_view view) {
   return llvm::StringRef(view.data(), view.size());
 }
 

@@ -119,12 +119,12 @@ class CPUFeatureGuard {
 
 CPUFeatureGuard g_cpu_feature_guard_singleton;
 
-absl::once_flag g_cpu_feature_guard_warn_once_flag;
+abslx::once_flag g_cpu_feature_guard_warn_once_flag;
 
 }  // namespace
 
 void InfoAboutUnusedCPUFeatures() {
-  absl::call_once(g_cpu_feature_guard_warn_once_flag, [] {
+  abslx::call_once(g_cpu_feature_guard_warn_once_flag, [] {
     string missing_instructions;
 #if defined(_MSC_VER) && !defined(__clang__)
 

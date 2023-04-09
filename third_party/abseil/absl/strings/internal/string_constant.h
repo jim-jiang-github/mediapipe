@@ -18,12 +18,12 @@
 #include "absl/meta/type_traits.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace strings_internal {
 
 // StringConstant<T> represents a compile time string constant.
-// It can be accessed via its `absl::string_view value` static member.
+// It can be accessed via its `abslx::string_view value` static member.
 // It is guaranteed that the `string_view` returned has constant `.data()`,
 // constant `.size()` and constant `value[i]` for all `0 <= i < .size()`
 //
@@ -35,8 +35,8 @@ namespace strings_internal {
 // below.
 template <typename T>
 struct StringConstant {
-  static constexpr absl::string_view value = T{}();
-  constexpr absl::string_view operator()() const { return value; }
+  static constexpr abslx::string_view value = T{}();
+  constexpr abslx::string_view operator()() const { return value; }
 
   // Check to be sure `view` points to constant data.
   // Otherwise, it can't be constant evaluated.
@@ -45,12 +45,12 @@ struct StringConstant {
 };
 
 template <typename T>
-constexpr absl::string_view StringConstant<T>::value;  // NOLINT
+constexpr abslx::string_view StringConstant<T>::value;  // NOLINT
 
 // Factory function for `StringConstant` instances.
 // It supports callables that have a constexpr default constructor and a
 // constexpr operator().
-// It must return an `absl::string_view` or `const char*` pointing to constant
+// It must return an `abslx::string_view` or `const char*` pointing to constant
 // data. This is validated at compile time.
 template <typename T>
 constexpr StringConstant<T> MakeStringConstant(T) {
@@ -59,6 +59,6 @@ constexpr StringConstant<T> MakeStringConstant(T) {
 
 }  // namespace strings_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_INTERNAL_STRING_CONSTANT_H_

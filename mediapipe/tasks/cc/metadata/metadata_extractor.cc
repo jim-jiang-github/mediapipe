@@ -37,7 +37,7 @@ namespace metadata {
 namespace {
 constexpr char kMetadataBufferName[] = "TFLITE_METADATA";
 
-using ::absl::StatusCode;
+using ::abslx::StatusCode;
 using ::flatbuffers::Offset;
 using ::flatbuffers::Vector;
 using ::mediapipe::tasks::CreateStatusWithPayload;
@@ -56,19 +56,19 @@ const T* GetItemFromVector(
 }  // namespace
 
 /* static */
-absl::StatusOr<std::unique_ptr<ModelMetadataExtractor>>
+abslx::StatusOr<std::unique_ptr<ModelMetadataExtractor>>
 ModelMetadataExtractor::CreateFromModelBuffer(const char* buffer_data,
                                               size_t buffer_size) {
-  // Use absl::WrapUnique() to call private constructor:
+  // Use abslx::WrapUnique() to call private constructor:
   // https://abseil.io/tips/126.
   std::unique_ptr<ModelMetadataExtractor> extractor =
-      absl::WrapUnique(new ModelMetadataExtractor());
+      abslx::WrapUnique(new ModelMetadataExtractor());
   MP_RETURN_IF_ERROR(extractor->InitFromModelBuffer(buffer_data, buffer_size));
   return extractor;
 }
 
 /* static */
-absl::StatusOr<const tflite::ProcessUnit*>
+abslx::StatusOr<const tflite::ProcessUnit*>
 ModelMetadataExtractor::FindFirstProcessUnit(
     const tflite::TensorMetadata& tensor_metadata,
     tflite::ProcessUnitOptions type) {
@@ -81,7 +81,7 @@ ModelMetadataExtractor::FindFirstProcessUnit(
       if (result != nullptr) {
         return CreateStatusWithPayload(
             StatusCode::kInvalidArgument,
-            absl::StrCat("Found multiple ProcessUnits with type=",
+            abslx::StrCat("Found multiple ProcessUnits with type=",
                          tflite::EnumNameProcessUnitOptions(type),
                          ", expected at most one."),
             MediaPipeTasksStatus::kMetadataInvalidProcessUnitsError);
@@ -95,7 +95,7 @@ ModelMetadataExtractor::FindFirstProcessUnit(
 /* static */
 std::string ModelMetadataExtractor::FindFirstAssociatedFileName(
     const tflite::TensorMetadata& tensor_metadata,
-    tflite::AssociatedFileType type, absl::string_view locale) {
+    tflite::AssociatedFileType type, abslx::string_view locale) {
   if (tensor_metadata.associated_files() == nullptr) {
     return std::string();
   }
@@ -111,7 +111,7 @@ std::string ModelMetadataExtractor::FindFirstAssociatedFileName(
   return std::string();
 }
 
-absl::Status ModelMetadataExtractor::InitFromModelBuffer(
+abslx::Status ModelMetadataExtractor::InitFromModelBuffer(
     const char* buffer_data, size_t buffer_size) {
   // Rely on the simplest, base flatbuffers verifier. Here is not the place to
   // e.g. use an OpResolver: we just want to make sure the buffer is valid to
@@ -128,7 +128,7 @@ absl::Status ModelMetadataExtractor::InitFromModelBuffer(
   if (model_->metadata() == nullptr) {
     // Not all models have metadata, which is OK. `GetModelMetadata()` then
     // returns nullptr.
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   // Look for the "TFLITE_METADATA" field, if any.
   for (int i = 0; i < model_->metadata()->size(); ++i) {
@@ -145,14 +145,14 @@ absl::Status ModelMetadataExtractor::InitFromModelBuffer(
     if (!tflite::ModelMetadataBufferHasIdentifier(metadata_buffer)) {
       return CreateStatusWithPayload(
           StatusCode::kInvalidArgument,
-          absl::StrFormat(
+          abslx::StrFormat(
               "Invalid metadata schema version: expected %s, got %s",
-              absl::string_view(tflite::ModelMetadataIdentifier())
+              abslx::string_view(tflite::ModelMetadataIdentifier())
                   .substr(
                       0, flatbuffers::FlatBufferBuilder::kFileIdentifierLength),
               // Returned identifier is not null terminated; has to be
               // truncated.
-              absl::string_view(
+              abslx::string_view(
                   flatbuffers::GetBufferIdentifier(metadata_buffer))
                   .substr(
                       0,
@@ -167,35 +167,35 @@ absl::Status ModelMetadataExtractor::InitFromModelBuffer(
     return ExtractAssociatedFiles(buffer_data, buffer_size);
     break;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ModelMetadataExtractor::ExtractAssociatedFiles(
+abslx::Status ModelMetadataExtractor::ExtractAssociatedFiles(
     const char* buffer_data, size_t buffer_size) {
   auto status =
       ExtractFilesfromZipFile(buffer_data, buffer_size, &associated_files_);
   if (!status.ok() &&
-      absl::StrContains(status.message(), "Unable to open zip archive.")) {
+      abslx::StrContains(status.message(), "Unable to open zip archive.")) {
     // It's OK if it fails: this means there are no associated files with this
     // model.
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   return status;
 }
 
-absl::StatusOr<absl::string_view> ModelMetadataExtractor::GetAssociatedFile(
+abslx::StatusOr<abslx::string_view> ModelMetadataExtractor::GetAssociatedFile(
     const std::string& filename) const {
   auto it = associated_files_.find(filename);
   if (it == associated_files_.end()) {
     return CreateStatusWithPayload(
         StatusCode::kNotFound,
-        absl::StrFormat("No associated file with name: %s", filename),
+        abslx::StrFormat("No associated file with name: %s", filename),
         MediaPipeTasksStatus::kMetadataAssociatedFileNotFoundError);
   }
   return it->second;
 }
 
-absl::StatusOr<std::string> ModelMetadataExtractor::GetModelVersion() const {
+abslx::StatusOr<std::string> ModelMetadataExtractor::GetModelVersion() const {
   if (model_metadata_ == nullptr) {
     return CreateStatusWithPayload(
         StatusCode::kFailedPrecondition, "No model metadata",

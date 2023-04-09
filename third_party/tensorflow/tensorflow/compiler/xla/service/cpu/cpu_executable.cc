@@ -93,7 +93,7 @@ CpuExecutable::~CpuExecutable() {
 
 static StatusOr<MaybeOwningDeviceMemory> MemoryForAllocation(
     const BufferAllocation& allocation,
-    absl::Span<ExecutionInput const> arguments,
+    abslx::Span<ExecutionInput const> arguments,
     se::DeviceMemoryAllocator* memory_allocator, int device_ordinal) {
   VLOG(3) << allocation.ToString();
   if (allocation.is_entry_computation_parameter()) {
@@ -129,7 +129,7 @@ static StatusOr<MaybeOwningDeviceMemory> MemoryForAllocation(
 
 StatusOr<std::vector<MaybeOwningDeviceMemory>> CpuExecutable::CreateBufferTable(
     se::DeviceMemoryAllocator* memory_allocator, int device_ordinal,
-    absl::Span<ExecutionInput const> arguments) {
+    abslx::Span<ExecutionInput const> arguments) {
   std::vector<MaybeOwningDeviceMemory> buffers(
       assignment_->Allocations().size());
   VLOG(3) << "Allocating " << assignment_->Allocations().size()
@@ -152,7 +152,7 @@ StatusOr<std::vector<MaybeOwningDeviceMemory>> CpuExecutable::CreateBufferTable(
 
 Status CpuExecutable::ExecuteComputeFunction(
     const ExecutableRunOptions* run_options,
-    absl::Span<MaybeOwningDeviceMemory const> buffers,
+    abslx::Span<MaybeOwningDeviceMemory const> buffers,
     HloExecutionProfile* hlo_execution_profile) {
   uint64_t start_micros = tensorflow::Env::Default()->NowMicros();
 
@@ -174,16 +174,16 @@ Status CpuExecutable::ExecuteComputeFunction(
   }
 
   VLOG(3) << "Executing compute function:";
-  VLOG(3) << absl::StrFormat("  Number of buffer table entries: %u",
+  VLOG(3) << abslx::StrFormat("  Number of buffer table entries: %u",
                              buffer_pointers.size());
   auto ptr_printer = [](std::string* out, const void* p) {
-    absl::StrAppend(out, absl::StrFormat("%p", p));
+    abslx::StrAppend(out, abslx::StrFormat("%p", p));
   };
-  VLOG(3) << absl::StrFormat("  Buffer table: [%s]",
-                             absl::StrJoin(buffer_pointers, ", ", ptr_printer));
-  VLOG(3) << absl::StrFormat("  Number of profile counters: %u",
+  VLOG(3) << abslx::StrFormat("  Buffer table: [%s]",
+                             abslx::StrJoin(buffer_pointers, ", ", ptr_printer));
+  VLOG(3) << abslx::StrFormat("  Number of profile counters: %u",
                              profile_counters_size);
-  VLOG(3) << absl::StrFormat("  Profile counters: %p", profile_counters);
+  VLOG(3) << abslx::StrFormat("  Profile counters: %p", profile_counters);
 
   XlaCustomCallStatus status;
   // For the entry computation (like all global computations), all inputs and
@@ -206,7 +206,7 @@ Status CpuExecutable::ExecuteComputeFunction(
     }
   }
 
-  std::optional<absl::string_view> error_message =
+  std::optional<abslx::string_view> error_message =
       CustomCallStatusGetMessage(&status);
   if (error_message) {
     return InternalError("CustomCall failed: %s", *error_message);
@@ -217,8 +217,8 @@ Status CpuExecutable::ExecuteComputeFunction(
 
 StatusOr<ExecutionOutput> CpuExecutable::CreateResultShapedBuffer(
     const ServiceExecutableRunOptions* run_options,
-    absl::Span<MaybeOwningDeviceMemory> buffers,
-    absl::Span<ExecutionInput> arguments) {
+    abslx::Span<MaybeOwningDeviceMemory> buffers,
+    abslx::Span<ExecutionInput> arguments) {
   se::Stream* stream = run_options->stream();
   ExecutionOutput result(/*on_device_shape=*/result_shape(),
                          run_options->allocator(),
@@ -350,8 +350,8 @@ StatusOr<ExecutionOutput> CpuExecutable::ExecuteAsyncOnStream(
 
   TF_ASSIGN_OR_RETURN(
       ExecutionOutput result,
-      CreateResultShapedBuffer(run_options, absl::MakeSpan(buffers),
-                               absl::MakeSpan(arguments)));
+      CreateResultShapedBuffer(run_options, abslx::MakeSpan(buffers),
+                               abslx::MakeSpan(arguments)));
 
   // Logically we want this lambda to capture `buffers` by move, ultimately our
   // functor needs to be wrapped in an std::function, and that requires its
@@ -379,7 +379,7 @@ StatusOr<ExecutionOutput> CpuExecutable::ExecuteAsyncOnStream(
                        std::move(buffers)),
                    hlo_execution_profile});
 
-  MarkToBeReleasedArguments(absl::MakeSpan(arguments), result);
+  MarkToBeReleasedArguments(abslx::MakeSpan(arguments), result);
   return std::move(result);
 }
 

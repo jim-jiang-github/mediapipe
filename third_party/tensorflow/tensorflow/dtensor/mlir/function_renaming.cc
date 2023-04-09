@@ -54,7 +54,7 @@ struct DTensorFunctionRenaming
       // public and may be used by other modules/pieces of code.
       if (func_op.getVisibility() != mlir::SymbolTable::Visibility::Private)
         continue;
-      std::string new_name = absl::StrCat(
+      std::string new_name = abslx::StrCat(
           mlir::SymbolTable::getSymbolName(func_op).getValue().str(), append);
       symbolUsers.replaceAllUsesWith(
           func_op, mlir::StringAttr::get(&getContext(), new_name));

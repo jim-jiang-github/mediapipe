@@ -50,7 +50,7 @@ Classification GetMaxScoringClassification(
 
 float GetScoreThreshold(
     const std::string& input_label,
-    const absl::btree_map<std::string, float>& classwise_thresholds,
+    const abslx::btree_map<std::string, float>& classwise_thresholds,
     const std::string& background_label, const float default_threshold) {
   float threshold = default_threshold;
   auto it = classwise_thresholds.find(input_label);
@@ -62,7 +62,7 @@ float GetScoreThreshold(
 
 std::unique_ptr<ClassificationList> GetWinningPrediction(
     const ClassificationList& classification_list,
-    const absl::btree_map<std::string, float>& classwise_thresholds,
+    const abslx::btree_map<std::string, float>& classwise_thresholds,
     const std::string& background_label, const float default_threshold) {
   auto prediction_list = std::make_unique<ClassificationList>();
   if (classification_list.classification().empty()) {
@@ -140,16 +140,16 @@ class CombinedPredictionCalculator : public Node {
   static constexpr Output<ClassificationList> kPredictionOut{"PREDICTION"};
   MEDIAPIPE_NODE_CONTRACT(kClassificationListIn, kPredictionOut);
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     options_ = cc->Options<CombinedPredictionCalculatorOptions>();
     for (const auto& input : options_.class_()) {
       classwise_thresholds_[input.label()] = input.score_threshold();
     }
     classwise_thresholds_[options_.background_label()] = 0;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     // After loop, if have winning prediction return. Otherwise empty packet.
     std::unique_ptr<ClassificationList> first_winning_prediction = nullptr;
     auto collection = kClassificationListIn(cc);
@@ -163,7 +163,7 @@ class CombinedPredictionCalculator : public Node {
       if (prediction->classification(0).label() !=
           options_.background_label()) {
         kPredictionOut(cc).Send(std::move(prediction));
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
       if (first_winning_prediction == nullptr) {
         first_winning_prediction = std::move(prediction);
@@ -172,12 +172,12 @@ class CombinedPredictionCalculator : public Node {
     if (first_winning_prediction != nullptr) {
       kPredictionOut(cc).Send(std::move(first_winning_prediction));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
   CombinedPredictionCalculatorOptions options_;
-  absl::btree_map<std::string, float> classwise_thresholds_;
+  abslx::btree_map<std::string, float> classwise_thresholds_;
 };
 
 MEDIAPIPE_REGISTER_NODE(CombinedPredictionCalculator);

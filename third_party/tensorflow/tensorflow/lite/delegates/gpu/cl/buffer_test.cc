@@ -35,7 +35,7 @@ TEST_F(OpenCLTest, BufferTestFloat) {
   Buffer buffer;
   ASSERT_OK(CreateReadWriteBuffer(sizeof(float) * 5, &env_.context(), &buffer));
   ASSERT_OK(buffer.WriteData(env_.queue(),
-                             absl::MakeConstSpan(data.data(), data.size())));
+                             abslx::MakeConstSpan(data.data(), data.size())));
   std::vector<float> gpu_data;
   ASSERT_OK(buffer.ReadData<float>(env_.queue(), &gpu_data));
 
@@ -47,7 +47,7 @@ TEST_F(OpenCLTest, BufferTestHalf) {
   Buffer buffer;
   ASSERT_OK(CreateReadWriteBuffer(sizeof(half) * 3, &env_.context(), &buffer));
   ASSERT_OK(buffer.WriteData(env_.queue(),
-                             absl::MakeConstSpan(data.data(), data.size())));
+                             abslx::MakeConstSpan(data.data(), data.size())));
   std::vector<half> gpu_data;
   ASSERT_OK(buffer.ReadData<half>(env_.queue(), &gpu_data));
 

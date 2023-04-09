@@ -53,7 +53,7 @@ Status GenNode::ParseInputs(const GenNodeMap* map) {
   if (!st.ok()) {
     return Status(
         error::INVALID_ARGUMENT,
-        absl::StrFormat("Node '%s' contains an undefined operation '%s': %s",
+        abslx::StrFormat("Node '%s' contains an undefined operation '%s': %s",
                         name(), opcode(), st.error_message()));
   }
 
@@ -95,7 +95,7 @@ Status GenNode::ParseInputs(const GenNodeMap* map) {
     if (other_it == map->end()) {
       return Status(
           error::INVALID_ARGUMENT,
-          absl::StrFormat(
+          abslx::StrFormat(
               "Node '%s' input %d refers to a non-existing node '%s'.", name(),
               i, other_name));
     }
@@ -107,7 +107,7 @@ Status GenNode::ParseInputs(const GenNodeMap* map) {
         this_position >= n_named_inputs) {
       return Status(
           error::INVALID_ARGUMENT,
-          absl::StrFormat(
+          abslx::StrFormat(
               "Node '%s' has a non-control input from '%s' at index %d but its "
               "operation '%s' defines only %d inputs.",
               name(), other_name, this_position, op_->name(), n_named_inputs));
@@ -138,7 +138,7 @@ GenNode::Port::operator string() const {
   if (this->IsControl()) {
     result.append("C");
   } else {
-    result.append(absl::StrFormat("%d", this->Id()));
+    result.append(abslx::StrFormat("%d", this->Id()));
   }
   return result;
 }

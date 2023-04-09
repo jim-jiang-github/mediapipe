@@ -51,11 +51,11 @@ void CopyFrontendAttributes(HloInstruction* old_while_op,
 // same as before.
 static StatusOr<HloInstruction*> RemoveDeadTupleIndices(
     HloInstruction* while_op,
-    absl::flat_hash_set<int64_t>& used_tuple_indices) {
+    abslx::flat_hash_set<int64_t>& used_tuple_indices) {
   // Build up maps from the old/new to the new/old tuple indices.
   std::vector<int64_t> new_to_old_tuple_idx(used_tuple_indices.begin(),
                                             used_tuple_indices.end());
-  absl::c_sort(new_to_old_tuple_idx);
+  abslx::c_sort(new_to_old_tuple_idx);
 
   HloModule* module = while_op->GetModule();
   HloComputation* computation = while_op->parent();
@@ -66,7 +66,7 @@ static StatusOr<HloInstruction*> RemoveDeadTupleIndices(
 
   auto print_no_metadata = HloPrintOptions().set_print_metadata(false);
 
-  absl::flat_hash_map<int64_t, int64_t> old_to_new_tuple_idx;
+  abslx::flat_hash_map<int64_t, int64_t> old_to_new_tuple_idx;
   for (int64_t new_idx = 0; new_idx < new_to_old_tuple_idx.size(); ++new_idx) {
     int64_t old_idx = new_to_old_tuple_idx[new_idx];
     old_to_new_tuple_idx[old_idx] = new_idx;
@@ -87,7 +87,7 @@ static StatusOr<HloInstruction*> RemoveDeadTupleIndices(
   // replace the old instructions after we remove unused elements from the while
   // tuple.
   auto make_while_computation_replacements = [&](const HloComputation* comp) {
-    absl::flat_hash_map<const HloInstruction*, std::unique_ptr<HloInstruction>>
+    abslx::flat_hash_map<const HloInstruction*, std::unique_ptr<HloInstruction>>
         replacements;
 
     auto* param = comp->parameter_instruction(0);
@@ -135,12 +135,12 @@ static StatusOr<HloInstruction*> RemoveDeadTupleIndices(
   };
 
   // Create the new while condition, body, and init value.
-  absl::flat_hash_map<const HloInstruction*, std::unique_ptr<HloInstruction>>
+  abslx::flat_hash_map<const HloInstruction*, std::unique_ptr<HloInstruction>>
       while_cond_replacements = make_while_computation_replacements(while_cond);
   std::unique_ptr<HloComputation> new_while_cond =
       while_cond->CloneWithReplacements(&while_cond_replacements);
 
-  absl::flat_hash_map<const HloInstruction*, std::unique_ptr<HloInstruction>>
+  abslx::flat_hash_map<const HloInstruction*, std::unique_ptr<HloInstruction>>
       while_body_replacements = make_while_computation_replacements(while_body);
   std::vector<HloInstruction*> new_while_body_root_elems;
   new_while_body_root_elems.reserve(new_to_old_tuple_idx.size());
@@ -253,7 +253,7 @@ static StatusOr<bool> TryRemoveDeadWhileParams(HloInstruction* while_op) {
   auto print_no_metadata = HloPrintOptions().set_print_metadata(false);
   // A set that stores all unused indices. Initialize to all indices and then
   // remove elements from it.
-  absl::flat_hash_set<int64_t> used_tuple_indices;
+  abslx::flat_hash_set<int64_t> used_tuple_indices;
   for (int64_t i = 0; i < tuple_size; ++i) {
     used_tuple_indices.insert(i);
   }
@@ -279,7 +279,7 @@ static StatusOr<bool> TryRemoveDeadWhileParams(HloInstruction* while_op) {
                "empty.";
     return false;
   }
-  absl::flat_hash_set<int64_t> used_indices_after_loop;
+  abslx::flat_hash_set<int64_t> used_indices_after_loop;
   if (while_op == while_op->parent()->root_instruction()) {
     for (int64_t i = 0; i < while_body_root->operand_count(); ++i) {
       used_indices_after_loop.insert(i);
@@ -311,12 +311,12 @@ static StatusOr<bool> TryRemoveDeadWhileParams(HloInstruction* while_op) {
       // merge requests have come. This in practice saves a lot of heap
       // allocations for unary/binary/ternay ops.
       if (all.size() + other.all.size() <= all.capacity() && owned == nullptr) {
-        absl::c_copy(other.all, std::back_inserter(all));
+        abslx::c_copy(other.all, std::back_inserter(all));
         return;
       }
       // Create owned storage to merge stacked sets.
       if (owned == nullptr) {
-        owned = std::make_unique<absl::flat_hash_set<int64_t>>();
+        owned = std::make_unique<abslx::flat_hash_set<int64_t>>();
         // Rough estimation of new set size, to reduce resize.
         owned->reserve(other.all.front()->size() * 2);
       }
@@ -335,21 +335,21 @@ static StatusOr<bool> TryRemoveDeadWhileParams(HloInstruction* while_op) {
     void Add(int64_t index) {
       if (owned == nullptr) {
         CHECK(all.empty());
-        owned = std::make_unique<absl::flat_hash_set<int64_t>>();
+        owned = std::make_unique<abslx::flat_hash_set<int64_t>>();
         all.push_back(owned.get());
       }
       owned->insert(index);
     }
     // Owned storage.
-    std::unique_ptr<absl::flat_hash_set<int64_t>> owned;
+    std::unique_ptr<abslx::flat_hash_set<int64_t>> owned;
     // Collection of pointers to all sets of dependencies, the union of which is
     // the set of input dependencies.
-    absl::InlinedVector<const absl::flat_hash_set<int64_t>*, 4> all;
+    abslx::InlinedVector<const abslx::flat_hash_set<int64_t>*, 4> all;
   };
-  absl::flat_hash_map<HloInstruction*, InputIndicesSet> inst_input_deps;
+  abslx::flat_hash_map<HloInstruction*, InputIndicesSet> inst_input_deps;
   // Find disjoint sets of connected instruction groups. This helps finding a
   // group of inter-dependent indices that can be removed together. For case 2).
-  absl::flat_hash_map<HloInstruction*, tensorflow::UnionFind<HloInstruction*>>
+  abslx::flat_hash_map<HloInstruction*, tensorflow::UnionFind<HloInstruction*>>
       disjoint_sets;
   // Initialize.
   for (HloComputation* comp : {while_body, while_cond}) {
@@ -362,7 +362,7 @@ static StatusOr<bool> TryRemoveDeadWhileParams(HloInstruction* while_op) {
     }
   }
   // Track the dependencies and merge the disjoint sets.
-  absl::flat_hash_set<int64_t> side_effecting_indices;
+  abslx::flat_hash_set<int64_t> side_effecting_indices;
   for (HloComputation* comp : {while_body, while_cond}) {
     HloInstruction* while_input = comp->parameter_instruction(0);
     for (HloInstruction* inst : comp->MakeInstructionPostOrder()) {
@@ -393,7 +393,7 @@ static StatusOr<bool> TryRemoveDeadWhileParams(HloInstruction* while_op) {
     }
   }
   // Find inputs that can be removed because they don't affect others.
-  absl::flat_hash_set<int64_t> indices_affecting_others;
+  abslx::flat_hash_set<int64_t> indices_affecting_others;
   for (int64_t i = 0; i < tuple_size; ++i) {
     HloInstruction* output = while_body_root->mutable_operand(i);
     for (auto* deps : inst_input_deps[output].all) {
@@ -413,7 +413,7 @@ static StatusOr<bool> TryRemoveDeadWhileParams(HloInstruction* while_op) {
     }
   }
   // Find the connected groups of input/output indices.
-  absl::flat_hash_map<HloInstruction*, absl::flat_hash_set<int64_t>> groups;
+  abslx::flat_hash_map<HloInstruction*, abslx::flat_hash_set<int64_t>> groups;
   for (int64_t i = 0; i < tuple_size; ++i) {
     HloInstruction* output = while_body_root->mutable_operand(i);
     groups[disjoint_sets[output].Get()].insert(i);
@@ -425,7 +425,7 @@ static StatusOr<bool> TryRemoveDeadWhileParams(HloInstruction* while_op) {
     }
   }
   for (const auto& group : groups) {
-    if (absl::c_any_of(group.second, [&](int64_t index) {
+    if (abslx::c_any_of(group.second, [&](int64_t index) {
           // We cannot remove this index causes side effects, or if its output
           // is not passed through from input and it is used after the while op.
           const HloInstruction* output = while_body_root->operand(index);
@@ -470,7 +470,7 @@ static StatusOr<bool> TryRemoveDeadWhileParams(HloInstruction* while_op) {
 // RemoveDeadTupleIndices.
 static StatusOr<HloInstruction*> TryRemoveRepeatedWhileTupleIndicesHelper(
     HloInstruction* while_op, const int64_t tuple_index,
-    absl::flat_hash_set<int64_t>& duplicates) {
+    abslx::flat_hash_set<int64_t>& duplicates) {
   HloComputation* while_cond = while_op->while_condition();
   HloComputation* while_body = while_op->while_body();
   HloInstruction* while_init = while_op->mutable_operand(0);
@@ -502,7 +502,7 @@ static StatusOr<HloInstruction*> TryRemoveRepeatedWhileTupleIndicesHelper(
   }
 
   // We know which tuple indices are useful; i.e, those which aren't duplicates.
-  absl::flat_hash_set<int64_t> used_tuple_indices;
+  abslx::flat_hash_set<int64_t> used_tuple_indices;
   for (int index = 0; index < while_init->shape().tuple_shapes_size();
        ++index) {
     if (!duplicates.count(index)) {
@@ -558,7 +558,7 @@ static StatusOr<bool> TryRemoveRepeatedWhileTupleIndices(
     auto& while_shape = while_init->shape();
     VLOG(2) << "Iterating " << index_to_investigate;
 
-    absl::flat_hash_set<int64_t> duplicates;
+    abslx::flat_hash_set<int64_t> duplicates;
     auto* pivot_init_elem = while_init->operand(index_to_investigate);
     auto* pivot_body_elem = while_body_root->operand(index_to_investigate);
     if (pivot_body_elem->opcode() == HloOpcode::kGetTupleElement &&
@@ -642,7 +642,7 @@ static StatusOr<bool> TryRemoveConstantParams(HloInstruction* while_op) {
   TF_RET_CHECK(
       ShapeUtil::Compatible(while_init->shape(), while_body_root->shape()));
 
-  absl::flat_hash_set<int64_t> constant_tuple_indices;
+  abslx::flat_hash_set<int64_t> constant_tuple_indices;
   const auto& while_shape = while_init->shape();
   for (int i = 0; i < while_shape.tuple_shapes_size(); ++i) {
     auto* init_elem = while_init->operand(i);
@@ -836,7 +836,7 @@ static StatusOr<bool> TryRemoveWhileLoop(HloInstruction* while_op) {
     // infeed2 = infeed() // no dependency between infeed1 and infeed2. infeed1
     //                    // can be scheduled after infeed2.
     //
-    bool has_side_effects = absl::c_any_of(
+    bool has_side_effects = abslx::c_any_of(
         while_op->called_computations(), [](const HloComputation* computation) {
           return computation->HasSideEffect();
         });
@@ -878,7 +878,7 @@ static StatusOr<bool> TryPropagateConstant(HloInstruction* while_op) {
   // build a map from the tuple element index to the constant value. Limit this
   // to scalar constant values because propagating array constants can regress
   // performance by forcing us to copy constants.
-  absl::flat_hash_map<int, const HloInstruction*> index_to_constant;
+  abslx::flat_hash_map<int, const HloInstruction*> index_to_constant;
   for (int i = 0; i < root_operands.size(); i++) {
     const HloInstruction* init_tuple_elem = nullptr;
     if (Match(root_operands[i],
@@ -935,7 +935,7 @@ static StatusOr<bool> TryPropagateConstant(HloInstruction* while_op) {
 // desired_shape must be a tuple.  (This precondition allows us to return a
 // unique_ptr rather than a raw ptr.)
 static std::unique_ptr<HloInstruction> UnflattenTupleInstr(
-    absl::Span<HloInstruction*> instrs, const Shape& desired_shape,
+    abslx::Span<HloInstruction*> instrs, const Shape& desired_shape,
     std::vector<std::unique_ptr<HloInstruction>>* new_instrs) {
   CHECK(desired_shape.IsTuple()) << ShapeUtil::HumanString(desired_shape);
 
@@ -1042,7 +1042,7 @@ static StatusOr<bool> TryFlattenNestedTuples(HloInstruction* while_op) {
           flat_shape.tuple_shapes(i), instr, i)));
     }
     auto nested_instr =
-        UnflattenTupleInstr(absl::MakeSpan(gtes), while_shape, &new_instrs);
+        UnflattenTupleInstr(abslx::MakeSpan(gtes), while_shape, &new_instrs);
     CHECK(ShapeUtil::Compatible(nested_instr->shape(), while_shape))
         << ShapeUtil::HumanString(nested_instr->shape()) << " vs "
         << ShapeUtil::HumanString(while_shape);
@@ -1146,7 +1146,7 @@ static StatusOr<HloInstruction*> TryMergeInductionVariables(
   // The tuple index of the trip counter, if one is present.
   std::optional<int64_t> trip_counter;
   // Maps the tuple index of each induction variable to its constant increment.
-  absl::flat_hash_map<int64_t, const HloConstantInstruction*> induction_vars;
+  abslx::flat_hash_map<int64_t, const HloConstantInstruction*> induction_vars;
   for (int64_t i = 0; i < while_body_root->operand_count(); ++i) {
     HloInstruction* constant;
     if (!Match(while_body_root->mutable_operand(i),
@@ -1338,7 +1338,7 @@ static StatusOr<HloInstruction*> TryMergeInductionVariables(
 
 StatusOr<bool> WhileLoopSimplifier::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   XLA_VLOG_LINES(3,
                  "WhileLoopSimplifier::Run(), before:\n" + module->ToString());
   bool changed = false;

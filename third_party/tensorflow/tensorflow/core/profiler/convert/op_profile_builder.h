@@ -49,12 +49,12 @@ class OpProfileBuilder {
  private:
   struct Category {
     op_profile::Node* node;
-    absl::flat_hash_map<std::string, op_profile::Node*> deduplicated_nodes;
+    abslx::flat_hash_map<std::string, op_profile::Node*> deduplicated_nodes;
   };
 
   struct Program {
     op_profile::Node* node;
-    absl::flat_hash_map<std::string, Category> categories;
+    abslx::flat_hash_map<std::string, Category> categories;
   };
 
   std::string GenerateProgramName(uint64_t program_id) const;
@@ -89,12 +89,12 @@ class OpProfileBuilder {
   op_profile::Node* root_;
 
   // Map to look up and aggregate OpMetrics.
-  absl::node_hash_map<op_profile::Node*, OpMetrics> metrics_;
+  abslx::node_hash_map<op_profile::Node*, OpMetrics> metrics_;
 
   // Maps to look up if a category / program / deduplicated node has
   // already been added to the tree.
-  absl::flat_hash_map<uint64_t, Program> programs_map_;
-  absl::flat_hash_map<std::string, Category> category_map_;
+  abslx::flat_hash_map<uint64_t, Program> programs_map_;
+  abslx::flat_hash_map<std::string, Category> category_map_;
 
   // Map to look up program names by id.
   const tensorflow::protobuf::Map<uint64_t, std::string>* program_name_map_ =

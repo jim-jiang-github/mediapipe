@@ -60,7 +60,7 @@ BroadcastTensorHandleToParallelTensor(TFE_Context* context,
                                       TF_Status* status) {
   // Broadcast tensor value to local devices.
   const Mesh& target_mesh = mesh.mesh_config();
-  absl::Span<const std::string> local_devices = target_mesh.local_devices();
+  abslx::Span<const std::string> local_devices = target_mesh.local_devices();
   const int num_local_devices = local_devices.size();
 
   std::vector<parallel_device::TensorHandlePtr> components;
@@ -72,7 +72,7 @@ BroadcastTensorHandleToParallelTensor(TFE_Context* context,
     if (TF_GetCode(status) != TF_OK) {
       TF_SetStatus(
           status, TF_INTERNAL,
-          absl::StrCat(
+          abslx::StrCat(
               "Unable to copy tensor value for broadcast. Original message: ",
               TF_Message(status))
               .c_str());
@@ -128,7 +128,7 @@ std::unique_ptr<TensorWithLayout> BroadcastResourceTensor(
         "variables inside the DTensor scope.\n";
 
     // Get the stack_trace and Summaries from the resource tensor.
-    absl::StrAppend(
+    abslx::StrAppend(
         &error_message, "Offending variable summary: ", r.SummarizeValue(),
         "\nStack trace: ", DefinitionLocationMsg(r.definition_stack_trace()));
     TF_SetStatus(status, TF_INVALID_ARGUMENT, error_message.c_str());
@@ -156,7 +156,7 @@ std::unique_ptr<TensorWithLayout> BroadcastResourceTensor(
   if (!result.ok()) {
     TF_SetStatus(
         status, TF_INTERNAL,
-        absl::StrCat("Error creating a TensorWithLayout from a resource tensor "
+        abslx::StrCat("Error creating a TensorWithLayout from a resource tensor "
                      "during broadcasting with original error message:",
                      result.status().error_message())
             .c_str());
@@ -175,8 +175,8 @@ std::unique_ptr<TensorWithLayout> BroadcastResourceTensor(
   return std::move(*result);
 }
 
-bool LayoutsAreCompatible(absl::optional<Layout> first_layout,
-                          absl::optional<Layout> second_layout) {
+bool LayoutsAreCompatible(abslx::optional<Layout> first_layout,
+                          abslx::optional<Layout> second_layout) {
   if (!first_layout.has_value() && !second_layout.has_value()) {
     return true;
   }
@@ -187,8 +187,8 @@ bool LayoutsAreCompatible(absl::optional<Layout> first_layout,
 }
 
 // Parse a pair of attribute of (indices, layouts) into a map.
-Status ParseAttrMap(const Node& node, absl::string_view indices_attr,
-                    absl::string_view layout_attr,
+Status ParseAttrMap(const Node& node, abslx::string_view indices_attr,
+                    abslx::string_view layout_attr,
                     std::map<int, Layout>* indices_layout_map) {
   std::vector<std::string> layouts;
   if (!TryGetNodeAttr(node.attrs(), layout_attr, &layouts)) {
@@ -295,7 +295,7 @@ std::unique_ptr<TensorWithLayout> TensorWithLayout::Broadcast(
     auto layout = Layout::ReplicatedOnMesh(mesh.mesh_config(), shape.size());
 
     auto ret = TensorWithLayout::Dummy(shape, dtype, mesh, layout);
-    absl::optional<NodeDef> const_value =
+    abslx::optional<NodeDef> const_value =
         ExtractSmallTensorValue(context, tensor, layout, status);
     if (TF_GetCode(status) != TF_OK) return nullptr;
     if (const_value) {
@@ -318,13 +318,13 @@ std::unique_ptr<TensorWithLayout> TensorWithLayout::Broadcast(
   size_t num_dims = shape->size();
   const Layout layout = Layout::ReplicatedOnMesh(mesh.mesh_config(), num_dims);
 
-  absl::optional<NodeDef> const_value =
+  abslx::optional<NodeDef> const_value =
       ExtractSmallTensorValue(context, tensor, layout, status);
   if (TF_GetCode(status) != TF_OK) return nullptr;
 
   std::unique_ptr<TensorWithLayout> result(new TensorWithLayout(
       std::move(parallel_tensor), mesh, std::move(layout), *shape,
-      /*dtype=*/absl::nullopt, std::move(const_value)));
+      /*dtype=*/abslx::nullopt, std::move(const_value)));
   return result;
 }
 
@@ -369,14 +369,14 @@ std::string TensorWithLayout::SummarizeValue() const {
   if (!status.ok()) {
     value_summary = "<error computing value>";
   }
-  return absl::StrCat(value_summary, ", layout=\"", layout().ToString(), "\"");
+  return abslx::StrCat(value_summary, ", layout=\"", layout().ToString(), "\"");
 }
 
 std::string TensorWithLayout::DebugString() const {
   auto dtype = static_cast<DataType>(tensor()->dtype());
 
   const auto& shape_vector = global_shape();
-  return absl::StrCat("DTensor(", SummarizeValue(),
+  return abslx::StrCat("DTensor(", SummarizeValue(),
                       ", shape=", ShapeToDebugString(shape_vector),
                       ", type=", DataTypeString(dtype), ")");
 }
@@ -470,7 +470,7 @@ std::string SparseTensorWithLayout::SummarizeValue() const {
   if (!dense_shapes_status.ok())
     indices_summary = "<error computing summary for dense_shapes>";
 
-  return absl::StrCat("indices: ", indices_summary, ", ",
+  return abslx::StrCat("indices: ", indices_summary, ", ",
                       "values: ", values_summary, ", ",
                       "dense_shapes: ", dense_shapes_summary, ", layout=\"",
                       layout().ToString(), "\"");
@@ -480,7 +480,7 @@ std::string SparseTensorWithLayout::DebugString() const {
   auto dtype = static_cast<DataType>(values_->dtype());
 
   const auto& shape_vector = global_shape();
-  return absl::StrCat("DTensor(", SummarizeValue(),
+  return abslx::StrCat("DTensor(", SummarizeValue(),
                       ", shape=", ShapeToDebugString(shape_vector),
                       ", type=", DataTypeString(dtype), ")");
 }
@@ -504,9 +504,9 @@ TFE_TensorHandle* SparseTensorWithLayout::get_tensor(size_t index) const {
   }
 }
 
-absl::flat_hash_map<int, NodeDef> GetConstantFoldableTensors(
+abslx::flat_hash_map<int, NodeDef> GetConstantFoldableTensors(
     const std::vector<TensorWithLayout*>& inputs) {
-  absl::flat_hash_map<int, NodeDef> small_tensors;
+  abslx::flat_hash_map<int, NodeDef> small_tensors;
   for (auto index = 0; index < inputs.size(); ++index) {
     if (inputs[index]->const_value().has_value()) {
       small_tensors.insert({index, inputs[index]->const_value().value()});
@@ -589,7 +589,7 @@ FunctionManager::GetCachedFunction(
   // some input(s) when it was not a constant input i.e. one of the small value
   // to this function input changed. So mark those changed values as
   // non-constant.
-  absl::flat_hash_map<int, NodeDef>& previous_small_inputs =
+  abslx::flat_hash_map<int, NodeDef>& previous_small_inputs =
       doperation_iter->second;
   std::vector<int> non_constant_indices;
 
@@ -654,7 +654,7 @@ Status PrepareGraphForMlir(
     const DTensorOperation& doperation,
     const tensorflow::FunctionLibraryDefinition& flib_def,
     const NameAttrList& attributes,
-    const absl::optional<Layout>& default_layout, tensorflow::Graph* graph,
+    const abslx::optional<Layout>& default_layout, tensorflow::Graph* graph,
     std::vector<PartialTensorShape>* global_output_shapes,
     std::vector<const Layout*>* output_layouts) {
   // We run shape inference on the graph to find output shapes, which may
@@ -705,7 +705,7 @@ Status PrepareGraphForMlir(
 
     tensorflow::NodeDef arg_node_def;
     auto dtype = static_cast<tensorflow::DataType>(input->dtype());
-    tensorflow::NodeDefBuilder builder(absl::StrCat("op_input_", i), "_Arg");
+    tensorflow::NodeDefBuilder builder(abslx::StrCat("op_input_", i), "_Arg");
 
     // Delegate TensorWithLayout to encode attributes if applicable.
     input->EncodeAttributes(builder);
@@ -750,7 +750,7 @@ Status PrepareGraphForMlir(
       // TODO(xiejw): Refactor the TensorWithLayout representation to avoid
       // special code here.
       NodeDef const_node = input->const_value().value();
-      const_node.set_name(absl::StrCat("input_", i, "_const_value"));
+      const_node.set_name(abslx::StrCat("input_", i, "_const_value"));
       Node* const_value_n = graph->AddNode(const_node, &status);
       TF_RETURN_IF_ERROR(status);
       TF_RETURN_IF_ERROR(shape_refiner.AddNode(const_value_n));
@@ -804,7 +804,7 @@ Status PrepareGraphForMlir(
   global_output_shapes->reserve(op_node->num_outputs());
   for (int output_index = 0; output_index < op_node->num_outputs();
        ++output_index) {
-    tensorflow::NodeDefBuilder builder(absl::StrCat("op_output_", output_index),
+    tensorflow::NodeDefBuilder builder(abslx::StrCat("op_output_", output_index),
                                        "_Retval");
     tensorflow::NodeDef ret_node_def;
     tensorflow::DataType output_type = op_node->output_type(output_index);
@@ -953,7 +953,7 @@ Status MaybeInsertIdentityNodes(const FunctionDef* function_def, Graph* graph) {
     int ret_index;
     TF_RETURN_IF_ERROR(GetNodeAttr(n->attrs(), "index", &ret_index));
     tensorflow::NodeDefBuilder identity_builder(
-        absl::StrCat("op_output_identity_", ret_index), "Identity");
+        abslx::StrCat("op_output_identity_", ret_index), "Identity");
     tensorflow::NodeDef ret_identity_node_def;
     tensorflow::DataType output_type = n->input_type(0);
     TF_RETURN_IF_ERROR(
@@ -992,11 +992,11 @@ void AddDTensorFunctionAttr(FunctionDef& function_def) {
 
 StatusOr<std::vector<parallel_device::ParallelTensor*>> PrepareEmbeddingInputs(
     const std::vector<TensorWithLayout*>& inputs) {
-  absl::flat_hash_map<int64_t, std::vector<int64_t>> table_vars_input_index;
+  abslx::flat_hash_map<int64_t, std::vector<int64_t>> table_vars_input_index;
   for (int64_t i = 0; i < inputs.size(); ++i) {
     if (inputs[i]->tensor_type() != kResource) continue;
 
-    const absl::optional<EmbeddingResourceAttrs>& resource_attrs =
+    const abslx::optional<EmbeddingResourceAttrs>& resource_attrs =
         inputs[i]->attrs();
     if (resource_attrs.has_value()) {
       table_vars_input_index[resource_attrs->table_id].push_back(i);
@@ -1077,7 +1077,7 @@ StatusOr<std::string> ValidateResourceMeshConsistency(
     if (mesh_str.empty()) {
       mesh_str = input_mesh_str;
     } else if (mesh_str != input_mesh_str) {
-      return errors::Internal(absl::StrCat(
+      return errors::Internal(abslx::StrCat(
           "All inputs of embedding resource must be on same mesh. but get : ",
           mesh_str, " != ", input_mesh_str));
     }
@@ -1092,7 +1092,7 @@ Status InsertFunctionForTPUEmbeddingCheckpoint(
     const std::string& checkpoint_fn_name) {
   if (checkpoint_fn_name != kLoadEmbeddingFn &&
       checkpoint_fn_name != kRetrieveEmbeddingFn) {
-    return errors::InvalidArgument(absl::StrCat(
+    return errors::InvalidArgument(abslx::StrCat(
         "Found wrong function name: ", checkpoint_fn_name,
         " \n expects : ", kLoadEmbeddingFn, " or ", kRetrieveEmbeddingFn));
   }
@@ -1117,7 +1117,7 @@ Status InsertFunctionForTPUEmbeddingCheckpoint(
     auto node_vec_ptr = table_id_node_map->find(i);
     if (node_vec_ptr == table_id_node_map->end()) {
       return errors::Internal(
-          absl::StrCat("Embedding table id ", i, " is not found."));
+          abslx::StrCat("Embedding table id ", i, " is not found."));
     }
     for (const Node* n : node_vec_ptr->second) {
       const std::string& node_name = n->name();

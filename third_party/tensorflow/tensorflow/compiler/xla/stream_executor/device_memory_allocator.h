@@ -241,7 +241,7 @@ class StreamExecutorMemoryAllocator : public DeviceMemoryAllocator {
   // Precondition: all stream_executors have different device ordinals.
   StreamExecutorMemoryAllocator(
       const Platform *platform,
-      absl::Span<StreamExecutor *const> stream_executors);
+      abslx::Span<StreamExecutor *const> stream_executors);
 
   port::StatusOr<OwningDeviceMemory> Allocate(int device_ordinal, uint64_t size,
                                               bool retry_on_failure,
@@ -266,7 +266,7 @@ class StreamExecutorMemoryAllocator : public DeviceMemoryAllocator {
   // ordinal.
   std::vector<StreamExecutor *> stream_executors_;
 
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
 
   // Cache of streams for GetStream.
   std::map<int, Stream> streams_ ABSL_GUARDED_BY(mutex_);

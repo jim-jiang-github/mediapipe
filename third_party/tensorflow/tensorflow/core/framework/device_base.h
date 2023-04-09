@@ -296,8 +296,8 @@ class DeviceBase {
 // Methods to create and check for Symbolic execution devices.
 // Such devices are mostly used for TF-XLA bridge. TF should not treat these as
 // normal devices.
-void AddSymbolicExecutionDevice(absl::string_view device_name);
-bool IsSymbolicExecutionDevice(absl::string_view device_name);
+void AddSymbolicExecutionDevice(abslx::string_view device_name);
+bool IsSymbolicExecutionDevice(abslx::string_view device_name);
 
 }  // namespace tensorflow
 

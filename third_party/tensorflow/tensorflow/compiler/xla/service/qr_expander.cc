@@ -38,8 +38,8 @@ namespace xla {
 
 namespace {
 
-std::vector<int64_t> ConcatVectors(absl::Span<const int64_t> xs,
-                                   absl::Span<const int64_t> ys) {
+std::vector<int64_t> ConcatVectors(abslx::Span<const int64_t> xs,
+                                   abslx::Span<const int64_t> ys) {
   std::vector<int64_t> output;
   output.reserve(xs.size() + ys.size());
   std::copy(xs.begin(), xs.end(), std::back_inserter(output));
@@ -106,7 +106,7 @@ XlaOp Norm(std::vector<XlaOp> xs) {
 //   return (v, tau, beta)
 // TODO(phawkins): LAPACK's xLARFG implementation has code for handling
 // overflows in the norm/beta calculations. Perhaps do the same here.
-Status House(XlaOp x, XlaOp k, absl::Span<const int64_t> batch_dims,
+Status House(XlaOp x, XlaOp k, abslx::Span<const int64_t> batch_dims,
              const int64_t m, XlaOp* v, XlaOp* tau, XlaOp* beta) {
   XlaBuilder* const builder = x.builder();
   TF_ASSIGN_OR_RETURN(Shape x_shape, builder->GetShape(x));
@@ -219,7 +219,7 @@ StatusOr<QrDecomposition> QrExpander::QrBlock(
   std::vector<int64_t> batch_dim_indices(num_batch_dims);
   std::iota(batch_dim_indices.begin(), batch_dim_indices.end(), 0);
 
-  auto qr_body_fn = [&](XlaOp j, absl::Span<const XlaOp> values,
+  auto qr_body_fn = [&](XlaOp j, abslx::Span<const XlaOp> values,
                         XlaBuilder* builder) -> StatusOr<std::vector<XlaOp>> {
     auto a = values[0];
     auto taus = values[1];
@@ -316,7 +316,7 @@ StatusOr<QrDecomposition> QrExpander::QrBlock(
 //     t[:, i] = scipy.linalg.blas.strmm(t, vtv[:, i])
 //   return t
 StatusOr<XlaOp> QrExpander::CompactWYRepresentation(
-    PrimitiveType type, absl::Span<const int64_t> batch_dims, XlaOp vs,
+    PrimitiveType type, abslx::Span<const int64_t> batch_dims, XlaOp vs,
     XlaOp taus, int64_t m, int64_t n, PrecisionConfig::Precision precision) {
   XlaBuilder* builder = vs.builder();
 
@@ -324,7 +324,7 @@ StatusOr<XlaOp> QrExpander::CompactWYRepresentation(
   std::iota(batch_dim_indices.begin(), batch_dim_indices.end(), 0);
   int64_t n_index = batch_dims.size() + 1;
 
-  auto body_fn = [&](XlaOp j, absl::Span<const XlaOp> values,
+  auto body_fn = [&](XlaOp j, abslx::Span<const XlaOp> values,
                      XlaBuilder* builder) -> StatusOr<std::vector<XlaOp>> {
     // w has shape [..., m, n]
     auto t = values[0];
@@ -512,7 +512,7 @@ bool QrExpander::InstructionMatchesPattern(HloInstruction* instruction) {
 StatusOr<HloInstruction*> QrExpander::ExpandInstruction(
     HloInstruction* instruction) {
   const std::string name =
-      absl::StrFormat("xla.%s_%s", instruction->custom_call_target(),
+      abslx::StrFormat("xla.%s_%s", instruction->custom_call_target(),
                       instruction->operand(0)->shape().ToString());
 
   HloModule* module = instruction->parent()->parent();

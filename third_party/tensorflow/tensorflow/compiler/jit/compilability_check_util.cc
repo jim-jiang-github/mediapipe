@@ -67,10 +67,10 @@ namespace tensorflow {
 namespace {
 
 bool HasResourceInput(const Node& node) {
-  return absl::c_count(node.input_types(), DT_RESOURCE) != 0;
+  return abslx::c_count(node.input_types(), DT_RESOURCE) != 0;
 }
 
-void LogNotCompilable(const Node& node, absl::string_view reason = "") {
+void LogNotCompilable(const Node& node, abslx::string_view reason = "") {
   VLOG(3) << "Found uncompilable node " << node.name() << " (op "
           << node.type_string() << ")" << (reason.empty() ? "" : ": ")
           << reason;
@@ -90,8 +90,8 @@ Status MakeCallNodeFromAttribute(const Node& node, const std::string& attr_name,
 }
 
 StatusOr<std::vector<NodeDef>> MakeCallNodesFromAttribute(
-    const Node& node, absl::string_view attr_name,
-    absl::string_view call_name) {
+    const Node& node, abslx::string_view attr_name,
+    abslx::string_view call_name) {
   std::vector<NameAttrList> attr_lists;
   TF_RETURN_IF_ERROR(GetNodeAttr(node.attrs(), attr_name, &attr_lists));
 
@@ -100,7 +100,7 @@ StatusOr<std::vector<NodeDef>> MakeCallNodesFromAttribute(
   for (int i = 0; i < attr_lists.size(); i++) {
     out.emplace_back();
     NodeDef& inserted = out.back();
-    inserted.set_name(absl::StrCat(call_name, "_", i));
+    inserted.set_name(abslx::StrCat(call_name, "_", i));
     inserted.set_op(attr_lists[i].name());
     *inserted.mutable_attr() = attr_lists[i].attr();
   }
@@ -119,7 +119,7 @@ class SinglePassSearch {
   // Creates a SinglePassSearch object that can be used to search in `values`.
   // Does not take ownership of `values`. `values` must outlive this.
   // `values` must be sorted.
-  explicit SinglePassSearch(absl::Span<int const> values)
+  explicit SinglePassSearch(abslx::Span<int const> values)
       : current_index_(0), values_(values) {}
 
   // Scans forward in the vector looking for "value", updating the internal
@@ -141,7 +141,7 @@ class SinglePassSearch {
 
  private:
   int current_index_;
-  const absl::Span<int const> values_;
+  const abslx::Span<int const> values_;
 };
 
 }  // anonymous namespace
@@ -286,7 +286,7 @@ bool RecursiveCompilabilityChecker::ExtractNodeDefAndCheckCompilability(
   NodeDef call;
   call.set_name(call_name);
   if (!MakeCallNodeFromAttribute(node, attr_name, &call).ok()) {
-    const auto uncompilable_reason = absl::StrCat(
+    const auto uncompilable_reason = abslx::StrCat(
         "missing '", attr_name, "' attribute from node", node.name());
     MaybeMarkUncompilableNode(uncompilable_reason, *stack_trace,
                               encapsulating_function, uncompilable_nodes);
@@ -331,7 +331,7 @@ bool RecursiveCompilabilityChecker::IsCompilableCall(
   }
   if (!s.ok()) {
     std::string uncompilable_reason =
-        absl::StrCat("could not instantiate call: '", function.name(), "'");
+        abslx::StrCat("could not instantiate call: '", function.name(), "'");
     MaybeMarkUncompilableNode(uncompilable_reason, *stack_trace,
                               encapsulating_function, uncompilable_nodes);
     VLOG(2) << "Rejecting " << call_def.DebugString() << ": "
@@ -387,7 +387,7 @@ bool RecursiveCompilabilityChecker::IsCompilableNode(
     return true;
 
   if (node.IsSource() || node.IsSink()) {
-    absl::string_view uncompilable_reason = "source or sink node";
+    abslx::string_view uncompilable_reason = "source or sink node";
     MaybeMarkUncompilableNode(uncompilable_reason, *stack_trace,
                               encapsulating_function, uncompilable_nodes);
     LogNotCompilable(node, uncompilable_reason);
@@ -398,7 +398,7 @@ bool RecursiveCompilabilityChecker::IsCompilableNode(
   // top-level function represent fetches.
   if (stack_depth == 1 &&
       (node.type_string() == "_Arg" || node.type_string() == "_Retval")) {
-    absl::string_view uncompilable_reason = "top level _Arg or _Retval";
+    abslx::string_view uncompilable_reason = "top level _Arg or _Retval";
     MaybeMarkUncompilableNode(uncompilable_reason, *stack_trace,
                               encapsulating_function, uncompilable_nodes);
     LogNotCompilable(node, uncompilable_reason);
@@ -409,7 +409,7 @@ bool RecursiveCompilabilityChecker::IsCompilableNode(
       node.attrs().Find("_forward_from")) {
     // TODO(b/128858118): XLA does not support _scoped_allocator and
     // _forward_from.
-    absl::string_view uncompilable_reason =
+    abslx::string_view uncompilable_reason =
         "_scoped_allocator or _forward_from attribute";
     MaybeMarkUncompilableNode(uncompilable_reason, *stack_trace,
                               encapsulating_function, uncompilable_nodes);
@@ -426,7 +426,7 @@ bool RecursiveCompilabilityChecker::IsCompilableNode(
     }
   } else if (!HasXLAKernel(node, &uncompilable_reason)) {
     MaybeMarkUncompilableNode(
-        absl::StrCat("unsupported op: ", uncompilable_reason), *stack_trace,
+        abslx::StrCat("unsupported op: ", uncompilable_reason), *stack_trace,
         encapsulating_function, uncompilable_nodes);
     LogNotCompilable(node, uncompilable_reason);
     return false;
@@ -455,7 +455,7 @@ bool RecursiveCompilabilityChecker::IsCompilableNode(
 
   if (!op_filter_.allow_stateful_rng_ops &&
       IsStatefulRandomOp(node.type_string())) {
-    absl::string_view uncompilable_reason = "stateful random op";
+    abslx::string_view uncompilable_reason = "stateful random op";
     MaybeMarkUncompilableNode(uncompilable_reason, *stack_trace,
                               encapsulating_function, uncompilable_nodes);
     LogNotCompilable(node, uncompilable_reason);
@@ -463,7 +463,7 @@ bool RecursiveCompilabilityChecker::IsCompilableNode(
   }
 
   if (!op_filter_.allow_control_trigger && node.IsControlTrigger()) {
-    absl::string_view uncompilable_reason = "not allowed control trigger";
+    abslx::string_view uncompilable_reason = "not allowed control trigger";
     MaybeMarkUncompilableNode(uncompilable_reason, *stack_trace,
                               encapsulating_function, uncompilable_nodes);
     LogNotCompilable(node, uncompilable_reason);
@@ -472,7 +472,7 @@ bool RecursiveCompilabilityChecker::IsCompilableNode(
 
   if (!op_filter_.allow_eliding_assert_and_checknumerics_ops &&
       IsAssertOrCheckNumerics(node.type_string())) {
-    absl::string_view uncompilable_reason = "Assert or CheckNumerics";
+    abslx::string_view uncompilable_reason = "Assert or CheckNumerics";
     MaybeMarkUncompilableNode(uncompilable_reason, *stack_trace,
                               encapsulating_function, uncompilable_nodes);
     LogNotCompilable(node, uncompilable_reason);
@@ -481,7 +481,7 @@ bool RecursiveCompilabilityChecker::IsCompilableNode(
 
   if (!op_filter_.allow_collective_reduce_v2 &&
       node.type_string() == "CollectiveReduceV2") {
-    absl::string_view uncompilable_reason = "Collective op";
+    abslx::string_view uncompilable_reason = "Collective op";
     MaybeMarkUncompilableNode(uncompilable_reason, *stack_trace,
                               encapsulating_function, uncompilable_nodes);
     LogNotCompilable(node, uncompilable_reason);
@@ -489,7 +489,7 @@ bool RecursiveCompilabilityChecker::IsCompilableNode(
   }
 
   if (!op_filter_.allow_where_op && node.type_string() == "Where") {
-    absl::string_view uncompilable_reason = "Where op";
+    abslx::string_view uncompilable_reason = "Where op";
     MaybeMarkUncompilableNode(uncompilable_reason, *stack_trace,
                               encapsulating_function, uncompilable_nodes);
     LogNotCompilable(node, uncompilable_reason);
@@ -497,7 +497,7 @@ bool RecursiveCompilabilityChecker::IsCompilableNode(
   }
 
   if (!op_filter_.allow_unique_op && node.type_string() == "Unique") {
-    absl::string_view uncompilable_reason = "Unique op";
+    abslx::string_view uncompilable_reason = "Unique op";
     MaybeMarkUncompilableNode(uncompilable_reason, *stack_trace,
                               encapsulating_function, uncompilable_nodes);
     LogNotCompilable(node, uncompilable_reason);
@@ -506,7 +506,7 @@ bool RecursiveCompilabilityChecker::IsCompilableNode(
 
   if (!op_filter_.allow_ops_producing_or_consuming_variant &&
       OpProducesOrConsumesVariant(node)) {
-    absl::string_view uncompilable_reason = "DT_VARIANT producer/consumer";
+    abslx::string_view uncompilable_reason = "DT_VARIANT producer/consumer";
     MaybeMarkUncompilableNode(uncompilable_reason, *stack_trace,
                               encapsulating_function, uncompilable_nodes);
     LogNotCompilable(node, uncompilable_reason);
@@ -514,7 +514,7 @@ bool RecursiveCompilabilityChecker::IsCompilableNode(
   }
 
   if (!op_filter_.allow_stack_ops && IsStackOp(node)) {
-    absl::string_view uncompilable_reason = "Stack op";
+    abslx::string_view uncompilable_reason = "Stack op";
     MaybeMarkUncompilableNode(uncompilable_reason, *stack_trace,
                               encapsulating_function, uncompilable_nodes);
     LogNotCompilable(node, uncompilable_reason);
@@ -522,7 +522,7 @@ bool RecursiveCompilabilityChecker::IsCompilableNode(
   }
 
   if (!op_filter_.allow_tensor_array_ops && IsTensorArrayOp(node)) {
-    absl::string_view uncompilable_reason = "TensorArray op";
+    abslx::string_view uncompilable_reason = "TensorArray op";
     MaybeMarkUncompilableNode(uncompilable_reason, *stack_trace,
                               encapsulating_function, uncompilable_nodes);
     LogNotCompilable(node, uncompilable_reason);
@@ -531,7 +531,7 @@ bool RecursiveCompilabilityChecker::IsCompilableNode(
 
   if (!op_filter_.allow_resource_ops_in_called_functions && stack_depth > 1 &&
       HasResourceInput(node)) {
-    absl::string_view uncompilable_reason =
+    abslx::string_view uncompilable_reason =
         "resource variable op in called function";
     MaybeMarkUncompilableNode(uncompilable_reason, *stack_trace,
                               encapsulating_function, uncompilable_nodes);
@@ -540,7 +540,7 @@ bool RecursiveCompilabilityChecker::IsCompilableNode(
   }
 
   if (!op_filter_.allow_inaccurate_ops && OpIsInaccurate(node)) {
-    absl::string_view uncompilable_reason =
+    abslx::string_view uncompilable_reason =
         "operation with numerical accuracy issues";
     BroadcastOptimizationRemark(XlaOptimizationRemark::INACCURATE_OPERATION,
                                 node.DebugString())
@@ -552,7 +552,7 @@ bool RecursiveCompilabilityChecker::IsCompilableNode(
   }
 
   if (!op_filter_.allow_slow_ops && OpIsSlow(node)) {
-    absl::string_view uncompilable_reason = "slow operation";
+    abslx::string_view uncompilable_reason = "slow operation";
     BroadcastOptimizationRemark(XlaOptimizationRemark::SLOW_OPERATION,
                                 node.DebugString())
         .IgnoreError();
@@ -584,7 +584,7 @@ RecursiveCompilabilityChecker::OperationFilter CreateOperationFilter(
 }
 
 /*static*/ void RecursiveCompilabilityChecker::MaybeMarkUncompilableNode(
-    const absl::string_view reason,
+    const abslx::string_view reason,
     const std::vector<StackFrameView>& stack_trace,
     NameAttrList* encapsulating_function,
     RecursiveCompilabilityChecker::UncompilableNodesMap* uncompilable_nodes) {
@@ -592,7 +592,7 @@ RecursiveCompilabilityChecker::OperationFilter CreateOperationFilter(
 
   UncompilableNodeInfo node_info;
   node_info.uncompilable_reason = std::string(reason);
-  absl::c_transform(stack_trace, std::back_inserter(node_info.stack_trace),
+  abslx::c_transform(stack_trace, std::back_inserter(node_info.stack_trace),
                     [](const StackFrameView& stack_element) {
                       return StackFrame{
                           std::string(stack_element.name),
@@ -665,8 +665,8 @@ Status GetBodyAndConstantsAndResources(FunctionLibraryRuntime* flr,
 
 tensorflow::MemoryTypeVector GetInputMemoryTypes(
     const tensorflow::FunctionBody* fbody,
-    absl::Span<int const> constant_arg_indices,
-    absl::Span<int const> resource_arg_indices) {
+    abslx::Span<int const> constant_arg_indices,
+    abslx::Span<int const> resource_arg_indices) {
   // Set input and output memory types.
   tensorflow::MemoryTypeVector input_memory_types(fbody->arg_types.size(),
                                                   tensorflow::DEVICE_MEMORY);
@@ -702,7 +702,7 @@ tensorflow::MemoryTypeVector GetOutputMemoryTypes(
 }
 
 static auto const ops_triggering_xla_compilation =
-    new absl::flat_hash_set<std::string>{"XlaBroadcastHelper",
+    new abslx::flat_hash_set<std::string>{"XlaBroadcastHelper",
                                          "XlaCallModule",
                                          "XlaConv",
                                          "XlaConvV2",

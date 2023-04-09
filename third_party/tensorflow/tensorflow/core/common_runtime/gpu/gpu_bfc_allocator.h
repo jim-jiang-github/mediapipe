@@ -46,7 +46,7 @@ class GPUBFCAllocator : public BFCAllocator {
     //
     //  - BFCAllocator defaults garbage_collection to false, not true.
     //  - this is not the same override behavior as TF_FORCE_GPU_ALLOW_GROWTH.
-    absl::optional<bool> garbage_collection;
+    abslx::optional<bool> garbage_collection;
 
     double fragmentation_fraction = 0;
     bool allow_retry_on_failure = true;

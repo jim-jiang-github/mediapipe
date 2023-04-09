@@ -260,11 +260,11 @@ class ScopedCounter final {
 
   // Returns duration of the current interval in case the timer has started.
   // Returns nullopt otherwise.
-  absl::optional<uint64> DurationMicroSec() const {
-    return started_ ? absl::optional<uint64>(
+  abslx::optional<uint64> DurationMicroSec() const {
+    return started_ ? abslx::optional<uint64>(
                           accumulated_time_ +
                           tensorflow::Env::Default()->NowMicros() - start_time_)
-                    : absl::nullopt;
+                    : abslx::nullopt;
   }
 
   // Temporarily stop the timer, but keep accumulated time.

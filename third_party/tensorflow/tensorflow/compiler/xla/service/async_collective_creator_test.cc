@@ -31,7 +31,7 @@ using ::testing::SizeIs;
 using AsyncAllReduceCreatorTest = HloTestBase;
 
 TEST_F(AsyncAllReduceCreatorTest, SplitsSingleAllReduce) {
-  constexpr absl::string_view hlo_string = R"(
+  constexpr abslx::string_view hlo_string = R"(
   HloModule test
   add {
     x = f32[] parameter(0)
@@ -61,7 +61,7 @@ TEST_F(AsyncAllReduceCreatorTest, SplitsSingleAllReduce) {
 }
 
 TEST_F(AsyncAllReduceCreatorTest, SplitsSingleAllGather) {
-  constexpr absl::string_view hlo_string = R"(
+  constexpr abslx::string_view hlo_string = R"(
   HloModule test
   ENTRY entry {
     p0 = f32[1] parameter(0)
@@ -86,7 +86,7 @@ TEST_F(AsyncAllReduceCreatorTest, SplitsSingleAllGather) {
 }
 
 TEST_F(AsyncAllReduceCreatorTest, SplitsSingleCollectivePermute) {
-  constexpr absl::string_view hlo_string = R"(
+  constexpr abslx::string_view hlo_string = R"(
   HloModule test
   ENTRY entry {
     %p0 = bf16[8]{0} parameter(0)
@@ -145,7 +145,7 @@ ENTRY %module_spmd () -> f32[4,4,128] {
 }
 
 TEST_F(AsyncAllReduceCreatorTest, SplitsSingleCollectivePermuteScheduled) {
-  constexpr absl::string_view hlo_string = R"(
+  constexpr abslx::string_view hlo_string = R"(
   HloModule test, is_scheduled=true
   ENTRY entry {
     %p0 = bf16[8]{0} parameter(0)
@@ -178,7 +178,7 @@ TEST_F(AsyncAllReduceCreatorTest, SplitsSingleCollectivePermuteScheduled) {
 }
 
 TEST_F(AsyncAllReduceCreatorTest, SplitsSingleAllToAll) {
-  constexpr absl::string_view hlo_string = R"(
+  constexpr abslx::string_view hlo_string = R"(
   HloModule test
   ENTRY entry {
     p0 = f32[8,16] parameter(0)

@@ -22,8 +22,8 @@
 
 namespace {
 
-using absl::random_internal::RandenSlow;
-using absl::random_internal::RandenTraits;
+using abslx::random_internal::RandenSlow;
+using abslx::random_internal::RandenTraits;
 
 // Local state parameters.
 constexpr size_t kSeedBytes =
@@ -57,7 +57,7 @@ TEST(RandenSlowTest, Default) {
 
   uint64_t* id = d.state;
   for (const auto& elem : kGolden) {
-    EXPECT_EQ(absl::little_endian::FromHost64(elem), *id++);
+    EXPECT_EQ(abslx::little_endian::FromHost64(elem), *id++);
   }
 }
 

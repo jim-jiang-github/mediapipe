@@ -42,9 +42,9 @@ class BinaryOpsTestBase : public OpsTestBase {
 
   template <typename T, typename OutT>
   void SetOpKernel(const std::string& op_name, const TensorShape& lhs_shape,
-                   const absl::InlinedVector<T, 10>& lhs_input,
+                   const abslx::InlinedVector<T, 10>& lhs_input,
                    const TensorShape& rhs_shape,
-                   const absl::InlinedVector<T, 10>& rhs_input,
+                   const abslx::InlinedVector<T, 10>& rhs_input,
                    const test::OpsTestConfig& config) {
     auto builder = NodeDefBuilder("some_name", op_name)
                        .Input(FakeInput(DataTypeToEnum<T>::v()))
@@ -67,11 +67,11 @@ class BinaryOpsTestBase : public OpsTestBase {
   template <typename T, typename OutT>
   void RunAndExpectResult(const std::string& op_name,
                           const TensorShape& lhs_shape,
-                          const absl::InlinedVector<T, 10>& lhs_input,
+                          const abslx::InlinedVector<T, 10>& lhs_input,
                           const TensorShape& rhs_shape,
-                          const absl::InlinedVector<T, 10>& rhs_input,
+                          const abslx::InlinedVector<T, 10>& rhs_input,
                           const TensorShape& expected_shape,
-                          const absl::InlinedVector<OutT, 10>& expected_output,
+                          const abslx::InlinedVector<OutT, 10>& expected_output,
                           const test::OpsTestConfig& config) {
     SetOpKernel<T, OutT>(op_name, lhs_shape, lhs_input, rhs_shape, rhs_input,
                          config);
@@ -94,9 +94,9 @@ class BinaryOpsTestBase : public OpsTestBase {
   template <typename T, typename OutT>
   void RunAndExpectInvalidArgument(const std::string& op_name,
                                    const TensorShape& lhs_shape,
-                                   const absl::InlinedVector<T, 10>& lhs_input,
+                                   const abslx::InlinedVector<T, 10>& lhs_input,
                                    const TensorShape& rhs_shape,
-                                   const absl::InlinedVector<T, 10>& rhs_input,
+                                   const abslx::InlinedVector<T, 10>& rhs_input,
                                    const test::OpsTestConfig& config) {
     SetOpKernel<T, OutT>(op_name, lhs_shape, lhs_input, rhs_shape, rhs_input,
                          config);
@@ -109,8 +109,8 @@ class BinaryOpsTestBase : public OpsTestBase {
 
   template <typename T, typename OutT>
   void TestIncompatibleShapes(const std::string& op_name,
-                              const absl::InlinedVector<T, 10>& lhs_input,
-                              const absl::InlinedVector<T, 10>& rhs_input,
+                              const abslx::InlinedVector<T, 10>& lhs_input,
+                              const abslx::InlinedVector<T, 10>& rhs_input,
                               const test::OpsTestConfig& config) {
     // Prepare incompatibly shaped inputs.
     TensorShape lhs_shape{3};
@@ -127,8 +127,8 @@ class BinaryOpsTestBase : public OpsTestBase {
   template <typename T, typename BaselineT, typename OutT,
             typename BaselineOutT>
   void TestEqualShapes(const std::string& op_name, const TensorShape& shape,
-                       const absl::InlinedVector<T, 10>& lhs_input,
-                       const absl::InlinedVector<T, 10>& rhs_input,
+                       const abslx::InlinedVector<T, 10>& lhs_input,
+                       const abslx::InlinedVector<T, 10>& rhs_input,
                        BaselineOutT (*baseline_callback)(BaselineT, BaselineT),
                        const test::OpsTestConfig& config) {
     // Prepare inputs.
@@ -141,7 +141,7 @@ class BinaryOpsTestBase : public OpsTestBase {
         test::RepeatInputToMatchShape(rhs_input, input_size);
 
     // Compute expected results.
-    absl::InlinedVector<OutT, 10> expected_output;
+    abslx::InlinedVector<OutT, 10> expected_output;
     for (auto it_lhs = repeated_lhs_input.begin(),
               it_rhs = repeated_rhs_input.begin(),
               end = repeated_lhs_input.end();
@@ -161,7 +161,7 @@ class BinaryOpsTestBase : public OpsTestBase {
             typename BaselineOutT>
   void TestOneScalar(const std::string& op_name, T scalar_input,
                      const TensorShape& other_shape,
-                     const absl::InlinedVector<T, 10>& other_input,
+                     const abslx::InlinedVector<T, 10>& other_input,
                      BaselineOutT (*baseline_callback)(BaselineT, BaselineT),
                      const test::OpsTestConfig& config) {
     // Prepare inputs.
@@ -172,7 +172,7 @@ class BinaryOpsTestBase : public OpsTestBase {
         test::RepeatInputToMatchShape(other_input, other_shape.num_elements());
 
     // Compute expected results.
-    absl::InlinedVector<OutT, 10> expected_output;
+    abslx::InlinedVector<OutT, 10> expected_output;
     for (auto it = repeated_other_input.begin(),
               end = repeated_other_input.end();
          it != end; ++it) {
@@ -193,7 +193,7 @@ class BinaryOpsTestBase : public OpsTestBase {
             typename BaselineOutT>
   void TestOneEffectiveScalar(const std::string& op_name, T scalar_input,
                               const TensorShape& other_shape,
-                              const absl::InlinedVector<T, 10>& other_input,
+                              const abslx::InlinedVector<T, 10>& other_input,
                               BaselineOutT (*baseline_callback)(BaselineT,
                                                                 BaselineT),
                               const test::OpsTestConfig& config) {
@@ -205,7 +205,7 @@ class BinaryOpsTestBase : public OpsTestBase {
         test::RepeatInputToMatchShape(other_input, other_shape.num_elements());
 
     // Compute expected results.
-    absl::InlinedVector<OutT, 10> expected_output;
+    abslx::InlinedVector<OutT, 10> expected_output;
     for (auto it = repeated_other_input.begin(),
               end = repeated_other_input.end();
          it != end; ++it) {
@@ -228,8 +228,8 @@ class BinaryOpsTestBase : public OpsTestBase {
   template <typename T, typename BaselineT, typename OutT,
             typename BaselineOutT>
   void TestBroadcastingExpand(const std::string& op_name,
-                              const absl::InlinedVector<T, 10>& lhs_input,
-                              const absl::InlinedVector<T, 10>& rhs_input,
+                              const abslx::InlinedVector<T, 10>& lhs_input,
+                              const abslx::InlinedVector<T, 10>& rhs_input,
                               BaselineOutT (*baseline_callback)(BaselineT,
                                                                 BaselineT),
                               const test::OpsTestConfig& config) {
@@ -257,8 +257,8 @@ class BinaryOpsTestBase : public OpsTestBase {
   template <typename T, typename BaselineT, typename OutT,
             typename BaselineOutT>
   void TestBroadcastingInDim(const std::string& op_name,
-                             const absl::InlinedVector<T, 10>& lhs_input,
-                             const absl::InlinedVector<T, 10>& rhs_input,
+                             const abslx::InlinedVector<T, 10>& lhs_input,
+                             const abslx::InlinedVector<T, 10>& rhs_input,
                              BaselineOutT (*baseline_callback)(BaselineT,
                                                                BaselineT),
                              const test::OpsTestConfig& config) {
@@ -286,8 +286,8 @@ class BinaryOpsTestBase : public OpsTestBase {
   template <typename T, typename BaselineT, typename OutT,
             typename BaselineOutT>
   void TestBroadcasting(const std::string& op_name,
-                        const absl::InlinedVector<T, 10>& lhs_input,
-                        const absl::InlinedVector<T, 10>& rhs_input,
+                        const abslx::InlinedVector<T, 10>& lhs_input,
+                        const abslx::InlinedVector<T, 10>& rhs_input,
                         BaselineOutT (*baseline_callback)(BaselineT, BaselineT),
                         const test::OpsTestConfig& config) {
     // Prepare inputs.
@@ -315,8 +315,8 @@ class BinaryOpsTestBase : public OpsTestBase {
   template <typename T, typename BaselineT, typename OutT,
             typename BaselineOutT>
   void TestBroadcastingRank6(const std::string& op_name,
-                             const absl::InlinedVector<T, 10>& lhs_input,
-                             const absl::InlinedVector<T, 10>& rhs_input,
+                             const abslx::InlinedVector<T, 10>& lhs_input,
+                             const abslx::InlinedVector<T, 10>& rhs_input,
                              BaselineOutT (*baseline_callback)(BaselineT,
                                                                BaselineT),
                              const test::OpsTestConfig& config) {
@@ -350,17 +350,17 @@ class BinaryOpsTestBase : public OpsTestBase {
   template <typename T, typename BaselineT, typename OutT,
             typename BaselineOutT>
   void TestEmptyShapeBroadcasting(const std::string& op_name,
-                                  const absl::InlinedVector<T, 10>& lhs_input,
-                                  const absl::InlinedVector<T, 10>& rhs_input,
+                                  const abslx::InlinedVector<T, 10>& lhs_input,
+                                  const abslx::InlinedVector<T, 10>& rhs_input,
                                   const test::OpsTestConfig& config) {
     // Prepare inputs.
     TensorShape lhs_shape{2, 0, 1};
     TensorShape rhs_shape{2, 0, 5};
-    absl::InlinedVector<T, 10> empty_input = {};
+    abslx::InlinedVector<T, 10> empty_input = {};
 
     // Define expected result.
     TensorShape expected_shape{2, 0, 5};
-    absl::InlinedVector<OutT, 10> expected_output = {};
+    abslx::InlinedVector<OutT, 10> expected_output = {};
 
     RunAndExpectResult<T, OutT>(op_name, lhs_shape, empty_input, rhs_shape,
                                 empty_input, expected_shape, expected_output,
@@ -370,11 +370,11 @@ class BinaryOpsTestBase : public OpsTestBase {
  private:
   template <typename T, typename BaselineT, typename OutT,
             typename BaselineOutT>
-  absl::InlinedVector<OutT, 10> ComputeExpectedOutput(
-      std::vector<int> lhs_indices, absl::InlinedVector<T, 10> lhs_input,
-      std::vector<int> rhs_indices, absl::InlinedVector<T, 10> rhs_input,
+  abslx::InlinedVector<OutT, 10> ComputeExpectedOutput(
+      std::vector<int> lhs_indices, abslx::InlinedVector<T, 10> lhs_input,
+      std::vector<int> rhs_indices, abslx::InlinedVector<T, 10> rhs_input,
       BaselineOutT (*baseline_callback)(BaselineT, BaselineT)) {
-    absl::InlinedVector<OutT, 10> expected_output;
+    abslx::InlinedVector<OutT, 10> expected_output;
     for (int i = 0; i < lhs_indices.size(); i++) {
       auto lhs = static_cast<BaselineT>(lhs_input[lhs_indices[i]]);
       auto rhs = static_cast<BaselineT>(rhs_input[rhs_indices[i]]);

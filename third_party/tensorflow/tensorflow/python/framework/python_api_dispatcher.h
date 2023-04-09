@@ -69,8 +69,8 @@ class PythonAPIDispatcher {
   //   defaults: The argument defaults, as returned by `inspect.getargspec`
   //       (used for parameter canonicalization).
   PythonAPIDispatcher(const std::string& api_name,
-                      absl::Span<const char*> arg_names,
-                      absl::Span<PyObject*> defaults);
+                      abslx::Span<const char*> arg_names,
+                      abslx::Span<PyObject*> defaults);
 
   // Registers a new dispatch target for this dispatcher.  If the API is
   // called with parameters that match `signature_checker`, then
@@ -108,7 +108,7 @@ class PythonAPIDispatcher {
   // writes to this pre-allocated storage, rather than allocating new storage
   // each time it is called.)
   std::vector<PyObject*> canonicalized_args_storage_;
-  absl::Span<PyObject*> canonicalized_args_span_;
+  abslx::Span<PyObject*> canonicalized_args_span_;
 };
 
 // Registers a type for use with dispatch.  Dispatch will only occur if at least
@@ -141,7 +141,7 @@ class PySignatureChecker {
 
   // Returns true if the given canonicalized arguments match this signature
   // checker.
-  bool CheckCanonicalizedArgs(absl::Span<PyObject*> canon_args) const;
+  bool CheckCanonicalizedArgs(abslx::Span<PyObject*> canon_args) const;
 
   std::string DebugString() const;
 
@@ -222,7 +222,7 @@ class PyInstanceChecker : public PyTypeChecker {
   // Cache to avoid having to call PyObject_IsInstance.  Note: we rely on the
   // Python GIL (global interpreter lock) to avoid concurrent writes to this
   // cache, since `Check()` is always called from Python (via pybind11).
-  absl::flat_hash_map<PyTypeObject*, MatchType> py_class_cache_;
+  abslx::flat_hash_map<PyTypeObject*, MatchType> py_class_cache_;
 
   // Maximum cache size.  In typical user programs, the cache will never become
   // full, but we use a maximum size in case the user creates types dynamically,

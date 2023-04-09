@@ -38,9 +38,9 @@ static constexpr char kStringSavedModelPath[] = "STRING_SAVED_MODEL_PATH";
 
 // Given the path to a directory containing multiple tensorflow saved models
 // in subdirectories, replaces path with the alphabetically last subdirectory.
-absl::Status GetLatestDirectory(std::string* path) {
+abslx::Status GetLatestDirectory(std::string* path) {
 #if defined(__ANDROID__)
-  return absl::UnimplementedError(
+  return abslx::UnimplementedError(
       "GetLatestDirectory is not implemented on Android");
 #else
   std::vector<std::string> saved_models;
@@ -50,7 +50,7 @@ absl::Status GetLatestDirectory(std::string* path) {
       << "No exported bundles found in " << path;
   ::std::sort(saved_models.begin(), saved_models.end());
   *path = std::string(file::Dirname(saved_models.back()));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 #endif
 }
 
@@ -67,7 +67,7 @@ const std::string MaybeConvertSignatureToTag(
     output.resize(name.length());
     std::transform(name.begin(), name.end(), output.begin(),
                    [](unsigned char c) { return std::toupper(c); });
-    output = absl::StrReplaceAll(
+    output = abslx::StrReplaceAll(
         output, {{"/", "_"}, {"-", "_"}, {".", "_"}, {":", "_"}});
     LOG(INFO) << "Renamed TAG from: " << name << " to " << output;
     return output;
@@ -98,7 +98,7 @@ const std::string MaybeConvertSignatureToTag(
 // }
 class TensorFlowSessionFromSavedModelCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     const auto& options =
         cc->Options<TensorFlowSessionFromSavedModelCalculatorOptions>();
     const bool has_exactly_one_model =
@@ -113,10 +113,10 @@ class TensorFlowSessionFromSavedModelCalculator : public CalculatorBase {
     }
     // A TensorFlow model loaded and ready for use along with tensor
     cc->OutputSidePackets().Tag(kSessionTag).Set<TensorFlowSession>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     const auto& options =
         cc->Options<TensorFlowSessionFromSavedModelCalculatorOptions>();
     std::string path = cc->InputSidePackets().HasTag(kStringSavedModelPath)
@@ -141,15 +141,15 @@ class TensorFlowSessionFromSavedModelCalculator : public CalculatorBase {
     tensorflow::RunOptions run_options;
     tensorflow::SessionOptions session_options;
     session_options.config = options.session_config();
-    auto saved_model = absl::make_unique<tensorflow::SavedModelBundle>();
+    auto saved_model = abslx::make_unique<tensorflow::SavedModelBundle>();
     ::tensorflow::Status status = tensorflow::LoadSavedModel(
         session_options, run_options, path, tags_set, saved_model.get());
     if (!status.ok()) {
-      return absl::Status(static_cast<absl::StatusCode>(status.code()),
+      return abslx::Status(static_cast<abslx::StatusCode>(status.code()),
                           status.ToString());
     }
 
-    auto session = absl::make_unique<TensorFlowSession>();
+    auto session = abslx::make_unique<TensorFlowSession>();
     session->session = std::move(saved_model->session);
 
     RET_CHECK(!options.signature_name().empty());
@@ -165,11 +165,11 @@ class TensorFlowSessionFromSavedModelCalculator : public CalculatorBase {
     }
 
     cc->OutputSidePackets().Tag(kSessionTag).Set(Adopt(session.release()));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
-    return absl::OkStatus();
+  abslx::Status Process(CalculatorContext* cc) override {
+    return abslx::OkStatus();
   }
 };
 

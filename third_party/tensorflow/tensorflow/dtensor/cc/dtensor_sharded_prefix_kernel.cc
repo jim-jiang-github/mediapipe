@@ -60,12 +60,12 @@ class DTensorShardedPrefixOpKernel : public OpKernel {
     const auto& mesh_or = Mesh::FromString(mesh_str);
     OP_REQUIRES(ctx, mesh_or.ok(),
                 errors::InvalidArgument(
-                    absl::StrCat("Got invalid mesh string : ", mesh_str)));
+                    abslx::StrCat("Got invalid mesh string : ", mesh_str)));
     const Mesh& mesh = *mesh_or;
 
     const auto& layouts_flat = layouts->flat<tensorflow::tstring>();
     OP_REQUIRES(ctx, tensor_names->NumElements() == layouts->NumElements(),
-                errors::InvalidArgument(absl::StrCat(
+                errors::InvalidArgument(abslx::StrCat(
                     "tensor_names must match the size of layouts, "
                     "but got tensor_names size : ",
                     tensor_names->NumElements(),
@@ -96,7 +96,7 @@ class DTensorShardedPrefixOpKernel : public OpKernel {
 
       const auto& layout_or = Layout::FromString(layout_string);
       OP_REQUIRES(ctx, layout_or.ok(),
-                  errors::InvalidArgument(absl::StrCat(
+                  errors::InvalidArgument(abslx::StrCat(
                       "Tensor at index : ", i,
                       " has invalid layout string : ", layout_string)));
       std::vector<int64_t> global_shape =
@@ -107,13 +107,13 @@ class DTensorShardedPrefixOpKernel : public OpKernel {
 
     const auto& saving_specs_or = BuildSavingSpec(metadata);
     OP_REQUIRES(ctx, saving_specs_or.ok(),
-                errors::Internal(absl::StrCat(
+                errors::Internal(abslx::StrCat(
                     "failed to build saving specs for given shapes and "
                     "layouts. This should not happen. Message from stack : ",
                     saving_specs_or.status().error_message())));
 
-    const absl::flat_hash_map<
-        int64_t, absl::flat_hash_map<int64_t, std::vector<std::string>>>&
+    const abslx::flat_hash_map<
+        int64_t, abslx::flat_hash_map<int64_t, std::vector<std::string>>>&
         saving_spec = *saving_specs_or;
 
     // Construct the mesh and builds per device save ops.

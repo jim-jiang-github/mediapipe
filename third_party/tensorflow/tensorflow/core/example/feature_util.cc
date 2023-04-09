@@ -22,19 +22,19 @@ limitations under the License.
 namespace tensorflow {
 
 namespace internal {
-Feature& ExampleFeature(absl::string_view name, Example* example) {
+Feature& ExampleFeature(abslx::string_view name, Example* example) {
   return *GetFeature(name, example);
 }
 
 }  // namespace internal
 
 template <>
-bool HasFeature<>(absl::string_view key, const Features& features) {
+bool HasFeature<>(abslx::string_view key, const Features& features) {
   return features.feature().contains(internal::ProtoMapKey(key));
 }
 
 template <>
-bool HasFeature<protobuf_int64>(absl::string_view key,
+bool HasFeature<protobuf_int64>(abslx::string_view key,
                                 const Features& features) {
   auto it = features.feature().find(internal::ProtoMapKey(key));
   return (it != features.feature().end()) &&
@@ -42,27 +42,27 @@ bool HasFeature<protobuf_int64>(absl::string_view key,
 }
 
 template <>
-bool HasFeature<float>(absl::string_view key, const Features& features) {
+bool HasFeature<float>(abslx::string_view key, const Features& features) {
   auto it = features.feature().find(internal::ProtoMapKey(key));
   return (it != features.feature().end()) &&
          (it->second.kind_case() == Feature::KindCase::kFloatList);
 }
 
 template <>
-bool HasFeature<std::string>(absl::string_view key, const Features& features) {
+bool HasFeature<std::string>(abslx::string_view key, const Features& features) {
   auto it = features.feature().find(internal::ProtoMapKey(key));
   return (it != features.feature().end()) &&
          (it->second.kind_case() == Feature::KindCase::kBytesList);
 }
 
 template <>
-bool HasFeature<tstring>(absl::string_view key, const Features& features) {
+bool HasFeature<tstring>(abslx::string_view key, const Features& features) {
   auto it = features.feature().find(internal::ProtoMapKey(key));
   return (it != features.feature().end()) &&
          (it->second.kind_case() == Feature::KindCase::kBytesList);
 }
 
-bool HasFeatureList(absl::string_view key,
+bool HasFeatureList(abslx::string_view key,
                     const SequenceExample& sequence_example) {
   return sequence_example.feature_lists().feature_list().contains(
       internal::ProtoMapKey(key));
@@ -116,7 +116,7 @@ protobuf::RepeatedPtrField<std::string>* GetFeatureValues<std::string>(
 }
 
 const protobuf::RepeatedPtrField<Feature>& GetFeatureList(
-    absl::string_view key, const SequenceExample& sequence_example) {
+    abslx::string_view key, const SequenceExample& sequence_example) {
   return sequence_example.feature_lists()
       .feature_list()
       .at(internal::ProtoMapKey(key))
@@ -124,7 +124,7 @@ const protobuf::RepeatedPtrField<Feature>& GetFeatureList(
 }
 
 protobuf::RepeatedPtrField<Feature>* GetFeatureList(
-    absl::string_view feature_list_key, SequenceExample* sequence_example) {
+    abslx::string_view feature_list_key, SequenceExample* sequence_example) {
   return (*sequence_example->mutable_feature_lists()
                ->mutable_feature_list())[internal::ProtoMapKey(
                                              feature_list_key)]

@@ -22,7 +22,7 @@ namespace {
 // A map that is keyed by the index of tensor_name.
 // For example, {2 : <"spec_a", "spec_b"> } means that the
 // save_v2.tensor_names[2] should have "spec_a" and "spec_b" saved.
-using SliceSpecByName = absl::flat_hash_map<int64_t, std::vector<std::string>>;
+using SliceSpecByName = abslx::flat_hash_map<int64_t, std::vector<std::string>>;
 
 // Builds a map from tensor slice spec to saving device_id for the given Tensor
 // and layout. The output would record the saving device and the slices it needs
@@ -39,7 +39,7 @@ using SliceSpecByName = absl::flat_hash_map<int64_t, std::vector<std::string>>;
 // from saving device to its corresponding host(CPU) devices. Since we don't
 // have multi-mesh execution yet, this isn't implemented yet.
 StatusOr<SliceSpecByName> BuildSliceSpecDeviceMap(
-    absl::Span<const int64_t> global_shape, Layout layout) {
+    abslx::Span<const int64_t> global_shape, Layout layout) {
   if (!layout.mesh().is_cpu_mesh())
     return errors::Unimplemented(
         "Saving tensors on non CPU mesh needs explicit send/receive and isn't "
@@ -48,7 +48,7 @@ StatusOr<SliceSpecByName> BuildSliceSpecDeviceMap(
   // Result map that records the minimum device_id that occupies the unique
   // copy.
   // Note that llvm::SmallDenseMap won't accept std::string as a key.
-  absl::flat_hash_map<std::string, int64_t> min_device_for_slice_spec;
+  abslx::flat_hash_map<std::string, int64_t> min_device_for_slice_spec;
   // Records the map of device_ids and a list of slice_spec that it needs to
   // save.
   SliceSpecByName device_slices;
@@ -63,11 +63,11 @@ StatusOr<SliceSpecByName> BuildSliceSpecDeviceMap(
                         SliceSpecOnDevice(layout, mesh, coords, global_shape));
 
     // Build the real slice_spec from string pieces.
-    std::string slice_spec = absl::StrJoin(slice_specs, ":");
+    std::string slice_spec = abslx::StrJoin(slice_specs, ":");
     // Get local shape from the global shape.
-    std::string shape_spec = absl::StrJoin(global_shape, " ");
+    std::string shape_spec = abslx::StrJoin(global_shape, " ");
     // Concat shape spec and slice spec to form a complete shape_and_slice.
-    std::string shape_and_slice = absl::StrCat(shape_spec, " ", slice_spec);
+    std::string shape_and_slice = abslx::StrCat(shape_spec, " ", slice_spec);
 
     // Only record the min device_id for the unique slice_spec on a given
     // Tensor.
@@ -89,11 +89,11 @@ StatusOr<SliceSpecByName> BuildSliceSpecDeviceMap(
 
 }  // namespace
 
-StatusOr<absl::flat_hash_map<
-    int64_t, absl::flat_hash_map<int64_t, std::vector<std::string>>>>
-BuildSavingSpec(absl::Span<const SavingTensorMetadata> tensor_metadatas) {
-  absl::flat_hash_map<int64_t,
-                      absl::flat_hash_map<int64_t, std::vector<std::string>>>
+StatusOr<abslx::flat_hash_map<
+    int64_t, abslx::flat_hash_map<int64_t, std::vector<std::string>>>>
+BuildSavingSpec(abslx::Span<const SavingTensorMetadata> tensor_metadatas) {
+  abslx::flat_hash_map<int64_t,
+                      abslx::flat_hash_map<int64_t, std::vector<std::string>>>
       saving_specs;
   for (const SavingTensorMetadata& tensor_metadata : tensor_metadatas) {
     // We use index to select the tensor names and shape_and_slices from the
@@ -101,7 +101,7 @@ BuildSavingSpec(absl::Span<const SavingTensorMetadata> tensor_metadatas) {
     // just arguments.
     int index = tensor_metadata.tensor_index;
     const Layout& layout = tensor_metadata.layout;
-    absl::Span<const int64_t> tensor_shape = tensor_metadata.shape;
+    abslx::Span<const int64_t> tensor_shape = tensor_metadata.shape;
 
     if (layout.IsFullyReplicated()) {
       // Push a fully replicated save on device 0, where slice_spec is simply
@@ -125,8 +125,8 @@ BuildSavingSpec(absl::Span<const SavingTensorMetadata> tensor_metadatas) {
 }
 
 SaveOpSpecs BuildPerDeviceSave(
-    const absl::flat_hash_map<int64_t, std::vector<std::string>>& saving_spec,
-    const int device_id, absl::string_view prefix) {
+    const abslx::flat_hash_map<int64_t, std::vector<std::string>>& saving_spec,
+    const int device_id, abslx::string_view prefix) {
   std::vector<std::string> new_prefixes;
   std::vector<std::vector<int>> tensor_indices;
   std::vector<std::vector<std::string>> shape_and_slice_specs;
@@ -144,7 +144,7 @@ SaveOpSpecs BuildPerDeviceSave(
         shape_and_slice_specs.push_back({});
         // Generate new prefix based on device_id and save op index, only when
         // we need a new save_op.
-        new_prefixes.push_back(absl::StrCat(prefix, "_device_", device_id));
+        new_prefixes.push_back(abslx::StrCat(prefix, "_device_", device_id));
       }
       tensor_indices[save_op_index].push_back(tensor_index);
       shape_and_slice_specs[save_op_index].push_back(specs[save_op_index]);
@@ -156,7 +156,7 @@ SaveOpSpecs BuildPerDeviceSave(
 
 StatusOr<std::vector<std::string>> SliceSpecOnDevice(
     const Layout& layout, const Mesh& mesh, const DeviceLocation& device_coords,
-    absl::Span<const int64_t> global_shape) {
+    abslx::Span<const int64_t> global_shape) {
   // Prefill the slice with replicated layouts.
   std::vector<std::string> slice_specs(global_shape.size(), "-");
 
@@ -170,7 +170,7 @@ StatusOr<std::vector<std::string>> SliceSpecOnDevice(
       TF_ASSIGN_OR_RETURN(int64_t dim_size, mesh.dim_size(mesh_dim));
       int64_t per_slice_size = global_shape[tensor_dim_index] / dim_size;
       int start = device_coords[mesh_dim_index] * per_slice_size;
-      slice_specs[tensor_dim_index] = absl::StrCat(start, ",", per_slice_size);
+      slice_specs[tensor_dim_index] = abslx::StrCat(start, ",", per_slice_size);
     }
   }
   return slice_specs;

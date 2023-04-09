@@ -160,7 +160,7 @@ mlir::LogicalResult GetDeviceOrdinalFromDeviceString(mlir::Location loc,
                                                      int64_t* device_ordinal) {
   DeviceNameUtils::ParsedName parsed_name;
   if (!DeviceNameUtils::ParseFullName(
-          absl::string_view(device.data(), device.size()), &parsed_name))
+          abslx::string_view(device.data(), device.size()), &parsed_name))
     return mlir::emitError(loc) << "invalid device '" << device << "'";
 
   if (!parsed_name.has_id)

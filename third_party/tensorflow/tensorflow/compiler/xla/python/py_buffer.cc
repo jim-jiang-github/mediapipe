@@ -191,7 +191,7 @@ StatusOr<py::object> PyBuffer::CopyToDevice(
   auto transfer_guard_formatter = [this, &dst_device] {
     auto shape = py::cast<std::string>(py::str(python_shape()));
     auto dtype = py::cast<std::string>(py::str(python_dtype()));
-    return absl::StrCat("shape=", shape, ", dtype=", dtype,
+    return abslx::StrCat("shape=", shape, ", dtype=", dtype,
                         ", device=", device()->DebugString(),
                         ", dst_device=", dst_device->DebugString());
   };
@@ -209,23 +209,23 @@ StatusOr<py::object> PyBuffer::CopyToDevice(
 }
 
 std::pair<Status, bool> PyBuffer::CopyToRemoteDevice(
-    absl::string_view serialized_descriptor) const {
-  absl::Mutex mu;
+    abslx::string_view serialized_descriptor) const {
+  abslx::Mutex mu;
   bool done = false;
   Status status;
   bool sends_were_enqueued;
   buffer_->CopyToRemoteDevice(
       serialized_descriptor,
       [&done, &status, &sends_were_enqueued, &mu](Status s, bool dispatched) {
-        absl::MutexLock l(&mu);
+        abslx::MutexLock l(&mu);
         done = true;
         status = s;
         sends_were_enqueued = dispatched;
       });
   {
     py::gil_scoped_release gil_release;
-    absl::MutexLock l(&mu);
-    mu.Await(absl::Condition(
+    abslx::MutexLock l(&mu);
+    mu.Await(abslx::Condition(
         +[](bool* done) { return *done; }, &done));
   }
   return std::make_pair(status, sends_were_enqueued);
@@ -242,7 +242,7 @@ Status PyBuffer::CopyToHostAsync() {
     auto transfer_guard_formatter = [this] {
       auto shape = py::cast<std::string>(py::str(python_shape()));
       auto dtype = py::cast<std::string>(py::str(python_dtype()));
-      return absl::StrCat("shape=", shape, ", dtype=", dtype,
+      return abslx::StrCat("shape=", shape, ", dtype=", dtype,
                           ", device=", device()->DebugString());
     };
     TF_RETURN_IF_ERROR(
@@ -345,7 +345,7 @@ StatusOr<py::dict> PyBuffer::CudaArrayInterface() {
   const void* root_ptr =
       external_reference_hold->OpaqueDeviceMemoryDataPointer();
   py::tuple data(2);
-  data[0] = py::int_(absl::bit_cast<std::uintptr_t>(root_ptr));
+  data[0] = py::int_(abslx::bit_cast<std::uintptr_t>(root_ptr));
   data[1] = py::bool_(true);  // read-only
   result["data"] = std::move(data);
   result["version"] = py::int_(2);
@@ -609,7 +609,7 @@ Status PyBuffer::RegisterTypes(py::module& m) {
   type.attr("copy_to_remote_device") = py::cpp_function(
       [](PyBuffer::object self, const py::bytes serialized_descriptor) {
         // TODO(phawkins): remove the std::string cast after C++17 is required.
-        // py::bytes has a std::string_view cast, but not an absl::string_view
+        // py::bytes has a std::string_view cast, but not an abslx::string_view
         // cast.
         return self.buf()->CopyToRemoteDevice(
             static_cast<std::string>(serialized_descriptor));

@@ -54,7 +54,7 @@ XlaIfOp::XlaIfOp(OpKernelConstruction* ctx) : XlaOpKernel(ctx) {
 // set of found tensor array gradients is non-empty.
 static StatusOr<bool> PopulateTensorArrayGradients(
     XlaOpKernelContext* ctx, xla::XlaBuilder* b,
-    absl::Span<XlaCompiler::Argument> arguments,
+    abslx::Span<XlaCompiler::Argument> arguments,
     XlaCompiler::CompilationResult* then_result,
     XlaCompiler::CompilationResult* else_result) {
   bool has_tensor_array_gradients = false;
@@ -277,7 +277,7 @@ void XlaIfOp::Compile(XlaOpKernelContext* ctx) {
                else_result));
 
   StatusOr<bool> has_tensor_array_gradients = PopulateTensorArrayGradients(
-      ctx, b, absl::MakeSpan(arguments), &then_result, &else_result);
+      ctx, b, abslx::MakeSpan(arguments), &then_result, &else_result);
   OP_REQUIRES_OK(ctx, has_tensor_array_gradients.status());
 
   // Recompile the functions to update the argument shapes for tensor arrays.

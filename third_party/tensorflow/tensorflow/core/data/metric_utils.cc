@@ -41,10 +41,10 @@ IteratorMetricsCollector::IteratorMetricsCollector(
     const std::string& device_type, const Env& env)
     : device_type_(device_type), env_(env) {}
 
-absl::Time IteratorMetricsCollector::RecordStart() {
+abslx::Time IteratorMetricsCollector::RecordStart() {
   const uint64_t start_time_us = env_.NowMicros();
   if (!ShouldCollectMetrics()) {
-    return absl::FromUnixMicros(start_time_us);
+    return abslx::FromUnixMicros(start_time_us);
   }
 
   mutex_lock l(mu_);
@@ -62,17 +62,17 @@ absl::Time IteratorMetricsCollector::RecordStart() {
   }
   metrics::RecordTFDataIteratorGap(gap_time_us);
   num_active_calls_++;
-  return absl::FromUnixMicros(start_time_us);
+  return abslx::FromUnixMicros(start_time_us);
 }
 
-void IteratorMetricsCollector::RecordStop(absl::Time start_time,
+void IteratorMetricsCollector::RecordStop(abslx::Time start_time,
                                           const std::vector<Tensor>& output) {
   if (!ShouldCollectMetrics()) {
     return;
   }
 
   const uint64_t end_time_us = env_.NowMicros();
-  AddLatencySample(safe_sub(end_time_us, absl::ToUnixMicros(start_time)));
+  AddLatencySample(safe_sub(end_time_us, abslx::ToUnixMicros(start_time)));
   IncrementThroughput(GetTotalBytes(output));
   mutex_lock l(mu_);
   metrics::RecordTFDataIteratorLifetime(safe_sub(end_time_us, end_time_us_));

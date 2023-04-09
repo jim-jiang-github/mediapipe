@@ -35,7 +35,7 @@ StatusOr<XlaComputation> BuildComputation() {
 
 void CompileAndExecute(
     LocalExecutable* executable, int device_ordinal, LocalClient* client,
-    absl::Mutex* results_mutex,
+    abslx::Mutex* results_mutex,
     std::vector<std::pair<int, StatusOr<ScopedShapedBuffer>>>* results) {
   xla::ExecutableRunOptions execute_options;
   execute_options.set_intra_op_thread_pool(
@@ -46,9 +46,9 @@ void CompileAndExecute(
           ->backend()
           .memory_allocator());
   StatusOr<ScopedShapedBuffer> result =
-      executable->Run(absl::Span<const ShapedBuffer* const>(), execute_options);
+      executable->Run(abslx::Span<const ShapedBuffer* const>(), execute_options);
   {
-    absl::MutexLock lock(results_mutex);
+    abslx::MutexLock lock(results_mutex);
     results->emplace_back(device_ordinal, std::move(result));
   }
 }
@@ -70,13 +70,13 @@ void TestWithDeviceCount(const int device_count) {
       client->Compile(xla_computation, {}, xla::ExecutableBuildOptions{}));
   std::unique_ptr<LocalExecutable> executable = std::move(executables[0]);
   std::vector<tensorflow::Thread*> threads;
-  absl::Mutex results_mutex;
+  abslx::Mutex results_mutex;
   std::vector<std::pair<int, StatusOr<ScopedShapedBuffer>>> results;
   tensorflow::Env* env = tensorflow::Env::Default();
   for (int device_ordinal = 0; device_ordinal < device_count;
        device_ordinal++) {
     tensorflow::Thread* t = env->StartThread(
-        tensorflow::ThreadOptions{}, absl::StrCat("thread-", device_ordinal),
+        tensorflow::ThreadOptions{}, abslx::StrCat("thread-", device_ordinal),
         [&executable, device_ordinal, client, &results_mutex, &results] {
           CompileAndExecute(executable.get(), device_ordinal, client,
                             &results_mutex, &results);

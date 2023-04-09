@@ -10,7 +10,7 @@ namespace internal {
 
 // Tries to return the contents of a file given the path. Implementation is
 // platform-dependent.
-absl::Status DefaultGetResourceContents(const std::string& path,
+abslx::Status DefaultGetResourceContents(const std::string& path,
                                         std::string* output,
                                         bool read_as_binary);
 

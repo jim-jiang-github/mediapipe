@@ -150,10 +150,10 @@ struct Costs {
   int64_t temporary_memory;
 
   // Output memory usage per port.
-  absl::flat_hash_map<int32_t, int64_t> output_tensor_size_bytes;
+  abslx::flat_hash_map<int32_t, int64_t> output_tensor_size_bytes;
 
   // Track persistent versus temporary memory.
-  absl::flat_hash_set<int32_t> persistent_output_ports;
+  abslx::flat_hash_set<int32_t> persistent_output_ports;
 
   // These fields are used for TPU-related estimations. They are per-op
   // maximums, so each op is evaluated independently, but we want the maximum of

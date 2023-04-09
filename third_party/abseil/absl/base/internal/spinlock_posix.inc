@@ -27,15 +27,15 @@ extern "C" {
 
 ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockDelay)(
     std::atomic<uint32_t>* /* lock_word */, uint32_t /* value */, int loop,
-    absl::base_internal::SchedulingMode /* mode */) {
-  absl::base_internal::ErrnoSaver errno_saver;
+    abslx::base_internal::SchedulingMode /* mode */) {
+  abslx::base_internal::ErrnoSaver errno_saver;
   if (loop == 0) {
   } else if (loop == 1) {
     sched_yield();
   } else {
     struct timespec tm;
     tm.tv_sec = 0;
-    tm.tv_nsec = absl::base_internal::SpinLockSuggestedDelayNS(loop);
+    tm.tv_nsec = abslx::base_internal::SpinLockSuggestedDelayNS(loop);
     nanosleep(&tm, nullptr);
   }
 }

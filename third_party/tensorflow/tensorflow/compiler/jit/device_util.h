@@ -103,7 +103,7 @@ class DeviceSet {
 #endif
   }
 
-  absl::InlinedVector<uint64, 1> storage_;
+  abslx::InlinedVector<uint64, 1> storage_;
 
   const int kWordSize = 64;
 };
@@ -114,11 +114,11 @@ class DeviceInfoCache {
   bool IsGpu(DeviceId device) const { return is_gpu_[device.id()]; }
   bool IsCpu(DeviceId device) const { return is_cpu_[device.id()]; }
 
-  absl::string_view GetNameFor(DeviceId device) const {
+  abslx::string_view GetNameFor(DeviceId device) const {
     return names_[device.id()];
   }
 
-  StatusOr<DeviceId> GetIdFor(absl::string_view name);
+  StatusOr<DeviceId> GetIdFor(abslx::string_view name);
 
   using DeviceRegistration = const XlaOpRegistry::DeviceRegistration;
 
@@ -126,7 +126,7 @@ class DeviceInfoCache {
     return id_to_compilation_device_[device.id()];
   }
 
-  StatusOr<DeviceRegistration*> GetCompilationDevice(absl::string_view name) {
+  StatusOr<DeviceRegistration*> GetCompilationDevice(abslx::string_view name) {
     TF_ASSIGN_OR_RETURN(DeviceId device_id, GetIdFor(name));
     return GetCompilationDevice(device_id);
   }
@@ -137,7 +137,7 @@ class DeviceInfoCache {
 
   using DeviceTypeConstRef = std::reference_wrapper<const DeviceType>;
 
-  StatusOr<DeviceTypeConstRef> GetDeviceTypeFor(absl::string_view device_name) {
+  StatusOr<DeviceTypeConstRef> GetDeviceTypeFor(abslx::string_view device_name) {
     TF_ASSIGN_OR_RETURN(DeviceId device_id, GetIdFor(device_name));
     return std::cref(*id_to_device_type_[device_id.id()]);
   }
@@ -145,7 +145,7 @@ class DeviceInfoCache {
   string DebugString(const DeviceSet& device_set) const;
 
  private:
-  absl::flat_hash_map<string, DeviceId> name_to_id_;
+  abslx::flat_hash_map<string, DeviceId> name_to_id_;
 
   // These fields are populated for a device in GetIdFor, *before* we give out a
   // DeviceId.

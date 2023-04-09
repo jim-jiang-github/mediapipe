@@ -27,12 +27,12 @@ namespace tensorflow {
 namespace profiler {
 
 // Special op types.
-TF_CONST_INIT extern const absl::string_view kUnknownOp;
-TF_CONST_INIT extern const absl::string_view kDatasetOp;
-TF_CONST_INIT extern const absl::string_view kMemcpyHToDOp;
-TF_CONST_INIT extern const absl::string_view kMemcpyDToHOp;
-TF_CONST_INIT extern const absl::string_view kMemcpyDToDOp;
-TF_CONST_INIT extern const absl::string_view kMemcpyHToHOp;
+TF_CONST_INIT extern const abslx::string_view kUnknownOp;
+TF_CONST_INIT extern const abslx::string_view kDatasetOp;
+TF_CONST_INIT extern const abslx::string_view kMemcpyHToDOp;
+TF_CONST_INIT extern const abslx::string_view kMemcpyDToHOp;
+TF_CONST_INIT extern const abslx::string_view kMemcpyDToDOp;
+TF_CONST_INIT extern const abslx::string_view kMemcpyHToHOp;
 
 enum class Category {
   kUnknown,
@@ -48,28 +48,28 @@ enum class Category {
 // Breaks a TensorFlow op fullname into name and type.
 struct TfOp {
   Category category = Category::kUnknown;
-  absl::string_view name;
-  absl::string_view type;
+  abslx::string_view name;
+  abslx::string_view type;
 };
-TfOp ParseTfOpFullname(absl::string_view tf_op_fullname);
+TfOp ParseTfOpFullname(abslx::string_view tf_op_fullname);
 
 // Returns a vector of TF name scopes extracted from a TF op name.
-std::vector<absl::string_view> ParseTfNameScopes(absl::string_view tf_op_name);
-std::vector<absl::string_view> ParseTfNameScopes(const TfOp& tf_op);
+std::vector<abslx::string_view> ParseTfNameScopes(abslx::string_view tf_op_name);
+std::vector<abslx::string_view> ParseTfNameScopes(const TfOp& tf_op);
 
 // Trace event name for TF ops is the op type so they have the same color in
 // trace viewer.
 std::string TfOpEventName(const TfOp& tf_op);
-std::string TfOpEventName(absl::string_view tf_op_fullname);
+std::string TfOpEventName(abslx::string_view tf_op_fullname);
 
 // Trace event name for dataset ops.
-std::string DatasetOpEventName(absl::string_view full_name);
+std::string DatasetOpEventName(abslx::string_view full_name);
 
 // Returns the iterator name without prefix and parent iterator names.
-std::string IteratorName(absl::string_view full_name);
+std::string IteratorName(abslx::string_view full_name);
 
 // Returns true if the given name is a TensorFlow Dataset Op.
-inline bool IsDatasetOp(absl::string_view tf_op_type) {
+inline bool IsDatasetOp(abslx::string_view tf_op_type) {
   return tf_op_type == kDatasetOp;
 }
 inline bool IsDatasetOp(const TfOp& tf_op) {
@@ -78,8 +78,8 @@ inline bool IsDatasetOp(const TfOp& tf_op) {
 
 // Returns true if the given name is a TensorFlow Infeed Enqueue Op.
 // See: tensorflow/core/tpu/kernels/infeed_ops.h
-inline bool IsInfeedEnqueueOp(absl::string_view tf_op_type) {
-  return absl::StartsWith(tf_op_type, "InfeedEnqueue");
+inline bool IsInfeedEnqueueOp(abslx::string_view tf_op_type) {
+  return abslx::StartsWith(tf_op_type, "InfeedEnqueue");
 }
 inline bool IsInfeedEnqueueOp(const TfOp& tf_op) {
   return tf_op.category == Category::kTensorFlow &&
@@ -87,29 +87,29 @@ inline bool IsInfeedEnqueueOp(const TfOp& tf_op) {
 }
 
 // Returns true if the given op has XlaSendToHost/XlaRecvFromHost in fullname.
-inline bool IsOutsideCompilationOp(absl::string_view tf_op_fullname) {
-  if (absl::EndsWith(tf_op_fullname, ":XlaSendToHost")) return true;
-  if (absl::EndsWith(tf_op_fullname, ":XlaRecvFromHost")) return true;
+inline bool IsOutsideCompilationOp(abslx::string_view tf_op_fullname) {
+  if (abslx::EndsWith(tf_op_fullname, ":XlaSendToHost")) return true;
+  if (abslx::EndsWith(tf_op_fullname, ":XlaRecvFromHost")) return true;
   return false;
 }
 
 // Returns true if the given op is for outside compilation.
-inline bool IsOutsideCompilationOp(absl::string_view tf_op_fullname,
-                                   absl::string_view hlo_expression) {
+inline bool IsOutsideCompilationOp(abslx::string_view tf_op_fullname,
+                                   abslx::string_view hlo_expression) {
   if (IsOutsideCompilationOp(tf_op_fullname)) return true;
-  if (absl::StrContains(hlo_expression, "send-done") &&
-      absl::StrContains(hlo_expression, "is_host_transfer=true"))
+  if (abslx::StrContains(hlo_expression, "send-done") &&
+      abslx::StrContains(hlo_expression, "is_host_transfer=true"))
     return true;
   return false;
 }
 
 // Returns true if the given name is a TensorFlow embedding op.
-inline bool IsEmbeddingOp(absl::string_view tf_op_fullname) {
-  return absl::StrContains(tf_op_fullname, "Embedding");
+inline bool IsEmbeddingOp(abslx::string_view tf_op_fullname) {
+  return abslx::StrContains(tf_op_fullname, "Embedding");
 }
 
 // Returns true if the given op is for copying data from host to device.
-inline bool IsMemcpyHToDOp(absl::string_view tf_op_type) {
+inline bool IsMemcpyHToDOp(abslx::string_view tf_op_type) {
   return tf_op_type == kMemcpyHToDOp;
 }
 inline bool IsMemcpyHToDOp(const TfOp& tf_op) {
@@ -133,20 +133,20 @@ inline bool IsMemcpyHToHOp(const TfOp& tf_op) {
 
 // Splits a string of tensor shapes in "(shape1;shape2;...)" format, i.e.,
 // delimited by '(' and ')' and separated by ';', into the individual shapes.
-std::vector<absl::string_view> ParseTensorShapes(
-    absl::string_view tensor_shapes);
+std::vector<abslx::string_view> ParseTensorShapes(
+    abslx::string_view tensor_shapes);
 
 // Returns true if the given string matches OpDef.name pattern.
-bool IsTfOpName(absl::string_view op_name);
+bool IsTfOpName(abslx::string_view op_name);
 
 // Returns true if the given string matches NodeDef.name pattern.
-bool IsTfOpType(absl::string_view op_type);
+bool IsTfOpType(abslx::string_view op_type);
 
 // Returns true if the given string matches JAX pattern.
-bool IsJaxOpType(absl::string_view op_type);
+bool IsJaxOpType(abslx::string_view op_type);
 
 // Returns true if the given strings match JAX pattern.
-bool IsJaxOpNameAndType(absl::string_view op_name, absl::string_view op_type);
+bool IsJaxOpNameAndType(abslx::string_view op_name, abslx::string_view op_type);
 
 }  // namespace profiler
 }  // namespace tensorflow

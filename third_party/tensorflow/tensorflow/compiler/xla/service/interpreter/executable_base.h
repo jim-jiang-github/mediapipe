@@ -46,7 +46,7 @@ class InterpreterExecutableBase : public Executable {
   virtual StatusOr<Literal> Evaluate(
       const ServiceExecutableRunOptions* run_options,
       const HloComputation& computation,
-      absl::Span<const Literal> arg_literals) = 0;
+      abslx::Span<const Literal> arg_literals) = 0;
 
  private:
   StatusOr<ExecutionOutput> AllocateOutputMemoryWithInputReuse(

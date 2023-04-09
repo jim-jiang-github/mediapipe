@@ -25,7 +25,7 @@ namespace {
 
 class DeterminismState {
  public:
-  explicit DeterminismState(absl::string_view env_var) : env_var_(env_var) {}
+  explicit DeterminismState(abslx::string_view env_var) : env_var_(env_var) {}
   bool Required() {
     mutex_lock l(*mutex_);
 
@@ -45,7 +45,7 @@ class DeterminismState {
   }
 
  private:
-  absl::string_view env_var_;
+  abslx::string_view env_var_;
   enum class Value { DISABLED, ENABLED, NOT_SET };
   mutex* mutex_ = new mutex;
   Value state_ = Value::NOT_SET;

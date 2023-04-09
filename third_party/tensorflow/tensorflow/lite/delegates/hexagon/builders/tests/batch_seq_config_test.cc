@@ -82,7 +82,7 @@ bool DiffOutput(const std::vector<float>& control,
 
 bool DiffOutput(const std::vector<float>& control,
                 const std::vector<float>& exp) {
-  return DiffOutput(control, exp, absl::GetFlag(FLAGS_error_epsilon));
+  return DiffOutput(control, exp, abslx::GetFlag(FLAGS_error_epsilon));
 }
 }  // namespace
 
@@ -94,7 +94,7 @@ class TestModel {
   // interpreter.
   void Init() {
     model_ = tflite::FlatBufferModel::BuildFromFile(
-        absl::GetFlag(FLAGS_model_file_path).c_str());
+        abslx::GetFlag(FLAGS_model_file_path).c_str());
     ASSERT_TRUE(model_ != nullptr);
 
     resolver_ = std::make_unique<ops::builtin::BuiltinOpResolver>();
@@ -170,7 +170,7 @@ class TestModel {
 
 std::vector<std::vector<int>> ParseInputShapes() {
   std::vector<string> str_input_shapes;
-  benchmark::util::SplitAndParse(absl::GetFlag(FLAGS_model_input_shapes), ':',
+  benchmark::util::SplitAndParse(abslx::GetFlag(FLAGS_model_input_shapes), ':',
                                  &str_input_shapes);
   std::vector<std::vector<int>> input_shapes(str_input_shapes.size());
   for (int i = 0; i < str_input_shapes.size(); ++i) {
@@ -187,7 +187,7 @@ TEST(HexagonDynamicBatch, MultipleResizes) {
   auto delegated_model = std::make_unique<TestModel>();
   default_model->Init();
   delegated_model->Init();
-  delegated_model->ApplyDelegate(absl::GetFlag(FLAGS_max_batch_size), {0}, {0});
+  delegated_model->ApplyDelegate(abslx::GetFlag(FLAGS_max_batch_size), {0}, {0});
   for (const auto& input_shape : test_input_shapes) {
     const auto input = GetData(NumElements(input_shape));
     default_model->Run(input_shape, input);
@@ -210,7 +210,7 @@ TEST(HexagonDynamicBatch, MultipleResizes) {
 
 int main(int argc, char** argv) {
   ::tflite::LogToStderr();
-  absl::ParseCommandLine(argc, argv);
+  abslx::ParseCommandLine(argc, argv);
   testing::InitGoogleTest();
 
   TfLiteHexagonInit();

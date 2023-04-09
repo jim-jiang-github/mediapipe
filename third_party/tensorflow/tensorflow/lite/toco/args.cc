@@ -62,9 +62,9 @@ class ClosingSymbolLookup {
   bool valid_closing_[256];
 };
 
-bool SplitStructuredLine(absl::string_view line, char delimiter,
+bool SplitStructuredLine(abslx::string_view line, char delimiter,
                          const char* symbol_pairs,
-                         std::vector<absl::string_view>* cols) {
+                         std::vector<abslx::string_view>* cols) {
   ClosingSymbolLookup lookup(symbol_pairs);
 
   // Stack of symbols expected to close the current opened expressions.
@@ -96,18 +96,18 @@ bool SplitStructuredLine(absl::string_view line, char delimiter,
   return true;  // Success
 }
 
-inline bool TryStripPrefixString(absl::string_view str,
-                                 absl::string_view prefix,
+inline bool TryStripPrefixString(abslx::string_view str,
+                                 abslx::string_view prefix,
                                  std::string* result) {
-  bool res = absl::ConsumePrefix(&str, prefix);
+  bool res = abslx::ConsumePrefix(&str, prefix);
   result->assign(str.begin(), str.end());
   return res;
 }
 
-inline bool TryStripSuffixString(absl::string_view str,
-                                 absl::string_view suffix,
+inline bool TryStripSuffixString(abslx::string_view str,
+                                 abslx::string_view suffix,
                                  std::string* result) {
-  bool res = absl::ConsumeSuffix(&str, suffix);
+  bool res = abslx::ConsumeSuffix(&str, suffix);
   result->assign(str.begin(), str.end());
   return res;
 }
@@ -117,13 +117,13 @@ inline bool TryStripSuffixString(absl::string_view str,
 bool Arg<toco::IntList>::Parse(std::string text) {
   parsed_value_.elements.clear();
   specified_ = true;
-  // absl::StrSplit("") produces {""}, but we need {} on empty input.
+  // abslx::StrSplit("") produces {""}, but we need {} on empty input.
   // TODO(aselle): Moved this from elsewhere, but ahentz recommends we could
-  // use absl::SplitLeadingDec32Values(text.c_str(), &parsed_values_.elements)
+  // use abslx::SplitLeadingDec32Values(text.c_str(), &parsed_values_.elements)
   if (!text.empty()) {
     int32_t element;
-    for (absl::string_view part : absl::StrSplit(text, ',')) {
-      if (!absl::SimpleAtoi(part, &element)) return false;
+    for (abslx::string_view part : abslx::StrSplit(text, ',')) {
+      if (!abslx::SimpleAtoi(part, &element)) return false;
       parsed_value_.elements.push_back(element);
     }
   }
@@ -138,31 +138,31 @@ bool Arg<toco::StringMapList>::Parse(std::string text) {
     return true;
   }
 
-  std::vector<absl::string_view> outer_vector;
-  absl::string_view text_disposable_copy = text;
+  std::vector<abslx::string_view> outer_vector;
+  abslx::string_view text_disposable_copy = text;
   // TODO(aselle): Change argument parsing when absl supports structuredline.
   SplitStructuredLine(text_disposable_copy, ',', "{}", &outer_vector);
-  for (const absl::string_view& outer_member_stringpiece : outer_vector) {
+  for (const abslx::string_view& outer_member_stringpiece : outer_vector) {
     std::string outer_member(outer_member_stringpiece);
     if (outer_member.empty()) {
       continue;
     }
     std::string outer_member_copy = outer_member;
-    absl::StripAsciiWhitespace(&outer_member);
+    abslx::StripAsciiWhitespace(&outer_member);
     if (!TryStripPrefixString(outer_member, "{", &outer_member)) return false;
     if (!TryStripSuffixString(outer_member, "}", &outer_member)) return false;
     const std::vector<std::string> inner_fields_vector =
-        absl::StrSplit(outer_member, ',');
+        abslx::StrSplit(outer_member, ',');
 
     std::unordered_map<std::string, std::string> element;
     for (const std::string& member_field : inner_fields_vector) {
       std::vector<std::string> outer_member_key_value =
-          absl::StrSplit(member_field, ':');
+          abslx::StrSplit(member_field, ':');
       if (outer_member_key_value.size() != 2) return false;
       std::string& key = outer_member_key_value[0];
       std::string& value = outer_member_key_value[1];
-      absl::StripAsciiWhitespace(&key);
-      absl::StripAsciiWhitespace(&value);
+      abslx::StripAsciiWhitespace(&key);
+      abslx::StripAsciiWhitespace(&value);
       if (element.count(key) != 0) return false;
       element[key] = value;
     }

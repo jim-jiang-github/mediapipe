@@ -31,22 +31,22 @@
 
 extern thread_local bool cord_ring;
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace {
 
 using RandomEngine = std::mt19937_64;
 
-using ::absl::cord_internal::CordRep;
-using ::absl::cord_internal::CordRepConcat;
-using ::absl::cord_internal::CordRepExternal;
-using ::absl::cord_internal::CordRepFlat;
-using ::absl::cord_internal::CordRepRing;
-using ::absl::cord_internal::CordRepSubstring;
+using ::abslx::cord_internal::CordRep;
+using ::abslx::cord_internal::CordRepConcat;
+using ::abslx::cord_internal::CordRepExternal;
+using ::abslx::cord_internal::CordRepFlat;
+using ::abslx::cord_internal::CordRepRing;
+using ::abslx::cord_internal::CordRepSubstring;
 
-using ::absl::cord_internal::CONCAT;
-using ::absl::cord_internal::EXTERNAL;
-using ::absl::cord_internal::SUBSTRING;
+using ::abslx::cord_internal::CONCAT;
+using ::abslx::cord_internal::EXTERNAL;
+using ::abslx::cord_internal::SUBSTRING;
 
 using testing::ElementsAre;
 using testing::ElementsAreArray;
@@ -85,7 +85,7 @@ struct TestParam {
   InputShareMode input_share_mode = kPrivate;
 
   std::string ToString() const {
-    return absl::StrCat(refcount_is_one ? "Private" : "Shared",
+    return abslx::StrCat(refcount_is_one ? "Private" : "Shared",
                         with_capacity ? "" : "_NoCapacity",
                         (input_share_mode == kPrivate) ? ""
                         : (input_share_mode == kShared)
@@ -97,13 +97,13 @@ using TestParams = std::vector<TestParam>;
 
 // Matcher validating when mutable copies are required / performed.
 MATCHER_P2(EqIfPrivate, param, rep,
-           absl::StrCat("Equal 0x", absl::Hex(rep), " if private")) {
+           abslx::StrCat("Equal 0x", abslx::Hex(rep), " if private")) {
   return param.refcount_is_one ? arg == rep : arg != rep;
 }
 
 // Matcher validating when mutable copies are required / performed.
 MATCHER_P2(EqIfPrivateAndCapacity, param, rep,
-           absl::StrCat("Equal 0x", absl::Hex(rep),
+           abslx::StrCat("Equal 0x", abslx::Hex(rep),
                         " if private and capacity")) {
   return (param.refcount_is_one && param.with_capacity) ? arg == rep
                                                         : arg != rep;
@@ -136,7 +136,7 @@ std::vector<string_view> ToFlats(const CordRepRing* r) {
 
 class not_a_string_view {
  public:
-  explicit not_a_string_view(absl::string_view s)
+  explicit not_a_string_view(abslx::string_view s)
       : data_(s.data()), size_(s.size()) {}
   explicit not_a_string_view(const void* data, size_t size)
       : data_(data), size_(size) {}
@@ -181,14 +181,14 @@ std::string ToString(const CordRepRing* r) {
   value.reserve(r->length);
   index_type pos = r->head();
   do {
-    absl::string_view sv = r->entry_data(pos);
+    abslx::string_view sv = r->entry_data(pos);
     value.append(sv.data(), sv.size());
   } while ((pos = r->advance(pos)) != r->tail());
   return value;
 }
 
 // Creates a flat for testing
-CordRep* MakeFlat(absl::string_view s, size_t extra = 0) {
+CordRep* MakeFlat(abslx::string_view s, size_t extra = 0) {
   CordRepFlat* flat = CordRepFlat::New(s.length() + extra);
   memcpy(flat->Data(), s.data(), s.length());
   flat->length = s.length();
@@ -196,10 +196,10 @@ CordRep* MakeFlat(absl::string_view s, size_t extra = 0) {
 }
 
 // Creates an external node for testing
-CordRepExternal* MakeExternal(absl::string_view s) {
+CordRepExternal* MakeExternal(abslx::string_view s) {
   struct Rep : public CordRepExternal {
     std::string s;
-    explicit Rep(absl::string_view s) : s(s) {
+    explicit Rep(abslx::string_view s) : s(s) {
       this->tag = EXTERNAL;
       this->base = s.data();
       this->length = s.length();
@@ -227,8 +227,8 @@ CordRepExternal* MakeFakeExternal(size_t length) {
 }
 
 // Creates a flat or an external node for testing depending on the size.
-CordRep* MakeLeaf(absl::string_view s, size_t extra = 0) {
-  if (s.size() <= absl::cord_internal::kMaxFlatLength) {
+CordRep* MakeLeaf(abslx::string_view s, size_t extra = 0) {
+  if (s.size() <= abslx::cord_internal::kMaxFlatLength) {
     return MakeFlat(s, extra);
   } else {
     return MakeExternal(s);
@@ -272,7 +272,7 @@ Composition RandomComposition() {
   return (rng() & 1) ? kMix : ((rng() & 1) ? kAppend : kPrepend);
 }
 
-absl::string_view ToString(Composition composition) {
+abslx::string_view ToString(Composition composition) {
   switch (composition) {
     case kAppend:
       return "Append";
@@ -506,7 +506,7 @@ INSTANTIATE_TEST_SUITE_P(
     TestParamToString);
 
 TEST_P(CordRingCreateTest, CreateFromFlat) {
-  absl::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  abslx::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
   CordRepRing* result = NeedsUnref(CordRepRing::Create(MakeFlat(str1)));
   ASSERT_THAT(result, IsValidRingBuffer());
   EXPECT_THAT(result->length, Eq(str1.size()));
@@ -545,7 +545,7 @@ TEST_F(CordRingTest, CreateWithIllegalExtraCapacity) {
 }
 
 TEST_P(CordRingCreateFromTreeTest, CreateFromSubstringOfFlat) {
-  absl::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  abslx::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
   auto* flat = RefIfInputShared(MakeFlat(str1));
   auto* child = RefIfInputSharedIndirect(MakeSubstring(4, 20, flat));
   CordRepRing* result = NeedsUnref(CordRepRing::Create(child));
@@ -555,7 +555,7 @@ TEST_P(CordRingCreateFromTreeTest, CreateFromSubstringOfFlat) {
 }
 
 TEST_P(CordRingCreateTest, CreateFromExternal) {
-  absl::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  abslx::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
   auto* child = RefIfInputShared(MakeExternal(str1));
   CordRepRing* result = NeedsUnref(CordRepRing::Create(child));
   ASSERT_THAT(result, IsValidRingBuffer());
@@ -564,7 +564,7 @@ TEST_P(CordRingCreateTest, CreateFromExternal) {
 }
 
 TEST_P(CordRingCreateFromTreeTest, CreateFromSubstringOfExternal) {
-  absl::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  abslx::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
   auto* external = RefIfInputShared(MakeExternal(str1));
   auto* child = RefIfInputSharedIndirect(MakeSubstring(1, 24, external));
   CordRepRing* result = NeedsUnref(CordRepRing::Create(child));
@@ -616,7 +616,7 @@ TEST_P(CordRingBuildInputTest, CreateFromSubstringConcat) {
 }
 
 TEST_P(CordRingCreateTest, Properties) {
-  absl::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  abslx::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
   CordRepRing* result = NeedsUnref(CordRepRing::Create(MakeFlat(str1), 120));
   ASSERT_THAT(result, IsValidRingBuffer());
   EXPECT_THAT(result->head(), Eq(0));
@@ -628,7 +628,7 @@ TEST_P(CordRingCreateTest, Properties) {
 }
 
 TEST_P(CordRingCreateTest, EntryForNewFlat) {
-  absl::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  abslx::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
   CordRep* child = MakeFlat(str1);
   CordRepRing* result = NeedsUnref(CordRepRing::Create(child, 120));
   ASSERT_THAT(result, IsValidRingBuffer());
@@ -638,7 +638,7 @@ TEST_P(CordRingCreateTest, EntryForNewFlat) {
 }
 
 TEST_P(CordRingCreateTest, EntryForNewFlatSubstring) {
-  absl::string_view str1 = "1234567890abcdefghijklmnopqrstuvwxyz";
+  abslx::string_view str1 = "1234567890abcdefghijklmnopqrstuvwxyz";
   CordRep* child = MakeFlat(str1);
   CordRep* substring = MakeSubstring(10, 26, child);
   CordRepRing* result = NeedsUnref(CordRepRing::Create(substring, 1));
@@ -649,8 +649,8 @@ TEST_P(CordRingCreateTest, EntryForNewFlatSubstring) {
 }
 
 TEST_P(CordRingBuildTest, AppendFlat) {
-  absl::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
-  absl::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  abslx::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  abslx::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   CordRepRing* ring = CreateWithCapacity(MakeExternal(str1), 1);
   CordRepRing* result = NeedsUnref(CordRepRing::Append(ring, MakeFlat(str2)));
   ASSERT_THAT(result, IsValidRingBuffer());
@@ -660,8 +660,8 @@ TEST_P(CordRingBuildTest, AppendFlat) {
 }
 
 TEST_P(CordRingBuildTest, PrependFlat) {
-  absl::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
-  absl::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  abslx::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  abslx::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   CordRepRing* ring = CreateWithCapacity(MakeExternal(str1), 1);
   CordRepRing* result = NeedsUnref(CordRepRing::Prepend(ring, MakeFlat(str2)));
   ASSERT_THAT(result, IsValidRingBuffer());
@@ -671,8 +671,8 @@ TEST_P(CordRingBuildTest, PrependFlat) {
 }
 
 TEST_P(CordRingBuildTest, AppendString) {
-  absl::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
-  absl::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  abslx::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  abslx::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   CordRepRing* ring = CreateWithCapacity(MakeExternal(str1), 1);
   CordRepRing* result = NeedsUnref(CordRepRing::Append(ring, str2));
   ASSERT_THAT(result, IsValidRingBuffer());
@@ -682,8 +682,8 @@ TEST_P(CordRingBuildTest, AppendString) {
 }
 
 TEST_P(CordRingBuildTest, AppendStringHavingExtra) {
-  absl::string_view str1 = "1234";
-  absl::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  abslx::string_view str1 = "1234";
+  abslx::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   CordRepRing* ring = CreateWithCapacity(MakeFlat(str1, 26), 0);
   CordRepRing* result = NeedsUnref(CordRepRing::Append(ring, str2));
   ASSERT_THAT(result, IsValidRingBuffer());
@@ -692,8 +692,8 @@ TEST_P(CordRingBuildTest, AppendStringHavingExtra) {
 }
 
 TEST_P(CordRingBuildTest, AppendStringHavingPartialExtra) {
-  absl::string_view str1 = "1234";
-  absl::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  abslx::string_view str1 = "1234";
+  abslx::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   // Create flat with at least one extra byte. We don't expect to have sized
   // alloc and capacity rounding to grant us enough to not make it partial.
@@ -702,8 +702,8 @@ TEST_P(CordRingBuildTest, AppendStringHavingPartialExtra) {
   ASSERT_THAT(avail, Lt(str2.size())) << " adjust test for larger flats!";
 
   // Construct the flats we do expect using all of `avail`.
-  absl::string_view str1a = str2.substr(0, avail);
-  absl::string_view str2a = str2.substr(avail);
+  abslx::string_view str1a = str2.substr(0, avail);
+  abslx::string_view str2a = str2.substr(avail);
 
   CordRepRing* ring = CreateWithCapacity(flat, 1);
   CordRepRing* result = NeedsUnref(CordRepRing::Append(ring, str2));
@@ -718,8 +718,8 @@ TEST_P(CordRingBuildTest, AppendStringHavingPartialExtra) {
 }
 
 TEST_P(CordRingBuildTest, AppendStringHavingExtraInSubstring) {
-  absl::string_view str1 = "123456789_1234";
-  absl::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  abslx::string_view str1 = "123456789_1234";
+  abslx::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   CordRep* flat = RemovePrefix(10, MakeFlat(str1, 26));
   CordRepRing* ring = CreateWithCapacity(flat, 0);
   CordRepRing* result = NeedsUnref(CordRepRing::Append(ring, str2));
@@ -734,10 +734,10 @@ TEST_P(CordRingBuildTest, AppendStringHavingExtraInSubstring) {
 }
 
 TEST_P(CordRingBuildTest, AppendStringHavingSharedExtra) {
-  absl::string_view str1 = "123456789_1234";
-  absl::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  abslx::string_view str1 = "123456789_1234";
+  abslx::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   for (int shared_type = 0; shared_type < 2; ++shared_type) {
-    SCOPED_TRACE(absl::StrCat("Shared extra type ", shared_type));
+    SCOPED_TRACE(abslx::StrCat("Shared extra type ", shared_type));
 
     // Create a flat that is shared in some way.
     CordRep* flat = nullptr;
@@ -766,9 +766,9 @@ TEST_P(CordRingBuildTest, AppendStringHavingSharedExtra) {
 }
 
 TEST_P(CordRingBuildTest, AppendStringWithExtra) {
-  absl::string_view str1 = "1234";
-  absl::string_view str2 = "1234567890";
-  absl::string_view str3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  abslx::string_view str1 = "1234";
+  abslx::string_view str2 = "1234567890";
+  abslx::string_view str3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   CordRepRing* ring = CreateWithCapacity(MakeExternal(str1), 1);
   CordRepRing* result = NeedsUnref(CordRepRing::Append(ring, str2, 26));
   result = CordRepRing::Append(result, str3);
@@ -779,8 +779,8 @@ TEST_P(CordRingBuildTest, AppendStringWithExtra) {
 }
 
 TEST_P(CordRingBuildTest, PrependString) {
-  absl::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
-  absl::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  abslx::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  abslx::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   // Use external rep to avoid appending to first flat
   CordRepRing* ring = CreateWithCapacity(MakeExternal(str1), 1);
   CordRepRing* result = NeedsUnref(CordRepRing::Prepend(ring, str2));
@@ -795,8 +795,8 @@ TEST_P(CordRingBuildTest, PrependString) {
 }
 
 TEST_P(CordRingBuildTest, PrependStringHavingExtra) {
-  absl::string_view str1 = "abcdefghijklmnopqrstuvwxyz1234";
-  absl::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  abslx::string_view str1 = "abcdefghijklmnopqrstuvwxyz1234";
+  abslx::string_view str2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   CordRep* flat = RemovePrefix(26, MakeFlat(str1));
   CordRepRing* ring = CreateWithCapacity(flat, 0);
   CordRepRing* result = NeedsUnref(CordRepRing::Prepend(ring, str2));
@@ -811,11 +811,11 @@ TEST_P(CordRingBuildTest, PrependStringHavingExtra) {
 }
 
 TEST_P(CordRingBuildTest, PrependStringHavingSharedExtra) {
-  absl::string_view str1 = "123456789_ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  absl::string_view str2 = "abcdefghij";
-  absl::string_view str1a = str1.substr(10);
+  abslx::string_view str1 = "123456789_ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  abslx::string_view str2 = "abcdefghij";
+  abslx::string_view str1a = str1.substr(10);
   for (int shared_type = 1; shared_type < 2; ++shared_type) {
-    SCOPED_TRACE(absl::StrCat("Shared extra type ", shared_type));
+    SCOPED_TRACE(abslx::StrCat("Shared extra type ", shared_type));
 
     // Create a flat that is shared in some way.
     CordRep* flat = nullptr;
@@ -839,9 +839,9 @@ TEST_P(CordRingBuildTest, PrependStringHavingSharedExtra) {
 }
 
 TEST_P(CordRingBuildTest, PrependStringWithExtra) {
-  absl::string_view str1 = "1234";
-  absl::string_view str2 = "1234567890";
-  absl::string_view str3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  abslx::string_view str1 = "1234";
+  abslx::string_view str2 = "1234567890";
+  abslx::string_view str3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   CordRepRing* ring = CreateWithCapacity(MakeExternal(str1), 1);
   CordRepRing* result = NeedsUnref(CordRepRing::Prepend(ring, str2, 26));
   ASSERT_THAT(result, IsValidRingBuffer());
@@ -933,8 +933,8 @@ TEST_P(CordRingSubTest, SubRingFromLargeExternal) {
       large_string.c_str(),
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
   };
-  std::string buffer = absl::StrCat(flats[0], flats[1], flats[2]);
-  absl::string_view all = buffer;
+  std::string buffer = abslx::StrCat(flats[0], flats[1], flats[2]);
+  abslx::string_view all = buffer;
   for (size_t offset = 0; offset < 30; ++offset) {
     CordRepRing* ring = RefIfShared(FromFlats(flats, composition));
     CordRepRing* result = CordRepRing::SubRing(ring, offset, 0);
@@ -1375,7 +1375,7 @@ TEST_F(CordRingTest, GetCharacter) {
 }
 
 TEST_F(CordRingTest, GetCharacterWithSubstring) {
-  absl::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
+  abslx::string_view str1 = "abcdefghijklmnopqrstuvwxyz";
   auto* child = MakeSubstring(4, 20, MakeFlat(str1));
   CordRepRing* result = NeedsUnref(CordRepRing::Create(child));
   ASSERT_THAT(result, IsValidRingBuffer());
@@ -1388,12 +1388,12 @@ TEST_F(CordRingTest, GetCharacterWithSubstring) {
 TEST_F(CordRingTest, IsFlatSingleFlat) {
   for (bool external : {false, true}) {
     SCOPED_TRACE(external ? "With External" : "With Flat");
-    absl::string_view str = "Hello world";
+    abslx::string_view str = "Hello world";
     CordRep* rep = external ? MakeExternal(str) : MakeFlat(str);
     CordRepRing* ring = NeedsUnref(CordRepRing::Create(rep));
 
     // The ring is a single non-fragmented flat:
-    absl::string_view fragment;
+    abslx::string_view fragment;
     EXPECT_TRUE(ring->IsFlat(nullptr));
     EXPECT_TRUE(ring->IsFlat(&fragment));
     EXPECT_THAT(fragment, Eq("Hello world"));
@@ -1413,8 +1413,8 @@ TEST_F(CordRingTest, IsFlatSingleFlat) {
 TEST_F(CordRingTest, IsFlatMultiFlat) {
   for (bool external : {false, true}) {
     SCOPED_TRACE(external ? "With External" : "With Flat");
-    absl::string_view str1 = "Hello world";
-    absl::string_view str2 = "Halt and catch fire";
+    abslx::string_view str1 = "Hello world";
+    abslx::string_view str2 = "Halt and catch fire";
     CordRep* rep1 = external ? MakeExternal(str1) : MakeFlat(str1);
     CordRep* rep2 = external ? MakeExternal(str2) : MakeFlat(str2);
     CordRepRing* ring = CordRepRing::Append(CordRepRing::Create(rep1), rep2);
@@ -1422,7 +1422,7 @@ TEST_F(CordRingTest, IsFlatMultiFlat) {
 
     // The ring is fragmented, IsFlat() on the entire cord must be false.
     EXPECT_FALSE(ring->IsFlat(nullptr));
-    absl::string_view fragment = "Don't touch this";
+    abslx::string_view fragment = "Don't touch this";
     EXPECT_FALSE(ring->IsFlat(&fragment));
     EXPECT_THAT(fragment, Eq("Don't touch this"));
 
@@ -1455,4 +1455,4 @@ TEST_F(CordRingTest, Dump) {
 
 }  // namespace
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

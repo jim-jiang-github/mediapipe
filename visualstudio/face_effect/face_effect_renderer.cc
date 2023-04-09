@@ -236,7 +236,7 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
   FaceEffectRenderer() = default;
   ~FaceEffectRenderer() override = default;
 
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     int input_checks = 0;
 
     // input side packets
@@ -279,15 +279,15 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
     }
 
     if (31==input_checks) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
-    return absl::InternalError("FaceEffectRenderer::GetContract() - illegal parameters");
+    return abslx::InternalError("FaceEffectRenderer::GetContract() - illegal parameters");
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     if (!cc->Inputs().HasTag(kImageTag)) {
-      return absl::InternalError("FaceEffectRenderer::Open() - no image frame input not available");
+      return abslx::InternalError("FaceEffectRenderer::Open() - no image frame input not available");
     }
     calc_ctx_ = cc; // OnInitedGL_()
     OpenGLRenderer::Run_();
@@ -302,10 +302,10 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
 
     print_help();
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     auto const& inputs = cc->Inputs();
 
     // user input
@@ -428,20 +428,20 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
         }
 
         // copy result to output
-        auto output_frame = absl::make_unique<ImageFrame>(target_format, render_task_.width, render_task_.height);
+        auto output_frame = abslx::make_unique<ImageFrame>(target_format, render_task_.width, render_task_.height);
         output_frame->CopyPixelData(target_format, render_task_.width, render_task_.height, render_frame.data,
                                     ImageFrame::kDefaultAlignmentBoundary);
         outputs.Tag(kImageTag).Add(output_frame.release(), cc->InputTimestamp());
       }
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Close(CalculatorContext* cc) override {
+  abslx::Status Close(CalculatorContext* cc) override {
     render_task_.Reset();
     OpenGLRenderer::Stop_();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // OpenGL Renderer

@@ -89,9 +89,9 @@ std::vector<string> DumpLinkMap(const GenNode::LinkMap& link_map) {
     std::multiset<string> others;
     for (const auto& other : link.second) {
       others.emplace(
-          absl::StrFormat("%s[%s]", other.node->name(), string(other.port)));
+          abslx::StrFormat("%s[%s]", other.node->name(), string(other.port)));
     }
-    ordered[key] = absl::StrJoin(others, ", ");
+    ordered[key] = abslx::StrJoin(others, ", ");
   }
   // Now dump the result in a predictable order.
   std::vector<string> result;
@@ -119,7 +119,7 @@ std::vector<string> DumpLinkHashMap(const SigNode::LinkHashMap& link_hash_map) {
     }
     std::sort(nodes.begin(), nodes.end());
     result.emplace_back(string(id.first.local) + ":" + string(id.first.remote) +
-                        ": " + absl::StrJoin(nodes, ", "));
+                        ": " + abslx::StrJoin(nodes, ", "));
   }
   return result;
 }

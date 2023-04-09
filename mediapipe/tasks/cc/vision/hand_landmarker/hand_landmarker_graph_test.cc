@@ -101,7 +101,7 @@ constexpr float kAbsMargin = 0.03;
 constexpr int kMaxNumHands = 2;
 constexpr float kMinTrackingConfidence = 0.5;
 
-NormalizedLandmarkList GetExpectedLandmarkList(absl::string_view filename) {
+NormalizedLandmarkList GetExpectedLandmarkList(abslx::string_view filename) {
   NormalizedLandmarkList expected_landmark_list;
   MP_EXPECT_OK(GetTextProto(file::JoinPath("./", kTestDataDirectory, filename),
                             &expected_landmark_list, Defaults()));
@@ -109,7 +109,7 @@ NormalizedLandmarkList GetExpectedLandmarkList(absl::string_view filename) {
 }
 
 // Helper function to create a Hand Landmarker TaskRunner.
-absl::StatusOr<std::unique_ptr<TaskRunner>> CreateTaskRunner() {
+abslx::StatusOr<std::unique_ptr<TaskRunner>> CreateTaskRunner() {
   Graph graph;
   auto& hand_landmarker_graph = graph.AddNode(
       "mediapipe.tasks.vision.hand_landmarker.HandLandmarkerGraph");
@@ -134,7 +134,7 @@ absl::StatusOr<std::unique_ptr<TaskRunner>> CreateTaskRunner() {
           .SetName(kHandRectNextFrameName) >>
       graph[Output<std::vector<NormalizedRect>>(kHandRectNextFrameTag)];
   return TaskRunner::Create(
-      graph.GetConfig(), absl::make_unique<core::MediaPipeBuiltinOpResolver>());
+      graph.GetConfig(), abslx::make_unique<core::MediaPipeBuiltinOpResolver>());
 }
 
 class HandLandmarkerTest : public tflite_shims::testing::Test {};

@@ -29,7 +29,7 @@
 #include "absl/hash/hash.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace hash_testing_internal {
@@ -95,16 +95,16 @@ struct NonStandardLayout {
 };
 
 struct StatefulTestingHash
-    : absl::container_internal::hash_testing_internal::WithId<
+    : abslx::container_internal::hash_testing_internal::WithId<
           StatefulTestingHash> {
   template <class T>
   size_t operator()(const T& t) const {
-    return absl::Hash<T>{}(t);
+    return abslx::Hash<T>{}(t);
   }
 };
 
 struct StatefulTestingEqual
-    : absl::container_internal::hash_testing_internal::WithId<
+    : abslx::container_internal::hash_testing_internal::WithId<
           StatefulTestingEqual> {
   template <class T, class U>
   bool operator()(const T& t, const U& u) const {
@@ -164,7 +164,7 @@ auto keys(const Set& s)
 
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 // ABSL_UNORDERED_SUPPORTS_ALLOC_CTORS is false for glibcxx versions
 // where the unordered containers are missing certain constructors that

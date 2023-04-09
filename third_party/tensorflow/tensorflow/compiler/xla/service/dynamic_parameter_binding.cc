@@ -89,7 +89,7 @@ std::string DynamicParameterBinding::ToString() const {
   for (const auto& binding : bindings_) {
     const DynamicDimension& dynamic_dimension = binding.first;
     const DynamicParameter& dynamic_param = binding.second;
-    pieces.push_back(absl::StrFormat(
+    pieces.push_back(abslx::StrFormat(
         " -- Input param number %lld at %s has dim %lld as dynamic"
         " dimension, which is represented by param number %lld at "
         "%s",
@@ -98,7 +98,7 @@ std::string DynamicParameterBinding::ToString() const {
         dynamic_dimension.dimension, dynamic_param.parameter_num,
         dynamic_param.parameter_index.ToString()));
   }
-  return absl::StrJoin(pieces, "\n");
+  return abslx::StrJoin(pieces, "\n");
 }
 
 Status DynamicParameterBinding::ForEachBinding(BindingFn fn) const {

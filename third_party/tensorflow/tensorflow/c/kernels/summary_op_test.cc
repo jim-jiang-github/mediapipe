@@ -89,7 +89,7 @@ void TestScalarSummaryOp(Tensor* tags, Tensor* values, string expected_output,
         &summary, ctx.mutable_output(0)->scalar<tstring>()()));
     ExpectSummaryMatches(summary, expected_output);
   } else {
-    EXPECT_TRUE(absl::StrContains(ctx.status().ToString(), expected_output))
+    EXPECT_TRUE(abslx::StrContains(ctx.status().ToString(), expected_output))
         << ctx.status();
   }
 }

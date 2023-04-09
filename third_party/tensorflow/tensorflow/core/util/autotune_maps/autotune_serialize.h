@@ -34,7 +34,7 @@ namespace tensorflow {
 // TODO(b/189530096) Support autotune maps for more ops.
 // Loads autotune maps from string output by SerializeAutotuneMaps and uses
 // them to update the runtime autotune maps.
-Status LoadSerializedAutotuneMaps(absl::string_view s);
+Status LoadSerializedAutotuneMaps(abslx::string_view s);
 
 // Serializes all the autotune maps into a string that can be decoded by
 // LoadSerializedAutotuneMaps.

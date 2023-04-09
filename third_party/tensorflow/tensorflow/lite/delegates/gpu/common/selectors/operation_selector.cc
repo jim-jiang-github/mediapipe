@@ -76,7 +76,7 @@ bool IsRecommendedForWinograd4x4To6x6(const Convolution2DAttributes& attr,
   return recommended_channels && recommended_hw;
 }
 
-absl::Status WinogradFromNode(const GpuInfo& gpu_info,
+abslx::Status WinogradFromNode(const GpuInfo& gpu_info,
                               const std::vector<Value*>& inputs,
                               const std::vector<Value*>& outputs,
                               const OperationDef& op_def, ModelHints hints,
@@ -84,10 +84,10 @@ absl::Status WinogradFromNode(const GpuInfo& gpu_info,
                               const Convolution2DAttributes& attr,
                               GPUOperationsSubgraph* gpu_subgraph) {
   if (!IsSuitableForWinograd4x4To6x6(attr)) {
-    return absl::UnimplementedError("No implementation for this case.");
+    return abslx::UnimplementedError("No implementation for this case.");
   }
   if (!IsRecommendedForWinograd4x4To6x6(attr, gpu_info, output_shape)) {
-    return absl::UnimplementedError("Not recommended for this case.");
+    return abslx::UnimplementedError("Not recommended for this case.");
   }
 
   const int tiles_x = DivideRoundUp(output_shape.w, 4);
@@ -148,14 +148,14 @@ absl::Status WinogradFromNode(const GpuInfo& gpu_info,
   winograd_down.operation =
       SelectWinograd36To4x4(gpu_info, winograd_down_def, bias_copy);
   winograd_down.name = "winograd_36_to_4x4";
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Supported operation types:
 // 1) BATCHED_MATMUL
 // 2) CONVOLUTION_2D
 // 3) CONVOLUTION_TRANSPOSED
-absl::Status AddDynamicConv(ModelHints hints, const GpuInfo& gpu_info,
+abslx::Status AddDynamicConv(ModelHints hints, const GpuInfo& gpu_info,
                             const OperationDef& op_def, OperationType op_type,
                             const BHWC& src_shape, const OHWI& weights_shape,
                             const BHWC& dst_shape, int src_id, int weights_id,
@@ -197,7 +197,7 @@ absl::Status AddDynamicConv(ModelHints hints, const GpuInfo& gpu_info,
     conv_op.operation->flops_ =
         dst_shape.b * dst_shape.h * dst_shape.w * dst_shape.c * weights_shape.i;
   } else {
-    return absl::InternalError("No support of this operation type.");
+    return abslx::InternalError("No support of this operation type.");
   }
   conv_op.input_ids = {src_id};
   if (weights_desc.layout == WeightsLayout::k2DX4I4YIsSpatialIAndXIsOOGroupO4 ||
@@ -238,7 +238,7 @@ absl::Status AddDynamicConv(ModelHints hints, const GpuInfo& gpu_info,
   converter_op.operation = SelectConverterToConvWeights(
       weights_desc, converter_def, hints, input_layout);
   converter_op.name = "bhwc_tensor_to_conv_weights";
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void AddConvSharedWeights(
@@ -273,7 +273,7 @@ void AddConvSharedWeights(
 
       std::vector<uint8_t> weights_data(flt_count * SizeOf(weights_desc.type));
       RearrangeWeights(attr.weights, weights_desc,
-                       absl::MakeSpan(weights_data));
+                       abslx::MakeSpan(weights_data));
       int sub_size = SizeOf(weights_desc.type) * 4 * tex_size.x * tex_size.y;
       for (int i = 0; i < 4; ++i) {
         TensorDescriptor weights_tensor = TensorDescriptor(
@@ -296,7 +296,7 @@ void AddConvSharedWeights(
       std::vector<uint8_t> weights_data =
           std::vector<uint8_t>(flt_count * SizeOf(weights_desc.type));
       RearrangeWeights(attr.weights, weights_desc,
-                       absl::MakeSpan(weights_data));
+                       abslx::MakeSpan(weights_data));
       weights_tensor.SetData(std::move(weights_data));
       int tensor_id = gpu_subgraph->AddTensor(std::move(weights_tensor));
       gpu_subgraph->operations[0].input_ids.push_back(tensor_id);
@@ -307,7 +307,7 @@ void AddConvSharedWeights(
 
 }  // namespace
 
-absl::Status GPUOperationFromNodePart0(
+abslx::Status GPUOperationFromNodePart0(
     const GpuInfo& gpu_info, const OperationDef& op_def, ModelHints hints,
     const std::vector<Value*>& inputs, const std::vector<Value*>& outputs,
     const Node& node, std::vector<SharedWeightsConvDesc>* shared_conv_weights,
@@ -323,7 +323,7 @@ absl::Status GPUOperationFromNodePart0(
         GPUOperation operation =
             CreateElementwiseTwoInput(op_def, op_type, inputs[1]->tensor.shape);
         *gpu_op = std::make_unique<GPUOperation>(std::move(operation));
-        return absl::OkStatus();
+        return abslx::OkStatus();
       } else if (inputs.size() >= 2) {
         auto output = outputs[0];
         std::vector<int> channels(inputs.size());
@@ -331,16 +331,16 @@ absl::Status GPUOperationFromNodePart0(
           channels[i] = inputs[i]->tensor.shape.c;
         }
         SelectAdd(op_def, channels, output->tensor.shape.c, gpu_op);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       } else if (inputs.size() == 1 && node.operation.attributes.has_value()) {
         auto attr =
-            absl::any_cast<ElementwiseAttributes>(node.operation.attributes);
+            abslx::any_cast<ElementwiseAttributes>(node.operation.attributes);
         GPUOperation operation =
             CreateElementwise(gpu_info, op_def, op_type, attr);
         *gpu_op = std::make_unique<GPUOperation>(std::move(operation));
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
-      return absl::UnimplementedError(absl::StrCat(
+      return abslx::UnimplementedError(abslx::StrCat(
           "No support of ", node.operation.type, " with this parameters"));
     }
     case OperationType::BATCHED_MATMUL: {
@@ -405,13 +405,13 @@ absl::Status GPUOperationFromNodePart0(
         reshape_output_op.output_ids = {static_cast<int>(outputs[0]->id)};
         reshape_output_op.name = "mat_mul_reshape_output";
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::CAST:
       SelectCast(op_def, gpu_info, gpu_op);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     case OperationType::CONCAT: {
-      auto attr = absl::any_cast<ConcatAttributes>(node.operation.attributes);
+      auto attr = abslx::any_cast<ConcatAttributes>(node.operation.attributes);
       int max_inputs = gpu_info.GetMaxImageArguments() - 8;
       if (gpu_info.IsMali()) {
         // Mali can fail clEnqueueNDRangeKernel with "Out of resources" when it
@@ -461,7 +461,7 @@ absl::Status GPUOperationFromNodePart0(
           RETURN_IF_ERROR(SelectConcat(attr, channels, new_def, gpu_info,
                                        &concat_op.operation));
         }
-        return absl::OkStatus();
+        return abslx::OkStatus();
       } else {
         std::vector<int> channels(inputs.size());
         for (int i = 0; i < inputs.size(); ++i) {
@@ -472,7 +472,7 @@ absl::Status GPUOperationFromNodePart0(
     }
     case OperationType::CONVOLUTION_2D: {
       auto attr =
-          absl::any_cast<Convolution2DAttributes>(node.operation.attributes);
+          abslx::any_cast<Convolution2DAttributes>(node.operation.attributes);
       auto input_shape = inputs[0]->tensor.shape;
       auto output_shape = outputs[0]->tensor.shape;
       if (inputs.size() == 1) {
@@ -480,7 +480,7 @@ absl::Status GPUOperationFromNodePart0(
             WinogradFromNode(gpu_info, inputs, outputs, op_def, hints,
                              input_shape, output_shape, attr, gpu_subgraph)
                 .ok()) {
-          return absl::OkStatus();
+          return abslx::OkStatus();
         } else {
           gpu_op = InitSingleOpSubgraph(inputs, outputs, gpu_subgraph);
           if (attr.groups != 1) {
@@ -507,7 +507,7 @@ absl::Status GPUOperationFromNodePart0(
           }
           (*gpu_op)->flops_ =
               GetConvolutionFlops(output_shape, attr.weights.shape);
-          return absl::OkStatus();
+          return abslx::OkStatus();
         }
       } else {
         // CONVOLUTION_2D with runtime weights
@@ -515,7 +515,7 @@ absl::Status GPUOperationFromNodePart0(
             OHWI(inputs[1]->tensor.shape.b, inputs[1]->tensor.shape.h,
                  inputs[1]->tensor.shape.w, inputs[1]->tensor.shape.c);
         if (weights_shape.i != inputs[0]->tensor.shape.c) {
-          return absl::UnimplementedError(
+          return abslx::UnimplementedError(
               "No support of grouped convolution with runtime weights");
         }
         if (attr.bias.data.empty()) {
@@ -530,13 +530,13 @@ absl::Status GPUOperationFromNodePart0(
       }
     }
     case OperationType::CONVOLUTION_TRANSPOSED: {
-      auto attr = absl::any_cast<ConvolutionTransposedAttributes>(
+      auto attr = abslx::any_cast<ConvolutionTransposedAttributes>(
           node.operation.attributes);
       if (inputs.size() == 1) {
         *gpu_op = SelectConvolutionTransposed(attr, gpu_info, op_def);
         (*gpu_op)->flops_ = GetConvolutionTransposedFlops(
             inputs[0]->tensor.shape, attr.weights.shape);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       } else {
         // CONVOLUTION_TRANSPOSED with runtime weights
         const OHWI weights_shape =
@@ -554,7 +554,7 @@ absl::Status GPUOperationFromNodePart0(
       }
     }
     case OperationType::DEPTHWISE_CONVOLUTION: {
-      auto attr = absl::any_cast<DepthwiseConvolution2DAttributes>(
+      auto attr = abslx::any_cast<DepthwiseConvolution2DAttributes>(
           node.operation.attributes);
       if (inputs.size() == 1) {
         *gpu_op = SelectDWConvolution(attr, gpu_info, op_def);
@@ -562,7 +562,7 @@ absl::Status GPUOperationFromNodePart0(
             outputs[0]->tensor.shape, attr.weights.shape);
       } else {
         if (inputs[1]->tensor.shape.b != 1) {
-          return absl::UnimplementedError(
+          return abslx::UnimplementedError(
               "No support of depthwise runtime weights with channel multiplier "
               "!= 1");
         }
@@ -572,121 +572,121 @@ absl::Status GPUOperationFromNodePart0(
             OHWI(inputs[1]->tensor.shape.b, inputs[1]->tensor.shape.h,
                  inputs[1]->tensor.shape.w, inputs[1]->tensor.shape.c));
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::CUMSUM: {
-      auto attr = absl::any_cast<CumsumAttributes>(node.operation.attributes);
+      auto attr = abslx::any_cast<CumsumAttributes>(node.operation.attributes);
       SelectCumsum(op_def, attr, gpu_op);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::DEPTH_TO_SPACE: {
       auto attr =
-          absl::any_cast<SpaceToDepthAttributes>(node.operation.attributes);
+          abslx::any_cast<SpaceToDepthAttributes>(node.operation.attributes);
       SelectDepthToSpace(attr, op_def, gpu_op);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::FULLY_CONNECTED: {
       auto attr =
-          absl::any_cast<FullyConnectedAttributes>(node.operation.attributes);
+          abslx::any_cast<FullyConnectedAttributes>(node.operation.attributes);
       *gpu_op = SelectFullyConnected(attr, gpu_info, op_def,
                                      inputs[0]->tensor.shape.b);
       (*gpu_op)->flops_ =
           GetFullyConnectedFlops(outputs[0]->tensor.shape, attr.weights.shape);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::FULLY_CONNECTED_INT8: {
-      auto attr = absl::any_cast<FullyConnectedInt8Attributes>(
+      auto attr = abslx::any_cast<FullyConnectedInt8Attributes>(
           node.operation.attributes);
       *gpu_op = SelectFullyConnected(attr, gpu_info, op_def);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::GATHER: {
-      auto attr = absl::any_cast<GatherAttributes>(node.operation.attributes);
+      auto attr = abslx::any_cast<GatherAttributes>(node.operation.attributes);
       RETURN_IF_ERROR(SelectGather(attr, op_def, gpu_op));
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::LSTM: {
       *gpu_op = SelectLSTM(op_def, gpu_info);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::MAX_UNPOOLING_2D: {
       auto attr =
-          absl::any_cast<MaxUnpooling2DAttributes>(node.operation.attributes);
+          abslx::any_cast<MaxUnpooling2DAttributes>(node.operation.attributes);
       *gpu_op = SelectMaxUnpooling(attr, gpu_info, op_def);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::MEAN: {
-      auto attr = absl::any_cast<MeanAttributes>(node.operation.attributes);
+      auto attr = abslx::any_cast<MeanAttributes>(node.operation.attributes);
       *gpu_op = SelectReduce(attr.dims, inputs[0]->tensor.shape, op_type,
                              op_def, gpu_info);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::MEAN_STDDEV_NORMALIZATION: {
       MeanStdDevNormalization operation = CreateMeanStdDevNormalization(
           op_def, gpu_info, inputs[0]->tensor.shape);
       *gpu_op = std::make_unique<MeanStdDevNormalization>(std::move(operation));
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::ONE_HOT: {
-      auto attr = absl::any_cast<OneHotAttributes>(node.operation.attributes);
+      auto attr = abslx::any_cast<OneHotAttributes>(node.operation.attributes);
       SelectOneHot(op_def, attr, gpu_op);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::PAD: {
-      auto attr = absl::any_cast<PadAttributes>(node.operation.attributes);
+      auto attr = abslx::any_cast<PadAttributes>(node.operation.attributes);
       SelectPadding(attr, op_def, gpu_op);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::POOLING_2D: {
       auto attr =
-          absl::any_cast<Pooling2DAttributes>(node.operation.attributes);
+          abslx::any_cast<Pooling2DAttributes>(node.operation.attributes);
       *gpu_op = SelectPooling(attr, gpu_info, op_def);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::PRELU: {
-      auto attr = absl::any_cast<PReLUAttributes>(node.operation.attributes);
+      auto attr = abslx::any_cast<PReLUAttributes>(node.operation.attributes);
       *gpu_op = SelectPReLU(attr, gpu_info, op_def);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::QUANTIZE_AND_DEQUANTIZE: {
-      auto attr = absl::any_cast<QuantizeAndDequantizeAttributes>(
+      auto attr = abslx::any_cast<QuantizeAndDequantizeAttributes>(
           node.operation.attributes);
       *gpu_op = SelectQuantizeAndDequantize(attr, op_def);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::RELU: {
-      auto attr = absl::any_cast<ReLUAttributes>(node.operation.attributes);
+      auto attr = abslx::any_cast<ReLUAttributes>(node.operation.attributes);
       *gpu_op = SelectReLU(attr, op_def);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::RESAMPLER: {
       *gpu_op = SelectResampler(op_def, gpu_info);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::RESHAPE: {
       const int src_channels = inputs[0]->tensor.shape.c;
-      auto attr = absl::any_cast<ReshapeAttributes>(node.operation.attributes);
+      auto attr = abslx::any_cast<ReshapeAttributes>(node.operation.attributes);
       SelectReshape(src_channels, attr.new_shape.c, op_def, gpu_op);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::RESIZE: {
-      auto attr = absl::any_cast<Resize2DAttributes>(node.operation.attributes);
+      auto attr = abslx::any_cast<Resize2DAttributes>(node.operation.attributes);
       return SelectResize(attr, op_def, gpu_op);
     }
     case OperationType::SLICE: {
-      auto attr = absl::any_cast<SliceAttributes>(node.operation.attributes);
+      auto attr = abslx::any_cast<SliceAttributes>(node.operation.attributes);
       SelectStridedSlice(attr, op_def, gpu_op);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::SOFTMAX: {
       SelectSoftmax(inputs[0]->tensor.shape, op_def, gpu_op);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::SPACE_TO_DEPTH: {
       auto attr =
-          absl::any_cast<SpaceToDepthAttributes>(node.operation.attributes);
+          abslx::any_cast<SpaceToDepthAttributes>(node.operation.attributes);
       SelectSpaceToDepth(attr, op_def, gpu_op);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::SPLIT: {
       std::vector<int> channels;
@@ -694,7 +694,7 @@ absl::Status GPUOperationFromNodePart0(
       for (const auto& output : outputs) {
         channels.push_back(output->tensor.shape.c);
       }
-      auto attr = absl::any_cast<SplitAttributes>(node.operation.attributes);
+      auto attr = abslx::any_cast<SplitAttributes>(node.operation.attributes);
       if (gpu_info.IsMali()) {
         // Mali can fail clEnqueueNDRangeKernel with "Out of resources" when it
         // receives too big kernel.
@@ -721,20 +721,20 @@ absl::Status GPUOperationFromNodePart0(
           split_offset += outputs[i]->tensor.shape.get(attr.axis);
           SelectStridedSlice(new_attr, new_def, &op.operation);
         }
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
       SelectSplit(attr, gpu_info, channels, op_def, gpu_op);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::TILE: {
       *gpu_op = SelectTile(op_def, inputs[0]->tensor.shape);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::TRANSPOSE: {
       auto attr =
-          absl::any_cast<TransposeAttributes>(node.operation.attributes);
+          abslx::any_cast<TransposeAttributes>(node.operation.attributes);
       SelectTranspose(attr, op_def, gpu_op);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::ABS:
     case OperationType::COPY:
@@ -753,7 +753,7 @@ absl::Status GPUOperationFromNodePart0(
       GPUOperation operation =
           CreateElementwiseOneInput(gpu_info, op_def, op_type);
       *gpu_op = std::make_unique<GPUOperation>(std::move(operation));
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::DIV:
     case OperationType::EQUAL:
@@ -772,31 +772,31 @@ absl::Status GPUOperationFromNodePart0(
         GPUOperation operation =
             CreateElementwiseTwoInput(op_def, op_type, inputs[1]->tensor.shape);
         *gpu_op = std::make_unique<GPUOperation>(std::move(operation));
-        return absl::OkStatus();
+        return abslx::OkStatus();
       } else if (inputs.size() == 1 && node.operation.attributes.has_value()) {
         auto attr =
-            absl::any_cast<ElementwiseAttributes>(node.operation.attributes);
+            abslx::any_cast<ElementwiseAttributes>(node.operation.attributes);
         GPUOperation operation =
             CreateElementwise(gpu_info, op_def, op_type, attr);
         *gpu_op = std::make_unique<GPUOperation>(std::move(operation));
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
-      return absl::UnimplementedError(absl::StrCat(
+      return abslx::UnimplementedError(abslx::StrCat(
           "No support of ", node.operation.type, " with this parameters"));
     }
     case OperationType::REDUCE_MAXIMUM:
     case OperationType::REDUCE_MINIMUM:
     case OperationType::REDUCE_PRODUCT:
     case OperationType::REDUCE_SUM: {
-      auto attr = absl::any_cast<ReduceAttributes>(node.operation.attributes);
+      auto attr = abslx::any_cast<ReduceAttributes>(node.operation.attributes);
       *gpu_op = SelectReduce(attr.dims, inputs[0]->tensor.shape, op_type,
                              op_def, gpu_info);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case OperationType::SELECT_V2: {
-      auto attr = absl::any_cast<SelectV2Attributes>(node.operation.attributes);
+      auto attr = abslx::any_cast<SelectV2Attributes>(node.operation.attributes);
       SelectSelectV2(op_def, attr, gpu_op);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     default:
       return SelectDefault(gpu_info, op_def, hints, inputs, outputs, node,
@@ -804,7 +804,7 @@ absl::Status GPUOperationFromNodePart0(
   }
 }
 
-absl::Status GPUOperationFromNode(
+abslx::Status GPUOperationFromNode(
     const GpuInfo& gpu_info, const OperationDef& op_def, ModelHints hints,
     const std::vector<Value*>& inputs, const std::vector<Value*>& outputs,
     const Node& node, std::vector<SharedWeightsConvDesc>* shared_conv_weights,
@@ -819,7 +819,7 @@ absl::Status GPUOperationFromNode(
       gpu_op.name += " " + std::to_string(node.id);
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

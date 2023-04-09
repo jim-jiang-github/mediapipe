@@ -46,7 +46,7 @@ size_t ProtobufHash(const tensorflow::protobuf::Message& m) {
   // We perform the hash on their serialized representation.
   std::string serialized;
   m.AppendToString(&serialized);
-  return absl::HashOf(serialized);
+  return abslx::HashOf(serialized);
 }
 
 Status DumpProtoToDirectory(const tensorflow::protobuf::Message& message,

@@ -29,12 +29,12 @@ std::string JStringToStdString(JNIEnv* env, jstring jstr);
 
 std::vector<std::string> JavaListToStdStringVector(JNIEnv* env, jobject from);
 
-// Creates a java MediaPipeException object for a absl::Status.
-jthrowable CreateMediaPipeException(JNIEnv* env, absl::Status status);
+// Creates a java MediaPipeException object for a abslx::Status.
+jthrowable CreateMediaPipeException(JNIEnv* env, abslx::Status status);
 
-// Throws a MediaPipeException for any non-ok absl::Status.
+// Throws a MediaPipeException for any non-ok abslx::Status.
 // Note that the exception is thrown after execution returns to Java.
-bool ThrowIfError(JNIEnv* env, absl::Status status);
+bool ThrowIfError(JNIEnv* env, abslx::Status status);
 
 // The Jni ids for Java class SerializedMessage.
 class SerializedMessageIds {

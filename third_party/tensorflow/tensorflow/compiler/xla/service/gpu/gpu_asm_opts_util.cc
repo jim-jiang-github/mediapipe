@@ -27,8 +27,8 @@ namespace gpu {
 
 stream_executor::GpuAsmOpts PtxOptsFromDebugOptions(
     const DebugOptions& debug_options) {
-  std::vector<std::string> extra_flags = absl::StrSplit(
-      debug_options.xla_gpu_asm_extra_flags(), ',', absl::SkipEmpty());
+  std::vector<std::string> extra_flags = abslx::StrSplit(
+      debug_options.xla_gpu_asm_extra_flags(), ',', abslx::SkipEmpty());
   return stream_executor::GpuAsmOpts(
       debug_options.xla_gpu_disable_gpuasm_optimizations(),
       debug_options.xla_gpu_cuda_data_dir(), extra_flags);

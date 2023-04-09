@@ -55,7 +55,7 @@ class HorizontalLoopFusionImpl {
   StatusOr<bool> Run();
 
  private:
-  Status Fuse(absl::Span<HloInstruction*> fused_fusion_instrs);
+  Status Fuse(abslx::Span<HloInstruction*> fused_fusion_instrs);
 
   // Horizontally fuses `fused_fusion_instrs`. It is required that each of
   // `fused_fusion_instrs` is a kLoop fusion. Also, we require their numbers of
@@ -66,7 +66,7 @@ class HorizontalLoopFusionImpl {
   // Returns the fused computation in `uniq_computation` and the operands that
   // are used by `uniq_computation`.
   Status CreateFusedComputation(
-      absl::Span<HloInstruction*> fused_fusion_instrs,
+      abslx::Span<HloInstruction*> fused_fusion_instrs,
       std::unique_ptr<HloComputation>* uniq_computation,
       std::vector<HloInstruction*>* bound_operands);
 
@@ -81,7 +81,7 @@ class HorizontalLoopFusionImpl {
     }
 
     // Gets a span of fusions to be fused.
-    absl::Span<HloInstruction*> GetNextSpanOfFusions();
+    abslx::Span<HloInstruction*> GetNextSpanOfFusions();
 
    private:
     void Initialize(HloInstruction*);
@@ -187,10 +187,10 @@ bool HasOnlyRowMajorLayout(const HloInstruction& instr) {
 // is shared with `fusion_instrs`.
 bool AnyOpndIsParamSharedAmongFusions(
     const HloInstruction* instr,
-    const absl::flat_hash_set<HloInstruction*>& fusion_instrs) {
-  return absl::c_any_of(instr->operands(), [&](const HloInstruction* opnd) {
+    const abslx::flat_hash_set<HloInstruction*>& fusion_instrs) {
+  return abslx::c_any_of(instr->operands(), [&](const HloInstruction* opnd) {
     return opnd->opcode() == HloOpcode::kParameter &&
-           absl::c_any_of(opnd->users(), [&](const HloInstruction* user) {
+           abslx::c_any_of(opnd->users(), [&](const HloInstruction* user) {
              return user != instr && fusion_instrs.contains(user);
            });
   });
@@ -200,7 +200,7 @@ void HorizontalLoopFusionImpl::FusionCandidates::Initialize(
     HloInstruction* consumer) {
   // First, find out all potential target candidates. We will filter out
   // unsupported/non-profitable cases below.
-  absl::flat_hash_set<HloInstruction*> fusible_candidates;
+  abslx::flat_hash_set<HloInstruction*> fusible_candidates;
   std::vector<HloInstruction*> ordered_fusible_candidates;
   for (HloInstruction* opnd : consumer->operands()) {
     HloInstruction* predecessor = opnd->LatestNonGteAncestor();
@@ -261,10 +261,10 @@ void HorizontalLoopFusionImpl::FusionCandidates::Initialize(
 }
 
 // Gets a next span of fusion instructions to be fused.
-absl::Span<HloInstruction*>
+abslx::Span<HloInstruction*>
 HorizontalLoopFusionImpl::FusionCandidates::GetNextSpanOfFusions() {
   if (pos_ >= fusible_instrs_.size()) {
-    return absl::Span<HloInstruction*>();
+    return abslx::Span<HloInstruction*>();
   }
 
   // Fusing too many computations at a time may not be easily profitable and
@@ -317,11 +317,11 @@ HorizontalLoopFusionImpl::FusionCandidates::GetNextSpanOfFusions() {
   }
 
   pos_ = right;
-  return absl::MakeSpan(fusible_instrs_).subspan(left, right - left);
+  return abslx::MakeSpan(fusible_instrs_).subspan(left, right - left);
 }
 
 Status HorizontalLoopFusionImpl::CreateFusedComputation(
-    absl::Span<HloInstruction*> fused_fusion_instrs,
+    abslx::Span<HloInstruction*> fused_fusion_instrs,
     std::unique_ptr<HloComputation>* uniq_computation,
     std::vector<HloInstruction*>* bound_operands) {
   // First, build a computation with only params.
@@ -334,7 +334,7 @@ Status HorizontalLoopFusionImpl::CreateFusedComputation(
       // in a form of param_i_j
       b.AddInstruction(HloInstruction::CreateParameter(
           fused_comp_param_id++, bound_opnd->shape(),
-          absl::StrCat("param_", i, "_", j)));
+          abslx::StrCat("param_", i, "_", j)));
       bound_operands->push_back(bound_opnd);
     }
   }
@@ -347,7 +347,7 @@ Status HorizontalLoopFusionImpl::CreateFusedComputation(
   HloComputation* comp = uniq_computation->get();
 
   // Preparing clone_map, which maps old operand to new operand.
-  absl::flat_hash_map<const HloInstruction*, HloInstruction*> clone_map;
+  abslx::flat_hash_map<const HloInstruction*, HloInstruction*> clone_map;
   size_t new_param_id = 0;
   for (size_t i = 0; i < fused_fusion_instrs.size(); ++i) {
     auto old_params = fused_fusion_instrs[i]->fused_parameters();
@@ -435,7 +435,7 @@ Status HorizontalLoopFusionImpl::CreateFusedComputation(
 }
 
 Status HorizontalLoopFusionImpl::Fuse(
-    absl::Span<HloInstruction*> fused_fusion_instrs) {
+    abslx::Span<HloInstruction*> fused_fusion_instrs) {
   // Fuse fused_fusion_instrs and replace them with the new fused computation.
   std::unique_ptr<HloComputation> uniq_computation;
   std::vector<HloInstruction*> bound_operands;
@@ -487,7 +487,7 @@ StatusOr<bool> HorizontalLoopFusionImpl::Run() {
   // to save compiler iterations to reach the fixed point.
   std::vector<HloInstruction*> use_to_def_order =
       computation_->MakeInstructionPostOrder();
-  absl::c_reverse(use_to_def_order);
+  abslx::c_reverse(use_to_def_order);
   for (size_t i = 0; i < use_to_def_order.size(); ++i) {
     HloInstruction* consumer = use_to_def_order[i];
     HorizontalLoopFusionImpl::FusionCandidates fusion_candidates(consumer);
@@ -514,7 +514,7 @@ StatusOr<bool> HorizontalLoopFusionImpl::Run() {
           fusion_instrs.push_back(fusion_instr);
         }
       }
-      TF_RETURN_IF_ERROR(Fuse(absl::MakeSpan(fusion_instrs)));
+      TF_RETURN_IF_ERROR(Fuse(abslx::MakeSpan(fusion_instrs)));
     }
   }
 
@@ -531,7 +531,7 @@ StatusOr<bool> GpuHorizontalLoopFusion::RunOnComputation(
 
 StatusOr<bool> GpuHorizontalLoopFusion::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   VLOG(2) << "Run horizontal fusion.";
 

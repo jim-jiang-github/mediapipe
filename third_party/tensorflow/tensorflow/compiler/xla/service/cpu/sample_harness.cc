@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
       /*execution_profile=*/&profile);
   xla::Literal actual = std::move(result).value();
 
-  LOG(INFO) << absl::StrFormat("computation took %dns",
+  LOG(INFO) << abslx::StrFormat("computation took %dns",
                                profile.compute_time_ns());
   LOG(INFO) << actual.ToString();
 

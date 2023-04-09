@@ -67,7 +67,7 @@ class Version {
       : version_({major, minor, patch}) {}
 
   explicit Version(const std::string& version) {
-    const std::vector<std::string> vec = absl::StrSplit(version, '.');
+    const std::vector<std::string> vec = abslx::StrSplit(version, '.');
     // The version string should always be less than four numbers.
     TFLITE_DCHECK(vec.size() <= kElementNumber && !vec.empty());
     version_[0] = std::stoi(vec[0]);
@@ -94,7 +94,7 @@ class Version {
   }
 
   // Converts version_ into a version string.
-  std::string ToString() { return absl::StrJoin(version_, "."); }
+  std::string ToString() { return abslx::StrJoin(version_, "."); }
 
  private:
   static constexpr int kElementNumber = 3;

@@ -48,12 +48,12 @@ struct InterThreadConnectInfo {
 
 struct GroupMetadata {
   std::string name;
-  absl::flat_hash_set<int64_t> parents;
-  absl::flat_hash_set<int64_t> children;
+  abslx::flat_hash_set<int64_t> parents;
+  abslx::flat_hash_set<int64_t> children;
 };
 
 using GroupMetadataMap =
-    absl::flat_hash_map<int64_t /*group_id*/, GroupMetadata>;
+    abslx::flat_hash_map<int64_t /*group_id*/, GroupMetadata>;
 
 // A wrapper for XEvent with parent and children pointers. Through these
 // pointers, a tree of EventNode is formed.
@@ -73,7 +73,7 @@ class EventNode {
     child->parents_.push_back(this);
   }
 
-  absl::optional<int64_t> GetGroupId() const { return group_id_; }
+  abslx::optional<int64_t> GetGroupId() const { return group_id_; }
 
   std::string GetGroupName() const;
 
@@ -84,9 +84,9 @@ class EventNode {
 
   const XEventVisitor& GetEventVisitor() const { return visitor_; }
 
-  absl::optional<XStatVisitor> GetContextStat(int64_t stat_type) const;
+  abslx::optional<XStatVisitor> GetContextStat(int64_t stat_type) const;
 
-  void AddStepName(absl::string_view step_name);
+  void AddStepName(abslx::string_view step_name);
 
   void SetIsEager(bool is_eager);
 
@@ -116,7 +116,7 @@ class EventNode {
   XEventVisitor visitor_;
   std::vector<EventNode*> parents_;
   std::vector<EventNode*> children_;
-  absl::optional<int64_t> group_id_;
+  abslx::optional<int64_t> group_id_;
   // Root event level.
   // By default root_level_ is set to 0, which means it is not a root event.
   // Events with root_level_ greater than 0 are considered as root events.
@@ -124,7 +124,7 @@ class EventNode {
 };
 
 using EventNodeMap =
-    absl::flat_hash_map<int64_t /*event_type*/, std::deque<EventNode>>;
+    abslx::flat_hash_map<int64_t /*event_type*/, std::deque<EventNode>>;
 
 using EventList = std::vector<EventNode*>;
 
@@ -133,9 +133,9 @@ struct ContextGroup {
   std::vector<EventNode*> consumers;
 };
 
-using ContextGroupMap = absl::flat_hash_map<
+using ContextGroupMap = abslx::flat_hash_map<
     int /*context_type*/,
-    absl::flat_hash_map<uint64 /*context_id*/, ContextGroup>>;
+    abslx::flat_hash_map<uint64 /*context_id*/, ContextGroup>>;
 
 // EventForest augments the input XSpace with the trace context. The trace
 // context is created by stitching XEvents (1) using the nesting relationship
@@ -210,7 +210,7 @@ class EventForest {
   std::deque<std::pair<XPlane*, XPlaneVisitor>> planes_;
   // The "step" id (actually it is "function" id that are associated with
   // the tf.data pipeline.
-  absl::flat_hash_set<int64_t> tf_data_step_ids_;
+  abslx::flat_hash_set<int64_t> tf_data_step_ids_;
   EventList tf_loop_root_events_;
   GroupMetadataMap group_metadata_map_;
 };

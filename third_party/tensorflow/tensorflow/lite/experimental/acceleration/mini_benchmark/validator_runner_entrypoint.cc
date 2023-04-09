@@ -41,7 +41,7 @@ namespace tflite {
 namespace acceleration {
 namespace {
 
-MinibenchmarkStatus RunValidator(absl::string_view model_path,
+MinibenchmarkStatus RunValidator(abslx::string_view model_path,
                                  const std::string& nnapi_sl_path,
                                  TFLiteSettingsT& tflite_settings,
                                  Validator::Results& results) {

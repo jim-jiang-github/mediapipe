@@ -26,7 +26,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status FullyConnectedTest(TestExecutionEnvironment* env) {
+abslx::Status FullyConnectedTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 1, 4);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f};
@@ -56,10 +56,10 @@ absl::Status FullyConnectedTest(TestExecutionEnvironment* env) {
           << "Failed using precision " << ToString(precision);
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FullyConnectedLargeTest(TestExecutionEnvironment* env) {
+abslx::Status FullyConnectedLargeTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 1, 8);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f};
@@ -105,10 +105,10 @@ absl::Status FullyConnectedLargeTest(TestExecutionEnvironment* env) {
           << "Failed using precision " << ToString(precision);
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FullyConnectedExtraLargeTest(TestExecutionEnvironment* env) {
+abslx::Status FullyConnectedExtraLargeTest(TestExecutionEnvironment* env) {
   static const int kInputSize = 1024;
   static const int kOutputSize = 1024;
   TensorFloat32 src_tensor;
@@ -163,7 +163,7 @@ absl::Status FullyConnectedExtraLargeTest(TestExecutionEnvironment* env) {
           << "Failed using precision " << ToString(precision);
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

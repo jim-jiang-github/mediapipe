@@ -57,28 +57,28 @@ class ImageCloneCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kIn, kOut);
 
-  static absl::Status UpdateContract(CalculatorContract* cc) {
+  static abslx::Status UpdateContract(CalculatorContract* cc) {
 #if MEDIAPIPE_DISABLE_GPU
     if (cc->Options<mediapipe::ImageCloneCalculatorOptions>().output_on_gpu()) {
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "GPU processing is disabled in build flags");
     }
 #else
     MP_RETURN_IF_ERROR(mediapipe::GlCalculatorHelper::UpdateContract(cc));
 #endif  // MEDIAPIPE_DISABLE_GPU
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     const auto& options = cc->Options<mediapipe::ImageCloneCalculatorOptions>();
     output_on_gpu_ = options.output_on_gpu();
 #if !MEDIAPIPE_DISABLE_GPU
     MP_RETURN_IF_ERROR(gpu_helper_.Open(cc));
 #endif  // !MEDIAPIPE_DISABLE_GPU
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     std::unique_ptr<Image> output;
     const auto& input = *kIn(cc);
     if (input.UsesGpu()) {
@@ -110,7 +110,7 @@ class ImageCloneCalculator : public Node {
     }
     kOut(cc).Send(std::move(output));
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

@@ -36,7 +36,7 @@ TpuCompilationCacheService::TpuCompilationCacheService(
       cache_(cache),
       server_builder_(server_builder),
       cq_(server_builder_->AddCompletionQueue()),
-      thread_pool_(absl::make_unique<thread::ThreadPool>(
+      thread_pool_(abslx::make_unique<thread::ThreadPool>(
           Env::Default(), "TpuCompilationCacheService",
           kGetTpuProgramServingThreads)) {
   cache_->Ref();
@@ -114,7 +114,7 @@ void TpuCompilationCacheService::GetTpuProgram(GetTpuProgramCall* call) {
   if (!s.ok()) {
     return call->SendResponse(::grpc::Status(
         ::grpc::StatusCode::INVALID_ARGUMENT,
-        absl::StrCat(
+        abslx::StrCat(
             "Error getting the fetching target ",
             CompilationCacheFetchTarget_Name(call->request.fetch_target())),
         s.error_message()));

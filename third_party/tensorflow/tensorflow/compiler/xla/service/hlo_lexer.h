@@ -87,7 +87,7 @@ std::string TokKindToString(TokKind kind);
 // it directly.
 class HloLexer {
  public:
-  explicit HloLexer(absl::string_view buf) : buf_(buf) {
+  explicit HloLexer(abslx::string_view buf) : buf_(buf) {
     current_ptr_ = buf_.data();
   }
 
@@ -130,7 +130,7 @@ class HloLexer {
   std::pair<unsigned, unsigned> GetLineAndColumn(LocTy location) const;
 
   // Returns the whole line given the location.
-  absl::string_view GetLine(LocTy loc) const;
+  abslx::string_view GetLine(LocTy loc) const;
 
   // Looks ahead one token and returns it. Lexer state is unchanged.
   TokKind LookAhead();
@@ -145,7 +145,7 @@ class HloLexer {
 
   // Creates string_view with the given begin and end. Exits if the begin > end,
   // or it's out of the range of the current buffer.
-  absl::string_view StringViewFromPointers(const char* begin,
+  abslx::string_view StringViewFromPointers(const char* begin,
                                            const char* end) const;
 
   // Returns true if the given ptr is dereferenceable within the range of the
@@ -161,9 +161,9 @@ class HloLexer {
   TokKind LexNumberOrPattern();
   TokKind LexString();
 
-  std::optional<int64_t> LexNanPayload(absl::string_view& consumable);
+  std::optional<int64_t> LexNanPayload(abslx::string_view& consumable);
 
-  absl::string_view buf_;
+  abslx::string_view buf_;
   const char* current_ptr_;
 
   // Information about the current token.

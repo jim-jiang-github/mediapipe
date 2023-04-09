@@ -22,12 +22,12 @@ limitations under the License.
 namespace tensorflow {
 namespace data {
 
-URL::URL(absl::string_view url) { Parse(url); }
+URL::URL(abslx::string_view url) { Parse(url); }
 
-void URL::Parse(absl::string_view url) {
+void URL::Parse(abslx::string_view url) {
   // Parses `url` into host:port. The port can be a number, named port, or
   // dynamic port (i.e.: %port_name%).
-  absl::string_view regexp = "(.*):([a-zA-Z0-9_]+|%port(_[a-zA-Z0-9_]+)?%)";
+  abslx::string_view regexp = "(.*):([a-zA-Z0-9_]+|%port(_[a-zA-Z0-9_]+)?%)";
 
   if (!RE2::FullMatch(url, regexp, &host_, &port_)) {
     host_ = std::string(url);

@@ -71,7 +71,7 @@ void BM_CustomStream(benchmark::State& state) {
   const std::string payload(bytes_per_write, 'x');
   for (auto _ : state) {
     std::string out;
-    absl::strings_internal::OStringStream strm(&out);
+    abslx::strings_internal::OStringStream strm(&out);
     benchmark::DoNotOptimize(strm);
     for (int i = 0; i != num_writes; ++i) {
       strm << payload;

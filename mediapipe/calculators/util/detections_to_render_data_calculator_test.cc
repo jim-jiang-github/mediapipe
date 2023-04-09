@@ -93,7 +93,7 @@ TEST(DetectionsToRenderDataCalculatorTest, OnlyDetecctionList) {
   )pb"));
 
   LocationData location_data = CreateLocationData(100, 200, 300, 400);
-  auto detections(absl::make_unique<DetectionList>());
+  auto detections(abslx::make_unique<DetectionList>());
   *(detections->add_detection()) =
       CreateDetection({"label1"}, {}, {0.3}, location_data, "feature_tag");
 
@@ -127,7 +127,7 @@ TEST(DetectionsToRenderDataCalculatorTest, OnlyDetecctionVector) {
   )pb")};
 
   LocationData location_data = CreateLocationData(100, 200, 300, 400);
-  auto detections(absl::make_unique<std::vector<Detection>>());
+  auto detections(abslx::make_unique<std::vector<Detection>>());
   detections->push_back(
       CreateDetection({"label1"}, {}, {0.3}, location_data, "feature_tag"));
 
@@ -162,7 +162,7 @@ TEST(DetectionsToRenderDataCalculatorTest, BothDetecctionListAndVector) {
   )pb")};
 
   LocationData location_data1 = CreateLocationData(100, 200, 300, 400);
-  auto detection_list(absl::make_unique<DetectionList>());
+  auto detection_list(abslx::make_unique<DetectionList>());
   *(detection_list->add_detection()) =
       CreateDetection({"label1"}, {}, {0.3}, location_data1, "feature_tag1");
   runner.MutableInputs()
@@ -171,7 +171,7 @@ TEST(DetectionsToRenderDataCalculatorTest, BothDetecctionListAndVector) {
           Adopt(detection_list.release()).At(Timestamp::PostStream()));
 
   LocationData location_data2 = CreateLocationData(600, 700, 800, 900);
-  auto detections(absl::make_unique<std::vector<Detection>>());
+  auto detections(abslx::make_unique<std::vector<Detection>>());
   detections->push_back(
       CreateDetection({"label2"}, {}, {0.6}, location_data2, "feature_tag2"));
   runner.MutableInputs()
@@ -208,13 +208,13 @@ TEST(DetectionsToRenderDataCalculatorTest, ProduceEmptyPacket) {
         }
       )pb")};
 
-  auto detection_list1(absl::make_unique<DetectionList>());
+  auto detection_list1(abslx::make_unique<DetectionList>());
   runner1.MutableInputs()
       ->Tag(kDetectionListTag)
       .packets.push_back(
           Adopt(detection_list1.release()).At(Timestamp::PostStream()));
 
-  auto detections1(absl::make_unique<std::vector<Detection>>());
+  auto detections1(abslx::make_unique<std::vector<Detection>>());
   runner1.MutableInputs()
       ->Tag(kDetectionsTag)
       .packets.push_back(
@@ -239,13 +239,13 @@ TEST(DetectionsToRenderDataCalculatorTest, ProduceEmptyPacket) {
         }
       )pb")};
 
-  auto detection_list2(absl::make_unique<DetectionList>());
+  auto detection_list2(abslx::make_unique<DetectionList>());
   runner2.MutableInputs()
       ->Tag(kDetectionListTag)
       .packets.push_back(
           Adopt(detection_list2.release()).At(Timestamp::PostStream()));
 
-  auto detections2(absl::make_unique<std::vector<Detection>>());
+  auto detections2(abslx::make_unique<std::vector<Detection>>());
   runner2.MutableInputs()
       ->Tag(kDetectionsTag)
       .packets.push_back(

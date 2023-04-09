@@ -62,12 +62,12 @@ class TpuFingerprintLookup : public ResourceBase {
   bool RegisterIntermediateAndValuePair(uint64 intermediate, std::string value);
 
   // Look up fingerprint with key.
-  // Return absl::optional<::tensorflow::StringPiece>{} if
+  // Return abslx::optional<::tensorflow::StringPiece>{} if
   // not found.
-  absl::optional<::tensorflow::StringPiece> Lookup(uint64 key);
+  abslx::optional<::tensorflow::StringPiece> Lookup(uint64 key);
 
   size_t num_valid() {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     return key_to_value_.size();
   }
 
@@ -76,15 +76,15 @@ class TpuFingerprintLookup : public ResourceBase {
  private:
   explicit TpuFingerprintLookup() {}
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   // Main storage for lookup
-  absl::node_hash_map<uint64, std::string> key_to_value_ ABSL_GUARDED_BY(mu_);
+  abslx::node_hash_map<uint64, std::string> key_to_value_ ABSL_GUARDED_BY(mu_);
 
   // An auxiliary storage to ensure 1-to-1 and invariant key-value pair
-  absl::node_hash_map<std::string, uint64> value_to_key_ ABSL_GUARDED_BY(mu_);
+  abslx::node_hash_map<std::string, uint64> value_to_key_ ABSL_GUARDED_BY(mu_);
 
   // An auxiliary storage to keep intermediate-key pairs.
-  absl::flat_hash_map<uint64, uint64> intermediate_to_key_ ABSL_GUARDED_BY(mu_);
+  abslx::flat_hash_map<uint64, uint64> intermediate_to_key_ ABSL_GUARDED_BY(mu_);
 
   TpuFingerprintLookup(const TpuFingerprintLookup&) = delete;
   TpuFingerprintLookup& operator=(const TpuFingerprintLookup&) = delete;

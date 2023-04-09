@@ -114,7 +114,7 @@ Status ConvertMlirHloToHloViaBuilder(mlir::ModuleOp module,
     auto num = arg.getArgNumber();
     xla::Shape shape = xla::TypeToShape(arg.getType());
     XlaOp argop =
-        xla::Parameter(&builder, num, shape, absl::StrCat("Arg_", num));
+        xla::Parameter(&builder, num, shape, abslx::StrCat("Arg_", num));
     xla_params.push_back(argop);
   }
 

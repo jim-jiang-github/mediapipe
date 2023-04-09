@@ -65,7 +65,7 @@ Status XlaGpuDeviceFactory::ListPhysicalDevices(std::vector<string>* devices) {
 
   for (int i = 0; i < device_count; ++i) {
     devices->push_back(
-        absl::StrCat("/physical_device:", DEVICE_XLA_GPU, ":", i));
+        abslx::StrCat("/physical_device:", DEVICE_XLA_GPU, ":", i));
   }
 
   return OkStatus();

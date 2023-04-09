@@ -39,7 +39,7 @@ class BCastArgsOp : public XlaOpKernel {
     OP_REQUIRES(
         ctx, ctx->num_inputs() == 2,
         errors::Unimplemented("Broadcast for n-ary operations (n > 2)"));
-    absl::InlinedVector<BCast::Vec, 2> shapes;
+    abslx::InlinedVector<BCast::Vec, 2> shapes;
     for (int i = 0; i < ctx->num_inputs(); ++i) {
       const TensorShape in_shape = ctx->InputShape(i);
       OP_REQUIRES(ctx, TensorShapeUtils::IsVector(in_shape),
@@ -53,8 +53,8 @@ class BCastArgsOp : public XlaOpKernel {
     BCast bcast(shapes[0], shapes[1]);
     OP_REQUIRES(ctx, bcast.IsValid(),
                 errors::InvalidArgument(
-                    "Incompatible shapes: [", absl::StrJoin(shapes[0], ","),
-                    "] vs. [", absl::StrJoin(shapes[1], ","), "]"));
+                    "Incompatible shapes: [", abslx::StrJoin(shapes[0], ","),
+                    "] vs. [", abslx::StrJoin(shapes[1], ","), "]"));
 
     DataType val_type = ctx->expected_output_dtype(0);
     const int64_t len = bcast.output_shape().size();
@@ -92,7 +92,7 @@ class BCastGradArgsOp : public XlaOpKernel {
         ctx, ctx->num_inputs() == 2,
         errors::Unimplemented("Broadcast for n-ary operations (n > 2)"));
 
-    absl::InlinedVector<BCast::Vec, 4> shapes;
+    abslx::InlinedVector<BCast::Vec, 4> shapes;
     for (int i = 0; i < ctx->num_inputs(); ++i) {
       const TensorShape in_shape = ctx->InputShape(i);
       OP_REQUIRES(ctx, TensorShapeUtils::IsVector(in_shape),
@@ -110,8 +110,8 @@ class BCastGradArgsOp : public XlaOpKernel {
     BCast bcast(shapes[0], shapes[1]);
     OP_REQUIRES(ctx, bcast.IsValid(),
                 errors::InvalidArgument(
-                    "Incompatible shapes: [", absl::StrJoin(shapes[0], ","),
-                    "] vs. [", absl::StrJoin(shapes[1], ","), "]"));
+                    "Incompatible shapes: [", abslx::StrJoin(shapes[0], ","),
+                    "] vs. [", abslx::StrJoin(shapes[1], ","), "]"));
     Output(ctx, 0, bcast.grad_x_reduce_idx());
     Output(ctx, 1, bcast.grad_y_reduce_idx());
   }

@@ -37,9 +37,9 @@ namespace tensorflow {
 namespace tensorrt {
 namespace convert {
 
-using absl::AsciiStrToUpper;
-using absl::StrAppend;
-using absl::StrCat;
+using abslx::AsciiStrToUpper;
+using abslx::StrAppend;
+using abslx::StrCat;
 
 TRTLayoutOptimizationPass::TRTLayoutOptimizationPass(const string& name)
     : name_(name),

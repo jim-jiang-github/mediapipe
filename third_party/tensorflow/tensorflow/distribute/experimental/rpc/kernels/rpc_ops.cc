@@ -169,7 +169,7 @@ class FunctionRegistry {
   std::string DebugString() const {
     mutex_lock l(mu_);
     std::string debug_string = "Registered methods: [";
-    debug_string.append(absl::StrJoin(
+    debug_string.append(abslx::StrJoin(
         registered_methods_, ", ",
         [](std::string* out, const auto& pair) { return pair.first; }));
 
@@ -194,7 +194,7 @@ class FunctionRegistry {
         std::pair<std::string, FunctionMetadata>(method, fn_metadata));
     if (!result.second) {
       return tensorflow::errors::InvalidArgument(
-          absl::StrCat(method, " is already registered."));
+          abslx::StrCat(method, " is already registered."));
     }
     return OkStatus();
   }
@@ -205,7 +205,7 @@ class FunctionRegistry {
     auto it = registered_methods_.find(method);
     if (it == registered_methods_.end()) {
       return tensorflow::errors::InvalidArgument(
-          absl::StrCat(method, " is not registered."));
+          abslx::StrCat(method, " is not registered."));
     }
 
     *output = it->second;
@@ -314,7 +314,7 @@ class RpcServer : public ResourceBase {
   }
 
   std::string DebugString() const override {
-    return absl::StrCat("RpcServer resource with ", registry_.DebugString());
+    return abslx::StrCat("RpcServer resource with ", registry_.DebugString());
   }
 
   tensorflow::Status Register(const std::string& method,
@@ -364,7 +364,7 @@ class GrpcPollingThread {
                        [](auto const c) -> bool { return !std::isalnum(c); }),
         thread_name.end());
     thread_.reset(Env::Default()->StartThread(
-        ThreadOptions(), absl::StrCat("GrpcPollingThread", thread_name),
+        ThreadOptions(), abslx::StrCat("GrpcPollingThread", thread_name),
         [this]() {
           void* tag;
           bool ok;
@@ -407,7 +407,7 @@ class RpcClient : public ResourceBase {
   }
 
   std::string DebugString() const override {
-    return absl::StrCat("Rpc client for address: ", server_address_);
+    return abslx::StrCat("Rpc client for address: ", server_address_);
   }
 
   void CallAsync(const std::string& method_name,
@@ -547,7 +547,7 @@ void RpcClientOp::ComputeAsync(OpKernelContext* ctx, DoneCallback done) {
   // Create resource handle
   AllocatorAttributes attr;
   attr.set_on_host(true);
-  auto resource_name = absl::StrCat(name_, address);
+  auto resource_name = abslx::StrCat(name_, address);
 
   ResourceHandle resource_handle =
       MakeResourceHandle<RpcClient>(ctx, "rpc_client", resource_name);
@@ -669,7 +669,7 @@ void RpcServerRegisterOp::Compute(OpKernelContext* ctx) {
     instantiate_opts.input_devices.push_back(ctx->device()->name());
   }
 
-  absl::flat_hash_map<string, std::vector<string>> composite_devices;
+  abslx::flat_hash_map<string, std::vector<string>> composite_devices;
   for (int i = 0; i < captured.size(); ++i) {
     if (captured[i].dtype() == DT_RESOURCE) {
       instantiate_opts.input_devices.push_back(GetFunctionResourceInputDevice(
@@ -713,7 +713,7 @@ void RpcCallOp::Compute(OpKernelContext* ctx) {
   OP_REQUIRES_OK(ctx, LookupResource(ctx, HandleFromInput(ctx, 0), &client));
 
   ResourceHandle resource_handle = MakeResourceHandle<RpcFutureResource>(
-      ctx, "rpc_future_resource", absl::StrFormat("%d", random::New64()));
+      ctx, "rpc_future_resource", abslx::StrFormat("%d", random::New64()));
 
   AllocatorAttributes attr;
   attr.set_on_host(true);
@@ -763,7 +763,7 @@ void RpcCheckStatusOp::ComputeAsync(OpKernelContext* ctx, DoneCallback done) {
     if (!status.ok()) {
       if (errors::IsNotFound(status)) {
         ctx->SetStatus(tensorflow::errors::NotFound(
-            absl::StrCat("Future resource no longer exists. Please make sure "
+            abslx::StrCat("Future resource no longer exists. Please make sure "
                          "resource is not already deleted.")));
         done();
         return;
@@ -797,7 +797,7 @@ void RpcGetValueOp::ComputeAsync(OpKernelContext* ctx, DoneCallback done) {
     if (!status.ok()) {
       if (errors::IsNotFound(status)) {
         ctx->SetStatus(tensorflow::errors::NotFound(
-            absl::StrCat("Future resource no longer exists. Please ensure "
+            abslx::StrCat("Future resource no longer exists. Please ensure "
                          "resource is not already deleted.")));
         done();
         return;
@@ -813,7 +813,7 @@ void RpcGetValueOp::ComputeAsync(OpKernelContext* ctx, DoneCallback done) {
           ctx->SetStatus(status);
         } else {
           if (ctx->num_outputs() != response.output_tensors().size()) {
-            ctx->SetStatus(tensorflow::errors::InvalidArgument(absl::StrCat(
+            ctx->SetStatus(tensorflow::errors::InvalidArgument(abslx::StrCat(
                 "Incorrect number of output types specified.",
                 ctx->num_outputs(), " ", response.output_tensors().size())));
           } else {
@@ -822,7 +822,7 @@ void RpcGetValueOp::ComputeAsync(OpKernelContext* ctx, DoneCallback done) {
               Tensor t;
               if (!t.FromProto(t_proto)) {
                 ctx->SetStatus(tensorflow::errors::Internal(
-                    absl::StrCat("Invalid Tensor Proto response returned.")));
+                    abslx::StrCat("Invalid Tensor Proto response returned.")));
               }
               ctx->set_output(i++, std::move(t));
             }

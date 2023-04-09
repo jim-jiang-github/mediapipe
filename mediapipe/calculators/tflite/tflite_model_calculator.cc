@@ -55,7 +55,7 @@ class TfLiteModelCalculator : public CalculatorBase {
       std::unique_ptr<tflite::FlatBufferModel,
                       std::function<void(tflite::FlatBufferModel*)>>;
 
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     if (cc->InputSidePackets().HasTag("MODEL_BLOB")) {
       cc->InputSidePackets().Tag("MODEL_BLOB").Set<std::string>();
     }
@@ -67,10 +67,10 @@ class TfLiteModelCalculator : public CalculatorBase {
     }
 
     cc->OutputSidePackets().Tag("MODEL").Set<TfLiteModelPtr>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     Packet model_packet;
     std::unique_ptr<tflite::FlatBufferModel> model;
 
@@ -95,7 +95,7 @@ class TfLiteModelCalculator : public CalculatorBase {
       model = tflite::FlatBufferModel::BuildFromAllocation(
           std::move(model_allocation), tflite::DefaultErrorReporter());
 #else
-      return absl::FailedPreconditionError(
+      return abslx::FailedPreconditionError(
           "Loading by file descriptor is not supported on this platform.");
 #endif
     }
@@ -111,11 +111,11 @@ class TfLiteModelCalculator : public CalculatorBase {
               delete model;
             })));
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
-    return absl::OkStatus();
+  abslx::Status Process(CalculatorContext* cc) override {
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(TfLiteModelCalculator);

@@ -60,7 +60,7 @@ Safe_PyObjectPtr RaiseDispatchConflictError(const std::string& api_name,
   Safe_PyObjectPtr s1(PyObject_Str(selected));
   Safe_PyObjectPtr s2(PyObject_Str(target));
   PyErr_SetString(PyExc_ValueError,
-                  absl::StrCat("Multiple dispatch targets that were "
+                  abslx::StrCat("Multiple dispatch targets that were "
                                "registered with tf.dispatch_for (",
                                s1 ? PyUnicode_AsUTF8(s1.get()) : "?", " and ",
                                s2 ? PyUnicode_AsUTF8(s2.get()) : "?",
@@ -76,7 +76,7 @@ bool RegisterDispatchableType(PyObject* py_class) {
   if (!PyType_Check(py_class)) {
     PyErr_SetString(
         PyExc_ValueError,
-        absl::StrCat("Expected a type object; got object with type ",
+        abslx::StrCat("Expected a type object; got object with type ",
                      py_class->ob_type->tp_name)
             .c_str());
     return false;
@@ -84,7 +84,7 @@ bool RegisterDispatchableType(PyObject* py_class) {
   if (IsRegisteredDispatchableType(py_class)) {
     Safe_PyObjectPtr s(PyObject_Str(py_class));
     PyErr_SetString(PyExc_ValueError,
-                    absl::StrCat("Type ", s ? PyUnicode_AsUTF8(s.get()) : "?",
+                    abslx::StrCat("Type ", s ? PyUnicode_AsUTF8(s.get()) : "?",
                                  " (or one of its bases clases) has "
                                  "already been registered")
                         .c_str());
@@ -96,8 +96,8 @@ bool RegisterDispatchableType(PyObject* py_class) {
 }
 
 PythonAPIDispatcher::PythonAPIDispatcher(const std::string& api_name,
-                                         absl::Span<const char*> arg_names,
-                                         absl::Span<PyObject*> defaults)
+                                         abslx::Span<const char*> arg_names,
+                                         abslx::Span<PyObject*> defaults)
     : api_name_(api_name),
       canonicalizer_(arg_names, defaults),
       canonicalized_args_storage_(canonicalizer_.GetArgSize()),
@@ -153,12 +153,12 @@ void PythonAPIDispatcher::Unregister(PyObject* func) {
 
 std::string PythonAPIDispatcher::DebugString() const {
   DCheckPyGilState();
-  std::string out = absl::StrCat("<Dispatch(", api_name_, "): ");
+  std::string out = abslx::StrCat("<Dispatch(", api_name_, "): ");
 
   const char* sep = "";
   for (const auto& target : targets_) {
     Safe_PyObjectPtr target_str(PyObject_Str(target.second.get()));
-    absl::StrAppend(&out, sep, target.first.DebugString(), " -> ",
+    abslx::StrAppend(&out, sep, target.first.DebugString(), " -> ",
                     target_str ? PyUnicode_AsUTF8(target_str.get()) : "?");
     sep = ", ";
   }
@@ -177,7 +177,7 @@ PySignatureChecker::PySignatureChecker(
 }
 
 bool PySignatureChecker::CheckCanonicalizedArgs(
-    absl::Span<PyObject*> canon_args) const {
+    abslx::Span<PyObject*> canon_args) const {
   bool matched_dispatchable_type = false;
   for (auto& c : positional_parameter_checkers_) {
     int index = c.first;
@@ -199,9 +199,9 @@ bool PySignatureChecker::CheckCanonicalizedArgs(
 }
 
 std::string PySignatureChecker::DebugString() const {
-  return absl::StrJoin(positional_parameter_checkers_, ", ",
+  return abslx::StrJoin(positional_parameter_checkers_, ", ",
                        [](std::string* out, ParamChecker p) {
-                         absl::StrAppend(out, "args[", p.first,
+                         abslx::StrAppend(out, "args[", p.first,
                                          "]:", p.second->DebugString());
                        });
 }
@@ -265,7 +265,7 @@ std::string PyInstanceChecker::DebugString() const {
     type_names.push_back(
         reinterpret_cast<PyTypeObject*>(py_class.get())->tp_name);
   }
-  return absl::StrJoin(
+  return abslx::StrJoin(
       py_classes_, ", ", [](std::string* out, const Safe_PyObjectPtr& v) {
         out->append(reinterpret_cast<PyTypeObject*>(v.get())->tp_name);
       });
@@ -301,7 +301,7 @@ PyTypeChecker::MatchType PyListChecker::Check(PyObject* value) {
 int PyListChecker::cost() const { return 10 * element_type_->cost(); }
 
 std::string PyListChecker::DebugString() const {
-  return absl::StrCat("List[", element_type_->DebugString(), "]");
+  return abslx::StrCat("List[", element_type_->DebugString(), "]");
 }
 
 PyTypeChecker::MatchType PyUnionChecker::Check(PyObject* value) {
@@ -329,8 +329,8 @@ int PyUnionChecker::cost() const {
 }
 
 std::string PyUnionChecker::DebugString() const {
-  return absl::StrCat("Union[",
-                      absl::StrJoin(options_, ", ",
+  return abslx::StrCat("Union[",
+                      abslx::StrJoin(options_, ", ",
                                     [](std::string* out, PyTypeChecker_ptr v) {
                                       out->append(v->DebugString());
                                     }),

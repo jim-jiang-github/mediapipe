@@ -34,7 +34,7 @@ class GlShader {
   //
   // @param shader_type is one of GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, or
   // GL_COMPUTE_SHADER.
-  static absl::Status CompileShader(GLenum shader_type,
+  static abslx::Status CompileShader(GLenum shader_type,
                                     const std::string& shader_source,
                                     GlShader* gl_shader);
 

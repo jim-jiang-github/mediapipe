@@ -412,7 +412,7 @@ Status CreateAllResourceHandles(ImmediateExecutionContext* ctx,
     AbstractTensorHandle* resource_handle = nullptr;
     int num_retvals = 1;
     TF_RETURN_IF_ERROR(function_op->Execute(
-        absl::MakeSpan(&resource_handle, num_retvals), &num_retvals));
+        abslx::MakeSpan(&resource_handle, num_retvals), &num_retvals));
     AbstractTensorHandlePtr owned_resource_handle(resource_handle);
     if (!tensorflow::isa<ImmediateExecutionTensorHandle>(
             owned_resource_handle.get())) {

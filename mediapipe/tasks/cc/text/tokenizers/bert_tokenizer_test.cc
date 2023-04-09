@@ -44,12 +44,12 @@ void AssertTokenizerResults(std::unique_ptr<BertTokenizer> tokenizer) {
 TEST(TokenizerTest, TestTokenizerCreationFromBuffer) {
   std::string buffer = LoadBinaryContent(kTestVocabPath);
   auto tokenizer =
-      absl::make_unique<BertTokenizer>(buffer.data(), buffer.size());
+      abslx::make_unique<BertTokenizer>(buffer.data(), buffer.size());
   AssertTokenizerResults(std::move(tokenizer));
 }
 
 TEST(TokenizerTest, TestTokenizerCreationFromFile) {
-  auto tokenizer = absl::make_unique<BertTokenizer>(kTestVocabPath);
+  auto tokenizer = abslx::make_unique<BertTokenizer>(kTestVocabPath);
 
   AssertTokenizerResults(std::move(tokenizer));
 }
@@ -60,13 +60,13 @@ TEST(TokenizerTest, TestTokenizerCreationFromVector) {
   vocab.emplace_back("'");
   vocab.emplace_back("m");
   vocab.emplace_back("question");
-  auto tokenizer = absl::make_unique<BertTokenizer>(vocab);
+  auto tokenizer = abslx::make_unique<BertTokenizer>(vocab);
 
   AssertTokenizerResults(std::move(tokenizer));
 }
 
 TEST(TokenizerTest, TestTokenizerMultipleRows) {
-  auto tokenizer = absl::make_unique<BertTokenizer>(kTestVocabPath);
+  auto tokenizer = abslx::make_unique<BertTokenizer>(kTestVocabPath);
 
   auto results = tokenizer->TokenizeWordpiece("i'm questionansweraskask");
 
@@ -83,7 +83,7 @@ TEST(TokenizerTest, TestTokenizerUnknownTokens) {
   vocab.emplace_back("'");
   vocab.emplace_back("m");
   vocab.emplace_back("question");
-  auto tokenizer = absl::make_unique<BertTokenizer>(vocab);
+  auto tokenizer = abslx::make_unique<BertTokenizer>(vocab);
 
   auto results = tokenizer->TokenizeWordpiece("i'm questionansweraskask");
 
@@ -100,7 +100,7 @@ TEST(TokenizerTest, TestLookupId) {
   vocab.emplace_back("'");
   vocab.emplace_back("m");
   vocab.emplace_back("question");
-  auto tokenizer = absl::make_unique<BertTokenizer>(vocab);
+  auto tokenizer = abslx::make_unique<BertTokenizer>(vocab);
 
   int i;
   ASSERT_FALSE(tokenizer->LookupId("iDontExist", &i));
@@ -121,9 +121,9 @@ TEST(TokenizerTest, TestLookupWord) {
   vocab.emplace_back("'");
   vocab.emplace_back("m");
   vocab.emplace_back("question");
-  auto tokenizer = absl::make_unique<BertTokenizer>(vocab);
+  auto tokenizer = abslx::make_unique<BertTokenizer>(vocab);
 
-  absl::string_view result;
+  abslx::string_view result;
   ASSERT_FALSE(tokenizer->LookupWord(6, &result));
 
   ASSERT_TRUE(tokenizer->LookupWord(0, &result));
@@ -142,7 +142,7 @@ TEST(TokenizerTest, TestContains) {
   vocab.emplace_back("'");
   vocab.emplace_back("m");
   vocab.emplace_back("question");
-  auto tokenizer = absl::make_unique<BertTokenizer>(vocab);
+  auto tokenizer = abslx::make_unique<BertTokenizer>(vocab);
 
   bool result;
   tokenizer->Contains("iDontExist", &result);
@@ -164,7 +164,7 @@ TEST(TokenizerTest, TestLVocabularySize) {
   vocab.emplace_back("'");
   vocab.emplace_back("m");
   vocab.emplace_back("question");
-  auto tokenizer = absl::make_unique<BertTokenizer>(vocab);
+  auto tokenizer = abslx::make_unique<BertTokenizer>(vocab);
 
   ASSERT_EQ(tokenizer->VocabularySize(), 4);
 }

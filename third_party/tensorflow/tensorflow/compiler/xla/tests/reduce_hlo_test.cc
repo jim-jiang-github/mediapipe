@@ -32,8 +32,8 @@ struct ReduceLayout {
   std::array<int64_t, 3> output_minor_to_major;
 
   std::string ToString() const {
-    return absl::StrCat(absl::StrJoin(input_minor_to_major, "x"), "_",
-                        absl::StrJoin(output_minor_to_major, "x"));
+    return abslx::StrCat(abslx::StrJoin(input_minor_to_major, "x"), "_",
+                        abslx::StrJoin(output_minor_to_major, "x"));
   }
 };
 

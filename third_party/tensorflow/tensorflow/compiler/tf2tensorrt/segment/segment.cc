@@ -45,10 +45,10 @@ namespace tensorflow {
 namespace tensorrt {
 namespace segment {
 namespace {
-using absl::StrAppend;
-using absl::StrAppendFormat;
-using absl::StrCat;
-using absl::StrJoin;
+using abslx::StrAppend;
+using abslx::StrAppendFormat;
+using abslx::StrCat;
+using abslx::StrJoin;
 
 // A simple graph representation to mirror Graph. This structure
 // helps saving memory since segmenter modifies the graph in place, preventing
@@ -405,7 +405,7 @@ string TensorPropertiesToString(
 //   segmentation, such as by requiring the dynamic dimensions to have the same
 //   negative value.
 std::optional<const TensorShapeProto*> FindLeadingShape(
-    absl::Span<const OpInfo::TensorProperties> properties) {
+    abslx::Span<const OpInfo::TensorProperties> properties) {
   DCHECK(!properties.empty());
   const TensorShapeProto* result;
   int max_batch_dim_value;
@@ -468,7 +468,7 @@ std::optional<const TensorShapeProto*> FindLeadingShape(
 //   . Special cases. Such as "Conv2DBackpropInput", "Conv3DBackpropInputV2".
 //   . The batch size of a operation is determined by the first input of the
 //     operation.
-absl::Span<const OpInfo::TensorProperties> GetInputsToDeterminateBatchSize(
+abslx::Span<const OpInfo::TensorProperties> GetInputsToDeterminateBatchSize(
     const Node* node, const std::vector<OpInfo::TensorProperties>& all_inputs) {
   // TODO(bixia): Find a way to share this knowledge with the converter.
   static std::set<string> broadcast_supporting_ops = {
@@ -493,17 +493,17 @@ absl::Span<const OpInfo::TensorProperties> GetInputsToDeterminateBatchSize(
 
   if (op == "Conv2DBackpropInput" || op == "Conv3DBackpropInputV2") {
     DCHECK_EQ(all_inputs.size(), 3);
-    return absl::MakeSpan(all_inputs).subspan(2, 1);
+    return abslx::MakeSpan(all_inputs).subspan(2, 1);
   }
 
   if (broadcast_supporting_ops.count(op)) {
-    return absl::MakeSpan(all_inputs);
+    return abslx::MakeSpan(all_inputs);
   }
 
   // This is the common case for the operations that don't support implicit
   // broadcasting: the first operand determines its batch size. All otherwise
   // cases are handled before reaching here.
-  return absl::MakeSpan(all_inputs).subspan(0, 1);
+  return abslx::MakeSpan(all_inputs).subspan(0, 1);
 }
 
 // Returns true if the operation we can remove the implicit batch of the
@@ -525,9 +525,9 @@ bool OperationCanBeTranslatedToImplicitBatch(
 
   const std::vector<OpInfo::TensorProperties>& all_input_properties =
       graph_properties->GetInputProperties(node->name());
-  absl::Span<const OpInfo::TensorProperties> input_properties =
+  abslx::Span<const OpInfo::TensorProperties> input_properties =
       GetInputsToDeterminateBatchSize(node, all_input_properties);
-  if (absl::c_any_of(input_properties, [](const OpInfo::TensorProperties& p) {
+  if (abslx::c_any_of(input_properties, [](const OpInfo::TensorProperties& p) {
         return p.shape().unknown_rank();
       })) {
     return false;
@@ -869,11 +869,11 @@ Status SegmentGraph(const Graph* tf_graph,
   auto graph = std::unique_ptr<SimpleGraph>(new SimpleGraph(tf_graph));
 
   // Fetch the user-provide TF operations denylisted for conversion by TF-TRT.
-  const absl::flat_hash_set<string> tftrt_op_denylist = [] {
+  const abslx::flat_hash_set<string> tftrt_op_denylist = [] {
     string tftrt_op_denylist_str;
     TF_CHECK_OK(ReadStringFromEnvVar("TF_TRT_OP_DENYLIST", /*default_value=*/"",
                                      &tftrt_op_denylist_str));
-    absl::flat_hash_set<string> tftrt_op_denylist{};
+    abslx::flat_hash_set<string> tftrt_op_denylist{};
     for (const auto& x : str_util::Split(tftrt_op_denylist_str, ",")) {
       tftrt_op_denylist.insert(x);
     }
@@ -900,7 +900,7 @@ Status SegmentGraph(const Graph* tf_graph,
 
     const string node_op_type{node->tf_node()->type_string()};
 
-    auto exclude_node = [&](absl::string_view reason) {
+    auto exclude_node = [&](abslx::string_view reason) {
       VLOG(1) << "Not a TF-TRT candidate, "
               << "(Op type: " << node_op_type << "), "
               << "(Op name: " << node->name() << "), "

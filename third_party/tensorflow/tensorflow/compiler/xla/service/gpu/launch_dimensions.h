@@ -65,7 +65,7 @@ class LaunchDimensions {
   }
 
   std::string ToString() const {
-    return absl::StrCat("blocks: {", block_counts_.x, ", ", block_counts_.y,
+    return abslx::StrCat("blocks: {", block_counts_.x, ", ", block_counts_.y,
                         ", ", block_counts_.z, "}, threads/block: {",
                         thread_counts_per_block_.x, ", ",
                         thread_counts_per_block_.y, ", ",
@@ -100,7 +100,7 @@ struct LaunchDimensionsConfig {
   bool logical_order = false;
 
   std::string ToString() {
-    return absl::StrCat(
+    return abslx::StrCat(
         "unroll_factor=", unroll_factor, ", few_waves=", few_waves,
         ", row_vectorized=", row_vectorized, ", logical_order", logical_order);
   }

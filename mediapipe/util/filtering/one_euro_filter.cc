@@ -16,14 +16,14 @@ OneEuroFilter::OneEuroFilter(double frequency, double min_cutoff, double beta,
   SetMinCutoff(min_cutoff);
   SetBeta(beta);
   SetDerivateCutoff(derivate_cutoff);
-  x_ = absl::make_unique<LowPassFilter>(GetAlpha(min_cutoff));
-  dx_ = absl::make_unique<LowPassFilter>(GetAlpha(derivate_cutoff));
+  x_ = abslx::make_unique<LowPassFilter>(GetAlpha(min_cutoff));
+  dx_ = abslx::make_unique<LowPassFilter>(GetAlpha(derivate_cutoff));
   last_time_ = 0;
 }
 
-double OneEuroFilter::Apply(absl::Duration timestamp, double value_scale,
+double OneEuroFilter::Apply(abslx::Duration timestamp, double value_scale,
                             double value) {
-  int64_t new_timestamp = absl::ToInt64Nanoseconds(timestamp);
+  int64_t new_timestamp = abslx::ToInt64Nanoseconds(timestamp);
   if (last_time_ >= new_timestamp) {
     // Results are unpredictable in this case, so nothing to do but
     // return same value

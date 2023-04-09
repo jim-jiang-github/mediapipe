@@ -140,7 +140,7 @@ TEST_F(BitcastConvertTest, ConvertReshape) {
 class BitcastConvertHloTest : public HloTestBase {};
 
 XLA_TEST_F(BitcastConvertHloTest, S32to4S8) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule bitcast_to_smaller
 
 ENTRY main {
@@ -152,7 +152,7 @@ ENTRY main {
 }
 
 XLA_TEST_F(BitcastConvertHloTest, FourS8toS32) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule bitcast_to_larger
 
 ENTRY main {
@@ -164,7 +164,7 @@ ENTRY main {
 }
 
 XLA_TEST_F(BitcastConvertHloTest, F32to2F16) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule bitcast_to_smaller
 
 ENTRY main {
@@ -176,7 +176,7 @@ ENTRY main {
 }
 
 XLA_TEST_F(BitcastConvertHloTest, TwoF16toF32) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule bitcast_to_smaller
 
 ENTRY main {

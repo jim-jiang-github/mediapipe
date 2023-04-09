@@ -101,8 +101,8 @@ class GpuKernelToBlobPass
     images.reserve(architectures_.size());
     for (const std::string& arch_str : architectures_) {
       // Parse ROCm architecture.
-      absl::string_view consumable_arch(arch_str);
-      if (!absl::ConsumePrefix(&consumable_arch, "gfx")) {
+      abslx::string_view consumable_arch(arch_str);
+      if (!abslx::ConsumePrefix(&consumable_arch, "gfx")) {
         return tensorflow::errors::Internal(
             "Could not parse ROCm architecture prefix (expected gfx)");
       }
@@ -179,7 +179,7 @@ class GpuKernelToBlobPass
                                                      ptx.c_str(), gpu_asm_opts);
         if (gpu_asm.ok()) {
           images.push_back(
-              {absl::StrCat("sm_", arch), std::move(gpu_asm.ValueOrDie())});
+              {abslx::StrCat("sm_", arch), std::move(gpu_asm.ValueOrDie())});
         } else {
 #ifdef PLATFORM_GOOGLE
           // Require compilation with ptxas.
@@ -198,7 +198,7 @@ class GpuKernelToBlobPass
         std::copy(ptx.begin(), ptx.end(), std::back_inserter(ptx_bytes));
         ptx_bytes.push_back('\0');
         images.push_back(
-            {absl::StrCat("compute_", arch), std::move(ptx_bytes)});
+            {abslx::StrCat("compute_", arch), std::move(ptx_bytes)});
       }
     }
 
@@ -217,11 +217,11 @@ class GpuKernelToBlobPass
  private:
   tensorflow::StatusOr<std::pair<bool, int>> ParseCudaArch(
       const std::string& arch_str) {
-    absl::string_view consumable_arch(arch_str);
+    abslx::string_view consumable_arch(arch_str);
     bool is_compute_profile;
-    if (absl::ConsumePrefix(&consumable_arch, "compute_")) {
+    if (abslx::ConsumePrefix(&consumable_arch, "compute_")) {
       is_compute_profile = true;
-    } else if (absl::ConsumePrefix(&consumable_arch, "sm_")) {
+    } else if (abslx::ConsumePrefix(&consumable_arch, "sm_")) {
       is_compute_profile = false;
     } else {
       return tensorflow::errors::Internal(
@@ -229,7 +229,7 @@ class GpuKernelToBlobPass
           "compute_)");
     }
     int arch;
-    if (!absl::SimpleAtoi(consumable_arch, &arch)) {
+    if (!abslx::SimpleAtoi(consumable_arch, &arch)) {
       return tensorflow::errors::Internal(
           "Could not parse cuda architecture number");
     }

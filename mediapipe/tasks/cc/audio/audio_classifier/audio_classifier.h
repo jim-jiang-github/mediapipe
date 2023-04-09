@@ -59,7 +59,7 @@ struct AudioClassifierOptions {
   // The user-defined result callback for processing audio stream data.
   // The result callback should only be specified when the running mode is set
   // to RunningMode::AUDIO_STREAM.
-  std::function<void(absl::StatusOr<AudioClassifierResult>)> result_callback =
+  std::function<void(abslx::StatusOr<AudioClassifierResult>)> result_callback =
       nullptr;
 };
 
@@ -103,7 +103,7 @@ class AudioClassifier : tasks::audio::core::BaseAudioTaskApi {
   //    data into the AudioClassifier, the classification results will be
   //    available in the result callback when the audio classifier finishes the
   //    work.
-  static absl::StatusOr<std::unique_ptr<AudioClassifier>> Create(
+  static abslx::StatusOr<std::unique_ptr<AudioClassifier>> Create(
       std::unique_ptr<AudioClassifierOptions> options);
 
   // Performs audio classification on the provided audio clip. Only use this
@@ -145,7 +145,7 @@ class AudioClassifier : tasks::audio::core::BaseAudioTaskApi {
   //
   // TODO: Use `sample_rate` in AudioClassifierOptions by default
   // and makes `audio_sample_rate` optional.
-  absl::StatusOr<std::vector<AudioClassifierResult>> Classify(
+  abslx::StatusOr<std::vector<AudioClassifierResult>> Classify(
       mediapipe::Matrix audio_clip, double audio_sample_rate);
 
   // Sends audio data (a block in a continuous audio stream) to perform audio
@@ -164,11 +164,11 @@ class AudioClassifier : tasks::audio::core::BaseAudioTaskApi {
   // in a single inference. When this occurs, the input audio block is split
   // into multiple chunks. For this reason, the callback may be called multiple
   // times (once per chunk) for each call to this function.
-  absl::Status ClassifyAsync(mediapipe::Matrix audio_block,
+  abslx::Status ClassifyAsync(mediapipe::Matrix audio_block,
                              double audio_sample_rate, int64 timestamp_ms);
 
   // Shuts down the AudioClassifier when all works are done.
-  absl::Status Close() { return runner_->Close(); }
+  abslx::Status Close() { return runner_->Close(); }
 };
 
 }  // namespace audio_classifier

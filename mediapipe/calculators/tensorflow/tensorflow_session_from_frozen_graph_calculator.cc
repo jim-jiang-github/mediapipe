@@ -53,7 +53,7 @@ constexpr char kStringModelFilePathTag[] = "STRING_MODEL_FILE_PATH";
 constexpr char kStringModelTag[] = "STRING_MODEL";
 
 // Updates the graph nodes to use the device as specified by device_id.
-void SetPreferredDevice(tf::GraphDef* graph_def, absl::string_view device_id) {
+void SetPreferredDevice(tf::GraphDef* graph_def, abslx::string_view device_id) {
   for (auto& node : *graph_def->mutable_node()) {
     if (node.device().empty()) {
       node.set_device(std::string(device_id));
@@ -64,7 +64,7 @@ void SetPreferredDevice(tf::GraphDef* graph_def, absl::string_view device_id) {
 
 class TensorFlowSessionFromFrozenGraphCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     const auto& options =
         cc->Options<TensorFlowSessionFromFrozenGraphCalculatorOptions>();
     bool has_exactly_one_model =
@@ -96,17 +96,17 @@ class TensorFlowSessionFromFrozenGraphCalculator : public CalculatorBase {
             // a map from tags to tensor names.
         );
     RET_CHECK_GT(options.tag_to_tensor_names().size(), 0);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     auto clock = std::unique_ptr<mediapipe::Clock>(
         mediapipe::MonotonicClock::CreateSynchronizedMonotonicClock());
-    const uint64 start_time = absl::ToUnixMicros(clock->TimeNow());
+    const uint64 start_time = abslx::ToUnixMicros(clock->TimeNow());
     const auto& options =
         cc->Options<TensorFlowSessionFromFrozenGraphCalculatorOptions>();
     // Output bundle packet.
-    auto session = ::absl::make_unique<TensorFlowSession>();
+    auto session = ::abslx::make_unique<TensorFlowSession>();
 
     tf::SessionOptions session_options;
     session_options.config.CopyFrom(options.config());
@@ -155,14 +155,14 @@ class TensorFlowSessionFromFrozenGraphCalculator : public CalculatorBase {
     }
 
     cc->OutputSidePackets().Tag(kSessionTag).Set(Adopt(session.release()));
-    const uint64 end_time = absl::ToUnixMicros(clock->TimeNow());
+    const uint64 end_time = abslx::ToUnixMicros(clock->TimeNow());
     LOG(INFO) << "Loaded frozen model in: " << end_time - start_time
               << " microseconds.";
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
-    return absl::OkStatus();
+  abslx::Status Process(CalculatorContext* cc) override {
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(TensorFlowSessionFromFrozenGraphCalculator);

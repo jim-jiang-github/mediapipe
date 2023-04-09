@@ -330,7 +330,7 @@ class OpSideEffectCollector {
   // Maps (type ID, instance ID) pairs to internal IDs for op-based resources.
   // Also see comment above. Instead of using TypeID directly we use its opaque
   // pointer.
-  absl::node_hash_map<std::pair<const void*, std::string>, ResourceId>
+  abslx::node_hash_map<std::pair<const void*, std::string>, ResourceId>
     type_instance_str_to_op_resource_id_;
   // Used for faster callable resolution.
   SymbolTableCollection symbol_table_collection_;

@@ -24,8 +24,8 @@ namespace {
 constexpr char kReferenceTag[] = "REFERENCE";
 }  // namespace
 
-// A calculator that diffs multiple input absl::Time streams against a
-// reference Time stream, and outputs the resulting absl::Duration's. Useful
+// A calculator that diffs multiple input abslx::Time streams against a
+// reference Time stream, and outputs the resulting abslx::Duration's. Useful
 // in combination with ClockTimestampCalculator to be able to determine the
 // latency between two different points in a graph.
 //
@@ -60,56 +60,56 @@ class ClockLatencyCalculator : public CalculatorBase {
  public:
   ClockLatencyCalculator() {}
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   int64 num_packet_streams_ = -1;
 };
 REGISTER_CALCULATOR(ClockLatencyCalculator);
 
-absl::Status ClockLatencyCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status ClockLatencyCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK_GT(cc->Inputs().NumEntries(), 1);
 
   int64 num_packet_streams = cc->Inputs().NumEntries() - 1;
   RET_CHECK_EQ(cc->Outputs().NumEntries(), num_packet_streams);
 
   for (int64 i = 0; i < num_packet_streams; ++i) {
-    cc->Inputs().Index(i).Set<absl::Time>();
-    cc->Outputs().Index(i).Set<absl::Duration>();
+    cc->Inputs().Index(i).Set<abslx::Time>();
+    cc->Outputs().Index(i).Set<abslx::Duration>();
   }
-  cc->Inputs().Tag(kReferenceTag).Set<absl::Time>();
+  cc->Inputs().Tag(kReferenceTag).Set<abslx::Time>();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ClockLatencyCalculator::Open(CalculatorContext* cc) {
+abslx::Status ClockLatencyCalculator::Open(CalculatorContext* cc) {
   // Direct passthrough, as far as timestamp and bounds are concerned.
   cc->SetOffset(TimestampDiff(0));
   num_packet_streams_ = cc->Inputs().NumEntries() - 1;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ClockLatencyCalculator::Process(CalculatorContext* cc) {
+abslx::Status ClockLatencyCalculator::Process(CalculatorContext* cc) {
   // Get reference time.
   RET_CHECK(!cc->Inputs().Tag(kReferenceTag).IsEmpty());
-  const absl::Time& reference_time =
-      cc->Inputs().Tag(kReferenceTag).Get<absl::Time>();
+  const abslx::Time& reference_time =
+      cc->Inputs().Tag(kReferenceTag).Get<abslx::Time>();
 
   // Push Duration packets for every input stream we have.
   for (int64 i = 0; i < num_packet_streams_; ++i) {
     if (!cc->Inputs().Index(i).IsEmpty()) {
-      const absl::Time& input_stream_time =
-          cc->Inputs().Index(i).Get<absl::Time>();
+      const abslx::Time& input_stream_time =
+          cc->Inputs().Index(i).Get<abslx::Time>();
       cc->Outputs().Index(i).AddPacket(
-          MakePacket<absl::Duration>(input_stream_time - reference_time)
+          MakePacket<abslx::Duration>(input_stream_time - reference_time)
               .At(cc->InputTimestamp()));
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

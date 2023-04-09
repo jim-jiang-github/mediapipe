@@ -21,7 +21,7 @@
 // combination with an Abseil random bit generator to produce random values
 // according to the rules of the distribution.
 //
-// `absl::uniform_int_distribution` is a drop-in replacement for the C++11
+// `abslx::uniform_int_distribution` is a drop-in replacement for the C++11
 // `std::uniform_int_distribution` [rand.dist.uni.int] but is considerably
 // faster than the libstdc++ implementation.
 
@@ -39,20 +39,20 @@
 #include "absl/random/internal/traits.h"
 #include "absl/random/internal/wide_multiply.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
-// absl::uniform_int_distribution<T>
+// abslx::uniform_int_distribution<T>
 //
 // This distribution produces random integer values uniformly distributed in the
 // closed (inclusive) interval [a, b].
 //
 // Example:
 //
-//   absl::BitGen gen;
+//   abslx::BitGen gen;
 //
 //   // Use the distribution to produce a value between 1 and 6, inclusive.
-//   int die_roll = absl::uniform_int_distribution<int>(1, 6)(gen);
+//   int die_roll = abslx::uniform_int_distribution<int>(1, 6)(gen);
 //
 template <typename IntType = int>
 class uniform_int_distribution {
@@ -98,7 +98,7 @@ class uniform_int_distribution {
     unsigned_type range_;
 
     static_assert(std::is_integral<result_type>::value,
-                  "Class-template absl::uniform_int_distribution<> must be "
+                  "Class-template abslx::uniform_int_distribution<> must be "
                   "parameterized using an integral type.");
   };  // param_type
 
@@ -270,6 +270,6 @@ uniform_int_distribution<IntType>::Generate(
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_UNIFORM_INT_DISTRIBUTION_H_

@@ -30,8 +30,8 @@ limitations under the License.
 
 namespace xla {
 
-using absl::StrAppendFormat;
-using absl::StrCat;
+using abslx::StrAppendFormat;
+using abslx::StrCat;
 
 std::string CallContextToString(CallContext context) {
   switch (context) {
@@ -81,7 +81,7 @@ std::string CallSite::ToString() const {
   return StrCat(
       instruction()->name(), " calls in context ",
       CallContextToString(context()), ": ",
-      absl::StrJoin(called_computations(), ", ",
+      abslx::StrJoin(called_computations(), ", ",
                     [](std::string* out, const HloComputation* computation) {
                       out->append(computation->name());
                     }));
@@ -147,7 +147,7 @@ CallGraphNode& CallGraph::GetNode(const HloComputation* computation) {
 
 bool CallGraph::DominatesHelper(
     const HloComputation* a, const HloComputation* b,
-    absl::flat_hash_set<const HloComputation*>* visited) const {
+    abslx::flat_hash_set<const HloComputation*>* visited) const {
   if (a == b || ContainsKey(*visited, b)) {
     // The call graph is guaranteed to be acyclic so any previously visited node
     // we encounter was already determined to be dominated.
@@ -172,7 +172,7 @@ bool CallGraph::DominatesHelper(
 
 bool CallGraph::Dominates(const HloComputation* a,
                           const HloComputation* b) const {
-  absl::flat_hash_set<const HloComputation*> visited;
+  abslx::flat_hash_set<const HloComputation*> visited;
   return DominatesHelper(a, b, &visited);
 }
 
@@ -282,7 +282,7 @@ void CallGraph::SetNodeDepths() {
 /* static */
 std::unique_ptr<CallGraph> CallGraph::Build(const HloModule* module) {
   // Constructor for CallGraph is private so std::make_unique can't be used.
-  auto call_graph = absl::WrapUnique<CallGraph>(new CallGraph(module));
+  auto call_graph = abslx::WrapUnique<CallGraph>(new CallGraph(module));
 
   VLOG(3) << "Building call graph for:";
   XLA_VLOG_LINES(3, module->ToString());
@@ -323,7 +323,7 @@ std::unique_ptr<CallGraph> CallGraph::Build(const HloModule* module) {
 
 Status CallGraph::VisitNodesInternal(
     const VisitorFunction& visitor_func, const CallGraphNode& node,
-    absl::flat_hash_set<const CallGraphNode*>* visited) const {
+    abslx::flat_hash_set<const CallGraphNode*>* visited) const {
   auto pair = visited->insert(&node);
   if (!pair.second) {
     // Node was not inserted. Node has already been visited.
@@ -340,7 +340,7 @@ Status CallGraph::VisitNodesInternal(
 
 Status CallGraph::VisitNodes(const VisitorFunction& visitor_func,
                              bool visit_unreachable_nodes) const {
-  absl::flat_hash_set<const CallGraphNode*> visited;
+  abslx::flat_hash_set<const CallGraphNode*> visited;
   if (visit_unreachable_nodes) {
     // Traverse from all roots in the call graph.
     for (const CallGraphNode& node : nodes()) {

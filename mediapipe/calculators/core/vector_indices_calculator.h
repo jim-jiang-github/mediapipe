@@ -49,13 +49,13 @@ class VectorIndicesCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kVector, kRange);
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     // Get the size of the input vector.
     const int vector_size = kVector(cc).Get().size();
     std::vector<int> out_idxs(vector_size);
     std::iota(out_idxs.begin(), out_idxs.end(), 0);
     kRange(cc).Send(out_idxs);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

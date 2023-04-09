@@ -115,7 +115,7 @@ bool CancellationManager::RegisterCallbackConfig(CancellationToken token,
   bool should_register = !is_cancelled_ && !is_cancelling_;
   if (should_register) {
     if (!state_) {
-      state_ = absl::make_unique<State>();
+      state_ = abslx::make_unique<State>();
     }
     std::swap(state_->callbacks[token], config);
   }
@@ -156,7 +156,7 @@ bool CancellationManager::RegisterChild(CancellationManager* child) {
   }
 
   if (!state_) {
-    state_ = absl::make_unique<State>();
+    state_ = abslx::make_unique<State>();
   }
 
   // Push `child` onto the front of the list of children.

@@ -52,7 +52,7 @@ Value* CreateNewSimilarValue(GraphFloat32* graph, const Value* old_value) {
   return new_value;
 }
 
-absl::Status GetFullyConnectedNode(int weights_tensor_id, int bias_tensor_id,
+abslx::Status GetFullyConnectedNode(int weights_tensor_id, int bias_tensor_id,
                                    ObjectReader* reader, Node* node) {
   const TfLiteTensor* weights_tensor =
       reader->GetInputTensor(weights_tensor_id);
@@ -95,7 +95,7 @@ absl::Status GetFullyConnectedNode(int weights_tensor_id, int bias_tensor_id,
     }
     node->operation.attributes = std::move(fc_attr);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 bool HasTensor(const TfLiteNode* node, const int index) {
@@ -144,7 +144,7 @@ bool HasProjection(const TfLiteNode* node) {
 //   else:
 //     gate = activate(temp + bias);
 //
-absl::Status BuildLstmGate(GraphFloat32* graph, ObjectReader* reader,
+abslx::Status BuildLstmGate(GraphFloat32* graph, ObjectReader* reader,
                            Value* output_state, Value* cell_state,
                            int input_weight_id, int recurrent_weight_id,
                            int cell_weight_id, int bias_id,
@@ -212,7 +212,7 @@ absl::Status BuildLstmGate(GraphFloat32* graph, ObjectReader* reader,
     // Bias is added in node #1.
     RETURN_IF_ERROR(MaybeFuseActivation(activation, graph, add_node));
     *gate_out = gate_before_normalization;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   Value* normalized_gate =
@@ -258,7 +258,7 @@ absl::Status BuildLstmGate(GraphFloat32* graph, ObjectReader* reader,
     RETURN_IF_ERROR(MaybeFuseActivation(activation, graph, node));
   }
   *gate_out = gate;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Builds subgraph for LSTM cell state update.
@@ -271,7 +271,7 @@ absl::Status BuildLstmGate(GraphFloat32* graph, ObjectReader* reader,
 //
 //   cell_state_new = clip(forget_gate .* cell_state + input_gate .* cell_gate);
 //
-absl::Status BuildCellStateUpdate(GraphFloat32* graph, ObjectReader* reader,
+abslx::Status BuildCellStateUpdate(GraphFloat32* graph, ObjectReader* reader,
                                   Value* forget_gate, Value* input_gate,
                                   Value* cell_gate, float cell_clip,
                                   Value** cell_state_new) {
@@ -309,7 +309,7 @@ absl::Status BuildCellStateUpdate(GraphFloat32* graph, ObjectReader* reader,
 
   if (cell_clip <= 0.0f) {
     *cell_state_new = new_cell_state;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   Value* max_clipped_state = CreateNewSimilarValue(graph, new_cell_state);
@@ -335,7 +335,7 @@ absl::Status BuildCellStateUpdate(GraphFloat32* graph, ObjectReader* reader,
     RETURN_IF_ERROR(graph->SetProducer(node->id, clipped_cell_state->id));
   }
   *cell_state_new = clipped_cell_state;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Build subgraph for LSTM output state update.
@@ -357,7 +357,7 @@ absl::Status BuildCellStateUpdate(GraphFloat32* graph, ObjectReader* reader,
 //   else:
 //     output_state_new = temp;
 //
-absl::Status BuildOutputStateUpdate(GraphFloat32* graph, ObjectReader* reader,
+abslx::Status BuildOutputStateUpdate(GraphFloat32* graph, ObjectReader* reader,
                                     Value* output_state, Value* output_gate,
                                     Value* cell_state,
                                     TfLiteFusedActivation activation,
@@ -375,8 +375,8 @@ absl::Status BuildOutputStateUpdate(GraphFloat32* graph, ObjectReader* reader,
         node->operation.type = ToString(OperationType::SIGMOID);
         break;
       default:
-        return absl::InvalidArgumentError(
-            absl::StrCat("Unsupported activation: ", activation));
+        return abslx::InvalidArgumentError(
+            abslx::StrCat("Unsupported activation: ", activation));
     }
     RETURN_IF_ERROR(graph->AddConsumer(node->id, cell_state->id));
     RETURN_IF_ERROR(graph->SetProducer(node->id, activated_state->id));
@@ -394,7 +394,7 @@ absl::Status BuildOutputStateUpdate(GraphFloat32* graph, ObjectReader* reader,
 
   if (!has_projection) {
     *output_state_new = new_output_state;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   Value* projected_output_state = CreateNewSimilarValue(graph, output_state);
@@ -412,7 +412,7 @@ absl::Status BuildOutputStateUpdate(GraphFloat32* graph, ObjectReader* reader,
 
   if (proj_clip <= 0.0f) {
     *output_state_new = projected_output_state;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   Value* max_clipped_state =
@@ -439,7 +439,7 @@ absl::Status BuildOutputStateUpdate(GraphFloat32* graph, ObjectReader* reader,
     RETURN_IF_ERROR(graph->SetProducer(node->id, clipped_output_state->id));
   }
   *output_state_new = clipped_output_state;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace
@@ -458,10 +458,10 @@ absl::Status BuildOutputStateUpdate(GraphFloat32* graph, ObjectReader* reader,
 //       Applies to only cell gate and output state update.
 //       Other gates always use Sigmoid.
 //
-absl::Status ParseLSTMAttributes(
+abslx::Status ParseLSTMAttributes(
     const TfLiteNode* tflite_node, const TfLiteRegistration* registration,
     GraphFloat32* graph, ObjectReader* reader, const TfLiteLSTMParams* params,
-    absl::flat_hash_map<int, ValueId>* new_variable_input_values) {
+    abslx::flat_hash_map<int, ValueId>* new_variable_input_values) {
   const bool has_cifg = HasCifg(tflite_node);
   const bool has_peephole = HasPeephole(tflite_node);
   const bool has_normalization = HasNormalization(tflite_node);
@@ -472,7 +472,7 @@ absl::Status ParseLSTMAttributes(
       tflite::ops::builtin::lstm::full::kCellStateTensor, &old_cell_state));
 
   if (old_cell_state->tensor.shape.b != 1) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "Batched execution is not supported for LSTM");
   }
 
@@ -562,7 +562,7 @@ absl::Status ParseLSTMAttributes(
   new_variable_input_values->emplace(
       tflite::ops::builtin::lstm::full::kOutputStateTensor,
       new_output_state->id);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

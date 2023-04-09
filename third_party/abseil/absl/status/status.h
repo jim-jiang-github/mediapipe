@@ -18,34 +18,34 @@
 //
 // This header file defines the Abseil `status` library, consisting of:
 //
-//   * An `absl::Status` class for holding error handling information
-//   * A set of canonical `absl::StatusCode` error codes, and associated
+//   * An `abslx::Status` class for holding error handling information
+//   * A set of canonical `abslx::StatusCode` error codes, and associated
 //     utilities for generating and propagating status codes.
 //   * A set of helper functions for creating status codes and checking their
 //     values
 //
-// Within Google, `absl::Status` is the primary mechanism for gracefully
+// Within Google, `abslx::Status` is the primary mechanism for gracefully
 // handling errors across API boundaries (and in particular across RPC
 // boundaries). Some of these errors may be recoverable, but others may not.
 // Most functions that can produce a recoverable error should be designed to
-// return an `absl::Status` (or `absl::StatusOr`).
+// return an `abslx::Status` (or `abslx::StatusOr`).
 //
 // Example:
 //
-// absl::Status myFunction(absl::string_view fname, ...) {
+// abslx::Status myFunction(abslx::string_view fname, ...) {
 //   ...
 //   // encounter error
 //   if (error condition) {
-//     return absl::InvalidArgumentError("bad mode");
+//     return abslx::InvalidArgumentError("bad mode");
 //   }
 //   // else, return OK
-//   return absl::OkStatus();
+//   return abslx::OkStatus();
 // }
 //
-// An `absl::Status` is designed to either return "OK" or one of a number of
+// An `abslx::Status` is designed to either return "OK" or one of a number of
 // different error codes, corresponding to typical error conditions.
-// In almost all cases, when using `absl::Status` you should use the canonical
-// error codes (of type `absl::StatusCode`) enumerated in this header file.
+// In almost all cases, when using `abslx::Status` you should use the canonical
+// error codes (of type `abslx::StatusCode`) enumerated in this header file.
 // These canonical codes are understood across the codebase and will be
 // accepted across all API and RPC boundaries.
 #ifndef ABSL_STATUS_STATUS_H_
@@ -60,19 +60,19 @@
 #include "absl/strings/string_view.h"
 #include "absl/types/optional.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
-// absl::StatusCode
+// abslx::StatusCode
 //
-// An `absl::StatusCode` is an enumerated type indicating either no error ("OK")
-// or an error condition. In most cases, an `absl::Status` indicates a
+// An `abslx::StatusCode` is an enumerated type indicating either no error ("OK")
+// or an error condition. In most cases, an `abslx::Status` indicates a
 // recoverable error, and the purpose of signalling an error is to indicate what
 // action to take in response to that error. These error codes map to the proto
 // RPC error codes indicated in https://cloud.google.com/apis/design/errors.
 //
 // The errors listed below are the canonical errors associated with
-// `absl::Status` and are used throughout the codebase. As a result, these
+// `abslx::Status` and are used throughout the codebase. As a result, these
 // error codes are somewhat generic.
 //
 // In general, try to return the most specific error that applies if more than
@@ -86,15 +86,15 @@ ABSL_NAMESPACE_BEGIN
 // The string value of these RPC codes is denoted within each enum below.
 //
 // If your error handling code requires more context, you can attach payloads
-// to your status. See `absl::Status::SetPayload()` and
-// `absl::Status::GetPayload()` below.
+// to your status. See `abslx::Status::SetPayload()` and
+// `abslx::Status::GetPayload()` below.
 enum class StatusCode : int {
   // StatusCode::kOk
   //
   // kOK (gRPC code "OK") does not indicate an error; this value is returned on
   // success. It is typical to check for this value before proceeding on any
   // given call across an API or RPC boundary. To check this value, use the
-  // `absl::Status::ok()` member function rather than inspecting the raw code.
+  // `abslx::Status::ok()` member function rather than inspecting the raw code.
   kOk = 0,
 
   // StatusCode::kCancelled
@@ -280,10 +280,10 @@ std::string StatusCodeToString(StatusCode code);
 // Streams StatusCodeToString(code) to `os`.
 std::ostream& operator<<(std::ostream& os, StatusCode code);
 
-// absl::StatusToStringMode
+// abslx::StatusToStringMode
 //
-// An `absl::StatusToStringMode` is an enumerated type indicating how
-// `absl::Status::ToString()` should construct the output string for an non-ok
+// An `abslx::StatusToStringMode` is an enumerated type indicating how
+// `abslx::Status::ToString()` should construct the output string for an non-ok
 // status.
 enum class StatusToStringMode : int {
   // ToString will not contain any extra data (such as payloads). It will only
@@ -297,7 +297,7 @@ enum class StatusToStringMode : int {
   kDefault = kWithPayload,
 };
 
-// absl::StatusToStringMode is specified as a bitmask type, which means the
+// abslx::StatusToStringMode is specified as a bitmask type, which means the
 // following operations must be provided:
 inline constexpr StatusToStringMode operator&(StatusToStringMode lhs,
                                               StatusToStringMode rhs) {
@@ -333,31 +333,31 @@ inline StatusToStringMode& operator^=(StatusToStringMode& lhs,
   return lhs;
 }
 
-// absl::Status
+// abslx::Status
 //
-// The `absl::Status` class is generally used to gracefully handle errors
+// The `abslx::Status` class is generally used to gracefully handle errors
 // across API boundaries (and in particular across RPC boundaries). Some of
 // these errors may be recoverable, but others may not. Most
 // functions which can produce a recoverable error should be designed to return
-// either an `absl::Status` (or the similar `absl::StatusOr<T>`, which holds
+// either an `abslx::Status` (or the similar `abslx::StatusOr<T>`, which holds
 // either an object of type `T` or an error).
 //
-// API developers should construct their functions to return `absl::OkStatus()`
-// upon success, or an `absl::StatusCode` upon another type of error (e.g
-// an `absl::StatusCode::kInvalidArgument` error). The API provides convenience
+// API developers should construct their functions to return `abslx::OkStatus()`
+// upon success, or an `abslx::StatusCode` upon another type of error (e.g
+// an `abslx::StatusCode::kInvalidArgument` error). The API provides convenience
 // functions to constuct each status code.
 //
 // Example:
 //
-// absl::Status myFunction(absl::string_view fname, ...) {
+// abslx::Status myFunction(abslx::string_view fname, ...) {
 //   ...
 //   // encounter error
 //   if (error condition) {
-//     // Construct an absl::StatusCode::kInvalidArgument error
-//     return absl::InvalidArgumentError("bad mode");
+//     // Construct an abslx::StatusCode::kInvalidArgument error
+//     return abslx::InvalidArgumentError("bad mode");
 //   }
 //   // else, return OK
-//   return absl::OkStatus();
+//   return abslx::OkStatus();
 // }
 //
 // Users handling status error codes should prefer checking for an OK status
@@ -371,7 +371,7 @@ inline StatusToStringMode& operator^=(StatusToStringMode& lhs,
 //
 // Example:
 //
-//   absl::Status result = DoSomething();
+//   abslx::Status result = DoSomething();
 //   if (!result.ok()) {
 //     LOG(ERROR) << result;
 //   }
@@ -379,11 +379,11 @@ inline StatusToStringMode& operator^=(StatusToStringMode& lhs,
 //   // Provide a default if switching on multiple error codes
 //   switch (result.code()) {
 //     // The user hasn't authenticated. Ask them to reauth
-//     case absl::StatusCode::kUnauthenticated:
+//     case abslx::StatusCode::kUnauthenticated:
 //       DoReAuth();
 //       break;
 //     // The user does not have permission. Log an error.
-//     case absl::StatusCode::kPermissionDenied:
+//     case abslx::StatusCode::kPermissionDenied:
 //       LOG(ERROR) << result;
 //       break;
 //     // Propagate the error otherwise.
@@ -391,7 +391,7 @@ inline StatusToStringMode& operator^=(StatusToStringMode& lhs,
 //       return true;
 //   }
 //
-// An `absl::Status` can optionally include a payload with more information
+// An `abslx::Status` can optionally include a payload with more information
 // about the error. Typically, this payload serves one of several purposes:
 //
 //   * It may provide more fine-grained semantic information about the error to
@@ -401,15 +401,15 @@ inline StatusToStringMode& operator^=(StatusToStringMode& lhs,
 //
 // Example:
 //
-//   absl::Status result = DoSomething();
+//   abslx::Status result = DoSomething();
 //   // Inform user to retry after 30 seconds
 //   // See more error details in googleapis/google/rpc/error_details.proto
-//   if (absl::IsResourceExhausted(result)) {
+//   if (abslx::IsResourceExhausted(result)) {
 //     google::rpc::RetryInfo info;
 //     info.retry_delay().seconds() = 30;
 //     // Payloads require a unique key (a URL to ensure no collisions with
-//     // other payloads), and an `absl::Cord` to hold the encoded data.
-//     absl::string_view url = "type.googleapis.com/google.rpc.RetryInfo";
+//     // other payloads), and an `abslx::Cord` to hold the encoded data.
+//     abslx::string_view url = "type.googleapis.com/google.rpc.RetryInfo";
 //     result.SetPayload(url, info.SerializeAsCord());
 //     return result;
 //   }
@@ -425,16 +425,16 @@ class Status final {
 
   // This default constructor creates an OK status with no message or payload.
   // Avoid this constructor and prefer explicit construction of an OK status
-  // with `absl::OkStatus()`.
+  // with `abslx::OkStatus()`.
   Status();
 
   // Creates a status in the canonical error space with the specified
-  // `absl::StatusCode` and error message.  If `code == absl::StatusCode::kOk`,  // NOLINT
+  // `abslx::StatusCode` and error message.  If `code == abslx::StatusCode::kOk`,  // NOLINT
   // `msg` is ignored and an object identical to an OK status is constructed.
   //
   // The `msg` string must be in UTF-8. The implementation may complain (e.g.,  // NOLINT
   // by printing a warning) if it is not.
-  Status(absl::StatusCode code, absl::string_view msg);
+  Status(abslx::StatusCode code, abslx::string_view msg);
 
   Status(const Status&);
   Status& operator=(const Status& x);
@@ -473,15 +473,15 @@ class Status final {
 
   // Status::code()
   //
-  // Returns the canonical error code of type `absl::StatusCode` of this status.
-  absl::StatusCode code() const;
+  // Returns the canonical error code of type `abslx::StatusCode` of this status.
+  abslx::StatusCode code() const;
 
   // Status::raw_code()
   //
   // Returns a raw (canonical) error code corresponding to the enum value of
   // `google.rpc.Code` definitions within
   // https://github.com/googleapis/googleapis/blob/master/google/rpc/code.proto.
-  // These values could be out of the range of canonical `absl::StatusCode`
+  // These values could be out of the range of canonical `abslx::StatusCode`
   // enum values.
   //
   // NOTE: This function should only be called when converting to an associated
@@ -494,7 +494,7 @@ class Status final {
   // Note that this message rarely describes the error code.  It is not unusual
   // for the error message to be the empty string. As a result, prefer
   // `Status::ToString()` for debug logging.
-  absl::string_view message() const;
+  abslx::string_view message() const;
 
   friend bool operator==(const Status&, const Status&);
   friend bool operator!=(const Status&, const Status&);
@@ -530,7 +530,7 @@ class Status final {
   //----------------------------------------------------------------------------
 
   // A payload may be attached to a status to provide additional context to an
-  // error that may not be satisifed by an existing `absl::StatusCode`.
+  // error that may not be satisifed by an existing `abslx::StatusCode`.
   // Typically, this payload serves one of several purposes:
   //
   //   * It may provide more fine-grained semantic information about the error
@@ -540,7 +540,7 @@ class Status final {
   //
   // A payload consists of a [key,value] pair, where the key is a string
   // referring to a unique "type URL" and the value is an object of type
-  // `absl::Cord` to hold the contextual data.
+  // `abslx::Cord` to hold the contextual data.
   //
   // The "type URL" should be unique and follow the format of a URL
   // (https://en.wikipedia.org/wiki/URL) and, ideally, provide some
@@ -553,7 +553,7 @@ class Status final {
   // C++ type if they want to deserialize the payload and read it effectively.
   //
   // To attach a payload to a status object, call `Status::SetPayload()`,
-  // passing it the type URL and an `absl::Cord` of associated data. Similarly,
+  // passing it the type URL and an `abslx::Cord` of associated data. Similarly,
   // to extract the payload from a status, call `Status::GetPayload()`. You
   // may attach multiple payloads (with differing type URLs) to any given
   // status object, provided that the status is currently exhibiting an error
@@ -562,7 +562,7 @@ class Status final {
   // Status::GetPayload()
   //
   // Gets the payload of a status given its unique `type_url` key, if present.
-  absl::optional<absl::Cord> GetPayload(absl::string_view type_url) const;
+  abslx::optional<abslx::Cord> GetPayload(abslx::string_view type_url) const;
 
   // Status::SetPayload()
   //
@@ -570,13 +570,13 @@ class Status final {
   // any existing payload for that `type_url`.
   //
   // NOTE: This function does nothing if the Status is ok.
-  void SetPayload(absl::string_view type_url, absl::Cord payload);
+  void SetPayload(abslx::string_view type_url, abslx::Cord payload);
 
   // Status::ErasePayload()
   //
   // Erases the payload corresponding to the `type_url` key.  Returns `true` if
   // the payload was present.
-  bool ErasePayload(absl::string_view type_url);
+  bool ErasePayload(abslx::string_view type_url);
 
   // Status::ForEachPayload()
   //
@@ -586,10 +586,10 @@ class Status final {
   // NOTE: The order of calls to `visitor()` is not specified and may change at
   // any time.
   //
-  // NOTE: Any mutation on the same 'absl::Status' object during visitation is
+  // NOTE: Any mutation on the same 'abslx::Status' object during visitation is
   // forbidden and could result in undefined behavior.
   void ForEachPayload(
-      const std::function<void(absl::string_view, const absl::Cord&)>& visitor)
+      const std::function<void(abslx::string_view, const abslx::Cord&)>& visitor)
       const;
 
  private:
@@ -597,7 +597,7 @@ class Status final {
 
   // Creates a status in the canonical error space with the specified
   // code, and an empty error message.
-  explicit Status(absl::StatusCode code);
+  explicit Status(abslx::StatusCode code);
 
   static void UnrefNonInlined(uintptr_t rep);
   static void Ref(uintptr_t rep);
@@ -612,9 +612,9 @@ class Status final {
 
   // Takes ownership of payload.
   static uintptr_t NewRep(
-      absl::StatusCode code, absl::string_view msg,
+      abslx::StatusCode code, abslx::string_view msg,
       std::unique_ptr<status_internal::Payloads> payload);
-  static bool EqualsSlow(const absl::Status& a, const absl::Status& b);
+  static bool EqualsSlow(const abslx::Status& a, const abslx::Status& b);
 
   // MSVC 14.0 limitation requires the const.
   static constexpr const char kMovedFromString[] =
@@ -634,8 +634,8 @@ class Status final {
 
   // Convert between error::Code and the inlined uintptr_t representation used
   // by rep_. See rep_ for details.
-  static uintptr_t CodeToInlinedRep(absl::StatusCode code);
-  static absl::StatusCode InlinedRepToCode(uintptr_t rep);
+  static uintptr_t CodeToInlinedRep(abslx::StatusCode code);
+  static abslx::StatusCode InlinedRepToCode(uintptr_t rep);
 
   // Converts between StatusRep* and the external uintptr_t representation used
   // by rep_. See rep_ for details.
@@ -658,7 +658,7 @@ class Status final {
 // OkStatus()
 //
 // Returns an OK status, equivalent to a default constructed instance. Prefer
-// usage of `absl::OkStatus()` when constructing such an OK status.
+// usage of `abslx::OkStatus()` when constructing such an OK status.
 Status OkStatus();
 
 // operator<<()
@@ -684,7 +684,7 @@ std::ostream& operator<<(std::ostream& os, const Status& x);
 // IsUnknown()
 //
 // These convenience functions return `true` if a given status matches the
-// `absl::StatusCode` error code of its associated function.
+// `abslx::StatusCode` error code of its associated function.
 ABSL_MUST_USE_RESULT bool IsAborted(const Status& status);
 ABSL_MUST_USE_RESULT bool IsAlreadyExists(const Status& status);
 ABSL_MUST_USE_RESULT bool IsCancelled(const Status& status);
@@ -719,33 +719,33 @@ ABSL_MUST_USE_RESULT bool IsUnknown(const Status& status);
 // UnimplementedError()
 // UnknownError()
 //
-// These convenience functions create an `absl::Status` object with an error
+// These convenience functions create an `abslx::Status` object with an error
 // code as indicated by the associated function name, using the error message
 // passed in `message`.
-Status AbortedError(absl::string_view message);
-Status AlreadyExistsError(absl::string_view message);
-Status CancelledError(absl::string_view message);
-Status DataLossError(absl::string_view message);
-Status DeadlineExceededError(absl::string_view message);
-Status FailedPreconditionError(absl::string_view message);
-Status InternalError(absl::string_view message);
-Status InvalidArgumentError(absl::string_view message);
-Status NotFoundError(absl::string_view message);
-Status OutOfRangeError(absl::string_view message);
-Status PermissionDeniedError(absl::string_view message);
-Status ResourceExhaustedError(absl::string_view message);
-Status UnauthenticatedError(absl::string_view message);
-Status UnavailableError(absl::string_view message);
-Status UnimplementedError(absl::string_view message);
-Status UnknownError(absl::string_view message);
+Status AbortedError(abslx::string_view message);
+Status AlreadyExistsError(abslx::string_view message);
+Status CancelledError(abslx::string_view message);
+Status DataLossError(abslx::string_view message);
+Status DeadlineExceededError(abslx::string_view message);
+Status FailedPreconditionError(abslx::string_view message);
+Status InternalError(abslx::string_view message);
+Status InvalidArgumentError(abslx::string_view message);
+Status NotFoundError(abslx::string_view message);
+Status OutOfRangeError(abslx::string_view message);
+Status PermissionDeniedError(abslx::string_view message);
+Status ResourceExhaustedError(abslx::string_view message);
+Status UnauthenticatedError(abslx::string_view message);
+Status UnavailableError(abslx::string_view message);
+Status UnimplementedError(abslx::string_view message);
+Status UnknownError(abslx::string_view message);
 
 //------------------------------------------------------------------------------
 // Implementation details follow
 //------------------------------------------------------------------------------
 
-inline Status::Status() : rep_(CodeToInlinedRep(absl::StatusCode::kOk)) {}
+inline Status::Status() : rep_(CodeToInlinedRep(abslx::StatusCode::kOk)) {}
 
-inline Status::Status(absl::StatusCode code) : rep_(CodeToInlinedRep(code)) {}
+inline Status::Status(abslx::StatusCode code) : rep_(CodeToInlinedRep(code)) {}
 
 inline Status::Status(const Status& x) : rep_(x.rep_) { Ref(rep_); }
 
@@ -788,14 +788,14 @@ inline void Status::Update(Status&& new_status) {
 inline Status::~Status() { Unref(rep_); }
 
 inline bool Status::ok() const {
-  return rep_ == CodeToInlinedRep(absl::StatusCode::kOk);
+  return rep_ == CodeToInlinedRep(abslx::StatusCode::kOk);
 }
 
-inline absl::string_view Status::message() const {
+inline abslx::string_view Status::message() const {
   return !IsInlined(rep_)
              ? RepToPointer(rep_)->message
-             : (IsMovedFrom(rep_) ? absl::string_view(kMovedFromString)
-                                  : absl::string_view());
+             : (IsMovedFrom(rep_) ? abslx::string_view(kMovedFromString)
+                                  : abslx::string_view());
 }
 
 inline bool operator==(const Status& lhs, const Status& rhs) {
@@ -814,7 +814,7 @@ inline void Status::IgnoreError() const {
   // no-op
 }
 
-inline void swap(absl::Status& a, absl::Status& b) {
+inline void swap(abslx::Status& a, abslx::Status& b) {
   using std::swap;
   swap(a.rep_, b.rep_);
 }
@@ -834,16 +834,16 @@ inline bool Status::IsMovedFrom(uintptr_t rep) {
 }
 
 inline uintptr_t Status::MovedFromRep() {
-  return CodeToInlinedRep(absl::StatusCode::kInternal) | 2;
+  return CodeToInlinedRep(abslx::StatusCode::kInternal) | 2;
 }
 
-inline uintptr_t Status::CodeToInlinedRep(absl::StatusCode code) {
+inline uintptr_t Status::CodeToInlinedRep(abslx::StatusCode code) {
   return static_cast<uintptr_t>(code) << 2;
 }
 
-inline absl::StatusCode Status::InlinedRepToCode(uintptr_t rep) {
+inline abslx::StatusCode Status::InlinedRepToCode(uintptr_t rep) {
   assert(IsInlined(rep));
-  return static_cast<absl::StatusCode>(rep >> 2);
+  return static_cast<abslx::StatusCode>(rep >> 2);
 }
 
 inline status_internal::StatusRep* Status::RepToPointer(uintptr_t rep) {
@@ -869,12 +869,12 @@ inline void Status::Unref(uintptr_t rep) {
 
 inline Status OkStatus() { return Status(); }
 
-// Creates a `Status` object with the `absl::StatusCode::kCancelled` error code
+// Creates a `Status` object with the `abslx::StatusCode::kCancelled` error code
 // and an empty message. It is provided only for efficiency, given that
 // message-less kCancelled errors are common in the infrastructure.
-inline Status CancelledError() { return Status(absl::StatusCode::kCancelled); }
+inline Status CancelledError() { return Status(abslx::StatusCode::kCancelled); }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STATUS_STATUS_H_

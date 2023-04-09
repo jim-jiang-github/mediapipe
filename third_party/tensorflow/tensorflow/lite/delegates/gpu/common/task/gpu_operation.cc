@@ -182,13 +182,13 @@ GPUOperation& GPUOperation::operator=(GPUOperation&& operation) {
   return *this;
 }
 
-absl::Status GPUOperation::AddOperation(const GpuInfo& gpu_info,
+abslx::Status GPUOperation::AddOperation(const GpuInfo& gpu_info,
                                         GPUOperation* operation) {
   const auto prev_type = definition_.dst_tensors[0].GetDataType();
   definition_.dst_tensors[0] = operation->definition_.dst_tensors[0];
   linkable_count_ += (operation->linkable_count_ + 1);
   std::string code = operation->elementwise_code_;
-  std::string unique_postfix = absl::StrCat("_link", linkable_count_);
+  std::string unique_postfix = abslx::StrCat("_link", linkable_count_);
   operation->args_.RenameArgs(unique_postfix, &code);
   operation->second_elementwise_tensor_name_ += unique_postfix;
   if (elementwise_code_.empty()) {
@@ -209,14 +209,14 @@ absl::Status GPUOperation::AddOperation(const GpuInfo& gpu_info,
       elementwise_inputs_ = 2;
     }
     const std::string new_value_name = "interm_value" + unique_postfix;
-    code = absl::StrReplaceAll(code, {{"in_value", new_value_name}});
+    code = abslx::StrReplaceAll(code, {{"in_value", new_value_name}});
     elementwise_code_ =
-        absl::StrReplaceAll(elementwise_code_, {{"out_value", new_value_name}});
+        abslx::StrReplaceAll(elementwise_code_, {{"out_value", new_value_name}});
     const std::string out_var_declaration =
         "\n" + GetTypeDeclaration(gpu_info, prev_type, 4) + " " +
         new_value_name + ";\n";
     elementwise_code_ =
-        absl::Substitute(elementwise_code_, out_var_declaration);
+        abslx::Substitute(elementwise_code_, out_var_declaration);
     elementwise_code_ = elementwise_code_ + "\n" + code;
   }
   RETURN_IF_ERROR(args_.Merge(std::move(operation->args_), unique_postfix));
@@ -230,12 +230,12 @@ absl::Status GPUOperation::AddOperation(const GpuInfo& gpu_info,
     dst_tensors_names_.push_back(operation->dst_tensors_names_[i] +
                                  unique_postfix);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GPUOperation::ResolveSecondElementwiseInput() {
+abslx::Status GPUOperation::ResolveSecondElementwiseInput() {
   if (elementwise_inputs_ != 2) {
-    return absl::FailedPreconditionError(
+    return abslx::FailedPreconditionError(
         "Can not apply ResolveSecondElementwiseInput for non 2 input "
         "elementwise");
   }
@@ -250,30 +250,30 @@ absl::Status GPUOperation::ResolveSecondElementwiseInput() {
                                 "::type second_value = args." +
                                 second_elementwise_tensor_name_ + ".Read(" +
                                 coords + ");\n";
-  elementwise_code_ = absl::StrReplaceAll(
+  elementwise_code_ = abslx::StrReplaceAll(
       elementwise_code_,
       {{"in2_value", "second_value"}, {"READ_SECOND_VALUE", read_code}});
   elementwise_inputs_ = 1;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GPUOperation::GetTensorDescriptor(const std::string& tensor_name,
+abslx::Status GPUOperation::GetTensorDescriptor(const std::string& tensor_name,
                                                TensorDescriptor** resutl) {
   for (int i = 0; i < src_tensors_names_.size(); ++i) {
     if (src_tensors_names_[i] == tensor_name) {
       int index = elementwise_ ? i + 1 : i;
       *resutl = &definition_.src_tensors[index];
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
   }
   for (int i = 0; i < dst_tensors_names_.size(); ++i) {
     if (dst_tensors_names_[i] == tensor_name) {
       int index = elementwise_ ? i + 1 : i;
       *resutl = &definition_.dst_tensors[index];
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
   }
-  return absl::NotFoundError("Can not find tensor with this name");
+  return abslx::NotFoundError("Can not find tensor with this name");
 }
 
 void GPUOperation::AddSrcTensor(const std::string& tensor_name,
@@ -304,7 +304,7 @@ void GPUOperation::AddDstTensor(const std::string& tensor_name,
   args_.AddObjectRef(tensor_name, AccessType::WRITE, std::move(desc_new));
 }
 
-absl::Status GPUOperation::AssembleCode(const GpuInfo& gpu_info) {
+abslx::Status GPUOperation::AssembleCode(const GpuInfo& gpu_info) {
   if (elementwise_inputs_ == 2) {
     RETURN_IF_ERROR(ResolveSecondElementwiseInput());
   }
@@ -324,7 +324,7 @@ absl::Status GPUOperation::AssembleCode(const GpuInfo& gpu_info) {
   RETURN_IF_ERROR(args_.Compile(
       gpu_info, {{dst_tensors_names_[0], elementwise_code_}}, &code_));
   CalculateConstArgsSize();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void GPUOperation::RecalculateWorkGroupsCount() {
@@ -410,12 +410,12 @@ GPUOperation CreateGpuOperation(const OperationDef& definition,
       const std::string x_coord = second_shape.w == 1 ? "0" : "X_COORD";
       const std::string y_coord = second_shape.h == 1 ? "0" : "Y_COORD";
       const std::string s_coord = second_shape.c == 1 ? "0" : "S_COORD";
-      std::string coords = absl::StrCat(x_coord, ", ", y_coord, ", ", s_coord);
+      std::string coords = abslx::StrCat(x_coord, ", ", y_coord, ", ", s_coord);
       if (second_tensor_def.HasAxis(Axis::BATCH)) {
         const std::string b_coord = second_shape.b == 1 ? "0" : "B_COORD";
         coords += ", " + b_coord;
       }
-      std::string read_value_code = absl::StrCat(
+      std::string read_value_code = abslx::StrCat(
           "args.src_tensor_1::type in2_value = args.src_tensor_1.Read(", coords,
           ");\n");
       if (second_shape.c == 1) {
@@ -425,7 +425,7 @@ GPUOperation CreateGpuOperation(const OperationDef& definition,
       }
       op.elementwise_code_ =
           "$0{" + read_value_code + op.elementwise_code_ + "}";
-      op.elementwise_code_ = absl::StrReplaceAll(
+      op.elementwise_code_ = abslx::StrReplaceAll(
           op.elementwise_code_, {{"in2_value", "second_value"}});
       op.elementwise_inputs_ = 1;
     } else {

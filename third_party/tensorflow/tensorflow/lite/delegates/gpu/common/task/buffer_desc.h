@@ -42,17 +42,17 @@ struct BufferDescriptor : public GPUObjectDescriptor {
   BufferDescriptor(BufferDescriptor&& desc) = default;
   BufferDescriptor& operator=(BufferDescriptor&& desc) = default;
 
-  absl::Status PerformSelector(const GpuInfo& gpu_info,
+  abslx::Status PerformSelector(const GpuInfo& gpu_info,
                                const std::string& selector,
                                const std::vector<std::string>& args,
                                const std::vector<std::string>& template_args,
                                std::string* result) const override;
 
   GPUResources GetGPUResources(const GpuInfo& gpu_info) const override;
-  absl::Status PerformReadSelector(const GpuInfo& gpu_info,
+  abslx::Status PerformReadSelector(const GpuInfo& gpu_info,
                                    const std::vector<std::string>& args,
                                    std::string* result) const;
-  absl::Status PerformGetPtrSelector(
+  abslx::Status PerformGetPtrSelector(
       const std::vector<std::string>& args,
       const std::vector<std::string>& template_args, std::string* result) const;
 

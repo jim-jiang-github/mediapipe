@@ -43,7 +43,7 @@ using ::testing::SizeIs;
 class WhileLoopAllReduceCodeMotionTest : public HloTestBase {};
 
 TEST_F(WhileLoopAllReduceCodeMotionTest, AllReduceAccumulate) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %reduction {
@@ -130,7 +130,7 @@ TEST_F(WhileLoopAllReduceCodeMotionTest, AllReduceAccumulate) {
 }
 
 TEST_F(WhileLoopAllReduceCodeMotionTest, AllReduceSliceAccumulate) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %reduction {
@@ -201,7 +201,7 @@ TEST_F(WhileLoopAllReduceCodeMotionTest, AllReduceSliceAccumulate) {
   EXPECT_THAT(transformed_while->while_body()->instructions(),
               Each(Not(op::AllReduce())));
   std::vector<HloInstruction*> hoisted_all_reduces;
-  absl::c_copy_if(module->entry_computation()->instructions(),
+  abslx::c_copy_if(module->entry_computation()->instructions(),
                   std::back_inserter(hoisted_all_reduces),
                   [](HloInstruction* instruction) {
                     return Value(instruction, op::AllReduce());
@@ -211,7 +211,7 @@ TEST_F(WhileLoopAllReduceCodeMotionTest, AllReduceSliceAccumulate) {
       hoisted_all_reduces,
       Each(Pointee(Property(&HloInstruction::channel_id, Ne(std::nullopt)))));
   // Check if added all-reduces have distinct channel IDs.
-  absl::flat_hash_set<int> unique_channel_ids = {
+  abslx::flat_hash_set<int> unique_channel_ids = {
       hoisted_all_reduces[0]->channel_id().value(),
       hoisted_all_reduces[1]->channel_id().value(),
       hoisted_all_reduces[2]->channel_id().value()};
@@ -219,7 +219,7 @@ TEST_F(WhileLoopAllReduceCodeMotionTest, AllReduceSliceAccumulate) {
 }
 
 TEST_F(WhileLoopAllReduceCodeMotionTest, AllReduceAccumulateUse) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %reduction {
@@ -287,7 +287,7 @@ TEST_F(WhileLoopAllReduceCodeMotionTest, AllReduceAccumulateUse) {
 }
 
 TEST_F(WhileLoopAllReduceCodeMotionTest, RepeatedlyAccumulatedAllReduce) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %reduction {
@@ -335,7 +335,7 @@ TEST_F(WhileLoopAllReduceCodeMotionTest, RepeatedlyAccumulatedAllReduce) {
 }
 
 TEST_F(WhileLoopAllReduceCodeMotionTest, TypeCastAllReduceAccumulate) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %reduction {
@@ -423,7 +423,7 @@ TEST_F(WhileLoopAllReduceCodeMotionTest, TypeCastAllReduceAccumulate) {
 }
 
 TEST_F(WhileLoopAllReduceCodeMotionTest, SelectAllReduceAccumulate) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %reduction {
@@ -513,7 +513,7 @@ TEST_F(WhileLoopAllReduceCodeMotionTest, SelectAllReduceAccumulate) {
 }
 
 TEST_F(WhileLoopAllReduceCodeMotionTest, MultipleLoopCalls) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %reduction {
@@ -567,10 +567,10 @@ TEST_F(WhileLoopAllReduceCodeMotionTest, MultipleLoopCalls) {
       HloVerifier(/*layout_sensitive=*/false, /*allow_mixed_precision=*/true)
           .Run(module.get())
           .status());
-  EXPECT_EQ(absl::c_count_if(module->entry_computation()->instructions(),
+  EXPECT_EQ(abslx::c_count_if(module->entry_computation()->instructions(),
                              Matches(op::While())),
             2);
-  EXPECT_EQ(absl::c_count_if(module->entry_computation()->instructions(),
+  EXPECT_EQ(abslx::c_count_if(module->entry_computation()->instructions(),
                              Matches(op::AllReduce())),
             2);
   HloInstruction* transformed_while =
@@ -586,7 +586,7 @@ TEST_F(WhileLoopAllReduceCodeMotionTest, MultipleLoopCalls) {
 }
 
 TEST_F(WhileLoopAllReduceCodeMotionTest, MultipleAllReduceAccumulate) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %reduction.0 {
@@ -659,13 +659,13 @@ TEST_F(WhileLoopAllReduceCodeMotionTest, MultipleAllReduceAccumulate) {
   HloInstruction* accumulation_buffer =
       transformed_while->mutable_operand(0)->mutable_operand(3);
   EXPECT_THAT(accumulation_buffer, op::Constant());
-  EXPECT_EQ(absl::c_count_if(module->entry_computation()->instructions(),
+  EXPECT_EQ(abslx::c_count_if(module->entry_computation()->instructions(),
                              Matches(op::AllReduce())),
             2);
 }
 
 TEST_F(WhileLoopAllReduceCodeMotionTest, MixMovableAllReduceWithNotMovable) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %reduction.0 {
@@ -734,20 +734,20 @@ TEST_F(WhileLoopAllReduceCodeMotionTest, MixMovableAllReduceWithNotMovable) {
 
   ASSERT_THAT(transformed_while, NotNull());
   // One all-reduce is movable and the other is not movable.
-  EXPECT_EQ(absl::c_count_if(transformed_while->while_body()->instructions(),
+  EXPECT_EQ(abslx::c_count_if(transformed_while->while_body()->instructions(),
                              Matches(op::AllReduce())),
             1);
   HloInstruction* accumulation_buffer =
       transformed_while->mutable_operand(0)->mutable_operand(3);
   EXPECT_THAT(accumulation_buffer, op::Constant());
-  EXPECT_EQ(absl::c_count_if(module->entry_computation()->instructions(),
+  EXPECT_EQ(abslx::c_count_if(module->entry_computation()->instructions(),
                              Matches(op::AllReduce())),
             1);
 }
 
 TEST_F(WhileLoopAllReduceCodeMotionTest,
        DynamicSliceAllReduceDynamicUpdateSliceAccumulate) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %reduction {
@@ -850,7 +850,7 @@ TEST_F(WhileLoopAllReduceCodeMotionTest,
 // replica group
 TEST_F(WhileLoopAllReduceCodeMotionTest,
        DynamicSliceAllReduceDynamicUpdateSliceAccumulateNotMoved) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule accumulated_all_reduce
 
     %reduction {

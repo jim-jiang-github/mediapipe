@@ -20,7 +20,7 @@ limitations under the License.
 
 class TpuCompileInterfaceExternal : public TpuCompileInterface {
  public:
-  uint64_t FingerprintString(absl::string_view str) override {
+  uint64_t FingerprintString(abslx::string_view str) override {
     return ::tensorflow::Fingerprint64(str);
   }
 };

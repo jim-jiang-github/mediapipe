@@ -25,7 +25,7 @@
 #include "absl/base/config.h"
 #include "absl/base/internal/endian.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -87,6 +87,6 @@ class ExplicitSeedSeq {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_INTERNAL_EXPLICIT_SEED_SEQ_H_

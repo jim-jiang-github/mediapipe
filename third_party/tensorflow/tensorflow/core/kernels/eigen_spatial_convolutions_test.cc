@@ -1569,7 +1569,7 @@ static void PackRhsHelper(::testing::benchmark::State& state,
   }
 
   state.SetLabel(
-      absl::StrCat("patch: ", patch_rows, "x", patch_cols, " D", patch_depth,
+      abslx::StrCat("patch: ", patch_rows, "x", patch_cols, " D", patch_depth,
                    "; num_patches=", num_patches, " patch_size=", patch_size,
                    " num_inputs=", num_inputs, " padding=", padding));
 }
@@ -1735,7 +1735,7 @@ static void PackLhsHelper(::testing::benchmark::State& state,
     pack_lhs(packed.data() + packed_offset, sub_mapper, cols, rows);
 #endif
   }
-  state.SetLabel(absl::StrCat(
+  state.SetLabel(abslx::StrCat(
       "filter: count=", filter_count, " dims=", filter_rows, "x", filter_cols,
       "; input: depth=", input_depth, "; num_filers=", num_filters));
 }

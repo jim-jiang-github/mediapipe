@@ -50,7 +50,7 @@ void DumpPostStreamPacket(Packet* post_stream_packet, const Packet& packet) {
 // while that pointer is still alive.
 class CallbackPacketCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     const auto& options = cc->Options<CallbackPacketCalculatorOptions>();
     switch (options.type()) {
       case CallbackPacketCalculatorOptions::VECTOR_PACKET:
@@ -63,10 +63,10 @@ class CallbackPacketCalculator : public CalculatorBase {
         return mediapipe::InvalidArgumentErrorBuilder(MEDIAPIPE_LOC)
                << "Invalid type of callback to produce.";
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     const auto& options = cc->Options<CallbackPacketCalculatorOptions>();
     void* ptr;
     if (sscanf(options.pointer().c_str(), "%p", &ptr) != 1) {
@@ -90,11 +90,11 @@ class CallbackPacketCalculator : public CalculatorBase {
         return mediapipe::InvalidArgumentErrorBuilder(MEDIAPIPE_LOC)
                << "Invalid type to dump into.";
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
-    return absl::OkStatus();
+  abslx::Status Process(CalculatorContext* cc) override {
+    return abslx::OkStatus();
   }
 };
 

@@ -22,7 +22,7 @@
 
 #include "absl/base/internal/raw_logging.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -78,4 +78,4 @@ ScopedSetEnv::~ScopedSetEnv() {
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

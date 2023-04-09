@@ -56,7 +56,7 @@ PYBIND11_MODULE(_tape, m) {
              std::vector<AbstractTensorHandle*> results(source_tensors.size());
              Status s = self->ComputeGradient(ctx, target_tensors,
                                               source_tensors, output_gradients,
-                                              absl::MakeSpan(results));
+                                              abslx::MakeSpan(results));
              MaybeRaiseRegisteredFromStatus(s);
              return results;
            });

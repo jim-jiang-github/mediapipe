@@ -138,18 +138,18 @@ Status AddRewritesForShape(int i, const xla::Shape& shape,
     indices = "[0]";
   } else {
     for (int dim = 0; dim < shape.dimensions_size(); ++dim) {
-      dim_vars.push_back(absl::StrCat("size_t dim", dim));
-      dim_sizes += absl::StrCat("[", shape.dimensions(dim), "]");
-      indices += absl::StrCat("[dim", dim, "]");
+      dim_vars.push_back(abslx::StrCat("size_t dim", dim));
+      dim_sizes += abslx::StrCat("[", shape.dimensions(dim), "]");
+      indices += abslx::StrCat("[dim", dim, "]");
       count *= shape.dimensions(dim);
     }
   }
-  rewrites->push_back({"{{I}}", absl::StrCat(i)});
+  rewrites->push_back({"{{I}}", abslx::StrCat(i)});
   rewrites->push_back({"{{TYPE}}", type});
-  rewrites->push_back({"{{DIM_VARS}}", absl::StrJoin(dim_vars, ", ")});
+  rewrites->push_back({"{{DIM_VARS}}", abslx::StrJoin(dim_vars, ", ")});
   rewrites->push_back({"{{DIM_SIZES}}", dim_sizes});
   rewrites->push_back({"{{INDICES}}", indices});
-  rewrites->push_back({"{{COUNT}}", absl::StrCat(count)});
+  rewrites->push_back({"{{COUNT}}", abslx::StrCat(count)});
   return OkStatus();
 }
 
@@ -163,8 +163,8 @@ Status AddRewritesForShape(int i, const xla::Shape& shape,
 // text-templating mechanism.
 string RewriteWithName(const string& name, string code,
                        const std::vector<std::pair<string, string>>& rewrites) {
-  absl::StrReplaceAll(rewrites, &code);
-  absl::StrReplaceAll({{"{{NAME}}", name}}, &code);
+  abslx::StrReplaceAll(rewrites, &code);
+  abslx::StrReplaceAll({{"{{NAME}}", name}}, &code);
   return code;
 }
 
@@ -209,7 +209,7 @@ Status GenArgMethods(const tf2xla::Config& config,
     return {{COUNT}};
   }
 )";
-    *methods += RewriteWithName(absl::StrCat(i), code, rewrites);
+    *methods += RewriteWithName(abslx::StrCat(i), code, rewrites);
     if (!config.feed(i).name().empty()) {
       *methods += RewriteWithName("_" + config.feed(i).name(), code, rewrites);
     }
@@ -226,7 +226,7 @@ Status GenResultMethods(const tf2xla::Config& config,
     return errors::Internal("codegen requires the XLA result to be a tuple");
   }
   size_t num_results = ps.result().tuple_shapes_size();
-  int readonly_variables = absl::c_count_if(
+  int readonly_variables = abslx::c_count_if(
       config.variable(),
       [](const tf2xla::Variable& var) { return var.readonly(); });
   const int actual_num_results =
@@ -263,7 +263,7 @@ Status GenResultMethods(const tf2xla::Config& config,
     return {{COUNT}};
   }
 )";
-    *methods += RewriteWithName(absl::StrCat(i), code, rewrites);
+    *methods += RewriteWithName(abslx::StrCat(i), code, rewrites);
     if (!config.fetch(i).name().empty()) {
       *methods += RewriteWithName("_" + config.fetch(i).name(), code, rewrites);
     }
@@ -381,8 +381,8 @@ std::vector<string> BufferInfosToCppExpression(
                    string encoded_second_as_str =
                        encoded.second == ~0ULL
                            ? "~0ULL"
-                           : absl::StrCat(encoded.second, "ULL");
-                   return absl::StrCat(
+                           : abslx::StrCat(encoded.second, "ULL");
+                   return abslx::StrCat(
                        "::xla::cpu_function_runtime::BufferInfo({",
                        encoded.first, "ULL, ", encoded_second_as_str, "})");
                  });
@@ -433,13 +433,13 @@ Status GenerateHeader(const CodegenOpts& opts, const tf2xla::Config& config,
   // Create rewrite strings for namespace start and end.
   string ns_start;
   for (const string& n : opts.namespaces) {
-    ns_start += absl::StrCat("namespace ", n, " {\n");
+    ns_start += abslx::StrCat("namespace ", n, " {\n");
   }
   ns_start += "\n";
   string ns_end("\n");
   for (int i = opts.namespaces.size() - 1; i >= 0; --i) {
     const string& n = opts.namespaces[i];
-    ns_end += absl::StrCat("}  // end namespace ", n, "\n");
+    ns_end += abslx::StrCat("}  // end namespace ", n, "\n");
   }
 
   // Generate metadata.
@@ -695,16 +695,16 @@ class {{CLASS}} final : public tensorflow::XlaCompiledCpuFunction {
 )";
   // The replacement strategy is naive, but good enough for our purposes.
   const std::vector<std::pair<string, string>> rewrites = {
-      {"{{ARG_BYTES_ALIGNED}}", absl::StrCat(arg_bytes_aligned)},
-      {"{{ARG_BYTES_TOTAL}}", absl::StrCat(arg_bytes_total)},
+      {"{{ARG_BYTES_ALIGNED}}", abslx::StrCat(arg_bytes_aligned)},
+      {"{{ARG_BYTES_TOTAL}}", abslx::StrCat(arg_bytes_total)},
       {"{{ARG_NAMES_CODE}}", arg_names_code},
-      {"{{ARG_NUM}}", absl::StrCat(arg_index_table.size())},
-      {"{{VARIABLE_NUM}}", absl::StrCat(config.variable_size())},
-      {"{{ARG_INDEX_TABLE}}", absl::StrJoin(arg_index_table, ", ")},
+      {"{{ARG_NUM}}", abslx::StrCat(arg_index_table.size())},
+      {"{{VARIABLE_NUM}}", abslx::StrCat(config.variable_size())},
+      {"{{ARG_INDEX_TABLE}}", abslx::StrJoin(arg_index_table, ", ")},
       {"{{ASSIGN_PROFILE_COUNTERS_SIZE}}", assign_profile_counters_size},
       {"{{CLASS}}", opts.class_name},
       {"{{DECLS_FROM_OBJ_FILE}}",
-       absl::StrJoin(metadata_result.header_variable_decls, "\n")},
+       abslx::StrJoin(metadata_result.header_variable_decls, "\n")},
       {"{{ENTRY}}", compile_result.entry_point},
       {"{{HLO_PROFILE_PRINTER_DATA_SHIM_EXPRESSION}}",
        metadata_result.hlo_profile_printer_data_access_shim},
@@ -720,25 +720,25 @@ class {{CLASS}} final : public tensorflow::XlaCompiledCpuFunction {
       {"{{PROGRAM_SHAPE_SHIM_EXPRESSION}}",
        metadata_result.program_shape_access_shim},
       {"{{VARIABLE_NAMES_CODE}}", variable_names_code},
-      {"{{RESULT_INDEX}}", absl::StrCat(result_index)},
+      {"{{RESULT_INDEX}}", abslx::StrCat(result_index)},
       {"{{RESULT_NAMES_CODE}}", result_names_code},
-      {"{{TEMP_BYTES_ALIGNED}}", absl::StrCat(temp_bytes_aligned)},
-      {"{{TEMP_BYTES_TOTAL}}", absl::StrCat(temp_bytes_total)},
-      {"{{NUM_BUFFERS}}", absl::StrCat(buffer_infos.size())},
+      {"{{TEMP_BYTES_ALIGNED}}", abslx::StrCat(temp_bytes_aligned)},
+      {"{{TEMP_BYTES_TOTAL}}", abslx::StrCat(temp_bytes_total)},
+      {"{{NUM_BUFFERS}}", abslx::StrCat(buffer_infos.size())},
       {"{{BUFFER_INFOS_AS_STRING}}",
-       absl::StrJoin(buffer_infos_as_strings, ",\n")}};
-  absl::StrReplaceAll(rewrites, header);
+       abslx::StrJoin(buffer_infos_as_strings, ",\n")}};
+  abslx::StrReplaceAll(rewrites, header);
   return OkStatus();
 }
 
 static string CreateUniqueIdentifier(const CodegenOpts& opts,
-                                     absl::string_view suffix) {
+                                     abslx::string_view suffix) {
   string result = "__tfcompile";
   for (const string& n : opts.namespaces) {
-    absl::StrAppend(&result, "_", n);
+    abslx::StrAppend(&result, "_", n);
   }
 
-  absl::StrAppend(&result, "_", opts.class_name, "_", suffix);
+  abslx::StrAppend(&result, "_", opts.class_name, "_", suffix);
   return result;
 }
 
@@ -749,7 +749,7 @@ Status GenerateMetadata(const CodegenOpts& opts,
 
   if (opts.gen_program_shape) {
     program_shape =
-        absl::make_unique<xla::ProgramShapeProto>(compile_result.program_shape);
+        abslx::make_unique<xla::ProgramShapeProto>(compile_result.program_shape);
 
     // The parameter names are currently meaningless, and redundant with the
     // rest of our metadata, so clear them out to avoid confusion and save
@@ -795,7 +795,7 @@ Status ParseCppClass(const string& cpp_class, string* class_name,
   if (cpp_class.empty()) {
     return errors::InvalidArgument("empty cpp_class: " + cpp_class);
   }
-  std::vector<string> parts = absl::StrSplit(cpp_class, "::");
+  std::vector<string> parts = abslx::StrSplit(cpp_class, "::");
   if (parts.front().empty()) {
     // Allow a fully qualified name that starts with "::".
     parts.erase(parts.begin());
@@ -814,7 +814,7 @@ Status ParseCppClass(const string& cpp_class, string* class_name,
   return OkStatus();
 }
 
-Status ValidateCppIdent(absl::string_view ident, absl::string_view msg) {
+Status ValidateCppIdent(abslx::string_view ident, abslx::string_view msg) {
   if (ident.empty()) {
     return errors::InvalidArgument("empty identifier: ", msg);
   }

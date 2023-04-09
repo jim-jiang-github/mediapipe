@@ -22,7 +22,7 @@ limitations under the License.
 
 namespace tensorflow {
 
-constexpr absl::string_view CoordinationErrorPayloadKey() {
+constexpr abslx::string_view CoordinationErrorPayloadKey() {
   return "type.googleapis.com/tensorflow.CoordinationServiceError";
 }
 

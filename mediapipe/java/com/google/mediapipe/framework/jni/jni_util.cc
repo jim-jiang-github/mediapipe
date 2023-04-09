@@ -22,7 +22,7 @@
 
 namespace {
 
-ABSL_CONST_INIT absl::Mutex g_jvm_mutex(absl::kConstInit);
+ABSL_CONST_INIT abslx::Mutex g_jvm_mutex(abslx::kConstInit);
 JavaVM* g_jvm ABSL_GUARDED_BY(g_jvm_mutex);
 
 class JvmThread {
@@ -91,7 +91,7 @@ void MakeKey() { pthread_key_create(&jvm_thread_key, ThreadExitCallback); }
 
 // Returns the global Java VM instance.
 JavaVM* GetJavaVM() {
-  absl::MutexLock lock(&g_jvm_mutex);
+  abslx::MutexLock lock(&g_jvm_mutex);
   return g_jvm;
 }
 
@@ -127,7 +127,7 @@ std::vector<std::string> JavaListToStdStringVector(JNIEnv* env, jobject from) {
   return result;
 }
 
-jthrowable CreateMediaPipeException(JNIEnv* env, absl::Status status) {
+jthrowable CreateMediaPipeException(JNIEnv* env, abslx::Status status) {
   auto& class_registry = mediapipe::android::ClassRegistry::GetInstance();
   std::string mpe_class_name = class_registry.GetClassName(
       mediapipe::android::ClassRegistry::kMediaPipeExceptionClassName);
@@ -149,7 +149,7 @@ jthrowable CreateMediaPipeException(JNIEnv* env, absl::Status status) {
   return result;
 }
 
-bool ThrowIfError(JNIEnv* env, absl::Status status) {
+bool ThrowIfError(JNIEnv* env, abslx::Status status) {
   if (!status.ok()) {
     env->Throw(mediapipe::android::CreateMediaPipeException(env, status));
     return true;
@@ -179,12 +179,12 @@ SerializedMessageIds::SerializedMessageIds(JNIEnv* env, jobject data) {
 namespace java {
 
 bool HasJavaVM() {
-  absl::MutexLock lock(&g_jvm_mutex);
+  abslx::MutexLock lock(&g_jvm_mutex);
   return g_jvm != nullptr;
 }
 
 bool SetJavaVM(JNIEnv* env) {
-  absl::MutexLock lock(&g_jvm_mutex);
+  abslx::MutexLock lock(&g_jvm_mutex);
   if (!g_jvm) {
     if (env->GetJavaVM(&g_jvm) != JNI_OK) {
       LOG(ERROR) << "Can not get the Java VM instance!";

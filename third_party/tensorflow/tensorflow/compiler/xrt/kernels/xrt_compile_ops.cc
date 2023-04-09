@@ -110,11 +110,11 @@ class XRTCompileOp : public OpKernel {
 Status CompilationCacheKey(const xrt::XLAComputation& computation,
                            string* key) {
   const size_t size = computation.ByteSizeLong();
-  auto serialized = absl::make_unique<char[]>(size);
+  auto serialized = abslx::make_unique<char[]>(size);
   TF_RET_CHECK(
       SerializeToBufferDeterministic(computation, serialized.get(), size));
-  uint64 fingerprint = Fingerprint64(absl::string_view(serialized.get(), size));
-  *key = absl::StrCat(fingerprint);
+  uint64 fingerprint = Fingerprint64(abslx::string_view(serialized.get(), size));
+  *key = abslx::StrCat(fingerprint);
   return OkStatus();
 }
 

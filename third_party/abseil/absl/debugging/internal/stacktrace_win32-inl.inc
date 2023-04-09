@@ -80,7 +80,7 @@ static int UnwindImpl(void** result, int* sizes, int max_depth, int skip_count,
   return n;
 }
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace debugging_internal {
 bool StackTraceWorksForTest() {
@@ -88,6 +88,6 @@ bool StackTraceWorksForTest() {
 }
 }  // namespace debugging_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_DEBUGGING_INTERNAL_STACKTRACE_WIN32_INL_H_

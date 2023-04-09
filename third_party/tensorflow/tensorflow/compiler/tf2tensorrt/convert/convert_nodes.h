@@ -173,7 +173,7 @@ Status ConvertGraphDefToEngine(
     TRTInt8Calibrator* calibrator,
     TrtUniquePtrType<nvinfer1::ICudaEngine>* engine, bool use_calibration,
     const bool use_implicit_batch, bool* convert_successfully,
-    TrtShapeOptimizationProfile* profiles, absl::string_view engine_name,
+    TrtShapeOptimizationProfile* profiles, abslx::string_view engine_name,
     bool use_explicit_precision,
     tensorflow::grappler::Cluster* cluster = nullptr);
 
@@ -259,7 +259,7 @@ class Converter {
   static StatusOr<std::unique_ptr<Converter>> Create(
       TrtPrecisionMode precision_mode, bool use_calibration,
       nvinfer1::ILogger* trt_logger, const bool use_implicit_batch,
-      absl::string_view engine_name, bool use_explicit_precision = false,
+      abslx::string_view engine_name, bool use_explicit_precision = false,
       OpKernelContext* ctx = nullptr);
 
   //////////////////////////////////////////////////////////////////////////////
@@ -328,7 +328,7 @@ class Converter {
                          const std::vector<int>& order_with_batch_dim,
                          ITensorProxyPtr* output_tensor,
                          const NodeDef& node_def,
-                         absl::string_view sub_op_name = "");
+                         abslx::string_view sub_op_name = "");
 
   // Reshapes a dynamic shape tensor by removing or adding dimensions of size 1,
   // and/or permuting the dimensions. The new shape is derived from the shape of
@@ -403,12 +403,12 @@ class Converter {
 
   // Constructs a name and passed it to the TensorRT layer to support xprof.
   void SetLayerName(nvinfer1::ILayer* layer, const NodeDef& node_def,
-                    absl::string_view sub_op_name = "",
+                    abslx::string_view sub_op_name = "",
                     std::optional<int> sub_op_instance = std::nullopt,
                     std::optional<std::string> origin_node_name = std::nullopt);
 
-  void SetLayerName(nvinfer1::ILayer* layer, absl::string_view main_op_name,
-                    absl::string_view sub_op_name,
+  void SetLayerName(nvinfer1::ILayer* layer, abslx::string_view main_op_name,
+                    abslx::string_view sub_op_name,
                     std::optional<int> sub_op_instance = std::nullopt);
 
   std::unordered_map<string, TRT_TensorOrWeights>& TensorsMap() {
@@ -420,7 +420,7 @@ class Converter {
  private:
   Converter(TrtPrecisionMode precision_mode, bool use_calibration,
             nvinfer1::ILogger* trt_logger, const bool use_implicit_batch,
-            absl::string_view engine_name, bool use_explicit_precision,
+            abslx::string_view engine_name, bool use_explicit_precision,
             OpKernelContext* ctx);
 
   Status Init(nvinfer1::ILogger* trt_logger);
@@ -482,7 +482,7 @@ class Converter {
   int next_constant_layer_id_ = 0;
 
   // The name of the TRTEngineOp node.
-  absl::string_view engine_name_;
+  abslx::string_view engine_name_;
 
   // Indicates whether to use explicit precision in TensorRT (Q/DQ support).
   bool use_explicit_precision_;
@@ -542,9 +542,9 @@ const BinaryOperationMapType* BinaryOperationMap();
 const BinaryOperationMapType* BinaryBooleanOperationMap();
 
 template <typename T>
-absl::InlinedVector<std::string, 10> GetOperationNames(const T& set) {
-  absl::InlinedVector<std::string, 10> result;
-  absl::c_transform(set, std::back_inserter(result),
+abslx::InlinedVector<std::string, 10> GetOperationNames(const T& set) {
+  abslx::InlinedVector<std::string, 10> result;
+  abslx::c_transform(set, std::back_inserter(result),
                     [](const auto x) { return x.first; });
   return result;
 }

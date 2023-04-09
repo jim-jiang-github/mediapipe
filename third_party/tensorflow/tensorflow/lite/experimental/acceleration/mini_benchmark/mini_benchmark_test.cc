@@ -111,11 +111,11 @@ class MiniBenchmarkTest : public ::testing::Test {
   }
 
   void WaitForValidationCompletion(
-      absl::Duration timeout = absl::Seconds(300)) {
-    absl::Time deadline = absl::Now() + timeout;
-    while (absl::Now() < deadline) {
+      abslx::Duration timeout = abslx::Seconds(300)) {
+    abslx::Time deadline = abslx::Now() + timeout;
+    while (abslx::Now() < deadline) {
       if (mb_->NumRemainingAccelerationTests() == 0) return;
-      absl::SleepFor(absl::Milliseconds(200));
+      abslx::SleepFor(abslx::Milliseconds(200));
     }
 
     // We reach here only when the timeout has been reached w/o validation

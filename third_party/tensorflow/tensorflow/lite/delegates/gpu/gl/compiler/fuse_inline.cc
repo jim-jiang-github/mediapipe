@@ -57,14 +57,14 @@ TransformResult FuseAutoOutputWithInline::ApplyToNodesSequence(
   }
 
   // Check if the code was not fused yet, and wrap source code into {}.
-  if (!absl::StrContains(node1->operation.type, '+')) {
+  if (!abslx::StrContains(node1->operation.type, '+')) {
     attr1.code.source_code =
-        absl::StrCat("\n{\n", attr1.code.source_code, "\n}\n");
+        abslx::StrCat("\n{\n", attr1.code.source_code, "\n}\n");
   }
   if (!MergeCode(&attr2, &attr1).ok()) {
     return {TransformStatus::INVALID, "Unable to merge two nodes"};
   }
-  absl::StrAppend(&attr1.code.source_code, "{\n", attr2.code.source_code,
+  abslx::StrAppend(&attr1.code.source_code, "{\n", attr2.code.source_code,
                   "\n}");
   node1->operation.type += "+" + node2->operation.type;
 

@@ -36,7 +36,7 @@ class CalibrationReader {
 
   // Gets a map from tensor index to recorded calibration values.
   virtual TfLiteStatus GetTensorStatsAsMap(
-      absl::flat_hash_map<std::tuple<int, int>, CalibrationStats>*
+      abslx::flat_hash_map<std::tuple<int, int>, CalibrationStats>*
           tensor_id_to_stats_map) const;
 
   // Annotates the tensors in the given model with statistics captured during

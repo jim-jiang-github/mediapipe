@@ -29,7 +29,7 @@ int64_t ShapeSize(const Shape& shape) {
 using GpuHloCostAnalysisTest = HloTestBase;
 
 TEST_F(GpuHloCostAnalysisTest, ConvCustomCall) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module, is_scheduled=true
 
 ENTRY entry {

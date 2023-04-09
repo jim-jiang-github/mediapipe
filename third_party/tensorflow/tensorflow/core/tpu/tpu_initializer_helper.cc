@@ -72,7 +72,7 @@ bool GetEnvBool(const char* name, bool defval) {
     return false;
   }
   int int_env;
-  bool has_int = absl::SimpleAtoi(env, &int_env);
+  bool has_int = abslx::SimpleAtoi(env, &int_env);
   return has_int && int_env != 0;
 }
 
@@ -81,7 +81,7 @@ bool GetEnvBool(const char* name, bool defval) {
 // This function gets pid of a process and checks if that process is using tpu.
 // It is not able to check processes that are owned by another user.
 bool IsTpuUsed(int64_t pid) {
-  std::string path = absl::StrCat("/proc/", pid, "/fd");
+  std::string path = abslx::StrCat("/proc/", pid, "/fd");
   DIR* raw_fd_dir = opendir(path.c_str());
   if (!raw_fd_dir) {
     return false;
@@ -94,7 +94,7 @@ bool IsTpuUsed(int64_t pid) {
   while ((ent = readdir(raw_fd_dir))) {
     if (!isdigit(*ent->d_name)) continue;
     int64_t fd = strtol(ent->d_name, nullptr, 10);
-    path = absl::StrCat("/proc/", pid, "/fd/", fd);
+    path = abslx::StrCat("/proc/", pid, "/fd/", fd);
     if (!readlink(path.c_str(), &line[0], line.size())) continue;
     if (line != tpu_dev_path) continue;
     return true;
@@ -128,10 +128,10 @@ StatusOr<int64_t> FindLibtpuProcess() {
 }
 
 Status TryAcquireTpuLock() {
-  static absl::Mutex* mu = new absl::Mutex();
-  absl::MutexLock l(mu);
+  static abslx::Mutex* mu = new abslx::Mutex();
+  abslx::MutexLock l(mu);
 
-  // TODO(skyewm): use `absl::StrCat(getenv(name))` once we build with the
+  // TODO(skyewm): use `abslx::StrCat(getenv(name))` once we build with the
   // fix for https://github.com/abseil/abseil-cpp/issues/1167.
   std::string load_library_override;
   const char* env_value = getenv("TPU_LOAD_LIBRARY");
@@ -169,7 +169,7 @@ Status TryAcquireTpuLock() {
     if (lockf(fd, F_TLOCK, 0) != 0) {
       auto pid = FindLibtpuProcess();
       if (pid.ok()) {
-        return errors::Aborted(absl::StrCat(
+        return errors::Aborted(abslx::StrCat(
             "libtpu.so is already in use by process with pid ",
             pid.ValueOrDie(),
             ". Not attempting to load libtpu.so in this process."));
@@ -224,7 +224,7 @@ void* CreateGcsFilesystemFn() {
 // This is a temporary fix for including GCS file system on TPU builds.
 // Will be removed once b/176954917 is fully resolved with the build fix.
 void InitializeCreateGcsFileSystemFnPtr() {
-  int fd = shm_open(absl::StrCat("/tmp_tf_gcs_fs_pointer_", getpid()).data(),
+  int fd = shm_open(abslx::StrCat("/tmp_tf_gcs_fs_pointer_", getpid()).data(),
                     O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
   if (fd == -1) {
     LOG(ERROR) << "Unable to open shared memory for GCS file system creator.";
@@ -251,7 +251,7 @@ void InitializeCreateGcsFileSystemFnPtr() {
 
   // Clean up shared memory on a clean exit.
   atexit([]() {
-    shm_unlink(absl::StrCat("/tmp_tf_gcs_fs_pointer_", getpid()).data());
+    shm_unlink(abslx::StrCat("/tmp_tf_gcs_fs_pointer_", getpid()).data());
   });
 }
 }  // namespace
@@ -312,7 +312,7 @@ GetLibTpuInitArguments() {
   char* env = getenv("LIBTPU_INIT_ARGS");
   if (env != nullptr) {
     // TODO(frankchn): Handles quotes properly if necessary.
-    args = absl::StrSplit(env, ' ');
+    args = abslx::StrSplit(env, ' ');
   }
 
   arg_ptrs.reserve(args.size());

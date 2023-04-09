@@ -236,8 +236,8 @@ void TestAllocatingOp(const F& f) {
 TEST(ThrowingValueTest, ThrowingAllocatingOps) {
   // make_unique calls unqualified operator new, so these exercise the
   // ThrowingValue overloads.
-  TestAllocatingOp([]() { return absl::make_unique<ThrowingValue<>>(1); });
-  TestAllocatingOp([]() { return absl::make_unique<ThrowingValue<>[]>(2); });
+  TestAllocatingOp([]() { return abslx::make_unique<ThrowingValue<>>(1); });
+  TestAllocatingOp([]() { return abslx::make_unique<ThrowingValue<>[]>(2); });
 }
 
 TEST(ThrowingValueTest, NonThrowingMoveCtor) {
@@ -515,7 +515,7 @@ struct NullaryTestValidator : public std::false_type {};
 template <typename TesterInstance>
 struct NullaryTestValidator<
     TesterInstance,
-    absl::void_t<decltype(std::declval<TesterInstance>().Test())>>
+    abslx::void_t<decltype(std::declval<TesterInstance>().Test())>>
     : public std::true_type {};
 
 template <typename TesterInstance>
@@ -531,7 +531,7 @@ struct UnaryTestValidator : public std::false_type {};
 template <typename TesterInstance>
 struct UnaryTestValidator<
     TesterInstance,
-    absl::void_t<decltype(std::declval<TesterInstance>().Test(DummyOp))>>
+    abslx::void_t<decltype(std::declval<TesterInstance>().Test(DummyOp))>>
     : public std::true_type {};
 
 template <typename TesterInstance>
@@ -543,7 +543,7 @@ TEST(ExceptionSafetyTesterTest, IncompleteTypesAreNotTestable) {
   using T = exceptions_internal::UninitializedT;
   auto op = [](T* t) {};
   auto inv = [](T*) { return testing::AssertionSuccess(); };
-  auto fac = []() { return absl::make_unique<T>(); };
+  auto fac = []() { return abslx::make_unique<T>(); };
 
   // Test that providing operation and inveriants still does not allow for the
   // the invocation of .Test() and .Test(op) because it lacks a factory
@@ -572,7 +572,7 @@ TEST(ExceptionSafetyTesterTest, IncompleteTypesAreNotTestable) {
 struct ExampleStruct {};
 
 std::unique_ptr<ExampleStruct> ExampleFunctionFactory() {
-  return absl::make_unique<ExampleStruct>();
+  return abslx::make_unique<ExampleStruct>();
 }
 
 void ExampleFunctionOperation(ExampleStruct*) {}
@@ -790,7 +790,7 @@ struct NonCopyable : public NonNegative {
 };
 
 TEST(ExceptionCheckTest, NonCopyable) {
-  auto factory = []() { return absl::make_unique<NonCopyable>(); };
+  auto factory = []() { return abslx::make_unique<NonCopyable>(); };
   EXPECT_TRUE(tester.WithFactory(factory).Test());
   EXPECT_TRUE(strong_tester.WithFactory(factory).Test());
 }
@@ -943,8 +943,8 @@ TEST(ThrowingValueTraitsTest, RelationalOperators) {
 }
 
 TEST(ThrowingAllocatorTraitsTest, Assignablility) {
-  EXPECT_TRUE(absl::is_move_assignable<ThrowingAllocator<int>>::value);
-  EXPECT_TRUE(absl::is_copy_assignable<ThrowingAllocator<int>>::value);
+  EXPECT_TRUE(abslx::is_move_assignable<ThrowingAllocator<int>>::value);
+  EXPECT_TRUE(abslx::is_copy_assignable<ThrowingAllocator<int>>::value);
   EXPECT_TRUE(std::is_nothrow_move_assignable<ThrowingAllocator<int>>::value);
   EXPECT_TRUE(std::is_nothrow_copy_assignable<ThrowingAllocator<int>>::value);
 }

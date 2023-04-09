@@ -717,7 +717,7 @@ TEST(TFCompileTest, HloProfiling) {
   VLOG(1) << "Stripped HLO profile string:\n" << hlo_profile_as_string;
 
   std::vector<string> hlo_profile_lines =
-      absl::StrSplit(hlo_profile_as_string, '\n');
+      abslx::StrSplit(hlo_profile_as_string, '\n');
 
   auto header = HasSubstr("Execution profile for");
   auto total_cycles_profile_line = HasSubstr("[total]");

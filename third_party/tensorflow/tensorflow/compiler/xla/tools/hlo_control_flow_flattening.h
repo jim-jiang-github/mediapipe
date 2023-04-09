@@ -54,11 +54,11 @@ class HloControlFlowFlattening : public HloModulePass {
         remove_host_transfer_(options.remove_host_transfer),
         remove_comm_(options.remove_comm) {}
   ~HloControlFlowFlattening() override = default;
-  absl::string_view name() const override { return "control-flow-flattening"; }
+  abslx::string_view name() const override { return "control-flow-flattening"; }
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   // Replaces an infeed with a custom call.
@@ -75,11 +75,11 @@ class HloControlFlowFlattening : public HloModulePass {
   // Removes send and send-done with a custom call.
   Status RemoveSendDone(
       HloInstruction* send_done,
-      absl::flat_hash_set<HloInstruction*>* additional_removed) const;
+      abslx::flat_hash_set<HloInstruction*>* additional_removed) const;
   // Removes recv and recv-done with a custom call.
   Status RemoveRecvDone(
       HloInstruction* recv_done,
-      absl::flat_hash_set<HloInstruction*>* additional_removed) const;
+      abslx::flat_hash_set<HloInstruction*>* additional_removed) const;
 
   int while_execution_count_;
   int max_outer_loop_count_;

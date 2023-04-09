@@ -26,9 +26,9 @@ limitations under the License.
 
 namespace xla {
 
-XlaOp DynamicStridedSlice(XlaOp input, absl::Span<const XlaOp> base_indices,
-                          absl::Span<const int64_t> window_sizes,
-                          absl::Span<const int64_t> strides) {
+XlaOp DynamicStridedSlice(XlaOp input, abslx::Span<const XlaOp> base_indices,
+                          abslx::Span<const int64_t> window_sizes,
+                          abslx::Span<const int64_t> strides) {
   XlaOp sliced_input = DynamicSlice(input, base_indices, window_sizes);
   if (std::any_of(strides.begin(), strides.end(),
                   [](int64_t stride) { return stride != 1; })) {
@@ -39,8 +39,8 @@ XlaOp DynamicStridedSlice(XlaOp input, absl::Span<const XlaOp> base_indices,
   return sliced_input;
 }
 
-XlaOp SliceInMinorDims(XlaOp x, absl::Span<const int64_t> start,
-                       absl::Span<const int64_t> end) {
+XlaOp SliceInMinorDims(XlaOp x, abslx::Span<const int64_t> start,
+                       abslx::Span<const int64_t> end) {
   XlaBuilder* builder = x.builder();
   return builder->ReportErrorOrReturn([&]() -> StatusOr<XlaOp> {
     TF_RET_CHECK(start.size() == end.size());
@@ -69,7 +69,7 @@ XlaOp SliceInMinorDims(XlaOp x, absl::Span<const int64_t> start,
   });
 }
 
-XlaOp UpdateSlice(XlaOp x, XlaOp update, absl::Span<const int64_t> start) {
+XlaOp UpdateSlice(XlaOp x, XlaOp update, abslx::Span<const int64_t> start) {
   XlaBuilder* builder = x.builder();
   return builder->ReportErrorOrReturn([&]() -> StatusOr<XlaOp> {
     TF_ASSIGN_OR_RETURN(Shape shape, builder->GetShape(x));
@@ -89,7 +89,7 @@ XlaOp UpdateSlice(XlaOp x, XlaOp update, absl::Span<const int64_t> start) {
 }
 
 XlaOp UpdateSliceInMinorDims(XlaOp x, XlaOp update,
-                             absl::Span<const int64_t> start) {
+                             abslx::Span<const int64_t> start) {
   XlaBuilder* builder = x.builder();
   return builder->ReportErrorOrReturn([&]() -> StatusOr<XlaOp> {
     TF_ASSIGN_OR_RETURN(Shape shape, builder->GetShape(x));
@@ -105,8 +105,8 @@ XlaOp UpdateSliceInMinorDims(XlaOp x, XlaOp update,
 
 namespace {
 
-std::vector<int64_t> ConcatVectors(absl::Span<const int64_t> xs,
-                                   absl::Span<const int64_t> ys) {
+std::vector<int64_t> ConcatVectors(abslx::Span<const int64_t> xs,
+                                   abslx::Span<const int64_t> ys) {
   std::vector<int64_t> output(xs.size() + ys.size());
   std::copy(xs.begin(), xs.end(), output.begin());
   std::copy(ys.begin(), ys.end(), output.begin() + xs.size());
@@ -114,7 +114,7 @@ std::vector<int64_t> ConcatVectors(absl::Span<const int64_t> xs,
 }
 
 StatusOr<std::vector<XlaOp>> PrependZerosInMajorDims(
-    XlaOp x, absl::Span<const XlaOp> starts) {
+    XlaOp x, abslx::Span<const XlaOp> starts) {
   XlaBuilder* builder = x.builder();
   TF_ASSIGN_OR_RETURN(Shape shape, builder->GetShape(x));
   const int64_t n_dims = shape.rank();
@@ -128,8 +128,8 @@ StatusOr<std::vector<XlaOp>> PrependZerosInMajorDims(
 
 }  // namespace
 
-XlaOp DynamicSliceInMinorDims(XlaOp x, absl::Span<const XlaOp> starts,
-                              absl::Span<const int64_t> sizes) {
+XlaOp DynamicSliceInMinorDims(XlaOp x, abslx::Span<const XlaOp> starts,
+                              abslx::Span<const int64_t> sizes) {
   XlaBuilder* builder = x.builder();
   return builder->ReportErrorOrReturn([&]() -> StatusOr<XlaOp> {
     TF_ASSIGN_OR_RETURN(Shape shape, builder->GetShape(x));
@@ -147,7 +147,7 @@ XlaOp DynamicSliceInMinorDims(XlaOp x, absl::Span<const XlaOp> starts,
 }
 
 XlaOp DynamicUpdateSliceInMinorDims(XlaOp x, XlaOp update,
-                                    absl::Span<const XlaOp> starts) {
+                                    abslx::Span<const XlaOp> starts) {
   XlaBuilder* builder = x.builder();
   return builder->ReportErrorOrReturn([&]() -> StatusOr<XlaOp> {
     TF_ASSIGN_OR_RETURN(auto padded_starts, PrependZerosInMajorDims(x, starts));

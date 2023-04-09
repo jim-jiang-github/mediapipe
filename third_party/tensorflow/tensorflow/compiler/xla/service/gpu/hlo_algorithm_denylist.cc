@@ -49,12 +49,12 @@ constexpr char kDefaultDenylist[] = R"pb(
   }
 )pb";
 
-absl::Span<const stream_executor::dnn::AlgorithmDesc> GetDisabledConvAlgorithms(
+abslx::Span<const stream_executor::dnn::AlgorithmDesc> GetDisabledConvAlgorithms(
     tensorflow::ComputeCapability cc, tensorflow::CudnnVersion cudnn_version,
     const std::string& blas_version, const std::string& hlo) {
   // Key is the tuple of canonicalized hlo, compute capability major/minor,
   // cudnn version major/minor/patch, blas version.
-  using MapType = absl::flat_hash_map<
+  using MapType = abslx::flat_hash_map<
       std::tuple<std::string, int, int, int, int, int, std::string>,
       std::vector<stream_executor::dnn::AlgorithmDesc>>;
 

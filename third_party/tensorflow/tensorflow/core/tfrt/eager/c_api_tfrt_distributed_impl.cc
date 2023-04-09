@@ -39,7 +39,7 @@ constexpr char kRemotePrefix[] = "remote_";
 
 std::string GetTensorFlowDeviceType(string_view name) {
   int pos = name.find(kRemotePrefix);
-  return absl::AsciiStrToUpper(
+  return abslx::AsciiStrToUpper(
       pos == 0 ? name.substr(strlen(kRemotePrefix)).str() : name.str());
 }
 
@@ -126,7 +126,7 @@ tensorflow::Status DistributedManagerContextImpl::SetOrUpdateServerDef(
   // blocking call to be consistent with the behavior of current TF.
   const DistributedInitHelper* init_helper =
       server_context_->GetDistributedInitHelper();
-  absl::Notification n;
+  abslx::Notification n;
   init_helper->InitializeSingleClientDistributedContext(
       std::move(dist_config),
       [&n, this](Expected<DistributedContext*> expected) mutable {
@@ -165,7 +165,7 @@ tensorflow::Status DistributedManagerContextImpl::EnableCollectiveOps(
 
   DistributedInitHelper* init_helper =
       server_context_->GetDistributedInitHelper();
-  absl::Notification n;
+  abslx::Notification n;
   init_helper->InitializeMultiClientDistributedContext(
       std::move(dist_config),
       [&n, this](Expected<DistributedContext*> expected) mutable {

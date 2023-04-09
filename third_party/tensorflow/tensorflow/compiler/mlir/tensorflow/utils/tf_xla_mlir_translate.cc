@@ -97,7 +97,7 @@ mlir::LogicalResult PrintHloModuleText(
 
   if (!compilation_result.input_mapping.empty())
     output << "// InputMapping {"
-           << absl::StrJoin(compilation_result.input_mapping, ", ") << "}\n";
+           << abslx::StrJoin(compilation_result.input_mapping, ", ") << "}\n";
 
   for (const auto& xla_input_shape : compilation_result.xla_input_shapes)
     output << "// XlaInputShape " << xla_input_shape.ToString() << '\n';
@@ -108,7 +108,7 @@ mlir::LogicalResult PrintHloModuleText(
   for (const auto& xla_output_description : compilation_result.outputs) {
     output << "// XlaOutputDescription type="
            << DataTypeString(xla_output_description.type) << " shape=("
-           << absl::StrJoin(xla_output_description.shape.dim_sizes(), ", ")
+           << abslx::StrJoin(xla_output_description.shape.dim_sizes(), ", ")
            << ')';
     if (xla_output_description.input_index >= 0)
       output << " input_index=" << xla_output_description.input_index;
@@ -120,7 +120,7 @@ mlir::LogicalResult PrintHloModuleText(
   for (const auto& resource_update : compilation_result.resource_updates) {
     output << "// ResourceUpdate input_index=" << resource_update.input_index
            << " type=" << DataTypeString(resource_update.type) << " shape=("
-           << absl::StrJoin(resource_update.shape.dim_sizes(), " ") << ')';
+           << abslx::StrJoin(resource_update.shape.dim_sizes(), " ") << ')';
     if (resource_update.modified) output << " modified";
     output << '\n';
   }
@@ -129,7 +129,7 @@ mlir::LogicalResult PrintHloModuleText(
 }
 
 Status ParseArgumentShapes(
-    absl::string_view input_shapes_str,
+    abslx::string_view input_shapes_str,
     llvm::SmallVectorImpl<TensorOrResourceShape>& arg_shapes) {
   arg_shapes.clear();
   std::vector<llvm::Optional<std::vector<int>>> input_shapes_vector;
@@ -148,7 +148,7 @@ Status ParseArgumentShapes(
   return OkStatus();
 }
 
-Status ParseDataTypes(absl::string_view data_types_str,
+Status ParseDataTypes(abslx::string_view data_types_str,
                       llvm::SmallVectorImpl<DataType>& data_types) {
   data_types.clear();
   std::vector<std::string> input_dtypes_vector;
@@ -172,13 +172,13 @@ Status ParseDataTypes(absl::string_view data_types_str,
 }
 
 Status ParseArgumentKinds(
-    absl::string_view input_types_str,
+    abslx::string_view input_types_str,
     llvm::SmallVectorImpl<XlaArgument::Kind>& argument_kinds) {
   argument_kinds.clear();
   if (input_types_str.empty()) return OkStatus();
 
-  std::vector<absl::string_view> argument_kind_strs =
-      absl::StrSplit(input_types_str, ',');
+  std::vector<abslx::string_view> argument_kind_strs =
+      abslx::StrSplit(input_types_str, ',');
   argument_kinds.reserve(argument_kind_strs.size());
   for (const auto& argument_kind_str : llvm::enumerate(argument_kind_strs)) {
     const auto& value = argument_kind_str.value();
@@ -196,9 +196,9 @@ Status ParseArgumentKinds(
   return OkStatus();
 }
 
-Status ParseXlaArguments(absl::string_view input_shapes_str,
-                         absl::string_view input_dtypes_str,
-                         absl::string_view arg_kinds_str,
+Status ParseXlaArguments(abslx::string_view input_shapes_str,
+                         abslx::string_view input_dtypes_str,
+                         abslx::string_view arg_kinds_str,
                          llvm::SmallVectorImpl<XlaArgument>& xla_arguments) {
   xla_arguments.clear();
   std::vector<llvm::Optional<std::vector<int>>> input_shapes_vector;
@@ -271,7 +271,7 @@ Status CompileMlirToXlaHloViaBuilder(
     auto num = arg.getArgNumber();
     xla::Shape shape = xla::TypeToShape(arg.getType());
     xla::XlaOp argop =
-        xla::Parameter(&builder, num, shape, absl::StrCat("Arg_", num));
+        xla::Parameter(&builder, num, shape, abslx::StrCat("Arg_", num));
     xla_params.push_back(argop);
   }
 

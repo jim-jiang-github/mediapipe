@@ -31,14 +31,14 @@ namespace profiler {
 
 // An argument passed to TraceMeEncode.
 struct TraceMeArg {
-  // This constructor is required because absl::AlphaNum is non-copyable.
+  // This constructor is required because abslx::AlphaNum is non-copyable.
   template <typename Value>
-  TraceMeArg(absl::string_view k, Value v) : key(k), value(v) {}
+  TraceMeArg(abslx::string_view k, Value v) : key(k), value(v) {}
 
   TF_DISALLOW_COPY_AND_ASSIGN(TraceMeArg);
 
-  absl::string_view key;
-  absl::AlphaNum value;
+  abslx::string_view key;
+  abslx::AlphaNum value;
 };
 
 namespace traceme_internal {
@@ -47,8 +47,8 @@ namespace traceme_internal {
 // Returns the address after the copy.
 // REQUIRED: The address range [out, out + str.size()] must have been allocated.
 TF_ATTRIBUTE_ALWAYS_INLINE inline char* Append(char* out,
-                                               absl::string_view str) {
-  DCHECK(!absl::StrContains(str, '#'))
+                                               abslx::string_view str) {
+  DCHECK(!abslx::StrContains(str, '#'))
       << "'#' is not a valid character in TraceMeEncode";
   const size_t str_size = str.size();
   if (TF_PREDICT_TRUE(str_size > 0)) {
@@ -85,7 +85,7 @@ TF_ATTRIBUTE_ALWAYS_INLINE inline std::string AppendArgs(
 
 // Appends new_metadata to the metadata part of name.
 TF_ATTRIBUTE_ALWAYS_INLINE inline void AppendMetadata(
-    std::string* name, absl::string_view new_metadata) {
+    std::string* name, abslx::string_view new_metadata) {
   if (!TF_PREDICT_FALSE(new_metadata.empty())) {
     if (!name->empty() && name->back() == '#') {  // name already has metadata
       name->back() = ',';
@@ -110,7 +110,7 @@ TF_ATTRIBUTE_ALWAYS_INLINE inline std::string TraceMeEncode(
   return traceme_internal::AppendArgs(std::move(name), args);
 }
 TF_ATTRIBUTE_ALWAYS_INLINE inline std::string TraceMeEncode(
-    absl::string_view name, std::initializer_list<TraceMeArg> args) {
+    abslx::string_view name, std::initializer_list<TraceMeArg> args) {
   return traceme_internal::AppendArgs(std::string(name), args);
 }
 TF_ATTRIBUTE_ALWAYS_INLINE inline std::string TraceMeEncode(
@@ -133,30 +133,30 @@ TF_ATTRIBUTE_ALWAYS_INLINE inline std::string TraceMeEncode(
 
 // Concatenates op_name and op_type.
 TF_ATTRIBUTE_ALWAYS_INLINE inline std::string TraceMeOp(
-    absl::string_view op_name, absl::string_view op_type) {
-  return absl::StrCat(op_name, ":", op_type);
+    abslx::string_view op_name, abslx::string_view op_type) {
+  return abslx::StrCat(op_name, ":", op_type);
 }
 
 TF_ATTRIBUTE_ALWAYS_INLINE inline std::string TraceMeOp(const char* op_name,
                                                         const char* op_type) {
-  return absl::StrCat(op_name, ":", op_type);
+  return abslx::StrCat(op_name, ":", op_type);
 }
 
 TF_ATTRIBUTE_ALWAYS_INLINE inline std::string TraceMeOp(
-    std::string&& op_name, absl::string_view op_type) {
-  absl::StrAppend(&op_name, ":", op_type);
+    std::string&& op_name, abslx::string_view op_type) {
+  abslx::StrAppend(&op_name, ":", op_type);
   return op_name;
 }
 
 // Concatenates op_name and op_type.
 TF_ATTRIBUTE_ALWAYS_INLINE inline std::string TraceMeOpOverride(
-    absl::string_view op_name, absl::string_view op_type) {
-  return absl::StrCat("#tf_op=", op_name, ":", op_type, "#");
+    abslx::string_view op_name, abslx::string_view op_type) {
+  return abslx::StrCat("#tf_op=", op_name, ":", op_type, "#");
 }
 
 TF_ATTRIBUTE_ALWAYS_INLINE inline std::string TraceMeOpOverride(
     const char* op_name, const char* op_type) {
-  return absl::StrCat("#tf_op=", op_name, ":", op_type, "#");
+  return abslx::StrCat("#tf_op=", op_name, ":", op_type, "#");
 }
 
 }  // namespace profiler

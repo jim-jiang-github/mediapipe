@@ -273,12 +273,12 @@ class HloModuleConfig {
     return &fusion_config_;
   }
 
-  const absl::flat_hash_map<std::string, std::vector<int64_t>>& dot_config()
+  const abslx::flat_hash_map<std::string, std::vector<int64_t>>& dot_config()
       const {
     return dot_config_;
   }
 
-  absl::flat_hash_map<std::string, std::vector<int64_t>>* mutable_dot_config() {
+  abslx::flat_hash_map<std::string, std::vector<int64_t>>* mutable_dot_config() {
     return &dot_config_;
   }
 
@@ -298,11 +298,11 @@ class HloModuleConfig {
     return &phase_ordering_config_;
   }
 
-  const absl::flat_hash_map<std::string, std::string>& flag_config() const {
+  const abslx::flat_hash_map<std::string, std::string>& flag_config() const {
     return flag_config_;
   }
 
-  absl::flat_hash_map<std::string, std::string>* mutable_flag_config() {
+  abslx::flat_hash_map<std::string, std::string>* mutable_flag_config() {
     return &flag_config_;
   }
 
@@ -326,7 +326,7 @@ class HloModuleConfig {
     return &memory_space_assignment_config_;
   }
 
-  int64_t GetAnalysisAllowance(absl::string_view pass_name) const {
+  int64_t GetAnalysisAllowance(abslx::string_view pass_name) const {
     auto it = analysis_allowance_map_.find(pass_name);
     if (it == analysis_allowance_map_.end()) {
       return -1;
@@ -334,7 +334,7 @@ class HloModuleConfig {
     return (*it).second;
   }
 
-  void SetAnalysisAllowance(absl::string_view pass_name, int64_t allowance) {
+  void SetAnalysisAllowance(abslx::string_view pass_name, int64_t allowance) {
     analysis_allowance_map_[pass_name] = allowance;
   }
 
@@ -411,7 +411,7 @@ class HloModuleConfig {
 
   // Custom dot canonicalization configuration, where dot_config_[v] control
   // how to convert dot operation named 'v' to convolution.
-  absl::flat_hash_map<std::string, std::vector<int64_t>> dot_config_;
+  abslx::flat_hash_map<std::string, std::vector<int64_t>> dot_config_;
 
   // Layout configuration, where layout_config_[v][i] controls the layout
   // decision i of operation v.
@@ -434,7 +434,7 @@ class HloModuleConfig {
 
   // Flag configuration to use instead of global flags. This allows multiple
   // HLO modules to be compiled in parallel with different flag values.
-  absl::flat_hash_map<std::string, std::string> flag_config_;
+  abslx::flat_hash_map<std::string, std::string> flag_config_;
 
   // Allows sharding propagation to propagate to the outputs. This changes the
   // output shape of the computation (which is undesirable), but it can be used
@@ -447,7 +447,7 @@ class HloModuleConfig {
 
   // Each Hlo analysis is allowed at least a constant number of
   // abstract cost units, before it is considered for early termination.
-  absl::flat_hash_map<absl::string_view, int64_t> analysis_allowance_map_;
+  abslx::flat_hash_map<abslx::string_view, int64_t> analysis_allowance_map_;
 
   PrecisionConfig::Precision matrix_unit_operand_precision_ =
       PrecisionConfig::DEFAULT;

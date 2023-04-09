@@ -16,7 +16,7 @@
 // mocking_bit_gen.h
 // -----------------------------------------------------------------------------
 //
-// This file includes an `absl::MockingBitGen` class to use as a mock within the
+// This file includes an `abslx::MockingBitGen` class to use as a mock within the
 // Googletest testing framework. Such a mock is useful to provide deterministic
 // values as return values within (otherwise random) Abseil distribution
 // functions. Such determinism within a mock is useful within testing frameworks
@@ -49,7 +49,7 @@
 #include "absl/types/variant.h"
 #include "absl/utility/utility.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 namespace random_internal {
@@ -62,42 +62,42 @@ class BitGenRef;
 
 // MockingBitGen
 //
-// `absl::MockingBitGen` is a mock Uniform Random Bit Generator (URBG) class
-// which can act in place of an `absl::BitGen` URBG within tests using the
+// `abslx::MockingBitGen` is a mock Uniform Random Bit Generator (URBG) class
+// which can act in place of an `abslx::BitGen` URBG within tests using the
 // Googletest testing framework.
 //
 // Usage:
 //
-// Use an `absl::MockingBitGen` along with a mock distribution object (within
+// Use an `abslx::MockingBitGen` along with a mock distribution object (within
 // mock_distributions.h) inside Googletest constructs such as ON_CALL(),
 // EXPECT_TRUE(), etc. to produce deterministic results conforming to the
 // distribution's API contract.
 //
 // Example:
 //
-//  // Mock a call to an `absl::Bernoulli` distribution using Googletest
-//   absl::MockingBitGen bitgen;
+//  // Mock a call to an `abslx::Bernoulli` distribution using Googletest
+//   abslx::MockingBitGen bitgen;
 //
-//   ON_CALL(absl::MockBernoulli(), Call(bitgen, 0.5))
+//   ON_CALL(abslx::MockBernoulli(), Call(bitgen, 0.5))
 //       .WillByDefault(testing::Return(true));
-//   EXPECT_TRUE(absl::Bernoulli(bitgen, 0.5));
+//   EXPECT_TRUE(abslx::Bernoulli(bitgen, 0.5));
 //
-//  // Mock a call to an `absl::Uniform` distribution within Googletest
-//  absl::MockingBitGen bitgen;
+//  // Mock a call to an `abslx::Uniform` distribution within Googletest
+//  abslx::MockingBitGen bitgen;
 //
-//   ON_CALL(absl::MockUniform<int>(), Call(bitgen, testing::_, testing::_))
+//   ON_CALL(abslx::MockUniform<int>(), Call(bitgen, testing::_, testing::_))
 //       .WillByDefault([] (int low, int high) {
 //           return (low + high) / 2;
 //       });
 //
-//   EXPECT_EQ(absl::Uniform<int>(gen, 0, 10), 5);
-//   EXPECT_EQ(absl::Uniform<int>(gen, 30, 40), 35);
+//   EXPECT_EQ(abslx::Uniform<int>(gen, 0, 10), 5);
+//   EXPECT_EQ(abslx::Uniform<int>(gen, 30, 40), 35);
 //
 // At this time, only mock distributions supplied within the Abseil random
 // library are officially supported.
 //
 // EXPECT_CALL and ON_CALL need to be made within the same DLL component as
-// the call to absl::Uniform and related methods, otherwise mocking will fail
+// the call to abslx::Uniform and related methods, otherwise mocking will fail
 // since the  underlying implementation creates a type-specific pointer which
 // will be distinct across different DLL boundaries.
 //
@@ -107,10 +107,10 @@ class MockingBitGen {
   ~MockingBitGen() = default;
 
   // URBG interface
-  using result_type = absl::BitGen::result_type;
+  using result_type = abslx::BitGen::result_type;
 
-  static constexpr result_type(min)() { return (absl::BitGen::min)(); }
-  static constexpr result_type(max)() { return (absl::BitGen::max)(); }
+  static constexpr result_type(min)() { return (abslx::BitGen::min)(); }
+  static constexpr result_type(max)() { return (abslx::BitGen::max)(); }
   result_type operator()() { return gen_(); }
 
  private:
@@ -120,7 +120,7 @@ class MockingBitGen {
   static auto GetMockFnType(ResultT, std::tuple<Args...>)
       -> ::testing::MockFunction<ResultT(Args...)>;
 
-  // MockFnCaller is a helper method for use with absl::apply to
+  // MockFnCaller is a helper method for use with abslx::apply to
   // apply an ArgTupleT to a compatible MockFunction.
   // NOTE: MockFnCaller is essentially equivalent to the lambda:
   // [fn](auto... args) { return fn->Call(std::move(args)...)}
@@ -158,7 +158,7 @@ class MockingBitGen {
       // std::tuple<Args...> used to invoke the mock function. Requires result
       // to point to a ResultT, which is the result of the call.
       *static_cast<ResultT*>(result) =
-          absl::apply(MockFnCaller<MockFnType, ResultT, ArgTupleT>{&mock_fn_},
+          abslx::apply(MockFnCaller<MockFnType, ResultT, ArgTupleT>{&mock_fn_},
                       *static_cast<ArgTupleT*>(args_tuple));
     }
 
@@ -182,22 +182,22 @@ class MockingBitGen {
     using MockFnType = decltype(GetMockFnType(std::declval<ResultT>(),
                                               std::declval<ArgTupleT>()));
 
-    using WrappedFnType = absl::conditional_t<
-        std::is_same<SelfT, ::testing::NiceMock<absl::MockingBitGen>>::value,
+    using WrappedFnType = abslx::conditional_t<
+        std::is_same<SelfT, ::testing::NiceMock<abslx::MockingBitGen>>::value,
         ::testing::NiceMock<MockFnType>,
-        absl::conditional_t<
+        abslx::conditional_t<
             std::is_same<SelfT,
-                         ::testing::NaggyMock<absl::MockingBitGen>>::value,
+                         ::testing::NaggyMock<abslx::MockingBitGen>>::value,
             ::testing::NaggyMock<MockFnType>,
-            absl::conditional_t<
+            abslx::conditional_t<
                 std::is_same<SelfT,
-                             ::testing::StrictMock<absl::MockingBitGen>>::value,
+                             ::testing::StrictMock<abslx::MockingBitGen>>::value,
                 ::testing::StrictMock<MockFnType>, MockFnType>>>;
 
     using ImplT = FunctionHolderImpl<WrappedFnType, ResultT, ArgTupleT>;
     auto& mock = mocks_[type];
     if (!mock) {
-      mock = absl::make_unique<ImplT>();
+      mock = abslx::make_unique<ImplT>();
     }
     return static_cast<ImplT*>(mock.get())->mock_fn_;
   }
@@ -222,19 +222,19 @@ class MockingBitGen {
     return true;
   }
 
-  absl::flat_hash_map<base_internal::FastTypeIdType,
+  abslx::flat_hash_map<base_internal::FastTypeIdType,
                       std::unique_ptr<FunctionHolder>>
       mocks_;
-  absl::BitGen gen_;
+  abslx::BitGen gen_;
 
   template <typename>
-  friend struct ::absl::random_internal::DistributionCaller;  // for InvokeMock
-  friend class ::absl::BitGenRef;                             // for InvokeMock
-  friend class ::absl::random_internal::MockHelpers;  // for RegisterMock,
+  friend struct ::abslx::random_internal::DistributionCaller;  // for InvokeMock
+  friend class ::abslx::BitGenRef;                             // for InvokeMock
+  friend class ::abslx::random_internal::MockHelpers;  // for RegisterMock,
                                                       // InvokeMock
 };
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_MOCKING_BIT_GEN_H_

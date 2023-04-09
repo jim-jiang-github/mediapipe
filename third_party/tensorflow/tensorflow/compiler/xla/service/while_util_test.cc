@@ -212,7 +212,7 @@ ENTRY main {
   auto is_while = [](const HloInstruction* instr) {
     return instr->opcode() == HloOpcode::kWhile;
   };
-  EXPECT_EQ(absl::c_count_if(main->instructions(), is_while), 1);
+  EXPECT_EQ(abslx::c_count_if(main->instructions(), is_while), 1);
 }
 }  // namespace
 }  // namespace xla

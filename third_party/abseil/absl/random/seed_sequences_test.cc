@@ -25,20 +25,20 @@ namespace {
 
 TEST(SeedSequences, Examples) {
   {
-    absl::SeedSeq seed_seq({1, 2, 3});
-    absl::BitGen bitgen(seed_seq);
+    abslx::SeedSeq seed_seq({1, 2, 3});
+    abslx::BitGen bitgen(seed_seq);
 
     EXPECT_NE(0, bitgen());
   }
   {
-    absl::BitGen engine;
-    auto seed_seq = absl::CreateSeedSeqFrom(&engine);
-    absl::BitGen bitgen(seed_seq);
+    abslx::BitGen engine;
+    auto seed_seq = abslx::CreateSeedSeqFrom(&engine);
+    abslx::BitGen bitgen(seed_seq);
 
     EXPECT_NE(engine(), bitgen());
   }
   {
-    auto seed_seq = absl::MakeSeedSeq();
+    auto seed_seq = abslx::MakeSeedSeq();
     std::mt19937 random(seed_seq);
 
     EXPECT_NE(0, random());
@@ -47,13 +47,13 @@ TEST(SeedSequences, Examples) {
 
 TEST(CreateSeedSeqFrom, CompatibleWithStdTypes) {
   using ExampleNonsecureURBG =
-      absl::random_internal::NonsecureURBGBase<std::minstd_rand0>;
+      abslx::random_internal::NonsecureURBGBase<std::minstd_rand0>;
 
   // Construct a URBG instance.
   ExampleNonsecureURBG rng;
 
   // Construct a Seed Sequence from its variates.
-  auto seq_from_rng = absl::CreateSeedSeqFrom(&rng);
+  auto seq_from_rng = abslx::CreateSeedSeqFrom(&rng);
 
   // Ensure that another URBG can be validly constructed from the Seed Sequence.
   std::mt19937_64{seq_from_rng};
@@ -61,10 +61,10 @@ TEST(CreateSeedSeqFrom, CompatibleWithStdTypes) {
 
 TEST(CreateSeedSeqFrom, CompatibleWithBitGenerator) {
   // Construct a URBG instance.
-  absl::BitGen rng;
+  abslx::BitGen rng;
 
   // Construct a Seed Sequence from its variates.
-  auto seq_from_rng = absl::CreateSeedSeqFrom(&rng);
+  auto seq_from_rng = abslx::CreateSeedSeqFrom(&rng);
 
   // Ensure that another URBG can be validly constructed from the Seed Sequence.
   std::mt19937_64{seq_from_rng};
@@ -72,10 +72,10 @@ TEST(CreateSeedSeqFrom, CompatibleWithBitGenerator) {
 
 TEST(CreateSeedSeqFrom, CompatibleWithInsecureBitGen) {
   // Construct a URBG instance.
-  absl::InsecureBitGen rng;
+  abslx::InsecureBitGen rng;
 
   // Construct a Seed Sequence from its variates.
-  auto seq_from_rng = absl::CreateSeedSeqFrom(&rng);
+  auto seq_from_rng = abslx::CreateSeedSeqFrom(&rng);
 
   // Ensure that another URBG can be validly constructed from the Seed Sequence.
   std::mt19937_64{seq_from_rng};
@@ -86,7 +86,7 @@ TEST(CreateSeedSeqFrom, CompatibleWithRawURBG) {
   std::random_device urandom;
 
   // Construct a Seed Sequence from its variates, using 64b of seed-material.
-  auto seq_from_rng = absl::CreateSeedSeqFrom(&urandom);
+  auto seq_from_rng = abslx::CreateSeedSeqFrom(&urandom);
 
   // Ensure that another URBG can be validly constructed from the Seed Sequence.
   std::mt19937_64{seq_from_rng};
@@ -98,7 +98,7 @@ void TestReproducibleVariateSequencesForNonsecureURBG() {
 
   URBG rng;
   // Reused for both RNG instances.
-  auto reusable_seed = absl::CreateSeedSeqFrom(&rng);
+  auto reusable_seed = abslx::CreateSeedSeqFrom(&rng);
 
   typename URBG::result_type variates[kNumVariates];
   {
@@ -117,10 +117,10 @@ void TestReproducibleVariateSequencesForNonsecureURBG() {
 }
 
 TEST(CreateSeedSeqFrom, ReproducesVariateSequencesForInsecureBitGen) {
-  TestReproducibleVariateSequencesForNonsecureURBG<absl::InsecureBitGen>();
+  TestReproducibleVariateSequencesForNonsecureURBG<abslx::InsecureBitGen>();
 }
 
 TEST(CreateSeedSeqFrom, ReproducesVariateSequencesForBitGenerator) {
-  TestReproducibleVariateSequencesForNonsecureURBG<absl::BitGen>();
+  TestReproducibleVariateSequencesForNonsecureURBG<abslx::BitGen>();
 }
 }  // namespace

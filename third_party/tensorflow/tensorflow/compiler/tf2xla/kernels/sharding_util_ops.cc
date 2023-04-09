@@ -34,15 +34,15 @@ limitations under the License.
 namespace tensorflow {
 namespace {
 
-constexpr absl::string_view kNumSplitsAttrName = "num_splits";
-constexpr absl::string_view kNumConcatsAttrName = "num_concats";
+constexpr abslx::string_view kNumSplitsAttrName = "num_splits";
+constexpr abslx::string_view kNumConcatsAttrName = "num_concats";
 
 template <bool Split>
 Status GetAndValidateAttributes(OpKernelConstruction* ctx,
                                 std::vector<int64_t>& num_partitions,
                                 int& num_slices, std::vector<int64_t>& paddings,
                                 bool& has_paddings) {
-  absl::string_view num_partitions_attr_name =
+  abslx::string_view num_partitions_attr_name =
       Split ? kNumSplitsAttrName : kNumConcatsAttrName;
   TF_RETURN_IF_ERROR(ctx->GetAttr(num_partitions_attr_name, &num_partitions));
 
@@ -94,8 +94,8 @@ Status GetAndValidateAttributes(OpKernelConstruction* ctx,
   return OkStatus();
 }
 
-std::vector<int64_t> GetSliceIndices(absl::Span<const int64> num_partitions,
-                                     absl::Span<const int64> slice_shape,
+std::vector<int64_t> GetSliceIndices(abslx::Span<const int64> num_partitions,
+                                     abslx::Span<const int64> slice_shape,
                                      const int index) {
   DCHECK_EQ(num_partitions.size(), slice_shape.size());
 
@@ -122,8 +122,8 @@ std::vector<int64_t> GetSliceIndices(absl::Span<const int64> num_partitions,
   return slice_indices;
 }
 
-constexpr absl::string_view kTensorName = "'input' tensor";
-constexpr absl::string_view kResourceName = "'resource' variable tensor";
+constexpr abslx::string_view kTensorName = "'input' tensor";
+constexpr abslx::string_view kResourceName = "'resource' variable tensor";
 
 template <bool Resource>
 class XlaSplitNDBaseOp : public XlaOpKernel {
@@ -141,7 +141,7 @@ class XlaSplitNDBaseOp : public XlaOpKernel {
     xla::PrimitiveType type;
     TF_RETURN_IF_ERROR(DataTypeToPrimitiveType(input_dtype, &type));
 
-    absl::string_view input_name = Resource ? kResourceName : kTensorName;
+    abslx::string_view input_name = Resource ? kResourceName : kTensorName;
     const int rank = input_shape.dims();
 
     if (rank != num_splits_.size()) {

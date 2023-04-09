@@ -29,7 +29,7 @@ namespace utils {
 // (quantized vs. float), have different sizes, or have a an L2-norm of 0.
 //
 // [1]: https://en.wikipedia.org/wiki/Cosine_similarity
-absl::StatusOr<double> CosineSimilarity(const containers::Embedding& u,
+abslx::StatusOr<double> CosineSimilarity(const containers::Embedding& u,
                                         const containers::Embedding& v);
 
 }  // namespace utils

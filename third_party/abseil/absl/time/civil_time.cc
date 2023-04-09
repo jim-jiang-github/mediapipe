@@ -20,15 +20,15 @@
 #include "absl/strings/str_cat.h"
 #include "absl/time/time.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 namespace {
 
-// Since a civil time has a larger year range than absl::Time (64-bit years vs
+// Since a civil time has a larger year range than abslx::Time (64-bit years vs
 // 64-bit seconds, respectively) we normalize years to roughly +/- 400 years
 // around the year 2400, which will produce an equivalent year in a range that
-// absl::Time can handle.
+// abslx::Time can handle.
 inline civil_year_t NormalizeYear(civil_year_t year) {
   return 2400 + year % 400;
 }
@@ -45,8 +45,8 @@ std::string FormatYearAnd(string_view fmt, CivilSecond cs) {
 
 template <typename CivilT>
 bool ParseYearAnd(string_view fmt, string_view s, CivilT* c) {
-  // Civil times support a larger year range than absl::Time, so we need to
-  // parse the year separately, normalize it, then use absl::ParseTime on the
+  // Civil times support a larger year range than abslx::Time, so we need to
+  // parse the year separately, normalize it, then use abslx::ParseTime on the
   // normalized string.
   const std::string ss = std::string(s);  // TODO(absl-team): Avoid conversion.
   const char* const np = ss.c_str();
@@ -172,4 +172,4 @@ std::ostream& operator<<(std::ostream& os, CivilSecond s) {
 }  // namespace time_internal
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

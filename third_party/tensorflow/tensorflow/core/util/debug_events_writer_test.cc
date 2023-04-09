@@ -822,7 +822,7 @@ TEST_F(DebugEventsWriterTest, RegisterDeviceAndGetIdTrace) {
   EXPECT_EQ(device_ids[2], device_ids[6]);
   EXPECT_EQ(device_ids[3], device_ids[7]);
   // Assert that the four device IDs are all unique.
-  EXPECT_EQ(absl::flat_hash_set<int>(device_ids, device_ids + 8).size(), 4);
+  EXPECT_EQ(abslx::flat_hash_set<int>(device_ids, device_ids + 8).size(), 4);
 
   std::vector<DebugEvent> actuals;
   ReadDebugEventProtos(writer, DebugEventFileType::GRAPHS, &actuals);
@@ -832,7 +832,7 @@ TEST_F(DebugEventsWriterTest, RegisterDeviceAndGetIdTrace) {
   for (const DebugEvent& actual : actuals) {
     const string& device_name = actual.debugged_device().device_name();
     int device_index = -1;
-    CHECK(absl::SimpleAtoi(device_name.substr(strlen(
+    CHECK(abslx::SimpleAtoi(device_name.substr(strlen(
                                "/job:localhost/replica:0/task:0/device:GPU:")),
                            &device_index));
     EXPECT_EQ(actual.debugged_device().device_id(), device_ids[device_index]);

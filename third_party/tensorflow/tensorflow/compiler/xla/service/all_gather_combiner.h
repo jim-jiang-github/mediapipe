@@ -34,12 +34,12 @@ class AllGatherCombiner : public HloModulePass {
   AllGatherCombiner(int64_t combine_threshold_in_bytes,
                     int64_t combine_threshold_count);
 
-  absl::string_view name() const override { return "all-gather-combiner"; }
+  abslx::string_view name() const override { return "all-gather-combiner"; }
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   // Combine all gather ops up to this threshold.

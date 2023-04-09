@@ -161,7 +161,7 @@ int main(int argc, char** argv) {
   tflite::RegisteredOpMap builtin_ops;
   tflite::RegisteredOpMap custom_ops;
   if (!input_models.empty()) {
-    std::vector<std::string> models = absl::StrSplit(input_models, ',');
+    std::vector<std::string> models = abslx::StrSplit(input_models, ',');
     for (const std::string& input_model : models) {
       AddOpsFromModel(input_model, &builtin_ops, &custom_ops);
     }

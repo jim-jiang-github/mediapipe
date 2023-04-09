@@ -24,7 +24,7 @@ namespace gpu {
 using GpuAotCompilationTest = HloTestBase;
 
 TEST_F(GpuAotCompilationTest, LoadExecutableFromAotCompilation) {
-  const absl::string_view hlo_string = R"(
+  const abslx::string_view hlo_string = R"(
 HloModule Test
 
 ENTRY main {

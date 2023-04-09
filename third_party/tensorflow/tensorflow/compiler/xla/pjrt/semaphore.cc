@@ -34,14 +34,14 @@ void Semaphore::Acquire(int64_t amount) {
   args.semaphore = this;
   args.amount = amount;
 
-  mu_.LockWhen(absl::Condition(&CanAcquire, &args));
+  mu_.LockWhen(abslx::Condition(&CanAcquire, &args));
   value_ -= amount;
   mu_.Unlock();
 }
 
 void Semaphore::Release(int64_t amount) {
   CHECK_GE(amount, 0);
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   value_ += amount;
 }
 

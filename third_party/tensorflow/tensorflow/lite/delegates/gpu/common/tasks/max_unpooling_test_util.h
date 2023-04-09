@@ -22,7 +22,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status MaxUnpoolingTest(TestExecutionEnvironment* env);
+abslx::Status MaxUnpoolingTest(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

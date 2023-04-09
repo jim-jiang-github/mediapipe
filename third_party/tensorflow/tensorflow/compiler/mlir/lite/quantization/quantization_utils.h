@@ -69,7 +69,7 @@ constexpr char kDebugModeOpQuantAttrName[] = "debug_quant";
 // Used to annotate custom ops if they are quantizable.
 constexpr char kQuantTraitAttrName[] = "_tfl_quant_trait";
 enum QuantizationTrait { FullyQuantizable = 0, NotQuantizable = 1 };
-constexpr absl::string_view QuantTraitValues[] = {"fully_quantizable",
+constexpr abslx::string_view QuantTraitValues[] = {"fully_quantizable",
                                                   "not_quantizable"};
 
 constexpr double kNearZeroTolerance = 1.0e-6;
@@ -89,7 +89,7 @@ using RequiredSameOperandsAndResultsScaleFunc = std::function<bool(bool, int)>;
 // bool RequiredSameQuantizedAxes()
 using RequiredSameQuantizedAxesFunc = std::function<bool()>;
 
-using StringSet = absl::flat_hash_set<std::string>;
+using StringSet = abslx::flat_hash_set<std::string>;
 using CustomMap = quant::CustomOpMap;
 
 // Quantization spec of an op, driving the quantization algorithm.

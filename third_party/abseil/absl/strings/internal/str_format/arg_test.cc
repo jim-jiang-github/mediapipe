@@ -19,7 +19,7 @@
 #include "gtest/gtest.h"
 #include "absl/strings/str_format.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace str_format_internal {
 namespace {
@@ -127,4 +127,4 @@ const char kMyArray[] = "ABCDE";
 }  // namespace
 }  // namespace str_format_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -26,14 +26,14 @@
 #include "absl/base/internal/thread_identity.h"
 #include "absl/synchronization/internal/per_thread_sem.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
 // ThreadIdentity storage is persistent, we maintain a free-list of previously
 // released ThreadIdentity objects.
 ABSL_CONST_INIT static base_internal::SpinLock freelist_lock(
-    absl::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
+    abslx::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
 ABSL_CONST_INIT static base_internal::ThreadIdentity* thread_identity_freelist;
 
 // A per-thread destructor for reclaiming associated ThreadIdentity objects.
@@ -135,6 +135,6 @@ base_internal::ThreadIdentity* CreateThreadIdentity() {
 
 }  // namespace synchronization_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_LOW_LEVEL_ALLOC_MISSING

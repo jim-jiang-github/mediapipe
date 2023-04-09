@@ -147,7 +147,7 @@ std::vector<HloInstruction*> GetProducerConsumerMultiOutputFusionCandidates(
              "happen.";
       return producer != operand && reachability.IsReachable(producer, operand);
     };
-    if (absl::c_any_of(consumer->operands(), operand_reachable_from_producer)) {
+    if (abslx::c_any_of(consumer->operands(), operand_reachable_from_producer)) {
       VLOG(3) << producer->name() << " would introduce a cycle when fused.";
       continue;
     }
@@ -209,7 +209,7 @@ bool GpuMultiOutputFusion::FuseSiblings(HloInstruction* parent,
   std::vector<HloInstruction*> siblings = parent->users();
   // Sort the siblings such that multi-output fusion ops occur first, followed
   // by fusion ops, followed by unfused ops.
-  absl::c_stable_sort(siblings,
+  abslx::c_stable_sort(siblings,
                       [](const HloInstruction* a, const HloInstruction* b) {
                         return FusionPriority(a) > FusionPriority(b);
                       });
@@ -227,7 +227,7 @@ bool GpuMultiOutputFusion::FuseSiblings(HloInstruction* parent,
         continue;
       }
       if (!ConsumeFuel(name(), [&] {
-            return absl::StrFormat("Not fusing siblings %s and %s.",
+            return abslx::StrFormat("Not fusing siblings %s and %s.",
                                    (*i)->name(), (*j)->name());
           })) {
         ++j;
@@ -240,7 +240,7 @@ bool GpuMultiOutputFusion::FuseSiblings(HloInstruction* parent,
       HloInstruction* fused = *j;
 
       DumpFusionState(*remaining,
-                      absl::StrCat("About to fuse producer |", fused->name(),
+                      abslx::StrCat("About to fuse producer |", fused->name(),
                                    "| into consumer |", remaining->name(),
                                    "| inside GPU multi-output fusion"),
                       /*producer=*/fused);
@@ -253,7 +253,7 @@ bool GpuMultiOutputFusion::FuseSiblings(HloInstruction* parent,
         TF_CHECK_OK(computation_->RemoveInstruction(fused));
       }
       DumpFusionState(*remaining,
-                      absl::StrCat("Fused into consumer |", remaining->name(),
+                      abslx::StrCat("Fused into consumer |", remaining->name(),
                                    "| inside GPU multi-output fusion"));
       changed = true;
       siblings.erase(j);
@@ -299,7 +299,7 @@ StatusOr<bool> GpuMultiOutputFusion::DoMultiOutputFusion() {
       continue;
     }
     if (!ConsumeFuel(name(), [&] {
-          return absl::StrFormat("Not fusing %s and %s.", producer->name(),
+          return abslx::StrFormat("Not fusing %s and %s.", producer->name(),
                                  consumer_for_fusion->name());
         })) {
       continue;
@@ -313,7 +313,7 @@ StatusOr<bool> GpuMultiOutputFusion::DoMultiOutputFusion() {
               << consumer_for_fusion->name();
       DumpFusionState(
           *consumer_for_fusion,
-          absl::StrCat("About to fuse producer |", producer_name,
+          abslx::StrCat("About to fuse producer |", producer_name,
                        "| into consumer |", consumer_for_fusion->name(),
                        "| inside GPU multi-output fusion"),
           /*producer=*/producer);
@@ -327,7 +327,7 @@ StatusOr<bool> GpuMultiOutputFusion::DoMultiOutputFusion() {
 
       DumpFusionState(
           *consumer_for_fusion,
-          absl::StrCat("Fusing producer |", producer_name, "| into consumer |",
+          abslx::StrCat("Fusing producer |", producer_name, "| into consumer |",
                        consumer_for_fusion->name(),
                        "| inside GPU multi-output fusion"));
       RecomputeReachability();
@@ -342,7 +342,7 @@ StatusOr<bool> GpuMultiOutputFusion::DoMultiOutputFusion() {
             << consumer_for_fusion->name() << " into " << input_fusion->name();
     DumpFusionState(
         *input_fusion,
-        absl::StrCat("About to fuse |", producer_name, "| into consumer |",
+        abslx::StrCat("About to fuse |", producer_name, "| into consumer |",
                      input_fusion->name(), "| inside GPU multi-output fusion"),
         /*producer=*/input_fusion);
     TF_CHECK_OK(
@@ -357,7 +357,7 @@ StatusOr<bool> GpuMultiOutputFusion::DoMultiOutputFusion() {
 
     DumpFusionState(
         *input_fusion,
-        absl::StrCat("Fusing producer |", producer_name, "| into consumer |",
+        abslx::StrCat("Fusing producer |", producer_name, "| into consumer |",
                      input_fusion->name(), "| inside GPU multi-output fusion"));
     RecomputeReachability();
   }
@@ -365,7 +365,7 @@ StatusOr<bool> GpuMultiOutputFusion::DoMultiOutputFusion() {
 }
 
 void GpuMultiOutputFusion::DumpFusionState(const HloInstruction& consumer,
-                                           absl::string_view label,
+                                           abslx::string_view label,
                                            const HloInstruction* producer) {
   if (consumer.GetModule()
           ->config()
@@ -377,7 +377,7 @@ void GpuMultiOutputFusion::DumpFusionState(const HloInstruction& consumer,
 
 StatusOr<bool> GpuMultiOutputFusion::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   for (auto* computation :
        module->MakeNonfusionComputations(execution_threads)) {

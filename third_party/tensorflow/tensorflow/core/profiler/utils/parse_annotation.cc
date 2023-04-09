@@ -27,14 +27,14 @@ namespace tensorflow {
 namespace profiler {
 namespace {
 
-std::vector<absl::string_view> SplitNameAndMetadata(
-    absl::string_view annotation) {
-  std::vector<absl::string_view> parts;
+std::vector<abslx::string_view> SplitNameAndMetadata(
+    abslx::string_view annotation) {
+  std::vector<abslx::string_view> parts;
   if (!HasMetadata(annotation)) {
     parts.emplace_back(annotation);
   } else {
     annotation.remove_suffix(1);
-    parts = absl::StrSplit(annotation, '#');
+    parts = abslx::StrSplit(annotation, '#');
     if (parts.size() > 2) {
       parts.resize(2);
     }
@@ -47,8 +47,8 @@ std::vector<absl::string_view> SplitNameAndMetadata(
 
 // Use comma as separate to split input metadata. However, treat comma inside
 // ""/''/[]/{}/() pairs as normal characters.
-std::vector<absl::string_view> SplitPairs(absl::string_view metadata) {
-  std::vector<absl::string_view> key_value_pairs;
+std::vector<abslx::string_view> SplitPairs(abslx::string_view metadata) {
+  std::vector<abslx::string_view> key_value_pairs;
   std::stack<char> quotes;
   size_t start = 0, end = 0;
   for (; end < metadata.size(); ++end) {
@@ -98,15 +98,15 @@ std::vector<absl::string_view> SplitPairs(absl::string_view metadata) {
   return key_value_pairs;
 }
 
-std::vector<std::pair<absl::string_view, absl::string_view>> ParseMetadata(
-    absl::string_view metadata) {
-  std::vector<std::pair<absl::string_view, absl::string_view>> key_values;
-  for (absl::string_view pair : SplitPairs(metadata)) {
-    std::vector<absl::string_view> parts =
-        absl::StrSplit(pair, absl::MaxSplits('=', 1));
+std::vector<std::pair<abslx::string_view, abslx::string_view>> ParseMetadata(
+    abslx::string_view metadata) {
+  std::vector<std::pair<abslx::string_view, abslx::string_view>> key_values;
+  for (abslx::string_view pair : SplitPairs(metadata)) {
+    std::vector<abslx::string_view> parts =
+        abslx::StrSplit(pair, abslx::MaxSplits('=', 1));
     if (parts.size() == 2) {
-      absl::string_view key = absl::StripAsciiWhitespace(parts[0]);
-      absl::string_view value = absl::StripAsciiWhitespace(parts[1]);
+      abslx::string_view key = abslx::StripAsciiWhitespace(parts[0]);
+      abslx::string_view value = abslx::StripAsciiWhitespace(parts[1]);
       if (!key.empty() && !value.empty()) {
         key_values.push_back({key, value});
       }
@@ -117,11 +117,11 @@ std::vector<std::pair<absl::string_view, absl::string_view>> ParseMetadata(
 
 }  // namespace
 
-Annotation ParseAnnotation(absl::string_view annotation) {
+Annotation ParseAnnotation(abslx::string_view annotation) {
   Annotation result;
-  std::vector<absl::string_view> parts = SplitNameAndMetadata(annotation);
+  std::vector<abslx::string_view> parts = SplitNameAndMetadata(annotation);
   if (!parts.empty()) {
-    result.name = absl::StripAsciiWhitespace(parts[0]);
+    result.name = abslx::StripAsciiWhitespace(parts[0]);
     for (const auto& key_value : ParseMetadata(parts[1])) {
       result.metadata.push_back({key_value.first, key_value.second});
     }
@@ -130,11 +130,11 @@ Annotation ParseAnnotation(absl::string_view annotation) {
 }
 
 std::vector<Annotation> ParseAnnotationStack(
-    absl::string_view annotation_stack) {
+    abslx::string_view annotation_stack) {
   std::vector<Annotation> annotations;
   const std::string kAnnotationDelimiter = "::";
-  for (absl::string_view annotation : absl::StrSplit(
-           annotation_stack, kAnnotationDelimiter, absl::SkipEmpty())) {
+  for (abslx::string_view annotation : abslx::StrSplit(
+           annotation_stack, kAnnotationDelimiter, abslx::SkipEmpty())) {
     annotations.emplace_back(ParseAnnotation(annotation));
   }
   return annotations;

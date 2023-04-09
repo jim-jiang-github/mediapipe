@@ -35,19 +35,19 @@ class TpuExecutable : public xla::TpuExecutableInterface {
       std::vector<ExecutionInput> arguments,
       HloExecutionProfile* hlo_execution_profile) override;
 
-  absl::string_view fingerprint() const override;
+  abslx::string_view fingerprint() const override;
 
   // The serialization is not guaranteed to be stable over time and has no
   // compatibility guarantees (i.e. this is not a suitable long-term storage
   // format).
   StatusOr<std::string> Serialize() const;
   static StatusOr<std::unique_ptr<TpuExecutable>> Deserialize(
-      absl::string_view serialized);
+      abslx::string_view serialized);
 
  private:
   Status LoadProgramAndEnqueueToStream(
       const ServiceExecutableRunOptions& run_options,
-      absl::Span<const stream_executor::DeviceMemoryBase> arguments,
+      abslx::Span<const stream_executor::DeviceMemoryBase> arguments,
       stream_executor::DeviceMemoryBase result,
       std::optional<stream_executor::DeviceMemoryBase>
           cross_program_prefetch_addr) override {

@@ -91,8 +91,8 @@ namespace tensorflow {
 namespace tensorrt {
 namespace convert {
 
-using absl::StrAppend;
-using absl::StrCat;
+using abslx::StrAppend;
+using abslx::StrCat;
 
 namespace {
 
@@ -150,31 +150,31 @@ const char* LayerTypeToString(nvinfer1::LayerType layer_type) {
 
 // Sets the ILayer name in the form of
 // <engine_name>/<tf_related_part>:<trt_operation_name>.
-void SetLayerNameHelper(nvinfer1::ILayer* layer, absl::string_view engine_name,
-                        absl::string_view tf_name) {
+void SetLayerNameHelper(nvinfer1::ILayer* layer, abslx::string_view engine_name,
+                        abslx::string_view tf_name) {
   const char* trt_name = LayerTypeToString(layer->getType());
   layer->setName(
-      absl::StrCat(engine_name, "/", tf_name, ":", trt_name).c_str());
+      abslx::StrCat(engine_name, "/", tf_name, ":", trt_name).c_str());
 }
 
 // Returns a string in the form of <sub_op_name><sub_op_instance>.
-std::string GetLayerNameSuffix(absl::string_view sub_op_name,
+std::string GetLayerNameSuffix(abslx::string_view sub_op_name,
                                std::optional<int> sub_op_instance) {
   std::string op_suffix(sub_op_name);
   if (sub_op_instance.has_value()) {
     op_suffix =
-        absl::StrCat(op_suffix, "_", std::to_string(sub_op_instance.value()));
+        abslx::StrCat(op_suffix, "_", std::to_string(sub_op_instance.value()));
   }
   return op_suffix;
 }
 
 }  // namespace
 
-bool IsEngineInput(absl::string_view name) {
-  return absl::StartsWith(name, IONamePrefixes::kInputPHName);
+bool IsEngineInput(abslx::string_view name) {
+  return abslx::StartsWith(name, IONamePrefixes::kInputPHName);
 }
-bool IsEngineOutput(absl::string_view name) {
-  return absl::StartsWith(name, IONamePrefixes::kOutputPHName);
+bool IsEngineOutput(abslx::string_view name) {
+  return abslx::StartsWith(name, IONamePrefixes::kOutputPHName);
 }
 
 void GetOutputProperties(const grappler::GraphProperties& graph_properties,
@@ -313,8 +313,8 @@ Status GetTrtBroadcastShape(const TRT_TensorOrWeights& operand_l,
                            std::array<int32_t, max_nb_dims>* output_dims_array,
                            nvinfer1::Dims* output_dims) -> Status {
     const nvinfer1::Dims input_dims = input.GetTrtDims();
-    absl::c_fill(*output_dims_array, 1);
-    absl::c_copy(
+    abslx::c_fill(*output_dims_array, 1);
+    abslx::c_copy(
         DimsAdapter(input_dims),
         output_dims_array->begin() + broadcast_num_dims - input_dims.nbDims);
     if (use_implicit_batch && input.is_tensor()) {
@@ -332,8 +332,8 @@ Status GetTrtBroadcastShape(const TRT_TensorOrWeights& operand_l,
     // Copy to output dimensions
     auto offt = use_implicit_batch ? 1 : 0;
     output_dims->nbDims = broadcast_num_dims - offt;
-    absl::c_copy(
-        absl::MakeSpan(*output_dims_array).subspan(offt, broadcast_num_dims),
+    abslx::c_copy(
+        abslx::MakeSpan(*output_dims_array).subspan(offt, broadcast_num_dims),
         output_dims->d);
     return Status::OK();
   };
@@ -420,7 +420,7 @@ Status ApplyBroadcast(std::unique_ptr<TRT_TensorOrWeights>& operand,
   } else {
     ITensorProxyPtr tensor = nullptr;
     auto is_static_shuffle_compatible = [](const auto& dims) {
-      return absl::c_count(dims, -1) <= 1;
+      return abslx::c_count(dims, -1) <= 1;
     };
     if (is_static_shuffle_compatible(broadcasted_dims)) {
       TF_RETURN_IF_ERROR(PrepareTensorForShape(
@@ -544,7 +544,7 @@ StatusOr<ITensorProxyPtr> ConcatenateTensors(
 // Convert an axis from TF format to TRT format while validating. TF format
 // includes the batch dimension, while TRT does not if implicit batching is used
 // (i.e. for tensors). TF can also use negative indices.
-Status ConvertAxis(int tf_axis, int trt_nb_dims, absl::string_view node_name,
+Status ConvertAxis(int tf_axis, int trt_nb_dims, abslx::string_view node_name,
                    bool use_implicit_batch, int* trt_axis) {
   const int tf_nb_dims = trt_nb_dims + (use_implicit_batch ? 1 : 0);
   // Check bounds.
@@ -627,8 +627,8 @@ string GetCommonNameScope(const string& op_name_a, const string& op_name_b) {
 
 // Verifies that shapes of the given inputs match after masking the specified
 // dimension.
-Status VerifyShapesMatch(absl::Span<const TRT_TensorOrWeights> inputs,
-                         int masked_dim, absl::string_view node_name) {
+Status VerifyShapesMatch(abslx::Span<const TRT_TensorOrWeights> inputs,
+                         int masked_dim, abslx::string_view node_name) {
   size_t num_inputs = inputs.size();
   if (num_inputs <= 1) return Status::OK();
 
@@ -924,7 +924,7 @@ Status TrtNodeValidator::IsTensorRTCandidate(const Node* node) {
   // these ops to the relevant tensors. This happens regardless of the value of
   // use_calibration.
   bool is_supported_op = false;
-  if (absl::c_find(kQuantizationOpNames, op) != kQuantizationOpNames.end()) {
+  if (abslx::c_find(kQuantizationOpNames, op) != kQuantizationOpNames.end()) {
     is_supported_op = (precision_mode_ == TrtPrecisionMode::INT8);
   } else {
     is_supported_op = GetValidator(op).ok();
@@ -992,9 +992,9 @@ Status TrtNodeValidator::ConvertConstToWeights(
 StatusOr<std::unique_ptr<Converter>> Converter::Create(
     TrtPrecisionMode precision_mode, bool use_calibration,
     nvinfer1::ILogger* trt_logger, const bool use_implicit_batch,
-    absl::string_view engine_name, bool use_explicit_precision,
+    abslx::string_view engine_name, bool use_explicit_precision,
     OpKernelContext* ctx) {
-  std::unique_ptr<Converter> converter = absl::WrapUnique(new Converter(
+  std::unique_ptr<Converter> converter = abslx::WrapUnique(new Converter(
       precision_mode, use_calibration, trt_logger, use_implicit_batch,
       engine_name, use_explicit_precision, ctx));
   TF_RETURN_IF_ERROR(converter->Init(trt_logger));
@@ -1004,7 +1004,7 @@ StatusOr<std::unique_ptr<Converter>> Converter::Create(
 Converter::Converter(TrtPrecisionMode precision_mode, bool use_calibration,
                      nvinfer1::ILogger* trt_logger,
                      const bool use_implicit_batch,
-                     absl::string_view engine_name, bool use_explicit_precision,
+                     abslx::string_view engine_name, bool use_explicit_precision,
                      OpKernelContext* ctx)
     : ctx_(ctx),
       precision_mode_(precision_mode),
@@ -1284,7 +1284,7 @@ Status Converter::BuildCudaEngine(
       TrtPrecisionModeToName(precision_mode_, &precision_mode_str));
   string trt_network_name = StrCat(
       "TF:", TF_VERSION_STRING, ", ",
-      "TRT:", absl::StrJoin(GetLoadedTensorRTVersion(), "."), "-",
+      "TRT:", abslx::StrJoin(GetLoadedTensorRTVersion(), "."), "-",
       "Precision:", precision_mode_str, ", ", "Calibration:", use_calibration_,
       ", ", "Max-Batch-Size:", max_batch_size, ", ",
       "Max-Workspace-Size:", max_workspace_size_bytes);
@@ -1375,7 +1375,7 @@ Status Converter::TransposeTensor(ITensorProxyPtr input_tensor,
                                   const std::vector<int>& order_with_batch_dim,
                                   ITensorProxyPtr* output_tensor,
                                   const NodeDef& node_def,
-                                  absl::string_view sub_op_name) {
+                                  abslx::string_view sub_op_name) {
   const auto dims = input_tensor->getDimensions();
   const int order_size = use_implicit_batch_ ? order_with_batch_dim.size() - 1
                                              : order_with_batch_dim.size();
@@ -1460,20 +1460,20 @@ Status Converter::GetWeightRange(const TRT_ShapedWeights& weights,
 // to specify sub_op_instance to be appended to the name of the layers to avoid
 // layer name conflicts.
 void Converter::SetLayerName(nvinfer1::ILayer* layer, const NodeDef& node_def,
-                             absl::string_view sub_op_name,
+                             abslx::string_view sub_op_name,
                              std::optional<int> sub_op_instance,
                              std::optional<std::string> origin_node_name) {
   std::string sub_op_suffix = GetLayerNameSuffix(sub_op_name, sub_op_instance);
   if (sub_op_suffix.empty()) {
     SetLayerNameHelper(layer, engine_name_, node_def.name());
   } else if (origin_node_name.has_value()) {
-    auto layer_name = absl::StrCat(node_def.name(), "-",
-                                   absl::string_view(origin_node_name.value()),
+    auto layer_name = abslx::StrCat(node_def.name(), "-",
+                                   abslx::string_view(origin_node_name.value()),
                                    "-", sub_op_suffix);
     SetLayerNameHelper(layer, engine_name_, layer_name);
   } else {
     SetLayerNameHelper(layer, engine_name_,
-                       absl::StrCat(node_def.name(), "-", sub_op_suffix));
+                       abslx::StrCat(node_def.name(), "-", sub_op_suffix));
   }
 }
 
@@ -1481,13 +1481,13 @@ void Converter::SetLayerName(nvinfer1::ILayer* layer, const NodeDef& node_def,
 // <main_op_name>_<sub_op_name>_<sub_op_instance> and callSetLayerNameHelper to
 // set the name for the ILayer.
 void Converter::SetLayerName(nvinfer1::ILayer* layer,
-                             absl::string_view main_op_name,
-                             absl::string_view sub_op_name,
+                             abslx::string_view main_op_name,
+                             abslx::string_view sub_op_name,
                              std::optional<int> sub_op_instance) {
   std::string layer_name_suffix =
       GetLayerNameSuffix(sub_op_name, sub_op_instance);
   SetLayerNameHelper(layer, engine_name_,
-                     absl::StrCat(main_op_name, "-", layer_name_suffix));
+                     abslx::StrCat(main_op_name, "-", layer_name_suffix));
 }
 
 // Converts 'input' of 'node_def' into 'tensor' with shape specified by 'dims'
@@ -1702,9 +1702,9 @@ Status AllowDataTypes(const OpConverterParams& params,
   DataType tf_type;
   TF_RETURN_IF_ERROR(GetNodeDefTfType(node_def, &tf_type, type_attr_name));
   if (!allowed_types.count(tf_type)) {
-    string allowed_types_string = absl::StrJoin(
+    string allowed_types_string = abslx::StrJoin(
         allowed_types, ", ", [](string* out, const DataType& type) {
-          absl::StrAppendFormat(out, "%s", DataTypeString(type));
+          abslx::StrAppendFormat(out, "%s", DataTypeString(type));
         });
     return errors::Unimplemented(
         "Data type ", DataTypeString(tf_type), " is not supported for ",
@@ -2214,7 +2214,7 @@ Status ConvertReshape(OpConverterParams* params) {
   }
 
   DimsAdapter output_shape_dims(
-      absl::MakeSpan(weights.GetPointer<int>(), weights.count()));
+      abslx::MakeSpan(weights.GetPointer<int>(), weights.count()));
   ITensorProxyPtr output_tensor = nullptr;
 
   if (!params->use_implicit_batch) {
@@ -2471,13 +2471,13 @@ Status ConvertSlice(OpConverterParams* params) {
   const TRT_ShapedWeights& size_weights = inputs.at(2).weights();
 
   // Check that "begin" is not negative.
-  if (absl::c_any_of(begin_weights.GetSpan<int32>(),
+  if (abslx::c_any_of(begin_weights.GetSpan<int32>(),
                      [](const int32 val) { return val < 0; })) {
     return errors::InvalidArgument("\"begin\" in Slice is out of range");
   }
 
   // Check that "size" is not less than -1.
-  if (absl::c_any_of(size_weights.GetSpan<int32>(),
+  if (abslx::c_any_of(size_weights.GetSpan<int32>(),
                      [](const int32 val) { return val < -1; })) {
     return errors::InvalidArgument("\"size\" in Slice is out of range");
   }
@@ -2522,9 +2522,9 @@ Status ConvertSlice(OpConverterParams* params) {
   bool is_identity;
   bool is_simple_slice;
   bool slice_dim0;
-  absl::InlinedVector<int64, 4> begin;
-  absl::InlinedVector<int64, 4> end;
-  absl::InlinedVector<int64, 4> strides;
+  abslx::InlinedVector<int64, 4> begin;
+  abslx::InlinedVector<int64, 4> end;
+  abslx::InlinedVector<int64, 4> strides;
   StridedSliceShapeSpec strided_slice_spec;
   std::bitset<32> begin_mask(0);
   std::bitset<32> end_mask(0);
@@ -2649,9 +2649,9 @@ Status ConvertStridedSlice(OpConverterParams* params) {
   bool is_identity;
   bool is_simple_slice;
   bool slice_dim0;
-  absl::InlinedVector<int64, 4> begin;
-  absl::InlinedVector<int64, 4> end;
-  absl::InlinedVector<int64, 4> strides;
+  abslx::InlinedVector<int64, 4> begin;
+  abslx::InlinedVector<int64, 4> end;
+  abslx::InlinedVector<int64, 4> strides;
   StridedSliceShapeSpec strided_slice_spec;
 
   TF_RETURN_IF_ERROR(ValidateStridedSliceOp(
@@ -3913,9 +3913,9 @@ Status ConvertSplitHelper(OpConverterParams* params,
     begin[tf_axis] = i * split_size_on_axis;
 
     // Stride is 1 for all dims.
-    absl::InlinedVector<int64, 4> stride_v(begin.size(), 1);
-    absl::InlinedVector<int64, 4> begin_v;
-    absl::InlinedVector<int64, 4> end_v;
+    abslx::InlinedVector<int64, 4> stride_v(begin.size(), 1);
+    abslx::InlinedVector<int64, 4> begin_v;
+    abslx::InlinedVector<int64, 4> end_v;
     for (int i = 0; i < begin.size(); i++) {
       end_v.push_back(begin[i] + size[i]);
       begin_v.push_back(begin[i]);
@@ -4064,7 +4064,7 @@ Status ConvertConcat(OpConverterParams* params) {
                                  params->use_implicit_batch, &trt_axis));
   // Check that dimensions match on non-concatenate axis.
   TF_RETURN_IF_ERROR(VerifyShapesMatch(
-      absl::Span<const TRT_TensorOrWeights>(inputs).first(num_inputs), trt_axis,
+      abslx::Span<const TRT_TensorOrWeights>(inputs).first(num_inputs), trt_axis,
       node_def.name()));
   if (params->validation_only) return Status::OK();
 
@@ -4286,7 +4286,7 @@ Status ConvertGather(OpConverterParams* params) {
   TF_RETURN_IF_ERROR(AllowDataTypes(*params, {DataType::DT_INT32},
                                     /*dtype_attr_name=*/"Tindices"));
 
-  absl::Span<const int> axis = axis_input.weights().GetSpan<int>();
+  abslx::Span<const int> axis = axis_input.weights().GetSpan<int>();
   if (axis.size() != 1) {
     return errors::InvalidArgument("Axis for GatherV2 must be a scalar");
   }
@@ -5776,7 +5776,7 @@ Status ConvertGraphDefToEngine(
     TRTInt8Calibrator* calibrator,
     TrtUniquePtrType<nvinfer1::ICudaEngine>* engine, bool use_calibration,
     const bool use_implicit_batch, bool* convert_successfully,
-    TrtShapeOptimizationProfile* profiles, absl::string_view engine_name,
+    TrtShapeOptimizationProfile* profiles, abslx::string_view engine_name,
     bool use_explicit_precision, tensorflow::grappler::Cluster* cluster) {
   engine->reset();
   if (convert_successfully) *convert_successfully = false;
@@ -5826,7 +5826,7 @@ Status ConvertGraphDefToEngine(
   VLOG(1) << "Starting to convert TensorFlow ops to TensorRT layers";
   std::vector<Converter::EngineOutputInfo> output_tensors;
   int num_layers = converter->network()->getNbLayers();
-  absl::flat_hash_set<const char*> layer_names;
+  abslx::flat_hash_set<const char*> layer_names;
   // Graph nodes are already topologically sorted during construction
   for (const auto& node_def : graph.node()) {
     const string& node_name = node_def.name();
@@ -5915,7 +5915,7 @@ Status ConvertGraphDefToEngine(
       auto layer = converter->network()->getLayer(i);
       if (layer->getName() == nullptr ||
           !layer_names.insert(layer->getName()).second) {
-        std::string error_message = absl::StrCat(
+        std::string error_message = abslx::StrCat(
             "Converting node ", node_name, ", op=", node_def.op(),
             layer->getName() ? " creates a layer with name collision"
                              : " creates a layer without a name");

@@ -553,7 +553,7 @@ struct ConvertTFStridedSlice : public RewritePattern {
     // The ellipsis fill might exceed the current output shape because we are
     // also taking account of any to-be-inserted new axes.
     const int ellipsis_filled_dim_size =
-        input_size - begin_shape[0] + 1 + absl::popcount(new_axis_mask);
+        input_size - begin_shape[0] + 1 + abslx::popcount(new_axis_mask);
 
     int64_t begin_mask = strided_slice_op.begin_mask();
     int64_t end_mask = strided_slice_op.end_mask();

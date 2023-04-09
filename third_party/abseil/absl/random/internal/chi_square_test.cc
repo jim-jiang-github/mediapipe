@@ -24,10 +24,10 @@
 #include "gtest/gtest.h"
 #include "absl/base/macros.h"
 
-using absl::random_internal::ChiSquare;
-using absl::random_internal::ChiSquarePValue;
-using absl::random_internal::ChiSquareValue;
-using absl::random_internal::ChiSquareWithExpected;
+using abslx::random_internal::ChiSquare;
+using abslx::random_internal::ChiSquarePValue;
+using abslx::random_internal::ChiSquareValue;
+using abslx::random_internal::ChiSquareWithExpected;
 
 namespace {
 

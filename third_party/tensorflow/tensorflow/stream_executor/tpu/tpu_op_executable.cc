@@ -36,7 +36,7 @@ TpuOpExecutable::TpuOpExecutable(const XLA_TpuProgram* core_program,
 
 Status TpuOpExecutable::LoadProgramAndEnqueueToStream(
     const xla::ServiceExecutableRunOptions& run_options,
-    absl::Span<const se::DeviceMemoryBase> arguments,
+    abslx::Span<const se::DeviceMemoryBase> arguments,
     se::DeviceMemoryBase result,
     std::optional<se::DeviceMemoryBase> cross_program_prefetch_addr) {
   SE_DeviceMemoryBase* arguments_bases = nullptr;
@@ -123,7 +123,7 @@ int64_t TpuOpExecutable::ShapeSize(const xla::Shape& shape) {
   return size;
 }
 
-absl::string_view TpuOpExecutable::fingerprint() const {
+abslx::string_view TpuOpExecutable::fingerprint() const {
   // TODO(skye): the fingerprint can be plumbed through via core_program_
   LOG(FATAL) << "TpuOpExecutable::fingerprint() unimplemented";
 }

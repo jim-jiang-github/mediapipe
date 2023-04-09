@@ -36,7 +36,7 @@ using tflite::gpu::half;
   const std::vector<float> data = {1.0, 2.0, 3.0, -4.0, 5.1, 6.7, 4.1, 6.17};
   tflite::gpu::metal::Texture2D texture;
   XCTAssertTrue(tflite::gpu::metal::CreateTexture2DRGBA32F(1, 2, device, &texture).ok());
-  XCTAssertTrue(texture.WriteData(device, absl::MakeConstSpan(data.data(), data.size())).ok());
+  XCTAssertTrue(texture.WriteData(device, abslx::MakeConstSpan(data.data(), data.size())).ok());
   std::vector<float> gpu_data;
   XCTAssertTrue(texture.ReadData<float>(device, &gpu_data).ok());
 
@@ -54,7 +54,7 @@ using tflite::gpu::half;
 
   tflite::gpu::metal::Texture2D texture;
   XCTAssertTrue(tflite::gpu::metal::CreateTexture2DRGBA16F(2, 1, device, &texture).ok());
-  XCTAssertTrue(texture.WriteData(device, absl::MakeConstSpan(data.data(), data.size())).ok());
+  XCTAssertTrue(texture.WriteData(device, abslx::MakeConstSpan(data.data(), data.size())).ok());
   std::vector<half> gpu_data;
   XCTAssertTrue(texture.ReadData<half>(device, &gpu_data).ok());
 

@@ -114,12 +114,12 @@ class ValidationGraphBuilder {
   // Builds the part of the model drawn above until the call to the validation
   // graph. The model is used to generate golden outputs. Calls Finish on the
   // FlatbufferBuilder.
-  absl::Status BuildIntermediateModel(flatbuffers::FlatBufferBuilder* fbb);
+  abslx::Status BuildIntermediateModel(flatbuffers::FlatBufferBuilder* fbb);
 
   // Builds the whole model as drawn above. The subgraph_with_golden_outputs
   // should be the result of invoking subgraph 1 on the output of
   // BuildIntermediateModel(). Calls Finish on the FlatbufferBuilder.
-  absl::Status BuildFinalModel(flatbuffers::FlatBufferBuilder* fbb,
+  abslx::Status BuildFinalModel(flatbuffers::FlatBufferBuilder* fbb,
                                Subgraph* subgraph_with_golden_outputs);
 
  private:
@@ -166,14 +166,14 @@ class ValidationGraphBuilder {
   static constexpr int32_t kMainSubgraphIndex = 0;
   static constexpr int32_t kValidationSubgraphIndex = 2;
 
-  absl::StatusOr<flatbuffers::Offset<Model>> MakeModel(
+  abslx::StatusOr<flatbuffers::Offset<Model>> MakeModel(
       bool intermediate_only, Subgraph* subgraph_with_golden_outputs);
 
-  absl::StatusOr<flatbuffers::Offset<
+  abslx::StatusOr<flatbuffers::Offset<
       flatbuffers::Vector<flatbuffers::Offset<OperatorCode>>>>
   OperatorCodes();
 
-  absl::StatusOr<
+  abslx::StatusOr<
       flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Tensor>>>>
   Tensors(bool intermediate_only, TensorInfo* tensor_info);
 
@@ -190,11 +190,11 @@ class ValidationGraphBuilder {
   flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Operator>>>
   Operators(bool intermediate_only, const TensorInfo& tensor_info);
 
-  absl::StatusOr<
+  abslx::StatusOr<
       flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<SubGraph>>>>
   SubGraphs(bool intermediate_only, TensorInfo* tensor_info);
 
-  absl::StatusOr<
+  abslx::StatusOr<
       flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Buffer>>>>
   Buffers(bool intermediate_only, const TensorInfo& tensor_info,
           Subgraph* subgraph_with_golden_outputs);

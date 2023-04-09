@@ -18,7 +18,7 @@
 // -----------------------------------------------------------------------------
 //
 // This file defines the main parsing function for Abseil flags:
-// `absl::ParseCommandLine()`.
+// `abslx::ParseCommandLine()`.
 
 #ifndef ABSL_FLAGS_PARSE_H_
 #define ABSL_FLAGS_PARSE_H_
@@ -28,7 +28,7 @@
 #include "absl/base/config.h"
 #include "absl/flags/internal/parse.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // ParseCommandLine()
@@ -55,6 +55,6 @@ ABSL_NAMESPACE_BEGIN
 std::vector<char*> ParseCommandLine(int argc, char* argv[]);
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_FLAGS_PARSE_H_

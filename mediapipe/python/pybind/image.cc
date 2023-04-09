@@ -176,7 +176,7 @@ void ImageSubmodule(pybind11::module* module) {
         if (pos.size() != 3 && !(pos.size() == 2 && self.channels() == 1)) {
           throw RaisePyError(
               PyExc_IndexError,
-              absl::StrCat("Invalid index dimension: ", pos.size()).c_str());
+              abslx::StrCat("Invalid index dimension: ", pos.size()).c_str());
         }
         py::object py_object =
             py::cast(self, py::return_value_policy::reference);
@@ -251,7 +251,7 @@ void ImageSubmodule(pybind11::module* module) {
                       /*desired_channels=*/0);
         if (image_data == nullptr) {
           throw RaisePyError(PyExc_RuntimeError,
-                             absl::StrFormat("Image decoding failed (%s): %s",
+                             abslx::StrFormat("Image decoding failed (%s): %s",
                                              stbi_failure_reason(), file_name)
                                  .c_str());
         }
@@ -275,7 +275,7 @@ void ImageSubmodule(pybind11::module* module) {
           default:
             throw RaisePyError(
                 PyExc_RuntimeError,
-                absl::StrFormat(
+                abslx::StrFormat(
                     "Expected image with 1 (grayscale), 3 (RGB) or 4 "
                     "(RGBA) channels, found %d channels.",
                     channels)

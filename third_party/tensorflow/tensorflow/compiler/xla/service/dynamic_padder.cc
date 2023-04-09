@@ -257,16 +257,16 @@ bool ShouldSkipPadOnOperand(const HloInstruction* inst, int64_t operand_num,
     }
     case HloOpcode::kDot: {
       if (operand_num == 0) {
-        return !absl::c_linear_search(
+        return !abslx::c_linear_search(
             inst->dot_dimension_numbers().lhs_contracting_dimensions(),
             dimension);
       }
-      return !absl::c_linear_search(
+      return !abslx::c_linear_search(
           inst->dot_dimension_numbers().rhs_contracting_dimensions(),
           dimension);
     }
     case HloOpcode::kReduce:
-      return !absl::c_linear_search(inst->dimensions(), dimension);
+      return !abslx::c_linear_search(inst->dimensions(), dimension);
     case HloOpcode::kSelectAndScatter:
     case HloOpcode::kReduceWindow:
       return inst->window().dimensions(dimension).size() == 1;
@@ -314,8 +314,8 @@ HloInstruction* PadWithScalar(HloInstruction* inst, int64_t dim,
 // Generate a 1-0 mask for input_dim where 1 means data in dynamic shape.
 HloInstruction* GenerateBinaryMask(
     HloInstruction* reshape, int64_t input_dim,
-    absl::Span<const int64_t> output_dims,
-    absl::Span<HloInstruction*> output_dynamic_dims, HloInstruction* one,
+    abslx::Span<const int64_t> output_dims,
+    abslx::Span<HloInstruction*> output_dynamic_dims, HloInstruction* one,
     HloInstruction* zero, bool split_input) {
   Shape input_shape =
       split_input ? reshape->operand(0)->shape() : reshape->shape();
@@ -467,8 +467,8 @@ HloInstruction* GenerateBinaryMask(
 //
 StatusOr<bool> RewriteDynamicReshapeSplitInput(
     HloInstruction* reshape, int64_t input_dim,
-    absl::Span<const int64_t> output_dims,
-    absl::Span<HloInstruction*> output_dynamic_dims,
+    abslx::Span<const int64_t> output_dims,
+    abslx::Span<HloInstruction*> output_dynamic_dims,
     DynamicDimensionInference* dynamic_dimension_inference) {
   VLOG(2) << "Reshaping input dim " << input_dim << " to "
           << VectorString(output_dims);
@@ -649,8 +649,8 @@ StatusOr<bool> RewriteDynamicReshapeSplitInput(
 //       [a,b,c,d,P,P]
 //
 StatusOr<bool> RewriteDynamicReshapeCombineInput(
-    HloInstruction* reshape, absl::Span<const int64_t> input_dims,
-    int64_t output_dim, absl::Span<HloInstruction*> input_dynamic_dims,
+    HloInstruction* reshape, abslx::Span<const int64_t> input_dims,
+    int64_t output_dim, abslx::Span<HloInstruction*> input_dynamic_dims,
     DynamicDimensionInference* dynamic_dimension_inference) {
   // Rewrite dynamic reshape into reshape followed by a sort, all padded
   // data will be moved to the end.
@@ -767,10 +767,10 @@ StatusOr<bool> RewriteDynamicReshapeCombineInput(
 }
 
 StatusOr<bool> RewriteDynamicReshapeSingleGroup(
-    HloInstruction* reshape, absl::Span<const int64_t> input_dims,
-    absl::Span<const int64_t> output_dims,
-    absl::Span<HloInstruction*> input_dynamic_dims,
-    absl::Span<HloInstruction*> output_dynamic_dims,
+    HloInstruction* reshape, abslx::Span<const int64_t> input_dims,
+    abslx::Span<const int64_t> output_dims,
+    abslx::Span<HloInstruction*> input_dynamic_dims,
+    abslx::Span<HloInstruction*> output_dynamic_dims,
     DynamicDimensionInference* dynamic_dimension_inference) {
   VLOG(2) << "Rewriting dynamic reshape " << reshape->ToString()
           << " input dims: " << VectorString(input_dims)
@@ -897,7 +897,7 @@ StatusOr<bool> RewriteReverse(
 
 HloInstruction* RewriteInputWithDynamicPadding(
     HloInstruction* conv, HloInstruction* input, HloInstruction* padding_value,
-    absl::Span<HloInstruction*> padding_before, Window* input_window,
+    abslx::Span<HloInstruction*> padding_before, Window* input_window,
     std::function<int64_t(int64_t)> window_dim_to_shape_dim) {
   HloInstruction* zero_s32 = conv->AddInstruction(
       HloInstruction::CreateConstant(LiteralUtil::Zero(S32)));
@@ -1001,7 +1001,7 @@ StatusOr<bool> RewriteDynamicConvolutionInputGrad(
 
   if (custom_call_conv->padding_type() == PaddingType::PADDING_SAME) {
     grad = RewriteInputWithDynamicPadding(
-        custom_call_conv, grad, zero, absl::MakeSpan(padding_before), &window,
+        custom_call_conv, grad, zero, abslx::MakeSpan(padding_before), &window,
         [&](int64_t dim) { return dnums.input_spatial_dimensions(dim); });
   }
 
@@ -1070,7 +1070,7 @@ StatusOr<bool> RewriteDynamicConvolutionForward(
 
   if (custom_call_conv->padding_type() == PaddingType::PADDING_SAME) {
     input = RewriteInputWithDynamicPadding(
-        custom_call_conv, input, zero, absl::MakeSpan(padding_before), &window,
+        custom_call_conv, input, zero, abslx::MakeSpan(padding_before), &window,
         [&](int64_t dim) { return dnums.input_spatial_dimensions(dim); });
   }
 
@@ -1153,7 +1153,7 @@ StatusOr<bool> RewriteDynamicConvolutionKernelGrad(
 
   if (custom_call_conv->padding_type() == PaddingType::PADDING_SAME) {
     activations = RewriteInputWithDynamicPadding(
-        custom_call_conv, activations, zero, absl::MakeSpan(padding_before),
+        custom_call_conv, activations, zero, abslx::MakeSpan(padding_before),
         &window,
         [&](int64_t dim) { return dnums.input_spatial_dimensions(dim); });
   }
@@ -1203,7 +1203,7 @@ StatusOr<bool> RewriteDynamicReduceWindowSamePadding(
   }
 
   input = RewriteInputWithDynamicPadding(
-      hlo, input, init, absl::MakeSpan(padding_before), &window,
+      hlo, input, init, abslx::MakeSpan(padding_before), &window,
       [](int64_t dim) { return dim; });
 
   HloInstruction* rewritten =
@@ -1256,7 +1256,7 @@ StatusOr<bool> RewriteDynamicSelectAndScatterSamePadding(
   }
 
   input = RewriteInputWithDynamicPadding(
-      hlo, input, input_padding_value, absl::MakeSpan(padding_before), &window,
+      hlo, input, input_padding_value, abslx::MakeSpan(padding_before), &window,
       [](int64_t dim) { return dim; });
 
   // RewriteInputWithDynamicPadding adds padding to the input. However those
@@ -1678,7 +1678,7 @@ StatusOr<bool> RewriteDynamicReshape(
     if (input_dims.empty() || output_dims.empty()) {
       return true;
     }
-    if (absl::c_none_of(output_dims, is_dynamic_dimension)) {
+    if (abslx::c_none_of(output_dims, is_dynamic_dimension)) {
       // Don't need to rewrite any group without dynamic dimensions.
       VLOG(2) << "All dimensions are static in this common factor group";
       return true;
@@ -1783,8 +1783,8 @@ StatusOr<bool> RewriteDynamicReshape(
 
     TF_ASSIGN_OR_RETURN(bool c, RewriteDynamicReshapeSingleGroup(
                                     reshape, input_dims, output_dims,
-                                    absl::MakeSpan(input_dynamic_dims),
-                                    absl::MakeSpan(output_dynamic_dims),
+                                    abslx::MakeSpan(input_dynamic_dims),
+                                    abslx::MakeSpan(output_dynamic_dims),
                                     dynamic_dimension_inference));
     changed |= c;
   }
@@ -1860,7 +1860,7 @@ Status InsertPadToStaticAfterModuleInputs(HloModule* module) {
       if (!instr->shape().is_static() &&
           ((instr->opcode() == HloOpcode::kParameter && comp == entry) ||
            instr->opcode() == HloOpcode::kCustomCall) &&
-          absl::c_all_of(instr->operands(), [&](HloInstruction* operand) {
+          abslx::c_all_of(instr->operands(), [&](HloInstruction* operand) {
             return operand->shape().is_static();
           })) {
         LOG(ERROR) << "Inserting PadToStatic for instruction: "
@@ -2029,7 +2029,7 @@ StatusOr<HloInstruction*> DynamicShapeRemovingVisitor::ConvertToStatic(
 }
 
 Status DynamicShapeRemovingVisitor::DefaultAction(HloInstruction* hlo) {
-  const bool input_is_dynamic = absl::c_any_of(
+  const bool input_is_dynamic = abslx::c_any_of(
       hlo->operands(),
       [](const HloInstruction* hlo) { return hlo->shape().is_dynamic(); });
 
@@ -2119,7 +2119,7 @@ Status DynamicShapeRemovingVisitor::HandleCustomCall(HloInstruction* hlo) {
 
 StatusOr<bool> DynamicPadder::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   VLOG(2) << "Pre DynamicPadder HLO:";
   XLA_VLOG_LINES(2, module->ToString());

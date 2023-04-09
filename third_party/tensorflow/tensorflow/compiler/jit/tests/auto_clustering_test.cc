@@ -22,23 +22,23 @@ namespace {
 class AutoClusteringTestImpl : public AutoClusteringTest {
  protected:
   // Test auto-clustering with a proto text file ${key}.pbtxt.
-  Status RunAutoClusteringTestWithPbtxt(absl::string_view key) {
+  Status RunAutoClusteringTestWithPbtxt(abslx::string_view key) {
     string file_name_without_extension =
-        absl::StrCat(testing::TensorFlowSrcRoot(), "/compiler/jit/tests/", key);
+        abslx::StrCat(testing::TensorFlowSrcRoot(), "/compiler/jit/tests/", key);
 
     return AutoClusteringTest::RunAutoClusteringTestWithPbtxt(
-        absl::StrCat(file_name_without_extension, ".pbtxt"),
-        absl::StrCat(file_name_without_extension, ".golden_summary"));
+        abslx::StrCat(file_name_without_extension, ".pbtxt"),
+        abslx::StrCat(file_name_without_extension, ".golden_summary"));
   }
 
   // Test auto-clustering with a gzipped proto text file ${key}.pbtxt.gz.
-  Status RunAutoClusteringTestWithGzippedPbtxt(absl::string_view key) {
+  Status RunAutoClusteringTestWithGzippedPbtxt(abslx::string_view key) {
     string file_name_without_extension =
-        absl::StrCat(testing::TensorFlowSrcRoot(), "/compiler/jit/tests/", key);
+        abslx::StrCat(testing::TensorFlowSrcRoot(), "/compiler/jit/tests/", key);
 
     return AutoClusteringTest::RunAutoClusteringTestWithGzippedPbtxt(
-        absl::StrCat(file_name_without_extension, ".pbtxt.gz"),
-        absl::StrCat(file_name_without_extension, ".golden_summary"));
+        abslx::StrCat(file_name_without_extension, ".pbtxt.gz"),
+        abslx::StrCat(file_name_without_extension, ".golden_summary"));
   }
 };
 
@@ -77,9 +77,9 @@ TEST_F(AutoClusteringTestImpl, OpenSeq2SeqGNMT) {
 }
 
 #if defined(PLATFORM_GOOGLE)
-Status BenchmarkHelper(absl::string_view key, benchmark::State& state) {
+Status BenchmarkHelper(abslx::string_view key, benchmark::State& state) {
   return BenchmarkMarkForCompilation(
-      absl::StrCat(testing::TensorFlowSrcRoot(), "/compiler/jit/tests/", key,
+      abslx::StrCat(testing::TensorFlowSrcRoot(), "/compiler/jit/tests/", key,
                    ".pbtxt"),
       state);
 }

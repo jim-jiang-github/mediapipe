@@ -87,12 +87,12 @@ class EagerClusterFunctionLibraryRuntime
 
   struct FunctionData {
     const string target;
-    const absl::optional<std::vector<int>> ret_indices;
+    const abslx::optional<std::vector<int>> ret_indices;
     core::RefCountPtr<EagerClient> eager_client;
     std::unique_ptr<EagerOperation> op;
 
     FunctionData(const string& target,
-                 const absl::optional<std::vector<int>>& ret_indices,
+                 const abslx::optional<std::vector<int>>& ret_indices,
                  EagerClient* eager_client, std::unique_ptr<EagerOperation> op)
         : target(target),
           ret_indices(ret_indices),

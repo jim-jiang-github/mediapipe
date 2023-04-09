@@ -185,7 +185,7 @@ class Comparison {
 
   // Applies the comparison from this Comparison's direction and ordering for
   // integral types.
-  template <typename T, absl::enable_if_t<std::is_integral<T>::value, int> = 0>
+  template <typename T, abslx::enable_if_t<std::is_integral<T>::value, int> = 0>
   bool Compare(const T a, const T b) const {
     CHECK(primitive_util::IsCanonicalRepresentation<T>(primitive_type_));
     return GetComparator<T>()(a, b);
@@ -194,7 +194,7 @@ class Comparison {
   // Applies the comparison from this Comparison's direction and ordering
   // for floating point types.
   template <typename T,
-            absl::enable_if_t<std::is_floating_point<T>::value ||
+            abslx::enable_if_t<std::is_floating_point<T>::value ||
                                   std::is_same<T, xla::bfloat16>::value,
                               int> = 0>
   bool Compare(const T a, const T b) const {
@@ -240,9 +240,9 @@ std::string ComparisonPrimitiveTypeToString(PrimitiveType type);
 std::string ComparisonOrderToString(Comparison::Order order);
 
 StatusOr<Comparison::Direction> StringToComparisonDirection(
-    absl::string_view direction);
-StatusOr<Comparison::Type> StringToComparisonType(absl::string_view comparison);
-StatusOr<Comparison::Order> StringToComparisonOrder(absl::string_view order);
+    abslx::string_view direction);
+StatusOr<Comparison::Type> StringToComparisonType(abslx::string_view comparison);
+StatusOr<Comparison::Order> StringToComparisonOrder(abslx::string_view order);
 
 // Returns a comparison function using the provided key function on each value,
 // i.e. `key_fn(a) < key_fn(b)`.

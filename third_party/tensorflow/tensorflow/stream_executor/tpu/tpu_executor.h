@@ -54,7 +54,7 @@ class TpuExecutor : public tensorflow::tpu::TpuExecutorInterface {
       ::stream_executor::internal::StreamExecutorInterface;
 
   using TimerMap =
-      absl::flat_hash_map<stream_executor::internal::TimerInterface*,
+      abslx::flat_hash_map<stream_executor::internal::TimerInterface*,
                           SE_Timer*>;
 
   explicit TpuExecutor(::tensorflow::tpu::TpuPlatformInterface* platform,
@@ -95,11 +95,11 @@ class TpuExecutor : public tensorflow::tpu::TpuExecutorInterface {
 
   bool DeviceMemoryUsage(int64_t* free, int64_t* total) const override;
 
-  void DequeueOutfeed(int32_t outfeed_queue_index, absl::Span<uint8> bytes,
+  void DequeueOutfeed(int32_t outfeed_queue_index, abslx::Span<uint8> bytes,
                       StatusCallback done);
 
   Status EnqueueInfeed(int32_t infeed_queue_index,
-                       absl::Span<const uint8> bytes);
+                       abslx::Span<const uint8> bytes);
 
   std::optional<stream_executor::AllocatorStats> GetAllocatorStats() override;
 

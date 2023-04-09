@@ -134,7 +134,7 @@ class BatchResourceBase : public ResourceBase {
         batcher_(std::move(batcher)),
         batcher_queue_options_(batcher_queue_options),
         allowed_batch_sizes_(std::move(allowed_batch_sizes)) {
-    allowed_batch_sizes_str_ = absl::StrJoin(allowed_batch_sizes_, ",");
+    allowed_batch_sizes_str_ = abslx::StrJoin(allowed_batch_sizes_, ",");
   }
 
   BatchResourceBase(bool has_process_batch_function,
@@ -200,7 +200,7 @@ class BatchResourceBase : public ResourceBase {
   // Implementation of calling the process batch function.
   virtual void ProcessFuncBatchImpl(
       const BatchResourceBase::BatchTask& last_task,
-      absl::Span<const Tensor> inputs, std::vector<Tensor>* combined_outputs,
+      abslx::Span<const Tensor> inputs, std::vector<Tensor>* combined_outputs,
       std::function<void(const Status&)> done) const = 0;
 
   // Factory method for creating a BatchTask, overridable by subclasses.

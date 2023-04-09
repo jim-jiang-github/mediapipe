@@ -16,7 +16,7 @@
 // File: cord.h
 // -----------------------------------------------------------------------------
 //
-// This file defines the `absl::Cord` data structure and operations on that data
+// This file defines the `abslx::Cord` data structure and operations on that data
 // structure. A Cord is a string-like sequence of characters optimized for
 // specific use cases. Unlike a `std::string`, which stores an array of
 // contiguous characters, Cord data is stored in a structure consisting of
@@ -89,12 +89,12 @@
 #include "absl/strings/string_view.h"
 #include "absl/types/optional.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 class Cord;
 class CordTestPeer;
 template <typename Releaser>
-Cord MakeCordFromExternal(absl::string_view, Releaser&&);
+Cord MakeCordFromExternal(abslx::string_view, Releaser&&);
 void CopyCordToString(const Cord& src, std::string* dst);
 
 // Cord
@@ -129,7 +129,7 @@ class Cord {
  private:
   template <typename T>
   using EnableIfString =
-      absl::enable_if_t<std::is_same<T, std::string>::value, int>;
+      abslx::enable_if_t<std::is_same<T, std::string>::value, int>;
 
  public:
   // Cord::Cord() Constructors.
@@ -146,13 +146,13 @@ class Cord {
 
   // Creates a Cord from a `src` string. This constructor is marked explicit to
   // prevent implicit Cord constructions from arguments convertible to an
-  // `absl::string_view`.
-  explicit Cord(absl::string_view src);
-  Cord& operator=(absl::string_view src);
+  // `abslx::string_view`.
+  explicit Cord(abslx::string_view src);
+  Cord& operator=(abslx::string_view src);
 
   // Creates a Cord from a `std::string&&` rvalue. These constructors are
   // templated to avoid ambiguities for types that are convertible to both
-  // `absl::string_view` and `std::string`, such as `const char*`.
+  // `abslx::string_view` and `std::string`, such as `const char*`.
   template <typename T, EnableIfString<T> = 0>
   explicit Cord(T&& src);
   template <typename T, EnableIfString<T> = 0>
@@ -178,16 +178,16 @@ class Cord {
   // remain live until the releaser is invoked. The callable releaser also must:
   //
   //   * be move constructible
-  //   * support `void operator()(absl::string_view) const` or `void operator()`
+  //   * support `void operator()(abslx::string_view) const` or `void operator()`
   //
   // Example:
   //
   // Cord MakeCord(BlockPool* pool) {
   //   Block* block = pool->NewBlock();
   //   FillBlock(block);
-  //   return absl::MakeCordFromExternal(
+  //   return abslx::MakeCordFromExternal(
   //       block->ToStringView(),
-  //       [pool, block](absl::string_view v) {
+  //       [pool, block](abslx::string_view v) {
   //         pool->FreeBlock(block, v);
   //       });
   // }
@@ -196,8 +196,8 @@ class Cord {
   // releaser doesn't do anything. For example, consider the following:
   //
   // void Foo(const char* buffer, int len) {
-  //   auto c = absl::MakeCordFromExternal(absl::string_view(buffer, len),
-  //                                       [](absl::string_view) {});
+  //   auto c = abslx::MakeCordFromExternal(abslx::string_view(buffer, len),
+  //                                       [](abslx::string_view) {});
   //
   //   // BUG: If Bar() copies its cord for any reason, including keeping a
   //   // substring of it, the lifetime of buffer might be extended beyond
@@ -205,7 +205,7 @@ class Cord {
   //   Bar(c);
   // }
   template <typename Releaser>
-  friend Cord MakeCordFromExternal(absl::string_view data, Releaser&& releaser);
+  friend Cord MakeCordFromExternal(abslx::string_view data, Releaser&& releaser);
 
   // Cord::Clear()
   //
@@ -219,7 +219,7 @@ class Cord {
   // data.
   void Append(const Cord& src);
   void Append(Cord&& src);
-  void Append(absl::string_view src);
+  void Append(abslx::string_view src);
   template <typename T, EnableIfString<T> = 0>
   void Append(T&& src);
 
@@ -228,7 +228,7 @@ class Cord {
   // Prepends data to the Cord, which may come from another Cord or other string
   // data.
   void Prepend(const Cord& src);
-  void Prepend(absl::string_view src);
+  void Prepend(abslx::string_view src);
   template <typename T, EnableIfString<T> = 0>
   void Prepend(T&& src);
 
@@ -284,19 +284,19 @@ class Cord {
   //   -1  'this' Cord is smaller
   //    0  two Cords are equal
   //    1  'this' Cord is larger
-  int Compare(absl::string_view rhs) const;
+  int Compare(abslx::string_view rhs) const;
   int Compare(const Cord& rhs) const;
 
   // Cord::StartsWith()
   //
   // Determines whether the Cord starts with the passed string data `rhs`.
   bool StartsWith(const Cord& rhs) const;
-  bool StartsWith(absl::string_view rhs) const;
+  bool StartsWith(abslx::string_view rhs) const;
 
   // Cord::EndsWith()
   //
   // Determines whether the Cord ends with the passed string data `rhs`.
-  bool EndsWith(absl::string_view rhs) const;
+  bool EndsWith(abslx::string_view rhs) const;
   bool EndsWith(const Cord& rhs) const;
 
   // Cord::operator std::string()
@@ -349,7 +349,7 @@ class Cord {
   class ChunkIterator {
    public:
     using iterator_category = std::input_iterator_tag;
-    using value_type = absl::string_view;
+    using value_type = abslx::string_view;
     using difference_type = ptrdiff_t;
     using pointer = const value_type*;
     using reference = value_type;
@@ -367,15 +367,15 @@ class Cord {
     friend class CharIterator;
 
    private:
-    using CordRep = absl::cord_internal::CordRep;
-    using CordRepRing = absl::cord_internal::CordRepRing;
-    using CordRepRingReader = absl::cord_internal::CordRepRingReader;
+    using CordRep = abslx::cord_internal::CordRep;
+    using CordRepRing = abslx::cord_internal::CordRepRing;
+    using CordRepRingReader = abslx::cord_internal::CordRepRingReader;
 
     // Stack of right children of concat nodes that we have to visit.
     // Keep this at the end of the structure to avoid cache-thrashing.
     // TODO(jgm): Benchmark to see if there's a more optimal value than 47 for
     // the inlined vector size (47 exists for backward compatibility).
-    using Stack = absl::InlinedVector<absl::cord_internal::CordRep*, 47>;
+    using Stack = abslx::InlinedVector<abslx::cord_internal::CordRep*, 47>;
 
     // Constructs a `begin()` iterator from `tree`. `tree` must not be null.
     explicit ChunkIterator(cord_internal::CordRep* tree);
@@ -405,11 +405,11 @@ class Cord {
 
     // A view into bytes of the current `CordRep`. It may only be a view to a
     // suffix of bytes if this is being used by `CharIterator`.
-    absl::string_view current_chunk_;
+    abslx::string_view current_chunk_;
     // The current leaf, or `nullptr` if the iterator points to short data.
     // If the current chunk is a substring node, current_leaf_ points to the
     // underlying flat or external node.
-    absl::cord_internal::CordRep* current_leaf_ = nullptr;
+    abslx::cord_internal::CordRep* current_leaf_ = nullptr;
     // The number of bytes left in the `Cord` over which we are iterating.
     size_t bytes_remaining_ = 0;
 
@@ -430,8 +430,8 @@ class Cord {
   //
   // Example:
   //
-  //   absl::Cord::ChunkIterator FindAsChunk(const absl::Cord& c,
-  //                                         absl::string_view s) {
+  //   abslx::Cord::ChunkIterator FindAsChunk(const abslx::Cord& c,
+  //                                         abslx::string_view s) {
   //     return std::find(c.chunk_begin(), c.chunk_end(), s);
   //   }
   ChunkIterator chunk_begin() const;
@@ -477,13 +477,13 @@ class Cord {
   // Example:
   //
   //   void ProcessChunks(const Cord& cord) {
-  //     for (absl::string_view chunk : cord.Chunks()) { ... }
+  //     for (abslx::string_view chunk : cord.Chunks()) { ... }
   //   }
   //
   // Note that the ordinary caveats of temporary lifetime extension apply:
   //
   //   void Process() {
-  //     for (absl::string_view chunk : CordFactory().Chunks()) {
+  //     for (abslx::string_view chunk : CordFactory().Chunks()) {
   //       // The temporary Cord returned by CordFactory has been destroyed!
   //     }
   //   }
@@ -558,7 +558,7 @@ class Cord {
   // Returns the longest contiguous view starting at the iterator's position.
   //
   // `it` must be dereferenceable.
-  static absl::string_view ChunkRemaining(const CharIterator& it);
+  static abslx::string_view ChunkRemaining(const CharIterator& it);
 
   // Cord::CharIterator::char_begin()
   //
@@ -636,23 +636,23 @@ class Cord {
   //
   // If this cord's representation is a single flat array, returns a
   // string_view referencing that array.  Otherwise returns nullopt.
-  absl::optional<absl::string_view> TryFlat() const;
+  abslx::optional<abslx::string_view> TryFlat() const;
 
   // Cord::Flatten()
   //
   // Flattens the cord into a single array and returns a view of the data.
   //
   // If the cord was already flat, the contents are not modified.
-  absl::string_view Flatten();
+  abslx::string_view Flatten();
 
-  // Supports absl::Cord as a sink object for absl::Format().
-  friend void AbslFormatFlush(absl::Cord* cord, absl::string_view part) {
+  // Supports abslx::Cord as a sink object for abslx::Format().
+  friend void AbslFormatFlush(abslx::Cord* cord, abslx::string_view part) {
     cord->Append(part);
   }
 
   template <typename H>
-  friend H AbslHashValue(H hash_state, const absl::Cord& c) {
-    absl::optional<absl::string_view> maybe_flat = c.TryFlat();
+  friend H AbslHashValue(H hash_state, const abslx::Cord& c) {
+    abslx::optional<abslx::string_view> maybe_flat = c.TryFlat();
     if (maybe_flat.has_value()) {
       return H::combine(std::move(hash_state), *maybe_flat);
     }
@@ -662,7 +662,7 @@ class Cord {
   // Create a Cord with the contents of StringConstant<T>::value.
   // No allocations will be done and no data will be copied.
   // This is an INTERNAL API and subject to change or removal. This API can only
-  // be used by spelling absl::strings_internal::MakeStringConstant, which is
+  // be used by spelling abslx::strings_internal::MakeStringConstant, which is
   // also an internal API.
   template <typename T>
   explicit constexpr Cord(strings_internal::StringConstant<T>);
@@ -670,15 +670,15 @@ class Cord {
  private:
   friend class CordTestPeer;
   friend bool operator==(const Cord& lhs, const Cord& rhs);
-  friend bool operator==(const Cord& lhs, absl::string_view rhs);
+  friend bool operator==(const Cord& lhs, abslx::string_view rhs);
 
   // Calls the provided function once for each cord chunk, in order.  Unlike
   // Chunks(), this API will not allocate memory.
-  void ForEachChunk(absl::FunctionRef<void(absl::string_view)>) const;
+  void ForEachChunk(abslx::FunctionRef<void(abslx::string_view)>) const;
 
   // Allocates new contiguous storage for the contents of the cord. This is
   // called by Flatten() when the cord was not already flat.
-  absl::string_view FlattenSlowPath();
+  abslx::string_view FlattenSlowPath();
 
   // Actual cord contents are hidden inside the following simple
   // class so that we can isolate the bulk of cord.cc from changes
@@ -688,7 +688,7 @@ class Cord {
   class InlineRep {
    public:
     static constexpr unsigned char kMaxInline = cord_internal::kMaxInline;
-    static_assert(kMaxInline >= sizeof(absl::cord_internal::CordRep*), "");
+    static_assert(kMaxInline >= sizeof(abslx::cord_internal::CordRep*), "");
 
     constexpr InlineRep() : data_() {}
     InlineRep(const InlineRep& src);
@@ -706,23 +706,23 @@ class Cord {
                   bool nullify_tail);  // Discards pointer, if any
     char* set_data(size_t n);  // Write data to the result
     // Returns nullptr if holding bytes
-    absl::cord_internal::CordRep* tree() const;
-    absl::cord_internal::CordRep* as_tree() const;
+    abslx::cord_internal::CordRep* tree() const;
+    abslx::cord_internal::CordRep* as_tree() const;
     // Discards old pointer, if any
-    void set_tree(absl::cord_internal::CordRep* rep);
+    void set_tree(abslx::cord_internal::CordRep* rep);
     // Replaces a tree with a new root. This is faster than set_tree, but it
     // should only be used when it's clear that the old rep was a tree.
-    void replace_tree(absl::cord_internal::CordRep* rep);
+    void replace_tree(abslx::cord_internal::CordRep* rep);
     // Returns non-null iff was holding a pointer
-    absl::cord_internal::CordRep* clear();
+    abslx::cord_internal::CordRep* clear();
     // Converts to pointer if necessary.
-    absl::cord_internal::CordRep* force_tree(size_t extra_hint);
+    abslx::cord_internal::CordRep* force_tree(size_t extra_hint);
     void reduce_size(size_t n);  // REQUIRES: holding data
     void remove_prefix(size_t n);  // REQUIRES: holding data
     void AppendArray(const char* src_data, size_t src_size);
-    absl::string_view FindFlatStartPiece() const;
-    void AppendTree(absl::cord_internal::CordRep* tree);
-    void PrependTree(absl::cord_internal::CordRep* tree);
+    abslx::string_view FindFlatStartPiece() const;
+    void AppendTree(abslx::cord_internal::CordRep* tree);
+    void PrependTree(abslx::cord_internal::CordRep* tree);
     void GetAppendRegion(char** region, size_t* size, size_t max_length);
     void GetAppendRegion(char** region, size_t* size);
     bool IsSame(const InlineRep& other) const {
@@ -738,7 +738,7 @@ class Cord {
         memcpy(&y, reinterpret_cast<const char*>(&other.data_) + 8, sizeof(y));
         if (x == y) return 0;
       }
-      return absl::big_endian::FromHost64(x) < absl::big_endian::FromHost64(y)
+      return abslx::big_endian::FromHost64(x) < abslx::big_endian::FromHost64(y)
                  ? -1
                  : 1;
     }
@@ -746,7 +746,7 @@ class Cord {
       // memcpy is much faster when operating on a known size. On most supported
       // platforms, the small string optimization is large enough that resizing
       // to 15 bytes does not cause a memory allocation.
-      absl::strings_internal::STLStringResizeUninitialized(dst,
+      abslx::strings_internal::STLStringResizeUninitialized(dst,
                                                            sizeof(data_) - 1);
       memcpy(&(*dst)[0], &data_, sizeof(data_) - 1);
       // erase is faster than resize because the logic for memory allocation is
@@ -763,7 +763,7 @@ class Cord {
     bool is_profiled() const { return data_.is_tree() && data_.is_profiled(); }
 
     // Returns the profiled CordzInfo, or nullptr if not sampled.
-    absl::cord_internal::CordzInfo* cordz_info() const {
+    abslx::cord_internal::CordzInfo* cordz_info() const {
       return data_.cordz_info();
     }
 
@@ -807,40 +807,40 @@ class Cord {
   InlineRep contents_;
 
   // Helper for MemoryUsage().
-  static size_t MemoryUsageAux(const absl::cord_internal::CordRep* rep);
+  static size_t MemoryUsageAux(const abslx::cord_internal::CordRep* rep);
 
   // Helper for GetFlat() and TryFlat().
-  static bool GetFlatAux(absl::cord_internal::CordRep* rep,
-                         absl::string_view* fragment);
+  static bool GetFlatAux(abslx::cord_internal::CordRep* rep,
+                         abslx::string_view* fragment);
 
   // Helper for ForEachChunk().
   static void ForEachChunkAux(
-      absl::cord_internal::CordRep* rep,
-      absl::FunctionRef<void(absl::string_view)> callback);
+      abslx::cord_internal::CordRep* rep,
+      abslx::FunctionRef<void(abslx::string_view)> callback);
 
   // The destructor for non-empty Cords.
   void DestroyCordSlow();
 
   // Out-of-line implementation of slower parts of logic.
   void CopyToArraySlowPath(char* dst) const;
-  int CompareSlowPath(absl::string_view rhs, size_t compared_size,
+  int CompareSlowPath(abslx::string_view rhs, size_t compared_size,
                       size_t size_to_compare) const;
   int CompareSlowPath(const Cord& rhs, size_t compared_size,
                       size_t size_to_compare) const;
-  bool EqualsImpl(absl::string_view rhs, size_t size_to_compare) const;
+  bool EqualsImpl(abslx::string_view rhs, size_t size_to_compare) const;
   bool EqualsImpl(const Cord& rhs, size_t size_to_compare) const;
   int CompareImpl(const Cord& rhs) const;
 
   template <typename ResultType, typename RHS>
   friend ResultType GenericCompare(const Cord& lhs, const RHS& rhs,
                                    size_t size_to_compare);
-  static absl::string_view GetFirstChunk(const Cord& c);
-  static absl::string_view GetFirstChunk(absl::string_view sv);
+  static abslx::string_view GetFirstChunk(const Cord& c);
+  static abslx::string_view GetFirstChunk(abslx::string_view sv);
 
   // Returns a new reference to contents_.tree(), or steals an existing
   // reference if called on an rvalue.
-  absl::cord_internal::CordRep* TakeRep() const&;
-  absl::cord_internal::CordRep* TakeRep() &&;
+  abslx::cord_internal::CordRep* TakeRep() const&;
+  abslx::cord_internal::CordRep* TakeRep() &&;
 
   // Helper for Append().
   template <typename C>
@@ -850,7 +850,7 @@ class Cord {
   template <typename H>
   H HashFragmented(H hash_state) const {
     typename H::AbslInternalPiecewiseCombiner combiner;
-    ForEachChunk([&combiner, &hash_state](absl::string_view chunk) {
+    ForEachChunk([&combiner, &hash_state](abslx::string_view chunk) {
       hash_state = combiner.add_buffer(std::move(hash_state), chunk.data(),
                                        chunk.size());
     });
@@ -859,9 +859,9 @@ class Cord {
 };
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // allow a Cord to be logged
@@ -914,14 +914,14 @@ inline void SmallMemmove(char* dst, const char* src, size_t n,
 
 // Does non-template-specific `CordRepExternal` initialization.
 // Expects `data` to be non-empty.
-void InitializeCordRepExternal(absl::string_view data, CordRepExternal* rep);
+void InitializeCordRepExternal(abslx::string_view data, CordRepExternal* rep);
 
 // Creates a new `CordRep` that owns `data` and `releaser` and returns a pointer
 // to it, or `nullptr` if `data` was empty.
 template <typename Releaser>
 // NOLINTNEXTLINE - suppress clang-tidy raw pointer return.
-CordRep* NewExternalRep(absl::string_view data, Releaser&& releaser) {
-  using ReleaserType = absl::decay_t<Releaser>;
+CordRep* NewExternalRep(abslx::string_view data, Releaser&& releaser) {
+  using ReleaserType = abslx::decay_t<Releaser>;
   if (data.empty()) {
     // Never create empty external nodes.
     InvokeReleaser(Rank0{}, ReleaserType(std::forward<Releaser>(releaser)),
@@ -938,17 +938,17 @@ CordRep* NewExternalRep(absl::string_view data, Releaser&& releaser) {
 // Overload for function reference types that dispatches using a function
 // pointer because there are no `alignof()` or `sizeof()` a function reference.
 // NOLINTNEXTLINE - suppress clang-tidy raw pointer return.
-inline CordRep* NewExternalRep(absl::string_view data,
-                               void (&releaser)(absl::string_view)) {
+inline CordRep* NewExternalRep(abslx::string_view data,
+                               void (&releaser)(abslx::string_view)) {
   return NewExternalRep(data, &releaser);
 }
 
 }  // namespace cord_internal
 
 template <typename Releaser>
-Cord MakeCordFromExternal(absl::string_view data, Releaser&& releaser) {
+Cord MakeCordFromExternal(abslx::string_view data, Releaser&& releaser) {
   Cord cord;
-  cord.contents_.set_tree(::absl::cord_internal::NewExternalRep(
+  cord.contents_.set_tree(::abslx::cord_internal::NewExternalRep(
       data, std::forward<Releaser>(releaser)));
   return cord;
 }
@@ -960,7 +960,7 @@ inline Cord::InlineRep::InlineRep(const Cord::InlineRep& src)
     : data_(src.data_) {
   if (is_tree()) {
     data_.clear_cordz_info();
-    absl::cord_internal::CordRep::Ref(as_tree());
+    abslx::cord_internal::CordRep::Ref(as_tree());
     if (ABSL_PREDICT_FALSE(should_profile())) {
       StartProfiling(src);
     }
@@ -1004,12 +1004,12 @@ inline const char* Cord::InlineRep::data() const {
   return is_tree() ? nullptr : data_.as_chars();
 }
 
-inline absl::cord_internal::CordRep* Cord::InlineRep::as_tree() const {
+inline abslx::cord_internal::CordRep* Cord::InlineRep::as_tree() const {
   assert(data_.is_tree());
   return data_.as_tree();
 }
 
-inline absl::cord_internal::CordRep* Cord::InlineRep::tree() const {
+inline abslx::cord_internal::CordRep* Cord::InlineRep::tree() const {
   if (is_tree()) {
     return as_tree();
   } else {
@@ -1023,10 +1023,10 @@ inline size_t Cord::InlineRep::size() const {
   return is_tree() ? as_tree()->length : inline_size();
 }
 
-inline void Cord::InlineRep::set_tree(absl::cord_internal::CordRep* rep) {
+inline void Cord::InlineRep::set_tree(abslx::cord_internal::CordRep* rep) {
   if (rep == nullptr) {
     if (ABSL_PREDICT_FALSE(is_profiled())) {
-      absl::cord_internal::CordzInfo::UntrackCord(cordz_info());
+      abslx::cord_internal::CordzInfo::UntrackCord(cordz_info());
     }
     ResetToEmpty();
   } else {
@@ -1045,7 +1045,7 @@ inline void Cord::InlineRep::set_tree(absl::cord_internal::CordRep* rep) {
   }
 }
 
-inline void Cord::InlineRep::replace_tree(absl::cord_internal::CordRep* rep) {
+inline void Cord::InlineRep::replace_tree(abslx::cord_internal::CordRep* rep) {
   ABSL_ASSERT(is_tree());
   if (ABSL_PREDICT_FALSE(rep == nullptr)) {
     set_tree(rep);
@@ -1055,11 +1055,11 @@ inline void Cord::InlineRep::replace_tree(absl::cord_internal::CordRep* rep) {
   UpdateCordzStatistics();
 }
 
-inline absl::cord_internal::CordRep* Cord::InlineRep::clear() {
+inline abslx::cord_internal::CordRep* Cord::InlineRep::clear() {
   if (ABSL_PREDICT_FALSE(is_profiled())) {
-    absl::cord_internal::CordzInfo::UntrackCord(cordz_info());
+    abslx::cord_internal::CordzInfo::UntrackCord(cordz_info());
   }
-  absl::cord_internal::CordRep* result = tree();
+  abslx::cord_internal::CordRep* result = tree();
   ResetToEmpty();
   return result;
 }
@@ -1072,7 +1072,7 @@ inline void Cord::InlineRep::CopyToArray(char* dst) const {
 }
 
 inline ABSL_ATTRIBUTE_ALWAYS_INLINE bool Cord::InlineRep::should_profile() {
-  return absl::cord_internal::cordz_should_profile();
+  return abslx::cord_internal::cordz_should_profile();
 }
 
 inline void Cord::InlineRep::UpdateCordzStatistics() {
@@ -1122,30 +1122,30 @@ inline bool Cord::empty() const { return contents_.empty(); }
 
 inline size_t Cord::EstimatedMemoryUsage() const {
   size_t result = sizeof(Cord);
-  if (const absl::cord_internal::CordRep* rep = contents_.tree()) {
+  if (const abslx::cord_internal::CordRep* rep = contents_.tree()) {
     result += MemoryUsageAux(rep);
   }
   return result;
 }
 
-inline absl::optional<absl::string_view> Cord::TryFlat() const {
-  absl::cord_internal::CordRep* rep = contents_.tree();
+inline abslx::optional<abslx::string_view> Cord::TryFlat() const {
+  abslx::cord_internal::CordRep* rep = contents_.tree();
   if (rep == nullptr) {
-    return absl::string_view(contents_.data(), contents_.size());
+    return abslx::string_view(contents_.data(), contents_.size());
   }
-  absl::string_view fragment;
+  abslx::string_view fragment;
   if (GetFlatAux(rep, &fragment)) {
     return fragment;
   }
-  return absl::nullopt;
+  return abslx::nullopt;
 }
 
-inline absl::string_view Cord::Flatten() {
-  absl::cord_internal::CordRep* rep = contents_.tree();
+inline abslx::string_view Cord::Flatten() {
+  abslx::cord_internal::CordRep* rep = contents_.tree();
   if (rep == nullptr) {
-    return absl::string_view(contents_.data(), contents_.size());
+    return abslx::string_view(contents_.data(), contents_.size());
   } else {
-    absl::string_view already_flat_contents;
+    abslx::string_view already_flat_contents;
     if (GetFlatAux(rep, &already_flat_contents)) {
       return already_flat_contents;
     }
@@ -1153,7 +1153,7 @@ inline absl::string_view Cord::Flatten() {
   return FlattenSlowPath();
 }
 
-inline void Cord::Append(absl::string_view src) {
+inline void Cord::Append(abslx::string_view src) {
   contents_.AppendArray(src.data(), src.size());
 }
 
@@ -1176,7 +1176,7 @@ inline bool Cord::StartsWith(const Cord& rhs) const {
   return EqualsImpl(rhs, rhs_size);
 }
 
-inline bool Cord::StartsWith(absl::string_view rhs) const {
+inline bool Cord::StartsWith(abslx::string_view rhs) const {
   size_t rhs_size = rhs.size();
   if (size() < rhs_size) return false;
   return EqualsImpl(rhs, rhs_size);
@@ -1203,7 +1203,7 @@ inline Cord::ChunkIterator::ChunkIterator(const Cord* cord)
     InitTree(cord->contents_.as_tree());
   } else {
     current_chunk_ =
-        absl::string_view(cord->contents_.data(), bytes_remaining_);
+        abslx::string_view(cord->contents_.data(), bytes_remaining_);
   }
 }
 
@@ -1336,7 +1336,7 @@ inline void Cord::Advance(CharIterator* it, size_t n_bytes) {
   it->chunk_iterator_.AdvanceBytes(n_bytes);
 }
 
-inline absl::string_view Cord::ChunkRemaining(const CharIterator& it) {
+inline abslx::string_view Cord::ChunkRemaining(const CharIterator& it) {
   return *it.chunk_iterator_;
 }
 
@@ -1357,10 +1357,10 @@ inline Cord::CharIterator Cord::CharRange::end() const {
 inline Cord::CharRange Cord::Chars() const { return CharRange(this); }
 
 inline void Cord::ForEachChunk(
-    absl::FunctionRef<void(absl::string_view)> callback) const {
-  absl::cord_internal::CordRep* rep = contents_.tree();
+    abslx::FunctionRef<void(abslx::string_view)> callback) const {
+  abslx::cord_internal::CordRep* rep = contents_.tree();
   if (rep == nullptr) {
-    callback(absl::string_view(contents_.data(), contents_.size()));
+    callback(abslx::string_view(contents_.data(), contents_.size()));
   } else {
     return ForEachChunkAux(rep, callback);
   }
@@ -1388,32 +1388,32 @@ inline bool operator>=(const Cord& x, const Cord& y) {
   return x.Compare(y) >= 0;
 }
 
-// Nonmember Cord-to-absl::string_view relational operators.
+// Nonmember Cord-to-abslx::string_view relational operators.
 //
 // Due to implicit conversions, these also enable comparisons of Cord with
 // with std::string, ::string, and const char*.
-inline bool operator==(const Cord& lhs, absl::string_view rhs) {
+inline bool operator==(const Cord& lhs, abslx::string_view rhs) {
   size_t lhs_size = lhs.size();
   size_t rhs_size = rhs.size();
   if (lhs_size != rhs_size) return false;
   return lhs.EqualsImpl(rhs, rhs_size);
 }
 
-inline bool operator==(absl::string_view x, const Cord& y) { return y == x; }
-inline bool operator!=(const Cord& x, absl::string_view y) { return !(x == y); }
-inline bool operator!=(absl::string_view x, const Cord& y) { return !(x == y); }
-inline bool operator<(const Cord& x, absl::string_view y) {
+inline bool operator==(abslx::string_view x, const Cord& y) { return y == x; }
+inline bool operator!=(const Cord& x, abslx::string_view y) { return !(x == y); }
+inline bool operator!=(abslx::string_view x, const Cord& y) { return !(x == y); }
+inline bool operator<(const Cord& x, abslx::string_view y) {
   return x.Compare(y) < 0;
 }
-inline bool operator<(absl::string_view x, const Cord& y) {
+inline bool operator<(abslx::string_view x, const Cord& y) {
   return y.Compare(x) > 0;
 }
-inline bool operator>(const Cord& x, absl::string_view y) { return y < x; }
-inline bool operator>(absl::string_view x, const Cord& y) { return y < x; }
-inline bool operator<=(const Cord& x, absl::string_view y) { return !(y < x); }
-inline bool operator<=(absl::string_view x, const Cord& y) { return !(y < x); }
-inline bool operator>=(const Cord& x, absl::string_view y) { return !(x < y); }
-inline bool operator>=(absl::string_view x, const Cord& y) { return !(x < y); }
+inline bool operator>(const Cord& x, abslx::string_view y) { return y < x; }
+inline bool operator>(abslx::string_view x, const Cord& y) { return y < x; }
+inline bool operator<=(const Cord& x, abslx::string_view y) { return !(y < x); }
+inline bool operator<=(abslx::string_view x, const Cord& y) { return !(y < x); }
+inline bool operator>=(const Cord& x, abslx::string_view y) { return !(x < y); }
+inline bool operator>=(abslx::string_view x, const Cord& y) { return !(x < y); }
 
 // Some internals exposed to test code.
 namespace strings_internal {
@@ -1429,6 +1429,6 @@ class CordTestAccess {
 };
 }  // namespace strings_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_CORD_H_

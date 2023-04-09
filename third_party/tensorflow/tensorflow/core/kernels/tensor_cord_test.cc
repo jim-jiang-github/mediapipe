@@ -230,11 +230,11 @@ void TensorCordFromTensorBenchmark(benchmark::State& state, int num_elem,
   }
 }
 
-void CordReleaser(void* cord_ptr) { delete static_cast<absl::Cord*>(cord_ptr); }
+void CordReleaser(void* cord_ptr) { delete static_cast<abslx::Cord*>(cord_ptr); }
 
 void TensorCordFromAbslCordBenchmark(benchmark::State& state, int num_elem,
                                      int string_size) {
-  std::vector<absl::Cord> cords(num_elem);
+  std::vector<abslx::Cord> cords(num_elem);
   for (int i = 0; i < num_elem; ++i) {
     string s(string_size, 'a');
     cords[i] = s;
@@ -244,7 +244,7 @@ void TensorCordFromAbslCordBenchmark(benchmark::State& state, int num_elem,
     Tensor copy(DT_VARIANT, {num_elem});
     auto t_copy = copy.flat<Variant>();
     for (int i = 0; i < num_elem; ++i) {
-      auto my_cord = new absl::Cord(cords[i]);
+      auto my_cord = new abslx::Cord(cords[i]);
       t_copy(i) = TensorCord(*my_cord->chunk_begin(), CordReleaser, my_cord);
     }
   }

@@ -76,7 +76,7 @@ bool CompareShapeDimsFromLeftToRight(const Shape& shape_a,
 
 std::vector<HloInstruction*> FindAndSortFusionCandidates(
     HloInstruction* consumer) {
-  absl::flat_hash_set<HloInstruction*> fusion_instr_set;
+  abslx::flat_hash_set<HloInstruction*> fusion_instr_set;
   std::vector<HloInstruction*> fusion_instrs;
   for (HloInstruction* opnd : consumer->operands()) {
     HloInstruction* predecessor = opnd->LatestNonGteAncestor();
@@ -165,7 +165,7 @@ StatusOr<bool> GpuHorizontalInputFusion::RunOnComputation(
 
 StatusOr<bool> GpuHorizontalInputFusion::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   VLOG(2) << "Run horizontal input fusion.";
   for (HloComputation* comp :

@@ -36,9 +36,9 @@ Tensor CreateInputTensor(const TensorShape& shape, float offset) {
 }
 
 NodeDef MakeNode(
-    absl::string_view name, absl::string_view op,
-    absl::Span<const std::string> inputs,
-    absl::Span<
+    abslx::string_view name, abslx::string_view op,
+    abslx::Span<const std::string> inputs,
+    abslx::Span<
         const std::pair<std::string, FunctionDefHelper::AttrValueWrapper>>
         attrs) {
   NodeDef node;
@@ -136,8 +136,8 @@ Status XlaCompilationCacheSerializeTest::ExecuteWithBatch(const GraphDef& graph,
 
 Status
 XlaCompilationCacheSerializeTest::AlterPersistentCacheEntryHloModuleNames(
-    absl::string_view persistent_cache_dir_path,
-    absl::string_view file_prefix) {
+    abslx::string_view persistent_cache_dir_path,
+    abslx::string_view file_prefix) {
   Env* env = Env::Default();
   std::vector<string> file_names;
   TF_RETURN_IF_ERROR(
@@ -145,13 +145,13 @@ XlaCompilationCacheSerializeTest::AlterPersistentCacheEntryHloModuleNames(
 
   bool altered = false;
   for (const auto& file_name : file_names) {
-    if (absl::EndsWith(file_name, ".pb") &&
-        absl::StartsWith(file_name, file_prefix)) {
+    if (abslx::EndsWith(file_name, ".pb") &&
+        abslx::StartsWith(file_name, file_prefix)) {
       XlaSerializedCacheEntry entry;
       auto file_path = io::JoinPath(persistent_cache_dir_path, file_name);
       TF_RETURN_IF_ERROR(ReadTextOrBinaryProto(env, file_path, &entry));
       entry.mutable_hlo_module()->set_name(
-          absl::StrCat(entry.hlo_module().name(), "_altered"));
+          abslx::StrCat(entry.hlo_module().name(), "_altered"));
       TF_RETURN_IF_ERROR(WriteBinaryProto(env, file_path, entry));
       altered = true;
     }

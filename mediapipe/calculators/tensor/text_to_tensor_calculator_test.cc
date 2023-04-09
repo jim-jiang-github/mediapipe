@@ -34,7 +34,7 @@ namespace {
 
 using ::testing::StrEq;
 
-absl::StatusOr<std::string> RunTextToTensorCalculator(absl::string_view text) {
+abslx::StatusOr<std::string> RunTextToTensorCalculator(abslx::string_view text) {
   auto graph_config = ParseTextProtoOrDie<CalculatorGraphConfig>(
       R"pb(
         input_stream: "text"
@@ -57,17 +57,17 @@ absl::StatusOr<std::string> RunTextToTensorCalculator(absl::string_view text) {
   MP_RETURN_IF_ERROR(graph.WaitUntilIdle());
 
   if (output_packets.size() != 1) {
-    return absl::InvalidArgumentError(absl::Substitute(
+    return abslx::InvalidArgumentError(abslx::Substitute(
         "output_packets has size $0, expected 1", output_packets.size()));
   }
   const std::vector<Tensor>& tensor_vec =
       output_packets[0].Get<std::vector<Tensor>>();
   if (tensor_vec.size() != 1) {
-    return absl::InvalidArgumentError(absl::Substitute(
+    return abslx::InvalidArgumentError(abslx::Substitute(
         "tensor_vec has size $0, expected 1", tensor_vec.size()));
   }
   if (tensor_vec[0].element_type() != Tensor::ElementType::kChar) {
-    return absl::InvalidArgumentError("Expected tensor element type kChar");
+    return abslx::InvalidArgumentError("Expected tensor element type kChar");
   }
   const char* buffer = tensor_vec[0].GetCpuReadView().buffer<char>();
   return std::string(buffer, text.length());

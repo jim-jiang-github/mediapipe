@@ -69,7 +69,7 @@ namespace mediapipe {
 //  class Client {};
 //
 //  using ClientRegistry =
-//      GlobalFactoryRegistry<absl::StatusOr<unique_ptr<Client>>;
+//      GlobalFactoryRegistry<abslx::StatusOr<unique_ptr<Client>>;
 //
 //  class MyClient : public Client {
 //   public:
@@ -85,20 +85,20 @@ namespace mediapipe {
 //      ClientRegistry, client_registration,
 //      ::my_ns::MyClient,
 //      []() {
-//        auto backend = absl::make_unique<Backend>("/path/to/backend");
-//        const absl::Status status = backend->Init();
+//        auto backend = abslx::make_unique<Backend>("/path/to/backend");
+//        const abslx::Status status = backend->Init();
 //        if (!status.ok()) {
 //          return status;
 //        }
 //        std::unique_ptr<Client> client
-//            = absl::make_unique<MyClient>(std::move(backend));
+//            = abslx::make_unique<MyClient>(std::move(backend));
 //        return client;
 //      });
 //
 // === Using the registry to create instances ==============================
 //
-//  // Registry will return absl::StatusOr<Object>
-//  absl::StatusOr<unique_ptr<Widget>> s_or_widget =
+//  // Registry will return abslx::StatusOr<Object>
+//  abslx::StatusOr<unique_ptr<Widget>> s_or_widget =
 //      WidgetRegistry::CreateByName(
 //          "my_ns.MyWidget", std::move(gadget), thing);
 //  // Registry will return NOT_FOUND if the name is unknown.
@@ -117,7 +117,7 @@ namespace mediapipe {
 //  // This might be useful if clients outside of your codebase are registering
 //  // plugins.
 //  for (const auto& name : WidgetRegistry::GetRegisteredNames()) {
-//    absl::StatusOr<unique_ptr<Widget>> s_or_widget =
+//    abslx::StatusOr<unique_ptr<Widget>> s_or_widget =
 //        WidgetRegistry::CreateByName(name, std::move(gadget), thing);
 //    ...
 //  }
@@ -136,19 +136,19 @@ namespace registration_internal {
 
 template <typename T>
 struct WrapStatusOr {
-  using type = absl::StatusOr<T>;
+  using type = abslx::StatusOr<T>;
 };
 
 // Specialization to avoid double-wrapping types that are already StatusOrs.
 template <typename T>
-struct WrapStatusOr<absl::StatusOr<T>> {
-  using type = absl::StatusOr<T>;
+struct WrapStatusOr<abslx::StatusOr<T>> {
+  using type = abslx::StatusOr<T>;
 };
 }  // namespace registration_internal
 
 class NamespaceAllowlist {
  public:
-  static const absl::flat_hash_set<std::string>& TopNamespaces();
+  static const abslx::flat_hash_set<std::string>& TopNamespaces();
 };
 
 template <typename R, typename... Args>
@@ -161,10 +161,10 @@ class FunctionRegistry {
   FunctionRegistry(const FunctionRegistry&) = delete;
   FunctionRegistry& operator=(const FunctionRegistry&) = delete;
 
-  RegistrationToken Register(absl::string_view name, Function func)
+  RegistrationToken Register(abslx::string_view name, Function func)
       ABSL_LOCKS_EXCLUDED(lock_) {
     std::string normalized_name = GetNormalizedName(name);
-    absl::WriterMutexLock lock(&lock_);
+    abslx::WriterMutexLock lock(&lock_);
     std::string adjusted_name = GetAdjustedName(normalized_name);
     if (adjusted_name != normalized_name) {
       functions_.insert(std::make_pair(adjusted_name, func));
@@ -183,23 +183,23 @@ class FunctionRegistry {
   // opposed to a plain rvalue reference.
   // https://isocpp.org/blog/2012/11/universal-references-in-c11-scott-meyers
   //
-  // The absl::enable_if_t is used to disable this method if Args2 are not
+  // The abslx::enable_if_t is used to disable this method if Args2 are not
   // convertible to Args. This will allow the compiler to identify the offending
   // line (i.e. the line where the method is called) in the first error message,
   // rather than nesting it multiple levels down the error stack.
   template <typename... Args2,
-            absl::enable_if_t<std::is_convertible<std::tuple<Args2...>,
+            abslx::enable_if_t<std::is_convertible<std::tuple<Args2...>,
                                                   std::tuple<Args...>>::value,
                               int> = 0>
-  ReturnType Invoke(absl::string_view name, Args2&&... args)
+  ReturnType Invoke(abslx::string_view name, Args2&&... args)
       ABSL_LOCKS_EXCLUDED(lock_) {
     Function function;
     {
-      absl::ReaderMutexLock lock(&lock_);
+      abslx::ReaderMutexLock lock(&lock_);
       auto it = functions_.find(name);
       if (it == functions_.end()) {
-        return absl::NotFoundError(
-            absl::StrCat("No registered object with name: ", name));
+        return abslx::NotFoundError(
+            abslx::StrCat("No registered object with name: ", name));
       }
       function = it->second;
     }
@@ -209,7 +209,7 @@ class FunctionRegistry {
   // Invokes the specified factory function and returns the result.
   // Namespaces in |name| and |ns| are separated by kNameSep.
   template <typename... Args2>
-  ReturnType Invoke(absl::string_view ns, absl::string_view name,
+  ReturnType Invoke(abslx::string_view ns, abslx::string_view name,
                     Args2&&... args) ABSL_LOCKS_EXCLUDED(lock_) {
     return Invoke(GetQualifiedName(ns, name), args...);
   }
@@ -217,14 +217,14 @@ class FunctionRegistry {
   // Note that it's possible for registered implementations to be subsequently
   // unregistered, though this will never happen with registrations made via
   // MEDIAPIPE_REGISTER_FACTORY_FUNCTION.
-  bool IsRegistered(absl::string_view name) const ABSL_LOCKS_EXCLUDED(lock_) {
-    absl::ReaderMutexLock lock(&lock_);
+  bool IsRegistered(abslx::string_view name) const ABSL_LOCKS_EXCLUDED(lock_) {
+    abslx::ReaderMutexLock lock(&lock_);
     return functions_.count(name) != 0;
   }
 
   // Returns true if the specified factory function is available.
   // Namespaces in |name| and |ns| are separated by kNameSep.
-  bool IsRegistered(absl::string_view ns, absl::string_view name) const
+  bool IsRegistered(abslx::string_view ns, abslx::string_view name) const
       ABSL_LOCKS_EXCLUDED(lock_) {
     return IsRegistered(GetQualifiedName(ns, name));
   }
@@ -235,7 +235,7 @@ class FunctionRegistry {
   // MEDIAPIPE_REGISTER_FACTORY_FUNCTION.
   std::unordered_set<std::string> GetRegisteredNames() const
       ABSL_LOCKS_EXCLUDED(lock_) {
-    absl::ReaderMutexLock lock(&lock_);
+    abslx::ReaderMutexLock lock(&lock_);
     std::unordered_set<std::string> names;
     std::for_each(functions_.cbegin(), functions_.cend(),
                   [&names](const std::pair<const std::string, Function>& pair) {
@@ -247,9 +247,9 @@ class FunctionRegistry {
   // Normalizes a C++ qualified name.  Validates the name qualification.
   // The name must be either unqualified or fully qualified with a leading "::".
   // The leading "::" in a fully qualified name is stripped.
-  std::string GetNormalizedName(absl::string_view name) {
+  std::string GetNormalizedName(abslx::string_view name) {
     using ::mediapipe::registration_internal::kCxxSep;
-    std::vector<std::string> names = absl::StrSplit(name, kCxxSep);
+    std::vector<std::string> names = abslx::StrSplit(name, kCxxSep);
     if (names[0].empty()) {
       names.erase(names.begin());
     } else {
@@ -257,29 +257,29 @@ class FunctionRegistry {
           << "A registered class name must be either fully qualified "
           << "with a leading :: or unqualified, got: " << name << ".";
     }
-    return absl::StrJoin(names, kCxxSep);
+    return abslx::StrJoin(names, kCxxSep);
   }
 
   // Returns the registry key for a name specified within a namespace.
   // Namespaces are separated by kNameSep.
-  std::string GetQualifiedName(absl::string_view ns,
-                               absl::string_view name) const {
+  std::string GetQualifiedName(abslx::string_view ns,
+                               abslx::string_view name) const {
     using ::mediapipe::registration_internal::kCxxSep;
     using ::mediapipe::registration_internal::kNameSep;
-    std::vector<std::string> names = absl::StrSplit(name, kNameSep);
+    std::vector<std::string> names = abslx::StrSplit(name, kNameSep);
     if (names[0].empty()) {
       names.erase(names.begin());
-      return absl::StrJoin(names, kCxxSep);
+      return abslx::StrJoin(names, kCxxSep);
     }
-    std::string cxx_name = absl::StrJoin(names, kCxxSep);
+    std::string cxx_name = abslx::StrJoin(names, kCxxSep);
     if (ns.empty()) {
       return cxx_name;
     }
-    std::vector<std::string> spaces = absl::StrSplit(ns, kNameSep);
-    absl::ReaderMutexLock lock(&lock_);
+    std::vector<std::string> spaces = abslx::StrSplit(ns, kNameSep);
+    abslx::ReaderMutexLock lock(&lock_);
     while (!spaces.empty()) {
-      std::string cxx_ns = absl::StrJoin(spaces, kCxxSep);
-      std::string qualified_name = absl::StrCat(cxx_ns, kCxxSep, cxx_name);
+      std::string cxx_ns = abslx::StrJoin(spaces, kCxxSep);
+      std::string qualified_name = abslx::StrCat(cxx_ns, kCxxSep, cxx_name);
       if (functions_.count(qualified_name)) {
         return qualified_name;
       }
@@ -289,24 +289,24 @@ class FunctionRegistry {
   }
 
  private:
-  mutable absl::Mutex lock_;
-  absl::flat_hash_map<std::string, Function> functions_ ABSL_GUARDED_BY(lock_);
+  mutable abslx::Mutex lock_;
+  abslx::flat_hash_map<std::string, Function> functions_ ABSL_GUARDED_BY(lock_);
 
   // For names included in NamespaceAllowlist, strips the namespace.
-  std::string GetAdjustedName(absl::string_view name) {
+  std::string GetAdjustedName(abslx::string_view name) {
     using ::mediapipe::registration_internal::kCxxSep;
-    std::vector<std::string> names = absl::StrSplit(name, kCxxSep);
+    std::vector<std::string> names = abslx::StrSplit(name, kCxxSep);
     std::string base_name = names.back();
     names.pop_back();
-    std::string ns = absl::StrJoin(names, kCxxSep);
+    std::string ns = abslx::StrJoin(names, kCxxSep);
     if (NamespaceAllowlist::TopNamespaces().count(ns)) {
       return base_name;
     }
     return std::string(name);
   }
 
-  void Unregister(absl::string_view name) {
-    absl::WriterMutexLock lock(&lock_);
+  void Unregister(abslx::string_view name) {
+    abslx::WriterMutexLock lock(&lock_);
     std::string adjusted_name = GetAdjustedName(name);
     if (adjusted_name != name) {
       functions_.erase(adjusted_name);
@@ -320,7 +320,7 @@ class GlobalFactoryRegistry {
   using Functions = FunctionRegistry<R, Args...>;
 
  public:
-  static RegistrationToken Register(absl::string_view name,
+  static RegistrationToken Register(abslx::string_view name,
                                     typename Functions::Function func) {
     return functions()->Register(name, std::move(func));
   }
@@ -329,7 +329,7 @@ class GlobalFactoryRegistry {
   // If using namespaces with this registry, the variant with a namespace
   // argument should be used.
   template <typename... Args2>
-  static typename Functions::ReturnType CreateByName(absl::string_view name,
+  static typename Functions::ReturnType CreateByName(abslx::string_view name,
                                                      Args2&&... args) {
     return functions()->Invoke(name, std::forward<Args2>(args)...);
   }
@@ -337,7 +337,7 @@ class GlobalFactoryRegistry {
   // Returns true if the specified factory function is available.
   // If using namespaces with this registry, the variant with a namespace
   // argument should be used.
-  static bool IsRegistered(absl::string_view name) {
+  static bool IsRegistered(abslx::string_view name) {
     return functions()->IsRegistered(name);
   }
 
@@ -347,19 +347,19 @@ class GlobalFactoryRegistry {
 
   // Invokes the specified factory function and returns the result.
   // Namespaces in |name| and |ns| are separated by kNameSep.
-  // See comments re: use of Args2 and absl::enable_if_t on Invoke.
+  // See comments re: use of Args2 and abslx::enable_if_t on Invoke.
   template <typename... Args2,
-            absl::enable_if_t<std::is_convertible<std::tuple<Args2...>,
+            abslx::enable_if_t<std::is_convertible<std::tuple<Args2...>,
                                                   std::tuple<Args...>>::value,
                               int> = 0>
   static typename Functions::ReturnType CreateByNameInNamespace(
-      absl::string_view ns, absl::string_view name, Args2&&... args) {
+      abslx::string_view ns, abslx::string_view name, Args2&&... args) {
     return functions()->Invoke(ns, name, std::forward<Args2>(args)...);
   }
 
   // Returns true if the specified factory function is available.
   // Namespaces in |name| and |ns| are separated by kNameSep.
-  static bool IsRegistered(absl::string_view ns, absl::string_view name) {
+  static bool IsRegistered(abslx::string_view ns, abslx::string_view name) {
     return functions()->IsRegistered(ns, name);
   }
 

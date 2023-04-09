@@ -44,12 +44,12 @@ class BaseAudioTaskApi : public tasks::core::BaseTaskApi {
   // A synchronous method to process independent audio clips.
   // The call blocks the current thread until a failure status or a successful
   // result is returned.
-  absl::StatusOr<tasks::core::PacketMap> ProcessAudioClip(
+  abslx::StatusOr<tasks::core::PacketMap> ProcessAudioClip(
       tasks::core::PacketMap inputs) {
     if (running_mode_ != RunningMode::AUDIO_CLIPS) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
-          absl::StrCat(
+          abslx::StatusCode::kInvalidArgument,
+          abslx::StrCat(
               "Task is not initialized with the audio clips mode. Current "
               "running mode:",
               GetRunningModeName(running_mode_)),
@@ -60,11 +60,11 @@ class BaseAudioTaskApi : public tasks::core::BaseTaskApi {
 
   // An asynchronous method to send audio stream data to the runner. The results
   // will be available in the user-defined results callback.
-  absl::Status SendAudioStreamData(tasks::core::PacketMap inputs) {
+  abslx::Status SendAudioStreamData(tasks::core::PacketMap inputs) {
     if (running_mode_ != RunningMode::AUDIO_STREAM) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
-          absl::StrCat("Task is not initialized with the audio stream mode. "
+          abslx::StatusCode::kInvalidArgument,
+          abslx::StrCat("Task is not initialized with the audio stream mode. "
                        "Current running mode:",
                        GetRunningModeName(running_mode_)),
           MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError);
@@ -73,12 +73,12 @@ class BaseAudioTaskApi : public tasks::core::BaseTaskApi {
   }
 
   // Checks or sets the sample rate in the audio stream mode.
-  absl::Status CheckOrSetSampleRate(std::string sample_rate_stream_name,
+  abslx::Status CheckOrSetSampleRate(std::string sample_rate_stream_name,
                                     double sample_rate) {
     if (running_mode_ != RunningMode::AUDIO_STREAM) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
-          absl::StrCat("Task is not initialized with the audio stream mode. "
+          abslx::StatusCode::kInvalidArgument,
+          abslx::StrCat("Task is not initialized with the audio stream mode. "
                        "Current running mode:",
                        GetRunningModeName(running_mode_)),
           MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError);
@@ -87,8 +87,8 @@ class BaseAudioTaskApi : public tasks::core::BaseTaskApi {
       if (std::fabs(sample_rate - default_sample_rate_) >
           std::numeric_limits<double>::epsilon()) {
         return CreateStatusWithPayload(
-            absl::StatusCode::kInvalidArgument,
-            absl::StrCat("The input audio sample rate: ", sample_rate,
+            abslx::StatusCode::kInvalidArgument,
+            abslx::StrCat("The input audio sample rate: ", sample_rate,
                          " is inconsistent with the previously provided: ",
                          default_sample_rate_),
             MediaPipeTasksStatus::kInvalidArgumentError);
@@ -99,7 +99,7 @@ class BaseAudioTaskApi : public tasks::core::BaseTaskApi {
           {{sample_rate_stream_name, MakePacket<double>(default_sample_rate_)
                                          .At(Timestamp::PreStream())}}));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

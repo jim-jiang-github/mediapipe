@@ -27,24 +27,24 @@ std::string OpMetadataToString(const OpMetadata& metadata) {
   std::vector<std::string> result;
   if (!metadata.op_type().empty()) {
     result.push_back(
-        absl::StrCat("op_type=\"", absl::CEscape(metadata.op_type()), "\""));
+        abslx::StrCat("op_type=\"", abslx::CEscape(metadata.op_type()), "\""));
   }
   if (!metadata.op_name().empty()) {
     result.push_back(
-        absl::StrCat("op_name=\"", absl::CEscape(metadata.op_name()), "\""));
+        abslx::StrCat("op_name=\"", abslx::CEscape(metadata.op_name()), "\""));
   }
   if (!metadata.source_file().empty()) {
-    result.push_back(absl::StrCat("source_file=\"",
-                                  absl::CEscape(metadata.source_file()), "\""));
+    result.push_back(abslx::StrCat("source_file=\"",
+                                  abslx::CEscape(metadata.source_file()), "\""));
   }
   if (metadata.source_line() != 0) {
-    result.push_back(absl::StrCat("source_line=", metadata.source_line()));
+    result.push_back(abslx::StrCat("source_line=", metadata.source_line()));
   }
   if (!metadata.profile_type().empty()) {
-    result.push_back(absl::StrCat(
-        "profile_type={", absl::StrJoin(metadata.profile_type(), ","), "}"));
+    result.push_back(abslx::StrCat(
+        "profile_type={", abslx::StrJoin(metadata.profile_type(), ","), "}"));
   }
-  return absl::StrJoin(result, " ");
+  return abslx::StrJoin(result, " ");
 }
 
 }  // namespace xla

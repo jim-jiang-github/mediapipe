@@ -48,18 +48,18 @@ std::unique_ptr<GPUOperation> SelectMaxUnpooling(
 void SelectAdd(const OperationDef& op_def, const std::vector<int>& channels,
                int dst_channels, std::unique_ptr<GPUOperation>* ptr);
 
-absl::Status SelectGather(const GatherAttributes& attr,
+abslx::Status SelectGather(const GatherAttributes& attr,
                           const OperationDef& op_def,
                           std::unique_ptr<GPUOperation>* ptr);
 
-absl::Status SelectResize(const Resize2DAttributes& attr,
+abslx::Status SelectResize(const Resize2DAttributes& attr,
                           const OperationDef& op_def,
                           std::unique_ptr<GPUOperation>* ptr);
 
 std::unique_ptr<GPUOperation> SelectResampler(const OperationDef& op_def,
                                               const GpuInfo& gpu_info);
 
-absl::Status SelectConcat(const ConcatAttributes& attr,
+abslx::Status SelectConcat(const ConcatAttributes& attr,
                           const std::vector<int>& channels,
                           const OperationDef& op_def, const GpuInfo& gpu_info,
                           std::unique_ptr<GPUOperation>* ptr);

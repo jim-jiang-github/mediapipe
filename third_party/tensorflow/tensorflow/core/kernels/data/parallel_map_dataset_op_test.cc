@@ -62,7 +62,7 @@ class ParallelMapDatasetParams : public DatasetParams {
     input_names->emplace_back(ParallelMapDatasetOp::kInputDataset);
     for (int i = 0; i < other_arguments_.size(); ++i) {
       input_names->emplace_back(
-          absl::StrCat(ParallelMapDatasetOp::kOtherArguments, "_", i));
+          abslx::StrCat(ParallelMapDatasetOp::kOtherArguments, "_", i));
     }
     input_names->emplace_back(ParallelMapDatasetOp::kNumParallelCalls);
     return OkStatus();

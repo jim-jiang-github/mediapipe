@@ -35,7 +35,7 @@ namespace gpu {
 namespace cl {
 namespace {
 bool IsWordSymbol(char symbol) {
-  return absl::ascii_isalnum(symbol) || symbol == '_';
+  return abslx::ascii_isalnum(symbol) || symbol == '_';
 }
 
 void ReplaceAllWords(const std::string& old_word, const std::string& new_word,
@@ -57,9 +57,9 @@ void ReplaceAllWords(const std::string& old_word, const std::string& new_word,
 
 void AppendArgument(const std::string& arg, std::string* args) {
   if (!args->empty()) {
-    absl::StrAppend(args, ",\n  ");
+    abslx::StrAppend(args, ",\n  ");
   }
-  absl::StrAppend(args, arg);
+  abslx::StrAppend(args, arg);
 }
 
 std::string GetImageModifier(AccessType access) {
@@ -100,7 +100,7 @@ std::string GetDefaultSamplers(const GpuInfo& gpu_info) {
   return result;
 }
 
-absl::Status CreateCLObject(GPUObjectDescriptor* desc, CLContext* context,
+abslx::Status CreateCLObject(GPUObjectDescriptor* desc, CLContext* context,
                             GPUObjectPtr* result) {
   const auto* buffer_desc = dynamic_cast<const BufferDescriptor*>(desc);
   if (buffer_desc) {
@@ -108,7 +108,7 @@ absl::Status CreateCLObject(GPUObjectDescriptor* desc, CLContext* context,
     RETURN_IF_ERROR(
         gpu_buffer.CreateFromBufferDescriptor(*buffer_desc, context));
     *result = std::make_unique<Buffer>(std::move(gpu_buffer));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   const auto* texture_desc = dynamic_cast<const Texture2DDescriptor*>(desc);
@@ -117,7 +117,7 @@ absl::Status CreateCLObject(GPUObjectDescriptor* desc, CLContext* context,
     RETURN_IF_ERROR(
         gpu_texture.CreateFromTexture2DDescriptor(*texture_desc, context));
     *result = std::make_unique<Texture2D>(std::move(gpu_texture));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   const auto* tensor_desc = dynamic_cast<const TensorDescriptor*>(desc);
@@ -125,10 +125,10 @@ absl::Status CreateCLObject(GPUObjectDescriptor* desc, CLContext* context,
     Tensor gpu_tensor;
     RETURN_IF_ERROR(gpu_tensor.CreateFromDescriptor(*tensor_desc, context));
     *result = std::make_unique<Tensor>(std::move(gpu_tensor));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  return absl::InvalidArgumentError("Unknown GPU descriptor.");
+  return abslx::InvalidArgumentError("Unknown GPU descriptor.");
 }
 
 }  // namespace
@@ -136,7 +136,7 @@ absl::Status CreateCLObject(GPUObjectDescriptor* desc, CLContext* context,
 // Static
 constexpr char CLArguments::kArgsPrefix[];
 
-absl::Status CLArguments::Init(const GpuInfo& gpu_info, CLContext* context,
+abslx::Status CLArguments::Init(const GpuInfo& gpu_info, CLContext* context,
                                Arguments* args, std::string* code) {
   RETURN_IF_ERROR(AllocateObjects(*args, context));
   RETURN_IF_ERROR(AddObjectArgs(gpu_info, *args));
@@ -146,14 +146,14 @@ absl::Status CLArguments::Init(const GpuInfo& gpu_info, CLContext* context,
   RETURN_IF_ERROR(SetObjectsResources(*args));
   RenameArgumentsInCode(code);
   args->ResolveArgsPass(code);
-  *code = absl::Substitute(*code, GetListOfArgs());
+  *code = abslx::Substitute(*code, GetListOfArgs());
   if (gpu_info.SupportsImages()) {
     *code = GetDefaultSamplers(gpu_info) + *code;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CLArguments::Init(const GpuInfo& gpu_info, Arguments* args,
+abslx::Status CLArguments::Init(const GpuInfo& gpu_info, Arguments* args,
                                CLContext* context) {
   RETURN_IF_ERROR(AllocateObjects(*args, context));
   RETURN_IF_ERROR(AddObjectArgs(gpu_info, *args));
@@ -161,10 +161,10 @@ absl::Status CLArguments::Init(const GpuInfo& gpu_info, Arguments* args,
   const bool use_f32_for_halfs = gpu_info.IsPowerVR();
   CopyArguments(*args, use_f32_for_halfs);
   RETURN_IF_ERROR(SetObjectsResources(*args));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CLArguments::AllocateObjects(const Arguments& args,
+abslx::Status CLArguments::AllocateObjects(const Arguments& args,
                                           CLContext* context) {
   objects_.resize(args.objects_.size());
   int i = 0;
@@ -172,10 +172,10 @@ absl::Status CLArguments::AllocateObjects(const Arguments& args,
     RETURN_IF_ERROR(CreateCLObject(t.second.get(), context, &objects_[i]));
     i++;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CLArguments::AddObjectArgs(const GpuInfo& gpu_info,
+abslx::Status CLArguments::AddObjectArgs(const GpuInfo& gpu_info,
                                         const Arguments& args) {
   for (const auto& t : args.objects_) {
     AddGPUResources(t.first, t.second->GetGPUResources(gpu_info));
@@ -183,10 +183,10 @@ absl::Status CLArguments::AddObjectArgs(const GpuInfo& gpu_info,
   for (const auto& t : args.object_refs_) {
     AddGPUResources(t.first, t.second->GetGPUResources(gpu_info));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CLArguments::SetObjectsResources(const Arguments& args) {
+abslx::Status CLArguments::SetObjectsResources(const Arguments& args) {
   int i = 0;
   for (const auto& t : args.objects_) {
     GPUResourcesWithValue resources;
@@ -194,7 +194,7 @@ absl::Status CLArguments::SetObjectsResources(const Arguments& args) {
     RETURN_IF_ERROR(SetGPUResources(t.first, resources));
     i++;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void CLArguments::CopyArguments(const Arguments& args, bool use_f32_for_halfs) {
@@ -306,55 +306,55 @@ void CLArguments::AddCustomMemory(const std::string& name,
 void CLArguments::AddGPUResources(const std::string& name,
                                   const GPUResources& resources) {
   for (const auto& r : resources.buffers) {
-    AddBuffer(absl::StrCat(name, "_", r.first), r.second);
+    AddBuffer(abslx::StrCat(name, "_", r.first), r.second);
   }
   for (const auto& r : resources.images2d) {
-    AddImage2D(absl::StrCat(name, "_", r.first), r.second);
+    AddImage2D(abslx::StrCat(name, "_", r.first), r.second);
   }
   for (const auto& r : resources.image2d_arrays) {
-    AddImage2DArray(absl::StrCat(name, "_", r.first), r.second);
+    AddImage2DArray(abslx::StrCat(name, "_", r.first), r.second);
   }
   for (const auto& r : resources.images3d) {
-    AddImage3D(absl::StrCat(name, "_", r.first), r.second);
+    AddImage3D(abslx::StrCat(name, "_", r.first), r.second);
   }
   for (const auto& r : resources.image_buffers) {
-    AddImageBuffer(absl::StrCat(name, "_", r.first), r.second);
+    AddImageBuffer(abslx::StrCat(name, "_", r.first), r.second);
   }
   for (const auto& r : resources.custom_memories) {
-    AddCustomMemory(absl::StrCat(name, "_", r.first), r.second);
+    AddCustomMemory(abslx::StrCat(name, "_", r.first), r.second);
   }
 }
 
-absl::Status CLArguments::SetInt(const std::string& name, int value) {
+abslx::Status CLArguments::SetInt(const std::string& name, int value) {
   auto it = int_values_.find(name);
   if (it == int_values_.end()) {
-    return absl::NotFoundError(
-        absl::StrCat("No int argument with name - ", name));
+    return abslx::NotFoundError(
+        abslx::StrCat("No int argument with name - ", name));
   }
   it->second.value = value;
   if (it->second.active) {
     shared_int4s_data_[it->second.offset] = value;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
-absl::Status CLArguments::SetFloat(const std::string& name, float value) {
+abslx::Status CLArguments::SetFloat(const std::string& name, float value) {
   auto it = float_values_.find(name);
   if (it == float_values_.end()) {
-    return absl::NotFoundError(
-        absl::StrCat("No float argument with name - ", name));
+    return abslx::NotFoundError(
+        abslx::StrCat("No float argument with name - ", name));
   }
   it->second.value = value;
   if (it->second.active) {
     shared_float4s_data_[it->second.offset] = value;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CLArguments::SetHalf(const std::string& name, half value) {
+abslx::Status CLArguments::SetHalf(const std::string& name, half value) {
   auto it = half_values_.find(name);
   if (it == half_values_.end()) {
-    return absl::NotFoundError(
-        absl::StrCat("No half argument with name - ", name));
+    return abslx::NotFoundError(
+        abslx::StrCat("No half argument with name - ", name));
   }
   it->second.value = value;
   if (it->second.active) {
@@ -364,113 +364,113 @@ absl::Status CLArguments::SetHalf(const std::string& name, half value) {
       shared_half4s_data_[it->second.offset] = value;
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CLArguments::SetImage2D(const std::string& name, cl_mem memory) {
+abslx::Status CLArguments::SetImage2D(const std::string& name, cl_mem memory) {
   auto it = images2d_.find(name);
   if (it == images2d_.end()) {
-    return absl::NotFoundError(
-        absl::StrCat("No image2D argument with name - ", name));
+    return abslx::NotFoundError(
+        abslx::StrCat("No image2D argument with name - ", name));
   }
   it->second.memory = memory;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CLArguments::SetBuffer(const std::string& name, cl_mem memory) {
+abslx::Status CLArguments::SetBuffer(const std::string& name, cl_mem memory) {
   auto it = buffers_.find(name);
   if (it == buffers_.end()) {
-    return absl::NotFoundError(
-        absl::StrCat("No buffer argument with name - ", name));
+    return abslx::NotFoundError(
+        abslx::StrCat("No buffer argument with name - ", name));
   }
   it->second.memory = memory;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CLArguments::SetImage2DArray(const std::string& name,
+abslx::Status CLArguments::SetImage2DArray(const std::string& name,
                                           cl_mem memory) {
   auto it = image2d_arrays_.find(name);
   if (it == image2d_arrays_.end()) {
-    return absl::NotFoundError(
-        absl::StrCat("No image2D array argument with name - ", name));
+    return abslx::NotFoundError(
+        abslx::StrCat("No image2D array argument with name - ", name));
   }
   it->second.memory = memory;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CLArguments::SetImage3D(const std::string& name, cl_mem memory) {
+abslx::Status CLArguments::SetImage3D(const std::string& name, cl_mem memory) {
   auto it = images3d_.find(name);
   if (it == images3d_.end()) {
-    return absl::NotFoundError(
-        absl::StrCat("No image3D argument with name - ", name));
+    return abslx::NotFoundError(
+        abslx::StrCat("No image3D argument with name - ", name));
   }
   it->second.memory = memory;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CLArguments::SetImageBuffer(const std::string& name,
+abslx::Status CLArguments::SetImageBuffer(const std::string& name,
                                          cl_mem memory) {
   auto it = image_buffers_.find(name);
   if (it == image_buffers_.end()) {
-    return absl::NotFoundError(
-        absl::StrCat("No image buffer argument with name - ", name));
+    return abslx::NotFoundError(
+        abslx::StrCat("No image buffer argument with name - ", name));
   }
   it->second.memory = memory;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CLArguments::SetCustomMemory(const std::string& name,
+abslx::Status CLArguments::SetCustomMemory(const std::string& name,
                                           cl_mem memory) {
   auto it = custom_memories_.find(name);
   if (it == custom_memories_.end()) {
-    return absl::NotFoundError(
-        absl::StrCat("No custom memory argument with name - ", name));
+    return abslx::NotFoundError(
+        abslx::StrCat("No custom memory argument with name - ", name));
   }
   it->second.memory = memory;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CLArguments::SetObjectRef(const std::string& name,
+abslx::Status CLArguments::SetObjectRef(const std::string& name,
                                        const GPUObject* object) {
   auto it = object_refs_.find(name);
   if (it == object_refs_.end()) {
-    return absl::NotFoundError(
-        absl::StrCat("No object ref with name - ", name));
+    return abslx::NotFoundError(
+        abslx::StrCat("No object ref with name - ", name));
   }
   GPUResourcesWithValue resources;
   RETURN_IF_ERROR(object->GetGPUResources(it->second.get(), &resources));
   return SetGPUResources(name, resources);
 }
 
-absl::Status CLArguments::SetGPUResources(
+abslx::Status CLArguments::SetGPUResources(
     const std::string& name, const GPUResourcesWithValue& resources) {
   for (const auto& r : resources.generic.ints) {
-    RETURN_IF_ERROR(SetInt(absl::StrCat(name, "_", r.first), r.second));
+    RETURN_IF_ERROR(SetInt(abslx::StrCat(name, "_", r.first), r.second));
   }
   for (const auto& r : resources.generic.floats) {
-    RETURN_IF_ERROR(SetFloat(absl::StrCat(name, "_", r.first), r.second));
+    RETURN_IF_ERROR(SetFloat(abslx::StrCat(name, "_", r.first), r.second));
   }
   for (const auto& r : resources.buffers) {
-    RETURN_IF_ERROR(SetBuffer(absl::StrCat(name, "_", r.first), r.second));
+    RETURN_IF_ERROR(SetBuffer(abslx::StrCat(name, "_", r.first), r.second));
   }
   for (const auto& r : resources.images2d) {
-    RETURN_IF_ERROR(SetImage2D(absl::StrCat(name, "_", r.first), r.second));
+    RETURN_IF_ERROR(SetImage2D(abslx::StrCat(name, "_", r.first), r.second));
   }
   for (const auto& r : resources.image2d_arrays) {
     RETURN_IF_ERROR(
-        SetImage2DArray(absl::StrCat(name, "_", r.first), r.second));
+        SetImage2DArray(abslx::StrCat(name, "_", r.first), r.second));
   }
   for (const auto& r : resources.images3d) {
-    RETURN_IF_ERROR(SetImage3D(absl::StrCat(name, "_", r.first), r.second));
+    RETURN_IF_ERROR(SetImage3D(abslx::StrCat(name, "_", r.first), r.second));
   }
   for (const auto& r : resources.image_buffers) {
-    RETURN_IF_ERROR(SetImageBuffer(absl::StrCat(name, "_", r.first), r.second));
+    RETURN_IF_ERROR(SetImageBuffer(abslx::StrCat(name, "_", r.first), r.second));
   }
   for (const auto& r : resources.custom_memories) {
     RETURN_IF_ERROR(
-        SetCustomMemory(absl::StrCat(name, "_", r.first), r.second));
+        SetCustomMemory(abslx::StrCat(name, "_", r.first), r.second));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 std::string CLArguments::GetListOfArgs() {
@@ -480,7 +480,7 @@ std::string CLArguments::GetListOfArgs() {
         t.second.desc.data_type == DataType::FLOAT32 ? "float" : "half";
     std::string attributes;
     for (const auto& attr : t.second.desc.attributes) {
-      attributes += absl::StrCat("  __attribute__((", attr, "))");
+      attributes += abslx::StrCat("  __attribute__((", attr, "))");
     }
     std::string cl_type;
     if (t.second.desc.data_type == DataType::BOOL) {
@@ -489,52 +489,52 @@ std::string CLArguments::GetListOfArgs() {
       cl_type =
           ToCLDataType(t.second.desc.data_type, t.second.desc.element_size);
     }
-    AppendArgument(absl::StrCat(MemoryTypeToCLType(t.second.desc.memory_type),
+    AppendArgument(abslx::StrCat(MemoryTypeToCLType(t.second.desc.memory_type),
                                 " ", cl_type, "* ", t.first, attributes),
                    &result);
   }
   for (auto& t : image_buffers_) {
-    AppendArgument(absl::StrCat(GetImageModifier(t.second.desc.access_type),
+    AppendArgument(abslx::StrCat(GetImageModifier(t.second.desc.access_type),
                                 " image1d_buffer_t ", t.first),
                    &result);
   }
   for (auto& t : images2d_) {
-    AppendArgument(absl::StrCat(GetImageModifier(t.second.desc.access_type),
+    AppendArgument(abslx::StrCat(GetImageModifier(t.second.desc.access_type),
                                 " image2d_t ", t.first),
                    &result);
   }
   for (auto& t : image2d_arrays_) {
-    AppendArgument(absl::StrCat(GetImageModifier(t.second.desc.access_type),
+    AppendArgument(abslx::StrCat(GetImageModifier(t.second.desc.access_type),
                                 " image2d_array_t ", t.first),
                    &result);
   }
   for (auto& t : images3d_) {
-    AppendArgument(absl::StrCat(GetImageModifier(t.second.desc.access_type),
+    AppendArgument(abslx::StrCat(GetImageModifier(t.second.desc.access_type),
                                 " image3d_t ", t.first),
                    &result);
   }
   for (auto& t : custom_memories_) {
-    AppendArgument(absl::StrCat(t.second.desc.type_name, " ", t.first),
+    AppendArgument(abslx::StrCat(t.second.desc.type_name, " ", t.first),
                    &result);
   }
   for (int i = 0; i < shared_int4s_data_.size() / 4; ++i) {
-    AppendArgument(absl::StrCat("int4 shared_int4_", i), &result);
+    AppendArgument(abslx::StrCat("int4 shared_int4_", i), &result);
   }
   for (int i = 0; i < shared_float4s_data_.size() / 4; ++i) {
-    AppendArgument(absl::StrCat("float4 shared_float4_", i), &result);
+    AppendArgument(abslx::StrCat("float4 shared_float4_", i), &result);
   }
   for (int i = 0; i < shared_half4s_data_.size() / 4; ++i) {
-    AppendArgument(absl::StrCat("half4 shared_half4_", i), &result);
+    AppendArgument(abslx::StrCat("half4 shared_half4_", i), &result);
   }
   return result;
 }
 
-absl::Status CLArguments::Bind(cl_kernel kernel, int offset) {
+abslx::Status CLArguments::Bind(cl_kernel kernel, int offset) {
   for (auto& t : buffers_) {
     const int error_code =
         clSetKernelArg(kernel, offset, sizeof(cl_mem), &t.second.memory);
     if (error_code != CL_SUCCESS) {
-      return absl::UnknownError(absl::StrCat(
+      return abslx::UnknownError(abslx::StrCat(
           "Failed to set kernel arguments - ", CLErrorCodeToString(error_code),
           "(at index - ", offset, ")"));
     }
@@ -544,7 +544,7 @@ absl::Status CLArguments::Bind(cl_kernel kernel, int offset) {
     const int error_code =
         clSetKernelArg(kernel, offset, sizeof(cl_mem), &t.second.memory);
     if (error_code != CL_SUCCESS) {
-      return absl::UnknownError(absl::StrCat(
+      return abslx::UnknownError(abslx::StrCat(
           "Failed to set kernel arguments - ", CLErrorCodeToString(error_code),
           "(at index - ", offset, ")"));
     }
@@ -554,7 +554,7 @@ absl::Status CLArguments::Bind(cl_kernel kernel, int offset) {
     const int error_code =
         clSetKernelArg(kernel, offset, sizeof(cl_mem), &t.second.memory);
     if (error_code != CL_SUCCESS) {
-      return absl::UnknownError(absl::StrCat(
+      return abslx::UnknownError(abslx::StrCat(
           "Failed to set kernel arguments - ", CLErrorCodeToString(error_code),
           "(at index - ", offset, ")"));
     }
@@ -564,7 +564,7 @@ absl::Status CLArguments::Bind(cl_kernel kernel, int offset) {
     const int error_code =
         clSetKernelArg(kernel, offset, sizeof(cl_mem), &t.second.memory);
     if (error_code != CL_SUCCESS) {
-      return absl::UnknownError(absl::StrCat(
+      return abslx::UnknownError(abslx::StrCat(
           "Failed to set kernel arguments - ", CLErrorCodeToString(error_code),
           "(at index - ", offset, ")"));
     }
@@ -574,7 +574,7 @@ absl::Status CLArguments::Bind(cl_kernel kernel, int offset) {
     const int error_code =
         clSetKernelArg(kernel, offset, sizeof(cl_mem), &t.second.memory);
     if (error_code != CL_SUCCESS) {
-      return absl::UnknownError(absl::StrCat(
+      return abslx::UnknownError(abslx::StrCat(
           "Failed to set kernel arguments - ", CLErrorCodeToString(error_code),
           "(at index - ", offset, ")"));
     }
@@ -584,7 +584,7 @@ absl::Status CLArguments::Bind(cl_kernel kernel, int offset) {
     const int error_code =
         clSetKernelArg(kernel, offset, sizeof(cl_mem), &t.second.memory);
     if (error_code != CL_SUCCESS) {
-      return absl::UnknownError(absl::StrCat(
+      return abslx::UnknownError(abslx::StrCat(
           "Failed to set kernel arguments - ", CLErrorCodeToString(error_code),
           "(at index - ", offset, ")"));
     }
@@ -594,7 +594,7 @@ absl::Status CLArguments::Bind(cl_kernel kernel, int offset) {
     const int error_code = clSetKernelArg(kernel, offset, sizeof(int32_t) * 4,
                                           &shared_int4s_data_[i * 4]);
     if (error_code != CL_SUCCESS) {
-      return absl::UnknownError(absl::StrCat(
+      return abslx::UnknownError(abslx::StrCat(
           "Failed to set kernel arguments - ", CLErrorCodeToString(error_code),
           "(at index - ", offset, ")"));
     }
@@ -604,7 +604,7 @@ absl::Status CLArguments::Bind(cl_kernel kernel, int offset) {
     const int error_code = clSetKernelArg(kernel, offset, sizeof(int32_t) * 4,
                                           &shared_float4s_data_[i * 4]);
     if (error_code != CL_SUCCESS) {
-      return absl::UnknownError(absl::StrCat(
+      return abslx::UnknownError(abslx::StrCat(
           "Failed to set kernel arguments - ", CLErrorCodeToString(error_code),
           "(at index - ", offset, ")"));
     }
@@ -614,13 +614,13 @@ absl::Status CLArguments::Bind(cl_kernel kernel, int offset) {
     const int error_code = clSetKernelArg(kernel, offset, sizeof(int16_t) * 4,
                                           &shared_half4s_data_[i * 4]);
     if (error_code != CL_SUCCESS) {
-      return absl::UnknownError(absl::StrCat(
+      return abslx::UnknownError(abslx::StrCat(
           "Failed to set kernel arguments - ", CLErrorCodeToString(error_code),
           "(at index - ", offset, ")"));
     }
     offset++;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace cl

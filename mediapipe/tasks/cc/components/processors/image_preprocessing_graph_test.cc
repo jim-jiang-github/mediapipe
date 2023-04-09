@@ -90,8 +90,8 @@ constexpr char kLetterboxPaddingName[] = "letterbox_padding_out";
 constexpr float kLetterboxMaxAbsError = 1e-5;
 
 // Helper function to get ModelResources.
-absl::StatusOr<std::unique_ptr<ModelResources>> CreateModelResourcesForModel(
-    absl::string_view model_name) {
+abslx::StatusOr<std::unique_ptr<ModelResources>> CreateModelResourcesForModel(
+    abslx::string_view model_name) {
   auto external_file = std::make_unique<core::proto::ExternalFile>();
   external_file->set_file_name(JoinPath("./", kTestDataDirectory, model_name));
   return ModelResources::Create(kTestModelResourcesTag,
@@ -99,7 +99,7 @@ absl::StatusOr<std::unique_ptr<ModelResources>> CreateModelResourcesForModel(
 }
 
 // Helper function to create a TaskRunner from ModelResources.
-absl::StatusOr<std::unique_ptr<TaskRunner>> CreateTaskRunner(
+abslx::StatusOr<std::unique_ptr<TaskRunner>> CreateTaskRunner(
     const ModelResources& model_resources, bool keep_aspect_ratio) {
   Graph graph;
 
@@ -239,7 +239,7 @@ TEST_F(ConfigureTest, FailsWithFloatModelWithoutMetadata) {
   auto status =
       ConfigureImagePreprocessingGraph(*model_resources, false, &options);
 
-  EXPECT_EQ(status.code(), absl::StatusCode::kNotFound);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kNotFound);
   EXPECT_THAT(status.message(),
               HasSubstr("requires specifying NormalizationOptions metadata"));
 }

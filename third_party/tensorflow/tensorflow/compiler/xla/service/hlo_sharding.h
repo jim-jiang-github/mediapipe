@@ -40,24 +40,24 @@ class HloSharding {
  public:
   // Creates a trivial sharding that replicates a maximal tile across all
   // devices.
-  static HloSharding Replicate(absl::Span<const OpMetadata> metadata = {}) {
+  static HloSharding Replicate(abslx::Span<const OpMetadata> metadata = {}) {
     return HloSharding(/*manual=*/false, /*replicated=*/true, metadata);
   }
 
   // Creates a sharding that represents the op is manually partitioned.
-  static HloSharding Manual(absl::Span<const OpMetadata> metadata = {}) {
+  static HloSharding Manual(abslx::Span<const OpMetadata> metadata = {}) {
     return HloSharding(/*manual=*/true, /*replicated=*/false, metadata);
   }
 
   // Creates a sharding that emulates device placement; a tile shape equal to
   // the input shape (one tile) assigned to a single device.
   static HloSharding AssignDevice(int64_t device_id,
-                                  absl::Span<const OpMetadata> metadata = {});
+                                  abslx::Span<const OpMetadata> metadata = {});
 
   // Creates a new sharding which splits a shape into tiles amongst the devices
   // specified by `tile_assignment`.
   static HloSharding Tile(const Array<int64_t>& tile_assignment,
-                          absl::Span<const OpMetadata> metadata = {}) {
+                          abslx::Span<const OpMetadata> metadata = {}) {
     return HloSharding(tile_assignment, /*replicate_on_last_tile_dim=*/false,
                        metadata);
   }
@@ -67,27 +67,27 @@ class HloSharding {
   // group_tile_assignment. Replication group members will be sorted.
   static HloSharding PartialTile(
       const Array<int64_t>& group_tile_assignment,
-      absl::Span<const absl::Span<const int64_t>> replication_groups,
-      absl::Span<const OpMetadata> metadata = {});
+      abslx::Span<const abslx::Span<const int64_t>> replication_groups,
+      abslx::Span<const OpMetadata> metadata = {});
 
   // Creates a partially replicated tiled sharding with device-level tile
   // assignment, where the last dimension is the additional replication
   // dimension. Replication group members will be sorted.
   static HloSharding PartialTile(
       const Array<int64_t>& tile_assignment_last_dim_replicate,
-      absl::Span<const OpMetadata> metadata = {});
+      abslx::Span<const OpMetadata> metadata = {});
 
   // Creates a subgroup sharding with device-level tile assignment, the
   // sharding type of each subgroup is defined by subgroup_types. When creating
   // the HloSharding, subgroup dims of the same type will be merged.
   static HloSharding Subgroup(const Array<int64_t>& tile_assignment,
-                              absl::Span<const OpSharding::Type> subgroup_types,
-                              absl::Span<const OpMetadata> metadata = {});
+                              abslx::Span<const OpSharding::Type> subgroup_types,
+                              abslx::Span<const OpMetadata> metadata = {});
 
   // Creates a new sharding which splits a one-dimensional input shape into
   // `num_tiles` tiles.
   static HloSharding Tile1D(const Shape& input_shape, int64_t num_tiles,
-                            absl::Span<const OpMetadata> metadata = {});
+                            abslx::Span<const OpMetadata> metadata = {});
 
   // Creates a new sharding for a tuple type. The given ShapeTree must have
   // elements for every leaf shape contained in the tuple.
@@ -97,7 +97,7 @@ class HloSharding {
   // shardings must match the number of leaf nodes in tuple_shape. For
   // empty tuples, the shardings array must have one element.
   static HloSharding Tuple(const Shape& tuple_shape,
-                           absl::Span<const HloSharding> shardings);
+                           abslx::Span<const HloSharding> shardings);
 
   // Creates a new sharding for a tuple type, with a single input sharding
   // repeated on each leaf.
@@ -132,7 +132,7 @@ class HloSharding {
     if (!IsTuple()) {
       return replicated_;
     }
-    return absl::c_all_of(
+    return abslx::c_all_of(
         tuple_elements_, [](const HloSharding& s) { return s.IsReplicated(); });
   }
 
@@ -141,7 +141,7 @@ class HloSharding {
     if (!IsTuple()) {
       return maximal_;
     }
-    return absl::c_all_of(tuple_elements_, [](const HloSharding& s) {
+    return abslx::c_all_of(tuple_elements_, [](const HloSharding& s) {
       return s.IsTileMaximal();
     });
   }
@@ -151,16 +151,16 @@ class HloSharding {
     if (!IsTuple()) {
       return manual_;
     }
-    return absl::c_all_of(tuple_elements_,
+    return abslx::c_all_of(tuple_elements_,
                           [](const HloSharding& s) { return s.IsManual(); });
   }
 
   // Returns whether the sharding represents manual subgroup sharding.
   bool IsManualSubgroup() const {
     if (!IsTuple()) {
-      return absl::c_linear_search(subgroup_types_, OpSharding::MANUAL);
+      return abslx::c_linear_search(subgroup_types_, OpSharding::MANUAL);
     }
-    return absl::c_all_of(tuple_elements_, [](const HloSharding& s) {
+    return abslx::c_all_of(tuple_elements_, [](const HloSharding& s) {
       return s.IsManualSubgroup();
     });
   }
@@ -178,7 +178,7 @@ class HloSharding {
   // ReplicateOnLastTileDim or subgroups with REPLICATED.
   bool HasPartialReplication() const {
     return replicate_on_last_tile_dim_ ||
-           absl::c_linear_search(subgroup_types_, OpSharding::REPLICATED);
+           abslx::c_linear_search(subgroup_types_, OpSharding::REPLICATED);
   }
 
   // Returns true if the sharding defines an operation on the given device.
@@ -203,7 +203,7 @@ class HloSharding {
   // index.size() should be the same as tile_assignment()'s rank and specifies
   // the member of the replication subgroup.
   // REQUIRES: !IsTuple()
-  int64_t DeviceForTileIndex(absl::Span<const int64_t> index) const;
+  int64_t DeviceForTileIndex(abslx::Span<const int64_t> index) const;
 
   // Given a device ID, returns the offset within the specified shape of the
   // tile that should be executed on the given core. This returns the lower
@@ -264,7 +264,7 @@ class HloSharding {
   // already present, that metadata will not be replaced unless `overwrite` is
   // set to true. If sharding is of tuple type, sub shardings metadata will be
   // assigned instead.
-  HloSharding WithMetadata(absl::Span<const OpMetadata> metadata,
+  HloSharding WithMetadata(abslx::Span<const OpMetadata> metadata,
                            bool overwrite) const;
 
   bool operator==(const HloSharding& other) const {
@@ -318,7 +318,7 @@ class HloSharding {
   int64_t NumTiles() const;
   // Like NumTiles() but considers only some specific dimensions passed as
   // argument
-  int64_t NumTiles(absl::Span<const int64_t> dims) const;
+  int64_t NumTiles(abslx::Span<const int64_t> dims) const;
 
   // Gets metadata from sharding.
   std::vector<OpMetadata>& metadata() { return metadata_; }
@@ -326,7 +326,7 @@ class HloSharding {
 
   // Returns the replication subgroiup dim, or -1 if it doesn't exist.
   int64_t SubgroupReplicationDim() const {
-    auto it = absl::c_find(subgroup_types_, OpSharding::REPLICATED);
+    auto it = abslx::c_find(subgroup_types_, OpSharding::REPLICATED);
     if (it != subgroup_types_.end()) {
       return (it - subgroup_types_.begin()) + TiledDataRank();
     }
@@ -338,7 +338,7 @@ class HloSharding {
 
   // Returns the manual subgroiup dim, or -1 if it doesn't exist.
   int64_t SubgroupManualDim() const {
-    auto it = absl::c_find(subgroup_types_, OpSharding::MANUAL);
+    auto it = abslx::c_find(subgroup_types_, OpSharding::MANUAL);
     if (it != subgroup_types_.end()) {
       return (it - subgroup_types_.begin()) + TiledDataRank();
     }
@@ -358,7 +358,7 @@ class HloSharding {
 
  private:
   explicit HloSharding(bool manual, bool replicated,
-                       absl::Span<const OpMetadata> metadata)
+                       abslx::Span<const OpMetadata> metadata)
       : replicated_(replicated),
         maximal_(replicated),
         tuple_(false),
@@ -372,7 +372,7 @@ class HloSharding {
   //  0 or positive: the id of a device
   // NOTE(dimvar): -1 is needed for outside compilation. It can be removed once
   // we have fully switched to the side-effect tokens.
-  explicit HloSharding(int64_t device_id, absl::Span<const OpMetadata> metadata)
+  explicit HloSharding(int64_t device_id, abslx::Span<const OpMetadata> metadata)
       : replicated_(false),
         maximal_(true),
         tuple_(false),
@@ -382,7 +382,7 @@ class HloSharding {
         metadata_(metadata.begin(), metadata.end()) {}
   explicit HloSharding(const Array<int64_t>& tile_assignment,
                        bool replicate_on_last_tile_dim,
-                       absl::Span<const OpMetadata> metadata = {})
+                       abslx::Span<const OpMetadata> metadata = {})
       : replicated_(false),
         maximal_(false),
         tuple_(false),
@@ -391,8 +391,8 @@ class HloSharding {
         replicate_on_last_tile_dim_(replicate_on_last_tile_dim),
         metadata_(metadata.begin(), metadata.end()) {}
   explicit HloSharding(const Array<int64_t>& tile_assignment,
-                       absl::Span<const OpSharding::Type> subgroup_types,
-                       absl::Span<const OpMetadata> metadata = {})
+                       abslx::Span<const OpSharding::Type> subgroup_types,
+                       abslx::Span<const OpMetadata> metadata = {})
       : replicated_(false),
         maximal_(false),
         tuple_(false),

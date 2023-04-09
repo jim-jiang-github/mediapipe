@@ -349,7 +349,7 @@ class PortCommon : public Base {
   }
 
  private:
-  absl::Status AddToContract(CalculatorContract* cc) const {
+  abslx::Status AddToContract(CalculatorContract* cc) const {
     if (kMultiple) {
       AddMultiple(cc);
     } else {
@@ -427,18 +427,18 @@ class SideFallbackT : public Base {
         side_port(tag) {}
 
  protected:
-  absl::Status AddToContract(CalculatorContract* cc) const {
+  abslx::Status AddToContract(CalculatorContract* cc) const {
     stream_port.AddToContract(cc);
     side_port.AddToContract(cc);
     int connected_count =
         stream_port(cc).IsConnected() + side_port(cc).IsConnected();
     if (connected_count > 1)
-      return absl::InvalidArgumentError(absl::StrCat(
+      return abslx::InvalidArgumentError(abslx::StrCat(
           Tag(),
           " can be connected as a stream or as a side packet, but not both"));
     if (!IsOptionalV && connected_count == 0)
-      return absl::InvalidArgumentError(
-          absl::StrCat(Tag(), " must be connected"));
+      return abslx::InvalidArgumentError(
+          abslx::StrCat(Tag(), " must be connected"));
     return {};
   }
 
@@ -593,13 +593,13 @@ class InputShardAccess : public Packet<T> {
   template <class U = T,
             class = std::enable_if_t<std::is_same<U, T>{},
                                      decltype(&Packet<U>::Consume)>>
-  absl::StatusOr<std::unique_ptr<U>> Consume() {
+  abslx::StatusOr<std::unique_ptr<U>> Consume() {
     return WrapConsumeCall(&Packet<T>::Consume);
   }
 
   template <class V, class U = T,
             std::enable_if_t<internal::IsCompatibleType<V, U>{}, int> = 0>
-  absl::StatusOr<std::unique_ptr<V>> Consume() {
+  abslx::StatusOr<std::unique_ptr<V>> Consume() {
     return WrapConsumeCall(&Packet<T>::template Consume<V>);
   }
 

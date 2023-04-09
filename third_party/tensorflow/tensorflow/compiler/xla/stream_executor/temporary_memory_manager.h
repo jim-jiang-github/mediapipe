@@ -109,7 +109,7 @@ class TemporaryMemoryManager {
       uint64_t element_count, uint64 element_size);
 
   // Mutex to guard temporary record state.
-  mutable absl::Mutex mutex_;
+  mutable abslx::Mutex mutex_;
 
   // Mapping from device memory to the current (live) temporary memory record.
   //

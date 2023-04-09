@@ -55,13 +55,13 @@ constexpr char kValueTag[] = "VALUE";
 //   }
 class DefaultSidePacketCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 };
 REGISTER_CALCULATOR(DefaultSidePacketCalculator);
 
-absl::Status DefaultSidePacketCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status DefaultSidePacketCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK(cc->InputSidePackets().HasTag(kDefaultValueTag))
       << "Default value must be provided";
   cc->InputSidePackets().Tag(kDefaultValueTag).SetAny();
@@ -79,26 +79,26 @@ absl::Status DefaultSidePacketCalculator::GetContract(CalculatorContract* cc) {
   cc->OutputSidePackets().Tag(kValueTag).SetSameAs(
       &cc->InputSidePackets().Tag(kDefaultValueTag));
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status DefaultSidePacketCalculator::Open(CalculatorContext* cc) {
+abslx::Status DefaultSidePacketCalculator::Open(CalculatorContext* cc) {
   // If optional value is provided it is returned as the calculator output.
   if (cc->InputSidePackets().HasTag(kOptionalValueTag)) {
     auto& packet = cc->InputSidePackets().Tag(kOptionalValueTag);
     cc->OutputSidePackets().Tag(kValueTag).Set(packet);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // If no optional value
   auto& packet = cc->InputSidePackets().Tag(kDefaultValueTag);
   cc->OutputSidePackets().Tag(kValueTag).Set(packet);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status DefaultSidePacketCalculator::Process(CalculatorContext* cc) {
-  return absl::OkStatus();
+abslx::Status DefaultSidePacketCalculator::Process(CalculatorContext* cc) {
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

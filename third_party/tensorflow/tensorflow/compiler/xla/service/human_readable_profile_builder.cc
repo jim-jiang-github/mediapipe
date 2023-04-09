@@ -23,10 +23,10 @@ limitations under the License.
 
 namespace xla {
 
-using absl::StrAppend;
-using absl::StrAppendFormat;
-using absl::StrCat;
-using absl::StrFormat;
+using abslx::StrAppend;
+using abslx::StrAppendFormat;
+using abslx::StrCat;
+using abslx::StrFormat;
 using tensorflow::strings::HumanReadableElapsedTime;
 using tensorflow::strings::HumanReadableNumBytes;
 
@@ -129,7 +129,7 @@ std::string HumanReadableProfileBuilder::ToString() const {
 
   // Sort ops in decreasing order of cycles, and print them.
   std::vector<OpInfo> sorted_ops(op_infos_);
-  absl::c_sort(sorted_ops, [](const OpInfo& a, const OpInfo& b) {
+  abslx::c_sort(sorted_ops, [](const OpInfo& a, const OpInfo& b) {
     return a.cycles > b.cycles;
   });
   for (const auto& op : sorted_ops) {

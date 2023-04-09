@@ -406,9 +406,9 @@ ABSL_INTERNAL_END_EXTERN_C
 #ifdef __cplusplus
 // ABSL_ANNOTATE_UNPROTECTED_READ is the preferred way to annotate racey reads.
 #define ABSL_ANNOTATE_UNPROTECTED_READ(x) \
-  absl::base_internal::AnnotateUnprotectedRead(x)
+  abslx::base_internal::AnnotateUnprotectedRead(x)
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -422,7 +422,7 @@ inline T AnnotateUnprotectedRead(const volatile T& x) {  // NOLINT
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 #endif
 
 #else
@@ -440,7 +440,7 @@ int RunningOnValgrind();
 double ValgrindSlowdown();
 ABSL_INTERNAL_END_EXTERN_C
 #else
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 ABSL_DEPRECATED(
@@ -451,10 +451,10 @@ ABSL_DEPRECATED(
 ABSL_ATTRIBUTE_ALWAYS_INLINE inline double ValgrindSlowdown() { return 1.0; }
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
-using absl::base_internal::RunningOnValgrind;
-using absl::base_internal::ValgrindSlowdown;
+using abslx::base_internal::RunningOnValgrind;
+using abslx::base_internal::ValgrindSlowdown;
 #endif
 #endif
 

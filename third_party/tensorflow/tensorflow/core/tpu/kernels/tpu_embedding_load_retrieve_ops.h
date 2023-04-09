@@ -47,7 +47,7 @@ class LoadAllTPUEmbeddingParametersOp : public OpKernel {
  protected:
   void GetStateVariables(
       OpKernelContext* ctx,
-      std::array<std::vector<absl::Span<const float>>,
+      std::array<std::vector<abslx::Span<const float>>,
                  tpu::kMaxAuxiliaryParameterCount + 1>& state_variable_vector);
 
  private:
@@ -80,7 +80,7 @@ class RetrieveAllTPUEmbeddingParametersOp : public OpKernel {
  protected:
   void GetStateVariables(
       OpKernelContext* ctx,
-      std::array<std::vector<absl::Span<float>>,
+      std::array<std::vector<abslx::Span<float>>,
                  tpu::kMaxAuxiliaryParameterCount + 1>& state_variable_vector,
       std::vector<int>& num_state_variables);
 

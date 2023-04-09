@@ -49,7 +49,7 @@
 #include "absl/types/internal/transform_args.h"
 #include "absl/utility/utility.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace types_internal {
 
@@ -92,9 +92,9 @@ struct GeneratorType {
 // A "make" function for the GeneratorType template that deduces the function
 // object type.
 template <class Fun,
-          absl::enable_if_t<IsNullaryCallable<Fun>::value>** = nullptr>
+          abslx::enable_if_t<IsNullaryCallable<Fun>::value>** = nullptr>
 GeneratorType<Fun> Generator(Fun fun, const char* description) {
-  return GeneratorType<Fun>{absl::move(fun), description};
+  return GeneratorType<Fun>{abslx::move(fun), description};
 }
 
 // A type that contains a set of nullary function objects that each return an
@@ -109,10 +109,10 @@ struct EquivalenceClassType {
 // A "make" function for the EquivalenceClassType template that deduces the
 // function object types and is constrained such that a user can only pass in
 // function objects that all have the same return type.
-template <class... Funs, absl::enable_if_t<AreGeneratorsWithTheSameReturnType<
+template <class... Funs, abslx::enable_if_t<AreGeneratorsWithTheSameReturnType<
                              Funs...>::value>** = nullptr>
 EquivalenceClassType<Funs...> EquivalenceClass(GeneratorType<Funs>... funs) {
-  return {std::make_tuple(absl::move(funs)...)};
+  return {std::make_tuple(abslx::move(funs)...)};
 }
 
 // A type that contains an ordered series of EquivalenceClassTypes, from
@@ -127,14 +127,14 @@ struct OrderedEquivalenceClasses {
 struct GivenDeclaration {
   std::string outputDeclaration(std::size_t width) const {
     const std::size_t indent_size = 2;
-    std::string result = absl::StrCat("  ", name);
+    std::string result = abslx::StrCat("  ", name);
 
     if (!expression.empty()) {
       // Indent
       result.resize(indent_size + width, ' ');
-      absl::StrAppend(&result, " = ", expression, ";\n");
+      abslx::StrAppend(&result, " = ", expression, ";\n");
     } else {
-      absl::StrAppend(&result, ";\n");
+      abslx::StrAppend(&result, ";\n");
     }
 
     return result;
@@ -148,7 +148,7 @@ struct GivenDeclaration {
 template <class... Decls>
 std::string PrepareGivenContext(const Decls&... decls) {
   const std::size_t width = (std::max)({decls.name.size()...});
-  return absl::StrCat("Given:\n", decls.outputDeclaration(width)..., "\n");
+  return abslx::StrCat("Given:\n", decls.outputDeclaration(width)..., "\n");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -158,12 +158,12 @@ std::string PrepareGivenContext(const Decls&... decls) {
 #define ABSL_INTERNAL_EXPECT_OP(name, op)                                   \
   struct Expect##name {                                                     \
     template <class T>                                                      \
-    void operator()(absl::string_view test_name, absl::string_view context, \
-                    const T& lhs, const T& rhs, absl::string_view lhs_name, \
-                    absl::string_view rhs_name) const {                     \
+    void operator()(abslx::string_view test_name, abslx::string_view context, \
+                    const T& lhs, const T& rhs, abslx::string_view lhs_name, \
+                    abslx::string_view rhs_name) const {                     \
       if (!static_cast<bool>(lhs op rhs)) {                                 \
         errors->addTestFailure(                                             \
-            test_name, absl::StrCat(context,                                \
+            test_name, abslx::StrCat(context,                                \
                                     "**Unexpected comparison result**\n"    \
                                     "\n"                                    \
                                     "Expression:\n"                         \
@@ -183,12 +183,12 @@ std::string PrepareGivenContext(const Decls&... decls) {
                                                                             \
   struct ExpectNot##name {                                                  \
     template <class T>                                                      \
-    void operator()(absl::string_view test_name, absl::string_view context, \
-                    const T& lhs, const T& rhs, absl::string_view lhs_name, \
-                    absl::string_view rhs_name) const {                     \
+    void operator()(abslx::string_view test_name, abslx::string_view context, \
+                    const T& lhs, const T& rhs, abslx::string_view lhs_name, \
+                    abslx::string_view rhs_name) const {                     \
       if (lhs op rhs) {                                                     \
         errors->addTestFailure(                                             \
-            test_name, absl::StrCat(context,                                \
+            test_name, abslx::StrCat(context,                                \
                                     "**Unexpected comparison result**\n"    \
                                     "\n"                                    \
                                     "Expression:\n"                         \
@@ -219,12 +219,12 @@ ABSL_INTERNAL_EXPECT_OP(Gt, >);
 // way of the std::hash specialization.
 struct ExpectSameHash {
   template <class T>
-  void operator()(absl::string_view test_name, absl::string_view context,
-                  const T& lhs, const T& rhs, absl::string_view lhs_name,
-                  absl::string_view rhs_name) const {
+  void operator()(abslx::string_view test_name, abslx::string_view context,
+                  const T& lhs, const T& rhs, abslx::string_view lhs_name,
+                  abslx::string_view rhs_name) const {
     if (std::hash<T>()(lhs) != std::hash<T>()(rhs)) {
       errors->addTestFailure(
-          test_name, absl::StrCat(context,
+          test_name, abslx::StrCat(context,
                                   "**Unexpected hash result**\n"
                                   "\n"
                                   "Expression:\n"
@@ -251,10 +251,10 @@ struct ExpectSameHash {
 // of the two possible orders whenever lhs and rhs are not the same initializer.
 template <class T, class Prof>
 void ExpectOneWayEquality(ConformanceErrors* errors,
-                          absl::string_view test_name,
-                          absl::string_view context, const T& lhs, const T& rhs,
-                          absl::string_view lhs_name,
-                          absl::string_view rhs_name) {
+                          abslx::string_view test_name,
+                          abslx::string_view context, const T& lhs, const T& rhs,
+                          abslx::string_view lhs_name,
+                          abslx::string_view rhs_name) {
   If<PropertiesOfT<Prof>::is_equality_comparable>::Invoke(
       ExpectEq{errors}, test_name, context, lhs, rhs, lhs_name, rhs_name);
 
@@ -282,9 +282,9 @@ void ExpectOneWayEquality(ConformanceErrors* errors,
 // differs from ExpectOneWayEquality in that this will do checks with argument
 // order reversed in addition to in-order.
 template <class T, class Prof>
-void ExpectEquality(ConformanceErrors* errors, absl::string_view test_name,
-                    absl::string_view context, const T& lhs, const T& rhs,
-                    absl::string_view lhs_name, absl::string_view rhs_name) {
+void ExpectEquality(ConformanceErrors* errors, abslx::string_view test_name,
+                    abslx::string_view context, const T& lhs, const T& rhs,
+                    abslx::string_view lhs_name, abslx::string_view rhs_name) {
   (ExpectOneWayEquality<T, Prof>)(errors, test_name, context, lhs, rhs,
                                   lhs_name, rhs_name);
   (ExpectOneWayEquality<T, Prof>)(errors, test_name, context, rhs, lhs,
@@ -298,7 +298,7 @@ struct ExpectMoveConstructOneGenerator {
   template <class Fun>
   void operator()(const Fun& generator) const {
     const T object = generator();
-    const T moved_object = absl::move(generator());  // Force no elision.
+    const T moved_object = abslx::move(generator());  // Force no elision.
 
     (ExpectEquality<T, Prof>)(errors, "Move construction",
                               PrepareGivenContext(
@@ -413,7 +413,7 @@ struct ExpectSelfMoveAssign {
   template <class Fun>
   void operator()(const Fun& generator) const {
     T object = generator();
-    object = absl::move(object);
+    object = abslx::move(object);
 
     // NOTE: Self move-assign results in a valid-but-unspecified state.
 
@@ -464,7 +464,7 @@ struct ExpectSelfSwap {
 
     type_traits_internal::Swap(object, object);
 
-    std::string preliminary_info = absl::StrCat(
+    std::string preliminary_info = abslx::StrCat(
         PrepareGivenContext(
             GivenDeclaration{"const _T source_of_truth", generator.description},
             GivenDeclaration{"_T object", generator.description}),
@@ -660,10 +660,10 @@ struct ExpectEquivalenceClassConsistency {
 // Given a "lesser" object and a "greater" object, perform every combination of
 // comparison operators supported for the type, expecting consistent results.
 template <class T, class Prof>
-void ExpectOrdered(ConformanceErrors* errors, absl::string_view context,
-                   const T& small, const T& big, absl::string_view small_name,
-                   absl::string_view big_name) {
-  const absl::string_view test_name = "Comparison";
+void ExpectOrdered(ConformanceErrors* errors, abslx::string_view context,
+                   const T& small, const T& big, abslx::string_view small_name,
+                   abslx::string_view big_name) {
+  const abslx::string_view test_name = "Comparison";
 
   If<PropertiesOfT<Prof>::is_equality_comparable>::Invoke(
       ExpectNotEq{errors}, test_name, context, small, big, small_name,
@@ -844,12 +844,12 @@ struct ExpectOrderedEquivalenceClassesComparisons {
     // For each generator in the first equivalence class, make sure that it is
     // less than each of those in the logically greater equivalence classes.
     (ForEachTupleElement)(
-        Impl<BigEqClasses...>{std::make_tuple(absl::move(big_eq_classes)...),
+        Impl<BigEqClasses...>{std::make_tuple(abslx::move(big_eq_classes)...),
                               errors},
         small_eq_class.generators);
 
     // Recurse so that all equivalence class combinations are checked.
-    (*this)(absl::move(big_eq_classes)...);
+    (*this)(abslx::move(big_eq_classes)...);
   }
 
   ConformanceErrors* errors;
@@ -880,11 +880,11 @@ struct ExpectOrderedEquivalenceClasses {
   void operator()(SmallEqClass small_eq_class,
                   BigEqClasses... big_eq_classes) const {
     (ForEachTupleElement)(
-        Impl<BigEqClasses...>{std::make_tuple(absl::move(big_eq_classes)...),
+        Impl<BigEqClasses...>{std::make_tuple(abslx::move(big_eq_classes)...),
                               errors},
         small_eq_class.generators);
 
-    (*this)(absl::move(big_eq_classes)...);
+    (*this)(abslx::move(big_eq_classes)...);
   }
 
   // Terminating case of operator().
@@ -961,7 +961,7 @@ ConformanceErrors ExpectRegularityImpl(
   If<!constexpr_instantiation_when_unevaluated()>::Invoke(
       ExpectModels<T, MinProf, MaxProf>(), &errors);
 
-  using minimal_profile = typename absl::conditional_t<
+  using minimal_profile = typename abslx::conditional_t<
       constexpr_instantiation_when_unevaluated(), Always<LogicalProf>,
       MinimalCheckableProfile<LogicalProf, T>>::type;
 
@@ -981,7 +981,7 @@ ConformanceErrors ExpectRegularityImpl(
   // Check all of the comparisons for each combination of values that are in
   // different equivalence classes (not equal with respect to comparison
   // operators).
-  absl::apply(
+  abslx::apply(
       ExpectOrderedEquivalenceClassesComparisons<T, minimal_profile>{&errors},
       vals.eq_classes);
   //
@@ -992,7 +992,7 @@ ConformanceErrors ExpectRegularityImpl(
   (ForEachTupleElement)(ExpectEquivalenceClass<T, minimal_profile>{&errors},
                         vals.eq_classes);
 
-  absl::apply(ExpectOrderedEquivalenceClasses<T, minimal_profile>{&errors},
+  abslx::apply(ExpectOrderedEquivalenceClasses<T, minimal_profile>{&errors},
               vals.eq_classes);
 
   return errors;
@@ -1098,7 +1098,7 @@ template <class T, class /*Enabler*/ = void>
 struct ProfileRangeOfImpl;
 
 template <class T>
-struct ProfileRangeOfImpl<T, absl::void_t<PropertiesOfT<T>>> {
+struct ProfileRangeOfImpl<T, abslx::void_t<PropertiesOfT<T>>> {
   using type = LooseProfileRange<T>;
 };
 
@@ -1157,34 +1157,34 @@ struct ExpectConformanceOf {
   // implicitly formed and passed when using the INITIALIZER macro at the bottom
   // of this file.
   template <class Fun,
-            absl::enable_if_t<std::is_same<
+            abslx::enable_if_t<std::is_same<
                 ResultOfGeneratorT<GeneratorType<Fun>>, T>::value>** = nullptr>
   ABSL_MUST_USE_RESULT ExpectConformanceOf<ExpectSuccess, T, EqClasses...,
                                            EquivalenceClassType<Fun>>
   initializer(GeneratorType<Fun> fun) && {
     return {
-        {std::tuple_cat(absl::move(ordered_vals.eq_classes),
-                        std::make_tuple((EquivalenceClass)(absl::move(fun))))},
+        {std::tuple_cat(abslx::move(ordered_vals.eq_classes),
+                        std::make_tuple((EquivalenceClass)(abslx::move(fun))))},
         std::move(expected_failed_tests)};
   }
 
   template <class... TestNames,
-            absl::enable_if_t<!ExpectSuccess && sizeof...(EqClasses) == 0 &&
-                              absl::conjunction<std::is_convertible<
-                                  TestNames, absl::string_view>...>::value>** =
+            abslx::enable_if_t<!ExpectSuccess && sizeof...(EqClasses) == 0 &&
+                              abslx::conjunction<std::is_convertible<
+                                  TestNames, abslx::string_view>...>::value>** =
                 nullptr>
   ABSL_MUST_USE_RESULT ExpectConformanceOf<ExpectSuccess, T, EqClasses...>
   due_to(TestNames&&... test_names) && {
     (InsertEach)(&expected_failed_tests,
-                 absl::AsciiStrToLower(absl::string_view(test_names))...);
+                 abslx::AsciiStrToLower(abslx::string_view(test_names))...);
 
-    return {absl::move(ordered_vals), std::move(expected_failed_tests)};
+    return {abslx::move(ordered_vals), std::move(expected_failed_tests)};
   }
 
   template <class... TestNames, int = 0,  // MSVC disambiguator
-            absl::enable_if_t<ExpectSuccess && sizeof...(EqClasses) == 0 &&
-                              absl::conjunction<std::is_convertible<
-                                  TestNames, absl::string_view>...>::value>** =
+            abslx::enable_if_t<ExpectSuccess && sizeof...(EqClasses) == 0 &&
+                              abslx::conjunction<std::is_convertible<
+                                  TestNames, abslx::string_view>...>::value>** =
                 nullptr>
   ABSL_MUST_USE_RESULT ExpectConformanceOf<ExpectSuccess, T, EqClasses...>
   due_to(TestNames&&... test_names) && {
@@ -1203,14 +1203,14 @@ struct ExpectConformanceOf {
   // implicitly formed and passed when using the INITIALIZER macro at the bottom
   // of this file.
   template <class Fun,
-            absl::enable_if_t<std::is_same<
+            abslx::enable_if_t<std::is_same<
                 ResultOfGeneratorT<GeneratorType<Fun>>, T>::value>** = nullptr>
   ABSL_MUST_USE_RESULT ExpectConformanceOf<ExpectSuccess, T, EqClasses...,
                                            EquivalenceClassType<Fun>>
   dont_class_directly_stateful_initializer(GeneratorType<Fun> fun) && {
     return {
-        {std::tuple_cat(absl::move(ordered_vals.eq_classes),
-                        std::make_tuple((EquivalenceClass)(absl::move(fun))))},
+        {std::tuple_cat(abslx::move(ordered_vals.eq_classes),
+                        std::make_tuple((EquivalenceClass)(abslx::move(fun))))},
         std::move(expected_failed_tests)};
   }
 
@@ -1218,14 +1218,14 @@ struct ExpectConformanceOf {
   // the comparison operators and std::hash specialization, if defined.
   template <
       class... Funs,
-      absl::void_t<absl::enable_if_t<std::is_same<
+      abslx::void_t<abslx::enable_if_t<std::is_same<
           ResultOfGeneratorT<GeneratorType<Funs>>, T>::value>...>** = nullptr>
   ABSL_MUST_USE_RESULT ExpectConformanceOf<ExpectSuccess, T, EqClasses...,
                                            EquivalenceClassType<Funs...>>
   equivalence_class(GeneratorType<Funs>... funs) && {
     return {{std::tuple_cat(
-                absl::move(ordered_vals.eq_classes),
-                std::make_tuple((EquivalenceClass)(absl::move(funs)...)))},
+                abslx::move(ordered_vals.eq_classes),
+                std::make_tuple((EquivalenceClass)(abslx::move(funs)...)))},
             std::move(expected_failed_tests)};
   }
 
@@ -1233,13 +1233,13 @@ struct ExpectConformanceOf {
   // of expected profiles in a given domain.
   template <
       class ProfRange,
-      absl::enable_if_t<IsProfileOrProfileRange<ProfRange>::value>** = nullptr>
+      abslx::enable_if_t<IsProfileOrProfileRange<ProfRange>::value>** = nullptr>
   ABSL_MUST_USE_RESULT ::testing::AssertionResult with_strict_profile(
       ProfRange /*profile*/) {
     ConformanceErrors test_result =
         (ExpectRegularityImpl<
             T, LogicalProfileOfT<ProfRange>, MinProfileOfT<ProfRange>,
-            MaxProfileOfT<ProfRange>>)(absl::move(ordered_vals));
+            MaxProfileOfT<ProfRange>>)(abslx::move(ordered_vals));
 
     return ExpectSuccess ? test_result.assertionResult()
                          : test_result.expectFailedTests(expected_failed_tests);
@@ -1249,14 +1249,14 @@ struct ExpectConformanceOf {
   // of expected profiles (loose in that an interface is allowed to be more
   // refined that a profile suggests, such as a type having a noexcept copy
   // constructor when all that is required is that the copy constructor exists).
-  template <class Prof, absl::enable_if_t<IsProfile<Prof>::value>** = nullptr>
+  template <class Prof, abslx::enable_if_t<IsProfile<Prof>::value>** = nullptr>
   ABSL_MUST_USE_RESULT ::testing::AssertionResult with_loose_profile(
       Prof /*profile*/) {
     ConformanceErrors test_result =
         (ExpectRegularityImpl<
             T, Prof, Prof,
             CombineProfiles<TriviallyCompleteProfile,
-                            NothrowComparableProfile>>)(absl::
+                            NothrowComparableProfile>>)(abslx::
                                                             move(ordered_vals));
 
     return ExpectSuccess ? test_result.assertionResult()
@@ -1289,7 +1289,7 @@ struct EquivalenceClassMaker {
   GTEST_AMBIGUOUS_ELSE_BLOCKER_                                             \
   if ABSL_INTERNAL_LPAREN                                                   \
   const ::testing::AssertionResult gtest_ar =                               \
-      ABSL_INTERNAL_LPAREN ::absl::types_internal::ExpectConformanceOfType< \
+      ABSL_INTERNAL_LPAREN ::abslx::types_internal::ExpectConformanceOfType< \
           __VA_ARGS__>()
 
 // Akin to ASSERT_CONFORMANCE_OF except that it expects failure and tries to
@@ -1298,7 +1298,7 @@ struct EquivalenceClassMaker {
   GTEST_AMBIGUOUS_ELSE_BLOCKER_                                                \
   if ABSL_INTERNAL_LPAREN                                                      \
   const ::testing::AssertionResult gtest_ar =                                  \
-      ABSL_INTERNAL_LPAREN ::absl::types_internal::ExpectNonconformanceOfType< \
+      ABSL_INTERNAL_LPAREN ::abslx::types_internal::ExpectNonconformanceOfType< \
           __VA_ARGS__>()
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1318,7 +1318,7 @@ struct EquivalenceClassMaker {
 // of lambda that captures no data. The expression is stringized during
 // preprocessing so that it can be used in error reports.
 #define INITIALIZER(...)                         \
-  initializer(::absl::types_internal::Generator( \
+  initializer(::abslx::types_internal::Generator( \
       [] { return __VA_ARGS__; }, ABSL_INTERNAL_STRINGIZE(__VA_ARGS__)))
 
 // Specify a value to be tested.
@@ -1327,7 +1327,7 @@ struct EquivalenceClassMaker {
 // of lambda that captures data by reference. The expression is stringized
 // during preprocessing so that it can be used in error reports.
 #define STATEFUL_INITIALIZER(...)                         \
-  stateful_initializer(::absl::types_internal::Generator( \
+  stateful_initializer(::abslx::types_internal::Generator( \
       [&] { return __VA_ARGS__; }, ABSL_INTERNAL_STRINGIZE(__VA_ARGS__)))
 
 // Used in the builder-pattern.
@@ -1352,7 +1352,7 @@ struct EquivalenceClassMaker {
 // requirements.
 #define WITH_LOOSE_PROFILE(...)                                      \
   with_loose_profile(                                                \
-      ::absl::types_internal::MakeLooseProfileRangeT<__VA_ARGS__>()) \
+      ::abslx::types_internal::MakeLooseProfileRangeT<__VA_ARGS__>()) \
       ABSL_INTERNAL_RPAREN ABSL_INTERNAL_RPAREN;                     \
   else GTEST_FATAL_FAILURE_(gtest_ar.failure_message())  // NOLINT
 
@@ -1370,17 +1370,17 @@ struct EquivalenceClassMaker {
 // delete that operation.
 #define WITH_STRICT_PROFILE(...)                                      \
   with_strict_profile(                                                \
-      ::absl::types_internal::MakeStrictProfileRangeT<__VA_ARGS__>()) \
+      ::abslx::types_internal::MakeStrictProfileRangeT<__VA_ARGS__>()) \
       ABSL_INTERNAL_RPAREN ABSL_INTERNAL_RPAREN;                      \
   else GTEST_FATAL_FAILURE_(gtest_ar.failure_message())  // NOLINT
 
 // Internal macro that is used in the internals of the EDSL when forming
 // equivalence classes.
 #define ABSL_INTERNAL_PREPEND_EQ_MAKER(arg) \
-  ::absl::types_internal::EquivalenceClassMaker().arg
+  ::abslx::types_internal::EquivalenceClassMaker().arg
 
 }  // namespace types_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_TYPES_INTERNAL_CONFORMANCE_TESTING_H_

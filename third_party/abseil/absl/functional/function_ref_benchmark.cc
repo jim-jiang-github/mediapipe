@@ -19,7 +19,7 @@
 #include "benchmark/benchmark.h"
 #include "absl/base/attributes.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace {
 
@@ -139,4 +139,4 @@ BENCHMARK(BM_NonTrivialArgsFunctionRef);
 
 }  // namespace
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

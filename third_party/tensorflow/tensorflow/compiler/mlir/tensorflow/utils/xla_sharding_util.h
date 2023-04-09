@@ -30,9 +30,9 @@ limitations under the License.
 
 namespace tensorflow {
 
-inline constexpr absl::string_view kInputShardingAttr =
+inline constexpr abslx::string_view kInputShardingAttr =
     "input_sharding_configuration";
-inline constexpr absl::string_view kOutputShardingAttr =
+inline constexpr abslx::string_view kOutputShardingAttr =
     "output_sharding_configuration";
 
 // Parses "input_sharding_configuration" attribute and returns a list where i-th

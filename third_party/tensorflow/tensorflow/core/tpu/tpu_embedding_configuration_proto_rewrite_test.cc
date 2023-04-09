@@ -33,7 +33,7 @@ limitations under the License.
 namespace tensorflow {
 namespace {
 
-Status ParseTextProto(absl::string_view text_proto,
+Status ParseTextProto(abslx::string_view text_proto,
                       protobuf::Message* parsed_proto) {
   protobuf::TextFormat::Parser parser;
   // Attempt to parse as text.

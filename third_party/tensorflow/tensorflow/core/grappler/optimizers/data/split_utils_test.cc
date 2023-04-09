@@ -76,7 +76,7 @@ void RunFunction(const FunctionDef& func,
   std::vector<std::pair<std::string, Tensor>> feeds;
   for (int i = 0; i < input_tensors.size(); i++) {
     const Tensor& tensor = input_tensors[i];
-    string input_name = absl::StrCat("input_", i);
+    string input_name = abslx::StrCat("input_", i);
     nodes.push_back(
         NDef(input_name, "Placeholder", {}, {{"dtype", tensor.dtype()}}));
     inputs.push_back(input_name);
@@ -96,7 +96,7 @@ void RunFunction(const FunctionDef& func,
   std::vector<string> outputs;
   const int num_outputs = func.ret_size();
   for (int i = 0; i < num_outputs; i++) {
-    outputs.push_back(absl::StrCat("f:", i));
+    outputs.push_back(abslx::StrCat("f:", i));
   }
   TF_ASSERT_OK(session->Run(feeds, outputs, {}, results));
 }
@@ -112,7 +112,7 @@ void RunSplitFunctions(const FunctionDef& first, const FunctionDef& second,
   std::vector<std::pair<std::string, Tensor>> feeds;
   for (int i = 0; i < input_tensors.size(); i++) {
     const Tensor& tensor = input_tensors[i];
-    string input_name = absl::StrCat("input_", i);
+    string input_name = abslx::StrCat("input_", i);
     nodes.push_back(
         NDef(input_name, "Placeholder", {}, {{"dtype", tensor.dtype()}}));
     first_inputs.push_back(input_name);
@@ -122,11 +122,11 @@ void RunSplitFunctions(const FunctionDef& first, const FunctionDef& second,
   std::vector<string> second_inputs;
   const int num_outputs_of_first = first.ret_size();
   for (int i = 0; i < num_outputs_of_first; i++) {
-    second_inputs.push_back(absl::StrCat("first:", i));
+    second_inputs.push_back(abslx::StrCat("first:", i));
   }
   for (int i = input_tensors.size() - num_captured_inputs;
        i < input_tensors.size(); i++) {
-    second_inputs.push_back(absl::StrCat("input_", i));
+    second_inputs.push_back(abslx::StrCat("input_", i));
   }
   nodes.push_back(NDef("second", second.signature().name(), second_inputs, {}));
   GraphDef graph_def = test::function::GDef(nodes, {first, second});
@@ -142,7 +142,7 @@ void RunSplitFunctions(const FunctionDef& first, const FunctionDef& second,
   std::vector<string> second_outputs;
   const int num_outputs_of_second = second.ret_size();
   for (int i = 0; i < num_outputs_of_second; i++) {
-    second_outputs.push_back(absl::StrCat("second:", i));
+    second_outputs.push_back(abslx::StrCat("second:", i));
   }
   TF_ASSERT_OK(session->Run(feeds, second_outputs, {}, results));
 }

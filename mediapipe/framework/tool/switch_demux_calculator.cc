@@ -56,15 +56,15 @@ namespace mediapipe {
 //
 class SwitchDemuxCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
-  absl::Status RecordPackets(CalculatorContext* cc);
+  abslx::Status RecordPackets(CalculatorContext* cc);
   int ChannelIndex(Timestamp timestamp);
-  absl::Status SendActivePackets(CalculatorContext* cc);
+  abslx::Status SendActivePackets(CalculatorContext* cc);
 
  private:
   int channel_index_;
@@ -96,7 +96,7 @@ inline Timestamp ChannelSettledTimestamp(CalculatorContext* cc) {
 }
 }  // namespace
 
-absl::Status SwitchDemuxCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status SwitchDemuxCalculator::GetContract(CalculatorContract* cc) {
   // Allow any one of kSelectTag, kEnableTag.
   cc->Inputs().Tag(kSelectTag).Set<int>().Optional();
   cc->Inputs().Tag(kEnableTag).Set<bool>().Optional();
@@ -146,10 +146,10 @@ absl::Status SwitchDemuxCalculator::GetContract(CalculatorContract* cc) {
     cc->SetInputStreamHandler("ImmediateInputStreamHandler");
   }
   cc->SetProcessTimestampBounds(true);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SwitchDemuxCalculator::Open(CalculatorContext* cc) {
+abslx::Status SwitchDemuxCalculator::Open(CalculatorContext* cc) {
   channel_index_ = tool::GetChannelIndex(*cc, channel_index_);
   channel_tags_ = ChannelTags(cc->Outputs().TagMap());
   channel_history_[Timestamp::Unstarted()] = channel_index_;
@@ -188,17 +188,17 @@ absl::Status SwitchDemuxCalculator::Open(CalculatorContext* cc) {
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SwitchDemuxCalculator::Process(CalculatorContext* cc) {
+abslx::Status SwitchDemuxCalculator::Process(CalculatorContext* cc) {
   MP_RETURN_IF_ERROR(RecordPackets(cc));
   MP_RETURN_IF_ERROR(SendActivePackets(cc));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Enqueue all arriving packets and bounds.
-absl::Status SwitchDemuxCalculator::RecordPackets(CalculatorContext* cc) {
+abslx::Status SwitchDemuxCalculator::RecordPackets(CalculatorContext* cc) {
   // Enqueue any new arriving packets.
   for (const std::string& tag : channel_tags_) {
     for (int index = 0; index < cc->Inputs().NumEntries(tag); ++index) {
@@ -218,7 +218,7 @@ absl::Status SwitchDemuxCalculator::RecordPackets(CalculatorContext* cc) {
     channel_index_ = new_channel_index;
     channel_history_[channel_settled] = channel_index_;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Returns the channel index for a Timestamp.
@@ -228,7 +228,7 @@ int SwitchDemuxCalculator::ChannelIndex(Timestamp timestamp) {
 }
 
 // Dispatches all queued input packets with known channels.
-absl::Status SwitchDemuxCalculator::SendActivePackets(CalculatorContext* cc) {
+abslx::Status SwitchDemuxCalculator::SendActivePackets(CalculatorContext* cc) {
   // Dispatch any queued input packets with a defined channel_index.
   Timestamp channel_settled = ChannelSettledTimestamp(cc);
   for (const std::string& tag : channel_tags_) {
@@ -263,7 +263,7 @@ absl::Status SwitchDemuxCalculator::SendActivePackets(CalculatorContext* cc) {
   Timestamp input_bound = input_settled.NextAllowedInStream();
   auto history_bound = std::prev(channel_history_.upper_bound(input_bound));
   channel_history_.erase(channel_history_.begin(), history_bound);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

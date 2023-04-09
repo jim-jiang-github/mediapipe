@@ -225,7 +225,7 @@ TEST(Cancellation, Parent_CancelManyChildren) {
   CancellationManager parent;
   std::vector<std::unique_ptr<CancellationManager>> children;
   for (size_t i = 0; i < 5; ++i) {
-    children.push_back(absl::make_unique<CancellationManager>(&parent));
+    children.push_back(abslx::make_unique<CancellationManager>(&parent));
     EXPECT_FALSE(children.back()->IsCancelled());
   }
   parent.StartCancel();
@@ -267,7 +267,7 @@ TEST(Cancellation, Parent_RandomDestructionOrder) {
     std::uniform_int_distribution<int> dist(1, 9);
     const size_t round_size = dist(rd);
     for (size_t i = 0; i < round_size; ++i) {
-      children.push_back(absl::make_unique<CancellationManager>(&parent));
+      children.push_back(abslx::make_unique<CancellationManager>(&parent));
       EXPECT_FALSE(children.back()->IsCancelled());
     }
 

@@ -29,7 +29,7 @@
 #include "absl/meta/type_traits.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 
@@ -53,7 +53,7 @@ inline void enable_shallow_subcords(bool enable) {
 }
 
 enum Constants {
-  // The inlined size to use with absl::InlinedVector.
+  // The inlined size to use with abslx::InlinedVector.
   //
   // Note: The InlinedVectors in this file (and in cord.h) do not need to use
   // the same value for their inlined size. The fact that they do is historical.
@@ -230,7 +230,7 @@ using ExternalReleaserInvoker = void (*)(CordRepExternal*);
 // releaser is stored in the memory directly following the CordRepExternal.
 struct CordRepExternal : public CordRep {
   CordRepExternal() = default;
-  explicit constexpr CordRepExternal(absl::string_view str)
+  explicit constexpr CordRepExternal(abslx::string_view str)
       : CordRep(Refcount::Immortal{}, str.size()),
         base(str.data()),
         releaser_invoker(nullptr) {}
@@ -247,23 +247,23 @@ struct CordRepExternal : public CordRep {
 struct Rank1 {};
 struct Rank0 : Rank1 {};
 
-template <typename Releaser, typename = ::absl::base_internal::invoke_result_t<
-                                 Releaser, absl::string_view>>
-void InvokeReleaser(Rank0, Releaser&& releaser, absl::string_view data) {
-  ::absl::base_internal::invoke(std::forward<Releaser>(releaser), data);
+template <typename Releaser, typename = ::abslx::base_internal::invoke_result_t<
+                                 Releaser, abslx::string_view>>
+void InvokeReleaser(Rank0, Releaser&& releaser, abslx::string_view data) {
+  ::abslx::base_internal::invoke(std::forward<Releaser>(releaser), data);
 }
 
 template <typename Releaser,
-          typename = ::absl::base_internal::invoke_result_t<Releaser>>
-void InvokeReleaser(Rank1, Releaser&& releaser, absl::string_view) {
-  ::absl::base_internal::invoke(std::forward<Releaser>(releaser));
+          typename = ::abslx::base_internal::invoke_result_t<Releaser>>
+void InvokeReleaser(Rank1, Releaser&& releaser, abslx::string_view) {
+  ::abslx::base_internal::invoke(std::forward<Releaser>(releaser));
 }
 
 // We use CompressedTuple so that we can benefit from EBCO.
 template <typename Releaser>
 struct CordRepExternalImpl
     : public CordRepExternal,
-      public ::absl::container_internal::CompressedTuple<Releaser> {
+      public ::abslx::container_internal::CompressedTuple<Releaser> {
   // The extra int arg is so that we can avoid interfering with copy/move
   // constructors while still benefitting from perfect forwarding.
   template <typename T>
@@ -274,7 +274,7 @@ struct CordRepExternalImpl
 
   ~CordRepExternalImpl() {
     InvokeReleaser(Rank0{}, std::move(this->template get<0>()),
-                   absl::string_view(base, length));
+                   abslx::string_view(base, length));
   }
 
   static void Release(CordRepExternal* rep) {
@@ -301,7 +301,7 @@ enum {
   kMaxInline = 15,
 };
 
-constexpr char GetOrNull(absl::string_view data, size_t pos) {
+constexpr char GetOrNull(abslx::string_view data, size_t pos) {
   return pos < data.size() ? data[pos] : '\0';
 }
 
@@ -337,7 +337,7 @@ class InlineData {
 
   constexpr InlineData() : as_chars_{0} {}
   explicit constexpr InlineData(CordRep* rep) : as_tree_(rep) {}
-  explicit constexpr InlineData(absl::string_view chars)
+  explicit constexpr InlineData(abslx::string_view chars)
       : as_chars_{
             GetOrNull(chars, 0),  GetOrNull(chars, 1),
             GetOrNull(chars, 2),  GetOrNull(chars, 3),
@@ -368,7 +368,7 @@ class InlineData {
   CordzInfo* cordz_info() const {
     assert(is_tree());
     intptr_t info =
-        static_cast<intptr_t>(absl::big_endian::ToHost64(as_tree_.cordz_info));
+        static_cast<intptr_t>(abslx::big_endian::ToHost64(as_tree_.cordz_info));
     assert(info & 1);
     return reinterpret_cast<CordzInfo*>(info - 1);
   }
@@ -379,7 +379,7 @@ class InlineData {
   void set_cordz_info(CordzInfo* cordz_info) {
     assert(is_tree());
     intptr_t info = reinterpret_cast<intptr_t>(cordz_info) | 1;
-    as_tree_.cordz_info = absl::big_endian::FromHost64(info);
+    as_tree_.cordz_info = abslx::big_endian::FromHost64(info);
   }
 
   // Resets the current cordz_info to null / empty.
@@ -452,13 +452,13 @@ class InlineData {
  private:
   // See cordz_info_t for forced alignment and size of `cordz_info` details.
   struct AsTree {
-    explicit constexpr AsTree(absl::cord_internal::CordRep* tree)
+    explicit constexpr AsTree(abslx::cord_internal::CordRep* tree)
         : rep(tree), cordz_info(kNullCordzInfo) {}
     // This union uses up extra space so that whether rep is 32 or 64 bits,
     // cordz_info will still start at the eighth byte, and the last
     // byte of cordz_info will still be the last byte of InlineData.
     union {
-      absl::cord_internal::CordRep* rep;
+      abslx::cord_internal::CordRep* rep;
       cordz_info_t unused_aligner;
     };
     cordz_info_t cordz_info;
@@ -527,5 +527,5 @@ inline void CordRep::Unref(CordRep* rep) {
 }  // namespace cord_internal
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 #endif  // ABSL_STRINGS_INTERNAL_CORD_INTERNAL_H_

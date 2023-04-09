@@ -25,9 +25,9 @@ namespace mediapipe {
 namespace api2 {
 
 class InverseMatrixCalculatorImpl : public NodeImpl<InverseMatrixCalculator> {
-  absl::Status Process(mediapipe::CalculatorContext* cc) override {
+  abslx::Status Process(mediapipe::CalculatorContext* cc) override {
     if (kInputMatrix(cc).IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     Eigen::Matrix<float, 4, 4, Eigen::RowMajor> matrix(
         kInputMatrix(cc).Get().data());
@@ -49,7 +49,7 @@ class InverseMatrixCalculatorImpl : public NodeImpl<InverseMatrixCalculator> {
     Eigen::Map<Eigen::Matrix<float, 4, 4, Eigen::RowMajor>>(
         output.data(), 4, 4) = inverse_matrix.matrix();
     kOutputMatrix(cc).Send(std::move(output));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 MEDIAPIPE_NODE_IMPLEMENTATION(InverseMatrixCalculatorImpl);

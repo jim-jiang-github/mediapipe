@@ -28,14 +28,14 @@ namespace mediapipe {
 namespace tasks {
 namespace vision {
 
-absl::StatusOr<Image> DecodeImageFromFile(const std::string& path) {
+abslx::StatusOr<Image> DecodeImageFromFile(const std::string& path) {
   int width;
   int height;
   int channels;
   auto* image_data = stbi_load(path.c_str(), &width, &height, &channels,
                                /*desired_channels=*/0);
   if (image_data == nullptr) {
-    return absl::InternalError(absl::StrFormat("Image decoding failed (%s): %s",
+    return abslx::InternalError(abslx::StrFormat("Image decoding failed (%s): %s",
                                                stbi_failure_reason(), path));
   }
   ImageFrameSharedPtr image_frame;
@@ -56,15 +56,15 @@ absl::StatusOr<Image> DecodeImageFromFile(const std::string& path) {
                                        4 * width, image_data, stbi_image_free);
       break;
     default:
-      return absl::InvalidArgumentError(
-          absl::StrFormat("Expected image with 1 (grayscale), 3 (RGB) or 4 "
+      return abslx::InvalidArgumentError(
+          abslx::StrFormat("Expected image with 1 (grayscale), 3 (RGB) or 4 "
                           "(RGBA) channels, found %d channels.",
                           channels));
   }
   return Image(std::move(image_frame));
 }
 
-absl::StatusOr<Shape> GetImageLikeTensorShape(const mediapipe::Tensor& tensor) {
+abslx::StatusOr<Shape> GetImageLikeTensorShape(const mediapipe::Tensor& tensor) {
   int width = 0;
   int height = 0;
   int channels = 1;
@@ -87,7 +87,7 @@ absl::StatusOr<Shape> GetImageLikeTensorShape(const mediapipe::Tensor& tensor) {
       break;
     }
     default:
-      return absl::InvalidArgumentError("Tensor should have 2, 3, or 4 dims");
+      return abslx::InvalidArgumentError("Tensor should have 2, 3, or 4 dims");
   }
   return {{height, width, channels}};
 }

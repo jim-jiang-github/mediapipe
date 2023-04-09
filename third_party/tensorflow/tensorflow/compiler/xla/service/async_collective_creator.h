@@ -45,12 +45,12 @@ class AsyncCollectiveCreator : public HloModulePass {
         convert_all_gather_(creator_config.convert_all_gather),
         convert_collective_permute_(creator_config.convert_collective_permute),
         convert_all_to_all_(creator_config.convert_all_to_all) {}
-  absl::string_view name() const override { return "async-collective-creator"; }
+  abslx::string_view name() const override { return "async-collective-creator"; }
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   HloPredicate convert_all_reduce_;

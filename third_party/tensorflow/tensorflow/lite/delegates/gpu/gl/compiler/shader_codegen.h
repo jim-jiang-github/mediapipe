@@ -39,7 +39,7 @@ class ShaderCodegen {
   ShaderCodegen(const CompilationOptions& options, const GpuInfo& gpu_info);
 
   // Builds final program representation.
-  absl::Status Build(CompiledNodeAttributes attr,
+  abslx::Status Build(CompiledNodeAttributes attr,
                      ShaderCode* shader_code) const;
 
  private:

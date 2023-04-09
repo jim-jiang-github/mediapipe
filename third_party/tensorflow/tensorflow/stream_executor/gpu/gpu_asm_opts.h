@@ -35,8 +35,8 @@ struct GpuAsmOpts {
   std::vector<std::string> extra_flags;
 
   explicit GpuAsmOpts(bool disable_gpuasm_optimizations = false,
-                      absl::string_view preferred_cuda_dir = "",
-                      absl::Span<const std::string> extra_flags = {})
+                      abslx::string_view preferred_cuda_dir = "",
+                      abslx::Span<const std::string> extra_flags = {})
       : disable_gpuasm_optimizations(disable_gpuasm_optimizations),
         preferred_cuda_dir(preferred_cuda_dir),
         extra_flags(extra_flags.begin(), extra_flags.end()) {}

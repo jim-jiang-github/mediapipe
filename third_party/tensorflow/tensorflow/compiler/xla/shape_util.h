@@ -52,7 +52,7 @@ namespace xla {
 // The memory backing the index array should be owned by an object
 // that lives longer than the ShapeIndexView instances pointing into
 // it.
-using ShapeIndexView = absl::Span<const int64_t>;
+using ShapeIndexView = abslx::Span<const int64_t>;
 
 // An index for specifying a particular nested subshape within a shape. Used in
 // ShapeUtil::GetSubshape and other interfaces. Shapes are recursive data
@@ -70,7 +70,7 @@ using ShapeIndexView = absl::Span<const int64_t>;
 //   index {0, 0} : invalid index (element at {0} is an array not a tuple)
 //
 // For indexing into array shapes, the index is always trivially empty, ie {}.
-struct ShapeIndex : public absl::InlinedVector<int64_t, 2> {
+struct ShapeIndex : public abslx::InlinedVector<int64_t, 2> {
   using InlinedVector::InlinedVector;
 
   ShapeIndex() = default;  // Needed to make MSVC work for some reason.
@@ -270,12 +270,12 @@ class ShapeUtil {
   static Shape MakeStaticShape(const Shape& original);
 
   // Creates a tuple shape from a slice of element shapes within the tuple.
-  static Shape MakeTupleShape(absl::Span<const Shape> shapes);
-  static Shape MakeTupleShapeWithPtrs(absl::Span<const Shape* const> shapes);
+  static Shape MakeTupleShape(abslx::Span<const Shape> shapes);
+  static Shape MakeTupleShapeWithPtrs(abslx::Span<const Shape* const> shapes);
 
   // Creates a tuple shape from a slice of element shapes within the tuple. If
   // only one shape is passed, returns that.
-  static Shape MakeMaybeTupleShape(absl::Span<const Shape> shapes);
+  static Shape MakeMaybeTupleShape(abslx::Span<const Shape> shapes);
 
   // Creates an opaque shape. These are generally used for threading a context
   // into a custom operation.
@@ -316,7 +316,7 @@ class ShapeUtil {
   // Constructs a new shape with the given element type and sequence of
   // dimensions.
   static Shape MakeShape(PrimitiveType element_type,
-                         absl::Span<const int64_t> dimensions);
+                         abslx::Span<const int64_t> dimensions);
 
   // Make a scalar shape with given primitive type.
   static Shape MakeScalarShape(PrimitiveType element_type);
@@ -328,22 +328,22 @@ class ShapeUtil {
   // bound on the dimension size. 'dimensions' and 'dynamic_dimensions' must be
   // the same size.
   static Shape MakeShape(PrimitiveType element_type,
-                         absl::Span<const int64_t> dimensions,
+                         abslx::Span<const int64_t> dimensions,
                          const std::vector<bool>& dynamic_dimensions);
 
   // Constructs a new shape with the given element type and sequence of
   // dimensions. Method checks if the element type is valid and the shape's
   // size fits in std::numeric_limits<int64_t>::max().
   static StatusOr<Shape> MakeValidatedShape(
-      PrimitiveType element_type, absl::Span<const int64_t> dimensions);
+      PrimitiveType element_type, abslx::Span<const int64_t> dimensions);
   static StatusOr<Shape> MakeValidatedShape(
-      PrimitiveType element_type, absl::Span<const int64_t> dimensions,
+      PrimitiveType element_type, abslx::Span<const int64_t> dimensions,
       const std::vector<bool>& dynamic_dimensions);
 
   // Creates a Shape with element type corresponding to T and the given
   // dimensions
   template <typename T>
-  static Shape MakeShapeWithType(absl::Span<const int64_t> dimensions) {
+  static Shape MakeShapeWithType(abslx::Span<const int64_t> dimensions) {
     return ShapeUtil::MakeShape(primitive_util::NativeToPrimitiveType<T>(),
                                 dimensions);
   }
@@ -351,9 +351,9 @@ class ShapeUtil {
   // Constructs a new shape with the given minor_to_major order in its Layout.
   // Returns a value shape such that shape.has_layout().
   static Shape MakeShapeWithLayout(PrimitiveType element_type,
-                                   absl::Span<const int64_t> dimensions,
-                                   absl::Span<const int64_t> minor_to_major,
-                                   absl::Span<const Tile> tiles = {},
+                                   abslx::Span<const int64_t> dimensions,
+                                   abslx::Span<const int64_t> minor_to_major,
+                                   abslx::Span<const Tile> tiles = {},
                                    int64_t element_size_in_bits = 0,
                                    int64_t memory_space = 0);
 
@@ -368,7 +368,7 @@ class ShapeUtil {
 
   // Constructs a new shape with major-first layout (i.e. {n, n-1, ..., 0}).
   static Shape MakeShapeWithDescendingLayout(
-      PrimitiveType element_type, absl::Span<const int64_t> dimensions);
+      PrimitiveType element_type, abslx::Span<const int64_t> dimensions);
 
   // Returns a new Shape based on the given Shape with low-dimension-major
   // layout (i.e. {n, n-1, ..., 0}, like Fortran), and with the dimensions
@@ -380,7 +380,7 @@ class ShapeUtil {
 
   // As MakeShape, but the object to write to is passed in.
   static Status PopulateShape(PrimitiveType element_type,
-                              absl::Span<const int64_t> dimensions,
+                              abslx::Span<const int64_t> dimensions,
                               Shape* shape);
 
   // Validates that the provided shape satisfies invariants.
@@ -503,7 +503,7 @@ class ShapeUtil {
   //   !HasLayout(shape) ||
   //   TransposeIsBitcast(shape, PermuteDimensions(permutation, shape),
   //                      permutation).
-  static Shape PermuteDimensions(absl::Span<const int64_t> permutation,
+  static Shape PermuteDimensions(abslx::Span<const int64_t> permutation,
                                  const Shape& shape);
 
   // Describes how we can go from shape A to shape B by inserting degenerate
@@ -561,7 +561,7 @@ class ShapeUtil {
   // Precondition: input_dim_indices is sorted.
   static std::optional<std::vector<int64_t>> ReshapeLeavesDimensionsUnmodified(
       const Shape& from_shape, const Shape& to_shape,
-      absl::Span<const int64_t> input_dim_indices);
+      abslx::Span<const int64_t> input_dim_indices);
 
   // Returns whether a transpose from input_shape to output_shape with dimension
   // mapping "dimension_mapping" produces a result which is bit-wise identical
@@ -570,7 +570,7 @@ class ShapeUtil {
   // Precondition: Both input_shape and output_shape have explicit layouts.
   static bool TransposeIsBitcast(const Shape& input_shape,
                                  const Shape& output_shape,
-                                 absl::Span<const int64_t> dimension_mapping);
+                                 abslx::Span<const int64_t> dimension_mapping);
 
   // Returns whether a reshape from `input_shape` to `output_shape` is a
   // bitcast, when minor_to_major in layout is considered.
@@ -594,7 +594,7 @@ class ShapeUtil {
   static Shape DeleteDimension(int64_t dim_to_delete, Shape shape);
 
   // Returns a shape with dimensions in `to_drop` dropped.
-  static Shape DeleteDimensions(absl::Span<int64_t const> dims_to_delete,
+  static Shape DeleteDimensions(abslx::Span<int64_t const> dims_to_delete,
                                 Shape shape);
 
   // Returns a shape with all the dimensions of the input shape for which `p`
@@ -621,16 +621,16 @@ class ShapeUtil {
   // return true if it wants to continue, or false otherwise.
   //
   // visitor_function must be a callable of type
-  // StatusOr<bool>(absl::Span<int64_t>) or compatible.
+  // StatusOr<bool>(abslx::Span<int64_t>) or compatible.
   template <typename FnType>
   static Status ForEachIndexWithStatus(const Shape& shape,
-                                       absl::Span<const int64_t> base,
-                                       absl::Span<const int64_t> count,
-                                       absl::Span<const int64_t> incr,
+                                       abslx::Span<const int64_t> base,
+                                       abslx::Span<const int64_t> count,
+                                       abslx::Span<const int64_t> incr,
                                        const FnType& visitor_function) {
     return ForEachIndexInternal(
         shape, base, count, incr,
-        [&visitor_function](absl::Span<const int64_t> indexes,
+        [&visitor_function](abslx::Span<const int64_t> indexes,
                             int /*thread_id*/) {
           return visitor_function(indexes);
         });
@@ -653,12 +653,12 @@ class ShapeUtil {
   }
 
   template <typename FnType>
-  static void ForEachIndex(const Shape& shape, absl::Span<const int64_t> base,
-                           absl::Span<const int64_t> count,
-                           absl::Span<const int64_t> incr,
+  static void ForEachIndex(const Shape& shape, abslx::Span<const int64_t> base,
+                           abslx::Span<const int64_t> count,
+                           abslx::Span<const int64_t> incr,
                            const FnType& visitor_function) {
     ForEachIndexWithStatus(shape, base, count, incr,
-                           [&](absl::Span<const int64_t> indices) {
+                           [&](abslx::Span<const int64_t> indices) {
                              return StatusOr<bool>(visitor_function(indices));
                            })
         .IgnoreError();
@@ -679,7 +679,7 @@ class ShapeUtil {
 
   template <typename FnType>
   static void ForEachIndex(const Shape& shape, const FnType& visitor_function) {
-    ForEachIndexWithStatus(shape, [&](absl::Span<const int64_t> indices) {
+    ForEachIndexWithStatus(shape, [&](abslx::Span<const int64_t> indices) {
       return StatusOr<bool>(visitor_function(indices));
     }).IgnoreError();
   }
@@ -692,14 +692,14 @@ class ShapeUtil {
   // void(Span<int64_t>, int thread_id) or compatible.
   template <typename FnType>
   static void ForEachIndexParallel(const Shape& shape,
-                                   absl::Span<const int64_t> base,
-                                   absl::Span<const int64_t> count,
-                                   absl::Span<const int64_t> incr,
+                                   abslx::Span<const int64_t> base,
+                                   abslx::Span<const int64_t> count,
+                                   abslx::Span<const int64_t> incr,
                                    const FnType& visitor_function) {
     // The parallel version of ForEachIndexInternal can never fail.
     CHECK(ForEachIndexInternal(
               shape, base, count, incr,
-              [&visitor_function](absl::Span<const int64_t> indexes,
+              [&visitor_function](abslx::Span<const int64_t> indexes,
                                   int thread_id) -> StatusOr<bool> {
                 visitor_function(indexes, thread_id);
                 return true;
@@ -745,7 +745,7 @@ class ShapeUtil {
   // Computes byte strides of an array shape `shape`. `shape` must have a
   // layout. Ignores tiling. `strides` must have size equal to the number of
   // dimensions of `shape`.
-  static Status ByteStrides(const Shape& shape, absl::Span<int64_t> strides);
+  static Status ByteStrides(const Shape& shape, abslx::Span<int64_t> strides);
 
   // Returns the array size in bytes (layout/tiling required), all paddings are
   // included.
@@ -759,7 +759,7 @@ class ShapeUtil {
   // Fills *shape. Returns true on success.
   // REQUIRES: *shape is empty.
   static bool FillNewShape(PrimitiveType element_type,
-                           absl::Span<const int64_t> dimensions, Shape* shape);
+                           abslx::Span<const int64_t> dimensions, Shape* shape);
 
   // Validates the shape size is sane. This makes sure it's safe to do
   // calculations in int64_t without overflowing.
@@ -771,9 +771,9 @@ class ShapeUtil {
 
   template <typename FnType>
   static Status ForEachIndexInternal(const Shape& shape,
-                                     absl::Span<const int64_t> base,
-                                     absl::Span<const int64_t> count,
-                                     absl::Span<const int64_t> incr,
+                                     abslx::Span<const int64_t> base,
+                                     abslx::Span<const int64_t> count,
+                                     abslx::Span<const int64_t> incr,
                                      const FnType& visitor_function,
                                      bool parallel = false) {
     if (ShapeUtil::IsZeroElementArray(shape)) {
@@ -793,7 +793,7 @@ class ShapeUtil {
       pool.emplace(tensorflow::Env::Default(), "foreach", kNumThreads);
     }
 
-    absl::Mutex mu;
+    abslx::Mutex mu;
     Status status;  // Guarded by mu
 
     while (n < rank) {
@@ -802,7 +802,7 @@ class ShapeUtil {
           const int thread_id = pool->CurrentThreadId();
           StatusOr<bool> result = visitor_function(indexes, thread_id);
           if (!result.ok()) {
-            absl::MutexLock lock(&mu);
+            abslx::MutexLock lock(&mu);
             status = status.ok() ? result.status() : status;
           }
         });

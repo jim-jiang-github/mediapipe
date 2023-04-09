@@ -38,7 +38,7 @@ xla::Status CreateXlaStatus(::TpuStatus* status) {
     return ::tensorflow::OkStatus();
   } else {
     return xla::Status(tensorflow::error::Code(status->code),
-                       absl::StrFormat("%s", status->msg));
+                       abslx::StrFormat("%s", status->msg));
   }
 }
 
@@ -74,9 +74,9 @@ class DirectEvent : public Event {
   }
 
   std::optional<xla::Status> AwaitWithTimeout(
-      absl::Duration duration) override {
+      abslx::Duration duration) override {
     auto tpu_status_or = driver_fn_->TpuDriver_EventAwait(
-        event_, absl::ToInt64Microseconds(duration));
+        event_, abslx::ToInt64Microseconds(duration));
     if (tpu_status_or == nullptr) {
       return std::nullopt;
     } else {
@@ -274,7 +274,7 @@ class DirectTpuDriver : public TpuDriver {
 
   std::unique_ptr<BufferHandle> Allocate(
       int32_t core_id, MemoryRegion region, int64_t num_bytes,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto tpu_events = MakeEventArray(wait_for);
     auto bh = std::make_unique<DirectBufferHandle>(
         &driver_fn_,
@@ -286,7 +286,7 @@ class DirectTpuDriver : public TpuDriver {
 
   std::unique_ptr<BufferHandle> Allocate(
       int32_t core_id, MemoryRegion region, const xla::ShapeProto& shape,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto tpu_events = MakeEventArray(wait_for);
 
     ::TpuAllocationShape shape_ = GetTpuAllocationShape(shape);
@@ -302,8 +302,8 @@ class DirectTpuDriver : public TpuDriver {
 
   std::unique_ptr<BufferHandle> AllocateTuple(
       int32_t core_id, MemoryRegion region,
-      absl::Span<BufferHandle* const> children,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<BufferHandle* const> children,
+      abslx::Span<Event* const> wait_for) override {
     auto tpu_events = MakeEventArray(wait_for);
 
     ::TpuBufferHandle** childbuf = new ::TpuBufferHandle*[children.size()];
@@ -324,7 +324,7 @@ class DirectTpuDriver : public TpuDriver {
 
   std::shared_ptr<Event> Deallocate(
       std::unique_ptr<BufferHandle> handle,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto tpu_events = MakeEventArray(wait_for);
     auto* direct_bh = static_cast<DirectBufferHandle*>(handle.get());
     auto event = std::make_shared<DirectEvent>(
@@ -337,7 +337,7 @@ class DirectTpuDriver : public TpuDriver {
 
   std::shared_ptr<Event> TransferToDevice(
       const void* src, BufferHandle* dst,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto tpu_events = MakeEventArray(wait_for);
     auto event = std::make_shared<DirectEvent>(
         &driver_fn_,
@@ -350,7 +350,7 @@ class DirectTpuDriver : public TpuDriver {
 
   std::shared_ptr<Event> TransferFromDevice(
       const BufferHandle* src, void* dst,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto tpu_events = MakeEventArray(wait_for);
     auto event = std::make_shared<DirectEvent>(
         &driver_fn_,
@@ -363,7 +363,7 @@ class DirectTpuDriver : public TpuDriver {
 
   std::shared_ptr<Event> TransferFromDeviceToDevice(
       const BufferHandle* src, BufferHandle* dst,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto tpu_events = MakeEventArray(wait_for);
     auto event = std::make_shared<DirectEvent>(
         &driver_fn_,
@@ -377,7 +377,7 @@ class DirectTpuDriver : public TpuDriver {
 
   std::unique_ptr<CompiledProgramHandle> CompileProgram(
       const xla::HloProto& source, int32_t num_replicas,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto tpu_events = MakeEventArray(wait_for);
 
     struct HloProto hlo;
@@ -399,7 +399,7 @@ class DirectTpuDriver : public TpuDriver {
   }
   std::unique_ptr<LoadedProgramHandle> LoadProgram(
       int32_t core_id, const CompiledProgramHandle* handle,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto tpu_events = MakeEventArray(wait_for);
 
     auto loaded_handle = std::make_unique<DirectLoadedProgramHandle>(
@@ -415,7 +415,7 @@ class DirectTpuDriver : public TpuDriver {
 
   std::shared_ptr<Event> UnloadProgram(
       std::unique_ptr<LoadedProgramHandle> handle,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto tpu_events = MakeEventArray(wait_for);
     auto* direct_lph = static_cast<DirectLoadedProgramHandle*>(handle.get());
     auto event = std::make_shared<DirectEvent>(
@@ -427,10 +427,10 @@ class DirectTpuDriver : public TpuDriver {
   }
 
   std::shared_ptr<Event> ExecuteProgram(
-      LoadedProgramHandle* program, absl::Span<BufferHandle* const> inputs,
-      absl::Span<BufferHandle* const> outputs,
+      LoadedProgramHandle* program, abslx::Span<BufferHandle* const> inputs,
+      abslx::Span<BufferHandle* const> outputs,
       const xla::DeviceAssignmentProto& device_assignment,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto tpu_events = MakeEventArray(wait_for);
 
     std::vector<::TpuBufferHandle*> inputv;
@@ -471,7 +471,7 @@ class DirectTpuDriver : public TpuDriver {
   ::TpuDriverFn driver_fn_;
   ::TpuDriver* driver_;
 
-  ::TpuEvent** MakeEventArray(absl::Span<Event* const> wait_for) {
+  ::TpuEvent** MakeEventArray(abslx::Span<Event* const> wait_for) {
     if (wait_for.empty()) return nullptr;
     ::TpuEvent** ret = new ::TpuEvent*[wait_for.size()];
     for (int i = 0; i < wait_for.size(); i++) {

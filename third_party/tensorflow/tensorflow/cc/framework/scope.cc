@@ -275,7 +275,7 @@ std::unordered_set<string> Scope::Impl::GetColocationConstraints(
   if (TryGetNodeAttr(attrs, kColocationAttrName, &node_constraints)) {
     for (const string& entry : node_constraints) {
       StringPiece s(entry);
-      if (absl::ConsumePrefix(&s, kColocationGroupPrefix)) {
+      if (abslx::ConsumePrefix(&s, kColocationGroupPrefix)) {
         current_constraints.emplace(s);
       }
     }
@@ -532,7 +532,7 @@ Scope NewInternalScope(Graph* graph, Status* status, ShapeRefiner* refiner) {
 }
 
 Status CreateOutputWithScope(string op_name,
-                             absl::Span<const ::tensorflow::Input> inputs,
+                             abslx::Span<const ::tensorflow::Input> inputs,
                              const Scope& scope, Output* output) {
   TF_RETURN_IF_ERROR(scope.status());
   const auto unique_name = scope.GetUniqueNameForOp(op_name);

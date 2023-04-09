@@ -38,8 +38,8 @@ class ReductionDegenerateDimRemoverVisitor : public DfsHloRewriteVisitor {
  public:
   Status HandleReduce(HloInstruction *hlo) override {
     auto instr = Cast<HloReduceInstruction>(hlo);
-    absl::InlinedVector<HloInstruction *, 2> input_reshapes;
-    absl::InlinedVector<Shape, 2> canonical_reduce_shapes;
+    abslx::InlinedVector<HloInstruction *, 2> input_reshapes;
+    abslx::InlinedVector<Shape, 2> canonical_reduce_shapes;
 
     int idx = -1;
     std::vector<int64_t> updated_reduced_dimensions;
@@ -66,7 +66,7 @@ class ReductionDegenerateDimRemoverVisitor : public DfsHloRewriteVisitor {
         if (input_shape.dimensions(dim) == 1) {
           shift++;
         } else {
-          if (absl::c_linear_search(reduced_dimensions, dim) && idx == 0) {
+          if (abslx::c_linear_search(reduced_dimensions, dim) && idx == 0) {
             // Only populate on first iteration.
             updated_reduced_dimensions.push_back(dim - shift);
           }
@@ -94,7 +94,7 @@ class ReductionDegenerateDimRemoverVisitor : public DfsHloRewriteVisitor {
     if (canonical_reduce_shape != instr->shape()) {
       HloInstruction *wrapped_reduce =
           instr->parent()->AddInstruction(std::move(new_reduce));
-      absl::InlinedVector<HloInstruction *, 2> out;
+      abslx::InlinedVector<HloInstruction *, 2> out;
       if (!canonical_reduce_shape.IsTuple()) {
         new_reduce =
             HloInstruction::CreateBitcast(orig_reduce_shape, wrapped_reduce);
@@ -116,7 +116,7 @@ class ReductionDegenerateDimRemoverVisitor : public DfsHloRewriteVisitor {
 
 StatusOr<bool> ReductionDegenerateDimRemover::Run(
     HloModule *module,
-    const absl::flat_hash_set<absl::string_view> &execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view> &execution_threads) {
   TF_ASSIGN_OR_RETURN(bool changed,
                       ReductionDegenerateDimRemoverVisitor().RunOnModule(
                           module, execution_threads));

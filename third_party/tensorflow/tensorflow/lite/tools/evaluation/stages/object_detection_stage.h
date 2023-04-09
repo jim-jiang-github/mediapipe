@@ -99,7 +99,7 @@ class ObjectDetectionStage : public EvaluationStage {
 // Useful for wrappers/scripts that use ObjectDetectionStage.
 TfLiteStatus PopulateGroundTruth(
     const std::string& grouth_truth_proto_file,
-    absl::flat_hash_map<std::string, ObjectDetectionResult>*
+    abslx::flat_hash_map<std::string, ObjectDetectionResult>*
         ground_truth_mapping);
 
 }  // namespace evaluation

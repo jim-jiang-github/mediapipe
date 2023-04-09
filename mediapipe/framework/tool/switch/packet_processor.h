@@ -29,7 +29,7 @@ class PacketConsumer {
   virtual ~PacketConsumer() = default;
 
   // Accepts a tagged input packet.
-  virtual absl::Status AddPacket(CollectionItemId id, Packet packet) = 0;
+  virtual abslx::Status AddPacket(CollectionItemId id, Packet packet) = 0;
 
   // Returns the id for each input tag.
   virtual std::shared_ptr<tool::TagMap> InputTags() = 0;
@@ -50,7 +50,7 @@ class SidePacketConsumer {
   virtual ~SidePacketConsumer() = default;
 
   // Accepts a tagged input side-packet.
-  virtual absl::Status SetSidePacket(CollectionItemId id, Packet packet) = 0;
+  virtual abslx::Status SetSidePacket(CollectionItemId id, Packet packet) = 0;
 
   // Returns the id for each input side-packet tag.
   virtual std::shared_ptr<tool::TagMap> SideInputTags() = 0;
@@ -74,13 +74,13 @@ class PacketProcessor : public PacketConsumer,
   virtual ~PacketProcessor() = default;
 
   // Activate this PacketProcessor.
-  virtual absl::Status Start() = 0;
+  virtual abslx::Status Start() = 0;
 
   // Block until this PacketProcessor has no remaining work to do.
-  virtual absl::Status WaitUntilIdle() = 0;
+  virtual abslx::Status WaitUntilIdle() = 0;
 
   // Deactivate this PacketProcessor.
-  virtual absl::Status Shutdown() = 0;
+  virtual abslx::Status Shutdown() = 0;
 };
 
 }  // namespace mediapipe

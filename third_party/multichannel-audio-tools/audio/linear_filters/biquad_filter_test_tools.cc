@@ -26,7 +26,7 @@
 
 namespace linear_filters {
 
-using ::absl::StrFormat;
+using ::abslx::StrFormat;
 using ::std::complex;
 
 namespace internal {
@@ -42,17 +42,17 @@ double GetMagnitudeResponseSingleStage(
 
 // Pretty print a set of coefficients.
 std::string AsString(const BiquadFilterCoefficients& coeffs) {
-  return absl::StrCat(
-      "B = [", absl::StrJoin(coeffs.b, ", "),
+  return abslx::StrCat(
+      "B = [", abslx::StrJoin(coeffs.b, ", "),
       "] and ", "A = [",
-      absl::StrJoin(coeffs.a, ", "), "]");
+      abslx::StrJoin(coeffs.a, ", "), "]");
 }
 
 // Pretty print the coefficients for a multi-stage filter.
 std::string AsString(const BiquadFilterCascadeCoefficients& coeffs) {
   std::string output;
   for (int i = 0; i < coeffs.size(); ++i) {
-    absl::SubstituteAndAppend(&output, "Stage $0: $1 ", i, AsString(coeffs[i]));
+    abslx::SubstituteAndAppend(&output, "Stage $0: $1 ", i, AsString(coeffs[i]));
   }
   return output;
 }

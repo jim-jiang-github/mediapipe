@@ -42,7 +42,7 @@ class Shape {
   template <typename... Args>
   explicit Shape(Args&&... args)  // forward ctor args to that of std::vector
       : value_(std::forward<Args>(args)...), has_value_(true) {}
-  explicit Shape(const absl::Span<int> value)
+  explicit Shape(const abslx::Span<int> value)
       : value_(value.data(), value.data() + value.size()), has_value_(true) {}
 
   // Accessors
@@ -88,7 +88,7 @@ class Shape {
   ValueType value_;
   bool has_value_ = false;
 };
-using ShapeOr = absl::StatusOr<Shape>;
+using ShapeOr = abslx::StatusOr<Shape>;
 
 }  // namespace shim
 }  // namespace tflite

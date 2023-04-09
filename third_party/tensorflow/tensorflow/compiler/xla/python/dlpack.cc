@@ -56,7 +56,7 @@ struct DLPackTensor {
 DLPackTensor::~DLPackTensor() {
   if (buffer_reference) {
     GlobalPyRefManager()->AddGarbage(
-        absl::MakeSpan(&buffer_reference, /*size=*/1));
+        abslx::MakeSpan(&buffer_reference, /*size=*/1));
   }
 }
 
@@ -192,11 +192,11 @@ std::vector<int64_t> StridesForShape(const Shape& shape) {
 }
 
 StatusOr<std::vector<int64_t>> StridesToLayout(
-    absl::Span<int64_t const> dims, absl::Span<int64_t const> strides) {
+    abslx::Span<int64_t const> dims, abslx::Span<int64_t const> strides) {
   CHECK_EQ(dims.size(), strides.size());
   std::vector<int64_t> minor_to_major(dims.size());
   std::iota(minor_to_major.begin(), minor_to_major.end(), 0);
-  absl::c_sort(minor_to_major, [&](int a, int b) {
+  abslx::c_sort(minor_to_major, [&](int a, int b) {
     if (strides[a] < strides[b]) {
       return true;
     }
@@ -213,7 +213,7 @@ StatusOr<std::vector<int64_t>> StridesToLayout(
           "i.e., tensors whose striding represents a transposition of the "
           "underlying buffer but not broadcasting. Dimensions were: [%s], "
           "strides were [%s].",
-          absl::StrJoin(dims, ","), absl::StrJoin(strides, ","));
+          abslx::StrJoin(dims, ","), abslx::StrJoin(strides, ","));
     }
     stride *= dims[d];
   }
@@ -349,11 +349,11 @@ StatusOr<PyBuffer::object> DLPackManagedTensorToBuffer(
                            cpu_client->pjrt_client()->platform_name());
   }
 
-  if (absl::string_view(tensor.name()) != kDlTensorCapsuleName) {
+  if (abslx::string_view(tensor.name()) != kDlTensorCapsuleName) {
     return InvalidArgument(
         "DLPack tensor must be a capsule with name \"dltensor\", got \"%s\". "
         "Note that a DLPack tensor may be consumed at most once.",
-        absl::string_view(tensor.name()));
+        abslx::string_view(tensor.name()));
   }
   DLManagedTensor* dlmt = static_cast<DLManagedTensor*>(tensor);
   if (dlmt->dl_tensor.ndim < 0) {
@@ -366,15 +366,15 @@ StatusOr<PyBuffer::object> DLPackManagedTensorToBuffer(
       DeviceForDLDevice(cpu_client ? cpu_client->pjrt_client() : nullptr,
                         gpu_client ? gpu_client->pjrt_client() : nullptr,
                         dlmt->dl_tensor.device));
-  absl::Span<int64_t const> dimensions(
+  abslx::Span<int64_t const> dimensions(
       reinterpret_cast<int64_t*>(dlmt->dl_tensor.shape), dlmt->dl_tensor.ndim);
   TF_ASSIGN_OR_RETURN(PrimitiveType element_type,
                       DLDataTypeToPrimitiveType(dlmt->dl_tensor.dtype));
 
   std::vector<int64_t> minor_to_major;
   if (dlmt->dl_tensor.strides &&
-      absl::c_find(dimensions, 0) == dimensions.end()) {
-    absl::Span<int64_t const> strides(
+      abslx::c_find(dimensions, 0) == dimensions.end()) {
+    abslx::Span<int64_t const> strides(
         reinterpret_cast<int64_t*>(dlmt->dl_tensor.strides),
         dlmt->dl_tensor.ndim);
     TF_ASSIGN_OR_RETURN(minor_to_major, StridesToLayout(dimensions, strides));

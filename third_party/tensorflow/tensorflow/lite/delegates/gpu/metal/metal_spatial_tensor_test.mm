@@ -41,7 +41,7 @@ using tflite::gpu::Layout;
 
 namespace {
 template <DataType T>
-absl::Status TensorBHWCTest(const BHWC& shape, const TensorDescriptor& descriptor,
+abslx::Status TensorBHWCTest(const BHWC& shape, const TensorDescriptor& descriptor,
                             id<MTLDevice> device) {
   tflite::gpu::Tensor<BHWC, T> tensor_cpu;
   tensor_cpu.shape = shape;
@@ -83,46 +83,46 @@ absl::Status TensorBHWCTest(const BHWC& shape, const TensorDescriptor& descripto
 
   for (int i = 0; i < tensor_gpu.data.size(); ++i) {
     if (tensor_gpu.data[i] != tensor_cpu.data[i]) {
-      return absl::InternalError("Wrong value at index - " + std::to_string(i) + ". GPU - " +
+      return abslx::InternalError("Wrong value at index - " + std::to_string(i) + ". GPU - " +
                                  std::to_string(tensor_gpu.data[i]) + ", CPU - " +
                                  std::to_string(tensor_cpu.data[i]));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-template absl::Status TensorBHWCTest<DataType::FLOAT32>(const BHWC& shape,
+template abslx::Status TensorBHWCTest<DataType::FLOAT32>(const BHWC& shape,
                                                         const TensorDescriptor& descriptor,
                                                         id<MTLDevice> device);
-template absl::Status TensorBHWCTest<DataType::INT32>(const BHWC& shape,
+template abslx::Status TensorBHWCTest<DataType::INT32>(const BHWC& shape,
                                                       const TensorDescriptor& descriptor,
                                                       id<MTLDevice> device);
 
-template absl::Status TensorBHWCTest<DataType::INT16>(const BHWC& shape,
+template abslx::Status TensorBHWCTest<DataType::INT16>(const BHWC& shape,
                                                       const TensorDescriptor& descriptor,
                                                       id<MTLDevice> device);
 
-template absl::Status TensorBHWCTest<DataType::INT8>(const BHWC& shape,
+template abslx::Status TensorBHWCTest<DataType::INT8>(const BHWC& shape,
                                                      const TensorDescriptor& descriptor,
                                                      id<MTLDevice> device);
-template absl::Status TensorBHWCTest<DataType::UINT32>(const BHWC& shape,
+template abslx::Status TensorBHWCTest<DataType::UINT32>(const BHWC& shape,
                                                        const TensorDescriptor& descriptor,
                                                        id<MTLDevice> device);
 
-template absl::Status TensorBHWCTest<DataType::UINT16>(const BHWC& shape,
+template abslx::Status TensorBHWCTest<DataType::UINT16>(const BHWC& shape,
                                                        const TensorDescriptor& descriptor,
                                                        id<MTLDevice> device);
 
-template absl::Status TensorBHWCTest<DataType::UINT8>(const BHWC& shape,
+template abslx::Status TensorBHWCTest<DataType::UINT8>(const BHWC& shape,
                                                       const TensorDescriptor& descriptor,
                                                       id<MTLDevice> device);
 
-template absl::Status TensorBHWCTest<DataType::BOOL>(const BHWC& shape,
+template abslx::Status TensorBHWCTest<DataType::BOOL>(const BHWC& shape,
                                                      const TensorDescriptor& descriptor,
                                                      id<MTLDevice> device);
 
 template <DataType T>
-absl::Status TensorBHWDCTest(const BHWDC& shape, const TensorDescriptor& descriptor,
+abslx::Status TensorBHWDCTest(const BHWDC& shape, const TensorDescriptor& descriptor,
                              id<MTLDevice> device) {
   tflite::gpu::Tensor<BHWDC, T> tensor_cpu;
   tensor_cpu.shape = shape;
@@ -164,44 +164,44 @@ absl::Status TensorBHWDCTest(const BHWDC& shape, const TensorDescriptor& descrip
 
   for (int i = 0; i < tensor_gpu.data.size(); ++i) {
     if (tensor_gpu.data[i] != tensor_cpu.data[i]) {
-      return absl::InternalError("Wrong value.");
+      return abslx::InternalError("Wrong value.");
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-template absl::Status TensorBHWDCTest<DataType::FLOAT32>(const BHWDC& shape,
+template abslx::Status TensorBHWDCTest<DataType::FLOAT32>(const BHWDC& shape,
                                                          const TensorDescriptor& descriptor,
                                                          id<MTLDevice> device);
-template absl::Status TensorBHWDCTest<DataType::INT32>(const BHWDC& shape,
+template abslx::Status TensorBHWDCTest<DataType::INT32>(const BHWDC& shape,
                                                        const TensorDescriptor& descriptor,
                                                        id<MTLDevice> device);
 
-template absl::Status TensorBHWDCTest<DataType::INT16>(const BHWDC& shape,
+template abslx::Status TensorBHWDCTest<DataType::INT16>(const BHWDC& shape,
                                                        const TensorDescriptor& descriptor,
                                                        id<MTLDevice> device);
 
-template absl::Status TensorBHWDCTest<DataType::INT8>(const BHWDC& shape,
+template abslx::Status TensorBHWDCTest<DataType::INT8>(const BHWDC& shape,
                                                       const TensorDescriptor& descriptor,
                                                       id<MTLDevice> device);
-template absl::Status TensorBHWDCTest<DataType::UINT32>(const BHWDC& shape,
+template abslx::Status TensorBHWDCTest<DataType::UINT32>(const BHWDC& shape,
                                                         const TensorDescriptor& descriptor,
                                                         id<MTLDevice> device);
 
-template absl::Status TensorBHWDCTest<DataType::UINT16>(const BHWDC& shape,
+template abslx::Status TensorBHWDCTest<DataType::UINT16>(const BHWDC& shape,
                                                         const TensorDescriptor& descriptor,
                                                         id<MTLDevice> device);
 
-template absl::Status TensorBHWDCTest<DataType::UINT8>(const BHWDC& shape,
+template abslx::Status TensorBHWDCTest<DataType::UINT8>(const BHWDC& shape,
                                                        const TensorDescriptor& descriptor,
                                                        id<MTLDevice> device);
 
-template absl::Status TensorBHWDCTest<DataType::BOOL>(const BHWDC& shape,
+template abslx::Status TensorBHWDCTest<DataType::BOOL>(const BHWDC& shape,
                                                       const TensorDescriptor& descriptor,
                                                       id<MTLDevice> device);
 
 template <DataType T>
-absl::Status TensorTests(DataType data_type, TensorStorageType storage_type) {
+abslx::Status TensorTests(DataType data_type, TensorStorageType storage_type) {
   id<MTLDevice> device = MTLCreateSystemDefaultDevice();
   RETURN_IF_ERROR(
       TensorBHWCTest<T>(BHWC(1, 6, 7, 3), {data_type, storage_type, Layout::HWC}, device));
@@ -237,24 +237,24 @@ absl::Status TensorTests(DataType data_type, TensorStorageType storage_type) {
       TensorBHWDCTest<T>(BHWDC(7, 6, 1, 3, 7), {data_type, storage_type, Layout::BHWDC}, device));
   RETURN_IF_ERROR(
       TensorBHWDCTest<T>(BHWDC(13, 7, 3, 4, 3), {data_type, storage_type, Layout::BHWDC}, device));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-template absl::Status TensorTests<DataType::FLOAT32>(DataType data_type,
+template abslx::Status TensorTests<DataType::FLOAT32>(DataType data_type,
                                                      TensorStorageType storage_type);
-template absl::Status TensorTests<DataType::INT32>(DataType data_type,
+template abslx::Status TensorTests<DataType::INT32>(DataType data_type,
                                                    TensorStorageType storage_type);
-template absl::Status TensorTests<DataType::INT16>(DataType data_type,
+template abslx::Status TensorTests<DataType::INT16>(DataType data_type,
                                                    TensorStorageType storage_type);
-template absl::Status TensorTests<DataType::INT8>(DataType data_type,
+template abslx::Status TensorTests<DataType::INT8>(DataType data_type,
                                                   TensorStorageType storage_type);
-template absl::Status TensorTests<DataType::UINT32>(DataType data_type,
+template abslx::Status TensorTests<DataType::UINT32>(DataType data_type,
                                                     TensorStorageType storage_type);
-template absl::Status TensorTests<DataType::UINT16>(DataType data_type,
+template abslx::Status TensorTests<DataType::UINT16>(DataType data_type,
                                                     TensorStorageType storage_type);
-template absl::Status TensorTests<DataType::UINT8>(DataType data_type,
+template abslx::Status TensorTests<DataType::UINT8>(DataType data_type,
                                                    TensorStorageType storage_type);
-template absl::Status TensorTests<DataType::BOOL>(DataType data_type,
+template abslx::Status TensorTests<DataType::BOOL>(DataType data_type,
                                                   TensorStorageType storage_type);
 
 }  // namespace

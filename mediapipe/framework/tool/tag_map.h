@@ -55,7 +55,7 @@ class TagMap {
   // This is the most common usage:
   // ASSIGN_OR_RETURN(std::shared_ptr<TagMap> tag_map,
   //                  tool::TagMap::Create(node.input_streams()));
-  static absl::StatusOr<std::shared_ptr<TagMap>> Create(
+  static abslx::StatusOr<std::shared_ptr<TagMap>> Create(
       const proto_ns::RepeatedPtrField<ProtoString>& tag_index_names) {
     std::shared_ptr<TagMap> output(new TagMap());
     MP_RETURN_IF_ERROR(output->Initialize(tag_index_names));
@@ -66,7 +66,7 @@ class TagMap {
   // TODO: Migrate callers and delete this method.
   ABSL_DEPRECATED(
       "Use mediapipe::tool::TagMap::Create(tag_index_names) instead.")
-  static absl::StatusOr<std::shared_ptr<TagMap>> Create(
+  static abslx::StatusOr<std::shared_ptr<TagMap>> Create(
       const TagAndNameInfo& info) {
     std::shared_ptr<TagMap> output(new TagMap());
     MP_RETURN_IF_ERROR(output->Initialize(info));
@@ -74,7 +74,7 @@ class TagMap {
   }
 
   // Returns a reference to the mapping from tag to tag data.
-  const absl::btree_map<std::string, TagData>& Mapping() const {
+  const abslx::btree_map<std::string, TagData>& Mapping() const {
     return mapping_;
   }
 
@@ -95,16 +95,16 @@ class TagMap {
 
   // The following functions are directly utilized by collection.h see
   // that file for comments.
-  bool HasTag(absl::string_view tag) const;
+  bool HasTag(abslx::string_view tag) const;
   int NumEntries() const { return num_entries_; }
-  int NumEntries(absl::string_view tag) const;
-  CollectionItemId GetId(absl::string_view tag, int index) const;
+  int NumEntries(abslx::string_view tag) const;
+  CollectionItemId GetId(abslx::string_view tag, int index) const;
   std::set<std::string> GetTags() const;
   std::pair<std::string, int> TagAndIndexFromId(CollectionItemId id) const;
   CollectionItemId BeginId() const { return CollectionItemId(0); }
   CollectionItemId EndId() const { return CollectionItemId(num_entries_); }
-  CollectionItemId BeginId(absl::string_view tag) const;
-  CollectionItemId EndId(absl::string_view tag) const;
+  CollectionItemId BeginId(abslx::string_view tag) const;
+  CollectionItemId EndId(abslx::string_view tag) const;
 
  private:
   // Use static factory function TagMap::Create().
@@ -112,12 +112,12 @@ class TagMap {
 
   // Initialize the TagMap.  Due to only having a factory function for
   // creation, there is no way for a user to have an uninitialized TagMap.
-  absl::Status Initialize(
+  abslx::Status Initialize(
       const proto_ns::RepeatedPtrField<ProtoString>& tag_index_names);
 
   // Initialize from a TagAndNameInfo.
   ABSL_DEPRECATED("Use Initialize(tag_index_names) instead.")
-  absl::Status Initialize(const TagAndNameInfo& info);
+  abslx::Status Initialize(const TagAndNameInfo& info);
 
   // Initialize names_ using a map from tag to the names for that tag.
   void InitializeNames(
@@ -126,7 +126,7 @@ class TagMap {
   // The total number of entries under all tags.
   int num_entries_;
   // Mapping from tag to tag data.
-  absl::btree_map<std::string, TagData> mapping_;
+  abslx::btree_map<std::string, TagData> mapping_;
   // The names of the data (indexed by CollectionItemId).
   std::vector<std::string> names_;
 };

@@ -249,7 +249,7 @@ Status CollectiveParamResolverDistributed::UpdateGroupCache(
     auto it = group_table_.find(resp.group_key());
     if (it == group_table_.end()) {
       VLOG(2) << "UpdateGroupCache: communicator_key="
-              << absl::CEscape(resp.communicator_key());
+              << abslx::CEscape(resp.communicator_key());
       group_table_[gr->group.group_key] = std::move(gr);
     } else {
       previous_gr = it->second.get();
@@ -262,9 +262,9 @@ Status CollectiveParamResolverDistributed::UpdateGroupCache(
       return errors::Internal(
           "UpdateGroupCache: CompleteGroupResponse for group ",
           resp.group_key(),
-          " gives communicator_key=", absl::CEscape(resp.communicator_key()),
+          " gives communicator_key=", abslx::CEscape(resp.communicator_key()),
           " but cache already holds communicator_key=",
-          absl::CEscape(previous_gr->group.runtime_details.communicator_key));
+          abslx::CEscape(previous_gr->group.runtime_details.communicator_key));
     }
   }
   return OkStatus();

@@ -31,12 +31,12 @@ limitations under the License.
 namespace xla {
 namespace gpu {
 
-using absl::StrAppend;
-using absl::StrCat;
+using abslx::StrAppend;
+using abslx::StrCat;
 
 void HloToIrBindings::EmitBasePointersForHlos(
-    absl::Span<const HloInstruction* const> io_hlos,
-    absl::Span<const HloInstruction* const> non_io_hlos) {
+    abslx::Span<const HloInstruction* const> io_hlos,
+    abslx::Span<const HloInstruction* const> non_io_hlos) {
   CHECK(is_nested_);
 
   // I/O HLOs are bound to the arguments of the current IR function,
@@ -49,11 +49,11 @@ void HloToIrBindings::EmitBasePointersForHlos(
 
   // An HLO can have duplicated operands. This data structure remembers which
   // operand HLOs are already bound to avoid rebinding the same HLO.
-  absl::flat_hash_set<const HloInstruction*> already_bound_for_this_function;
+  abslx::flat_hash_set<const HloInstruction*> already_bound_for_this_function;
   auto arg_iter = function->arg_begin();
   for (const HloInstruction* io_hlo : io_hlos) {
     CHECK(io_hlo == io_hlo->parent()->root_instruction() ||
-          !absl::c_count(non_io_hlos, io_hlo))
+          !abslx::c_count(non_io_hlos, io_hlo))
         << "IO HLOs and non-IO HLOs should be disjoint";
     if (!already_bound_for_this_function.contains(io_hlo)) {
       BindHloToIrValue(*io_hlo, &*arg_iter);

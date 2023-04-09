@@ -36,7 +36,7 @@ Status GraphAnalyzer::Run() {
   // to report it up front than spend time computing all the graphs first.
   if (subgraph_size_ > Signature::kMaxGraphSize) {
     return Status(error::INVALID_ARGUMENT,
-                  absl::StrFormat("Subgraphs of %d nodes are not supported, "
+                  abslx::StrFormat("Subgraphs of %d nodes are not supported, "
                                   "the maximal supported node count is %d.",
                                   subgraph_size_, Signature::kMaxGraphSize));
   }
@@ -320,7 +320,7 @@ std::vector<string> GraphAnalyzer::DumpSubgraphs() {
   std::vector<string> result;
   for (auto ptr : ordered_collation_) {
     result.emplace_back(
-        absl::StrFormat("%d %s", ptr->count, ptr->sig->ToString()));
+        abslx::StrFormat("%d %s", ptr->count, ptr->sig->ToString()));
   }
   return result;
 }

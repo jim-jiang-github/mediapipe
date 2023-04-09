@@ -87,7 +87,7 @@ bool SchedulerQueue::Item::operator<(const SchedulerQueue::Item& that) const {
 }
 
 void SchedulerQueue::Reset() {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   num_pending_tasks_ = 0;
   num_tasks_to_add_ = 0;
   running_count_ = 0;
@@ -102,7 +102,7 @@ bool SchedulerQueue::IsIdle() {
 }
 
 void SchedulerQueue::SetRunning(bool running) {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   running_count_ += running ? 1 : -1;
   DCHECK_LE(running_count_, 1);
 }
@@ -135,7 +135,7 @@ void SchedulerQueue::AddItemToQueue(Item&& item) {
   bool was_idle;
   int tasks_to_add = 0;
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     was_idle = IsIdle();
     queue_.push(item);
     ++num_tasks_to_add_;
@@ -174,7 +174,7 @@ void SchedulerQueue::SubmitWaitingTasksToExecutor() {
   // such waiting tasks, and submit them.
   int tasks_to_add = 0;
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     if (running_count_ > 0) {
       tasks_to_add = GetTasksToSubmitToExecutor();
     }
@@ -190,7 +190,7 @@ void SchedulerQueue::RunNextTask() {
   CalculatorContext* calculator_context;
   bool is_open_node;
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
 
     CHECK(!queue_.empty()) << "Called RunNextTask when the queue is empty. "
                               "This should not happen.";
@@ -220,7 +220,7 @@ void SchedulerQueue::RunNextTask() {
 
   bool is_idle;
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     DCHECK_GT(num_pending_tasks_, 0);
     --num_pending_tasks_;
     is_idle = IsIdle();
@@ -245,8 +245,8 @@ void SchedulerQueue::RunCalculatorNode(CalculatorNode* node,
     // source node always reuses the same CalculatorContext and Close() doesn't
     // access any inputs.
     // TODO: Should we pass tool::StatusStop() in this case?
-    const absl::Status result =
-        node->CloseNode(absl::OkStatus(), /*graph_run_ended=*/false);
+    const abslx::Status result =
+        node->CloseNode(abslx::OkStatus(), /*graph_run_ended=*/false);
     shared_->timer.EndNode(start_time);
     if (!result.ok()) {
       VLOG(3) << node->DebugName()
@@ -257,7 +257,7 @@ void SchedulerQueue::RunCalculatorNode(CalculatorNode* node,
     // Note that we don't need a lock because only one thread can execute this
     // due to the lock on running_nodes.
     int64 start_time = shared_->timer.StartNode();
-    const absl::Status result = node->ProcessNode(cc);
+    const abslx::Status result = node->ProcessNode(cc);
     shared_->timer.EndNode(start_time);
 
     if (!result.ok()) {
@@ -284,7 +284,7 @@ void SchedulerQueue::RunCalculatorNode(CalculatorNode* node,
 void SchedulerQueue::OpenCalculatorNode(CalculatorNode* node) {
   VLOG(3) << "Opening " << node->DebugName();
   int64 start_time = shared_->timer.StartNode();
-  const absl::Status result = node->OpenNode();
+  const abslx::Status result = node->OpenNode();
   shared_->timer.EndNode(start_time);
   if (!result.ok()) {
     VLOG(3) << node->DebugName() << " had an error!";
@@ -297,7 +297,7 @@ void SchedulerQueue::OpenCalculatorNode(CalculatorNode* node) {
 void SchedulerQueue::CleanupAfterRun() {
   bool was_idle;
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     was_idle = IsIdle();
     CHECK_EQ(num_pending_tasks_, 0);
     CHECK_EQ(num_tasks_to_add_, queue_.size());

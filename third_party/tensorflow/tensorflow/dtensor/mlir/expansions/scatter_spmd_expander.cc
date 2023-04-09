@@ -30,9 +30,9 @@ namespace tensorflow {
 namespace dtensor {
 namespace {
 
-StatusOr<Layout> GetOutputLayout(const absl::optional<Layout>& tensor_layout,
+StatusOr<Layout> GetOutputLayout(const abslx::optional<Layout>& tensor_layout,
                                  int tensor_rank,
-                                 const absl::optional<Layout>& updates_layout,
+                                 const abslx::optional<Layout>& updates_layout,
                                  int updates_rank, const Mesh& mesh) {
   // The first tensor_rank - update_rank dimensions of the output should be set
   // to replicated. The remainder are set from tensor_layout and updates_layout
@@ -47,7 +47,7 @@ StatusOr<Layout> GetOutputLayout(const absl::optional<Layout>& tensor_layout,
   for (int i = 0; i < tensor_rank; ++i)
     output_specs[i].set_sharding_spec(Layout::kUnshardedDim);
 
-  absl::flat_hash_set<std::string> used_mesh_dims;
+  abslx::flat_hash_set<std::string> used_mesh_dims;
 
   if (tensor_layout) {
     for (int i = index_dimensions; i < tensor_rank; ++i) {
@@ -161,10 +161,10 @@ StatusOr<llvm::DenseMap<int, Layout>> TensorScatterOpComputeLayoutForward(
   if (tensor_rank == -1 || updates_rank == -1)
     return errors::InvalidArgument("all inputs must have valid rank.");
 
-  absl::optional<Layout> tensor_layout;
+  abslx::optional<Layout> tensor_layout;
   if (input_layouts.find(0) != input_layouts.end())
     tensor_layout.emplace(input_layouts.lookup(0));
-  absl::optional<Layout> updates_layout;
+  abslx::optional<Layout> updates_layout;
   if (input_layouts.find(2) != input_layouts.end())
     updates_layout.emplace(input_layouts.lookup(2));
 
@@ -237,7 +237,7 @@ StatusOr<mlir::Operation*> TensorScatterOpSPMDExpander::ExpandOp(
   if (llvm::isa<mlir::TF::TensorScatterAddOp>(op)) {
     return TensorScatterOpExpand<mlir::TF::TensorScatterAddOp>(op);
   }
-  return errors::Unimplemented(absl::StrCat(
+  return errors::Unimplemented(abslx::StrCat(
       "SPMD expansion for op : ", OpName(op), " is not implemented"));
 }
 
@@ -252,7 +252,7 @@ TensorScatterOpSPMDExpander::ComputeLayoutForward(
     return TensorScatterOpComputeLayoutForward<mlir::TF::TensorScatterAddOp>(
         op, input_layouts);
   }
-  return errors::Unimplemented(absl::StrCat(
+  return errors::Unimplemented(abslx::StrCat(
       "Layout propagation for op : ", OpName(op), " is not implemented"));
 }
 
@@ -267,7 +267,7 @@ TensorScatterOpSPMDExpander::ComputeLayoutBackward(
     return TensorScatterOpComputeLayoutBackward<mlir::TF::TensorScatterAddOp>(
         op, output_layouts);
   }
-  return errors::Unimplemented(absl::StrCat(
+  return errors::Unimplemented(abslx::StrCat(
       "Layout propagation for op : ", OpName(op), " is not implemented"));
 }
 

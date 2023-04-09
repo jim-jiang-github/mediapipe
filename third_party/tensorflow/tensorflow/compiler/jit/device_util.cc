@@ -44,10 +44,10 @@ void DeviceSet::UnionWith(const DeviceSet& other) {
 }
 
 bool DeviceSet::IsEmpty() const {
-  return absl::c_all_of(storage_, [&](uint64 val) { return val == 0; });
+  return abslx::c_all_of(storage_, [&](uint64 val) { return val == 0; });
 }
 
-StatusOr<DeviceId> DeviceInfoCache::GetIdFor(absl::string_view name) {
+StatusOr<DeviceId> DeviceInfoCache::GetIdFor(abslx::string_view name) {
   TF_RET_CHECK(!name.empty());
 
   auto it = name_to_id_.find(name);
@@ -83,7 +83,7 @@ string DeviceInfoCache::DebugString(const DeviceSet& device_set) const {
     return true;
   });
 
-  return absl::StrCat("[", absl::StrJoin(names, ","), "]");
+  return abslx::StrCat("[", abslx::StrJoin(names, ","), "]");
 }
 }  // namespace jit
 
@@ -122,8 +122,8 @@ StatusOr<std::optional<jit::DeviceId>> PickDeviceForXlaImpl(
   // TODO(sanjoy): Cache DeviceNameUtils::ParsedName inside device_info_cache.
   const auto is_multiple_devices =
       [&](const jit::DeviceId& d0, std::optional<jit::DeviceId>* d1) -> bool {
-    const absl::string_view name0 = device_info_cache.GetNameFor(d0);
-    const absl::string_view name1 = device_info_cache.GetNameFor(d1->value());
+    const abslx::string_view name0 = device_info_cache.GetNameFor(d0);
+    const abslx::string_view name1 = device_info_cache.GetNameFor(d1->value());
 
     DeviceNameUtils::ParsedName parsed0, parsed1;
     if (!DeviceNameUtils::ParseFullName(name0, &parsed0) ||

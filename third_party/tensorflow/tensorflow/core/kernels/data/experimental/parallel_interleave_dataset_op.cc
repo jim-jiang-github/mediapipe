@@ -792,7 +792,7 @@ class ParallelInterleaveDatasetOp::Dataset : public DatasetBase {
           bool thread_in_staging = false;
           {
             mutex_lock l(mu_);
-            thread_in_staging = absl::c_find(staging_indices_, thread_index) !=
+            thread_in_staging = abslx::c_find(staging_indices_, thread_index) !=
                                 staging_indices_.end();
           }
           // 1b. Run the user defined function to produce a new iterator.

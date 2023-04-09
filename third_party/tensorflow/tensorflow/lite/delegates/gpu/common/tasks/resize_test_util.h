@@ -22,13 +22,13 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status ResizeBilinearAlignedTest(TestExecutionEnvironment* env);
-absl::Status ResizeBilinearNonAlignedTest(TestExecutionEnvironment* env);
-absl::Status ResizeBilinearWithoutHalfPixelTest(TestExecutionEnvironment* env);
-absl::Status ResizeBilinearWithHalfPixelTest(TestExecutionEnvironment* env);
-absl::Status ResizeNearestTest(TestExecutionEnvironment* env);
-absl::Status ResizeNearestAlignCornersTest(TestExecutionEnvironment* env);
-absl::Status ResizeNearestHalfPixelCentersTest(TestExecutionEnvironment* env);
+abslx::Status ResizeBilinearAlignedTest(TestExecutionEnvironment* env);
+abslx::Status ResizeBilinearNonAlignedTest(TestExecutionEnvironment* env);
+abslx::Status ResizeBilinearWithoutHalfPixelTest(TestExecutionEnvironment* env);
+abslx::Status ResizeBilinearWithHalfPixelTest(TestExecutionEnvironment* env);
+abslx::Status ResizeNearestTest(TestExecutionEnvironment* env);
+abslx::Status ResizeNearestAlignCornersTest(TestExecutionEnvironment* env);
+abslx::Status ResizeNearestHalfPixelCentersTest(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

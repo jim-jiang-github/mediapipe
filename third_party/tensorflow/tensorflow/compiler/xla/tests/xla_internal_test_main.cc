@@ -34,15 +34,15 @@ GTEST_API_ int main(int argc, char** argv) {
   // If the --benchmark_filter flag is passed in then only run the benchmarks,
   // not the tests.
   for (int i = 1; i < argc; i++) {
-    absl::string_view arg(argv[i]);
+    abslx::string_view arg(argv[i]);
     if (arg == "--benchmark_filter" ||
-        absl::StartsWith(arg, "--benchmark_filter=")) {
+        abslx::StartsWith(arg, "--benchmark_filter=")) {
       const char* pattern = nullptr;
-      if (absl::StartsWith(arg, "--benchmark_filter=")) {
+      if (abslx::StartsWith(arg, "--benchmark_filter=")) {
         pattern = argv[i] + strlen("--benchmark_filter=");
       } else {
         // Handle flag of the form '--benchmark_filter foo' (no '=').
-        if (i + 1 >= argc || absl::StartsWith(argv[i + 1], "--")) {
+        if (i + 1 >= argc || abslx::StartsWith(argv[i + 1], "--")) {
           LOG(ERROR) << "--benchmark_filter flag requires an argument.";
           return 2;
         }

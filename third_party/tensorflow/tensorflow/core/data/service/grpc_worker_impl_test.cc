@@ -74,7 +74,7 @@ class GrpcWorkerImplTest : public ::testing::Test {
     experimental::WorkerConfig config;
     config.set_protocol(kProtocol);
     config.set_dispatcher_address(GetDispatcherAddress());
-    config.set_worker_address(absl::StrCat(kHostAddress, ":%port%"));
+    config.set_worker_address(abslx::StrCat(kHostAddress, ":%port%"));
     TF_RETURN_IF_ERROR(NewWorkerServer(config, worker_server_));
     return worker_server_->Start();
   }
@@ -93,11 +93,11 @@ class GrpcWorkerImplTest : public ::testing::Test {
   }
 
   std::string GetDispatcherAddress() const {
-    return absl::StrCat(kHostAddress, ":", dispatcher_server_->BoundPort());
+    return abslx::StrCat(kHostAddress, ":", dispatcher_server_->BoundPort());
   }
 
   std::string GetWorkerAddress() const {
-    return absl::StrCat(kHostAddress, ":", worker_server_->BoundPort());
+    return abslx::StrCat(kHostAddress, ":", worker_server_->BoundPort());
   }
 
   std::unique_ptr<DispatchGrpcDataServer> dispatcher_server_;

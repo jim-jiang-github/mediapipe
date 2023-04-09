@@ -139,7 +139,7 @@ class IrEmitter : public DfsHloVisitorWithDefault,
   // and output. If no IR function has been previously emitted for the
   // computation, also emits such a function.
   Status EmitCallToNestedComputation(const HloComputation& nested_computation,
-                                     absl::Span<llvm::Value* const> operands,
+                                     abslx::Span<llvm::Value* const> operands,
                                      llvm::Value* output);
 
   // Emits an atomic operation that implements `nested_computation` in the
@@ -152,18 +152,18 @@ class IrEmitter : public DfsHloVisitorWithDefault,
 
   GpuElementalIrEmitter::NestedComputer GetNestedComputer() {
     return [&](const HloComputation& computation,
-               absl::Span<llvm::Value* const> parameter_elements) {
+               abslx::Span<llvm::Value* const> parameter_elements) {
       return ComputeNestedElement(computation, parameter_elements);
     };
   }
 
   StatusOr<std::vector<llvm::Value*>> ComputeNestedElement(
       const HloComputation& computation,
-      absl::Span<llvm::Value* const> parameter_elements);
+      abslx::Span<llvm::Value* const> parameter_elements);
 
   StatusOr<std::vector<llvm::Value*>> ComputeNestedElementFromAddrs(
       const HloComputation& computation,
-      absl::Span<llvm::Value* const> parameter_elements_addrs);
+      abslx::Span<llvm::Value* const> parameter_elements_addrs);
 
   IrEmitterContext* ir_emitter_context_;
   llvm::Module* module_;

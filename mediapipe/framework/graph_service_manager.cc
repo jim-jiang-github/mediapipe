@@ -2,11 +2,11 @@
 
 namespace mediapipe {
 
-absl::Status GraphServiceManager::SetServicePacket(
+abslx::Status GraphServiceManager::SetServicePacket(
     const GraphServiceBase& service, Packet p) {
   // TODO: check service is already set?
   service_packets_[service.key] = std::move(p);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 Packet GraphServiceManager::GetServicePacket(

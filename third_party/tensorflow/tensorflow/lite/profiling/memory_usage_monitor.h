@@ -43,8 +43,8 @@ class MemoryUsageMonitor {
     virtual MemoryUsage GetMemoryUsage() {
       return tflite::profiling::memory::GetMemoryUsage();
     }
-    virtual void SleepFor(const absl::Duration& duration) {
-      absl::SleepFor(duration);
+    virtual void SleepFor(const abslx::Duration& duration) {
+      abslx::SleepFor(duration);
     }
   };
 
@@ -81,8 +81,8 @@ class MemoryUsageMonitor {
 
   std::unique_ptr<Sampler> sampler_ = nullptr;
   bool is_supported_ = false;
-  std::unique_ptr<absl::Notification> stop_signal_ = nullptr;
-  absl::Duration sampling_interval_;
+  std::unique_ptr<abslx::Notification> stop_signal_ = nullptr;
+  abslx::Duration sampling_interval_;
   std::unique_ptr<std::thread> check_memory_thd_ = nullptr;
   int64_t peak_max_rss_kb_ = static_cast<int64_t>(kInvalidMemUsageMB * 1024);
 };

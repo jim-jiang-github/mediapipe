@@ -82,13 +82,13 @@ class TileOp : public XlaOpKernel {
     OP_REQUIRES_OK(ctx, ctx->ResolveInputDynamismIntoPredVector(
                             1, &multiples_are_dynamic));
 
-    bool all_multiples_are_static = absl::c_all_of(
+    bool all_multiples_are_static = abslx::c_all_of(
         multiples_are_dynamic, [](bool dynamic) { return !dynamic; });
     // If a value is static, it means the upper bound is the value itself:
     // constant_value = constant_upper_boudn = counstant_lower_bound
     if (all_multiples_are_static) {
       // If all multiples are 1, than the input is the same as the output.
-      if (absl::c_all_of(multiples_bounds,
+      if (abslx::c_all_of(multiples_bounds,
                          [](int64_t multiple) { return multiple == 1; })) {
         ctx->SetOutput(0, input);
         return;

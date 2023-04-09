@@ -23,7 +23,7 @@ namespace tensorflow {
 TEST(ToStringTest, PayloadsArePrinted) {
   Status status = errors::Aborted("Aborted Error Message");
   status.SetPayload("payload_key",
-                    absl::StrFormat("payload_value %c%c%c", 1, 2, 3));
+                    abslx::StrFormat("payload_value %c%c%c", 1, 2, 3));
 
   EXPECT_EQ(status.ToString(),
             "ABORTED: Aborted Error Message [payload_key='payload_value "
@@ -33,11 +33,11 @@ TEST(ToStringTest, PayloadsArePrinted) {
 TEST(ToStringTest, MatchesAbslStatus) {
   Status status = errors::Aborted("Aborted Error Message");
   status.SetPayload("payload_key",
-                    absl::StrFormat("payload_value %c%c%c", 1, 2, 3));
+                    abslx::StrFormat("payload_value %c%c%c", 1, 2, 3));
 
-  absl::Status absl_status =
-      absl::Status(absl::StatusCode::kAborted, status.error_message());
-  absl_status.SetPayload("payload_key", absl::Cord(absl::StrFormat(
+  abslx::Status absl_status =
+      abslx::Status(abslx::StatusCode::kAborted, status.error_message());
+  absl_status.SetPayload("payload_key", abslx::Cord(abslx::StrFormat(
                                             "payload_value %c%c%c", 1, 2, 3)));
 
   EXPECT_EQ(status.ToString(), absl_status.ToString());

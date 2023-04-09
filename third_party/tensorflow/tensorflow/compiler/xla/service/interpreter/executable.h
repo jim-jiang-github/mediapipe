@@ -50,12 +50,12 @@ class InterpreterExecutable : public InterpreterExecutableBase {
  protected:
   StatusOr<Literal> Evaluate(const ServiceExecutableRunOptions* run_options,
                              const HloComputation& computation,
-                             absl::Span<const Literal> arg_literals) override
+                             abslx::Span<const Literal> arg_literals) override
       ABSL_LOCKS_EXCLUDED(evaluator_lock_);
 
   // The interpreter interprets executables with an HloEvaluator.
   std::unique_ptr<HloEvaluator> evaluator_ ABSL_PT_GUARDED_BY(evaluator_lock_);
-  mutable absl::Mutex evaluator_lock_;
+  mutable abslx::Mutex evaluator_lock_;
 
  private:
   std::optional<DynamicDimensionInference> dynamic_dimension_inference_;

@@ -42,7 +42,7 @@ namespace mediapipe::face_geometry {
 namespace {
 
 struct RenderableMesh3d {
-  static absl::StatusOr<RenderableMesh3d> CreateFromProtoMesh3d(
+  static abslx::StatusOr<RenderableMesh3d> CreateFromProtoMesh3d(
       const Mesh3d& proto_mesh_3d) {
     Mesh3d::VertexType vertex_type = proto_mesh_3d.vertex_type();
 
@@ -106,14 +106,14 @@ struct RenderableMesh3d {
 
 class Texture {
  public:
-  static absl::StatusOr<std::unique_ptr<Texture>> WrapExternalTexture(
+  static abslx::StatusOr<std::unique_ptr<Texture>> WrapExternalTexture(
       GLuint handle, GLenum target, int width, int height) {
     RET_CHECK(handle) << "External texture must have a non-null handle!";
-    return absl::WrapUnique(new Texture(handle, target, width, height,
+    return abslx::WrapUnique(new Texture(handle, target, width, height,
                                         /*is_owned*/ false));
   }
 
-  static absl::StatusOr<std::unique_ptr<Texture>> CreateFromImageFrame(
+  static abslx::StatusOr<std::unique_ptr<Texture>> CreateFromImageFrame(
       const ImageFrame& image_frame) {
     RET_CHECK(image_frame.IsAligned(ImageFrame::kGlDefaultAlignmentBoundary))
         << "Image frame memory must be aligned for GL usage!";
@@ -154,7 +154,7 @@ class Texture {
     glGenerateMipmap(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    return absl::WrapUnique(new Texture(
+    return abslx::WrapUnique(new Texture(
         handle, GL_TEXTURE_2D, image_frame.Width(), image_frame.Height(),
         /*is_owned*/ true));
   }
@@ -187,13 +187,13 @@ class Texture {
 
 class RenderTarget {
  public:
-  static absl::StatusOr<std::unique_ptr<RenderTarget>> Create() {
+  static abslx::StatusOr<std::unique_ptr<RenderTarget>> Create() {
     GLuint framebuffer_handle;
     glGenFramebuffers(1, &framebuffer_handle);
     RET_CHECK(framebuffer_handle)
         << "Failed to initialize an OpenGL framebuffer!";
 
-    return absl::WrapUnique(new RenderTarget(framebuffer_handle));
+    return abslx::WrapUnique(new RenderTarget(framebuffer_handle));
   }
 
   ~RenderTarget() {
@@ -205,7 +205,7 @@ class RenderTarget {
     }
   }
 
-  absl::Status SetColorbuffer(const Texture& colorbuffer_texture) {
+  abslx::Status SetColorbuffer(const Texture& colorbuffer_texture) {
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_handle_);
     glViewport(0, 0, colorbuffer_texture.width(), colorbuffer_texture.height());
 
@@ -245,7 +245,7 @@ class RenderTarget {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glFlush();
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   void Bind() const {
@@ -288,7 +288,7 @@ class Renderer {
  public:
   enum class RenderMode { OPAQUE, OVERDRAW, OCCLUSION };
 
-  static absl::StatusOr<std::unique_ptr<Renderer>> Create() {
+  static abslx::StatusOr<std::unique_ptr<Renderer>> Create() {
     static const GLint kAttrLocation[NUM_ATTRIBUTES] = {
         ATTRIB_VERTEX,
         ATTRIB_TEXTURE_POSITION,
@@ -340,13 +340,13 @@ class Renderer {
         << "Failed to find `model_mat` uniform!";
     RET_CHECK_NE(texture_uniform, -1) << "Failed to find `texture` uniform!";
 
-    return absl::WrapUnique(new Renderer(program_handle, projection_mat_uniform,
+    return abslx::WrapUnique(new Renderer(program_handle, projection_mat_uniform,
                                          model_mat_uniform, texture_uniform));
   }
 
   ~Renderer() { glDeleteProgram(program_handle_); }
 
-  absl::Status Render(const RenderTarget& render_target, const Texture& texture,
+  abslx::Status Render(const RenderTarget& render_target, const Texture& texture,
                       const RenderableMesh3d& mesh_3d,
                       const std::array<float, 16>& projection_mat,
                       const std::array<float, 16>& model_mat,
@@ -412,7 +412,7 @@ class Renderer {
     glUseProgram(0);
     glFlush();
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -438,7 +438,7 @@ class EffectRendererImpl : public EffectRenderer {
       std::unique_ptr<RenderTarget> render_target,
       std::unique_ptr<Renderer> renderer,
       RenderableMesh3d&& renderable_quad_mesh_3d,
-      absl::optional<RenderableMesh3d>&& renderable_effect_mesh_3d,
+      abslx::optional<RenderableMesh3d>&& renderable_effect_mesh_3d,
       std::unique_ptr<Texture> empty_color_texture,
       std::unique_ptr<Texture> effect_texture)
       : environment_(environment),
@@ -450,7 +450,7 @@ class EffectRendererImpl : public EffectRenderer {
         effect_texture_(std::move(effect_texture)),
         identity_matrix_(Create4x4IdentityMatrix()) {}
 
-  absl::Status RenderEffect(
+  abslx::Status RenderEffect(
       const std::vector<FaceGeometry>& multi_face_geometry,
       int frame_width,            //
       int frame_height,           //
@@ -566,7 +566,7 @@ class EffectRendererImpl : public EffectRenderer {
 
     // At this point in the code, the destination texture must contain the
     // correctly renderer effect, so we should just return.
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -605,7 +605,7 @@ class EffectRendererImpl : public EffectRenderer {
             0.f, 0.f, 0.f, 1.f};
   }
 
-  static absl::StatusOr<std::array<float, 16>>
+  static abslx::StatusOr<std::array<float, 16>>
   Convert4x4MatrixDataToArrayFormat(const MatrixData& matrix_data) {
     RET_CHECK(matrix_data.rows() == 4 &&  //
               matrix_data.cols() == 4 &&  //
@@ -637,7 +637,7 @@ class EffectRendererImpl : public EffectRenderer {
   std::unique_ptr<Renderer> renderer_;
 
   RenderableMesh3d renderable_quad_mesh_3d_;
-  absl::optional<RenderableMesh3d> renderable_effect_mesh_3d_;
+  abslx::optional<RenderableMesh3d> renderable_effect_mesh_3d_;
 
   std::unique_ptr<Texture> empty_color_texture_;
   std::unique_ptr<Texture> effect_texture_;
@@ -688,9 +688,9 @@ ImageFrame CreateEmptyColorTexture() {
 
 }  // namespace
 
-absl::StatusOr<std::unique_ptr<EffectRenderer>> CreateEffectRenderer(
+abslx::StatusOr<std::unique_ptr<EffectRenderer>> CreateEffectRenderer(
     const Environment& environment,                //
-    const absl::optional<Mesh3d>& effect_mesh_3d,  //
+    const abslx::optional<Mesh3d>& effect_mesh_3d,  //
     ImageFrame&& effect_texture) {
   MP_RETURN_IF_ERROR(ValidateEnvironment(environment))
       << "Invalid environment!";
@@ -707,7 +707,7 @@ absl::StatusOr<std::unique_ptr<EffectRenderer>> CreateEffectRenderer(
   ASSIGN_OR_RETURN(RenderableMesh3d renderable_quad_mesh_3d,
                    RenderableMesh3d::CreateFromProtoMesh3d(CreateQuadMesh3d()),
                    _ << "Failed to create a renderable quad mesh!");
-  absl::optional<RenderableMesh3d> renderable_effect_mesh_3d;
+  abslx::optional<RenderableMesh3d> renderable_effect_mesh_3d;
   if (effect_mesh_3d) {
     ASSIGN_OR_RETURN(renderable_effect_mesh_3d,
                      RenderableMesh3d::CreateFromProtoMesh3d(*effect_mesh_3d),
@@ -721,7 +721,7 @@ absl::StatusOr<std::unique_ptr<EffectRenderer>> CreateEffectRenderer(
                    _ << "Failed to create an effect texture!");
 
   std::unique_ptr<EffectRenderer> result =
-      absl::make_unique<EffectRendererImpl>(
+      abslx::make_unique<EffectRendererImpl>(
           environment, std::move(render_target), std::move(renderer),
           std::move(renderable_quad_mesh_3d),
           std::move(renderable_effect_mesh_3d),

@@ -48,7 +48,7 @@ void CheckUnsupportedOperations(const Model& model) {
   }
   QCHECK(unsupported_ops.empty())
       << "These unsupported ops were not removed by graph transformations: "
-      << absl::StrJoin(unsupported_ops, ", ");
+      << abslx::StrJoin(unsupported_ops, ", ");
 }
 
 void MakeGeneralGraphTransformationsSet(

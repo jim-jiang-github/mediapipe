@@ -187,7 +187,7 @@ se::KernelBase* JitRtKernelsCache::Get(se::StreamExecutor* executor,
                                        const char* data, StringRef name) {
   Key key(executor, data, name);
 
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   auto it = kernels_cache_.find(key);
   if (it != kernels_cache_.end()) return it->second.get();
 
@@ -199,7 +199,7 @@ se::KernelBase* JitRtKernelsCache::Set(se::StreamExecutor* executor,
                                        std::unique_ptr<se::KernelBase> kernel) {
   Key key(executor, data, name);
 
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   auto it = kernels_cache_.find(key);
   if (it != kernels_cache_.end()) return it->second.get();
 
@@ -221,14 +221,14 @@ static se::DeviceMemoryBase GetDeviceAddress(jitrt::FlatMemrefView& memref) {
 // -------------------------------------------------------------------------- //
 
 const GemmConfig* JitRtGemmConfigCache::Get(int64_t uid) {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   auto it = configs_.find(uid);
   if (it != configs_.end()) return &it->second;
   return nullptr;
 }
 
 const GemmConfig* JitRtGemmConfigCache::Set(int64_t uid, GemmConfig config) {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   auto it = configs_.find(uid);
   if (it != configs_.end()) return &it->second;
 
@@ -246,7 +246,7 @@ Status JitRtCollectiveSupport::MaybeBlockAfterFirstRun(int32_t uid,
                                                        int32_t device_ordinal,
                                                        se::Stream* stream) {
   bool block = [&] {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     return executed_.try_emplace(Key(uid, device_ordinal), true).second;
   }();
   return block ? stream->BlockHostUntilDone() : Status::OK();
@@ -256,7 +256,7 @@ FailureOr<se::Event> JitRtAsyncCollectiveSupport::PopEvent(
     int32_t uid, int32_t device_ordinal) {
   const int64_t key = EventKey(uid, device_ordinal);
 
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   auto it = done_events_.find(key);
   if (it == done_events_.end()) return failure();
 
@@ -270,7 +270,7 @@ LogicalResult JitRtAsyncCollectiveSupport::PushEvent(int32_t uid,
                                                      se::Event done_event) {
   const int64_t key = EventKey(uid, device_ordinal);
 
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   auto result = done_events_.try_emplace(key, std::move(done_event));
   if (!result.second) return failure();  // done event has not been consumed
 
@@ -406,7 +406,7 @@ Error LaunchFunc::operator()(const ServiceExecutableRunOptions* run_options,
 
   // If kernel does not exists create it from the ptx.
   if (kernel == nullptr) {
-    auto created = CreateKernel(absl::string_view(name.data(), name.size()),
+    auto created = CreateKernel(abslx::string_view(name.data(), name.size()),
                                 args.size(), ptx.data(), {}, executor);
     if (!created.ok()) return AsError(created);
 
@@ -415,7 +415,7 @@ Error LaunchFunc::operator()(const ServiceExecutableRunOptions* run_options,
   }
 
   VLOG(3) << "Launching " << kernel->name();
-  absl::InlinedVector<se::DeviceMemoryBase, 4> buffer_args;
+  abslx::InlinedVector<se::DeviceMemoryBase, 4> buffer_args;
   buffer_args.reserve(args.size());
 
   // Add MemRef arguments as buffer arguments.

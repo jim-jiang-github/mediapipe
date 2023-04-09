@@ -365,7 +365,7 @@ class AbstractStackTrace {
   virtual ~AbstractStackTrace() {}
 
   // The returned span is alive as long as the AbstractStackTrace is alive.
-  virtual absl::Span<StackFrame const> ToFrames() const = 0;
+  virtual abslx::Span<StackFrame const> ToFrames() const = 0;
 
   // Returns the last stack frame from user code, attempting to ignore the
   // framework code. Returns an empty frame if no such stack frame was found.
@@ -687,11 +687,11 @@ class FunctionLibraryRuntime {
     std::vector<string> output_devices;
 
     // If set, it indicates the original output indices of a component function.
-    absl::optional<std::vector<int>> ret_indices = absl::nullopt;
+    abslx::optional<std::vector<int>> ret_indices = abslx::nullopt;
 
     // Maps from a CompositeDevice name to a list of underlying physical
     // devices.
-    absl::flat_hash_map<string, const std::vector<string>*> composite_devices;
+    abslx::flat_hash_map<string, const std::vector<string>*> composite_devices;
 
     // This interface is EXPERIMENTAL and subject to change.
     //
@@ -799,7 +799,7 @@ class FunctionLibraryRuntime {
                              Handle* handle) = 0;
   Status Instantiate(const std::string& function_name, AttrSlice attrs,
                      Handle* handle) {
-    auto opts = absl::make_unique<InstantiateOptions>();
+    auto opts = abslx::make_unique<InstantiateOptions>();
     return Instantiate(function_name, attrs, *opts, handle);
   }
 
@@ -840,7 +840,7 @@ class FunctionLibraryRuntime {
     // remote outputs lazily. All components of a remote multi-device function
     // should use the same op_id, in order to correctly map remote output
     // tensors to the remote TensorHandles in the default device.
-    absl::optional<int64_t> op_id = absl::nullopt;
+    abslx::optional<int64_t> op_id = abslx::nullopt;
 
     RendezvousInterface* rendezvous = nullptr;
     CancellationManager* cancellation_manager = nullptr;
@@ -849,7 +849,7 @@ class FunctionLibraryRuntime {
     StepStatsCollectorInterface* stats_collector = nullptr;
     CoordinationServiceAgent* coordination_service_agent = nullptr;
 
-    absl::optional<ManagedStackTrace> stack_trace = absl::nullopt;
+    abslx::optional<ManagedStackTrace> stack_trace = abslx::nullopt;
 
     std::function<void(std::function<void()>)>* runner = nullptr;
 
@@ -975,7 +975,7 @@ class FunctionLibraryRuntime {
 // `composite_devices` if the input device is a composite device.
 std::string GetFunctionResourceInputDevice(
     const Tensor& input, const int arg_index, const FunctionDef& function_def,
-    absl::flat_hash_map<string, std::vector<string>>* composite_devices);
+    abslx::flat_hash_map<string, std::vector<string>>* composite_devices);
 
 // Returns a canonicalized string for the instantiation of the function of the
 // given "name", attributes "attrs", and "options".
@@ -1010,15 +1010,15 @@ class CustomKernelCreator {
 
 typedef
 #if !defined(IS_MOBILE_PLATFORM)
-    absl::variant<Tensor, eager::RemoteTensorHandle*>
+    abslx::variant<Tensor, eager::RemoteTensorHandle*>
         FunctionArg;
 #else
-    absl::variant<Tensor>
+    abslx::variant<Tensor>
         FunctionArg;
 #endif
 
 // Either a local tensor or the shape of a remote tensor.
-typedef absl::variant<Tensor, TensorShape> FunctionRet;
+typedef abslx::variant<Tensor, TensorShape> FunctionRet;
 
 // Used to instantiate and run functions in a distributed system.
 class DistributedFunctionLibraryRuntime {

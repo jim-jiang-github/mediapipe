@@ -51,14 +51,14 @@ TEST(SemaphoreTest, ConcurrentTest) {
   Semaphore semaphore(2);
   semaphore.Acquire(1);
 
-  absl::Notification a_done;
+  abslx::Notification a_done;
   pool.Schedule([&]() {
     semaphore.Acquire(2);
     semaphore.Release(2);
     a_done.Notify();
   });
 
-  absl::Notification b_done;
+  abslx::Notification b_done;
   pool.Schedule([&]() {
     semaphore.Acquire(1);
     semaphore.Release(1);

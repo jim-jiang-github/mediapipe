@@ -182,9 +182,9 @@ class GlobalCalibratorRegistry {
   }
 
  private:
-  absl::flat_hash_map<const TfLiteContext*, std::unique_ptr<Calibrator>>
+  abslx::flat_hash_map<const TfLiteContext*, std::unique_ptr<Calibrator>>
       calibrator_registry_;
-  absl::flat_hash_map<const TfLiteNode*, Calibrator*> node_to_calibrator_;
+  abslx::flat_hash_map<const TfLiteNode*, Calibrator*> node_to_calibrator_;
 };
 
 GlobalCalibratorRegistry* GetCalibratorRegistry() {
@@ -299,7 +299,7 @@ std::vector<int> GetLoggableTensorIndices(
 // This is done by querying the TfLiteContext for node and registrations using
 // the |NodeInfoDelegateObserver|.
 TfLiteStatus GetNodeOpInfoMapAndContext(
-    const absl::flat_hash_map<std::tuple<int, int>, OperatorInfo>&
+    const abslx::flat_hash_map<std::tuple<int, int>, OperatorInfo>&
         node_to_opinfo,
     tflite::Interpreter* const interpreter,
     std::unordered_map<const TfLiteNode*, OperatorInfo>* node_ptr_opinfo_map,
@@ -394,7 +394,7 @@ TfLiteStatus BuildLoggingInterpreter(
   // log details of which inputs and outputs.
   // At runtime TFLite kernel invoke functions can only look into their
   // own node in the graph (TFLiteNode*) and some limited context information.
-  absl::flat_hash_map<std::tuple<int, int>, OperatorInfo> node_to_opinfo;
+  abslx::flat_hash_map<std::tuple<int, int>, OperatorInfo> node_to_opinfo;
   BuiltinOpsSet builtin_op_and_versions;
   CustomOpsSet custom_op_and_versions;
 

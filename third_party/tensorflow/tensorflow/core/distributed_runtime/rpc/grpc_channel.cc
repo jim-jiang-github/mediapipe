@@ -65,8 +65,8 @@ Status ValidateHostPortPair(const string& host_port) {
   ::grpc::ChannelArguments* args = new ::grpc::ChannelArguments();
   const char* env = std::getenv("TF_GRPC_DEFAULT_OPTIONS");
   if (env != nullptr) {
-    for (auto& grpc_option : absl::StrSplit(env, ',')) {
-      std::vector<string> name_value = absl::StrSplit(grpc_option, '=');
+    for (auto& grpc_option : abslx::StrSplit(env, ',')) {
+      std::vector<string> name_value = abslx::StrSplit(grpc_option, '=');
       if (name_value.size() != 2) {
         LOG(ERROR) << "Invalid GRPC options format: " << grpc_option;
         continue;
@@ -77,7 +77,7 @@ Status ValidateHostPortPair(const string& host_port) {
         string ue_value = name_value[1].substr(1, name_value[1].size() - 2);
         string value;
         string error;
-        if (!absl::CUnescape(ue_value, &value, &error)) {
+        if (!abslx::CUnescape(ue_value, &value, &error)) {
           LOG(ERROR) << "Failed to parse escaped string for " << grpc_option
                      << ": " << error;
         } else {
@@ -332,7 +332,7 @@ class SparseGrpcChannelCache : public CachingGrpcChannelCache {
       task_strings.emplace_back(
           strings::StrCat(id_host_port.first, " -> ", id_host_port.second));
     }
-    return strings::StrCat(job_id_, " -> {", absl::StrJoin(task_strings, ", "),
+    return strings::StrCat(job_id_, " -> {", abslx::StrJoin(task_strings, ", "),
                            "}");
   }
 

@@ -108,10 +108,10 @@ class SimulationClockTest : public ::testing::Test {
     return result;
   }
 
-  static std::vector<int64> TimeValues(const std::vector<absl::Time>& times) {
+  static std::vector<int64> TimeValues(const std::vector<abslx::Time>& times) {
     std::vector<int64> result;
-    for (const absl::Time& t : times) {
-      result.push_back(absl::ToUnixMicros(t));
+    for (const abslx::Time& t : times) {
+      result.push_back(abslx::ToUnixMicros(t));
     }
     return result;
   }
@@ -124,7 +124,7 @@ class SimulationClockTest : public ::testing::Test {
 
 // Just directly calls SimulationClock::Sleep on several threads.
 TEST_F(SimulationClockTest, SleepUntil) {
-  std::vector<absl::Time> start_times;
+  std::vector<abslx::Time> start_times;
   auto executor = std::make_shared<SimulationClockExecutor>(4);
   simulation_clock_ = executor->GetClock();
   clock_ = simulation_clock_.get();
@@ -132,16 +132,16 @@ TEST_F(SimulationClockTest, SleepUntil) {
   std::function<void(int)> run_chain = [&](int count) {
     if (count > 0) {
       start_times.push_back(clock_->TimeNow());
-      clock_->Sleep(absl::Microseconds(10000));
+      clock_->Sleep(abslx::Microseconds(10000));
       run_chain(count - 1);
     }
   };
   simulation_clock_->ThreadStart();
   for (int i = 0; i < 3; i++) {
     executor->Schedule([&] { run_chain(3); });
-    clock_->Sleep(absl::Microseconds(2000));
+    clock_->Sleep(abslx::Microseconds(2000));
   }
-  clock_->Sleep(absl::Microseconds(100000));
+  clock_->Sleep(abslx::Microseconds(100000));
   simulation_clock_->ThreadFinish();
   EXPECT_THAT(
       TimeValues(start_times),  //
@@ -150,7 +150,7 @@ TEST_F(SimulationClockTest, SleepUntil) {
 
 // Directly calls SimulationClock::Sleep with duplicate wake times.
 TEST_F(SimulationClockTest, DuplicateWakeTimes) {
-  std::vector<absl::Time> start_times;
+  std::vector<abslx::Time> start_times;
   std::vector<int> start_counts;
   auto executor = std::make_shared<SimulationClockExecutor>(4);
   simulation_clock_ = executor->GetClock();
@@ -159,16 +159,16 @@ TEST_F(SimulationClockTest, DuplicateWakeTimes) {
     if (count > 0) {
       start_times.push_back(clock_->TimeNow());
       start_counts.push_back(count);
-      clock_->Sleep(absl::Microseconds(10000));
+      clock_->Sleep(abslx::Microseconds(10000));
       run_chain(count - 1);
     }
   };
   simulation_clock_->ThreadStart();
   for (int i = 0; i < 3; i++) {
     executor->Schedule([&] { run_chain(3); });
-    clock_->Sleep(absl::Microseconds(10000));
+    clock_->Sleep(abslx::Microseconds(10000));
   }
-  clock_->Sleep(absl::Microseconds(100000));
+  clock_->Sleep(abslx::Microseconds(100000));
   simulation_clock_->ThreadFinish();
   EXPECT_THAT(
       TimeValues(start_times),
@@ -177,19 +177,19 @@ TEST_F(SimulationClockTest, DuplicateWakeTimes) {
 }
 
 // A Calculator::Process callback function.
-typedef std::function<absl::Status(const InputStreamShardSet&,
+typedef std::function<abslx::Status(const InputStreamShardSet&,
                                    OutputStreamShardSet*)>
     ProcessFunction;
 
 // A testing callback function that passes through all packets.
-absl::Status PassThrough(const InputStreamShardSet& inputs,
+abslx::Status PassThrough(const InputStreamShardSet& inputs,
                          OutputStreamShardSet* outputs) {
   for (int i = 0; i < inputs.NumEntries(); ++i) {
     if (!inputs.Index(i).Value().IsEmpty()) {
       outputs->Index(i).AddPacket(inputs.Index(i).Value());
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // This test shows sim clock synchronizing a bunch of parallel tasks.
@@ -200,12 +200,12 @@ TEST_F(SimulationClockTest, InFlight) {
   SetupSimulationClock();
   ProcessFunction wait_0 = [&](const InputStreamShardSet& inputs,
                                OutputStreamShardSet* outputs) {
-    clock_->Sleep(absl::Microseconds(20000));
+    clock_->Sleep(abslx::Microseconds(20000));
     return PassThrough(inputs, outputs);
   };
   ProcessFunction wait_1 = [&](const InputStreamShardSet& inputs,
                                OutputStreamShardSet* outputs) {
-    clock_->Sleep(absl::Microseconds(30000));
+    clock_->Sleep(abslx::Microseconds(30000));
     return PassThrough(inputs, outputs);
   };
 
@@ -224,15 +224,15 @@ TEST_F(SimulationClockTest, InFlight) {
 
   // Add 10 input packets to the graph, one each 10 ms, starting after 11 ms
   // of clock time.  Timestamps lag clock times by 1 ms.
-  clock_->Sleep(absl::Microseconds(11000));
+  clock_->Sleep(abslx::Microseconds(11000));
   for (uint64 ts = 10000; ts <= 100000; ts += 10000) {
     MP_EXPECT_OK(graph_.AddPacketToInputStream(
         "input_packets_0", MakePacket<uint64>(ts).At(Timestamp(ts))));
-    clock_->Sleep(absl::Microseconds(10000));
+    clock_->Sleep(abslx::Microseconds(10000));
   }
 
   // Wait for 100 ms of clock time, then close the graph.
-  clock_->Sleep(absl::Microseconds(100000));
+  clock_->Sleep(abslx::Microseconds(100000));
   simulation_clock_->ThreadFinish();
   MP_ASSERT_OK(graph_.CloseAllInputStreams());
   MP_ASSERT_OK(graph_.WaitUntilDone());
@@ -263,23 +263,23 @@ TEST_F(SimulationClockTest, DestroyClock) {
   int input_count = 0;
   ProcessFunction wait_0 = [&](const InputStreamShardSet& inputs,
                                OutputStreamShardSet* outputs) {
-    clock_->Sleep(absl::Microseconds(20000));
+    clock_->Sleep(abslx::Microseconds(20000));
     if (++input_count < 4) {
       outputs->Index(0).AddPacket(
           MakePacket<uint64>(input_count).At(Timestamp(input_count)));
-      return absl::OkStatus();
+      return abslx::OkStatus();
     } else {
       return tool::StatusStop();
     }
   };
   ProcessFunction wait_1 = [&](const InputStreamShardSet& inputs,
                                OutputStreamShardSet* outputs) {
-    clock_->Sleep(absl::Microseconds(30000));
+    clock_->Sleep(abslx::Microseconds(30000));
     return PassThrough(inputs, outputs);
   };
 
   std::vector<Packet> out_packets;
-  absl::Status status;
+  abslx::Status status;
   {
     CalculatorGraph graph;
     auto executor = std::make_shared<SimulationClockExecutor>(4);

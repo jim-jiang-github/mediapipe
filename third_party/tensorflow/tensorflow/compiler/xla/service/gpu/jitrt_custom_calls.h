@@ -139,7 +139,7 @@ class JitRtKernelsCache {
       std::unique_ptr<::stream_executor::KernelBase> kernel);
 
  private:
-  mutable absl::Mutex mutex_;
+  mutable abslx::Mutex mutex_;
 
   using Key = std::tuple<::stream_executor::StreamExecutor*, const char*,
                          llvm::StringRef>;
@@ -153,7 +153,7 @@ class JitRtGemmConfigCache {
   const GemmConfig* Set(int64_t uid, GemmConfig config);
 
  private:
-  mutable absl::Mutex mutex_;
+  mutable abslx::Mutex mutex_;
 
   llvm::SmallDenseMap<int64_t, GemmConfig> configs_ ABSL_GUARDED_BY(mutex_);
 };
@@ -176,7 +176,7 @@ class JitRtCollectiveSupport {
     return static_cast<int64_t>(uid) << 32 | device_ordinal;
   }
 
-  mutable absl::Mutex mutex_;
+  mutable abslx::Mutex mutex_;
 
   // Store if a particular collective operation was executed at least once. We
   // rely on unique `uid` assigned to each collective operation by the lowering
@@ -202,7 +202,7 @@ class JitRtAsyncCollectiveSupport {
     return static_cast<int64_t>(uid) << 32 | device_ordinal;
   }
 
-  mutable absl::Mutex mutex_;
+  mutable abslx::Mutex mutex_;
 
   ::stream_executor::Stream* async_comm_stream_;
 

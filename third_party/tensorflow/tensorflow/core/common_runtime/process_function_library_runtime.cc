@@ -95,7 +95,7 @@ ProcessFunctionLibraryRuntime::ProcessFunctionLibraryRuntime(
     Rendezvous::Factory rendezvous_factory)
     : parent_(parent),
       env_(env),
-      config_(config ? absl::make_optional(*config) : absl::nullopt),
+      config_(config ? abslx::make_optional(*config) : abslx::nullopt),
       device_mgr_(device_mgr),
       lib_def_(lib_def),
       default_thread_pool_(default_thread_pool),
@@ -419,7 +419,7 @@ std::vector<Tensor> GetLocalArgs(gtl::ArraySlice<FunctionArg> args) {
   std::vector<Tensor> tensors;
   for (const auto& arg : args) {
     if (arg.index() == 0) {
-      tensors.push_back(absl::get<Tensor>(arg));
+      tensors.push_back(abslx::get<Tensor>(arg));
     }
   }
   return tensors;
@@ -448,7 +448,7 @@ Status FunctionRetsToTensors(const std::vector<FunctionRet>* function_rets,
       return errors::Internal(
           "Expect a Tensor as a function output but got a TensorShape.");
     }
-    tensors->push_back(absl::get<Tensor>(ret));
+    tensors->push_back(abslx::get<Tensor>(ret));
   }
   return OkStatus();
 }
@@ -577,7 +577,7 @@ Status ProcessFunctionLibraryRuntime::PinArgsAndRets(
               }
             }
             // Convert a vector of devices to a string.
-            // Using absl::StrJoin did not work in Android builds.
+            // Using abslx::StrJoin did not work in Android builds.
             string devices = "[";
             for (Device* device : matching_devices) {
               devices.append(device->name());
@@ -1013,11 +1013,11 @@ Status ProcessFunctionLibraryRuntime::InstantiateMultiDevice(
   // We must preserve control returns in each of the function components,
   // otherwise after function inlining we might prune side-effectful nodes.
   const auto control_ret =
-      [&node_name_to_control_ret](const Node* n) -> absl::optional<string> {
+      [&node_name_to_control_ret](const Node* n) -> abslx::optional<string> {
     const auto it = node_name_to_control_ret.find(n->name());
     return it != node_name_to_control_ret.end()
-               ? absl::make_optional<string>(it->second)
-               : absl::nullopt;
+               ? abslx::make_optional<string>(it->second)
+               : abslx::nullopt;
   };
 
   int i = 0;
@@ -1025,7 +1025,7 @@ Status ProcessFunctionLibraryRuntime::InstantiateMultiDevice(
   // function instantiated by another function.
   FunctionLibraryDefinition* data_lib_def = &data->lib_def_;
   FunctionNameGenerator name_generator(
-      data_lib_def, absl::StrCat(function_name, "_", random::New64()));
+      data_lib_def, abslx::StrCat(function_name, "_", random::New64()));
   auto num_subgraphs = subgraphs.size();
   gtl::InlinedVector<Status, 4> instantiate_status(num_subgraphs);
   BlockingCounter counter(static_cast<int>(num_subgraphs));

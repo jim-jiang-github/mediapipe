@@ -59,7 +59,7 @@ StatusOr<HloInstruction*> SelectAndScatterExpander::ExpandInstruction(
   // Construct the WindowReduction region
   HloComputation* new_comp = [&]() -> HloComputation* {
     HloComputation::Builder builder(
-        absl::StrCat(select->name(), ".reduce_window"));
+        abslx::StrCat(select->name(), ".reduce_window"));
     auto rhs_begin = static_cast<int64_t>(iotas.size() + 1);
     auto first_iota_index = 1;
     auto* neg_one = builder.AddInstruction(

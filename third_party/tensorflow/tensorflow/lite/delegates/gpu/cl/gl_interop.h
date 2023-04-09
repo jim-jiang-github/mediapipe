@@ -42,7 +42,7 @@ namespace cl {
 // returned sync and could be safely destroyed.
 //
 // Depends on EGL 1.5.
-absl::Status CreateEglSyncFromClEvent(cl_event event, EGLDisplay display,
+abslx::Status CreateEglSyncFromClEvent(cl_event event, EGLDisplay display,
                                       EglSync* sync);
 
 // Returns true if 'CreateEglSyncFromClEvent' is supported.
@@ -51,19 +51,19 @@ bool IsEglSyncFromClEventSupported();
 // Creates CL event from EGL sync.
 // Created event could only be consumed by AcquiredGlObject::Acquire call as
 // a 'wait_event'.
-absl::Status CreateClEventFromEglSync(cl_context context,
+abslx::Status CreateClEventFromEglSync(cl_context context,
                                       const EglSync& egl_sync, CLEvent* event);
 
 // Returns true if 'CreateClEventFromEglSync' is supported.
 bool IsClEventFromEglSyncSupported(const CLDevice& device);
 
 // Creates new CL memory object from OpenGL buffer.
-absl::Status CreateClMemoryFromGlBuffer(GLuint gl_ssbo_id,
+abslx::Status CreateClMemoryFromGlBuffer(GLuint gl_ssbo_id,
                                         AccessType access_type,
                                         CLContext* context, CLMemory* memory);
 
 // Creates new CL memory object from OpenGL texture.
-absl::Status CreateClMemoryFromGlTexture(GLenum texture_target,
+abslx::Status CreateClMemoryFromGlTexture(GLenum texture_target,
                                          GLuint texture_id,
                                          AccessType access_type,
                                          CLContext* context, CLMemory* memory);
@@ -86,7 +86,7 @@ class AcquiredGlObjects {
   // CreateClMemoryFromGlBuffer or CreateClMemoryFromGlTexture calls.
   // If 'acquire_event' is not nullptr, it will be signared once acquisition is
   // complete.
-  static absl::Status Acquire(const std::vector<cl_mem>& memory,
+  static abslx::Status Acquire(const std::vector<cl_mem>& memory,
                               cl_command_queue queue,
                               const std::vector<cl_event>& wait_events,
                               CLEvent* acquire_event /* optional */,
@@ -94,7 +94,7 @@ class AcquiredGlObjects {
 
   // Releases OpenCL memory back to OpenGL context. If 'release_event' is not
   // nullptr, it will be signalled once release is complete.
-  absl::Status Release(const std::vector<cl_event>& wait_events,
+  abslx::Status Release(const std::vector<cl_event>& wait_events,
                        CLEvent* release_event /* optional */);
 
  private:
@@ -113,10 +113,10 @@ class GlInteropFabric {
 
   // Ensures proper GL->CL synchronization is in place before
   // GL objects that are mapped to CL objects are used.
-  absl::Status Start();
+  abslx::Status Start();
 
   // Puts appropriate CL->GL synchronization after all work is complete.
-  absl::Status Finish();
+  abslx::Status Finish();
 
   // Registers memory to be used from GL context. Such CL memory object must
   // be created with CreateClMemoryFromGlBuffer or CreateClMemoryFromGlTexture
@@ -155,7 +155,7 @@ class GlClBufferCopier : public TensorObjectConverter {
   GlClBufferCopier(const TensorObjectDef& input_def,
                    const TensorObjectDef& output_def, Environment* environment);
 
-  absl::Status Convert(const TensorObject& input_obj,
+  abslx::Status Convert(const TensorObject& input_obj,
                        const TensorObject& output_obj) override;
 
  private:

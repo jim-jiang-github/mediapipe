@@ -24,7 +24,7 @@ namespace xla {
 
 class EighExpander : public OpExpanderPass {
  public:
-  absl::string_view name() const override { return "eigh_expander"; }
+  abslx::string_view name() const override { return "eigh_expander"; }
 
  protected:
   bool InstructionMatchesPattern(HloInstruction* instruction) override;
@@ -39,7 +39,7 @@ class EighExpander : public OpExpanderPass {
 
  private:
   // Mapping from op signatures to existing computations.
-  absl::flat_hash_map<std::string, HloComputation*> computation_cache_;
+  abslx::flat_hash_map<std::string, HloComputation*> computation_cache_;
 };
 
 }  // namespace xla

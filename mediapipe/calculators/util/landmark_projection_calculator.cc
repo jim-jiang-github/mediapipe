@@ -91,7 +91,7 @@ constexpr char kProjectionMatrix[] = "PROJECTION_MATRIX";
 // }
 class LandmarkProjectionCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     RET_CHECK(cc->Inputs().HasTag(kLandmarksTag))
         << "Missing NORM_LANDMARKS input.";
 
@@ -117,13 +117,13 @@ class LandmarkProjectionCalculator : public CalculatorBase {
       cc->Outputs().Get(id).Set<NormalizedLandmarkList>();
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   static void ProjectXY(const NormalizedLandmark& lm,
@@ -156,12 +156,12 @@ class LandmarkProjectionCalculator : public CalculatorBase {
                      std::pow(b_projected.y() - a_projected.y(), 2));
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     std::function<void(const NormalizedLandmark&, NormalizedLandmark*)>
         project_fn;
     if (cc->Inputs().HasTag(kRectTag)) {
       if (cc->Inputs().Tag(kRectTag).IsEmpty()) {
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
       const auto& input_rect = cc->Inputs().Tag(kRectTag).Get<NormalizedRect>();
       const auto& options =
@@ -189,7 +189,7 @@ class LandmarkProjectionCalculator : public CalculatorBase {
       };
     } else if (cc->Inputs().HasTag(kProjectionMatrix)) {
       if (cc->Inputs().Tag(kProjectionMatrix).IsEmpty()) {
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
       const auto& project_mat =
           cc->Inputs().Tag(kProjectionMatrix).Get<std::array<float, 16>>();
@@ -201,7 +201,7 @@ class LandmarkProjectionCalculator : public CalculatorBase {
         new_landmark->set_z(z_scale * lm.z());
       };
     } else {
-      return absl::InternalError("Either rect or matrix must be specified.");
+      return abslx::InternalError("Either rect or matrix must be specified.");
     }
 
     CollectionItemId input_id = cc->Inputs().BeginId(kLandmarksTag);
@@ -226,7 +226,7 @@ class LandmarkProjectionCalculator : public CalculatorBase {
           MakePacket<NormalizedLandmarkList>(std::move(output_landmarks))
               .At(cc->InputTimestamp()));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(LandmarkProjectionCalculator);

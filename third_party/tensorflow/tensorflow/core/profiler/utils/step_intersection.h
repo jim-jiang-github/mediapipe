@@ -37,7 +37,7 @@ class StepIntersection {
  public:
   StepIntersection(
       uint32 max_steps,
-      const absl::flat_hash_map</*host_id=*/uint32, const StepDatabaseResult*>&
+      const abslx::flat_hash_map</*host_id=*/uint32, const StepDatabaseResult*>&
           perhost_stepdb);
 
   // Returns the number of steps in the intersection.
@@ -62,7 +62,7 @@ class StepIntersection {
   std::string DebugString() const;
 
  private:
-  absl::flat_hash_map</*host_id=*/uint32, StepsAlignment> perhost_alignment_;
+  abslx::flat_hash_map</*host_id=*/uint32, StepsAlignment> perhost_alignment_;
   uint32
       chief_host_id_;  // the host whose step sequence is selected as the chief.
   uint32 steps_dropped_;  // number of steps dropped.

@@ -39,8 +39,8 @@ ROCmPlatform::~ROCmPlatform() {}
 void ROCmPlatform::InspectNumaNodes() {
   // To get NUMA node information, we need to create all executors, so we can
   // examine their device descriptions to see their bus assignments.
-  absl::once_flag once;
-  absl::call_once(once, [&] {
+  abslx::once_flag once;
+  abslx::call_once(once, [&] {
     StreamExecutorConfig config;
     for (int i = 0; i < VisibleDeviceCount(); i++) {
       config.ordinal = i;
@@ -86,7 +86,7 @@ port::StatusOr<StreamExecutor*> ROCmPlatform::FirstExecutorForBus(
 
   return port::Status{
       port::error::NOT_FOUND,
-      absl::StrFormat("Executor for bus %d not found.", bus_ordinal)};
+      abslx::StrFormat("Executor for bus %d not found.", bus_ordinal)};
 }
 
 Platform::Id ROCmPlatform::id() const { return rocm::kROCmPlatformId; }
@@ -140,14 +140,14 @@ port::StatusOr<StreamExecutor*> ROCmPlatform::GetExecutor(
 
 port::StatusOr<std::unique_ptr<StreamExecutor>>
 ROCmPlatform::GetUncachedExecutor(const StreamExecutorConfig& config) {
-  auto executor = absl::make_unique<StreamExecutor>(
-      this, absl::make_unique<GpuExecutor>(config.plugin_config),
+  auto executor = abslx::make_unique<StreamExecutor>(
+      this, abslx::make_unique<GpuExecutor>(config.plugin_config),
       config.ordinal);
   auto init_status = executor->Init(config.device_options);
   if (!init_status.ok()) {
     return port::Status{
         port::error::INTERNAL,
-        absl::StrFormat(
+        abslx::StrFormat(
             "failed initializing StreamExecutor for ROCM device ordinal %d: %s",
             config.ordinal, init_status.ToString().c_str())};
   }

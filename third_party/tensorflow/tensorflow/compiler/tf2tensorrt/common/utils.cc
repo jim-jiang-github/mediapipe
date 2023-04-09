@@ -70,7 +70,7 @@ Status GetTrtBindingIndex(const char* tensor_name, int profile_index,
   // We can also consider it as a "binding_index_within_profile".
   *binding_index = cuda_engine->getBindingIndex(tensor_name);
   if (*binding_index == -1) {
-    const string msg = absl::StrCat("Input node ", tensor_name, " not found");
+    const string msg = abslx::StrCat("Input node ", tensor_name, " not found");
     return errors::NotFound(msg);
   }
   int n_profiles = cuda_engine->getNbOptimizationProfiles();
@@ -87,7 +87,7 @@ Status GetTrtBindingIndex(int network_input_index, int profile_index,
                           const nvinfer1::ICudaEngine* cuda_engine,
                           int* binding_index) {
   const string input_name =
-      absl::StrCat(IONamePrefixes::kInputPHName, network_input_index);
+      abslx::StrCat(IONamePrefixes::kInputPHName, network_input_index);
   return GetTrtBindingIndex(input_name.c_str(), profile_index, cuda_engine,
                             binding_index);
 }
@@ -102,9 +102,9 @@ void InitializeTrtPlugins(nvinfer1::ILogger* trt_logger) {
          "risk.";
 #endif
   LOG(INFO) << "Linked TensorRT version: "
-            << absl::StrJoin(GetLinkedTensorRTVersion(), ".");
+            << abslx::StrJoin(GetLinkedTensorRTVersion(), ".");
   LOG(INFO) << "Loaded TensorRT version: "
-            << absl::StrJoin(GetLoadedTensorRTVersion(), ".");
+            << abslx::StrJoin(GetLoadedTensorRTVersion(), ".");
 
   bool plugin_initialized = initLibNvInferPlugins(trt_logger, "");
   if (!plugin_initialized) {
@@ -136,8 +136,8 @@ void InitializeTrtPlugins(nvinfer1::ILogger* trt_logger) {
 }  // namespace
 
 void MaybeInitializeTrtPlugins(nvinfer1::ILogger* trt_logger) {
-  static absl::once_flag once;
-  absl::call_once(once, InitializeTrtPlugins, trt_logger);
+  static abslx::once_flag once;
+  abslx::call_once(once, InitializeTrtPlugins, trt_logger);
 }
 
 }  // namespace tensorrt

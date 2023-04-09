@@ -31,7 +31,7 @@ extern "C" {
 bool absl_internal_cordz_disabled ABSL_ATTRIBUTE_WEAK = false;
 }
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 namespace {
@@ -59,7 +59,7 @@ ABSL_ATTRIBUTE_NOINLINE bool cordz_should_profile_slow() {
     return false;
   }
 
-  thread_local absl::base_internal::ExponentialBiased
+  thread_local abslx::base_internal::ExponentialBiased
       exponential_biased_generator;
   int32_t mean_interval = get_cordz_mean_interval();
 
@@ -101,4 +101,4 @@ void set_cordz_mean_interval(int32_t mean_interval) {
 
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

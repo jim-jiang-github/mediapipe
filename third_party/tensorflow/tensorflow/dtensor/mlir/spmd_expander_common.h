@@ -41,15 +41,15 @@ limitations under the License.
 namespace tensorflow {
 namespace dtensor {
 
-constexpr absl::string_view kReduceOpAdd = "Add";
-constexpr absl::string_view kReduceOpAll = "All";
-constexpr absl::string_view kReduceOpAny = "Any";
-constexpr absl::string_view kReduceOpMax = "Max";
-constexpr absl::string_view kReduceOpMin = "Min";
-constexpr absl::string_view kReduceOpMul = "Mul";
+constexpr abslx::string_view kReduceOpAdd = "Add";
+constexpr abslx::string_view kReduceOpAll = "All";
+constexpr abslx::string_view kReduceOpAny = "Any";
+constexpr abslx::string_view kReduceOpMax = "Max";
+constexpr abslx::string_view kReduceOpMin = "Min";
+constexpr abslx::string_view kReduceOpMul = "Mul";
 // Mean is not a valid combinator function on its own. It is handled specially
 // by the reduce expansion.
-constexpr absl::string_view kReduceOpMean = "Mean";
+constexpr abslx::string_view kReduceOpMean = "Mean";
 
 // Takes a global type and converts it to a local type. Fails if the number of
 // shards does not divide the size of the dimension (if not dynamic).
@@ -76,7 +76,7 @@ StatusOr<Layout> GetBroadcastLayoutForElementWise(
 
 // Returns a merged layout using `GetBroadcastLayoutForElementwise()` function
 // given a list of operand layouts.
-StatusOr<absl::optional<Layout>> GetMergedOperandLayout(
+StatusOr<abslx::optional<Layout>> GetMergedOperandLayout(
     const llvm::DenseMap<int, Layout>& operand_layouts, mlir::Operation* op);
 
 // Returns the forwarded input value of DTensorLayout op for which `value` is

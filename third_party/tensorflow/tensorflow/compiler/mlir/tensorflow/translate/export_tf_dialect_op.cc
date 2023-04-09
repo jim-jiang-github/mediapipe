@@ -44,7 +44,7 @@ template <typename ContainerT,
           typename = typename std::enable_if<
               std::is_same<mlir::Type, decltype(*std::declval<ContainerT>()
                                                      .begin())>::value>::type>
-Status SetTypeAttribute(absl::string_view name, ContainerT types,
+Status SetTypeAttribute(abslx::string_view name, ContainerT types,
                         AttrValueMap* values) {
   AttrValue value;
   auto& type_list = *value.mutable_list();
@@ -67,7 +67,7 @@ template <typename ContainerT,
           typename = typename std::enable_if<std::is_same<
               llvm::Optional<llvm::ArrayRef<int64_t>>,
               decltype(*std::declval<ContainerT>().begin())>::value>::type>
-void SetShapeAttribute(absl::string_view name, ContainerT shapes,
+void SetShapeAttribute(abslx::string_view name, ContainerT shapes,
                        AttrValueMap* values) {
   AttrValue value;
   auto& shape_list = *value.mutable_list();
@@ -91,7 +91,7 @@ void SetShapeAttribute(absl::string_view name, ContainerT shapes,
 // of an TF op attributes.
 Status GetUnregisteredAttrs(
     mlir::Operation* inst, const tensorflow::OpRegistrationData* op_reg_data,
-    absl::flat_hash_set<absl::string_view>* attrs_to_ignore) {
+    abslx::flat_hash_set<abslx::string_view>* attrs_to_ignore) {
   if (!op_reg_data) {
     // This is likely a function call node, so we should continue.
     return OkStatus();
@@ -108,7 +108,7 @@ Status GetUnregisteredAttrs(
   for (auto& attr : inst->getAttrs()) {
     if (registered_attrs.find(attr.getName()) == registered_attrs.end()) {
       attrs_to_ignore->insert(
-          absl::string_view(attr.getName().data(), attr.getName().size()));
+          abslx::string_view(attr.getName().data(), attr.getName().size()));
     }
   }
   return OkStatus();
@@ -116,12 +116,12 @@ Status GetUnregisteredAttrs(
 
 // Collects all attribute names to ignore in an MLIR operation when exporting to
 // a TensorFlow NodeDef.
-StatusOr<absl::flat_hash_set<absl::string_view>> GetAttributesToIgnore(
+StatusOr<abslx::flat_hash_set<abslx::string_view>> GetAttributesToIgnore(
     mlir::Operation* inst, mlir::DictionaryAttr derived_attrs,
     const tensorflow::OpRegistrationData* op_reg_data,
     bool ignore_unregistered_attrs) {
   // The elements are owned by the MLIRContext.
-  absl::flat_hash_set<absl::string_view> attrs_to_ignore;
+  abslx::flat_hash_set<abslx::string_view> attrs_to_ignore;
 
   // We ignore attributes attached to the operation when there is already a
   // derived attribute defined in ODS.

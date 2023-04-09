@@ -30,17 +30,17 @@ namespace mediapipe {
 // }
 class StreamToSidePacketCalculator : public mediapipe::CalculatorBase {
  public:
-  static absl::Status GetContract(mediapipe::CalculatorContract* cc) {
+  static abslx::Status GetContract(mediapipe::CalculatorContract* cc) {
     cc->Inputs().Index(0).SetAny();
     cc->OutputSidePackets().Index(0).SetAny();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(mediapipe::CalculatorContext* cc) override {
+  abslx::Status Process(mediapipe::CalculatorContext* cc) override {
     mediapipe::Packet& packet = cc->Inputs().Index(0).Value();
     cc->OutputSidePackets().Index(0).Set(
         packet.At(mediapipe::Timestamp::Unset()));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(StreamToSidePacketCalculator);

@@ -60,7 +60,7 @@ constexpr char kOpResolverTag[] = "OP_RESOLVER";
 // }
 class TfLiteCustomOpResolverCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     if (cc->OutputSidePackets().HasTag(kOpResolverTag)) {
       cc->OutputSidePackets().Tag(kOpResolverTag).Set<tflite::OpResolver>();
     } else {
@@ -68,10 +68,10 @@ class TfLiteCustomOpResolverCalculator : public CalculatorBase {
           .Index(0)
           .Set<tflite::ops::builtin::BuiltinOpResolver>();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
 
     const TfLiteCustomOpResolverCalculatorOptions& options =
@@ -79,9 +79,9 @@ class TfLiteCustomOpResolverCalculator : public CalculatorBase {
 
     std::unique_ptr<tflite::ops::builtin::BuiltinOpResolver> op_resolver;
     if (options.use_gpu()) {
-      op_resolver = absl::make_unique<mediapipe::OpResolver>();
+      op_resolver = abslx::make_unique<mediapipe::OpResolver>();
     } else {
-      op_resolver = absl::make_unique<mediapipe::CpuOpResolver>();
+      op_resolver = abslx::make_unique<mediapipe::CpuOpResolver>();
     }
 
     if (cc->OutputSidePackets().HasTag(kOpResolverTag)) {
@@ -92,11 +92,11 @@ class TfLiteCustomOpResolverCalculator : public CalculatorBase {
     } else {
       cc->OutputSidePackets().Index(0).Set(Adopt(op_resolver.release()));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
-    return absl::OkStatus();
+  abslx::Status Process(CalculatorContext* cc) override {
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(TfLiteCustomOpResolverCalculator);

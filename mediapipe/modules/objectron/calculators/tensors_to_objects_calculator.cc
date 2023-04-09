@@ -58,16 +58,16 @@ namespace mediapipe {
 // }
 class TensorsToObjectsCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
-  absl::Status ProcessCPU(CalculatorContext* cc,
+  abslx::Status ProcessCPU(CalculatorContext* cc,
                           FrameAnnotation* output_objects);
-  absl::Status LoadOptions(CalculatorContext* cc);
+  abslx::Status LoadOptions(CalculatorContext* cc);
   // Takes point_3d in FrameAnnotation, projects to 2D, and overwrite the
   // point_2d field with the projection.
   void Project3DTo2D(bool portrait, FrameAnnotation* annotation) const;
@@ -87,7 +87,7 @@ class TensorsToObjectsCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(TensorsToObjectsCalculator);
 
-absl::Status TensorsToObjectsCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status TensorsToObjectsCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK(!cc->Inputs().GetTags().empty());
   RET_CHECK(!cc->Outputs().GetTags().empty());
 
@@ -98,10 +98,10 @@ absl::Status TensorsToObjectsCalculator::GetContract(CalculatorContract* cc) {
   if (cc->Outputs().HasTag(kOutputStreamTag)) {
     cc->Outputs().Tag(kOutputStreamTag).Set<FrameAnnotation>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorsToObjectsCalculator::Open(CalculatorContext* cc) {
+abslx::Status TensorsToObjectsCalculator::Open(CalculatorContext* cc) {
   MP_RETURN_IF_ERROR(LoadOptions(cc));
   // clang-format off
   projection_matrix_ <<
@@ -110,18 +110,18 @@ absl::Status TensorsToObjectsCalculator::Open(CalculatorContext* cc) {
       0,        0, -1.0002, -0.2,
       0,        0,      -1, 0;
   // clang-format on
-  decoder_ = absl::make_unique<Decoder>(
+  decoder_ = abslx::make_unique<Decoder>(
       BeliefDecoderConfig(options_.decoder_config()));
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorsToObjectsCalculator::Process(CalculatorContext* cc) {
+abslx::Status TensorsToObjectsCalculator::Process(CalculatorContext* cc) {
   if (cc->Inputs().Tag(kInputStreamTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  auto output_objects = absl::make_unique<FrameAnnotation>();
+  auto output_objects = abslx::make_unique<FrameAnnotation>();
 
   MP_RETURN_IF_ERROR(ProcessCPU(cc, output_objects.get()));
 
@@ -132,10 +132,10 @@ absl::Status TensorsToObjectsCalculator::Process(CalculatorContext* cc) {
         .Add(output_objects.release(), cc->InputTimestamp());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorsToObjectsCalculator::ProcessCPU(
+abslx::Status TensorsToObjectsCalculator::ProcessCPU(
     CalculatorContext* cc, FrameAnnotation* output_objects) {
   const auto& input_tensors =
       cc->Inputs().Tag(kInputStreamTag).Get<std::vector<mediapipe::Tensor>>();
@@ -155,14 +155,14 @@ absl::Status TensorsToObjectsCalculator::ProcessCPU(
   AssignObjectIdAndTimestamp(cc->InputTimestamp().Microseconds(),
                              output_objects);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorsToObjectsCalculator::Close(CalculatorContext* cc) {
-  return absl::OkStatus();
+abslx::Status TensorsToObjectsCalculator::Close(CalculatorContext* cc) {
+  return abslx::OkStatus();
 }
 
-absl::Status TensorsToObjectsCalculator::LoadOptions(CalculatorContext* cc) {
+abslx::Status TensorsToObjectsCalculator::LoadOptions(CalculatorContext* cc) {
   // Get calculator options specified in the graph.
   options_ = cc->Options<::mediapipe::TensorsToObjectsCalculatorOptions>();
 
@@ -172,7 +172,7 @@ absl::Status TensorsToObjectsCalculator::LoadOptions(CalculatorContext* cc) {
   // Currently only support 2D when num_values_per_keypoint equals to 2.
   CHECK_EQ(options_.num_values_per_keypoint(), 2);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void TensorsToObjectsCalculator::Project3DTo2D(

@@ -39,7 +39,7 @@ using std::nullopt;
 using std::optional;
 
 using ShouldMakeOperandColMajorCache =
-    absl::flat_hash_map<const HloInstruction*, bool>;
+    abslx::flat_hash_map<const HloInstruction*, bool>;
 }  // namespace
 
 static bool ShouldMakeAllUsersColMajor(const HloInstruction* instruction) {
@@ -47,7 +47,7 @@ static bool ShouldMakeAllUsersColMajor(const HloInstruction* instruction) {
     optional<int64_t> operand_idx =
         ProfitableToMakeDotOperandColumnMajor(*user);
     if (!operand_idx || user->operand(*operand_idx) != instruction ||
-        absl::c_count(user->operands(), instruction) != 1) {
+        abslx::c_count(user->operands(), instruction) != 1) {
       return false;
     }
   }

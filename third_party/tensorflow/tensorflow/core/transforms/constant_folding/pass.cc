@@ -341,7 +341,7 @@ bool OpPropertyHelper::ModifiesInputsInPlace(TFOp op) {
   std::string lower_op_name = op_name.str();
   std::transform(lower_op_name.begin(), lower_op_name.end(),
                  lower_op_name.begin(), ::tolower);
-  if (absl::StrContains(lower_op_name, "inplace")) return true;
+  if (abslx::StrContains(lower_op_name, "inplace")) return true;
 
   return op->hasAttr("in_place") || op->hasAttr("inplace");
 }
@@ -402,7 +402,7 @@ bool OpPropertyHelper::MaybeFoldable(TFOp op) {
     return false;
 
   if (op_name.contains("Quantized") ||
-      absl::StartsWith(op_name.data(), "Sparse"))
+      abslx::StartsWith(op_name.data(), "Sparse"))
     return false;
 
   // Don't fold nodes that contain TPU attributes.

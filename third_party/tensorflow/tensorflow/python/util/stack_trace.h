@@ -109,7 +109,7 @@ class StackTrace final {
   }
 
  private:
-  absl::InlinedVector<std::pair<PyCodeObject*, int>, kStackTraceInitialSize>
+  abslx::InlinedVector<std::pair<PyCodeObject*, int>, kStackTraceInitialSize>
       code_objs_;
 
   StackTrace(const StackTrace&) = delete;

@@ -64,7 +64,7 @@ class TrackedDetectionManager {
     return detection_ptr->second.get();
   }
 
-  const absl::node_hash_map<int, std::unique_ptr<TrackedDetection>>&
+  const abslx::node_hash_map<int, std::unique_ptr<TrackedDetection>>&
   GetAllTrackedDetections() const {
     return detections_;
   }
@@ -79,7 +79,7 @@ class TrackedDetectionManager {
   // of the detections that are removed.
   std::vector<int> RemoveDuplicatedDetections(int id);
 
-  absl::node_hash_map<int, std::unique_ptr<TrackedDetection>> detections_;
+  abslx::node_hash_map<int, std::unique_ptr<TrackedDetection>> detections_;
 
   mediapipe::TrackedDetectionManagerConfig config_;
 };

@@ -73,7 +73,7 @@ string ToString(FilterTensorFormat format) {
   }
 }
 
-bool FormatFromString(absl::string_view format_str, TensorFormat* format) {
+bool FormatFromString(abslx::string_view format_str, TensorFormat* format) {
   if (format_str == "NHWC" || format_str == "NDHWC") {
     *format = FORMAT_NHWC;
     return true;
@@ -101,7 +101,7 @@ bool FormatFromString(absl::string_view format_str, TensorFormat* format) {
   return false;
 }
 
-bool FilterFormatFromString(absl::string_view format_str,
+bool FilterFormatFromString(abslx::string_view format_str,
                             FilterTensorFormat* format) {
   if (format_str == "HWIO" || format_str == "DHWIO") {
     *format = FORMAT_HWIO;

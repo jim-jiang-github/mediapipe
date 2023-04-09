@@ -29,7 +29,7 @@ namespace tasks {
 namespace core {
 
 namespace {
-using ::absl::StatusCode;
+using ::abslx::StatusCode;
 }  // namespace
 
 ModelAssetBundleResources::ModelAssetBundleResources(
@@ -38,7 +38,7 @@ ModelAssetBundleResources::ModelAssetBundleResources(
     : tag_(tag), model_asset_bundle_file_(std::move(model_asset_bundle_file)) {}
 
 /* static */
-absl::StatusOr<std::unique_ptr<ModelAssetBundleResources>>
+abslx::StatusOr<std::unique_ptr<ModelAssetBundleResources>>
 ModelAssetBundleResources::Create(
     const std::string& tag,
     std::unique_ptr<proto::ExternalFile> model_asset_bundle_file) {
@@ -48,14 +48,14 @@ ModelAssetBundleResources::Create(
         "The model asset bundle file proto cannot be nullptr.",
         MediaPipeTasksStatus::kInvalidArgumentError);
   }
-  auto model_bundle_resources = absl::WrapUnique(
+  auto model_bundle_resources = abslx::WrapUnique(
       new ModelAssetBundleResources(tag, std::move(model_asset_bundle_file)));
   MP_RETURN_IF_ERROR(
       model_bundle_resources->ExtractModelFilesFromExternalFileProto());
   return model_bundle_resources;
 }
 
-absl::Status
+abslx::Status
 ModelAssetBundleResources::ExtractModelFilesFromExternalFileProto() {
   if (model_asset_bundle_file_->has_file_name()) {
     // If the model asset bundle file name is a relative path, searches the file
@@ -76,17 +76,17 @@ ModelAssetBundleResources::ExtractModelFilesFromExternalFileProto() {
                                            &model_files_);
 }
 
-absl::StatusOr<absl::string_view> ModelAssetBundleResources::GetModelFile(
+abslx::StatusOr<abslx::string_view> ModelAssetBundleResources::GetModelFile(
     const std::string& filename) const {
   auto it = model_files_.find(filename);
   if (it == model_files_.end()) {
     auto model_files = ListModelFiles();
     std::string all_model_files =
-        absl::StrJoin(model_files.begin(), model_files.end(), ", ");
+        abslx::StrJoin(model_files.begin(), model_files.end(), ", ");
 
     return CreateStatusWithPayload(
         StatusCode::kNotFound,
-        absl::StrFormat("No model file with name: %s. All model files in the "
+        abslx::StrFormat("No model file with name: %s. All model files in the "
                         "model asset bundle are: %s.",
                         filename, all_model_files),
         MediaPipeTasksStatus::kFileNotFoundError);

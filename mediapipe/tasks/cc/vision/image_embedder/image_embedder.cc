@@ -106,14 +106,14 @@ std::unique_ptr<ImageEmbedderGraphOptions> ConvertImageEmbedderOptionsToProto(
 
 }  // namespace
 
-absl::StatusOr<std::unique_ptr<ImageEmbedder>> ImageEmbedder::Create(
+abslx::StatusOr<std::unique_ptr<ImageEmbedder>> ImageEmbedder::Create(
     std::unique_ptr<ImageEmbedderOptions> options) {
   auto options_proto = ConvertImageEmbedderOptionsToProto(options.get());
   tasks::core::PacketsCallback packets_callback = nullptr;
   if (options->result_callback) {
     auto result_callback = options->result_callback;
     packets_callback =
-        [=](absl::StatusOr<tasks::core::PacketMap> status_or_packets) {
+        [=](abslx::StatusOr<tasks::core::PacketMap> status_or_packets) {
           if (!status_or_packets.ok()) {
             Image image;
             result_callback(status_or_packets.status(), image,
@@ -141,12 +141,12 @@ absl::StatusOr<std::unique_ptr<ImageEmbedder>> ImageEmbedder::Create(
       std::move(packets_callback));
 }
 
-absl::StatusOr<ImageEmbedderResult> ImageEmbedder::Embed(
+abslx::StatusOr<ImageEmbedderResult> ImageEmbedder::Embed(
     Image image,
     std::optional<core::ImageProcessingOptions> image_processing_options) {
   if (image.UsesGpu()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "GPU input images are currently not supported.",
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }
@@ -162,12 +162,12 @@ absl::StatusOr<ImageEmbedderResult> ImageEmbedder::Embed(
       output_packets[kEmbeddingsStreamName].Get<EmbeddingResult>());
 }
 
-absl::StatusOr<ImageEmbedderResult> ImageEmbedder::EmbedForVideo(
+abslx::StatusOr<ImageEmbedderResult> ImageEmbedder::EmbedForVideo(
     Image image, int64 timestamp_ms,
     std::optional<core::ImageProcessingOptions> image_processing_options) {
   if (image.UsesGpu()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "GPU input images are currently not supported.",
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }
@@ -186,12 +186,12 @@ absl::StatusOr<ImageEmbedderResult> ImageEmbedder::EmbedForVideo(
       output_packets[kEmbeddingsStreamName].Get<EmbeddingResult>());
 }
 
-absl::Status ImageEmbedder::EmbedAsync(
+abslx::Status ImageEmbedder::EmbedAsync(
     Image image, int64 timestamp_ms,
     std::optional<core::ImageProcessingOptions> image_processing_options) {
   if (image.UsesGpu()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "GPU input images are currently not supported.",
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }
@@ -206,7 +206,7 @@ absl::Status ImageEmbedder::EmbedAsync(
             .At(Timestamp(timestamp_ms * kMicroSecondsPerMilliSecond))}});
 }
 
-absl::StatusOr<double> ImageEmbedder::CosineSimilarity(
+abslx::StatusOr<double> ImageEmbedder::CosineSimilarity(
     const components::containers::Embedding& u,
     const components::containers::Embedding& v) {
   return components::utils::CosineSimilarity(u, v);

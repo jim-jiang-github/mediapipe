@@ -24,7 +24,7 @@ namespace xla {
 
 EventPool::Handle::~Handle() {
   if (pool_ && event_) {
-    absl::MutexLock lock(&pool_->mu_);
+    abslx::MutexLock lock(&pool_->mu_);
     pool_->free_events_.push(std::move(event_));
   }
 }
@@ -38,7 +38,7 @@ StatusOr<EventPool::Handle> EventPool::AllocateEvent(
 
   if (allow_reuse_) {
     event.pool_ = this;
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     if (!free_events_.empty()) {
       event.event_ = std::move(free_events_.top());
       free_events_.pop();
@@ -52,7 +52,7 @@ StatusOr<EventPool::Handle> EventPool::AllocateEvent(
 }
 
 void EventPool::ThenRecordEvent(se::Stream* stream, EventPool::Handle& handle) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   stream->ThenRecordEvent(handle.event_.get());
   handle.sequence_number_ = next_sequence_number_++;
 }

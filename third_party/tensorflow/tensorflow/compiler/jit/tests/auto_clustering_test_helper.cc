@@ -49,10 +49,10 @@ StatusOr<string> SummarizeClustering(const GraphDef& auto_clustered_graph_def) {
   int clustered_nodes = 0;
   for (Node* n : graph.op_nodes()) {
     int cluster = kNoCluster;
-    if (std::optional<absl::string_view> maybe_cluster =
+    if (std::optional<abslx::string_view> maybe_cluster =
             GetXlaClusterForNode(*n)) {
-      maybe_cluster->remove_prefix(absl::string_view("cluster_").size());
-      TF_RET_CHECK(absl::SimpleAtoi(*maybe_cluster, &cluster));
+      maybe_cluster->remove_prefix(abslx::string_view("cluster_").size());
+      TF_RET_CHECK(abslx::SimpleAtoi(*maybe_cluster, &cluster));
       clustered_nodes++;
     }
     clusters[cluster][n->type_string()]++;
@@ -60,20 +60,20 @@ StatusOr<string> SummarizeClustering(const GraphDef& auto_clustered_graph_def) {
   }
 
   string result =
-      absl::StrCat("Clustered nodes: ", clustered_nodes,
+      abslx::StrCat("Clustered nodes: ", clustered_nodes,
                    "\nUnclustered nodes: ", cluster_size[kNoCluster],
                    "\nNumber of clusters: ", clusters.size() - 1, "\n\n");
   for (const auto& pair : clusters) {
     if (pair.first == kNoCluster) {
-      absl::StrAppend(&result, "unclustered");
+      abslx::StrAppend(&result, "unclustered");
     } else {
-      absl::StrAppend(&result, "cluster ", pair.first);
+      abslx::StrAppend(&result, "cluster ", pair.first);
     }
 
-    absl::StrAppend(&result, " size ", cluster_size[pair.first], "\n");
+    abslx::StrAppend(&result, " size ", cluster_size[pair.first], "\n");
 
     for (const auto& ops_and_counts : pair.second) {
-      absl::StrAppend(&result, " ", ops_and_counts.first, " ",
+      abslx::StrAppend(&result, " ", ops_and_counts.first, " ",
                       ops_and_counts.second, "\n");
     }
   }
@@ -108,7 +108,7 @@ Status ReadTextProtoFromString(Env* env, const string& data,
 }  // namespace
 
 Status AutoClusteringTest::RunAutoClusteringTestImpl(
-    GraphDef graphdef, absl::string_view golden_summary_file_path) {
+    GraphDef graphdef, abslx::string_view golden_summary_file_path) {
   if (!IsGoogleCudaEnabled()) {
     // There is some slight change in the clustering decisions under
     // --config=cuda.  I have not looked closely at why that is happening, but
@@ -131,7 +131,7 @@ Status AutoClusteringTest::RunAutoClusteringTestImpl(
   TF_RETURN_IF_ERROR(runner.AddCpus(32));
   TF_RETURN_IF_ERROR(runner.AddGpus(8));
 
-  for (absl::string_view auto_clustering_pass :
+  for (abslx::string_view auto_clustering_pass :
        {"CloneConstantsForBetterClusteringPass", "MarkForCompilationPass",
         "IncreaseDynamismForAutoJitPass", "PartiallyDeclusterPass"}) {
     GraphDef next;
@@ -162,8 +162,8 @@ Status AutoClusteringTest::RunAutoClusteringTestImpl(
 }
 
 Status AutoClusteringTest::RunAutoClusteringTestWithPbtxt(
-    absl::string_view pbtxt_file_path,
-    absl::string_view golden_summary_file_path) {
+    abslx::string_view pbtxt_file_path,
+    abslx::string_view golden_summary_file_path) {
   GraphDef graphdef;
   TF_RETURN_IF_ERROR(
       ReadTextProto(Env::Default(), string(pbtxt_file_path), &graphdef));
@@ -172,8 +172,8 @@ Status AutoClusteringTest::RunAutoClusteringTestWithPbtxt(
 }
 
 Status AutoClusteringTest::RunAutoClusteringTestWithGzippedPbtxt(
-    absl::string_view gzipped_pbtxt_file_path,
-    absl::string_view golden_summary_file_path) {
+    abslx::string_view gzipped_pbtxt_file_path,
+    abslx::string_view golden_summary_file_path) {
   Env* env = Env::Default();
   std::unique_ptr<RandomAccessFile> file_reader;
   TF_RETURN_IF_ERROR(
@@ -201,7 +201,7 @@ Status AutoClusteringTest::RunAutoClusteringTestWithGzippedPbtxt(
 }
 
 #if defined(PLATFORM_GOOGLE)
-Status BenchmarkMarkForCompilation(absl::string_view graph_def_path,
+Status BenchmarkMarkForCompilation(abslx::string_view graph_def_path,
                                    benchmark::State& state) {
   GraphDef graph_def;
   TF_RETURN_IF_ERROR(

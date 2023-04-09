@@ -66,15 +66,15 @@ InputSplitMetadata::InputSplitMetadata(int input_task_size,
     : task_sizes_(generate_task_sizes(
           input_task_size, open_batch_remaining_slot, batch_size_limit)) {}
 
-const absl::FixedArray<int>& InputSplitMetadata::task_sizes() const {
+const abslx::FixedArray<int>& InputSplitMetadata::task_sizes() const {
   return task_sizes_;
 }
 
 std::string InputSplitMetadata::DebugString() const {
-  return absl::StrJoin(task_sizes_, ", ");
+  return abslx::StrJoin(task_sizes_, ", ");
 }
 
-absl::FixedArray<int> InputSplitMetadata::generate_task_sizes(
+abslx::FixedArray<int> InputSplitMetadata::generate_task_sizes(
     int input_task_size, int open_batch_remaining_slot,
     int batch_size_limit) const {
   const int task_size_from_open_batch = compute_task_size_from_open_batch(
@@ -83,7 +83,7 @@ absl::FixedArray<int> InputSplitMetadata::generate_task_sizes(
   const int num_batches =
       compute_num_batches(task_size_from_open_batch, batch_size_limit);
 
-  absl::FixedArray<int> task_sizes(num_batches, batch_size_limit);
+  abslx::FixedArray<int> task_sizes(num_batches, batch_size_limit);
 
   task_sizes.front() = compute_head_task_size(
       input_task_size, open_batch_remaining_slot, batch_size_limit);

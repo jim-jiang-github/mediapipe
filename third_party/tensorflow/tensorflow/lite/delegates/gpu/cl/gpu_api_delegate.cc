@@ -87,7 +87,7 @@ class Delegate {
     }
   }
 
-  absl::Status Prepare(TfLiteContext* context,
+  abslx::Status Prepare(TfLiteContext* context,
                        const TfLiteDelegateParams* delegate_params) {
     // Extract TFLite delegate execution plan from the context and convert it
     // into GraphFloat32.
@@ -97,7 +97,7 @@ class Delegate {
     // Apply general transformations on the graph.
     ModelTransformer transformer(&graph);
     if (!ApplyModelTransformations(&transformer)) {
-      return absl::InternalError("Graph transformations failed");
+      return abslx::InternalError("Graph transformations failed");
     }
 
     InferenceEnvironmentOptions env_options;
@@ -107,7 +107,7 @@ class Delegate {
         options_.serialized_binary_cache_data,
         options_.serialized_binary_cache_size};
     InferenceEnvironmentProperties properties;
-    absl::Status status =
+    abslx::Status status =
         NewInferenceEnvironment(env_options, &environment_, &properties);
     if (!properties.is_opencl_available) {
       TF_LITE_KERNEL_LOG(context, "TfLiteGpuDelegate: OpenCL is not available");
@@ -210,7 +210,7 @@ class Delegate {
     return builder->Build(&runner_);
   }
 
-  absl::Status SetInputsAndOutputs(TfLiteContext* context) {
+  abslx::Status SetInputsAndOutputs(TfLiteContext* context) {
     int i = 0;
     for (auto index : input_indices_) {
       RETURN_IF_ERROR(
@@ -221,10 +221,10 @@ class Delegate {
       RETURN_IF_ERROR(
           runner_->SetOutputObject(i++, GetTensorObject(index, context)));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Invoke(TfLiteContext* context) {
+  abslx::Status Invoke(TfLiteContext* context) {
     RETURN_IF_ERROR(SetInputsAndOutputs(context));
     return runner_->Run();
   }
@@ -266,7 +266,7 @@ class Delegate {
       return tensors_[index].first;
     }
     auto& tensor = context->tensors[index];
-    return MakeCpuMemory(absl::MakeSpan(tensor.data.raw, tensor.bytes));
+    return MakeCpuMemory(abslx::MakeSpan(tensor.data.raw, tensor.bytes));
   }
 
   TfLiteDelegate* tflite_delegate() { return &delegate_; }
@@ -276,7 +276,7 @@ class Delegate {
            options_.egl_display != EGL_NO_DISPLAY;
   }
 
-  absl::Span<const uint8_t> GetSerializedBinaryCache() {
+  abslx::Span<const uint8_t> GetSerializedBinaryCache() {
     binary_cache_ = environment_->GetSerializedBinaryCache();
     return binary_cache_;
   }

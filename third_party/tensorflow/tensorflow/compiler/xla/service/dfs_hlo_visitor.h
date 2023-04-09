@@ -332,7 +332,7 @@ class DfsHloVisitorBase {
   // Useful when we want to free up the memory used by the visit state without
   // destroying the actual visitor subclass.
   void DestroyVisitState() {
-    visit_state_ = absl::flat_hash_map<int, VisitState>{};
+    visit_state_ = abslx::flat_hash_map<int, VisitState>{};
   }
 
   void SetVisitState(int id, VisitState state) { visit_state_[id] = state; }
@@ -384,7 +384,7 @@ class DfsHloVisitorBase {
   virtual Status Postprocess(HloInstructionPtr hlo);
 
  private:
-  absl::flat_hash_map<int, VisitState> visit_state_;
+  abslx::flat_hash_map<int, VisitState> visit_state_;
 
   DfsHloVisitorBase(const DfsHloVisitorBase&) = delete;
   DfsHloVisitorBase& operator=(const DfsHloVisitorBase&) = delete;

@@ -50,7 +50,7 @@
 #include "absl/synchronization/mutex.h"
 #include "absl/utility/utility.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 
@@ -84,7 +84,7 @@ struct HashtablezInfo {
   // comments on `HashtablezSampler::all_` for details on these.  `init_mu`
   // guards the ability to restore the sample to a pristine state.  This
   // prevents races with sampling and resurrecting an object.
-  absl::Mutex init_mu;
+  abslx::Mutex init_mu;
   HashtablezInfo* next;
   HashtablezInfo* dead ABSL_GUARDED_BY(init_mu);
 
@@ -94,7 +94,7 @@ struct HashtablezInfo {
   // can only read them during `HashtablezSampler::Iterate` which will hold the
   // lock.
   static constexpr int kMaxStackDepth = 64;
-  absl::Time create_time;
+  abslx::Time create_time;
   int32_t depth;
   void* stack[kMaxStackDepth];
 };
@@ -158,12 +158,12 @@ class HashtablezInfoHandle {
   HashtablezInfoHandle& operator=(const HashtablezInfoHandle&) = delete;
 
   HashtablezInfoHandle(HashtablezInfoHandle&& o) noexcept
-      : info_(absl::exchange(o.info_, nullptr)) {}
+      : info_(abslx::exchange(o.info_, nullptr)) {}
   HashtablezInfoHandle& operator=(HashtablezInfoHandle&& o) noexcept {
     if (ABSL_PREDICT_FALSE(info_ != nullptr)) {
       UnsampleSlow(info_);
     }
-    info_ = absl::exchange(o.info_, nullptr);
+    info_ = abslx::exchange(o.info_, nullptr);
     return *this;
   }
 
@@ -317,6 +317,6 @@ extern "C" bool ABSL_INTERNAL_C_SYMBOL(AbslContainerInternalSampleEverything)();
 
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_CONTAINER_INTERNAL_HASHTABLEZ_SAMPLER_H_

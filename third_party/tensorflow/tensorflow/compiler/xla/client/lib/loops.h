@@ -29,12 +29,12 @@ namespace xla {
 
 // Function that builds a loop condition. Takes as input a sequence of input
 // values, and returns a boolean value representing if the condition succeeds.
-typedef std::function<StatusOr<XlaOp>(absl::Span<const XlaOp>, XlaBuilder*)>
+typedef std::function<StatusOr<XlaOp>(abslx::Span<const XlaOp>, XlaBuilder*)>
     WhileLoopHelperConditionFunction;
 
 // Function that builds a loop body. Takes as input a sequence of input values
 // and returns a sequence of output values.
-typedef std::function<StatusOr<std::vector<XlaOp>>(absl::Span<const XlaOp>,
+typedef std::function<StatusOr<std::vector<XlaOp>>(abslx::Span<const XlaOp>,
                                                    XlaBuilder*)>
     WhileLoopHelperBodyFunction;
 
@@ -49,7 +49,7 @@ typedef std::function<StatusOr<std::vector<XlaOp>>(absl::Span<const XlaOp>,
 StatusOr<std::vector<XlaOp>> WhileLoopHelper(
     const WhileLoopHelperConditionFunction& condition_function,
     const WhileLoopHelperBodyFunction& body_function,
-    absl::Span<const XlaOp> initial_values, absl::string_view name,
+    abslx::Span<const XlaOp> initial_values, abslx::string_view name,
     XlaBuilder* builder);
 
 // Builds an XLA loop that repeats a computation `num_iterations` times.
@@ -58,13 +58,13 @@ StatusOr<std::vector<XlaOp>> WhileLoopHelper(
 // (current iteration number, loop-carried values), and returns an updated
 // vector of the loop-carried values.
 typedef std::function<StatusOr<std::vector<XlaOp>>(
-    XlaOp, absl::Span<const XlaOp>, XlaBuilder*)>
+    XlaOp, abslx::Span<const XlaOp>, XlaBuilder*)>
     ForEachIndexBodyFunction;
 
 StatusOr<std::vector<XlaOp>> ForEachIndex(
     int64_t num_iterations, PrimitiveType num_iterations_type,
     const ForEachIndexBodyFunction& body_function,
-    absl::Span<const XlaOp> initial_values, absl::string_view name,
+    abslx::Span<const XlaOp> initial_values, abslx::string_view name,
     XlaBuilder* builder);
 
 }  // namespace xla

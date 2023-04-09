@@ -35,7 +35,7 @@ class LogisticExpander : public OpExpanderPass {
   explicit LogisticExpander(LogisticExpansionType expansion_type)
       : expansion_type_(expansion_type) {}
   ~LogisticExpander() override = default;
-  absl::string_view name() const override { return "logistic-expander"; }
+  abslx::string_view name() const override { return "logistic-expander"; }
 
  private:
   // Returns `true` if `instruction` should be expanded by this pass.

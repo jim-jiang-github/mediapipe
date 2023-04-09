@@ -350,7 +350,7 @@ StatusOr<Literal> ReplayComputation(const HloSnapshot& module,
   return result_literal;
 }
 
-StatusOr<std::vector<HloSnapshot>> ParseRecordIoFile(absl::string_view filename,
+StatusOr<std::vector<HloSnapshot>> ParseRecordIoFile(abslx::string_view filename,
                                                      const Options& opts) {
   tensorflow::Env* env = tensorflow::Env::Default();
 
@@ -408,7 +408,7 @@ StatusOr<std::vector<HloSnapshot>> ParseSingleHloFile(
   HloModuleConfig config;
   config.set_debug_options(GetDebugOptionsFromFlags());
   std::vector<std::string> hlo_module_texts =
-      absl::StrSplit(contents, "// -----");
+      abslx::StrSplit(contents, "// -----");
   std::vector<HloSnapshot> snapshots;
   int start_line = 0;
   for (const std::string& hlo_module_text : hlo_module_texts) {
@@ -427,7 +427,7 @@ StatusOr<std::vector<HloSnapshot>> ParseSingleHloFile(
             << start_line;
       }
     }
-    start_line += absl::c_count(hlo_module_text, '\n');
+    start_line += abslx::c_count(hlo_module_text, '\n');
   }
   if (!snapshots.empty()) {
     return snapshots;
@@ -440,14 +440,14 @@ StatusOr<std::vector<HloSnapshot>> ParseSingleHloFile(
 StatusOr<std::vector<HloSnapshot>> ParseInputFile(const std::string& filename,
                                                   const Options& opts) {
   std::vector<HloSnapshot> snapshots;
-  absl::string_view filename_view = filename;
-  if (absl::ConsumePrefix(&filename_view, "recordio_hlo_proto:")) {
+  abslx::string_view filename_view = filename;
+  if (abslx::ConsumePrefix(&filename_view, "recordio_hlo_proto:")) {
     return ParseRecordIoFile(filename_view, opts);
   }
   return ParseSingleHloFile(filename, opts);
 }
 
-int RealMain(absl::Span<char* const> args, const Options& opts) {
+int RealMain(abslx::Span<char* const> args, const Options& opts) {
   LocalClient* client = ClientLibrary::LocalClientOrDie();
   int exit_status = EXIT_SUCCESS;
 
@@ -568,7 +568,7 @@ int main(int argc, char** argv) {
   if (argc < 2 || !parse_ok) {
     LOG(QFATAL) << usage;
   }
-  absl::Span<char* const> args(argv, argc);
+  abslx::Span<char* const> args(argv, argc);
   args.remove_prefix(1);  // Pop off the binary name, argv[0]
   if (opts.compile_only) {
     opts.use_fake_data = true;

@@ -55,7 +55,7 @@ class TestCustomDevice : public CustomDevice {
     return errors::Unimplemented("Not implemented");
   }
 
-  Status Pack(absl::Span<ImmediateExecutionTensorHandle*> handles,
+  Status Pack(abslx::Span<ImmediateExecutionTensorHandle*> handles,
               ImmediateExecutionTensorHandle** result) override {
     return errors::Unimplemented("Packing is not implemented");
   }

@@ -39,13 +39,13 @@ using ::testing::ElementsAreArray;
 
 constexpr int kNumInputTensorsForBert = 3;
 constexpr int kBertMaxSeqLen = 128;
-constexpr absl::string_view kTestModelPath =
+constexpr abslx::string_view kTestModelPath =
     "mediapipe/tasks/testdata/text/bert_text_classifier.tflite";
 
-absl::StatusOr<std::vector<std::vector<int>>> RunBertPreprocessorCalculator(
-    absl::string_view text, absl::string_view model_path) {
+abslx::StatusOr<std::vector<std::vector<int>>> RunBertPreprocessorCalculator(
+    abslx::string_view text, abslx::string_view model_path) {
   auto graph_config = ParseTextProtoOrDie<CalculatorGraphConfig>(
-      absl::Substitute(R"(
+      abslx::Substitute(R"(
         input_stream: "text"
         output_stream: "tensors"
         node {
@@ -80,14 +80,14 @@ absl::StatusOr<std::vector<std::vector<int>>> RunBertPreprocessorCalculator(
   MP_RETURN_IF_ERROR(graph.WaitUntilIdle());
 
   if (output_packets.size() != 1) {
-    return absl::InvalidArgumentError(absl::Substitute(
+    return abslx::InvalidArgumentError(abslx::Substitute(
         "output_packets has size $0, expected 1", output_packets.size()));
   }
   const std::vector<Tensor>& tensor_vec =
       output_packets[0].Get<std::vector<Tensor>>();
   if (tensor_vec.size() != kNumInputTensorsForBert) {
-    return absl::InvalidArgumentError(
-        absl::Substitute("tensor_vec has size $0, expected $1",
+    return abslx::InvalidArgumentError(
+        abslx::Substitute("tensor_vec has size $0, expected $1",
                          tensor_vec.size(), kNumInputTensorsForBert));
   }
 
@@ -95,7 +95,7 @@ absl::StatusOr<std::vector<std::vector<int>>> RunBertPreprocessorCalculator(
   for (int i = 0; i < kNumInputTensorsForBert; i++) {
     const Tensor& tensor = tensor_vec[i];
     if (tensor.element_type() != Tensor::ElementType::kInt32) {
-      return absl::InvalidArgumentError("Expected tensor element type kInt32");
+      return abslx::InvalidArgumentError("Expected tensor element type kInt32");
     }
     auto* buffer = tensor.GetCpuReadView().buffer<int>();
     std::vector<int> buffer_view(buffer, buffer + kBertMaxSeqLen);

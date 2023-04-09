@@ -112,14 +112,14 @@ string ClusterBatchSize::ToString() const {
   string s;
   const auto append_optional_num = [&](const std::optional<int>& num) {
     if (num.has_value()) {
-      absl::StrAppendFormat(&s, "%d", num.value());
+      abslx::StrAppendFormat(&s, "%d", num.value());
     } else {
-      absl::StrAppendFormat(&s, "?");
+      abslx::StrAppendFormat(&s, "?");
     }
   };
-  absl::StrAppendFormat(&s, "batch_size=");
+  abslx::StrAppendFormat(&s, "batch_size=");
   append_optional_num(batch_size_);
-  absl::StrAppendFormat(&s, ", max_batch_size=");
+  abslx::StrAppendFormat(&s, ", max_batch_size=");
   append_optional_num(max_batch_size_);
   return s;
 }

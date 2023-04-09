@@ -333,7 +333,7 @@ void ReadTocoFlagsFromCommandLineFlags(const ParsedTocoFlags& parsed_toco_flags,
            "control the quantization/dequantization of real-numbers input "
            "arrays in the output file, use --inference_input_type.";
     std::vector<std::string> input_types =
-        absl::StrSplit(parsed_toco_flags.input_types.value(), ',');
+        abslx::StrSplit(parsed_toco_flags.input_types.value(), ',');
     QCHECK(!input_types.empty());
     for (size_t i = 1; i < input_types.size(); i++) {
       QCHECK_EQ(input_types[i], input_types[0]);

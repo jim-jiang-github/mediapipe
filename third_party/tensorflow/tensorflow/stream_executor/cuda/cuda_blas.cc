@@ -377,7 +377,7 @@ port::Status CUDABlas::DoBlasInternalImpl(FuncT cublas_func, Stream *stream,
                                           bool pointer_mode_host,
                                           cublasMath_t math_type,
                                           Args... args) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
 
   CHECK(blas_ != nullptr);
   if (!SetStream(stream)) {
@@ -1649,7 +1649,7 @@ port::Status CUDABlas::DoBlasGemm(Stream *stream, blas::Transpose transa,
     }
   }
 
-  VLOG(1) << absl::StrFormat(
+  VLOG(1) << abslx::StrFormat(
       "doing cuBLAS SGEMM: at=%d bt=%d m=%u n=%u "
       "k=%u alpha=%p a=%p lda=%d b=%p ldb=%d beta=%p "
       "c=%p ldc=%d",
@@ -1724,7 +1724,7 @@ port::Status CUDABlas::DoBlasGemm(Stream *stream, blas::Transpose transa,
           static_cast<GpuDoubleComplexType *>(c->opaque()), ldc);
     }
     default:
-      return port::InternalError(absl::StrCat("Unsupported datatype for GEMM: ",
+      return port::InternalError(abslx::StrCat("Unsupported datatype for GEMM: ",
                                               blas::DataTypeString(dtype)));
   }
 }
@@ -1912,7 +1912,7 @@ static port::StatusOr<cublasMath_t> GetMathTypeForGemmEx(
   // GPUs < sm_50 don't support cublasGemmEx.
   CudaComputeCapability cc = stream->GetCudaComputeCapability();
   if (cc.major < 5) {
-    return port::InternalError(absl::StrCat(
+    return port::InternalError(abslx::StrCat(
         "sm_", cc.major, " does not support explicit gemm algorithms."));
   }
 
@@ -1920,23 +1920,23 @@ static port::StatusOr<cublasMath_t> GetMathTypeForGemmEx(
   cublasMath_t math_type = CUBLAS_DEFAULT_MATH;
   if (algo_uses_tensor_ops) {
     if (cc.major < 7) {
-      return port::InternalError(absl::StrCat(
+      return port::InternalError(abslx::StrCat(
           "Algorithm ", algorithm,
           " uses tensor ops, but tensor ops are not available in sm", cc.major,
           "X devices."));
     } else if (type_a == blas::DataType::kFloat) {
 #if CUDA_VERSION < 11000
-      return port::InternalError(absl::StrCat(
+      return port::InternalError(abslx::StrCat(
           "Algorithm ", algorithm,
           " uses tensor ops, but tensor ops are not available for fp32"));
 #else
       if (cc.major < 8) {
-        return port::InternalError(absl::StrCat(
+        return port::InternalError(abslx::StrCat(
             "Algorithm ", algorithm,
             " uses tensor ops, but tensor ops are not available in sm",
             cc.major, "X devices for float input types."));
       } else if (!tensorflow::tensor_float_32_execution_enabled()) {
-        return port::InternalError(absl::StrCat(
+        return port::InternalError(abslx::StrCat(
             "Algorithm ", algorithm,
             " uses tensor ops, but tensor ops are disabled for fp32 inputs"));
       }
@@ -1948,7 +1948,7 @@ static port::StatusOr<cublasMath_t> GetMathTypeForGemmEx(
 #endif
     } else {
       return port::InternalError(
-          absl::StrCat("Algorithm ", algorithm,
+          abslx::StrCat("Algorithm ", algorithm,
                        " uses tensor ops which are not supported for input"));
     }
   }
@@ -2528,7 +2528,7 @@ port::Status CUDABlas::DoBlasGemmStridedBatched(
           batch_count);
     }
     default:
-      return port::InternalError(absl::StrCat("Unsupported datatype for GEMM: ",
+      return port::InternalError(abslx::StrCat("Unsupported datatype for GEMM: ",
                                               blas::DataTypeString(dtype)));
   }
 }
@@ -2942,7 +2942,7 @@ bool CUDABlas::DoBlasTrsmBatched(Stream *stream, blas::Side side,
 }
 
 port::Status CUDABlas::GetVersion(std::string *version) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
 
   int v;
   auto status = cublasGetVersion(blas_, &v);

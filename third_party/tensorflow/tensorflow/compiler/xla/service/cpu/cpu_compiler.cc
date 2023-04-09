@@ -227,9 +227,9 @@ bool UseMlirHloLowering(bool use_mlir, HloModule* module) {
 // For each computation in the module, determines whether that computation
 // calls a custom-call function, either directly or indirectly (e.g. because it
 // calls another computation that does).
-absl::flat_hash_map<const HloComputation*, bool>
+abslx::flat_hash_map<const HloComputation*, bool>
 ModuleComputationsTransitivelyContainCustomCall(const HloModule& module) {
-  absl::flat_hash_map<const HloComputation*, bool> custom_call_map;
+  abslx::flat_hash_map<const HloComputation*, bool> custom_call_map;
   std::unique_ptr<CallGraph> call_graph = CallGraph::Build(&module);
 
   // Can never fail because we always return an OK status from the visitor.
@@ -330,18 +330,18 @@ namespace {
 // multiple invocations of the LLVM compilation pipeline with a different set of
 // flags. Therefore, we only pass command-line flags to LLVM once, before the
 // first module is compiled.
-absl::once_flag llvm_command_line_options_initialized;
+abslx::once_flag llvm_command_line_options_initialized;
 
 // This visitor records which HLO instructions should have profiling information
 // recorded.
 class CollectProfileCandidates : public DfsHloVisitorWithDefault {
  public:
-  static StatusOr<absl::flat_hash_map<const HloInstruction*, int64_t>>
+  static StatusOr<abslx::flat_hash_map<const HloInstruction*, int64_t>>
   GetCandidatesForComputation(
       const HloComputation& computation,
-      const absl::flat_hash_map<const HloInstruction*, int64_t>&
+      const abslx::flat_hash_map<const HloInstruction*, int64_t>&
           assigned_indices) {
-    absl::flat_hash_map<const HloInstruction*, int64_t> hlo_to_profile_idx;
+    abslx::flat_hash_map<const HloInstruction*, int64_t> hlo_to_profile_idx;
     CollectProfileCandidates profile_candidates_for_computation(
         &hlo_to_profile_idx, assigned_indices);
     TF_RETURN_IF_ERROR(computation.Accept(&profile_candidates_for_computation));
@@ -350,8 +350,8 @@ class CollectProfileCandidates : public DfsHloVisitorWithDefault {
 
  private:
   CollectProfileCandidates(
-      absl::flat_hash_map<const HloInstruction*, int64_t>* hlo_to_profile_idx,
-      const absl::flat_hash_map<const HloInstruction*, int64_t>&
+      abslx::flat_hash_map<const HloInstruction*, int64_t>* hlo_to_profile_idx,
+      const abslx::flat_hash_map<const HloInstruction*, int64_t>&
           assigned_indices)
       : hlo_to_profile_idx_(hlo_to_profile_idx),
         assigned_indices_(assigned_indices) {}
@@ -407,8 +407,8 @@ class CollectProfileCandidates : public DfsHloVisitorWithDefault {
     return OkStatus();
   }
 
-  absl::flat_hash_map<const HloInstruction*, int64_t>* hlo_to_profile_idx_;
-  const absl::flat_hash_map<const HloInstruction*, int64_t>& assigned_indices_;
+  abslx::flat_hash_map<const HloInstruction*, int64_t>* hlo_to_profile_idx_;
+  const abslx::flat_hash_map<const HloInstruction*, int64_t>& assigned_indices_;
 };
 
 }  // namespace
@@ -764,9 +764,9 @@ Status VerifyLlvmModule(const llvm::Module& llvm_module) {
 
 Status CreateHloProfilingArtifacts(
     const HloModule& module,
-    absl::flat_hash_map<const HloInstruction*, int64_t>*
+    abslx::flat_hash_map<const HloInstruction*, int64_t>*
         instruction_to_profile_idx,
-    absl::flat_hash_map<const HloComputation*, int64_t>*
+    abslx::flat_hash_map<const HloComputation*, int64_t>*
         computation_to_profile_idx,
     std::unique_ptr<HloProfileIndexMap>* hlo_profile_index_map,
     std::unique_ptr<HloProfilePrinterData>* hlo_profile_printer_data) {
@@ -863,7 +863,7 @@ struct OrcJITPostCompilationHook {
       return;
     }
     DumpToFileInDir(*module, /*file_prefix=*/"", /*file_suffix=*/"o",
-                    absl::string_view(obj_file.getData().data(),
+                    abslx::string_view(obj_file.getData().data(),
                                       obj_file.getData().size()));
   }
 
@@ -1053,7 +1053,7 @@ struct ComputationToEmit {
 
 std::vector<ComputationToEmit> SubcomputationEmissionOrder(
     HloComputation* root) {
-  absl::flat_hash_set<ComputationToEmit> visited;
+  abslx::flat_hash_set<ComputationToEmit> visited;
   std::vector<ComputationToEmit> postorder;
 
   // agenda of (node, leave) pairs.
@@ -1101,12 +1101,12 @@ StatusOr<std::unique_ptr<Executable>> CpuCompiler::RunBackend(
     const CompileOptions& options) {
   VLOG(1) << "Compiling: " << module->name();
   XLA_SCOPED_LOGGING_TIMER(
-      absl::StrFormat("Compiling [%s] for CPU using JIT", module->name()));
+      abslx::StrFormat("Compiling [%s] for CPU using JIT", module->name()));
   std::string slow_compilation_msg =
-      absl::StrCat("Compiling module ", module->name());
+      abslx::StrCat("Compiling module ", module->name());
   auto slow_compile_alarm = SlowCompilationAlarm(slow_compilation_msg);
 
-  absl::call_once(llvm_command_line_options_initialized,
+  abslx::call_once(llvm_command_line_options_initialized,
                   &InitializeLLVMCommandLineOptions, module->config());
 
   ModuleHook pre_optimization_ir_hook;
@@ -1138,9 +1138,9 @@ StatusOr<std::unique_ptr<Executable>> CpuCompiler::RunBackend(
   llvm_module->setTargetTriple((*jit)->target_triple().getTriple());
 
   HloComputation* entry_computation = module->entry_computation();
-  absl::flat_hash_map<const HloInstruction*, int64_t>
+  abslx::flat_hash_map<const HloInstruction*, int64_t>
       instruction_to_profile_idx;
-  absl::flat_hash_map<const HloComputation*, int64_t>
+  abslx::flat_hash_map<const HloComputation*, int64_t>
       computation_to_profile_idx;
   std::unique_ptr<HloProfileIndexMap> hlo_profile_index_map;
   std::unique_ptr<HloProfilePrinterData> hlo_profile_printer_data;
@@ -1294,7 +1294,7 @@ CpuCompiler::CompileAheadOfTime(std::unique_ptr<HloModuleGroup> module_group,
   std::vector<std::unique_ptr<HloModule>> modules =
       module_group->ConsumeModules();
 
-  absl::call_once(llvm_command_line_options_initialized,
+  abslx::call_once(llvm_command_line_options_initialized,
                   &InitializeLLVMCommandLineOptions, modules[0]->config());
 
   // We can pass just one llvm::TargetOptions when we compile the LLVM module,
@@ -1370,7 +1370,7 @@ CpuCompiler::CompileAheadOfTime(std::unique_ptr<HloModuleGroup> module_group,
   }
   llvm::CodeGenOpt::Level opt_level = CodeGenOptLevel(modules[0]->config());
   std::unique_ptr<llvm::TargetMachine> target_machine =
-      absl::WrapUnique(target->createTargetMachine(
+      abslx::WrapUnique(target->createTargetMachine(
           triple.getTriple(), options.cpu_name(), options.features(),
           CompilerTargetOptions(modules[0]->config()), reloc_model, llvm::None,
           opt_level));
@@ -1409,9 +1409,9 @@ CpuCompiler::CompileAheadOfTime(std::unique_ptr<HloModuleGroup> module_group,
     }
     DumpHloModuleIfEnabled(*module, *assignment, "cpu_after_optimizations");
 
-    absl::flat_hash_map<const HloInstruction*, int64_t>
+    abslx::flat_hash_map<const HloInstruction*, int64_t>
         instruction_to_profile_idx;
-    absl::flat_hash_map<const HloComputation*, int64_t>
+    abslx::flat_hash_map<const HloComputation*, int64_t>
         computation_to_profile_idx;
     std::unique_ptr<HloProfileIndexMap> hlo_profile_index_map;
     std::unique_ptr<HloProfilePrinterData> hlo_profile_printer_data;
@@ -1517,7 +1517,7 @@ CpuCompiler::CompileAheadOfTime(std::unique_ptr<HloModuleGroup> module_group,
         return;
       }
       DumpToFileInDir(*module, /*file_prefix=*/"", /*file_suffix=*/"o",
-                      absl::string_view(obj_file.getData().data(),
+                      abslx::string_view(obj_file.getData().data(),
                                         obj_file.getData().size()));
     };
 

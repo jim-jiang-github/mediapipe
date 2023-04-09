@@ -39,10 +39,10 @@ std::string DtypeAndShapesToString(
     // Note that it is a bit unfortunate to return int/enum as dtype, given we
     // can't directly use DataTypeString due to circular dependency.
     dtype_and_shape_strings.push_back(
-        absl::StrFormat("DType enum: %d, Shape: %s", dtype_and_shape.dtype,
+        abslx::StrFormat("DType enum: %d, Shape: %s", dtype_and_shape.dtype,
                         dtype_and_shape.shape.DebugString()));
   }
-  return absl::StrFormat("[ %s ]", absl::StrJoin(dtype_and_shape_strings, ","));
+  return abslx::StrFormat("[ %s ]", abslx::StrJoin(dtype_and_shape_strings, ","));
 }
 }  // namespace
 
@@ -111,7 +111,7 @@ bool ResourceHandle::ParseFromString(const string& s) {
 }
 
 string ResourceHandle::DebugString() const {
-  return absl::StrFormat(
+  return abslx::StrFormat(
       "device: %s container: %s name: %s hash_code: 0x%X maybe_type_name %s, "
       "dtype and shapes : %s",
       device(), container(), name(), hash_code(),
@@ -119,7 +119,7 @@ string ResourceHandle::DebugString() const {
       DtypeAndShapesToString(dtypes_and_shapes()));
 }
 string ResourceHandle::SummarizeValue() const {
-  return absl::StrFormat(
+  return abslx::StrFormat(
       "ResourceHandle(name=\"%s\", device=\"%s\", container=\"%s\", "
       "type=\"%s\", dtype and shapes : \"%s\")",
       name(), device(), container(), port::Demangle(maybe_type_name()),
@@ -130,7 +130,7 @@ ResourceHandle ResourceHandle::MakeRefCountingHandle(
     ResourceBase* resource, const string& device_name,
     const TypeIndex& type_index,
     const std::vector<DtypeAndPartialTensorShape>& dtypes_and_shapes,
-    const absl::optional<ManagedStackTrace>& definition_stack_trace) {
+    const abslx::optional<ManagedStackTrace>& definition_stack_trace) {
   ResourceHandle result;
   result.resource_.reset(resource, /*add_ref=*/false);
   result.set_device(device_name);
@@ -139,7 +139,7 @@ ResourceHandle ResourceHandle::MakeRefCountingHandle(
   result.set_container("Anonymous");
   result.set_definition_stack_trace(definition_stack_trace);
   result.set_name(
-      absl::StrFormat("Resource-%d-at-%p", GenerateUniqueId(), resource));
+      abslx::StrFormat("Resource-%d-at-%p", GenerateUniqueId(), resource));
   result.set_hash_code(type_index.hash_code());
   result.set_maybe_type_name(type_index.name());
   result.set_dtypes_and_shapes(dtypes_and_shapes);

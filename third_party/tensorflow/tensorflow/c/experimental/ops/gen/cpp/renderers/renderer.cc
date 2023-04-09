@@ -48,29 +48,29 @@ Renderer& Renderer::Statement(const string& text) {
     LOG(WARNING) << "Superfluous terminating ';' in '" << text << "'";
     context_.code.AddLineWithIndent(text);
   } else {
-    context_.code.AddLineWithIndent(absl::StrCat(text, ";"));
+    context_.code.AddLineWithIndent(abslx::StrCat(text, ";"));
   }
   return *this;
 }
 
 Renderer& Renderer::TFStatement(const string& text) {
-  return Statement(absl::Substitute("TF_RETURN_IF_ERROR($0)", text));
+  return Statement(abslx::Substitute("TF_RETURN_IF_ERROR($0)", text));
 }
 
 Renderer& Renderer::CommentLine(const string& text) {
-  context_.code.AddLineWithIndent(absl::StrCat("// ", text));
+  context_.code.AddLineWithIndent(abslx::StrCat("// ", text));
   return *this;
 }
 
 Renderer& Renderer::BlockOpen(const string& text) {
-  context_.code.AddLineWithIndent(absl::StrCat(text, " {"));
+  context_.code.AddLineWithIndent(abslx::StrCat(text, " {"));
   context_.code.IncreaseIndent();
   return *this;
 }
 
 Renderer& Renderer::BlockClose(const string& text) {
   context_.code.DecreaseIndent();
-  context_.code.AddLineWithIndent(absl::StrCat("}", text));
+  context_.code.AddLineWithIndent(abslx::StrCat("}", text));
   return *this;
 }
 

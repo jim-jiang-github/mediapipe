@@ -18,7 +18,7 @@
 namespace tflite {
 namespace gpu {
 
-absl::Status LandmarksToTransformMatrixOperationParser::IsSupported(
+abslx::Status LandmarksToTransformMatrixOperationParser::IsSupported(
     const TfLiteContext* context, const TfLiteNode* tflite_node,
     const TfLiteRegistration* registration) {
   RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 2));
@@ -26,7 +26,7 @@ absl::Status LandmarksToTransformMatrixOperationParser::IsSupported(
                             /*outputs=*/1);
 }
 
-absl::Status LandmarksToTransformMatrixOperationParser::Parse(
+abslx::Status LandmarksToTransformMatrixOperationParser::Parse(
     const TfLiteNode* tflite_node, const TfLiteRegistration* registration,
     GraphFloat32* graph, ObjectReader* reader) {
   Node* node = graph->NewNode();
@@ -48,17 +48,17 @@ absl::Status LandmarksToTransformMatrixOperationParser::Parse(
         &attr, &output_shape));
     node->operation.attributes = attr;
   } else {
-    return absl::UnimplementedError(
+    return abslx::UnimplementedError(
         "Landmarks To Transform Matrix operation can be of version 1 or 2 "
         "only.");
   }
 
   auto output_value = graph->FindOutputs(node->id)[0];
   output_value->tensor.shape = output_shape;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ParseLandmarksToTransformMatrixV1Attributes(
+abslx::Status ParseLandmarksToTransformMatrixV1Attributes(
     const void* data, uint32_t data_size,
     LandmarksToTransformMatrixV1Attributes* attr, BHWC* output_shape) {
   const flexbuffers::Map m =
@@ -87,10 +87,10 @@ absl::Status ParseLandmarksToTransformMatrixV1Attributes(
                               subset[subset.size() - 1].AsInt32());
   }
   *output_shape = BHWC(1, 1, 4, 4);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ParseLandmarksToTransformMatrixV2Attributes(
+abslx::Status ParseLandmarksToTransformMatrixV2Attributes(
     const void* data, uint32_t data_size,
     LandmarksToTransformMatrixV2Attributes* attr, BHWC* output_shape) {
   const flexbuffers::Map m =
@@ -116,7 +116,7 @@ absl::Status ParseLandmarksToTransformMatrixV2Attributes(
   attr->scale_y = m["scale_y"].AsFloat();
 
   *output_shape = BHWC(1, 1, 4, 4);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 TransformResult LandmarksToTransformMatrixV2ToV2WithMul::ApplyToNode(
@@ -127,7 +127,7 @@ TransformResult LandmarksToTransformMatrixV2ToV2WithMul::ApplyToNode(
     return {TransformStatus::SKIPPED, ""};
   }
   auto* landmarks2tm_attr =
-      absl::any_cast<LandmarksToTransformMatrixV2Attributes>(
+      abslx::any_cast<LandmarksToTransformMatrixV2Attributes>(
           &node->operation.attributes);
   if (!landmarks2tm_attr) {
     return {TransformStatus::SKIPPED, ""};
@@ -142,12 +142,12 @@ TransformResult LandmarksToTransformMatrixV2ToV2WithMul::ApplyToNode(
     return {TransformStatus::SKIPPED, ""};
   }
   const auto& mul_attr =
-      absl::any_cast<const ElementwiseAttributes&>(mul->operation.attributes);
+      abslx::any_cast<const ElementwiseAttributes&>(mul->operation.attributes);
   float scalar = 0.0;
-  if (!absl::holds_alternative<float>(mul_attr.param)) {
+  if (!abslx::holds_alternative<float>(mul_attr.param)) {
     return {TransformStatus::SKIPPED, ""};
   } else {
-    scalar = absl::get<float>(mul_attr.param);
+    scalar = abslx::get<float>(mul_attr.param);
   }
   auto mul_inputs = graph->FindInputs(mul->id);
   if (mul_inputs.size() != 1) {
@@ -160,14 +160,14 @@ TransformResult LandmarksToTransformMatrixV2ToV2WithMul::ApplyToNode(
   }
   // Start modifying the graph.
   {
-    absl::Status status = RemoveSimpleNodeKeepInput(graph, reshape);
+    abslx::Status status = RemoveSimpleNodeKeepInput(graph, reshape);
     if (!status.ok()) {
       return {TransformStatus::INVALID,
               "Unable to remove a node: " + std::string(status.message())};
     }
   }
   {
-    absl::Status status = RemoveSimpleNodeKeepInput(graph, mul);
+    abslx::Status status = RemoveSimpleNodeKeepInput(graph, mul);
     if (!status.ok()) {
       return {TransformStatus::INVALID,
               "Unable to remove a node: " + std::string(status.message())};

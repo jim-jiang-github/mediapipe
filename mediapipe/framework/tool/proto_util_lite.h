@@ -70,7 +70,7 @@ class ProtoUtilLite {
     FieldAccess(uint32 field_id, FieldType field_type);
 
     // Specifies the original serialized protobuf message.
-    absl::Status SetMessage(const FieldValue& message);
+    abslx::Status SetMessage(const FieldValue& message);
 
     // Returns the serialized protobuf message with updated field values.
     void GetMessage(FieldValue* result);
@@ -89,48 +89,48 @@ class ProtoUtilLite {
 
   // Replace a range of field values nested within a protobuf.
   // Starting at the proto_path index, "length" values are replaced.
-  static absl::Status ReplaceFieldRange(
+  static abslx::Status ReplaceFieldRange(
       FieldValue* message, ProtoPath proto_path, int length,
       FieldType field_type, const std::vector<FieldValue>& field_values);
 
   // Retrieve a range of field values nested within a protobuf.
   // Starting at the proto_path index, "length" values are retrieved.
-  static absl::Status GetFieldRange(const FieldValue& message,
+  static abslx::Status GetFieldRange(const FieldValue& message,
                                     ProtoPath proto_path, int length,
                                     FieldType field_type,
                                     std::vector<FieldValue>* field_values);
 
   // Returns the number of field values in a repeated protobuf field.
-  static absl::Status GetFieldCount(const FieldValue& message,
+  static abslx::Status GetFieldCount(const FieldValue& message,
                                     ProtoPath proto_path, FieldType field_type,
                                     int* field_count);
 
   // Serialize one or more protobuf field values from text.
-  static absl::Status Serialize(const std::vector<std::string>& text_values,
+  static abslx::Status Serialize(const std::vector<std::string>& text_values,
                                 FieldType field_type,
                                 std::vector<FieldValue>* result);
 
   // Deserialize one or more protobuf field values to text.
-  static absl::Status Deserialize(const std::vector<FieldValue>& field_values,
+  static abslx::Status Deserialize(const std::vector<FieldValue>& field_values,
                                   FieldType field_type,
                                   std::vector<std::string>* result);
 
   // Write a protobuf field value from a typed FieldData value.
-  static absl::Status WriteValue(const mediapipe::FieldData& value,
+  static abslx::Status WriteValue(const mediapipe::FieldData& value,
                                  FieldType field_type,
                                  std::string* field_bytes);
 
   // Read a protobuf field value into a typed FieldData value.
-  static absl::Status ReadValue(absl::string_view field_bytes,
+  static abslx::Status ReadValue(abslx::string_view field_bytes,
                                 FieldType field_type,
-                                absl::string_view message_type,
+                                abslx::string_view message_type,
                                 mediapipe::FieldData* result);
 
   // Returns the protobuf type-url for a protobuf type-name.
-  static std::string TypeUrl(absl::string_view type_name);
+  static std::string TypeUrl(abslx::string_view type_name);
 
   // Returns the protobuf type-name for a protobuf type-url.
-  static std::string ParseTypeUrl(absl::string_view type_url);
+  static std::string ParseTypeUrl(abslx::string_view type_url);
 };
 
 }  // namespace tool

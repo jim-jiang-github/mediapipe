@@ -59,7 +59,7 @@ class GenericCachingChannelCache : public ChannelCacheT {
 
     {
       mutex_lock l(mu_);
-      typename absl::flat_hash_map<string, ChannelState>::iterator iter;
+      typename abslx::flat_hash_map<string, ChannelState>::iterator iter;
       bool was_inserted;
       std::tie(iter, was_inserted) = channels_.insert({target, new_chan_state});
       VLOG(2) << "Channel cache for target: " << target
@@ -95,7 +95,7 @@ class GenericCachingChannelCache : public ChannelCacheT {
   const int num_channels_per_target_;
   // TODO(zhifengc): Eviction when the map becomes too big.
   mutex mu_;
-  absl::flat_hash_map<string, ChannelState> channels_ TF_GUARDED_BY(mu_);
+  abslx::flat_hash_map<string, ChannelState> channels_ TF_GUARDED_BY(mu_);
 };
 
 }  // namespace tensorflow

@@ -121,7 +121,7 @@ class CpuGpuFusionTest : public HloTestBase {
     hlos[0] = builder.AddInstruction(std::move(root_hlo));
     hlo_module->AddEntryComputation(builder.Build())
         ->CreateFusionInstruction(
-            absl::Span<HloInstruction* const>(hlos).subspan(0, Arity + 1),
+            abslx::Span<HloInstruction* const>(hlos).subspan(0, Arity + 1),
             HloInstruction::FusionKind::kLoop);
 
     auto expected = LiteralUtil::CreateR2FromArray2D(answer_data);
@@ -135,9 +135,9 @@ class CpuGpuFusionTest : public HloTestBase {
 
  private:
   float ComputeElementwiseAnswerFloat(HloOpcode opcode,
-                                      absl::Span<const float> xs);
+                                      abslx::Span<const float> xs);
   bool ComputeElementwiseAnswerCompare(ComparisonDirection direction,
-                                       absl::Span<const float> xs);
+                                       abslx::Span<const float> xs);
   DebugOptions GetDebugOptionsForTest() override {
     DebugOptions debug_options = HloTestBase::GetDebugOptionsForTest();
     debug_options.add_xla_disable_hlo_passes("layout-assignment");
@@ -146,7 +146,7 @@ class CpuGpuFusionTest : public HloTestBase {
 };
 
 float CpuGpuFusionTest::ComputeElementwiseAnswerFloat(
-    HloOpcode opcode, absl::Span<const float> xs) {
+    HloOpcode opcode, abslx::Span<const float> xs) {
   switch (opcode) {
     case HloOpcode::kAdd:
       return xs[0] + xs[1];
@@ -170,7 +170,7 @@ float CpuGpuFusionTest::ComputeElementwiseAnswerFloat(
 }
 
 bool CpuGpuFusionTest::ComputeElementwiseAnswerCompare(
-    ComparisonDirection direction, absl::Span<const float> xs) {
+    ComparisonDirection direction, abslx::Span<const float> xs) {
   switch (direction) {
     case ComparisonDirection::kEq:
       return xs[0] == xs[1];

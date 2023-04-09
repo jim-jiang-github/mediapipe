@@ -42,8 +42,8 @@ namespace audio_dsp {
 template <typename DataType>
 class CircularBuffer {
  public:
-  using Span = absl::Span<const DataType>;
-  using MutableSpan = absl::Span<DataType>;
+  using Span = abslx::Span<const DataType>;
+  using MutableSpan = abslx::Span<DataType>;
 
   CircularBuffer()
       : capacity_(0 /*uninitialized*/) {}
@@ -112,7 +112,7 @@ class CircularBuffer {
   void Read(int num_to_read, std::vector<DataType>* output) {
     output->resize(num_to_read);
     std::pair<Span, Span> buffers = Read(output->size());
-    CopySpansToBuffer(buffers, absl::MakeSpan(*output));
+    CopySpansToBuffer(buffers, abslx::MakeSpan(*output));
   }
 
   // Similar to above, the returned array slices give direct, immutable access
@@ -139,7 +139,7 @@ class CircularBuffer {
   void Peek(int num_to_read, std::vector<DataType>* output) const {
     output->resize(num_to_read);
     std::pair<Span, Span> buffers = Peek(output->size());
-    CopySpansToBuffer(buffers, absl::MakeSpan(*output));
+    CopySpansToBuffer(buffers, abslx::MakeSpan(*output));
   }
 
   std::pair<Span, Span> Peek(int num_to_read) const {
@@ -225,7 +225,7 @@ class PlanarCircularBuffer {
   }
 
   // input.size() / num_channels must be less than size()!
-  void Write(const absl::Span<std::vector<DataType>> input) {
+  void Write(const abslx::Span<std::vector<DataType>> input) {
     for (int i = 0; i < num_channels_; ++i) {
       DCHECK_EQ(input[i].size(), input[0].size());
       buffers_[i].Write(input[i]);

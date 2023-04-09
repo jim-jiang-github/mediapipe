@@ -33,24 +33,24 @@ namespace dtensor {
 template <typename T>
 using StatusOr = stream_executor::port::StatusOr<T>;
 
-inline Status WithContext(const Status& ds, absl::string_view file,
-                          int line_number, absl::string_view context = "") {
+inline Status WithContext(const Status& ds, abslx::string_view file,
+                          int line_number, abslx::string_view context = "") {
   if (ds.ok()) {
     return ds;
   }
-  return Status(ds.code(), absl::StrCat(ds.error_message(), "\n", file, ":",
+  return Status(ds.code(), abslx::StrCat(ds.error_message(), "\n", file, ":",
                                         line_number, " :: ", context));
 }
 
 template <class T>
-inline StatusOr<T> WithContext(StatusOr<T>&& ds, absl::string_view file,
+inline StatusOr<T> WithContext(StatusOr<T>&& ds, abslx::string_view file,
                                int line_number,
-                               absl::string_view context = "") {
+                               abslx::string_view context = "") {
   if (ds.ok()) {
     return ds;
   }
   return Status(ds.status().code(),
-                absl::StrCat(ds.status().error_message(), "\n", file, ":",
+                abslx::StrCat(ds.status().error_message(), "\n", file, ":",
                              line_number, " :: ", context));
 }
 

@@ -80,7 +80,7 @@ bool operator!=(const Mallocator<T>&, const Mallocator<U>&) {
 TEST(StringViewTest, Ctor) {
   {
     // Null.
-    absl::string_view s10;
+    abslx::string_view s10;
     EXPECT_TRUE(s10.data() == nullptr);
     EXPECT_EQ(0, s10.length());
   }
@@ -88,17 +88,17 @@ TEST(StringViewTest, Ctor) {
   {
     // const char* without length.
     const char* hello = "hello";
-    absl::string_view s20(hello);
+    abslx::string_view s20(hello);
     EXPECT_TRUE(s20.data() == hello);
     EXPECT_EQ(5, s20.length());
 
     // const char* with length.
-    absl::string_view s21(hello, 4);
+    abslx::string_view s21(hello, 4);
     EXPECT_TRUE(s21.data() == hello);
     EXPECT_EQ(4, s21.length());
 
     // Not recommended, but valid C++
-    absl::string_view s22(hello, 6);
+    abslx::string_view s22(hello, 6);
     EXPECT_TRUE(s22.data() == hello);
     EXPECT_EQ(6, s22.length());
   }
@@ -106,7 +106,7 @@ TEST(StringViewTest, Ctor) {
   {
     // std::string.
     std::string hola = "hola";
-    absl::string_view s30(hola);
+    abslx::string_view s30(hola);
     EXPECT_TRUE(s30.data() == hola.data());
     EXPECT_EQ(4, s30.length());
 
@@ -114,7 +114,7 @@ TEST(StringViewTest, Ctor) {
     hola.push_back('\0');
     hola.append("h2");
     hola.push_back('\0');
-    absl::string_view s31(hola);
+    abslx::string_view s31(hola);
     EXPECT_TRUE(s31.data() == hola.data());
     EXPECT_EQ(8, s31.length());
   }
@@ -125,22 +125,22 @@ TEST(StringViewTest, Ctor) {
     mstring str1("BUNGIE-JUMPING!");
     const mstring str2("SLEEPING!");
 
-    absl::string_view s1(str1);
+    abslx::string_view s1(str1);
     s1.remove_prefix(strlen("BUNGIE-JUM"));
 
-    absl::string_view s2(str2);
+    abslx::string_view s2(str2);
     s2.remove_prefix(strlen("SLEE"));
 
     EXPECT_EQ(s1, s2);
     EXPECT_EQ(s1, "PING!");
   }
 
-  // TODO(mec): absl::string_view(const absl::string_view&);
+  // TODO(mec): abslx::string_view(const abslx::string_view&);
 }
 
 TEST(StringViewTest, Swap) {
-  absl::string_view a("a");
-  absl::string_view b("bbb");
+  abslx::string_view a("a");
+  abslx::string_view b("bbb");
   EXPECT_TRUE(noexcept(a.swap(b)));
   a.swap(b);
   EXPECT_EQ(a, "bbb");
@@ -155,11 +155,11 @@ TEST(StringViewTest, STLComparator) {
   std::string s2("bar");
   std::string s3("baz");
 
-  absl::string_view p1(s1);
-  absl::string_view p2(s2);
-  absl::string_view p3(s3);
+  abslx::string_view p1(s1);
+  abslx::string_view p2(s2);
+  abslx::string_view p3(s3);
 
-  typedef std::map<absl::string_view, int> TestMap;
+  typedef std::map<abslx::string_view, int> TestMap;
   TestMap map;
 
   map.insert(std::make_pair(p1, 0));
@@ -194,13 +194,13 @@ TEST(StringViewTest, STLComparator) {
 }
 
 #define COMPARE(result, op, x, y)                                      \
-  EXPECT_EQ(result, absl::string_view((x)) op absl::string_view((y))); \
-  EXPECT_EQ(result, absl::string_view((x)).compare(absl::string_view((y))) op 0)
+  EXPECT_EQ(result, abslx::string_view((x)) op abslx::string_view((y))); \
+  EXPECT_EQ(result, abslx::string_view((x)).compare(abslx::string_view((y))) op 0)
 
 TEST(StringViewTest, ComparisonOperators) {
   COMPARE(true, ==, "",   "");
-  COMPARE(true, ==, "", absl::string_view());
-  COMPARE(true, ==, absl::string_view(), "");
+  COMPARE(true, ==, "", abslx::string_view());
+  COMPARE(true, ==, abslx::string_view(), "");
   COMPARE(true, ==, "a",  "a");
   COMPARE(true, ==, "aa", "aa");
   COMPARE(false, ==, "a",  "");
@@ -287,7 +287,7 @@ TEST(StringViewTest, ComparisonOperatorsByCharacterPosition) {
 #undef COMPARE
 
 // Sadly, our users often confuse std::string::npos with
-// absl::string_view::npos; So much so that we test here that they are the same.
+// abslx::string_view::npos; So much so that we test here that they are the same.
 // They need to both be unsigned, and both be the maximum-valued integer of
 // their type.
 
@@ -301,26 +301,26 @@ struct is_type {
 };
 
 TEST(StringViewTest, NposMatchesStdStringView) {
-  EXPECT_EQ(absl::string_view::npos, std::string::npos);
+  EXPECT_EQ(abslx::string_view::npos, std::string::npos);
 
-  EXPECT_TRUE(is_type<size_t>::same(absl::string_view::npos));
+  EXPECT_TRUE(is_type<size_t>::same(abslx::string_view::npos));
   EXPECT_FALSE(is_type<size_t>::same(""));
 
-  // Make sure absl::string_view::npos continues to be a header constant.
-  char test[absl::string_view::npos & 1] = {0};
+  // Make sure abslx::string_view::npos continues to be a header constant.
+  char test[abslx::string_view::npos & 1] = {0};
   EXPECT_EQ(0, test[0]);
 }
 
 TEST(StringViewTest, STL1) {
-  const absl::string_view a("abcdefghijklmnopqrstuvwxyz");
-  const absl::string_view b("abc");
-  const absl::string_view c("xyz");
-  const absl::string_view d("foobar");
-  const absl::string_view e;
+  const abslx::string_view a("abcdefghijklmnopqrstuvwxyz");
+  const abslx::string_view b("abc");
+  const abslx::string_view c("xyz");
+  const abslx::string_view d("foobar");
+  const abslx::string_view e;
   std::string temp("123");
   temp += '\0';
   temp += "456";
-  const absl::string_view f(temp);
+  const abslx::string_view f(temp);
 
   EXPECT_EQ(a[6], 'g');
   EXPECT_EQ(b[0], 'a');
@@ -374,48 +374,48 @@ TEST(StringViewTest, STL1) {
 #ifdef ABSL_HAVE_EXCEPTIONS
   EXPECT_THROW(a.copy(buf, 1, 27), std::out_of_range);
 #else
-  ABSL_EXPECT_DEATH_IF_SUPPORTED(a.copy(buf, 1, 27), "absl::string_view::copy");
+  ABSL_EXPECT_DEATH_IF_SUPPORTED(a.copy(buf, 1, 27), "abslx::string_view::copy");
 #endif
 }
 
 // Separated from STL1() because some compilers produce an overly
 // large stack frame for the combined function.
 TEST(StringViewTest, STL2) {
-  const absl::string_view a("abcdefghijklmnopqrstuvwxyz");
-  const absl::string_view b("abc");
-  const absl::string_view c("xyz");
-  absl::string_view d("foobar");
-  const absl::string_view e;
-  const absl::string_view f(
+  const abslx::string_view a("abcdefghijklmnopqrstuvwxyz");
+  const abslx::string_view b("abc");
+  const abslx::string_view c("xyz");
+  abslx::string_view d("foobar");
+  const abslx::string_view e;
+  const abslx::string_view f(
       "123"
       "\0"
       "456",
       7);
 
-  d = absl::string_view();
+  d = abslx::string_view();
   EXPECT_EQ(d.size(), 0);
   EXPECT_TRUE(d.empty());
   EXPECT_TRUE(d.data() == nullptr);
   EXPECT_TRUE(d.begin() == d.end());
 
   EXPECT_EQ(a.find(b), 0);
-  EXPECT_EQ(a.find(b, 1), absl::string_view::npos);
+  EXPECT_EQ(a.find(b, 1), abslx::string_view::npos);
   EXPECT_EQ(a.find(c), 23);
   EXPECT_EQ(a.find(c, 9), 23);
-  EXPECT_EQ(a.find(c, absl::string_view::npos), absl::string_view::npos);
-  EXPECT_EQ(b.find(c), absl::string_view::npos);
-  EXPECT_EQ(b.find(c, absl::string_view::npos), absl::string_view::npos);
+  EXPECT_EQ(a.find(c, abslx::string_view::npos), abslx::string_view::npos);
+  EXPECT_EQ(b.find(c), abslx::string_view::npos);
+  EXPECT_EQ(b.find(c, abslx::string_view::npos), abslx::string_view::npos);
   EXPECT_EQ(a.find(d), 0);
   EXPECT_EQ(a.find(e), 0);
   EXPECT_EQ(a.find(d, 12), 12);
   EXPECT_EQ(a.find(e, 17), 17);
-  absl::string_view g("xx not found bb");
-  EXPECT_EQ(a.find(g), absl::string_view::npos);
+  abslx::string_view g("xx not found bb");
+  EXPECT_EQ(a.find(g), abslx::string_view::npos);
   // empty string nonsense
-  EXPECT_EQ(d.find(b), absl::string_view::npos);
-  EXPECT_EQ(e.find(b), absl::string_view::npos);
-  EXPECT_EQ(d.find(b, 4), absl::string_view::npos);
-  EXPECT_EQ(e.find(b, 7), absl::string_view::npos);
+  EXPECT_EQ(d.find(b), abslx::string_view::npos);
+  EXPECT_EQ(e.find(b), abslx::string_view::npos);
+  EXPECT_EQ(d.find(b, 4), abslx::string_view::npos);
+  EXPECT_EQ(e.find(b, 7), abslx::string_view::npos);
 
   size_t empty_search_pos = std::string().find(std::string());
   EXPECT_EQ(d.find(d), empty_search_pos);
@@ -430,42 +430,42 @@ TEST(StringViewTest, STL2) {
   EXPECT_EQ(a.find('a'), 0);
   EXPECT_EQ(a.find('c'), 2);
   EXPECT_EQ(a.find('z'), 25);
-  EXPECT_EQ(a.find('$'), absl::string_view::npos);
-  EXPECT_EQ(a.find('\0'), absl::string_view::npos);
+  EXPECT_EQ(a.find('$'), abslx::string_view::npos);
+  EXPECT_EQ(a.find('\0'), abslx::string_view::npos);
   EXPECT_EQ(f.find('\0'), 3);
   EXPECT_EQ(f.find('3'), 2);
   EXPECT_EQ(f.find('5'), 5);
   EXPECT_EQ(g.find('o'), 4);
   EXPECT_EQ(g.find('o', 4), 4);
   EXPECT_EQ(g.find('o', 5), 8);
-  EXPECT_EQ(a.find('b', 5), absl::string_view::npos);
+  EXPECT_EQ(a.find('b', 5), abslx::string_view::npos);
   // empty string nonsense
-  EXPECT_EQ(d.find('\0'), absl::string_view::npos);
-  EXPECT_EQ(e.find('\0'), absl::string_view::npos);
-  EXPECT_EQ(d.find('\0', 4), absl::string_view::npos);
-  EXPECT_EQ(e.find('\0', 7), absl::string_view::npos);
-  EXPECT_EQ(d.find('x'), absl::string_view::npos);
-  EXPECT_EQ(e.find('x'), absl::string_view::npos);
-  EXPECT_EQ(d.find('x', 4), absl::string_view::npos);
-  EXPECT_EQ(e.find('x', 7), absl::string_view::npos);
+  EXPECT_EQ(d.find('\0'), abslx::string_view::npos);
+  EXPECT_EQ(e.find('\0'), abslx::string_view::npos);
+  EXPECT_EQ(d.find('\0', 4), abslx::string_view::npos);
+  EXPECT_EQ(e.find('\0', 7), abslx::string_view::npos);
+  EXPECT_EQ(d.find('x'), abslx::string_view::npos);
+  EXPECT_EQ(e.find('x'), abslx::string_view::npos);
+  EXPECT_EQ(d.find('x', 4), abslx::string_view::npos);
+  EXPECT_EQ(e.find('x', 7), abslx::string_view::npos);
 
   EXPECT_EQ(a.rfind(b), 0);
   EXPECT_EQ(a.rfind(b, 1), 0);
   EXPECT_EQ(a.rfind(c), 23);
-  EXPECT_EQ(a.rfind(c, 22), absl::string_view::npos);
-  EXPECT_EQ(a.rfind(c, 1), absl::string_view::npos);
-  EXPECT_EQ(a.rfind(c, 0), absl::string_view::npos);
-  EXPECT_EQ(b.rfind(c), absl::string_view::npos);
-  EXPECT_EQ(b.rfind(c, 0), absl::string_view::npos);
+  EXPECT_EQ(a.rfind(c, 22), abslx::string_view::npos);
+  EXPECT_EQ(a.rfind(c, 1), abslx::string_view::npos);
+  EXPECT_EQ(a.rfind(c, 0), abslx::string_view::npos);
+  EXPECT_EQ(b.rfind(c), abslx::string_view::npos);
+  EXPECT_EQ(b.rfind(c, 0), abslx::string_view::npos);
   EXPECT_EQ(a.rfind(d), std::string(a).rfind(std::string()));
   EXPECT_EQ(a.rfind(e), std::string(a).rfind(std::string()));
   EXPECT_EQ(a.rfind(d, 12), 12);
   EXPECT_EQ(a.rfind(e, 17), 17);
-  EXPECT_EQ(a.rfind(g), absl::string_view::npos);
-  EXPECT_EQ(d.rfind(b), absl::string_view::npos);
-  EXPECT_EQ(e.rfind(b), absl::string_view::npos);
-  EXPECT_EQ(d.rfind(b, 4), absl::string_view::npos);
-  EXPECT_EQ(e.rfind(b, 7), absl::string_view::npos);
+  EXPECT_EQ(a.rfind(g), abslx::string_view::npos);
+  EXPECT_EQ(d.rfind(b), abslx::string_view::npos);
+  EXPECT_EQ(e.rfind(b), abslx::string_view::npos);
+  EXPECT_EQ(d.rfind(b, 4), abslx::string_view::npos);
+  EXPECT_EQ(e.rfind(b, 7), abslx::string_view::npos);
   // empty string nonsense
   EXPECT_EQ(d.rfind(d, 4), std::string().rfind(std::string()));
   EXPECT_EQ(e.rfind(d, 7), std::string().rfind(std::string()));
@@ -477,64 +477,64 @@ TEST(StringViewTest, STL2) {
   EXPECT_EQ(e.rfind(e), std::string().rfind(std::string()));
 
   EXPECT_EQ(g.rfind('o'), 8);
-  EXPECT_EQ(g.rfind('q'), absl::string_view::npos);
+  EXPECT_EQ(g.rfind('q'), abslx::string_view::npos);
   EXPECT_EQ(g.rfind('o', 8), 8);
   EXPECT_EQ(g.rfind('o', 7), 4);
-  EXPECT_EQ(g.rfind('o', 3), absl::string_view::npos);
+  EXPECT_EQ(g.rfind('o', 3), abslx::string_view::npos);
   EXPECT_EQ(f.rfind('\0'), 3);
   EXPECT_EQ(f.rfind('\0', 12), 3);
   EXPECT_EQ(f.rfind('3'), 2);
   EXPECT_EQ(f.rfind('5'), 5);
   // empty string nonsense
-  EXPECT_EQ(d.rfind('o'), absl::string_view::npos);
-  EXPECT_EQ(e.rfind('o'), absl::string_view::npos);
-  EXPECT_EQ(d.rfind('o', 4), absl::string_view::npos);
-  EXPECT_EQ(e.rfind('o', 7), absl::string_view::npos);
+  EXPECT_EQ(d.rfind('o'), abslx::string_view::npos);
+  EXPECT_EQ(e.rfind('o'), abslx::string_view::npos);
+  EXPECT_EQ(d.rfind('o', 4), abslx::string_view::npos);
+  EXPECT_EQ(e.rfind('o', 7), abslx::string_view::npos);
 }
 
 // Continued from STL2
 TEST(StringViewTest, STL2FindFirst) {
-  const absl::string_view a("abcdefghijklmnopqrstuvwxyz");
-  const absl::string_view b("abc");
-  const absl::string_view c("xyz");
-  absl::string_view d("foobar");
-  const absl::string_view e;
-  const absl::string_view f(
+  const abslx::string_view a("abcdefghijklmnopqrstuvwxyz");
+  const abslx::string_view b("abc");
+  const abslx::string_view c("xyz");
+  abslx::string_view d("foobar");
+  const abslx::string_view e;
+  const abslx::string_view f(
       "123"
       "\0"
       "456",
       7);
-  absl::string_view g("xx not found bb");
+  abslx::string_view g("xx not found bb");
 
-  d = absl::string_view();
+  d = abslx::string_view();
   EXPECT_EQ(a.find_first_of(b), 0);
   EXPECT_EQ(a.find_first_of(b, 0), 0);
   EXPECT_EQ(a.find_first_of(b, 1), 1);
   EXPECT_EQ(a.find_first_of(b, 2), 2);
-  EXPECT_EQ(a.find_first_of(b, 3), absl::string_view::npos);
+  EXPECT_EQ(a.find_first_of(b, 3), abslx::string_view::npos);
   EXPECT_EQ(a.find_first_of(c), 23);
   EXPECT_EQ(a.find_first_of(c, 23), 23);
   EXPECT_EQ(a.find_first_of(c, 24), 24);
   EXPECT_EQ(a.find_first_of(c, 25), 25);
-  EXPECT_EQ(a.find_first_of(c, 26), absl::string_view::npos);
+  EXPECT_EQ(a.find_first_of(c, 26), abslx::string_view::npos);
   EXPECT_EQ(g.find_first_of(b), 13);
   EXPECT_EQ(g.find_first_of(c), 0);
-  EXPECT_EQ(a.find_first_of(f), absl::string_view::npos);
-  EXPECT_EQ(f.find_first_of(a), absl::string_view::npos);
+  EXPECT_EQ(a.find_first_of(f), abslx::string_view::npos);
+  EXPECT_EQ(f.find_first_of(a), abslx::string_view::npos);
   // empty string nonsense
-  EXPECT_EQ(a.find_first_of(d), absl::string_view::npos);
-  EXPECT_EQ(a.find_first_of(e), absl::string_view::npos);
-  EXPECT_EQ(d.find_first_of(b), absl::string_view::npos);
-  EXPECT_EQ(e.find_first_of(b), absl::string_view::npos);
-  EXPECT_EQ(d.find_first_of(d), absl::string_view::npos);
-  EXPECT_EQ(e.find_first_of(d), absl::string_view::npos);
-  EXPECT_EQ(d.find_first_of(e), absl::string_view::npos);
-  EXPECT_EQ(e.find_first_of(e), absl::string_view::npos);
+  EXPECT_EQ(a.find_first_of(d), abslx::string_view::npos);
+  EXPECT_EQ(a.find_first_of(e), abslx::string_view::npos);
+  EXPECT_EQ(d.find_first_of(b), abslx::string_view::npos);
+  EXPECT_EQ(e.find_first_of(b), abslx::string_view::npos);
+  EXPECT_EQ(d.find_first_of(d), abslx::string_view::npos);
+  EXPECT_EQ(e.find_first_of(d), abslx::string_view::npos);
+  EXPECT_EQ(d.find_first_of(e), abslx::string_view::npos);
+  EXPECT_EQ(e.find_first_of(e), abslx::string_view::npos);
 
   EXPECT_EQ(a.find_first_not_of(b), 3);
   EXPECT_EQ(a.find_first_not_of(c), 0);
-  EXPECT_EQ(b.find_first_not_of(a), absl::string_view::npos);
-  EXPECT_EQ(c.find_first_not_of(a), absl::string_view::npos);
+  EXPECT_EQ(b.find_first_not_of(a), abslx::string_view::npos);
+  EXPECT_EQ(c.find_first_not_of(a), abslx::string_view::npos);
   EXPECT_EQ(f.find_first_not_of(a), 0);
   EXPECT_EQ(a.find_first_not_of(f), 0);
   EXPECT_EQ(a.find_first_not_of(d), 0);
@@ -546,52 +546,52 @@ TEST(StringViewTest, STL2FindFirst) {
   EXPECT_EQ(a.find_first_not_of(e, 1), 1);
   EXPECT_EQ(a.find_first_not_of(d, a.size() - 1), a.size() - 1);
   EXPECT_EQ(a.find_first_not_of(e, a.size() - 1), a.size() - 1);
-  EXPECT_EQ(a.find_first_not_of(d, a.size()), absl::string_view::npos);
-  EXPECT_EQ(a.find_first_not_of(e, a.size()), absl::string_view::npos);
-  EXPECT_EQ(a.find_first_not_of(d, absl::string_view::npos),
-            absl::string_view::npos);
-  EXPECT_EQ(a.find_first_not_of(e, absl::string_view::npos),
-            absl::string_view::npos);
-  EXPECT_EQ(d.find_first_not_of(a), absl::string_view::npos);
-  EXPECT_EQ(e.find_first_not_of(a), absl::string_view::npos);
-  EXPECT_EQ(d.find_first_not_of(d), absl::string_view::npos);
-  EXPECT_EQ(e.find_first_not_of(d), absl::string_view::npos);
-  EXPECT_EQ(d.find_first_not_of(e), absl::string_view::npos);
-  EXPECT_EQ(e.find_first_not_of(e), absl::string_view::npos);
+  EXPECT_EQ(a.find_first_not_of(d, a.size()), abslx::string_view::npos);
+  EXPECT_EQ(a.find_first_not_of(e, a.size()), abslx::string_view::npos);
+  EXPECT_EQ(a.find_first_not_of(d, abslx::string_view::npos),
+            abslx::string_view::npos);
+  EXPECT_EQ(a.find_first_not_of(e, abslx::string_view::npos),
+            abslx::string_view::npos);
+  EXPECT_EQ(d.find_first_not_of(a), abslx::string_view::npos);
+  EXPECT_EQ(e.find_first_not_of(a), abslx::string_view::npos);
+  EXPECT_EQ(d.find_first_not_of(d), abslx::string_view::npos);
+  EXPECT_EQ(e.find_first_not_of(d), abslx::string_view::npos);
+  EXPECT_EQ(d.find_first_not_of(e), abslx::string_view::npos);
+  EXPECT_EQ(e.find_first_not_of(e), abslx::string_view::npos);
 
-  absl::string_view h("====");
-  EXPECT_EQ(h.find_first_not_of('='), absl::string_view::npos);
-  EXPECT_EQ(h.find_first_not_of('=', 3), absl::string_view::npos);
+  abslx::string_view h("====");
+  EXPECT_EQ(h.find_first_not_of('='), abslx::string_view::npos);
+  EXPECT_EQ(h.find_first_not_of('=', 3), abslx::string_view::npos);
   EXPECT_EQ(h.find_first_not_of('\0'), 0);
   EXPECT_EQ(g.find_first_not_of('x'), 2);
   EXPECT_EQ(f.find_first_not_of('\0'), 0);
   EXPECT_EQ(f.find_first_not_of('\0', 3), 4);
   EXPECT_EQ(f.find_first_not_of('\0', 2), 2);
   // empty string nonsense
-  EXPECT_EQ(d.find_first_not_of('x'), absl::string_view::npos);
-  EXPECT_EQ(e.find_first_not_of('x'), absl::string_view::npos);
-  EXPECT_EQ(d.find_first_not_of('\0'), absl::string_view::npos);
-  EXPECT_EQ(e.find_first_not_of('\0'), absl::string_view::npos);
+  EXPECT_EQ(d.find_first_not_of('x'), abslx::string_view::npos);
+  EXPECT_EQ(e.find_first_not_of('x'), abslx::string_view::npos);
+  EXPECT_EQ(d.find_first_not_of('\0'), abslx::string_view::npos);
+  EXPECT_EQ(e.find_first_not_of('\0'), abslx::string_view::npos);
 }
 
 // Continued from STL2
 TEST(StringViewTest, STL2FindLast) {
-  const absl::string_view a("abcdefghijklmnopqrstuvwxyz");
-  const absl::string_view b("abc");
-  const absl::string_view c("xyz");
-  absl::string_view d("foobar");
-  const absl::string_view e;
-  const absl::string_view f(
+  const abslx::string_view a("abcdefghijklmnopqrstuvwxyz");
+  const abslx::string_view b("abc");
+  const abslx::string_view c("xyz");
+  abslx::string_view d("foobar");
+  const abslx::string_view e;
+  const abslx::string_view f(
       "123"
       "\0"
       "456",
       7);
-  absl::string_view g("xx not found bb");
-  absl::string_view h("====");
-  absl::string_view i("56");
+  abslx::string_view g("xx not found bb");
+  abslx::string_view h("====");
+  abslx::string_view i("56");
 
-  d = absl::string_view();
-  EXPECT_EQ(h.find_last_of(a), absl::string_view::npos);
+  d = abslx::string_view();
+  EXPECT_EQ(h.find_last_of(a), abslx::string_view::npos);
   EXPECT_EQ(g.find_last_of(a), g.size()-1);
   EXPECT_EQ(a.find_last_of(b), 2);
   EXPECT_EQ(a.find_last_of(c), a.size()-1);
@@ -601,78 +601,78 @@ TEST(StringViewTest, STL2FindLast) {
   EXPECT_EQ(a.find_last_of('z'), 25);
   EXPECT_EQ(a.find_last_of('a', 5), 0);
   EXPECT_EQ(a.find_last_of('b', 5), 1);
-  EXPECT_EQ(a.find_last_of('b', 0), absl::string_view::npos);
+  EXPECT_EQ(a.find_last_of('b', 0), abslx::string_view::npos);
   EXPECT_EQ(a.find_last_of('z', 25), 25);
-  EXPECT_EQ(a.find_last_of('z', 24), absl::string_view::npos);
+  EXPECT_EQ(a.find_last_of('z', 24), abslx::string_view::npos);
   EXPECT_EQ(f.find_last_of(i, 5), 5);
   EXPECT_EQ(f.find_last_of(i, 6), 6);
-  EXPECT_EQ(f.find_last_of(a, 4), absl::string_view::npos);
+  EXPECT_EQ(f.find_last_of(a, 4), abslx::string_view::npos);
   // empty string nonsense
-  EXPECT_EQ(f.find_last_of(d), absl::string_view::npos);
-  EXPECT_EQ(f.find_last_of(e), absl::string_view::npos);
-  EXPECT_EQ(f.find_last_of(d, 4), absl::string_view::npos);
-  EXPECT_EQ(f.find_last_of(e, 4), absl::string_view::npos);
-  EXPECT_EQ(d.find_last_of(d), absl::string_view::npos);
-  EXPECT_EQ(d.find_last_of(e), absl::string_view::npos);
-  EXPECT_EQ(e.find_last_of(d), absl::string_view::npos);
-  EXPECT_EQ(e.find_last_of(e), absl::string_view::npos);
-  EXPECT_EQ(d.find_last_of(f), absl::string_view::npos);
-  EXPECT_EQ(e.find_last_of(f), absl::string_view::npos);
-  EXPECT_EQ(d.find_last_of(d, 4), absl::string_view::npos);
-  EXPECT_EQ(d.find_last_of(e, 4), absl::string_view::npos);
-  EXPECT_EQ(e.find_last_of(d, 4), absl::string_view::npos);
-  EXPECT_EQ(e.find_last_of(e, 4), absl::string_view::npos);
-  EXPECT_EQ(d.find_last_of(f, 4), absl::string_view::npos);
-  EXPECT_EQ(e.find_last_of(f, 4), absl::string_view::npos);
+  EXPECT_EQ(f.find_last_of(d), abslx::string_view::npos);
+  EXPECT_EQ(f.find_last_of(e), abslx::string_view::npos);
+  EXPECT_EQ(f.find_last_of(d, 4), abslx::string_view::npos);
+  EXPECT_EQ(f.find_last_of(e, 4), abslx::string_view::npos);
+  EXPECT_EQ(d.find_last_of(d), abslx::string_view::npos);
+  EXPECT_EQ(d.find_last_of(e), abslx::string_view::npos);
+  EXPECT_EQ(e.find_last_of(d), abslx::string_view::npos);
+  EXPECT_EQ(e.find_last_of(e), abslx::string_view::npos);
+  EXPECT_EQ(d.find_last_of(f), abslx::string_view::npos);
+  EXPECT_EQ(e.find_last_of(f), abslx::string_view::npos);
+  EXPECT_EQ(d.find_last_of(d, 4), abslx::string_view::npos);
+  EXPECT_EQ(d.find_last_of(e, 4), abslx::string_view::npos);
+  EXPECT_EQ(e.find_last_of(d, 4), abslx::string_view::npos);
+  EXPECT_EQ(e.find_last_of(e, 4), abslx::string_view::npos);
+  EXPECT_EQ(d.find_last_of(f, 4), abslx::string_view::npos);
+  EXPECT_EQ(e.find_last_of(f, 4), abslx::string_view::npos);
 
   EXPECT_EQ(a.find_last_not_of(b), a.size()-1);
   EXPECT_EQ(a.find_last_not_of(c), 22);
-  EXPECT_EQ(b.find_last_not_of(a), absl::string_view::npos);
-  EXPECT_EQ(b.find_last_not_of(b), absl::string_view::npos);
+  EXPECT_EQ(b.find_last_not_of(a), abslx::string_view::npos);
+  EXPECT_EQ(b.find_last_not_of(b), abslx::string_view::npos);
   EXPECT_EQ(f.find_last_not_of(i), 4);
   EXPECT_EQ(a.find_last_not_of(c, 24), 22);
   EXPECT_EQ(a.find_last_not_of(b, 3), 3);
-  EXPECT_EQ(a.find_last_not_of(b, 2), absl::string_view::npos);
+  EXPECT_EQ(a.find_last_not_of(b, 2), abslx::string_view::npos);
   // empty string nonsense
   EXPECT_EQ(f.find_last_not_of(d), f.size()-1);
   EXPECT_EQ(f.find_last_not_of(e), f.size()-1);
   EXPECT_EQ(f.find_last_not_of(d, 4), 4);
   EXPECT_EQ(f.find_last_not_of(e, 4), 4);
-  EXPECT_EQ(d.find_last_not_of(d), absl::string_view::npos);
-  EXPECT_EQ(d.find_last_not_of(e), absl::string_view::npos);
-  EXPECT_EQ(e.find_last_not_of(d), absl::string_view::npos);
-  EXPECT_EQ(e.find_last_not_of(e), absl::string_view::npos);
-  EXPECT_EQ(d.find_last_not_of(f), absl::string_view::npos);
-  EXPECT_EQ(e.find_last_not_of(f), absl::string_view::npos);
-  EXPECT_EQ(d.find_last_not_of(d, 4), absl::string_view::npos);
-  EXPECT_EQ(d.find_last_not_of(e, 4), absl::string_view::npos);
-  EXPECT_EQ(e.find_last_not_of(d, 4), absl::string_view::npos);
-  EXPECT_EQ(e.find_last_not_of(e, 4), absl::string_view::npos);
-  EXPECT_EQ(d.find_last_not_of(f, 4), absl::string_view::npos);
-  EXPECT_EQ(e.find_last_not_of(f, 4), absl::string_view::npos);
+  EXPECT_EQ(d.find_last_not_of(d), abslx::string_view::npos);
+  EXPECT_EQ(d.find_last_not_of(e), abslx::string_view::npos);
+  EXPECT_EQ(e.find_last_not_of(d), abslx::string_view::npos);
+  EXPECT_EQ(e.find_last_not_of(e), abslx::string_view::npos);
+  EXPECT_EQ(d.find_last_not_of(f), abslx::string_view::npos);
+  EXPECT_EQ(e.find_last_not_of(f), abslx::string_view::npos);
+  EXPECT_EQ(d.find_last_not_of(d, 4), abslx::string_view::npos);
+  EXPECT_EQ(d.find_last_not_of(e, 4), abslx::string_view::npos);
+  EXPECT_EQ(e.find_last_not_of(d, 4), abslx::string_view::npos);
+  EXPECT_EQ(e.find_last_not_of(e, 4), abslx::string_view::npos);
+  EXPECT_EQ(d.find_last_not_of(f, 4), abslx::string_view::npos);
+  EXPECT_EQ(e.find_last_not_of(f, 4), abslx::string_view::npos);
 
   EXPECT_EQ(h.find_last_not_of('x'), h.size() - 1);
-  EXPECT_EQ(h.find_last_not_of('='), absl::string_view::npos);
+  EXPECT_EQ(h.find_last_not_of('='), abslx::string_view::npos);
   EXPECT_EQ(b.find_last_not_of('c'), 1);
   EXPECT_EQ(h.find_last_not_of('x', 2), 2);
-  EXPECT_EQ(h.find_last_not_of('=', 2), absl::string_view::npos);
+  EXPECT_EQ(h.find_last_not_of('=', 2), abslx::string_view::npos);
   EXPECT_EQ(b.find_last_not_of('b', 1), 0);
   // empty string nonsense
-  EXPECT_EQ(d.find_last_not_of('x'), absl::string_view::npos);
-  EXPECT_EQ(e.find_last_not_of('x'), absl::string_view::npos);
-  EXPECT_EQ(d.find_last_not_of('\0'), absl::string_view::npos);
-  EXPECT_EQ(e.find_last_not_of('\0'), absl::string_view::npos);
+  EXPECT_EQ(d.find_last_not_of('x'), abslx::string_view::npos);
+  EXPECT_EQ(e.find_last_not_of('x'), abslx::string_view::npos);
+  EXPECT_EQ(d.find_last_not_of('\0'), abslx::string_view::npos);
+  EXPECT_EQ(e.find_last_not_of('\0'), abslx::string_view::npos);
 }
 
 // Continued from STL2
 TEST(StringViewTest, STL2Substr) {
-  const absl::string_view a("abcdefghijklmnopqrstuvwxyz");
-  const absl::string_view b("abc");
-  const absl::string_view c("xyz");
-  absl::string_view d("foobar");
-  const absl::string_view e;
+  const abslx::string_view a("abcdefghijklmnopqrstuvwxyz");
+  const abslx::string_view b("abc");
+  const abslx::string_view c("xyz");
+  abslx::string_view d("foobar");
+  const abslx::string_view e;
 
-  d = absl::string_view();
+  d = abslx::string_view();
   EXPECT_EQ(a.substr(0, 3), b);
   EXPECT_EQ(a.substr(23), c);
   EXPECT_EQ(a.substr(23, 3), c);
@@ -682,34 +682,34 @@ TEST(StringViewTest, STL2Substr) {
   // empty string nonsense
   EXPECT_EQ(d.substr(0, 99), e);
   // use of npos
-  EXPECT_EQ(a.substr(0, absl::string_view::npos), a);
-  EXPECT_EQ(a.substr(23, absl::string_view::npos), c);
+  EXPECT_EQ(a.substr(0, abslx::string_view::npos), a);
+  EXPECT_EQ(a.substr(23, abslx::string_view::npos), c);
   // throw exception
 #ifdef ABSL_HAVE_EXCEPTIONS
   EXPECT_THROW((void)a.substr(99, 2), std::out_of_range);
 #else
   ABSL_EXPECT_DEATH_IF_SUPPORTED((void)a.substr(99, 2),
-                                 "absl::string_view::substr");
+                                 "abslx::string_view::substr");
 #endif
 }
 
 TEST(StringViewTest, TruncSubstr) {
-  const absl::string_view hi("hi");
-  EXPECT_EQ("", absl::ClippedSubstr(hi, 0, 0));
-  EXPECT_EQ("h", absl::ClippedSubstr(hi, 0, 1));
-  EXPECT_EQ("hi", absl::ClippedSubstr(hi, 0));
-  EXPECT_EQ("i", absl::ClippedSubstr(hi, 1));
-  EXPECT_EQ("", absl::ClippedSubstr(hi, 2));
-  EXPECT_EQ("", absl::ClippedSubstr(hi, 3));  // truncation
-  EXPECT_EQ("", absl::ClippedSubstr(hi, 3, 2));  // truncation
+  const abslx::string_view hi("hi");
+  EXPECT_EQ("", abslx::ClippedSubstr(hi, 0, 0));
+  EXPECT_EQ("h", abslx::ClippedSubstr(hi, 0, 1));
+  EXPECT_EQ("hi", abslx::ClippedSubstr(hi, 0));
+  EXPECT_EQ("i", abslx::ClippedSubstr(hi, 1));
+  EXPECT_EQ("", abslx::ClippedSubstr(hi, 2));
+  EXPECT_EQ("", abslx::ClippedSubstr(hi, 3));  // truncation
+  EXPECT_EQ("", abslx::ClippedSubstr(hi, 3, 2));  // truncation
 }
 
 TEST(StringViewTest, UTF8) {
   std::string utf8 = "\u00E1";
   std::string utf8_twice = utf8 + " " + utf8;
   int utf8_len = strlen(utf8.data());
-  EXPECT_EQ(utf8_len, absl::string_view(utf8_twice).find_first_of(" "));
-  EXPECT_EQ(utf8_len, absl::string_view(utf8_twice).find_first_of(" \t"));
+  EXPECT_EQ(utf8_len, abslx::string_view(utf8_twice).find_first_of(" "));
+  EXPECT_EQ(utf8_len, abslx::string_view(utf8_twice).find_first_of(" \t"));
 }
 
 TEST(StringViewTest, FindConformance) {
@@ -739,9 +739,9 @@ TEST(StringViewTest, FindConformance) {
     SCOPED_TRACE(s.haystack);
     SCOPED_TRACE(s.needle);
     std::string st = s.haystack;
-    absl::string_view sp = s.haystack;
+    abslx::string_view sp = s.haystack;
     for (size_t i = 0; i <= sp.size(); ++i) {
-      size_t pos = (i == sp.size()) ? absl::string_view::npos : i;
+      size_t pos = (i == sp.size()) ? abslx::string_view::npos : i;
       SCOPED_TRACE(pos);
       EXPECT_EQ(sp.find(s.needle, pos),
                 st.find(s.needle, pos));
@@ -760,15 +760,15 @@ TEST(StringViewTest, FindConformance) {
 }
 
 TEST(StringViewTest, Remove) {
-  absl::string_view a("foobar");
+  abslx::string_view a("foobar");
   std::string s1("123");
   s1 += '\0';
   s1 += "456";
-  absl::string_view e;
+  abslx::string_view e;
   std::string s2;
 
   // remove_prefix
-  absl::string_view c(a);
+  abslx::string_view c(a);
   c.remove_prefix(3);
   EXPECT_EQ(c, "bar");
   c = a;
@@ -789,32 +789,32 @@ TEST(StringViewTest, Remove) {
 }
 
 TEST(StringViewTest, Set) {
-  absl::string_view a("foobar");
-  absl::string_view empty;
-  absl::string_view b;
+  abslx::string_view a("foobar");
+  abslx::string_view empty;
+  abslx::string_view b;
 
   // set
-  b = absl::string_view("foobar", 6);
+  b = abslx::string_view("foobar", 6);
   EXPECT_EQ(b, a);
-  b = absl::string_view("foobar", 0);
+  b = abslx::string_view("foobar", 0);
   EXPECT_EQ(b, empty);
-  b = absl::string_view("foobar", 7);
+  b = abslx::string_view("foobar", 7);
   EXPECT_NE(b, a);
 
-  b = absl::string_view("foobar");
+  b = abslx::string_view("foobar");
   EXPECT_EQ(b, a);
 }
 
 TEST(StringViewTest, FrontBack) {
   static const char arr[] = "abcd";
-  const absl::string_view csp(arr, 4);
+  const abslx::string_view csp(arr, 4);
   EXPECT_EQ(&arr[0], &csp.front());
   EXPECT_EQ(&arr[3], &csp.back());
 }
 
 TEST(StringViewTest, FrontBackSingleChar) {
   static const char c = 'a';
-  const absl::string_view csp(&c, 1);
+  const abslx::string_view csp(&c, 1);
   EXPECT_EQ(&c, &csp.front());
   EXPECT_EQ(&c, &csp.back());
 }
@@ -824,7 +824,7 @@ TEST(StringViewTest, FrontBackEmpty) {
 #if !defined(NDEBUG) || ABSL_OPTION_HARDENED
   // Abseil's string_view implementation has debug assertions that check that
   // front() and back() are not called on an empty string_view.
-  absl::string_view sv;
+  abslx::string_view sv;
   ABSL_EXPECT_DEATH_IF_SUPPORTED(sv.front(), "");
   ABSL_EXPECT_DEATH_IF_SUPPORTED(sv.back(), "");
 #endif
@@ -840,7 +840,7 @@ TEST(StringViewTest, FrontBackEmpty) {
 // GCC also started rejected this in libstdc++ starting in GCC9.
 // In MSVC, creating a constexpr string_view from nullptr also triggers an
 // "unevaluable pointer value" error. This compiler implementation conforms
-// to the standard, but `absl::string_view` implements a different
+// to the standard, but `abslx::string_view` implements a different
 // behavior for historical reasons. We work around tests that construct
 // `string_view` from `nullptr` when using libc++.
 #if !defined(ABSL_USES_STD_STRING_VIEW) ||                    \
@@ -850,16 +850,16 @@ TEST(StringViewTest, FrontBackEmpty) {
 #endif
 
 TEST(StringViewTest, NULLInput) {
-  absl::string_view s;
+  abslx::string_view s;
   EXPECT_EQ(s.data(), nullptr);
   EXPECT_EQ(s.size(), 0);
 
 #ifdef ABSL_HAVE_STRING_VIEW_FROM_NULLPTR
-  s = absl::string_view(nullptr);
+  s = abslx::string_view(nullptr);
   EXPECT_EQ(s.data(), nullptr);
   EXPECT_EQ(s.size(), 0);
 
-  // .ToString() on a absl::string_view with nullptr should produce the empty
+  // .ToString() on a abslx::string_view with nullptr should produce the empty
   // string.
   EXPECT_EQ("", std::string(s));
 #endif  // ABSL_HAVE_STRING_VIEW_FROM_NULLPTR
@@ -874,31 +874,31 @@ TEST(StringViewTest, Comparisons2) {
   //  (5) compare(pos1, count1, s)
   //  (6) compare(pos1, count1, s, count2)
 
-  absl::string_view abc("abcdefghijklmnopqrstuvwxyz");
+  abslx::string_view abc("abcdefghijklmnopqrstuvwxyz");
 
   // check comparison operations on strings longer than 4 bytes.
-  EXPECT_EQ(abc, absl::string_view("abcdefghijklmnopqrstuvwxyz"));
-  EXPECT_EQ(abc.compare(absl::string_view("abcdefghijklmnopqrstuvwxyz")), 0);
+  EXPECT_EQ(abc, abslx::string_view("abcdefghijklmnopqrstuvwxyz"));
+  EXPECT_EQ(abc.compare(abslx::string_view("abcdefghijklmnopqrstuvwxyz")), 0);
 
-  EXPECT_LT(abc, absl::string_view("abcdefghijklmnopqrstuvwxzz"));
-  EXPECT_LT(abc.compare(absl::string_view("abcdefghijklmnopqrstuvwxzz")), 0);
+  EXPECT_LT(abc, abslx::string_view("abcdefghijklmnopqrstuvwxzz"));
+  EXPECT_LT(abc.compare(abslx::string_view("abcdefghijklmnopqrstuvwxzz")), 0);
 
-  EXPECT_GT(abc, absl::string_view("abcdefghijklmnopqrstuvwxyy"));
-  EXPECT_GT(abc.compare(absl::string_view("abcdefghijklmnopqrstuvwxyy")), 0);
+  EXPECT_GT(abc, abslx::string_view("abcdefghijklmnopqrstuvwxyy"));
+  EXPECT_GT(abc.compare(abslx::string_view("abcdefghijklmnopqrstuvwxyy")), 0);
 
   // The "substr" variants of `compare`.
-  absl::string_view digits("0123456789");
-  auto npos = absl::string_view::npos;
+  abslx::string_view digits("0123456789");
+  auto npos = abslx::string_view::npos;
 
   // Taking string_view
-  EXPECT_EQ(digits.compare(3, npos, absl::string_view("3456789")), 0);  // 2
-  EXPECT_EQ(digits.compare(3, 4, absl::string_view("3456")), 0);        // 2
-  EXPECT_EQ(digits.compare(10, 0, absl::string_view()), 0);             // 2
-  EXPECT_EQ(digits.compare(3, 4, absl::string_view("0123456789"), 3, 4),
+  EXPECT_EQ(digits.compare(3, npos, abslx::string_view("3456789")), 0);  // 2
+  EXPECT_EQ(digits.compare(3, 4, abslx::string_view("3456")), 0);        // 2
+  EXPECT_EQ(digits.compare(10, 0, abslx::string_view()), 0);             // 2
+  EXPECT_EQ(digits.compare(3, 4, abslx::string_view("0123456789"), 3, 4),
             0);  // 3
-  EXPECT_LT(digits.compare(3, 4, absl::string_view("0123456789"), 3, 5),
+  EXPECT_LT(digits.compare(3, 4, abslx::string_view("0123456789"), 3, 5),
             0);  // 3
-  EXPECT_LT(digits.compare(0, npos, absl::string_view("0123456789"), 3, 5),
+  EXPECT_LT(digits.compare(0, npos, abslx::string_view("0123456789"), 3, 5),
             0);  // 3
   // Taking const char*
   EXPECT_EQ(digits.compare(3, 4, "3456"), 0);                 // 5
@@ -910,59 +910,59 @@ TEST(StringViewTest, Comparisons2) {
 }
 
 TEST(StringViewTest, At) {
-  absl::string_view abc = "abc";
+  abslx::string_view abc = "abc";
   EXPECT_EQ(abc.at(0), 'a');
   EXPECT_EQ(abc.at(1), 'b');
   EXPECT_EQ(abc.at(2), 'c');
 #ifdef ABSL_HAVE_EXCEPTIONS
   EXPECT_THROW((void)abc.at(3), std::out_of_range);
 #else
-  ABSL_EXPECT_DEATH_IF_SUPPORTED((void)abc.at(3), "absl::string_view::at");
+  ABSL_EXPECT_DEATH_IF_SUPPORTED((void)abc.at(3), "abslx::string_view::at");
 #endif
 }
 
 struct MyCharAlloc : std::allocator<char> {};
 
 TEST(StringViewTest, ExplicitConversionOperator) {
-  absl::string_view sp = "hi";
+  abslx::string_view sp = "hi";
   EXPECT_EQ(sp, std::string(sp));
 }
 
 TEST(StringViewTest, NullSafeStringView) {
   {
-    absl::string_view s = absl::NullSafeStringView(nullptr);
+    abslx::string_view s = abslx::NullSafeStringView(nullptr);
     EXPECT_EQ(nullptr, s.data());
     EXPECT_EQ(0, s.size());
-    EXPECT_EQ(absl::string_view(), s);
+    EXPECT_EQ(abslx::string_view(), s);
   }
   {
     static const char kHi[] = "hi";
-    absl::string_view s = absl::NullSafeStringView(kHi);
+    abslx::string_view s = abslx::NullSafeStringView(kHi);
     EXPECT_EQ(kHi, s.data());
     EXPECT_EQ(strlen(kHi), s.size());
-    EXPECT_EQ(absl::string_view("hi"), s);
+    EXPECT_EQ(abslx::string_view("hi"), s);
   }
 }
 
 TEST(StringViewTest, ConstexprNullSafeStringView) {
   {
-    constexpr absl::string_view s = absl::NullSafeStringView(nullptr);
+    constexpr abslx::string_view s = abslx::NullSafeStringView(nullptr);
     EXPECT_EQ(nullptr, s.data());
     EXPECT_EQ(0, s.size());
-    EXPECT_EQ(absl::string_view(), s);
+    EXPECT_EQ(abslx::string_view(), s);
   }
 #if !defined(_MSC_VER) || _MSC_VER >= 1910
   // MSVC 2017+ is required for good constexpr string_view support.
-  // See the implementation of `absl::string_view::StrlenInternal()`.
+  // See the implementation of `abslx::string_view::StrlenInternal()`.
   {
     static constexpr char kHi[] = "hi";
-    absl::string_view s = absl::NullSafeStringView(kHi);
+    abslx::string_view s = abslx::NullSafeStringView(kHi);
     EXPECT_EQ(kHi, s.data());
     EXPECT_EQ(strlen(kHi), s.size());
-    EXPECT_EQ(absl::string_view("hi"), s);
+    EXPECT_EQ(abslx::string_view("hi"), s);
   }
   {
-    constexpr absl::string_view s = absl::NullSafeStringView("hello");
+    constexpr abslx::string_view s = abslx::NullSafeStringView("hello");
     EXPECT_EQ(s.size(), 5);
     EXPECT_EQ("hello", s);
   }
@@ -970,11 +970,11 @@ TEST(StringViewTest, ConstexprNullSafeStringView) {
 }
 
 TEST(StringViewTest, ConstexprCompiles) {
-  constexpr absl::string_view sp;
+  constexpr abslx::string_view sp;
 #ifdef ABSL_HAVE_STRING_VIEW_FROM_NULLPTR
-  constexpr absl::string_view cstr(nullptr);
+  constexpr abslx::string_view cstr(nullptr);
 #endif
-  constexpr absl::string_view cstr_len("cstr", 4);
+  constexpr abslx::string_view cstr_len("cstr", 4);
 
 #if defined(ABSL_USES_STD_STRING_VIEW)
   // In libstdc++ (as of 7.2), `std::string_view::string_view(const char*)`
@@ -1008,9 +1008,9 @@ TEST(StringViewTest, ConstexprCompiles) {
 #endif  // ABSL_USES_STD_STRING_VIEW
 
 #ifdef ABSL_HAVE_CONSTEXPR_STRING_VIEW_FROM_CSTR
-  constexpr absl::string_view cstr_strlen("foo");
+  constexpr abslx::string_view cstr_strlen("foo");
   EXPECT_EQ(cstr_strlen.length(), 3);
-  constexpr absl::string_view cstr_strlen2 = "bar";
+  constexpr abslx::string_view cstr_strlen2 = "bar";
   EXPECT_EQ(cstr_strlen2, "bar");
 
 #if ABSL_HAVE_BUILTIN(__builtin_memcmp) || \
@@ -1018,8 +1018,8 @@ TEST(StringViewTest, ConstexprCompiles) {
 #define ABSL_HAVE_CONSTEXPR_STRING_VIEW_COMPARISON 1
 #endif
 #ifdef ABSL_HAVE_CONSTEXPR_STRING_VIEW_COMPARISON
-  constexpr absl::string_view foo = "foo";
-  constexpr absl::string_view bar = "bar";
+  constexpr abslx::string_view foo = "foo";
+  constexpr abslx::string_view bar = "bar";
   constexpr bool foo_eq_bar = foo == bar;
   constexpr bool foo_ne_bar = foo != bar;
   constexpr bool foo_lt_bar = foo < bar;
@@ -1041,21 +1041,21 @@ TEST(StringViewTest, ConstexprCompiles) {
   (3 == __clang_major__ && 4 < __clang_minor__)
   // older clang versions (< 3.5) complain that:
   //   "cannot perform pointer arithmetic on null pointer"
-  constexpr absl::string_view::iterator const_begin_empty = sp.begin();
-  constexpr absl::string_view::iterator const_end_empty = sp.end();
+  constexpr abslx::string_view::iterator const_begin_empty = sp.begin();
+  constexpr abslx::string_view::iterator const_end_empty = sp.end();
   EXPECT_EQ(const_begin_empty, const_end_empty);
 
 #ifdef ABSL_HAVE_STRING_VIEW_FROM_NULLPTR
-  constexpr absl::string_view::iterator const_begin_nullptr = cstr.begin();
-  constexpr absl::string_view::iterator const_end_nullptr = cstr.end();
+  constexpr abslx::string_view::iterator const_begin_nullptr = cstr.begin();
+  constexpr abslx::string_view::iterator const_end_nullptr = cstr.end();
   EXPECT_EQ(const_begin_nullptr, const_end_nullptr);
 #endif  // ABSL_HAVE_STRING_VIEW_FROM_NULLPTR
 #endif  // !defined(__clang__) || ...
 
-  constexpr absl::string_view::iterator const_begin = cstr_len.begin();
-  constexpr absl::string_view::iterator const_end = cstr_len.end();
-  constexpr absl::string_view::size_type const_size = cstr_len.size();
-  constexpr absl::string_view::size_type const_length = cstr_len.length();
+  constexpr abslx::string_view::iterator const_begin = cstr_len.begin();
+  constexpr abslx::string_view::iterator const_end = cstr_len.end();
+  constexpr abslx::string_view::size_type const_size = cstr_len.size();
+  constexpr abslx::string_view::size_type const_length = cstr_len.length();
   static_assert(const_begin + const_size == const_end,
                 "pointer arithmetic check");
   static_assert(const_begin + const_length == const_end,
@@ -1088,20 +1088,20 @@ TEST(StringViewTest, ConstexprCompiles) {
 }
 
 TEST(StringViewTest, ConstexprSubstr) {
-  constexpr absl::string_view foobar("foobar", 6);
-  constexpr absl::string_view foo = foobar.substr(0, 3);
-  constexpr absl::string_view bar = foobar.substr(3);
+  constexpr abslx::string_view foobar("foobar", 6);
+  constexpr abslx::string_view foo = foobar.substr(0, 3);
+  constexpr abslx::string_view bar = foobar.substr(3);
   EXPECT_EQ(foo, "foo");
   EXPECT_EQ(bar, "bar");
 }
 
 TEST(StringViewTest, Noexcept) {
-  EXPECT_TRUE((std::is_nothrow_constructible<absl::string_view,
+  EXPECT_TRUE((std::is_nothrow_constructible<abslx::string_view,
                                              const std::string&>::value));
-  EXPECT_TRUE((std::is_nothrow_constructible<absl::string_view,
+  EXPECT_TRUE((std::is_nothrow_constructible<abslx::string_view,
                                              const std::string&>::value));
-  EXPECT_TRUE(std::is_nothrow_constructible<absl::string_view>::value);
-  constexpr absl::string_view sp;
+  EXPECT_TRUE(std::is_nothrow_constructible<abslx::string_view>::value);
+  constexpr abslx::string_view sp;
   EXPECT_TRUE(noexcept(sp.begin()));
   EXPECT_TRUE(noexcept(sp.end()));
   EXPECT_TRUE(noexcept(sp.cbegin()));
@@ -1133,7 +1133,7 @@ TEST(StringViewTest, BoundsCheck) {
 #ifndef ABSL_USES_STD_STRING_VIEW
 #if !defined(NDEBUG) || ABSL_OPTION_HARDENED
   // Abseil's string_view implementation has bounds-checking in debug mode.
-  absl::string_view h = "hello";
+  abslx::string_view h = "hello";
   ABSL_EXPECT_DEATH_IF_SUPPORTED(h[5], "");
   ABSL_EXPECT_DEATH_IF_SUPPORTED(h[-1], "");
 #endif
@@ -1146,12 +1146,12 @@ TEST(ComparisonOpsTest, StringCompareNotAmbiguous) {
 }
 
 TEST(ComparisonOpsTest, HeterogenousStringViewEquals) {
-  EXPECT_EQ(absl::string_view("hello"), std::string("hello"));
-  EXPECT_EQ("hello", absl::string_view("hello"));
+  EXPECT_EQ(abslx::string_view("hello"), std::string("hello"));
+  EXPECT_EQ("hello", abslx::string_view("hello"));
 }
 
 TEST(FindOneCharTest, EdgeCases) {
-  absl::string_view a("xxyyyxx");
+  abslx::string_view a("xxyyyxx");
 
   // Set a = "xyyyx".
   a.remove_prefix(1);
@@ -1161,7 +1161,7 @@ TEST(FindOneCharTest, EdgeCases) {
   EXPECT_EQ(0, a.find('x', 0));
   EXPECT_EQ(4, a.find('x', 1));
   EXPECT_EQ(4, a.find('x', 4));
-  EXPECT_EQ(absl::string_view::npos, a.find('x', 5));
+  EXPECT_EQ(abslx::string_view::npos, a.find('x', 5));
 
   EXPECT_EQ(4, a.rfind('x'));
   EXPECT_EQ(4, a.rfind('x', 5));
@@ -1173,8 +1173,8 @@ TEST(FindOneCharTest, EdgeCases) {
   a.remove_prefix(1);
   a.remove_suffix(1);
 
-  EXPECT_EQ(absl::string_view::npos, a.find('x'));
-  EXPECT_EQ(absl::string_view::npos, a.rfind('x'));
+  EXPECT_EQ(abslx::string_view::npos, a.find('x'));
+  EXPECT_EQ(abslx::string_view::npos, a.rfind('x'));
 }
 
 #ifndef ABSL_HAVE_THREAD_SANITIZER  // Allocates too much memory for tsan.
@@ -1184,7 +1184,7 @@ TEST(HugeStringView, TwoPointTwoGB) {
   // Try a huge string piece.
   const size_t size = size_t{2200} * 1000 * 1000;
   std::string s(size, 'a');
-  absl::string_view sp(s);
+  abslx::string_view sp(s);
   EXPECT_EQ(size, sp.length());
   sp.remove_prefix(1);
   EXPECT_EQ(size - 1, sp.length());
@@ -1195,18 +1195,18 @@ TEST(HugeStringView, TwoPointTwoGB) {
 
 #if !defined(NDEBUG) && !defined(ABSL_USES_STD_STRING_VIEW)
 TEST(NonNegativeLenTest, NonNegativeLen) {
-  ABSL_EXPECT_DEATH_IF_SUPPORTED(absl::string_view("xyz", -1),
+  ABSL_EXPECT_DEATH_IF_SUPPORTED(abslx::string_view("xyz", -1),
                                  "len <= kMaxSize");
 }
 
 TEST(LenExceedsMaxSizeTest, LenExceedsMaxSize) {
-  auto max_size = absl::string_view().max_size();
+  auto max_size = abslx::string_view().max_size();
 
   // This should construct ok (although the view itself is obviously invalid).
-  absl::string_view ok_view("", max_size);
+  abslx::string_view ok_view("", max_size);
 
   // Adding one to the max should trigger an assertion.
-  ABSL_EXPECT_DEATH_IF_SUPPORTED(absl::string_view("", max_size + 1),
+  ABSL_EXPECT_DEATH_IF_SUPPORTED(abslx::string_view("", max_size + 1),
                                  "len <= kMaxSize");
 }
 #endif  // !defined(NDEBUG) && !defined(ABSL_USES_STD_STRING_VIEW)
@@ -1231,7 +1231,7 @@ class StringViewStreamTest : public ::testing::Test {
 
 TEST_F(StringViewStreamTest, Padding) {
   std::string s("hello");
-  absl::string_view sp(s);
+  abslx::string_view sp(s);
   for (int w = -64; w < 64; ++w) {
     SCOPED_TRACE(w);
     EXPECT_EQ(Pad(s, w), Pad(sp, w));
@@ -1248,7 +1248,7 @@ TEST_F(StringViewStreamTest, ResetsWidth) {
   // we'd have width=5 carrying over to the printing of the "]",
   // creating "[###hi####]".
   std::string s = "hi";
-  absl::string_view sp = s;
+  abslx::string_view sp = s;
   {
     std::ostringstream oss;
     oss << "[" << std::setfill('#') << std::setw(5) << s << "]";

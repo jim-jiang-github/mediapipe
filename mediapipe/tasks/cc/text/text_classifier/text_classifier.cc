@@ -80,7 +80,7 @@ ConvertTextClassifierOptionsToProto(TextClassifierOptions* options) {
 
 }  // namespace
 
-absl::StatusOr<std::unique_ptr<TextClassifier>> TextClassifier::Create(
+abslx::StatusOr<std::unique_ptr<TextClassifier>> TextClassifier::Create(
     std::unique_ptr<TextClassifierOptions> options) {
   auto options_proto = ConvertTextClassifierOptionsToProto(options.get());
   return core::TaskApiFactory::Create<TextClassifier,
@@ -89,8 +89,8 @@ absl::StatusOr<std::unique_ptr<TextClassifier>> TextClassifier::Create(
       std::move(options->base_options.op_resolver));
 }
 
-absl::StatusOr<TextClassifierResult> TextClassifier::Classify(
-    absl::string_view text) {
+abslx::StatusOr<TextClassifierResult> TextClassifier::Classify(
+    abslx::string_view text) {
   ASSIGN_OR_RETURN(
       auto output_packets,
       runner_->Process(

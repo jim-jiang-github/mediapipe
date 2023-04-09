@@ -28,11 +28,11 @@ namespace gpu {
 namespace gl {
 
 // Functor takes old name and returns new name.
-using NameFunctor = std::function<std::string(absl::string_view name)>;
+using NameFunctor = std::function<std::string(abslx::string_view name)>;
 
 // Rewrites source code, objects and parameters with the new names supplied
 // by the given functor.
-absl::Status Rename(const NameFunctor& name_func, GeneratedCode* code);
+abslx::Status Rename(const NameFunctor& name_func, GeneratedCode* code);
 
 }  // namespace gl
 }  // namespace gpu

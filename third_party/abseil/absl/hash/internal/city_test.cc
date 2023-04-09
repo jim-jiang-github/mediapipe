@@ -19,7 +19,7 @@
 #include <iostream>
 #include "gtest/gtest.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace hash_internal {
 
@@ -592,4 +592,4 @@ TEST(CityHashTest, Unchanging) {
 
 }  // namespace hash_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -50,33 +50,33 @@ constexpr char kVisibilityTag[] = "VISIBILITY";
 //
 class SetLandmarkVisibilityCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 };
 REGISTER_CALCULATOR(SetLandmarkVisibilityCalculator);
 
-absl::Status SetLandmarkVisibilityCalculator::GetContract(
+abslx::Status SetLandmarkVisibilityCalculator::GetContract(
     CalculatorContract* cc) {
   cc->Inputs().Tag(kNormalizedLandmarksTag).Set<NormalizedLandmarkList>();
   cc->Inputs().Tag(kVisibilityTag).Set<float>();
   cc->Outputs().Tag(kNormalizedLandmarksTag).Set<NormalizedLandmarkList>();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SetLandmarkVisibilityCalculator::Open(CalculatorContext* cc) {
+abslx::Status SetLandmarkVisibilityCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SetLandmarkVisibilityCalculator::Process(CalculatorContext* cc) {
+abslx::Status SetLandmarkVisibilityCalculator::Process(CalculatorContext* cc) {
   // Check that landmark and visibility are not empty.
   // Don't emit an empty packet for this timestamp.
   if (cc->Inputs().Tag(kNormalizedLandmarksTag).IsEmpty() ||
       cc->Inputs().Tag(kVisibilityTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   const auto& in_landmarks =
@@ -86,7 +86,7 @@ absl::Status SetLandmarkVisibilityCalculator::Process(CalculatorContext* cc) {
 
   const auto& visibility = cc->Inputs().Tag(kVisibilityTag).Get<float>();
 
-  auto out_landmarks = absl::make_unique<NormalizedLandmarkList>();
+  auto out_landmarks = abslx::make_unique<NormalizedLandmarkList>();
   NormalizedLandmark* out_landmark = out_landmarks->add_landmark();
   *out_landmark = in_landmark;
   // Update visibility.
@@ -96,7 +96,7 @@ absl::Status SetLandmarkVisibilityCalculator::Process(CalculatorContext* cc) {
       .Tag(kNormalizedLandmarksTag)
       .Add(out_landmarks.release(), cc->InputTimestamp());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

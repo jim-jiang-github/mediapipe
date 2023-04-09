@@ -51,7 +51,7 @@ std::vector<const typename Map::value_type*> SortByKey(const Map& m) {
   for (const auto& pair : m) {
     pairs.push_back(&pair);
   }
-  absl::c_sort(pairs, [](const typename Map::value_type* a,
+  abslx::c_sort(pairs, [](const typename Map::value_type* a,
                          const typename Map::value_type* b) {
     return a->first < b->first;
   });
@@ -61,11 +61,11 @@ std::vector<const typename Map::value_type*> SortByKey(const Map& m) {
 inline void AddDeviceMetadata(uint32 device_id, const Device& device,
                               std::string* json) {
   if (!device.name().empty()) {
-    absl::StrAppend(json, R"({"ph":"M","pid":)", device_id,
+    abslx::StrAppend(json, R"({"ph":"M","pid":)", device_id,
                     R"(,"name":"process_name","args":{"name":)",
                     JsonString(device.name()), "}},");
   }
-  absl::StrAppend(json, R"({"ph":"M","pid":)", device_id,
+  abslx::StrAppend(json, R"({"ph":"M","pid":)", device_id,
                   R"(,"name":"process_sort_index","args":{"sort_index":)",
                   device_id, "}},");
 }
@@ -73,34 +73,34 @@ inline void AddDeviceMetadata(uint32 device_id, const Device& device,
 inline void AddResourceMetadata(uint32 device_id, uint32 resource_id,
                                 const Resource& resource, std::string* json) {
   if (!resource.name().empty()) {
-    absl::StrAppend(json, R"({"ph":"M","pid":)", device_id, R"(,"tid":)",
+    abslx::StrAppend(json, R"({"ph":"M","pid":)", device_id, R"(,"tid":)",
                     resource_id, R"(,"name":"thread_name","args":{"name":)",
                     JsonString(resource.name()), "}},");
   }
   uint32 sort_index =
       resource.sort_index() ? resource.sort_index() : resource_id;
-  absl::StrAppend(json, R"({"ph":"M","pid":)", device_id, R"(,"tid":)",
+  abslx::StrAppend(json, R"({"ph":"M","pid":)", device_id, R"(,"tid":)",
                   resource_id, R"(,"name":"thread_sort_index")",
                   R"(,"args":{"sort_index":)", sort_index, "}},");
 }
 
 inline void AddTraceEvent(const TraceEvent& event, string* json) {
   auto duration_ps = std::max(event.duration_ps(), protobuf_uint64{1});
-  absl::StrAppend(json, R"({"ph":"X","pid":)", event.device_id(), R"(,"tid":)",
+  abslx::StrAppend(json, R"({"ph":"X","pid":)", event.device_id(), R"(,"tid":)",
                   event.resource_id(), R"(,"ts":)",
                   PicosToMicrosString(event.timestamp_ps()), R"(,"dur":)",
                   PicosToMicrosString(duration_ps), R"(,"name":)",
                   JsonString(event.name()));
   if (!event.args().empty()) {
-    absl::StrAppend(json, R"(,"args":{)");
+    abslx::StrAppend(json, R"(,"args":{)");
     for (const auto* arg : SortByKey(event.args())) {
-      absl::StrAppend(json, JsonString(arg->first), ":",
+      abslx::StrAppend(json, JsonString(arg->first), ":",
                       JsonString(arg->second), ",");
     }
     // Replace trailing comma with closing brace.
     json->back() = '}';
   }
-  absl::StrAppend(json, "},");
+  abslx::StrAppend(json, "},");
 }
 
 }  // namespace
@@ -123,7 +123,7 @@ std::string TraceEventsToJson(const Trace& trace) {
     AddTraceEvent(event, &json);
   }
   // Add one fake event to avoid dealing with no-trailing-comma rule.
-  absl::StrAppend(&json, "{}]}");
+  abslx::StrAppend(&json, "{}]}");
   return json;
 }
 

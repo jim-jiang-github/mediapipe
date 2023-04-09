@@ -49,7 +49,7 @@ class TaskApiFactory {
 
   template <typename T, typename Options,
             EnableIfBaseTaskApiSubclass<T> = nullptr>
-  static absl::StatusOr<std::unique_ptr<T>> Create(
+  static abslx::StatusOr<std::unique_ptr<T>> Create(
       CalculatorGraphConfig graph_config,
       std::unique_ptr<tflite::OpResolver> resolver,
       PacketsCallback packets_callback = nullptr) {
@@ -60,14 +60,14 @@ class TaskApiFactory {
       }
       if (found_task_subgraph) {
         return CreateStatusWithPayload(
-            absl::StatusCode::kInvalidArgument,
+            abslx::StatusCode::kInvalidArgument,
             "Task graph config should only contain one task subgraph node.",
             MediaPipeTasksStatus::kInvalidTaskGraphConfigError);
       } else {
         if (!node.options().HasExtension(Options::ext)) {
           return CreateStatusWithPayload(
-              absl::StatusCode::kInvalidArgument,
-              absl::StrCat(node.calculator(),
+              abslx::StatusCode::kInvalidArgument,
+              abslx::StrCat(node.calculator(),
                            " is missing the required task options field."),
               MediaPipeTasksStatus::kInvalidTaskGraphConfigError);
         }

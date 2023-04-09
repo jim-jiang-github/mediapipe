@@ -25,7 +25,7 @@
 #include "absl/base/internal/throw_delegate.h"
 #include "absl/meta/type_traits.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 namespace span_internal {
@@ -54,7 +54,7 @@ constexpr auto GetData(C& c) noexcept  // NOLINT(runtime/references)
 // Detection idioms for size() and data().
 template <typename C>
 using HasSize =
-    std::is_integral<absl::decay_t<decltype(std::declval<C&>().size())>>;
+    std::is_integral<abslx::decay_t<decltype(std::declval<C&>().size())>>;
 
 // We want to enable conversion from vector<T*> to Span<const T* const> but
 // disable conversion from vector<Derived> to Span<Base>. Here we use
@@ -64,13 +64,13 @@ using HasSize =
 // which returns a reference.
 template <typename T, typename C>
 using HasData =
-    std::is_convertible<absl::decay_t<decltype(GetData(std::declval<C&>()))>*,
+    std::is_convertible<abslx::decay_t<decltype(GetData(std::declval<C&>()))>*,
                         T* const*>;
 
 // Extracts value type from a Container
 template <typename C>
 struct ElementType {
-  using type = typename absl::remove_reference_t<C>::value_type;
+  using type = typename abslx::remove_reference_t<C>::value_type;
 };
 
 template <typename T, size_t N>
@@ -88,7 +88,7 @@ using EnableIfMutable =
 template <template <typename> class SpanT, typename T>
 bool EqualImpl(SpanT<T> a, SpanT<T> b) {
   static_assert(std::is_const<T>::value, "");
-  return absl::equal(a.begin(), a.end(), b.begin(), b.end());
+  return abslx::equal(a.begin(), a.end(), b.begin(), b.end());
 }
 
 template <template <typename> class SpanT, typename T>
@@ -123,6 +123,6 @@ using EnableIfConvertibleTo =
     typename std::enable_if<IsConvertible<From, To>::value>::type;
 }  // namespace span_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_TYPES_INTERNAL_SPAN_H_

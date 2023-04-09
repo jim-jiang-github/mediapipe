@@ -49,7 +49,7 @@ xla::Shape GetTPUInfeedLayout(const xla::Shape& shape) {
 // sharding of the op. If the op has tile sharding, assign the layout based on
 // the shard shape.
 Status UpdateInfeedLayout(xla::Shape* shape,
-                          absl::optional<xla::OpSharding> sharding) {
+                          abslx::optional<xla::OpSharding> sharding) {
   if (sharding && sharding->type() == xla::OpSharding::OTHER) {
     TF_ASSIGN_OR_RETURN(auto hlo_sharding,
                         xla::HloSharding::FromProto(*sharding));
@@ -128,7 +128,7 @@ class InfeedDequeueTupleOp : public XlaOpKernel {
   void Compile(XlaOpKernelContext* ctx) override {
     xla::XlaBuilder* b = ctx->builder();
     for (int64_t i = 0; i < xla_shapes_.size(); ++i) {
-      absl::optional<xla::OpSharding> sharding;
+      abslx::optional<xla::OpSharding> sharding;
       if (b->sharding()) {
         sharding = b->sharding()->type() == xla::OpSharding::TUPLE
                        ? b->sharding()->tuple_shardings(i)
@@ -141,7 +141,7 @@ class InfeedDequeueTupleOp : public XlaOpKernel {
 
     // Don't apply the infeed tuple sharding to the get-tuple-elements. They
     // need non-tuple shardings.
-    xla::XlaScopedShardingAssignment clear_sharding(b, absl::nullopt);
+    xla::XlaScopedShardingAssignment clear_sharding(b, abslx::nullopt);
     for (int i = 0; i < shapes_.size(); ++i) {
       ctx->SetOutput(i, xla::GetTupleElement(tuple, i));
     }

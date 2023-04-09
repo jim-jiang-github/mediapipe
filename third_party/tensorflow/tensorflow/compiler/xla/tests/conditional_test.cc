@@ -244,7 +244,7 @@ XLA_TEST_P(CaseOpTest, Parameters1) {
         bi, 0, "branch_index_arg", &builder, &branch_index);
 
     auto make_branch = [&builder, this](int i) {
-      auto sb = builder.CreateSubBuilder(absl::StrCat("branch_", i));
+      auto sb = builder.CreateSubBuilder(abslx::StrCat("branch_", i));
       Add(ConstantR0<float>(sb.get(), static_cast<float>(i)),
           Parameter(sb.get(), 0, r0f32_, "p0"));
       return sb->BuildAndNoteError();
@@ -420,7 +420,7 @@ XLA_TEST_P(CaseOpTest, Parameters2Array) {
     auto operand2 = ConstantR1<float>(&builder, {10.0f, 11.0f});
     auto operands = Tuple(&builder, {operand1, operand2});
     auto make_branch = [&builder, this](int i) {
-      auto sb = builder.CreateSubBuilder(absl::StrCat("branch_", i));
+      auto sb = builder.CreateSubBuilder(abslx::StrCat("branch_", i));
       auto p = Parameter(sb.get(), 0, tuple_2_r1s2f32_, "p0");
       Add(Mul(ConstantR0<float>(sb.get(), static_cast<float>(i)),
               GetTupleElement(p, 0)),

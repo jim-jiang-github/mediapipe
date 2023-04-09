@@ -33,7 +33,7 @@ namespace tf = ::tensorflow;
 
 class GraphTensorsPacketGenerator : public PacketGenerator {
  public:
-  static absl::Status FillExpectations(
+  static abslx::Status FillExpectations(
       const PacketGeneratorOptions& extendable_options,
       PacketTypeSet* input_side_packets, PacketTypeSet* output_side_packets) {
     RET_CHECK(extendable_options.HasExtension(
@@ -45,17 +45,17 @@ class GraphTensorsPacketGenerator : public PacketGenerator {
             /* "A map of tensor tags and tensors" */);
     RET_CHECK_EQ(options.tensor_tag_size(), options.tensor_num_nodes_size());
     RET_CHECK_GT(options.tensor_tag_size(), 0);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  static absl::Status Generate(
+  static abslx::Status Generate(
       const PacketGeneratorOptions& packet_generator_options,
       const PacketSet& input_side_packets, PacketSet* output_side_packets) {
     const GraphTensorsPacketGeneratorOptions& options =
         packet_generator_options.GetExtension(
             GraphTensorsPacketGeneratorOptions::ext);
     // Output bundle packet.
-    auto tensor_map = absl::make_unique<std::map<std::string, tf::Tensor>>();
+    auto tensor_map = abslx::make_unique<std::map<std::string, tf::Tensor>>();
 
     for (int i = 0; i < options.tensor_tag_size(); ++i) {
       const std::string& tensor_tag = options.tensor_tag(i);
@@ -65,7 +65,7 @@ class GraphTensorsPacketGenerator : public PacketGenerator {
       (*tensor_map)[tensor_tag].flat<float>().setZero();
     }
     output_side_packets->Index(0) = AdoptAsUniquePtr(tensor_map.release());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_PACKET_GENERATOR(GraphTensorsPacketGenerator);

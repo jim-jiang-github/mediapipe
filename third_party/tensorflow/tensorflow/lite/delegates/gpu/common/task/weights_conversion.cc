@@ -59,7 +59,7 @@ uint2 Get2dResourceSize(const WeightsDescription& weight_desc,
 
 void RearrangeWeights(
     const tflite::gpu::Tensor<OHWI, DataType::FLOAT32>& weights,
-    const WeightsDescription& dst_weight_desc, absl::Span<uint8_t> dst) {
+    const WeightsDescription& dst_weight_desc, abslx::Span<uint8_t> dst) {
   const uint flt_count =
       GetTotalElementsCountForLayout(dst_weight_desc, weights.shape);
   if (dst_weight_desc.layout == WeightsLayout::kOSpatialIOGroupI4O4) {
@@ -67,12 +67,12 @@ void RearrangeWeights(
       float4* f32_ptr = reinterpret_cast<float4*>(dst.data());
       RearrangeWeightsToOHWIOGroupI4O4(weights,
                                        dst_weight_desc.output_group_size,
-                                       absl::MakeSpan(f32_ptr, flt_count / 4));
+                                       abslx::MakeSpan(f32_ptr, flt_count / 4));
     } else if (dst_weight_desc.type == DataType::FLOAT16) {
       half4* f16_ptr = reinterpret_cast<half4*>(dst.data());
       RearrangeWeightsToOHWIOGroupI4O4(weights,
                                        dst_weight_desc.output_group_size,
-                                       absl::MakeSpan(f16_ptr, flt_count / 4));
+                                       abslx::MakeSpan(f16_ptr, flt_count / 4));
     }
     return;
   } else if (dst_weight_desc.layout == WeightsLayout::kOSpatialIOGroupO4I4) {
@@ -80,12 +80,12 @@ void RearrangeWeights(
       float4* f32_ptr = reinterpret_cast<float4*>(dst.data());
       RearrangeWeightsToOHWIOGroupO4I4(weights,
                                        dst_weight_desc.output_group_size,
-                                       absl::MakeSpan(f32_ptr, flt_count / 4));
+                                       abslx::MakeSpan(f32_ptr, flt_count / 4));
     } else if (dst_weight_desc.type == DataType::FLOAT16) {
       half4* f16_ptr = reinterpret_cast<half4*>(dst.data());
       RearrangeWeightsToOHWIOGroupO4I4(weights,
                                        dst_weight_desc.output_group_size,
-                                       absl::MakeSpan(f16_ptr, flt_count / 4));
+                                       abslx::MakeSpan(f16_ptr, flt_count / 4));
     }
     return;
   } else if (dst_weight_desc.layout == WeightsLayout::kOICustomSpatialI4O4) {
@@ -93,12 +93,12 @@ void RearrangeWeights(
       float4* f32_ptr = reinterpret_cast<float4*>(dst.data());
       RearrangeWeightsToOICustomSpatialI4O4(
           weights, dst_weight_desc.spatial_remap,
-          absl::MakeSpan(f32_ptr, flt_count / 4));
+          abslx::MakeSpan(f32_ptr, flt_count / 4));
     } else if (dst_weight_desc.type == DataType::FLOAT16) {
       half4* f16_ptr = reinterpret_cast<half4*>(dst.data());
       RearrangeWeightsToOICustomSpatialI4O4(
           weights, dst_weight_desc.spatial_remap,
-          absl::MakeSpan(f16_ptr, flt_count / 4));
+          abslx::MakeSpan(f16_ptr, flt_count / 4));
     }
     return;
   } else if (dst_weight_desc.layout == WeightsLayout::kOICustomSpatialO4I4) {
@@ -106,12 +106,12 @@ void RearrangeWeights(
       float4* f32_ptr = reinterpret_cast<float4*>(dst.data());
       RearrangeWeightsToOICustomSpatialO4I4(
           weights, dst_weight_desc.spatial_remap,
-          absl::MakeSpan(f32_ptr, flt_count / 4));
+          abslx::MakeSpan(f32_ptr, flt_count / 4));
     } else if (dst_weight_desc.type == DataType::FLOAT16) {
       half4* f16_ptr = reinterpret_cast<half4*>(dst.data());
       RearrangeWeightsToOICustomSpatialO4I4(
           weights, dst_weight_desc.spatial_remap,
-          absl::MakeSpan(f16_ptr, flt_count / 4));
+          abslx::MakeSpan(f16_ptr, flt_count / 4));
     }
     return;
   } else if (dst_weight_desc.layout ==
@@ -120,12 +120,12 @@ void RearrangeWeights(
       float4* f32_ptr = reinterpret_cast<float4*>(dst.data());
       RearrangeWeightsToI4HWIOOGroupO4(weights,
                                        dst_weight_desc.output_group_size,
-                                       absl::MakeSpan(f32_ptr, flt_count / 4));
+                                       abslx::MakeSpan(f32_ptr, flt_count / 4));
     } else if (dst_weight_desc.type == DataType::FLOAT16) {
       half4* f16_ptr = reinterpret_cast<half4*>(dst.data());
       RearrangeWeightsToI4HWIOOGroupO4(weights,
                                        dst_weight_desc.output_group_size,
-                                       absl::MakeSpan(f16_ptr, flt_count / 4));
+                                       abslx::MakeSpan(f16_ptr, flt_count / 4));
     }
     return;
   } else if (dst_weight_desc.layout ==
@@ -134,12 +134,12 @@ void RearrangeWeights(
       float4* f32_ptr = reinterpret_cast<float4*>(dst.data());
       RearrangeWeightsToO4HWIOOGroupI4(weights,
                                        dst_weight_desc.output_group_size,
-                                       absl::MakeSpan(f32_ptr, flt_count / 4));
+                                       abslx::MakeSpan(f32_ptr, flt_count / 4));
     } else if (dst_weight_desc.type == DataType::FLOAT16) {
       half4* f16_ptr = reinterpret_cast<half4*>(dst.data());
       RearrangeWeightsToO4HWIOOGroupI4(weights,
                                        dst_weight_desc.output_group_size,
-                                       absl::MakeSpan(f16_ptr, flt_count / 4));
+                                       abslx::MakeSpan(f16_ptr, flt_count / 4));
     }
     return;
   }
@@ -147,7 +147,7 @@ void RearrangeWeights(
 
 void RearrangeWeights(
     const tflite::gpu::Tensor<OHWDI, DataType::FLOAT32>& weights,
-    const WeightsDescription& dst_weight_desc, absl::Span<uint8_t> dst) {
+    const WeightsDescription& dst_weight_desc, abslx::Span<uint8_t> dst) {
   const uint flt_count =
       GetTotalElementsCountForLayout(dst_weight_desc, weights.shape);
   if (dst_weight_desc.layout == WeightsLayout::kOSpatialIOGroupI4O4) {
@@ -155,12 +155,12 @@ void RearrangeWeights(
       float4* f32_ptr = reinterpret_cast<float4*>(dst.data());
       RearrangeWeightsToODHWIOGroupI4O4(weights,
                                         dst_weight_desc.output_group_size,
-                                        absl::MakeSpan(f32_ptr, flt_count / 4));
+                                        abslx::MakeSpan(f32_ptr, flt_count / 4));
     } else if (dst_weight_desc.type == DataType::FLOAT16) {
       half4* f16_ptr = reinterpret_cast<half4*>(dst.data());
       RearrangeWeightsToODHWIOGroupI4O4(weights,
                                         dst_weight_desc.output_group_size,
-                                        absl::MakeSpan(f16_ptr, flt_count / 4));
+                                        abslx::MakeSpan(f16_ptr, flt_count / 4));
     }
     return;
   } else if (dst_weight_desc.layout == WeightsLayout::kOSpatialIOGroupO4I4) {
@@ -168,12 +168,12 @@ void RearrangeWeights(
       float4* f32_ptr = reinterpret_cast<float4*>(dst.data());
       RearrangeWeightsToODHWIOGroupO4I4(weights,
                                         dst_weight_desc.output_group_size,
-                                        absl::MakeSpan(f32_ptr, flt_count / 4));
+                                        abslx::MakeSpan(f32_ptr, flt_count / 4));
     } else if (dst_weight_desc.type == DataType::FLOAT16) {
       half4* f16_ptr = reinterpret_cast<half4*>(dst.data());
       RearrangeWeightsToODHWIOGroupO4I4(weights,
                                         dst_weight_desc.output_group_size,
-                                        absl::MakeSpan(f16_ptr, flt_count / 4));
+                                        abslx::MakeSpan(f16_ptr, flt_count / 4));
     }
     return;
   } else if (dst_weight_desc.layout == WeightsLayout::kOICustomSpatialI4O4) {
@@ -181,12 +181,12 @@ void RearrangeWeights(
       float4* f32_ptr = reinterpret_cast<float4*>(dst.data());
       RearrangeWeightsToOICustomSpatialI4O4(
           weights, dst_weight_desc.spatial_remap,
-          absl::MakeSpan(f32_ptr, flt_count / 4));
+          abslx::MakeSpan(f32_ptr, flt_count / 4));
     } else if (dst_weight_desc.type == DataType::FLOAT16) {
       half4* f16_ptr = reinterpret_cast<half4*>(dst.data());
       RearrangeWeightsToOICustomSpatialI4O4(
           weights, dst_weight_desc.spatial_remap,
-          absl::MakeSpan(f16_ptr, flt_count / 4));
+          abslx::MakeSpan(f16_ptr, flt_count / 4));
     }
     return;
   } else if (dst_weight_desc.layout == WeightsLayout::kOICustomSpatialO4I4) {
@@ -194,12 +194,12 @@ void RearrangeWeights(
       float4* f32_ptr = reinterpret_cast<float4*>(dst.data());
       RearrangeWeightsToOICustomSpatialO4I4(
           weights, dst_weight_desc.spatial_remap,
-          absl::MakeSpan(f32_ptr, flt_count / 4));
+          abslx::MakeSpan(f32_ptr, flt_count / 4));
     } else if (dst_weight_desc.type == DataType::FLOAT16) {
       half4* f16_ptr = reinterpret_cast<half4*>(dst.data());
       RearrangeWeightsToOICustomSpatialO4I4(
           weights, dst_weight_desc.spatial_remap,
-          absl::MakeSpan(f16_ptr, flt_count / 4));
+          abslx::MakeSpan(f16_ptr, flt_count / 4));
     }
     return;
   } else if (dst_weight_desc.layout ==
@@ -208,12 +208,12 @@ void RearrangeWeights(
       float4* f32_ptr = reinterpret_cast<float4*>(dst.data());
       RearrangeWeightsToI4DHWIOOGroupO4(weights,
                                         dst_weight_desc.output_group_size,
-                                        absl::MakeSpan(f32_ptr, flt_count / 4));
+                                        abslx::MakeSpan(f32_ptr, flt_count / 4));
     } else if (dst_weight_desc.type == DataType::FLOAT16) {
       half4* f16_ptr = reinterpret_cast<half4*>(dst.data());
       RearrangeWeightsToI4DHWIOOGroupO4(weights,
                                         dst_weight_desc.output_group_size,
-                                        absl::MakeSpan(f16_ptr, flt_count / 4));
+                                        abslx::MakeSpan(f16_ptr, flt_count / 4));
     }
     return;
   } else if (dst_weight_desc.layout ==
@@ -222,12 +222,12 @@ void RearrangeWeights(
       float4* f32_ptr = reinterpret_cast<float4*>(dst.data());
       RearrangeWeightsToO4DHWIOOGroupI4(weights,
                                         dst_weight_desc.output_group_size,
-                                        absl::MakeSpan(f32_ptr, flt_count / 4));
+                                        abslx::MakeSpan(f32_ptr, flt_count / 4));
     } else if (dst_weight_desc.type == DataType::FLOAT16) {
       half4* f16_ptr = reinterpret_cast<half4*>(dst.data());
       RearrangeWeightsToO4DHWIOOGroupI4(weights,
                                         dst_weight_desc.output_group_size,
-                                        absl::MakeSpan(f16_ptr, flt_count / 4));
+                                        abslx::MakeSpan(f16_ptr, flt_count / 4));
     }
     return;
   }

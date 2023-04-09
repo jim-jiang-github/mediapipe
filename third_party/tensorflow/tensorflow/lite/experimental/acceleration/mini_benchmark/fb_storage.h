@@ -42,7 +42,7 @@ namespace acceleration {
 // unnecessarily.
 class FileStorage {
  public:
-  FileStorage(absl::string_view path, ErrorReporter* error_reporter);
+  FileStorage(abslx::string_view path, ErrorReporter* error_reporter);
   // Read contents into buffer_. Returns an error if file exists but cannot be
   // read.
   MinibenchmarkStatus ReadFileIntoBuffer();
@@ -52,7 +52,7 @@ class FileStorage {
   // This calls fsync() on the file to guarantee persistence and is hence quite
   // expensive. The assumption is that this is not done often or in a critical
   // path.
-  MinibenchmarkStatus AppendDataToFile(absl::string_view data);
+  MinibenchmarkStatus AppendDataToFile(abslx::string_view data);
 
  protected:
   std::string path_;
@@ -75,7 +75,7 @@ template <typename T>
 class FlatbufferStorage : protected FileStorage {
  public:
   explicit FlatbufferStorage(
-      absl::string_view path,
+      abslx::string_view path,
       ErrorReporter* error_reporter = DefaultErrorReporter())
       : FileStorage(path, error_reporter) {}
   // Reads current contents. Returns an error if file is inaccessible or

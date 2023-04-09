@@ -38,7 +38,7 @@ Status DeviceContext::CopyDeviceTensorToCPUSync(const Tensor* device_tensor,
                                                 StringPiece tensor_name,
                                                 Device* device,
                                                 Tensor* cpu_tensor) {
-  absl::Notification n;
+  abslx::Notification n;
   Status status;
   CopyDeviceTensorToCPU(device_tensor, tensor_name, device, cpu_tensor,
                         [&](const Status& s) {
@@ -52,7 +52,7 @@ Status DeviceContext::CopyDeviceTensorToCPUSync(const Tensor* device_tensor,
 Status DeviceContext::CopyCPUTensorToDeviceSync(const Tensor* cpu_tensor,
                                                 Device* device,
                                                 Tensor* device_tensor) const {
-  absl::Notification n;
+  abslx::Notification n;
   Status status;
   CopyCPUTensorToDevice(cpu_tensor, device, device_tensor,
                         [&](const Status& s) {
@@ -105,20 +105,20 @@ const Eigen::ThreadPoolDevice* DeviceBase::eigen_cpu_device() {
 
 namespace {
 
-absl::flat_hash_set<std::string>* GetSymbolicDeviceList() {
-  static absl::flat_hash_set<std::string>* symbolic_device_list =
-      new absl::flat_hash_set<std::string>();
+abslx::flat_hash_set<std::string>* GetSymbolicDeviceList() {
+  static abslx::flat_hash_set<std::string>* symbolic_device_list =
+      new abslx::flat_hash_set<std::string>();
   return symbolic_device_list;
 }
 
 }  // namespace
 
-void AddSymbolicExecutionDevice(const absl::string_view device_name) {
+void AddSymbolicExecutionDevice(const abslx::string_view device_name) {
   GetSymbolicDeviceList()->insert(std::string(device_name));
 }
 
-bool IsSymbolicExecutionDevice(const absl::string_view device_name) {
-  absl::flat_hash_set<std::string>* symbolic_devices = GetSymbolicDeviceList();
+bool IsSymbolicExecutionDevice(const abslx::string_view device_name) {
+  abslx::flat_hash_set<std::string>* symbolic_devices = GetSymbolicDeviceList();
   if (symbolic_devices->contains(device_name)) {
     return true;
   } else {

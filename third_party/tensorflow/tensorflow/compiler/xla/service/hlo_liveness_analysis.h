@@ -39,7 +39,7 @@ namespace xla {
 class HloLivenessAnalysis {
  public:
   // Maps from an HloInstruction to its live/dead output shape indices.
-  using HloIndexMap = absl::flat_hash_map<const HloInstruction*,
+  using HloIndexMap = abslx::flat_hash_map<const HloInstruction*,
                                           std::unique_ptr<ShapeTree<bool>>>;
 
   // Runs liveness analysis on 'module'. Returns HloLivenessAnalysis object

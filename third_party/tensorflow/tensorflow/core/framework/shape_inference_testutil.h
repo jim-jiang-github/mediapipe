@@ -93,7 +93,7 @@ class ShapeInferenceTestutil {
             .error_message();                                               \
     const std::string substring = error_substring;                          \
     EXPECT_NE("", error_message);                                           \
-    EXPECT_TRUE(absl::StrContains(error_message, substring))                \
+    EXPECT_TRUE(abslx::StrContains(error_message, substring))                \
         << "Expected to see '" << substring << "' in '" << error_message    \
         << "'";                                                             \
   }

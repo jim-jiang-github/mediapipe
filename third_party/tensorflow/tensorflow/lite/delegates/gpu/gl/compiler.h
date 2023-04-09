@@ -31,7 +31,7 @@ namespace tflite {
 namespace gpu {
 namespace gl {
 
-using ShaderCodeCallback = std::function<absl::Status(ShaderCode code)>;
+using ShaderCodeCallback = std::function<abslx::Status(ShaderCode code)>;
 
 class Compiler {
  public:
@@ -40,7 +40,7 @@ class Compiler {
   // Goes over a graph and generates OpenGL shaders for the given graph.
   // Callback is called for every generated shader. Callback may execute shaders
   // as they come or store them elsewhere to execute later.
-  virtual absl::Status Compile(
+  virtual abslx::Status Compile(
       const GraphFloat32& graph,
       const std::unordered_set<int>& tflite_graph_io,  // NOLINT
       const ShaderCodeCallback& callback) = 0;

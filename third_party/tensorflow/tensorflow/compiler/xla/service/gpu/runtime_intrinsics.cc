@@ -34,7 +34,7 @@ namespace xla {
 extern const char* const kXlaGpuAssertCustomCallTag = "__xla_gpu_assert";
 
 static Status AssertOnGpu(void* stream_handle, void* buffer,
-                          absl::string_view error_msg) {
+                          abslx::string_view error_msg) {
   TF_ASSIGN_OR_RETURN(se::Platform * platform,
                       se::MultiPlatformManager::PlatformWithName("CUDA"));
   se::StreamExecutorConfig config;
@@ -65,7 +65,7 @@ static void AssertionCustomCall(void* stream_handle, void** buffers,
                                 XlaCustomCallStatus* status) {
   Status s =
       AssertOnGpu(stream_handle, buffers[0],
-                  absl::string_view{opaque, static_cast<uint64_t>(opaque_len)});
+                  abslx::string_view{opaque, static_cast<uint64_t>(opaque_len)});
   if (!s.ok()) {
     XlaCustomCallStatusSetFailure(status, s.error_message().c_str(),
                                   s.error_message().size());

@@ -45,7 +45,7 @@ PaddingEffectGenerator::PaddingEffectGenerator(const int input_width,
   }
 }
 
-absl::Status PaddingEffectGenerator::Process(
+abslx::Status PaddingEffectGenerator::Process(
     const ImageFrame& input_frame, const float background_contrast,
     const int blur_cv_size, const float overlay_opacity,
     ImageFrame* output_frame, const cv::Scalar* background_color_in_rgb) {
@@ -170,7 +170,7 @@ absl::Status PaddingEffectGenerator::Process(
   output_frame->CopyPixelData(input_frame.Format(), canvas.cols, canvas.rows,
                               canvas.data,
                               ImageFrame::kDefaultAlignmentBoundary);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 cv::Rect PaddingEffectGenerator::ComputeOutputLocation() {

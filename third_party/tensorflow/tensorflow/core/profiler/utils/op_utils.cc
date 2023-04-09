@@ -40,8 +40,8 @@ double GetCappedPerf(double perf, uint64 time, double rate_limit) {
 
 }  // namespace
 
-void HostOpMetricsDbBuilder::EnterOp(absl::string_view name,
-                                     absl::string_view category, bool is_eager,
+void HostOpMetricsDbBuilder::EnterOp(abslx::string_view name,
+                                     abslx::string_view category, bool is_eager,
                                      uint64 time_ps, uint64 children_time_ps) {
   uint64 self_time_ps = time_ps - children_time_ps;
   DCHECK_GE(time_ps, self_time_ps);
@@ -74,8 +74,8 @@ void HostOpMetricsDbBuilder::EnterHostInfeedEnqueue(
 }
 
 void DeviceOpMetricsDbBuilder::EnterOp(
-    uint64 program_id, absl::string_view name, absl::string_view category,
-    absl::string_view provenance, bool is_eager, uint64 occurrences,
+    uint64 program_id, abslx::string_view name, abslx::string_view category,
+    abslx::string_view provenance, bool is_eager, uint64 occurrences,
     uint64 time_ps, uint64 children_time_ps, int64_t flops,
     int64_t bytes_accessed,
     const protobuf::RepeatedPtrField<OpMetrics::MemoryAccessed>&

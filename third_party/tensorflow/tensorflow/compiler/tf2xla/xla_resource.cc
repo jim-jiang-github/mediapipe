@@ -26,7 +26,7 @@ limitations under the License.
 
 namespace tensorflow {
 
-/*static*/ absl::string_view XlaResource::KindToString(XlaResource::Kind kind) {
+/*static*/ abslx::string_view XlaResource::KindToString(XlaResource::Kind kind) {
   switch (kind) {
     case XlaResource::kInvalid:
       return "invalid";
@@ -81,7 +81,7 @@ XlaResource::XlaResource(
   for (const string& gradient : tensor_array_gradients) {
     tensor_array_gradients_[gradient].reset(new XlaResource(
         /*kind=*/kTensorArray, /*arg_num=*/-1,
-        /*name=*/absl::StrCat("TensorArrayGrad: ", name_), type_, shape_,
+        /*name=*/abslx::StrCat("TensorArrayGrad: ", name_), type_, shape_,
         xla::XlaOp(), max_array_size_, /*tensor_array_gradients=*/{},
         /*tensor_array_multiple_writes_aggregate=*/true));
   }
@@ -177,7 +177,7 @@ Status XlaResource::GetOrCreateTensorArrayGradient(const string& source,
         xla::Broadcast(XlaHelpers::Zero(builder, type_), ta_shape.dim_sizes());
     gradient.reset(
         new XlaResource(/*kind=*/kTensorArray, /*arg_num=*/-1,
-                        /*name=*/absl::StrCat("TensorArrayGrad: ", name_),
+                        /*name=*/abslx::StrCat("TensorArrayGrad: ", name_),
                         type_, shape_, gradient_value, max_array_size_,
                         /*tensor_array_gradients=*/{},
                         /*tensor_array_multiple_writes_aggregate=*/true));

@@ -28,10 +28,10 @@ class UserDefinedType {
  public:
   UserDefinedType() = default;
 
-  void Append(absl::string_view str) { value_.append(str.data(), str.size()); }
+  void Append(abslx::string_view str) { value_.append(str.data(), str.size()); }
   const std::string& Value() const { return value_; }
 
-  friend void AbslFormatFlush(UserDefinedType* x, absl::string_view str) {
+  friend void AbslFormatFlush(UserDefinedType* x, abslx::string_view str) {
     x->Append(str);
   }
 
@@ -56,7 +56,7 @@ std::string MakeRandomString(size_t len) {
 TEST(FormatExtensionTest, SinkAppendSubstring) {
   for (size_t chunk_size : {1, 10, 100, 1000, 10000}) {
     std::string expected, actual;
-    absl::str_format_internal::FormatSinkImpl sink(&actual);
+    abslx::str_format_internal::FormatSinkImpl sink(&actual);
     for (size_t chunks = 0; chunks < 10; ++chunks) {
       std::string rand = MakeRandomString(chunk_size);
       expected += rand;
@@ -70,7 +70,7 @@ TEST(FormatExtensionTest, SinkAppendSubstring) {
 TEST(FormatExtensionTest, SinkAppendChars) {
   for (size_t chunk_size : {1, 10, 100, 1000, 10000}) {
     std::string expected, actual;
-    absl::str_format_internal::FormatSinkImpl sink(&actual);
+    abslx::str_format_internal::FormatSinkImpl sink(&actual);
     for (size_t chunks = 0; chunks < 10; ++chunks) {
       std::string rand = MakeRandomString(1);
       expected.append(chunk_size, rand[0]);
@@ -83,14 +83,14 @@ TEST(FormatExtensionTest, SinkAppendChars) {
 
 TEST(FormatExtensionTest, VerifyEnumEquality) {
 #define X_VAL(id)                           \
-  EXPECT_EQ(absl::FormatConversionChar::id, \
-            absl::str_format_internal::FormatConversionCharInternal::id);
+  EXPECT_EQ(abslx::FormatConversionChar::id, \
+            abslx::str_format_internal::FormatConversionCharInternal::id);
   ABSL_INTERNAL_CONVERSION_CHARS_EXPAND_(X_VAL, );
 #undef X_VAL
 
 #define X_VAL(id)                              \
-  EXPECT_EQ(absl::FormatConversionCharSet::id, \
-            absl::str_format_internal::FormatConversionCharSetInternal::id);
+  EXPECT_EQ(abslx::FormatConversionCharSet::id, \
+            abslx::str_format_internal::FormatConversionCharSetInternal::id);
   ABSL_INTERNAL_CONVERSION_CHARS_EXPAND_(X_VAL, );
 #undef X_VAL
 }

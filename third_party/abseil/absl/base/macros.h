@@ -42,9 +42,9 @@
 // can be used in defining new arrays. If you use this macro on a pointer by
 // mistake, you will get a compile-time error.
 #define ABSL_ARRAYSIZE(array) \
-  (sizeof(::absl::macros_internal::ArraySizeHelper(array)))
+  (sizeof(::abslx::macros_internal::ArraySizeHelper(array)))
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace macros_internal {
 // Note: this internal template function declaration is used by ABSL_ARRAYSIZE.
@@ -53,7 +53,7 @@ template <typename T, size_t N>
 auto ArraySizeHelper(const T (&array)[N]) -> char (&)[N];
 }  // namespace macros_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 // ABSL_BAD_CALL_IF()
 //

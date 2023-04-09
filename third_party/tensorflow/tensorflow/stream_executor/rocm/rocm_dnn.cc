@@ -92,7 +92,7 @@ string ToString(miopenStatus_t status) {
     case miopenStatusUnknownError:
       return "miopenStatusUnknownError";
     default:
-      return absl::StrCat("<unknown miopen status: ", static_cast<int>(status),
+      return abslx::StrCat("<unknown miopen status: ", static_cast<int>(status),
                           ">");
   }
 }
@@ -193,7 +193,7 @@ class MIOpenHandle {
   // Takes ownership of the executor context and the lock to access MIOpen
   // using handle.
   MIOpenHandle(gpu::ScopedActivateExecutorContext context,
-               std::unique_ptr<absl::MutexLock> lock, miopenHandle_t handle)
+               std::unique_ptr<abslx::MutexLock> lock, miopenHandle_t handle)
       : context_(std::move(context)), lock_(std::move(lock)), handle_(handle) {}
 
   // Returns MIOpen handle. To be passed directly to MIOpen APIs, don't keep
@@ -202,7 +202,7 @@ class MIOpenHandle {
 
  private:
   gpu::ScopedActivateExecutorContext context_;
-  std::unique_ptr<absl::MutexLock> lock_;
+  std::unique_ptr<abslx::MutexLock> lock_;
   miopenHandle_t handle_;  // Not owned.
 };
 
@@ -435,7 +435,7 @@ class CachedFusionPlans {
                            miopenFusionPlanDescriptor_t* fusion_plan,
                            miopenFusionDirection_t fusion_direction,
                            miopenTensorDescriptor_t input_descriptor) {
-    absl::MutexLock lock{&cached_plans_mutex};
+    abslx::MutexLock lock{&cached_plans_mutex};
 
     bool found_cached_plan = false;
 
@@ -459,7 +459,7 @@ class CachedFusionPlans {
 
   // Need to figure out the right place to call this routine
   static void Clear() {
-    absl::MutexLock lock{&cached_plans_mutex};
+    abslx::MutexLock lock{&cached_plans_mutex};
 
     for (auto it : cached_plans) {
       auto status = wrap::miopenDestroyFusionPlan(it.second);
@@ -476,19 +476,19 @@ class CachedFusionPlans {
 
   // Is the Fusion plan corresponding to this hash unsupported
   static bool IsUnsupportedFusionPlan(uint64_t hash) {
-    absl::MutexLock lock{&cached_plans_mutex};
+    abslx::MutexLock lock{&cached_plans_mutex};
     return unsupported_plans.count(hash) > 0;
   }
 
   // Mark the given hash value as corresponding to an unsupported fusion plan
   static void MarkFusionPlanUnsupported(uint64_t hash) {
-    absl::MutexLock lock{&cached_plans_mutex};
+    abslx::MutexLock lock{&cached_plans_mutex};
     unsupported_plans.insert(hash);
   }
 
  private:
   // Mutex to guard access to all data within this class
-  static absl::Mutex cached_plans_mutex;
+  static abslx::Mutex cached_plans_mutex;
 
   // Map of hash-value to MIOpen Fusion plan descriptors
   // Need to be able share this across more than one stream and hence static
@@ -499,7 +499,7 @@ class CachedFusionPlans {
   static std::set<uint64_t> unsupported_plans;
 };
 
-absl::Mutex CachedFusionPlans::cached_plans_mutex;
+abslx::Mutex CachedFusionPlans::cached_plans_mutex;
 std::map<uint64_t, miopenFusionPlanDescriptor_t>
     CachedFusionPlans::cached_plans;
 std::set<uint64_t> CachedFusionPlans::unsupported_plans;
@@ -551,7 +551,7 @@ class MIOpenAccess {
   explicit MIOpenAccess(miopenHandle_t handle) : handle_(handle) {}
 
   ~MIOpenAccess() {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     wrap::miopenDestroy(handle_);
   }
 
@@ -570,7 +570,7 @@ class MIOpenAccess {
   // therefore a bad idea (performance wise) to call any MIOpen APIs that
   // enqueue work in the stream.
   MIOpenHandle GetHandle(GpuExecutor* executor, Stream* stream) {
-    auto lock = absl::make_unique<absl::MutexLock>(&mutex_);
+    auto lock = abslx::make_unique<abslx::MutexLock>(&mutex_);
     mutex_.AssertHeld();
     gpu::ScopedActivateExecutorContext context(executor);
     hipStream_t hip_stream = stream ? AsGpuStreamValue(stream) : nullptr;
@@ -581,7 +581,7 @@ class MIOpenAccess {
 
  private:
   // Guards the enqueueing of MIOpen operations via the handle_ below.
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
 
   // MIOpen library handle.
   miopenHandle_t handle_ TF_GUARDED_BY(mutex_);  // Owned.
@@ -633,7 +633,7 @@ port::Status MIOpenSupport::Init() {
   }
 
   return port::Status{port::error::INTERNAL,
-                      absl::StrCat("miopen library could not create a handle: ",
+                      abslx::StrCat("miopen library could not create a handle: ",
                                    ToString(status))};
 }
 
@@ -765,9 +765,9 @@ class ScopedFilterDescriptor {
         // MIOpen requires arrays of ints.
         std::vector<int> strides;
         std::vector<int> dims;
-        absl::c_transform(strides64, std::back_inserter(strides),
+        abslx::c_transform(strides64, std::back_inserter(strides),
                           &CheckedNarrowing<int64_t, int>);
-        absl::c_transform(dims64, std::back_inserter(dims),
+        abslx::c_transform(dims64, std::back_inserter(dims),
                           &CheckedNarrowing<int64_t, int>);
         status = wrap::miopenSetTensorDescriptor(handle_, elem_type, nd,
                                                  dims.data(), strides.data());
@@ -880,9 +880,9 @@ class ScopedPoolingDescriptor {
                  << ToString(status);
     }
 
-    absl::Span<const int64_t> strides64 = pooling_descriptor.strides();
-    absl::Span<const int64_t> padding64 = pooling_descriptor.padding();
-    absl::Span<const int64_t> shape64 = pooling_descriptor.window();
+    abslx::Span<const int64_t> strides64 = pooling_descriptor.strides();
+    abslx::Span<const int64_t> padding64 = pooling_descriptor.padding();
+    abslx::Span<const int64_t> shape64 = pooling_descriptor.window();
 
     const int nd = pooling_descriptor.ndims();
     std::vector<int> shape(nd);
@@ -1757,7 +1757,7 @@ class MixinBase<void> {};
 
 #define RETURN_IF_MIOPEN_ERROR(STATUS, ...)                              \
   if (!SE_PREDICT_TRUE((STATUS) == miopenStatusSuccess)) {               \
-    string error_msg = absl::StrCat(ToString(STATUS), " ", __VA_ARGS__); \
+    string error_msg = abslx::StrCat(ToString(STATUS), " ", __VA_ARGS__); \
     SetFailure(port::Status(port::error::UNKNOWN, error_msg));           \
     LOG(ERROR) << error_msg;                                             \
     return;                                                              \
@@ -1922,7 +1922,7 @@ class MIOpenRnnSequenceTensorDescriptor
     miopenTensorDescriptor_t handle = nullptr;
     if (seq_length <= 0) {
       string error_msg =
-          absl::StrCat("sequence length must be positive: ", seq_length);
+          abslx::StrCat("sequence length must be positive: ", seq_length);
       LOG(ERROR) << error_msg;
       SetFailure(port::Status(port::error::UNKNOWN, error_msg));
       return;
@@ -2443,9 +2443,9 @@ port::Status MIOpenSupport::DoPrepareForCtcLoss(
     Stream* stream, dnn::DataType element_type,
     const dnn::RnnStateTensorDescriptor& probs_desc,
     const dnn::RnnStateTensorDescriptor& grads_desc,
-    absl::Span<const int> labels_data,
-    absl::Span<const int> labels_lengths_data,
-    absl::Span<const int> input_lengths_data,
+    abslx::Span<const int> labels_data,
+    abslx::Span<const int> labels_lengths_data,
+    abslx::Span<const int> input_lengths_data,
     ScratchAllocator* scratch_allocator, DeviceMemory<uint8>* scratch_memory,
     int* ctc_loss_algo_id) {
   auto miopen = miopen_->GetHandle(parent_, stream);
@@ -2480,7 +2480,7 @@ port::Status MIOpenSupport::DoPrepareForCtcLoss(
   if (workspace_size_in_bytes != 0) {
     if (scratch_allocator == nullptr) {
       return port::InternalError(
-          absl::StrCat("An allocator must be specified when scratch memory is "
+          abslx::StrCat("An allocator must be specified when scratch memory is "
                        "needed"));
     }
     auto scratch_or = scratch_allocator->AllocateBytes(workspace_size_in_bytes);
@@ -2494,7 +2494,7 @@ port::Status MIOpenSupport::DoPrepareForCtcLoss(
              "larger number (e.g. 8192) to increase the max memory limit.\n"
           << "\tIncreasing the max memory limit might help resolve this "
              "error";
-      return port::InternalError(absl::StrCat(
+      return port::InternalError(abslx::StrCat(
           "Failed to allocate scratch memory for MIOpen CTC Loss, of size: ",
           workspace_size_in_bytes));
     }
@@ -2505,9 +2505,9 @@ port::Status MIOpenSupport::DoPrepareForCtcLoss(
 
 port::Status MIOpenSupport::DoCtcLossImpl(
     Stream* stream, const MIOpenRnnStateTensorDescriptor& probs_desc,
-    const DeviceMemoryBase probs_data, absl::Span<const int> labels_data,
-    absl::Span<const int> labels_lengths_data,
-    absl::Span<const int> input_lengths_data, DeviceMemoryBase costs_data,
+    const DeviceMemoryBase probs_data, abslx::Span<const int> labels_data,
+    abslx::Span<const int> labels_lengths_data,
+    abslx::Span<const int> input_lengths_data, DeviceMemoryBase costs_data,
     const MIOpenRnnStateTensorDescriptor& grads_desc,
     DeviceMemoryBase grads_data, const MIOpenCTCLossDescriptor& ctc_loss_desc,
     DeviceMemory<uint8> scratch_memory, int ctc_loss_algo_id) {
@@ -2536,9 +2536,9 @@ port::Status MIOpenSupport::DoCtcLossImpl(
 port::Status MIOpenSupport::DoCtcLoss(
     Stream* stream, dnn::DataType element_type,
     const dnn::RnnStateTensorDescriptor& probs_desc,
-    const DeviceMemoryBase probs_data, absl::Span<const int> labels_data,
-    absl::Span<const int> labels_lengths_data,
-    absl::Span<const int> input_lengths_data, DeviceMemoryBase costs_data,
+    const DeviceMemoryBase probs_data, abslx::Span<const int> labels_data,
+    abslx::Span<const int> labels_lengths_data,
+    abslx::Span<const int> input_lengths_data, DeviceMemoryBase costs_data,
     const dnn::RnnStateTensorDescriptor& grads_desc,
     DeviceMemoryBase grads_data, DeviceMemory<uint8> scratch_memory,
     int ctc_loss_algo_id) {
@@ -2924,7 +2924,7 @@ port::Status MIOpenSupport::DoPrepareForConvolution(
   if (scratch_memory_size != 0) {
     if (scratch_allocator == nullptr) {
       return port::InternalError(
-          absl::StrCat("An allocator must be specified when scratch memory is "
+          abslx::StrCat("An allocator must be specified when scratch memory is "
                        "needed"));
     }
     auto allocated = scratch_allocator->AllocateBytes(scratch_memory_size);
@@ -2938,7 +2938,7 @@ port::Status MIOpenSupport::DoPrepareForConvolution(
              "larger number (e.g. 8192) to increase the max memory limit.\n"
           << "\tIncreasing the max memory limit might help resolve this "
              "error";
-      return port::InternalError(absl::StrCat(
+      return port::InternalError(abslx::StrCat(
           "Failed to allocate scratch memory of size: ", scratch_memory_size));
     }
   }
@@ -3065,7 +3065,7 @@ class RocmConvRunner : public dnn::ConvRunner {
         break;
       }
       default:
-        return port::InternalError(absl::StrCat("Unexpected convolution kind ",
+        return port::InternalError(abslx::StrCat("Unexpected convolution kind ",
                                                 static_cast<int>(kind_)));
     }
 
@@ -3085,7 +3085,7 @@ class RocmConvRunner : public dnn::ConvRunner {
 
     if (status != miopenStatusSuccess) {
       return port::InternalError(
-          absl::StrCat("Failed to enqueue convolution on stream: ",
+          abslx::StrCat("Failed to enqueue convolution on stream: ",
                        ::stream_executor::gpu::ToString(status)));
     }
 
@@ -3153,7 +3153,7 @@ port::Status MIOpenSupport::GetConvolveRunners(
     std::vector<std::unique_ptr<const dnn::ConvRunner>>* out_runners) {
   if (input_type != output_type) {
     return port::UnimplementedError(
-        absl::StrFormat("MIOpen backend does not support different input and "
+        abslx::StrFormat("MIOpen backend does not support different input and "
                         "output types: %d != %d",
                         input_type, output_type));
   }
@@ -3190,7 +3190,7 @@ MIOpenSupport::ConvolveRunnerFromDesc(
     const dnn::ConvolutionDescriptor& convolution_descriptor) {
   if (input_type != output_type) {
     return port::UnimplementedError(
-        absl::StrFormat("MIOpen backend does not support different input and "
+        abslx::StrFormat("MIOpen backend does not support different input and "
                         "output types: %d != %d",
                         input_type, output_type));
   }
@@ -4046,7 +4046,7 @@ port::Status MIOpenSupport::DoPoolForward(
     auto status = wrap::miopenPoolingGetWorkSpaceSizeV2(
         pooling_desc.handle(), dest_desc.handle(), &workspace_size);
     if (status != miopenStatusSuccess) {
-      return port::InternalError(absl::StrCat(
+      return port::InternalError(abslx::StrCat(
           "Failed to obtain workspace size for backward pooling on stream: ",
           ToString(status)));
     }
@@ -4079,7 +4079,7 @@ port::Status MIOpenSupport::DoPoolForward(
       input_data.opaque(), &beta, dest_desc.handle(), output_data.opaque(),
       do_backward, workspace, workspace_size);
   if (status != miopenStatusSuccess) {
-    return port::InternalError(absl::StrCat(
+    return port::InternalError(abslx::StrCat(
         "Failed to enqueue forward pooling on stream: ", ToString(status)));
   }
   return port::Status::OK();
@@ -4203,7 +4203,7 @@ port::Status MIOpenSupport::DoPoolBackward(
   auto status = wrap::miopenPoolingGetWorkSpaceSizeV2(
       pooling_desc.handle(), dest_desc.handle(), &workspace_size_in_bytes);
   if (status != miopenStatusSuccess) {
-    return port::InternalError(absl::StrCat(
+    return port::InternalError(abslx::StrCat(
         "Failed to obtain workspace size for backward pooling on stream: ",
         ToString(status)));
   }
@@ -4260,7 +4260,7 @@ port::Status MIOpenSupport::DoPoolBackward(
           workspace.opaque(), workspace_size_in_bytes);
 
       if (status != miopenStatusSuccess) {
-        return port::InternalError(absl::StrCat(
+        return port::InternalError(abslx::StrCat(
             "Failed to enqueue forward pooling (before backward) on stream: ",
             ToString(status)));
       }
@@ -4275,7 +4275,7 @@ port::Status MIOpenSupport::DoPoolBackward(
       output_diff_data.opaque(), workspace_ptr);
 
   if (status != miopenStatusSuccess) {
-    return port::InternalError(absl::StrCat(
+    return port::InternalError(abslx::StrCat(
         "Failed to enqueue backward pooling on stream: ", ToString(status)));
   }
   return port::Status::OK();
@@ -4449,7 +4449,7 @@ bool MIOpenSupport::DoDepthConcatenate(
   for (size_t i = 0; i < input_data.size(); ++i) {
     const auto& dimensions = input_dimensions[i];
     tmp.resize(dimensions.ElementCount());
-    stream->ThenMemcpyD2H<float>(*input_data[i], absl::MakeSpan(tmp));
+    stream->ThenMemcpyD2H<float>(*input_data[i], abslx::MakeSpan(tmp));
     port::Status block_status = stream->BlockHostUntilDone();
     if (!block_status.ok()) {
       LOG(ERROR) << "BlockHostUntilDone failed: " << block_status;

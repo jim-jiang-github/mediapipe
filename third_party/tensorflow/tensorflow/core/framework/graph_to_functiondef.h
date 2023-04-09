@@ -50,7 +50,7 @@ Status GraphToFunctionDef(const Graph& fn_body, const string& fn_name,
 //     be unique for all control output nodes.
 Status GraphToFunctionDef(
     const Graph& graph, const string& name,
-    const std::function<absl::optional<string>(const Node*)>& control_ret,
+    const std::function<abslx::optional<string>(const Node*)>& control_ret,
     FunctionDef* fdef);
 
 Status GraphToFunctionDef(const Graph& graph, const string& name,

@@ -49,10 +49,10 @@ class ScopedAllocatorOptimizer : public GraphOptimizer {
                   GraphDef* optimized_graph) override;
 
   // Map from an Op name to a vector of Nodes with that Op.
-  typedef absl::flat_hash_map<string, std::vector<NodeDef*>> DevOpOccurrences;
+  typedef abslx::flat_hash_map<string, std::vector<NodeDef*>> DevOpOccurrences;
   // Map from a device name to a DevOpOccurrences map.
-  typedef absl::flat_hash_map<string, DevOpOccurrences> GraphOpOccurrences;
-  typedef absl::flat_hash_set<string> OpNameSet;
+  typedef abslx::flat_hash_map<string, DevOpOccurrences> GraphOpOccurrences;
+  typedef abslx::flat_hash_set<string> OpNameSet;
 
   Status ProcessGraphDef(GraphDef* graph,
                          const GraphProperties& graph_properties);
@@ -72,7 +72,7 @@ class ScopedAllocatorOptimizer : public GraphOptimizer {
 
   NodeMap* node_map() { return node_map_.get(); }
 
-  const absl::flat_hash_set<string>& repeated_outputs() {
+  const abslx::flat_hash_set<string>& repeated_outputs() {
     return repeated_outputs_;
   }
 
@@ -110,7 +110,7 @@ class ScopedAllocatorOptimizer : public GraphOptimizer {
   RewriterConfig::Toggle opt_level_;
   std::unordered_set<string> nodes_to_preserve_;
   OpNameSet op_name_set_;
-  absl::flat_hash_map<string, Rewriter*> rewriters_;
+  abslx::flat_hash_map<string, Rewriter*> rewriters_;
   std::vector<Rewriter*> to_delete_;
   int next_sa_id_ = 1;
   int next_identity_id_ = 1;
@@ -118,7 +118,7 @@ class ScopedAllocatorOptimizer : public GraphOptimizer {
   // Keeps track of outputs, i.e. a node and an output index, that are inputs to
   // more than one op groups that are candidates for scoped allocator
   // optimization.
-  absl::flat_hash_set<string> repeated_outputs_;
+  abslx::flat_hash_set<string> repeated_outputs_;
 };
 
 }  // namespace grappler

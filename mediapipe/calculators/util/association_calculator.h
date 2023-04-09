@@ -46,7 +46,7 @@ namespace mediapipe {
 template <typename T>
 class AssociationCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     // Atmost one input stream can be tagged with "PREV".
     RET_CHECK_LE(cc->Inputs().NumEntries("PREV"), 1);
 
@@ -61,10 +61,10 @@ class AssociationCalculator : public CalculatorBase {
 
     cc->Outputs().Index(0).Set<std::vector<T>>();
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
 
     has_prev_input_stream_ = cc->Inputs().HasTag("PREV");
@@ -74,10 +74,10 @@ class AssociationCalculator : public CalculatorBase {
     options_ = cc->Options<::mediapipe::AssociationCalculatorOptions>();
     CHECK_GE(options_.min_similarity_threshold(), 0);
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     auto get_non_overlapping_elements = GetNonOverlappingElements(cc);
     if (!get_non_overlapping_elements.ok()) {
       return get_non_overlapping_elements.status();
@@ -98,13 +98,13 @@ class AssociationCalculator : public CalculatorBase {
           PropagateIdsFromPreviousToCurrent(prev_input_vec, &result));
     }
 
-    auto output = absl::make_unique<std::vector<T>>();
+    auto output = abslx::make_unique<std::vector<T>>();
     for (auto it = result.begin(); it != result.end(); ++it) {
       output->push_back(*it);
     }
     cc->Outputs().Index(0).Add(output.release(), cc->InputTimestamp());
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  protected:
@@ -113,8 +113,8 @@ class AssociationCalculator : public CalculatorBase {
   bool has_prev_input_stream_;
   CollectionItemId prev_input_stream_id_;
 
-  virtual absl::StatusOr<Rectangle_f> GetRectangle(const T& input) {
-    return absl::OkStatus();
+  virtual abslx::StatusOr<Rectangle_f> GetRectangle(const T& input) {
+    return abslx::OkStatus();
   }
 
   virtual std::pair<bool, int> GetId(const T& input) { return {false, -1}; }
@@ -124,7 +124,7 @@ class AssociationCalculator : public CalculatorBase {
  private:
   // Get a list of non-overlapping elements from all input streams, with
   // increasing order of priority based on input stream index.
-  absl::StatusOr<std::list<T>> GetNonOverlappingElements(
+  abslx::StatusOr<std::list<T>> GetNonOverlappingElements(
       CalculatorContext* cc) {
     std::list<T> result;
 
@@ -166,7 +166,7 @@ class AssociationCalculator : public CalculatorBase {
     return result;
   }
 
-  absl::Status AddElementToList(T element, std::list<T>* current) {
+  abslx::Status AddElementToList(T element, std::list<T>* current) {
     // Compare this element with elements of the input collection. If this
     // element has high overlap with elements of the collection, remove
     // those elements from the collection and add this element.
@@ -197,13 +197,13 @@ class AssociationCalculator : public CalculatorBase {
     }
     current->push_back(element);
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Compare elements of the current list with elements in from the collection
   // of elements from the previous input stream, and propagate IDs from the
   // previous input stream as appropriate.
-  absl::Status PropagateIdsFromPreviousToCurrent(
+  abslx::Status PropagateIdsFromPreviousToCurrent(
       const std::vector<T>& prev_input_vec, std::list<T>* current) {
     for (auto vit = current->begin(); vit != current->end(); ++vit) {
       auto get_cur_rectangle = GetRectangle(*vit);
@@ -240,7 +240,7 @@ class AssociationCalculator : public CalculatorBase {
         *vit = element;
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

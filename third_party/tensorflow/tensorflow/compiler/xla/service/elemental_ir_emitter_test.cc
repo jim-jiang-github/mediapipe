@@ -28,7 +28,7 @@ using std::nullopt;
 
 class ElementalIrEmitterExecutionTest : public HloTestBase {
  protected:
-  void RunTest(const std::string& hlo_text, absl::Span<Literal* const> args) {
+  void RunTest(const std::string& hlo_text, abslx::Span<Literal* const> args) {
     HloModuleConfig config;
     config.set_debug_options(GetDebugOptionsForTest());
     TF_ASSERT_OK_AND_ASSIGN(std::unique_ptr<HloModule> module,
@@ -36,7 +36,7 @@ class ElementalIrEmitterExecutionTest : public HloTestBase {
     EXPECT_TRUE(RunAndCompareNoHloPasses(std::move(module), args, nullopt));
   }
 
-  void RunTypeConversionTest(absl::string_view hlo_text) {
+  void RunTypeConversionTest(abslx::string_view hlo_text) {
     HloModuleConfig config;
     auto debug_options = GetDebugOptionsForTest();
     debug_options.set_xla_cpu_fast_math_honor_nans(true);

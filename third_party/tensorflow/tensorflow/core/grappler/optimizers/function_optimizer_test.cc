@@ -1309,7 +1309,7 @@ TEST_F(FunctionOptimizerTest, InlineIndirectFunctionWithFunctionalControlFlow) {
   TF_EXPECT_OK(optimizer.Optimize(nullptr, item, &optimized_graph));
 
   const auto count_nodes_with_op = [&](const string& op) {
-    return absl::c_count_if(optimized_graph.node(), [&](const NodeDef& node) {
+    return abslx::c_count_if(optimized_graph.node(), [&](const NodeDef& node) {
       return node.op() == op;
     });
   };
@@ -1372,7 +1372,7 @@ TEST_F(FunctionOptimizerTest, InlineIndirectFunctionDontLowerControlFlow) {
   TF_EXPECT_OK(optimizer.Optimize(nullptr, item, &optimized_graph));
 
   const auto count_nodes_with_op = [&](const string& op) {
-    return absl::c_count_if(optimized_graph.node(), [&](const NodeDef& node) {
+    return abslx::c_count_if(optimized_graph.node(), [&](const NodeDef& node) {
       return node.op() == op;
     });
   };

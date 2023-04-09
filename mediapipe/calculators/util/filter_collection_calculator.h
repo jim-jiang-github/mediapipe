@@ -42,7 +42,7 @@ namespace mediapipe {
 template <typename IterableT>
 class FilterCollectionCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     RET_CHECK(cc->Inputs().HasTag("ITERABLE"));
     RET_CHECK(cc->Inputs().HasTag("CONDITION"));
     RET_CHECK(cc->Outputs().HasTag("ITERABLE"));
@@ -52,20 +52,20 @@ class FilterCollectionCalculator : public CalculatorBase {
 
     cc->Outputs().Tag("ITERABLE").Set<IterableT>();
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     if (cc->Inputs().Tag("ITERABLE").IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     if (cc->Inputs().Tag("CONDITION").IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     const std::vector<bool>& filter_by =
@@ -77,29 +77,29 @@ class FilterCollectionCalculator : public CalculatorBase {
   }
 
   template <typename IterableU>
-  absl::Status FilterCollection(std::true_type, CalculatorContext* cc,
+  abslx::Status FilterCollection(std::true_type, CalculatorContext* cc,
                                 const std::vector<bool>& filter_by) {
     const IterableU& input = cc->Inputs().Tag("ITERABLE").Get<IterableU>();
     if (input.size() != filter_by.size()) {
-      return absl::InternalError(absl::StrCat(
+      return abslx::InternalError(abslx::StrCat(
           "Input vector size: ", input.size(),
           " doesn't mach condition vector size: ", filter_by.size()));
     }
 
-    auto output = absl::make_unique<IterableU>();
+    auto output = abslx::make_unique<IterableU>();
     for (int i = 0; i < input.size(); ++i) {
       if (filter_by[i]) {
         output->push_back(input[i]);
       }
     }
     cc->Outputs().Tag("ITERABLE").Add(output.release(), cc->InputTimestamp());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   template <typename IterableU>
-  absl::Status FilterCollection(std::false_type, CalculatorContext* cc,
+  abslx::Status FilterCollection(std::false_type, CalculatorContext* cc,
                                 const std::vector<bool>& filter_by) {
-    return absl::InternalError("Cannot copy input collection to filter it.");
+    return abslx::InternalError("Cannot copy input collection to filter it.");
   }
 };
 

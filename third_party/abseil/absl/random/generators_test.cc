@@ -26,72 +26,72 @@ namespace {
 template <typename URBG>
 void TestUniform(URBG* gen) {
   // [a, b) default-semantics, inferred types.
-  absl::Uniform(*gen, 0, 100);     // int
-  absl::Uniform(*gen, 0, 1.0);     // Promoted to double
-  absl::Uniform(*gen, 0.0f, 1.0);  // Promoted to double
-  absl::Uniform(*gen, 0.0, 1.0);   // double
-  absl::Uniform(*gen, -1, 1L);     // Promoted to long
+  abslx::Uniform(*gen, 0, 100);     // int
+  abslx::Uniform(*gen, 0, 1.0);     // Promoted to double
+  abslx::Uniform(*gen, 0.0f, 1.0);  // Promoted to double
+  abslx::Uniform(*gen, 0.0, 1.0);   // double
+  abslx::Uniform(*gen, -1, 1L);     // Promoted to long
 
   // Roll a die.
-  absl::Uniform(absl::IntervalClosedClosed, *gen, 1, 6);
+  abslx::Uniform(abslx::IntervalClosedClosed, *gen, 1, 6);
 
   // Get a fraction.
-  absl::Uniform(absl::IntervalOpenOpen, *gen, 0.0, 1.0);
+  abslx::Uniform(abslx::IntervalOpenOpen, *gen, 0.0, 1.0);
 
   // Assign a value to a random element.
   std::vector<int> elems = {10, 20, 30, 40, 50};
-  elems[absl::Uniform(*gen, 0u, elems.size())] = 5;
-  elems[absl::Uniform<size_t>(*gen, 0, elems.size())] = 3;
+  elems[abslx::Uniform(*gen, 0u, elems.size())] = 5;
+  elems[abslx::Uniform<size_t>(*gen, 0, elems.size())] = 3;
 
   // Choose some epsilon around zero.
-  absl::Uniform(absl::IntervalOpenOpen, *gen, -1.0, 1.0);
+  abslx::Uniform(abslx::IntervalOpenOpen, *gen, -1.0, 1.0);
 
   // (a, b) semantics, inferred types.
-  absl::Uniform(absl::IntervalOpenOpen, *gen, 0, 1.0);  // Promoted to double
+  abslx::Uniform(abslx::IntervalOpenOpen, *gen, 0, 1.0);  // Promoted to double
 
   // Explict overriding of types.
-  absl::Uniform<int>(*gen, 0, 100);
-  absl::Uniform<int8_t>(*gen, 0, 100);
-  absl::Uniform<int16_t>(*gen, 0, 100);
-  absl::Uniform<uint16_t>(*gen, 0, 100);
-  absl::Uniform<int32_t>(*gen, 0, 1 << 10);
-  absl::Uniform<uint32_t>(*gen, 0, 1 << 10);
-  absl::Uniform<int64_t>(*gen, 0, 1 << 10);
-  absl::Uniform<uint64_t>(*gen, 0, 1 << 10);
+  abslx::Uniform<int>(*gen, 0, 100);
+  abslx::Uniform<int8_t>(*gen, 0, 100);
+  abslx::Uniform<int16_t>(*gen, 0, 100);
+  abslx::Uniform<uint16_t>(*gen, 0, 100);
+  abslx::Uniform<int32_t>(*gen, 0, 1 << 10);
+  abslx::Uniform<uint32_t>(*gen, 0, 1 << 10);
+  abslx::Uniform<int64_t>(*gen, 0, 1 << 10);
+  abslx::Uniform<uint64_t>(*gen, 0, 1 << 10);
 
-  absl::Uniform<float>(*gen, 0.0, 1.0);
-  absl::Uniform<float>(*gen, 0, 1);
-  absl::Uniform<float>(*gen, -1, 1);
-  absl::Uniform<double>(*gen, 0.0, 1.0);
+  abslx::Uniform<float>(*gen, 0.0, 1.0);
+  abslx::Uniform<float>(*gen, 0, 1);
+  abslx::Uniform<float>(*gen, -1, 1);
+  abslx::Uniform<double>(*gen, 0.0, 1.0);
 
-  absl::Uniform<float>(*gen, -1.0, 0);
-  absl::Uniform<double>(*gen, -1.0, 0);
+  abslx::Uniform<float>(*gen, -1.0, 0);
+  abslx::Uniform<double>(*gen, -1.0, 0);
 
   // Tagged
-  absl::Uniform<double>(absl::IntervalClosedClosed, *gen, 0, 1);
-  absl::Uniform<double>(absl::IntervalClosedOpen, *gen, 0, 1);
-  absl::Uniform<double>(absl::IntervalOpenOpen, *gen, 0, 1);
-  absl::Uniform<double>(absl::IntervalOpenClosed, *gen, 0, 1);
-  absl::Uniform<double>(absl::IntervalClosedClosed, *gen, 0, 1);
-  absl::Uniform<double>(absl::IntervalOpenOpen, *gen, 0, 1);
+  abslx::Uniform<double>(abslx::IntervalClosedClosed, *gen, 0, 1);
+  abslx::Uniform<double>(abslx::IntervalClosedOpen, *gen, 0, 1);
+  abslx::Uniform<double>(abslx::IntervalOpenOpen, *gen, 0, 1);
+  abslx::Uniform<double>(abslx::IntervalOpenClosed, *gen, 0, 1);
+  abslx::Uniform<double>(abslx::IntervalClosedClosed, *gen, 0, 1);
+  abslx::Uniform<double>(abslx::IntervalOpenOpen, *gen, 0, 1);
 
-  absl::Uniform<int>(absl::IntervalClosedClosed, *gen, 0, 100);
-  absl::Uniform<int>(absl::IntervalClosedOpen, *gen, 0, 100);
-  absl::Uniform<int>(absl::IntervalOpenOpen, *gen, 0, 100);
-  absl::Uniform<int>(absl::IntervalOpenClosed, *gen, 0, 100);
-  absl::Uniform<int>(absl::IntervalClosedClosed, *gen, 0, 100);
-  absl::Uniform<int>(absl::IntervalOpenOpen, *gen, 0, 100);
+  abslx::Uniform<int>(abslx::IntervalClosedClosed, *gen, 0, 100);
+  abslx::Uniform<int>(abslx::IntervalClosedOpen, *gen, 0, 100);
+  abslx::Uniform<int>(abslx::IntervalOpenOpen, *gen, 0, 100);
+  abslx::Uniform<int>(abslx::IntervalOpenClosed, *gen, 0, 100);
+  abslx::Uniform<int>(abslx::IntervalClosedClosed, *gen, 0, 100);
+  abslx::Uniform<int>(abslx::IntervalOpenOpen, *gen, 0, 100);
 
   // With *generator as an R-value reference.
-  absl::Uniform<int>(URBG(), 0, 100);
-  absl::Uniform<double>(URBG(), 0.0, 1.0);
+  abslx::Uniform<int>(URBG(), 0, 100);
+  abslx::Uniform<double>(URBG(), 0.0, 1.0);
 }
 
 template <typename URBG>
 void TestExponential(URBG* gen) {
-  absl::Exponential<float>(*gen);
-  absl::Exponential<double>(*gen);
-  absl::Exponential<double>(URBG());
+  abslx::Exponential<float>(*gen);
+  abslx::Exponential<double>(*gen);
+  abslx::Exponential<double>(URBG());
 }
 
 template <typename URBG>
@@ -99,53 +99,53 @@ void TestPoisson(URBG* gen) {
   // [rand.dist.pois] Indicates that the std::poisson_distribution
   // is parameterized by IntType, however MSVC does not allow 8-bit
   // types.
-  absl::Poisson<int>(*gen);
-  absl::Poisson<int16_t>(*gen);
-  absl::Poisson<uint16_t>(*gen);
-  absl::Poisson<int32_t>(*gen);
-  absl::Poisson<uint32_t>(*gen);
-  absl::Poisson<int64_t>(*gen);
-  absl::Poisson<uint64_t>(*gen);
-  absl::Poisson<uint64_t>(URBG());
+  abslx::Poisson<int>(*gen);
+  abslx::Poisson<int16_t>(*gen);
+  abslx::Poisson<uint16_t>(*gen);
+  abslx::Poisson<int32_t>(*gen);
+  abslx::Poisson<uint32_t>(*gen);
+  abslx::Poisson<int64_t>(*gen);
+  abslx::Poisson<uint64_t>(*gen);
+  abslx::Poisson<uint64_t>(URBG());
 }
 
 template <typename URBG>
 void TestBernoulli(URBG* gen) {
-  absl::Bernoulli(*gen, 0.5);
-  absl::Bernoulli(*gen, 0.5);
+  abslx::Bernoulli(*gen, 0.5);
+  abslx::Bernoulli(*gen, 0.5);
 }
 
 template <typename URBG>
 void TestZipf(URBG* gen) {
-  absl::Zipf<int>(*gen, 100);
-  absl::Zipf<int8_t>(*gen, 100);
-  absl::Zipf<int16_t>(*gen, 100);
-  absl::Zipf<uint16_t>(*gen, 100);
-  absl::Zipf<int32_t>(*gen, 1 << 10);
-  absl::Zipf<uint32_t>(*gen, 1 << 10);
-  absl::Zipf<int64_t>(*gen, 1 << 10);
-  absl::Zipf<uint64_t>(*gen, 1 << 10);
-  absl::Zipf<uint64_t>(URBG(), 1 << 10);
+  abslx::Zipf<int>(*gen, 100);
+  abslx::Zipf<int8_t>(*gen, 100);
+  abslx::Zipf<int16_t>(*gen, 100);
+  abslx::Zipf<uint16_t>(*gen, 100);
+  abslx::Zipf<int32_t>(*gen, 1 << 10);
+  abslx::Zipf<uint32_t>(*gen, 1 << 10);
+  abslx::Zipf<int64_t>(*gen, 1 << 10);
+  abslx::Zipf<uint64_t>(*gen, 1 << 10);
+  abslx::Zipf<uint64_t>(URBG(), 1 << 10);
 }
 
 template <typename URBG>
 void TestGaussian(URBG* gen) {
-  absl::Gaussian<float>(*gen, 1.0, 1.0);
-  absl::Gaussian<double>(*gen, 1.0, 1.0);
-  absl::Gaussian<double>(URBG(), 1.0, 1.0);
+  abslx::Gaussian<float>(*gen, 1.0, 1.0);
+  abslx::Gaussian<double>(*gen, 1.0, 1.0);
+  abslx::Gaussian<double>(URBG(), 1.0, 1.0);
 }
 
 template <typename URBG>
 void TestLogNormal(URBG* gen) {
-  absl::LogUniform<int>(*gen, 0, 100);
-  absl::LogUniform<int8_t>(*gen, 0, 100);
-  absl::LogUniform<int16_t>(*gen, 0, 100);
-  absl::LogUniform<uint16_t>(*gen, 0, 100);
-  absl::LogUniform<int32_t>(*gen, 0, 1 << 10);
-  absl::LogUniform<uint32_t>(*gen, 0, 1 << 10);
-  absl::LogUniform<int64_t>(*gen, 0, 1 << 10);
-  absl::LogUniform<uint64_t>(*gen, 0, 1 << 10);
-  absl::LogUniform<uint64_t>(URBG(), 0, 1 << 10);
+  abslx::LogUniform<int>(*gen, 0, 100);
+  abslx::LogUniform<int8_t>(*gen, 0, 100);
+  abslx::LogUniform<int16_t>(*gen, 0, 100);
+  abslx::LogUniform<uint16_t>(*gen, 0, 100);
+  abslx::LogUniform<int32_t>(*gen, 0, 1 << 10);
+  abslx::LogUniform<uint32_t>(*gen, 0, 1 << 10);
+  abslx::LogUniform<int64_t>(*gen, 0, 1 << 10);
+  abslx::LogUniform<uint64_t>(*gen, 0, 1 << 10);
+  abslx::LogUniform<uint64_t>(URBG(), 0, 1 << 10);
 }
 
 template <typename URBG>
@@ -167,13 +167,13 @@ TEST(std_mt19937_64, Compatibility) {
 }
 
 TEST(BitGen, Compatibility) {
-  // Validate with absl::BitGen
-  CompatibilityTest<absl::BitGen>();
+  // Validate with abslx::BitGen
+  CompatibilityTest<abslx::BitGen>();
 }
 
 TEST(InsecureBitGen, Compatibility) {
-  // Validate with absl::InsecureBitGen
-  CompatibilityTest<absl::InsecureBitGen>();
+  // Validate with abslx::InsecureBitGen
+  CompatibilityTest<abslx::InsecureBitGen>();
 }
 
 }  // namespace

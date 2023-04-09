@@ -55,8 +55,8 @@ class Exhaustive32BitOrMoreBinaryTest
     CHECK(input_size == (*input_literals)[0].element_count() &&
           input_size == (*input_literals)[1].element_count());
 
-    absl::Span<NativeT> input_arr_0 = (*input_literals)[0].data<NativeT>();
-    absl::Span<NativeT> input_arr_1 = (*input_literals)[1].data<NativeT>();
+    abslx::Span<NativeT> input_arr_0 = (*input_literals)[0].data<NativeT>();
+    abslx::Span<NativeT> input_arr_1 = (*input_literals)[1].data<NativeT>();
 
     uint64_t i = 0;
     for (auto src0 : values_0) {

@@ -26,14 +26,14 @@ HloValue::Id PhiGraph::GetOptimizedId(const HloValue& value) {
 
 // Returns true if the inputs to a hlo value are the same as `inputs`.
 bool PhiGraph::InputsEqualTo(const HloValue& value,
-                             absl::Span<const HloValue* const> inputs) {
+                             abslx::Span<const HloValue* const> inputs) {
   auto iter = value_id_to_node_.find(value.id());
   CHECK(iter != value_id_to_node_.end());
-  absl::flat_hash_set<HloValue::Id> existing_set;
+  abslx::flat_hash_set<HloValue::Id> existing_set;
   for (Node* operand : iter->second->operands) {
     existing_set.insert(operand->value_id);
   }
-  absl::flat_hash_set<HloValue::Id> new_set;
+  abslx::flat_hash_set<HloValue::Id> new_set;
   for (const HloValue* input : inputs) {
     new_set.insert(input->id());
   }
@@ -80,12 +80,12 @@ void PhiGraph::ReplaceNodeWith(PhiGraph::Node* node, PhiGraph::Node* replace) {
   }
   CHECK(!replace->mark_as_dead);
   for (Node* user : node->users) {
-    absl::c_replace(user->operands, node, replace);
+    abslx::c_replace(user->operands, node, replace);
   }
 
   // Update operand's users
   for (Node* operand : node->operands) {
-    absl::c_replace(operand->users, node, replace);
+    abslx::c_replace(operand->users, node, replace);
   }
 
   for (HloValue::Id value_id : node_to_value_id_[node]) {
@@ -93,14 +93,14 @@ void PhiGraph::ReplaceNodeWith(PhiGraph::Node* node, PhiGraph::Node* replace) {
     value_id_to_node_[value_id] = replace;
   }
   // Update mappings to HloValue::Id.
-  absl::c_copy(node_to_value_id_[node],
+  abslx::c_copy(node_to_value_id_[node],
                std::back_inserter(node_to_value_id_[replace]));
   node_to_value_id_[node].clear();
   node->mark_as_dead = true;
 }
 
 void PhiGraph::RegisterPhi(const HloValue& value,
-                           absl::Span<const HloValue* const> inputs) {
+                           abslx::Span<const HloValue* const> inputs) {
   Node* node = CreateOrReuseNode(value);
   CHECK(value.is_phi());
   node->is_phi = true;
@@ -117,12 +117,12 @@ std::string PhiGraph::ToString() {
   for (auto& node : node_storage_) {
     std::string is_phi = node->is_phi ? ", phi" : "";
     std::string is_optimized = node->mark_as_dead ? ", dead" : "";
-    absl::StrAppend(&out, node->value_id);
-    absl::StrAppend(&out, is_phi);
-    absl::StrAppend(&out, is_optimized, ":\n");
+    abslx::StrAppend(&out, node->value_id);
+    abslx::StrAppend(&out, is_phi);
+    abslx::StrAppend(&out, is_optimized, ":\n");
     for (Node* input : node->operands) {
-      absl::StrAppend(&out, "  ", input->value_id);
-      absl::StrAppend(&out, "\n");
+      abslx::StrAppend(&out, "  ", input->value_id);
+      abslx::StrAppend(&out, "\n");
     }
   }
   return out;
@@ -144,7 +144,7 @@ void PhiGraph::Optimize() {
   // Run the optimization to a fixed point.
   while (changed) {
     changed = false;
-    absl::flat_hash_set<Node*> checked_for_closure;
+    abslx::flat_hash_set<Node*> checked_for_closure;
     for (auto& node : node_storage_) {
       // Only optimize phi node.
       if (!node->is_phi) {
@@ -162,16 +162,16 @@ void PhiGraph::Optimize() {
       CHECK_GE(node_ptr->operands.size(), 1);
 
       // Remove self-referencing ids from users and operands.
-      auto it = absl::c_find(node_ptr->operands, node_ptr);
+      auto it = abslx::c_find(node_ptr->operands, node_ptr);
       while (it != node_ptr->operands.end()) {
         node_ptr->operands.erase(it);
-        it = absl::c_find(node_ptr->operands, node_ptr);
+        it = abslx::c_find(node_ptr->operands, node_ptr);
       }
 
-      it = absl::c_find(node_ptr->users, node_ptr);
+      it = abslx::c_find(node_ptr->users, node_ptr);
       while (it != node_ptr->users.end()) {
         node_ptr->users.erase(it);
-        it = absl::c_find(node_ptr->users, node_ptr);
+        it = abslx::c_find(node_ptr->users, node_ptr);
       }
 
       // If all inputs to phi (after self referencing ids are removed) are the
@@ -180,7 +180,7 @@ void PhiGraph::Optimize() {
       // phi(A, A, ... A) => A
       // phi(A, self) = phi(A) => A
       CHECK_GE(node_ptr->operands.size(), 1);
-      bool all_inputs_are_same = absl::c_all_of(
+      bool all_inputs_are_same = abslx::c_all_of(
           node_ptr->operands,
           [&](Node* elem) { return elem == node_ptr->operands[0]; });
 
@@ -208,7 +208,7 @@ void PhiGraph::Optimize() {
         continue;
       }
       // Keeps track of nodes in the current closure being tested.
-      absl::flat_hash_set<Node*> workset;
+      abslx::flat_hash_set<Node*> workset;
       std::queue<Node*> worklist;
       Node* non_phi = nullptr;
       worklist.push(node_ptr);

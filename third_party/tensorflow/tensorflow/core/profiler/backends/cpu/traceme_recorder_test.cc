@@ -85,7 +85,7 @@ TEST(RecorderTest, Multithreaded) {
         int64_t start_time = GetCurrentTimeNanos();
         int64_t end_time = start_time + UniToNano(1);
         TraceMeRecorder::Record(
-            {/*name=*/absl::StrCat(j++), start_time, end_time});
+            {/*name=*/abslx::StrCat(j++), start_time, end_time});
       };
       thread_count.fetch_add(1, std::memory_order_relaxed);
       start.WaitForNotification();
@@ -120,7 +120,7 @@ TEST(RecorderTest, Multithreaded) {
     bool overlapping_sessions = false;
     std::set<uint64> events;
   };
-  absl::flat_hash_map<uint32 /*tid*/, ThreadState> thread_state;
+  abslx::flat_hash_map<uint32 /*tid*/, ThreadState> thread_state;
   // We expect each thread to eventually have multiple events, not all in a
   // contiguous range.
   auto done = [&thread_state] {
@@ -155,7 +155,7 @@ TEST(RecorderTest, Multithreaded) {
       uint64 current = 0;
       for (const auto& event : thread.events) {
         uint64 activity_id;
-        ASSERT_TRUE(absl::SimpleAtoi(event.name, &activity_id));
+        ASSERT_TRUE(abslx::SimpleAtoi(event.name, &activity_id));
         session_events.emplace(activity_id);
         // Session events should be contiguous.
         if (current != 0 && activity_id != current + 1) {

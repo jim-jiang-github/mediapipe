@@ -320,7 +320,7 @@ void ConvGeneric::GenerateCode(const GpuInfo& gpu_info) {
   }
 }
 
-absl::Status ConvGeneric::BindArguments(ArgumentsBinder* args) {
+abslx::Status ConvGeneric::BindArguments(ArgumentsBinder* args) {
   const int task_size_b = dst_[0]->Batch();
   const int task_size_x =
       DivideRoundUp(dst_[0]->Width(), conv_params_.block_size.x);
@@ -332,7 +332,7 @@ absl::Status ConvGeneric::BindArguments(ArgumentsBinder* args) {
   RETURN_IF_ERROR(args->SetInt("task_size_x", task_size_x));
   RETURN_IF_ERROR(args->SetInt("task_size_y", task_size_y));
   RETURN_IF_ERROR(args->SetInt("task_size_z", task_size_z));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 int3 ConvGeneric::GetGridSize() const {
@@ -1008,7 +1008,7 @@ std::string ConvGeneric::GenerateConv(const GpuInfo& gpu_info,
       if (conv_params.different_weights_for_height) {
         f_y = "DST_Y * args.src_tensor.Slices() + s";
       }
-      c += absl::Substitute(
+      c += abslx::Substitute(
           R"(    FLT4 f$2 = args.weights0.Read(DST_S + $0, $1);
     FLT4 f$3 = args.weights1.Read(DST_S + $0, $1);
     FLT4 f$4 = args.weights2.Read(DST_S + $0, $1);

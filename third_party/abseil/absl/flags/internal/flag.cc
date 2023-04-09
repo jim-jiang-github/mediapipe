@@ -39,7 +39,7 @@
 #include "absl/strings/string_view.h"
 #include "absl/synchronization/mutex.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace flags_internal {
 
@@ -61,20 +61,20 @@ bool ShouldValidateFlagValue(FlagFastTypeId flag_type_id) {
   return true;
 }
 
-// RAII helper used to temporarily unlock and relock `absl::Mutex`.
+// RAII helper used to temporarily unlock and relock `abslx::Mutex`.
 // This is used when we need to ensure that locks are released while
 // invoking user supplied callbacks and then reacquired, since callbacks may
 // need to acquire these locks themselves.
 class MutexRelock {
  public:
-  explicit MutexRelock(absl::Mutex& mu) : mu_(mu) { mu_.Unlock(); }
+  explicit MutexRelock(abslx::Mutex& mu) : mu_(mu) { mu_.Unlock(); }
   ~MutexRelock() { mu_.Lock(); }
 
   MutexRelock(const MutexRelock&) = delete;
   MutexRelock& operator=(const MutexRelock&) = delete;
 
  private:
-  absl::Mutex& mu_;
+  abslx::Mutex& mu_;
 };
 
 }  // namespace
@@ -110,7 +110,7 @@ class FlagState : public flags_internal::FlagStateInterface {
     if (!flag_impl_.RestoreState(*this)) return;
 
     ABSL_INTERNAL_LOG(INFO,
-                      absl::StrCat("Restore saved value of ", flag_impl_.Name(),
+                      abslx::StrCat("Restore saved value of ", flag_impl_.Name(),
                                    " to: ", flag_impl_.CurrentValue()));
   }
 
@@ -140,7 +140,7 @@ void DynValueDeleter::operator()(void* ptr) const {
 }
 
 void FlagImpl::Init() {
-  new (&data_guard_) absl::Mutex;
+  new (&data_guard_) abslx::Mutex;
 
   auto def_kind = static_cast<FlagDefaultKind>(def_kind_);
 
@@ -159,7 +159,7 @@ void FlagImpl::Init() {
         assert(def_kind != FlagDefaultKind::kDynamicValue);
         std::memcpy(buf.data(), &default_value_, Sizeof(op_));
       }
-      OneWordValue().store(absl::bit_cast<int64_t>(buf),
+      OneWordValue().store(abslx::bit_cast<int64_t>(buf),
                            std::memory_order_release);
       break;
     }
@@ -174,12 +174,12 @@ void FlagImpl::Init() {
   seq_lock_.MarkInitialized();
 }
 
-absl::Mutex* FlagImpl::DataGuard() const {
-  absl::call_once(const_cast<FlagImpl*>(this)->init_control_, &FlagImpl::Init,
+abslx::Mutex* FlagImpl::DataGuard() const {
+  abslx::call_once(const_cast<FlagImpl*>(this)->init_control_, &FlagImpl::Init,
                   const_cast<FlagImpl*>(this));
 
   // data_guard_ is initialized inside Init.
-  return reinterpret_cast<absl::Mutex*>(&data_guard_);
+  return reinterpret_cast<abslx::Mutex*>(&data_guard_);
 }
 
 void FlagImpl::AssertValidType(FlagFastTypeId rhs_type_id,
@@ -203,7 +203,7 @@ void FlagImpl::AssertValidType(FlagFastTypeId rhs_type_id,
 #endif
 
   ABSL_INTERNAL_LOG(
-      FATAL, absl::StrCat("Flag '", Name(),
+      FATAL, abslx::StrCat("Flag '", Name(),
                           "' is defined as one type and declared as another"));
 }
 
@@ -246,7 +246,7 @@ void FlagImpl::StoreValue(const void* src) {
   InvokeCallback();
 }
 
-absl::string_view FlagImpl::Name() const { return name_; }
+abslx::string_view FlagImpl::Name() const { return name_; }
 
 std::string FlagImpl::Filename() const {
   return flags_internal::GetUsageConfig().normalize_filename(filename_);
@@ -266,12 +266,12 @@ int64_t FlagImpl::ModificationCount() const {
 }
 
 bool FlagImpl::IsSpecifiedOnCommandLine() const {
-  absl::MutexLock l(DataGuard());
+  abslx::MutexLock l(DataGuard());
   return on_command_line_;
 }
 
 std::string FlagImpl::DefaultValue() const {
-  absl::MutexLock l(DataGuard());
+  abslx::MutexLock l(DataGuard());
 
   auto obj = MakeInitValue();
   return flags_internal::Unparse(op_, obj.get());
@@ -281,12 +281,12 @@ std::string FlagImpl::CurrentValue() const {
   auto* guard = DataGuard();  // Make sure flag initialized
   switch (ValueStorageKind()) {
     case FlagValueStorageKind::kAlignedBuffer: {
-      absl::MutexLock l(guard);
+      abslx::MutexLock l(guard);
       return flags_internal::Unparse(op_, AlignedBufferValue());
     }
     case FlagValueStorageKind::kOneWordAtomic: {
       const auto one_word_val =
-          absl::bit_cast<std::array<char, sizeof(int64_t)>>(
+          abslx::bit_cast<std::array<char, sizeof(int64_t)>>(
               OneWordValue().load(std::memory_order_acquire));
       return flags_internal::Unparse(op_, one_word_val.data());
     }
@@ -302,7 +302,7 @@ std::string FlagImpl::CurrentValue() const {
 }
 
 void FlagImpl::SetCallback(const FlagCallbackFunc mutation_callback) {
-  absl::MutexLock l(DataGuard());
+  abslx::MutexLock l(DataGuard());
 
   if (callback_ == nullptr) {
     callback_ = new FlagCallback;
@@ -331,23 +331,23 @@ void FlagImpl::InvokeCallback() const {
   // completed. Requires that *primary_lock be held in exclusive mode; it may be
   // released and reacquired by the implementation.
   MutexRelock relock(*DataGuard());
-  absl::MutexLock lock(&callback_->guard);
+  abslx::MutexLock lock(&callback_->guard);
   cb();
 }
 
 std::unique_ptr<FlagStateInterface> FlagImpl::SaveState() {
-  absl::MutexLock l(DataGuard());
+  abslx::MutexLock l(DataGuard());
 
   bool modified = modified_;
   bool on_command_line = on_command_line_;
   switch (ValueStorageKind()) {
     case FlagValueStorageKind::kAlignedBuffer: {
-      return absl::make_unique<FlagState>(
+      return abslx::make_unique<FlagState>(
           *this, flags_internal::Clone(op_, AlignedBufferValue()), modified,
           on_command_line, ModificationCount());
     }
     case FlagValueStorageKind::kOneWordAtomic: {
-      return absl::make_unique<FlagState>(
+      return abslx::make_unique<FlagState>(
           *this, OneWordValue().load(std::memory_order_acquire), modified,
           on_command_line, ModificationCount());
     }
@@ -358,7 +358,7 @@ std::unique_ptr<FlagStateInterface> FlagImpl::SaveState() {
           seq_lock_.TryRead(cloned, AtomicBufferValue(), Sizeof(op_));
       assert(success);
       static_cast<void>(success);
-      return absl::make_unique<FlagState>(*this, cloned, modified,
+      return abslx::make_unique<FlagState>(*this, cloned, modified,
                                           on_command_line, ModificationCount());
     }
   }
@@ -366,7 +366,7 @@ std::unique_ptr<FlagStateInterface> FlagImpl::SaveState() {
 }
 
 bool FlagImpl::RestoreState(const FlagState& flag_state) {
-  absl::MutexLock l(DataGuard());
+  abslx::MutexLock l(DataGuard());
   if (flag_state.counter_ == ModificationCount()) {
     return false;
   }
@@ -416,13 +416,13 @@ std::atomic<int64_t>& FlagImpl::OneWordValue() const {
 // parsed value. In case if any error is encountered in either step, the error
 // message is stored in 'err'
 std::unique_ptr<void, DynValueDeleter> FlagImpl::TryParse(
-    absl::string_view value, std::string& err) const {
+    abslx::string_view value, std::string& err) const {
   std::unique_ptr<void, DynValueDeleter> tentative_value = MakeInitValue();
 
   std::string parse_err;
   if (!flags_internal::Parse(op_, value, tentative_value.get(), &parse_err)) {
-    absl::string_view err_sep = parse_err.empty() ? "" : "; ";
-    err = absl::StrCat("Illegal value '", value, "' specified for flag '",
+    abslx::string_view err_sep = parse_err.empty() ? "" : "; ";
+    err = abslx::StrCat("Illegal value '", value, "' specified for flag '",
                        Name(), "'", err_sep, parse_err);
     return nullptr;
   }
@@ -434,7 +434,7 @@ void FlagImpl::Read(void* dst) const {
   auto* guard = DataGuard();  // Make sure flag initialized
   switch (ValueStorageKind()) {
     case FlagValueStorageKind::kAlignedBuffer: {
-      absl::MutexLock l(guard);
+      abslx::MutexLock l(guard);
       flags_internal::CopyConstruct(op_, AlignedBufferValue(), dst);
       break;
     }
@@ -459,14 +459,14 @@ void FlagImpl::ReadSequenceLockedData(void* dst) const {
   }
   // We failed due to contention. Acquire the lock to prevent contention
   // and try again.
-  absl::ReaderMutexLock l(DataGuard());
+  abslx::ReaderMutexLock l(DataGuard());
   bool success = seq_lock_.TryRead(dst, AtomicBufferValue(), size);
   assert(success);
   static_cast<void>(success);
 }
 
 void FlagImpl::Write(const void* src) {
-  absl::MutexLock l(DataGuard());
+  abslx::MutexLock l(DataGuard());
 
   if (ShouldValidateFlagValue(flags_internal::FastTypeId(op_))) {
     std::unique_ptr<void, DynValueDeleter> obj{flags_internal::Clone(op_, src),
@@ -474,7 +474,7 @@ void FlagImpl::Write(const void* src) {
     std::string ignored_error;
     std::string src_as_str = flags_internal::Unparse(op_, src);
     if (!flags_internal::Parse(op_, src_as_str, obj.get(), &ignored_error)) {
-      ABSL_INTERNAL_LOG(ERROR, absl::StrCat("Attempt to set flag '", Name(),
+      ABSL_INTERNAL_LOG(ERROR, abslx::StrCat("Attempt to set flag '", Name(),
                                             "' to invalid value ", src_as_str));
     }
   }
@@ -490,9 +490,9 @@ void FlagImpl::Write(const void* src) {
 //  * Update the flag's default value
 //  * Update the current flag value if it was never set before
 // The mode is selected based on 'set_mode' parameter.
-bool FlagImpl::ParseFrom(absl::string_view value, FlagSettingMode set_mode,
+bool FlagImpl::ParseFrom(abslx::string_view value, FlagSettingMode set_mode,
                          ValueSource source, std::string& err) {
-  absl::MutexLock l(DataGuard());
+  abslx::MutexLock l(DataGuard());
 
   switch (set_mode) {
     case SET_FLAGS_VALUE: {
@@ -513,7 +513,7 @@ bool FlagImpl::ParseFrom(absl::string_view value, FlagSettingMode set_mode,
         // TODO(rogeeff): review and fix this semantic. Currently we do not fail
         // in this case if flag is modified. This is misleading since the flag's
         // value is not updated even though we return true.
-        // *err = absl::StrCat(Name(), " is already set to ",
+        // *err = abslx::StrCat(Name(), " is already set to ",
         //                     CurrentValue(), "\n");
         // return false;
         return true;
@@ -552,14 +552,14 @@ bool FlagImpl::ParseFrom(absl::string_view value, FlagSettingMode set_mode,
 void FlagImpl::CheckDefaultValueParsingRoundtrip() const {
   std::string v = DefaultValue();
 
-  absl::MutexLock lock(DataGuard());
+  abslx::MutexLock lock(DataGuard());
 
   auto dst = MakeInitValue();
   std::string error;
   if (!flags_internal::Parse(op_, v, dst.get(), &error)) {
     ABSL_INTERNAL_LOG(
         FATAL,
-        absl::StrCat("Flag ", Name(), " (from ", Filename(),
+        abslx::StrCat("Flag ", Name(), " (from ", Filename(),
                      "): string form of default value '", v,
                      "' could not be parsed; error=", error));
   }
@@ -568,8 +568,8 @@ void FlagImpl::CheckDefaultValueParsingRoundtrip() const {
   // small changes, e.g., precision loss for floating point types.
 }
 
-bool FlagImpl::ValidateInputValue(absl::string_view value) const {
-  absl::MutexLock l(DataGuard());
+bool FlagImpl::ValidateInputValue(abslx::string_view value) const {
+  abslx::MutexLock l(DataGuard());
 
   auto obj = MakeInitValue();
   std::string ignored_error;
@@ -578,4 +578,4 @@ bool FlagImpl::ValidateInputValue(absl::string_view value) const {
 
 }  // namespace flags_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

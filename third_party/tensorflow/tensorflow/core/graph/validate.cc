@@ -110,13 +110,13 @@ Status ValidateGraphHasNoCycle(const Graph& graph) {
     return errors::InvalidArgument(
         "Graph is invalid, contains a cycle with ",
         graph.num_nodes() - processed,
-        " nodes, including: ", absl::StrJoin(nodes_in_cycle, ", "));
+        " nodes, including: ", abslx::StrJoin(nodes_in_cycle, ", "));
   }
   return OkStatus();
 }
 
 Status VerifyNoDuplicateNodeNames(const GraphDef& graph) {
-  absl::flat_hash_set<absl::string_view> nodes;
+  abslx::flat_hash_set<abslx::string_view> nodes;
   for (const auto& node : graph.node()) {
     if (nodes.contains(node.name())) {
       return errors::AlreadyExists("Node already exists: ", node.name());

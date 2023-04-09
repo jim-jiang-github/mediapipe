@@ -89,7 +89,7 @@ class HloFunctionImporter {
   // TODO(b/179166199): move this to attribute_importer.h.
   // Converts replica groups to attribute
   static mlir::NamedAttribute ConvertReplicaGroups(
-      absl::Span<const ReplicaGroup> replica_groups, mlir::Builder* builder);
+      abslx::Span<const ReplicaGroup> replica_groups, mlir::Builder* builder);
 
   // For mlir::IfOp or mlir::CaseOp, replace the uses of their region's block
   // arguments with 'implicit_operands'. Here | implicit_operands | == sum of
@@ -211,7 +211,7 @@ class HloFunctionImporter {
 
   // Converts the dimensions of an HLO instruction into an MLIR attribute.
   mlir::DenseIntElementsAttr ConvertDimensions(
-      absl::Span<const int64_t> op_dimensions);
+      abslx::Span<const int64_t> op_dimensions);
 
   // Converts Array ref to an DenseIntElementsAttr.
   mlir::DenseIntElementsAttr Convert(llvm::ArrayRef<int64_t> elements);

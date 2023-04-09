@@ -46,7 +46,7 @@ namespace {
 bool HasTPUDevice(mlir::ModuleOp module) {
   mlir::TF::RuntimeDevices devices;
   if (failed(GetDevicesFromOp(module.getOperation(), &devices))) return false;
-  return absl::c_any_of(
+  return abslx::c_any_of(
       devices.device_names(),
       [](const tensorflow::DeviceNameUtils::ParsedName& device) {
         return device.has_type && device.type == kTpuDevice;
@@ -209,8 +209,8 @@ MlirOptimizationPassState MlirBridgePass::GetPassState(
 Status MlirBridgePass::Run(const ConfigProto& config_proto,
                            mlir::ModuleOp module, const Graph& graph,
                            const FunctionLibraryDefinition& function_library) {
-  static absl::once_flag flag;
-  absl::call_once(flag, UpdateLogVerbosityIfDefined, "TF_DEBUG_LOG_VERBOSITY");
+  static abslx::once_flag flag;
+  abslx::call_once(flag, UpdateLogVerbosityIfDefined, "TF_DEBUG_LOG_VERBOSITY");
 
   // Check if there are TPU devices or TPU ops. If not, then check if the
   // non TPU graph is qualified to run TF XLA Bridge.
@@ -293,8 +293,8 @@ MlirOptimizationPassState MlirBridgeV1CompatPass::GetPassState(
 
 Status MlirBridgeV1CompatPass::Run(const GraphOptimizationPassOptions& options,
                                    mlir::ModuleOp module) {
-  static absl::once_flag flag;
-  absl::call_once(flag, UpdateLogVerbosityIfDefined, "TF_DEBUG_LOG_VERBOSITY");
+  static abslx::once_flag flag;
+  abslx::call_once(flag, UpdateLogVerbosityIfDefined, "TF_DEBUG_LOG_VERBOSITY");
 
   // Skip function graphs as MlirBridgePass will be used instead.
   if (options.is_function_graph) return OkStatus();

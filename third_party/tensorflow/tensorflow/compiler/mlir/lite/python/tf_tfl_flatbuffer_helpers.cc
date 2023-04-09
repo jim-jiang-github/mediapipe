@@ -338,7 +338,7 @@ Status ConvertMLIRToTFLiteFlatBuffer(
     TF_RETURN_IF_ERROR(DumpOpGraphToFile(
         module.get(),
         // rename once we enable the new converter feature flag.
-        absl::StrCat(toco_flags.dump_graphviz_dir(), "/toco_AT_IMPORT.dot")));
+        abslx::StrCat(toco_flags.dump_graphviz_dir(), "/toco_AT_IMPORT.dot")));
   }
 
   mlir::TFL::PassConfig pass_config_copy = pass_config;
@@ -349,7 +349,7 @@ Status ConvertMLIRToTFLiteFlatBuffer(
   if (toco_flags.has_dump_graphviz_dir()) {
     TF_RETURN_IF_ERROR(DumpOpGraphToFile(
         // rename once we enable the new converter feature flag.
-        module.get(), absl::StrCat(toco_flags.dump_graphviz_dir(),
+        module.get(), abslx::StrCat(toco_flags.dump_graphviz_dir(),
                                    "/toco_AFTER_TRANSFORMATIONS.dot")));
   }
 

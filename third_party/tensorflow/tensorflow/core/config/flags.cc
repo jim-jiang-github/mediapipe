@@ -24,7 +24,7 @@ namespace config {
 
 Flag::Flag(StringPiece flag, bool default_value) {
   bool val = default_value;
-  if (ReadBoolFromEnvVar(absl::AsciiStrToUpper(flag), default_value, &val)
+  if (ReadBoolFromEnvVar(abslx::AsciiStrToUpper(flag), default_value, &val)
           .ok()) {
     value_ = val;
     return;

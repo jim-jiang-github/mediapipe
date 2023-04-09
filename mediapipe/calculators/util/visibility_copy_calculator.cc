@@ -69,13 +69,13 @@ constexpr char kNormalizedLandmarksToTag[] = "NORM_LANDMARKS_TO";
 //
 class VisibilityCopyCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   template <class LandmarkFromType, class LandmarkToType>
-  absl::Status CopyVisibility(CalculatorContext* cc,
+  abslx::Status CopyVisibility(CalculatorContext* cc,
                               const std::string& landmarks_from_tag,
                               const std::string& landmarks_to_tag);
 
@@ -84,7 +84,7 @@ class VisibilityCopyCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(VisibilityCopyCalculator);
 
-absl::Status VisibilityCopyCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status VisibilityCopyCalculator::GetContract(CalculatorContract* cc) {
   // Landmarks to copy from.
   RET_CHECK(cc->Inputs().HasTag(kLandmarksFromTag) ^
             cc->Inputs().HasTag(kNormalizedLandmarksFromTag))
@@ -113,23 +113,23 @@ absl::Status VisibilityCopyCalculator::GetContract(CalculatorContract* cc) {
     cc->Outputs().Tag(kNormalizedLandmarksToTag).Set<NormalizedLandmarkList>();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status VisibilityCopyCalculator::Open(CalculatorContext* cc) {
+abslx::Status VisibilityCopyCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
   const auto& options = cc->Options<VisibilityCopyCalculatorOptions>();
   copy_visibility_ = options.copy_visibility();
   copy_presence_ = options.copy_presence();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status VisibilityCopyCalculator::Process(CalculatorContext* cc) {
+abslx::Status VisibilityCopyCalculator::Process(CalculatorContext* cc) {
   // Switch between all four possible combinations of landmarks from and
   // landmarks to types (normalized and non-normalized).
-  auto status = absl::OkStatus();
+  auto status = abslx::OkStatus();
   if (cc->Inputs().HasTag(kLandmarksFromTag)) {
     if (cc->Inputs().HasTag(kLandmarksToTag)) {
       status = CopyVisibility<LandmarkList, LandmarkList>(cc, kLandmarksFromTag,
@@ -152,20 +152,20 @@ absl::Status VisibilityCopyCalculator::Process(CalculatorContext* cc) {
 }
 
 template <class LandmarkFromType, class LandmarkToType>
-absl::Status VisibilityCopyCalculator::CopyVisibility(
+abslx::Status VisibilityCopyCalculator::CopyVisibility(
     CalculatorContext* cc, const std::string& landmarks_from_tag,
     const std::string& landmarks_to_tag) {
   // Check that both landmarks to copy from and to copy to are non empty.
   if (cc->Inputs().Tag(landmarks_from_tag).IsEmpty() ||
       cc->Inputs().Tag(landmarks_to_tag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   const auto landmarks_from =
       cc->Inputs().Tag(landmarks_from_tag).Get<LandmarkFromType>();
   const auto landmarks_to =
       cc->Inputs().Tag(landmarks_to_tag).Get<LandmarkToType>();
-  auto landmarks_out = absl::make_unique<LandmarkToType>();
+  auto landmarks_out = abslx::make_unique<LandmarkToType>();
 
   for (int i = 0; i < landmarks_from.landmark_size(); ++i) {
     const auto& landmark_from = landmarks_from.landmark(i);
@@ -188,7 +188,7 @@ absl::Status VisibilityCopyCalculator::CopyVisibility(
       .Tag(landmarks_to_tag)
       .Add(landmarks_out.release(), cc->InputTimestamp());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

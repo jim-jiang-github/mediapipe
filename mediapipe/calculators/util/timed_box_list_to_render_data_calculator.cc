@@ -120,36 +120,36 @@ class TimedBoxListToRenderDataCalculator : public CalculatorBase {
   TimedBoxListToRenderDataCalculator& operator=(
       const TimedBoxListToRenderDataCalculator&) = delete;
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
 
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   TimedBoxListToRenderDataCalculatorOptions options_;
 };
 REGISTER_CALCULATOR(TimedBoxListToRenderDataCalculator);
 
-absl::Status TimedBoxListToRenderDataCalculator::GetContract(
+abslx::Status TimedBoxListToRenderDataCalculator::GetContract(
     CalculatorContract* cc) {
   if (cc->Inputs().HasTag(kTimedBoxListTag)) {
     cc->Inputs().Tag(kTimedBoxListTag).Set<TimedBoxProtoList>();
   }
   cc->Outputs().Tag(kRenderDataTag).Set<RenderData>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TimedBoxListToRenderDataCalculator::Open(CalculatorContext* cc) {
+abslx::Status TimedBoxListToRenderDataCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
   options_ = cc->Options<TimedBoxListToRenderDataCalculatorOptions>();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TimedBoxListToRenderDataCalculator::Process(
+abslx::Status TimedBoxListToRenderDataCalculator::Process(
     CalculatorContext* cc) {
-  auto render_data = absl::make_unique<RenderData>();
+  auto render_data = abslx::make_unique<RenderData>();
 
   if (cc->Inputs().HasTag(kTimedBoxListTag)) {
     const auto& box_list =
@@ -163,7 +163,7 @@ absl::Status TimedBoxListToRenderDataCalculator::Process(
   cc->Outputs()
       .Tag(kRenderDataTag)
       .Add(render_data.release(), cc->InputTimestamp());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

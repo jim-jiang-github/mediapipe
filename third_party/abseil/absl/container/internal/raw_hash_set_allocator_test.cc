@@ -19,7 +19,7 @@
 #include "absl/container/internal/raw_hash_set.h"
 #include "absl/container/internal/tracked.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
@@ -502,4 +502,4 @@ TEST(NoPropagateOn, Assignment) {
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

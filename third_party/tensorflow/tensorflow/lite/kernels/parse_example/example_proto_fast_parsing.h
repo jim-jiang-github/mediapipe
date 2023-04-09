@@ -245,7 +245,7 @@ class Feature {
             uint32 buffer32;
             if (!stream.ReadLittleEndian32(&buffer32)) return false;
             if (index < float_list->size()) {
-              float_list->data()[index] = absl::bit_cast<float>(buffer32);
+              float_list->data()[index] = abslx::bit_cast<float>(buffer32);
               ++index;
             }
           }
@@ -264,7 +264,7 @@ class Feature {
           if (!stream.ExpectTag(kFixed32Tag(1))) return false;
           uint32 buffer32;
           if (!stream.ReadLittleEndian32(&buffer32)) return false;
-          float_list->data()[index] = absl::bit_cast<float>(buffer32);
+          float_list->data()[index] = abslx::bit_cast<float>(buffer32);
           ++index;
         }
       }
@@ -448,7 +448,7 @@ struct FeatureProtos {
 };
 
 // Map from feature name to FeatureProtos for that feature.
-using FeatureProtosMap = absl::flat_hash_map<StringPiece, FeatureProtos>;
+using FeatureProtosMap = abslx::flat_hash_map<StringPiece, FeatureProtos>;
 
 string ExampleName(const gtl::ArraySlice<tstring> example_names, int n);
 
@@ -522,7 +522,7 @@ inline int ParseFloatFeature(protobuf::io::CodedInputStream* stream,
           return -1;
         }
         if (out != nullptr) {
-          *out++ = absl::bit_cast<float>(buffer32);
+          *out++ = abslx::bit_cast<float>(buffer32);
         }
         num_elements++;
       }
@@ -535,7 +535,7 @@ inline int ParseFloatFeature(protobuf::io::CodedInputStream* stream,
           return -1;
         }
         if (out != nullptr) {
-          *out++ = absl::bit_cast<float>(buffer32);
+          *out++ = abslx::bit_cast<float>(buffer32);
         }
         num_elements++;
       }

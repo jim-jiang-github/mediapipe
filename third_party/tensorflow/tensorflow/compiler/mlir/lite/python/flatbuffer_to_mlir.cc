@@ -50,7 +50,7 @@ static mlir::OwningOpRef<mlir::ModuleOp> FlatBufferFileToMlirTranslation(
   std::vector<std::string> inputs;
   std::vector<std::string> outputs;
   return tflite::FlatBufferToMlir(
-      absl::string_view(input->getBufferStart(), input->getBufferSize()),
+      abslx::string_view(input->getBufferStart(), input->getBufferSize()),
       context, loc, false, inputs, outputs, false);
 }
 

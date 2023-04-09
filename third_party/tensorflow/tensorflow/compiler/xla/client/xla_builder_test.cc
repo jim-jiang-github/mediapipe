@@ -1015,7 +1015,7 @@ TEST_F(XlaBuilderTest, VariadicDynamicReduceWindow) {
   auto p4 = Parameter(&bsum, 2, ShapeUtil::MakeShape(F32, {}), "y0");
   auto p5 = Parameter(&bsum, 3, ShapeUtil::MakeShape(F32, {}), "y1");
   std::vector<XlaOp> output_operands = {Add(p2, p4), Add(p3, p5)};
-  Tuple(&bsum, absl::MakeSpan(output_operands));
+  Tuple(&bsum, abslx::MakeSpan(output_operands));
   TF_ASSERT_OK_AND_ASSIGN(auto sum, bsum.Build());
   auto init = ConstantR0<float>(&b, 0.f);
   ReduceWindow(input_operands, {init, init}, sum,

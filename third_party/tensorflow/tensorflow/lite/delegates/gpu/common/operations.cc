@@ -637,7 +637,7 @@ BHWDC CalculateOutputShape(const BHWDC& input, const MeanAttributes& attr) {
   return BHWDC(b, h, w, d, c);
 }
 
-absl::Status CalculateOutputShape(const std::vector<BHWC>& input,
+abslx::Status CalculateOutputShape(const std::vector<BHWC>& input,
                                   const ConcatAttributes& attr,
                                   BHWC* output_shape) {
   BHWC new_shape = input[0];
@@ -646,7 +646,7 @@ absl::Status CalculateOutputShape(const std::vector<BHWC>& input,
       for (int i = 1; i < input.size(); i++) {
         if (input[i].h != new_shape.h || input[i].w != new_shape.w ||
             input[i].b != new_shape.b) {
-          return absl::InvalidArgumentError(
+          return abslx::InvalidArgumentError(
               "Height, Width and Batch must be the same when concatenating "
               "by channels axis");
         }
@@ -657,7 +657,7 @@ absl::Status CalculateOutputShape(const std::vector<BHWC>& input,
       for (int i = 1; i < input.size(); i++) {
         if (input[i].w != new_shape.w || input[i].c != new_shape.c ||
             input[i].b != new_shape.b) {
-          return absl::InvalidArgumentError(
+          return abslx::InvalidArgumentError(
               "Channels, Width and Batch must be the same when concatenating "
               "by height axis");
         }
@@ -668,7 +668,7 @@ absl::Status CalculateOutputShape(const std::vector<BHWC>& input,
       for (int i = 1; i < input.size(); i++) {
         if (input[i].h != new_shape.h || input[i].c != new_shape.c ||
             input[i].b != new_shape.b) {
-          return absl::InvalidArgumentError(
+          return abslx::InvalidArgumentError(
               "Height, Channels and Batch must be the same when concatenating "
               "by width axis");
         }
@@ -679,7 +679,7 @@ absl::Status CalculateOutputShape(const std::vector<BHWC>& input,
       for (int i = 1; i < input.size(); i++) {
         if (input[i].h != new_shape.h || input[i].c != new_shape.c ||
             input[i].w != new_shape.w) {
-          return absl::InvalidArgumentError(
+          return abslx::InvalidArgumentError(
               "Width, Height and Channels must be the same when concatenating "
               "by batch axis");
         }
@@ -687,14 +687,14 @@ absl::Status CalculateOutputShape(const std::vector<BHWC>& input,
       }
       break;
     default:
-      return absl::InvalidArgumentError("Invalid axis");
+      return abslx::InvalidArgumentError("Invalid axis");
       break;
   }
   *output_shape = new_shape;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculateOutputShape(const std::vector<BHWDC>& input,
+abslx::Status CalculateOutputShape(const std::vector<BHWDC>& input,
                                   const ConcatAttributes& attr,
                                   BHWDC* output_shape) {
   BHWDC new_shape = input[0];
@@ -703,7 +703,7 @@ absl::Status CalculateOutputShape(const std::vector<BHWDC>& input,
       for (int i = 1; i < input.size(); ++i) {
         if (input[i].h != new_shape.h || input[i].w != new_shape.w ||
             input[i].d != new_shape.d || input[i].b != new_shape.b) {
-          return absl::InvalidArgumentError(
+          return abslx::InvalidArgumentError(
               "Height, Width, Batch and Depth must be the same when "
               "concatenating "
               "by channels axis");
@@ -715,7 +715,7 @@ absl::Status CalculateOutputShape(const std::vector<BHWDC>& input,
       for (int i = 1; i < input.size(); ++i) {
         if (input[i].w != new_shape.w || input[i].c != new_shape.c ||
             input[i].d != new_shape.d || input[i].b != new_shape.b) {
-          return absl::InvalidArgumentError(
+          return abslx::InvalidArgumentError(
               "Width, Depth, Batch and Channels must be the same when "
               "concatenating "
               "by height axis");
@@ -727,7 +727,7 @@ absl::Status CalculateOutputShape(const std::vector<BHWDC>& input,
       for (int i = 1; i < input.size(); ++i) {
         if (input[i].h != new_shape.h || input[i].c != new_shape.c ||
             input[i].d != new_shape.d || input[i].b != new_shape.b) {
-          return absl::InvalidArgumentError(
+          return abslx::InvalidArgumentError(
               "Height, Depth, Batch and Channels must be the same when "
               "concatenating "
               "by width axis");
@@ -739,7 +739,7 @@ absl::Status CalculateOutputShape(const std::vector<BHWDC>& input,
       for (int i = 1; i < input.size(); ++i) {
         if (input[i].w != new_shape.w || input[i].h != new_shape.h ||
             input[i].c != new_shape.c || input[i].b != new_shape.b) {
-          return absl::InvalidArgumentError(
+          return abslx::InvalidArgumentError(
               "Width, Height, Batch and Channels must be the same when "
               "concatenating "
               "by depth axis");
@@ -751,7 +751,7 @@ absl::Status CalculateOutputShape(const std::vector<BHWDC>& input,
       for (int i = 1; i < input.size(); ++i) {
         if (input[i].w != new_shape.w || input[i].h != new_shape.h ||
             input[i].c != new_shape.c || input[i].d != new_shape.d) {
-          return absl::InvalidArgumentError(
+          return abslx::InvalidArgumentError(
               "Width, Height, Depth and Channels must be the same when "
               "concatenating "
               "by batch axis");
@@ -760,10 +760,10 @@ absl::Status CalculateOutputShape(const std::vector<BHWDC>& input,
       }
       break;
     default:
-      return absl::InvalidArgumentError("Invalid axis");
+      return abslx::InvalidArgumentError("Invalid axis");
   }
   *output_shape = new_shape;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 Padding2D CalculateSamePadding(const BHWC& input,

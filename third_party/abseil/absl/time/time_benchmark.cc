@@ -35,9 +35,9 @@ namespace {
 //
 
 void BM_Time_Arithmetic(benchmark::State& state) {
-  const absl::Duration nano = absl::Nanoseconds(1);
-  const absl::Duration sec = absl::Seconds(1);
-  absl::Time t = absl::UnixEpoch();
+  const abslx::Duration nano = abslx::Nanoseconds(1);
+  const abslx::Duration sec = abslx::Seconds(1);
+  abslx::Time t = abslx::UnixEpoch();
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(t += nano);
     benchmark::DoNotOptimize(t -= sec);
@@ -50,9 +50,9 @@ BENCHMARK(BM_Time_Arithmetic);
 //
 
 void BM_Time_Difference(benchmark::State& state) {
-  absl::Time start = absl::Now();
-  absl::Time end = start + absl::Nanoseconds(1);
-  absl::Duration diff;
+  abslx::Time start = abslx::Now();
+  abslx::Time end = start + abslx::Nanoseconds(1);
+  abslx::Duration diff;
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(diff += end - start);
   }
@@ -70,13 +70,13 @@ BENCHMARK(BM_Time_Difference);
 //
 
 void BM_Time_ToDateTime_Absl(benchmark::State& state) {
-  const absl::TimeZone tz =
-      absl::time_internal::LoadTimeZone("America/Los_Angeles");
-  absl::Time t = absl::FromUnixSeconds(1384569027);
-  absl::Time t2 = absl::FromUnixSeconds(1418962578);
+  const abslx::TimeZone tz =
+      abslx::time_internal::LoadTimeZone("America/Los_Angeles");
+  abslx::Time t = abslx::FromUnixSeconds(1384569027);
+  abslx::Time t2 = abslx::FromUnixSeconds(1418962578);
   while (state.KeepRunning()) {
     std::swap(t, t2);
-    t += absl::Seconds(1);
+    t += abslx::Seconds(1);
     benchmark::DoNotOptimize(t.In(tz));
   }
 }
@@ -100,10 +100,10 @@ void BM_Time_ToDateTime_Libc(benchmark::State& state) {
 BENCHMARK(BM_Time_ToDateTime_Libc);
 
 void BM_Time_ToDateTimeUTC_Absl(benchmark::State& state) {
-  const absl::TimeZone tz = absl::UTCTimeZone();
-  absl::Time t = absl::FromUnixSeconds(1384569027);
+  const abslx::TimeZone tz = abslx::UTCTimeZone();
+  abslx::Time t = abslx::FromUnixSeconds(1384569027);
   while (state.KeepRunning()) {
-    t += absl::Seconds(1);
+    t += abslx::Seconds(1);
     benchmark::DoNotOptimize(t.In(tz));
   }
 }
@@ -130,14 +130,14 @@ BENCHMARK(BM_Time_ToDateTimeUTC_Libc);
 void BM_Time_FromUnixMicros(benchmark::State& state) {
   int i = 0;
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(absl::FromUnixMicros(i));
+    benchmark::DoNotOptimize(abslx::FromUnixMicros(i));
     ++i;
   }
 }
 BENCHMARK(BM_Time_FromUnixMicros);
 
 void BM_Time_ToUnixNanos(benchmark::State& state) {
-  const absl::Time t = absl::UnixEpoch() + absl::Seconds(123);
+  const abslx::Time t = abslx::UnixEpoch() + abslx::Seconds(123);
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(ToUnixNanos(t));
   }
@@ -145,7 +145,7 @@ void BM_Time_ToUnixNanos(benchmark::State& state) {
 BENCHMARK(BM_Time_ToUnixNanos);
 
 void BM_Time_ToUnixMicros(benchmark::State& state) {
-  const absl::Time t = absl::UnixEpoch() + absl::Seconds(123);
+  const abslx::Time t = abslx::UnixEpoch() + abslx::Seconds(123);
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(ToUnixMicros(t));
   }
@@ -153,7 +153,7 @@ void BM_Time_ToUnixMicros(benchmark::State& state) {
 BENCHMARK(BM_Time_ToUnixMicros);
 
 void BM_Time_ToUnixMillis(benchmark::State& state) {
-  const absl::Time t = absl::UnixEpoch() + absl::Seconds(123);
+  const abslx::Time t = abslx::UnixEpoch() + abslx::Seconds(123);
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(ToUnixMillis(t));
   }
@@ -161,9 +161,9 @@ void BM_Time_ToUnixMillis(benchmark::State& state) {
 BENCHMARK(BM_Time_ToUnixMillis);
 
 void BM_Time_ToUnixSeconds(benchmark::State& state) {
-  const absl::Time t = absl::UnixEpoch() + absl::Seconds(123);
+  const abslx::Time t = abslx::UnixEpoch() + abslx::Seconds(123);
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(absl::ToUnixSeconds(t));
+    benchmark::DoNotOptimize(abslx::ToUnixSeconds(t));
   }
 }
 BENCHMARK(BM_Time_ToUnixSeconds);
@@ -180,14 +180,14 @@ BENCHMARK(BM_Time_ToUnixSeconds);
 //
 
 void BM_Time_FromCivil_Absl(benchmark::State& state) {
-  const absl::TimeZone tz =
-      absl::time_internal::LoadTimeZone("America/Los_Angeles");
+  const abslx::TimeZone tz =
+      abslx::time_internal::LoadTimeZone("America/Los_Angeles");
   int i = 0;
   while (state.KeepRunning()) {
     if ((i & 1) == 0) {
-      absl::FromCivil(absl::CivilSecond(2014, 12, 18, 20, 16, 18), tz);
+      abslx::FromCivil(abslx::CivilSecond(2014, 12, 18, 20, 16, 18), tz);
     } else {
-      absl::FromCivil(absl::CivilSecond(2013, 11, 15, 18, 30, 27), tz);
+      abslx::FromCivil(abslx::CivilSecond(2013, 11, 15, 18, 30, 27), tz);
     }
     ++i;
   }
@@ -222,22 +222,22 @@ void BM_Time_FromCivil_Libc(benchmark::State& state) {
 BENCHMARK(BM_Time_FromCivil_Libc);
 
 void BM_Time_FromCivilUTC_Absl(benchmark::State& state) {
-  const absl::TimeZone tz = absl::UTCTimeZone();
+  const abslx::TimeZone tz = abslx::UTCTimeZone();
   while (state.KeepRunning()) {
-    absl::FromCivil(absl::CivilSecond(2014, 12, 18, 20, 16, 18), tz);
+    abslx::FromCivil(abslx::CivilSecond(2014, 12, 18, 20, 16, 18), tz);
   }
 }
 BENCHMARK(BM_Time_FromCivilUTC_Absl);
 
 void BM_Time_FromCivilDay0_Absl(benchmark::State& state) {
-  const absl::TimeZone tz =
-      absl::time_internal::LoadTimeZone("America/Los_Angeles");
+  const abslx::TimeZone tz =
+      abslx::time_internal::LoadTimeZone("America/Los_Angeles");
   int i = 0;
   while (state.KeepRunning()) {
     if ((i & 1) == 0) {
-      absl::FromCivil(absl::CivilSecond(2014, 12, 0, 20, 16, 18), tz);
+      abslx::FromCivil(abslx::CivilSecond(2014, 12, 0, 20, 16, 18), tz);
     } else {
-      absl::FromCivil(absl::CivilSecond(2013, 11, 0, 18, 30, 27), tz);
+      abslx::FromCivil(abslx::CivilSecond(2013, 11, 0, 18, 30, 27), tz);
     }
     ++i;
   }
@@ -276,21 +276,21 @@ BENCHMARK(BM_Time_FromCivilDay0_Libc);
 //
 
 void BM_Time_ToTimespec(benchmark::State& state) {
-  absl::Time now = absl::Now();
+  abslx::Time now = abslx::Now();
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(absl::ToTimespec(now));
+    benchmark::DoNotOptimize(abslx::ToTimespec(now));
   }
 }
 BENCHMARK(BM_Time_ToTimespec);
 
 void BM_Time_FromTimespec(benchmark::State& state) {
-  timespec ts = absl::ToTimespec(absl::Now());
+  timespec ts = abslx::ToTimespec(abslx::Now());
   while (state.KeepRunning()) {
     if (++ts.tv_nsec == 1000 * 1000 * 1000) {
       ++ts.tv_sec;
       ts.tv_nsec = 0;
     }
-    benchmark::DoNotOptimize(absl::TimeFromTimespec(ts));
+    benchmark::DoNotOptimize(abslx::TimeFromTimespec(ts));
   }
 }
 BENCHMARK(BM_Time_FromTimespec);
@@ -301,14 +301,14 @@ BENCHMARK(BM_Time_FromTimespec);
 
 void BM_Time_InfiniteFuture(benchmark::State& state) {
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(absl::InfiniteFuture());
+    benchmark::DoNotOptimize(abslx::InfiniteFuture());
   }
 }
 BENCHMARK(BM_Time_InfiniteFuture);
 
 void BM_Time_InfinitePast(benchmark::State& state) {
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(absl::InfinitePast());
+    benchmark::DoNotOptimize(abslx::InfinitePast());
   }
 }
 BENCHMARK(BM_Time_InfinitePast);

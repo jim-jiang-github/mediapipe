@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
     int count = input_file.gcount();
     if (count == 0) break;
     for (int i = 0; i < count; ++i) {
-      std::string out = absl::CEscape(absl::string_view(&buf[i], 1));
+      std::string out = abslx::CEscape(abslx::string_view(&buf[i], 1));
       if (line_len + out.size() > 79) {
         std::cout << "\"\n\"";
         line_len = 1;

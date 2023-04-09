@@ -45,7 +45,7 @@ StatusOr<std::shared_ptr<TrackedDeviceBuffer>> MakeArray(const Shape& shape,
   return std::make_shared<TrackedDeviceBuffer>(
       client->backend().memory_allocator(), /*device_ordinal=*/0,
       device_buffers,
-      absl::Span<const std::shared_ptr<BufferSequencingEvent>>(), nullptr);
+      abslx::Span<const std::shared_ptr<BufferSequencingEvent>>(), nullptr);
 }
 
 TEST(TrackedDeviceBufferTest, AsShapedBuffer) {

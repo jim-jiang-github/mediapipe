@@ -49,13 +49,13 @@ class VectorIntToTensorCalculatorTest : public ::testing::Test {
     options->set_input_size(input_size);
     options->set_transpose(transpose);
     options->set_tensor_data_type(tensor_data_type);
-    runner_ = ::absl::make_unique<CalculatorRunner>(config);
+    runner_ = ::abslx::make_unique<CalculatorRunner>(config);
   }
 
   void TestConvertFromVectoVectorInt(const bool transpose) {
     SetUpRunner(VectorIntToTensorCalculatorOptions::INPUT_2D,
                 tensorflow::DT_INT32, transpose, false);
-    auto input = ::absl::make_unique<std::vector<std::vector<int>>>(
+    auto input = ::abslx::make_unique<std::vector<std::vector<int>>>(
         2, std::vector<int>(2));
     for (int i = 0; i < 2; ++i) {
       for (int j = 0; j < 2; ++j) {
@@ -119,7 +119,7 @@ TEST_F(VectorIntToTensorCalculatorTest, TestSingleValue) {
 TEST_F(VectorIntToTensorCalculatorTest, TesOneDim) {
   SetUpRunner(VectorIntToTensorCalculatorOptions::INPUT_1D,
               tensorflow::DT_INT32, false, false);
-  auto input = ::absl::make_unique<std::vector<int>>(5);
+  auto input = ::abslx::make_unique<std::vector<int>>(5);
   for (int i = 0; i < 5; ++i) {
     input->at(i) = i;
   }
@@ -177,7 +177,7 @@ TEST_F(VectorIntToTensorCalculatorTest, TestInt64) {
 TEST_F(VectorIntToTensorCalculatorTest, TestUint8) {
   SetUpRunner(VectorIntToTensorCalculatorOptions::INPUT_1D,
               tensorflow::DT_UINT8, false, false);
-  auto input = ::absl::make_unique<std::vector<int>>(5);
+  auto input = ::abslx::make_unique<std::vector<int>>(5);
   for (int i = 0; i < 5; ++i) {
     input->at(i) = i;
   }

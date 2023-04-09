@@ -102,7 +102,7 @@ Status OutputStreamShard::AddPacketInternal(T&& packet) {
 
   if (packet.IsEmpty()) {
     SetNextTimestampBound(packet.Timestamp().NextAllowedInStream());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   const Timestamp timestamp = packet.Timestamp();
@@ -115,7 +115,7 @@ Status OutputStreamShard::AddPacketInternal(T&& packet) {
 
   Status result = output_stream_spec_->packet_type->Validate(packet);
   if (!result.ok()) {
-    return StatusBuilder(result, MEDIAPIPE_LOC).SetPrepend() << absl::StrCat(
+    return StatusBuilder(result, MEDIAPIPE_LOC).SetPrepend() << abslx::StrCat(
                "Packet type mismatch on calculator outputting to stream \"",
                Name(), "\": ");
   }
@@ -128,7 +128,7 @@ Status OutputStreamShard::AddPacketInternal(T&& packet) {
 
   // TODO debug log?
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void OutputStreamShard::AddPacket(const Packet& packet) {

@@ -84,13 +84,13 @@ const mediapipe::GraphService<std::string> kStringTestService{
     "mediapipe::StringTestService"};
 class EmitSideServiceStringTestSubgraph : public Subgraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       mediapipe::SubgraphContext* sc) override {
     auto string_service = sc->Service(kStringTestService);
     RET_CHECK(string_service.IsAvailable()) << "Service not available";
     CalculatorGraphConfig config =
         mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(
-            absl::StrFormat(R"(
+            abslx::StrFormat(R"(
           output_side_packet: "string"
           node {
             calculator: "ConstantSidePacketCalculator"

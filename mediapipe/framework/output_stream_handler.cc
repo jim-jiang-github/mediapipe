@@ -20,16 +20,16 @@
 
 namespace mediapipe {
 
-absl::Status OutputStreamHandler::InitializeOutputStreamManagers(
+abslx::Status OutputStreamHandler::InitializeOutputStreamManagers(
     OutputStreamManager* flat_output_stream_managers) {
   for (CollectionItemId id = output_stream_managers_.BeginId();
        id < output_stream_managers_.EndId(); ++id) {
     output_stream_managers_.Get(id) = &flat_output_stream_managers[id.value()];
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status OutputStreamHandler::SetupOutputShards(
+abslx::Status OutputStreamHandler::SetupOutputShards(
     OutputStreamShardSet* output_shards) {
   CHECK(output_shards);
   for (CollectionItemId id = output_stream_managers_.BeginId();
@@ -37,15 +37,15 @@ absl::Status OutputStreamHandler::SetupOutputShards(
     OutputStreamManager* manager = output_stream_managers_.Get(id);
     output_shards->Get(id).SetSpec(manager->Spec());
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void OutputStreamHandler::PrepareForRun(
-    const std::function<void(absl::Status)>& error_callback) {
+    const std::function<void(abslx::Status)>& error_callback) {
   for (auto& manager : output_stream_managers_) {
     manager->PrepareForRun(error_callback);
   }
-  absl::MutexLock lock(&timestamp_mutex_);
+  abslx::MutexLock lock(&timestamp_mutex_);
   completed_input_timestamps_.clear();
   task_timestamp_bound_ = Timestamp::Unset();
   propagation_state_ = kIdle;
@@ -75,7 +75,7 @@ void OutputStreamHandler::UpdateTaskTimestampBound(Timestamp timestamp) {
     return;
   }
   {
-    absl::MutexLock lock(&timestamp_mutex_);
+    abslx::MutexLock lock(&timestamp_mutex_);
     if (task_timestamp_bound_ == timestamp) {
       return;
     }
@@ -100,7 +100,7 @@ void OutputStreamHandler::PostProcess(Timestamp input_timestamp) {
     return;
   }
   {
-    absl::MutexLock lock(&timestamp_mutex_);
+    abslx::MutexLock lock(&timestamp_mutex_);
     completed_input_timestamps_.insert(input_timestamp);
     if (propagation_state_ == kPropagatingBound) {
       propagation_state_ = kPropagationPending;

@@ -60,7 +60,7 @@ struct ComputationInstructionOrdering {
     return graph_cycles.InsertEdge(source_id, dest_id);
   }
 
-  absl::flat_hash_map<int32_t, int32_t> node_id_to_graph_id;
+  abslx::flat_hash_map<int32_t, int32_t> node_id_to_graph_id;
 
   tensorflow::GraphCycles graph_cycles;
 };
@@ -127,7 +127,7 @@ static StatusOr<bool> AddControlEdgesForLoopWrites(
             continue;
           }
 
-          changed |= absl::c_linear_search(read->control_successors(), write);
+          changed |= abslx::c_linear_search(read->control_successors(), write);
 
           // Unless we want a copy, read should happen before write.
           TF_RETURN_IF_ERROR(read->AddControlDependencyTo(write));
@@ -142,7 +142,7 @@ static StatusOr<bool> AddControlEdgesForLoopWrites(
 
 StatusOr<bool> LoopScheduleLinearizer::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   TF_ASSIGN_OR_RETURN(std::unique_ptr<HloAliasAnalysis> alias_analysis,
                       HloAliasAnalysis::Run(module, can_share_buffer_));
 

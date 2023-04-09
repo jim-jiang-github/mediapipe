@@ -27,7 +27,7 @@ class TpuCompileInterface {
   static TpuCompileInterface* Get();
   static bool RegisterImplementation(TpuCompileInterface* impl);
 
-  virtual uint64_t FingerprintString(absl::string_view str) = 0;
+  virtual uint64_t FingerprintString(abslx::string_view str) = 0;
 
   // Proto: tensorflow::tpu::CompilationResultProto
   // Location: tensorflow/core/protobuf/tpu/compilation_result.proto

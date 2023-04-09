@@ -162,10 +162,10 @@ void WorkerGrpcDataServer::AddDataServiceToBuilder(
 Status WorkerGrpcDataServer::StartServiceInternal() {
   std::string base_address = config_.worker_address();
   if (base_address.empty()) {
-    base_address = absl::StrCat("localhost:", kPortPlaceholder);
+    base_address = abslx::StrCat("localhost:", kPortPlaceholder);
   }
   std::string worker_address = str_util::StringReplace(
-      base_address, kPortPlaceholder, absl::StrCat(bound_port()),
+      base_address, kPortPlaceholder, abslx::StrCat(bound_port()),
       /*replace_all=*/false);
   std::string transfer_address = worker_address;
   std::string transfer_protocol = config_.data_transfer_protocol();
@@ -177,7 +177,7 @@ Status WorkerGrpcDataServer::StartServiceInternal() {
               << transfer_server_->get_port();
     transfer_address = str_util::StringReplace(
         config_.data_transfer_address(), kPortPlaceholder,
-        absl::StrCat(transfer_server_->get_port()),
+        abslx::StrCat(transfer_server_->get_port()),
         /*replace_all=*/false);
   }
   TF_RETURN_IF_ERROR(service_->Start(worker_address, transfer_address));

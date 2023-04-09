@@ -49,7 +49,7 @@ using ReduceScatterKey =
 // Combines the elements of to_combine into a single ReduceScatter op. All
 // entries in to_combine must be ReduceScatter ops with exactly one operand
 // and the same reduction operation.
-Status CombineReduceScatters(absl::Span<HloInstruction* const> to_combine) {
+Status CombineReduceScatters(abslx::Span<HloInstruction* const> to_combine) {
   if (to_combine.size() < 2) {
     return OkStatus();
   }
@@ -116,7 +116,7 @@ ReduceScatterCombiner::ReduceScatterCombiner(int64_t combine_threshold_in_bytes,
 
 StatusOr<bool> ReduceScatterCombiner::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   VLOG(1) << "Running ReduceScatterCombiner with threshold of "
           << combine_threshold_in_bytes_ << " bytes";
 

@@ -27,10 +27,10 @@ limitations under the License.
 namespace tensorflow::tpu {
 
 // The payload URL for TPU embedding initialization permanent errors.
-constexpr absl::string_view kTpuEmbeddingErrorUrl =
+constexpr abslx::string_view kTpuEmbeddingErrorUrl =
     "type.googleapis.com/tensorflow.tpu.TPUEmbeddingError";
 
-constexpr absl::string_view kTpuEmbeddingErrorMessage =
+constexpr abslx::string_view kTpuEmbeddingErrorMessage =
     "TPUEmbedding permanent error";
 
 // Appends a payload of type tensorflow::tpu::kTpuEmbeddingErrorUrl to the
@@ -46,7 +46,7 @@ StatusOr<T> AppendTpuEmbeddingErrorPayload(StatusOr<T> obj) {
   if (obj.ok()) {
     return std::move(obj.value());
   } else {
-    const std::string error_message = absl::StrCat(
+    const std::string error_message = abslx::StrCat(
         kTpuEmbeddingErrorMessage, ". ", obj.status().error_message());
     Status status(obj.status().code(), error_message);
     TPUEmbeddingError error_payload;

@@ -31,7 +31,7 @@ class OperationChecker : public Checker {
   AdviceProto::Checker Check(const AdvisorOptionsProto::CheckerOption& options,
                              const TFStats* stats) override {
     if (!stats) {
-      absl::FPrintF(
+      abslx::FPrintF(
           stderr, "Missing profiles (e.g. graph, run_meta). Skip %s\n", name());
       return reports_;
     }

@@ -51,7 +51,7 @@ Status RandomAccessInputStream::ReadNBytes(int64_t bytes_to_read,
 
 #if defined(TF_CORD_SUPPORT)
 Status RandomAccessInputStream::ReadNBytes(int64_t bytes_to_read,
-                                           absl::Cord* result) {
+                                           abslx::Cord* result) {
   if (bytes_to_read < 0) {
     return errors::InvalidArgument("Cannot read negative number of bytes");
   }

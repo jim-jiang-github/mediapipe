@@ -32,12 +32,12 @@ namespace tensorflow {
 namespace profiler {
 namespace {
 
-const absl::string_view kEager = "eager";
-const absl::string_view kConcrete = "concrete";
-const absl::string_view kTracedNonXla = "traced-nonXla";
-const absl::string_view kTracedXla = "traced-xla";
-const absl::string_view kNotTracedNonXla = "notTraced-nonXla";
-const absl::string_view kNotTracedXla = "notTraced-xla";
+const abslx::string_view kEager = "eager";
+const abslx::string_view kConcrete = "concrete";
+const abslx::string_view kTracedNonXla = "traced-nonXla";
+const abslx::string_view kTracedXla = "traced-xla";
+const abslx::string_view kNotTracedNonXla = "notTraced-nonXla";
+const abslx::string_view kNotTracedXla = "notTraced-xla";
 
 constexpr double kMaxError = 0.001;
 

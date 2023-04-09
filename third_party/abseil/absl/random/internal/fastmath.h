@@ -24,7 +24,7 @@
 
 #include "absl/numeric/bits.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -52,6 +52,6 @@ inline double StirlingLogFactorial(double n) {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_INTERNAL_FASTMATH_H_

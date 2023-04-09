@@ -115,7 +115,7 @@ class FusedBatchNormExOpTestBase : public OpsTestBase {
 
     // Check if session has an available GPU device.
     const bool has_gpu_device =
-        absl::c_any_of(available_devices, [](const DeviceAttributes& device) {
+        abslx::c_any_of(available_devices, [](const DeviceAttributes& device) {
           return device.device_type() == DEVICE_GPU;
         });
 

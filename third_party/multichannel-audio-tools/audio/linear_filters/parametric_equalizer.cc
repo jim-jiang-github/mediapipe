@@ -260,7 +260,7 @@ std::string ParametricEqualizerParams::ToString() const {
     }
     info += StageParams(i).ToString();
   }
-  info += absl::StrFormat(" } gain_db: %f ", GetGainDb());
+  info += abslx::StrFormat(" } gain_db: %f ", GetGainDb());
   return info;
 }
 
@@ -268,8 +268,8 @@ std::string ParametricEqualizerParams::ToString() const {
 // Shelving Sections", 2004.
 
 void SetParametricEqualizerGainsToMatchMagnitudeResponse(
-    absl::Span<const float> frequencies_hz,
-    absl::Span<const float> magnitude_target_db, ConvergenceParams params,
+    abslx::Span<const float> frequencies_hz,
+    abslx::Span<const float> magnitude_target_db, ConvergenceParams params,
     float sample_rate_hz, ParametricEqualizerParams* eq_params) {
   CHECK_EQ(frequencies_hz.size(), magnitude_target_db.size());
   // Start by setting all the gains to an arbitrary value that is not 0dB. We
@@ -344,8 +344,8 @@ void SetParametricEqualizerGainsToMatchMagnitudeResponse(
 }
 
 void SetParametricEqualizerGainsToMatchMagnitudeResponse(
-    absl::Span<const float> frequencies_hz,
-    absl::Span<const float> magnitude_target_db, float sample_rate_hz,
+    abslx::Span<const float> frequencies_hz,
+    abslx::Span<const float> magnitude_target_db, float sample_rate_hz,
     ParametricEqualizerParams* eq_params) {
   SetParametricEqualizerGainsToMatchMagnitudeResponse(
       frequencies_hz, magnitude_target_db, ConvergenceParams(), sample_rate_hz,
@@ -372,8 +372,8 @@ ArrayXf ParametricEqualizerGainMagnitudeAtFrequencies(
   return gains;
 }
 
-float FitParametricEqualizer(absl::Span<const float> frequencies_hz,
-                             absl::Span<const float> magnitude_target_db,
+float FitParametricEqualizer(abslx::Span<const float> frequencies_hz,
+                             abslx::Span<const float> magnitude_target_db,
                              float sample_rate_hz,
                              const NelderMeadFitParams& fit_params,
                              ParametricEqualizerParams* eq_params) {

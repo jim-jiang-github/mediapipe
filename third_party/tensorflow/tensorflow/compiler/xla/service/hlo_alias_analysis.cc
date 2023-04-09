@@ -40,11 +40,11 @@ limitations under the License.
 
 namespace xla {
 
-using absl::StrAppend;
+using abslx::StrAppend;
 
 namespace {
 
-using FlatValueSet = absl::flat_hash_set<const HloValue*>;
+using FlatValueSet = abslx::flat_hash_set<const HloValue*>;
 
 void ComputeInputOutputAliasedValues(const HloValue& value,
                                      const HloDataflowAnalysis& dataflow,
@@ -221,7 +221,7 @@ std::vector<HloBuffer> CreateBuffers(const HloDataflowAnalysis& dataflow) {
   // The sets of values contained in each buffer.
   std::vector<FlatValueSet> buffer_values(values.size());
   // Maps values to the set of values with which they are aliased.
-  absl::flat_hash_map<const HloValue*, FlatValueSet*> value_to_set;
+  abslx::flat_hash_map<const HloValue*, FlatValueSet*> value_to_set;
   value_to_set.reserve(values.size());
 
   for (size_t i = 0; i < values.size(); ++i) {
@@ -251,7 +251,7 @@ std::vector<HloBuffer> CreateBuffers(const HloDataflowAnalysis& dataflow) {
       return std::make_pair(set_and_id.first->size(), -set_and_id.second);
     };
     FlatValueSet* union_set =
-        absl::c_max_element(aliased_sets, LessThanByKey(key))->first;
+        abslx::c_max_element(aliased_sets, LessThanByKey(key))->first;
 
     for (auto& aliased_set_and_id : aliased_sets) {
       FlatValueSet* aliased_set = aliased_set_and_id.first;
@@ -310,7 +310,7 @@ std::vector<const HloBuffer*> HloAliasAnalysis::ComputeBuffersAt(
   }
 
   // Sort and uniquify vector before returning.
-  absl::c_sort(buffers, HloBuffer::IdLessThan);
+  abslx::c_sort(buffers, HloBuffer::IdLessThan);
   buffers.erase(std::unique(buffers.begin(), buffers.end()), buffers.end());
 
   return buffers;
@@ -322,7 +322,7 @@ Status HloAliasAnalysis::Verify() const {
   for (const auto& pair : value_to_buffer_) {
     const HloValue* value = pair.first;
     const HloBuffer& buffer = *pair.second;
-    TF_RET_CHECK(absl::c_linear_search(buffer.values(), value));
+    TF_RET_CHECK(abslx::c_linear_search(buffer.values(), value));
   }
 
   for (HloBuffer::Id id = 0; id < buffers_.size(); ++id) {
@@ -344,7 +344,7 @@ Status HloAliasAnalysis::Verify() const {
 
 std::string HloAliasAnalysis::ToString() const {
   std::string out =
-      absl::StrCat("HloAliasAnalysis, module ", module_->name(), "\n");
+      abslx::StrCat("HloAliasAnalysis, module ", module_->name(), "\n");
   StrAppend(&out, "  Buffers at each position:\n");
   for (const HloComputation* computation : module_->computations()) {
     for (const HloInstruction* instruction : computation->instructions()) {
@@ -387,7 +387,7 @@ StatusOr<std::unique_ptr<HloAliasAnalysis>> HloAliasAnalysis::Run(
   VLOG(2) << "HloAliasAnalysis::Run on module " << module->name();
   XLA_VLOG_LINES(2, module->ToString());
 
-  auto alias_analysis = absl::WrapUnique(new HloAliasAnalysis(module));
+  auto alias_analysis = abslx::WrapUnique(new HloAliasAnalysis(module));
   TF_ASSIGN_OR_RETURN(alias_analysis->dataflow_analysis_,
                       HloDataflowAnalysis::Run(*module, /*ssa_form=*/true,
                                                /*bitcast_defines_value=*/false,

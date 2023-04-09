@@ -41,8 +41,8 @@ class EnforceMinorToMajorReduceOpVisitor : public DfsHloRewriteVisitor {
 
     int operand_idx = -1;
 
-    absl::InlinedVector<HloInstruction *, 2> canonical_reduce_inputs;
-    absl::InlinedVector<Shape, 2> new_reduce_shapes;
+    abslx::InlinedVector<HloInstruction *, 2> canonical_reduce_inputs;
+    abslx::InlinedVector<Shape, 2> new_reduce_shapes;
 
     DimensionVector out_reduce_dimensions;
     const Shape &first_instruction_shape = reduce->inputs()[0]->shape();
@@ -86,7 +86,7 @@ class EnforceMinorToMajorReduceOpVisitor : public DfsHloRewriteVisitor {
 
       auto to_reduce_logical_dim = [&](int64_t op_logical_dim) {
         return op_logical_dim -
-               absl::c_count_if(reduce->dimensions(), [&](int64_t dim) {
+               abslx::c_count_if(reduce->dimensions(), [&](int64_t dim) {
                  CHECK(dim != op_logical_dim);
                  return dim < op_logical_dim;
                });
@@ -103,7 +103,7 @@ class EnforceMinorToMajorReduceOpVisitor : public DfsHloRewriteVisitor {
                 << dim_size;
         new_operand_shape_data.push_back(dim_size);
 
-        if (absl::c_linear_search(reduce->dimensions(), logical_dim)) {
+        if (abslx::c_linear_search(reduce->dimensions(), logical_dim)) {
           new_reduce_dimensions.push_back(i);
         } else {
           new_reduce_shape_data.push_back(dim_size);
@@ -162,7 +162,7 @@ class EnforceMinorToMajorReduceOpVisitor : public DfsHloRewriteVisitor {
             HloInstruction::CreateBitcast(reduce->shape(), wrapped_reduce);
       } else {
         // Bitcast each element of the tuple.
-        absl::InlinedVector<HloInstruction *, 2> out;
+        abslx::InlinedVector<HloInstruction *, 2> out;
         for (int oidx = 0; oidx < reduce->input_count(); oidx++) {
           HloInstruction *gte = reduce->parent()->AddInstruction(
               HloInstruction::CreateGetTupleElement(wrapped_reduce, oidx));
@@ -181,7 +181,7 @@ class EnforceMinorToMajorReduceOpVisitor : public DfsHloRewriteVisitor {
 
 StatusOr<bool> ReductionLayoutNormalizer::Run(
     HloModule *module,
-    const absl::flat_hash_set<absl::string_view> &execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view> &execution_threads) {
   TF_ASSIGN_OR_RETURN(bool changed,
                       EnforceMinorToMajorReduceOpVisitor().RunOnModule(
                           module, execution_threads));

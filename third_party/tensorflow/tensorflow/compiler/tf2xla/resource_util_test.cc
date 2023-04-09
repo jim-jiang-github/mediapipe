@@ -31,8 +31,8 @@ limitations under the License.
 namespace tensorflow {
 
 namespace {
-ResourceUsageAnalysis::NodeInfo node_info_from_string(absl::string_view s) {
-  std::vector<std::string> tokens = absl::StrSplit(s, ':');
+ResourceUsageAnalysis::NodeInfo node_info_from_string(abslx::string_view s) {
+  std::vector<std::string> tokens = abslx::StrSplit(s, ':');
   EXPECT_EQ(tokens.size(), 3);
 
   ResourceUsageAnalysis::NodeInfo node_info;
@@ -48,7 +48,7 @@ ResourceUsageAnalysis::NodeInfo node_info_from_string(absl::string_view s) {
 
 void AnalyzeAndVerify(
     const GraphDef& graphdef, FunctionLibraryDefinition* flib_def,
-    const absl::flat_hash_map<std::string, absl::flat_hash_set<std::string>>&
+    const abslx::flat_hash_map<std::string, abslx::flat_hash_set<std::string>>&
         expected) {
   auto graph = std::make_unique<Graph>(flib_def);
   TF_EXPECT_OK(
@@ -59,14 +59,14 @@ void AnalyzeAndVerify(
       flib_def, OptimizerOptions());
   FunctionLibraryRuntime* lib_runtime =
       pflr->GetFLR(ProcessFunctionLibraryRuntime::kDefaultFLRDevice);
-  absl::flat_hash_map<ResourceUsageAnalysis::NodeInfo,
-                      absl::flat_hash_set<ResourceUsageAnalysis::NodeInfo>>
+  abslx::flat_hash_map<ResourceUsageAnalysis::NodeInfo,
+                      abslx::flat_hash_set<ResourceUsageAnalysis::NodeInfo>>
       source_to_path;
   TF_EXPECT_OK(ResourceUsageAnalysis::Analyze(graph.get(), lib_runtime,
                                               &source_to_path));
 
-  absl::flat_hash_map<ResourceUsageAnalysis::NodeInfo,
-                      absl::flat_hash_set<ResourceUsageAnalysis::NodeInfo>>
+  abslx::flat_hash_map<ResourceUsageAnalysis::NodeInfo,
+                      abslx::flat_hash_set<ResourceUsageAnalysis::NodeInfo>>
       expected_source_to_path;
   for (auto it : expected) {
     auto src_node_info = node_info_from_string(it.first);
@@ -110,9 +110,9 @@ TEST(ResourceOpAnalyzerTest, SingleResourceSingleUserNoPassThrough) {
   GraphDef graphdef;
   TF_EXPECT_OK(builder.ToGraphDef(&graphdef));
 
-  absl::flat_hash_map<std::string, absl::flat_hash_set<std::string>> expected;
+  abslx::flat_hash_map<std::string, abslx::flat_hash_set<std::string>> expected;
   expected[":stack_op:StackV2"] =
-      absl::flat_hash_set<std::string>({":stack_close:StackCloseV2"});
+      abslx::flat_hash_set<std::string>({":stack_close:StackCloseV2"});
   AnalyzeAndVerify(graphdef, &flib_def, expected);
 }
 
@@ -150,8 +150,8 @@ TEST(ResourceOpAnalyzerTest, SingleResourceSingleUserWithPassThrough) {
   GraphDef graphdef;
   TF_EXPECT_OK(builder.ToGraphDef(&graphdef));
 
-  absl::flat_hash_map<std::string, absl::flat_hash_set<std::string>> expected;
-  expected[":stack_op:StackV2"] = absl::flat_hash_set<std::string>(
+  abslx::flat_hash_map<std::string, abslx::flat_hash_set<std::string>> expected;
+  expected[":stack_op:StackV2"] = abslx::flat_hash_set<std::string>(
       {":resource_identity:Identity", ":stack_close:StackCloseV2"});
   AnalyzeAndVerify(graphdef, &flib_def, expected);
 }
@@ -193,8 +193,8 @@ TEST(ResourceOpAnalyzerTest, SingleResourceMultipleUserNoPassThrough) {
   GraphDef graphdef;
   TF_EXPECT_OK(builder.ToGraphDef(&graphdef));
 
-  absl::flat_hash_map<std::string, absl::flat_hash_set<std::string>> expected;
-  expected[":stack_op:StackV2"] = absl::flat_hash_set<std::string>(
+  abslx::flat_hash_map<std::string, abslx::flat_hash_set<std::string>> expected;
+  expected[":stack_op:StackV2"] = abslx::flat_hash_set<std::string>(
       {":stack_close0:StackCloseV2", ":stack_close1:StackCloseV2"});
   AnalyzeAndVerify(graphdef, &flib_def, expected);
 }
@@ -241,8 +241,8 @@ TEST(ResourceOpAnalyzerTest, SingleResourceMultipleUserWithPassThrough) {
   GraphDef graphdef;
   TF_EXPECT_OK(builder.ToGraphDef(&graphdef));
 
-  absl::flat_hash_map<std::string, absl::flat_hash_set<std::string>> expected;
-  expected[":stack_op:StackV2"] = absl::flat_hash_set<std::string>(
+  abslx::flat_hash_map<std::string, abslx::flat_hash_set<std::string>> expected;
+  expected[":stack_op:StackV2"] = abslx::flat_hash_set<std::string>(
       {":resource_identity:Identity", ":stack_close0:StackCloseV2",
        ":stack_close1:StackCloseV2"});
   AnalyzeAndVerify(graphdef, &flib_def, expected);
@@ -303,10 +303,10 @@ TEST(ResourceOpAnalyzerTest, MultipleResourceMultipleUserNoPassThrough) {
   GraphDef graphdef;
   TF_EXPECT_OK(builder.ToGraphDef(&graphdef));
 
-  absl::flat_hash_map<std::string, absl::flat_hash_set<std::string>> expected;
-  expected[":stack_op0:StackV2"] = absl::flat_hash_set<std::string>(
+  abslx::flat_hash_map<std::string, abslx::flat_hash_set<std::string>> expected;
+  expected[":stack_op0:StackV2"] = abslx::flat_hash_set<std::string>(
       {":stack_close0:StackCloseV2", ":stack_close1:StackCloseV2"});
-  expected[":stack_op1:StackV2"] = absl::flat_hash_set<std::string>(
+  expected[":stack_op1:StackV2"] = abslx::flat_hash_set<std::string>(
       {":stack_close2:StackCloseV2", ":stack_close3:StackCloseV2"});
   AnalyzeAndVerify(graphdef, &flib_def, expected);
 }
@@ -366,10 +366,10 @@ TEST(ResourceOpAnalyzerTest, MultipleResourceMultipleUserWithPassThrough) {
   GraphDef graphdef;
   TF_EXPECT_OK(builder.ToGraphDef(&graphdef));
 
-  absl::flat_hash_map<std::string, absl::flat_hash_set<std::string>> expected;
-  expected[":stack_op0:StackV2"] = absl::flat_hash_set<std::string>(
+  abslx::flat_hash_map<std::string, abslx::flat_hash_set<std::string>> expected;
+  expected[":stack_op0:StackV2"] = abslx::flat_hash_set<std::string>(
       {":stack_close0:StackCloseV2", ":stack_close1:StackCloseV2"});
-  expected[":stack_op1:StackV2"] = absl::flat_hash_set<std::string>(
+  expected[":stack_op1:StackV2"] = abslx::flat_hash_set<std::string>(
       {":stack_close2:StackCloseV2", ":stack_close3:StackCloseV2"});
   AnalyzeAndVerify(graphdef, &flib_def, expected);
 }
@@ -421,8 +421,8 @@ TEST(ResourceOpAnalyzerTest, ResourcePassThroughFunction) {
   GraphDef graphdef;
   TF_EXPECT_OK(builder.ToGraphDef(&graphdef));
 
-  absl::flat_hash_map<std::string, absl::flat_hash_set<std::string>> expected;
-  expected[":stack_op:StackV2"] = absl::flat_hash_set<std::string>(
+  abslx::flat_hash_map<std::string, abslx::flat_hash_set<std::string>> expected;
+  expected[":stack_op:StackV2"] = abslx::flat_hash_set<std::string>(
       {":stack_close:StackCloseV2", ":pass_through_fn:pass_through_function",
        "pass_through_function:out:Identity"});
   AnalyzeAndVerify(graphdef, &flib_def, expected);
@@ -474,8 +474,8 @@ TEST(ResourceOpAnalyzerTest, ResourceUserInFunction) {
   GraphDef graphdef;
   TF_EXPECT_OK(builder.ToGraphDef(&graphdef));
 
-  absl::flat_hash_map<std::string, absl::flat_hash_set<std::string>> expected;
-  expected[":stack_op:StackV2"] = absl::flat_hash_set<std::string>(
+  abslx::flat_hash_map<std::string, abslx::flat_hash_set<std::string>> expected;
+  expected[":stack_op:StackV2"] = abslx::flat_hash_set<std::string>(
       {":resource_user_function:resource_user_function",
        "resource_user_function:stack_close:StackCloseV2"});
   AnalyzeAndVerify(graphdef, &flib_def, expected);
@@ -525,9 +525,9 @@ TEST(ResourceOpAnalyzerTest, ResourceSourceInFunction) {
   GraphDef graphdef;
   TF_EXPECT_OK(builder.ToGraphDef(&graphdef));
 
-  absl::flat_hash_map<std::string, absl::flat_hash_set<std::string>> expected;
+  abslx::flat_hash_map<std::string, abslx::flat_hash_set<std::string>> expected;
   expected["resource_source_function:out:StackV2"] =
-      absl::flat_hash_set<std::string>({":stack_close:StackCloseV2"});
+      abslx::flat_hash_set<std::string>({":stack_close:StackCloseV2"});
   AnalyzeAndVerify(graphdef, &flib_def, expected);
 }
 

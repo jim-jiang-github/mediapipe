@@ -32,7 +32,7 @@ namespace {
 
 // Create a diagonal / batch diagonal matrix with 'input' on the diagonal.
 xla::XlaOp CreateDiagonal(xla::XlaOp input, int64_t last_dim_size,
-                          absl::Span<const int64_t> other_dims) {
+                          abslx::Span<const int64_t> other_dims) {
   xla::XlaBuilder* builder = input.builder();
   // Create two matrices that have the following forms, and compare them:
   //
@@ -66,7 +66,7 @@ xla::XlaOp CreateDiagonal(xla::XlaOp input, int64_t last_dim_size,
 
   // Broadcast into the second to last dimension.
   std::vector<int64_t> broadcast_dimensions(other_dims.size() + 1);
-  absl::c_iota(broadcast_dimensions, 0);
+  abslx::c_iota(broadcast_dimensions, 0);
   ++broadcast_dimensions.back();
   xla::XlaOp input_broadcast =
       xla::BroadcastInDim(input, out_dim_sizes, broadcast_dimensions);

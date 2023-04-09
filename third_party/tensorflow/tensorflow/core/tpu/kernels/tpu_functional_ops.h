@@ -33,20 +33,20 @@ limitations under the License.
 
 namespace tensorflow {
 // Holds node's shape information for Concat/Split.
-using EdgeShapes = absl::flat_hash_map<const Edge*, std::vector<int>>;
+using EdgeShapes = abslx::flat_hash_map<const Edge*, std::vector<int>>;
 using GroupedEdges =
-    absl::flat_hash_map<std::string, std::vector<const Edge*>>;
+    abslx::flat_hash_map<std::string, std::vector<const Edge*>>;
 
 // Contains attrs "T", "sharding", "_tpu_replicate" for each XlaSharding op that
 // we find as part of searching for inputs to models that are replicated.
-using XlaShardingInfoMap = absl::flat_hash_map<
+using XlaShardingInfoMap = abslx::flat_hash_map<
     std::string, std::tuple<tensorflow::DataType, std::string, std::string>>;
 
 // Contains attrs "T", and a pointer to tpu_replicated_metadata for ctrl dep
 // for each TpuReplicatedInput op that we find as part of searching for inputs
 // to models that are replicated.
 using TpuReplicatedInputInfoMap =
-    absl::flat_hash_map<std::string,
+    abslx::flat_hash_map<std::string,
                            std::tuple<tensorflow::DataType, Node*>>;
 
 namespace tpu_functional_internal {
@@ -54,7 +54,7 @@ namespace tpu_functional_internal {
 // Helper functions for graph rewrites.
 GroupedEdges GroupTensorsForInputPacking(
     const EdgeShapes& tpu_input_shapes,
-    const absl::flat_hash_map<const Edge*, DataType>& tpu_input_dtypes,
+    const abslx::flat_hash_map<const Edge*, DataType>& tpu_input_dtypes,
     bool input_shape_opt, bool group_tensors_for_packing);
 GroupedEdges GroupTensorsForOutputPacking(Graph* graph,
                                           EdgeShapes& tpu_output_shapes,
@@ -62,7 +62,7 @@ GroupedEdges GroupTensorsForOutputPacking(Graph* graph,
 
 Status CreateConcatAndSplitNodesForInputTensor(
     Graph* graph, const string& cluster_name, EdgeShapes* tpu_input_shapes,
-    const absl::flat_hash_map<std::string, std::vector<const Edge*>>&
+    const abslx::flat_hash_map<std::string, std::vector<const Edge*>>&
         grouped_input_edges,
     int32_t minimum_input_tensors_packing, bool xla_spmd_input_sharded,
     const XlaShardingInfoMap& xla_sharding_info,
@@ -303,8 +303,8 @@ class TPUPartitionedCallOp : public AsyncOpKernel {
   }
 
   // Init once flagas.
-  absl::once_flag once_;
-  absl::once_flag ordinal_selector_once_;
+  abslx::once_flag once_;
+  abslx::once_flag ordinal_selector_once_;
 
   // Device manager and device set.
   const DeviceMgr* device_mgr_;
@@ -322,13 +322,13 @@ class TPUPartitionedCallOp : public AsyncOpKernel {
       ABSL_GUARDED_BY(mu_);
 
   // A set contains seen ordinals. Used by variable initialization on TPU.
-  absl::flat_hash_set<int> seen_ordinals_;
+  abslx::flat_hash_set<int> seen_ordinals_;
 
   // Record the indices of the _Arg with type DT_RESOURCE that goes
   // into a TPU Op.
   std::vector<bool> replaced_input_indices_;
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   // Function shards are added to the `flib_def_`, and later on it'll create
   // a copy of `flib_def_` to pass to `library_runtime_` as an overlay function
   // library for instantiation.
@@ -345,7 +345,7 @@ class TPUPartitionedCallOp : public AsyncOpKernel {
   std::shared_ptr<tpu::TPUOrdinalSelector> ordinal_selector_;
 
   // Maps input hash to TF fingerprint.
-  absl::flat_hash_map<uint64, uint64> inputs_to_fingerprint_;
+  abslx::flat_hash_map<uint64, uint64> inputs_to_fingerprint_;
 
   // List of TPU devices
   std::vector<Device*> tpu_devices_;

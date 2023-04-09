@@ -36,15 +36,15 @@ namespace {
 // Input side packets: 1, pointing to CalculatorRunner::StreamContents.
 class CalculatorRunnerSourceCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->InputSidePackets()
         .Index(0)
         .Set<const CalculatorRunner::StreamContents*>();
     cc->Outputs().Index(0).SetAny();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     const auto* contents = cc->InputSidePackets()
                                .Index(0)
                                .Get<const CalculatorRunner::StreamContents*>();
@@ -53,9 +53,9 @@ class CalculatorRunnerSourceCalculator : public CalculatorBase {
     for (const Packet& packet : contents->packets) {
       cc->Outputs().Index(0).AddPacket(packet);
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     return tool::StatusStop();
   }
 };
@@ -67,23 +67,23 @@ REGISTER_CALCULATOR(CalculatorRunnerSourceCalculator);
 // Input side packets: 1, pointing to CalculatorRunner::StreamContents.
 class CalculatorRunnerSinkCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).SetAny();
     cc->InputSidePackets().Index(0).Set<CalculatorRunner::StreamContents*>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     contents_ = cc->InputSidePackets()
                     .Index(0)
                     .Get<CalculatorRunner::StreamContents*>();
     contents_->header = cc->Inputs().Index(0).Header();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     contents_->packets.push_back(cc->Inputs().Index(0).Value());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -98,7 +98,7 @@ CalculatorRunner::CalculatorRunner(
   MEDIAPIPE_CHECK_OK(InitializeFromNodeConfig(node_config));
 }
 
-absl::Status CalculatorRunner::InitializeFromNodeConfig(
+abslx::Status CalculatorRunner::InitializeFromNodeConfig(
     const CalculatorGraphConfig::Node& node_config) {
   node_config_ = node_config;
 
@@ -112,21 +112,21 @@ absl::Status CalculatorRunner::InitializeFromNodeConfig(
 
   ASSIGN_OR_RETURN(auto input_map,
                    tool::TagMap::Create(node_config_.input_stream()));
-  inputs_ = absl::make_unique<StreamContentsSet>(input_map);
+  inputs_ = abslx::make_unique<StreamContentsSet>(input_map);
 
   ASSIGN_OR_RETURN(auto output_map,
                    tool::TagMap::Create(node_config_.output_stream()));
-  outputs_ = absl::make_unique<StreamContentsSet>(output_map);
+  outputs_ = abslx::make_unique<StreamContentsSet>(output_map);
 
   ASSIGN_OR_RETURN(auto input_side_map,
                    tool::TagMap::Create(node_config_.input_side_packet()));
-  input_side_packets_ = absl::make_unique<PacketSet>(input_side_map);
+  input_side_packets_ = abslx::make_unique<PacketSet>(input_side_map);
 
   ASSIGN_OR_RETURN(auto output_side_map,
                    tool::TagMap::Create(node_config_.output_side_packet()));
-  output_side_packets_ = absl::make_unique<PacketSet>(output_side_map);
+  output_side_packets_ = abslx::make_unique<PacketSet>(output_side_map);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 CalculatorRunner::CalculatorRunner(const std::string& calculator_type,
@@ -166,7 +166,7 @@ CalculatorRunner::~CalculatorRunner() {}
 void CalculatorRunner::SetNumInputs(int n) {
   tool::TagAndNameInfo info;
   for (int i = 0; i < n; ++i) {
-    info.names.push_back(absl::StrCat("input_", i));
+    info.names.push_back(abslx::StrCat("input_", i));
   }
   InitializeInputs(info);
 }
@@ -174,7 +174,7 @@ void CalculatorRunner::SetNumInputs(int n) {
 void CalculatorRunner::SetNumOutputs(int n) {
   tool::TagAndNameInfo info;
   for (int i = 0; i < n; ++i) {
-    info.names.push_back(absl::StrCat("output_", i));
+    info.names.push_back(abslx::StrCat("output_", i));
   }
   InitializeOutputs(info);
 }
@@ -182,7 +182,7 @@ void CalculatorRunner::SetNumOutputs(int n) {
 void CalculatorRunner::SetNumInputSidePackets(int n) {
   tool::TagAndNameInfo info;
   for (int i = 0; i < n; ++i) {
-    info.names.push_back(absl::StrCat("side_packet_", i));
+    info.names.push_back(abslx::StrCat("side_packet_", i));
   }
   InitializeInputSidePackets(info);
 }
@@ -220,10 +220,10 @@ std::map<std::string, int64> CalculatorRunner::GetCountersValues() {
   return graph_->GetCounterFactory()->GetCounterSet()->GetCountersValues();
 }
 
-absl::Status CalculatorRunner::BuildGraph() {
+abslx::Status CalculatorRunner::BuildGraph() {
   if (graph_ != nullptr) {
     // The graph was already built.
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   RET_CHECK(inputs_) << "The inputs were not initialized.";
   RET_CHECK(outputs_) << "The outputs were not initialized.";
@@ -244,7 +244,7 @@ absl::Status CalculatorRunner::BuildGraph() {
     auto* node = config.add_node();
     node->set_calculator("CalculatorRunnerSourceCalculator");
     node->add_output_stream(name);
-    node->add_input_side_packet(absl::StrCat(kSourcePrefix, name));
+    node->add_input_side_packet(abslx::StrCat(kSourcePrefix, name));
   }
   for (int i = 0; i < node_config_.output_stream_size(); ++i) {
     std::string name;
@@ -256,7 +256,7 @@ absl::Status CalculatorRunner::BuildGraph() {
     auto* node = config.add_node();
     node->set_calculator("CalculatorRunnerSinkCalculator");
     node->add_input_stream(name);
-    node->add_input_side_packet(absl::StrCat(kSinkPrefix, name));
+    node->add_input_side_packet(abslx::StrCat(kSinkPrefix, name));
   }
   config.set_num_threads(1);
 
@@ -275,12 +275,12 @@ absl::Status CalculatorRunner::BuildGraph() {
 #endif
   }
 
-  graph_ = absl::make_unique<CalculatorGraph>();
+  graph_ = abslx::make_unique<CalculatorGraph>();
   MP_RETURN_IF_ERROR(graph_->Initialize(config));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorRunner::Run() {
+abslx::Status CalculatorRunner::Run() {
   MP_RETURN_IF_ERROR(BuildGraph());
   // Set the input side packets for the sources.
   std::map<std::string, Packet> input_side_packets;
@@ -301,7 +301,7 @@ absl::Status CalculatorRunner::Run() {
     } else {
       contents = &inputs_->Get(tag, index);
     }
-    input_side_packets.emplace(absl::StrCat(kSourcePrefix, name),
+    input_side_packets.emplace(abslx::StrCat(kSourcePrefix, name),
                                Adopt(new auto(contents)));
   }
   // Set the input side packets for the calculator.
@@ -336,7 +336,7 @@ absl::Status CalculatorRunner::Run() {
     }
     // Clear |contents| because Run() may be called multiple times.
     *contents = CalculatorRunner::StreamContents();
-    input_side_packets.emplace(absl::StrCat(kSinkPrefix, name),
+    input_side_packets.emplace(abslx::StrCat(kSinkPrefix, name),
                                Adopt(new auto(contents)));
   }
   MP_RETURN_IF_ERROR(graph_->Run(input_side_packets));
@@ -352,7 +352,7 @@ absl::Status CalculatorRunner::Run() {
         tag, (index == -1) ? ++positional_index : index);
     ASSIGN_OR_RETURN(contents, graph_->GetOutputSidePacket(name));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

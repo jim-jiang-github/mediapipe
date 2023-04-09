@@ -40,8 +40,8 @@ class MatMulSPMDExpander : public SPMDExpanderBase {
  private:
   StatusOr<Layout> OutputLayoutAndReducedDims(
       bool allow_unknown_layouts, mlir::Operation* op,
-      absl::flat_hash_set<std::string>* reduced_dims,
-      absl::optional<Layout>* left, absl::optional<Layout>* right);
+      abslx::flat_hash_set<std::string>* reduced_dims,
+      abslx::optional<Layout>* left, abslx::optional<Layout>* right);
 
   // This function prepares the inputs (x, y or a, b) to (Batch)MatMul by
   // possibly computing a new layout for each input that allows us to simply

@@ -48,15 +48,15 @@ TfrtSavedModelMLIRImportInput::TfrtSavedModelMLIRImportInput(
       graph_execution_state_(std::move(graph_execution_state)) {}
 
 StatusOr<const tensorflow::Graph*> TfrtSavedModelMLIRImportInput::GetSubGraph(
-    absl::string_view name, GraphImportConfig& graph_import_config) {
+    abslx::string_view name, GraphImportConfig& graph_import_config) {
   LOG(INFO) << "TFRT importing savedmodel signature: " << name;
 
   // Protects the members when muti-threads are calling this method to import
   // signatures in parallel.
-  ABSL_CONST_INIT static absl::Mutex mu(absl::kConstInit);
+  ABSL_CONST_INIT static abslx::Mutex mu(abslx::kConstInit);
 
   {
-    absl::MutexLock l(&mu);
+    abslx::MutexLock l(&mu);
     auto iter = optimized_graphs_.find(name);
     if (iter != optimized_graphs_.end()) return iter->second.get();
   }
@@ -65,7 +65,7 @@ StatusOr<const tensorflow::Graph*> TfrtSavedModelMLIRImportInput::GetSubGraph(
       auto optimization_result,
       graph_execution_state_->CreateOptimizedGraph(graph_import_config));
 
-  absl::MutexLock l(&mu);
+  abslx::MutexLock l(&mu);
   functionalization_duration_ += optimization_result.functionalization_duration;
   grappler_duration_ += optimization_result.grappler_duration;
 

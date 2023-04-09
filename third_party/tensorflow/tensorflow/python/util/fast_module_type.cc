@@ -31,7 +31,7 @@ struct FastModuleObject {
   // because it's inherited from PyModuleObject.
   const std::array<char, PY_MODULE_TYPE_TP_BASIC_SIZE> opaque_base_fields;
   // A cache that helps reduce attribute lookup overhead.
-  absl::flat_hash_map<PyObject *, PyObject *> attr_map;
+  abslx::flat_hash_map<PyObject *, PyObject *> attr_map;
   // pointer to the external getattribute function
   PyObject *cb_getattribute = nullptr;
   // pointer to the external getattr function
@@ -48,7 +48,7 @@ static int FastModule_init(FastModuleObject *self, PyObject *args,
   DCHECK_EQ(PY_MODULE_TYPE_TP_BASIC_SIZE, PyModule_Type.tp_basicsize);
   if (PyModule_Type.tp_init(reinterpret_cast<PyObject *>(self), args, kwds) < 0)
     return -1;
-  new (&(self->attr_map)) absl::flat_hash_map<PyObject *, PyObject *>();
+  new (&(self->attr_map)) abslx::flat_hash_map<PyObject *, PyObject *>();
   return 0;
 }
 

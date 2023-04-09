@@ -31,7 +31,7 @@
 #include "absl/synchronization/internal/create_thread_identity.h"
 #include "absl/synchronization/internal/kernel_timeout.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 class Mutex;
@@ -80,14 +80,14 @@ class PerThreadSem {
 
   // Permitted callers.
   friend class PerThreadSemTest;
-  friend class absl::Mutex;
-  friend absl::base_internal::ThreadIdentity* CreateThreadIdentity();
+  friend class abslx::Mutex;
+  friend abslx::base_internal::ThreadIdentity* CreateThreadIdentity();
   friend void ReclaimThreadIdentity(void* v);
 };
 
 }  // namespace synchronization_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 // In some build configurations we pass --detect-odr-violations to the
 // gold linker.  This causes it to flag weak symbol overrides as ODR
@@ -97,18 +97,18 @@ ABSL_NAMESPACE_END
 // check.
 extern "C" {
 void ABSL_INTERNAL_C_SYMBOL(AbslInternalPerThreadSemPost)(
-    absl::base_internal::ThreadIdentity* identity);
+    abslx::base_internal::ThreadIdentity* identity);
 bool ABSL_INTERNAL_C_SYMBOL(AbslInternalPerThreadSemWait)(
-    absl::synchronization_internal::KernelTimeout t);
+    abslx::synchronization_internal::KernelTimeout t);
 }  // extern "C"
 
-void absl::synchronization_internal::PerThreadSem::Post(
-    absl::base_internal::ThreadIdentity* identity) {
+void abslx::synchronization_internal::PerThreadSem::Post(
+    abslx::base_internal::ThreadIdentity* identity) {
   ABSL_INTERNAL_C_SYMBOL(AbslInternalPerThreadSemPost)(identity);
 }
 
-bool absl::synchronization_internal::PerThreadSem::Wait(
-    absl::synchronization_internal::KernelTimeout t) {
+bool abslx::synchronization_internal::PerThreadSem::Wait(
+    abslx::synchronization_internal::KernelTimeout t) {
   return ABSL_INTERNAL_C_SYMBOL(AbslInternalPerThreadSemWait)(t);
 }
 

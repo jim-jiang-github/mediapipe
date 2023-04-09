@@ -22,10 +22,10 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status ConcatWidthTest(TestExecutionEnvironment* env);
-absl::Status ConcatHeightTest(TestExecutionEnvironment* env);
-absl::Status ConcatChannelsTest(TestExecutionEnvironment* env);
-absl::Status ConcatChannelsAlignedx4Test(TestExecutionEnvironment* env);
+abslx::Status ConcatWidthTest(TestExecutionEnvironment* env);
+abslx::Status ConcatHeightTest(TestExecutionEnvironment* env);
+abslx::Status ConcatChannelsTest(TestExecutionEnvironment* env);
+abslx::Status ConcatChannelsAlignedx4Test(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

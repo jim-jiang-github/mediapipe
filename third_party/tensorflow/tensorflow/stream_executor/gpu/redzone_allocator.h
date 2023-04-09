@@ -62,7 +62,7 @@ class RedzoneAllocator : public ScratchAllocator {
   struct RedzoneCheckStatus {
     RedzoneCheckStatus() = default;
 
-    RedzoneCheckStatus(absl::string_view buffer_name, void* user_buffer_address,
+    RedzoneCheckStatus(abslx::string_view buffer_name, void* user_buffer_address,
                        int64_t offset, uint64_t expected_value,
                        uint64_t actual_value)
         : buffer_name(buffer_name),

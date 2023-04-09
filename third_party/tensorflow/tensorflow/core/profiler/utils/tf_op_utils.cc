@@ -31,28 +31,28 @@ namespace tensorflow {
 namespace profiler {
 namespace {
 
-const absl::string_view kIterator = "Iterator";
-const absl::string_view kSeparator = "::";
+const abslx::string_view kIterator = "Iterator";
+const abslx::string_view kSeparator = "::";
 constexpr char kNameScopeSeparator = '/';
 constexpr char kOpNameSuffixSeparator = '_';
 
-bool IsInteger(absl::string_view str) {
+bool IsInteger(abslx::string_view str) {
   int64_t unused;
-  return absl::SimpleAtoi(str, &unused);
+  return abslx::SimpleAtoi(str, &unused);
 }
 
 // Returns an op type derived from an op name.
-absl::string_view DeriveOpType(absl::string_view full_op_name) {
+abslx::string_view DeriveOpType(abslx::string_view full_op_name) {
   // Use the op name without name scopes and suffix as an op type. A full op
   // name consists of name scopes, an op type, and optionally a numeric suffix
   // (e.g., model/layer/MatMul_1).
-  std::vector<absl::string_view> name_scopes_and_op_name =
-      absl::StrSplit(full_op_name, kNameScopeSeparator);
-  absl::string_view op_name = name_scopes_and_op_name.back();
-  std::vector<absl::string_view> op_type_and_maybe_suffix =
-      absl::StrSplit(op_name, kOpNameSuffixSeparator);
-  absl::string_view maybe_suffix = op_type_and_maybe_suffix.back();
-  absl::string_view op_type = op_name;
+  std::vector<abslx::string_view> name_scopes_and_op_name =
+      abslx::StrSplit(full_op_name, kNameScopeSeparator);
+  abslx::string_view op_name = name_scopes_and_op_name.back();
+  std::vector<abslx::string_view> op_type_and_maybe_suffix =
+      abslx::StrSplit(op_name, kOpNameSuffixSeparator);
+  abslx::string_view maybe_suffix = op_type_and_maybe_suffix.back();
+  abslx::string_view op_type = op_name;
   if (IsInteger(maybe_suffix)) {
     // NOTE: assuming a numeric suffix is not part of an op type while
     // technically it is allowed.
@@ -63,53 +63,53 @@ absl::string_view DeriveOpType(absl::string_view full_op_name) {
 
 }  // namespace
 
-const absl::string_view kUnknownOp = "";  // op types are non-empty strings
-const absl::string_view kDatasetOp = "Dataset";
-const absl::string_view kMemcpyHToDOp = "MemcpyHToD";
-const absl::string_view kMemcpyDToHOp = "MemcpyDToH";
-const absl::string_view kMemcpyDToDOp = "MemcpyDToD";
-const absl::string_view kMemcpyHToHOp = "MemcpyHToH";
+const abslx::string_view kUnknownOp = "";  // op types are non-empty strings
+const abslx::string_view kDatasetOp = "Dataset";
+const abslx::string_view kMemcpyHToDOp = "MemcpyHToD";
+const abslx::string_view kMemcpyDToHOp = "MemcpyDToH";
+const abslx::string_view kMemcpyDToDOp = "MemcpyDToD";
+const abslx::string_view kMemcpyHToHOp = "MemcpyHToH";
 
-bool IsTfOpName(absl::string_view op_name) {
+bool IsTfOpName(abslx::string_view op_name) {
   // TODO(b/177602927): Confirm the naming convention with the TF team.
   static const LazyRE2 kTfOpNameRegEx = {"[A-Za-z0-9.][A-Za-z0-9_.\\/>-]*"};
   return RE2::FullMatch(op_name, *kTfOpNameRegEx);
 }
 
-bool IsTfOpType(absl::string_view op_type) {
+bool IsTfOpType(abslx::string_view op_type) {
   static const LazyRE2 kTfOpTypeRegEx = {"[A-Z_][a-zA-Z0-9_]*"};
   return RE2::FullMatch(op_type, *kTfOpTypeRegEx);
 }
 
-bool IsJaxOpType(absl::string_view op_type) {
+bool IsJaxOpType(abslx::string_view op_type) {
   static const LazyRE2 kJaxOpTypeRegEx = {"[a-z_][a-z0-9_]*"};
   return RE2::FullMatch(op_type, *kJaxOpTypeRegEx);
 }
 
-bool IsJaxOpNameAndType(absl::string_view op_name, absl::string_view op_type) {
+bool IsJaxOpNameAndType(abslx::string_view op_name, abslx::string_view op_type) {
   if (op_name.empty() || !IsJaxOpType(op_type)) return false;
-  std::vector<absl::string_view> split_result =
-      absl::StrSplit(op_name, kNameScopeSeparator);
-  return absl::StrContains(split_result.back(), op_type);
+  std::vector<abslx::string_view> split_result =
+      abslx::StrSplit(op_name, kNameScopeSeparator);
+  return abslx::StrContains(split_result.back(), op_type);
 }
 
-TfOp ParseTfOpFullname(absl::string_view tf_op_fullname) {
+TfOp ParseTfOpFullname(abslx::string_view tf_op_fullname) {
   // TF Op names have the format "name:type".
   TfOp tf_op = {Category::kUnknown, tf_op_fullname, kUnknownOp};
-  std::vector<absl::string_view> parts =
-      absl::StrSplit(tf_op_fullname, absl::MaxSplits(':', 1));
+  std::vector<abslx::string_view> parts =
+      abslx::StrSplit(tf_op_fullname, abslx::MaxSplits(':', 1));
   if (parts.size() != 2) {
     // GPU-related Ops that need to be tracked.
-    if (absl::StartsWithIgnoreCase(tf_op_fullname, "MEMCPYHToD")) {
+    if (abslx::StartsWithIgnoreCase(tf_op_fullname, "MEMCPYHToD")) {
       tf_op.category = Category::kMemcpyHToD;
       tf_op.type = kMemcpyHToDOp;
-    } else if (absl::StartsWithIgnoreCase(tf_op_fullname, "MEMCPYDToH")) {
+    } else if (abslx::StartsWithIgnoreCase(tf_op_fullname, "MEMCPYDToH")) {
       tf_op.category = Category::kMemcpyDToH;
       tf_op.type = kMemcpyDToHOp;
-    } else if (absl::StartsWithIgnoreCase(tf_op_fullname, "MEMCPYDToD")) {
+    } else if (abslx::StartsWithIgnoreCase(tf_op_fullname, "MEMCPYDToD")) {
       tf_op.category = Category::kMemcpyDToD;
       tf_op.type = kMemcpyDToDOp;
-    } else if (absl::StartsWithIgnoreCase(tf_op_fullname, "MEMCPYHToH")) {
+    } else if (abslx::StartsWithIgnoreCase(tf_op_fullname, "MEMCPYHToH")) {
       tf_op.category = Category::kMemcpyHToH;
       tf_op.type = kMemcpyHToHOp;
     }
@@ -130,15 +130,15 @@ TfOp ParseTfOpFullname(absl::string_view tf_op_fullname) {
   return tf_op;
 }
 
-std::vector<absl::string_view> ParseTfNameScopes(absl::string_view tf_op_name) {
-  std::vector<absl::string_view> name_scopes =
-      absl::StrSplit(tf_op_name, kNameScopeSeparator);
+std::vector<abslx::string_view> ParseTfNameScopes(abslx::string_view tf_op_name) {
+  std::vector<abslx::string_view> name_scopes =
+      abslx::StrSplit(tf_op_name, kNameScopeSeparator);
   // The last element is an op name not TF name scope.
   if (!name_scopes.empty()) name_scopes.pop_back();
   return name_scopes;
 }
 
-std::vector<absl::string_view> ParseTfNameScopes(const TfOp& tf_op) {
+std::vector<abslx::string_view> ParseTfNameScopes(const TfOp& tf_op) {
   return ParseTfNameScopes(tf_op.name);
 }
 
@@ -146,7 +146,7 @@ std::string TfOpEventName(const TfOp& tf_op) {
   std::string event_name;
   if (tf_op.category == Category::kUnknown) {
     // Some TraceMe names contain trailing whitespace, remove it.
-    event_name = std::string(absl::StripTrailingAsciiWhitespace(tf_op.name));
+    event_name = std::string(abslx::StripTrailingAsciiWhitespace(tf_op.name));
   } else if (tf_op.category == Category::kTfData) {
     event_name = DatasetOpEventName(tf_op.name);
   } else {
@@ -155,27 +155,27 @@ std::string TfOpEventName(const TfOp& tf_op) {
   return event_name;
 }
 
-std::string TfOpEventName(absl::string_view tf_op_fullname) {
+std::string TfOpEventName(abslx::string_view tf_op_fullname) {
   return TfOpEventName(ParseTfOpFullname(tf_op_fullname));
 }
 
-std::string DatasetOpEventName(absl::string_view full_name) {
-  std::vector<absl::string_view> split_result =
-      absl::StrSplit(full_name, kSeparator);
-  return absl::StrCat(kIterator, kSeparator, split_result.back());
+std::string DatasetOpEventName(abslx::string_view full_name) {
+  std::vector<abslx::string_view> split_result =
+      abslx::StrSplit(full_name, kSeparator);
+  return abslx::StrCat(kIterator, kSeparator, split_result.back());
 }
 
-std::string IteratorName(absl::string_view full_name) {
-  std::vector<absl::string_view> split_result =
-      absl::StrSplit(full_name, kSeparator);
+std::string IteratorName(abslx::string_view full_name) {
+  std::vector<abslx::string_view> split_result =
+      abslx::StrSplit(full_name, kSeparator);
   return std::string(split_result.back());
 }
 
-std::vector<absl::string_view> ParseTensorShapes(
-    absl::string_view tensor_shapes) {
-  absl::ConsumePrefix(&tensor_shapes, "(");
-  absl::ConsumeSuffix(&tensor_shapes, ")");
-  return absl::StrSplit(tensor_shapes, ';');
+std::vector<abslx::string_view> ParseTensorShapes(
+    abslx::string_view tensor_shapes) {
+  abslx::ConsumePrefix(&tensor_shapes, "(");
+  abslx::ConsumeSuffix(&tensor_shapes, ")");
+  return abslx::StrSplit(tensor_shapes, ';');
 }
 
 }  // namespace profiler

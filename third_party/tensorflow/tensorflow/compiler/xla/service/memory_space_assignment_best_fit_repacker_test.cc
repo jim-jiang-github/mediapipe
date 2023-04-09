@@ -49,7 +49,7 @@ TEST_F(MemorySpaceAssignmentBestFitRepackerTest, Simple) {
   std::vector<AllocationBlock*> allocation_blocks;
   allocation_blocks.push_back(MakeAllocationBlock(10, 20, 10));
   allocation_blocks.push_back(MakeAllocationBlock(5, 25, 15));
-  EXPECT_TRUE(*repacker_.Repack(absl::MakeSpan(allocation_blocks)));
+  EXPECT_TRUE(*repacker_.Repack(abslx::MakeSpan(allocation_blocks)));
 
   EXPECT_EQ(allocation_blocks[0]->offset, 15);
   EXPECT_EQ(allocation_blocks[1]->offset, 0);
@@ -63,7 +63,7 @@ TEST_F(MemorySpaceAssignmentBestFitRepackerTest, Colocation) {
   allocation_blocks[0]->colocations.push_back(allocation_blocks[1]);
   allocation_blocks[1]->colocations.push_back(allocation_blocks[0]);
   allocation_blocks.push_back(MakeAllocationBlock(5, 25, 15));
-  EXPECT_TRUE(*repacker_.Repack(absl::MakeSpan(allocation_blocks)));
+  EXPECT_TRUE(*repacker_.Repack(abslx::MakeSpan(allocation_blocks)));
 
   EXPECT_EQ(allocation_blocks[0]->offset, 15);
   EXPECT_EQ(allocation_blocks[1]->offset, 15);
@@ -78,7 +78,7 @@ TEST_F(MemorySpaceAssignmentBestFitRepackerTest, TooLarge) {
   allocation_blocks.push_back(MakeAllocationBlock(15, 20, 10));
   allocation_blocks.push_back(MakeAllocationBlock(12, 22, 50));
   allocation_blocks.push_back(MakeAllocationBlock(10, 18, 20));
-  EXPECT_FALSE(*repacker_.Repack(absl::MakeSpan(allocation_blocks)));
+  EXPECT_FALSE(*repacker_.Repack(abslx::MakeSpan(allocation_blocks)));
 
   // Make sure the buffers didn't get offset assignments.
   EXPECT_EQ(allocation_blocks[0]->offset, -1);
@@ -97,7 +97,7 @@ TEST_F(MemorySpaceAssignmentBestFitRepackerTest, ColocationDifferentSizes) {
   allocation_blocks[1]->colocations.push_back(allocation_blocks[0]);
   allocation_blocks.push_back(MakeAllocationBlock(9, 11, 2));
   allocation_blocks.push_back(MakeAllocationBlock(1, 2, 2));
-  EXPECT_TRUE(*repacker_.Repack(absl::MakeSpan(allocation_blocks)));
+  EXPECT_TRUE(*repacker_.Repack(abslx::MakeSpan(allocation_blocks)));
 
   EXPECT_EQ(allocation_blocks[0]->offset, 0);
   EXPECT_EQ(allocation_blocks[1]->offset, 0);

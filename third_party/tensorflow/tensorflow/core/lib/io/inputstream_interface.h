@@ -41,9 +41,9 @@ class InputStreamInterface {
   // Reads the next bytes_to_read from the file. Typical return codes:
   //  * OK - in case of success.
   //  * OUT_OF_RANGE - not enough bytes remaining before end of file.
-  virtual Status ReadNBytes(int64_t bytes_to_read, absl::Cord* cord) {
+  virtual Status ReadNBytes(int64_t bytes_to_read, abslx::Cord* cord) {
     return errors::Unimplemented(
-        "ReadNBytes(int64, absl::Cord*) is not implemented.");
+        "ReadNBytes(int64, abslx::Cord*) is not implemented.");
   }
 #endif
 

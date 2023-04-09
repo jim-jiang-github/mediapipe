@@ -53,11 +53,11 @@ class TextToTensorCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kTextIn, kTensorsOut);
 
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 };
 
-absl::Status TextToTensorCalculator::Process(CalculatorContext* cc) {
-  absl::string_view text = kTextIn(cc).Get();
+abslx::Status TextToTensorCalculator::Process(CalculatorContext* cc) {
+  abslx::string_view text = kTextIn(cc).Get();
   int input_len = static_cast<int>(text.length());
 
   std::vector<Tensor> result;
@@ -65,7 +65,7 @@ absl::Status TextToTensorCalculator::Process(CalculatorContext* cc) {
   std::memcpy(result[0].GetCpuWriteView().buffer<char>(), text.data(),
               input_len * sizeof(char));
   kTensorsOut(cc).Send(std::move(result));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 MEDIAPIPE_REGISTER_NODE(TextToTensorCalculator);

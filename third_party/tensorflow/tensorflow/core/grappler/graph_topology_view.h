@@ -56,10 +56,10 @@ class GraphTopologyView {
   // execution of dequeue/enqueue ops from the same queue resource, but we might
   // want to enforce ordering between them for the purpose of graph analysis.
   Status InitializeFromGraph(const GraphDef& graph,
-                             absl::Span<const GraphView::Edge> ephemeral_edges,
+                             abslx::Span<const GraphView::Edge> ephemeral_edges,
                              bool ignore_control_edges);
   Status InitializeFromGraph(const GraphDef& graph,
-                             absl::Span<const GraphView::Edge> ephemeral_edges);
+                             abslx::Span<const GraphView::Edge> ephemeral_edges);
   Status InitializeFromGraph(const GraphDef& graph, bool ignore_control_edges);
   Status InitializeFromGraph(const GraphDef& graph);
 
@@ -68,26 +68,26 @@ class GraphTopologyView {
   const GraphDef* graph() const { return graph_; }
 
   // Returns true iff the node exists in the underlying graph.
-  bool HasNode(absl::string_view node_name) const;
+  bool HasNode(abslx::string_view node_name) const;
 
   // Finds a node by name or returns `nullptr` if it's not in the graph.
-  const NodeDef* GetNode(absl::string_view node_name) const;
+  const NodeDef* GetNode(abslx::string_view node_name) const;
   // Returns a node corresponding to the given node index.
   const NodeDef* GetNode(int node_idx) const;
 
   // Returns a node index for the given node name, if the name exists in the
   // underlying graph. Otherwise returns empty optional.
-  const absl::optional<int> GetNodeIndex(absl::string_view node_name) const;
+  const abslx::optional<int> GetNodeIndex(abslx::string_view node_name) const;
   // Returns a node index for the given node, if the node belongs to the
   // underlying graph. Otherwise returns empty optional.
-  const absl::optional<int> GetNodeIndex(const NodeDef& node) const;
+  const abslx::optional<int> GetNodeIndex(const NodeDef& node) const;
 
   // Returns all the node indexes that are in the direct fanin of the given
   // node. If the `node_idx` is outside of [0, num_nodes_) returns empty vector.
-  const absl::InlinedVector<int, 4>& GetFanin(int node_idx) const;
+  const abslx::InlinedVector<int, 4>& GetFanin(int node_idx) const;
   // Returns all the node indexes that are in the direct fanout of the given
   // node. If the `node_idx` is outside of [0, num_nodes_) returns empty vector.
-  const absl::InlinedVector<int, 2>& GetFanout(int node_idx) const;
+  const abslx::InlinedVector<int, 2>& GetFanout(int node_idx) const;
 
  private:
   // If true, all invalid edges and inputs (srd, dst or input node not found in
@@ -95,18 +95,18 @@ class GraphTopologyView {
   bool skip_invalid_edges_ = false;
 
   // WARN: `graph_` must outlive this object and graph nodes must not be
-  // destructed, because node names captured with absl::string_view.
+  // destructed, because node names captured with abslx::string_view.
   const GraphDef* graph_ = nullptr;  // do not own
   int num_nodes_ = 0;
-  std::vector<absl::string_view> index_to_node_name_;
-  absl::flat_hash_map<absl::string_view, int> node_name_to_index_;
-  std::vector<absl::InlinedVector<int, 4>> fanins_;   // node_idx->input nodes
-  std::vector<absl::InlinedVector<int, 2>> fanouts_;  // node_idx->output nodes
+  std::vector<abslx::string_view> index_to_node_name_;
+  abslx::flat_hash_map<abslx::string_view, int> node_name_to_index_;
+  std::vector<abslx::InlinedVector<int, 4>> fanins_;   // node_idx->input nodes
+  std::vector<abslx::InlinedVector<int, 2>> fanouts_;  // node_idx->output nodes
 
   // We need a valid reference to return from GetFanin/GetFanout if the
   // `node_idx` argument is outside of the [0, num_nodes_) range.
-  absl::InlinedVector<int, 4> empty_fanin_;
-  absl::InlinedVector<int, 2> empty_fanout_;
+  abslx::InlinedVector<int, 4> empty_fanin_;
+  abslx::InlinedVector<int, 2> empty_fanout_;
 };
 
 }  // end namespace grappler

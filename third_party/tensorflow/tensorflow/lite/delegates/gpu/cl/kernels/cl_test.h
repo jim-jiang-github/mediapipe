@@ -35,7 +35,7 @@ class ClExecutionEnvironment : public TestExecutionEnvironment {
   ClExecutionEnvironment() = default;
   ~ClExecutionEnvironment() override = default;
 
-  absl::Status Init();
+  abslx::Status Init();
 
   std::vector<CalculationsPrecision> GetSupportedPrecisions() const override;
   std::vector<TensorStorageType> GetSupportedStorages(
@@ -43,7 +43,7 @@ class ClExecutionEnvironment : public TestExecutionEnvironment {
 
   const GpuInfo& GetGpuInfo() const override;
 
-  absl::Status ExecuteGpuOperationInternal(
+  abslx::Status ExecuteGpuOperationInternal(
       const std::vector<TensorDescriptor*>& src_cpu,
       const std::vector<TensorDescriptor*>& dst_cpu,
       std::unique_ptr<GPUOperation>&& operation) override;

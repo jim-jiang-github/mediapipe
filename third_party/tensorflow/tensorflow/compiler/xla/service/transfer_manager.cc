@@ -31,17 +31,17 @@ limitations under the License.
 #include "tensorflow/core/platform/logging.h"
 #include "tensorflow/core/platform/notification.h"
 
-using absl::StrCat;
+using abslx::StrCat;
 
 namespace xla {
 
-/* static */ absl::Mutex TransferManager::platform_transfer_manager_mutex_(
-    absl::kConstInit);
+/* static */ abslx::Mutex TransferManager::platform_transfer_manager_mutex_(
+    abslx::kConstInit);
 
-/* static */ absl::flat_hash_map<se::Platform::Id, TransferManager::State>*
+/* static */ abslx::flat_hash_map<se::Platform::Id, TransferManager::State>*
 TransferManager::GetPlatformTransferManagers() {
   static auto* r =
-      new absl::flat_hash_map<se::Platform::Id, TransferManager::State>;
+      new abslx::flat_hash_map<se::Platform::Id, TransferManager::State>;
   return r;
 }
 
@@ -54,7 +54,7 @@ StatusOr<Literal> TransferManager::TransferLiteralFromDevice(
 
   se::Stream* substream = stream->GetOrCreateSubStream();
   substream->ThenWaitFor(stream);
-  absl::Cleanup cleanup = [&]() { stream->ReturnSubStream(substream); };
+  abslx::Cleanup cleanup = [&]() { stream->ReturnSubStream(substream); };
 
   tensorflow::Notification n;
   Status s;
@@ -78,7 +78,7 @@ Status TransferManager::TransferLiteralFromDevice(
     const MutableBorrowingLiteral& literal,
     const TransferMetadata* transfer_metadata) {
   se::Stream* substream = stream->GetOrCreateSubStream();
-  absl::Cleanup cleanup = [&]() { stream->ReturnSubStream(substream); };
+  abslx::Cleanup cleanup = [&]() { stream->ReturnSubStream(substream); };
 
   Status ret;
   tensorflow::Notification n;
@@ -102,7 +102,7 @@ Status TransferManager::TransferLiteralToDevice(
   // deadlock.
   se::Stream* substream = stream->GetOrCreateSubStream();
   substream->ThenWaitFor(stream);
-  absl::Cleanup cleanup = [&]() { stream->ReturnSubStream(substream); };
+  abslx::Cleanup cleanup = [&]() { stream->ReturnSubStream(substream); };
   TF_RETURN_IF_ERROR(TransferLiteralToDeviceAsync(
       substream, literal, device_buffer, transfer_metadata));
   return substream->BlockHostUntilDone();
@@ -116,7 +116,7 @@ StatusOr<Literal> TransferManager::TransferArrayFromDevice(
   // Use a substream so that if we are called from a HostCallback we don't
   // deadlock.
   se::Stream* substream = stream->GetOrCreateSubStream();
-  absl::Cleanup cleanup = [&]() { stream->ReturnSubStream(substream); };
+  abslx::Cleanup cleanup = [&]() { stream->ReturnSubStream(substream); };
 
   tensorflow::Notification n;
   Literal literal(shape);
@@ -143,7 +143,7 @@ Status TransferManager::TransferArrayToDevice(
   // Use a substream so that if we are called from a HostCallback we don't
   // deadlock.
   se::Stream* substream = stream->GetOrCreateSubStream();
-  absl::Cleanup cleanup = [&]() { stream->ReturnSubStream(substream); };
+  abslx::Cleanup cleanup = [&]() { stream->ReturnSubStream(substream); };
   TF_RETURN_IF_ERROR(
       TransferArrayToDeviceAsync(substream, literal, dest, transfer_metadata));
   return substream->BlockHostUntilDone();
@@ -251,7 +251,7 @@ Status TransferManager::ReadDynamicShapes(se::Stream* stream,
 /* static */ void TransferManager::RegisterTransferManager(
     se::Platform::Id platform_id,
     TransferManagerCreationFunction creation_function) {
-  absl::MutexLock lock(&TransferManager::platform_transfer_manager_mutex_);
+  abslx::MutexLock lock(&TransferManager::platform_transfer_manager_mutex_);
   auto* managers = GetPlatformTransferManagers();
   CHECK(managers->find(platform_id) == managers->end());
   (*managers)[platform_id].creation_function = creation_function;
@@ -259,7 +259,7 @@ Status TransferManager::ReadDynamicShapes(se::Stream* stream,
 
 /* static */ StatusOr<TransferManager*> TransferManager::GetForPlatform(
     const se::Platform* platform) {
-  absl::MutexLock lock(&TransferManager::platform_transfer_manager_mutex_);
+  abslx::MutexLock lock(&TransferManager::platform_transfer_manager_mutex_);
   auto* managers = GetPlatformTransferManagers();
 
   auto it = managers->find(platform->id());

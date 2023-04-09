@@ -101,8 +101,8 @@ class TRT_ShapedWeights {
   string DebugString() const;
 
   template <typename T>
-  absl::Span<const T> GetSpan() const {
-    return absl::Span<const T>(tensor_.flat<T>().data(), volume_);
+  abslx::Span<const T> GetSpan() const {
+    return abslx::Span<const T>(tensor_.flat<T>().data(), volume_);
   }
 
   template <typename T>

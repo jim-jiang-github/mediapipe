@@ -53,7 +53,7 @@ class AddQuantAdjustments : public NodeTransformation {
 
       // Add a new QuantizeAndDequantize node.
       Node* quant_and_dequant_node;
-      absl::Status status =
+      abslx::Status status =
           graph->InsertNodeAfter(node->id, &quant_and_dequant_node);
       if (!status.ok()) {
         return {TransformStatus::INVALID, "Could not insert new node."};
@@ -83,7 +83,7 @@ class AddQuantAdjustments : public NodeTransformation {
                                      adjusted_value->id);
         if (!status.ok()) {
           return {TransformStatus::INVALID,
-                  absl::StrCat(
+                  abslx::StrCat(
                       "Failed to associate quant-adjusted value for consumer: ",
                       status.message())};
         }
@@ -93,7 +93,7 @@ class AddQuantAdjustments : public NodeTransformation {
       status = graph->AddConsumer(quant_and_dequant_node->id, output_value->id);
       if (!status.ok()) {
         return {TransformStatus::INVALID,
-                absl::StrCat(
+                abslx::StrCat(
                     "Could not associate output to QuantizeAndDequantize: ",
                     status.message())};
       }

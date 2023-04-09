@@ -16,7 +16,7 @@
 // bad_variant_access.h
 // -----------------------------------------------------------------------------
 //
-// This header file defines the `absl::bad_variant_access` type.
+// This header file defines the `abslx::bad_variant_access` type.
 
 #ifndef ABSL_TYPES_BAD_VARIANT_ACCESS_H_
 #define ABSL_TYPES_BAD_VARIANT_ACCESS_H_
@@ -29,36 +29,36 @@
 
 #include <variant>
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 using std::bad_variant_access;
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #else  // ABSL_USES_STD_VARIANT
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // -----------------------------------------------------------------------------
 // bad_variant_access
 // -----------------------------------------------------------------------------
 //
-// An `absl::bad_variant_access` type is an exception type that is thrown in
+// An `abslx::bad_variant_access` type is an exception type that is thrown in
 // the following cases:
 //
-//   * Calling `absl::get(absl::variant) with an index or type that does not
+//   * Calling `abslx::get(abslx::variant) with an index or type that does not
 //     match the currently selected alternative type
-//   * Calling `absl::visit on an `absl::variant` that is in the
+//   * Calling `abslx::visit on an `abslx::variant` that is in the
 //     `variant::valueless_by_exception` state.
 //
 // Example:
 //
-//   absl::variant<int, std::string> v;
+//   abslx::variant<int, std::string> v;
 //   v = 1;
 //   try {
-//     absl::get<std::string>(v);
-//   } catch(const absl::bad_variant_access& e) {
+//     abslx::get<std::string>(v);
+//   } catch(const abslx::bad_variant_access& e) {
 //     std::cout << "Bad variant access: " << e.what() << '\n';
 //   }
 class bad_variant_access : public std::exception {
@@ -75,7 +75,7 @@ namespace variant_internal {
 
 }  // namespace variant_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_USES_STD_VARIANT
 

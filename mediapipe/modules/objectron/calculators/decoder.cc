@@ -198,7 +198,7 @@ std::vector<cv::Point> Decoder::ExtractCenterKeypoints(
   return locations;
 }
 
-absl::Status Decoder::Lift2DTo3D(
+abslx::Status Decoder::Lift2DTo3D(
     const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>& projection_matrix,
     bool portrait, FrameAnnotation* estimated_box) const {
   CHECK(estimated_box != nullptr);
@@ -246,7 +246,7 @@ absl::Status Decoder::Lift2DTo3D(
     // Fill box scale.
     *annotation.mutable_scale() = {scale.data(), scale.data() + scale.size()};
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

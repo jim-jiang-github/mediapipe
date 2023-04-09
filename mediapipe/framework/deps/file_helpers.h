@@ -20,23 +20,23 @@
 
 namespace mediapipe {
 namespace file {
-absl::Status GetContents(absl::string_view file_name, std::string* output,
+abslx::Status GetContents(abslx::string_view file_name, std::string* output,
                          bool read_as_binary = true);
 
-absl::Status SetContents(absl::string_view file_name,
-                         absl::string_view content);
+abslx::Status SetContents(abslx::string_view file_name,
+                         abslx::string_view content);
 
-absl::Status MatchInTopSubdirectories(const std::string& parent_directory,
+abslx::Status MatchInTopSubdirectories(const std::string& parent_directory,
                                       const std::string& file_name,
                                       std::vector<std::string>* results);
 
-absl::Status MatchFileTypeInDirectory(const std::string& directory,
+abslx::Status MatchFileTypeInDirectory(const std::string& directory,
                                       const std::string& file_suffix,
                                       std::vector<std::string>* results);
 
-absl::Status Exists(absl::string_view file_name);
+abslx::Status Exists(abslx::string_view file_name);
 
-absl::Status RecursivelyCreateDir(absl::string_view path);
+abslx::Status RecursivelyCreateDir(abslx::string_view path);
 
 }  // namespace file
 }  // namespace mediapipe

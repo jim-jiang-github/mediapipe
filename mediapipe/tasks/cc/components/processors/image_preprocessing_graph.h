@@ -62,7 +62,7 @@ namespace processors {
 //   IMAGE - Image @Optional
 //     The image that has the pixel data stored on the target storage (CPU vs
 //     GPU).
-absl::Status ConfigureImagePreprocessingGraph(
+abslx::Status ConfigureImagePreprocessingGraph(
     const core::ModelResources& model_resources, bool use_gpu,
     proto::ImagePreprocessingGraphOptions* options);
 

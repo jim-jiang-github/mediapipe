@@ -55,7 +55,7 @@ limitations under the License.
 
 namespace tensorflow {
 namespace tensorrt {
-using ::absl::StrCat;
+using ::abslx::StrCat;
 using ::testing::ElementsAre;
 
 struct TestParam {
@@ -152,7 +152,7 @@ class TRTEngineOpTestBase : public OpsTestBase {
     TF_ASSERT_OK(InitOpWithFunctionLibrary());
   }
 
-  static const absl::string_view kOpName;
+  static const abslx::string_view kOpName;
 
   template <typename T>
   void AddSimpleInput(const TensorShape& shape) {
@@ -196,7 +196,7 @@ class TRTEngineOpTestWithParam
   TestParam param_;
 };
 
-const absl::string_view TRTEngineOpTestBase::kOpName = "myop";
+const abslx::string_view TRTEngineOpTestBase::kOpName = "myop";
 
 constexpr std::array<TestParam, 2> TestParameters{TestParam{false},
                                                   TestParam{true}};
@@ -363,7 +363,7 @@ TYPED_TEST(TRTEngineOpTest, Basic) {
   // Verify the result.
   Tensor* output = OpsTestBase::GetOutput(0);
   EXPECT_THAT(
-      absl::Span<const TypeParam>(output->template flat<TypeParam>().data(),
+      abslx::Span<const TypeParam>(output->template flat<TypeParam>().data(),
                                   output->NumElements()),
       ElementsAre(TypeParam(0.0f), TypeParam(2.0f)));
 }

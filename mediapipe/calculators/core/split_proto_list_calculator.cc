@@ -36,7 +36,7 @@ namespace mediapipe {
 template <typename ItemType, typename ListType>
 class SplitListsCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     RET_CHECK(cc->Inputs().NumEntries() == 1);
     RET_CHECK(cc->Outputs().NumEntries() != 0);
 
@@ -56,7 +56,7 @@ class SplitListsCalculator : public CalculatorBase {
                range_0.begin() < range_1.end()) ||
               (range_1.begin() >= range_0.begin() &&
                range_1.begin() < range_0.end())) {
-            return absl::InvalidArgumentError(
+            return abslx::InvalidArgumentError(
                 "Ranges must be non-overlapping when using combine_outputs "
                 "option.");
           }
@@ -64,7 +64,7 @@ class SplitListsCalculator : public CalculatorBase {
       }
     } else {
       if (cc->Outputs().NumEntries() != options.ranges_size()) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "The number of output streams should match the number of ranges "
             "specified in the CalculatorOptions.");
       }
@@ -73,13 +73,13 @@ class SplitListsCalculator : public CalculatorBase {
       for (int i = 0; i < cc->Outputs().NumEntries(); ++i) {
         if (options.ranges(i).begin() < 0 || options.ranges(i).end() < 0 ||
             options.ranges(i).begin() >= options.ranges(i).end()) {
-          return absl::InvalidArgumentError(
+          return abslx::InvalidArgumentError(
               "Indices should be non-negative and begin index should be less "
               "than the end index.");
         }
         if (options.element_only()) {
           if (options.ranges(i).end() - options.ranges(i).begin() != 1) {
-            return absl::InvalidArgumentError(
+            return abslx::InvalidArgumentError(
                 "Since element_only is true, all ranges should be of size 1.");
           }
           cc->Outputs().Index(i).Set<ItemType>();
@@ -89,10 +89,10 @@ class SplitListsCalculator : public CalculatorBase {
       }
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
 
     const auto& options =
@@ -107,10 +107,10 @@ class SplitListsCalculator : public CalculatorBase {
       total_elements_ += range.end() - range.begin();
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     const ListType& input = cc->Inputs().Index(0).Get<ListType>();
     RET_CHECK_GE(ListSize(input), max_range_end_)
         << "Max range end " << max_range_end_ << " exceeds list size "
@@ -147,7 +147,7 @@ class SplitListsCalculator : public CalculatorBase {
       }
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  protected:

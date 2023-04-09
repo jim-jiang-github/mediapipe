@@ -68,7 +68,7 @@ struct HloRenderOptions {
 // interactive_graphviz, which calls RenderNeighborhoodAround to render subsets
 // of a graph.
 StatusOr<std::string> RenderGraph(
-    const HloComputation& computation, absl::string_view label,
+    const HloComputation& computation, abslx::string_view label,
     const DebugOptions& debug_options, RenderedGraphFormat format,
     const HloExecutionProfile* hlo_execution_profile = nullptr,
     HloRenderOptions hlo_render_options = {});
@@ -84,7 +84,7 @@ StatusOr<std::string> RenderGraph(
 StatusOr<std::string> RenderNeighborhoodAround(
     const HloInstruction& node, int radius, RenderedGraphFormat format,
     HloRenderOptions hlo_render_options = {},
-    const absl::flat_hash_set<const HloInstruction*>& boundary = {});
+    const abslx::flat_hash_set<const HloInstruction*>& boundary = {});
 
 // Renders nodes on any of the paths from `from` to `to`.  If there are more
 // than max_nodes on all paths, restricts to the max_nodes nodes on the shortest
@@ -102,7 +102,7 @@ StatusOr<std::string> RenderAllPathsFromTo(
 // The `producer` remains `nullptr` if it's fused, or is set if the desire is to
 // highlight it.
 void RegisterFusionState(const HloComputation& computation,
-                         absl::string_view label,
+                         abslx::string_view label,
                          const HloInstruction& consumer,
                          const HloInstruction* producer = nullptr);
 
@@ -113,7 +113,7 @@ void RegisterFusionState(const HloComputation& computation,
 // There can only be one active renderer, and the last call to this function
 // wins.
 void RegisterGraphToURLRenderer(
-    std::function<StatusOr<std::string>(absl::string_view dot)> renderer);
+    std::function<StatusOr<std::string>(abslx::string_view dot)> renderer);
 
 // Generates a fusion explorer for the given computation using the data in
 // fusion_visualizer_state.

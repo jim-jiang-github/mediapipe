@@ -35,7 +35,7 @@
 #include "time_zone_fixed.h"
 #include "time_zone_impl.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
@@ -184,4 +184,4 @@ time_zone local_time_zone() {
 }  // namespace cctz
 }  // namespace time_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

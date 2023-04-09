@@ -62,7 +62,7 @@ std::pair<Status, bool> BarrierProxy::Wait() {
     }
     status_set_ = true;
     cv_.notify_all();
-  } else if (WaitForMilliseconds(&l, &cv_, timeout_ / absl::Milliseconds(1)) ==
+  } else if (WaitForMilliseconds(&l, &cv_, timeout_ / abslx::Milliseconds(1)) ==
              kCond_Timeout) {
     if (!status_set_) {
       if (tasks_.size() != 1) {
@@ -92,8 +92,8 @@ size_t BarrierProxyManager::size() const {
 
 Status BarrierProxyManager::Wait(CoordinationServiceAgent* agent,
                                  const std::vector<CoordinatedTask>& tasks,
-                                 int num_local_threads, absl::string_view key,
-                                 absl::Duration timeout) {
+                                 int num_local_threads, abslx::string_view key,
+                                 abslx::Duration timeout) {
   // Only one device, no need to wait.
   if (tasks.size() == 1 && num_local_threads <= 1) return OkStatus();
 

@@ -26,7 +26,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status ResizeBilinearAlignedTest(TestExecutionEnvironment* env) {
+abslx::Status ResizeBilinearAlignedTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 3, 1);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f};
@@ -55,10 +55,10 @@ absl::Status ResizeBilinearAlignedTest(TestExecutionEnvironment* env) {
           dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ResizeBilinearNonAlignedTest(TestExecutionEnvironment* env) {
+abslx::Status ResizeBilinearNonAlignedTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 3, 1);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f};
@@ -87,10 +87,10 @@ absl::Status ResizeBilinearNonAlignedTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ResizeBilinearWithoutHalfPixelTest(TestExecutionEnvironment* env) {
+abslx::Status ResizeBilinearWithoutHalfPixelTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 1);
   src_tensor.data = {1.0f, 2.0f, 3.0f, 4.0f};
@@ -119,10 +119,10 @@ absl::Status ResizeBilinearWithoutHalfPixelTest(TestExecutionEnvironment* env) {
                                     dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ResizeBilinearWithHalfPixelTest(TestExecutionEnvironment* env) {
+abslx::Status ResizeBilinearWithHalfPixelTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 1);
   src_tensor.data = {1.0f, 2.0f, 3.0f, 4.0f};
@@ -151,10 +151,10 @@ absl::Status ResizeBilinearWithHalfPixelTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ResizeNearestTest(TestExecutionEnvironment* env) {
+abslx::Status ResizeNearestTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 2, 1);
   src_tensor.data = {1.0f, 2.0f};
@@ -183,10 +183,10 @@ absl::Status ResizeNearestTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ResizeNearestAlignCornersTest(TestExecutionEnvironment* env) {
+abslx::Status ResizeNearestAlignCornersTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 1);
   src_tensor.data = {3.0f, 6.0f, 9.0f, 12.0f};
@@ -215,10 +215,10 @@ absl::Status ResizeNearestAlignCornersTest(TestExecutionEnvironment* env) {
           dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ResizeNearestHalfPixelCentersTest(TestExecutionEnvironment* env) {
+abslx::Status ResizeNearestHalfPixelCentersTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 1);
   src_tensor.data = {3.0f, 6.0f, 9.0f, 12.0f};
@@ -247,7 +247,7 @@ absl::Status ResizeNearestHalfPixelCentersTest(TestExecutionEnvironment* env) {
           dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

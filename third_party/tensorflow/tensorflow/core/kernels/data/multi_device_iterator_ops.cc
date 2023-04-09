@@ -710,7 +710,7 @@ class MultiDeviceIteratorGetNextFromShardOp : public AsyncOpKernel {
     background_worker_.Schedule(std::bind(
         [ctx, iterator, shard_num, incarnation_id](DoneCallback done) {
           Notification n;
-          absl::Time start_time = iterator->metrics_collector().RecordStart();
+          abslx::Time start_time = iterator->metrics_collector().RecordStart();
           MultiDeviceIteratorCallback callback = std::bind(
               [ctx, iterator, start_time, &n](const HostBufferElement& elem) {
                 iterator->metrics_collector().RecordStop(start_time,

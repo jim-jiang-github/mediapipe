@@ -66,7 +66,7 @@ std::string GraphImportConfig::str() const {
   return ss.str();
 }
 
-Status ParseOutputArrayInfo(absl::string_view array_names,
+Status ParseOutputArrayInfo(abslx::string_view array_names,
                             std::vector<string>* outputs) {
   TF_RETURN_IF_ERROR(ParseNodeNames(array_names, *outputs));
   return OkStatus();
@@ -81,9 +81,9 @@ Status ParseOutputArrayInfo(const std::vector<string>& output_names,
   return OkStatus();
 }
 
-Status ParseInputArrayInfo(absl::string_view array_names,
-                           absl::string_view data_types,
-                           absl::string_view shapes,
+Status ParseInputArrayInfo(abslx::string_view array_names,
+                           abslx::string_view data_types,
+                           abslx::string_view shapes,
                            GraphImportConfig::InputArrays* inputs) {
   std::vector<string> node_names;
   std::vector<string> node_dtypes;
@@ -95,9 +95,9 @@ Status ParseInputArrayInfo(absl::string_view array_names,
 }
 
 static StatusOr<std::vector<int>> ParseShapeStr(
-    absl::string_view node_shapes_str) {
+    abslx::string_view node_shapes_str) {
   std::vector<int> dims;
-  for (absl::string_view dim_str : absl::StrSplit(node_shapes_str, ',')) {
+  for (abslx::string_view dim_str : abslx::StrSplit(node_shapes_str, ',')) {
     // Treats empty input shape as scalar
     if (dim_str.empty()) continue;
     if (dim_str == "?") {
@@ -105,15 +105,15 @@ static StatusOr<std::vector<int>> ParseShapeStr(
       continue;
     }
     int size;
-    TF_RET_CHECK(absl::SimpleAtoi(dim_str, &size));
+    TF_RET_CHECK(abslx::SimpleAtoi(dim_str, &size));
     dims.push_back(size);
   }
   return dims;
 }
 
-static Status HandleSubtype(absl::string_view subtype,
+static Status HandleSubtype(abslx::string_view subtype,
                             ArrayInfo::SubTypeInfo* result) {
-  std::vector<std::string> shape_and_type = absl::StrSplit(subtype, ':');
+  std::vector<std::string> shape_and_type = abslx::StrSplit(subtype, ':');
 
   std::vector<int> dims;
   if (shape_and_type.size() > 2) {
@@ -129,7 +129,7 @@ static Status HandleSubtype(absl::string_view subtype,
   DataType subtype_dtype;
   if (!DataType_Parse(subtype_str, &subtype_dtype)) {
     return errors::FailedPrecondition(
-        absl::StrCat("Invalid type: '", subtype_str, "'"));
+        abslx::StrCat("Invalid type: '", subtype_str, "'"));
   }
 
   TensorShapeProto subtype_tensor_shape;
@@ -162,13 +162,13 @@ Status ParseInputArrayInfo(
       }
     }
   } else {
-    return errors::InvalidArgument(absl::StrCat(
+    return errors::InvalidArgument(abslx::StrCat(
         "Length of input node array and data type doesn't match (#arrays ",
         node_names.size(), ", #data_types ", node_dtypes.size(), ")"));
   }
 
   if (!node_shapes.empty() && node_names.size() != node_shapes.size()) {
-    return errors::InvalidArgument(absl::StrCat(
+    return errors::InvalidArgument(abslx::StrCat(
         "Length of input node array and data shape doesn't match (#arrays ",
         node_names.size(), ", #input_shapes ", node_shapes.size(), ")"));
   }
@@ -182,12 +182,12 @@ Status ParseInputArrayInfo(
     auto it_inserted_pair = inputs->insert({name, {}});
     if (!it_inserted_pair.second)
       return errors::FailedPrecondition(
-          absl::StrCat("tensor ", name, " is repeated in the arrays flag"));
+          abslx::StrCat("tensor ", name, " is repeated in the arrays flag"));
 
     ArrayInfo& info = it_inserted_pair.first->second;
     // Splitting the type and subtype into parts
     std::vector<std::string> parts =
-        absl::StrSplit(type, absl::ByAnyChar("()"));
+        abslx::StrSplit(type, abslx::ByAnyChar("()"));
     // If type has subtypes then parts[0] = type, parts[1] = subtypes,
     // parts[2] = ""
     if (parts.size() != 3 && parts.size() != 1) {
@@ -200,7 +200,7 @@ Status ParseInputArrayInfo(
     }
     if (!DataType_Parse(parts[0], &info.imported_dtype)) {
       return errors::FailedPrecondition(
-          absl::StrCat("Invalid node type '", node_dtypes[i], "'"));
+          abslx::StrCat("Invalid node type '", node_dtypes[i], "'"));
     }
 
     if (!node_shapes.empty()) {
@@ -217,11 +217,11 @@ Status ParseInputArrayInfo(
 }
 
 Status ParseNodeShapes(
-    absl::string_view shapes_str,
+    abslx::string_view shapes_str,
     std::vector<llvm::Optional<std::vector<int>>>& shapes_vector) {
   shapes_vector.clear();
   if (!shapes_str.empty()) {
-    std::vector<string> node_shapes_str = absl::StrSplit(shapes_str, ':');
+    std::vector<string> node_shapes_str = abslx::StrSplit(shapes_str, ':');
     for (int i = 0; i < node_shapes_str.size(); i++) {
       if (node_shapes_str[i] == "*") {
         shapes_vector.push_back(llvm::None);
@@ -234,14 +234,14 @@ Status ParseNodeShapes(
   return OkStatus();
 }
 
-Status ParseNodeNames(absl::string_view names_str,
+Status ParseNodeNames(abslx::string_view names_str,
                       std::vector<std::string>& names_vector) {
-  names_vector = absl::StrSplit(names_str, ',', absl::SkipEmpty());
+  names_vector = abslx::StrSplit(names_str, ',', abslx::SkipEmpty());
   return OkStatus();
 }
 
 static StatusOr<std::vector<std::string>> ParseDTypesHelper(
-    absl::string_view data_types_str) {
+    abslx::string_view data_types_str) {
   bool inside_subtype = false;
   int cur_pos = 0;
   std::vector<std::string> dtypes;
@@ -252,14 +252,14 @@ static StatusOr<std::vector<std::string>> ParseDTypesHelper(
     if (c == '(') {
       if (inside_subtype) {
         return errors::FailedPrecondition(
-            absl::StrCat("Syntax error: unexpected '(' in input data types: '",
+            abslx::StrCat("Syntax error: unexpected '(' in input data types: '",
                          data_types_str, "'"));
       }
       inside_subtype = true;
     } else if (c == ')') {
       if (!inside_subtype) {
         return errors::FailedPrecondition(
-            absl::StrCat("Syntax error: unexpected ')' in input data types: '",
+            abslx::StrCat("Syntax error: unexpected ')' in input data types: '",
                          data_types_str, "'"));
       }
       inside_subtype = false;
@@ -273,7 +273,7 @@ static StatusOr<std::vector<std::string>> ParseDTypesHelper(
   }
   if (inside_subtype) {
     return errors::FailedPrecondition(
-        absl::StrCat("Syntax error: expected a ')' in input data types '",
+        abslx::StrCat("Syntax error: expected a ')' in input data types '",
                      data_types_str, "'"));
   }
   if (!data_types_str.empty()) {
@@ -283,7 +283,7 @@ static StatusOr<std::vector<std::string>> ParseDTypesHelper(
   return dtypes;
 }
 
-Status ParseNodeDataTypes(absl::string_view data_types_str,
+Status ParseNodeDataTypes(abslx::string_view data_types_str,
                           std::vector<std::string>& data_type_vector) {
   data_type_vector.clear();
   if (!data_types_str.empty()) {

@@ -196,7 +196,7 @@ class PrintV2Op : public OpKernel {
   // If output_stream_ is a file path, extracts it to file_path_ and clears
   // output_stream_; otherwise sets file_paths_ to "".
   void SetFilePathIfAny() {
-    if (absl::StartsWith(output_stream_, kOutputStreamEscapeStr)) {
+    if (abslx::StartsWith(output_stream_, kOutputStreamEscapeStr)) {
       file_path_ = output_stream_.substr(strlen(kOutputStreamEscapeStr));
       output_stream_ = "";
     } else {

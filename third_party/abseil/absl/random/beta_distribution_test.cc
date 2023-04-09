@@ -50,7 +50,7 @@ class BetaDistributionInterfaceTest : public ::testing::Test {};
 // https://bugs.llvm.org/show_bug.cgi?id=49132. Don't bother running these tests
 // with double doubles until compiler support is better.
 using RealTypes =
-    std::conditional<absl::numeric_internal::IsDoubleDouble(),
+    std::conditional<abslx::numeric_internal::IsDoubleDouble(),
                      ::testing::Types<float, double>,
                      ::testing::Types<float, double, long double>>::type;
 TYPED_TEST_CASE(BetaDistributionInterfaceTest, RealTypes);
@@ -63,10 +63,10 @@ TYPED_TEST(BetaDistributionInterfaceTest, SerializeTest) {
   const TypeParam kLargeA =
       std::exp(std::log((std::numeric_limits<TypeParam>::max)()) -
                std::log(std::log((std::numeric_limits<TypeParam>::max)())));
-  using param_type = typename absl::beta_distribution<TypeParam>::param_type;
+  using param_type = typename abslx::beta_distribution<TypeParam>::param_type;
 
   constexpr int kCount = 1000;
-  absl::InsecureBitGen gen;
+  abslx::InsecureBitGen gen;
   const TypeParam kValues[] = {
       TypeParam(1e-20), TypeParam(1e-12), TypeParam(1e-8), TypeParam(1e-4),
       TypeParam(1e-3), TypeParam(0.1), TypeParam(0.25),
@@ -97,15 +97,15 @@ TYPED_TEST(BetaDistributionInterfaceTest, SerializeTest) {
   for (TypeParam alpha : kValues) {
     for (TypeParam beta : kValues) {
       ABSL_INTERNAL_LOG(
-          INFO, absl::StrFormat("Smoke test for Beta(%a, %a)", alpha, beta));
+          INFO, abslx::StrFormat("Smoke test for Beta(%a, %a)", alpha, beta));
 
       param_type param(alpha, beta);
-      absl::beta_distribution<TypeParam> before(alpha, beta);
+      abslx::beta_distribution<TypeParam> before(alpha, beta);
       EXPECT_EQ(before.alpha(), param.alpha());
       EXPECT_EQ(before.beta(), param.beta());
 
       {
-        absl::beta_distribution<TypeParam> via_param(param);
+        abslx::beta_distribution<TypeParam> via_param(param);
         EXPECT_EQ(via_param, before);
         EXPECT_EQ(via_param.param(), before.param());
       }
@@ -121,7 +121,7 @@ TYPED_TEST(BetaDistributionInterfaceTest, SerializeTest) {
       // Validate stream serialization.
       std::stringstream ss;
       ss << before;
-      absl::beta_distribution<TypeParam> after(3.8f, 1.43f);
+      abslx::beta_distribution<TypeParam> after(3.8f, 1.43f);
       EXPECT_NE(before.alpha(), after.alpha());
       EXPECT_NE(before.beta(), after.beta());
       EXPECT_NE(before.param(), after.param());
@@ -145,7 +145,7 @@ TYPED_TEST(BetaDistributionInterfaceTest, DegenerateCases) {
   // We use a fixed bit generator for distribution accuracy tests.  This allows
   // these tests to be deterministic, while still testing the qualify of the
   // implementation.
-  absl::random_internal::pcg64_2018_engine rng(0x2B7E151628AED2A6);
+  abslx::random_internal::pcg64_2018_engine rng(0x2B7E151628AED2A6);
 
   // Extreme cases when the params are abnormal.
   constexpr int kCount = 1000;
@@ -171,7 +171,7 @@ TYPED_TEST(BetaDistributionInterfaceTest, DegenerateCases) {
       for (TypeParam beta : kSmallValues) {
         int zeros = 0;
         int ones = 0;
-        absl::beta_distribution<TypeParam> d(alpha, beta);
+        abslx::beta_distribution<TypeParam> d(alpha, beta);
         for (int i = 0; i < kCount; ++i) {
           TypeParam x = d(rng);
           if (x == 0.0) {
@@ -197,7 +197,7 @@ TYPED_TEST(BetaDistributionInterfaceTest, DegenerateCases) {
     //   * Beta[1, 0.0000001, 1000000]
     for (TypeParam alpha : kSmallValues) {
       for (TypeParam beta : kLargeValues) {
-        absl::beta_distribution<TypeParam> d(alpha, beta);
+        abslx::beta_distribution<TypeParam> d(alpha, beta);
         for (int i = 0; i < kCount; ++i) {
           EXPECT_EQ(d(rng), 0.0);
         }
@@ -212,7 +212,7 @@ TYPED_TEST(BetaDistributionInterfaceTest, DegenerateCases) {
     //   * Beta[1, 1000000, 0.0000001]
     for (TypeParam alpha : kLargeValues) {
       for (TypeParam beta : kSmallValues) {
-        absl::beta_distribution<TypeParam> d(alpha, beta);
+        abslx::beta_distribution<TypeParam> d(alpha, beta);
         for (int i = 0; i < kCount; ++i) {
           EXPECT_EQ(d(rng), 1.0);
         }
@@ -221,7 +221,7 @@ TYPED_TEST(BetaDistributionInterfaceTest, DegenerateCases) {
   }
   {
     // Large alpha and beta.
-    absl::beta_distribution<TypeParam> d(std::numeric_limits<TypeParam>::max(),
+    abslx::beta_distribution<TypeParam> d(std::numeric_limits<TypeParam>::max(),
                                          std::numeric_limits<TypeParam>::max());
     for (int i = 0; i < kCount; ++i) {
       EXPECT_EQ(d(rng), 0.5);
@@ -229,7 +229,7 @@ TYPED_TEST(BetaDistributionInterfaceTest, DegenerateCases) {
   }
   {
     // Large alpha and beta but unequal.
-    absl::beta_distribution<TypeParam> d(
+    abslx::beta_distribution<TypeParam> d(
         std::numeric_limits<TypeParam>::max(),
         std::numeric_limits<TypeParam>::max() * 0.9999);
     for (int i = 0; i < kCount; ++i) {
@@ -277,7 +277,7 @@ class BetaDistributionTest
   template <class D>
   bool SingleChiSquaredTest(double p, size_t samples, size_t buckets);
 
-  absl::InsecureBitGen rng_;
+  abslx::InsecureBitGen rng_;
 };
 
 template <class D>
@@ -298,7 +298,7 @@ bool BetaDistributionTest::SingleZTestOnMeanAndVariance(double p,
 
   // We validate that the sample mean and sample variance are indeed from a
   // Beta distribution with the given shape parameters.
-  const auto m = absl::random_internal::ComputeDistributionMoments(data);
+  const auto m = abslx::random_internal::ComputeDistributionMoments(data);
 
   // The variance of the sample mean is variance / n.
   const double mean_stddev = std::sqrt(Variance() / static_cast<double>(m.n));
@@ -310,15 +310,15 @@ bool BetaDistributionTest::SingleZTestOnMeanAndVariance(double p,
   // z score for the sample variance.
   const double z_variance = (m.variance - Variance()) / variance_stddev;
 
-  const double max_err = absl::random_internal::MaxErrorTolerance(p);
-  const double z_mean = absl::random_internal::ZScore(Mean(), m);
+  const double max_err = abslx::random_internal::MaxErrorTolerance(p);
+  const double z_mean = abslx::random_internal::ZScore(Mean(), m);
   const bool pass =
-      absl::random_internal::Near("z", z_mean, 0.0, max_err) &&
-      absl::random_internal::Near("z_variance", z_variance, 0.0, max_err);
+      abslx::random_internal::Near("z", z_mean, 0.0, max_err) &&
+      abslx::random_internal::Near("z_variance", z_variance, 0.0, max_err);
   if (!pass) {
     ABSL_INTERNAL_LOG(
         INFO,
-        absl::StrFormat(
+        abslx::StrFormat(
             "Beta(%f, %f), "
             "mean: sample %f, expect %f, which is %f stddevs away, "
             "variance: sample %f, expect %f, which is %f stddevs away.",
@@ -340,7 +340,7 @@ bool BetaDistributionTest::SingleChiSquaredTest(double p, size_t samples,
   for (; i < buckets; ++i) {
     const double p = bucket_width * static_cast<double>(i);
     const double boundary =
-        absl::random_internal::BetaIncompleteInv(alpha_, beta_, p);
+        abslx::random_internal::BetaIncompleteInv(alpha_, beta_, p);
     // The intention is to add `boundary` to the list of `cutoffs`. It becomes
     // problematic, however, when the boundary values are not monotone, due to
     // numerical issues when computing the inverse regularized incomplete
@@ -380,23 +380,23 @@ bool BetaDistributionTest::SingleChiSquaredTest(double p, size_t samples,
   // provided alpha, beta params (not estimated from the data).
   const int dof = cutoffs.size() - 1;
 
-  const double chi_square = absl::random_internal::ChiSquare(
+  const double chi_square = abslx::random_internal::ChiSquare(
       counts.begin(), counts.end(), expected.begin(), expected.end());
   const bool pass =
-      (absl::random_internal::ChiSquarePValue(chi_square, dof) >= p);
+      (abslx::random_internal::ChiSquarePValue(chi_square, dof) >= p);
   if (!pass) {
     for (int i = 0; i < cutoffs.size(); i++) {
       ABSL_INTERNAL_LOG(
-          INFO, absl::StrFormat("cutoff[%d] = %f, actual count %d, expected %d",
+          INFO, abslx::StrFormat("cutoff[%d] = %f, actual count %d, expected %d",
                                 i, cutoffs[i], counts[i],
                                 static_cast<int>(expected[i])));
     }
 
     ABSL_INTERNAL_LOG(
-        INFO, absl::StrFormat(
+        INFO, abslx::StrFormat(
                   "Beta(%f, %f) %s %f, p = %f", alpha_, beta_,
-                  absl::random_internal::kChiSquared, chi_square,
-                  absl::random_internal::ChiSquarePValue(chi_square, dof)));
+                  abslx::random_internal::kChiSquared, chi_square,
+                  abslx::random_internal::ChiSquarePValue(chi_square, dof)));
   }
   return pass;
 }
@@ -405,16 +405,16 @@ TEST_P(BetaDistributionTest, TestSampleStatistics) {
   static constexpr int kRuns = 20;
   static constexpr double kPFail = 0.02;
   const double p =
-      absl::random_internal::RequiredSuccessProbability(kPFail, kRuns);
+      abslx::random_internal::RequiredSuccessProbability(kPFail, kRuns);
   static constexpr int kSampleCount = 10000;
   static constexpr int kBucketCount = 100;
   int failed = 0;
   for (int i = 0; i < kRuns; ++i) {
-    if (!SingleZTestOnMeanAndVariance<absl::beta_distribution<double>>(
+    if (!SingleZTestOnMeanAndVariance<abslx::beta_distribution<double>>(
             p, kSampleCount)) {
       failed++;
     }
-    if (!SingleChiSquaredTest<absl::beta_distribution<double>>(
+    if (!SingleChiSquaredTest<abslx::beta_distribution<double>>(
             0.005, kSampleCount, kBucketCount)) {
       failed++;
     }
@@ -425,9 +425,9 @@ TEST_P(BetaDistributionTest, TestSampleStatistics) {
 
 std::string ParamName(
     const ::testing::TestParamInfo<::testing::tuple<double, double>>& info) {
-  std::string name = absl::StrCat("alpha_", ::testing::get<0>(info.param),
+  std::string name = abslx::StrCat("alpha_", ::testing::get<0>(info.param),
                                   "__beta_", ::testing::get<1>(info.param));
-  return absl::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
+  return abslx::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
 }
 
 INSTANTIATE_TEST_CASE_P(
@@ -443,15 +443,15 @@ INSTANTIATE_TEST_CASE_P(
                       std::make_pair(4e5, 2e7), std::make_pair(1e7, 1e5)),
     ParamName);
 
-// NOTE: absl::beta_distribution is not guaranteed to be stable.
+// NOTE: abslx::beta_distribution is not guaranteed to be stable.
 TEST(BetaDistributionTest, StabilityTest) {
-  // absl::beta_distribution stability relies on the stability of
-  // absl::random_interna::RandU64ToDouble, std::exp, std::log, std::pow,
+  // abslx::beta_distribution stability relies on the stability of
+  // abslx::random_interna::RandU64ToDouble, std::exp, std::log, std::pow,
   // and std::sqrt.
   //
   // This test also depends on the stability of std::frexp.
   using testing::ElementsAre;
-  absl::random_internal::sequence_urbg urbg({
+  abslx::random_internal::sequence_urbg urbg({
       0xffff00000000e6c8ull, 0xffff0000000006c8ull, 0x800003766295CFA9ull,
       0x11C819684E734A41ull, 0x832603766295CFA9ull, 0x7fbe76c8b4395800ull,
       0xB3472DCA7B14A94Aull, 0x0003eb76f6f7f755ull, 0xFFCEA50FDB2F953Bull,
@@ -489,7 +489,7 @@ TEST(BetaDistributionTest, StabilityTest) {
   std::vector<uint64_t> output(20);
   {
     // Algorithm Joehnk (float)
-    absl::beta_distribution<float> dist(0.1f, 0.2f);
+    abslx::beta_distribution<float> dist(0.1f, 0.2f);
     std::generate(std::begin(output), std::end(output),
                   [&] { return float_to_u64(dist(urbg)); });
     EXPECT_EQ(44, urbg.invocations());
@@ -504,7 +504,7 @@ TEST(BetaDistributionTest, StabilityTest) {
   urbg.reset();
   {
     // Algorithm Joehnk (double)
-    absl::beta_distribution<double> dist(0.1, 0.2);
+    abslx::beta_distribution<double> dist(0.1, 0.2);
     std::generate(std::begin(output), std::end(output),
                   [&] { return double_to_u64(dist(urbg)); });
     EXPECT_EQ(44, urbg.invocations());
@@ -521,7 +521,7 @@ TEST(BetaDistributionTest, StabilityTest) {
   urbg.reset();
   {
     // Algorithm Cheng 1
-    absl::beta_distribution<double> dist(0.9, 2.0);
+    abslx::beta_distribution<double> dist(0.9, 2.0);
     std::generate(std::begin(output), std::end(output),
                   [&] { return double_to_u64(dist(urbg)); });
     EXPECT_EQ(62, urbg.invocations());
@@ -538,7 +538,7 @@ TEST(BetaDistributionTest, StabilityTest) {
   urbg.reset();
   {
     // Algorithm Cheng 2
-    absl::beta_distribution<double> dist(1.5, 2.5);
+    abslx::beta_distribution<double> dist(1.5, 2.5);
     std::generate(std::begin(output), std::end(output),
                   [&] { return double_to_u64(dist(urbg)); });
     EXPECT_EQ(54, urbg.invocations());
@@ -559,10 +559,10 @@ TEST(BetaDistributionTest, StabilityTest) {
 // is also likely to change.
 TEST(BetaDistributionTest, AlgorithmBounds) {
   {
-    absl::random_internal::sequence_urbg urbg(
+    abslx::random_internal::sequence_urbg urbg(
         {0x7fbe76c8b4395800ull, 0x8000000000000000ull});
     // u=0.499, v=0.5
-    absl::beta_distribution<double> dist(1e-4, 1e-4);
+    abslx::beta_distribution<double> dist(1e-4, 1e-4);
     double a = dist(urbg);
     EXPECT_EQ(a, 2.0202860861567108529e-09);
     EXPECT_EQ(2, urbg.invocations());
@@ -572,15 +572,15 @@ TEST(BetaDistributionTest, AlgorithmBounds) {
   // initial draw.
   {
     // 1/alpha = 1/beta = 2.
-    absl::beta_distribution<float> dist(0.5, 0.5);
+    abslx::beta_distribution<float> dist(0.5, 0.5);
 
     // first two outputs are close to 1.0 - epsilon,
     // thus:  (u ^ 2 + v ^ 2) > 1.0
-    absl::random_internal::sequence_urbg urbg(
+    abslx::random_internal::sequence_urbg urbg(
         {0xffff00000006e6c8ull, 0xffff00000007c7c8ull, 0x800003766295CFA9ull,
          0x11C819684E734A41ull});
     {
-      double y = absl::beta_distribution<double>(0.5, 0.5)(urbg);
+      double y = abslx::beta_distribution<double>(0.5, 0.5)(urbg);
       EXPECT_EQ(4, urbg.invocations());
       EXPECT_EQ(y, 0.9810668952633862) << y;
     }
@@ -591,7 +591,7 @@ TEST(BetaDistributionTest, AlgorithmBounds) {
     // thus z > 0
     urbg.reset();
     {
-      float x = absl::beta_distribution<float>(0.5, 0.5)(urbg);
+      float x = abslx::beta_distribution<float>(0.5, 0.5)(urbg);
       EXPECT_EQ(4, urbg.invocations());
       EXPECT_NEAR(0.98106688261032104, x, 0.0000005) << x << "f";
     }

@@ -83,8 +83,8 @@ void LlvmIrGenTestBase::CompileAheadOfTimeAndVerifyIr(
   EXPECT_TRUE(filecheck_result.ValueOrDie()) << "Full IR: " << ir_;
 }
 
-void LlvmIrGenTestBase::MatchOptimizedHlo(absl::string_view hlo,
-                                          absl::string_view pattern,
+void LlvmIrGenTestBase::MatchOptimizedHlo(abslx::string_view hlo,
+                                          abslx::string_view pattern,
                                           bool print_operand_shape) {
   TF_ASSERT_OK_AND_ASSIGN(std::unique_ptr<HloModule> optimized_module,
                           GetOptimizedModule(hlo));
@@ -97,7 +97,7 @@ void LlvmIrGenTestBase::MatchOptimizedHlo(absl::string_view hlo,
 }
 
 StatusOr<std::unique_ptr<HloModule>> LlvmIrGenTestBase::GetOptimizedModule(
-    absl::string_view hlo) {
+    abslx::string_view hlo) {
   TF_ASSIGN_OR_RETURN(
       std::unique_ptr<HloModule> module,
       ParseAndReturnVerifiedModule(hlo, GetModuleConfigForTest()));

@@ -28,7 +28,7 @@ bool IsLeftHand(const mediapipe::Classification& c);
 
 bool IsRightHand(const mediapipe::Classification& c);
 
-absl::StatusOr<float> GetLeftHandScore(
+abslx::StatusOr<float> GetLeftHandScore(
     const mediapipe::ClassificationList& classification_list);
 
 }  // namespace gesture_recognizer

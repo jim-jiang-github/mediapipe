@@ -309,9 +309,9 @@
 // Disables warnings for a single read operation.  This can be used to avoid
 // warnings when it is known that the read is not actually involved in a race,
 // but the compiler cannot confirm that.
-#define ABSL_TS_UNCHECKED_READ(x) absl::base_internal::ts_unchecked_read(x)
+#define ABSL_TS_UNCHECKED_READ(x) abslx::base_internal::ts_unchecked_read(x)
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -330,6 +330,6 @@ inline T& ts_unchecked_read(T& v) ABSL_NO_THREAD_SAFETY_ANALYSIS {
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_BASE_THREAD_ANNOTATIONS_H_

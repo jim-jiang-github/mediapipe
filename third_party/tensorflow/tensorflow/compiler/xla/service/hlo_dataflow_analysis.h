@@ -295,7 +295,7 @@ class HloDataflowAnalysis {
   // Returns the result of the SSA Phi function applied to the given inputs at
   // the given instruction.
   bool Phi(HloInstruction* instruction,
-           absl::Span<const InstructionValueSet* const> inputs);
+           abslx::Span<const InstructionValueSet* const> inputs);
 
   // Updates the positions of the HloValues in the output of the given
   // instruction. This should be called after the instruction value set of
@@ -320,10 +320,10 @@ class HloDataflowAnalysis {
   // The map of all HloValues in the module. We pass around pointers to the
   // mapped HloValues, so the underlying container must keep them valid despite
   // mutations touching other map entries.
-  absl::flat_hash_map<HloValue::Id, std::unique_ptr<HloValue>> values_;
+  abslx::flat_hash_map<HloValue::Id, std::unique_ptr<HloValue>> values_;
 
   // A map from instruction to InstructionValueSet.
-  absl::flat_hash_map<const HloInstruction*,
+  abslx::flat_hash_map<const HloInstruction*,
                       std::unique_ptr<InstructionValueSet>>
       value_sets_;
 

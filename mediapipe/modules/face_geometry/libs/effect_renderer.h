@@ -49,7 +49,7 @@ class EffectRenderer {
   // reference existing OpenGL textures in the current context. They should also
   // reference different textures as the in-place effect rendering is not yet
   // supported.
-  virtual absl::Status RenderEffect(
+  virtual abslx::Status RenderEffect(
       const std::vector<FaceGeometry>& multi_face_geometry,
       int frame_width,            //
       int frame_height,           //
@@ -82,9 +82,9 @@ class EffectRenderer {
 //
 // `effect_texture` must have positive dimensions. Its format must be either
 // `SRGB` or `SRGBA`. Its memory must be aligned for GL usage.
-absl::StatusOr<std::unique_ptr<EffectRenderer>> CreateEffectRenderer(
+abslx::StatusOr<std::unique_ptr<EffectRenderer>> CreateEffectRenderer(
     const Environment& environment,                //
-    const absl::optional<Mesh3d>& effect_mesh_3d,  //
+    const abslx::optional<Mesh3d>& effect_mesh_3d,  //
     ImageFrame&& effect_texture);
 
 }  // namespace mediapipe::face_geometry

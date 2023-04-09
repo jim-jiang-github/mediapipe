@@ -23,7 +23,7 @@
 #include "absl/base/config.h"
 #include "absl/synchronization/notification.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 namespace {
@@ -97,7 +97,7 @@ TEST(CordzUpdateTracker, OperatorAssign) {
 }
 
 TEST(CordzUpdateTracker, ThreadSanitizedValueCheck) {
-  absl::Notification done;
+  abslx::Notification done;
   CordzUpdateTracker tracker;
 
   std::thread reader([&done, &tracker] {
@@ -127,4 +127,4 @@ TEST(CordzUpdateTracker, ThreadSanitizedValueCheck) {
 }  // namespace
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

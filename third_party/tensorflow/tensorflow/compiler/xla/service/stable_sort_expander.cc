@@ -40,7 +40,7 @@ StatusOr<HloInstruction*> StableSortExpander::ExpandInstruction(
   HloComputation* computation = sort->parent();
 
   HloInstruction* expanded_sort = nullptr;
-  absl::flat_hash_set<int64_t> used_indices;
+  abslx::flat_hash_set<int64_t> used_indices;
   int64_t iota_index = -1;
   for (const HloInstruction* operand : sort->operands()) {
     // We can only use the iota operand if it has an iota dimension which is the
@@ -77,18 +77,18 @@ StatusOr<HloInstruction*> StableSortExpander::ExpandInstruction(
 
     // Create a new comparator.
     auto comparator = sort->to_apply();
-    absl::flat_hash_map<const HloInstruction*, std::unique_ptr<HloInstruction>>
+    abslx::flat_hash_map<const HloInstruction*, std::unique_ptr<HloInstruction>>
         replacements;
     std::vector<std::unique_ptr<HloInstruction>> extra_parameters;
     std::vector<HloInstruction*> extra_parameter_ptrs;
     Shape scalar_shape = ShapeUtil::MakeShape(S32, {});
     extra_parameters.push_back(HloInstruction::CreateParameter(
         sort->operand_count() * 2, scalar_shape,
-        absl::StrCat("p.", sort->operand_count(), ".lhs")));
+        abslx::StrCat("p.", sort->operand_count(), ".lhs")));
     extra_parameter_ptrs.push_back(extra_parameters.back().get());
     extra_parameters.push_back(HloInstruction::CreateParameter(
         sort->operand_count() * 2 + 1, scalar_shape,
-        absl::StrCat("p.", sort->operand_count(), ".rhs")));
+        abslx::StrCat("p.", sort->operand_count(), ".rhs")));
     extra_parameter_ptrs.push_back(extra_parameters.back().get());
     sort->set_to_apply(sort->GetModule()->AddEmbeddedComputation(
         comparator->CloneWithReplacements(&replacements,
@@ -130,7 +130,7 @@ StatusOr<HloInstruction*> StableSortExpander::ExpandInstruction(
   auto comparator = sort->to_apply();
   std::vector<HloInstruction*> instructions_postorder =
       comparator->MakeInstructionPostOrder();
-  absl::flat_hash_map<HloInstruction*, HloInstruction*> replacements;
+  abslx::flat_hash_map<HloInstruction*, HloInstruction*> replacements;
   // Look up instr in the replacements map, and return either the replacement,
   // or instr, if the replacement isn't present.
   auto replace = [&](HloInstruction* instr) {

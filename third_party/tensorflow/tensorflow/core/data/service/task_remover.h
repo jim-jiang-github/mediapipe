@@ -45,7 +45,7 @@ class TaskRemover {
   int64_t round_ TF_GUARDED_BY(mu_);
   bool removed_ TF_GUARDED_BY(mu_) = false;
   // Consumers currently blocked in RequestRemoval.
-  absl::flat_hash_set<int64_t> consumers_waiting_ TF_GUARDED_BY(mu_);
+  abslx::flat_hash_set<int64_t> consumers_waiting_ TF_GUARDED_BY(mu_);
 };
 
 }  // namespace data

@@ -66,7 +66,7 @@ std::unique_ptr<Device> FakeDevice::Make(const string& name,
   return std::unique_ptr<Device>(new FakeDevice(device_attributes));
 }
 
-Status FindPassWithName(absl::string_view name,
+Status FindPassWithName(abslx::string_view name,
                         GraphOptimizationPass** result) {
   *result = nullptr;
   // Run the optimization pass specified by the command line flag.
@@ -91,14 +91,14 @@ Status FindPassWithName(absl::string_view name,
 }
 }  // namespace
 
-Status OptimizationPassRunner::Run(absl::string_view pass_to_run,
+Status OptimizationPassRunner::Run(abslx::string_view pass_to_run,
                                    GraphDef input, GraphDef* result) {
-  auto session_options = absl::make_unique<SessionOptions>();
+  auto session_options = abslx::make_unique<SessionOptions>();
   session_options->config.mutable_graph_options()
       ->mutable_optimizer_options()
       ->set_global_jit_level(jit_level_);
   FunctionDefLibrary flib;
-  std::unique_ptr<Graph> graph = absl::make_unique<Graph>(OpRegistry::Global());
+  std::unique_ptr<Graph> graph = abslx::make_unique<Graph>(OpRegistry::Global());
 
   GraphOptimizationPassOptions options;
   options.session_options = session_options.get();
@@ -135,15 +135,15 @@ Status OptimizationPassRunner::SetJitLevel(
   return OkStatus();
 }
 
-Status OptimizationPassRunner::AddDevices(absl::string_view type, int count) {
+Status OptimizationPassRunner::AddDevices(abslx::string_view type, int count) {
   for (int i = 0; i < count; i++) {
     devices_.push_back(FakeDevice::Make(
-        absl::StrCat("/job:localhost/replica:0/task:0/device:", type, ":", i),
-        absl::StrCat(type)));
+        abslx::StrCat("/job:localhost/replica:0/task:0/device:", type, ":", i),
+        abslx::StrCat(type)));
     devices_.push_back(FakeDevice::Make(
-        absl::StrCat("/job:localhost/replica:0/task:0/device:XLA_", type, ":",
+        abslx::StrCat("/job:localhost/replica:0/task:0/device:XLA_", type, ":",
                      i),
-        absl::StrCat(type)));
+        abslx::StrCat(type)));
   }
 
   return OkStatus();

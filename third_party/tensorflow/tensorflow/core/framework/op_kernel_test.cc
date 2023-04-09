@@ -375,7 +375,7 @@ TEST_F(OpKernelTest, InputDtype) {
   gtl::InlinedVector<TensorValue, 4> inputs{TensorValue(&a), TensorValue(&b),
                                             TensorValue(&c)};
   params.inputs = inputs;
-  auto ctx = absl::make_unique<OpKernelContext>(&params);
+  auto ctx = abslx::make_unique<OpKernelContext>(&params);
 
   DataType dtype;
   EXPECT_FALSE(ctx->input_dtype("non_existent_input", &dtype).ok());
@@ -445,7 +445,7 @@ class ScopedAllocatorDevice : public DeviceBase {
 TEST_F(OpKernelTest, ScopedAllocationTest) {
   Env* env = Env::Default();
   OpKernelContext::Params params;
-  auto sa_device = absl::make_unique<ScopedAllocatorDevice>(env);
+  auto sa_device = abslx::make_unique<ScopedAllocatorDevice>(env);
   params.device = sa_device.get();
   Status status;
   std::unique_ptr<OpKernel> op(CreateOpKernel(
@@ -459,7 +459,7 @@ TEST_F(OpKernelTest, ScopedAllocationTest) {
   params.output_attr_array = output_alloc_attrs.data();
   std::vector<int> forward_from({OpKernelContext::Params::kNeverForward});
   params.forward_from_array = forward_from.data();
-  auto ctx = absl::make_unique<OpKernelContext>(&params);
+  auto ctx = abslx::make_unique<OpKernelContext>(&params);
 
   EXPECT_EQ(sa_device->num_allocations(false), 0);
   EXPECT_EQ(sa_device->num_allocations(true), 0);
@@ -559,7 +559,7 @@ TEST_F(OpKernelBuilderTest, DuplicateKernel) {
   PrioritizedDeviceTypeVector devs;
   Status status = SupportedDeviceTypesForNode(DeviceTypes(), ndef, &devs);
   ASSERT_FALSE(status.ok());
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       status.error_message(), "Multiple OpKernel registrations match NodeDef"));
 
   ExpectFailure("DuplicateKernel", DEVICE_CPU, {}, error::INVALID_ARGUMENT);
@@ -579,7 +579,7 @@ TEST_F(OpKernelBuilderTest, DuplicateKernelForT) {
   PrioritizedDeviceTypeVector devs;
   Status status = SupportedDeviceTypesForNode(DeviceTypes(), ndef, &devs);
   ASSERT_FALSE(status.ok());
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       status.error_message(), "Multiple OpKernel registrations match NodeDef"));
 
   ExpectFailure("DuplicateKernelForT", DEVICE_CPU, {"T|type|DT_FLOAT"},
@@ -601,7 +601,7 @@ TEST_F(OpKernelBuilderTest, BadConstraint) {
   Status status = SupportedDeviceTypesForNode(DeviceTypes(), ndef, &devs);
   ASSERT_FALSE(status.ok());
   EXPECT_TRUE(
-      absl::StrContains(status.error_message(),
+      abslx::StrContains(status.error_message(),
                         "OpKernel 'BadConstraint' has constraint on attr "
                         "'T' not in NodeDef"));
 
@@ -625,7 +625,7 @@ TEST_F(OpKernelBuilderTest, OpOutputList) {
       TF_GRAPH_DEF_VERSION, &status));
   EXPECT_TRUE(status.ok()) << status.ToString();
   params.op_kernel = op.get();
-  auto ctx = absl::make_unique<OpKernelContext>(&params);
+  auto ctx = abslx::make_unique<OpKernelContext>(&params);
 
   EXPECT_EQ(DT_INT32, ctx->expected_output_dtype(0));
   OpOutputList out_list;
@@ -893,9 +893,9 @@ REGISTER_KERNEL_BUILDER(
     LabeledKernel<4>);
 
 TEST_F(LabelTest, Filter) {
-  ExpectSuccess("JitKernel", DEVICE_CPU, {absl::StrCat("_kernel|string|''")});
+  ExpectSuccess("JitKernel", DEVICE_CPU, {abslx::StrCat("_kernel|string|''")});
   ExpectFailure("JitKernel", DEVICE_CPU,
-                {absl::StrCat("_kernel|string|'", kJitKernelLabel, "'")},
+                {abslx::StrCat("_kernel|string|'", kJitKernelLabel, "'")},
                 error::NOT_FOUND);
 }
 
@@ -903,7 +903,7 @@ void BM_InputRangeHelper(::testing::benchmark::State& state,
                          const NodeDef& node_def, const char* input_name,
                          int expected_start, int expected_stop) {
   Status status;
-  auto device = absl::make_unique<DummyDevice>(Env::Default());
+  auto device = abslx::make_unique<DummyDevice>(Env::Default());
 
   std::unique_ptr<OpKernel> op(CreateOpKernel(DEVICE_CPU, device.get(),
                                               cpu_allocator(), node_def,
@@ -979,7 +979,7 @@ void BM_TraceString(::testing::benchmark::State& state) {
 
   // Build OpKernel and OpKernelContext
   Status status;
-  auto device = absl::make_unique<DummyDevice>(Env::Default());
+  auto device = abslx::make_unique<DummyDevice>(Env::Default());
   std::unique_ptr<OpKernel> op(CreateOpKernel(DEVICE_CPU, device.get(),
                                               cpu_allocator(), node_def,
                                               TF_GRAPH_DEF_VERSION, &status));
@@ -992,7 +992,7 @@ void BM_TraceString(::testing::benchmark::State& state) {
   Tensor b(DT_FLOAT, TensorShape({256, 256}));
   gtl::InlinedVector<TensorValue, 4> inputs{TensorValue(&a), TensorValue(&b)};
   params.inputs = inputs;
-  auto ctx = absl::make_unique<OpKernelContext>(&params);
+  auto ctx = abslx::make_unique<OpKernelContext>(&params);
 
   for (auto s : state) {
     auto trace = op->TraceString(*ctx, verbose);

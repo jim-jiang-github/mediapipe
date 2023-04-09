@@ -100,7 +100,7 @@ class TFPackage {
   std::unique_ptr<tensorflow::BundleReader> variable_reader_;
   std::string variables_filepath_;
   bool has_checkpoint_;
-  absl::flat_hash_map<std::string, const NodeDef*> graph_def_nodes_by_name_;
+  abslx::flat_hash_map<std::string, const NodeDef*> graph_def_nodes_by_name_;
 };
 
 }  // namespace libexport

@@ -104,7 +104,7 @@ TfLiteStatus DuplicateBiasesWithMultipleUses(ModelT* model,
           }
           std::unique_ptr<TensorT> new_tensor(new TensorT);
           new_tensor->name =
-              absl::StrCat(bias_tensor->name, "_duplicate_", bias_use_count);
+              abslx::StrCat(bias_tensor->name, "_duplicate_", bias_use_count);
           new_tensor->shape = bias_tensor->shape;
           new_tensor->type = bias_tensor->type;
           if (bias_tensor->quantization) {

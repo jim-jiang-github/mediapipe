@@ -39,13 +39,13 @@ Status ZerosLike(AbstractContext* ctx, AbstractTensorHandle* t,
   TF_RETURN_IF_ERROR(op->Reset("ZerosLike", /*raw_device_name=*/nullptr));
   if (isa<tracing::TracingOperation>(op.get())) {
     TF_RETURN_IF_ERROR(dyn_cast<tracing::TracingOperation>(op.get())->SetOpName(
-        absl::StrCat("ZerosLike", ToId(t)).c_str()));
+        abslx::StrCat("ZerosLike", ToId(t)).c_str()));
   }
   TF_RETURN_IF_ERROR(op->AddInput(t));
   int num_outputs = 1;
   std::vector<AbstractTensorHandle*> outputs(num_outputs);
   TF_RETURN_IF_ERROR(
-      op->Execute(absl::Span<AbstractTensorHandle*>(outputs), &num_outputs));
+      op->Execute(abslx::Span<AbstractTensorHandle*>(outputs), &num_outputs));
   *result = outputs[0];
   return OkStatus();
 }
@@ -111,7 +111,7 @@ class TapeVSpace
       const string& op_type, GradientFunction* gradient_function,
       const std::vector<int64_t>& unneeded_gradients,
       gtl::ArraySlice<AbstractTensorHandle*> output_gradients,
-      absl::Span<AbstractTensorHandle*> result) const override;
+      abslx::Span<AbstractTensorHandle*> result) const override;
 
   // Builds a tensor filled with ones with the same shape and dtype as `t`.
   Status BuildOnesLike(const TapeTensor& t,
@@ -162,7 +162,7 @@ AbstractTensorHandle* TapeVSpace::AggregateGradients(
 
   int num_outputs = 1;
   std::vector<AbstractTensorHandle*> outputs(num_outputs);
-  s = op->Execute(absl::Span<AbstractTensorHandle*>(outputs), &num_outputs);
+  s = op->Execute(abslx::Span<AbstractTensorHandle*>(outputs), &num_outputs);
   if (!s.ok()) {
     return nullptr;
   }
@@ -175,7 +175,7 @@ Status TapeVSpace::CallBackwardFunction(
     const string& op_type, GradientFunction* gradient_function,
     const std::vector<int64_t>& unneeded_gradients,
     gtl::ArraySlice<AbstractTensorHandle*> output_gradients,
-    absl::Span<AbstractTensorHandle*> result) const {
+    abslx::Span<AbstractTensorHandle*> result) const {
   if (gradient_function == nullptr) {
     return errors::InvalidArgument(
         "Provided null gradient_function for '", op_type, "'.\n",
@@ -192,13 +192,13 @@ Status TapeVSpace::BuildOnesLike(const TapeTensor& t,
   TF_RETURN_IF_ERROR(op->Reset("OnesLike", /*raw_device_name=*/nullptr));
   if (isa<tracing::TracingOperation>(op.get())) {
     TF_RETURN_IF_ERROR(dyn_cast<tracing::TracingOperation>(op.get())->SetOpName(
-        absl::StrCat("OnesLike", ToId(t.GetHandle())).c_str()));
+        abslx::StrCat("OnesLike", ToId(t.GetHandle())).c_str()));
   }
   TF_RETURN_IF_ERROR(op->AddInput(t.GetHandle()));
   int num_outputs = 1;
   std::vector<AbstractTensorHandle*> outputs(num_outputs);
   TF_RETURN_IF_ERROR(
-      op->Execute(absl::Span<AbstractTensorHandle*>(outputs), &num_outputs));
+      op->Execute(abslx::Span<AbstractTensorHandle*>(outputs), &num_outputs));
   *result = outputs[0];
   return OkStatus();
 }
@@ -222,8 +222,8 @@ void TapeVSpace::DeleteGradient(AbstractTensorHandle* gradient) const {
 void Tape::Watch(const AbstractTensorHandle* t) {
   GradientTape::Watch(ToId(t));
 }
-void Tape::RecordOperation(absl::Span<AbstractTensorHandle* const> inputs,
-                           absl::Span<AbstractTensorHandle* const> outputs,
+void Tape::RecordOperation(abslx::Span<AbstractTensorHandle* const> inputs,
+                           abslx::Span<AbstractTensorHandle* const> outputs,
                            GradientFunction* gradient_function,
                            const string& op_name) {
   std::vector<int64_t> input_ids(inputs.size());
@@ -247,7 +247,7 @@ void Tape::RecordOperation(absl::Span<AbstractTensorHandle* const> inputs,
       });
 }
 bool Tape::ShouldRecord(
-    absl::Span<const AbstractTensorHandle* const> tensors) const {
+    abslx::Span<const AbstractTensorHandle* const> tensors) const {
   std::vector<int64_t> tensor_ids(tensors.size());
   std::vector<tensorflow::DataType> tensor_dtypes(tensors.size());
   for (int i = 0; i < tensors.size(); i++) {
@@ -261,7 +261,7 @@ void Tape::DeleteTrace(const AbstractTensorHandle* t) {
 }
 
 std::vector<int64_t> MakeTensorIDList(
-    absl::Span<AbstractTensorHandle* const> tensors) {
+    abslx::Span<AbstractTensorHandle* const> tensors) {
   std::vector<int64_t> ids(tensors.size());
   for (int i = 0; i < tensors.size(); i++) {
     ids[i] = ToId(tensors[i]);
@@ -270,10 +270,10 @@ std::vector<int64_t> MakeTensorIDList(
 }
 
 Status Tape::ComputeGradient(
-    AbstractContext* ctx, absl::Span<AbstractTensorHandle* const> targets,
-    absl::Span<AbstractTensorHandle* const> sources,
-    absl::Span<AbstractTensorHandle* const> output_gradients,
-    absl::Span<AbstractTensorHandle*> result) {
+    AbstractContext* ctx, abslx::Span<AbstractTensorHandle* const> targets,
+    abslx::Span<AbstractTensorHandle* const> sources,
+    abslx::Span<AbstractTensorHandle* const> output_gradients,
+    abslx::Span<AbstractTensorHandle*> result) {
   TapeVSpace vspace(ctx);
   std::vector<int64_t> target_tensor_ids = MakeTensorIDList(targets);
   std::vector<int64_t> source_tensor_ids = MakeTensorIDList(sources);
@@ -312,7 +312,7 @@ Status AddInput(AbstractOperation* op_, AbstractTensorHandle* input,
   return OkStatus();
 }
 Status AddInputList(AbstractOperation* op_,
-                    absl::Span<AbstractTensorHandle* const> inputs,
+                    abslx::Span<AbstractTensorHandle* const> inputs,
                     ForwardOperation* forward_op_) {
   TF_RETURN_IF_ERROR(op_->AddInputList(inputs));
   for (auto input : inputs) {
@@ -458,14 +458,14 @@ Status SetAttrShapeList(AbstractOperation* op_, const char* attr_name,
   return op_->SetAttrShapeList(attr_name, dims, num_dims, num_values);
 }
 Status SetAttrFunctionList(AbstractOperation* op_, const char* attr_name,
-                           absl::Span<const AbstractOperation*> values,
+                           abslx::Span<const AbstractOperation*> values,
                            ForwardOperation* forward_op_) {
   return tensorflow::errors::Unimplemented(
       "SetAttrFunctionList has not been "
       "implemented yet.");
 }
 Status Execute(AbstractOperation* op_, AbstractContext* ctx,
-               absl::Span<AbstractTensorHandle*> retvals, int* num_retvals,
+               abslx::Span<AbstractTensorHandle*> retvals, int* num_retvals,
                ForwardOperation* forward_op_, Tape* tape,
                const GradientRegistry& registry) {
   TF_RETURN_IF_ERROR(op_->Execute(retvals, num_retvals));

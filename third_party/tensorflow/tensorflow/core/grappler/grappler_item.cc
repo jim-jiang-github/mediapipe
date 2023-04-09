@@ -141,7 +141,7 @@ std::unordered_set<string> GrapplerItem::NodesToPreserve() const {
     }
   }
 
-  absl::optional<FunctionLibraryDefinition> fn_library;
+  abslx::optional<FunctionLibraryDefinition> fn_library;
   if (!optimization_options_.allow_pruning_stateful_and_dataset_ops) {
     fn_library.emplace(OpRegistry::Global(), graph.library());
   }
@@ -188,7 +188,7 @@ Status GrapplerItem::AddDevice(const string& device) {
 }
 
 Status GrapplerItem::AddDevices(const GrapplerItem& other) {
-  std::vector<absl::string_view> invalid_devices;
+  std::vector<abslx::string_view> invalid_devices;
   for (const string& device : other.devices()) {
     Status added = AddDevice(device);
     if (!added.ok()) invalid_devices.emplace_back(device);
@@ -196,21 +196,21 @@ Status GrapplerItem::AddDevices(const GrapplerItem& other) {
   return invalid_devices.empty()
              ? OkStatus()
              : errors::InvalidArgument("Skipped invalid devices: [",
-                                       absl::StrJoin(invalid_devices, ", "),
+                                       abslx::StrJoin(invalid_devices, ", "),
                                        "]");
 }
 
 Status GrapplerItem::InferDevicesFromGraph() {
-  absl::flat_hash_set<absl::string_view> invalid_devices;
+  abslx::flat_hash_set<abslx::string_view> invalid_devices;
   for (const NodeDef& node : graph.node()) {
     Status added = AddDevice(node.device());
     if (!added.ok()) invalid_devices.insert(node.device());
   }
-  VLOG(2) << "Inferred device set: [" << absl::StrJoin(devices_, ", ") << "]";
+  VLOG(2) << "Inferred device set: [" << abslx::StrJoin(devices_, ", ") << "]";
   return invalid_devices.empty()
              ? OkStatus()
              : errors::InvalidArgument("Skipped invalid devices: [",
-                                       absl::StrJoin(invalid_devices, ", "),
+                                       abslx::StrJoin(invalid_devices, ", "),
                                        "]");
 }
 

@@ -31,7 +31,7 @@
 #include "absl/base/internal/unaligned_access.h"
 #include "absl/base/port.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // Use compiler byte-swapping intrinsics if they are available.  32-bit
@@ -322,6 +322,6 @@ inline void Store64(void *p, uint64_t v) {
 }  // namespace big_endian
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_BASE_INTERNAL_ENDIAN_H_

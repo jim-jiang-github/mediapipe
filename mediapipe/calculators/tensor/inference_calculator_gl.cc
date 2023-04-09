@@ -35,11 +35,11 @@ namespace api2 {
 class InferenceCalculatorGlImpl
     : public NodeImpl<InferenceCalculatorGl, InferenceCalculatorGlImpl> {
  public:
-  static absl::Status UpdateContract(CalculatorContract* cc);
+  static abslx::Status UpdateContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
   // Helper class that wraps everything related to GPU inference acceleration.
@@ -47,19 +47,19 @@ class InferenceCalculatorGlImpl
    public:
     ~GpuInferenceRunner();
 
-    absl::Status Init(CalculatorContext* cc,
+    abslx::Status Init(CalculatorContext* cc,
                       const mediapipe::InferenceCalculatorOptions::Delegate&
                           delegate_options);
-    absl::Status LoadModel(CalculatorContext* cc);
-    absl::Status LoadDelegate(
+    abslx::Status LoadModel(CalculatorContext* cc);
+    abslx::Status LoadDelegate(
         CalculatorContext* cc,
         const mediapipe::InferenceCalculatorOptions::Delegate&
             delegate_options);
-    absl::Status LoadDelegateAndAllocateTensors(
+    abslx::Status LoadDelegateAndAllocateTensors(
         CalculatorContext* cc,
         const mediapipe::InferenceCalculatorOptions::Delegate&
             delegate_options);
-    absl::Status Process(CalculatorContext* cc,
+    abslx::Status Process(CalculatorContext* cc,
                          const std::vector<Tensor>& input_tensors,
                          std::vector<Tensor>& output_tensors);
 
@@ -87,18 +87,18 @@ InferenceCalculatorGlImpl::GpuInferenceRunner::~GpuInferenceRunner() {
   });
 }
 
-absl::Status InferenceCalculatorGlImpl::GpuInferenceRunner::Init(
+abslx::Status InferenceCalculatorGlImpl::GpuInferenceRunner::Init(
     CalculatorContext* cc,
     const mediapipe::InferenceCalculatorOptions::Delegate& delegate_options) {
   MP_RETURN_IF_ERROR(LoadModel(cc));
   MP_RETURN_IF_ERROR(gpu_helper_.Open(cc));
   return gpu_helper_.RunInGlContext(
-      [this, &cc, &delegate_options]() -> absl::Status {
+      [this, &cc, &delegate_options]() -> abslx::Status {
         return LoadDelegateAndAllocateTensors(cc, delegate_options);
       });
 }
 
-absl::Status InferenceCalculatorGlImpl::GpuInferenceRunner::LoadModel(
+abslx::Status InferenceCalculatorGlImpl::GpuInferenceRunner::LoadModel(
     CalculatorContext* cc) {
   ASSIGN_OR_RETURN(model_packet_, GetModelAsPacket(cc));
   const auto& model = *model_packet_.Get();
@@ -116,10 +116,10 @@ absl::Status InferenceCalculatorGlImpl::GpuInferenceRunner::LoadModel(
   interpreter_->SetNumThreads(
       cc->Options<mediapipe::InferenceCalculatorOptions>().cpu_num_thread());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status
+abslx::Status
 InferenceCalculatorGlImpl::GpuInferenceRunner::LoadDelegateAndAllocateTensors(
     CalculatorContext* cc,
     const mediapipe::InferenceCalculatorOptions::Delegate& delegate_options) {
@@ -131,10 +131,10 @@ InferenceCalculatorGlImpl::GpuInferenceRunner::LoadDelegateAndAllocateTensors(
   RET_CHECK_NE(
       interpreter_->tensor(interpreter_->inputs()[0])->quantization.type,
       kTfLiteAffineQuantization);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status InferenceCalculatorGlImpl::GpuInferenceRunner::LoadDelegate(
+abslx::Status InferenceCalculatorGlImpl::GpuInferenceRunner::LoadDelegate(
     CalculatorContext* cc,
     const mediapipe::InferenceCalculatorOptions::Delegate& delegate_options) {
   // Configure and create the delegate.
@@ -155,11 +155,11 @@ absl::Status InferenceCalculatorGlImpl::GpuInferenceRunner::LoadDelegate(
   const auto& input_indices = interpreter_->inputs();
   for (int i = 0; i < input_indices.size(); ++i) {
     const TfLiteTensor* tensor = interpreter_->tensor(input_indices[i]);
-    RET_CHECK(tensor->dims->size > 0) << absl::StrFormat(
+    RET_CHECK(tensor->dims->size > 0) << abslx::StrFormat(
         "Input tensor at index [%d] doesn't specify dimensions.",
         input_indices[i]);
 
-    gpu_buffers_in_.emplace_back(absl::make_unique<Tensor>(
+    gpu_buffers_in_.emplace_back(abslx::make_unique<Tensor>(
         Tensor::ElementType::kFloat32,
         Tensor::Shape{std::vector<int>{
             tensor->dims->data, tensor->dims->data + tensor->dims->size}}));
@@ -176,10 +176,10 @@ absl::Status InferenceCalculatorGlImpl::GpuInferenceRunner::LoadDelegate(
   // Create and bind output buffers.
   for (int i = 0; i < output_size_; ++i) {
     const TfLiteTensor* tensor = interpreter_->tensor(output_indices[i]);
-    RET_CHECK(tensor->dims->size > 0) << absl::StrFormat(
+    RET_CHECK(tensor->dims->size > 0) << abslx::StrFormat(
         "Output tensor at index [%d] doesn't specify dimensions.",
         output_indices[i]);
-    gpu_buffers_out_.emplace_back(absl::make_unique<Tensor>(
+    gpu_buffers_out_.emplace_back(abslx::make_unique<Tensor>(
         Tensor::ElementType::kFloat32,
         Tensor::Shape{std::vector<int>{
             tensor->dims->data, tensor->dims->data + tensor->dims->size}}));
@@ -194,14 +194,14 @@ absl::Status InferenceCalculatorGlImpl::GpuInferenceRunner::LoadDelegate(
   RET_CHECK_EQ(interpreter_->ModifyGraphWithDelegate(delegate_.get()),
                kTfLiteOk);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status InferenceCalculatorGlImpl::GpuInferenceRunner::Process(
+abslx::Status InferenceCalculatorGlImpl::GpuInferenceRunner::Process(
     CalculatorContext* cc, const std::vector<Tensor>& input_tensors,
     std::vector<Tensor>& output_tensors) {
   return gpu_helper_.RunInGlContext(
-      [this, cc, &input_tensors, &output_tensors]() -> absl::Status {
+      [this, cc, &input_tensors, &output_tensors]() -> abslx::Status {
         // Explicitly copy input.
         for (int i = 0; i < input_tensors.size(); ++i) {
           glBindBuffer(GL_COPY_READ_BUFFER,
@@ -231,11 +231,11 @@ absl::Status InferenceCalculatorGlImpl::GpuInferenceRunner::Process(
                               t->bytes());
         }
 
-        return absl::OkStatus();
+        return abslx::OkStatus();
       });
 }
 
-absl::Status InferenceCalculatorGlImpl::UpdateContract(CalculatorContract* cc) {
+abslx::Status InferenceCalculatorGlImpl::UpdateContract(CalculatorContract* cc) {
   const auto& options = cc->Options<mediapipe::InferenceCalculatorOptions>();
   RET_CHECK(!options.model_path().empty() ^ kSideInModel(cc).IsConnected())
       << "Either model as side packet or model path in options is required.";
@@ -243,7 +243,7 @@ absl::Status InferenceCalculatorGlImpl::UpdateContract(CalculatorContract* cc) {
   return mediapipe::GlCalculatorHelper::UpdateContract(cc);
 }
 
-absl::Status InferenceCalculatorGlImpl::Open(CalculatorContext* cc) {
+abslx::Status InferenceCalculatorGlImpl::Open(CalculatorContext* cc) {
   const auto& options = cc->Options<mediapipe::InferenceCalculatorOptions>();
   mediapipe::InferenceCalculatorOptions::Delegate delegate = options.delegate();
   if (!kDelegate(cc).IsEmpty()) {
@@ -263,25 +263,25 @@ absl::Status InferenceCalculatorGlImpl::Open(CalculatorContext* cc) {
   return gpu_inference_runner_->Init(cc, delegate);
 }
 
-absl::Status InferenceCalculatorGlImpl::Process(CalculatorContext* cc) {
+abslx::Status InferenceCalculatorGlImpl::Process(CalculatorContext* cc) {
   if (kInTensors(cc).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   const auto& input_tensors = *kInTensors(cc);
   RET_CHECK(!input_tensors.empty());
-  auto output_tensors = absl::make_unique<std::vector<Tensor>>();
+  auto output_tensors = abslx::make_unique<std::vector<Tensor>>();
 
   MP_RETURN_IF_ERROR(
       gpu_inference_runner_->Process(cc, input_tensors, *output_tensors));
 
   kOutTensors(cc).Send(std::move(output_tensors));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status InferenceCalculatorGlImpl::Close(CalculatorContext* cc) {
+abslx::Status InferenceCalculatorGlImpl::Close(CalculatorContext* cc) {
   gpu_inference_runner_ = nullptr;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace api2

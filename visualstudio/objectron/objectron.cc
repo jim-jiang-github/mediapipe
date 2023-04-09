@@ -36,7 +36,7 @@ struct {
 };
 CATEGORY const detect_category = CATEGORY_CUP; // free to change
 
-absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
+abslx::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
   mediapipe::CalculatorGraphConfig config;
   if (read_config_from_pbtxt(config, calculator_graph_config_file)) {
     auto const& cat = categories[detect_category];
@@ -60,7 +60,7 @@ absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
 
     return graph.Initialize(config, side_packets);
   }
-  return absl::NotFoundError(calculator_graph_config_file);
+  return abslx::NotFoundError(calculator_graph_config_file);
 }
 
 // the program entrance point, the main().

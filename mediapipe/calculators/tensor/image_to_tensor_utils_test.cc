@@ -183,7 +183,7 @@ TEST(ValidateOptionOutputDims, EmptyProto) {
   mediapipe::ImageToTensorCalculatorOptions options;
   // No output tensor range set.
   EXPECT_THAT(ValidateOptionOutputDims(options),
-              StatusIs(absl::StatusCode::kInternal,
+              StatusIs(abslx::StatusCode::kInternal,
                        HasSubstr("Output tensor range is required")));
 
   // Invalid output float tensor range.
@@ -191,14 +191,14 @@ TEST(ValidateOptionOutputDims, EmptyProto) {
   options.mutable_output_tensor_float_range()->set_max(0.0);
   EXPECT_THAT(
       ValidateOptionOutputDims(options),
-      StatusIs(absl::StatusCode::kInternal,
+      StatusIs(abslx::StatusCode::kInternal,
                HasSubstr("Valid output float tensor range is required")));
 
   // Output width/height is not set.
   options.mutable_output_tensor_float_range()->set_min(0.0);
   options.mutable_output_tensor_float_range()->set_max(1.0);
   EXPECT_THAT(ValidateOptionOutputDims(options),
-              StatusIs(absl::StatusCode::kInternal,
+              StatusIs(abslx::StatusCode::kInternal,
                        HasSubstr("Valid output tensor width is required")));
 }
 

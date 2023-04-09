@@ -40,15 +40,15 @@ constexpr int kPhwo4i4ChannelsInPlane = 4;
 constexpr int kPiohw4ChannelsInPlane = 4;
 
 // Layout is Po,H,W,OI4x4.
-absl::Status ConvertToPHWO4I4(absl::Span<const float> in, const OHWI& shape,
-                              absl::Span<float> out, bool reverse_space) {
+abslx::Status ConvertToPHWO4I4(abslx::Span<const float> in, const OHWI& shape,
+                              abslx::Span<float> out, bool reverse_space) {
   if (in.size() != shape.DimensionsProduct()) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "ConvertToPHWO4I4: Input data size does not match expected size: ",
         in.size(), " != ", shape.DimensionsProduct()));
   }
   if (out.size() != GetElementsSizeForPHWO4I4(shape)) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "ConvertToPHWO4I4: Output data size does not match expected size: ",
         out.size(), " != ", GetElementsSizeForPHWO4I4(shape)));
   }
@@ -78,7 +78,7 @@ absl::Status ConvertToPHWO4I4(absl::Span<const float> in, const OHWI& shape,
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace
@@ -97,7 +97,7 @@ std::vector<float> ConvertToPHWO4I4(
     const Tensor<OHWI, DataType::FLOAT32>& tensor) {
   std::vector<float> transposed(GetElementsSizeForPHWO4I4(tensor.shape));
   ConvertToPHWO4I4(tensor.data, tensor.shape,
-                   absl::MakeSpan(transposed.data(), transposed.size()),
+                   abslx::MakeSpan(transposed.data(), transposed.size()),
                    /*reverse_space=*/false)
       .IgnoreError();
   return transposed;
@@ -107,7 +107,7 @@ std::vector<float> ConvertToPHWO4I4Transposed(
     const Tensor<OHWI, DataType::FLOAT32>& tensor) {
   std::vector<float> transposed(GetElementsSizeForPHWO4I4(tensor.shape));
   ConvertToPHWO4I4(tensor.data, tensor.shape,
-                   absl::MakeSpan(transposed.data(), transposed.size()),
+                   abslx::MakeSpan(transposed.data(), transposed.size()),
                    /*reverse_space=*/true)
       .IgnoreError();
   return transposed;
@@ -119,15 +119,15 @@ uint3 Get3DSizeForPHWO4I4(const OHWI& shape) {
 }
 
 // Layout is Po,H,W,OI4x4.
-absl::Status ConvertToPHWO4I4(absl::Span<const float> in, const IHWO& shape,
-                              absl::Span<float> out) {
+abslx::Status ConvertToPHWO4I4(abslx::Span<const float> in, const IHWO& shape,
+                              abslx::Span<float> out) {
   if (in.size() != shape.DimensionsProduct()) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "ConvertToPHWO4I4: Input data size does not match expected size: ",
         in.size(), " != ", shape.DimensionsProduct()));
   }
   if (out.size() != GetElementsSizeForPHWO4I4(shape)) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "ConvertToPHWO4I4: Output data size does not match expected size: ",
         out.size(), " != ", GetElementsSizeForPHWO4I4(shape)));
   }
@@ -156,14 +156,14 @@ absl::Status ConvertToPHWO4I4(absl::Span<const float> in, const IHWO& shape,
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 std::vector<float> ConvertToPHWO4I4(
     const Tensor<IHWO, DataType::FLOAT32>& tensor) {
   std::vector<float> transposed(GetElementsSizeForPHWO4I4(tensor.shape));
   ConvertToPHWO4I4(tensor.data, tensor.shape,
-                   absl::MakeSpan(transposed.data(), transposed.size()))
+                   abslx::MakeSpan(transposed.data(), transposed.size()))
       .IgnoreError();
   return transposed;
 }
@@ -173,15 +173,15 @@ uint32_t GetElementsSizeForPIOHW4(const OHWI& shape) {
          shape.w;
 }
 
-absl::Status ConvertToPIOHW4(absl::Span<const float> in, const OHWI& shape,
-                             absl::Span<float> out) {
+abslx::Status ConvertToPIOHW4(abslx::Span<const float> in, const OHWI& shape,
+                             abslx::Span<float> out) {
   if (in.size() != shape.DimensionsProduct()) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "ConvertToPIOHW4: Input data size does not match expected size: ",
         in.size(), " != ", shape.DimensionsProduct()));
   }
   if (out.size() != GetElementsSizeForPIOHW4(shape)) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "ConvertToPIOHW4: Output data size does not match expected size: ",
         out.size(), " != ", GetElementsSizeForPIOHW4(shape)));
   }
@@ -202,42 +202,42 @@ absl::Status ConvertToPIOHW4(absl::Span<const float> in, const OHWI& shape,
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 std::vector<float> ConvertToPIOHW4(
     const Tensor<OHWI, DataType::FLOAT32>& tensor) {
   std::vector<float> transposed(GetElementsSizeForPIOHW4(tensor.shape));
   ConvertToPIOHW4(tensor.data, tensor.shape,
-                  absl::MakeSpan(transposed.data(), transposed.size()))
+                  abslx::MakeSpan(transposed.data(), transposed.size()))
       .IgnoreError();
   return transposed;
 }
 
 template <typename T>
-absl::Status ValidateConvertToPHWC4(absl::Span<const float> in,
-                                    const BHWC& shape, absl::Span<T> out) {
+abslx::Status ValidateConvertToPHWC4(abslx::Span<const float> in,
+                                    const BHWC& shape, abslx::Span<T> out) {
   if (in.size() != shape.DimensionsProduct()) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "ConvertToPHWC4: Input data size does not match expected size: ",
         in.size(), " != ", shape.DimensionsProduct()));
   }
   if (out.size() != GetElementsSizeForPHWC4(shape)) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "ConvertToPHWC4: Output data size does not match expected size: ",
         out.size(), " != ", GetElementsSizeForPHWC4(shape)));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Layout is Pc,H,W,C4 where P - is a plane based on channels.
-absl::Status ConvertToPHWC4(absl::Span<const float> in, const BHWC& shape,
-                            absl::Span<float> out) {
+abslx::Status ConvertToPHWC4(abslx::Span<const float> in, const BHWC& shape,
+                            abslx::Span<float> out) {
   RETURN_IF_ERROR(ValidateConvertToPHWC4(in, shape, out));
   if (shape.c == 4) {
     std::memcpy(out.data(), in.data(),
                 shape.DimensionsProduct() * sizeof(float));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   // Layout is Pc,H,W,C4 where P - is a plane based on channels.
   int num_planes = DivideRoundUp(shape.c, kPhwc4ChannelsInPlane);
@@ -264,7 +264,7 @@ absl::Status ConvertToPHWC4(absl::Span<const float> in, const BHWC& shape,
   const int remaining_channels =
       shape.c - num_full_planes * kPhwc4ChannelsInPlane;
   if (remaining_channels == 0) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   for (int b = 0; b < shape.b; b++) {
     const float* src =
@@ -280,12 +280,12 @@ absl::Status ConvertToPHWC4(absl::Span<const float> in, const BHWC& shape,
       dest += kPhwc4ChannelsInPlane;
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Layout is Pc,H,W,C4 where P - is a plane based on channels.
-absl::Status ConvertToPHWC4Half(absl::Span<const float> in, const BHWC& shape,
-                                absl::Span<HalfBits> out) {
+abslx::Status ConvertToPHWC4Half(abslx::Span<const float> in, const BHWC& shape,
+                                abslx::Span<HalfBits> out) {
   RETURN_IF_ERROR(ValidateConvertToPHWC4(in, shape, out));
 
   // Layout is Pc,H,W,C4 where P - is a plane based on channels.
@@ -316,7 +316,7 @@ absl::Status ConvertToPHWC4Half(absl::Span<const float> in, const BHWC& shape,
   const int remaining_channels =
       shape.c - num_full_planes * kPhwc4ChannelsInPlane;
   if (remaining_channels == 0) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   for (int b = 0; b < shape.b; b++) {
@@ -357,18 +357,18 @@ absl::Status ConvertToPHWC4Half(absl::Span<const float> in, const BHWC& shape,
         }
         break;
       default:
-        return absl::UnimplementedError(
+        return abslx::UnimplementedError(
             "ConvertToPHWC4Half: Unsupported channels per planes count.");
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 std::vector<float> ConvertToPHWC4(
     const Tensor<BHWC, DataType::FLOAT32>& tensor) {
   std::vector<float> transposed(GetElementsSizeForPHWC4(tensor.shape));
   ConvertToPHWC4(tensor.data, tensor.shape,
-                 absl::MakeSpan(transposed.data(), transposed.size()))
+                 abslx::MakeSpan(transposed.data(), transposed.size()))
       .IgnoreError();
   // TODO(akulik): Maybe safer to return Status.
   return transposed;
@@ -380,7 +380,7 @@ std::vector<float> ConvertToPHWC4(
       BHWC(1, tensor.shape.h, tensor.shape.w, tensor.shape.c);
   std::vector<float> transposed(GetElementsSizeForPHWC4(batched_shape));
   ConvertToPHWC4(tensor.data, batched_shape,
-                 absl::MakeSpan(transposed.data(), transposed.size()))
+                 abslx::MakeSpan(transposed.data(), transposed.size()))
       .IgnoreError();
   // TODO(akulik): Maybe safer to return Status.
   return transposed;
@@ -391,28 +391,28 @@ uint32_t GetElementsSizeForPHWC4(const BHWC& shape) {
 }
 
 template <typename T>
-absl::Status ValidateConvertFromPHWC4(absl::Span<const T> in, const BHWC& shape,
-                                      absl::Span<float> out) {
+abslx::Status ValidateConvertFromPHWC4(abslx::Span<const T> in, const BHWC& shape,
+                                      abslx::Span<float> out) {
   if (in.size() != GetElementsSizeForPHWC4(shape)) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "ConvertFromPHWC4: Input data size does not match expected size: ",
         in.size(), " != ", GetElementsSizeForPHWC4(shape)));
   }
   if (out.size() != shape.DimensionsProduct()) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "ConvertFromPHWC4: Output data size does not match expected size: ",
         out.size(), " != ", shape.DimensionsProduct()));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConvertFromPHWC4(absl::Span<const float> in, const BHWC& shape,
-                              absl::Span<float> out) {
+abslx::Status ConvertFromPHWC4(abslx::Span<const float> in, const BHWC& shape,
+                              abslx::Span<float> out) {
   RETURN_IF_ERROR(ValidateConvertFromPHWC4(in, shape, out));
   if (shape.c == 4) {
     std::memcpy(out.data(), in.data(),
                 shape.DimensionsProduct() * sizeof(float));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   int num_planes = DivideRoundUp(shape.c, kPhwc4ChannelsInPlane);
@@ -437,7 +437,7 @@ absl::Status ConvertFromPHWC4(absl::Span<const float> in, const BHWC& shape,
   const int remaining_channels =
       shape.c - num_full_planes * kPhwc4ChannelsInPlane;
   if (remaining_channels == 0) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   for (int b = 0; b < shape.b; b++) {
     const float* src = in.data() + b * padded_size +
@@ -451,11 +451,11 @@ absl::Status ConvertFromPHWC4(absl::Span<const float> in, const BHWC& shape,
       dest += shape.c;
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConvertFromPHWC4Half(absl::Span<const HalfBits> in,
-                                  const BHWC& shape, absl::Span<float> out) {
+abslx::Status ConvertFromPHWC4Half(abslx::Span<const HalfBits> in,
+                                  const BHWC& shape, abslx::Span<float> out) {
   RETURN_IF_ERROR(ValidateConvertFromPHWC4(in, shape, out));
   int num_planes = DivideRoundUp(shape.c, kPhwc4ChannelsInPlane);
   const int num_pixels = shape.h * shape.w;
@@ -482,7 +482,7 @@ absl::Status ConvertFromPHWC4Half(absl::Span<const HalfBits> in,
   const int remaining_channels =
       shape.c - num_full_planes * kPhwc4ChannelsInPlane;
   if (remaining_channels == 0) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   for (int b = 0; b < shape.b; b++) {
     const HalfBits* src = in.data() + b * padded_size +
@@ -516,11 +516,11 @@ absl::Status ConvertFromPHWC4Half(absl::Span<const HalfBits> in,
         }
         break;
       default:
-        return absl::UnimplementedError(
+        return abslx::UnimplementedError(
             "ConvertToPHWC4Half: Unsupported channels per planes count.");
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

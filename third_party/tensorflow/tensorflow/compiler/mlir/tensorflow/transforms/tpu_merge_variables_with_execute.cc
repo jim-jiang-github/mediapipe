@@ -136,7 +136,7 @@ bool AddAccessedResourceIds(
       return true;
     }
     const auto& ids = resource_analysis_info.GetResourceUniqueIds(operand);
-    VLOG(2) << "  accesses following resources: " << absl::StrJoin(ids, ", ");
+    VLOG(2) << "  accesses following resources: " << abslx::StrJoin(ids, ", ");
     resource_ids.insert(ids.begin(), ids.end());
   }
   return false;

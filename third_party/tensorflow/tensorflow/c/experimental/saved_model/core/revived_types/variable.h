@@ -36,7 +36,7 @@ class Variable : public TensorHandleConvertible {
   // call "assign" to associate a value with the variable.
   static Status CreateUninitialized(
       ImmediateExecutionContext* ctx, DataType dtype, TensorShape shape,
-      absl::optional<std::string> name, const char* raw_device_name,
+      abslx::optional<std::string> name, const char* raw_device_name,
       const std::vector<std::string>& component_devices,
       std::unique_ptr<Variable>* output);
 
@@ -60,7 +60,7 @@ class Variable : public TensorHandleConvertible {
 
  private:
   Variable(ImmediateExecutionContext* ctx, DataType dtype, TensorShape shape,
-           absl::optional<std::string> name, ImmediateTensorHandlePtr handle);
+           abslx::optional<std::string> name, ImmediateTensorHandlePtr handle);
   Variable(const Variable& variable) = delete;
   Variable& operator=(const Variable&) = delete;
 

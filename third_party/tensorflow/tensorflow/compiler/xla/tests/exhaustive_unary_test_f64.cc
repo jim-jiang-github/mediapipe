@@ -43,7 +43,7 @@ class ExhaustiveF64UnaryTest : public ExhaustiveUnaryTest<F64>,
     int64_t input_size = (*input_literal)[0].element_count();
     LOG(INFO) << "Checking fp values " << fp_values.ToString() << ", "
               << input_size;
-    absl::Span<double> input_arr = (*input_literal)[0].data<double>();
+    abslx::Span<double> input_arr = (*input_literal)[0].data<double>();
 
     uint64_t i = 0;
     for (auto bits : fp_values) {

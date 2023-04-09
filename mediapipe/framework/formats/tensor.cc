@@ -119,7 +119,7 @@ MtlBufferView MtlBufferView::GetReadView(const Tensor& tensor,
          !(tensor.valid_ & (Tensor::kValidCpu | Tensor::kValidMetalBuffer)))
       << "Tensor conversion between different GPU resources is not supported "
          "yet.";
-  auto lock(absl::make_unique<absl::MutexLock>(&tensor.view_mutex_));
+  auto lock(abslx::make_unique<abslx::MutexLock>(&tensor.view_mutex_));
   tensor.valid_ |= Tensor::kValidMetalBuffer;
   AllocateMtlBuffer(tensor, [command_buffer device]);
   return {tensor.mtl_resources_->metal_buffer, std::move(lock)};
@@ -135,7 +135,7 @@ MtlBufferView MtlBufferView::GetWriteView(const Tensor& tensor,
 
 MtlBufferView MtlBufferView::GetWriteView(const Tensor& tensor,
                                           id<MTLDevice> device) {
-  auto lock(absl::make_unique<absl::MutexLock>(&tensor.view_mutex_));
+  auto lock(abslx::make_unique<abslx::MutexLock>(&tensor.view_mutex_));
   tensor.valid_ = Tensor::kValidMetalBuffer;
   AllocateMtlBuffer(tensor, device);
   return {tensor.mtl_resources_->metal_buffer, std::move(lock)};
@@ -166,12 +166,12 @@ Tensor::OpenGlTexture2dView Tensor::GetOpenGlTexture2dReadView() const {
   LOG_IF(FATAL, !(valid_ & (kValidCpu | kValidOpenGlTexture2d)))
       << "Tensor conversion between different GPU resources is not supported "
          "yet.";
-  auto lock = absl::make_unique<absl::MutexLock>(&view_mutex_);
+  auto lock = abslx::make_unique<abslx::MutexLock>(&view_mutex_);
   AllocateOpenGlTexture2d();
   if (!(valid_ & kValidOpenGlTexture2d)) {
     const int padded_size =
         texture_height_ * texture_width_ * 4 * element_size();
-    auto temp_buffer = absl::make_unique<uint8_t[]>(padded_size);
+    auto temp_buffer = abslx::make_unique<uint8_t[]>(padded_size);
     uint8_t* dest_buffer = temp_buffer.get();
     uint8_t* src_buffer = reinterpret_cast<uint8_t*>(cpu_buffer_);
     const int num_elements = BhwcWidthFromShape(shape_) *
@@ -215,7 +215,7 @@ Tensor::OpenGlTexture2dView Tensor::GetOpenGlTexture2dReadView() const {
 }
 
 Tensor::OpenGlTexture2dView Tensor::GetOpenGlTexture2dWriteView() const {
-  auto lock = absl::make_unique<absl::MutexLock>(&view_mutex_);
+  auto lock = abslx::make_unique<abslx::MutexLock>(&view_mutex_);
   AllocateOpenGlTexture2d();
 #ifdef __EMSCRIPTEN__
   // On web, we may have to change type from float to half-float
@@ -336,7 +336,7 @@ Tensor::OpenGlBufferView Tensor::GetOpenGlBufferReadView() const {
 #endif  // MEDIAPIPE_TENSOR_USE_AHWB
                             kValidOpenGlBuffer)))
       << "Tensor conversion between different GPU resources is not supported.";
-  auto lock(absl::make_unique<absl::MutexLock>(&view_mutex_));
+  auto lock(abslx::make_unique<abslx::MutexLock>(&view_mutex_));
   AllocateOpenGlBuffer();
   if (!(valid_ & kValidOpenGlBuffer)) {
     // If the call succeeds then AHWB -> SSBO are synchronized so any usage of
@@ -363,7 +363,7 @@ Tensor::OpenGlBufferView Tensor::GetOpenGlBufferReadView() const {
 
 Tensor::OpenGlBufferView Tensor::GetOpenGlBufferWriteView(
     uint64_t source_location_hash) const {
-  auto lock(absl::make_unique<absl::MutexLock>(&view_mutex_));
+  auto lock(abslx::make_unique<abslx::MutexLock>(&view_mutex_));
   TrackAhwbUsage(source_location_hash);
   AllocateOpenGlBuffer();
   valid_ = kValidOpenGlBuffer;
@@ -440,7 +440,7 @@ void Tensor::Invalidate() {
   GLuint cleanup_gl_fb = GL_INVALID_INDEX;
 #endif  // MEDIAPIPE_OPENGL_ES_VERSION >= MEDIAPIPE_OPENGL_ES_30
   {
-    absl::MutexLock lock(&view_mutex_);
+    abslx::MutexLock lock(&view_mutex_);
     // If memory is allocated and not owned by the metal buffer.
     // TODO: Re-design cpu buffer memory management.
     if (cpu_buffer_ && !mtl_resources_->metal_buffer) {
@@ -483,7 +483,7 @@ void Tensor::Invalidate() {
 #endif  // MEDIAPIPE_OPENGL_ES_VERSION >= MEDIAPIPE_OPENGL_ES_31
 #endif  // MEDIAPIPE_OPENGL_ES_VERSION >= MEDIAPIPE_OPENGL_ES_30
   {
-    absl::MutexLock lock(&view_mutex_);
+    abslx::MutexLock lock(&view_mutex_);
     ReleaseAhwbStuff();
 
     // Don't need to wait for the resource to be deleted bacause if will be
@@ -525,7 +525,7 @@ void Tensor::Invalidate() {
 #endif  // MEDIAPIPE_METAL_ENABLED
 
 Tensor::CpuReadView Tensor::GetCpuReadView() const {
-  auto lock = absl::make_unique<absl::MutexLock>(&view_mutex_);
+  auto lock = abslx::make_unique<abslx::MutexLock>(&view_mutex_);
   LOG_IF(FATAL, valid_ == kValidNone)
       << "Tensor must be written prior to read from.";
 #ifdef MEDIAPIPE_TENSOR_USE_AHWB
@@ -576,7 +576,7 @@ Tensor::CpuReadView Tensor::GetCpuReadView() const {
         gl_context_->Run([this]() {
           const int padded_size =
               texture_height_ * texture_width_ * 4 * element_size();
-          auto temp_buffer = absl::make_unique<uint8_t[]>(padded_size);
+          auto temp_buffer = abslx::make_unique<uint8_t[]>(padded_size);
           uint8_t* buffer = temp_buffer.get();
 
           glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer_);
@@ -609,7 +609,7 @@ Tensor::CpuReadView Tensor::GetCpuReadView() const {
 
 Tensor::CpuWriteView Tensor::GetCpuWriteView(
     uint64_t source_location_hash) const {
-  auto lock = absl::make_unique<absl::MutexLock>(&view_mutex_);
+  auto lock = abslx::make_unique<abslx::MutexLock>(&view_mutex_);
   TrackAhwbUsage(source_location_hash);
   AllocateCpuBuffer();
   valid_ = kValidCpu;

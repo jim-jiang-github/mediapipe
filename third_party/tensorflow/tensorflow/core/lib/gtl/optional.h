@@ -21,11 +21,11 @@ limitations under the License.
 namespace tensorflow {
 namespace gtl {
 
-// Deprecated: please use absl::optional directly.
-using absl::make_optional;
-using absl::nullopt;
+// Deprecated: please use abslx::optional directly.
+using abslx::make_optional;
+using abslx::nullopt;
 template <typename T>
-using optional = absl::optional<T>;
+using optional = abslx::optional<T>;
 
 }  // namespace gtl
 }  // namespace tensorflow

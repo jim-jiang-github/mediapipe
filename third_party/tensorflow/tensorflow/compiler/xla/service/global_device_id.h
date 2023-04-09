@@ -31,7 +31,7 @@ namespace xla {
 TF_LIB_GTL_DEFINE_INT_TYPE(GlobalDeviceId, int64_t);
 
 // Returns a comma-separated string of global device IDs.
-std::string GlobalDeviceIdsToString(absl::Span<GlobalDeviceId const> ids);
+std::string GlobalDeviceIdsToString(abslx::Span<GlobalDeviceId const> ids);
 
 }  // namespace xla
 

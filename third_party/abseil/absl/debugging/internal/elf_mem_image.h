@@ -40,7 +40,7 @@
 
 #include <link.h>  // for ElfW
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace debugging_internal {
 
@@ -127,7 +127,7 @@ class ElfMemImage {
 
 }  // namespace debugging_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_HAVE_ELF_MEM_IMAGE
 

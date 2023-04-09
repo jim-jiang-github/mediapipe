@@ -284,7 +284,7 @@ std::vector<ValueType> QResampleSignal(float input_sample_rate,
                                        float output_sample_rate,
                                        int num_channels,
                                        const QResamplerParams& params,
-                                       absl::Span<const ValueType> input) {
+                                       abslx::Span<const ValueType> input) {
   CHECK_GE(num_channels, 1);
   CHECK_EQ(static_cast<int>(input.size()) % num_channels, 0);
   const int num_input_frames = input.size() / num_channels;
@@ -297,7 +297,7 @@ std::vector<ValueType> QResampleSignal(float input_sample_rate,
       num_channels * resampler.NextNumOutputFrames(num_input_frames +
                                                    resampler.flush_frames());
   std::vector<ValueType> output(total_output_size);
-  absl::Span<ValueType> output_span(absl::MakeSpan(output));
+  abslx::Span<ValueType> output_span(abslx::MakeSpan(output));
 
   // Get how many samples ProcessSamples() will produce.
   const int process_output_size =
@@ -362,7 +362,7 @@ class QResampler
   // See the top level comment in this file for examples of how to use it.
   // ProcessSamples accepts the following types of args:
   //  * std::vector
-  //  * absl::Span
+  //  * abslx::Span
   //  * Eigen::Array, Matrix, Vector, and RowVector
   //  * Eigen block expressions like `x.head(n)` and `x.leftCols(n)`
   //  * (only as input) Eigen "nullaryop" expressions Zero, Ones, and Random
@@ -372,11 +372,11 @@ class QResampler
   // the size must match. Use NextNumOutputFrames() to get the correct size.
   //
   // When used for the output, std::vector and Eigen::Array, Matrix, Vector, and
-  // RowVector must be passed by pointer. On the other hand, absl::Span and
+  // RowVector must be passed by pointer. On the other hand, abslx::Span and
   // Eigen block expressions must be passed by value.
   //
   // For num_channels > 1, multichannel data is represented in std::vector and
-  // absl::Span with interleaved order, e.g. L0, R0, L1, R1, L2, R2, ... for
+  // abslx::Span with interleaved order, e.g. L0, R0, L1, R1, L2, R2, ... for
   // stereo data. Or with Eigen, the Eigen object has num_channels rows, so that
   // the ith row represents the ith channel. As an optimization, if you know the
   // number of channels at compile time, use Eigen types with a fixed number
@@ -521,7 +521,7 @@ class QResampler
 
   bool ValidImpl() const override { return valid_; }
 
-  void ProcessSamplesImpl(absl::Span<const ValueType> input,
+  void ProcessSamplesImpl(abslx::Span<const ValueType> input,
                           std::vector<ValueType>* output) override {
     ProcessSamplesCommon(WrapContainer(input), WrapContainer(*output));
   }
@@ -666,7 +666,7 @@ namespace qresampler_internal {
 // definition of ProcessSamplesGeneric().
 template <typename ValueTypeOrImpl, typename>
 struct UnpackTemplateArg {
-  using ValueType = typename absl::decay_t<ValueTypeOrImpl>;
+  using ValueType = typename abslx::decay_t<ValueTypeOrImpl>;
   using CoeffType = typename RealType<ValueType>::Type;
 
   // Resampling implementation.
@@ -800,7 +800,7 @@ struct UnpackTemplateArg {
 
 template <typename ValueTypeOrImpl>
 struct UnpackTemplateArg<
-    ValueTypeOrImpl, typename absl::void_t<typename ValueTypeOrImpl::ValueType>>
+    ValueTypeOrImpl, typename abslx::void_t<typename ValueTypeOrImpl::ValueType>>
     : public ValueTypeOrImpl {};
 
 template <typename CoeffType /* either float or double */>

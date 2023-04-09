@@ -317,8 +317,8 @@ TEST(CUSTOM_DEVICE, InputBasedPlacement) {
   num_retvals = 1;
   TFE_Execute(matmul.get(), &retval, &num_retvals, status.get());
   ASSERT_NE(TF_OK, TF_GetCode(status.get()));
-  ASSERT_TRUE(absl::StrContains(TF_Message(status.get()), custom0));
-  ASSERT_TRUE(absl::StrContains(TF_Message(status.get()), custom1));
+  ASSERT_TRUE(abslx::StrContains(TF_Message(status.get()), custom0));
+  ASSERT_TRUE(abslx::StrContains(TF_Message(status.get()), custom1));
 
   // Custom device: mix of custom/physical places the op on the custom device.
   matmul.reset(MatMulOp(context.get(), hcustom0.get(), hcpu.get()));

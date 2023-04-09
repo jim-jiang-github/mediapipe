@@ -28,7 +28,7 @@ namespace {
 
 Status CreatePoolFromSet(const protobuf::FileDescriptorSet& set,
                          std::unique_ptr<protobuf::DescriptorPool>* out_pool) {
-  *out_pool = absl::make_unique<protobuf::DescriptorPool>();
+  *out_pool = abslx::make_unique<protobuf::DescriptorPool>();
   for (const auto& file : set.file()) {
     if ((*out_pool)->BuildFile(file) == nullptr) {
       return errors::InvalidArgument("Failed to load FileDescriptorProto: ",
@@ -67,16 +67,16 @@ Status GetDescriptorPoolFromFile(
 Status GetDescriptorPoolFromBinary(
     const string& source,
     std::unique_ptr<protobuf::DescriptorPool>* owned_desc_pool) {
-  if (!absl::StartsWith(source, "bytes://")) {
-    return errors::InvalidArgument(absl::StrCat(
+  if (!abslx::StartsWith(source, "bytes://")) {
+    return errors::InvalidArgument(abslx::StrCat(
         "Source does not represent serialized file descriptor set proto. ",
         "This may be due to a missing dependency on the file containing ",
         "REGISTER_DESCRIPTOR_POOL(\"", source, "\", ...);"));
   }
   // Parse the FileDescriptorSet.
   protobuf::FileDescriptorSet proto;
-  if (!proto.ParseFromString(string(absl::StripPrefix(source, "bytes://")))) {
-    return errors::InvalidArgument(absl::StrCat(
+  if (!proto.ParseFromString(string(abslx::StripPrefix(source, "bytes://")))) {
+    return errors::InvalidArgument(abslx::StrCat(
         "Source does not represent serialized file descriptor set proto. ",
         "This may be due to a missing dependency on the file containing ",
         "REGISTER_DESCRIPTOR_POOL(\"", source, "\", ...);"));

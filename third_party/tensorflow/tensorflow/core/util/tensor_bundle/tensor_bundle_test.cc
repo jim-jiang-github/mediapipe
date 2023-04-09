@@ -527,7 +527,7 @@ void VersionTest(const VersionDef& version, StringPiece expected_error) {
   BundleReader reader(Env::Default(), path);
   EXPECT_TRUE(errors::IsInvalidArgument(reader.status()));
   EXPECT_TRUE(
-      absl::StartsWith(reader.status().error_message(), expected_error));
+      abslx::StartsWith(reader.status().error_message(), expected_error));
 }
 
 }  // namespace
@@ -951,7 +951,7 @@ TEST(TensorBundleTest, Error) {
     BundleWriter writer(Env::Default(), Prefix("dup"));
     TF_EXPECT_OK(writer.Add("foo", Constant_2x3(1.f)));
     EXPECT_FALSE(writer.Add("foo", Constant_2x3(2.f)).ok());
-    EXPECT_TRUE(absl::StrContains(writer.status().ToString(), "duplicate key"));
+    EXPECT_TRUE(abslx::StrContains(writer.status().ToString(), "duplicate key"));
     EXPECT_FALSE(writer.Finish().ok());
   }
   {  // Double finish
@@ -992,7 +992,7 @@ TEST(TensorBundleTest, Checksum) {
     BundleReader reader(Env::Default(), Prefix(prefix));
     Status status = reader.Lookup(key, &val);
     EXPECT_TRUE(errors::IsDataLoss(status));
-    EXPECT_TRUE(absl::StrContains(status.ToString(), expected_msg));
+    EXPECT_TRUE(abslx::StrContains(status.ToString(), expected_msg));
   };
 
   // Corrupts a float tensor.

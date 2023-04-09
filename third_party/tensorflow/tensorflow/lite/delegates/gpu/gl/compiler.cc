@@ -106,7 +106,7 @@ class CompilerImpl : public Compiler {
     }
   }
 
-  absl::Status Compile(
+  abslx::Status Compile(
       const GraphFloat32& graph,
       const std::unordered_set<int>& tflite_graph_io,  // NOLINT
       const ShaderCodeCallback& callback) final {
@@ -144,26 +144,26 @@ class CompilerImpl : public Compiler {
     if (options_.fuse_operations) {
       FuseAutoOutputWithInline fuse_inline;
       if (!transformer.Apply("fuse_auto_with_inline", &fuse_inline)) {
-        return absl::InternalError("fuse_auto_with_inline failed");
+        return abslx::InternalError("fuse_auto_with_inline failed");
       }
       FuseInplaceUpdate fuse_inplace;
       if (!transformer.Apply("fuse_inplace_update", &fuse_inplace)) {
-        return absl::InternalError("fuse_inplace failed");
+        return abslx::InternalError("fuse_inplace failed");
       }
       if (options_.auto_input_fusion) {
         FuseAutoInput fuse_auto_input;
         if (!transformer.Apply("fuse_auto_input", &fuse_auto_input)) {
-          return absl::InternalError("fuse_auto_input failed");
+          return abslx::InternalError("fuse_auto_input failed");
         }
       }
     }
     RemoveUnusedInplaceUpdates remove_inplace_updates;
     if (!transformer.Apply("remove_inplace_updates", &remove_inplace_updates)) {
-      return absl::InternalError("remove_inplace_updates failed");
+      return abslx::InternalError("remove_inplace_updates failed");
     }
 
     // Prepare internal objects.
-    absl::flat_hash_map<ValueId, Object> objects;
+    abslx::flat_hash_map<ValueId, Object> objects;
     for (auto value : compiled_graph_.values()) {
       Object object = MakePHWC4Ref(value->id, value->tensor.shape);
       object.data_type = value->tensor.type;
@@ -191,7 +191,7 @@ class CompilerImpl : public Compiler {
         auto shape = outputs[0]->tensor.shape;
         for (auto output : outputs) {
           if (shape != output->tensor.shape) {
-            return absl::FailedPreconditionError(
+            return abslx::FailedPreconditionError(
                 "Workload uint3() requires all output sizes to match");
           }
         }
@@ -287,7 +287,7 @@ class CompilerImpl : public Compiler {
       RETURN_IF_ERROR(codegen.Build(std::move(attr), &shader_code));
       RETURN_IF_ERROR(callback(std::move(shader_code)));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

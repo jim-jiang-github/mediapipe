@@ -47,12 +47,12 @@ namespace impl {
 class TaggedValue;
 class Tuple;
 template <class T>
-// TODO(ccrusius): Use absl::Hash specializations instead.
+// TODO(ccrusius): Use abslx::Hash specializations instead.
 class TaggedValueHash;
 using List = std::vector<TaggedValue>;
 using ListPtr = std::shared_ptr<List>;
 using Dict =
-    absl::flat_hash_map<TaggedValue, TaggedValue, TaggedValueHash<TaggedValue>>;
+    abslx::flat_hash_map<TaggedValue, TaggedValue, TaggedValueHash<TaggedValue>>;
 using DictPtr = std::shared_ptr<Dict>;
 using TuplePtr = std::shared_ptr<Tuple>;
 using Func =
@@ -65,7 +65,7 @@ using TaggedValueTensor =
 
 // Declare hash types so they can be instantiated below.
 
-/// @brief TaggedValue hashing infrastructure, which uses absl::hash.
+/// @brief TaggedValue hashing infrastructure, which uses abslx::hash.
 ///
 /// Hashable TaggedValues overload `AbslHashValue`. Non-hashable structures
 /// return 0.
@@ -433,7 +433,7 @@ class TaggedValue final {
 
   // we use an explicit union here because we want to avoid C++17's
   // variant structures due to c++14 compatibility requirements.
-  // TODO(b/183980966): Compare against absl::variant.
+  // TODO(b/183980966): Compare against abslx::variant.
   union Data {
     explicit Data() {}
     explicit Data(Float32 f32) : f32(f32) {}
@@ -577,7 +577,7 @@ class TaggedValueHashVisitor {
   }
   template <class T>
   size_t operator()(const T& t) {
-    return absl::Hash<T>()(t);
+    return abslx::Hash<T>()(t);
   }
 };
 

@@ -88,7 +88,7 @@ class ConvGeneric : public GPUOperation {
       TuningType tuning_type, const GpuInfo& gpu_info,
       const KernelInfo& kernel_info,
       std::vector<int3>* work_groups) const override;
-  absl::Status BindArguments(ArgumentsBinder* args) override;
+  abslx::Status BindArguments(ArgumentsBinder* args) override;
   int3 GetGridSize() const override;
 
   WeightsDescription GetWeightsDescription() const {
@@ -266,7 +266,7 @@ void ConvGeneric::UploadWeights(const tflite::gpu::Tensor<OHWI, T>& weights) {
       GetTotalElementsCountForLayout(weights_desc, weights.shape);
 
   std::vector<uint8_t> weights_data(flt_count * SizeOf(weights_desc.type));
-  RearrangeWeights(weights, weights_desc, absl::MakeSpan(weights_data));
+  RearrangeWeights(weights, weights_desc, abslx::MakeSpan(weights_data));
 
   if (conv_params_.AreWeightsBuffer()) {
     BufferDescriptor desc;
@@ -303,7 +303,7 @@ void ConvGeneric::UploadWeights(const tflite::gpu::Tensor<OHWDI, T>& weights) {
       GetTotalElementsCountForLayout(weights_desc, weights.shape);
 
   std::vector<uint8_t> weights_data(flt_count * SizeOf(weights_desc.type));
-  RearrangeWeights(weights, weights_desc, absl::MakeSpan(weights_data));
+  RearrangeWeights(weights, weights_desc, abslx::MakeSpan(weights_data));
 
   if (conv_params_.AreWeightsBuffer()) {
     BufferDescriptor desc;

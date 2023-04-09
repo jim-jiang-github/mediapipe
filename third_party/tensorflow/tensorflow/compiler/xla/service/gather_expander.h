@@ -45,7 +45,7 @@ class GatherExpander : public OpExpanderPass {
 
   explicit GatherExpander(Mode m) : mode_(m) {}
 
-  absl::string_view name() const override { return "gather_expander"; }
+  abslx::string_view name() const override { return "gather_expander"; }
 
  protected:
   bool InstructionMatchesPattern(HloInstruction* instruction) override;

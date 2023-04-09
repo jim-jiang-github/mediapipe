@@ -22,14 +22,14 @@
 #include "absl/synchronization/mutex.h"
 #include "absl/types/span.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 
 constexpr int CordzInfo::kMaxStackDepth;
 
 ABSL_CONST_INIT std::atomic<CordzInfo*> CordzInfo::ci_head_{nullptr};
-ABSL_CONST_INIT absl::Mutex CordzInfo::ci_mutex_(absl::kConstInit);
+ABSL_CONST_INIT abslx::Mutex CordzInfo::ci_mutex_(abslx::kConstInit);
 
 CordzInfo* CordzInfo::Head(const CordzSnapshot& snapshot) {
   ABSL_ASSERT(snapshot.is_snapshot());
@@ -68,10 +68,10 @@ void CordzInfo::UntrackCord(CordzInfo* cordz_info) {
 
 CordzInfo::CordzInfo(CordRep* rep)
     : rep_(rep),
-      stack_depth_(absl::GetStackTrace(stack_, /*max_depth=*/kMaxStackDepth,
+      stack_depth_(abslx::GetStackTrace(stack_, /*max_depth=*/kMaxStackDepth,
                                        /*skip_count=*/1)),
       parent_stack_depth_(0),
-      create_time_(absl::Now()) {}
+      create_time_(abslx::Now()) {}
 
 CordzInfo::~CordzInfo() {
   // `rep_` is potentially kept alive if CordzInfo is included
@@ -82,7 +82,7 @@ CordzInfo::~CordzInfo() {
 }
 
 void CordzInfo::Track() {
-  absl::MutexLock l(&ci_mutex_);
+  abslx::MutexLock l(&ci_mutex_);
 
   CordzInfo* const head = ci_head_.load(std::memory_order_acquire);
   if (head != nullptr) {
@@ -96,11 +96,11 @@ void CordzInfo::Untrack() {
   {
     // TODO(b/117940323): change this to assuming ownership instead once all
     // Cord logic is properly keeping `rep_` in sync with the Cord root rep.
-    absl::MutexLock lock(&mutex());
+    abslx::MutexLock lock(&mutex());
     rep_ = nullptr;
   }
 
-  absl::MutexLock l(&ci_mutex_);
+  abslx::MutexLock l(&ci_mutex_);
 
   CordzInfo* const head = ci_head_.load(std::memory_order_acquire);
   CordzInfo* const next = ci_next_.load(std::memory_order_acquire);
@@ -125,14 +125,14 @@ void CordzInfo::SetCordRep(CordRep* rep) {
   rep_ = rep;
 }
 
-absl::Span<void* const> CordzInfo::GetStack() const {
-  return absl::MakeConstSpan(stack_, stack_depth_);
+abslx::Span<void* const> CordzInfo::GetStack() const {
+  return abslx::MakeConstSpan(stack_, stack_depth_);
 }
 
-absl::Span<void* const> CordzInfo::GetParentStack() const {
-  return absl::MakeConstSpan(parent_stack_, parent_stack_depth_);
+abslx::Span<void* const> CordzInfo::GetParentStack() const {
+  return abslx::MakeConstSpan(parent_stack_, parent_stack_depth_);
 }
 
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

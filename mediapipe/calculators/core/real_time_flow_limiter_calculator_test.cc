@@ -130,25 +130,25 @@ TEST(RealTimeFlowLimiterCalculator, BasicTest) {
 }
 
 // A Calculator::Process callback function.
-typedef std::function<absl::Status(const InputStreamShardSet&,
+typedef std::function<abslx::Status(const InputStreamShardSet&,
                                    OutputStreamShardSet*)>
     ProcessFunction;
 
 // A testing callback function that passes through all packets.
-absl::Status PassthroughFunction(const InputStreamShardSet& inputs,
+abslx::Status PassthroughFunction(const InputStreamShardSet& inputs,
                                  OutputStreamShardSet* outputs) {
   for (int i = 0; i < inputs.NumEntries(); ++i) {
     if (!inputs.Index(i).Value().IsEmpty()) {
       outputs->Index(i).AddPacket(inputs.Index(i).Value());
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // A Calculator that runs a testing callback function in Close.
 class CloseCallbackCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     for (CollectionItemId id = cc->Inputs().BeginId();
          id < cc->Inputs().EndId(); ++id) {
       cc->Inputs().Get(id).SetAny();
@@ -157,17 +157,17 @@ class CloseCallbackCalculator : public CalculatorBase {
          id < cc->Outputs().EndId(); ++id) {
       cc->Outputs().Get(id).SetAny();
     }
-    cc->InputSidePackets().Index(0).Set<std::function<absl::Status()>>();
-    return absl::OkStatus();
+    cc->InputSidePackets().Index(0).Set<std::function<abslx::Status()>>();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     return PassthroughFunction(cc->Inputs(), &(cc->Outputs()));
   }
 
-  absl::Status Close(CalculatorContext* cc) override {
+  abslx::Status Close(CalculatorContext* cc) override {
     const auto& callback =
-        cc->InputSidePackets().Index(0).Get<std::function<absl::Status()>>();
+        cc->InputSidePackets().Index(0).Get<std::function<abslx::Status()>>();
     return callback();
   }
 };
@@ -198,9 +198,9 @@ class RealTimeFlowLimiterCalculatorTest : public testing::Test {
       exit_semaphore_.Acquire(1);
       return PassthroughFunction(inputs, outputs);
     };
-    std::function<absl::Status()> close_func = [this]() {
+    std::function<abslx::Status()> close_func = [this]() {
       close_count_++;
-      return absl::OkStatus();
+      return abslx::OkStatus();
     };
     MP_ASSERT_OK(graph_.Initialize(
         graph_config_, {

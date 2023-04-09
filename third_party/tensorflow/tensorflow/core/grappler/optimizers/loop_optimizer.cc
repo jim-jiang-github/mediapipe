@@ -471,7 +471,7 @@ std::vector<int> GetStackPushNodesToConvert(
                TraversalDirection::kFollowOutputs,
                DfsPredicates::Advance(is_op_to_traverse),
                DfsCallbacks::PreOrder([&](const NodeDef* node) {
-                 const absl::optional<int> idx = graph_view.GetNodeIndex(*node);
+                 const abslx::optional<int> idx = graph_view.GetNodeIndex(*node);
                  fanouts.push_back(idx.value());
                }));
 
@@ -586,7 +586,7 @@ Status EvaluateBoolOpForConstantOperands(const NodeDef& op_node,
 
 // TODO(lyandy): Consolidate with ConstantFolding implementation.
 bool IsReallyConstant(const NodeDef& node,
-                      const absl::flat_hash_set<string>& feed_nodes) {
+                      const abslx::flat_hash_set<string>& feed_nodes) {
   if (!IsConstant(node)) {
     return false;
   }
@@ -596,7 +596,7 @@ bool IsReallyConstant(const NodeDef& node,
 
 Status CheckForDeadFanout(const MutableGraphView& view,
                           const NodeDef& switch_node, const NodeMap& node_map,
-                          const absl::flat_hash_set<string>& feed_nodes,
+                          const abslx::flat_hash_set<string>& feed_nodes,
                           DeviceBase* cpu_device, ResourceMgr* resource_mgr,
                           bool* has_dead_fanout, int* dead_fanout) {
   *has_dead_fanout = false;
@@ -747,7 +747,7 @@ Status LoopOptimizer::Optimize(Cluster* cluster, const GrapplerItem& item,
   }
   if (options_.enable_dead_branch_removal) {
     NodeMap node_map(optimized_graph);
-    absl::flat_hash_set<string> feed_nodes;
+    abslx::flat_hash_set<string> feed_nodes;
     for (const auto& feed : item.feed) {
       feed_nodes.insert(NodeName(feed.first));
     }
@@ -760,10 +760,10 @@ Status LoopOptimizer::Optimize(Cluster* cluster, const GrapplerItem& item,
 
 Status LoopOptimizer::RemoveDeadBranches(
     const std::unordered_set<string>& nodes_to_preserve, NodeMap& node_map,
-    const absl::flat_hash_set<string>& feed_nodes, GraphDef* optimized_graph) {
+    const abslx::flat_hash_set<string>& feed_nodes, GraphDef* optimized_graph) {
   std::unordered_set<const NodeDef*> dead_nodes;
   std::unordered_map<NodeDef*, std::set<int>> dead_merge_inputs;
-  absl::flat_hash_set<GraphView::OutputPort> identity_switches;
+  abslx::flat_hash_set<GraphView::OutputPort> identity_switches;
 
   MutableGraphView view(optimized_graph);
   for (const NodeDef& node : optimized_graph->node()) {
@@ -787,7 +787,7 @@ Status LoopOptimizer::RemoveDeadBranches(
     }
     GraphView::OutputPort dead(&node, dead_fanout);
 
-    SetVector<MutableGraphView::InputPort, absl::Hash<MutableGraphView::Port>>
+    SetVector<MutableGraphView::InputPort, abslx::Hash<MutableGraphView::Port>>
         zombie_inputs;
     for (const MutableGraphView::InputPort& port : view.GetFanout(dead)) {
       if (dead_nodes.find(port.node) == dead_nodes.end()) {
@@ -823,7 +823,7 @@ Status LoopOptimizer::RemoveDeadBranches(
           break;
         }
         MutableGraphView::OutputPort value_index(dead.node, 1);
-        const absl::flat_hash_set<MutableGraphView::InputPort>& index_fanout =
+        const abslx::flat_hash_set<MutableGraphView::InputPort>& index_fanout =
             view.GetFanout(value_index);
         if (!index_fanout.empty()) {
           // The 2nd output (that indicates which input is propagated) is
@@ -887,7 +887,7 @@ Status LoopOptimizer::RemoveDeadBranches(
   }
 
   // Names of the nodes that were removed from the graph.
-  absl::flat_hash_set<absl::string_view> dead_node_names;
+  abslx::flat_hash_set<abslx::string_view> dead_node_names;
   dead_node_names.reserve(dead_nodes.size());
   for (const NodeDef* dead_node : dead_nodes) {
     dead_node_names.insert(dead_node->name());

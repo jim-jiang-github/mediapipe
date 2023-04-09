@@ -21,7 +21,7 @@
 
 #include "absl/strings/internal/memutil.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace {
 
@@ -501,4 +501,4 @@ template ParsedFloat ParseFloat<16>(const char* begin, const char* end,
 
 }  // namespace strings_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

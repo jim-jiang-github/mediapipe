@@ -28,18 +28,18 @@ const auto SetVLOGLevel = google::SetVLOGLevel;
 class LogEntry {
  public:
   LogEntry(LogSeverity severity, const struct ::tm* tm_time,
-           absl::string_view message)
+           abslx::string_view message)
       : severity_(severity),
-        timestamp_(absl::FromTM(*tm_time, absl::LocalTimeZone())),
+        timestamp_(abslx::FromTM(*tm_time, abslx::LocalTimeZone())),
         text_message_(message) {}
   LogSeverity log_severity() const { return severity_; }
-  absl::Time timestamp() const { return timestamp_; }
-  absl::string_view text_message() const { return text_message_; }
+  abslx::Time timestamp() const { return timestamp_; }
+  abslx::string_view text_message() const { return text_message_; }
 
  private:
   LogSeverity severity_;
-  absl::Time timestamp_;
-  absl::string_view text_message_;
+  abslx::Time timestamp_;
+  abslx::string_view text_message_;
 };
 class LogSink : public google::LogSink {
  public:
@@ -53,7 +53,7 @@ class LogSink : public google::LogSink {
                     const struct ::tm* tm_time, const char* message,
                     size_t message_len) {
     LogEntry log_entry(severity, tm_time,
-                       absl::string_view(message, message_len));
+                       abslx::string_view(message, message_len));
     Send(log_entry);
   }
 };

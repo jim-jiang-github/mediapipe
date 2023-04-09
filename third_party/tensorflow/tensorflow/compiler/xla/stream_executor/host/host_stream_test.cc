@@ -30,12 +30,12 @@ TEST(HostStream, EnforcesFIFOOrder) {
   se::Stream stream(executor);
   stream.Init();
 
-  absl::Mutex mu;
+  abslx::Mutex mu;
   int expected = 0;
   bool ok = true;
   for (int i = 0; i < 2000; ++i) {
     stream.ThenDoHostCallback([i, &mu, &expected, &ok]() {
-      absl::MutexLock lock(&mu);
+      abslx::MutexLock lock(&mu);
       if (expected != i) {
         ok = false;
       }
@@ -43,7 +43,7 @@ TEST(HostStream, EnforcesFIFOOrder) {
     });
   }
   TF_ASSERT_OK(stream.BlockHostUntilDone());
-  absl::MutexLock lock(&mu);
+  abslx::MutexLock lock(&mu);
   EXPECT_TRUE(ok);
 }
 

@@ -47,7 +47,7 @@ LocalDeviceState::LocalDeviceState(se::StreamExecutor* executor,
   host_to_device_stream_->Init();
   if (use_callback_stream) {
     callback_stream_map_ =
-        absl::flat_hash_map<se::Stream*, std::unique_ptr<se::Stream>>();
+        abslx::flat_hash_map<se::Stream*, std::unique_ptr<se::Stream>>();
   }
   device_to_host_streams_.reserve(kNumDeviceToHostStreams);
   for (int i = 0; i < kNumDeviceToHostStreams; ++i) {
@@ -112,7 +112,7 @@ void LocalDeviceState::ThenExecuteCallback(se::Stream* stream,
   tensorflow::profiler::TraceMe traceme("ThenExecuteCallback");
   if (callback_stream_map_.has_value()) {
     // Prevent concurrent updates to the callback stream map.
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     auto callback_stream = callback_stream_map_->find(stream);
     if (callback_stream == callback_stream_map_->end()) {
       auto new_stream = std::make_unique<se::Stream>(executor_);
@@ -129,7 +129,7 @@ void LocalDeviceState::ThenExecuteCallback(se::Stream* stream,
 }
 
 se::Stream* LocalDeviceState::GetDeviceToHostStream() {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   int i = next_device_to_host_stream_;
   next_device_to_host_stream_ =
       (next_device_to_host_stream_ + 1) % device_to_host_streams_.size();
@@ -137,7 +137,7 @@ se::Stream* LocalDeviceState::GetDeviceToHostStream() {
 }
 
 se::Stream* LocalDeviceState::GetDeviceToDeviceStream() {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   int i = next_device_to_device_stream_;
   next_device_to_device_stream_ =
       (next_device_to_device_stream_ + 1) % device_to_device_streams_.size();
@@ -145,7 +145,7 @@ se::Stream* LocalDeviceState::GetDeviceToDeviceStream() {
 }
 
 std::unique_ptr<se::Stream> LocalDeviceState::BorrowStreamFromPool() {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   if (usage_stream_pool_.empty()) {
     auto stream = std::make_unique<se::Stream>(compute_stream_->parent());
     stream->Init();
@@ -168,12 +168,12 @@ void LocalDeviceState::ReturnStreamToPool(std::unique_ptr<se::Stream> stream) {
   if (status.code() != tensorflow::error::ABORTED) {
     CHECK(stream->ok()) << status;
   }
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   usage_stream_pool_.push(std::move(stream));
 }
 
 int LocalDeviceState::GetNewPrngSeed() {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   int x = 0;
   do {
     x = prng_seed_distribution_(prng_seed_generator_);

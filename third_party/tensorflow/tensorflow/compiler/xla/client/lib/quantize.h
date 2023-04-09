@@ -46,7 +46,7 @@ struct QuantizedRange {
 };
 
 template <typename T>
-inline std::vector<uint32_t> PackToUint32(absl::Span<const T> input) {
+inline std::vector<uint32_t> PackToUint32(abslx::Span<const T> input) {
   const int64_t kElementsPerPack = sizeof(uint32_t) / sizeof(T);
   const int64_t input_size = input.size();
   const int64_t output_size = CeilOfRatio(input_size, kElementsPerPack);
@@ -79,7 +79,7 @@ inline std::vector<uint32_t> PackToUint32(absl::Span<const T> input) {
 // transpose_output feature.
 template <typename T>
 inline XlaOp Dequantize(XlaOp input, const QuantizedRange& range,
-                        absl::string_view mode_string = "MIN_COMBINED",
+                        abslx::string_view mode_string = "MIN_COMBINED",
                         bool transpose_output = false) {
   XlaBuilder* const builder = input.builder();
   return builder->ReportErrorOrReturn([&]() -> StatusOr<XlaOp> {

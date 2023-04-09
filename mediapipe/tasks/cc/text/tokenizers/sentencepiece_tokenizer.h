@@ -41,7 +41,7 @@ class SentencePieceTokenizer : public Tokenizer {
 
   explicit SentencePieceTokenizer(const char* spmodel_buffer_data,
                                   size_t spmodel_buffer_size) {
-    absl::string_view buffer_binary(spmodel_buffer_data, spmodel_buffer_size);
+    abslx::string_view buffer_binary(spmodel_buffer_data, spmodel_buffer_size);
     CHECK_OK(sp_.LoadFromSerializedProto(buffer_binary));
   }
 
@@ -54,13 +54,13 @@ class SentencePieceTokenizer : public Tokenizer {
   }
 
   // Find the id of a string token.
-  bool LookupId(absl::string_view key, int* result) const override {
+  bool LookupId(abslx::string_view key, int* result) const override {
     *result = sp_.PieceToId(key);
     return true;
   }
 
   // Find the string token of an id.
-  bool LookupWord(int vocab_id, absl::string_view* result) const override {
+  bool LookupWord(int vocab_id, abslx::string_view* result) const override {
     *result = sp_.IdToPiece(vocab_id);
     return true;
   }

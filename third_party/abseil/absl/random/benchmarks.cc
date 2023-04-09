@@ -100,7 +100,7 @@ using use_default_initialization = std::false_type;
 // either via the default constructor, when use_default_initialization<T>
 // is true, or via the indicated seed sequence, SSeq.
 template <typename Engine, typename SSeq = PrecompiledSeedSeq>
-typename absl::enable_if_t<!use_default_initialization<Engine>::value, Engine>
+typename abslx::enable_if_t<!use_default_initialization<Engine>::value, Engine>
 make_engine() {
   // Initialize the random engine using the seed sequence SSeq, which
   // is constructed from the precompiled seed data.
@@ -109,7 +109,7 @@ make_engine() {
 }
 
 template <typename Engine, typename SSeq = PrecompiledSeedSeq>
-typename absl::enable_if_t<use_default_initialization<Engine>::value, Engine>
+typename abslx::enable_if_t<use_default_initialization<Engine>::value, Engine>
 make_engine() {
   // Initialize the random engine using the default constructor.
   return Engine();
@@ -257,36 +257,36 @@ void BM_Thread(benchmark::State& state) {
   BENCHMARK_TEMPLATE(BM_ShuffleReuse, Engine, 100);                            \
   BENCHMARK_TEMPLATE(BM_ShuffleReuse, Engine, 1000);                           \
   BENCHMARK_TEMPLATE(BM_Dist, Engine,                                          \
-                     absl::random_internal::FastUniformBits<uint32_t>);        \
+                     abslx::random_internal::FastUniformBits<uint32_t>);        \
   BENCHMARK_TEMPLATE(BM_Dist, Engine,                                          \
-                     absl::random_internal::FastUniformBits<uint64_t>);        \
+                     abslx::random_internal::FastUniformBits<uint64_t>);        \
   BENCHMARK_TEMPLATE(BM_Dist, Engine, std::uniform_int_distribution<int32_t>); \
   BENCHMARK_TEMPLATE(BM_Dist, Engine, std::uniform_int_distribution<int64_t>); \
   BENCHMARK_TEMPLATE(BM_Dist, Engine,                                          \
-                     absl::uniform_int_distribution<int32_t>);                 \
+                     abslx::uniform_int_distribution<int32_t>);                 \
   BENCHMARK_TEMPLATE(BM_Dist, Engine,                                          \
-                     absl::uniform_int_distribution<int64_t>);                 \
+                     abslx::uniform_int_distribution<int64_t>);                 \
   BENCHMARK_TEMPLATE(BM_Large, Engine,                                         \
                      std::uniform_int_distribution<int32_t>);                  \
   BENCHMARK_TEMPLATE(BM_Large, Engine,                                         \
                      std::uniform_int_distribution<int64_t>);                  \
   BENCHMARK_TEMPLATE(BM_Large, Engine,                                         \
-                     absl::uniform_int_distribution<int32_t>);                 \
+                     abslx::uniform_int_distribution<int32_t>);                 \
   BENCHMARK_TEMPLATE(BM_Large, Engine,                                         \
-                     absl::uniform_int_distribution<int64_t>);                 \
+                     abslx::uniform_int_distribution<int64_t>);                 \
   BENCHMARK_TEMPLATE(BM_Dist, Engine, std::uniform_real_distribution<float>);  \
   BENCHMARK_TEMPLATE(BM_Dist, Engine, std::uniform_real_distribution<double>); \
-  BENCHMARK_TEMPLATE(BM_Dist, Engine, absl::uniform_real_distribution<float>); \
-  BENCHMARK_TEMPLATE(BM_Dist, Engine, absl::uniform_real_distribution<double>)
+  BENCHMARK_TEMPLATE(BM_Dist, Engine, abslx::uniform_real_distribution<float>); \
+  BENCHMARK_TEMPLATE(BM_Dist, Engine, abslx::uniform_real_distribution<double>)
 
 #define BM_COPY(Engine) BENCHMARK_TEMPLATE(BM_Generate, Engine)
 
 #define BM_THREAD(Engine)                                           \
   BENCHMARK_TEMPLATE(BM_Thread, Engine,                             \
-                     absl::uniform_int_distribution<int64_t>)       \
+                     abslx::uniform_int_distribution<int64_t>)       \
       ->ThreadPerCpu();                                             \
   BENCHMARK_TEMPLATE(BM_Thread, Engine,                             \
-                     absl::uniform_real_distribution<double>)       \
+                     abslx::uniform_real_distribution<double>)       \
       ->ThreadPerCpu();                                             \
   BENCHMARK_TEMPLATE(BM_Shuffle, Engine, 100)->ThreadPerCpu();      \
   BENCHMARK_TEMPLATE(BM_Shuffle, Engine, 1000)->ThreadPerCpu();     \
@@ -300,72 +300,72 @@ void BM_Thread(benchmark::State& state) {
   BENCHMARK_TEMPLATE(BM_Small, Engine,                                         \
                      std::uniform_int_distribution<int64_t>);                  \
   BENCHMARK_TEMPLATE(BM_Small, Engine,                                         \
-                     absl::uniform_int_distribution<int32_t>);                 \
+                     abslx::uniform_int_distribution<int32_t>);                 \
   BENCHMARK_TEMPLATE(BM_Small, Engine,                                         \
-                     absl::uniform_int_distribution<int64_t>);                 \
+                     abslx::uniform_int_distribution<int64_t>);                 \
   BENCHMARK_TEMPLATE(BM_Small, Engine, std::uniform_real_distribution<float>); \
   BENCHMARK_TEMPLATE(BM_Small, Engine,                                         \
                      std::uniform_real_distribution<double>);                  \
   BENCHMARK_TEMPLATE(BM_Small, Engine,                                         \
-                     absl::uniform_real_distribution<float>);                  \
+                     abslx::uniform_real_distribution<float>);                  \
   BENCHMARK_TEMPLATE(BM_Small, Engine,                                         \
-                     absl::uniform_real_distribution<double>);                 \
+                     abslx::uniform_real_distribution<double>);                 \
   /* -------------- Other -----------------------*/                            \
   BENCHMARK_TEMPLATE(BM_Dist, Engine, std::normal_distribution<double>);       \
-  BENCHMARK_TEMPLATE(BM_Dist, Engine, absl::gaussian_distribution<double>);    \
+  BENCHMARK_TEMPLATE(BM_Dist, Engine, abslx::gaussian_distribution<double>);    \
   BENCHMARK_TEMPLATE(BM_Dist, Engine, std::exponential_distribution<double>);  \
-  BENCHMARK_TEMPLATE(BM_Dist, Engine, absl::exponential_distribution<double>); \
+  BENCHMARK_TEMPLATE(BM_Dist, Engine, abslx::exponential_distribution<double>); \
   BENCHMARK_TEMPLATE(BM_Poisson, Engine, std::poisson_distribution<int64_t>,   \
                      100);                                                     \
-  BENCHMARK_TEMPLATE(BM_Poisson, Engine, absl::poisson_distribution<int64_t>,  \
+  BENCHMARK_TEMPLATE(BM_Poisson, Engine, abslx::poisson_distribution<int64_t>,  \
                      100);                                                     \
   BENCHMARK_TEMPLATE(BM_Poisson, Engine, std::poisson_distribution<int64_t>,   \
                      10 * 100);                                                \
-  BENCHMARK_TEMPLATE(BM_Poisson, Engine, absl::poisson_distribution<int64_t>,  \
+  BENCHMARK_TEMPLATE(BM_Poisson, Engine, abslx::poisson_distribution<int64_t>,  \
                      10 * 100);                                                \
   BENCHMARK_TEMPLATE(BM_Poisson, Engine, std::poisson_distribution<int64_t>,   \
                      13 * 100);                                                \
-  BENCHMARK_TEMPLATE(BM_Poisson, Engine, absl::poisson_distribution<int64_t>,  \
+  BENCHMARK_TEMPLATE(BM_Poisson, Engine, abslx::poisson_distribution<int64_t>,  \
                      13 * 100);                                                \
   BENCHMARK_TEMPLATE(BM_Dist, Engine,                                          \
-                     absl::log_uniform_int_distribution<int32_t>);             \
+                     abslx::log_uniform_int_distribution<int32_t>);             \
   BENCHMARK_TEMPLATE(BM_Dist, Engine,                                          \
-                     absl::log_uniform_int_distribution<int64_t>);             \
+                     abslx::log_uniform_int_distribution<int64_t>);             \
   BENCHMARK_TEMPLATE(BM_Dist, Engine, std::geometric_distribution<int64_t>);   \
-  BENCHMARK_TEMPLATE(BM_Zipf, Engine, absl::zipf_distribution<uint64_t>);      \
-  BENCHMARK_TEMPLATE(BM_Zipf, Engine, absl::zipf_distribution<uint64_t>, 2,    \
+  BENCHMARK_TEMPLATE(BM_Zipf, Engine, abslx::zipf_distribution<uint64_t>);      \
+  BENCHMARK_TEMPLATE(BM_Zipf, Engine, abslx::zipf_distribution<uint64_t>, 2,    \
                      3);                                                       \
   BENCHMARK_TEMPLATE(BM_Bernoulli, Engine, std::bernoulli_distribution,        \
                      257305);                                                  \
-  BENCHMARK_TEMPLATE(BM_Bernoulli, Engine, absl::bernoulli_distribution,       \
+  BENCHMARK_TEMPLATE(BM_Bernoulli, Engine, abslx::bernoulli_distribution,       \
                      257305);                                                  \
-  BENCHMARK_TEMPLATE(BM_Beta, Engine, absl::beta_distribution<double>, 65,     \
+  BENCHMARK_TEMPLATE(BM_Beta, Engine, abslx::beta_distribution<double>, 65,     \
                      41);                                                      \
-  BENCHMARK_TEMPLATE(BM_Beta, Engine, absl::beta_distribution<double>, 99,     \
+  BENCHMARK_TEMPLATE(BM_Beta, Engine, abslx::beta_distribution<double>, 99,     \
                      330);                                                     \
-  BENCHMARK_TEMPLATE(BM_Beta, Engine, absl::beta_distribution<double>, 150,    \
+  BENCHMARK_TEMPLATE(BM_Beta, Engine, abslx::beta_distribution<double>, 150,    \
                      150);                                                     \
-  BENCHMARK_TEMPLATE(BM_Beta, Engine, absl::beta_distribution<double>, 410,    \
+  BENCHMARK_TEMPLATE(BM_Beta, Engine, abslx::beta_distribution<double>, 410,    \
                      580);                                                     \
-  BENCHMARK_TEMPLATE(BM_Beta, Engine, absl::beta_distribution<float>, 65, 41); \
-  BENCHMARK_TEMPLATE(BM_Beta, Engine, absl::beta_distribution<float>, 99,      \
+  BENCHMARK_TEMPLATE(BM_Beta, Engine, abslx::beta_distribution<float>, 65, 41); \
+  BENCHMARK_TEMPLATE(BM_Beta, Engine, abslx::beta_distribution<float>, 99,      \
                      330);                                                     \
-  BENCHMARK_TEMPLATE(BM_Beta, Engine, absl::beta_distribution<float>, 150,     \
+  BENCHMARK_TEMPLATE(BM_Beta, Engine, abslx::beta_distribution<float>, 150,     \
                      150);                                                     \
-  BENCHMARK_TEMPLATE(BM_Beta, Engine, absl::beta_distribution<float>, 410,     \
+  BENCHMARK_TEMPLATE(BM_Beta, Engine, abslx::beta_distribution<float>, 410,     \
                      580);                                                     \
   BENCHMARK_TEMPLATE(BM_Gamma, Engine, std::gamma_distribution<float>, 199);   \
   BENCHMARK_TEMPLATE(BM_Gamma, Engine, std::gamma_distribution<double>, 199);
 
 // ABSL Recommended interfaces.
-BM_BASIC(absl::InsecureBitGen);  // === pcg64_2018_engine
-BM_BASIC(absl::BitGen);    // === randen_engine<uint64_t>.
-BM_THREAD(absl::BitGen);
-BM_EXTENDED(absl::BitGen);
+BM_BASIC(abslx::InsecureBitGen);  // === pcg64_2018_engine
+BM_BASIC(abslx::BitGen);    // === randen_engine<uint64_t>.
+BM_THREAD(abslx::BitGen);
+BM_EXTENDED(abslx::BitGen);
 
 // Instantiate benchmarks for multiple engines.
-using randen_engine_64 = absl::random_internal::randen_engine<uint64_t>;
-using randen_engine_32 = absl::random_internal::randen_engine<uint32_t>;
+using randen_engine_64 = abslx::random_internal::randen_engine<uint64_t>;
+using randen_engine_32 = abslx::random_internal::randen_engine<uint32_t>;
 
 // Comparison interfaces.
 BM_BASIC(std::mt19937_64);

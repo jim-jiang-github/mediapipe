@@ -1208,7 +1208,7 @@ Status FileOutputBuffer::Close() {
 Status FileOutputBuffer::FlushBuffer(bool closing) {
   if (position_ > 0) {
     // Use Cord to avoid extra data copy for some WritableFile implementations.
-    absl::Cord buffer = absl::MakeCordFromExternal(
+    abslx::Cord buffer = abslx::MakeCordFromExternal(
         StringPiece(buffer_ptr_, position_),
         [ptr = buffer_ptr_](StringPiece) { port::AlignedFree(ptr); });
     buffer_ptr_ = closing ? nullptr : AlignedMalloc(buffer_size_);

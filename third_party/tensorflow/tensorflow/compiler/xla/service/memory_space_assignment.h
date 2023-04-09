@@ -74,17 +74,17 @@ class PresetAssignments {
     return &assignment_info_.back().second;
   }
 
-  absl::Span<const std::pair<HloPosition, HeapSimulator::Chunk>> chunks()
+  abslx::Span<const std::pair<HloPosition, HeapSimulator::Chunk>> chunks()
       const {
     return chunks_;
   }
 
-  absl::Span<const std::pair<HloInstruction*, HeapSimulator::Chunk>>
+  abslx::Span<const std::pair<HloInstruction*, HeapSimulator::Chunk>>
   scoped_allocation_chunks() const {
     return scoped_allocation_chunks_;
   }
 
-  absl::Span<const std::pair<int64_t, AssignmentInformation>>
+  abslx::Span<const std::pair<int64_t, AssignmentInformation>>
   assignment_informations() const {
     return assignment_info_;
   }
@@ -109,7 +109,7 @@ class MemorySpaceAssignmentCostAnalysis {
   // An optional Cache object may be provided to some of the methods below to
   // speed up the lookup.
   struct Cache {
-    absl::flat_hash_map<const HloInstruction*, float> while_nest_multiplier;
+    abslx::flat_hash_map<const HloInstruction*, float> while_nest_multiplier;
   };
 
   // Function type that can be used to indicate which input/output values are in
@@ -160,9 +160,9 @@ class MemorySpaceAssignmentCostAnalysis {
   // buffer in alternate memory.
   float GetInstructionElapsedDueToMemory(
       const HloInstruction& instruction,
-      absl::Span<const std::pair<int64_t, ShapeIndex>>
+      abslx::Span<const std::pair<int64_t, ShapeIndex>>
           operands_in_alternate_mem = {},
-      absl::Span<const ShapeIndex> outputs_in_alternate_mem = {}) const;
+      abslx::Span<const ShapeIndex> outputs_in_alternate_mem = {}) const;
 
   // Like above, only the inputs/outputs indicated by is_in_alternate_mem are in
   // the alternate memory.
@@ -181,9 +181,9 @@ class MemorySpaceAssignmentCostAnalysis {
   // alternate memory.
   virtual float GetInstructionElapsedInAlternateMemory(
       const HloInstruction& instruction,
-      absl::Span<const std::pair<int64_t, ShapeIndex>>
+      abslx::Span<const std::pair<int64_t, ShapeIndex>>
           operands_in_alternate_mem,
-      absl::Span<const ShapeIndex> outputs_in_alternate_mem) const;
+      abslx::Span<const ShapeIndex> outputs_in_alternate_mem) const;
 
   // Like above, only the inputs/outputs indicated by is_in_alternate_mem are in
   // the alternate memory.
@@ -312,7 +312,7 @@ class PrefetchIntervalPicker {
   }
 
  protected:
-  const absl::flat_hash_map<const HloInstruction*, int64_t>*
+  const abslx::flat_hash_map<const HloInstruction*, int64_t>*
       instruction_schedule_ = nullptr;
   int retry_number_ = 0;
 };
@@ -573,11 +573,11 @@ class MemorySpaceAssignment {
     // ParentAllocations are needed if they have any uses or if other
     // CopyAllocation or ParentAllocations depend on them.
     virtual void MarkIfNeeded(
-        absl::flat_hash_set<const Allocation*>& needed_allocations) const;
+        abslx::flat_hash_set<const Allocation*>& needed_allocations) const;
 
     // Marks this allocation as needed.
     virtual void MarkNeeded(
-        absl::flat_hash_set<const Allocation*>& needed_allocations) const;
+        abslx::flat_hash_set<const Allocation*>& needed_allocations) const;
 
     // Returns the defining position for this allocation.
     virtual HloPosition defining_position() const { return defining_position_; }
@@ -641,7 +641,7 @@ class MemorySpaceAssignment {
 
     Status Process() override;
 
-    void MarkNeeded(absl::flat_hash_set<const Allocation*>& needed_allocations)
+    void MarkNeeded(abslx::flat_hash_set<const Allocation*>& needed_allocations)
         const override;
 
     HloPosition defining_position() const override {
@@ -716,7 +716,7 @@ class MemorySpaceAssignment {
 
     Status Process() override;
 
-    void MarkNeeded(absl::flat_hash_set<const Allocation*>& needed_allocations)
+    void MarkNeeded(abslx::flat_hash_set<const Allocation*>& needed_allocations)
         const override;
 
     std::string ToString() const override;
@@ -742,9 +742,9 @@ class MemorySpaceAssignment {
     Status Process() override;
     Status PostProcess() override;
 
-    void MarkIfNeeded(absl::flat_hash_set<const Allocation*>&
+    void MarkIfNeeded(abslx::flat_hash_set<const Allocation*>&
                           needed_allocations) const override;
-    void MarkNeeded(absl::flat_hash_set<const Allocation*>& needed_allocations)
+    void MarkNeeded(abslx::flat_hash_set<const Allocation*>& needed_allocations)
         const override;
 
     std::string ToString() const override;
@@ -992,7 +992,7 @@ class MemorySpaceAssignment {
   HloModule* module_;
   const Options& options_;
   std::vector<HloInstruction*> flattened_instructions_;
-  absl::flat_hash_set<const HloComputation*> computations_in_schedule_;
+  abslx::flat_hash_set<const HloComputation*> computations_in_schedule_;
   std::unique_ptr<PresetAssignments> preset_assignments_;
   std::vector<std::pair<HloPosition, Chunk>> alternate_memory_assignments_;
   std::vector<std::pair<HloInstruction*, Chunk>> scoped_memory_assignments_;
@@ -1001,8 +1001,8 @@ class MemorySpaceAssignment {
   // These maps hold vectors of new instructions that need to be scheduled after
   // (or before) the instruction index in the key. FixSchedule uses these maps
   // to modify and fix the schedule.
-  absl::flat_hash_map<int64_t, std::vector<HloInstruction*>> schedule_after_;
-  absl::flat_hash_map<int64_t, std::vector<HloInstruction*>> schedule_before_;
+  abslx::flat_hash_map<int64_t, std::vector<HloInstruction*>> schedule_after_;
+  abslx::flat_hash_map<int64_t, std::vector<HloInstruction*>> schedule_before_;
 };
 
 // The different options to be passed to the Run() API.
@@ -1096,7 +1096,7 @@ struct Options {
   // If not nullptr, this function is called to dump debugging information.
   // The first argument is appended to the file name and the second argument
   // is the contents of the file.
-  std::function<void(absl::string_view, absl::string_view)> dump_fn = nullptr;
+  std::function<void(abslx::string_view, abslx::string_view)> dump_fn = nullptr;
 
   // Enable prefetching buffers into preferred memory across program
   // boundaries
@@ -1154,7 +1154,7 @@ class AsynchronousCopyResource {
   AsynchronousCopyResource() = default;
 
   // The constructor needs the initial resources.
-  explicit AsynchronousCopyResource(absl::Span<const float> initial_resources)
+  explicit AsynchronousCopyResource(abslx::Span<const float> initial_resources)
       : initial_resources_(initial_resources.begin(), initial_resources.end()),
         delay_(initial_resources.size(), 0) {}
 
@@ -1200,7 +1200,7 @@ class AsynchronousCopyResource {
 // async_copies_.
 // TODO(b/210891274): Use btree_map after build issue in Windows is resolved.
 #if defined(__GNUC__) || defined(__clang__)
-  absl::btree_map<int64_t, std::list<AsynchronousCopy>::iterator>
+  abslx::btree_map<int64_t, std::list<AsynchronousCopy>::iterator>
       async_copy_time_map_;
 #else
   std::map<int64_t, std::list<AsynchronousCopy>::iterator> async_copy_time_map_;
@@ -1246,7 +1246,7 @@ class AlternateMemoryBestFitHeap
   // Given colocated intervals, populates allocation_values with the
   // corresponding AllocationValue objects.
   virtual void CreateAllocationValuesFromColocatedIntervals(
-      absl::Span<const AlternateMemoryBestFitHeap::BufferInterval* const>
+      abslx::Span<const AlternateMemoryBestFitHeap::BufferInterval* const>
           colocated_intervals,
       std::vector<MemorySpaceAssignment::AllocationValue>& allocation_values);
 
@@ -1273,7 +1273,7 @@ class AlternateMemoryBestFitHeap
   // and must get the same offset.
   struct AliasedOffset {
     int64_t offset;
-    absl::flat_hash_set<const MemorySpaceAssignment::Allocation*> allocations;
+    abslx::flat_hash_set<const MemorySpaceAssignment::Allocation*> allocations;
   };
 
   // An allocation request for a use segment. A use segment is the time segment
@@ -1306,7 +1306,7 @@ class AlternateMemoryBestFitHeap
     AliasedOffset* preferred_offset;
     const MemorySpaceAssignment::AllocationValue::Use* use;
     MemorySpaceAssignment::AllocationValue* allocation_value;
-    absl::Span<const int64_t> all_use_times;
+    abslx::Span<const int64_t> all_use_times;
   };
 
   // This struct contains mandatory memory assignments at a given time. E.g., an
@@ -1419,7 +1419,7 @@ class AlternateMemoryBestFitHeap
   // other. Returns either kSuccess if all of the sites could be placed in the
   // alternate memory or a bitwise OR of failure reasons why they couldn't
   Result AllocateAllocationValues(
-      absl::Span<AllocationValue> allocation_values);
+      abslx::Span<AllocationValue> allocation_values);
 
   // Finds an allocation for an allocation request for a segment (see the
   // documentation for AllocationRequest above how a segment is defined).
@@ -1474,7 +1474,7 @@ class AlternateMemoryBestFitHeap
 
   // Goes through the colocated intervals and adds any required assignment.
   void AddRequiredAssignmentsForColocatedIntervals(
-      absl::Span<const AlternateMemoryBestFitHeap::BufferInterval* const>
+      abslx::Span<const AlternateMemoryBestFitHeap::BufferInterval* const>
           colocated_intervals);
 
   // Propagates aliased required assignment for a given position.
@@ -1499,7 +1499,7 @@ class AlternateMemoryBestFitHeap
   // or root instruction of the entry computation and are reserved by the user
   // to be in the alternate memory space.
   bool AreIntervalsReservedInAlternateMemory(
-      absl::Span<const BufferInterval* const> colocated_intervals) const;
+      abslx::Span<const BufferInterval* const> colocated_intervals) const;
 
   // Since the allocations are recorded to the AllocationSequence, we don't
   // maintain result_ in GlobalDecreasingSizeBestFitHeap. Override AddToChunkMap
@@ -1542,10 +1542,10 @@ class AlternateMemoryBestFitHeap
   // removes pending chunks and asynchronous copies in the respective pending
   // buffers from the interval trees. If an allocation request returns
   // kFailRequiresUncommit, this method must be called.
-  void UncommitPendingChunks(absl::Span<AllocationValue> allocation_values);
+  void UncommitPendingChunks(abslx::Span<AllocationValue> allocation_values);
 
   // Finalizes the allocations where they can no longer be uncommitted.
-  void FinalizeAllocations(absl::Span<AllocationValue> allocation_values);
+  void FinalizeAllocations(abslx::Span<AllocationValue> allocation_values);
 
   // Clears all pending chunks and asynchronous copies.
   void ClearPendingChunks();
@@ -1618,11 +1618,11 @@ class AlternateMemoryBestFitHeap
   // The data structure that contains AliasedOffset objects and Allocation to
   // AliasedOffset map for efficient lookup.
   std::list<AliasedOffset> aliased_offsets_;
-  absl::flat_hash_map<const MemorySpaceAssignment::Allocation*, AliasedOffset*>
+  abslx::flat_hash_map<const MemorySpaceAssignment::Allocation*, AliasedOffset*>
       aliased_offset_map_;
   // This map contains required memory assignments for HloValues (e.g., input
   // and outputs).
-  absl::flat_hash_map<const HloValue*, std::vector<RequiredMemoryAssignment>>
+  abslx::flat_hash_map<const HloValue*, std::vector<RequiredMemoryAssignment>>
       required_assignments_;
   // Number of bytes reserved in alternate memory space.
   int64_t reserved_in_bytes_ = 0;

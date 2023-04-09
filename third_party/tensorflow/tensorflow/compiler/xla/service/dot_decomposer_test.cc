@@ -28,7 +28,7 @@ namespace {
 using DotDecomposerTest = HloTestBase;
 
 TEST_F(DotDecomposerTest, CanonicalizeMultipleNonContractingDims) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -51,7 +51,7 @@ TEST_F(DotDecomposerTest, CanonicalizeMultipleNonContractingDims) {
 }
 
 TEST_F(DotDecomposerTest, DontCanonicalizeIfNoNoncontractingDims) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -71,7 +71,7 @@ TEST_F(DotDecomposerTest, DontCanonicalizeIfNoNoncontractingDims) {
 }
 
 TEST_F(DotDecomposerTest, DontAddLhsNonContractingDimIfOne) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -96,7 +96,7 @@ TEST_F(DotDecomposerTest, DontAddLhsNonContractingDimIfOne) {
 }
 
 TEST_F(DotDecomposerTest, DontAddRhsNonContractingDimIfOne) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {

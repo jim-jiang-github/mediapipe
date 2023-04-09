@@ -27,7 +27,7 @@
 #include <string>
 #include <unordered_set>
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace str_format_internal {
 
@@ -347,4 +347,4 @@ bool ParsedFormatBase::MatchesConversions(
 
 }  // namespace str_format_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

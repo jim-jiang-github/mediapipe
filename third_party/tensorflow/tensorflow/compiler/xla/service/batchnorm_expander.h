@@ -36,14 +36,14 @@ class BatchNormExpander : public HloModulePass {
         rewrite_inference_op_(rewrite_inference_op),
         rewrite_grad_op_(rewrite_grad_op) {}
   ~BatchNormExpander() = default;
-  absl::string_view name() const override { return "batchnorm_expander"; }
+  abslx::string_view name() const override { return "batchnorm_expander"; }
 
   // Run operation expander on the given computation. Returns whether the
   // computation was changed.
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   bool rewrite_training_op_;

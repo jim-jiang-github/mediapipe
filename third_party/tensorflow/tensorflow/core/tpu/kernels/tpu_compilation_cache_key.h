@@ -56,7 +56,7 @@ struct TpuCompilationCacheKey {
     if (!has_guaranteed_const) {
       return prefix;
     }
-    return absl::StrCat(prefix, "|", session_handle, "|",
+    return abslx::StrCat(prefix, "|", session_handle, "|",
                         guaranteed_const_fingerprint());
   }
 

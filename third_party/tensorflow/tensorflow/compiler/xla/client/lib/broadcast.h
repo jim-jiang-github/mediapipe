@@ -25,7 +25,7 @@ namespace xla {
 
 // Broadcasts 'input' up to shape 'output_dims', using TensorFlow broadcasting
 // rules. Supports broadcasting a dimension of size x to size x*y, i.e., tiling.
-StatusOr<XlaOp> BroadcastTo(XlaOp input, absl::Span<int64_t const> output_dims);
+StatusOr<XlaOp> BroadcastTo(XlaOp input, abslx::Span<int64_t const> output_dims);
 
 }  // namespace xla
 

@@ -55,7 +55,7 @@ class SimpleRunner : public CalculatorRunner {
     MutableInputs()->Index(0).packets.clear();
     for (const int64 ts : timestamp_list) {
       MutableInputs()->Index(0).packets.push_back(
-          Adopt(new std::string(absl::StrCat("Frame #", ts)))
+          Adopt(new std::string(abslx::StrCat("Frame #", ts)))
               .At(Timestamp(ts)));
     }
   }
@@ -80,7 +80,7 @@ class SimpleRunner : public CalculatorRunner {
     for (const Packet& packet : Outputs().Index(0).packets) {
       EXPECT_EQ(Timestamp(expected_timestamps[count]), packet.Timestamp());
       const std::string& packet_contents = packet.Get<std::string>();
-      EXPECT_EQ(std::string(absl::StrCat("Frame #", expected_frames[count])),
+      EXPECT_EQ(std::string(abslx::StrCat("Frame #", expected_frames[count])),
                 packet_contents);
       ++count;
     }
@@ -106,7 +106,7 @@ class SimpleRunner : public CalculatorRunner {
 // Matcher for Packets with uint64 payload, comparing arg packet's
 // timestamp and uint64 payload.
 MATCHER_P2(PacketAtTimestamp, payload, timestamp,
-           absl::StrCat(negation ? "isn't" : "is", " a packet with payload ",
+           abslx::StrCat(negation ? "isn't" : "is", " a packet with payload ",
                         payload, " @ time ", timestamp)) {
   if (timestamp != arg.Timestamp().Value()) {
     *result_listener << "at incorrect timestamp = " << arg.Timestamp().Value();
@@ -160,14 +160,14 @@ std::vector<uint64>
 class ReproducibleResamplerCalculatorForTesting
     : public PacketResamplerCalculator {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     return PacketResamplerCalculator::GetContract(cc);
   }
 
  protected:
   std::unique_ptr<class PacketResamplerStrategy> GetSamplingStrategy(
       const mediapipe::PacketResamplerCalculatorOptions& Options) {
-    return absl::make_unique<
+    return abslx::make_unique<
         ReproducibleJitterWithReflectionStrategyForTesting>(this);
   }
 };
@@ -471,7 +471,7 @@ TEST(PacketResamplerCalculatorTest, SetVideoHeader) {
 
   for (const int64 ts : {0, 5000, 10010, 15001, 19990}) {
     runner.MutableInputs()->Tag(kDataTag).packets.push_back(
-        Adopt(new std::string(absl::StrCat("Frame #", ts))).At(Timestamp(ts)));
+        Adopt(new std::string(abslx::StrCat("Frame #", ts))).At(Timestamp(ts)));
   }
   VideoHeader video_header_in;
   video_header_in.width = 10;

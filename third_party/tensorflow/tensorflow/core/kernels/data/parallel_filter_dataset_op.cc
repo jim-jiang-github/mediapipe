@@ -214,19 +214,19 @@ class ParallelFilterDatasetOp::Dataset : public DatasetBase {
       }
       TF_RETURN_IF_ERROR(SaveInput(ctx, writer, input_impl_));
       TF_RETURN_IF_ERROR(
-          writer->WriteScalar(absl::StrCat(prefix(), "::", kInvocationResults),
+          writer->WriteScalar(abslx::StrCat(prefix(), "::", kInvocationResults),
                               kSize, invocation_results_.size()));
       for (size_t i = 0; i < invocation_results_.size(); i++) {
         const auto& result = *(invocation_results_[i]);
         std::string element_prefix =
-            absl::StrCat(prefix(), "::", kInvocationResults, "::", i);
+            abslx::StrCat(prefix(), "::", kInvocationResults, "::", i);
         TF_RETURN_IF_ERROR(
             WriteStatusLocked(writer, element_prefix, result.status));
         TF_RETURN_IF_ERROR(WriteComponentsLocked(
-            writer, absl::StrCat(element_prefix, "::", kReturnValues),
+            writer, abslx::StrCat(element_prefix, "::", kReturnValues),
             result.return_values));
         TF_RETURN_IF_ERROR(WriteComponentsLocked(
-            writer, absl::StrCat(element_prefix, "::", kPredicateValues),
+            writer, abslx::StrCat(element_prefix, "::", kPredicateValues),
             result.predicate_values));
         if (result.end_of_input) {
           TF_RETURN_IF_ERROR(
@@ -242,21 +242,21 @@ class ParallelFilterDatasetOp::Dataset : public DatasetBase {
       TF_RETURN_IF_ERROR(RestoreInput(ctx, reader, input_impl_));
       int64_t invocation_results_size;
       TF_RETURN_IF_ERROR(
-          reader->ReadScalar(absl::StrCat(prefix(), "::", kInvocationResults),
+          reader->ReadScalar(abslx::StrCat(prefix(), "::", kInvocationResults),
                              kSize, &invocation_results_size));
       DCHECK(invocation_results_.empty());
       for (size_t i = 0; i < invocation_results_size; i++) {
         invocation_results_.push_back(std::make_shared<InvocationResult>());
         auto& result = *invocation_results_.back();
         std::string element_prefix =
-            absl::StrCat(prefix(), "::", kInvocationResults, "::", i);
+            abslx::StrCat(prefix(), "::", kInvocationResults, "::", i);
         TF_RETURN_IF_ERROR(
             ReadStatusLocked(reader, element_prefix, &result.status));
         TF_RETURN_IF_ERROR(ReadComponentsLocked(
-            ctx, reader, absl::StrCat(element_prefix, "::", kReturnValues),
+            ctx, reader, abslx::StrCat(element_prefix, "::", kReturnValues),
             &result.return_values));
         TF_RETURN_IF_ERROR(ReadComponentsLocked(
-            ctx, reader, absl::StrCat(element_prefix, "::", kPredicateValues),
+            ctx, reader, abslx::StrCat(element_prefix, "::", kPredicateValues),
             &result.predicate_values));
         result.end_of_input = reader->Contains(element_prefix, kEndOfInput);
         RecordBufferEnqueue(ctx, result.return_values);
@@ -527,7 +527,7 @@ class ParallelFilterDatasetOp::Dataset : public DatasetBase {
       TF_RETURN_IF_ERROR(writer->WriteScalar(prefix, kSize, values.size()));
       for (size_t j = 0; j < values.size(); j++) {
         TF_RETURN_IF_ERROR(writer->WriteTensor(
-            prefix, absl::StrCat(kComponent, "[", j, "]"), values[j]));
+            prefix, abslx::StrCat(kComponent, "[", j, "]"), values[j]));
       }
       return OkStatus();
     }
@@ -548,7 +548,7 @@ class ParallelFilterDatasetOp::Dataset : public DatasetBase {
       for (size_t j = 0; j < num_return_values; j++) {
         values->emplace_back();
         TF_RETURN_IF_ERROR(reader->ReadTensor(
-            ctx->flr(), prefix, absl::StrCat(kComponent, "[", j, "]"),
+            ctx->flr(), prefix, abslx::StrCat(kComponent, "[", j, "]"),
             &values->back()));
       }
       return OkStatus();

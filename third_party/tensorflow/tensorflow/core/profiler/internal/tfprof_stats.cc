@@ -81,13 +81,13 @@ TFStats::TFStats(const string& filename,
   string str;
   Status s = ReadFileToString(Env::Default(), filename, &str);
   if (!s.ok()) {
-    absl::FPrintF(stderr, "Failed to read profile: %s", s.ToString());
+    abslx::FPrintF(stderr, "Failed to read profile: %s", s.ToString());
     return;
   }
 
   ProfileProto profile;
   if (!profile.ParseFromString(str)) {
-    absl::FPrintF(stderr, "Failed to parse profile\n");
+    abslx::FPrintF(stderr, "Failed to parse profile\n");
     return;
   }
   for (const auto& entry : profile.id_to_string()) {
@@ -164,7 +164,7 @@ const GraphNodeProto& TFStats::ShowGraphNode(const string& cmd,
     }
     return graph_view_->Show(prefix, opts);
   } else {
-    absl::FPrintF(stderr, "Unknown command: %s\n", cmd);
+    abslx::FPrintF(stderr, "Unknown command: %s\n", cmd);
     return empty_graph_node_;
   }
 }
@@ -179,14 +179,14 @@ const MultiGraphNodeProto& TFStats::ShowMultiGraphNode(
 
   if (cmd == kCmds[2]) {
     if (!has_code_traces()) {
-      absl::FPrintF(stderr, "No code trace information\n");
+      abslx::FPrintF(stderr, "No code trace information\n");
       return empty_multi_graph_node_;
     }
     return code_view_->Show(prefix, opts);
   } else if (cmd == kCmds[3]) {
     return op_view_->Show(prefix, opts);
   } else {
-    absl::FPrintF(stderr, "Unknown command: %s\n", cmd);
+    abslx::FPrintF(stderr, "Unknown command: %s\n", cmd);
     return empty_multi_graph_node_;
   }
 }
@@ -213,11 +213,11 @@ void TFStats::AddGraph(std::unique_ptr<GraphDef> graph) {
       // if not :src_output, then it's the first one (further verify?)
       auto prefix_pos = node_input.find(':');
       if (prefix_pos != node_input.npos) {
-        std::vector<string> input_parts = absl::StrSplit(node_input, ':');
+        std::vector<string> input_parts = abslx::StrSplit(node_input, ':');
         DCHECK(input_parts.size() == 2)
             << "Unknown NodeDef.input format: " << node_input;
         node_input = input_parts[0];
-        DCHECK(absl::SimpleAtoi(input_parts[1], &output_idx))
+        DCHECK(abslx::SimpleAtoi(input_parts[1], &output_idx))
             << "Failed to parse integer: " << output_idx;
       }
       if (node_input.substr(0, 1) == "^") {
@@ -264,7 +264,7 @@ void TFStats::AddOpLogProto(std::unique_ptr<OpLogProto> op_log) {
 
 void TFStats::AddRunMeta(int64_t step, std::unique_ptr<RunMetadata> run_meta) {
   if (!run_meta || !run_meta->has_step_stats()) {
-    absl::FPrintF(stderr, "Invalid RunMetadata for step %d\n", step);
+    abslx::FPrintF(stderr, "Invalid RunMetadata for step %d\n", step);
     return;
   }
   if (steps_.find(step) == steps_.end()) {
@@ -276,7 +276,7 @@ void TFStats::AddRunMeta(int64_t step, std::unique_ptr<RunMetadata> run_meta) {
   bool has_gpu_stream = false;
 
   for (const auto& dev_stat : run_meta->step_stats().dev_stats()) {
-    string dev = absl::AsciiStrToLower(dev_stat.device());
+    string dev = abslx::AsciiStrToLower(dev_stat.device());
     if (IsPlacedOnAccelerator(dev)) {
       has_gpu_scheduling = true;
       if (CountAsAcceleratorTime(dev)) {
@@ -350,18 +350,18 @@ void TFStats::WriteProfile(const string& filename) {
   SerializeToString(&content);
   Status s = WriteStringToFile(Env::Default(), filename, content);
   if (!s.ok()) {
-    absl::FPrintF(stderr, "%s\n", s.ToString());
+    abslx::FPrintF(stderr, "%s\n", s.ToString());
   }
 }
 
 bool TFStats::Validate(const Options& opts) const {
   if (opts.step >= 0 && steps_.find(opts.step) == steps_.end()) {
-    absl::FPrintF(stderr,
+    abslx::FPrintF(stderr,
                   "Options -step=%d not found.\nAvailable steps: ", opts.step);
     for (int64_t s : steps_) {
-      absl::FPrintF(stderr, "%d ", s);
+      abslx::FPrintF(stderr, "%d ", s);
     }
-    absl::FPrintF(stderr, "\n");
+    abslx::FPrintF(stderr, "\n");
     return false;
   }
   return true;

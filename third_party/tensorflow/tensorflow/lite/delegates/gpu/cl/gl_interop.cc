@@ -44,10 +44,10 @@ PFNEGLCREATESYNCPROC g_eglCreateSync = nullptr;
 
 }  // namespace
 
-absl::Status CreateEglSyncFromClEvent(cl_event event, EGLDisplay display,
+abslx::Status CreateEglSyncFromClEvent(cl_event event, EGLDisplay display,
                                       EglSync* sync) {
   if (!IsEglSyncFromClEventSupported()) {
-    return absl::UnimplementedError(
+    return abslx::UnimplementedError(
         "CreateEglSyncFromClEvent is not supported");
   }
   EGLSync egl_sync;
@@ -56,10 +56,10 @@ absl::Status CreateEglSyncFromClEvent(cl_event event, EGLDisplay display,
   RETURN_IF_ERROR(TFLITE_GPU_CALL_EGL(g_eglCreateSync, &egl_sync, display,
                                       EGL_SYNC_CL_EVENT, attributes));
   if (egl_sync == EGL_NO_SYNC) {
-    return absl::InternalError("Returned empty EGL sync");
+    return abslx::InternalError("Returned empty EGL sync");
   }
   *sync = EglSync(display, egl_sync);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 bool IsEglSyncFromClEventSupported() {
@@ -77,40 +77,40 @@ bool IsEglSyncFromClEventSupported() {
   return supported;
 }
 
-absl::Status CreateClEventFromEglSync(cl_context context,
+abslx::Status CreateClEventFromEglSync(cl_context context,
                                       const EglSync& egl_sync, CLEvent* event) {
   cl_int error_code;
   cl_event new_event = clCreateEventFromEGLSyncKHR(
       context, egl_sync.sync(), egl_sync.display(), &error_code);
   if (error_code != CL_SUCCESS) {
-    return absl::InternalError(
-        absl::StrCat("Unable to create CL sync from EGL sync. ",
+    return abslx::InternalError(
+        abslx::StrCat("Unable to create CL sync from EGL sync. ",
                      CLErrorCodeToString(error_code)));
   }
   *event = CLEvent(new_event);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 bool IsClEventFromEglSyncSupported(const CLDevice& device) {
   return device.GetInfo().SupportsExtension("cl_khr_egl_event");
 }
 
-absl::Status CreateClMemoryFromGlBuffer(GLuint gl_ssbo_id,
+abslx::Status CreateClMemoryFromGlBuffer(GLuint gl_ssbo_id,
                                         AccessType access_type,
                                         CLContext* context, CLMemory* memory) {
   cl_int error_code;
   auto mem = clCreateFromGLBuffer(context->context(), ToClMemFlags(access_type),
                                   gl_ssbo_id, &error_code);
   if (error_code != CL_SUCCESS) {
-    return absl::InternalError(
-        absl::StrCat("Unable to acquire CL buffer from GL buffer. ",
+    return abslx::InternalError(
+        abslx::StrCat("Unable to acquire CL buffer from GL buffer. ",
                      CLErrorCodeToString(error_code)));
   }
   *memory = CLMemory(mem, true);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CreateClMemoryFromGlTexture(GLenum texture_target,
+abslx::Status CreateClMemoryFromGlTexture(GLenum texture_target,
                                          GLuint texture_id,
                                          AccessType access_type,
                                          CLContext* context, CLMemory* memory) {
@@ -119,12 +119,12 @@ absl::Status CreateClMemoryFromGlTexture(GLenum texture_target,
       clCreateFromGLTexture(context->context(), ToClMemFlags(access_type),
                             texture_target, 0, texture_id, &error_code);
   if (error_code != CL_SUCCESS) {
-    return absl::InternalError(
-        absl::StrCat("Unable to create CL buffer from GL texture. ",
+    return abslx::InternalError(
+        abslx::StrCat("Unable to create CL buffer from GL texture. ",
                      CLErrorCodeToString(error_code)));
   }
   *memory = CLMemory(mem, true);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 bool IsGlSharingSupported(const CLDevice& device) {
@@ -134,7 +134,7 @@ bool IsGlSharingSupported(const CLDevice& device) {
 
 AcquiredGlObjects::~AcquiredGlObjects() { Release({}, nullptr).IgnoreError(); }
 
-absl::Status AcquiredGlObjects::Acquire(
+abslx::Status AcquiredGlObjects::Acquire(
     const std::vector<cl_mem>& memory, cl_command_queue queue,
     const std::vector<cl_event>& wait_events, CLEvent* acquire_event,
     AcquiredGlObjects* objects) {
@@ -144,7 +144,7 @@ absl::Status AcquiredGlObjects::Acquire(
         queue, memory.size(), memory.data(), wait_events.size(),
         wait_events.data(), acquire_event ? &new_event : nullptr);
     if (error_code != CL_SUCCESS) {
-      return absl::InternalError(absl::StrCat("Unable to acquire GL object. ",
+      return abslx::InternalError(abslx::StrCat("Unable to acquire GL object. ",
                                               CLErrorCodeToString(error_code)));
     }
     if (acquire_event) {
@@ -153,10 +153,10 @@ absl::Status AcquiredGlObjects::Acquire(
     clFlush(queue);
   }
   *objects = AcquiredGlObjects(memory, queue);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AcquiredGlObjects::Release(
+abslx::Status AcquiredGlObjects::Release(
     const std::vector<cl_event>& wait_events, CLEvent* release_event) {
   if (queue_ && !memory_.empty()) {
     cl_event new_event;
@@ -164,7 +164,7 @@ absl::Status AcquiredGlObjects::Release(
         queue_, memory_.size(), memory_.data(), wait_events.size(),
         wait_events.data(), release_event ? &new_event : nullptr);
     if (error_code != CL_SUCCESS) {
-      return absl::InternalError(absl::StrCat("Unable to release GL object. ",
+      return abslx::InternalError(abslx::StrCat("Unable to release GL object. ",
                                               CLErrorCodeToString(error_code)));
     }
     if (release_event) {
@@ -173,7 +173,7 @@ absl::Status AcquiredGlObjects::Release(
     clFlush(queue_);
     queue_ = nullptr;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 GlInteropFabric::GlInteropFabric(EGLDisplay egl_display,
@@ -197,9 +197,9 @@ void GlInteropFabric::UnregisterMemory(cl_mem memory) {
   }
 }
 
-absl::Status GlInteropFabric::Start() {
+abslx::Status GlInteropFabric::Start() {
   if (!is_enabled()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // In GL-CL interoperability, we need to make sure GL finished processing of
@@ -236,9 +236,9 @@ absl::Status GlInteropFabric::Start() {
                                     &gl_objects_);
 }
 
-absl::Status GlInteropFabric::Finish() {
+abslx::Status GlInteropFabric::Finish() {
   if (!is_enabled()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   CLEvent outbound_event;
   RETURN_IF_ERROR(gl_objects_.Release({}, &outbound_event));
@@ -260,7 +260,7 @@ absl::Status GlInteropFabric::Finish() {
   // This slow sync is the only working solution right now. We have to debug why
   // above version is not working fast and reliable.
   outbound_event.Wait();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 GlClBufferCopier::GlClBufferCopier(const TensorObjectDef& input_def,
@@ -271,7 +271,7 @@ GlClBufferCopier::GlClBufferCopier(const TensorObjectDef& input_def,
       NumElements(input_def) * SizeOf(input_def.object_def.data_type);
 }
 
-absl::Status GlClBufferCopier::Convert(const TensorObject& input_obj,
+abslx::Status GlClBufferCopier::Convert(const TensorObject& input_obj,
                                        const TensorObject& output_obj) {
   if (std::holds_alternative<OpenGlBuffer>(input_obj)) {
     auto ssbo = std::get_if<OpenGlBuffer>(&input_obj);
@@ -300,7 +300,7 @@ absl::Status GlClBufferCopier::Convert(const TensorObject& input_obj,
     RETURN_IF_ERROR(
         TFLITE_GPU_CALL_GL(glUnmapBuffer, GL_SHADER_STORAGE_BUFFER));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace cl

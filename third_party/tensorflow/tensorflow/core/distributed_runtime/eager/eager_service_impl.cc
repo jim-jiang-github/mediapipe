@@ -323,12 +323,12 @@ Status EagerServiceImpl::CreateContext(const CreateContextRequest* request,
     auto preemption_notifier =
         PreemptionNotifier::CreatePreemptionNotifier("sigterm", Env::Default());
     preemption_notifier->WillBePreemptedAtAsync(
-        [coord_agent](StatusOr<absl::Time> time_or_status) {
+        [coord_agent](StatusOr<abslx::Time> time_or_status) {
           if (time_or_status.ok()) {
             const auto& coord_task = coord_agent->GetOwnTask().ValueOrDie();
             Status s = coord_agent->InsertKeyValue(
                 "TF_DEFAULT_PREEMPTION_NOTICE_KEY",
-                absl::StrCat("/job:", coord_task.job_name(),
+                abslx::StrCat("/job:", coord_task.job_name(),
                              "/task:", coord_task.task_id()));
             if (!s.ok()) {
               LOG(INFO) << "Preemption not exported to coordination service: "
@@ -508,7 +508,7 @@ void EagerServiceImpl::RunComponentFunction(
     return;
   }
 
-  auto* retvals = new absl::FixedArray<TensorHandle*>(*num_retvals);
+  auto* retvals = new abslx::FixedArray<TensorHandle*>(*num_retvals);
   VLOG(3) << "ServerContext: Calling EagerLocalExecuteAsync for op "
           << operation.id();
   std::vector<int32> output_nums;
@@ -563,10 +563,10 @@ Status EagerServiceImpl::ExecuteOp(CallOptions* call_opts,
     call_opts->SetCancelCallback([cm] { cm->StartCancel(); });
   }
 
-  absl::FixedArray<tensorflow::TensorHandle*> retvals(num_retvals);
+  abslx::FixedArray<tensorflow::TensorHandle*> retvals(num_retvals);
   VLOG(3) << "ServerContext: Calling EagerExecute for op " << operation.id();
   TF_RETURN_IF_ERROR(op.Execute(
-      absl::MakeSpan(
+      abslx::MakeSpan(
           reinterpret_cast<tensorflow::AbstractTensorHandle**>(retvals.data()),
           num_retvals),
       &num_retvals));
@@ -591,7 +591,7 @@ Status EagerServiceImpl::Enqueue(CallOptions* call_opts,
                                  EnqueueResponse* response, uint64 stream_id) {
   profiler::TraceMe activity(
       [&] {
-        return absl::StrCat(
+        return abslx::StrCat(
             "EagerService:Enqueue#debug_str=", request->DebugString(), "#");
       },
       profiler::TraceMeLevel::kInfo);

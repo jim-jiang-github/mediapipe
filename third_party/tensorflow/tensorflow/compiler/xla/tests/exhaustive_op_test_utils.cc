@@ -36,23 +36,23 @@ namespace exhaustive_op_test {
 namespace {
 template <typename T>
 struct ComponentStringifyFormat {
-  static const absl::string_view value;
+  static const abslx::string_view value;
 };
 
 template <>
-constexpr absl::string_view ComponentStringifyFormat<double>::value =
+constexpr abslx::string_view ComponentStringifyFormat<double>::value =
     "%0.17g (0x%16x)";
 
 template <>
-constexpr absl::string_view ComponentStringifyFormat<float>::value =
+constexpr abslx::string_view ComponentStringifyFormat<float>::value =
     "%0.9g (0x%08x)";
 
 template <>
-constexpr absl::string_view ComponentStringifyFormat<Eigen::half>::value =
+constexpr abslx::string_view ComponentStringifyFormat<Eigen::half>::value =
     "%0.5g (0x%04x)";
 
 template <>
-constexpr absl::string_view ComponentStringifyFormat<bfloat16>::value =
+constexpr abslx::string_view ComponentStringifyFormat<bfloat16>::value =
     "%0.4g (0x%04x)";
 
 template <typename Type, typename FuncPtr>
@@ -87,7 +87,7 @@ constexpr int kNonSubnormal = -1;
 constexpr int kInvalidCacheIndex = -1;
 
 template <typename T>
-struct is_complex_t : absl::disjunction<std::is_same<T, complex64>,
+struct is_complex_t : abslx::disjunction<std::is_same<T, complex64>,
                                         std::is_same<T, complex128>> {};
 
 // When we are testing a value such that all of its components are subnormal,
@@ -245,7 +245,7 @@ std::string GetSubnormalDescription(NativeRefT test_val,
     imag = "imag";
   }
 
-  return absl::StrCat("(", real, ", ", imag, ")");
+  return abslx::StrCat("(", real, ", ", imag, ")");
 }
 
 template <bool is_complex, typename NativeRefT, size_t N>
@@ -264,14 +264,14 @@ std::string GetSubnormalDescription(std::array<NativeRefT, N> test_vals,
     }
   }
 
-  return absl::StrCat("(", absl::StrJoin(str_vals, ", "), ")");
+  return abslx::StrCat("(", abslx::StrJoin(str_vals, ", "), ")");
 }
 
 template <
     typename NativeT, typename IntegralType,
     typename std::enable_if<!is_complex_t<NativeT>::value>::type* = nullptr>
 std::string StringifyNum(NativeT x) {
-  return absl::StrFormat(ComponentStringifyFormat<NativeT>::value,
+  return abslx::StrFormat(ComponentStringifyFormat<NativeT>::value,
                          static_cast<double>(x), BitCast<IntegralType>(x));
 }
 
@@ -279,7 +279,7 @@ template <
     typename NativeT, typename IntegralType,
     typename std::enable_if<is_complex_t<NativeT>::value>::type* = nullptr>
 std::string StringifyNum(NativeT x) {
-  return absl::StrCat(
+  return abslx::StrCat(
       "(", StringifyNum<typename NativeT::value_type, IntegralType>(x.real()),
       ", ", StringifyNum<typename NativeT::value_type, IntegralType>(x.imag()),
       ")");
@@ -296,7 +296,7 @@ std::string StringifyNum(const std::array<NativeT, N>& inputs) {
     str_vals[i] = StringifyNum<NativeT, IntegralType>(inputs[i]);
   }
 
-  return absl::StrCat("(", absl::StrJoin(str_vals, ", "), ")");
+  return abslx::StrCat("(", abslx::StrJoin(str_vals, ", "), ")");
 }
 
 template <typename ErrorGenerator>
@@ -346,7 +346,7 @@ void ExhaustiveOpTestBase<T, N>::ExpectNear(const InputLiterals& input_literals,
     inputs_arr[i] = literal.data<NativeT>();
   }
 
-  absl::Span<const NativeT> result_arr = result_literal.data<NativeT>();
+  abslx::Span<const NativeT> result_arr = result_literal.data<NativeT>();
 
   int64_t mismatches = 0;
 
@@ -376,7 +376,7 @@ void ExhaustiveOpTestBase<T, N>::ExpectNear(const InputLiterals& input_literals,
     // error_spec), print an error.
     if (subnormal_test_inputs.size() == 1) {
       PrintMismatch(&mismatches, [&] {
-        return absl::StrFormat(
+        return abslx::StrFormat(
             "Mismatch on %s. Expected %s, but got %s.",
             StringifyNum<NativeT, ComponentIntegralNativeT, N>(inputs),
             StringifyNum<NativeT, ComponentIntegralNativeT>(expected),
@@ -412,7 +412,7 @@ void ExhaustiveOpTestBase<T, N>::ExpectNear(const InputLiterals& input_literals,
       continue;
     }
 
-    std::string mismatch = absl::StrFormat(
+    std::string mismatch = abslx::StrFormat(
         "Mismatch on subnormal value %s.  Expected one of:\n"
         "  %10s (evaluated at full-precision value)\n",
         StringifyNum<NativeT, ComponentIntegralNativeT, N>(inputs),
@@ -423,17 +423,17 @@ void ExhaustiveOpTestBase<T, N>::ExpectNear(const InputLiterals& input_literals,
       using IntegralNativeRefT =
           typename ExhaustiveOpTestBase<RefT::value,
                                         N>::ComponentIntegralNativeT;
-      absl::StrAppend(
+      abslx::StrAppend(
           &mismatch,
-          absl::StrFormat("  %10s (evaluated at %s)\n",
+          abslx::StrFormat("  %10s (evaluated at %s)\n",
                           StringifyNum<NativeRefT, IntegralNativeRefT>(
                               subnormal_test_results[i]),
                           GetSubnormalDescription<kIsComplex, NativeRefT, N>(
                               subnormal_test_inputs[i], inputs_ref_ty)));
     }
-    absl::StrAppend(
+    abslx::StrAppend(
         &mismatch,
-        absl::StrFormat(
+        abslx::StrFormat(
             "but got %s",
             StringifyNum<NativeT, ComponentIntegralNativeT>(actual)));
 

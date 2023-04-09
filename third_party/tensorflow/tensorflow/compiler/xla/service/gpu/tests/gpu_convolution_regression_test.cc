@@ -23,7 +23,7 @@ class GpuConvolutionRegressionTest : public HloTestBase {
  public:
   // RunHloPasses goes through convolution autotuning, which performs
   // correctness cross-checking.
-  void CheckForHloText(absl::string_view hlo_string) {
+  void CheckForHloText(abslx::string_view hlo_string) {
     HloModuleConfig config;
     config.set_debug_options(GetDebugOptionsFromFlags());
     (void)backend().compiler()->RunHloPasses(

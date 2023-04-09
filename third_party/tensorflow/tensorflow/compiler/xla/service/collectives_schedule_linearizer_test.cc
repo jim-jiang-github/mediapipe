@@ -53,7 +53,7 @@ class CollectivesScheduleLinearizerTest : public HloTestBase {
 };
 
 TEST_F(CollectivesScheduleLinearizerTest, FixOrdering) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 sum {
@@ -85,11 +85,11 @@ ENTRY entry {
     }
   }
   EXPECT_TRUE(c1 != nullptr && c2 != nullptr);
-  EXPECT_TRUE(absl::c_linear_search(c2->control_predecessors(), c1));
+  EXPECT_TRUE(abslx::c_linear_search(c2->control_predecessors(), c1));
 }
 
 TEST_F(CollectivesScheduleLinearizerTest, NoFixRequired) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 sum {
@@ -114,7 +114,7 @@ ENTRY entry {
 }
 
 TEST_F(CollectivesScheduleLinearizerTest, DependentCollectives) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 sum {
@@ -139,7 +139,7 @@ ENTRY entry {
 }
 
 TEST_F(CollectivesScheduleLinearizerTest, NonPostorder) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 sum {

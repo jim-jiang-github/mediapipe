@@ -42,7 +42,7 @@ constexpr char kBoxesTag[] = "BOXES";
 // }
 class DetectionsToTimedBoxListCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     RET_CHECK(cc->Inputs().HasTag(kDetectionListTag) ||
               cc->Inputs().HasTag(kDetectionsTag))
         << "None of the input streams are provided.";
@@ -53,14 +53,14 @@ class DetectionsToTimedBoxListCalculator : public CalculatorBase {
       cc->Inputs().Tag(kDetectionsTag).Set<std::vector<Detection>>();
     }
     cc->Outputs().Tag(kBoxesTag).Set<TimedBoxProtoList>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   void ConvertDetectionToTimedBox(const Detection& detection,
@@ -68,9 +68,9 @@ class DetectionsToTimedBoxListCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(DetectionsToTimedBoxListCalculator);
 
-absl::Status DetectionsToTimedBoxListCalculator::Process(
+abslx::Status DetectionsToTimedBoxListCalculator::Process(
     CalculatorContext* cc) {
-  auto output_timed_box_list = absl::make_unique<TimedBoxProtoList>();
+  auto output_timed_box_list = abslx::make_unique<TimedBoxProtoList>();
 
   if (cc->Inputs().HasTag(kDetectionListTag)) {
     const auto& detection_list =
@@ -91,7 +91,7 @@ absl::Status DetectionsToTimedBoxListCalculator::Process(
 
   cc->Outputs().Tag(kBoxesTag).Add(output_timed_box_list.release(),
                                    cc->InputTimestamp());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void DetectionsToTimedBoxListCalculator::ConvertDetectionToTimedBox(

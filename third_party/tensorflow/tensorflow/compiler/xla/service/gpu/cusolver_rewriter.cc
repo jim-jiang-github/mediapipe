@@ -62,8 +62,8 @@ StatusOr<HloInstruction*> CreateCholesky(GpuSolverContext* context,
   std::vector<int64_t> batch_dims(a_shape.dimensions().begin(),
                                   a_shape.dimensions().end() - 2);
   std::vector<int64_t> batch_dim_ids(batch_dims.size());
-  absl::c_iota(batch_dim_ids, 0);
-  int64_t batch_size = absl::c_accumulate(batch_dims, 1, std::multiplies<>{});
+  abslx::c_iota(batch_dim_ids, 0);
+  int64_t batch_size = abslx::c_accumulate(batch_dims, 1, std::multiplies<>{});
 
   // Find the workspace size.
   se::blas::UpperLower uplo = options.lower() ? se::blas::UpperLower::kLower
@@ -182,7 +182,7 @@ GpusolverRewriter::GpusolverRewriter() = default;
 
 StatusOr<bool> GpusolverRewriter::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   for (HloComputation* computation :
        module->MakeNonfusionComputations(execution_threads)) {

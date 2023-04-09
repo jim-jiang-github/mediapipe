@@ -28,9 +28,9 @@ namespace xla {
 namespace {
 
 int64_t GlobalRandomValue() {
-  static auto* mu = new absl::Mutex();
+  static auto* mu = new abslx::Mutex();
   static std::mt19937_64 rng{42};
-  absl::MutexLock l(mu);
+  abslx::MutexLock l(mu);
   return rng();
 }
 
@@ -47,7 +47,7 @@ StatusOr<HloInstruction*> ConvertSmallFpRngToF32Rng(HloInstruction* rng) {
   CHECK(primitive_type == F16 || primitive_type == BF16);
 
   std::vector<HloInstruction*> new_operands;
-  absl::c_transform(rng->operands(), std::back_inserter(new_operands),
+  abslx::c_transform(rng->operands(), std::back_inserter(new_operands),
                     [&](HloInstruction* operand) {
                       CHECK_EQ(operand->shape().element_type(), primitive_type);
                       return MakeConvertToHlo(operand, F32);

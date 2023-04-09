@@ -228,7 +228,7 @@ class ImmediateMuxCalculatorTest : public ::testing::Test {
         const Packet& packet = input_set[i];
         if (!IsNone(packet)) {
           MP_EXPECT_OK(graph.AddPacketToInputStream(
-              absl::StrCat("input_packets_", i), packet));
+              abslx::StrCat("input_packets_", i), packet));
         }
       }
     }
@@ -289,19 +289,19 @@ TEST_F(ImmediateMuxCalculatorTest, SimultaneousTimestamps) {
 }
 
 // A Calculator::Process callback function.
-typedef std::function<absl::Status(const InputStreamShardSet&,
+typedef std::function<abslx::Status(const InputStreamShardSet&,
                                    OutputStreamShardSet*)>
     ProcessFunction;
 
 // A testing callback function that passes through all packets.
-absl::Status PassThrough(const InputStreamShardSet& inputs,
+abslx::Status PassThrough(const InputStreamShardSet& inputs,
                          OutputStreamShardSet* outputs) {
   for (int i = 0; i < inputs.NumEntries(); ++i) {
     if (!inputs.Index(i).Value().IsEmpty()) {
       outputs->Index(i).AddPacket(inputs.Index(i).Value());
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 TEST_F(ImmediateMuxCalculatorTest, Demux) {
@@ -321,15 +321,15 @@ TEST_F(ImmediateMuxCalculatorTest, Demux) {
 
   // A callback to await and capture output packets.
   std::vector<Packet> out_packets;
-  absl::Mutex out_mutex;
+  abslx::Mutex out_mutex;
   auto out_cb = [&](const Packet& p) {
-    absl::MutexLock lock(&out_mutex);
+    abslx::MutexLock lock(&out_mutex);
     out_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   };
   auto wait_for = [&](std::function<bool()> cond) {
-    absl::MutexLock lock(&out_mutex);
-    out_mutex.Await(absl::Condition(&cond));
+    abslx::MutexLock lock(&out_mutex);
+    out_mutex.Await(abslx::Condition(&cond));
   };
   SetUpDemuxGraph();
 

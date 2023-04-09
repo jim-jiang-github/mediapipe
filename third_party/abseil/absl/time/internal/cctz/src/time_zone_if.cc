@@ -18,7 +18,7 @@
 #include "time_zone_info.h"
 #include "time_zone_libc.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
@@ -42,4 +42,4 @@ TimeZoneIf::~TimeZoneIf() {}
 }  // namespace cctz
 }  // namespace time_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

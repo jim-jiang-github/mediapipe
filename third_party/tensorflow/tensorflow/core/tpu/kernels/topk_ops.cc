@@ -187,7 +187,7 @@ std::pair<xla::XlaOp, xla::XlaOp> CreateTopKUnique(
 
   xla::XlaOp topk_indices_r2;
   if (masked_with_iota) {
-    int32_t next_power_of_two = absl::bit_ceil<uint64_t>(width);
+    int32_t next_power_of_two = abslx::bit_ceil<uint64_t>(width);
     int32_t count_mask = next_power_of_two - 1;
     xla::XlaOp mask_r0 = xla::ConstantR0(builder, count_mask);
     xla::XlaOp mask_r2 = xla::Broadcast(mask_r0, {height, k});
@@ -265,7 +265,7 @@ xla::XlaOp CreateMakeUnique(xla::XlaBuilder* builder, const xla::XlaOp input,
 
   // count_mask is used to mask away the low order bits to ensure
   // that every element is distinct.
-  uint32_t next_power_of_two = absl::bit_ceil<uint64_t>(width);
+  uint32_t next_power_of_two = abslx::bit_ceil<uint64_t>(width);
   uint32 count_mask = ~(next_power_of_two - 1);
   xla::XlaOp count_mask_r0 = xla::ConstantR0(builder, count_mask);
   xla::XlaOp count_mask_r2 = xla::Broadcast(count_mask_r0, {height, width});

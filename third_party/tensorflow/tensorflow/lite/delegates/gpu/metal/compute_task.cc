@@ -36,7 +36,7 @@ namespace gpu {
 namespace metal {
 namespace {
 bool IsWordSymbol(char symbol) {
-  return absl::ascii_isalnum(symbol) || symbol == '_';
+  return abslx::ascii_isalnum(symbol) || symbol == '_';
 }
 
 void ReplaceAllWords(const std::string& old_word, const std::string& new_word,
@@ -189,7 +189,7 @@ const OperationDef& ComputeTask::GetDefinition() const {
   return operation_->GetDefinition();
 }
 
-absl::Status ComputeTask::Compile(MetalDevice* device) {
+abslx::Status ComputeTask::Compile(MetalDevice* device) {
   RETURN_IF_ERROR(metal_args_.Init(use_arguments_buffer_, device,
                                    &operation_->args_, &operation_->code_));
 
@@ -204,7 +204,7 @@ absl::Status ComputeTask::Compile(MetalDevice* device) {
   return CompileProgram(device, operation_->code_, defines_);
 }
 
-absl::Status ComputeTask::CompileProgram(
+abslx::Status ComputeTask::CompileProgram(
     MetalDevice* device, const std::string& code,
     const std::map<std::string, std::string>& defines) {
   id<MTLComputePipelineState> program;
@@ -224,36 +224,36 @@ absl::Status ComputeTask::CompileProgram(
         [device->device() newBufferWithLength:arguments_encoder_.encodedLength
                                       options:0];
     if (!arg_buffer_) {
-      return absl::InternalError("Failed to create MTLBuffer.");
+      return abslx::InternalError("Failed to create MTLBuffer.");
     }
   } else {
     RETURN_IF_ERROR(CreateComputeProgram(device->device(), code,
                                          "ComputeFunction", defines, &program));
   }
   program_ = program;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ComputeTask::Init(
+abslx::Status ComputeTask::Init(
     MetalDevice* device, const std::string& code,
     const std::map<std::string, std::string>& defines) {
   return CompileProgram(device, code, defines);
 }
 
-absl::Status ComputeTask::RestoreDeserialized(MetalDevice* device) {
+abslx::Status ComputeTask::RestoreDeserialized(MetalDevice* device) {
   RETURN_IF_ERROR(
       metal_args_.Init(use_arguments_buffer_, device, &operation_->args_));
 
   operation_->args_.ReleaseCPURepresentation();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ComputeTask::UpdateParams() {
+abslx::Status ComputeTask::UpdateParams() {
   for (int i = 0; i < operation_->GetSrcTensorsNames().size(); ++i) {
     const auto* metal_spatial_tensor =
         dynamic_cast<const MetalSpatialTensor*>(operation_->GetSrcTensors()[i]);
     if (!metal_spatial_tensor) {
-      return absl::InvalidArgumentError("Expected MetalSpatialTensor.");
+      return abslx::InvalidArgumentError("Expected MetalSpatialTensor.");
     }
     RETURN_IF_ERROR(metal_args_.SetObjectRef(
         operation_->GetSrcTensorsNames()[i], *metal_spatial_tensor));
@@ -262,7 +262,7 @@ absl::Status ComputeTask::UpdateParams() {
     const auto* metal_spatial_tensor =
         dynamic_cast<const MetalSpatialTensor*>(operation_->GetDstTensors()[i]);
     if (!metal_spatial_tensor) {
-      return absl::InvalidArgumentError("Expected MetalSpatialTensor.");
+      return abslx::InvalidArgumentError("Expected MetalSpatialTensor.");
     }
     RETURN_IF_ERROR(metal_args_.SetObjectRef(
         operation_->GetDstTensorsNames()[i], *metal_spatial_tensor));
@@ -271,7 +271,7 @@ absl::Status ComputeTask::UpdateParams() {
   operation_->RecalculateGridSize();
   operation_->RecalculateWorkGroupsCount();
   Update();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 API_AVAILABLE(ios(13.0), macos(11.00), tvos(13.0))
@@ -337,7 +337,7 @@ void ComputeTask::SetDstTensor(MetalSpatialTensor* tensor, int index) {
       operation_->GetDstTensorsNames()[index], *tensor);
 }
 
-absl::Status ComputeTask::Tune(TuningType tuning_type, MetalDevice* device) {
+abslx::Status ComputeTask::Tune(TuningType tuning_type, MetalDevice* device) {
   KernelInfo kernel_info;
   kernel_info.max_work_group_size = [program_ maxTotalThreadsPerThreadgroup];
   kernel_info.private_memory_size = 0;
@@ -345,11 +345,11 @@ absl::Status ComputeTask::Tune(TuningType tuning_type, MetalDevice* device) {
   operation_->GetPossibleDispatches(tuning_type, device->GetInfo(), kernel_info,
                                     &possible_dispatches);
   if (possible_dispatches.empty()) {
-    return absl::NotFoundError("No dispatch parameters to launch kernel");
+    return abslx::NotFoundError("No dispatch parameters to launch kernel");
   }
   operation_->work_group_size_ = possible_dispatches[0].work_group_size;
   operation_->RecalculateWorkGroupsCount();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void ComputeTask::SetWorkGroupSize(const int3& work_group_size) {

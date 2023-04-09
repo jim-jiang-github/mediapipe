@@ -43,7 +43,7 @@ class ImmediateExecutionOperation : public AbstractOperation {
   virtual void Clear() = 0;
 
   // Returns the inputs of this op.
-  virtual absl::Span<ImmediateExecutionTensorHandle* const> GetInputs()
+  virtual abslx::Span<ImmediateExecutionTensorHandle* const> GetInputs()
       const = 0;
   virtual Status SetInput(size_t index,
                           ImmediateExecutionTensorHandle* input) = 0;
@@ -70,7 +70,7 @@ class ImmediateExecutionOperation : public AbstractOperation {
       CancellationManager* cancellation_manager) = 0;
 
   // Returns the stack trace set by `SetStackTrace` if exists.
-  virtual absl::optional<ManagedStackTrace> GetStackTrace() = 0;
+  virtual abslx::optional<ManagedStackTrace> GetStackTrace() = 0;
 
   virtual void SetStepId(int64_t step_id) = 0;
 

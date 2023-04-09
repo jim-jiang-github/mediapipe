@@ -34,7 +34,7 @@ namespace xla {
 // performance implications.
 class GatherSimplifier : public OpExpanderPass {
  public:
-  absl::string_view name() const override { return "gather_simplifier"; }
+  abslx::string_view name() const override { return "gather_simplifier"; }
 
  protected:
   bool InstructionMatchesPattern(HloInstruction* inst) override;

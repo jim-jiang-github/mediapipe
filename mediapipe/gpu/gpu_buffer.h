@@ -170,7 +170,7 @@ class GpuBuffer {
 
     template <class T>
     std::shared_ptr<T> internal_storage() const {
-      absl::MutexLock lock(&mutex_);
+      abslx::MutexLock lock(&mutex_);
       for (const auto& s : storages_)
         if (s->down_cast<T>()) return std::static_pointer_cast<T>(s);
       return nullptr;
@@ -184,7 +184,7 @@ class GpuBuffer {
     GpuBufferFormat format_ = GpuBufferFormat::kUnknown;
     // This is mutable because view methods that do not change the contents may
     // still need to allocate new storages.
-    mutable absl::Mutex mutex_;
+    mutable abslx::Mutex mutex_;
     mutable std::vector<std::shared_ptr<internal::GpuBufferStorage>> storages_
         ABSL_GUARDED_BY(mutex_);
   };

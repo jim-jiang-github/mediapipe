@@ -25,9 +25,9 @@ namespace tensorflow {
 namespace profiler {
 
 // Creates a html that links to the given url with the given text.
-inline std::string AnchorElement(absl::string_view url,
-                                 absl::string_view text) {
-  return absl::StrCat("<a href=\"", url, "\" target=\"_blank\">", text, "</a>");
+inline std::string AnchorElement(abslx::string_view url,
+                                 abslx::string_view text) {
+  return abslx::StrCat("<a href=\"", url, "\" target=\"_blank\">", text, "</a>");
 }
 
 }  // namespace profiler

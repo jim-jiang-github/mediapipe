@@ -148,7 +148,7 @@ TEST(NumberUtilTest, IsPowerOfTwoOrZero) {
 
 TEST(NumberUtilTest, Log2) {
   for (int value = 1; value < 300; ++value) {
-    SCOPED_TRACE(absl::StrFormat("value:%d", value));
+    SCOPED_TRACE(abslx::StrFormat("value:%d", value));
     EXPECT_EQ(std::floor(std::log2(value)), Log2Floor(value));
     EXPECT_EQ(std::ceil(std::log2(value)), Log2Ceiling(value));
   }
@@ -156,7 +156,7 @@ TEST(NumberUtilTest, Log2) {
 
 TEST(NumberUtilTest, NextPowerOfTwo) {
   for (int value = 1; value < 300; ++value) {
-    SCOPED_TRACE(absl::StrFormat("value:%d", value));
+    SCOPED_TRACE(abslx::StrFormat("value:%d", value));
     int result = NextPowerOfTwo(value);
     EXPECT_TRUE(IsPowerOfTwoOrZero(result));
     EXPECT_GE(result, value);
@@ -211,7 +211,7 @@ double operator-(double x, ULPs ulps) {
 
 void CheckArithmeticSequenceWithPerturbedArgs(
     const std::vector<double>& args, int size) {
-  SCOPED_TRACE(absl::StrCat("Args: (", absl::StrJoin(args, ", "), ")"));
+  SCOPED_TRACE(abslx::StrCat("Args: (", abslx::StrJoin(args, ", "), ")"));
   const double base = args[0];
   const double step = args[1];
   const double limit = args[2];
@@ -289,7 +289,7 @@ TEST(NumberUtilTest, CombinationsIterator) {
 
   for (int n = 1; n <= 7; ++n) {
     for (int k = 1; k <= n; ++k) {
-      SCOPED_TRACE(absl::StrFormat("n:%d, k:%d", n, k));
+      SCOPED_TRACE(abslx::StrFormat("n:%d, k:%d", n, k));
       vector<vector<int>> combinations;
       for (CombinationsIterator it(n, k); !it.Done(); it.Next()) {
         const vector<int>& combination = it.GetCurrentCombination();
@@ -313,7 +313,7 @@ TEST(NumberUtilTest, BuildCombinationsTable) {
       BuildCombinationsTable(vector<std::string>({"A", "B", "C", "D", "E"}), 3);
   vector<std::string> joined_combinations;
   for (const auto& combination : combinations) {
-    joined_combinations.push_back(absl::StrJoin(combination, ""));
+    joined_combinations.push_back(abslx::StrJoin(combination, ""));
   }
   EXPECT_THAT(joined_combinations, ElementsAreArray(
       {"ABC", "ABD", "ABE", "ACD", "ACE", "ADE", "BCD", "BCE", "BDE", "CDE"}));

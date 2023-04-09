@@ -34,7 +34,7 @@ class AllToAllDecomposer : public OpExpanderPass {
       : decompose_to_tuple_(decompose_to_tuple),
         min_array_rank_(min_array_rank) {}
   ~AllToAllDecomposer() override = default;
-  absl::string_view name() const override { return "all_to_all_decomposer"; }
+  abslx::string_view name() const override { return "all_to_all_decomposer"; }
 
  private:
   bool InstructionMatchesPattern(HloInstruction* instruction) override;

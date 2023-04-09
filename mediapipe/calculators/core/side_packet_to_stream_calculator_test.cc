@@ -168,10 +168,10 @@ TEST(SidePacketToStreamCalculator, WrongConfig_NotEnoughOutputStreams) {
           "Same number of input side packets and output streams is required."));
 }
 
-void DoTestNonAtTickOutputTag(absl::string_view tag,
+void DoTestNonAtTickOutputTag(abslx::string_view tag,
                               Timestamp expected_timestamp) {
   CalculatorGraphConfig graph_config =
-      ParseTextProtoOrDie<CalculatorGraphConfig>(absl::StrReplaceAll(
+      ParseTextProtoOrDie<CalculatorGraphConfig>(abslx::StrReplaceAll(
           R"(
             input_side_packet: "side_packet"
             output_stream: "packet"
@@ -189,7 +189,7 @@ void DoTestNonAtTickOutputTag(absl::string_view tag,
   MP_ASSERT_OK(graph.ObserveOutputStream(
       "packet", [&output_packets](const Packet& packet) {
         output_packets.push_back(packet);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
   MP_ASSERT_OK(
       graph.StartRun({{"side_packet", MakePacket<int>(expected_value)}}));

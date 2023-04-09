@@ -88,7 +88,7 @@ class HloRunnerInterface {
   // Converts an HloModule from the given hlo textual IR string (in
   // HloModule::ToString format).
   static StatusOr<std::unique_ptr<HloModule>> CreateModuleFromString(
-      const absl::string_view hlo_string, const DebugOptions& debug_options);
+      const abslx::string_view hlo_string, const DebugOptions& debug_options);
 
   // Reads the proto file in xla.HloProto format, creates and returns the
   // HloModule.
@@ -119,33 +119,33 @@ class HloRunnerInterface {
   // If run_hlo_passes is false, the module will be executed without Hlo
   // optimization
   StatusOr<Literal> Execute(std::unique_ptr<HloModule> module,
-                            absl::Span<const Literal* const> arguments,
+                            abslx::Span<const Literal* const> arguments,
                             bool run_hlo_passes = true) {
     return Execute(std::move(module), arguments, run_hlo_passes, nullptr);
   }
 
   StatusOr<Literal> Execute(std::unique_ptr<HloModule> module,
-                            absl::Span<const Literal> arguments,
+                            abslx::Span<const Literal> arguments,
                             bool run_hlo_passes = true,
                             ExecutionProfile* profile = nullptr);
 
   virtual StatusOr<Literal> Execute(std::unique_ptr<HloModule> module,
-                                    absl::Span<const Literal* const> arguments,
+                                    abslx::Span<const Literal* const> arguments,
                                     bool run_hlo_passes,
                                     ExecutionProfile* profile) = 0;
 
   // Same as above, but with Executable as input.
   StatusOr<Literal> ExecuteWithExecutable(Executable* executable,
-                                          absl::Span<const Literal> arguments,
+                                          abslx::Span<const Literal> arguments,
                                           ExecutionProfile* profile = nullptr);
 
   StatusOr<Literal> ExecuteWithExecutable(
-      Executable* executable, absl::Span<const Literal* const> arguments) {
+      Executable* executable, abslx::Span<const Literal* const> arguments) {
     return ExecuteWithExecutable(executable, arguments, nullptr);
   }
 
   virtual StatusOr<Literal> ExecuteWithExecutable(
-      Executable* executable, absl::Span<const Literal* const> arguments,
+      Executable* executable, abslx::Span<const Literal* const> arguments,
       ExecutionProfile* profile) = 0;
 
   // Executes a given HLO module into a set of replicas, and returns a map
@@ -170,7 +170,7 @@ class HloRunnerInterface {
       DeviceAssignment* device_assignment) = 0;
 
   // Returns the name of this runner.
-  virtual absl::string_view Name() const = 0;
+  virtual abslx::string_view Name() const = 0;
 
   typedef std::function<Shape(const Shape&)> DeviceShapeRepresentationFn;
 };

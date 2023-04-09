@@ -114,7 +114,7 @@ void DispatcherState::RegisterWorker(
   DCHECK(!workers_.contains(address));
   workers_[address] = std::make_shared<Worker>(register_worker);
   tasks_by_worker_[address] =
-      absl::flat_hash_map<int64_t, std::shared_ptr<Task>>();
+      abslx::flat_hash_map<int64_t, std::shared_ptr<Task>>();
   worker_index_resolver_.AddWorker(address);
 }
 
@@ -316,11 +316,11 @@ void DispatcherState::FinishTask(const FinishTaskUpdate& finish_task) {
 }
 
 std::string DispatcherState::NextAvailableDatasetId() const {
-  return absl::StrCat(next_available_dataset_id_);
+  return abslx::StrCat(next_available_dataset_id_);
 }
 
 void DispatcherState::UpdateNextAvailableDatasetId() {
-  while (datasets_by_id_.contains(absl::StrCat(next_available_dataset_id_))) {
+  while (datasets_by_id_.contains(abslx::StrCat(next_available_dataset_id_))) {
     ++next_available_dataset_id_;
   }
 }
@@ -455,14 +455,14 @@ Status DispatcherState::TasksForIteration(
 }
 
 Status DispatcherState::TasksForWorker(
-    absl::string_view worker_address,
+    abslx::string_view worker_address,
     std::vector<std::shared_ptr<const Task>>& tasks) const {
   tasks.clear();
   auto it = tasks_by_worker_.find(worker_address);
   if (it == tasks_by_worker_.end()) {
     return errors::NotFound("Worker ", worker_address, " not found");
   }
-  const absl::flat_hash_map<int64_t, std::shared_ptr<Task>>& worker_tasks =
+  const abslx::flat_hash_map<int64_t, std::shared_ptr<Task>>& worker_tasks =
       it->second;
   tasks.reserve(worker_tasks.size());
   for (const auto& task : worker_tasks) {
@@ -475,12 +475,12 @@ int64_t DispatcherState::NextAvailableTaskId() const {
   return next_available_task_id_;
 }
 
-Status DispatcherState::ValidateWorker(absl::string_view worker_address) const {
+Status DispatcherState::ValidateWorker(abslx::string_view worker_address) const {
   return worker_index_resolver_.ValidateWorker(worker_address);
 }
 
 StatusOr<int64_t> DispatcherState::GetWorkerIndex(
-    absl::string_view worker_address) const {
+    abslx::string_view worker_address) const {
   return worker_index_resolver_.GetWorkerIndex(worker_address);
 }
 

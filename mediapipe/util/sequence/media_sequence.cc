@@ -85,10 +85,10 @@ float TimestampsToRate(int64 first_timestamp, int64 second_timestamp) {
 // "segment/start/index" and "segment/end/index" by finding the closest
 // timestamps in the "image/timestamp" FeatureList if image timestamps are
 // present.
-absl::Status ReconcileAnnotationIndicesByImageTimestamps(
+abslx::Status ReconcileAnnotationIndicesByImageTimestamps(
     tensorflow::SequenceExample* sequence) {
   if (GetImageTimestampSize(*sequence) == 0) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   int index;
 
@@ -118,15 +118,15 @@ absl::Status ReconcileAnnotationIndicesByImageTimestamps(
     }
     SetSegmentEndIndex(end_indices, sequence);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Sets the values of "image/format", "image/channels", "image/height",
 // "image/width", and "image/frame_rate" based image metadata and timestamps.
-absl::Status ReconcileMetadataImages(const std::string& prefix,
+abslx::Status ReconcileMetadataImages(const std::string& prefix,
                                      tensorflow::SequenceExample* sequence) {
   if (GetImageEncodedSize(prefix, *sequence) == 0) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   std::string format;
   int height, width, channels;
@@ -144,7 +144,7 @@ absl::Status ReconcileMetadataImages(const std::string& prefix,
                                   GetImageTimestampAt(prefix, *sequence, 1));
     SetImageFrameRate(prefix, rate, sequence);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Sets the values of "feature/${TAG}/dimensions", and
@@ -152,13 +152,13 @@ absl::Status ReconcileMetadataImages(const std::string& prefix,
 // dimensions are already present as a context feature, this method verifies
 // the number of elements in the feature. Otherwise, it will write the
 // dimensions as a 1D vector with the number of elements.
-absl::Status ReconcileMetadataFeatureFloats(
+abslx::Status ReconcileMetadataFeatureFloats(
     tensorflow::SequenceExample* sequence) {
   // Loop through all keys and see if they contain "/feature/floats"
   // If so, check dimensions and set rate.
   for (const auto& key_value : sequence->feature_lists().feature_list()) {
     const std::string& key = key_value.first;
-    if (absl::StrContains(key, kFeatureFloatsKey)) {
+    if (abslx::StrContains(key, kFeatureFloatsKey)) {
       const auto prefix = key.substr(0, key.find(kFeatureFloatsKey) - 1);
       int number_of_elements = GetFeatureFloatsAt(prefix, *sequence, 0).size();
       if (HasFeatureDimensions(prefix, *sequence) &&
@@ -183,7 +183,7 @@ absl::Status ReconcileMetadataFeatureFloats(
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Go through all bounding box annotations and move the annotation to the
@@ -191,7 +191,7 @@ absl::Status ReconcileMetadataFeatureFloats(
 // nothing. If two or more annotations are closest to the same frame, then only
 // the closest annotation is saved. This matches the behavior of downsampling
 // images streams in time.
-absl::Status ReconcileMetadataBoxAnnotations(
+abslx::Status ReconcileMetadataBoxAnnotations(
     const std::string& prefix, tensorflow::SequenceExample* sequence) {
   int num_bboxes = GetBBoxTimestampSize(prefix, *sequence);
   int num_frames = GetImageTimestampSize(*sequence);
@@ -312,7 +312,7 @@ absl::Status ReconcileMetadataBoxAnnotations(
     ::tensorflow::SequenceExample tmp_seq;
     for (const auto& key_value : sequence->feature_lists().feature_list()) {
       const std::string& key = key_value.first;
-      if (::absl::StartsWith(key, expected_prefix)) {
+      if (::abslx::StartsWith(key, expected_prefix)) {
         // create a new set of values and swap them in.
         tmp_seq.Clear();
         auto* old_feature_list = MutableFeatureList(key, sequence);
@@ -356,10 +356,10 @@ absl::Status ReconcileMetadataBoxAnnotations(
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ReconcileMetadataRegionAnnotations(
+abslx::Status ReconcileMetadataRegionAnnotations(
     tensorflow::SequenceExample* sequence) {
   // Copy keys for fixed iteration order while updating feature_lists.
   std::vector<std::string> keys;
@@ -367,7 +367,7 @@ absl::Status ReconcileMetadataRegionAnnotations(
     keys.push_back(key_value.first);
   }
   for (const std::string& key : keys) {
-    if (::absl::StrContains(key, kRegionTimestampKey)) {
+    if (::abslx::StrContains(key, kRegionTimestampKey)) {
       std::string prefix = "";
       if (key != kRegionTimestampKey) {
         prefix = key.substr(0, key.size() - sizeof(kRegionTimestampKey));
@@ -375,7 +375,7 @@ absl::Status ReconcileMetadataRegionAnnotations(
       RET_CHECK_OK(ReconcileMetadataBoxAnnotations(prefix, sequence));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 }  // namespace
 
@@ -518,7 +518,7 @@ std::unique_ptr<mediapipe::Matrix> GetAudioFromFeatureAt(
       << "The data size is not a multiple of the number of channels: "
       << flat_data.size() << " % " << num_channels << " = "
       << flat_data.size() % num_channels << " for sequence index " << index;
-  auto output = absl::make_unique<mediapipe::Matrix>(
+  auto output = abslx::make_unique<mediapipe::Matrix>(
       num_channels, flat_data.size() / num_channels);
   std::copy(flat_data.begin(), flat_data.end(), output->data());
   return output;
@@ -537,7 +537,7 @@ void AddAudioAsFeature(const std::string& prefix,
       .Swap(value_list);
 }
 
-absl::Status ReconcileMetadata(bool reconcile_bbox_annotations,
+abslx::Status ReconcileMetadata(bool reconcile_bbox_annotations,
                                bool reconcile_region_annotations,
                                tensorflow::SequenceExample* sequence) {
   RET_CHECK_OK(ReconcileAnnotationIndicesByImageTimestamps(sequence));
@@ -553,7 +553,7 @@ absl::Status ReconcileMetadata(bool reconcile_bbox_annotations,
     RET_CHECK_OK(ReconcileMetadataRegionAnnotations(sequence));
   }
   // audio is always reconciled in the framework.
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediasequence

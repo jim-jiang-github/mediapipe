@@ -110,6 +110,7 @@
     <ProjectGuid>{f5bed556-0db6-4d2a-a6f1-09727ffdc8fd}</ProjectGuid>
     <RootNamespace>absl</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>abslx</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

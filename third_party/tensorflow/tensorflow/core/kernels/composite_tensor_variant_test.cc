@@ -51,7 +51,7 @@ CompositeTensorVariant Make2DRaggedTensor(const std::vector<int32>& values,
   std::vector<Tensor> components;
   components.push_back(test::AsTensor<int32>(values));
   components.push_back(test::AsTensor<int64_t>(splits));
-  CompositeTensorVariant v(metadata, absl::MakeSpan(components));
+  CompositeTensorVariant v(metadata, abslx::MakeSpan(components));
   return v;
 }
 

@@ -22,7 +22,7 @@ namespace tpu {
 #if defined(LIBTPU_ON_GCE)
 /* static */
 void TpuCompilationMetrics::IncrementCacheLookupCount(
-    bool is_cache_hit, absl::string_view session_name) {
+    bool is_cache_hit, abslx::string_view session_name) {
   // A placeholder for tracking metrics.
 }
 
@@ -33,7 +33,7 @@ void TpuCompilationMetrics::SetCacheEntryCount(int64 count) {
 
 /* static */
 void TpuCompilationMetrics::IncrementCompilationCount(
-    absl::string_view session_name) {
+    abslx::string_view session_name) {
   // A placeholder for tracking metrics.
 }
 #endif  // LIBTPU_ON_GCE

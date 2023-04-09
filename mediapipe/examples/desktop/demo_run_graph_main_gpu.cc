@@ -44,10 +44,10 @@ ABSL_FLAG(std::string, output_video_path, "",
           "Full path of where to save result (.mp4 only). "
           "If not provided, show result in a window.");
 
-absl::Status RunMPPGraph() {
+abslx::Status RunMPPGraph() {
   std::string calculator_graph_config_contents;
   MP_RETURN_IF_ERROR(mediapipe::file::GetContents(
-      absl::GetFlag(FLAGS_calculator_graph_config_file),
+      abslx::GetFlag(FLAGS_calculator_graph_config_file),
       &calculator_graph_config_contents));
   LOG(INFO) << "Get calculator graph config contents: "
             << calculator_graph_config_contents;
@@ -67,16 +67,16 @@ absl::Status RunMPPGraph() {
 
   LOG(INFO) << "Initialize the camera or load the video.";
   cv::VideoCapture capture;
-  const bool load_video = !absl::GetFlag(FLAGS_input_video_path).empty();
+  const bool load_video = !abslx::GetFlag(FLAGS_input_video_path).empty();
   if (load_video) {
-    capture.open(absl::GetFlag(FLAGS_input_video_path));
+    capture.open(abslx::GetFlag(FLAGS_input_video_path));
   } else {
     capture.open(0);
   }
   RET_CHECK(capture.isOpened());
 
   cv::VideoWriter writer;
-  const bool save_video = !absl::GetFlag(FLAGS_output_video_path).empty();
+  const bool save_video = !abslx::GetFlag(FLAGS_output_video_path).empty();
   if (!save_video) {
     cv::namedWindow(kWindowName, /*flags=WINDOW_AUTOSIZE*/ 1);
 #if (CV_MAJOR_VERSION >= 3) && (CV_MINOR_VERSION >= 2)
@@ -112,7 +112,7 @@ absl::Status RunMPPGraph() {
     }
 
     // Wrap Mat into an ImageFrame.
-    auto input_frame = absl::make_unique<mediapipe::ImageFrame>(
+    auto input_frame = abslx::make_unique<mediapipe::ImageFrame>(
         mediapipe::ImageFormat::SRGBA, camera_frame.cols, camera_frame.rows,
         mediapipe::ImageFrame::kGlDefaultAlignmentBoundary);
     cv::Mat input_frame_mat = mediapipe::formats::MatView(input_frame.get());
@@ -123,7 +123,7 @@ absl::Status RunMPPGraph() {
         (double)cv::getTickCount() / (double)cv::getTickFrequency() * 1e6;
     MP_RETURN_IF_ERROR(
         gpu_helper.RunInGlContext([&input_frame, &frame_timestamp_us, &graph,
-                                   &gpu_helper]() -> absl::Status {
+                                   &gpu_helper]() -> abslx::Status {
           // Convert ImageFrame to GpuBuffer.
           auto texture = gpu_helper.CreateSourceTexture(*input_frame.get());
           auto gpu_frame = texture.GetFrame<mediapipe::GpuBuffer>();
@@ -133,7 +133,7 @@ absl::Status RunMPPGraph() {
           MP_RETURN_IF_ERROR(graph.AddPacketToInputStream(
               kInputStream, mediapipe::Adopt(gpu_frame.release())
                                 .At(mediapipe::Timestamp(frame_timestamp_us))));
-          return absl::OkStatus();
+          return abslx::OkStatus();
         }));
 
     // Get the graph result packet, or stop if that fails.
@@ -143,10 +143,10 @@ absl::Status RunMPPGraph() {
 
     // Convert GpuBuffer to ImageFrame.
     MP_RETURN_IF_ERROR(gpu_helper.RunInGlContext(
-        [&packet, &output_frame, &gpu_helper]() -> absl::Status {
+        [&packet, &output_frame, &gpu_helper]() -> abslx::Status {
           auto& gpu_frame = packet.Get<mediapipe::GpuBuffer>();
           auto texture = gpu_helper.CreateSourceTexture(gpu_frame);
-          output_frame = absl::make_unique<mediapipe::ImageFrame>(
+          output_frame = abslx::make_unique<mediapipe::ImageFrame>(
               mediapipe::ImageFormatForGpuBufferFormat(gpu_frame.format()),
               gpu_frame.width(), gpu_frame.height(),
               mediapipe::ImageFrame::kGlDefaultAlignmentBoundary);
@@ -157,7 +157,7 @@ absl::Status RunMPPGraph() {
                        info.gl_type, output_frame->MutablePixelData());
           glFlush();
           texture.Release();
-          return absl::OkStatus();
+          return abslx::OkStatus();
         }));
 
     // Convert back to opencv for display or saving.
@@ -169,7 +169,7 @@ absl::Status RunMPPGraph() {
     if (save_video) {
       if (!writer.isOpened()) {
         LOG(INFO) << "Prepare video writer.";
-        writer.open(absl::GetFlag(FLAGS_output_video_path),
+        writer.open(abslx::GetFlag(FLAGS_output_video_path),
                     mediapipe::fourcc('a', 'v', 'c', '1'),  // .mp4
                     capture.get(cv::CAP_PROP_FPS), output_frame_mat.size());
         RET_CHECK(writer.isOpened());
@@ -191,8 +191,8 @@ absl::Status RunMPPGraph() {
 
 int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
-  absl::ParseCommandLine(argc, argv);
-  absl::Status run_status = RunMPPGraph();
+  abslx::ParseCommandLine(argc, argv);
+  abslx::Status run_status = RunMPPGraph();
   if (!run_status.ok()) {
     LOG(ERROR) << "Failed to run the graph: " << run_status.message();
     return EXIT_FAILURE;

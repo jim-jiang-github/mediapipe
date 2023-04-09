@@ -109,7 +109,7 @@ bool IsOpWithUnderscorePrefix(const string& s) {
 
 string AvoidPythonReserved(const string& s) {
   // Convert namespace separators ('>' characters) to joiners
-  string result = absl::StrReplaceAll(s, {{">", "_"}});
+  string result = abslx::StrReplaceAll(s, {{">", "_"}});
 
   if (IsPythonReserved(result)) return strings::StrCat(result, "_");
   return result;
@@ -120,7 +120,7 @@ string AvoidPythonReserved(const string& s) {
 string Indent(int initial, int rest, StringPiece in) {
   // TODO(josh11b): Also word-wrapping?
   string copy(in.data(), in.size());
-  absl::StripTrailingAsciiWhitespace(&copy);
+  abslx::StripTrailingAsciiWhitespace(&copy);
   std::vector<string> v = str_util::Split(copy, '\n');
 
   string result;
@@ -323,7 +323,7 @@ string GetReturns(const OpDef& op_def,
         }
       }
       strings::StrAppend(&result, "    A tuple of `Tensor` objects (",
-                         absl::StrJoin(out_names, ", "), ").\n\n");
+                         abslx::StrJoin(out_names, ", "), ").\n\n");
       for (int i = 0; i < num_outs; ++i) {
         string desc = strings::StrCat(out_names[i], ": ");
         StringPiece description = op_def.output_arg(i).description();
@@ -354,7 +354,7 @@ string GetReturns(const OpDef& op_def,
 }
 
 string StringToPython(const string& str) {
-  return strings::StrCat("\"", absl::CEscape(str), "\"");
+  return strings::StrCat("\"", abslx::CEscape(str), "\"");
 }
 
 string DataTypeToPython(DataType dtype, const string& dtype_module) {
@@ -466,7 +466,7 @@ string AttrValueToPython(const string& type, const AttrValue& value,
     return TensorToPython(value.tensor());
   } else if (type == "func") {
     return StringToPython(value.func().name());
-  } else if (absl::StartsWith(type, "list(")) {
+  } else if (abslx::StartsWith(type, "list(")) {
     return strings::StrCat("[", AttrListToPython(value, dtype_module), "]");
   } else {
     return "?";
@@ -800,7 +800,7 @@ void GenPythonOp::AddOutputGlobals() {
                        "Output = collections.namedtuple(\n");
     strings::StrAppend(&prelude_, "    \"", AvoidPythonReserved(op_def_.name()),
                        "\",\n");
-    strings::StrAppend(&prelude_, "    [", absl::StrJoin(out_names, ", "),
+    strings::StrAppend(&prelude_, "    [", abslx::StrJoin(out_names, ", "),
                        "])");
     strings::StrAppend(&prelude_, "\n\n");
   }

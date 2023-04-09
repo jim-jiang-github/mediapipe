@@ -108,14 +108,14 @@ class HloModuleGroupMetadata {
     HloInstruction* recv_done = nullptr;
   };
 
-  explicit HloModuleGroupMetadata(absl::Span<HloModule* const> modules)
+  explicit HloModuleGroupMetadata(abslx::Span<HloModule* const> modules)
       : modules_(modules.begin(), modules.end()) {}
 
   ~HloModuleGroupMetadata() = default;
 
   // Build and return the metadata for the given modules.
   static StatusOr<std::unique_ptr<HloModuleGroupMetadata>> Build(
-      absl::Span<HloModule* const> modules);
+      abslx::Span<HloModule* const> modules);
 
   // Returns true if the instruction is one of the 4 channel instructions (Send,
   // Recv, SendDone, RecvDone).
@@ -255,25 +255,25 @@ class HloModuleGroupMetadata {
   std::vector<std::unique_ptr<std::vector<HloInstruction*>>> companion_sets_;
 
   // Map from each companion while instruction to the index into companion_set_.
-  absl::flat_hash_map<const HloInstruction*, int64_t> companion_set_index_;
+  abslx::flat_hash_map<const HloInstruction*, int64_t> companion_set_index_;
 
   // Map from computation to the instruction using it (a kWhile, kConditional).
-  absl::flat_hash_map<const HloComputation*, TrackedInstruction>
+  abslx::flat_hash_map<const HloComputation*, TrackedInstruction>
       tracked_instructions_;
 
   // Maps tracked instructions (kWhile, kConditional, kCall, ...) to the set of
   // communicating instructions within the proper called computation(s).
-  absl::flat_hash_map<HloInstruction*, std::vector<HloInstruction*>>
+  abslx::flat_hash_map<HloInstruction*, std::vector<HloInstruction*>>
       tracked_instructions_comms_;
 
   // All channels in the module.
   std::vector<Channel> channels_;
 
   // Map from channel ids to the index in channels_.
-  absl::flat_hash_map<int64_t, int64_t> channel_id_map_;
+  abslx::flat_hash_map<int64_t, int64_t> channel_id_map_;
 
   // Map from all-reduce ids to the all reduce instructions.
-  absl::flat_hash_map<int64_t, std::vector<HloInstruction*>> all_reduce_map_;
+  abslx::flat_hash_map<int64_t, std::vector<HloInstruction*>> all_reduce_map_;
 
   // The maximum channel id used in the module group.
   int64_t max_channel_id_ = -1;
@@ -281,7 +281,7 @@ class HloModuleGroupMetadata {
   // The modules that this metadata was built from.
   const std::vector<HloModule*> modules_;
 
-  absl::flat_hash_map<HloModule*, std::unique_ptr<HloAliasAnalysis>>
+  abslx::flat_hash_map<HloModule*, std::unique_ptr<HloAliasAnalysis>>
       alias_analyses_;
 };
 

@@ -41,17 +41,17 @@ using mediapipe::reporter::Reporter;
 // The command line utility to mine trace files of useful statistics to
 // determine bottlenecks and performance of a graph.
 int main(int argc, char** argv) {
-  absl::SetProgramUsageMessage("Display statistics from MediaPipe log files.");
-  absl::ParseCommandLine(argc, argv);
+  abslx::SetProgramUsageMessage("Display statistics from MediaPipe log files.");
+  abslx::ParseCommandLine(argc, argv);
 
   Reporter reporter;
-  reporter.set_compact(absl::GetFlag(FLAGS_compact));
-  const auto result = reporter.set_columns(absl::GetFlag(FLAGS_cols));
+  reporter.set_compact(abslx::GetFlag(FLAGS_compact));
+  const auto result = reporter.set_columns(abslx::GetFlag(FLAGS_cols));
   if (result.message().length()) {
     std::cout << "WARNING" << std::endl << result.message();
   }
 
-  const auto& flags_logfiles = absl::GetFlag(FLAGS_logfiles);
+  const auto& flags_logfiles = abslx::GetFlag(FLAGS_logfiles);
   for (const auto& file_name : flags_logfiles) {
     std::ifstream ifs(file_name.c_str(), std::ifstream::in);
     mediapipe::proto_ns::io::IstreamInputStream isis(&ifs);

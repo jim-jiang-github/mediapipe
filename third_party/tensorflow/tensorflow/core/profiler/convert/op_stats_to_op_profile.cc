@@ -54,7 +54,7 @@ void BuildOpProfileNodeTree(const OpStats& op_stats, bool group_by_program,
   for (const OpMetrics& op_metrics : metrics_db.metrics_db()) {
     DCHECK(!op_metrics.name().empty());
     // Don't add ops that cannot be symbolized.
-    if (absl::StartsWith(op_metrics.name(), "region")) continue;
+    if (abslx::StartsWith(op_metrics.name(), "region")) continue;
     if (exclude_idle_ops && IsIdleOp(op_metrics)) continue;
     builder.AddOp(op_metrics);
   }

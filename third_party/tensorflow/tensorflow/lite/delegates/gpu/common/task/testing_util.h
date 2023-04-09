@@ -43,27 +43,27 @@ class TestExecutionEnvironment {
 
   virtual const GpuInfo& GetGpuInfo() const = 0;
 
-  absl::Status ExecuteGPUOperation(
+  abslx::Status ExecuteGPUOperation(
       const std::vector<TensorDescriptor*>& src_cpu,
       const std::vector<TensorDescriptor*>& dst_cpu,
       std::unique_ptr<GPUOperation>&& operation);
 
-  absl::Status ExecuteGpuModel(const std::vector<TensorFloat32>& src_cpu,
+  abslx::Status ExecuteGpuModel(const std::vector<TensorFloat32>& src_cpu,
                                const std::vector<TensorFloat32*>& dst_cpu,
                                GpuModel* gpu_model);
 
-  absl::Status ExecuteGPUOperation(const std::vector<TensorFloat32>& src_cpu,
+  abslx::Status ExecuteGPUOperation(const std::vector<TensorFloat32>& src_cpu,
                                    std::unique_ptr<GPUOperation>&& operation,
                                    const std::vector<BHWC>& dst_sizes,
                                    const std::vector<TensorFloat32*>& dst_cpu);
 
-  absl::Status ExecuteGPUOperation(
+  abslx::Status ExecuteGPUOperation(
       const std::vector<Tensor5DFloat32>& src_cpu,
       std::unique_ptr<GPUOperation>&& operation,
       const std::vector<BHWDC>& dst_sizes,
       const std::vector<Tensor5DFloat32*>& dst_cpu);
 
-  absl::Status ExecuteGPUOperation(const TensorFloat32& src_cpu,
+  abslx::Status ExecuteGPUOperation(const TensorFloat32& src_cpu,
                                    std::unique_ptr<GPUOperation>&& operation,
                                    const BHWC& dst_size,
                                    TensorFloat32* result) {
@@ -71,7 +71,7 @@ class TestExecutionEnvironment {
                                std::move(operation), dst_size, result);
   }
 
-  absl::Status ExecuteGPUOperation(const Tensor5DFloat32& src_cpu,
+  abslx::Status ExecuteGPUOperation(const Tensor5DFloat32& src_cpu,
                                    std::unique_ptr<GPUOperation>&& operation,
                                    const BHWDC& dst_size,
                                    Tensor5DFloat32* result) {
@@ -79,7 +79,7 @@ class TestExecutionEnvironment {
                                std::move(operation), dst_size, result);
   }
 
-  absl::Status ExecuteGPUOperation(const std::vector<TensorFloat32>& src_cpu,
+  abslx::Status ExecuteGPUOperation(const std::vector<TensorFloat32>& src_cpu,
                                    std::unique_ptr<GPUOperation>&& operation,
                                    const BHWC& dst_size,
                                    TensorFloat32* result) {
@@ -88,7 +88,7 @@ class TestExecutionEnvironment {
         std::vector<BHWC>{dst_size}, std::vector<TensorFloat32*>{result});
   }
 
-  absl::Status ExecuteGPUOperation(const std::vector<Tensor5DFloat32>& src_cpu,
+  abslx::Status ExecuteGPUOperation(const std::vector<Tensor5DFloat32>& src_cpu,
                                    std::unique_ptr<GPUOperation>&& operation,
                                    const BHWDC& dst_size,
                                    Tensor5DFloat32* result) {
@@ -98,13 +98,13 @@ class TestExecutionEnvironment {
   }
 
  protected:
-  virtual absl::Status ExecuteGpuOperationInternal(
+  virtual abslx::Status ExecuteGpuOperationInternal(
       const std::vector<TensorDescriptor*>& src_cpu,
       const std::vector<TensorDescriptor*>& dst_cpu,
       std::unique_ptr<GPUOperation>&& operation) = 0;
 };
 
-absl::Status PointWiseNear(const std::vector<float>& ref,
+abslx::Status PointWiseNear(const std::vector<float>& ref,
                            const std::vector<float>& to_compare,
                            float eps = 0.0f);
 

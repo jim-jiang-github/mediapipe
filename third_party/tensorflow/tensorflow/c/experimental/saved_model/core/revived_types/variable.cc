@@ -30,7 +30,7 @@ limitations under the License.
 namespace tensorflow {
 
 Variable::Variable(ImmediateExecutionContext* ctx, DataType dtype,
-                   TensorShape shape, absl::optional<std::string> name,
+                   TensorShape shape, abslx::optional<std::string> name,
                    ImmediateTensorHandlePtr handle)
     : TensorHandleConvertible(std::move(handle)),
       name_(name.has_value() ? *name : "Variable"),
@@ -66,7 +66,7 @@ Status Variable::ReadValue(ImmediateTensorHandlePtr* out) {
 
 Status Variable::CreateUninitialized(
     ImmediateExecutionContext* ctx, DataType dtype, TensorShape shape,
-    absl::optional<std::string> name, const char* raw_device_name,
+    abslx::optional<std::string> name, const char* raw_device_name,
     const std::vector<std::string>& component_devices,
     std::unique_ptr<Variable>* output) {
   ImmediateTensorHandlePtr handle;

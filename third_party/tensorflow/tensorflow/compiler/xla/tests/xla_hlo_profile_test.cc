@@ -80,8 +80,8 @@ struct ParsedProfileOutputLine {
 
 Status ParseOneProfileOutputLine(
     const std::string& line, bool expect_hlo,
-    absl::flat_hash_map<std::string, ParsedProfileOutputLine>* parsed_results,
-    absl::Span<const absl::string_view> opcodes_to_ignore = {}) {
+    abslx::flat_hash_map<std::string, ParsedProfileOutputLine>* parsed_results,
+    abslx::Span<const abslx::string_view> opcodes_to_ignore = {}) {
   std::string separator = "[^:]*:: +";
   std::string match_percentage = R"(\d+\.\d*% +\d+Σ)";
   std::string match_cycles =
@@ -99,7 +99,7 @@ Status ParseOneProfileOutputLine(
 
   std::string match_opcode = expect_hlo ? "%[^=]+= [^ ]+ ([^(]+)\\(.*"
                                         : "(\\[total\\])( \\[entry\\])?";
-  std::string regexp_pattern = absl::StrCat(
+  std::string regexp_pattern = abslx::StrCat(
       " +", match_cycles, separator, match_usecs, separator, match_flops,
       separator, match_trops, separator, match_bytes_per_sec, separator,
       match_bytes_per_cycle, separator, match_opcode);
@@ -116,7 +116,7 @@ Status ParseOneProfileOutputLine(
         ", Regexp: ", regexp_pattern);
   }
 
-  if (!absl::c_linear_search(opcodes_to_ignore, parsed_line.opcode)) {
+  if (!abslx::c_linear_search(opcodes_to_ignore, parsed_line.opcode)) {
     InsertOrDie(parsed_results, parsed_line.opcode, parsed_line);
   }
 
@@ -209,9 +209,9 @@ XLA_TEST_F(HloProfileTest, DISABLED_ON_GPU(ProfileSingleComputation)) {
                          rhs_shape);
   VLOG(4) << "Profile Output:\n" << profile_output;
   std::vector<std::string> profile_output_lines =
-      absl::StrSplit(profile_output, '\n');
+      abslx::StrSplit(profile_output, '\n');
 
-  absl::flat_hash_map<std::string, ParsedProfileOutputLine>
+  abslx::flat_hash_map<std::string, ParsedProfileOutputLine>
       parsed_profile_lines;
 
   int line_no = 0;
@@ -313,19 +313,19 @@ XLA_TEST_F(HloProfileTest, DISABLED_ON_GPU(ProfileWhileComputation)) {
   SCOPED_TRACE(profile_output);
 
   std::vector<std::string> profile_output_lines =
-      absl::StrSplit(profile_output, '\n');
+      abslx::StrSplit(profile_output, '\n');
 
   auto while_body_profile_start =
-      absl::c_find_if(profile_output_lines, [](absl::string_view s) {
-        return absl::StartsWith(s, "Execution profile for body");
+      abslx::c_find_if(profile_output_lines, [](abslx::string_view s) {
+        return abslx::StartsWith(s, "Execution profile for body");
       });
 
   ASSERT_NE(while_body_profile_start, profile_output_lines.cend());
 
   auto while_body_profile_end =
       std::find_if(while_body_profile_start, profile_output_lines.end(),
-                   [](absl::string_view s) {
-                     return absl::StartsWith(s, "********** microseconds ");
+                   [](abslx::string_view s) {
+                     return abslx::StartsWith(s, "********** microseconds ");
                    });
 
   // We emit a blank line before the "microseconds report" line.
@@ -333,7 +333,7 @@ XLA_TEST_F(HloProfileTest, DISABLED_ON_GPU(ProfileWhileComputation)) {
 
   ASSERT_NE(while_body_profile_end, profile_output_lines.end());
 
-  absl::flat_hash_map<std::string, ParsedProfileOutputLine>
+  abslx::flat_hash_map<std::string, ParsedProfileOutputLine>
       parsed_profile_lines;
 
   for (auto while_body_profile_i = while_body_profile_start + 1;

@@ -42,7 +42,7 @@ LogicalResult HasValidCompilationAndReplicationAttributes(Operation& op) {
   if (compile_attr) {
     auto value = compile_attr.getValue();
     // TODO(b/229028654): Remove string conversion once we have C++17.
-    absl::string_view device_type(value.data(), value.size());
+    abslx::string_view device_type(value.data(), value.size());
     auto it = std::find(kValidDeviceTypes.begin(), kValidDeviceTypes.end(),
                         device_type);
     if (it == kValidDeviceTypes.end()) {

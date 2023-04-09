@@ -73,15 +73,15 @@ class XStatsBuilder {
   }
 
   void ParseAndAddStatValue(const XStatMetadata& metadata,
-                            absl::string_view value) {
+                            abslx::string_view value) {
     int64_t int_value;
     uint64 uint_value;
     double double_value;
-    if (absl::SimpleAtoi(value, &int_value)) {
+    if (abslx::SimpleAtoi(value, &int_value)) {
       AddStatValue(metadata, int_value);
-    } else if (absl::SimpleAtoi(value, &uint_value)) {
+    } else if (abslx::SimpleAtoi(value, &uint_value)) {
       AddStatValue(metadata, uint_value);
-    } else if (absl::SimpleAtod(value, &double_value)) {
+    } else if (abslx::SimpleAtod(value, &double_value)) {
       AddStatValue(metadata, double_value);
     } else {
       AddStatValue(metadata, GetOrCreateStatMetadata(value));
@@ -113,7 +113,7 @@ class XStatsBuilder {
                                                     : stat.int64_value();
   }
 
-  absl::string_view StrOrRefValue(const XStat& stat);
+  abslx::string_view StrOrRefValue(const XStat& stat);
 
  private:
   XStat* AddStat(const XStatMetadata& metadata) {
@@ -137,7 +137,7 @@ class XStatsBuilder {
     stat->set_int64_value(value);
   }
   template <typename Int,
-            std::enable_if_t<absl::conjunction<std::is_integral<Int>,
+            std::enable_if_t<abslx::conjunction<std::is_integral<Int>,
                                                std::is_signed<Int>>::value,
                              bool> = true>
   static void SetStatValue(Int value, XStat* stat) {
@@ -145,8 +145,8 @@ class XStatsBuilder {
   }
   template <typename UInt,
             std::enable_if_t<
-                absl::conjunction<std::is_integral<UInt>,
-                                  absl::negation<std::is_signed<UInt>>>::value,
+                abslx::conjunction<std::is_integral<UInt>,
+                                  abslx::negation<std::is_signed<UInt>>>::value,
                 bool> = true>
   static void SetStatValue(UInt value, XStat* stat) {
     stat->set_uint64_value(value);
@@ -157,7 +157,7 @@ class XStatsBuilder {
   static void SetStatValue(const char* value, XStat* stat) {
     stat->set_str_value(std::string(value));
   }
-  static void SetStatValue(absl::string_view value, XStat* stat) {
+  static void SetStatValue(abslx::string_view value, XStat* stat) {
     stat->set_str_value(std::string(value));
   }
   static void SetStatValue(std::string&& value, XStat* stat) {
@@ -192,7 +192,7 @@ class XStatsBuilder {
         const auto& stat_metadata_by_id = src_plane.stat_metadata();
         const auto it = stat_metadata_by_id.find(src_stat.ref_value());
         if (TF_PREDICT_TRUE(it != stat_metadata_by_id.end())) {
-          absl::string_view value = it->second.name();
+          abslx::string_view value = it->second.name();
           dst_stat->set_ref_value(GetOrCreateStatMetadata(value).id());
         }
         break;
@@ -203,7 +203,7 @@ class XStatsBuilder {
     }
   }
 
-  const XStatMetadata& GetOrCreateStatMetadata(absl::string_view value);
+  const XStatMetadata& GetOrCreateStatMetadata(abslx::string_view value);
 
   T* stats_owner_;
   XPlaneBuilder* stats_metadata_owner_;
@@ -279,10 +279,10 @@ class XLineBuilder {
 
   int64_t NumEvents() const { return line_->events_size(); }
 
-  absl::string_view Name() const { return line_->name(); }
-  void SetName(absl::string_view name) { line_->set_name(std::string(name)); }
+  abslx::string_view Name() const { return line_->name(); }
+  void SetName(abslx::string_view name) { line_->set_name(std::string(name)); }
 
-  void SetNameIfEmpty(absl::string_view name) {
+  void SetNameIfEmpty(abslx::string_view name) {
     if (line_->name().empty()) SetName(name);
   }
 
@@ -304,7 +304,7 @@ class XLineBuilder {
     line_->mutable_events()->Reserve(num_events);
   }
 
-  void SetDisplayNameIfEmpty(absl::string_view display_name) {
+  void SetDisplayNameIfEmpty(abslx::string_view display_name) {
     if (line_->display_name().empty()) {
       line_->set_display_name(std::string(display_name));
     }
@@ -334,8 +334,8 @@ class XPlaneBuilder : public XStatsBuilder<XPlane> {
   int64_t Id() const { return plane_->id(); }
   void SetId(int64_t id) { plane_->set_id(id); }
 
-  absl::string_view Name() const { return plane_->name(); }
-  void SetName(absl::string_view name) { plane_->set_name(std::string(name)); }
+  abslx::string_view Name() const { return plane_->name(); }
+  void SetName(abslx::string_view name) { plane_->set_name(std::string(name)); }
 
   void ReserveLines(size_t num_lines) {
     plane_->mutable_lines()->Reserve(num_lines);
@@ -367,20 +367,20 @@ class XPlaneBuilder : public XStatsBuilder<XPlane> {
   // Using these overloads guarantees names are unique.
   // WARNING: If calling any of these overloads, do not call the integer one
   // above on the same instance.
-  XEventMetadata* GetOrCreateEventMetadata(absl::string_view name);
+  XEventMetadata* GetOrCreateEventMetadata(abslx::string_view name);
   XEventMetadata* GetOrCreateEventMetadata(std::string&& name);
   XEventMetadata* GetOrCreateEventMetadata(const char* name) {
-    return GetOrCreateEventMetadata(absl::string_view(name));
+    return GetOrCreateEventMetadata(abslx::string_view(name));
   }
   // Like the functions above but for multiple names.
   std::vector<XEventMetadata*> GetOrCreateEventsMetadata(
-      const std::vector<absl::string_view>& names);
+      const std::vector<abslx::string_view>& names);
 
   // Returns event metadata with the given name. Returns nullptr if not found.
-  XEventMetadata* GetEventMetadata(absl::string_view name) const;
+  XEventMetadata* GetEventMetadata(abslx::string_view name) const;
 
   // Returns stat metadata with the given name. Returns nullptr if not found.
-  XStatMetadata* GetStatMetadata(absl::string_view name) const;
+  XStatMetadata* GetStatMetadata(abslx::string_view name) const;
 
   // Returns stat metadata given its id. Returns a default value if not found.
   const XStatMetadata* GetStatMetadata(int64_t metadata_id) const;
@@ -400,10 +400,10 @@ class XPlaneBuilder : public XStatsBuilder<XPlane> {
   // Using these overloads guarantees names are unique.
   // WARNING: If calling any of these overloads, do not call the integer one
   // above on the same instance.
-  XStatMetadata* GetOrCreateStatMetadata(absl::string_view name);
+  XStatMetadata* GetOrCreateStatMetadata(abslx::string_view name);
   XStatMetadata* GetOrCreateStatMetadata(std::string&& name);
   XStatMetadata* GetOrCreateStatMetadata(const char* name) {
-    return GetOrCreateStatMetadata(absl::string_view(name));
+    return GetOrCreateStatMetadata(abslx::string_view(name));
   }
 
  private:
@@ -412,32 +412,32 @@ class XPlaneBuilder : public XStatsBuilder<XPlane> {
   // Artifacts to accelerate the builders.
   int64_t last_event_metadata_id_ = 0LL;
   int64_t last_stat_metadata_id_ = 0LL;
-  absl::flat_hash_map<std::string, XEventMetadata*> event_metadata_by_name_;
-  absl::flat_hash_map<std::string, XStatMetadata*> stat_metadata_by_name_;
-  absl::flat_hash_map<int64_t, XLine*> lines_by_id_;
+  abslx::flat_hash_map<std::string, XEventMetadata*> event_metadata_by_name_;
+  abslx::flat_hash_map<std::string, XStatMetadata*> stat_metadata_by_name_;
+  abslx::flat_hash_map<int64_t, XLine*> lines_by_id_;
 };
 
 template <typename T>
 const XStatMetadata& XStatsBuilder<T>::GetOrCreateStatMetadata(
-    absl::string_view value) {
+    abslx::string_view value) {
   return *stats_metadata_owner_->GetOrCreateStatMetadata(value);
 }
 
 template <typename T>
-absl::string_view XStatsBuilder<T>::StrOrRefValue(const XStat& stat) {
+abslx::string_view XStatsBuilder<T>::StrOrRefValue(const XStat& stat) {
   switch (stat.value_case()) {
     case XStat::kStrValue:
       return stat.str_value();
     case XStat::kRefValue: {
       auto* ref_stat = stats_metadata_owner_->GetStatMetadata(stat.ref_value());
-      return ref_stat ? ref_stat->name() : absl::string_view();
+      return ref_stat ? ref_stat->name() : abslx::string_view();
     }
     case XStat::kInt64Value:
     case XStat::kUint64Value:
     case XStat::kDoubleValue:
     case XStat::kBytesValue:
     case XStat::VALUE_NOT_SET:
-      return absl::string_view();
+      return abslx::string_view();
   }
 }
 }  // namespace profiler

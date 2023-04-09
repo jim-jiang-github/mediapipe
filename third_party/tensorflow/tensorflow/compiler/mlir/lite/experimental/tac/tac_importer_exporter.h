@@ -31,7 +31,7 @@ class TacImporter {
   virtual ~TacImporter() {}
 
   // Imports and returns the Module for the imported program.
-  virtual absl::StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> Import() = 0;
+  virtual abslx::StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> Import() = 0;
 };
 
 // Interface for exporting a module.
@@ -43,7 +43,7 @@ class TacExporter {
   virtual ~TacExporter() {}
 
   // Imports and returns the Module for the imported program.
-  virtual absl::Status Export(mlir::ModuleOp module) = 0;
+  virtual abslx::Status Export(mlir::ModuleOp module) = 0;
 };
 }  // namespace tac
 }  // namespace TFL

@@ -45,15 +45,15 @@ namespace mediapipe {
         constexpr GraphServiceBase(const char* key) : key(key) {}
 
         virtual ~GraphServiceBase() = default;
-        virtual absl::StatusOr<Packet> CreateDefaultObject() const {
+        virtual abslx::StatusOr<Packet> CreateDefaultObject() const {
             return DefaultInitializationUnsupported();
         }
 
         const char* key;
 
     protected:
-        absl::Status DefaultInitializationUnsupported() const {
-            return absl::UnimplementedError(absl::StrCat(
+        abslx::Status DefaultInitializationUnsupported() const {
+            return abslx::UnimplementedError(abslx::StrCat(
                 "Graph service '", key, "' does not support default initialization"));
         }
     };
@@ -68,7 +68,7 @@ namespace mediapipe {
             kDisallowDefaultInitialization)
             : GraphServiceBase(my_key), default_init_(default_init) {}
 
-        absl::StatusOr<Packet> CreateDefaultObject() const override {
+        abslx::StatusOr<Packet> CreateDefaultObject() const override {
             if (default_init_ != kAllowDefaultInitialization) {
                 return DefaultInitializationUnsupported();
             }
@@ -82,11 +82,11 @@ namespace mediapipe {
         }
 
     private:
-        absl::StatusOr<std::shared_ptr<T>> CreateDefaultObjectInternal() const {
+        abslx::StatusOr<std::shared_ptr<T>> CreateDefaultObjectInternal() const {
             auto call_create = [](auto x) -> decltype(decltype(x)::type::Create()) {
                 return decltype(x)::type::Create();
             };
-          /*  if constexpr (std::is_invocable_r_v<absl::StatusOr<std::shared_ptr<T>>,
+          /*  if constexpr (std::is_invocable_r_v<abslx::StatusOr<std::shared_ptr<T>>,
                 decltype(call_create), type_tag<T>>) {
                 return T::Create();
             }*/

@@ -62,7 +62,7 @@ class WorkgroupsCalculatorFromMetadata : public WorkgroupsCalculator {
   }
 
  private:
-  absl::flat_hash_map<NodeId, uint3> workgroups_;
+  abslx::flat_hash_map<NodeId, uint3> workgroups_;
   std::unique_ptr<WorkgroupsCalculator> default_calculator_;
 };
 

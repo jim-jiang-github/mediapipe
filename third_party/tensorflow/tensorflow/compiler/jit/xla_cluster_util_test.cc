@@ -154,13 +154,13 @@ StatusOr<std::vector<string>> GetNodesRelatedToRefVarsSorted(
   FunctionLibraryRuntime* lib_runtime =
       pflr->GetFLR(ProcessFunctionLibraryRuntime::kDefaultFLRDevice);
 
-  TF_ASSIGN_OR_RETURN(absl::flat_hash_set<Node*> nodes_related_to_ref_vars,
+  TF_ASSIGN_OR_RETURN(abslx::flat_hash_set<Node*> nodes_related_to_ref_vars,
                       GetNodesRelatedToRefVariables(*graph, lib_runtime));
 
   std::vector<string> names;
-  absl::c_transform(nodes_related_to_ref_vars, std::back_inserter(names),
+  abslx::c_transform(nodes_related_to_ref_vars, std::back_inserter(names),
                     [](Node* n) { return n->name(); });
-  absl::c_sort(names);
+  abslx::c_sort(names);
   return names;
 }
 
@@ -186,7 +186,7 @@ void CreateSubgraphNotTouchingRefVar(const Scope& s) {
 void CreateSubgraphCallingFunctionWithRefVar(const Scope& s) {
   NameAttrList ref_float_function;
   ref_float_function.set_name("RefFloatFn");
-  ops::PartitionedCall call(s.WithOpName("RefFloat"), {absl::Span<Input>{}},
+  ops::PartitionedCall call(s.WithOpName("RefFloat"), {abslx::Span<Input>{}},
                             {DT_FLOAT}, ref_float_function);
   Output constant =
       ops::Const(s.WithOpName("constant_ref_pco"), Input::Initializer(0.0));
@@ -196,7 +196,7 @@ void CreateSubgraphCallingFunctionWithRefVar(const Scope& s) {
 void CreateSubgraphCallingFunctionWithoutRefVar(const Scope& s) {
   NameAttrList regular_float_function;
   regular_float_function.set_name("RegularFloatFn");
-  ops::PartitionedCall call(s.WithOpName("RegularFloat"), {absl::Span<Input>{}},
+  ops::PartitionedCall call(s.WithOpName("RegularFloat"), {abslx::Span<Input>{}},
                             {DT_FLOAT}, regular_float_function);
   Output constant =
       ops::Const(s.WithOpName("constant_normal_pco"), Input::Initializer(0.0));
@@ -255,7 +255,7 @@ TEST(NodesRelatedToRefVariables, Basic) {
   EXPECT_EQ(names, expected);
 }
 
-Status MakeLoop(Scope s, Output init_value, absl::string_view loop_name) {
+Status MakeLoop(Scope s, Output init_value, abslx::string_view loop_name) {
   s = s.NewSubScope(std::string(loop_name));
   ops::internal::Enter enter(s.WithOpName("init_value"), init_value, loop_name);
   ops::Merge merge(s.WithOpName("merge"), {init_value, init_value});

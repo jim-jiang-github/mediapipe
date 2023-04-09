@@ -96,7 +96,7 @@ Status SingleRestore(ImmediateExecutionContext* ctx, const std::string& prefix,
   AbstractTensorHandle* restored_handle = nullptr;
   int num_retvals = 1;
   TF_RETURN_IF_ERROR(restore_op->Execute(
-      absl::MakeSpan(&restored_handle, num_retvals), &num_retvals));
+      abslx::MakeSpan(&restored_handle, num_retvals), &num_retvals));
   AbstractTensorHandlePtr owned_restored_handle(restored_handle);
   if (!tensorflow::isa<ImmediateExecutionTensorHandle>(
           owned_restored_handle.get())) {

@@ -35,7 +35,7 @@ StatusOr<HloInstruction*> GatherSimplifier::ExpandInstruction(
   auto* gather = DynCast<HloGatherInstruction>(inst);
 
   // If any slice size is 0, we can just return a constant zero.
-  if (absl::c_linear_search(gather->gather_slice_sizes(), 0)) {
+  if (abslx::c_linear_search(gather->gather_slice_sizes(), 0)) {
     auto* zero = gather->AddInstruction(HloInstruction::CreateConstant(
         LiteralUtil::Zero(gather->shape().element_type())));
     return gather->AddInstruction(
@@ -60,14 +60,14 @@ StatusOr<HloInstruction*> GatherSimplifier::ExpandInstruction(
   // output shape for the Gather op.
   auto slice_sizes = Permute(gather->gather_slice_sizes(), operand_permutation);
   std::vector<int64_t> output_dims = {start_indices->shape().dimensions(0)};
-  absl::c_copy(slice_sizes, std::back_inserter(output_dims));
+  abslx::c_copy(slice_sizes, std::back_inserter(output_dims));
   Shape output_shape =
       ShapeUtil::MakeShape(operand->shape().element_type(), output_dims);
 
   std::vector<int64_t> offset_dims(operand_rank);
-  absl::c_iota(offset_dims, 1);
+  abslx::c_iota(offset_dims, 1);
   std::vector<int64_t> start_index_map(dims.start_index_map().size());
-  absl::c_iota(start_index_map, 0);
+  abslx::c_iota(start_index_map, 0);
 
   auto* result = gather->AddInstruction(HloInstruction::CreateGather(
       output_shape, operand, start_indices,
@@ -79,7 +79,7 @@ StatusOr<HloInstruction*> GatherSimplifier::ExpandInstruction(
   // Undo the start_index_map transpose.
   std::vector<int64_t> output_permutation(1 +  // start index dimension.
                                           operand_rank);
-  absl::c_transform(operand_permutation_inverse, output_permutation.begin() + 1,
+  abslx::c_transform(operand_permutation_inverse, output_permutation.begin() + 1,
                     [](int64_t dim) { return dim + 1; });
   TF_ASSIGN_OR_RETURN(result, MaybeTranspose(result, output_permutation));
 
@@ -87,7 +87,7 @@ StatusOr<HloInstruction*> GatherSimplifier::ExpandInstruction(
   if (!dims.collapsed_slice_dims().empty()) {
     std::vector<int64_t> collapsed_slice_dims(
         dims.collapsed_slice_dims().size());
-    absl::c_transform(dims.collapsed_slice_dims(), collapsed_slice_dims.begin(),
+    abslx::c_transform(dims.collapsed_slice_dims(), collapsed_slice_dims.begin(),
                       [](int64_t dim) { return dim + 1; });
     TF_ASSIGN_OR_RETURN(result,
                         ElideDegenerateDims(result, collapsed_slice_dims));
@@ -116,7 +116,7 @@ StatusOr<HloInstruction*> GatherSimplifier::ExpandInstruction(
   auto offset_dim_index = static_cast<int64_t>(start_indices_dims.size());
   int64_t start_index_dim_index = 0;
   for (int64_t i = 0; i < output_rank; ++i) {
-    if (absl::c_linear_search(dims.offset_dims(), i)) {
+    if (abslx::c_linear_search(dims.offset_dims(), i)) {
       output_perm.push_back(offset_dim_index++);
     } else {
       output_perm.push_back(start_index_dim_index++);

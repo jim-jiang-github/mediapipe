@@ -119,7 +119,7 @@ StatusOr<HloInstruction*> Convolution4DExpander::ExpandInstruction(
   auto compute_new_dimension =
       [](const std::vector<int64_t>& removed_dimensions,
          int64_t old_dimension) {
-        int64_t num_smaller = absl::c_count_if(
+        int64_t num_smaller = abslx::c_count_if(
             removed_dimensions, [old_dimension](int64_t removed_dimension) {
               return removed_dimension < old_dimension;
             });

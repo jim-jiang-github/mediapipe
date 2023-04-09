@@ -37,8 +37,8 @@ XlaOp DynamicConditional(XlaBuilder* builder, XlaOp predicate,
 // Similar to DynamicConditional, but support multiple branches.
 XlaOp DynamicConditional(
     XlaBuilder* builder, XlaOp branch_index,
-    absl::Span<const XlaComputation* const> branch_computations,
-    absl::Span<const XlaOp> branch_operands);
+    abslx::Span<const XlaComputation* const> branch_computations,
+    abslx::Span<const XlaOp> branch_operands);
 
 // Similar to SetDimensionSize, but automatically adjust the bound of output if
 // a tighter one can be inferred by `value_inference`.

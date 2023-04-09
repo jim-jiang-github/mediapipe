@@ -19,7 +19,7 @@
 
 #include "absl/strings/internal/resize_uninitialized.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace strings_internal {
 
@@ -53,6 +53,6 @@ void Base64EscapeInternal(const unsigned char* src, size_t szsrc, String* dest,
 
 }  // namespace strings_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_INTERNAL_ESCAPING_H_

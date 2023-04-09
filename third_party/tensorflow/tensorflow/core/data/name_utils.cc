@@ -42,7 +42,7 @@ string ArgsToString(const std::vector<string>& args) {
   if (args.empty()) {
     return "";
   }
-  return strings::StrCat("(", absl::StrJoin(args, ", "), ")");
+  return strings::StrCat("(", abslx::StrJoin(args, ", "), ")");
 }
 
 string DatasetDebugString(const string& dataset_type) {

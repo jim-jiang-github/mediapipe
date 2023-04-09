@@ -41,14 +41,14 @@ namespace mlir {
 namespace TFL {
 namespace tac {
 
-absl::StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> ImportFlatbufferOrMlir(
+abslx::StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> ImportFlatbufferOrMlir(
     const std::string& input_filename, bool input_mlir,
     llvm::SourceMgr* source_mgr, mlir::MLIRContext* context) {
   std::string error;
   std::unique_ptr<llvm::MemoryBuffer> buffer =
       mlir::openInputFile(input_filename, &error);
   if (buffer == nullptr) {
-    return absl::InvalidArgumentError(absl::StrFormat(
+    return abslx::InvalidArgumentError(abslx::StrFormat(
         "Cannot open input file: %s. %s", input_filename, error));
   }
 
@@ -68,18 +68,18 @@ absl::StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> ImportFlatbufferOrMlir(
   std::vector<std::string> inputs;
   std::vector<std::string> outputs;
   return tflite::FlatBufferToMlir(
-      absl::string_view(buffer->getBufferStart(), buffer->getBufferSize()),
+      abslx::string_view(buffer->getBufferStart(), buffer->getBufferSize()),
       context, loc, /*use_external_constant=*/false, inputs, outputs,
       /*experimental_prune_unreachable_nodes_unconditionally=*/true);
 }
 
-absl::Status ExportFlatbufferOrMlir(const std::string& output_filename,
+abslx::Status ExportFlatbufferOrMlir(const std::string& output_filename,
                                     bool output_mlir, mlir::ModuleOp module) {
   std::string error_msg;
   auto output = mlir::openOutputFile(output_filename, &error_msg);
   if (output == nullptr) {
     llvm::errs() << error_msg << '\n';
-    return absl::InvalidArgumentError("cannot open output file.");
+    return abslx::InvalidArgumentError("cannot open output file.");
   }
 
   std::string result;
@@ -93,13 +93,13 @@ absl::Status ExportFlatbufferOrMlir(const std::string& output_filename,
     options.toco_flags.set_enable_select_tf_ops(false);
     options.toco_flags.set_allow_custom_ops(true);
     if (!tflite::MlirToFlatBufferTranslateFunction(module, options, &result)) {
-      return absl::UnknownError("Failed to export tflite file.");
+      return abslx::UnknownError("Failed to export tflite file.");
     }
   }
 
   output->os() << result;
   output->keep();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace tac

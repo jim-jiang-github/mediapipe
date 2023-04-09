@@ -97,12 +97,12 @@ class MultiPlatformManager {
   // If the requested platform is not registered, an error status is returned.
   // Ownership of the platform is NOT transferred to the caller --
   // the MultiPlatformManager owns the platforms in a singleton-like fashion.
-  static port::StatusOr<Platform*> PlatformWithName(absl::string_view target);
+  static port::StatusOr<Platform*> PlatformWithName(abslx::string_view target);
   static port::StatusOr<Platform*> PlatformWithId(const Platform::Id& id);
 
   // Same functions as above, but allows platforms to be returned without
   // initialization if initialize_platform == false.
-  static port::StatusOr<Platform*> PlatformWithName(absl::string_view target,
+  static port::StatusOr<Platform*> PlatformWithName(abslx::string_view target,
                                                     bool initialize_platform);
   static port::StatusOr<Platform*> PlatformWithId(const Platform::Id& id,
                                                   bool initialize_platform);
@@ -118,7 +118,7 @@ class MultiPlatformManager {
   // Ownership of the platform is NOT transferred to the caller --
   // the MultiPlatformManager owns the platforms in a singleton-like fashion.
   static port::StatusOr<Platform*> InitializePlatformWithName(
-      absl::string_view target,
+      abslx::string_view target,
       const std::map<std::string, std::string>& options);
 
   static port::StatusOr<Platform*> InitializePlatformWithId(

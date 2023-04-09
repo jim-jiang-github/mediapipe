@@ -31,7 +31,7 @@ inline Status FileExists(const std::string& filename) {
   return Env::Default()->FileExists(filename);
 }
 
-inline Status FileExists(const absl::string_view& filename) {
+inline Status FileExists(const abslx::string_view& filename) {
   return Env::Default()->FileExists(std::string(filename));
 }
 

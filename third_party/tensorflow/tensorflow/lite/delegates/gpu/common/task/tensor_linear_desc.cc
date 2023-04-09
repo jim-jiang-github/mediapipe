@@ -55,39 +55,39 @@ GPUResources TensorLinearDescriptor::GetGPUResources(
   return resources;
 }
 
-absl::Status TensorLinearDescriptor::PerformSelector(
+abslx::Status TensorLinearDescriptor::PerformSelector(
     const GpuInfo& gpu_info, const std::string& selector,
     const std::vector<std::string>& args,
     const std::vector<std::string>& template_args, std::string* result) const {
   if (selector == "Length") {
     *result = "length";
-    return absl::OkStatus();
+    return abslx::OkStatus();
   } else if (selector == "Read") {
     return PerformReadSelector(gpu_info, args, result);
   } else if (selector == "GetPtr") {
     if (storage_type != LinearStorageType::BUFFER) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "GetPtr selector supported for LinearStorageType::BUFFER only.");
     }
     if (gpu_info.IsApiMetal() || gpu_info.IsApiOpenCl()) {
       *result = "buffer";
-      return absl::OkStatus();
+      return abslx::OkStatus();
     } else {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "GetPtr selector supported only in Metal and OpenCL.");
     }
   } else {
-    return absl::NotFoundError(absl::StrCat(
+    return abslx::NotFoundError(abslx::StrCat(
         "TensorLinearDescriptor don't have selector with name - ", selector));
   }
 }
 
-absl::Status TensorLinearDescriptor::PerformReadSelector(
+abslx::Status TensorLinearDescriptor::PerformReadSelector(
     const GpuInfo& gpu_info, const std::vector<std::string>& args,
     std::string* result) const {
   if (args.size() != 1) {
-    return absl::NotFoundError(
-        absl::StrCat("TensorLinearDescriptor Read require one argument, but ",
+    return abslx::NotFoundError(
+        abslx::StrCat("TensorLinearDescriptor Read require one argument, but ",
                      args.size(), " was passed"));
   }
   if (storage_type == LinearStorageType::BUFFER) {
@@ -97,47 +97,47 @@ absl::Status TensorLinearDescriptor::PerformReadSelector(
         if (memory_type == MemoryType::CONSTANT) {
           const std::string arg0 = "(" + args[0] + ")";
           *result =
-              absl::StrCat("vec4(unpackHalf2x16(buffer[", arg0, " / 2][", arg0,
+              abslx::StrCat("vec4(unpackHalf2x16(buffer[", arg0, " / 2][", arg0,
                            " % 2 == 0 ? 0 : 2]), unpackHalf2x16(buffer[", arg0,
                            " / 2][", arg0, " % 2 == 0 ? 1 : 3]))");
         } else {
           *result =
-              absl::StrCat("vec4(unpackHalf2x16(buffer[", args[0],
+              abslx::StrCat("vec4(unpackHalf2x16(buffer[", args[0],
                            "].x), unpackHalf2x16(buffer[", args[0], "].y))");
         }
       } else {
-        *result = absl::StrCat("buffer[", args[0], "]");
+        *result = abslx::StrCat("buffer[", args[0], "]");
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     } else {
-      *result = absl::StrCat("buffer[", args[0], "]");
-      return absl::OkStatus();
+      *result = abslx::StrCat("buffer[", args[0], "]");
+      return abslx::OkStatus();
     }
   } else {
     if (gpu_info.IsApiMetal()) {
-      *result = absl::StrCat("tex2d.read(ushort2(", args[0], ", 0))");
-      return absl::OkStatus();
+      *result = abslx::StrCat("tex2d.read(ushort2(", args[0], ", 0))");
+      return abslx::OkStatus();
     } else if (gpu_info.IsApiOpenCl()) {
       const std::string read =
           element_type == DataType::FLOAT16 ? "read_imageh" : "read_imagef";
       *result =
-          absl::StrCat(read, "(tex2d, smp_none, (int2)(", args[0], ", 0))");
-      return absl::OkStatus();
+          abslx::StrCat(read, "(tex2d, smp_none, (int2)(", args[0], ", 0))");
+      return abslx::OkStatus();
     } else if (gpu_info.IsGlsl()) {
       if (gpu_info.IsApiOpenGl() && gpu_info.opengl_info.major_version < 3) {
-        *result = absl::StrCat("texture2D(tex2d, vec2(float(", args[0],
+        *result = abslx::StrCat("texture2D(tex2d, vec2(float(", args[0],
                                ") * inv_tex_width, 0.0))");
-        return absl::OkStatus();
+        return abslx::OkStatus();
       } else {
         *result = "texelFetch(tex2d, ivec2(" + args[0] + ", 0), 0)";
         if (element_type == DataType::FLOAT16 &&
             gpu_info.IsGlslSupportsExplicitFp16()) {
           *result = "f16vec4(" + *result + ")";
         }
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
     } else {
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "No implementation of TensorLinear.Read for this API.");
     }
   }

@@ -77,7 +77,7 @@ class FusedIrEmitter {
   // Map from instructions to functions that generate code for the output
   // elements. If an instruction is a GetTupleElement instruction, the
   // instruction produces non-tuple result.
-  absl::flat_hash_map<const HloInstruction*, IndexedGenerator>
+  abslx::flat_hash_map<const HloInstruction*, IndexedGenerator>
       indexed_generators_;
 
   // Cache of generated values, lest we regenerate an element of a node with
@@ -85,7 +85,7 @@ class FusedIrEmitter {
   // Use instruction and index values as the key.
   using ValueCacheKey =
       std::pair<const HloInstruction*, std::vector<llvm::Value*>>;
-  absl::flat_hash_map<ValueCacheKey, llvm::Value*> value_cache_;
+  abslx::flat_hash_map<ValueCacheKey, llvm::Value*> value_cache_;
 };
 
 }  // namespace xla

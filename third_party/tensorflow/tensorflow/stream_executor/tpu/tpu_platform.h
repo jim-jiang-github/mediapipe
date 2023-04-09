@@ -33,10 +33,10 @@ namespace tpu {
 class TpuPlatform : public ::tensorflow::tpu::TpuPlatformInterface {
  public:
   using StreamMap =
-      absl::flat_hash_map<stream_executor::internal::StreamInterface*,
+      abslx::flat_hash_map<stream_executor::internal::StreamInterface*,
                           SE_Stream*>;
   using EventMap =
-      absl::flat_hash_map<stream_executor::internal::EventInterface*,
+      abslx::flat_hash_map<stream_executor::internal::EventInterface*,
                           SE_Event*>;
 
   static const ::stream_executor::Platform::Id kId;
@@ -73,7 +73,7 @@ class TpuPlatform : public ::tensorflow::tpu::TpuPlatformInterface {
   Status Initialize(
       const std::map<std::string, std::string>& platform_options) override;
 
-  Status Reset(bool only_tear_down, absl::string_view reason) override {
+  Status Reset(bool only_tear_down, abslx::string_view reason) override {
     LOG(FATAL) << "Not yet implemented";
   }
 

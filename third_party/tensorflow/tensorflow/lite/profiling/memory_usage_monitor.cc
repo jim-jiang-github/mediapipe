@@ -31,7 +31,7 @@ MemoryUsageMonitor::MemoryUsageMonitor(int sampling_interval_ms,
                                        std::unique_ptr<Sampler> sampler)
     : sampler_(std::move(sampler)),
       is_supported_(false),
-      sampling_interval_(absl::Milliseconds(sampling_interval_ms)) {
+      sampling_interval_(abslx::Milliseconds(sampling_interval_ms)) {
   is_supported_ = (sampler_ != nullptr && sampler_->IsSupported());
   if (!is_supported_) {
     TFLITE_LOG(TFLITE_LOG_INFO,
@@ -47,7 +47,7 @@ void MemoryUsageMonitor::Start() {
     return;
   }
 
-  stop_signal_ = std::make_unique<absl::Notification>();
+  stop_signal_ = std::make_unique<abslx::Notification>();
   check_memory_thd_ = std::make_unique<std::thread>(([this]() {
     // Note we retrieve the memory usage at the very beginning of the thread.
     while (true) {

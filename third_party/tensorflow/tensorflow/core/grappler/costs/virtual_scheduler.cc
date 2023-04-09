@@ -583,7 +583,7 @@ Status SchedulerState::Init(const GrapplerItem* item,
     // of feed and fetch nodes, by default we consider all placeholders as feed
     // nodes, but some of them may not be needed for the default fetch node.
     VLOG(1) << "Some feed nodes were not consumed by the fetch fanin: "
-            << absl::StrJoin(feed_nodes, ",");
+            << abslx::StrJoin(feed_nodes, ",");
   }
 
   initialized_ = true;
@@ -646,14 +646,14 @@ string SchedulerState::DeviceName(const NodeDef* node) const {
 string SchedulerState::SanitizedDeviceName(const NodeDef* node) const {
   // Replace the ":" characters that may be present in the device name with "_".
   // This makes it possible to then use the resulting string in a node name.
-  return absl::StrReplaceAll(placer_->get_canonical_device_name(*node),
+  return abslx::StrReplaceAll(placer_->get_canonical_device_name(*node),
                              {{":", "_"}});
 }
 
 string SchedulerState::ChannelDeviceName(const NodeDef* from,
                                          const NodeDef* to) const {
   CHECK(!initialized_) << "ChannelDeviceName is called after Init().";
-  return absl::StrCat(kChannelDevice, "_from_", SanitizedDeviceName(from),
+  return abslx::StrCat(kChannelDevice, "_from_", SanitizedDeviceName(from),
                       "_to_", SanitizedDeviceName(to));
 }
 
@@ -677,9 +677,9 @@ std::pair<const NodeDef*, const NodeDef*> SchedulerState::CreateSendRecv(
   string src_name;
   bool control_input = false;
   if (input_node_port_num >= 0) {
-    src_name = absl::StrCat(from->name(), "_", input_node_port_num);
+    src_name = abslx::StrCat(from->name(), "_", input_node_port_num);
   } else {
-    src_name = absl::StrCat(from->name(), "_minus1");
+    src_name = abslx::StrCat(from->name(), "_minus1");
     control_input = true;
   }
 
@@ -1078,7 +1078,7 @@ Costs SchedulerState::Summary() const {
         op_cost_pair.second.intermediate_memory_time.count();
     const bool is_op_cost_accurate = !op_cost_pair.second.inaccurate;
     if (cost) {  // Skip printing out zero-cost ops.
-      VLOG(1) << absl::StrFormat(" + %30s : %c %10d / %10d / %10d / %10d", op,
+      VLOG(1) << abslx::StrFormat(" + %30s : %c %10d / %10d / %10d / %10d", op,
                                  (is_op_cost_accurate ? ' ' : '~'), cost,
                                  compute_cost, memory_cost,
                                  intermediate_memory_cost);
@@ -1191,7 +1191,7 @@ Costs SchedulerState::Summary() const {
                                : 0.0;
       if (cost || mem_usage_percent > 1.0) {
         // Print out only non-zero cost ops or ops with > 1% memory usage.
-        VLOG(1) << absl::StrFormat(
+        VLOG(1) << abslx::StrFormat(
                        " + %30s : %c %10d / %10d / %10d / %10d", op.c_str(),
                        (is_op_cost_accurate ? ' ' : '~'), cost, compute_cost,
                        memory_cost, intermediate_memory_cost)
@@ -1287,11 +1287,11 @@ void SchedulerState::GenerateRunMetadata(RunMetadata* metadata) {
         // For HloGenericOp, display hlo_opcode as timeline label.
         string timeline_label;
         if (node_def->attr().count("hlo_opcode") > 0) {
-          absl::StrAppend(&timeline_label,
+          abslx::StrAppend(&timeline_label,
                           node_def->attr().at("hlo_opcode").s());
         }
         if (node_def->attr().count("_hlo_metadata_op_type") > 0) {
-          absl::StrAppend(&timeline_label, "/",
+          abslx::StrAppend(&timeline_label, "/",
                           node_def->attr().at("_hlo_metadata_op_type").s());
         }
         node_stats->set_timeline_label(timeline_label);

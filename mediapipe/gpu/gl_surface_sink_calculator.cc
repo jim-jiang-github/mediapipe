@@ -53,10 +53,10 @@ class GlSurfaceSinkCalculator : public Node {
 
   ~GlSurfaceSinkCalculator();
 
-  static absl::Status UpdateContract(CalculatorContract* cc);
+  static abslx::Status UpdateContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) final;
-  absl::Status Process(CalculatorContext* cc) final;
+  abslx::Status Open(CalculatorContext* cc) final;
+  abslx::Status Process(CalculatorContext* cc) final;
 
  private:
   mediapipe::GlCalculatorHelper helper_;
@@ -69,7 +69,7 @@ class GlSurfaceSinkCalculator : public Node {
 MEDIAPIPE_REGISTER_NODE(GlSurfaceSinkCalculator);
 
 // static
-absl::Status GlSurfaceSinkCalculator::UpdateContract(CalculatorContract* cc) {
+abslx::Status GlSurfaceSinkCalculator::UpdateContract(CalculatorContract* cc) {
   RET_CHECK(kInVideo(cc).IsConnected() ^ kIn(cc).IsConnected())
       << "Only one of VIDEO or index 0 input is expected.";
 
@@ -78,7 +78,7 @@ absl::Status GlSurfaceSinkCalculator::UpdateContract(CalculatorContract* cc) {
   return mediapipe::GlCalculatorHelper::UpdateContract(cc);
 }
 
-absl::Status GlSurfaceSinkCalculator::Open(CalculatorContext* cc) {
+abslx::Status GlSurfaceSinkCalculator::Open(CalculatorContext* cc) {
   surface_holder_ = kSurface(cc).Get().get();
 
   scale_mode_ = FrameScaleModeFromProto(
@@ -90,13 +90,13 @@ absl::Status GlSurfaceSinkCalculator::Open(CalculatorContext* cc) {
   return helper_.Open(cc);
 }
 
-absl::Status GlSurfaceSinkCalculator::Process(CalculatorContext* cc) {
-  return helper_.RunInGlContext([this, &cc]() -> absl::Status {
-    absl::MutexLock lock(&surface_holder_->mutex);
+abslx::Status GlSurfaceSinkCalculator::Process(CalculatorContext* cc) {
+  return helper_.RunInGlContext([this, &cc]() -> abslx::Status {
+    abslx::MutexLock lock(&surface_holder_->mutex);
     EGLSurface surface = surface_holder_->surface;
     if (surface == EGL_NO_SURFACE) {
       LOG_EVERY_N(INFO, 300) << "GlSurfaceSinkCalculator: no surface";
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     mediapipe::Packet packet;
@@ -112,7 +112,7 @@ absl::Status GlSurfaceSinkCalculator::Process(CalculatorContext* cc) {
       input = packet.Get<mediapipe::Image>().GetGpuBuffer();
 
     if (!initialized_) {
-      renderer_ = absl::make_unique<mediapipe::QuadRenderer>();
+      renderer_ = abslx::make_unique<mediapipe::QuadRenderer>();
       MP_RETURN_IF_ERROR(renderer_->GlSetup());
       initialized_ = true;
     }
@@ -158,7 +158,7 @@ absl::Status GlSurfaceSinkCalculator::Process(CalculatorContext* cc) {
     RET_CHECK(success) << "failed to restore old surface";
 
     src.Release();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   });
 }
 

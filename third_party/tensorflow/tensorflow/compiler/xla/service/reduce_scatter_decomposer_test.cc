@@ -38,7 +38,7 @@ class ReduceScatterDecomposerTest : public HloTestBase {
     kTableLookup,
   };
   void RunPass(
-      absl::string_view hlo_module, PassAction action,
+      abslx::string_view hlo_module, PassAction action,
       CollectiveOpGroupMode mode = CollectiveOpGroupMode::kCrossReplica,
       int64_t shard_size = 0, int64_t shard_dimension = 0,
       int64_t replica_count = 2) {
@@ -98,7 +98,7 @@ class ReduceScatterDecomposerTest : public HloTestBase {
 };
 
 TEST_F(ReduceScatterDecomposerTest, TrivialReplicaID) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -118,7 +118,7 @@ ENTRY main {
 }
 
 TEST_F(ReduceScatterDecomposerTest, TableLookupReplicaId) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -138,7 +138,7 @@ ENTRY main {
 }
 
 TEST_F(ReduceScatterDecomposerTest, TrivialCrossReplicaAndPartition) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -161,7 +161,7 @@ ENTRY main {
 
 TEST_F(ReduceScatterDecomposerTest,
        TrivialCrossReplicaAndPartition_SingleReplica) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -185,7 +185,7 @@ ENTRY main {
 }
 
 TEST_F(ReduceScatterDecomposerTest, TableLookupFlattenedId) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -205,7 +205,7 @@ ENTRY main {
 }
 
 TEST_F(ReduceScatterDecomposerTest, NoChange) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {

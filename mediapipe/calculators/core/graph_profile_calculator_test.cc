@@ -46,23 +46,23 @@ using mediapipe::Clock;
 // A Calculator with a fixed Process call latency.
 class SleepCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->InputSidePackets().Tag(kClockTag).Set<std::shared_ptr<Clock>>();
     cc->Inputs().Index(0).SetAny();
     cc->Outputs().Index(0).SetSameAs(&cc->Inputs().Index(0));
     cc->SetTimestampOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     clock_ =
         cc->InputSidePackets().Tag(kClockTag).Get<std::shared_ptr<Clock>>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
-    clock_->Sleep(absl::Milliseconds(5));
+  abslx::Status Process(CalculatorContext* cc) final {
+    clock_->Sleep(abslx::Milliseconds(5));
     cc->Outputs().Index(0).AddPacket(cc->Inputs().Index(0).Value());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   std::shared_ptr<::mediapipe::Clock> clock_ = nullptr;
 };
@@ -138,13 +138,13 @@ class GraphProfileCalculatorTest : public ::testing::Test {
         const Packet& packet = input_set[i];
         if (!IsNone(packet)) {
           MP_EXPECT_OK(graph.AddPacketToInputStream(
-              absl::StrCat("input_packets_", i), packet));
+              abslx::StrCat("input_packets_", i), packet));
         }
-        executor->GetClock()->Sleep(absl::Milliseconds(10));
+        executor->GetClock()->Sleep(abslx::Milliseconds(10));
       }
     }
     MP_ASSERT_OK(graph.CloseAllInputStreams());
-    executor->GetClock()->Sleep(absl::Milliseconds(100));
+    executor->GetClock()->Sleep(abslx::Milliseconds(100));
     executor->GetClock()->ThreadFinish();
     MP_ASSERT_OK(graph.WaitUntilDone());
   }

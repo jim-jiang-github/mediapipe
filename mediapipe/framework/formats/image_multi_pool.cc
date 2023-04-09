@@ -77,7 +77,7 @@ Image ImageMultiPool::GetBufferFromSimplePool(
   CVReturn err = mediapipe::CreateCVPixelBufferWithPool(
       *pool, auxAttributes,
       [this]() {
-        absl::MutexLock lock(&mutex_gpu_);
+        abslx::MutexLock lock(&mutex_gpu_);
         for (const auto& cache : texture_caches_) {
 #if TARGET_OS_OSX
           CVOpenGLTextureCacheFlush(*cache, 0);
@@ -125,7 +125,7 @@ Image ImageMultiPool::GetBuffer(int width, int height, bool use_gpu,
                                 ImageFormat::Format format) {
 #if !MEDIAPIPE_DISABLE_GPU
   if (use_gpu) {
-    absl::MutexLock lock(&mutex_gpu_);
+    abslx::MutexLock lock(&mutex_gpu_);
     IBufferSpec key(width, height, format);
     auto pool_it = pools_gpu_.find(key);
     if (pool_it == pools_gpu_.end()) {
@@ -155,7 +155,7 @@ Image ImageMultiPool::GetBuffer(int width, int height, bool use_gpu,
   } else  // NOLINT(readability/braces)
 #endif    // !MEDIAPIPE_DISABLE_GPU
   {
-    absl::MutexLock lock(&mutex_cpu_);
+    abslx::MutexLock lock(&mutex_cpu_);
     IBufferSpec key(width, height, format);
     auto pool_it = pools_cpu_.find(key);
     if (pool_it == pools_cpu_.end()) {
@@ -197,7 +197,7 @@ ImageMultiPool::~ImageMultiPool() {
 #if !MEDIAPIPE_DISABLE_GPU
 #ifdef __APPLE__
 void ImageMultiPool::RegisterTextureCache(mediapipe::CVTextureCacheType cache) {
-  absl::MutexLock lock(&mutex_gpu_);
+  abslx::MutexLock lock(&mutex_gpu_);
 
   CHECK(std::find(texture_caches_.begin(), texture_caches_.end(), cache) ==
         texture_caches_.end())
@@ -207,7 +207,7 @@ void ImageMultiPool::RegisterTextureCache(mediapipe::CVTextureCacheType cache) {
 
 void ImageMultiPool::UnregisterTextureCache(
     mediapipe::CVTextureCacheType cache) {
-  absl::MutexLock lock(&mutex_gpu_);
+  abslx::MutexLock lock(&mutex_gpu_);
 
   auto it = std::find(texture_caches_.begin(), texture_caches_.end(), cache);
   CHECK(it != texture_caches_.end())

@@ -32,12 +32,12 @@ FlatHashMapBackedWordpiece::FlatHashMapBackedWordpiece(
 }
 
 tensorflow::text::LookupStatus FlatHashMapBackedWordpiece::Contains(
-    absl::string_view key, bool* value) const {
+    abslx::string_view key, bool* value) const {
   *value = index_map_.contains(key);
   return tensorflow::text::LookupStatus();
 }
 
-bool FlatHashMapBackedWordpiece::LookupId(const absl::string_view key,
+bool FlatHashMapBackedWordpiece::LookupId(const abslx::string_view key,
                                           int* result) const {
   auto it = index_map_.find(key);
   if (it == index_map_.end()) {
@@ -48,7 +48,7 @@ bool FlatHashMapBackedWordpiece::LookupId(const absl::string_view key,
 }
 
 bool FlatHashMapBackedWordpiece::LookupWord(int vocab_id,
-                                            absl::string_view* result) const {
+                                            abslx::string_view* result) const {
   if (vocab_id >= vocab_.size() || vocab_id < 0) {
     return false;
   }
@@ -67,7 +67,7 @@ WordpieceTokenizerResult BertTokenizer::TokenizeWordpiece(
   std::vector<int>& wp_absolute_begin_offset = result.wp_begin_offset;
   std::vector<int>& wp_absolute_end_offset = result.wp_end_offset;
 
-  std::vector<absl::string_view> tokens;
+  std::vector<abslx::string_view> tokens;
   std::vector<long long> begin_offsets;
   std::vector<long long> end_offsets;
 

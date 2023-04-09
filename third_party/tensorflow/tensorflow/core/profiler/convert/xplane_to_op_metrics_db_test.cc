@@ -69,9 +69,9 @@ void AddTensorFlowTpuOpEvent(std::string&& name, std::string&& tf_op_fullname,
 
 void AddTensorFlowOpEvent(std::string&& tf_op_fullname,
                           int64_t start_timestamp_ns, int64_t duration_ns,
-                          bool on_device, absl::string_view kernel_name,
+                          bool on_device, abslx::string_view kernel_name,
                           XPlaneBuilder* plane, XLineBuilder* line) {
-  absl::string_view name = on_device ? kernel_name : tf_op_fullname;
+  abslx::string_view name = on_device ? kernel_name : tf_op_fullname;
   XEventBuilder event = line->AddEvent(*plane->GetOrCreateEventMetadata(name));
   event.SetTimestampNs(start_timestamp_ns);
   event.SetDurationNs(duration_ns);
@@ -93,14 +93,14 @@ TEST(ConvertXPlaneToOpMetricsDb, HostOpMetricsDb) {
   XPlane* xplane = GetOrCreateHostXPlane(&xspace);
   XPlaneBuilder host_plane(xplane);
   XLineBuilder thread1 = host_plane.GetOrCreateLine(/*line_id=*/10);
-  AddTensorFlowOpEvent(absl::StrCat(kTfOp1, ":", kTfOp1), kTfOp1StartNs,
+  AddTensorFlowOpEvent(abslx::StrCat(kTfOp1, ":", kTfOp1), kTfOp1StartNs,
                        kTfOp1DurationNs, /*on_device=*/false,
                        /*kernel_name=*/"", &host_plane, &thread1);
   XLineBuilder thread2 = host_plane.GetOrCreateLine(/*line_id=*/20);
-  AddTensorFlowOpEvent(absl::StrCat(kTfOp1, ":", kTfOp1), kTfOp1StartNs,
+  AddTensorFlowOpEvent(abslx::StrCat(kTfOp1, ":", kTfOp1), kTfOp1StartNs,
                        kTfOp1DurationNs, /*on_device=*/false,
                        /*kernel_name=*/"", &host_plane, &thread2);
-  AddTensorFlowOpEvent(absl::StrCat(kTfOp2, ":", kTfOp2), kTfOp2StartNs,
+  AddTensorFlowOpEvent(abslx::StrCat(kTfOp2, ":", kTfOp2), kTfOp2StartNs,
                        kTfOp2DurationNs, /*on_device=*/false,
                        /*kernel_name=*/"", &host_plane, &thread2);
 
@@ -152,20 +152,20 @@ TEST(ConvertXPlaneToOpMetricsDb, DeviceOpMetricsDb) {
   XPlane* xplane = GetOrCreateGpuXPlane(&xspace, /*device_ordinal=*/0);
   XPlaneBuilder device_plane(xplane);
   XLineBuilder stream1 = device_plane.GetOrCreateLine(/*line_id=*/10);
-  AddTensorFlowOpEvent(absl::StrCat(kTfOp1, ":", kTfOp1), kKernel1StartNs,
+  AddTensorFlowOpEvent(abslx::StrCat(kTfOp1, ":", kTfOp1), kKernel1StartNs,
                        kKernel1DurationNs, /*on_device=*/true, kKernel1,
                        &device_plane, &stream1);
-  AddTensorFlowOpEvent(absl::StrCat(kTfOp1, ":", kTfOp1), kKernel2StartNs,
+  AddTensorFlowOpEvent(abslx::StrCat(kTfOp1, ":", kTfOp1), kKernel2StartNs,
                        kKernel2DurationNs, /*on_device=*/true, kKernel2,
                        &device_plane, &stream1);
   XLineBuilder stream2 = device_plane.GetOrCreateLine(/*line_id=*/20);
-  AddTensorFlowOpEvent(absl::StrCat(kTfOp1, ":", kTfOp1), kKernel1StartNs,
+  AddTensorFlowOpEvent(abslx::StrCat(kTfOp1, ":", kTfOp1), kKernel1StartNs,
                        kKernel1DurationNs, /*on_device=*/true, kKernel1,
                        &device_plane, &stream2);
-  AddTensorFlowOpEvent(absl::StrCat(kTfOp1, ":", kTfOp1), kKernel2StartNs,
+  AddTensorFlowOpEvent(abslx::StrCat(kTfOp1, ":", kTfOp1), kKernel2StartNs,
                        kKernel2DurationNs, /*on_device=*/true, kKernel2,
                        &device_plane, &stream2);
-  AddTensorFlowOpEvent(absl::StrCat(kTfOp2, ":", kTfOp2), kKernel3StartNs,
+  AddTensorFlowOpEvent(abslx::StrCat(kTfOp2, ":", kTfOp2), kKernel3StartNs,
                        kKernel3DurationNs, /*on_device=*/true, kKernel3,
                        &device_plane, &stream2);
 
@@ -185,19 +185,19 @@ TEST(ConvertXPlaneToOpMetricsDb, DeviceOpMetricsDb) {
 
   // Verifies OpMetricsDb is built correctly.
   const OpMetrics& op_1 = op_metrics.metrics_db().at(0);
-  EXPECT_EQ(absl::StrCat(kTfOp1, "/", kKernel1), op_1.name());
+  EXPECT_EQ(abslx::StrCat(kTfOp1, "/", kKernel1), op_1.name());
   EXPECT_EQ(kTfOp1, op_1.category());
   EXPECT_EQ(2, op_1.occurrences());
   EXPECT_EQ(NanoToPico(kKernel1DurationNs) * 2, op_1.time_ps());
 
   const OpMetrics& op_2 = op_metrics.metrics_db().at(1);
-  EXPECT_EQ(absl::StrCat(kTfOp1, "/", kKernel2), op_2.name());
+  EXPECT_EQ(abslx::StrCat(kTfOp1, "/", kKernel2), op_2.name());
   EXPECT_EQ(kTfOp1, op_2.category());
   EXPECT_EQ(2, op_2.occurrences());
   EXPECT_EQ(NanoToPico(kKernel2DurationNs) * 2, op_2.time_ps());
 
   const OpMetrics& op_3 = op_metrics.metrics_db().at(2);
-  EXPECT_EQ(absl::StrCat(kTfOp2, "/", kKernel3), op_3.name());
+  EXPECT_EQ(abslx::StrCat(kTfOp2, "/", kKernel3), op_3.name());
   EXPECT_EQ(kTfOp2, op_3.category());
   EXPECT_EQ(1, op_3.occurrences());
   EXPECT_EQ(NanoToPico(kKernel3DurationNs), op_3.time_ps());

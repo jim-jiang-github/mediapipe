@@ -33,7 +33,7 @@ class MemorySpaceAssignmentBestFitRepacker
       Type type = GlobalDecreasingSizeBestFitHeap<AllocationBlock>::kTemporal)
       : MemorySpaceAssignmentRepacker(max_size, alignment), type_(type) {}
 
-  StatusOr<bool> Repack(absl::Span<AllocationBlock*> allocations) override;
+  StatusOr<bool> Repack(abslx::Span<AllocationBlock*> allocations) override;
 
  private:
   Type type_;

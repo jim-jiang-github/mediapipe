@@ -47,7 +47,7 @@ namespace {
 // A computation with array type that only contains parameters and tuples is
 // considered emtpy.
 bool ComputationIsEmptyWithArrayRoot(const HloComputation* computation) {
-  bool empty_operations = absl::c_all_of(
+  bool empty_operations = abslx::c_all_of(
       computation->MakeInstructionPostOrder(), [](const HloInstruction* inst) {
         return inst->opcode() == HloOpcode::kTuple ||
                inst->opcode() == HloOpcode::kGetTupleElement ||
@@ -65,7 +65,7 @@ bool ComputationIsEmptyWithArrayRoot(const HloComputation* computation) {
 
 StatusOr<bool> TryRemoveUnusedConditionalOperands(
     HloComputation* computation,
-    const absl::flat_hash_set<HloInstruction*>& calling_conditionals) {
+    const abslx::flat_hash_set<HloInstruction*>& calling_conditionals) {
   HloInstruction* param = computation->parameter_instruction(0);
   // Do not remove from the root instruction.
   if (param == computation->root_instruction()) {
@@ -233,7 +233,7 @@ bool RemoveUnusedTupleElements(HloInstruction* conditional_op) {
   }
 
   // Compute old-to-new (old-to-new) indices mapping.
-  absl::flat_hash_map<int, int> new_to_old_mapping, old_to_new_mapping;
+  abslx::flat_hash_map<int, int> new_to_old_mapping, old_to_new_mapping;
   auto old_iter = used_indices.begin();
   for (int new_index = 0; new_index < new_tuple_shapes_size; ++new_index) {
     old_iter = std::find(old_iter, used_indices.end(), true);
@@ -398,7 +398,7 @@ bool MergeDuplicateTupleElements(HloInstruction* conditional) {
   // identical.
   auto vectorize_branches_root_tuple_ith_operand = [conditional](int64_t i) {
     std::vector<const HloInstruction*> operands;
-    absl::c_transform(conditional->branch_computations(),
+    abslx::c_transform(conditional->branch_computations(),
                       std::back_inserter(operands),
                       [i](const HloComputation* branch) {
                         return branch->root_instruction()->operand(i);
@@ -419,7 +419,7 @@ bool MergeDuplicateTupleElements(HloInstruction* conditional) {
   };
 
   bool changed = false;
-  absl::flat_hash_map<std::vector<const HloInstruction*>, int64_t>
+  abslx::flat_hash_map<std::vector<const HloInstruction*>, int64_t>
       index_collision_table;
   for (int i = 0; i < conditional->shape().tuple_shapes_size(); ++i) {
     const std::vector<const HloInstruction*> ith_operands_vector =
@@ -508,9 +508,9 @@ StatusOr<bool> ConditionalSimplifier::TryRemoveConditional(
 
   if (conditional->branch_count() != 2 ||
       conditional->operand(0)->shape().element_type() != PRED ||
-      absl::c_any_of(conditional->branch_computation(0)->instructions(),
+      abslx::c_any_of(conditional->branch_computation(0)->instructions(),
                      instruction_is_expensive) ||
-      absl::c_any_of(conditional->branch_computation(1)->instructions(),
+      abslx::c_any_of(conditional->branch_computation(1)->instructions(),
                      instruction_is_expensive)) {
     VLOG(2)
         << "Not attempting  to remove conditional as its branch_index is not a "
@@ -605,7 +605,7 @@ static bool InstructionCallsChannelInstructions(
 
 StatusOr<bool> ConditionalSimplifier::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   XLA_VLOG_LINES(
       3, "ConditionalSimplifier::Run(), before:\n" + module->ToString());
   bool changed = false;
@@ -631,7 +631,7 @@ StatusOr<bool> ConditionalSimplifier::Run(
     }
   }
 
-  absl::flat_hash_set<HloInstruction*> removed_conditionals;
+  abslx::flat_hash_set<HloInstruction*> removed_conditionals;
   for (HloInstruction* conditional_op : conditional_ops) {
     changed |= MergeDuplicateTupleElements(conditional_op);
     changed |= RemoveUnusedTupleElements(conditional_op);
@@ -645,7 +645,7 @@ StatusOr<bool> ConditionalSimplifier::Run(
   // Try to remove unused conditional operands from branch computations. We need
   // to be careful to adjust *all* calling conditional ops if we do that, so
   // lets collect them first.
-  absl::flat_hash_map<HloComputation*, absl::flat_hash_set<HloInstruction*>>
+  abslx::flat_hash_map<HloComputation*, abslx::flat_hash_set<HloInstruction*>>
       calling_conditionals;
   // Keys of calling_conditionals to get a deterministic ordering.
   std::vector<HloComputation*> calling_computationals_vector;

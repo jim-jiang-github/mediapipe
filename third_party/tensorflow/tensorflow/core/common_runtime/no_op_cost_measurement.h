@@ -30,8 +30,8 @@ class NoOpCostMeasurement : public CostMeasurement {
   using CostMeasurement::CostMeasurement;
 
   // Always returns zero Duration as the total cost.
-  absl::Duration GetTotalCost() override;
-  absl::string_view GetCostType() const override;
+  abslx::Duration GetTotalCost() override;
+  abslx::string_view GetCostType() const override;
 };
 
 }  // namespace tensorflow

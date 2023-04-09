@@ -41,7 +41,7 @@ class Slack : public TFDataOptimizerBase {
 
     const string& slack_period_param =
         config->parameter_map().at("slack_period").s();
-    if (!absl::SimpleAtoi(slack_period_param, &slack_period_)) {
+    if (!abslx::SimpleAtoi(slack_period_param, &slack_period_)) {
       return errors::InvalidArgument("Invalid `slack_period` parameter: ",
                                      slack_period_param);
     }

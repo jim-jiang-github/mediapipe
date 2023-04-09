@@ -49,7 +49,7 @@ kernel void FunctionName(device TYPE* const src_buffer[[buffer(0)]],
   id<MTLDevice> device = GetBestSupportedMetalDevice();
   XCTAssertNotNil(device, @"The Metal device must exists on real device");
   id<MTLComputePipelineState> program;
-  absl::Status status;
+  abslx::Status status;
 
   status = CreateComputeProgram(device, code, "FunctionName", {{"TYPE", "float4"}}, &program);
   XCTAssertTrue(status.ok(), @"%s", std::string(status.message()).c_str());

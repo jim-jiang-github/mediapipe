@@ -49,7 +49,7 @@ class VariableAccessor : public InlineRewrite {
   explicit VariableAccessor(bool inline_values, bool vulkan_support = false)
       : inline_values_(inline_values), vulkan_support_(vulkan_support) {}
 
-  RewriteStatus Rewrite(absl::string_view input, std::string* output) final;
+  RewriteStatus Rewrite(abslx::string_view input, std::string* output) final;
 
   // Returns true if variable was successfully added.
   bool AddSharedVariable(Variable&& variable);
@@ -75,7 +75,7 @@ class VariableAccessor : public InlineRewrite {
  private:
   const bool inline_values_;
   const bool vulkan_support_;
-  absl::flat_hash_map<std::string, Variable> name_to_variable_;
+  abslx::flat_hash_map<std::string, Variable> name_to_variable_;
   std::set<std::string> shared_variables_;
   std::set<std::string> uniform_parameters_;
 };
@@ -85,14 +85,14 @@ class VariableAccessor : public InlineRewrite {
 namespace variable_accessor_internal {
 
 struct VariableReference {
-  absl::string_view name;
-  absl::string_view index;
-  absl::string_view field;
+  abslx::string_view name;
+  abslx::string_view index;
+  abslx::string_view field;
 };
 
 // Parse the following regex manually
 // name(\[index\])?(\.field)?
-VariableReference Parse(absl::string_view input);
+VariableReference Parse(abslx::string_view input);
 
 }  // namespace variable_accessor_internal
 }  // namespace gl

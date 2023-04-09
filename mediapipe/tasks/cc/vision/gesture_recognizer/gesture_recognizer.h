@@ -81,7 +81,7 @@ struct GestureRecognizerOptions {
   // The user-defined result callback for processing live stream data.
   // The result callback should only be specified when the running mode is set
   // to RunningMode::LIVE_STREAM.
-  std::function<void(absl::StatusOr<GestureRecognizerResult>, const Image&,
+  std::function<void(abslx::StatusOr<GestureRecognizerResult>, const Image&,
                      int64)>
       result_callback = nullptr;
 };
@@ -122,7 +122,7 @@ class GestureRecognizer : tasks::vision::core::BaseVisionTaskApi {
   //    the input timestamp and the image that gesture recognizer runs on will
   //    be available in the result callback when the gesture recognizer finishes
   //    the work.
-  static absl::StatusOr<std::unique_ptr<GestureRecognizer>> Create(
+  static abslx::StatusOr<std::unique_ptr<GestureRecognizer>> Create(
       std::unique_ptr<GestureRecognizerOptions> options);
 
   // Performs hand gesture recognition on the given image.
@@ -138,7 +138,7 @@ class GestureRecognizer : tasks::vision::core::BaseVisionTaskApi {
   // The image can be of any size with format RGB or RGBA.
   // TODO: Describes how the input image will be preprocessed
   // after the yuv support is implemented.
-  absl::StatusOr<GestureRecognizerResult> Recognize(
+  abslx::StatusOr<GestureRecognizerResult> Recognize(
       Image image,
       std::optional<core::ImageProcessingOptions> image_processing_options =
           std::nullopt);
@@ -156,7 +156,7 @@ class GestureRecognizer : tasks::vision::core::BaseVisionTaskApi {
   // The image can be of any size with format RGB or RGBA. It's required to
   // provide the video frame's timestamp (in milliseconds). The input timestamps
   // must be monotonically increasing.
-  absl::StatusOr<GestureRecognizerResult> RecognizeForVideo(
+  abslx::StatusOr<GestureRecognizerResult> RecognizeForVideo(
       Image image, int64 timestamp_ms,
       std::optional<core::ImageProcessingOptions> image_processing_options =
           std::nullopt);
@@ -185,12 +185,12 @@ class GestureRecognizer : tasks::vision::core::BaseVisionTaskApi {
   //     longer be valid when the callback returns. To access the image data
   //     outside of the callback, callers need to make a copy of the image.
   //   - The input timestamp in milliseconds.
-  absl::Status RecognizeAsync(Image image, int64 timestamp_ms,
+  abslx::Status RecognizeAsync(Image image, int64 timestamp_ms,
                               std::optional<core::ImageProcessingOptions>
                                   image_processing_options = std::nullopt);
 
   // Shuts down the GestureRecognizer when all works are done.
-  absl::Status Close() { return runner_->Close(); }
+  abslx::Status Close() { return runner_->Close(); }
 };
 
 }  // namespace gesture_recognizer

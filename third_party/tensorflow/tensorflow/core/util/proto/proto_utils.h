@@ -34,7 +34,7 @@ bool IsCompatibleType(FieldDescriptor::Type field_type, DataType dtype);
 // Parses a text-formatted protobuf from a string into the given Message* output
 // and returns status OK if valid, or INVALID_ARGUMENT with an accompanying
 // parser error message if the text format is invalid.
-Status ParseTextFormatFromString(absl::string_view input,
+Status ParseTextFormatFromString(abslx::string_view input,
                                  protobuf::Message* output);
 
 class StringErrorCollector : public protobuf::io::ErrorCollector {
@@ -60,18 +60,18 @@ class StringErrorCollector : public protobuf::io::ErrorCollector {
   const int index_offset_;
 };
 
-// Converts an absl::Duration to a google::protobuf::Duration.
-inline google::protobuf::Duration ToDurationProto(absl::Duration duration) {
+// Converts an abslx::Duration to a google::protobuf::Duration.
+inline google::protobuf::Duration ToDurationProto(abslx::Duration duration) {
   google::protobuf::Duration proto;
-  proto.set_seconds(absl::IDivDuration(duration, absl::Seconds(1), &duration));
+  proto.set_seconds(abslx::IDivDuration(duration, abslx::Seconds(1), &duration));
   proto.set_nanos(
-      absl::IDivDuration(duration, absl::Nanoseconds(1), &duration));
+      abslx::IDivDuration(duration, abslx::Nanoseconds(1), &duration));
   return proto;
 }
 
-// Converts a google::protobuf::Duration to an absl::Duration.
-inline absl::Duration FromDurationProto(google::protobuf::Duration proto) {
-  return absl::Seconds(proto.seconds()) + absl::Nanoseconds(proto.nanos());
+// Converts a google::protobuf::Duration to an abslx::Duration.
+inline abslx::Duration FromDurationProto(google::protobuf::Duration proto) {
+  return abslx::Seconds(proto.seconds()) + abslx::Nanoseconds(proto.nanos());
 }
 
 }  // namespace proto_utils

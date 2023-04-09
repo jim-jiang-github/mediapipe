@@ -33,8 +33,8 @@ constexpr char kPartitionedCallOpName[] = "PartitionedCall";
 constexpr char kFunctionAttrName[] = "f";
 
 namespace {
-absl::optional<FunctionDef> GetFunctionByNameFromLibrary(
-    const GraphDef& graph, absl::string_view function_name) {
+abslx::optional<FunctionDef> GetFunctionByNameFromLibrary(
+    const GraphDef& graph, abslx::string_view function_name) {
   for (const auto& fct : graph.library().function()) {
     if (fct.signature().name() == function_name) {
       return fct;
@@ -45,9 +45,9 @@ absl::optional<FunctionDef> GetFunctionByNameFromLibrary(
 
 std::string NormalizeNodeDefInput(const std::string& input_name) {
   std::vector<std::string> name_parts =
-      absl::StrSplit(input_name, absl::ByChar(':'));
+      abslx::StrSplit(input_name, abslx::ByChar(':'));
   if (name_parts.size() > 2) {
-    return absl::StrCat(name_parts[0], ":", name_parts.back());
+    return abslx::StrCat(name_parts[0], ":", name_parts.back());
   }
   return input_name;
 }
@@ -58,7 +58,7 @@ Status InlinePartitionedCall(const GraphDef& input_graph_def,
                              const TransformFuncContext& context,
                              GraphDef* output_graph_def) {
   output_graph_def->Clear();
-  absl::flat_hash_map<std::string, std::string> remap_input;
+  abslx::flat_hash_map<std::string, std::string> remap_input;
 
   for (const NodeDef& node : input_graph_def.node()) {
     if (node.op() == kPartitionedCallOpName) {
@@ -74,7 +74,7 @@ Status InlinePartitionedCall(const GraphDef& input_graph_def,
       }
       const std::string function_name =
           node.attr().at(kFunctionAttrName).func().name();
-      absl::optional<FunctionDef> function =
+      abslx::optional<FunctionDef> function =
           GetFunctionByNameFromLibrary(input_graph_def, function_name);
       if (!function.has_value()) {
         return Status(error::Code::NOT_FOUND,
@@ -89,8 +89,8 @@ Status InlinePartitionedCall(const GraphDef& input_graph_def,
         const std::string function_arg_output_name =
             function->ret().at(function->signature().output_arg()[k].name());
         remap_input.insert_or_assign(
-            CanonicalInputName(absl::StrCat(node.name(), ":", k)),
-            absl::StrCat(prefix, "/",
+            CanonicalInputName(abslx::StrCat(node.name(), ":", k)),
+            abslx::StrCat(prefix, "/",
                          NormalizeNodeDefInput(function_arg_output_name)));
       }
 
@@ -100,7 +100,7 @@ Status InlinePartitionedCall(const GraphDef& input_graph_def,
                       "Called function  " + function_name +
                           " has invalid input signature.");
       }
-      absl::flat_hash_map<std::string, std::string> input_argument_map;
+      abslx::flat_hash_map<std::string, std::string> input_argument_map;
       for (int k = 0; k < kInputArgumentCount; ++k) {
         const std::string canonical_name =
             CanonicalInputName(function->signature().input_arg()[k].name());
@@ -110,8 +110,8 @@ Status InlinePartitionedCall(const GraphDef& input_graph_def,
       for (const NodeDef& function_node : function->node_def()) {
         NodeDef* new_node = output_graph_def->mutable_node()->Add();
         *new_node = function_node;
-        new_node->set_name(absl::StrCat(prefix, "/", function_node.name()));
-        absl::c_transform(
+        new_node->set_name(abslx::StrCat(prefix, "/", function_node.name()));
+        abslx::c_transform(
             *new_node->mutable_input(), new_node->mutable_input()->begin(),
             [prefix, input_argument_map](const std::string& input_name) {
               const std::string canonical_input_name =
@@ -120,7 +120,7 @@ Status InlinePartitionedCall(const GraphDef& input_graph_def,
                   input_argument_map.end()) {
                 return input_argument_map.at(canonical_input_name);
               }
-              return absl::StrCat(prefix, "/",
+              return abslx::StrCat(prefix, "/",
                                   NormalizeNodeDefInput(input_name));
             });
       }
@@ -132,7 +132,7 @@ Status InlinePartitionedCall(const GraphDef& input_graph_def,
 
   // Remap PartitionCall outputs to correct nodes.
   for (NodeDef& node : *output_graph_def->mutable_node()) {
-    absl::c_transform(
+    abslx::c_transform(
         *node.mutable_input(), node.mutable_input()->begin(),
         [remap_input](const std::string& input_name) {
           const std::string canonical_input_name =

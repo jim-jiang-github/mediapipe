@@ -28,9 +28,9 @@ namespace xla {
 namespace {
 
 int64_t GetUniqueId() {
-  static absl::Mutex mu(absl::kConstInit);
+  static abslx::Mutex mu(abslx::kConstInit);
   static int64_t counter = 0;
-  absl::MutexLock loc(&mu);
+  abslx::MutexLock loc(&mu);
   const int64_t id = counter++;
   return id;
 }
@@ -39,7 +39,7 @@ int64_t GetUniqueId() {
 
 ExecutionHandle CompilationCache::Insert(
     std::unique_ptr<Executable> executable) {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
 
   CacheKey key = GetUniqueId();
   VLOG(2) << "inserting cache key: " << key;
@@ -53,7 +53,7 @@ ExecutionHandle CompilationCache::Insert(
 
 StatusOr<std::shared_ptr<Executable>> CompilationCache::LookUp(
     const ExecutionHandle& handle) const {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
 
   CacheKey key = handle.handle();
   VLOG(2) << "looking up cache key: " << key;

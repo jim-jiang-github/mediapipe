@@ -40,7 +40,7 @@ namespace gpu {
 // gap. Otherwise we can allocate it after the rightmost tensor, which usage
 // interval intersects with usage interval of current tensor. So we assign
 // corresponding offset to current tensor and the tensor becomes assigned.
-absl::Status GreedyBySizeAssignment(
+abslx::Status GreedyBySizeAssignment(
     const std::vector<TensorUsageRecord<size_t>>& usage_records,
     size_t base_addr_align_bytes, OffsetsAssignment* assignment);
 
@@ -68,7 +68,7 @@ absl::Status GreedyBySizeAssignment(
 // object with size equal to current tensor's size;
 // - Modify SizeDistPriority records of tensors, that haven't been assigned yet,
 // to reflect distance changes after that assignment.
-absl::Status GreedyBySizeDistPriorityAssignment(
+abslx::Status GreedyBySizeDistPriorityAssignment(
     const std::vector<TensorUsageRecord<size_t>>& usage_records,
     ObjectsAssignment<size_t>* assignment);
 

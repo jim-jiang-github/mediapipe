@@ -33,17 +33,17 @@ namespace metadata {
 
 namespace {
 
-using ::absl::StatusCode;
+using ::abslx::StatusCode;
 
 // Wrapper function around calls to unzip to avoid repeating conversion logic
 // from error code to Status.
-absl::Status UnzipErrorToStatus(int error) {
+abslx::Status UnzipErrorToStatus(int error) {
   if (error != UNZ_OK) {
     return CreateStatusWithPayload(StatusCode::kUnknown,
                                    "Unable to read the file in zip archive.",
                                    MediaPipeTasksStatus::kFileZipError);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Stores a file name, position in zip buffer and size.
@@ -55,12 +55,12 @@ struct ZipFileInfo {
 
 // Returns the ZipFileInfo corresponding to the current file in the provided
 // unzFile object.
-absl::StatusOr<ZipFileInfo> GetCurrentZipFileInfo(const unzFile& zf) {
+abslx::StatusOr<ZipFileInfo> GetCurrentZipFileInfo(const unzFile& zf) {
   // Open file in raw mode, as data is expected to be uncompressed.
   int method;
   MP_RETURN_IF_ERROR(UnzipErrorToStatus(
       unzOpenCurrentFile2(zf, &method, /*level=*/nullptr, /*raw=*/1)));
-  absl::Cleanup unzipper_closer = [zf]() {
+  abslx::Cleanup unzipper_closer = [zf]() {
     auto status = UnzipErrorToStatus(unzCloseCurrentFile(zf));
     if (!status.ok()) {
       LOG(ERROR) << "Failed to close the current zip file: " << status;
@@ -111,9 +111,9 @@ absl::StatusOr<ZipFileInfo> GetCurrentZipFileInfo(const unzFile& zf) {
 
 }  // namespace
 
-absl::Status ExtractFilesfromZipFile(
+abslx::Status ExtractFilesfromZipFile(
     const char* buffer_data, const size_t buffer_size,
-    absl::flat_hash_map<std::string, absl::string_view>* files) {
+    abslx::flat_hash_map<std::string, abslx::string_view>* files) {
   // Create in-memory read-only zip file.
   ZipReadOnlyMemFile mem_file = ZipReadOnlyMemFile(buffer_data, buffer_size);
   // Open zip.
@@ -123,7 +123,7 @@ absl::Status ExtractFilesfromZipFile(
                                    "Unable to open zip archive.",
                                    MediaPipeTasksStatus::kFileZipError);
   }
-  absl::Cleanup unzipper_closer = [zf]() {
+  abslx::Cleanup unzipper_closer = [zf]() {
     if (unzClose(zf) != UNZ_OK) {
       LOG(ERROR) << "Unable to close zip archive.";
     }
@@ -142,7 +142,7 @@ absl::Status ExtractFilesfromZipFile(
     while (error == UNZ_OK) {
       ASSIGN_OR_RETURN(auto zip_file_info, GetCurrentZipFileInfo(zf));
       // Store result in map.
-      (*files)[zip_file_info.name] = absl::string_view(
+      (*files)[zip_file_info.name] = abslx::string_view(
           buffer_data + zip_file_info.position, zip_file_info.size);
       error = unzGoToNextFile(zf);
     }
@@ -161,10 +161,10 @@ absl::Status ExtractFilesfromZipFile(
                                    "Unable to close zip archive.",
                                    MediaPipeTasksStatus::kFileZipError);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-void SetExternalFile(const absl::string_view& file_content,
+void SetExternalFile(const abslx::string_view& file_content,
                      core::proto::ExternalFile* model_file, bool is_copy) {
   if (is_copy) {
     std::string str_content{file_content};

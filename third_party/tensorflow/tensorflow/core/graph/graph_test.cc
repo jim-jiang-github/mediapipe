@@ -411,7 +411,7 @@ TEST_F(GraphTest, NewName) {
   EXPECT_NE(a1, a2);
   EXPECT_NE(a1, b1);
   EXPECT_NE(a2, b1);
-  EXPECT_TRUE(absl::StartsWith(a1, "A")) << a1;
+  EXPECT_TRUE(abslx::StartsWith(a1, "A")) << a1;
 }
 
 TEST_F(GraphTest, IsValidNode) {

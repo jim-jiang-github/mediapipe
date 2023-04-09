@@ -55,7 +55,7 @@ namespace {}  // namespace
 // }
 class ConstantSidePacketCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     const auto& options =
         cc->Options<::mediapipe::ConstantSidePacketCalculatorOptions>();
     RET_CHECK_EQ(cc->OutputSidePackets().NumEntries(kPacketTag),
@@ -85,14 +85,14 @@ class ConstantSidePacketCalculator : public CalculatorBase {
       } else if (packet_options.has_double_value()) {
         packet.Set<double>();
       } else {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "None of supported values were specified in options.");
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     const auto& options =
         cc->Options<::mediapipe::ConstantSidePacketCalculatorOptions>();
     int index = 0;
@@ -119,15 +119,15 @@ class ConstantSidePacketCalculator : public CalculatorBase {
       } else if (packet_options.has_double_value()) {
         packet.Set(MakePacket<double>(packet_options.double_value()));
       } else {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "None of supported values were specified in options.");
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
-    return absl::OkStatus();
+  abslx::Status Process(CalculatorContext* cc) override {
+    return abslx::OkStatus();
   }
 
  private:

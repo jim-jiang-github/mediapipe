@@ -83,7 +83,7 @@ TEST_P(DatasetStoreTest, StoreAndGetMultiple) {
   int64_t num_datasets = 10;
   std::vector<std::string> keys;
   for (int i = 0; i < num_datasets; ++i) {
-    std::string key = absl::StrCat("key", i);
+    std::string key = abslx::StrCat("key", i);
     DatasetDef dataset_def = DatasetDefWithVersion(i);
     TF_ASSERT_OK(store->Put(key, dataset_def));
     keys.push_back(key);

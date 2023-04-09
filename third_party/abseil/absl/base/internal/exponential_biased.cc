@@ -24,7 +24,7 @@
 #include "absl/base/attributes.h"
 #include "absl/base/optimization.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -90,4 +90,4 @@ void ExponentialBiased::Initialize() {
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -106,13 +106,13 @@ class SignalFusingCalculator : public mediapipe::CalculatorBase {
   SignalFusingCalculator(const SignalFusingCalculator&) = delete;
   SignalFusingCalculator& operator=(const SignalFusingCalculator&) = delete;
 
-  static absl::Status GetContract(mediapipe::CalculatorContract* cc);
-  absl::Status Open(mediapipe::CalculatorContext* cc) override;
-  absl::Status Process(mediapipe::CalculatorContext* cc) override;
-  absl::Status Close(mediapipe::CalculatorContext* cc) override;
+  static abslx::Status GetContract(mediapipe::CalculatorContract* cc);
+  abslx::Status Open(mediapipe::CalculatorContext* cc) override;
+  abslx::Status Process(mediapipe::CalculatorContext* cc) override;
+  abslx::Status Close(mediapipe::CalculatorContext* cc) override;
 
  private:
-  absl::Status ProcessScene(mediapipe::CalculatorContext* cc);
+  abslx::Status ProcessScene(mediapipe::CalculatorContext* cc);
   std::vector<Packet> GetSignalPackets(mediapipe::CalculatorContext* cc);
   SignalFusingCalculatorOptions options_;
   std::map<std::string, SignalSettings> settings_by_type_;
@@ -155,7 +155,7 @@ void SetupOrderedInput(mediapipe::CalculatorContract* cc) {
 }
 }  // namespace
 
-absl::Status SignalFusingCalculator::Open(mediapipe::CalculatorContext* cc) {
+abslx::Status SignalFusingCalculator::Open(mediapipe::CalculatorContext* cc) {
   options_ = cc->Options<SignalFusingCalculatorOptions>();
   for (const auto& setting : options_.signal_settings()) {
     settings_by_type_[CreateSettingsKey(setting.type())] = setting;
@@ -166,21 +166,21 @@ absl::Status SignalFusingCalculator::Open(mediapipe::CalculatorContext* cc) {
       process_by_scene_ = false;
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SignalFusingCalculator::Close(mediapipe::CalculatorContext* cc) {
+abslx::Status SignalFusingCalculator::Close(mediapipe::CalculatorContext* cc) {
   if (!scene_frames_.empty()) {
     MP_RETURN_IF_ERROR(ProcessScene(cc));
     scene_frames_.clear();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SignalFusingCalculator::ProcessScene(
+abslx::Status SignalFusingCalculator::ProcessScene(
     mediapipe::CalculatorContext* cc) {
-  absl::btree_map<std::string, int> detection_count;
-  absl::btree_map<std::string, float> multiframe_score;
+  abslx::btree_map<std::string, int> detection_count;
+  abslx::btree_map<std::string, float> multiframe_score;
   // Create a unified score for all items with temporal ids.
   for (const Frame& frame : scene_frames_) {
     for (const auto& detection : frame.input_detections) {
@@ -239,7 +239,7 @@ absl::Status SignalFusingCalculator::ProcessScene(
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 std::vector<Packet> SignalFusingCalculator::GetSignalPackets(
@@ -259,7 +259,7 @@ std::vector<Packet> SignalFusingCalculator::GetSignalPackets(
   return signal_packets;
 }
 
-absl::Status SignalFusingCalculator::Process(mediapipe::CalculatorContext* cc) {
+abslx::Status SignalFusingCalculator::Process(mediapipe::CalculatorContext* cc) {
   bool is_boundary = false;
   if (process_by_scene_) {
     const auto& shot_tag = (tag_input_interface_)
@@ -300,17 +300,17 @@ absl::Status SignalFusingCalculator::Process(mediapipe::CalculatorContext* cc) {
     scene_frames_.clear();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SignalFusingCalculator::GetContract(
+abslx::Status SignalFusingCalculator::GetContract(
     mediapipe::CalculatorContract* cc) {
   if (cc->Inputs().NumEntries(kSignalInputsTag) > 0) {
     SetupTagInput(cc);
   } else {
     SetupOrderedInput(cc);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace autoflip

@@ -58,11 +58,11 @@ extern "C" {
 
 ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockDelay)(
     std::atomic<uint32_t> *w, uint32_t value, int loop,
-    absl::base_internal::SchedulingMode) {
-  absl::base_internal::ErrnoSaver errno_saver;
+    abslx::base_internal::SchedulingMode) {
+  abslx::base_internal::ErrnoSaver errno_saver;
   struct timespec tm;
   tm.tv_sec = 0;
-  tm.tv_nsec = absl::base_internal::SpinLockSuggestedDelayNS(loop);
+  tm.tv_nsec = abslx::base_internal::SpinLockSuggestedDelayNS(loop);
   syscall(SYS_futex, w, FUTEX_WAIT | FUTEX_PRIVATE_FLAG, value, &tm);
 }
 

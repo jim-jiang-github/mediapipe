@@ -648,7 +648,7 @@ void MotionAnalysis::RenderResults(const RegionFlowFeatureList& feature_list,
 
   if (viz_options.visualize_stats()) {
     // Output general stats.
-    std::string hud_text = absl::StrFormat(
+    std::string hud_text = abslx::StrFormat(
         "H-cvg %.2f | H-err %4.2f | Avg.t %3.1f | dx: %+2.1f dy: %+2.1f "
         "Feat# %4d | %s | ",
         motion.homography_inlier_coverage(), motion.average_homography_error(),
@@ -664,7 +664,7 @@ void MotionAnalysis::RenderResults(const RegionFlowFeatureList& feature_list,
                 text_scale * 3, cv::LINE_AA);
 
     cv::putText(*rendered_results,
-                absl::StrFormat("%6d", motion.timestamp_usec() / 1000),
+                abslx::StrFormat("%6d", motion.timestamp_usec() / 1000),
                 cv::Point(0.9 * frame_width_, 0.05 * frame_height_),
                 cv::FONT_HERSHEY_SIMPLEX, text_scale, cv::Scalar::all(255),
                 text_scale * 3, cv::LINE_AA);

@@ -54,7 +54,7 @@ bool ShouldInjectPrefetch(const NodeDef* last_node,
   // Skip all datasets that could be chained by tf.data to the user defined
   // pipeline because of optimization, etc.
   while (last_node != nullptr &&
-         absl::c_any_of(kDatasetsToSkip, [last_node](const char* dataset) {
+         abslx::c_any_of(kDatasetsToSkip, [last_node](const char* dataset) {
            return data::MatchesAnyVersion(dataset, last_node->op());
          })) {
     last_node = graph_utils::GetInputNode(*last_node, graph);
@@ -64,7 +64,7 @@ bool ShouldInjectPrefetch(const NodeDef* last_node,
                "rewrite failed to find a dataset node.";
     return false;
   }
-  if (absl::c_any_of(kAsyncTransforms, [last_node](const char* dataset) {
+  if (abslx::c_any_of(kAsyncTransforms, [last_node](const char* dataset) {
         return data::MatchesAnyVersion(dataset, last_node->op());
       })) {
     VLOG(1) << "The optimization inject_prefetch is not applied because the "
@@ -98,7 +98,7 @@ Status InjectPrefetch::OptimizeAndCollectStats(Cluster* cluster,
   if (item.fetch.size() != 1) {
     return errors::InvalidArgument(
         "Expected only one fetch node but there were ", item.fetch.size(), ": ",
-        absl::StrJoin(item.fetch, ", "));
+        abslx::StrJoin(item.fetch, ", "));
   }
 
   NodeDef* sink_node = graph.GetNode(item.fetch.at(0));

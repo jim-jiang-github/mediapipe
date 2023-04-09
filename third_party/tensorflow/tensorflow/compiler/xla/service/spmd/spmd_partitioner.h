@@ -97,7 +97,7 @@ class SpmdBuilder : public HloComputation::Builder {
   HloInstruction* visiting_hlo() const { return visiting_hlo_; }
 
   // Wrapper of queries to broadcast_dims_.
-  std::optional<const absl::flat_hash_set<int64_t>*> BroadcastDimsForCreatedHlo(
+  std::optional<const abslx::flat_hash_set<int64_t>*> BroadcastDimsForCreatedHlo(
       const HloInstruction* hlo) {
     auto it = broadcast_dims_.find(hlo);
     if (it == broadcast_dims_.end()) {
@@ -117,7 +117,7 @@ class SpmdBuilder : public HloComputation::Builder {
   // Maps from each created instruction to a set of dimensions that are from
   // broadcasts or elementwise ops over broadcasts. This means elements along
   // these dimensions have the same value.
-  absl::flat_hash_map<const HloInstruction*, absl::flat_hash_set<int64_t>>
+  abslx::flat_hash_map<const HloInstruction*, abslx::flat_hash_set<int64_t>>
       broadcast_dims_;
 };
 
@@ -142,7 +142,7 @@ struct SPMDCollectiveOpsCreator {
 
   // Function used to create a cross-partition all-to-all HLO.
   std::function<HloInstruction*(
-      SpmdBuilder*, absl::Span<HloInstruction* const> operands,
+      SpmdBuilder*, abslx::Span<HloInstruction* const> operands,
       const std::vector<std::vector<int64_t>>& partition_subgroups,
       int64_t channel_id, std::optional<int64_t> split_dimension)>
       create_cross_partition_all_to_all;
@@ -209,11 +209,11 @@ class SpmdPartitioner : public HloModulePass {
         num_replicas_(num_replicas),
         options_(std::move(options)),
         collective_ops_creator_(std::move(collective_ops_creator)) {}
-  absl::string_view name() const override { return "spmd-partitioning"; }
+  abslx::string_view name() const override { return "spmd-partitioning"; }
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
   // Transforms the given computation with SPMD instructions, replacing it with
   // a new computation.
@@ -231,14 +231,14 @@ class SpmdPartitioner : public HloModulePass {
   // all-gather.
   virtual HloInstruction* AllGatherShards(
       SpmdBuilder* b, HloInstruction* operand, const HloSharding& sharding,
-      int64_t* next_channel_id, absl::Span<const int64_t> selected_dims,
+      int64_t* next_channel_id, abslx::Span<const int64_t> selected_dims,
       const SPMDCollectiveOpsCreator& collectives_creator);
 
   // Creates all-reduce(s) across devices along selected_dims in sharding. Can
   // be overridden to customize.
   virtual HloInstruction* AllReduceAlongShardingDims(
       SpmdBuilder* b, HloInstruction* operand, const HloSharding& sharding,
-      int64_t* next_channel_id, absl::Span<const int64_t> selected_dims,
+      int64_t* next_channel_id, abslx::Span<const int64_t> selected_dims,
       const SPMDCollectiveOpsCreator& collectives_creator,
       HloComputation* reduction);
 
@@ -253,11 +253,11 @@ class SpmdPartitioner : public HloModulePass {
 
   HloInstruction* AllGatherShardsInternal(
       SpmdBuilder* b, HloInstruction* operand, const HloSharding& sharding,
-      int64_t* next_channel_id, absl::Span<const int64_t> selected_dims,
+      int64_t* next_channel_id, abslx::Span<const int64_t> selected_dims,
       const SPMDCollectiveOpsCreator& collectives_creator, bool per_dim_ag);
   HloInstruction* AllReduceAlongShardingDimsInternal(
       SpmdBuilder* b, HloInstruction* operand, const HloSharding& sharding,
-      int64_t* next_channel_id, absl::Span<const int64_t> selected_dims,
+      int64_t* next_channel_id, abslx::Span<const int64_t> selected_dims,
       const SPMDCollectiveOpsCreator& collectives_creator,
       HloComputation* reduction, bool per_dim_ar);
 
@@ -265,7 +265,7 @@ class SpmdPartitioner : public HloModulePass {
   // also fill in missing sharding information.
   virtual Status PreprocessSharding(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads);
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads);
 
   // Returns if the given side-effecting instruction is allowed to have
   // replicated sharding.
@@ -280,7 +280,7 @@ class SpmdPartitioner : public HloModulePass {
   // multiple halo exchanges.
   Status PreprocessHlos(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads);
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads);
 
   const int64_t num_partitions_;
   const int64_t num_replicas_;
@@ -313,11 +313,11 @@ class PartitionedHlo {
           std::tuple<HloSharding, Window, WindowedInputShardReturnValue>>
           window_reshard_cache;
     };
-    // Use absl::node_hash_map for pointer stability.
-    absl::node_hash_map<HloInstruction*, PerHloCache> per_hlo_cache;
+    // Use abslx::node_hash_map for pointer stability.
+    abslx::node_hash_map<HloInstruction*, PerHloCache> per_hlo_cache;
     // Caches for nested partitioning of grouped sharding. Each string key
     // represents a unique way of grouping devices.
-    absl::flat_hash_map<std::string, std::unique_ptr<ReshardCache>>
+    abslx::flat_hash_map<std::string, std::unique_ptr<ReshardCache>>
         groupd_caches;
   };
   struct PartitioningState {
@@ -352,17 +352,17 @@ class PartitionedHlo {
   // handling of kReverse, etc.
   PartitionedHlo PadWithValue(
       HloInstruction* pad_value,
-      absl::Span<const int64_t> left_padded_dims = {},
-      absl::Span<const int64_t> skipped_dims = {}) const;
+      abslx::Span<const int64_t> left_padded_dims = {},
+      abslx::Span<const int64_t> skipped_dims = {}) const;
 
   // Same as PadWithValue but does not create a new PartitionedHlo.
   HloInstruction* PadWithValueHlo(
       HloInstruction* pad_value,
-      absl::Span<const int64_t> left_padded_dims = {},
-      absl::Span<const int64_t> skipped_dims = {}) const;
+      abslx::Span<const int64_t> left_padded_dims = {},
+      abslx::Span<const int64_t> skipped_dims = {}) const;
 
-  PartitionedHlo PadWithZero(absl::Span<const int64_t> left_padded_dims = {},
-                             absl::Span<const int64_t> skipped_dims = {}) const;
+  PartitionedHlo PadWithZero(abslx::Span<const int64_t> left_padded_dims = {},
+                             abslx::Span<const int64_t> skipped_dims = {}) const;
 
   // Returns the SPMD instruction.
   HloInstruction* hlo() const { return hlo_; }
@@ -388,7 +388,7 @@ class PartitionedHlo {
   PartitionedHlo Replicate();
 
   // Helper function to replicate the data for partitions along the given dims.
-  HloInstruction* ReplicatePartial(absl::Span<const int64_t> dims);
+  HloInstruction* ReplicatePartial(abslx::Span<const int64_t> dims);
 
   // Set state of the partitoned HLO.
   void set_state(PartitioningState state) { state_ = std::move(state); }
@@ -411,7 +411,7 @@ class PartitionedHlo {
   // default of Replicate followed by Slice).
   PartitionedHlo ReshardWithAllToAll(
       const HloSharding& target,
-      absl::Span<const std::pair<int64_t, int64_t>> source_target_dims) const;
+      abslx::Span<const std::pair<int64_t, int64_t>> source_target_dims) const;
 
   // Helper function to reshard the tensor using CollectivePermute.
   PartitionedHlo ReshardWithCollectivePermute(const HloSharding& target) const;
@@ -556,12 +556,12 @@ class SpmdPartitioningVisitor : public DfsHloVisitorWithDefault {
   }
 
   virtual double GetCommunicationTimeInMilliSec(
-      int64_t bytes, absl::Span<const ReplicaGroup> device_groups) {
+      int64_t bytes, abslx::Span<const ReplicaGroup> device_groups) {
     return 0.0;
   }
 
   virtual int GetCommunicationMultiplier(
-      absl::Span<const ReplicaGroup> device_groups) {
+      abslx::Span<const ReplicaGroup> device_groups) {
     return 1;
   }
 

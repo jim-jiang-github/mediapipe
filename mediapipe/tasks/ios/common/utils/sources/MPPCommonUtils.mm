@@ -26,7 +26,7 @@
 NSString *const MPPTasksErrorDomain = @"com.google.mediapipe.tasks";
 
 namespace {
-using absl::StatusCode;
+using abslx::StatusCode;
 }
 
 @implementation MPPCommonUtils
@@ -67,20 +67,20 @@ using absl::StatusCode;
   return allocedMemory;
 }
 
-+ (BOOL)checkCppError:(const absl::Status &)status toError:(NSError *_Nullable *)error {
++ (BOOL)checkCppError:(const abslx::Status &)status toError:(NSError *_Nullable *)error {
   if (status.ok()) {
     return YES;
   }
 
   // Converts the absl status message to an NSString.
   NSString *description = [NSString
-      stringWithCString:status.ToString(absl::StatusToStringMode::kWithNoExtraData).c_str()
+      stringWithCString:status.ToString(abslx::StatusToStringMode::kWithNoExtraData).c_str()
                encoding:NSUTF8StringEncoding];
 
   MPPTasksErrorCode errorCode = MPPTasksErrorCodeUnknownError;
 
-  // Maps the absl::StatusCode to the appropriate MPPTasksErrorCode. Note: MPPTasksErrorCode omits
-  // absl::StatusCode::kOk.
+  // Maps the abslx::StatusCode to the appropriate MPPTasksErrorCode. Note: MPPTasksErrorCode omits
+  // abslx::StatusCode::kOk.
   switch (status.code()) {
     case StatusCode::kCancelled:
       errorCode = MPPTasksErrorCodeCancelledError;

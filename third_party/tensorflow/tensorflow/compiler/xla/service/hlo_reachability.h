@@ -60,7 +60,7 @@ class HloReachabilityMap {
   // Sets up a graph with no edges and where the nodes correspond to the given
   // instructions.
   explicit HloReachabilityMap(
-      absl::Span<const HloInstruction* const> instructions);
+      abslx::Span<const HloInstruction* const> instructions);
 
   // Computes and returns the reachability between HLO instructions in the
   // computation. The returned HloReachabilityMap is constructed such that
@@ -79,7 +79,7 @@ class HloReachabilityMap {
   // as add, sub, mul, div.
   static std::unique_ptr<HloReachabilityMap> BuildWithRestrictions(
       const HloComputation* computation,
-      absl::FunctionRef<void(const HloInstruction*,
+      abslx::FunctionRef<void(const HloInstruction*,
                              std::vector<HloInstruction*>*)>
           add_dependencies);
 
@@ -93,16 +93,16 @@ class HloReachabilityMap {
   // vector in the internal graph of this HloReachabilityMap for the given
   // instruction and does not transitively update any other part of the
   // adjacency matrix.
-  bool SetReachabilityToUnion(absl::Span<const HloInstruction* const> inputs,
+  bool SetReachabilityToUnion(abslx::Span<const HloInstruction* const> inputs,
                               const HloInstruction* instruction);
 
   // As above, but faster because it does not check if the reachability changed.
   void FastSetReachabilityToUnion(
-      absl::Span<const HloInstruction* const> inputs,
+      abslx::Span<const HloInstruction* const> inputs,
       const HloInstruction* instruction);
   // As above, but use Index instead if it's already looked up which is even
   // faster since no hash map lookup will occur.
-  void FastSetReachabilityToUnion(absl::Span<const Index> input_indices,
+  void FastSetReachabilityToUnion(abslx::Span<const Index> input_indices,
                                   Index index);
 
   Index GetIndex(const HloInstruction* instruction) const {
@@ -219,14 +219,14 @@ class HloReachabilityMap {
 
   // Helper for SetReachabilityToUnion/FastSetReachabilityToUnion.
   void SetReachabilityToUnionHelper(
-      absl::Span<const HloInstruction* const> inputs, Index index);
-  void SetReachabilityToUnionHelper(absl::Span<const Index> input_indices,
+      abslx::Span<const HloInstruction* const> inputs, Index index);
+  void SetReachabilityToUnionHelper(abslx::Span<const Index> input_indices,
                                     Index index);
 
   uint64_t GetKey(const HloInstruction* instruction) const {
-    uint64_t unique_id = absl::bit_cast<uint32_t>(instruction->unique_id());
+    uint64_t unique_id = abslx::bit_cast<uint32_t>(instruction->unique_id());
     uint64_t module_id =
-        absl::bit_cast<uint32_t>(instruction->parent()->parent()->unique_id());
+        abslx::bit_cast<uint32_t>(instruction->parent()->parent()->unique_id());
     return (module_id << 32) | unique_id;
   }
   // Return the index of the given instruction.
@@ -239,7 +239,7 @@ class HloReachabilityMap {
 
   // Dense assignment from HloInstruction::unique_id to number. These numbers
   // index into the bit_vectors_ vector and into the bits within a BitVector.
-  absl::flat_hash_map<uint64_t, int> indices_;
+  abslx::flat_hash_map<uint64_t, int> indices_;
 
   // Bitvectors holding the reachability to each instruction. The bit vector for
   // instruction X includes ones for each instruction which X is reachable from.

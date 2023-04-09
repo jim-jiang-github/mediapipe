@@ -26,7 +26,7 @@ namespace tensorflow {
 
 // Validates that all the combiners passed are one of the following: sum, mean,
 // or sqrtn.
-Status ValidateCombiners(absl::Span<const std::string> combiners);
+Status ValidateCombiners(abslx::Span<const std::string> combiners);
 
 // Validates the `mode_override` input of the TPUEnqueue* ops, and, if correct,
 // sets the `mode` to pass on to the TPU Embedding manager.

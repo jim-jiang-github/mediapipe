@@ -67,7 +67,7 @@ StatusOr<std::unique_ptr<TFRDecomposeContext>> TFRDecomposeContext::Get(
   std::vector<string> files;
   TF_RETURN_IF_ERROR(env->GetChildren(composite_mlir_dir, &files));
   if (files.empty()) {
-    return errors::Internal(absl::StrCat(
+    return errors::Internal(abslx::StrCat(
         "Failed to find the decomposition lib from path ", composite_mlir_dir));
   }
   std::string tfr_raw_text;
@@ -82,7 +82,7 @@ StatusOr<std::unique_ptr<TFRDecomposeContext>> TFRDecomposeContext::Get(
 
   auto ctx = TFRDecomposeContext::GetFromText(tfr_raw_text, mlir_ctx);
   if (!ctx) {
-    return errors::Internal(absl::StrCat(
+    return errors::Internal(abslx::StrCat(
         "Failed to load the imported decomposition lib: ", tfr_raw_text));
   }
   return ctx;
@@ -161,7 +161,7 @@ StatusOr<FunctionDef> TFRDecomposeContext::ExpandNode(const NodeDef& node_def,
   mlir::OpBuilder op_builder(func.getBody());
 
   // Create the TF op
-  const std::string tf_op_full_name = absl::StrCat("tf.", node_def.op());
+  const std::string tf_op_full_name = abslx::StrCat("tf.", node_def.op());
   mlir::OperationState op_state(loc, tf_op_full_name);
   op_state.addOperands(func.getArguments());
   op_state.addTypes(output_tys);

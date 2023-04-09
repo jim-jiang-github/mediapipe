@@ -46,26 +46,26 @@ class HloProtoMap {
   auto begin() const { return hlo_protos_by_program_id_.begin(); }
   auto end() const { return hlo_protos_by_program_id_.end(); }
 
-  bool contains(absl::string_view name) const {
+  bool contains(abslx::string_view name) const {
     return hlo_protos_by_name_.contains(name);
   }
 
   // Returns a list of module names (not sorted).
-  std::vector<absl::string_view> GetModuleList() const;
+  std::vector<abslx::string_view> GetModuleList() const;
 
   // Returns a list of module names sorted alphabetically.
-  std::vector<absl::string_view> GetSortedModuleList() const;
+  std::vector<abslx::string_view> GetSortedModuleList() const;
 
   // Returns a list of hlo module names sorted first by heap trace size and then
   // by hlo module name alphabetically.
-  std::vector<absl::string_view> GetSortedModuleListByHeapTraceSize() const;
+  std::vector<abslx::string_view> GetSortedModuleListByHeapTraceSize() const;
 
-  absl::StatusOr<const xla::HloProto*> GetHloProtoByModuleName(
-      absl::string_view module_name) const;
+  abslx::StatusOr<const xla::HloProto*> GetHloProtoByModuleName(
+      abslx::string_view module_name) const;
 
  private:
-  absl::flat_hash_map<int64_t, const xla::HloProto*> hlo_protos_by_program_id_;
-  absl::flat_hash_map<std::string, const xla::HloProto*> hlo_protos_by_name_;
+  abslx::flat_hash_map<int64_t, const xla::HloProto*> hlo_protos_by_program_id_;
+  abslx::flat_hash_map<std::string, const xla::HloProto*> hlo_protos_by_name_;
   std::vector<std::unique_ptr<const xla::HloProto>> owned_hlo_protos_;
 };
 

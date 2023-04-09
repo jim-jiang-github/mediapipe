@@ -33,22 +33,22 @@ namespace {
 typedef Eigen::ThreadPoolDevice CPUDevice;
 
 // `UniqueOpHashMap` defines the map type that is used when elements of type
-// `T` are to be uniquified. By default, we use `absl::flat_hash_map<T, TIndex>`
+// `T` are to be uniquified. By default, we use `abslx::flat_hash_map<T, TIndex>`
 // as the map type. Subsequent specializations are provided for
 // performance and/or correctness.
 template <typename T, typename TIndex>
 struct UniqueOpHashMap {
-  using map_type = absl::flat_hash_map<T, TIndex>;
+  using map_type = abslx::flat_hash_map<T, TIndex>;
 };
 
-// NOTE(mrry): For `tstring` elements, we use an `absl::string_view` key to
+// NOTE(mrry): For `tstring` elements, we use an `abslx::string_view` key to
 // avoid copying the input strings into the map.
 template <typename TIndex>
 struct UniqueOpHashMap<tstring, TIndex> {
-  using map_type = absl::flat_hash_map<absl::string_view, TIndex>;
+  using map_type = abslx::flat_hash_map<abslx::string_view, TIndex>;
 };
 
-// NOTE(mrry): `absl::flat_hash_map<float, ...>` does not allow `NaN` as a key,
+// NOTE(mrry): `abslx::flat_hash_map<float, ...>` does not allow `NaN` as a key,
 // because `NaN != NaN`, so we fall back to `std::unordered_map<>` for
 // floating-point types.
 template <typename TIndex>
@@ -197,7 +197,7 @@ class UniqueOp : public OpKernel {
         return true;
       };
 
-      absl::flat_hash_map<int64_t, int64_t, decltype(hash_fn),
+      abslx::flat_hash_map<int64_t, int64_t, decltype(hash_fn),
                           decltype(equal_to_fn)>
           uniq(0, hash_fn, equal_to_fn);
 

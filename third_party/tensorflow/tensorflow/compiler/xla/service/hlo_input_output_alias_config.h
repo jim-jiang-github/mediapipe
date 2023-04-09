@@ -55,7 +55,7 @@ class HloInputOutputAliasConfig {
     bool must_alias() const { return kind == kMustAlias; }
 
     std::string ToString() const {
-      return absl::StrFormat("(%lld, %s, %s)", parameter_number,
+      return abslx::StrFormat("(%lld, %s, %s)", parameter_number,
                              parameter_index.ToString(),
                              kind == kMustAlias ? "must-alias" : "may-alias");
     }

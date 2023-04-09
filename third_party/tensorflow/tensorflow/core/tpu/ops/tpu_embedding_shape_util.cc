@@ -60,8 +60,8 @@ using tensorflow::tpu::TPUEmbeddingConfiguration;
 }
 
 /* static */ Status TpuEmbeddingShapeUtil::ComputeTableShapes(
-    const absl::Span<const int64> vocabulary_sizes,
-    const absl::Span<const int> table_dimensions, int shard_id, int num_shards,
+    const abslx::Span<const int64> vocabulary_sizes,
+    const abslx::Span<const int> table_dimensions, int shard_id, int num_shards,
     std::vector<TensorShapeProto>* shapes) {
   shapes->resize(vocabulary_sizes.size());
   for (int i = 0; i < vocabulary_sizes.size(); ++i) {

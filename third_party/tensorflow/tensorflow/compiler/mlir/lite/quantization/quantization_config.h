@@ -42,7 +42,7 @@ struct CustomOpInfo {
 };
 
 using ::tflite::optimize::ReducedPrecisionSupport;
-using StringSet = absl::flat_hash_set<std::string>;
+using StringSet = abslx::flat_hash_set<std::string>;
 using CustomOpMap = std::unordered_map<std::string, CustomOpInfo>;
 enum CustomOpUpdateOptions { kINputIndices, kWeightOnly, kNoSideEffect };
 
@@ -201,17 +201,17 @@ struct QuantizationSpecs {
 };
 
 // Parses the command line flag strings to the CustomOpMap specification.
-void ParseCustomOpSpecs(absl::string_view node_names,
+void ParseCustomOpSpecs(abslx::string_view node_names,
                         const CustomOpUpdateOptions& update_option,
                         CustomOpMap& custom_op_map);
 
 // Parses the command line flag strings to the quantization specification for
 // input arrays of a graph. The array names are not stored in the spec, and will
 // be matched by position. Returns true if failed.
-bool ParseInputNodeQuantSpecs(absl::string_view node_names,
-                              absl::string_view min_values,
-                              absl::string_view max_values,
-                              absl::string_view inference_type,
+bool ParseInputNodeQuantSpecs(abslx::string_view node_names,
+                              abslx::string_view min_values,
+                              abslx::string_view max_values,
+                              abslx::string_view inference_type,
                               QuantizationSpecs* quant_specs);
 
 // Gets the quantization specification for input arrays. The array names are not

@@ -68,7 +68,7 @@ float ComputeRotation(const NormalizedLandmarkList& landmarks,
   return rotation;
 }
 
-absl::Status NormalizedLandmarkListToRect(
+abslx::Status NormalizedLandmarkListToRect(
     const NormalizedLandmarkList& landmarks,
     const std::pair<int, int>& image_size, NormalizedRect* rect) {
   const float rotation = ComputeRotation(landmarks, image_size);
@@ -127,7 +127,7 @@ absl::Status NormalizedLandmarkListToRect(
   rect->set_height(height);
   rect->set_rotation(rotation);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace
@@ -140,35 +140,35 @@ absl::Status NormalizedLandmarkListToRect(
 // mean of PIP joints at the top.
 class HandLandmarksToRectCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Tag(kNormalizedLandmarksTag).Set<NormalizedLandmarkList>();
     cc->Inputs().Tag(kImageSizeTag).Set<std::pair<int, int>>();
     cc->Outputs().Tag(kNormRectTag).Set<NormalizedRect>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     if (cc->Inputs().Tag(kNormalizedLandmarksTag).IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     RET_CHECK(!cc->Inputs().Tag(kImageSizeTag).IsEmpty());
 
     std::pair<int, int> image_size =
         cc->Inputs().Tag(kImageSizeTag).Get<std::pair<int, int>>();
     const auto landmarks = GetPartialLandmarks(cc);
-    auto output_rect = absl::make_unique<NormalizedRect>();
+    auto output_rect = abslx::make_unique<NormalizedRect>();
     MP_RETURN_IF_ERROR(
         NormalizedLandmarkListToRect(landmarks, image_size, output_rect.get()));
     cc->Outputs()
         .Tag(kNormRectTag)
         .Add(output_rect.release(), cc->InputTimestamp());
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

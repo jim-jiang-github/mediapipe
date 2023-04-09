@@ -146,7 +146,7 @@ TEST(LiteralTestUtilTest, ExpectNearFailurePlacesResultsInTemporaryDirectory) {
   std::vector<std::string> results;
   TF_CHECK_OK(env->GetMatchingPaths(pattern, &results));
 
-  LOG(INFO) << "results: [" << absl::StrJoin(results, ", ") << "]";
+  LOG(INFO) << "results: [" << abslx::StrJoin(results, ", ") << "]";
   EXPECT_EQ(3, results.size());
   for (const std::string& result : results) {
     LiteralProto literal_proto;

@@ -43,10 +43,10 @@ stream_executor::port::StatusOr<mlir::OwningOpRef<mlir::ModuleOp>>
 LoadFromGraphdefOrMlirSource(
     const std::string& input_filename, bool input_mlir,
     bool use_splatted_constant, const std::vector<std::string>& extra_tf_opdefs,
-    const GraphImportConfig& specs, absl::string_view debug_info_file,
-    absl::string_view input_arrays, absl::string_view input_dtypes,
-    absl::string_view input_shapes, absl::string_view output_arrays,
-    absl::string_view control_output_arrays, llvm::SourceMgr* source_mgr,
+    const GraphImportConfig& specs, abslx::string_view debug_info_file,
+    abslx::string_view input_arrays, abslx::string_view input_dtypes,
+    abslx::string_view input_shapes, abslx::string_view output_arrays,
+    abslx::string_view control_output_arrays, llvm::SourceMgr* source_mgr,
     mlir::MLIRContext* context);
 
 // Load Saved model (either v1 or v2) into MLIR.
@@ -55,8 +55,8 @@ stream_executor::port::StatusOr<mlir::OwningOpRef<mlir::ModuleOp>>
 ImportSavedModel(
     const std::string& input_filename, const int saved_model_version,
     const std::unordered_set<std::string>& tags,
-    absl::Span<const std::string> extra_tf_opdefs,
-    absl::Span<std::string> exported_names, const GraphImportConfig& specs,
+    abslx::Span<const std::string> extra_tf_opdefs,
+    abslx::Span<std::string> exported_names, const GraphImportConfig& specs,
     bool enable_variable_lifting, mlir::MLIRContext* context,
     std::unique_ptr<tensorflow::SavedModelBundle>* saved_model_bundle);
 

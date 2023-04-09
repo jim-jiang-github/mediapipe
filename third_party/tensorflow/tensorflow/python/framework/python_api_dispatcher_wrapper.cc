@@ -49,7 +49,7 @@ PythonAPIDispatcher MakePythonAPIDispatcher(
   for (const auto& name : arg_names) {
     name_strs.push_back(name.c_str());
   }
-  absl::Span<const char*> arg_names_span(name_strs);
+  abslx::Span<const char*> arg_names_span(name_strs);
   if (defaults.ptr() == Py_None) {
     return PythonAPIDispatcher(api_name, arg_names_span, {});
   } else {
@@ -60,7 +60,7 @@ PythonAPIDispatcher MakePythonAPIDispatcher(
     }
     return PythonAPIDispatcher(
         api_name, arg_names_span,
-        absl::MakeSpan(PySequence_Fast_ITEMS(fast_defaults.get()),
+        abslx::MakeSpan(PySequence_Fast_ITEMS(fast_defaults.get()),
                        PySequence_Fast_GET_SIZE(fast_defaults.get())));
   }
 }
@@ -83,7 +83,7 @@ PYBIND11_MODULE(_pywrap_python_api_dispatcher, m) {
              return static_cast<PyInstanceChecker*>(self)->cache_size();
            })
       .def("__repr__", [](PyTypeChecker* self) {
-        return absl::StrCat("<PyTypeChecker ", self->DebugString(), ">");
+        return abslx::StrCat("<PyTypeChecker ", self->DebugString(), ">");
       });
 
   py::class_<PySignatureChecker>(m, "PySignatureChecker")
@@ -94,10 +94,10 @@ PYBIND11_MODULE(_pywrap_python_api_dispatcher, m) {
              tensorflow::Safe_PyObjectPtr seq(PySequence_Fast(args.ptr(), ""));
              PyObject** items = PySequence_Fast_ITEMS(seq.get());
              int n = PySequence_Fast_GET_SIZE(seq.get());
-             return self->CheckCanonicalizedArgs(absl::MakeSpan(items, n));
+             return self->CheckCanonicalizedArgs(abslx::MakeSpan(items, n));
            })
       .def("__repr__", [](PySignatureChecker* self) {
-        return absl::StrCat("<PySignatureChecker ", self->DebugString(), ">");
+        return abslx::StrCat("<PySignatureChecker ", self->DebugString(), ">");
       });
 
   py::class_<PythonAPIDispatcher>(m, "PythonAPIDispatcher")

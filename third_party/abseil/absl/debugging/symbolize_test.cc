@@ -119,20 +119,20 @@ const char kHpageTextPadding[kHpageSize * 4] ABSL_ATTRIBUTE_SECTION_VARIABLE(
 
 static char try_symbolize_buffer[4096];
 
-// A wrapper function for absl::Symbolize() to make the unit test simple.  The
+// A wrapper function for abslx::Symbolize() to make the unit test simple.  The
 // limit must be < sizeof(try_symbolize_buffer).  Returns null if
-// absl::Symbolize() returns false, otherwise returns try_symbolize_buffer with
-// the result of absl::Symbolize().
+// abslx::Symbolize() returns false, otherwise returns try_symbolize_buffer with
+// the result of abslx::Symbolize().
 static const char *TrySymbolizeWithLimit(void *pc, int limit) {
   ABSL_RAW_CHECK(limit <= sizeof(try_symbolize_buffer),
                  "try_symbolize_buffer is too small");
 
   // Use the heap to facilitate heap and buffer sanitizer tools.
-  auto heap_buffer = absl::make_unique<char[]>(sizeof(try_symbolize_buffer));
-  bool found = absl::Symbolize(pc, heap_buffer.get(), limit);
+  auto heap_buffer = abslx::make_unique<char[]>(sizeof(try_symbolize_buffer));
+  bool found = abslx::Symbolize(pc, heap_buffer.get(), limit);
   if (found) {
     ABSL_RAW_CHECK(strnlen(heap_buffer.get(), limit) < limit,
-                   "absl::Symbolize() did not properly terminate the string");
+                   "abslx::Symbolize() did not properly terminate the string");
     strncpy(try_symbolize_buffer, heap_buffer.get(),
             sizeof(try_symbolize_buffer) - 1);
     try_symbolize_buffer[sizeof(try_symbolize_buffer) - 1] = '\0';
@@ -202,7 +202,7 @@ static char g_symbolize_buffer[4096];
 static char *g_symbolize_result;
 
 static void SymbolizeSignalHandler(int signo) {
-  if (absl::Symbolize(g_pc_to_symbolize, g_symbolize_buffer,
+  if (abslx::Symbolize(g_pc_to_symbolize, g_symbolize_buffer,
                       sizeof(g_symbolize_buffer))) {
     g_symbolize_result = g_symbolize_buffer;
   } else {
@@ -213,7 +213,7 @@ static void SymbolizeSignalHandler(int signo) {
 // Call Symbolize and figure out the stack footprint of this call.
 static const char *SymbolizeStackConsumption(void *pc, int *stack_consumed) {
   g_pc_to_symbolize = pc;
-  *stack_consumed = absl::debugging_internal::GetSignalHandlerStackConsumption(
+  *stack_consumed = abslx::debugging_internal::GetSignalHandlerStackConsumption(
       SymbolizeSignalHandler);
   return g_symbolize_result;
 }
@@ -276,7 +276,7 @@ static int FilterElfHeader(struct dl_phdr_info *info, size_t size, void *data) {
     if (info->dlpi_phdr[i].p_type == PT_LOAD &&
         info->dlpi_phdr[i].p_flags == (PF_R | PF_X)) {
       const void *const vaddr =
-          absl::bit_cast<void *>(info->dlpi_addr + info->dlpi_phdr[i].p_vaddr);
+          abslx::bit_cast<void *>(info->dlpi_addr + info->dlpi_phdr[i].p_vaddr);
       const auto segsize = info->dlpi_phdr[i].p_memsz;
 
       const char *self_exe;
@@ -286,7 +286,7 @@ static int FilterElfHeader(struct dl_phdr_info *info, size_t size, void *data) {
         self_exe = "/proc/self/exe";
       }
 
-      absl::debugging_internal::RegisterFileMappingHint(
+      abslx::debugging_internal::RegisterFileMappingHint(
           vaddr, reinterpret_cast<const char *>(vaddr) + segsize,
           info->dlpi_phdr[i].p_offset, self_exe);
 
@@ -307,11 +307,11 @@ TEST(Symbolize, SymbolizeWithMultipleMaps) {
   // Verify we can symbolize everything.
   char buf[512];
   memset(buf, 0, sizeof(buf));
-  absl::Symbolize(kPadding0, buf, sizeof(buf));
+  abslx::Symbolize(kPadding0, buf, sizeof(buf));
   EXPECT_STREQ("kPadding0", buf);
 
   memset(buf, 0, sizeof(buf));
-  absl::Symbolize(kPadding1, buf, sizeof(buf));
+  abslx::Symbolize(kPadding1, buf, sizeof(buf));
   EXPECT_STREQ("kPadding1", buf);
 
   // Specify a hint for the executable segment.
@@ -336,7 +336,7 @@ TEST(Symbolize, SymbolizeWithMultipleMaps) {
   }
 
   // Invalidate the symbolization cache so we are forced to rely on the hint.
-  absl::Symbolize(nullptr, buf, sizeof(buf));
+  abslx::Symbolize(nullptr, buf, sizeof(buf));
 
   // Verify we can still symbolize.
   const char *expected[] = {"kPadding0", "kPadding1"};
@@ -345,7 +345,7 @@ TEST(Symbolize, SymbolizeWithMultipleMaps) {
   for (int i = 0; i < 2; i++) {
     for (size_t offset : offsets) {
       memset(buf, 0, sizeof(buf));
-      absl::Symbolize(ptrs[i] + offset, buf, sizeof(buf));
+      abslx::Symbolize(ptrs[i] + offset, buf, sizeof(buf));
       EXPECT_STREQ(expected[i], buf);
     }
   }
@@ -353,7 +353,7 @@ TEST(Symbolize, SymbolizeWithMultipleMaps) {
 
 // Appends string(*args->arg) to args->symbol_buf.
 static void DummySymbolDecorator(
-    const absl::debugging_internal::SymbolDecoratorArgs *args) {
+    const abslx::debugging_internal::SymbolDecoratorArgs *args) {
   std::string *message = static_cast<std::string *>(args->arg);
   strncat(args->symbol_buf, message->c_str(),
           args->symbol_buf_size - strlen(args->symbol_buf) - 1);
@@ -362,33 +362,33 @@ static void DummySymbolDecorator(
 TEST(Symbolize, InstallAndRemoveSymbolDecorators) {
   int ticket_a;
   std::string a_message("a");
-  EXPECT_GE(ticket_a = absl::debugging_internal::InstallSymbolDecorator(
+  EXPECT_GE(ticket_a = abslx::debugging_internal::InstallSymbolDecorator(
                 DummySymbolDecorator, &a_message),
             0);
 
   int ticket_b;
   std::string b_message("b");
-  EXPECT_GE(ticket_b = absl::debugging_internal::InstallSymbolDecorator(
+  EXPECT_GE(ticket_b = abslx::debugging_internal::InstallSymbolDecorator(
                 DummySymbolDecorator, &b_message),
             0);
 
   int ticket_c;
   std::string c_message("c");
-  EXPECT_GE(ticket_c = absl::debugging_internal::InstallSymbolDecorator(
+  EXPECT_GE(ticket_c = abslx::debugging_internal::InstallSymbolDecorator(
                 DummySymbolDecorator, &c_message),
             0);
 
   char *address = reinterpret_cast<char *>(1);
   EXPECT_STREQ("abc", TrySymbolize(address++));
 
-  EXPECT_TRUE(absl::debugging_internal::RemoveSymbolDecorator(ticket_b));
+  EXPECT_TRUE(abslx::debugging_internal::RemoveSymbolDecorator(ticket_b));
 
   EXPECT_STREQ("ac", TrySymbolize(address++));
 
   // Cleanup: remove all remaining decorators so other stack traces don't
   // get mystery "ac" decoration.
-  EXPECT_TRUE(absl::debugging_internal::RemoveSymbolDecorator(ticket_a));
-  EXPECT_TRUE(absl::debugging_internal::RemoveSymbolDecorator(ticket_c));
+  EXPECT_TRUE(abslx::debugging_internal::RemoveSymbolDecorator(ticket_a));
+  EXPECT_TRUE(abslx::debugging_internal::RemoveSymbolDecorator(ticket_c));
 }
 
 // Some versions of Clang with optimizations enabled seem to be able
@@ -402,8 +402,8 @@ TEST(Symbolize, ForEachSection) {
   ASSERT_NE(fd, -1);
 
   std::vector<std::string> sections;
-  ASSERT_TRUE(absl::debugging_internal::ForEachSection(
-      fd, [&sections](const absl::string_view name, const ElfW(Shdr) &) {
+  ASSERT_TRUE(abslx::debugging_internal::ForEachSection(
+      fd, [&sections](const abslx::string_view name, const ElfW(Shdr) &) {
         sections.emplace_back(name);
         return true;
       }));
@@ -522,9 +522,9 @@ TEST(Symbolize, SymbolizeWithDemangling) {
 
 TEST(Symbolize, Unimplemented) {
   char buf[64];
-  EXPECT_FALSE(absl::Symbolize((void *)(&nonstatic_func), buf, sizeof(buf)));
-  EXPECT_FALSE(absl::Symbolize((void *)(&static_func), buf, sizeof(buf)));
-  EXPECT_FALSE(absl::Symbolize((void *)(&Foo::func), buf, sizeof(buf)));
+  EXPECT_FALSE(abslx::Symbolize((void *)(&nonstatic_func), buf, sizeof(buf)));
+  EXPECT_FALSE(abslx::Symbolize((void *)(&static_func), buf, sizeof(buf)));
+  EXPECT_FALSE(abslx::Symbolize((void *)(&Foo::func), buf, sizeof(buf)));
 }
 
 #endif
@@ -543,7 +543,7 @@ int main(int argc, char **argv) {
   symbolize_test_thread_big[0] = 0;
 #endif
 
-  absl::InitializeSymbolizer(argv[0]);
+  abslx::InitializeSymbolizer(argv[0]);
   testing::InitGoogleTest(&argc, argv);
 
 #if defined(ABSL_INTERNAL_HAVE_ELF_SYMBOLIZE) || \

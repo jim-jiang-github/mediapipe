@@ -82,23 +82,23 @@ std::vector<T> PacketValues(const std::vector<Packet>& packets) {
 std::string SourceString(Timestamp t) {
   return (t.IsSpecialValue())
              ? t.DebugString()
-             : absl::StrCat("Timestamp(", t.DebugString(), ")");
+             : abslx::StrCat("Timestamp(", t.DebugString(), ")");
 }
 
 // A Calculator::Process callback function.
-typedef std::function<absl::Status(const InputStreamShardSet&,
+typedef std::function<abslx::Status(const InputStreamShardSet&,
                                    OutputStreamShardSet*)>
     ProcessFunction;
 
 // A testing callback function that passes through all packets.
-absl::Status PassthroughFunction(const InputStreamShardSet& inputs,
+abslx::Status PassthroughFunction(const InputStreamShardSet& inputs,
                                  OutputStreamShardSet* outputs) {
   for (int i = 0; i < inputs.NumEntries(); ++i) {
     if (!inputs.Index(i).Value().IsEmpty()) {
       outputs->Index(i).AddPacket(inputs.Index(i).Value());
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Tests demonstrating an FlowLimiterCalculator operating in a cyclic graph.
@@ -218,24 +218,24 @@ TEST_F(FlowLimiterCalculatorSemaphoreTest, FramesDropped) {
 // A calculator that sleeps during Process.
 class SleepCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Tag(kPacketTag).SetAny();
     cc->Outputs().Tag(kPacketTag).SetSameAs(&cc->Inputs().Tag(kPacketTag));
     cc->InputSidePackets().Tag(kSleepTimeTag).Set<int64>();
     cc->InputSidePackets().Tag(kWarmupTimeTag).Set<int64>();
     cc->InputSidePackets().Tag(kClockTag).Set<mediapipe::Clock*>();
     cc->SetTimestampOffset(0);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     clock_ = cc->InputSidePackets().Tag(kClockTag).Get<mediapipe::Clock*>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     ++packet_count;
-    absl::Duration sleep_time = absl::Microseconds(
+    abslx::Duration sleep_time = abslx::Microseconds(
         packet_count == 1
             ? cc->InputSidePackets().Tag(kWarmupTimeTag).Get<int64>()
             : cc->InputSidePackets().Tag(kSleepTimeTag).Get<int64>());
@@ -243,7 +243,7 @@ class SleepCalculator : public CalculatorBase {
     cc->Outputs()
         .Tag(kPacketTag)
         .AddPacket(cc->Inputs().Tag(kPacketTag).Value());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -256,15 +256,15 @@ REGISTER_CALCULATOR(SleepCalculator);
 // Drops the 3rd packet, and optionally the corresponding timestamp bound.
 class DropCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Tag(kPacketTag).SetAny();
     cc->Outputs().Tag(kPacketTag).SetSameAs(&cc->Inputs().Tag(kPacketTag));
     cc->InputSidePackets().Tag(kDropTimestampsTag).Set<bool>();
     cc->SetProcessTimestampBounds(true);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     if (!cc->Inputs().Tag(kPacketTag).Value().IsEmpty()) {
       ++packet_count;
     }
@@ -279,7 +279,7 @@ class DropCalculator : public CalculatorBase {
           .Tag(kPacketTag)
           .SetNextTimestampBound(cc->InputTimestamp().NextAllowedInStream());
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -319,15 +319,15 @@ class FlowLimiterCalculatorTest : public testing::Test {
     )pb");
   }
 
-  // Parse an absl::Time from RFC3339 format.
-  absl::Time ParseTime(const std::string& date_time_str) {
-    absl::Time result;
-    absl::ParseTime(absl::RFC3339_sec, date_time_str, &result, nullptr);
+  // Parse an abslx::Time from RFC3339 format.
+  abslx::Time ParseTime(const std::string& date_time_str) {
+    abslx::Time result;
+    abslx::ParseTime(abslx::RFC3339_sec, date_time_str, &result, nullptr);
     return result;
   }
 
   // The point in simulated time when the test starts.
-  absl::Time StartTime() { return ParseTime("2020-11-03T20:00:00Z"); }
+  abslx::Time StartTime() { return ParseTime("2020-11-03T20:00:00Z"); }
 
   // Initialize the test clock to follow simulated time.
   void SetUpSimulationClock() {
@@ -385,11 +385,11 @@ TEST_F(FlowLimiterCalculatorTest, FinishedTimestamps) {
   MP_ASSERT_OK(graph_.Initialize(graph_config));
   MP_EXPECT_OK(graph_.ObserveOutputStream("out_1", [this](Packet p) {
     out_1_packets_.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_EXPECT_OK(graph_.ObserveOutputStream("allow", [this](Packet p) {
     allow_packets_.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   simulation_clock_->ThreadStart();
   MP_ASSERT_OK(graph_.StartRun(side_packets));
@@ -400,26 +400,26 @@ TEST_F(FlowLimiterCalculatorTest, FinishedTimestamps) {
   // 3. packet-2 is queued and packet-1 is dropped,
   // 4. packet-2 is released, and so forth.
   MP_EXPECT_OK(graph_.AddPacketToInputStream("in_1", input_packets_[0]));
-  clock_->Sleep(absl::Microseconds(1));
+  clock_->Sleep(abslx::Microseconds(1));
   EXPECT_EQ(allow_packets_.size(), 1);
   EXPECT_EQ(allow_packets_.back().Get<bool>(), true);
-  clock_->Sleep(absl::Microseconds(10000));
+  clock_->Sleep(abslx::Microseconds(10000));
   for (int i = 1; i < 8; i += 2) {
     MP_EXPECT_OK(graph_.AddPacketToInputStream("in_1", input_packets_[i]));
-    clock_->Sleep(absl::Microseconds(10000));
+    clock_->Sleep(abslx::Microseconds(10000));
     EXPECT_EQ(allow_packets_.size(), i);
     MP_EXPECT_OK(graph_.AddPacketToInputStream("in_1", input_packets_[i + 1]));
-    clock_->Sleep(absl::Microseconds(1));
+    clock_->Sleep(abslx::Microseconds(1));
     EXPECT_EQ(allow_packets_.size(), i + 1);
     EXPECT_EQ(allow_packets_.back().Get<bool>(), false);
-    clock_->Sleep(absl::Microseconds(10000));
+    clock_->Sleep(abslx::Microseconds(10000));
     EXPECT_EQ(allow_packets_.size(), i + 2);
     EXPECT_EQ(allow_packets_.back().Get<bool>(), true);
   }
 
   // Finish the graph.
   MP_EXPECT_OK(graph_.CloseAllPacketSources());
-  clock_->Sleep(absl::Microseconds(40000));
+  clock_->Sleep(abslx::Microseconds(40000));
   MP_EXPECT_OK(graph_.WaitUntilDone());
   simulation_clock_->ThreadFinish();
 
@@ -457,11 +457,11 @@ TEST_F(FlowLimiterCalculatorTest, FinishedLost) {
   MP_ASSERT_OK(graph_.Initialize(graph_config));
   MP_EXPECT_OK(graph_.ObserveOutputStream("out_1", [this](Packet p) {
     out_1_packets_.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_EXPECT_OK(graph_.ObserveOutputStream("allow", [this](Packet p) {
     allow_packets_.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   simulation_clock_->ThreadStart();
   MP_ASSERT_OK(graph_.StartRun(side_packets));
@@ -473,15 +473,15 @@ TEST_F(FlowLimiterCalculatorTest, FinishedLost) {
   // 4. packet-4 expires and queued packet-14 is released.
   // 5. packet-17, 19, and 20 are released on time.
   MP_EXPECT_OK(graph_.AddPacketToInputStream("in_1", input_packets_[0]));
-  clock_->Sleep(absl::Microseconds(10000));
+  clock_->Sleep(abslx::Microseconds(10000));
   for (int i = 1; i < 21; ++i) {
     MP_EXPECT_OK(graph_.AddPacketToInputStream("in_1", input_packets_[i]));
-    clock_->Sleep(absl::Microseconds(10000));
+    clock_->Sleep(abslx::Microseconds(10000));
   }
 
   // Finish the graph.
   MP_EXPECT_OK(graph_.CloseAllPacketSources());
-  clock_->Sleep(absl::Microseconds(40000));
+  clock_->Sleep(abslx::Microseconds(40000));
   MP_EXPECT_OK(graph_.WaitUntilDone());
   simulation_clock_->ThreadFinish();
 
@@ -521,11 +521,11 @@ TEST_F(FlowLimiterCalculatorTest, FinishedDelayed) {
   MP_ASSERT_OK(graph_.Initialize(graph_config));
   MP_EXPECT_OK(graph_.ObserveOutputStream("out_1", [this](Packet p) {
     out_1_packets_.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_EXPECT_OK(graph_.ObserveOutputStream("allow", [this](Packet p) {
     allow_packets_.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   simulation_clock_->ThreadStart();
   MP_ASSERT_OK(graph_.StartRun(side_packets));
@@ -537,15 +537,15 @@ TEST_F(FlowLimiterCalculatorTest, FinishedDelayed) {
   // 3. After the graph is finally finished with warmup and the backlog packets,
   //    packets 60 through 70 are released and processed on time.
   MP_EXPECT_OK(graph_.AddPacketToInputStream("in_1", input_packets_[0]));
-  clock_->Sleep(absl::Microseconds(10000));
+  clock_->Sleep(abslx::Microseconds(10000));
   for (int i = 1; i < 71; ++i) {
     MP_EXPECT_OK(graph_.AddPacketToInputStream("in_1", input_packets_[i]));
-    clock_->Sleep(absl::Microseconds(10000));
+    clock_->Sleep(abslx::Microseconds(10000));
   }
 
   // Finish the graph.
   MP_EXPECT_OK(graph_.CloseAllPacketSources());
-  clock_->Sleep(absl::Microseconds(40000));
+  clock_->Sleep(abslx::Microseconds(40000));
   MP_EXPECT_OK(graph_.WaitUntilDone());
   simulation_clock_->ThreadFinish();
 
@@ -616,39 +616,39 @@ TEST_F(FlowLimiterCalculatorTest, TwoInputStreams) {
   MP_ASSERT_OK(graph_.Initialize(graph_config));
   MP_EXPECT_OK(graph_.ObserveOutputStream("out_1", [this](Packet p) {
     out_1_packets_.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   std::vector<Packet> out_2_packets;
   MP_EXPECT_OK(graph_.ObserveOutputStream("in_2_sampled", [&](Packet p) {
     out_2_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_EXPECT_OK(graph_.ObserveOutputStream("allow", [this](Packet p) {
     allow_packets_.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   simulation_clock_->ThreadStart();
   MP_ASSERT_OK(graph_.StartRun(side_packets));
 
   // Add packets 0..9 to stream in_1, and packets 0..10 to stream in_2.
   MP_EXPECT_OK(graph_.AddPacketToInputStream("in_1", input_packets_[0]));
-  clock_->Sleep(absl::Microseconds(10000));
+  clock_->Sleep(abslx::Microseconds(10000));
   for (int i = 1; i < 10; ++i) {
     MP_EXPECT_OK(graph_.AddPacketToInputStream("in_1", input_packets_[i]));
     MP_EXPECT_OK(graph_.AddPacketToInputStream("in_2", input_packets_[i - 1]));
-    clock_->Sleep(absl::Microseconds(10000));
+    clock_->Sleep(abslx::Microseconds(10000));
   }
 
   // Add packets 10..20 to stream in_1, and packets 11..21 to stream in_2.
   for (int i = 10; i < 21; ++i) {
     MP_EXPECT_OK(graph_.AddPacketToInputStream("in_2", input_packets_[i + 1]));
     MP_EXPECT_OK(graph_.AddPacketToInputStream("in_1", input_packets_[i]));
-    clock_->Sleep(absl::Microseconds(10000));
+    clock_->Sleep(abslx::Microseconds(10000));
   }
 
   // Finish the graph run.
   MP_EXPECT_OK(graph_.CloseAllPacketSources());
-  clock_->Sleep(absl::Microseconds(40000));
+  clock_->Sleep(abslx::Microseconds(40000));
   MP_EXPECT_OK(graph_.WaitUntilDone());
   simulation_clock_->ThreadFinish();
 
@@ -725,39 +725,39 @@ TEST_F(FlowLimiterCalculatorTest, ZeroQueue) {
   MP_ASSERT_OK(graph_.Initialize(graph_config));
   MP_EXPECT_OK(graph_.ObserveOutputStream("out_1", [this](Packet p) {
     out_1_packets_.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   std::vector<Packet> out_2_packets;
   MP_EXPECT_OK(graph_.ObserveOutputStream("in_2_sampled", [&](Packet p) {
     out_2_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_EXPECT_OK(graph_.ObserveOutputStream("allow", [this](Packet p) {
     allow_packets_.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   simulation_clock_->ThreadStart();
   MP_ASSERT_OK(graph_.StartRun(side_packets));
 
   // Add packets 0..9 to stream in_1, and packets 0..10 to stream in_2.
   MP_EXPECT_OK(graph_.AddPacketToInputStream("in_1", input_packets_[0]));
-  clock_->Sleep(absl::Microseconds(10000));
+  clock_->Sleep(abslx::Microseconds(10000));
   for (int i = 1; i < 10; ++i) {
     MP_EXPECT_OK(graph_.AddPacketToInputStream("in_1", input_packets_[i]));
     MP_EXPECT_OK(graph_.AddPacketToInputStream("in_2", input_packets_[i - 1]));
-    clock_->Sleep(absl::Microseconds(10000));
+    clock_->Sleep(abslx::Microseconds(10000));
   }
 
   // Add packets 10..20 to stream in_1, and packets 11..21 to stream in_2.
   for (int i = 10; i < 21; ++i) {
     MP_EXPECT_OK(graph_.AddPacketToInputStream("in_2", input_packets_[i + 1]));
     MP_EXPECT_OK(graph_.AddPacketToInputStream("in_1", input_packets_[i]));
-    clock_->Sleep(absl::Microseconds(10000));
+    clock_->Sleep(abslx::Microseconds(10000));
   }
 
   // Finish the graph run.
   MP_EXPECT_OK(graph_.CloseAllPacketSources());
-  clock_->Sleep(absl::Microseconds(40000));
+  clock_->Sleep(abslx::Microseconds(40000));
   MP_EXPECT_OK(graph_.WaitUntilDone());
   simulation_clock_->ThreadFinish();
 
@@ -875,7 +875,7 @@ TEST_F(FlowLimiterCalculatorTest, AuxiliaryInputs) {
       "out_1",
       [this](Packet p) {
         out_1_packets_.push_back(p);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       },
       true));
   std::vector<Packet> out_2_packets, out_3_packets;
@@ -883,21 +883,21 @@ TEST_F(FlowLimiterCalculatorTest, AuxiliaryInputs) {
       "auxiliary_input_2_sampled",
       [&](Packet p) {
         out_2_packets.push_back(p);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       },
       true));
   MP_EXPECT_OK(graph_.ObserveOutputStream(
       "auxiliary_input_3_sampled",
       [&](Packet p) {
         out_3_packets.push_back(p);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       },
       true));
   MP_EXPECT_OK(graph_.ObserveOutputStream(
       "allow",
       [this](Packet p) {
         allow_packets_.push_back(p);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       },
       true));
   simulation_clock_->ThreadStart();
@@ -922,13 +922,13 @@ TEST_F(FlowLimiterCalculatorTest, AuxiliaryInputs) {
     }
     MP_EXPECT_OK(graph_.AddPacketToInputStream(
         "auxiliary_input_2", MakePacket<int>(i).At(Timestamp(i * 10000))));
-    clock_->Sleep(absl::Microseconds(10000));
+    clock_->Sleep(abslx::Microseconds(10000));
     EXPECT_EQ(out_2_packets.size(), sizes_2[i]);
   }
 
   // Finish the graph run.
   MP_EXPECT_OK(graph_.CloseAllPacketSources());
-  clock_->Sleep(absl::Microseconds(40000));
+  clock_->Sleep(abslx::Microseconds(40000));
   MP_EXPECT_OK(graph_.WaitUntilDone());
   simulation_clock_->ThreadFinish();
 

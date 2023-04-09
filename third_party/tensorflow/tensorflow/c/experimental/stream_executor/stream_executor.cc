@@ -273,17 +273,17 @@ class CStreamExecutor : public internal::StreamExecutorInterface {
     stream_executor_->unified_memory_deallocate(&device_, mem);
   }
 
-  absl::optional<AllocatorStats> GetAllocatorStats() override {
+  abslx::optional<AllocatorStats> GetAllocatorStats() override {
     SP_AllocatorStats c_stats{SP_ALLOCATORSTATS_STRUCT_SIZE};
     TF_Bool has_stats =
         stream_executor_->get_allocator_stats(&device_, &c_stats);
     if (!has_stats) {
-      return absl::nullopt;
+      return abslx::nullopt;
     }
     port::Status status = ValidateSPAllocatorStats(c_stats);
     if (!status.ok()) {
       LOG(ERROR) << status.error_message();
-      return absl::nullopt;
+      return abslx::nullopt;
     }
     ::stream_executor::AllocatorStats stats;
     stats.num_allocs = c_stats.num_allocs;
@@ -726,10 +726,10 @@ port::StatusOr<std::unique_ptr<StreamExecutor>> CPlatform::GetUncachedExecutor(
                                  c_status.get());
   TF_RETURN_IF_ERROR(StatusFromTF_Status(c_status.get()));
 
-  auto executor = absl::make_unique<CStreamExecutor>(
+  auto executor = abslx::make_unique<CStreamExecutor>(
       std::move(device), &device_fns_, &stream_executor_, &platform_,
       &platform_fns_, &timer_fns_, name_, visible_device_count);
-  auto result = absl::make_unique<StreamExecutor>(this, std::move(executor),
+  auto result = abslx::make_unique<StreamExecutor>(this, std::move(executor),
                                                   config.ordinal);
   return result;
 }

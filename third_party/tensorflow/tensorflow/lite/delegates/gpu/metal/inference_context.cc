@@ -110,13 +110,13 @@ void DecodeProgram(const data::MetalProgram* metal_program, std::string* code,
 }
 }  // namespace
 
-absl::Status InferenceContext::InitFromGraphWithTransforms(
+abslx::Status InferenceContext::InitFromGraphWithTransforms(
     const CreateGpuModelInfo& create_info, GraphFloat32* graph,
     id<MTLDevice> device_id, std::vector<uint8_t>* serialized_model) {
   RETURN_IF_ERROR(RunGraphTransformsForGpuModel(graph));
   RETURN_IF_ERROR(
       InitFromGraph(create_info, *graph, device_id, serialized_model));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void InferenceContext::CopyFromGpuModel(GpuModel* gpu_model) {
@@ -137,7 +137,7 @@ void InferenceContext::CopyFromGpuModel(GpuModel* gpu_model) {
   tensors_descs_ = std::move(gpu_model->tensors);
 }
 
-absl::Status InferenceContext::InitFromGraph(
+abslx::Status InferenceContext::InitFromGraph(
     const CreateGpuModelInfo& create_info, const GraphFloat32& graph,
     id<MTLDevice> device_id, std::vector<uint8_t>* serialized_model) {
   device_ = device_id;
@@ -156,7 +156,7 @@ absl::Status InferenceContext::InitFromGraph(
     auto* metal_spatial_tensor =
         dynamic_cast<MetalSpatialTensor*>(external_tensor.second);
     if (!metal_spatial_tensor) {
-      return absl::InvalidArgumentError("Expected MetalSpatialTensor.");
+      return abslx::InvalidArgumentError("Expected MetalSpatialTensor.");
     }
     external_immutable_tensors_[external_tensor.first] = metal_spatial_tensor;
   }
@@ -209,16 +209,16 @@ absl::Status InferenceContext::InitFromGraph(
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status InferenceContext::RestoreDeserialized(
-    const absl::Span<const uint8_t> serialized_model, id<MTLDevice> device_id,
+abslx::Status InferenceContext::RestoreDeserialized(
+    const abslx::Span<const uint8_t> serialized_model, id<MTLDevice> device_id,
     CreateGpuModelInfo* create_info) {
   flatbuffers::Verifier verifier(serialized_model.data(),
                                  serialized_model.size());
   if (!data::VerifyInferenceContextBuffer(verifier)) {
-    return absl::DataLossError("Deserialization failed.");
+    return abslx::DataLossError("Deserialization failed.");
   }
   auto decoded_fb = data::GetInferenceContext(serialized_model.data());
   device_ = device_id;
@@ -232,7 +232,7 @@ absl::Status InferenceContext::RestoreDeserialized(
       auto* cl_spatial_tensor =
           dynamic_cast<MetalSpatialTensor*>(external_tensor.second);
       if (!cl_spatial_tensor) {
-        return absl::InvalidArgumentError("Expected MetalSpatialTensor.");
+        return abslx::InvalidArgumentError("Expected MetalSpatialTensor.");
       }
       external_immutable_tensors_[external_tensor.first] = cl_spatial_tensor;
     }
@@ -256,7 +256,7 @@ absl::Status InferenceContext::RestoreDeserialized(
   for (auto& external_tensor : external_mutable_tensors_) {
     external_tensor.second = nullptr;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 flatbuffers::Offset<data::InferenceContext> InferenceContext::Encode(
@@ -286,7 +286,7 @@ flatbuffers::Offset<data::InferenceContext> InferenceContext::Encode(
   return inf_builder.Finish();
 }
 
-absl::Status InferenceContext::Decode(
+abslx::Status InferenceContext::Decode(
     MetalDevice* device, const data::InferenceContext* fb_inference) {
   GpuModel gpu_model;
   RETURN_IF_ERROR(tflite::gpu::Decode(fb_inference->gpu_model(), &gpu_model));
@@ -304,21 +304,21 @@ absl::Status InferenceContext::Decode(
     wg_size.z = (*fb_inference->tuned_work_group_sizes_per_node())[i]->z();
     nodes_[i].task.SetWorkGroupSize(wg_size);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status InferenceContext::CompileOperations(MetalDevice* device) {
+abslx::Status InferenceContext::CompileOperations(MetalDevice* device) {
   for (auto& node : nodes_) {
     RETURN_IF_ERROR(node.task.Compile(device));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status InferenceContext::AllocateTensors(MetalDevice* device) {
+abslx::Status InferenceContext::AllocateTensors(MetalDevice* device) {
   RETURN_IF_ERROR(AllocateMemoryForConstTensors(device));
   RETURN_IF_ERROR(AllocateMemoryForBuffers(device));
   RETURN_IF_ERROR(AllocateMemoryForStrongShapes(device));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 MetalSpatialTensor* InferenceContext::GetTensor(ValueId tensor_id) {
@@ -342,7 +342,7 @@ MetalSpatialTensor* InferenceContext::GetTensor(ValueId tensor_id) {
   return nullptr;
 }
 
-absl::Status InferenceContext::SetInputTensor(ValueId id,
+abslx::Status InferenceContext::SetInputTensor(ValueId id,
                                               const TensorFloat32& tensor) {
   MetalSpatialTensor* gpu_tensor = GetTensor(id);
   TensorDescriptor descriptor_with_data = gpu_tensor->GetDescriptor();
@@ -350,7 +350,7 @@ absl::Status InferenceContext::SetInputTensor(ValueId id,
   return gpu_tensor->UploadDescriptorData(descriptor_with_data, device_);
 }
 
-absl::Status InferenceContext::GetOutputTensor(ValueId id,
+abslx::Status InferenceContext::GetOutputTensor(ValueId id,
                                                TensorFloat32* result) {
   const MetalSpatialTensor* gpu_tensor = GetTensor(id);
   const auto dst_shape = BHWC(gpu_tensor->Batch(), gpu_tensor->Height(),
@@ -362,7 +362,7 @@ absl::Status InferenceContext::GetOutputTensor(ValueId id,
   TensorDescriptor desc;
   RETURN_IF_ERROR(gpu_tensor->ToDescriptor(&desc, device_));
   desc.DownloadData(result);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void InferenceContext::BindTensorsToOperations() {
@@ -378,7 +378,7 @@ void InferenceContext::BindTensorsToOperations() {
   }
 }
 
-absl::Status InferenceContext::UpdateParams(const GpuInfo& gpu_info) {
+abslx::Status InferenceContext::UpdateParams(const GpuInfo& gpu_info) {
   for (auto& node : nodes_) {
     std::vector<BHWC> src_shapes;
     std::vector<BHWC> dst_shapes;
@@ -392,7 +392,7 @@ absl::Status InferenceContext::UpdateParams(const GpuInfo& gpu_info) {
     }
     RETURN_IF_ERROR(node.task.UpdateParams());
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 InferenceContext::TensorMemoryType InferenceContext::GetTensorMemoryType(
@@ -438,17 +438,17 @@ void InferenceContext::GetUsages(const std::function<bool(ValueId)>& functor,
   }
 }
 
-absl::Status InferenceContext::AllocateMemoryForConstTensors(
+abslx::Status InferenceContext::AllocateMemoryForConstTensors(
     MetalDevice* device) {
   for (auto& description : const_tensors_descs_) {
     RETURN_IF_ERROR(const_tensors_[description.first].CreateFromDescriptor(
         description.second, device->device()));
   }
   const_tensors_descs_.clear();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status InferenceContext::AllocateMemoryForBuffers(MetalDevice* device) {
+abslx::Status InferenceContext::AllocateMemoryForBuffers(MetalDevice* device) {
   std::map<ValueId, int2> buffer_usages;
   GetUsages(
       [this](ValueId id) {
@@ -457,7 +457,7 @@ absl::Status InferenceContext::AllocateMemoryForBuffers(MetalDevice* device) {
       &buffer_usages);
 
   if (buffer_usages.empty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // From Apple documentation:
@@ -544,7 +544,7 @@ absl::Status InferenceContext::AllocateMemoryForBuffers(MetalDevice* device) {
                  " with size: " + std::to_string(bufferSize) +
                  " exceeds MTLDevice maxBufferLength: " +
                  std::to_string(device->GetInfo().GetMaxBufferSize());
-        return absl::ResourceExhaustedError(error);
+        return abslx::ResourceExhaustedError(error);
       }
 
       shared_buffers_[i] =
@@ -592,10 +592,10 @@ absl::Status InferenceContext::AllocateMemoryForBuffers(MetalDevice* device) {
       created_tensors[tensor_index] = true;
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status InferenceContext::AllocateMemoryForStrongShapes(
+abslx::Status InferenceContext::AllocateMemoryForStrongShapes(
     MetalDevice* device) {
   std::map<ValueId, int2> usages;
   GetUsages(
@@ -643,15 +643,15 @@ absl::Status InferenceContext::AllocateMemoryForStrongShapes(
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status InferenceContext::Tune(TuningType tuning_type,
+abslx::Status InferenceContext::Tune(TuningType tuning_type,
                                     MetalDevice* device) {
   for (auto& node : nodes_) {
     RETURN_IF_ERROR(node.task.Tune(tuning_type, device));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void InferenceContext::EncodeWithEncoder(
@@ -692,10 +692,10 @@ void InferenceContext::Profile(id<MTLDevice> device, ProfilingInfo* result) {
         task.Encode(encoder);
       }
       [encoder endEncoding];
-      auto start = absl::Now();
+      auto start = abslx::Now();
       [command_buffer commit];
       [command_buffer waitUntilCompleted];
-      auto end = absl::Now();
+      auto end = abslx::Now();
       auto& dispatch_info = result->dispatches[k];
       dispatch_info.label = nodes_[k].name;
       dispatch_info.duration = (end - start) / static_cast<float>(kRuns);
@@ -768,11 +768,11 @@ void InferenceContext::EncodeWithCommandQueue(id<MTLCommandQueue> command_queue,
   [command_buffer commit];
 }
 
-absl::Status InferenceContext::SetTensor(const ValueId& tensor_id,
+abslx::Status InferenceContext::SetTensor(const ValueId& tensor_id,
                                          MetalSpatialTensor* tensor_ptr) {
   auto it = external_mutable_tensors_.find(tensor_id);
   if (it == external_mutable_tensors_.end()) {
-    return absl::InvalidArgumentError("No external tensor with this id.");
+    return abslx::InvalidArgumentError("No external tensor with this id.");
   }
   external_mutable_tensors_[tensor_id] = tensor_ptr;
   for (int node_index : external_tensor_to_nodes_[tensor_id]) {
@@ -788,7 +788,7 @@ absl::Status InferenceContext::SetTensor(const ValueId& tensor_id,
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void InferenceContext::PrepareExternal() {

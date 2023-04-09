@@ -117,9 +117,9 @@ std::unique_ptr<mlir::TFL::tac::TacExporter> CreateTfLiteExporter(
   return std::make_unique<mlir::TFL::tac::TfLiteExporter>(options);
 }
 
-absl::Status TargetAwareConversionMain() {
+abslx::Status TargetAwareConversionMain() {
   std::vector<std::string> device_specs_array =
-      absl::StrSplit(device_specs, ',', absl::SkipEmpty());
+      abslx::StrSplit(device_specs, ',', abslx::SkipEmpty());
   mlir::TFL::tac::TacModule::Options options;
   options.hardware_backends = device_specs_array;
   options.debug_mode = true;
@@ -143,7 +143,7 @@ int main(int argc, char** argv) {
 
   llvm::cl::ParseCommandLineOptions(argc, argv, "Target aware conversion\n");
 
-  absl::Status status = TargetAwareConversionMain();
+  abslx::Status status = TargetAwareConversionMain();
   if (!status.ok()) {
     LOG(ERROR) << status;
   }

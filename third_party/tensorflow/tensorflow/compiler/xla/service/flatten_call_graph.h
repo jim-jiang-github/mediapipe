@@ -28,14 +28,14 @@ namespace xla {
 // points-to analysis (see b/36865746 for details).
 class FlattenCallGraph : public HloModulePass {
  public:
-  absl::string_view name() const override { return "flatten-call-graph"; }
+  abslx::string_view name() const override { return "flatten-call-graph"; }
 
   // Duplicates computations called from multiple call- or while-nodes to
   // flatten the call graph.
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 };
 
 }  // namespace xla

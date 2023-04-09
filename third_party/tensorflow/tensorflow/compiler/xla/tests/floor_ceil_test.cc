@@ -37,9 +37,9 @@ class FloorCeilTest : public ClientLibraryTestBase {
   };
 
   // Runs a computation and comparison on expected vs f(input)
-  void TestR1F32(absl::Span<const float> input,
-                 absl::Span<const float> expected, Function f) {
-    LOG(INFO) << "input: {" << absl::StrJoin(expected, ", ") << "}";
+  void TestR1F32(abslx::Span<const float> input,
+                 abslx::Span<const float> expected, Function f) {
+    LOG(INFO) << "input: {" << abslx::StrJoin(expected, ", ") << "}";
     XlaBuilder builder(TestName());
     auto c = ConstantR1<float>(&builder, input);
     if (f == kCeil) {

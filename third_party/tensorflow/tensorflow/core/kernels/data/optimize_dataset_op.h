@@ -48,10 +48,10 @@ class OptimizeDatasetOp : public UnaryDatasetOpKernel {
   // used to create the dataset without explicitly using the OptimizeDatasetOp.
   static void MakeDatasetFromOptions(
       OpKernelContext* ctx, DatasetBase* input,
-      const absl::flat_hash_set<tstring>& optimizations_enabled,
-      const absl::flat_hash_set<tstring>& optimizations_disabled,
-      const absl::flat_hash_set<tstring>& optimizations_default,
-      const absl::flat_hash_set<tstring>& optimization_configs,
+      const abslx::flat_hash_set<tstring>& optimizations_enabled,
+      const abslx::flat_hash_set<tstring>& optimizations_disabled,
+      const abslx::flat_hash_set<tstring>& optimizations_default,
+      const abslx::flat_hash_set<tstring>& optimization_configs,
       DatasetBase** output);
 
   explicit OptimizeDatasetOp(OpKernelConstruction* ctx);
@@ -61,7 +61,7 @@ class OptimizeDatasetOp : public UnaryDatasetOpKernel {
                    DatasetBase** output) override;
 
  private:
-  absl::flat_hash_set<tstring> optimization_configs_;
+  abslx::flat_hash_set<tstring> optimization_configs_;
   int op_version_ = 0;
 };
 
@@ -77,10 +77,10 @@ class OptimizeDatasetOp : public UnaryDatasetOpKernel {
   // executing the OptimizeDatasetOp op kernel).
   static void MakeDatasetFromOptions(
       OpKernelContext* ctx, DatasetBase* input,
-      const absl::flat_hash_set<tstring>& optimizations_enabled,
-      const absl::flat_hash_set<tstring>& optimizations_disabled,
-      const absl::flat_hash_set<tstring>& optimizations_default,
-      const absl::flat_hash_set<tstring>& optimization_configs,
+      const abslx::flat_hash_set<tstring>& optimizations_enabled,
+      const abslx::flat_hash_set<tstring>& optimizations_disabled,
+      const abslx::flat_hash_set<tstring>& optimizations_default,
+      const abslx::flat_hash_set<tstring>& optimization_configs,
       DatasetBase** output);
 
   explicit OptimizeDatasetOp(OpKernelConstruction* ctx);

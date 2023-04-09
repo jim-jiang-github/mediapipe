@@ -120,7 +120,7 @@ mlir::LogicalResult EvaluateOperation(
 
   // Executes the TF operation.
   int num_outputs = inst->getNumResults();
-  absl::InlinedVector<TFE_TensorHandle*, 2> outputs(num_outputs);
+  abslx::InlinedVector<TFE_TensorHandle*, 2> outputs(num_outputs);
   TFE_Execute(op, outputs.data(), &num_outputs, status);
   RETURN_FAILURE_IF_ERROR(status);
   auto clean_outputs = MakeCleanup([&outputs] {

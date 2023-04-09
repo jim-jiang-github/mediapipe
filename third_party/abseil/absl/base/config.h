@@ -76,21 +76,21 @@
 
 // ABSL_NAMESPACE_BEGIN/ABSL_NAMESPACE_END
 //
-// An annotation placed at the beginning/end of each `namespace absl` scope.
+// An annotation placed at the beginning/end of each `namespace abslx` scope.
 // This is used to inject an inline namespace.
 //
 // The proper way to write Abseil code in the `absl` namespace is:
 //
-// namespace absl {
+// namespace abslx {
 // ABSL_NAMESPACE_BEGIN
 //
-// void Foo();  // absl::Foo().
+// void Foo();  // abslx::Foo().
 //
 // ABSL_NAMESPACE_END
-// }  // namespace absl
+// }  // namespace abslx
 //
 // Users of Abseil should not use these macros, because users of Abseil should
-// not write `namespace absl {` in their own code for any reason.  (Abseil does
+// not write `namespace abslx {` in their own code for any reason.  (Abseil does
 // not support forward declarations of its own types, nor does it support
 // user-provided specialization of Abseil templates.  Code that violates these
 // rules may be broken without warning.)
@@ -216,7 +216,7 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 
 // ABSL_HAVE_SOURCE_LOCATION_CURRENT
 //
-// Indicates whether `absl::SourceLocation::current()` will return useful
+// Indicates whether `abslx::SourceLocation::current()` will return useful
 // information in some contexts.
 #ifndef ABSL_HAVE_SOURCE_LOCATION_CURRENT
 #if ABSL_INTERNAL_HAS_KEYWORD(__builtin_LINE) && \
@@ -573,7 +573,7 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 
 // ABSL_USES_STD_ANY
 //
-// Indicates whether absl::any is an alias for std::any.
+// Indicates whether abslx::any is an alias for std::any.
 #if !defined(ABSL_OPTION_USE_STD_ANY)
 #error options.h is misconfigured.
 #elif ABSL_OPTION_USE_STD_ANY == 0 || \
@@ -588,7 +588,7 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 
 // ABSL_USES_STD_OPTIONAL
 //
-// Indicates whether absl::optional is an alias for std::optional.
+// Indicates whether abslx::optional is an alias for std::optional.
 #if !defined(ABSL_OPTION_USE_STD_OPTIONAL)
 #error options.h is misconfigured.
 #elif ABSL_OPTION_USE_STD_OPTIONAL == 0 || \
@@ -603,7 +603,7 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 
 // ABSL_USES_STD_VARIANT
 //
-// Indicates whether absl::variant is an alias for std::variant.
+// Indicates whether abslx::variant is an alias for std::variant.
 #if !defined(ABSL_OPTION_USE_STD_VARIANT)
 #error options.h is misconfigured.
 #elif ABSL_OPTION_USE_STD_VARIANT == 0 || \
@@ -618,7 +618,7 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 
 // ABSL_USES_STD_STRING_VIEW
 //
-// Indicates whether absl::string_view is an alias for std::string_view.
+// Indicates whether abslx::string_view is an alias for std::string_view.
 #if !defined(ABSL_OPTION_USE_STD_STRING_VIEW)
 #error options.h is misconfigured.
 #elif ABSL_OPTION_USE_STD_STRING_VIEW == 0 || \

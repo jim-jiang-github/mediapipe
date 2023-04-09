@@ -139,9 +139,9 @@ StatusOr<std::unique_ptr<RequestInfo>> SetUpRequestContext(
 tensorflow::Status GraphExecutionRunOnFunction(
     const GraphExecutionOptions& options,
     const GraphExecutionRunOptions& run_options,
-    absl::string_view signature_name, const tfrt::Function& func,
-    absl::Span<const tensorflow::Tensor> inputs,
-    absl::Span<const tensorflow::Tensor> captures,
+    abslx::string_view signature_name, const tfrt::Function& func,
+    abslx::Span<const tensorflow::Tensor> inputs,
+    abslx::Span<const tensorflow::Tensor> captures,
     std::vector<tensorflow::Tensor>* outputs,
     tfrt::ResourceContext* resource_context, const Runtime& runtime,
     const FallbackState& fallback_state,
@@ -164,7 +164,7 @@ tensorflow::Status GraphExecutionRunOnFunction(
             {{"_r", 1},
              {"id", request_id},
              {"signature", signature_name},
-             {"model_id", absl::StrCat(options.model_metadata.name(), ":",
+             {"model_id", abslx::StrCat(options.model_metadata.name(), ":",
                                        options.model_metadata.version())}});
       },
       tensorflow::profiler::ContextType::kTfrtExecutor,
@@ -173,7 +173,7 @@ tensorflow::Status GraphExecutionRunOnFunction(
   // Only configure timer when the deadline is set.
   if (run_options.deadline.has_value()) {
     auto deadline = run_options.deadline.value();
-    if (absl::ToChronoTime(absl::Now()) > deadline) {
+    if (abslx::ToChronoTime(abslx::Now()) > deadline) {
       return tensorflow::errors::DeadlineExceeded(kDeadlineExceededMessage);
     }
     req_deadline_tracker.CancelRequestOnDeadline(
@@ -314,7 +314,7 @@ namespace {
 // Sort the strings in `names` and store the results in `sorted_names`. In
 // addition, the original index in `names` for the item `sorted_names[i]` is
 // stored in `original_indices[i]`.
-void CreateSortedNamesAndOriginalIndices(absl::Span<const std::string> names,
+void CreateSortedNamesAndOriginalIndices(abslx::Span<const std::string> names,
                                          std::vector<std::string>& sorted_names,
                                          std::vector<int>& original_indices) {
   DCHECK(sorted_names.empty());
@@ -340,9 +340,9 @@ void CreateSortedNamesAndOriginalIndices(absl::Span<const std::string> names,
 
 tensorflow::Status GraphExecutor::Run(
     const RunOptions& run_options,
-    absl::Span<const std::pair<std::string, tensorflow::Tensor>> inputs,
-    absl::Span<const std::string> output_tensor_names,
-    absl::Span<const std::string> target_tensor_names,
+    abslx::Span<const std::pair<std::string, tensorflow::Tensor>> inputs,
+    abslx::Span<const std::string> output_tensor_names,
+    abslx::Span<const std::string> target_tensor_names,
     std::vector<tensorflow::Tensor>* outputs) {
   // TODO(b/192498110): Validate input type.
 
@@ -426,20 +426,20 @@ GraphExecutor::ImportAndCompileClientGraph(
       runtime(), tpu_model_resource_, options_.compile_options.tpu_target);
 
   // Step 1 of loading: Import the client graph from proto to an MLIR module.
-  auto import_start_time = absl::Now();
+  auto import_start_time = abslx::Now();
   mlir::MLIRContext context;
   ASSIGN_OR_RETURN_IN_IMPORT(
       auto module, ImportClientGraphToMlirModule(client_graph, &context));
-  auto import_duration = absl::Now() - import_start_time;
+  auto import_duration = abslx::Now() - import_start_time;
   LOG(INFO) << "TFRT finished importing client graph (" << &client_graph
-            << "). Took " << absl::ToInt64Milliseconds(import_duration)
+            << "). Took " << abslx::ToInt64Milliseconds(import_duration)
             << " ms. Client graph name: " << client_graph.name;
 
   // Step 2 of loading: Compile the MLIR module from TF dialect to TFRT dialect
   // (in BEF).
   // TODO(b/229261464): Unify the sync and async lowering passes so we do not
   // need this branch.
-  auto compile_start_time = absl::Now();
+  auto compile_start_time = abslx::Now();
   if (options_.compile_options.compile_to_sync_tfrt_dialect) {
     ASSIGN_OR_RETURN_IN_COMPILE(
         loaded_client_graph->bef,
@@ -451,9 +451,9 @@ GraphExecutor::ImportAndCompileClientGraph(
   ASSIGN_OR_RETURN_IN_COMPILE(
       loaded_client_graph->bef_file,
       tfrt::CreateBefFileFromBefBuffer(runtime(), loaded_client_graph->bef));
-  auto compile_duration = absl::Now() - compile_start_time;
+  auto compile_duration = abslx::Now() - compile_start_time;
   LOG(INFO) << "TFRT finished compiling client graph (" << &client_graph
-            << "). Took " << absl::ToInt64Milliseconds(compile_duration)
+            << "). Took " << abslx::ToInt64Milliseconds(compile_duration)
             << " ms. Client graph name: " << client_graph.name;
 
   return loaded_client_graph;
@@ -469,13 +469,13 @@ GraphExecutor::LoadClientGraph(
                       ImportAndCompileClientGraph(client_graph));
 
   // Step 3 of loading: Initialize runtime states using special BEF functions.
-  auto init_start_time = absl::Now();
+  auto init_start_time = abslx::Now();
   RETURN_IF_ERROR_IN_INIT(InitBef(loaded_client_graph->bef_file.get(),
                                   loaded_client_graph->resource_context.get(),
                                   work_queue));
-  auto init_duration = absl::Now() - init_start_time;
+  auto init_duration = abslx::Now() - init_start_time;
   LOG(INFO) << "TFRT finished initializing client graph (" << &client_graph
-            << "). Took " << absl::ToInt64Milliseconds(init_duration)
+            << "). Took " << abslx::ToInt64Milliseconds(init_duration)
             << " ms. Client graph name: " << client_graph.name;
 
   return loaded_client_graph;
@@ -499,12 +499,12 @@ GraphExecutor::ImportClientGraphToMlirModule(
 
   LOG(INFO) << "TFRT import client graph (" << &client_graph
             << "): Functionalization took "
-            << absl::ToInt64Milliseconds(
+            << abslx::ToInt64Milliseconds(
                    optimized_graph.functionalization_duration)
             << " ms. Client graph name: " << client_graph.name;
   LOG(INFO) << "TFRT import client graph (" << &client_graph
             << "): Grappler took "
-            << absl::ToInt64Milliseconds(optimized_graph.grappler_duration)
+            << abslx::ToInt64Milliseconds(optimized_graph.grappler_duration)
             << " ms. Client graph name: " << client_graph.name;
 
   // Convert the optimized graph to an MLIR module.
@@ -550,19 +550,19 @@ tensorflow::Status GraphExecutor::InitBef(
 
 StatusOr<std::reference_wrapper<const GraphExecutor::LoadedClientGraph>>
 GraphExecutor::GetOrCreateLoadedClientGraph(
-    absl::Span<const std::string> input_tensor_names,
-    absl::Span<const tensorflow::DataType> input_tensor_dtypes,
-    absl::Span<const std::string> output_tensor_names,
-    absl::Span<const std::string> target_tensor_names,
+    abslx::Span<const std::string> input_tensor_names,
+    abslx::Span<const tensorflow::DataType> input_tensor_dtypes,
+    abslx::Span<const std::string> output_tensor_names,
+    abslx::Span<const std::string> target_tensor_names,
     tensorflow::tfrt_stub::WorkQueueInterface* work_queue) {
   // The format of the joined name is illustrated as in the following example:
   // input1-input2^output1-output2^target1-target2
-  const auto joined_name = absl::StrCat(
-      absl::StrJoin(input_tensor_names, kTensorNameJoiningDelimiter),
+  const auto joined_name = abslx::StrCat(
+      abslx::StrJoin(input_tensor_names, kTensorNameJoiningDelimiter),
       kArgumentTypeJoiningDelimiter,
-      absl::StrJoin(output_tensor_names, kTensorNameJoiningDelimiter),
+      abslx::StrJoin(output_tensor_names, kTensorNameJoiningDelimiter),
       kArgumentTypeJoiningDelimiter,
-      absl::StrJoin(target_tensor_names, kTensorNameJoiningDelimiter));
+      abslx::StrJoin(target_tensor_names, kTensorNameJoiningDelimiter));
 
   tensorflow::mutex_lock l(loaded_client_graphs_mu_);
 

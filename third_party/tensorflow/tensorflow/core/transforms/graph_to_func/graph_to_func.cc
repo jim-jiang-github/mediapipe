@@ -37,7 +37,7 @@ namespace tfg {
 
 // TODO(jpienaar): Move to helper header/this shouldn't be needed once we
 // upgrade to C++17.
-static inline absl::string_view ToStringView(llvm::StringRef ref) {
+static inline abslx::string_view ToStringView(llvm::StringRef ref) {
   return {ref.data(), ref.size()};
 }
 

@@ -36,8 +36,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   std::string path = tensorflow::io::JoinPath(first, second);
 
   // Assert path contains strings
-  assert(absl::StrContains(path, first));
-  assert(absl::StrContains(path, second));
+  assert(abslx::StrContains(path, first));
+  assert(abslx::StrContains(path, second));
 
   return 0;
 }

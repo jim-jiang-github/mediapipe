@@ -314,27 +314,27 @@ Status CopyBatch(CopyBatchParams params,
 // Computes the set of experiments to apply based on the job name, rollout
 // percentage of registered experiments, and the TF_DATA_EXPERIMENT_OPT_IN and
 // TF_DATA_EXPERIMENT_OPT_OUT environment variables.
-absl::flat_hash_set<string> GetExperiments();
-absl::flat_hash_set<string> GetExperiments(
+abslx::flat_hash_set<string> GetExperiments();
+abslx::flat_hash_set<string> GetExperiments(
     const string& job_name, std::function<uint64(const string&)> hash_func);
 
 // Logs and records the experiments that will be applied.
-void LogAndRecordExperiments(const absl::flat_hash_set<string>& experiments);
+void LogAndRecordExperiments(const abslx::flat_hash_set<string>& experiments);
 
 // Computes the set of enabled, disabled, and default optimizations based on the
 // given options. An optimization must be a graph optimizer name that has been
 // registered with Grappler.
 void GetOptimizations(const Options& options,
-                      absl::flat_hash_set<tstring>* optimizations_enabled,
-                      absl::flat_hash_set<tstring>* optimizations_disabled,
-                      absl::flat_hash_set<tstring>* optimizations_default);
+                      abslx::flat_hash_set<tstring>* optimizations_enabled,
+                      abslx::flat_hash_set<tstring>* optimizations_disabled,
+                      abslx::flat_hash_set<tstring>* optimizations_default);
 
 // Creates graph rewrite configs based on the given options. The configs will
 // only be used if their corresponding optimizers registered with Grappler are
 // enabled.
 // A config is a string with the following format:
 //   <optimizer name>:<attribute name>:<attribute value>
-absl::flat_hash_set<tstring> CreateGraphRewriteConfigs(const Options& options);
+abslx::flat_hash_set<tstring> CreateGraphRewriteConfigs(const Options& options);
 
 // Determines whether max intra-op parallelism should be configured.
 bool ShouldConfigureMaxIntraOpParallelism(const Options& options);
@@ -348,8 +348,8 @@ bool ShouldUseAutotuning(const Options& options);
 // Determines whether optimizations should be applied.
 bool ShouldApplyOptimizations(
     const Options& options,
-    const absl::flat_hash_set<tstring>& optimizations_enabled,
-    const absl::flat_hash_set<tstring>& optimizations_default);
+    const abslx::flat_hash_set<tstring>& optimizations_enabled,
+    const abslx::flat_hash_set<tstring>& optimizations_default);
 
 // Returns the default CPU budget.
 inline int GetCpuBudget() {
@@ -368,7 +368,7 @@ class DatasetExperimentRegistry {
   static void Register(const string& experiment, int64_t rollout_pct);
 
   // Returns all registered experiments.
-  static absl::flat_hash_map<string, int64_t> Experiments();
+  static abslx::flat_hash_map<string, int64_t> Experiments();
 };
 
 // Helper class to register a dataset experiment.

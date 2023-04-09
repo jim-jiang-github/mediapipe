@@ -66,7 +66,7 @@ class JitCompilationListener : public XlaActivityListener {
 class XlaCompilationCacheSerializeTest : public ::testing::Test {
  protected:
   XlaCompilationCacheSerializeTest() {
-    auto listener = absl::make_unique<JitCompilationListener>();
+    auto listener = abslx::make_unique<JitCompilationListener>();
     listener_ = listener.get();
     RegisterXlaActivityListener(std::move(listener));
   }
@@ -85,8 +85,8 @@ class XlaCompilationCacheSerializeTest : public ::testing::Test {
   // XLA compilation cache entries found at the specified directory. If none are
   // found, returns NOT_FOUND error.
   Status AlterPersistentCacheEntryHloModuleNames(
-      absl::string_view persistent_cache_dir_path,
-      absl::string_view file_prefix = "xla_compile_cache");
+      abslx::string_view persistent_cache_dir_path,
+      abslx::string_view file_prefix = "xla_compile_cache");
 
  private:
   JitCompilationListener* listener_;

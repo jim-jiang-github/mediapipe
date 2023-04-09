@@ -87,9 +87,9 @@ struct SaveOpSpecs {
 //
 // For a complete definition of shape_and_slices field, please see:
 // third_party/tensorflow/core/framework/tensor_slice.h
-StatusOr<absl::flat_hash_map<
-    int64_t, absl::flat_hash_map<int64_t, std::vector<std::string>>>>
-BuildSavingSpec(absl::Span<const SavingTensorMetadata> tensor_metadatas);
+StatusOr<abslx::flat_hash_map<
+    int64_t, abslx::flat_hash_map<int64_t, std::vector<std::string>>>>
+BuildSavingSpec(abslx::Span<const SavingTensorMetadata> tensor_metadatas);
 
 // For a given per device saving spec, find out the counts of SaveV2 ops
 // needed and their corresponding inputs.
@@ -135,14 +135,14 @@ BuildSavingSpec(absl::Span<const SavingTensorMetadata> tensor_metadatas);
 // shape_and_slice_spec[0] is a list of shape_and_slices parameters for SaveV2
 // op.
 SaveOpSpecs BuildPerDeviceSave(
-    const absl::flat_hash_map<int64_t, std::vector<std::string>>& saving_spec,
-    int device_id, absl::string_view prefix);
+    const abslx::flat_hash_map<int64_t, std::vector<std::string>>& saving_spec,
+    int device_id, abslx::string_view prefix);
 
 // Figures out the tensor slice_spec for a given layout and mesh device
 // location.
 StatusOr<std::vector<std::string>> SliceSpecOnDevice(
     const Layout& layout, const Mesh& mesh, const DeviceLocation& device_coords,
-    absl::Span<const int64_t> global_shape);
+    abslx::Span<const int64_t> global_shape);
 }  // namespace dtensor
 
 }  // namespace tensorflow

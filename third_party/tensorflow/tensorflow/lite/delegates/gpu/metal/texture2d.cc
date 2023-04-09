@@ -21,7 +21,7 @@ namespace metal {
 namespace {
 
 // Creates new 4-channel 2D texture with cl_channel_type elements
-absl::Status CreateTexture2D(int width, int height, DataType type, void* data,
+abslx::Status CreateTexture2D(int width, int height, DataType type, void* data,
                              id<MTLDevice> device, Texture2D* result) {
   MTLPixelFormat pixel_format = DataTypeToRGBAPixelFormat(type);
 
@@ -36,7 +36,7 @@ absl::Status CreateTexture2D(int width, int height, DataType type, void* data,
 
   id<MTLTexture> texture = [device newTextureWithDescriptor:texture_desc];
   if (!texture) {
-    return absl::UnknownError("Failed to allocate id<MTLTexture>");
+    return abslx::UnknownError("Failed to allocate id<MTLTexture>");
   }
 
   if (data) {
@@ -45,7 +45,7 @@ absl::Status CreateTexture2D(int width, int height, DataType type, void* data,
 
   *result = Texture2D(texture, width, height, pixel_format);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 }  // namespace
 
@@ -85,19 +85,19 @@ void Texture2D::Release() {
   }
 }
 
-absl::Status Texture2D::GetGPUResources(
+abslx::Status Texture2D::GetGPUResources(
     const GPUObjectDescriptor* obj_ptr,
     GPUResourcesWithValue* resources) const {
   const auto* texture_desc = dynamic_cast<const Texture2DDescriptor*>(obj_ptr);
   if (!texture_desc) {
-    return absl::InvalidArgumentError("Expected Texture2DDescriptor on input.");
+    return abslx::InvalidArgumentError("Expected Texture2DDescriptor on input.");
   }
 
   resources->images2d.push_back({"tex2d", texture_});
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Texture2D::CreateFromTexture2DDescriptor(
+abslx::Status Texture2D::CreateFromTexture2DDescriptor(
     const Texture2DDescriptor& desc, id<MTLDevice> device) {
   width_ = desc.size.x;
   height_ = desc.size.y;
@@ -117,36 +117,36 @@ absl::Status Texture2D::CreateFromTexture2DDescriptor(
 
   texture_ = [device newTextureWithDescriptor:texture_desc];
   if (!texture_) {
-    return absl::UnknownError("Failed to allocate id<MTLTexture>");
+    return abslx::UnknownError("Failed to allocate id<MTLTexture>");
   }
 
   if (data_ptr) {
     WriteDataToTexture2D(texture_, device, data_ptr);
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Creates new 4-channel 2D texture with f32 elements
-absl::Status CreateTexture2DRGBA32F(int width, int height, id<MTLDevice> device,
+abslx::Status CreateTexture2DRGBA32F(int width, int height, id<MTLDevice> device,
                                     Texture2D* result) {
   return CreateTexture2D(width, height, DataType::FLOAT32, nullptr, device,
                          result);
 }
 
 // Creates new 4-channel 2D texture with f16 elements
-absl::Status CreateTexture2DRGBA16F(int width, int height, id<MTLDevice> device,
+abslx::Status CreateTexture2DRGBA16F(int width, int height, id<MTLDevice> device,
                                     Texture2D* result) {
   return CreateTexture2D(width, height, DataType::FLOAT16, nullptr, device,
                          result);
 }
 
-absl::Status CreateTexture2DRGBA(DataType type, int width, int height,
+abslx::Status CreateTexture2DRGBA(DataType type, int width, int height,
                                  id<MTLDevice> device, Texture2D* result) {
   return CreateTexture2D(width, height, type, nullptr, device, result);
 }
 
-absl::Status CreateTexture2DRGBA(DataType type, int width, int height,
+abslx::Status CreateTexture2DRGBA(DataType type, int width, int height,
                                  void* data, id<MTLDevice> device,
                                  Texture2D* result) {
   return CreateTexture2D(width, height, type, data, device, result);

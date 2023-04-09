@@ -190,7 +190,7 @@ StepIntersection ComputeStepIntersectionToMergeOpStats(
     uint32 max_step_per_host) {
   bool no_accelerator_in_system = NoAcceleratorInSystem(all_op_stats_info);
 
-  absl::flat_hash_map<uint32, const StepDatabaseResult*> per_host_step_db;
+  abslx::flat_hash_map<uint32, const StepDatabaseResult*> per_host_step_db;
   for (const auto& op_stats_info : all_op_stats_info) {
     if (IsCoordinator(no_accelerator_in_system, op_stats_info.hardware_type))
       continue;

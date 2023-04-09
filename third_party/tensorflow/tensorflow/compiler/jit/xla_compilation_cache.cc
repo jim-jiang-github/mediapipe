@@ -84,11 +84,11 @@ struct SignatureHumanStringAppender {
   explicit SignatureHumanStringAppender(string* dest) : dest(dest) {}
   string* dest;
   void operator()(const Tensor& arg) {
-    absl::StrAppend(dest, "; ", arg.DebugString());
+    abslx::StrAppend(dest, "; ", arg.DebugString());
   }
   void operator()(const TensorTypeAndShape& arg) {
-    absl::StrAppend(dest, ",", DataTypeString(arg.first));
-    absl::StrAppend(dest, " [", absl::StrJoin(arg.second, ","), "]");
+    abslx::StrAppend(dest, ",", DataTypeString(arg.first));
+    abslx::StrAppend(dest, " [", abslx::StrJoin(arg.second, ","), "]");
   }
 };
 
@@ -136,7 +136,7 @@ struct SignatureHashCombiner {
 };
 
 std::string XlaSerializedCacheKeyToString(const XlaSerializedCacheKey& key) {
-  return absl::StrCat(
+  return abslx::StrCat(
       key.prefix(), key.prefix().empty() ? "" : kXlaSerializedCacheKeySeparator,
       key.signature_fingerprint(), kXlaSerializedCacheKeySeparator,
       key.cluster_fingerprint(), kXlaSerializedCacheKeySeparator,
@@ -193,7 +193,7 @@ string XlaCompilationCache::DebugString() const {
 string XlaCompilationCache::Signature::HumanString() const {
   string result = name;
   for (const auto& a : args) {
-    absl::visit(SignatureHumanStringAppender(&result), a);
+    abslx::visit(SignatureHumanStringAppender(&result), a);
   }
   return result;
 }
@@ -202,7 +202,7 @@ bool XlaCompilationCache::Signature::operator==(const Signature& other) const {
   if (name != other.name) return false;
   if (args.size() != other.args.size()) return false;
   for (int i = 0, end = args.size(); i < end; ++i) {
-    if (absl::visit(SignatureNotEqual(), args[i], other.args[i])) {
+    if (abslx::visit(SignatureNotEqual(), args[i], other.args[i])) {
       return false;
     }
   }
@@ -213,14 +213,14 @@ uint64 XlaCompilationCache::Signature::Hash::operator()(
     const XlaCompilationCache::Signature& signature) const {
   uint64 h = std::hash<string>()(signature.name);
   for (const auto& arg : signature.args) {
-    h = absl::visit(SignatureHashCombiner(h), arg);
+    h = abslx::visit(SignatureHashCombiner(h), arg);
   }
   return h;
 }
 
 StatusOr<XlaCompilationCache::Signature> XlaCompilationCache::BuildSignature(
     const NameAttrList& function,
-    absl::Span<const XlaCompiler::Argument> args) {
+    abslx::Span<const XlaCompiler::Argument> args) {
   Signature signature;
   signature.name = Canonicalize(function.name(), AttrSlice(&function.attr()));
 
@@ -245,7 +245,7 @@ StatusOr<XlaCompilationCache::Signature> XlaCompilationCache::BuildSignature(
 }
 
 static std::vector<const xla::Shape*> GetShapePointers(
-    absl::Span<const xla::Shape> shapes) {
+    abslx::Span<const xla::Shape> shapes) {
   std::vector<const xla::Shape*> shape_ptrs;
   shape_ptrs.reserve(shapes.size());
   for (const auto& shape : shapes) {
@@ -348,8 +348,8 @@ static bool ShouldBeMegamorphic(int64_t compile_count,
 }
 
 StatusOr<std::unique_ptr<Graph>> CreateGraph(
-    const NodeDef& node_def, absl::Span<const XlaCompiler::Argument> args,
-    absl::Span<const DataType> result_types) {
+    const NodeDef& node_def, abslx::Span<const XlaCompiler::Argument> args,
+    abslx::Span<const DataType> result_types) {
   // TODO(b/74182462): We implement this by creating a new dummy Graph including
   // _Arg nodes, and let CompileGraph walk it. This could be optimized.
   std::unique_ptr<Graph> graph(new Graph(OpRegistry::Global()));
@@ -361,7 +361,7 @@ StatusOr<std::unique_ptr<Graph>> CreateGraph(
   // dependency edge to the _SOURCE node.
   for (int64_t i = 0, end = args.size(); i < end; ++i) {
     Node* node;
-    string arg_name = absl::StrCat("_arg", i);
+    string arg_name = abslx::StrCat("_arg", i);
     Status status =
         NodeBuilder(arg_name, FunctionLibraryDefinition::kArgOp)
             .ControlInput(graph->source_node())
@@ -377,7 +377,7 @@ StatusOr<std::unique_ptr<Graph>> CreateGraph(
   // Similarly with return values, create dummy _Retval nodes fed by `node`.
   for (int64_t i = 0, end = result_types.size(); i < end; ++i) {
     Node* node;
-    string retval_name = absl::StrCat("_retval", i);
+    string retval_name = abslx::StrCat("_retval", i);
     Status status = NodeBuilder(retval_name, FunctionLibraryDefinition::kRetOp)
                         .Input(main_node, i)
                         .Attr("T", result_types[i])
@@ -471,8 +471,8 @@ namespace {
 //
 // Prints only once to avoid spamming LOG(INFO).
 void LogOnceXlaCompiledFirstCluster() {
-  static absl::once_flag log_once;
-  absl::call_once(log_once, [] {
+  static abslx::once_flag log_once;
+  abslx::call_once(log_once, [] {
     LOG(INFO) << "Compiled cluster using XLA!  This line is logged at most "
                  "once for the lifetime of the process.";
   });
@@ -524,7 +524,7 @@ Status XlaCompilationCache::CompileStrict(
     XlaSerializedCacheKey cache_key = BuildSerializedCacheKey(sig, hlo_module);
 
     {
-      XLA_SCOPED_LOGGING_TIMER(absl::StrCat(
+      XLA_SCOPED_LOGGING_TIMER(abslx::StrCat(
           "Try loading serialized cache entry:", sig.HumanString()));
       TF_ASSIGN_OR_RETURN(serialized_entry, TryLoadSerializedEntry(cache_key));
     }
@@ -550,7 +550,7 @@ Status XlaCompilationCache::CompileStrict(
     // Caching is done regardless of the entry->compilation_status. To take
     // advantage of newer compilation code, a cache flush is required.
     if (!persistent_cache_directory_.empty()) {
-      XLA_SCOPED_LOGGING_TIMER(absl::StrCat(
+      XLA_SCOPED_LOGGING_TIMER(abslx::StrCat(
           "Serializing and saving cache entry: ", sig.HumanString()));
       TF_ASSIGN_OR_RETURN(XlaSerializedCacheEntry serialized_entry,
                           SerializeEntry(options, sig, *entry));
@@ -785,10 +785,10 @@ Status XlaCompilationCache::CompileImpl(
   // for example by changing the threshold.
   if (state == CompileState::kUncompiled && FailOnXlaCompilation()) {
     VLOG(1) << "XLA compilation disabled: " << function.name() << "\n"
-            << absl::StrJoin(
+            << abslx::StrJoin(
                    args, "\n",
                    [](std::string* out, const XlaCompiler::Argument& arg) {
-                     absl::StrAppend(out, " arg: ", arg.HumanString());
+                     abslx::StrAppend(out, " arg: ", arg.HumanString());
                    });
 
     return errors::Internal("XLA compilation disabled");
@@ -840,7 +840,7 @@ XlaSerializedCacheKey XlaCompilationCache::BuildSerializedCacheKey(
 Status XlaCompilationCache::VerifyLoadedCacheEntry(
     const XlaSerializedCacheKey& key, const xla::HloModuleProto& hlo_module,
     const XlaSerializedCacheEntry& entry) {
-  XLA_SCOPED_LOGGING_TIMER(absl::StrCat("Verifying loaded cache entry: ",
+  XLA_SCOPED_LOGGING_TIMER(abslx::StrCat("Verifying loaded cache entry: ",
                                         hlo_module.entry_computation_name()));
 
   if (!AreSerializedProtosEqual(key, entry.key())) {
@@ -902,9 +902,9 @@ StatusOr<XlaSerializedCacheEntry> XlaCompilationCache::SerializeEntry(
 namespace {
 
 std::string GetFilePath(const XlaSerializedCacheKey& key,
-                        absl::string_view persistent_cache_directory) {
+                        abslx::string_view persistent_cache_directory) {
   const std::string file_name =
-      absl::StrCat(XlaSerializedCacheKeyToString(key), ".pb");
+      abslx::StrCat(XlaSerializedCacheKeyToString(key), ".pb");
   return io::JoinPath(persistent_cache_directory, file_name);
 }
 

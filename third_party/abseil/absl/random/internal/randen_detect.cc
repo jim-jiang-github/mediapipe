@@ -94,7 +94,7 @@ static uint32_t GetAuxval(uint32_t hwcap_type) {
 
 #endif
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -218,4 +218,4 @@ bool CPUSupportsRandenHwAes() {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

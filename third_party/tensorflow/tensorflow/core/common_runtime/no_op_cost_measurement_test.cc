@@ -24,7 +24,7 @@ namespace {
 TEST(NoOpCostMeasurementTest, Basic) {
   CostMeasurement::Context context;
   NoOpCostMeasurement measurement(context);
-  EXPECT_EQ(measurement.GetTotalCost(), absl::ZeroDuration());
+  EXPECT_EQ(measurement.GetTotalCost(), abslx::ZeroDuration());
   EXPECT_EQ(measurement.GetCostType(), "no_op");
 }
 

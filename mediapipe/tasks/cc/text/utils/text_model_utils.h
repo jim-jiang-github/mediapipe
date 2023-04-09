@@ -25,7 +25,7 @@ namespace mediapipe::tasks::text::utils {
 // Determines the ModelType for the model based on its metadata as well
 // as its input tensors' type and count. Returns an error if there is no
 // compatible model type.
-absl::StatusOr<components::processors::proto::TextModelType::ModelType>
+abslx::StatusOr<components::processors::proto::TextModelType::ModelType>
 GetModelType(const core::ModelResources& model_resources);
 
 }  // namespace mediapipe::tasks::text::utils

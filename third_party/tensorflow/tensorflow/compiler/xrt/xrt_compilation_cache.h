@@ -213,7 +213,7 @@ class XRTCompilationCache : public ResourceBase {
   // are marked for eviction.
   const int max_cache_entries_;
 
-  mutable absl::Mutex mu_;
+  mutable abslx::Mutex mu_;
   // The total number of entries that are stored and not marked for eviction.
   int cache_entries_ TF_GUARDED_BY(mu_) = 0;
   // The total number of entries that are marked for eviction.

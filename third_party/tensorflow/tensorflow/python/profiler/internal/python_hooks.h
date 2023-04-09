@@ -128,12 +128,12 @@ class PythonHookContext {
   void operator=(const PythonHookContext&) = delete;
   void operator=(PythonHookContext&&) = delete;
 
-  absl::flat_hash_map<int64_t, PerThreadEvents> entries_;
+  abslx::flat_hash_map<int64_t, PerThreadEvents> entries_;
   uint64 start_timestamp_ns_;
   PythonHooksOptions options_;
   // In end to end mode, Python get uninitialized before Stop()/Finalize(), we
   // need to buffer the result.
-  absl::optional<XPlane> end_to_end_xplane_;
+  abslx::optional<XPlane> end_to_end_xplane_;
 };
 
 // Singleton for tracing python function calls.
@@ -151,7 +151,7 @@ class PythonHooks {
     if (e2e_context_) {
       auto* e2e_context = e2e_context_;
       e2e_context_ = nullptr;
-      return absl::WrapUnique(e2e_context);
+      return abslx::WrapUnique(e2e_context);
     }
 
     if (!active_context_) return nullptr;

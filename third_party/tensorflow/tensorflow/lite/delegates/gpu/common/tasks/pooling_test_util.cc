@@ -26,7 +26,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status AveragePoolingTest(TestExecutionEnvironment* env) {
+abslx::Status AveragePoolingTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 2);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f};
@@ -54,10 +54,10 @@ absl::Status AveragePoolingTest(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear({3.0f, 4.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AveragePoolingNonEmptyPaddingTest(TestExecutionEnvironment* env) {
+abslx::Status AveragePoolingNonEmptyPaddingTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 1);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f};
@@ -86,10 +86,10 @@ absl::Status AveragePoolingNonEmptyPaddingTest(TestExecutionEnvironment* env) {
           PointWiseNear({1.5f, 2.0f, 2.5f, 3.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MaxPoolingTest(TestExecutionEnvironment* env) {
+abslx::Status MaxPoolingTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 2);
   src_tensor.data = {8.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f};
@@ -117,10 +117,10 @@ absl::Status MaxPoolingTest(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear({8.0f, 7.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MaxPoolingIndicesTest(TestExecutionEnvironment* env) {
+abslx::Status MaxPoolingIndicesTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 2);
   src_tensor.data = {8.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f};
@@ -188,11 +188,11 @@ absl::Status MaxPoolingIndicesTest(TestExecutionEnvironment* env) {
       ref_tensor.shape = BHWC(1, 1, 1, 2);
       ref_tensor.data = {0, 3};
       if (dst_tensor_ind.data != ref_tensor.data) {
-        return absl::InternalError("not equal");
+        return abslx::InternalError("not equal");
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

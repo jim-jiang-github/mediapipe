@@ -182,7 +182,7 @@ class LocalDeviceState {
   static constexpr int kNumDeviceToHostStreams = 4;
   static constexpr int kNumDeviceToDeviceStreams = 4;
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   int next_device_to_host_stream_ ABSL_GUARDED_BY(mu_) = 0;
   int next_device_to_device_stream_ ABSL_GUARDED_BY(mu_) = 0;
   std::stack<std::unique_ptr<se::Stream>> usage_stream_pool_
@@ -195,7 +195,7 @@ class LocalDeviceState {
   // Callback map pairs callback stream with a device stream and is used for
   // running short host-side callbacks after device side events, without
   // preventing the device-side stream from doing useful work.
-  std::optional<absl::flat_hash_map<se::Stream*, std::unique_ptr<se::Stream>>>
+  std::optional<abslx::flat_hash_map<se::Stream*, std::unique_ptr<se::Stream>>>
       callback_stream_map_;
 
   // A worker thread, used for replicated computation launches.

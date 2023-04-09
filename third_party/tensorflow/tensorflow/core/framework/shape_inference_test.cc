@@ -116,10 +116,10 @@ static OpDef MakeOpDef(int num_inputs, int num_outputs) {
   OpRegistrationData op_reg_data;
   OpDefBuilder b("dummy");
   for (int i = 0; i < num_inputs; ++i) {
-    b.Input(absl::StrCat("i", i, ": float"));
+    b.Input(abslx::StrCat("i", i, ": float"));
   }
   for (int i = 0; i < num_outputs; ++i) {
-    b.Output(absl::StrCat("o", i, ": float"));
+    b.Output(abslx::StrCat("o", i, ": float"));
   }
   CHECK(b.Attr("foo:string").Finalize(&op_reg_data).ok());
   return op_reg_data.op_def;

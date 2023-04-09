@@ -244,8 +244,8 @@ TEST(FirstComeFirstServedTaskRunnerTest, ConcurrentReaders) {
   std::vector<int64_t> results;  // Guarded by `mu`.
   std::vector<std::unique_ptr<Thread>> reader_threads;
   for (int i = 0; i < num_readers; ++i) {
-    reader_threads.push_back(absl::WrapUnique(Env::Default()->StartThread(
-        /*thread_options=*/{}, /*name=*/absl::StrCat("Trainer_", i),
+    reader_threads.push_back(abslx::WrapUnique(Env::Default()->StartThread(
+        /*thread_options=*/{}, /*name=*/abslx::StrCat("Trainer_", i),
         [&runner, &results, &mu]() {
           TF_ASSERT_OK_AND_ASSIGN(
               std::vector<int64_t> output,
@@ -310,7 +310,7 @@ TEST(CachingTaskRunnerTest, GetNext) {
   size_t num_trainers = 10;
   for (size_t i = 0; i < num_trainers; ++i) {
     GetElementRequest request;
-    request.set_trainer_id(absl::StrCat("Trainer ", i));
+    request.set_trainer_id(abslx::StrCat("Trainer ", i));
     TF_ASSERT_OK_AND_ASSIGN(
         std::vector<int64_t> output,
         GetElementsFromTaskRunner<int64_t>(runner, request, range));
@@ -365,11 +365,11 @@ TEST(CachingTaskRunnerTest, ConcurrentTrainers) {
   // When the cache is large enough, every trainer can read all the elements.
   std::vector<std::unique_ptr<Thread>> reader_threads;
   for (int i = 0; i < num_readers; ++i) {
-    reader_threads.push_back(absl::WrapUnique(Env::Default()->StartThread(
-        /*thread_options=*/{}, /*name=*/absl::StrCat("Trainer_", i),
+    reader_threads.push_back(abslx::WrapUnique(Env::Default()->StartThread(
+        /*thread_options=*/{}, /*name=*/abslx::StrCat("Trainer_", i),
         [&runner, range, i]() {
           GetElementRequest request;
-          request.set_trainer_id(absl::StrCat("Trainer_", i));
+          request.set_trainer_id(abslx::StrCat("Trainer_", i));
           TF_ASSERT_OK_AND_ASSIGN(
               std::vector<int64_t> output,
               GetElementsFromTaskRunner<int64_t>(runner, request, range));
@@ -410,12 +410,12 @@ TEST(CachingTaskRunnerTest, CancelConcurrentReaders) {
   // The readers keep getting elements until cancelled.
   std::vector<std::unique_ptr<Thread>> reader_threads;
   for (size_t i = 0; i < num_readers; ++i) {
-    reader_threads.push_back(absl::WrapUnique(Env::Default()->StartThread(
-        /*thread_options=*/{}, /*name=*/absl::StrCat("Trainer_", i),
+    reader_threads.push_back(abslx::WrapUnique(Env::Default()->StartThread(
+        /*thread_options=*/{}, /*name=*/abslx::StrCat("Trainer_", i),
         [&runner]() {
           for (size_t j = 0; true; ++j) {
             GetElementRequest request;
-            request.set_trainer_id(absl::StrCat("Trainer_", (j % 100)));
+            request.set_trainer_id(abslx::StrCat("Trainer_", (j % 100)));
             GetElementResult result;
             Status status = runner.GetNext(request, result);
             if (!status.ok()) {
@@ -435,7 +435,7 @@ TEST(CachingTaskRunnerTest, CancelConcurrentReaders) {
 
   GetElementRequest request;
   GetElementResult result;
-  request.set_trainer_id(absl::StrCat("Trainer_", 0));
+  request.set_trainer_id(abslx::StrCat("Trainer_", 0));
   EXPECT_THAT(runner.GetNext(request, result),
               testing::StatusIs(error::CANCELLED));
 }
@@ -460,11 +460,11 @@ TEST(CachingTaskRunnerTest, Errors) {
   for (size_t i = 0; i < num_readers; ++i) {
     results.emplace_back();
     std::vector<tstring>& result = results.back();
-    reader_threads.push_back(absl::WrapUnique(Env::Default()->StartThread(
-        /*thread_options=*/{}, /*name=*/absl::StrCat("Trainer_", i),
+    reader_threads.push_back(abslx::WrapUnique(Env::Default()->StartThread(
+        /*thread_options=*/{}, /*name=*/abslx::StrCat("Trainer_", i),
         [&runner, &result, i]() {
           GetElementRequest request;
-          request.set_trainer_id(absl::StrCat("Trainer_", i));
+          request.set_trainer_id(abslx::StrCat("Trainer_", i));
           while (true) {
             StatusOr<tstring> element =
                 GetNextFromTaskRunner<tstring>(runner, request);
@@ -513,8 +513,8 @@ TEST_P(ConsumeParallelTest, ConsumeParallel) {
   for (int consumer = 0; consumer < num_consumers; ++consumer) {
     mutex_lock l(mu);
     per_consumer_results.emplace_back();
-    consumers.push_back(absl::WrapUnique(Env::Default()->StartThread(
-        {}, absl::StrCat("consumer_", consumer), [&, consumer] {
+    consumers.push_back(abslx::WrapUnique(Env::Default()->StartThread(
+        {}, abslx::StrCat("consumer_", consumer), [&, consumer] {
           std::vector<int64_t> results;
           Status s = RunConsumer(consumer, /*start_index=*/0,
                                  /*end_index=*/num_elements, runner, results);
@@ -561,8 +561,8 @@ TEST(RoundRobinTaskRunner, ConsumeParallelPartialRound) {
   for (int consumer = 0; consumer < num_consumers; ++consumer) {
     mutex_lock l(mu);
     per_consumer_results.emplace_back();
-    consumers.push_back(absl::WrapUnique(Env::Default()->StartThread(
-        {}, absl::StrCat("consumer_", consumer), [&, consumer] {
+    consumers.push_back(abslx::WrapUnique(Env::Default()->StartThread(
+        {}, abslx::StrCat("consumer_", consumer), [&, consumer] {
           std::vector<int64_t> results;
           Status s = RunConsumer(consumer, starting_rounds[consumer], end_index,
                                  runner, results);

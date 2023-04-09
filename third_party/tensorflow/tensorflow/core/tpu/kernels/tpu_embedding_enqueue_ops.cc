@@ -29,7 +29,7 @@ limitations under the License.
 
 namespace tensorflow {
 
-Status ValidateCombiners(absl::Span<const std::string> combiners) {
+Status ValidateCombiners(abslx::Span<const std::string> combiners) {
   for (const std::string& combiner : combiners) {
     if (combiner != "sum" && combiner != "mean" && combiner != "sqrtn") {
       return errors::InvalidArgument(

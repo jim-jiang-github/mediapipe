@@ -33,13 +33,13 @@ namespace tensorflow {
 namespace tfd {
 
 // Converts a TFRT string_view to the Abseil version.
-inline absl::string_view ToAbslStringView(tfrt::string_view sv) {
-  return absl::string_view(sv.data(), sv.size());
+inline abslx::string_view ToAbslStringView(tfrt::string_view sv) {
+  return abslx::string_view(sv.data(), sv.size());
 }
 
 // Parses the string representation of the DataType in `dtype` into `data_type`.
 // Aborts the program for unsupported dtypes.
-tensorflow::Status ParseTfDataType(absl::string_view dtype,
+tensorflow::Status ParseTfDataType(abslx::string_view dtype,
                                    DataType* data_type);
 
 // The following 2 functions convert between Tensorflow DataTypes and
@@ -56,32 +56,32 @@ tfrt::DType ConvertTfDataTypeToBefAttrType(DataType data_type);
 // Parses the tensor valued `attr_value` and constructs the tensor with its
 // contents in `tensor`. Returns OK status on success, INVALID_ARGUMENT on
 // failure.
-tensorflow::Status ParseTensorAttrValue(absl::string_view attr_value,
+tensorflow::Status ParseTensorAttrValue(abslx::string_view attr_value,
                                         tensorflow::Tensor* tensor);
 
 // Parses a string of the form "[1,2,3,...]" in `attr_value` and returns the
 // constituent dimension sizes (shape) in `int_list_val`. Returns
 // INVALID_ARGUMENT on invalid input.
-tensorflow::Status ParseTensorShapeAttrValue(absl::string_view attr_value,
+tensorflow::Status ParseTensorShapeAttrValue(abslx::string_view attr_value,
                                              std::vector<int64_t>* shape_val);
 
 // Parses a boolean from `attr_value` into `bool_val` and returns OK status on
 // success. Returns INVALID_ARGUMENT on invalid input.
-tensorflow::Status ParseBoolAttrValue(absl::string_view attr_value,
+tensorflow::Status ParseBoolAttrValue(abslx::string_view attr_value,
                                       bool* bool_val);
 
 // Parses an int64_t from `attr_value` into `int_val` and returns OK status on
 // success. Returns INVLAID_ARGUMENT on invalid input.
-tensorflow::Status ParseIntAttrValue(absl::string_view attr_value,
+tensorflow::Status ParseIntAttrValue(abslx::string_view attr_value,
                                      int64_t* int_val);
 
-inline std::vector<absl::string_view> AttrValueSplit(absl::string_view str) {
-  return absl::StrSplit(str, absl::MaxSplits('$', 1));
+inline std::vector<abslx::string_view> AttrValueSplit(abslx::string_view str) {
+  return abslx::StrSplit(str, abslx::MaxSplits('$', 1));
 }
 
 // Returns true if `attr_name` is an attribute that is not required by TFRT
 // (usually added by stages higher in the lowering process)
-bool IsUnusedAttribute(absl::string_view attr_name);
+bool IsUnusedAttribute(abslx::string_view attr_name);
 
 // Fills in the passed in AttrValueMap `attr_value_map` with attributes from
 // `attrs`.

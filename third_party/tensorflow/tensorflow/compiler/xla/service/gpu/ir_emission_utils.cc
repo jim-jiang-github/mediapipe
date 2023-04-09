@@ -49,7 +49,7 @@ bool IsRank2(const Shape& shape, int64_t batch_dimensions_size) {
 // dimensions more minor then the given dimensions, and middle is the size of
 // the given dimensions.
 std::array<int64_t, 3> PartitionShapeByMiddleDimensions(
-    const Shape& shape, absl::Span<const int64_t> dims_middle) {
+    const Shape& shape, abslx::Span<const int64_t> dims_middle) {
   CHECK(LayoutUtil::AreDimensionsConsecutive(shape.layout(), dims_middle));
   std::array<int64_t, 3> values = {1, 1, 1};
   enum Segment { kMajor = 0, kMiddle = 1, kMinor = 2 };
@@ -58,7 +58,7 @@ std::array<int64_t, 3> PartitionShapeByMiddleDimensions(
   for (int64_t cur_dim : LayoutUtil::MinorToMajor(shape)) {
     if (cur_segment != kMajor) {
       // Handle change of segments.
-      bool cur_dim_in_middle = absl::c_linear_search(dims_middle, cur_dim);
+      bool cur_dim_in_middle = abslx::c_linear_search(dims_middle, cur_dim);
       if (cur_segment == kMinor) {
         if (cur_dim_in_middle) {
           cur_segment = kMiddle;
@@ -83,7 +83,7 @@ Shape GetShapeFromTensorType(mlir::Value value) {
   Shape shape;
   if (auto attr = op->getAttrOfType<mlir::StringAttr>(kDefaultLayoutAttrName)) {
     shape = *xla::ParseShape(
-        absl::string_view(attr.getValue().data(), attr.getValue().size()));
+        abslx::string_view(attr.getValue().data(), attr.getValue().size()));
   } else {
     shape = TypeToShape(value.getType());
   }
@@ -152,10 +152,10 @@ bool IsCustomCallToCusolver(const HloInstruction& hlo) {
 }
 
 static ReductionDimensions GetReductionKindAndContiguousComponentsImpl(
-    const Shape& input_shape, absl::Span<const int64_t> dims_to_reduce) {
+    const Shape& input_shape, abslx::Span<const int64_t> dims_to_reduce) {
   DimensionVector dims_to_keep;
   for (int64_t dim = 0; dim < input_shape.rank(); ++dim) {
-    if (!absl::c_linear_search(dims_to_reduce, dim)) {
+    if (!abslx::c_linear_search(dims_to_reduce, dim)) {
       dims_to_keep.push_back(dim);
     }
   }
@@ -220,10 +220,10 @@ static bool IsUnnestedReductionFasterThanElemental(
 
 // Whether we can/should use the unnested emitter for reduction.
 static bool IsReductionFromOrToContiguousDimensionsImpl(
-    const Shape& operand_shape, absl::Span<int64_t const> dims_to_reduce) {
+    const Shape& operand_shape, abslx::Span<int64_t const> dims_to_reduce) {
   DimensionVector dims_to_keep;
   for (int64_t dim = 0; dim < operand_shape.dimensions().size(); ++dim) {
-    if (!absl::c_linear_search(dims_to_reduce, dim)) {
+    if (!abslx::c_linear_search(dims_to_reduce, dim)) {
       dims_to_keep.push_back(dim);
     }
   }
@@ -273,7 +273,7 @@ bool IsInputFusibleSlices(mlir::Operation* unnested_hlo,
   }
 
   auto is_non_strided = [](mlir::DenseIntElementsAttr strides) -> bool {
-    return absl::c_all_of(
+    return abslx::c_all_of(
         strides, [](const llvm::APInt& stride) { return stride == 1; });
   };
 
@@ -312,8 +312,8 @@ ReductionDimensions GetReductionKindAndContiguousComponents(
 // This emits a device-side call to
 // "i32 vprintf(i8* fmt, arguments_type* arguments)" in the driver; see
 // http://docs.nvidia.com/cuda/ptx-writers-guide-to-interoperability/index.html#system-calls
-llvm::Value* EmitPrintf(absl::string_view fmt,
-                        absl::Span<llvm::Value* const> arguments,
+llvm::Value* EmitPrintf(abslx::string_view fmt,
+                        abslx::Span<llvm::Value* const> arguments,
                         llvm::IRBuilder<>* builder) {
   std::vector<llvm::Type*> argument_types;
 
@@ -540,7 +540,7 @@ bool WritesMlirBuffer(mlir::Operation* op, mlir::Value operand) {
   llvm::SmallVector<mlir::MemoryEffects::EffectInstance, 2> effects;
   mlir::cast<mlir::MemoryEffectOpInterface>(op).getEffectsOnValue(operand,
                                                                   effects);
-  return absl::c_any_of(
+  return abslx::c_any_of(
       effects, [](const mlir::MemoryEffects::EffectInstance& instance) {
         return mlir::isa<mlir::MemoryEffects::Write>(instance.getEffect());
       });
@@ -569,7 +569,7 @@ static int64_t GetAllocationIndex(mlir::BlockArgument func_arg,
 }
 
 StatusOr<BufferAllocation::Slice> GetAllocationSlice(
-    mlir::Value v, absl::Span<const BufferAllocation> allocations,
+    mlir::Value v, abslx::Span<const BufferAllocation> allocations,
     std::string* constant_name) {
   if (constant_name) {
     constant_name->clear();
@@ -624,7 +624,7 @@ StatusOr<BufferAllocation::Slice> GetAllocationSlice(
 
 bool CanEmitFusedDynamicUpdateSliceInPlaceForGpu(
     mlir::lmhlo::FusionOp fusion,
-    absl::Span<const BufferAllocation> allocations) {
+    abslx::Span<const BufferAllocation> allocations) {
   auto results = fusion.getFusionResults();
   if (results.size() != 1) {
     return false;
@@ -713,7 +713,7 @@ bool ReductionIsRaceFree(const ReductionDimensions& reduction_dimensions,
 // operation.
 static bool IsInstructionSafeForShmemTranspose(const HloInstruction* hlo) {
   if (hlo->IsElementwise()) {
-    return absl::c_all_of(hlo->users(), [&](const HloInstruction* user) {
+    return abslx::c_all_of(hlo->users(), [&](const HloInstruction* user) {
       return IsInstructionSafeForShmemTranspose(user);
     });
   }
@@ -730,7 +730,7 @@ static bool IsInstructionSafeForShmemTranspose(const HloInstruction* hlo) {
     case HloOpcode::kMap:
     case HloOpcode::kParameter:
     case HloOpcode::kTuple:
-      return absl::c_all_of(hlo->users(), [&](const HloInstruction* user) {
+      return abslx::c_all_of(hlo->users(), [&](const HloInstruction* user) {
         return IsInstructionSafeForShmemTranspose(user);
       });
 
@@ -795,7 +795,7 @@ std::optional<TransposeDimsAndParams> FindTranspose021DimsAndParameters(
     if (!reduced_dims_021.has_value()) {
       reduced_dims_021 = curr_reduced_dims_021;
     }
-    if (!absl::c_equal(*reduced_dims_021, curr_reduced_dims_021)) {
+    if (!abslx::c_equal(*reduced_dims_021, curr_reduced_dims_021)) {
       // There is more than one possible transpose. Instead of picking one
       // transpose, we simply give up here.
       VLOG(3) << "021 transpose not matched; More than one possible "
@@ -826,7 +826,7 @@ std::optional<TransposeDimsAndParams> Match021Transpose(
   const Shape& output_shape = root->shape();
 
   std::vector<Shape> param_shapes;
-  absl::c_for_each(fused_computation->parameter_instructions(),
+  abslx::c_for_each(fused_computation->parameter_instructions(),
                    [&](const HloInstruction* param) {
                      param_shapes.push_back(param->shape());
                    });
@@ -905,7 +905,7 @@ bool FusionCanBeEmittedAsShmemTranspose(const HloInstruction& producer,
                                         const HloInstruction& consumer) {
   const Shape& output_shape = consumer.shape();
   std::vector<Shape> consumer_operand_shapes;
-  absl::c_for_each(consumer.operands(), [&](const HloInstruction* operand) {
+  abslx::c_for_each(consumer.operands(), [&](const HloInstruction* operand) {
     consumer_operand_shapes.push_back(operand->shape());
   });
   std::optional<TransposeDimsAndParams> consumer_dims_and_params_021 =
@@ -920,7 +920,7 @@ bool FusionCanBeEmittedAsShmemTranspose(const HloInstruction& producer,
                                        consumer_dims_and_params_021->params);
 
   std::vector<Shape> producer_operand_shapes;
-  absl::c_for_each(producer.operands(), [&](const HloInstruction* operand) {
+  abslx::c_for_each(producer.operands(), [&](const HloInstruction* operand) {
     producer_operand_shapes.push_back(operand->shape());
   });
   std::optional<TransposeDimsAndParams> producer_dims_and_params_021 =
@@ -942,7 +942,7 @@ bool FusionCanBeEmittedAsShmemTranspose(const HloInstruction& producer,
   // The transposed dimensions of `producer` and `consumer` need to match.
   if (consumer_dims_and_params_021.has_value() &&
       producer_dims_and_params_021.has_value() &&
-      !absl::c_equal(consumer_dims_and_params_021->dims,
+      !abslx::c_equal(consumer_dims_and_params_021->dims,
                      producer_dims_and_params_021->dims)) {
     VLOG(3) << producer.name() << " and " << consumer.name()
             << " have different 021 transposed dimensions: "
@@ -959,7 +959,7 @@ bool FusionCanBeEmittedAsShmemTranspose(const HloInstruction& producer,
   // If the producer feeds into a 021 transposing param of the consumer, all
   // consumer params need to be taken into account for further analysis.
   if (consumer_dims_and_params_021.has_value() &&
-      absl::c_linear_search(consumer_dims_and_params_021->params,
+      abslx::c_linear_search(consumer_dims_and_params_021->params,
                             producer_param_idx)) {
     producer_params_012.resize(producer.operand_count());
     std::iota(producer_params_012.begin(), producer_params_012.end(), 0);

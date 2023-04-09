@@ -32,7 +32,7 @@ namespace variable_accessor_internal {
 
 // Parse the following regex manually
 // name(\[index\])?(\.field)?
-VariableReference Parse(absl::string_view input) {
+VariableReference Parse(abslx::string_view input) {
   VariableReference ref;
   auto start_index = input.find('[');
   if (start_index != std::string::npos) {
@@ -94,15 +94,15 @@ int GetLength(const Variable::ValueType& value) {
 
 template <typename T>
 void FormatValue(std::string* result, T t) {
-  absl::StrAppend(result, t);
+  abslx::StrAppend(result, t);
 }
 
 template <>
 void FormatValue(std::string* result, float t) {
-  absl::StrAppend(result, absl::StrFormat("%.9ff", t));
+  abslx::StrAppend(result, abslx::StrFormat("%.9ff", t));
 }
 
-// Unfortunately absl::StrJoin with custom formatter requires formatter to use
+// Unfortunately abslx::StrJoin with custom formatter requires formatter to use
 // string, not std::string. Therefore, due to this compatibility issue data
 // needs to be converted to string representation first and then joined.
 template <typename T, int N>
@@ -122,36 +122,36 @@ struct ConstGenerator {
 
   template <typename T>
   void operator()(const Vec2<T>& v) const {
-    absl::StrAppend(result, VariableTypeGetter()(v), "(",
-                    absl::StrJoin(ToString<T, 2>(v.data_), ","), ")");
+    abslx::StrAppend(result, VariableTypeGetter()(v), "(",
+                    abslx::StrJoin(ToString<T, 2>(v.data_), ","), ")");
   }
 
   template <typename T>
   void operator()(const Vec3<T>& v) const {
-    absl::StrAppend(result, VariableTypeGetter()(v), "(",
-                    absl::StrJoin(ToString<T, 3>(v.data_), ","), ")");
+    abslx::StrAppend(result, VariableTypeGetter()(v), "(",
+                    abslx::StrJoin(ToString<T, 3>(v.data_), ","), ")");
   }
 
   template <typename T>
   void operator()(const Vec4<T>& v) const {
-    absl::StrAppend(result, VariableTypeGetter()(v), "(",
-                    absl::StrJoin(ToString<T, 4>(v.data_), ","), ")");
+    abslx::StrAppend(result, VariableTypeGetter()(v), "(",
+                    abslx::StrJoin(ToString<T, 4>(v.data_), ","), ")");
   }
 
   template <typename T>
   void operator()(const std::vector<T>& v) const {
     std::string type = VariableTypeGetter()(v);
-    absl::StrAppend(result, type, "[", v.size(), "](");
+    abslx::StrAppend(result, type, "[", v.size(), "](");
     bool first = true;
     for (const auto& i : v) {
       if (first) {
         first = false;
       } else {
-        absl::StrAppend(result, ",");
+        abslx::StrAppend(result, ",");
       }
       (*this)(i);
     }
-    absl::StrAppend(result, ")");
+    abslx::StrAppend(result, ")");
   }
 
   std::string* result;
@@ -165,22 +165,22 @@ void GetValue(const Variable::ValueType& value, std::string* result) {
 struct SharedVariableDeclarationGenerator {
   template <typename T>
   void operator()(const T&) const {
-    absl::StrAppend(result, "shared highp ", GetVariableType(variable.value),
+    abslx::StrAppend(result, "shared highp ", GetVariableType(variable.value),
                     " ", variable.name, ";\n");
   }
 
   template <typename T>
   void operator()(const std::vector<T>& v) const {
-    absl::StrAppend(result, "shared highp ", GetVariableType(variable.value),
+    abslx::StrAppend(result, "shared highp ", GetVariableType(variable.value),
                     " ", variable.name);
     if (v.empty()) {
       // Normalize the size of the shared array to that of the WorkGroupSize
-      absl::StrAppend(
+      abslx::StrAppend(
           result,
           "[gl_WorkGroupSize.z * gl_WorkGroupSize.y * gl_WorkGroupSize.x];\n");
     } else {
       // Use the specified size
-      absl::StrAppend(result, "[", v.size(), "];\n");
+      abslx::StrAppend(result, "[", v.size(), "];\n");
     }
   }
 
@@ -197,13 +197,13 @@ void GenerateSharedVariableDeclaration(const Variable& variable,
 struct UniformParameterDeclarationGenerator {
   template <typename T>
   void operator()(const T&) const {
-    absl::StrAppend(result, "uniform ", GetVariableType(variable.value), " ",
+    abslx::StrAppend(result, "uniform ", GetVariableType(variable.value), " ",
                     variable.name, ";\n");
   }
 
   template <typename T>
   void operator()(const std::vector<T>& v) const {
-    absl::StrAppend(result, "uniform ", GetVariableType(variable.value), " ",
+    abslx::StrAppend(result, "uniform ", GetVariableType(variable.value), " ",
                     variable.name, "[", v.size(), "];\n");
   }
 
@@ -220,13 +220,13 @@ void GenerateUniformParameterDeclaration(const Variable& variable,
 struct VulkanPushConstantGenerator {
   template <typename T>
   void operator()(const T&) const {
-    absl::StrAppend(result, "  ", GetVariableType(variable.value), " ",
+    abslx::StrAppend(result, "  ", GetVariableType(variable.value), " ",
                     variable.name, ";\n");
   }
 
   template <typename T>
   void operator()(const std::vector<T>& v) const {
-    absl::StrAppend(result, "  ", GetVariableType(variable.value), " ",
+    abslx::StrAppend(result, "  ", GetVariableType(variable.value), " ",
                     variable.name, "[", v.size(), "];\n");
   }
 
@@ -258,11 +258,11 @@ struct VulkanConstantGenerator {
     // types go in push (uniform) constants.
     if (variable_type == "int" || variable_type == "uint" ||
         variable_type == "float") {
-      absl::StrAppend(result, "layout(constant_id = ", *constant_id, ") const ",
+      abslx::StrAppend(result, "layout(constant_id = ", *constant_id, ") const ",
                       variable_type, " ", variable.name, " = ");
       // Always set the default values to zero to generate generic cacheable
       // shaders.
-      absl::StrAppend(result, (variable_type == "float" ? "0.0" : "0"), ";\n");
+      abslx::StrAppend(result, (variable_type == "float" ? "0.0" : "0"), ";\n");
       (*constant_id)++;
     } else {
       non_scalar_variables->push_back(variable);
@@ -319,7 +319,7 @@ bool IsVariableLength(const Variable::ValueType& value) {
 
 enum Field : uint8_t { UNKNOWN = 4, X = 0, Y = 1, Z = 2, W = 3 };
 
-Field ToField(absl::string_view field_name) {
+Field ToField(abslx::string_view field_name) {
   if (field_name.size() == 2 && field_name[0] == '.') {
     switch (field_name[1]) {
       case 'x':
@@ -403,22 +403,22 @@ bool HasField(const Variable::ValueType& value, Field field) {
   return std::visit(FieldChecker{field}, value);
 }
 
-void AssembleAccessor(absl::string_view name, absl::string_view index,
-                      absl::string_view field, std::string* result) {
+void AssembleAccessor(abslx::string_view name, abslx::string_view index,
+                      abslx::string_view field, std::string* result) {
   if (index.empty()) {
-    absl::StrAppend(result, name, field);
+    abslx::StrAppend(result, name, field);
   } else {
-    absl::StrAppend(result, name, "[", index, "]", field);
+    abslx::StrAppend(result, name, "[", index, "]", field);
   }
 }
 
 }  // namespace
 
-RewriteStatus VariableAccessor::Rewrite(absl::string_view input,
+RewriteStatus VariableAccessor::Rewrite(abslx::string_view input,
                                         std::string* output) {
   auto ref = variable_accessor_internal::Parse(input);
   if (ref.name.empty()) {
-    absl::StrAppend(output, "INVALID_SYNTAX");
+    abslx::StrAppend(output, "INVALID_SYNTAX");
     return RewriteStatus::ERROR;
   }
 
@@ -432,14 +432,14 @@ RewriteStatus VariableAccessor::Rewrite(absl::string_view input,
 
   if (!ref.index.empty() && !IsVariableLength(value)) {
     // Trying to access variable by index, but it is not variable-length.
-    absl::StrAppend(output, "INVALID_ACCESS_BY_INDEX");
+    abslx::StrAppend(output, "INVALID_ACCESS_BY_INDEX");
     return RewriteStatus::ERROR;
   }
 
   Field f = ToField(ref.field);
   if (!ref.field.empty() && !HasField(value, f)) {
     // Trying to access a variable by field, but it does not have it.
-    absl::StrAppend(output, "INVALID_ACCESS_BY_FIELD");
+    abslx::StrAppend(output, "INVALID_ACCESS_BY_FIELD");
     return RewriteStatus::ERROR;
   }
 
@@ -496,10 +496,10 @@ std::string VariableAccessor::GetConstDeclarations() const {
 
     const auto& value = variable.second.value;
     if (IsVariableLength(value)) {
-      absl::StrAppend(&declarations, "const ", GetVariableType(value), " ",
+      abslx::StrAppend(&declarations, "const ", GetVariableType(value), " ",
                       variable_name, "[] = ");
       GetValue(value, &declarations);
-      absl::StrAppend(&declarations, ";\n");
+      abslx::StrAppend(&declarations, ";\n");
     }
   }
   return declarations;

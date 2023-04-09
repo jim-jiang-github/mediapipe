@@ -41,9 +41,9 @@ Status AttachDef(const Status& status, const Node& node,
   return AttachDef(status, node.def(), allow_multiple_formatted_node);
 }
 
-absl::btree_set<string> GetMergedNames(const std::vector<string>& from_names,
+abslx::btree_set<string> GetMergedNames(const std::vector<string>& from_names,
                                        const std::vector<string>& to_names) {
-  absl::btree_set<string> merged_names;
+  abslx::btree_set<string> merged_names;
   merged_names.insert(from_names.begin(), from_names.end());
   merged_names.insert(to_names.begin(), to_names.end());
   return merged_names;

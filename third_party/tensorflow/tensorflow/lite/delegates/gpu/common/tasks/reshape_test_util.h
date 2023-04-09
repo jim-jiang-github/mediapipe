@@ -22,8 +22,8 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status ReshapeTest(TestExecutionEnvironment* env);
-absl::Status Reshapex4Test(TestExecutionEnvironment* env);
+abslx::Status ReshapeTest(TestExecutionEnvironment* env);
+abslx::Status Reshapex4Test(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

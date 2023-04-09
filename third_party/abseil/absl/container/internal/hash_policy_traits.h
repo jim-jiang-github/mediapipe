@@ -23,7 +23,7 @@
 
 #include "absl/meta/type_traits.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 
@@ -39,7 +39,7 @@ struct hash_policy_traits {
     // access to the key for use in node handle.
 #if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606
     template <class Key,
-              absl::enable_if_t<std::is_lvalue_reference<Key>::value, int> = 0>
+              abslx::enable_if_t<std::is_lvalue_reference<Key>::value, int> = 0>
     static key_type& Impl(Key&& k, int) {
       return *std::launder(
           const_cast<key_type*>(std::addressof(std::forward<Key>(k))));
@@ -65,7 +65,7 @@ struct hash_policy_traits {
   struct ConstantIteratorsImpl : std::false_type {};
 
   template <class P>
-  struct ConstantIteratorsImpl<P, absl::void_t<typename P::constant_iterators>>
+  struct ConstantIteratorsImpl<P, abslx::void_t<typename P::constant_iterators>>
       : P::constant_iterators {};
 
  public:
@@ -203,6 +203,6 @@ struct hash_policy_traits {
 
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_CONTAINER_INTERNAL_HASH_POLICY_TRAITS_H_

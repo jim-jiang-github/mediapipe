@@ -25,18 +25,18 @@ limitations under the License.
 
 namespace xla {
 
-ABSL_CONST_INIT absl::Mutex registry_mutex(absl::kConstInit);
-absl::flat_hash_map<std::string, std::unique_ptr<PjRtCompiler>>*
+ABSL_CONST_INIT abslx::Mutex registry_mutex(abslx::kConstInit);
+abslx::flat_hash_map<std::string, std::unique_ptr<PjRtCompiler>>*
 CompilerRegistry() {
   static auto* compiler_registry =
-      new absl::flat_hash_map<std::string, std::unique_ptr<PjRtCompiler>>();
+      new abslx::flat_hash_map<std::string, std::unique_ptr<PjRtCompiler>>();
   return compiler_registry;
 }
 
-void PjRtRegisterCompiler(absl::string_view platform_name,
+void PjRtRegisterCompiler(abslx::string_view platform_name,
                           std::unique_ptr<PjRtCompiler> compiler) {
   CHECK(compiler != nullptr);
-  absl::MutexLock l(&registry_mutex);
+  abslx::MutexLock l(&registry_mutex);
   auto* compiler_registry = CompilerRegistry();
   CHECK(!compiler_registry->contains(platform_name));
   (*compiler_registry)[platform_name] = std::move(compiler);
@@ -45,11 +45,11 @@ void PjRtRegisterCompiler(absl::string_view platform_name,
 StatusOr<std::unique_ptr<PjRtExecutable>> PjRtCompile(
     CompileOptions options, const XlaComputation& computation,
     const PjRtDeviceTopology& topology, PjRtClient* client) {
-  absl::ReaderMutexLock l(&registry_mutex);
+  abslx::ReaderMutexLock l(&registry_mutex);
   const auto* compiler_registry = CompilerRegistry();
   auto it = compiler_registry->find(topology.platform_name());
   if (it == compiler_registry->end()) {
-    return tensorflow::errors::NotFound(absl::StrCat(
+    return tensorflow::errors::NotFound(abslx::StrCat(
         "No compiler registered for platform ", topology.platform_name()));
   }
   return it->second->Compile(options, computation, topology, client);

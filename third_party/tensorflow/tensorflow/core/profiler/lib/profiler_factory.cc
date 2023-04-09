@@ -51,7 +51,7 @@ std::vector<std::unique_ptr<profiler::ProfilerInterface>> CreateProfilers(
     // A factory might return nullptr based on options.
     if (profiler == nullptr) continue;
     result.emplace_back(
-        absl::make_unique<ProfilerController>(std::move(profiler)));
+        abslx::make_unique<ProfilerController>(std::move(profiler)));
   }
   return result;
 }

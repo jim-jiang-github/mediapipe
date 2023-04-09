@@ -33,7 +33,7 @@ std::vector<T> PacketValues(const std::vector<mediapipe::Packet>& packets) {
 
 class FooImpl : public NodeImpl<Foo, FooImpl> {
  public:
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     float bias = kBias(cc).GetOr(0.0);
     float scale = kScale(cc).GetOr(1.0);
     kOut(cc).Send(*kBase(cc) * scale + bias);
@@ -81,7 +81,7 @@ class Foo5 : public FunctionNode<Foo5> {
 
 class Foo2Impl : public NodeImpl<Foo2, Foo2Impl> {
  public:
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     float bias = SideIn(MPP_TAG("BIAS"), cc).GetOr(0.0);
     float scale = In(MPP_TAG("SCALE"), cc).GetOr(1.0);
     Out(MPP_TAG("OUT"), cc).Send(*In(MPP_TAG("BASE"), cc) * scale + bias);
@@ -91,7 +91,7 @@ class Foo2Impl : public NodeImpl<Foo2, Foo2Impl> {
 
 class BarImpl : public NodeImpl<Bar, BarImpl> {
  public:
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     Packet p = kIn(cc);
     kOut(cc).Send(p);
     return {};
@@ -100,9 +100,9 @@ class BarImpl : public NodeImpl<Bar, BarImpl> {
 
 class BazImpl : public NodeImpl<Baz> {
  public:
-  static absl::Status UpdateContract(CalculatorContract* cc) { return {}; }
+  static abslx::Status UpdateContract(CalculatorContract* cc) { return {}; }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     for (int i = 0; i < kData(cc).Count(); ++i) {
       kDataOut(cc)[i].Send(kData(cc)[i]);
     }
@@ -113,7 +113,7 @@ MEDIAPIPE_NODE_IMPLEMENTATION(BazImpl);
 
 class IntForwarderImpl : public NodeImpl<IntForwarder, IntForwarderImpl> {
  public:
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     kOut(cc).Send(*kIn(cc));
     return {};
   }
@@ -121,7 +121,7 @@ class IntForwarderImpl : public NodeImpl<IntForwarder, IntForwarderImpl> {
 
 class ToFloatImpl : public NodeImpl<ToFloat, ToFloatImpl> {
  public:
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     kIn(cc).Visit([cc](auto x) { kOut(cc).Send(x); });
     return {};
   }
@@ -168,7 +168,7 @@ TEST(NodeTest, CreateByName) {
 void RunFooCalculatorInGraph(const std::string& foo_name) {
   CalculatorGraphConfig config =
       mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(
-          absl::Substitute(R"(
+          abslx::Substitute(R"(
         input_stream: "base"
         input_stream: "scale"
         output_stream: "out"
@@ -316,7 +316,7 @@ struct SideFallback : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kIn, kFactor, kOut);
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     kOut(cc).Send(kIn(cc).Get() * kFactor(cc).Get());
     return {};
   }
@@ -342,7 +342,7 @@ TEST(NodeTest, SideFallbackWithStream) {
   MP_EXPECT_OK(
       graph.ObserveOutputStream("out", [&outputs](const mediapipe::Packet& p) {
         outputs.push_back(p.Get<int>());
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
   MP_EXPECT_OK(graph.StartRun({}));
   MP_EXPECT_OK(graph.AddPacketToInputStream(
@@ -373,7 +373,7 @@ TEST(NodeTest, SideFallbackWithSide) {
   MP_EXPECT_OK(
       graph.ObserveOutputStream("out", [&outputs](const mediapipe::Packet& p) {
         outputs.push_back(p.Get<int>());
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
   MP_EXPECT_OK(graph.StartRun({{"factor", mediapipe::MakePacket<int>(2)}}));
   MP_EXPECT_OK(graph.AddPacketToInputStream(
@@ -452,7 +452,7 @@ struct DropEvenTimestamps : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kIn, kOut);
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     if (cc->InputTimestamp().Value() % 2) {
       kOut(cc).Send(kIn(cc));
     }
@@ -467,13 +467,13 @@ struct ListIntPackets : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kIn, kOut);
 
-  absl::Status Process(CalculatorContext* cc) override {
-    std::string result = absl::StrCat(cc->InputTimestamp().DebugString(), ":");
+  abslx::Status Process(CalculatorContext* cc) override {
+    std::string result = abslx::StrCat(cc->InputTimestamp().DebugString(), ":");
     for (int i = 0; i < kIn(cc).Count(); ++i) {
       if (kIn(cc)[i].IsEmpty()) {
-        absl::StrAppend(&result, " empty");
+        abslx::StrAppend(&result, " empty");
       } else {
-        absl::StrAppend(&result, " ", *kIn(cc)[i]);
+        abslx::StrAppend(&result, " ", *kIn(cc)[i]);
       }
     }
     kOut(cc).Send(std::move(result));
@@ -530,7 +530,7 @@ struct ConsumerNode : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kInt, kGeneric, kOneOf);
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     ASSIGN_OR_RETURN(auto maybe_int, kInt(cc).Consume());
     ASSIGN_OR_RETURN(auto maybe_float, kGeneric(cc).Consume<float>());
     ASSIGN_OR_RETURN(auto maybe_int2, kOneOf(cc).Consume<int>());
@@ -571,7 +571,7 @@ struct LogSinkNode : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kIn);
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     LOG(INFO) << "LogSinkNode received: " << kIn(cc).Get();
     return {};
   }

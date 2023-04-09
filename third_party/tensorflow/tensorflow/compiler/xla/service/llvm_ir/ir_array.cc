@@ -36,7 +36,7 @@ limitations under the License.
 namespace xla {
 namespace llvm_ir {
 
-IrArray::Index::Index(absl::Span<llvm::Value* const> multidim,
+IrArray::Index::Index(abslx::Span<llvm::Value* const> multidim,
                       llvm::Value* linear, const Shape& shape,
                       llvm::Type* index_type)
     : Index(multidim, shape, index_type) {
@@ -76,7 +76,7 @@ void IrArray::Index::Delinearize(std::vector<llvm::Value*>* multidim,
 
 void IrArray::Index::Delinearize(std::vector<llvm::Value*>* multidim,
                                  llvm::Value* linear, const Shape& shape,
-                                 absl::Span<llvm::Value*> dynamic_dims,
+                                 abslx::Span<llvm::Value*> dynamic_dims,
                                  llvm::IRBuilder<>* b) const {
   CHECK_EQ(shape.dimensions_size(), dynamic_dims.size());
   CHECK_EQ(multidim_.size(), shape.rank());
@@ -118,7 +118,7 @@ IrArray::Index::Index(llvm::Value* linear, const Shape& shape,
 }
 
 IrArray::Index::Index(llvm::Value* linear,
-                      absl::Span<llvm::Value* const> multidim,
+                      abslx::Span<llvm::Value* const> multidim,
                       const Shape& shape, llvm::IRBuilder<>* b)
     : multidim_(shape.rank()),
       linear_(linear),
@@ -144,7 +144,7 @@ IrArray::Index::Index(llvm::Value* linear,
 }
 
 IrArray::Index::Index(llvm::Value* linear, const Shape& shape,
-                      absl::Span<llvm::Value*> dynamic_dims,
+                      abslx::Span<llvm::Value*> dynamic_dims,
                       llvm::IRBuilder<>* b)
     : multidim_(shape.rank()),
       linear_(linear),
@@ -158,13 +158,13 @@ IrArray::Index::Index(llvm::Value* linear, const Shape& shape,
   Delinearize(&multidim_, linear, shape, dynamic_dims, b);
 }
 
-IrArray::Index::Index(absl::Span<llvm::Value* const> multidim,
-                      absl::Span<int64_t const> dimensions,
+IrArray::Index::Index(abslx::Span<llvm::Value* const> multidim,
+                      abslx::Span<int64_t const> dimensions,
                       llvm::Type* index_type)
     : Index(multidim, ShapeUtil::MakeShape(/*arbitrary*/ PRED, dimensions),
             index_type) {}
 
-IrArray::Index::Index(absl::Span<llvm::Value* const> multidim,
+IrArray::Index::Index(abslx::Span<llvm::Value* const> multidim,
                       const Shape& shape, llvm::Type* index_type)
     : multidim_(multidim.begin(), multidim.end()),
       linear_(nullptr),
@@ -255,11 +255,11 @@ IrArray::Index IrArray::Index::SourceIndexOfReshape(
     // We compute the source indices in each common factor from only the target
     // indices in the same common factor.
     for (ssize_t k = common_factors.size() - 2; k >= 0; --k) {
-      absl::Span<int64_t const> dimensions = output_shape.dimensions().subspan(
+      abslx::Span<int64_t const> dimensions = output_shape.dimensions().subspan(
           common_factors[k].second,
           common_factors[k + 1].second - common_factors[k].second);
       llvm::Value* logical_linear_index =
-          Index(absl::Span<llvm::Value* const>(multidim_).subspan(
+          Index(abslx::Span<llvm::Value* const>(multidim_).subspan(
                     common_factors[k].second,
                     common_factors[k + 1].second - common_factors[k].second),
                 dimensions, index_type_)
@@ -294,8 +294,8 @@ IrArray::Index IrArray::Index::SourceIndexOfReshape(
 }
 
 IrArray::Index IrArray::Index::SourceIndexOfSlice(
-    const Shape& operand_shape, absl::Span<const int64_t> starts,
-    absl::Span<const int64_t> strides, llvm::IRBuilder<>* builder) const {
+    const Shape& operand_shape, abslx::Span<const int64_t> starts,
+    abslx::Span<const int64_t> strides, llvm::IRBuilder<>* builder) const {
   std::vector<llvm::Value*> source_multi_index(multidim_.size());
   for (int i = 0; i < multidim_.size(); ++i) {
     int64_t stride = strides[i];
@@ -313,7 +313,7 @@ IrArray::Index IrArray::Index::SourceIndexOfSlice(
 
 IrArray::Index IrArray::Index::SourceIndexOfTranspose(
     const Shape& shape, const Shape& operand_shape,
-    absl::Span<const int64_t> dimension_mapping) const {
+    abslx::Span<const int64_t> dimension_mapping) const {
   std::vector<llvm::Value*> operand_multidim_index =
       PermuteInverse(multidim(), dimension_mapping);
 
@@ -365,7 +365,7 @@ IrArray::Index IrArray::Index::SourceIndexOfBitcast(
 
 IrArray::Index IrArray::Index::SourceIndexOfBroadcast(
     const Shape& shape, const Shape& operand_shape,
-    absl::Span<const int64_t> dimension_mapping,
+    abslx::Span<const int64_t> dimension_mapping,
     llvm::IRBuilder<>* builder) const {
   int64_t rank = operand_shape.rank();
   std::vector<llvm::Value*> source_index(rank);
@@ -426,7 +426,7 @@ IrArray::Index IrArray::Index::SourceIndexOfBroadcast(
   return Index(source_index, linear, operand_shape, index_type_);
 }
 
-llvm::Value* IrArray::Index::Linearize(absl::Span<const int64_t> dimensions,
+llvm::Value* IrArray::Index::Linearize(abslx::Span<const int64_t> dimensions,
                                        llvm::IRBuilder<>* builder) const {
   // Each dimension is multiplied by the product of the sizes of all
   // earlier dimensions and added to the accumulator logical_linear_index.
@@ -469,7 +469,7 @@ llvm::Value* IrArray::Index::Linearize(
 
 llvm::Value* IrArray::EmitArrayElementAddress(const IrArray::Index& index,
                                               llvm::IRBuilder<>* b,
-                                              absl::string_view name,
+                                              abslx::string_view name,
                                               bool use_linear_index) const {
   if (ShapeUtil::IsScalar(shape_)) {
     // Special handling of scalars: a scalar pretends to have the same value for
@@ -530,7 +530,7 @@ void IrArray::AnnotateLoadStoreInstructionWithMetadata(
 
 llvm::Value* IrArray::EmitReadArrayElement(const Index& index,
                                            llvm::IRBuilder<>* b,
-                                           absl::string_view name,
+                                           abslx::string_view name,
                                            bool use_linear_index) const {
   llvm::Value* element_address =
       EmitArrayElementAddress(index, b, name, use_linear_index);

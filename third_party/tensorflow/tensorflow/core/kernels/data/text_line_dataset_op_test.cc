@@ -93,12 +93,12 @@ Status CreateTestFiles(const std::vector<tstring>& filenames,
 TextLineDatasetParams TextLineDatasetParams1() {
   std::vector<tstring> filenames = {LocalTempFilename(), LocalTempFilename()};
   std::vector<tstring> contents = {
-      absl::StrCat("hello world\n", "11223334455\n"),
-      absl::StrCat("abcd, EFgH\n", "           \n", "$%^&*()\n")};
+      abslx::StrCat("hello world\n", "11223334455\n"),
+      abslx::StrCat("abcd, EFgH\n", "           \n", "$%^&*()\n")};
   CompressionType compression_type = CompressionType::ZLIB;
   if (!CreateTestFiles(filenames, contents, compression_type).ok()) {
     VLOG(WARNING) << "Failed to create the test files: "
-                  << absl::StrJoin(filenames, ", ");
+                  << abslx::StrJoin(filenames, ", ");
   }
   return TextLineDatasetParams(filenames,
                                /*compression_type=*/compression_type,
@@ -110,12 +110,12 @@ TextLineDatasetParams TextLineDatasetParams1() {
 TextLineDatasetParams TextLineDatasetParams2() {
   std::vector<tstring> filenames = {LocalTempFilename(), LocalTempFilename()};
   std::vector<tstring> contents = {
-      absl::StrCat("hello world\n", "11223334455\n"),
-      absl::StrCat("abcd, EFgH\n", "           \n", "$%^&*()\n")};
+      abslx::StrCat("hello world\n", "11223334455\n"),
+      abslx::StrCat("abcd, EFgH\n", "           \n", "$%^&*()\n")};
   CompressionType compression_type = CompressionType::GZIP;
   if (!CreateTestFiles(filenames, contents, compression_type).ok()) {
     VLOG(WARNING) << "Failed to create the test files: "
-                  << absl::StrJoin(filenames, ", ");
+                  << abslx::StrJoin(filenames, ", ");
   }
   return TextLineDatasetParams(filenames,
                                /*compression_type=*/compression_type,
@@ -127,12 +127,12 @@ TextLineDatasetParams TextLineDatasetParams2() {
 TextLineDatasetParams TextLineDatasetParams3() {
   std::vector<tstring> filenames = {LocalTempFilename(), LocalTempFilename()};
   std::vector<tstring> contents = {
-      absl::StrCat("hello world\n", "11223334455\n"),
-      absl::StrCat("abcd, EFgH\n", "           \n", "$%^&*()\n")};
+      abslx::StrCat("hello world\n", "11223334455\n"),
+      abslx::StrCat("abcd, EFgH\n", "           \n", "$%^&*()\n")};
   CompressionType compression_type = CompressionType::UNCOMPRESSED;
   if (!CreateTestFiles(filenames, contents, compression_type).ok()) {
     VLOG(WARNING) << "Failed to create the test files: "
-                  << absl::StrJoin(filenames, ", ");
+                  << abslx::StrJoin(filenames, ", ");
   }
   return TextLineDatasetParams(filenames,
                                /*compression_type=*/compression_type,

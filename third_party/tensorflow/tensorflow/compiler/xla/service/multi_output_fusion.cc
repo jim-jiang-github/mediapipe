@@ -29,7 +29,7 @@ namespace xla {
 
 StatusOr<bool> MultiOutputFusion::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
 
   for (auto* computation :
@@ -58,7 +58,7 @@ StatusOr<bool> MultiOutputFusion::Run(
                                           reachability_->GetIndex(instruction));
 
       std::vector<HloInstruction*> candidates;
-      absl::flat_hash_set<HloInstruction*> candidates_set;
+      abslx::flat_hash_set<HloInstruction*> candidates_set;
       VLOG(10) << "Looking at instruction: " << instruction->name();
       for (auto operand : instruction->operands()) {
         // Filter out the non-interesting instructions -- they
@@ -208,7 +208,7 @@ MultiOutputFusion::GetNewFusibles(HloInstruction* instr1,
 
   // The second entry of the pair is an old profit value.
   std::vector<std::pair<HloInstruction*, int64_t>> new_fusibles;
-  absl::flat_hash_set<HloInstruction*> in_list;
+  abslx::flat_hash_set<HloInstruction*> in_list;
   auto it = fusion_node.fusibles.begin();
   while (it != fusion_node.fusibles.end()) {
     HloInstruction* instr = it->first;
@@ -363,7 +363,7 @@ void MultiOutputFusion::RecomputeReachability() {
 
 void MultiOutputFusion::UpdateReachability(
     HloInstruction* instr1, HloInstruction* instr2,
-    absl::Span<const std::pair<HloInstruction*, HloReachabilityMap::Index>>
+    abslx::Span<const std::pair<HloInstruction*, HloReachabilityMap::Index>>
         instrs_to_update,
     const std::function<bool(HloInstruction*)>& skip) {
   auto instr1_i = reachability_->GetIndex(instr1);
@@ -409,7 +409,7 @@ bool MultiOutputFusion::Perform() {
 
     if (LegalToFuse(instr1, instr2)) {
       if (!ConsumeFuel(name(), [&] {
-            return absl::StrFormat("Not fusing %s and %s.", instr1->ToString(),
+            return abslx::StrFormat("Not fusing %s and %s.", instr1->ToString(),
                                    instr2->ToString());
           })) {
         break;

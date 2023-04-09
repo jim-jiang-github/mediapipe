@@ -52,9 +52,9 @@ using tensorflow::AutotuneResult;
 // ConvolutionDimensionNumbers doesn't explicitly say which dimension is `k`,
 // but we can infer it by finding the first dnum that isn't otherwise mentioned
 // in the dnums.
-int64_t FindMissingDnum(absl::Span<const int64_t> vals) {
+int64_t FindMissingDnum(abslx::Span<const int64_t> vals) {
   for (int i = 0; i < vals.size(); i++) {
-    if (!absl::c_linear_search(vals, i)) {
+    if (!abslx::c_linear_search(vals, i)) {
       return i;
     }
   }
@@ -280,9 +280,9 @@ XlaConvShapesToStreamExecutorLayouts(const ConvolutionDimensionNumbers& dnums,
 // the convolution.
 static std::optional<int64_t> FindVectorizedDim(int64_t rank, int64_t d0,
                                                 int64_t d1,
-                                                absl::Span<const int64_t> ds) {
+                                                abslx::Span<const int64_t> ds) {
   for (int64_t i = 0; i < rank; i++) {
-    if (i == d0 || i == d1 || absl::c_linear_search(ds, i)) {
+    if (i == d0 || i == d1 || abslx::c_linear_search(ds, i)) {
       continue;
     }
     return i;
@@ -310,14 +310,14 @@ FindVectorizedFeatureDims(const ConvolutionDimensionNumbers& dnums,
 }
 
 // Returns a mutex that can be used to lock the given stream executor.
-absl::Mutex& GetGpuMutex(const se::StreamExecutor* stream_exec) {
-  static absl::Mutex mu(absl::kConstInit);
+abslx::Mutex& GetGpuMutex(const se::StreamExecutor* stream_exec) {
+  static abslx::Mutex mu(abslx::kConstInit);
   // se::Platform*s are global singletons guaranteed to live forever.
   static auto* mutexes =
       new std::map<std::pair<const se::Platform*, /*device_ordinal*/ int64_t>,
-                   absl::Mutex>();
+                   abslx::Mutex>();
 
-  absl::MutexLock global_lock(&mu);
+  abslx::MutexLock global_lock(&mu);
   auto it = mutexes
                 ->emplace(std::piecewise_construct,
                           std::make_tuple(stream_exec->platform(),
@@ -329,8 +329,8 @@ absl::Mutex& GetGpuMutex(const se::StreamExecutor* stream_exec) {
 }
 
 StatusOr<std::unique_ptr<se::KernelBase>> CreateKernel(
-    absl::string_view kernel_name, uint64_t num_args, absl::string_view ptx,
-    absl::Span<const uint8_t> cubin_data, se::StreamExecutor* stream_exec) {
+    abslx::string_view kernel_name, uint64_t num_args, abslx::string_view ptx,
+    abslx::Span<const uint8_t> cubin_data, se::StreamExecutor* stream_exec) {
   se::MultiKernelLoaderSpec loader_spec(num_args);
   loader_spec.AddCudaPtxInMemory(ptx, kernel_name);
 
@@ -346,7 +346,7 @@ StatusOr<std::unique_ptr<se::KernelBase>> CreateKernel(
 
 template <int n>
 static std::unique_ptr<se::KernelArgsArrayBase> MakeKernelArgs(
-    absl::Span<const se::DeviceMemoryBase> args) {
+    abslx::Span<const se::DeviceMemoryBase> args) {
   auto kernel_args = std::make_unique<se::KernelArgsArray<n>>();
   for (const se::DeviceMemoryBase& buf : args) {
     kernel_args->add_device_memory_argument(buf);
@@ -355,7 +355,7 @@ static std::unique_ptr<se::KernelArgsArrayBase> MakeKernelArgs(
 }
 
 Status ExecuteKernelOnStream(const se::KernelBase& kernel,
-                             absl::Span<const se::DeviceMemoryBase> args,
+                             abslx::Span<const se::DeviceMemoryBase> args,
                              const LaunchDimensions& dims, se::Stream* stream) {
   static constexpr int kKernelArgsLimit = 1024;
   std::unique_ptr<se::KernelArgsArrayBase> kernel_args;
@@ -527,7 +527,7 @@ bool RequireDeterminism(const HloModuleConfig& config) {
 }
 
 StatusOr<AutotuneResult> PickBestResult(
-    absl::Span<AutotuneResult const> profile_results,
+    abslx::Span<AutotuneResult const> profile_results,
     const HloInstruction& instr) {
   std::vector<AutotuneResult> filtered_results;
 
@@ -535,7 +535,7 @@ StatusOr<AutotuneResult> PickBestResult(
   // possible (e.g. perhaps the reference algorithm is the one that's
   // incorrect!).  But we don't ignore REDZONE_MODIFIED failures because they're
   // quite severe and can be detected with high accuracy.
-  absl::c_copy_if(
+  abslx::c_copy_if(
       profile_results, std::back_inserter(filtered_results),
       [](const AutotuneResult& r) {
         return !(r.has_failure() &&
@@ -554,7 +554,7 @@ StatusOr<AutotuneResult> PickBestResult(
 
   auto selected_result = filtered_results.begin();
   if (!RequireDeterminism(instr.parent()->parent()->config())) {
-    selected_result = absl::c_min_element(
+    selected_result = abslx::c_min_element(
         filtered_results,
         [](const AutotuneResult& lhs, const AutotuneResult& rhs) {
           return tensorflow::proto_utils::FromDurationProto(lhs.run_time()) <

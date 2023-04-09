@@ -39,17 +39,17 @@ namespace profiler {
 
 namespace {
 
-std::string ConstructXStatName(absl::string_view name,
+std::string ConstructXStatName(abslx::string_view name,
                                const monitoring::Point& point) {
   if (point.labels.empty()) {
     return std::string(name);
   }
-  return absl::Substitute(
+  return abslx::Substitute(
       "$0{$1}", name,
-      absl::StrJoin(
+      abslx::StrJoin(
           point.labels, ", ",
           [](std::string* out, const monitoring::Point::Label& label) {
-            absl::StrAppend(out, label.name, "=", label.value);
+            abslx::StrAppend(out, label.name, "=", label.value);
           }));
 }
 

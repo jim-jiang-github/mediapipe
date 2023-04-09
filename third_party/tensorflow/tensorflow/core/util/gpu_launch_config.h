@@ -365,7 +365,7 @@ Cuda2DLaunchConfig GetCuda2DLaunchConfig(int xdim, int ydim,
 namespace detail {
 template <typename... Ts, size_t... Is>
 std::array<void*, sizeof...(Ts)> GetArrayOfElementPointersImpl(
-    std::tuple<Ts...>* tuple, absl::index_sequence<Is...>) {
+    std::tuple<Ts...>* tuple, abslx::index_sequence<Is...>) {
   return {{&std::get<Is>(*tuple)...}};
 }
 // Returns an array of void pointers to the elements of the given tuple.
@@ -373,7 +373,7 @@ template <typename... Ts>
 std::array<void*, sizeof...(Ts)> GetArrayOfElementPointers(
     std::tuple<Ts...>* tuple) {
   return GetArrayOfElementPointersImpl(tuple,
-                                       absl::index_sequence_for<Ts...>{});
+                                       abslx::index_sequence_for<Ts...>{});
 }
 
 template <bool...>

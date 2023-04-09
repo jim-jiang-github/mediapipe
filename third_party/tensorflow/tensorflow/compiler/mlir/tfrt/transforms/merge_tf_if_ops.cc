@@ -98,7 +98,7 @@ class MergeTfIfOpsPass
         pm.addPass(mlir::createInlinerPass());
         if (mlir::failed(runPipeline(pm, module))) {
           module.emitWarning(
-              absl::StrCat("could not run inliner pass within the "
+              abslx::StrCat("could not run inliner pass within the "
                            "tfrt-merge-tf-if-ops pass iteration ",
                            i));
           break;
@@ -139,7 +139,7 @@ class MergeTfIfOpsPass
       // be given unique names.
       MergeIfOpsWithSameArgs(builder, iter.first->getLoc(),
                              /*branch_prefix=*/
-                             absl::StrCat(op.getSymName().str(), "_merged_if_",
+                             abslx::StrCat(op.getSymName().str(), "_merged_if_",
                                           iteration, "_", id++),
                              iter.second);
 
@@ -156,7 +156,7 @@ class MergeTfIfOpsPass
   }
 
   void MergeIfOpsWithSameArgs(mlir::OpBuilder &builder, mlir::Location loc,
-                              absl::string_view branch_prefix,
+                              abslx::string_view branch_prefix,
                               llvm::MutableArrayRef<mlir::TF::IfOp> if_ops) {
     assert(if_ops.size() > 1);
 
@@ -204,11 +204,11 @@ class MergeTfIfOpsPass
 
   llvm::StringRef CreateBranchFunction(
       mlir::OpBuilder &builder, mlir::Location loc,
-      absl::string_view branch_prefix, absl::string_view branch_suffix,
+      abslx::string_view branch_prefix, abslx::string_view branch_suffix,
       mlir::FunctionType branch_function_type,
       llvm::ArrayRef<mlir::TF::IfOp> if_ops,
       llvm::function_ref<mlir::FlatSymbolRefAttr(mlir::TF::IfOp)> get_branch) {
-    std::string branch_name = absl::StrCat(branch_prefix, branch_suffix);
+    std::string branch_name = abslx::StrCat(branch_prefix, branch_suffix);
     auto branch = builder.create<mlir::func::FuncOp>(loc, branch_name,
                                                      branch_function_type);
     branch.setVisibility(mlir::func::FuncOp::Visibility::Private);

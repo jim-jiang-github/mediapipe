@@ -85,7 +85,7 @@ class GpuTransferManager : public GenericTransferManager {
   static constexpr int64_t kPinnedChunkBytes = 128 * 1024;
   static constexpr int64_t kPinnedBufferBytes = 128;
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
 
   // The StreamExecutor on which our pinned memory was allocated.  We use this
   // when freeing the pinned memory.  Lazily initialized.

@@ -135,7 +135,7 @@ class TraceMeRecorder {
   // tracing is active. If the thread is destroyed during tracing, the
   // ThreadLocalRecorder is marked inactive but remains alive until tracing
   // stops so the events can be retrieved.
-  absl::flat_hash_map<uint32, std::shared_ptr<ThreadLocalRecorder>> threads_
+  abslx::flat_hash_map<uint32, std::shared_ptr<ThreadLocalRecorder>> threads_
       TF_GUARDED_BY(mutex_);
 };
 

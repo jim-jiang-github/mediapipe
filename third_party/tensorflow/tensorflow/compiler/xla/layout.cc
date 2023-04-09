@@ -40,11 +40,11 @@ std::string Tile::ToString() const {
       if (dim == kCombineDimension) {
         elements.push_back("*");
       } else {
-        elements.push_back(absl::StrCat("Invalid value ", dim));
+        elements.push_back(abslx::StrCat("Invalid value ", dim));
       }
     }
   }
-  return absl::StrCat("(", absl::StrJoin(elements, ","), ")");
+  return abslx::StrCat("(", abslx::StrJoin(elements, ","), ")");
 }
 
 /* static */ Layout Layout::CreateFromProto(const LayoutProto& proto) {
@@ -81,15 +81,15 @@ std::string Layout::ToString() const {
   if (format() == DENSE) {
     std::string colon_string = tiles().empty() ? "" : "T";
     for (const Tile& tile : tiles()) {
-      absl::StrAppend(&colon_string, tile.ToString());
+      abslx::StrAppend(&colon_string, tile.ToString());
     }
     if (element_size_in_bits() != 0) {
-      absl::StrAppend(&colon_string, "E(", element_size_in_bits(), ")");
+      abslx::StrAppend(&colon_string, "E(", element_size_in_bits(), ")");
     }
     if (memory_space() != 0) {
-      absl::StrAppend(&colon_string, "S(", memory_space(), ")");
+      abslx::StrAppend(&colon_string, "S(", memory_space(), ")");
     }
-    return absl::StrCat("{", absl::StrJoin(minor_to_major(), ","),
+    return abslx::StrCat("{", abslx::StrJoin(minor_to_major(), ","),
                         colon_string.empty() ? "" : ":", colon_string, "}");
   } else {
     CHECK_EQ(format(), INVALID_FORMAT);

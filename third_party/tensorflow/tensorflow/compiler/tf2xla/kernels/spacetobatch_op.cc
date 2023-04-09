@@ -24,10 +24,10 @@ namespace {
 
 void SpaceToBatch(XlaOpKernelContext* ctx, const xla::XlaOp& input,
                   DataType input_dtype, const TensorShape& input_tensor_shape,
-                  absl::Span<const int64_t> block_shape,
+                  abslx::Span<const int64_t> block_shape,
                   const xla::Literal& paddings) {
   const int input_rank = input_tensor_shape.dims();
-  const absl::InlinedVector<int64_t, 4> input_shape =
+  const abslx::InlinedVector<int64_t, 4> input_shape =
       input_tensor_shape.dim_sizes();
   const int block_rank = block_shape.size();
 
@@ -35,7 +35,7 @@ void SpaceToBatch(XlaOpKernelContext* ctx, const xla::XlaOp& input,
       ctx, input_rank >= 1 + block_rank,
       errors::InvalidArgument("input rank should be >= ", 1 + block_rank,
                               " instead of ", input_rank));
-  absl::Span<const int64_t> remainder_shape(input_shape);
+  abslx::Span<const int64_t> remainder_shape(input_shape);
   remainder_shape.remove_prefix(1 + block_rank);
 
   OP_REQUIRES(

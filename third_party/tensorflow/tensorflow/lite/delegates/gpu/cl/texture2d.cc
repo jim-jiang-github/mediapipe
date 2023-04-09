@@ -23,7 +23,7 @@ namespace cl {
 namespace {
 
 // Creates new 4-channel 2D texture with cl_channel_type elements
-absl::Status CreateTexture2D(int width, int height, DataType type, void* data,
+abslx::Status CreateTexture2D(int width, int height, DataType type, void* data,
                              CLContext* context, Texture2D* result) {
   cl_mem texture;
   cl_channel_type channel_type = DataTypeToChannelType(type);
@@ -31,7 +31,7 @@ absl::Status CreateTexture2D(int width, int height, DataType type, void* data,
                                     channel_type, data, &texture));
   *result = Texture2D(texture, width, height, channel_type);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 }  // namespace
 
@@ -69,19 +69,19 @@ void Texture2D::Release() {
   }
 }
 
-absl::Status Texture2D::GetGPUResources(
+abslx::Status Texture2D::GetGPUResources(
     const GPUObjectDescriptor* obj_ptr,
     GPUResourcesWithValue* resources) const {
   const auto* texture_desc = dynamic_cast<const Texture2DDescriptor*>(obj_ptr);
   if (!texture_desc) {
-    return absl::InvalidArgumentError("Expected Texture2DDescriptor on input.");
+    return abslx::InvalidArgumentError("Expected Texture2DDescriptor on input.");
   }
 
   resources->images2d.push_back({"tex2d", texture_});
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Texture2D::CreateFromTexture2DDescriptor(
+abslx::Status Texture2D::CreateFromTexture2DDescriptor(
     const Texture2DDescriptor& desc, CLContext* context) {
   width_ = desc.size.x;
   height_ = desc.size.y;
@@ -94,25 +94,25 @@ absl::Status Texture2D::CreateFromTexture2DDescriptor(
 }
 
 // Creates new 4-channel 2D texture with f32 elements
-absl::Status CreateTexture2DRGBA32F(int width, int height, CLContext* context,
+abslx::Status CreateTexture2DRGBA32F(int width, int height, CLContext* context,
                                     Texture2D* result) {
   return CreateTexture2D(width, height, DataType::FLOAT32, nullptr, context,
                          result);
 }
 
 // Creates new 4-channel 2D texture with f16 elements
-absl::Status CreateTexture2DRGBA16F(int width, int height, CLContext* context,
+abslx::Status CreateTexture2DRGBA16F(int width, int height, CLContext* context,
                                     Texture2D* result) {
   return CreateTexture2D(width, height, DataType::FLOAT16, nullptr, context,
                          result);
 }
 
-absl::Status CreateTexture2DRGBA(DataType type, int width, int height,
+abslx::Status CreateTexture2DRGBA(DataType type, int width, int height,
                                  CLContext* context, Texture2D* result) {
   return CreateTexture2D(width, height, type, nullptr, context, result);
 }
 
-absl::Status CreateTexture2DRGBA(DataType type, int width, int height,
+abslx::Status CreateTexture2DRGBA(DataType type, int width, int height,
                                  void* data, CLContext* context,
                                  Texture2D* result) {
   return CreateTexture2D(width, height, type, data, context, result);

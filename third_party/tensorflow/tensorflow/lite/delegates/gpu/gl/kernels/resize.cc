@@ -36,21 +36,21 @@ namespace {
 
 class Resize : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     const auto& attr = std::any_cast<const Resize2DAttributes&>(ctx.op_attr);
 
     if (ctx.input_shapes[0][2] > ctx.output_shapes[0][2] ||
         ctx.input_shapes[0][1] > ctx.output_shapes[0][1]) {
-      return absl::InvalidArgumentError("Output size is less than input size.");
+      return abslx::InvalidArgumentError("Output size is less than input size.");
     }
     if (ctx.output_shapes[0][2] != attr.new_shape.w ||
         ctx.output_shapes[0][1] != attr.new_shape.h) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Output size does not match new_size in attributes.");
     }
     if (ctx.input_shapes[0][3] != ctx.output_shapes[0][3]) {
-      return absl::InvalidArgumentError("Input/output channels mismatch.");
+      return abslx::InvalidArgumentError("Input/output channels mismatch.");
     }
     if (ctx.input_shapes[0][1] == 1 && ctx.input_shapes[0][2] == 1) {
       // Copy a single element from input.
@@ -64,7 +64,7 @@ class Resize : public NodeShader {
           /*input=*/IOStructure::ONLY_DEFINITIONS,
           /*output=*/IOStructure::AUTO,
       };
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     std::vector<Variable> parameters = {
         {"input_data_0_h", static_cast<int>(ctx.input_shapes[0][1])},
@@ -124,7 +124,7 @@ class Resize : public NodeShader {
       value_0 = $input_data_0[coord.x, coord.y, gid.z]$;
       )";
     } else {
-      return absl::InvalidArgumentError("Unknown sampling type");
+      return abslx::InvalidArgumentError("Unknown sampling type");
     }
     *generated_code = {
         /*parameters=*/std::move(parameters),
@@ -136,7 +136,7 @@ class Resize : public NodeShader {
         /*input=*/IOStructure::ONLY_DEFINITIONS,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

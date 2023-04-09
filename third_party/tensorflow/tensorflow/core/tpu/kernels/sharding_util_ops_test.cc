@@ -45,7 +45,7 @@ namespace {
 
 MATCHER_P2(IsStatus, error_code, error_message, "") {
   return arg.code() == error_code &&
-         absl::StrContains(arg.error_message(), error_message);
+         abslx::StrContains(arg.error_message(), error_message);
 }
 
 Status RunGraph(const Graph& graph,
@@ -130,8 +130,8 @@ TEST(ReadVariableXlaSplitNDOpTest, DTypeInvalid) {
 }
 
 Status CreateSplitTensorGraph(const TensorShape& input_shape,
-                              absl::Span<const int32> num_splits,
-                              absl::Span<const int32> paddings,
+                              abslx::Span<const int32> num_splits,
+                              abslx::Span<const int32> paddings,
                               const int num_outputs, Graph* graph,
                               std::vector<std::string>* output_tensor_names) {
   DataType data_type = DataTypeToEnum<int32>::value;
@@ -150,15 +150,15 @@ Status CreateSplitTensorGraph(const TensorShape& input_shape,
 
   output_tensor_names->reserve(num_outputs);
   for (int i = 0; i < num_outputs; ++i) {
-    output_tensor_names->push_back(absl::StrCat(xla_op->name(), ":", i));
+    output_tensor_names->push_back(abslx::StrCat(xla_op->name(), ":", i));
   }
 
   return OkStatus();
 }
 
 Status CreateSplitResourceGraph(const TensorShape& input_shape,
-                                absl::Span<const int32> num_splits,
-                                absl::Span<const int32> paddings,
+                                abslx::Span<const int32> num_splits,
+                                abslx::Span<const int32> paddings,
                                 const int num_outputs, Graph* graph,
                                 std::vector<std::string>* output_tensor_names) {
   Node* var_handle = nullptr;
@@ -193,7 +193,7 @@ Status CreateSplitResourceGraph(const TensorShape& input_shape,
 
   output_tensor_names->reserve(num_outputs);
   for (int i = 0; i < num_outputs; ++i) {
-    output_tensor_names->push_back(absl::StrCat(xla_op->name(), ":", i));
+    output_tensor_names->push_back(abslx::StrCat(xla_op->name(), ":", i));
   }
 
   return OkStatus();
@@ -201,8 +201,8 @@ Status CreateSplitResourceGraph(const TensorShape& input_shape,
 
 struct XlaSplitNDTestParam {
   std::string name;
-  std::function<Status(const TensorShape&, absl::Span<const int32>,
-                       absl::Span<const int32>, const int num_outputs, Graph*,
+  std::function<Status(const TensorShape&, abslx::Span<const int32>,
+                       abslx::Span<const int32>, const int num_outputs, Graph*,
                        std::vector<std::string>*)>
       graph_creator;
 };
@@ -524,8 +524,8 @@ INSTANTIATE_TEST_SUITE_P(
 struct RankedXlaSplitNDTestParam {
   std::string name;
   int rank = 0;
-  std::function<Status(const TensorShape&, absl::Span<const int32>,
-                       absl::Span<const int32>, const int num_outputs, Graph*,
+  std::function<Status(const TensorShape&, abslx::Span<const int32>,
+                       abslx::Span<const int32>, const int num_outputs, Graph*,
                        std::vector<std::string>*)>
       graph_creator;
 };
@@ -780,16 +780,16 @@ TEST(AssignVariableXlaConcatNDOpTest, AssignDifferentShape) {
 
   std::vector<Tensor> output_tensors;
   TF_ASSERT_OK(RunGraph(
-      graph, /*output_tensor_names=*/{absl::StrCat(read_var->name(), ":", 0)},
+      graph, /*output_tensor_names=*/{abslx::StrCat(read_var->name(), ":", 0)},
       /*target_tensor_names=*/{}, &output_tensors));
   ASSERT_EQ(output_tensors.size(), 1);
   test::ExpectTensorNear<float>(output_tensors[0], update_input_tensor,
                                 /*atol=*/1e-6);
 }
 
-Status CreateConcatTensorGraph(absl::Span<const TensorShape> input_shapes,
-                               absl::Span<const int32> num_concats,
-                               absl::Span<const int32> paddings, Graph* graph,
+Status CreateConcatTensorGraph(abslx::Span<const TensorShape> input_shapes,
+                               abslx::Span<const int32> num_concats,
+                               abslx::Span<const int32> paddings, Graph* graph,
                                std::vector<std::string>* output_tensor_names) {
   int32_t val = 0;
   DataType data_type = DataTypeToEnum<int32>::value;
@@ -811,15 +811,15 @@ Status CreateConcatTensorGraph(absl::Span<const TensorShape> input_shapes,
                          .Attr("N", static_cast<int64_t>(input_shapes.size()))
                          .Finalize(graph, &xla_op));
 
-  output_tensor_names->push_back(absl::StrCat(xla_op->name(), ":", 0));
+  output_tensor_names->push_back(abslx::StrCat(xla_op->name(), ":", 0));
 
   return OkStatus();
 }
 
 template <bool Init>
 Status CreateConcatResourceGraph(
-    absl::Span<const TensorShape> input_shapes,
-    absl::Span<const int32> num_concats, absl::Span<const int32> paddings,
+    abslx::Span<const TensorShape> input_shapes,
+    abslx::Span<const int32> num_concats, abslx::Span<const int32> paddings,
     Graph* graph, std::vector<std::string>* output_tensor_names) {
   Node* var_handle = nullptr;
   DataType data_type = DataTypeToEnum<int32>::value;
@@ -872,15 +872,15 @@ Status CreateConcatResourceGraph(
                          .Attr("dtype", data_type)
                          .Finalize(graph, &read_var));
 
-  output_tensor_names->push_back(absl::StrCat(read_var->name(), ":", 0));
+  output_tensor_names->push_back(abslx::StrCat(read_var->name(), ":", 0));
 
   return OkStatus();
 }
 
 struct XlaConcatNDTestParam {
   std::string name;
-  std::function<Status(absl::Span<const TensorShape>, absl::Span<const int32>,
-                       absl::Span<const int32>, Graph*,
+  std::function<Status(abslx::Span<const TensorShape>, abslx::Span<const int32>,
+                       abslx::Span<const int32>, Graph*,
                        std::vector<std::string>*)>
       graph_creator;
 };
@@ -1149,8 +1149,8 @@ INSTANTIATE_TEST_SUITE_P(
 struct RankedXlaConcatNDTestParam {
   std::string name;
   int rank = 0;
-  std::function<Status(absl::Span<const TensorShape>, absl::Span<const int32>,
-                       absl::Span<const int32>, Graph*,
+  std::function<Status(abslx::Span<const TensorShape>, abslx::Span<const int32>,
+                       abslx::Span<const int32>, Graph*,
                        std::vector<std::string>*)>
       graph_creator;
 };
@@ -1215,8 +1215,8 @@ INSTANTIATE_TEST_SUITE_P(
            info) { return info.param.name; });
 
 Status CreateRoundtripTensorGraph(
-    const TensorShape& input_shape, absl::Span<const int32> num_partitions,
-    absl::Span<const int32> paddings, Graph* graph,
+    const TensorShape& input_shape, abslx::Span<const int32> num_partitions,
+    abslx::Span<const int32> paddings, Graph* graph,
     std::vector<std::string>* output_tensor_names) {
   const int32_t num_partitions_size =
       std::accumulate(num_partitions.begin(), num_partitions.end(), 1,
@@ -1258,14 +1258,14 @@ Status CreateRoundtripTensorGraph(
                          .Attr("T", data_type)
                          .Finalize(graph, &equal));
 
-  output_tensor_names->push_back(absl::StrCat(equal->name(), ":", 0));
+  output_tensor_names->push_back(abslx::StrCat(equal->name(), ":", 0));
 
   return OkStatus();
 }
 
 Status CreateRoundtripResourceGraph(
-    const TensorShape& input_shape, absl::Span<const int32> num_partitions,
-    absl::Span<const int32> paddings, Graph* graph,
+    const TensorShape& input_shape, abslx::Span<const int32> num_partitions,
+    abslx::Span<const int32> paddings, Graph* graph,
     std::vector<std::string>* output_tensor_names) {
   const int32_t num_partitions_size =
       std::accumulate(num_partitions.begin(), num_partitions.end(), 1,
@@ -1332,7 +1332,7 @@ Status CreateRoundtripResourceGraph(
                          .Attr("T", data_type)
                          .Finalize(graph, &equal));
 
-  output_tensor_names->push_back(absl::StrCat(equal->name(), ":", 0));
+  output_tensor_names->push_back(abslx::StrCat(equal->name(), ":", 0));
 
   return OkStatus();
 }
@@ -1340,8 +1340,8 @@ Status CreateRoundtripResourceGraph(
 struct RoundtripXlaSplitConcatNDTestParam {
   std::string name;
   int rank = 0;
-  std::function<Status(const TensorShape&, absl::Span<const int32>,
-                       absl::Span<const int32>, Graph*,
+  std::function<Status(const TensorShape&, abslx::Span<const int32>,
+                       abslx::Span<const int32>, Graph*,
                        std::vector<std::string>*)>
       graph_creator;
 };

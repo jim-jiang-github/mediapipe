@@ -61,7 +61,7 @@ struct CreateGpuModelInfo {
   // WARNING: This is an experimental API and subject to change.
   // IMPORTANT: tensors ids from predefined / external_immutable_tensors /
   // external_mutable_tensors should not intersect.
-  absl::flat_hash_map<ValueId, TensorDescriptor> predefined;
+  abslx::flat_hash_map<ValueId, TensorDescriptor> predefined;
 
   // User can provide immutable external tensors for inference context.
   // Some restrictions apply:
@@ -76,7 +76,7 @@ struct CreateGpuModelInfo {
   // WARNING: This is an experimental API and subject to change.
   // IMPORTANT: tensors ids from predefined / external_immutable_tensors /
   // external_mutable_tensors should not intersect.
-  absl::flat_hash_map<ValueId, GpuSpatialTensor*> external_immutable_tensors;
+  abslx::flat_hash_map<ValueId, GpuSpatialTensor*> external_immutable_tensors;
 
   // User can provide mutable external tensors for inference context.
   // HINT: Highly recommended to use other options if possible, this options
@@ -92,7 +92,7 @@ struct CreateGpuModelInfo {
   // WARNING: This is an experimental API and subject to change.
   // IMPORTANT: tensors ids from predefined / external_immutable_tensors /
   // external_mutable_tensors should not intersect.
-  absl::flat_hash_map<ValueId, TensorDescriptor> external_mutable_tensors;
+  abslx::flat_hash_map<ValueId, TensorDescriptor> external_mutable_tensors;
 };
 
 struct GpuModel {
@@ -100,22 +100,22 @@ struct GpuModel {
   std::vector<std::pair<ValueId, ValueId>> variable_ids_and_refs;
   std::vector<std::pair<ValueId, ValueId>> output_ids_and_refs;
   std::vector<GpuNode> nodes;
-  absl::flat_hash_map<ValueId, TensorDescriptor> tensors;
-  absl::flat_hash_map<ValueId, TensorDescriptor> const_tensors;
+  abslx::flat_hash_map<ValueId, TensorDescriptor> tensors;
+  abslx::flat_hash_map<ValueId, TensorDescriptor> const_tensors;
 };
 
-absl::Status GraphToGpuModel(const GraphFloat32& graph,
+abslx::Status GraphToGpuModel(const GraphFloat32& graph,
                              const CreateGpuModelInfo& create_info,
                              const GpuInfo& gpu_info, GpuModel* gpu_model);
 
 flatbuffers::Offset<data::GpuModel> Encode(
     const GpuModel& gpu_model, flatbuffers::FlatBufferBuilder* builder);
 
-absl::Status Decode(const data::GpuModel* fb_gpu_model, GpuModel* gpu_model);
+abslx::Status Decode(const data::GpuModel* fb_gpu_model, GpuModel* gpu_model);
 
 // This transformations MUST be applied to graph for correct work of GpuModel
 // that will be created from graph
-absl::Status RunGraphTransformsForGpuModel(GraphFloat32* graph);
+abslx::Status RunGraphTransformsForGpuModel(GraphFloat32* graph);
 
 }  // namespace gpu
 }  // namespace tflite

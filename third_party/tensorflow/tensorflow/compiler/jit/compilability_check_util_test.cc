@@ -34,7 +34,7 @@ limitations under the License.
 namespace tensorflow {
 namespace {
 
-AttrValue FuncListAttr(const absl::Span<const char* const> names) {
+AttrValue FuncListAttr(const abslx::Span<const char* const> names) {
   AttrValue attr;
   for (const char* name : names) {
     attr.mutable_list()->add_func()->set_name(name);
@@ -141,7 +141,7 @@ TEST_F(CompilabilityCheckUtilTest, CheckNonFunctionalNodes) {
   const auto& uncompilable_nodes_inside_function = node_info_it->second.second;
   ASSERT_EQ(1, uncompilable_nodes_inside_function.size());
   const auto& uncompilable_node_info = uncompilable_nodes_inside_function.at(0);
-  EXPECT_TRUE(absl::StrContains(uncompilable_node_info.uncompilable_reason,
+  EXPECT_TRUE(abslx::StrContains(uncompilable_node_info.uncompilable_reason,
                                 "unsupported op"));
   ASSERT_EQ(1, uncompilable_node_info.stack_trace.size());
   ASSERT_EQ("", uncompilable_node_info.stack_trace.at(0).function_name);
@@ -214,7 +214,7 @@ TEST_F(CompilabilityCheckUtilTest, CheckSimpleFunctionNode) {
   EXPECT_EQ(kUncompilableFunctionNodeName, node_stack.at(1).name);
   EXPECT_EQ(kUncompilableFunctionNodeName, node_info.name);
   EXPECT_TRUE(
-      absl::StrContains(node_info.uncompilable_reason, "unsupported op"));
+      abslx::StrContains(node_info.uncompilable_reason, "unsupported op"));
 }
 
 TEST_F(CompilabilityCheckUtilTest, CheckFunctionalWhileNode) {
@@ -294,7 +294,7 @@ TEST_F(CompilabilityCheckUtilTest, CheckFunctionalWhileNode) {
 
   EXPECT_EQ(kUncompilableFunctionNodeName, node_info.name);
   EXPECT_TRUE(
-      absl::StrContains(node_info.uncompilable_reason, "unsupported op"));
+      abslx::StrContains(node_info.uncompilable_reason, "unsupported op"));
 }
 
 TEST_F(CompilabilityCheckUtilTest, CheckFunctionalIfNode) {
@@ -370,7 +370,7 @@ TEST_F(CompilabilityCheckUtilTest, CheckFunctionalIfNode) {
             stacktrace_second_node_info.function_name);
 
   EXPECT_EQ(kUncompilableFunctionNodeName, uncompilable_node_one.name);
-  EXPECT_TRUE(absl::StrContains(uncompilable_node_one.uncompilable_reason,
+  EXPECT_TRUE(abslx::StrContains(uncompilable_node_one.uncompilable_reason,
                                 "unsupported op"));
 
   NameAttrList function_two;
@@ -394,7 +394,7 @@ TEST_F(CompilabilityCheckUtilTest, CheckFunctionalIfNode) {
             node_two_stacktrace_second_node.function_name);
 
   EXPECT_EQ(kUncompilableFunctionNodeTwoName, uncompilable_node_two.name);
-  EXPECT_TRUE(absl::StrContains(uncompilable_node_one.uncompilable_reason,
+  EXPECT_TRUE(abslx::StrContains(uncompilable_node_one.uncompilable_reason,
                                 "unsupported op"));
 }
 

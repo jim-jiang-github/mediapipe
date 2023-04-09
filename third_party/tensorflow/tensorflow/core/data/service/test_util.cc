@@ -55,8 +55,8 @@ constexpr const char kTestdataDir[] =
 constexpr const char kInterleaveTextlineDatasetFile[] =
     "interleave_textline_dataset.pbtxt";
 
-NodeDef GetMapNode(absl::string_view name, absl::string_view input_node_name,
-                   absl::string_view function_name) {
+NodeDef GetMapNode(abslx::string_view name, abslx::string_view input_node_name,
+                   abslx::string_view function_name) {
   return NDef(
       name, /*op=*/"MapDataset", {std::string(input_node_name)},
       {{"f", FunctionDefHelper::FunctionRef(std::string(function_name))},

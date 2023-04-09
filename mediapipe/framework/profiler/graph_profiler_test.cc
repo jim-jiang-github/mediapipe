@@ -96,27 +96,27 @@ class GraphProfilerTestPeer : public testing::Test {
   void SetUp() override { packet_type_.SetAny(); }
 
   bool GetIsInitialized() {
-    absl::ReaderMutexLock lock(&profiler_.profiler_mutex_);
+    abslx::ReaderMutexLock lock(&profiler_.profiler_mutex_);
     return profiler_.is_initialized_;
   }
 
   bool GetIsProfiling() {
-    absl::ReaderMutexLock lock(&profiler_.profiler_mutex_);
+    abslx::ReaderMutexLock lock(&profiler_.profiler_mutex_);
     return profiler_.is_profiling_;
   }
 
   bool GetIsProfilingStreamLatency() {
-    absl::ReaderMutexLock lock(&profiler_.profiler_mutex_);
+    abslx::ReaderMutexLock lock(&profiler_.profiler_mutex_);
     return profiler_.profiler_config_.enable_stream_latency();
   }
 
   bool GetTraceLogDisabled() {
-    absl::ReaderMutexLock lock(&profiler_.profiler_mutex_);
+    abslx::ReaderMutexLock lock(&profiler_.profiler_mutex_);
     return profiler_.profiler_config_.trace_log_disabled();
   }
 
   bool GetUsePacketTimeStampForAddedPacket() {
-    absl::ReaderMutexLock lock(&profiler_.profiler_mutex_);
+    abslx::ReaderMutexLock lock(&profiler_.profiler_mutex_);
     return profiler_.profiler_config_.use_packet_timestamp_for_added_packet();
   }
 
@@ -456,7 +456,7 @@ TEST_F(GraphProfilerTestPeer, InitializeMultipleProfilers) {
       input_stream: "input_stream"
     })";
   const int n_iterations = 100;
-  absl::flat_hash_set<int> seen_ids;
+  abslx::flat_hash_set<int> seen_ids;
   for (int i = 0; i < n_iterations; ++i) {
     std::shared_ptr<ProfilingContext> profiler =
         std::make_shared<ProfilingContext>();
@@ -495,7 +495,7 @@ TEST_F(GraphProfilerTestPeer, PauseResumeReset) {
   {
     GraphProfiler::Scope profiler_scope(GraphTrace::PROCESS, context.get(),
                                         &profiler_);
-    simulation_clock->Sleep(absl::Microseconds(10));
+    simulation_clock->Sleep(abslx::Microseconds(10));
   }
   ASSERT_THAT(Profiles()[0].process_runtime(),
               Partially(EqualsProto(CreateTimeHistogram(/*total=*/10, {1}))));
@@ -505,7 +505,7 @@ TEST_F(GraphProfilerTestPeer, PauseResumeReset) {
   {
     GraphProfiler::Scope profiler_scope(GraphTrace::PROCESS, context.get(),
                                         &profiler_);
-    simulation_clock->Sleep(absl::Microseconds(100));
+    simulation_clock->Sleep(abslx::Microseconds(100));
   }
   ASSERT_THAT(Profiles()[0].process_runtime(),
               Partially(EqualsProto(CreateTimeHistogram(/*total=*/10, {1}))));
@@ -515,7 +515,7 @@ TEST_F(GraphProfilerTestPeer, PauseResumeReset) {
   {
     GraphProfiler::Scope profiler_scope(GraphTrace::PROCESS, context.get(),
                                         &profiler_);
-    simulation_clock->Sleep(absl::Microseconds(1000));
+    simulation_clock->Sleep(abslx::Microseconds(1000));
   }
   ASSERT_THAT(Profiles()[0].process_runtime(),
               Partially(EqualsProto(CreateTimeHistogram(/*total=*/1010, {2}))));
@@ -529,7 +529,7 @@ TEST_F(GraphProfilerTestPeer, PauseResumeReset) {
   {
     GraphProfiler::Scope profiler_scope(GraphTrace::PROCESS, context.get(),
                                         &profiler_);
-    simulation_clock->Sleep(absl::Microseconds(10000));
+    simulation_clock->Sleep(abslx::Microseconds(10000));
   }
   ASSERT_THAT(
       Profiles()[0].process_runtime(),
@@ -593,7 +593,7 @@ TEST_F(GraphProfilerTestPeer, AddPacketInfoUsingProfilerClock) {
   // Checks packets_info_ map before adding any packet.
   ASSERT_EQ(GetPacketsInfoMap()->size(), 0);
 
-  simulation_clock->Sleep(absl::Microseconds(200));
+  simulation_clock->Sleep(abslx::Microseconds(200));
   std::string input_stream_name = "input_stream";
   Packet packet = MakePacket<std::string>("hello").At(Timestamp(110));
   profiler_.LogEvent(TraceEvent(GraphTrace::PROCESS)
@@ -674,7 +674,7 @@ TEST_F(GraphProfilerTestPeer, SetOpenRuntime) {
   {
     GraphProfiler::Scope profiler_scope(GraphTrace::OPEN, context.get(),
                                         &profiler_);
-    simulation_clock->Sleep(absl::Microseconds(100));
+    simulation_clock->Sleep(abslx::Microseconds(100));
   }
 
   std::vector<CalculatorProfile> profiles = Profiles();
@@ -724,11 +724,11 @@ TEST_F(GraphProfilerTestPeer, SetOpenRuntimeWithStreamLatency) {
   source_context.AddOutputs(
       {{}, {MakePacket<std::string>("15").At(Timestamp(100))}});
 
-  simulation_clock->SleepUntil(absl::FromUnixMicros(1000));
+  simulation_clock->SleepUntil(abslx::FromUnixMicros(1000));
   {
     GraphProfiler::Scope profiler_scope(GraphTrace::OPEN, source_context.get(),
                                         &profiler_);
-    simulation_clock->Sleep(absl::Microseconds(150));
+    simulation_clock->Sleep(abslx::Microseconds(150));
   }
 
   std::vector<CalculatorProfile> profiles = Profiles();
@@ -794,7 +794,7 @@ TEST_F(GraphProfilerTestPeer, SetCloseRuntime) {
   {
     GraphProfiler::Scope profiler_scope(GraphTrace::CLOSE, context.get(),
                                         &profiler_);
-    simulation_clock->Sleep(absl::Microseconds(100));
+    simulation_clock->Sleep(abslx::Microseconds(100));
   }
 
   std::vector<CalculatorProfile> profiles = Profiles();
@@ -845,11 +845,11 @@ TEST_F(GraphProfilerTestPeer, SetCloseRuntimeWithStreamLatency) {
       {{MakePacket<std::string>("15").At(Timestamp::PostStream())}});
   CalculatorContextManager().PushInputTimestampToContext(
       source_context.get(), Timestamp::PostStream());
-  simulation_clock->SleepUntil(absl::FromUnixMicros(1000));
+  simulation_clock->SleepUntil(abslx::FromUnixMicros(1000));
   {
     GraphProfiler::Scope profiler_scope(GraphTrace::CLOSE, source_context.get(),
                                         &profiler_);
-    simulation_clock->Sleep(absl::Microseconds(100));
+    simulation_clock->Sleep(abslx::Microseconds(100));
   }
 
   std::vector<CalculatorProfile> profiles = Profiles();
@@ -1023,7 +1023,7 @@ TEST_F(GraphProfilerTestPeer, AddProcessSample) {
   {
     GraphProfiler::Scope profiler_scope(GraphTrace::PROCESS, context.get(),
                                         &profiler_);
-    simulation_clock->Sleep(absl::Microseconds(150));
+    simulation_clock->Sleep(abslx::Microseconds(150));
   }
 
   std::vector<CalculatorProfile> profiles = Profiles();
@@ -1076,11 +1076,11 @@ TEST_F(GraphProfilerTestPeer, AddProcessSampleWithStreamLatency) {
 
   int64 when_source_started = 1000;
   int64 when_source_finished = when_source_started + 150;
-  simulation_clock->SleepUntil(absl::FromUnixMicros(when_source_started));
+  simulation_clock->SleepUntil(abslx::FromUnixMicros(when_source_started));
   {
     GraphProfiler::Scope profiler_scope(GraphTrace::PROCESS,
                                         source_context.get(), &profiler_);
-    simulation_clock->Sleep(absl::Microseconds(150));
+    simulation_clock->Sleep(abslx::Microseconds(150));
   }
   std::vector<CalculatorProfile> profiles = Profiles();
 
@@ -1124,11 +1124,11 @@ TEST_F(GraphProfilerTestPeer, AddProcessSampleWithStreamLatency) {
   consumer_context.AddInputs(
       {Packet(), MakePacket<std::string>("15").At(Timestamp(100))});
 
-  simulation_clock->SleepUntil(absl::FromUnixMicros(2000));
+  simulation_clock->SleepUntil(abslx::FromUnixMicros(2000));
   {
     GraphProfiler::Scope profiler_scope(GraphTrace::PROCESS,
                                         consumer_context.get(), &profiler_);
-    simulation_clock->Sleep(absl::Microseconds(250));
+    simulation_clock->Sleep(abslx::Microseconds(250));
   }
 
   profiles = Profiles();
@@ -1194,14 +1194,14 @@ TEST(GraphProfilerTest, ParallelReads) {
                                                        &config));
 
   // Start running the graph on its own threads.
-  absl::Mutex out_1_mutex;
+  abslx::Mutex out_1_mutex;
   std::vector<Packet> out_1_packets;
   CalculatorGraph graph;
   MP_ASSERT_OK(graph.Initialize(config));
   MP_ASSERT_OK(graph.ObserveOutputStream("out_1", [&](const Packet& packet) {
-    absl::MutexLock lock(&out_1_mutex);
+    abslx::MutexLock lock(&out_1_mutex);
     out_1_packets.push_back(packet);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_EXPECT_OK(graph.StartRun(
       {{"range_step", MakePacket<std::pair<uint32, uint32>>(1000, 1)}}));
@@ -1211,7 +1211,7 @@ TEST(GraphProfilerTest, ParallelReads) {
     std::vector<CalculatorProfile> profiles;
     MP_ASSERT_OK(graph.profiler()->GetCalculatorProfiles(&profiles));
     EXPECT_EQ(2, profiles.size());
-    absl::MutexLock lock(&out_1_mutex);
+    abslx::MutexLock lock(&out_1_mutex);
     if (out_1_packets.size() >= 1001) {
       break;
     }

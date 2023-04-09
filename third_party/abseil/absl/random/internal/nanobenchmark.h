@@ -52,7 +52,7 @@
 
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal_nanobenchmark {
 
@@ -167,6 +167,6 @@ static inline size_t MeasureClosure(const Closure& closure,
 
 }  // namespace random_internal_nanobenchmark
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_INTERNAL_NANOBENCHMARK_H_

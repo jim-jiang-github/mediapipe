@@ -156,8 +156,8 @@ std::optional<int64_t> TopkRewriter::SortIsInTopK(HloInstruction* inst) {
       supported = false;
       break;
     }
-    if (absl::c_any_of(slice->slice_starts(), [](int x) { return x != 0; }) ||
-        absl::c_any_of(slice->slice_strides(), [](int x) { return x != 1; })) {
+    if (abslx::c_any_of(slice->slice_starts(), [](int x) { return x != 0; }) ||
+        abslx::c_any_of(slice->slice_strides(), [](int x) { return x != 1; })) {
       // Strided slice or slicing at the beginning isn't supported.
       supported = false;
       break;
@@ -184,7 +184,7 @@ std::optional<int64_t> TopkRewriter::SortIsInTopK(HloInstruction* inst) {
 
 StatusOr<bool> TopkRewriter::TransformToCustomCall(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   for (HloComputation* comp : module->computations(execution_threads)) {
     for (HloInstruction* inst : comp->MakeInstructionPostOrder()) {
@@ -273,7 +273,7 @@ StatusOr<bool> TopkRewriter::TransformToCustomCall(
 
 StatusOr<bool> TopkRewriter::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   TF_ASSIGN_OR_RETURN(auto transform_to_customcall_changed,
                       TransformToCustomCall(module, execution_threads));

@@ -35,14 +35,14 @@ class LayoutUtil {
  public:
   // Creates a layout with the given minor-to-major dimension order. (This is a
   // convenience function for protobuf construction.)
-  static Layout MakeLayout(absl::Span<const int64_t> minor_to_major,
-                           absl::Span<const Tile> tiles = {},
+  static Layout MakeLayout(abslx::Span<const int64_t> minor_to_major,
+                           abslx::Span<const Tile> tiles = {},
                            int64_t element_size_in_bits = 0,
                            int64_t memory_space = 0);
 
   // Similar to MakeLayout, but take indices in reverse order.
   static Layout MakeLayoutFromMajorToMinor(
-      absl::Span<const int64_t> major_to_minor);
+      abslx::Span<const int64_t> major_to_minor);
 
   // Returns a layout with descending ((i.e. {n-1, n-2, ... 0}) minor-to-major
   // dimensions.
@@ -120,8 +120,8 @@ class LayoutUtil {
 
   // Returns the minor_to_major array for the given Shape.  Requires that the
   // shape is an array and has a dense layout.
-  static absl::Span<const int64_t> MinorToMajor(const Shape& shape);
-  static absl::Span<const int64_t> MinorToMajor(const Layout& layout);
+  static abslx::Span<const int64_t> MinorToMajor(const Shape& shape);
+  static abslx::Span<const int64_t> MinorToMajor(const Layout& layout);
 
   // Major(0) is the most major logical dimension number, Major(1) is the
   // second-most-major logical dimension number and so on.
@@ -178,7 +178,7 @@ class LayoutUtil {
   // Returns whether the given dimensions are consecutive in the given layout,
   // not necessarily in the order given.
   static bool AreDimensionsConsecutive(const Layout& layout,
-                                       absl::Span<const int64_t> dims);
+                                       abslx::Span<const int64_t> dims);
 
   // Constructs a new layout by making the given dimension `dim` in the given
   // layout `layout` as the most major dimension.
@@ -190,7 +190,7 @@ class LayoutUtil {
   // NOTE: this method only uses the top-level tile and disregards the sub-tile
   // in the layout. This method is also performance critical.
   static int64_t LinearIndex(const Shape& shape,
-                             absl::Span<const int64_t> indices);
+                             abslx::Span<const int64_t> indices);
 
  private:
   LayoutUtil(const LayoutUtil&) = delete;

@@ -71,14 +71,14 @@ class OrderedSet {
   bool Contains(T value) const { return value_to_index_.contains(value); }
   size_t Size() const { return value_sequence_.size(); }
 
-  absl::Span<T const> GetSequence() const { return value_sequence_; }
+  abslx::Span<T const> GetSequence() const { return value_sequence_; }
 
  private:
   // The stable order that we maintain through insertions and deletions.
   std::vector<T> value_sequence_;
 
   // Maps values to their indices in `value_sequence_`.
-  absl::flat_hash_map<T, int> value_to_index_;
+  abslx::flat_hash_map<T, int> value_to_index_;
 };
 }  // namespace tensorflow
 

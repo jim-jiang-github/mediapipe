@@ -47,7 +47,7 @@ Status PopulateInfeedLayoutVector(const xla::Shape& shape,
 // Populate the output layout unless the minor_to_major array contains all -1
 // value, in which case the layout is considered missing and the API returns
 // false.
-StatusOr<bool> MakeLayout(absl::Span<const int64_t> minor_to_major,
+StatusOr<bool> MakeLayout(abslx::Span<const int64_t> minor_to_major,
                           xla::Layout* layout) {
   if (std::all_of(minor_to_major.begin(), minor_to_major.end(),
                   [](int64_t dim) { return dim == -1; })) {
@@ -70,7 +70,7 @@ StatusOr<bool> MakeLayout(absl::Span<const int64_t> minor_to_major,
 }
 
 Status AssignLayout(
-    absl::Span<const int64_t> minor_to_major,
+    abslx::Span<const int64_t> minor_to_major,
     const std::function<xla::Layout(const xla::Shape&)>& layout_func,
     xla::Shape* shape) {
   xla::Layout layout;
@@ -170,7 +170,7 @@ StatusOr<std::vector<int>> GetShapeLayoutVector(const xla::Shape& shape) {
 }
 
 Status GetShapeWithLayout(
-    const xla::Shape& input_shape, absl::Span<const int64_t> minor_to_major,
+    const xla::Shape& input_shape, abslx::Span<const int64_t> minor_to_major,
     const std::function<xla::Layout(const xla::Shape&)>& layout_func,
     xla::Shape* output_shape) {
   if (input_shape.IsTuple()) {
@@ -194,7 +194,7 @@ Status GetShapeWithLayout(
       }
       shapes.push_back(shape);
       TF_RETURN_IF_ERROR(AssignLayout(
-          absl::Span<const int64_t>(minor_to_major).subspan(position, rank),
+          abslx::Span<const int64_t>(minor_to_major).subspan(position, rank),
           layout_func, &shapes.back()));
       position += rank;
 

@@ -37,7 +37,7 @@ class TensorToVectorFloatCalculatorTest : public ::testing::Test {
         TensorToVectorFloatCalculatorOptions::ext);
     options->set_tensor_is_2d(tensor_is_2d);
     options->set_flatten_nd(flatten_nd);
-    runner_ = absl::make_unique<CalculatorRunner>(config);
+    runner_ = abslx::make_unique<CalculatorRunner>(config);
   }
 
   std::unique_ptr<CalculatorRunner> runner_;
@@ -46,7 +46,7 @@ class TensorToVectorFloatCalculatorTest : public ::testing::Test {
 TEST_F(TensorToVectorFloatCalculatorTest, ConvertsToVectorFloat) {
   SetUpRunner(false, false);
   const tf::TensorShape tensor_shape(std::vector<tf::int64>{5});
-  auto tensor = absl::make_unique<tf::Tensor>(tf::DT_FLOAT, tensor_shape);
+  auto tensor = abslx::make_unique<tf::Tensor>(tf::DT_FLOAT, tensor_shape);
   auto tensor_vec = tensor->vec<float>();
   for (int i = 0; i < 5; ++i) {
     // 2^i can be represented exactly in floating point numbers if 'i' is small.
@@ -75,7 +75,7 @@ TEST_F(TensorToVectorFloatCalculatorTest, ConvertsToVectorFloat) {
 TEST_F(TensorToVectorFloatCalculatorTest, ConvertsBatchedToVectorVectorFloat) {
   SetUpRunner(true, false);
   const tf::TensorShape tensor_shape(std::vector<tf::int64>{1, 5});
-  auto tensor = absl::make_unique<tf::Tensor>(tf::DT_FLOAT, tensor_shape);
+  auto tensor = abslx::make_unique<tf::Tensor>(tf::DT_FLOAT, tensor_shape);
   auto slice = tensor->Slice(0, 1).flat<float>();
   for (int i = 0; i < 5; ++i) {
     // 2^i can be represented exactly in floating point numbers if 'i' is small.
@@ -105,7 +105,7 @@ TEST_F(TensorToVectorFloatCalculatorTest, ConvertsBatchedToVectorVectorFloat) {
 TEST_F(TensorToVectorFloatCalculatorTest, FlattenShouldTakeAllDimensions) {
   SetUpRunner(false, true);
   const tf::TensorShape tensor_shape(std::vector<tf::int64>{2, 2, 2});
-  auto tensor = absl::make_unique<tf::Tensor>(tf::DT_FLOAT, tensor_shape);
+  auto tensor = abslx::make_unique<tf::Tensor>(tf::DT_FLOAT, tensor_shape);
   auto slice = tensor->flat<float>();
   for (int i = 0; i < 2 * 2 * 2; ++i) {
     // 2^i can be represented exactly in floating point numbers if 'i' is small.

@@ -515,7 +515,7 @@ struct RegionFlowComputation::LongTrackData {
   // Clears buffered information for all features that are not present
   // anymore, i.e. not within the specified hash_set.
   void RemoveAbsentFeatureEntries(
-      const absl::node_hash_set<int>& present_features) {
+      const abslx::node_hash_set<int>& present_features) {
     auto entry = track_info.begin();
     while (entry != track_info.end()) {
       if (present_features.find(entry->first) == present_features.end()) {
@@ -559,7 +559,7 @@ struct RegionFlowComputation::LongTrackData {
     float motion_mag = 0;  // Smoothed average motion. -1 for unknown.
   };
 
-  absl::flat_hash_map<int, TrackInfo> track_info;
+  abslx::flat_hash_map<int, TrackInfo> track_info;
 };
 
 template <class T>
@@ -1274,7 +1274,7 @@ void RegionFlowComputation::ComputeRegionFlow(
     if (index1 + 1 == index2) {
       // Forward track, check if initial transform present.
       if (data2->initial_transform != nullptr) {
-        initial_transform = absl::make_unique<Homography>(
+        initial_transform = abslx::make_unique<Homography>(
             ModelInvert(*data2->initial_transform));
       }
     } else if (index1 - 1 == index2) {
@@ -1306,7 +1306,7 @@ void RegionFlowComputation::ComputeRegionFlow(
       track_features =
           options_.tracking_options().refine_wide_baseline_matches();
       if (track_features) {
-        initial_transform = absl::make_unique<Homography>(
+        initial_transform = abslx::make_unique<Homography>(
             HomographyAdapter::Embed(AffineModelFromFeatures(&feature_tracks)));
         feature_tracks.clear();
       } else {
@@ -2183,7 +2183,7 @@ void RegionFlowComputation::RemoveAbsentFeatures(
   CHECK(long_track_data_ != nullptr);
 
   // Build hash set of track ids.
-  absl::node_hash_set<int> track_ids;
+  abslx::node_hash_set<int> track_ids;
   for (const auto& feature : prev_result) {
     DCHECK_NE(feature.track_id, -1);
     track_ids.insert(feature.track_id);

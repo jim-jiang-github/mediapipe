@@ -43,7 +43,7 @@ constexpr char kInterpreter[] = "interpreter";
 namespace {
 
 std::string CanonicalPlatformName(const std::string& platform_name) {
-  std::string lowercase_platform_name = absl::AsciiStrToLower(platform_name);
+  std::string lowercase_platform_name = abslx::AsciiStrToLower(platform_name);
   // "cpu" and "host" mean the same thing.
   if (lowercase_platform_name == "cpu") {
     return "host";
@@ -92,8 +92,8 @@ PlatformUtil::GetSupportedPlatforms() {
     platform = platforms[0];
   } else if (platforms.size() == 2) {
     for (int i = 0; i < 2; i++) {
-      if (absl::AsciiStrToLower(platforms[i]->Name()) == kInterpreter &&
-          absl::AsciiStrToLower(platforms[1 - i]->Name()) != kInterpreter) {
+      if (abslx::AsciiStrToLower(platforms[i]->Name()) == kInterpreter &&
+          abslx::AsciiStrToLower(platforms[1 - i]->Name()) != kInterpreter) {
         platform = platforms[1 - i];
         break;
       }
@@ -104,7 +104,7 @@ PlatformUtil::GetSupportedPlatforms() {
   }
 
   // Multiple platforms present and we can't pick a reasonable default.
-  std::string platforms_string = absl::StrJoin(
+  std::string platforms_string = abslx::StrJoin(
       platforms, ", ",
       [](std::string* out, const se::Platform* p) { out->append(p->Name()); });
   return InvalidArgument(

@@ -39,12 +39,12 @@ Status MlirXlaOpKernel::ContextToXlaArgs(
     if (ctx_kind_i != XlaExpression::Kind::kXlaOp &&
         ctx_kind_i != XlaExpression::Kind::kConstant)
       return tensorflow::errors::InvalidArgument(
-          absl::StrCat("Input ", i, " to an MlirXlaOpKernel is invalid: ",
+          abslx::StrCat("Input ", i, " to an MlirXlaOpKernel is invalid: ",
                        ctx->InputExpression(i).HumanString()));
     XlaCompiler::Argument arg;
     arg.type = ctx->input_type(i);
     arg.shape = ctx->InputXlaShape(i).ValueOrDie();
-    arg.name = absl::StrCat("_arg", i);
+    arg.name = abslx::StrCat("_arg", i);
     if (registered_consts.count(i)) {
       arg.kind = XlaCompiler::Argument::kConstant;
       TF_ASSIGN_OR_RETURN(arg.constant_value, ctx->ConstantInputTensor(i));

@@ -85,7 +85,7 @@ static tensorflow::StatusOr<TaggedValue> ImportModule(String name,
   // Initialize concrete function traces.
   const RepeatedPtrField<FunctionDef> function_defs =
       tf_package->GetFunctionDefs();
-  absl::flat_hash_map<std::string, AbstractFunctionPtr> traces;
+  abslx::flat_hash_map<std::string, AbstractFunctionPtr> traces;
   for (auto& fdef : function_defs) {
     AbstractFunctionPtr trace(new GraphFunction(fdef), /*add_ref=*/false);
     traces[fdef.signature().name()] = trace;

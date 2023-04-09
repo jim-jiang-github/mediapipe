@@ -41,7 +41,7 @@ class DeviceProfilerSession {
     ProfileOptions options = ProfilerSession::DefaultOptions();
     options.set_host_tracer_level(0);
     options.set_device_type(ProfileOptions::GPU);
-    return absl::WrapUnique(new DeviceProfilerSession(options));
+    return abslx::WrapUnique(new DeviceProfilerSession(options));
 #else
     return nullptr;
 #endif

@@ -89,7 +89,7 @@ TEST_F(ImageTensorSpecsTest, BuildInputImageTensorSpecsWorks) {
       *model_resources->GetMetadataExtractor();
   MP_ASSERT_OK_AND_ASSIGN(auto* metadata,
                           GetImageTensorMetadataIfAny(metadata_extractor, 0));
-  absl::StatusOr<ImageTensorSpecs> input_specs_or =
+  abslx::StatusOr<ImageTensorSpecs> input_specs_or =
       BuildInputImageTensorSpecs(*input_tensor, metadata);
   MP_ASSERT_OK(input_specs_or);
 
@@ -129,13 +129,13 @@ TEST_F(
       *model_resources->GetMetadataExtractor();
   MP_ASSERT_OK_AND_ASSIGN(auto* metadata,
                           GetImageTensorMetadataIfAny(metadata_extractor, 0));
-  absl::StatusOr<ImageTensorSpecs> input_specs_or =
+  abslx::StatusOr<ImageTensorSpecs> input_specs_or =
       BuildInputImageTensorSpecs(*input_tensor, metadata);
 
-  EXPECT_THAT(input_specs_or, StatusIs(absl::StatusCode::kNotFound));
+  EXPECT_THAT(input_specs_or, StatusIs(abslx::StatusCode::kNotFound));
   EXPECT_THAT(
       input_specs_or.status().GetPayload(kMediaPipeTasksPayload),
-      Optional(absl::Cord(absl::StrCat(
+      Optional(abslx::Cord(abslx::StrCat(
           MediaPipeTasksStatus::kMetadataMissingNormalizationOptionsError))));
 }
 
@@ -158,7 +158,7 @@ TEST_F(ImageTensorSpecsTest,
       *model_resources->GetMetadataExtractor();
   MP_ASSERT_OK_AND_ASSIGN(auto* metadata,
                           GetImageTensorMetadataIfAny(metadata_extractor, 0));
-  absl::StatusOr<ImageTensorSpecs> input_specs_or =
+  abslx::StatusOr<ImageTensorSpecs> input_specs_or =
       BuildInputImageTensorSpecs(*input_tensor, metadata);
   MP_ASSERT_OK(input_specs_or);
 
@@ -168,7 +168,7 @@ TEST_F(ImageTensorSpecsTest,
   EXPECT_EQ(input_specs.color_space, ColorSpaceType_RGB);
   EXPECT_STREQ(EnumNameTensorType(input_specs.tensor_type),
                EnumNameTensorType(tflite::TensorType_UINT8));
-  EXPECT_EQ(input_specs.normalization_options, absl::nullopt);
+  EXPECT_EQ(input_specs.normalization_options, abslx::nullopt);
 }
 
 }  // namespace

@@ -31,21 +31,21 @@ static const uint64_t kSalt[5] = {0xa0761d6478bd642f, 0xe7037ed1a0b428dbl,
 TEST(WyhashTest, EmptyString) {
   const std::string s = "";
   EXPECT_EQ(
-      absl::hash_internal::Wyhash(s.c_str(), s.length(), kCurrentSeed, kSalt),
+      abslx::hash_internal::Wyhash(s.c_str(), s.length(), kCurrentSeed, kSalt),
       4808886099364463827);
 }
 
 TEST(WyhashTest, Spaces) {
   const std::string s = "   ";
   EXPECT_EQ(
-      absl::hash_internal::Wyhash(s.c_str(), s.length(), kCurrentSeed, kSalt),
+      abslx::hash_internal::Wyhash(s.c_str(), s.length(), kCurrentSeed, kSalt),
       1686201463024549249);
 }
 
 TEST(WyhashTest, RepeatingString) {
   const std::string s = "aaaa";
   EXPECT_EQ(
-      absl::hash_internal::Wyhash(s.c_str(), s.length(), kCurrentSeed, kSalt),
+      abslx::hash_internal::Wyhash(s.c_str(), s.length(), kCurrentSeed, kSalt),
       6646112255271966632);
 }
 
@@ -53,10 +53,10 @@ TEST(WyhashTest, HexString) {
   const std::string small = "\x01\x02\x03";
   const std::string med = "\x01\x02\x03\x04";
 
-  EXPECT_EQ(absl::hash_internal::Wyhash(small.c_str(), small.length(),
+  EXPECT_EQ(abslx::hash_internal::Wyhash(small.c_str(), small.length(),
                                         kCurrentSeed, kSalt),
             11989428023081740911ULL);
-  EXPECT_EQ(absl::hash_internal::Wyhash(med.c_str(), med.length(), kCurrentSeed,
+  EXPECT_EQ(abslx::hash_internal::Wyhash(med.c_str(), med.length(), kCurrentSeed,
                                         kSalt),
             9765997711188871556ULL);
 }
@@ -64,7 +64,7 @@ TEST(WyhashTest, HexString) {
 TEST(WyhashTest, Words) {
   const std::string s = "third_party|wyhash|64";
   EXPECT_EQ(
-      absl::hash_internal::Wyhash(s.c_str(), s.length(), kCurrentSeed, kSalt),
+      abslx::hash_internal::Wyhash(s.c_str(), s.length(), kCurrentSeed, kSalt),
       3702018632387611330);
 }
 
@@ -77,13 +77,13 @@ TEST(WyhashTest, LongString) {
       "6789AbCdEfGhIjKlMnOpQrStUvWxYz0123456789";
 
   EXPECT_EQ(
-      absl::hash_internal::Wyhash(s.c_str(), s.length(), kCurrentSeed, kSalt),
+      abslx::hash_internal::Wyhash(s.c_str(), s.length(), kCurrentSeed, kSalt),
       9245411362605796064ULL);
 }
 
 TEST(WyhashTest, BigReference) {
   struct ExpectedResult {
-    absl::string_view base64_data;
+    abslx::string_view base64_data;
     uint64_t seed;
     uint64_t hash;
   } expected_results[] = {
@@ -476,8 +476,8 @@ TEST(WyhashTest, BigReference) {
 
   for (const auto& expected_result : expected_results) {
     std::string str;
-    ASSERT_TRUE(absl::Base64Unescape(expected_result.base64_data, &str));
-    EXPECT_EQ(absl::hash_internal::Wyhash(str.data(), str.size(),
+    ASSERT_TRUE(abslx::Base64Unescape(expected_result.base64_data, &str));
+    EXPECT_EQ(abslx::hash_internal::Wyhash(str.data(), str.size(),
                                           expected_result.seed, kSalt),
               expected_result.hash);
   }

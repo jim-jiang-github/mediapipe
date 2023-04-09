@@ -100,7 +100,7 @@ xla::StatusOr<std::vector<RefPtr<XRTTupleAllocation>>> GetInputTuples(
 
 xla::StatusOr<std::vector<RefPtr<XRTTupleAllocation>>> GetChainedOpInputTuples(
     const xrt::XRTChainedExecuteOp& op,
-    absl::Span<const RefPtr<XRTTupleAllocation>> op_inputs) {
+    abslx::Span<const RefPtr<XRTTupleAllocation>> op_inputs) {
   std::vector<RefPtr<XRTTupleAllocation>> input_tuples;
   input_tuples.reserve(op.inputs_size());
   for (int i = 0; i < op.inputs_size(); ++i) {
@@ -297,7 +297,7 @@ xla::StatusOr<RefPtr<XRTTupleAllocation>> CreateOutputTuple(
 xla::StatusOr<RefPtr<XRTTupleAllocation>> RunExecutable(
     OpKernelContext* context, XRTGenericDeviceAccessor::ScopedRef* device_ref,
     xla::LocalExecutable* executable,
-    absl::Span<const RefPtr<XRTTupleAllocation>> input_tuples,
+    abslx::Span<const RefPtr<XRTTupleAllocation>> input_tuples,
     bool release_inputs, se::Stream* stream, int rng_seed,
     const xrt::CommonExecutionConfig& config) {
   const xla::ComputationLayout& computation_layout =
@@ -379,7 +379,7 @@ xla::StatusOr<RefPtr<XRTTupleAllocation>> ExecuteComputation(
     OpKernelContext* context, XRTMemoryManager* memory_manager,
     XRTGenericDeviceAccessor::ScopedRef* device_ref,
     xla::LocalExecutable* executable,
-    absl::Span<const RefPtr<XRTTupleAllocation>> input_tuples,
+    abslx::Span<const RefPtr<XRTTupleAllocation>> input_tuples,
     bool release_inputs, se::Stream* stream, int rng_seed,
     const xrt::CommonExecutionConfig& config) {
   auto runfn = [&]() {
@@ -560,7 +560,7 @@ Status XRTExecuteChainedOp::DoWork(OpKernelContext* context) {
                            : nullptr;
   RefPtr<XRTMemoryManager> memory_manager = XRTMemoryManager::Get(rm);
   auto execute_op = [&](const xrt::XRTChainedExecuteOp& op,
-                        absl::Span<const RefPtr<XRTTupleAllocation>> op_inputs)
+                        abslx::Span<const RefPtr<XRTTupleAllocation>> op_inputs)
       -> xla::StatusOr<RefPtr<XRTTupleAllocation>> {
     std::unique_ptr<XRTCompilationCacheEntryRef> entry;
     TF_RETURN_IF_ERROR(cache->Lookup(op.computation_handle(), &entry));

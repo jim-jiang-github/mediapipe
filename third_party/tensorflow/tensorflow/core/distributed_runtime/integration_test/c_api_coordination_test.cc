@@ -52,9 +52,9 @@ void ConfigCoordinationService(
   coord_config->set_agent_destruction_without_shutdown(
       agent_destruction_without_shutdown);
   coord_config->set_heartbeat_timeout_in_ms(
-      absl::ToInt64Milliseconds(absl::Seconds(5)));
+      abslx::ToInt64Milliseconds(abslx::Seconds(5)));
   coord_config->set_shutdown_barrier_timeout_in_ms(
-      absl::ToInt64Milliseconds(absl::Seconds(5)));
+      abslx::ToInt64Milliseconds(abslx::Seconds(5)));
 }
 
 string SetConfigKeyValueFn() {

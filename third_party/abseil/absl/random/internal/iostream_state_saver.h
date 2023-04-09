@@ -23,7 +23,7 @@
 #include "absl/meta/type_traits.h"
 #include "absl/numeric/int128.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -91,7 +91,7 @@ ostream_state_saver<std::basic_ostream<CharT, Traits>> make_ostream_state_saver(
 }
 
 template <typename T>
-typename absl::enable_if_t<!std::is_base_of<std::ios_base, T>::value,
+typename abslx::enable_if_t<!std::is_base_of<std::ios_base, T>::value,
                            null_state_saver<T>>
 make_ostream_state_saver(T& is,  // NOLINT(runtime/references)
                          std::ios_base::fmtflags flags = std::ios_base::dec) {
@@ -156,7 +156,7 @@ istream_state_saver<std::basic_istream<CharT, Traits>> make_istream_state_saver(
 }
 
 template <typename T>
-typename absl::enable_if_t<!std::is_base_of<std::ios_base, T>::value,
+typename abslx::enable_if_t<!std::is_base_of<std::ios_base, T>::value,
                            null_state_saver<T>>
 make_istream_state_saver(T& is,  // NOLINT(runtime/references)
                          std::ios_base::fmtflags flags = std::ios_base::dec) {
@@ -174,26 +174,26 @@ template <typename T>
 struct stream_format_type
     : public std::conditional<(sizeof(T) == sizeof(char)), int, T> {};
 
-// stream_u128_helper allows us to write out either absl::uint128 or
+// stream_u128_helper allows us to write out either abslx::uint128 or
 // __uint128_t types in the same way, which enables their use as internal
 // state of PRNG engines.
 template <typename T>
 struct stream_u128_helper;
 
 template <>
-struct stream_u128_helper<absl::uint128> {
+struct stream_u128_helper<abslx::uint128> {
   template <typename IStream>
-  inline absl::uint128 read(IStream& in) {
+  inline abslx::uint128 read(IStream& in) {
     uint64_t h = 0;
     uint64_t l = 0;
     in >> h >> l;
-    return absl::MakeUint128(h, l);
+    return abslx::MakeUint128(h, l);
   }
 
   template <typename OStream>
-  inline void write(absl::uint128 val, OStream& out) {
-    uint64_t h = absl::Uint128High64(val);
-    uint64_t l = absl::Uint128Low64(val);
+  inline void write(abslx::uint128 val, OStream& out) {
+    uint64_t h = abslx::Uint128High64(val);
+    uint64_t l = abslx::Uint128Low64(val);
     out << h << out.fill() << l;
   }
 };
@@ -240,6 +240,6 @@ inline FloatType read_floating_point(IStream& is) {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_INTERNAL_IOSTREAM_STATE_SAVER_H_

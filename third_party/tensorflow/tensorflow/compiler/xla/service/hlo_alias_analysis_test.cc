@@ -122,13 +122,13 @@ class HloAliasAnalysisTest : public HloTestBase {
   // Returns true if no HloBuffer appears in more than one shape index in the
   // output of the given instruction.
   bool InstructionBuffersAreDistinct(const HloInstruction* instruction) const {
-    absl::flat_hash_set<const HloBuffer*> buffers_seen;
+    abslx::flat_hash_set<const HloBuffer*> buffers_seen;
     for (const auto& pair :
          analysis_->dataflow_analysis().GetInstructionValueSet(instruction)) {
       const HloValueSet& value_set = pair.second;
       // It's possible for multiple values at this index to have the same
       // HloBuffer. This does not result in non-distinctness.
-      absl::flat_hash_set<const HloBuffer*> buffers_at_this_index;
+      abslx::flat_hash_set<const HloBuffer*> buffers_at_this_index;
       for (const HloValue* value : value_set.values()) {
         buffers_at_this_index.insert(
             &analysis_->GetBufferContainingValue(*value));
@@ -922,7 +922,7 @@ TEST_F(HloAliasAnalysisTest, DynamicUpdateSlice) {
 }
 
 TEST_F(HloAliasAnalysisTest, DynamicUpdateSliceMultiOutputFusion) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule Module
 
 fused_computation {
@@ -975,7 +975,7 @@ TEST_F(HloAliasAnalysisTest, ChainedDynamicUpdateSliceFusion) {
   // CPU and GPU backends may generate fusions with dynamic update slices
   // feeding each other. They expect the fusion to not be in-place if that is
   // the case.
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule Module
 
 fused_computation {

@@ -95,7 +95,7 @@ class BoxDetectorOpencvBfImpl : public BoxDetectorInterface {
 std::unique_ptr<BoxDetectorInterface> BoxDetectorInterface::Create(
     const BoxDetectorOptions &options) {
   if (options.index_type() == BoxDetectorOptions::OPENCV_BF) {
-    return absl::make_unique<BoxDetectorOpencvBfImpl>(options);
+    return abslx::make_unique<BoxDetectorOpencvBfImpl>(options);
   } else {
     LOG(FATAL) << "index type undefined.";
   }
@@ -108,7 +108,7 @@ void BoxDetectorInterface::DetectAndAddBoxFromFeatures(
     const std::vector<Vector2_f> &features, const cv::Mat &descriptors,
     const TimedBoxProtoList &tracked_boxes, int64 timestamp_msec, float scale_x,
     float scale_y, TimedBoxProtoList *detected_boxes) {
-  absl::MutexLock lock_access(&access_to_index_);
+  abslx::MutexLock lock_access(&access_to_index_);
   image_scale_ = std::min(scale_x, scale_y);
   image_aspect_ = scale_x / scale_y;
 
@@ -119,7 +119,7 @@ void BoxDetectorInterface::DetectAndAddBoxFromFeatures(
       continue;
     }
 
-    const absl::flat_hash_map<int, int>::iterator iter =
+    const abslx::flat_hash_map<int, int>::iterator iter =
         box_id_to_idx_.find(box.id());
     if (iter == box_id_to_idx_.end()) {
       // De-normalize the input box to image scale
@@ -211,7 +211,7 @@ bool BoxDetectorInterface::CheckDetectAndAddBox(
       continue;
     }
 
-    const absl::flat_hash_map<int, int>::iterator iter =
+    const abslx::flat_hash_map<int, int>::iterator iter =
         box_id_to_idx_.find(box.id());
     if (iter == box_id_to_idx_.end()) {
       need_add = true;
@@ -555,7 +555,7 @@ void BoxDetectorInterface::AddBoxFeaturesToIndex(
   std::vector<int> insider_idx = GetFeatureIndexWithinBox(features, box);
 
   if (!insider_idx.empty()) {
-    const absl::flat_hash_map<int, int>::iterator iter =
+    const abslx::flat_hash_map<int, int>::iterator iter =
         box_id_to_idx_.find(box.id());
     int box_idx;
     if (iter == box_id_to_idx_.end()) {
@@ -623,8 +623,8 @@ void BoxDetectorInterface::AddBoxFeaturesToIndex(
 }
 
 void BoxDetectorInterface::CancelBoxDetection(int box_id) {
-  absl::MutexLock lock_access(&access_to_index_);
-  const absl::flat_hash_map<int, int>::iterator iter =
+  abslx::MutexLock lock_access(&access_to_index_);
+  const abslx::flat_hash_map<int, int>::iterator iter =
       box_id_to_idx_.find(box_id);
   if (iter == box_id_to_idx_.end()) {
     return;
@@ -644,7 +644,7 @@ void BoxDetectorInterface::CancelBoxDetection(int box_id) {
 }
 
 BoxDetectorIndex BoxDetectorInterface::ObtainBoxDetectorIndex() const {
-  absl::MutexLock lock_access(&access_to_index_);
+  abslx::MutexLock lock_access(&access_to_index_);
   BoxDetectorIndex index;
   for (int j = 0; j < frame_box_.size(); ++j) {
     BoxDetectorIndex::BoxEntry *box_ptr = index.add_box_entry();
@@ -670,7 +670,7 @@ BoxDetectorIndex BoxDetectorInterface::ObtainBoxDetectorIndex() const {
 }
 
 void BoxDetectorInterface::AddBoxDetectorIndex(const BoxDetectorIndex &index) {
-  absl::MutexLock lock_access(&access_to_index_);
+  abslx::MutexLock lock_access(&access_to_index_);
   for (int j = 0; j < index.box_entry_size(); ++j) {
     const auto &box_entry = index.box_entry(j);
     for (int i = 0; i < box_entry.frame_entry_size(); ++i) {

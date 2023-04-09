@@ -134,7 +134,7 @@ string MakeComment(StringPiece text, StringPiece indent) {
 }
 
 string PrintString(const string& str) {
-  return strings::StrCat("\"", absl::CEscape(str), "\"");
+  return strings::StrCat("\"", abslx::CEscape(str), "\"");
 }
 
 string PrintTensorShape(const TensorShapeProto& shape_proto) {
@@ -192,7 +192,7 @@ string PrintTensor(const TensorProto& tensor_proto) {
       string ret;
       for (int64_t i = 0; i < num_elts; ++i) {
         if (i > 0) strings::StrAppend(&ret, " ");
-        strings::StrAppend(&ret, absl::CEscape(t.flat<tstring>()(i)));
+        strings::StrAppend(&ret, abslx::CEscape(t.flat<tstring>()(i)));
       }
       return ret;
     }

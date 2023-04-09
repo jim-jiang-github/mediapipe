@@ -62,7 +62,7 @@ class TFSignatureDefFunction : public SignatureDefFunction {
                        std::unique_ptr<TFSignatureDefFunction>* out);
 
   // This method creates a "Call" Op used to execute the function.
-  Status MakeCallOp(absl::Span<AbstractTensorHandle* const> inputs,
+  Status MakeCallOp(abslx::Span<AbstractTensorHandle* const> inputs,
                     ImmediateOpPtr* out) const override;
 
   const SignatureDefFunctionMetadata& GetFunctionMetadata() const override;

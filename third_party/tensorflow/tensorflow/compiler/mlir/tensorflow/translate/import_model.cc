@@ -131,14 +131,14 @@ limitations under the License.
 #include "tensorflow/core/util/dump_graph.h"
 #include "tensorflow/stream_executor/lib/statusor.h"
 
-static inline absl::string_view StringRefToView(llvm::StringRef ref) {
+static inline abslx::string_view StringRefToView(llvm::StringRef ref) {
   return {ref.data(), ref.size()};
 }
 
 namespace tensorflow {
 
 constexpr size_t kNumThreadToConvertSignatures = 10;
-constexpr absl::string_view kOutputShapesAttrName = "_output_shapes";
+constexpr abslx::string_view kOutputShapesAttrName = "_output_shapes";
 
 using mlir::NamedAttrList;
 using mlir::TensorType;
@@ -244,9 +244,9 @@ class ImporterBase {
   // Extracts arg and ret nodes from FunctionBody.
   void GetArgsAndRetsFromFunctionBody(
       const FunctionBody& fbody,
-      absl::InlinedVector<OutputTensor, 4>* arg_nodes,
-      absl::InlinedVector<OutputTensor, 4>* ret_nodes,
-      absl::InlinedVector<Node*, 4>* control_ret_nodes);
+      abslx::InlinedVector<OutputTensor, 4>* arg_nodes,
+      abslx::InlinedVector<OutputTensor, 4>* ret_nodes,
+      abslx::InlinedVector<Node*, 4>* control_ret_nodes);
 
   // Prepares converting the graph to an MLIR module. This step removes the
   // backedges of the graph, orders the nodes and infers the shapes.
@@ -261,9 +261,9 @@ class ImporterBase {
   // of nodes from the graph are given to converted to the arguments and returns
   // of the function.
   Status Convert(llvm::StringRef func_name, mlir::FunctionType func_type,
-                 const absl::InlinedVector<OutputTensor, 4>& arg_nodes,
-                 const absl::InlinedVector<OutputTensor, 4>& ret_nodes,
-                 const absl::InlinedVector<Node*, 4>& control_ret_nodes,
+                 const abslx::InlinedVector<OutputTensor, 4>& arg_nodes,
+                 const abslx::InlinedVector<OutputTensor, 4>& ret_nodes,
+                 const abslx::InlinedVector<Node*, 4>& control_ret_nodes,
                  llvm::ArrayRef<mlir::NamedAttribute> attrs);
 
   // Finds out the function definition for the given function name from the
@@ -398,9 +398,9 @@ class ImporterBase {
   Status ConvertFunctionArgAndRets(
       mlir::func::FuncOp func, mlir::tf_executor::GraphOp graph_op,
       llvm::ArrayRef<mlir::Type> arg_types,
-      const absl::InlinedVector<OutputTensor, 4>& arg_nodes,
-      const absl::InlinedVector<OutputTensor, 4>& ret_nodes,
-      const absl::InlinedVector<Node*, 4>& control_ret_nodes);
+      const abslx::InlinedVector<OutputTensor, 4>& arg_nodes,
+      const abslx::InlinedVector<OutputTensor, 4>& ret_nodes,
+      const abslx::InlinedVector<Node*, 4>& control_ret_nodes);
 
   // Gets the location information of the given node. It uses the
   // "original_node_name" in the NodeDef to get the corresponding file location
@@ -437,10 +437,10 @@ class ImporterBase {
   // in the back_edge_helper.
   BackEdgeHelper back_edge_helper_;
   // A map between node and output index, for each backedge.
-  absl::flat_hash_map<const Node*, int> back_edge_node_output_;
-  absl::flat_hash_map<const Node*, BackEdge> back_edge_dst_inputs_;
+  abslx::flat_hash_map<const Node*, int> back_edge_node_output_;
+  abslx::flat_hash_map<const Node*, BackEdge> back_edge_dst_inputs_;
   // A map between sink and source operation of NextIteration
-  absl::flat_hash_map<mlir::Operation*, mlir::Operation*>
+  abslx::flat_hash_map<mlir::Operation*, mlir::Operation*>
       next_iteration_sink_source_;
 
   // All nodes and version information about the (copied) imported graph.
@@ -448,7 +448,7 @@ class ImporterBase {
   std::vector<Node*> ordered_nodes_;
 
   // Maps from a Node ID to a MLIR value.
-  using NodeValueMap = absl::flat_hash_map<int, mlir::Operation*>;
+  using NodeValueMap = abslx::flat_hash_map<int, mlir::Operation*>;
 
   mlir::OpBuilder builder_;
   mlir::ModuleOp module_;
@@ -470,7 +470,7 @@ class ImporterBase {
 
  protected:
   // Maps feed as TensorId to new Placeholder node name.
-  absl::flat_hash_map<TensorId, absl::string_view> remapped_feeds_;
+  abslx::flat_hash_map<TensorId, abslx::string_view> remapped_feeds_;
   // Keep track of functions required deferred conversion.
   std::queue<DeferredConversionMetaData> deferred_functions_;
 };
@@ -482,7 +482,7 @@ bool HasNonPrimaryOutputInUse(const GraphDef& graph_def,
                               const std::string& node) {
   for (const auto& node_def : graph_def.node()) {
     for (const auto& input : node_def.input()) {
-      if (absl::StartsWith(input, node + ":") && input != node + ":0") {
+      if (abslx::StartsWith(input, node + ":") && input != node + ":0") {
         return true;
       }
     }
@@ -553,9 +553,9 @@ Status PreprocessGraphDef(const GraphImportConfig* specs, GraphDef* graph_def) {
 
 // Mapping from node name to feed (index and ArrayInfo). Node name must outlive
 // this map.
-using FeedsByNode = absl::flat_hash_map<
-    absl::string_view,
-    absl::flat_hash_map<int, const std::pair<std::string, ArrayInfo>*>>;
+using FeedsByNode = abslx::flat_hash_map<
+    abslx::string_view,
+    abslx::flat_hash_map<int, const std::pair<std::string, ArrayInfo>*>>;
 
 // Creates from a `GraphImportConfig::InputArrays` a mapping from a feeds output
 // tensor name to index and ArrayInfo. Keys and values are backed by
@@ -583,13 +583,13 @@ StatusOr<FeedsByNode> GetFeedsByNode(
 
 // Creates a unique name for a node that will be replacing a feed output tensor.
 std::string GetUniqueNodeName(
-    absl::string_view node_name, int index,
+    abslx::string_view node_name, int index,
     const std::unordered_map<string, Node*>& node_name_map) {
-  std::string new_node_name_base = absl::StrCat(node_name, "_", index);
+  std::string new_node_name_base = abslx::StrCat(node_name, "_", index);
   int count = 0;
   std::string new_node_name = new_node_name_base;
   while (node_name_map.find(new_node_name) != node_name_map.end()) {
-    new_node_name = absl::StrCat(new_node_name_base, "_", count++);
+    new_node_name = abslx::StrCat(new_node_name_base, "_", count++);
   }
   return new_node_name;
 }
@@ -644,9 +644,9 @@ Status ImporterBase::ConvertDeferredFunctions() {
 
     TF_ASSIGN_OR_RETURN(auto func_type, importer.InferLibFunctionType(*fbody));
 
-    absl::InlinedVector<OutputTensor, 4> arg_nodes;
-    absl::InlinedVector<OutputTensor, 4> ret_nodes;
-    absl::InlinedVector<Node*, 4> control_ret_nodes;
+    abslx::InlinedVector<OutputTensor, 4> arg_nodes;
+    abslx::InlinedVector<OutputTensor, 4> ret_nodes;
+    abslx::InlinedVector<Node*, 4> control_ret_nodes;
     importer.GetArgsAndRetsFromFunctionBody(*fbody, &arg_nodes, &ret_nodes,
                                             &control_ret_nodes);
     const std::string& mlir_func_name =
@@ -773,11 +773,11 @@ StatusOr<std::pair<Node*, bool>> ImporterBase::CreatePlaceholderNodeForFeed(
 Status ImporterBase::GetInputOutputNodes(
     const std::unordered_map<string, Node*>& node_name_map,
     std::unordered_set<const Node*>* nodes) {
-  auto add_node = [&](absl::string_view name) {
+  auto add_node = [&](abslx::string_view name) {
     auto it = node_name_map.find(std::string(name));
     if (it == node_name_map.end()) {
       return errors::FailedPrecondition(
-          absl::StrCat("Graph does not contain node: ", name));
+          abslx::StrCat("Graph does not contain node: ", name));
     }
     nodes->insert(it->second);
     return OkStatus();
@@ -1012,7 +1012,7 @@ Status ImporterBase::AddNodesToShapeRefiner(
     for (const Node* node : ordered_nodes_) {
       auto* shape_context = shape_refiner_->GetContext(node);
       DCHECK(shape_context != nullptr);
-      absl::InlinedVector<shape_inference::ShapeHandle, 4> existing;
+      abslx::InlinedVector<shape_inference::ShapeHandle, 4> existing;
       existing.reserve(shape_context->num_outputs());
       for (int o = 0; o < shape_context->num_outputs(); ++o) {
         existing.push_back(shape_context->output(o));
@@ -1126,8 +1126,8 @@ StatusOr<mlir::Type> ImporterBase::InferOutputType(const Node& node, int idx,
   }
 
   auto type_from_array_attr = [&node, &idx, &builder](
-                                  absl::string_view output_shape_attr,
-                                  absl::string_view element_type_attr) {
+                                  abslx::string_view output_shape_attr,
+                                  abslx::string_view element_type_attr) {
     auto* output_shapes = node.attrs().Find(output_shape_attr);
     auto* element_types = node.attrs().Find(element_type_attr);
     const auto& output_shape = output_shapes->list().shape(idx);
@@ -1265,7 +1265,7 @@ StatusOr<TensorType> ImporterBase::ConvertElementTypeAndShape(
   // TODO(jmolloy): Ideally this shouldn't be a local sentinel.
   const int64_t kUnknownDim = -1;
 
-  absl::InlinedVector<int64_t, 4> dimensions;
+  abslx::InlinedVector<int64_t, 4> dimensions;
   int32_t rank = context->Rank(handle);
   dimensions.reserve(rank);
   for (int i = 0; i < rank; ++i) {
@@ -1308,7 +1308,7 @@ Status ImporterBase::ConvertFunctionCallAttribute(const std::string& base_name,
   attributes->push_back(builder_.getNamedAttr(base_name, func_attr));
 
   for (const auto& it : value.func().attr()) {
-    auto name = absl::StrCat(base_name, ".", it.first);
+    auto name = abslx::StrCat(base_name, ".", it.first);
     TF_ASSIGN_OR_RETURN(auto value, ConvertAttributeValue(it.second));
     attributes->push_back(builder_.getNamedAttr(name, value));
   }
@@ -1346,7 +1346,7 @@ StatusOr<mlir::Attribute> ImporterBase::ConvertAttributeValue(
     }
     case AttrValue::kList: {
       if (!value.list().func().empty()) {
-        absl::InlinedVector<mlir::Attribute, 8> attrs;
+        abslx::InlinedVector<mlir::Attribute, 8> attrs;
         for (const auto& item : value.list().func()) {
           TF_ASSIGN_OR_RETURN(auto attr, ConvertFunctionCallName(item.name()));
           if (item.attr_size() != 0)
@@ -1365,9 +1365,9 @@ StatusOr<mlir::Attribute> ImporterBase::ConvertAttributeValue(
 }
 
 void ImporterBase::GetArgsAndRetsFromFunctionBody(
-    const FunctionBody& fbody, absl::InlinedVector<OutputTensor, 4>* arg_nodes,
-    absl::InlinedVector<OutputTensor, 4>* ret_nodes,
-    absl::InlinedVector<Node*, 4>* control_ret_nodes) {
+    const FunctionBody& fbody, abslx::InlinedVector<OutputTensor, 4>* arg_nodes,
+    abslx::InlinedVector<OutputTensor, 4>* ret_nodes,
+    abslx::InlinedVector<Node*, 4>* control_ret_nodes) {
   arg_nodes->reserve(fbody.arg_nodes.size());
   ret_nodes->reserve(fbody.ret_nodes.size());
   for (auto arg : fbody.arg_nodes) {
@@ -1394,7 +1394,7 @@ Status ImporterBase::ConvertLibFunction(llvm::StringRef func_name) {
   const auto* func_def = func_lib.Find(std::string(func_name));
   if (func_def == nullptr) {
     return errors::FailedPrecondition(
-        absl::StrCat("Failed to find function '", StringRefToView(func_name),
+        abslx::StrCat("Failed to find function '", StringRefToView(func_name),
                      "'. The imported TensorFlow GraphDef is ill-formed."));
   }
 
@@ -1461,7 +1461,7 @@ Status ImporterBase::ConvertFeedsToPlaceholders(
     auto jt = node_name_map->find(std::string(tensor.node()));
     if (jt == node_name_map->end()) {
       return errors::FailedPrecondition(
-          absl::StrCat("Graph does not contain node: ", tensor.node()));
+          abslx::StrCat("Graph does not contain node: ", tensor.node()));
     }
 
     Node* node = jt->second;
@@ -1546,9 +1546,9 @@ Status ImporterBase::PrepareConvert(const Graph& graph,
 
 Status ImporterBase::Convert(
     llvm::StringRef func_name, mlir::FunctionType func_type,
-    const absl::InlinedVector<OutputTensor, 4>& arg_nodes,
-    const absl::InlinedVector<OutputTensor, 4>& ret_nodes,
-    const absl::InlinedVector<Node*, 4>& control_ret_nodes,
+    const abslx::InlinedVector<OutputTensor, 4>& arg_nodes,
+    const abslx::InlinedVector<OutputTensor, 4>& ret_nodes,
+    const abslx::InlinedVector<Node*, 4>& control_ret_nodes,
     llvm::ArrayRef<mlir::NamedAttribute> attrs) {
   // TODO(b/122040776): Uses debug info for FunctionDef.
   auto function = mlir::func::FuncOp::create(mlir::UnknownLoc::get(context_),
@@ -1601,9 +1601,9 @@ Status ImporterBase::Convert(
 Status ImporterBase::ConvertFunctionArgAndRets(
     mlir::func::FuncOp func, mlir::tf_executor::GraphOp graph_op,
     llvm::ArrayRef<mlir::Type> arg_types,
-    const absl::InlinedVector<OutputTensor, 4>& arg_nodes,
-    const absl::InlinedVector<OutputTensor, 4>& ret_nodes,
-    const absl::InlinedVector<Node*, 4>& control_ret_nodes) {
+    const abslx::InlinedVector<OutputTensor, 4>& arg_nodes,
+    const abslx::InlinedVector<OutputTensor, 4>& ret_nodes,
+    const abslx::InlinedVector<Node*, 4>& control_ret_nodes) {
   // Store the arg/return attributes as a list rather than uniqueuing during
   // construction.
   llvm::SmallVector<mlir::NamedAttrList, 4> arg_attrs;
@@ -1756,7 +1756,7 @@ mlir::Location ImporterBase::GetLocation(const Node& node) {
     // finally to just name.
     if (auto stack_trace = node.GetStackTrace()) {
       DVLOG(1) << "Stack available for " << node.name();
-      absl::Span<const StackFrame> frames = stack_trace->ToFrames();
+      abslx::Span<const StackFrame> frames = stack_trace->ToFrames();
       locations.reserve(frames.size());
       for (const StackFrame& frame : llvm::reverse(frames)) {
         auto file_name = mlir::StringAttr::get(context_, frame.file_name);
@@ -2060,9 +2060,9 @@ Status ImporterBase::ConvertNode(const Node& node) {
   // TODO(jmolloy): We should probably just ignore _SOURCE and _SINK nodes.
   // They'll break roundtripping anyway unless we strip them when converting
   // back to graphdef.
-  absl::InlinedVector<const Edge*, 8> in_edges(node.in_edges().size());
-  absl::c_copy(node.in_edges(), in_edges.begin());
-  absl::c_stable_sort(in_edges, [](const Edge* e1, const Edge* e2) {
+  abslx::InlinedVector<const Edge*, 8> in_edges(node.in_edges().size());
+  abslx::c_copy(node.in_edges(), in_edges.begin());
+  abslx::c_stable_sort(in_edges, [](const Edge* e1, const Edge* e2) {
     if (e1->IsControlEdge() && !e2->IsControlEdge()) return false;
     if (!e1->IsControlEdge() && e2->IsControlEdge()) return true;
     if (e1->IsControlEdge() && e2->IsControlEdge())
@@ -2185,7 +2185,7 @@ Status ImporterBase::ConvertNode(const Node& node) {
 
   auto composite_control_flow_op = [&](const std::string& name) {
     result.name = mlir::OperationName(get_full_op_name(name), context_);
-    bool stateless = absl::StartsWith(node_type_name, "Stateless");
+    bool stateless = abslx::StartsWith(node_type_name, "Stateless");
     mlir::BoolAttr val = builder_.getBoolAttr(stateless);
     result.attributes.push_back(builder_.getNamedAttr("is_stateless", val));
   };
@@ -2366,8 +2366,8 @@ class GraphDefImporter : public ImporterBase {
   // ImporterBase.
   StatusOr<mlir::FunctionType> InferMainFunctionType(
       const GraphImportConfig& specs, mlir::MLIRContext* context,
-      absl::InlinedVector<OutputTensor, 4>* arg_nodes,
-      absl::InlinedVector<OutputTensor, 4>* ret_nodes);
+      abslx::InlinedVector<OutputTensor, 4>* arg_nodes,
+      abslx::InlinedVector<OutputTensor, 4>* ret_nodes);
 
   // Returns the function signature of the main function, alongside input and
   // output nodes, for function graphs. Arguments and return values are
@@ -2375,15 +2375,15 @@ class GraphDefImporter : public ImporterBase {
   // inferred by the shape refiner in ImporterBase.
   StatusOr<mlir::FunctionType> GetArgsRetsAndTypesFromFunctionGraph(
       mlir::MLIRContext* context,
-      absl::InlinedVector<OutputTensor, 4>* arg_nodes,
-      absl::InlinedVector<OutputTensor, 4>* ret_nodes);
+      abslx::InlinedVector<OutputTensor, 4>* arg_nodes,
+      abslx::InlinedVector<OutputTensor, 4>* ret_nodes);
 
   // Finds the graph's target nodes/function's control ret nodes based on
   // supplied node names in `control_outputs`. If `control_outputs` are not
   // unique or a control ret node is missing, an error will be returned.
   Status GetControlRetsFromGraph(
       llvm::ArrayRef<std::string> control_outputs,
-      absl::InlinedVector<Node*, 4>* control_ret_nodes);
+      abslx::InlinedVector<Node*, 4>* control_ret_nodes);
 };
 
 StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> GraphDefImporter::Convert(
@@ -2405,11 +2405,11 @@ StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> GraphDefImporter::Convert(
   static std::atomic<uint32> counter(0);
   uint32 current_file_prefix = counter++;
   const auto* graph_crash_handle = crash_analysis::ReportProtoDataOnCrash(
-      absl::StrCat(current_file_prefix, "_mlir_import_graph.pbtxt"),
+      abslx::StrCat(current_file_prefix, "_mlir_import_graph.pbtxt"),
       *graph_def);
   auto reachable_flib = flib_def.ReachableDefinitions(*graph_def);
   const auto* flib_crash_handle = crash_analysis::ReportProtoDataOnCrash(
-      absl::StrCat(current_file_prefix, "_mlir_import_flib.pbtxt"),
+      abslx::StrCat(current_file_prefix, "_mlir_import_flib.pbtxt"),
       reachable_flib.ToProto());
 
   auto scope_exit = llvm::make_scope_exit([&]() {
@@ -2427,9 +2427,9 @@ StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> GraphDefImporter::Convert(
   TF_RETURN_IF_ERROR(importer.PrepareConvert(graph, std::move(graph_def)));
 
   mlir::FunctionType func_type;
-  absl::InlinedVector<OutputTensor, 4> arg_nodes;
-  absl::InlinedVector<OutputTensor, 4> ret_nodes;
-  absl::InlinedVector<Node*, 4> control_ret_nodes;
+  abslx::InlinedVector<OutputTensor, 4> arg_nodes;
+  abslx::InlinedVector<OutputTensor, 4> ret_nodes;
+  abslx::InlinedVector<Node*, 4> control_ret_nodes;
   llvm::SmallVector<mlir::NamedAttribute, 1> attrs;
   if (specs.graph_as_function) {
     if (specs.prune_unused_nodes || !specs.inputs.empty() ||
@@ -2528,12 +2528,12 @@ StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> GraphDefImporter::Convert(
 
 StatusOr<mlir::FunctionType> GraphDefImporter::InferMainFunctionType(
     const GraphImportConfig& specs, mlir::MLIRContext* context,
-    absl::InlinedVector<OutputTensor, 4>* arg_nodes,
-    absl::InlinedVector<OutputTensor, 4>* ret_nodes) {
+    abslx::InlinedVector<OutputTensor, 4>* arg_nodes,
+    abslx::InlinedVector<OutputTensor, 4>* ret_nodes) {
   // Find all the input nodes and output nodes.
   // Feeds have been remapped to single output nodes (Placeholder), so an exact
   // name match is sufficient.
-  absl::flat_hash_map<absl::string_view, int> inputs;
+  abslx::flat_hash_map<abslx::string_view, int> inputs;
   for (auto input_and_idx : llvm::enumerate(specs.inputs)) {
     TensorId tensor = ParseTensorName(input_and_idx.value().first);
     auto remapped_it = remapped_feeds_.find(tensor);
@@ -2544,7 +2544,7 @@ StatusOr<mlir::FunctionType> GraphDefImporter::InferMainFunctionType(
     }
   }
 
-  absl::flat_hash_set<absl::string_view> output_node_names;
+  abslx::flat_hash_set<abslx::string_view> output_node_names;
   std::vector<TensorId> outputs;
   output_node_names.reserve(specs.outputs.size());
   for (const auto& output : specs.outputs) {
@@ -2661,9 +2661,9 @@ StatusOr<mlir::FunctionType> GraphDefImporter::InferMainFunctionType(
 
 StatusOr<mlir::FunctionType>
 GraphDefImporter::GetArgsRetsAndTypesFromFunctionGraph(
-    mlir::MLIRContext* context, absl::InlinedVector<OutputTensor, 4>* arg_nodes,
-    absl::InlinedVector<OutputTensor, 4>* ret_nodes) {
-  auto add_node = [](Node* node, absl::InlinedVector<OutputTensor, 4>* nodes) {
+    mlir::MLIRContext* context, abslx::InlinedVector<OutputTensor, 4>* arg_nodes,
+    abslx::InlinedVector<OutputTensor, 4>* ret_nodes) {
+  auto add_node = [](Node* node, abslx::InlinedVector<OutputTensor, 4>* nodes) {
     auto* attr = node->attrs().Find("index");
     if (!attr)
       return errors::InvalidArgument(node->type_string(), " node '",
@@ -2724,7 +2724,7 @@ GraphDefImporter::GetArgsRetsAndTypesFromFunctionGraph(
 
 Status GraphDefImporter::GetControlRetsFromGraph(
     llvm::ArrayRef<std::string> control_outputs,
-    absl::InlinedVector<Node*, 4>* control_ret_nodes) {
+    abslx::InlinedVector<Node*, 4>* control_ret_nodes) {
   if (control_outputs.empty()) return OkStatus();
 
   llvm::SmallDenseMap<llvm::StringRef, int32_t> controls_to_idx;
@@ -2756,7 +2756,7 @@ class SavedModelObjectGraphImporter : public ImporterBase {
   // Main entry point: converts all functions in the given meta graph to an MLIR
   // Module.
   static StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> Convert(
-      SavedModelV2Bundle* saved_model, absl::Span<std::string> exported_names,
+      SavedModelV2Bundle* saved_model, abslx::Span<std::string> exported_names,
       mlir::MLIRContext* context, bool add_default_attributes,
       bool unconditionally_use_set_output_shapes);
 
@@ -2774,7 +2774,7 @@ class SavedModelObjectGraphImporter : public ImporterBase {
 class ObjectNames {
  public:
   explicit ObjectNames(const SavedObjectGraph& object_graph,
-                       absl::Span<std::string> exported_names);
+                       abslx::Span<std::string> exported_names);
 
   // Gets the names that external users of the SavedModel can use to refer to
   // this node.
@@ -2819,16 +2819,16 @@ class ObjectNames {
   // example, this happens commonly in Keras models, where `foo.bar` is
   // also reachable via the name `keras_api.foo.bar`.
   // Cycles are possible too.
-  absl::flat_hash_map<int, std::vector<std::string>> object_names_;
+  abslx::flat_hash_map<int, std::vector<std::string>> object_names_;
 
   // Key: node_id
   // Value: all names that this object is exported as
-  absl::flat_hash_map<int, llvm::SmallVector<llvm::StringRef, 1>>
+  abslx::flat_hash_map<int, llvm::SmallVector<llvm::StringRef, 1>>
       exported_names_;
   // Key: node_id
   // Value: pretty symbol table name to use for internal references to this
   // object.
-  absl::flat_hash_map<int, llvm::StringRef> pretty_symbol_table_name_;
+  abslx::flat_hash_map<int, llvm::StringRef> pretty_symbol_table_name_;
 
   // Stable strings we can take StringRef's into. Used only by the SaveString
   // method.
@@ -2836,7 +2836,7 @@ class ObjectNames {
 };
 
 ObjectNames::ObjectNames(const SavedObjectGraph& object_graph,
-                         absl::Span<std::string> exported_names)
+                         abslx::Span<std::string> exported_names)
     : object_graph_(object_graph),
       names_to_export_(exported_names.begin(), exported_names.end()) {
   // Visit all reachable nodes from the root of the object graph.
@@ -2850,7 +2850,7 @@ ObjectNames::ObjectNames(const SavedObjectGraph& object_graph,
     // Make object names map independent of our particular choice of object
     // graph traversal.
     std::sort(kv.second.begin(), kv.second.end(),
-              [](absl::string_view a, absl::string_view b) {
+              [](abslx::string_view a, abslx::string_view b) {
                 // The sort order here influences the "pretty name" we assign
                 // below. We want the most debuggable name to be first.
                 //
@@ -2883,7 +2883,7 @@ ObjectNames::ObjectNames(const SavedObjectGraph& object_graph,
   for (auto& kv : object_names_) {
     int node_id = kv.first;
     std::string internal_name =
-        absl::StrCat(GetDefaultSymbolTableName(node_id), "__");
+        abslx::StrCat(GetDefaultSymbolTableName(node_id), "__");
     // If the object has an exported name, we prefer that since it is probably
     // the most recognizable. Otherwise, we grab some non-exported name of the
     // object.
@@ -2914,7 +2914,7 @@ llvm::StringRef ObjectNames::GetSymbolTableName(int node_id) const {
 }
 
 std::string ObjectNames::GetDefaultSymbolTableName(int node_id) const {
-  return absl::StrCat("__sm_node", node_id);
+  return abslx::StrCat("__sm_node", node_id);
 }
 
 bool ObjectNames::IsExported(const std::string& name) {
@@ -2931,7 +2931,7 @@ void ObjectNames::RecursivelyVisitObjectGraph(int node_id) {
     case SavedObject::kConstant:
     case SavedObject::kFunction:
     case SavedObject::kVariable: {
-      object_names_[node_id].push_back(absl::StrJoin(path_segments_, "."));
+      object_names_[node_id].push_back(abslx::StrJoin(path_segments_, "."));
       break;
     }
     default:
@@ -3020,7 +3020,7 @@ Status DiagnoseMultipleConcreteFunctions(const SavedObjectGraph& object_graph,
         }
         return errors::InvalidArgument(
             "Exported function with exported name(s) ",
-            absl::StrJoin(names, ", "),
+            abslx::StrJoin(names, ", "),
             " with multiple concrete functions. Add "
             "@tf.function(input_signature=[...]) on this function, or use a "
             "narrower list of exported names that excludes this function.");
@@ -3318,7 +3318,7 @@ Status CreateSavedModelIR(
 
   // Create a side data-structure, indexed by the object_graph node_id to
   // a TrackableObject that is restorable.
-  absl::flat_hash_map<int, const TrackableObjectGraph::TrackableObject*>
+  abslx::flat_hash_map<int, const TrackableObjectGraph::TrackableObject*>
       restored_objects;
   TF_RETURN_IF_ERROR(saved_model->VisitObjectsToRestore(
       [&](int saved_node_id,
@@ -3507,7 +3507,7 @@ Status CreateSavedModelIR(
 
 StatusOr<mlir::OwningOpRef<mlir::ModuleOp>>
 SavedModelObjectGraphImporter::Convert(
-    SavedModelV2Bundle* saved_model, absl::Span<std::string> exported_names,
+    SavedModelV2Bundle* saved_model, abslx::Span<std::string> exported_names,
     mlir::MLIRContext* context, bool add_default_attributes,
     // TODO(b/200093974): Remove post triage.
     bool unconditionally_use_set_output_shapes) {
@@ -3624,7 +3624,7 @@ class SimpleSavedModelMLIRImportInput : public SavedModelMLIRImportInput {
       : SavedModelMLIRImportInput(meta_graph_def, debug_info),
         graph_(std::move(graph)) {}
 
-  StatusOr<const Graph*> GetSubGraph(absl::string_view name,
+  StatusOr<const Graph*> GetSubGraph(abslx::string_view name,
                                      GraphImportConfig& specs) override {
     DCHECK(CheckGraphNameValidity(name));
     DCHECK(CheckGraphContainsFeedsAndFetches(specs));
@@ -3633,7 +3633,7 @@ class SimpleSavedModelMLIRImportInput : public SavedModelMLIRImportInput {
 
  private:
   bool CheckGraphContainsFeedsAndFetches(const GraphImportConfig& specs) const {
-    absl::flat_hash_set<std::string> feed_fetch_nodes;
+    abslx::flat_hash_set<std::string> feed_fetch_nodes;
     for (const auto& iter : specs.inputs) {
       TensorId tensor_id = ParseTensorName(iter.first);
       feed_fetch_nodes.insert(std::string(tensor_id.node()));
@@ -3651,7 +3651,7 @@ class SimpleSavedModelMLIRImportInput : public SavedModelMLIRImportInput {
     return feed_fetch_nodes.empty();
   }
 
-  bool CheckGraphNameValidity(absl::string_view name) const {
+  bool CheckGraphNameValidity(abslx::string_view name) const {
     // If it is one of the signature name, it is valid.
     const auto& signature_defs = meta_graph_def().signature_def();
     if (signature_defs.contains(std::string(name))) return true;
@@ -3674,9 +3674,9 @@ class SimpleSavedModelMLIRImportInput : public SavedModelMLIRImportInput {
   std::unique_ptr<Graph> graph_;
 };
 
-static absl::flat_hash_set<std::string> GetOriginalTfFuncNamesFromGraphDef(
+static abslx::flat_hash_set<std::string> GetOriginalTfFuncNamesFromGraphDef(
     const GraphDef& graph_def) {
-  absl::flat_hash_set<std::string> original_func_tf_names;
+  abslx::flat_hash_set<std::string> original_func_tf_names;
   for (const auto& function : graph_def.library().function()) {
     original_func_tf_names.insert(function.signature().name());
   }
@@ -3702,7 +3702,7 @@ class SavedModelSignatureDefImporterLite {
   // handled in SavedModelSignatureDefImporter.
   static StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> Convert(
       SavedModelMLIRImportInput& input,
-      std::optional<absl::Span<const std::string>> exported_names,
+      std::optional<abslx::Span<const std::string>> exported_names,
       mlir::MLIRContext* context, bool import_restore = true,
       bool unconditionally_use_set_output_shapes = false) {
     SavedModelSignatureDefImporterLite importer(
@@ -3714,7 +3714,7 @@ class SavedModelSignatureDefImporterLite {
  private:
   SavedModelSignatureDefImporterLite(
       SavedModelMLIRImportInput& input,
-      std::optional<absl::Span<const std::string>> exported_names,
+      std::optional<abslx::Span<const std::string>> exported_names,
       mlir::MLIRContext* context, bool import_restore,
       bool unconditionally_use_set_output_shapes)
       : input_(input),
@@ -3753,7 +3753,7 @@ class SavedModelSignatureDefImporterLite {
   // Moves the functions in `sub_module` to `module_` and skips the duplicate
   // functions.
   Status MoveConvertedFunctionsToModule(
-      absl::string_view name, mlir::ModuleOp sub_module,
+      abslx::string_view name, mlir::ModuleOp sub_module,
       const std::unordered_map<std::string, std::string>& tf_name_to_mlir_name);
 
   StatusOr<GraphImportConfig::InputArrays> ParseInputArrays(
@@ -3761,10 +3761,10 @@ class SavedModelSignatureDefImporterLite {
 
  private:
   SavedModelMLIRImportInput& input_;
-  absl::flat_hash_set<std::string> original_func_tf_names_;
-  std::optional<absl::Span<const std::string>> exported_names_;
+  abslx::flat_hash_set<std::string> original_func_tf_names_;
+  std::optional<abslx::Span<const std::string>> exported_names_;
   mlir::OwningOpRef<mlir::ModuleOp> module_;
-  absl::Mutex symbol_table_mu_;
+  abslx::Mutex symbol_table_mu_;
   mlir::SymbolTable symbol_table_ ABSL_GUARDED_BY(symbol_table_mu_);
   bool import_restore_ = true;
   bool unconditionally_use_set_output_shapes_ = false;
@@ -3786,7 +3786,7 @@ SavedModelSignatureDefImporterLite::ConvertAssets() {
         module_->getLoc(),
         /*sym_name=*/
         builder.getStringAttr(
-            absl::StrCat("__tf_saved_model_asset", i++, "_", asset.filename())),
+            abslx::StrCat("__tf_saved_model_asset", i++, "_", asset.filename())),
         /*filename=*/
         builder.getStringAttr(
             io::JoinPath(kSavedModelAssetsDirectory, asset.filename())));
@@ -3798,14 +3798,14 @@ SavedModelSignatureDefImporterLite::ConvertAssets() {
 }
 
 Status SavedModelSignatureDefImporterLite::MoveConvertedFunctionsToModule(
-    absl::string_view name, mlir::ModuleOp sub_module,
+    abslx::string_view name, mlir::ModuleOp sub_module,
     const std::unordered_map<std::string, std::string>& tf_name_to_mlir_name) {
   mlir::Builder builder(sub_module.getContext());
   mlir::SymbolTable sub_module_symbol_table(sub_module);
 
   // Functions originally from graphdef library might have a different name
   // after conversion, we build the set of the converted names
-  absl::flat_hash_set<std::string> original_func_mlir_names;
+  abslx::flat_hash_set<std::string> original_func_mlir_names;
   for (const auto& kv : tf_name_to_mlir_name) {
     if (original_func_tf_names_.contains(kv.first))
       original_func_mlir_names.insert(kv.second);
@@ -3819,11 +3819,11 @@ Status SavedModelSignatureDefImporterLite::MoveConvertedFunctionsToModule(
     // Skip the original functions from graphdef library
     if (original_func_mlir_names.count(func.getSymName().str())) continue;
 
-    std::string new_sym_name = absl::StrCat(name, "/", func.getSymName().str());
+    std::string new_sym_name = abslx::StrCat(name, "/", func.getSymName().str());
     mlir::StringAttr new_sym_name_attr = builder.getStringAttr(new_sym_name);
     if (mlir::failed(sub_module_symbol_table.replaceAllSymbolUses(
             func, new_sym_name_attr, sub_module)))
-      return tensorflow::errors::InvalidArgument(absl::StrCat(
+      return tensorflow::errors::InvalidArgument(abslx::StrCat(
           "SavedModelSignatureDefImporterLite: failed to assign a unique "
           "name to the private function used in a signature: ",
           func.getSymName().str()));
@@ -3833,7 +3833,7 @@ Status SavedModelSignatureDefImporterLite::MoveConvertedFunctionsToModule(
 
   // Copy all functions used by this signature to the final MLIR module.
   for (auto func : sub_module.getOps<mlir::func::FuncOp>()) {
-    absl::MutexLock l(&symbol_table_mu_);
+    abslx::MutexLock l(&symbol_table_mu_);
     // The insert here is a NO-OP if the function already exists.
     symbol_table_.insert(func.clone());
   }
@@ -3879,7 +3879,7 @@ Status SavedModelSignatureDefImporterLite::ConvertInitializer(
   // tf_saved_model.
   init_func_op->setAttr(
       "tf_saved_model.exported_names",
-      builder.getStrArrayAttr({absl::StrCat(
+      builder.getStrArrayAttr({abslx::StrCat(
           "__tf_saved_model_session_initializer_", target_node_name)}));
 
   // Move the converted functions to top level MLIR module.
@@ -4016,7 +4016,7 @@ SavedModelSignatureDefImporterLite::ConvertSignatures() {
     exported_name_set.insert(exported_names_->begin(), exported_names_->end());
   }
 
-  absl::Mutex error_status_mu;  // Needed since `error_status` is non-atomic.
+  abslx::Mutex error_status_mu;  // Needed since `error_status` is non-atomic.
   tensorflow::Status error_status;
   {
     // Start a threadpool to convert signatures, since signature conversion can
@@ -4041,7 +4041,7 @@ SavedModelSignatureDefImporterLite::ConvertSignatures() {
       thread_pool.Schedule([&]() {
         auto status = ConvertSignature(sig_def_key, signature_def);
         if (!status.ok()) {
-          absl::MutexLock l(&error_status_mu);
+          abslx::MutexLock l(&error_status_mu);
           error_status = std::move(status);
         }
       });
@@ -4111,7 +4111,7 @@ class SavedModelSignatureDefImporter {
   // the given meta graph to an MLIR Module.
   static StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> Convert(
       const SavedModelBundle& bundle,
-      std::optional<absl::Span<const std::string>> exported_names,
+      std::optional<abslx::Span<const std::string>> exported_names,
       mlir::MLIRContext* context, tensorflow::MLIRImportOptions options,
       bool lift_varhandle_ops_to_args = true) {
     // debug_info might not be loaded with loader_lite.
@@ -4256,7 +4256,7 @@ ConvertFunctionToMlir(const FunctionBody* fbody,
 
 StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> ConvertSavedModelToMlir(
     SavedModelV2Bundle* saved_model, mlir::MLIRContext* context,
-    absl::Span<std::string> exported_names, bool add_default_attributes,
+    abslx::Span<std::string> exported_names, bool add_default_attributes,
     bool unconditionally_use_set_output_shapes) {
   return SavedModelObjectGraphImporter::Convert(
       saved_model, exported_names, context, add_default_attributes,
@@ -4264,10 +4264,10 @@ StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> ConvertSavedModelToMlir(
 }
 
 StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> ConvertSavedModelV1ToMlir(
-    const SavedModelBundle& saved_model, absl::Span<std::string> exported_names,
+    const SavedModelBundle& saved_model, abslx::Span<std::string> exported_names,
     mlir::MLIRContext* context, MLIRImportOptions options,
     bool lift_variables) {
-  std::optional<absl::Span<const std::string>> optional_exported_names;
+  std::optional<abslx::Span<const std::string>> optional_exported_names;
   // TODO(b/187062560): Change ConvertSavedModelV1ToMlir() to take an optional
   // `exported_names` so that it can be configured to import only restore/init
   // graphs.
@@ -4278,7 +4278,7 @@ StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> ConvertSavedModelV1ToMlir(
 
 StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> ConvertSavedModelV1ToMlirLite(
     const MetaGraphDef& meta_graph_def, const GraphDebugInfo& debug_info,
-    std::optional<absl::Span<const std::string>> exported_names,
+    std::optional<abslx::Span<const std::string>> exported_names,
     mlir::MLIRContext* context, MLIRImportOptions options) {
   TF_ASSIGN_OR_RETURN(auto input, SimpleSavedModelMLIRImportInput::Create(
                                       options, &meta_graph_def, debug_info));
@@ -4289,7 +4289,7 @@ StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> ConvertSavedModelV1ToMlirLite(
 
 StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> ConvertSavedModelV1ToMlirLite(
     SavedModelMLIRImportInput& input,
-    std::optional<absl::Span<const std::string>> exported_names,
+    std::optional<abslx::Span<const std::string>> exported_names,
     mlir::MLIRContext* context, bool unconditionally_use_set_output_shapes) {
   return SavedModelSignatureDefImporterLite::Convert(
       input, exported_names, context,

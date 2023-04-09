@@ -37,7 +37,7 @@ class PluggableDeviceSimpleAllocator : public Allocator {
 
   bool TracksAllocationSizes() const override { return false; }
   string Name() override { return "Simple allocator"; }
-  absl::optional<AllocatorStats> GetStats() override;
+  abslx::optional<AllocatorStats> GetStats() override;
 
   AllocatorMemoryType GetMemoryType() const override {
     return sub_allocator_->GetMemoryType();

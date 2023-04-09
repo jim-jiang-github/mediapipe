@@ -104,10 +104,10 @@ Source<std::vector<Tensor>> ConvertMatrixToTensor(Source<Matrix> matrix,
   return node[Output<std::vector<Tensor>>{"TENSORS"}];
 }
 
-absl::Status ConfigureCombinedPredictionCalculator(
+abslx::Status ConfigureCombinedPredictionCalculator(
     CombinedPredictionCalculatorOptions* options) {
   options->set_background_label(kBackgroundLabel);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void PopulateAccelerationAndUseStreamMode(
@@ -167,7 +167,7 @@ void PopulateAccelerationAndUseStreamMode(
 // }
 class SingleHandGestureRecognizerGraph : public core::ModelTaskGraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     if (sc->Options<HandGestureRecognizerGraphOptions>()
             .base_options()
@@ -203,7 +203,7 @@ class SingleHandGestureRecognizerGraph : public core::ModelTaskGraph {
 
  private:
   // Sets the base options in the sub tasks.
-  absl::Status SetSubTaskBaseOptions(const ModelAssetBundleResources& resources,
+  abslx::Status SetSubTaskBaseOptions(const ModelAssetBundleResources& resources,
                                      HandGestureRecognizerGraphOptions* options,
                                      bool is_copy) {
     ASSIGN_OR_RETURN(const auto gesture_embedder_file,
@@ -249,10 +249,10 @@ class SingleHandGestureRecognizerGraph : public core::ModelTaskGraph {
     } else {
       LOG(INFO) << "Custom gesture classifier is not defined.";
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::StatusOr<SubTaskModelResources> CreateSubTaskModelResources(
+  abslx::StatusOr<SubTaskModelResources> CreateSubTaskModelResources(
       SubgraphContext* sc) {
     auto* options = sc->MutableOptions<HandGestureRecognizerGraphOptions>();
     SubTaskModelResources sub_task_model_resources;
@@ -293,7 +293,7 @@ class SingleHandGestureRecognizerGraph : public core::ModelTaskGraph {
     return sub_task_model_resources;
   }
 
-  absl::StatusOr<Source<ClassificationList>> BuildGestureRecognizerGraph(
+  abslx::StatusOr<Source<ClassificationList>> BuildGestureRecognizerGraph(
       const HandGestureRecognizerGraphOptions& graph_options,
       const SubTaskModelResources& sub_task_model_resources,
       Source<ClassificationList> handedness,
@@ -398,7 +398,7 @@ class SingleHandGestureRecognizerGraph : public core::ModelTaskGraph {
     return combined_classification_list;
   }
 
-  absl::StatusOr<Source<ClassificationList>> GetGestureClassificationList(
+  abslx::StatusOr<Source<ClassificationList>> GetGestureClassificationList(
       const core::ModelResources* model_resources,
       const proto::GestureClassifierGraphOptions& options,
       Source<Tensor>& embedding_tensors, Graph& graph) {
@@ -478,7 +478,7 @@ REGISTER_MEDIAPIPE_GRAPH(
 // }
 class MultipleHandGestureRecognizerGraph : public core::ModelTaskGraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     Graph graph;
     ASSIGN_OR_RETURN(
@@ -497,7 +497,7 @@ class MultipleHandGestureRecognizerGraph : public core::ModelTaskGraph {
   }
 
  private:
-  absl::StatusOr<Source<std::vector<ClassificationList>>>
+  abslx::StatusOr<Source<std::vector<ClassificationList>>>
   BuildMultiGestureRecognizerSubraph(
       const HandGestureRecognizerGraphOptions& graph_options,
       Source<std::vector<ClassificationList>> multi_handedness,

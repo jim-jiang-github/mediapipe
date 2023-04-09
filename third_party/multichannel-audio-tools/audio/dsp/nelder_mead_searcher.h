@@ -74,7 +74,7 @@ class NelderMeadSearcher {
   // around it by |offset| along each canonical coordinate axis. Resets
   // num_evaluations_ to zero.
   void SetSimplexFromStartingGuess(const Vector& starting_guess, Scalar offset);
-  void SetSimplexFromStartingGuessSpan(absl::Span<const Scalar> starting_guess,
+  void SetSimplexFromStartingGuessSpan(abslx::Span<const Scalar> starting_guess,
                                        Scalar offset);
 
   // Sets the objective function to minimize. The objective must take a Vector
@@ -112,11 +112,11 @@ class NelderMeadSearcher {
 
   // Sets lower bounds to impose on coordinates. A lower bound of -infinity may
   // be used to specify that a coordinate is unconstrained.
-  void SetLowerBounds(absl::Span<const Scalar> lower_bounds);
+  void SetLowerBounds(abslx::Span<const Scalar> lower_bounds);
 
   // Sets upper bounds to impose on coordinates. An upper bound of +infinity may
   // be used to specify that a coordinate is unconstrained.
-  void SetUpperBounds(absl::Span<const Scalar> upper_bounds);
+  void SetUpperBounds(abslx::Span<const Scalar> upper_bounds);
 
   // Clears all bounds previously set.
   void ClearBounds();
@@ -226,7 +226,7 @@ void NelderMeadSearcher<Scalar>::SetSimplexFromStartingGuess(
 
 template <typename Scalar>
 void NelderMeadSearcher<Scalar>::SetSimplexFromStartingGuessSpan(
-    absl::Span<const Scalar> starting_guess, Scalar offset) {
+    abslx::Span<const Scalar> starting_guess, Scalar offset) {
   Eigen::Map<const Vector> starting_guess_map(starting_guess.data(),
                                               starting_guess.size());
   SetSimplexFromStartingGuess(starting_guess_map, offset);
@@ -368,7 +368,7 @@ NelderMeadSearcher<Scalar>::GetSimplex() const {
 
 template <typename Scalar>
 void NelderMeadSearcher<Scalar>::SetLowerBounds(
-    absl::Span<const Scalar> lower_bounds) {
+    abslx::Span<const Scalar> lower_bounds) {
   CHECK_EQ(lower_bounds.size(), dimensions_);
   const Eigen::Map<const Vector> lower_bounds_map(lower_bounds.data(),
                                                   lower_bounds.size());
@@ -380,7 +380,7 @@ void NelderMeadSearcher<Scalar>::SetLowerBounds(
 
 template <typename Scalar>
 void NelderMeadSearcher<Scalar>::SetUpperBounds(
-    absl::Span<const Scalar> upper_bounds) {
+    abslx::Span<const Scalar> upper_bounds) {
   CHECK_EQ(upper_bounds.size(), dimensions_);
   const Eigen::Map<const Vector> upper_bounds_map(upper_bounds.data(),
                                                   upper_bounds.size());

@@ -158,7 +158,7 @@ TEST_F(LoaderTest, NoTagMatch) {
   Status st = LoadSavedModel(session_options, run_options, export_dir,
                              {"missing-tag"}, &bundle);
   EXPECT_FALSE(st.ok());
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       st.error_message(),
       "Could not find meta graph def matching supplied tags: { missing-tag }"))
       << st.error_message();
@@ -174,7 +174,7 @@ TEST_F(LoaderTest, NoTagMatchMultiple) {
   Status st = LoadSavedModel(session_options, run_options, export_dir,
                              {kSavedModelTagServe, "missing-tag"}, &bundle);
   EXPECT_FALSE(st.ok());
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       st.error_message(),
       "Could not find meta graph def matching supplied tags: "))
       << st.error_message();
@@ -194,7 +194,7 @@ TEST_F(LoaderTest, SessionCreationFailure) {
   Status st = LoadSavedModel(session_options, run_options, export_dir,
                              {kSavedModelTagServe}, &bundle);
   EXPECT_FALSE(st.ok());
-  EXPECT_TRUE(absl::StrContains(st.error_message(), kInvalidTarget))
+  EXPECT_TRUE(abslx::StrContains(st.error_message(), kInvalidTarget))
       << st.error_message();
 }
 

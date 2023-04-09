@@ -24,14 +24,14 @@
 #include "absl/meta/type_traits.h"
 #include "absl/types/span.h"
 
-using absl::random_internal::PoolURBG;
-using absl::random_internal::RandenPool;
+using abslx::random_internal::PoolURBG;
+using abslx::random_internal::RandenPool;
 
 namespace {
 
 // is_randen_pool trait is true when parameterized by an RandenPool
 template <typename T>
-using is_randen_pool = typename absl::disjunction<  //
+using is_randen_pool = typename abslx::disjunction<  //
     std::is_same<T, RandenPool<uint8_t>>,           //
     std::is_same<T, RandenPool<uint16_t>>,          //
     std::is_same<T, RandenPool<uint32_t>>,          //
@@ -39,14 +39,14 @@ using is_randen_pool = typename absl::disjunction<  //
 
 // MyFill either calls RandenPool::Fill() or std::generate(..., rng)
 template <typename T, typename V>
-typename absl::enable_if_t<absl::negation<is_randen_pool<T>>::value, void>  //
-MyFill(T& rng, absl::Span<V> data) {  // NOLINT(runtime/references)
+typename abslx::enable_if_t<abslx::negation<is_randen_pool<T>>::value, void>  //
+MyFill(T& rng, abslx::Span<V> data) {  // NOLINT(runtime/references)
   std::generate(std::begin(data), std::end(data), rng);
 }
 
 template <typename T, typename V>
-typename absl::enable_if_t<is_randen_pool<T>::value, void>  //
-MyFill(T& rng, absl::Span<V> data) {  // NOLINT(runtime/references)
+typename abslx::enable_if_t<is_randen_pool<T>::value, void>  //
+MyFill(T& rng, abslx::Span<V> data) {  // NOLINT(runtime/references)
   rng.Fill(data);
 }
 
@@ -78,7 +78,7 @@ TYPED_TEST(PoolURBGTypedTest, URBGInterface) {
   static_assert(std::is_copy_constructible<E>::value,
                 "engine must be copy constructible");
 
-  static_assert(absl::is_copy_assignable<E>::value,
+  static_assert(abslx::is_copy_assignable<E>::value,
                 "engine must be copy assignable");
 
   E e;
@@ -112,7 +112,7 @@ TYPED_TEST(PoolURBGTypedTest, VerifySequences) {
   // Fill a using Fill or generate, depending on the engine type.
   {
     E x = rng;
-    MyFill(x, absl::MakeSpan(a));
+    MyFill(x, abslx::MakeSpan(a));
   }
 
   // Fill b using std::generate().

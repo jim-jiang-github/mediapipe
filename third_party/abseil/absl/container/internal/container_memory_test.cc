@@ -25,13 +25,13 @@
 #include "absl/container/internal/test_instance_tracker.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
 
-using ::absl::test_internal::CopyableMovableInstance;
-using ::absl::test_internal::InstanceTracker;
+using ::abslx::test_internal::CopyableMovableInstance;
+using ::abslx::test_internal::InstanceTracker;
 using ::testing::_;
 using ::testing::ElementsAre;
 using ::testing::Gt;
@@ -143,9 +143,9 @@ TEST(PairArgs, Piecewise) {
 }
 
 TEST(WithConstructed, Simple) {
-  EXPECT_EQ(1, WithConstructed<absl::string_view>(
+  EXPECT_EQ(1, WithConstructed<abslx::string_view>(
                    std::make_tuple(std::string("a")),
-                   [](absl::string_view str) { return str.size(); }));
+                   [](abslx::string_view str) { return str.size(); }));
 }
 
 template <class F, class Arg>
@@ -254,4 +254,4 @@ TEST(MapSlotPolicy, ConstKeyAndValue) {
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

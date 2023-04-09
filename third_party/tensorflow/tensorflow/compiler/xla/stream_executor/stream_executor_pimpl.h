@@ -433,7 +433,7 @@ class StreamExecutor {
   port::StatusOr<std::unique_ptr<dnn::RnnSequenceTensorDescriptor>>
   createRnnSequenceTensorDescriptor(int max_seq_length, int batch_size,
                                     int data_size,
-                                    const absl::Span<const int>& seq_lengths,
+                                    const abslx::Span<const int>& seq_lengths,
                                     bool time_major, dnn::DataType data_type);
 
   // Create an RNN state descriptor that specifies the input or hidden state.
@@ -459,8 +459,8 @@ class StreamExecutor {
   // lifetime of the kernel.
   template <typename... Args>
   port::StatusOr<std::unique_ptr<TypedKernel<Args...>>> CreateTypedKernel(
-      absl::string_view kernel_name, absl::string_view ptx,
-      absl::Span<const uint8> cubin_data);
+      abslx::string_view kernel_name, abslx::string_view ptx,
+      abslx::Span<const uint8> cubin_data);
 
   // Warning: use Stream::ThenLaunch instead, this method is not for general
   // consumption. However, this is the only way to launch a kernel for which
@@ -676,13 +676,13 @@ class StreamExecutor {
   void SubmitTrace(TraceCallT trace_call, ArgsT&&... args);
 
   // Reader/writer lock for class-static StreamExecutor members.
-  static absl::Mutex static_mu_;
+  static abslx::Mutex static_mu_;
 
   // Reader/writer lock for mutable data structures on this StreamExecutor.
   //
   // Mutable so that caching functions (like DeviceDescription, AsBlas, etc.)
   // can acquire the lock on their first (mutating) call as well.
-  mutable absl::Mutex mu_;
+  mutable abslx::Mutex mu_;
 
   // Reference to the platform that created this executor.
   const Platform* platform_;
@@ -808,9 +808,9 @@ class ScopedModuleHandle {
 
 template <typename... Args>
 inline port::StatusOr<std::unique_ptr<TypedKernel<Args...>>>
-StreamExecutor::CreateTypedKernel(absl::string_view kernel_name,
-                                  absl::string_view ptx,
-                                  absl::Span<const uint8> cubin_data) {
+StreamExecutor::CreateTypedKernel(abslx::string_view kernel_name,
+                                  abslx::string_view ptx,
+                                  abslx::Span<const uint8> cubin_data) {
   auto kernel_base = std::make_unique<TypedKernel<Args...>>(this);
   MultiKernelLoaderSpec loader_spec(kernel_base->kNumberOfParameters);
   loader_spec.AddCudaPtxInMemory(ptx, kernel_name);

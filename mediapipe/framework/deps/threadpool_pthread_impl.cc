@@ -82,7 +82,7 @@ void* ThreadPool::WorkerThread::ThreadBody(void* arg) {
             -1 ||
         errno == 0) {
       VLOG(1) << "Pinned the thread pool executor to processor "
-              << absl::StrJoin(selected_cpus, ", processor ") << ".";
+              << abslx::StrJoin(selected_cpus, ", processor ") << ".";
     } else {
       LOG(ERROR) << "Error : " << strerror(errno) << std::endl
                  << "Failed to set processor affinity. Ignore processor "
@@ -189,7 +189,7 @@ namespace internal {
 // - why do we even need the thread id in the name? any thread list should show
 //   the id too.
 std::string CreateThreadName(const std::string& prefix, int thread_id) {
-  std::string name = absl::StrCat(prefix, "/", thread_id);
+  std::string name = abslx::StrCat(prefix, "/", thread_id);
   // 16 is the limit allowed by `pthread_setname_np`, including
   // the terminating null byte ('\0')
   constexpr size_t kMaxThreadNameLength = 15;

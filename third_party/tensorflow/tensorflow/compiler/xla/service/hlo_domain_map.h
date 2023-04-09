@@ -78,7 +78,7 @@ class HloDomainMap {
   // Map used for representing instruction ordering, i.e.
   // order_map[a] < order_map[b] means a must be ordered before b.
   using InstructionOrderMap =
-      absl::flat_hash_map<const HloInstruction*, int64_t>;
+      abslx::flat_hash_map<const HloInstruction*, int64_t>;
 
   HloDomainMap(std::string domain_kind)
       : domain_kind_(std::move(domain_kind)) {}
@@ -112,7 +112,7 @@ class HloDomainMap {
   // Out of an instruction set, returns a vector of all the ones which are not
   // a kDomain kind.
   static std::vector<HloInstruction*> MakeNonDomainInstructions(
-      const absl::flat_hash_set<HloInstruction*>& instruction_set,
+      const abslx::flat_hash_set<HloInstruction*>& instruction_set,
       const InstructionOrderMap& instructions_order);
 
   // Populates domain_metadata_id_ that maps each HloInstruction to the unique
@@ -121,8 +121,8 @@ class HloDomainMap {
 
   std::string domain_kind_;
   std::vector<std::unique_ptr<DomainMetadata::Domain>> instruction_domains_;
-  absl::flat_hash_map<const HloInstruction*, int64_t> instruction_to_domain_;
-  absl::flat_hash_map<const HloInstruction*, int64_t> domain_metadata_id_;
+  abslx::flat_hash_map<const HloInstruction*, int64_t> instruction_to_domain_;
+  abslx::flat_hash_map<const HloInstruction*, int64_t> domain_metadata_id_;
 };
 
 }  // namespace xla

@@ -43,7 +43,7 @@ std::set<TensorStorageType> GetSupportedStorages(const GpuInfo& gpu_info) {
   return supported_storages;
 }
 
-absl::Status RunSample(const std::string& model_name_mv1,
+abslx::Status RunSample(const std::string& model_name_mv1,
                        const std::string& model_name_mv2) {
   // mv1 postfix here and later is for mobilenet_v1
   // mv2 postfix here and later is for mobilenet_v2
@@ -66,7 +66,7 @@ absl::Status RunSample(const std::string& model_name_mv1,
 
   auto supported_storages = GetSupportedStorages(gpu_info);
   if (supported_storages.empty()) {
-    return absl::UnimplementedError("No solution for this device");
+    return abslx::UnimplementedError("No solution for this device");
   }
   TensorStorageType storage_type = *supported_storages.begin();
   if (gpu_info.IsAdreno()) {
@@ -206,7 +206,7 @@ absl::Status RunSample(const std::string& model_name_mv1,
                    1024.0 / 1024.0
             << " MB" << std::endl;
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace cl

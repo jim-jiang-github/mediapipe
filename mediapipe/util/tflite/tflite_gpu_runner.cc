@@ -56,18 +56,18 @@ void UpdateShapes(const tflite::Interpreter& interpreter,
   }
 }
 
-absl::Status InitializeShapes(const tflite::FlatBufferModel& flatbuffer,
+abslx::Status InitializeShapes(const tflite::FlatBufferModel& flatbuffer,
                               const tflite::OpResolver& op_resolver,
                               std::vector<std::vector<int>>* input_shapes,
                               std::vector<std::vector<int>>* output_shapes) {
   std::unique_ptr<tflite::Interpreter> interpreter;
   tflite::InterpreterBuilder interpreter_builder(flatbuffer, op_resolver);
   if (interpreter_builder(&interpreter) != kTfLiteOk || !interpreter) {
-    return absl::InternalError("Unable to prepare TfLite interpreter.");
+    return abslx::InternalError("Unable to prepare TfLite interpreter.");
   }
   UpdateShapes(*interpreter, interpreter->inputs(), input_shapes);
   UpdateShapes(*interpreter, interpreter->outputs(), output_shapes);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 ObjectDef GetSSBOObjectDef(int channels) {
@@ -93,7 +93,7 @@ cl::InferenceOptions GetClInferenceOptions(const InferenceOptions& options) {
   return result;
 }
 
-absl::Status VerifyShapes(const std::vector<TensorObjectDef>& actual,
+abslx::Status VerifyShapes(const std::vector<TensorObjectDef>& actual,
                           const std::vector<BHWC>& expected) {
   RET_CHECK_EQ(actual.size(), expected.size());
   const int size = actual.size();
@@ -103,14 +103,14 @@ absl::Status VerifyShapes(const std::vector<TensorObjectDef>& actual,
     RET_CHECK(dims.b == bhwc.b && dims.h == bhwc.h && dims.w == bhwc.w &&
               dims.c == bhwc.c);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 #endif  // defined(__ANDROID__) || defined(MEDIAPIPE_CHROMIUMOS)
 
 }  // namespace
 
-absl::Status TFLiteGPURunner::InitializeWithModel(
+abslx::Status TFLiteGPURunner::InitializeWithModel(
     const tflite::FlatBufferModel& flatbuffer,
     const tflite::OpResolver& op_resolver, bool allow_quant_ops) {
   // GraphFloat32 is created twice because, when OpenCL and OpenGL backends are
@@ -135,26 +135,26 @@ absl::Status TFLiteGPURunner::InitializeWithModel(
   MP_RETURN_IF_ERROR(InitializeShapes(flatbuffer, op_resolver,
                                       &input_shape_from_model_,
                                       &output_shape_from_model_));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::StatusOr<int64_t> TFLiteGPURunner::GetInputElements(int id) {
+abslx::StatusOr<int64_t> TFLiteGPURunner::GetInputElements(int id) {
   if (id >= input_shapes_.size()) {
-    return absl::InternalError("Wrong input tensor id.");
+    return abslx::InternalError("Wrong input tensor id.");
   } else {
     return input_shapes_[id].DimensionsProduct();
   }
 }
 
-absl::StatusOr<int64_t> TFLiteGPURunner::GetOutputElements(int id) {
+abslx::StatusOr<int64_t> TFLiteGPURunner::GetOutputElements(int id) {
   if (id >= output_shapes_.size()) {
-    return absl::InternalError("Wrong output tensor id.");
+    return abslx::InternalError("Wrong output tensor id.");
   } else {
     return output_shapes_[id].DimensionsProduct();
   }
 }
 
-absl::Status TFLiteGPURunner::Build() {
+abslx::Status TFLiteGPURunner::Build() {
   // 1. Prepare inference builder.
   std::unique_ptr<InferenceBuilder> builder;
   // By default, we try CL first & fall back to GL if that fails.
@@ -164,7 +164,7 @@ absl::Status TFLiteGPURunner::Build() {
     MP_RETURN_IF_ERROR(InitializeOpenGL(&builder));
   } else {
     // try to build OpenCL first. If something goes wrong, fall back to OpenGL.
-    absl::Status status = InitializeOpenCL(&builder);
+    abslx::Status status = InitializeOpenCL(&builder);
     if (status.ok()) {
       VLOG(2) << "OpenCL backend is used.";
     } else {
@@ -191,23 +191,23 @@ absl::Status TFLiteGPURunner::Build() {
   return builder->Build(&runner_);
 }
 
-absl::Status TFLiteGPURunner::BindSSBOToInputTensor(GLuint ssbo_id,
+abslx::Status TFLiteGPURunner::BindSSBOToInputTensor(GLuint ssbo_id,
                                                     int input_id) {
   OpenGlBuffer buffer;
   buffer.id = ssbo_id;
   return runner_->SetInputObject(input_id, std::move(buffer));
 }
 
-absl::Status TFLiteGPURunner::BindSSBOToOutputTensor(GLuint ssbo_id,
+abslx::Status TFLiteGPURunner::BindSSBOToOutputTensor(GLuint ssbo_id,
                                                      int output_id) {
   OpenGlBuffer buffer;
   buffer.id = ssbo_id;
   return runner_->SetOutputObject(output_id, std::move(buffer));
 }
 
-absl::Status TFLiteGPURunner::Invoke() { return runner_->Run(); }
+abslx::Status TFLiteGPURunner::Invoke() { return runner_->Run(); }
 
-absl::Status TFLiteGPURunner::InitializeOpenGL(
+abslx::Status TFLiteGPURunner::InitializeOpenGL(
     std::unique_ptr<InferenceBuilder>* builder) {
   gl::InferenceEnvironmentOptions env_options;
   gl::InferenceEnvironmentProperties properties;
@@ -220,10 +220,10 @@ absl::Status TFLiteGPURunner::InitializeOpenGL(
       NewInferenceEnvironment(env_options, &gl_environment_, &properties));
   MP_RETURN_IF_ERROR(gl_environment_->NewInferenceBuilder(std::move(*graph_gl_),
                                                           gl_options, builder));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TFLiteGPURunner::InitializeOpenCL(
+abslx::Status TFLiteGPURunner::InitializeOpenCL(
     std::unique_ptr<InferenceBuilder>* builder) {
 #if defined(__ANDROID__) || defined(MEDIAPIPE_CHROMIUMOS)
   cl::InferenceEnvironmentOptions env_options;
@@ -236,10 +236,10 @@ absl::Status TFLiteGPURunner::InitializeOpenCL(
 
   // Try to initialize from serialized model first.
   if (!serialized_model_.empty()) {
-    absl::Status init_status = InitializeOpenCLFromSerializedModel(builder);
+    abslx::Status init_status = InitializeOpenCLFromSerializedModel(builder);
     if (init_status.ok()) {
       serialized_model_used_ = true;
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     VLOG(2) << "Failed to init from serialized model: [" << init_status
             << "]. Trying to init from scratch.";
@@ -252,7 +252,7 @@ absl::Status TFLiteGPURunner::InitializeOpenCL(
   MP_RETURN_IF_ERROR(cl_environment_->NewInferenceBuilder(
       cl_options, std::move(graph_cl), builder));
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 #else
   return mediapipe::UnimplementedError(
       "Currently only Android & ChromeOS are supported");
@@ -261,7 +261,7 @@ absl::Status TFLiteGPURunner::InitializeOpenCL(
 
 #if defined(__ANDROID__) || defined(MEDIAPIPE_CHROMIUMOS)
 
-absl::Status TFLiteGPURunner::InitializeOpenCLFromSerializedModel(
+abslx::Status TFLiteGPURunner::InitializeOpenCLFromSerializedModel(
     std::unique_ptr<InferenceBuilder>* builder) {
   MP_RETURN_IF_ERROR(
       cl_environment_->NewInferenceBuilder(serialized_model_, builder));
@@ -269,7 +269,7 @@ absl::Status TFLiteGPURunner::InitializeOpenCLFromSerializedModel(
   return VerifyShapes(builder->get()->outputs(), output_shapes_);
 }
 
-absl::StatusOr<std::vector<uint8_t>> TFLiteGPURunner::GetSerializedModel() {
+abslx::StatusOr<std::vector<uint8_t>> TFLiteGPURunner::GetSerializedModel() {
   RET_CHECK(runner_) << "Runner is in invalid state.";
   if (serialized_model_used_) {
     return serialized_model_;

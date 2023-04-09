@@ -46,7 +46,7 @@ Status XlaCpuDeviceFactory::ListPhysicalDevices(std::vector<string>* devices) {
     return OkStatus();
   }
 
-  devices->push_back(absl::StrCat("/physical_device:", DEVICE_XLA_CPU, ":0"));
+  devices->push_back(abslx::StrCat("/physical_device:", DEVICE_XLA_CPU, ":0"));
   return OkStatus();
 }
 

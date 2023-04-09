@@ -34,7 +34,7 @@ ResourceHandle MakeResourceHandle(
     const string& container, const string& name, const DeviceBase& device,
     const TypeIndex& type_index,
     const std::vector<DtypeAndPartialTensorShape>& dtypes_and_shapes,
-    const absl::optional<ManagedStackTrace>& definition_stack_trace) {
+    const abslx::optional<ManagedStackTrace>& definition_stack_trace) {
   ResourceHandle result;
   result.set_device(device.name());
   result.set_container(container);
@@ -97,17 +97,17 @@ const char* ResourceMgr::DebugTypeName(uint64 hash_code) const {
 ResourceMgr::ResourceAndName::ResourceAndName() : name(nullptr) {}
 
 ResourceMgr::ResourceAndName::ResourceAndName(const string& name)
-    : name(absl::make_unique<string>(name)) {}
+    : name(abslx::make_unique<string>(name)) {}
 
 core::RefCountPtr<ResourceBase> ResourceMgr::ResourceAndName::GetResource()
     const {
-  if (absl::holds_alternative<core::RefCountPtr<ResourceBase>>(resource)) {
+  if (abslx::holds_alternative<core::RefCountPtr<ResourceBase>>(resource)) {
     ResourceBase* ptr =
-        absl::get<core::RefCountPtr<ResourceBase>>(resource).get();
+        abslx::get<core::RefCountPtr<ResourceBase>>(resource).get();
     ptr->Ref();
     return core::RefCountPtr<ResourceBase>(ptr);
-  } else if (absl::holds_alternative<core::WeakPtr<ResourceBase>>(resource)) {
-    return absl::get<core::WeakPtr<ResourceBase>>(resource).GetNewRef();
+  } else if (abslx::holds_alternative<core::WeakPtr<ResourceBase>>(resource)) {
+    return abslx::get<core::WeakPtr<ResourceBase>>(resource).GetNewRef();
   } else {
     return nullptr;
   }
@@ -138,7 +138,7 @@ ResourceMgr::~ResourceMgr() { Clear(); }
 void ResourceMgr::Clear() {
   // We do the deallocation outside of the lock to avoid a potential deadlock
   // in case any of the destructors access the resource manager.
-  absl::flat_hash_map<string, Container*> tmp_containers;
+  abslx::flat_hash_map<string, Container*> tmp_containers;
   {
     mutex_lock l(mu_);
     tmp_containers = std::move(containers_);
@@ -177,7 +177,7 @@ string ResourceMgr::DebugString() const {
         line.type.c_str(), line.resource->c_str(), line.detail.c_str()));
   }
   std::sort(text.begin(), text.end());
-  return absl::StrJoin(text, "\n");
+  return abslx::StrJoin(text, "\n");
 }
 
 Status ResourceMgr::DoCreate(const string& container_name, TypeIndex type,
@@ -287,7 +287,7 @@ Status ResourceMgr::DoDelete(const string& container, uint64 type_hash_code,
   TF_RETURN_IF_ERROR(PopResourceAndName(
       container, type_hash_code, resource_name, type_name, resource_and_name));
 
-  if (absl::holds_alternative<core::WeakPtr<ResourceBase>>(
+  if (abslx::holds_alternative<core::WeakPtr<ResourceBase>>(
           resource_and_name.resource)) {
     return errors::Internal(
         "Cannot delete an unowned Resource ", container, "/", resource_name,

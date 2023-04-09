@@ -130,11 +130,11 @@ class ClientLibrary {
     std::unique_ptr<CompileOnlyClient> client;
   };
 
-  absl::Mutex service_mutex_;  // Guards the singleton creation state.
-  absl::flat_hash_map<se::Platform::Id, std::unique_ptr<LocalInstance>>
+  abslx::Mutex service_mutex_;  // Guards the singleton creation state.
+  abslx::flat_hash_map<se::Platform::Id, std::unique_ptr<LocalInstance>>
       local_instances_ ABSL_GUARDED_BY(service_mutex_);
 
-  absl::flat_hash_map<se::Platform::Id, std::unique_ptr<CompileOnlyInstance>>
+  abslx::flat_hash_map<se::Platform::Id, std::unique_ptr<CompileOnlyInstance>>
       compile_only_instances_ ABSL_GUARDED_BY(service_mutex_);
 
   ClientLibrary(const ClientLibrary&) = delete;

@@ -86,7 +86,7 @@ TEST_F(FunctionsTest, InstantiationParameters) {
   func_instantiation_attr["C"].mutable_list()->add_type(DT_INT32);
   func_instantiation_attr["D"].set_type(DT_DOUBLE);
 
-  absl::flat_hash_map<string, DataType> type_parameters;
+  abslx::flat_hash_map<string, DataType> type_parameters;
   TF_EXPECT_OK(InstantiationTypeParameters(
       func, AttrSlice(&func_instantiation_attr), &type_parameters));
 
@@ -97,7 +97,7 @@ TEST_F(FunctionsTest, InstantiationParameters) {
   EXPECT_EQ(DT_INT32, type_parameters["C:1"]);
   EXPECT_EQ(DT_DOUBLE, type_parameters["D"]);
 
-  absl::flat_hash_map<string, AttrValue> body_parameters;
+  abslx::flat_hash_map<string, AttrValue> body_parameters;
   TF_EXPECT_OK(InstantiationBodyParameters(
       func, AttrSlice(&func_instantiation_attr), &body_parameters));
 

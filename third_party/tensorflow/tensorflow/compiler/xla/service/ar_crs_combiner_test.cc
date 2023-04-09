@@ -376,8 +376,8 @@ ENTRY %WhileLoop () -> (f32[2,2], f32[2,2]) {
   EXPECT_TRUE(ArCrsCombiner::TestInstructionsComputeSameValue(i1, i2));
 }
 
-void CompareReplicaGroups(absl::Span<const ReplicaGroup> groups_before,
-                          absl::Span<const ReplicaGroup> groups_after) {
+void CompareReplicaGroups(abslx::Span<const ReplicaGroup> groups_before,
+                          abslx::Span<const ReplicaGroup> groups_after) {
   ASSERT_EQ(groups_before.size(), groups_after.size());
   for (int i = 0; i < groups_before.size(); ++i) {
     // Somewhat verbose way to compare the replica_ids, because EqualsProto

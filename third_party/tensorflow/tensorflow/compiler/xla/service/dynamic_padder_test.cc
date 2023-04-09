@@ -532,7 +532,7 @@ class ExecutionTest : public HloTestBase {
     return module;
   }
   Literal PadAndExecute(std::unique_ptr<HloModule> module,
-                        absl::Span<Literal* const> arguments,
+                        abslx::Span<Literal* const> arguments,
                         bool slice_dynamic_output = true) {
     if (!slice_dynamic_output) {
       auto new_config = module->config();
@@ -577,7 +577,7 @@ ENTRY main {
 }
 )";
   const std::string hlo_text_not_padded =
-      absl::StrReplaceAll(hlo_text, {{"INDICES_BOUND", "2"}});
+      abslx::StrReplaceAll(hlo_text, {{"INDICES_BOUND", "2"}});
   auto module_not_padded = GetHloModule(hlo_text_not_padded);
 
   Literal operand =
@@ -593,7 +593,7 @@ ENTRY main {
 
   // Pad input to 4.
   const std::string hlo_text_padded =
-      absl::StrReplaceAll(hlo_text, {{"INDICES_BOUND", "4"}});
+      abslx::StrReplaceAll(hlo_text, {{"INDICES_BOUND", "4"}});
   auto module_padded = GetHloModule(hlo_text_padded);
   // Set up dynamic parameter binding.
   TF_CHECK_OK(module_padded->dynamic_parameter_binding().Bind(
@@ -787,7 +787,7 @@ ENTRY main {
 }
 )";
   const std::string hlo_text_not_padded =
-      absl::StrReplaceAll(hlo_text, {{"INDICES_BOUND", "2"}});
+      abslx::StrReplaceAll(hlo_text, {{"INDICES_BOUND", "2"}});
   auto module_not_padded = GetHloModule(hlo_text_not_padded);
 
   Literal operand = LiteralUtil::CreateR2<int32_t>({{1, 2}, {4, 5}});
@@ -798,7 +798,7 @@ ENTRY main {
 
   // Pad input to 4.
   const std::string hlo_text_padded =
-      absl::StrReplaceAll(hlo_text, {{"INDICES_BOUND", "4"}});
+      abslx::StrReplaceAll(hlo_text, {{"INDICES_BOUND", "4"}});
   auto module_padded = GetHloModule(hlo_text_padded);
   // Set up dynamic parameter binding.
   TF_CHECK_OK(module_padded->dynamic_parameter_binding().Bind(

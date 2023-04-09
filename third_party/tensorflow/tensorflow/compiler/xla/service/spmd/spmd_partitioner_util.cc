@@ -49,7 +49,7 @@ using hlo_sharding_util::GroupedSharding;
 
 bool HasReplicatedSharding(const HloSharding& sharding) {
   if (sharding.IsTuple()) {
-    return absl::c_any_of(sharding.tuple_elements(), HasReplicatedSharding);
+    return abslx::c_any_of(sharding.tuple_elements(), HasReplicatedSharding);
   }
   return sharding.IsReplicated();
 }
@@ -201,7 +201,7 @@ Shape MakeNonPaddedShapeForGivenPartition(const Shape& shape,
 std::vector<HloInstruction*> MakePartitionOffsets(
     const Shape& shape, const HloSharding& sharding,
     HloInstruction* partition_id, SpmdBuilder* b,
-    absl::Span<const int64_t> dims) {
+    abslx::Span<const int64_t> dims) {
   CHECK(!shape.IsTuple());
 
   std::vector<std::vector<int32_t>> offset_arrays(shape.rank());
@@ -210,7 +210,7 @@ std::vector<HloInstruction*> MakePartitionOffsets(
   }
   auto shard_shape = MakePartitionedShape(shape, sharding);
   sharding.tile_assignment().Each(
-      [&](absl::Span<const int64_t> indices, int64_t device) {
+      [&](abslx::Span<const int64_t> indices, int64_t device) {
         for (int64_t i = 0; i < shape.rank(); ++i) {
           offset_arrays[i][device] = indices[i] * shard_shape.dimensions(i);
         }
@@ -218,7 +218,7 @@ std::vector<HloInstruction*> MakePartitionOffsets(
   std::vector<HloInstruction*> offsets;
   for (int64_t i = 0; i < shape.rank(); ++i) {
     if (sharding.tile_assignment().dim(i) == 1 ||
-        (!dims.empty() && !absl::c_linear_search(dims, i))) {
+        (!dims.empty() && !abslx::c_linear_search(dims, i))) {
       offsets.push_back(b->AddInstruction(
           HloInstruction::CreateConstant(LiteralUtil::Zero(S32))));
     } else {
@@ -309,9 +309,9 @@ std::optional<HloSharding> PartialReplicateReshardCompatibleSharding(
     return std::nullopt;
   }
 
-  absl::flat_hash_map<int64_t, int64_t> device_to_replication_group;
+  abslx::flat_hash_map<int64_t, int64_t> device_to_replication_group;
   partial_sharding.tile_assignment().Each(
-      [&](absl::Span<const int64_t> indices, int64_t device) {
+      [&](abslx::Span<const int64_t> indices, int64_t device) {
         int64_t gid = 0;
         for (int64_t i = 0; i < rank; ++i) {
           gid *= partial_sharding.tile_assignment().dim(i);
@@ -387,7 +387,7 @@ std::optional<HloSharding> PartialReplicateReshardCompatibleSharding(
 
   bool groups_matching = true;
   target_sharding.tile_assignment().Each(
-      [&](absl::Span<const int64_t> indices, int64_t device) {
+      [&](abslx::Span<const int64_t> indices, int64_t device) {
         if (device_to_replication_group[device] !=
             device_to_replication_group[transpose_tile_assignment(indices)]) {
           groups_matching = false;
@@ -829,7 +829,7 @@ std::optional<HloInstruction*> ExchangeHalo(
        i >= 0 && (-i - 1) * input_shard_size < right_bound; --i) {
     std::vector<std::pair<int64_t, int64_t>> source_target_pairs;
     target.tile_assignment().Each(
-        [&](absl::Span<const int64_t> indices, int64_t device) {
+        [&](abslx::Span<const int64_t> indices, int64_t device) {
           if (indices[dim] > i) {
             std::vector<int64_t> source_indices(indices.begin(), indices.end());
             source_indices[dim] -= i + 1;
@@ -891,7 +891,7 @@ std::optional<HloInstruction*> ExchangeHalo(
        i < CeilOfRatio(max_right_halo_size, input_shard_size); ++i) {
     std::vector<std::pair<int64_t, int64_t>> source_target_pairs;
     target.tile_assignment().Each(
-        [&](absl::Span<const int64_t> indices, int64_t device) {
+        [&](abslx::Span<const int64_t> indices, int64_t device) {
           if (indices[dim] > i) {
             std::vector<int64_t> target_indices(indices.begin(), indices.end());
             target_indices[dim] -= i + 1;
@@ -1113,7 +1113,7 @@ std::optional<HloInstruction*> ExchangeHaloAndGetValidData(
 }
 
 HloInstruction* HaloExchangeToPadOnLeft(PartitionedHlo& original,
-                                        absl::Span<const int64_t> dims) {
+                                        abslx::Span<const int64_t> dims) {
   if (original.sharding().IsTileMaximal()) {
     return original.hlo();
   }
@@ -1127,7 +1127,7 @@ HloInstruction* HaloExchangeToPadOnLeft(PartitionedHlo& original,
     dim->set_window_dilation(1);
     dim->set_window_reversal(false);
     int64_t low_padding = 0;
-    if (absl::c_linear_search(dims, i)) {
+    if (abslx::c_linear_search(dims, i)) {
       low_padding = RoundUpTo(original.base_shape().dimensions(i),
                               original.sharding().tile_assignment().dim(i)) -
                     original.base_shape().dimensions(i);
@@ -1235,8 +1235,8 @@ std::optional<int64_t> GetKValueInTopKWhenPartitionSortDim(
       supported = false;
       break;
     }
-    if (absl::c_any_of(slice->slice_starts(), [](int x) { return x != 0; }) ||
-        absl::c_any_of(slice->slice_strides(), [](int x) { return x != 1; })) {
+    if (abslx::c_any_of(slice->slice_starts(), [](int x) { return x != 0; }) ||
+        abslx::c_any_of(slice->slice_strides(), [](int x) { return x != 1; })) {
       // Strided slice or slicing at the beginning isn't supported.
       supported = false;
       break;
@@ -1423,10 +1423,10 @@ std::optional<GroupedSharding> AlignGroupsWithInternal(
     GroupedSharding grouped_sharding, const GroupedSharding& reference,
     bool requires_compatibility, bool ignore_group_order) {
   // Returns src -> dst index mapping.
-  auto get_permutation = [](absl::Span<const int64_t> src,
-                            absl::Span<const int64_t> dst) {
+  auto get_permutation = [](abslx::Span<const int64_t> src,
+                            abslx::Span<const int64_t> dst) {
     CHECK_EQ(src.size(), dst.size());
-    absl::flat_hash_map<int64_t, int64_t> dst_reverse_map;
+    abslx::flat_hash_map<int64_t, int64_t> dst_reverse_map;
     for (int64_t i = 0; i < dst.size(); ++i) {
       dst_reverse_map[dst[i]] = i;
     }
@@ -1440,14 +1440,14 @@ std::optional<GroupedSharding> AlignGroupsWithInternal(
   };
   CHECK_EQ(grouped_sharding.device_groups.size(),
            reference.device_groups.size());
-  absl::flat_hash_map<int64_t, int64_t> device_to_ref_group;
+  abslx::flat_hash_map<int64_t, int64_t> device_to_ref_group;
   for (int64_t g = 0; g < reference.device_groups.size(); ++g) {
     for (int64_t device : reference.device_groups[g]) {
       device_to_ref_group[device] = g;
     }
   }
   auto unique_ref_dev_group =
-      [&](absl::Span<const int64_t> devices) -> int64_t {
+      [&](abslx::Span<const int64_t> devices) -> int64_t {
     int64_t ref_g = -1;
     for (int64_t device : devices) {
       if (ref_g == -1) {
@@ -1482,7 +1482,7 @@ std::optional<GroupedSharding> AlignGroupsWithInternal(
   }
   if (matching_groups && !grouped_sharding.sharding.IsTileMaximal()) {
     auto tiles = grouped_sharding.sharding.tile_assignment();
-    tiles.Each([&](absl::Span<const int64_t> indices, int64_t* device) {
+    tiles.Each([&](abslx::Span<const int64_t> indices, int64_t* device) {
       *device = original_src_to_ref_permutation[*device];
     });
     grouped_sharding.sharding =
@@ -1510,9 +1510,9 @@ std::optional<GroupedSharding> AlignGroupsWithIfCompatible(
 }
 
 HloSharding AlignShardingOnDims(const HloSharding& sharding,
-                                absl::Span<const int64_t> sharding_dims,
+                                abslx::Span<const int64_t> sharding_dims,
                                 const HloSharding& reference,
-                                absl::Span<const int64_t> reference_dims) {
+                                abslx::Span<const int64_t> reference_dims) {
   auto sharding_grouped =
       hlo_sharding_util::GroupShardingOnDims(sharding, sharding_dims);
   auto reference_grouped =
@@ -1612,7 +1612,7 @@ SPMDCollectiveOpsCreator GetPerGroupCollectiveOpsCreator(
       };
   result.create_cross_partition_all_to_all =
       [creator, expand_partition_groups](
-          SpmdBuilder* b, absl::Span<HloInstruction* const> operands,
+          SpmdBuilder* b, abslx::Span<HloInstruction* const> operands,
           const std::vector<std::vector<int64_t>>& partition_subgroups,
           int64_t channel_id, std::optional<int64_t> split_dimension) {
         return creator.create_cross_partition_all_to_all(
@@ -1647,10 +1647,10 @@ PartitionedHlo::PartitioningState CreatePerGroupPartitioningState(
   // Create a string key for the groups.
   std::vector<std::string> per_group_strings(device_groups.size());
   for (int64_t i = 0; i < per_group_strings.size(); ++i) {
-    per_group_strings[i] = absl::StrJoin(device_groups[i], ",");
+    per_group_strings[i] = abslx::StrJoin(device_groups[i], ",");
   }
   auto& grouped_cache =
-      state.reshard_cache->groupd_caches[absl::StrJoin(per_group_strings, ";")];
+      state.reshard_cache->groupd_caches[abslx::StrJoin(per_group_strings, ";")];
   if (!grouped_cache) {
     grouped_cache = std::make_unique<PartitionedHlo::ReshardCache>();
   }
@@ -1661,8 +1661,8 @@ PartitionedHlo::PartitioningState CreatePerGroupPartitioningState(
 HloInstruction* PerGroupSliceFromReplicated(
     HloInstruction* replicated, HloInstruction* partition_id,
     const std::vector<std::vector<int64_t>>& device_groups,
-    absl::Span<const int64_t> group_dims,
-    absl::Span<const int64_t> group_dim_sizes, SpmdBuilder* b) {
+    abslx::Span<const int64_t> group_dims,
+    abslx::Span<const int64_t> group_dim_sizes, SpmdBuilder* b) {
   std::vector<uint32_t> group_ids(device_groups.size() *
                                   device_groups[0].size());
   for (int64_t g = 0; g < device_groups.size(); ++g) {
@@ -1682,7 +1682,7 @@ HloInstruction* PerGroupSliceFromReplicated(
     group_level_tile_dims[group_dims[i]] = group_dim_sizes[i];
   }
   Array<int64_t> group_level_tile(group_level_tile_dims);
-  group_level_tile.Each([&](absl::Span<const int64_t> indices, int64_t* group) {
+  group_level_tile.Each([&](abslx::Span<const int64_t> indices, int64_t* group) {
     *group = 0;
     for (int64_t dim : group_dims) {
       *group *= group_level_tile.dim(dim);
@@ -1710,9 +1710,9 @@ std::optional<HloOpcode> ParseReductionComputation(
   if (!root->IsElementwiseBinary()) {
     return std::nullopt;
   }
-  if (!absl::c_linear_search(root->operands(),
+  if (!abslx::c_linear_search(root->operands(),
                              reduction_comp->parameter_instruction(0)) ||
-      !absl::c_linear_search(root->operands(),
+      !abslx::c_linear_search(root->operands(),
                              reduction_comp->parameter_instruction(1))) {
     return std::nullopt;
   }
@@ -1736,9 +1736,9 @@ std::optional<std::vector<int64_t>> FindMatchingPartitionedDimsForGrouping(
     return dims;
   }
   int64_t rank = sharding.tile_assignment().num_dimensions();
-  absl::flat_hash_map<int64_t, std::vector<int64_t>> device_to_index;
+  abslx::flat_hash_map<int64_t, std::vector<int64_t>> device_to_index;
   sharding.tile_assignment().Each(
-      [&](absl::Span<const int64_t> index, int64_t device) {
+      [&](abslx::Span<const int64_t> index, int64_t device) {
         device_to_index[device] =
             std::vector<int64_t>(index.begin(), index.begin() + rank);
       });
@@ -1755,7 +1755,7 @@ std::optional<std::vector<int64_t>> FindMatchingPartitionedDimsForGrouping(
   }
   for (const auto& group : device_groups) {
     for (int64_t i = 1; i < group.size(); ++i) {
-      if (absl::c_any_of(dims, [&](const int64_t dim) {
+      if (abslx::c_any_of(dims, [&](const int64_t dim) {
             return device_to_index[group[i]][dim] !=
                    device_to_index[group[0]][dim];
           })) {
@@ -1768,14 +1768,14 @@ std::optional<std::vector<int64_t>> FindMatchingPartitionedDimsForGrouping(
 
 HloSharding CreateMatchingShardingOnDims(
     const Shape& target_shape, const HloSharding& source_sharding,
-    absl::Span<const int64_t> target_dims,
-    absl::Span<const int64_t> source_dims) {
+    abslx::Span<const int64_t> target_dims,
+    abslx::Span<const int64_t> source_dims) {
   CHECK(target_dims.size() == source_dims.size())
       << "Expected 1:1 match between parallel dimensions";
   if (source_sharding.IsReplicated()) {
     return HloSharding::Replicate();
   }
-  absl::InlinedVector<int64_t, 4> tile_dims(target_shape.dimensions_size(), 1);
+  abslx::InlinedVector<int64_t, 4> tile_dims(target_shape.dimensions_size(), 1);
   int num_tiles = 1;
   for (int i = 0, end = target_dims.size(); i < end; ++i) {
     num_tiles *= source_sharding.tile_assignment().dim(source_dims[i]);
@@ -1818,7 +1818,7 @@ GatherOperandsShardedAcrossParallelDims(
   if (idx_parallel_tiles_num == 1 && op_parallel_tiles_num == 1) {
     return std::nullopt;
   }
-  absl::InlinedVector<int64_t, 1> indices_parallel_dims_ordered_as_operand;
+  abslx::InlinedVector<int64_t, 1> indices_parallel_dims_ordered_as_operand;
   for (int idx : parallel_dims.index_parallel_in_dim) {
     if (idx != -1) {
       indices_parallel_dims_ordered_as_operand.push_back(idx);

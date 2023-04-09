@@ -32,7 +32,7 @@ namespace xla {
 
 void BufferSequencingEvent::SetSequencingEvent(EventPool::Handle event,
                                                se::Stream* stream) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   CHECK(!event_.event());
   event_ = std::move(event);
   CHECK(streams_defined_on_.empty());
@@ -51,12 +51,12 @@ uint64_t BufferSequencingEvent::sequence_number() const {
 }
 
 void BufferSequencingEvent::WaitForEventOnStream(se::Stream* stream) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
 
   // We cannot wait for an event until ThenRecordEvent has been called; on GPU
   // newly created events are deemed to have already happened past.
   mu_.Await(
-      absl::Condition(this, &BufferSequencingEvent::EventHasBeenRecorded));
+      abslx::Condition(this, &BufferSequencingEvent::EventHasBeenRecorded));
 
   // The set of defined streams is expected to be very small indeed (usually
   // 1-2), so a simple linear scan should be fast enough.
@@ -71,12 +71,12 @@ void BufferSequencingEvent::WaitForEventOnStream(se::Stream* stream) {
 }
 
 bool BufferSequencingEvent::DefinedOn(se::Stream* stream) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
 
   // We cannot wait for an event until ThenRecordEvent has been called; on GPU
   // newly created events are deemed to have already happened past.
   mu_.Await(
-      absl::Condition(this, &BufferSequencingEvent::EventHasBeenRecorded));
+      abslx::Condition(this, &BufferSequencingEvent::EventHasBeenRecorded));
 
   // The set of defined streams is expected to be very small indeed (usually
   // 1-2), so a simple linear scan should be fast enough.
@@ -85,12 +85,12 @@ bool BufferSequencingEvent::DefinedOn(se::Stream* stream) {
 }
 
 bool BufferSequencingEvent::IsComplete() {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
 
   // We cannot wait for an event until ThenRecordEvent has been called; on
   // GPU newly created events are deemed to have already happened past.
   mu_.Await(
-      absl::Condition(this, &BufferSequencingEvent::EventHasBeenRecorded));
+      abslx::Condition(this, &BufferSequencingEvent::EventHasBeenRecorded));
 
   return event_.event()->PollForStatus() == se::Event::Status::kComplete;
 }
@@ -98,7 +98,7 @@ bool BufferSequencingEvent::IsComplete() {
 /* static */ std::shared_ptr<TrackedDeviceBuffer>
 TrackedDeviceBuffer::FromScopedShapedBuffer(
     ScopedShapedBuffer* shaped_buffer,
-    absl::Span<const std::shared_ptr<BufferSequencingEvent>>
+    abslx::Span<const std::shared_ptr<BufferSequencingEvent>>
         definition_events) {
   ShapeTree<se::DeviceMemoryBase>::iterator iterator =
       shaped_buffer->buffers().begin();
@@ -115,7 +115,7 @@ TrackedDeviceBuffer::FromScopedShapedBuffer(
   CHECK(iterator == shaped_buffer->buffers().end());
   return std::make_shared<TrackedDeviceBuffer>(
       shaped_buffer->memory_allocator(), shaped_buffer->device_ordinal(),
-      absl::Span<se::DeviceMemoryBase>(buffers), definition_events,
+      abslx::Span<se::DeviceMemoryBase>(buffers), definition_events,
       /*on_delete_callback=*/nullptr);
 }
 
@@ -164,8 +164,8 @@ void TrackedDeviceBuffer::AddToInputAsDonated(
 
 TrackedDeviceBuffer::TrackedDeviceBuffer(
     se::DeviceMemoryAllocator* allocator, int device_ordinal,
-    absl::Span<se::DeviceMemoryBase const> device_memory,
-    absl::Span<const std::shared_ptr<BufferSequencingEvent>> definition_events,
+    abslx::Span<se::DeviceMemoryBase const> device_memory,
+    abslx::Span<const std::shared_ptr<BufferSequencingEvent>> definition_events,
     std::function<void()> on_delete_callback)
     : allocator_(allocator),
       device_ordinal_(device_ordinal),
@@ -215,7 +215,7 @@ TrackedDeviceBuffer::LockUseAndTransferUsageEvents() {
 
 void GetDeviceBufferEvents(
     const TrackedDeviceBuffer& buffer, bool get_usage_events,
-    absl::flat_hash_set<BufferSequencingEvent*>* events) {
+    abslx::flat_hash_set<BufferSequencingEvent*>* events) {
   if (get_usage_events) {
     for (const auto& e : buffer.usage_events()) {
       events->insert(e.event.get());
@@ -229,7 +229,7 @@ void GetDeviceBufferEvents(
 
 void WaitForBufferDefinitionEventsOnStream(const TrackedDeviceBuffer& buffer,
                                            se::Stream* stream) {
-  absl::flat_hash_set<BufferSequencingEvent*> events;
+  abslx::flat_hash_set<BufferSequencingEvent*> events;
   GetDeviceBufferEvents(buffer, /*get_usage_events=*/false, &events);
   for (BufferSequencingEvent* event : events) {
     event->WaitForEventOnStream(stream);

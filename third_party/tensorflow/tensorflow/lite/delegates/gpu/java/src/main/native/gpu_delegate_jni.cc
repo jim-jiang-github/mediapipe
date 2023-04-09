@@ -166,14 +166,14 @@ class CompatibilityListHelper {
   CompatibilityListHelper()
       : compatibility_list_(
             tflite::acceleration::GPUCompatibilityList::Create()) {}
-  absl::Status ReadInfo() {
+  abslx::Status ReadInfo() {
     auto status = tflite::acceleration::RequestAndroidInfo(&android_info_);
     if (!status.ok()) return status;
 
     if (android_info_.android_sdk_version < "21") {
       // Weakly linked symbols may not be available on pre-21, and the GPU is
       // not supported anyway so return early.
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     std::unique_ptr<tflite::gpu::gl::EglEnvironment> env;
@@ -183,7 +183,7 @@ class CompatibilityListHelper {
     status = tflite::gpu::gl::RequestGpuInfo(&gpu_info_);
     if (!status.ok()) return status;
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   bool IsDelegateSupportedOnThisDevice() {

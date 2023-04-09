@@ -71,10 +71,10 @@ class TensorDataset : public CachableSequence<Tensor> {
 
 class SlowDataset : public CachableSequence<Tensor> {
  public:
-  explicit SlowDataset(absl::Duration delay) : delay_(delay) {}
+  explicit SlowDataset(abslx::Duration delay) : delay_(delay) {}
 
   StatusOr<Tensor> GetNext() override {
-    Env::Default()->SleepForMicroseconds(absl::ToInt64Microseconds(delay_));
+    Env::Default()->SleepForMicroseconds(abslx::ToInt64Microseconds(delay_));
     return Tensor("Test Tensor");
   }
 
@@ -83,7 +83,7 @@ class SlowDataset : public CachableSequence<Tensor> {
   }
 
  private:
-  absl::Duration delay_;
+  abslx::Duration delay_;
 };
 
 template <class T>
@@ -156,7 +156,7 @@ TEST(CrossTrainerCacheTest, GetFromMultipleTrainers) {
   for (size_t i = 0; i < num_elements; ++i) {
     // All the readers get the same element in one step.
     for (size_t j = 0; j < num_trainers; ++j) {
-      const std::string trainer_id = absl::StrCat("Trainer ", j);
+      const std::string trainer_id = abslx::StrCat("Trainer ", j);
       EXPECT_THAT(cache.Get(trainer_id), IsOkAndHolds(Pointee(i)));
     }
   }
@@ -200,7 +200,7 @@ TEST(CrossTrainerCacheTest, NewTrainersStartLate) {
 
   // New trainers start to read after the first trainer has finished.
   for (int j = 0; j < 100; ++j) {
-    EXPECT_THAT(cache.Get(absl::StrCat("New trainer ", j)),
+    EXPECT_THAT(cache.Get(abslx::StrCat("New trainer ", j)),
                 IsOkAndHolds(Pointee(Gt(94))));
   }
 }
@@ -298,8 +298,8 @@ TEST(CrossTrainerCacheTest, ConcurrentReaders) {
   for (size_t i = 0; i < num_trainers; ++i) {
     results.emplace_back();
     std::vector<int64_t>& result = results.back();
-    reader_threads.push_back(absl::WrapUnique(Env::Default()->StartThread(
-        /*thread_options=*/{}, /*name=*/absl::StrCat("Trainer_", i),
+    reader_threads.push_back(abslx::WrapUnique(Env::Default()->StartThread(
+        /*thread_options=*/{}, /*name=*/abslx::StrCat("Trainer_", i),
         [&cache, num_elements_to_read, &result]() {
           for (size_t i = 0; i < num_elements_to_read; ++i) {
             // Randomly slows down some trainers.
@@ -307,7 +307,7 @@ TEST(CrossTrainerCacheTest, ConcurrentReaders) {
               Env::Default()->SleepForMicroseconds(2000);
             }
             TF_ASSERT_OK_AND_ASSIGN(std::shared_ptr<const int64_t> next,
-                                    cache.Get(absl::StrCat("Trainer_", i)));
+                                    cache.Get(abslx::StrCat("Trainer_", i)));
             result.push_back(*next);
           }
         })));
@@ -333,8 +333,8 @@ TEST(CrossTrainerCacheTest, ConcurrentReadersFromOneTrainer) {
   std::vector<int64_t> results;  // Guarded by `mu`.
   std::vector<std::unique_ptr<Thread>> reader_threads;
   for (size_t i = 0; i < num_trainers; ++i) {
-    reader_threads.push_back(absl::WrapUnique(Env::Default()->StartThread(
-        /*thread_options=*/{}, /*name=*/absl::StrCat("Thread_", i),
+    reader_threads.push_back(abslx::WrapUnique(Env::Default()->StartThread(
+        /*thread_options=*/{}, /*name=*/abslx::StrCat("Thread_", i),
         [&cache, num_elements_to_read, &results, &mu]() {
           for (size_t i = 0; i < num_elements_to_read; ++i) {
             // Randomly slows down some trainers.
@@ -365,12 +365,12 @@ TEST(CrossTrainerCacheTest, Cancel) {
   Status status;  // Guarded by `mu`.
   std::vector<std::unique_ptr<Thread>> reader_threads;
   for (size_t i = 0; i < num_trainers; ++i) {
-    reader_threads.push_back(absl::WrapUnique(Env::Default()->StartThread(
-        /*thread_options=*/{}, /*name=*/absl::StrCat("Trainer_", i),
+    reader_threads.push_back(abslx::WrapUnique(Env::Default()->StartThread(
+        /*thread_options=*/{}, /*name=*/abslx::StrCat("Trainer_", i),
         [&cache, &status, &mu]() {
           for (int j = 0; true; ++j) {
             StatusOr<std::shared_ptr<const Tensor>> tensor =
-                cache.Get(absl::StrCat("Trainer_", j % 1000));
+                cache.Get(abslx::StrCat("Trainer_", j % 1000));
             {
               mutex_lock l(mu);
               status = tensor.status();

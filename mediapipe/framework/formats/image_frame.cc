@@ -248,10 +248,10 @@ std::string ImageFrame::InvalidFormatString(ImageFormat::Format format) {
   const proto_ns::EnumValueDescriptor* enum_value_descriptor =
       ImageFormat::Format_descriptor()->FindValueByNumber(format);
   if (enum_value_descriptor == nullptr) {
-    return absl::StrCat("Format with number ", format,
+    return abslx::StrCat("Format with number ", format,
                         " is not a valid format.");
   } else {
-    return absl::StrCat("Format ", enum_value_descriptor->DebugString(),
+    return abslx::StrCat("Format ", enum_value_descriptor->DebugString(),
                         " is not valid in this situation.");
   }
 #endif

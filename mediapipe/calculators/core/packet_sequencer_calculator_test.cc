@@ -79,7 +79,7 @@ TEST_F(PacketSequencerCalculatorTest, ChannelEarly) {
   std::vector<Packet> outputs;
   MP_ASSERT_OK(graph.ObserveOutputStream("select_timed", [&](const Packet& p) {
     outputs.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
 

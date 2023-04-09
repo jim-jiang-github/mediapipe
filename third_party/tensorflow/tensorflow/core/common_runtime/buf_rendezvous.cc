@@ -76,7 +76,7 @@ void BufRendezvous::PurgeTable(const Status& s, HookTable* table) {
 }
 
 string BufRendezvous::Hook::DebugString() const {
-  return absl::StrCat("[dev:", (prod_dev ? prod_dev->name() : "none"),
+  return abslx::StrCat("[dev:", (prod_dev ? prod_dev->name() : "none"),
                       ", ctx:", reinterpret_cast<uint64>(prod_ctx),
                       ", val:", reinterpret_cast<uint64>(prod_value),
                       ", pcb:", reinterpret_cast<uint64>(&prod_cb),

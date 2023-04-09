@@ -138,7 +138,7 @@ class SPMDExpanderRegistry {
       std::string opName, std::unique_ptr<SPMDExpanderBase> prop);
 
  private:
-  absl::flat_hash_map<std::string, std::unique_ptr<SPMDExpanderBase>>
+  abslx::flat_hash_map<std::string, std::unique_ptr<SPMDExpanderBase>>
       op_to_propagate_fn_map_;
 };
 

@@ -35,8 +35,8 @@ namespace tensorflow {
 
 /*static*/ ProcessState* ProcessState::singleton() {
   static ProcessState* instance = new ProcessState;
-  static absl::once_flag f;
-  absl::call_once(f, []() {
+  static abslx::once_flag f;
+  abslx::call_once(f, []() {
     AllocatorFactoryRegistry::singleton()->process_state_ = instance;
   });
 
@@ -104,7 +104,7 @@ Allocator* ProcessState::GetCPUAllocator(int numa_node) {
       BFCAllocator::Options allocator_opts;
       allocator_opts.allow_growth = true;
       allocator = new BFCAllocator(
-          absl::WrapUnique(sub_allocator), cpu_mem_limit,
+          abslx::WrapUnique(sub_allocator), cpu_mem_limit,
           /*name=*/"bfc_cpu_allocator_for_gpu", allocator_opts);
 
       VLOG(2) << "Using BFCAllocator with memory limit of "

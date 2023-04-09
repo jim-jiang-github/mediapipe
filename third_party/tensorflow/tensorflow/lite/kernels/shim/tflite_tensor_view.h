@@ -46,7 +46,7 @@ class TfLiteTensorView : public TensorView {
   // deduce the right template parameter
   template <typename DType>
   TfLiteTensorView(::TfLiteTensor *wrapped_tensor, const DType &dtype)
-      : TensorView(absl::Span<int>(wrapped_tensor->dims->data,
+      : TensorView(abslx::Span<int>(wrapped_tensor->dims->data,
                                    wrapped_tensor->dims->size),
                    wrapped_tensor->data.raw, wrapped_tensor->bytes, dtype),
         wrapped_tensor_(wrapped_tensor),
@@ -59,7 +59,7 @@ class TfLiteTensorView : public TensorView {
   // Templated constructor for const input.
   template <typename DType>
   TfLiteTensorView(const ::TfLiteTensor *wrapped_tensor, const DType &dtype)
-      : TensorView(absl::Span<int>(wrapped_tensor->dims->data,
+      : TensorView(abslx::Span<int>(wrapped_tensor->dims->data,
                                    wrapped_tensor->dims->size),
                    wrapped_tensor->data.raw, wrapped_tensor->bytes, dtype),
         const_wrapped_tensor_(wrapped_tensor) {}
@@ -71,7 +71,7 @@ class TfLiteTensorView : public TensorView {
 
   // Let the factory implementation use private constructors
   template <typename TfLiteTensorType>
-  friend absl::StatusOr<
+  friend abslx::StatusOr<
       typename MatchConstNess<TfLiteTensorType, TfLiteTensorView>::Type>
   TfLiteTensorViewTemplatizedNew(TfLiteTensorType *wrapped_tensor);
 
@@ -114,12 +114,12 @@ struct TensorViewSubType<const ::TfLiteTensor> {
 
 // Specialization for TensorView::New()
 template <>
-absl::StatusOr<TfLiteTensorView> TensorView::New<::TfLiteTensor>(
+abslx::StatusOr<TfLiteTensorView> TensorView::New<::TfLiteTensor>(
     ::TfLiteTensor *wrapped_tensor);
 
 // Specialization for TensorView::New()
 template <>
-absl::StatusOr<const TfLiteTensorView> TensorView::New<const ::TfLiteTensor>(
+abslx::StatusOr<const TfLiteTensorView> TensorView::New<const ::TfLiteTensor>(
     const ::TfLiteTensor *wrapped_tensor);
 
 }  // namespace shim

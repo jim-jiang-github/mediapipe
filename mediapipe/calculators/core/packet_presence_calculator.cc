@@ -60,26 +60,26 @@ constexpr char kPacketTag[] = "PACKET";
 // }
 class PacketPresenceCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Tag(kPacketTag).SetAny();
     cc->Outputs().Tag(kPresenceTag).Set<bool>();
     // Process() function is invoked in response to input stream timestamp
     // bound updates.
     cc->SetProcessTimestampBounds(true);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     cc->Outputs()
         .Tag(kPresenceTag)
         .AddPacket(MakePacket<bool>(!cc->Inputs().Tag(kPacketTag).IsEmpty())
                        .At(cc->InputTimestamp()));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(PacketPresenceCalculator);

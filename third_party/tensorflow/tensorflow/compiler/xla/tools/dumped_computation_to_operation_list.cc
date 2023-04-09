@@ -44,13 +44,13 @@ class OperationDumper : public DfsHloVisitorWithDefault {
   explicit OperationDumper(const std::string& path) : path_(path) {}
 
   Status DefaultAction(HloInstruction* hlo) override {
-    std::string params = absl::StrJoin(
+    std::string params = abslx::StrJoin(
         hlo->operands(), ", ",
         [](std::string* out, const HloInstruction* operand) {
-          absl::StrAppend(out, ShapeUtil::HumanString(operand->shape()));
+          abslx::StrAppend(out, ShapeUtil::HumanString(operand->shape()));
         });
     // Spit `op_name(params...) -> result_type :: path` to stdout.
-    std::cout << absl::StrFormat("%s :: (%s) -> %s :: %s\n",
+    std::cout << abslx::StrFormat("%s :: (%s) -> %s :: %s\n",
                                  HloOpcodeString(hlo->opcode()), params,
                                  ShapeUtil::HumanString(hlo->shape()), path_);
     return OkStatus();
@@ -60,7 +60,7 @@ class OperationDumper : public DfsHloVisitorWithDefault {
   std::string path_;
 };
 
-void RealMain(absl::Span<char* const> args) {
+void RealMain(abslx::Span<char* const> args) {
   LocalClient* client = ClientLibrary::LocalClientOrDie();
   LocalService* local_service =
       ClientLibrary::GetXlaService(client->platform());
@@ -106,7 +106,7 @@ void RealMain(absl::Span<char* const> args) {
 int main(int argc, char** argv) {
   tensorflow::port::InitMain(argv[0], &argc, &argv);
 
-  absl::Span<char* const> args(argv, argc);
+  abslx::Span<char* const> args(argv, argc);
   args.remove_prefix(1);  // Pop off the binary name, argv[0]
   xla::tools::RealMain(args);
   return 0;

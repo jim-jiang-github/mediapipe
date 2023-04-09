@@ -57,7 +57,7 @@ class DescriptorReader {
 
   static std::string CleanTypeName(const std::string& package,
                                    const std::string& name) {
-    return absl::StrCat(package, ".", name);
+    return abslx::StrCat(package, ".", name);
   }
 
   // Returns the length of the common prefix between two strings.
@@ -80,7 +80,7 @@ class DescriptorReader {
     std::string result = "";
     int best_match = -1;
     for (const std::string& type_name : type_names) {
-      std::string name = absl::AsciiStrToLower(type_name);
+      std::string name = abslx::AsciiStrToLower(type_name);
       if (name.rfind('.') != std::string::npos) {
         name = name.substr(name.rfind('.') + 1);
       }
@@ -134,7 +134,7 @@ class DescriptorReader {
     DescriptorProto descriptor = FindTopDescriptor(file);
     std::string type_name = mediapipe::DescriptorReader::FindTopTypeName(files);
     mediapipe::DescriptorReader::WriteFile(
-        absl::GetFlag(FLAGS_root_type_name_output_path), type_name);
+        abslx::GetFlag(FLAGS_root_type_name_output_path), type_name);
   }
 
   static void WriteMessageTypeMacro(const std::string& path,
@@ -142,11 +142,11 @@ class DescriptorReader {
     FileDescriptorProto file = FindTopFile(files);
     DescriptorProto descriptor = FindTopDescriptor(file);
     std::string type_package =
-        absl::StrReplaceAll(file.package(), {{".", "::"}});
+        abslx::StrReplaceAll(file.package(), {{".", "::"}});
     std::string type_name = descriptor.name();
     std::string contents =
-        absl::StrCat("#define MP_OPTION_TYPE_NS ", type_package, "\n") +
-        absl::StrCat("#define MP_OPTION_TYPE_NAME ", type_name, "\n");
+        abslx::StrCat("#define MP_OPTION_TYPE_NS ", type_package, "\n") +
+        abslx::StrCat("#define MP_OPTION_TYPE_NAME ", type_name, "\n");
     WriteFile(path, contents);
   }
 };
@@ -155,16 +155,16 @@ class DescriptorReader {
 
 int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
-  absl::ParseCommandLine(argc, argv);
+  abslx::ParseCommandLine(argc, argv);
   auto files = mediapipe::DescriptorReader::ReadFileDescriptorSet(
-      absl::GetFlag(FLAGS_input_path));
-  if (!absl::GetFlag(FLAGS_root_type_name_output_path).empty()) {
+      abslx::GetFlag(FLAGS_input_path));
+  if (!abslx::GetFlag(FLAGS_root_type_name_output_path).empty()) {
     mediapipe::DescriptorReader::WriteMessageTypeName(
-        absl::GetFlag(FLAGS_root_type_name_output_path), files);
+        abslx::GetFlag(FLAGS_root_type_name_output_path), files);
   }
-  if (!absl::GetFlag(FLAGS_root_type_macro_output_path).empty()) {
+  if (!abslx::GetFlag(FLAGS_root_type_macro_output_path).empty()) {
     mediapipe::DescriptorReader::WriteMessageTypeMacro(
-        absl::GetFlag(FLAGS_root_type_macro_output_path), files);
+        abslx::GetFlag(FLAGS_root_type_macro_output_path), files);
   }
   return EXIT_SUCCESS;
 }

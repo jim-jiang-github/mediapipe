@@ -29,7 +29,7 @@ namespace gpu {
 
 // Parameterized test: mean, difference, tolerance.
 // Input is constructed as [mean-2*diff, mean-diff, mean+diff, mean+2*diff]
-absl::Status MeanStddevNormSeparateBatchesTest(float mean, float diff,
+abslx::Status MeanStddevNormSeparateBatchesTest(float mean, float diff,
                                                float tolerance,
                                                TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
@@ -78,10 +78,10 @@ absl::Status MeanStddevNormSeparateBatchesTest(float mean, float diff,
                                     dst_tensor_single_step.data, tolerance));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MeanStddevNormalizationAllBatchesTest(
+abslx::Status MeanStddevNormalizationAllBatchesTest(
     TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(9, 1, 1, 4);
@@ -143,10 +143,10 @@ absl::Status MeanStddevNormalizationAllBatchesTest(
           << "Failed using precision " << ToString(precision);
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MeanStddevNormalizationLargeVectorTest(
+abslx::Status MeanStddevNormalizationLargeVectorTest(
     TestExecutionEnvironment* env) {
   const float mean = 100.0f;
   const float diff = 1.0f;
@@ -217,7 +217,7 @@ absl::Status MeanStddevNormalizationLargeVectorTest(
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

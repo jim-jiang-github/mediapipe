@@ -33,7 +33,7 @@ namespace python {
 
 // A mutex to guard the output stream observer python callback function.
 // Only one python callback can run at once.
-absl::Mutex callback_mutex;
+abslx::Mutex callback_mutex;
 
 template <typename T>
 T ParseProto(const py::object& proto_object) {
@@ -41,7 +41,7 @@ T ParseProto(const py::object& proto_object) {
   if (!ParseTextProto<T>(proto_object.str(), &proto)) {
     throw RaisePyError(
         PyExc_RuntimeError,
-        absl::StrCat("Failed to parse: ", std::string(proto_object.str()))
+        abslx::StrCat("Failed to parse: ", std::string(proto_object.str()))
             .c_str());
   }
   return proto;
@@ -95,7 +95,7 @@ void CalculatorGraphSubmodule(pybind11::module* module) {
           } else {
             throw RaisePyError(
                 PyExc_RuntimeError,
-                absl::StrCat("Unknown kwargs input argument: ", key).c_str());
+                abslx::StrCat("Unknown kwargs input argument: ", key).c_str());
           }
         }
 
@@ -111,7 +111,7 @@ void CalculatorGraphSubmodule(pybind11::module* module) {
                              "\'validated_graph_config\' to initialize the "
                              "graph with a ValidatedGraphConfig object.");
         }
-        auto calculator_graph = absl::make_unique<CalculatorGraph>();
+        auto calculator_graph = abslx::make_unique<CalculatorGraph>();
         RaisePyErrorIfNotOk(calculator_graph->Initialize(graph_config_proto));
         return calculator_graph.release();
       }),
@@ -161,7 +161,7 @@ void CalculatorGraphSubmodule(pybind11::module* module) {
         if (!packet_timestamp.IsAllowedInStream()) {
           throw RaisePyError(
               PyExc_ValueError,
-              absl::StrCat(packet_timestamp.DebugString(),
+              abslx::StrCat(packet_timestamp.DebugString(),
                            " can't be the timestamp of a Packet in a stream.")
                   .c_str());
         }
@@ -386,7 +386,7 @@ void CalculatorGraphSubmodule(pybind11::module* module) {
   calculator_graph.def(
       "get_combined_error_message",
       [](CalculatorGraph* self) {
-        absl::Status error_status;
+        abslx::Status error_status;
         if (self->GetCombinedErrors(&error_status) && !error_status.ok()) {
           return error_status.ToString();
         }
@@ -408,11 +408,11 @@ void CalculatorGraphSubmodule(pybind11::module* module) {
         RaisePyErrorIfNotOk(self->ObserveOutputStream(
             stream_name,
             [callback_fn, stream_name](const Packet& packet) {
-              absl::MutexLock lock(&callback_mutex);
+              abslx::MutexLock lock(&callback_mutex);
               // Acquires GIL before calling Python callback.
               py::gil_scoped_acquire gil_acquire;
               callback_fn(stream_name, packet);
-              return absl::OkStatus();
+              return abslx::OkStatus();
             },
             observe_timestamp_bounds));
       },

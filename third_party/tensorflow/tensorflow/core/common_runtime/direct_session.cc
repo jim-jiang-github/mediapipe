@@ -239,12 +239,12 @@ class DirectSessionFactory : public SessionFactory {
 
  private:
   static string GetMetadataKey(const SessionMetadata& metadata) {
-    return absl::StrCat(metadata.name(), "/", metadata.version());
+    return abslx::StrCat(metadata.name(), "/", metadata.version());
   }
 
   mutex sessions_lock_;
   std::vector<DirectSession*> sessions_ TF_GUARDED_BY(sessions_lock_);
-  absl::flat_hash_set<string> session_metadata_keys_
+  abslx::flat_hash_set<string> session_metadata_keys_
       TF_GUARDED_BY(sessions_lock_);
 };
 
@@ -609,9 +609,9 @@ Status DirectSession::RunInternal(
   const int64_t call_timeout = run_options.timeout_in_ms() > 0
                                    ? run_options.timeout_in_ms()
                                    : operation_timeout_in_ms_;
-  absl::optional<absl::Time> deadline;
+  abslx::optional<abslx::Time> deadline;
   if (call_timeout > 0) {
-    deadline = absl::Now() + absl::Milliseconds(call_timeout);
+    deadline = abslx::Now() + abslx::Milliseconds(call_timeout);
   }
 
   std::unique_ptr<RunHandler> handler;
@@ -1495,8 +1495,8 @@ Status DirectSession::GetOrCreateExecutors(
 
   // Fast lookup path, no sorting.
   const string key = strings::StrCat(
-      absl::StrJoin(inputs, ","), "->", absl::StrJoin(outputs, ","), "/",
-      absl::StrJoin(target_nodes, ","), "/", run_state_args->is_partial_run,
+      abslx::StrJoin(inputs, ","), "->", abslx::StrJoin(outputs, ","), "/",
+      abslx::StrJoin(target_nodes, ","), "/", run_state_args->is_partial_run,
       "/", debug_tensor_watches_summary);
   // Set the handle, if it's needed to log memory or for partial run.
   if (handle_name_counter_value >= 0) {
@@ -1528,8 +1528,8 @@ Status DirectSession::GetOrCreateExecutors(
   std::sort(tn_sorted.begin(), tn_sorted.end());
 
   const string sorted_key = strings::StrCat(
-      absl::StrJoin(inputs_sorted, ","), "->",
-      absl::StrJoin(outputs_sorted, ","), "/", absl::StrJoin(tn_sorted, ","),
+      abslx::StrJoin(inputs_sorted, ","), "->",
+      abslx::StrJoin(outputs_sorted, ","), "/", abslx::StrJoin(tn_sorted, ","),
       "/", run_state_args->is_partial_run, "/", debug_tensor_watches_summary);
   // Set the handle, if its needed to log memory or for partial run.
   if (handle_name_counter_value >= 0) {
@@ -1705,7 +1705,7 @@ Status DirectSession::CreateGraphs(
           "Creating a partition for ", local_partition_name,
           " which doesn't exist in the list of available devices. Available "
           "devices: ",
-          absl::StrJoin(device_names, ","));
+          abslx::StrJoin(device_names, ","));
     }
   }
 

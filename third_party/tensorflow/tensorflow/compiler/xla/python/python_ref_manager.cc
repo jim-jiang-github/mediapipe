@@ -22,7 +22,7 @@ namespace xla {
 namespace py = pybind11;
 
 PythonRefManager::ManagedPyObjects::ManagedPyObjects(
-    PythonRefManager* manager, absl::Span<pybind11::object> objects)
+    PythonRefManager* manager, abslx::Span<pybind11::object> objects)
     : manager_(manager) {
   objects_.reserve(objects.size());
   for (pybind11::object& object : objects) {
@@ -32,23 +32,23 @@ PythonRefManager::ManagedPyObjects::ManagedPyObjects(
 
 PythonRefManager::ManagedPyObjects::~ManagedPyObjects() {
   if (manager_ && !objects_.empty()) {
-    manager_->AddGarbage(absl::MakeSpan(objects_));
+    manager_->AddGarbage(abslx::MakeSpan(objects_));
   }
 }
 
 std::shared_ptr<PythonRefManager::ManagedPyObjects>
 PythonRefManager::ManageReference(py::object object) {
   return std::make_shared<ManagedPyObjects>(this,
-                                            absl::Span<py::object>(&object, 1));
+                                            abslx::Span<py::object>(&object, 1));
 }
 
 std::shared_ptr<PythonRefManager::ManagedPyObjects>
-PythonRefManager::ManageReferences(absl::Span<py::object> objects) {
+PythonRefManager::ManageReferences(abslx::Span<py::object> objects) {
   return std::make_shared<ManagedPyObjects>(this, objects);
 }
 
-void PythonRefManager::AddGarbage(absl::Span<py::object> garbage) {
-  absl::MutexLock lock(&mu_);
+void PythonRefManager::AddGarbage(abslx::Span<py::object> garbage) {
+  abslx::MutexLock lock(&mu_);
   // We want to collect arbitrary python garbage (e.g., buffers) aggressively.
   garbage_count_.fetch_add(100, std::memory_order_relaxed);
   for (py::object& o : garbage) {
@@ -57,8 +57,8 @@ void PythonRefManager::AddGarbage(absl::Span<py::object> garbage) {
 }
 
 void PythonRefManager::AddGarbage(
-    absl::Span<std::pair<PyCodeObject*, int> const> garbage) {
-  absl::MutexLock lock(&mu_);
+    abslx::Span<std::pair<PyCodeObject*, int> const> garbage) {
+  abslx::MutexLock lock(&mu_);
   // We don't care about collecting stack frame objects often. We grab a lot of
   // tracebacks and the code objects are most likely live for the entire
   // process.
@@ -73,13 +73,13 @@ void PythonRefManager::CollectGarbage() {
   // TODO(phawkins): we should CHECK(PyGILState_Check());
   std::deque<pybind11::object> garbage;
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     garbage_count_ = 0;
     garbage.swap(python_garbage_);
   }
   // We defer deleting garbage until the lock is released. It's possible that
   // deleting garbage will lead to more Python garbage being added; if we held
-  // the lock we would deadlock because absl::Mutex is not reentrant.
+  // the lock we would deadlock because abslx::Mutex is not reentrant.
 }
 
 PythonRefManager* GlobalPyRefManager() {

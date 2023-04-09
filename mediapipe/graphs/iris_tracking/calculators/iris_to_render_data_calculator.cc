@@ -108,7 +108,7 @@ float CalculateDepth(const NormalizedLandmark& center, float focal_length,
 // }
 class IrisToRenderDataCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Tag(kIrisTag).Set<NormalizedLandmarkList>();
     cc->Outputs().Tag(kRenderDataTag).Set<RenderData>();
     cc->Inputs().Tag(kImageSizeTag).Set<std::pair<int, int>>();
@@ -119,12 +119,12 @@ class IrisToRenderDataCalculator : public CalculatorBase {
     if (cc->Inputs().HasTag(kRightIrisDepthTag)) {
       cc->Inputs().Tag(kRightIrisDepthTag).Set<float>();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
 
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   void RenderIris(const NormalizedLandmarkList& iris_landmarks,
@@ -150,15 +150,15 @@ class IrisToRenderDataCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(IrisToRenderDataCalculator);
 
-absl::Status IrisToRenderDataCalculator::Open(CalculatorContext* cc) {
+abslx::Status IrisToRenderDataCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status IrisToRenderDataCalculator::Process(CalculatorContext* cc) {
+abslx::Status IrisToRenderDataCalculator::Process(CalculatorContext* cc) {
   // Only process if there's input landmarks.
   if (cc->Inputs().Tag(kIrisTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   const auto& options =
       cc->Options<::mediapipe::IrisToRenderDataCalculatorOptions>();
@@ -172,9 +172,9 @@ absl::Status IrisToRenderDataCalculator::Process(CalculatorContext* cc) {
   RET_CHECK(!cc->Inputs().Tag(kImageSizeTag).IsEmpty());
   image_size = cc->Inputs().Tag(kImageSizeTag).Get<std::pair<int, int>>();
 
-  auto render_data = absl::make_unique<RenderData>();
-  auto left_iris = absl::make_unique<NormalizedLandmarkList>();
-  auto right_iris = absl::make_unique<NormalizedLandmarkList>();
+  auto render_data = abslx::make_unique<RenderData>();
+  auto left_iris = abslx::make_unique<NormalizedLandmarkList>();
+  auto right_iris = abslx::make_unique<NormalizedLandmarkList>();
   GetLeftIris(iris_landmarks, left_iris.get());
   GetRightIris(iris_landmarks, right_iris.get());
 
@@ -193,7 +193,7 @@ absl::Status IrisToRenderDataCalculator::Process(CalculatorContext* cc) {
         cc->Inputs().Tag(kLeftIrisDepthTag).Get<float>();
     if (!std::isinf(left_iris_depth)) {
       line = "Left : ";
-      absl::StrAppend(&line, ":", std::round(left_iris_depth / 10), " cm");
+      abslx::StrAppend(&line, ":", std::round(left_iris_depth / 10), " cm");
       lines.emplace_back(line);
     }
   }
@@ -203,7 +203,7 @@ absl::Status IrisToRenderDataCalculator::Process(CalculatorContext* cc) {
         cc->Inputs().Tag(kRightIrisDepthTag).Get<float>();
     if (!std::isinf(right_iris_depth)) {
       line = "Right : ";
-      absl::StrAppend(&line, ":", std::round(right_iris_depth / 10), " cm");
+      abslx::StrAppend(&line, ":", std::round(right_iris_depth / 10), " cm");
       lines.emplace_back(line);
     }
   }
@@ -212,7 +212,7 @@ absl::Status IrisToRenderDataCalculator::Process(CalculatorContext* cc) {
   cc->Outputs()
       .Tag(kRenderDataTag)
       .Add(render_data.release(), cc->InputTimestamp());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void IrisToRenderDataCalculator::AddTextRenderData(

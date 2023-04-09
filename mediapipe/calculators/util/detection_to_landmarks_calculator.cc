@@ -29,7 +29,7 @@ namespace {
 constexpr char kDetectionTag[] = "DETECTION";
 constexpr char kLandmarksTag[] = "LANDMARKS";
 
-absl::Status ConvertDetectionToLandmarks(const Detection& detection,
+abslx::Status ConvertDetectionToLandmarks(const Detection& detection,
                                          NormalizedLandmarkList* landmarks) {
   const auto& location_data = detection.location_data();
   for (int i = 0; i < location_data.relative_keypoints_size(); ++i) {
@@ -40,7 +40,7 @@ absl::Status ConvertDetectionToLandmarks(const Detection& detection,
     landmark->set_y(keypoint.y());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace
@@ -66,32 +66,32 @@ absl::Status ConvertDetectionToLandmarks(const Detection& detection,
 //
 class DetectionToLandmarksCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     RET_CHECK(cc->Inputs().HasTag(kDetectionTag));
     RET_CHECK(cc->Outputs().HasTag(kLandmarksTag));
 
     cc->Inputs().Tag(kDetectionTag).Set<Detection>();
     cc->Outputs().Tag(kLandmarksTag).Set<NormalizedLandmarkList>();
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     const auto& detection = cc->Inputs().Tag(kDetectionTag).Get<Detection>();
 
-    auto landmarks = absl::make_unique<NormalizedLandmarkList>();
+    auto landmarks = abslx::make_unique<NormalizedLandmarkList>();
     MP_RETURN_IF_ERROR(ConvertDetectionToLandmarks(detection, landmarks.get()));
 
     cc->Outputs()
         .Tag(kLandmarksTag)
         .Add(landmarks.release(), cc->InputTimestamp());
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

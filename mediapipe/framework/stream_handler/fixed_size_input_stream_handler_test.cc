@@ -34,7 +34,7 @@ const int64 kMaxPacketId = 100;
 const int64 kSlowCalculatorRate = 10;
 
 // Rate limiter for TestSlowCalculator.
-ABSL_CONST_INIT absl::Mutex g_source_mutex(absl::kConstInit);
+ABSL_CONST_INIT abslx::Mutex g_source_mutex(abslx::kConstInit);
 int64 g_source_counter ABSL_GUARDED_BY(g_source_mutex);
 
 // Rate limiter for TestSourceCalculator.
@@ -46,31 +46,31 @@ bool g_source_done ABSL_GUARDED_BY(g_source_mutex);
 class TestSourceCalculator : public CalculatorBase {
  public:
   TestSourceCalculator() : current_packet_id_(0) {}
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Outputs().Index(0).Set<int64>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Open(CalculatorContext* cc) override {
-    absl::MutexLock lock(&g_source_mutex);
+  abslx::Status Open(CalculatorContext* cc) override {
+    abslx::MutexLock lock(&g_source_mutex);
     g_source_counter = 0;
     g_source_done = false;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     if (current_packet_id_ == kMaxPacketId) {
-      absl::MutexLock lock(&g_source_mutex);
+      abslx::MutexLock lock(&g_source_mutex);
       g_source_done = true;
       return tool::StatusStop();
     }
     cc->Outputs().Index(0).Add(new int64(0), Timestamp(current_packet_id_));
     ++current_packet_id_;
     {
-      absl::MutexLock lock(&g_source_mutex);
+      abslx::MutexLock lock(&g_source_mutex);
       ++g_source_counter;
       g_source_mutex.Await(
-          absl::Condition(this, &TestSourceCalculator::CanProceed));
+          abslx::Condition(this, &TestSourceCalculator::CanProceed));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -86,26 +86,26 @@ REGISTER_CALCULATOR(TestSourceCalculator);
 class TestSlowCalculator : public CalculatorBase {
  public:
   TestSlowCalculator() = default;
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<int64>();
     cc->Outputs().Index(0).Set<int64>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Open(CalculatorContext* cc) override {
-    absl::MutexLock lock(&g_source_mutex);
+  abslx::Status Open(CalculatorContext* cc) override {
+    abslx::MutexLock lock(&g_source_mutex);
     g_slow_counter = 0;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     cc->Outputs().Index(0).Add(new int64(0),
                                cc->Inputs().Index(0).Value().Timestamp());
     {
-      absl::MutexLock lock(&g_source_mutex);
+      abslx::MutexLock lock(&g_source_mutex);
       ++g_slow_counter;
       g_source_mutex.Await(
-          absl::Condition(this, &TestSlowCalculator::CanProceed));
+          abslx::Condition(this, &TestSlowCalculator::CanProceed));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -245,7 +245,7 @@ TEST_P(FixedSizeInputStreamHandlerTest, ParallelWriteAndRead) {
   SetFixedMinSize(graph_config.mutable_node(0), GetParam());
   std::vector<Packet> output_packets[3];
   for (int i = 0; i < 3; ++i) {
-    tool::AddVectorSink(absl::StrCat("out_", i), &graph_config,
+    tool::AddVectorSink(abslx::StrCat("out_", i), &graph_config,
                         &output_packets[i]);
   }
   CalculatorGraph graph;
@@ -259,11 +259,11 @@ TEST_P(FixedSizeInputStreamHandlerTest, ParallelWriteAndRead) {
     // Start 3 writers.
     for (int w = 0; w < 3; ++w) {
       pool.Schedule([&, w]() {
-        std::string stream_name = absl::StrCat("in_", w);
+        std::string stream_name = abslx::StrCat("in_", w);
         for (int i = 0; i < 50; ++i) {
           Packet p = MakePacket<int>(i).At(Timestamp(i));
           MP_EXPECT_OK(graph.AddPacketToInputStream(stream_name, p));
-          absl::SleepFor(absl::Microseconds(100));
+          abslx::SleepFor(abslx::Microseconds(100));
         }
       });
     }
@@ -315,8 +315,8 @@ TEST_P(FixedSizeInputStreamHandlerTest, LateArrivalDrop) {
   std::vector<Packet> output_packets[3];
   std::string in_streams[3];
   for (int i = 0; i < 3; ++i) {
-    in_streams[i] = absl::StrCat("in_", i);
-    tool::AddVectorSink(absl::StrCat("out_", i), &graph_config,
+    in_streams[i] = abslx::StrCat("in_", i);
+    tool::AddVectorSink(abslx::StrCat("out_", i), &graph_config,
                         &output_packets[i]);
   }
   CalculatorGraph graph;

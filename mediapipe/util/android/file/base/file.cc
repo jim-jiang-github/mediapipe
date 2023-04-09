@@ -85,7 +85,7 @@ bool File::Exists(const char* name) {
 
 namespace {
 
-absl::once_flag localhost_init;
+abslx::once_flag localhost_init;
 
 std::string* localhost_name_str = nullptr;
 
@@ -101,23 +101,23 @@ void LocalHostInit() {
 }
 
 const std::string* localhost_name() {
-  absl::call_once(localhost_init, &LocalHostInit);
+  abslx::call_once(localhost_init, &LocalHostInit);
   return localhost_name_str;
 }
 
-void StringReplace(absl::string_view s, absl::string_view oldsub,
-                   absl::string_view newsub, bool replace_all,
+void StringReplace(abslx::string_view s, abslx::string_view oldsub,
+                   abslx::string_view newsub, bool replace_all,
                    std::string* res) {
   if (oldsub.empty()) {
     res->append(s.data(), s.length());  // If empty, append the given string.
     return;
   }
 
-  absl::string_view::size_type start_pos = 0;
-  absl::string_view::size_type pos;
+  abslx::string_view::size_type start_pos = 0;
+  abslx::string_view::size_type pos;
   do {
     pos = s.find(oldsub, start_pos);
-    if (pos == absl::string_view::npos) {
+    if (pos == abslx::string_view::npos) {
       break;
     }
     res->append(s.data() + start_pos, pos - start_pos);
@@ -166,8 +166,8 @@ const std::string File::CanonicalizeFileName(const char* fname) {
   // Stubby remote functionality (starts with /remote) removed.
 
   std::string result;
-  absl::string_view fname_piece(fname);
-  if (!absl::StrContains(fname_piece, kSlashDotSlash)) {
+  abslx::string_view fname_piece(fname);
+  if (!abslx::StrContains(fname_piece, kSlashDotSlash)) {
     result.assign(fname_piece.data(), fname_piece.size());
   } else {
     // repeatedly replace "/./" with "/" until the length stops changing

@@ -31,7 +31,7 @@ DfsCallbacks MkCallbacks(std::vector<string>* pre_order,
   return {[pre_order](const NodeDef* n) { pre_order->push_back(n->name()); },
           [post_order](const NodeDef* n) { post_order->push_back(n->name()); },
           [back_edges](const NodeDef* src, const NodeDef* dst) {
-            back_edges->push_back(absl::StrCat(src->name(), "->", dst->name()));
+            back_edges->push_back(abslx::StrCat(src->name(), "->", dst->name()));
           }};
 }
 

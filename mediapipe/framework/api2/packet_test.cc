@@ -22,12 +22,12 @@ class LiveCheck {
 class Base {
  public:
   virtual ~Base() = default;
-  virtual absl::string_view name() const { return "Base"; }
+  virtual abslx::string_view name() const { return "Base"; }
 };
 
 class Derived : public Base {
  public:
-  absl::string_view name() const override { return "Derived"; }
+  abslx::string_view name() const override { return "Derived"; }
 };
 
 TEST(PacketTest, PacketBaseDefault) {
@@ -117,16 +117,16 @@ TEST(PacketTest, OneOf) {
   EXPECT_FALSE(p.Has<int>());
   EXPECT_EQ(p.Get<std::string>(), "hi");
   std::string out =
-      p.Visit([](std::string s) { return absl::StrCat("string: ", s); },
-              [](int i) { return absl::StrCat("int: ", i); });
+      p.Visit([](std::string s) { return abslx::StrCat("string: ", s); },
+              [](int i) { return abslx::StrCat("int: ", i); });
   EXPECT_EQ(out, "string: hi");
 
   p = MakePacket<int>(2);
   EXPECT_FALSE(p.Has<std::string>());
   EXPECT_TRUE(p.Has<int>());
   EXPECT_EQ(p.Get<int>(), 2);
-  out = p.Visit([](std::string s) { return absl::StrCat("string: ", s); },
-                [](int i) { return absl::StrCat("int: ", i); });
+  out = p.Visit([](std::string s) { return abslx::StrCat("string: ", s); },
+                [](int i) { return abslx::StrCat("int: ", i); });
   EXPECT_EQ(out, "int: 2");
 }
 
@@ -238,46 +238,46 @@ TEST(PacketTest, OneOfConsume) {
   EXPECT_TRUE(p.Has<std::string>());
   EXPECT_FALSE(p.Has<int>());
   EXPECT_EQ(p.Get<std::string>(), "hi");
-  absl::StatusOr<std::string> out = p.ConsumeAndVisit(
+  abslx::StatusOr<std::string> out = p.ConsumeAndVisit(
       [](std::unique_ptr<std::string> s) {
-        return absl::StrCat("string: ", *s);
+        return abslx::StrCat("string: ", *s);
       },
-      [](std::unique_ptr<int> i) { return absl::StrCat("int: ", *i); });
+      [](std::unique_ptr<int> i) { return abslx::StrCat("int: ", *i); });
   MP_EXPECT_OK(out);
   EXPECT_EQ(out.value(), "string: hi");
   EXPECT_TRUE(p.IsEmpty());
 
   p = MakePacket<int>(3);
-  absl::Status out2 = p.ConsumeAndVisit([](std::unique_ptr<std::string> s) {},
+  abslx::Status out2 = p.ConsumeAndVisit([](std::unique_ptr<std::string> s) {},
                                         [](std::unique_ptr<int> i) {});
   MP_EXPECT_OK(out2);
   EXPECT_TRUE(p.IsEmpty());
 }
 
 TEST(PacketTest, Polymorphism) {
-  Packet<Base> base = PacketAdopting<Base>(absl::make_unique<Derived>());
+  Packet<Base> base = PacketAdopting<Base>(abslx::make_unique<Derived>());
   EXPECT_EQ(base->name(), "Derived");
   // Since packet contents are implicitly immutable, if you need mutability the
   // current recommendation is still to wrap the contents in a unique_ptr.
   Packet<std::unique_ptr<Base>> mutable_base =
-      MakePacket<std::unique_ptr<Base>>(absl::make_unique<Derived>());
+      MakePacket<std::unique_ptr<Base>>(abslx::make_unique<Derived>());
   EXPECT_EQ((**mutable_base).name(), "Derived");
 }
 
 class AbstractBase {
  public:
   virtual ~AbstractBase() = default;
-  virtual absl::string_view name() const = 0;
+  virtual abslx::string_view name() const = 0;
 };
 
 class ConcreteDerived : public AbstractBase {
  public:
-  absl::string_view name() const override { return "ConcreteDerived"; }
+  abslx::string_view name() const override { return "ConcreteDerived"; }
 };
 
 TEST(PacketTest, PolymorphismAbstract) {
   Packet<AbstractBase> base =
-      PacketAdopting<AbstractBase>(absl::make_unique<ConcreteDerived>());
+      PacketAdopting<AbstractBase>(abslx::make_unique<ConcreteDerived>());
   EXPECT_EQ(base->name(), "ConcreteDerived");
 }
 

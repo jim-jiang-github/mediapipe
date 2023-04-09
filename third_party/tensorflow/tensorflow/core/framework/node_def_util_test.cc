@@ -68,7 +68,7 @@ void ExpectFailure(const NodeDef& bad, const OpDef& op_def,
       << "; OpDef: " << SummarizeOpDef(op_def);
 
   LOG(INFO) << "Message: " << status.error_message();
-  EXPECT_TRUE(absl::StrContains(status.ToString(), message))
+  EXPECT_TRUE(abslx::StrContains(status.ToString(), message))
       << "NodeDef: " << SummarizeNodeDef(bad)
       << "; OpDef: " << SummarizeOpDef(op_def) << "\nActual error: " << status
       << "\nDoes not contain: " << message;
@@ -329,7 +329,7 @@ void ExpectInvalidSyntax(const NodeDef& bad, const string& message) {
   EXPECT_TRUE(errors::IsInvalidArgument(status))
       << status << "; NodeDef: " << SummarizeNodeDef(bad);
 
-  EXPECT_TRUE(absl::StrContains(StringPiece(status.ToString()), message))
+  EXPECT_TRUE(abslx::StrContains(StringPiece(status.ToString()), message))
       << "NodeDef: " << SummarizeNodeDef(bad) << ", " << status << ", "
       << message;
 }
@@ -812,7 +812,7 @@ TEST(MaybeUpdateColocationConstraintsWithMap, Basic) {
                strings::StrCat(kColocationGroupPrefix, "Node3")},
               &node_def);
 
-  std::map<absl::string_view, absl::string_view> node_map;
+  std::map<abslx::string_view, abslx::string_view> node_map;
   node_map["Node1"] = "Node4";
   node_map["Invalid"] = "Node5";
   TF_ASSERT_OK(MaybeUpdateColocationConstraintsWithMap(node_map, &node_def));
@@ -827,7 +827,7 @@ TEST(MaybeUpdateColocationConstraintsWithMap, NoConstraints) {
   node_def.set_name("Identity");
   node_def.set_op("Identity");
 
-  std::map<absl::string_view, absl::string_view> node_map;
+  std::map<abslx::string_view, abslx::string_view> node_map;
   node_map["Node1"] = "Node4";
   node_map["Invalid"] = "Node5";
   TF_ASSERT_OK(MaybeUpdateColocationConstraintsWithMap(node_map, &node_def));

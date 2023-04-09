@@ -123,7 +123,7 @@ StatusOrOptional<SliceInputs> GetSliceInputs(Node* slice) {
 }
 
 // Casts `x` to a DT_INT64 if it isn't one already.
-Output MakeInt64(const Scope& host_scope, absl::string_view name,
+Output MakeInt64(const Scope& host_scope, abslx::string_view name,
                  const Output& x) {
   return x.type() == DT_INT64
              ? x
@@ -181,7 +181,7 @@ Status ComputeSliceSize(const Scope& host_scope,
   // don't do anything here.  We've already filtered these cases out in
   // IsRewritableSlice.
 
-  if (absl::c_all_of(slice_inputs.size_as_vector,
+  if (abslx::c_all_of(slice_inputs.size_as_vector,
                      [](int64_t i) { return i >= 0; })) {
     *size = slice_inputs.size;
     return OkStatus();
@@ -235,7 +235,7 @@ Status ComputeSliceSize(const Scope& host_scope,
 // these slices can be solely determined by their "size" input.
 Status ConvertTensorFlowSliceToStaticShapedSlice(
     Graph* g, Node* slice, const SliceInputs& slice_inputs,
-    absl::string_view cluster_name, Node** result) {
+    abslx::string_view cluster_name, Node** result) {
   string host_name;
   TF_RETURN_IF_ERROR(DeviceNameUtils::DeviceNameToCpuDeviceName(
       slice->assigned_device_name(), &host_name));
@@ -244,7 +244,7 @@ Status ConvertTensorFlowSliceToStaticShapedSlice(
   Scope main_scope =
       NewInternalScope(g, &status, /*refiner=*/nullptr)
           .WithXlaCluster(string(cluster_name))
-          .NewSubScope(absl::StrCat(slice->name(), "/static_shaped_slice"));
+          .NewSubScope(abslx::StrCat(slice->name(), "/static_shaped_slice"));
   Scope host_scope = main_scope.WithAssignedDevice(host_name);
 
   // In the future we may want to be clever here and avoid the extra Cast ops.
@@ -256,7 +256,7 @@ Status ConvertTensorFlowSliceToStaticShapedSlice(
   Node* old_size;
   std::vector<const Edge*> old_size_ctrl_deps;
   TF_RETURN_IF_ERROR(slice->input_node(2, &old_size));
-  absl::c_copy_if(old_size->in_edges(), std::back_inserter(old_size_ctrl_deps),
+  abslx::c_copy_if(old_size->in_edges(), std::back_inserter(old_size_ctrl_deps),
                   [](const Edge* e) { return e->IsControlEdge(); });
 
   Output slice_size;
@@ -280,9 +280,9 @@ Status ConvertTensorFlowSliceToStaticShapedSlice(
 
 void ReplaceTensorFlowSliceWithStaticShapedSlice(Graph* g, Node* slice,
                                                  Node* static_shaped_slice) {
-  absl::InlinedVector<const Edge*, 6> edges_to_remove;
+  abslx::InlinedVector<const Edge*, 6> edges_to_remove;
   std::vector<const Edge*> slice_out_edges;
-  absl::c_copy(slice->out_edges(), std::back_inserter(slice_out_edges));
+  abslx::c_copy(slice->out_edges(), std::back_inserter(slice_out_edges));
   for (const Edge* e : slice_out_edges) {
     DCHECK(e->src_output() == 0 || e->src_output() == Graph::kControlSlot);
 
@@ -303,7 +303,7 @@ void ReplaceTensorFlowSliceWithStaticShapedSlice(Graph* g, Node* slice,
 }
 
 Status RewriteSlice(Graph* g, Node* slice, const SliceInputs& slice_inputs,
-                    absl::string_view cluster_name) {
+                    abslx::string_view cluster_name) {
   VLOG(3) << "Rewriting slice " << slice->name()
           << " to a \"static shaped\" Slice";
   Node* static_shaped_slice;
@@ -334,7 +334,7 @@ StatusOr<bool> ShouldRewriteSlice(Node* n) {
   // If slice_size[i] < -1 for any i then executing the slice will throw an
   // error, and we don't do anything here.
   bool slice_size_has_error =
-      absl::c_all_of(slice_inputs->size_as_vector,
+      abslx::c_all_of(slice_inputs->size_as_vector,
                      [](int64_t size_i) { return size_i >= -1; });
   if (!slice_size_has_error) {
     return false;

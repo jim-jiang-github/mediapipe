@@ -22,7 +22,7 @@
 
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
@@ -44,9 +44,9 @@ class ZoneInfoSource {
 }  // namespace cctz
 }  // namespace time_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz_extension {
@@ -55,10 +55,10 @@ namespace cctz_extension {
 // given the name of a time zone and a fallback factory.  Returns null
 // when the data for the named zone cannot be found.
 using ZoneInfoSourceFactory =
-    std::unique_ptr<absl::time_internal::cctz::ZoneInfoSource> (*)(
+    std::unique_ptr<abslx::time_internal::cctz::ZoneInfoSource> (*)(
         const std::string&,
         const std::function<std::unique_ptr<
-            absl::time_internal::cctz::ZoneInfoSource>(const std::string&)>&);
+            abslx::time_internal::cctz::ZoneInfoSource>(const std::string&)>&);
 
 // The user can control the mapping of zone names to zoneinfo data by
 // providing a definition for cctz_extension::zone_info_source_factory.
@@ -97,6 +97,6 @@ extern ZoneInfoSourceFactory zone_info_source_factory;
 }  // namespace cctz_extension
 }  // namespace time_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_TIME_INTERNAL_CCTZ_ZONE_INFO_SOURCE_H_

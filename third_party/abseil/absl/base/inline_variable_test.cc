@@ -19,7 +19,7 @@
 
 #include "gtest/gtest.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace inline_variable_testing_internal {
 namespace {
@@ -61,4 +61,4 @@ TEST(InlineVariableTest, FunPtrType) {
 }  // namespace
 }  // namespace inline_variable_testing_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

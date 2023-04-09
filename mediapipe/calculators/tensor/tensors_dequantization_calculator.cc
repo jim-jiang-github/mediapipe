@@ -66,12 +66,12 @@ class TensorsDequantizationCalculator : public Node {
   static constexpr Output<std::vector<Tensor>> kOutTensors{"TENSORS"};
   MEDIAPIPE_NODE_CONTRACT(kInTensors, kOutTensors);
 
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 };
 
-absl::Status TensorsDequantizationCalculator::Process(CalculatorContext* cc) {
+abslx::Status TensorsDequantizationCalculator::Process(CalculatorContext* cc) {
   if (kInTensors(cc).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   const auto& input_tensors = *kInTensors(cc);
   RET_CHECK(!input_tensors.empty());
@@ -91,12 +91,12 @@ absl::Status TensorsDequantizationCalculator::Process(CalculatorContext* cc) {
         Dequantize<bool>(input_tensor, &output_tensors->back());
         break;
       default:
-        return absl::InvalidArgumentError(absl::StrCat(
+        return abslx::InvalidArgumentError(abslx::StrCat(
             "Unsupported input tensor type: ", input_tensor.element_type()));
     }
   }
   kOutTensors(cc).Send(std::move(output_tensors));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 MEDIAPIPE_REGISTER_NODE(TensorsDequantizationCalculator);

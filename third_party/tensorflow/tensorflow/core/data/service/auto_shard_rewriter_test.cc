@@ -49,23 +49,23 @@ using ::tensorflow::testing::StatusIs;
 using ::testing::HasSubstr;
 using ::testing::SizeIs;
 
-StatusOr<NodeDef> GetNode(const GraphDef& graph_def, absl::string_view name) {
+StatusOr<NodeDef> GetNode(const GraphDef& graph_def, abslx::string_view name) {
   for (const NodeDef& node : graph_def.node()) {
     if (node.name() == name) {
       return node;
     }
   }
-  return errors::NotFound(absl::Substitute("Node $0 not found in graph $1.",
+  return errors::NotFound(abslx::Substitute("Node $0 not found in graph $1.",
                                            name, graph_def.ShortDebugString()));
 }
 
-StatusOr<int64_t> GetValue(const GraphDef& graph_def, absl::string_view name) {
+StatusOr<int64_t> GetValue(const GraphDef& graph_def, abslx::string_view name) {
   for (const NodeDef& node : graph_def.node()) {
     if (node.name() == name) {
       return node.attr().at("value").tensor().int64_val()[0];
     }
   }
-  return errors::NotFound(absl::Substitute("Node $0 not found in graph $1.",
+  return errors::NotFound(abslx::Substitute("Node $0 not found in graph $1.",
                                            name, graph_def.ShortDebugString()));
 }
 

@@ -25,7 +25,7 @@
 //   * Implicitly, through the installation of an Abseil failure signal handler.
 //     (See failure_signal_handler.h for more information.)
 //   * By calling `Symbolize()` directly on a program counter you obtain through
-//     `absl::GetStackTrace()` or `absl::GetStackFrames()`. (See stacktrace.h
+//     `abslx::GetStackTrace()` or `abslx::GetStackFrames()`. (See stacktrace.h
 //     for more information.
 //   * By calling `Symbolize()` directly on a program counter you obtain through
 //     other means (which would be platform-dependent).
@@ -38,11 +38,11 @@
 //
 //   int main(int argc, char** argv) {
 //     // Initialize the Symbolizer before installing the failure signal handler
-//     absl::InitializeSymbolizer(argv[0]);
+//     abslx::InitializeSymbolizer(argv[0]);
 //
 //     // Now you may install the failure signal handler
-//     absl::FailureSignalHandlerOptions options;
-//     absl::InstallFailureSignalHandler(options);
+//     abslx::FailureSignalHandlerOptions options;
+//     abslx::InstallFailureSignalHandler(options);
 //
 //     // Start running your main program
 //     ...
@@ -54,7 +54,7 @@
 
 #include "absl/debugging/internal/symbolize.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // InitializeSymbolizer()
@@ -67,7 +67,7 @@ ABSL_NAMESPACE_BEGIN
 // Example:
 //
 // int main(int argc, char *argv[]) {
-//   absl::InitializeSymbolizer(argv[0]);
+//   abslx::InitializeSymbolizer(argv[0]);
 //   // Now you can use the symbolizer
 // }
 void InitializeSymbolizer(const char* argv0);
@@ -86,14 +86,14 @@ void InitializeSymbolizer(const char* argv0);
 //   static void DumpPCAndSymbol(void *pc) {
 //     char tmp[1024];
 //     const char *symbol = "(unknown)";
-//     if (absl::Symbolize(pc, tmp, sizeof(tmp))) {
+//     if (abslx::Symbolize(pc, tmp, sizeof(tmp))) {
 //       symbol = tmp;
 //     }
-//     absl::PrintF("%p  %s\n", pc, symbol);
+//     abslx::PrintF("%p  %s\n", pc, symbol);
 //  }
 bool Symbolize(const void *pc, char *out, int out_size);
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_DEBUGGING_SYMBOLIZE_H_

@@ -48,7 +48,7 @@ void PopulateEntry(const std::string& key, CompiledSubgraph* entry,
   }
 
   entry->tpu_program_group =
-      absl::make_unique<TpuProgramGroup>(std::move(tpu_program_group));
+      abslx::make_unique<TpuProgramGroup>(std::move(tpu_program_group));
   entry->initialized = true;
 
   if (entry->initialization_status.ok()) {
@@ -59,9 +59,9 @@ void PopulateEntry(const std::string& key, CompiledSubgraph* entry,
 
 std::unique_ptr<CompiledSubgraph> CreateAndInitializeCompiledSubgraph(
     CompiledSubgraph* main_entry) {
-  auto entry = absl::make_unique<CompiledSubgraph>();
+  auto entry = abslx::make_unique<CompiledSubgraph>();
   entry->main_entry = main_entry;
-  entry->tpu_program_group = absl::make_unique<TpuProgramGroup>();
+  entry->tpu_program_group = abslx::make_unique<TpuProgramGroup>();
   return entry;
 }
 }  // namespace

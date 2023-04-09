@@ -27,9 +27,9 @@ string KeyValueToStr(const std::map<string, string>& kv_map) {
   std::vector<string> kv_vec;
   kv_vec.reserve(kv_map.size());
   for (const auto& pair : kv_map) {
-    kv_vec.push_back(absl::StrCat(pair.first, "=", pair.second));
+    kv_vec.push_back(abslx::StrCat(pair.first, "=", pair.second));
   }
-  return absl::StrJoin(kv_vec, ",");
+  return abslx::StrJoin(kv_vec, ",");
 }
 }  // namespace
 
@@ -49,8 +49,8 @@ tensorflow::Status ParseOutput(const string& output_opt, string* output_type,
     if (output_types.find(output_opt) == output_types.end()) {
       return tensorflow::Status(
           tensorflow::error::INVALID_ARGUMENT,
-          absl::StrFormat("E.g. Unknown output type: %s, Valid types: %s\n",
-                          output_opt, absl::StrJoin(output_types, ",")));
+          abslx::StrFormat("E.g. Unknown output type: %s, Valid types: %s\n",
+                          output_opt, abslx::StrJoin(output_types, ",")));
     }
     *output_type = output_opt;
   } else {
@@ -58,11 +58,11 @@ tensorflow::Status ParseOutput(const string& output_opt, string* output_type,
     if (output_types.find(*output_type) == output_types.end()) {
       return tensorflow::Status(
           tensorflow::error::INVALID_ARGUMENT,
-          absl::StrFormat("E.g. Unknown output type: %s, Valid types: %s\n",
-                          *output_type, absl::StrJoin(output_types, ",")));
+          abslx::StrFormat("E.g. Unknown output type: %s, Valid types: %s\n",
+                          *output_type, abslx::StrJoin(output_types, ",")));
     }
-    kv_split = absl::StrSplit(output_opt.substr(opt_split + 1), ",",
-                              absl::SkipEmpty());
+    kv_split = abslx::StrSplit(output_opt.substr(opt_split + 1), ",",
+                              abslx::SkipEmpty());
   }
 
   std::set<string> valid_options;
@@ -92,7 +92,7 @@ tensorflow::Status ParseOutput(const string& output_opt, string* output_type,
 
   for (const string& kv_str : kv_split) {
     const std::vector<string> kv =
-        absl::StrSplit(kv_str, "=", absl::SkipEmpty());
+        abslx::StrSplit(kv_str, "=", abslx::SkipEmpty());
     if (kv.size() < 2) {
       return tensorflow::Status(
           tensorflow::error::INVALID_ARGUMENT,
@@ -101,18 +101,18 @@ tensorflow::Status ParseOutput(const string& output_opt, string* output_type,
     if (valid_options.find(kv[0]) == valid_options.end()) {
       return tensorflow::Status(
           tensorflow::error::INVALID_ARGUMENT,
-          absl::StrFormat("Unrecognized options %s for output_type: %s\n",
+          abslx::StrFormat("Unrecognized options %s for output_type: %s\n",
                           kv[0], *output_type));
     }
     const std::vector<string> kv_without_key(kv.begin() + 1, kv.end());
-    (*output_options)[kv[0]] = absl::StrJoin(kv_without_key, "=");
+    (*output_options)[kv[0]] = abslx::StrJoin(kv_without_key, "=");
   }
 
   for (const string& opt : required_options) {
     if (output_options->find(opt) == output_options->end()) {
       return tensorflow::Status(
           tensorflow::error::INVALID_ARGUMENT,
-          absl::StrFormat("Missing required output_options for %s\n"
+          abslx::StrFormat("Missing required output_options for %s\n"
                           "E.g. -output %s:%s=...\n",
                           *output_type, *output_type, opt));
     }
@@ -126,7 +126,7 @@ tensorflow::Status Options::FromProtoStr(const string& opts_proto_str,
   if (!opts_pb.ParseFromString(opts_proto_str)) {
     return tensorflow::Status(
         tensorflow::error::INTERNAL,
-        absl::StrCat("Failed to parse option string from Python API: ",
+        abslx::StrCat("Failed to parse option string from Python API: ",
                      opts_proto_str));
   }
 
@@ -137,10 +137,10 @@ tensorflow::Status Options::FromProtoStr(const string& opts_proto_str,
   if (!s.ok()) return s;
 
   if (!opts_pb.dump_to_file().empty()) {
-    absl::FPrintF(stderr,
+    abslx::FPrintF(stderr,
                   "-dump_to_file option is deprecated. "
                   "Please use -output file:outfile=<filename>\n");
-    absl::FPrintF(stderr,
+    abslx::FPrintF(stderr,
                   "-output %s is overwritten with -output file:outfile=%s\n",
                   opts_pb.output(), opts_pb.dump_to_file());
     output_type = kOutput[2];
@@ -172,7 +172,7 @@ tensorflow::Status Options::FromProtoStr(const string& opts_proto_str,
 
 std::string Options::ToString() const {
   // clang-format off
-  const std::string s = absl::StrFormat(
+  const std::string s = abslx::StrFormat(
       "%-28s%d\n"
       "%-28s%d\n"
       "%-28s%d\n"
@@ -207,13 +207,13 @@ std::string Options::ToString() const {
       kOptions[10], min_occurrence,
       kOptions[11], step,
       kOptions[12], order_by,
-      kOptions[13], absl::StrJoin(account_type_regexes, ","),
-      kOptions[14], absl::StrJoin(start_name_regexes, ","),
-      kOptions[15], absl::StrJoin(trim_name_regexes, ","),
-      kOptions[16], absl::StrJoin(show_name_regexes, ","),
-      kOptions[17], absl::StrJoin(hide_name_regexes, ","),
+      kOptions[13], abslx::StrJoin(account_type_regexes, ","),
+      kOptions[14], abslx::StrJoin(start_name_regexes, ","),
+      kOptions[15], abslx::StrJoin(trim_name_regexes, ","),
+      kOptions[16], abslx::StrJoin(show_name_regexes, ","),
+      kOptions[17], abslx::StrJoin(hide_name_regexes, ","),
       kOptions[18], (account_displayed_op_only ? "true" : "false"),
-      kOptions[19], absl::StrJoin(select, ","),
+      kOptions[19], abslx::StrJoin(select, ","),
       kOptions[20], output_type, KeyValueToStr(output_options));
   // clang-format on
   return s;

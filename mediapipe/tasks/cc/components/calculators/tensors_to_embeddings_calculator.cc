@@ -69,8 +69,8 @@ class TensorsToEmbeddingsCalculator : public Node {
   static constexpr Output<EmbeddingResult> kEmbeddingsOut{"EMBEDDINGS"};
   MEDIAPIPE_NODE_CONTRACT(kTensorsIn, kEmbeddingsOut);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   bool l2_normalize_;
@@ -81,7 +81,7 @@ class TensorsToEmbeddingsCalculator : public Node {
   void FillQuantizedEmbedding(const Tensor& tensor, Embedding* embedding);
 };
 
-absl::Status TensorsToEmbeddingsCalculator::Open(CalculatorContext* cc) {
+abslx::Status TensorsToEmbeddingsCalculator::Open(CalculatorContext* cc) {
   auto options = cc->Options<mediapipe::TensorsToEmbeddingsCalculatorOptions>();
   l2_normalize_ = options.embedder_options().l2_normalize();
   quantize_ = options.embedder_options().quantize();
@@ -89,14 +89,14 @@ absl::Status TensorsToEmbeddingsCalculator::Open(CalculatorContext* cc) {
     head_names_.assign(options.head_names().begin(),
                        options.head_names().end());
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorsToEmbeddingsCalculator::Process(CalculatorContext* cc) {
+abslx::Status TensorsToEmbeddingsCalculator::Process(CalculatorContext* cc) {
   EmbeddingResult result;
   const auto& tensors = *kTensorsIn(cc);
   if (!head_names_.empty() && tensors.size() != head_names_.size()) {
-    return absl::InvalidArgumentError(absl::StrFormat(
+    return abslx::InvalidArgumentError(abslx::StrFormat(
         "Mismatch between number of provided head names (%d) and number "
         "of input tensors (%d).",
         head_names_.size(), tensors.size()));
@@ -116,7 +116,7 @@ absl::Status TensorsToEmbeddingsCalculator::Process(CalculatorContext* cc) {
     }
   }
   kEmbeddingsOut(cc).Send(result);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void TensorsToEmbeddingsCalculator::FillFloatEmbedding(const Tensor& tensor,

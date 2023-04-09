@@ -171,7 +171,7 @@ TEST(DetectionsTransformationCalculatorTest,
     output_stream: "RELATIVE_DETECTION_LIST:output_detection_list"
   )pb"));
 
-  auto detections(absl::make_unique<std::vector<Detection>>());
+  auto detections(abslx::make_unique<std::vector<Detection>>());
   detections->push_back(DetectionWithBoundingBox(100, 200, 400, 300));
   detections->push_back(DetectionWithBoundingBox(0, 0, 2000, 1000));
   std::pair<int, int> image_size({2000, 1000});
@@ -211,7 +211,7 @@ TEST(DetectionsTransformationCalculatorTest,
     output_stream: "PIXEL_DETECTION_LIST:output_detection_list"
   )pb"));
 
-  auto detections(absl::make_unique<std::vector<Detection>>());
+  auto detections(abslx::make_unique<std::vector<Detection>>());
   detections->push_back(DetectionWithRelativeBoundingBox(0.1, 0.2, 0.3, 0.4));
   detections->push_back(DetectionWithRelativeBoundingBox(0, 0, 1, 1));
   std::pair<int, int> image_size({2000, 1000});

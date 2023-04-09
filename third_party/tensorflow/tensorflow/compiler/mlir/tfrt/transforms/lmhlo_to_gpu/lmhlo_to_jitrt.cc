@@ -481,7 +481,7 @@ class CublasLtMatmulOpLowering : public OpRewritePattern<CublasLtMatmulOp> {
         matmul = kCustomCallTarget;
         break;
       case 5:
-        matmul = absl::StrCat(kCustomCallTarget, ".bias");
+        matmul = abslx::StrCat(kCustomCallTarget, ".bias");
         break;
       default:
         return op.emitOpError("unexpected number of operands for matmul");

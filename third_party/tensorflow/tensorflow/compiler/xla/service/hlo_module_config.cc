@@ -26,7 +26,7 @@ limitations under the License.
 
 namespace xla {
 
-using absl::StrAppend;
+using abslx::StrAppend;
 
 HloModuleConfig::HloModuleConfig(const ProgramShape& program_shape,
                                  bool ignore_layouts)
@@ -48,7 +48,7 @@ void HloModuleConfig::SetComputationLayoutIfExists(
 }
 
 std::string HloModuleConfig::compilation_cache_key() const {
-  std::string key = absl::StrCat("profiling=", hlo_profiling_enabled());
+  std::string key = abslx::StrCat("profiling=", hlo_profiling_enabled());
   StrAppend(&key, "::(");
   std::vector<std::string> params;
   if (entry_computation_layout_.has_value()) {
@@ -56,7 +56,7 @@ std::string HloModuleConfig::compilation_cache_key() const {
          entry_computation_layout_->parameter_layouts()) {
       params.push_back(param_layout.shape().DebugString());
     }
-    StrAppend(&key, absl::StrJoin(params, ", "), ") => ",
+    StrAppend(&key, abslx::StrJoin(params, ", "), ") => ",
               entry_computation_layout_->result_shape().SerializeAsString());
   }
   if (seed() != 0) {

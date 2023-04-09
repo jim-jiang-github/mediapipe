@@ -33,18 +33,18 @@ namespace tensorflow {
 namespace dtensor {
 
 // Extracts `_layout` attribute from `op` and assert a single layout.
-StatusOr<absl::optional<Layout>> ExtractSingleLayoutFromOp(mlir::Operation* op);
+StatusOr<abslx::optional<Layout>> ExtractSingleLayoutFromOp(mlir::Operation* op);
 
 // Extracts `_layout` attribute from `op`, and returns an error is the layout
 // is missing.
 StatusOr<Layout> ExtractRequiredSingleLayoutFromOp(mlir::Operation* op);
 
 // Extracts `_layout` attribute from `op` and assert a single layout.
-StatusOr<absl::optional<Layout>> ExtractSingleLayoutFromOp(
+StatusOr<abslx::optional<Layout>> ExtractSingleLayoutFromOp(
     mlir::Operation* op, std::string attr_name);
 
 // Extracts `_layout` attribute from `op`.
-StatusOr<std::vector<absl::optional<Layout>>> ExtractLayoutFromOp(
+StatusOr<std::vector<abslx::optional<Layout>>> ExtractLayoutFromOp(
     mlir::Operation* op);
 
 // Extracts `_layout` attribute from `op` and returns an error if any are
@@ -52,11 +52,11 @@ StatusOr<std::vector<absl::optional<Layout>>> ExtractLayoutFromOp(
 StatusOr<std::vector<Layout>> ExtractRequiredLayoutFromOp(mlir::Operation* op);
 
 // Extract and deserialize a tensor layout from `attr_name`.
-StatusOr<std::vector<absl::optional<Layout>>> ExtractLayoutFromOp(
+StatusOr<std::vector<abslx::optional<Layout>>> ExtractLayoutFromOp(
     mlir::Operation* op, std::string attr_name);
 
 // Extracts '_layout' attribute from `operand`.
-StatusOr<absl::optional<Layout>> ExtractLayoutFromOperand(mlir::Value operand);
+StatusOr<abslx::optional<Layout>> ExtractLayoutFromOperand(mlir::Value operand);
 
 // Extracts '_layout' attribute from `operand` and returns an error if missing.
 StatusOr<Layout> ExtractRequiredLayoutFromOperand(mlir::Value operand);
@@ -69,10 +69,10 @@ StatusOr<std::vector<Layout>> ExtractRequiredLayoutFromOperands(
 // Set `_layout` attribute for op. For layouts without value, an empty string is
 // used as place holder.
 void SetLayoutOnOp(mlir::Operation* op, mlir::OpBuilder builder,
-                   absl::Span<const absl::optional<Layout>> layouts);
+                   abslx::Span<const abslx::optional<Layout>> layouts);
 
 void SetLayoutOnOp(mlir::Operation* op,
-                   absl::Span<const absl::optional<Layout>> layouts);
+                   abslx::Span<const abslx::optional<Layout>> layouts);
 
 void SetSingleLayoutOnOp(mlir::Operation* op, const Layout& layout);
 
@@ -80,10 +80,10 @@ void SetSingleLayoutOnOp(mlir::Operation* op, const Layout& layout);
 StatusOr<Mesh> ExtractDeviceMeshEnclosingCluster(mlir::Operation* op);
 
 // Extracts device mesh configuration from op's `_mesh` attribute.
-StatusOr<absl::optional<Mesh>> ExtractDeviceMeshFromOp(mlir::Operation* op);
+StatusOr<abslx::optional<Mesh>> ExtractDeviceMeshFromOp(mlir::Operation* op);
 
 // Extracts default layout information from function return attribute.
-StatusOr<absl::optional<Layout>> ExtractLayoutFromFunctionReturnAttr(
+StatusOr<abslx::optional<Layout>> ExtractLayoutFromFunctionReturnAttr(
     mlir::func::ReturnOp return_op, const int return_index);
 
 }  // namespace dtensor

@@ -29,7 +29,7 @@ GPUOperation CreateUnequalAdd(const OperationDef& op_def) {
   GPUOperation op(op_def);
   op.AddDstTensor("dst_tensor", op_def.dst_tensors[0]);
   for (int i = 0; i < op_def.src_tensors.size(); ++i) {
-    const std::string tensor_name = absl::StrCat("src_tensor_", i);
+    const std::string tensor_name = abslx::StrCat("src_tensor_", i);
     op.AddSrcTensor(tensor_name, op_def.src_tensors[i]);
   }
   op.tensor_to_grid_ = TensorToGrid::kWBToX_HDToY_SToZ;
@@ -41,7 +41,7 @@ GPUOperation CreateUnequalAdd(const OperationDef& op_def) {
     c += "  int B = linear_id % args.dst_tensor.Batch();\n";
     c += "  args.dst_tensor.SetBatchRef(B);\n";
     for (int i = 0; i < op_def.src_tensors.size(); ++i) {
-      const std::string tensor_name = absl::StrCat("src_tensor_", i);
+      const std::string tensor_name = abslx::StrCat("src_tensor_", i);
       c += "  args." + tensor_name + ".SetBatchRef(B);\n";
     }
   } else {
@@ -53,7 +53,7 @@ GPUOperation CreateUnequalAdd(const OperationDef& op_def) {
        "S >= args.dst_tensor.Slices()) return; \n";
   c += "  args.src_tensor_0::type src = args.src_tensor_0::zero_value;\n";
   for (int i = 0; i < op_def.src_tensors.size(); ++i) {
-    const std::string tensor_name = absl::StrCat("src_tensor_", i);
+    const std::string tensor_name = abslx::StrCat("src_tensor_", i);
     c += "  if (S < args." + tensor_name + ".Slices()) {\n";
     c += "    src += args." + tensor_name + ".Read(X, Y, S);\n";
     c += "  }\n";
@@ -73,7 +73,7 @@ GPUOperation CreateAdd(const OperationDef& definition,
   ElementwiseDescriptor op_desc;
   op_desc.code = "  out_value = in_value;\n";
   for (int i = 1; i < definition.src_tensors.size(); ++i) {
-    const std::string tensor_name = absl::StrCat("src_tensor_", i);
+    const std::string tensor_name = abslx::StrCat("src_tensor_", i);
     std::string coords = "X_COORD, Y_COORD";
     if (definition.src_tensors[i].HasAxis(Axis::DEPTH)) {
       coords += ", Z_COORD";

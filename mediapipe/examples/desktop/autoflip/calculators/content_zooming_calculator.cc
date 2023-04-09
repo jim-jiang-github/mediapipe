@@ -81,45 +81,45 @@ class ContentZoomingCalculator : public CalculatorBase {
   ContentZoomingCalculator(const ContentZoomingCalculator&) = delete;
   ContentZoomingCalculator& operator=(const ContentZoomingCalculator&) = delete;
 
-  static absl::Status GetContract(mediapipe::CalculatorContract* cc);
-  absl::Status Open(mediapipe::CalculatorContext* cc) override;
-  absl::Status Process(mediapipe::CalculatorContext* cc) override;
-  absl::Status Close(mediapipe::CalculatorContext* cc) override;
+  static abslx::Status GetContract(mediapipe::CalculatorContract* cc);
+  abslx::Status Open(mediapipe::CalculatorContext* cc) override;
+  abslx::Status Process(mediapipe::CalculatorContext* cc) override;
+  abslx::Status Close(mediapipe::CalculatorContext* cc) override;
 
  private:
   // Tries to load state from a state-cache, if provided. Fallsback to
   // initializing state if no cache or no value in the cache are available.
-  absl::Status MaybeLoadState(mediapipe::CalculatorContext* cc, int frame_width,
+  abslx::Status MaybeLoadState(mediapipe::CalculatorContext* cc, int frame_width,
                               int frame_height);
   // Saves state to a state-cache, if provided.
-  absl::Status SaveState(mediapipe::CalculatorContext* cc) const;
+  abslx::Status SaveState(mediapipe::CalculatorContext* cc) const;
   // Returns the factor for maximum zoom based on options and the
   // kMaxZoomFactorPercent input (if present).
   double GetMaxZoomFactor(mediapipe::CalculatorContext* cc) const;
   // Initializes the calculator for the given frame size, creating path solvers
   // and resetting history like last measured values.
-  absl::Status InitializeState(mediapipe::CalculatorContext* cc,
+  abslx::Status InitializeState(mediapipe::CalculatorContext* cc,
                                int frame_width, int frame_height);
   // Adjusts state to work with an updated frame size.
-  absl::Status UpdateForResolutionChange(mediapipe::CalculatorContext* cc,
+  abslx::Status UpdateForResolutionChange(mediapipe::CalculatorContext* cc,
                                          int frame_width, int frame_height);
   // Returns true if we are animating to the first rect.
   bool IsAnimatingToFirstRect(const Timestamp& timestamp) const;
   // Builds the output rectangle when animating to the first rect.
-  absl::StatusOr<mediapipe::Rect> GetAnimationRect(
+  abslx::StatusOr<mediapipe::Rect> GetAnimationRect(
       int frame_width, int frame_height, const Timestamp& timestamp) const;
   // Converts bounds to tilt offset, pan offset and height.
-  absl::Status ConvertToPanTiltZoom(float xmin, float xmax, float ymin,
+  abslx::Status ConvertToPanTiltZoom(float xmin, float xmax, float ymin,
                                     float ymax, int* tilt_offset,
                                     int* pan_offset, int* height);
   // Sets max_frame_value_ and target_aspect_
-  absl::Status UpdateAspectAndMax();
+  abslx::Status UpdateAspectAndMax();
   // Smooth camera path
-  absl::Status SmoothAndClampPath(int target_width, int target_height,
+  abslx::Status SmoothAndClampPath(int target_width, int target_height,
                                   float path_width, float path_height,
                                   float* path_offset_x, float* path_offset_y);
   // Compute box containing all detections.
-  absl::Status GetDetectionsBox(mediapipe::CalculatorContext* cc, float* xmin,
+  abslx::Status GetDetectionsBox(mediapipe::CalculatorContext* cc, float* xmin,
                                 float* xmax, float* ymin, float* ymax,
                                 bool* only_required_found,
                                 bool* has_detections);
@@ -156,7 +156,7 @@ class ContentZoomingCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(ContentZoomingCalculator);
 
-absl::Status ContentZoomingCalculator::GetContract(
+abslx::Status ContentZoomingCalculator::GetContract(
     mediapipe::CalculatorContract* cc) {
   RET_CHECK(
       !(cc->Inputs().HasTag(kVideoFrame) && cc->Inputs().HasTag(kVideoSize)))
@@ -199,10 +199,10 @@ absl::Status ContentZoomingCalculator::GetContract(
   if (cc->Outputs().HasTag(kCameraActive)) {
     cc->Outputs().Tag(kCameraActive).Set<bool>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ContentZoomingCalculator::Open(mediapipe::CalculatorContext* cc) {
+abslx::Status ContentZoomingCalculator::Open(mediapipe::CalculatorContext* cc) {
   cc->SetOffset(mediapipe::TimestampDiff(0));
   options_ = cc->Options<ContentZoomingCalculatorOptions>();
   if (options_.has_kinematic_options()) {
@@ -216,17 +216,17 @@ absl::Status ContentZoomingCalculator::Open(mediapipe::CalculatorContext* cc) {
               "in kinematic_options_zoom and kinematic_options_tilt "
               "directly.";
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ContentZoomingCalculator::Close(mediapipe::CalculatorContext* cc) {
+abslx::Status ContentZoomingCalculator::Close(mediapipe::CalculatorContext* cc) {
   if (initialized_) {
     MP_RETURN_IF_ERROR(SaveState(cc));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ContentZoomingCalculator::ConvertToPanTiltZoom(
+abslx::Status ContentZoomingCalculator::ConvertToPanTiltZoom(
     float xmin, float xmax, float ymin, float ymax, int* tilt_offset,
     int* pan_offset, int* height) {
   // Find center of the y-axis offset (for tilt control).
@@ -254,7 +254,7 @@ absl::Status ContentZoomingCalculator::ConvertToPanTiltZoom(
   *tilt_offset = frame_height_ * y_center;
   *pan_offset = frame_width_ * x_center;
   *height = frame_height_ * fit_size_raw;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 namespace {
@@ -278,7 +278,7 @@ mediapipe::autoflip::RectF ShiftDetection(
                    relative_bounding_box.width() * x_offset_percent);
   return shifted_bb;
 }
-absl::Status UpdateRanges(const SalientRegion& region,
+abslx::Status UpdateRanges(const SalientRegion& region,
                           const float shift_vertical,
                           const float shift_horizontal,
                           const float pad_vertical, const float pad_horizontal,
@@ -298,9 +298,9 @@ absl::Status UpdateRanges(const SalientRegion& region,
   *ymin = fmin(*ymin, location.y() - y_padding);
   *ymax = fmax(*ymax, location.y() + location.height() + y_padding);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
-absl::Status UpdateRanges(const mediapipe::Detection& detection,
+abslx::Status UpdateRanges(const mediapipe::Detection& detection,
                           const float shift_vertical,
                           const float shift_horizontal,
                           const float pad_vertical, const float pad_horizontal,
@@ -320,7 +320,7 @@ absl::Status UpdateRanges(const mediapipe::Detection& detection,
   *ymin = fmin(*ymin, location.ymin() - y_padding);
   *ymax = fmax(*ymax, location.ymin() + location.height() + y_padding);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 void MakeStaticFeatures(const int top_border, const int bottom_border,
                         const int frame_width, const int frame_height,
@@ -339,7 +339,7 @@ void MakeStaticFeatures(const int top_border, const int bottom_border,
   border_bottom->mutable_border_position()->set_width(frame_width);
   border_bottom->mutable_border_position()->set_height(bottom_border);
 }
-absl::Status GetVideoResolution(mediapipe::CalculatorContext* cc,
+abslx::Status GetVideoResolution(mediapipe::CalculatorContext* cc,
                                 int* frame_width, int* frame_height) {
   if (cc->Inputs().HasTag(kVideoFrame)) {
     *frame_width = cc->Inputs().Tag(kVideoFrame).Get<ImageFrame>().Width();
@@ -353,11 +353,11 @@ absl::Status GetVideoResolution(mediapipe::CalculatorContext* cc,
     return mediapipe::UnknownErrorBuilder(MEDIAPIPE_LOC)
            << "Input VIDEO or VIDEO_SIZE must be provided.";
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 }  // namespace
 
-absl::Status ContentZoomingCalculator::UpdateAspectAndMax() {
+abslx::Status ContentZoomingCalculator::UpdateAspectAndMax() {
   max_frame_value_ = 1.0;
   target_aspect_ = frame_width_ / static_cast<float>(frame_height_);
   // If target size is set and wider than input aspect, make sure to always
@@ -373,10 +373,10 @@ absl::Status ContentZoomingCalculator::UpdateAspectAndMax() {
     max_frame_value_ =
         std::min(input_aspect / target_aspect_, target_aspect_ / input_aspect);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ContentZoomingCalculator::MaybeLoadState(
+abslx::Status ContentZoomingCalculator::MaybeLoadState(
     mediapipe::CalculatorContext* cc, int frame_width, int frame_height) {
   const auto* state_cache =
       cc->InputSidePackets().HasTag(kStateCache)
@@ -406,14 +406,14 @@ absl::Status ContentZoomingCalculator::MaybeLoadState(
   return UpdateForResolutionChange(cc, frame_width, frame_height);
 }
 
-absl::Status ContentZoomingCalculator::SaveState(
+abslx::Status ContentZoomingCalculator::SaveState(
     mediapipe::CalculatorContext* cc) const {
   auto* state_cache =
       cc->InputSidePackets().HasTag(kStateCache)
           ? cc->InputSidePackets().Tag(kStateCache).Get<StateCacheType*>()
           : nullptr;
   if (!state_cache) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   *state_cache = ContentZoomingCalculatorState{
@@ -429,7 +429,7 @@ absl::Status ContentZoomingCalculator::SaveState(
       .last_measured_x_offset = last_measured_x_offset_,
       .last_measured_y_offset = last_measured_y_offset_,
   };
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 double ContentZoomingCalculator::GetMaxZoomFactor(
@@ -444,7 +444,7 @@ double ContentZoomingCalculator::GetMaxZoomFactor(
   return max_zoom_value;
 }
 
-absl::Status ContentZoomingCalculator::InitializeState(
+abslx::Status ContentZoomingCalculator::InitializeState(
     mediapipe::CalculatorContext* cc, int frame_width, int frame_height) {
   frame_width_ = frame_width;
   frame_height_ = frame_height;
@@ -465,10 +465,10 @@ absl::Status ContentZoomingCalculator::InitializeState(
   last_measured_height_ = max_frame_value_ * frame_height_;
   last_measured_x_offset_ = target_aspect_ * frame_width_;
   last_measured_y_offset_ = frame_width_ / 2;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ContentZoomingCalculator::UpdateForResolutionChange(
+abslx::Status ContentZoomingCalculator::UpdateForResolutionChange(
     mediapipe::CalculatorContext* cc, int frame_width, int frame_height) {
   // Update state for change in input resolution.
   if (frame_width_ != frame_width || frame_height_ != frame_height) {
@@ -489,7 +489,7 @@ absl::Status ContentZoomingCalculator::UpdateForResolutionChange(
     MP_RETURN_IF_ERROR(path_solver_zoom_->UpdatePixelsPerDegree(
         static_cast<float>(frame_height_) / kFieldOfView));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 bool ContentZoomingCalculator::IsAnimatingToFirstRect(
@@ -517,7 +517,7 @@ double easeInOutQuad(double t) {
 double lerp(double a, double b, double i) { return a * (1 - i) + b * i; }
 }  // namespace
 
-absl::StatusOr<mediapipe::Rect> ContentZoomingCalculator::GetAnimationRect(
+abslx::StatusOr<mediapipe::Rect> ContentZoomingCalculator::GetAnimationRect(
     int frame_width, int frame_height, const Timestamp& timestamp) const {
   RET_CHECK(IsAnimatingToFirstRect(timestamp))
       << "Must only be called if animating to first rect.";
@@ -541,12 +541,12 @@ absl::StatusOr<mediapipe::Rect> ContentZoomingCalculator::GetAnimationRect(
   return gpu_rect;
 }
 
-absl::Status ContentZoomingCalculator::Process(
+abslx::Status ContentZoomingCalculator::Process(
     mediapipe::CalculatorContext* cc) {
   // For async subgraph support, return on empty video size packets.
   if (cc->Inputs().HasTag(kVideoSize) &&
       cc->Inputs().Tag(kVideoSize).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   int frame_width, frame_height;
   MP_RETURN_IF_ERROR(GetVideoResolution(cc, &frame_width, &frame_height));
@@ -566,7 +566,7 @@ absl::Status ContentZoomingCalculator::Process(
   bool has_detections = true;
   MP_RETURN_IF_ERROR(GetDetectionsBox(cc, &xmin, &xmax, &ymin, &ymax,
                                       &only_required_found, &has_detections));
-  if (!has_detections) return absl::OkStatus();
+  if (!has_detections) return abslx::OkStatus();
 
   const bool may_start_animation = (options_.us_to_first_rect() != 0) &&
                                    (!cc->Inputs().HasTag(kAnimateZoom) ||
@@ -681,7 +681,7 @@ absl::Status ContentZoomingCalculator::Process(
     const int path_top = path_offset_y - path_height / 2;
     const int path_bottom = frame_height_ - (path_offset_y + path_height / 2);
     std::unique_ptr<StaticFeatures> features =
-        absl::make_unique<StaticFeatures>();
+        abslx::make_unique<StaticFeatures>();
     MakeStaticFeatures(path_top, path_bottom, frame_width_, frame_height_,
                        features.get());
     cc->Outputs()
@@ -712,9 +712,9 @@ absl::Status ContentZoomingCalculator::Process(
       auto rect =
           GetAnimationRect(frame_width, frame_height, cc->InputTimestamp());
       MP_RETURN_IF_ERROR(rect.status());
-      gpu_rect = absl::make_unique<mediapipe::Rect>(*rect);
+      gpu_rect = abslx::make_unique<mediapipe::Rect>(*rect);
     } else {
-      gpu_rect = absl::make_unique<mediapipe::Rect>();
+      gpu_rect = abslx::make_unique<mediapipe::Rect>();
       gpu_rect->set_x_center(path_offset_x);
       gpu_rect->set_width(path_width);
       gpu_rect->set_y_center(path_offset_y);
@@ -725,7 +725,7 @@ absl::Status ContentZoomingCalculator::Process(
   }
   if (cc->Outputs().HasTag(kNormalizedCropRect)) {
     std::unique_ptr<mediapipe::NormalizedRect> gpu_rect =
-        absl::make_unique<mediapipe::NormalizedRect>();
+        abslx::make_unique<mediapipe::NormalizedRect>();
     const float float_frame_width = static_cast<float>(frame_width_);
     const float float_frame_height = static_cast<float>(frame_height_);
     if (is_animating) {
@@ -754,10 +754,10 @@ absl::Status ContentZoomingCalculator::Process(
              Timestamp(cc->InputTimestamp()));
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ContentZoomingCalculator::SmoothAndClampPath(
+abslx::Status ContentZoomingCalculator::SmoothAndClampPath(
     int target_width, int target_height, float path_width, float path_height,
     float* path_offset_x, float* path_offset_y) {
   float delta_height;
@@ -814,10 +814,10 @@ absl::Status ContentZoomingCalculator::SmoothAndClampPath(
     MP_RETURN_IF_ERROR(path_solver_pan_->SetState(*path_offset_x));
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ContentZoomingCalculator::GetDetectionsBox(
+abslx::Status ContentZoomingCalculator::GetDetectionsBox(
     mediapipe::CalculatorContext* cc, float* xmin, float* xmax, float* ymin,
     float* ymax, bool* only_required_found, bool* has_detections) {
   if (cc->Inputs().HasTag(kSalientRegions)) {
@@ -841,7 +841,7 @@ absl::Status ContentZoomingCalculator::GetDetectionsBox(
         // If no detections are available and we never had any,
         // simply return the full-image rectangle as crop-rect.
         if (cc->Outputs().HasTag(kCropRect)) {
-          auto default_rect = absl::make_unique<mediapipe::Rect>();
+          auto default_rect = abslx::make_unique<mediapipe::Rect>();
           default_rect->set_x_center(frame_width_ / 2);
           default_rect->set_y_center(frame_height_ / 2);
           default_rect->set_width(frame_width_);
@@ -850,7 +850,7 @@ absl::Status ContentZoomingCalculator::GetDetectionsBox(
                                            Timestamp(cc->InputTimestamp()));
         }
         if (cc->Outputs().HasTag(kNormalizedCropRect)) {
-          auto default_rect = absl::make_unique<mediapipe::NormalizedRect>();
+          auto default_rect = abslx::make_unique<mediapipe::NormalizedRect>();
           default_rect->set_x_center(0.5);
           default_rect->set_y_center(0.5);
           default_rect->set_width(1.0);
@@ -867,7 +867,7 @@ absl::Status ContentZoomingCalculator::GetDetectionsBox(
                    Timestamp(cc->InputTimestamp()));
         }
         *has_detections = false;
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
     } else {
       auto raw_detections = cc->Inputs()
@@ -883,7 +883,7 @@ absl::Status ContentZoomingCalculator::GetDetectionsBox(
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace autoflip

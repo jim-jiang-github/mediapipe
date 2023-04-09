@@ -26,8 +26,8 @@ limitations under the License.
 
 namespace tensorflow {
 
-inline constexpr absl::string_view kCrashReproducerStdErr = "-";
-inline constexpr absl::string_view kCrashReproducerCrashAnalysis =
+inline constexpr abslx::string_view kCrashReproducerStdErr = "-";
+inline constexpr abslx::string_view kCrashReproducerCrashAnalysis =
     "crash_analysis";
 
 // Creates a file to use for dumping and returns success if a file could be

@@ -59,7 +59,7 @@ class NVPTXCompiler : public GpuCompiler {
       se::StreamExecutor* stream_exec,
       std::vector<std::vector<uint8_t>> modules) override;
 
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
 
   // When compiling an HLO module, we need to find a path to the nvvm libdevice
   // files.  We search in the module's config.debug_options().cuda_data_dir()
@@ -116,13 +116,13 @@ class NVPTXCompiler : public GpuCompiler {
     bool compilation_done = false;
     std::vector<uint8_t> cubin_data;
     // mutex and condition variable to serialize compilation completing.
-    absl::Mutex mutex;
-    absl::CondVar compilation_done_cv;
+    abslx::Mutex mutex;
+    abslx::CondVar compilation_done_cv;
   };
 
   // Don't even think about switching this to flat_hash_map; iterator stability
   // is critical here.
-  absl::node_hash_map<CompilationCacheKey, CompilationCacheValue>
+  abslx::node_hash_map<CompilationCacheKey, CompilationCacheValue>
       compilation_cache_ ABSL_GUARDED_BY(mutex_);
 
   NVPTXCompiler(const NVPTXCompiler&) = delete;

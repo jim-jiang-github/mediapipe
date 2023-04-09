@@ -25,8 +25,8 @@ absl_cc_library(
   LINKOPTS
     ${ABSL_DEFAULT_LINKOPTS}
   DEPS
-    absl::config
-    absl::strings
+    abslx::config
+    abslx::strings
   PUBLIC
 )
 
@@ -43,11 +43,11 @@ absl_cc_library(
   LINKOPTS
     ${ABSL_DEFAULT_LINKOPTS}
   DEPS
-    absl::config
-    absl::core_headers
-    absl::flags_path_util
-    absl::strings
-    absl::synchronization
+    abslx::config
+    abslx::core_headers
+    abslx::flags_path_util
+    abslx::strings
+    abslx::synchronization
   PUBLIC
 )
 
@@ -64,12 +64,12 @@ absl_cc_library(
   LINKOPTS
     ${ABSL_DEFAULT_LINKOPTS}
   DEPS
-    absl::config
-    absl::flags_path_util
-    absl::flags_program_name
-    absl::core_headers
-    absl::strings
-    absl::synchronization
+    abslx::config
+    abslx::flags_path_util
+    abslx::flags_program_name
+    abslx::core_headers
+    abslx::strings
+    abslx::synchronization
 )
 
 absl_cc_library(
@@ -84,11 +84,11 @@ absl_cc_library(
   LINKOPTS
     ${ABSL_DEFAULT_LINKOPTS}
   DEPS
-    absl::config
-    absl::core_headers
-    absl::log_severity
-    absl::strings
-    absl::str_format
+    abslx::config
+    abslx::core_headers
+    abslx::log_severity
+    abslx::strings
+    abslx::str_format
 )
 
 # Internal-only target, do not depend on directly.
@@ -104,8 +104,8 @@ absl_cc_library(
   LINKOPTS
     ${ABSL_DEFAULT_LINKOPTS}
   DEPS
-    absl::config
-    absl::fast_type_id
+    abslx::config
+    abslx::fast_type_id
 )
 
 absl_cc_library(
@@ -120,11 +120,11 @@ absl_cc_library(
   LINKOPTS
     ${ABSL_DEFAULT_LINKOPTS}
   DEPS
-    absl::config
-    absl::fast_type_id
-    absl::flags_commandlineflag_internal
-    absl::optional
-    absl::strings
+    abslx::config
+    abslx::fast_type_id
+    abslx::flags_commandlineflag_internal
+    abslx::optional
+    abslx::strings
 )
 
 # Internal-only target, do not depend on directly.
@@ -140,10 +140,10 @@ absl_cc_library(
   LINKOPTS
     ${ABSL_DEFAULT_LINKOPTS}
   DEPS
-    absl::config
-    absl::flags_commandlineflag
-    absl::flags_commandlineflag_internal
-    absl::strings
+    abslx::config
+    abslx::flags_commandlineflag
+    abslx::flags_commandlineflag_internal
+    abslx::strings
 )
 
 absl_cc_library(
@@ -159,13 +159,13 @@ absl_cc_library(
   LINKOPTS
     ${ABSL_DEFAULT_LINKOPTS}
   DEPS
-    absl::config
-    absl::flags_commandlineflag
-    absl::flags_private_handle_accessor
-    absl::flags_config
-    absl::strings
-    absl::synchronization
-    absl::flat_hash_map
+    abslx::config
+    abslx::flags_commandlineflag
+    abslx::flags_private_handle_accessor
+    abslx::flags_config
+    abslx::strings
+    abslx::synchronization
+    abslx::flat_hash_map
 )
 
 # Internal-only target, do not depend on directly.
@@ -182,15 +182,15 @@ absl_cc_library(
   LINKOPTS
     ${ABSL_DEFAULT_LINKOPTS}
   DEPS
-    absl::base
-    absl::config
-    absl::flags_commandlineflag
-    absl::flags_commandlineflag_internal
-    absl::flags_config
-    absl::flags_marshalling
-    absl::synchronization
-    absl::meta
-    absl::utility
+    abslx::base
+    abslx::config
+    abslx::flags_commandlineflag
+    abslx::flags_commandlineflag_internal
+    abslx::flags_config
+    abslx::flags_marshalling
+    abslx::synchronization
+    abslx::meta
+    abslx::utility
   PUBLIC
 )
 
@@ -207,14 +207,14 @@ absl_cc_library(
   LINKOPTS
     ${ABSL_DEFAULT_LINKOPTS}
   DEPS
-    absl::config
-    absl::flags_commandlineflag
-    absl::flags_config
-    absl::flags_internal
-    absl::flags_reflection
-    absl::base
-    absl::core_headers
-    absl::strings
+    abslx::config
+    abslx::flags_commandlineflag
+    abslx::flags_config
+    abslx::flags_internal
+    abslx::flags_reflection
+    abslx::base
+    abslx::core_headers
+    abslx::strings
 )
 
 # Internal-only target, do not depend on directly.
@@ -230,17 +230,17 @@ absl_cc_library(
   LINKOPTS
     ${ABSL_DEFAULT_LINKOPTS}
   DEPS
-    absl::config
-    absl::flags_config
-    absl::flags
-    absl::flags_commandlineflag
-    absl::flags_internal
-    absl::flags_path_util
-    absl::flags_private_handle_accessor
-    absl::flags_program_name
-    absl::flags_reflection
-    absl::strings
-    absl::synchronization
+    abslx::config
+    abslx::flags_config
+    abslx::flags
+    abslx::flags_commandlineflag
+    abslx::flags_internal
+    abslx::flags_path_util
+    abslx::flags_private_handle_accessor
+    abslx::flags_program_name
+    abslx::flags_reflection
+    abslx::strings
+    abslx::synchronization
 )
 
 absl_cc_library(
@@ -255,11 +255,11 @@ absl_cc_library(
   LINKOPTS
     ${ABSL_DEFAULT_LINKOPTS}
   DEPS
-    absl::config
-    absl::core_headers
-    absl::flags_usage_internal
-    absl::strings
-    absl::synchronization
+    abslx::config
+    abslx::core_headers
+    abslx::flags_usage_internal
+    abslx::strings
+    abslx::synchronization
 )
 
 absl_cc_library(
@@ -275,19 +275,19 @@ absl_cc_library(
   LINKOPTS
     ${ABSL_DEFAULT_LINKOPTS}
   DEPS
-    absl::config
-    absl::core_headers
-    absl::flags_config
-    absl::flags
-    absl::flags_commandlineflag
-    absl::flags_commandlineflag_internal
-    absl::flags_internal
-    absl::flags_private_handle_accessor
-    absl::flags_program_name
-    absl::flags_reflection
-    absl::flags_usage
-    absl::strings
-    absl::synchronization
+    abslx::config
+    abslx::core_headers
+    abslx::flags_config
+    abslx::flags
+    abslx::flags_commandlineflag
+    abslx::flags_commandlineflag_internal
+    abslx::flags_internal
+    abslx::flags_private_handle_accessor
+    abslx::flags_program_name
+    abslx::flags_reflection
+    abslx::flags_usage
+    abslx::strings
+    abslx::synchronization
 )
 
 ############################################################################
@@ -301,14 +301,14 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::flags
-    absl::flags_commandlineflag
-    absl::flags_commandlineflag_internal
-    absl::flags_config
-    absl::flags_private_handle_accessor
-    absl::flags_reflection
-    absl::memory
-    absl::strings
+    abslx::flags
+    abslx::flags_commandlineflag
+    abslx::flags_commandlineflag_internal
+    abslx::flags_config
+    abslx::flags_private_handle_accessor
+    abslx::flags_reflection
+    abslx::memory
+    abslx::strings
     gtest_main
 )
 
@@ -320,7 +320,7 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::flags_config
+    abslx::flags_config
     gtest_main
 )
 
@@ -333,14 +333,14 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::core_headers
-    absl::flags
-    absl::flags_config
-    absl::flags_internal
-    absl::flags_marshalling
-    absl::flags_reflection
-    absl::strings
-    absl::time
+    abslx::core_headers
+    abslx::flags
+    abslx::flags_config
+    abslx::flags_internal
+    abslx::flags_marshalling
+    abslx::flags_reflection
+    abslx::strings
+    abslx::time
     gtest_main
 )
 
@@ -352,7 +352,7 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::flags_marshalling
+    abslx::flags_marshalling
     gtest_main
 )
 
@@ -364,14 +364,14 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::flags
-    absl::flags_parse
-    absl::flags_reflection
-    absl::flags_usage_internal
-    absl::raw_logging_internal
-    absl::scoped_set_env
-    absl::span
-    absl::strings
+    abslx::flags
+    abslx::flags_parse
+    abslx::flags_reflection
+    abslx::flags_usage_internal
+    abslx::raw_logging_internal
+    abslx::scoped_set_env
+    abslx::span
+    abslx::strings
     gmock_main
 )
 
@@ -383,7 +383,7 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::flags_path_util
+    abslx::flags_path_util
     gtest_main
 )
 
@@ -395,8 +395,8 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::flags_program_name
-    absl::strings
+    abslx::flags_program_name
+    abslx::strings
     gtest_main
 )
 
@@ -408,12 +408,12 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::flags_commandlineflag_internal
-    absl::flags
-    absl::flags_reflection
-    absl::flags_usage
-    absl::memory
-    absl::strings
+    abslx::flags_commandlineflag_internal
+    abslx::flags
+    abslx::flags_reflection
+    abslx::flags_usage
+    abslx::memory
+    abslx::strings
     gmock_main
 )
 
@@ -425,9 +425,9 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::base
-    absl::flags_internal
-    absl::time
+    abslx::base
+    abslx::flags_internal
+    abslx::time
     gmock_main
 )
 
@@ -439,10 +439,10 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::flags_config
-    absl::flags_path_util
-    absl::flags_program_name
-    absl::strings
+    abslx::flags_config
+    abslx::flags_path_util
+    abslx::flags_program_name
+    abslx::strings
     gtest_main
 )
 
@@ -454,13 +454,13 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::flags_config
-    absl::flags
-    absl::flags_path_util
-    absl::flags_program_name
-    absl::flags_parse
-    absl::flags_reflection
-    absl::flags_usage
-    absl::strings
+    abslx::flags_config
+    abslx::flags
+    abslx::flags_path_util
+    abslx::flags_program_name
+    abslx::flags_parse
+    abslx::flags_reflection
+    abslx::flags_usage
+    abslx::strings
     gtest
 )

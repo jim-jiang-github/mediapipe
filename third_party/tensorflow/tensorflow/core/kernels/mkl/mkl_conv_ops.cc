@@ -1520,7 +1520,7 @@ class MklFusedConvOp
     } else {
       OP_REQUIRES(context, false,
                   errors::Unimplemented("Fusion is not implemented: [",
-                                        absl::StrJoin(fused_ops, ","), "]"));
+                                        abslx::StrJoin(fused_ops, ","), "]"));
     }
 
     if (pad_enabled) {
@@ -1585,7 +1585,7 @@ class MklFusedDepthwiseConvOp
     } else {
       OP_REQUIRES(context, false,
                   errors::Unimplemented("Fusion is not implemented: [",
-                                        absl::StrJoin(fused_ops, ","), "]"));
+                                        abslx::StrJoin(fused_ops, ","), "]"));
     }
 
     OP_REQUIRES(
@@ -2202,7 +2202,7 @@ class MklFusedConv3DOp
       if (padding_list.empty()) {
         OP_REQUIRES(context, false,
                     errors::Unimplemented("Fusion is not implemented: [",
-                                          absl::StrJoin(fused_ops, ","), "]"));
+                                          abslx::StrJoin(fused_ops, ","), "]"));
       }
     }
   }

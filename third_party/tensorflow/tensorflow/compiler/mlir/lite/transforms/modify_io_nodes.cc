@@ -73,7 +73,7 @@ LogicalResult ModifyIONodesPass::SetupInputOutputTypesIfNull(
     OpBuilder builder) {
   if (input_type && output_type) return success();
 
-  auto convert_str_to_type = [&builder](absl::string_view str) -> Type {
+  auto convert_str_to_type = [&builder](abslx::string_view str) -> Type {
     if (str == "int8") {
       return builder.getIntegerType(8);
     } else if (str == "uint8") {

@@ -46,7 +46,7 @@ class CompositeTensorVariantMetadata;
 class CompositeTensorVariant {
  public:
   CompositeTensorVariant(const CompositeTensorVariantMetadata& metadata,
-                         absl::Span<Tensor> flat_components);
+                         abslx::Span<Tensor> flat_components);
 
   CompositeTensorVariant();
   CompositeTensorVariant(const CompositeTensorVariant& other);
@@ -56,8 +56,8 @@ class CompositeTensorVariant {
 
   // Returns the list of Tensor components that encode this value's dynamic
   // data.
-  absl::Span<const Tensor> flat_components() const {
-    return absl::MakeConstSpan(flat_components_);
+  abslx::Span<const Tensor> flat_components() const {
+    return abslx::MakeConstSpan(flat_components_);
   }
 
   // Returns the serialized TypeSpec that encodes the value's static data.

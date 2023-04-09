@@ -26,7 +26,7 @@
 #include "absl/strings/internal/cord_rep_ring_reader.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 namespace {
@@ -34,14 +34,14 @@ namespace {
 using testing::Eq;
 
 // Creates a flat for testing
-CordRep* MakeFlat(absl::string_view s) {
+CordRep* MakeFlat(abslx::string_view s) {
   CordRepFlat* flat = CordRepFlat::New(s.length());
   memcpy(flat->Data(), s.data(), s.length());
   flat->length = s.length();
   return flat;
 }
 
-CordRepRing* FromFlats(Span<absl::string_view const> flats) {
+CordRepRing* FromFlats(Span<abslx::string_view const> flats) {
   CordRepRing* ring = CordRepRing::Create(MakeFlat(flats[0]), flats.size() - 1);
   for (int i = 1; i < flats.size(); ++i) {
     ring = CordRepRing::Append(ring, MakeFlat(flats[i]));
@@ -49,7 +49,7 @@ CordRepRing* FromFlats(Span<absl::string_view const> flats) {
   return ring;
 }
 
-std::array<absl::string_view, 12> TestFlats() {
+std::array<abslx::string_view, 12> TestFlats() {
   return {"abcdefghij", "klmnopqrst", "uvwxyz",     "ABCDEFGHIJ",
           "KLMNOPQRST", "UVWXYZ",     "1234567890", "~!@#$%^&*()_",
           "+-=",        "[]\\{}|;':", ",/<>?",      "."};
@@ -73,7 +73,7 @@ TEST(CordRingReaderTest, Reset) {
   auto flats = TestFlats();
   CordRepRing* ring = FromFlats(flats);
 
-  absl::string_view first = reader.Reset(ring);
+  abslx::string_view first = reader.Reset(ring);
   EXPECT_THAT(first, Eq(flats[0]));
   EXPECT_TRUE(static_cast<bool>(reader));
   EXPECT_THAT(reader.ring(), Eq(ring));
@@ -103,7 +103,7 @@ TEST(CordRingReaderTest, Next) {
     CordRepRing::index_type index = ring->advance(head, i);
     consumed += flats[i].length();
     remaining -= flats[i].length();
-    absl::string_view next = reader.Next();
+    abslx::string_view next = reader.Next();
     ASSERT_THAT(next, Eq(flats[i]));
     ASSERT_THAT(reader.index(), Eq(index));
     ASSERT_THAT(reader.node(), Eq(ring->entry_child(index)));
@@ -133,7 +133,7 @@ TEST(CordRingReaderTest, SeekForward) {
     consumed += flats[i].length();
     remaining -= flats[i].length();
     for (int off = 0; off < flats[i].length(); ++off) {
-      absl::string_view chunk = reader.Seek(offset + off);
+      abslx::string_view chunk = reader.Seek(offset + off);
       ASSERT_THAT(chunk, Eq(flats[i].substr(off)));
       ASSERT_THAT(reader.index(), Eq(index));
       ASSERT_THAT(reader.node(), Eq(ring->entry_child(index)));
@@ -158,7 +158,7 @@ TEST(CordRingReaderTest, SeekBackward) {
     CordRepRing::index_type index = ring->advance(head, i);
     size_t offset = consumed - flats[i].length();
     for (int off = 0; off < flats[i].length(); ++off) {
-      absl::string_view chunk = reader.Seek(offset + off);
+      abslx::string_view chunk = reader.Seek(offset + off);
       ASSERT_THAT(chunk, Eq(flats[i].substr(off)));
       ASSERT_THAT(reader.index(), Eq(index));
       ASSERT_THAT(reader.node(), Eq(ring->entry_child(index)));
@@ -177,4 +177,4 @@ TEST(CordRingReaderTest, SeekBackward) {
 }  // namespace
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

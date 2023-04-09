@@ -118,7 +118,7 @@
 #include "absl/numeric/bits.h"
 #include "absl/utility/utility.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 
@@ -172,7 +172,7 @@ struct IsDecomposable : std::false_type {};
 
 template <class Policy, class Hash, class Eq, class... Ts>
 struct IsDecomposable<
-    absl::void_t<decltype(
+    abslx::void_t<decltype(
         Policy::apply(RequireUsableKey<typename Policy::key_type, Hash, Eq>(),
                       std::declval<Ts>()...))>,
     Policy, Hash, Eq, Ts...> : std::true_type {};
@@ -607,9 +607,9 @@ class raw_hash_set {
   using value_type = typename PolicyTraits::value_type;
   using reference = value_type&;
   using const_reference = const value_type&;
-  using pointer = typename absl::allocator_traits<
+  using pointer = typename abslx::allocator_traits<
       allocator_type>::template rebind_traits<value_type>::pointer;
-  using const_pointer = typename absl::allocator_traits<
+  using const_pointer = typename abslx::allocator_traits<
       allocator_type>::template rebind_traits<value_type>::const_pointer;
 
   // Alias used for heterogeneous lookup functions.
@@ -624,17 +624,17 @@ class raw_hash_set {
   auto KeyTypeCanBeHashed(const Hash& h, const key_type& k) -> decltype(h(k));
   auto KeyTypeCanBeEq(const Eq& eq, const key_type& k) -> decltype(eq(k, k));
 
-  using Layout = absl::container_internal::Layout<ctrl_t, slot_type>;
+  using Layout = abslx::container_internal::Layout<ctrl_t, slot_type>;
 
   static Layout MakeLayout(size_t capacity) {
     assert(IsValidCapacity(capacity));
     return Layout(capacity + Group::kWidth + 1, capacity);
   }
 
-  using AllocTraits = absl::allocator_traits<allocator_type>;
-  using SlotAlloc = typename absl::allocator_traits<
+  using AllocTraits = abslx::allocator_traits<allocator_type>;
+  using SlotAlloc = typename abslx::allocator_traits<
       allocator_type>::template rebind_alloc<slot_type>;
-  using SlotAllocTraits = typename absl::allocator_traits<
+  using SlotAllocTraits = typename abslx::allocator_traits<
       allocator_type>::template rebind_traits<slot_type>;
 
   static_assert(std::is_lvalue_reference<reference>::value,
@@ -654,7 +654,7 @@ class raw_hash_set {
   // cases.
   template <class T>
   using RequiresInsertable = typename std::enable_if<
-      absl::disjunction<std::is_convertible<T, init_type>,
+      abslx::disjunction<std::is_convertible<T, init_type>,
                         SameAsElementReference<T>>::value,
       int>::type;
 
@@ -680,9 +680,9 @@ class raw_hash_set {
     using iterator_category = std::forward_iterator_tag;
     using value_type = typename raw_hash_set::value_type;
     using reference =
-        absl::conditional_t<PolicyTraits::constant_iterators::value,
+        abslx::conditional_t<PolicyTraits::constant_iterators::value,
                             const value_type&, value_type&>;
-    using pointer = absl::remove_reference_t<reference>*;
+    using pointer = abslx::remove_reference_t<reference>*;
     using difference_type = typename raw_hash_set::difference_type;
 
     iterator() {}
@@ -843,14 +843,14 @@ class raw_hash_set {
   //
   //   // Turns {"abc", "def"} into std::initializer_list<const char*>, then
   //   // copies the strings into the set.
-  //   absl::flat_hash_set<std::string> s = {"abc", "def"};
+  //   abslx::flat_hash_set<std::string> s = {"abc", "def"};
   //
   // The same trick is used in insert().
   //
   // The enabler is necessary to prevent this constructor from triggering where
   // the copy constructor is meant to be called.
   //
-  //   absl::flat_hash_set<int> a, b{a};
+  //   abslx::flat_hash_set<int> a, b{a};
   //
   // RequiresNotInit<T> is a workaround for gcc prior to 7.1.
   template <class T, RequiresNotInit<T> = 0, RequiresInsertable<T> = 0>
@@ -914,15 +914,15 @@ class raw_hash_set {
       std::is_nothrow_copy_constructible<hasher>::value&&
           std::is_nothrow_copy_constructible<key_equal>::value&&
               std::is_nothrow_copy_constructible<allocator_type>::value)
-      : ctrl_(absl::exchange(that.ctrl_, EmptyGroup())),
-        slots_(absl::exchange(that.slots_, nullptr)),
-        size_(absl::exchange(that.size_, 0)),
-        capacity_(absl::exchange(that.capacity_, 0)),
+      : ctrl_(abslx::exchange(that.ctrl_, EmptyGroup())),
+        slots_(abslx::exchange(that.slots_, nullptr)),
+        size_(abslx::exchange(that.size_, 0)),
+        capacity_(abslx::exchange(that.capacity_, 0)),
         // Hash, equality and allocator are copied instead of moved because
         // `that` must be left valid. If Hash is std::function<Key>, moving it
         // would create a nullptr functor that cannot be called.
-        settings_(absl::exchange(that.growth_left(), 0),
-                  absl::exchange(that.infoz(), HashtablezInfoHandle()),
+        settings_(abslx::exchange(that.growth_left(), 0),
+                  abslx::exchange(that.infoz(), HashtablezInfoHandle()),
                   that.hash_ref(), that.eq_ref(), that.alloc_ref()) {}
 
   raw_hash_set(raw_hash_set&& that, const allocator_type& a)
@@ -957,7 +957,7 @@ class raw_hash_set {
   }
 
   raw_hash_set& operator=(raw_hash_set&& that) noexcept(
-      absl::allocator_traits<allocator_type>::is_always_equal::value&&
+      abslx::allocator_traits<allocator_type>::is_always_equal::value&&
           std::is_nothrow_move_assignable<hasher>::value&&
               std::is_nothrow_move_assignable<key_equal>::value) {
     // TODO(sbenza): We should only use the operations from the noexcept clause
@@ -1448,7 +1448,7 @@ class raw_hash_set {
 
  private:
   template <class Container, typename Enabler>
-  friend struct absl::container_internal::hashtable_debug_internal::
+  friend struct abslx::container_internal::hashtable_debug_internal::
       HashtableDebugAccess;
 
   struct FindElement {
@@ -1818,7 +1818,7 @@ class raw_hash_set {
   slot_type* slots_ = nullptr;     // [capacity * slot_type]
   size_t size_ = 0;                // number of full slots
   size_t capacity_ = 0;            // total number of slots
-  absl::container_internal::CompressedTuple<size_t /* growth_left */,
+  abslx::container_internal::CompressedTuple<size_t /* growth_left */,
                                             HashtablezInfoHandle, hasher,
                                             key_equal, allocator_type>
       settings_{0, HashtablezInfoHandle{}, hasher{}, key_equal{},
@@ -1838,7 +1838,7 @@ void EraseIf(Predicate pred, raw_hash_set<P, H, E, A>* c) {
 
 namespace hashtable_debug_internal {
 template <typename Set>
-struct HashtableDebugAccess<Set, absl::void_t<typename Set::raw_hash_set>> {
+struct HashtableDebugAccess<Set, abslx::void_t<typename Set::raw_hash_set>> {
   using Traits = typename Set::PolicyTraits;
   using Slot = typename Traits::slot_type;
 
@@ -1898,6 +1898,6 @@ struct HashtableDebugAccess<Set, absl::void_t<typename Set::raw_hash_set>> {
 }  // namespace hashtable_debug_internal
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_CONTAINER_INTERNAL_RAW_HASH_SET_H_

@@ -60,7 +60,7 @@ Status ConvertGraphToXla(std::unique_ptr<Graph> graph,
   XlaOpRegistry::RegisterCompilationKernels();
   for (Node* node : graph->nodes()) {
     node->set_assigned_device_name(
-        absl::StrCat("/device:", DEVICE_CPU_XLA_JIT));
+        abslx::StrCat("/device:", DEVICE_CPU_XLA_JIT));
   }
   std::vector<XlaCompiler::Argument> xla_args;
   TF_RETURN_IF_ERROR(CreateXlaArgs(*graph, &xla_args));

@@ -158,7 +158,7 @@ TEST(TestUtilTest, InterleaveTextlineWithNewLines) {
                           GetIteratorOutput(*iterator));
   ASSERT_THAT(result, SizeIs(10));
   for (int64 i = 0; i < 10; ++i) {
-    test::ExpectEqual(result[i][0], Tensor(absl::StrCat(i)));
+    test::ExpectEqual(result[i][0], Tensor(abslx::StrCat(i)));
   }
 }
 

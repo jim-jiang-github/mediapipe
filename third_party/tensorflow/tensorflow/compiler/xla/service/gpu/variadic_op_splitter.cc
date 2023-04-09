@@ -41,7 +41,7 @@ StatusOr<bool> SplitConcatenate(HloInstruction* concat, HloComputation* comp) {
                                                  operands.end());
   while (operands_to_split.size() > 1) {
     std::vector<HloInstruction*> new_operands;
-    absl::Span<HloInstruction*> operands_span(operands_to_split);
+    abslx::Span<HloInstruction*> operands_span(operands_to_split);
     for (int64_t offset = 0; offset < operands_to_split.size();
          offset += kMaxParameters) {
       // Check if there is a remainder of operands that does not completely fill
@@ -91,7 +91,7 @@ std::vector<HloInstruction*> GetRelevantVariadicOps(HloComputation* comp) {
 
 StatusOr<bool> VariadicOpSplitter::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   for (HloComputation* comp :
        module->MakeNonfusionComputations(execution_threads)) {

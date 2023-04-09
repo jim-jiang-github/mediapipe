@@ -102,14 +102,14 @@ std::string ClientLibraryTestBase::TestName() const {
 }
 
 StatusOr<std::unique_ptr<GlobalData>> ClientLibraryTestBase::Execute(
-    XlaBuilder* builder, absl::Span<GlobalData* const> arguments) {
+    XlaBuilder* builder, abslx::Span<GlobalData* const> arguments) {
   // Build the computation, as a convenience.
   TF_ASSIGN_OR_RETURN(auto computation, builder->Build());
   return client_->Execute(computation, arguments, &execution_options_);
 }
 
 StatusOr<Literal> ClientLibraryTestBase::ExecuteAndTransfer(
-    const XlaComputation& computation, absl::Span<GlobalData* const> arguments,
+    const XlaComputation& computation, abslx::Span<GlobalData* const> arguments,
     const Shape* shape_with_output_layout) {
   ExecutionOptions execution_options = execution_options_;
   if (shape_with_output_layout != nullptr) {
@@ -121,7 +121,7 @@ StatusOr<Literal> ClientLibraryTestBase::ExecuteAndTransfer(
 }
 
 StatusOr<Literal> ClientLibraryTestBase::ExecuteAndTransfer(
-    XlaBuilder* builder, absl::Span<GlobalData* const> arguments,
+    XlaBuilder* builder, abslx::Span<GlobalData* const> arguments,
     const Shape* shape_with_output_layout) {
   // Build the computation, as a convenience.
   TF_ASSIGN_OR_RETURN(auto computation, builder->Build());
@@ -129,7 +129,7 @@ StatusOr<Literal> ClientLibraryTestBase::ExecuteAndTransfer(
 }
 
 StatusOr<Literal> ClientLibraryTestBase::ExecuteAndTransferReference(
-    const XlaComputation& computation, absl::Span<GlobalData* const> arguments,
+    const XlaComputation& computation, abslx::Span<GlobalData* const> arguments,
     const Shape* shape_with_output_layout) {
   ExecutionOptions execution_options = execution_options_;
   if (shape_with_output_layout != nullptr) {
@@ -142,7 +142,7 @@ StatusOr<Literal> ClientLibraryTestBase::ExecuteAndTransferReference(
 }
 
 std::string ClientLibraryTestBase::ExecuteToString(
-    XlaBuilder* builder, absl::Span<GlobalData* const> arguments) {
+    XlaBuilder* builder, abslx::Span<GlobalData* const> arguments) {
   auto computation_status = builder->Build();
   if (!computation_status.ok()) {
     return computation_status.status().ToString();
@@ -160,7 +160,7 @@ std::string ClientLibraryTestBase::ExecuteToString(
 
 void ClientLibraryTestBase::ComputeAndCompareR1(
     XlaBuilder* builder, const tensorflow::core::Bitmap& expected,
-    absl::Span<GlobalData* const> arguments) {
+    abslx::Span<GlobalData* const> arguments) {
   Literal expected_literal = LiteralUtil::CreateR1(expected);
   ClientLibraryTestBase::ComputeAndCompareLiteral(builder, expected_literal,
                                                   arguments);
@@ -168,14 +168,14 @@ void ClientLibraryTestBase::ComputeAndCompareR1(
 
 void ClientLibraryTestBase::ComputeAndCompareLiteral(
     XlaBuilder* builder, const Literal& expected,
-    absl::Span<GlobalData* const> arguments, const Shape* shape_with_layout) {
+    abslx::Span<GlobalData* const> arguments, const Shape* shape_with_layout) {
   EXPECT_IS_OK(ComputeAndCompareLiteralWithStatus(builder, expected, arguments,
                                                   shape_with_layout));
 }
 
 void ClientLibraryTestBase::ComputeAndCompareLiteral(
     XlaBuilder* builder, const Literal& expected,
-    absl::Span<GlobalData* const> arguments, ErrorSpec error,
+    abslx::Span<GlobalData* const> arguments, ErrorSpec error,
     const Shape* shape_with_layout) {
   EXPECT_IS_OK(ComputeAndCompareLiteralWithStatus(builder, expected, arguments,
                                                   error, shape_with_layout));
@@ -183,7 +183,7 @@ void ClientLibraryTestBase::ComputeAndCompareLiteral(
 
 Status ClientLibraryTestBase::ComputeAndCompareLiteralWithAllOutputLayouts(
     const xla::XlaComputation& computation, const Literal& expected,
-    absl::Span<GlobalData* const> arguments,
+    abslx::Span<GlobalData* const> arguments,
     const std::function<void(const Literal& actual,
                              const std::string& error_message)>&
         verify_output) {
@@ -201,7 +201,7 @@ Status ClientLibraryTestBase::ComputeAndCompareLiteralWithAllOutputLayouts(
     TF_ASSIGN_OR_RETURN(auto actual,
                         ExecuteAndTransfer(computation, arguments, &layout));
     verify_output(actual,
-                  absl::StrCat("Test with output layout: ",
+                  abslx::StrCat("Test with output layout: ",
                                ShapeUtil::HumanStringWithLayout(layout)));
   } while (std::next_permutation(minor_to_major.begin(), minor_to_major.end()));
   return OkStatus();
@@ -209,7 +209,7 @@ Status ClientLibraryTestBase::ComputeAndCompareLiteralWithAllOutputLayouts(
 
 Status ClientLibraryTestBase::ComputeAndCompareLiteralWithAllInputLayouts(
     const xla::XlaComputation& computation, const Literal& /*expected*/,
-    absl::Span<GlobalData* const> arguments,
+    abslx::Span<GlobalData* const> arguments,
     const std::function<void(const Literal& actual,
                              const std::string& error_message)>& verify_output,
     const Shape* output_with_layout) {
@@ -257,11 +257,11 @@ Status ClientLibraryTestBase::ComputeAndCompareLiteralWithAllInputLayouts(
     TF_ASSIGN_OR_RETURN(
         auto actual,
         ExecuteAndTransfer(computation,
-                           absl::Span<GlobalData* const>(arguments_with_layout),
+                           abslx::Span<GlobalData* const>(arguments_with_layout),
                            output_with_layout));
     std::string error_message = "Test with input layouts: ";
     for (const auto& str : layout_strings) {
-      absl::StrAppend(&error_message, str, " ");
+      abslx::StrAppend(&error_message, str, " ");
     }
     verify_output(actual, error_message);
     return OkStatus();
@@ -271,7 +271,7 @@ Status ClientLibraryTestBase::ComputeAndCompareLiteralWithAllInputLayouts(
 }
 
 StatusOr<Literal> ClientLibraryTestBase::ComputeAndTransfer(
-    XlaBuilder* builder, absl::Span<GlobalData* const> arguments_passed_in,
+    XlaBuilder* builder, abslx::Span<GlobalData* const> arguments_passed_in,
     const Shape* shape_with_layout) {
   std::vector<GlobalData*> arguments(arguments_passed_in.begin(),
                                      arguments_passed_in.end());
@@ -295,7 +295,7 @@ StatusOr<Literal> ClientLibraryTestBase::ComputeAndTransfer(
 
 Status ClientLibraryTestBase::ComputeAndCompareLiteralWithStatus(
     XlaBuilder* builder, const Literal& expected,
-    absl::Span<GlobalData* const> arguments_passed_in,
+    abslx::Span<GlobalData* const> arguments_passed_in,
     const Shape* shape_with_layout) {
   std::vector<GlobalData*> arguments(arguments_passed_in.begin(),
                                      arguments_passed_in.end());
@@ -357,7 +357,7 @@ Status ClientLibraryTestBase::ComputeAndCompareLiteralWithStatus(
 
 Status ClientLibraryTestBase::ComputeAndCompareLiteralWithStatus(
     XlaBuilder* builder, const Literal& expected,
-    absl::Span<GlobalData* const> arguments_passed_in, ErrorSpec error,
+    abslx::Span<GlobalData* const> arguments_passed_in, ErrorSpec error,
     const Shape* shape_with_layout) {
   std::vector<GlobalData*> arguments(arguments_passed_in.begin(),
                                      arguments_passed_in.end());
@@ -415,8 +415,8 @@ Status ClientLibraryTestBase::ComputeAndCompareLiteralWithStatus(
 }
 
 void ClientLibraryTestBase::ComputeAndCompareR1U8(
-    XlaBuilder* builder, absl::string_view expected,
-    absl::Span<GlobalData* const> arguments) {
+    XlaBuilder* builder, abslx::string_view expected,
+    abslx::Span<GlobalData* const> arguments) {
   auto actual_status = ExecuteAndTransfer(builder, arguments);
   EXPECT_IS_OK(actual_status.status());
   if (!actual_status.ok()) {
@@ -435,7 +435,7 @@ void ClientLibraryTestBase::ComputeAndCompareR1U8(
 
 void ClientLibraryTestBase::ComputeAndCompareTuple(
     XlaBuilder* builder, const Literal& expected,
-    absl::Span<GlobalData* const> arguments) {
+    abslx::Span<GlobalData* const> arguments) {
   auto actual_status = ExecuteAndTransfer(builder, arguments);
   EXPECT_IS_OK(actual_status.status());
   if (!actual_status.ok()) {
@@ -447,7 +447,7 @@ void ClientLibraryTestBase::ComputeAndCompareTuple(
 
 void ClientLibraryTestBase::ComputeAndCompareTuple(
     XlaBuilder* builder, const Literal& expected,
-    absl::Span<GlobalData* const> arguments, ErrorSpec error) {
+    abslx::Span<GlobalData* const> arguments, ErrorSpec error) {
   auto actual_status = ExecuteAndTransfer(builder, arguments);
   EXPECT_IS_OK(actual_status.status());
   if (!actual_status.ok()) {
@@ -458,7 +458,7 @@ void ClientLibraryTestBase::ComputeAndCompareTuple(
 }
 
 void ClientLibraryTestBase::ComputeAndCompare(
-    XlaBuilder* builder, absl::Span<const Literal> arguments) {
+    XlaBuilder* builder, abslx::Span<const Literal> arguments) {
   auto status_or_data = ComputeValueAndReference(builder, arguments);
   EXPECT_IS_OK(status_or_data);
   if (!status_or_data.ok()) {
@@ -470,7 +470,7 @@ void ClientLibraryTestBase::ComputeAndCompare(
 }
 
 void ClientLibraryTestBase::ComputeAndCompare(
-    XlaBuilder* builder, absl::Span<const Literal> arguments, ErrorSpec error) {
+    XlaBuilder* builder, abslx::Span<const Literal> arguments, ErrorSpec error) {
   auto status_or_data = ComputeValueAndReference(builder, arguments);
   EXPECT_IS_OK(status_or_data);
   if (!status_or_data.ok()) {
@@ -483,7 +483,7 @@ void ClientLibraryTestBase::ComputeAndCompare(
 
 StatusOr<std::pair<Literal, Literal>>
 ClientLibraryTestBase::ComputeValueAndReference(
-    XlaBuilder* builder, absl::Span<const Literal> arguments) {
+    XlaBuilder* builder, abslx::Span<const Literal> arguments) {
   // Transfer the arguments to the executor service. We put the unique_ptr's
   // into a vector to keep the data alive on the service until the end of this
   // function.

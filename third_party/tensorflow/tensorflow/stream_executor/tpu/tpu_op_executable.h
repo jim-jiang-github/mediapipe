@@ -46,12 +46,12 @@ class TpuOpExecutable : public xla::TpuExecutableInterface {
 
   const XLA_TpuProgram* core_program() const { return core_program_; }
 
-  absl::string_view fingerprint() const override;
+  abslx::string_view fingerprint() const override;
 
  private:
   Status LoadProgramAndEnqueueToStream(
       const xla::ServiceExecutableRunOptions& run_options,
-      absl::Span<const stream_executor::DeviceMemoryBase> arguments,
+      abslx::Span<const stream_executor::DeviceMemoryBase> arguments,
       stream_executor::DeviceMemoryBase result,
       std::optional<stream_executor::DeviceMemoryBase>
           cross_program_prefetch_addr) override;

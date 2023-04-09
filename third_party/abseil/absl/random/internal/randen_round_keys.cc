@@ -80,7 +80,7 @@ EOF
 
 */
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 namespace {
@@ -459,4 +459,4 @@ alignas(16) const unsigned char kRandenRoundKeys[kKeyBytes] = {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

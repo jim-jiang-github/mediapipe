@@ -198,7 +198,7 @@ class ResourceMgr {
   // single lock acquisition.  If containers_and_names[i] is uninitialized
   // then this function does not modify resources[i].
   template <typename T, bool use_dynamic_cast = false>
-  Status LookupMany(absl::Span<std::pair<const string*, const string*> const>
+  Status LookupMany(abslx::Span<std::pair<const string*, const string*> const>
                         containers_and_names,
                     std::vector<std::unique_ptr<T, core::RefCountDeleter>>*
                         resources) const TF_MUST_USE_RESULT;
@@ -250,7 +250,7 @@ class ResourceMgr {
     }
   };
   struct ResourceAndName {
-    absl::variant<core::RefCountPtr<ResourceBase>, core::WeakPtr<ResourceBase>>
+    abslx::variant<core::RefCountPtr<ResourceBase>, core::WeakPtr<ResourceBase>>
         resource;
     std::unique_ptr<std::string> name;
 
@@ -268,12 +268,12 @@ class ResourceMgr {
    private:
     TF_DISALLOW_COPY_AND_ASSIGN(ResourceAndName);
   };
-  typedef absl::flat_hash_map<Key, ResourceAndName, KeyHash, KeyEqual>
+  typedef abslx::flat_hash_map<Key, ResourceAndName, KeyHash, KeyEqual>
       Container;
 
   const std::string default_container_;
   mutable mutex mu_;
-  absl::flat_hash_map<string, Container*> containers_ TF_GUARDED_BY(mu_);
+  abslx::flat_hash_map<string, Container*> containers_ TF_GUARDED_BY(mu_);
 
   template <typename T, bool use_dynamic_cast = false>
   Status LookupInternal(const std::string& container, const std::string& name,
@@ -331,14 +331,14 @@ ResourceHandle MakeResourceHandle(
     const std::string& container, const std::string& name,
     const DeviceBase& device, const TypeIndex& type_index,
     const std::vector<DtypeAndPartialTensorShape>& dtypes_and_shapes = {},
-    const absl::optional<ManagedStackTrace>& definition_stack_trace = {})
+    const abslx::optional<ManagedStackTrace>& definition_stack_trace = {})
     TF_MUST_USE_RESULT;
 
 template <typename T>
 ResourceHandle MakeResourceHandle(
     OpKernelContext* ctx, const std::string& container, const std::string& name,
     const std::vector<DtypeAndPartialTensorShape>& dtypes_and_shapes = {},
-    const absl::optional<ManagedStackTrace>& definition_stack_trace = {}) {
+    const abslx::optional<ManagedStackTrace>& definition_stack_trace = {}) {
   return MakeResourceHandle(container.empty()
                                 ? ctx->resource_manager()->default_container()
                                 : container,
@@ -351,7 +351,7 @@ ResourceHandle MakeResourceHandle(
     OpKernelConstruction* ctx, const std::string& container,
     const std::string& name,
     const std::vector<DtypeAndPartialTensorShape>& dtypes_and_shapes = {},
-    const absl::optional<ManagedStackTrace>& definition_stack_trace = {}) {
+    const abslx::optional<ManagedStackTrace>& definition_stack_trace = {}) {
   return MakeResourceHandle(container.empty()
                                 ? ctx->resource_manager()->default_container()
                                 : container,
@@ -394,7 +394,7 @@ Status LookupResource(OpKernelContext* ctx, const ResourceHandle& p,
 // Looks up multiple resources pointed by a sequence of resource handles.  If
 // p[i] is uninitialized then values[i] is unmodified.
 template <typename T>
-Status LookupResources(OpKernelContext* ctx, absl::Span<ResourceHandle const> p,
+Status LookupResources(OpKernelContext* ctx, abslx::Span<ResourceHandle const> p,
                        std::vector<core::RefCountPtr<T>>* values);
 
 // Looks up or creates a resource.
@@ -656,7 +656,7 @@ Status ResourceMgr::Lookup(const std::string& container,
 
 template <typename T, bool use_dynamic_cast>
 Status ResourceMgr::LookupMany(
-    absl::Span<std::pair<const string*, const string*> const>
+    abslx::Span<std::pair<const string*, const string*> const>
         containers_and_names,
     std::vector<std::unique_ptr<T, core::RefCountDeleter>>* resources) const {
   CheckDeriveFromResourceBase<T>();
@@ -823,7 +823,7 @@ Status LookupResource(OpKernelContext* ctx, const ResourceHandle& p,
 // single lock acquisition.
 template <typename T>
 Status LookupResources(OpKernelContext* ctx,
-                       absl::Span<ResourceHandle const* const> p,
+                       abslx::Span<ResourceHandle const* const> p,
                        std::vector<core::RefCountPtr<T>>* values) {
   std::vector<std::pair<const string*, const string*>> containers_and_names(
       p.size());

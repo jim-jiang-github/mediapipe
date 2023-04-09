@@ -54,8 +54,8 @@ class BroadcastSimpleTest : public ClientLibraryTestBase {
   }
 
   std::unique_ptr<GlobalData> MakeR3Data(
-      absl::Span<const int64_t> bounds,
-      absl::Span<const int64_t> minor_to_major, Shape* r3_shape,
+      abslx::Span<const int64_t> bounds,
+      abslx::Span<const int64_t> minor_to_major, Shape* r3_shape,
       Array3D<float>* r3_array, float start, float end, int seed) {
     *r3_shape = ShapeUtil::MakeShapeWithLayout(F32, bounds, minor_to_major);
     r3_array->FillRandom(start, end, seed);
@@ -67,8 +67,8 @@ class BroadcastSimpleTest : public ClientLibraryTestBase {
   }
 
   std::unique_ptr<GlobalData> MakeR2Data(
-      absl::Span<const int64_t> bounds,
-      absl::Span<const int64_t> minor_to_major, Shape* r2_shape,
+      abslx::Span<const int64_t> bounds,
+      abslx::Span<const int64_t> minor_to_major, Shape* r2_shape,
       Array2D<float>* r2_array, float start, float end, int seed) {
     *r2_shape = ShapeUtil::MakeShapeWithLayout(F32, bounds, minor_to_major);
     r2_array->FillRandom(start, end, seed);
@@ -345,7 +345,7 @@ XLA_TEST_P(BroadcastR3ImplicitTest, Doit) {
 
   Array3D<float> expected_array(spec.output_bounds[0], spec.output_bounds[1],
                                 spec.output_bounds[2]);
-  auto Each = ([&](absl::Span<const int64_t> indices, float* value) {
+  auto Each = ([&](abslx::Span<const int64_t> indices, float* value) {
     float r3_implicit = r3_implicit_array(indices[0] % spec.input_bounds[0],
                                           indices[1] % spec.input_bounds[1],
                                           indices[2] % spec.input_bounds[2]);

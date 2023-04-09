@@ -54,13 +54,13 @@ class EmbedderTest : public tflite_shims::testing::Test {};
 TEST_F(EmbedderTest, FailsWithMissingModel) {
   auto text_embedder =
       TextEmbedder::Create(std::make_unique<TextEmbedderOptions>());
-  ASSERT_EQ(text_embedder.status().code(), absl::StatusCode::kInvalidArgument);
+  ASSERT_EQ(text_embedder.status().code(), abslx::StatusCode::kInvalidArgument);
   ASSERT_THAT(
       text_embedder.status().message(),
       HasSubstr("ExternalFile must specify at least one of 'file_content', "
                 "'file_name', 'file_pointer_meta' or 'file_descriptor_meta'."));
   ASSERT_THAT(text_embedder.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInitializationError))));
 }
 

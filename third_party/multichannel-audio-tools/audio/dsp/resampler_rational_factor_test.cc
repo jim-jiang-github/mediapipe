@@ -46,13 +46,13 @@ TEST(ResamplerRationalFactorTest, ResamplingKernel) {
   constexpr double kKaiserBeta = 6.0;
   for (double input_sample_rate : {12000, 16000, 32000, 44100, 48000}) {
     for (double output_sample_rate : {12000, 16000, 32000, 44100, 48000}) {
-      SCOPED_TRACE(absl::StrFormat("Resampling from %gHz to %gHz",
+      SCOPED_TRACE(abslx::StrFormat("Resampling from %gHz to %gHz",
                                    input_sample_rate, output_sample_rate));
       for (double radius : {5, 17}) {
         if (input_sample_rate > output_sample_rate) {
           radius *= input_sample_rate / output_sample_rate;
         }
-        SCOPED_TRACE(absl::StrFormat("radius: %g input samples", radius));
+        SCOPED_TRACE(abslx::StrFormat("radius: %g input samples", radius));
         const double cutoff =
             0.45 * std::min(input_sample_rate, output_sample_rate);
         DefaultResamplingKernel kernel(input_sample_rate, output_sample_rate,
@@ -129,7 +129,7 @@ double FindCorrelationPeak(const Eigen::ArrayXf& output, Fun chirp,
 TEST(ResamplerRationalFactorTest, TimeAlignment) {
   for (double input_sample_rate : {16000, 32000, 44100, 48000}) {
     for (double output_sample_rate : {16000, 32000, 44100, 48000}) {
-      SCOPED_TRACE(absl::StrFormat("Resampling from %gHz to %gHz",
+      SCOPED_TRACE(abslx::StrFormat("Resampling from %gHz to %gHz",
                                    input_sample_rate, output_sample_rate));
       const double max_frequency = 0.45 * std::min<double>(input_sample_rate,
                                                            output_sample_rate);
@@ -182,7 +182,7 @@ TEST(ResamplerRationalFactorTest, TimeAlignment) {
 TEST(ResamplerRationalFactorTest, FullyPrimed) {
   for (double input_sample_rate : {16000, 32000, 44100, 48000}) {
     for (double output_sample_rate : {16000, 32000, 44100, 48000}) {
-      SCOPED_TRACE(absl::StrFormat("Resampling from %gHz to %gHz",
+      SCOPED_TRACE(abslx::StrFormat("Resampling from %gHz to %gHz",
                                    input_sample_rate, output_sample_rate));
       int factor_numerator = input_sample_rate;
       int factor_denominator = output_sample_rate;
@@ -294,13 +294,13 @@ TYPED_TEST(ResamplerRationalFactorTypedTest, CompareWithReferenceResampler) {
       if (input_sample_rate == output_sample_rate) {
         continue;
       }
-      SCOPED_TRACE(absl::StrFormat("Resampling from %gHz to %gHz",
+      SCOPED_TRACE(abslx::StrFormat("Resampling from %gHz to %gHz",
                                    input_sample_rate, output_sample_rate));
       for (double radius : {4, 5, 17}) {
         if (input_sample_rate > output_sample_rate) {
           radius *= input_sample_rate / output_sample_rate;
         }
-        SCOPED_TRACE(absl::StrFormat("radius: %g input samples", radius));
+        SCOPED_TRACE(abslx::StrFormat("radius: %g input samples", radius));
         const double cutoff =
             0.45 * std::min(input_sample_rate, output_sample_rate);
         DefaultResamplingKernel kernel(input_sample_rate, output_sample_rate,
@@ -374,7 +374,7 @@ TYPED_TEST(ResamplerRationalFactorTypedTest, ResampleSineWave) {
   constexpr double kFrequency = 1100.7;
   for (double input_sample_rate : {12000, 16000, 32000, 44100, 48000}) {
     for (double output_sample_rate : {12000, 16000, 32000, 44100, 48000}) {
-      SCOPED_TRACE(absl::StrFormat("Resampling from %gHz to %gHz",
+      SCOPED_TRACE(abslx::StrFormat("Resampling from %gHz to %gHz",
                                    input_sample_rate, output_sample_rate));
       DefaultResamplingKernel kernel(input_sample_rate, output_sample_rate);
       int factor_numerator = input_sample_rate;
@@ -523,7 +523,7 @@ TYPED_TEST(ResamplerRationalFactorTypedTest,
 
   for (double input_sample_rate : {12000, 16000, 32000, 44100, 48000}) {
     for (double output_sample_rate : {12000, 16000, 32000, 44100, 48000}) {
-      SCOPED_TRACE(absl::StrFormat("Resampling from %gHz to %gHz.",
+      SCOPED_TRACE(abslx::StrFormat("Resampling from %gHz to %gHz.",
                                    input_sample_rate, output_sample_rate));
 
       DefaultResamplingKernel kernel(input_sample_rate, output_sample_rate);

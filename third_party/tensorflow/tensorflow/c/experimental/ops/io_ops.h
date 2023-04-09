@@ -28,15 +28,15 @@ namespace ops {
 Status RestoreV2(AbstractContext* ctx, AbstractTensorHandle* const prefix,
                  AbstractTensorHandle* const tensor_names,
                  AbstractTensorHandle* const shape_and_slices,
-                 absl::Span<AbstractTensorHandle*> tensors,
-                 absl::Span<DataType> dtypes, const char* name = nullptr,
+                 abslx::Span<AbstractTensorHandle*> tensors,
+                 abslx::Span<DataType> dtypes, const char* name = nullptr,
                  const char* raw_device_name = nullptr);
 
 // Saves tensors in V2 checkpoint format.
 Status SaveV2(AbstractContext* ctx, AbstractTensorHandle* const prefix,
               AbstractTensorHandle* const tensor_names,
               AbstractTensorHandle* const shape_and_slices,
-              absl::Span<AbstractTensorHandle* const> tensors,
+              abslx::Span<AbstractTensorHandle* const> tensors,
               const char* name = nullptr,
               const char* raw_device_name = nullptr);
 

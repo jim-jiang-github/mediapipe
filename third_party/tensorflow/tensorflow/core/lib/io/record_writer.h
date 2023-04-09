@@ -80,7 +80,7 @@ class RecordWriter {
   Status WriteRecord(StringPiece data);
 
 #if defined(TF_CORD_SUPPORT)
-  Status WriteRecord(const absl::Cord& data);
+  Status WriteRecord(const abslx::Cord& data);
 #endif
 
   // Flushes any buffered data held by underlying containers of the
@@ -99,7 +99,7 @@ class RecordWriter {
   inline static void PopulateHeader(char* header, const char* data, size_t n);
 
 #if defined(TF_CORD_SUPPORT)
-  inline static void PopulateHeader(char* header, const absl::Cord& data);
+  inline static void PopulateHeader(char* header, const abslx::Cord& data);
 #endif
 
   // Utility method to populate TFRecord footers.  Populates record-footer in
@@ -107,7 +107,7 @@ class RecordWriter {
   inline static void PopulateFooter(char* footer, const char* data, size_t n);
 
 #if defined(TF_CORD_SUPPORT)
-  inline static void PopulateFooter(char* footer, const absl::Cord& data);
+  inline static void PopulateFooter(char* footer, const abslx::Cord& data);
 #endif
 
  private:
@@ -119,7 +119,7 @@ class RecordWriter {
   }
 
 #if defined(TF_CORD_SUPPORT)
-  inline static uint32 MaskedCrc(const absl::Cord& data) {
+  inline static uint32 MaskedCrc(const abslx::Cord& data) {
     return crc32c::Mask(crc32c::Value(data));
   }
 #endif
@@ -138,13 +138,13 @@ void RecordWriter::PopulateFooter(char* footer, const char* data, size_t n) {
 }
 
 #if defined(TF_CORD_SUPPORT)
-void RecordWriter::PopulateHeader(char* header, const absl::Cord& data) {
+void RecordWriter::PopulateHeader(char* header, const abslx::Cord& data) {
   core::EncodeFixed64(header + 0, data.size());
   core::EncodeFixed32(header + sizeof(uint64),
                       MaskedCrc(header, sizeof(uint64)));
 }
 
-void RecordWriter::PopulateFooter(char* footer, const absl::Cord& data) {
+void RecordWriter::PopulateFooter(char* footer, const abslx::Cord& data) {
   core::EncodeFixed32(footer, MaskedCrc(data));
 }
 #endif

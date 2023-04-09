@@ -52,7 +52,7 @@ enum { ATTRIB_VERTEX, ATTRIB_TEXTURE_POSITION, NUM_ATTRIBUTES };
 // numeric type; in the latter case, it is upscaled to values between 0 and 255
 // from an assumed input range of [0, 1). RGB and RGBA Mat's must be uchar.
 template <typename AlphaType>
-absl::Status MergeRGBA8Image(const cv::Mat input_mat, const cv::Mat& alpha_mat,
+abslx::Status MergeRGBA8Image(const cv::Mat input_mat, const cv::Mat& alpha_mat,
                              cv::Mat& output_mat) {
   RET_CHECK_EQ(input_mat.rows, alpha_mat.rows);
   RET_CHECK_EQ(input_mat.cols, alpha_mat.cols);
@@ -78,7 +78,7 @@ absl::Status MergeRGBA8Image(const cv::Mat input_mat, const cv::Mat& alpha_mat,
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 }  // namespace
 
@@ -121,18 +121,18 @@ class SetAlphaCalculator : public CalculatorBase {
   SetAlphaCalculator() = default;
   ~SetAlphaCalculator() override = default;
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
   // From Calculator.
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
-  absl::Status RenderGpu(CalculatorContext* cc);
-  absl::Status RenderCpu(CalculatorContext* cc);
+  abslx::Status RenderGpu(CalculatorContext* cc);
+  abslx::Status RenderCpu(CalculatorContext* cc);
 
-  absl::Status GlSetup(CalculatorContext* cc);
+  abslx::Status GlSetup(CalculatorContext* cc);
   void GlRender(CalculatorContext* cc);
 
   mediapipe::SetAlphaCalculatorOptions options_;
@@ -147,18 +147,18 @@ class SetAlphaCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(SetAlphaCalculator);
 
-absl::Status SetAlphaCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status SetAlphaCalculator::GetContract(CalculatorContract* cc) {
   CHECK_GE(cc->Inputs().NumEntries(), 1);
 
   bool use_gpu = false;
 
   if (cc->Inputs().HasTag(kInputFrameTag) &&
       cc->Inputs().HasTag(kInputFrameTagGpu)) {
-    return absl::InternalError("Cannot have multiple input images.");
+    return abslx::InternalError("Cannot have multiple input images.");
   }
   if (cc->Inputs().HasTag(kInputFrameTagGpu) !=
       cc->Outputs().HasTag(kOutputFrameTagGpu)) {
-    return absl::InternalError("GPU output must have GPU input.");
+    return abslx::InternalError("GPU output must have GPU input.");
   }
 
   // Input image to add/edit alpha channel.
@@ -200,10 +200,10 @@ absl::Status SetAlphaCalculator::GetContract(CalculatorContract* cc) {
 #endif  // !MEDIAPIPE_DISABLE_GPU
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SetAlphaCalculator::Open(CalculatorContext* cc) {
+abslx::Status SetAlphaCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
   options_ = cc->Options<mediapipe::SetAlphaCalculatorOptions>();
@@ -232,29 +232,29 @@ absl::Status SetAlphaCalculator::Open(CalculatorContext* cc) {
 #endif
   }  //  !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SetAlphaCalculator::Process(CalculatorContext* cc) {
+abslx::Status SetAlphaCalculator::Process(CalculatorContext* cc) {
   if (use_gpu_) {
 #if !MEDIAPIPE_DISABLE_GPU
-    MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext([this, cc]() -> absl::Status {
+    MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext([this, cc]() -> abslx::Status {
       if (!gpu_initialized_) {
         MP_RETURN_IF_ERROR(GlSetup(cc));
         gpu_initialized_ = true;
       }
       MP_RETURN_IF_ERROR(RenderGpu(cc));
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }));
 #endif  // !MEDIAPIPE_DISABLE_GPU
   } else {
     MP_RETURN_IF_ERROR(RenderCpu(cc));
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SetAlphaCalculator::Close(CalculatorContext* cc) {
+abslx::Status SetAlphaCalculator::Close(CalculatorContext* cc) {
 #if !MEDIAPIPE_DISABLE_GPU
   gpu_helper_.RunInGlContext([this] {
     if (program_) glDeleteProgram(program_);
@@ -262,12 +262,12 @@ absl::Status SetAlphaCalculator::Close(CalculatorContext* cc) {
   });
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SetAlphaCalculator::RenderCpu(CalculatorContext* cc) {
+abslx::Status SetAlphaCalculator::RenderCpu(CalculatorContext* cc) {
   if (cc->Inputs().Tag(kInputFrameTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Setup source image
@@ -278,7 +278,7 @@ absl::Status SetAlphaCalculator::RenderCpu(CalculatorContext* cc) {
   }
 
   // Setup destination image
-  auto output_frame = absl::make_unique<ImageFrame>(
+  auto output_frame = abslx::make_unique<ImageFrame>(
       ImageFormat::SRGBA, input_mat.cols, input_mat.rows);
   cv::Mat output_mat = mediapipe::formats::MatView(output_frame.get());
 
@@ -321,12 +321,12 @@ absl::Status SetAlphaCalculator::RenderCpu(CalculatorContext* cc) {
       .Tag(kOutputFrameTag)
       .Add(output_frame.release(), cc->InputTimestamp());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SetAlphaCalculator::RenderGpu(CalculatorContext* cc) {
+abslx::Status SetAlphaCalculator::RenderGpu(CalculatorContext* cc) {
   if (cc->Inputs().Tag(kInputFrameTagGpu).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 #if !MEDIAPIPE_DISABLE_GPU
   // Setup source texture.
@@ -383,7 +383,7 @@ absl::Status SetAlphaCalculator::RenderGpu(CalculatorContext* cc) {
   output_texture.Release();
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void SetAlphaCalculator::GlRender(CalculatorContext* cc) {
@@ -439,7 +439,7 @@ void SetAlphaCalculator::GlRender(CalculatorContext* cc) {
 #endif  // !MEDIAPIPE_DISABLE_GPU
 }
 
-absl::Status SetAlphaCalculator::GlSetup(CalculatorContext* cc) {
+abslx::Status SetAlphaCalculator::GlSetup(CalculatorContext* cc) {
 #if !MEDIAPIPE_DISABLE_GPU
   const GLint attr_location[NUM_ATTRIBUTES] = {
       ATTRIB_VERTEX,
@@ -495,7 +495,7 @@ absl::Status SetAlphaCalculator::GlSetup(CalculatorContext* cc) {
 
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

@@ -113,7 +113,7 @@ PYBIND11_MODULE(_pywrap_server_lib, m) {
         Py_BEGIN_ALLOW_THREADS;
         status = tensorflow::data::grpc_util::Retry(
             [&]() {
-              return client.GetDataServiceMetadata(absl::StrCat(dataset_id),
+              return client.GetDataServiceMetadata(abslx::StrCat(dataset_id),
                                                    metadata);
             },
             /*description=*/

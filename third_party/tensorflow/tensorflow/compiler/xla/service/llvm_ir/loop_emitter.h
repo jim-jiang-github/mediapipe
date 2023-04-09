@@ -39,7 +39,7 @@ using BodyEmitter = std::function<Status(const IrArray::Index& index)>;
 
 // Creates the body emitter from target arrays.
 BodyEmitter MakeBodyEmitter(const ElementGenerator& target_element_generator,
-                            absl::Span<IrArray const> target_arrays,
+                            abslx::Span<IrArray const> target_arrays,
                             llvm::IRBuilder<>* b, bool is_tuple);
 
 // Emits a loop for every element in the given shape.
@@ -64,7 +64,7 @@ class LoopEmitter {
   // This is used for multi-output fusion.  target_element_generator must
   // produce an LLVM struct with N elements.
   LoopEmitter(const ElementGenerator& target_element_generator,
-              absl::Span<const IrArray> target_arrays, llvm::IRBuilder<>* b);
+              abslx::Span<const IrArray> target_arrays, llvm::IRBuilder<>* b);
 
   LoopEmitter(const LoopEmitter&) = delete;
   LoopEmitter& operator=(const LoopEmitter&) = delete;
@@ -75,11 +75,11 @@ class LoopEmitter {
   // specifies the element, will return multiple indices if the loop is
   // unrolled.
   virtual std::vector<IrArray::Index> EmitIndexAndSetExitBasicBlock(
-      absl::string_view loop_name, llvm::Type* index_type,
+      abslx::string_view loop_name, llvm::Type* index_type,
       llvm::Value* base_index);
 
   // Emits a complete loop nest for every element in the given shape.
-  Status EmitLoop(absl::string_view loop_name = "",
+  Status EmitLoop(abslx::string_view loop_name = "",
                   llvm::Type* index_type = nullptr);
 
  protected:

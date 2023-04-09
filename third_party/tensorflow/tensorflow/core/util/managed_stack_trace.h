@@ -32,7 +32,7 @@ using StackTraceFilter = std::function<bool(const char*)>;
 
 using SourceLoc = std::pair<std::string, int>;
 
-// Using absl::Hash breaks NVCC under Windows :P
+// Using abslx::Hash breaks NVCC under Windows :P
 struct PairHash {
   template <class T1, class T2>
   std::size_t operator()(const std::pair<T1, T2>& pair) const {
@@ -50,13 +50,13 @@ using ToStackFramesFunctor = std::vector<StackFrame>(int, const SourceMap&,
                                                      bool, int);
 
 // Returns whether the given frame is internal to TF.
-inline bool IsInternalFrameForFilename(absl::string_view file_name) {
+inline bool IsInternalFrameForFilename(abslx::string_view file_name) {
   // Use a simple heuristic for now.
   // TODO(cheshire): Build a more sophisticated mechanism, rely on @tf.export.
-  return (absl::StrContains(file_name, "tensorflow/python") ||
-          absl::StrContains(file_name, "tensorflow\\python")) &&
-         !absl::StrContains(file_name, "keras") &&
-         !absl::StrContains(file_name, "test.py");
+  return (abslx::StrContains(file_name, "tensorflow/python") ||
+          abslx::StrContains(file_name, "tensorflow\\python")) &&
+         !abslx::StrContains(file_name, "keras") &&
+         !abslx::StrContains(file_name, "test.py");
 }
 
 // Language agnostic stack trace class. It only saves an id, and language
@@ -83,7 +83,7 @@ class ManagedStackTrace {
 // Generates a message with a definition location based on a provided stack
 // trace, or an empty one if the stack trace is empty.
 inline std::string DefinitionLocationMsg(
-    const absl::optional<ManagedStackTrace>& stack_trace) {
+    const abslx::optional<ManagedStackTrace>& stack_trace) {
   if (stack_trace.has_value()) {
     std::vector<StackFrame> stack_frames =
         stack_trace->ToStackFrames({}, IsInternalFrameForFilename,
@@ -91,7 +91,7 @@ inline std::string DefinitionLocationMsg(
                                    /*limit=*/1);
     if (!stack_frames.empty()) {
       const StackFrame& last_frame = stack_frames[0];
-      return absl::StrCat(" (defined @ ", last_frame.file_name, ":",
+      return abslx::StrCat(" (defined @ ", last_frame.file_name, ":",
                           last_frame.line_number, ")");
     }
   }

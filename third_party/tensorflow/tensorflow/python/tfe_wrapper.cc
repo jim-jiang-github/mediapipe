@@ -182,13 +182,13 @@ TFE_InputTensorHandles InputTFE_InputTensorHandles(
         if (auto stack_trace = node.GetStackTrace()) {
           auto frame = stack_trace->LastUserFrame();
           frame_str =
-              absl::StrFormat("File \"%s\", line %d, in %s", frame.file_name,
+              abslx::StrFormat("File \"%s\", line %d, in %s", frame.file_name,
                               frame.line_number, frame.function_name);
           auto stack_trace_list =
-              absl::StrSplit(stack_trace->ToString({true}), '\n');
-          traceback_str = absl::StrJoin(
+              abslx::StrSplit(stack_trace->ToString({true}), '\n');
+          traceback_str = abslx::StrJoin(
               stack_trace_list, "", [&](std::string* out, const auto line) {
-                absl::StrAppend(out, "    ", line, "\n");
+                abslx::StrAppend(out, "    ", line, "\n");
               });
         } else {
           frame_str = "<unknown>";
@@ -278,7 +278,7 @@ tensorflow::Device* GetMatchedDevice(py::handle& ctx, const char* device_name) {
   if (!tensorflow::DeviceNameUtils::ParseFullOrLocalName(device_name,
                                                          &input_device_name)) {
     tensorflow::ThrowValueError(
-        absl::StrFormat("Failed parsing device name: '%s'. Note a valid device "
+        abslx::StrFormat("Failed parsing device name: '%s'. Note a valid device "
                         "string should at least contain a device type and a "
                         "device index, like \"GPU:0\".",
                         device_name)
@@ -295,7 +295,7 @@ tensorflow::Device* GetMatchedDevice(py::handle& ctx, const char* device_name) {
             input_device_name, device->parsed_name())) {
       if (matched_device != nullptr) {
         tensorflow::ThrowValueError(
-            absl::StrFormat("Multiple devices match the provided string "
+            abslx::StrFormat("Multiple devices match the provided string "
                             "'%s': '%s' and '%s'.",
                             device_name, matched_device->name(), device->name())
                 .c_str());
@@ -306,7 +306,7 @@ tensorflow::Device* GetMatchedDevice(py::handle& ctx, const char* device_name) {
 
   if (matched_device == nullptr) {
     tensorflow::ThrowValueError(
-        absl::StrFormat("No matching devices found for '%s'", device_name)
+        abslx::StrFormat("No matching devices found for '%s'", device_name)
             .c_str());
   }
 
@@ -427,7 +427,7 @@ static py::bytes TFE_GetCompilerIr(py::handle& ctx,
       return IrExportStage::OPTIMIZED_HLO_DOT;
     } else {
       ThrowValueError(
-          absl::StrFormat("Invalid stage selected: '%s'. Valid values are: "
+          abslx::StrFormat("Invalid stage selected: '%s'. Valid values are: "
                           "'hlo', 'hlo_serialized', 'optimized_hlo', "
                           "'optimized_hlo_serialized', 'optimized_hlo_dot'",
                           s_stage)
@@ -446,18 +446,18 @@ static py::bytes TFE_GetCompilerIr(py::handle& ctx,
   DeviceNameUtils::ParsedName input_device_name;
   if (!DeviceNameUtils::ParseFullOrLocalName(device_name, &input_device_name)) {
     ThrowValueError(
-        absl::StrFormat("Failed parsing device name: '%s'", device_name)
+        abslx::StrFormat("Failed parsing device name: '%s'", device_name)
             .c_str());
   }
 
   std::vector<Device*> devices = context->local_device_mgr()->ListDevices();
-  auto selected_device = absl::c_find_if(devices, [&](const Device* d) {
+  auto selected_device = abslx::c_find_if(devices, [&](const Device* d) {
     return DeviceNameUtils::AreCompatibleDevNames(input_device_name,
                                                   d->parsed_name());
   });
   if (selected_device == devices.end()) {
     ThrowValueError(
-        absl::StrFormat("No matching device found for '%s'", device_name)
+        abslx::StrFormat("No matching device found for '%s'", device_name)
             .c_str());
   }
 
@@ -466,7 +466,7 @@ static py::bytes TFE_GetCompilerIr(py::handle& ctx,
                     *selected_device, context, input_handles);
 
   if (!hlo_str.ok()) {
-    ThrowValueError(absl::StrFormat("Failed getting HLO text: '%s'",
+    ThrowValueError(abslx::StrFormat("Failed getting HLO text: '%s'",
                                     hlo_str.status().error_message())
                         .c_str());
   }
@@ -643,14 +643,14 @@ PYBIND11_MODULE(_pywrap_tfe, m) {
     tensorflow::AllocatorAttributes attrs;
     tensorflow::Allocator* allocator = matched_device->GetAllocator(attrs);
 
-    if (absl::optional<tensorflow::AllocatorStats> stats =
+    if (abslx::optional<tensorflow::AllocatorStats> stats =
             allocator->GetStats()) {
       return std::map<std::string, int64_t>{{"current", stats->bytes_in_use},
                                             {"peak", stats->peak_bytes_in_use}};
     }
 
     tensorflow::ThrowValueError(
-        absl::StrFormat("Allocator stats not available for device '%s'",
+        abslx::StrFormat("Allocator stats not available for device '%s'",
                         device_name)
             .c_str());
   });
@@ -664,7 +664,7 @@ PYBIND11_MODULE(_pywrap_tfe, m) {
 
     if (!allocator->ClearStats()) {
       tensorflow::ThrowValueError(
-          absl::StrFormat("Cannot reset memory stats for device '%s'",
+          abslx::StrFormat("Cannot reset memory stats for device '%s'",
                           device_name)
               .c_str());
     }
@@ -1605,12 +1605,12 @@ PYBIND11_MODULE(_pywrap_tfe, m) {
                                     const py::handle& context) {
     tensorflow::Safe_TF_StatusPtr status =
         tensorflow::make_safe(TF_NewStatus());
-    if (absl::string_view(pycapsule.name()) !=
+    if (abslx::string_view(pycapsule.name()) !=
         tensorflow::kDlTensorCapsuleName) {
       status->status = tensorflow::errors::InvalidArgument(
           "DLPack tensor must be a capsule with name \"dltensor\", got \"%s\". "
           "Note that a DLPack tensor may be consumed at most once.",
-          absl::string_view(pycapsule.name()));
+          abslx::string_view(pycapsule.name()));
       tensorflow::MaybeRaiseRegisteredFromTFStatus(status.get());
     }
 
@@ -1632,19 +1632,19 @@ PYBIND11_MODULE(_pywrap_tfe, m) {
                                           const py::capsule& device_info) {
     tensorflow::Safe_TF_StatusPtr status =
         tensorflow::make_safe(TF_NewStatus());
-    if (absl::string_view(device.name()) != "TFE_CustomDevice") {
+    if (abslx::string_view(device.name()) != "TFE_CustomDevice") {
       status->status = tensorflow::errors::InvalidArgument(
           "Expected a capsule named 'TFE_CustomDevice' for the `device` "
           "argument, got ",
-          absl::string_view(device.name()));
+          abslx::string_view(device.name()));
       tensorflow::MaybeRaiseRegisteredFromTFStatus(status.get());
     }
-    if (absl::string_view(device_info.name()) !=
+    if (abslx::string_view(device_info.name()) !=
         "TFE_CustomDevice_DeviceInfo") {
       status->status = tensorflow::errors::InvalidArgument(
           "Expected a capsule named 'TFE_CustomDevice_DeviceInfo' for "
           "the `device_info` argument, got ",
-          absl::string_view(device_info.name()));
+          abslx::string_view(device_info.name()));
       tensorflow::MaybeRaiseRegisteredFromTFStatus(status.get());
     }
     // TFE_RegisterCustomDevice takes ownership

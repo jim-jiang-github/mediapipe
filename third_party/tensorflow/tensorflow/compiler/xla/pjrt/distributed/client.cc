@@ -52,10 +52,10 @@ class DistributedRuntimeClientImpl : public DistributedRuntimeClient {
   xla::Status EnumerateDevices(const LocalTopologyProto& local_topology,
                                GlobalTopologyProto* global_topology) override;
   xla::StatusOr<std::string> BlockingKeyValueGet(
-      std::string key, absl::Duration timeout) override;
+      std::string key, abslx::Duration timeout) override;
   xla::Status KeyValueSet(std::string key, std::string value) override;
   xla::Status WaitAtBarrier(std::string barrier_id,
-                            absl::Duration timeout) override;
+                            abslx::Duration timeout) override;
   xla::StatusOr<tensorflow::CoordinationServiceAgent*>
   GetCoordinationServiceAgent() override;
 
@@ -87,18 +87,18 @@ class DistributedRuntimeClientImpl : public DistributedRuntimeClient {
     kClosed,
   };
 
-  static absl::string_view StateToString(State state);
+  static abslx::string_view StateToString(State state);
 
   // state_ is protected by a mutex because the heartbeat thread needs to look
   // at it.
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   State state_ ABSL_GUARDED_BY(mu_) = State::kNotConnected;
 
   // A unique session ID, assigned by the server during Connect().
   uint64_t session_id_;
 
   // Notification that tells the heartbeat thread to stop running.
-  absl::Notification stop_heartbeats_;
+  abslx::Notification stop_heartbeats_;
 
   // Thread responsible for performing heartbeats.
   std::unique_ptr<tensorflow::Thread> heartbeat_thread_;
@@ -119,10 +119,10 @@ class DistributedRuntimeCoordinationServiceClient
   xla::Status EnumerateDevices(const LocalTopologyProto& local_topology,
                                GlobalTopologyProto* global_topology) override;
   xla::StatusOr<std::string> BlockingKeyValueGet(
-      std::string key, absl::Duration timeout) override;
+      std::string key, abslx::Duration timeout) override;
   xla::Status KeyValueSet(std::string key, std::string value) override;
   xla::Status WaitAtBarrier(std::string barrier_id,
-                            absl::Duration timeout) override;
+                            abslx::Duration timeout) override;
   xla::StatusOr<tensorflow::CoordinationServiceAgent*>
   GetCoordinationServiceAgent() override;
 
@@ -140,7 +140,7 @@ DistributedRuntimeClientImpl::DistributedRuntimeClientImpl(
 DistributedRuntimeClientImpl::~DistributedRuntimeClientImpl() {
   bool connected;
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     connected = (state_ == State::kConnected);
   }
   if (connected) {
@@ -157,7 +157,7 @@ DistributedRuntimeClientImpl::~DistributedRuntimeClientImpl() {
   }
 }
 
-/*static*/ absl::string_view DistributedRuntimeClientImpl::StateToString(
+/*static*/ abslx::string_view DistributedRuntimeClientImpl::StateToString(
     State state) {
   switch (state) {
     case State::kNotConnected:
@@ -173,7 +173,7 @@ DistributedRuntimeClientImpl::~DistributedRuntimeClientImpl() {
 
 xla::Status DistributedRuntimeClientImpl::Connect() {
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     if (state_ != State::kNotConnected) {
       return xla::FailedPrecondition("Connect() called when client in state %s",
                                      StateToString(state_));
@@ -182,19 +182,19 @@ xla::Status DistributedRuntimeClientImpl::Connect() {
   ConnectRequest request;
   request.set_protocol_version(DistributedRuntimeProtocolVersion());
   request.set_timeout_milliseconds(
-      absl::ToInt64Milliseconds(options_.rpc_timeout) / 2);
+      abslx::ToInt64Milliseconds(options_.rpc_timeout) / 2);
   request.set_node_id(options_.node_id);
   VLOG(10) << "Connect: " << request.DebugString();
   ConnectResponse response;
   ::grpc::Status status;
-  absl::Time deadline = absl::Now() + options_.init_timeout;
+  abslx::Time deadline = abslx::Now() + options_.init_timeout;
   int attempt = 0;
   std::default_random_engine generator;
   std::uniform_real_distribution<double> distribution(0.0, 1.0);
   do {
     ::grpc::ClientContext ctx;
     ctx.set_fail_fast(false);
-    ctx.set_deadline(absl::ToChronoTime(absl::Now() + options_.rpc_timeout));
+    ctx.set_deadline(abslx::ToChronoTime(abslx::Now() + options_.rpc_timeout));
     request.set_client_id(tensorflow::random::New64());
     response.Clear();
     status = stub_->Connect(&ctx, request, &response);
@@ -207,23 +207,23 @@ xla::Status DistributedRuntimeClientImpl::Connect() {
       // time in total; the `14` here corresponds to an ~16s maximum interval
       // between connection attempts.
       int backoff = 1 << std::min(14, attempt);
-      absl::SleepFor(absl::Milliseconds(backoff * distribution(generator)));
+      abslx::SleepFor(abslx::Milliseconds(backoff * distribution(generator)));
     }
     ++attempt;
-  } while (!status.ok() && absl::Now() < deadline);
+  } while (!status.ok() && abslx::Now() < deadline);
   if (!status.ok()) {
     LOG(ERROR) << "Connect() failed after " << attempt << " retries in "
                << options_.init_timeout
                << "; most recent failure status: " << FromGrpcStatus(status);
     return tensorflow::errors::DeadlineExceeded(
-        absl::StrFormat("Connect() timed out after %s with %d attempts. Most "
+        abslx::StrFormat("Connect() timed out after %s with %d attempts. Most "
                         "recent failure was: %s",
-                        absl::FormatDuration(options_.init_timeout), attempt,
+                        abslx::FormatDuration(options_.init_timeout), attempt,
                         FromGrpcStatus(status).ToString()));
   }
   VLOG(10) << "Connect() response: " << response.DebugString();
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     state_ = State::kConnected;
   }
   session_id_ = response.session_id();
@@ -239,7 +239,7 @@ xla::Status DistributedRuntimeClientImpl::EnumerateDevices(
     const LocalTopologyProto& local_topology,
     GlobalTopologyProto* global_topology) {
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     if (state_ != State::kConnected) {
       return xla::FailedPrecondition(
           "EnumerateDevices() called when client not connected.");
@@ -247,7 +247,7 @@ xla::Status DistributedRuntimeClientImpl::EnumerateDevices(
   }
   ::grpc::ClientContext ctx;
   ctx.set_fail_fast(false);
-  ctx.set_deadline(absl::ToChronoTime(absl::Now() + options_.rpc_timeout));
+  ctx.set_deadline(abslx::ToChronoTime(abslx::Now() + options_.rpc_timeout));
   EnumerateDevicesRequest request;
   request.set_session_id(session_id_);
   *request.mutable_local_topology() = local_topology;
@@ -268,7 +268,7 @@ xla::Status DistributedRuntimeClientImpl::Shutdown() {
   LOG(INFO) << "Waiting for all distributed JAX tasks to shut down.";
   ::grpc::ClientContext ctx;
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     if (state_ != State::kConnected) {
       return xla::FailedPrecondition(
           "Shutdown() called when client not connected.");
@@ -276,7 +276,7 @@ xla::Status DistributedRuntimeClientImpl::Shutdown() {
     state_ = State::kShuttingDown;
   }
   ctx.set_fail_fast(false);
-  ctx.set_deadline(absl::ToChronoTime(absl::Now() + options_.shutdown_timeout));
+  ctx.set_deadline(abslx::ToChronoTime(abslx::Now() + options_.shutdown_timeout));
   ShutdownRequest request;
   request.set_session_id(session_id_);
   VLOG(10) << "Shutdown: " << request.DebugString();
@@ -291,15 +291,15 @@ xla::Status DistributedRuntimeClientImpl::Shutdown() {
     stop_heartbeats_.Notify();
   }
   VLOG(10) << "Shutdown() response: " << response.DebugString();
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   state_ = State::kClosed;
   return OkStatus();
 }
 
 xla::StatusOr<std::string> DistributedRuntimeClientImpl::BlockingKeyValueGet(
-    std::string key, absl::Duration timeout) {
+    std::string key, abslx::Duration timeout) {
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     if (state_ != State::kConnected) {
       return xla::FailedPrecondition(
           "BlockingKeyValueGet() called when client not connected.");
@@ -307,12 +307,12 @@ xla::StatusOr<std::string> DistributedRuntimeClientImpl::BlockingKeyValueGet(
   }
   ::grpc::ClientContext ctx;
   ctx.set_fail_fast(false);
-  ctx.set_deadline(absl::ToChronoTime(absl::Now() + timeout));
+  ctx.set_deadline(abslx::ToChronoTime(abslx::Now() + timeout));
   KeyValueGetRequest request;
   request.set_session_id(session_id_);
   request.set_key(std::move(key));
-  timeout = std::min(timeout, absl::Minutes(10));  // Avoid overflow
-  request.set_timeout_milliseconds(absl::ToInt64Milliseconds(timeout));
+  timeout = std::min(timeout, abslx::Minutes(10));  // Avoid overflow
+  request.set_timeout_milliseconds(abslx::ToInt64Milliseconds(timeout));
   VLOG(10) << "BlockingKeyValueGet: " << request.DebugString();
   KeyValueGetResponse response;
   ::grpc::Status status = stub_->KeyValueGet(&ctx, request, &response);
@@ -325,7 +325,7 @@ xla::StatusOr<std::string> DistributedRuntimeClientImpl::BlockingKeyValueGet(
 xla::Status DistributedRuntimeClientImpl::KeyValueSet(std::string key,
                                                       std::string value) {
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     if (state_ != State::kConnected) {
       return xla::FailedPrecondition(
           "KeyValueSet() called when client not connected.");
@@ -333,7 +333,7 @@ xla::Status DistributedRuntimeClientImpl::KeyValueSet(std::string key,
   }
   ::grpc::ClientContext ctx;
   ctx.set_fail_fast(false);
-  ctx.set_deadline(absl::ToChronoTime(absl::Now() + options_.rpc_timeout));
+  ctx.set_deadline(abslx::ToChronoTime(abslx::Now() + options_.rpc_timeout));
   KeyValueSetRequest request;
   request.set_session_id(session_id_);
   request.set_key(std::move(key));
@@ -345,9 +345,9 @@ xla::Status DistributedRuntimeClientImpl::KeyValueSet(std::string key,
 }
 
 xla::Status DistributedRuntimeClientImpl::WaitAtBarrier(
-    std::string barrier_id, absl::Duration timeout) {
+    std::string barrier_id, abslx::Duration timeout) {
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     if (state_ != State::kConnected) {
       return xla::FailedPrecondition(
           "WaitAtBarrier() called when client not connected.");
@@ -358,15 +358,15 @@ xla::Status DistributedRuntimeClientImpl::WaitAtBarrier(
   // Set timeout to be at least 5 seconds so that there is time for service-side
   // timeout logic to execute.
   ctx.set_deadline(
-      absl::ToChronoTime(absl::Now() + std::max(timeout, absl::Seconds(5))));
+      abslx::ToChronoTime(abslx::Now() + std::max(timeout, abslx::Seconds(5))));
   WaitAtBarrierRequest request;
   request.set_session_id(session_id_);
   request.set_barrier_id(std::move(barrier_id));
   request.set_node_id(options_.node_id);
   // TODO(yashkatariya,hanyuangtay): Change timeout_milliseconds to int64 in
   // protocol.proto so that we don't need a minimum timeout here.
-  timeout = std::min(timeout, absl::Minutes(10));  // Avoid overflow
-  request.set_timeout_milliseconds(absl::ToInt64Milliseconds(timeout));
+  timeout = std::min(timeout, abslx::Minutes(10));  // Avoid overflow
+  request.set_timeout_milliseconds(abslx::ToInt64Milliseconds(timeout));
   VLOG(10) << "WaitAtBarrier: " << request.DebugString();
   WaitAtBarrierResponse response;
   ::grpc::Status status = stub_->WaitAtBarrier(&ctx, request, &response);
@@ -393,7 +393,7 @@ void DistributedRuntimeClientImpl::HeartbeatLoop() {
     ::grpc::ClientContext ctx;
     ctx.set_fail_fast(false);
     ctx.set_deadline(
-        absl::ToChronoTime(absl::Now() + options_.heartbeat_interval));
+        abslx::ToChronoTime(abslx::Now() + options_.heartbeat_interval));
     HeartbeatRequest request;
     request.set_session_id(session_id_);
     request.set_node_id(options_.node_id);
@@ -417,7 +417,7 @@ void DistributedRuntimeClientImpl::HeartbeatLoop() {
         // If we are shutting down, missed heartbeats are benign: they may
         // simply mean that the server has shut down already before it saw
         // the heartbeat request.
-        absl::MutexLock lock(&mu_);
+        abslx::MutexLock lock(&mu_);
         if (state_ != State::kShuttingDown) {
           options_.missed_heartbeat_callback(FromGrpcStatus(status),
                                              !is_transient_error);
@@ -436,11 +436,11 @@ DistributedRuntimeCoordinationServiceClient::
   config.set_service_type("standalone");
   config.set_service_leader("/job:jax_worker/task:0");
   config.set_cluster_register_timeout_in_ms(
-      absl::ToInt64Milliseconds(options.init_timeout));
-  config.set_heartbeat_timeout_in_ms(absl::ToInt64Milliseconds(
+      abslx::ToInt64Milliseconds(options.init_timeout));
+  config.set_heartbeat_timeout_in_ms(abslx::ToInt64Milliseconds(
       options.heartbeat_interval * options.max_missing_heartbeats));
   config.set_shutdown_barrier_timeout_in_ms(
-      absl::ToInt64Milliseconds(options.shutdown_timeout));
+      abslx::ToInt64Milliseconds(options.shutdown_timeout));
   config.set_agent_destruction_without_shutdown(
       !options.shutdown_on_destruction);
   auto error_fn =
@@ -467,9 +467,9 @@ DistributedRuntimeCoordinationServiceClient::
 
 xla::Status DistributedRuntimeCoordinationServiceClient::Connect() {
   Status s = tensorflow::errors::Unknown("Connection not attempted yet.");
-  absl::Duration timeout =
-      absl::Milliseconds(config_.cluster_register_timeout_in_ms());
-  absl::Time deadline = absl::Now() + timeout;
+  abslx::Duration timeout =
+      abslx::Milliseconds(config_.cluster_register_timeout_in_ms());
+  abslx::Time deadline = abslx::Now() + timeout;
   int attempt = 0;
   std::default_random_engine generator;
   std::uniform_real_distribution<double> distribution(0.0, 1.0);
@@ -486,8 +486,8 @@ xla::Status DistributedRuntimeCoordinationServiceClient::Connect() {
     // between connection attempts.
 
     int backoff = 1 << std::min(14, attempt);
-    absl::SleepFor(absl::Milliseconds(backoff * distribution(generator)));
-  } while (!s.ok() && absl::Now() < deadline &&
+    abslx::SleepFor(abslx::Milliseconds(backoff * distribution(generator)));
+  } while (!s.ok() && abslx::Now() < deadline &&
            // Retries are only made for RPC errors. If a valid service error is
            // returned, fail immediately.
            s.GetPayload(tensorflow::CoordinationErrorPayloadKey()) ==
@@ -523,7 +523,7 @@ xla::Status DistributedRuntimeCoordinationServiceClient::EnumerateDevices(
 
 xla::StatusOr<std::string>
 DistributedRuntimeCoordinationServiceClient::BlockingKeyValueGet(
-    std::string key, absl::Duration timeout) {
+    std::string key, abslx::Duration timeout) {
   return coord_agent_->GetKeyValue(key, timeout);
 }
 
@@ -533,7 +533,7 @@ xla::Status DistributedRuntimeCoordinationServiceClient::KeyValueSet(
 }
 
 xla::Status DistributedRuntimeCoordinationServiceClient::WaitAtBarrier(
-    std::string barrier_id, absl::Duration timeout) {
+    std::string barrier_id, abslx::Duration timeout) {
   return coord_agent_->WaitAtBarrier(barrier_id, timeout, /*tasks=*/{});
 }
 

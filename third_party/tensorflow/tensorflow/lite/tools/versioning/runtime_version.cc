@@ -28,13 +28,13 @@ limitations under the License.
 namespace tflite {
 
 bool CompareRuntimeVersion(const std::string& v1, const std::string& v2) {
-  const std::vector<std::string> vec1 = absl::StrSplit(v1, '.');
-  const std::vector<std::string> vec2 = absl::StrSplit(v2, '.');
+  const std::vector<std::string> vec1 = abslx::StrSplit(v1, '.');
+  const std::vector<std::string> vec2 = abslx::StrSplit(v2, '.');
   int i = 0;
   while (i < vec1.size() && i < vec2.size()) {
     int v1_val, v2_val;
-    if (absl::SimpleAtoi(vec1[i], &v1_val) &&
-        absl::SimpleAtoi(vec2[i], &v2_val)) {
+    if (abslx::SimpleAtoi(vec1[i], &v1_val) &&
+        abslx::SimpleAtoi(vec2[i], &v2_val)) {
       if (v1_val != v2_val) return v1_val < v2_val;
     }
     ++i;

@@ -34,7 +34,7 @@ namespace gpu {
 struct FftPlan {
   // CuFFT thread-safety requires that separate host threads not share plans;
   // protect each plan with a mutex.
-  absl::Mutex mu;
+  abslx::Mutex mu;
   std::unique_ptr<se::fft::Plan> plan ABSL_GUARDED_BY(mu);
   float scale_factor ABSL_GUARDED_BY(mu);
 };
@@ -43,15 +43,15 @@ class FftPlanCache {
  public:
   // Returnes Fft plan cached for the given device ordinal or creates a new one.
   FftPlan* GetOrCreate(int device_ordinal) {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     std::unique_ptr<FftPlan>& plan = fft_plans_[device_ordinal];
     if (!plan) plan = std::make_unique<FftPlan>();
     return plan.get();
   }
 
  private:
-  absl::Mutex mu_;
-  absl::flat_hash_map<int, std::unique_ptr<FftPlan>> fft_plans_
+  abslx::Mutex mu_;
+  abslx::flat_hash_map<int, std::unique_ptr<FftPlan>> fft_plans_
       ABSL_GUARDED_BY(mu_);
 };
 
@@ -64,7 +64,7 @@ class FftThunk : public Thunk {
   // Constructs a thunk for launching an FFT on a stream.
   // Semantics of null hlo_instruction argument are as in Thunk.
   FftThunk(ThunkInfo thunk_info, FftType fft_type,
-           absl::Span<const int64_t> fft_length,
+           abslx::Span<const int64_t> fft_length,
            const BufferAllocation::Slice& input_buffer,
            const BufferAllocation::Slice& output_buffer,
            const Shape& input_shape, const Shape& output_shape);
@@ -90,7 +90,7 @@ class FftThunk : public Thunk {
 
 Status RunFft(se::DeviceMemoryBase input, const Shape& input_shape,
               se::DeviceMemoryBase output, const Shape& output_shape,
-              se::fft::Type fft_type, absl::Span<const int64_t> fft_length,
+              se::fft::Type fft_type, abslx::Span<const int64_t> fft_length,
               int device_ordinal, FftPlanCache* fft_plan_cache,
               se::Stream* stream, se::DeviceMemoryAllocator* memory_allocator);
 

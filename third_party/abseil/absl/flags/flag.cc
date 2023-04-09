@@ -17,7 +17,7 @@
 
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // This global mutex protects on-demand construction of flag objects in MSVC
@@ -26,13 +26,13 @@ ABSL_NAMESPACE_BEGIN
 
 namespace flags_internal {
 
-ABSL_CONST_INIT static absl::Mutex construction_guard(absl::kConstInit);
+ABSL_CONST_INIT static abslx::Mutex construction_guard(abslx::kConstInit);
 
-absl::Mutex* GetGlobalConstructionGuard() { return &construction_guard; }
+abslx::Mutex* GetGlobalConstructionGuard() { return &construction_guard; }
 
 }  // namespace flags_internal
 
 #endif
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

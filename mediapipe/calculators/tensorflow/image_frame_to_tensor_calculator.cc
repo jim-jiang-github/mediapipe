@@ -42,7 +42,7 @@ std::unique_ptr<tf::Tensor> ImageFrameToNormalizedTensor(
   const int channels = image_frame.NumberOfChannels();
   const uint8* pixel = image_frame.PixelData();
   const int width_padding = image_frame.WidthStep() - cols * channels;
-  auto tensor = ::absl::make_unique<tf::Tensor>(
+  auto tensor = ::abslx::make_unique<tf::Tensor>(
       tf::DT_FLOAT, tf::TensorShape({rows, cols, channels}));
   auto tensor_data = tensor->tensor<float, 3>();
 
@@ -95,17 +95,17 @@ std::unique_ptr<tf::Tensor> ImageFrameToNormalizedTensor(
 //  }
 class ImageFrameToTensorCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   ImageFrameToTensorCalculatorOptions options_;
 };
 REGISTER_CALCULATOR(ImageFrameToTensorCalculator);
 
-absl::Status ImageFrameToTensorCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status ImageFrameToTensorCalculator::GetContract(CalculatorContract* cc) {
   // Start with only one input packet.
   RET_CHECK_EQ(cc->Inputs().NumEntries(), 1)
       << "Only one input stream is supported.";
@@ -117,18 +117,18 @@ absl::Status ImageFrameToTensorCalculator::GetContract(CalculatorContract* cc) {
   cc->Outputs().Index(0).Set<tf::Tensor>(
       // Output TensorFlow Tensor.
   );
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ImageFrameToTensorCalculator::Open(CalculatorContext* cc) {
+abslx::Status ImageFrameToTensorCalculator::Open(CalculatorContext* cc) {
   options_ = cc->Options<ImageFrameToTensorCalculatorOptions>();
   // Inform the framework that we always output at the same timestamp
   // as we receive a packet at.
   cc->SetOffset(TimestampDiff(0));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ImageFrameToTensorCalculator::Process(CalculatorContext* cc) {
+abslx::Status ImageFrameToTensorCalculator::Process(CalculatorContext* cc) {
   const Packet& input_item = cc->Inputs().Index(0).Value();
   RET_CHECK(!input_item.IsEmpty()) << "Input cannot be empty.";
 
@@ -173,7 +173,7 @@ absl::Status ImageFrameToTensorCalculator::Process(CalculatorContext* cc) {
     } else if (bytes_per_pixel == 4) {
       data_type = tf::DT_FLOAT;
     } else {
-      return absl::InvalidArgumentError(absl::StrCat(
+      return abslx::InvalidArgumentError(abslx::StrCat(
           "Unsupported image format (", bytes_per_pixel, " bytes per pixel)"));
     }
 
@@ -184,7 +184,7 @@ absl::Status ImageFrameToTensorCalculator::Process(CalculatorContext* cc) {
         << ")";
 
     // Create the output tensor.
-    tensor = ::absl::make_unique<tf::Tensor>(data_type, tensor_shape);
+    tensor = ::abslx::make_unique<tf::Tensor>(data_type, tensor_shape);
 
     // Copy pixel data from the ImageFrame to the tensor.
     if (data_type == tf::DT_UINT8) {
@@ -200,7 +200,7 @@ absl::Status ImageFrameToTensorCalculator::Process(CalculatorContext* cc) {
   }
 
   cc->Outputs().Index(0).Add(tensor.release(), cc->InputTimestamp());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

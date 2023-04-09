@@ -54,7 +54,7 @@ namespace stream_executor {
 namespace cuda {
 
 std::string DriverVersionToString(DriverVersion version) {
-  return absl::StrFormat("%d.%d.%d", std::get<0>(version), std::get<1>(version),
+  return abslx::StrFormat("%d.%d.%d", std::get<0>(version), std::get<1>(version),
                          std::get<2>(version));
 }
 
@@ -67,11 +67,11 @@ std::string DriverVersionStatusToString(port::StatusOr<DriverVersion> version) {
 }
 
 port::StatusOr<DriverVersion> StringToDriverVersion(const std::string &value) {
-  std::vector<std::string> pieces = absl::StrSplit(value, '.');
+  std::vector<std::string> pieces = abslx::StrSplit(value, '.');
   if (pieces.size() < 2 || pieces.size() > 4) {
     return port::Status(
         port::error::INVALID_ARGUMENT,
-        absl::StrFormat(
+        abslx::StrFormat(
             "expected %%d.%%d, %%d.%%d.%%d, or %%d.%%d.%%d.%%d form "
             "for driver version; got \"%s\"",
             value.c_str()));
@@ -83,21 +83,21 @@ port::StatusOr<DriverVersion> StringToDriverVersion(const std::string &value) {
   if (!port::safe_strto32(pieces[0], &major)) {
     return port::Status(
         port::error::INVALID_ARGUMENT,
-        absl::StrFormat("could not parse major version number \"%s\" as an "
+        abslx::StrFormat("could not parse major version number \"%s\" as an "
                         "integer from string \"%s\"",
                         pieces[0], value));
   }
   if (!port::safe_strto32(pieces[1], &minor)) {
     return port::Status(
         port::error::INVALID_ARGUMENT,
-        absl::StrFormat("could not parse minor version number \"%s\" as an "
+        abslx::StrFormat("could not parse minor version number \"%s\" as an "
                         "integer from string \"%s\"",
                         pieces[1].c_str(), value.c_str()));
   }
   if (pieces.size() == 3 && !port::safe_strto32(pieces[2], &patch)) {
     return port::Status(
         port::error::INVALID_ARGUMENT,
-        absl::StrFormat("could not parse patch version number \"%s\" as an "
+        abslx::StrFormat("could not parse patch version number \"%s\" as an "
                         "integer from string \"%s\"",
                         pieces[2], value));
   }
@@ -123,7 +123,7 @@ static const char *kDriverVersionPath = "/proc/driver/nvidia/version";
 // -- class Diagnostician
 
 std::string Diagnostician::GetDevNodePath(int dev_node_ordinal) {
-  return absl::StrCat("/dev/nvidia", dev_node_ordinal);
+  return abslx::StrCat("/dev/nvidia", dev_node_ordinal);
 }
 
 void Diagnostician::LogDiagnosticInformation() {
@@ -180,7 +180,7 @@ void Diagnostician::LogDiagnosticInformation() {
     std::string library_path = value == nullptr ? "" : value;
     VLOG(1) << "LD_LIBRARY_PATH is: \"" << library_path << "\"";
 
-    std::vector<std::string> pieces = absl::StrSplit(library_path, ':');
+    std::vector<std::string> pieces = abslx::StrSplit(library_path, ':');
     for (const auto &piece : pieces) {
       if (piece.empty()) {
         continue;
@@ -266,7 +266,7 @@ port::StatusOr<DriverVersion> Diagnostician::FindDsoVersion() {
       }
       std::string dso_version = dot + strlen(so_suffix);
       // TODO(b/22689637): Eliminate the explicit namespace if possible.
-      auto stripped_dso_version = absl::StripSuffix(dso_version, ".ld64");
+      auto stripped_dso_version = abslx::StripSuffix(dso_version, ".ld64");
       auto result = static_cast<port::StatusOr<DriverVersion> *>(data);
       *result = cuda::StringToDriverVersion(std::string(stripped_dso_version));
       return 1;
@@ -288,7 +288,7 @@ port::StatusOr<DriverVersion> Diagnostician::FindKernelModuleVersion(
   if (offset == std::string::npos) {
     return port::Status(
         port::error::NOT_FOUND,
-        absl::StrCat("could not find kernel module information in "
+        abslx::StrCat("could not find kernel module information in "
                      "driver version file contents: \"",
                      driver_version_file_contents, "\""));
   }
@@ -298,7 +298,7 @@ port::StatusOr<DriverVersion> Diagnostician::FindKernelModuleVersion(
   size_t space_index = version_and_rest.find(' ');
   auto kernel_version = version_and_rest.substr(0, space_index);
   // TODO(b/22689637): Eliminate the explicit namespace if possible.
-  auto stripped_kernel_version = absl::StripSuffix(kernel_version, ".ld64");
+  auto stripped_kernel_version = abslx::StripSuffix(kernel_version, ".ld64");
   return cuda::StringToDriverVersion(std::string(stripped_kernel_version));
 }
 
@@ -350,7 +350,7 @@ port::StatusOr<DriverVersion> Diagnostician::FindKernelDriverVersion() {
   CFRelease(kext_infos);
   auto status = port::Status(
       port::error::INTERNAL,
-      absl::StrCat(
+      abslx::StrCat(
           "failed to read driver bundle version: ",
           CFStringGetCStringPtr(kDriverKextIdentifier, kCFStringEncodingUTF8)));
   return status;
@@ -364,12 +364,12 @@ port::StatusOr<DriverVersion> Diagnostician::FindKernelDriverVersion() {
   if (driver_version_file == nullptr) {
     return port::Status(
         port::error::PERMISSION_DENIED,
-        absl::StrCat("could not open driver version path for reading: ",
+        abslx::StrCat("could not open driver version path for reading: ",
                      kDriverVersionPath));
   }
 
   static const int kContentsSize = 1024;
-  absl::InlinedVector<char, 4> contents(kContentsSize);
+  abslx::InlinedVector<char, 4> contents(kContentsSize);
   size_t retcode =
       fread(contents.begin(), 1, kContentsSize - 2, driver_version_file);
   if (retcode < kContentsSize - 1) {
@@ -386,7 +386,7 @@ port::StatusOr<DriverVersion> Diagnostician::FindKernelDriverVersion() {
 
   auto status = port::Status(
       port::error::INTERNAL,
-      absl::StrCat(
+      abslx::StrCat(
           "failed to read driver version file contents: ", kDriverVersionPath,
           "; ferror: ", ferror(driver_version_file)));
   fclose(driver_version_file);

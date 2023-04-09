@@ -38,33 +38,33 @@ namespace mediapipe {
 // }
 class OpenCvImageEncoderCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
   int encoding_quality_;
 };
 
-absl::Status OpenCvImageEncoderCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status OpenCvImageEncoderCalculator::GetContract(CalculatorContract* cc) {
   cc->Inputs().Index(0).Set<ImageFrame>();
   cc->Outputs().Index(0).Set<OpenCvImageEncoderCalculatorResults>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status OpenCvImageEncoderCalculator::Open(CalculatorContext* cc) {
+abslx::Status OpenCvImageEncoderCalculator::Open(CalculatorContext* cc) {
   auto options = cc->Options<OpenCvImageEncoderCalculatorOptions>();
   encoding_quality_ = options.quality();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status OpenCvImageEncoderCalculator::Process(CalculatorContext* cc) {
+abslx::Status OpenCvImageEncoderCalculator::Process(CalculatorContext* cc) {
   const ImageFrame& image_frame = cc->Inputs().Index(0).Get<ImageFrame>();
   CHECK_EQ(1, image_frame.ByteDepth());
 
   std::unique_ptr<OpenCvImageEncoderCalculatorResults> encoded_result =
-      absl::make_unique<OpenCvImageEncoderCalculatorResults>();
+      abslx::make_unique<OpenCvImageEncoderCalculatorResults>();
   encoded_result->set_width(image_frame.Width());
   encoded_result->set_height(image_frame.Height());
 
@@ -106,11 +106,11 @@ absl::Status OpenCvImageEncoderCalculator::Process(CalculatorContext* cc) {
   encoded_result->set_encoded_image(&encode_buffer[0], encode_buffer.size());
 
   cc->Outputs().Index(0).Add(encoded_result.release(), cc->InputTimestamp());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status OpenCvImageEncoderCalculator::Close(CalculatorContext* cc) {
-  return absl::OkStatus();
+abslx::Status OpenCvImageEncoderCalculator::Close(CalculatorContext* cc) {
+  return abslx::OkStatus();
 }
 
 REGISTER_CALCULATOR(OpenCvImageEncoderCalculator);

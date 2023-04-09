@@ -37,11 +37,11 @@ class NameUniquer {
 
   // Get a sanitized unique name in a string, with an optional prefix for
   // convenience.
-  std::string GetUniqueName(absl::string_view prefix = "");
+  std::string GetUniqueName(abslx::string_view prefix = "");
 
   // Sanitizes and returns the name. Unallowed characters will be replaced with
   // '_'. The result will match the regexp "[a-zA-Z_][a-zA-Z0-9_.-]*".
-  static std::string GetSanitizedName(absl::string_view name);
+  static std::string GetSanitizedName(abslx::string_view name);
 
  private:
   // Used to track and generate new identifiers for the same instruction name
@@ -68,7 +68,7 @@ class NameUniquer {
     int64_t next_ = 0;
 
     // Set of all the identifiers which has been used.
-    absl::flat_hash_set<int64_t> used_;
+    abslx::flat_hash_set<int64_t> used_;
   };
 
   // The string to use to separate the prefix of the name from the uniquing
@@ -77,7 +77,7 @@ class NameUniquer {
 
   // Map from name prefix to the generator data structure which tracks used
   // identifiers and generates new ones.
-  absl::flat_hash_map<std::string, SequentialIdGenerator> generated_names_;
+  abslx::flat_hash_map<std::string, SequentialIdGenerator> generated_names_;
 
   NameUniquer(const NameUniquer&) = delete;
   NameUniquer& operator=(const NameUniquer&) = delete;

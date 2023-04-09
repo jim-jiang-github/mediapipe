@@ -49,7 +49,7 @@ using MemorySchedulerPostprocessor =
 typedef std::function<StatusOr<HloInstructionSequence>(
     HloComputation*, const TuplePointsToAnalysis&, const HloAliasAnalysis&,
     const LogicalBuffer::SizeFunction&,
-    const absl::flat_hash_map<const HloComputation*, int64_t>&,
+    const abslx::flat_hash_map<const HloComputation*, int64_t>&,
     const MemorySchedulerPostprocessor&,
     /*peak_memory*/ int64_t*)>
     MemorySchedulerAlgorithm;
@@ -58,7 +58,7 @@ typedef std::function<StatusOr<HloInstructionSequence>(
 typedef std::function<StatusOr<HloSchedule>(
     const HloModule*, const TuplePointsToAnalysis&, const HloAliasAnalysis&,
     const LogicalBuffer::SizeFunction&,
-    const absl::flat_hash_set<absl::string_view>& execution_threads,
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads,
     /*peak_memory*/ int64_t*)>
     ModuleSchedulerAlgorithm;
 
@@ -73,7 +73,7 @@ StatusOr<HloInstructionSequence> ListMemoryScheduler(
     const TuplePointsToAnalysis& points_to_analysis,
     const HloAliasAnalysis& alias_analysis,
     const LogicalBuffer::SizeFunction& size_function,
-    const absl::flat_hash_map<const HloComputation*, int64_t>&
+    const abslx::flat_hash_map<const HloComputation*, int64_t>&
         memory_by_computation,
     const MemorySchedulerPostprocessor& postprocessor, int64_t* peak_memory);
 
@@ -83,7 +83,7 @@ StatusOr<HloInstructionSequence> DFSMemoryScheduler(
     const TuplePointsToAnalysis& points_to_analysis,
     const HloAliasAnalysis& alias_analysis,
     const LogicalBuffer::SizeFunction& size_function,
-    const absl::flat_hash_map<const HloComputation*, int64_t>&
+    const abslx::flat_hash_map<const HloComputation*, int64_t>&
         memory_by_computation,
     const MemorySchedulerPostprocessor& postprocessor, int64_t* peak_memory);
 
@@ -93,7 +93,7 @@ StatusOr<HloInstructionSequence> PostOrderMemoryScheduler(
     const TuplePointsToAnalysis& points_to_analysis,
     const HloAliasAnalysis& alias_analysis,
     const LogicalBuffer::SizeFunction& size_function,
-    const absl::flat_hash_map<const HloComputation*, int64_t>&
+    const abslx::flat_hash_map<const HloComputation*, int64_t>&
         memory_by_computation,
     const MemorySchedulerPostprocessor& postprocessor, int64_t* peak_memory);
 
@@ -106,7 +106,7 @@ StatusOr<HloInstructionSequence> DefaultMemoryScheduler(
     const TuplePointsToAnalysis& points_to_analysis,
     const HloAliasAnalysis& alias_analysis,
     const LogicalBuffer::SizeFunction& size_function,
-    const absl::flat_hash_map<const HloComputation*, int64_t>&
+    const abslx::flat_hash_map<const HloComputation*, int64_t>&
         memory_by_computation,
     const MemorySchedulerPostprocessor& postprocessor, int64_t* peak_memory);
 
@@ -114,7 +114,7 @@ StatusOr<HloSchedule> DefaultModuleScheduler(
     const HloModule* module, const TuplePointsToAnalysis& points_to_analysis,
     const HloAliasAnalysis& alias_analysis,
     const LogicalBuffer::SizeFunction& size_function,
-    const absl::flat_hash_set<absl::string_view>& execution_threads,
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads,
     int64_t* peak_memory);
 
 // Returns an HloSchedule which seeks to minimize the memory required for the
@@ -124,7 +124,7 @@ StatusOr<HloSchedule> DefaultModuleScheduler(
 StatusOr<HloSchedule> ScheduleModule(
     const HloModule* module, const LogicalBuffer::SizeFunction& size_function,
     const ModuleSchedulerAlgorithm& algorithm = {},
-    const absl::flat_hash_set<absl::string_view>& execution_threads = {},
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads = {},
     int64_t* peak_memory = nullptr);
 
 // Computes the schedule for a single computation.
@@ -147,12 +147,12 @@ class HloMemoryScheduler : public HloModulePass {
 
   ~HloMemoryScheduler() override = default;
 
-  absl::string_view name() const override { return "hlo-memory-scheduler"; }
+  abslx::string_view name() const override { return "hlo-memory-scheduler"; }
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   LogicalBuffer::SizeFunction size_function_;
@@ -164,12 +164,12 @@ class HloMemoryScheduler : public HloModulePass {
 // using a DFS traversal of the graph with no attempt to minimize memory use.
 class HloTrivialScheduler : public HloModulePass {
  public:
-  absl::string_view name() const override { return "hlo-trivial-scheduler"; }
+  abslx::string_view name() const override { return "hlo-trivial-scheduler"; }
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 };
 
 // A trivial pass which clears the schedule currently set on the
@@ -178,12 +178,12 @@ class HloDescheduler : public HloModulePass {
  public:
   HloDescheduler() = default;
   ~HloDescheduler() override = default;
-  absl::string_view name() const override { return "hlo-descheduler"; }
+  abslx::string_view name() const override { return "hlo-descheduler"; }
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 };
 
 }  // namespace xla

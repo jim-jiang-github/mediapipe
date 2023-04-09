@@ -111,10 +111,10 @@ class BufferSequencingEvent {
   // refactored the EventPool API.
   std::atomic<uint64_t> sequence_number_{0};
 
-  mutable absl::Mutex mu_;
+  mutable abslx::Mutex mu_;
   // A list of all streams for which the buffer's content is known to be defined
   // at the tail of the queue, i.e., for any newly enqueued command.
-  absl::InlinedVector<se::Stream*, 2> streams_defined_on_ ABSL_GUARDED_BY(mu_);
+  abslx::InlinedVector<se::Stream*, 2> streams_defined_on_ ABSL_GUARDED_BY(mu_);
 };
 
 // Class that represents a tuple of device buffers. Like a ScopedShapedBuffer it
@@ -139,7 +139,7 @@ class TrackedDeviceBuffer {
   // of the buffers of the shaped_buffer.
   static std::shared_ptr<TrackedDeviceBuffer> FromScopedShapedBuffer(
       ScopedShapedBuffer* shaped_buffer,
-      absl::Span<const std::shared_ptr<BufferSequencingEvent>>
+      abslx::Span<const std::shared_ptr<BufferSequencingEvent>>
           definition_events);
 
   // Builds a ShapedBuffer view onto the buffers of 'tree'.
@@ -170,17 +170,17 @@ class TrackedDeviceBuffer {
 
   se::DeviceMemoryAllocator* allocator() const { return allocator_; }
   int device_ordinal() const { return device_ordinal_; }
-  absl::InlinedVector<se::DeviceMemoryBase, 1>& device_memory() {
+  abslx::InlinedVector<se::DeviceMemoryBase, 1>& device_memory() {
     return device_memory_;
   }
-  const absl::InlinedVector<se::DeviceMemoryBase, 1>& device_memory() const {
+  const abslx::InlinedVector<se::DeviceMemoryBase, 1>& device_memory() const {
     return device_memory_;
   }
-  absl::Span<const std::shared_ptr<BufferSequencingEvent>> definition_events()
+  abslx::Span<const std::shared_ptr<BufferSequencingEvent>> definition_events()
       const {
     return definition_events_;
   }
-  absl::Span<const StreamAndEvent> usage_events() const {
+  abslx::Span<const StreamAndEvent> usage_events() const {
     return usage_events_;
   }
 
@@ -201,7 +201,7 @@ class TrackedDeviceBuffer {
                      std::shared_ptr<BufferSequencingEvent> event,
                      bool reference_held);
 
-  using StreamAndEventContainer = absl::InlinedVector<StreamAndEvent, 3>;
+  using StreamAndEventContainer = abslx::InlinedVector<StreamAndEvent, 3>;
   // Returns the set of streams that the buffer was used on, and for each stream
   // an event later than the last use of the buffer. After
   // LockUseAndTransferUsageEvents is called it is illegal to use the buffer on
@@ -210,8 +210,8 @@ class TrackedDeviceBuffer {
 
   TrackedDeviceBuffer() : in_use_(true) {}
   TrackedDeviceBuffer(se::DeviceMemoryAllocator* allocator, int device_ordinal,
-                      absl::Span<se::DeviceMemoryBase const> device_memory,
-                      absl::Span<const std::shared_ptr<BufferSequencingEvent>>
+                      abslx::Span<se::DeviceMemoryBase const> device_memory,
+                      abslx::Span<const std::shared_ptr<BufferSequencingEvent>>
                           definition_events,
                       std::function<void()> on_delete_callback);
   ~TrackedDeviceBuffer();
@@ -223,14 +223,14 @@ class TrackedDeviceBuffer {
   int device_ordinal_;
 
   // Each host-side buffer may have several buffers on-device.
-  absl::InlinedVector<se::DeviceMemoryBase, 1> device_memory_;
+  abslx::InlinedVector<se::DeviceMemoryBase, 1> device_memory_;
 
   // Events that are triggered when the content of one or more buffers is ready
   // during multistream execution. May be nullptr, which is used in the
   // single-stream execution case where events are not necessary for buffer
   // event sequencing. All events must be triggered before the buffers can be
   // used.
-  absl::InlinedVector<std::shared_ptr<BufferSequencingEvent>, 2>
+  abslx::InlinedVector<std::shared_ptr<BufferSequencingEvent>, 2>
       definition_events_;
 
   // in_use_ starts out true, and is set to false when the buffer is released
@@ -250,7 +250,7 @@ class TrackedDeviceBuffer {
 // populates with the definition events.
 void GetDeviceBufferEvents(const TrackedDeviceBuffer& buffer,
                            bool get_usage_events,
-                           absl::flat_hash_set<BufferSequencingEvent*>* events);
+                           abslx::flat_hash_set<BufferSequencingEvent*>* events);
 
 // Waits for all of the definition events in a buffer on 'stream'.
 void WaitForBufferDefinitionEventsOnStream(const TrackedDeviceBuffer& buffer,

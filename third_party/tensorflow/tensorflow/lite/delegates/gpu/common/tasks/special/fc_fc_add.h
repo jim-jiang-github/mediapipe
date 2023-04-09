@@ -193,7 +193,7 @@ FCFCAdd CreateFCFCAdd(const GpuInfo& gpu_info, const OperationDef& definition,
                       const FullyConnectedInt8Attributes& attr0,
                       const FullyConnectedInt8Attributes& attr1);
 
-absl::Status TryFCFCAdd(
+abslx::Status TryFCFCAdd(
     const GpuInfo& gpu_info, CalculationsPrecision precision,
     const GraphFloat32& graph, NodeId first_node_id,
     const std::map<ValueId, TensorDescriptor>& tensor_descriptors,

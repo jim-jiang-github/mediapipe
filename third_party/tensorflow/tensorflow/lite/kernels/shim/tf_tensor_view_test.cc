@@ -209,7 +209,7 @@ TEST(TfTensorView, Str) {
  ["hi" ""]])";
 
   EXPECT_THAT(tf_tensor.SummarizeValue(10, true),
-              ::testing::Eq(absl::string_view(expectation).substr(1)));
+              ::testing::Eq(abslx::string_view(expectation).substr(1)));
 }
 
 }  // namespace

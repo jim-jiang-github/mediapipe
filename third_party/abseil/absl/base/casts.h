@@ -33,7 +33,7 @@
 #include "absl/base/macros.h"
 #include "absl/meta/type_traits.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 namespace internal_casts {
@@ -99,7 +99,7 @@ struct is_bitcastable
 //
 // Such implicit cast chaining may be useful within template logic.
 template <typename To>
-constexpr To implicit_cast(typename absl::internal::identity_t<To> to) {
+constexpr To implicit_cast(typename abslx::internal::identity_t<To> to) {
   return to;
 }
 
@@ -169,7 +169,7 @@ template <
         !internal_casts::is_bitcastable<Dest, Source>::value,
         int>::type = 0>
 ABSL_DEPRECATED(
-    "absl::bit_cast type requirements were violated. Update the types "
+    "abslx::bit_cast type requirements were violated. Update the types "
     "being used such that they are the same size and are both "
     "TriviallyCopyable.")
 inline Dest bit_cast(const Source& source) {
@@ -182,6 +182,6 @@ inline Dest bit_cast(const Source& source) {
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_BASE_CASTS_H_

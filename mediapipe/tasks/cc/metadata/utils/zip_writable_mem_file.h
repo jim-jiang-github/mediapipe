@@ -44,7 +44,7 @@ class ZipWritableMemFile {
   // in-memory zip file.
   zlib_filefunc64_def& GetFileFunc64Def();
   // Provides access to the file contents.
-  absl::string_view GetFileContent() const;
+  abslx::string_view GetFileContent() const;
 
  private:
   // The string backing the in-memory file.

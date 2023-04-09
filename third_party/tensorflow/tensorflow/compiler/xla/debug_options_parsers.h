@@ -29,7 +29,7 @@ template <typename T>
 void parse_xla_backend_extra_options(T* extra_options_map,
                                      std::string comma_separated_values) {
   std::vector<std::string> extra_options_parts =
-      absl::StrSplit(comma_separated_values, ',');
+      abslx::StrSplit(comma_separated_values, ',');
 
   // The flag contains a comma-separated list of options; some options
   // have arguments following "=", some don't.

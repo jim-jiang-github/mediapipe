@@ -64,7 +64,7 @@ struct BaseOptions {
   // A non-default OpResolver to support custom Ops or specify a subset of
   // built-in Ops.
   std::unique_ptr<tflite::OpResolver> op_resolver =
-      absl::make_unique<MediaPipeBuiltinOpResolver>();
+      abslx::make_unique<MediaPipeBuiltinOpResolver>();
 };
 
 // Converts a BaseOptions to a BaseOptionsProto.

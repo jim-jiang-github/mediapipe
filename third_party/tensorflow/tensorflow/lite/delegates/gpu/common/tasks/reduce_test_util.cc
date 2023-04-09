@@ -27,7 +27,7 @@ namespace tflite {
 namespace gpu {
 namespace {
 template <DataType T>
-absl::Status ReduceSumChannelsIntTest(TestExecutionEnvironment* env) {
+abslx::Status ReduceSumChannelsIntTest(TestExecutionEnvironment* env) {
   tflite::gpu::Tensor<BHWC, T> src;
   src.shape = BHWC(1, 2, 1, 5);
   src.data = {1, 2, -5, -2, 1, 3, 4, -2, 1, 4};
@@ -54,21 +54,21 @@ absl::Status ReduceSumChannelsIntTest(TestExecutionEnvironment* env) {
     tflite::gpu::Tensor<BHWC, T> dst_tensor;
     dst.DownloadData(&dst_tensor);
     if (dst_tensor.data != ref_tensor.data) {
-      return absl::InternalError("not equal");
+      return abslx::InternalError("not equal");
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-template absl::Status ReduceSumChannelsIntTest<DataType::INT32>(
+template abslx::Status ReduceSumChannelsIntTest<DataType::INT32>(
     TestExecutionEnvironment* env);
-template absl::Status ReduceSumChannelsIntTest<DataType::INT16>(
+template abslx::Status ReduceSumChannelsIntTest<DataType::INT16>(
     TestExecutionEnvironment* env);
-template absl::Status ReduceSumChannelsIntTest<DataType::INT8>(
+template abslx::Status ReduceSumChannelsIntTest<DataType::INT8>(
     TestExecutionEnvironment* env);
 
 template <DataType T>
-absl::Status ReduceProductChannelsUIntTest(TestExecutionEnvironment* env) {
+abslx::Status ReduceProductChannelsUIntTest(TestExecutionEnvironment* env) {
   tflite::gpu::Tensor<BHWC, T> src;
   src.shape = BHWC(1, 3, 1, 2);
   src.data = {1, 2, 3, 4, 0, 7};
@@ -95,21 +95,21 @@ absl::Status ReduceProductChannelsUIntTest(TestExecutionEnvironment* env) {
     tflite::gpu::Tensor<BHWC, T> dst_tensor;
     dst.DownloadData(&dst_tensor);
     if (dst_tensor.data != ref_tensor.data) {
-      return absl::InternalError("not equal");
+      return abslx::InternalError("not equal");
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-template absl::Status ReduceProductChannelsUIntTest<DataType::INT32>(
+template abslx::Status ReduceProductChannelsUIntTest<DataType::INT32>(
     TestExecutionEnvironment* env);
-template absl::Status ReduceProductChannelsUIntTest<DataType::INT16>(
+template abslx::Status ReduceProductChannelsUIntTest<DataType::INT16>(
     TestExecutionEnvironment* env);
-template absl::Status ReduceProductChannelsUIntTest<DataType::INT8>(
+template abslx::Status ReduceProductChannelsUIntTest<DataType::INT8>(
     TestExecutionEnvironment* env);
 }  // namespace
 
-absl::Status MeanHWTest(TestExecutionEnvironment* env) {
+abslx::Status MeanHWTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 1);
   src_tensor.data = {1.0f, 2.0f, 3.0f, 4.0f};
@@ -133,10 +133,10 @@ absl::Status MeanHWTest(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear({2.5f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ReduceSumChannelsTest(TestExecutionEnvironment* env) {
+abslx::Status ReduceSumChannelsTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 5);
   src_tensor.data = {1.1, 2.1, 0.7, 0.3, 1.2, 3.1, 4.1, 0.0, 1.0, 4.4};
@@ -164,10 +164,10 @@ absl::Status ReduceSumChannelsTest(TestExecutionEnvironment* env) {
   RETURN_IF_ERROR(ReduceSumChannelsIntTest<DataType::INT32>(env));
   RETURN_IF_ERROR(ReduceSumChannelsIntTest<DataType::INT16>(env));
   RETURN_IF_ERROR(ReduceSumChannelsIntTest<DataType::INT8>(env));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ReduceProductChannelsTest(TestExecutionEnvironment* env) {
+abslx::Status ReduceProductChannelsTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {1.1, 2.0, 3.1, 4.0};
@@ -195,10 +195,10 @@ absl::Status ReduceProductChannelsTest(TestExecutionEnvironment* env) {
   RETURN_IF_ERROR(ReduceProductChannelsUIntTest<DataType::UINT32>(env));
   RETURN_IF_ERROR(ReduceProductChannelsUIntTest<DataType::UINT16>(env));
   RETURN_IF_ERROR(ReduceProductChannelsUIntTest<DataType::UINT8>(env));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ReduceMaxChannelsTest(TestExecutionEnvironment* env) {
+abslx::Status ReduceMaxChannelsTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 6);
   src_tensor.data = {1.1,  2.0,  -0.3, -100.0, 32.6, 1.1,
@@ -223,10 +223,10 @@ absl::Status ReduceMaxChannelsTest(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear({32.6f, -2.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ReduceMinChannelsTest(TestExecutionEnvironment* env) {
+abslx::Status ReduceMinChannelsTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 6);
   src_tensor.data = {1.1,  2.0,  -0.3, -100.0, 32.6, 1.1,
@@ -251,7 +251,7 @@ absl::Status ReduceMinChannelsTest(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear({-100.0f, -7.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

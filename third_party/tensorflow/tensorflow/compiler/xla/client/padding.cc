@@ -23,9 +23,9 @@ limitations under the License.
 
 namespace xla {
 
-Status ValidatePaddingValues(absl::Span<const int64_t> input_dimensions,
-                             absl::Span<const int64_t> window_dimensions,
-                             absl::Span<const int64_t> window_strides) {
+Status ValidatePaddingValues(abslx::Span<const int64_t> input_dimensions,
+                             abslx::Span<const int64_t> window_dimensions,
+                             abslx::Span<const int64_t> window_strides) {
   bool ok = input_dimensions.size() == window_dimensions.size() &&
             input_dimensions.size() == window_strides.size();
   if (!ok) {
@@ -39,9 +39,9 @@ Status ValidatePaddingValues(absl::Span<const int64_t> input_dimensions,
 }
 
 std::vector<std::pair<int64_t, int64_t>> MakePadding(
-    absl::Span<const int64_t> input_dimensions,
-    absl::Span<const int64_t> window_dimensions,
-    absl::Span<const int64_t> window_strides, Padding padding) {
+    abslx::Span<const int64_t> input_dimensions,
+    abslx::Span<const int64_t> window_dimensions,
+    abslx::Span<const int64_t> window_strides, Padding padding) {
   TF_CHECK_OK(ValidatePaddingValues(input_dimensions, window_dimensions,
                                     window_strides));
   std::vector<std::pair<int64_t, int64_t>> low_high_padding;

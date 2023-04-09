@@ -58,7 +58,7 @@ class ExecutorCache {
     // ExecutorCache class protects both the 'cache_' and the existence of each
     // Entry, but not the Entry's contents. 'configurations_mutex' protects the
     // contents of the entry after 'mutex_' has been dropped.
-    absl::Mutex configurations_mutex;
+    abslx::Mutex configurations_mutex;
 
     // Vector of cached {config, executor} pairs.
     std::vector<
@@ -69,7 +69,7 @@ class ExecutorCache {
   // Maps ordinal number to a list of cached executors for that ordinal.
   // We key off of ordinal (instead of just looking up all fields in the
   // StreamExecutorConfig) for a slight improvement in lookup time.
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
   std::map<int, Entry> cache_ ABSL_GUARDED_BY(mutex_);
 
   SE_DISALLOW_COPY_AND_ASSIGN(ExecutorCache);

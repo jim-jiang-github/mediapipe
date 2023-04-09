@@ -76,5 +76,5 @@ TEST(GraphTransformWrapper, ReplacedGraph) {
 
   EXPECT_EQ(4, graph.num_nodes());
   EXPECT_TRUE(
-      absl::StrContains(graph.ToGraphDefDebug().ShortDebugString(), "\"n2\""));
+      abslx::StrContains(graph.ToGraphDefDebug().ShortDebugString(), "\"n2\""));
 }

@@ -611,28 +611,28 @@ int IsNestedForDataHelper(PyObject* o) {
 
 ValueIteratorPtr GetValueIterator(PyObject* nested) {
   if (PyDict_Check(nested)) {
-    return absl::make_unique<DictValueIterator>(nested);
+    return abslx::make_unique<DictValueIterator>(nested);
   } else if (IsMappingHelper(nested)) {
-    return absl::make_unique<MappingValueIterator>(nested);
+    return abslx::make_unique<MappingValueIterator>(nested);
   } else if (IsAttrsHelper(nested)) {
-    return absl::make_unique<AttrsValueIterator>(nested);
+    return abslx::make_unique<AttrsValueIterator>(nested);
   } else {
-    return absl::make_unique<SequenceValueIterator>(nested);
+    return abslx::make_unique<SequenceValueIterator>(nested);
   }
 }
 
 // Similar to above, just specialized for the functions in the data package.
 ValueIteratorPtr GetValueIteratorForData(PyObject* nested) {
   if (PyDict_Check(nested)) {
-    return absl::make_unique<DictValueIterator>(nested);
+    return abslx::make_unique<DictValueIterator>(nested);
   } else if (IsMappingHelper(nested)) {
-    return absl::make_unique<MappingValueIterator>(nested);
+    return abslx::make_unique<MappingValueIterator>(nested);
   } else if (IsAttrsHelper(nested)) {
-    return absl::make_unique<AttrsValueIterator>(nested);
+    return abslx::make_unique<AttrsValueIterator>(nested);
   } else if (IsSparseTensorValueType(nested)) {
-    return absl::make_unique<SingleValueIterator>(nested);
+    return abslx::make_unique<SingleValueIterator>(nested);
   } else {
-    return absl::make_unique<SequenceValueIterator>(nested);
+    return abslx::make_unique<SequenceValueIterator>(nested);
   }
 }
 
@@ -641,7 +641,7 @@ ValueIteratorPtr GetValueIteratorForComposite(PyObject* nested) {
   if (IsCompositeTensor(nested)) {
     Safe_PyObjectPtr spec(PyObject_GetAttrString(nested, "_type_spec"));
     if (PyErr_Occurred() || !spec) {
-      return absl::make_unique<ErrorValueIterator>();
+      return abslx::make_unique<ErrorValueIterator>();
     }
 
     static char to_components[] = "_to_components";
@@ -649,17 +649,17 @@ ValueIteratorPtr GetValueIteratorForComposite(PyObject* nested) {
     Safe_PyObjectPtr components(
         PyObject_CallMethod(spec.get(), to_components, argspec, nested));
     if (PyErr_Occurred() || components == nullptr) {
-      return absl::make_unique<ErrorValueIterator>();
+      return abslx::make_unique<ErrorValueIterator>();
     }
-    return absl::make_unique<SingleValueIterator>(components.get());
+    return abslx::make_unique<SingleValueIterator>(components.get());
   }
 
   if (IsTypeSpec(nested)) {
     Safe_PyObjectPtr specs(PyObject_GetAttrString(nested, "_component_specs"));
     if (PyErr_Occurred() || specs == nullptr) {
-      return absl::make_unique<ErrorValueIterator>();
+      return abslx::make_unique<ErrorValueIterator>();
     }
-    return absl::make_unique<SingleValueIterator>(specs.get());
+    return abslx::make_unique<SingleValueIterator>(specs.get());
   }
 
   return GetValueIterator(nested);

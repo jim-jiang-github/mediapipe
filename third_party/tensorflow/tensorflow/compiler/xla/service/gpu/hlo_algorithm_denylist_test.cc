@@ -34,12 +34,12 @@ class DenylistTest : public testing::Test {
     std::string existing_xla_flags;
     const char* env = std::getenv("XLA_FLAGS");
     if (env != nullptr) {
-      existing_xla_flags = absl::StrCat(env, " ");
+      existing_xla_flags = abslx::StrCat(env, " ");
     }
 
     tensorflow::setenv(
         "XLA_FLAGS",
-        absl::StrCat(
+        abslx::StrCat(
             existing_xla_flags, "--xla_gpu_algorithm_denylist_path=",
             tensorflow::GetDataDependencyFilepath(tensorflow::io::JoinPath(
                 "tensorflow", "compiler", "xla", "service", "gpu", "data",

@@ -20,10 +20,10 @@
 #include "absl/status/status.h"
 #include "absl/strings/str_cat.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
-BadStatusOrAccess::BadStatusOrAccess(absl::Status status)
+BadStatusOrAccess::BadStatusOrAccess(abslx::Status status)
     : status_(std::move(status)) {}
 
 BadStatusOrAccess::~BadStatusOrAccess() = default;
@@ -31,11 +31,11 @@ const char* BadStatusOrAccess::what() const noexcept {
   return "Bad StatusOr access";
 }
 
-const absl::Status& BadStatusOrAccess::status() const { return status_; }
+const abslx::Status& BadStatusOrAccess::status() const { return status_; }
 
 namespace internal_statusor {
 
-void Helper::HandleInvalidStatusCtorArg(absl::Status* status) {
+void Helper::HandleInvalidStatusCtorArg(abslx::Status* status) {
   const char* kMessage =
       "An OK status is not a valid constructor argument to StatusOr<T>";
 #ifdef NDEBUG
@@ -44,23 +44,23 @@ void Helper::HandleInvalidStatusCtorArg(absl::Status* status) {
   ABSL_INTERNAL_LOG(FATAL, kMessage);
 #endif
   // In optimized builds, we will fall back to InternalError.
-  *status = absl::InternalError(kMessage);
+  *status = abslx::InternalError(kMessage);
 }
 
-void Helper::Crash(const absl::Status& status) {
+void Helper::Crash(const abslx::Status& status) {
   ABSL_INTERNAL_LOG(
       FATAL,
-      absl::StrCat("Attempting to fetch value instead of handling error ",
+      abslx::StrCat("Attempting to fetch value instead of handling error ",
                    status.ToString()));
 }
 
-void ThrowBadStatusOrAccess(absl::Status status) {
+void ThrowBadStatusOrAccess(abslx::Status status) {
 #ifdef ABSL_HAVE_EXCEPTIONS
-  throw absl::BadStatusOrAccess(std::move(status));
+  throw abslx::BadStatusOrAccess(std::move(status));
 #else
   ABSL_INTERNAL_LOG(
       FATAL,
-      absl::StrCat("Attempting to fetch value instead of handling error ",
+      abslx::StrCat("Attempting to fetch value instead of handling error ",
                    status.ToString()));
   std::abort();
 #endif
@@ -68,4 +68,4 @@ void ThrowBadStatusOrAccess(absl::Status status) {
 
 }  // namespace internal_statusor
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

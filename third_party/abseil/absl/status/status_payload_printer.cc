@@ -18,12 +18,12 @@
 #include "absl/base/attributes.h"
 #include "absl/base/internal/atomic_hook.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace status_internal {
 
 ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
-static absl::base_internal::AtomicHook<StatusPayloadPrinter> storage;
+static abslx::base_internal::AtomicHook<StatusPayloadPrinter> storage;
 
 void SetStatusPayloadPrinter(StatusPayloadPrinter printer) {
   storage.Store(printer);
@@ -35,4 +35,4 @@ StatusPayloadPrinter GetStatusPayloadPrinter() {
 
 }  // namespace status_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

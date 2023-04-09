@@ -22,9 +22,9 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status CumsumHWCTest(TestExecutionEnvironment* env);
+abslx::Status CumsumHWCTest(TestExecutionEnvironment* env);
 
-absl::Status CumsumBHWCTest(TestExecutionEnvironment* env);
+abslx::Status CumsumBHWCTest(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

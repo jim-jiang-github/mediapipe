@@ -28,7 +28,7 @@ class OperandUpcaster : public OpExpanderPass {
   explicit OperandUpcaster(HloPredicate extra_filter = nullptr)
       : OpExpanderPass(std::move(extra_filter)) {}
 
-  absl::string_view name() const override { return "operand_upcaster"; }
+  abslx::string_view name() const override { return "operand_upcaster"; }
 
  protected:
   bool InstructionMatchesPattern(HloInstruction* instruction) override;

@@ -42,7 +42,7 @@ class ImageToTensorConverter {
   // buffer the result should be written to.
   // @output_tensor a tensor with pre-defined shape. The "Convert" is
   // responsible of populating the content into the output tensor.
-  virtual absl::Status Convert(const mediapipe::Image& input,
+  virtual abslx::Status Convert(const mediapipe::Image& input,
                                const RotatedRect& roi, float range_min,
                                float range_max, int tensor_buffer_offset,
                                Tensor& output_tensor) = 0;

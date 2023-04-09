@@ -28,14 +28,14 @@ limitations under the License.
 namespace xla {
 namespace llvm_ir {
 using EmitCallToNestedComputationCallback =
-    std::function<Status(absl::Span<llvm::Value* const>, llvm::Value*)>;
+    std::function<Status(abslx::Span<llvm::Value* const>, llvm::Value*)>;
 // Emits llvm IR to do pairwise comparisons/swaps in the 'dimension_to_sort'
 // dimension of each array in 'values_arrays'. All other dimensions are kept
 // as-is. This implements the inner loop of BitonicSort. It is assumed that
 // 'xor_masks' contains only powers of 2, or values 2^k - 1 (k > 0).
 Status EmitSortInPlace(
     int64_t dimension_to_sort, const std::vector<IrArray>& values_arrays,
-    absl::string_view name, absl::Span<const int64_t> xor_masks,
+    abslx::string_view name, abslx::Span<const int64_t> xor_masks,
     llvm::IRBuilder<>* b, const gpu::LaunchDimensions& launch_dimensions,
     int64_t num_iterations_in_sort_dim, int64_t tile_size,
     const EmitCallToNestedComputationCallback& emit_compare_callback);

@@ -134,7 +134,7 @@ class TestDynamicTfOp : public OpKernel {
     TensorShape allocated_shape;
     OP_REQUIRES_OK(ctx,
                    TensorShapeUtils::MakeShape(
-                       absl::Span<const int>{static_cast<int>(size_to_cpy)},
+                       abslx::Span<const int>{static_cast<int>(size_to_cpy)},
                        &allocated_shape));
 
     Tensor* out_tensor = nullptr;
@@ -325,7 +325,7 @@ class TestDynamicTfWithBoundOp : public OpKernel {
     TensorShape allocated_shape;
     OP_REQUIRES_OK(ctx,
                    TensorShapeUtils::MakeShape(
-                       absl::Span<const int>{static_cast<int>(size_to_cpy)},
+                       abslx::Span<const int>{static_cast<int>(size_to_cpy)},
                        &allocated_shape));
 
     Tensor* out_tensor = nullptr;

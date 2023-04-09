@@ -362,7 +362,7 @@ StatusOr<bool> TryReshapeMoveOnCandidates(
 
     removed = false;
     for (auto operand : nontrivial_operands) {
-      if (absl::c_any_of(operand->users(), [&](HloInstruction* user) {
+      if (abslx::c_any_of(operand->users(), [&](HloInstruction* user) {
             return !reshape_candidates->count(user);
           })) {
         for (auto* user : operand->users()) {
@@ -390,7 +390,7 @@ StatusOr<bool> TryReshapeMoveOnCandidates(
 
 StatusOr<bool> ReshapeMover::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   for (auto* comp : module->MakeNonfusionComputations(execution_threads)) {
     HloInstructionSet reshape_candidates;

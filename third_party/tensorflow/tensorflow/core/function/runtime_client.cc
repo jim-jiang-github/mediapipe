@@ -86,7 +86,7 @@ StatusOr<FunctionDef> Runtime::GetFunctionProto(StringPiece name) {
   const FunctionDef* f = ctx.FindFunctionDef(std::string(name));
   if (f == nullptr) {
     return Status(error::INVALID_ARGUMENT,
-                  absl::StrCat("Could not find an attribute for key ", name));
+                  abslx::StrCat("Could not find an attribute for key ", name));
   }
 
   return *f;
@@ -119,7 +119,7 @@ Status Runtime::TransformFunction(StringPiece name, StringPiece pipeline_name) {
   if (mlir::failed(mlir::parsePassPipeline(std::string(pipeline_name), pm,
                                            error_stream))) {
     return Status(error::INVALID_ARGUMENT,
-                  absl::StrCat("locating pass pipeline ", pipeline_name, ": ",
+                  abslx::StrCat("locating pass pipeline ", pipeline_name, ": ",
                                error_stream.str()));
   }
 
@@ -139,20 +139,20 @@ Status Runtime::TransformFunction(StringPiece name, StringPiece pipeline_name) {
   if (failed(pm.run(mlir_fn->get()))) {
     return diagnostics_handler.Combine(
         Status(error::INVALID_ARGUMENT,
-               absl::StrCat("running pass pipeline ", pipeline_name, ": ")));
+               abslx::StrCat("running pass pipeline ", pipeline_name, ": ")));
   }
 
   for (auto fn : mlir_fn->get().getBody()->getOps<mlir::tfg::GraphFuncOp>()) {
     TF_RETURN_WITH_CONTEXT_IF_ERROR(
         CreateFunction(reinterpret_cast<OpaqueTfgGraphFuncOp*>(&fn)),
-        absl::StrCat("updating function ", fn.getName().str()));
+        abslx::StrCat("updating function ", fn.getName().str()));
   }
 
   return OkStatus();
 }
 
 StatusOr<ReturnValues> Runtime::CallFunction(
-    StringPiece name, absl::Span<AbstractTensorHandle* const> args) {
+    StringPiece name, abslx::Span<AbstractTensorHandle* const> args) {
   EagerContext& ctx = this->eager_ctx_;
 
   ImmediateOpPtr op(ctx.CreateOperation());
@@ -167,7 +167,7 @@ StatusOr<ReturnValues> Runtime::CallFunction(
   int actual_retvals = num_retvals;
   std::vector<ImmediateExecutionTensorHandle*> retvals(num_retvals);
   TF_RETURN_WITH_CONTEXT_IF_ERROR(
-      op->Execute(absl::MakeSpan(
+      op->Execute(abslx::MakeSpan(
                       reinterpret_cast<AbstractTensorHandle**>(retvals.data()),
                       num_retvals),
                   &actual_retvals),

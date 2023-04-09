@@ -21,7 +21,7 @@
 #include "absl/strings/internal/cord_rep_flat.h"
 #include "absl/strings/internal/cord_rep_ring.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 
@@ -33,7 +33,7 @@ ABSL_CONST_INIT std::atomic<bool> shallow_subcords_enabled(
 void CordRep::Destroy(CordRep* rep) {
   assert(rep != nullptr);
 
-  absl::InlinedVector<CordRep*, Constants::kInlinedVectorSize> pending;
+  abslx::InlinedVector<CordRep*, Constants::kInlinedVectorSize> pending;
   while (true) {
     assert(!rep->refcount.IsImmortal());
     if (rep->tag == CONCAT) {
@@ -80,4 +80,4 @@ void CordRep::Destroy(CordRep* rep) {
 
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

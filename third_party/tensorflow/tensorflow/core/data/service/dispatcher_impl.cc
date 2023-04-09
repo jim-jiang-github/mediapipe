@@ -109,7 +109,7 @@ std::string DatasetsDir(const std::string& work_dir) {
 }
 
 std::string DatasetKey(const std::string& dataset_id, uint64 fingerprint) {
-  return absl::StrCat("id_", dataset_id, "_fp_", fingerprint);
+  return abslx::StrCat("id_", dataset_id, "_fp_", fingerprint);
 }
 
 Status CreateWorkerStub(const std::string& address, const std::string& protocol,
@@ -189,7 +189,7 @@ DataServiceDispatcherImpl::~DataServiceDispatcherImpl() {
 Status DataServiceDispatcherImpl::Start() {
   mutex_lock l(mu_);
   if (config_.job_gc_timeout_ms() >= 0) {
-    iteration_gc_thread_ = absl::WrapUnique(env_->StartThread(
+    iteration_gc_thread_ = abslx::WrapUnique(env_->StartThread(
         {}, "iteration-gc-thread", [&] { IterationGcThread(); }));
   }
   if (config_.work_dir().empty()) {
@@ -235,7 +235,7 @@ Status DataServiceDispatcherImpl::Start() {
     // Conservatively pretend we just received a heartbeat from all clients, so
     // that we don't garbage collect iterations too early.
     latest_client_heartbeats_time_[client_id] =
-        absl::FromUnixMicros(env_->NowMicros());
+        abslx::FromUnixMicros(env_->NowMicros());
   }
   // Initialize the journal writer in `Start` so that we fail fast in case it
   // can't be initialized.
@@ -282,10 +282,10 @@ Status DataServiceDispatcherImpl::RestoreSplitProviders(
 }
 
 Status DataServiceDispatcherImpl::FindTasksToDelete(
-    const absl::flat_hash_set<int64_t>& current_tasks,
+    const abslx::flat_hash_set<int64_t>& current_tasks,
     const std::vector<std::shared_ptr<const Task>> assigned_tasks,
     WorkerHeartbeatResponse* response) {
-  absl::flat_hash_set<int64_t> assigned_ids;
+  abslx::flat_hash_set<int64_t> assigned_ids;
   for (const auto& assigned : assigned_tasks) {
     assigned_ids.insert(assigned->task_id);
   }
@@ -299,12 +299,12 @@ Status DataServiceDispatcherImpl::FindTasksToDelete(
 
 Status DataServiceDispatcherImpl::FindNewTasks(
     const std::string& worker_address,
-    const absl::flat_hash_set<int64_t>& current_tasks,
+    const abslx::flat_hash_set<int64_t>& current_tasks,
     std::vector<std::shared_ptr<const Task>>& assigned_tasks,
     WorkerHeartbeatResponse* response) TF_EXCLUSIVE_LOCKS_REQUIRED(mu_) {
   // Check for round-robin iterations that had tasks on the worker removed. Now
   // that the worker is back, we create a new pending task for the worker.
-  absl::flat_hash_set<int64_t> assigned_iteration_ids;
+  abslx::flat_hash_set<int64_t> assigned_iteration_ids;
   for (const auto& task : assigned_tasks) {
     assigned_iteration_ids.insert(task->iteration->iteration_id);
   }
@@ -355,7 +355,7 @@ Status DataServiceDispatcherImpl::WorkerHeartbeat(
     TF_RETURN_IF_ERROR(CreateTasksForWorker(worker_address));
     TF_RETURN_IF_ERROR(state_.TasksForWorker(worker_address, assigned_tasks));
   }
-  absl::flat_hash_set<int64_t> current_tasks;
+  abslx::flat_hash_set<int64_t> current_tasks;
   current_tasks.insert(request->current_tasks().cbegin(),
                        request->current_tasks().cend());
   TF_RETURN_IF_ERROR(
@@ -482,7 +482,7 @@ Status DataServiceDispatcherImpl::GetOrRegisterDataset(
   PrepareGraph(graph);
   TF_RETURN_IF_ERROR(HashGraph(*graph, &fingerprint));
   VLogLines(/*log_level=*/4,
-            absl::StrCat("Registering dataset graph: ", graph->DebugString()));
+            abslx::StrCat("Registering dataset graph: ", graph->DebugString()));
 
   mutex_lock l(mu_);
   TF_ASSIGN_OR_RETURN(std::optional<std::string> dataset_id,
@@ -582,7 +582,7 @@ Status DataServiceDispatcherImpl::GetOrCreateJob(
     if (request->optional_job_name_case() == GetOrCreateJobRequest::kJobName) {
       job_name = request->job_name();
     } else {
-      job_name = absl::StrCat("anonymous_job_", state_.NextAvailableJobId(),
+      job_name = abslx::StrCat("anonymous_job_", state_.NextAvailableJobId(),
                               "_", random::New64());
     }
     Status s = state_.JobByName(job_name, job);
@@ -803,7 +803,7 @@ Status DataServiceDispatcherImpl::AcquireIterationClientId(
   acquire_iteration_client->set_iteration_id(iteration->iteration_id);
   TF_RETURN_IF_ERROR(Apply(update));
   // Does not release clients before they start to read from the dataset.
-  latest_client_heartbeats_time_[iteration_client_id] = absl::InfiniteFuture();
+  latest_client_heartbeats_time_[iteration_client_id] = abslx::InfiniteFuture();
   return OkStatus();
 }
 
@@ -922,7 +922,7 @@ Status DataServiceDispatcherImpl::AssignTask(std::shared_ptr<const Task> task)
       return OkStatus();
     }
     return grpc_util::WrapError(
-        absl::StrCat("Failed to submit task to worker ", task->worker_address),
+        abslx::StrCat("Failed to submit task to worker ", task->worker_address),
         s);
   }
   VLOG(2) << "Finished assigning task " << task->task_id << " to worker "
@@ -937,7 +937,7 @@ Status DataServiceDispatcherImpl::ClientHeartbeat(
   VLOG(4) << "Received heartbeat from client id "
           << request->iteration_client_id();
   latest_client_heartbeats_time_[request->iteration_client_id()] =
-      absl::FromUnixMicros(env_->NowMicros());
+      abslx::FromUnixMicros(env_->NowMicros());
   std::shared_ptr<const Iteration> iteration;
   Status s = state_.IterationForIterationClientId(
       request->iteration_client_id(), iteration);
@@ -1146,9 +1146,9 @@ Status DataServiceDispatcherImpl::ReleaseMissingClients()
     TF_EXCLUSIVE_LOCKS_REQUIRED(mu_) {
   int64_t now = env_->NowMicros();
   for (const auto& client_id : state_.ListActiveClientIds()) {
-    if (absl::FromUnixMicros(now) >
+    if (abslx::FromUnixMicros(now) >
         latest_client_heartbeats_time_[client_id] +
-            absl::Milliseconds(config_.client_timeout_ms())) {
+            abslx::Milliseconds(config_.client_timeout_ms())) {
       LOG(INFO) << "Releasing timed-out client with id " << client_id;
       Update update;
       ReleaseIterationClientUpdate* release_client =

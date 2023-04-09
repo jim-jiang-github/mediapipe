@@ -74,7 +74,7 @@ class ImmediateInputStreamHandlerTest : public ::testing::Test {
 
   void SetupInputStreamHandler(
       const std::shared_ptr<tool::TagMap>& input_tag_map) {
-    calculator_state_ = absl::make_unique<CalculatorState>(
+    calculator_state_ = abslx::make_unique<CalculatorState>(
         "Node", /*node_id=*/0, "Calculator", CalculatorGraphConfig::Node(),
         nullptr);
     cc_manager_.Initialize(
@@ -82,7 +82,7 @@ class ImmediateInputStreamHandlerTest : public ::testing::Test {
         /*output_tag_map=*/tool::CreateTagMap({"output_a"}).value(),
         /*calculator_run_in_parallel=*/false);
 
-    absl::StatusOr<std::unique_ptr<mediapipe::InputStreamHandler>>
+    abslx::StatusOr<std::unique_ptr<mediapipe::InputStreamHandler>>
         status_or_handler = InputStreamHandlerRegistry::CreateByName(
             "ImmediateInputStreamHandler", input_tag_map, &cc_manager_,
             MediaPipeOptions(),
@@ -108,10 +108,10 @@ class ImmediateInputStreamHandlerTest : public ::testing::Test {
     cc_ = cc;
   }
 
-  void RecordError(const absl::Status& error) { errors_.push_back(error); }
+  void RecordError(const abslx::Status& error) { errors_.push_back(error); }
 
-  absl::Status SetupShardsNoOp(CalculatorContext* calculator_context) {
-    return absl::OkStatus();
+  abslx::Status SetupShardsNoOp(CalculatorContext* calculator_context) {
+    return abslx::OkStatus();
   }
 
   void ReportQueueNoOp(InputStreamManager* stream, bool* stream_was_full) {}
@@ -140,13 +140,13 @@ class ImmediateInputStreamHandlerTest : public ::testing::Test {
   std::function<void()> headers_ready_callback_;
   std::function<void()> notification_callback_;
   std::function<void(CalculatorContext*)> schedule_callback_;
-  std::function<void(absl::Status)> error_callback_;
-  std::function<absl::Status(CalculatorContext*)> setup_shards_callback_;
+  std::function<void(abslx::Status)> error_callback_;
+  std::function<abslx::Status(CalculatorContext*)> setup_shards_callback_;
   InputStreamManager::QueueSizeCallback queue_full_callback_;
   InputStreamManager::QueueSizeCallback queue_not_full_callback_;
 
   // Vector of errors encountered while using the stream.
-  std::vector<absl::Status> errors_;
+  std::vector<abslx::Status> errors_;
 
   std::unique_ptr<CalculatorState> calculator_state_;
   CalculatorContextManager cc_manager_;

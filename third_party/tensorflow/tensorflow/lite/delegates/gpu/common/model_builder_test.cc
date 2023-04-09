@@ -759,7 +759,7 @@ TEST(ModelBuilderTest, GetOpsToReplaceMultiplePartitions) {
   // As the Dequant op is not pruned and the ADD op could run on GPU, we have
   // 2 partitions with an ADD each (op #1 and op #3).
   ASSERT_EQ(ops_to_replace->size, 2);
-  EXPECT_THAT(absl::MakeConstSpan(ops_to_replace->data, 2),
+  EXPECT_THAT(abslx::MakeConstSpan(ops_to_replace->data, 2),
               testing::UnorderedElementsAre(1, 3));
 
   TfLiteIntArrayFree(ops_to_replace);
@@ -1350,7 +1350,7 @@ TEST(ModelBuilderTest, GetOpsToReplaceRejectsSplitOpGl) {
         *num_partitions = 0;
         return kTfLiteOk;
       };
-  absl::flat_hash_set<TfLiteBuiltinOperator> excluded_ops = {
+  abslx::flat_hash_set<TfLiteBuiltinOperator> excluded_ops = {
       kTfLiteBuiltinSplit};
   TfLiteIntArray* ops_to_replace =
       GetOpsToReplace(context, /*allow_quant_ops=*/false,

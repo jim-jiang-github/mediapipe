@@ -75,7 +75,7 @@ TEST(DetectionLetterboxRemovalCalculatorTest, PaddingLeftRight) {
       CreateRelativeLocationData(0.25f, 0.25f, 0.25f, 0.25f);
   const std::string label = "detected_object";
 
-  auto detections = absl::make_unique<std::vector<Detection>>();
+  auto detections = abslx::make_unique<std::vector<Detection>>();
   detections->push_back(
       CreateDetection({label}, {}, {0.3f}, location_data, "feature_tag"));
   runner.MutableInputs()
@@ -83,7 +83,7 @@ TEST(DetectionLetterboxRemovalCalculatorTest, PaddingLeftRight) {
       .packets.push_back(
           Adopt(detections.release()).At(Timestamp::PostStream()));
 
-  auto padding = absl::make_unique<std::array<float, 4>>(
+  auto padding = abslx::make_unique<std::array<float, 4>>(
       std::array<float, 4>{0.2f, 0.f, 0.3f, 0.f});
   runner.MutableInputs()
       ->Tag(kLetterboxPaddingTag)
@@ -123,7 +123,7 @@ TEST(DetectionLetterboxRemovalCalculatorTest, PaddingTopBottom) {
       CreateRelativeLocationData(0.25f, 0.25f, 0.25f, 0.25f);
   const std::string label = "detected_object";
 
-  auto detections = absl::make_unique<std::vector<Detection>>();
+  auto detections = abslx::make_unique<std::vector<Detection>>();
   detections->push_back(
       CreateDetection({label}, {}, {0.3f}, location_data, "feature_tag"));
   runner.MutableInputs()
@@ -131,7 +131,7 @@ TEST(DetectionLetterboxRemovalCalculatorTest, PaddingTopBottom) {
       .packets.push_back(
           Adopt(detections.release()).At(Timestamp::PostStream()));
 
-  auto padding = absl::make_unique<std::array<float, 4>>(
+  auto padding = abslx::make_unique<std::array<float, 4>>(
       std::array<float, 4>{0.f, 0.2f, 0.f, 0.3f});
   runner.MutableInputs()
       ->Tag(kLetterboxPaddingTag)

@@ -167,7 +167,7 @@ class SchedulerQueue : public TaskQueue {
 
   SchedulerShared* const shared_;
 
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
 };
 
 }  // namespace internal

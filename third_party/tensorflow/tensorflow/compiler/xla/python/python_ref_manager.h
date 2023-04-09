@@ -46,7 +46,7 @@ class PythonRefManager {
    public:
     ManagedPyObjects() = default;
     ManagedPyObjects(PythonRefManager* manager,
-                     absl::Span<pybind11::object> objects);
+                     abslx::Span<pybind11::object> objects);
 
     ~ManagedPyObjects();
 
@@ -57,7 +57,7 @@ class PythonRefManager {
 
    private:
     PythonRefManager* manager_ = nullptr;
-    absl::InlinedVector<pybind11::object, 1> objects_;
+    abslx::InlinedVector<pybind11::object, 1> objects_;
   };
 
   // Creates a managed std::shared_ptr to an object. When the shared_ptr is
@@ -65,11 +65,11 @@ class PythonRefManager {
   // and collected next time CollectGarbage() is called.
   std::shared_ptr<ManagedPyObjects> ManageReference(pybind11::object object);
   std::shared_ptr<ManagedPyObjects> ManageReferences(
-      absl::Span<pybind11::object> objects);
+      abslx::Span<pybind11::object> objects);
 
   // Adds garbage objects to the manager.
-  void AddGarbage(absl::Span<pybind11::object> garbage);
-  void AddGarbage(absl::Span<std::pair<PyCodeObject*, int> const> garbage);
+  void AddGarbage(abslx::Span<pybind11::object> garbage);
+  void AddGarbage(abslx::Span<std::pair<PyCodeObject*, int> const> garbage);
 
   // Releases the contents of python_garbage_. Requires that the GIL is held.
   // The client calls this method during API entry points where the GIL is held
@@ -86,7 +86,7 @@ class PythonRefManager {
   }
 
  private:
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   std::deque<pybind11::object> python_garbage_ ABSL_GUARDED_BY(mu_);
 
   // Writes to garbage_count_ are protected by mu_, reads are not protected.

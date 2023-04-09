@@ -39,10 +39,10 @@ namespace {
 
 class SimpleTestCalculator : public CalculatorBase {
  public:
-  absl::Status Process(CalculatorContext* cc) override {
-    return absl::OkStatus();
+  abslx::Status Process(CalculatorContext* cc) override {
+    return abslx::OkStatus();
   }
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     for (PacketType& type : cc->Inputs()) {
       type.Set<int>();
     }
@@ -52,7 +52,7 @@ class SimpleTestCalculator : public CalculatorBase {
     for (PacketType& type : cc->InputSidePackets()) {
       type.Set<int>();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(SimpleTestCalculator);
@@ -67,7 +67,7 @@ REGISTER_CALCULATOR(SomeAggregator);
 
 class TestSubgraph : public Subgraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       const SubgraphOptions& /*options*/) override {
     CalculatorGraphConfig config =
         mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(R"pb(
@@ -96,7 +96,7 @@ REGISTER_MEDIAPIPE_GRAPH(TestSubgraph);
 
 class PacketFactoryTestSubgraph : public Subgraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       const SubgraphOptions& /*options*/) override {
     CalculatorGraphConfig config =
         mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(R"pb(
@@ -127,7 +127,7 @@ REGISTER_MEDIAPIPE_GRAPH(PacketFactoryTestSubgraph);
 // and the number of copies of the node are specified in subgraph options.
 class NodeChainSubgraph : public Subgraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       const SubgraphOptions& options) override {
     auto opts =
         Subgraph::GetOptions<mediapipe::NodeChainSubgraphOptions>(options);
@@ -137,12 +137,12 @@ class NodeChainSubgraph : public Subgraph {
     RET_CHECK_GT(chain_length, 0);
     CalculatorGraphConfig config;
     config.add_input_stream("INPUT:stream_0");
-    config.add_output_stream(absl::StrCat("OUTPUT:stream_", chain_length));
+    config.add_output_stream(abslx::StrCat("OUTPUT:stream_", chain_length));
     for (int i = 0; i < chain_length; ++i) {
       CalculatorGraphConfig::Node* node = config.add_node();
       node->set_calculator(node_type);
-      node->add_input_stream(absl::StrCat("stream_", i));
-      node->add_output_stream(absl::StrCat("stream_", i + 1));
+      node->add_input_stream(abslx::StrCat("stream_", i));
+      node->add_output_stream(abslx::StrCat("stream_", i + 1));
     }
     return config;
   }
@@ -153,7 +153,7 @@ REGISTER_MEDIAPIPE_GRAPH(NodeChainSubgraph);
 // subgraph contains a node with the executor field "custom_thread_pool".
 class NodeWithExecutorSubgraph : public Subgraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       const SubgraphOptions& options) override {
     CalculatorGraphConfig config =
         mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(R"pb(
@@ -175,7 +175,7 @@ REGISTER_MEDIAPIPE_GRAPH(NodeWithExecutorSubgraph);
 // subgraph contains a NodeWithExecutorSubgraph.
 class EnclosingSubgraph : public Subgraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       const SubgraphOptions& options) override {
     CalculatorGraphConfig config =
         mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(R"pb(
@@ -213,7 +213,7 @@ TEST(SubgraphExpansionTest, TransformStreamNames) {
           input_stream: "AUDIO:1:input_4_foo"
         }
       )pb");
-  auto add_foo = [](absl::string_view s) { return absl::StrCat(s, "_foo"); };
+  auto add_foo = [](abslx::string_view s) { return abslx::StrCat(s, "_foo"); };
   MP_EXPECT_OK(tool::TransformStreamNames(
       (*config.mutable_node())[0].mutable_input_stream(), add_foo));
   EXPECT_THAT(config, mediapipe::EqualsProto(expected_config));
@@ -257,8 +257,8 @@ TEST(SubgraphExpansionTest, TransformNames) {
           output_stream: "__sg0_output_2"
         }
       )pb");
-  auto add_prefix = [](absl::string_view s) {
-    return absl::StrCat("__sg0_", s);
+  auto add_prefix = [](abslx::string_view s) {
+    return abslx::StrCat("__sg0_", s);
   };
   MP_EXPECT_OK(tool::TransformNames(&config, add_prefix));
   EXPECT_THAT(config, mediapipe::EqualsProto(expected_config));
@@ -475,12 +475,12 @@ TEST(SubgraphExpansionTest, ValidateSubgraphFields) {
           buffer_size_hint: -1  # This field is only applicable to calculators.
         }
       )pb");
-  absl::Status s1 = tool::ValidateSubgraphFields(supergraph.node(1));
-  EXPECT_EQ(s1.code(), absl::StatusCode::kInvalidArgument);
+  abslx::Status s1 = tool::ValidateSubgraphFields(supergraph.node(1));
+  EXPECT_EQ(s1.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(s1.message(), testing::HasSubstr("foo_subgraph"));
 
-  absl::Status s2 = tool::ExpandSubgraphs(&supergraph);
-  EXPECT_EQ(s2.code(), absl::StatusCode::kInvalidArgument);
+  abslx::Status s2 = tool::ExpandSubgraphs(&supergraph);
+  EXPECT_EQ(s2.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(s2.message(), testing::HasSubstr("foo_subgraph"));
 }
 
@@ -531,7 +531,7 @@ const mediapipe::GraphService<std::string> kStringTestService{
     "mediapipe::StringTestService"};
 class GraphServicesClientTestSubgraph : public Subgraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     auto string_service = sc->Service(kStringTestService);
     RET_CHECK(string_service.IsAvailable()) << "Service not available";

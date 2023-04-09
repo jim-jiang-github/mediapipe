@@ -62,7 +62,7 @@ namespace {
 namespace py = pybind11;
 
 struct Uniquer {
-  absl::Mutex mu;
+  abslx::Mutex mu;
   NameUniquer name_uniquer ABSL_GUARDED_BY(mu);
 };
 
@@ -73,7 +73,7 @@ Uniquer* GetUniquer() {
 
 static std::string UniquifyName(const std::string& name) {
   Uniquer* uniquer = GetUniquer();
-  absl::MutexLock lock(&uniquer->mu);
+  abslx::MutexLock lock(&uniquer->mu);
   return uniquer->name_uniquer.GetUniqueName(name);
 }
 
@@ -146,13 +146,13 @@ StatusOr<std::string> GetComputationHloDotGraph(
 StatusOr<uint64_t> HashComputation(const XlaComputation& computation) {
   TF_ASSIGN_OR_RETURN(std::shared_ptr<HloModule> hlo_module,
                       GetHloModule(computation));
-  return absl::HashOf(*hlo_module);
+  return abslx::HashOf(*hlo_module);
 }
 // Safe version of ShapeUtil::MakeShapeWithLayout that fails gracefully on
 // invalid input.
 StatusOr<Shape> MakeShapeWithLayout(
-    PrimitiveType element_type, absl::Span<const int64_t> dims,
-    std::optional<absl::Span<const int64_t>> minor_to_major,
+    PrimitiveType element_type, abslx::Span<const int64_t> dims,
+    std::optional<abslx::Span<const int64_t>> minor_to_major,
     std::optional<const std::vector<bool>> dynamic_dimensions) {
   Shape shape;
   if (dynamic_dimensions) {
@@ -183,8 +183,8 @@ Status PyRegisterCustomCallTarget(const std::string& fn_name,
   static const char* const kName = "xla._CUSTOM_CALL_TARGET";
   // TODO(phawkins): remove old name after fixing users.
   static const char* const kOldCpuName = "xla._CPU_CUSTOM_CALL_TARGET";
-  if (absl::string_view(capsule.name()) != kName &&
-      absl::string_view(capsule.name()) != kOldCpuName) {
+  if (abslx::string_view(capsule.name()) != kName &&
+      abslx::string_view(capsule.name()) != kOldCpuName) {
     return InvalidArgument(
         "Argument to RegisterCustomCallTargetRegistry was not a "
         "xla._CUSTOM_CALL_TARGET capsule.");
@@ -229,7 +229,7 @@ void BuildXlaCompilerSubmodule(py::module& m) {
       .def("__ne__", [](const Layout& layout,
                         const Layout& other) { return layout != other; })
       .def("__hash__",
-           [](const Layout& layout) { return absl::HashOf(layout); })
+           [](const Layout& layout) { return abslx::HashOf(layout); })
       .def("to_string", &Layout::ToString);
 
   py::class_<Shape> shape_class(m, "Shape");
@@ -355,14 +355,14 @@ void BuildXlaCompilerSubmodule(py::module& m) {
                         const Shape& other) { return shape == other; })
       .def("__ne__", [](const Shape& shape,
                         const Shape& other) { return shape != other; })
-      .def("__hash__", [](const Shape& shape) { return absl::HashOf(shape); })
+      .def("__hash__", [](const Shape& shape) { return abslx::HashOf(shape); })
       .def("__repr__", [](const Shape& shape) {
         return shape.ToString(/*print_layout=*/true);
       });
 
   py::class_<ProgramShape>(m, "ProgramShape")
       .def(py::init(
-          [](absl::Span<const Shape> params, Shape result) -> ProgramShape {
+          [](abslx::Span<const Shape> params, Shape result) -> ProgramShape {
             ProgramShape program_shape;
             for (const Shape& param : params) {
               *program_shape.add_parameters() = param;
@@ -386,7 +386,7 @@ void BuildXlaCompilerSubmodule(py::module& m) {
       .def("__ne__", [](const ShapeIndex& shape_ind,
                         const ShapeIndex& other) { return shape_ind != other; })
       .def("__hash__",
-           [](const ShapeIndex& shape_ind) { return absl::HashOf(shape_ind); });
+           [](const ShapeIndex& shape_ind) { return abslx::HashOf(shape_ind); });
 
   // Literals
   py::class_<Literal, std::shared_ptr<Literal>>(m, "Literal")
@@ -770,7 +770,7 @@ void BuildXlaCompilerSubmodule(py::module& m) {
       .def("__eq__", [](const xla::HloSharding& a,
                         const xla::HloSharding& b) { return a == b; })
       .def("__hash__",
-           [](const xla::HloSharding& self) { return absl::HashOf(self); })
+           [](const xla::HloSharding& self) { return abslx::HashOf(self); })
       .def("is_replicated", &xla::HloSharding::IsReplicated)
       .def("to_proto", &xla::HloSharding::ToProto);
 

@@ -26,7 +26,7 @@ namespace tensorflow {
 namespace testing {
 namespace {
 
-constexpr absl::string_view kZeroArgInputSignatureTextProto = R"(
+constexpr abslx::string_view kZeroArgInputSignatureTextProto = R"(
 tuple_value: {
     values: {
       tuple_value: {
@@ -39,7 +39,7 @@ tuple_value: {
 }
 )";
 
-constexpr absl::string_view kSingleArgInputSignatureTextProto = R"(
+constexpr abslx::string_view kSingleArgInputSignatureTextProto = R"(
 tuple_value: {
     values: {
     tuple_value: {
@@ -66,7 +66,7 @@ tuple_value: {
 }
 )";
 
-constexpr absl::string_view kThreeArgInputSignatureTextProto = R"(
+constexpr abslx::string_view kThreeArgInputSignatureTextProto = R"(
 tuple_value: {
   values: {
     tuple_value: {
@@ -113,11 +113,11 @@ tuple_value: {
 
 )";
 
-constexpr absl::string_view kZeroReturnOutputSignatureTextProto = R"(
+constexpr abslx::string_view kZeroReturnOutputSignatureTextProto = R"(
 none_value: {}
 )";
 
-constexpr absl::string_view kSingleReturnOutputSignatureTextProto = R"(
+constexpr abslx::string_view kSingleReturnOutputSignatureTextProto = R"(
 tensor_spec_value: {
   shape: {
     dim: {
@@ -128,7 +128,7 @@ tensor_spec_value: {
 }
 )";
 
-constexpr absl::string_view kThreeReturnOutputSignatureTextProto = R"(
+constexpr abslx::string_view kThreeReturnOutputSignatureTextProto = R"(
 tuple_value: {
     values: {
     dict_value: {
@@ -176,7 +176,7 @@ tuple_value: {
 }
 )";
 
-StructuredValue ParseStructuredValue(absl::string_view text_proto) {
+StructuredValue ParseStructuredValue(abslx::string_view text_proto) {
   StructuredValue value;
   CHECK(tensorflow::protobuf::TextFormat::ParseFromString(string(text_proto),
                                                           &value));

@@ -85,7 +85,7 @@ void ProcessOneTfActivity(const TfActivity& activity,
   switch (activity.activity_type) {
     case kTfOpBegin: {
       tf_op_stack->Push(tf_op_id,
-                        absl::make_unique<TfOpInfo>(activity.timestamp_ps));
+                        abslx::make_unique<TfOpInfo>(activity.timestamp_ps));
       break;
     }
     case kTfOpEnd: {
@@ -119,7 +119,7 @@ void ProcessOneTfActivity(const TfActivity& activity,
 void ProcessTfActivities(std::vector<TfActivity>* tf_activities,
                          TfMetricsDbData* tf_metrics_db_data) {
   if (tf_activities->empty()) return;
-  absl::c_stable_sort(*tf_activities,
+  abslx::c_stable_sort(*tf_activities,
                       [](const TfActivity& a, const TfActivity& b) {
                         return a.timestamp_ps < b.timestamp_ps;
                       });
@@ -133,7 +133,7 @@ void ProcessTfActivities(std::vector<TfActivity>* tf_activities,
 }
 
 void CollectTfActivities(const XLineVisitor& line,
-                         const absl::flat_hash_map<int64_t, TfOp>& tf_ops,
+                         const abslx::flat_hash_map<int64_t, TfOp>& tf_ops,
                          std::vector<TfActivity>* tf_activities) {
   uint32 tf_op_id = 0;
   tf_activities->reserve(line.NumEvents() * 2);
@@ -143,7 +143,7 @@ void CollectTfActivities(const XLineVisitor& line,
     if (tf_op != nullptr) {
       ++tf_op_id;
       bool is_eager = false;
-      if (absl::optional<XStatVisitor> stat =
+      if (abslx::optional<XStatVisitor> stat =
               event.GetStat(StatType::kIsEager)) {
         is_eager = stat->IntValue();
       }
@@ -258,9 +258,9 @@ void SetOpMetricsFromHloEvent(const XEventVisitor& hlo_event,
 
 }  // namespace
 
-absl::flat_hash_map<int64_t, TfOp> CollectTfOpsFromHostThreadsXPlane(
+abslx::flat_hash_map<int64_t, TfOp> CollectTfOpsFromHostThreadsXPlane(
     const XPlane& host_trace) {
-  absl::flat_hash_map<int64_t, TfOp> tf_ops;
+  abslx::flat_hash_map<int64_t, TfOp> tf_ops;
   for (const auto& id_metadata : host_trace.event_metadata()) {
     const XEventMetadata& metadata = id_metadata.second;
     // On the host, we have added some user-specified TraceMe's in addition to
@@ -277,7 +277,7 @@ absl::flat_hash_map<int64_t, TfOp> CollectTfOpsFromHostThreadsXPlane(
 
 TfMetricsDbData ConvertHostThreadsXLineToTfMetricsDbData(
     const XLineVisitor& line,
-    const absl::flat_hash_map<int64_t, TfOp>& tf_ops) {
+    const abslx::flat_hash_map<int64_t, TfOp>& tf_ops) {
   TfMetricsDbData tf_metrics_db_data;
   if (!tf_ops.empty()) {
     std::vector<TfActivity> tf_activities;
@@ -296,7 +296,7 @@ void ConsumeTfMetricsDbData(TfMetricsDbData src, OpMetricsDbCombiner* dst) {
 }
 
 OpMetricsDb ConvertHostThreadsXPlaneToOpMetricsDb(const XPlane& host_trace) {
-  absl::flat_hash_map<int64_t, TfOp> tf_ops =
+  abslx::flat_hash_map<int64_t, TfOp> tf_ops =
       CollectTfOpsFromHostThreadsXPlane(host_trace);
   OpMetricsDb result;
   OpMetricsDbCombiner combiner(&result);
@@ -312,8 +312,8 @@ OpMetricsDb ConvertTpuDeviceTraceXPlaneToOpMetricsDb(
     const XPlane& device_trace) {
   OpMetricsDb result;
   XPlaneVisitor plane = CreateTfXPlaneVisitor(&device_trace);
-  using OpMetricBySymbol = absl::flat_hash_map<int64_t, OpMetrics>;
-  absl::flat_hash_map<int64_t, OpMetricBySymbol> flat_op_metric;
+  using OpMetricBySymbol = abslx::flat_hash_map<int64_t, OpMetrics>;
+  abslx::flat_hash_map<int64_t, OpMetricBySymbol> flat_op_metric;
   plane.ForEachLine([&](const XLineVisitor& line) {
     line.ForEachEvent([&](const XEventVisitor& event) {
       OpKey key = GetOpKeyFromHloEventMetadata(event.Metadata());
@@ -351,7 +351,7 @@ OpMetricsDb ConvertDeviceTraceXPlaneToOpMetricsDb(const XPlane& device_trace) {
       first_op_offset_ps = std::min(first_op_offset_ps, event.OffsetPs());
       last_op_offset_ps = std::max(last_op_offset_ps, event.EndOffsetPs());
 
-      absl::string_view tf_op_full_name;
+      abslx::string_view tf_op_full_name;
       bool is_eager = false;
       event.ForEachStat([&](const XStatVisitor& stat) {
         if (stat.Type() == StatType::kTfOp) {
@@ -367,7 +367,7 @@ OpMetricsDb ConvertDeviceTraceXPlaneToOpMetricsDb(const XPlane& device_trace) {
         costs = op_level_cost_estimator.Predict(event);
       }
       device_op_metrics_db_builder.EnterOp(
-          /*program_id=*/0, absl::StrCat(tf_op.name, "/", event.Name()),
+          /*program_id=*/0, abslx::StrCat(tf_op.name, "/", event.Name()),
           tf_op.type, tf_op_full_name, is_eager,
           /*occurrences=*/1, event.DurationPs(),
           /*children_time_ps=*/0, costs.flops, costs.bytes_accessed);

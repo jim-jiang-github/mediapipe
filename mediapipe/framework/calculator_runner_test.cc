@@ -45,7 +45,7 @@ constexpr char kSideOutputTag[] = "SIDE_OUTPUT";
 // at InputTimestamp. The headers are strings.
 class CalculatorRunnerTestCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<int>();
     cc->Inputs().Index(1).Set<int>();
     cc->Outputs().Index(0).Set<int>();
@@ -55,33 +55,33 @@ class CalculatorRunnerTestCalculator : public CalculatorBase {
     cc->OutputSidePackets()
         .Tag(kSideOutputTag)
         .SetSameAs(&cc->InputSidePackets().Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     std::string input_header_string =
-        absl::StrCat(cc->Inputs().Index(0).Header().Get<std::string>(),
+        abslx::StrCat(cc->Inputs().Index(0).Header().Get<std::string>(),
                      cc->Inputs().Index(1).Header().Get<std::string>());
     for (int i = 0; i < cc->Outputs().NumEntries(); ++i) {
       // Set the header to the concatenation of the input headers and
       // the index of the output stream.
       cc->Outputs().Index(i).SetHeader(
-          Adopt(new std::string(absl::StrCat(input_header_string, i))));
+          Adopt(new std::string(abslx::StrCat(input_header_string, i))));
     }
     cc->OutputSidePackets()
         .Tag(kSideOutputTag)
         .Set(cc->InputSidePackets().Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     for (int index = 0; index < 2; ++index) {
       cc->Outputs().Index(index).Add(
           new int(-cc->Inputs().Index(index).Get<int>()), cc->InputTimestamp());
     }
     cc->Outputs().Index(2).AddPacket(
         cc->InputSidePackets().Index(0).At(cc->InputTimestamp()));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(CalculatorRunnerTestCalculator);
@@ -92,7 +92,7 @@ REGISTER_CALCULATOR(CalculatorRunnerTestCalculator);
 //          with the same tag name (and any index).
 class CalculatorRunnerMultiTagTestCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     for (const std::string& tag : cc->Inputs().GetTags()) {
       for (CollectionItemId item_id = cc->Inputs().BeginId(tag);
            item_id < cc->Inputs().EndId(tag); ++item_id) {
@@ -100,12 +100,12 @@ class CalculatorRunnerMultiTagTestCalculator : public CalculatorBase {
       }
       cc->Outputs().Get(tag, 0).Set<int>();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     for (const std::string& tag : cc->Inputs().GetTags()) {
-      auto sum = absl::make_unique<int>(0);
+      auto sum = abslx::make_unique<int>(0);
       for (CollectionItemId item_id = cc->Inputs().BeginId(tag);
            item_id < cc->Inputs().EndId(tag); ++item_id) {
         if (!cc->Inputs().Get(item_id).IsEmpty()) {
@@ -114,7 +114,7 @@ class CalculatorRunnerMultiTagTestCalculator : public CalculatorBase {
       }
       cc->Outputs().Get(tag, 0).Add(sum.release(), cc->InputTimestamp());
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(CalculatorRunnerMultiTagTestCalculator);
@@ -150,7 +150,7 @@ TEST(CalculatorRunner, RunsCalculator) {
       // Set the header to the concatenation of kHeaderPrefix and the index of
       // the input stream.
       runner.MutableInputs()->Index(index).header =
-          Adopt(new std::string(absl::StrCat(kHeaderPrefix, index)));
+          Adopt(new std::string(abslx::StrCat(kHeaderPrefix, index)));
     }
     const int input_side_packet_content = 10 + iter;
     runner.MutableSidePackets()->Index(0) =
@@ -165,7 +165,7 @@ TEST(CalculatorRunner, RunsCalculator) {
     for (int index = 0; index < outputs.NumEntries(); ++index) {
       // The header should be the concatenation of the input headers
       // and the index of the output stream.
-      EXPECT_EQ(absl::StrCat(kHeaderPrefix, 0, kHeaderPrefix, 1, index),
+      EXPECT_EQ(abslx::StrCat(kHeaderPrefix, 0, kHeaderPrefix, 1, index),
                 outputs.Index(index).header.Get<std::string>());
       // Check the packets.
       const std::vector<Packet>& packets = outputs.Index(index).packets;

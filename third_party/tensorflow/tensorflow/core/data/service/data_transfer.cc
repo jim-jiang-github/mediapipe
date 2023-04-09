@@ -111,7 +111,7 @@ Status DataTransferServer::Build(std::string name, GetElementT get_element,
 
   return errors::NotFound(
       "No data transfer server factory has been registered for name ", name,
-      ". The available names are: [ ", absl::StrJoin(available_names, ", "),
+      ". The available names are: [ ", abslx::StrJoin(available_names, ", "),
       " ]");
 }
 
@@ -139,7 +139,7 @@ Status DataTransferClient::Build(std::string name, Config config,
 
   return errors::NotFound(
       "No data transfer client factory has been registered for name ", name,
-      ". The available names are: [ ", absl::StrJoin(available_names, ", "),
+      ". The available names are: [ ", abslx::StrJoin(available_names, ", "),
       " ]");
 }
 

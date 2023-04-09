@@ -38,10 +38,10 @@ class Tokenizer {
   virtual TokenizerResult Tokenize(const std::string& input) = 0;
 
   // Find the id of a string token.
-  virtual bool LookupId(absl::string_view key, int* result) const = 0;
+  virtual bool LookupId(abslx::string_view key, int* result) const = 0;
 
   // Find the string token from an id.
-  virtual bool LookupWord(int vocab_id, absl::string_view* result) const = 0;
+  virtual bool LookupWord(int vocab_id, abslx::string_view* result) const = 0;
 
   // Destructor.
   virtual ~Tokenizer() = default;

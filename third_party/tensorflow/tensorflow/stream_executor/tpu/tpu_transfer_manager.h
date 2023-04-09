@@ -63,7 +63,7 @@ class TpuTransferManager : public xla::TpuTransferManagerInterface {
       const std::deque<tensorflow::tpu::NoncopyableBuffer>& buffers) override;
 
   Status ResetDevices(
-      absl::Span<stream_executor::StreamExecutor* const> executor) override;
+      abslx::Span<stream_executor::StreamExecutor* const> executor) override;
 
   int64_t GetByteSizeRequirement(const xla::Shape& shape) const override;
 
@@ -80,7 +80,7 @@ class TpuTransferManager : public xla::TpuTransferManagerInterface {
 
   Status WriteSingleTupleIndexTable(
       stream_executor::Stream* stream,
-      absl::Span<const stream_executor::DeviceMemoryBase> elements,
+      abslx::Span<const stream_executor::DeviceMemoryBase> elements,
       const xla::Shape& shape,
       stream_executor::DeviceMemoryBase* region) override;
 

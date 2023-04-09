@@ -61,7 +61,7 @@ class SummaryFileWriterTest : public ::testing::Test {
     TF_CHECK_OK(env_.GetChildren(testing::TmpDir(), &files));
     bool found = false;
     for (const string& f : files) {
-      if (absl::StrContains(f, test_name)) {
+      if (abslx::StrContains(f, test_name)) {
         if (found) {
           return errors::Unknown("Found more than one file for ", test_name);
         }
@@ -274,11 +274,11 @@ TEST_F(SummaryFileWriterTest, AvoidFilenameCollision) {
   // Filter `files` down to just those generated in this test.
   files.erase(std::remove_if(files.begin(), files.end(),
                              [test_name](string f) {
-                               return !absl::StrContains(f, test_name);
+                               return !abslx::StrContains(f, test_name);
                              }),
               files.end());
   EXPECT_EQ(num_files, files.size())
-      << "files = [" << absl::StrJoin(files, ", ") << "]";
+      << "files = [" << abslx::StrJoin(files, ", ") << "]";
 }
 
 }  // namespace

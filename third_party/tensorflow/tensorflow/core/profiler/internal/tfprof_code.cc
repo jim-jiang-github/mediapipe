@@ -36,11 +36,11 @@ const char* const kGradientSuffix = " (gradient)";
 // Convert to Trace proto into a short readable string.
 std::string GetTraceString(const CallStack::Trace& trace) {
   std::string ntrace =
-      absl::StrCat(io::Basename(trace.file()), ":", trace.lineno());
+      abslx::StrCat(io::Basename(trace.file()), ":", trace.lineno());
   if (trace.function().length() < 20) {
-    absl::StrAppend(&ntrace, ":", trace.function());
+    abslx::StrAppend(&ntrace, ":", trace.function());
   } else {
-    absl::StrAppend(&ntrace, ":", trace.function().substr(0, 17), "...");
+    abslx::StrAppend(&ntrace, ":", trace.function().substr(0, 17), "...");
   }
   return ntrace;
 }
@@ -114,7 +114,7 @@ class FunctionTable {
     string file_base(io::Basename(file_path));
     file_base = file_base.substr(0, file_base.find_last_of('.'));
     func_pb->set_name(
-        string_table_->GetIndex(absl::StrCat(file_base, ":", func_name)));
+        string_table_->GetIndex(abslx::StrCat(file_base, ":", func_name)));
     func_pb->set_filename(string_table_->GetIndex(file_path));
     func_pb->set_start_line(func_start_line);
     return func_pb->id();
@@ -227,7 +227,7 @@ class Samples {
         } else if (type == kShown[3]) {
           sample_pb->mutable_value()->Add(gn->float_ops(node->node->step()));
         } else {
-          absl::FPrintF(stderr, "pprof doesn't support -select=%s\n", type);
+          abslx::FPrintF(stderr, "pprof doesn't support -select=%s\n", type);
         }
       }
     }
@@ -307,7 +307,7 @@ class PprofProfileImpl : public PprofProfile {
       delete zlib_output_buffer;
       return s;
     }
-    absl::FPrintF(stdout,
+    abslx::FPrintF(stdout,
                   "\nRun pprof -png --nodecount=100 --sample_index=1 <%s>\n",
                   filename);
     delete zlib_output_buffer;
@@ -363,7 +363,7 @@ class PprofProfileImpl : public PprofProfile {
       profile_pb->mutable_comment()->Add(string_table_.GetIndex(
           "Model float operations (Only available if defined)."));
     } else {
-      absl::FPrintF(stderr, "pprof doesn't support selecting: %s\n", type);
+      abslx::FPrintF(stderr, "pprof doesn't support selecting: %s\n", type);
     }
 
     for (const string& str : string_table_.strings()) {
@@ -460,7 +460,7 @@ void TFCode::Build() {
     }
   }
   if (unaccounted_nodes > 0) {
-    absl::FPrintF(stderr, "%d gradient nodes not accounted\n",
+    abslx::FPrintF(stderr, "%d gradient nodes not accounted\n",
                   unaccounted_nodes);
   }
 }
@@ -470,19 +470,19 @@ const ShowMultiNode* TFCode::ShowInternal(const Options& opts,
   root_->ResetTotalStats();
   if (opts.output_type == kOutput[3]) {
     if (opts.select.size() != 1) {
-      absl::FPrintF(stderr, "Can only select 1 attribute for pprof output.\n");
+      abslx::FPrintF(stderr, "Can only select 1 attribute for pprof output.\n");
       return root_.get();
     }
     string select = *opts.select.begin();
     if (select != kShown[0] && select != kShown[1] && select != kShown[2] &&
         select != kShown[3] && select != kShown[9] && select != kShown[10] &&
         select != kShown[11] && select != kShown[12] && select != kShown[13]) {
-      absl::FPrintF(stderr, "pprof doesn't support -select=%s\n", select);
+      abslx::FPrintF(stderr, "pprof doesn't support -select=%s\n", select);
       return root_.get();
     }
   }
   if (opts.account_displayed_op_only) {
-    absl::FPrintF(stderr,
+    abslx::FPrintF(stderr,
                   "Note: code view ignores account_displayed_op_only\n");
   }
 
@@ -511,7 +511,7 @@ const ShowMultiNode* TFCode::ShowInternal(const Options& opts,
     Status s = pprof_profile_->WritePprofProfile(
         opts.output_options.at(kPprofOpts[0]));
     if (!s.ok()) {
-      absl::FPrintF(stderr, "%s\n", s.ToString());
+      abslx::FPrintF(stderr, "%s\n", s.ToString());
     }
   } else {
     Format(root, root->show_children, opts, &root->formatted_str,
@@ -596,7 +596,7 @@ std::vector<CodeNode*> TFCode::PrintScope(const std::vector<CodeNode*> roots,
       node->formatted_str = FormatNode(node, opts, last_ident);
 
       if (opts.select.find(kShown[4]) != opts.select.end()) {
-        absl::FPrintF(stderr, "code view has no tensor value to show\n");
+        abslx::FPrintF(stderr, "code view has no tensor value to show\n");
       }
       show_nodes.push_back(node);
     } else {
@@ -685,22 +685,22 @@ string TFCode::FormatNode(CodeNode* node, const Options& opts,
 
   if (opts.select.find(kShown[5]) != opts.select.end() &&
       !node->node->devices().empty()) {
-    attrs.push_back(absl::StrJoin(node->node->devices(), "|"));
+    attrs.push_back(abslx::StrJoin(node->node->devices(), "|"));
   }
   if (opts.select.find(kShown[6]) != opts.select.end()) {
     std::set<string> op_types = node->node->op_types();
-    attrs.push_back(absl::StrJoin(op_types, "|"));
+    attrs.push_back(abslx::StrJoin(op_types, "|"));
   }
   if (opts.select.find(kShown[7]) != opts.select.end()) {
     // TODO(xpan): Make op count available in code view?
-    attrs.push_back(absl::StrFormat("%s N/A in code view", kShown[7]));
+    attrs.push_back(abslx::StrFormat("%s N/A in code view", kShown[7]));
   }
   if (opts.select.find(kShown[8]) != opts.select.end()) {
-    attrs.push_back(absl::StrFormat("%s N/A in code view", kShown[8]));
+    attrs.push_back(abslx::StrFormat("%s N/A in code view", kShown[8]));
   }
 
-  return absl::StrFormat("%s%s (%s)\n", std::string(indent, ' '), node->name(),
-                         absl::StrJoin(attrs, ", "));
+  return abslx::StrFormat("%s%s (%s)\n", std::string(indent, ' '), node->name(),
+                         abslx::StrJoin(attrs, ", "));
 }
 }  // namespace tfprof
 }  // namespace tensorflow

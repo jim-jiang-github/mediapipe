@@ -33,7 +33,7 @@ namespace xla {
 class Tile {
  public:
   Tile() = default;
-  explicit Tile(absl::Span<const int64_t> dimensions)
+  explicit Tile(abslx::Span<const int64_t> dimensions)
       : dimensions_(dimensions.begin(), dimensions.end()) {}
 
   // De/Serialize a Tile to and from a TileProto.
@@ -53,7 +53,7 @@ class Tile {
   int64_t dimension(int i) const { return dimensions_.at(i); }
 
   // Returns the dimensions of the tile.
-  absl::Span<const int64_t> dimensions() const { return dimensions_; }
+  abslx::Span<const int64_t> dimensions() const { return dimensions_; }
 
   Tile& add_dimensions(int64_t value) {
     dimensions_.push_back(value);
@@ -77,7 +77,7 @@ class Tile {
 
  private:
   // The bounds of the tile.
-  absl::InlinedVector<int64_t, 2> dimensions_;
+  abslx::InlinedVector<int64_t, 2> dimensions_;
 };
 
 class Layout {
@@ -85,13 +85,13 @@ class Layout {
   Layout() = default;
 
   // Constructs a dense layout with the given minor-to-major order.
-  explicit Layout(absl::Span<const int64_t> minor_to_major)
+  explicit Layout(abslx::Span<const int64_t> minor_to_major)
       : format_(DENSE),
         minor_to_major_(minor_to_major.begin(), minor_to_major.end()) {}
 
   // Constructs a dense tiled layout with the given minor-to-major order and
   // tiles.
-  Layout(absl::Span<const int64_t> minor_to_major, absl::Span<const Tile> tiles,
+  Layout(abslx::Span<const int64_t> minor_to_major, abslx::Span<const Tile> tiles,
          int64_t element_size_in_bits = 0, int64_t memory_space = 0)
       : format_(DENSE),
         minor_to_major_(minor_to_major.begin(), minor_to_major.end()),
@@ -184,7 +184,7 @@ class Layout {
     minor_to_major_.clear();
     return *this;
   }
-  absl::Span<const int64_t> minor_to_major() const { return minor_to_major_; }
+  abslx::Span<const int64_t> minor_to_major() const { return minor_to_major_; }
   DimensionVector* mutable_minor_to_major() { return &minor_to_major_; }
 
   // Methods for accessing the tile field.
@@ -199,8 +199,8 @@ class Layout {
     tiles_.clear();
     return *this;
   }
-  absl::Span<const Tile> tiles() const { return tiles_; }
-  absl::InlinedVector<Tile, 2>* mutable_tiles() { return &tiles_; }
+  abslx::Span<const Tile> tiles() const { return tiles_; }
+  abslx::InlinedVector<Tile, 2>* mutable_tiles() { return &tiles_; }
 
   int64_t element_size_in_bits() const { return element_size_in_bits_; }
   Layout& set_element_size_in_bits(int64_t value) {
@@ -249,7 +249,7 @@ class Layout {
   DimensionVector minor_to_major_;
 
   // The tiles used in tiling-based layout.
-  absl::InlinedVector<Tile, 2> tiles_;
+  abslx::InlinedVector<Tile, 2> tiles_;
 
   // The number of bits used to store an individual array element.
   int64_t element_size_in_bits_ = 0;

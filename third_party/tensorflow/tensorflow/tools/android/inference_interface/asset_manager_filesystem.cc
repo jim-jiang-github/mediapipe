@@ -27,7 +27,7 @@ namespace {
 string RemoveSuffix(const string& name, const string& suffix) {
   string output(name);
   StringPiece piece(output);
-  absl::ConsumeSuffix(&piece, suffix);
+  abslx::ConsumeSuffix(&piece, suffix);
   return string(piece);
 }
 
@@ -237,7 +237,7 @@ string AssetManagerFileSystem::NormalizeDirectoryPath(const string& fname) {
 
 string AssetManagerFileSystem::RemoveAssetPrefix(const string& name) {
   StringPiece piece(name);
-  absl::ConsumePrefix(&piece, prefix_);
+  abslx::ConsumePrefix(&piece, prefix_);
   return string(piece);
 }
 

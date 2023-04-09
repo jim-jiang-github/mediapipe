@@ -155,7 +155,7 @@ class ExhaustiveOpTestBase : public ClientLibraryTestBase {
 
  private:
   // N spans corresponding to the list of literal data values.
-  using NativeInputsList = std::array<absl::Span<const NativeT>, N>;
+  using NativeInputsList = std::array<abslx::Span<const NativeT>, N>;
 
   // N data items representing a single input to an XLA function.
   using NativeInputs = std::array<NativeT, N>;
@@ -243,14 +243,14 @@ class ExhaustiveOpTestBase : public ClientLibraryTestBase {
   // slow given that we're touching a lot of data here.
   StatusOr<Literal> RunComputation(
       const XlaComputation& computation,
-      absl::Span<const Literal* const> input_literals) {
+      abslx::Span<const Literal* const> input_literals) {
     // Copy debug options from ClientLibraryTestBase.  In particular, we're
     // interested in disabling constant folding.
     ExecutableBuildOptions build_opts;
     *build_opts.mutable_debug_options() = *mutable_debug_options();
 
     std::vector<ScopedShapedBuffer> input_buffers;
-    absl::c_transform(input_literals, std::back_inserter(input_buffers),
+    abslx::c_transform(input_literals, std::back_inserter(input_buffers),
                       [&](const Literal* input_literal) {
                         return client_
                             ->LiteralToShapedBuffer(*input_literal,
@@ -258,7 +258,7 @@ class ExhaustiveOpTestBase : public ClientLibraryTestBase {
                             .value();
                       });
     std::vector<const Shape*> input_shapes;
-    absl::c_transform(input_buffers, std::back_inserter(input_shapes),
+    abslx::c_transform(input_buffers, std::back_inserter(input_shapes),
                       [&](const ScopedShapedBuffer& buffer) {
                         return &buffer.on_device_shape();
                       });
@@ -268,7 +268,7 @@ class ExhaustiveOpTestBase : public ClientLibraryTestBase {
         client_->Compile(computation, input_shapes, build_opts));
 
     std::vector<const ShapedBuffer*> input_buffer_pointers;
-    absl::c_transform(
+    abslx::c_transform(
         input_buffers, std::back_inserter(input_buffer_pointers),
         [&](const ScopedShapedBuffer& buffer) { return &buffer; });
 
@@ -599,7 +599,7 @@ class BitChunks {
     }
 
     std::string ToString() const {
-      return absl::StrFormat("0x%08x", next_bit_chunk_);
+      return abslx::StrFormat("0x%08x", next_bit_chunk_);
     }
 
    private:
@@ -637,7 +637,7 @@ class BitChunks {
   }
 
   std::string ToString() const {
-    return absl::StrFormat("(0x%08x, 0x%08x, 0x%08x)", start_, end_, spacing_);
+    return abslx::StrFormat("(0x%08x, 0x%08x, 0x%08x)", start_, end_, spacing_);
   }
 
   uint64_t start_;
@@ -651,7 +651,7 @@ inline std::string StringifyNum(BitChunks::iterator c) { return c.ToString(); }
 
 template <typename T>
 void AppendStringifyNum(std::string* s, T x) {
-  absl::StrAppend(s, StringifyNum(x));
+  abslx::StrAppend(s, StringifyNum(x));
 }
 
 // Represents a set of floating point values through the possible values for
@@ -715,7 +715,7 @@ class FpValues {
     const BitChunks::iterator& GetBitChunksIter(int i) { return iters_[i]; }
 
     std::string ToString() const {
-      return absl::StrJoin(iters_, ",",
+      return abslx::StrJoin(iters_, ",",
                            AppendStringifyNum<BitChunks::iterator>);
     }
 
@@ -742,7 +742,7 @@ class FpValues {
   };
 
   FpValues() : bit_chunks_(), offsets_() {}
-  FpValues(absl::Span<const BitChunks> chunks, absl::Span<const int> offsets) {
+  FpValues(abslx::Span<const BitChunks> chunks, abslx::Span<const int> offsets) {
     CHECK_EQ(chunks.size(), offsets.size() - 1);
     CHECK_EQ(chunks.size(), kTotalBitChunks);
     std::copy_n(chunks.begin(), kTotalBitChunks, bit_chunks_.begin());
@@ -772,7 +772,7 @@ class FpValues {
 
   int64_t GetTotalNumValues() const {
     int64_t total = 1;
-    absl::c_for_each(bit_chunks_, [&](const BitChunks& chunks) {
+    abslx::c_for_each(bit_chunks_, [&](const BitChunks& chunks) {
       total *= chunks.GetTotalBitChunks();
     });
     return total;
@@ -781,8 +781,8 @@ class FpValues {
   const BitChunks& GetBitChunks(int i) const { return bit_chunks_[i]; }
 
   std::string ToString() const {
-    return absl::StrCat(
-        "[", absl::StrJoin(bit_chunks_, ",", AppendStringifyNum<BitChunks>),
+    return abslx::StrCat(
+        "[", abslx::StrJoin(bit_chunks_, ",", AppendStringifyNum<BitChunks>),
         "]");
   }
 
@@ -1044,7 +1044,7 @@ T ReferenceMin(T x, T y) {
 // Returns a wrapper of the given build method, which build an HLO operation
 // with an empty broadcast dimension.
 inline std::function<XlaOp(XlaOp, XlaOp)> AddEmptyBroadcastDimension(
-    std::function<XlaOp(XlaOp, XlaOp, absl::Span<const int64_t>)>
+    std::function<XlaOp(XlaOp, XlaOp, abslx::Span<const int64_t>)>
         build_method) {
   return [&](XlaOp src0, XlaOp src1) -> XlaOp {
     return build_method(src0, src1, {});

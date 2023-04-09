@@ -610,9 +610,9 @@ class MIOpenSupport : public dnn::DnnSupport {
   port::Status DoCtcLoss(Stream* stream, dnn::DataType element_type,
                          const dnn::RnnStateTensorDescriptor& probs_desc,
                          const DeviceMemoryBase probs_data,
-                         absl::Span<const int> labels_data,
-                         absl::Span<const int> labels_lengths_data,
-                         absl::Span<const int> input_lengths_data,
+                         abslx::Span<const int> labels_data,
+                         abslx::Span<const int> labels_lengths_data,
+                         abslx::Span<const int> input_lengths_data,
                          DeviceMemoryBase costs_data,
                          const dnn::RnnStateTensorDescriptor& grads_desc,
                          DeviceMemoryBase grads_data,
@@ -771,9 +771,9 @@ class MIOpenSupport : public dnn::DnnSupport {
 
   port::Status DoCtcLossImpl(
       Stream* stream, const MIOpenRnnStateTensorDescriptor& probs_desc,
-      const DeviceMemoryBase probs_data, absl::Span<const int> labels_data,
-      absl::Span<const int> labels_lengths_data,
-      absl::Span<const int> input_lengths_data, DeviceMemoryBase costs_data,
+      const DeviceMemoryBase probs_data, abslx::Span<const int> labels_data,
+      abslx::Span<const int> labels_lengths_data,
+      abslx::Span<const int> input_lengths_data, DeviceMemoryBase costs_data,
       const MIOpenRnnStateTensorDescriptor& grads_desc,
       DeviceMemoryBase grads_data, const MIOpenCTCLossDescriptor& ctc_loss_desc,
       DeviceMemory<uint8> scratch_memory, int ctc_loss_algo_id);
@@ -782,9 +782,9 @@ class MIOpenSupport : public dnn::DnnSupport {
       Stream* stream, dnn::DataType element_type,
       const dnn::RnnStateTensorDescriptor& probs_desc,
       const dnn::RnnStateTensorDescriptor& grads_desc,
-      absl::Span<const int> labels_data,
-      absl::Span<const int> labels_lengths_data,
-      absl::Span<const int> input_lengths_data,
+      abslx::Span<const int> labels_data,
+      abslx::Span<const int> labels_lengths_data,
+      abslx::Span<const int> input_lengths_data,
       ScratchAllocator* scratch_allocator, DeviceMemory<uint8>* scratch_memory,
       int* ctc_loss_algo_id) override;
 

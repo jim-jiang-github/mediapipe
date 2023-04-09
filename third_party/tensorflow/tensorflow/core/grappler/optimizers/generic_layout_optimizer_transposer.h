@@ -62,9 +62,9 @@ struct TransposeContext {
   }
 
   // Sets data formats to convert from and to for specified device type.
-  void AssignDeviceAndDataFormats(absl::string_view target_device,
-                                  absl::string_view src_format,
-                                  absl::string_view dst_format);
+  void AssignDeviceAndDataFormats(abslx::string_view target_device,
+                                  abslx::string_view src_format,
+                                  abslx::string_view dst_format);
 
   FrameView frames;
   GraphDef graph;
@@ -72,15 +72,15 @@ struct TransposeContext {
   // of the graph, all new nodes should have a node index greater than or equal
   // to this.
   int num_nodes;
-  absl::flat_hash_set<string> nodes_to_preserve;
+  abslx::flat_hash_set<string> nodes_to_preserve;
   std::unique_ptr<GraphProperties> graph_properties;
   std::unique_ptr<utils::MutableGraphView> graph_view;
 
   string target_device;
   string src_format;
   string dst_format;
-  absl::flat_hash_map<char, int> src_dim_indices;
-  absl::flat_hash_map<char, int> dst_dim_indices;
+  abslx::flat_hash_map<char, int> src_dim_indices;
+  abslx::flat_hash_map<char, int> dst_dim_indices;
   std::vector<int> src_to_dst;
   std::vector<int> dst_to_src;
 
@@ -115,10 +115,10 @@ class Transposer {
   // Creates a Const node for permutation. If node with node_name already exits,
   // return and reuse it.
   Status CreateConstPermNode(TransposeContext* context,
-                             absl::string_view node_name,
-                             absl::string_view device,
-                             absl::Span<const int> permutation,
-                             absl::string_view control_node_name,
+                             abslx::string_view node_name,
+                             abslx::string_view device,
+                             abslx::Span<const int> permutation,
+                             abslx::string_view control_node_name,
                              utils::MutationNewNode* added_node);
 
   // Creates a TransposeNode with given properties. If node with node_name
@@ -126,31 +126,31 @@ class Transposer {
   // A const perm node is also created and connected to the 2nd fanin.
   // control_node_name is ignored if it is empty.
   Status CreateTransposeNode(
-      TransposeContext* context, absl::string_view name_format,
-      const DataType& data_type, absl::string_view device,
-      TensorShapeProto fanin_shape, absl::Span<const int> permutation,
-      absl::string_view control_node_name, utils::MutationNewNode* added_node,
+      TransposeContext* context, abslx::string_view name_format,
+      const DataType& data_type, abslx::string_view device,
+      TensorShapeProto fanin_shape, abslx::Span<const int> permutation,
+      abslx::string_view control_node_name, utils::MutationNewNode* added_node,
       string* transpose_node_name);
 
   // Update all edges between dst_node->fanin[dst_ports] and dst_node by
   // inserting an op node.
   Status UpdateFaninEdgesWithOp(TransposeContext* context,
-                                absl::Span<const int> dst_ports,
+                                abslx::Span<const int> dst_ports,
                                 utils::MutableNodeView* dst_node,
-                                absl::string_view op);
+                                abslx::string_view op);
 
   // Update all edges between src_node:src_ports and nodes take
   // src_node:src_ports as fanin. Also update attr _output_shape of src_node.
   Status UpdateFanoutEdgesWithOp(TransposeContext* context,
-                                 absl::Span<const int> src_ports,
+                                 abslx::Span<const int> src_ports,
                                  utils::MutableNodeView* src_node,
-                                 absl::string_view op);
+                                 abslx::string_view op);
 
   // Creates a DataFromat node with given properties.
   // DataFromat op is either DataFormatVecPermute or DataFormatDimMap.
   Status CreateDataFormatNode(TransposeContext* context,
-                              absl::string_view node_name, absl::string_view op,
-                              absl::string_view device,
+                              abslx::string_view node_name, abslx::string_view op,
+                              abslx::string_view device,
                               const DataType& data_type, bool is_fanin_on_host,
                               bool is_src_format_to_dst_format,
                               utils::MutationNewNode* added_node);
@@ -160,7 +160,7 @@ class Transposer {
   bool IsFanoutPortRankN(const utils::MutableNodeView& node, int port,
                          int n) const;
   bool IsFanoutPortsRankN(const utils::MutableNodeView& node,
-                          absl::Span<const int> ports, int n) const;
+                          abslx::Span<const int> ports, int n) const;
   int GetFaninPortRank(const utils::MutableNodeView& node, int port) const;
   bool IsFaninPortRankN(const utils::MutableNodeView& node, int port,
                         int n) const;
@@ -169,32 +169,32 @@ class Transposer {
   // Const. If fanin is not a Const, no dimensions will be checked and this will
   // return true.
   bool IsFaninPortDimsNIfConst(const utils::MutableNodeView& node, int port,
-                               absl::Span<const int> dims) const;
+                               abslx::Span<const int> dims) const;
   bool IsFaninPortsDimsNIfConst(const utils::MutableNodeView& node,
-                                absl::Span<const int> ports,
-                                absl::Span<const int> dims) const;
+                                abslx::Span<const int> ports,
+                                abslx::Span<const int> dims) const;
   bool CanProcessNode(const TransposeContext& context,
                       const utils::MutableNodeView& node) const;
   // Update all edges between dst_node->fanin[dst_ports] and dst_node.
   // A node with op is created and inserted between all edges.
   // op is one of Transpose, DataFormatVecPermute or DataFormatDimMap.
-  Status UpdateEdge(TransposeContext* context, absl::string_view name_format,
-                    absl::string_view op, const AttrValue* input_shape,
+  Status UpdateEdge(TransposeContext* context, abslx::string_view name_format,
+                    abslx::string_view op, const AttrValue* input_shape,
                     bool is_in_frame, bool is_src_format_to_dst_format,
                     const int src_port, const int dst_port,
                     utils::MutableNodeView* src_node,
                     utils::MutableNodeView* dst_node);
-  string GetFaninNameFormat(absl::string_view node_name, int port,
-                            absl::string_view src_format,
-                            absl::string_view dst_format);
-  string GetFanoutNameFormat(absl::string_view node_name, int port, int index,
-                             absl::string_view src_format,
-                             absl::string_view dst_format);
-  string LayoutOptimizerNode(absl::string_view node_name);
-  string GetReshapeNodeNameFormat(absl::string_view node_name, int index,
-                                  absl::string_view src_format,
-                                  absl::string_view dst_format);
-  string GetShapeConstNodeNameFormat(absl::string_view node_name, int index);
+  string GetFaninNameFormat(abslx::string_view node_name, int port,
+                            abslx::string_view src_format,
+                            abslx::string_view dst_format);
+  string GetFanoutNameFormat(abslx::string_view node_name, int port, int index,
+                             abslx::string_view src_format,
+                             abslx::string_view dst_format);
+  string LayoutOptimizerNode(abslx::string_view node_name);
+  string GetReshapeNodeNameFormat(abslx::string_view node_name, int index,
+                                  abslx::string_view src_format,
+                                  abslx::string_view dst_format);
+  string GetShapeConstNodeNameFormat(abslx::string_view node_name, int index);
 };
 
 class LayoutSensitiveOpTransposer : public Transposer {
@@ -368,14 +368,14 @@ class BinaryOpTransposer : public LayoutAgnosticOpTransposer {
   std::vector<int> GetNDDataFaninPorts(const utils::MutableNodeView& node,
                                        int rank);
   Status AddNodeShapeConst(utils::Mutation* mutation,
-                           absl::string_view node_name,
-                           absl::string_view node_device, bool node_in_frame,
-                           int num_channels, absl::string_view depended_node,
+                           abslx::string_view node_name,
+                           abslx::string_view node_device, bool node_in_frame,
+                           int num_channels, abslx::string_view depended_node,
                            int rank);
-  Status AddNodeReshape(utils::Mutation* mutation, absl::string_view node_name,
-                        absl::string_view node_device,
-                        absl::string_view input_name,
-                        absl::string_view shape_const_node_name,
+  Status AddNodeReshape(utils::Mutation* mutation, abslx::string_view node_name,
+                        abslx::string_view node_device,
+                        abslx::string_view input_name,
+                        abslx::string_view shape_const_node_name,
                         const DataType& data_type);
   Status MaybeReshapeVectorFanin(TransposeContext* context,
                                  utils::MutableNodeView* node, int rank);
@@ -435,7 +435,7 @@ class ReduceTransposer : public LayoutAgnosticOpTransposer {
 
  private:
   bool KeepDims(const utils::MutableNodeView& node);
-  bool IsAlongAxis(const Tensor& tensor, absl::Span<const int> axis, int rank);
+  bool IsAlongAxis(const Tensor& tensor, abslx::Span<const int> axis, int rank);
   bool IsReduceAxisSupported(const TransposeContext& context,
                              const utils::MutableNodeView& node, int rank);
 };
@@ -510,7 +510,7 @@ class SqueezeTransposer : public LayoutAgnosticOpTransposer {
  private:
   bool IsInputConvertible(const TransposeContext& context,
                           const utils::MutableNodeView& node) const;
-  bool IsAlongAxis(const AttrValue& attr, absl::Span<const int> axis,
+  bool IsAlongAxis(const AttrValue& attr, abslx::Span<const int> axis,
                    int rank) const;
   bool IsDimsSupported(const TransposeContext& context,
                        const utils::MutableNodeView& node) const;
@@ -526,10 +526,10 @@ class StridedSliceTransposer : public LayoutAgnosticOpTransposer {
                        utils::MutableNodeView* node) override;
 
  private:
-  bool IsMaskZero(const utils::MutableNodeView& node, absl::string_view mask);
+  bool IsMaskZero(const utils::MutableNodeView& node, abslx::string_view mask);
   bool HasOnlyBeginEndMask(const utils::MutableNodeView& node);
   Status PermuteMask(TransposeContext* context, utils::MutableNodeView* node,
-                     absl::string_view mask);
+                     abslx::string_view mask);
 };
 
 class SwitchTransposer : public LayoutAgnosticOpTransposer {
@@ -569,13 +569,13 @@ class UnaryGradTransposer : public LayoutAgnosticOpTransposer {
 // Permutes elements according to permutation and replaces the original values.
 // Permutation and values must have same size.
 template <typename T>
-Status PermuteSingle(absl::string_view location,
-                     absl::Span<const int> permutation, T* values) {
+Status PermuteSingle(abslx::string_view location,
+                     abslx::Span<const int> permutation, T* values) {
   DCHECK(values != nullptr);
   int permutation_size = permutation.size();
   if (values->size() != permutation_size) {
     return Status(tensorflow::error::Code::INVALID_ARGUMENT,
-                  absl::StrCat("Size of values ", values->size(),
+                  abslx::StrCat("Size of values ", values->size(),
                                " does not match size of permutation ",
                                permutation_size, " @ ", location));
   }
@@ -591,13 +591,13 @@ Status PermuteSingle(absl::string_view location,
 // Permutes two elements at a time according to permutation and replaces the
 // original values. Values must be twice the size of permutation.
 template <typename T>
-Status PermuteDouble(absl::string_view location,
-                     absl::Span<const int> permutation, T* values) {
+Status PermuteDouble(abslx::string_view location,
+                     abslx::Span<const int> permutation, T* values) {
   DCHECK(values != nullptr);
   int permutation_size = permutation.size();
   if (values->size() != permutation_size * 2) {
     return Status(tensorflow::error::Code::INVALID_ARGUMENT,
-                  absl::StrCat("Size of values ", values->size(),
+                  abslx::StrCat("Size of values ", values->size(),
                                " does not match twice the size of permutation ",
                                permutation_size, " @ ", location));
   }
@@ -650,12 +650,12 @@ bool GetValueAttrFromConstInputNode(
 
 bool IsDataFormatOp(const utils::MutableNodeView& node);
 
-absl::flat_hash_map<char, int> GetDimensionIndices(
-    absl::string_view data_format);
+abslx::flat_hash_map<char, int> GetDimensionIndices(
+    abslx::string_view data_format);
 
 std::vector<int> GetPermutation(
-    const absl::flat_hash_map<char, int>& src_dim_indices,
-    absl::string_view dst_format);
+    const abslx::flat_hash_map<char, int>& src_dim_indices,
+    abslx::string_view dst_format);
 
 }  // namespace grappler
 }  // namespace tensorflow

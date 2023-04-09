@@ -41,7 +41,7 @@ struct TopologicalDependency {
 // queue resource, but we might want to enforce ordering between them.
 Status ComputeTopologicalOrder(
     const GraphDef& graph,
-    absl::Span<const TopologicalDependency> extra_dependencies,
+    abslx::Span<const TopologicalDependency> extra_dependencies,
     std::vector<const NodeDef*>* topo_order);
 Status ComputeTopologicalOrder(const GraphDef& graph,
                                std::vector<const NodeDef*>* topo_order);

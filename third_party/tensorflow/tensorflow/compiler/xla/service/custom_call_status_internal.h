@@ -31,7 +31,7 @@ namespace xla {
 // Get a view of the internal error message of the XlaCustomCallStatus. Only
 // lives as long as the XlaCustomCallStatus. Returns an empty optional if the
 // result was "success".
-std::optional<absl::string_view> CustomCallStatusGetMessage(
+std::optional<abslx::string_view> CustomCallStatusGetMessage(
     const XlaCustomCallStatus* status);
 
 }  // namespace xla

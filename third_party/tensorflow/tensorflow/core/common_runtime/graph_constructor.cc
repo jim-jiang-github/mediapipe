@@ -224,8 +224,8 @@ class GraphConstructor {
   // Performs DFS starting at `cur_node` and prints any cycles found.
   void DFS(int cur_node, std::vector<int>* cur_branch,
            std::vector<bool>* is_on_cur_branch,
-           absl::flat_hash_set<int>* unvisited,
-           const std::vector<absl::string_view>& node_names);
+           abslx::flat_hash_set<int>* unvisited,
+           const std::vector<abslx::string_view>& node_names);
   Status IsNodeFullyMapped(const NodeDef& node_def, bool* is_node_mapped);
   Status ValidateColocationConstraints(const NodeDef& node_def);
   Status MakeNode(NodeDef&& node_def, Node** node);
@@ -316,7 +316,7 @@ class GraphConstructor {
   std::set<TensorId> used_input_map_keys_;
 
   // Intermediate datastructure used to track the destinations of back edges.
-  absl::flat_hash_set<int> merge_node_indices_;
+  abslx::flat_hash_set<int> merge_node_indices_;
 
   // Mapping from node name to the index within node_defs_.
   struct NodeInfo {
@@ -326,16 +326,16 @@ class GraphConstructor {
     int gdef_index;
     Node* node;  // nullptr until the NodeDef is converted to a Node.
   };
-  absl::flat_hash_map<std::string, NodeInfo> gdef_nodes_;
+  abslx::flat_hash_map<std::string, NodeInfo> gdef_nodes_;
 
   // Prefixes already used in the GraphDef being imported.
-  absl::flat_hash_set<StringPiece> gdef_prefixes_;
+  abslx::flat_hash_set<StringPiece> gdef_prefixes_;
 
   // Mapping from node name to the existing node in g_.
-  absl::flat_hash_map<StringPiece, Node*> existing_nodes_;
+  abslx::flat_hash_map<StringPiece, Node*> existing_nodes_;
 
   // Prefixes already used in the graph.
-  absl::flat_hash_set<StringPiece> existing_prefixes_;
+  abslx::flat_hash_set<StringPiece> existing_prefixes_;
 
   // Imported node names that have been uniquified. The key is the original
   // name, the value is the new unique name.
@@ -467,7 +467,7 @@ Status MaybeAppendVersionWarning(const VersionDef* versions,
   if (versions && ForwardCompatibilityWindowPassed(*versions)) {
     return Status(
         import_status.code(),
-        absl::StrCat(
+        abslx::StrCat(
             "Converting GraphDef to Graph has failed with an error: '",
             import_status.error_message(),
             "' The binary trying to import the GraphDef was built when "
@@ -563,7 +563,7 @@ bool NodeNameInValues(const std::vector<string>& control_dependencies,
 // Adds any prefixes of `node_name` (not including the full name itself) to
 // `prefixes`.
 void AddPrefixes(StringPiece node_name,
-                 absl::flat_hash_set<StringPiece>* prefixes) {
+                 abslx::flat_hash_set<StringPiece>* prefixes) {
   size_t idx = -1;
   while ((idx = node_name.find('/', idx + 1)) != StringPiece::npos) {
     prefixes->insert(node_name.substr(0, idx));
@@ -669,7 +669,7 @@ Status GraphConstructor::BuildNodeIndex() {
     bool in_control_dependence = false;
     for (int i = 0; i < node_def.input_size(); ++i) {
       StringPiece input_name = node_def.input(i);
-      if (!input_name.empty() && absl::StartsWith(input_name, "^")) {
+      if (!input_name.empty() && abslx::StartsWith(input_name, "^")) {
         in_control_dependence = true;
       } else if (in_control_dependence) {
         return errors::InvalidArgument(
@@ -708,7 +708,7 @@ Status GraphConstructor::InitFromEdges() {
       bool has_loop_back_edge = false;
       for (int i = 0; i < node_def.input_size(); ++i) {
         StringPiece input_name(node_def.input(i));
-        if (absl::StartsWith(input_name, "^")) {
+        if (abslx::StartsWith(input_name, "^")) {
           num_control_edges++;
         } else {
           TensorId id(ParseTensorName(input_name));
@@ -758,7 +758,7 @@ Status GraphConstructor::ValidateColocationConstraints(
   if (iter == node_def.attr().end()) return OkStatus();
   for (const string& c : iter->second.list().s()) {
     StringPiece s(c);
-    if (absl::ConsumePrefix(&s, kColocationGroupPrefix) &&
+    if (abslx::ConsumePrefix(&s, kColocationGroupPrefix) &&
         gdef_nodes_.find(s) == gdef_nodes_.end()) {
       return errors::InvalidArgument(
           "Node '", node_def.name(),
@@ -950,7 +950,7 @@ void GraphConstructor::AddPrefixToNodeDef(
     // imported).
     if (input_already_exists[i]) continue;
     StringPiece input(node_def->input(i));
-    if (absl::ConsumePrefix(&input, "^")) {
+    if (abslx::ConsumePrefix(&input, "^")) {
       node_def->set_input(i, strings::StrCat("^", prefix_, input));
     } else {
       node_def->set_input(i, strings::StrCat(prefix_, input));
@@ -962,7 +962,7 @@ void GraphConstructor::AddPrefixToNodeDef(
         node_def->mutable_attr()->at(kColocationAttrName).mutable_list();
     for (int i = 0; i < list->s_size(); ++i) {
       StringPiece v(list->s(i));
-      if (absl::ConsumePrefix(&v, kColocationGroupPrefix)) {
+      if (abslx::ConsumePrefix(&v, kColocationGroupPrefix)) {
         list->set_s(i, strings::StrCat(kColocationGroupPrefix, prefix_, v));
       }
     }
@@ -1004,7 +1004,7 @@ void GraphConstructor::UpdateUniquifiedColocationNames() {
     bool updated = false;
     for (size_t i = 0; i < coloc_values.size(); ++i) {
       StringPiece val(coloc_values[i]);
-      if (absl::ConsumePrefix(&val, kColocationGroupPrefix)) {
+      if (abslx::ConsumePrefix(&val, kColocationGroupPrefix)) {
         auto name_pair = uniquified_names_.find(string(val));
         if (name_pair == uniquified_names_.end()) continue;
         updated = true;
@@ -1057,8 +1057,8 @@ Status GraphConstructor::IsNodeFullyMapped(const NodeDef& node_def,
 
 void GraphConstructor::DFS(int cur_node, std::vector<int>* cur_branch,
                            std::vector<bool>* is_on_cur_branch,
-                           absl::flat_hash_set<int>* unvisited,
-                           const std::vector<absl::string_view>& node_names) {
+                           abslx::flat_hash_set<int>* unvisited,
+                           const std::vector<abslx::string_view>& node_names) {
   cur_branch->push_back(cur_node);
   is_on_cur_branch->at(cur_node) = true;
   for (auto next_node : outputs_[cur_node]) {
@@ -1068,7 +1068,7 @@ void GraphConstructor::DFS(int cur_node, std::vector<int>* cur_branch,
             std::find(cur_branch->begin(), cur_branch->end(), next_node);
         LOG(WARNING) << "Cycle detected:";
         while (iter != cur_branch->end()) {
-          const absl::string_view name = node_names[*iter];
+          const abslx::string_view name = node_names[*iter];
           DCHECK(!name.empty());
           LOG(WARNING) << "node id=" << *iter << ", name=" << name;
           ++iter;
@@ -1087,7 +1087,7 @@ void GraphConstructor::DFS(int cur_node, std::vector<int>* cur_branch,
 void GraphConstructor::PrintCycles() {
   int num_nodes = outputs_.size();
 
-  std::vector<absl::string_view> node_names;
+  std::vector<abslx::string_view> node_names;
   node_names.resize(num_nodes);
   for (const auto& named_node : gdef_nodes_) {
     DCHECK_GE(named_node.second.gdef_index, 0);
@@ -1095,7 +1095,7 @@ void GraphConstructor::PrintCycles() {
     node_names[named_node.second.gdef_index] = named_node.first;
   }
 
-  absl::flat_hash_set<int> unvisited;
+  abslx::flat_hash_set<int> unvisited;
   for (int i = 0; i < num_nodes; i++) {
     unvisited.insert(i);
   }
@@ -1253,7 +1253,7 @@ Status GraphConstructor::Convert() {
 
     // Remove duplicate control inputs before adding edges to the graph. It
     // will allow us to skip expensive duplicates check in 'AddControlEdge'.
-    auto first_control = absl::c_find_if(inputs, &InputInfo::IsControlInput);
+    auto first_control = abslx::c_find_if(inputs, &InputInfo::IsControlInput);
     auto first_control_copy = first_control;
     std::sort(first_control, inputs.end(), &InputInfo::CompareName);
     inputs.erase(

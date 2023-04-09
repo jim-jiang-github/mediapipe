@@ -39,11 +39,11 @@ of the following criteria:
     of the libraries we've released have tens of thousands of users.
 *   **Anticipated widespread usage** - Pre-adoption of some standard-compliant
     APIs may not have broad adoption initially but can be expected to pick up
-    usage when it replaces legacy APIs. `absl::from_chars`, for example,
+    usage when it replaces legacy APIs. `abslx::from_chars`, for example,
     replaces existing code that converts strings to numbers and will therefore
     likely see usage growth.
 *   **High impact** - APIs that provide a key solution to a specific problem,
-    such as `absl::FixedArray`, have higher impact than usage numbers may signal
+    such as `abslx::FixedArray`, have higher impact than usage numbers may signal
     and are released because of their importance.
 *   **Direct support for a library that falls under one of the above** - When we
     want access to a smaller library as an implementation detail for a

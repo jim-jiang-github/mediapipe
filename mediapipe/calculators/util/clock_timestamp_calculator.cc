@@ -37,7 +37,7 @@ constexpr char kClockTag[] = "CLOCK";
 //   A single packet stream we wish to get the current clocktime for
 
 // Outputs:
-//   A single stream of absl::Time packets, representing the clock time at which
+//   A single stream of abslx::Time packets, representing the clock time at which
 //   we received the input stream's packets.
 
 // Example config:
@@ -52,10 +52,10 @@ class ClockTimestampCalculator : public CalculatorBase {
  public:
   ClockTimestampCalculator() {}
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   // Clock object.
@@ -63,12 +63,12 @@ class ClockTimestampCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(ClockTimestampCalculator);
 
-absl::Status ClockTimestampCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status ClockTimestampCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK_EQ(cc->Inputs().NumEntries(), 1);
   RET_CHECK_EQ(cc->Outputs().NumEntries(), 1);
 
   cc->Inputs().Index(0).SetAny();
-  cc->Outputs().Index(0).Set<absl::Time>();
+  cc->Outputs().Index(0).Set<abslx::Time>();
 
   // Optional Clock input side packet.
   if (cc->InputSidePackets().HasTag(kClockTag)) {
@@ -77,10 +77,10 @@ absl::Status ClockTimestampCalculator::GetContract(CalculatorContract* cc) {
         .Set<std::shared_ptr<::mediapipe::Clock>>();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ClockTimestampCalculator::Open(CalculatorContext* cc) {
+abslx::Status ClockTimestampCalculator::Open(CalculatorContext* cc) {
   // Direct passthrough, as far as timestamp and bounds are concerned.
   cc->SetOffset(TimestampDiff(0));
 
@@ -94,14 +94,14 @@ absl::Status ClockTimestampCalculator::Open(CalculatorContext* cc) {
         ::mediapipe::MonotonicClock::CreateSynchronizedMonotonicClock());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ClockTimestampCalculator::Process(CalculatorContext* cc) {
+abslx::Status ClockTimestampCalculator::Process(CalculatorContext* cc) {
   // Push the Time packet to output.
-  auto timestamp_packet = MakePacket<absl::Time>(clock_->TimeNow());
+  auto timestamp_packet = MakePacket<abslx::Time>(clock_->TimeNow());
   cc->Outputs().Index(0).AddPacket(timestamp_packet.At(cc->InputTimestamp()));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

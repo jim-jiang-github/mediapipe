@@ -67,15 +67,15 @@ limitations under the License.
 namespace xla {
 namespace {
 
-using absl::StrCat;
-using absl::StrFormat;
+using abslx::StrCat;
+using abslx::StrFormat;
 
 // Argument used when calling DumpHloModuleIfEnabled before optimizations are
 // performed on an HloModule.
 constexpr char kBeforeOptimizationsDumpName[] = "before_optimizations";
 
 // Records the arguments used to invoke a computation in an HloSnapshot proto.
-Status RecordArguments(const absl::Span<const ShapedBuffer* const> arguments,
+Status RecordArguments(const abslx::Span<const ShapedBuffer* const> arguments,
                        se::Stream* stream, TransferManager* transfer_manager,
                        HloSnapshot* module) {
   module->clear_arguments();
@@ -234,8 +234,8 @@ Status Service::ValidateResultShape(const Shape& client_shape,
 
 StatusOr<std::vector<std::vector<const ShapedBuffer*>>>
 Service::ResolveAndValidateArguments(
-    absl::Span<const GlobalDataHandle* const> arguments,
-    absl::Span<se::StreamExecutor* const> stream_executors) const {
+    abslx::Span<const GlobalDataHandle* const> arguments,
+    abslx::Span<se::StreamExecutor* const> stream_executors) const {
   CHECK_EQ(options_.number_of_replicas(), stream_executors.size());
   std::vector<std::vector<const ShapedBuffer*>> replicated_arguments;
   replicated_arguments.resize(options_.number_of_replicas());
@@ -259,7 +259,7 @@ Service::ResolveAndValidateArguments(
 
 StatusOr<std::unique_ptr<HloModuleConfig>> Service::CreateModuleConfig(
     const ProgramShape& program_shape,
-    absl::Span<const Shape* const> argument_shapes,
+    abslx::Span<const Shape* const> argument_shapes,
     const ExecutionOptions* execution_options,
     const AotCompilationOptions* aot_options) {
   int default_num_replicas = options_.number_of_replicas();
@@ -276,7 +276,7 @@ StatusOr<std::unique_ptr<HloModuleConfig>> Service::CreateModuleConfig(
 
 StatusOr<std::unique_ptr<HloModuleConfig>> Service::CreateModuleConfig(
     const ProgramShape& program_shape,
-    absl::Span<const ShapedBuffer* const> arguments,
+    abslx::Span<const ShapedBuffer* const> arguments,
     const ExecutionOptions& execution_options,
     const AotCompilationOptions* aot_options) {
   std::vector<const Shape*> argument_shapes;
@@ -371,10 +371,10 @@ Service::BuildAotResults(
 
 StatusOr<std::vector<GlobalDataHandle>>
 Service::ExecuteParallelAndRegisterResult(
-    absl::Span<Executable* const> executables,
-    absl::Span<const std::vector<std::vector<const ShapedBuffer*>>> arguments,
-    Backend* backend, absl::Span<const DeviceHandle> device_handles,
-    absl::Span<const std::string> result_tags, ExecutionProfile* profile) {
+    abslx::Span<Executable* const> executables,
+    abslx::Span<const std::vector<std::vector<const ShapedBuffer*>>> arguments,
+    Backend* backend, abslx::Span<const DeviceHandle> device_handles,
+    abslx::Span<const std::string> result_tags, ExecutionProfile* profile) {
   // Streams where the computation are launched, so we can wait on the streams
   // to complete.
   std::vector<StreamPool::Ptr> streams;
@@ -498,7 +498,7 @@ Service::ExecuteParallelAndRegisterResult(
 
 StatusOr<GlobalDataHandle> Service::ExecuteAndRegisterResult(
     Executable* executable,
-    absl::Span<const std::vector<const ShapedBuffer*>> arguments,
+    abslx::Span<const std::vector<const ShapedBuffer*>> arguments,
     Backend* backend, const DeviceHandle& device_handle,
     const std::string& result_tag, ExecutionProfile* profile) {
   // Set up streams.
@@ -541,7 +541,7 @@ StatusOr<GlobalDataHandle> Service::ExecuteAndRegisterResult(
 
   // TODO(b/69985541): Support profiling also on this path.
 
-  std::vector<absl::Span<const ShapedBuffer* const>> replicated_arguments;
+  std::vector<abslx::Span<const ShapedBuffer* const>> replicated_arguments;
   for (const auto& arg : arguments) {
     replicated_arguments.push_back(arg);
   }
@@ -580,7 +580,7 @@ StatusOr<std::vector<se::StreamExecutor*>> Service::GetExecutors(
 
 StatusOr<std::vector<std::vector<const ShapedBuffer*>>> Service::GetArguments(
     const ExecutionOptions& execution_options,
-    absl::Span<const GlobalDataHandle* const> arguments) const {
+    abslx::Span<const GlobalDataHandle* const> arguments) const {
   // Resolve the allocations for the arguments of the computation, and create
   // a vector of device memory offsets for the arguments from the allocations.
   // In the case of partitioned computations, assume all arguments go on the
@@ -1151,7 +1151,7 @@ Status Service::ComputeConstantGraph(const ComputeConstantGraphRequest* arg,
   evaluator.set_dynamic_dimension_inference(&dynamic_dimension_inference);
   evaluator.set_custom_call_handler(
       [](HloInstruction* custom_call,
-         absl::Span<const Literal*> operands) -> StatusOr<Literal> {
+         abslx::Span<const Literal*> operands) -> StatusOr<Literal> {
         if (custom_call->custom_call_target() == "SliceToDynamic") {
           auto result = operands[0]->Clone();
           for (int64_t i = 0; i < result.shape().rank(); ++i) {

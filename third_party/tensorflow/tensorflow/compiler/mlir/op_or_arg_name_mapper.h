@@ -42,7 +42,7 @@ class OpOrArgNameMapper {
   llvm::StringRef GetUniqueName(OpOrVal op_or_val);
 
   // Returns unique name as a string_view for the operation or value.
-  absl::string_view GetUniqueNameView(OpOrVal op_or_val);
+  abslx::string_view GetUniqueNameView(OpOrVal op_or_val);
 
   // Initializes operation or value to map to name. Returns number of
   // operations or value already named 'name' which should be 0 else
@@ -60,7 +60,7 @@ class OpOrArgNameMapper {
   virtual bool IsUnique(llvm::StringRef name);
 
   // Returns a constant view of the underlying map.
-  const llvm::DenseMap<OpOrVal, absl::string_view>& GetMap() const {
+  const llvm::DenseMap<OpOrVal, abslx::string_view>& GetMap() const {
     return op_or_val_to_name_;
   }
 
@@ -76,7 +76,7 @@ class OpOrArgNameMapper {
   llvm::StringMap<int64_t> name_to_count_;
   // Maps operation or values to name. Value in map is a view of the string
   // name in `name_to_count_`. Names in `name_to_count_` are never removed.
-  llvm::DenseMap<OpOrVal, absl::string_view> op_or_val_to_name_;
+  llvm::DenseMap<OpOrVal, abslx::string_view> op_or_val_to_name_;
 };
 
 // OpOrArgNameMapper that returns, for operations or values not initialized

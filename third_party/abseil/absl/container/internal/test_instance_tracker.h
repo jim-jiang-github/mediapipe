@@ -20,7 +20,7 @@
 
 #include "absl/types/compare.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace test_internal {
 
@@ -99,12 +99,12 @@ class BaseCountedInstance {
     return value_ >= x.value_;
   }
 
-  absl::weak_ordering compare(const BaseCountedInstance& x) const {
+  abslx::weak_ordering compare(const BaseCountedInstance& x) const {
     ++num_comparisons_;
     return value_ < x.value_
-               ? absl::weak_ordering::less
-               : value_ == x.value_ ? absl::weak_ordering::equivalent
-                                    : absl::weak_ordering::greater;
+               ? abslx::weak_ordering::less
+               : value_ == x.value_ ? abslx::weak_ordering::equivalent
+                                    : abslx::weak_ordering::greater;
   }
 
   int value() const {
@@ -269,6 +269,6 @@ class MovableOnlyInstance : public BaseCountedInstance {
 
 }  // namespace test_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_CONTAINER_INTERNAL_TEST_INSTANCE_TRACKER_H_

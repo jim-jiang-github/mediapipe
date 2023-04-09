@@ -541,6 +541,6 @@ Similarly, in C++, this can be done with the method,
 `ModelMetadataExtractor::GetAssociatedFile`:
 
 ```c++
-tflite::support::StatusOr<absl::string_view> GetAssociatedFile(
+tflite::support::StatusOr<abslx::string_view> GetAssociatedFile(
       const std::string& filename) const;
 ```

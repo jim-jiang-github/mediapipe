@@ -86,7 +86,7 @@ class EventPool {
  private:
   const bool allow_reuse_;
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   std::stack<std::unique_ptr<se::Event>> free_events_ ABSL_GUARDED_BY(mu_);
   uint64_t next_sequence_number_ ABSL_GUARDED_BY(mu_);
 };

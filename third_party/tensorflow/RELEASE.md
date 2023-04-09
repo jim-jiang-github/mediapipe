@@ -118,7 +118,7 @@ This release contains contributions from many people at Google, as well as:
 
 ## Deprecations
 
-*   The C++ `tensorflow::Code` and `tensorflow::Status` will become aliases of respectively `absl::StatusCode` and `absl::Status` in some future release.
+*   The C++ `tensorflow::Code` and `tensorflow::Status` will become aliases of respectively `abslx::StatusCode` and `abslx::Status` in some future release.
     *   Use `tensorflow::OkStatus()` instead of `tensorflow::Status::OK()`.
     *   Stop constructing `Status` objects from `tensorflow::error::Code`.
     *   One MUST NOT access `tensorflow::errors::Code` fields. Accessing
@@ -126,7 +126,7 @@ This release contains contributions from many people at Google, as well as:
         *   Use the constructors such as `tensorflow::errors:InvalidArgument` to create status using an error code without accessing it.
         *   Use the free functions such as `tensorflow::errors::IsInvalidArgument` if needed.
         *   In the last resort, use e.g. `static_cast<tensorflow::errors::Code>(error::Code::INVALID_ARGUMENT)` or `static_cast<int>(code)` for comparisons.
-*   `tensorflow::StatusOr` will also become in the future alias to `absl::StatusOr`, so use `StatusOr::value` instead of `StatusOr::ConsumeValueOrDie`.
+*   `tensorflow::StatusOr` will also become in the future alias to `abslx::StatusOr`, so use `StatusOr::value` instead of `StatusOr::ConsumeValueOrDie`.
 
 
 
@@ -7047,7 +7047,7 @@ love to hear your migration feedback and questions.
         `Tensor::BitcastFrom`.
     *   In `map_vectorization` optimization, reduce the degree of parallelism in
         the vectorized map node.
-    *   Add variant wrapper for `absl::string_view`.
+    *   Add variant wrapper for `abslx::string_view`.
     *   Add OpKernels for some stateless maps.
     *   DType is no longer convertible to an int. Use `dtype.as_datatype_enum`
         instead of `int(dtype)` to get the same result.
@@ -7274,7 +7274,7 @@ Yuan (Terry) Tang, Yuchen Ying, Yves-Noel Weweler, zhangyujing, zjjott, zyeric,
     *   `add_update` can now be passed a zero-arg callable in order to support
         turning off the update when setting `trainable=False` on a Layer of a
         Model compiled with `run_eagerly=True`.
-    *   Add variant wrapper for absl::string_view
+    *   Add variant wrapper for abslx::string_view
     *   Add expand_composites argument to all nest.* methods.
     *   Add pfor converter for Squeeze.
     *   Bug fix for tf.tile gradient

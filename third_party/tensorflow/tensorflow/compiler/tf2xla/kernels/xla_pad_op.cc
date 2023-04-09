@@ -65,9 +65,9 @@ class XlaPadOp : public XlaOpKernel {
 
     auto non_negative = [](int64_t x) { return x >= 0; };
     OP_REQUIRES(
-        context, absl::c_all_of(padding_interior, non_negative),
+        context, abslx::c_all_of(padding_interior, non_negative),
         errors::InvalidArgument("padding_interior must be non-negative, got [",
-                                absl::StrJoin(padding_interior, ","), "]"));
+                                abslx::StrJoin(padding_interior, ","), "]"));
 
     xla::PaddingConfig padding_config;
     for (int i = 0; i < rank; ++i) {

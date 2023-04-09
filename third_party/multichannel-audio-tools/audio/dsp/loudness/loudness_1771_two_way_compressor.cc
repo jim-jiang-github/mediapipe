@@ -77,7 +77,7 @@ bool Loudness1771TwoWayCompressor::Init(
                             sample_rate_hz_)) {
     return false;
   }
-  envelope_ = absl::make_unique<AttackReleaseEnvelope>(
+  envelope_ = abslx::make_unique<AttackReleaseEnvelope>(
       params_.attack_s, params_.release_s, sample_rate_hz_);
 
   int lookahead_samples = std::round(params_.lookahead_s * sample_rate_hz_);

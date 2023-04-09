@@ -59,10 +59,10 @@ StatusOr<Literal> PackedLiteralReader::Read(const Shape& shape,
   result.PopulateWithValue(std::numeric_limits<float>::quiet_NaN());
 
   int64_t elements = ShapeUtil::ElementsIn(shape);
-  absl::Span<const float> field = result.data<float>();
-  char* data = absl::bit_cast<char*>(field.data());
+  abslx::Span<const float> field = result.data<float>();
+  char* data = abslx::bit_cast<char*>(field.data());
   uint64_t bytes = elements * sizeof(float);
-  absl::string_view sp;
+  abslx::string_view sp;
   auto s = file_->Read(offset_, bytes, &sp, data);
   offset_ += sp.size();
   if (!s.ok()) {
@@ -83,7 +83,7 @@ bool PackedLiteralReader::IsExhausted() const {
   // Try to read a single byte from offset_.  If we can't, we've
   // exhausted the data.
   char single_byte[1];
-  absl::string_view sp;
+  abslx::string_view sp;
   auto s = file_->Read(offset_, sizeof(single_byte), &sp, single_byte);
   return !s.ok();
 }

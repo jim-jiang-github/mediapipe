@@ -42,25 +42,25 @@ const char kTensorPrefix[] = "tftensor$";
 
 }  // namespace
 
-std::string MangleAttributeName(absl::string_view str) {
-  return absl::StrCat(kAttributePrefix, str);
+std::string MangleAttributeName(abslx::string_view str) {
+  return abslx::StrCat(kAttributePrefix, str);
 }
 
-bool IsMangledAttributeName(absl::string_view str) {
-  return absl::StartsWith(str, kAttributePrefix);
+bool IsMangledAttributeName(abslx::string_view str) {
+  return abslx::StartsWith(str, kAttributePrefix);
 }
 
-absl::string_view DemangleAttributeName(absl::string_view str) {
+abslx::string_view DemangleAttributeName(abslx::string_view str) {
   DCHECK(IsMangledAttributeName(str));
   return str.substr(std::strlen(kAttributePrefix));
 }
 
-MangledKind GetMangledKind(absl::string_view str) {
-  if (absl::StartsWith(str, kDataTypePrefix)) {
+MangledKind GetMangledKind(abslx::string_view str) {
+  if (abslx::StartsWith(str, kDataTypePrefix)) {
     return MangledKind::kDataType;
-  } else if (absl::StartsWith(str, kTensorShapePrefix)) {
+  } else if (abslx::StartsWith(str, kTensorShapePrefix)) {
     return MangledKind::kTensorShape;
-  } else if (absl::StartsWith(str, kTensorPrefix)) {
+  } else if (abslx::StartsWith(str, kTensorPrefix)) {
     return MangledKind::kTensor;
   } else {
     return MangledKind::kUnknown;
@@ -68,27 +68,27 @@ MangledKind GetMangledKind(absl::string_view str) {
 }
 
 std::string MangleShape(const TensorShapeProto& shape) {
-  return absl::StrCat(kTensorShapePrefix, shape.ShortDebugString());
+  return abslx::StrCat(kTensorShapePrefix, shape.ShortDebugString());
 }
 
-Status DemangleShape(absl::string_view str, TensorShapeProto* proto) {
+Status DemangleShape(abslx::string_view str, TensorShapeProto* proto) {
   return ParseTextProto(str, kTensorShapePrefix, proto);
 }
 
 std::string MangleTensor(const TensorProto& tensor) {
-  return absl::StrCat(kTensorPrefix, tensor.ShortDebugString());
+  return abslx::StrCat(kTensorPrefix, tensor.ShortDebugString());
 }
 
-Status DemangleTensor(absl::string_view str, TensorProto* proto) {
+Status DemangleTensor(abslx::string_view str, TensorProto* proto) {
   return ParseTextProto(str, kTensorPrefix, proto);
 }
 
 std::string MangleDataType(const DataType& dtype) {
-  return absl::StrCat(kDataTypePrefix, DataType_Name(dtype));
+  return abslx::StrCat(kDataTypePrefix, DataType_Name(dtype));
 }
 
-Status DemangleDataType(absl::string_view str, DataType* proto) {
-  absl::string_view pbtxt;
+Status DemangleDataType(abslx::string_view str, DataType* proto) {
+  abslx::string_view pbtxt;
   TF_RETURN_IF_ERROR(ConsumePrefix(str, kDataTypePrefix, &pbtxt));
   // NOLINTNEXTLINE: redundant string conversion for divergence in OSS API.
   if (!DataType_Parse(std::string(pbtxt), proto)) {

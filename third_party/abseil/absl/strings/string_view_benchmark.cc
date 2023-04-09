@@ -36,7 +36,7 @@ void BM_StringViewFromString(benchmark::State& state) {
   struct SV {
     SV() = default;
     explicit SV(const std::string& s) : sv(s) {}
-    absl::string_view sv;
+    abslx::string_view sv;
   } sv;
   SV* psv = &sv;
   benchmark::DoNotOptimize(ps);
@@ -51,13 +51,13 @@ BENCHMARK(BM_StringViewFromString)->Arg(12)->Arg(128);
 // Provide a forcibly out-of-line wrapper for operator== that can be used in
 // benchmarks to measure the impact of inlining.
 ABSL_ATTRIBUTE_NOINLINE
-bool NonInlinedEq(absl::string_view a, absl::string_view b) { return a == b; }
+bool NonInlinedEq(abslx::string_view a, abslx::string_view b) { return a == b; }
 
 // We use functions that cannot be inlined to perform the comparison loops so
 // that inlining of the operator== can't optimize away *everything*.
 ABSL_ATTRIBUTE_NOINLINE
-void DoEqualityComparisons(benchmark::State& state, absl::string_view a,
-                           absl::string_view b) {
+void DoEqualityComparisons(benchmark::State& state, abslx::string_view a,
+                           abslx::string_view b) {
   for (auto _ : state) {
     benchmark::DoNotOptimize(a == b);
   }
@@ -94,7 +94,7 @@ void BM_EqualDifferent(benchmark::State& state) {
 BENCHMARK(BM_EqualDifferent)->DenseRange(0, 3)->Range(4, 1 << 10);
 
 // This benchmark is intended to check that important simplifications can be
-// made with absl::string_view comparisons against constant strings. The idea is
+// made with abslx::string_view comparisons against constant strings. The idea is
 // that if constant strings cause redundant components of the comparison, the
 // compiler should detect and eliminate them. Here we use 8 different strings,
 // each with the same size. Provided our comparison makes the implementation
@@ -102,7 +102,7 @@ BENCHMARK(BM_EqualDifferent)->DenseRange(0, 3)->Range(4, 1 << 10);
 // size check once per loop iteration.
 ABSL_ATTRIBUTE_NOINLINE
 void DoConstantSizeInlinedEqualityComparisons(benchmark::State& state,
-                                              absl::string_view a) {
+                                              abslx::string_view a) {
   for (auto _ : state) {
     benchmark::DoNotOptimize(a == "aaa");
     benchmark::DoNotOptimize(a == "bbb");
@@ -127,7 +127,7 @@ BENCHMARK(BM_EqualConstantSizeInlined)->DenseRange(2, 4);
 // between two comparisons when they are comparing against constant strings.
 ABSL_ATTRIBUTE_NOINLINE
 void DoConstantSizeNonInlinedEqualityComparisons(benchmark::State& state,
-                                                 absl::string_view a) {
+                                                 abslx::string_view a) {
   for (auto _ : state) {
     // Force these out-of-line to compare with the above function.
     benchmark::DoNotOptimize(NonInlinedEq(a, "aaa"));
@@ -156,8 +156,8 @@ void BM_CompareSame(benchmark::State& state) {
     x += 'a';
   }
   std::string y = x;
-  absl::string_view a = x;
-  absl::string_view b = y;
+  abslx::string_view a = x;
+  abslx::string_view b = y;
 
   for (auto _ : state) {
     benchmark::DoNotOptimize(a);
@@ -172,8 +172,8 @@ void BM_CompareFirstOneLess(benchmark::State& state) {
   std::string x(len, 'a');
   std::string y = x;
   y.back() = 'b';
-  absl::string_view a = x;
-  absl::string_view b = y;
+  abslx::string_view a = x;
+  abslx::string_view b = y;
 
   for (auto _ : state) {
     benchmark::DoNotOptimize(a);
@@ -188,8 +188,8 @@ void BM_CompareSecondOneLess(benchmark::State& state) {
   std::string x(len, 'a');
   std::string y = x;
   x.back() = 'b';
-  absl::string_view a = x;
-  absl::string_view b = y;
+  abslx::string_view a = x;
+  abslx::string_view b = y;
 
   for (auto _ : state) {
     benchmark::DoNotOptimize(a);
@@ -201,7 +201,7 @@ BENCHMARK(BM_CompareSecondOneLess)->DenseRange(1, 3)->Range(4, 1 << 10);
 
 void BM_find_string_view_len_one(benchmark::State& state) {
   std::string haystack(state.range(0), '0');
-  absl::string_view s(haystack);
+  abslx::string_view s(haystack);
   for (auto _ : state) {
     benchmark::DoNotOptimize(s.find("x"));  // not present; length 1
   }
@@ -210,7 +210,7 @@ BENCHMARK(BM_find_string_view_len_one)->Range(1, 1 << 20);
 
 void BM_find_string_view_len_two(benchmark::State& state) {
   std::string haystack(state.range(0), '0');
-  absl::string_view s(haystack);
+  abslx::string_view s(haystack);
   for (auto _ : state) {
     benchmark::DoNotOptimize(s.find("xx"));  // not present; length 2
   }
@@ -219,7 +219,7 @@ BENCHMARK(BM_find_string_view_len_two)->Range(1, 1 << 20);
 
 void BM_find_one_char(benchmark::State& state) {
   std::string haystack(state.range(0), '0');
-  absl::string_view s(haystack);
+  abslx::string_view s(haystack);
   for (auto _ : state) {
     benchmark::DoNotOptimize(s.find('x'));  // not present
   }
@@ -228,7 +228,7 @@ BENCHMARK(BM_find_one_char)->Range(1, 1 << 20);
 
 void BM_rfind_one_char(benchmark::State& state) {
   std::string haystack(state.range(0), '0');
-  absl::string_view s(haystack);
+  abslx::string_view s(haystack);
   for (auto _ : state) {
     benchmark::DoNotOptimize(s.rfind('x'));  // not present
   }
@@ -243,7 +243,7 @@ void BM_worst_case_find_first_of(benchmark::State& state, int haystack_len) {
   }
   std::string haystack(haystack_len, '0');  // 1000 zeros.
 
-  absl::string_view s(haystack);
+  abslx::string_view s(haystack);
   for (auto _ : state) {
     benchmark::DoNotOptimize(s.find_first_of(needle));
   }
@@ -265,7 +265,7 @@ BENCHMARK(BM_find_first_of_short)->DenseRange(0, 4)->Arg(8)->Arg(16)->Arg(32);
 BENCHMARK(BM_find_first_of_medium)->DenseRange(0, 4)->Arg(8)->Arg(16)->Arg(32);
 BENCHMARK(BM_find_first_of_long)->DenseRange(0, 4)->Arg(8)->Arg(16)->Arg(32);
 
-struct EasyMap : public std::map<absl::string_view, uint64_t> {
+struct EasyMap : public std::map<abslx::string_view, uint64_t> {
   explicit EasyMap(size_t) {}
 };
 
@@ -299,7 +299,7 @@ void StringViewMapBenchmark(benchmark::State& state) {
     do {
       keys[i].clear();
       for (int j = 0; j < WordsPerKey; j++) {
-        absl::StrAppend(&keys[i], j > 0 ? " " : "", words[uniform(rng)]);
+        abslx::StrAppend(&keys[i], j > 0 ? " " : "", words[uniform(rng)]);
       }
     } while (!t.insert(keys[i]).second);
   }
@@ -323,7 +323,7 @@ void StringViewMapBenchmark(benchmark::State& state) {
       num_cold * kNumLookupsOfColdKeys + num_hot * kNumLookupsOfHotKeys ==
           indices.size(),
       "");
-  // After constructing the array we probe it with absl::string_views built from
+  // After constructing the array we probe it with abslx::string_views built from
   // test_strings.  This means operator== won't see equal pointers, so
   // it'll have to check for equal lengths and equal characters.
   std::vector<std::string> test_strings(indices.size());
@@ -359,7 +359,7 @@ BENCHMARK(BM_StdMap_8)->Range(1 << 10, 1 << 16);
 
 void BM_CopyToStringNative(benchmark::State& state) {
   std::string src(state.range(0), 'x');
-  absl::string_view sv(src);
+  abslx::string_view sv(src);
   std::string dst;
   for (auto _ : state) {
     dst.assign(sv.begin(), sv.end());
@@ -369,7 +369,7 @@ BENCHMARK(BM_CopyToStringNative)->Range(1 << 3, 1 << 12);
 
 void BM_AppendToStringNative(benchmark::State& state) {
   std::string src(state.range(0), 'x');
-  absl::string_view sv(src);
+  abslx::string_view sv(src);
   std::string dst;
   for (auto _ : state) {
     dst.clear();

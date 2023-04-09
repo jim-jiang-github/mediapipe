@@ -44,7 +44,7 @@ limitations under the License.
 namespace xla {
 namespace tools {
 
-void RealMain(absl::Span<char* const> args) {
+void RealMain(abslx::Span<char* const> args) {
   Client* client = ClientLibrary::LocalClientOrDie();
   for (char* arg : args) {
     HloSnapshot module;
@@ -65,7 +65,7 @@ void RealMain(absl::Span<char* const> args) {
 int main(int argc, char** argv) {
   tensorflow::port::InitMain(argv[0], &argc, &argv);
 
-  absl::Span<char* const> args(argv, argc);
+  abslx::Span<char* const> args(argv, argc);
   args.remove_prefix(1);  // Pop off the binary name, argv[0]
   xla::tools::RealMain(args);
   return 0;

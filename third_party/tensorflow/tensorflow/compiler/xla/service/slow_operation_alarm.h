@@ -34,13 +34,13 @@ class SlowOperationAlarm {
  public:
   // If `counter` is not null, this alarm will throttle itself to logging
   // once-every-power-of-two occurrences. The counter must outlive this object.
-  SlowOperationAlarm(absl::Duration timeout, std::string msg,
+  SlowOperationAlarm(abslx::Duration timeout, std::string msg,
                      std::atomic<int64_t>* counter = nullptr,
-                     absl::string_view context = "");
-  SlowOperationAlarm(absl::Duration timeout,
+                     abslx::string_view context = "");
+  SlowOperationAlarm(abslx::Duration timeout,
                      std::function<std::string()> msg_fn,
                      std::atomic<int64_t>* counter = nullptr,
-                     absl::string_view context = "");
+                     abslx::string_view context = "");
   ~SlowOperationAlarm();
 
   // Not copyable or movable, because the constructor stores a pointer to `this`
@@ -50,7 +50,7 @@ class SlowOperationAlarm {
   SlowOperationAlarm& operator=(const SlowOperationAlarm&) = delete;
   SlowOperationAlarm& operator=(const SlowOperationAlarm&&) = delete;
 
-  absl::Time deadline() const { return deadline_; }
+  abslx::Time deadline() const { return deadline_; }
   std::string msg() const { return msg_fn_(); }
   std::atomic<int64_t>* counter() { return counter_; }
   void cancel() { UnscheduleAlarm(this); }
@@ -63,8 +63,8 @@ class SlowOperationAlarm {
   static void ScheduleAlarm(SlowOperationAlarm* alarm);
   static void UnscheduleAlarm(const SlowOperationAlarm* alarm);
 
-  absl::Time start_;
-  absl::Time deadline_;
+  abslx::Time start_;
+  abslx::Time deadline_;
   std::string context_;
   std::function<std::string()> msg_fn_;
   std::atomic<bool> fired_{false};
@@ -85,7 +85,7 @@ class SlowOperationAlarm {
 //
 // `context` is an additional message prepended to the alarm.
 [[nodiscard]] std::unique_ptr<SlowOperationAlarm> SlowCompilationAlarm(
-    absl::string_view context);
+    abslx::string_view context);
 
 }  // namespace xla
 

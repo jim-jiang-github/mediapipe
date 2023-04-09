@@ -64,7 +64,7 @@ const XlaExpression& XlaOpKernelContext::InputExpression(int index) {
 }
 
 const XlaExpression& XlaOpKernelContext::InputExpression(
-    absl::string_view name) {
+    abslx::string_view name) {
   return *XlaExpression::CastExpressionFromTensor(GetInputTensorByName(name));
 }
 
@@ -72,7 +72,7 @@ xla::XlaOp XlaOpKernelContext::Input(int index) {
   return InputExpression(index).AsXlaOp(builder());
 }
 
-xla::XlaOp XlaOpKernelContext::Input(absl::string_view name) {
+xla::XlaOp XlaOpKernelContext::Input(abslx::string_view name) {
   return InputExpression(name).AsXlaOp(builder());
 }
 
@@ -80,7 +80,7 @@ TensorShape XlaOpKernelContext::InputShape(int index) {
   return context_->input(index).shape();
 }
 
-TensorShape XlaOpKernelContext::InputShape(absl::string_view name) {
+TensorShape XlaOpKernelContext::InputShape(abslx::string_view name) {
   return GetInputTensorByName(name).shape();
 }
 
@@ -88,7 +88,7 @@ StatusOr<xla::Shape> XlaOpKernelContext::InputXlaShape(int index) {
   return builder()->GetShape(Input(index));
 }
 
-StatusOr<xla::Shape> XlaOpKernelContext::InputXlaShape(absl::string_view name) {
+StatusOr<xla::Shape> XlaOpKernelContext::InputXlaShape(abslx::string_view name) {
   return builder()->GetShape(Input(name));
 }
 
@@ -104,7 +104,7 @@ DataType XlaOpKernelContext::input_type(int index) const {
   return type;
 }
 
-DataType XlaOpKernelContext::InputType(absl::string_view name) {
+DataType XlaOpKernelContext::InputType(abslx::string_view name) {
   const Tensor& tensor = GetInputTensorByName(name);
   DataType type = tensor.dtype();
   if (type == DT_UINT8) {
@@ -126,7 +126,7 @@ xla::PrimitiveType XlaOpKernelContext::input_xla_type(int index) {
   return type;
 }
 
-xla::PrimitiveType XlaOpKernelContext::InputXlaType(absl::string_view name) {
+xla::PrimitiveType XlaOpKernelContext::InputXlaType(abslx::string_view name) {
   xla::PrimitiveType type;
   Status status = DataTypeToPrimitiveType(InputType(name), &type);
   if (!status.ok()) {
@@ -151,7 +151,7 @@ Status XlaOpKernelContext::ConstantInput(int index,
 }
 
 static StatusOr<int> InputIndex(XlaOpKernelContext* context,
-                                absl::string_view name) {
+                                abslx::string_view name) {
   int start, stop;
   TF_RETURN_IF_ERROR(context->op_kernel().InputRange(name, &start, &stop));
   if (stop != start + 1) {
@@ -170,12 +170,12 @@ Status XlaOpKernelContext::ResolveInputDynamism(
 }
 
 Status XlaOpKernelContext::ResolveInputDynamism(
-    absl::string_view name, xla::Literal* dynamism_literal) {
+    abslx::string_view name, xla::Literal* dynamism_literal) {
   TF_ASSIGN_OR_RETURN(int index, InputIndex(this, name));
   return ResolveInputDynamism(index, dynamism_literal);
 }
 
-Status XlaOpKernelContext::ConstantInput(absl::string_view name,
+Status XlaOpKernelContext::ConstantInput(abslx::string_view name,
                                          xla::Literal* constant_literal,
                                          xla::ValueInferenceMode mode) {
   TF_ASSIGN_OR_RETURN(int index, InputIndex(this, name));
@@ -183,7 +183,7 @@ Status XlaOpKernelContext::ConstantInput(absl::string_view name,
 }
 
 Status XlaOpKernelContext::ConstantInputReshaped(
-    int index, absl::Span<const int64_t> new_dims,
+    int index, abslx::Span<const int64_t> new_dims,
     xla::Literal* constant_literal, xla::ValueInferenceMode mode) {
   TF_ASSIGN_OR_RETURN(Tensor constant, ConstantInputTensor(index, mode));
   Tensor temp(constant.dtype());
@@ -239,7 +239,7 @@ Status XlaOpKernelContext::ConstantInputAsIntScalar(
 }
 
 Status XlaOpKernelContext::ConstantInputAsIntScalar(
-    absl::string_view name, int64_t* out, xla::ValueInferenceMode mode) {
+    abslx::string_view name, int64_t* out, xla::ValueInferenceMode mode) {
   TF_ASSIGN_OR_RETURN(int index, InputIndex(this, name));
   return ConstantInputAsIntScalar(index, out, mode);
 }
@@ -298,19 +298,19 @@ Status XlaOpKernelContext::ResolveInputDynamismIntoPred(int index, bool* out) {
 }
 
 Status XlaOpKernelContext::ResolveInputDynamismIntoPredVector(
-    absl::string_view name, std::vector<bool>* out) {
+    abslx::string_view name, std::vector<bool>* out) {
   TF_ASSIGN_OR_RETURN(int index, InputIndex(this, name));
   return ResolveInputDynamismIntoPredVector(index, out);
 }
 
-Status XlaOpKernelContext::ResolveInputDynamismIntoPred(absl::string_view name,
+Status XlaOpKernelContext::ResolveInputDynamismIntoPred(abslx::string_view name,
                                                         bool* out) {
   TF_ASSIGN_OR_RETURN(int index, InputIndex(this, name));
   return ResolveInputDynamismIntoPred(index, out);
 }
 
 Status XlaOpKernelContext::ResolveInputDynamismReshaped(
-    int index, absl::Span<const int64_t> new_dims,
+    int index, abslx::Span<const int64_t> new_dims,
     xla::Literal* dynamism_literal) {
   XlaExpression e = InputExpression(index);
   auto* client = compiler() ? compiler()->client() : nullptr;
@@ -381,7 +381,7 @@ Status XlaOpKernelContext::ConstantInputAsIntVector(
 }
 
 Status XlaOpKernelContext::ConstantInputAsIntVector(
-    absl::string_view name, std::vector<int64_t>* out,
+    abslx::string_view name, std::vector<int64_t>* out,
     xla::ValueInferenceMode mode) {
   TF_ASSIGN_OR_RETURN(int index, InputIndex(this, name));
   return ConstantInputAsIntVector(index, out, mode);
@@ -396,7 +396,7 @@ Status XlaOpKernelContext::ConstantInputReshapedToIntVector(
 }
 
 Status XlaOpKernelContext::ConstantInputReshapedToIntVector(
-    absl::string_view name, std::vector<int64_t>* out,
+    abslx::string_view name, std::vector<int64_t>* out,
     xla::ValueInferenceMode mode) {
   TF_ASSIGN_OR_RETURN(int index, InputIndex(this, name));
   xla::Literal literal;
@@ -431,7 +431,7 @@ Status XlaOpKernelContext::ConstantInputAsInt64Literal(
 }
 
 Status XlaOpKernelContext::ConstantInputAsInt64Literal(
-    absl::string_view name, xla::Literal* out, xla::ValueInferenceMode mode) {
+    abslx::string_view name, xla::Literal* out, xla::ValueInferenceMode mode) {
   TF_ASSIGN_OR_RETURN(int index, InputIndex(this, name));
   return ConstantInputAsInt64Literal(index, out, mode);
 }
@@ -479,7 +479,7 @@ Status XlaOpKernelContext::ConstantInputAsPartialShape(
   return OkStatus();
 }
 
-Status XlaOpKernelContext::InputList(absl::string_view name,
+Status XlaOpKernelContext::InputList(abslx::string_view name,
                                      std::vector<xla::XlaOp>* handles,
                                      std::vector<TensorShape>* shapes) {
   OpInputList inputs;
@@ -494,7 +494,7 @@ Status XlaOpKernelContext::InputList(absl::string_view name,
   return OkStatus();
 }
 
-Status XlaOpKernelContext::ConstantInputList(absl::string_view name,
+Status XlaOpKernelContext::ConstantInputList(abslx::string_view name,
                                              std::vector<xla::Literal>* outputs,
                                              xla::ValueInferenceMode mode) {
   int start, stop;
@@ -595,7 +595,7 @@ Status XlaOpKernelContext::ReadVariableInput(int index, DataType type,
                                  value);
 }
 
-Status XlaOpKernelContext::ReadVariableInput(absl::string_view name,
+Status XlaOpKernelContext::ReadVariableInput(abslx::string_view name,
                                              DataType type, TensorShape* shape,
                                              xla::XlaOp* value) {
   return ReadVariableInputTensor(GetInputTensorByName(name), type, this, shape,
@@ -740,7 +740,7 @@ Status XlaOpKernelContext::AssignVariable(int input_index, DataType type,
                               builder());
 }
 
-Status XlaOpKernelContext::AssignVariable(absl::string_view name, DataType type,
+Status XlaOpKernelContext::AssignVariable(abslx::string_view name, DataType type,
                                           xla::XlaOp handle) {
   TF_RET_CHECK(handle.valid());
   return AssignVariableTensor(GetInputTensorByName(name), type, this, handle,
@@ -751,7 +751,7 @@ static Status GetStatusWithStackTrace(const Status& s,
                                       const XlaOpKernelContext* ctx) {
   if (s.code() == error::INVALID_ARGUMENT) {
     return Status{s.code(),
-                  absl::StrCat(s.error_message(), "\n", ctx->StackTrace())};
+                  abslx::StrCat(s.error_message(), "\n", ctx->StackTrace())};
   }
   return s;
 }
@@ -792,7 +792,7 @@ const xla::XlaComputation* XlaOpKernelContext::GetOrCreateMul(
   return xla_context()->GetOrCreateMul(type);
 }
 
-const Tensor& XlaOpKernelContext::GetInputTensorByName(absl::string_view name) {
+const Tensor& XlaOpKernelContext::GetInputTensorByName(abslx::string_view name) {
   const Tensor* tensor;
   CHECK(context_->input(name, &tensor).ok());
   return *tensor;
@@ -812,7 +812,7 @@ std::string XlaOpKernelContext::StackTrace() const {
     opts.show_line_contents = true;
     opts.filter_common_prefix = true;
     opts.drop_internal_frames = true;
-    return absl::StrCat("\nStack trace for op definition: \n",
+    return abslx::StrCat("\nStack trace for op definition: \n",
                         stack_trace->ToString(opts), "\n");
   } else {
     return "";

@@ -66,14 +66,14 @@ xla::Status PjrtErrorToStatus(const PJRT_Error* error, const PJRT_Api* api) {
   return status;
 }
 
-absl::string_view GetPjrtErrorMessage(const PJRT_Error* error,
+abslx::string_view GetPjrtErrorMessage(const PJRT_Error* error,
                                       const PJRT_Api* api) {
   PJRT_Error_Message_Args message_args;
   message_args.struct_size = PJRT_Error_Message_Args_STRUCT_SIZE;
   message_args.priv = nullptr;
   message_args.error = error;
   api->PJRT_Error_Message(&message_args);
-  return absl::string_view(message_args.message, message_args.message_size);
+  return abslx::string_view(message_args.message, message_args.message_size);
 }
 
 void LogFatalIfPjrtError(PJRT_Error* error, const PJRT_Api* api) {

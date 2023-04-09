@@ -105,7 +105,7 @@ int NumIterations(const RewriterConfig& cfg) {
 bool IsRunOnceOptimizer(const string& name) {
   return name == "layout" || name == "memory_optimizer" ||
          name == "loop_optimizer" ||
-         absl::StartsWith(name, "auto_mixed_precision");
+         abslx::StartsWith(name, "auto_mixed_precision");
 }
 
 // Creates a function library stub from a real function library: copy only
@@ -917,7 +917,7 @@ Status MetaOptimizer::RunOptimizer(
   if (!is_function_library_aware) {
     VLOG(3) << "Replace function library with a stub for " << optimizer->name();
     optimized_graph_function_library =
-        absl::WrapUnique(optimized_graph->release_library());
+        abslx::WrapUnique(optimized_graph->release_library());
     *optimized_graph->mutable_library() =
         GetFunctionDefLibraryStub(*optimized_graph_function_library);
   }
@@ -973,7 +973,7 @@ Status MetaOptimizer::RunOptimizer(
     if (cfg_.fail_on_optimizer_errors()) return status;
 
     // Non-aborted failures in the TFG optimizer are always fatal.
-    if (absl::StartsWith(optimizer->name(), "tfg_optimizer")) return status;
+    if (abslx::StartsWith(optimizer->name(), "tfg_optimizer")) return status;
   }
 
   return OkStatus();
@@ -983,7 +983,7 @@ Status MetaOptimizer::RunOptimizer(
 void PropagateTFDataAttrs(const FunctionLibraryDefinition& flib,
                           FunctionDefLibrary& fdef_lib) {
   // Collect functions that need the attribute in this set.
-  absl::flat_hash_set<std::string> tf_data_functions;
+  abslx::flat_hash_set<std::string> tf_data_functions;
   std::function<void(const std::string&)> collect_tf_data_functions_dfs =
       [&](const std::string& func_name) -> void {
     const FunctionDef* func_def = flib.Find(func_name);
@@ -1063,7 +1063,7 @@ Status MetaOptimizer::OptimizeConsumeItem(Cluster* cluster, GrapplerItem&& item,
   *item.graph.mutable_library() = minimized_flib(item.graph).ToProto();
   int new_library_size = item.graph.library().function_size();
 
-  VLOG(1) << absl::Substitute(
+  VLOG(1) << abslx::Substitute(
       "Deleted $0 unreachable functions from the graph (library size = $1)",
       old_library_size - new_library_size, new_library_size);
 
@@ -1083,7 +1083,7 @@ Status MetaOptimizer::OptimizeConsumeItem(Cluster* cluster, GrapplerItem&& item,
   using NodeDefs = protobuf::RepeatedPtrField<NodeDef>;
 
   // Find functions for which we might need to compute a gradient at runtime.
-  absl::flat_hash_set<string> differentiable_functions;
+  abslx::flat_hash_set<string> differentiable_functions;
 
   const auto find_differentiable_functions =
       [&](const NodeDefs& nodes) -> void {
@@ -1108,7 +1108,7 @@ Status MetaOptimizer::OptimizeConsumeItem(Cluster* cluster, GrapplerItem&& item,
   // Grappler rewrites can potentially add nodes that are
   // not supported by XLA, so we choose to skip such functions when we optimize
   // the function library.
-  absl::flat_hash_set<string> xla_compiled_functions;
+  abslx::flat_hash_set<string> xla_compiled_functions;
   std::function<void(const string&)> find_all_functions;
   find_all_functions = [&](const string& func) -> void {
     // Ignore call cycles in the graph
@@ -1153,7 +1153,7 @@ Status MetaOptimizer::OptimizeConsumeItem(Cluster* cluster, GrapplerItem&& item,
   bool is_tpu_graph = IsLegacyTPUBridgeGraphDef(*optimized_graph);
 
   // Optimize each function only once.
-  absl::flat_hash_set<string> optimized_funcs;
+  abslx::flat_hash_set<string> optimized_funcs;
   while (optimize_function_library) {
     optimize_function_library = false;
 
@@ -1295,7 +1295,7 @@ Status MetaOptimizer::OptimizeConsumeItem(Cluster* cluster, GrapplerItem&& item,
 #endif
 
   VLOG(1) << "Optimized " << optimized_funcs.size()
-          << " functions: " << absl::StrJoin(optimized_funcs, ", ");
+          << " functions: " << abslx::StrJoin(optimized_funcs, ", ");
   VLOG(3) << "Optimized graph =\n" << optimized_graph->DebugString();
   if (VLOG_IS_ON(1)) {
     DumpGraphDefToFile(
@@ -1310,11 +1310,11 @@ Status MetaOptimizer::OptimizeConsumeItem(Cluster* cluster, GrapplerItem&& item,
 string MetaOptimizer::GetResultString() const {
   std::string result_string;
   for (const GraphOptimizationResult& graph_result : optimization_results_) {
-    absl::StrAppend(&result_string,
+    abslx::StrAppend(&result_string,
                     "Optimization results for grappler item: ", graph_result.id,
                     "\n");
     for (const OptimizerResult& result : graph_result.results) {
-      absl::StrAppend(&result_string, "  ", result.optimizer_name, ": ",
+      abslx::StrAppend(&result_string, "  ", result.optimizer_name, ": ",
                       result.message, "\n");
     }
   }
@@ -1385,7 +1385,7 @@ Status OptimizeGraph(
     if (!added_device.ok()) VLOG(3) << added_device.error_message();
   }
   VLOG(3) << "Grappler available devices: "
-          << absl::StrJoin(item.devices(), ", ");
+          << abslx::StrJoin(item.devices(), ", ");
 
   // Add fetches so that the graph can be pruned.
   item.fetch.swap(ret_node_names);

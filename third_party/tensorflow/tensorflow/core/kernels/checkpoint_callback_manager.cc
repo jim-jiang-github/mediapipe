@@ -33,22 +33,22 @@ limitations under the License.
 namespace tensorflow {
 namespace checkpoint {
 
-const absl::string_view kCheckpointCallbackManagerResourceName =
+const abslx::string_view kCheckpointCallbackManagerResourceName =
     "checkpoint_callback_manager";
 
 namespace {
 
-const absl::string_view kCheckpointFileRegex = "^part-[0-9]*-of-[0-9]*$";
-const absl::string_view kCheckpointTempDirRegex = "-[0-9]*_temp$";
-const absl::string_view kCheckpointDirRegex = "-[0-9]*$";
-const absl::string_view kCheckpointTempDirSuffix = "_temp";
+const abslx::string_view kCheckpointFileRegex = "^part-[0-9]*-of-[0-9]*$";
+const abslx::string_view kCheckpointTempDirRegex = "-[0-9]*_temp$";
+const abslx::string_view kCheckpointDirRegex = "-[0-9]*$";
+const abslx::string_view kCheckpointTempDirSuffix = "_temp";
 
-void TriggerSaveCallbackIfFileNotExist(absl::string_view checkpoint_id,
-                                       absl::string_view checkpoint_dir,
-                                       absl::string_view file_extension,
+void TriggerSaveCallbackIfFileNotExist(abslx::string_view checkpoint_id,
+                                       abslx::string_view checkpoint_dir,
+                                       abslx::string_view file_extension,
                                        SaveCallback callback) {
   const std::string file_path = io::JoinPath(
-      checkpoint_dir, absl::StrCat(checkpoint_id, ".", file_extension));
+      checkpoint_dir, abslx::StrCat(checkpoint_id, ".", file_extension));
 
   // If the file already exists, we are done.
   if (Env::Default()->FileExists(file_path).ok()) {
@@ -78,12 +78,12 @@ void TriggerSaveCallbackIfFileNotExist(absl::string_view checkpoint_id,
   }
 }
 
-void TriggerRestoreCallbackIfFileExists(absl::string_view checkpoint_id,
-                                        absl::string_view checkpoint_dir,
-                                        absl::string_view file_extension,
+void TriggerRestoreCallbackIfFileExists(abslx::string_view checkpoint_id,
+                                        abslx::string_view checkpoint_dir,
+                                        abslx::string_view file_extension,
                                         RestoreCallback callback) {
   const std::string file_path = io::JoinPath(
-      checkpoint_dir, absl::StrCat(checkpoint_id, ".", file_extension));
+      checkpoint_dir, abslx::StrCat(checkpoint_id, ".", file_extension));
   if (!Env::Default()->FileExists(file_path).ok()) {
     return;
   }
@@ -113,9 +113,9 @@ void TriggerRestoreCallbackIfFileExists(absl::string_view checkpoint_id,
 //    "/foo/bar"              --> NotFound error
 StatusOr<std::pair<std::string, std::string>>
 CheckpointCallbackManager::GetCheckpointIdAndPathFromPrefix(
-    absl::string_view prefix) {
-  for (absl::string_view path = prefix;; path = io::Dirname(path)) {
-    absl::string_view basename = io::Basename(path);
+    abslx::string_view prefix) {
+  for (abslx::string_view path = prefix;; path = io::Dirname(path)) {
+    abslx::string_view basename = io::Basename(path);
 
     // Failed to find checkpoint_id
     if (basename.empty()) break;
@@ -139,11 +139,11 @@ CheckpointCallbackManager::GetCheckpointIdAndPathFromPrefix(
     }
   }
   return errors::NotFound(
-      absl::StrCat("Failed to find a checkpoint id. prefix = ", prefix));
+      abslx::StrCat("Failed to find a checkpoint id. prefix = ", prefix));
 }
 
 Status CheckpointCallbackManager::RegisterSaveCallback(
-    absl::string_view file_extension, SaveCallback callback) {
+    abslx::string_view file_extension, SaveCallback callback) {
   SaveCallback lazy_callback = nullptr;
   std::string checkpoint_id;
   std::string checkpoint_dir;
@@ -171,13 +171,13 @@ Status CheckpointCallbackManager::RegisterSaveCallback(
 }
 
 bool CheckpointCallbackManager::DoesSaveCallbackExist(
-    absl::string_view file_extension) {
+    abslx::string_view file_extension) {
   tf_shared_lock l(mu_);
   return save_callbacks_.contains(file_extension);
 }
 
 Status CheckpointCallbackManager::RegisterRestoreCallback(
-    absl::string_view file_extension, RestoreCallback callback) {
+    abslx::string_view file_extension, RestoreCallback callback) {
   RestoreCallback lazy_callback = nullptr;
   std::string checkpoint_id;
   std::string checkpoint_dir;
@@ -205,12 +205,12 @@ Status CheckpointCallbackManager::RegisterRestoreCallback(
 }
 
 bool CheckpointCallbackManager::DoesRestoreCallbackExist(
-    absl::string_view file_extension) {
+    abslx::string_view file_extension) {
   tf_shared_lock l(mu_);
   return restore_callbacks_.contains(file_extension);
 }
 
-void CheckpointCallbackManager::Save(absl::string_view prefix) {
+void CheckpointCallbackManager::Save(abslx::string_view prefix) {
   StatusOr<std::pair<std::string, std::string>> id_and_dir =
       GetCheckpointIdAndPathFromPrefix(prefix);
   if (!id_and_dir.ok()) {
@@ -218,7 +218,7 @@ void CheckpointCallbackManager::Save(absl::string_view prefix) {
   }
 
   // Create a copy to avoid holding lock while calling a callback.
-  absl::flat_hash_map<std::string, SaveCallback> copy_of_save_callbacks;
+  abslx::flat_hash_map<std::string, SaveCallback> copy_of_save_callbacks;
   {
     mutex_lock l(mu_);
     last_saved_checkpoint_id_and_dir_ = *id_and_dir;
@@ -232,7 +232,7 @@ void CheckpointCallbackManager::Save(absl::string_view prefix) {
   }
 }
 
-void CheckpointCallbackManager::Restore(absl::string_view prefix) {
+void CheckpointCallbackManager::Restore(abslx::string_view prefix) {
   StatusOr<std::pair<std::string, std::string>> id_and_dir =
       GetCheckpointIdAndPathFromPrefix(prefix);
   if (!id_and_dir.ok()) {
@@ -240,7 +240,7 @@ void CheckpointCallbackManager::Restore(absl::string_view prefix) {
   }
 
   // Create a copy to avoid holding lock while calling a callback.
-  absl::flat_hash_map<std::string, RestoreCallback> copy_of_restore_callbacks;
+  abslx::flat_hash_map<std::string, RestoreCallback> copy_of_restore_callbacks;
   {
     mutex_lock l(mu_);
     last_restored_checkpoint_id_and_dir_ = *id_and_dir;

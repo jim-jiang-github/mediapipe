@@ -80,9 +80,9 @@ std::string DumpModuleToString(const llvm::Module& module);
 //   - joining all of the nonempty inputs by '.', and then
 //   - removing all '%'s.
 //
-std::string IrName(absl::string_view a);
-std::string IrName(absl::string_view a, absl::string_view b);
-std::string IrName(const HloInstruction* a, absl::string_view b = "");
+std::string IrName(abslx::string_view a);
+std::string IrName(abslx::string_view a, abslx::string_view b);
+std::string IrName(const HloInstruction* a, abslx::string_view b = "");
 
 // Removes special characters from a function name.
 //
@@ -95,21 +95,21 @@ std::string SanitizeFunctionName(std::string function_name);
 // for each overloaded type. Typically, overloaded intrinsics have only a single
 // overloaded type.
 llvm::CallInst* EmitCallToIntrinsic(
-    llvm::Intrinsic::ID intrinsic_id, absl::Span<llvm::Value* const> operands,
-    absl::Span<llvm::Type* const> overloaded_types, llvm::IRBuilder<>* b,
-    absl::string_view name = "");
+    llvm::Intrinsic::ID intrinsic_id, abslx::Span<llvm::Value* const> operands,
+    abslx::Span<llvm::Type* const> overloaded_types, llvm::IRBuilder<>* b,
+    abslx::string_view name = "");
 
 // Emit float max. Emit maxnum intrinsic is fast math is disabled, or
 // fcmp+select otherwise
 llvm::Value* EmitFloatMax(llvm::Value* lhs_value, llvm::Value* rhs_value,
                           llvm::IRBuilder<>* b, bool enable_fast_min_max,
-                          absl::string_view name = "");
+                          abslx::string_view name = "");
 
 // Emit float min. Emit minnum intrinsic is fast math is disabled, or
 // fcmp+select otherwise
 llvm::Value* EmitFloatMin(llvm::Value* lhs_value, llvm::Value* rhs_value,
                           llvm::IRBuilder<>* b, bool enable_fast_min_max,
-                          absl::string_view name = "");
+                          abslx::string_view name = "");
 
 // Convenience methods for emitting a GEP instruction that indexes into a buffer
 // (1-dimensional array), equivalent to array[index]. The element type of the
@@ -145,7 +145,7 @@ llvm::Constant* ConvertLiteralToIrConstant(const Literal& literal,
 // Allocates a tile of shared memory.
 llvm::GlobalVariable* AllocateSharedMemoryTile(llvm::Module* module,
                                                llvm::Type* tile_type,
-                                               absl::string_view name);
+                                               abslx::string_view name);
 
 // Inserts an allocate of the requested type at the entry point of the
 // function that the builder is currently building. The insert point
@@ -155,7 +155,7 @@ llvm::GlobalVariable* AllocateSharedMemoryTile(llvm::Module* module,
 // This can be useful to avoid e.g. executing an alloca every time
 // through a loop.
 llvm::AllocaInst* EmitAllocaAtFunctionEntry(llvm::Type* type,
-                                            absl::string_view name,
+                                            abslx::string_view name,
                                             llvm::IRBuilder<>* b,
                                             int alignment = 0);
 
@@ -163,7 +163,7 @@ llvm::AllocaInst* EmitAllocaAtFunctionEntry(llvm::Type* type,
 // instead of a single element.
 llvm::AllocaInst* EmitAllocaAtFunctionEntryWithCount(llvm::Type* type,
                                                      llvm::Value* element_count,
-                                                     absl::string_view name,
+                                                     abslx::string_view name,
                                                      llvm::IRBuilder<>* b,
                                                      int alignment = 0);
 
@@ -171,7 +171,7 @@ llvm::AllocaInst* EmitAllocaAtFunctionEntryWithCount(llvm::Type* type,
 // builder. Inserts at the end of the function if insert_before is
 // null.
 llvm::BasicBlock* CreateBasicBlock(llvm::BasicBlock* insert_before,
-                                   absl::string_view name,
+                                   abslx::string_view name,
                                    llvm::IRBuilder<>* b);
 
 // Struct with data on a conditional branch in a diamond shape created
@@ -203,14 +203,14 @@ struct LlvmIfData {
 // Currently the insertion point of the builder must be a well-formed
 // block with a terminator. If you need to use this for a
 // non-terminated block, just make the function able to do that too.
-LlvmIfData EmitIfThenElse(llvm::Value* condition, absl::string_view name,
+LlvmIfData EmitIfThenElse(llvm::Value* condition, abslx::string_view name,
                           llvm::IRBuilder<>* b, bool emit_else = true);
 
 // Emits a compare operation between "lhs" and "rhs" with the given predicate,
 // and then converts the result to i8 so that it is addressable.
 llvm::Value* EmitComparison(llvm::CmpInst::Predicate predicate,
                             llvm::Value* lhs, llvm::Value* rhs,
-                            llvm::IRBuilder<>* b, absl::string_view name = "");
+                            llvm::IRBuilder<>* b, abslx::string_view name = "");
 
 // Emits a call that logs the given value with the given tag as a prefix.
 // The provided tag and value are passed to a runtime logging call that is
@@ -269,12 +269,12 @@ std::map<int, llvm::MDNode*> MergeMetadata(
 // of "-no-opt.ll" is used.
 void DumpIrIfEnabled(const HloModule& hlo_module,
                      const llvm::Module& llvm_module, bool optimized,
-                     absl::string_view filename_suffix = "");
+                     abslx::string_view filename_suffix = "");
 
 llvm::Function* CreateCpuFunction(llvm::FunctionType* function_type,
                                   llvm::GlobalValue::LinkageTypes linkage,
                                   const HloModuleConfig& module_config,
-                                  absl::string_view name, llvm::Module* module);
+                                  abslx::string_view name, llvm::Module* module);
 
 // Zero-extends two 32-bit values to 64 bits, multiplies them, and returns the
 // result as a pair of (low 32 bits, high 32 bits).

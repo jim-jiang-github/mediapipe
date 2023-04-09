@@ -65,7 +65,7 @@ bool AllBatchParallel(const std::vector<Layout>& layouts,
 // Check all Layouts have the same batch rank
 bool SameBatchRank(const std::vector<Layout>& layouts,
                    const llvm::DenseMap<int, int>& batchable_indices) {
-  absl::flat_hash_set<int> batch_ranks;
+  abslx::flat_hash_set<int> batch_ranks;
   // Add all batch ranks of layouts
   for (auto const& idx_and_non_batch_rank : batchable_indices) {
     auto const& idx = idx_and_non_batch_rank.first;
@@ -108,7 +108,7 @@ StatusOr<Layout> MergeBatchLayouts(
 
   // Merge layouts. If any dimension don't agree on sharding dim, then replicate
   for (int i = 0; i < batch_rank; ++i) {
-    absl::flat_hash_set<std::string> spec_set;
+    abslx::flat_hash_set<std::string> spec_set;
     for (auto const& arg_idx_and_unused : batchable_args) {
       auto const& arg_idx = arg_idx_and_unused.first;
       if (layouts.find(arg_idx) == layouts.end()) continue;
@@ -125,7 +125,7 @@ StatusOr<Layout> MergeBatchLayouts(
   }
 
   // Deduplicate same usage of mesh dims. [x,x] -> [unsharded, unsharded]
-  absl::flat_hash_map<std::string, int> counter;
+  abslx::flat_hash_map<std::string, int> counter;
   for (const std::string& spec : merged_specs) counter[spec] += 1;
   for (std::string& spec : merged_specs) {
     if (counter[spec] > 1) {
@@ -165,7 +165,7 @@ StatusOr<Layout> IntermediateBatchLayout(
   for (int i = 0; i < batch_rank; ++i) {
     std::string mesh_dim = Layout::kUnshardedDim;
     int max_count = 0;
-    absl::flat_hash_map<std::string, int> counter;
+    abslx::flat_hash_map<std::string, int> counter;
     // add operand counts
     for (auto const& idx_and_unused : batchable_operands) {
       auto const& idx = idx_and_unused.first;
@@ -189,7 +189,7 @@ StatusOr<Layout> IntermediateBatchLayout(
     batch_specs[i] = mesh_dim;
   }
   // deduplicate
-  absl::flat_hash_map<std::string, int> counter;
+  abslx::flat_hash_map<std::string, int> counter;
   for (const std::string& spec : batch_specs) counter[spec] += 1;
   for (std::string& spec : batch_specs) {
     if (counter[spec] > 1) {

@@ -42,7 +42,7 @@ class TestKernelAndDeviceFunc final : public KernelAndDeviceFunc {
             /*allow_control_flow_sync_execution=*/false,
             /*shape_inference_on_tfe_dialect_import=*/true,
             /*int_args_and_retvals_on_device=*/false,
-            /*xla_compile_device_type=*/absl::nullopt,
+            /*xla_compile_device_type=*/abslx::nullopt,
             /*rendezvous_creator=*/nullptr, /*get_op_id=*/nullptr),
         test_input_devices_(std::move(input_devices)) {}
 
@@ -106,7 +106,7 @@ TEST(ExecuteNodeTest, ExecuteNodeArgs) {
   TF_ASSERT_OK(TensorHandle::CreatePackedHandle({h1, h2}, ctx, &packed_h));
 
   // LOCAL, PACKED, REMOTE
-  absl::InlinedVector<TensorHandle*, 4> inputs = {h0, packed_h, h3};
+  abslx::InlinedVector<TensorHandle*, 4> inputs = {h0, packed_h, h3};
 
   std::vector<Device*> input_devices;
   for (auto* h : inputs) {

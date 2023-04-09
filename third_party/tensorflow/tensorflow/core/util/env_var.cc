@@ -32,7 +32,7 @@ Status ReadBoolFromEnvVar(StringPiece env_var_name, bool default_val,
   if (tf_env_var_val == nullptr) {
     return OkStatus();
   }
-  string str_value = absl::AsciiStrToLower(tf_env_var_val);
+  string str_value = abslx::AsciiStrToLower(tf_env_var_val);
   if (str_value == "0" || str_value == "false") {
     *value = false;
     return OkStatus();

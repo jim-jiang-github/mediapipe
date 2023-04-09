@@ -48,16 +48,16 @@ ABSL_FLAG(std::string, output_image_path, "",
 
 namespace {
 
-absl::StatusOr<std::string> ReadFileToString(const std::string& file_path) {
+abslx::StatusOr<std::string> ReadFileToString(const std::string& file_path) {
   std::string contents;
   MP_RETURN_IF_ERROR(mediapipe::file::GetContents(file_path, &contents));
   return contents;
 }
 
-absl::Status ProcessImage(std::unique_ptr<mediapipe::CalculatorGraph> graph) {
+abslx::Status ProcessImage(std::unique_ptr<mediapipe::CalculatorGraph> graph) {
   LOG(INFO) << "Load the image.";
   ASSIGN_OR_RETURN(const std::string raw_image,
-                   ReadFileToString(absl::GetFlag(FLAGS_input_image_path)));
+                   ReadFileToString(abslx::GetFlag(FLAGS_input_image_path)));
 
   LOG(INFO) << "Start running the calculator graph.";
   ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller output_image_poller,
@@ -79,7 +79,7 @@ absl::Status ProcessImage(std::unique_ptr<mediapipe::CalculatorGraph> graph) {
   // Get the graph result packets, or stop if that fails.
   mediapipe::Packet left_iris_depth_packet;
   if (!left_iris_depth_poller.Next(&left_iris_depth_packet)) {
-    return absl::UnknownError(
+    return abslx::UnknownError(
         "Failed to get packet from output stream 'left_iris_depth_mm'.");
   }
   const auto& left_iris_depth_mm = left_iris_depth_packet.Get<float>();
@@ -88,7 +88,7 @@ absl::Status ProcessImage(std::unique_ptr<mediapipe::CalculatorGraph> graph) {
 
   mediapipe::Packet right_iris_depth_packet;
   if (!right_iris_depth_poller.Next(&right_iris_depth_packet)) {
-    return absl::UnknownError(
+    return abslx::UnknownError(
         "Failed to get packet from output stream 'right_iris_depth_mm'.");
   }
   const auto& right_iris_depth_mm = right_iris_depth_packet.Get<float>();
@@ -98,7 +98,7 @@ absl::Status ProcessImage(std::unique_ptr<mediapipe::CalculatorGraph> graph) {
 
   mediapipe::Packet output_image_packet;
   if (!output_image_poller.Next(&output_image_packet)) {
-    return absl::UnknownError(
+    return abslx::UnknownError(
         "Failed to get packet from output stream 'output_image'.");
   }
   auto& output_frame = output_image_packet.Get<mediapipe::ImageFrame>();
@@ -106,10 +106,10 @@ absl::Status ProcessImage(std::unique_ptr<mediapipe::CalculatorGraph> graph) {
   // Convert back to opencv for display or saving.
   cv::Mat output_frame_mat = mediapipe::formats::MatView(&output_frame);
   cv::cvtColor(output_frame_mat, output_frame_mat, cv::COLOR_RGB2BGR);
-  const bool save_image = !absl::GetFlag(FLAGS_output_image_path).empty();
+  const bool save_image = !abslx::GetFlag(FLAGS_output_image_path).empty();
   if (save_image) {
     LOG(INFO) << "Saving image to file...";
-    cv::imwrite(absl::GetFlag(FLAGS_output_image_path), output_frame_mat);
+    cv::imwrite(abslx::GetFlag(FLAGS_output_image_path), output_frame_mat);
   } else {
     cv::namedWindow(kWindowName, /*flags=WINDOW_AUTOSIZE*/ 1);
     cv::imshow(kWindowName, output_frame_mat);
@@ -122,7 +122,7 @@ absl::Status ProcessImage(std::unique_ptr<mediapipe::CalculatorGraph> graph) {
   return graph->WaitUntilDone();
 }
 
-absl::Status RunMPPGraph() {
+abslx::Status RunMPPGraph() {
   std::string calculator_graph_config_contents;
   MP_RETURN_IF_ERROR(mediapipe::file::GetContents(
       kCalculatorGraphConfigFile, &calculator_graph_config_contents));
@@ -134,14 +134,14 @@ absl::Status RunMPPGraph() {
 
   LOG(INFO) << "Initialize the calculator graph.";
   std::unique_ptr<mediapipe::CalculatorGraph> graph =
-      absl::make_unique<mediapipe::CalculatorGraph>();
+      abslx::make_unique<mediapipe::CalculatorGraph>();
   MP_RETURN_IF_ERROR(graph->Initialize(config));
 
-  const bool load_image = !absl::GetFlag(FLAGS_input_image_path).empty();
+  const bool load_image = !abslx::GetFlag(FLAGS_input_image_path).empty();
   if (load_image) {
     return ProcessImage(std::move(graph));
   } else {
-    return absl::InvalidArgumentError("Missing image file.");
+    return abslx::InvalidArgumentError("Missing image file.");
   }
 }
 
@@ -149,8 +149,8 @@ absl::Status RunMPPGraph() {
 
 int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
-  absl::ParseCommandLine(argc, argv);
-  absl::Status run_status = RunMPPGraph();
+  abslx::ParseCommandLine(argc, argv);
+  abslx::Status run_status = RunMPPGraph();
   if (!run_status.ok()) {
     LOG(ERROR) << "Failed to run the graph: " << run_status.message();
     return EXIT_FAILURE;

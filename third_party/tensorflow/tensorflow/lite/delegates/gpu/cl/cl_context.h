@@ -51,8 +51,8 @@ class CLContext {
   bool has_ownership_ = false;
 };
 
-absl::Status CreateCLContext(const CLDevice& device, CLContext* result);
-absl::Status CreateCLGLContext(const CLDevice& device,
+abslx::Status CreateCLContext(const CLDevice& device, CLContext* result);
+abslx::Status CreateCLGLContext(const CLDevice& device,
                                cl_context_properties egl_context,
                                cl_context_properties egl_display,
                                CLContext* result);

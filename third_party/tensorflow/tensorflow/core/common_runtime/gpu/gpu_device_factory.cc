@@ -66,7 +66,7 @@ class GPUDeviceFactory : public BaseGPUDeviceFactory {
       const DeviceLocality& locality, TfDeviceId tf_device_id,
       const string& physical_device_desc, Allocator* gpu_allocator,
       Allocator* cpu_allocator) override {
-    return absl::make_unique<GPUDevice>(options, name, memory_limit, locality,
+    return abslx::make_unique<GPUDevice>(options, name, memory_limit, locality,
                                         tf_device_id, physical_device_desc,
                                         gpu_allocator, cpu_allocator);
   }
@@ -131,7 +131,7 @@ class GPUCompatibleCPUDeviceFactory : public DeviceFactory {
       int numa_node = i % num_numa_nodes;
       DeviceLocality locality;
       locality.set_numa_node(numa_node);
-      devices->push_back(absl::make_unique<GPUCompatibleCPUDevice>(
+      devices->push_back(abslx::make_unique<GPUCompatibleCPUDevice>(
           options, name, Bytes(256 << 20), DeviceLocality(),
           ProcessState::singleton()->GetCPUAllocator(numa_node)));
     }

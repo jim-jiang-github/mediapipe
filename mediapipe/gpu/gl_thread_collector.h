@@ -47,7 +47,7 @@ class GlThreadCollector {
   static void WaitForThreadsToTerminate() { Collector().Wait(); }
 
   void ChangeCount(int delta) {
-    absl::MutexLock l(&mutex_);
+    abslx::MutexLock l(&mutex_);
     active_threads_ += delta;
   }
 
@@ -56,11 +56,11 @@ class GlThreadCollector {
       mutex_.AssertReaderHeld();
       return active_threads_ == 0;
     };
-    absl::MutexLock l(&mutex_);
-    mutex_.Await(absl::Condition(&done));
+    abslx::MutexLock l(&mutex_);
+    mutex_.Await(abslx::Condition(&done));
   }
 
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
   int active_threads_ ABSL_GUARDED_BY(mutex_) = 0;
   friend NoDestructor<GlThreadCollector>;
 };

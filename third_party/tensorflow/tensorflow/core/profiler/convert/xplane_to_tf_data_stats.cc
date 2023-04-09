@@ -41,16 +41,16 @@ namespace {
 
 // Returns true if the given iterator event is for a root iterator.
 bool IsRootIteratorEvent(const XEventVisitor& iterator_event) {
-  std::vector<absl::string_view> split_result =
-      absl::StrSplit(iterator_event.Name(), "::");
+  std::vector<abslx::string_view> split_result =
+      abslx::StrSplit(iterator_event.Name(), "::");
   // The root iterator's name contains only its own name (no parent
   // information).
   return split_result.size() == 2;
 }
 
 // Returns true if the given iterator event name is for an async iterator.
-bool IsAsyncIterator(absl::string_view iterator_event_name) {
-  static auto* kAsyncIterators = new absl::flat_hash_set<absl::string_view>(
+bool IsAsyncIterator(abslx::string_view iterator_event_name) {
+  static auto* kAsyncIterators = new abslx::flat_hash_set<abslx::string_view>(
       {"Prefetch", "ParallelInterleave", "ParallelMap", "ParseExample",
        "MapAndBatch", "DataService", "LegacyParallelInterleave",
        "ParallelBatch"});
@@ -72,12 +72,12 @@ void SetIteratorMetadata(int64_t id, const XEventVisitor& event,
 
 // Returns the parent iterator's id if it is a root of a device input
 // pipeline.
-absl::optional<int64_t> FindDeviceInputPipeline(const XEventVisitor& event) {
+abslx::optional<int64_t> FindDeviceInputPipeline(const XEventVisitor& event) {
   if (event.Type() == HostEventType::kDeviceInputPipelineSecondIterator) {
     auto parent_id_stat = event.GetStat(StatType::kParentId);
     if (parent_id_stat.has_value()) return parent_id_stat->IntValue();
   }
-  return absl::nullopt;
+  return abslx::nullopt;
 }
 
 // Processes EventForest to do the following:
@@ -86,8 +86,8 @@ absl::optional<int64_t> FindDeviceInputPipeline(const XEventVisitor& event) {
 // (3) find device input pipeline ids
 void ProcessEventForest(
     const EventForest& event_forest,
-    absl::flat_hash_set<int64_t>* device_input_pipeline_ids,
-    absl::flat_hash_map<int64_t, std::vector<const EventNode*>>*
+    abslx::flat_hash_set<int64_t>* device_input_pipeline_ids,
+    abslx::flat_hash_map<int64_t, std::vector<const EventNode*>>*
         root_iterator_event_map,
     TfDataStats* tf_data_stats) {
   const EventNodeMap& event_node_map = event_forest.GetEventNodeMap();
@@ -129,7 +129,7 @@ void ProcessEventForest(
       // First time processing this iterator.
       SetIteratorMetadata(iterator_id, iterator_event_visitor, &metadata);
       // Find and record device input pipeline ids.
-      absl::optional<int64_t> device_input_pipeline_id =
+      abslx::optional<int64_t> device_input_pipeline_id =
           FindDeviceInputPipeline(iterator_event_visitor);
       if (device_input_pipeline_id.has_value()) {
         device_input_pipeline_ids->insert(*device_input_pipeline_id);
@@ -141,15 +141,15 @@ void ProcessEventForest(
 void SetInputPipelineMetadata(int64_t id, int64_t name_id,
                               bool is_device_input_pipeline,
                               InputPipelineMetadata* metadata) {
-  constexpr absl::string_view kHostInputPipelinePrefix = "Host:";
-  constexpr absl::string_view kDeviceInputPipelinePrefix = "Device:";
+  constexpr abslx::string_view kHostInputPipelinePrefix = "Host:";
+  constexpr abslx::string_view kDeviceInputPipelinePrefix = "Device:";
   metadata->set_id(id);
   if (is_device_input_pipeline) {
     metadata->set_type(InputPipelineMetadata::DEVICE);
-    metadata->set_name(absl::StrCat(kDeviceInputPipelinePrefix, name_id));
+    metadata->set_name(abslx::StrCat(kDeviceInputPipelinePrefix, name_id));
   } else {
     metadata->set_type(InputPipelineMetadata::HOST);
-    metadata->set_name(absl::StrCat(kHostInputPipelinePrefix, name_id));
+    metadata->set_name(abslx::StrCat(kHostInputPipelinePrefix, name_id));
   }
 }
 
@@ -204,8 +204,8 @@ void SetBottleneckIteratorId(InputPipelineStat* input_pipeline_stat) {
 }
 
 void ProcessInputPipelines(
-    const absl::flat_hash_set<int64_t>& device_input_pipeline_ids,
-    absl::flat_hash_map<int64_t, std::vector<const EventNode*>>*
+    const abslx::flat_hash_set<int64_t>& device_input_pipeline_ids,
+    abslx::flat_hash_map<int64_t, std::vector<const EventNode*>>*
         root_iterator_event_map,
     TfDataStats* tf_data_stats) {
   auto* input_pipelines = tf_data_stats->mutable_input_pipelines();
@@ -214,7 +214,7 @@ void ProcessInputPipelines(
   for (auto& id_and_events : *root_iterator_event_map) {
     auto& root_iterator_id = id_and_events.first;
     auto& root_iterator_events = id_and_events.second;
-    absl::c_sort(root_iterator_events,
+    abslx::c_sort(root_iterator_events,
                  [](const EventNode* lhs, const EventNode* rhs) {
                    return lhs->GetEventVisitor().DurationPs() >
                           rhs->GetEventVisitor().DurationPs();
@@ -256,10 +256,10 @@ void ProcessInputPipelines(
 
 void SetBottleneckAnalysis(CombinedTfDataStats* combined_tf_data_stats) {
   struct InputPipeline {
-    InputPipeline(absl::string_view host_name,
-                  absl::string_view input_pipeline_name, int64_t max_latency_ps,
-                  absl::string_view iterator_name,
-                  absl::string_view iterator_long_name,
+    InputPipeline(abslx::string_view host_name,
+                  abslx::string_view input_pipeline_name, int64_t max_latency_ps,
+                  abslx::string_view iterator_name,
+                  abslx::string_view iterator_long_name,
                   int64_t iterator_latency_ps)
         : host_name(host_name),
           input_pipeline_name(input_pipeline_name),
@@ -267,11 +267,11 @@ void SetBottleneckAnalysis(CombinedTfDataStats* combined_tf_data_stats) {
           iterator_name(iterator_name),
           iterator_long_name(iterator_long_name),
           iterator_latency_ps(iterator_latency_ps) {}
-    absl::string_view host_name;
-    absl::string_view input_pipeline_name;
+    abslx::string_view host_name;
+    abslx::string_view input_pipeline_name;
     int64_t max_latency_ps;
-    absl::string_view iterator_name;
-    absl::string_view iterator_long_name;
+    abslx::string_view iterator_name;
+    abslx::string_view iterator_long_name;
     int64_t iterator_latency_ps;
 
     bool operator<(const InputPipeline& rhs) const {
@@ -281,7 +281,7 @@ void SetBottleneckAnalysis(CombinedTfDataStats* combined_tf_data_stats) {
   std::vector<InputPipeline> slow_input_pipelines;
   for (const auto& host_name_and_tf_data_stats :
        combined_tf_data_stats->tf_data_stats()) {
-    absl::string_view host_name = host_name_and_tf_data_stats.first;
+    abslx::string_view host_name = host_name_and_tf_data_stats.first;
     const TfDataStats& tf_data_stats = host_name_and_tf_data_stats.second;
     for (const auto& id_and_stats : tf_data_stats.input_pipelines()) {
       const InputPipelineStats& input_pipeline_stats = id_and_stats.second;
@@ -324,31 +324,31 @@ void SetBottleneckAnalysis(CombinedTfDataStats* combined_tf_data_stats) {
 }
 
 std::string GetSuggestion(BottleneckType type) {
-  constexpr absl::string_view kPlaybookLink =
+  constexpr abslx::string_view kPlaybookLink =
       "https://www.tensorflow.org/guide/data_performance_analysis";
-  constexpr absl::string_view kPlaybookSourceDatasetLink =
+  constexpr abslx::string_view kPlaybookSourceDatasetLink =
       "https://www.tensorflow.org/guide/"
       "data_performance_analysis#source_datasets";
-  constexpr absl::string_view kPlaybookCpuUtilizationLink =
+  constexpr abslx::string_view kPlaybookCpuUtilizationLink =
       "https://www.tensorflow.org/guide/"
       "data_performance_analysis#3_are_you_reaching_high_cpu_utilization";
-  constexpr absl::string_view kPlaybookTransformationLink =
+  constexpr abslx::string_view kPlaybookTransformationLink =
       "https://www.tensorflow.org/guide/"
       "data_performance_analysis#transformation_datasets";
-  constexpr absl::string_view kTfGuideParallelDataExtractionLink =
+  constexpr abslx::string_view kTfGuideParallelDataExtractionLink =
       "https://www.tensorflow.org/guide/"
       "data_performance#parallelizing_data_extraction";
-  constexpr absl::string_view kTfGuideParallelTransformationLink =
+  constexpr abslx::string_view kTfGuideParallelTransformationLink =
       "https://www.tensorflow.org/guide/"
       "data_performance#parallelizing_data_transformation";
-  constexpr absl::string_view kTfGuideCacheLink =
+  constexpr abslx::string_view kTfGuideCacheLink =
       "https://www.tensorflow.org/guide/data_performance#caching";
-  constexpr absl::string_view kTfDataServiceLink =
+  constexpr abslx::string_view kTfDataServiceLink =
       "https://www.tensorflow.org/api_docs/python/tf/data/experimental/"
       "service?version=nightly";
   switch (type) {
     case BottleneckType::kSlowSource:
-      return absl::StrFormat(
+      return abslx::StrFormat(
           "1. Check the locality of a host and input data. Ideally, they "
           "should be in the same cell (or very close, like the same "
           "region).<br/>"
@@ -357,7 +357,7 @@ std::string GetSuggestion(BottleneckType type) {
           AnchorElement(kPlaybookSourceDatasetLink, "here"),
           AnchorElement(kTfGuideParallelDataExtractionLink, "here"));
     case BottleneckType::kSlowDataService:
-      return absl::StrFormat(
+      return abslx::StrFormat(
           "1. Fetching data from tf.data service took a while. Profile the "
           "tf.data service worker to analyze the issue further.<br/>"
           "2. See %s for more details on tf.data service.<br/>"
@@ -365,13 +365,13 @@ std::string GetSuggestion(BottleneckType type) {
           AnchorElement(kTfDataServiceLink, "this"),
           AnchorElement(kPlaybookLink, "this"));
     case BottleneckType::kSlowRemoteSource:
-      return absl::StrFormat(
+      return abslx::StrFormat(
           "1. The remote data source is slow. Profile its host to analyze the "
           "issue further.<br/>"
           "2. See %s for other suggestions.",
           AnchorElement(kPlaybookLink, "this"));
     case BottleneckType::kSlowTransformationWithParallelVersion:
-      return absl::StrFormat(
+      return abslx::StrFormat(
           "1. Parallelize this transformation by setting "
           "<code>num_parallel_calls=tf.data.experimental.AUTOTUNE</code>. See "
           "%s for more details.<br/>"
@@ -384,7 +384,7 @@ std::string GetSuggestion(BottleneckType type) {
           AnchorElement(kTfGuideCacheLink, "this"),
           AnchorElement(kPlaybookTransformationLink, "here"));
     case BottleneckType::kSlowTransformationWithoutParallelVersion:
-      return absl::StrFormat(
+      return abslx::StrFormat(
           "1. This transformation is inherently sequential. Add outer "
           "parallelism by running multiple copies of the input pipeline over "
           "sharded inputs and combining the results. See %s for more "
@@ -398,7 +398,7 @@ std::string GetSuggestion(BottleneckType type) {
           AnchorElement(kTfGuideCacheLink, "this"),
           AnchorElement(kPlaybookCpuUtilizationLink, "here"));
     default:
-      return absl::StrFormat("See %s for suggestions.",
+      return abslx::StrFormat("See %s for suggestions.",
                              AnchorElement(kPlaybookLink, "this"));
   }
 }
@@ -439,8 +439,8 @@ void SetSummary(CombinedTfDataStats* combined_tf_data_stats) {
 
 }  // namespace
 
-BottleneckType GetBottleneckType(absl::string_view bottleneck_iterator_name) {
-  static auto* kBottleneckTypeMap = new absl::flat_hash_map<absl::string_view,
+BottleneckType GetBottleneckType(abslx::string_view bottleneck_iterator_name) {
+  static auto* kBottleneckTypeMap = new abslx::flat_hash_map<abslx::string_view,
                                                             BottleneckType>(
       {// Read from storage.
        {"TFRecord", BottleneckType::kSlowSource},
@@ -484,7 +484,7 @@ BottleneckType GetBottleneckType(absl::string_view bottleneck_iterator_name) {
   return BottleneckType::kOther;
 }
 
-void CombinedTfDataStatsBuilder::Add(absl::string_view host_name,
+void CombinedTfDataStatsBuilder::Add(abslx::string_view host_name,
                                      XPlane* host_plane) {
   TfDataStats& tf_data_stats =
       (*combined_tf_data_stats_
@@ -493,8 +493,8 @@ void CombinedTfDataStatsBuilder::Add(absl::string_view host_name,
   event_forest.AddPlanes(CreateTfXPlaneVisitor, {host_plane});
   event_forest.ConnectEvents();
   event_forest.ConnectTfDataEvents();
-  absl::flat_hash_set<int64_t> device_input_pipeline_ids;
-  absl::flat_hash_map<int64_t, std::vector<const EventNode*>>
+  abslx::flat_hash_set<int64_t> device_input_pipeline_ids;
+  abslx::flat_hash_map<int64_t, std::vector<const EventNode*>>
       root_iterator_event_map;
   ProcessEventForest(event_forest, &device_input_pipeline_ids,
                      &root_iterator_event_map, &tf_data_stats);

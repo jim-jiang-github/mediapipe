@@ -42,8 +42,8 @@ namespace {
     explicit NAME##Op(OpKernelConstruction* ctx) : XlaBinaryOp(ctx) {}     \
     xla::XlaOp Computation(                                                \
         XlaOpKernelContext* ctx, const xla::XlaOp& lhs,                    \
-        const absl::Span<const int64_t>& lhs_shape, const xla::XlaOp& rhs, \
-        const absl::Span<const int64_t>& rhs_shape,                        \
+        const abslx::Span<const int64_t>& lhs_shape, const xla::XlaOp& rhs, \
+        const abslx::Span<const int64_t>& rhs_shape,                        \
         const BCast& broadcast_helper,                                     \
         const std::vector<int64_t>& extend_dimensions) override {          \
       xla::XlaBuilder* b = ctx->builder();                                 \

@@ -55,21 +55,21 @@ TEST_F(PreemptNotifierTest, WillBePreemptedAt) {
   auto env = Env::Default();
   std::unique_ptr<PreemptionNotifier> preempt_notifier =
       PreemptionNotifier::CreatePreemptionNotifier("sigterm", env);
-  absl::Time start_time = absl::Now();
-  env->SchedClosureAfter(/*micros=*/absl::ToInt64Microseconds(absl::Seconds(1)),
+  abslx::Time start_time = abslx::Now();
+  env->SchedClosureAfter(/*micros=*/abslx::ToInt64Microseconds(abslx::Seconds(1)),
                          []() { std::raise(SIGTERM); });
 
   // Preempt time should be current timestamp.
-  StatusOr<absl::Time> result = preempt_notifier->WillBePreemptedAt();
+  StatusOr<abslx::Time> result = preempt_notifier->WillBePreemptedAt();
   TF_CHECK_OK(result.status());
-  absl::Time preempt_time = result.ValueOrDie();
+  abslx::Time preempt_time = result.ValueOrDie();
 
   // Make sure that preempt time is approximately correct.
-  absl::Duration time_diff = preempt_time - start_time;
+  abslx::Duration time_diff = preempt_time - start_time;
   // Signal was raised 1 second after start time.
-  EXPECT_GT(time_diff, absl::Seconds(1.0));
+  EXPECT_GT(time_diff, abslx::Seconds(1.0));
   // Listen to signal once per second, so we should catch within 2 seconds.
-  EXPECT_LT(time_diff, absl::Seconds(3));
+  EXPECT_LT(time_diff, abslx::Seconds(3));
 }
 
 TEST_F(PreemptNotifierTest,
@@ -77,46 +77,46 @@ TEST_F(PreemptNotifierTest,
   auto env = Env::Default();
   std::unique_ptr<PreemptionNotifier> preempt_notifier =
       PreemptionNotifier::CreatePreemptionNotifier("sigterm", env);
-  absl::Time start_time = absl::Now();
+  abslx::Time start_time = abslx::Now();
   std::raise(SIGTERM);
   // Note: sleep for a while to ensure that (a) SIGTERM is fully handled and (b)
   // the correct death time is returned (time when signal is caught instead of
   // when WillBePreemptedAt() is called).
-  env->SleepForMicroseconds(absl::ToInt64Microseconds(absl::Seconds(2)));
+  env->SleepForMicroseconds(abslx::ToInt64Microseconds(abslx::Seconds(2)));
 
   // Preempt time should be current timestamp.
-  StatusOr<absl::Time> result = preempt_notifier->WillBePreemptedAt();
+  StatusOr<abslx::Time> result = preempt_notifier->WillBePreemptedAt();
   TF_CHECK_OK(result.status());
-  absl::Time preempt_time = result.ValueOrDie();
+  abslx::Time preempt_time = result.ValueOrDie();
 
   // Make sure that preempt time is approximately correct.
-  absl::Duration time_diff = preempt_time - start_time;
+  abslx::Duration time_diff = preempt_time - start_time;
   // Signal was raised immediately after start time.
-  EXPECT_GT(time_diff, absl::ZeroDuration());
+  EXPECT_GT(time_diff, abslx::ZeroDuration());
   // Verify that preempt time is not set at the time of call (2 seconds after
   // signal was raised).
-  EXPECT_LT(time_diff, absl::Seconds(2));
+  EXPECT_LT(time_diff, abslx::Seconds(2));
 }
 
 TEST_F(PreemptNotifierTest, WillBePreemptedAtAsync_SameResultForAllCallbacks) {
   auto env = Env::Default();
   std::unique_ptr<PreemptionNotifier> preempt_notifier =
       PreemptionNotifier::CreatePreemptionNotifier("sigterm", env);
-  env->SchedClosureAfter(/*micros=*/absl::ToInt64Microseconds(absl::Seconds(1)),
+  env->SchedClosureAfter(/*micros=*/abslx::ToInt64Microseconds(abslx::Seconds(1)),
                          []() { std::raise(SIGTERM); });
 
   // Preempt time should be current timestamp.
-  StatusOr<absl::Time> preempt_time;
-  StatusOr<absl::Time> preempt_time_2;
-  absl::Notification n;
-  absl::Notification n_2;
+  StatusOr<abslx::Time> preempt_time;
+  StatusOr<abslx::Time> preempt_time_2;
+  abslx::Notification n;
+  abslx::Notification n_2;
   preempt_notifier->WillBePreemptedAtAsync(
-      [&preempt_time, &n](StatusOr<absl::Time> result) {
+      [&preempt_time, &n](StatusOr<abslx::Time> result) {
         preempt_time = result;
         n.Notify();
       });
   preempt_notifier->WillBePreemptedAtAsync(
-      [&preempt_time_2, &n_2](StatusOr<absl::Time> result) {
+      [&preempt_time_2, &n_2](StatusOr<abslx::Time> result) {
         preempt_time_2 = result;
         n_2.Notify();
       });
@@ -136,16 +136,16 @@ TEST_F(PreemptNotifierTest, Reset_TwoDifferentPreemptTimesRecorded) {
 
   // Raise first signal.
   std::raise(SIGTERM);
-  StatusOr<absl::Time> result = preempt_notifier->WillBePreemptedAt();
+  StatusOr<abslx::Time> result = preempt_notifier->WillBePreemptedAt();
   TF_CHECK_OK(result.status());
-  absl::Time preempt_time = result.ValueOrDie();
+  abslx::Time preempt_time = result.ValueOrDie();
 
   preempt_notifier =
       PreemptionNotifier::CreatePreemptionNotifier("sigterm", env);
 
   // Raise second signal.
   std::raise(SIGTERM);
-  absl::Time preempt_time_2 =
+  abslx::Time preempt_time_2 =
       preempt_notifier->WillBePreemptedAt().ValueOrDie();
 
   // Verify that two different preempt times are recorded.
@@ -156,10 +156,10 @@ TEST_F(PreemptNotifierTest, DestructorCancelsPendingCalls) {
   auto env = Env::Default();
   std::unique_ptr<PreemptionNotifier> preempt_notifier =
       PreemptionNotifier::CreatePreemptionNotifier("sigterm", env);
-  StatusOr<absl::Time> result;
-  absl::Notification n;
+  StatusOr<abslx::Time> result;
+  abslx::Notification n;
   preempt_notifier->WillBePreemptedAtAsync(
-      [&result, &n](StatusOr<absl::Time> status_or_time) {
+      [&result, &n](StatusOr<abslx::Time> status_or_time) {
         result = status_or_time;
         n.Notify();
       });

@@ -66,7 +66,7 @@ class CollectiveParamResolverLocalTest : public ::testing::Test {
     if (!gpu_ring_order.empty()) {
       config.mutable_gpu_options()
           ->mutable_experimental()
-          ->set_collective_ring_order(absl::StrJoin(gpu_ring_order, ","));
+          ->set_collective_ring_order(abslx::StrJoin(gpu_ring_order, ","));
     }
     ResetParamResolver(config);
     prl_->CompleteDefaultRanking(&group);

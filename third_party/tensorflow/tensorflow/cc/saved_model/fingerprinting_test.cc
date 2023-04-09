@@ -42,7 +42,7 @@ GraphDef CreateTestProto() {
   return graph_def;
 }
 
-StatusOr<SavedModel> ReadSavedModel(absl::string_view file_path) {
+StatusOr<SavedModel> ReadSavedModel(abslx::string_view file_path) {
   std::string serialized_saved_model;
   auto status = ReadFileToString(Env::Default(), std::string(file_path),
                                  &serialized_saved_model);

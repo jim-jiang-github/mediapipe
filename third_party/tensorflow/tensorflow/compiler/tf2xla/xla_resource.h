@@ -37,7 +37,7 @@ class XlaResource {
     kTensorArray,
     kStack,
   };
-  static absl::string_view KindToString(Kind kind);
+  static abslx::string_view KindToString(Kind kind);
 
   // Creates a new Stack resource.
   static std::unique_ptr<XlaResource> CreateStack(string name, DataType type,
@@ -111,7 +111,7 @@ class XlaResource {
 
   // Sets the representational shape of the resource on device.
   void SetRepresentationShape(const xla::Shape& shape) {
-    representation_shape_ = absl::make_optional(shape);
+    representation_shape_ = abslx::make_optional(shape);
   }
 
   // Looks up the gradient for `source`, or creates it if it does not already

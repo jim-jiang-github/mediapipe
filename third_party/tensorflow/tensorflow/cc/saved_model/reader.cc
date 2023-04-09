@@ -40,7 +40,7 @@ namespace {
 
 // Reads the SavedModel proto from saved_model.pb in `export_dir`.
 // Returns a failure status when the SavedModel file does not exist.
-Status ReadSavedModel(absl::string_view export_dir,
+Status ReadSavedModel(abslx::string_view export_dir,
                       SavedModel* saved_model_proto) {
   LOG(INFO) << "Reading SavedModel from: " << export_dir;
 
@@ -86,7 +86,7 @@ Status ReadSavedModel(absl::string_view export_dir,
 Status FindMetaGraphDef(const std::unordered_set<string>& tags,
                         SavedModel* saved_model_proto,
                         MetaGraphDef* meta_graph_def) {
-  LOG(INFO) << "Reading meta graph with tags { " << absl::StrJoin(tags, " ")
+  LOG(INFO) << "Reading meta graph with tags { " << abslx::StrJoin(tags, " ")
             << " }";
   for (MetaGraphDef& graph_def : *saved_model_proto->mutable_meta_graphs()) {
     // Get tags from the graph_def.
@@ -108,7 +108,7 @@ Status FindMetaGraphDef(const std::unordered_set<string>& tags,
       error::Code::NOT_FOUND,
       strings::StrCat(
           "Could not find meta graph def matching supplied tags: { ",
-          absl::StrJoin(tags, " "),
+          abslx::StrJoin(tags, " "),
           " }. To inspect available tag-sets in the SavedModel, please "
           "use the SavedModel CLI: `saved_model_cli`"));
 }
@@ -139,7 +139,7 @@ Status ReadSavedModelDebugInfoIfPresent(
     TF_RETURN_IF_ERROR(
         ReadBinaryProto(Env::Default(), debug_info_pb_path, &debug_info));
     *debug_info_proto =
-        absl::make_unique<GraphDebugInfo>(std::move(debug_info));
+        abslx::make_unique<GraphDebugInfo>(std::move(debug_info));
   }
   return OkStatus();
 }

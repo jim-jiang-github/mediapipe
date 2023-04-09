@@ -280,11 +280,11 @@ class ShuffleDatasetOpBase::ShuffleDatasetBase : public DatasetBase {
           writer->WriteScalar(this->full_name(kSlicesSize), slices_.size()));
       for (size_t i = 0; i < slices_.size(); ++i) {
         TF_RETURN_IF_ERROR(
-            writer->WriteScalar(this->full_name(absl::StrJoin(
+            writer->WriteScalar(this->full_name(abslx::StrJoin(
                                     std::make_tuple(kSlicesStart, i), "_")),
                                 slices_[i]->start));
         TF_RETURN_IF_ERROR(writer->WriteScalar(
-            this->full_name(absl::StrJoin(std::make_tuple(kSlicesEnd, i), "_")),
+            this->full_name(abslx::StrJoin(std::make_tuple(kSlicesEnd, i), "_")),
             slices_[i]->end));
       }
       if (data_produced_) {
@@ -341,12 +341,12 @@ class ShuffleDatasetOpBase::ShuffleDatasetBase : public DatasetBase {
       for (size_t i = 0; i < slices_size; ++i) {
         int64_t start;
         TF_RETURN_IF_ERROR(
-            reader->ReadScalar(this->full_name(absl::StrJoin(
+            reader->ReadScalar(this->full_name(abslx::StrJoin(
                                    std::make_tuple(kSlicesStart, i), "_")),
                                &start));
         int64_t end;
         TF_RETURN_IF_ERROR(reader->ReadScalar(
-            this->full_name(absl::StrJoin(std::make_tuple(kSlicesEnd, i), "_")),
+            this->full_name(abslx::StrJoin(std::make_tuple(kSlicesEnd, i), "_")),
             &end));
         slices_.push_back(std::make_unique<Slice>(start, end));
       }
@@ -476,7 +476,7 @@ class ShuffleDatasetOpBase::ShuffleDatasetBase : public DatasetBase {
     }
 
     std::string BufferSizeString() {
-      return absl::StrCat(dataset()->buffer_size_);
+      return abslx::StrCat(dataset()->buffer_size_);
     }
 
     mutex mu_;

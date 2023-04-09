@@ -163,15 +163,15 @@ class SavedModel {
 
   // Returns the `FunctionMetadata` for a function. If the function is not
   // found, returns nullopt instead.
-  virtual absl::optional<FunctionMetadata> GetFunctionMetadata(
-      absl::string_view func_name) const = 0;
+  virtual abslx::optional<FunctionMetadata> GetFunctionMetadata(
+      abslx::string_view func_name) const = 0;
 
   // Runs the signature specified by `name`. Both `inputs` and `outputs`
   // are all host tensors. The `outputs` must be non-null. If the returned
   // status is non-OK, the `outputs` are invalid.
   virtual tensorflow::Status Run(const RunOptions& run_options,
-                                 absl::string_view name,
-                                 absl::Span<const tensorflow::Tensor> inputs,
+                                 abslx::string_view name,
+                                 abslx::Span<const tensorflow::Tensor> inputs,
                                  std::vector<tensorflow::Tensor>* outputs) = 0;
 
   // Runs the signatures specified by `names`. Both `inputs` and `outputs` are
@@ -185,17 +185,17 @@ class SavedModel {
   // NOTE: The input/output tensors can only be dense tensors (as opposed to
   // sparse tensors or composite tensors).
   virtual tensorflow::Status RunMultipleSignatures(
-      const RunOptions& run_options, absl::Span<const std::string> names,
-      absl::Span<const std::vector<tensorflow::Tensor>> multi_inputs,
+      const RunOptions& run_options, abslx::Span<const std::string> names,
+      abslx::Span<const std::vector<tensorflow::Tensor>> multi_inputs,
       std::vector<std::vector<tensorflow::Tensor>>* multi_outputs) = 0;
 
   // Runs the graphs specified by the tensor names terminal tensors (eg. feed
   // tensors, fetch tesnors) in the graph.
   virtual tensorflow::Status RunByTensorNames(
       const RunOptions& run_options,
-      absl::Span<const std::pair<std::string, tensorflow::Tensor>> inputs,
-      absl::Span<const std::string> output_tensor_names,
-      absl::Span<const std::string> target_node_names,
+      abslx::Span<const std::pair<std::string, tensorflow::Tensor>> inputs,
+      abslx::Span<const std::string> output_tensor_names,
+      abslx::Span<const std::string> target_node_names,
       std::vector<tensorflow::Tensor>* outputs) = 0;
 
  private:
@@ -214,13 +214,13 @@ class SavedModelImpl final : public SavedModel {
   // If `options.load_from_mla` is true, treat `saved_model_dir` as an MLA path
   // that wraps the saved model path.
   static std::unique_ptr<SavedModel> LoadSavedModel(
-      Options options, absl::string_view saved_model_dir,
+      Options options, abslx::string_view saved_model_dir,
       const std::unordered_set<std::string>& tags, tensorflow::Status* status);
 
   SavedModelImpl(
       Options options, tensorflow::MetaGraphDef meta_graph_def,
       tfrt::BefBuffer bef, tfrt::RCReference<tfrt::BEFFile> bef_file,
-      absl::flat_hash_map<std::string, internal::Signature> signatures,
+      abslx::flat_hash_map<std::string, internal::Signature> signatures,
       std::unique_ptr<FallbackState> fallback_state,
       std::unique_ptr<tfrt::tpu::TpuModelResource> tpu_model_resource,
       std::unique_ptr<tfrt::ResourceContext> resource_context,
@@ -235,23 +235,23 @@ class SavedModelImpl final : public SavedModel {
 
   std::vector<std::string> GetFunctionNames() const override;
 
-  absl::optional<FunctionMetadata> GetFunctionMetadata(
-      absl::string_view func_name) const override;
+  abslx::optional<FunctionMetadata> GetFunctionMetadata(
+      abslx::string_view func_name) const override;
 
-  tensorflow::Status Run(const RunOptions& run_options, absl::string_view name,
-                         absl::Span<const tensorflow::Tensor> inputs,
+  tensorflow::Status Run(const RunOptions& run_options, abslx::string_view name,
+                         abslx::Span<const tensorflow::Tensor> inputs,
                          std::vector<tensorflow::Tensor>* outputs) override;
 
   tensorflow::Status RunMultipleSignatures(
-      const RunOptions& run_options, absl::Span<const std::string> names,
-      absl::Span<const std::vector<tensorflow::Tensor>> multi_inputs,
+      const RunOptions& run_options, abslx::Span<const std::string> names,
+      abslx::Span<const std::vector<tensorflow::Tensor>> multi_inputs,
       std::vector<std::vector<tensorflow::Tensor>>* multi_outputs) override;
 
   tensorflow::Status RunByTensorNames(
       const RunOptions& run_options,
-      absl::Span<const std::pair<std::string, tensorflow::Tensor>> inputs,
-      absl::Span<const std::string> output_tensor_names,
-      absl::Span<const std::string> target_node_names,
+      abslx::Span<const std::pair<std::string, tensorflow::Tensor>> inputs,
+      abslx::Span<const std::string> output_tensor_names,
+      abslx::Span<const std::string> target_node_names,
       std::vector<tensorflow::Tensor>* outputs) override;
 
  private:
@@ -280,15 +280,15 @@ class SavedModelImpl final : public SavedModel {
   // Returns the loading result given the signature names.
   tensorflow::StatusOr<
       std::reference_wrapper<const SavedModelImpl::LoadingResult>>
-  GetOrCreateLoadingResult(absl::Span<const std::string> names)
+  GetOrCreateLoadingResult(abslx::Span<const std::string> names)
       TF_LOCKS_EXCLUDED(loading_result_cache_mu_);
 
   // Runs `func` with the given inputs, and outputs the result.
   tensorflow::Status RunInternal(const RunOptions& run_options,
-                                 absl::string_view signature_name,
+                                 abslx::string_view signature_name,
                                  const tfrt::Function& func,
-                                 absl::Span<const tensorflow::Tensor> inputs,
-                                 absl::Span<const tensorflow::Tensor> captures,
+                                 abslx::Span<const tensorflow::Tensor> inputs,
+                                 abslx::Span<const tensorflow::Tensor> captures,
                                  std::vector<tensorflow::Tensor>* outputs,
                                  tfrt::ResourceContext* resource_context);
 
@@ -303,16 +303,16 @@ class SavedModelImpl final : public SavedModel {
   tfrt::BefBuffer bef_;
   tfrt::RCReference<tfrt::BEFFile> bef_file_;
   tfrt::RequestDeadlineTracker req_deadline_tracker_;
-  absl::flat_hash_map<std::string, internal::Signature> signatures_;
+  abslx::flat_hash_map<std::string, internal::Signature> signatures_;
   std::unique_ptr<FallbackState> fallback_state_;
   // TODO(b/178227859): Change the hardcoding of this specific TPU resource
   // (TpuModelResource) to a general and plugable interface.
   std::unique_ptr<tfrt::tpu::TpuModelResource> tpu_model_resource_;
   std::unique_ptr<tfrt::ResourceContext> resource_context_;
   tensorflow::mutex loading_result_cache_mu_;
-  // For pointer stability of values in `absl::flat_hash_map<>`, additional
+  // For pointer stability of values in `abslx::flat_hash_map<>`, additional
   // `std::unique_ptr<>` is necessary. (See https://abseil.io/tips/136.)
-  absl::flat_hash_map<std::string /*joined_name*/,
+  abslx::flat_hash_map<std::string /*joined_name*/,
                       std::unique_ptr<LoadingResult>>
       loading_result_cache_ TF_GUARDED_BY(loading_result_cache_mu_);
   std::unique_ptr<GraphExecutor> graph_executor_;

@@ -1369,7 +1369,7 @@ class ModelTimingTest : public ::testing::Test {
  protected:
   std::unique_ptr<Model> model_;
   std::unique_ptr<ModelTiming> model_timing_;
-  absl::flat_hash_map<int64_t, Node*> node_map_;
+  abslx::flat_hash_map<int64_t, Node*> node_map_;
 };
 
 TEST_F(ModelTimingTest, Interleave) {
@@ -1792,7 +1792,7 @@ class BufferSizeTest : public ::testing::Test {
 
  protected:
   std::unique_ptr<Model> model_;
-  absl::flat_hash_map<int64_t, std::shared_ptr<Node>> node_map_;
+  abslx::flat_hash_map<int64_t, std::shared_ptr<Node>> node_map_;
 };
 
 TEST_F(BufferSizeTest, OptimizeBuffers_PlentyOfMemory) {

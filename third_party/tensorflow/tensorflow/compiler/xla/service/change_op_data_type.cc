@@ -21,13 +21,13 @@ namespace xla {
 
 StatusOr<bool> ChangeOpDataType::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   for (HloComputation* comp :
        module->MakeNonfusionComputations(execution_threads)) {
     for (HloInstruction* instr : comp->MakeInstructionPostOrder()) {
       if (!op_matcher_(instr) ||
-          !absl::c_all_of(instr->operands(),
+          !abslx::c_all_of(instr->operands(),
                           [&](const HloInstruction* operand) {
                             return operand->shape().element_type() == from_ty_;
                           }) ||
@@ -35,7 +35,7 @@ StatusOr<bool> ChangeOpDataType::Run(
           instr->opcode() == HloOpcode::kParameter) {
         continue;
       }
-      absl::InlinedVector<HloInstruction*, 8> new_operands;
+      abslx::InlinedVector<HloInstruction*, 8> new_operands;
       for (HloInstruction* operand : instr->mutable_operands()) {
         new_operands.push_back(MakeConvertToHlo(operand, to_ty_));
       }

@@ -71,7 +71,7 @@ Status MapParallelization::OptimizeAndCollectStats(Cluster* cluster,
   // pipeline.
   if (graph_utils::IsItemDerivedFromFunctionDef(item, graph)) return OkStatus();
 
-  absl::flat_hash_set<string> nodes_to_delete;
+  abslx::flat_hash_set<string> nodes_to_delete;
   FunctionLibraryDefinition function_library(OpRegistry::Global(),
                                              item.graph.library());
   auto get_map_node = [](const NodeDef& node) -> const NodeDef* {

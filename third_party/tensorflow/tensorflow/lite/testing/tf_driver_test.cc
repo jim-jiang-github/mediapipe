@@ -66,7 +66,7 @@ TEST(TfDriverTest, ReadingAndWritingValuesStrings) {
 
     char* char_b = nullptr;
     int size = dynamic_buffer.WriteToBuffer(&char_b);
-    *buffer = absl::BytesToHexString(absl::string_view(char_b, size));
+    *buffer = abslx::BytesToHexString(abslx::string_view(char_b, size));
     free(char_b);
   };
 

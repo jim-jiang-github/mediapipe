@@ -32,14 +32,14 @@ std::string ImmediateExecutionTensorHandle::DebugString() const {
   if (value_string.length() > 100) {
     // The default NumPy-style output can be distractingly long in error
     // messages.
-    value_string = absl::StrCat(value_string.substr(0, 100), " [...]");
+    value_string = abslx::StrCat(value_string.substr(0, 100), " [...]");
   }
   Status s;
   const char* device_name = DeviceName(&s);
   if (!s.ok()) {
     device_name = "<error fetching device name>";
   }
-  return absl::StrCat("TensorHandle(", value_string, ", shape=", shape_string,
+  return abslx::StrCat("TensorHandle(", value_string, ", shape=", shape_string,
                       ", dtype=", DataType_Name(DataType()), ", device=\"",
                       device_name, "\")");
 }

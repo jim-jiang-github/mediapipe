@@ -41,8 +41,8 @@ std::unique_ptr<Device> RenamedDevice::NewRenamedDevice(
                                           parsed_name.id);
   DeviceAttributes attributes(underlying->attributes());
   attributes.set_name(name);
-  // Call absl::WrapUnique to access private constructor.
-  return absl::WrapUnique(
+  // Call abslx::WrapUnique to access private constructor.
+  return abslx::WrapUnique(
       new RenamedDevice(underlying, attributes, owns_underlying,
                         isolate_session_state, underlying_threadpool));
 }

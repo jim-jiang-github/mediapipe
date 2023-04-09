@@ -107,7 +107,7 @@ float AveragePrecision::FromBoxes(const std::vector<Detection>& groundtruth,
                                   const std::vector<Detection>& prediction,
                                   std::vector<PR>* pr_out) {
   // Index ground truth boxes based on imageid.
-  absl::flat_hash_map<int64_t, std::list<Detection>> gt;
+  abslx::flat_hash_map<int64_t, std::list<Detection>> gt;
   int num_gt = 0;
   for (auto& box : groundtruth) {
     gt[box.imgid].push_back(box);

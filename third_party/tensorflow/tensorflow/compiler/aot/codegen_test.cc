@@ -39,9 +39,9 @@ namespace {
 
 using ::xla::cpu_function_runtime::BufferInfo;
 
-void ExpectErrorContains(const Status& status, absl::string_view str) {
+void ExpectErrorContains(const Status& status, abslx::string_view str) {
   EXPECT_NE(OkStatus(), status);
-  EXPECT_TRUE(absl::StrContains(status.error_message(), str))
+  EXPECT_TRUE(abslx::StrContains(status.error_message(), str))
       << "expected error: " << status.error_message() << " to contain: " << str;
 }
 

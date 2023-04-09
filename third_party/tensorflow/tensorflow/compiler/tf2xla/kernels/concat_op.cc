@@ -192,9 +192,9 @@ class ConcatOffsetOp : public XlaOpKernel {
           OP_REQUIRES(ctx, inp0_element == inp_element,
                       errors::InvalidArgument(
                           "All dimensions except ", axis, " must match. Input ",
-                          i, " has shape [", absl::StrJoin(inp_dims, " "),
+                          i, " has shape [", abslx::StrJoin(inp_dims, " "),
                           "] and doesn't match input 0 with shape [",
-                          absl::StrJoin(inp0_dims, " "), "]."));
+                          abslx::StrJoin(inp0_dims, " "), "]."));
           out_vec(j) = 0;
         }
       }

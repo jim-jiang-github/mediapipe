@@ -78,7 +78,7 @@ class AudioToTensorCalculatorNonStreamingModeTest : public ::testing::Test {
     double input_sample_rate = 10000;
     double target_sample_rate = input_sample_rate * resampling_factor;
     auto graph_config = ParseTextProtoOrDie<CalculatorGraphConfig>(
-        absl::Substitute(R"(
+        abslx::Substitute(R"(
         input_stream: "audio"
         input_stream: "sample_rate"
         output_stream: "tensors"
@@ -312,7 +312,7 @@ class AudioToTensorCalculatorStreamingModeTest : public ::testing::Test {
                                : Options::ENTIRE_TAIL_AT_TIMESTAMP_MAX;
 
     auto graph_config = ParseTextProtoOrDie<CalculatorGraphConfig>(
-        absl::Substitute(R"(
+        abslx::Substitute(R"(
         input_stream: "audio"
         input_stream: "sample_rate"
         output_stream: "tensors"
@@ -341,7 +341,7 @@ class AudioToTensorCalculatorStreamingModeTest : public ::testing::Test {
     tool::AddVectorSink("tensors", &graph_config, &tensors_packets_);
 
     // Run the graph.
-    const absl::Status init_status = graph_.Initialize(graph_config);
+    const abslx::Status init_status = graph_.Initialize(graph_config);
     if (expect_init_error) {
       EXPECT_THAT(init_status, Not(IsOk()));
       return;
@@ -417,7 +417,7 @@ class AudioToTensorCalculatorStreamingModeTest : public ::testing::Test {
 
   // Fully close graph at end, otherwise calculator+tensors are destroyed
   // after calling WaitUntilDone().
-  absl::Status TryCloseGraph() { return graph_.WaitUntilDone(); }
+  abslx::Status TryCloseGraph() { return graph_.WaitUntilDone(); }
   void CloseGraph() { MP_EXPECT_OK(TryCloseGraph()); }
 
  private:
@@ -561,7 +561,7 @@ class AudioToTensorCalculatorFftTest : public ::testing::Test {
                    int num_overlapping_samples, double sample_rate,
                    int fft_size) {
     graph_config_ = ParseTextProtoOrDie<CalculatorGraphConfig>(
-        absl::Substitute(R"(
+        abslx::Substitute(R"(
         input_stream: "audio"
         input_stream: "sample_rate"
         output_stream: "tensors"
@@ -621,7 +621,7 @@ TEST_F(AudioToTensorCalculatorFftTest, TestInvalidFftSize) {
   MP_ASSERT_OK(graph_.Initialize(graph_config_));
   MP_ASSERT_OK(graph_.StartRun({}));
   auto status = graph_.WaitUntilIdle();
-  EXPECT_EQ(status.code(), absl::StatusCode::kInternal);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInternal);
   EXPECT_THAT(status.message(),
               ::testing::HasSubstr("FFT size must be of the form"));
 }
@@ -631,7 +631,7 @@ TEST_F(AudioToTensorCalculatorFftTest, TestInvalidNumChannels) {
   MP_ASSERT_OK(graph_.Initialize(graph_config_));
   MP_ASSERT_OK(graph_.StartRun({}));
   auto status = graph_.WaitUntilIdle();
-  EXPECT_EQ(status.code(), absl::StatusCode::kInternal);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInternal);
   EXPECT_THAT(
       status.message(),
       ::testing::HasSubstr("only support applying FFT on mono channel"));

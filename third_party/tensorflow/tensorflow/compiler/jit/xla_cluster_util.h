@@ -61,7 +61,7 @@ StatusOr<bool> CreateCycleDetectionGraph(const Graph* graph,
 
 // Returns the XLA cluster in which `node` is placed if it is in an XLA cluster,
 // otherwise returns nullopt.
-std::optional<absl::string_view> GetXlaClusterForNode(const Node& node);
+std::optional<abslx::string_view> GetXlaClusterForNode(const Node& node);
 
 // Removes `node_def` its XLA cluster (by clearing its _XlaCluster attribute).
 void RemoveFromXlaCluster(NodeDef* node_def);
@@ -98,7 +98,7 @@ XlaAutoClusteringSummary GetXlaAutoClusteringSummary(const Graph& graph);
 //
 // We assume each node has a trivial path to itself so the returned set includes
 // all of the nodes that have ref variables as input or output.
-StatusOr<absl::flat_hash_set<Node*>> GetNodesRelatedToRefVariables(
+StatusOr<abslx::flat_hash_set<Node*>> GetNodesRelatedToRefVariables(
     const Graph& graph, FunctionLibraryRuntime* lib_runtime);
 
 // Deterministically serialized the graph to a byte string.

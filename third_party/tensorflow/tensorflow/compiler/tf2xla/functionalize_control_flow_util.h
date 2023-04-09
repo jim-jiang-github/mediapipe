@@ -98,10 +98,10 @@ StatusOr<Node*> BuildRetvalNode(Graph* graph, DataType type, int index);
 // Returns a textual representation of the names of the nodes in the input.
 template <typename T>
 string NodesToString(const T& nodes) {
-  return absl::StrCat("{",
-                      absl::StrJoin(nodes, ",",
+  return abslx::StrCat("{",
+                      abslx::StrJoin(nodes, ",",
                                     [](string* output, const Node* node) {
-                                      absl::StrAppend(output, node->name());
+                                      abslx::StrAppend(output, node->name());
                                     }),
                       "}");
 }

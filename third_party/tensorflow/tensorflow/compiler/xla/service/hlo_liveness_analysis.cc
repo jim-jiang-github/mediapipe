@@ -37,7 +37,7 @@ namespace xla {
 namespace {
 
 using Worklist = std::deque<const HloInstruction*>;
-using Workset = absl::flat_hash_set<const HloInstruction*>;
+using Workset = abslx::flat_hash_set<const HloInstruction*>;
 
 void AddToWorklist(const HloInstruction* instruction, Worklist* worklist,
                    Workset* workset) {
@@ -339,7 +339,7 @@ StatusOr<std::unique_ptr<HloLivenessAnalysis>> HloLivenessAnalysis::Run(
   VLOG(1) << "HloLivenessAnalysis::Run on module " << module.name();
   XLA_VLOG_LINES(2, module.ToString());
 
-  auto liveness_analysis = absl::WrapUnique(new HloLivenessAnalysis(module));
+  auto liveness_analysis = abslx::WrapUnique(new HloLivenessAnalysis(module));
 
   liveness_analysis->RunAnalysis();
 

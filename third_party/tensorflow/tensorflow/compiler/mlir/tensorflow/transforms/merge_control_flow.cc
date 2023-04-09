@@ -237,14 +237,14 @@ IfOpIterConst FindLastIfInSegment(
 }
 
 // Returns a set of ops to be moved after merged IfRegion between two IfRegions.
-absl::flat_hash_set<Operation*> GetMoveOpsBetweenTwoIfRegions(
+abslx::flat_hash_set<Operation*> GetMoveOpsBetweenTwoIfRegions(
     Operation* result_op, Operation* after_op,
     llvm::SmallSetVector<Operation*, 4> middle_if_ops,
     const std::unique_ptr<TF::SideEffectAnalysis>& side_effect_analysis) {
   Block* block = after_op->getBlock();
   std::queue<Operation*> queue;
-  absl::flat_hash_set<Operation*> visited;
-  absl::flat_hash_set<Operation*> moved_ops;
+  abslx::flat_hash_set<Operation*> visited;
+  abslx::flat_hash_set<Operation*> moved_ops;
 
   func::FuncOp func = result_op->getParentOfType<func::FuncOp>();
   const TF::SideEffectAnalysis::Info& analysis =
@@ -289,7 +289,7 @@ absl::flat_hash_set<Operation*> GetMoveOpsBetweenTwoIfRegions(
 llvm::SmallVector<Operation*, 8> GetMoveOpList(
     llvm::SmallVector<TF::IfRegionOp, 8>& sub_if_group,
     const std::unique_ptr<TF::SideEffectAnalysis>& side_effect_analysis) {
-  absl::flat_hash_set<Operation*> all_moved_ops;
+  abslx::flat_hash_set<Operation*> all_moved_ops;
   Operation* last_if_op = sub_if_group.back().getOperation();
   llvm::SmallSetVector<Operation*, 4> middle_if_ops;
 
@@ -411,7 +411,7 @@ void ReplaceInternalUsage(llvm::SmallVector<TF::IfRegionOp, 8>& if_op_segment) {
 void MoveOpsAfter(Operation* last_op,
                   llvm::SmallVector<Operation*, 8>& moved_ops_ordered) {
   auto block = last_op->getBlock();
-  absl::flat_hash_set<Operation*> all_moved_ops(moved_ops_ordered.begin(),
+  abslx::flat_hash_set<Operation*> all_moved_ops(moved_ops_ordered.begin(),
                                                 moved_ops_ordered.end());
   moved_ops_ordered.clear();
   for (Operation& op : *block) {

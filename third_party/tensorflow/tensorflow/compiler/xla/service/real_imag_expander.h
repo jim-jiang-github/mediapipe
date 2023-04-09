@@ -23,7 +23,7 @@ namespace xla {
 // Expands real/image instructions with non-complex inputs.
 class RealImagExpander : public OpExpanderPass {
  public:
-  absl::string_view name() const override { return "real_imag_expander"; }
+  abslx::string_view name() const override { return "real_imag_expander"; }
 
  protected:
   bool InstructionMatchesPattern(HloInstruction* inst) override;

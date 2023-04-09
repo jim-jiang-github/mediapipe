@@ -497,7 +497,7 @@ LogicalResult BatchToSpaceNDOp::verify() {
 //
 LogicalResult BiasAddOp::verify() {
   BiasAddOp op = *this;
-  absl::string_view data_format(op.data_format().data(),
+  abslx::string_view data_format(op.data_format().data(),
                                 op.data_format().size());
   tensorflow::TensorFormat format;
   bool is_valid = FormatFromString(data_format, &format);
@@ -559,7 +559,7 @@ StringRef BiasAddOp::GetOptimalLayout(const RuntimeDevices &devices) {
 //
 LogicalResult BiasAddGradOp::verify() {
   BiasAddGradOp op = *this;
-  absl::string_view data_format(op.data_format().data(),
+  abslx::string_view data_format(op.data_format().data(),
                                 op.data_format().size());
   tensorflow::TensorFormat format;
   bool is_valid = FormatFromString(data_format, &format);
@@ -1673,7 +1673,7 @@ static LogicalResult Verify(OpT op) {
 
   int64_t input_channels = -1;
   if (auto ty = op.input().getType().template dyn_cast<RankedTensorType>()) {
-    absl::string_view data_format(op.data_format().data(),
+    abslx::string_view data_format(op.data_format().data(),
                                   op.data_format().size());
     tensorflow::TensorFormat format;
     auto is_valid = FormatFromString(data_format, &format);

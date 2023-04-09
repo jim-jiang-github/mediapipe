@@ -66,7 +66,7 @@ struct CostContext {
 using CostFunction =
     std::function<int64_t(const CostContext&, mlir::Operation*)>;
 
-void RegisterCostFunction(absl::string_view op_name,
+void RegisterCostFunction(abslx::string_view op_name,
                           CostFunction cost_function);
 
 template <typename OpType, typename F>

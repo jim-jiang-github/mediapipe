@@ -42,7 +42,7 @@ namespace profiler {
 // This will add 'my kernels' to both kernels in the profiler UI
 class ScopedAnnotation {
  public:
-  explicit ScopedAnnotation(absl::string_view name) {
+  explicit ScopedAnnotation(abslx::string_view name) {
 #if !defined(IS_MOBILE_PLATFORM)
     if (TF_PREDICT_FALSE(AnnotationStack::IsEnabled())) {
       old_length_ = AnnotationStack::PushAnnotation(name);
@@ -51,7 +51,7 @@ class ScopedAnnotation {
   }
 
   explicit ScopedAnnotation(const char* name)
-      : ScopedAnnotation(absl::string_view(name)) {}
+      : ScopedAnnotation(abslx::string_view(name)) {}
 
   explicit ScopedAnnotation(const string& name) {
 #if !defined(IS_MOBILE_PLATFORM)

@@ -95,7 +95,7 @@ class HloAliasAnalysis {
   std::vector<const HloBuffer*> LiveOutBuffers() const {
     std::vector<const HloBuffer*> results(live_out_buffers_.begin(),
                                           live_out_buffers_.end());
-    absl::c_sort(results, HloBuffer::IdLessThan);
+    abslx::c_sort(results, HloBuffer::IdLessThan);
     return results;
   }
 
@@ -108,13 +108,13 @@ class HloAliasAnalysis {
   const HloModule* module_;
 
   // A set of buffers that live out the module.
-  absl::flat_hash_set<const HloBuffer*> live_out_buffers_;
+  abslx::flat_hash_set<const HloBuffer*> live_out_buffers_;
 
   // The underlying dataflow analysis used by this alias analysis.
   std::unique_ptr<HloDataflowAnalysis> dataflow_analysis_;
 
   // A map indicating which buffer a value is contained in.
-  absl::flat_hash_map<const HloValue*, HloBuffer*> value_to_buffer_;
+  abslx::flat_hash_map<const HloValue*, HloBuffer*> value_to_buffer_;
 
   // A lazily constructed vector containing all HloBuffers sorted by
   // HloBuffer::Id.

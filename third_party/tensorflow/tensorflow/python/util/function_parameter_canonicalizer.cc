@@ -51,7 +51,7 @@ inline void PyUnicodeInternInPlaceCompat(PyObject** obj) {
 namespace tensorflow {
 
 FunctionParameterCanonicalizer::FunctionParameterCanonicalizer(
-    absl::Span<const char*> arg_names, absl::Span<PyObject*> defaults)
+    abslx::Span<const char*> arg_names, abslx::Span<PyObject*> defaults)
     : positional_args_size_(arg_names.size() - defaults.size()) {
   DCheckPyGilState();
   DCHECK_GE(positional_args_size_, 0);
@@ -67,7 +67,7 @@ FunctionParameterCanonicalizer::FunctionParameterCanonicalizer(
 }
 
 bool FunctionParameterCanonicalizer::Canonicalize(
-    PyObject* args, PyObject* kwargs, absl::Span<PyObject*> result) {
+    PyObject* args, PyObject* kwargs, abslx::Span<PyObject*> result) {
   // TODO(kkb): Closely follow `Python/ceval.c`'s logic and error handling.
 
   DCheckPyGilState();
@@ -82,7 +82,7 @@ bool FunctionParameterCanonicalizer::Canonicalize(
   if (TF_PREDICT_FALSE(args_size > interned_arg_names_.size())) {
     PyErr_SetString(
         PyExc_TypeError,
-        absl::StrCat("Too many arguments were given. Expected ",
+        abslx::StrCat("Too many arguments were given. Expected ",
                      interned_arg_names_.size(), " but got ", args_size, ".")
             .c_str());
     return false;
@@ -164,7 +164,7 @@ inline std::size_t FunctionParameterCanonicalizer::InternedArgNameLinearSearch(
 }
 
 bool FunctionParameterCanonicalizer::AreInternedArgNamesUnique() {
-  absl::flat_hash_set<PyObject*> interned_arg_names_set;
+  abslx::flat_hash_set<PyObject*> interned_arg_names_set;
   for (const Safe_PyObjectPtr& obj : interned_arg_names_)
     interned_arg_names_set.emplace(obj.get());
 

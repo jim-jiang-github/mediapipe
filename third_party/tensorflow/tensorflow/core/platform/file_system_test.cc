@@ -127,7 +127,7 @@ class InterPlanetaryFileSystem : public NullFileSystem {
     this->ParseURI(name, &scheme, &host, &path);
     ASSERT_EQ(scheme, "ipfs");
     ASSERT_EQ(host, "solarsystem");
-    absl::ConsumePrefix(&path, "/");
+    abslx::ConsumePrefix(&path, "/");
     *parsed_path = string(path);
   }
 
@@ -164,10 +164,10 @@ string Match(InterPlanetaryFileSystem* ipfs, const string& suffix_pattern) {
     for (const string& result : results) {
       StringPiece trimmed_result(result);
       EXPECT_TRUE(
-          absl::ConsumePrefix(&trimmed_result, strings::StrCat(kPrefix, "/")));
+          abslx::ConsumePrefix(&trimmed_result, strings::StrCat(kPrefix, "/")));
       trimmed_results.push_back(trimmed_result);
     }
-    return absl::StrJoin(trimmed_results, ",");
+    return abslx::StrJoin(trimmed_results, ",");
   }
 }
 

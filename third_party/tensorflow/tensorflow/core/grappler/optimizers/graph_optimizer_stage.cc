@@ -48,7 +48,7 @@ Status GetTensorProperties(const GraphOptimizerContext& ctx,
   }
 
   // TODO(ezhulenev): Make it TensorId when graph properties will support
-  // absl::string_view lookup.
+  // abslx::string_view lookup.
   SafeTensorId tensor_id = ParseTensorName(tensor);
 
   if (tensor_id.index() < 0) {
@@ -87,7 +87,7 @@ NodeDef* AddEmptyNode(const GraphOptimizerContext& ctx, const string& name) {
   std::string new_name = name;
   for (int count = 0; ctx.node_map->NodeExists(new_name); ++count) {
     LOG(WARNING) << name << " already exists in the graph.";
-    new_name = absl::StrCat(name, "_", count);
+    new_name = abslx::StrCat(name, "_", count);
   }
   NodeDef* new_node = ctx.optimized_graph->add_node();
   new_node->set_name(new_name);

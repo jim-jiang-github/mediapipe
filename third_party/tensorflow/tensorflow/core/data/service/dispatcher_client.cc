@@ -158,7 +158,7 @@ Status DataServiceDispatcherClient::GetOrCreateJob(
   grpc::Status status = stub_->GetOrCreateJob(&client_ctx, req, &resp);
   if (!status.ok()) {
     return grpc_util::WrapError(
-        absl::StrCat("Failed to get or create job for dataset with id ",
+        abslx::StrCat("Failed to get or create job for dataset with id ",
                      dataset_id),
         status);
   }
@@ -177,7 +177,7 @@ Status DataServiceDispatcherClient::GetOrCreateIteration(
   grpc::Status status = stub_->GetOrCreateIteration(&client_ctx, req, &resp);
   if (!status.ok()) {
     return grpc_util::WrapError(
-        absl::StrCat("Failed to get or create iteration for job with id ",
+        abslx::StrCat("Failed to get or create iteration for job with id ",
                      job_id),
         status);
   }
@@ -195,7 +195,7 @@ Status DataServiceDispatcherClient::ReleaseIterationClient(
   grpc::Status status = stub_->ReleaseIterationClient(&client_ctx, req, &resp);
   if (!status.ok()) {
     return grpc_util::WrapError(
-        absl::StrCat("Failed to release iteration client with id ",
+        abslx::StrCat("Failed to release iteration client with id ",
                      iteration_client_id),
         status);
   }
@@ -299,7 +299,7 @@ Status DataServiceDispatcherClient::EnsureInitialized() {
         grpc::Status s = stub_->GetVersion(&ctx, req, &resp);
         if (!s.ok()) {
           return grpc_util::WrapError(
-              absl::StrCat("Failed to get dispatcher version from dispatcher "
+              abslx::StrCat("Failed to get dispatcher version from dispatcher "
                            "running at ",
                            address_),
               s);

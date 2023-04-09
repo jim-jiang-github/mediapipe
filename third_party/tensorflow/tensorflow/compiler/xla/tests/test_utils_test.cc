@@ -140,9 +140,9 @@ ENTRY %sort.148.1589 (parameter.0: f32[1048576], parameter.1: s32[1048576]) -> (
   ASSERT_EQ(args.size(), 2);
   const Literal& key_arg = args[0];
 
-  absl::flat_hash_set<uint32_t> key_set;
+  abslx::flat_hash_set<uint32_t> key_set;
   for (const float& value : key_arg.data<float>()) {
-    EXPECT_TRUE(key_set.insert(absl::bit_cast<uint32_t>(value)).second);
+    EXPECT_TRUE(key_set.insert(abslx::bit_cast<uint32_t>(value)).second);
   }
 }
 
@@ -171,9 +171,9 @@ ENTRY %sort.148.1589 (parameter.0: s32[1048576], parameter.1: s32[1048576]) -> (
   ASSERT_EQ(args.size(), 2);
   const Literal& key_arg = args[0];
 
-  absl::flat_hash_set<int32_t> key_set;
+  abslx::flat_hash_set<int32_t> key_set;
   for (const int32_t& value : key_arg.data<int32_t>()) {
-    EXPECT_TRUE(key_set.insert(absl::bit_cast<uint32_t>(value)).second);
+    EXPECT_TRUE(key_set.insert(abslx::bit_cast<uint32_t>(value)).second);
   }
 }
 
@@ -202,9 +202,9 @@ ENTRY %sort. (parameter.0: bf16[2,1452], parameter.1: s32[2,1452]) -> (bf16[2,14
   ASSERT_EQ(args.size(), 2);
   const Literal& key_arg = args[0];
 
-  absl::flat_hash_set<uint16_t> key_set;
+  abslx::flat_hash_set<uint16_t> key_set;
   for (const bfloat16& value : key_arg.data<bfloat16>()) {
-    EXPECT_TRUE(key_set.insert(absl::bit_cast<uint16_t>(value)).second);
+    EXPECT_TRUE(key_set.insert(abslx::bit_cast<uint16_t>(value)).second);
   }
 }
 

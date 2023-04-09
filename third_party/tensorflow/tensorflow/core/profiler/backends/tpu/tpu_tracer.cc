@@ -125,7 +125,7 @@ std::unique_ptr<ProfilerInterface> CreateTpuTracer(
   if (tpu::OpsApiFn()->TpuProfiler_CreateFn == nullptr) {
     return nullptr;
   }
-  return absl::make_unique<TpuTracer>();
+  return abslx::make_unique<TpuTracer>();
 }
 
 auto register_tpu_tracer_factory = [] {

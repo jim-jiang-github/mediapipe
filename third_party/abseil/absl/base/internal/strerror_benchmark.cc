@@ -22,7 +22,7 @@
 namespace {
 void BM_AbslStrError(benchmark::State& state) {
   for (auto _ : state) {
-    benchmark::DoNotOptimize(absl::base_internal::StrError(ERANGE));
+    benchmark::DoNotOptimize(abslx::base_internal::StrError(ERANGE));
   }
 }
 BENCHMARK(BM_AbslStrError);

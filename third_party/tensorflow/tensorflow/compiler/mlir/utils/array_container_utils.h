@@ -22,23 +22,23 @@ limitations under the License.
 namespace mlir {
 
 template <typename T>
-inline llvm::ArrayRef<T> SpanToArrayRef(absl::Span<const T> span) {
+inline llvm::ArrayRef<T> SpanToArrayRef(abslx::Span<const T> span) {
   return llvm::ArrayRef<T>(span.data(), span.size());
 }
 
 template <typename T>
-inline llvm::ArrayRef<T> SpanToArrayRef(absl::Span<T> span) {
+inline llvm::ArrayRef<T> SpanToArrayRef(abslx::Span<T> span) {
   return llvm::ArrayRef<T>(span.data(), span.size());
 }
 
 template <typename T>
-inline llvm::MutableArrayRef<T> SpanToMutableArrayRef(absl::Span<T> span) {
+inline llvm::MutableArrayRef<T> SpanToMutableArrayRef(abslx::Span<T> span) {
   return llvm::MutableArrayRef<T>(span.data(), span.size());
 }
 
 template <typename T>
-inline absl::Span<const T> ArrayRefToSpan(llvm::ArrayRef<T> ref) {
-  return absl::Span<const T>(ref.data(), ref.size());
+inline abslx::Span<const T> ArrayRefToSpan(llvm::ArrayRef<T> ref) {
+  return abslx::Span<const T>(ref.data(), ref.size());
 }
 
 }  // namespace mlir

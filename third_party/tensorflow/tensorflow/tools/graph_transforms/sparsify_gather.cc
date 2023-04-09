@@ -87,11 +87,11 @@ void CreateConstNode(const Tensor& tensor, const string& name,
 
 string GetMonolithicTensorKey(const string& tensor_slice_name) {
   std::vector<string> names = Split(tensor_slice_name, "/");
-  if (absl::StartsWith(names[names.size() - 1], "part_")) {
+  if (abslx::StartsWith(names[names.size() - 1], "part_")) {
     CHECK_GE(names.size(), 2);
     names.pop_back();
   }
-  return absl::StrJoin(names, "/");
+  return abslx::StrJoin(names, "/");
 }
 
 Status ObtainTensorSlice(const GraphDef& input_graph_def,
@@ -101,8 +101,8 @@ Status ObtainTensorSlice(const GraphDef& input_graph_def,
   for (const auto& node : input_graph_def.node()) {
     std::vector<string> node_name_parts = Split(node.name(), "/");
     if (node_name_parts.size() == 2 &&
-        absl::StartsWith(node_name_parts[0], "save") &&
-        absl::StartsWith(node_name_parts[1], "Assign") &&
+        abslx::StartsWith(node_name_parts[0], "save") &&
+        abslx::StartsWith(node_name_parts[1], "Assign") &&
         node.input(0) == target_name) {
       restore_node_name = node.input(1);
       break;

@@ -33,19 +33,19 @@ const GraphNodeProto& TFShow::Show(const string& prefix, const Options& opts) {
   } else {
     const ShowNode* ret = ShowInternal(opts, nullptr);
     if (opts.output_type == kOutput[1]) {
-      absl::PrintF("%s", (prefix + ret->formatted_str));
+      abslx::PrintF("%s", (prefix + ret->formatted_str));
       fflush(stdout);
     } else if (opts.output_type == kOutput[2]) {
       Status s = WriteStringToFile(Env::Default(),
                                    opts.output_options.at(kFileOpts[0]),
                                    prefix + ret->formatted_str);
       if (!s.ok()) {
-        absl::FPrintF(stderr, "%s\n", s.ToString());
+        abslx::FPrintF(stderr, "%s\n", s.ToString());
       }
     } else if (opts.output_type == kOutput[3] ||
                opts.output_type == kOutput[4]) {
     } else {
-      absl::FPrintF(stderr, "Unknown output type: %s\n", opts.output_type);
+      abslx::FPrintF(stderr, "Unknown output type: %s\n", opts.output_type);
     }
     return ret->proto();
   }
@@ -60,7 +60,7 @@ bool TFShow::LookUpCheckPoint(const string& name,
   TF_Status* status = TF_NewStatus();
   ckpt_reader_->GetTensor(name, &out_tensor, status);
   if (TF_GetCode(status) != TF_OK) {
-    absl::FPrintF(stderr, "%s\n", TF_Message(status));
+    abslx::FPrintF(stderr, "%s\n", TF_Message(status));
     TF_DeleteStatus(status);
     return false;
   }
@@ -201,12 +201,12 @@ string TFShow::FormatNode(ShowNode* node, const Options& opts) const {
   }
   if (opts.select.find(kShown[5]) != opts.select.end()) {
     if (node->proto().devices_size() > 0) {
-      info.push_back(absl::StrJoin(node->proto().devices(), "|"));
+      info.push_back(abslx::StrJoin(node->proto().devices(), "|"));
     }
   }
   if (opts.select.find(kShown[6]) != opts.select.end()) {
     const std::set<string>& op_types = node->node->op_types();
-    info.push_back(absl::StrJoin(op_types, "|"));
+    info.push_back(abslx::StrJoin(op_types, "|"));
   }
   if (opts.select.find(kShown[7]) != opts.select.end()) {
     string run = FormatNumber(node->proto().total_run_count());
@@ -227,16 +227,16 @@ string TFShow::FormatNode(ShowNode* node, const Options& opts) const {
     std::vector<string> shape_vec;
     for (const auto& s : node->node->input_shapes()) {
       if (s.second.empty()) {
-        shape_vec.push_back(absl::StrFormat("%d:unknown", s.first));
+        shape_vec.push_back(abslx::StrFormat("%d:unknown", s.first));
       } else {
         shape_vec.push_back(
-            absl::StrFormat("%d:%s", s.first, absl::StrJoin(s.second, "x")));
+            abslx::StrFormat("%d:%s", s.first, abslx::StrJoin(s.second, "x")));
       }
     }
-    info.push_back(absl::StrJoin(shape_vec, "|"));
+    info.push_back(abslx::StrJoin(shape_vec, "|"));
   }
 
-  return absl::StrFormat("%s (%s)", node->name(), absl::StrJoin(info, ", "));
+  return abslx::StrFormat("%s (%s)", node->name(), abslx::StrJoin(info, ", "));
 }
 
 string TFShow::FormatLegend(const Options& opts) const {
@@ -284,7 +284,7 @@ string TFShow::FormatLegend(const Options& opts) const {
   if (opts.select.find(kShown[8]) != opts.select.end()) {
     legends.push_back("input shapes");
   }
-  return absl::StrFormat("node name | %s\n", absl::StrJoin(legends, " | "));
+  return abslx::StrFormat("node name | %s\n", abslx::StrJoin(legends, " | "));
 }
 
 }  // namespace tfprof

@@ -84,7 +84,7 @@ class ConvertTile : public OpConverterBase<ConvertTile> {
 
       if (std::any_of(multiplies, multiplies + nb_dims,
                       [](int i) { return i <= 0; })) {
-        const auto &mul = absl::StrJoin(multiplies, multiplies + nb_dims, ", ");
+        const auto &mul = abslx::StrJoin(multiplies, multiplies + nb_dims, ", ");
         return errors::InvalidArgument(
             "All replications of the Tile operation in '",
             params.node_def.name(), "' should be positive, got (", mul, ").");

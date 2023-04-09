@@ -31,7 +31,7 @@ class AccuInlineRewrite : public InlineRewrite {
   explicit AccuInlineRewrite(std::vector<std::string>* blocks)
       : blocks_(blocks) {}
 
-  RewriteStatus Rewrite(absl::string_view input, std::string* output) final {
+  RewriteStatus Rewrite(abslx::string_view input, std::string* output) final {
     blocks_->push_back(std::string(input.data(), input.size()));
     output->append("r:");
     output->append(input.data(), input.size());
@@ -95,7 +95,7 @@ TEST(Preprocessor, RewriteMore) {
 
 class SingleRewrite : public InlineRewrite {
  public:
-  RewriteStatus Rewrite(absl::string_view input, std::string* output) final {
+  RewriteStatus Rewrite(abslx::string_view input, std::string* output) final {
     if (input == "foo") {
       output->append("bla");
       return RewriteStatus::SUCCESS;

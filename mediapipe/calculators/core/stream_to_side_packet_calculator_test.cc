@@ -36,7 +36,7 @@ class StreamToSidePacketCalculatorTest : public Test {
       input_stream: "stream"
       output_side_packet: "side_packet"
     )";
-    runner_ = absl::make_unique<CalculatorRunner>(kConfig);
+    runner_ = abslx::make_unique<CalculatorRunner>(kConfig);
   }
 
   std::unique_ptr<CalculatorRunner> runner_;
@@ -44,7 +44,7 @@ class StreamToSidePacketCalculatorTest : public Test {
 
 TEST_F(StreamToSidePacketCalculatorTest,
        StreamToSidePacketCalculatorWithEmptyStreamFails) {
-  EXPECT_EQ(runner_->Run().code(), absl::StatusCode::kUnavailable);
+  EXPECT_EQ(runner_->Run().code(), abslx::StatusCode::kUnavailable);
 }
 
 TEST_F(StreamToSidePacketCalculatorTest,
@@ -61,7 +61,7 @@ TEST_F(StreamToSidePacketCalculatorTest,
       Adopt(new std::string("test1")).At(Timestamp(1)));
   runner_->MutableInputs()->Index(0).packets.push_back(
       Adopt(new std::string("test2")).At(Timestamp(2)));
-  EXPECT_EQ(runner_->Run().code(), absl::StatusCode::kAlreadyExists);
+  EXPECT_EQ(runner_->Run().code(), abslx::StatusCode::kAlreadyExists);
 }
 
 }  // namespace mediapipe

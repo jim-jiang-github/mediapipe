@@ -127,7 +127,7 @@ class SimpleHashTableResource : public ::tensorflow::ResourceBase {
 
  private:
   mutable mutex mu_;
-  absl::flat_hash_map<K, V> table_ TF_GUARDED_BY(mu_);
+  abslx::flat_hash_map<K, V> table_ TF_GUARDED_BY(mu_);
 };
 
 template <class K, class V>

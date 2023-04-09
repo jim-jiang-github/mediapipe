@@ -84,11 +84,11 @@ template <typename T>
 struct ExampleStore {
  private:
   static ExampleTensorMap serialized_example;
-  static absl::once_flag flags_init;
+  static abslx::once_flag flags_init;
 
  public:
   static ExampleTensorMap& GetSerializedExample() {
-    absl::call_once(flags_init, [] {
+    abslx::call_once(flags_init, [] {
       AddExample(&serialized_example, 10, 1, 1);
       AddExample(&serialized_example, 100, 1, 1);
       AddExample(&serialized_example, 1000, 1, 1);
@@ -135,7 +135,7 @@ struct ExampleStore {
 template <typename T>
 ExampleTensorMap ExampleStore<T>::serialized_example;
 template <typename T>
-absl::once_flag ExampleStore<T>::flags_init;
+abslx::once_flag ExampleStore<T>::flags_init;
 
 template struct ExampleStore<BytesFiller>;
 template struct ExampleStore<Int64Filler>;

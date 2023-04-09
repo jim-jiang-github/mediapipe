@@ -114,7 +114,7 @@ class GrapplerTest : public ::testing::Test {
     return tensor;
   }
 
-  inline tensorflow::Scope CreateScopeWithDevice(absl::string_view device) {
+  inline tensorflow::Scope CreateScopeWithDevice(abslx::string_view device) {
     return tensorflow::Scope::NewRootScope().WithDevice(string(device));
   }
 

@@ -59,7 +59,7 @@ void AddInputPackets(int num_packets, CalculatorGraph* graph) {
 
 void RunTest(int num_input_packets, int max_in_flight) {
   CalculatorGraphConfig config = ParseTextProtoOrDie<CalculatorGraphConfig>(
-      absl::Substitute(R"(
+      abslx::Substitute(R"(
     input_stream: "first_frames"
     input_stream: "second_frames"
     node {

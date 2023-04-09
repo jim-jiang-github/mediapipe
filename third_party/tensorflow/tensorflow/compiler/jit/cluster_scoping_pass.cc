@@ -84,19 +84,19 @@ void SetXlaInternalScope(Node* node, StringPiece scope) {
 //                              V
 //  Node_X (scope "stage") -> Stage
 //
-void AddOrAppendXlaInternalScope(Node* node, absl::string_view suffix) {
+void AddOrAppendXlaInternalScope(Node* node, abslx::string_view suffix) {
   string updated_scope;
   std::optional<string> cur_scope = GetXlaInternalScope(node);
   if (cur_scope == std::nullopt) {
     updated_scope = std::string(suffix);
   } else {
-    updated_scope = absl::StrCat(cur_scope.value(), "&", suffix);
+    updated_scope = abslx::StrCat(cur_scope.value(), "&", suffix);
   }
   SetXlaInternalScope(node, updated_scope);
 }
 
 void ClusterScopingPassImpl::AddScopeToAllTransitivePredecessors(Node* start) {
-  const string unique_suffix = absl::StrCat("_", GetUniqueScopeId());
+  const string unique_suffix = abslx::StrCat("_", GetUniqueScopeId());
 
   std::vector<Node*> starts;
   starts.push_back(start);
@@ -106,7 +106,7 @@ void ClusterScopingPassImpl::AddScopeToAllTransitivePredecessors(Node* start) {
 }
 
 void ClusterScopingPassImpl::AddScopeToAllTransitiveSuccessors(Node* start) {
-  const string unique_suffix = absl::StrCat("_", GetUniqueScopeId());
+  const string unique_suffix = abslx::StrCat("_", GetUniqueScopeId());
 
   std::vector<Node*> starts;
   starts.push_back(start);

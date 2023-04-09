@@ -20,15 +20,15 @@
 // in time, durations of time, and formatting and parsing time within a given
 // time zone. The following abstractions are defined:
 //
-//  * `absl::Time` defines an absolute, specific instance in time
-//  * `absl::Duration` defines a signed, fixed-length span of time
-//  * `absl::TimeZone` defines geopolitical time zone regions (as collected
+//  * `abslx::Time` defines an absolute, specific instance in time
+//  * `abslx::Duration` defines a signed, fixed-length span of time
+//  * `abslx::TimeZone` defines geopolitical time zone regions (as collected
 //     within the IANA Time Zone database (https://www.iana.org/time-zones)).
 //
 // Note: Absolute times are distinct from civil times, which refer to the
 // human-scale time commonly represented by `YYYY-MM-DD hh:mm:ss`. The mapping
 // between absolute and civil times can be specified by use of time zones
-// (`absl::TimeZone` within this API). That is:
+// (`abslx::TimeZone` within this API). That is:
 //
 //   Civil Time = F(Absolute Time, Time Zone)
 //   Absolute Time = G(Civil Time, Time Zone)
@@ -38,24 +38,24 @@
 //
 // Example:
 //
-//   absl::TimeZone nyc;
+//   abslx::TimeZone nyc;
 //   // LoadTimeZone() may fail so it's always better to check for success.
-//   if (!absl::LoadTimeZone("America/New_York", &nyc)) {
+//   if (!abslx::LoadTimeZone("America/New_York", &nyc)) {
 //      // handle error case
 //   }
 //
 //   // My flight leaves NYC on Jan 2, 2017 at 03:04:05
-//   absl::CivilSecond cs(2017, 1, 2, 3, 4, 5);
-//   absl::Time takeoff = absl::FromCivil(cs, nyc);
+//   abslx::CivilSecond cs(2017, 1, 2, 3, 4, 5);
+//   abslx::Time takeoff = abslx::FromCivil(cs, nyc);
 //
-//   absl::Duration flight_duration = absl::Hours(21) + absl::Minutes(35);
-//   absl::Time landing = takeoff + flight_duration;
+//   abslx::Duration flight_duration = abslx::Hours(21) + abslx::Minutes(35);
+//   abslx::Time landing = takeoff + flight_duration;
 //
-//   absl::TimeZone syd;
-//   if (!absl::LoadTimeZone("Australia/Sydney", &syd)) {
+//   abslx::TimeZone syd;
+//   if (!abslx::LoadTimeZone("Australia/Sydney", &syd)) {
 //      // handle error case
 //   }
-//   std::string s = absl::FormatTime(
+//   std::string s = abslx::FormatTime(
 //       "My flight will land in Sydney on %Y-%m-%d at %H:%M:%S",
 //       landing, syd);
 
@@ -88,7 +88,7 @@ struct timeval;
 #include "absl/time/civil_time.h"
 #include "absl/time/internal/cctz/include/cctz/time_zone.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 class Duration;  // Defined below
@@ -120,9 +120,9 @@ using EnableIfFloat =
 
 // Duration
 //
-// The `absl::Duration` class represents a signed, fixed-length span of time.
+// The `abslx::Duration` class represents a signed, fixed-length span of time.
 // A `Duration` is generated using a unit-specific factory function, or is
-// the result of subtracting one `absl::Time` from another. Durations behave
+// the result of subtracting one `abslx::Time` from another. Durations behave
 // like unit-safe integers and they support all the natural integer-like
 // arithmetic operations. Arithmetic overflows and saturates at +/- infinity.
 // `Duration` should be passed by value rather than const reference.
@@ -133,23 +133,23 @@ using EnableIfFloat =
 //
 // Examples:
 //
-//   constexpr absl::Duration ten_ns = absl::Nanoseconds(10);
-//   constexpr absl::Duration min = absl::Minutes(1);
-//   constexpr absl::Duration hour = absl::Hours(1);
-//   absl::Duration dur = 60 * min;  // dur == hour
-//   absl::Duration half_sec = absl::Milliseconds(500);
-//   absl::Duration quarter_sec = 0.25 * absl::Seconds(1);
+//   constexpr abslx::Duration ten_ns = abslx::Nanoseconds(10);
+//   constexpr abslx::Duration min = abslx::Minutes(1);
+//   constexpr abslx::Duration hour = abslx::Hours(1);
+//   abslx::Duration dur = 60 * min;  // dur == hour
+//   abslx::Duration half_sec = abslx::Milliseconds(500);
+//   abslx::Duration quarter_sec = 0.25 * abslx::Seconds(1);
 //
 // `Duration` values can be easily converted to an integral number of units
 // using the division operator.
 //
 // Example:
 //
-//   constexpr absl::Duration dur = absl::Milliseconds(1500);
-//   int64_t ns = dur / absl::Nanoseconds(1);   // ns == 1500000000
-//   int64_t ms = dur / absl::Milliseconds(1);  // ms == 1500
-//   int64_t sec = dur / absl::Seconds(1);    // sec == 1 (subseconds truncated)
-//   int64_t min = dur / absl::Minutes(1);    // min == 0
+//   constexpr abslx::Duration dur = abslx::Milliseconds(1500);
+//   int64_t ns = dur / abslx::Nanoseconds(1);   // ns == 1500000000
+//   int64_t ms = dur / abslx::Milliseconds(1);  // ms == 1500
+//   int64_t sec = dur / abslx::Seconds(1);    // sec == 1 (subseconds truncated)
+//   int64_t min = dur / abslx::Minutes(1);    // min == 0
 //
 // See the `IDivDuration()` and `FDivDuration()` functions below for details on
 // how to access the fractional parts of the quotient.
@@ -261,15 +261,15 @@ inline Duration operator%(Duration lhs, Duration rhs) { return lhs %= rhs; }
 //
 // Example:
 //
-//   constexpr absl::Duration a =
-//       absl::Seconds(std::numeric_limits<int64_t>::max());  // big
-//   constexpr absl::Duration b = absl::Nanoseconds(1);       // small
+//   constexpr abslx::Duration a =
+//       abslx::Seconds(std::numeric_limits<int64_t>::max());  // big
+//   constexpr abslx::Duration b = abslx::Nanoseconds(1);       // small
 //
-//   absl::Duration rem = a % b;
-//   // rem == absl::ZeroDuration()
+//   abslx::Duration rem = a % b;
+//   // rem == abslx::ZeroDuration()
 //
 //   // Here, q would overflow int64_t, so rem accounts for the difference.
-//   int64_t q = absl::IDivDuration(a, b, &rem);
+//   int64_t q = abslx::IDivDuration(a, b, &rem);
 //   // q == std::numeric_limits<int64_t>::max(), rem == a - b * q
 inline int64_t IDivDuration(Duration num, Duration den, Duration* rem) {
   return time_internal::IDivDuration(true, num, den,
@@ -286,7 +286,7 @@ inline int64_t IDivDuration(Duration num, Duration den, Duration* rem) {
 //
 // Example:
 //
-//   double d = absl::FDivDuration(absl::Milliseconds(1500), absl::Seconds(1));
+//   double d = abslx::FDivDuration(abslx::Milliseconds(1500), abslx::Seconds(1));
 //   // d == 1.5
 double FDivDuration(Duration num, Duration den);
 
@@ -309,8 +309,8 @@ inline Duration AbsDuration(Duration d) {
 //
 // Example:
 //
-//   absl::Duration d = absl::Nanoseconds(123456789);
-//   absl::Duration a = absl::Trunc(d, absl::Microseconds(1));  // 123456us
+//   abslx::Duration d = abslx::Nanoseconds(123456789);
+//   abslx::Duration a = abslx::Trunc(d, abslx::Microseconds(1));  // 123456us
 Duration Trunc(Duration d, Duration unit);
 
 // Floor()
@@ -320,8 +320,8 @@ Duration Trunc(Duration d, Duration unit);
 //
 // Example:
 //
-//   absl::Duration d = absl::Nanoseconds(123456789);
-//   absl::Duration b = absl::Floor(d, absl::Microseconds(1));  // 123456us
+//   abslx::Duration d = abslx::Nanoseconds(123456789);
+//   abslx::Duration b = abslx::Floor(d, abslx::Microseconds(1));  // 123456us
 Duration Floor(Duration d, Duration unit);
 
 // Ceil()
@@ -331,8 +331,8 @@ Duration Floor(Duration d, Duration unit);
 //
 // Example:
 //
-//   absl::Duration d = absl::Nanoseconds(123456789);
-//   absl::Duration c = absl::Ceil(d, absl::Microseconds(1));   // 123457us
+//   abslx::Duration d = abslx::Nanoseconds(123456789);
+//   abslx::Duration c = abslx::Ceil(d, abslx::Microseconds(1));   // 123457us
 Duration Ceil(Duration d, Duration unit);
 
 // InfiniteDuration()
@@ -347,8 +347,8 @@ Duration Ceil(Duration d, Duration unit);
 //
 // Examples:
 //
-//   constexpr absl::Duration inf = absl::InfiniteDuration();
-//   const absl::Duration d = ... any finite duration ...
+//   constexpr abslx::Duration inf = abslx::InfiniteDuration();
+//   const abslx::Duration d = ... any finite duration ...
 //
 //   inf == inf + inf
 //   inf == inf + d
@@ -365,7 +365,7 @@ Duration Ceil(Duration d, Duration unit);
 //
 //   // Division by zero returns infinity, or INT64_MIN/MAX where appropriate.
 //   inf == d / 0
-//   INT64_MAX == d / absl::ZeroDuration()
+//   INT64_MAX == d / abslx::ZeroDuration()
 //
 // The examples involving the `/` operator above also apply to `IDivDuration()`
 // and `FDivDuration()`.
@@ -385,13 +385,13 @@ constexpr Duration InfiniteDuration();
 // NOTE: no "Days()" factory function exists because "a day" is ambiguous.
 // Civil days are not always 24 hours long, and a 24-hour duration often does
 // not correspond with a civil day. If a 24-hour duration is needed, use
-// `absl::Hours(24)`. If you actually want a civil day, use absl::CivilDay
+// `abslx::Hours(24)`. If you actually want a civil day, use abslx::CivilDay
 // from civil_time.h.
 //
 // Example:
 //
-//   absl::Duration a = absl::Seconds(60);
-//   absl::Duration b = absl::Minutes(1);  // b == a
+//   abslx::Duration a = abslx::Seconds(60);
+//   abslx::Duration b = abslx::Minutes(1);  // b == a
 constexpr Duration Nanoseconds(int64_t n);
 constexpr Duration Microseconds(int64_t n);
 constexpr Duration Milliseconds(int64_t n);
@@ -406,8 +406,8 @@ constexpr Duration Hours(int64_t n);
 //
 // Example:
 //
-//   auto a = absl::Seconds(1.5);        // OK
-//   auto b = absl::Milliseconds(1500);  // BETTER
+//   auto a = abslx::Seconds(1.5);        // OK
+//   auto b = abslx::Milliseconds(1500);  // BETTER
 template <typename T, time_internal::EnableIfFloat<T> = 0>
 Duration Nanoseconds(T n) {
   return n * Nanoseconds(1);
@@ -456,8 +456,8 @@ Duration Hours(T n) {
 //
 // Example:
 //
-//   absl::Duration d = absl::Milliseconds(1500);
-//   int64_t isec = absl::ToInt64Seconds(d);  // isec == 1
+//   abslx::Duration d = abslx::Milliseconds(1500);
+//   int64_t isec = abslx::ToInt64Seconds(d);  // isec == 1
 ABSL_ATTRIBUTE_PURE_FUNCTION int64_t ToInt64Nanoseconds(Duration d);
 ABSL_ATTRIBUTE_PURE_FUNCTION int64_t ToInt64Microseconds(Duration d);
 ABSL_ATTRIBUTE_PURE_FUNCTION int64_t ToInt64Milliseconds(Duration d);
@@ -478,8 +478,8 @@ ABSL_ATTRIBUTE_PURE_FUNCTION int64_t ToInt64Hours(Duration d);
 //
 // Example:
 //
-//   absl::Duration d = absl::Milliseconds(1500);
-//   double dsec = absl::ToDoubleSeconds(d);  // dsec == 1.5
+//   abslx::Duration d = abslx::Milliseconds(1500);
+//   double dsec = abslx::ToDoubleSeconds(d);  // dsec == 1.5
 ABSL_ATTRIBUTE_PURE_FUNCTION double ToDoubleNanoseconds(Duration d);
 ABSL_ATTRIBUTE_PURE_FUNCTION double ToDoubleMicroseconds(Duration d);
 ABSL_ATTRIBUTE_PURE_FUNCTION double ToDoubleMilliseconds(Duration d);
@@ -489,12 +489,12 @@ ABSL_ATTRIBUTE_PURE_FUNCTION double ToDoubleHours(Duration d);
 
 // FromChrono()
 //
-// Converts any of the pre-defined std::chrono durations to an absl::Duration.
+// Converts any of the pre-defined std::chrono durations to an abslx::Duration.
 //
 // Example:
 //
 //   std::chrono::milliseconds ms(123);
-//   absl::Duration d = absl::FromChrono(ms);
+//   abslx::Duration d = abslx::FromChrono(ms);
 constexpr Duration FromChrono(const std::chrono::nanoseconds& d);
 constexpr Duration FromChrono(const std::chrono::microseconds& d);
 constexpr Duration FromChrono(const std::chrono::milliseconds& d);
@@ -509,16 +509,16 @@ constexpr Duration FromChrono(const std::chrono::hours& d);
 // ToChronoMinutes()
 // ToChronoHours()
 //
-// Converts an absl::Duration to any of the pre-defined std::chrono durations.
+// Converts an abslx::Duration to any of the pre-defined std::chrono durations.
 // If overflow would occur, the returned value will saturate at the min/max
 // chrono duration value instead.
 //
 // Example:
 //
-//   absl::Duration d = absl::Microseconds(123);
-//   auto x = absl::ToChronoMicroseconds(d);
-//   auto y = absl::ToChronoNanoseconds(d);  // x == y
-//   auto z = absl::ToChronoSeconds(absl::InfiniteDuration());
+//   abslx::Duration d = abslx::Microseconds(123);
+//   auto x = abslx::ToChronoMicroseconds(d);
+//   auto y = abslx::ToChronoNanoseconds(d);  // x == y
+//   auto z = abslx::ToChronoSeconds(abslx::InfiniteDuration());
 //   // z == std::chrono::seconds::max()
 std::chrono::nanoseconds ToChronoNanoseconds(Duration d);
 std::chrono::microseconds ToChronoMicroseconds(Duration d);
@@ -545,11 +545,11 @@ inline std::ostream& operator<<(std::ostream& os, Duration d) {
 // suffix.  The valid suffixes are "ns", "us" "ms", "s", "m", and "h".
 // Simple examples include "300ms", "-1.5h", and "2h45m".  Parses "0" as
 // `ZeroDuration()`. Parses "inf" and "-inf" as +/- `InfiniteDuration()`.
-bool ParseDuration(absl::string_view dur_string, Duration* d);
+bool ParseDuration(abslx::string_view dur_string, Duration* d);
 
 // Support for flag values of type Duration. Duration flags must be specified
-// in a format that is valid input for absl::ParseDuration().
-bool AbslParseFlag(absl::string_view text, Duration* dst, std::string* error);
+// in a format that is valid input for abslx::ParseDuration().
+bool AbslParseFlag(abslx::string_view text, Duration* dst, std::string* error);
 std::string AbslUnparseFlag(Duration d);
 ABSL_DEPRECATED("Use AbslParseFlag() instead.")
 bool ParseFlag(const std::string& text, Duration* dst, std::string* error);
@@ -558,19 +558,19 @@ std::string UnparseFlag(Duration d);
 
 // Time
 //
-// An `absl::Time` represents a specific instant in time. Arithmetic operators
+// An `abslx::Time` represents a specific instant in time. Arithmetic operators
 // are provided for naturally expressing time calculations. Instances are
-// created using `absl::Now()` and the `absl::From*()` factory functions that
+// created using `abslx::Now()` and the `abslx::From*()` factory functions that
 // accept the gamut of other time representations. Formatting and parsing
-// functions are provided for conversion to and from strings.  `absl::Time`
+// functions are provided for conversion to and from strings.  `abslx::Time`
 // should be passed by value rather than const reference.
 //
-// `absl::Time` assumes there are 60 seconds in a minute, which means the
+// `abslx::Time` assumes there are 60 seconds in a minute, which means the
 // underlying time scales must be "smeared" to eliminate leap seconds.
 // See https://developers.google.com/time/smear.
 //
-// Even though `absl::Time` supports a wide range of timestamps, exercise
-// caution when using values in the distant past. `absl::Time` uses the
+// Even though `abslx::Time` supports a wide range of timestamps, exercise
+// caution when using values in the distant past. `abslx::Time` uses the
 // Proleptic Gregorian calendar, which extends the Gregorian calendar backward
 // to dates before its introduction in 1582.
 // See https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar
@@ -583,10 +583,10 @@ std::string UnparseFlag(Duration d);
 // breakdown of future timestamps is subject to the whim of regional
 // governments.
 //
-// The `absl::Time` class represents an instant in time as a count of clock
+// The `abslx::Time` class represents an instant in time as a count of clock
 // ticks of some granularity (resolution) from some starting point (epoch).
 //
-// `absl::Time` uses a resolution that is high enough to avoid loss in
+// `abslx::Time` uses a resolution that is high enough to avoid loss in
 // precision, and a range that is wide enough to avoid overflow, when
 // converting between tick counts in most Google time scales (i.e., resolution
 // of at least one nanosecond, and range +/-100 billion years).  Conversions
@@ -595,9 +595,9 @@ std::string UnparseFlag(Duration d);
 //
 // Examples:
 //
-//   absl::Time t1 = ...;
-//   absl::Time t2 = t1 + absl::Minutes(2);
-//   absl::Duration d = t2 - t1;  // == absl::Minutes(2)
+//   abslx::Time t1 = ...;
+//   abslx::Time t2 = t1 + abslx::Minutes(2);
+//   abslx::Duration d = t2 - t1;  // == abslx::Minutes(2)
 //
 class Time final {
  public:
@@ -608,10 +608,10 @@ class Time final {
   // readable by explicitly initializing all instances before use.
   //
   // Example:
-  //   absl::Time t = absl::UnixEpoch();
-  //   absl::Time t = absl::Now();
-  //   absl::Time t = absl::TimeFromTimeval(tv);
-  //   absl::Time t = absl::InfinitePast();
+  //   abslx::Time t = abslx::UnixEpoch();
+  //   abslx::Time t = abslx::Now();
+  //   abslx::Time t = abslx::TimeFromTimeval(tv);
+  //   abslx::Time t = abslx::InfinitePast();
   constexpr Time() = default;
 
   // Copyable.
@@ -631,12 +631,12 @@ class Time final {
   // Time::Breakdown
   //
   // The calendar and wall-clock (aka "civil time") components of an
-  // `absl::Time` in a certain `absl::TimeZone`. This struct is not
+  // `abslx::Time` in a certain `abslx::TimeZone`. This struct is not
   // intended to represent an instant in time. So, rather than passing
-  // a `Time::Breakdown` to a function, pass an `absl::Time` and an
-  // `absl::TimeZone`.
+  // a `Time::Breakdown` to a function, pass an `abslx::Time` and an
+  // `abslx::TimeZone`.
   //
-  // Deprecated. Use `absl::TimeZone::CivilInfo`.
+  // Deprecated. Use `abslx::TimeZone::CivilInfo`.
   struct Breakdown {
     int64_t year;        // year (e.g., 2013)
     int month;           // month of year [1:12]
@@ -662,7 +662,7 @@ class Time final {
   //
   // Returns the breakdown of this instant in the given TimeZone.
   //
-  // Deprecated. Use `absl::TimeZone::At(Time)`.
+  // Deprecated. Use `abslx::TimeZone::At(Time)`.
   Breakdown In(TimeZone tz) const;
 
   template <typename H>
@@ -699,12 +699,12 @@ inline Duration operator-(Time lhs, Time rhs) { return lhs.rep_ - rhs.rep_; }
 
 // UnixEpoch()
 //
-// Returns the `absl::Time` representing "1970-01-01 00:00:00.0 +0000".
+// Returns the `abslx::Time` representing "1970-01-01 00:00:00.0 +0000".
 constexpr Time UnixEpoch() { return Time(); }
 
 // UniversalEpoch()
 //
-// Returns the `absl::Time` representing "0001-01-01 00:00:00.0 +0000", the
+// Returns the `abslx::Time` representing "0001-01-01 00:00:00.0 +0000", the
 // epoch of the ICU Universal Time Scale.
 constexpr Time UniversalEpoch() {
   // 719162 is the number of days from 0001-01-01 to 1970-01-01,
@@ -714,7 +714,7 @@ constexpr Time UniversalEpoch() {
 
 // InfiniteFuture()
 //
-// Returns an `absl::Time` that is infinitely far in the future.
+// Returns an `abslx::Time` that is infinitely far in the future.
 constexpr Time InfiniteFuture() {
   return Time(
       time_internal::MakeDuration((std::numeric_limits<int64_t>::max)(), ~0U));
@@ -722,7 +722,7 @@ constexpr Time InfiniteFuture() {
 
 // InfinitePast()
 //
-// Returns an `absl::Time` that is infinitely far in the past.
+// Returns an `abslx::Time` that is infinitely far in the past.
 constexpr Time InfinitePast() {
   return Time(
       time_internal::MakeDuration((std::numeric_limits<int64_t>::min)(), ~0U));
@@ -736,7 +736,7 @@ constexpr Time InfinitePast() {
 // FromUDate()
 // FromUniversal()
 //
-// Creates an `absl::Time` from a variety of other representations.
+// Creates an `abslx::Time` from a variety of other representations.
 constexpr Time FromUnixNanos(int64_t ns);
 constexpr Time FromUnixMicros(int64_t us);
 constexpr Time FromUnixMillis(int64_t ms);
@@ -753,7 +753,7 @@ Time FromUniversal(int64_t universal);
 // ToUDate()
 // ToUniversal()
 //
-// Converts an `absl::Time` to a variety of other representations.  Note that
+// Converts an `abslx::Time` to a variety of other representations.  Note that
 // these operations round down toward negative infinity where necessary to
 // adjust to the resolution of the result type.  Beware of possible time_t
 // over/underflow in ToTime{T,val,spec}() on 32-bit platforms.
@@ -790,39 +790,39 @@ timeval ToTimeval(Time t);
 
 // FromChrono()
 //
-// Converts a std::chrono::system_clock::time_point to an absl::Time.
+// Converts a std::chrono::system_clock::time_point to an abslx::Time.
 //
 // Example:
 //
 //   auto tp = std::chrono::system_clock::from_time_t(123);
-//   absl::Time t = absl::FromChrono(tp);
-//   // t == absl::FromTimeT(123)
+//   abslx::Time t = abslx::FromChrono(tp);
+//   // t == abslx::FromTimeT(123)
 Time FromChrono(const std::chrono::system_clock::time_point& tp);
 
 // ToChronoTime()
 //
-// Converts an absl::Time to a std::chrono::system_clock::time_point. If
+// Converts an abslx::Time to a std::chrono::system_clock::time_point. If
 // overflow would occur, the returned value will saturate at the min/max time
 // point value instead.
 //
 // Example:
 //
-//   absl::Time t = absl::FromTimeT(123);
-//   auto tp = absl::ToChronoTime(t);
+//   abslx::Time t = abslx::FromTimeT(123);
+//   auto tp = abslx::ToChronoTime(t);
 //   // tp == std::chrono::system_clock::from_time_t(123);
 std::chrono::system_clock::time_point ToChronoTime(Time);
 
 // Support for flag values of type Time. Time flags must be specified in a
-// format that matches absl::RFC3339_full. For example:
+// format that matches abslx::RFC3339_full. For example:
 //
 //   --start_time=2016-01-02T03:04:05.678+08:00
 //
 // Note: A UTC offset (or 'Z' indicating a zero-offset from UTC) is required.
 //
 // Additionally, if you'd like to specify a time as a count of
-// seconds/milliseconds/etc from the Unix epoch, use an absl::Duration flag
-// and add that duration to absl::UnixEpoch() to get an absl::Time.
-bool AbslParseFlag(absl::string_view text, Time* t, std::string* error);
+// seconds/milliseconds/etc from the Unix epoch, use an abslx::Duration flag
+// and add that duration to abslx::UnixEpoch() to get an abslx::Time.
+bool AbslParseFlag(abslx::string_view text, Time* t, std::string* error);
 std::string AbslUnparseFlag(Time t);
 ABSL_DEPRECATED("Use AbslParseFlag() instead.")
 bool ParseFlag(const std::string& text, Time* t, std::string* error);
@@ -831,12 +831,12 @@ std::string UnparseFlag(Time t);
 
 // TimeZone
 //
-// The `absl::TimeZone` is an opaque, small, value-type class representing a
+// The `abslx::TimeZone` is an opaque, small, value-type class representing a
 // geo-political region within which particular rules are used for converting
-// between absolute and civil times (see https://git.io/v59Ly). `absl::TimeZone`
+// between absolute and civil times (see https://git.io/v59Ly). `abslx::TimeZone`
 // values are named using the TZ identifiers from the IANA Time Zone Database,
-// such as "America/Los_Angeles" or "Australia/Sydney". `absl::TimeZone` values
-// are created from factory functions such as `absl::LoadTimeZone()`. Note:
+// such as "America/Los_Angeles" or "Australia/Sydney". `abslx::TimeZone` values
+// are created from factory functions such as `abslx::LoadTimeZone()`. Note:
 // strings like "PST" and "EDT" are not valid TZ identifiers. Prefer to pass by
 // value rather than const reference.
 //
@@ -845,11 +845,11 @@ std::string UnparseFlag(Time t);
 //
 // Examples:
 //
-//   absl::TimeZone utc = absl::UTCTimeZone();
-//   absl::TimeZone pst = absl::FixedTimeZone(-8 * 60 * 60);
-//   absl::TimeZone loc = absl::LocalTimeZone();
-//   absl::TimeZone lax;
-//   if (!absl::LoadTimeZone("America/Los_Angeles", &lax)) {
+//   abslx::TimeZone utc = abslx::UTCTimeZone();
+//   abslx::TimeZone pst = abslx::FixedTimeZone(-8 * 60 * 60);
+//   abslx::TimeZone loc = abslx::LocalTimeZone();
+//   abslx::TimeZone lax;
+//   if (!abslx::LoadTimeZone("America/Los_Angeles", &lax)) {
 //     // handle error case
 //   }
 //
@@ -874,8 +874,8 @@ class TimeZone {
   //
   // Information about the civil time corresponding to an absolute time.
   // This struct is not intended to represent an instant in time. So, rather
-  // than passing a `TimeZone::CivilInfo` to a function, pass an `absl::Time`
-  // and an `absl::TimeZone`.
+  // than passing a `TimeZone::CivilInfo` to a function, pass an `abslx::Time`
+  // and an `abslx::TimeZone`.
   struct CivilInfo {
     CivilSecond cs;
     Duration subsecond;
@@ -892,15 +892,15 @@ class TimeZone {
 
   // TimeZone::At(Time)
   //
-  // Returns the civil time for this TimeZone at a certain `absl::Time`.
+  // Returns the civil time for this TimeZone at a certain `abslx::Time`.
   // If the input time is infinite, the output civil second will be set to
   // CivilSecond::max() or min(), and the subsecond will be infinite.
   //
   // Example:
   //
-  //   const auto epoch = lax.At(absl::UnixEpoch());
+  //   const auto epoch = lax.At(abslx::UnixEpoch());
   //   // epoch.cs == 1969-12-31 16:00:00
-  //   // epoch.subsecond == absl::ZeroDuration()
+  //   // epoch.subsecond == abslx::ZeroDuration()
   //   // epoch.offset == -28800
   //   // epoch.is_dst == false
   //   // epoch.abbr == "PST"
@@ -918,8 +918,8 @@ class TimeZone {
   // transition skips or repeats civil times---in the United States,
   // March 13, 2011 02:15 never occurred, while November 6, 2011 01:15
   // occurred twice---so requests for such times are not well-defined.
-  // To account for these possibilities, `absl::TimeZone::TimeInfo` is
-  // richer than just a single `absl::Time`.
+  // To account for these possibilities, `abslx::TimeZone::TimeInfo` is
+  // richer than just a single `abslx::Time`.
   struct TimeInfo {
     enum CivilKind {
       UNIQUE,    // the civil time was singular (pre == trans == post)
@@ -933,29 +933,29 @@ class TimeZone {
 
   // TimeZone::At(CivilSecond)
   //
-  // Returns an `absl::TimeInfo` containing the absolute time(s) for this
-  // TimeZone at an `absl::CivilSecond`. When the civil time is skipped or
+  // Returns an `abslx::TimeInfo` containing the absolute time(s) for this
+  // TimeZone at an `abslx::CivilSecond`. When the civil time is skipped or
   // repeated, returns times calculated using the pre-transition and post-
   // transition UTC offsets, plus the transition time itself.
   //
   // Examples:
   //
   //   // A unique civil time
-  //   const auto jan01 = lax.At(absl::CivilSecond(2011, 1, 1, 0, 0, 0));
+  //   const auto jan01 = lax.At(abslx::CivilSecond(2011, 1, 1, 0, 0, 0));
   //   // jan01.kind == TimeZone::TimeInfo::UNIQUE
   //   // jan01.pre    is 2011-01-01 00:00:00 -0800
   //   // jan01.trans  is 2011-01-01 00:00:00 -0800
   //   // jan01.post   is 2011-01-01 00:00:00 -0800
   //
   //   // A Spring DST transition, when there is a gap in civil time
-  //   const auto mar13 = lax.At(absl::CivilSecond(2011, 3, 13, 2, 15, 0));
+  //   const auto mar13 = lax.At(abslx::CivilSecond(2011, 3, 13, 2, 15, 0));
   //   // mar13.kind == TimeZone::TimeInfo::SKIPPED
   //   // mar13.pre   is 2011-03-13 03:15:00 -0700
   //   // mar13.trans is 2011-03-13 03:00:00 -0700
   //   // mar13.post  is 2011-03-13 01:15:00 -0800
   //
   //   // A Fall DST transition, when civil times are repeated
-  //   const auto nov06 = lax.At(absl::CivilSecond(2011, 11, 6, 1, 15, 0));
+  //   const auto nov06 = lax.At(abslx::CivilSecond(2011, 11, 6, 1, 15, 0));
   //   // nov06.kind == TimeZone::TimeInfo::REPEATED
   //   // nov06.pre   is 2011-11-06 01:15:00 -0700
   //   // nov06.trans is 2011-11-06 01:00:00 -0800
@@ -984,11 +984,11 @@ class TimeZone {
   // occur.
   //
   // Example:
-  //   absl::TimeZone nyc;
-  //   if (!absl::LoadTimeZone("America/New_York", &nyc)) { ... }
-  //   const auto now = absl::Now();
-  //   auto t = absl::InfinitePast();
-  //   absl::TimeZone::CivilTransition trans;
+  //   abslx::TimeZone nyc;
+  //   if (!abslx::LoadTimeZone("America/New_York", &nyc)) { ... }
+  //   const auto now = abslx::Now();
+  //   auto t = abslx::InfinitePast();
+  //   abslx::TimeZone::CivilTransition trans;
   //   while (t <= now && nyc.NextTransition(t, &trans)) {
   //     // transition: trans.from -> trans.to
   //     t = nyc.At(trans.to).trans;
@@ -1020,7 +1020,7 @@ class TimeZone {
 // Loads the named zone. May perform I/O on the initial load of the named
 // zone. If the name is invalid, or some other kind of error occurs, returns
 // `false` and `*tz` is set to the UTC time zone.
-inline bool LoadTimeZone(absl::string_view name, TimeZone* tz) {
+inline bool LoadTimeZone(abslx::string_view name, TimeZone* tz) {
   if (name == "localtime") {
     *tz = TimeZone(time_internal::cctz::local_time_zone());
     return true;
@@ -1069,9 +1069,9 @@ inline TimeZone LocalTimeZone() {
 //
 // Example:
 //
-//   absl::Time t = ...;
-//   absl::TimeZone tz = ...;
-//   const auto cd = absl::ToCivilDay(t, tz);
+//   abslx::Time t = ...;
+//   abslx::TimeZone tz = ...;
+//   const auto cd = abslx::ToCivilDay(t, tz);
 inline CivilSecond ToCivilSecond(Time t, TimeZone tz) {
   return tz.At(t).cs;  // already a CivilSecond
 }
@@ -1111,12 +1111,12 @@ inline Time FromCivil(CivilSecond ct, TimeZone tz) {
 
 // TimeConversion
 //
-// An `absl::TimeConversion` represents the conversion of year, month, day,
+// An `abslx::TimeConversion` represents the conversion of year, month, day,
 // hour, minute, and second values (i.e., a civil time), in a particular
-// `absl::TimeZone`, to a time instant (an absolute time), as returned by
-// `absl::ConvertDateTime()`. Legacy version of `absl::TimeZone::TimeInfo`.
+// `abslx::TimeZone`, to a time instant (an absolute time), as returned by
+// `abslx::ConvertDateTime()`. Legacy version of `abslx::TimeZone::TimeInfo`.
 //
-// Deprecated. Use `absl::TimeZone::TimeInfo`.
+// Deprecated. Use `abslx::TimeZone::TimeInfo`.
 struct
     TimeConversion {
   Time pre;    // time calculated using the pre-transition offset
@@ -1135,7 +1135,7 @@ struct
 
 // ConvertDateTime()
 //
-// Legacy version of `absl::TimeZone::At(absl::CivilSecond)` that takes
+// Legacy version of `abslx::TimeZone::At(abslx::CivilSecond)` that takes
 // the civil time as six, separate values (YMDHMS).
 //
 // The input month, day, hour, minute, and second values can be outside
@@ -1145,31 +1145,31 @@ struct
 // Example:
 //
 //   // "October 32" normalizes to "November 1".
-//   absl::TimeConversion tc =
-//       absl::ConvertDateTime(2013, 10, 32, 8, 30, 0, lax);
+//   abslx::TimeConversion tc =
+//       abslx::ConvertDateTime(2013, 10, 32, 8, 30, 0, lax);
 //   // tc.kind == TimeConversion::UNIQUE && tc.normalized == true
-//   // absl::ToCivilDay(tc.pre, tz).month() == 11
-//   // absl::ToCivilDay(tc.pre, tz).day() == 1
+//   // abslx::ToCivilDay(tc.pre, tz).month() == 11
+//   // abslx::ToCivilDay(tc.pre, tz).day() == 1
 //
-// Deprecated. Use `absl::TimeZone::At(CivilSecond)`.
+// Deprecated. Use `abslx::TimeZone::At(CivilSecond)`.
 TimeConversion ConvertDateTime(int64_t year, int mon, int day, int hour,
                                int min, int sec, TimeZone tz);
 
 // FromDateTime()
 //
-// A convenience wrapper for `absl::ConvertDateTime()` that simply returns
-// the "pre" `absl::Time`.  That is, the unique result, or the instant that
+// A convenience wrapper for `abslx::ConvertDateTime()` that simply returns
+// the "pre" `abslx::Time`.  That is, the unique result, or the instant that
 // is correct using the pre-transition offset (as if the transition never
 // happened).
 //
 // Example:
 //
-//   absl::Time t = absl::FromDateTime(2017, 9, 26, 9, 30, 0, lax);
+//   abslx::Time t = abslx::FromDateTime(2017, 9, 26, 9, 30, 0, lax);
 //   // t = 2017-09-26 09:30:00 -0700
 //
-// Deprecated. Use `absl::FromCivil(CivilSecond, TimeZone)`. Note that the
+// Deprecated. Use `abslx::FromCivil(CivilSecond, TimeZone)`. Note that the
 // behavior of `FromCivil()` differs from `FromDateTime()` for skipped civil
-// times. If you care about that see `absl::TimeZone::At(absl::CivilSecond)`.
+// times. If you care about that see `abslx::TimeZone::At(abslx::CivilSecond)`.
 inline Time FromDateTime(int64_t year, int mon, int day, int hour,
                          int min, int sec, TimeZone tz) {
   return ConvertDateTime(year, mon, day, hour, min, sec, tz).pre;
@@ -1178,9 +1178,9 @@ inline Time FromDateTime(int64_t year, int mon, int day, int hour,
 // FromTM()
 //
 // Converts the `tm_year`, `tm_mon`, `tm_mday`, `tm_hour`, `tm_min`, and
-// `tm_sec` fields to an `absl::Time` using the given time zone. See ctime(3)
+// `tm_sec` fields to an `abslx::Time` using the given time zone. See ctime(3)
 // for a description of the expected values of the tm fields. If the civil time
-// is unique (see `absl::TimeZone::At(absl::CivilSecond)` above), the matching
+// is unique (see `abslx::TimeZone::At(abslx::CivilSecond)` above), the matching
 // time instant is returned.  Otherwise, the `tm_isdst` field is consulted to
 // choose between the possible results.  For a repeated civil time, `tm_isdst !=
 // 0` returns the matching DST instant, while `tm_isdst == 0` returns the
@@ -1192,7 +1192,7 @@ Time FromTM(const struct tm& tm, TimeZone tz);
 
 // ToTM()
 //
-// Converts the given `absl::Time` to a struct tm using the given time zone.
+// Converts the given `abslx::Time` to a struct tm using the given time zone.
 // See ctime(3) for a description of the values of the tm fields.
 struct tm ToTM(Time t, TimeZone tz);
 
@@ -1218,7 +1218,7 @@ ABSL_DLL extern const char RFC1123_no_wday[];  // %d %b %E4Y %H:%M:%S %z
 
 // FormatTime()
 //
-// Formats the given `absl::Time` in the `absl::TimeZone` according to the
+// Formats the given `abslx::Time` in the `abslx::TimeZone` according to the
 // provided format string. Uses strftime()-like formatting options, with
 // the following extensions:
 //
@@ -1243,17 +1243,17 @@ ABSL_DLL extern const char RFC1123_no_wday[];  // %d %b %E4Y %H:%M:%S %z
 //
 // Example:
 //
-//   absl::CivilSecond cs(2013, 1, 2, 3, 4, 5);
-//   absl::Time t = absl::FromCivil(cs, lax);
-//   std::string f = absl::FormatTime("%H:%M:%S", t, lax);  // "03:04:05"
-//   f = absl::FormatTime("%H:%M:%E3S", t, lax);  // "03:04:05.000"
+//   abslx::CivilSecond cs(2013, 1, 2, 3, 4, 5);
+//   abslx::Time t = abslx::FromCivil(cs, lax);
+//   std::string f = abslx::FormatTime("%H:%M:%S", t, lax);  // "03:04:05"
+//   f = abslx::FormatTime("%H:%M:%E3S", t, lax);  // "03:04:05.000"
 //
-// Note: If the given `absl::Time` is `absl::InfiniteFuture()`, the returned
-// string will be exactly "infinite-future". If the given `absl::Time` is
-// `absl::InfinitePast()`, the returned string will be exactly "infinite-past".
-// In both cases the given format string and `absl::TimeZone` are ignored.
+// Note: If the given `abslx::Time` is `abslx::InfiniteFuture()`, the returned
+// string will be exactly "infinite-future". If the given `abslx::Time` is
+// `abslx::InfinitePast()`, the returned string will be exactly "infinite-past".
+// In both cases the given format string and `abslx::TimeZone` are ignored.
 //
-std::string FormatTime(absl::string_view format, Time t, TimeZone tz);
+std::string FormatTime(abslx::string_view format, Time t, TimeZone tz);
 
 // Convenience functions that format the given time using the RFC3339_full
 // format.  The first overload uses the provided TimeZone, while the second
@@ -1269,7 +1269,7 @@ inline std::ostream& operator<<(std::ostream& os, Time t) {
 // ParseTime()
 //
 // Parses an input string according to the provided format string and
-// returns the corresponding `absl::Time`. Uses strftime()-like formatting
+// returns the corresponding `abslx::Time`. Uses strftime()-like formatting
 // options, with the same extensions as FormatTime(), but with the
 // exceptions that %E#S is interpreted as %E*S, and %E#f as %E*f.  %Ez
 // and %E*z also accept the same inputs, which (along with %z) includes
@@ -1283,20 +1283,20 @@ inline std::ostream& operator<<(std::ostream& os, Time t) {
 //
 //   "1970-01-01 00:00:00.0 +0000"
 //
-// For example, parsing a string of "15:45" (%H:%M) will return an absl::Time
+// For example, parsing a string of "15:45" (%H:%M) will return an abslx::Time
 // that represents "1970-01-01 15:45:00.0 +0000".
 //
 // Note that since ParseTime() returns time instants, it makes the most sense
 // to parse fully-specified date/time strings that include a UTC offset (%z,
 // %Ez, or %E*z).
 //
-// Note also that `absl::ParseTime()` only heeds the fields year, month, day,
+// Note also that `abslx::ParseTime()` only heeds the fields year, month, day,
 // hour, minute, (fractional) second, and UTC offset.  Other fields, like
 // weekday (%a or %A), while parsed for syntactic validity, are ignored
 // in the conversion.
 //
 // Date and time fields that are out-of-range will be treated as errors
-// rather than normalizing them like `absl::CivilSecond` does.  For example,
+// rather than normalizing them like `abslx::CivilSecond` does.  For example,
 // it is an error to parse the date "Oct 32, 2013" because 32 is out of range.
 //
 // A leap second of ":60" is normalized to ":00" of the following minute
@@ -1311,11 +1311,11 @@ inline std::ostream& operator<<(std::ostream& os, Time t) {
 // to the "err" out param if it is non-null.
 //
 // Note: If the input string is exactly "infinite-future", the returned
-// `absl::Time` will be `absl::InfiniteFuture()` and `true` will be returned.
-// If the input string is "infinite-past", the returned `absl::Time` will be
-// `absl::InfinitePast()` and `true` will be returned.
+// `abslx::Time` will be `abslx::InfiniteFuture()` and `true` will be returned.
+// If the input string is "infinite-past", the returned `abslx::Time` will be
+// `abslx::InfinitePast()` and `true` will be returned.
 //
-bool ParseTime(absl::string_view format, absl::string_view input, Time* time,
+bool ParseTime(abslx::string_view format, abslx::string_view input, Time* time,
                std::string* err);
 
 // Like ParseTime() above, but if the format string does not contain a UTC
@@ -1325,7 +1325,7 @@ bool ParseTime(absl::string_view format, absl::string_view input, Time* time,
 // of ambiguity or non-existence, in which case the "pre" time (as defined
 // by TimeZone::TimeInfo) is returned.  For these reasons we recommend that
 // all date/time strings include a UTC offset so they're context independent.
-bool ParseTime(absl::string_view format, absl::string_view input, TimeZone tz,
+bool ParseTime(abslx::string_view format, abslx::string_view input, TimeZone tz,
                Time* time, std::string* err);
 
 // ============================================================================
@@ -1426,7 +1426,7 @@ constexpr auto IsValidRep64(char) -> bool {
   return false;
 }
 
-// Converts a std::chrono::duration to an absl::Duration.
+// Converts a std::chrono::duration to an abslx::Duration.
 template <typename Rep, typename Period>
 constexpr Duration FromChrono(const std::chrono::duration<Rep, Period>& d) {
   static_assert(IsValidRep64<Rep>(0), "duration::rep is invalid");
@@ -1459,7 +1459,7 @@ inline int64_t ToInt64(Duration d, std::ratio<3600>) {
   return ToInt64Hours(d);
 }
 
-// Converts an absl::Duration to a chrono duration of type T.
+// Converts an abslx::Duration to a chrono duration of type T.
 template <typename T>
 T ToChronoDuration(Duration d) {
   using Rep = typename T::rep;
@@ -1579,6 +1579,6 @@ constexpr Time FromTimeT(time_t t) {
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_TIME_TIME_H_

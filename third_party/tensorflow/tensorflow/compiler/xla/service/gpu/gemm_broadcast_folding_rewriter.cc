@@ -67,7 +67,7 @@ class GemmBroadcastFoldingVisitor : public DfsHloRewriteVisitor {
           return OkStatus();
         }
         // bcast_dim should not be in batch_dimensions.
-        if (absl::c_linear_search(batch_dimensions, bcast_dim)) {
+        if (abslx::c_linear_search(batch_dimensions, bcast_dim)) {
           return OkStatus();
         }
       }
@@ -107,7 +107,7 @@ static StatusOr<bool> RunOnComputation(HloComputation *computation) {
 
 StatusOr<bool> GemmBroadcastFoldingRewriter::Run(
     HloModule *module,
-    const absl::flat_hash_set<absl::string_view> &execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view> &execution_threads) {
   bool changed = false;
   for (HloComputation *computation :
        module->MakeNonfusionComputations(execution_threads)) {

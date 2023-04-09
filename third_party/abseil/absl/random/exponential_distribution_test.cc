@@ -43,7 +43,7 @@
 
 namespace {
 
-using absl::random_internal::kChiSquared;
+using abslx::random_internal::kChiSquared;
 
 template <typename RealType>
 class ExponentialDistributionTypedTest : public ::testing::Test {};
@@ -54,14 +54,14 @@ class ExponentialDistributionTypedTest : public ::testing::Test {};
 // https://bugs.llvm.org/show_bug.cgi?id=49132. Don't bother running these tests
 // with double doubles until compiler support is better.
 using RealTypes =
-    std::conditional<absl::numeric_internal::IsDoubleDouble(),
+    std::conditional<abslx::numeric_internal::IsDoubleDouble(),
                      ::testing::Types<float, double>,
                      ::testing::Types<float, double, long double>>::type;
 TYPED_TEST_CASE(ExponentialDistributionTypedTest, RealTypes);
 
 TYPED_TEST(ExponentialDistributionTypedTest, SerializeTest) {
   using param_type =
-      typename absl::exponential_distribution<TypeParam>::param_type;
+      typename abslx::exponential_distribution<TypeParam>::param_type;
 
   const TypeParam kParams[] = {
       // Cases around 1.
@@ -85,7 +85,7 @@ TYPED_TEST(ExponentialDistributionTypedTest, SerializeTest) {
   };
 
   constexpr int kCount = 1000;
-  absl::InsecureBitGen gen;
+  abslx::InsecureBitGen gen;
 
   for (const TypeParam lambda : kParams) {
     // Some values may be invalid; skip those.
@@ -94,11 +94,11 @@ TYPED_TEST(ExponentialDistributionTypedTest, SerializeTest) {
 
     const param_type param(lambda);
 
-    absl::exponential_distribution<TypeParam> before(lambda);
+    abslx::exponential_distribution<TypeParam> before(lambda);
     EXPECT_EQ(before.lambda(), param.lambda());
 
     {
-      absl::exponential_distribution<TypeParam> via_param(param);
+      abslx::exponential_distribution<TypeParam> via_param(param);
       EXPECT_EQ(via_param, before);
       EXPECT_EQ(via_param.param(), before.param());
     }
@@ -115,7 +115,7 @@ TYPED_TEST(ExponentialDistributionTypedTest, SerializeTest) {
     }
     if (!std::is_same<TypeParam, long double>::value) {
       ABSL_INTERNAL_LOG(INFO,
-                        absl::StrFormat("Range {%f}: %f, %f, lambda=%f", lambda,
+                        abslx::StrFormat("Range {%f}: %f, %f, lambda=%f", lambda,
                                         sample_min, sample_max, lambda));
     }
 
@@ -127,7 +127,7 @@ TYPED_TEST(ExponentialDistributionTypedTest, SerializeTest) {
       continue;
     }
     // Validate stream serialization.
-    absl::exponential_distribution<TypeParam> after(34.56f);
+    abslx::exponential_distribution<TypeParam> after(34.56f);
 
     EXPECT_NE(before.lambda(), after.lambda());
     EXPECT_NE(before.param(), after.param());
@@ -197,7 +197,7 @@ class ExponentialDistributionTests : public testing::TestWithParam<Param>,
   // We use a fixed bit generator for distribution accuracy tests.  This allows
   // these tests to be deterministic, while still testing the qualify of the
   // implementation.
-  absl::random_internal::pcg64_2018_engine rng_{0x2B7E151628AED2A6};
+  abslx::random_internal::pcg64_2018_engine rng_{0x2B7E151628AED2A6};
 };
 
 template <typename D>
@@ -212,14 +212,14 @@ bool ExponentialDistributionTests::SingleZTest(const double p,
     data.push_back(x);
   }
 
-  const auto m = absl::random_internal::ComputeDistributionMoments(data);
-  const double max_err = absl::random_internal::MaxErrorTolerance(p);
-  const double z = absl::random_internal::ZScore(mean(), m);
-  const bool pass = absl::random_internal::Near("z", z, 0.0, max_err);
+  const auto m = abslx::random_internal::ComputeDistributionMoments(data);
+  const double max_err = abslx::random_internal::MaxErrorTolerance(p);
+  const double z = abslx::random_internal::ZScore(mean(), m);
+  const bool pass = abslx::random_internal::Near("z", z, 0.0, max_err);
 
   if (!pass) {
     ABSL_INTERNAL_LOG(
-        INFO, absl::StrFormat("p=%f max_err=%f\n"
+        INFO, abslx::StrFormat("p=%f max_err=%f\n"
                               " lambda=%f\n"
                               " mean=%f vs. %f\n"
                               " stddev=%f vs. %f\n"
@@ -263,23 +263,23 @@ double ExponentialDistributionTests::SingleChiSquaredTest() {
   const int dof = static_cast<int>(counts.size()) - 1;
 
   // Our threshold for logging is 1-in-50.
-  const double threshold = absl::random_internal::ChiSquareValue(dof, 0.98);
+  const double threshold = abslx::random_internal::ChiSquareValue(dof, 0.98);
 
   const double expected =
       static_cast<double>(kSamples) / static_cast<double>(counts.size());
 
-  double chi_square = absl::random_internal::ChiSquareWithExpected(
+  double chi_square = abslx::random_internal::ChiSquareWithExpected(
       std::begin(counts), std::end(counts), expected);
-  double p = absl::random_internal::ChiSquarePValue(chi_square, dof);
+  double p = abslx::random_internal::ChiSquarePValue(chi_square, dof);
 
   if (chi_square > threshold) {
     for (int i = 0; i < cutoffs.size(); i++) {
       ABSL_INTERNAL_LOG(
-          INFO, absl::StrFormat("%d : (%f) = %d", i, cutoffs[i], counts[i]));
+          INFO, abslx::StrFormat("%d : (%f) = %d", i, cutoffs[i], counts[i]));
     }
 
     ABSL_INTERNAL_LOG(INFO,
-                      absl::StrCat("lambda ", lambda(), "\n",     //
+                      abslx::StrCat("lambda ", lambda(), "\n",     //
                                    " expected ", expected, "\n",  //
                                    kChiSquared, " ", chi_square, " (", p, ")\n",
                                    kChiSquared, " @ 0.98 = ", threshold));
@@ -292,12 +292,12 @@ TEST_P(ExponentialDistributionTests, ZTest) {
   const auto& param = GetParam();
   const int expected_failures =
       std::max(1, static_cast<int>(std::ceil(param.trials * param.p_fail)));
-  const double p = absl::random_internal::RequiredSuccessProbability(
+  const double p = abslx::random_internal::RequiredSuccessProbability(
       param.p_fail, param.trials);
 
   int failures = 0;
   for (int i = 0; i < param.trials; i++) {
-    failures += SingleZTest<absl::exponential_distribution<double>>(p, kSamples)
+    failures += SingleZTest<abslx::exponential_distribution<double>>(p, kSamples)
                     ? 0
                     : 1;
   }
@@ -310,7 +310,7 @@ TEST_P(ExponentialDistributionTests, ChiSquaredTest) {
 
   for (int i = 0; i < kTrials; i++) {
     double p_value =
-        SingleChiSquaredTest<absl::exponential_distribution<double>>();
+        SingleChiSquaredTest<abslx::exponential_distribution<double>>();
     if (p_value < 0.005) {  // 1/200
       failures++;
     }
@@ -338,18 +338,18 @@ std::vector<Param> GenParams() {
 
 std::string ParamName(const ::testing::TestParamInfo<Param>& info) {
   const auto& p = info.param;
-  std::string name = absl::StrCat("lambda_", absl::SixDigits(p.lambda));
-  return absl::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
+  std::string name = abslx::StrCat("lambda_", abslx::SixDigits(p.lambda));
+  return abslx::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
 }
 
 INSTANTIATE_TEST_CASE_P(All, ExponentialDistributionTests,
                         ::testing::ValuesIn(GenParams()), ParamName);
 
-// NOTE: absl::exponential_distribution is not guaranteed to be stable.
+// NOTE: abslx::exponential_distribution is not guaranteed to be stable.
 TEST(ExponentialDistributionTest, StabilityTest) {
-  // absl::exponential_distribution stability relies on std::log1p and
-  // absl::uniform_real_distribution.
-  absl::random_internal::sequence_urbg urbg(
+  // abslx::exponential_distribution stability relies on std::log1p and
+  // abslx::uniform_real_distribution.
+  abslx::random_internal::sequence_urbg urbg(
       {0x0003eb76f6f7f755ull, 0xFFCEA50FDB2F953Bull, 0xC332DDEFBE6C5AA5ull,
        0x6558218568AB9702ull, 0x2AEF7DAD5B6E2F84ull, 0x1521B62829076170ull,
        0xECDD4775619F1510ull, 0x13CCA830EB61BD96ull, 0x0334FE1EAA0363CFull,
@@ -358,7 +358,7 @@ TEST(ExponentialDistributionTest, StabilityTest) {
   std::vector<int> output(14);
 
   {
-    absl::exponential_distribution<double> dist;
+    abslx::exponential_distribution<double> dist;
     std::generate(std::begin(output), std::end(output),
                   [&] { return static_cast<int>(10000.0 * dist(urbg)); });
 
@@ -370,7 +370,7 @@ TEST(ExponentialDistributionTest, StabilityTest) {
 
   urbg.reset();
   {
-    absl::exponential_distribution<float> dist;
+    abslx::exponential_distribution<float> dist;
     std::generate(std::begin(output), std::end(output),
                   [&] { return static_cast<int>(10000.0f * dist(urbg)); });
 
@@ -382,34 +382,34 @@ TEST(ExponentialDistributionTest, StabilityTest) {
 }
 
 TEST(ExponentialDistributionTest, AlgorithmBounds) {
-  // Relies on absl::uniform_real_distribution, so some of these comments
+  // Relies on abslx::uniform_real_distribution, so some of these comments
   // reference that.
-  absl::exponential_distribution<double> dist;
+  abslx::exponential_distribution<double> dist;
 
   {
-    // This returns the smallest value >0 from absl::uniform_real_distribution.
-    absl::random_internal::sequence_urbg urbg({0x0000000000000001ull});
+    // This returns the smallest value >0 from abslx::uniform_real_distribution.
+    abslx::random_internal::sequence_urbg urbg({0x0000000000000001ull});
     double a = dist(urbg);
     EXPECT_EQ(a, 5.42101086242752217004e-20);
   }
 
   {
-    // This returns a value very near 0.5 from absl::uniform_real_distribution.
-    absl::random_internal::sequence_urbg urbg({0x7fffffffffffffefull});
+    // This returns a value very near 0.5 from abslx::uniform_real_distribution.
+    abslx::random_internal::sequence_urbg urbg({0x7fffffffffffffefull});
     double a = dist(urbg);
     EXPECT_EQ(a, 0.693147180559945175204);
   }
 
   {
-    // This returns the largest value <1 from absl::uniform_real_distribution.
+    // This returns the largest value <1 from abslx::uniform_real_distribution.
     // WolframAlpha: ~39.1439465808987766283058547296341915292187253
-    absl::random_internal::sequence_urbg urbg({0xFFFFFFFFFFFFFFeFull});
+    abslx::random_internal::sequence_urbg urbg({0xFFFFFFFFFFFFFFeFull});
     double a = dist(urbg);
     EXPECT_EQ(a, 36.7368005696771007251);
   }
   {
     // This *ALSO* returns the largest value <1.
-    absl::random_internal::sequence_urbg urbg({0xFFFFFFFFFFFFFFFFull});
+    abslx::random_internal::sequence_urbg urbg({0xFFFFFFFFFFFFFFFFull});
     double a = dist(urbg);
     EXPECT_EQ(a, 36.7368005696771007251);
   }

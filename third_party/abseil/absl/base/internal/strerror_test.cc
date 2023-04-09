@@ -32,13 +32,13 @@ using ::testing::Eq;
 
 TEST(StrErrorTest, ValidErrorCode) {
   errno = ERANGE;
-  EXPECT_THAT(absl::base_internal::StrError(EDOM), Eq(strerror(EDOM)));
+  EXPECT_THAT(abslx::base_internal::StrError(EDOM), Eq(strerror(EDOM)));
   EXPECT_THAT(errno, Eq(ERANGE));
 }
 
 TEST(StrErrorTest, InvalidErrorCode) {
   errno = ERANGE;
-  EXPECT_THAT(absl::base_internal::StrError(-1),
+  EXPECT_THAT(abslx::base_internal::StrError(-1),
               AnyOf(Eq("No error information"), Eq("Unknown error -1")));
   EXPECT_THAT(errno, Eq(ERANGE));
 }
@@ -61,13 +61,13 @@ TEST(StrErrorTest, MultipleThreads) {
     for (int i = 0; i < kNumCodes; ++i) {
       ++counter;
       errno = ERANGE;
-      const std::string value = absl::base_internal::StrError(i);
+      const std::string value = abslx::base_internal::StrError(i);
       // EXPECT_* could change errno. Stash it first.
       int check_err = errno;
       EXPECT_THAT(check_err, Eq(ERANGE));
       // Only the GNU implementation is guaranteed to provide the
       // string "Unknown error nnn". POSIX doesn't say anything.
-      if (!absl::StartsWith(value, "Unknown error ")) {
+      if (!abslx::StartsWith(value, "Unknown error ")) {
         EXPECT_THAT(value, Eq(expected_strings[i]));
       }
     }

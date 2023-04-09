@@ -40,7 +40,7 @@ namespace {}  // namespace
 //   }
 class AlignmentPointsRectsCalculator : public DetectionsToRectsCalculator {
  public:
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     RET_CHECK_OK(DetectionsToRectsCalculator::Open(cc));
 
     // Make sure that start and end keypoints are provided.
@@ -52,18 +52,18 @@ class AlignmentPointsRectsCalculator : public DetectionsToRectsCalculator {
     RET_CHECK(options_.has_rotation_vector_end_keypoint_index())
         << "End keypoint is required to calculate rect size and rotation";
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
-  absl::Status DetectionToNormalizedRect(
+  abslx::Status DetectionToNormalizedRect(
       const ::mediapipe::Detection& detection,
       const DetectionSpec& detection_spec,
       ::mediapipe::NormalizedRect* rect) override;
 };
 REGISTER_CALCULATOR(AlignmentPointsRectsCalculator);
 
-absl::Status AlignmentPointsRectsCalculator::DetectionToNormalizedRect(
+abslx::Status AlignmentPointsRectsCalculator::DetectionToNormalizedRect(
     const Detection& detection, const DetectionSpec& detection_spec,
     NormalizedRect* rect) {
   const auto& location_data = detection.location_data();
@@ -96,7 +96,7 @@ absl::Status AlignmentPointsRectsCalculator::DetectionToNormalizedRect(
   rect->set_width(box_size / image_size->first);
   rect->set_height(box_size / image_size->second);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

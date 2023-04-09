@@ -35,7 +35,7 @@ namespace ops {
 Status VarHandleOp(AbstractContext* ctx, AbstractTensorHandle** resource,
                    DataType dtype, const PartialTensorShape shape,
                    const char* container, const char* shared_name,
-                   absl::Span<string const> allowed_devices, const char* name,
+                   abslx::Span<string const> allowed_devices, const char* name,
                    const char* raw_device_name) {
   AbstractOperationPtr op_ptr(ctx->CreateOperation());
   TF_RETURN_IF_ERROR(op_ptr->Reset("VarHandleOp", raw_device_name));
@@ -49,7 +49,7 @@ Status VarHandleOp(AbstractContext* ctx, AbstractTensorHandle** resource,
   TF_RETURN_IF_ERROR(
       op_ptr->SetAttrStringList("allowed_devices", allowed_devices));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(resource, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(resource, 1), &num_retvals);
 }
 
 // Op: ReadVariableOp()
@@ -72,7 +72,7 @@ Status ReadVariableOp(AbstractContext* ctx,
   TF_RETURN_IF_ERROR(op_ptr->AddInput(resource));
   TF_RETURN_IF_ERROR(op_ptr->SetAttrType("dtype", dtype));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(value, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(value, 1), &num_retvals);
 }
 
 // Op: AssignVariableOp()
@@ -93,7 +93,7 @@ Status AssignVariableOp(AbstractContext* ctx,
   TF_RETURN_IF_ERROR(op_ptr->SetAttrBool("validate_shape", validate_shape));
   int num_retvals = 0;
   std::vector<AbstractTensorHandle*> dummy_outputs;
-  return op_ptr->Execute(absl::MakeSpan(dummy_outputs), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(dummy_outputs), &num_retvals);
 }
 
 // Op: DestroyResourceOp()
@@ -114,7 +114,7 @@ Status DestroyResourceOp(AbstractContext* ctx,
       op_ptr->SetAttrBool("ignore_lookup_error", ignore_lookup_error));
   int num_retvals = 0;
   std::vector<AbstractTensorHandle*> dummy_outputs;
-  return op_ptr->Execute(absl::MakeSpan(dummy_outputs), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(dummy_outputs), &num_retvals);
 }
 
 }  // namespace ops

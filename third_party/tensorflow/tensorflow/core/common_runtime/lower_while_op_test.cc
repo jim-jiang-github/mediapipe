@@ -386,7 +386,7 @@ TEST(LowerWhileOpTest, ForwardRequestedInputDevice) {
   // Verify the requested device of LoopControlInputs.
   const Node* loop_control_inputs_node = nullptr;
   for (const auto* op : graph->op_nodes()) {
-    if (absl::StrContains(op->name(), "LoopControlInputs")) {
+    if (abslx::StrContains(op->name(), "LoopControlInputs")) {
       loop_control_inputs_node = op;
     }
   }
@@ -395,7 +395,7 @@ TEST(LowerWhileOpTest, ForwardRequestedInputDevice) {
   // Verify the requested device of LoopExecuted.
   const Node* loop_executed_node = nullptr;
   for (const auto* op : graph->op_nodes()) {
-    if (absl::StrContains(op->name(), "LoopExecuted")) {
+    if (abslx::StrContains(op->name(), "LoopExecuted")) {
       loop_executed_node = op;
     }
   }

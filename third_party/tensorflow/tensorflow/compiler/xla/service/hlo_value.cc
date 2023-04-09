@@ -38,8 +38,8 @@ limitations under the License.
 
 namespace xla {
 
-using absl::StrAppend;
-using absl::StrCat;
+using abslx::StrAppend;
+using abslx::StrCat;
 
 const Shape& HloPosition::shape() const {
   return ShapeUtil::GetSubshape(instruction->shape(), index);
@@ -77,7 +77,7 @@ HloValue::HloValue(HloValue::Id id, HloInstruction* instruction,
 }
 
 std::string HloValue::ToShortString() const {
-  return absl::StrFormat(
+  return abslx::StrFormat(
       "<%d %s%s%s%s>", id(), instruction()->name(),
       instruction()->shape().IsTuple() ? index().ToString() : "",
       is_phi() ? " (phi)" : "", has_color() ? StrCat(" @", color()) : "");
@@ -133,7 +133,7 @@ bool MayUseOperandValue(int64_t operand_number, const ShapeIndex& index,
 
 }  // namespace
 
-void HloValue::SetPositions(absl::Span<const HloPosition> positions) {
+void HloValue::SetPositions(abslx::Span<const HloPosition> positions) {
   CHECK_EQ(positions_.size(), 1) << "SetPositions should only be called once.";
 
   // The positions must be unique and should not contain the defining position
@@ -155,7 +155,7 @@ void HloValue::SetPositions(absl::Span<const HloPosition> positions) {
 
 void HloValue::ComputeUses(std::vector<HloUse>& uses) const {
   // Gather the computation roots at which this value appears.
-  absl::flat_hash_set<HloInstruction*> root_positions;
+  abslx::flat_hash_set<HloInstruction*> root_positions;
   for (const HloPosition& position : positions_) {
     if (position.instruction->IsRoot()) {
       root_positions.insert(position.instruction);
@@ -189,7 +189,7 @@ void HloValue::ComputeUses(std::vector<HloUse>& uses) const {
 }
 
 bool HloValue::IsRootOf(const HloComputation* computation) const {
-  return absl::c_any_of(positions_, [&](const HloPosition& position) {
+  return abslx::c_any_of(positions_, [&](const HloPosition& position) {
     return position.instruction->IsRoot() &&
            position.instruction->parent() == computation;
   });
@@ -200,31 +200,31 @@ std::ostream& operator<<(std::ostream& out, const HloValue& value) {
   return out;
 }
 
-HloValueSet::HloValueSet(absl::Span<const HloValue* const> values)
+HloValueSet::HloValueSet(abslx::Span<const HloValue* const> values)
     : values_(values.begin(), values.end()) {
   SortAndUniquifyValues();
 }
 
-HloValueSet::HloValueSet(const absl::flat_hash_set<const HloValue*>& values)
+HloValueSet::HloValueSet(const abslx::flat_hash_set<const HloValue*>& values)
     : values_(values.begin(), values.end()) {
   // Values are already unique, so only need to sort.
-  absl::c_sort(values_, HloValue::IdLessThan);
+  abslx::c_sort(values_, HloValue::IdLessThan);
 }
 
 void HloValueSet::SortAndUniquifyValues() {
-  absl::c_sort(values_, HloValue::IdLessThan);
+  abslx::c_sort(values_, HloValue::IdLessThan);
   values_.erase(std::unique(values_.begin(), values_.end()), values_.end());
 }
 
 std::string HloValueSet::ToString() const {
   return StrCat("HloValueSet: ",
-                absl::StrJoin(values_, ", ",
+                abslx::StrJoin(values_, ", ",
                               [](std::string* result, const HloValue* value) {
                                 result->append(value->ToShortString());
                               }));
 }
 
-bool HloValueSet::AssignUnionOf(absl::Span<const HloValueSet* const> inputs) {
+bool HloValueSet::AssignUnionOf(abslx::Span<const HloValueSet* const> inputs) {
   HloValueSet union_set;
   for (const HloValueSet* input : inputs) {
     for (const HloValue* value : input->values()) {
@@ -263,7 +263,7 @@ bool InstructionValueSet::IsAmbiguous() const {
 }
 
 bool InstructionValueSet::AssignUnionOf(
-    absl::Span<const InstructionValueSet* const> inputs) {
+    abslx::Span<const InstructionValueSet* const> inputs) {
   CHECK_GT(inputs.size(), 0);
   for (int i = 1; i < inputs.size(); ++i) {
     DCHECK(ShapeUtil::Compatible(inputs[0]->shape(), inputs[i]->shape()));

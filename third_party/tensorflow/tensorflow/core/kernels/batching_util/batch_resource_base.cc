@@ -51,7 +51,7 @@ void RecordPaddingSize(int32_t padding_size, const string& model_name,
        "model_name", "execution_batch_size", "op_name"},
       /*percentiles=*/{25.0, 50.0, 75.0, 90.0, 95.0, 99.0},
       /*max_samples=*/1024, tensorflow::monitoring::UnitOfMeasure::kNumber);
-  cell->GetCell(model_name, absl::StrCat(execution_batch_size), op_name)
+  cell->GetCell(model_name, abslx::StrCat(execution_batch_size), op_name)
       ->Add(static_cast<double>(padding_size));
 }
 
@@ -65,7 +65,7 @@ void RecordPaddingSizeV2(int32_t padding_size, const string& model_name,
       // It's 14 buckets with the last bucket being 2^13 to DBL_MAX;
       // so the limits are [1, 2, 4, 8, ..., 8 * 1024, DBL_MAX].
       monitoring::Buckets::Exponential(1, 2, 14));
-  cell->GetCell(model_name, absl::StrCat(execution_batch_size), op_name)
+  cell->GetCell(model_name, abslx::StrCat(execution_batch_size), op_name)
       ->Add(static_cast<double>(padding_size));
 }
 
@@ -351,7 +351,7 @@ BatchResourceBase::GetAdaptiveBatcherQueueOptions(
     const std::vector<int32>& allowed_batch_sizes) {
   AdaptiveBatcherT::QueueOptions batcher_queue_options;
   batcher_queue_options.max_input_task_size =
-      absl::make_optional(max_batch_size);
+      abslx::make_optional(max_batch_size);
   batcher_queue_options.max_enqueued_batches = max_enqueued_batches;
   batcher_queue_options.batch_timeout_micros = batch_timeout_micros;
   if (allowed_batch_sizes.empty()) {
@@ -516,7 +516,7 @@ Status BatchResourceBase::ConcatInputTensors(
   const internal::InputSplitMetadata input_split_metadata(
       input_task_size, open_batch_remaining_slot, max_batch_size);
 
-  const absl::FixedArray<int>& task_sizes = input_split_metadata.task_sizes();
+  const abslx::FixedArray<int>& task_sizes = input_split_metadata.task_sizes();
   const int num_batches = task_sizes.size();
   std::vector<int64_t> output_task_sizes;
   output_task_sizes.resize(num_batches);
@@ -882,7 +882,7 @@ Status BatchResourceBase::LookupOrCreateBatcherQueue(const string& queue_name,
 Status BatchResourceBase::CreateBatchTask(
     OpKernelContext* context,
     std::unique_ptr<BatchResourceBase::BatchTask>* output) const {
-  *output = absl::make_unique<BatchResourceBase::BatchTask>();
+  *output = abslx::make_unique<BatchResourceBase::BatchTask>();
   return OkStatus();
 }
 
@@ -890,7 +890,7 @@ void BatchResourceBase::SplitBatchCosts(
     std::vector<std::unique_ptr<CostMeasurement>>& batch_cost_measurements,
     const int64_t processed_size, BatchT& batch) {
   for (auto& batch_cost_measurement : batch_cost_measurements) {
-    if (batch_cost_measurement->GetTotalCost() <= absl::ZeroDuration()) {
+    if (batch_cost_measurement->GetTotalCost() <= abslx::ZeroDuration()) {
       return;
     }
     if (batch.size() == 0) {  // NOLINT: empty() checks the batch contains 0
@@ -904,8 +904,8 @@ void BatchResourceBase::SplitBatchCosts(
           << "Non-zero cost collected but the processed size is 0.";
       return;
     }
-    const absl::string_view cost_type = batch_cost_measurement->GetCostType();
-    const absl::Duration total_cost = batch_cost_measurement->GetTotalCost();
+    const abslx::string_view cost_type = batch_cost_measurement->GetCostType();
+    const abslx::Duration total_cost = batch_cost_measurement->GetTotalCost();
 
     for (int i = 0; i < batch.num_tasks(); i++) {
       RequestCost* request_cost = batch.task(i).request_cost;
@@ -921,8 +921,8 @@ void BatchResourceBase::SplitBatchCosts(
           total_cost / processed_size * batch.task(i).size();
 
       request_cost->RecordCost(
-          {{absl::StrCat(cost_type, kWithSmearSuffix), cost_with_smear},
-           {absl::StrCat(cost_type, kNoSmearSuffix), cost_no_smear}});
+          {{abslx::StrCat(cost_type, kWithSmearSuffix), cost_with_smear},
+           {abslx::StrCat(cost_type, kNoSmearSuffix), cost_no_smear}});
     }
   }
 }

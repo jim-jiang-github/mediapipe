@@ -21,7 +21,7 @@
 #include "absl/container/internal/test_instance_tracker.h"
 #include "absl/memory/memory.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace {
 
@@ -56,11 +56,11 @@ TEST(FunctionRefTest, NoExceptFunction) {
 TEST(FunctionRefTest, ForwardsArgs) {
   auto l = [](std::unique_ptr<int> i) { return *i; };
   FunctionRef<int(std::unique_ptr<int>)> ref(l);
-  EXPECT_EQ(42, ref(absl::make_unique<int>(42)));
+  EXPECT_EQ(42, ref(abslx::make_unique<int>(42)));
 }
 
 TEST(FunctionRef, ReturnMoveOnly) {
-  auto l = [] { return absl::make_unique<int>(29); };
+  auto l = [] { return abslx::make_unique<int>(29); };
   FunctionRef<std::unique_ptr<int>()> ref(l);
   EXPECT_EQ(29, *ref());
 }
@@ -159,49 +159,49 @@ TEST(FunctionRef, NullMemberPtrAssertFails) {
 #endif  // GTEST_HAS_DEATH_TEST
 
 TEST(FunctionRef, CopiesAndMovesPerPassByValue) {
-  absl::test_internal::InstanceTracker tracker;
-  absl::test_internal::CopyableMovableInstance instance(0);
-  auto l = [](absl::test_internal::CopyableMovableInstance) {};
-  FunctionRef<void(absl::test_internal::CopyableMovableInstance)> ref(l);
+  abslx::test_internal::InstanceTracker tracker;
+  abslx::test_internal::CopyableMovableInstance instance(0);
+  auto l = [](abslx::test_internal::CopyableMovableInstance) {};
+  FunctionRef<void(abslx::test_internal::CopyableMovableInstance)> ref(l);
   ref(instance);
   EXPECT_EQ(tracker.copies(), 1);
   EXPECT_EQ(tracker.moves(), 1);
 }
 
 TEST(FunctionRef, CopiesAndMovesPerPassByRef) {
-  absl::test_internal::InstanceTracker tracker;
-  absl::test_internal::CopyableMovableInstance instance(0);
-  auto l = [](const absl::test_internal::CopyableMovableInstance&) {};
-  FunctionRef<void(const absl::test_internal::CopyableMovableInstance&)> ref(l);
+  abslx::test_internal::InstanceTracker tracker;
+  abslx::test_internal::CopyableMovableInstance instance(0);
+  auto l = [](const abslx::test_internal::CopyableMovableInstance&) {};
+  FunctionRef<void(const abslx::test_internal::CopyableMovableInstance&)> ref(l);
   ref(instance);
   EXPECT_EQ(tracker.copies(), 0);
   EXPECT_EQ(tracker.moves(), 0);
 }
 
 TEST(FunctionRef, CopiesAndMovesPerPassByValueCallByMove) {
-  absl::test_internal::InstanceTracker tracker;
-  absl::test_internal::CopyableMovableInstance instance(0);
-  auto l = [](absl::test_internal::CopyableMovableInstance) {};
-  FunctionRef<void(absl::test_internal::CopyableMovableInstance)> ref(l);
+  abslx::test_internal::InstanceTracker tracker;
+  abslx::test_internal::CopyableMovableInstance instance(0);
+  auto l = [](abslx::test_internal::CopyableMovableInstance) {};
+  FunctionRef<void(abslx::test_internal::CopyableMovableInstance)> ref(l);
   ref(std::move(instance));
   EXPECT_EQ(tracker.copies(), 0);
   EXPECT_EQ(tracker.moves(), 2);
 }
 
 TEST(FunctionRef, CopiesAndMovesPerPassByValueToRef) {
-  absl::test_internal::InstanceTracker tracker;
-  absl::test_internal::CopyableMovableInstance instance(0);
-  auto l = [](const absl::test_internal::CopyableMovableInstance&) {};
-  FunctionRef<void(absl::test_internal::CopyableMovableInstance)> ref(l);
+  abslx::test_internal::InstanceTracker tracker;
+  abslx::test_internal::CopyableMovableInstance instance(0);
+  auto l = [](const abslx::test_internal::CopyableMovableInstance&) {};
+  FunctionRef<void(abslx::test_internal::CopyableMovableInstance)> ref(l);
   ref(std::move(instance));
   EXPECT_EQ(tracker.copies(), 0);
   EXPECT_EQ(tracker.moves(), 1);
 }
 
 TEST(FunctionRef, PassByValueTypes) {
-  using absl::functional_internal::Invoker;
-  using absl::functional_internal::VoidPtr;
-  using absl::test_internal::CopyableMovableInstance;
+  using abslx::functional_internal::Invoker;
+  using abslx::functional_internal::VoidPtr;
+  using abslx::test_internal::CopyableMovableInstance;
   struct Trivial {
     void* p[2];
   };
@@ -240,18 +240,18 @@ TEST(FunctionRef, PassByValueTypes) {
   {
     LargeTrivial obj;
     auto test = [&obj](LargeTrivial& input) { ASSERT_EQ(&input, &obj); };
-    absl::FunctionRef<void(LargeTrivial&)> ref(test);
+    abslx::FunctionRef<void(LargeTrivial&)> ref(test);
     ref(obj);
   }
 
   {
     Trivial obj;
     auto test = [&obj](Trivial& input) { ASSERT_EQ(&input, &obj); };
-    absl::FunctionRef<void(Trivial&)> ref(test);
+    abslx::FunctionRef<void(Trivial&)> ref(test);
     ref(obj);
   }
 }
 
 }  // namespace
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

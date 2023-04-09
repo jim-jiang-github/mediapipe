@@ -37,7 +37,7 @@ template <typename EigenType>
 auto TransposeToRowVector(
     EigenType&& x,
     typename std::enable_if<  // If `x` is a column vector at compile time.
-        absl::decay_t<EigenType>::ColsAtCompileTime == 1>::type* = nullptr)
+        abslx::decay_t<EigenType>::ColsAtCompileTime == 1>::type* = nullptr)
     -> decltype(x.transpose()) {
   return x.transpose();  // Return Eigen::Transpose expression object by value.
 }
@@ -45,7 +45,7 @@ template <typename EigenType>
 EigenType&& TransposeToRowVector(
     EigenType&& x,
     typename std::enable_if<  // If `x` is not a column vector.
-        absl::decay_t<EigenType>::ColsAtCompileTime != 1>::type* = nullptr) {
+        abslx::decay_t<EigenType>::ColsAtCompileTime != 1>::type* = nullptr) {
   return std::forward<EigenType>(x);  // Forward the object without change.
 }
 
@@ -79,7 +79,7 @@ template <typename Container>
 struct ContainerWrapperTraits { enum { Valid = false }; };
 }  // namespace internal
 
-// Wrap std::vector, absl::Span, and Eigen types with a uniform interface.
+// Wrap std::vector, abslx::Span, and Eigen types with a uniform interface.
 // WrapContainer() returns a `ContainerWrapper` (defined below) to make a
 // uniform interface for accessing the size and resizing the wrapped object and
 // also to return an Eigen Matrix representation (e.g. an Eigen::Map for vectors
@@ -93,7 +93,7 @@ struct ContainerWrapperTraits { enum { Valid = false }; };
 //    * Eigen::Matrix, Eigen::Vector, Eigen::RowVector
 //
 //  * Non-resizable containers
-//    * absl::Span
+//    * abslx::Span
 //    * Eigen::VectorBlock: the expression objects created by
 //      .head(), .segment(), .tail()
 //    * Eigen::Block: the expression objects created by
@@ -133,7 +133,7 @@ struct ContainerWrapperTraits { enum { Valid = false }; };
 // For comparison, do not do this:
 //
 //   // Span returned by MakeSpan is destroyed after this line.
-//   auto wrapper = WrapContainer(absl::MakeSpan(buffer));  // WRONG.
+//   auto wrapper = WrapContainer(abslx::MakeSpan(buffer));  // WRONG.
 //   // (Code using wrapper.)
 //
 // Code using the wrapper attempts to use a dead reference, which is undefined
@@ -226,7 +226,7 @@ class ContainerWrapper {
  public:
   using Container = typename std::remove_reference<Container_>::type;
   using Traits =
-      internal::ContainerWrapperTraits<typename absl::decay_t<Container>>;
+      internal::ContainerWrapperTraits<typename abslx::decay_t<Container>>;
   static_assert(Traits::Valid, "Invalid type for ContainerWrapper.");
   enum {
     // The number of container dimensions, either 1 or 2. Returns 2 for all
@@ -299,15 +299,15 @@ class ContainerWrapper {
 // directly. It is not enough if C is merely convertible to D, not even if C
 // inherits from D. Particularly:
 //
-// * Even though many containers are convertible to absl::Span, they will not
-//   find the absl::Span traits.
+// * Even though many containers are convertible to abslx::Span, they will not
+//   find the abslx::Span traits.
 // * Even though Eigen::PlainObjectBase is the base class of Array and Matrix, a
 //   partial specialization for PlainObjectBase wouldn't match Array or Matrix.
 
-// absl::Span<T>.
+// abslx::Span<T>.
 template <typename ValueType>
-struct ContainerWrapperTraits<absl::Span<ValueType>> {
-  using Container = absl::Span<ValueType>;
+struct ContainerWrapperTraits<abslx::Span<ValueType>> {
+  using Container = abslx::Span<ValueType>;
   using Scalar = typename std::remove_const<ValueType>::type;
   enum {
     Valid = true,

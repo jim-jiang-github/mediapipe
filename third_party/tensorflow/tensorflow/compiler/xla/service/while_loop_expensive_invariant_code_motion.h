@@ -37,13 +37,13 @@ class WhileLoopExpensiveInvariantCodeMotion : public HloModulePass {
         worth_hoisting_individually_(std::move(worth_hoisting_individually)) {}
   ~WhileLoopExpensiveInvariantCodeMotion() override = default;
 
-  absl::string_view name() const override {
+  abslx::string_view name() const override {
     return "while-loop-expensive-invariant-code-motion";
   }
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   StatusOr<bool> TryHoistingInvariantInstructionsFromWhileBody(

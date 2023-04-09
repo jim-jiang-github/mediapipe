@@ -74,7 +74,7 @@ Status StatusScopedDiagnosticHandler::Combine(Status status) {
   // TensorFlow's AppendToMessage without the additional formatting inserted
   // there.
   status = ::tensorflow::Status(
-      status.code(), absl::StrCat(status.error_message(), diag_str_));
+      status.code(), abslx::StrCat(status.error_message(), diag_str_));
   diag_str_.clear();
   return status;
 }

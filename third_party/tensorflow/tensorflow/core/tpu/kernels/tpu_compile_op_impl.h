@@ -52,7 +52,7 @@ class TpuCompileOpKernelImpl : public TpuCompileOpKernelCommon {
             unload_cache_on_session_close, /*persistent_cache=*/nullptr) {}
 
   Status Compile(
-      const absl::variant<MlirToHloArgs, FunctionToHloArgs>& computation,
+      const abslx::variant<MlirToHloArgs, FunctionToHloArgs>& computation,
       const XLA_TpuMeshState* mesh_state,
       const std::vector<TensorShape>& arg_shapes,
       const TpuCompilationCacheKey* key,

@@ -119,7 +119,7 @@ StepDatabaseResult ConvertStepEventsToStepDb(
   for (const auto& step_events : nonoverlapped_step_events) {
     step_numbers.push_back(step_events.first);
   }
-  absl::c_sort(step_numbers);
+  abslx::c_sort(step_numbers);
   for (const auto& step : step_numbers) {
     const auto* step_details = gtl::FindOrNull(nonoverlapped_step_events, step);
     if (step_details == nullptr) continue;

@@ -30,12 +30,12 @@ namespace text {
 namespace tokenizers {
 
 // Creates a RegexTokenizer by extracting vocab files from the metadata.
-absl::StatusOr<std::unique_ptr<RegexTokenizer>> CreateRegexTokenizerFromOptions(
+abslx::StatusOr<std::unique_ptr<RegexTokenizer>> CreateRegexTokenizerFromOptions(
     const tflite::RegexTokenizerOptions* options,
     const metadata::ModelMetadataExtractor* metadata_extractor);
 
 // Create a Tokenizer by extracting vocab / model files from the metadata.
-absl::StatusOr<std::unique_ptr<Tokenizer>> CreateTokenizerFromProcessUnit(
+abslx::StatusOr<std::unique_ptr<Tokenizer>> CreateTokenizerFromProcessUnit(
     const tflite::ProcessUnit* tokenizer_process_unit,
     const metadata::ModelMetadataExtractor* metadata_extractor);
 

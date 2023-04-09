@@ -46,7 +46,7 @@ void CredentialsFactory::Register(CredentialsFactory* factory) {
   }
 }
 
-Status CredentialsFactory::Get(absl::string_view protocol,
+Status CredentialsFactory::Get(abslx::string_view protocol,
                                CredentialsFactory** out) {
   mutex_lock l(*get_lock());
   auto it = credentials_factories().find(std::string(protocol));
@@ -63,11 +63,11 @@ Status CredentialsFactory::Get(absl::string_view protocol,
   return errors::NotFound("No credentials factory has been registered for ",
                           "protocol ", protocol,
                           ". The available types are: [ ",
-                          absl::StrJoin(available_types, ", "), " ]");
+                          abslx::StrJoin(available_types, ", "), " ]");
 }
 
 Status CredentialsFactory::CreateServerCredentials(
-    absl::string_view protocol,
+    abslx::string_view protocol,
     std::shared_ptr<::grpc::ServerCredentials>* out) {
   CredentialsFactory* factory;
   TF_RETURN_IF_ERROR(CredentialsFactory::Get(protocol, &factory));
@@ -76,7 +76,7 @@ Status CredentialsFactory::CreateServerCredentials(
 }
 
 Status CredentialsFactory::CreateClientCredentials(
-    absl::string_view protocol,
+    abslx::string_view protocol,
     std::shared_ptr<::grpc::ChannelCredentials>* out) {
   CredentialsFactory* factory;
   TF_RETURN_IF_ERROR(CredentialsFactory::Get(protocol, &factory));
@@ -84,7 +84,7 @@ Status CredentialsFactory::CreateClientCredentials(
   return OkStatus();
 }
 
-bool CredentialsFactory::Exists(absl::string_view protocol) {
+bool CredentialsFactory::Exists(abslx::string_view protocol) {
   mutex_lock l(*get_lock());
   return credentials_factories().find(std::string(protocol)) !=
          credentials_factories().end();

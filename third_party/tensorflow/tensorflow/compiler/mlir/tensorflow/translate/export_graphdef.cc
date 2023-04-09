@@ -114,7 +114,7 @@ class Exporter {
   static Status Convert(mlir::ModuleOp module, const GraphExportConfig& configs,
                         std::unique_ptr<Graph>* graph,
                         FunctionLibraryDefinition* flib_def,
-                        absl::flat_hash_set<Node*>* control_ret_nodes);
+                        abslx::flat_hash_set<Node*>* control_ret_nodes);
 
   // Converts a given FuncOp to a FunctionDef and adds it to the function
   // definition library
@@ -131,7 +131,7 @@ class Exporter {
       const GraphExportConfig& configs, const Dialect* tf_dialect,
       const SymbolTable& symbol_table, FuncOp function,
       FunctionDefLibrary* flib, llvm::SmallDenseSet<FuncOp>& visited_functions,
-      absl::flat_hash_set<Node*>* control_ret_nodes);
+      abslx::flat_hash_set<Node*>* control_ret_nodes);
 
  private:
   explicit Exporter(Graph* graph, const Dialect* tf_dialect)
@@ -152,19 +152,19 @@ class Exporter {
                                                    unsigned index,
                                                    llvm::StringRef name);
   Status GetControlRetNodes(mlir::tf_executor::FetchOp fetch,
-                            absl::flat_hash_set<Node*>* control_ret_nodes);
+                            abslx::flat_hash_set<Node*>* control_ret_nodes);
   // Adds one edge between src_node and dst_node. If it is not a control edge,
   // an index is used to find out the right operand of the dst_node.
   Status AddEdgeBetweenNodes(Value src, Node* dst_node, unsigned dst_index);
 
   Graph* graph_;
   LegalizedOpOrValLocNameMapper op_to_name_;
-  absl::flat_hash_map<Operation*, Node*> nodes_;
+  abslx::flat_hash_map<Operation*, Node*> nodes_;
   llvm::DenseMap<BlockArgument, Node*> args_;
   // One single return operation can return multiple results, and each of them
   // will be converted to one node in the graph.
-  typedef absl::InlinedVector<Node*, 4> NodeVector;
-  absl::flat_hash_map<Operation*, NodeVector> returns_;
+  typedef abslx::InlinedVector<Node*, 4> NodeVector;
+  abslx::flat_hash_map<Operation*, NodeVector> returns_;
   const mlir::Dialect* tf_dialect_;
 };
 
@@ -221,7 +221,7 @@ StatusOr<std::unique_ptr<NodeDef>> Exporter::GetArgumentNode(
 
   llvm::ArrayRef<mlir::NamedAttribute> func_arg_i_attrs =
       func.getArgAttrs(index);
-  absl::flat_hash_set<absl::string_view> attrs_to_ignore = {kDeviceAttr,
+  abslx::flat_hash_set<abslx::string_view> attrs_to_ignore = {kDeviceAttr,
                                                             kAliasingAttr};
   TF_RETURN_IF_ERROR(ConvertAttributes(func_arg_i_attrs, attrs_to_ignore,
                                        /*remove_ref_type=*/false,
@@ -256,7 +256,7 @@ StatusOr<std::unique_ptr<NodeDef>> Exporter::GetReturnNode(
 
   llvm::ArrayRef<mlir::NamedAttribute> func_res_i_attrs =
       function.getResultAttrs(index);
-  absl::flat_hash_set<absl::string_view> attrs_to_ignore = {kDeviceAttr};
+  abslx::flat_hash_set<abslx::string_view> attrs_to_ignore = {kDeviceAttr};
   TF_RETURN_IF_ERROR(ConvertAttributes(func_res_i_attrs, attrs_to_ignore,
                                        /*remove_ref_type=*/false,
                                        node_def->mutable_attr()));
@@ -407,7 +407,7 @@ Status Exporter::AddFetchNode(FuncOp function, mlir::tf_executor::FetchOp fetch,
 // tf_executor.fetch control inputs.
 Status Exporter::GetControlRetNodes(
     mlir::tf_executor::FetchOp fetch,
-    absl::flat_hash_set<Node*>* control_ret_nodes) {
+    abslx::flat_hash_set<Node*>* control_ret_nodes) {
   for (Value fetch_operand : fetch.getOperands()) {
     if (fetch_operand.getType().isa<mlir::tf_executor::ControlType>()) {
       Operation* defining_op =
@@ -424,7 +424,7 @@ StatusOr<std::unique_ptr<Graph>> Exporter::Convert(
     const GraphExportConfig& configs, const Dialect* tf_dialect,
     const SymbolTable& symbol_table, FuncOp function, FunctionDefLibrary* flib,
     llvm::SmallDenseSet<FuncOp>& visited_functions,
-    absl::flat_hash_set<Node*>* control_ret_nodes) {
+    abslx::flat_hash_set<Node*>* control_ret_nodes) {
   mlir::Block& block = function.front();
 
   // Extract input & output names if set.
@@ -596,14 +596,14 @@ Status Exporter::ConvertLibFunction(
   auto function_name = function.getName().str();
 
   // TODO(fengliuai): use a small flib_def to reduce overhead
-  absl::flat_hash_set<Node*> control_ret_nodes;
+  abslx::flat_hash_set<Node*> control_ret_nodes;
   TF_ASSIGN_OR_RETURN(
       auto sub_graph,
       Exporter::Convert(configs, tf_dialect, symbol_table, function, flib,
                         visited_functions, &control_ret_nodes));
   const auto control_ret = [&](const Node* n) -> std::optional<string> {
     return control_ret_nodes.contains(n)
-               ? absl::make_optional<string>(n->name())
+               ? abslx::make_optional<string>(n->name())
                : std::nullopt;
   };
   FunctionDef func_def;
@@ -641,7 +641,7 @@ Status Exporter::ConvertLibFunction(
   // Ignore the gradient and is_stateful attribute on the function as they have
   // been handled above. Ignore the entry func attribute as it is an MLIR
   // metadata attribute and is not required in the function definition.
-  absl::flat_hash_set<absl::string_view> attrs_to_ignore = {
+  abslx::flat_hash_set<abslx::string_view> attrs_to_ignore = {
       grad_string.data(), stateful_string.data(), kEntryFuncAttr};
   llvm::SmallVector<mlir::NamedAttribute, 8> funcAttrs(
       function->getDialectAttrs());
@@ -666,7 +666,7 @@ Status Exporter::Convert(mlir::ModuleOp module,
                          const GraphExportConfig& configs,
                          std::unique_ptr<Graph>* graph,
                          FunctionLibraryDefinition* flib_def,
-                         absl::flat_hash_set<Node*>* control_ret_nodes) {
+                         abslx::flat_hash_set<Node*>* control_ret_nodes) {
   mlir::StringAttr entry_func_id =
       mlir::StringAttr::get(module.getContext(), "main");
   std::optional<FuncOp> entry_func;
@@ -721,7 +721,7 @@ Status ConvertMlirToGraph(mlir::ModuleOp module,
                           const GraphExportConfig& configs,
                           std::unique_ptr<Graph>* graph,
                           FunctionLibraryDefinition* flib_def,
-                          absl::flat_hash_set<Node*>* control_ret_nodes) {
+                          abslx::flat_hash_set<Node*>* control_ret_nodes) {
   mlir::StatusScopedDiagnosticHandler sh(module.getContext());
   if (failed(VerifyExportSuitable(module))) return sh.ConsumeStatus();
   return sh.Combine(
@@ -732,7 +732,7 @@ Status ConvertMlirToGraph(mlir::ModuleOp module,
                           const GraphExportConfig& configs,
                           std::unique_ptr<Graph>* graph,
                           FunctionLibraryDefinition* flib_def) {
-  absl::flat_hash_set<Node*> control_ret_nodes;
+  abslx::flat_hash_set<Node*> control_ret_nodes;
   return ConvertMlirToGraph(module, configs, graph, flib_def,
                             &control_ret_nodes);
 }

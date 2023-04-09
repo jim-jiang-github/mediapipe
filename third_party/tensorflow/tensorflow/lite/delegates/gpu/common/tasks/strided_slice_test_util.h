@@ -22,7 +22,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status StridedSliceTest(TestExecutionEnvironment* env);
+abslx::Status StridedSliceTest(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

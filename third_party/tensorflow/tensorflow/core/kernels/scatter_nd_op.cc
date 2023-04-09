@@ -1021,7 +1021,7 @@ Status DoScatterNd(OpKernelContext* c, const Tensor& indices,
     slice_shape.RemoveLastDims(1);
     return errors::InvalidArgument(
         "indices", SliceDebugString(slice_shape, bad_i), " = [",
-        absl::StrJoin(
+        abslx::StrJoin(
             gtl::ArraySlice<Index>(&indices_flat(bad_i, 0), slice_dim), ", "),
         "] does not index into shape ", shape.DebugString());
   }

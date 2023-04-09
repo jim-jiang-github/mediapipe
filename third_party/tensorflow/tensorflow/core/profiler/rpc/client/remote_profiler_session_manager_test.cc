@@ -42,11 +42,11 @@ constexpr double kGracePeriodSeconds = 2.0;
 
 // Copied from capture_profile to not introduce a dependency.
 ProfileRequest PopulateProfileRequest(
-    absl::string_view repository_root, absl::string_view session_id,
-    absl::string_view host_name,
+    abslx::string_view repository_root, abslx::string_view session_id,
+    abslx::string_view host_name,
     const RemoteProfilerSessionManagerOptions& options) {
   constexpr uint64 kMaxEvents = 1000000;
-  const absl::string_view kXPlanePb = "xplane.pb";
+  const abslx::string_view kXPlanePb = "xplane.pb";
   ProfileRequest request;
   // TODO(b/169976117) Remove duration from request.
   request.set_duration_ms(options.profiler_options().duration_ms());
@@ -62,21 +62,21 @@ ProfileRequest PopulateProfileRequest(
 }
 
 TEST(RemoteProfilerSessionManagerTest, Simple) {
-  absl::Duration duration = absl::Milliseconds(30);
+  abslx::Duration duration = abslx::Milliseconds(30);
   RemoteProfilerSessionManagerOptions options;
   *options.mutable_profiler_options() =
       tensorflow::ProfilerSession::DefaultOptions();
   options.mutable_profiler_options()->set_duration_ms(
-      absl::ToInt64Milliseconds(duration));
+      abslx::ToInt64Milliseconds(duration));
 
   std::string service_address;
   auto server = StartServer(duration, &service_address);
   options.add_service_addresses(service_address);
-  absl::Time approx_start = absl::Now();
-  absl::Duration grace = absl::Seconds(kGracePeriodSeconds);
-  absl::Duration max_duration = duration + grace;
-  options.set_max_session_duration_ms(absl::ToInt64Milliseconds(max_duration));
-  options.set_session_creation_timestamp_ns(absl::ToUnixNanos(approx_start));
+  abslx::Time approx_start = abslx::Now();
+  abslx::Duration grace = abslx::Seconds(kGracePeriodSeconds);
+  abslx::Duration max_duration = duration + grace;
+  options.set_max_session_duration_ms(abslx::ToInt64Milliseconds(max_duration));
+  options.set_session_creation_timestamp_ns(abslx::ToUnixNanos(approx_start));
 
   ProfileRequest request =
       PopulateProfileRequest(TmpDir(), "session_id", service_address, options);
@@ -85,7 +85,7 @@ TEST(RemoteProfilerSessionManagerTest, Simple) {
       RemoteProfilerSessionManager::Create(options, request, status);
   EXPECT_TRUE(status.ok());
   std::vector<Response> responses = sessions->WaitForCompletion();
-  absl::Duration elapsed = absl::Now() - approx_start;
+  abslx::Duration elapsed = abslx::Now() - approx_start;
   ASSERT_EQ(responses.size(), 1);
   EXPECT_TRUE(responses.back().status.ok());
   EXPECT_TRUE(responses.back().profile_response->empty_trace());
@@ -94,23 +94,23 @@ TEST(RemoteProfilerSessionManagerTest, Simple) {
 }
 
 TEST(RemoteProfilerSessionManagerTest, ExpiredDeadline) {
-  absl::Duration duration = absl::Milliseconds(30);
+  abslx::Duration duration = abslx::Milliseconds(30);
   RemoteProfilerSessionManagerOptions options;
   *options.mutable_profiler_options() =
       tensorflow::ProfilerSession::DefaultOptions();
   options.mutable_profiler_options()->set_duration_ms(
-      absl::ToInt64Milliseconds(duration));
+      abslx::ToInt64Milliseconds(duration));
 
   std::string service_address;
   auto server = StartServer(duration, &service_address);
   options.add_service_addresses(service_address);
-  absl::Duration grace = absl::Seconds(kGracePeriodSeconds);
-  absl::Duration max_duration = duration + grace;
-  options.set_max_session_duration_ms(absl::ToInt64Milliseconds(max_duration));
+  abslx::Duration grace = abslx::Seconds(kGracePeriodSeconds);
+  abslx::Duration max_duration = duration + grace;
+  options.set_max_session_duration_ms(abslx::ToInt64Milliseconds(max_duration));
   // This will create a deadline in the past.
   options.set_session_creation_timestamp_ns(0);
 
-  absl::Time approx_start = absl::Now();
+  abslx::Time approx_start = abslx::Now();
   ProfileRequest request =
       PopulateProfileRequest(TmpDir(), "session_id", service_address, options);
   Status status;
@@ -118,8 +118,8 @@ TEST(RemoteProfilerSessionManagerTest, ExpiredDeadline) {
       RemoteProfilerSessionManager::Create(options, request, status);
   EXPECT_TRUE(status.ok());
   std::vector<Response> responses = sessions->WaitForCompletion();
-  absl::Duration elapsed = absl::Now() - approx_start;
-  EXPECT_THAT(elapsed, DurationNear(absl::Seconds(0)));
+  abslx::Duration elapsed = abslx::Now() - approx_start;
+  EXPECT_THAT(elapsed, DurationNear(abslx::Seconds(0)));
   ASSERT_EQ(responses.size(), 1);
   EXPECT_TRUE(errors::IsDeadlineExceeded(responses.back().status));
   EXPECT_TRUE(responses.back().profile_response->empty_trace());
@@ -127,22 +127,22 @@ TEST(RemoteProfilerSessionManagerTest, ExpiredDeadline) {
 }
 
 TEST(RemoteProfilerSessionManagerTest, LongSession) {
-  absl::Duration duration = absl::Seconds(3);
+  abslx::Duration duration = abslx::Seconds(3);
   RemoteProfilerSessionManagerOptions options;
   *options.mutable_profiler_options() =
       tensorflow::ProfilerSession::DefaultOptions();
   options.mutable_profiler_options()->set_duration_ms(
-      absl::ToInt64Milliseconds(duration));
+      abslx::ToInt64Milliseconds(duration));
 
   std::string service_address;
   auto server = StartServer(duration, &service_address);
   options.add_service_addresses(service_address);
-  absl::Time approx_start = absl::Now();
+  abslx::Time approx_start = abslx::Now();
   // Empirically determined value.
-  absl::Duration grace = absl::Seconds(kGracePeriodSeconds);
-  absl::Duration max_duration = duration + grace;
-  options.set_max_session_duration_ms(absl::ToInt64Milliseconds(max_duration));
-  options.set_session_creation_timestamp_ns(absl::ToUnixNanos(approx_start));
+  abslx::Duration grace = abslx::Seconds(kGracePeriodSeconds);
+  abslx::Duration max_duration = duration + grace;
+  options.set_max_session_duration_ms(abslx::ToInt64Milliseconds(max_duration));
+  options.set_session_creation_timestamp_ns(abslx::ToUnixNanos(approx_start));
 
   ProfileRequest request =
       PopulateProfileRequest(TmpDir(), "session_id", service_address, options);
@@ -151,7 +151,7 @@ TEST(RemoteProfilerSessionManagerTest, LongSession) {
       RemoteProfilerSessionManager::Create(options, request, status);
   EXPECT_TRUE(status.ok());
   std::vector<Response> responses = sessions->WaitForCompletion();
-  absl::Duration elapsed = absl::Now() - approx_start;
+  abslx::Duration elapsed = abslx::Now() - approx_start;
   ASSERT_EQ(responses.size(), 1);
   EXPECT_TRUE(responses.back().status.ok());
   EXPECT_TRUE(responses.back().profile_response->empty_trace());

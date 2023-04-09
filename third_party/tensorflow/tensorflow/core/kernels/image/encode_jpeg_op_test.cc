@@ -41,7 +41,7 @@ TEST_F(EncodeJpegWithVariableQualityTest, FailsForInvalidQuality) {
   Status status = RunOpKernel();
   EXPECT_TRUE(errors::IsInvalidArgument(status));
   EXPECT_TRUE(
-      absl::StartsWith(status.error_message(), "quality must be in [0,100]"));
+      abslx::StartsWith(status.error_message(), "quality must be in [0,100]"));
 }
 
 }  // namespace

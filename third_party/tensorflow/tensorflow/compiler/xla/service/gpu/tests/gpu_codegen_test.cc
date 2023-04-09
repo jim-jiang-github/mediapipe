@@ -46,7 +46,7 @@ GpuCodegenTest::CreateNewVerifiedModuleWithFTZ(bool ftz) {
 }
 
 void GpuCodegenTest::CompileAndOptionallyVerifyPtx(
-    std::unique_ptr<VerifiedHloModule> hlo_module, absl::string_view pattern) {
+    std::unique_ptr<VerifiedHloModule> hlo_module, abslx::string_view pattern) {
   std::unique_ptr<Executable> executable =
       std::move(CompileToExecutable(std::move(hlo_module)).ValueOrDie());
   std::string ptx_str(static_cast<GpuExecutable*>(executable.get())->text());

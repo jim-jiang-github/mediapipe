@@ -31,7 +31,7 @@ SavedObjectGraph ParseSavedObjectGraph(StringPiece text_proto) {
   return value;
 }
 
-constexpr absl::string_view kSingleChildFoo = R"(
+constexpr abslx::string_view kSingleChildFoo = R"(
 nodes {
   children {
     node_id: 1
@@ -56,7 +56,7 @@ nodes {
 }
 )";
 
-constexpr absl::string_view kSingleChildFooWithFuncBar = R"(
+constexpr abslx::string_view kSingleChildFooWithFuncBar = R"(
 nodes {
   children {
     node_id: 1
@@ -175,7 +175,7 @@ concrete_functions {
 )";
 
 // In this graph, foo.baz and bar.wombat should point to the same object.
-constexpr absl::string_view kMultiplePathsToChild = R"(
+constexpr abslx::string_view kMultiplePathsToChild = R"(
 nodes {
   children {
     node_id: 1
@@ -244,7 +244,7 @@ nodes {
 )";
 
 // `foo` has edge `bar`, which has edge `parent` pointing back to `foo`.
-constexpr absl::string_view kCycleBetweenParentAndChild = R"(
+constexpr abslx::string_view kCycleBetweenParentAndChild = R"(
 nodes {
   children {
     node_id: 1
@@ -301,39 +301,39 @@ nodes {
 
 TEST(ObjectGraphTraversalTest, Success) {
   SavedObjectGraph object_graph = ParseSavedObjectGraph(kSingleChildFoo);
-  absl::optional<int> node = internal::FindNodeAtPath("foo", object_graph);
+  abslx::optional<int> node = internal::FindNodeAtPath("foo", object_graph);
   ASSERT_TRUE(node.has_value());
   EXPECT_EQ(*node, 1);
 }
 
 TEST(ObjectGraphTraversalTest, ObjectNotFound) {
   SavedObjectGraph object_graph = ParseSavedObjectGraph(kSingleChildFoo);
-  absl::optional<int> node = internal::FindNodeAtPath("bar", object_graph);
+  abslx::optional<int> node = internal::FindNodeAtPath("bar", object_graph);
   EXPECT_FALSE(node.has_value());
 }
 
 TEST(ObjectGraphTraversalTest, CaseSensitiveMismatch) {
   SavedObjectGraph object_graph = ParseSavedObjectGraph(kSingleChildFoo);
-  absl::optional<int> node = internal::FindNodeAtPath("FOO", object_graph);
+  abslx::optional<int> node = internal::FindNodeAtPath("FOO", object_graph);
   EXPECT_FALSE(node.has_value());
 }
 
 TEST(ObjectGraphTraversalTest, NestedObjectFound) {
   SavedObjectGraph object_graph =
       ParseSavedObjectGraph(kSingleChildFooWithFuncBar);
-  absl::optional<int> node = internal::FindNodeAtPath("foo.bar", object_graph);
+  abslx::optional<int> node = internal::FindNodeAtPath("foo.bar", object_graph);
   ASSERT_TRUE(node.has_value());
   EXPECT_EQ(*node, 2);
 }
 
 TEST(ObjectGraphTraversalTest, MultiplePathsAliasSameObject) {
   SavedObjectGraph object_graph = ParseSavedObjectGraph(kMultiplePathsToChild);
-  absl::optional<int> foo_baz_node =
+  abslx::optional<int> foo_baz_node =
       internal::FindNodeAtPath("foo.baz", object_graph);
   ASSERT_TRUE(foo_baz_node.has_value());
   EXPECT_EQ(*foo_baz_node, 4);
 
-  absl::optional<int> bar_wombat_node =
+  abslx::optional<int> bar_wombat_node =
       internal::FindNodeAtPath("bar.wombat", object_graph);
   ASSERT_TRUE(bar_wombat_node.has_value());
   EXPECT_EQ(*bar_wombat_node, 4);
@@ -344,21 +344,21 @@ TEST(ObjectGraphTraversalTest, MultiplePathsAliasSameObject) {
 TEST(ObjectGraphTraversalTest, CyclesAreOK) {
   SavedObjectGraph object_graph =
       ParseSavedObjectGraph(kCycleBetweenParentAndChild);
-  absl::optional<int> foo = internal::FindNodeAtPath("foo", object_graph);
+  abslx::optional<int> foo = internal::FindNodeAtPath("foo", object_graph);
   ASSERT_TRUE(foo.has_value());
   EXPECT_EQ(*foo, 1);
 
-  absl::optional<int> foo_bar =
+  abslx::optional<int> foo_bar =
       internal::FindNodeAtPath("foo.bar", object_graph);
   ASSERT_TRUE(foo_bar.has_value());
   EXPECT_EQ(*foo_bar, 3);
 
-  absl::optional<int> foo_bar_parent =
+  abslx::optional<int> foo_bar_parent =
       internal::FindNodeAtPath("foo.bar.parent", object_graph);
   ASSERT_TRUE(foo_bar_parent.has_value());
   EXPECT_EQ(*foo_bar_parent, 1);
 
-  absl::optional<int> foo_bar_parent_bar =
+  abslx::optional<int> foo_bar_parent_bar =
       internal::FindNodeAtPath("foo.bar.parent.bar", object_graph);
   ASSERT_TRUE(foo_bar_parent_bar.has_value());
   EXPECT_EQ(*foo_bar_parent_bar, 3);

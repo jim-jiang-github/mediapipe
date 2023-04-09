@@ -48,7 +48,7 @@ auto OpGradientInfoInit(const T &a) {
 }
 }  // namespace
 
-absl::optional<tensorflow::gtl::FlatSet<int>> OpGradientUnusedInputIndices(
+abslx::optional<tensorflow::gtl::FlatSet<int>> OpGradientUnusedInputIndices(
     const tensorflow::string &op_name) {
   static std::array<OpIndexInfo, 364> a = {{
       {"Acosh"},
@@ -422,10 +422,10 @@ absl::optional<tensorflow::gtl::FlatSet<int>> OpGradientUnusedInputIndices(
   if (it != m.end()) {
     return it->second;
   }
-  return absl::nullopt;
+  return abslx::nullopt;
 }
 
-absl::optional<tensorflow::gtl::FlatSet<int>> OpGradientUnusedOutputIndices(
+abslx::optional<tensorflow::gtl::FlatSet<int>> OpGradientUnusedOutputIndices(
     const tensorflow::string &op_name) {
   static std::array<OpIndexInfo, 483> a = {{
       {"Abs"},
@@ -918,5 +918,5 @@ absl::optional<tensorflow::gtl::FlatSet<int>> OpGradientUnusedOutputIndices(
   if (it != m.end()) {
     return it->second;
   }
-  return absl::nullopt;
+  return abslx::nullopt;
 }

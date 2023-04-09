@@ -29,7 +29,7 @@ namespace {
 ResourceProviderFn resource_provider_ = nullptr;
 }  // namespace
 
-absl::Status GetResourceContents(const std::string& path, std::string* output,
+abslx::Status GetResourceContents(const std::string& path, std::string* output,
                                  bool read_as_binary) {
   if (resource_provider_) {
     return resource_provider_(path, output);

@@ -153,7 +153,7 @@ std::vector<std::string> Split(const std::string& str, const char delim) {
   if (str.empty()) {
     return {};
   }
-  return absl::StrSplit(str, delim);
+  return abslx::StrSplit(str, delim);
 }
 
 int GetNumElements(const TfLiteIntArray* dim_array) {
@@ -203,8 +203,8 @@ TfLiteStatus PopulateInputValueRanges(
 
     // Parse the range value.
     int low, high;
-    bool has_low = absl::SimpleAtoi(name_range[1], &low);
-    bool has_high = absl::SimpleAtoi(name_range[2], &high);
+    bool has_low = abslx::SimpleAtoi(name_range[1], &low);
+    bool has_high = abslx::SimpleAtoi(name_range[2], &high);
     if (!has_low || !has_high || low > high) {
       TFLITE_LOG(ERROR)
           << "Wrong low and high value of the input value range specified: "
@@ -327,9 +327,9 @@ TfLiteStatus SplitInputLayerNameAndValueFile(
     return kTfLiteError;
   }
   // 2. replace escaped "\:" string to ":"
-  name_file_pair.first = absl::StrReplaceAll(
+  name_file_pair.first = abslx::StrReplaceAll(
       name_and_value_file.substr(0, delim_index), {{"\\:", ":"}});
-  name_file_pair.second = absl::StrReplaceAll(
+  name_file_pair.second = abslx::StrReplaceAll(
       name_and_value_file.substr(delim_index + 1), {{"\\:", ":"}});
   return kTfLiteOk;
 }

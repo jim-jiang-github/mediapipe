@@ -28,9 +28,9 @@ limitations under the License.
 namespace tflite {
 namespace shim {
 template <typename... Args>
-void AppendToMessage(::absl::Status* status, Args... args) {
-  *status = ::absl::Status(status->code(),
-                           ::absl::StrCat(status->message(), "\n\t", args...));
+void AppendToMessage(::abslx::Status* status, Args... args) {
+  *status = ::abslx::Status(status->code(),
+                           ::abslx::StrCat(status->message(), "\n\t", args...));
 }
 }  // namespace shim
 }  // namespace tflite
@@ -38,7 +38,7 @@ void AppendToMessage(::absl::Status* status, Args... args) {
 // Propagates error up the stack and appends to the error message.
 #define SH_RETURN_WITH_CONTEXT_IF_ERROR(expr, ...)            \
   do {                                                        \
-    ::absl::Status _status = (expr);                          \
+    ::abslx::Status _status = (expr);                          \
     if (!_status.ok()) {                                      \
       ::tflite::shim::AppendToMessage(&_status, __VA_ARGS__); \
       return _status;                                         \
@@ -50,7 +50,7 @@ void AppendToMessage(::absl::Status* status, Args... args) {
 // overly clever/unreadable macro magic is used.
 #define SH_RETURN_IF_ERROR(...)             \
   do {                                      \
-    ::absl::Status _status = (__VA_ARGS__); \
+    ::abslx::Status _status = (__VA_ARGS__); \
     if (!_status.ok()) return _status;      \
   } while (0)
 

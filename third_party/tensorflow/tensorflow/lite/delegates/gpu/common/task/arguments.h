@@ -36,9 +36,9 @@ class CLArguments;
 
 class ArgumentsBinder {
  public:
-  virtual absl::Status SetInt(const std::string& name, int value) = 0;
-  virtual absl::Status SetFloat(const std::string& name, float value) = 0;
-  virtual absl::Status SetHalf(const std::string& name, half value) = 0;
+  virtual abslx::Status SetInt(const std::string& name, int value) = 0;
+  virtual abslx::Status SetFloat(const std::string& name, float value) = 0;
+  virtual abslx::Status SetHalf(const std::string& name, half value) = 0;
   virtual ~ArgumentsBinder() = default;
 };
 
@@ -56,19 +56,19 @@ class Arguments : public ArgumentsBinder {
   void AddFloat(const std::string& name, float value = 0.0f);
   void AddHalf(const std::string& name, half value = half(0.0f));
   void AddInt(const std::string& name, int value = 0);
-  absl::Status SetInt(const std::string& name, int value) override;
-  absl::Status SetFloat(const std::string& name, float value) override;
-  absl::Status SetHalf(const std::string& name, half value) override;
+  abslx::Status SetInt(const std::string& name, int value) override;
+  abslx::Status SetFloat(const std::string& name, float value) override;
+  abslx::Status SetHalf(const std::string& name, half value) override;
   void AddObjectRef(const std::string& name, AccessType access_type,
                     GPUObjectDescriptorPtr&& descriptor_ptr);
   void AddObject(const std::string& name,
                  GPUObjectDescriptorPtr&& descriptor_ptr);
 
   void RenameArgs(const std::string& postfix, std::string* code) const;
-  absl::Status Merge(Arguments&& args, const std::string& postfix,
+  abslx::Status Merge(Arguments&& args, const std::string& postfix,
                      const std::vector<std::string>& exception_names = {});
 
-  absl::Status GetDescriptor(const std::string& name,
+  abslx::Status GetDescriptor(const std::string& name,
                              GPUObjectDescriptor** descriptor) const;
 
   int GetReadTexturesCount(const GpuInfo& gpu_info) const;
@@ -123,24 +123,24 @@ class Arguments : public ArgumentsBinder {
     *result = std::move(object_refs_);
   }
 
-  absl::Status Compile(const GpuInfo& gpu_info,
+  abslx::Status Compile(const GpuInfo& gpu_info,
                        const std::map<std::string, std::string>& linkables,
                        std::string* code);
 
-  absl::Status ResolveConstExprPass(const GpuInfo& gpu_info,
+  abslx::Status ResolveConstExprPass(const GpuInfo& gpu_info,
                                     std::string* code) const;
 
-  absl::Status ResolveConstExpr(const GpuInfo& gpu_info,
+  abslx::Status ResolveConstExpr(const GpuInfo& gpu_info,
                                 const std::string& object_name,
                                 const std::string& const_expr,
                                 std::string* result) const;
 
-  absl::Status ResolveSelectorsPass(
+  abslx::Status ResolveSelectorsPass(
       const GpuInfo& gpu_info,
       const std::map<std::string, std::string>& linkables,
       std::string* code) const;
 
-  absl::Status ResolveSelector(
+  abslx::Status ResolveSelector(
       const GpuInfo& gpu_info,
       const std::map<std::string, std::string>& linkables,
       const std::string& object_name, const std::string& selector,
@@ -150,16 +150,16 @@ class Arguments : public ArgumentsBinder {
   void ResolveObjectNames(const std::string& object_name,
                           const std::vector<std::string>& member_names,
                           std::string* code) const;
-  absl::Status AddObjectsScalarArgs(const GpuInfo& gpu_info);
+  abslx::Status AddObjectsScalarArgs(const GpuInfo& gpu_info);
   void ResolveArgsPass(std::string* code) const;
 
  private:
   friend flatbuffers::Offset<tflite::gpu::data::Arguments> Encode(
       const Arguments& args, flatbuffers::FlatBufferBuilder* builder);
-  friend absl::Status Decode(const tflite::gpu::data::Arguments* fb_args,
+  friend abslx::Status Decode(const tflite::gpu::data::Arguments* fb_args,
                              Arguments* args);
 
-  absl::Status ResolveKernelGlobalSpaceBuffers(const GpuInfo& gpu_info,
+  abslx::Status ResolveKernelGlobalSpaceBuffers(const GpuInfo& gpu_info,
                                                std::string* code);
 
   friend class cl::CLArguments;

@@ -36,7 +36,7 @@ namespace xla {
 class ElementalIrEmitter : public IrBuilderMixin<ElementalIrEmitter> {
  public:
   using HloToElementGeneratorMap =
-      absl::flat_hash_map<const HloInstruction*, llvm_ir::ElementGenerator>;
+      abslx::flat_hash_map<const HloInstruction*, llvm_ir::ElementGenerator>;
 
   ElementalIrEmitter(llvm::Module* module, llvm::IRBuilder<>* b)
       : b_(b), module_(module) {}
@@ -116,11 +116,11 @@ class ElementalIrEmitter : public IrBuilderMixin<ElementalIrEmitter> {
 
   virtual llvm::Value* EmitFloatMax(llvm::Value* lhs_value,
                                     llvm::Value* rhs_value,
-                                    absl::string_view name);
+                                    abslx::string_view name);
 
   virtual llvm::Value* EmitFloatMin(llvm::Value* lhs_value,
                                     llvm::Value* rhs_value,
-                                    absl::string_view name);
+                                    abslx::string_view name);
 
   llvm::Value* EmitIntegralMax(llvm::Value* lhs_value, llvm::Value* rhs_value,
                                bool is_signed);
@@ -130,7 +130,7 @@ class ElementalIrEmitter : public IrBuilderMixin<ElementalIrEmitter> {
 
   virtual StatusOr<llvm::Value*> EmitAtan2(PrimitiveType prim_type,
                                            llvm::Value* lhs, llvm::Value* rhs,
-                                           absl::string_view name);
+                                           abslx::string_view name);
 
   virtual StatusOr<llvm::Value*> EmitLog(PrimitiveType prim_type,
                                          llvm::Value* value);
@@ -155,14 +155,14 @@ class ElementalIrEmitter : public IrBuilderMixin<ElementalIrEmitter> {
 
   virtual StatusOr<llvm::Value*> EmitExp(PrimitiveType prim_type,
                                          llvm::Value* value,
-                                         absl::string_view name);
+                                         abslx::string_view name);
 
   virtual StatusOr<llvm::Value*> EmitExpm1(PrimitiveType prim_type,
                                            llvm::Value* value);
 
   virtual StatusOr<llvm::Value*> EmitPow(PrimitiveType prim_type,
                                          llvm::Value* lhs, llvm::Value* rhs,
-                                         absl::string_view name);
+                                         abslx::string_view name);
 
   virtual StatusOr<llvm::Value*> EmitTanh(PrimitiveType prim_type,
                                           llvm::Value* value);
@@ -214,7 +214,7 @@ class ElementalIrEmitter : public IrBuilderMixin<ElementalIrEmitter> {
                                                   llvm::Value* operand_value);
 
   StatusOr<llvm::Value*> EmitAccumResult(
-      absl::Span<llvm::Value* const> accumulator_addrs,
+      abslx::Span<llvm::Value* const> accumulator_addrs,
       llvm::ArrayRef<llvm::Type*> accumulator_types, bool is_variadic);
 
   // Composes a complex struct. imag may be nullptr for simple cast operations.
@@ -270,12 +270,12 @@ class ElementalIrEmitter : public IrBuilderMixin<ElementalIrEmitter> {
       const llvm_ir::IrArray::Index& dot_result_index);
 
   virtual StatusOr<std::vector<llvm::Value*>> EmitThreadLocalCall(
-      const HloComputation& callee, absl::Span<llvm::Value* const> parameters,
-      absl::string_view name, bool is_reducer) = 0;
+      const HloComputation& callee, abslx::Span<llvm::Value* const> parameters,
+      abslx::string_view name, bool is_reducer) = 0;
 
   StatusOr<llvm::Value*> EmitElementalMap(
       const HloMapInstruction* map_instr,
-      absl::Span<llvm::Value* const> elemental_operands);
+      abslx::Span<llvm::Value* const> elemental_operands);
 
   StatusOr<llvm::Value*> EmitElementalReduceWindow(
       const HloReduceWindowInstruction* reduce_window,
@@ -301,7 +301,7 @@ class ElementalIrEmitter : public IrBuilderMixin<ElementalIrEmitter> {
 
   // Evaluates a polynomial using Horner's method.
   StatusOr<llvm::Value*> EvaluatePolynomial(
-      llvm::Type* type, llvm::Value* x, absl::Span<const double> coefficients);
+      llvm::Type* type, llvm::Value* x, abslx::Span<const double> coefficients);
 
   virtual bool fast_min_max() = 0;
 

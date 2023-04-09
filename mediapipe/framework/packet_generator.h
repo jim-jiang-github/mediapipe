@@ -49,12 +49,12 @@ class PacketGenerator {
   // and
   // produce output side packets.
   //
-  // static absl::Status FillExpectations(
+  // static abslx::Status FillExpectations(
   //     const PacketGeneratorOptions& extendable_options,
   //     PacketTypeSet* input_side_packets,
   //     PacketTypeSet* output_side_packets);
   //
-  // static absl::Status Generate(
+  // static abslx::Status Generate(
   //     const PacketGeneratorOptions& extendable_options,
   //     const PacketSet& input_side_packets,
   //     PacketSet* output_side_packets);
@@ -69,11 +69,11 @@ namespace internal {
 class StaticAccessToGenerator {
  public:
   virtual ~StaticAccessToGenerator() {}
-  virtual absl::Status FillExpectations(
+  virtual abslx::Status FillExpectations(
       const PacketGeneratorOptions& extendable_options,  //
       PacketTypeSet* input_side_packets,                 //
       PacketTypeSet* output_side_packets) = 0;
-  virtual absl::Status Generate(
+  virtual abslx::Status Generate(
       const PacketGeneratorOptions& extendable_options,  //
       const PacketSet& input_side_packets,               //
       PacketSet* output_side_packets) = 0;
@@ -87,7 +87,7 @@ using StaticAccessToGeneratorRegistry =
 template <class T>
 constexpr bool PacketGeneratorHasFillExpectations(
     decltype(&T::FillExpectations) /*unused*/) {
-  typedef absl::Status (*FillExpectationsType)(
+  typedef abslx::Status (*FillExpectationsType)(
       const PacketGeneratorOptions& extendable_options,  //
       PacketTypeSet* input_side_packets,                 //
       PacketTypeSet* output_side_packets);
@@ -100,7 +100,7 @@ constexpr bool PacketGeneratorHasFillExpectations(...) {
 }
 template <class T>
 constexpr bool PacketGeneratorHasGenerate(decltype(&T::Generate) /*unused*/) {
-  typedef absl::Status (*GenerateType)(
+  typedef abslx::Status (*GenerateType)(
       const PacketGeneratorOptions& extendable_options,  //
       const PacketSet& input_side_packets,               //
       PacketSet* output_side_packets);
@@ -129,7 +129,7 @@ class StaticAccessToGeneratorTyped : public StaticAccessToGenerator {
                 "Generate() must be defined with the correct signature in "
                 "every PacketGenerator.");
 
-  absl::Status FillExpectations(
+  abslx::Status FillExpectations(
       const PacketGeneratorOptions& extendable_options,  //
       PacketTypeSet* input_side_packets,                 //
       PacketTypeSet* output_side_packets) final {
@@ -137,7 +137,7 @@ class StaticAccessToGeneratorTyped : public StaticAccessToGenerator {
         extendable_options, input_side_packets, output_side_packets);
   }
 
-  absl::Status Generate(const PacketGeneratorOptions& extendable_options,  //
+  abslx::Status Generate(const PacketGeneratorOptions& extendable_options,  //
                         const PacketSet& input_side_packets,               //
                         PacketSet* output_side_packets) final {
     return PacketGeneratorSubclass::Generate(
@@ -153,7 +153,7 @@ class StaticAccessToGeneratorTyped : public StaticAccessToGenerator {
   REGISTER_FACTORY_FUNCTION_QUALIFIED(                      \
       mediapipe::internal::StaticAccessToGeneratorRegistry, \
       generator_registration, name,                         \
-      absl::make_unique<                                    \
+      abslx::make_unique<                                    \
           mediapipe::internal::StaticAccessToGeneratorTyped<name>>)
 
 }  // namespace mediapipe

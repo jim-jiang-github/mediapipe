@@ -548,7 +548,7 @@ void GetGpuInfoFromDeviceDescription(const std::string& gpu_description,
                                      GpuApi gpu_api, GpuInfo* gpu_info) {
   gpu_info->gpu_api = gpu_api;
   std::string lowered = gpu_description;
-  absl::AsciiStrToLower(&lowered);
+  abslx::AsciiStrToLower(&lowered);
   gpu_info->vendor = GetGpuVendor(lowered);
   if (gpu_info->IsAdreno()) {
     gpu_info->adreno_info = AdrenoInfo(lowered);

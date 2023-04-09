@@ -144,14 +144,14 @@ class BoxDetectorInterface {
   int cnt_detect_called_ = 0;
   float image_scale_;
   float image_aspect_;
-  absl::flat_hash_map<int, int> box_id_to_idx_;
+  abslx::flat_hash_map<int, int> box_id_to_idx_;
   std::vector<int> box_idx_to_id_;
   std::vector<std::vector<TimedBoxProto>> frame_box_;
   std::vector<std::vector<int>> feature_to_frame_;
   std::vector<std::vector<Vector2_f>> feature_keypoints_;
   std::vector<cv::Mat> feature_descriptors_;
   std::vector<bool> has_been_out_of_fov_;
-  mutable absl::Mutex access_to_index_;
+  mutable abslx::Mutex access_to_index_;
   cv::Ptr<cv::ORB> orb_extractor_;
   BoxDetectorOptions options_;
 };

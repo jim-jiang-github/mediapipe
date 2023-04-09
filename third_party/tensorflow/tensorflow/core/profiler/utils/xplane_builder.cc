@@ -63,7 +63,7 @@ XEventMetadata* XPlaneBuilder::CreateEventMetadata() {
 }
 
 XEventMetadata* XPlaneBuilder::GetOrCreateEventMetadata(
-    absl::string_view name) {
+    abslx::string_view name) {
   XEventMetadata*& metadata = event_metadata_by_name_[name];
   if (metadata == nullptr) {
     metadata = CreateEventMetadata();
@@ -82,22 +82,22 @@ XEventMetadata* XPlaneBuilder::GetOrCreateEventMetadata(std::string&& name) {
 }
 
 std::vector<XEventMetadata*> XPlaneBuilder::GetOrCreateEventsMetadata(
-    const std::vector<absl::string_view>& names) {
+    const std::vector<abslx::string_view>& names) {
   std::vector<XEventMetadata*> metadata;
   metadata.reserve(names.size());
-  for (absl::string_view name : names) {
+  for (abslx::string_view name : names) {
     metadata.push_back(GetOrCreateEventMetadata(name));
   }
   return metadata;
 }
 
-XEventMetadata* XPlaneBuilder::GetEventMetadata(absl::string_view name) const {
+XEventMetadata* XPlaneBuilder::GetEventMetadata(abslx::string_view name) const {
   auto result = event_metadata_by_name_.find(name);
   if (result == event_metadata_by_name_.end()) return nullptr;
   return result->second;
 }
 
-XStatMetadata* XPlaneBuilder::GetStatMetadata(absl::string_view name) const {
+XStatMetadata* XPlaneBuilder::GetStatMetadata(abslx::string_view name) const {
   auto result = stat_metadata_by_name_.find(name);
   if (result == stat_metadata_by_name_.end()) return nullptr;
   return result->second;
@@ -119,7 +119,7 @@ XStatMetadata* XPlaneBuilder::CreateStatMetadata() {
   return GetOrCreateStatMetadata(++last_stat_metadata_id_);
 }
 
-XStatMetadata* XPlaneBuilder::GetOrCreateStatMetadata(absl::string_view name) {
+XStatMetadata* XPlaneBuilder::GetOrCreateStatMetadata(abslx::string_view name) {
   XStatMetadata*& metadata = stat_metadata_by_name_[name];
   if (metadata == nullptr) {
     metadata = CreateStatMetadata();

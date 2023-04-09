@@ -109,7 +109,7 @@ TEST_F(TensorFlowSessionFromFrozenGraphGeneratorTest,
   PacketSet input_side_packets(tool::CreateTagMap({}).value());
   PacketSet output_side_packets(
       tool::CreateTagMap({"SESSION:session"}).value());
-  absl::Status run_status = tool::RunGenerateAndValidateTypes(
+  abslx::Status run_status = tool::RunGenerateAndValidateTypes(
       "TensorFlowSessionFromFrozenGraphGenerator", extendable_options_,
       input_side_packets, &output_side_packets);
   MP_EXPECT_OK(run_status) << run_status.message();
@@ -122,7 +122,7 @@ TEST_F(TensorFlowSessionFromFrozenGraphGeneratorTest,
        ProducesPacketUsableByTensorFlowInferenceCalculator) {
   CalculatorGraphConfig config =
       mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(
-          absl::Substitute(R"(
+          abslx::Substitute(R"(
       node {
         calculator: "TensorFlowInferenceCalculator"
         input_side_packet: "SESSION:tf_model"
@@ -185,7 +185,7 @@ TEST_F(TensorFlowSessionFromFrozenGraphGeneratorTest,
   generator_options_->clear_graph_proto_path();
   input_side_packets.Tag(kStringModelTag) =
       Adopt(new std::string(serialized_graph_contents));
-  absl::Status run_status = tool::RunGenerateAndValidateTypes(
+  abslx::Status run_status = tool::RunGenerateAndValidateTypes(
       "TensorFlowSessionFromFrozenGraphGenerator", extendable_options_,
       input_side_packets, &output_side_packets);
   MP_EXPECT_OK(run_status) << run_status.message();
@@ -202,7 +202,7 @@ TEST_F(
   generator_options_->clear_graph_proto_path();
   input_side_packets.Tag(kStringModelFilePathTag) =
       Adopt(new std::string(GetGraphDefPath()));
-  absl::Status run_status = tool::RunGenerateAndValidateTypes(
+  abslx::Status run_status = tool::RunGenerateAndValidateTypes(
       "TensorFlowSessionFromFrozenGraphGenerator", extendable_options_,
       input_side_packets, &output_side_packets);
   MP_EXPECT_OK(run_status) << run_status.message();
@@ -217,10 +217,10 @@ TEST_F(TensorFlowSessionFromFrozenGraphGeneratorTest,
       tool::CreateTagMap({"SESSION:session"}).value());
   input_side_packets.Tag(kStringModelFilePathTag) =
       Adopt(new std::string(GetGraphDefPath()));
-  absl::Status run_status = tool::RunGenerateAndValidateTypes(
+  abslx::Status run_status = tool::RunGenerateAndValidateTypes(
       "TensorFlowSessionFromFrozenGraphGenerator", extendable_options_,
       input_side_packets, &output_side_packets);
-  EXPECT_EQ(run_status.code(), absl::StatusCode::kInternal);
+  EXPECT_EQ(run_status.code(), abslx::StatusCode::kInternal);
   EXPECT_THAT(
       run_status.message(),
       ::testing::HasSubstr("Must have exactly one of graph_proto_path"));
@@ -242,10 +242,10 @@ TEST_F(TensorFlowSessionFromFrozenGraphGeneratorTest,
   input_side_packets.Tag(kStringModelFilePathTag) =
       Adopt(new std::string(GetGraphDefPath()));
 
-  absl::Status run_status = tool::RunGenerateAndValidateTypes(
+  abslx::Status run_status = tool::RunGenerateAndValidateTypes(
       "TensorFlowSessionFromFrozenGraphGenerator", extendable_options_,
       input_side_packets, &output_side_packets);
-  EXPECT_EQ(run_status.code(), absl::StatusCode::kInternal);
+  EXPECT_EQ(run_status.code(), abslx::StatusCode::kInternal);
   EXPECT_THAT(
       run_status.message(),
       ::testing::HasSubstr("Must have exactly one of graph_proto_path"));
@@ -268,10 +268,10 @@ TEST_F(TensorFlowSessionFromFrozenGraphGeneratorTest,
       Adopt(new std::string(GetGraphDefPath()));
   generator_options_->clear_graph_proto_path();
 
-  absl::Status run_status = tool::RunGenerateAndValidateTypes(
+  abslx::Status run_status = tool::RunGenerateAndValidateTypes(
       "TensorFlowSessionFromFrozenGraphGenerator", extendable_options_,
       input_side_packets, &output_side_packets);
-  EXPECT_EQ(run_status.code(), absl::StatusCode::kInternal);
+  EXPECT_EQ(run_status.code(), abslx::StatusCode::kInternal);
   EXPECT_THAT(
       run_status.message(),
       ::testing::HasSubstr("Must have exactly one of graph_proto_path"));
@@ -283,7 +283,7 @@ TEST_F(TensorFlowSessionFromFrozenGraphGeneratorTest,
   PacketSet output_side_packets(
       tool::CreateTagMap({"SESSION:session"}).value());
   generator_options_->add_initialization_op_names("multiplied:0");
-  absl::Status run_status = tool::RunGenerateAndValidateTypes(
+  abslx::Status run_status = tool::RunGenerateAndValidateTypes(
       "TensorFlowSessionFromFrozenGraphGenerator", extendable_options_,
       input_side_packets, &output_side_packets);
   MP_EXPECT_OK(run_status);

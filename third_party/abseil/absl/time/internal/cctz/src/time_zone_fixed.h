@@ -20,7 +20,7 @@
 #include "absl/base/config.h"
 #include "absl/time/internal/cctz/include/cctz/time_zone.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
@@ -47,6 +47,6 @@ std::string FixedOffsetToAbbr(const seconds& offset);
 }  // namespace cctz
 }  // namespace time_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_FIXED_H_

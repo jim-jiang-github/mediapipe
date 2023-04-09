@@ -33,7 +33,7 @@ StatusOr<std::unique_ptr<BoundedExecutor>> BoundedExecutor::Create(
   if (options.num_threads <= 0) {
     return errors::InvalidArgument("options.num_threads must be positive");
   }
-  return absl::WrapUnique(new BoundedExecutor(options));
+  return abslx::WrapUnique(new BoundedExecutor(options));
 }
 
 BoundedExecutor::BoundedExecutor(const Options& options) : options_(options) {
@@ -42,7 +42,7 @@ BoundedExecutor::BoundedExecutor(const Options& options) : options_(options) {
 
 void BoundedExecutor::InitWorker() {
   for (int i = 0; i < options_.num_threads; i++) {
-    std::unique_ptr<Thread> thread = absl::WrapUnique(
+    std::unique_ptr<Thread> thread = abslx::WrapUnique(
         options_.env->StartThread(options_.thread_options, options_.thread_name,
                                   [this]() { this->Run(); }));
     threads_.push_back(std::move(thread));

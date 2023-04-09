@@ -112,7 +112,7 @@ class LLVMTargetMachineFeatures : public TargetMachineFeatures {
   // This is mutated from within `GetTargetTransformInfoFor` which is
   // semantically a getter (and thus `const`); and is therefore declared
   // mutable.  Making this mutable is okay because it has cache semantics.
-  mutable absl::flat_hash_map<const llvm::Function*, llvm::TargetTransformInfo>
+  mutable abslx::flat_hash_map<const llvm::Function*, llvm::TargetTransformInfo>
       target_transform_info_cache_;
   llvm::TargetMachine* target_machine_;
 };

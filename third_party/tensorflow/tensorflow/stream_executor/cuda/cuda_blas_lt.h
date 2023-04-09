@@ -208,7 +208,7 @@ class BlasLt {
 
   gpu::GpuExecutor* parent_;
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   Owned<cublasLtHandle_t> blas_lt_ ABSL_GUARDED_BY(mu_);
 };
 

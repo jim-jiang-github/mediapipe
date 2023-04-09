@@ -65,7 +65,7 @@ class SparseExpanderRegistry {
       std::string opName, std::unique_ptr<SparseExpanderBase> prop);
 
  private:
-  absl::flat_hash_map<std::string, std::unique_ptr<SparseExpanderBase>>
+  abslx::flat_hash_map<std::string, std::unique_ptr<SparseExpanderBase>>
       op_to_sparse_expansion_fn_map_;
 };
 

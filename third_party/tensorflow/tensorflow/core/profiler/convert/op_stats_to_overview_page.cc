@@ -52,7 +52,7 @@ namespace {
 constexpr double kLowPrecisionPercentThreshold = 10;
 
 struct TfFunctionInfo {
-  absl::string_view function_name;
+  abslx::string_view function_name;
   double expensive_call_percent;
 };
 
@@ -65,8 +65,8 @@ OverviewPageTip MakeOverviewPageTip(std::string text) {
 // Makes a recommendation for looking up a document.
 // doc_url is expected to be already be escaped suitably for use in an HTML
 // attribute.
-OverviewPageTip MakeOverviewPageTipDocLink(absl::string_view doc_url,
-                                           absl::string_view text) {
+OverviewPageTip MakeOverviewPageTipDocLink(abslx::string_view doc_url,
+                                           abslx::string_view text) {
   return MakeOverviewPageTip(AnchorElement(doc_url, text));
 }
 
@@ -84,19 +84,19 @@ void ComputeHostTips(OverviewPageRecommendation* re) {
 
 void ComputeDeviceTips(HardwareType hardware_type,
                        OverviewPageRecommendation* re) {
-  absl::string_view device_name = HardwareType_Name(hardware_type);
-  absl::string_view timeline_name = device_name;
-  absl::string_view op_stats_toolname = "tensorflow_stats";
+  abslx::string_view device_name = HardwareType_Name(hardware_type);
+  abslx::string_view timeline_name = device_name;
+  abslx::string_view op_stats_toolname = "tensorflow_stats";
   if (hardware_type == tensorflow::profiler::TPU) {
     timeline_name = "TPU core";
     op_stats_toolname = "op_profile";
   }
   *re->add_device_tips() = MakeOverviewPageTip(
-      absl::StrCat(op_stats_toolname,
+      abslx::StrCat(op_stats_toolname,
                    " (identify the time-consuming operations "
                    "executed on the ",
                    device_name, ")"));
-  *re->add_device_tips() = MakeOverviewPageTip(absl::StrCat(
+  *re->add_device_tips() = MakeOverviewPageTip(abslx::StrCat(
       "trace_viewer (look at the activities on the timeline of each ",
       timeline_name, " in the trace view)"));
 }
@@ -122,7 +122,7 @@ std::string GeneratePrecisionStatement(const PrecisionStats& precision_stats) {
     double percent_16bit =
         (100.0 * precision_stats.compute_16bit_ps()) / total_compute_ps;
     if (percent_16bit < kLowPrecisionPercentThreshold) {
-      return absl::StrCat(
+      return abslx::StrCat(
           "Only ", OneDigit(percent_16bit),
           "% of device computation is 16 bit. So you might want to replace "
           "more 32-bit Ops by 16-bit Ops to improve performance (if the "
@@ -135,11 +135,11 @@ std::string GeneratePrecisionStatement(const PrecisionStats& precision_stats) {
 }  // namespace
 
 void SetCommonRecommendation(
-    absl::string_view input_classification, absl::string_view input_statement,
-    absl::string_view output_statement, HardwareType hardware_type,
-    absl::string_view tf_function_statement_html,
-    absl::string_view eager_statement_html,
-    absl::string_view outside_compilation_statement_html,
+    abslx::string_view input_classification, abslx::string_view input_statement,
+    abslx::string_view output_statement, HardwareType hardware_type,
+    abslx::string_view tf_function_statement_html,
+    abslx::string_view eager_statement_html,
+    abslx::string_view outside_compilation_statement_html,
     OverviewPageRecommendation* re) {
   re->set_bottleneck(std::string(input_classification));
   re->set_statement(std::string(input_statement));
@@ -322,19 +322,19 @@ std::string TfFunctionRecommendationHtml(const TfFunctionDb& tf_function_db) {
     return a.expensive_call_percent > b.expensive_call_percent;
   };
   // Sorts candidates in descending order of expensive_call_percent.
-  absl::c_sort(candidates, cmp);
+  abslx::c_sort(candidates, cmp);
   std::string expensive_functions = "";
   auto num_functions_shown = std::min(
       static_cast<decltype(candidates)::size_type>(3), candidates.size());
 
   for (decltype(candidates)::size_type i = 0; i < num_functions_shown; i++) {
-    if (i > 0) absl::StrAppend(&expensive_functions, ", ");
-    absl::StrAppend(&expensive_functions, "\"", candidates[i].function_name,
+    if (i > 0) abslx::StrAppend(&expensive_functions, ", ");
+    abslx::StrAppend(&expensive_functions, "\"", candidates[i].function_name,
                     "\"");
   }
   if (candidates.size() > num_functions_shown)
-    absl::StrAppend(&expensive_functions, " and more");
-  return absl::StrCat("Expensive tf-functions detected (", expensive_functions,
+    abslx::StrAppend(&expensive_functions, " and more");
+  return abslx::StrCat("Expensive tf-functions detected (", expensive_functions,
                       ") due to either retracing or eager execution.");
 }
 
@@ -342,13 +342,13 @@ std::string EagerRecommendationHtml(double host_op_time_eager_percent,
                                     double device_op_time_eager_percent) {
   std::string recommendation = "";
   if (host_op_time_eager_percent > kEagerReportThresholdInPercent)
-    absl::StrAppend(&recommendation, OneDigit(host_op_time_eager_percent),
+    abslx::StrAppend(&recommendation, OneDigit(host_op_time_eager_percent),
                     "% of Op time on the host used eager execution. ");
   if (device_op_time_eager_percent > kEagerReportThresholdInPercent)
-    absl::StrAppend(&recommendation, OneDigit(device_op_time_eager_percent),
+    abslx::StrAppend(&recommendation, OneDigit(device_op_time_eager_percent),
                     "% of Op time on the device used eager execution. ");
   if (!recommendation.empty())
-    absl::StrAppend(&recommendation, "Performance could be improved with ",
+    abslx::StrAppend(&recommendation, "Performance could be improved with ",
                     AnchorElement("https://www.tensorflow.org/guide/function",
                                   "tf.function."));
   return recommendation;
@@ -359,7 +359,7 @@ std::string OutsideCompilationRecommendationHtml(
   if (device_op_time_outside_compilation_percent <=
       kOutsideCompilationThresholdInPercent)
     return "";
-  return absl::StrCat(
+  return abslx::StrCat(
       OneDigit(device_op_time_outside_compilation_percent),
       " % of Op time on the device are for outside compilation. Performance "
       "could be improved by avoiding outside compilation.");

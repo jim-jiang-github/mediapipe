@@ -207,7 +207,7 @@ OHWI ConverterToConvWeights::GetWeightsSize() const {
   return OHWI(output_channels, kernel_height, kernel_width, input_channels);
 }
 
-absl::Status ConverterToConvWeights::BindArguments(ArgumentsBinder* args) {
+abslx::Status ConverterToConvWeights::BindArguments(ArgumentsBinder* args) {
   const auto& weights_shape = GetWeightsSize();
   const int output_channels_x4_groups = DivideRoundUp(
       AlignByN(weights_shape.o, 4 * weights_desc_.GetOutputGroupSize()), 4);

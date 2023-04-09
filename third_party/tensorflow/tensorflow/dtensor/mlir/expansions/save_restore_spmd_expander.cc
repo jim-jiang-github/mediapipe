@@ -85,7 +85,7 @@ mlir::Value GetAllCandidateCheckpointPrefixes(mlir::OpBuilder& builder,
               prefix.getType().dyn_cast<mlir::RankedTensorType>(), prefix,
               StringConst(builder, prefix.getLoc(),
                           llvm::SmallVector<llvm::StringRef>(
-                              {absl::StrCat("_device_", 0)})))
+                              {abslx::StrCat("_device_", 0)})))
           .z();
 
   for (int64_t device_id = 1; device_id < mesh.num_devices(); ++device_id) {
@@ -96,7 +96,7 @@ mlir::Value GetAllCandidateCheckpointPrefixes(mlir::OpBuilder& builder,
                 prefix.getType().dyn_cast<mlir::RankedTensorType>(), prefix,
                 StringConst(builder, prefix.getLoc(),
                             llvm::SmallVector<llvm::StringRef>(
-                                {absl::StrCat("_device_", device_id)})))
+                                {abslx::StrCat("_device_", device_id)})))
             .z();
 
     new_prefix = builder
@@ -177,8 +177,8 @@ mlir::Value DeviceIdToLocalBranchIndex(
 // in MergeV2.
 StatusOr<mlir::TF::CaseOp> ConditionalSave(
     mlir::TF::SaveV2Op original_save, const Mesh& mesh,
-    const absl::flat_hash_map<
-        int64_t, absl::flat_hash_map<int64_t, std::vector<std::string>>>&
+    const abslx::flat_hash_map<
+        int64_t, abslx::flat_hash_map<int64_t, std::vector<std::string>>>&
         saving_specs) {
   mlir::ModuleOp module = original_save->getParentOfType<mlir::ModuleOp>();
   if (!module)
@@ -206,7 +206,7 @@ StatusOr<mlir::TF::CaseOp> ConditionalSave(
     for (const std::string& shape_and_slice : original_shape_and_slices) {
       if (!shape_and_slice.empty())
         return errors::InvalidArgument(
-            absl::StrCat("DTensor SaveV2 requires shape_and_slices() field to "
+            abslx::StrCat("DTensor SaveV2 requires shape_and_slices() field to "
                          "be empty for tensors, but get : ",
                          shape_and_slice));
     }
@@ -249,7 +249,7 @@ StatusOr<mlir::TF::CaseOp> ConditionalSave(
 
       branch_funs.push_back(no_op);
     } else {
-      const absl::flat_hash_map<int64_t, std::vector<std::string>>&
+      const abslx::flat_hash_map<int64_t, std::vector<std::string>>&
           per_device_specs = it->second;
 
       // Build the new SaveV2 that contains proper SliceSpec on this device.
@@ -392,7 +392,7 @@ StatusOr<mlir::Operation*> ExpandSaveV2Op(mlir::Operation* op) {
 
   mlir::OpBuilder builder(save_v2);
 
-  absl::flat_hash_map<int64_t, std::pair<std::vector<int64_t>, Layout>>
+  abslx::flat_hash_map<int64_t, std::pair<std::vector<int64_t>, Layout>>
       tensor_shape_layout_map;
   std::vector<SavingTensorMetadata> metadata;
   for (const auto& it : llvm::enumerate(save_v2.tensors())) {
@@ -401,7 +401,7 @@ StatusOr<mlir::Operation*> ExpandSaveV2Op(mlir::Operation* op) {
     // inputs. This is generic regardless whether the inputs are constants or
     // just arguments.
     int index = it.index();
-    TF_ASSIGN_OR_RETURN(absl::optional<Layout> layout,
+    TF_ASSIGN_OR_RETURN(abslx::optional<Layout> layout,
                         ExtractLayoutFromOperand(tensor));
     if (!layout)
       return errors::InvalidArgument(
@@ -591,8 +591,8 @@ StatusOr<mlir::Operation*> ExpandRestoreV2OpHelper(
 
       // Concat shape and slice specs
       new_shapes_and_slices[it.index()] =
-          llvm::formatv("{0} {1}", absl::StrJoin(global_shape, " "),
-                        absl::StrJoin(slice_specs, ":"))
+          llvm::formatv("{0} {1}", abslx::StrJoin(global_shape, " "),
+                        abslx::StrJoin(slice_specs, ":"))
               .str();
     }
 

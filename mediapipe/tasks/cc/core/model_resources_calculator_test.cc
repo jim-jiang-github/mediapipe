@@ -58,14 +58,14 @@ CalculatorGraphConfig GenerateGraphConfig(
   std::string model_resources_tag_field = "";
   if (!model_resources_tag.empty()) {
     model_resources_tag_field =
-        absl::Substitute("model_resources_tag: \"$0\"", model_resources_tag);
+        abslx::Substitute("model_resources_tag: \"$0\"", model_resources_tag);
   }
   std::string model_file_field = "";
   if (!model_file_name.empty()) {
     model_file_field =
-        absl::Substitute("model_file {file_name: \"$0\"}", model_file_name);
+        abslx::Substitute("model_file {file_name: \"$0\"}", model_file_name);
   }
-  return ParseTextProtoOrDie<CalculatorGraphConfig>(absl::Substitute(
+  return ParseTextProtoOrDie<CalculatorGraphConfig>(abslx::Substitute(
       R"(
     output_side_packet: "model"
     output_side_packet: "op_resolver"

@@ -31,14 +31,14 @@ namespace {
 using tensorflow::TF_StatusPtr;
 
 Status ReluModel(AbstractContext* ctx,
-                 absl::Span<AbstractTensorHandle* const> inputs,
-                 absl::Span<AbstractTensorHandle*> outputs) {
+                 abslx::Span<AbstractTensorHandle* const> inputs,
+                 abslx::Span<AbstractTensorHandle*> outputs) {
   return ops::Relu(ctx, inputs[0], &outputs[0], "Relu");
 }
 
 Status SparseSoftmaxCrossEntropyWithLogitsModel(
-    AbstractContext* ctx, absl::Span<AbstractTensorHandle* const> inputs,
-    absl::Span<AbstractTensorHandle*> outputs) {
+    AbstractContext* ctx, abslx::Span<AbstractTensorHandle* const> inputs,
+    abslx::Span<AbstractTensorHandle*> outputs) {
   AbstractTensorHandle* loss;
   AbstractTensorHandle* backprop;
   TF_RETURN_IF_ERROR(ops::SparseSoftmaxCrossEntropyWithLogits(
@@ -54,8 +54,8 @@ Status SparseSoftmaxCrossEntropyWithLogitsModel(
 }
 
 Status BiasAddModel(AbstractContext* ctx,
-                    absl::Span<AbstractTensorHandle* const> inputs,
-                    absl::Span<AbstractTensorHandle*> outputs) {
+                    abslx::Span<AbstractTensorHandle* const> inputs,
+                    abslx::Span<AbstractTensorHandle*> outputs) {
   return ops::BiasAdd(ctx, inputs[0], inputs[1], &outputs[0], "NHWC",
                       "BiasAdd");
 }
@@ -126,7 +126,7 @@ TEST_P(CppGradients, TestReluGrad) {
 
   std::vector<AbstractTensorHandle*> outputs(1);
   status_ = RunModel(ReluGradModel, immediate_execution_ctx_.get(), {Y.get()},
-                     absl::MakeSpan(outputs), UseFunction());
+                     abslx::MakeSpan(outputs), UseFunction());
   ASSERT_EQ(errors::OK, status_.code()) << status_.error_message();
   ASSERT_NO_FATAL_FAILURE(CheckTensorValue(outputs[0], {0.0f}, /*dims*/ {},
                                            /*abs_error*/ 0));

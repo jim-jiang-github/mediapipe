@@ -65,7 +65,7 @@ protocol: "grpc"
   TF_Buffer* null_result =
       TFE_GetServerDef(malformed_text_proto.c_str(), status);
   EXPECT_NE(TF_GetCode(status), TF_OK);
-  EXPECT_TRUE(absl::StrContains(TF_Message(status),
+  EXPECT_TRUE(abslx::StrContains(TF_Message(status),
                                 "Invalid text proto for ServerDef"));
   EXPECT_EQ(null_result, nullptr);
 
@@ -102,9 +102,9 @@ class ShapeInferenceTest : public ::testing::Test {
   // Checks the expected result of shape inference for the given `op`.
   void CheckOutputShapes(
       TFE_Op* op,
-      const std::vector<absl::optional<std::vector<int64_t>>>& input_shapes_vec,
+      const std::vector<abslx::optional<std::vector<int64_t>>>& input_shapes_vec,
       const std::vector<TF_Tensor*>& input_tensors,
-      const absl::optional<std::vector<int64_t>>& expected_shape) {
+      const abslx::optional<std::vector<int64_t>>& expected_shape) {
     // Create input_shapes.
     TF_ShapeAndTypeList* input_shapes =
         TF_NewShapeAndTypeList(input_shapes_vec.size());
@@ -145,13 +145,13 @@ class ShapeInferenceTest : public ::testing::Test {
     TF_DeleteShapeAndTypeList(output_shapes);
   }
 
-  absl::optional<std::vector<int64_t>> make_shape(
+  abslx::optional<std::vector<int64_t>> make_shape(
       std::vector<int64_t>&& dims) const {
-    return absl::make_optional(dims);
+    return abslx::make_optional(dims);
   }
 
-  absl::optional<std::vector<int64_t>> unknown_shape() const {
-    return absl::nullopt;
+  abslx::optional<std::vector<int64_t>> unknown_shape() const {
+    return abslx::nullopt;
   }
 
   static constexpr int64_t kUnknownDim =

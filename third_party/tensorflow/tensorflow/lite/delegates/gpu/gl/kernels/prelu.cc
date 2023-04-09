@@ -38,15 +38,15 @@ namespace {
 
 class PReLULinearAlpha : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     const auto& attr = std::any_cast<const PReLUAttributes&>(ctx.op_attr);
     auto alpha = std::get_if<Tensor<Linear, DataType::FLOAT32>>(&attr.alpha);
     if (!alpha) {
-      return absl::InvalidArgumentError("Alpha is missing");
+      return abslx::InvalidArgumentError("Alpha is missing");
     }
     if (alpha->shape.v != ctx.output_shapes[0][3]) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Alpha shape does not match the number of channels.");
     }
 
@@ -67,23 +67,23 @@ class PReLULinearAlpha : public NodeShader {
         /*input=*/IOStructure::AUTO,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class PReLUFull : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     const auto& attr = std::any_cast<const PReLUAttributes&>(ctx.op_attr);
     auto alpha = std::get_if<Tensor<HWC, DataType::FLOAT32>>(&attr.alpha);
     if (!alpha) {
-      return absl::InvalidArgumentError("Alpha is missing");
+      return abslx::InvalidArgumentError("Alpha is missing");
     }
     if (alpha->shape.h != ctx.output_shapes[0][1] ||
         alpha->shape.w != ctx.output_shapes[0][2] ||
         alpha->shape.c != ctx.output_shapes[0][3]) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Alpha shape does not match input shape.");
     }
 
@@ -110,13 +110,13 @@ class PReLUFull : public NodeShader {
         /*input=*/IOStructure::AUTO,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class PReLU : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     const auto& attr = std::any_cast<const PReLUAttributes&>(ctx.op_attr);
     auto* alpha = std::get_if<Tensor<HWC, DataType::FLOAT32>>(&attr.alpha);

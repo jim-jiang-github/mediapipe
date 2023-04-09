@@ -79,7 +79,7 @@ class EarlyCloseInputStreamHandler : public InputStreamHandler {
       Packet current_packet = stream->PopPacketAtTimestamp(
           input_timestamp, &num_packets_dropped, &stream_is_done);
       CHECK_EQ(num_packets_dropped, 0)
-          << absl::Substitute("Dropped $0 packet(s) on input stream \"$1\".",
+          << abslx::Substitute("Dropped $0 packet(s) on input stream \"$1\".",
                               num_packets_dropped, stream->Name());
       AddPacketToShard(&input_set->Get(id), std::move(current_packet),
                        stream_is_done);

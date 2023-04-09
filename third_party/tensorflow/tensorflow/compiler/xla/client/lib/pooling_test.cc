@@ -23,7 +23,7 @@ namespace xla {
 namespace {
 
 TensorFormat MakeNCHWFormat(int num_spatial_dims) {
-  absl::InlinedVector<int64_t, 4> spatial_dimensions;
+  abslx::InlinedVector<int64_t, 4> spatial_dimensions;
   for (int i = 0; i < num_spatial_dims; ++i) {
     spatial_dimensions.push_back(i + 2);
   }
@@ -32,8 +32,8 @@ TensorFormat MakeNCHWFormat(int num_spatial_dims) {
 }
 
 std::vector<std::pair<int64_t, int64_t>> MakeGeneralPadding(
-    XlaOp input, absl::Span<const int64_t> kernel_size,
-    absl::Span<const int64_t> stride, Padding padding,
+    XlaOp input, abslx::Span<const int64_t> kernel_size,
+    abslx::Span<const int64_t> stride, Padding padding,
     const xla::TensorFormat& data_format) {
   XlaBuilder* b = input.builder();
   Shape operand_shape = b->GetShape(input).ValueOrDie();
@@ -46,7 +46,7 @@ std::vector<std::pair<int64_t, int64_t>> MakeGeneralPadding(
 // Add singleton batch and feature dimensions to spatial dimensions, according
 // to 'data_format' specification.
 std::vector<int64_t> ExpandWithBatchAndFeatureDimensions(
-    absl::Span<const int64_t> spatial_dim_sizes,
+    abslx::Span<const int64_t> spatial_dim_sizes,
     const xla::TensorFormat& data_format) {
   const int num_spatial_dims = spatial_dim_sizes.size();
   std::vector<int64_t> tensor_sizes(num_spatial_dims + 2, 1);

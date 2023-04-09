@@ -68,7 +68,7 @@ Safe_PyObjectPtr GetAttr_DType(PyObject* tensor) {
 // is called, then add its message as a suffix to the message string.
 template <typename... Args>
 void RaiseTypeError(Args... args) {
-  string message = absl::StrCat(args...);
+  string message = abslx::StrCat(args...);
   if (!PyErr_Occurred()) {
     PyErr_SetString(PyExc_TypeError, message.c_str());
   } else {
@@ -128,7 +128,7 @@ bool IsOkDType(DataType dtype, const std::vector<DataType>* ok_dtypes) {
               ok_dtypes->end());
 }
 
-// Formatter for DataTypes for absl::StrJoin.
+// Formatter for DataTypes for abslx::StrJoin.
 struct DataTypeFormatter {
   void operator()(std::string* out, DataType dtype) const {
     out->append(DataType_Name(dtype));
@@ -172,7 +172,7 @@ bool ConvertToTensorInPlace(PyObject*& src, DataType& dtype,
     if (default_dtype == DT_INVALID) {
       RaiseTypeError(api_info.api_name(), " argument ",
                      api_info.param_names()[param_index], ": Expected one of {",
-                     absl::StrJoin(*ok_dtypes, ", ", DataTypeFormatter()),
+                     abslx::StrJoin(*ok_dtypes, ", ", DataTypeFormatter()),
                      "}, but got ", DataType_Name(dtype));
       return false;
     } else {
@@ -196,7 +196,7 @@ bool ConvertToTensorInPlace(PyObject*& src, DataType& dtype,
 // returns false on failure.
 ABSL_MUST_USE_RESULT
 bool ConvertAttribute(const Attribute& attr, const PythonAPIInfo& api_info,
-                      absl::Span<PyObject*> params) {
+                      abslx::Span<PyObject*> params) {
   if (attr.index == -1) return true;  // Inferred attribute.
   PyObject* src = params[attr.index];
   Safe_PyObjectPtr converted = ConvertPyObjectToAttributeType(src, attr.type);
@@ -219,7 +219,7 @@ ABSL_MUST_USE_RESULT
 bool ConvertInputWithFixedDType(const InputWithFixedDType& input,
                                 const PythonTensorConverter& tensor_converter,
                                 const PythonAPIInfo& api_info,
-                                absl::Span<PyObject*> params) {
+                                abslx::Span<PyObject*> params) {
   DataType dtype = input.dtype;
   PyObject*& src = params[input.index];
   if (!input.is_list) {
@@ -246,7 +246,7 @@ ABSL_MUST_USE_RESULT
 bool ConvertInputsWithTypeAttr(const InputsWithTypeAttr& input,
                                const PythonTensorConverter& tensor_converter,
                                const PythonAPIInfo& api_info,
-                               absl::Span<PyObject*> params,
+                               abslx::Span<PyObject*> params,
                                InferredAttributes* inferred_attrs) {
   DataType dtype = DT_INVALID;
   if (input.type_attr->index != -1) {
@@ -321,7 +321,7 @@ ABSL_MUST_USE_RESULT
 bool ConvertInputsWithTypeListAttr(
     const InputsWithTypeListAttr& input,
     const PythonTensorConverter& tensor_converter,
-    const PythonAPIInfo& api_info, absl::Span<PyObject*> params,
+    const PythonAPIInfo& api_info, abslx::Span<PyObject*> params,
     InferredAttributes* inferred_attrs) {
   DCHECK(!input.tensor_list_params.empty());
 
@@ -398,7 +398,7 @@ bool ConvertInputsWithTypeListAttr(
 // different lengths. Returns true on success, or sets an exception and returns
 // false on failure.
 ABSL_MUST_USE_RESULT
-bool InferLengthAttributes(const absl::Span<PyObject*> params,
+bool InferLengthAttributes(const abslx::Span<PyObject*> params,
                            const PythonAPIInfo& api_info,
                            std::vector<int64_t>& inferred_length_attrs) {
   for (int i = 0; i < api_info.inputs_with_number_attrs().size(); ++i) {
@@ -434,7 +434,7 @@ bool InferLengthAttributes(const absl::Span<PyObject*> params,
 
 bool ConvertPythonAPIParameters(const PythonAPIInfo& api_info,
                                 const PythonTensorConverter& tensor_converter,
-                                absl::Span<PyObject*> params,
+                                abslx::Span<PyObject*> params,
                                 InferredAttributes* inferred_attrs) {
   // Make room for inferred attributes.
   if (inferred_attrs) {
@@ -474,7 +474,7 @@ bool ConvertPythonAPIParameters(const PythonAPIInfo& api_info,
 }
 
 bool CopyPythonAPITensorLists(const PythonAPIInfo& api_info,
-                              absl::Span<PyObject*> params) {
+                              abslx::Span<PyObject*> params) {
   for (const auto& input : api_info.inputs()) {
     if (input.is_list) {
       PyObject* src = params[input.index];

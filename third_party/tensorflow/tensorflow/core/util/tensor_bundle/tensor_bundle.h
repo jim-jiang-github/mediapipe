@@ -218,7 +218,7 @@ class BundleReader {
   // REQUIRES: status().ok()
   template <class T>
   Status SortForSequentialAccess(std::vector<T>& container,
-                                 absl::FunctionRef<string(const T&)> get_key);
+                                 abslx::FunctionRef<string(const T&)> get_key);
 
   // Looks up the dtype and the shape of the tensor keyed by "key".
   // REQUIRES: status().ok()
@@ -374,18 +374,18 @@ class FileOutputBuffer {
 
 template <class T>
 Status BundleReader::SortForSequentialAccess(
-    std::vector<T>& container, absl::FunctionRef<string(const T&)> get_key) {
+    std::vector<T>& container, abslx::FunctionRef<string(const T&)> get_key) {
   struct FileOffset {
     int32_t shard_id;
     int64_t offset;
   };
-  absl::flat_hash_map<string, FileOffset> file_offsets;
+  abslx::flat_hash_map<string, FileOffset> file_offsets;
   for (const T& element : container) {
     BundleEntryProto entry;
     TF_RETURN_IF_ERROR(GetBundleEntryProto(get_key(element), &entry));
     file_offsets[get_key(element)] = {entry.shard_id(), entry.offset()};
   }
-  absl::c_sort(container, [&get_key, &file_offsets](const T& a, const T& b) {
+  abslx::c_sort(container, [&get_key, &file_offsets](const T& a, const T& b) {
     const FileOffset& file_offset_a = file_offsets[get_key(a)];
     const FileOffset& file_offset_b = file_offsets[get_key(b)];
     if (file_offset_a.shard_id == file_offset_b.shard_id) {

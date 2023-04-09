@@ -51,7 +51,7 @@ constexpr char kMobileNetWithNoMetadata[] =
 // Text file not in FlatBuffer format.
 constexpr char kRandomTextFile[] = "external_file";
 
-absl::StatusOr<std::unique_ptr<ModelMetadataExtractor>> CreateMetadataExtractor(
+abslx::StatusOr<std::unique_ptr<ModelMetadataExtractor>> CreateMetadataExtractor(
     std::string model_name, std::string* file_contents) {
   MP_RETURN_IF_ERROR(file::GetContents(
       file::JoinPath("./", kTestDataDirectory, model_name), file_contents));
@@ -61,23 +61,23 @@ absl::StatusOr<std::unique_ptr<ModelMetadataExtractor>> CreateMetadataExtractor(
 
 TEST(ModelMetadataExtractorTest, CreateFailsWithInvalidFlatBuffer) {
   std::string buffer;
-  absl::StatusOr<std::unique_ptr<ModelMetadataExtractor>> extractor =
+  abslx::StatusOr<std::unique_ptr<ModelMetadataExtractor>> extractor =
       CreateMetadataExtractor(kRandomTextFile, &buffer);
 
-  EXPECT_THAT(extractor.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_THAT(extractor.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(extractor.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kInvalidFlatBufferError))));
 }
 
 TEST(ModelMetadataExtractorTest, CreateFailsWithUnsupportedMetadataVersion) {
   std::string buffer;
-  absl::StatusOr<std::unique_ptr<ModelMetadataExtractor>> extractor =
+  abslx::StatusOr<std::unique_ptr<ModelMetadataExtractor>> extractor =
       CreateMetadataExtractor(kMobileIcaWithUnsupportedMetadataVersion,
                               &buffer);
-  EXPECT_THAT(extractor.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_THAT(extractor.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(extractor.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kMetadataInvalidSchemaVersionError))));
 }
 
@@ -134,12 +134,12 @@ TEST(ModelMetadataExtractorTest, GetAssociatedFileFailsWithNoSuchFile) {
   MP_ASSERT_OK_AND_ASSIGN(
       std::unique_ptr<ModelMetadataExtractor> extractor,
       CreateMetadataExtractor(kMobileIcaWithTfLiteMetadata, &buffer));
-  absl::StatusOr<absl::string_view> file_contents =
+  abslx::StatusOr<abslx::string_view> file_contents =
       extractor->GetAssociatedFile("foo");
-  EXPECT_THAT(file_contents.status().code(), absl::StatusCode::kNotFound);
+  EXPECT_THAT(file_contents.status().code(), abslx::StatusCode::kNotFound);
   EXPECT_THAT(
       file_contents.status().GetPayload(kMediaPipeTasksPayload),
-      Optional(absl::Cord(absl::StrCat(
+      Optional(abslx::Cord(abslx::StrCat(
           MediaPipeTasksStatus::kMetadataAssociatedFileNotFoundError))));
 }
 
@@ -151,7 +151,7 @@ TEST(ModelMetadataExtractorTest, FindFirstProcessUnitSucceeds) {
   const flatbuffers::Vector<flatbuffers::Offset<tflite::TensorMetadata>>*
       output_tensor_metadata = extractor->GetOutputTensorMetadata();
   ASSERT_EQ(output_tensor_metadata->size(), 1);
-  absl::StatusOr<const tflite::ProcessUnit*> process_unit =
+  abslx::StatusOr<const tflite::ProcessUnit*> process_unit =
       ModelMetadataExtractor::FindFirstProcessUnit(
           *output_tensor_metadata->Get(0),
           tflite::ProcessUnitOptions_ScoreCalibrationOptions);
@@ -167,7 +167,7 @@ TEST(ModelMetadataExtractorTest, FindFirstProcessUnitNonExistentReturnsNull) {
   const flatbuffers::Vector<flatbuffers::Offset<tflite::TensorMetadata>>*
       output_tensor_metadata = extractor->GetOutputTensorMetadata();
   ASSERT_EQ(output_tensor_metadata->size(), 1);
-  absl::StatusOr<const tflite::ProcessUnit*> process_unit =
+  abslx::StatusOr<const tflite::ProcessUnit*> process_unit =
       ModelMetadataExtractor::FindFirstProcessUnit(
           *output_tensor_metadata->Get(0),
           tflite::ProcessUnitOptions_NormalizationOptions);

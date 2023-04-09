@@ -28,10 +28,10 @@ namespace sharding_op_util {
 
 // Encodes the attributes string for Sharding and auto/manual covnersion custom
 // ops. This will be used in the opaque field.
-std::string EncodeAttributes(absl::Span<const int64_t> unspecified_dims);
+std::string EncodeAttributes(abslx::Span<const int64_t> unspecified_dims);
 
 // Parses the opaque string of Sharding and auto/manual covnersion custom ops.
-Status ParseAttributes(absl::string_view opaque,
+Status ParseAttributes(abslx::string_view opaque,
                        std::vector<int64_t>* unspecified_dims);
 
 }  // namespace sharding_op_util

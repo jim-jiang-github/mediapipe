@@ -24,7 +24,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status TestExecutionEnvironment::ExecuteGPUOperation(
+abslx::Status TestExecutionEnvironment::ExecuteGPUOperation(
     const std::vector<TensorDescriptor*>& src_cpu,
     const std::vector<TensorDescriptor*>& dst_cpu,
     std::unique_ptr<GPUOperation>&& operation) {
@@ -32,7 +32,7 @@ absl::Status TestExecutionEnvironment::ExecuteGPUOperation(
   for (int i = 0; i < src_cpu.size(); ++i) {
     auto src_shape = src_cpu[i]->GetBHWDCShape();
     if (src_shape.b != 1 && !op_def.IsBatchSupported()) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Layout doesn't have Batch dimension, but shape.b != 1");
     }
   }
@@ -40,7 +40,7 @@ absl::Status TestExecutionEnvironment::ExecuteGPUOperation(
   for (int i = 0; i < dst_cpu.size(); ++i) {
     auto dst_shape = dst_cpu[i]->GetBHWDCShape();
     if (dst_shape.b != 1 && !op_def.IsBatchSupported()) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Layout doesn't have Batch dimension, but shape.b != 1");
     }
   }
@@ -48,7 +48,7 @@ absl::Status TestExecutionEnvironment::ExecuteGPUOperation(
   return ExecuteGpuOperationInternal(src_cpu, dst_cpu, std::move(operation));
 }
 
-absl::Status TestExecutionEnvironment::ExecuteGPUOperation(
+abslx::Status TestExecutionEnvironment::ExecuteGPUOperation(
     const std::vector<TensorFloat32>& src_cpu,
     std::unique_ptr<GPUOperation>&& operation,
     const std::vector<BHWC>& dst_sizes,
@@ -75,10 +75,10 @@ absl::Status TestExecutionEnvironment::ExecuteGPUOperation(
   for (int i = 0; i < dst_cpu.size(); ++i) {
     dst_cpu_descs[i].DownloadData(dst_cpu[i]);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TestExecutionEnvironment::ExecuteGPUOperation(
+abslx::Status TestExecutionEnvironment::ExecuteGPUOperation(
     const std::vector<Tensor5DFloat32>& src_cpu,
     std::unique_ptr<GPUOperation>&& operation,
     const std::vector<BHWDC>& dst_sizes,
@@ -105,28 +105,28 @@ absl::Status TestExecutionEnvironment::ExecuteGPUOperation(
   for (int i = 0; i < dst_cpu.size(); ++i) {
     dst_cpu_descs[i].DownloadData(dst_cpu[i]);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PointWiseNear(const std::vector<float>& ref,
+abslx::Status PointWiseNear(const std::vector<float>& ref,
                            const std::vector<float>& to_compare, float eps) {
   if (ref.size() != to_compare.size()) {
-    return absl::InternalError(absl::StrCat("ref size(", ref.size(),
+    return abslx::InternalError(abslx::StrCat("ref size(", ref.size(),
                                             ") != to_compare size(",
                                             to_compare.size(), ")"));
   }
   for (int i = 0; i < ref.size(); ++i) {
     const float abs_diff = fabs(ref[i] - to_compare[i]);
     if (abs_diff > eps) {
-      return absl::InternalError(absl::StrCat(
+      return abslx::InternalError(abslx::StrCat(
           "ref[", i, "] = ", ref[i], ", to_compare[", i, "] = ", to_compare[i],
           ", abs diff = ", abs_diff, " > ", eps, " (eps)"));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TestExecutionEnvironment::ExecuteGpuModel(
+abslx::Status TestExecutionEnvironment::ExecuteGpuModel(
     const std::vector<TensorFloat32>& src_cpu,
     const std::vector<TensorFloat32*>& dst_cpu, GpuModel* gpu_model) {
   std::vector<TensorFloat32> inputs = src_cpu;
@@ -157,12 +157,12 @@ absl::Status TestExecutionEnvironment::ExecuteGpuModel(
     }
   }
   if (dst_cpu.size() != inputs.size()) {
-    return absl::InternalError("Size mismatch.");
+    return abslx::InternalError("Size mismatch.");
   }
   for (int i = 0; i < dst_cpu.size(); ++i) {
     *dst_cpu[i] = inputs[i];
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

@@ -63,14 +63,14 @@ class WhileLoopConcatCodeMotion : public HloModulePass {
       : min_operand_count_to_optimize_(min_operand_count_to_optimize) {}
   ~WhileLoopConcatCodeMotion() override = default;
 
-  absl::string_view name() const override {
-    static constexpr absl::string_view kName = "while-loop-concat-code-motion";
+  abslx::string_view name() const override {
+    static constexpr abslx::string_view kName = "while-loop-concat-code-motion";
     return kName;
   }
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   const int64_t min_operand_count_to_optimize_;

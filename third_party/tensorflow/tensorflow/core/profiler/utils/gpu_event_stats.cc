@@ -23,7 +23,7 @@ namespace tensorflow {
 namespace profiler {
 namespace {
 
-const absl::string_view kAnnotationDelimiter = "::";
+const abslx::string_view kAnnotationDelimiter = "::";
 
 }
 
@@ -42,7 +42,7 @@ GpuEventStats::GpuEventStats(const XEventVisitor* event) {
         break;
       case StatType::kHloOp:
         hlo_op_names =
-            absl::StrSplit(stat.StrOrRefValue(), kAnnotationDelimiter);
+            abslx::StrSplit(stat.StrOrRefValue(), kAnnotationDelimiter);
         break;
       case StatType::kHloModule:
         hlo_module_name = stat.StrOrRefValue();

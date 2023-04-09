@@ -44,7 +44,7 @@ class CompositeTensorVariantFromComponents : public OpKernel {
 
     std::vector<Tensor> components{components_in.begin(), components_in.end()};
     encoded->flat<Variant>()(0) =
-        CompositeTensorVariant(metadata_, absl::MakeSpan(components));
+        CompositeTensorVariant(metadata_, abslx::MakeSpan(components));
   }
 
  private:

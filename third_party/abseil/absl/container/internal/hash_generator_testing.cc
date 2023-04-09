@@ -16,7 +16,7 @@
 
 #include <deque>
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace hash_internal {
@@ -58,7 +58,7 @@ std::string Generator<std::string>::operator()() const {
   return res;
 }
 
-absl::string_view Generator<absl::string_view>::operator()() const {
+abslx::string_view Generator<abslx::string_view>::operator()() const {
   static auto* arena = new std::deque<std::string>();
   // NOLINTNEXTLINE(runtime/int)
   std::uniform_int_distribution<short> chars(0x20, 0x7E);
@@ -73,4 +73,4 @@ absl::string_view Generator<absl::string_view>::operator()() const {
 }  // namespace hash_internal
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

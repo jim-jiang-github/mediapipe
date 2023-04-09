@@ -25,33 +25,33 @@
 #include "absl/base/macros.h"
 #include "absl/time/time.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // Now()
 //
-// Returns the current time, expressed as an `absl::Time` absolute time value.
-absl::Time Now();
+// Returns the current time, expressed as an `abslx::Time` absolute time value.
+abslx::Time Now();
 
 // GetCurrentTimeNanos()
 //
 // Returns the current time, expressed as a count of nanoseconds since the Unix
-// Epoch (https://en.wikipedia.org/wiki/Unix_time). Prefer `absl::Now()` instead
+// Epoch (https://en.wikipedia.org/wiki/Unix_time). Prefer `abslx::Now()` instead
 // for all but the most performance-sensitive cases (i.e. when you are calling
 // this function hundreds of thousands of times per second).
 int64_t GetCurrentTimeNanos();
 
 // SleepFor()
 //
-// Sleeps for the specified duration, expressed as an `absl::Duration`.
+// Sleeps for the specified duration, expressed as an `abslx::Duration`.
 //
 // Notes:
 // * Signal interruptions will not reduce the sleep duration.
 // * Returns immediately when passed a nonpositive duration.
-void SleepFor(absl::Duration duration);
+void SleepFor(abslx::Duration duration);
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 // -----------------------------------------------------------------------------
 // Implementation Details
@@ -64,10 +64,10 @@ ABSL_NAMESPACE_END
 // By changing our extension points to be extern "C", we dodge this
 // check.
 extern "C" {
-void ABSL_INTERNAL_C_SYMBOL(AbslInternalSleepFor)(absl::Duration duration);
+void ABSL_INTERNAL_C_SYMBOL(AbslInternalSleepFor)(abslx::Duration duration);
 }  // extern "C"
 
-inline void absl::SleepFor(absl::Duration duration) {
+inline void abslx::SleepFor(abslx::Duration duration) {
   ABSL_INTERNAL_C_SYMBOL(AbslInternalSleepFor)(duration);
 }
 

@@ -121,7 +121,7 @@ class CellReader {
 
   // Records the value of the cells since the last time `Delta()` was called.
   // This is used to compute the next delta value.
-  absl::flat_hash_map<std::vector<std::string>, ValueType> delta_map_;
+  abslx::flat_hash_map<std::vector<std::string>, ValueType> delta_map_;
 };
 
 template <typename ValueType>

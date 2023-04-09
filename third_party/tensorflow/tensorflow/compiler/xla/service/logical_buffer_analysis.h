@@ -74,7 +74,7 @@ class LogicalBufferAnalysis : public DfsHloVisitorWithDefault {
 
   // A map from an hlo + shape index to the logical buffer representing
   // the appropriate output.
-  absl::flat_hash_map<std::pair<const HloInstruction*, const ShapeIndex>,
+  abslx::flat_hash_map<std::pair<const HloInstruction*, const ShapeIndex>,
                       LogicalBuffer*>
       output_buffers_;
 };

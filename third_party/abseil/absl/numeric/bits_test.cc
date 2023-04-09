@@ -20,7 +20,7 @@
 #include "gtest/gtest.h"
 #include "absl/random/random.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace {
 
@@ -104,40 +104,40 @@ TEST(Rotate, Right) {
 
 TEST(Rotate, Symmetry) {
   // rotr(x, s) is equivalent to rotl(x, -s)
-  absl::BitGen rng;
+  abslx::BitGen rng;
   constexpr int kTrials = 100;
 
   for (int i = 0; i < kTrials; ++i) {
-    uint8_t value = absl::Uniform(rng, std::numeric_limits<uint8_t>::min(),
+    uint8_t value = abslx::Uniform(rng, std::numeric_limits<uint8_t>::min(),
                                   std::numeric_limits<uint8_t>::max());
-    int shift = absl::Uniform(rng, -2 * std::numeric_limits<uint8_t>::digits,
+    int shift = abslx::Uniform(rng, -2 * std::numeric_limits<uint8_t>::digits,
                               2 * std::numeric_limits<uint8_t>::digits);
 
     EXPECT_EQ(rotl(value, shift), rotr(value, -shift));
   }
 
   for (int i = 0; i < kTrials; ++i) {
-    uint16_t value = absl::Uniform(rng, std::numeric_limits<uint16_t>::min(),
+    uint16_t value = abslx::Uniform(rng, std::numeric_limits<uint16_t>::min(),
                                    std::numeric_limits<uint16_t>::max());
-    int shift = absl::Uniform(rng, -2 * std::numeric_limits<uint16_t>::digits,
+    int shift = abslx::Uniform(rng, -2 * std::numeric_limits<uint16_t>::digits,
                               2 * std::numeric_limits<uint16_t>::digits);
 
     EXPECT_EQ(rotl(value, shift), rotr(value, -shift));
   }
 
   for (int i = 0; i < kTrials; ++i) {
-    uint32_t value = absl::Uniform(rng, std::numeric_limits<uint32_t>::min(),
+    uint32_t value = abslx::Uniform(rng, std::numeric_limits<uint32_t>::min(),
                                    std::numeric_limits<uint32_t>::max());
-    int shift = absl::Uniform(rng, -2 * std::numeric_limits<uint32_t>::digits,
+    int shift = abslx::Uniform(rng, -2 * std::numeric_limits<uint32_t>::digits,
                               2 * std::numeric_limits<uint32_t>::digits);
 
     EXPECT_EQ(rotl(value, shift), rotr(value, -shift));
   }
 
   for (int i = 0; i < kTrials; ++i) {
-    uint64_t value = absl::Uniform(rng, std::numeric_limits<uint64_t>::min(),
+    uint64_t value = abslx::Uniform(rng, std::numeric_limits<uint64_t>::min(),
                                    std::numeric_limits<uint64_t>::max());
-    int shift = absl::Uniform(rng, -2 * std::numeric_limits<uint64_t>::digits,
+    int shift = abslx::Uniform(rng, -2 * std::numeric_limits<uint64_t>::digits,
                               2 * std::numeric_limits<uint64_t>::digits);
 
     EXPECT_EQ(rotl(value, shift), rotr(value, -shift));
@@ -309,10 +309,10 @@ struct PopcountInput {
 };
 
 template <typename T>
-PopcountInput<T> GeneratePopcountInput(absl::BitGen& gen) {
+PopcountInput<T> GeneratePopcountInput(abslx::BitGen& gen) {
   PopcountInput<T> ret;
   for (int i = 0; i < std::numeric_limits<T>::digits; i++) {
-    bool coin = absl::Bernoulli(gen, 0.2);
+    bool coin = abslx::Bernoulli(gen, 0.2);
     if (coin) {
       ret.value |= T{1} << i;
       ret.expected++;
@@ -322,7 +322,7 @@ PopcountInput<T> GeneratePopcountInput(absl::BitGen& gen) {
 }
 
 TEST(Counting, PopcountFuzz) {
-  absl::BitGen rng;
+  abslx::BitGen rng;
   constexpr int kTrials = 100;
 
   for (int i = 0; i < kTrials; ++i) {
@@ -570,4 +570,4 @@ static_assert(ABSL_INTERNAL_HAS_CONSTEXPR_CTZ, "ctz should be constexpr");
 
 }  // namespace
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

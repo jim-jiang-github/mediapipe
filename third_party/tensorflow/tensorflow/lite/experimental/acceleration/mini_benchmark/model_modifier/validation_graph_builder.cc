@@ -37,7 +37,7 @@ namespace acceleration {
 using ::flatbuffers::FlatBufferBuilder;
 using ::flatbuffers::GetRoot;
 
-absl::Status ValidationGraphBuilder::BuildIntermediateModel(
+abslx::Status ValidationGraphBuilder::BuildIntermediateModel(
     FlatBufferBuilder* fbb) {
   fbb_.Reset();
   auto model = MakeModel(/* intermediate_only */ true,
@@ -52,7 +52,7 @@ absl::Status ValidationGraphBuilder::BuildIntermediateModel(
   return CombineModels(fbb, models, subgraph_names_not_important, schema_);
 }
 
-absl::Status ValidationGraphBuilder::BuildFinalModel(
+abslx::Status ValidationGraphBuilder::BuildFinalModel(
     FlatBufferBuilder* fbb, Subgraph* subgraph_with_golden_outputs) {
   fbb_.Reset();
   auto model =
@@ -71,7 +71,7 @@ absl::Status ValidationGraphBuilder::BuildFinalModel(
   return CombineModels(fbb, models, subgraph_names, schema_);
 }
 
-absl::StatusOr<flatbuffers::Offset<Model>> ValidationGraphBuilder::MakeModel(
+abslx::StatusOr<flatbuffers::Offset<Model>> ValidationGraphBuilder::MakeModel(
     bool intermediate_only, Subgraph* subgraph_with_golden_outputs) {
   TensorInfo tensor_info;
   auto operator_codes = OperatorCodes();
@@ -93,13 +93,13 @@ absl::StatusOr<flatbuffers::Offset<Model>> ValidationGraphBuilder::MakeModel(
                      /* signature_defs */ 0);
 }
 
-absl::StatusOr<
+abslx::StatusOr<
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<OperatorCode>>>>
 ValidationGraphBuilder::OperatorCodes() {
 #define RET_CHECK_INDEX(constant, code_index)                              \
   do {                                                                     \
     if ((constant) != (code_index)) {                                      \
-      return absl::InternalError(absl::StrFormat(                          \
+      return abslx::InternalError(abslx::StrFormat(                          \
           "Operator code indexing mismatch %s (%d) != %s (%d)", #constant, \
           (constant), #code_index, (code_index)));                         \
     }                                                                      \
@@ -118,7 +118,7 @@ ValidationGraphBuilder::OperatorCodes() {
 #undef RET_CHECK_INDEX
 }
 
-absl::StatusOr<
+abslx::StatusOr<
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Tensor>>>>
 ValidationGraphBuilder::Tensors(bool intermediate_only,
                                 TensorInfo* tensor_info) {
@@ -134,8 +134,8 @@ ValidationGraphBuilder::Tensors(bool intermediate_only,
           const flatbuffers::Vector<int32_t>* indices,
           std::vector<int32_t>* store_indices_into, int batch_size,
           const std::string prefix = "",
-          std::function<absl::StatusOr<bool>(const Tensor*, int)> filter =
-              nullptr) -> absl::Status {
+          std::function<abslx::StatusOr<bool>(const Tensor*, int)> filter =
+              nullptr) -> abslx::Status {
     int counter = 0;
     for (auto index = indices->cbegin(); index != indices->cend();
          index++, counter++) {
@@ -185,7 +185,7 @@ ValidationGraphBuilder::Tensors(bool intermediate_only,
           shape_signature.empty() ? 0 : fbb_.CreateVector(shape_signature)));
       buffer_count++;
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   };
   // Input image, jpeg data.
   tensor_info->jpeg_images.push_back(tensors.size());
@@ -267,7 +267,7 @@ ValidationGraphBuilder::Tensors(bool intermediate_only,
       validation_model_->subgraphs()->Get(0)->inputs(),
       &tensor_info->dequantized_validation_inputs, jpeg_data_.size(), "",
       [&tensors, &tensor_info, this](const Tensor* validation_model_input,
-                                     int i) -> absl::StatusOr<bool> {
+                                     int i) -> abslx::StatusOr<bool> {
         // validation_model_input is the tensor for metrics calculation.
         // validation_graph_input is the under-construction graph will be
         // given to the metrics calculation but need to be dequantized
@@ -284,8 +284,8 @@ ValidationGraphBuilder::Tensors(bool intermediate_only,
           if (validation_model_input->name()) {
             name = validation_model_input->name()->c_str();
           }
-          return absl::InvalidArgumentError(
-              absl::StrFormat("Validation model input %s with type %d is "
+          return abslx::InvalidArgumentError(
+              abslx::StrFormat("Validation model input %s with type %d is "
                               "incompatible with main model output type %d",
                               name, validation_model_input->type(),
                               validation_graph_input->type()));
@@ -406,7 +406,7 @@ ValidationGraphBuilder::Operators(bool intermediate_only,
   return fbb_.CreateVector(ops);
 }
 
-absl::StatusOr<
+abslx::StatusOr<
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<SubGraph>>>>
 ValidationGraphBuilder::SubGraphs(bool intermediate_only,
                                   TensorInfo* tensor_info) {
@@ -429,7 +429,7 @@ ValidationGraphBuilder::SubGraphs(bool intermediate_only,
   return fbb_.CreateVector(graphs);
 }
 
-absl::StatusOr<
+abslx::StatusOr<
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Buffer>>>>
 ValidationGraphBuilder::Buffers(bool intermediate_only,
                                 const TensorInfo& tensor_info,
@@ -443,7 +443,7 @@ ValidationGraphBuilder::Buffers(bool intermediate_only,
 #define RET_CHECK_INDEX(tensor_index, buffer_index)                         \
   do {                                                                      \
     if ((tensor_index) != (buffer_index)) {                                 \
-      return absl::InternalError(absl::StrFormat(                           \
+      return abslx::InternalError(abslx::StrFormat(                           \
           "%s:%d, Tensor/buffer indexing mismatch %s (%d) != %s (%d)",      \
           __FILE__, __LINE__, #tensor_index, (tensor_index), #buffer_index, \
           (buffer_index)));                                                 \

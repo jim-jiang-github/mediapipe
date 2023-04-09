@@ -57,7 +57,7 @@ StatusOr<bool> CanonicalizeAllGatherForCSE::RunOnComputation(
       new_ag_dim = dims->at(0);
     } else {
       int64_t major_elements =
-          Product(absl::MakeConstSpan(ag->operand(0)->shape().dimensions())
+          Product(abslx::MakeConstSpan(ag->operand(0)->shape().dimensions())
                       .subspan(0, ag_dim));
       new_ag_dim = 0;
       while (major_elements > 1) {
@@ -94,7 +94,7 @@ StatusOr<bool> CanonicalizeAllGatherForCSE::RunOnComputation(
 
 StatusOr<bool> CanonicalizeAllGatherForCSE::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   next_channel_id_ = hlo_query::NextChannelId(*module);
   for (HloComputation* comp : module->computations(execution_threads)) {

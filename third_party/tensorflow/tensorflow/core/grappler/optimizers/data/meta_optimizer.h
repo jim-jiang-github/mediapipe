@@ -40,7 +40,7 @@ class TFDataMetaOptimizer : public CustomGraphOptimizer {
                   GraphDef* output) override;
 
  private:
-  absl::flat_hash_map<string, std::unique_ptr<GraphOptimizer>>
+  abslx::flat_hash_map<string, std::unique_ptr<GraphOptimizer>>
       enabled_optimizers_;
 
   // Applies an optimization with the specified name on `item`, and stores

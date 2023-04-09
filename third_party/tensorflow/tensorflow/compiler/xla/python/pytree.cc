@@ -76,7 +76,7 @@ namespace py = pybind11;
   auto it = registry->registrations_.emplace(type, std::move(registration));
   if (!it.second) {
     throw std::invalid_argument(
-        absl::StrFormat("Duplicate custom PyTreeDef type registration for %s.",
+        abslx::StrFormat("Duplicate custom PyTreeDef type registration for %s.",
                         py::repr(type)));
   }
 }
@@ -209,7 +209,7 @@ void PyTreeDef::FlattenIntoImpl(
 }
 
 void PyTreeDef::FlattenInto(py::handle handle,
-                            absl::InlinedVector<py::object, 2>& leaves,
+                            abslx::InlinedVector<py::object, 2>& leaves,
                             std::optional<py::function> leaf_predicate) {
   FlattenIntoImpl(handle, leaves, leaf_predicate);
 }
@@ -237,7 +237,7 @@ PyTreeDef::Flatten(py::handle x, std::optional<py::function> leaf_predicate) {
 
 template <typename T>
 py::object PyTreeDef::UnflattenImpl(T leaves) const {
-  absl::InlinedVector<py::object, 4> agenda;
+  abslx::InlinedVector<py::object, 4> agenda;
   auto it = leaves.begin();
   int leaf_count = 0;
   for (const Node& node : traversal_) {
@@ -247,7 +247,7 @@ py::object PyTreeDef::UnflattenImpl(T leaves) const {
     switch (node.kind) {
       case PyTreeKind::kLeaf:
         if (it == leaves.end()) {
-          throw std::invalid_argument(absl::StrFormat(
+          throw std::invalid_argument(abslx::StrFormat(
               "Too few leaves for PyTreeDef; expected %d, got %d", num_leaves(),
               leaf_count));
         }
@@ -263,9 +263,9 @@ py::object PyTreeDef::UnflattenImpl(T leaves) const {
       case PyTreeKind::kDict:
       case PyTreeKind::kCustom: {
         const int size = agenda.size();
-        absl::Span<py::object> span;
+        abslx::Span<py::object> span;
         if (node.arity > 0) {
-          span = absl::Span<py::object>(&agenda[size - node.arity], node.arity);
+          span = abslx::Span<py::object>(&agenda[size - node.arity], node.arity);
         }
         py::object o = MakeNode(node, span);
         agenda.resize(size - node.arity);
@@ -275,7 +275,7 @@ py::object PyTreeDef::UnflattenImpl(T leaves) const {
     }
   }
   if (it != leaves.end()) {
-    throw std::invalid_argument(absl::StrFormat(
+    throw std::invalid_argument(abslx::StrFormat(
         "Too many leaves for PyTreeDef; expected %d.", num_leaves()));
   }
   if (agenda.size() != 1) {
@@ -288,12 +288,12 @@ py::object PyTreeDef::Unflatten(py::iterable leaves) const {
   return UnflattenImpl(leaves);
 }
 
-py::object PyTreeDef::Unflatten(absl::Span<const py::object> leaves) const {
+py::object PyTreeDef::Unflatten(abslx::Span<const py::object> leaves) const {
   return UnflattenImpl(leaves);
 }
 
 /*static*/ py::object PyTreeDef::MakeNode(const PyTreeDef::Node& node,
-                                          absl::Span<py::object> children) {
+                                          abslx::Span<py::object> children) {
   if (children.size() != node.arity) {
     throw std::logic_error("Node arity mismatch.");
   }
@@ -353,7 +353,7 @@ py::list PyTreeDef::FlattenUpTo(py::handle xs) const {
   int leaf = num_leaves() - 1;
   while (!agenda.empty()) {
     if (it == traversal_.rend()) {
-      throw std::invalid_argument(absl::StrFormat(
+      throw std::invalid_argument(abslx::StrFormat(
           "Tree structures did not match: %s vs %s", py::repr(xs), ToString()));
     }
     const Node& node = *it;
@@ -376,12 +376,12 @@ py::list PyTreeDef::FlattenUpTo(py::handle xs) const {
       case PyTreeKind::kTuple: {
         if (!PyTuple_CheckExact(object.ptr())) {
           throw std::invalid_argument(
-              absl::StrFormat("Expected tuple, got %s.", py::repr(object)));
+              abslx::StrFormat("Expected tuple, got %s.", py::repr(object)));
         }
         py::tuple tuple = py::reinterpret_borrow<py::tuple>(object);
         if (tuple.size() != node.arity) {
           throw std::invalid_argument(
-              absl::StrFormat("Tuple arity mismatch: %d != %d; tuple: %s.",
+              abslx::StrFormat("Tuple arity mismatch: %d != %d; tuple: %s.",
                               tuple.size(), node.arity, py::repr(object)));
         }
         for (py::handle entry : tuple) {
@@ -393,12 +393,12 @@ py::list PyTreeDef::FlattenUpTo(py::handle xs) const {
       case PyTreeKind::kList: {
         if (!PyList_CheckExact(object.ptr())) {
           throw std::invalid_argument(
-              absl::StrFormat("Expected list, got %s.", py::repr(object)));
+              abslx::StrFormat("Expected list, got %s.", py::repr(object)));
         }
         py::list list = py::reinterpret_borrow<py::list>(object);
         if (list.size() != node.arity) {
           throw std::invalid_argument(
-              absl::StrFormat("List arity mismatch: %d != %d; list: %s.",
+              abslx::StrFormat("List arity mismatch: %d != %d; list: %s.",
                               list.size(), node.arity, py::repr(object)));
         }
         for (py::handle entry : list) {
@@ -410,7 +410,7 @@ py::list PyTreeDef::FlattenUpTo(py::handle xs) const {
       case PyTreeKind::kDict: {
         if (!PyDict_CheckExact(object.ptr())) {
           throw std::invalid_argument(
-              absl::StrFormat("Expected dict, got %s.", py::repr(object)));
+              abslx::StrFormat("Expected dict, got %s.", py::repr(object)));
         }
         py::dict dict = py::reinterpret_borrow<py::dict>(object);
         py::list keys =
@@ -420,7 +420,7 @@ py::list PyTreeDef::FlattenUpTo(py::handle xs) const {
         }
         if (keys.not_equal(node.node_data)) {
           throw std::invalid_argument(
-              absl::StrFormat("Dict key mismatch; expected keys: %s; dict: %s.",
+              abslx::StrFormat("Dict key mismatch; expected keys: %s; dict: %s.",
                               py::repr(node.node_data), py::repr(object)));
         }
         for (py::handle key : keys) {
@@ -432,17 +432,17 @@ py::list PyTreeDef::FlattenUpTo(py::handle xs) const {
       case PyTreeKind::kNamedTuple: {
         if (!py::isinstance<py::tuple>(object) ||
             !py::hasattr(object, "_fields")) {
-          throw std::invalid_argument(absl::StrFormat(
+          throw std::invalid_argument(abslx::StrFormat(
               "Expected named tuple, got %s.", py::repr(object)));
         }
         py::tuple tuple = py::reinterpret_borrow<py::tuple>(object);
         if (tuple.size() != node.arity) {
-          throw std::invalid_argument(absl::StrFormat(
+          throw std::invalid_argument(abslx::StrFormat(
               "Named tuple arity mismatch: %d != %d; tuple: %s.", tuple.size(),
               node.arity, py::repr(object)));
         }
         if (tuple.get_type().not_equal(node.node_data)) {
-          throw std::invalid_argument(absl::StrFormat(
+          throw std::invalid_argument(abslx::StrFormat(
               "Named tuple type mismatch: expected type: %s, tuple: %s.",
               py::repr(node.node_data), py::repr(object)));
         }
@@ -455,7 +455,7 @@ py::list PyTreeDef::FlattenUpTo(py::handle xs) const {
       case PyTreeKind::kCustom: {
         auto* registration = PyTreeTypeRegistry::Lookup(object.get_type());
         if (registration != node.custom) {
-          throw std::invalid_argument(absl::StrFormat(
+          throw std::invalid_argument(abslx::StrFormat(
               "Custom node type mismatch: expected type: %s, value: %s.",
               py::repr(node.custom->type), py::repr(object)));
         }
@@ -465,7 +465,7 @@ py::list PyTreeDef::FlattenUpTo(py::handle xs) const {
               "PyTree custom to_iterable function should return a pair");
         }
         if (node.node_data.not_equal(out[1])) {
-          throw std::invalid_argument(absl::StrFormat(
+          throw std::invalid_argument(abslx::StrFormat(
               "Mismatch custom node data: %s != %s; value: %s.",
               py::repr(node.node_data), py::repr(out[1]), py::repr(object)));
         }
@@ -475,7 +475,7 @@ py::list PyTreeDef::FlattenUpTo(py::handle xs) const {
           agenda.push_back(py::reinterpret_borrow<py::object>(entry));
         }
         if (arity != node.arity) {
-          throw std::invalid_argument(absl::StrFormat(
+          throw std::invalid_argument(abslx::StrFormat(
               "Custom type arity mismatch: %d != %d; value: %s.", arity,
               node.arity, py::repr(object)));
         }
@@ -484,7 +484,7 @@ py::list PyTreeDef::FlattenUpTo(py::handle xs) const {
     }
   }
   if (it != traversal_.rend() || leaf != -1) {
-    throw std::invalid_argument(absl::StrFormat(
+    throw std::invalid_argument(abslx::StrFormat(
         "Tree structures did not match: %s vs %s", py::repr(xs), ToString()));
   }
   return leaves;
@@ -538,7 +538,7 @@ py::object PyTreeDef::Walk(const py::function& f_node, py::handle f_leaf,
 
 py::object PyTreeDef::FromIterableTreeHelper(
     py::handle xs,
-    absl::InlinedVector<PyTreeDef::Node, 1>::const_reverse_iterator* it) const {
+    abslx::InlinedVector<PyTreeDef::Node, 1>::const_reverse_iterator* it) const {
   if (*it == traversal_.rend()) {
     throw std::invalid_argument("Tree structures did not match.");
   }
@@ -560,7 +560,7 @@ py::object PyTreeDef::FromIterableTreeHelper(
     ys[j] = FromIterableTreeHelper(ys[j], it);
   }
 
-  return MakeNode(node, absl::MakeSpan(ys));
+  return MakeNode(node, abslx::MakeSpan(ys));
 }
 
 py::object PyTreeDef::FromIterableTree(py::handle xs) const {
@@ -576,7 +576,7 @@ std::unique_ptr<PyTreeDef> PyTreeDef::Compose(const PyTreeDef& inner) const {
   auto out = std::make_unique<PyTreeDef>();
   for (const Node& n : traversal_) {
     if (n.kind == PyTreeKind::kLeaf) {
-      absl::c_copy(inner.traversal_, std::back_inserter(out->traversal_));
+      abslx::c_copy(inner.traversal_, std::back_inserter(out->traversal_));
     } else {
       out->traversal_.push_back(n);
     }
@@ -596,7 +596,7 @@ std::unique_ptr<PyTreeDef> PyTreeDef::Compose(const PyTreeDef& inner) const {
   auto out = std::make_unique<PyTreeDef>();
   int num_leaves = 0;
   for (const PyTreeDef& def : defs) {
-    absl::c_copy(def.traversal_, std::back_inserter(out->traversal_));
+    abslx::c_copy(def.traversal_, std::back_inserter(out->traversal_));
     num_leaves += def.num_leaves();
   }
   Node node;
@@ -641,7 +641,7 @@ std::string PyTreeDef::ToString() const {
     }
 
     std::string children =
-        absl::StrJoin(agenda.end() - node.arity, agenda.end(), ", ");
+        abslx::StrJoin(agenda.end() - node.arity, agenda.end(), ", ");
     std::string representation;
     switch (node.kind) {
       case PyTreeKind::kLeaf:
@@ -653,10 +653,10 @@ std::string PyTreeDef::ToString() const {
       case PyTreeKind::kTuple:
         // Tuples with only one element must have a trailing comma.
         if (node.arity == 1) children += ",";
-        representation = absl::StrCat("(", children, ")");
+        representation = abslx::StrCat("(", children, ")");
         break;
       case PyTreeKind::kList:
-        representation = absl::StrCat("[", children, "]");
+        representation = abslx::StrCat("[", children, "]");
         break;
       case PyTreeKind::kDict: {
         if (py::len(node.node_data) != node.arity) {
@@ -666,7 +666,7 @@ std::string PyTreeDef::ToString() const {
         std::string separator;
         auto child_iter = agenda.end() - node.arity;
         for (const py::handle& key : node.node_data) {
-          absl::StrAppendFormat(&representation, "%s%s: %s", separator,
+          abslx::StrAppendFormat(&representation, "%s%s: %s", separator,
                                 py::repr(key), *child_iter);
           child_iter++;
           separator = ", ";
@@ -683,19 +683,19 @@ std::string PyTreeDef::ToString() const {
           kind = "namedtuple";
           if (node.node_data) {
             // Node data for named tuples is the type.
-            data = absl::StrFormat(
+            data = abslx::StrFormat(
                 "[%s]", py::str(py::getattr(node.node_data, "__name__")));
           }
         } else {
           kind = static_cast<std::string>(
               py::str(py::getattr(node.custom->type, "__name__")));
           if (node.node_data) {
-            data = absl::StrFormat("[%s]", py::str(node.node_data));
+            data = abslx::StrFormat("[%s]", py::str(node.node_data));
           }
         }
 
         representation =
-            absl::StrFormat("CustomNode(%s%s, [%s])", kind, data, children);
+            abslx::StrFormat("CustomNode(%s%s, [%s])", kind, data, children);
         break;
       }
     }
@@ -705,7 +705,7 @@ std::string PyTreeDef::ToString() const {
   if (agenda.size() != 1) {
     throw std::logic_error("PyTreeDef traversal did not yield a singleton.");
   }
-  return absl::StrCat("PyTreeDef(", agenda.back(), ")");
+  return abslx::StrCat("PyTreeDef(", agenda.back(), ")");
 }
 
 py::object PyTreeDef::ToPickleable() const {
@@ -750,7 +750,7 @@ PyTreeDef PyTreeDef::FromPickleable(py::object pickleable) {
       node.custom = t[3].is_none() ? nullptr : PyTreeTypeRegistry::Lookup(t[3]);
       if (node.custom == nullptr) {
         throw xla::XlaRuntimeError(
-            absl::StrCat("Unknown custom type in pickled PyTreeDef: ",
+            abslx::StrCat("Unknown custom type in pickled PyTreeDef: ",
                          static_cast<std::string>(py::repr(t[3]))));
       }
     } else {
@@ -791,7 +791,7 @@ void BuildPytreeSubmodule(py::module& m) {
            [](const PyTreeDef& a, const PyTreeDef& b) { return a == b; })
       .def("__ne__",
            [](const PyTreeDef& a, const PyTreeDef& b) { return a != b; })
-      .def("__hash__", [](const PyTreeDef& t) { return absl::HashOf(t); })
+      .def("__hash__", [](const PyTreeDef& t) { return abslx::HashOf(t); })
       .def(py::pickle(
           [](const PyTreeDef& t) { return t.ToPickleable(); },
           [](py::object o) { return PyTreeDef::FromPickleable(o); }));

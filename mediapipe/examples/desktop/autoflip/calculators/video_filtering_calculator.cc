@@ -57,19 +57,19 @@ class VideoFilteringCalculator : public CalculatorBase {
   VideoFilteringCalculator() = default;
   ~VideoFilteringCalculator() override = default;
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 };
 REGISTER_CALCULATOR(VideoFilteringCalculator);
 
-absl::Status VideoFilteringCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status VideoFilteringCalculator::GetContract(CalculatorContract* cc) {
   cc->Inputs().Tag(kInputFrameTag).Set<ImageFrame>();
   cc->Outputs().Tag(kOutputFrameTag).Set<ImageFrame>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status VideoFilteringCalculator::Process(CalculatorContext* cc) {
+abslx::Status VideoFilteringCalculator::Process(CalculatorContext* cc) {
   const auto& options = cc->Options<VideoFilteringCalculatorOptions>();
 
   const Packet& input_packet = cc->Inputs().Tag(kInputFrameTag).Value();
@@ -83,7 +83,7 @@ absl::Status VideoFilteringCalculator::Process(CalculatorContext* cc) {
   if (filter_type ==
       VideoFilteringCalculatorOptions::AspectRatioFilter::NO_FILTERING) {
     cc->Outputs().Tag(kOutputFrameTag).AddPacket(input_packet);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   const int target_width = options.aspect_ratio_filter().target_width();
   const int target_height = options.aspect_ratio_filter().target_height();
@@ -105,16 +105,16 @@ absl::Status VideoFilteringCalculator::Process(CalculatorContext* cc) {
   }
   if (should_pass) {
     cc->Outputs().Tag(kOutputFrameTag).AddPacket(input_packet);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   if (options.fail_if_any()) {
-    return mediapipe::UnknownErrorBuilder(MEDIAPIPE_LOC) << absl::Substitute(
+    return mediapipe::UnknownErrorBuilder(MEDIAPIPE_LOC) << abslx::Substitute(
                "Failing due to aspect ratio. Target aspect ratio: $0. Frame "
                "width: $1, height: $2.",
                target_ratio, frame.Width(), frame.Height());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 }  // namespace autoflip
 }  // namespace mediapipe

@@ -47,18 +47,18 @@ void Buffer::Release() {
   }
 }
 
-absl::Status Buffer::GetGPUResources(const GPUObjectDescriptor* obj_ptr,
+abslx::Status Buffer::GetGPUResources(const GPUObjectDescriptor* obj_ptr,
                                      GPUResourcesWithValue* resources) const {
   const auto* buffer_desc = dynamic_cast<const BufferDescriptor*>(obj_ptr);
   if (!buffer_desc) {
-    return absl::InvalidArgumentError("Expected BufferDescriptor on input.");
+    return abslx::InvalidArgumentError("Expected BufferDescriptor on input.");
   }
 
   resources->buffers.push_back({"buffer", {buffer_, 0}});
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Buffer::CreateFromBufferDescriptor(const BufferDescriptor& desc,
+abslx::Status Buffer::CreateFromBufferDescriptor(const BufferDescriptor& desc,
                                                 id<MTLDevice> device) {
   size_ = desc.size;
   if (desc.data.empty()) {
@@ -69,10 +69,10 @@ absl::Status Buffer::CreateFromBufferDescriptor(const BufferDescriptor& desc,
                                   length:size_
                                  options:MTLResourceStorageModeShared];
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CreateBuffer(size_t size_in_bytes, const void* data,
+abslx::Status CreateBuffer(size_t size_in_bytes, const void* data,
                           id<MTLDevice> device, Buffer* result) {
   id<MTLBuffer> buffer;
   if (data) {
@@ -86,7 +86,7 @@ absl::Status CreateBuffer(size_t size_in_bytes, const void* data,
 
   *result = Buffer(buffer, size_in_bytes);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace metal

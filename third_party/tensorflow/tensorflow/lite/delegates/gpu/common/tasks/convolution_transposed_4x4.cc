@@ -353,7 +353,7 @@ std::string ConvolutionTransposed4x4::GenerateConvolutionTransposedCode(
   return c;
 }
 
-absl::Status ConvolutionTransposed4x4::BindArguments(ArgumentsBinder* args) {
+abslx::Status ConvolutionTransposed4x4::BindArguments(ArgumentsBinder* args) {
   return args->SetInt("filter_offset", 4 * 16 * src_[0]->Slices());
 }
 
@@ -386,7 +386,7 @@ void ConvolutionTransposed4x4::UploadWeights(
   desc.size = flt_count * SizeOf(desc.element_type);
   desc.data.resize(desc.size);
 
-  RearrangeWeights(weights, weights_desc, absl::MakeSpan(desc.data));
+  RearrangeWeights(weights, weights_desc, abslx::MakeSpan(desc.data));
   args_.AddObject("weights",
                   std::make_unique<BufferDescriptor>(std::move(desc)));
 }

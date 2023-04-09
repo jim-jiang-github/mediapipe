@@ -54,7 +54,7 @@ class ModelLoader {
 // Load the Model from a file path.
 class PathModelLoader : public ModelLoader {
  public:
-  explicit PathModelLoader(absl::string_view model_path)
+  explicit PathModelLoader(abslx::string_view model_path)
       : ModelLoader(), model_path_(model_path) {}
 
  protected:
@@ -134,7 +134,7 @@ class PipeModelLoader : public ModelLoader {
 // NOTE: This helper function is designed for creating the ModelLoader from
 // command line parameters. Prefer to use the ModelLoader constructors directly
 // when possible.
-std::unique_ptr<ModelLoader> CreateModelLoaderFromPath(absl::string_view path);
+std::unique_ptr<ModelLoader> CreateModelLoaderFromPath(abslx::string_view path);
 
 }  // namespace acceleration
 }  // namespace tflite

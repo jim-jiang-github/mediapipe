@@ -32,7 +32,7 @@ namespace gpu {
 
 Status BufferAllocations::TearDown(
     const std::set<se::DeviceMemoryBase>& live_addresses,
-    absl::Span<const BufferAllocation> allocations) {
+    abslx::Span<const BufferAllocation> allocations) {
   // Deallocate temporary buffers, taking care to try to deallocate all of them
   // even if one of the deallocations fails.
   Status status;

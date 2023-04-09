@@ -43,7 +43,7 @@ limitations under the License.
 namespace xla {
 
 std::vector<int64_t> ToMixedRadix(const int64_t n,
-                                  absl::Span<const int64_t> bounds) {
+                                  abslx::Span<const int64_t> bounds) {
   if (bounds.empty()) {
     return {};
   }
@@ -72,7 +72,7 @@ Status WithLogBacktrace(const Status& status) {
   return status;
 }
 
-ScopedLoggingTimer::ScopedLoggingTimer(absl::string_view label, bool enabled,
+ScopedLoggingTimer::ScopedLoggingTimer(abslx::string_view label, bool enabled,
                                        const char* file, int line,
                                        TimerStats* timer_stats)
     : label_(label),
@@ -91,7 +91,7 @@ void ScopedLoggingTimer::StopAndLog() {
     double secs = (end_micros - start_micros_) / 1000000.0;
 
     TimerStats& stats = *timer_stats_;
-    absl::MutexLock lock(&stats.stats_mutex);
+    abslx::MutexLock lock(&stats.stats_mutex);
     stats.cumulative_secs += secs;
     if (secs > stats.max_secs) {
       stats.max_secs = secs;
@@ -112,25 +112,25 @@ void ScopedLoggingTimer::StopAndLog() {
 
 ScopedLoggingTimer::~ScopedLoggingTimer() { StopAndLog(); }
 
-Status AddStatus(Status prior, absl::string_view context) {
+Status AddStatus(Status prior, abslx::string_view context) {
   CHECK(!prior.ok());
   return Status{prior.code(),
-                absl::StrCat(context, ": ", prior.error_message())};
+                abslx::StrCat(context, ": ", prior.error_message())};
 }
 
-Status AppendStatus(Status prior, absl::string_view context) {
+Status AppendStatus(Status prior, abslx::string_view context) {
   CHECK(!prior.ok());
   return Status{prior.code(),
-                absl::StrCat(prior.error_message(), ": ", context)};
+                abslx::StrCat(prior.error_message(), ": ", context)};
 }
 
-std::string Reindent(absl::string_view original,
-                     const absl::string_view indentation) {
+std::string Reindent(abslx::string_view original,
+                     const abslx::string_view indentation) {
   std::vector<std::string> pieces =
-      absl::StrSplit(absl::string_view(original.data(), original.size()), '\n');
-  return absl::StrJoin(
-      pieces, "\n", [indentation](std::string* out, absl::string_view s) {
-        absl::StrAppend(out, indentation, absl::StripAsciiWhitespace(s));
+      abslx::StrSplit(abslx::string_view(original.data(), original.size()), '\n');
+  return abslx::StrJoin(
+      pieces, "\n", [indentation](std::string* out, abslx::string_view s) {
+        abslx::StrAppend(out, indentation, abslx::StripAsciiWhitespace(s));
       });
 }
 
@@ -138,11 +138,11 @@ template <typename FloatT>
 static void RoundTripNanPayload(FloatT value, std::string* result) {
   const int kPayloadBits = NanPayloadBits<FloatT>();
   if (std::isnan(value) && kPayloadBits > 0) {
-    auto rep = absl::bit_cast<
+    auto rep = abslx::bit_cast<
         typename UnsignedIntegerTypeForSize<sizeof(FloatT)>::type>(value);
     auto payload = rep & NanPayloadBitMask<FloatT>();
     if (payload != QuietNanWithoutPayload<FloatT>()) {
-      absl::StrAppendFormat(result, "(0x%x)", payload);
+      abslx::StrAppendFormat(result, "(0x%x)", payload);
     }
   }
 }
@@ -152,7 +152,7 @@ static std::string GenericRoundTripFpToString(FloatT value) {
   // TODO(majnemer): Remove this temporary variable once Eigen creates a symbol
   // definition for `max_digits10`.
   int max_decimal_digits = std::numeric_limits<FloatT>::max_digits10;
-  return absl::StrFormat("%.*g", max_decimal_digits,
+  return abslx::StrFormat("%.*g", max_decimal_digits,
                          static_cast<double>(value));
 }
 
@@ -171,8 +171,8 @@ std::string RoundTripFpToString(half value) {
 std::string RoundTripFpToString(float value) {
   float parsed_result;
   std::string result =
-      absl::StrFormat("%.*g", std::numeric_limits<float>::digits10, value);
-  if (!absl::SimpleAtof(result, &parsed_result) || parsed_result != value) {
+      abslx::StrFormat("%.*g", std::numeric_limits<float>::digits10, value);
+  if (!abslx::SimpleAtof(result, &parsed_result) || parsed_result != value) {
     result = GenericRoundTripFpToString(value);
   }
   RoundTripNanPayload(value, &result);
@@ -182,8 +182,8 @@ std::string RoundTripFpToString(float value) {
 std::string RoundTripFpToString(double value) {
   double parsed_result;
   std::string result =
-      absl::StrFormat("%.*g", std::numeric_limits<double>::digits10, value);
-  if (!absl::SimpleAtod(result, &parsed_result) || parsed_result != value) {
+      abslx::StrFormat("%.*g", std::numeric_limits<double>::digits10, value);
+  if (!abslx::SimpleAtod(result, &parsed_result) || parsed_result != value) {
     result = GenericRoundTripFpToString(value);
   }
   RoundTripNanPayload(value, &result);
@@ -202,7 +202,7 @@ PaddingConfig MakeNoPaddingConfig(int64_t rank) {
 }
 
 PaddingConfig MakeEdgePaddingConfig(
-    absl::Span<const std::pair<int64_t, int64_t>> padding) {
+    abslx::Span<const std::pair<int64_t, int64_t>> padding) {
   PaddingConfig padding_config;
   for (const std::pair<int64_t, int64_t>& dim : padding) {
     auto dimension = padding_config.add_dimensions();
@@ -224,20 +224,20 @@ bool HasInteriorPadding(const PaddingConfig& config) {
 
 namespace {
 std::string HumanReadableNumOps(double flops, double nanoseconds,
-                                absl::string_view op_prefix) {
+                                abslx::string_view op_prefix) {
   if (nanoseconds == 0) {
-    return absl::StrCat("NaN ", op_prefix, "OP/s");
+    return abslx::StrCat("NaN ", op_prefix, "OP/s");
   }
   double nano_flops = flops / nanoseconds;
   std::string throughput = tensorflow::strings::HumanReadableNum(
       static_cast<int64_t>(nano_flops * 1e9));
-  absl::string_view sp(throughput);
+  abslx::string_view sp(throughput);
   // Use the more common "G(FLOPS)", rather than "B(FLOPS)"
-  if (absl::EndsWith(sp, "B") ||  // Ends in 'B', ignoring case
-      absl::EndsWith(sp, "b")) {
+  if (abslx::EndsWith(sp, "B") ||  // Ends in 'B', ignoring case
+      abslx::EndsWith(sp, "b")) {
     *throughput.rbegin() = 'G';
   }
-  throughput += absl::StrCat(op_prefix, "OP/s");
+  throughput += abslx::StrCat(op_prefix, "OP/s");
   return throughput;
 }
 }  // namespace
@@ -251,7 +251,7 @@ std::string HumanReadableNumTranscendentalOps(double trops,
   return HumanReadableNumOps(trops, nanoseconds, "TR");
 }
 
-void LogLines(int sev, absl::string_view text, const char* fname, int lineno) {
+void LogLines(int sev, abslx::string_view text, const char* fname, int lineno) {
   const int orig_sev = sev;
   if (sev == tensorflow::FATAL) {
     sev = tensorflow::ERROR;
@@ -259,13 +259,13 @@ void LogLines(int sev, absl::string_view text, const char* fname, int lineno) {
 
   // Protect calls with a mutex so we don't interleave calls to LogLines from
   // multiple threads.
-  static absl::Mutex log_lines_mu(absl::kConstInit);
-  absl::MutexLock lock(&log_lines_mu);
+  static abslx::Mutex log_lines_mu(abslx::kConstInit);
+  abslx::MutexLock lock(&log_lines_mu);
 
   size_t cur = 0;
   while (cur < text.size()) {
     size_t eol = text.find('\n', cur);
-    if (eol == absl::string_view::npos) {
+    if (eol == abslx::string_view::npos) {
       eol = text.size();
     }
     auto msg = text.substr(cur, eol - cur);
@@ -280,16 +280,16 @@ void LogLines(int sev, absl::string_view text, const char* fname, int lineno) {
   }
 }
 
-int64_t Product(absl::Span<const int64_t> xs) {
+int64_t Product(abslx::Span<const int64_t> xs) {
   return std::accumulate(xs.begin(), xs.end(), static_cast<int64_t>(1),
                          std::multiplies<int64_t>());
 }
 
-absl::InlinedVector<std::pair<int64_t, int64_t>, 8> CommonFactors(
-    absl::Span<const int64_t> a, absl::Span<const int64_t> b) {
+abslx::InlinedVector<std::pair<int64_t, int64_t>, 8> CommonFactors(
+    abslx::Span<const int64_t> a, abslx::Span<const int64_t> b) {
   CHECK_EQ(Product(a), Product(b));
-  absl::InlinedVector<std::pair<int64_t, int64_t>, 8> bounds;
-  if (absl::c_equal(a, b)) {
+  abslx::InlinedVector<std::pair<int64_t, int64_t>, 8> bounds;
+  if (abslx::c_equal(a, b)) {
     bounds.reserve(a.size() + 1);
     for (int64_t i = 0; i <= a.size(); ++i) {
       bounds.emplace_back(i, i);
@@ -353,8 +353,8 @@ absl::InlinedVector<std::pair<int64_t, int64_t>, 8> CommonFactors(
 }
 
 ConvertedDimensionNumbers ConvertDimensionNumbers(
-    absl::Span<const int64_t> from_dimensions,
-    absl::Span<const int64_t> from_sizes, absl::Span<const int64_t> to_sizes) {
+    abslx::Span<const int64_t> from_dimensions,
+    abslx::Span<const int64_t> from_sizes, abslx::Span<const int64_t> to_sizes) {
   ConvertedDimensionNumbers dimensions;
   auto common_factors = CommonFactors(from_sizes, to_sizes);
   for (int64_t i = 0; i < common_factors.size() - 1; ++i) {
@@ -362,7 +362,7 @@ ConvertedDimensionNumbers ConvertDimensionNumbers(
     bool all_present = true;
     for (int64_t d = common_factors[i].first; d < common_factors[i + 1].first;
          ++d) {
-      const bool present = absl::c_linear_search(from_dimensions, d);
+      const bool present = abslx::c_linear_search(from_dimensions, d);
       any_present |= present;
       all_present &= present;
     }
@@ -380,7 +380,7 @@ ConvertedDimensionNumbers ConvertDimensionNumbers(
       // (to) [4,4,4] to detect that from dimensoin 1 can be partially mapped
       // into dimension 1 and 2 of the to sizes with a partial size of 2.
       if (common_factors[i].first + 2 == common_factors[i + 1].first &&
-          absl::c_linear_search(from_dimensions, common_factors[i].first + 1)) {
+          abslx::c_linear_search(from_dimensions, common_factors[i].first + 1)) {
         int64_t from_size = from_sizes[common_factors[i + 1].first - 1];
         bool has_to_dim = false;
         for (int64_t to_dim = common_factors[i + 1].second - 1;
@@ -402,13 +402,13 @@ ConvertedDimensionNumbers ConvertDimensionNumbers(
       }
       for (int64_t d = common_factors[i].first; d < common_factors[i + 1].first;
            ++d) {
-        if (absl::c_linear_search(from_dimensions, d)) {
+        if (abslx::c_linear_search(from_dimensions, d)) {
           dimensions.untransformed_from_dimensions.push_back(d);
         }
       }
     }
   }
-  absl::c_sort(dimensions.to_dimensions);
+  abslx::c_sort(dimensions.to_dimensions);
   return dimensions;
 }
 std::string SanitizeFileName(std::string file_name) {

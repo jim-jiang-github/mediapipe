@@ -35,7 +35,7 @@ class GlContext::DedicatedThread {
   DedicatedThread(const DedicatedThread&) = delete;
   DedicatedThread& operator=(DedicatedThread) = delete;
 
-  absl::Status Run(GlStatusFunction gl_func);
+  abslx::Status Run(GlStatusFunction gl_func);
   void RunWithoutWaiting(GlVoidFunction gl_func);
 
   bool IsCurrentThread();
@@ -50,13 +50,13 @@ class GlContext::DedicatedThread {
   Job GetJob();
   void PutJob(Job job);
 
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
   // Used to wait for a job's completion.
-  absl::CondVar gl_job_done_cv_ ABSL_GUARDED_BY(mutex_);
+  abslx::CondVar gl_job_done_cv_ ABSL_GUARDED_BY(mutex_);
   pthread_t gl_thread_id_;
 
   std::deque<Job> jobs_ ABSL_GUARDED_BY(mutex_);
-  absl::CondVar has_jobs_cv_ ABSL_GUARDED_BY(mutex_);
+  abslx::CondVar has_jobs_cv_ ABSL_GUARDED_BY(mutex_);
 
   bool self_destruct_ = false;
 };

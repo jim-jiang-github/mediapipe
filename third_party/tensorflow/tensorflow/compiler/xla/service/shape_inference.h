@@ -53,7 +53,7 @@ class ShapeInference {
   // given input shapes.
   static StatusOr<Shape> InferBinaryOpShape(
       HloOpcode opcode, const Shape& lhs, const Shape& rhs,
-      absl::Span<const int64_t> broadcast_dimensions);
+      abslx::Span<const int64_t> broadcast_dimensions);
   static StatusOr<Shape> InferBinaryOpShape(HloOpcode opcode,
                                             const HloInstruction* lhs,
                                             const HloInstruction* rhs);
@@ -71,15 +71,15 @@ class ShapeInference {
   // Infers the shape produced by applying the given variadic operation to the
   // given input operand shapes.
   static StatusOr<Shape> InferVariadicOpShape(
-      HloOpcode opcode, absl::Span<const Shape* const> operand_shapes);
+      HloOpcode opcode, abslx::Span<const Shape* const> operand_shapes);
   static StatusOr<Shape> InferVariadicOpShape(
-      HloOpcode opcode, absl::Span<const HloInstruction* const> operands);
+      HloOpcode opcode, abslx::Span<const HloInstruction* const> operands);
 
   // Infers the shape produced by applying the given mapping computation shape
   // to the given operand shapes.
   static StatusOr<Shape> InferMapShape(
-      absl::Span<const Shape* const> arg_shapes, const ProgramShape& to_apply,
-      absl::Span<const int64_t> dimensions);
+      abslx::Span<const Shape* const> arg_shapes, const ProgramShape& to_apply,
+      abslx::Span<const int64_t> dimensions);
 
   // Infers the shape produced by InferBatchNormTraining with the given
   // operands.
@@ -114,7 +114,7 @@ class ShapeInference {
 
   // Infers the shape produced by the given FFT type on the given operand.
   static StatusOr<Shape> InferFftShape(const Shape& in, FftType fft_type,
-                                       absl::Span<const int64_t> fft_length);
+                                       abslx::Span<const int64_t> fft_length);
 
   // Infers the shape produced by the given triangular solve operation.
   static StatusOr<Shape> InferTriangularSolveShape(
@@ -126,13 +126,13 @@ class ShapeInference {
   // Infers the shape produced by an all-gather with the given operand shape,
   // concat dimension, and shard count.
   static StatusOr<Shape> InferAllGatherShape(
-      absl::Span<const Shape* const> operand_shapes,
+      abslx::Span<const Shape* const> operand_shapes,
       int64_t all_gather_dimension, int64_t shard_count);
 
   // Infers the shape produced by an all-gather-start with the given operand
   // shape, concat dimension, and shard count.
   static StatusOr<Shape> InferAllGatherStartShape(
-      absl::Span<const Shape* const> operand_shapes,
+      abslx::Span<const Shape* const> operand_shapes,
       int64_t all_gather_dimension, int64_t shard_count);
 
   // Infers the shape produced by an all-gather-done given a certain
@@ -143,17 +143,17 @@ class ShapeInference {
   // Infers the shape produced by a cross replica sum with the given operand
   // shapes.
   static StatusOr<Shape> InferAllReduceShape(
-      absl::Span<const Shape* const> operand_shapes);
+      abslx::Span<const Shape* const> operand_shapes);
 
   // Infers the shape produced by a reduce-scatter with the given operand
   // shape, scatter dimension, and shard count.
   static StatusOr<Shape> InferReduceScatterShape(
-      absl::Span<const Shape* const> operand_shapes, int64_t scatter_dimension,
+      abslx::Span<const Shape* const> operand_shapes, int64_t scatter_dimension,
       int64_t shard_count);
 
   // Infers the shape produced by a cross replica sum start.
   static StatusOr<Shape> InferAllReduceStartShape(
-      absl::Span<const Shape* const> operand_shapes);
+      abslx::Span<const Shape* const> operand_shapes);
 
   // Infers the shape produced by a cross replica sum done.
   static StatusOr<Shape> InferAllReduceDoneShape(const Shape& operand_shape);
@@ -167,15 +167,15 @@ class ShapeInference {
 
   // Infers the shape of an HLO all-to-all instruction.
   static StatusOr<Shape> InferAllToAllTupleShape(
-      absl::Span<const Shape* const> operand_shapes);
+      abslx::Span<const Shape* const> operand_shapes);
 
   // Infers the shape of a collective permute operation.
   static StatusOr<Shape> InferCollectivePermuteShape(
-      absl::Span<const Shape* const> operand_shapes);
+      abslx::Span<const Shape* const> operand_shapes);
 
   // Infers the shape of a collective permute start operation.
   static StatusOr<Shape> InferCollectivePermuteStartShape(
-      absl::Span<const Shape* const> operand_shapes);
+      abslx::Span<const Shape* const> operand_shapes);
 
   // Infers the shape of a collective permute operation.
   static StatusOr<Shape> InferCollectivePermuteDoneShape(
@@ -188,8 +188,8 @@ class ShapeInference {
   // index as the leading parameter, and the program shape should match
   // accordingly (or an error will result).
   static StatusOr<Shape> InferReduceShape(
-      absl::Span<const Shape* const> arg_shapes,
-      absl::Span<const int64_t> dimensions_to_reduce,
+      abslx::Span<const Shape* const> arg_shapes,
+      abslx::Span<const int64_t> dimensions_to_reduce,
       const ProgramShape& to_apply);
 
   // Infers the shape produced by applying the given computation to the operand
@@ -201,12 +201,12 @@ class ShapeInference {
                                                 const Shape& init_value,
                                                 const Window& window);
   static StatusOr<Shape> InferReduceWindowShape(
-      absl::Span<const Shape* const> operands,
-      absl::Span<const Shape* const> init_values, const Window& window,
+      abslx::Span<const Shape* const> operands,
+      abslx::Span<const Shape* const> init_values, const Window& window,
       const ProgramShape& to_apply_shape);
 
   static StatusOr<Shape> InferReduceWindowShape(
-      absl::Span<const Shape*> operands, absl::Span<const Shape*> init_values,
+      abslx::Span<const Shape*> operands, abslx::Span<const Shape*> init_values,
       const Window& window);
 
   // Infers the shape produced by scattering the given source shape to the
@@ -219,28 +219,28 @@ class ShapeInference {
   // Infers the shape produced by a reverse operation that reverses the order
   // of the elements in the given dimensions.
   static StatusOr<Shape> InferReverseShape(
-      const Shape& operand_shape, absl::Span<const int64_t> dimensions);
+      const Shape& operand_shape, abslx::Span<const int64_t> dimensions);
 
   // Infers the shape produced by a slice operation spanning from the starts to
   // the limits in the original shape's dimensions.
   //
   // e.g. slice f32[32x32] 0:16 0:16 -> f32[16x16]
   static StatusOr<Shape> InferSliceShape(const Shape& arg,
-                                         absl::Span<const int64_t> starts,
-                                         absl::Span<const int64_t> limits,
-                                         absl::Span<const int64_t> strides);
+                                         abslx::Span<const int64_t> starts,
+                                         abslx::Span<const int64_t> limits,
+                                         abslx::Span<const int64_t> strides);
 
   // Infers the shape produced by a dynamic slice operation of size specified
   // in 'slice_sizes', with dynamic start indices shape 'start_indices_shape'.
   static StatusOr<Shape> InferDynamicSliceShape(
-      const Shape& operand_shape, absl::Span<const Shape> start_index_shapes,
-      absl::Span<const int64_t> slice_sizes, bool allow_scalar_indices = true);
+      const Shape& operand_shape, abslx::Span<const Shape> start_index_shapes,
+      abslx::Span<const int64_t> slice_sizes, bool allow_scalar_indices = true);
 
   // Infers the shape produced by a dynamic update slice operation based
   // on the shape of operand and update.
   static StatusOr<Shape> InferDynamicUpdateSliceShape(
       const Shape& operand_shape, const Shape& update_shape,
-      absl::Span<const Shape> start_index_shapes,
+      abslx::Span<const Shape> start_index_shapes,
       bool allow_scalar_indices = true);
 
   // Infers the shape produced by doing a compile-time-constant indexing into
@@ -261,24 +261,24 @@ class ShapeInference {
   // Infers the shape produced by a predicated or indexed conditional operation.
   static StatusOr<Shape> InferConditionalShape(
       const Shape& branch_index,
-      absl::Span<const ProgramShape> branch_computations,
-      absl::Span<const Shape> branch_operands);
+      abslx::Span<const ProgramShape> branch_computations,
+      abslx::Span<const Shape> branch_operands);
 
   // Infers the shape produced by a broadcast operation.
   static StatusOr<Shape> InferBroadcastShape(
-      const Shape& operand, absl::Span<const int64_t> broadcast_sizes);
+      const Shape& operand, abslx::Span<const int64_t> broadcast_sizes);
 
   // Checks whether the given parameters can form a broadcast. Returns the same
   // output_shape if it's legal.
   static StatusOr<Shape> InferBroadcastShape(
       const Shape& operand_shape, const Shape& output_shape,
-      absl::Span<const int64_t> broadcast_dimensions);
+      abslx::Span<const int64_t> broadcast_dimensions);
 
   // Infers the shape produced by a reshape operation from the element type of
   // its operand and the new dimension sizes specified.
   static StatusOr<Shape> InferReshapeShape(const Shape& operand,
-                                           absl::Span<const int64_t> dimensions,
-                                           absl::Span<const int64_t> new_sizes,
+                                           abslx::Span<const int64_t> dimensions,
+                                           abslx::Span<const int64_t> new_sizes,
                                            int64_t inferred_dimension);
 
   // Infers the shape produced by a dynamic reshape operation from the element
@@ -286,19 +286,19 @@ class ShapeInference {
   // will have dynamic dimensions as specific in `dim_is_dynamic` and bound
   // `new_size_bounds`.
   static StatusOr<Shape> InferDynamicReshapeShape(
-      const Shape& operand, absl::Span<const Shape* const> dim_size_shapes,
-      absl::Span<const int64_t> new_size_bounds,
+      const Shape& operand, abslx::Span<const Shape* const> dim_size_shapes,
+      abslx::Span<const int64_t> new_size_bounds,
       const std::vector<bool>& dims_are_dynamic);
 
   // Infers the shape produced by a transpose operation from the element type of
   // its operand and its dimensions field.
   static StatusOr<Shape> InferTransposeShape(
-      const Shape& operand, absl::Span<const int64_t> dimensions);
+      const Shape& operand, abslx::Span<const int64_t> dimensions);
 
   // Helper that infers the shape produced by performing a concatenate operation
   // with the given operand shapes.
   static StatusOr<Shape> InferConcatOpShape(
-      absl::Span<const Shape* const> arg_shapes, int64_t dimension);
+      abslx::Span<const Shape* const> arg_shapes, int64_t dimension);
 
   // Helper that validates the given operand shape can be converted to the
   // target output_shape via a convert instruction -- the requirement is that
@@ -328,7 +328,7 @@ class ShapeInference {
   // Helper that validates the given arg_shapes are compatible with the shape of
   // the to_apply parameters, and returns the to_apply result shape.
   static StatusOr<Shape> InferCallShape(
-      absl::Span<const Shape* const> arg_shapes, const ProgramShape& to_apply);
+      abslx::Span<const Shape* const> arg_shapes, const ProgramShape& to_apply);
 
   // Helper that infers the shape produced by performing a dot operation with
   // the given LHS and RHS shapes. An optional preferred_element_type can be
@@ -344,13 +344,13 @@ class ShapeInference {
   static StatusOr<Shape> InferGatherShape(
       const Shape& input_shape, const Shape& start_indices_shape,
       const GatherDimensionNumbers& gather_dim_numbers,
-      absl::Span<const int64_t> slice_sizes);
+      abslx::Span<const int64_t> slice_sizes);
 
   // Helper that validates the given input shape, scatter indices shape, updates
   // shape, and scatter dimension numbers that constitute a scatter operation,
   // and returns the result shape of the scatter operation.
   static StatusOr<Shape> InferScatterShape(
-      absl::Span<const Shape* const> arg_shapes,
+      abslx::Span<const Shape* const> arg_shapes,
       const ProgramShape& to_apply_shape,
       const ScatterDimensionNumbers& scatter_dim_numbers);
 
@@ -366,11 +366,11 @@ class ShapeInference {
   // Helper function for creating a Window proto from user-supplied data.
   // Returns error if the user-supplied data was invalid.
   static StatusOr<Window> InferWindowFromDimensions(
-      absl::Span<const int64_t> window_dimensions,
-      absl::Span<const int64_t> window_strides,
-      absl::Span<const std::pair<int64_t, int64_t>> padding,
-      absl::Span<const int64_t> lhs_dilation,
-      absl::Span<const int64_t> rhs_dilation,
+      abslx::Span<const int64_t> window_dimensions,
+      abslx::Span<const int64_t> window_strides,
+      abslx::Span<const std::pair<int64_t, int64_t>> padding,
+      abslx::Span<const int64_t> lhs_dilation,
+      abslx::Span<const int64_t> rhs_dilation,
       std::optional<std::vector<bool>> window_reversal = std::nullopt);
 
  private:
@@ -381,7 +381,7 @@ class ShapeInference {
   // even in the presence of broadcasting of one of the operands over the other.
   static StatusOr<Shape> InferElementwiseBinaryOpShape(
       HloOpcode operation, const Shape& lhs, const Shape& rhs,
-      absl::Span<const int64_t> broadcast_dimensions);
+      abslx::Span<const int64_t> broadcast_dimensions);
 
   // Helper for inferring the shape of Clamp ops.
   static StatusOr<Shape> InferClampShape(const Shape& min, const Shape& operand,
@@ -405,7 +405,7 @@ class ShapeInference {
   // smaller_shape is broadcast to.
   static StatusOr<Shape> InferInDimBroadcastShape(
       const Shape& smaller_shape, const Shape& larger_shape,
-      absl::Span<const int64_t> broadcast_dimensions);
+      abslx::Span<const int64_t> broadcast_dimensions);
 
   ShapeInference(const ShapeInference&) = delete;
   ShapeInference& operator=(const ShapeInference&) = delete;

@@ -105,7 +105,7 @@ Status CreateIteration(int64_t iteration_id, const std::string& dataset_id,
 
 Status CreateIteration(int64_t iteration_id, const std::string& dataset_id,
                        DispatcherState& state) {
-  IterationKey key(/*name=*/absl::StrCat(random::New64()), /*repetition=*/0);
+  IterationKey key(/*name=*/abslx::StrCat(random::New64()), /*repetition=*/0);
   return CreateIteration(iteration_id, dataset_id, key, state);
 }
 
@@ -154,9 +154,9 @@ TEST(DispatcherState, RegisterDataset) {
   DispatcherState state;
   std::string dataset_id = state.NextAvailableDatasetId();
   int64_t dataset_id_int;
-  ASSERT_TRUE(absl::SimpleAtoi(dataset_id, &dataset_id_int));
+  ASSERT_TRUE(abslx::SimpleAtoi(dataset_id, &dataset_id_int));
   TF_EXPECT_OK(RegisterDataset(dataset_id, fingerprint, state));
-  EXPECT_EQ(state.NextAvailableDatasetId(), absl::StrCat(dataset_id_int + 1));
+  EXPECT_EQ(state.NextAvailableDatasetId(), abslx::StrCat(dataset_id_int + 1));
 
   {
     std::shared_ptr<const Dataset> dataset;
@@ -273,12 +273,12 @@ TEST(DispatcherState, NextAvailableDatasetId) {
   DispatcherState state;
   std::string dataset_id = state.NextAvailableDatasetId();
   int64_t dataset_id_int;
-  ASSERT_TRUE(absl::SimpleAtoi(dataset_id, &dataset_id_int));
+  ASSERT_TRUE(abslx::SimpleAtoi(dataset_id, &dataset_id_int));
 
   uint64 fingerprint = 20;
   TF_EXPECT_OK(RegisterDataset(dataset_id, fingerprint, state));
   EXPECT_NE(state.NextAvailableDatasetId(), dataset_id);
-  EXPECT_EQ(state.NextAvailableDatasetId(), absl::StrCat(dataset_id_int + 1));
+  EXPECT_EQ(state.NextAvailableDatasetId(), abslx::StrCat(dataset_id_int + 1));
   EXPECT_EQ(state.NextAvailableDatasetId(), state.NextAvailableDatasetId());
 }
 

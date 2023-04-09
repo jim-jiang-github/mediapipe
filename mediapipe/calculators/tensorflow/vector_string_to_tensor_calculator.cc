@@ -45,17 +45,17 @@ namespace tf = ::tensorflow;
 // }
 class VectorStringToTensorCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   VectorStringToTensorCalculatorOptions options_;
 };
 REGISTER_CALCULATOR(VectorStringToTensorCalculator);
 
-absl::Status VectorStringToTensorCalculator::GetContract(
+abslx::Status VectorStringToTensorCalculator::GetContract(
     CalculatorContract* cc) {
   const auto& options = cc->Options<VectorStringToTensorCalculatorOptions>();
   // Start with only one input packet.
@@ -76,16 +76,16 @@ absl::Status VectorStringToTensorCalculator::GetContract(
   cc->Outputs().Index(0).Set<tf::Tensor>(
       // Output stream with data as tf::Tensor and the same TimeSeriesHeader.
   );
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status VectorStringToTensorCalculator::Open(CalculatorContext* cc) {
+abslx::Status VectorStringToTensorCalculator::Open(CalculatorContext* cc) {
   options_ = cc->Options<VectorStringToTensorCalculatorOptions>();
   cc->SetOffset(0);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status VectorStringToTensorCalculator::Process(CalculatorContext* cc) {
+abslx::Status VectorStringToTensorCalculator::Process(CalculatorContext* cc) {
   tf::TensorShape tensor_shape;
   if (options_.input_size() == INPUT_2D) {
     const std::vector<std::vector<std::string>>& input =
@@ -106,7 +106,7 @@ absl::Status VectorStringToTensorCalculator::Process(CalculatorContext* cc) {
     } else {
       tensor_shape = tf::TensorShape({rows, cols});
     }
-    auto output = ::absl::make_unique<tf::Tensor>(tf::DT_STRING, tensor_shape);
+    auto output = ::abslx::make_unique<tf::Tensor>(tf::DT_STRING, tensor_shape);
     for (int r = 0; r < rows; ++r) {
       for (int c = 0; c < cols; ++c) {
         if (options_.transpose()) {
@@ -123,7 +123,7 @@ absl::Status VectorStringToTensorCalculator::Process(CalculatorContext* cc) {
     RET_CHECK_GE(input.size(), 1);
     const int32 length = input.size();
     tensor_shape = tf::TensorShape({length});
-    auto output = ::absl::make_unique<tf::Tensor>(tf::DT_STRING, tensor_shape);
+    auto output = ::abslx::make_unique<tf::Tensor>(tf::DT_STRING, tensor_shape);
     for (int i = 0; i < length; ++i) {
       output->tensor<tensorflow::tstring, 1>()(i) = input.at(i);
     }
@@ -131,7 +131,7 @@ absl::Status VectorStringToTensorCalculator::Process(CalculatorContext* cc) {
   } else {
     LOG(FATAL) << "input size not supported";
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

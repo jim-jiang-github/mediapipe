@@ -44,7 +44,7 @@ class OutfeedReceiver {
   //   max_callback_queue_size_bytes: the maximum number of bytes for all
   //     received outfeeds queued to be processed. When this limit is reached
   //     we pause receiving outfeeds from devices.
-  OutfeedReceiver(Callback callback, absl::Span<PjRtClient* const> clients,
+  OutfeedReceiver(Callback callback, abslx::Span<PjRtClient* const> clients,
                   ssize_t max_callback_queue_size_bytes);
 
   OutfeedReceiver(const OutfeedReceiver&) = delete;

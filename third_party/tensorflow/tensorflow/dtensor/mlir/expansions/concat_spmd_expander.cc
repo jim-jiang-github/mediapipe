@@ -108,7 +108,7 @@ StatusOr<llvm::DenseMap<int, Layout>> ConcatSPMDExpander::ComputeLayoutForward(
     if (input_layouts.find(idx) != input_layouts.end())
       concat_operands_layouts[idx] = input_layouts.lookup(idx);
   }
-  TF_ASSIGN_OR_RETURN(absl::optional<Layout> concat_operand_layout,
+  TF_ASSIGN_OR_RETURN(abslx::optional<Layout> concat_operand_layout,
                       GetMergedOperandLayout(concat_operands_layouts, op));
   // Concat/ConcatV2 has different operand index for concat dim. Retrieve the
   // correct concat dim value.

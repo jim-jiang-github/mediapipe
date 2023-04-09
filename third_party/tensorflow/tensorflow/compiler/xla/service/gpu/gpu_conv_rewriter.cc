@@ -309,10 +309,10 @@ MatchBackwardInput(HloInstruction* conv) {
   // and we want to pattern-match to that after running this pass.
   bool is_reversed_filter =
       reverse_filter->opcode() == HloOpcode::kReverse &&
-      absl::c_is_permutation(dnums.kernel_spatial_dimensions(),
+      abslx::c_is_permutation(dnums.kernel_spatial_dimensions(),
                              reverse_filter->dimensions());
   bool is_1x1_filter =
-      absl::c_all_of(conv->window().dimensions(),
+      abslx::c_all_of(conv->window().dimensions(),
                      [](const WindowDimension& d) { return d.size() == 1; });
   if (!is_reversed_filter &&
       !(window_util::HasBaseDilation(conv->window()) &&
@@ -557,7 +557,7 @@ MatchBackwardInput(HloInstruction* conv) {
 
 namespace {
 
-HloInstruction* CreateGpuConv(absl::string_view call_target, const Shape& shape,
+HloInstruction* CreateGpuConv(abslx::string_view call_target, const Shape& shape,
                               HloInstruction* lhs, HloInstruction* rhs,
                               const Window& window,
                               const ConvolutionDimensionNumbers& dnums,
@@ -745,7 +745,7 @@ StatusOr<bool> RunOnComputation(HloComputation* computation) {
 
 StatusOr<bool> GpuConvRewriter::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   XLA_VLOG_LINES(2, "GpuConvRewriter::Run(), before:\n" + module->ToString());
   bool changed = false;
   for (HloComputation* computation :

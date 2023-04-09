@@ -36,7 +36,7 @@ limitations under the License.
 
 namespace tensorflow {
 
-inline constexpr absl::string_view kImportModelDefaultGraphFuncName = "main";
+inline constexpr abslx::string_view kImportModelDefaultGraphFuncName = "main";
 
 // Given a GraphDef, returns a MLIR module containing the graph, expressed with
 // tf_executor dialect.
@@ -67,7 +67,7 @@ ConvertFunctionToMlir(const FunctionBody* fbody,
 stream_executor::port::StatusOr<mlir::OwningOpRef<mlir::ModuleOp>>
 ConvertSavedModelToMlir(SavedModelV2Bundle* saved_model,
                         mlir::MLIRContext* context,
-                        absl::Span<std::string> exported_names,
+                        abslx::Span<std::string> exported_names,
                         bool add_default_attributes = true,
                         bool unconditionally_use_set_output_shapes = false);
 
@@ -75,7 +75,7 @@ ConvertSavedModelToMlir(SavedModelV2Bundle* saved_model,
 // expressed with tf_executor dialect.
 stream_executor::port::StatusOr<mlir::OwningOpRef<mlir::ModuleOp>>
 ConvertSavedModelV1ToMlir(const SavedModelBundle& saved_model,
-                          absl::Span<std::string> exported_names,
+                          abslx::Span<std::string> exported_names,
                           mlir::MLIRContext* context, MLIRImportOptions options,
                           bool lift_variables = true);
 
@@ -92,7 +92,7 @@ ConvertSavedModelV1ToMlir(const SavedModelBundle& saved_model,
 stream_executor::port::StatusOr<mlir::OwningOpRef<mlir::ModuleOp>>
 ConvertSavedModelV1ToMlirLite(
     const MetaGraphDef& meta_graph_def, const GraphDebugInfo& debug_info,
-    std::optional<absl::Span<const std::string>> exported_names,
+    std::optional<abslx::Span<const std::string>> exported_names,
     mlir::MLIRContext* context, MLIRImportOptions options);
 
 // SavedModelMLIRImportInput is an adapter class for users to inject custom
@@ -124,7 +124,7 @@ class SavedModelMLIRImportInput {
   // `name` is a unique identifier for this subgraph, so the implementation can
   // use it for eg. debugging or caching compilation results.
   virtual stream_executor::port::StatusOr<const Graph*> GetSubGraph(
-      absl::string_view name, GraphImportConfig& specs) = 0;
+      abslx::string_view name, GraphImportConfig& specs) = 0;
 
  private:
   const MetaGraphDef* meta_graph_def_ = nullptr;
@@ -145,7 +145,7 @@ class SavedModelMLIRImportInput {
 stream_executor::port::StatusOr<mlir::OwningOpRef<mlir::ModuleOp>>
 ConvertSavedModelV1ToMlirLite(
     SavedModelMLIRImportInput& input,
-    std::optional<absl::Span<const std::string>> exported_names,
+    std::optional<abslx::Span<const std::string>> exported_names,
     mlir::MLIRContext* context,
     bool unconditionally_use_set_output_shapes = false);
 

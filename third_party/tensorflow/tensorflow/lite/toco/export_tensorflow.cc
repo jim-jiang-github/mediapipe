@@ -1461,9 +1461,9 @@ void ConvertOneHotOperator(const Model& model, const OneHotOperator& src_op,
 
 namespace {
 // TODO(aselle): Remove when available in absl
-absl::string_view FindLongestCommonPrefix(absl::string_view a,
-                                          absl::string_view b) {
-  if (a.empty() || b.empty()) return absl::string_view();
+abslx::string_view FindLongestCommonPrefix(abslx::string_view a,
+                                          abslx::string_view b) {
+  if (a.empty() || b.empty()) return abslx::string_view();
 
   const char* pa = a.data();
   const char* pb = b.data();
@@ -1475,7 +1475,7 @@ absl::string_view FindLongestCommonPrefix(absl::string_view a,
     ++count;
   }
 
-  return absl::string_view(a.data(), count);
+  return abslx::string_view(a.data(), count);
 }
 }  // namespace
 

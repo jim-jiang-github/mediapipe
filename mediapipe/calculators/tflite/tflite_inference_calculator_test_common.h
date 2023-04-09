@@ -87,7 +87,7 @@ void DoSmokeTest(const std::string& graph_proto) {
     input_tensor_buffer[i] = 1;
   }
 
-  auto input_vec = absl::make_unique<std::vector<TfLiteTensor>>();
+  auto input_vec = abslx::make_unique<std::vector<TfLiteTensor>>();
   input_vec->emplace_back(*input_tensor);
 
   // Prepare single calculator graph to and wait for packets.

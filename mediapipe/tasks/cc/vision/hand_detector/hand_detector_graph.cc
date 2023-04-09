@@ -192,7 +192,7 @@ void ConfigureRectTransformationCalculator(
 // TODO Decouple detection part and rects part.
 class HandDetectorGraph : public core::ModelTaskGraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     ASSIGN_OR_RETURN(const auto* model_resources,
                      CreateModelResources<HandDetectorGraphOptions>(sc));
@@ -222,7 +222,7 @@ class HandDetectorGraph : public core::ModelTaskGraph {
   // model file with model metadata.
   // image_in: image stream to run hand detection on.
   // graph: the mediapipe builder::Graph instance to be updated.
-  absl::StatusOr<HandDetectionOuts> BuildHandDetectionSubgraph(
+  abslx::StatusOr<HandDetectionOuts> BuildHandDetectionSubgraph(
       const HandDetectorGraphOptions& subgraph_options,
       const core::ModelResources& model_resources, Source<Image> image_in,
       Source<NormalizedRect> norm_rect_in, Graph& graph) {

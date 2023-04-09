@@ -84,18 +84,18 @@ Status MonitorGrpc(const std::string& service_address,
 }
 
 /*static*/ std::unique_ptr<RemoteProfilerSession> RemoteProfilerSession::Create(
-    const std::string& service_address, absl::Time deadline,
+    const std::string& service_address, abslx::Time deadline,
     const ProfileRequest& profile_request) {
-  auto instance = absl::WrapUnique(
+  auto instance = abslx::WrapUnique(
       new RemoteProfilerSession(service_address, deadline, profile_request));
   instance->ProfileAsync();
   return instance;
 }
 
 RemoteProfilerSession::RemoteProfilerSession(
-    const std::string& service_address, absl::Time deadline,
+    const std::string& service_address, abslx::Time deadline,
     const ProfileRequest& profile_request)
-    : response_(absl::make_unique<ProfileResponse>()),
+    : response_(abslx::make_unique<ProfileResponse>()),
       service_address_(service_address),
       stub_(CreateStub<grpc::ProfilerService>(service_address_)),
       deadline_(deadline),
@@ -111,14 +111,14 @@ RemoteProfilerSession::~RemoteProfilerSession() {
 
 void RemoteProfilerSession::ProfileAsync() {
   LOG(INFO) << "Asynchronous gRPC Profile() to " << service_address_;
-  grpc_context_.set_deadline(absl::ToChronoTime(deadline_));
+  grpc_context_.set_deadline(abslx::ToChronoTime(deadline_));
   VLOG(1) << "Deadline set to " << deadline_;
   rpc_ = stub_->AsyncProfile(&grpc_context_, profile_request_, &cq_);
   // Connection failure will create lame channel whereby grpc_status_ will be an
   // error.
   rpc_->Finish(response_.get(), &grpc_status_,
                static_cast<void*>(&status_on_completion_));
-  VLOG(2) << "Asynchronous gRPC Profile() issued." << absl::Now();
+  VLOG(2) << "Asynchronous gRPC Profile() issued." << abslx::Now();
 }
 
 std::unique_ptr<ProfileResponse> RemoteProfilerSession::WaitForCompletion(

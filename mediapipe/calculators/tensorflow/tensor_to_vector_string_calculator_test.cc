@@ -36,7 +36,7 @@ class TensorToVectorStringCalculatorTest : public ::testing::Test {
         TensorToVectorStringCalculatorOptions::ext);
     options->set_tensor_is_2d(tensor_is_2d);
     options->set_flatten_nd(flatten_nd);
-    runner_ = absl::make_unique<CalculatorRunner>(config);
+    runner_ = abslx::make_unique<CalculatorRunner>(config);
   }
 
   std::unique_ptr<CalculatorRunner> runner_;
@@ -45,10 +45,10 @@ class TensorToVectorStringCalculatorTest : public ::testing::Test {
 TEST_F(TensorToVectorStringCalculatorTest, ConvertsToVectorFloat) {
   SetUpRunner(false, false);
   const tf::TensorShape tensor_shape(std::vector<tf::int64>{5});
-  auto tensor = absl::make_unique<tf::Tensor>(tf::DT_STRING, tensor_shape);
+  auto tensor = abslx::make_unique<tf::Tensor>(tf::DT_STRING, tensor_shape);
   auto tensor_vec = tensor->vec<tensorflow::tstring>();
   for (int i = 0; i < 5; ++i) {
-    tensor_vec(i) = absl::StrCat("foo", i);
+    tensor_vec(i) = abslx::StrCat("foo", i);
   }
 
   const int64 time = 1234;
@@ -65,7 +65,7 @@ TEST_F(TensorToVectorStringCalculatorTest, ConvertsToVectorFloat) {
 
   EXPECT_EQ(5, output_vector.size());
   for (int i = 0; i < 5; ++i) {
-    const std::string expected = absl::StrCat("foo", i);
+    const std::string expected = abslx::StrCat("foo", i);
     EXPECT_EQ(expected, output_vector[i]);
   }
 }
@@ -73,10 +73,10 @@ TEST_F(TensorToVectorStringCalculatorTest, ConvertsToVectorFloat) {
 TEST_F(TensorToVectorStringCalculatorTest, ConvertsBatchedToVectorVectorFloat) {
   SetUpRunner(true, false);
   const tf::TensorShape tensor_shape(std::vector<tf::int64>{1, 5});
-  auto tensor = absl::make_unique<tf::Tensor>(tf::DT_STRING, tensor_shape);
+  auto tensor = abslx::make_unique<tf::Tensor>(tf::DT_STRING, tensor_shape);
   auto slice = tensor->Slice(0, 1).flat<tensorflow::tstring>();
   for (int i = 0; i < 5; ++i) {
-    slice(i) = absl::StrCat("foo", i);
+    slice(i) = abslx::StrCat("foo", i);
   }
 
   const int64 time = 1234;
@@ -94,7 +94,7 @@ TEST_F(TensorToVectorStringCalculatorTest, ConvertsBatchedToVectorVectorFloat) {
   const std::vector<std::string>& output_vector = output_vectors[0];
   EXPECT_EQ(5, output_vector.size());
   for (int i = 0; i < 5; ++i) {
-    const std::string expected = absl::StrCat("foo", i);
+    const std::string expected = abslx::StrCat("foo", i);
     EXPECT_EQ(expected, output_vector[i]);
   }
 }
@@ -102,10 +102,10 @@ TEST_F(TensorToVectorStringCalculatorTest, ConvertsBatchedToVectorVectorFloat) {
 TEST_F(TensorToVectorStringCalculatorTest, FlattenShouldTakeAllDimensions) {
   SetUpRunner(false, true);
   const tf::TensorShape tensor_shape(std::vector<tf::int64>{2, 2, 2});
-  auto tensor = absl::make_unique<tf::Tensor>(tf::DT_STRING, tensor_shape);
+  auto tensor = abslx::make_unique<tf::Tensor>(tf::DT_STRING, tensor_shape);
   auto slice = tensor->flat<tensorflow::tstring>();
   for (int i = 0; i < 2 * 2 * 2; ++i) {
-    slice(i) = absl::StrCat("foo", i);
+    slice(i) = abslx::StrCat("foo", i);
   }
 
   const int64 time = 1234;
@@ -121,7 +121,7 @@ TEST_F(TensorToVectorStringCalculatorTest, FlattenShouldTakeAllDimensions) {
       output_packets[0].Get<std::vector<std::string>>();
   EXPECT_EQ(2 * 2 * 2, output_vector.size());
   for (int i = 0; i < 2 * 2 * 2; ++i) {
-    const std::string expected = absl::StrCat("foo", i);
+    const std::string expected = abslx::StrCat("foo", i);
     EXPECT_EQ(expected, output_vector[i]);
   }
 }

@@ -48,21 +48,21 @@ namespace tensorflow {
 class AutoClusteringTest : public ::testing::Test {
  protected:
   Status RunAutoClusteringTestWithPbtxt(
-      absl::string_view pbtxt_file_path,
-      absl::string_view golden_summary_file_path);
+      abslx::string_view pbtxt_file_path,
+      abslx::string_view golden_summary_file_path);
   Status RunAutoClusteringTestWithGzippedPbtxt(
-      absl::string_view gzipped_pbtxt_file_path,
-      absl::string_view golden_summary_file_path);
+      abslx::string_view gzipped_pbtxt_file_path,
+      abslx::string_view golden_summary_file_path);
 
  private:
   Status RunAutoClusteringTestImpl(GraphDef graphdef,
-                                   absl::string_view golden_summary_file_path);
+                                   abslx::string_view golden_summary_file_path);
 };
 
 #if defined(PLATFORM_GOOGLE)
 // Reads the GraphDef stored in graph_def_path (which must be a pbtxt file) and
 // benchmarks MarkForCompilationPass on this graphdef.
-Status BenchmarkMarkForCompilation(absl::string_view graph_def_path,
+Status BenchmarkMarkForCompilation(abslx::string_view graph_def_path,
                                    benchmark::State& state);
 #endif  // PLATFORM_GOOGLE
 

@@ -16,7 +16,7 @@
 // optional.h
 // -----------------------------------------------------------------------------
 //
-// This header file defines the `absl::optional` type for holding a value which
+// This header file defines the `abslx::optional` type for holding a value which
 // may or may not be present. This type is useful for providing value semantics
 // for operations that may either wish to return or hold "something-or-nothing".
 //
@@ -26,10 +26,10 @@
 //   // parameter and a bool return type:
 //   bool AcquireResource(const Input&, Resource * out);
 //
-//   // Providing an absl::optional return type provides a cleaner API:
-//   absl::optional<Resource> AcquireResource(const Input&);
+//   // Providing an abslx::optional return type provides a cleaner API:
+//   abslx::optional<Resource> AcquireResource(const Input&);
 //
-// `absl::optional` is a C++11 compatible version of the C++17 `std::optional`
+// `abslx::optional` is a C++11 compatible version of the C++17 `std::optional`
 // abstraction and is designed to be a drop-in replacement for code compliant
 // with C++17.
 #ifndef ABSL_TYPES_OPTIONAL_H_
@@ -42,7 +42,7 @@
 
 #include <optional>  // IWYU pragma: export
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 using std::bad_optional_access;
 using std::optional;
@@ -50,7 +50,7 @@ using std::make_optional;
 using std::nullopt_t;
 using std::nullopt;
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #else  // ABSL_USES_STD_OPTIONAL
 
@@ -66,12 +66,12 @@ ABSL_NAMESPACE_END
 #include "absl/types/bad_optional_access.h"
 #include "absl/types/internal/optional.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // nullopt_t
 //
-// Class type for `absl::nullopt` used to indicate an `absl::optional<T>` type
+// Class type for `abslx::nullopt` used to indicate an `abslx::optional<T>` type
 // that does not contain a value.
 struct nullopt_t {
   // It must not be default-constructible to avoid ambiguity for opt = {}.
@@ -80,16 +80,16 @@ struct nullopt_t {
 
 // nullopt
 //
-// A tag constant of type `absl::nullopt_t` used to indicate an empty
-// `absl::optional` in certain functions, such as construction or assignment.
+// A tag constant of type `abslx::nullopt_t` used to indicate an empty
+// `abslx::optional` in certain functions, such as construction or assignment.
 ABSL_INTERNAL_INLINE_CONSTEXPR(nullopt_t, nullopt,
                                nullopt_t(optional_internal::init_t()));
 
 // -----------------------------------------------------------------------------
-// absl::optional
+// abslx::optional
 // -----------------------------------------------------------------------------
 //
-// A value of type `absl::optional<T>` holds either a value of `T` or an
+// A value of type `abslx::optional<T>` holds either a value of `T` or an
 // "empty" value.  When it holds a value of `T`, it stores it as a direct
 // sub-object, so `sizeof(optional<T>)` is approximately
 // `sizeof(T) + sizeof(bool)`.
@@ -97,13 +97,13 @@ ABSL_INTERNAL_INLINE_CONSTEXPR(nullopt_t, nullopt,
 // This implementation is based on the specification in the latest draft of the
 // C++17 `std::optional` specification as of May 2017, section 20.6.
 //
-// Differences between `absl::optional<T>` and `std::optional<T>` include:
+// Differences between `abslx::optional<T>` and `std::optional<T>` include:
 //
 //    * `constexpr` is not used for non-const member functions.
 //      (dependency on some differences between C++11 and C++14.)
-//    * `absl::nullopt` and `absl::in_place` are not declared `constexpr`. We
+//    * `abslx::nullopt` and `abslx::in_place` are not declared `constexpr`. We
 //      need the inline variable support in C++17 for external linkage.
-//    * Throws `absl::bad_optional_access` instead of
+//    * Throws `abslx::bad_optional_access` instead of
 //      `std::bad_optional_access`.
 //    * `make_optional()` cannot be declared `constexpr` due to the absence of
 //      guaranteed copy elision.
@@ -146,11 +146,11 @@ class optional : private optional_internal::optional_data<T>,
   // (The `in_place_t` is a tag used to indicate that the contained object
   // should be constructed in-place.)
   template <typename InPlaceT, typename... Args,
-            absl::enable_if_t<absl::conjunction<
+            abslx::enable_if_t<abslx::conjunction<
                 std::is_same<InPlaceT, in_place_t>,
                 std::is_constructible<T, Args&&...> >::value>* = nullptr>
   constexpr explicit optional(InPlaceT, Args&&... args)
-      : data_base(in_place_t(), absl::forward<Args>(args)...) {}
+      : data_base(in_place_t(), abslx::forward<Args>(args)...) {}
 
   // Constructs a non-empty `optional` direct-initialized value of type `T` from
   // the arguments of an initializer_list and `std::forward<Args>(args)...`.
@@ -161,43 +161,43 @@ class optional : private optional_internal::optional_data<T>,
                 T, std::initializer_list<U>&, Args&&...>::value>::type>
   constexpr explicit optional(in_place_t, std::initializer_list<U> il,
                               Args&&... args)
-      : data_base(in_place_t(), il, absl::forward<Args>(args)...) {
+      : data_base(in_place_t(), il, abslx::forward<Args>(args)...) {
   }
 
   // Value constructor (implicit)
   template <
       typename U = T,
       typename std::enable_if<
-          absl::conjunction<absl::negation<std::is_same<
+          abslx::conjunction<abslx::negation<std::is_same<
                                 in_place_t, typename std::decay<U>::type> >,
-                            absl::negation<std::is_same<
+                            abslx::negation<std::is_same<
                                 optional<T>, typename std::decay<U>::type> >,
                             std::is_convertible<U&&, T>,
                             std::is_constructible<T, U&&> >::value,
           bool>::type = false>
-  constexpr optional(U&& v) : data_base(in_place_t(), absl::forward<U>(v)) {}
+  constexpr optional(U&& v) : data_base(in_place_t(), abslx::forward<U>(v)) {}
 
   // Value constructor (explicit)
   template <
       typename U = T,
       typename std::enable_if<
-          absl::conjunction<absl::negation<std::is_same<
+          abslx::conjunction<abslx::negation<std::is_same<
                                 in_place_t, typename std::decay<U>::type>>,
-                            absl::negation<std::is_same<
+                            abslx::negation<std::is_same<
                                 optional<T>, typename std::decay<U>::type>>,
-                            absl::negation<std::is_convertible<U&&, T>>,
+                            abslx::negation<std::is_convertible<U&&, T>>,
                             std::is_constructible<T, U&&>>::value,
           bool>::type = false>
   explicit constexpr optional(U&& v)
-      : data_base(in_place_t(), absl::forward<U>(v)) {}
+      : data_base(in_place_t(), abslx::forward<U>(v)) {}
 
   // Converting copy constructor (implicit)
   template <typename U,
             typename std::enable_if<
-                absl::conjunction<
-                    absl::negation<std::is_same<T, U> >,
+                abslx::conjunction<
+                    abslx::negation<std::is_same<T, U> >,
                     std::is_constructible<T, const U&>,
-                    absl::negation<
+                    abslx::negation<
                         optional_internal::
                             is_constructible_convertible_from_optional<T, U> >,
                     std::is_convertible<const U&, T> >::value,
@@ -211,13 +211,13 @@ class optional : private optional_internal::optional_data<T>,
   // Converting copy constructor (explicit)
   template <typename U,
             typename std::enable_if<
-                absl::conjunction<
-                    absl::negation<std::is_same<T, U>>,
+                abslx::conjunction<
+                    abslx::negation<std::is_same<T, U>>,
                     std::is_constructible<T, const U&>,
-                    absl::negation<
+                    abslx::negation<
                         optional_internal::
                             is_constructible_convertible_from_optional<T, U>>,
-                    absl::negation<std::is_convertible<const U&, T>>>::value,
+                    abslx::negation<std::is_convertible<const U&, T>>>::value,
                 bool>::type = false>
   explicit optional(const optional<U>& rhs) {
     if (rhs) {
@@ -228,10 +228,10 @@ class optional : private optional_internal::optional_data<T>,
   // Converting move constructor (implicit)
   template <typename U,
             typename std::enable_if<
-                absl::conjunction<
-                    absl::negation<std::is_same<T, U> >,
+                abslx::conjunction<
+                    abslx::negation<std::is_same<T, U> >,
                     std::is_constructible<T, U&&>,
-                    absl::negation<
+                    abslx::negation<
                         optional_internal::
                             is_constructible_convertible_from_optional<T, U> >,
                     std::is_convertible<U&&, T> >::value,
@@ -246,12 +246,12 @@ class optional : private optional_internal::optional_data<T>,
   template <
       typename U,
       typename std::enable_if<
-          absl::conjunction<
-              absl::negation<std::is_same<T, U>>, std::is_constructible<T, U&&>,
-              absl::negation<
+          abslx::conjunction<
+              abslx::negation<std::is_same<T, U>>, std::is_constructible<T, U&&>,
+              abslx::negation<
                   optional_internal::is_constructible_convertible_from_optional<
                       T, U>>,
-              absl::negation<std::is_convertible<U&&, T>>>::value,
+              abslx::negation<std::is_convertible<U&&, T>>>::value,
           bool>::type = false>
   explicit optional(optional<U>&& rhs) {
     if (rhs) {
@@ -269,7 +269,7 @@ class optional : private optional_internal::optional_data<T>,
   // Example:
   //
   //   struct S { int value; };
-  //   optional<S> opt = absl::nullopt;  // Could also use opt = { };
+  //   optional<S> opt = abslx::nullopt;  // Could also use opt = { };
   optional& operator=(nullopt_t) noexcept {
     this->destruct();
     return *this;
@@ -284,11 +284,11 @@ class optional : private optional_internal::optional_data<T>,
   // Value assignment operators
   template <
       typename U = T,
-      typename = typename std::enable_if<absl::conjunction<
-          absl::negation<
+      typename = typename std::enable_if<abslx::conjunction<
+          abslx::negation<
               std::is_same<optional<T>, typename std::decay<U>::type>>,
-          absl::negation<
-              absl::conjunction<std::is_scalar<T>,
+          abslx::negation<
+              abslx::conjunction<std::is_scalar<T>,
                                 std::is_same<T, typename std::decay<U>::type>>>,
           std::is_constructible<T, U>, std::is_assignable<T&, U>>::value>::type>
   optional& operator=(U&& v) {
@@ -298,10 +298,10 @@ class optional : private optional_internal::optional_data<T>,
 
   template <
       typename U,
-      typename = typename std::enable_if<absl::conjunction<
-          absl::negation<std::is_same<T, U>>,
+      typename = typename std::enable_if<abslx::conjunction<
+          abslx::negation<std::is_same<T, U>>,
           std::is_constructible<T, const U&>, std::is_assignable<T&, const U&>,
-          absl::negation<
+          abslx::negation<
               optional_internal::
                   is_constructible_convertible_assignable_from_optional<
                       T, U>>>::value>::type>
@@ -315,10 +315,10 @@ class optional : private optional_internal::optional_data<T>,
   }
 
   template <typename U,
-            typename = typename std::enable_if<absl::conjunction<
-                absl::negation<std::is_same<T, U>>, std::is_constructible<T, U>,
+            typename = typename std::enable_if<abslx::conjunction<
+                abslx::negation<std::is_same<T, U>>, std::is_constructible<T, U>,
                 std::is_assignable<T&, U>,
-                absl::negation<
+                abslx::negation<
                     optional_internal::
                         is_constructible_convertible_assignable_from_optional<
                             T, U>>>::value>::type>
@@ -335,7 +335,7 @@ class optional : private optional_internal::optional_data<T>,
 
   // optional::reset()
   //
-  // Destroys the inner `T` value of an `absl::optional` if one is present.
+  // Destroys the inner `T` value of an `abslx::optional` if one is present.
   ABSL_ATTRIBUTE_REINITIALIZES void reset() noexcept { this->destruct(); }
 
   // optional::emplace()
@@ -432,7 +432,7 @@ class optional : private optional_internal::optional_data<T>,
     return reference();
   }
   constexpr const T&& operator*() const && {
-    return ABSL_HARDENING_ASSERT(this->engaged_), absl::move(reference());
+    return ABSL_HARDENING_ASSERT(this->engaged_), abslx::move(reference());
   }
   T&& operator*() && {
     ABSL_HARDENING_ASSERT(this->engaged_);
@@ -467,7 +467,7 @@ class optional : private optional_internal::optional_data<T>,
   //
   // Returns a reference to an `optional`s underlying value. The constness
   // and lvalue/rvalue-ness of the `optional` is preserved to the view of
-  // the `T` sub-object. Throws `absl::bad_optional_access` when the `optional`
+  // the `T` sub-object. Throws `abslx::bad_optional_access` when the `optional`
   // is empty.
   constexpr const T& value() const & {
     return static_cast<bool>(*this)
@@ -486,7 +486,7 @@ class optional : private optional_internal::optional_data<T>,
             : (optional_internal::throw_bad_optional_access(), reference()));
   }
   constexpr const T&& value() const && {  // NOLINT(build/c++11)
-    return absl::move(
+    return abslx::move(
         static_cast<bool>(*this)
             ? reference()
             : (optional_internal::throw_bad_optional_access(), reference()));
@@ -507,7 +507,7 @@ class optional : private optional_internal::optional_data<T>,
                   "optional<T>::value_or: U must be convertible to T");
     return static_cast<bool>(*this)
                ? **this
-               : static_cast<T>(absl::forward<U>(v));
+               : static_cast<T>(abslx::forward<U>(v));
   }
   template <typename U>
   T value_or(U&& v) && {  // NOLINT(build/c++11)
@@ -540,7 +540,7 @@ class optional : private optional_internal::optional_data<T>,
 
 // swap()
 //
-// Performs a swap between two `absl::optional` objects, using standard
+// Performs a swap between two `abslx::optional` objects, using standard
 // semantics.
 template <typename T, typename std::enable_if<
                           std::is_move_constructible<T>::value &&
@@ -553,7 +553,7 @@ void swap(optional<T>& a, optional<T>& b) noexcept(noexcept(a.swap(b))) {
 // make_optional()
 //
 // Creates a non-empty `optional<T>` where the type of `T` is deduced. An
-// `absl::optional` can also be explicitly instantiated with
+// `abslx::optional` can also be explicitly instantiated with
 // `make_optional<T>(v)`.
 //
 // Note: `make_optional()` constructions may be declared `constexpr` for
@@ -563,23 +563,23 @@ void swap(optional<T>& a, optional<T>& b) noexcept(noexcept(a.swap(b))) {
 //
 // Example:
 //
-//   constexpr absl::optional<int> opt = absl::make_optional(1);
+//   constexpr abslx::optional<int> opt = abslx::make_optional(1);
 //   static_assert(opt.value() == 1, "");
 template <typename T>
 constexpr optional<typename std::decay<T>::type> make_optional(T&& v) {
-  return optional<typename std::decay<T>::type>(absl::forward<T>(v));
+  return optional<typename std::decay<T>::type>(abslx::forward<T>(v));
 }
 
 template <typename T, typename... Args>
 constexpr optional<T> make_optional(Args&&... args) {
-  return optional<T>(in_place_t(), absl::forward<Args>(args)...);
+  return optional<T>(in_place_t(), abslx::forward<Args>(args)...);
 }
 
 template <typename T, typename U, typename... Args>
 constexpr optional<T> make_optional(std::initializer_list<U> il,
                                     Args&&... args) {
   return optional<T>(in_place_t(), il,
-                     absl::forward<Args>(args)...);
+                     abslx::forward<Args>(args)...);
 }
 
 // Relational operators [optional.relops]
@@ -758,14 +758,14 @@ constexpr auto operator>=(const U& v, const optional<T>& x)
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 namespace std {
 
-// std::hash specialization for absl::optional.
+// std::hash specialization for abslx::optional.
 template <typename T>
-struct hash<absl::optional<T> >
-    : absl::optional_internal::optional_hash_base<T> {};
+struct hash<abslx::optional<T> >
+    : abslx::optional_internal::optional_hash_base<T> {};
 
 }  // namespace std
 

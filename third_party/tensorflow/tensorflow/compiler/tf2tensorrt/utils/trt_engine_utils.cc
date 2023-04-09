@@ -34,7 +34,7 @@ limitations under the License.
 namespace tensorflow {
 namespace tensorrt {
 
-using absl::StrCat;
+using abslx::StrCat;
 
 ExecutionContext ExecutionContext::Create(nvinfer1::ICudaEngine* cuda_engine) {
   bool has_int32_output = false;

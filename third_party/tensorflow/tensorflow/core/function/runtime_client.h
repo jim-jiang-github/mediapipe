@@ -72,7 +72,7 @@ class Runtime {
   Status TransformFunction(StringPiece name, StringPiece pipeline_name);
 
   StatusOr<ReturnValues> CallFunction(
-      StringPiece name, absl::Span<AbstractTensorHandle* const> args);
+      StringPiece name, abslx::Span<AbstractTensorHandle* const> args);
 
  private:
   EagerContext& eager_ctx_;

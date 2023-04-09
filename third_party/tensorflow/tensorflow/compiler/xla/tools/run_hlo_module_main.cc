@@ -131,7 +131,7 @@ int main(int argc, char** argv) {
   xla::AppendDebugOptionsFlags(&flag_list);
   // The usage string includes the message at the top of the file, the
   // DebugOptions flags and the flags defined above.
-  const std::string kUsageString = absl::StrCat(
+  const std::string kUsageString = abslx::StrCat(
       kUsage, "\n\n", tensorflow::Flags::Usage(argv[0], flag_list));
   bool parse_ok = tensorflow::Flags::Parse(&argc, argv, flag_list);
   tensorflow::port::InitMain(kUsageString.c_str(), &argc, &argv);

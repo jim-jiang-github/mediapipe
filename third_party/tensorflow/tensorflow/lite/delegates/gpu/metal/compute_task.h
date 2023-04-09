@@ -53,10 +53,10 @@ class ComputeTask {
   const OperationDef& GetDefinition() const;
   const GPUOperation& GetGpuOperation() const { return *operation_; }
 
-  absl::Status Compile(MetalDevice* device);
+  abslx::Status Compile(MetalDevice* device);
 
   // should be called after changes of inputs/outputs.
-  absl::Status UpdateParams();
+  abslx::Status UpdateParams();
 
   void Encode(id<MTLComputeCommandEncoder> encoder);
 
@@ -71,7 +71,7 @@ class ComputeTask {
 
   void SetDstTensor(MetalSpatialTensor* tensor, int index);
 
-  absl::Status Tune(TuningType tuning_type, MetalDevice* device);
+  abslx::Status Tune(TuningType tuning_type, MetalDevice* device);
 
   int3 GetWorkGroupSize() const { return operation_->work_group_size_; }
   void SetWorkGroupSize(const int3& work_group_size);
@@ -81,12 +81,12 @@ class ComputeTask {
     return defines_;
   }
 
-  absl::Status Init(MetalDevice* device, const std::string& code,
+  abslx::Status Init(MetalDevice* device, const std::string& code,
                     const std::map<std::string, std::string>& defines);
-  absl::Status RestoreDeserialized(MetalDevice* device);
+  abslx::Status RestoreDeserialized(MetalDevice* device);
 
  private:
-  absl::Status CompileProgram(
+  abslx::Status CompileProgram(
       MetalDevice* device, const std::string& code,
       const std::map<std::string, std::string>& defines);
   void Release();

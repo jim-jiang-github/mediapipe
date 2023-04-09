@@ -85,7 +85,7 @@ Status ConvertDataType(DataType dtype, Builder builder, Type* type) {
 #include "tensorflow/compiler/mlir/tensorflow/ir/tf_types.def"
 
     default:
-      return errors::Unimplemented(absl::StrCat(
+      return errors::Unimplemented(abslx::StrCat(
           "Converting DataType '", DataTypeString(dtype), "' to MLIR Type"));
   }
 }
@@ -122,7 +122,7 @@ Status ConvertScalarTypeToDataType(Type type, DataType* dtype) {
         return OkStatus();
       default:
         return errors::Unimplemented(
-            absl::StrCat("Converting ", debugString(type), " to DataType"));
+            abslx::StrCat("Converting ", debugString(type), " to DataType"));
     }
   } else if (auto complex_type = type.dyn_cast<mlir::ComplexType>()) {
     auto etype = complex_type.getElementType();
@@ -134,7 +134,7 @@ Status ConvertScalarTypeToDataType(Type type, DataType* dtype) {
       return OkStatus();
     }
     return errors::Unimplemented(
-        absl::StrCat("Converting ", debugString(type), " to DataType"));
+        abslx::StrCat("Converting ", debugString(type), " to DataType"));
   }
 
 #define HANDLE_TF_TYPE(tftype, enumerant, name)  \
@@ -146,7 +146,7 @@ Status ConvertScalarTypeToDataType(Type type, DataType* dtype) {
 #include "tensorflow/compiler/mlir/tensorflow/ir/tf_types.def"
 
   return errors::Unimplemented(
-      absl::StrCat("Converting ", debugString(type), " to DataType"));
+      abslx::StrCat("Converting ", debugString(type), " to DataType"));
 }
 
 Status ConvertToDataType(Type type, DataType* dtype) {

@@ -97,32 +97,32 @@ struct HandLandmarkerOutputs {
   Source<std::vector<ClassificationList>> handednesses;
 };
 
-absl::Status SanityCheckOptions(
+abslx::Status SanityCheckOptions(
     const HandLandmarksDetectorGraphOptions& options) {
   if (options.min_detection_confidence() < 0 ||
       options.min_detection_confidence() > 1) {
-    return CreateStatusWithPayload(absl::StatusCode::kInvalidArgument,
+    return CreateStatusWithPayload(abslx::StatusCode::kInvalidArgument,
                                    "Invalid `min_detection_confidence` option: "
                                    "value must be in the range [0.0, 1.0]",
                                    MediaPipeTasksStatus::kInvalidArgumentError);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Builds an ImageTensorSpecs for configuring the image preprocessing subgraph.
-absl::StatusOr<ImageTensorSpecs> BuildImageTensorSpecs(
+abslx::StatusOr<ImageTensorSpecs> BuildImageTensorSpecs(
     const ModelResources& model_resources) {
   const tflite::Model& model = *model_resources.GetTfLiteModel();
   if (model.subgraphs()->size() != 1) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "Hand landmark model is assumed to have a single subgraph.",
         MediaPipeTasksStatus::kInvalidArgumentError);
   }
   const auto* primary_subgraph = (*model.subgraphs())[0];
   if (primary_subgraph->inputs()->size() != 1) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "Hand landmark model is assumed to have a single input.",
         MediaPipeTasksStatus::kInvalidArgumentError);
   }
@@ -237,7 +237,7 @@ void ConfigureHandRectTransformationCalculator(
 // }
 class SingleHandLandmarksDetectorGraph : public core::ModelTaskGraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     ASSIGN_OR_RETURN(
         const auto* model_resources,
@@ -276,7 +276,7 @@ class SingleHandLandmarksDetectorGraph : public core::ModelTaskGraph {
   // image_in: (mediapipe::Image) stream to run hand landmark detection on.
   // rect: (NormalizedRect) stream to run on the RoI of image.
   // graph: the mediapipe graph instance to be updated.
-  absl::StatusOr<SingleHandLandmarkerOutputs>
+  abslx::StatusOr<SingleHandLandmarkerOutputs>
   BuildSingleHandLandmarksDetectorGraph(
       const HandLandmarksDetectorGraphOptions& subgraph_options,
       const core::ModelResources& model_resources, Source<Image> image_in,
@@ -486,7 +486,7 @@ REGISTER_MEDIAPIPE_GRAPH(
 // }
 class MultipleHandLandmarksDetectorGraph : public core::ModelTaskGraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     Graph graph;
     ASSIGN_OR_RETURN(
@@ -512,7 +512,7 @@ class MultipleHandLandmarksDetectorGraph : public core::ModelTaskGraph {
   }
 
  private:
-  absl::StatusOr<HandLandmarkerOutputs> BuildHandLandmarksDetectorGraph(
+  abslx::StatusOr<HandLandmarkerOutputs> BuildHandLandmarksDetectorGraph(
       const HandLandmarksDetectorGraphOptions& subgraph_options,
       Source<Image> image_in,
       Source<std::vector<NormalizedRect>> multi_hand_rects, Graph& graph) {

@@ -90,7 +90,7 @@ using xla::StatusOr;
 namespace mlir {
 namespace {
 
-absl::string_view StringRefToView(llvm::StringRef ref) {
+abslx::string_view StringRefToView(llvm::StringRef ref) {
   return {ref.data(), ref.size()};
 }
 
@@ -277,10 +277,10 @@ StatusOr<mlir::Operation*> LhloDialectEmitter::CreateOpInFusion(
     size_t num_arguments, size_t num_results) {
   Location loc = getLocation(instr);
   std::vector<Value> buffers(buffer_operands.begin(), buffer_operands.end());
-  absl::Span<Value> arguments =
-      absl::MakeSpan(buffers).subspan(0, num_arguments);
-  absl::Span<Value> results =
-      absl::MakeSpan(buffers).subspan(num_arguments, num_results);
+  abslx::Span<Value> arguments =
+      abslx::MakeSpan(buffers).subspan(0, num_arguments);
+  abslx::Span<Value> results =
+      abslx::MakeSpan(buffers).subspan(num_arguments, num_results);
 
   mlir::lmhlo::FusionOp fusion = builder_.create<mlir::lmhlo::FusionOp>(loc);
   mlir::OpBuilder b(&fusion.getRegion());
@@ -462,7 +462,7 @@ StatusOr<mlir::Operation*> LhloDialectEmitter::EmitOp(
     default:
       llvm::errs() << instr->ToString();
       return tensorflow::errors::Internal(
-          absl::StrCat("LHLO opcode ", xla::HloOpcodeString(instr->opcode()),
+          abslx::StrCat("LHLO opcode ", xla::HloOpcodeString(instr->opcode()),
                        " is not supported."));
   }
 }
@@ -550,7 +550,7 @@ StatusOr<lmhlo::FusionOp> LhloDialectEmitter::EmitFusionOp(
 
   auto fusion = builder_.create<lmhlo::FusionOp>(getLocation(instr));
   auto after_fusion = builder_.saveInsertionPoint();
-  auto reverter = absl::MakeCleanup(
+  auto reverter = abslx::MakeCleanup(
       [this, after_fusion] { builder_.restoreInsertionPoint(after_fusion); });
   builder_ = mlir::OpBuilder(fusion);
 
@@ -619,7 +619,7 @@ LhloDialectEmitter::GetScatterDimensionNumbers(const HloInstruction* instr,
   const xla::ScatterDimensionNumbers& xla_scatter_dim =
       scatter_instr->scatter_dimension_numbers();
 
-  auto get_i64_array = [](absl::Span<const int64_t> container) {
+  auto get_i64_array = [](abslx::Span<const int64_t> container) {
     return ArrayRef<int64_t>{container.data(),
                              static_cast<size_t>(container.size())};
   };
@@ -791,7 +791,7 @@ namespace {
 template <typename OpT>
 void SetMatmulAttributes(OpT op, const xla::gpu::GemmBackendConfig& config,
                          OpBuilder& builder) {
-  auto arrayref = [](absl::Span<const int64_t> array) {
+  auto arrayref = [](abslx::Span<const int64_t> array) {
     return llvm::ArrayRef<int64_t>{array.data(), array.size()};
   };
 
@@ -926,7 +926,7 @@ StatusOr<Operation*> LhloDialectEmitter::EmitDnnConvolution(
 
   auto get_layout_attribute = [&](const xla::Layout& layout) {
     std::vector<int64_t> minor_to_major(layout.minor_to_major_size());
-    absl::c_transform(layout.minor_to_major(), minor_to_major.begin(),
+    abslx::c_transform(layout.minor_to_major(), minor_to_major.begin(),
                       [](int64_t x) { return static_cast<int64_t>(x); });
     return minor_to_major;
   };
@@ -1362,7 +1362,7 @@ mlir::DenseIntElementsAttr LhloDialectEmitter::GetLayoutAttribute(
 Status LhloDialectEmitter::ImportAsLmhloRegion(xla::HloComputation* computation,
                                                mlir::Region* region) {
   auto after = builder_.saveInsertionPoint();
-  auto reverter = absl::MakeCleanup(
+  auto reverter = abslx::MakeCleanup(
       [this, after] { builder_.restoreInsertionPoint(after); });
 
   builder_ = OpBuilder(region);
@@ -1599,7 +1599,7 @@ Status LhloDialectEmitter::Initialize() {
                      allocation_comparator);
   }
 
-  absl::flat_hash_map<const BufferAllocation*,
+  abslx::flat_hash_map<const BufferAllocation*,
                       std::pair<const Shape*, xla::ShapeIndex>>
       allocation_to_output_info;
   TF_RETURN_IF_ERROR(xla::ShapeUtil::ForEachSubshapeWithStatus(
@@ -1745,7 +1745,7 @@ OwningOpRef<mlir::ModuleOp> HloTextToLhloTranslateFunction(
     llvm::StringRef input, MLIRContext* context, bool optimize_xla_hlo) {
   StatusOr<std::unique_ptr<HloModule>> maybe_module =
       xla::ParseAndReturnUnverifiedModule(
-          absl::string_view(input.data(), input.size()));
+          abslx::string_view(input.data(), input.size()));
   TF_CHECK_OK(maybe_module.status());
 
   OwningOpRef<mlir::ModuleOp> module =

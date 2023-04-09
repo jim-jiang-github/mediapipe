@@ -45,7 +45,7 @@ StatusOr<se::OwningDeviceMemory> TestAllocator::Allocate(int device_ordinal,
                                                          int64_t memory_space) {
   VLOG(2) << "Allocate(" << device_ordinal << ", " << size << ")";
   {
-    absl::MutexLock lock(&count_mutex_);
+    abslx::MutexLock lock(&count_mutex_);
     allocation_count_++;
     device_allocation_count_[device_ordinal]++;
   }
@@ -56,7 +56,7 @@ StatusOr<se::OwningDeviceMemory> TestAllocator::Allocate(int device_ordinal,
 Status TestAllocator::Deallocate(int device_ordinal, se::DeviceMemoryBase mem) {
   VLOG(2) << "Deallocate(" << device_ordinal << ")";
   {
-    absl::MutexLock lock(&count_mutex_);
+    abslx::MutexLock lock(&count_mutex_);
     deallocation_count_++;
     device_deallocation_count_[device_ordinal]++;
   }
@@ -64,12 +64,12 @@ Status TestAllocator::Deallocate(int device_ordinal, se::DeviceMemoryBase mem) {
 }
 
 int64_t TestAllocator::allocation_count() const {
-  absl::MutexLock lock(&count_mutex_);
+  abslx::MutexLock lock(&count_mutex_);
   return allocation_count_;
 }
 
 int64_t TestAllocator::allocation_count(int device_ordinal) const {
-  absl::MutexLock lock(&count_mutex_);
+  abslx::MutexLock lock(&count_mutex_);
   auto it = device_allocation_count_.find(device_ordinal);
   if (it == device_allocation_count_.end()) {
     return 0;
@@ -79,12 +79,12 @@ int64_t TestAllocator::allocation_count(int device_ordinal) const {
 }
 
 int64_t TestAllocator::deallocation_count() const {
-  absl::MutexLock lock(&count_mutex_);
+  abslx::MutexLock lock(&count_mutex_);
   return deallocation_count_;
 }
 
 int64_t TestAllocator::deallocation_count(int device_ordinal) const {
-  absl::MutexLock lock(&count_mutex_);
+  abslx::MutexLock lock(&count_mutex_);
   auto it = device_deallocation_count_.find(device_ordinal);
   if (it == device_deallocation_count_.end()) {
     return 0;
@@ -95,8 +95,8 @@ int64_t TestAllocator::deallocation_count(int device_ordinal) const {
 
 /* static */ TestAllocator* LocalClientTestBase::GetOrCreateAllocator(
     se::Platform* platform) {
-  static absl::Mutex mu(absl::kConstInit);
-  absl::MutexLock lock(&mu);
+  static abslx::Mutex mu(abslx::kConstInit);
+  abslx::MutexLock lock(&mu);
 
   if (allocator_ == nullptr) {
     allocator_ = new TestAllocator(
@@ -159,7 +159,7 @@ ExecutableRunOptions LocalClientTestBase::DefaultExecutableRunOptions() const {
 
 ScopedShapedBuffer LocalClientTestBase::ExecuteLocallyOrDie(
     const XlaComputation& computation,
-    absl::Span<const ShapedBuffer* const> arguments) {
+    abslx::Span<const ShapedBuffer* const> arguments) {
   return ExecuteLocally(computation, arguments, DefaultExecutableBuildOptions(),
                         DefaultExecutableRunOptions())
       .value();
@@ -167,7 +167,7 @@ ScopedShapedBuffer LocalClientTestBase::ExecuteLocallyOrDie(
 
 ScopedShapedBuffer LocalClientTestBase::ExecuteLocallyOrDie(
     const XlaComputation& computation,
-    absl::Span<const ShapedBuffer* const> arguments,
+    abslx::Span<const ShapedBuffer* const> arguments,
     const ExecutableBuildOptions& build_options,
     const ExecutableRunOptions& run_options) {
   return ExecuteLocally(computation, arguments, build_options, run_options)
@@ -176,14 +176,14 @@ ScopedShapedBuffer LocalClientTestBase::ExecuteLocallyOrDie(
 
 StatusOr<ScopedShapedBuffer> LocalClientTestBase::ExecuteLocally(
     const XlaComputation& computation,
-    absl::Span<const ShapedBuffer* const> arguments) {
+    abslx::Span<const ShapedBuffer* const> arguments) {
   return ExecuteLocally(computation, arguments, DefaultExecutableBuildOptions(),
                         DefaultExecutableRunOptions());
 }
 
 StatusOr<ScopedShapedBuffer> LocalClientTestBase::ExecuteLocally(
     const XlaComputation& computation,
-    absl::Span<const ShapedBuffer* const> arguments,
+    abslx::Span<const ShapedBuffer* const> arguments,
     const ExecutableBuildOptions& build_options,
     const ExecutableRunOptions& run_options) {
   std::vector<const Shape*> argument_layouts(arguments.size());
@@ -210,13 +210,13 @@ StatusOr<ScopedShapedBuffer> LocalClientTestBase::ExecuteLocally(
 }
 
 StatusOr<std::unique_ptr<VerifiedHloModule>>
-LocalClientTestBase::ParseAndReturnVerifiedModule(absl::string_view hlo_text) {
+LocalClientTestBase::ParseAndReturnVerifiedModule(abslx::string_view hlo_text) {
   return ParseAndReturnVerifiedModule(hlo_text, HloModuleConfig());
 }
 
 StatusOr<std::unique_ptr<VerifiedHloModule>>
 LocalClientTestBase::ParseAndReturnVerifiedModule(
-    absl::string_view hlo_text, const HloModuleConfig& config) {
+    abslx::string_view hlo_text, const HloModuleConfig& config) {
   auto module = std::make_unique<VerifiedHloModule>(
       TestName(), config, /*verifier_layout_sensitive=*/false,
       /*allow_mixed_precision_in_hlo_verifier=*/true,

@@ -197,7 +197,7 @@ void ImageFrameSubmodule(pybind11::module* module) {
             !(pos.size() == 2 && self.NumberOfChannels() == 1)) {
           throw RaisePyError(
               PyExc_IndexError,
-              absl::StrCat("Invalid index dimension: ", pos.size()).c_str());
+              abslx::StrCat("Invalid index dimension: ", pos.size()).c_str());
         }
         py::object py_object =
             py::cast(self, py::return_value_policy::reference);

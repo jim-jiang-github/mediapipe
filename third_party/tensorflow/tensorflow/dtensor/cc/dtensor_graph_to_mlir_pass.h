@@ -34,7 +34,7 @@ class DTensorMlirPassRunner {
   Status RunOnGraph(const DeviceSet& device_set, bool is_func,
                     FunctionLibraryDefinition* flib_def,
                     std::unique_ptr<Graph>* graph,
-                    absl::flat_hash_set<Node*>& control_ret_nodes,
+                    abslx::flat_hash_set<Node*>& control_ret_nodes,
                     Fprint128 cache_key);
 
  private:

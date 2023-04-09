@@ -56,40 +56,40 @@ class FlowToImageCalculator : public CalculatorBase {
  public:
   FlowToImageCalculator() {}
   ~FlowToImageCalculator() override {}
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   FlowQuantizerModel model_;
 };
 
-absl::Status FlowToImageCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status FlowToImageCalculator::GetContract(CalculatorContract* cc) {
   cc->Inputs().Index(0).Set<OpticalFlowField>();
   cc->Outputs().Index(0).Set<ImageFrame>();
 
   // Model sanity check
   const auto& options = cc->Options<FlowToImageCalculatorOptions>();
   if (options.min_value() >= options.max_value()) {
-    return absl::InvalidArgumentError("Invalid quantizer model.");
+    return abslx::InvalidArgumentError("Invalid quantizer model.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FlowToImageCalculator::Open(CalculatorContext* cc) {
+abslx::Status FlowToImageCalculator::Open(CalculatorContext* cc) {
   const auto& options = cc->Options<FlowToImageCalculatorOptions>();
   // Fill the the model_data, ideally we want to train the model, but we omit
   // the step for now, and takes the (min, max) range from protobuf.
   const QuantizerModelData& model_data =
       ParseTextProtoOrDie<QuantizerModelData>(
-          absl::StrFormat("min_value:%f min_value:%f max_value:%f max_value:%f",
+          abslx::StrFormat("min_value:%f min_value:%f max_value:%f max_value:%f",
                           options.min_value(), options.min_value(),
                           options.max_value(), options.max_value()));
   model_.LoadFromProto(model_data);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FlowToImageCalculator::Process(CalculatorContext* cc) {
+abslx::Status FlowToImageCalculator::Process(CalculatorContext* cc) {
   const auto& input = cc->Inputs().Index(0).Get<OpticalFlowField>();
   // Input flow is 2-channel with x-dim flow and y-dim flow.
   // Convert it to a ImageFrame in SRGB space, the 3rd channel is not used (0).
@@ -106,7 +106,7 @@ absl::Status FlowToImageCalculator::Process(CalculatorContext* cc) {
     }
   }
   cc->Outputs().Index(0).Add(output.release(), cc->InputTimestamp());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 REGISTER_CALCULATOR(FlowToImageCalculator);

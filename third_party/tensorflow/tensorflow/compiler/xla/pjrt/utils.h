@@ -57,8 +57,8 @@ int DefaultThreadPoolSize();
 
 // Returns true if the striding of an array corresponds to a major-to-minor
 // layout.
-bool HasMajorToMinorLayout(PrimitiveType type, absl::Span<int64_t const> dims,
-                           absl::Span<int64_t const> byte_strides);
+bool HasMajorToMinorLayout(PrimitiveType type, abslx::Span<int64_t const> dims,
+                           abslx::Span<int64_t const> byte_strides);
 
 }  // namespace xla
 

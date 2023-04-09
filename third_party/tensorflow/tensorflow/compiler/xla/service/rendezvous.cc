@@ -21,15 +21,15 @@ limitations under the License.
 
 namespace xla {
 
-void AwaitAndLogIfStuck(absl::Mutex& mutex, const absl::Condition& condition,
-                        absl::Duration warn_stuck_timeout,
-                        absl::Duration terminate_timeout) {
+void AwaitAndLogIfStuck(abslx::Mutex& mutex, const abslx::Condition& condition,
+                        abslx::Duration warn_stuck_timeout,
+                        abslx::Duration terminate_timeout) {
   if (mutex.AwaitWithTimeout(condition, warn_stuck_timeout)) {
     return;
   }
 
   LOG(ERROR) << "This thread has been waiting for "
-             << absl::ToInt64Seconds(warn_stuck_timeout)
+             << abslx::ToInt64Seconds(warn_stuck_timeout)
              << " seconds and may be stuck:";
 
   if (mutex.AwaitWithTimeout(condition, terminate_timeout)) {
@@ -39,7 +39,7 @@ void AwaitAndLogIfStuck(absl::Mutex& mutex, const absl::Condition& condition,
   }
 
   LOG(ERROR)
-      << "Termination timeout of " << absl::ToInt64Seconds(terminate_timeout)
+      << "Termination timeout of " << abslx::ToInt64Seconds(terminate_timeout)
       << " seconds exceeded. Exiting to ensure a consistent program state.";
   std::exit(42);
 }

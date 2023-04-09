@@ -27,9 +27,9 @@ namespace profiler {
 double GetFlopMaxThroughputPerSM(const DeviceCapabilities& device_cap);
 
 // Returns the GPU model name from the given DeviceCapabilities.
-absl::string_view GpuModelName(const DeviceCapabilities& device_cap);
+abslx::string_view GpuModelName(const DeviceCapabilities& device_cap);
 
-HardwareType ParseHardwareType(absl::string_view device_type);
+HardwareType ParseHardwareType(abslx::string_view device_type);
 
 // Returns true if the given hardware type has a device.
 bool HasDevice(HardwareType x);

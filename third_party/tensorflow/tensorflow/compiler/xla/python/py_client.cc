@@ -236,7 +236,7 @@ StatusOr<py::object> PyClient::BufferFromPyval(
     } catch (const std::exception& e) {
       dtype = "<unknown>";
     }
-    return absl::StrCat("type=", type, ", shape=", shape, ", dtype=", dtype,
+    return abslx::StrCat("type=", type, ", shape=", shape, ", dtype=", dtype,
                         ", dst_device=", dst_device->DebugString());
   };
   TF_RETURN_IF_ERROR(
@@ -269,10 +269,10 @@ StatusOr<py::object> PyClient::BufferFromPyval(
 }
 
 StatusOr<std::vector<std::pair<pybind11::bytes, pybind11::object>>>
-PyClient::MakeCrossHostReceiveBuffers(absl::Span<const Shape> shapes,
+PyClient::MakeCrossHostReceiveBuffers(abslx::Span<const Shape> shapes,
                                       PjRtDevice* device) {
   CHECK(device != nullptr);
-  absl::Mutex mu;
+  abslx::Mutex mu;
   StatusOr<std::vector<PjRtCrossHostRecvDescriptors>> recv_descriptors_or;
   bool done = false;
 
@@ -281,7 +281,7 @@ PyClient::MakeCrossHostReceiveBuffers(absl::Span<const Shape> shapes,
                         shapes, device,
                         [&done, &recv_descriptors_or,
                          &mu](StatusOr<PjRtCrossHostRecvState> recv_state_or) {
-                          absl::MutexLock l(&mu);
+                          abslx::MutexLock l(&mu);
                           if (recv_state_or.ok()) {
                             py::gil_scoped_acquire gil;
                             recv_descriptors_or =
@@ -294,8 +294,8 @@ PyClient::MakeCrossHostReceiveBuffers(absl::Span<const Shape> shapes,
 
   {
     py::gil_scoped_release gil_release;
-    absl::MutexLock l(&mu);
-    mu.Await(absl::Condition(&done));
+    abslx::MutexLock l(&mu);
+    mu.Await(abslx::Condition(&done));
   }
 
   TF_RETURN_IF_ERROR(recv_descriptors_or.status());
@@ -412,8 +412,8 @@ H AbslHashValue(H h, const HeapProfileKey& key) {
 
 StatusOr<py::bytes> PyClient::HeapProfile() {
   CHECK(PyGILState_Check());
-  absl::flat_hash_set<PjRtBuffer*> buffer_set;
-  absl::flat_hash_map<HeapProfileKey, int64_t> entries;
+  abslx::flat_hash_set<PjRtBuffer*> buffer_set;
+  abslx::flat_hash_map<HeapProfileKey, int64_t> entries;
   for (PyBuffer* device_buffers : buffers_) {
     for (PyBuffer* buffer = device_buffers; buffer; buffer = buffer->next_) {
       // We only wish to count each PjRtBuffer once, even though they may be
@@ -478,7 +478,7 @@ StatusOr<py::bytes> PyClient::HeapProfile() {
 namespace {
 
 StatusOr<std::vector<CpuCallback::Arg>> CreateCallbackArgs(
-    absl::Span<Shape const> operand_shapes) {
+    abslx::Span<Shape const> operand_shapes) {
   std::vector<CpuCallback::Arg> callback_args(operand_shapes.size());
   for (int i = 0; i < operand_shapes.size(); ++i) {
     Shape shape = operand_shapes[i];
@@ -488,7 +488,7 @@ StatusOr<std::vector<CpuCallback::Arg>> CreateCallbackArgs(
           (shape.has_layout() ? shape
                               : LayoutUtil::GetWithDefaultLayout(shape));
       callback_args[i].dims.resize(shape.dimensions_size());
-      absl::c_copy(shape.dimensions(), callback_args[i].dims.begin());
+      abslx::c_copy(shape.dimensions(), callback_args[i].dims.begin());
       callback_args[i].strides = ByteStridesForShape(layout);
       callback_args[i].type = shape.element_type();
       callback_args[i].size_in_bytes = ShapeUtil::ByteSizeOf(layout);
@@ -507,7 +507,7 @@ StatusOr<std::vector<CpuCallback::Arg>> CreateCallbackArgs(
 }
 
 StatusOr<std::vector<CpuCallback::Result>> CreateCallbackResults(
-    absl::Span<Shape const> result_shapes) {
+    abslx::Span<Shape const> result_shapes) {
   std::vector<CpuCallback::Result> callback_results(result_shapes.size());
   for (int i = 0; i < result_shapes.size(); ++i) {
     if (result_shapes[i].IsArray()) {
@@ -516,13 +516,13 @@ StatusOr<std::vector<CpuCallback::Result>> CreateCallbackResults(
               ? result_shapes[i]
               : LayoutUtil::GetWithDefaultLayout(result_shapes[i]);
       callback_results[i].expected_dims.resize(shape.dimensions_size());
-      absl::c_copy(shape.dimensions(),
+      abslx::c_copy(shape.dimensions(),
                    callback_results[i].expected_dims.begin());
       callback_results[i].expected_strides = ByteStridesForShapeInt64(shape);
       callback_results[i].type = shape.element_type();
       callback_results[i].size_in_bytes = ShapeUtil::ByteSizeOf(shape);
       callback_results[i].reversed_layout.resize(shape.dimensions_size());
-      absl::c_reverse_copy(shape.layout().minor_to_major(),
+      abslx::c_reverse_copy(shape.layout().minor_to_major(),
                            callback_results[i].reversed_layout.begin());
     } else if (result_shapes[i].IsToken()) {
       callback_results[i].type = TOKEN;
@@ -539,10 +539,10 @@ StatusOr<std::vector<CpuCallback::Result>> CreateCallbackResults(
 }  // namespace
 
 StatusOr<pybind11::object> PyClient::MakePythonCallbackUsingHostSendAndRecv(
-    pybind11::function callable, absl::Span<Shape const> operand_shapes,
-    absl::Span<Shape const> result_shapes,
-    absl::Span<uint16_t const> send_channel_ids,
-    absl::Span<uint16_t const> recv_channel_ids) {
+    pybind11::function callable, abslx::Span<Shape const> operand_shapes,
+    abslx::Span<Shape const> result_shapes,
+    abslx::Span<uint16_t const> send_channel_ids,
+    abslx::Span<uint16_t const> recv_channel_ids) {
   static_assert(sizeof(uintptr_t) == sizeof(uint64_t),
                 "Expected 64-bit pointers");
 
@@ -555,8 +555,8 @@ StatusOr<pybind11::object> PyClient::MakePythonCallbackUsingHostSendAndRecv(
 
   auto* host_callback = new HostCallback;
 
-  auto assign_arg_info = [](absl::Span<Shape const> shapes,
-                            absl::Span<uint16_t const> channel_ids,
+  auto assign_arg_info = [](abslx::Span<Shape const> shapes,
+                            abslx::Span<uint16_t const> channel_ids,
                             std::vector<HostCallbackArgInfo>& arg_infos) {
     DCHECK_EQ(shapes.size(), channel_ids.size());
     arg_infos.reserve(shapes.size());
@@ -588,8 +588,8 @@ StatusOr<pybind11::object> PyClient::MakePythonCallbackUsingHostSendAndRecv(
 
 StatusOr<std::pair<uint64_t, pybind11::object>>
 PyClient::GetEmitPythonCallbackDescriptor(
-    pybind11::function callable, absl::Span<Shape const> operand_shapes,
-    absl::Span<Shape const> result_shapes) {
+    pybind11::function callable, abslx::Span<Shape const> operand_shapes,
+    abslx::Span<Shape const> result_shapes) {
   PjRtPlatformId platform_id = pjrt_client_->platform_id();
   if (platform_id != GpuId() && platform_id != CpuId()) {
     return Unimplemented(
@@ -605,7 +605,7 @@ PyClient::GetEmitPythonCallbackDescriptor(
 
   auto callback = std::make_unique<CpuCallback>(
       std::move(callable), callback_args, callback_results);
-  uint64_t descriptor = absl::bit_cast<std::uint64_t>(callback.get());
+  uint64_t descriptor = abslx::bit_cast<std::uint64_t>(callback.get());
 
   py::capsule callback_capsule(callback.release(), [](void* ptr) {
     delete reinterpret_cast<CpuCallback*>(ptr);
@@ -614,15 +614,15 @@ PyClient::GetEmitPythonCallbackDescriptor(
 }
 
 StatusOr<XlaOp> PyClient::EmitPythonCallbackFromDescriptor(
-    XlaBuilder& builder, uint64_t descriptor, absl::Span<XlaOp const> operands,
-    absl::Span<Shape const> result_shapes,
+    XlaBuilder& builder, uint64_t descriptor, abslx::Span<XlaOp const> operands,
+    abslx::Span<Shape const> result_shapes,
     std::optional<std::vector<Shape>> operand_layouts, bool has_side_effect) {
   std::vector<Shape> custom_call_arg_layouts(operands.size() + 1);
   custom_call_arg_layouts[0] =
       ShapeUtil::MakeShapeWithDescendingLayout(U64, {});
   std::vector<XlaOp> custom_call_args(operands.size() + 1);
   custom_call_args[0] = ConstantR0<std::uint64_t>(&builder, descriptor);
-  absl::c_copy(operands, custom_call_args.begin() + 1);
+  abslx::c_copy(operands, custom_call_args.begin() + 1);
 
   if (operand_layouts && operand_layouts->size() != operands.size()) {
     return InvalidArgument(
@@ -687,7 +687,7 @@ StatusOr<XlaOp> PyClient::EmitPythonCallbackFromDescriptor(
 
 StatusOr<std::pair<XlaOp, pybind11::object>> PyClient::EmitPythonCallback(
     pybind11::function callable, XlaBuilder& builder,
-    absl::Span<XlaOp const> operands, absl::Span<Shape const> result_shapes,
+    abslx::Span<XlaOp const> operands, abslx::Span<Shape const> result_shapes,
     std::optional<std::vector<Shape>> operand_layouts, bool has_side_effect) {
   std::vector<Shape> operand_shapes(operands.size());
   for (int i = 0; i < operands.size(); ++i) {

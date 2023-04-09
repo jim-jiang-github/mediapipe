@@ -578,7 +578,7 @@ TEST(HashtableOpsTest, TestNoImport) {
   EXPECT_EQ(graph.AllocateTensors(), kTfLiteOk);
   EXPECT_EQ(graph.Invoke(), kTfLiteError);
   EXPECT_TRUE(
-      absl::StrContains(graph.GetErrorReporter()->error_messages(),
+      abslx::StrContains(graph.GetErrorReporter()->error_messages(),
                         "hashtable need to be initialized before using"));
 }
 

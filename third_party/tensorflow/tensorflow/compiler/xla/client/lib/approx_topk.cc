@@ -37,8 +37,8 @@ namespace xla {
 
 namespace {
 StatusOr<std::vector<PrimitiveType>> GetOperandTypes(
-    XlaBuilder* builder, absl::Span<const XlaOp> operands,
-    absl::Span<const XlaOp> init_values) {
+    XlaBuilder* builder, abslx::Span<const XlaOp> operands,
+    abslx::Span<const XlaOp> init_values) {
   std::vector<PrimitiveType> op_types;
   auto num_operands = operands.size();
   auto operands_shapes = builder->GetOperandShapes(operands).ValueOrDie();
@@ -68,7 +68,7 @@ StatusOr<std::vector<PrimitiveType>> GetOperandTypes(
 // Converts a comparator to a combiner computation that can be fed to reduce or
 // partial reduce ops.
 XlaComputation BuildReductionComputation(
-    XlaBuilder* builder, absl::Span<const PrimitiveType> op_types,
+    XlaBuilder* builder, abslx::Span<const PrimitiveType> op_types,
     const XlaComputation& comparator) {
   auto num_operands = op_types.size();
   std::vector<XlaOp> lhs_params;
@@ -80,13 +80,13 @@ XlaComputation BuildReductionComputation(
   for (const auto& op_type : op_types) {
     lhs_params.push_back(Parameter(reduction_builder.get(), param_number,
                                    ShapeUtil::MakeScalarShape(op_type),
-                                   absl::StrFormat("lhs.%d", param_number)));
+                                   abslx::StrFormat("lhs.%d", param_number)));
     param_number++;
   }
   for (const auto& op_type : op_types) {
     rhs_params.push_back(Parameter(reduction_builder.get(), param_number,
                                    ShapeUtil::MakeScalarShape(op_type),
-                                   absl::StrFormat("rhs.%d", param_number)));
+                                   abslx::StrFormat("rhs.%d", param_number)));
     param_number++;
   }
 
@@ -107,8 +107,8 @@ XlaComputation BuildReductionComputation(
 }
 
 XlaOp AggregateToTopKBuilder(XlaBuilder* builder,
-                             absl::Span<const XlaOp> operands,
-                             absl::Span<const XlaOp> init_values, int64_t top_k,
+                             abslx::Span<const XlaOp> operands,
+                             abslx::Span<const XlaOp> init_values, int64_t top_k,
                              int64_t reduction_dim,
                              const XlaComputation& comparator) {
   auto operands_shapes = builder->GetOperandShapes(operands).ValueOrDie();
@@ -154,8 +154,8 @@ XlaOp AggregateToTopKBuilder(XlaBuilder* builder,
   return Tuple(builder, sliced_results);
 }
 
-XlaOp ApproxTopK(XlaBuilder* builder, absl::Span<const XlaOp> operands,
-                 absl::Span<const XlaOp> init_values, int64_t top_k,
+XlaOp ApproxTopK(XlaBuilder* builder, abslx::Span<const XlaOp> operands,
+                 abslx::Span<const XlaOp> init_values, int64_t top_k,
                  int64_t reduction_dim, const XlaComputation& comparator,
                  float recall_target, bool aggregate_to_topk,
                  int64_t reduction_input_size_override) {
@@ -229,7 +229,7 @@ XlaOp ApproxTopK(XlaBuilder* builder, absl::Span<const XlaOp> operands,
   auto approx_output_shape =
       ShapeUtil::MakeTupleShapeWithPtrs(approx_output_shapes);
   // PartialReduce option in JSON form
-  std::string partial_reduce_option = absl::StrFormat(
+  std::string partial_reduce_option = abslx::StrFormat(
       "{\"log2_reduction\": %d, \"reduction_dim\": %d, \"to_apply_type\": "
       "\"comparator\"}",
       log2_reduction, reduction_dim);
@@ -250,8 +250,8 @@ XlaOp ApproxTopK(XlaBuilder* builder, absl::Span<const XlaOp> operands,
   return approx_topk;
 }
 
-XlaOp ApproxTopKFallback(XlaBuilder* builder, absl::Span<const XlaOp> operands,
-                         absl::Span<const XlaOp> init_values, int64_t top_k,
+XlaOp ApproxTopKFallback(XlaBuilder* builder, abslx::Span<const XlaOp> operands,
+                         abslx::Span<const XlaOp> init_values, int64_t top_k,
                          int64_t reduction_dim,
                          const XlaComputation& comparator, float recall_target,
                          bool aggregate_to_topk,

@@ -76,7 +76,7 @@ class HeapSimulator {
     }
 
     // The assignment of buffers to chunks.
-    absl::flat_hash_map<const BufferType*, Chunk> chunk_map;
+    abslx::flat_hash_map<const BufferType*, Chunk> chunk_map;
 
     // The total size in bytes of the heap, containing all assigned chunks.
     int64_t heap_size = 0;
@@ -112,7 +112,7 @@ class HeapSimulator {
     bool alloc_constants;
     // If 'buffers_to_assign' is provided, only those buffers are assigned
     // offsets, otherwise all buffers defined by the instructions are assigned.
-    const absl::flat_hash_set<const HloValue*>* buffers_to_assign;
+    const abslx::flat_hash_set<const HloValue*>* buffers_to_assign;
   };
 
   // Returns the minimum memory required to compute an HLO module where all
@@ -128,7 +128,7 @@ class HeapSimulator {
       const HloComputation& computation, const HloInstructionSequence& sequence,
       const HloAliasAnalysis& alias_analysis,
       const LogicalBuffer::SizeFunction& size_function,
-      const absl::flat_hash_map<const HloComputation*, int64_t>*
+      const abslx::flat_hash_map<const HloComputation*, int64_t>*
           memory_by_computation = nullptr);
 
   static StatusOr<int64_t> MinimumMemoryForComputation(
@@ -164,7 +164,7 @@ class HeapSimulator {
       const HloAliasAnalysis& alias_analysis,
       const BufferValue::SizeFunction& size_fn,
       const Options& options = Options(),
-      const absl::flat_hash_map<const HloComputation*, int64_t>*
+      const abslx::flat_hash_map<const HloComputation*, int64_t>*
           memory_by_computation = nullptr);
 
   // Same as above, but runs on with a schedule that covers all nested
@@ -184,7 +184,7 @@ class HeapSimulator {
   HeapSimulator(std::unique_ptr<HeapAlgorithm<HloValue>> algorithm,
                 const BufferValue::SizeFunction& size_fn,
                 const Options& options, const HloSchedule* schedule = nullptr,
-                const absl::flat_hash_map<const HloComputation*, int64_t>*
+                const abslx::flat_hash_map<const HloComputation*, int64_t>*
                     memory_by_computation = nullptr);
   ~HeapSimulator();
 
@@ -224,12 +224,12 @@ class HeapSimulator {
   // handle subcomputations. It would be good to unify the handling of
   // subcomputations, but it's not clear how.
   const HloSchedule* schedule_;
-  const absl::flat_hash_map<const HloComputation*, int64_t>*
+  const abslx::flat_hash_map<const HloComputation*, int64_t>*
       memory_by_computation_;
 
   // Hold some sets for error-checking the sequence of Alloc and Free calls.
-  absl::flat_hash_set<const HloValue*> allocated_buffers_;
-  absl::flat_hash_set<const HloValue*> freed_buffers_;
+  abslx::flat_hash_set<const HloValue*> allocated_buffers_;
+  abslx::flat_hash_set<const HloValue*> freed_buffers_;
 
   // Debugging information filled in while the heap simulator runs.
   HeapSimulatorTrace debug_trace_;
@@ -264,7 +264,7 @@ class HeapAlgorithm {
       const HloInstruction* instruction,
       // The total number of bytes allocated by instruction.
       int64_t alloc_size_by_instruction,
-      const absl::flat_hash_map<const HloComputation*, int64_t>&
+      const abslx::flat_hash_map<const HloComputation*, int64_t>&
           memory_by_computation) {}
 
   // Free de-allocates a previously allocated buffer.
@@ -302,7 +302,7 @@ class NoFragmentationStatsHeap : public HeapAlgorithm<BufferType> {
 
   void AccountForSubcomputationMemory(
       const HloInstruction* instruction, int64_t alloc_size_by_instruction,
-      const absl::flat_hash_map<const HloComputation*, int64_t>&
+      const abslx::flat_hash_map<const HloComputation*, int64_t>&
           memory_by_computation) override;
 
   void Free(const BufferType* buffer, int64_t size) override;
@@ -382,7 +382,7 @@ class GlobalDecreasingSizeBestFitHeap : public HeapAlgorithm<BufferType> {
     int64_t end;
 
     // Colocation buffers that need to be collocated with this one.
-    absl::InlinedVector<const BufferType*, 2> colocations;
+    abslx::InlinedVector<const BufferType*, 2> colocations;
 
     // True if this buffer needs an allocation. False if it is collocated with
     // other buffer.
@@ -434,7 +434,7 @@ class GlobalDecreasingSizeBestFitHeap : public HeapAlgorithm<BufferType> {
   // contiguous.
   BufferIntervalCompare GetTemporalBufferIntervalCompare() const;
 
-  absl::flat_hash_map<const BufferType*, BufferInterval> buffer_intervals_;
+  abslx::flat_hash_map<const BufferType*, BufferInterval> buffer_intervals_;
   HeapResult result_;
   BufferIntervalCompare buffer_interval_compare_;
   BufferIntervalTree interval_tree_;
@@ -449,7 +449,7 @@ class GlobalDecreasingSizeBestFitHeap : public HeapAlgorithm<BufferType> {
   // Returns all transitive colocated buffers of this buffer interval. I.e., If
   // a buffer A is colocated with B and B is colocated with C, this function
   // returns all three of them.
-  absl::flat_hash_set<const BufferType*> GetTransitiveColocations(
+  abslx::flat_hash_set<const BufferType*> GetTransitiveColocations(
       const BufferInterval& interval) const;
 };
 

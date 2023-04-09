@@ -65,9 +65,9 @@ constexpr float kFontHeightScale = 1.25f;
 // }
 class LabelsToRenderDataCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   LabelsToRenderDataCalculatorOptions options_;
@@ -79,7 +79,7 @@ class LabelsToRenderDataCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(LabelsToRenderDataCalculator);
 
-absl::Status LabelsToRenderDataCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status LabelsToRenderDataCalculator::GetContract(CalculatorContract* cc) {
   if (cc->Inputs().HasTag(kClassificationsTag)) {
     cc->Inputs().Tag(kClassificationsTag).Set<ClassificationList>();
   } else {
@@ -94,25 +94,25 @@ absl::Status LabelsToRenderDataCalculator::GetContract(CalculatorContract* cc) {
     cc->Inputs().Tag(kVideoPrestreamTag).Set<VideoHeader>();
   }
   cc->Outputs().Tag(kRenderDataTag).Set<RenderData>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LabelsToRenderDataCalculator::Open(CalculatorContext* cc) {
+abslx::Status LabelsToRenderDataCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
   options_ = cc->Options<LabelsToRenderDataCalculatorOptions>();
   num_colors_ = options_.color_size();
   label_height_px_ = std::ceil(options_.font_height_px() * kFontHeightScale);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LabelsToRenderDataCalculator::Process(CalculatorContext* cc) {
+abslx::Status LabelsToRenderDataCalculator::Process(CalculatorContext* cc) {
   if (cc->Inputs().HasTag(kVideoPrestreamTag) &&
       cc->InputTimestamp() == Timestamp::PreStream()) {
     const VideoHeader& video_header =
         cc->Inputs().Tag(kVideoPrestreamTag).Get<VideoHeader>();
     video_width_ = video_header.width;
     video_height_ = video_header.height;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   } else {
     CHECK_EQ(options_.location(), LabelsToRenderDataCalculatorOptions::TOP_LEFT)
         << "Only TOP_LEFT is supported without VIDEO_PRESTREAM.";
@@ -177,7 +177,7 @@ absl::Status LabelsToRenderDataCalculator::Process(CalculatorContext* cc) {
     std::string display_text = labels[i];
     if (cc->Inputs().HasTag(kScoresTag) ||
         options_.display_classification_score()) {
-      absl::StrAppend(&display_text, ":", scores[i]);
+      abslx::StrAppend(&display_text, ":", scores[i]);
     }
     text->set_display_text(display_text);
     text->set_font_height(options_.font_height_px());
@@ -200,6 +200,6 @@ absl::Status LabelsToRenderDataCalculator::Process(CalculatorContext* cc) {
       .Tag(kRenderDataTag)
       .AddPacket(MakePacket<RenderData>(render_data).At(cc->InputTimestamp()));
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 }  // namespace mediapipe

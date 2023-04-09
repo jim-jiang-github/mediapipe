@@ -50,8 +50,8 @@ namespace ops {
 Status RestoreV2(AbstractContext* ctx, AbstractTensorHandle* const prefix,
                  AbstractTensorHandle* const tensor_names,
                  AbstractTensorHandle* const shape_and_slices,
-                 absl::Span<AbstractTensorHandle*> tensors,
-                 absl::Span<DataType> dtypes, const char* name,
+                 abslx::Span<AbstractTensorHandle*> tensors,
+                 abslx::Span<DataType> dtypes, const char* name,
                  const char* raw_device_name) {
   AbstractOperationPtr op_ptr(ctx->CreateOperation());
   TF_RETURN_IF_ERROR(op_ptr->Reset("RestoreV2", raw_device_name));
@@ -75,7 +75,7 @@ Status RestoreV2(AbstractContext* ctx, AbstractTensorHandle* const prefix,
 Status SaveV2(AbstractContext* ctx, AbstractTensorHandle* const prefix,
               AbstractTensorHandle* const tensor_names,
               AbstractTensorHandle* const shape_and_slices,
-              absl::Span<AbstractTensorHandle* const> tensors, const char* name,
+              abslx::Span<AbstractTensorHandle* const> tensors, const char* name,
               const char* raw_device_name) {
   AbstractOperationPtr op_ptr(ctx->CreateOperation());
   TF_RETURN_IF_ERROR(op_ptr->Reset("SaveV2", raw_device_name));
@@ -86,7 +86,7 @@ Status SaveV2(AbstractContext* ctx, AbstractTensorHandle* const prefix,
   TF_RETURN_IF_ERROR(op_ptr->AddInputList(tensors));
   int num_retvals = 0;
   std::vector<AbstractTensorHandle*> dummy_outputs;
-  return op_ptr->Execute(absl::MakeSpan(dummy_outputs), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(dummy_outputs), &num_retvals);
 }
 
 }  // namespace ops

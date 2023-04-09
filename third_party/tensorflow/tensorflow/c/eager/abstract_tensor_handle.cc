@@ -26,7 +26,7 @@ std::string AbstractTensorHandle::DebugString() const {
   } else {
     shape_string = shape.DebugString();
   }
-  return absl::StrCat("TensorHandle(shape=", shape_string,
+  return abslx::StrCat("TensorHandle(shape=", shape_string,
                       ", dtype=", DataType_Name(DataType()), ")");
 }
 

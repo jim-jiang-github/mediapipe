@@ -53,27 +53,27 @@ class TensorsToFloatsCalculator : public Node {
   MEDIAPIPE_NODE_INTERFACE(TensorsToFloatsCalculator, kInTensors, kOutFloat,
                            kOutFloats);
 
-  static absl::Status UpdateContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) final;
-  absl::Status Process(CalculatorContext* cc) final;
+  static abslx::Status UpdateContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) final;
+  abslx::Status Process(CalculatorContext* cc) final;
 
  private:
   ::mediapipe::TensorsToFloatsCalculatorOptions options_;
 };
 MEDIAPIPE_REGISTER_NODE(TensorsToFloatsCalculator);
 
-absl::Status TensorsToFloatsCalculator::UpdateContract(CalculatorContract* cc) {
+abslx::Status TensorsToFloatsCalculator::UpdateContract(CalculatorContract* cc) {
   // Only exactly a single output allowed.
   RET_CHECK(kOutFloat(cc).IsConnected() ^ kOutFloats(cc).IsConnected());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorsToFloatsCalculator::Open(CalculatorContext* cc) {
+abslx::Status TensorsToFloatsCalculator::Open(CalculatorContext* cc) {
   options_ = cc->Options<::mediapipe::TensorsToFloatsCalculatorOptions>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorsToFloatsCalculator::Process(CalculatorContext* cc) {
+abslx::Status TensorsToFloatsCalculator::Process(CalculatorContext* cc) {
   const auto& input_tensors = *kInTensors(cc);
   RET_CHECK(!input_tensors.empty());
   RET_CHECK(input_tensors[0].element_type() == Tensor::ElementType::kFloat32);
@@ -81,7 +81,7 @@ absl::Status TensorsToFloatsCalculator::Process(CalculatorContext* cc) {
   auto view = input_tensors[0].GetCpuReadView();
   auto raw_floats = view.buffer<float>();
   int num_values = input_tensors[0].shape().num_elements();
-  auto output_floats = absl::make_unique<std::vector<float>>(
+  auto output_floats = abslx::make_unique<std::vector<float>>(
       raw_floats, raw_floats + num_values);
 
   switch (options_.activation()) {
@@ -101,7 +101,7 @@ absl::Status TensorsToFloatsCalculator::Process(CalculatorContext* cc) {
   } else {
     kOutFloats(cc).Send(std::move(output_floats));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 }  // namespace api2
 }  // namespace mediapipe

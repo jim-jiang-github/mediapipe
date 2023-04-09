@@ -26,9 +26,9 @@ namespace mediapipe {
 
 Detection TensorToDetection(
     const ::tensorflow::TTypes<const float>::Vec& box, float score,
-    const ::absl::variant<int, std::string>& class_label);
+    const ::abslx::variant<int, std::string>& class_label);
 
-absl::Status TensorsToDetections(const ::tensorflow::Tensor& num_detections,
+abslx::Status TensorsToDetections(const ::tensorflow::Tensor& num_detections,
                                  const ::tensorflow::Tensor& boxes,
                                  const ::tensorflow::Tensor& scores,
                                  const ::tensorflow::Tensor& classes,
@@ -36,7 +36,7 @@ absl::Status TensorsToDetections(const ::tensorflow::Tensor& num_detections,
                                  std::vector<Detection>* detections);
 
 // Use this version if keypoints or masks are available.
-absl::Status TensorsToDetections(const ::tensorflow::Tensor& num_detections,
+abslx::Status TensorsToDetections(const ::tensorflow::Tensor& num_detections,
                                  const ::tensorflow::Tensor& boxes,
                                  const ::tensorflow::Tensor& scores,
                                  const ::tensorflow::Tensor& classes,

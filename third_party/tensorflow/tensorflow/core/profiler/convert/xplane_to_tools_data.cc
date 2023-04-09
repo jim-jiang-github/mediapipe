@@ -197,7 +197,7 @@ std::pair<std::string, bool> ConvertMultiXSpacesToTfDataBottleneckAnalysis(
       LOG(WARNING) << "Could not find host XPlane for tf data stats: ";
       return std::make_pair("", false);
     }
-    absl::string_view host_name = mutable_xspaces[idx].hostnames_size()
+    abslx::string_view host_name = mutable_xspaces[idx].hostnames_size()
                                       ? mutable_xspaces[idx].hostnames(0)
                                       : filenames[idx];
     builder.Add(host_name, host_plane);
@@ -211,7 +211,7 @@ std::pair<std::string, bool> ConvertMultiXSpacesToTfDataBottleneckAnalysis(
 std::pair<std::string, bool> ConvertMultiXSpacesToToolData(
     const std::vector<XSpace>& xspaces,
     const std::vector<std::string>& filenames,
-    const absl::string_view tool_name) {
+    const abslx::string_view tool_name) {
   if (tool_name == "trace_viewer") {
     return ConvertXSpaceToTraceEvents(xspaces);
   } else if (tool_name == "overview_page") {

@@ -70,7 +70,7 @@ struct HandLandmarkerOptions {
   // The user-defined result callback for processing live stream data.
   // The result callback should only be specified when the running mode is set
   // to RunningMode::LIVE_STREAM.
-  std::function<void(absl::StatusOr<HandLandmarkerResult>, const Image&, int64)>
+  std::function<void(abslx::StatusOr<HandLandmarkerResult>, const Image&, int64)>
       result_callback = nullptr;
 };
 
@@ -111,7 +111,7 @@ class HandLandmarker : tasks::vision::core::BaseVisionTaskApi {
   //    input timestamp and the image that hand landmarker runs on will be
   //    available in the result callback when the hand landmarker finishes the
   //    work.
-  static absl::StatusOr<std::unique_ptr<HandLandmarker>> Create(
+  static abslx::StatusOr<std::unique_ptr<HandLandmarker>> Create(
       std::unique_ptr<HandLandmarkerOptions> options);
 
   // Performs hand landmarks detection on the given image.
@@ -127,7 +127,7 @@ class HandLandmarker : tasks::vision::core::BaseVisionTaskApi {
   // The image can be of any size with format RGB or RGBA.
   // TODO: Describes how the input image will be preprocessed
   // after the yuv support is implemented.
-  absl::StatusOr<HandLandmarkerResult> Detect(
+  abslx::StatusOr<HandLandmarkerResult> Detect(
       Image image,
       std::optional<core::ImageProcessingOptions> image_processing_options =
           std::nullopt);
@@ -145,7 +145,7 @@ class HandLandmarker : tasks::vision::core::BaseVisionTaskApi {
   // The image can be of any size with format RGB or RGBA. It's required to
   // provide the video frame's timestamp (in milliseconds). The input timestamps
   // must be monotonically increasing.
-  absl::StatusOr<HandLandmarkerResult> DetectForVideo(
+  abslx::StatusOr<HandLandmarkerResult> DetectForVideo(
       Image image, int64 timestamp_ms,
       std::optional<core::ImageProcessingOptions> image_processing_options =
           std::nullopt);
@@ -174,12 +174,12 @@ class HandLandmarker : tasks::vision::core::BaseVisionTaskApi {
   //     longer be valid when the callback returns. To access the image data
   //     outside of the callback, callers need to make a copy of the image.
   //   - The input timestamp in milliseconds.
-  absl::Status DetectAsync(Image image, int64 timestamp_ms,
+  abslx::Status DetectAsync(Image image, int64 timestamp_ms,
                            std::optional<core::ImageProcessingOptions>
                                image_processing_options = std::nullopt);
 
   // Shuts down the HandLandmarker when all works are done.
-  absl::Status Close() { return runner_->Close(); }
+  abslx::Status Close() { return runner_->Close(); }
 };
 
 }  // namespace hand_landmarker

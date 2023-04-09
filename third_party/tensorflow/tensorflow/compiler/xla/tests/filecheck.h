@@ -27,7 +27,7 @@ namespace xla {
 // FileCheck can execute, returns true if and only if FileCheck succeeded in
 // matching the input.
 StatusOr<bool> RunFileCheck(const std::string& input,
-                            absl::string_view pattern);
+                            abslx::string_view pattern);
 
 // Runs FileCheck with the given pattern file over given input string. Provided
 // that FileCheck can execute, returns true if and only if FileCheck succeeded

@@ -158,7 +158,7 @@ struct EinsumHelper {
         max_bcast_dims = std::max(max_bcast_dims, num_bcast_dims);
       }
     }
-    if (!absl::c_linear_search(input_has_ellipsis, true) &&
+    if (!abslx::c_linear_search(input_has_ellipsis, true) &&
         !output_has_ellipsis) {
       return Status::OK();
     }
@@ -244,7 +244,7 @@ struct EinsumHelper {
                                 const LabelCounts& label_counts,
                                 const bool should_inflate, Tensor* output) {
     // Return early if there are no repeated indices.
-    if (absl::c_all_of(label_counts, [](int c) { return c <= 1; })) {
+    if (abslx::c_all_of(label_counts, [](int c) { return c <= 1; })) {
       return CopyFrom(input, input.shape(), output);
     }
     // We reshape so that each repeated label is compressed to one dimension.
@@ -342,7 +342,7 @@ struct EinsumHelper {
     // EinsumDimensionType; i.e. batch, free, contract and reduce dimensions.
     // This makes it more convenient to invoke Reduce/Contract operations.
     std::vector<int> permutation(input.dims());
-    absl::c_iota(permutation, 0);
+    abslx::c_iota(permutation, 0);
     Tensor input_transposed;
     // Check if we can avoid the transpose. We need to flip the adj_x (or adj_y)
     // flag during BatchMatMul. This is an extra optimization not necessary for
@@ -350,7 +350,7 @@ struct EinsumHelper {
     if (ShouldSwapFreeAndContract(*labels, label_types)) {
       *swap_free_and_contract = true;
     } else {
-      absl::c_sort(permutation, [&](int i, int j) {
+      abslx::c_sort(permutation, [&](int i, int j) {
         int label_i = (*labels)[i];
         int label_j = (*labels)[j];
         return std::tie(label_types[label_i], label_i) <
@@ -431,8 +431,8 @@ struct EinsumHelper {
   // case and perform componentwise multiplication functor instead.
   template <typename Device, typename T>
   static Status ContractOperands(OpKernelContext* ctx,
-                                 absl::Span<const Tensor> inputs,
-                                 absl::Span<const bool> swap_free_and_contract,
+                                 abslx::Span<const Tensor> inputs,
+                                 abslx::Span<const bool> swap_free_and_contract,
                                  Tensor* output) {
     if (inputs.size() == 1)
       return CopyFrom(inputs[0], inputs[0].shape(), output);

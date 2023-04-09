@@ -41,8 +41,8 @@ TEST(MetricUtilsTest, CollectMetrics) {
   EXPECT_EQ(iterator_busy.Delta(), 0);
 
   IteratorMetricsCollector metrics_collector(DEVICE_CPU, *Env::Default());
-  absl::Time start_time = metrics_collector.RecordStart();
-  absl::SleepFor(absl::Seconds(1));
+  abslx::Time start_time = metrics_collector.RecordStart();
+  abslx::SleepFor(abslx::Seconds(1));
   metrics_collector.RecordStop(start_time, /*output=*/{});
 
   Histogram latency_histogram = latency.Delta();
@@ -61,8 +61,8 @@ TEST(MetricUtilsTest, ShouldNotCollectMetrics) {
   EXPECT_EQ(iterator_busy.Delta(), 0);
 
   IteratorMetricsCollector metrics_collector(DEVICE_TPU, *Env::Default());
-  absl::Time start_time = metrics_collector.RecordStart();
-  absl::SleepFor(absl::Seconds(1));
+  abslx::Time start_time = metrics_collector.RecordStart();
+  abslx::SleepFor(abslx::Seconds(1));
   metrics_collector.RecordStop(start_time, /*output=*/{});
 
   EXPECT_FLOAT_EQ(latency.Delta().num(), 0.0);
@@ -79,30 +79,30 @@ TEST(MetricUtilsTest, ConcurrentThreads) {
   EXPECT_EQ(iterator_busy.Delta(), 0);
 
   IteratorMetricsCollector metrics_collector(DEVICE_CPU, *Env::Default());
-  absl::Time start_time = metrics_collector.RecordStart();
-  auto thread = absl::WrapUnique(Env::Default()->StartThread(
+  abslx::Time start_time = metrics_collector.RecordStart();
+  auto thread = abslx::WrapUnique(Env::Default()->StartThread(
       /*thread_options=*/{}, /*name=*/"Concurrent metric collection thread",
       [&metrics_collector]() {
-        absl::Time concurrent_start_time = metrics_collector.RecordStart();
-        absl::SleepFor(absl::Seconds(1));
+        abslx::Time concurrent_start_time = metrics_collector.RecordStart();
+        abslx::SleepFor(abslx::Seconds(1));
         metrics_collector.RecordStop(concurrent_start_time, /*output=*/{});
       }));
-  absl::SleepFor(absl::Seconds(1));
+  abslx::SleepFor(abslx::Seconds(1));
   metrics_collector.RecordStop(start_time, /*output=*/{});
   thread.reset();
 
   Histogram latency_histogram = latency.Delta();
   EXPECT_FLOAT_EQ(latency_histogram.num(), 2.0);
   EXPECT_GT(latency_histogram.sum(),
-            absl::ToInt64Microseconds(absl::Seconds(2)));
+            abslx::ToInt64Microseconds(abslx::Seconds(2)));
   // The iterator busy time and lifetime do not count the latency twice.
   EXPECT_GE(iterator_lifetime.Delta(),
-            absl::ToInt64Microseconds(absl::Seconds(1)));
+            abslx::ToInt64Microseconds(abslx::Seconds(1)));
   EXPECT_LT(iterator_lifetime.Delta(),
-            absl::ToInt64Microseconds(absl::Seconds(1.5)));
-  EXPECT_GE(iterator_busy.Delta(), absl::ToInt64Microseconds(absl::Seconds(1)));
+            abslx::ToInt64Microseconds(abslx::Seconds(1.5)));
+  EXPECT_GE(iterator_busy.Delta(), abslx::ToInt64Microseconds(abslx::Seconds(1)));
   EXPECT_LT(iterator_busy.Delta(),
-            absl::ToInt64Microseconds(absl::Seconds(1.5)));
+            abslx::ToInt64Microseconds(abslx::Seconds(1.5)));
 }
 
 TEST(MetricUtilsTest, OverlappingThreads) {
@@ -119,33 +119,33 @@ TEST(MetricUtilsTest, OverlappingThreads) {
   // Overlap: 0.5 sec.
   // Iterator busy time: 2.5 sec.
   IteratorMetricsCollector metrics_collector(DEVICE_CPU, *Env::Default());
-  absl::Time start_time = metrics_collector.RecordStart();
-  absl::SleepFor(absl::Seconds(0.5));
-  auto thread = absl::WrapUnique(Env::Default()->StartThread(
+  abslx::Time start_time = metrics_collector.RecordStart();
+  abslx::SleepFor(abslx::Seconds(0.5));
+  auto thread = abslx::WrapUnique(Env::Default()->StartThread(
       /*thread_options=*/{}, /*name=*/"Concurrent metric collection thread",
       [&metrics_collector]() {
-        absl::Time concurrent_start_time = metrics_collector.RecordStart();
-        absl::SleepFor(absl::Seconds(2));
+        abslx::Time concurrent_start_time = metrics_collector.RecordStart();
+        abslx::SleepFor(abslx::Seconds(2));
         metrics_collector.RecordStop(concurrent_start_time, /*output=*/{});
       }));
-  absl::SleepFor(absl::Seconds(0.5));
+  abslx::SleepFor(abslx::Seconds(0.5));
   metrics_collector.RecordStop(start_time, /*output=*/{});
-  absl::SleepFor(absl::Seconds(1.5));
+  abslx::SleepFor(abslx::Seconds(1.5));
   thread.reset();
 
   Histogram latency_histogram = latency.Delta();
   EXPECT_FLOAT_EQ(latency_histogram.num(), 2.0);
   EXPECT_GT(latency_histogram.sum(),
-            absl::ToInt64Microseconds(absl::Seconds(3)));
+            abslx::ToInt64Microseconds(abslx::Seconds(3)));
   // The iterator busy time and lifetime should not count the overlap twice.
   EXPECT_GE(iterator_lifetime.Delta(),
-            absl::ToInt64Microseconds(absl::Seconds(2.5)));
+            abslx::ToInt64Microseconds(abslx::Seconds(2.5)));
   EXPECT_LT(iterator_lifetime.Delta(),
-            absl::ToInt64Microseconds(absl::Seconds(2.9)));
+            abslx::ToInt64Microseconds(abslx::Seconds(2.9)));
   EXPECT_GE(iterator_busy.Delta(),
-            absl::ToInt64Microseconds(absl::Seconds(2.5)));
+            abslx::ToInt64Microseconds(abslx::Seconds(2.5)));
   EXPECT_LT(iterator_busy.Delta(),
-            absl::ToInt64Microseconds(absl::Seconds(2.9)));
+            abslx::ToInt64Microseconds(abslx::Seconds(2.9)));
 }
 
 }  // namespace

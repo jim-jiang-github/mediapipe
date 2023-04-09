@@ -89,7 +89,7 @@ TEST_P(InferenceCalculatorTest, TestBackendSelection) {
   SetDelegateForParam(node);
   MP_ASSERT_OK(tool::ExpandSubgraphs(&config));
   EXPECT_EQ(config.node(0).calculator(),
-            absl::StrCat("InferenceCalculator", GetParam().impl_suffix));
+            abslx::StrCat("InferenceCalculator", GetParam().impl_suffix));
 }
 
 TEST_P(InferenceCalculatorTest, TestFaceDetection) {
@@ -106,7 +106,7 @@ TEST_P(InferenceCalculatorTest, TestFaceDetection) {
     // The InferenceCalculator subgraph itself will have expanded to a specific
     // implementation. Replace it.
     // TODO: make it possible to exclude it from expansion above.
-    if (absl::StartsWith(node.calculator(), "InferenceCalculator")) {
+    if (abslx::StartsWith(node.calculator(), "InferenceCalculator")) {
       ++found;
       node.set_calculator("InferenceCalculator");
       SetDelegateForParam(&node);

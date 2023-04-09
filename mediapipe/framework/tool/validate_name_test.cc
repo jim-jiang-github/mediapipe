@@ -140,7 +140,7 @@ TEST(ValidateNameTest, ParseTagAndName) {
     tag = "blah";
     name = "blah";
     EXPECT_FALSE(
-        tool::ParseTagAndName(absl::StrCat("MALE", character, "ACTOR:humphrey"),
+        tool::ParseTagAndName(abslx::StrCat("MALE", character, "ACTOR:humphrey"),
                               &tag, &name)
             .ok());
     EXPECT_EQ("", tag);
@@ -149,7 +149,7 @@ TEST(ValidateNameTest, ParseTagAndName) {
     name = "blah";
     EXPECT_FALSE(
         tool::ParseTagAndName(
-            absl::StrCat("ACTOR:humphrey", character, "bogart"), &tag, &name)
+            abslx::StrCat("ACTOR:humphrey", character, "bogart"), &tag, &name)
             .ok());
     EXPECT_EQ("", tag);
     EXPECT_EQ("", name);
@@ -206,7 +206,7 @@ TEST(ValidateNameTest, ParseTagIndexName) {
                             "mieko_harada");
   TestPassParseTagIndexName("A1:100:mieko1", "A1", 100, "mieko1");
   TestPassParseTagIndexName(
-      absl::StrCat("A1:", mediapipe::internal::kMaxCollectionItemId, ":mieko1"),
+      abslx::StrCat("A1:", mediapipe::internal::kMaxCollectionItemId, ":mieko1"),
       "A1", mediapipe::internal::kMaxCollectionItemId, "mieko1");
 
   // Failure cases.
@@ -244,7 +244,7 @@ TEST(ValidateNameTest, ParseTagIndexName) {
   TestFailParseTagIndexName("A:01:name");  // Leading zero.
   TestFailParseTagIndexName("A:00:name");  // Leading zero.
   TestFailParseTagIndexName(
-      absl::StrCat("A:", mediapipe::internal::kMaxCollectionItemId + 1,
+      abslx::StrCat("A:", mediapipe::internal::kMaxCollectionItemId + 1,
                    ":a"));  // Too large an index.
   // Extra field
   TestFailParseTagIndexName("A:1:a:");   // extra field.
@@ -257,17 +257,17 @@ TEST(ValidateNameTest, ParseTagIndexName) {
   for (char character : {'!', '@', '#', '$',  '%', '^', '&', '*', '(',  ')',
                          '{', '}', '[', ']',  '/', '=', '?', '+', '\\', '|',
                          '-', ';', ':', '\'', '"', ',', '<', '.', '>'}) {
-    TestFailParseTagIndexName(absl::Substitute("$0", character));
-    TestFailParseTagIndexName(absl::Substitute("$0a", character));
-    TestFailParseTagIndexName(absl::Substitute("a$0", character));
-    TestFailParseTagIndexName(absl::Substitute("$0:a", character));
-    TestFailParseTagIndexName(absl::Substitute("A$0:a", character));
-    TestFailParseTagIndexName(absl::Substitute("$0A:a", character));
-    TestFailParseTagIndexName(absl::Substitute("A:$0:a", character));
-    TestFailParseTagIndexName(absl::Substitute("A:$01:a", character));
-    TestFailParseTagIndexName(absl::Substitute("A:1$0:a", character));
-    TestFailParseTagIndexName(absl::Substitute("A:1:a$0", character));
-    TestFailParseTagIndexName(absl::Substitute("$0A:1:a", character));
+    TestFailParseTagIndexName(abslx::Substitute("$0", character));
+    TestFailParseTagIndexName(abslx::Substitute("$0a", character));
+    TestFailParseTagIndexName(abslx::Substitute("a$0", character));
+    TestFailParseTagIndexName(abslx::Substitute("$0:a", character));
+    TestFailParseTagIndexName(abslx::Substitute("A$0:a", character));
+    TestFailParseTagIndexName(abslx::Substitute("$0A:a", character));
+    TestFailParseTagIndexName(abslx::Substitute("A:$0:a", character));
+    TestFailParseTagIndexName(abslx::Substitute("A:$01:a", character));
+    TestFailParseTagIndexName(abslx::Substitute("A:1$0:a", character));
+    TestFailParseTagIndexName(abslx::Substitute("A:1:a$0", character));
+    TestFailParseTagIndexName(abslx::Substitute("$0A:1:a", character));
   }
 }
 
@@ -332,14 +332,14 @@ TEST(ValidateNameTest, ParseTagIndex) {
   for (char character : {'!', '@', '#', '$',  '%', '^', '&', '*', '(',  ')',
                          '{', '}', '[', ']',  '/', '=', '?', '+', '\\', '|',
                          '-', ';', ':', '\'', '"', ',', '<', '.', '>'}) {
-    TestFailParseTagIndex(absl::Substitute("$0", character));
-    TestFailParseTagIndex(absl::Substitute("$0A", character));
-    TestFailParseTagIndex(absl::Substitute("A$0", character));
-    TestFailParseTagIndex(absl::Substitute("$0:1", character));
-    TestFailParseTagIndex(absl::Substitute("A$0:1", character));
-    TestFailParseTagIndex(absl::Substitute("$0A:1", character));
-    TestFailParseTagIndex(absl::Substitute("A:1$0", character));
-    TestFailParseTagIndex(absl::Substitute("A:$01", character));
+    TestFailParseTagIndex(abslx::Substitute("$0", character));
+    TestFailParseTagIndex(abslx::Substitute("$0A", character));
+    TestFailParseTagIndex(abslx::Substitute("A$0", character));
+    TestFailParseTagIndex(abslx::Substitute("$0:1", character));
+    TestFailParseTagIndex(abslx::Substitute("A$0:1", character));
+    TestFailParseTagIndex(abslx::Substitute("$0A:1", character));
+    TestFailParseTagIndex(abslx::Substitute("A:1$0", character));
+    TestFailParseTagIndex(abslx::Substitute("A:$01", character));
   }
 }
 

@@ -24,19 +24,19 @@ struct TransformLandmarksAttributes {
 
 class TransformLandmarksOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final;
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final;
 };
 
-absl::Status ParseTransformLandmarksV1Attributes(
+abslx::Status ParseTransformLandmarksV1Attributes(
     const void* data, uint32_t data_size, TransformLandmarksAttributes* attr,
     BHWC* output_shape);
 
-absl::Status ParseTransformLandmarksV2Attributes(
+abslx::Status ParseTransformLandmarksV2Attributes(
     const void* data, uint32_t data_size, TransformLandmarksAttributes* attr,
     BHWC* output_shape);
 

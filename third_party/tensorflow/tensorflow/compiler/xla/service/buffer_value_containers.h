@@ -38,7 +38,7 @@ BufferValueCompactPointerSet ToBufferValueCompactPointerSet(
   return output;
 }
 
-using BufferValueFlatSet = absl::flat_hash_set<const BufferValue*>;
+using BufferValueFlatSet = abslx::flat_hash_set<const BufferValue*>;
 template <class LogicalBufferContainerT>
 BufferValueFlatSet ToBufferValueFlatSet(
     const LogicalBufferContainerT& logical_buffer_container) {

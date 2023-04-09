@@ -104,7 +104,7 @@ inline std::string EncodeVectorToString(const std::vector<T>& vec) {
 }
 
 template <typename T>
-inline bool DecodeFromStringView(absl::string_view str, T* result) {
+inline bool DecodeFromStringView(abslx::string_view str, T* result) {
   CHECK(result != nullptr);
   if (sizeof(*result) != str.size()) {
     return false;
@@ -114,7 +114,7 @@ inline bool DecodeFromStringView(absl::string_view str, T* result) {
 }
 
 template <typename T>
-inline bool DecodeVectorFromStringView(absl::string_view str,
+inline bool DecodeVectorFromStringView(abslx::string_view str,
                                        std::vector<T>* result) {
   CHECK(result != nullptr);
   if (str.size() % sizeof(T) != 0) return false;
@@ -564,7 +564,7 @@ void FlowPackager::EncodeTrackingData(const TrackingData& tracking_data,
       ModelCompose3(homog_scale, background_model, inv_homog_scale);
 
   std::string background_model_string =
-      absl::StrCat(EncodeToString(background_model.h_00()),
+      abslx::StrCat(EncodeToString(background_model.h_00()),
                    EncodeToString(background_model.h_01()),
                    EncodeToString(background_model.h_02()),
                    EncodeToString(background_model.h_10()),
@@ -580,7 +580,7 @@ void FlowPackager::EncodeTrackingData(const TrackingData& tracking_data,
                           : flow_compressed_8.size();
   int32 row_idx_size = row_idx.size();
 
-  absl::StrAppend(data, EncodeToString(frame_flags),
+  abslx::StrAppend(data, EncodeToString(frame_flags),
                   EncodeToString(domain_width), EncodeToString(domain_height),
                   EncodeToString(frame_aspect), background_model_string,
                   EncodeToString(scale), EncodeToString(num_vectors),
@@ -594,7 +594,7 @@ void FlowPackager::EncodeTrackingData(const TrackingData& tracking_data,
           << " (" << vector_size << ")";
 }
 
-std::string PopSubstring(int len, absl::string_view* piece) {
+std::string PopSubstring(int len, abslx::string_view* piece) {
   std::string result = std::string(piece->substr(0, len));
   piece->remove_prefix(len);
   return result;
@@ -604,7 +604,7 @@ void FlowPackager::DecodeTrackingData(const BinaryTrackingData& container_data,
                                       TrackingData* tracking_data) const {
   CHECK(tracking_data != nullptr);
 
-  absl::string_view data(container_data.data());
+  abslx::string_view data(container_data.data());
   int32 frame_flags = 0;
   int32 domain_width = 0;
   int32 domain_height = 0;
@@ -811,7 +811,7 @@ void FlowPackager::DecodeMetaData(const TrackingContainer& container_data,
   CHECK_EQ("META", container_data.header());
   CHECK_EQ(1, container_data.version()) << "Unsupported version.";
 
-  absl::string_view data(container_data.data());
+  abslx::string_view data(container_data.data());
 
   int32 num_frames;
   DecodeFromStringView(PopSubstring(4, &data), &num_frames);
@@ -861,9 +861,9 @@ void FlowPackager::FinalizeTrackingContainerFormat(
   meta->set_header("META");
 
   std::string* binary_metadata = meta->mutable_data();
-  absl::StrAppend(binary_metadata, EncodeToString(meta_data.num_frames()));
+  abslx::StrAppend(binary_metadata, EncodeToString(meta_data.num_frames()));
   for (auto& track_offset : *meta_data.mutable_track_offsets()) {
-    absl::StrAppend(binary_metadata, EncodeToString(track_offset.msec()),
+    abslx::StrAppend(binary_metadata, EncodeToString(track_offset.msec()),
                     EncodeToString(track_offset.stream_offset()));
   }
 
@@ -929,13 +929,13 @@ void FlowPackager::AddContainerToString(const TrackingContainer& container,
 
   std::vector<char> header{header_string[0], header_string[1], header_string[2],
                            header_string[3]};
-  absl::StrAppend(binary_data, EncodeVectorToString(header),
+  abslx::StrAppend(binary_data, EncodeVectorToString(header),
                   EncodeToString(container.version()),
                   EncodeToString(container.size()), container.data());
 }
 
 std::string FlowPackager::SplitContainerFromString(
-    absl::string_view* binary_data, TrackingContainer* container) {
+    abslx::string_view* binary_data, TrackingContainer* container) {
   CHECK(binary_data != nullptr);
   CHECK(container != nullptr);
   CHECK_GE(binary_data->size(), 12) << "Data does not contain "
@@ -977,7 +977,7 @@ void FlowPackager::TrackingContainerFormatFromBinary(
   CHECK(container_format != nullptr);
   container_format->Clear();
 
-  absl::string_view data(binary);
+  abslx::string_view data(binary);
 
   CHECK_EQ("META", SplitContainerFromString(
                        &data, container_format->mutable_meta_data()));

@@ -24,8 +24,8 @@ namespace tensorflow {
 
 bool AreWeightsFrozen() {
   static bool weights_const = false;
-  static absl::once_flag once;
-  absl::call_once(once, [&] {
+  static abslx::once_flag once;
+  abslx::call_once(once, [&] {
     TF_CHECK_OK(ReadBoolFromEnvVar("TF_ONEDNN_ASSUME_FROZEN_WEIGHTS",
                                    /*default_value*/ false, &weights_const));
   });
@@ -34,8 +34,8 @@ bool AreWeightsFrozen() {
 
 bool UseSystemAlloc() {
   static bool use_sys_alloc = false;
-  static absl::once_flag once;
-  absl::call_once(once, [&] {
+  static abslx::once_flag once;
+  abslx::call_once(once, [&] {
     TF_CHECK_OK(ReadBoolFromEnvVar("TF_ONEDNN_USE_SYSTEM_ALLOCATOR",
                                    /*default_value*/ false, &use_sys_alloc));
   });

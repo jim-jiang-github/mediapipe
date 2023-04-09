@@ -33,7 +33,7 @@ namespace profiler {
 std::pair<std::string, bool> ConvertMultiXSpacesToToolData(
     const std::vector<XSpace>& xspaces,
     const std::vector<std::string>& filenames,
-    const absl::string_view tool_name);
+    const abslx::string_view tool_name);
 
 }  // namespace profiler
 }  // namespace tensorflow

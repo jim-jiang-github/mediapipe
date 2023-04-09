@@ -48,12 +48,12 @@ Status EagerExecute(EagerOperation* op, TensorHandle** retvals,
 // Low-level utility to execute the kernel specified by `kernel` on
 // `kernel->device()`, with the inputs op_inputs, in the context 'ctx'.
 Status EagerKernelExecute(
-    EagerContext* ctx, const absl::InlinedVector<TensorHandle*, 4>& op_inputs,
-    const absl::optional<EagerFunctionParams>& eager_func_params,
+    EagerContext* ctx, const abslx::InlinedVector<TensorHandle*, 4>& op_inputs,
+    const abslx::optional<EagerFunctionParams>& eager_func_params,
     const core::RefCountPtr<KernelAndDevice>& kernel,
     GraphCollector* graph_collector, CancellationManager* cancellation_manager,
-    absl::Span<TensorHandle*> retvals,
-    const absl::optional<ManagedStackTrace>& stack_trace = {});
+    abslx::Span<TensorHandle*> retvals,
+    const abslx::optional<ManagedStackTrace>& stack_trace = {});
 
 // Low-level utility to copy a tensor handle from one device to another. If
 // successful, result TensorHandle will be populated. If the caller requests for

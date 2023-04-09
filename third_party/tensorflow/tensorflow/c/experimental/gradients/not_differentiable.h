@@ -23,8 +23,8 @@ namespace gradients {
 // Ignores `grad_outputs` and sets all entries in grad_inputs to nullptr.
 class NotDifferentiableGradientFunction : public GradientFunction {
   Status Compute(AbstractContext* ctx,
-                 absl::Span<AbstractTensorHandle* const> grad_outputs,
-                 absl::Span<AbstractTensorHandle*> grad_inputs) override;
+                 abslx::Span<AbstractTensorHandle* const> grad_outputs,
+                 abslx::Span<AbstractTensorHandle*> grad_inputs) override;
 };
 // Shorthand for registry->Register(op, new NotDifferentiableGradientFunction)
 Status RegisterNotDifferentiable(GradientRegistry* registry, const string& op);

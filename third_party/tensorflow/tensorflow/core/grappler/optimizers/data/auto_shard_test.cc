@@ -98,7 +98,7 @@ TEST(RewriteBatchTest, InfiniteSource) {
   std::vector<std::string> ineligible_reason;
   EXPECT_TRUE(internal::IsEligibleRewriteBatchSize(*sink_node, graph,
                                                    &ineligible_reason))
-      << absl::StrJoin(ineligible_reason, ",");
+      << abslx::StrJoin(ineligible_reason, ",");
 }
 
 TEST(RewriteBatchTest, InfiniteSourceMapAndBatch) {
@@ -130,7 +130,7 @@ TEST(RewriteBatchTest, InfiniteSourceMapAndBatch) {
   std::vector<std::string> ineligible_reason;
   EXPECT_TRUE(internal::IsEligibleRewriteBatchSize(*sink_node, graph,
                                                    &ineligible_reason))
-      << absl::StrJoin(ineligible_reason, ",");
+      << abslx::StrJoin(ineligible_reason, ",");
 }
 
 TEST(RewriteBatchTest, InfiniteSourceParallelBatch) {
@@ -163,7 +163,7 @@ TEST(RewriteBatchTest, InfiniteSourceParallelBatch) {
   std::vector<std::string> ineligible_reason;
   EXPECT_TRUE(internal::IsEligibleRewriteBatchSize(*sink_node, graph,
                                                    &ineligible_reason))
-      << absl::StrJoin(ineligible_reason, ",");
+      << abslx::StrJoin(ineligible_reason, ",");
 }
 
 TEST(RewriteBatchTest, FiniteSourceNoDropRemainder) {
@@ -189,7 +189,7 @@ TEST(RewriteBatchTest, FiniteSourceNoDropRemainder) {
   std::vector<std::string> ineligible_reason;
   EXPECT_TRUE(internal::IsEligibleRewriteBatchSize(*sink_node, graph,
                                                    &ineligible_reason))
-      << absl::StrJoin(ineligible_reason, ",");
+      << abslx::StrJoin(ineligible_reason, ",");
 }
 
 TEST(RewriteBatchTest, FiniteSourceDropRemainder) {
@@ -376,7 +376,7 @@ TEST(RewriteBatchTest, InfiniteSourceNoRebatch) {
   std::vector<std::string> ineligible_reason;
   EXPECT_TRUE(internal::IsEligibleRewriteBatchSize(*sink_node, graph,
                                                    &ineligible_reason))
-      << absl::StrJoin(ineligible_reason, ",");
+      << abslx::StrJoin(ineligible_reason, ",");
 }
 
 }  // namespace

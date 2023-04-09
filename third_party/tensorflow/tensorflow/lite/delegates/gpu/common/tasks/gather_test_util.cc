@@ -26,7 +26,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 namespace {
-absl::Status GatherWidthIntTest(TestExecutionEnvironment* env) {
+abslx::Status GatherWidthIntTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 5, 1);
   src_tensor.data = {half(1.5f), half(2.4f), half(3.3f), half(4.2f),
@@ -62,11 +62,11 @@ absl::Status GatherWidthIntTest(TestExecutionEnvironment* env) {
           dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 }  // namespace
 
-absl::Status GatherWidthTest(TestExecutionEnvironment* env) {
+abslx::Status GatherWidthTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 5, 1);
   src_tensor.data = {half(1.5f), half(2.4f), half(3.3f), half(4.2f),
@@ -100,7 +100,7 @@ absl::Status GatherWidthTest(TestExecutionEnvironment* env) {
   }
 
   RETURN_IF_ERROR(GatherWidthIntTest(env));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

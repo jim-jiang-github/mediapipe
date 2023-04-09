@@ -340,7 +340,7 @@ class HashTable : public InitializableLookupTable {
   }
 
  private:
-  absl::flat_hash_map<K, V> table_;
+  abslx::flat_hash_map<K, V> table_;
 };
 
 }  // namespace lookup

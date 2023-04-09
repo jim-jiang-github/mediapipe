@@ -302,10 +302,10 @@ class StreamingBuffer {
  private:
   int overlap_ = 0;
   int first_frame_index_ = 0;
-  absl::node_hash_map<std::string, std::deque<absl::any>> data_;
+  abslx::node_hash_map<std::string, std::deque<abslx::any>> data_;
 
   // Stores tag, TypeId of corresponding type.
-  absl::node_hash_map<std::string, size_t> data_config_;
+  abslx::node_hash_map<std::string, size_t> data_config_;
 };
 
 //// Implementation details.
@@ -326,7 +326,7 @@ void StreamingBuffer::AddDatum(const std::string& tag,
   CHECK(HasTag(tag));
   CHECK_EQ(data_config_[tag], kTypeId<PointerType<T>>.hash_code());
   auto& buffer = data_[tag];
-  absl::any packet(PointerType<T>(CreatePointer(pointer.release())));
+  abslx::any packet(PointerType<T>(CreatePointer(pointer.release())));
   buffer.push_back(packet);
 }
 
@@ -393,8 +393,8 @@ T* StreamingBuffer::GetMutableDatum(const std::string& tag,
   if (frame_index > buffer.size()) {
     return nullptr;
   } else {
-    const absl::any& packet = buffer[frame_index];
-    if (absl::any_cast<PointerType<T>>(&packet) == nullptr) {
+    const abslx::any& packet = buffer[frame_index];
+    if (abslx::any_cast<PointerType<T>>(&packet) == nullptr) {
       LOG(ERROR) << "Stored item is not of requested type. "
                  << "Check data configuration.";
       return nullptr;
@@ -402,7 +402,7 @@ T* StreamingBuffer::GetMutableDatum(const std::string& tag,
 
     // Unpack and return.
     const PointerType<T>& pointer =
-        *absl::any_cast<const PointerType<T>>(&packet);
+        *abslx::any_cast<const PointerType<T>>(&packet);
     return pointer->get();
   }
 }
@@ -444,7 +444,7 @@ bool StreamingBuffer::IsInitialized(const std::string& tag) const {
   const auto& buffer = data_.find(tag)->second;
   int idx = 0;
   for (const auto& item : buffer) {
-    const PointerType<T>* pointer = absl::any_cast<const PointerType<T>>(&item);
+    const PointerType<T>* pointer = abslx::any_cast<const PointerType<T>>(&item);
     CHECK(pointer != nullptr);
     if (*pointer == nullptr) {
       LOG(ERROR) << "Data for " << tag << " at frame " << idx
@@ -462,13 +462,13 @@ std::vector<T*> StreamingBuffer::GetMutableDatumVector(
   auto& buffer = data_.find(tag)->second;
   std::vector<T*> result;
   for (const auto& packet : buffer) {
-    if (absl::any_cast<PointerType<T>>(&packet) == nullptr) {
+    if (abslx::any_cast<PointerType<T>>(&packet) == nullptr) {
       LOG(ERROR) << "Stored item is not of requested type. "
                  << "Check data configuration.";
       result.push_back(nullptr);
     } else {
       result.push_back(
-          absl::any_cast<const PointerType<T>>(&packet)->get()->get());
+          abslx::any_cast<const PointerType<T>>(&packet)->get()->get());
     }
   }
   return result;
@@ -494,8 +494,8 @@ std::unique_ptr<T> StreamingBuffer::ReleaseDatum(const std::string& tag,
   if (frame_index >= buffer.size()) {
     return nullptr;
   } else {
-    const absl::any& packet = buffer[frame_index];
-    if (absl::any_cast<PointerType<T>>(&packet) == nullptr) {
+    const abslx::any& packet = buffer[frame_index];
+    if (abslx::any_cast<PointerType<T>>(&packet) == nullptr) {
       LOG(ERROR) << "Stored item is not of requested type. "
                  << "Check data configuration.";
       return nullptr;
@@ -503,7 +503,7 @@ std::unique_ptr<T> StreamingBuffer::ReleaseDatum(const std::string& tag,
 
     // Unpack and return.
     const PointerType<T>& pointer =
-        *absl::any_cast<const PointerType<T>>(&packet);
+        *abslx::any_cast<const PointerType<T>>(&packet);
     return std::move(*pointer);
   }
 }

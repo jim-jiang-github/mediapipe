@@ -56,7 +56,7 @@ int FillTensorWithData(tensorflow::Tensor* tensor,
 // TensorFlow tensor.
 int FillTensorWithTfLiteHexString(tensorflow::Tensor* tensor,
                                   const string& values_as_string) {
-  string s = absl::HexStringToBytes(values_as_string);
+  string s = abslx::HexStringToBytes(values_as_string);
 
   int num_strings = values_as_string.empty() ? 0 : GetStringCount(s.data());
 
@@ -95,7 +95,7 @@ string TensorDataToTfLiteHexString(const tensorflow::Tensor& tensor) {
 
   char* char_buffer = nullptr;
   size_t size = dynamic_buffer.WriteToBuffer(&char_buffer);
-  string s = absl::BytesToHexString({char_buffer, size});
+  string s = abslx::BytesToHexString({char_buffer, size});
   free(char_buffer);
 
   return s;
@@ -176,7 +176,7 @@ void TfDriver::ResetTensor(const std::string& name) {
       break;
     }
     default:
-      Invalidate(absl::StrCat("Unsupported tensor type ", input_types_[id],
+      Invalidate(abslx::StrCat("Unsupported tensor type ", input_types_[id],
                               tensorflow::DataType_Name(input_types_[id]),
                               " in ResetInput"));
       return;
@@ -197,7 +197,7 @@ void TfDriver::Invoke(const std::vector<std::pair<string, string>>& inputs) {
   auto status = session_->Run({input_tensors_.begin(), input_tensors_.end()},
                               output_names_, {}, &output_tensors_);
   if (!status.ok()) {
-    Invalidate(absl::StrCat("TensorFlow failed to run graph:",
+    Invalidate(abslx::StrCat("TensorFlow failed to run graph:",
                             status.error_message()));
   }
 }
@@ -227,14 +227,14 @@ void TfDriver::SetInput(const string& values_as_string,
           FillTensorWithTfLiteHexString(tensor, values_as_string);
       break;
     default:
-      Invalidate(absl::StrCat("Unsupported tensor type ",
+      Invalidate(abslx::StrCat("Unsupported tensor type ",
                               tensorflow::DataType_Name(tensor->dtype()),
                               " in SetInput"));
       return;
   }
 
   if (tensor->NumElements() != num_values_available) {
-    Invalidate(absl::StrCat("Needed ", tensor->NumElements(),
+    Invalidate(abslx::StrCat("Needed ", tensor->NumElements(),
                             " values for input tensor, but was given ",
                             num_values_available, " instead."));
   }
@@ -257,7 +257,7 @@ string TfDriver::ReadOutput(const tensorflow::Tensor& tensor) {
     case tensorflow::DT_BOOL:
       return TensorDataToCsvString<bool>(tensor);
     default:
-      Invalidate(absl::StrCat("Unsupported tensor type ",
+      Invalidate(abslx::StrCat("Unsupported tensor type ",
                               tensorflow::DataType_Name(tensor.dtype()),
                               " in ReadOutput"));
       return "";

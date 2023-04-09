@@ -53,7 +53,7 @@ class SerializedCompiledModelBuilder {
 
   // Returns serialized data that will stay valid until this object is
   // destroyed.
-  absl::Span<const uint8_t> Finalize(const CompiledModelOptions& options);
+  abslx::Span<const uint8_t> Finalize(const CompiledModelOptions& options);
 
  private:
   std::vector<flatbuffers::Offset<flatbuffers::String>> shaders_;
@@ -67,9 +67,9 @@ class DeserializationHandler {
  public:
   virtual ~DeserializationHandler() = default;
 
-  virtual absl::Status OnShader(absl::Span<const char> shader_src) = 0;
+  virtual abslx::Status OnShader(abslx::Span<const char> shader_src) = 0;
 
-  virtual absl::Status OnProgram(const std::vector<Variable>& parameters,
+  virtual abslx::Status OnProgram(const std::vector<Variable>& parameters,
                                  const std::vector<Object>& objects,
                                  const uint3& workgroup_size,
                                  const uint3& num_workgroups,
@@ -78,7 +78,7 @@ class DeserializationHandler {
   virtual void OnOptions(const CompiledModelOptions& options) = 0;
 };
 
-absl::Status DeserializeCompiledModel(absl::Span<const uint8_t> serialized,
+abslx::Status DeserializeCompiledModel(abslx::Span<const uint8_t> serialized,
                                       DeserializationHandler* handler);
 
 }  // namespace gl

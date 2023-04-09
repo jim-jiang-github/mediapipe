@@ -83,7 +83,7 @@ XRTCompilationCache::~XRTCompilationCache() {
 }
 
 Status XRTCompilationCache::Release(int64_t uid) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   auto iter = entries_by_uid_.find(uid);
 
   if (iter == entries_by_uid_.end()) {
@@ -103,7 +103,7 @@ Status XRTCompilationCache::Release(int64_t uid) {
 }
 
 void XRTCompilationCache::DiscardEntryRef(CompiledSubgraph* entry) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   DiscardEntryRefLocked(entry);
 }
 
@@ -217,7 +217,7 @@ Status XRTCompilationCache::CompileIfKeyAbsent(
         compile_function) {
   CompiledSubgraph* entry = nullptr;
 
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   auto iter = cache_.find(key);
 
   if (iter == cache_.end()) {
@@ -240,7 +240,7 @@ Status XRTCompilationCache::CompileIfKeyAbsent(
     // Make a new reference that is owned by the caller.
     entry->Ref();
     // Block if necessary until the subgraph has been initialized.
-    mu_.Await(absl::Condition(
+    mu_.Await(abslx::Condition(
         +[](CompiledSubgraph* e) { return e->initialized; }, entry));
   }
 
@@ -271,7 +271,7 @@ Status XRTCompilationCache::Lookup(
     int64_t uid, std::unique_ptr<XRTCompilationCacheEntryRef>* entry) {
   entry->reset();
 
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   const auto iter = entries_by_uid_.find(uid);
   if (iter == entries_by_uid_.end()) {
     return errors::NotFound("No executable found for uid ", uid);

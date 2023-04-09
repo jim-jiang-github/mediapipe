@@ -97,7 +97,7 @@ class PosixRandomAccessFile : public RandomAccessFile {
   }
 
 #if defined(TF_CORD_SUPPORT)
-  Status Read(uint64 offset, size_t n, absl::Cord* cord) const override {
+  Status Read(uint64 offset, size_t n, abslx::Cord* cord) const override {
     if (n == 0) {
       return OkStatus();
     }
@@ -116,9 +116,9 @@ class PosixRandomAccessFile : public RandomAccessFile {
     StringPiece tmp;
     Status s = Read(offset, n, &tmp, scratch);
 
-    absl::Cord tmp_cord = absl::MakeCordFromExternal(
-        absl::string_view(static_cast<char*>(scratch), tmp.size()),
-        [scratch](absl::string_view) { delete[] scratch; });
+    abslx::Cord tmp_cord = abslx::MakeCordFromExternal(
+        abslx::string_view(static_cast<char*>(scratch), tmp.size()),
+        [scratch](abslx::string_view) { delete[] scratch; });
     cord->Append(tmp_cord);
     return s;
   }
@@ -151,7 +151,7 @@ class PosixWritableFile : public WritableFile {
 
 #if defined(TF_CORD_SUPPORT)
   // \brief Append 'cord' to the file.
-  Status Append(const absl::Cord& cord) override {
+  Status Append(const abslx::Cord& cord) override {
     for (const auto& chunk : cord.Chunks()) {
       size_t r = fwrite(chunk.data(), 1, chunk.size(), file_);
       if (r != chunk.size()) {

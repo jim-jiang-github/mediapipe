@@ -24,9 +24,9 @@ limitations under the License.
 namespace pybind11 {
 namespace detail {
 
-// Convert between tensorflow::StringPiece (aka absl::string_view) and Python.
+// Convert between tensorflow::StringPiece (aka abslx::string_view) and Python.
 //
-// pybind11 supports std::string_view, and absl::string_view is meant to be a
+// pybind11 supports std::string_view, and abslx::string_view is meant to be a
 // drop-in replacement for std::string_view, so we can just use the built in
 // implementation.
 template <>

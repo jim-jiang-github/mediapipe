@@ -34,12 +34,12 @@ uint64 ComputeHash(int device_id, const ConvParametersProto& proto) {
 }  // namespace
 
 ConvParameters::ConvParameters(
-    int64_t batch, int64_t in_depths, const absl::Span<const int64_t> in,
-    int data_format, int64_t out_depths, const absl::Span<const int64_t> filter,
-    const absl::Span<const int64_t> dilation,
-    const absl::Span<const int64_t> stride,
-    const absl::Span<const int64_t> padding, DataType dtype, int device_id,
-    int group_count, absl::optional<ConvParameters::FusionInfo> fusion_info,
+    int64_t batch, int64_t in_depths, const abslx::Span<const int64_t> in,
+    int data_format, int64_t out_depths, const abslx::Span<const int64_t> filter,
+    const abslx::Span<const int64_t> dilation,
+    const abslx::Span<const int64_t> stride,
+    const abslx::Span<const int64_t> padding, DataType dtype, int device_id,
+    int group_count, abslx::optional<ConvParameters::FusionInfo> fusion_info,
     int version)
     : device_id_(device_id) {
   proto_.set_batch(batch);

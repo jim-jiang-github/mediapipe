@@ -52,25 +52,25 @@ bool IsGlSupported() {
 }
 
 // Expects the target SSBO to be already bound.
-absl::Status MapAHardwareBufferToGlBuffer(AHardwareBuffer* handle,
+abslx::Status MapAHardwareBufferToGlBuffer(AHardwareBuffer* handle,
                                           size_t size) {
   if (!IsGlSupported()) {
-    return absl::UnknownError(
+    return abslx::UnknownError(
         "No GL extension functions found to bind AHardwareBuffer and "
         "OpenGL buffer");
   }
   EGLClientBuffer native_buffer = eglGetNativeClientBufferANDROID(handle);
   if (!native_buffer) {
-    return absl::UnknownError("Can't get native buffer");
+    return abslx::UnknownError("Can't get native buffer");
   }
   glBufferStorageExternalEXT(GL_SHADER_STORAGE_BUFFER, 0, size, native_buffer,
                              GL_MAP_READ_BIT | GL_MAP_WRITE_BIT |
                                  GL_MAP_COHERENT_BIT_EXT |
                                  GL_MAP_PERSISTENT_BIT_EXT);
   if (glGetError() == GL_NO_ERROR) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   } else {
-    return absl::InternalError("Error in glBufferStorageExternalEXT");
+    return abslx::InternalError("Error in glBufferStorageExternalEXT");
   }
 }
 
@@ -101,19 +101,19 @@ class DelayedReleaser {
                   Tensor::FinishingFunc&& ahwb_written,
                   std::shared_ptr<mediapipe::GlContext> gl_context,
                   std::function<void()>&& callback) {
-    static absl::Mutex mutex;
+    static abslx::Mutex mutex;
     std::deque<std::unique_ptr<DelayedReleaser>> to_release_local;
     using std::swap;
 
     // IsSignaled will grab other mutexes, so we don't want to call it while
     // holding the deque mutex.
     {
-      absl::MutexLock lock(&mutex);
+      abslx::MutexLock lock(&mutex);
       swap(to_release_local, to_release_);
     }
 
     // Using `new` to access a non-public constructor.
-    to_release_local.emplace_back(absl::WrapUnique(new DelayedReleaser(
+    to_release_local.emplace_back(abslx::WrapUnique(new DelayedReleaser(
         ahwb, opengl_buffer, ssbo_sync, ssbo_read, std::move(ahwb_written),
         gl_context, std::move(callback))));
     for (auto it = to_release_local.begin(); it != to_release_local.end();) {
@@ -125,7 +125,7 @@ class DelayedReleaser {
     }
 
     {
-      absl::MutexLock lock(&mutex);
+      abslx::MutexLock lock(&mutex);
       to_release_.insert(to_release_.end(),
                          std::make_move_iterator(to_release_local.begin()),
                          std::make_move_iterator(to_release_local.end()));
@@ -207,7 +207,7 @@ class DelayedReleaser {
 }  // namespace
 
 Tensor::AHardwareBufferView Tensor::GetAHardwareBufferReadView() const {
-  auto lock(absl::make_unique<absl::MutexLock>(&view_mutex_));
+  auto lock(abslx::make_unique<abslx::MutexLock>(&view_mutex_));
   CHECK(valid_ != kValidNone) << "Tensor must be written prior to read from.";
   CHECK(!(valid_ & kValidOpenGlTexture2d))
       << "Tensor conversion between OpenGL texture and AHardwareBuffer is not "
@@ -252,7 +252,7 @@ void Tensor::CreateEglSyncAndFd() const {
 
 Tensor::AHardwareBufferView Tensor::GetAHardwareBufferWriteView(
     int size_alignment) const {
-  auto lock(absl::make_unique<absl::MutexLock>(&view_mutex_));
+  auto lock(abslx::make_unique<abslx::MutexLock>(&view_mutex_));
   CHECK(AllocateAHardwareBuffer(size_alignment))
       << "AHardwareBuffer is not supported on the target system.";
   valid_ = kValidAHardwareBuffer;

@@ -46,7 +46,7 @@ std::string LoadBinaryContent(const char* filename) {
 int FindTensorIndexByMetadataName(
     const flatbuffers::Vector<flatbuffers::Offset<tflite::TensorMetadata>>*
         tensor_metadatas,
-    absl::string_view name) {
+    abslx::string_view name) {
   if (tensor_metadatas == nullptr) {
     return -1;
   }

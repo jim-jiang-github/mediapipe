@@ -27,7 +27,7 @@ namespace op = ::xla::testing::opcode_matchers;
 using ConvertOperandFoldingTest = HloTestBase;
 
 TEST_F(ConvertOperandFoldingTest, IntegralUpcastConvertFolded) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -49,7 +49,7 @@ TEST_F(ConvertOperandFoldingTest, IntegralUpcastConvertFolded) {
 }
 
 TEST_F(ConvertOperandFoldingTest, FloatingUpcastConvertFolded) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -71,7 +71,7 @@ TEST_F(ConvertOperandFoldingTest, FloatingUpcastConvertFolded) {
 }
 
 TEST_F(ConvertOperandFoldingTest, IntegralToFloatingConvertFolded) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -93,7 +93,7 @@ TEST_F(ConvertOperandFoldingTest, IntegralToFloatingConvertFolded) {
 }
 
 TEST_F(ConvertOperandFoldingTest, DowncastConvertNotFolded) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {
@@ -119,7 +119,7 @@ TEST_F(ConvertOperandFoldingTest, DowncastConvertNotFolded) {
 }
 
 TEST_F(ConvertOperandFoldingTest, OneOperandFolded) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
   HloModule module
 
   ENTRY main {

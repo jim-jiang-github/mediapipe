@@ -158,7 +158,7 @@ StatusOr<mlir::Operation*> LowerDTensorRecvToXlaOp(
     auto recv_cluster =
         dtensor_recv->getParentOfType<mlir::tf_device::ClusterOp>();
 
-    TF_ASSIGN_OR_RETURN(absl::optional<Mesh> mesh,
+    TF_ASSIGN_OR_RETURN(abslx::optional<Mesh> mesh,
                         ExtractDeviceMeshFromOp(recv_cluster));
     if (!mesh.has_value())
       return errors::InvalidArgument(
@@ -203,11 +203,11 @@ StatusOr<mlir::Operation*> LowerDTensorSendFromCPUToTFOp(
 
   // Create multiple send from host. There should be #number of local
   // devices(in target mesh) number of sends.
-  absl::Span<const std::string> sending_devices =
+  abslx::Span<const std::string> sending_devices =
       send_input_layout.mesh().local_devices();
 
   Layout target_layout = dtensor_send.target_layout();
-  absl::Span<const std::string> receiving_devices =
+  abslx::Span<const std::string> receiving_devices =
       target_layout.mesh().local_devices();
 
   std::string tensor_name = dtensor_send.key().str();
@@ -235,8 +235,8 @@ StatusOr<mlir::Operation*> LowerDTensorRecvFromCPUToTFOp(
   llvm::SmallVector<mlir::Type, 4> output_types{dtensor_recv.getType()};
   builder.setInsertionPoint(dtensor_recv);
   std::string tensor_name = dtensor_recv.key().str();
-  absl::Span<const std::string> sending_devices = send_mesh.local_devices();
-  absl::Span<const std::string> receiving_devices =
+  abslx::Span<const std::string> sending_devices = send_mesh.local_devices();
+  abslx::Span<const std::string> receiving_devices =
       recv_layout.mesh().local_devices();
 
   mlir::Operation* lowered_recv_op;

@@ -74,7 +74,7 @@ class TpuCompilationCacheRpcLookup : public TpuCompilationCacheLookup {
   std::unique_ptr<StubType> stub_;
 
   // Protect concurrent access to member variables below.
-  mutable absl::Mutex mu_;
+  mutable abslx::Mutex mu_;
 
   // The total size of entries in the cache.
   int64_t cache_size_ ABSL_GUARDED_BY(mu_) = 0;

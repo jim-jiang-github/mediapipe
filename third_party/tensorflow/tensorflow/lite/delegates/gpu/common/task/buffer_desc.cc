@@ -44,7 +44,7 @@ GPUResources BufferDescriptor::GetGPUResources(const GpuInfo& gpu_info) const {
   return resources;
 }
 
-absl::Status BufferDescriptor::PerformSelector(
+abslx::Status BufferDescriptor::PerformSelector(
     const GpuInfo& gpu_info, const std::string& selector,
     const std::vector<std::string>& args,
     const std::vector<std::string>& template_args, std::string* result) const {
@@ -53,17 +53,17 @@ absl::Status BufferDescriptor::PerformSelector(
   } else if (selector == "GetPtr") {
     return PerformGetPtrSelector(args, template_args, result);
   } else {
-    return absl::NotFoundError(absl::StrCat(
+    return abslx::NotFoundError(abslx::StrCat(
         "BufferDescriptor don't have selector with name - ", selector));
   }
 }
 
-absl::Status BufferDescriptor::PerformReadSelector(
+abslx::Status BufferDescriptor::PerformReadSelector(
     const GpuInfo& gpu_info, const std::vector<std::string>& args,
     std::string* result) const {
   if (args.size() != 1) {
-    return absl::NotFoundError(
-        absl::StrCat("BufferDescriptor Read require one argument, but ",
+    return abslx::NotFoundError(
+        abslx::StrCat("BufferDescriptor Read require one argument, but ",
                      args.size(), " was passed"));
   }
   if (gpu_info.IsGlsl()) {
@@ -78,61 +78,61 @@ absl::Status BufferDescriptor::PerformReadSelector(
           }
         }
         if (is_kernel_global_space) {
-          *result = absl::StrCat("buffer[", args[0], "]");
-          return absl::OkStatus();
+          *result = abslx::StrCat("buffer[", args[0], "]");
+          return abslx::OkStatus();
         }
         const std::string arg0 = "(" + args[0] + ")";
         *result =
-            absl::StrCat("vec4(unpackHalf2x16(buffer[", arg0, " / 2][", arg0,
+            abslx::StrCat("vec4(unpackHalf2x16(buffer[", arg0, " / 2][", arg0,
                          " % 2 == 0 ? 0 : 2]), unpackHalf2x16(buffer[", arg0,
                          " / 2][", arg0, " % 2 == 0 ? 1 : 3]))");
       } else {
         if (element_size == 4) {
           *result =
-              absl::StrCat("vec4(unpackHalf2x16(buffer[", args[0],
+              abslx::StrCat("vec4(unpackHalf2x16(buffer[", args[0],
                            "].x), unpackHalf2x16(buffer[", args[0], "].y))");
         } else if (element_size == 16) {
-          const std::string vec0 = absl::Substitute(
+          const std::string vec0 = abslx::Substitute(
               "vec4(unpackHalf2x16(buffer[$0].a.x), "
               "unpackHalf2x16(buffer[$0].a.y))",
               args[0]);
-          const std::string vec1 = absl::Substitute(
+          const std::string vec1 = abslx::Substitute(
               "vec4(unpackHalf2x16(buffer[$0].a.z), "
               "unpackHalf2x16(buffer[$0].a.w))",
               args[0]);
-          const std::string vec2 = absl::Substitute(
+          const std::string vec2 = abslx::Substitute(
               "vec4(unpackHalf2x16(buffer[$0].b.x), "
               "unpackHalf2x16(buffer[$0].b.y))",
               args[0]);
-          const std::string vec3 = absl::Substitute(
+          const std::string vec3 = abslx::Substitute(
               "vec4(unpackHalf2x16(buffer[$0].b.z), "
               "unpackHalf2x16(buffer[$0].b.w))",
               args[0]);
-          *result = absl::Substitute("mat4x4($0, $1, $2, $3)", vec0, vec1, vec2,
+          *result = abslx::Substitute("mat4x4($0, $1, $2, $3)", vec0, vec1, vec2,
                                      vec3);
         }
       }
     } else {
-      *result = absl::StrCat("buffer[", args[0], "]");
+      *result = abslx::StrCat("buffer[", args[0], "]");
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   } else {
-    *result = absl::StrCat("buffer[", args[0], "]");
-    return absl::OkStatus();
+    *result = abslx::StrCat("buffer[", args[0], "]");
+    return abslx::OkStatus();
   }
 }
 
-absl::Status BufferDescriptor::PerformGetPtrSelector(
+abslx::Status BufferDescriptor::PerformGetPtrSelector(
     const std::vector<std::string>& args,
     const std::vector<std::string>& template_args, std::string* result) const {
   if (args.size() > 1) {
-    return absl::NotFoundError(absl::StrCat(
+    return abslx::NotFoundError(abslx::StrCat(
         "BufferDescriptor GetPtr require one or zero arguments, but ",
         args.size(), " was passed"));
   }
   if (template_args.size() > 1) {
-    return absl::NotFoundError(
-        absl::StrCat("BufferDescriptor GetPtr require one or zero teemplate "
+    return abslx::NotFoundError(
+        abslx::StrCat("BufferDescriptor GetPtr require one or zero teemplate "
                      "arguments, but ",
                      template_args.size(), " was passed"));
   }
@@ -140,18 +140,18 @@ absl::Status BufferDescriptor::PerformGetPtrSelector(
   if (template_args.size() == 1) {
     const std::string type_name = ToCLDataType(element_type, element_size);
     if (type_name != template_args[0]) {
-      conversion = absl::StrCat("(", MemoryTypeToCLType(memory_type), " ",
+      conversion = abslx::StrCat("(", MemoryTypeToCLType(memory_type), " ",
                                 template_args[0], "*)&");
     }
   }
   if (args.empty()) {
-    *result = absl::StrCat(conversion, "buffer");
+    *result = abslx::StrCat(conversion, "buffer");
   } else if (conversion.empty()) {
-    *result = absl::StrCat("(buffer + ", args[0], ")");
+    *result = abslx::StrCat("(buffer + ", args[0], ")");
   } else {
-    *result = absl::StrCat(conversion, "buffer[", args[0], "]");
+    *result = abslx::StrCat(conversion, "buffer[", args[0], "]");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

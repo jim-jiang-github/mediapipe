@@ -56,7 +56,7 @@ Status TapeOperation::AddInput(AbstractTensorHandle* input) {
   return OkStatus();
 }
 Status TapeOperation::AddInputList(
-    absl::Span<AbstractTensorHandle* const> inputs) {
+    abslx::Span<AbstractTensorHandle* const> inputs) {
   TF_RETURN_IF_ERROR(parent_op_->AddInputList(inputs));
   for (auto input : inputs) {
     forward_op_.inputs.push_back(input);
@@ -188,13 +188,13 @@ Status TapeOperation::SetAttrShapeList(const char* attr_name,
   return parent_op_->SetAttrShapeList(attr_name, dims, num_dims, num_values);
 }
 Status TapeOperation::SetAttrFunctionList(
-    const char* attr_name, absl::Span<const AbstractOperation*> values) {
+    const char* attr_name, abslx::Span<const AbstractOperation*> values) {
   return tensorflow::errors::Unimplemented(
       "SetAttrFunctionList has not been "
       "implemented yet.");
 }
 AbstractOperation* TapeOperation::GetBackingOperation() { return parent_op_; }
-Status TapeOperation::Execute(absl::Span<AbstractTensorHandle*> retvals,
+Status TapeOperation::Execute(abslx::Span<AbstractTensorHandle*> retvals,
                               int* num_retvals) {
   TF_RETURN_IF_ERROR(parent_op_->Execute(retvals, num_retvals));
   for (int i = 0; i < *num_retvals; i++) {

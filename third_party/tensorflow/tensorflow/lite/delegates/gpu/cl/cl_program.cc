@@ -36,7 +36,7 @@ std::string GetProgramBuildInfo(cl_program program, cl_device_id id,
   cl_int error_code =
       clGetProgramBuildInfo(program, id, info, 0, nullptr, &size);
   if (error_code != CL_SUCCESS) {
-    return absl::StrCat("Failed to GetProgramBuildInfo - ",
+    return abslx::StrCat("Failed to GetProgramBuildInfo - ",
                         CLErrorCodeToString(error_code));
   }
 
@@ -44,35 +44,35 @@ std::string GetProgramBuildInfo(cl_program program, cl_device_id id,
   error_code =
       clGetProgramBuildInfo(program, id, info, size, &result[0], nullptr);
   if (error_code != CL_SUCCESS) {
-    return absl::StrCat("Failed to GetProgramBuildInfo - ",
+    return abslx::StrCat("Failed to GetProgramBuildInfo - ",
                         CLErrorCodeToString(error_code));
   }
   return result;
 }
 
-absl::Status GetBinarySize(cl_program program, size_t* binary_size) {
+abslx::Status GetBinarySize(cl_program program, size_t* binary_size) {
   cl_int error_code = clGetProgramInfo(program, CL_PROGRAM_BINARY_SIZES,
                                        sizeof(size_t), binary_size, nullptr);
   if (error_code != CL_SUCCESS) {
-    return absl::UnknownError(
-        absl::StrCat("Failed to get program binary size - ",
+    return abslx::UnknownError(
+        abslx::StrCat("Failed to get program binary size - ",
                      CLErrorCodeToString(error_code)));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status BuildProgram(cl_program program, const CLDevice& device,
+abslx::Status BuildProgram(cl_program program, const CLDevice& device,
                           const std::string& compiler_options) {
   const int error_code = clBuildProgram(
       program, 0, nullptr, compiler_options.c_str(), nullptr, nullptr);
   if (error_code != CL_SUCCESS) {
-    return absl::UnknownError(absl::StrCat(
+    return abslx::UnknownError(abslx::StrCat(
         "Failed to build program executable - ",
         CLErrorCodeToString(error_code),
         GetProgramBuildInfo(program, device.id(), CL_PROGRAM_BUILD_LOG)));
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 std::string CompilerOptionToString(const GpuInfo& gpu_info,
@@ -118,7 +118,7 @@ std::string CompilerOptionsToString(
     const std::vector<CompilerOptions>& compiler_options) {
   std::string result;
   for (auto option : compiler_options) {
-    absl::StrAppend(&result, CompilerOptionToString(gpu_info, option), " ");
+    abslx::StrAppend(&result, CompilerOptionToString(gpu_info, option), " ");
   }
   return result;
 }
@@ -149,7 +149,7 @@ void CLProgram::Release() {
   }
 }
 
-absl::Status CLProgram::GetBinary(std::vector<uint8_t>* result) const {
+abslx::Status CLProgram::GetBinary(std::vector<uint8_t>* result) const {
   size_t binary_size;
   RETURN_IF_ERROR(GetBinarySize(program_, &binary_size));
   result->resize(result->size() + binary_size);
@@ -158,13 +158,13 @@ absl::Status CLProgram::GetBinary(std::vector<uint8_t>* result) const {
       clGetProgramInfo(program_, CL_PROGRAM_BINARIES, sizeof(unsigned char*),
                        &binary_ptr, nullptr);
   if (error_code != CL_SUCCESS) {
-    return absl::UnknownError(absl::StrCat("Failed to get program binary - ",
+    return abslx::UnknownError(abslx::StrCat("Failed to get program binary - ",
                                            CLErrorCodeToString(error_code)));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CreateCLProgram(const std::string& code,
+abslx::Status CreateCLProgram(const std::string& code,
                              const std::string& compiler_options,
                              const CLContext& context, const CLDevice& device,
                              CLProgram* result) {
@@ -174,19 +174,19 @@ absl::Status CreateCLProgram(const std::string& code,
   cl_program program = clCreateProgramWithSource(context.context(), 1, &source,
                                                  nullptr, &error_code);
   if (!program || error_code != CL_SUCCESS) {
-    return absl::UnknownError(
-        absl::StrCat("Failed to create compute program - ",
+    return abslx::UnknownError(
+        abslx::StrCat("Failed to create compute program - ",
                      CLErrorCodeToString(error_code)));
   }
 
   *result = CLProgram(program, device.id());
   RETURN_IF_ERROR(BuildProgram(program, device, compiler_options));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CreateCLProgramFromBinary(const CLContext& context,
+abslx::Status CreateCLProgramFromBinary(const CLContext& context,
                                        const CLDevice& device,
-                                       absl::Span<const uint8_t> binary,
+                                       abslx::Span<const uint8_t> binary,
                                        CLProgram* result) {
   cl_int binary_status;
   cl_int error_code;
@@ -197,12 +197,12 @@ absl::Status CreateCLProgramFromBinary(const CLContext& context,
       context.context(), 1, devices_list, &binary_size, &binary_pointer,
       &binary_status, &error_code);
   if (binary_status != CL_SUCCESS) {
-    return absl::UnknownError(absl::StrCat(
+    return abslx::UnknownError(abslx::StrCat(
         "Something wrong with binary after clCreateProgramWithBinary - ",
         binary_status));
   }
   if (error_code != CL_SUCCESS) {
-    return absl::UnknownError(absl::StrCat("Failed to create program - ",
+    return abslx::UnknownError(abslx::StrCat("Failed to create program - ",
                                            CLErrorCodeToString(error_code)));
   }
   *result = CLProgram(program, device.id());

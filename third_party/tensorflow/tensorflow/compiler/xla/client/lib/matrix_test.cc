@@ -265,7 +265,7 @@ XLA_TEST_F(MatrixTest, Einsum) {
 }
 
 XLA_TEST_F(MatrixTest, ParseEinsumString) {
-  auto to_vec = [](absl::string_view s) {
+  auto to_vec = [](abslx::string_view s) {
     std::vector<int64_t> v;
     v.reserve(s.size());
     int e = -3;
@@ -275,9 +275,9 @@ XLA_TEST_F(MatrixTest, ParseEinsumString) {
     return v;
   };
 
-  auto to_string = [&](absl::string_view x, absl::string_view y,
-                       absl::string_view o) {
-    return absl::StrCat(x, ",", y, "->", o);
+  auto to_string = [&](abslx::string_view x, abslx::string_view y,
+                       abslx::string_view o) {
+    return abslx::StrCat(x, ",", y, "->", o);
   };
 
   std::vector<std::vector<std::string>> good_test_cases = {

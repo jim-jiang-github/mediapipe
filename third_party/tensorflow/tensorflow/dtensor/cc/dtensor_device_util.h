@@ -133,7 +133,7 @@ struct DTensorOperation {
 
 struct EmbeddingResourceAttrs {
   int64_t table_id;
-  absl::optional<int64_t> slot_id;  // NOLINT
+  abslx::optional<int64_t> slot_id;  // NOLINT
   bool is_dirty = false;
 };
 
@@ -303,7 +303,7 @@ class TensorWithLayout {
     input_layout_for_shape_op_result_.emplace(layout);
   }
 
-  const absl::optional<Layout> shape_metadata_layout() const {
+  const abslx::optional<Layout> shape_metadata_layout() const {
     return input_layout_for_shape_op_result_;
   }
 
@@ -320,16 +320,16 @@ class TensorWithLayout {
 
   const std::vector<int64_t> local_shape() const { return local_shape_; }
 
-  const absl::optional<NodeDef> const_value() const { return const_value_; }
+  const abslx::optional<NodeDef> const_value() const { return const_value_; }
 
-  const absl::optional<EmbeddingResourceAttrs>& attrs() const { return attrs_; }
+  const abslx::optional<EmbeddingResourceAttrs>& attrs() const { return attrs_; }
 
  protected:
   TensorWithLayout(std::unique_ptr<parallel_device::ParallelTensor> tensor,
                    const MeshWithParallelDevice& mesh, const Layout& layout,
                    std::vector<int64_t> local_shape,
-                   absl::optional<TF_DataType> dtype = absl::nullopt,
-                   absl::optional<NodeDef> const_value = absl::nullopt)
+                   abslx::optional<TF_DataType> dtype = abslx::nullopt,
+                   abslx::optional<NodeDef> const_value = abslx::nullopt)
       : tensor_(std::move(tensor)),
         layout_(layout),
         mesh_(mesh),
@@ -348,21 +348,21 @@ class TensorWithLayout {
   // This provides extra information to the layout propagation and SPMD passes
   // during op-by-op execution. (For example, the reduction indices for Sum,
   // target shapes for Rng/Reshape, etc).
-  absl::optional<NodeDef> const_value_;
+  abslx::optional<NodeDef> const_value_;
 
   // Optionally holds the original input layout for a shape Op returned Tensor.
   // This is used to preserve information for a shape op output so that future
   // uses could recover local shape.
   // TODO(hthu,allenl,xiejw): Move this into a separate class for clarity.
-  absl::optional<Layout> input_layout_for_shape_op_result_ = absl::nullopt;
+  abslx::optional<Layout> input_layout_for_shape_op_result_ = abslx::nullopt;
 
   // The local shape of tensors placed on each of `tensor_`'s component devices.
   std::vector<int64_t> local_shape_;
 
-  absl::optional<TF_DataType> dtype_;
+  abslx::optional<TF_DataType> dtype_;
 
   // Resource input attributes for embedding inputs.
-  absl::optional<EmbeddingResourceAttrs> attrs_;  // NOLINT
+  abslx::optional<EmbeddingResourceAttrs> attrs_;  // NOLINT
 };
 
 // Extension of TensorWithLayout which holds resource handle with layout.
@@ -416,10 +416,10 @@ class ResourceHandleWithLayout : public TensorWithLayout {
     dereferenced_dtype_.emplace(dtype);
   }
 
-  const absl::optional<TensorShapeProto>& dereferenced_shape() const {
+  const abslx::optional<TensorShapeProto>& dereferenced_shape() const {
     return dereferenced_shape_;
   }
-  const absl::optional<DataType>& dereferenced_dtype() const {
+  const abslx::optional<DataType>& dereferenced_dtype() const {
     return dereferenced_dtype_;
   }
 
@@ -433,10 +433,10 @@ class ResourceHandleWithLayout : public TensorWithLayout {
 
  private:
   // The layout of the tensor pointed to by this handle, if any.
-  absl::optional<Layout> dereferenced_layout_;
+  abslx::optional<Layout> dereferenced_layout_;
   // The shape and dtype of the tensor pointed to by this resource tensor.
-  absl::optional<TensorShapeProto> dereferenced_shape_;
-  absl::optional<DataType> dereferenced_dtype_;
+  abslx::optional<TensorShapeProto> dereferenced_shape_;
+  abslx::optional<DataType> dereferenced_dtype_;
 };
 
 // TensorWithLayout for SparseTensors.
@@ -501,8 +501,8 @@ class SparseTensorWithLayout : public TensorWithLayout {
       std::unique_ptr<parallel_device::ParallelTensor> dense_shapes,
       const MeshWithParallelDevice& mesh, const Layout& layout,
       std::vector<int64_t> local_shape,
-      absl::optional<TF_DataType> dtype = absl::nullopt,
-      absl::optional<NodeDef> const_value = absl::nullopt)
+      abslx::optional<TF_DataType> dtype = abslx::nullopt,
+      abslx::optional<NodeDef> const_value = abslx::nullopt)
       : TensorWithLayout(nullptr, mesh, layout, local_shape),
         indices_(std::move(indices)),
         values_(std::move(values)),
@@ -576,7 +576,7 @@ class FunctionManager {
       const std::vector<const Layout*>& output_layouts);
 
   // Maps the hash of a graph with the lowered graph.
-  absl::flat_hash_map<tensorflow::Fprint128, ExecutionFunctions,
+  abslx::flat_hash_map<tensorflow::Fprint128, ExecutionFunctions,
                       tensorflow::Fprint128Hasher>
       function_cache_;
 
@@ -584,7 +584,7 @@ class FunctionManager {
   // representing the small constant indices and values to the function. The
   // small constant indices are saved to make faster comparisons for constant
   // folding validation.
-  absl::flat_hash_map<tensorflow::Fprint128, absl::flat_hash_map<int, NodeDef>,
+  abslx::flat_hash_map<tensorflow::Fprint128, abslx::flat_hash_map<int, NodeDef>,
                       tensorflow::Fprint128Hasher>
       dtensor_op_and_small_inputs_;
 };
@@ -601,7 +601,7 @@ Status PrepareGraphForMlir(
     const DTensorOperation& doperation,
     const tensorflow::FunctionLibraryDefinition& flib_def,
     const NameAttrList& attributes,
-    const absl::optional<Layout>& default_layout, tensorflow::Graph* graph,
+    const abslx::optional<Layout>& default_layout, tensorflow::Graph* graph,
     std::vector<PartialTensorShape>* global_output_shapes,
     std::vector<const Layout*>* output_layouts);
 

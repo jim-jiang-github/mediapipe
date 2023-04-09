@@ -130,7 +130,7 @@ class StatusOr : private internal_statusor::StatusOrData<T>,
   // Constructs the inner value `T` in-place using the provided args, using the
   // `T(args...)` constructor.
   template <typename... Args>
-  explicit StatusOr(absl::in_place_t, Args&&... args);
+  explicit StatusOr(abslx::in_place_t, Args&&... args);
 
   // Constructs a new StatusOr with the given value. After calling this
   // constructor, calls to ValueOrDie() will succeed, and calls to status() will
@@ -177,7 +177,7 @@ class StatusOr : private internal_statusor::StatusOrData<T>,
 
   // StatusOr<T>::value()
   //
-  // absl::StatusOr compatible versions of ValueOrDie and ConsumeValueOrDie.
+  // abslx::StatusOr compatible versions of ValueOrDie and ConsumeValueOrDie.
   const T& value() const&;
   T& value() &;
   const T&& value() const&&;
@@ -266,8 +266,8 @@ StatusOr<T>::StatusOr(T&& value) : Base(std::move(value)) {}
 
 template <typename T>
 template <typename... Args>
-StatusOr<T>::StatusOr(absl::in_place_t, Args&&... args)
-    : Base(absl::in_place, std::forward<Args>(args)...) {}
+StatusOr<T>::StatusOr(abslx::in_place_t, Args&&... args)
+    : Base(abslx::in_place, std::forward<Args>(args)...) {}
 
 template <typename T>
 StatusOr<T>::StatusOr(Status&& status) : Base(std::move(status)) {}

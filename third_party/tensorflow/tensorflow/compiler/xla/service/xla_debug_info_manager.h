@@ -69,12 +69,12 @@ class XlaDebugInfoManager {
     bool active = false;
   };
 
-  mutable absl::Mutex mutex_;
+  mutable abslx::Mutex mutex_;
   bool tracing_active_ ABSL_GUARDED_BY(mutex_) = false;
   // Active modules are those still tracked by us. There could be much more
   // active modules than running modules, we will try to reduce the trace size
   // by only transfer those modules that were running during tracing period.
-  absl::flat_hash_map<ModuleIdentifier, XlaModuleEntry> modules_
+  abslx::flat_hash_map<ModuleIdentifier, XlaModuleEntry> modules_
       ABSL_GUARDED_BY(mutex_);
 };
 

@@ -44,8 +44,8 @@ StatusOr<HloInstruction*> ConvolutionPredExpander::ExpandInstruction(
   // The underlying convolution library (cuDNN) supports convolutions on FP and
   // integer (only S8) inputs. We cannot use S8, as the value could overflow to
   // zero, so we use F16 instead - it is not as efficient, but is correct.
-  absl::InlinedVector<HloInstruction*, 2> new_operands;
-  absl::c_transform(instruction->operands(), std::back_inserter(new_operands),
+  abslx::InlinedVector<HloInstruction*, 2> new_operands;
+  abslx::c_transform(instruction->operands(), std::back_inserter(new_operands),
                     [&](HloInstruction* operand) {
                       CHECK_EQ(operand->shape().element_type(), PRED);
                       return MakeConvertToHlo(operand, F16);

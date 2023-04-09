@@ -75,7 +75,7 @@ enum class MemoryStrategy {
 
 // Chooses greedy algorithm with the lowest memory consumption for given usage
 // records and returns corresponding shared objects assignment.
-absl::Status BestGreedy(
+abslx::Status BestGreedy(
     const std::vector<TensorUsageRecord<size_t>>& usage_records,
     ObjectsAssignment<size_t>* assignment);
 
@@ -87,7 +87,7 @@ absl::Status BestGreedy(
 // can be larger. Currently only GREEDY_IN_ORDER strategy can use this
 // reallocation_graph.
 template <typename TensorSizeT>
-absl::Status AssignObjectsToTensors(
+abslx::Status AssignObjectsToTensors(
     const std::vector<TensorUsageRecord<TensorSizeT>>& usage_records,
     MemoryStrategy strategy, ObjectsAssignment<TensorSizeT>* assignment,
     const UsageGraph* reallocation_graph = nullptr) {
@@ -97,39 +97,39 @@ absl::Status AssignObjectsToTensors(
     case MemoryStrategy::EQUALITY:
       return EqualityAssignment(usage_records, assignment);
     default:
-      return absl::InternalError(
+      return abslx::InternalError(
           "MemoryStrategy is not supported with current tensor size type.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <>
-absl::Status AssignObjectsToTensors(
+abslx::Status AssignObjectsToTensors(
     const std::vector<TensorUsageRecord<size_t>>& usage_records,
     MemoryStrategy strategy, ObjectsAssignment<size_t>* assignment,
     const UsageGraph* reallocation_graph);
 
 template <>
-absl::Status AssignObjectsToTensors(
+abslx::Status AssignObjectsToTensors(
     const std::vector<TensorUsageRecord<BHWC>>& usage_records,
     MemoryStrategy strategy, ObjectsAssignment<BHWC>* assignment,
     const UsageGraph* reallocation_graph);
 
 template <>
-absl::Status AssignObjectsToTensors(
+abslx::Status AssignObjectsToTensors(
     const std::vector<TensorUsageRecord<uint2>>& usage_records,
     MemoryStrategy strategy, ObjectsAssignment<uint2>* assignment,
     const UsageGraph* reallocation_graph);
 
 template <>
-absl::Status AssignObjectsToTensors(
+abslx::Status AssignObjectsToTensors(
     const std::vector<TensorUsageRecord<uint3>>& usage_records,
     MemoryStrategy strategy, ObjectsAssignment<uint3>* assignment,
     const UsageGraph* reallocation_graph);
 
 // Calculates the assignment of tensors to offsets, considering those tensors
 // are going to be allocated in one continuous memory block.
-absl::Status AssignOffsetsToTensors(
+abslx::Status AssignOffsetsToTensors(
     const std::vector<TensorUsageRecord<size_t>>& usage_records,
     const MemoryStrategy& strategy, OffsetsAssignment* assignment,
     size_t base_addr_align_bytes = 1,

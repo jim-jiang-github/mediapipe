@@ -26,7 +26,7 @@ StatusOr<mlir::Operation*> SparseToDenseSPMDExpander::ExpandOp(
     mlir::Operation* op) {
   // Set the op's shape as the local shape of the input tensors from the
   // layouts.
-  TF_ASSIGN_OR_RETURN(absl::optional<Layout> computed_layout,
+  TF_ASSIGN_OR_RETURN(abslx::optional<Layout> computed_layout,
                       ExtractSingleLayoutFromOp(op));
   auto local_shape = computed_layout->LocalShapeFromGlobalShape(
       ExtractGlobalOutputShape(op->getResult(0)).ValueOrDie());

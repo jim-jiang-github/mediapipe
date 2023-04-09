@@ -63,20 +63,20 @@ class InferenceContext {
 
   // IMPORTANT: If InitFromGraph used, RunGraphTransforms must be applied for
   // this graph upfront, otherwise not guaranteed correct behavior
-  absl::Status InitFromGraph(const CreateGpuModelInfo& create_info,
+  abslx::Status InitFromGraph(const CreateGpuModelInfo& create_info,
                              const GraphFloat32& graph, id<MTLDevice> device_id,
                              std::vector<uint8_t>* serialized_model = nullptr);
 
   // Applies specific transformations to the graph before the
   // initialization. These transformations are either impossible or useless in
   // other backends.
-  absl::Status InitFromGraphWithTransforms(
+  abslx::Status InitFromGraphWithTransforms(
       const CreateGpuModelInfo& create_info, GraphFloat32* graph,
       id<MTLDevice> device_id,
       std::vector<uint8_t>* serialized_model = nullptr);
 
-  absl::Status RestoreDeserialized(
-      const absl::Span<const uint8_t> serialized_model, id<MTLDevice> device_id,
+  abslx::Status RestoreDeserialized(
+      const abslx::Span<const uint8_t> serialized_model, id<MTLDevice> device_id,
       CreateGpuModelInfo* create_info = nullptr);
 
   /// Inserts all GPU compute tasks into the command encoder.
@@ -125,12 +125,12 @@ class InferenceContext {
 
   // Can be used only with ids from external_mutable_tensors in create_info
   // Must be called after initialization and before execution
-  absl::Status SetTensor(const ValueId& tensor_id,
+  abslx::Status SetTensor(const ValueId& tensor_id,
                          MetalSpatialTensor* tensor_ptr);
 
   MetalSpatialTensor* GetTensor(ValueId tensor_id);
-  absl::Status SetInputTensor(ValueId id, const TensorFloat32& tensor);
-  absl::Status GetOutputTensor(ValueId id, TensorFloat32* result);
+  abslx::Status SetInputTensor(ValueId id, const TensorFloat32& tensor);
+  abslx::Status GetOutputTensor(ValueId id, TensorFloat32* result);
 
  private:
   enum class TensorMemoryType {
@@ -146,34 +146,34 @@ class InferenceContext {
       flatbuffers::Offset<tflite::gpu::data::GpuModel> gpu_model_fb,
       flatbuffers::FlatBufferBuilder* builder);
 
-  absl::Status Decode(MetalDevice* device,
+  abslx::Status Decode(MetalDevice* device,
                       const data::InferenceContext* fb_inference);
 
   void CopyFromGpuModel(GpuModel* gpu_model);
-  absl::Status CompileOperations(MetalDevice* device);
+  abslx::Status CompileOperations(MetalDevice* device);
   void PrepareExternal();
 
-  absl::Status AllocateTensors(MetalDevice* device);
-  absl::Status AllocateMemoryForConstTensors(MetalDevice* device);
-  absl::Status AllocateMemoryForBuffers(MetalDevice* device);
-  absl::Status AllocateMemoryForStrongShapes(MetalDevice* device);
+  abslx::Status AllocateTensors(MetalDevice* device);
+  abslx::Status AllocateMemoryForConstTensors(MetalDevice* device);
+  abslx::Status AllocateMemoryForBuffers(MetalDevice* device);
+  abslx::Status AllocateMemoryForStrongShapes(MetalDevice* device);
   void BindTensorsToOperations();
-  absl::Status UpdateParams(const GpuInfo& gpu_info);
+  abslx::Status UpdateParams(const GpuInfo& gpu_info);
   void GetUsages(const std::function<bool(ValueId)>& functor,
                  std::map<ValueId, int2>* usages);
   TensorMemoryType GetTensorMemoryType(ValueId id);
-  absl::Status Tune(TuningType tuning_type, MetalDevice* device);
+  abslx::Status Tune(TuningType tuning_type, MetalDevice* device);
 
-  absl::flat_hash_map<ValueId, TensorDescriptor> tensors_descs_;
+  abslx::flat_hash_map<ValueId, TensorDescriptor> tensors_descs_;
 
   std::vector<MetalNode> nodes_;
   std::vector<ValueId> input_ids_;
   std::vector<ValueId> output_ids_;
 
-  absl::flat_hash_map<ValueId, MetalSpatialTensor*> external_immutable_tensors_;
-  absl::flat_hash_map<ValueId, MetalSpatialTensor*> external_mutable_tensors_;
-  absl::flat_hash_map<ValueId, std::vector<int>> external_tensor_to_nodes_;
-  absl::flat_hash_map<ValueId, TensorDescriptor> const_tensors_descs_;
+  abslx::flat_hash_map<ValueId, MetalSpatialTensor*> external_immutable_tensors_;
+  abslx::flat_hash_map<ValueId, MetalSpatialTensor*> external_mutable_tensors_;
+  abslx::flat_hash_map<ValueId, std::vector<int>> external_tensor_to_nodes_;
+  abslx::flat_hash_map<ValueId, TensorDescriptor> const_tensors_descs_;
   std::map<ValueId, MetalSpatialTensor> const_tensors_;
 
   std::map<ValueId, int> graph_ids_to_shared_buffer_tensors_;

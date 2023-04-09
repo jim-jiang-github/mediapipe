@@ -227,7 +227,7 @@ TEST_F(HloComputationTest, VisitWithMultipleRoots) {
     }
 
     HloComputation* computation_;
-    absl::flat_hash_set<HloInstruction*> visited_set_;
+    abslx::flat_hash_set<HloInstruction*> visited_set_;
     int64_t finish_visit_calls_ = 0;
     HloInstruction* last_visited_ = nullptr;
   };
@@ -497,7 +497,7 @@ TEST_F(HloComputationTest, CloneWithReplacements) {
   auto module = CreateNewVerifiedModule();
   auto computation =
       module->AddEntryComputation(builder.Build(/*root_instruction=*/lt));
-  absl::flat_hash_map<const HloInstruction*, std::unique_ptr<HloInstruction>>
+  abslx::flat_hash_map<const HloInstruction*, std::unique_ptr<HloInstruction>>
       replacements;
   replacements.emplace(param2,
                        HloInstruction::CreateParameter(2, r0s32, "p.1"));

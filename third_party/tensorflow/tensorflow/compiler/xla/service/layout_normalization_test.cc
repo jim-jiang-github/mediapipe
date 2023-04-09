@@ -26,8 +26,8 @@ namespace {
 
 class LayoutNormalizationTest : public HloTestBase {
  public:
-  void CheckLayoutNormalization(absl::string_view hlo,
-                                std::optional<absl::string_view> expected) {
+  void CheckLayoutNormalization(abslx::string_view hlo,
+                                std::optional<abslx::string_view> expected) {
     RunAndFilecheckHloRewrite(hlo, LayoutNormalization{}, expected);
   }
 };

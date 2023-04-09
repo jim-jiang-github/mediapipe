@@ -86,15 +86,15 @@ void CompareCPUGPUResults(tflite::Interpreter* cpu,
 }
 }  // namespace
 
-absl::Status RunModelSampleWithInternalAPISerializedKernels(
+abslx::Status RunModelSampleWithInternalAPISerializedKernels(
     const std::string& model_name, const std::vector<uint8_t>& kernel_cache);
 
-absl::Status RunModelSampleWithInternalAPISerialized(
+abslx::Status RunModelSampleWithInternalAPISerialized(
     tflite::Interpreter* cpu, const std::vector<uint8_t>& kernel_cache,
     const std::vector<uint8_t>& serialized_model);
 
 // Run Jet with OpenCL internal API and compares correctness with TFLite CPU
-absl::Status RunModelSampleWithInternalAPI(const std::string& model_name,
+abslx::Status RunModelSampleWithInternalAPI(const std::string& model_name,
                                            std::vector<uint8_t>* kernel_cache) {
   auto flatbuffer = tflite::FlatBufferModel::BuildFromFile(model_name.c_str());
 
@@ -105,17 +105,17 @@ absl::Status RunModelSampleWithInternalAPI(const std::string& model_name,
   std::unique_ptr<tflite::Interpreter> cpu_inference;
   tfl_builder(&cpu_inference);
   if (!cpu_inference) {
-    return absl::InternalError("Failed to build CPU inference.");
+    return abslx::InternalError("Failed to build CPU inference.");
   }
   auto status = cpu_inference->AllocateTensors();
   if (status != kTfLiteOk) {
-    return absl::InternalError("Failed to AllocateTensors for CPU inference.");
+    return abslx::InternalError("Failed to AllocateTensors for CPU inference.");
   }
   for (int k = 0; k < cpu_inference->inputs().size(); ++k) {
     TfLiteTensor* tensor_ptr =
         cpu_inference->tensor(cpu_inference->inputs()[k]);
     if (tensor_ptr->type != kTfLiteFloat32) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Internal api supports only F32 input tensors");
     }
   }
@@ -123,14 +123,14 @@ absl::Status RunModelSampleWithInternalAPI(const std::string& model_name,
     TfLiteTensor* tensor_ptr =
         cpu_inference->tensor(cpu_inference->outputs()[k]);
     if (tensor_ptr->type != kTfLiteFloat32) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Internal api supports only F32 output tensors");
     }
   }
   FillInputTensors(cpu_inference.get());
   status = cpu_inference->Invoke();
   if (status != kTfLiteOk) {
-    return absl::InternalError("Failed to Invoke CPU inference.");
+    return abslx::InternalError("Failed to Invoke CPU inference.");
   }
 
   const auto start = std::chrono::high_resolution_clock::now();
@@ -215,10 +215,10 @@ absl::Status RunModelSampleWithInternalAPI(const std::string& model_name,
 
   CompareCPUGPUResults(cpu_inference.get(), out_refs, output_tensors, 1e-4f);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RunModelSampleWithInternalAPISerializedKernels(
+abslx::Status RunModelSampleWithInternalAPISerializedKernels(
     const std::string& model_name, const std::vector<uint8_t>& kernel_cache) {
   auto flatbuffer = tflite::FlatBufferModel::BuildFromFile(model_name.c_str());
 
@@ -229,17 +229,17 @@ absl::Status RunModelSampleWithInternalAPISerializedKernels(
   std::unique_ptr<tflite::Interpreter> cpu_inference;
   tfl_builder(&cpu_inference);
   if (!cpu_inference) {
-    return absl::InternalError("Failed to build CPU inference.");
+    return abslx::InternalError("Failed to build CPU inference.");
   }
   auto status = cpu_inference->AllocateTensors();
   if (status != kTfLiteOk) {
-    return absl::InternalError("Failed to AllocateTensors for CPU inference.");
+    return abslx::InternalError("Failed to AllocateTensors for CPU inference.");
   }
   for (int k = 0; k < cpu_inference->inputs().size(); ++k) {
     TfLiteTensor* tensor_ptr =
         cpu_inference->tensor(cpu_inference->inputs()[k]);
     if (tensor_ptr->type != kTfLiteFloat32) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Internal api supports only F32 input tensors");
     }
   }
@@ -247,14 +247,14 @@ absl::Status RunModelSampleWithInternalAPISerializedKernels(
     TfLiteTensor* tensor_ptr =
         cpu_inference->tensor(cpu_inference->outputs()[k]);
     if (tensor_ptr->type != kTfLiteFloat32) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Internal api supports only F32 output tensors");
     }
   }
   FillInputTensors(cpu_inference.get());
   status = cpu_inference->Invoke();
   if (status != kTfLiteOk) {
-    return absl::InternalError("Failed to Invoke CPU inference.");
+    return abslx::InternalError("Failed to Invoke CPU inference.");
   }
 
   const auto start = std::chrono::high_resolution_clock::now();
@@ -282,7 +282,7 @@ absl::Status RunModelSampleWithInternalAPISerializedKernels(
   env_options.context = env.context().context();
   env_options.command_queue = env.queue()->queue();
   env_options.serialized_binary_cache =
-      absl::MakeSpan(kernel_cache.data(), kernel_cache.size());
+      abslx::MakeSpan(kernel_cache.data(), kernel_cache.size());
   RETURN_IF_ERROR(NewInferenceEnvironment(env_options, &inf_env, nullptr));
 
   InferenceOptions options;
@@ -343,16 +343,16 @@ absl::Status RunModelSampleWithInternalAPISerializedKernels(
   RETURN_IF_ERROR(RunModelSampleWithInternalAPISerialized(
       cpu_inference.get(), kernel_cache, serialized_model));
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RunModelSampleWithInternalAPISerialized(
+abslx::Status RunModelSampleWithInternalAPISerialized(
     tflite::Interpreter* cpu, const std::vector<uint8_t>& kernel_cache,
     const std::vector<uint8_t>& serialized_model) {
   FillInputTensors(cpu);
   auto status = cpu->Invoke();
   if (status != kTfLiteOk) {
-    return absl::InternalError("Failed to Invoke CPU inference.");
+    return abslx::InternalError("Failed to Invoke CPU inference.");
   }
 
   const auto start = std::chrono::high_resolution_clock::now();
@@ -367,7 +367,7 @@ absl::Status RunModelSampleWithInternalAPISerialized(
   env_options.context = env.context().context();
   env_options.command_queue = env.queue()->queue();
   env_options.serialized_binary_cache =
-      absl::MakeSpan(kernel_cache.data(), kernel_cache.size());
+      abslx::MakeSpan(kernel_cache.data(), kernel_cache.size());
   RETURN_IF_ERROR(NewInferenceEnvironment(env_options, &inf_env, nullptr));
 
   std::vector<int64_t> in_refs;
@@ -423,7 +423,7 @@ absl::Status RunModelSampleWithInternalAPISerialized(
 
   CompareCPUGPUResults(cpu, out_refs, output_tensors, 1e-4f);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace cl

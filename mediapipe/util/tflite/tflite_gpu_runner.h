@@ -56,24 +56,24 @@ class TFLiteGPURunner {
   explicit TFLiteGPURunner(const InferenceOptions& options)
       : options_(options) {}
 
-  absl::Status InitializeWithModel(const tflite::FlatBufferModel& flatbuffer,
+  abslx::Status InitializeWithModel(const tflite::FlatBufferModel& flatbuffer,
                                    const tflite::OpResolver& op_resolver,
                                    bool allow_quant_ops = false);
 
   void ForceOpenGL() { opengl_is_forced_ = true; }
   void ForceOpenCL() { opencl_is_forced_ = true; }
 
-  absl::Status BindSSBOToInputTensor(GLuint ssbo_id, int input_id);
-  absl::Status BindSSBOToOutputTensor(GLuint ssbo_id, int output_id);
+  abslx::Status BindSSBOToInputTensor(GLuint ssbo_id, int input_id);
+  abslx::Status BindSSBOToOutputTensor(GLuint ssbo_id, int output_id);
 
   int inputs_size() const { return input_shapes_.size(); }
   int outputs_size() const { return output_shapes_.size(); }
 
-  absl::StatusOr<int64_t> GetInputElements(int id);
-  absl::StatusOr<int64_t> GetOutputElements(int id);
+  abslx::StatusOr<int64_t> GetInputElements(int id);
+  abslx::StatusOr<int64_t> GetOutputElements(int id);
 
-  absl::Status Build();
-  absl::Status Invoke();
+  abslx::Status Build();
+  abslx::Status Invoke();
 
   std::vector<BHWC> GetInputShapes() { return input_shapes_; }
   std::vector<BHWC> GetOutputShapes() { return output_shapes_; }
@@ -90,7 +90,7 @@ class TFLiteGPURunner {
     serialized_binary_cache_ = std::move(cache);
   }
 
-  absl::StatusOr<std::vector<uint8_t>> GetSerializedBinaryCache() {
+  abslx::StatusOr<std::vector<uint8_t>> GetSerializedBinaryCache() {
     RET_CHECK(cl_environment_) << "CL environment is not initialized.";
     return cl_environment_->GetSerializedBinaryCache();
   }
@@ -100,14 +100,14 @@ class TFLiteGPURunner {
     serialized_model_used_ = false;
   }
 
-  absl::StatusOr<std::vector<uint8_t>> GetSerializedModel();
+  abslx::StatusOr<std::vector<uint8_t>> GetSerializedModel();
 #endif  // defined(__ANDROID__) || defined(MEDIAPIPE_CHROMIUMOS)
 
  private:
-  absl::Status InitializeOpenGL(std::unique_ptr<InferenceBuilder>* builder);
-  absl::Status InitializeOpenCL(std::unique_ptr<InferenceBuilder>* builder);
+  abslx::Status InitializeOpenGL(std::unique_ptr<InferenceBuilder>* builder);
+  abslx::Status InitializeOpenCL(std::unique_ptr<InferenceBuilder>* builder);
 #if defined(__ANDROID__) || defined(MEDIAPIPE_CHROMIUMOS)
-  absl::Status InitializeOpenCLFromSerializedModel(
+  abslx::Status InitializeOpenCLFromSerializedModel(
       std::unique_ptr<InferenceBuilder>* builder);
 #endif  // defined(__ANDROID__) || defined(MEDIAPIPE_CHROMIUMOS)
 

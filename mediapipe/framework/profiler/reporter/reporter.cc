@@ -28,10 +28,10 @@ const LazyRE2 kValidColumnRegex = {"^[a-zA-Z0-9_?*]+$"};
 const LazyRE2 kReplace1WildcharRegex = {"\\?"};
 const LazyRE2 kReplace0toNWildcharRegex = {"\\*"};
 
-std::string ToStringF(double d) { return absl::StrFormat("%1.2f", d); }
-std::string ToString(double d) { return absl::StrFormat("%1.0f", d); }
+std::string ToStringF(double d) { return abslx::StrFormat("%1.2f", d); }
+std::string ToString(double d) { return abslx::StrFormat("%1.0f", d); }
 
-absl::btree_map<std::string,
+abslx::btree_map<std::string,
                 std::function<const std::string(const CalculatorData&)>>
     kColumns = {
         {"calculator",
@@ -234,7 +234,7 @@ void Reporter::Accumulate(const mediapipe::GraphProfile& profile) {
   // The start and finish time of PROCESS events might be split between
   // events. If a start event has been seen, we'll record it so that we can
   // match it up later.
-  std::map<int32_t, absl::optional<int64_t>> start_times;
+  std::map<int32_t, abslx::optional<int64_t>> start_times;
 
   for (const auto& graph_trace : profile.graph_trace()) {
     for (const auto& calc_trace : graph_trace.calculator_trace()) {
@@ -264,7 +264,7 @@ void Reporter::Accumulate(const mediapipe::GraphProfile& profile) {
             calc_trace.finish_time() + graph_trace.base_time();
         max_time = std::max(max_time, static_cast<int64_t>(finish_time));
 
-        absl::optional<int64_t> start_time;
+        abslx::optional<int64_t> start_time;
         if (calc_trace.has_start_time()) {
           start_time.emplace(calc_trace.start_time());
         } else {
@@ -297,7 +297,7 @@ void Reporter::Accumulate(const mediapipe::GraphProfile& profile) {
   }
 }
 
-absl::Status Reporter::set_columns(const std::vector<std::string>& columns) {
+abslx::Status Reporter::set_columns(const std::vector<std::string>& columns) {
   bool error = false;
   std::stringstream warnings;
   std::vector<std::string> new_columns({"calculator"});
@@ -336,9 +336,9 @@ absl::Status Reporter::set_columns(const std::vector<std::string>& columns) {
     columns_.swap(new_columns);
   }
   if (!error) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  return absl::InvalidArgumentError(warnings.str());
+  return abslx::InvalidArgumentError(warnings.str());
 }
 
 class ReportImpl : public Report {

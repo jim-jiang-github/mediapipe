@@ -90,7 +90,7 @@ class BatchFunctionKernel : public AsyncOpKernel {
   int32 max_enqueued_batches_;
   std::vector<int32> allowed_batch_sizes_;
   NameAttrList func_;
-  absl::optional<FunctionLibraryRuntime::Handle> fhandle_ TF_GUARDED_BY(mu_);
+  abslx::optional<FunctionLibraryRuntime::Handle> fhandle_ TF_GUARDED_BY(mu_);
   FunctionLibraryRuntime* flib_;
   bool enable_large_batch_splitting_;
   bool has_attribute_enable_large_batch_splitting_;
@@ -107,8 +107,8 @@ class BatchFunctionKernel : public AsyncOpKernel {
     int32 max_in_flight_batches_limit = kMaxInflightBatches;
     int32 batches_to_average_over = kBatchesToAverageOver;
   };
-  absl::optional<AdaptiveBatchSchedulerOptions>
-      adaptive_batch_scheduler_options_ = absl::nullopt;
+  abslx::optional<AdaptiveBatchSchedulerOptions>
+      adaptive_batch_scheduler_options_ = abslx::nullopt;
 };
 
 }  // namespace tensorflow

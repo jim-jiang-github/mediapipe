@@ -466,7 +466,7 @@ void RecomputationRewritingPass(RewriterConfig::MemOptType optimization_level,
         // meaning it either begins with or contains the name scope.
         // Defaults to "gradients/" which will match any node names that begins
         // with "gradients/" or contains "/gradients/".
-        return absl::StartsWith(node.name(),
+        return abslx::StartsWith(node.name(),
                                 recomputation_targets_name_scope) ||
                static_cast<int>(node.name().find(
                    "/" + recomputation_targets_name_scope)) != -1;
@@ -746,7 +746,7 @@ Status BuildSwapPair(NodeDef* node, int input_to_swap,
                      std::pair<NodeDef*, NodeDef*>* swap_pair) {
   string task, device;
   if (!DeviceNameUtils::SplitDeviceName(node->device(), &task, &device) ||
-      !absl::StrContains(device, DEVICE_GPU)) {
+      !abslx::StrContains(device, DEVICE_GPU)) {
     return errors::InvalidArgument("Can't swap input ", input_to_swap,
                                    " of node ", node->name(),
                                    " since it is not on GPU");
@@ -933,7 +933,7 @@ static NodeDef* FindSwapOutTrigger(
     return nullptr;
   }
 
-  const absl::flat_hash_set<MutableGraphView::InputPort>& fanout =
+  const abslx::flat_hash_set<MutableGraphView::InputPort>& fanout =
       view.GetFanout(generator);
   NodeDef* trigger = nullptr;
   Costs::NanoSeconds earliest_fanout(Costs::NanoSeconds::infinity());
@@ -1278,10 +1278,10 @@ bool CrossesTaskOrCpuGpuBoundary(const NodeDef& node1, const NodeDef& node2) {
   string device2;
   DeviceNameUtils::SplitDeviceName(node2.device(), &task2, &device2);
   return task1 != task2 ||
-         (absl::StrContains(device1, DEVICE_CPU) &&
-          absl::StrContains(device2, DEVICE_GPU)) ||
-         (absl::StrContains(device1, DEVICE_GPU) &&
-          absl::StrContains(device2, DEVICE_CPU));
+         (abslx::StrContains(device1, DEVICE_CPU) &&
+          abslx::StrContains(device2, DEVICE_GPU)) ||
+         (abslx::StrContains(device1, DEVICE_GPU) &&
+          abslx::StrContains(device2, DEVICE_CPU));
 }
 
 void RelaxAssignNodes(const std::set<int>& nodes_to_relax,
@@ -1366,7 +1366,7 @@ Status FindAssignNodesToRelax(const GraphDef& graph,
           optimized_nodes.insert(assign_node_in_fanout);
 
           // Set an attribute telling AssignOp to ignore allocator constraints.
-          const absl::optional<int> assign_node_idx =
+          const abslx::optional<int> assign_node_idx =
               graph_view.GetNodeIndex(*assign_node_in_fanout);
           nodes_to_relax->insert(assign_node_idx.value());
         }

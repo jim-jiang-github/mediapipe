@@ -58,7 +58,7 @@ Status AddGraphDefToFunctionLibrary(const GraphDefBuilder& graphdef_builder,
   FunctionDef* fdef = library->add_function();
   TF_RETURN_IF_ERROR(GraphToFunctionDef(
       *graph,
-      absl::StrCat("_outside_compilation_shape_inference_", name_suffix),
+      abslx::StrCat("_outside_compilation_shape_inference_", name_suffix),
       fdef));
   return OkStatus();
 }
@@ -75,7 +75,7 @@ bool EqualProtoMap(const ::tensorflow::protobuf::Map<Tkey, Tvalue>& a,
     const auto iter = b.find(elt_a.first);
     if (iter == b.end()) {
       if (diff) {
-        *diff = absl::StrCat(map_name, " expected: contains element with key '",
+        *diff = abslx::StrCat(map_name, " expected: contains element with key '",
                              key_to_string(elt_a.first),
                              "' got: map has no such element");
       }
@@ -83,7 +83,7 @@ bool EqualProtoMap(const ::tensorflow::protobuf::Map<Tkey, Tvalue>& a,
     }
     if (!compare(elt_a.first, elt_a.second, iter->second)) {
       if (diff) {
-        *diff = absl::StrCat(map_name, " expected: element with key '",
+        *diff = abslx::StrCat(map_name, " expected: element with key '",
                              key_to_string(elt_a.first), "' has value '",
                              value_to_string(elt_a.second), "' got: '",
                              value_to_string(iter->second), "'");
@@ -95,7 +95,7 @@ bool EqualProtoMap(const ::tensorflow::protobuf::Map<Tkey, Tvalue>& a,
     const auto iter = a.find(elt_b.first);
     if (iter == a.end()) {
       if (diff) {
-        *diff = absl::StrCat(map_name, " got: contains element with key '",
+        *diff = abslx::StrCat(map_name, " got: contains element with key '",
                              key_to_string(elt_b.first),
                              "' expected: map has no such element");
       }
@@ -109,14 +109,14 @@ bool EqualFunctionNodeDef(const NodeDef& a, const NodeDef& b,
                           const string& diff_preamble, string* diff) {
   if (a.op() != b.op()) {
     if (diff) {
-      *diff = absl::StrCat(diff_preamble, " mismatch for node ", a.name(),
+      *diff = abslx::StrCat(diff_preamble, " mismatch for node ", a.name(),
                            ", expected op '", a.op(), "' got '", b.op());
     }
     return false;
   }
   if (a.device() != b.device()) {
     if (diff) {
-      *diff = absl::StrCat(diff_preamble, " mismatch for node ", a.name(),
+      *diff = abslx::StrCat(diff_preamble, " mismatch for node ", a.name(),
                            ", expected device '", a.device(), "' got '",
                            b.device());
     }
@@ -124,7 +124,7 @@ bool EqualFunctionNodeDef(const NodeDef& a, const NodeDef& b,
   }
   if (a.input_size() != b.input_size()) {
     if (diff) {
-      *diff = absl::StrCat(diff_preamble, " mismatch for node ", a.name(),
+      *diff = abslx::StrCat(diff_preamble, " mismatch for node ", a.name(),
                            ", expected ", a.input_size(), " inputs got ",
                            b.input_size(), " expected:\n", a.DebugString(),
                            "\ngot:\n", b.DebugString());
@@ -134,10 +134,10 @@ bool EqualFunctionNodeDef(const NodeDef& a, const NodeDef& b,
   std::unordered_set<string> control_input_a;
   std::unordered_set<string> control_input_b;
   for (int i = 0; i < a.input_size(); ++i) {
-    if (absl::StartsWith(a.input(i), "^")) {
-      if (!absl::StartsWith(b.input(i), "^")) {
+    if (abslx::StartsWith(a.input(i), "^")) {
+      if (!abslx::StartsWith(b.input(i), "^")) {
         if (diff) {
-          *diff = absl::StrCat(diff_preamble, " mismatch for node ", a.name(),
+          *diff = abslx::StrCat(diff_preamble, " mismatch for node ", a.name(),
                                " input ", i, ", expected control input ",
                                a.input(i), " got ", b.input(i), " expected:\n",
                                a.DebugString(), "\ngot:\n", b.DebugString());
@@ -148,7 +148,7 @@ bool EqualFunctionNodeDef(const NodeDef& a, const NodeDef& b,
       control_input_b.insert(b.input(i));
     } else if (a.input(i) != b.input(i)) {
       if (diff) {
-        *diff = absl::StrCat(diff_preamble, " mismatch for node ", a.name(),
+        *diff = abslx::StrCat(diff_preamble, " mismatch for node ", a.name(),
                              " input ", i, ", expected ", a.input(i), " got ",
                              b.input(i), " expected:\n", a.DebugString(),
                              "\ngot:\n", b.DebugString());
@@ -158,7 +158,7 @@ bool EqualFunctionNodeDef(const NodeDef& a, const NodeDef& b,
   }
   if (control_input_a != control_input_b) {
     if (diff) {
-      *diff = absl::StrCat(diff_preamble, " mismatch for node ", a.name(),
+      *diff = abslx::StrCat(diff_preamble, " mismatch for node ", a.name(),
                            " control inputs differ expected:\n",
                            a.DebugString(), "\ngot:\n", b.DebugString());
     }
@@ -180,7 +180,7 @@ bool EqualFunctionNodeDef(const NodeDef& a, const NodeDef& b,
           return av.DebugString() == bv.DebugString();
         }
       },
-      absl::StrCat(diff_preamble, " attr mismatch for node ", a.name()), diff);
+      abslx::StrCat(diff_preamble, " attr mismatch for node ", a.name()), diff);
 }
 
 bool EqualFunctionDef(const FunctionDef& a, const FunctionDef& b,
@@ -188,7 +188,7 @@ bool EqualFunctionDef(const FunctionDef& a, const FunctionDef& b,
   if (a.signature().DebugString() != b.signature().DebugString()) {
     if (diff) {
       *diff =
-          absl::StrCat("Signature mismatch for function ", a.signature().name(),
+          abslx::StrCat("Signature mismatch for function ", a.signature().name(),
                        ", expected:\n", a.signature().DebugString(), "\ngot:\n",
                        b.signature().DebugString());
     }
@@ -200,7 +200,7 @@ bool EqualFunctionDef(const FunctionDef& a, const FunctionDef& b,
           [](const string& key, const AttrValue& av, const AttrValue& bv) {
             return av.DebugString() == bv.DebugString();
           },
-          absl::StrCat("attr mismatch for function ", a.signature().name()),
+          abslx::StrCat("attr mismatch for function ", a.signature().name()),
           diff)) {
     return false;
   }
@@ -210,7 +210,7 @@ bool EqualFunctionDef(const FunctionDef& a, const FunctionDef& b,
           [](const string& key, const string& av, const string& bv) {
             return av == bv;
           },
-          absl::StrCat("ret mismatch for function ", a.signature().name()),
+          abslx::StrCat("ret mismatch for function ", a.signature().name()),
           diff)) {
     return false;
   }
@@ -220,7 +220,7 @@ bool EqualFunctionDef(const FunctionDef& a, const FunctionDef& b,
       if (a.node_def(i).name() == b.node_def(j).name()) {
         if (!EqualFunctionNodeDef(
                 a.node_def(i), b.node_def(j),
-                absl::StrCat("Function ", a.signature().name()), diff)) {
+                abslx::StrCat("Function ", a.signature().name()), diff)) {
           return false;
         }
         found = true;
@@ -229,7 +229,7 @@ bool EqualFunctionDef(const FunctionDef& a, const FunctionDef& b,
     }
     if (!found) {
       if (diff) {
-        *diff = absl::StrCat("Function ", a.signature().name(),
+        *diff = abslx::StrCat("Function ", a.signature().name(),
                              ", expected: has node '", a.node_def(i).name(),
                              "' got: no node of that name");
       }
@@ -246,7 +246,7 @@ bool EqualFunctionDef(const FunctionDef& a, const FunctionDef& b,
     }
     if (!found) {
       if (diff) {
-        *diff = absl::StrCat("Function ", a.signature().name(),
+        *diff = abslx::StrCat("Function ", a.signature().name(),
                              ", got: has node '", b.node_def(i).name(),
                              "' expected: no node of that name");
       }
@@ -267,7 +267,7 @@ bool EqualFunctionDefLibrary(const FunctionDefLibrary& expected,
     auto it = actual_index.find(expected_function.signature().name());
     if (it == actual_index.end()) {
       if (diff) {
-        *diff = absl::StrCat("Did not find expected function '",
+        *diff = abslx::StrCat("Did not find expected function '",
                              expected_function.signature().name(), "'");
       }
       return false;
@@ -279,7 +279,7 @@ bool EqualFunctionDefLibrary(const FunctionDefLibrary& expected,
   if (!actual_index.empty()) {
     if (diff != nullptr) {
       *diff =
-          absl::StrCat("Found unexpected function '",
+          abslx::StrCat("Found unexpected function '",
                        actual_index.begin()->second->signature().name(), "'");
     }
     return false;
@@ -359,7 +359,7 @@ Node* InputShaped(const GraphDefBuilder::Options& opts) {
   return ops::SourceOp("InputTestShaped", opts);
 }
 
-Node* KnownShapeBase(DataType dtype, absl::Span<const int> shape,
+Node* KnownShapeBase(DataType dtype, abslx::Span<const int> shape,
                      const GraphDefBuilder::Options& opts) {
   if (opts.HaveError()) return nullptr;
   NodeBuilder node_builder(opts.GetNameForOp("Const"), "Const",
@@ -374,7 +374,7 @@ Node* KnownShapeBase(DataType dtype, absl::Span<const int> shape,
       .FinalizeBuilder(&node_builder);
 }
 
-Node* KnownShape(absl::Span<const int> shape,
+Node* KnownShape(abslx::Span<const int> shape,
                  const GraphDefBuilder::Options& opts) {
   return KnownShapeBase(DT_FLOAT, shape, opts);
 }
@@ -386,7 +386,7 @@ Node* KeyPlaceholderShape(const GraphDefBuilder::Options& opts) {
 Node* KeyPlaceholder(const string& call_node,
                      const GraphDefBuilder::Options& opts) {
   if (opts.HaveError()) return nullptr;
-  NodeBuilder node_builder(absl::StrCat(call_node, "_key_placeholder"),
+  NodeBuilder node_builder(abslx::StrCat(call_node, "_key_placeholder"),
                            "Placeholder", opts.op_registry());
   TensorShapeProto shape;
   shape.add_dim()->set_size(2);
@@ -398,12 +398,12 @@ Node* KeyPlaceholder(const string& call_node,
 
 Node* RecvAtHost(ops::NodeOut key_input, const string& cluster,
                  const string& new_func_name, const string& oc_cluster,
-                 absl::Span<const DataType> dtypes,
+                 abslx::Span<const DataType> dtypes,
                  const GraphDefBuilder::Options& opts) {
   if (opts.HaveError()) return nullptr;
-  string key = absl::StrCat("host_compute_channel_", cluster, "_",
+  string key = abslx::StrCat("host_compute_channel_", cluster, "_",
                             new_func_name, "_", oc_cluster);
-  string name = absl::StrCat("outside_compilation_", cluster, "_",
+  string name = abslx::StrCat("outside_compilation_", cluster, "_",
                              new_func_name, "_", oc_cluster, "_recv");
   NodeBuilder node_builder(opts.WithName(name).GetNameForOp("_XlaRecvAtHost"),
                            "_XlaRecvAtHost", opts.op_registry());
@@ -421,9 +421,9 @@ Node* SendFromHost(ops::NodeOut key_input, const string& cluster,
                    const std::vector<ops::NodeOut>& inputs,
                    const GraphDefBuilder::Options& opts) {
   if (opts.HaveError()) return nullptr;
-  string key = absl::StrCat("host_compute_channel_", cluster, "_",
+  string key = abslx::StrCat("host_compute_channel_", cluster, "_",
                             new_func_name, "_", oc_cluster);
-  string name = absl::StrCat("outside_compilation_", cluster, "_",
+  string name = abslx::StrCat("outside_compilation_", cluster, "_",
                              new_func_name, "_", oc_cluster, "_send");
   NodeBuilder node_builder(opts.WithName(name).GetNameForOp("_XlaSendFromHost"),
                            "_XlaSendFromHost", opts.op_registry());
@@ -715,8 +715,8 @@ std::vector<std::pair<string, string>> GraphEdges(const Graph& graph) {
   for (const Edge* edge : graph.edges()) {
     if (edge->src()->IsSource() || edge->dst()->IsSink()) continue;
     edges.emplace_back(
-        absl::StrCat(edge->src()->name(), ":", edge->src_output()),
-        absl::StrCat(edge->dst()->name(), ":", edge->dst_input()));
+        abslx::StrCat(edge->src()->name(), ":", edge->src_output()),
+        abslx::StrCat(edge->dst()->name(), ":", edge->dst_input()));
   }
   std::sort(edges.begin(), edges.end());
   return edges;
@@ -800,7 +800,7 @@ TEST(EncapsulateSubgraphsWithGuaranteeConstOpTest, Simple) {
         Graph* graph = graph_ptr->get();
         for (const Node* n : graph->nodes()) {
           if (n->type_string() == "_Arg" &&
-              absl::StartsWith(n->name(), "const")) {
+              abslx::StartsWith(n->name(), "const")) {
             ++guaranteed_consts;
             EXPECT_TRUE(HasGuaranteeConstAttr(*n));
           } else {
@@ -845,7 +845,7 @@ TEST(EncapsulateSubgraphsWithGuaranteeConstOpTest, Add) {
         Graph* graph = graph_ptr->get();
         for (const Node* n : graph->nodes()) {
           if (n->type_string() == "_Arg" &&
-              absl::StartsWith(n->name(), "const")) {
+              abslx::StartsWith(n->name(), "const")) {
             ++guaranteed_consts;
             EXPECT_TRUE(HasGuaranteeConstAttr(*n));
           } else {
@@ -929,19 +929,19 @@ TEST(EncapsulateSubgraphsTest, OneFunctionOneOutside) {
           {{"outside_compilation_O1_host_compute"},
            "XlaHostCompute",
            {"C:o:0", "c:o:0"},
-           {{"Tinputs", absl::Span<const DataType>({DT_FLOAT, DT_FLOAT})},
-            {"Toutputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"ancestors", absl::Span<const string>({})},
+           {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT, DT_FLOAT})},
+            {"Toutputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"ancestors", abslx::Span<const string>({})},
             {"key", "host_compute_channel_F1_F1_O1"},
             {"send_key", ""},
             {"recv_key", ""},
             {"shape_inference_graph", shape_inference_graph},
             {"tpu_core", 0},
             {"cost_estimate_ns", 1000000},
-            {"shapes", absl::Span<const DataType>({})},
+            {"shapes", abslx::Span<const DataType>({})},
             {"_outside_compilation_subgraph", "O1"},
             {"_xla_token_input_nodes",
-             absl::Span<const string>({"_xla_token_arg_node"})},
+             abslx::Span<const string>({"_xla_token_arg_node"})},
             {"_xla_original_oc_node_name",
              "outside_compilation_O1_host_compute"}},
            {"c"}},
@@ -1100,19 +1100,19 @@ TEST(EncapsulateSubgraphsTest, OneFunctionTwoOutside) {
           {{"outside_compilation_O2_host_compute"},
            "XlaHostCompute",
            {"F:o:0", "D:o:0"},
-           {{"Tinputs", absl::Span<const DataType>({DT_FLOAT, DT_FLOAT})},
-            {"Toutputs", absl::Span<const DataType>({DT_FLOAT, DT_FLOAT})},
-            {"ancestors", absl::Span<const string>({})},
+           {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT, DT_FLOAT})},
+            {"Toutputs", abslx::Span<const DataType>({DT_FLOAT, DT_FLOAT})},
+            {"ancestors", abslx::Span<const string>({})},
             {"key", "host_compute_channel_F1_F1_O2"},
             {"send_key", ""},
             {"recv_key", ""},
             {"shape_inference_graph", shape_inference_graph2},
             {"tpu_core", 0},
             {"cost_estimate_ns", 1000000},
-            {"shapes", absl::Span<const DataType>({})},
+            {"shapes", abslx::Span<const DataType>({})},
             {"_outside_compilation_subgraph", "O2"},
             {"_xla_token_input_nodes",
-             absl::Span<const string>({"_xla_token_arg_node",
+             abslx::Span<const string>({"_xla_token_arg_node",
                                        "outside_compilation_O1_host_compute"})},
             {"_xla_original_oc_node_name",
              "outside_compilation_O2_host_compute"}},
@@ -1120,19 +1120,19 @@ TEST(EncapsulateSubgraphsTest, OneFunctionTwoOutside) {
           {{"outside_compilation_O1_host_compute"},
            "XlaHostCompute",
            {"C:o:0", "D:o:0"},
-           {{"Tinputs", absl::Span<const DataType>({DT_FLOAT, DT_FLOAT})},
-            {"Toutputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"ancestors", absl::Span<const string>({})},
+           {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT, DT_FLOAT})},
+            {"Toutputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"ancestors", abslx::Span<const string>({})},
             {"key", "host_compute_channel_F1_F1_O1"},
             {"send_key", ""},
             {"recv_key", ""},
             {"shape_inference_graph", shape_inference_graph1},
             {"tpu_core", 0},
             {"cost_estimate_ns", 1000000},
-            {"shapes", absl::Span<const DataType>({})},
+            {"shapes", abslx::Span<const DataType>({})},
             {"_outside_compilation_subgraph", "O1"},
             {"_xla_token_input_nodes",
-             absl::Span<const string>({"_xla_token_arg_node"})},
+             abslx::Span<const string>({"_xla_token_arg_node"})},
             {"_xla_original_oc_node_name",
              "outside_compilation_O1_host_compute"}},
            {"D"}},
@@ -1260,9 +1260,9 @@ TEST(EncapsulateSubgraphsTest, TwoFunctionsTwoOutside) {
           {{"outside_compilation_O1_host_compute"},
            "XlaHostCompute",
            {"C:o:0", "D:o:0"},
-           {{"Tinputs", absl::Span<const DataType>({DT_FLOAT, DT_FLOAT})},
-            {"Toutputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"ancestors", absl::Span<const string>({})},
+           {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT, DT_FLOAT})},
+            {"Toutputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"ancestors", abslx::Span<const string>({})},
             {"key", "host_compute_channel_F1_F1_O1"},
             {"send_key", ""},
             {"recv_key", ""},
@@ -1270,10 +1270,10 @@ TEST(EncapsulateSubgraphsTest, TwoFunctionsTwoOutside) {
             {"tpu_core", 0},
             {"cost_estimate_ns", 1000000},
             {"shapes",
-             absl::Span<const TensorShapeProto>({shape_proto_expected})},
+             abslx::Span<const TensorShapeProto>({shape_proto_expected})},
             {"_outside_compilation_subgraph", "O1"},
             {"_xla_token_input_nodes",
-             absl::Span<const string>({"_xla_token_arg_node"})},
+             abslx::Span<const string>({"_xla_token_arg_node"})},
             {"_xla_original_oc_node_name",
              "outside_compilation_O1_host_compute"}},
            {"D"}},
@@ -1293,9 +1293,9 @@ TEST(EncapsulateSubgraphsTest, TwoFunctionsTwoOutside) {
           {{"outside_compilation_O1_host_compute"},
            "XlaHostCompute",
            {"d_0_arg", "G:o:0"},
-           {{"Tinputs", absl::Span<const DataType>({DT_FLOAT, DT_FLOAT})},
-            {"Toutputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"ancestors", absl::Span<const string>({})},
+           {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT, DT_FLOAT})},
+            {"Toutputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"ancestors", abslx::Span<const string>({})},
             {"key", "host_compute_channel_F2_F2_O1"},
             {"send_key", ""},
             {"recv_key", ""},
@@ -1303,10 +1303,10 @@ TEST(EncapsulateSubgraphsTest, TwoFunctionsTwoOutside) {
             {"tpu_core", 0},
             {"cost_estimate_ns", 1000000},
             {"shapes",
-             absl::Span<const TensorShapeProto>({shape_proto_expected})},
+             abslx::Span<const TensorShapeProto>({shape_proto_expected})},
             {"_outside_compilation_subgraph", "O1"},
             {"_xla_token_input_nodes",
-             absl::Span<const string>({"_xla_token_arg_node"})},
+             abslx::Span<const string>({"_xla_token_arg_node"})},
             {"_xla_original_oc_node_name",
              "outside_compilation_O1_host_compute"}}},
       },
@@ -1430,9 +1430,9 @@ TEST(EncapsulateSubgraphsTest, TwoFunctionsTwoOutsideDependencyFromOutside) {
           {{"outside_compilation_O1_host_compute"},
            "XlaHostCompute",
            {"C:o:0", "D:o:0"},
-           {{"Tinputs", absl::Span<const DataType>({DT_FLOAT, DT_FLOAT})},
-            {"Toutputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"ancestors", absl::Span<const string>({})},
+           {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT, DT_FLOAT})},
+            {"Toutputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"ancestors", abslx::Span<const string>({})},
             {"key", "host_compute_channel_F1_F1_O1"},
             {"send_key", ""},
             {"recv_key", ""},
@@ -1440,10 +1440,10 @@ TEST(EncapsulateSubgraphsTest, TwoFunctionsTwoOutsideDependencyFromOutside) {
             {"tpu_core", 0},
             {"cost_estimate_ns", 1000000},
             {"shapes",
-             absl::Span<const TensorShapeProto>({shape_proto_expected})},
+             abslx::Span<const TensorShapeProto>({shape_proto_expected})},
             {"_outside_compilation_subgraph", "O1"},
             {"_xla_token_input_nodes",
-             absl::Span<const string>({"_xla_token_arg_node"})},
+             abslx::Span<const string>({"_xla_token_arg_node"})},
             {"_xla_original_oc_node_name",
              "outside_compilation_O1_host_compute"}},
            {"D"}},
@@ -1460,9 +1460,9 @@ TEST(EncapsulateSubgraphsTest, TwoFunctionsTwoOutsideDependencyFromOutside) {
           {{"outside_compilation_O1_host_compute"},
            "XlaHostCompute",
            {"G:o:0"},
-           {{"Tinputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"Toutputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"ancestors", absl::Span<const string>({})},
+           {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"Toutputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"ancestors", abslx::Span<const string>({})},
             {"key", "host_compute_channel_F2_F2_O1"},
             {"send_key", ""},
             {"recv_key", ""},
@@ -1470,10 +1470,10 @@ TEST(EncapsulateSubgraphsTest, TwoFunctionsTwoOutsideDependencyFromOutside) {
             {"tpu_core", 0},
             {"cost_estimate_ns", 1000000},
             {"shapes",
-             absl::Span<const TensorShapeProto>({shape_proto_expected})},
+             abslx::Span<const TensorShapeProto>({shape_proto_expected})},
             {"_outside_compilation_subgraph", "O1"},
             {"_xla_token_input_nodes",
-             absl::Span<const string>({"_xla_token_arg_node"})},
+             abslx::Span<const string>({"_xla_token_arg_node"})},
             {"_xla_original_oc_node_name",
              "outside_compilation_O1_host_compute"}}},
       },
@@ -1576,9 +1576,9 @@ TEST(EncapsulateSubgraphsTest, OutsideCompilationNoInputs) {
           {{"outside_compilation_O1_host_compute"},
            "XlaHostCompute",
            {"a_0_arg"},
-           {{"Tinputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"Toutputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"ancestors", absl::Span<const string>({})},
+           {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"Toutputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"ancestors", abslx::Span<const string>({})},
             {"key", "host_compute_channel_F1_F1_O1"},
             {"send_key", ""},
             {"recv_key", ""},
@@ -1586,10 +1586,10 @@ TEST(EncapsulateSubgraphsTest, OutsideCompilationNoInputs) {
             {"tpu_core", 0},
             {"cost_estimate_ns", 1000000},
             {"shapes",
-             absl::Span<const TensorShapeProto>({shape_proto_expected})},
+             abslx::Span<const TensorShapeProto>({shape_proto_expected})},
             {"_outside_compilation_subgraph", "O1"},
             {"_xla_token_input_nodes",
-             absl::Span<const string>({"_xla_token_arg_node"})},
+             abslx::Span<const string>({"_xla_token_arg_node"})},
             {"_xla_original_oc_node_name",
              "outside_compilation_O1_host_compute"}}},
       },
@@ -1672,9 +1672,9 @@ TEST(EncapsulateSubgraphsTest, OutsideCompilationControlInput) {
           {{"outside_compilation_O1_host_compute"},
            "XlaHostCompute",
            {"a_0_arg"},
-           {{"Tinputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"Toutputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"ancestors", absl::Span<const string>({})},
+           {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"Toutputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"ancestors", abslx::Span<const string>({})},
             {"key", "host_compute_channel_F1_F1_O1"},
             {"send_key", ""},
             {"recv_key", ""},
@@ -1682,10 +1682,10 @@ TEST(EncapsulateSubgraphsTest, OutsideCompilationControlInput) {
             {"tpu_core", 0},
             {"cost_estimate_ns", 1000000},
             {"shapes",
-             absl::Span<const TensorShapeProto>({shape_proto_expected})},
+             abslx::Span<const TensorShapeProto>({shape_proto_expected})},
             {"_outside_compilation_subgraph", "O1"},
             {"_xla_token_input_nodes",
-             absl::Span<const string>({"_xla_token_arg_node"})},
+             abslx::Span<const string>({"_xla_token_arg_node"})},
             {"_xla_original_oc_node_name",
              "outside_compilation_O1_host_compute"}},
            {"D"}},
@@ -1783,19 +1783,19 @@ TEST(EncapsulateSubgraphsTest, OutsideCompilationNoOutputs) {
           {{"outside_compilation_O1_host_compute"},
            "XlaHostCompute",
            {"D:o:0"},
-           {{"Tinputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"Toutputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"ancestors", absl::Span<const string>({})},
+           {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"Toutputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"ancestors", abslx::Span<const string>({})},
             {"key", "host_compute_channel_F1_F1_O1"},
             {"send_key", ""},
             {"recv_key", ""},
             {"shape_inference_graph", shape_inference_graph},
             {"tpu_core", 0},
             {"cost_estimate_ns", 1000000},
-            {"shapes", absl::Span<const TensorShapeProto>({})},
+            {"shapes", abslx::Span<const TensorShapeProto>({})},
             {"_outside_compilation_subgraph", "O1"},
             {"_xla_token_input_nodes",
-             absl::Span<const string>({"_xla_token_arg_node"})},
+             abslx::Span<const string>({"_xla_token_arg_node"})},
             {"_xla_original_oc_node_name",
              "outside_compilation_O1_host_compute"}}},
       },
@@ -1897,19 +1897,19 @@ TEST(EncapsulateSubgraphsTest, OutsideCompilationControlOutput) {
           {{"outside_compilation_O1_host_compute"},
            "XlaHostCompute",
            {"D:o:0"},
-           {{"Tinputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"Toutputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"ancestors", absl::Span<const string>({})},
+           {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"Toutputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"ancestors", abslx::Span<const string>({})},
             {"key", "host_compute_channel_F1_F1_O1"},
             {"send_key", ""},
             {"recv_key", ""},
             {"shape_inference_graph", shape_inference_graph},
             {"tpu_core", 0},
             {"cost_estimate_ns", 1000000},
-            {"shapes", absl::Span<const TensorShapeProto>({})},
+            {"shapes", abslx::Span<const TensorShapeProto>({})},
             {"_outside_compilation_subgraph", "O1"},
             {"_xla_token_input_nodes",
-             absl::Span<const string>({"_xla_token_arg_node"})},
+             abslx::Span<const string>({"_xla_token_arg_node"})},
             {"_xla_original_oc_node_name",
              "outside_compilation_O1_host_compute"}}},
       },
@@ -2035,37 +2035,37 @@ TEST(EncapsulateSubgraphsTest,
           {{"outside_compilation_O1_host_compute"},
            "XlaHostCompute",
            {"a_0_arg"},
-           {{"Tinputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"Toutputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"ancestors", absl::Span<const string>({})},
+           {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"Toutputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"ancestors", abslx::Span<const string>({})},
             {"key", "host_compute_channel_F1_F1_O1"},
             {"send_key", ""},
             {"recv_key", ""},
             {"shape_inference_graph", shape_inference_graph1},
             {"tpu_core", 0},
             {"cost_estimate_ns", 1000000},
-            {"shapes", absl::Span<const TensorShapeProto>({})},
+            {"shapes", abslx::Span<const TensorShapeProto>({})},
             {"_outside_compilation_subgraph", "O1"},
             {"_xla_token_input_nodes",
-             absl::Span<const string>({"_xla_token_arg_node"})},
+             abslx::Span<const string>({"_xla_token_arg_node"})},
             {"_xla_original_oc_node_name",
              "outside_compilation_O1_host_compute"}}},
           {{"outside_compilation_O2_host_compute"},
            "XlaHostCompute",
            {"F:o:0"},
-           {{"Tinputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"Toutputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"ancestors", absl::Span<const string>({})},
+           {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"Toutputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"ancestors", abslx::Span<const string>({})},
             {"key", "host_compute_channel_F1_F1_O2"},
             {"send_key", ""},
             {"recv_key", ""},
             {"shape_inference_graph", shape_inference_graph2},
             {"tpu_core", 0},
             {"cost_estimate_ns", 1000000},
-            {"shapes", absl::Span<const TensorShapeProto>({})},
+            {"shapes", abslx::Span<const TensorShapeProto>({})},
             {"_outside_compilation_subgraph", "O2"},
             {"_xla_token_input_nodes",
-             absl::Span<const string>({"_xla_token_arg_node",
+             abslx::Span<const string>({"_xla_token_arg_node",
                                        "outside_compilation_O1_host_compute"})},
             {"_xla_original_oc_node_name",
              "outside_compilation_O2_host_compute"}},
@@ -2187,19 +2187,19 @@ TEST(EncapsulateSubgraphsTest,
           {{"outside_compilation_O2_host_compute"},
            "XlaHostCompute",
            {"a_0_arg"},
-           {{"Tinputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"Toutputs", absl::Span<const DataType>({})},
-            {"ancestors", absl::Span<const string>({})},
+           {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"Toutputs", abslx::Span<const DataType>({})},
+            {"ancestors", abslx::Span<const string>({})},
             {"key", "host_compute_channel_F1_F1_O2"},
             {"send_key", ""},
             {"recv_key", ""},
             {"shape_inference_graph", NameAttrList()},
             {"tpu_core", 0},
             {"cost_estimate_ns", 1000000},
-            {"shapes", absl::Span<const TensorShapeProto>({})},
+            {"shapes", abslx::Span<const TensorShapeProto>({})},
             {"_outside_compilation_subgraph", "O2"},
             {"_xla_token_input_nodes",
-             absl::Span<const string>({"_xla_token_arg_node",
+             abslx::Span<const string>({"_xla_token_arg_node",
                                        "outside_compilation_O1_host_compute"})},
             {"_xla_original_oc_node_name",
              "outside_compilation_O2_host_compute"}},
@@ -2207,19 +2207,19 @@ TEST(EncapsulateSubgraphsTest,
           {{"outside_compilation_O1_host_compute"},
            "XlaHostCompute",
            {"D:o:0"},
-           {{"Tinputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"Toutputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"ancestors", absl::Span<const string>({})},
+           {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"Toutputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"ancestors", abslx::Span<const string>({})},
             {"key", "host_compute_channel_F1_F1_O1"},
             {"send_key", ""},
             {"recv_key", ""},
             {"shape_inference_graph", shape_inference_graph},
             {"tpu_core", 0},
             {"cost_estimate_ns", 1000000},
-            {"shapes", absl::Span<const TensorShapeProto>({})},
+            {"shapes", abslx::Span<const TensorShapeProto>({})},
             {"_outside_compilation_subgraph", "O1"},
             {"_xla_token_input_nodes",
-             absl::Span<const string>({"_xla_token_arg_node"})},
+             abslx::Span<const string>({"_xla_token_arg_node"})},
             {"_xla_original_oc_node_name",
              "outside_compilation_O1_host_compute"}}},
       },
@@ -2338,56 +2338,56 @@ TEST(EncapsulateSubgraphsTest, OutsideCompilationClusterDependency) {
        {{"outside_compilation_O1_host_compute"},
         "XlaHostCompute",
         {"D:o:0"},
-        {{"Tinputs", absl::Span<const DataType>({DT_FLOAT})},
-         {"Toutputs", absl::Span<const DataType>({DT_FLOAT})},
-         {"ancestors", absl::Span<const string>({})},
+        {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT})},
+         {"Toutputs", abslx::Span<const DataType>({DT_FLOAT})},
+         {"ancestors", abslx::Span<const string>({})},
          {"key", "host_compute_channel_F1_F1_O1"},
          {"send_key", ""},
          {"recv_key", ""},
          {"shape_inference_graph", shape_inference_graph},
          {"tpu_core", 0},
          {"cost_estimate_ns", 1000000},
-         {"shapes", absl::Span<const TensorShapeProto>({})},
+         {"shapes", abslx::Span<const TensorShapeProto>({})},
          {"_outside_compilation_subgraph", "O1"},
          {"_xla_token_input_nodes",
-          absl::Span<const string>({"_xla_token_arg_node"})},
+          abslx::Span<const string>({"_xla_token_arg_node"})},
          {"_xla_original_oc_node_name",
           "outside_compilation_O1_host_compute"}}},
        {{"outside_compilation_O2_host_compute"},
         "XlaHostCompute",
         {"D:o:0"},
-        {{"Tinputs", absl::Span<const DataType>({DT_FLOAT})},
-         {"Toutputs", absl::Span<const DataType>({})},
-         {"ancestors", absl::Span<const string>({})},
+        {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT})},
+         {"Toutputs", abslx::Span<const DataType>({})},
+         {"ancestors", abslx::Span<const string>({})},
          {"key", "host_compute_channel_F1_F1_O2"},
          {"send_key", ""},
          {"recv_key", ""},
          {"shape_inference_graph", NameAttrList()},
          {"tpu_core", 0},
          {"cost_estimate_ns", 1000000},
-         {"shapes", absl::Span<const TensorShapeProto>({})},
+         {"shapes", abslx::Span<const TensorShapeProto>({})},
          {"_outside_compilation_subgraph", "O2"},
          {"_xla_token_input_nodes",
-          absl::Span<const string>(
+          abslx::Span<const string>(
               {"_xla_token_arg_node", "outside_compilation_O1_host_compute"})},
          {"_xla_original_oc_node_name", "outside_compilation_O2_host_compute"}},
         {"outside_compilation_O1_host_compute"}},
        {{"outside_compilation_O3_host_compute"},
         "XlaHostCompute",
         {"D:o:0"},
-        {{"Tinputs", absl::Span<const DataType>({DT_FLOAT})},
-         {"Toutputs", absl::Span<const DataType>({})},
-         {"ancestors", absl::Span<const string>({})},
+        {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT})},
+         {"Toutputs", abslx::Span<const DataType>({})},
+         {"ancestors", abslx::Span<const string>({})},
          {"key", "host_compute_channel_F1_F1_O3"},
          {"send_key", ""},
          {"recv_key", ""},
          {"shape_inference_graph", NameAttrList()},
          {"tpu_core", 0},
          {"cost_estimate_ns", 1000000},
-         {"shapes", absl::Span<const TensorShapeProto>({})},
+         {"shapes", abslx::Span<const TensorShapeProto>({})},
          {"_outside_compilation_subgraph", "O3"},
          {"_xla_token_input_nodes",
-          absl::Span<const string>({"_xla_token_arg_node",
+          abslx::Span<const string>({"_xla_token_arg_node",
                                     "outside_compilation_O1_host_compute",
                                     "outside_compilation_O2_host_compute"})},
          {"_xla_original_oc_node_name", "outside_compilation_O3_host_compute"}},
@@ -2505,19 +2505,19 @@ TEST(EncapsulateSubgraphsTest, OutsideCompilationNoInputsOrOutputs) {
           {{"outside_compilation_O1_host_compute"},
            "XlaHostCompute",
            {"a_0_arg"},
-           {{"Tinputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"Toutputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"ancestors", absl::Span<const string>({})},
+           {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"Toutputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"ancestors", abslx::Span<const string>({})},
             {"key", "host_compute_channel_F1_F1_O1"},
             {"send_key", ""},
             {"recv_key", ""},
             {"shape_inference_graph", shape_inference_graph},
             {"tpu_core", 0},
             {"cost_estimate_ns", 1000000},
-            {"shapes", absl::Span<const TensorShapeProto>({})},
+            {"shapes", abslx::Span<const TensorShapeProto>({})},
             {"_outside_compilation_subgraph", "O1"},
             {"_xla_token_input_nodes",
-             absl::Span<const string>({"_xla_token_arg_node"})},
+             abslx::Span<const string>({"_xla_token_arg_node"})},
             {"_xla_original_oc_node_name",
              "outside_compilation_O1_host_compute"}}},
       },
@@ -2625,19 +2625,19 @@ TEST(EncapsulateSubgraphsTest, OutsideCompilationShapeInference) {
           {{"outside_compilation_O1_host_compute"},
            "XlaHostCompute",
            {"c_0_arg", "c:o:0"},
-           {{"Tinputs", absl::Span<const DataType>({DT_FLOAT, DT_FLOAT})},
-            {"Toutputs", absl::Span<const DataType>({DT_FLOAT})},
-            {"ancestors", absl::Span<const string>({})},
+           {{"Tinputs", abslx::Span<const DataType>({DT_FLOAT, DT_FLOAT})},
+            {"Toutputs", abslx::Span<const DataType>({DT_FLOAT})},
+            {"ancestors", abslx::Span<const string>({})},
             {"key", "host_compute_channel_F1_F1_O1"},
             {"send_key", ""},
             {"recv_key", ""},
             {"shape_inference_graph", shape_inference_graph},
             {"tpu_core", 0},
             {"cost_estimate_ns", 1000000},
-            {"shapes", absl::Span<const DataType>({})},
+            {"shapes", abslx::Span<const DataType>({})},
             {"_outside_compilation_subgraph", "O1"},
             {"_xla_token_input_nodes",
-             absl::Span<const string>({"_xla_token_arg_node"})},
+             abslx::Span<const string>({"_xla_token_arg_node"})},
             {"_xla_original_oc_node_name",
              "outside_compilation_O1_host_compute"}},
            {"c"}},

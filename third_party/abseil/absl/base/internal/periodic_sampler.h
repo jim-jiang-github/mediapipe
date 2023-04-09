@@ -22,7 +22,7 @@
 #include "absl/base/internal/exponential_biased.h"
 #include "absl/base/optimization.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -206,6 +206,6 @@ std::atomic<int> PeriodicSampler<Tag, default_period>::period_(default_period);
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_BASE_INTERNAL_PERIODIC_SAMPLER_H_

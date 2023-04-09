@@ -27,7 +27,7 @@
 #endif  // ABSL_HAVE_ATTRIBUTE(enable_if) && !defined(__native_client__)
 #endif  // ABSL_INTERNAL_ENABLE_FORMAT_CHECKER
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace str_format_internal {
 
@@ -328,6 +328,6 @@ constexpr bool ValidFormatImpl(string_view format) {
 
 }  // namespace str_format_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_INTERNAL_STR_FORMAT_CHECKER_H_

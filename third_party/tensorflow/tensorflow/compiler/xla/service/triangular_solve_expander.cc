@@ -44,7 +44,7 @@ XlaOp DiagonalBlocks(XlaOp a, int64_t block_size) {
     int ndims = shape.rank();
     int64_t n = ShapeUtil::GetDimension(shape, -1);
     int64_t num_blocks = n / block_size;
-    absl::Span<int64_t const> batch_dims = absl::MakeConstSpan(
+    abslx::Span<int64_t const> batch_dims = abslx::MakeConstSpan(
         shape.dimensions().begin(), shape.dimensions().begin() + (ndims - 2));
 
     XlaOp diag_blocks;
@@ -556,7 +556,7 @@ StatusOr<HloInstruction*> TriangularSolveExpander::ExpandInstruction(
     HloInstruction* instruction) {
   const TriangularSolveOptions& options =
       instruction->triangular_solve_options();
-  const std::string name = absl::StrFormat(
+  const std::string name = abslx::StrFormat(
       "xla.triangular_solve_%s_%s_%s_%s_%s_%s",
       instruction->operand(0)->shape().ToString(),
       instruction->operand(1)->shape().ToString(),

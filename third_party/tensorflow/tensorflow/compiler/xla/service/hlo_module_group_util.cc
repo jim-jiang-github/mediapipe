@@ -41,7 +41,7 @@ std::vector<HloInstruction*> HloModuleGroupUtil::GlobalPredecessors(
     HloInstruction* instruction) {
   std::vector<HloInstruction*>
       predecessors;  // Use a vector to avoid non-determinism.
-  absl::flat_hash_set<HloInstruction*> unique;
+  abslx::flat_hash_set<HloInstruction*> unique;
 
   // Adds to the unique predecessors list; if the predecessors is a companion
   // instruction, also add companion instructions; if the predecessors is a
@@ -118,7 +118,7 @@ std::vector<HloInstruction*> HloModuleGroupUtil::GlobalSuccessors(
     HloInstruction* instruction) {
   std::vector<HloInstruction*>
       successors;  // Use a vector to avoid non-determinism.
-  absl::flat_hash_set<HloInstruction*> unique;
+  abslx::flat_hash_set<HloInstruction*> unique;
 
   // Adds to the unique successors list; if the successor is a companion
   // instruction, also add companion instructions; if the successor is a
@@ -192,7 +192,7 @@ std::vector<HloInstruction*> HloModuleGroupUtil::GlobalSuccessors(
 }
 
 std::vector<HloInstruction*> HloModuleGroupUtil::RootInstructions(
-    absl::Span<HloComputation* const> computations) {
+    abslx::Span<HloComputation* const> computations) {
   std::vector<HloInstruction*> roots;
   for (HloComputation* computation : computations) {
     for (HloInstruction* instruction : computation->instructions()) {
@@ -209,7 +209,7 @@ std::vector<HloInstruction*> HloModuleGroupUtil::RootInstructions(
 std::string HloModuleGroupUtil::CycleToString(
     HloInstruction* init_instruction) {
   std::vector<std::string> names;
-  absl::flat_hash_set<HloInstruction*> seen;
+  abslx::flat_hash_set<HloInstruction*> seen;
 
   std::function<bool(HloInstruction*)> helper =
       [&](HloInstruction* instruction) {
@@ -232,7 +232,7 @@ std::string HloModuleGroupUtil::CycleToString(
       };
 
   helper(init_instruction);
-  return absl::StrJoin(names, " --> ");
+  return abslx::StrJoin(names, " --> ");
 }
 
 Status HloModuleGroupUtil::VisitTopologicalOrder(
@@ -310,7 +310,7 @@ Status HloModuleGroupUtil::VisitTopologicalOrder(
 }
 
 Status HloModuleGroupUtil::VerifyComputations(
-    absl::Span<HloComputation* const> computations) {
+    abslx::Span<HloComputation* const> computations) {
   auto visit_function =
       [&](HloInstruction* instruction,
           const std::vector<HloInstruction*>& instruction_group) {
@@ -341,7 +341,7 @@ Status HloModuleGroupUtil::VerifyComputations(
 
 StatusOr<std::unique_ptr<HloReachabilityMap>>
 HloModuleGroupUtil::ComputeReachability(
-    absl::Span<HloComputation* const> computations) {
+    abslx::Span<HloComputation* const> computations) {
   std::vector<HloInstruction*> post_order;
   auto visit_function =
       [&](HloInstruction* instruction,

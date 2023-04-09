@@ -87,8 +87,8 @@ StatusOr<AutoShardPolicy> ToAutoShardPolicy(
   }
 }
 
-StatusOr<TargetWorkers> ParseTargetWorkers(absl::string_view s) {
-  std::string str_upper = absl::AsciiStrToUpper(s);
+StatusOr<TargetWorkers> ParseTargetWorkers(abslx::string_view s) {
+  std::string str_upper = abslx::AsciiStrToUpper(s);
   if (str_upper.empty() || str_upper == kAuto) {
     return TARGET_WORKERS_AUTO;
   }
@@ -115,8 +115,8 @@ std::string TargetWorkersToString(TargetWorkers target_workers) {
   }
 }
 
-StatusOr<DeploymentMode> ParseDeploymentMode(absl::string_view s) {
-  std::string str_upper = absl::AsciiStrToUpper(s);
+StatusOr<DeploymentMode> ParseDeploymentMode(abslx::string_view s) {
+  std::string str_upper = abslx::AsciiStrToUpper(s);
   if (str_upper == kColocated) {
     return DEPLOYMENT_MODE_COLOCATED;
   }

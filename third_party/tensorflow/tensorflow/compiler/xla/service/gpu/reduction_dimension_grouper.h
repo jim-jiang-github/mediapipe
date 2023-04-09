@@ -41,13 +41,13 @@ namespace gpu {
 //
 class ReductionDimensionGrouper : public HloModulePass {
  public:
-  absl::string_view name() const override {
+  abslx::string_view name() const override {
     return "reduction-dimension-grouper";
   }
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 };
 
 }  // namespace gpu

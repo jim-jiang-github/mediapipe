@@ -153,7 +153,7 @@ ENTRY root {
       schedule.sequence(module->entry_computation()).instructions();
   EXPECT_EQ(module->entry_computation()->instruction_count(), sequence.size());
 
-  absl::flat_hash_map<std::string, const HloInstruction*> instructions_by_name;
+  abslx::flat_hash_map<std::string, const HloInstruction*> instructions_by_name;
   for (const HloInstruction* instruction : sequence) {
     instructions_by_name[instruction->name()] = instruction;
   }
@@ -204,13 +204,13 @@ ENTRY entry {
       schedule.sequence(module->entry_computation()).instructions();
   EXPECT_EQ(module->entry_computation()->instruction_count(), sequence.size());
 
-  absl::flat_hash_map<std::string, const HloInstruction*> instructions_by_name;
+  abslx::flat_hash_map<std::string, const HloInstruction*> instructions_by_name;
   for (const HloInstruction* instruction : sequence) {
     instructions_by_name[instruction->name()] = instruction;
   }
 
-  EXPECT_LT(absl::c_find(sequence, instructions_by_name.at("send-done")),
-            absl::c_find(sequence, instructions_by_name.at("n1")));
+  EXPECT_LT(abslx::c_find(sequence, instructions_by_name.at("send-done")),
+            abslx::c_find(sequence, instructions_by_name.at("n1")));
 }
 
 TEST_F(HloSchedulingTest, TuplesAreAccountedCorrectly) {
@@ -227,7 +227,7 @@ TEST_F(HloSchedulingTest, TuplesAreAccountedCorrectly) {
   auto abs_abs1 = builder.AddInstruction(
       HloInstruction::CreateUnary(r1f32, HloOpcode::kAbs, abs_const));
   auto tuple = builder.AddInstruction(HloInstruction::CreateTuple(
-      absl::Span<HloInstruction* const>({abs_abs1})));
+      abslx::Span<HloInstruction* const>({abs_abs1})));
   auto tuple_elm = builder.AddInstruction(
       HloInstruction::CreateGetTupleElement(r1f32, tuple, 0));
 

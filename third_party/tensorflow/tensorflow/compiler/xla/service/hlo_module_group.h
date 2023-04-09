@@ -32,15 +32,15 @@ namespace xla {
 class HloModuleGroup {
  public:
   // Construct an empty module group.
-  explicit HloModuleGroup(absl::string_view name) : name_(name) {}
+  explicit HloModuleGroup(abslx::string_view name) : name_(name) {}
 
   // Construct a module group containing a single module.
   explicit HloModuleGroup(std::unique_ptr<HloModule> module);
 
   // Construct a module group containing any number of modules.
-  HloModuleGroup(absl::string_view name,
-                 absl::Span<std::unique_ptr<HloModule>> modules);
-  HloModuleGroup(absl::string_view name,
+  HloModuleGroup(abslx::string_view name,
+                 abslx::Span<std::unique_ptr<HloModule>> modules);
+  HloModuleGroup(abslx::string_view name,
                  std::vector<std::unique_ptr<HloModule>>&& modules);
 
   // Returns the modules contained in the group.
@@ -83,7 +83,7 @@ class HloModuleGroup {
   HloModuleGroupProto ToProto() const;
   static StatusOr<HloModuleGroup> CreateFromProto(
       const HloModuleGroupProto& proto,
-      absl::Span<const HloModuleConfig> module_configs);
+      abslx::Span<const HloModuleConfig> module_configs);
 
   // Returns the number of modules in the module group.
   int size() const { return modules_.size(); }
@@ -91,8 +91,8 @@ class HloModuleGroup {
   // Returns true if there are no modules in the module group.
   bool empty() const { return modules_.empty(); }
 
-  absl::string_view cache_key() const { return cache_key_; }
-  void set_cache_key(absl::string_view cache_key) {
+  abslx::string_view cache_key() const { return cache_key_; }
+  void set_cache_key(abslx::string_view cache_key) {
     cache_key_ = std::string(cache_key);
   }
 

@@ -28,7 +28,7 @@ namespace gpu {
 // in the given TfLiteRegistration object.
 std::unique_ptr<TFLiteOperationParser> NewOperationParser(
     const TfLiteRegistration* registration, bool allow_quant_ops = false,
-    const absl::flat_hash_set<TfLiteBuiltinOperator>* excluded_ops = nullptr);
+    const abslx::flat_hash_set<TfLiteBuiltinOperator>* excluded_ops = nullptr);
 
 }  // namespace gpu
 }  // namespace tflite

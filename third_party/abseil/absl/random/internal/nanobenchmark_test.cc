@@ -17,7 +17,7 @@
 #include "absl/base/internal/raw_logging.h"
 #include "absl/strings/numbers.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal_nanobenchmark {
 namespace {
@@ -53,7 +53,7 @@ void RunAll(const int argc, char* argv[]) {
   // Avoid migrating between cores - important on multi-socket systems.
   int cpu = -1;
   if (argc == 2) {
-    if (!absl::SimpleAtoi(argv[1], &cpu)) {
+    if (!abslx::SimpleAtoi(argv[1], &cpu)) {
       ABSL_RAW_LOG(FATAL, "The optional argument must be a CPU number >= 0.\n");
     }
   }
@@ -69,9 +69,9 @@ void RunAll(const int argc, char* argv[]) {
 }  // namespace
 }  // namespace random_internal_nanobenchmark
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 int main(int argc, char* argv[]) {
-  absl::random_internal_nanobenchmark::RunAll(argc, argv);
+  abslx::random_internal_nanobenchmark::RunAll(argc, argv);
   return 0;
 }

@@ -18,7 +18,7 @@ limitations under the License.
 namespace xla {
 // Internal functions
 
-std::optional<absl::string_view> CustomCallStatusGetMessage(
+std::optional<abslx::string_view> CustomCallStatusGetMessage(
     const XlaCustomCallStatus* status) {
   return status->message;
 }

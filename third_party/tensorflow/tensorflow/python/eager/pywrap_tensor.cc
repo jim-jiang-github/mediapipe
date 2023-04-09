@@ -313,7 +313,7 @@ TFE_TensorHandle* ConvertToEagerTensorUncached(TFE_Context* ctx,
                                 static_cast<TF_DataType>(dtype), status.get()));
       if (!status->status.ok()) {
         PyErr_SetString(PyExc_TypeError,
-                        absl::StrCat("Error while casting from dtype ",
+                        abslx::StrCat("Error while casting from dtype ",
                                      tensorflow::DataTypeString(
                                          static_cast<DataType>(handle_dtype)),
                                      " to ", tensorflow::DataTypeString(dtype),
@@ -325,7 +325,7 @@ TFE_TensorHandle* ConvertToEagerTensorUncached(TFE_Context* ctx,
       tensorflow::Safe_PyObjectPtr value_str(PyObject_Repr(value));
       PyErr_SetString(
           PyExc_TypeError,
-          absl::StrCat("Cannot convert ", TFE_GetPythonString(value_str.get()),
+          abslx::StrCat("Cannot convert ", TFE_GetPythonString(value_str.get()),
                        " to EagerTensor of dtype ",
                        tensorflow::DataTypeString(dtype))
               .c_str());

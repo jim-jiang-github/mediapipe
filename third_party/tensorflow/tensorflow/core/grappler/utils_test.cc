@@ -436,8 +436,8 @@ TEST(CheckAttrExists, All) {
   EXPECT_FALSE(status.ok());
   EXPECT_EQ(status.code(), error::INVALID_ARGUMENT);
   EXPECT_TRUE(
-      absl::StrContains(status.error_message(),
-                        absl::StrFormat("Node 'node' lacks 'banana' attr: %s",
+      abslx::StrContains(status.error_message(),
+                        abslx::StrFormat("Node 'node' lacks 'banana' attr: %s",
                                         node.ShortDebugString())));
   EXPECT_FALSE(CheckAttrsExist(node, {""}).ok());
   EXPECT_FALSE(CheckAttrsExist(node, {"pear", "cherry"}).ok());
@@ -599,7 +599,7 @@ TEST_F(UtilsTest, EraseNodeOutputAttributes) {
 
 template <typename T>
 void TestSetTensorValue(DataType type, int val, bool success,
-                        absl::string_view error_msg) {
+                        abslx::string_view error_msg) {
   Tensor t(type, TensorShape({}));
   Status s = SetTensorValue(t.dtype(), val, &t);
   EXPECT_EQ(s.ok(), success);
@@ -612,12 +612,12 @@ void TestSetTensorValue(DataType type, int val, bool success,
 
 TEST(SetTensorValueTest, Quantized) {
   auto int_min_error = [](DataType type) {
-    return absl::Substitute(
+    return abslx::Substitute(
         "Cannot store value -2147483648 in tensor of type $0",
         DataType_Name(type));
   };
   auto int_max_error = [](DataType type) {
-    return absl::Substitute(
+    return abslx::Substitute(
         "Cannot store value 2147483647 in tensor of type $0",
         DataType_Name(type));
   };

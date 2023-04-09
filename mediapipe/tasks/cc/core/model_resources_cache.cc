@@ -50,116 +50,116 @@ bool ModelResourcesCache::ModelAssetBundleExists(const std::string& tag) const {
   return model_asset_bundle_resources_collection_.contains(tag);
 }
 
-absl::Status ModelResourcesCache::AddModelResources(
+abslx::Status ModelResourcesCache::AddModelResources(
     std::unique_ptr<ModelResources> model_resources) {
   if (model_resources == nullptr) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument, "ModelResources object is null.",
+        abslx::StatusCode::kInvalidArgument, "ModelResources object is null.",
         MediaPipeTasksStatus::kRunnerModelResourcesCacheServiceError);
   }
   const std::string& tag = model_resources->GetTag();
   if (tag.empty()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "ModelResources must have a non-empty tag.",
         MediaPipeTasksStatus::kRunnerModelResourcesCacheServiceError);
   }
   if (Exists(tag)) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::Substitute("ModelResources with tag \"$0\" already exists.", tag),
+        abslx::StatusCode::kInvalidArgument,
+        abslx::Substitute("ModelResources with tag \"$0\" already exists.", tag),
         MediaPipeTasksStatus::kRunnerModelResourcesCacheServiceError);
   }
   model_resources_collection_.emplace(tag, std::move(model_resources));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ModelResourcesCache::AddModelResourcesCollection(
+abslx::Status ModelResourcesCache::AddModelResourcesCollection(
     std::vector<std::unique_ptr<ModelResources>>& model_resources_collection) {
   for (auto& model_resources : model_resources_collection) {
     MP_RETURN_IF_ERROR(AddModelResources(std::move(model_resources)));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::StatusOr<const ModelResources*> ModelResourcesCache::GetModelResources(
+abslx::StatusOr<const ModelResources*> ModelResourcesCache::GetModelResources(
     const std::string& tag) const {
   if (tag.empty()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "ModelResources must be retrieved with a non-empty tag.",
         MediaPipeTasksStatus::kRunnerModelResourcesCacheServiceError);
   }
   if (!Exists(tag)) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::Substitute("ModelResources with tag \"$0\" does not exist.", tag),
+        abslx::StatusCode::kInvalidArgument,
+        abslx::Substitute("ModelResources with tag \"$0\" does not exist.", tag),
         MediaPipeTasksStatus::kRunnerModelResourcesCacheServiceError);
   }
   return model_resources_collection_.at(tag).get();
 }
 
-absl::Status ModelResourcesCache::AddModelAssetBundleResources(
+abslx::Status ModelResourcesCache::AddModelAssetBundleResources(
     std::unique_ptr<ModelAssetBundleResources> model_asset_bundle_resources) {
   if (model_asset_bundle_resources == nullptr) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "ModelAssetBundleResources object is null.",
         MediaPipeTasksStatus::kRunnerModelResourcesCacheServiceError);
   }
   const std::string& tag = model_asset_bundle_resources->GetTag();
   if (tag.empty()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "ModelAssetBundleResources must have a non-empty tag.",
         MediaPipeTasksStatus::kRunnerModelResourcesCacheServiceError);
   }
   if (ModelAssetBundleExists(tag)) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::Substitute(
+        abslx::StatusCode::kInvalidArgument,
+        abslx::Substitute(
             "ModelAssetBundleResources with tag \"$0\" already exists.", tag),
         MediaPipeTasksStatus::kRunnerModelResourcesCacheServiceError);
   }
   model_asset_bundle_resources_collection_.emplace(
       tag, std::move(model_asset_bundle_resources));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ModelResourcesCache::AddModelAssetBundleResourcesCollection(
+abslx::Status ModelResourcesCache::AddModelAssetBundleResourcesCollection(
     std::vector<std::unique_ptr<ModelAssetBundleResources>>&
         model_asset_bundle_resources_collection) {
   for (auto& model_bundle_resources : model_asset_bundle_resources_collection) {
     MP_RETURN_IF_ERROR(
         AddModelAssetBundleResources(std::move(model_bundle_resources)));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::StatusOr<const ModelAssetBundleResources*>
+abslx::StatusOr<const ModelAssetBundleResources*>
 ModelResourcesCache::GetModelAssetBundleResources(
     const std::string& tag) const {
   if (tag.empty()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "ModelAssetBundleResources must be retrieved with a non-empty tag.",
         MediaPipeTasksStatus::kRunnerModelResourcesCacheServiceError);
   }
   if (!ModelAssetBundleExists(tag)) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::Substitute(
+        abslx::StatusCode::kInvalidArgument,
+        abslx::Substitute(
             "ModelAssetBundleResources with tag \"$0\" does not exist.", tag),
         MediaPipeTasksStatus::kRunnerModelResourcesCacheServiceError);
   }
   return model_asset_bundle_resources_collection_.at(tag).get();
 }
 
-absl::StatusOr<api2::Packet<tflite::OpResolver>>
+abslx::StatusOr<api2::Packet<tflite::OpResolver>>
 ModelResourcesCache::GetGraphOpResolverPacket() const {
   if (graph_op_resolver_packet_.IsEmpty()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "The graph op resolver is not set in ModelResourcesCache.",
         MediaPipeTasksStatus::kRunnerModelResourcesCacheServiceError);
   }

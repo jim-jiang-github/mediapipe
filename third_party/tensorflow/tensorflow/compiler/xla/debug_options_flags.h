@@ -57,7 +57,7 @@ DebugOptions DefaultDebugOptionsIgnoringFlags();
 //
 // We recommend as a convention you use a pass's name for the `pass` argument,
 // but any value is accepted.
-bool ConsumeFuel(absl::string_view pass, bool* just_ran_out = nullptr);
+bool ConsumeFuel(abslx::string_view pass, bool* just_ran_out = nullptr);
 
 // Overload of ConsumeFuel that lets you pass in a functor which generates a log
 // message when we first run out of fuel for a pass.  This is useful because
@@ -71,7 +71,7 @@ bool ConsumeFuel(absl::string_view pass, bool* just_ran_out = nullptr);
 //   }
 //
 template <typename MsgGenerator>
-bool ConsumeFuel(absl::string_view pass,
+bool ConsumeFuel(abslx::string_view pass,
                  const MsgGenerator& ran_out_of_fuel_msg) {
   bool just_ran_out = false;
   bool ret = ConsumeFuel(pass, &just_ran_out);

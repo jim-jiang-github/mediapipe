@@ -47,8 +47,8 @@ void GetDims(const TF_Tensor* t, int64_t* out_dims) {
 // Runs model as is if output is a scalar,
 // else sums the output tensor before returning.
 Status RunAndMaybeSum(AbstractContext* ctx, Model forward,
-                      absl::Span<AbstractTensorHandle* const> inputs,
-                      absl::Span<AbstractTensorHandle*> outputs,
+                      abslx::Span<AbstractTensorHandle* const> inputs,
+                      abslx::Span<AbstractTensorHandle*> outputs,
                       bool use_function) {
   AbstractTensorHandle* model_outputs[1];
 
@@ -90,7 +90,7 @@ Status RunAndMaybeSum(AbstractContext* ctx, Model forward,
 // ========================= End Helper Functions==============================
 
 Status CalcNumericalGrad(AbstractContext* ctx, Model forward,
-                         absl::Span<AbstractTensorHandle* const> inputs,
+                         abslx::Span<AbstractTensorHandle* const> inputs,
                          int input_index, bool use_function,
                          AbstractTensorHandle** numerical_grad) {
   vector<AbstractTensorHandle*> theta_inputs(inputs.size());

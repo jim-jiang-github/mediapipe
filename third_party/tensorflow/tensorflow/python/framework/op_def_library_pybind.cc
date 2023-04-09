@@ -57,11 +57,11 @@ using AttrDef = ::tensorflow::OpDef::AttrDef;
 using ArgDef = ::tensorflow::OpDef::ArgDef;
 // Keys: attr.name(); Values: attr_def.allowed_values().list().type()
 using AllowedAttrMap =
-    absl::flat_hash_map<std::string, absl::flat_hash_set<int>>;
+    abslx::flat_hash_map<std::string, abslx::flat_hash_set<int>>;
 // Keys: attr.name(); Values; attr_def.default_value().type()
-using DefaultAttrMap = absl::flat_hash_map<std::string, py::object>;
+using DefaultAttrMap = abslx::flat_hash_map<std::string, py::object>;
 // Keys: attr.name(); Values: corresponding attr serialized as an AttrValue
-using AttrProtosMap = absl::flat_hash_map<std::string, AttrValue>;
+using AttrProtosMap = abslx::flat_hash_map<std::string, AttrValue>;
 
 constexpr char kType[] = "type";
 constexpr char kTypeEnum[] = "_type_enum";
@@ -105,7 +105,7 @@ py::object ToAttributeType(const py::handle& value, const AttributeType type) {
 inline bool MakeBool(const py::handle& value, const std::string& arg_name) {
   if (!py::isinstance<py::bool_>(value)) {
     throw PyTypeError(
-        absl::StrCat("Expected bool for argument '", arg_name, "' not ",
+        abslx::StrCat("Expected bool for argument '", arg_name, "' not ",
                      value.attr("__repr__")().cast<std::string>(), "."));
   }
   return value.cast<py::bool_>();
@@ -127,7 +127,7 @@ inline DataType MakeType(const py::handle& value, const std::string& arg_name) {
         .attr(kBaseDType)
         .cast<DataType>();
   } catch (...) {
-    throw PyTypeError(absl::StrCat("Expected DataType for argument '", arg_name,
+    throw PyTypeError(abslx::StrCat("Expected DataType for argument '", arg_name,
                                    "' not ", repr_v, "."));
   }
 }
@@ -141,7 +141,7 @@ inline std::string MakeShape(const py::handle& value,
         .attr(kSerialize)()
         .cast<std::string>();
   } catch (...) {
-    throw PyTypeError(absl::StrCat("Error converting ", repr_v, " (arg name = ",
+    throw PyTypeError(abslx::StrCat("Error converting ", repr_v, " (arg name = ",
                                    arg_name, ") to a TensorShape"));
   }
 }
@@ -150,9 +150,9 @@ AttrValue ValueToAttrValue(const py::object& value,
                            const std::string& attr_type,
                            const std::string& arg_name) {
   AttrValue attr_value;
-  if (absl::StartsWith(attr_type, kListPrefix)) {
+  if (abslx::StartsWith(attr_type, kListPrefix)) {
     if (!py::isinstance<py::list>(value) && !py::isinstance<py::tuple>(value)) {
-      throw PyTypeError(absl::StrCat(
+      throw PyTypeError(abslx::StrCat(
           "Expected list for attr ", arg_name, ", obtained ",
           py::type::handle_of(value).attr("__name__").cast<std::string>(),
           " instead."));
@@ -240,13 +240,13 @@ AttrValue ValueToAttrValue(const py::object& value,
         break;
       }
       default:
-        throw PyTypeError(absl::StrCat("Unrecognized Attr type ", attr_type,
+        throw PyTypeError(abslx::StrCat("Unrecognized Attr type ", attr_type,
                                        " for ", arg_name, "."));
     }
   } catch (const py::error_already_set& e) {
     throw e;
   } catch (...) {
-    throw PyTypeError(absl::StrCat(
+    throw PyTypeError(abslx::StrCat(
         "Expected ", attr_type, " for argument '", arg_name, "' not ",
         value.attr("__repr__")().cast<std::string>(), "."));
   }
@@ -266,10 +266,10 @@ void AssertSatisfiesLengthConstraint(const py::object& attr,
                                      const AttrDef& attr_def,
                                      const std::string& attr_name,
                                      const std::string& op_type_name) {
-  if (!absl::StartsWith(attr_def.type(), kListPrefix)) return;
+  if (!abslx::StartsWith(attr_def.type(), kListPrefix)) return;
   int attr_size = attr.cast<py::list>().size();
   if (attr_def.has_minimum() && attr_size < attr_def.minimum()) {
-    throw PyValueError(absl::StrCat("Attr '", attr_name, "' of '", op_type_name,
+    throw PyValueError(abslx::StrCat("Attr '", attr_name, "' of '", op_type_name,
                                     "' Op passed list of length ", attr_size,
                                     " less than minimum ", attr_def.minimum(),
                                     "."));
@@ -280,10 +280,10 @@ void AssertSatisfiesAllowedStringConstraint(
     const std::string& attr,
     const RepeatedPtrField<std::string>& allowed_values,
     const std::string& attr_name, const std::string& op_type_name) {
-  if (!absl::c_linear_search(allowed_values, attr)) {
+  if (!abslx::c_linear_search(allowed_values, attr)) {
     const std::string allowed_values_str =
-        absl::StrJoin(allowed_values, "\", \"");
-    throw PyValueError(absl::StrCat("Attr '", attr_name, "' of '", op_type_name,
+        abslx::StrJoin(allowed_values, "\", \"");
+    throw PyValueError(abslx::StrCat("Attr '", attr_name, "' of '", op_type_name,
                                     "' Op passed string '", attr,
                                     "' not in: \"", allowed_values_str, "\"."));
   }
@@ -314,7 +314,7 @@ void AssertSatisfiesIntMinimumConstraint(const AttrValue& attr,
                                          const std::string& op_type_name) {
   if (attr_def.has_minimum() && attr_type == AttributeType::INT &&
       attr.i() < attr_def.minimum()) {
-    throw PyValueError(absl::StrCat(
+    throw PyValueError(abslx::StrCat(
         "Attr '", attr_name, "' of '", op_type_name, "' Op passed ", attr.i(),
         " less than minimum ", attr_def.minimum(), "."));
   }
@@ -333,11 +333,11 @@ void AssertSatisfiesAllowedListAttrTypeConstraint(
               .attr("name")
               .cast<std::string>());
     }
-    throw PyTypeError(absl::StrCat("Value passed to parameter '", input_name,
+    throw PyTypeError(abslx::StrCat("Value passed to parameter '", input_name,
                                    "' has DataType ",
                                    dtype.attr("name").cast<std::string>(),
                                    " not in list of allowed values: ",
-                                   absl::StrJoin(allowed_values, ", ")));
+                                   abslx::StrJoin(allowed_values, ", ")));
   }
 }
 
@@ -345,16 +345,16 @@ void AssertSatisfiesDTypeConstraint(const int attr,
                                     const RepeatedField<int>& allowed_values,
                                     const std::string& attr_name,
                                     const std::string& op_type_name) {
-  if (!absl::c_linear_search(allowed_values, attr)) {
+  if (!abslx::c_linear_search(allowed_values, attr)) {
     std::string allowed_vals_str;
     for (const auto& v : allowed_values) {
-      if (!allowed_vals_str.empty()) absl::StrAppend(&allowed_vals_str, ", ");
-      absl::StrAppend(&allowed_vals_str,
+      if (!allowed_vals_str.empty()) abslx::StrAppend(&allowed_vals_str, ", ");
+      abslx::StrAppend(&allowed_vals_str,
                       DataTypeToPybindObject(static_cast<DataType>(v))
                           .attr("name")
                           .cast<std::string>());
     }
-    throw PyTypeError(absl::StrCat(
+    throw PyTypeError(abslx::StrCat(
         "Value passed to parameter '", attr_name, "' has DataType ",
         DataTypeToPybindObject(static_cast<DataType>(attr))
             .attr("name")
@@ -388,7 +388,7 @@ const OpDef* GetOpDef(const std::string& op_type_name, int producer_version) {
   auto status = OpRegistry::Global()->LookUpOpDef(op_type_name, &op_def);
   if (!status.ok() || op_def == nullptr) {
     throw std::runtime_error(
-        absl::StrCat("Unrecognized Op name ", op_type_name));
+        abslx::StrCat("Unrecognized Op name ", op_type_name));
   }
   return op_def;
 }
@@ -407,7 +407,7 @@ void ExtractDefaultTypesAndAllowedTypes(const OpDef& op_def,
     }
     if (attr_def.has_allowed_values()) {
       const auto& types = attr_def.allowed_values().list().type();
-      absl::flat_hash_set<int> allowed_values(types.begin(), types.end());
+      abslx::flat_hash_set<int> allowed_values(types.begin(), types.end());
       allowed_list_attr_map[attr_name] = std::move(allowed_values);
     }
   }
@@ -420,12 +420,12 @@ py::object GetInputTensor(std::string& input_name, const py::dict& keywords,
   if (keywords.contains(input_name)) {
     return py::reinterpret_borrow<py::object>(
         keywords.attr(kPop)(input_name.c_str()));
-  } else if (keywords.contains(absl::StrCat(input_name, "_"))) {
-    absl::StrAppend(&input_name, "_");
+  } else if (keywords.contains(abslx::StrCat(input_name, "_"))) {
+    abslx::StrAppend(&input_name, "_");
     return py::reinterpret_borrow<py::object>(
         keywords.attr(kPop)(input_name.c_str()));
   } else {
-    throw PyTypeError(absl::StrCat("No argument for input ", input_name,
+    throw PyTypeError(abslx::StrCat("No argument for input ", input_name,
                                    " found in ", op_def.DebugString()));
   }
 }
@@ -436,7 +436,7 @@ py::object GetInputType(
     const AllowedAttrMap& allowed_list_attr_map,
     const std::string& op_type_name, const std::string& input_name,
     py::dict& attrs,
-    absl::flat_hash_map<std::string, std::string>& inferred_from) {
+    abslx::flat_hash_map<std::string, std::string>& inferred_from) {
   py::object dtype = input_tensor.attr(kDType);
   py::object base_type = dtype.attr(kBaseDType);
 
@@ -444,7 +444,7 @@ py::object GetInputType(
   if (input_arg.type() != DataType::DT_INVALID &&
       input_arg.type() != dtype.cast<DataType>() &&
       input_arg.type() != base_type.cast<DataType>()) {
-    throw PyTypeError(absl::StrCat("Input '", input_name, "' of '",
+    throw PyTypeError(abslx::StrCat("Input '", input_name, "' of '",
                                    op_type_name, "' Op has type ",
                                    base_type.attr("name").cast<std::string>(),
                                    " that does not match expected type of ",
@@ -458,7 +458,7 @@ py::object GetInputType(
   if (!type_attr.empty()) {
     if (attrs.contains(type_attr) &&
         attrs[type_attr.c_str()].cast<py::object>() != base_type) {
-      throw PyTypeError(absl::StrCat(
+      throw PyTypeError(abslx::StrCat(
           "Input '", input_name, "' of '", op_type_name, "' Op has type ",
           base_type.attr("name").cast<std::string>(),
           " that does not match type ",
@@ -483,7 +483,7 @@ void ExtractInputsAndAttrs(const std::string& op_type_name, const OpDef& op_def,
                            const AllowedAttrMap& allowed_list_attr_map,
                            py::dict& keywords, py::dict& attrs,
                            py::list& inputs, py::list& input_types) {
-  absl::flat_hash_map<std::string, std::string> inferred_from;
+  abslx::flat_hash_map<std::string, std::string> inferred_from;
   for (const ArgDef& input_arg : op_def.input_arg()) {
     std::string input_name = input_arg.name();
     py::object input_tensor = GetInputTensor(input_name, keywords, op_def);
@@ -505,7 +505,7 @@ void ExtractRemainingAttrs(const std::string& op_type_name, const OpDef& op_def,
     if (attrs.contains(attr_name)) {
       if (keywords.contains(attr_name)) {
         throw PyTypeError(
-            absl::StrCat("Should not specify value for inferred attr '",
+            abslx::StrCat("Should not specify value for inferred attr '",
                          attr_name, "' for ", op_type_name, "."));
       }
       continue;
@@ -513,14 +513,14 @@ void ExtractRemainingAttrs(const std::string& op_type_name, const OpDef& op_def,
     if (keywords.contains(attr_name)) {
       attrs[attr_name.c_str()] =
           keywords.attr(kPop)(attr_name.c_str()).cast<py::object>();
-    } else if (keywords.contains(absl::StrCat(attr_name, "_"))) {
+    } else if (keywords.contains(abslx::StrCat(attr_name, "_"))) {
       attrs[attr_name.c_str()] =
-          keywords.attr(kPop)(absl::StrCat(attr_name, "_").c_str())
+          keywords.attr(kPop)(abslx::StrCat(attr_name, "_").c_str())
               .cast<py::object>();
     } else if (default_type_attr_map.contains(attr_name)) {
       attrs[attr_name.c_str()] = default_type_attr_map.at(attr_name);
     } else {
-      throw PyTypeError(absl::StrCat("No argument found for attr ", attr_name,
+      throw PyTypeError(abslx::StrCat("No argument found for attr ", attr_name,
                                      " for ", op_type_name));
     }
   }
@@ -566,7 +566,7 @@ inline const AttrValue& MaybeGetAttrValue(const py::dict& attr_protos,
                                           const std::string& op_type_name) {
   auto it = attr_protos_map.find(attr_name);
   if (it != attr_protos_map.end()) return it->second;
-  throw PyTypeError(absl::StrCat(
+  throw PyTypeError(abslx::StrCat(
       "Inconsistent OpDef for '", op_type_name, "', missing attr '", attr_name,
       "' from '", attr_protos.attr("__repr__")().cast<std::string>(), "'."));
 }
@@ -599,10 +599,10 @@ void CheckAllInputsUsed(const std::string& op_type_name,
   if (!keywords.empty()) {
     std::string all_keywords;
     for (const auto& item : keywords) {
-      if (!all_keywords.empty()) absl::StrAppend(&all_keywords, ", ");
-      absl::StrAppend(&all_keywords, item.first.cast<std::string>());
+      if (!all_keywords.empty()) abslx::StrAppend(&all_keywords, ", ");
+      abslx::StrAppend(&all_keywords, item.first.cast<std::string>());
     }
-    throw PyTypeError(absl::StrCat(
+    throw PyTypeError(abslx::StrCat(
         op_type_name, " got unexpected keyword arguments: ", all_keywords));
   }
 }

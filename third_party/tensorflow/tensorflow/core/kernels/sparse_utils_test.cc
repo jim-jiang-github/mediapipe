@@ -324,11 +324,11 @@ void GenerateRandomSparseTensor(int64_t max_nnz, const TensorShape& shape,
 
   // Generate random unique sparse indices.
   if (ordered) {
-    // NOTE: absl::btree_set does not seem to be available in TF OSS.
+    // NOTE: abslx::btree_set does not seem to be available in TF OSS.
     FillIndicesWithRandomTuples<std::set<std::vector<int64_t>>>(shape,
                                                                 output_indices);
   } else {
-    FillIndicesWithRandomTuples<absl::flat_hash_set<std::vector<int64_t>>>(
+    FillIndicesWithRandomTuples<abslx::flat_hash_set<std::vector<int64_t>>>(
         shape, output_indices);
   }
 

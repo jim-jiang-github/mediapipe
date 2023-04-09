@@ -52,14 +52,14 @@ class MaskOverlayCalculator : public CalculatorBase {
   MaskOverlayCalculator() {}
   ~MaskOverlayCalculator();
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
-  absl::Status GlSetup(
+  abslx::Status GlSetup(
       const MaskOverlayCalculatorOptions::MaskChannel mask_channel);
-  absl::Status GlRender(const float mask_const);
+  abslx::Status GlRender(const float mask_const);
 
  private:
   GlCalculatorHelper helper_;
@@ -73,7 +73,7 @@ class MaskOverlayCalculator : public CalculatorBase {
 REGISTER_CALCULATOR(MaskOverlayCalculator);
 
 // static
-absl::Status MaskOverlayCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status MaskOverlayCalculator::GetContract(CalculatorContract* cc) {
   MP_RETURN_IF_ERROR(GlCalculatorHelper::UpdateContract(cc));
   cc->Inputs().Get("VIDEO", 0).Set<GpuBuffer>();
   cc->Inputs().Get("VIDEO", 1).Set<GpuBuffer>();
@@ -82,13 +82,13 @@ absl::Status MaskOverlayCalculator::GetContract(CalculatorContract* cc) {
   else if (cc->Inputs().HasTag("CONST_MASK"))
     cc->Inputs().Tag("CONST_MASK").Set<float>();
   else
-    return absl::Status(absl::StatusCode::kNotFound,
+    return abslx::Status(abslx::StatusCode::kNotFound,
                         "At least one mask input stream must be present.");
   cc->Outputs().Tag("OUTPUT").Set<GpuBuffer>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MaskOverlayCalculator::Open(CalculatorContext* cc) {
+abslx::Status MaskOverlayCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
   if (cc->Inputs().HasTag("MASK")) {
     use_mask_tex_ = true;
@@ -96,8 +96,8 @@ absl::Status MaskOverlayCalculator::Open(CalculatorContext* cc) {
   return helper_.Open(cc);
 }
 
-absl::Status MaskOverlayCalculator::Process(CalculatorContext* cc) {
-  return helper_.RunInGlContext([this, &cc]() -> absl::Status {
+abslx::Status MaskOverlayCalculator::Process(CalculatorContext* cc) {
+  return helper_.RunInGlContext([this, &cc]() -> abslx::Status {
     if (!initialized_) {
       const auto& options = cc->Options<MaskOverlayCalculatorOptions>();
       const auto mask_channel = options.mask_channel();
@@ -115,7 +115,7 @@ absl::Status MaskOverlayCalculator::Process(CalculatorContext* cc) {
 
     if (mask_packet.IsEmpty()) {
       cc->Outputs().Tag("OUTPUT").AddPacket(input1_packet);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     const auto& input0_buffer = cc->Inputs().Get("VIDEO", 0).Get<GpuBuffer>();
@@ -172,11 +172,11 @@ absl::Status MaskOverlayCalculator::Process(CalculatorContext* cc) {
     dst.Release();
 
     cc->Outputs().Tag("OUTPUT").Add(output.release(), cc->InputTimestamp());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   });
 }
 
-absl::Status MaskOverlayCalculator::GlSetup(
+abslx::Status MaskOverlayCalculator::GlSetup(
     const MaskOverlayCalculatorOptions::MaskChannel mask_channel) {
   // Load vertex and fragment shaders
   const GLint attr_location[NUM_ATTRIBUTES] = {
@@ -247,10 +247,10 @@ absl::Status MaskOverlayCalculator::GlSetup(
   unif_frame1_ = glGetUniformLocation(program_, "frame1");
   unif_frame2_ = glGetUniformLocation(program_, "frame2");
   unif_mask_ = glGetUniformLocation(program_, "mask");
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MaskOverlayCalculator::GlRender(const float mask_const) {
+abslx::Status MaskOverlayCalculator::GlRender(const float mask_const) {
   glUseProgram(program_);
   glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, 0, 0, kBasicSquareVertices);
   glEnableVertexAttribArray(ATTRIB_VERTEX);
@@ -266,7 +266,7 @@ absl::Status MaskOverlayCalculator::GlRender(const float mask_const) {
     glUniform1f(unif_mask_, mask_const);
 
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 MaskOverlayCalculator::~MaskOverlayCalculator() {

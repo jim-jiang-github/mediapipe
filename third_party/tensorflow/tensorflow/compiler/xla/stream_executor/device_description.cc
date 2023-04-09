@@ -66,20 +66,20 @@ std::unique_ptr<std::map<std::string, std::string>> DeviceDescription::ToMap()
 
   const ThreadDim &thread_dim = thread_dim_limit();
   result["ThreadDim Limit"] =
-      absl::StrCat(thread_dim.x, ",", thread_dim.y, ",", thread_dim.z);
+      abslx::StrCat(thread_dim.x, ",", thread_dim.y, ",", thread_dim.z);
   const BlockDim &block_dim = block_dim_limit();
   result["BlockDim Limit"] =
-      absl::StrCat(block_dim.x, ",", block_dim.y, ",", block_dim.z);
+      abslx::StrCat(block_dim.x, ",", block_dim.y, ",", block_dim.z);
 
-  result["Threads Per Core Limit"] = absl::StrCat(threads_per_core_limit());
-  result["Threads Per Block Limit"] = absl::StrCat(threads_per_block_limit());
+  result["Threads Per Core Limit"] = abslx::StrCat(threads_per_core_limit());
+  result["Threads Per Block Limit"] = abslx::StrCat(threads_per_block_limit());
   result["Registers Per Block Limit"] =
-      absl::StrCat(registers_per_block_limit());
+      abslx::StrCat(registers_per_block_limit());
 
-  result["Device Address Bits"] = absl::StrCat(device_address_bits());
+  result["Device Address Bits"] = abslx::StrCat(device_address_bits());
   result["Device Memory Size"] =
       port::HumanReadableNumBytes::ToString(device_memory_size());
-  result["Memory Bandwidth"] = absl::StrCat(
+  result["Memory Bandwidth"] = abslx::StrCat(
       port::HumanReadableNumBytes::ToString(memory_bandwidth_), "/s");
 
   result["Shared Memory Per Core"] =
@@ -87,15 +87,15 @@ std::unique_ptr<std::map<std::string, std::string>> DeviceDescription::ToMap()
   result["Shared Memory Per Block"] =
       port::HumanReadableNumBytes::ToString(shared_memory_per_block_);
 
-  result["Clock Rate GHz"] = absl::StrCat(clock_rate_ghz());
+  result["Clock Rate GHz"] = abslx::StrCat(clock_rate_ghz());
 
   result["CUDA Compute Capability"] = cuda_compute_capability().ToString();
 
   result["AMDGPU GCN Arch Name"] = rocm_compute_capability().gcn_arch_name();
 
-  result["NUMA Node"] = absl::StrCat(numa_node());
-  result["Core Count"] = absl::StrCat(core_count());
-  result["ECC Enabled"] = absl::StrCat(ecc_enabled());
+  result["NUMA Node"] = abslx::StrCat(numa_node());
+  result["Core Count"] = abslx::StrCat(core_count());
+  result["ECC Enabled"] = abslx::StrCat(ecc_enabled());
   return owned_result;
 }
 

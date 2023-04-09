@@ -16,33 +16,33 @@
 
 #include "mediapipe/framework/port/status.h"
 
-/// Error domain for absl::Status errors.
+/// Error domain for abslx::Status errors.
 extern NSString *const kGUSGoogleUtilStatusErrorDomain;
 
-/// Key for the absl::Status wrapper in an NSError's user info dictionary.
+/// Key for the abslx::Status wrapper in an NSError's user info dictionary.
 extern NSString *const kGUSGoogleUtilStatusErrorKey;
 
-/// This just wraps absl::Status into an Objective-C object.
+/// This just wraps abslx::Status into an Objective-C object.
 @interface GUSUtilStatusWrapper : NSObject
 
-@property(nonatomic) absl::Status status;
+@property(nonatomic) abslx::Status status;
 
-+ (instancetype)wrapStatus:(const absl::Status &)status;
++ (instancetype)wrapStatus:(const abslx::Status &)status;
 
 @end
 
-/// This category adds methods for generating NSError objects from absl::Status
+/// This category adds methods for generating NSError objects from abslx::Status
 /// objects, and vice versa.
 @interface NSError (GUSGoogleUtilStatus)
 
-/// Generates an NSError representing a absl::Status. Note that NSError always
-/// represents an error, so this should not be called with absl::Status::OK.
-+ (NSError *)gus_errorWithStatus:(const absl::Status &)status;
+/// Generates an NSError representing a abslx::Status. Note that NSError always
+/// represents an error, so this should not be called with abslx::Status::OK.
++ (NSError *)gus_errorWithStatus:(const abslx::Status &)status;
 
-/// Returns a absl::Status object representing an NSError. If the NSError was
-/// generated from a absl::Status, the absl::Status returned is identical to
+/// Returns a abslx::Status object representing an NSError. If the NSError was
+/// generated from a abslx::Status, the abslx::Status returned is identical to
 /// the original. Otherwise, this returns a status with code ::util::error::UNKNOWN
 /// and a message extracted from the NSError.
-@property(nonatomic, readonly) absl::Status gus_status;  // NOLINT(identifier-naming)
+@property(nonatomic, readonly) abslx::Status gus_status;  // NOLINT(identifier-naming)
 
 @end

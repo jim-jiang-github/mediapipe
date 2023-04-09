@@ -80,17 +80,17 @@ Detection ConvertLandmarksToDetection(const NormalizedLandmarkList& landmarks) {
 // }
 class LandmarksToDetectionCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
 
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   ::mediapipe::LandmarksToDetectionCalculatorOptions options_;
 };
 REGISTER_CALCULATOR(LandmarksToDetectionCalculator);
 
-absl::Status LandmarksToDetectionCalculator::GetContract(
+abslx::Status LandmarksToDetectionCalculator::GetContract(
     CalculatorContract* cc) {
   RET_CHECK(cc->Inputs().HasTag(kNormalizedLandmarksTag));
   RET_CHECK(cc->Outputs().HasTag(kDetectionTag));
@@ -98,23 +98,23 @@ absl::Status LandmarksToDetectionCalculator::GetContract(
   cc->Inputs().Tag(kNormalizedLandmarksTag).Set<NormalizedLandmarkList>();
   cc->Outputs().Tag(kDetectionTag).Set<Detection>();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LandmarksToDetectionCalculator::Open(CalculatorContext* cc) {
+abslx::Status LandmarksToDetectionCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
   options_ = cc->Options<::mediapipe::LandmarksToDetectionCalculatorOptions>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LandmarksToDetectionCalculator::Process(CalculatorContext* cc) {
+abslx::Status LandmarksToDetectionCalculator::Process(CalculatorContext* cc) {
   const auto& landmarks =
       cc->Inputs().Tag(kNormalizedLandmarksTag).Get<NormalizedLandmarkList>();
   RET_CHECK_GT(landmarks.landmark_size(), 0)
       << "Input landmark vector is empty.";
 
-  auto detection = absl::make_unique<Detection>();
+  auto detection = abslx::make_unique<Detection>();
   if (options_.selected_landmark_indices_size()) {
     NormalizedLandmarkList subset_landmarks;
     for (int i = 0; i < options_.selected_landmark_indices_size(); ++i) {
@@ -132,7 +132,7 @@ absl::Status LandmarksToDetectionCalculator::Process(CalculatorContext* cc) {
       .Tag(kDetectionTag)
       .Add(detection.release(), cc->InputTimestamp());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

@@ -157,7 +157,7 @@ class CoordinationServiceInterface {
   // the directory. This is not a blocking call. Agent does not need to be
   // connected to utilize the distributed key-value store.
   virtual std::vector<KeyValueEntry> GetKeyValueDir(
-      absl::string_view directory_key) = 0;
+      abslx::string_view directory_key) = 0;
 
   // Delete configuration key-value. If key is a directory, recursively clean
   // up all key-values under the directory.
@@ -193,7 +193,7 @@ class CoordinationServiceInterface {
   //       list of participating tasks.
   //   - FailedPrecondition: Agent is in UNINITIALIZED or ERROR state.
   virtual void BarrierAsync(
-      const std::string& barrier_id, absl::Duration timeout,
+      const std::string& barrier_id, abslx::Duration timeout,
       const CoordinatedTask& task,
       const std::vector<CoordinatedTask>& participating_tasks,
       StatusCallback done) = 0;

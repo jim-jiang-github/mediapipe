@@ -27,7 +27,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status ReshapeTest(TestExecutionEnvironment* env) {
+abslx::Status ReshapeTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 3);
   src_tensor.data = {half(0.5f), half(-1.1f), half(-2.2f),
@@ -50,10 +50,10 @@ absl::Status ReshapeTest(TestExecutionEnvironment* env) {
                                     dst_tensor.data, 0.0));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Reshapex4Test(TestExecutionEnvironment* env) {
+abslx::Status Reshapex4Test(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 1, 8);
   src_tensor.data = {half(0.5f), half(-1.1f), half(-2.2f), half(3.1f),
@@ -77,7 +77,7 @@ absl::Status Reshapex4Test(TestExecutionEnvironment* env) {
                         dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

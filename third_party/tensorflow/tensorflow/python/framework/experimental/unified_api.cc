@@ -143,7 +143,7 @@ PYBIND11_MODULE(_unified_api, m) {
            })
       .def("Finalize", [](TracingContext* self, py::handle& outputs) {
         // TODO(srbs): Using OutputList seems like an overkill here. Should we
-        // simply pass in an absl::Span?
+        // simply pass in an abslx::Span?
         OutputList output_list;
         if (outputs.ptr() != Py_None) {
           if (!PyList_Check(outputs.ptr())) {
@@ -220,7 +220,7 @@ PYBIND11_MODULE(_unified_api, m) {
       .def("Execute", [](AbstractOperation* self, int num_outputs) {
         std::vector<AbstractTensorHandle*> outputs(num_outputs);
         MaybeRaiseRegisteredFromStatus(
-            self->Execute(absl::MakeSpan(outputs), &num_outputs));
+            self->Execute(abslx::MakeSpan(outputs), &num_outputs));
         return outputs;
       });
 

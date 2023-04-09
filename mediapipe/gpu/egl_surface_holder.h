@@ -28,7 +28,7 @@ struct EglSurfaceHolder {
   // before grabbing this one. For example, do not call GlContext::Run or
   // GlCalculatorHelper::RunInGlContext while holding this mutex, but instead
   // grab this inside the callable passed to them.
-  absl::Mutex mutex;
+  abslx::Mutex mutex;
   EGLSurface surface ABSL_GUARDED_BY(mutex) = EGL_NO_SURFACE;
   // True if MediaPipe created the surface and is responsible for destroying it.
   bool owned ABSL_GUARDED_BY(mutex) = false;

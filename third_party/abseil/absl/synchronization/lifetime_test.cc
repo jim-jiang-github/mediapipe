@@ -38,14 +38,14 @@ namespace {
 // These tests use ABSL_RAW_CHECK to validate invariants, rather than EXPECT or
 // ASSERT from gUnit, because we need to invoke them during global destructors,
 // when gUnit teardown would have already begun.
-void ThreadOne(absl::Mutex* mutex, absl::CondVar* condvar,
-               absl::Notification* notification, bool* state) {
+void ThreadOne(abslx::Mutex* mutex, abslx::CondVar* condvar,
+               abslx::Notification* notification, bool* state) {
   // Test that the notification is in a valid initial state.
   ABSL_RAW_CHECK(!notification->HasBeenNotified(), "invalid Notification");
   ABSL_RAW_CHECK(*state == false, "*state not initialized");
 
   {
-    absl::MutexLock lock(mutex);
+    abslx::MutexLock lock(mutex);
 
     notification->Notify();
     ABSL_RAW_CHECK(notification->HasBeenNotified(), "invalid Notification");
@@ -56,15 +56,15 @@ void ThreadOne(absl::Mutex* mutex, absl::CondVar* condvar,
   }
 }
 
-void ThreadTwo(absl::Mutex* mutex, absl::CondVar* condvar,
-               absl::Notification* notification, bool* state) {
+void ThreadTwo(abslx::Mutex* mutex, abslx::CondVar* condvar,
+               abslx::Notification* notification, bool* state) {
   ABSL_RAW_CHECK(*state == false, "*state not initialized");
 
   // Wake thread one
   notification->WaitForNotification();
   ABSL_RAW_CHECK(notification->HasBeenNotified(), "invalid Notification");
   {
-    absl::MutexLock lock(mutex);
+    abslx::MutexLock lock(mutex);
     *state = true;
     condvar->Signal();
   }
@@ -73,10 +73,10 @@ void ThreadTwo(absl::Mutex* mutex, absl::CondVar* condvar,
 // Launch thread 1 and thread 2, and block on their completion.
 // If any of 'mutex', 'condvar', or 'notification' is nullptr, use a locally
 // constructed instance instead.
-void RunTests(absl::Mutex* mutex, absl::CondVar* condvar) {
-  absl::Mutex default_mutex;
-  absl::CondVar default_condvar;
-  absl::Notification notification;
+void RunTests(abslx::Mutex* mutex, abslx::CondVar* condvar) {
+  abslx::Mutex default_mutex;
+  abslx::CondVar default_condvar;
+  abslx::Notification notification;
   if (!mutex) {
     mutex = &default_mutex;
   }
@@ -91,13 +91,13 @@ void RunTests(absl::Mutex* mutex, absl::CondVar* condvar) {
 }
 
 void TestLocals() {
-  absl::Mutex mutex;
-  absl::CondVar condvar;
+  abslx::Mutex mutex;
+  abslx::CondVar condvar;
   RunTests(&mutex, &condvar);
 }
 
 // Normal kConstInit usage
-ABSL_CONST_INIT absl::Mutex const_init_mutex(absl::kConstInit);
+ABSL_CONST_INIT abslx::Mutex const_init_mutex(abslx::kConstInit);
 void TestConstInitGlobal() { RunTests(&const_init_mutex, nullptr); }
 
 // Global variables during start and termination
@@ -130,7 +130,7 @@ class OnDestruction {
 // kConstInit
 // Test early usage.  (Declaration comes first; definitions must appear after
 // the test runner.)
-extern absl::Mutex early_const_init_mutex;
+extern abslx::Mutex early_const_init_mutex;
 // (Normally I'd write this +[], to make the cast-to-function-pointer explicit,
 // but in some MSVC setups we support, lambdas provide conversion operators to
 // different flavors of function pointers, making this trick ambiguous.)
@@ -140,18 +140,18 @@ OnConstruction test_early_const_init([] {
 // This definition appears before test_early_const_init, but it should be
 // initialized first (due to constant initialization).  Test that the object
 // actually works when constructed this way.
-ABSL_CONST_INIT absl::Mutex early_const_init_mutex(absl::kConstInit);
+ABSL_CONST_INIT abslx::Mutex early_const_init_mutex(abslx::kConstInit);
 
 // Furthermore, test that the const-init c'tor doesn't stomp over the state of
 // a Mutex.  Really, this is a test that the platform under test correctly
 // supports C++11 constant initialization.  (The constant-initialization
 // constructors of globals "happen at link time"; memory is pre-initialized,
 // before the constructors of either grab_lock or check_still_locked are run.)
-extern absl::Mutex const_init_sanity_mutex;
+extern abslx::Mutex const_init_sanity_mutex;
 OnConstruction grab_lock([]() ABSL_NO_THREAD_SAFETY_ANALYSIS {
   const_init_sanity_mutex.Lock();
 });
-ABSL_CONST_INIT absl::Mutex const_init_sanity_mutex(absl::kConstInit);
+ABSL_CONST_INIT abslx::Mutex const_init_sanity_mutex(abslx::kConstInit);
 OnConstruction check_still_locked([]() ABSL_NO_THREAD_SAFETY_ANALYSIS {
   const_init_sanity_mutex.AssertHeld();
   const_init_sanity_mutex.Unlock();
@@ -160,7 +160,7 @@ OnConstruction check_still_locked([]() ABSL_NO_THREAD_SAFETY_ANALYSIS {
 
 // Test shutdown usage.  (Declarations come first; definitions must appear after
 // the test runner.)
-extern absl::Mutex late_const_init_mutex;
+extern abslx::Mutex late_const_init_mutex;
 // OnDestruction is being used here as a global variable, even though it has a
 // non-trivial destructor.  This is against the style guide.  We're violating
 // that rule here to check that the exception we allow for kConstInit is safe.
@@ -168,7 +168,7 @@ extern absl::Mutex late_const_init_mutex;
 OnDestruction test_late_const_init([] {
   RunTests(&late_const_init_mutex, nullptr);
 });
-ABSL_CONST_INIT absl::Mutex late_const_init_mutex(absl::kConstInit);
+ABSL_CONST_INIT abslx::Mutex late_const_init_mutex(abslx::kConstInit);
 
 }  // namespace
 

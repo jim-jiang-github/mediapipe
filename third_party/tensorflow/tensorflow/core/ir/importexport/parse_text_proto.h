@@ -26,17 +26,17 @@ namespace tfg {
 
 // Sets output to the given input with `prefix` stripped, or returns an error if
 // the prefix doesn't exist.
-tensorflow::Status ConsumePrefix(absl::string_view str,
-                                 absl::string_view prefix,
-                                 absl::string_view* output);
+tensorflow::Status ConsumePrefix(abslx::string_view str,
+                                 abslx::string_view prefix,
+                                 abslx::string_view* output);
 
 // Strips `prefix_to_strip` from `text_proto`, parses, and returns the parsed
 // proto.
-tensorflow::Status ParseTextProto(absl::string_view text_proto,
-                                  absl::string_view prefix_to_strip,
+tensorflow::Status ParseTextProto(abslx::string_view text_proto,
+                                  abslx::string_view prefix_to_strip,
                                   tensorflow::protobuf::Message* parsed_proto);
 inline tensorflow::Status ParseTextProto(
-    absl::string_view /* text_proto */, absl::string_view /* prefix_to_strip */,
+    abslx::string_view /* text_proto */, abslx::string_view /* prefix_to_strip */,
     tensorflow::protobuf::MessageLite* /* parsed_proto */) {
   return tensorflow::errors::Unavailable("Cannot parse text protos on mobile.");
 }

@@ -60,7 +60,7 @@ namespace {
 
 namespace py = pybind11;
 
-using StringSet = absl::flat_hash_set<std::string>;
+using StringSet = abslx::flat_hash_set<std::string>;
 
 // Python wrapper for a SourceMap.
 class PyBindSourceMap {
@@ -119,9 +119,9 @@ std::string StackFrameToString(
     const StackFrame& frame,
     const AbstractStackTrace::TracePrintingOptions& opts,
     int shared_prefix_size = 0) {
-  std::string out = absl::StrFormat(
+  std::string out = abslx::StrFormat(
       "File \"%s\", line %d, in %s",
-      absl::StrContains(frame.file_name, kFilenameToIgnorePrefix)
+      abslx::StrContains(frame.file_name, kFilenameToIgnorePrefix)
           ? frame.file_name
           : frame.file_name.substr(shared_prefix_size),
       frame.line_number, frame.function_name);
@@ -131,7 +131,7 @@ std::string StackFrameToString(
     std::string line_contents = std::string(LineContents(frame));
     PyGILState_Release(state);
     if (!line_contents.empty()) {
-      absl::StrAppend(&out, "\n  ", line_contents);
+      abslx::StrAppend(&out, "\n  ", line_contents);
     }
   }
   return out;
@@ -139,7 +139,7 @@ std::string StackFrameToString(
 
 class StackTraceWrapper : public AbstractStackTrace {
  public:
-  explicit StackTraceWrapper(absl::Span<const StackFrame> stack_frames)
+  explicit StackTraceWrapper(abslx::Span<const StackFrame> stack_frames)
       : stack_frames_cache_(std::vector<StackFrame>(stack_frames.begin(),
                                                     stack_frames.end())) {}
 
@@ -176,7 +176,7 @@ class StackTraceWrapper : public AbstractStackTrace {
                              stacklevel};
   }
 
-  absl::Span<const StackFrame> ToFrames() const override {
+  abslx::Span<const StackFrame> ToFrames() const override {
     tensorflow::mutex_lock lock(mu_);
     if (stack_frames_cache_) {
       return *stack_frames_cache_;
@@ -216,7 +216,7 @@ class StackTraceWrapper : public AbstractStackTrace {
         /*limit=*/limit);
     PyGILState_Release(state);
     // ensure we use the original (outermost first) ordering.
-    absl::c_reverse(user_frames);
+    abslx::c_reverse(user_frames);
     return user_frames;
   }
 
@@ -256,7 +256,7 @@ class StackTraceWrapper : public AbstractStackTrace {
   std::string ToString(const TracePrintingOptions& opts) const override {
     std::vector<std::string> files_to_find_prefix;
     for (const StackFrame& frame : ToFrames()) {
-      if (!absl::StrContains(frame.file_name, kFilenameToIgnorePrefix)) {
+      if (!abslx::StrContains(frame.file_name, kFilenameToIgnorePrefix)) {
         files_to_find_prefix.push_back(frame.file_name);
       }
     }
@@ -296,12 +296,12 @@ class StackTraceWrapper : public AbstractStackTrace {
         filter_(filter),
         stacklevel_(stacklevel) {}
 
-  static std::string ToStringHelper(absl::Span<const StackFrame> stack_frames,
+  static std::string ToStringHelper(abslx::Span<const StackFrame> stack_frames,
                                     const TracePrintingOptions& opts,
                                     int shared_prefix_size) {
-    return absl::StrJoin(
+    return abslx::StrJoin(
         stack_frames, "\n", [&](std::string* out, const StackFrame& frame) {
-          absl::StrAppend(out,
+          abslx::StrAppend(out,
                           StackFrameToString(frame, opts, shared_prefix_size));
         });
   }
@@ -318,9 +318,9 @@ class StackTraceWrapper : public AbstractStackTrace {
   int stacklevel_;
 
   // Using optional to force destruction while we hold a GIL.
-  mutable absl::optional<std::vector<StackFrame>> stack_frames_cache_
+  mutable abslx::optional<std::vector<StackFrame>> stack_frames_cache_
       TF_GUARDED_BY(mu_);
-  mutable absl::optional<StackFrame> last_stack_frame_cache_ TF_GUARDED_BY(mu_);
+  mutable abslx::optional<StackFrame> last_stack_frame_cache_ TF_GUARDED_BY(mu_);
   mutable mutex mu_;
 };
 
@@ -381,7 +381,7 @@ PYBIND11_MODULE(_tf_stack, m) {
       .def("__ne__", &StackFrame::operator!=)
       .def("__hash__",
            [](const StackFrame& self) {
-             return absl::Hash<std::tuple<std::string, int, std::string>>()(
+             return abslx::Hash<std::tuple<std::string, int, std::string>>()(
                  std::make_tuple(self.file_name, self.line_number,
                                  self.function_name));
            })
@@ -408,7 +408,7 @@ PYBIND11_MODULE(_tf_stack, m) {
       .def(
           "__getitem__",
           [](const StackTraceWrapper& self, py::ssize_t index) {
-            absl::Span<const StackFrame> frames = self.ToFrames();
+            abslx::Span<const StackFrame> frames = self.ToFrames();
             const size_t eff_index =
                 index < 0 ? frames.size() + index : static_cast<size_t>(index);
             if (eff_index >= frames.size()) {
@@ -420,7 +420,7 @@ PYBIND11_MODULE(_tf_stack, m) {
       .def(
           "__getitem__",
           [](const StackTraceWrapper& self, py::slice slice) {
-            absl::Span<const StackFrame> frames = self.ToFrames();
+            abslx::Span<const StackFrame> frames = self.ToFrames();
             py::ssize_t start, stop, step, slicelength;
             if (!slice.compute(frames.size(), &start, &stop, &step,
                                &slicelength)) {
@@ -442,7 +442,7 @@ PYBIND11_MODULE(_tf_stack, m) {
           py::return_value_policy::reference_internal)
       .def("__delitem__",
            [](StackTraceWrapper& self, py::ssize_t index) {
-             absl::Span<const StackFrame> frames = self.ToFrames();
+             abslx::Span<const StackFrame> frames = self.ToFrames();
              const size_t eff_index =
                  index < 0 ? frames.size() + index : static_cast<size_t>(index);
              if (eff_index >= frames.size()) {
@@ -452,7 +452,7 @@ PYBIND11_MODULE(_tf_stack, m) {
            })
       .def("__delitem__",
            [](StackTraceWrapper& self, py::slice slice) {
-             absl::Span<const StackFrame> frames = self.ToFrames();
+             abslx::Span<const StackFrame> frames = self.ToFrames();
              py::ssize_t start, stop, step, slicelength;
              if (!slice.compute(frames.size(), &start, &stop, &step,
                                 &slicelength)) {

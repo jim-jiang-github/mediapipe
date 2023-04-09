@@ -296,7 +296,7 @@ void XlaCaseOp::Compile(XlaOpKernelContext* ctx) {
   }
   auto input_tuple = xla::Tuple(b, inputs);
   xla::XlaOp outputs = xla::DynamicConditional(
-      ctx->builder(), branch_index, absl::MakeSpan(result_computations),
+      ctx->builder(), branch_index, abslx::MakeSpan(result_computations),
       std::vector<xla::XlaOp>(num_branches, input_tuple));
   // Sets non-variable outputs.
   for (int i = 0; i < output_types_.size(); ++i) {

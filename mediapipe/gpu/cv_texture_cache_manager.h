@@ -39,7 +39,7 @@ class CvTextureCacheManager {
   void FlushTextureCaches();
 
  private:
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
   std::vector<CFHolder<CVTextureCacheType>> texture_caches_
       ABSL_GUARDED_BY(mutex_);
 };

@@ -35,7 +35,7 @@ limitations under the License.
 
 namespace xla {
 namespace {
-constexpr absl::Duration kHeartbeatInterval = absl::Milliseconds(500);
+constexpr abslx::Duration kHeartbeatInterval = abslx::Milliseconds(500);
 constexpr int kMaxMissingHeartbeats = 3;
 
 struct ServiceParams {
@@ -63,7 +63,7 @@ class ClientServerTest : public testing::TestWithParam<ServiceParams> {
 
   void StartService(int num_nodes, bool use_coordination_service,
                     DistributedRuntimeServiceImpl::Options service_options = {},
-                    absl::string_view service_address = "") {
+                    abslx::string_view service_address = "") {
     ::grpc::ServerBuilder builder;
     service_options.num_nodes = num_nodes;
     // Set a small heartbeat interval for quicker tests.
@@ -116,11 +116,11 @@ TEST_P(ClientServerTest, ConnectAndShutdownAreBarriers) {
   int num_nodes = 3;
   StartService(num_nodes, GetParam().use_coordination_service);
 
-  absl::Mutex mu;
+  abslx::Mutex mu;
   int connect_count = 0;
   int shutdown_count = 0;
 
-  absl::Barrier barrier(num_nodes);
+  abslx::Barrier barrier(num_nodes);
 
   auto thread_fn = [&](int node_id) -> xla::Status {
     auto client = GetClient(node_id, GetParam().use_coordination_service);
@@ -131,15 +131,15 @@ TEST_P(ClientServerTest, ConnectAndShutdownAreBarriers) {
       return connect_count == node_id;
     };
     {
-      absl::MutexLock lock(&mu);
-      mu.Await(absl::Condition(&my_connect_turn));
+      abslx::MutexLock lock(&mu);
+      mu.Await(abslx::Condition(&my_connect_turn));
       ++connect_count;
     }
     TF_RETURN_IF_ERROR(client->Connect());
     // Verify that all of the threads have called Connect() by the time we get
     // here.
     {
-      absl::MutexLock lock(&mu);
+      abslx::MutexLock lock(&mu);
       TF_RET_CHECK(connect_count == num_nodes);
     }
 
@@ -149,13 +149,13 @@ TEST_P(ClientServerTest, ConnectAndShutdownAreBarriers) {
       return shutdown_count == node_id;
     };
     {
-      absl::MutexLock lock(&mu);
-      mu.Await(absl::Condition(&my_shutdown_turn));
+      abslx::MutexLock lock(&mu);
+      mu.Await(abslx::Condition(&my_shutdown_turn));
       ++shutdown_count;
     }
     TF_RETURN_IF_ERROR(client->Shutdown());
     {
-      absl::MutexLock lock(&mu);
+      abslx::MutexLock lock(&mu);
       TF_RET_CHECK(shutdown_count == num_nodes);
     }
 
@@ -202,7 +202,7 @@ TEST_P(ClientServerTest, ConnectAndEnumerateDevices) {
 
   // Used to ensure that thread0's client connects before thread1's client to
   // set the global device ids deterministically.
-  absl::Notification n;
+  abslx::Notification n;
   auto thread0_fn = [&]() -> xla::Status {
     auto client = GetClient(/*node_id=*/0, GetParam().use_coordination_service);
     GlobalTopologyProto topology;
@@ -219,7 +219,7 @@ TEST_P(ClientServerTest, ConnectAndEnumerateDevices) {
     TF_RETURN_IF_ERROR(client->KeyValueSet("key1", "value1"));
     TF_ASSIGN_OR_RETURN(
         std::string value,
-        client->BlockingKeyValueGet("key2", absl::InfiniteDuration()));
+        client->BlockingKeyValueGet("key2", abslx::InfiniteDuration()));
     TF_RET_CHECK(value == "value2");
     return OkStatus();
   };
@@ -230,14 +230,14 @@ TEST_P(ClientServerTest, ConnectAndEnumerateDevices) {
     auto client = GetClient(/*node_id=*/1, GetParam().use_coordination_service);
     GlobalTopologyProto topology;
     TF_RETURN_IF_ERROR(client->Connect());
-    absl::SleepFor(absl::Seconds(1));
+    abslx::SleepFor(abslx::Seconds(1));
     TF_RETURN_IF_ERROR(client->EnumerateDevices(locals[1], &topology));
     TF_RET_CHECK(
         xla::protobuf_util::ProtobufEquals(topology, expected_topology))
         << topology.DebugString();
     TF_ASSIGN_OR_RETURN(
         std::string value,
-        client->BlockingKeyValueGet("key1", absl::InfiniteDuration()));
+        client->BlockingKeyValueGet("key1", abslx::InfiniteDuration()));
     TF_RET_CHECK(value == "value1");
     TF_RETURN_IF_ERROR(client->KeyValueSet("key2", "value2"));
     return OkStatus();
@@ -314,7 +314,7 @@ TEST_P(ClientServerTest, ClientsReceiveMissedHeartbeatIfAnyClientGoesAway) {
   auto thread_fn = [&](int node_id) -> xla::Status {
     DistributedRuntimeClient::Options client_options;
     client_options.shutdown_on_destruction = (node_id != 0);
-    absl::Notification shutdown;
+    abslx::Notification shutdown;
     client_options.missed_heartbeat_callback = [&](xla::Status status,
                                                    bool coordinator_initiated) {
       shutdown.Notify();
@@ -351,15 +351,15 @@ TEST_P(ClientServerTest, ClientsTerminateIfServiceGoesAway) {
   // active clients.
   int port = tensorflow::testing::PickUnusedPortOrDie();
   StartService(num_nodes, GetParam().use_coordination_service,
-               /*service_options=*/{}, absl::StrCat("[::]:", port));
+               /*service_options=*/{}, abslx::StrCat("[::]:", port));
 
-  absl::Barrier barrier(num_nodes + 1);
+  abslx::Barrier barrier(num_nodes + 1);
 
   auto thread_fn = [&](int node_id) -> xla::Status {
     DistributedRuntimeClient::Options client_options;
-    client_options.rpc_timeout = absl::Seconds(1);
-    client_options.shutdown_timeout = absl::Seconds(10);
-    absl::Notification shutdown;
+    client_options.rpc_timeout = abslx::Seconds(1);
+    client_options.shutdown_timeout = abslx::Seconds(10);
+    abslx::Notification shutdown;
     client_options.missed_heartbeat_callback = [&](xla::Status status,
                                                    bool coordinator_initiated) {
       shutdown.Notify();
@@ -367,7 +367,7 @@ TEST_P(ClientServerTest, ClientsTerminateIfServiceGoesAway) {
     std::shared_ptr<::grpc::ChannelCredentials> creds =
         ::grpc::InsecureChannelCredentials();
     std::shared_ptr<::grpc::Channel> channel =
-        ::grpc::CreateChannel(absl::StrCat("dns:///localhost:", port), creds);
+        ::grpc::CreateChannel(abslx::StrCat("dns:///localhost:", port), creds);
     auto client = GetClient(node_id, GetParam().use_coordination_service,
                             client_options, channel);
 
@@ -405,17 +405,17 @@ TEST_P(ClientServerTest, LateClientsAreOk) {
   int num_nodes = 3;
   StartService(num_nodes, GetParam().use_coordination_service);
 
-  absl::Barrier barrier(num_nodes);
+  abslx::Barrier barrier(num_nodes);
 
   auto thread_fn = [&](int node_id) -> xla::Status {
     DistributedRuntimeClient::Options client_options;
-    client_options.init_timeout = absl::Milliseconds(20000);
-    client_options.rpc_timeout = absl::Milliseconds(200);
+    client_options.init_timeout = abslx::Milliseconds(20000);
+    client_options.rpc_timeout = abslx::Milliseconds(200);
     auto client =
         GetClient(node_id, GetParam().use_coordination_service, client_options);
 
     barrier.Block();
-    absl::SleepFor(absl::Milliseconds(200) * node_id);
+    abslx::SleepFor(abslx::Milliseconds(200) * node_id);
     TF_RETURN_IF_ERROR(client->Connect());
     TF_RETURN_IF_ERROR(client->Shutdown());
     return OkStatus();
@@ -437,7 +437,7 @@ TEST_P(ClientServerTest, LateClientsAreOk) {
 // We should eventually time out if a client does not show up.
 TEST_P(ClientServerTest, ConnectEventuallyTimesOutIfAClientDoesNotShowUp) {
   int num_nodes = 3;
-  absl::Duration timeout = absl::Milliseconds(100);
+  abslx::Duration timeout = abslx::Milliseconds(100);
   DistributedRuntimeServiceImpl::Options service_options;
   service_options.enumerate_devices_timeout = timeout;
   service_options.shutdown_timeout = timeout;
@@ -446,7 +446,7 @@ TEST_P(ClientServerTest, ConnectEventuallyTimesOutIfAClientDoesNotShowUp) {
   auto thread_fn = [&](int node_id) -> xla::Status {
     DistributedRuntimeClient::Options client_options;
     client_options.init_timeout = timeout;
-    client_options.rpc_timeout = absl::Milliseconds(100);
+    client_options.rpc_timeout = abslx::Milliseconds(100);
     auto client =
         GetClient(node_id, GetParam().use_coordination_service, client_options);
 
@@ -478,9 +478,9 @@ TEST_P(ClientServerTest, WaitAtBarrier_Succeed) {
     TF_RETURN_IF_ERROR(client->Connect());
 
     TF_RETURN_IF_ERROR(
-        client->WaitAtBarrier("barrier_1", absl::Milliseconds(100)));
+        client->WaitAtBarrier("barrier_1", abslx::Milliseconds(100)));
     TF_RETURN_IF_ERROR(
-        client->WaitAtBarrier("barrier_2", absl::Milliseconds(100)));
+        client->WaitAtBarrier("barrier_2", abslx::Milliseconds(100)));
 
     TF_RETURN_IF_ERROR(client->Shutdown());
     return xla::Status::OK();
@@ -502,7 +502,7 @@ TEST_P(ClientServerTest, WaitAtBarrier_Succeed) {
 TEST_P(ClientServerTest, WaitAtBarrier_Timeout) {
   int num_nodes = 2;
   StartService(num_nodes, GetParam().use_coordination_service);
-  absl::Notification n;
+  abslx::Notification n;
 
   auto thread_fn = [&](int node_id) -> xla::Status {
     auto client = GetClient(node_id, GetParam().use_coordination_service);
@@ -513,7 +513,7 @@ TEST_P(ClientServerTest, WaitAtBarrier_Timeout) {
       n.WaitForNotification();
     }
     Status barrier_status =
-        client->WaitAtBarrier("barrier_1", absl::Milliseconds(100));
+        client->WaitAtBarrier("barrier_1", abslx::Milliseconds(100));
     // Node 0 notifies that barrier has already timed out.
     if (node_id == 0) {
       n.Notify();
@@ -566,7 +566,7 @@ TEST_P(ClientServerTest, WaitAtBarrier_TimeoutWithDifferentBarrierId) {
       barrier_id = "barrier_1";
     }
     TF_RETURN_IF_ERROR(
-        client->WaitAtBarrier(barrier_id, absl::Milliseconds(100)));
+        client->WaitAtBarrier(barrier_id, abslx::Milliseconds(100)));
 
     TF_RETURN_IF_ERROR(client->Shutdown());
     return xla::Status::OK();
@@ -595,9 +595,9 @@ TEST_P(ClientServerTest, WaitAtBarrier_FailWithSameBarrierId) {
     TF_RETURN_IF_ERROR(client->Connect());
 
     TF_RETURN_IF_ERROR(
-        client->WaitAtBarrier("barrier_1", absl::Milliseconds(100)));
+        client->WaitAtBarrier("barrier_1", abslx::Milliseconds(100)));
     TF_RETURN_IF_ERROR(
-        client->WaitAtBarrier("barrier_1", absl::Milliseconds(100)));
+        client->WaitAtBarrier("barrier_1", abslx::Milliseconds(100)));
 
     TF_RETURN_IF_ERROR(client->Shutdown());
     return xla::Status::OK();

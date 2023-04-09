@@ -35,7 +35,7 @@ TEST(XlaCompilationCacheTest, TestDisabledXlaCompilation) {
     args[i].kind = XlaCompiler::Argument::kParameter;
     args[i].type = DT_INT32;
     args[i].shape = TensorShape({2, i + 1});
-    args[i].name = absl::StrCat("arg", i);
+    args[i].name = abslx::StrCat("arg", i);
   }
 
   DisableXlaCompilation();
@@ -57,7 +57,7 @@ TEST(XlaCompilationCacheTest, TestDisabledXlaCompilation) {
                                  &compilation_result, &executable);
   EXPECT_FALSE(status.ok());
   EXPECT_TRUE(
-      absl::StrContains(status.error_message(), "XLA compilation disabled"));
+      abslx::StrContains(status.error_message(), "XLA compilation disabled"));
 
   // Check that async compilation is disallowed.
   status = cache->Compile(XlaCompiler::Options{}, fn, args,
@@ -66,7 +66,7 @@ TEST(XlaCompilationCacheTest, TestDisabledXlaCompilation) {
                           &compilation_result, &executable);
   EXPECT_FALSE(status.ok());
   EXPECT_TRUE(
-      absl::StrContains(status.error_message(), "XLA compilation disabled"));
+      abslx::StrContains(status.error_message(), "XLA compilation disabled"));
 
   // Check that lazy compilation is disallowed.
   status = cache->Compile(XlaCompiler::Options{}, fn, args,
@@ -75,7 +75,7 @@ TEST(XlaCompilationCacheTest, TestDisabledXlaCompilation) {
                           &compilation_result, &executable);
   EXPECT_FALSE(status.ok());
   EXPECT_TRUE(
-      absl::StrContains(status.error_message(), "XLA compilation disabled"));
+      abslx::StrContains(status.error_message(), "XLA compilation disabled"));
 }
 
 }  // namespace

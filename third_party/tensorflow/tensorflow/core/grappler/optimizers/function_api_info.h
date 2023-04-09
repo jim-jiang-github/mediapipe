@@ -91,9 +91,9 @@ class FunctionLibraryApiInfo {
   // Forward/backward function pair usually have different signatures between
   // each other since forward function could produce extra internal state as
   // output, and backward will take those extra state as inputs.
-  absl::flat_hash_map<string, std::vector<string>> intf_to_inference_funcs_;
-  absl::flat_hash_map<string, std::vector<string>> intf_to_forward_funcs_;
-  absl::flat_hash_map<string, std::vector<string>> intf_to_backward_funcs_;
+  abslx::flat_hash_map<string, std::vector<string>> intf_to_inference_funcs_;
+  abslx::flat_hash_map<string, std::vector<string>> intf_to_forward_funcs_;
+  abslx::flat_hash_map<string, std::vector<string>> intf_to_backward_funcs_;
 
   TF_DISALLOW_COPY_AND_ASSIGN(FunctionLibraryApiInfo);
 };

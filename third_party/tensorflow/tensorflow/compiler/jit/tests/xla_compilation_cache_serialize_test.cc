@@ -57,7 +57,7 @@ TEST_F(XlaCompilationCacheSerializeTest, PersistentCacheTest) {
   for (int b = 1; b < 4; ++b) {
     auto status = ExecuteWithBatch(graph, b);
     EXPECT_FALSE(status.ok());
-    EXPECT_TRUE(absl::StrContains(status.error_message(),
+    EXPECT_TRUE(abslx::StrContains(status.error_message(),
                                   "Serialized HLO does not match."));
   }
 }

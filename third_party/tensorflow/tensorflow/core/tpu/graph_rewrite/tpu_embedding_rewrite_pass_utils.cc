@@ -33,14 +33,14 @@ Status ReplaceNode(const NodeDef& to_def, Node* from, Node** to, Graph* graph) {
   std::vector<const Edge*> edges;
   VLOG(1) << "Node: " << from->DebugString() << " in_edges";
   for (const Edge* edge : from->in_edges()) {
-    VLOG(1) << absl::StrFormat("Edge from [%s:%d] to [%s:%d]",
+    VLOG(1) << abslx::StrFormat("Edge from [%s:%d] to [%s:%d]",
                                edge->src()->name(), edge->src_output(),
                                edge->dst()->name(), edge->dst_input());
     edges.push_back(edge);
   }
   VLOG(1) << "Node: " << from->DebugString() << " out_edges";
   for (const Edge* edge : from->out_edges()) {
-    VLOG(1) << absl::StrFormat("Edge from [%s:%d] to [%s:%d]",
+    VLOG(1) << abslx::StrFormat("Edge from [%s:%d] to [%s:%d]",
                                edge->src()->name(), edge->src_output(),
                                edge->dst()->name(), edge->dst_input());
     if (edge->dst() != from) {
@@ -55,7 +55,7 @@ Status ReplaceNode(const NodeDef& to_def, Node* from, Node** to, Graph* graph) {
   for (const Edge* edge : edges) {
     Node* new_edge_src = (edge->src() == from ? *to : edge->src());
     Node* new_edge_dst = (edge->dst() == from ? *to : edge->dst());
-    VLOG(1) << absl::StrFormat("Adding new edge from [%s:%d] to [%s:%d]",
+    VLOG(1) << abslx::StrFormat("Adding new edge from [%s:%d] to [%s:%d]",
                                new_edge_src->name(), edge->src_output(),
                                new_edge_dst->name(), edge->dst_input());
     graph->AddEdge(new_edge_src, edge->src_output(), new_edge_dst,

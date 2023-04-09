@@ -55,7 +55,7 @@ class Event {
   virtual xla::Status Await() = 0;
   // Returns an empty result if the wait times out.
   virtual std::optional<xla::Status> AwaitWithTimeout(
-      absl::Duration duration) = 0;
+      abslx::Duration duration) = 0;
 
   // If the event is already done, the callback is called immediately.
   virtual void AddCallback(std::function<void(xla::Status)> callback) = 0;
@@ -163,10 +163,10 @@ class TpuDriver {
 
   virtual std::unique_ptr<BufferHandle> Allocate(
       int32_t core_id, MemoryRegion region, int64_t num_bytes,
-      absl::Span<Event* const> wait_for) = 0;
+      abslx::Span<Event* const> wait_for) = 0;
   virtual std::unique_ptr<BufferHandle> Allocate(
       int32_t core_id, MemoryRegion region, const xla::ShapeProto& shape,
-      absl::Span<Event* const> wait_for) = 0;
+      abslx::Span<Event* const> wait_for) = 0;
 
   // Allocate a buffer representing a tuple of `children` buffers.
   //
@@ -179,11 +179,11 @@ class TpuDriver {
   // If `children` is empty, a zero-sized tuple will be allocated in `region`.
   virtual std::unique_ptr<BufferHandle> AllocateTuple(
       int32_t core_id, MemoryRegion region,
-      absl::Span<BufferHandle* const> children,
-      absl::Span<Event* const> wait_for) = 0;
+      abslx::Span<BufferHandle* const> children,
+      abslx::Span<Event* const> wait_for) = 0;
   virtual std::shared_ptr<Event> Deallocate(
       std::unique_ptr<BufferHandle> handle,
-      absl::Span<Event* const> wait_for) = 0;
+      abslx::Span<Event* const> wait_for) = 0;
 
   /* For buffers declared with an xla::ShapeProto rather than a raw size,
    * `src` must be laid out in consecutive row-major format for ingestion, and
@@ -205,29 +205,29 @@ class TpuDriver {
    */
   virtual std::shared_ptr<Event> TransferToDevice(
       const void* src, BufferHandle* dst,
-      absl::Span<Event* const> wait_for) = 0;
+      abslx::Span<Event* const> wait_for) = 0;
   virtual std::shared_ptr<Event> TransferFromDevice(
       const BufferHandle* src, void* dst,
-      absl::Span<Event* const> wait_for) = 0;
+      abslx::Span<Event* const> wait_for) = 0;
 
   virtual std::shared_ptr<Event> TransferFromDeviceToDevice(
       const BufferHandle* src, BufferHandle* dst,
-      absl::Span<Event* const> wait_for) = 0;
+      abslx::Span<Event* const> wait_for) = 0;
 
   virtual std::unique_ptr<CompiledProgramHandle> CompileProgram(
       const xla::HloProto& source, int32_t num_replicas,
-      absl::Span<Event* const> wait_for) = 0;
+      abslx::Span<Event* const> wait_for) = 0;
   virtual std::unique_ptr<LoadedProgramHandle> LoadProgram(
       int32_t core_id, const CompiledProgramHandle* handle,
-      absl::Span<Event* const> wait_for) = 0;
+      abslx::Span<Event* const> wait_for) = 0;
   virtual std::shared_ptr<Event> UnloadProgram(
       std::unique_ptr<LoadedProgramHandle> handle,
-      absl::Span<Event* const> wait_for) = 0;
+      abslx::Span<Event* const> wait_for) = 0;
   virtual std::shared_ptr<Event> ExecuteProgram(
-      LoadedProgramHandle* program, absl::Span<BufferHandle* const> inputs,
-      absl::Span<BufferHandle* const> outputs,
+      LoadedProgramHandle* program, abslx::Span<BufferHandle* const> inputs,
+      abslx::Span<BufferHandle* const> outputs,
       const xla::DeviceAssignmentProto& device_assignment,
-      absl::Span<Event* const> wait_for) = 0;
+      abslx::Span<Event* const> wait_for) = 0;
 
   virtual std::unique_ptr<TpuLinearizer> GetLinearizer() { return nullptr; }
 };

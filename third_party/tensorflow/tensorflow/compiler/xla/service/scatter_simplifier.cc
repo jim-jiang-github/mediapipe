@@ -37,8 +37,8 @@ namespace xla {
 namespace {
 
 StatusOr<HloInstruction*> FlattenAndTransposeUpdates(
-    HloInstruction* updates, absl::Span<const int64_t> update_window_dims,
-    absl::Span<const int64_t> inserted_window_dims,
+    HloInstruction* updates, abslx::Span<const int64_t> update_window_dims,
+    abslx::Span<const int64_t> inserted_window_dims,
     int64_t scatter_indices_size) {
   int64_t updates_rank = updates->shape().rank();
 
@@ -48,12 +48,12 @@ StatusOr<HloInstruction*> FlattenAndTransposeUpdates(
   // Move the scatter dimensions to the front.
   for (int i = 0; i < updates_rank; ++i) {
     // update_window_dims is small, so linear search is acceptable.
-    if (!absl::c_linear_search(update_window_dims, i)) {
+    if (!abslx::c_linear_search(update_window_dims, i)) {
       permutation.push_back(i);
     }
   }
   // Followed by the update_window_dims.
-  absl::c_copy(update_window_dims, std::back_inserter(permutation));
+  abslx::c_copy(update_window_dims, std::back_inserter(permutation));
   TF_ASSIGN_OR_RETURN(updates, MaybeTranspose(updates, permutation));
 
   // Collapse scatter dimensions to one.
@@ -215,7 +215,7 @@ bool ScatterSimplifier::InstructionMatchesPattern(HloInstruction* inst) {
     bool scatter_indices_reordered =
         !IsIdentityPermutation(dims.scatter_dims_to_operand_dims());
     bool scatter_dim_not_first =
-        absl::c_linear_search(dims.update_window_dims(), 0);
+        abslx::c_linear_search(dims.update_window_dims(), 0);
 
     return nonstandard_index_vector_dim || num_scatter_dims > 1 ||
            scatter_indices_reordered || scatter_dim_not_first ||

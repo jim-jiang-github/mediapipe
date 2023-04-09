@@ -27,22 +27,22 @@ class MlirGpuTestBase : public HloTestBase {
   MlirGpuTestBase();
 
   StatusOr<std::vector<std::vector<uint8_t>>> RunMlirTextWithHostBuffers(
-      absl::string_view module_text,
-      std::vector<absl::Span<uint8_t>> arguments);
+      abslx::string_view module_text,
+      std::vector<abslx::Span<uint8_t>> arguments);
 
   StatusOr<std::unique_ptr<Executable>> CompileMlirText(
-      absl::string_view module_text);
+      abslx::string_view module_text);
 
   template <typename T>
-  static absl::Span<uint8_t> ToUint8Span(std::vector<T>* v) {
-    return absl::Span<uint8_t>(reinterpret_cast<uint8_t*>(v->data()),
+  static abslx::Span<uint8_t> ToUint8Span(std::vector<T>* v) {
+    return abslx::Span<uint8_t>(reinterpret_cast<uint8_t*>(v->data()),
                                v->size() * sizeof(T));
   }
 
   template <typename T>
-  static absl::Span<const T> FromUint8Span(absl::Span<const uint8_t> span) {
+  static abslx::Span<const T> FromUint8Span(abslx::Span<const uint8_t> span) {
     CHECK_EQ(0, span.size() % sizeof(T));
-    return absl::Span<const T>(reinterpret_cast<const T*>(span.data()),
+    return abslx::Span<const T>(reinterpret_cast<const T*>(span.data()),
                                span.size() / sizeof(T));
   }
 
@@ -50,17 +50,17 @@ class MlirGpuTestBase : public HloTestBase {
 
  private:
   StatusOr<std::vector<std::vector<uint8_t>>> RunMlirModuleWithHostBuffers(
-      mlir::ModuleOp module, std::vector<absl::Span<uint8_t>> arguments);
+      mlir::ModuleOp module, std::vector<abslx::Span<uint8_t>> arguments);
 
   StatusOr<std::unique_ptr<Executable>> CompileMlirModule(mlir::ModuleOp module,
                                                           se::Stream* stream);
 
   StatusOr<ExecutionOutput> RunMlirModule(
       mlir::ModuleOp module, se::Stream* stream,
-      absl::Span<const se::DeviceMemoryBase> arguments);
+      abslx::Span<const se::DeviceMemoryBase> arguments);
 
   StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> ParseMlirModule(
-      absl::string_view module_text, mlir::MLIRContext& context);
+      abslx::string_view module_text, mlir::MLIRContext& context);
 
   std::unique_ptr<xla::Backend> backend_;
 };

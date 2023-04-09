@@ -22,9 +22,9 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status DepthwiseConvSimpleWeightsTest(TestExecutionEnvironment* env);
-absl::Status DepthwiseConvNoMultiplierTest(TestExecutionEnvironment* env);
-absl::Status DepthwiseConvMultiplier2Test(TestExecutionEnvironment* env);
+abslx::Status DepthwiseConvSimpleWeightsTest(TestExecutionEnvironment* env);
+abslx::Status DepthwiseConvNoMultiplierTest(TestExecutionEnvironment* env);
+abslx::Status DepthwiseConvMultiplier2Test(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

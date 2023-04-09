@@ -33,7 +33,7 @@ namespace tensorflow {
 static int kMaxBatches = std::numeric_limits<int>::max();
 
 template <class T>
-using BatchedMap = std::vector<absl::flat_hash_map<int64_t, T>>;
+using BatchedMap = std::vector<abslx::flat_hash_map<int64_t, T>>;
 
 namespace {
 // TODO(momernick): Extend this function to work with outputs of rank > 2.

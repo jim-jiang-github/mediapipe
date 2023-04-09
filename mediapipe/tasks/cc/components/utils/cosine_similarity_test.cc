@@ -54,7 +54,7 @@ TEST(CosineSimilarity, FailsWithQuantizedAndFloatEmbeddings) {
 
   auto status = CosineSimilarity(u, v);
 
-  EXPECT_EQ(status.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.status().message(),
               HasSubstr("Cannot compute cosine similarity between quantized "
                         "and float embeddings"));
@@ -66,7 +66,7 @@ TEST(CosineSimilarity, FailsWithZeroNorm) {
 
   auto status = CosineSimilarity(u, v);
 
-  EXPECT_EQ(status.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       status.status().message(),
       HasSubstr("Cannot compute cosine similarity on embedding with 0 norm"));
@@ -78,7 +78,7 @@ TEST(CosineSimilarity, FailsWithDifferentSizes) {
 
   auto status = CosineSimilarity(u, v);
 
-  EXPECT_EQ(status.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.status().message(),
               HasSubstr("Cannot compute cosine similarity between embeddings "
                         "of different sizes"));

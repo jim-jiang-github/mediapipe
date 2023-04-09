@@ -147,7 +147,7 @@ std::string CudnnStatusToString(cudnnStatus_t status) {
     case CUDNN_STATUS_RUNTIME_FP_OVERFLOW:
       return "CUDNN_STATUS_RUNTIME_FP_OVERFLOW";
     default:
-      return absl::StrCat("<unknown cudnn status: ", static_cast<int>(status),
+      return abslx::StrCat("<unknown cudnn status: ", static_cast<int>(status),
                           ">");
   }
 }
@@ -160,7 +160,7 @@ class CudnnHandle {
   // Takes ownership of the executor context and the lock to access cuDNN
   // using handle.
   CudnnHandle(gpu::ScopedActivateExecutorContext context,
-              std::unique_ptr<absl::MutexLock> lock, cudnnHandle_t handle)
+              std::unique_ptr<abslx::MutexLock> lock, cudnnHandle_t handle)
       : context_(std::move(context)), lock_(std::move(lock)), handle_(handle) {}
 
   // Returns cuDNN handle. To be passed directly to cuDNN APIs, don't keep
@@ -169,7 +169,7 @@ class CudnnHandle {
 
  private:
   gpu::ScopedActivateExecutorContext context_;
-  std::unique_ptr<absl::MutexLock> lock_;
+  std::unique_ptr<abslx::MutexLock> lock_;
   cudnnHandle_t handle_;  // Not owned.
 };
 
@@ -186,7 +186,7 @@ class CudnnAccess {
   explicit CudnnAccess(cudnnHandle_t handle) : handle_(handle) {}
 
   ~CudnnAccess() {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     cudnnDestroy(handle_);
   }
 
@@ -207,7 +207,7 @@ class CudnnAccess {
   // therefore a bad idea (performance wise) to call any cuDNN APIs that
   // enqueue work in the stream.
   CudnnHandle GetHandle(GpuExecutor* executor, Stream* stream) {
-    auto lock = std::make_unique<absl::MutexLock>(&mutex_);
+    auto lock = std::make_unique<abslx::MutexLock>(&mutex_);
     mutex_.AssertHeld();
     gpu::ScopedActivateExecutorContext context(executor);
     CUstream cu_stream = stream ? AsGpuStreamValue(stream) : cudaStreamLegacy;
@@ -221,7 +221,7 @@ class CudnnAccess {
 
   void NotifyStreamDestroyed(Stream* stream) {
     CUstream cu_stream = AsGpuStreamValue(stream);
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     if (current_stream_ && cu_stream == *current_stream_) {
       current_stream_.reset();
     }
@@ -230,7 +230,7 @@ class CudnnAccess {
  private:
   // Guards current_stream_ and the enqueueing of cuDNN operations via the
   // handle_ below.
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
 
   // If set, indicates the stream currently active on handle_, to avoid the
   // overhead of re-setting the same stream unnecessarily.
@@ -406,7 +406,7 @@ port::Status CudnnSupport::Init() {
     CudnnVersion loaded_version;
     TF_RETURN_IF_ERROR(GetLoadedCudnnVersion(&loaded_version));
     if (!IsSourceCompatibleWithCudnnLibrary(source_version, loaded_version)) {
-      const std::string error = absl::StrCat(
+      const std::string error = abslx::StrCat(
           "Loaded runtime CuDNN library: ", loaded_version.ToString(),
           " but source was compiled with: ", source_version.ToString(),
           ".  CuDNN library needs to have matching major version and equal or "
@@ -441,7 +441,7 @@ port::Status CudnnSupport::Init() {
   }
 
   return port::Status(port::error::INTERNAL,
-                      absl::StrCat("cudnn library could not create a handle: ",
+                      abslx::StrCat("cudnn library could not create a handle: ",
                                    CudnnStatusToString(status)));
 }
 
@@ -699,7 +699,7 @@ class CudnnFilterDescriptor {
     std::vector<int> dims(2 + filter_descriptor.ndims());
     dims[0] = filter_descriptor.output_feature_map_count();
     dims[1] = filter_descriptor.input_feature_map_count();
-    absl::Span<const int64_t> spatial_dims =
+    abslx::Span<const int64_t> spatial_dims =
         filter_descriptor.input_filter_dims();
     std::copy(spatial_dims.begin(), spatial_dims.end(), dims.begin() + 2);
 
@@ -731,7 +731,7 @@ class CudnnFilterDescriptor {
 // CUDNN_ERRATA_JSON_FILE at runtime.
 // We are also excluding two flavors of ConvFwd_eng42 due to b/234183340.
 const json* CudnnExecutionPlanEngineFilterStatic() {
-  static absl::string_view filter_str = R"({
+  static abslx::string_view filter_str = R"({
       "version" : 1,
         "rules"   : [
           { "rule_id"             : "ConvFwd_eng999",
@@ -839,9 +839,9 @@ class CudnnConvolutionDescriptor {
       const dnn::ConvolutionDescriptor& convolution_descriptor,
       cudnnDataType_t data_type)
       : handle_(CreateConvolutionDescriptor()) {
-    absl::Span<const int64_t> strides64 = convolution_descriptor.strides();
-    absl::Span<const int64_t> padding64 = convolution_descriptor.padding();
-    absl::Span<const int64_t> dilations64 = convolution_descriptor.dilations();
+    abslx::Span<const int64_t> strides64 = convolution_descriptor.strides();
+    abslx::Span<const int64_t> padding64 = convolution_descriptor.padding();
+    abslx::Span<const int64_t> dilations64 = convolution_descriptor.dilations();
     CHECK_NE(convolution_descriptor.pad_alignment(),
              dnn::PadAlignment::kTensorFlowPadding)
         << "TensorFlow padding alignment is not supported.";
@@ -934,9 +934,9 @@ class CudnnPoolingDescriptor {
   explicit CudnnPoolingDescriptor(
       const dnn::PoolingDescriptor& pooling_descriptor)
       : handle_(CreatePoolingDescriptor()) {
-    absl::Span<const int64_t> strides64 = pooling_descriptor.strides();
-    absl::Span<const int64_t> padding64 = pooling_descriptor.padding();
-    absl::Span<const int64_t> shape64 = pooling_descriptor.window();
+    abslx::Span<const int64_t> strides64 = pooling_descriptor.strides();
+    abslx::Span<const int64_t> padding64 = pooling_descriptor.padding();
+    abslx::Span<const int64_t> shape64 = pooling_descriptor.window();
 
     const int nd = pooling_descriptor.ndims();
     std::vector<int> shape(nd);
@@ -1667,7 +1667,7 @@ class CudnnRnnSequenceTensorDescriptor
 
   static port::StatusOr<CudnnRnnSequenceTensorDescriptor> Create(
       GpuExecutor* parent, int max_seq_length, int batch_size, int data_size,
-      const absl::Span<const int>& seq_lengths, bool time_major,
+      const abslx::Span<const int>& seq_lengths, bool time_major,
       cudnnDataType_t data_type) {
     if (max_seq_length <= 0) {
       return port::Status(port::error::INVALID_ARGUMENT, "max_seq_length <= 0");
@@ -2370,9 +2370,9 @@ port::Status CudnnSupport::DoRnnBackwardImpl(
 
 port::Status CudnnSupport::DoCtcLossImpl(
     Stream* stream, const CudnnRnnStateTensorDescriptor& probs_desc,
-    const DeviceMemoryBase probs_data, absl::Span<const int> labels_data,
-    absl::Span<const int> labels_lengths_data,
-    absl::Span<const int> input_lengths_data, DeviceMemoryBase costs_data,
+    const DeviceMemoryBase probs_data, abslx::Span<const int> labels_data,
+    abslx::Span<const int> labels_lengths_data,
+    abslx::Span<const int> input_lengths_data, DeviceMemoryBase costs_data,
     const CudnnRnnStateTensorDescriptor& grads_desc,
     DeviceMemoryBase grads_data, const CudnnCtcLossDescriptor& ctc_loss_desc,
     DeviceMemory<uint8> scratch_memory, int ctc_loss_algo_id) {
@@ -2445,7 +2445,7 @@ CudnnSupport::createRnnSequenceTensorDescriptor(int max_seq_length,
 port::StatusOr<std::unique_ptr<dnn::RnnSequenceTensorDescriptor>>
 CudnnSupport::createRnnSequenceTensorDescriptor(
     int max_seq_length, int batch_size, int data_size,
-    const absl::Span<const int>& seq_lengths, bool time_major,
+    const abslx::Span<const int>& seq_lengths, bool time_major,
     dnn::DataType data_type) {
   TF_ASSIGN_OR_RETURN(CudnnRnnSequenceTensorDescriptor descriptor,
                       CudnnRnnSequenceTensorDescriptor::Create(
@@ -3096,7 +3096,7 @@ port::StatusOr<dnn::AlgorithmDesc> GetCudnnConvolutionForwardAlgorithm(
   if (!algo_desc.has_value()) {
     return port::Status(
         scratch_or.status().code(),
-        absl::StrCat("The primary convolution algorithm failed, ",
+        abslx::StrCat("The primary convolution algorithm failed, ",
                      "while a secondary algorithm is not provided. ",
                      "Returned status: ", scratch_or.status().ToString()));
   }
@@ -3220,7 +3220,7 @@ port::StatusOr<dnn::AlgorithmDesc> GetCudnnConvolutionBackwardFilterAlgorithm(
   if (!algo_desc.has_value()) {
     return port::Status(
         port::error::INVALID_ARGUMENT,
-        absl::StrCat(
+        abslx::StrCat(
             "The primary convolution algorithm failed memory allocation, "
             "while a secondary algorithm is not provided. Actual error: ",
             scratch_or.status().ToString()));
@@ -3249,7 +3249,7 @@ class CudnnEnvVar {
   static bool IsEnabledImpl() {
     const char* tf_env_var_val = getenv(EnvVar::kName);
     if (tf_env_var_val != nullptr) {
-      absl::string_view tf_env_var_val_str(tf_env_var_val);
+      abslx::string_view tf_env_var_val_str(tf_env_var_val);
       if (tf_env_var_val_str == "0") {
         return false;
       }
@@ -3482,7 +3482,7 @@ std::tuple<int, int> GetTensorVectorSizeAndDim(
 }
 
 port::StatusOr<cudnn_frontend::Tensor> CreateCudnnTensor(
-    absl::Span<const int64_t> dims, absl::Span<const int64_t> strides,
+    abslx::Span<const int64_t> dims, abslx::Span<const int64_t> strides,
     int64_t uid, dnn::DataType dtype, int64_t vec_count, int64_t vec_dim,
     bool is_virtual = false) {
   auto tensor = cudnn_frontend::TensorBuilder()
@@ -3783,7 +3783,7 @@ GetCudnnFusedOperationGraph(
   RETURN_MSG_IF_CUDNN_ERROR(bias_add_op);
 
   // CUDNN OperationGraph
-  absl::InlinedVector<cudnn_frontend::Operation const*, 4> ops = {
+  abslx::InlinedVector<cudnn_frontend::Operation const*, 4> ops = {
       &conv_op, &add_op, &bias_add_op};
 
   std::optional<cudnn_frontend::PointWiseDesc_v8> act_desc;
@@ -3808,7 +3808,7 @@ GetCudnnFusedOperationGraph(
       break;
     default:
       return port::InternalError(
-          absl::StrCat("Unimplemented activation mode ",
+          abslx::StrCat("Unimplemented activation mode ",
                        dnn::ActivationModeString(activation_mode)));
   }
 
@@ -3870,7 +3870,7 @@ static port::StatusOr<cudnn_frontend::ExecutionPlan> RebuildExecutionPlan(
   // impossible for AlgorithmDesc to just give us a map initially.  Get the
   // vector of tuning knobs and build the map locally.
   auto tuning_knobs_vec = desc.TuningKnobs();
-  absl::flat_hash_map<int64_t, int64_t> tuning_knobs;
+  abslx::flat_hash_map<int64_t, int64_t> tuning_knobs;
   tuning_knobs.reserve(tuning_knobs_vec.size());
   for (const auto& pair : tuning_knobs_vec) {
     tuning_knobs[pair.first] = pair.second;
@@ -3949,7 +3949,7 @@ port::Status CudnnSupport::DoPrepareForConvolution(
     }
     default:
       return port::InternalError(
-          absl::StrCat("Unexpected convolution kind ", static_cast<int>(kind)));
+          abslx::StrCat("Unexpected convolution kind ", static_cast<int>(kind)));
   }
 
   return ::tensorflow::OkStatus();
@@ -4141,7 +4141,7 @@ class CudnnLegacyConvRunner : public dnn::ConvRunner {
         break;
       }
       default:
-        return port::InternalError(absl::StrCat("Unexpected convolution kind ",
+        return port::InternalError(abslx::StrCat("Unexpected convolution kind ",
                                                 static_cast<int>(kind_)));
     }
 
@@ -4274,7 +4274,7 @@ port::StatusOr<std::vector<BackendDescriptor>> GetDescriptorAttribute(
 
   std::vector<cudnnBackendDescriptor_t> raw_ptrs;
   raw_ptrs.reserve(result.size());
-  absl::c_transform(result, std::back_inserter(raw_ptrs),
+  abslx::c_transform(result, std::back_inserter(raw_ptrs),
                     [](const BackendDescriptor& ptr) { return ptr.get(); });
 
   // This API evidently does a deep copy of the descriptors into the pointers in
@@ -4329,7 +4329,7 @@ port::StatusOr<dnn::AlgorithmDesc> ExecutionPlanToAlgorithmDesc(
   }
   std::vector<cudnnBackendDescriptor_t> raw_knob_ptrs;
   raw_knob_ptrs.reserve(knobs.size());
-  absl::c_transform(knobs, std::back_inserter(raw_knob_ptrs),
+  abslx::c_transform(knobs, std::back_inserter(raw_knob_ptrs),
                     [](const BackendDescriptor& ptr) { return ptr.get(); });
   RETURN_IF_CUDNN_ERROR(cudnnBackendGetAttribute(
       engine_cfgs[0].get(), CUDNN_ATTR_ENGINECFG_KNOB_CHOICES,
@@ -4337,7 +4337,7 @@ port::StatusOr<dnn::AlgorithmDesc> ExecutionPlanToAlgorithmDesc(
       raw_knob_ptrs.data()));
   knobs.resize(n);
 
-  absl::flat_hash_map<int64_t, int64_t> tuning_knobs;
+  abslx::flat_hash_map<int64_t, int64_t> tuning_knobs;
   for (const auto& knob : knobs) {
     cudnnBackendKnobType_t knob_type;
     int64_t knob_value;
@@ -4347,7 +4347,7 @@ port::StatusOr<dnn::AlgorithmDesc> ExecutionPlanToAlgorithmDesc(
                                  CUDNN_TYPE_KNOB_TYPE, 1, &n, &knob_type));
     if (n != 1) {
       return port::InternalError(
-          absl::StrCat("Knob should have exactly one KNOB_TYPE; had ", n));
+          abslx::StrCat("Knob should have exactly one KNOB_TYPE; had ", n));
     }
 
     RETURN_IF_CUDNN_ERROR(
@@ -4355,12 +4355,12 @@ port::StatusOr<dnn::AlgorithmDesc> ExecutionPlanToAlgorithmDesc(
                                  CUDNN_TYPE_INT64, 1, &n, &knob_value));
     if (n != 1) {
       return port::InternalError(
-          absl::StrCat("Knob should have exactly one KNOB_VALUE; had ", n));
+          abslx::StrCat("Knob should have exactly one KNOB_VALUE; had ", n));
     }
 
     auto emplaced = tuning_knobs.try_emplace(knob_type, knob_value).second;
     if (!emplaced) {
-      return port::InternalError(absl::StrFormat(
+      return port::InternalError(abslx::StrFormat(
           "cuDNN gave multiple knob values for the same knob type.\n"
           "  KNOB_TYPE: %d\n"
           "  new KNOB_VALUE: %d\n"
@@ -4371,7 +4371,7 @@ port::StatusOr<dnn::AlgorithmDesc> ExecutionPlanToAlgorithmDesc(
 
   std::vector<std::pair<int64_t, int64_t>> tuning_knobs_vec;
   tuning_knobs_vec.reserve(tuning_knobs.size());
-  absl::c_copy(tuning_knobs, std::back_inserter(tuning_knobs_vec));
+  abslx::c_copy(tuning_knobs, std::back_inserter(tuning_knobs_vec));
 
   return dnn::AlgorithmDesc(engine_id, tuning_knobs_vec, workspace_size);
 }
@@ -4461,7 +4461,7 @@ class CudnnExecutionPlanRunner<void(Args...)>
 
   static port::StatusOr<CudnnExecutionPlanRunner> Create(
       GpuExecutor* parent, CudnnAccess* cudnn,
-      cudnn_frontend::ExecutionPlan plan, absl::Span<const int64_t> uids) {
+      cudnn_frontend::ExecutionPlan plan, abslx::Span<const int64_t> uids) {
     auto workspace_size = static_cast<uint64_t>(plan.getWorkspaceSize());
     RETURN_MSG_IF_CUDNN_ERROR(plan);
     return {{parent, cudnn, std::move(plan), workspace_size, uids}};
@@ -4471,7 +4471,7 @@ class CudnnExecutionPlanRunner<void(Args...)>
   CudnnExecutionPlanRunner(GpuExecutor* parent, CudnnAccess* cudnn,
                            cudnn_frontend::ExecutionPlan plan,
                            size_t workspace_size,
-                           absl::Span<const int64_t> uids)
+                           abslx::Span<const int64_t> uids)
       : parent_(parent),
         cudnn_(cudnn),
         plan_(std::move(plan)),
@@ -4481,7 +4481,7 @@ class CudnnExecutionPlanRunner<void(Args...)>
   CudnnAccess* cudnn_;
   cudnn_frontend::ExecutionPlan plan_;
   size_t workspace_size_;
-  absl::InlinedVector<int64_t, sizeof...(Args)> data_uids_;
+  abslx::InlinedVector<int64_t, sizeof...(Args)> data_uids_;
 };
 #endif  // CUDNN_VERSION >= 8100 && TF_ENABLE_CUDNN_FRONTEND
 
@@ -4525,7 +4525,7 @@ port::Status CreateOpRunners(
     CudnnAccess* cudnn_access,
     std::unique_ptr<cudnn_frontend::OperationGraph> op_graph,
     dnn::ConvolutionKind kind, dnn::DataType input_type,
-    absl::Span<const int64_t> input_uids, bool use_fallback,
+    abslx::Span<const int64_t> input_uids, bool use_fallback,
     std::vector<std::unique_ptr<const dnn::OpRunner<Sig>>>* out_runners) {
   cudnn_frontend::EngineConfigList filtered_configs;
   auto generic_filter_fn = [=](cudnnBackendDescriptor_t engine_config) -> bool {
@@ -4672,7 +4672,7 @@ port::Status CudnnSupport::GetConvolveRunners(
     bool got_algos = false;
     switch (kind) {
       default:
-        return port::InternalError(absl::StrFormat(
+        return port::InternalError(abslx::StrFormat(
             "Unknown ConvolutionKind for unfused conv: %d", kind));
       case dnn::ConvolutionKind::FORWARD:
         got_algos = GetConvolveAlgorithms(cuda_compute_capability, &algorithms);
@@ -4689,7 +4689,7 @@ port::Status CudnnSupport::GetConvolveRunners(
     if (!got_algos) {
       return port::Status(
           port::error::UNKNOWN,
-          absl::StrFormat("Listing algorithms failed for kind %d", kind));
+          abslx::StrFormat("Listing algorithms failed for kind %d", kind));
     }
 
     for (const auto& algo : algorithms) {
@@ -5165,7 +5165,7 @@ port::Status CudnnSupport::GetFusedConvolveRunners(
       convolution_descriptor, activation_mode, cudnn);
   if (!op_graph_status.status().ok()) {
     return port::Status(port::error::INTERNAL,
-                        absl::StrCat("Cudnn graph failed to build: ",
+                        abslx::StrCat("Cudnn graph failed to build: ",
                                      op_graph_status.status().ToString()));
   }
   auto op_graph = std::move(op_graph_status).value();
@@ -5430,7 +5430,7 @@ port::Status CudnnSupport::DoBatchNormalizationForwardImpl(
         !side_input.is_null()) {
       return port::Status(
           port::error::INTERNAL,
-          absl::StrCat(
+          abslx::StrCat(
               "Side input and activation are not supported by cuDNN version: ",
               CUDNN_VERSION));
     } else {
@@ -5637,7 +5637,7 @@ port::Status CudnnSupport::DoBatchNormalizationBackwardImpl(
   auto check_no_side_input_or_activation = [&]() -> port::Status {
     if (activation_mode != dnn::ActivationMode::kNone ||
         !side_input_backprop->is_null()) {
-      return port::InternalError(absl::StrCat(
+      return port::InternalError(abslx::StrCat(
           "Side input and activation are not supported by cuDNN version: ",
           CUDNN_VERSION));
     } else {
@@ -5745,9 +5745,9 @@ port::Status CudnnSupport::DoPrepareForCtcLoss(
     Stream* stream, dnn::DataType element_type,
     const dnn::RnnStateTensorDescriptor& probs_desc,
     const dnn::RnnStateTensorDescriptor& grads_desc,
-    absl::Span<const int> labels_data,
-    absl::Span<const int> labels_lengths_data,
-    absl::Span<const int> input_lengths_data,
+    abslx::Span<const int> labels_data,
+    abslx::Span<const int> labels_lengths_data,
+    abslx::Span<const int> input_lengths_data,
     ScratchAllocator* scratch_allocator, DeviceMemory<uint8>* scratch_memory,
     int* ctc_loss_algo_id) {
   auto cudnn = cudnn_->GetHandle(parent_, stream);
@@ -5814,9 +5814,9 @@ port::Status CudnnSupport::DoPrepareForCtcLoss(
 port::Status CudnnSupport::DoCtcLoss(
     Stream* stream, dnn::DataType element_type,
     const dnn::RnnStateTensorDescriptor& probs_desc,
-    const DeviceMemoryBase probs_data, absl::Span<const int> labels_data,
-    absl::Span<const int> labels_lengths_data,
-    absl::Span<const int> input_lengths_data, DeviceMemoryBase costs_data,
+    const DeviceMemoryBase probs_data, abslx::Span<const int> labels_data,
+    abslx::Span<const int> labels_lengths_data,
+    abslx::Span<const int> input_lengths_data, DeviceMemoryBase costs_data,
     const dnn::RnnStateTensorDescriptor& grads_desc,
     DeviceMemoryBase grads_data, DeviceMemory<uint8> scratch_memory,
     int ctc_loss_algo_id) {
@@ -6105,7 +6105,7 @@ port::StatusOr<std::vector<PoolingSplitsSpec>> GetTensorSplits(
   if (max_batches_per_split == 0) {
     return port::Status(
         port::error::INTERNAL,
-        absl::StrCat(
+        abslx::StrCat(
             "Tensor has too many elements for int32 indexing: batches=",
             num_batches, " elements_per_batch=", elements_per_batch_input,
             "."));
@@ -6369,7 +6369,7 @@ bool CudnnSupport::DoDepthConcatenate(
   for (size_t i = 0; i < input_data.size(); ++i) {
     const auto& dimensions = input_dimensions[i];
     tmp.resize(dimensions.ElementCount());
-    stream->ThenMemcpyD2H<float>(*input_data[i], absl::MakeSpan(tmp));
+    stream->ThenMemcpyD2H<float>(*input_data[i], abslx::MakeSpan(tmp));
     port::Status block_status = stream->BlockHostUntilDone();
     if (!block_status.ok()) {
       LOG(ERROR) << "BlockHostUntilDone failed: " << block_status;

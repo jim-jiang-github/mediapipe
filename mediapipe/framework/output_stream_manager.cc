@@ -20,23 +20,23 @@
 
 namespace mediapipe {
 
-absl::Status OutputStreamManager::Initialize(const std::string& name,
+abslx::Status OutputStreamManager::Initialize(const std::string& name,
                                              const PacketType* packet_type) {
   output_stream_spec_.name = name;
   output_stream_spec_.packet_type = packet_type;
   output_stream_spec_.offset_enabled = false;
   PrepareForRun(nullptr);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void OutputStreamManager::PrepareForRun(
-    std::function<void(absl::Status)> error_callback) {
+    std::function<void(abslx::Status)> error_callback) {
   output_stream_spec_.error_callback = std::move(error_callback);
 
   output_stream_spec_.locked_intro_data = false;
   output_stream_spec_.header = Packet();
   {
-    absl::MutexLock lock(&stream_mutex_);
+    abslx::MutexLock lock(&stream_mutex_);
     next_timestamp_bound_ = Timestamp::PreStream();
     closed_ = false;
   }
@@ -44,7 +44,7 @@ void OutputStreamManager::PrepareForRun(
 
 void OutputStreamManager::Close() {
   {
-    absl::MutexLock lock(&stream_mutex_);
+    abslx::MutexLock lock(&stream_mutex_);
     if (closed_) {
       return;
     }
@@ -59,7 +59,7 @@ void OutputStreamManager::Close() {
 }
 
 bool OutputStreamManager::IsClosed() const {
-  absl::MutexLock lock(&stream_mutex_);
+  abslx::MutexLock lock(&stream_mutex_);
   return closed_;
 }
 
@@ -91,7 +91,7 @@ void OutputStreamManager::SetMaxQueueSize(int max_queue_size) {
 }
 
 Timestamp OutputStreamManager::NextTimestampBound() const {
-  absl::MutexLock lock(&stream_mutex_);
+  abslx::MutexLock lock(&stream_mutex_);
   return next_timestamp_bound_;
 }
 
@@ -166,7 +166,7 @@ void OutputStreamManager::PropagateUpdatesToMirrors(
   CHECK(output_stream_shard);
   {
     if (next_timestamp_bound != Timestamp::Unset()) {
-      absl::MutexLock lock(&stream_mutex_);
+      abslx::MutexLock lock(&stream_mutex_);
       next_timestamp_bound_ = next_timestamp_bound;
       VLOG(3) << "Next timestamp bound for output " << output_stream_spec_.name
               << " is " << next_timestamp_bound_;
@@ -209,7 +209,7 @@ void OutputStreamManager::PropagateUpdatesToMirrors(
 void OutputStreamManager::ResetShard(OutputStreamShard* output_stream_shard) {
   Timestamp next_timestamp_bound;
   bool closed = false;
-  absl::MutexLock lock(&stream_mutex_);
+  abslx::MutexLock lock(&stream_mutex_);
   {
     next_timestamp_bound = next_timestamp_bound_;
     closed = closed_;

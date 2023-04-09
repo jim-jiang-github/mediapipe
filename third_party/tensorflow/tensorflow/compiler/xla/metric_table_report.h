@@ -107,7 +107,7 @@ class MetricTableReport {
   // Append all parameters to the report.
   template <typename... Args>
   void AppendLine(Args... args) {
-    absl::StrAppend(&report_, std::forward<Args>(args)..., "\n");
+    abslx::StrAppend(&report_, std::forward<Args>(args)..., "\n");
   }
 
   // Represents a set of entries with the same category_text.

@@ -697,7 +697,7 @@ REGISTER_OP("SplitV")
                           : total_size != split_dim_size) {
             return errors::InvalidArgument(
                 "can't split axis of size ", split_dim_size,
-                " into pieces of size [", absl::StrJoin(data, ","), "]");
+                " into pieces of size [", abslx::StrJoin(data, ","), "]");
           }
         }
       }
@@ -1324,7 +1324,7 @@ REGISTER_OP("IdentityN")
       // If any of the input shapes are not known, we should return error.
       for (int i = 0; i < input.size(); i++) {
         if (!input[i].Handle()) {
-          return errors::InvalidArgument(absl::StrCat(
+          return errors::InvalidArgument(abslx::StrCat(
               "Cannot infer output shape #", i,
               " for IdentityN node because input shape #", i, " is unknown."));
         }

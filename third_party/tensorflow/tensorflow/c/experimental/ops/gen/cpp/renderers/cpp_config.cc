@@ -23,7 +23,7 @@ namespace cpp {
 CppConfig::CppConfig(const string &category, const string &name_space)
     : category(category),
       unit(str_util::Lowercase(category)),
-      namespaces(absl::StrSplit(name_space, "::")) {}
+      namespaces(abslx::StrSplit(name_space, "::")) {}
 
 }  // namespace cpp
 }  // namespace generator

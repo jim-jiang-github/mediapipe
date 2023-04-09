@@ -53,7 +53,7 @@ bool EqualWithTolerance(const T value1, const T value2, const T max_diff) {
 }
 
 template <typename T>
-absl::Status CompareDiff(const ImageFrame& image1, const ImageFrame& image2,
+abslx::Status CompareDiff(const ImageFrame& image1, const ImageFrame& image2,
                          const T max_color_diff, const T max_alpha_diff,
                          const float max_avg_diff,
                          std::unique_ptr<ImageFrame>& diff_image) {
@@ -119,22 +119,22 @@ absl::Status CompareDiff(const ImageFrame& image1, const ImageFrame& image2,
 
   std::vector<std::string> errors;
   if (different_color_components)
-    errors.push_back(absl::Substitute(
+    errors.push_back(abslx::Substitute(
         "$0 color components differences above limit of $1, max found was $2",
         different_color_components, max_color_diff, max_color_diff_found));
   if (different_alpha_components)
-    errors.push_back(absl::Substitute(
+    errors.push_back(abslx::Substitute(
         "$0 alpha components differences above limit of $1, max found was $2",
         different_alpha_components, max_alpha_diff, max_alpha_diff_found));
   if (avg_diff > max_avg_diff)
     errors.push_back(
-        absl::Substitute("the average component difference is $0 (limit: $1)",
+        abslx::Substitute("the average component difference is $0 (limit: $1)",
                          avg_diff, max_avg_diff));
 
   if (!errors.empty())
-    return absl::InternalError(
-        absl::StrCat("images differ: ", absl::StrJoin(errors, "; ")));
-  return absl::OkStatus();
+    return abslx::InternalError(
+        abslx::StrCat("images differ: ", abslx::StrJoin(errors, "; ")));
+  return abslx::OkStatus();
 }
 
 #if defined(__linux__)
@@ -144,13 +144,13 @@ std::string GetBinaryDirectory() {
   int length = readlink("/proc/self/exe", full_path, PATH_MAX + 1);
   CHECK_GT(length, 0);
   return std::string(
-      ::mediapipe::file::Dirname(absl::string_view(full_path, length)));
+      ::mediapipe::file::Dirname(abslx::string_view(full_path, length)));
 }
 #endif
 
 }  // namespace
 
-absl::Status CompareImageFrames(const ImageFrame& image1,
+abslx::Status CompareImageFrames(const ImageFrame& image1,
                                 const ImageFrame& image2,
                                 const float max_color_diff,
                                 const float max_alpha_diff,
@@ -209,8 +209,8 @@ bool CompareImageFrames(const ImageFrame& image1, const ImageFrame& image2,
   return false;
 }
 
-absl::Status CompareAndSaveImageOutput(
-    absl::string_view golden_image_path, const ImageFrame& actual,
+abslx::Status CompareAndSaveImageOutput(
+    abslx::string_view golden_image_path, const ImageFrame& actual,
     const ImageFrameComparisonOptions& options) {
   ASSIGN_OR_RETURN(auto output_img_path, SavePngTestOutput(actual, "output"));
 
@@ -250,16 +250,16 @@ std::string GetTestOutputsDir() {
   return output_dir;
 }
 
-std::string GetTestDataDir(absl::string_view package_base_path) {
+std::string GetTestDataDir(abslx::string_view package_base_path) {
   return file::JoinPath(GetTestRootDir(), package_base_path, "testdata/");
 }
 
-std::string GetTestFilePath(absl::string_view relative_path) {
+std::string GetTestFilePath(abslx::string_view relative_path) {
   return file::JoinPath(GetTestRootDir(), relative_path);
 }
 
-absl::StatusOr<std::unique_ptr<ImageFrame>> DecodeTestImage(
-    absl::string_view encoded, ImageFormat::Format format) {
+abslx::StatusOr<std::unique_ptr<ImageFrame>> DecodeTestImage(
+    abslx::string_view encoded, ImageFormat::Format format) {
   // stbi_load determines the output pixel format based on the desired channels.
   // 0 means "use whatever's in the file".
   int desired_channels = format == ImageFormat::UNKNOWN ? 0
@@ -288,18 +288,18 @@ absl::StatusOr<std::unique_ptr<ImageFrame>> DecodeTestImage(
         << "unsupported number of channels: " << output_channels;
   }
 
-  return absl::make_unique<ImageFrame>(
+  return abslx::make_unique<ImageFrame>(
       format, width, height, width * output_channels, data, stbi_image_free);
 }
 
-absl::StatusOr<std::unique_ptr<ImageFrame>> LoadTestImage(
-    absl::string_view path, ImageFormat::Format format) {
+abslx::StatusOr<std::unique_ptr<ImageFrame>> LoadTestImage(
+    abslx::string_view path, ImageFormat::Format format) {
   std::string encoded;
   MP_RETURN_IF_ERROR(mediapipe::file::GetContents(path, &encoded));
   return DecodeTestImage(encoded, format);
 }
 
-std::unique_ptr<ImageFrame> LoadTestPng(absl::string_view path,
+std::unique_ptr<ImageFrame> LoadTestPng(abslx::string_view path,
                                         ImageFormat::Format format) {
   return nullptr;
 }
@@ -307,11 +307,11 @@ std::unique_ptr<ImageFrame> LoadTestPng(absl::string_view path,
 // Write an ImageFrame as PNG to the test undeclared outputs directory.
 // The image's name will contain the given prefix and a timestamp.
 // Returns the path to the output if successful.
-absl::StatusOr<std::string> SavePngTestOutput(
-    const mediapipe::ImageFrame& image, absl::string_view prefix) {
-  std::string now_string = absl::FormatTime(absl::Now());
+abslx::StatusOr<std::string> SavePngTestOutput(
+    const mediapipe::ImageFrame& image, abslx::string_view prefix) {
+  std::string now_string = abslx::FormatTime(abslx::Now());
   std::string output_relative_path =
-      absl::StrCat(prefix, "_", now_string, ".png");
+      abslx::StrCat(prefix, "_", now_string, ".png");
   std::string output_full_path =
       file::JoinPath(GetTestOutputsDir(), output_relative_path);
   RET_CHECK(stbi_write_png(output_full_path.c_str(), image.Width(),
@@ -347,7 +347,7 @@ std::unique_ptr<ImageFrame> GenerateLuminanceImage(
     return nullptr;
   }
   auto luminance_image =
-      absl::make_unique<ImageFrame>(original_image.Format(), width, height,
+      abslx::make_unique<ImageFrame>(original_image.Format(), width, height,
                                     ImageFrame::kGlDefaultAlignmentBoundary);
   const uint8* pixel1 = original_image.PixelData();
   uint8* pixel2 = luminance_image->MutablePixelData();

@@ -60,9 +60,9 @@ static mutex* get_dataset_experiment_registry_lock() {
   return &dataset_experiment_registry_lock;
 }
 
-static absl::flat_hash_map<string, int64_t>* get_dataset_experiments() {
-  static absl::flat_hash_map<string, int64_t>* experiments =
-      new absl::flat_hash_map<string, int64_t>;
+static abslx::flat_hash_map<string, int64_t>* get_dataset_experiments() {
+  static abslx::flat_hash_map<string, int64_t>* experiments =
+      new abslx::flat_hash_map<string, int64_t>;
   return experiments;
 }
 
@@ -91,9 +91,9 @@ constexpr char kMakeDeterministicOpt[] = "make_deterministic";
 constexpr char kFilterParallelizationOpt[] = "filter_parallelization";
 
 void DefaultOptimizationGraphRewrites(
-    const Options& options, absl::flat_hash_set<tstring>* optimization_enabled,
-    absl::flat_hash_set<tstring>* optimization_disabled,
-    absl::flat_hash_set<tstring>* optimization_default) {
+    const Options& options, abslx::flat_hash_set<tstring>* optimization_enabled,
+    abslx::flat_hash_set<tstring>* optimization_disabled,
+    abslx::flat_hash_set<tstring>* optimization_default) {
   const auto& optimization_options = options.optimization_options();
   if (optimization_options.optional_apply_default_optimizations_case() !=
           OptimizationOptions::kApplyDefaultOptimizations ||
@@ -211,8 +211,8 @@ void DefaultOptimizationGraphRewrites(
 bool IsOpAllowlisted(const OpDef* op_def) {
   return (op_def->output_arg_size() == 1 &&
           op_def->output_arg(0).type() == DT_VARIANT &&
-          (absl::EndsWith(op_def->name(), "Dataset") ||
-           absl::EndsWith(op_def->name(), "DatasetV2"))) ||
+          (abslx::EndsWith(op_def->name(), "Dataset") ||
+           abslx::EndsWith(op_def->name(), "DatasetV2"))) ||
          AllowlistedStatefulOpRegistry::Global()->Contains(op_def->name());
 }
 
@@ -444,7 +444,7 @@ std::string DeterminismPolicy::String() const {
 }
 
 bool MatchesAnyVersion(StringPiece op_prefix, StringPiece op_to_match) {
-  if (!absl::StartsWith(op_to_match, op_prefix)) {
+  if (!abslx::StartsWith(op_to_match, op_prefix)) {
     return false;
   }
   if (op_to_match.length() == op_prefix.length()) {
@@ -457,14 +457,14 @@ bool MatchesAnyVersion(StringPiece op_prefix, StringPiece op_to_match) {
   return (op_to_match[index] == 'V') && (op_prefix.length() == index);
 }
 
-absl::flat_hash_set<string> GetExperiments() {
+abslx::flat_hash_set<string> GetExperiments() {
   return GetExperiments(port::JobName(),
                         [](const tstring& str) { return Hash64(str); });
 }
 
-absl::flat_hash_set<string> GetExperiments(
+abslx::flat_hash_set<string> GetExperiments(
     const string& job_name, std::function<uint64(const string&)> hash_func) {
-  absl::flat_hash_set<string> experiments;
+  abslx::flat_hash_set<string> experiments;
   if (job_name.empty()) {
     return experiments;
   }
@@ -482,9 +482,9 @@ absl::flat_hash_set<string> GetExperiments(
   }
 
   // Identify opted out experiments.
-  absl::flat_hash_map<string, int64_t> live_experiments =
+  abslx::flat_hash_map<string, int64_t> live_experiments =
       DatasetExperimentRegistry::Experiments();
-  absl::flat_hash_set<string> opt_outs;
+  abslx::flat_hash_set<string> opt_outs;
   if (opt_outs_raw == "all") {
     for (const auto& pair : live_experiments) {
       opt_outs.insert(pair.first);
@@ -529,12 +529,12 @@ absl::flat_hash_set<string> GetExperiments(
   return experiments;
 }
 
-void LogAndRecordExperiments(const absl::flat_hash_set<string>& experiments) {
+void LogAndRecordExperiments(const abslx::flat_hash_set<string>& experiments) {
   if (!experiments.empty()) {
     constexpr float TEN_MINUTES = 60.0 * 10.0;
     LOG_EVERY_N_SEC(INFO, TEN_MINUTES)
         << "The input pipeline is subject to the following tf.data experiments:"
-        << " " << absl::StrJoin(experiments, ", ") << ". "
+        << " " << abslx::StrJoin(experiments, ", ") << ". "
         << "See `go/tf-data-experiments` for more details.";
   }
   for (auto& experiment : experiments) {
@@ -543,9 +543,9 @@ void LogAndRecordExperiments(const absl::flat_hash_set<string>& experiments) {
 }
 
 void GetOptimizations(const Options& options,
-                      absl::flat_hash_set<tstring>* optimizations_enabled,
-                      absl::flat_hash_set<tstring>* optimizations_disabled,
-                      absl::flat_hash_set<tstring>* optimizations_default) {
+                      abslx::flat_hash_set<tstring>* optimizations_enabled,
+                      abslx::flat_hash_set<tstring>* optimizations_disabled,
+                      abslx::flat_hash_set<tstring>* optimizations_default) {
   DefaultOptimizationGraphRewrites(options, optimizations_enabled,
                                    optimizations_disabled,
                                    optimizations_default);
@@ -822,8 +822,8 @@ Status CopyBatch(CopyBatchParams params,
   return OkStatus();
 }
 
-absl::flat_hash_set<tstring> CreateGraphRewriteConfigs(const Options& options) {
-  absl::flat_hash_set<tstring> configs;
+abslx::flat_hash_set<tstring> CreateGraphRewriteConfigs(const Options& options) {
+  abslx::flat_hash_set<tstring> configs;
   const auto& autotune_options = options.autotune_options();
   std::vector<tstring> autotune_only_optimizations = {
       kAutotuneBufferSizesOpt,
@@ -838,12 +838,12 @@ absl::flat_hash_set<tstring> CreateGraphRewriteConfigs(const Options& options) {
       !autotune_options.enabled()) {
     for (const auto& optimization : autotune_only_optimizations) {
       configs.insert(
-          absl::StrCat(optimization.data(), ":", kAutotuneOpt, ":false"));
+          abslx::StrCat(optimization.data(), ":", kAutotuneOpt, ":false"));
     }
   } else {
     for (const auto& optimization : autotune_only_optimizations) {
       configs.insert(
-          absl::StrCat(optimization.data(), ":", kAutotuneOpt, ":true"));
+          abslx::StrCat(optimization.data(), ":", kAutotuneOpt, ":true"));
     }
   }
   if (options.slack()) {
@@ -853,7 +853,7 @@ absl::flat_hash_set<tstring> CreateGraphRewriteConfigs(const Options& options) {
       num_devices = options.distribute_options().num_devices();
     }
     configs.insert(
-        absl::StrCat(kSlackOpt, ":", kSlackPeriodOpt, ":", num_devices));
+        abslx::StrCat(kSlackOpt, ":", kSlackPeriodOpt, ":", num_devices));
   }
   return configs;
 }
@@ -876,8 +876,8 @@ bool ShouldUseAutotuning(const Options& options) {
 
 bool ShouldApplyOptimizations(
     const Options& options,
-    const absl::flat_hash_set<tstring>& optimizations_enabled,
-    const absl::flat_hash_set<tstring>& optimizations_default) {
+    const abslx::flat_hash_set<tstring>& optimizations_enabled,
+    const abslx::flat_hash_set<tstring>& optimizations_default) {
   return (options.optimization_options()
                   .optional_apply_default_optimizations_case() !=
               OptimizationOptions::kApplyDefaultOptimizations ||
@@ -897,7 +897,7 @@ void DatasetExperimentRegistry::Register(const string& experiment,
 }
 
 // static
-absl::flat_hash_map<string, int64_t> DatasetExperimentRegistry::Experiments() {
+abslx::flat_hash_map<string, int64_t> DatasetExperimentRegistry::Experiments() {
   mutex_lock l(*get_dataset_experiment_registry_lock());
   return *get_dataset_experiments();
 }

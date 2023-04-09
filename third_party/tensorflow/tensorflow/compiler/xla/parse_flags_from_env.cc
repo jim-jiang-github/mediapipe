@@ -106,7 +106,7 @@ static void ParseArgvFromString(const std::string& flag_str, EnvArgv* a) {
     size_t e = b;
     while (e != flag_str.size() && isascii(flag_str[e]) &&
            (strchr("-_", flag_str[e]) != nullptr ||
-            absl::ascii_isalnum(flag_str[e]))) {
+            abslx::ascii_isalnum(flag_str[e]))) {
       e++;
     }
     if (e != flag_str.size() && flag_str[e] == '=' &&
@@ -143,7 +143,7 @@ static void ParseArgvFromString(const std::string& flag_str, EnvArgv* a) {
 
 // Call ParseArgvFromString(..., a) on a string derived from the setting of the
 // environment variable `envvar`, or a file it points to.
-static void SetArgvFromEnv(absl::string_view envvar, EnvArgv* a) {
+static void SetArgvFromEnv(abslx::string_view envvar, EnvArgv* a) {
   if (!a->initialized) {
     static const char kDummyArgv[] = "<argv[0]>";
     AppendToEnvArgv(kDummyArgv, strlen(kDummyArgv), nullptr, 0,
@@ -179,17 +179,17 @@ static void SetArgvFromEnv(absl::string_view envvar, EnvArgv* a) {
 
 // The simulated argv[] parsed from the environment, one for each different
 // environment variable we've seen.
-static absl::flat_hash_map<std::string, EnvArgv>& EnvArgvs() {
-  static auto* env_argvs = new absl::flat_hash_map<std::string, EnvArgv>();
+static abslx::flat_hash_map<std::string, EnvArgv>& EnvArgvs() {
+  static auto* env_argvs = new abslx::flat_hash_map<std::string, EnvArgv>();
   return *env_argvs;
 }
 
 // Used to protect accesses to env_argvs.
-static absl::Mutex env_argv_mu(absl::kConstInit);
+static abslx::Mutex env_argv_mu(abslx::kConstInit);
 
 bool ParseFlagsFromEnvAndDieIfUnknown(
-    absl::string_view envvar, const std::vector<tensorflow::Flag>& flag_list) {
-  absl::MutexLock lock(&env_argv_mu);
+    abslx::string_view envvar, const std::vector<tensorflow::Flag>& flag_list) {
+  abslx::MutexLock lock(&env_argv_mu);
   auto* env_argv = &EnvArgvs()[std::string(envvar)];
   SetArgvFromEnv(envvar, env_argv);  // a no-op if already initialized
 
@@ -206,7 +206,7 @@ bool ParseFlagsFromEnvAndDieIfUnknown(
   // There's always at least one unparsed argc, namely the fake argv[0].
   if (result && env_argv->argc != 1) {
     // Skip the first argv, which is the fake argv[0].
-    auto unknown_flags = absl::MakeSpan(env_argv->argv);
+    auto unknown_flags = abslx::MakeSpan(env_argv->argv);
     unknown_flags.remove_prefix(1);
 
     // Some flags are set on XLA_FLAGS, others on TF_XLA_FLAGS.  If we find an
@@ -219,13 +219,13 @@ bool ParseFlagsFromEnvAndDieIfUnknown(
     }
     std::string did_you_mean;
     if (!alternate_envvar.empty()) {
-      did_you_mean = absl::StrFormat(
+      did_you_mean = abslx::StrFormat(
           "\nPerhaps you meant to specify these on the %s envvar?",
           alternate_envvar);
     }
 
     LOG(QFATAL) << "Unknown flag" << (unknown_flags.size() > 1 ? "s" : "")
-                << " in " << envvar << ": " << absl::StrJoin(unknown_flags, " ")
+                << " in " << envvar << ": " << abslx::StrJoin(unknown_flags, " ")
                 << did_you_mean;
     return false;
   }
@@ -238,9 +238,9 @@ bool ParseFlagsFromEnvAndDieIfUnknown(
 // ParseFlagsFromEnvAndDieIfUnknown() will parse the environment variable (or
 // the file it points to) anew, and set *pargc, and *pargv to point to the
 // internal locations of the argc and argv constructed from the environment.
-void ResetFlagsFromEnvForTesting(absl::string_view envvar, int** pargc,
+void ResetFlagsFromEnvForTesting(abslx::string_view envvar, int** pargc,
                                  std::vector<char*>** pargv) {
-  absl::MutexLock lock(&env_argv_mu);
+  abslx::MutexLock lock(&env_argv_mu);
   EnvArgvs().erase(std::string(envvar));
   auto& env_argv = EnvArgvs()[std::string(envvar)];
   *pargc = &env_argv.argc;

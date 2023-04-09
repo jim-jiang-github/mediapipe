@@ -207,7 +207,7 @@ TEST_F(CallInlinerTest, CallToOutfeedComputationIsInlined) {
 }
 
 TEST_F(CallInlinerTest, InlineSingleUseCalleesOnly) {
-  const absl::string_view hlo_string = R"(
+  const abslx::string_view hlo_string = R"(
   HloModule inline_module
 
   a {

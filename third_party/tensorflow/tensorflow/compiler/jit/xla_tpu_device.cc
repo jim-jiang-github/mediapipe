@@ -324,7 +324,7 @@ Status TpuNodeDeviceFactory::ListPhysicalDevices(std::vector<string>* devices) {
   int device_count = platform->VisibleDeviceCount();
 
   for (int i = 0; i < device_count; ++i) {
-    const string device_name = absl::StrCat("/physical_device:TPU:", i);
+    const string device_name = abslx::StrCat("/physical_device:TPU:", i);
     devices->push_back(device_name);
   }
 
@@ -444,9 +444,9 @@ Status TpuSystemDeviceFactory::CreateDevices(
 
   // Creates a device that represents a TPU distributed system.
   const DeviceAttributes attrs = Device::BuildDeviceAttributes(
-      absl::StrCat(name_prefix, "/device:", DEVICE_TPU_SYSTEM, ":", 0),
+      abslx::StrCat(name_prefix, "/device:", DEVICE_TPU_SYSTEM, ":", 0),
       DeviceType(DEVICE_TPU_SYSTEM), Bytes(memory_limit), DeviceLocality(),
-      absl::StrCat("device: ", DEVICE_TPU_SYSTEM, " device"));
+      abslx::StrCat("device: ", DEVICE_TPU_SYSTEM, " device"));
   devices->push_back(std::make_unique<VirtualDevice>(options.env, attrs));
   VLOG(1) << "Created TPU_SYSTEM device. This host has " << device_count
           << " TPUs";

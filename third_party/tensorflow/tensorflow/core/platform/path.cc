@@ -275,10 +275,10 @@ int64_t UniqueId() {
   return ++id;
 }
 
-string CommonPathPrefix(absl::Span<const string> paths) {
+string CommonPathPrefix(abslx::Span<const string> paths) {
   if (paths.empty()) return "";
   size_t min_filename_size =
-      absl::c_min_element(paths, [](const string& a, const string& b) {
+      abslx::c_min_element(paths, [](const string& a, const string& b) {
         return a.size() < b.size();
       })->size();
   if (min_filename_size == 0) return "";
@@ -296,12 +296,12 @@ string CommonPathPrefix(absl::Span<const string> paths) {
     return min_filename_size;
   }();
 
-  size_t rpos = absl::string_view(paths[0])
+  size_t rpos = abslx::string_view(paths[0])
                     .substr(0, common_prefix_size)
                     .rfind(internal::kPathSep);
   return rpos == std::string::npos
              ? ""
-             : std::string(absl::string_view(paths[0]).substr(0, rpos + 1));
+             : std::string(abslx::string_view(paths[0]).substr(0, rpos + 1));
 }
 
 string GetTempFilename(const string& extension) {

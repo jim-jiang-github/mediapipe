@@ -379,7 +379,7 @@ auto AllOf(const detail::AllOfPattern<Item, InnerPs...>& inner_p,
                                 InnerPs..., OuterPs...>(inner_ps...,
                                                         outer_ps...);
   };
-  return absl::apply(make_all_of, std::tuple_cat(inner_p.patterns(),
+  return abslx::apply(make_all_of, std::tuple_cat(inner_p.patterns(),
                                                  std::make_tuple(outer_ps...)));
 }
 
@@ -590,7 +590,7 @@ class AnyOfPattern {
       std::get<index>(patterns_).DescribeTo(option.explain_os, /*indent=*/3);
       EXPLAIN << "\nfailed with";
       EXPLAIN << "\n - ";
-      EXPLAIN << absl::StrReplaceAll(explanation->str(), {{"\n", "\n   "}});
+      EXPLAIN << abslx::StrReplaceAll(explanation->str(), {{"\n", "\n   "}});
     }
     return MatchRecursiveImpl(item, option,
                               std::integral_constant<size_t, index + 1>());
@@ -747,12 +747,12 @@ class ShapePatternElementTypeImpl {
 // list of dimensions.
 class ShapePatternDimsImpl {
  public:
-  explicit ShapePatternDimsImpl(absl::Span<const int64_t> dims)
+  explicit ShapePatternDimsImpl(abslx::Span<const int64_t> dims)
       : dims_(dims.begin(), dims.end()) {}
 
   bool Match(const ::xla::Shape* shape, MatchOption option) const {
     if (shape->dimensions() != dims_) {
-      EXPLAIN << "Shape does not have dimensions [" << absl::StrJoin(dims_, ",")
+      EXPLAIN << "Shape does not have dimensions [" << abslx::StrJoin(dims_, ",")
               << "]";
       return false;
     }
@@ -760,11 +760,11 @@ class ShapePatternDimsImpl {
   }
 
   void DescribeTo(std::ostream* os, int64_t indent = 0) const {
-    *os << "with dimensions [" << absl::StrJoin(dims_, ",") << "]";
+    *os << "with dimensions [" << abslx::StrJoin(dims_, ",") << "]";
   }
 
  private:
-  absl::InlinedVector<int64_t, 8> dims_;
+  abslx::InlinedVector<int64_t, 8> dims_;
 };
 
 // A ShapePattern implementation that matches only if the shape is scalar.
@@ -1021,7 +1021,7 @@ class ShapePattern {
     return AppendImpl(ShapePatternElementTypeImpl(element_type));
   }
 
-  constexpr auto WithDims(absl::Span<const int64_t> dims) const {
+  constexpr auto WithDims(abslx::Span<const int64_t> dims) const {
     return AppendImpl(ShapePatternDimsImpl(dims));
   }
 
@@ -1164,7 +1164,7 @@ class HloInstructionPatternBaseImpl {
 // has a given name.
 class HloInstructionPatternNameImpl {
  public:
-  explicit HloInstructionPatternNameImpl(absl::string_view name)
+  explicit HloInstructionPatternNameImpl(abslx::string_view name)
       : name_(name) {}
 
   bool Match(const ::xla::HloInstruction* inst, MatchOption option) const {
@@ -1180,7 +1180,7 @@ class HloInstructionPatternNameImpl {
   }
 
  private:
-  absl::string_view name_;
+  abslx::string_view name_;
 };
 
 // An HloInstructionPattern implementation that matches only if the instruction
@@ -1250,20 +1250,20 @@ class HloInstructionPatternOpcodeImpl {
 class HloInstructionCustomCallTargetImpl {
  public:
   explicit HloInstructionCustomCallTargetImpl(
-      absl::Span<const absl::string_view> custom_call_targets)
+      abslx::Span<const abslx::string_view> custom_call_targets)
       : custom_call_targets_(custom_call_targets.begin(),
                              custom_call_targets.end()) {}
 
   bool Match(const ::xla::HloInstruction* inst, MatchOption option) const {
     if (inst->opcode() != HloOpcode::kCustomCall ||
-        !absl::c_linear_search(custom_call_targets_,
+        !abslx::c_linear_search(custom_call_targets_,
                                inst->custom_call_target())) {
       if (custom_call_targets_.size() == 1) {
         EXPLAIN << "HloInstruction is not a custom call with a target '"
                 << custom_call_targets_.front() << "'";
       } else {
         EXPLAIN << "HloInstruction is not a custom call with a target in {"
-                << absl::StrJoin(custom_call_targets_, ", ") << "}";
+                << abslx::StrJoin(custom_call_targets_, ", ") << "}";
       }
       return false;
     }
@@ -1275,12 +1275,12 @@ class HloInstructionCustomCallTargetImpl {
       *os << "custom call with target '" << custom_call_targets_.front() << "'";
     } else {
       *os << "custom call with target in {"
-          << absl::StrJoin(custom_call_targets_, ", ") << "}";
+          << abslx::StrJoin(custom_call_targets_, ", ") << "}";
     }
   }
 
  private:
-  absl::InlinedVector<std::string, 1> custom_call_targets_;
+  abslx::InlinedVector<std::string, 1> custom_call_targets_;
 };
 
 // An HloInstructionPattern implementation that matches only if the instruction
@@ -1541,7 +1541,7 @@ class HloInstructionPatternBinaryOperandsAnyOrderImpl {
         }
         EXPLAIN << "\ndoes not match " << (i == 0 ? "LHS" : "RHS") << ":\n";
         EXPLAIN << " - ";
-        EXPLAIN << absl::StrReplaceAll(
+        EXPLAIN << abslx::StrReplaceAll(
             explanations[matcher_idx][/*operand*/ i].str(), {{"\n", "\n   "}});
       }
     };
@@ -1722,7 +1722,7 @@ class HloInstructionPatternOneUseImpl
       return false;
     }
 
-    int64_t use_count = absl::c_count_if(
+    int64_t use_count = abslx::c_count_if(
         inst->users()[0]->operands(),
         [&](const HloInstruction* operand) { return operand == inst; });
     if (use_count != 1) {
@@ -1915,7 +1915,7 @@ class HloInstructionPattern {
   }
 
   // Modifies the pattern to match only if the instruction has the given name.
-  auto WithName(absl::string_view name) const {
+  auto WithName(abslx::string_view name) const {
     return AppendImpl(HloInstructionPatternNameImpl(name));
   }
 
@@ -1925,13 +1925,13 @@ class HloInstructionPattern {
   }
 
   // Modifies the pattern to match only the custom call with a given target.
-  auto WithCustomCallTarget(absl::string_view custom_call_target) const {
+  auto WithCustomCallTarget(abslx::string_view custom_call_target) const {
     return AppendImpl(HloInstructionCustomCallTargetImpl({custom_call_target}));
   }
 
   // Modifies the pattern to match a custom call with one of the given targets.
   auto WithCustomCallTarget(
-      absl::Span<const absl::string_view> custom_call_targets) const {
+      abslx::Span<const abslx::string_view> custom_call_targets) const {
     return AppendImpl(HloInstructionCustomCallTargetImpl(custom_call_targets));
   }
 
@@ -1994,7 +1994,7 @@ class HloInstructionPattern {
   // effectivley checking shape-compatible-to, not shape-equal-to.  Perhaps this
   // function should be called WithShapeCompatibleTo, but the short name is
   // nice, and there's no ambiguity because there's no layout in the args!
-  constexpr auto WithShape(PrimitiveType ty, absl::Span<const int64_t> dims) {
+  constexpr auto WithShape(PrimitiveType ty, abslx::Span<const int64_t> dims) {
     return WithShape(Shape().WithElementType(ty).WithDims(dims));
   }
 
@@ -2342,7 +2342,7 @@ auto CustomCall(HloInstructionType** matched_inst) {
 template <
     typename Arg0, typename... Args,
     typename std::enable_if<
-        !std::is_convertible<Arg0, absl::string_view>::value &&
+        !std::is_convertible<Arg0, abslx::string_view>::value &&
         !std::is_convertible<Arg0, HloInstruction**>::value &&
         !std::is_convertible<Arg0, const HloInstruction**>::value>::type* =
         nullptr>
@@ -2352,14 +2352,14 @@ auto CustomCall(Arg0&& arg0, Args&&... args) {
                               std::forward<Args>(args)...);
 }
 template <typename... Args>
-auto CustomCall(absl::string_view custom_call_target, Args&&... args) {
+auto CustomCall(abslx::string_view custom_call_target, Args&&... args) {
   return CustomCall(std::forward<Args>(args)...)
       .WithCustomCallTarget(custom_call_target);
 }
 
 template <typename HloInstructionType, typename Arg0, typename... Args,
           typename std::enable_if<!std::is_convertible<
-              Arg0, absl::string_view>::value>::type* = nullptr>
+              Arg0, abslx::string_view>::value>::type* = nullptr>
 auto CustomCall(HloInstructionType** matched_inst, Arg0&& arg0,
                 Args&&... args) {
   return detail::WithOperands(
@@ -2368,7 +2368,7 @@ auto CustomCall(HloInstructionType** matched_inst, Arg0&& arg0,
 }
 template <typename HloInstructionType, typename... Args>
 auto CustomCall(HloInstructionType** matched_inst,
-                absl::string_view custom_call_target, Args&&... args) {
+                abslx::string_view custom_call_target, Args&&... args) {
   return CustomCall(matched_inst, std::forward<Args>(args)...)
       .WithCustomCallTarget(custom_call_target);
 }

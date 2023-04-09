@@ -64,7 +64,7 @@ class OpenCvProcessor : public ImageToTensorConverter {
     }
   }
 
-  absl::Status Convert(const mediapipe::Image& input, const RotatedRect& roi,
+  abslx::Status Convert(const mediapipe::Image& input, const RotatedRect& roi,
                        float range_min, float range_max,
                        int tensor_buffer_offset,
                        Tensor& output_tensor) override {
@@ -73,7 +73,7 @@ class OpenCvProcessor : public ImageToTensorConverter {
         input.image_format() == mediapipe::ImageFormat::SRGBA ||
         input.image_format() == mediapipe::ImageFormat::GRAY8;
     if (!is_supported_format) {
-      return InvalidArgumentError(absl::StrCat(
+      return InvalidArgumentError(abslx::StrCat(
           "Unsupported format: ", static_cast<uint32_t>(input.image_format())));
     }
 
@@ -122,7 +122,7 @@ class OpenCvProcessor : public ImageToTensorConverter {
         break;
       default:
         return InvalidArgumentError(
-            absl::StrCat("Unsupported tensor type: ", tensor_type_));
+            abslx::StrCat("Unsupported tensor type: ", tensor_type_));
     }
 
     const cv::RotatedRect rotated_rect(cv::Point2f(roi.center_x, roi.center_y),
@@ -164,18 +164,18 @@ class OpenCvProcessor : public ImageToTensorConverter {
                                     range_min, range_max));
     transformed.convertTo(dst, dst_data_type, transform.scale,
                           transform.offset);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
-  absl::Status ValidateTensorShape(const Tensor::Shape& output_shape) {
+  abslx::Status ValidateTensorShape(const Tensor::Shape& output_shape) {
     RET_CHECK_EQ(output_shape.dims.size(), 4)
         << "Wrong output dims size: " << output_shape.dims.size();
     RET_CHECK_GE(output_shape.dims[0], 1)
         << "The batch dimension needs to be equal or larger than 1.";
     RET_CHECK(output_shape.dims[3] == 3 || output_shape.dims[3] == 1)
         << "Wrong output channel: " << output_shape.dims[3];
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   enum cv::BorderTypes border_mode_;
@@ -186,17 +186,17 @@ class OpenCvProcessor : public ImageToTensorConverter {
 
 }  // namespace
 
-absl::StatusOr<std::unique_ptr<ImageToTensorConverter>> CreateOpenCvConverter(
+abslx::StatusOr<std::unique_ptr<ImageToTensorConverter>> CreateOpenCvConverter(
     CalculatorContext* cc, BorderMode border_mode,
     Tensor::ElementType tensor_type) {
   if (tensor_type != Tensor::ElementType::kInt8 &&
       tensor_type != Tensor::ElementType::kFloat32 &&
       tensor_type != Tensor::ElementType::kUInt8) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "Tensor type is currently not supported by OpenCvProcessor, type: ",
         tensor_type));
   }
-  return absl::make_unique<OpenCvProcessor>(border_mode, tensor_type);
+  return abslx::make_unique<OpenCvProcessor>(border_mode, tensor_type);
 }
 
 }  // namespace mediapipe

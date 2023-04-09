@@ -22,7 +22,7 @@
 #include "absl/base/internal/raw_logging.h"
 #include "absl/synchronization/mutex.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 
@@ -70,9 +70,9 @@ class CordzHandle {
   // Global queue data. CordzHandle stores a pointer to the global queue
   // instance to harden against ODR violations.
   struct Queue {
-    constexpr explicit Queue(absl::ConstInitType) : mutex(absl::kConstInit) {}
+    constexpr explicit Queue(abslx::ConstInitType) : mutex(abslx::kConstInit) {}
 
-    absl::Mutex mutex;
+    abslx::Mutex mutex;
     std::atomic<CordzHandle*> dq_tail ABSL_GUARDED_BY(mutex){nullptr};
 
     // Returns true if this delete queue is empty. This method does not acquire
@@ -112,6 +112,6 @@ class CordzSnapshot : public CordzHandle {
 
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_CORDZ_HANDLE_H_

@@ -22,7 +22,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status OneHotTest(TestExecutionEnvironment* env) {
+abslx::Status OneHotTest(TestExecutionEnvironment* env) {
   tflite::gpu::Tensor<BHWC, DataType::INT32> src_tensor;
   src_tensor.shape = BHWC(1, 1, 1, 1);
   src_tensor.data = {3};
@@ -48,10 +48,10 @@ absl::Status OneHotTest(TestExecutionEnvironment* env) {
           PointWiseNear({0, 0, 0, 1.0, 0, 0, 0, 0}, dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status OneHotBatchTest(TestExecutionEnvironment* env) {
+abslx::Status OneHotBatchTest(TestExecutionEnvironment* env) {
   tflite::gpu::Tensor<BHWC, DataType::INT32> src_tensor;
   src_tensor.shape = BHWC(10, 1, 1, 1);
   src_tensor.data = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -80,7 +80,7 @@ absl::Status OneHotBatchTest(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear(expected, dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

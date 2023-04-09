@@ -72,12 +72,12 @@ TEST(CRC, Mask) {
 
 #if defined(PLATFORM_GOOGLE)
 TEST(CRC, ValuesWithCord) {
-  ASSERT_NE(Value(absl::Cord("a")), Value(absl::Cord("foo")));
+  ASSERT_NE(Value(abslx::Cord("a")), Value(abslx::Cord("foo")));
 }
 
 TEST(CRC, ExtendWithCord) {
-  ASSERT_EQ(Value(absl::Cord("hello world")),
-            Extend(Value(absl::Cord("hello ")), absl::Cord("world")));
+  ASSERT_EQ(Value(abslx::Cord("hello world")),
+            Extend(Value(abslx::Cord("hello ")), abslx::Cord("world")));
 }
 #endif
 

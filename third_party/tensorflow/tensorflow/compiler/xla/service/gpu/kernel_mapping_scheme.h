@@ -68,22 +68,22 @@ class TilingScheme {
   }
 
   std::string ToString() const {
-    return absl::StrJoin(
-        {absl::StrFormat("dims_in_elems = {%s}",
-                         absl::StrJoin(dims_in_elems_, ", ")),
-         absl::StrFormat("tile_sizes = {%s}", absl::StrJoin(tile_sizes_, ", ")),
-         absl::StrFormat("num_threads = {%s}",
-                         absl::StrJoin(num_threads_, ", ")),
-         absl::StrFormat("indexing_order = %s",
+    return abslx::StrJoin(
+        {abslx::StrFormat("dims_in_elems = {%s}",
+                         abslx::StrJoin(dims_in_elems_, ", ")),
+         abslx::StrFormat("tile_sizes = {%s}", abslx::StrJoin(tile_sizes_, ", ")),
+         abslx::StrFormat("num_threads = {%s}",
+                         abslx::StrJoin(num_threads_, ", ")),
+         abslx::StrFormat("indexing_order = %s",
                          IndexingOrderToString(indexing_order_)),
-         absl::StrFormat("vector_size = %d", vector_size_),
-         absl::StrFormat("thread_id_virtual_scaling = %d",
+         abslx::StrFormat("vector_size = %d", vector_size_),
+         abslx::StrFormat("thread_id_virtual_scaling = %d",
                          thread_id_virtual_scaling_)},
         ", ");
   }
 
   // Number of elements in each dimension (Z/Y/X respectively).
-  absl::Span<const int64_t> GetDimsInElems() const { return dims_in_elems_; }
+  abslx::Span<const int64_t> GetDimsInElems() const { return dims_in_elems_; }
 
   Vector3 GetDimsInBlocks() const {
     return {GetDimInBlock(0), GetDimInBlock(1), GetDimInBlock(2)};
@@ -228,10 +228,10 @@ class ReductionCodegenState {
   ReductionCodegenInfo reduction_codegen_info_;
 
   // One state per reduction operand.
-  using ReductionOpState = absl::InlinedVector<ReductionCalculationState, 2>;
+  using ReductionOpState = abslx::InlinedVector<ReductionCalculationState, 2>;
 
   // HloInstruction -> operand_idx -> cache
-  absl::flat_hash_map<const HloInstruction*, ReductionOpState> state_;
+  abslx::flat_hash_map<const HloInstruction*, ReductionOpState> state_;
 };
 
 }  // end namespace gpu

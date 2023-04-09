@@ -116,7 +116,7 @@ Status RecordWriter::WriteRecord(StringPiece data) {
 }
 
 #if defined(TF_CORD_SUPPORT)
-Status RecordWriter::WriteRecord(const absl::Cord& data) {
+Status RecordWriter::WriteRecord(const abslx::Cord& data) {
   if (dest_ == nullptr) {
     return Status(::tensorflow::error::FAILED_PRECONDITION,
                   "Writer not initialized or previously closed");

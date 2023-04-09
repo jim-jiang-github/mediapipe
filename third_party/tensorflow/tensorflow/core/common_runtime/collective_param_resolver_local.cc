@@ -98,7 +98,7 @@ struct RankFormatter {
 };
 
 Status CheckUserSpecifiedRanks(const std::vector<CollGroupMember> members) {
-  absl::flat_hash_set<int> user_ranks = {};
+  abslx::flat_hash_set<int> user_ranks = {};
   bool at_least_one_member_with_no_rank = false;
   bool at_least_one_member_with_user_rank = false;
   for (const auto& m : members) {
@@ -110,7 +110,7 @@ Status CheckUserSpecifiedRanks(const std::vector<CollGroupMember> members) {
     }
   }
 
-  auto received_ranks = absl::StrJoin(members, ",", RankFormatter());
+  auto received_ranks = abslx::StrJoin(members, ",", RankFormatter());
   if (at_least_one_member_with_no_rank && at_least_one_member_with_user_rank) {
     return errors::InvalidArgument(
         "Only part of the group members have user given rank specified.",

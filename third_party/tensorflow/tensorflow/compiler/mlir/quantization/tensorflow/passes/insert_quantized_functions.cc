@@ -95,7 +95,7 @@ class InsertQuantizedFunctionsPass
 
 llvm::StringRef InsertQuantizedFunctionsPass::GetFunctionLibrary(
     QuantizationMethod quantization_method, OpSet op_set) {
-  absl::flat_hash_map<OpSet, llvm::StringRef> function_library_map;
+  abslx::flat_hash_map<OpSet, llvm::StringRef> function_library_map;
   if (quantization_method == QuantizationMethod::kDynamicRangeQuantization) {
     function_library_map = {
         {OpSet::UNIFORM_QUANTIZED,

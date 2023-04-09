@@ -37,25 +37,25 @@ class ThreadSafePjRtChunkQueue {
  public:
   // Push a PjRtChunk into the queue.
   void Push(PjRtChunk chunk) {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     queue_.push_back(std::move(chunk));
   }
 
   // Pop a PjRtChunk from the queue. This method blocks if the queue is empty.
   PjRtChunk Pop() {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     auto cond = [this]() {
       mu_.AssertHeld();
       return !queue_.empty();
     };
-    mu_.Await(absl::Condition(&cond));
+    mu_.Await(abslx::Condition(&cond));
     auto chunk = std::move(queue_.front());
     queue_.pop_front();
     return chunk;
   }
 
  private:
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   std::deque<PjRtChunk> queue_ ABSL_GUARDED_BY(mu_);
 };
 

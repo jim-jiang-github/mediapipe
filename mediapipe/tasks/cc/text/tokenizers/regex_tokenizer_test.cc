@@ -40,7 +40,7 @@ constexpr char kRegex[] = "[^\\w\\']+";
 
 TEST(RegexTokenizerTest, TestTokenize) {
   auto tokenizer =
-      absl::make_unique<RegexTokenizer>(kRegex, kTestRegexVocabPath);
+      abslx::make_unique<RegexTokenizer>(kRegex, kTestRegexVocabPath);
   auto results = tokenizer->Tokenize("good    morning, i'm your teacher.\n");
   EXPECT_THAT(results.subwords,
               ElementsAre("good", "morning", "i'm", "your", "teacher"));
@@ -49,7 +49,7 @@ TEST(RegexTokenizerTest, TestTokenize) {
 TEST(RegexTokenizerTest, TestTokenizeFromFileBuffer) {
   std::string buffer = LoadBinaryContent(kTestRegexVocabPath);
   auto tokenizer =
-      absl::make_unique<RegexTokenizer>(kRegex, buffer.data(), buffer.size());
+      abslx::make_unique<RegexTokenizer>(kRegex, buffer.data(), buffer.size());
   auto results = tokenizer->Tokenize("good    morning, i'm your teacher.\n");
   EXPECT_THAT(results.subwords,
               ElementsAre("good", "morning", "i'm", "your", "teacher"));
@@ -57,7 +57,7 @@ TEST(RegexTokenizerTest, TestTokenizeFromFileBuffer) {
 
 TEST(RegexTokenizerTest, TestLookupId) {
   auto tokenizer =
-      absl::make_unique<RegexTokenizer>(kRegex, kTestRegexVocabPath);
+      abslx::make_unique<RegexTokenizer>(kRegex, kTestRegexVocabPath);
   std::vector<std::string> subwords = {"good", "morning", "i'm", "your",
                                        "teacher"};
   std::vector<int> true_ids = {52, 1972, 146, 129, 1750};
@@ -70,11 +70,11 @@ TEST(RegexTokenizerTest, TestLookupId) {
 
 TEST(RegexTokenizerTest, TestLookupWord) {
   auto tokenizer =
-      absl::make_unique<RegexTokenizer>(kRegex, kTestRegexVocabPath);
+      abslx::make_unique<RegexTokenizer>(kRegex, kTestRegexVocabPath);
   std::vector<int> ids = {52, 1972, 146, 129, 1750};
   std::vector<std::string> subwords = {"good", "morning", "i'm", "your",
                                        "teacher"};
-  absl::string_view result;
+  abslx::string_view result;
   for (int i = 0; i < ids.size(); i++) {
     ASSERT_TRUE(tokenizer->LookupWord(ids[i], &result));
     ASSERT_EQ(result, subwords[i]);
@@ -87,7 +87,7 @@ TEST(RegexTokenizerTest, TestGetSpecialTokens) {
   // <START> 1
   // <UNKNOWN> 2
   auto tokenizer =
-      absl::make_unique<RegexTokenizer>(kRegex, kTestRegexVocabPath);
+      abslx::make_unique<RegexTokenizer>(kRegex, kTestRegexVocabPath);
 
   int start_token;
   ASSERT_TRUE(tokenizer->GetStartToken(&start_token));
@@ -104,7 +104,7 @@ TEST(RegexTokenizerTest, TestGetSpecialTokens) {
 
 TEST(RegexTokenizerTest, TestGetSpecialTokensFailure) {
   auto tokenizer =
-      absl::make_unique<RegexTokenizer>(kRegex, kTestRegexEmptyVocabPath);
+      abslx::make_unique<RegexTokenizer>(kRegex, kTestRegexEmptyVocabPath);
 
   int start_token;
   ASSERT_FALSE(tokenizer->GetStartToken(&start_token));

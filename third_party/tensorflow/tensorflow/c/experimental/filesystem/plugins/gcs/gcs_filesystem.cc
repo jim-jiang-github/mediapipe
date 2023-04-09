@@ -127,7 +127,7 @@ static int64_t LoadBufferFromGCS(const std::string& path, size_t offset,
     // GCS will return an empty header (e.g no `content-length` header). In this
     // case, we will set read to `0` and continue.
     read = 0;
-  } else if (!absl::SimpleAtoi(content_length->second, &read)) {
+  } else if (!abslx::SimpleAtoi(content_length->second, &read)) {
     TF_SetStatus(status, TF_UNKNOWN, "Could not get content-length header");
     return -1;
   }
@@ -143,7 +143,7 @@ static int64_t LoadBufferFromGCS(const std::string& path, size_t offset,
     if (gcs_file->stat_cache->Lookup(path, &stat)) {
       if (offset + read < stat.base.length) {
         TF_SetStatus(status, TF_INTERNAL,
-                     absl::StrCat("File contents are inconsistent for file: ",
+                     abslx::StrCat("File contents are inconsistent for file: ",
                                   path, " @ ", offset)
                          .c_str());
       }
@@ -165,7 +165,7 @@ typedef struct GCSFile {
   const bool is_cache_enable;
   const uint64_t buffer_size;
   ReadFn read_fn;
-  absl::Mutex buffer_mutex;
+  abslx::Mutex buffer_mutex;
   uint64_t buffer_start ABSL_GUARDED_BY(buffer_mutex);
   bool buffer_end_is_past_eof ABSL_GUARDED_BY(buffer_mutex);
   std::string buffer ABSL_GUARDED_BY(buffer_mutex);
@@ -195,7 +195,7 @@ int64_t Read(const TF_RandomAccessFile* file, uint64_t offset, size_t n,
   if (gcs_file->is_cache_enable || n > gcs_file->buffer_size) {
     return gcs_file->read_fn(gcs_file->path, offset, n, buffer, status);
   } else {
-    absl::MutexLock l(&gcs_file->buffer_mutex);
+    abslx::MutexLock l(&gcs_file->buffer_mutex);
     size_t buffer_end = gcs_file->buffer_start + gcs_file->buffer.size();
     size_t copy_size = 0;
     if (offset < buffer_end && gcs_file->buffer_start) {
@@ -438,15 +438,15 @@ GCSFile::GCSFile(google::cloud::storage::Client&& gcs_client)
   // Apply the overrides for the block size (MB), max bytes (MB), and max
   // staleness (seconds) if provided.
   const char* block_size_env = std::getenv(kBlockSize);
-  if (block_size_env && absl::SimpleAtoi(block_size_env, &value)) {
+  if (block_size_env && abslx::SimpleAtoi(block_size_env, &value)) {
     block_size = value * 1024 * 1024;
   }
   const char* max_bytes_env = std::getenv(kMaxCacheSize);
-  if (max_bytes_env && absl::SimpleAtoi(max_bytes_env, &value)) {
+  if (max_bytes_env && abslx::SimpleAtoi(max_bytes_env, &value)) {
     max_bytes = static_cast<size_t>(value * 1024 * 1024);
   }
   const char* max_staleness_env = std::getenv(kMaxStaleness);
-  if (max_staleness_env && absl::SimpleAtoi(max_staleness_env, &value)) {
+  if (max_staleness_env && abslx::SimpleAtoi(max_staleness_env, &value)) {
     max_staleness = value;
   }
   TF_VLog(1, "GCS cache max size = %u ; block size = %u ; max staleness = %u",
@@ -464,12 +464,12 @@ GCSFile::GCSFile(google::cloud::storage::Client&& gcs_client)
   size_t stat_cache_max_entries = kStatCacheDefaultMaxEntries;
   const char* stat_cache_max_age_env = std::getenv(kStatCacheMaxAge);
   if (stat_cache_max_age_env &&
-      absl::SimpleAtoi(stat_cache_max_age_env, &value)) {
+      abslx::SimpleAtoi(stat_cache_max_age_env, &value)) {
     stat_cache_max_age = value;
   }
   const char* stat_cache_max_entries_env = std::getenv(kStatCacheMaxEntries);
   if (stat_cache_max_entries_env &&
-      absl::SimpleAtoi(stat_cache_max_entries_env, &value)) {
+      abslx::SimpleAtoi(stat_cache_max_entries_env, &value)) {
     stat_cache_max_entries = static_cast<size_t>(value);
   }
   stat_cache = std::make_unique<ExpiringLRUCache<GcsFileStat>>(
@@ -556,7 +556,7 @@ void NewRandomAccessFile(const TF_Filesystem* filesystem, const char* path,
   auto gcs_file = static_cast<GCSFile*>(filesystem->plugin_filesystem);
   bool is_cache_enabled;
   {
-    absl::MutexLock l(&gcs_file->block_cache_lock);
+    abslx::MutexLock l(&gcs_file->block_cache_lock);
     is_cache_enabled = gcs_file->file_block_cache->IsCacheEnabled();
   }
   auto read_fn = [gcs_file, is_cache_enabled, bucket, object](
@@ -564,7 +564,7 @@ void NewRandomAccessFile(const TF_Filesystem* filesystem, const char* path,
                      char* buffer, TF_Status* status) -> int64_t {
     int64_t read = 0;
     if (is_cache_enabled) {
-      absl::ReaderMutexLock l(&gcs_file->block_cache_lock);
+      abslx::ReaderMutexLock l(&gcs_file->block_cache_lock);
       GcsFileStat stat;
       gcs_file->stat_cache->LookupOrCompute(
           path, &stat,
@@ -707,7 +707,7 @@ static void StatForObject(GCSFile* gcs_file, const std::string& path,
   if (object.empty())
     return TF_SetStatus(
         status, TF_INVALID_ARGUMENT,
-        absl::StrCat("'object' must be a non-empty string. (File: ", path, ")")
+        abslx::StrCat("'object' must be a non-empty string. (File: ", path, ")")
             .c_str());
   TF_SetStatus(status, TF_OK, "");
   gcs_file->stat_cache->LookupOrCompute(
@@ -771,13 +771,13 @@ static std::vector<std::string> GetChildrenBounded(
       return result;
     }
     auto value = *std::move(item);
-    std::string children = absl::holds_alternative<std::string>(value)
-                               ? absl::get<std::string>(value)
-                               : absl::get<gcs::ObjectMetadata>(value).name();
+    std::string children = abslx::holds_alternative<std::string>(value)
+                               ? abslx::get<std::string>(value)
+                               : abslx::get<gcs::ObjectMetadata>(value).name();
     auto pos = children.find(prefix);
     if (pos != 0) {
       TF_SetStatus(status, TF_INTERNAL,
-                   absl::StrCat("Unexpected response: the returned file name ",
+                   abslx::StrCat("Unexpected response: the returned file name ",
                                 children, " doesn't match the prefix ", prefix)
                        .c_str());
       return result;
@@ -819,7 +819,7 @@ static bool FolderExists(GCSFile* gcs_file, std::string dir,
 }
 
 static void ClearFileCaches(GCSFile* gcs_file, const std::string& path) {
-  absl::ReaderMutexLock l(&gcs_file->block_cache_lock);
+  abslx::ReaderMutexLock l(&gcs_file->block_cache_lock);
   gcs_file->file_block_cache->RemoveFile(path);
   gcs_file->stat_cache->Delete(path);
 }
@@ -845,7 +845,7 @@ void PathExists(const TF_Filesystem* filesystem, const char* path,
     return;
   return TF_SetStatus(
       status, TF_NOT_FOUND,
-      absl::StrCat("The path ", path, " does not exist.").c_str());
+      abslx::StrCat("The path ", path, " does not exist.").c_str());
 }
 
 void CreateDir(const TF_Filesystem* filesystem, const char* path,
@@ -865,7 +865,7 @@ void CreateDir(const TF_Filesystem* filesystem, const char* path,
     if (TF_GetCode(status) != TF_OK) return;
     if (!is_directory)
       TF_SetStatus(status, TF_NOT_FOUND,
-                   absl::StrCat("The specified bucket ", dir, " was not found.")
+                   abslx::StrCat("The specified bucket ", dir, " was not found.")
                        .c_str());
     return;
   }
@@ -957,7 +957,7 @@ bool IsDirectory(const TF_Filesystem* filesystem, const char* path,
     if (!result)
       TF_SetStatus(
           status, TF_NOT_FOUND,
-          absl::StrCat("The specified bucket gs://", bucket, " was not found.")
+          abslx::StrCat("The specified bucket gs://", bucket, " was not found.")
               .c_str());
     return result;
   }
@@ -971,12 +971,12 @@ bool IsDirectory(const TF_Filesystem* filesystem, const char* path,
   if (is_object) {
     TF_SetStatus(
         status, TF_FAILED_PRECONDITION,
-        absl::StrCat("The specified path ", path, " is not a directory.")
+        abslx::StrCat("The specified path ", path, " is not a directory.")
             .c_str());
     return false;
   }
   TF_SetStatus(status, TF_NOT_FOUND,
-               absl::StrCat("The path ", path, " does not exist.").c_str());
+               abslx::StrCat("The path ", path, " does not exist.").c_str());
   return false;
 }
 
@@ -1136,7 +1136,7 @@ static char* TranslateName(const TF_Filesystem* filesystem, const char* uri) {
 
 static void FlushCaches(const TF_Filesystem* filesystem) {
   auto gcs_file = static_cast<GCSFile*>(filesystem->plugin_filesystem);
-  absl::ReaderMutexLock l(&gcs_file->block_cache_lock);
+  abslx::ReaderMutexLock l(&gcs_file->block_cache_lock);
   gcs_file->file_block_cache->Flush();
   gcs_file->stat_cache->Clear();
 }

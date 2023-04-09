@@ -155,7 +155,7 @@ Status ConvertSavedModelToTFLiteFlatBuffer(const toco::ModelFlags& model_flags,
                                        saved_model_tags.end());
   auto exported_names_in_vector = std::vector<std::string>(
       saved_model_exported_names.begin(), saved_model_exported_names.end());
-  absl::Span<std::string> exported_names(exported_names_in_vector);
+  abslx::Span<std::string> exported_names(exported_names_in_vector);
 
   if (exported_names.empty()) {
     return errors::Unimplemented("Need at least one exported name.");
@@ -171,7 +171,7 @@ Status ConvertSavedModelToTFLiteFlatBuffer(const toco::ModelFlags& model_flags,
       auto module,
       ImportSavedModel(
           model_flags.saved_model_dir(), model_flags.saved_model_version(),
-          tags, absl::MakeSpan(custom_opdefs), exported_names, specs,
+          tags, abslx::MakeSpan(custom_opdefs), exported_names, specs,
           !toco_flags.enable_tflite_resource_variables(), &context, &bundle));
 
   if (!model_flags.input_arrays().empty() ||

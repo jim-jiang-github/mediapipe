@@ -296,7 +296,7 @@ StatusOr<FuncOp> HloFunctionImporter::ImportAsFunc(
   if (computation.root_instruction()->has_sharding()) {
     auto result = computation.root_instruction();
     if (function.getNumResults() != 1) {
-      return tensorflow::errors::Internal(absl::StrCat(
+      return tensorflow::errors::Internal(abslx::StrCat(
           "Expected only a single result but got ", function.getNumResults()));
     }
     function.setResultAttr(
@@ -1083,7 +1083,7 @@ StatusOr<mlir::Operation*> HloFunctionImporter::ImportInstructionImpl(
               .getOperation();
 
         default:
-          return tensorflow::errors::InvalidArgument(absl::StrCat(
+          return tensorflow::errors::InvalidArgument(abslx::StrCat(
               "Unsupported distribution: ",
               RandomDistributionToString(instruction->random_distribution())));
       }
@@ -1575,7 +1575,7 @@ StatusOr<llvm::SmallVector<mlir::Value, 4>> HloFunctionImporter::GetOperands(
     auto input_it = instruction_value_map_.find(operand);
     if (input_it == instruction_value_map_.end()) {
       return tensorflow::errors::Internal(
-          absl::StrCat("Could not find input value: ", operand->name(),
+          abslx::StrCat("Could not find input value: ", operand->name(),
                        " for instruction ", instruction->name()));
     }
     operands.push_back(input_it->second);
@@ -1601,7 +1601,7 @@ StatusOr<Value> HloFunctionImporter::GetMlirValue(
     return lookup->second;
   }
 
-  return tensorflow::errors::Internal(absl::StrCat(
+  return tensorflow::errors::Internal(abslx::StrCat(
       "Unable to find value for input: ", instruction->ToString()));
 }
 
@@ -1626,7 +1626,7 @@ mlir::NamedAttribute HloFunctionImporter::ConvertComparisonType(
 }
 
 mlir::DenseIntElementsAttr HloFunctionImporter::ConvertDimensions(
-    absl::Span<const int64_t> op_dimensions) {
+    abslx::Span<const int64_t> op_dimensions) {
   llvm::SmallVector<APInt, 8> dimensions;
   dimensions.reserve(op_dimensions.size());
   for (auto value : op_dimensions) dimensions.emplace_back(APInt(64, value));
@@ -1673,12 +1673,12 @@ mlir::NamedAttribute HloFunctionImporter::ConvertSourceTargetPairs(
 }
 
 mlir::NamedAttribute HloFunctionImporter::ConvertReplicaGroups(
-    absl::Span<const ReplicaGroup> replica_groups, mlir::Builder* builder) {
+    abslx::Span<const ReplicaGroup> replica_groups, mlir::Builder* builder) {
   const int64_t num_groups = replica_groups.size();
   // Replica groups in HLO can be non-uniform in size, for example:
   // replica_groups={{0},{1,2},{3}}. Since we are representing them as a 2D
   // tensor, pad the smaller sized replica groups with -1.
-  const int64_t group_size = absl::c_accumulate(
+  const int64_t group_size = abslx::c_accumulate(
       replica_groups, int64_t(0), [](int64_t current, const ReplicaGroup& g) {
         return std::max<int64_t>(current, g.replica_ids_size());
       });

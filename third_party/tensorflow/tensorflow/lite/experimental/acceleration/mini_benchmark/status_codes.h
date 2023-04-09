@@ -27,7 +27,7 @@ namespace acceleration {
 // This enum is used as a single source of truth for the possible error
 // conditions encountered. Layers can pass status codes upwards unchanged.
 //
-// (absl::Status and friends are not allowed in the TFLite codebase for version
+// (abslx::Status and friends are not allowed in the TFLite codebase for version
 // skew and binary size reasons).
 enum MinibenchmarkStatus {
   kMinibenchmarkUnknownStatus = 0,

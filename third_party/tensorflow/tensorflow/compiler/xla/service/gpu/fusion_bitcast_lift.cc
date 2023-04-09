@@ -55,7 +55,7 @@ static bool AreInstructionSupported(HloComputation* comp) {
     // If there is an instruction that change the layout, we do not do
     // anything.
     if (HloInstruction::IsOpElementwise(instr->opcode()) &&
-        !absl::c_all_of(instr->operands(), [&](HloInstruction* input) {
+        !abslx::c_all_of(instr->operands(), [&](HloInstruction* input) {
           return ShapeUtil::EqualIgnoringElementType(input->shape(),
                                                      instr->shape());
         })) {
@@ -69,7 +69,7 @@ static bool AreInstructionSupported(HloComputation* comp) {
 
 StatusOr<bool> FusionBitcastLift::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   XLA_VLOG_LINES(2, "FusionBitcastLift::Run(), before:\n" + module->ToString());
   bool changed = false;
   for (HloComputation* comp :
@@ -132,7 +132,7 @@ StatusOr<bool> FusionBitcastLift::Run(
         // The set is used only as an optimization to search in the set.
         std::vector<HloInstruction*> stack(
             {cloned_fusion->fused_expression_root()});
-        absl::flat_hash_set<HloInstruction*> set(
+        abslx::flat_hash_set<HloInstruction*> set(
             {cloned_fusion->fused_expression_root()});
         bool clone_changed = false;
         while (!stack.empty()) {
@@ -145,7 +145,7 @@ StatusOr<bool> FusionBitcastLift::Run(
             set.insert(i->operands().begin(), i->operands().end());
             VLOG(3) << "kTuple: " << i->ToString();
           } else if (i->opcode() == HloOpcode::kParameter &&
-                     absl::c_all_of(i->users(), [](HloInstruction* u) {
+                     abslx::c_all_of(i->users(), [](HloInstruction* u) {
                        return u->opcode() == HloOpcode::kBitcast;
                      })) {
             VLOG(3) << "kParameter: " << i->ToString();
@@ -187,7 +187,7 @@ StatusOr<bool> FusionBitcastLift::Run(
             }
           } else if (i->opcode() == HloOpcode::kConstant &&
                      !i->users().empty() &&
-                     absl::c_all_of(i->users(), [](HloInstruction* u) {
+                     abslx::c_all_of(i->users(), [](HloInstruction* u) {
                        return u->opcode() == HloOpcode::kBitcast;
                      })) {
             // Handling this case is optional for correctness, but
@@ -203,7 +203,7 @@ StatusOr<bool> FusionBitcastLift::Run(
                      // must be handled manually as kConstant and
                      // kParameter.
                      !i->operands().empty() &&
-                     absl::c_all_of(i->users(), [](HloInstruction* u) {
+                     abslx::c_all_of(i->users(), [](HloInstruction* u) {
                        return u->opcode() == HloOpcode::kBitcast;
                      })) {
             VLOG(3) << "All User bitcast: " << i->ToString();

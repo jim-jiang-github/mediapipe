@@ -64,16 +64,16 @@ class GetVectorItemCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kIn, kIdx, kOut);
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     cc->SetOffset(mediapipe::TimestampDiff(0));
     auto& options = cc->Options<mediapipe::GetVectorItemCalculatorOptions>();
     RET_CHECK(kIdx(cc).IsConnected() || options.has_item_index());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     if (kIn(cc).IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     const std::vector<T>& items = kIn(cc).Get();
@@ -88,7 +88,7 @@ class GetVectorItemCalculator : public Node {
     } else if (options.has_item_index()) {
       idx = options.item_index();
     } else {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     RET_CHECK(idx >= 0);
@@ -98,7 +98,7 @@ class GetVectorItemCalculator : public Node {
       kOut(cc).Send(items[idx]);
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

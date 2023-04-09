@@ -22,7 +22,7 @@
 #include "absl/status/status.h"
 #include "absl/utility/utility.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 template <typename T>
@@ -36,7 +36,7 @@ template <typename T, typename U, typename = void>
 struct HasConversionOperatorToStatusOr : std::false_type {};
 
 template <typename T, typename U>
-void test(char (*)[sizeof(std::declval<U>().operator absl::StatusOr<T>())]);
+void test(char (*)[sizeof(std::declval<U>().operator abslx::StatusOr<T>())]);
 
 template <typename T, typename U>
 struct HasConversionOperatorToStatusOr<T, U, decltype(test<T, U>(0))>
@@ -45,7 +45,7 @@ struct HasConversionOperatorToStatusOr<T, U, decltype(test<T, U>(0))>
 // Detects whether `T` is constructible or convertible from `StatusOr<U>`.
 template <typename T, typename U>
 using IsConstructibleOrConvertibleFromStatusOr =
-    absl::disjunction<std::is_constructible<T, StatusOr<U>&>,
+    abslx::disjunction<std::is_constructible<T, StatusOr<U>&>,
                       std::is_constructible<T, const StatusOr<U>&>,
                       std::is_constructible<T, StatusOr<U>&&>,
                       std::is_constructible<T, const StatusOr<U>&&>,
@@ -58,7 +58,7 @@ using IsConstructibleOrConvertibleFromStatusOr =
 // `StatusOr<U>`.
 template <typename T, typename U>
 using IsConstructibleOrConvertibleOrAssignableFromStatusOr =
-    absl::disjunction<IsConstructibleOrConvertibleFromStatusOr<T, U>,
+    abslx::disjunction<IsConstructibleOrConvertibleFromStatusOr<T, U>,
                       std::is_assignable<T&, StatusOr<U>&>,
                       std::is_assignable<T&, const StatusOr<U>&>,
                       std::is_assignable<T&, StatusOr<U>&&>,
@@ -68,30 +68,30 @@ using IsConstructibleOrConvertibleOrAssignableFromStatusOr =
 // when `U` is `StatusOr<V>` and `T` is constructible or convertible from `V`.
 template <typename T, typename U>
 struct IsDirectInitializationAmbiguous
-    : public absl::conditional_t<
-          std::is_same<absl::remove_cv_t<absl::remove_reference_t<U>>,
+    : public abslx::conditional_t<
+          std::is_same<abslx::remove_cv_t<abslx::remove_reference_t<U>>,
                        U>::value,
           std::false_type,
           IsDirectInitializationAmbiguous<
-              T, absl::remove_cv_t<absl::remove_reference_t<U>>>> {};
+              T, abslx::remove_cv_t<abslx::remove_reference_t<U>>>> {};
 
 template <typename T, typename V>
-struct IsDirectInitializationAmbiguous<T, absl::StatusOr<V>>
+struct IsDirectInitializationAmbiguous<T, abslx::StatusOr<V>>
     : public IsConstructibleOrConvertibleFromStatusOr<T, V> {};
 
 // Checks against the constraints of the direction initialization, i.e. when
 // `StatusOr<T>::StatusOr(U&&)` should participate in overload resolution.
 template <typename T, typename U>
-using IsDirectInitializationValid = absl::disjunction<
+using IsDirectInitializationValid = abslx::disjunction<
     // Short circuits if T is basically U.
-    std::is_same<T, absl::remove_cv_t<absl::remove_reference_t<U>>>,
-    absl::negation<absl::disjunction<
-        std::is_same<absl::StatusOr<T>,
-                     absl::remove_cv_t<absl::remove_reference_t<U>>>,
-        std::is_same<absl::Status,
-                     absl::remove_cv_t<absl::remove_reference_t<U>>>,
-        std::is_same<absl::in_place_t,
-                     absl::remove_cv_t<absl::remove_reference_t<U>>>,
+    std::is_same<T, abslx::remove_cv_t<abslx::remove_reference_t<U>>>,
+    abslx::negation<abslx::disjunction<
+        std::is_same<abslx::StatusOr<T>,
+                     abslx::remove_cv_t<abslx::remove_reference_t<U>>>,
+        std::is_same<abslx::Status,
+                     abslx::remove_cv_t<abslx::remove_reference_t<U>>>,
+        std::is_same<abslx::in_place_t,
+                     abslx::remove_cv_t<abslx::remove_reference_t<U>>>,
         IsDirectInitializationAmbiguous<T, U>>>>;
 
 // This trait detects whether `StatusOr<T>::operator=(U&&)` is ambiguous, which
@@ -106,37 +106,37 @@ using IsDirectInitializationValid = absl::disjunction<
 //   s1 = s2;  // ambiguous, `s1 = s2.ValueOrDie()` or `s1 = bool(s2)`?
 template <typename T, typename U>
 struct IsForwardingAssignmentAmbiguous
-    : public absl::conditional_t<
-          std::is_same<absl::remove_cv_t<absl::remove_reference_t<U>>,
+    : public abslx::conditional_t<
+          std::is_same<abslx::remove_cv_t<abslx::remove_reference_t<U>>,
                        U>::value,
           std::false_type,
           IsForwardingAssignmentAmbiguous<
-              T, absl::remove_cv_t<absl::remove_reference_t<U>>>> {};
+              T, abslx::remove_cv_t<abslx::remove_reference_t<U>>>> {};
 
 template <typename T, typename U>
-struct IsForwardingAssignmentAmbiguous<T, absl::StatusOr<U>>
+struct IsForwardingAssignmentAmbiguous<T, abslx::StatusOr<U>>
     : public IsConstructibleOrConvertibleOrAssignableFromStatusOr<T, U> {};
 
 // Checks against the constraints of the forwarding assignment, i.e. whether
 // `StatusOr<T>::operator(U&&)` should participate in overload resolution.
 template <typename T, typename U>
-using IsForwardingAssignmentValid = absl::disjunction<
+using IsForwardingAssignmentValid = abslx::disjunction<
     // Short circuits if T is basically U.
-    std::is_same<T, absl::remove_cv_t<absl::remove_reference_t<U>>>,
-    absl::negation<absl::disjunction<
-        std::is_same<absl::StatusOr<T>,
-                     absl::remove_cv_t<absl::remove_reference_t<U>>>,
-        std::is_same<absl::Status,
-                     absl::remove_cv_t<absl::remove_reference_t<U>>>,
-        std::is_same<absl::in_place_t,
-                     absl::remove_cv_t<absl::remove_reference_t<U>>>,
+    std::is_same<T, abslx::remove_cv_t<abslx::remove_reference_t<U>>>,
+    abslx::negation<abslx::disjunction<
+        std::is_same<abslx::StatusOr<T>,
+                     abslx::remove_cv_t<abslx::remove_reference_t<U>>>,
+        std::is_same<abslx::Status,
+                     abslx::remove_cv_t<abslx::remove_reference_t<U>>>,
+        std::is_same<abslx::in_place_t,
+                     abslx::remove_cv_t<abslx::remove_reference_t<U>>>,
         IsForwardingAssignmentAmbiguous<T, U>>>>;
 
 class Helper {
  public:
   // Move type-agnostic error handling to the .cc.
   static void HandleInvalidStatusCtorArg(Status*);
-  ABSL_ATTRIBUTE_NORETURN static void Crash(const absl::Status& status);
+  ABSL_ATTRIBUTE_NORETURN static void Crash(const abslx::Status& status);
 };
 
 // Construct an instance of T in `p` through placement new, passing Args... to
@@ -197,7 +197,7 @@ class StatusOrData {
   }
 
   template <typename... Args>
-  explicit StatusOrData(absl::in_place_t, Args&&... args)
+  explicit StatusOrData(abslx::in_place_t, Args&&... args)
       : data_(std::forward<Args>(args)...) {
     MakeStatus();
   }
@@ -210,7 +210,7 @@ class StatusOrData {
   }
 
   template <typename U,
-            absl::enable_if_t<std::is_constructible<absl::Status, U&&>::value,
+            abslx::enable_if_t<std::is_constructible<abslx::Status, U&&>::value,
                               int> = 0>
   explicit StatusOrData(U&& v) : status_(std::forward<U>(v)) {
     EnsureNotOk();
@@ -256,7 +256,7 @@ class StatusOrData {
   template <typename U>
   void AssignStatus(U&& v) {
     Clear();
-    status_ = static_cast<absl::Status>(std::forward<U>(v));
+    status_ = static_cast<abslx::Status>(std::forward<U>(v));
     EnsureNotOk();
   }
 
@@ -387,10 +387,10 @@ struct MoveAssignBase<T, false> {
   MoveAssignBase& operator=(MoveAssignBase&&) = delete;
 };
 
-ABSL_ATTRIBUTE_NORETURN void ThrowBadStatusOrAccess(absl::Status status);
+ABSL_ATTRIBUTE_NORETURN void ThrowBadStatusOrAccess(abslx::Status status);
 
 }  // namespace internal_statusor
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STATUS_INTERNAL_STATUSOR_INTERNAL_H_

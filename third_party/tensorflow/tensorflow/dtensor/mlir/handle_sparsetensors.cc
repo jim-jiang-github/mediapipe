@@ -100,7 +100,7 @@ mlir::LogicalResult UpdateFunctionInputAttributes(
 
     llvm::SmallVector<std::string, 2> new_input_names;
 
-    absl::flat_hash_set<int> skip_indices;
+    abslx::flat_hash_set<int> skip_indices;
     for (const auto component : sparse_tensor_components) {
       skip_indices.insert(component.func_op_arg_index);
     }
@@ -114,16 +114,16 @@ mlir::LogicalResult UpdateFunctionInputAttributes(
     for (const auto component : sparse_tensor_components) {
       int arg_index = component.func_op_arg_index;
       new_input_names.push_back(
-          absl::StrCat(kSparseIndicesStr, "_", arg_index));
+          abslx::StrCat(kSparseIndicesStr, "_", arg_index));
       new_input_names.push_back(
-          absl::StrCat(kSparseDenseShapesStr, "_", arg_index));
-      new_input_names.push_back(absl::StrCat(kSparseValuesStr, "_", arg_index));
+          abslx::StrCat(kSparseDenseShapesStr, "_", arg_index));
+      new_input_names.push_back(abslx::StrCat(kSparseValuesStr, "_", arg_index));
     }
 
     mlir::NamedAttrList attributes(dict_attr);
     attributes.set(
         "inputs",
-        mlir::StringAttr::get(&context, absl::StrJoin(new_input_names, ",")));
+        mlir::StringAttr::get(&context, abslx::StrJoin(new_input_names, ",")));
     main_func->setAttr(kEntryFuncAttr, attributes.getDictionary(&context));
   }
   UpdateFunctionSignature(main_func, builder);

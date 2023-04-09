@@ -90,7 +90,7 @@ NcclCollectivePermuteThunk::GetNcclCollectivePermuteConfig(
   const int64_t expected_size =
       op.getChannelId() ? partition_count : replica_count;
   return source_target_pairs.size() == expected_size &&
-         absl::c_all_of(source_target_pairs,
+         abslx::c_all_of(source_target_pairs,
                         [](const std::pair<int64_t, int64_t>& source_target) {
                           return source_target.first == source_target.second;
                         });
@@ -141,7 +141,7 @@ Status NcclCollectivePermuteThunk::RunNcclCollective(
 Status RunCollectivePermute(
     NcclCollectivePermuteConfig::SourceTargetMapEntry source_target,
     DeviceBufferPair& buffer, se::Stream& stream, ncclComm_t comm,
-    absl::string_view device_string, int64_t current_id) {
+    abslx::string_view device_string, int64_t current_id) {
 #if XLA_ENABLE_XCCL
   // Determine the source and target IDs for this instance. The source ID is the
   // ID which will copy its data to this instance. The destination ID is the ID
@@ -182,8 +182,8 @@ Status RunCollectivePermute(
   // use of NCCL_LAUNCH_MODE=PARALLEL to avoid these issues. See
   // https://docs.nvidia.com/deeplearning/nccl/release-notes/rel_2-8-4.html#rel_2-8-4
   if (!IsNcclLaunchModeParallel()) {
-    static absl::once_flag log_once;
-    absl::call_once(log_once, [] {
+    static abslx::once_flag log_once;
+    abslx::call_once(log_once, [] {
       LOG(WARNING) << "NCCL based collective permute may not work correctly if "
                       "NCCL_LAUNCH_MODE is not set to PARALLEL";
     });
@@ -192,7 +192,7 @@ Status RunCollectivePermute(
   se::DeviceMemoryBase src_addr = buffer.source_buffer;
   se::DeviceMemoryBase dest_addr = buffer.destination_buffer;
 
-  VLOG(3) << absl::StreamFormat("%s : id = %d, source_id = %d, target_id = %d",
+  VLOG(3) << abslx::StreamFormat("%s : id = %d, source_id = %d, target_id = %d",
                                 device_string, current_id,
                                 source_id.value_or(-1), target_id.value_or(-1));
 
@@ -207,7 +207,7 @@ Status RunCollectivePermute(
 
   // send source buffer to target peer if needed.
   if (target_id) {
-    VLOG(3) << absl::StreamFormat(
+    VLOG(3) << abslx::StreamFormat(
         "%s : Calling ncclSend(sendbuff=%p, count=%d, peer=%d "
         "comm=%p, stream=%p)",
         device_string, src_addr.opaque(), element_count, *target_id,
@@ -218,7 +218,7 @@ Status RunCollectivePermute(
 
   // Receive data from the source peer to the destination buffer.
   if (source_id) {
-    VLOG(3) << absl::StreamFormat(
+    VLOG(3) << abslx::StreamFormat(
         "%s : Calling ncclRecv(recvbuff=%p, count=%d, peer=%d comm=%p, "
         "stream=%p)",
         device_string, dest_addr.opaque(), element_count, *source_id,
@@ -231,7 +231,7 @@ Status RunCollectivePermute(
   if (!source_id) {
     // If there is no source peer, i.e. no one send us any data, zero out dest
     // buffer.
-    VLOG(3) << absl::StreamFormat("%s : collective-Permute: Issuing MemZero",
+    VLOG(3) << abslx::StreamFormat("%s : collective-Permute: Issuing MemZero",
                                   device_string);
     stream.ThenMemZero(&dest_addr, dest_addr.size());
   }

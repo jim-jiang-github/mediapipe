@@ -76,7 +76,7 @@ constexpr char kTensorsTag[] = "TENSORS";
 // }
 class TextEmbedderGraph : public core::ModelTaskGraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     CHECK(sc != nullptr);
     ASSIGN_OR_RETURN(const ModelResources* model_resources,
@@ -101,7 +101,7 @@ class TextEmbedderGraph : public core::ModelTaskGraph {
   //   TextEmbedder model file with model metadata.
   // text_in: (std::string) stream to run embedding extraction on.
   // graph: the mediapipe builder::Graph instance to be updated.
-  absl::StatusOr<Source<EmbeddingResult>> BuildTextEmbedderTask(
+  abslx::StatusOr<Source<EmbeddingResult>> BuildTextEmbedderTask(
       const proto::TextEmbedderGraphOptions& task_options,
       const ModelResources& model_resources, Source<std::string> text_in,
       Graph& graph) {

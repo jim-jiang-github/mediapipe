@@ -461,7 +461,7 @@ void Decode(const data::TensorDescriptor* fb_desc, TensorDescriptor* desc) {
       fb_desc->use_buffer_for_write_only_image_buffer();
 }
 
-absl::Status Decode(const data::Arguments* fb_args, Arguments* args) {
+abslx::Status Decode(const data::Arguments* fb_args, Arguments* args) {
   args->int_values_.clear();
   for (auto int_values_fb : *fb_args->int_values()) {
     Arguments::IntValue value;
@@ -546,7 +546,7 @@ absl::Status Decode(const data::Arguments* fb_args, Arguments* args) {
     args->AddObjectRef(key, access_type,
                        std::make_unique<TensorDescriptor>(std::move(desc)));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 flatbuffers::Offset<data::Arguments> Encode(
@@ -723,7 +723,7 @@ void Decode(const data::OperationDef* fb_def, OperationDef* def) {
   def->precision = ToEnum(fb_def->precision());
 }
 
-absl::Status Decode(const data::GPUOperation* fb_op, GPUOperation* op) {
+abslx::Status Decode(const data::GPUOperation* fb_op, GPUOperation* op) {
   RETURN_IF_ERROR(Decode(fb_op->arguments(), &op->args_));
   op->work_group_size_.x = fb_op->work_group_size()->x();
   op->work_group_size_.y = fb_op->work_group_size()->y();
@@ -750,7 +750,7 @@ absl::Status Decode(const data::GPUOperation* fb_op, GPUOperation* op) {
   op->work_groups_count_.y = fb_op->work_groups_count()->y();
   op->work_groups_count_.z = fb_op->work_groups_count()->z();
   op->CalculateConstArgsSize();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 flatbuffers::Offset<data::GPUOperation> Encode(

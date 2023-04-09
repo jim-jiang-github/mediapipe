@@ -32,7 +32,7 @@ namespace gpu {
 
 // Fast version of Equality Assignments for hashable types.
 template <typename TensorSizeT>
-absl::Status EqualityAssignmentWithHash(
+abslx::Status EqualityAssignmentWithHash(
     const std::vector<TensorUsageRecord<TensorSizeT>>& usage_records,
     ObjectsAssignment<TensorSizeT>* assignment) {
   size_t num_records = usage_records.size();
@@ -41,7 +41,7 @@ absl::Status EqualityAssignmentWithHash(
 
   // Pool is a map with size as a key and vector with ids of free shared objects
   // of this size as a value.
-  absl::flat_hash_map<TensorSizeT, std::vector<size_t>> pool;
+  abslx::flat_hash_map<TensorSizeT, std::vector<size_t>> pool;
   std::priority_queue<QueueRecord> objects_in_use;
   for (size_t i = 0; i < num_records; ++i) {
     // Pop from the queue and add to the pool all objects that are no longer
@@ -72,12 +72,12 @@ absl::Status EqualityAssignmentWithHash(
           {usage_records[i].last_task, assignment->object_ids[i]});
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Slower version of Equality Assignments for unhashable types.
 template <typename TensorSizeT>
-absl::Status EqualityAssignment(
+abslx::Status EqualityAssignment(
     const std::vector<TensorUsageRecord<TensorSizeT>>& usage_records,
     ObjectsAssignment<TensorSizeT>* assignment) {
   size_t num_records = usage_records.size();
@@ -112,7 +112,7 @@ absl::Status EqualityAssignment(
       dealloc_task[best_obj] = usage_records[i].last_task;
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

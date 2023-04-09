@@ -19,15 +19,15 @@
 
 #include "absl/time/time.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace time_internal {
 
 // Loads the named timezone, but dies on any failure.
-absl::TimeZone LoadTimeZone(const std::string& name);
+abslx::TimeZone LoadTimeZone(const std::string& name);
 
 }  // namespace time_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_TIME_INTERNAL_TEST_UTIL_H_

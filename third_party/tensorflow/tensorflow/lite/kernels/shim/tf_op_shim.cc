@@ -32,7 +32,7 @@ namespace shim {
 
 namespace {
 // Converts a TF AttrValue into a TF Shim AttrValue
-absl::StatusOr<AttrValue> TfAttrValueToShimAttrValue(
+abslx::StatusOr<AttrValue> TfAttrValueToShimAttrValue(
     const ::tensorflow::AttrValue& attr_value) {
   AttrValue ret;
   switch (attr_value.value_case()) {
@@ -53,7 +53,7 @@ absl::StatusOr<AttrValue> TfAttrValueToShimAttrValue(
       break;
     }
     default: {
-      return absl::FailedPreconditionError(absl::StrCat(
+      return abslx::FailedPreconditionError(abslx::StrCat(
           "Unsupported attribute type: ", attr_value.DebugString()));
     }
   }
@@ -64,11 +64,11 @@ absl::StatusOr<AttrValue> TfAttrValueToShimAttrValue(
 TfInitContext::TfInitContext(const ::tensorflow::OpKernelConstruction* context)
     : context_(context) {}
 
-absl::StatusOr<AttrValue> TfInitContext::GetAttr(
+abslx::StatusOr<AttrValue> TfInitContext::GetAttr(
     const std::string& attr_name) const {
   if (!context_->HasAttr(attr_name))
-    return absl::InvalidArgumentError(
-        absl::StrCat("Non-existent attribute: ", attr_name, "\nop def:\n",
+    return abslx::InvalidArgumentError(
+        abslx::StrCat("Non-existent attribute: ", attr_name, "\nop def:\n",
                      context_->def().DebugString()));
   const auto& attr_value = context_->def().attr().at(attr_name);
   return TfAttrValueToShimAttrValue(attr_value);
@@ -79,8 +79,8 @@ TfInvokeContext::TfInvokeContext(::tensorflow::OpKernelContext* context)
 
 ConstTensorViewOr TfInvokeContext::GetInput(const int idx) const {
   if (idx >= context_->num_inputs()) {
-    return absl::InvalidArgumentError(
-        absl::StrCat("Expected idx < num_inputs. idx: ", idx,
+    return abslx::InvalidArgumentError(
+        abslx::StrCat("Expected idx < num_inputs. idx: ", idx,
                      " num_inputs: ", context_->num_inputs()));
   }
   const auto tf_tensor = context_->input(idx);
@@ -93,7 +93,7 @@ TensorViewOr TfInvokeContext::GetOutput(const int idx,
                                         const Shape& shape) const {
   tensorflow::Tensor* output_t = nullptr;
   if (!shape.has_value())
-    return absl::InvalidArgumentError("Output shape needs to be specified.");
+    return abslx::InvalidArgumentError("Output shape needs to be specified.");
   std::vector<int64_t> shape_64(shape->size());
   for (int i = 0; i < shape->size(); ++i) shape_64[i] = (*shape)[i];
   auto status = context_->allocate_output(
@@ -122,7 +122,7 @@ ShapeOr TfShapeInferenceContext::GetInputShape(const int idx) const {
   return Shape(ret);
 }
 
-absl::Status TfShapeInferenceContext::SetOutputShape(const int idx,
+abslx::Status TfShapeInferenceContext::SetOutputShape(const int idx,
                                                      const Shape& shape) {
   tensorflow::shape_inference::ShapeHandle output_shape;
   if (shape.has_value()) {
@@ -135,26 +135,26 @@ absl::Status TfShapeInferenceContext::SetOutputShape(const int idx,
     output_shape = context_->UnknownShape();
   }
   context_->set_output(idx, output_shape);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 ConstTensorViewOr TfShapeInferenceContext::GetInputTensor(const int idx) const {
   const auto* tf_tensor = context_->input_tensor(idx);
   if (tf_tensor == nullptr) {
-    return absl::UnavailableError(
-        absl::StrCat("Tensor is not available. idx: ", idx));
+    return abslx::UnavailableError(
+        abslx::StrCat("Tensor is not available. idx: ", idx));
   }
   SH_ASSIGN_OR_RETURN(const TfTensorView& tensor_view,
                       TensorView::New(tf_tensor));
   return std::make_unique<const TfTensorView>(tensor_view);
 }
 
-absl::StatusOr<AttrValue> TfShapeInferenceContext::GetAttr(
+abslx::StatusOr<AttrValue> TfShapeInferenceContext::GetAttr(
     const std::string& attr_name) const {
   const auto* tf_attr_value = context_->GetAttr(attr_name);
   if (tf_attr_value == nullptr)
-    return absl::InvalidArgumentError(
-        absl::StrCat("Non-existent attribute: ", attr_name));
+    return abslx::InvalidArgumentError(
+        abslx::StrCat("Non-existent attribute: ", attr_name));
   return TfAttrValueToShimAttrValue(*tf_attr_value);
 }
 
@@ -166,15 +166,15 @@ int TfShapeInferenceContext::NumOutputs() const {
   return context_->num_outputs();
 }
 
-::tensorflow::Status FromAbslStatus(const absl::Status& s) {
+::tensorflow::Status FromAbslStatus(const abslx::Status& s) {
   if (s.ok()) return ::tensorflow::Status();
   return ::tensorflow::Status(static_cast<::tensorflow::error::Code>(s.code()),
                               s.message());
 }
 
-absl::Status ToAbslStatus(const ::tensorflow::Status& s) {
-  return s.ok() ? absl::OkStatus()
-                : absl::Status(static_cast<absl::StatusCode>(s.code()),
+abslx::Status ToAbslStatus(const ::tensorflow::Status& s) {
+  return s.ok() ? abslx::OkStatus()
+                : abslx::Status(static_cast<abslx::StatusCode>(s.code()),
                                s.error_message());
 }
 

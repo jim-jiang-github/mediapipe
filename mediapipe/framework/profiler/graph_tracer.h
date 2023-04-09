@@ -47,7 +47,7 @@ namespace mediapipe {
 class GraphTracer {
  public:
   // Returns the interval between trace log output.
-  absl::Duration GetTraceLogInterval();
+  abslx::Duration GetTraceLogInterval();
 
   // Returns the maximum number of trace events buffered in memory.
   int64 GetTraceLogCapacity();
@@ -63,20 +63,20 @@ class GraphTracer {
 
   // Append TraceEvents to the TraceBuffer for task input.
   void LogInputEvents(GraphTrace::EventType event_type,
-                      const CalculatorContext* context, absl::Time event_time);
+                      const CalculatorContext* context, abslx::Time event_time);
 
   // Append TraceEvents to the TraceBuffer for task output.
   void LogOutputEvents(GraphTrace::EventType event_type,
-                       const CalculatorContext* context, absl::Time event_time);
+                       const CalculatorContext* context, abslx::Time event_time);
 
   // Returns the earliest packet timestamp appearing only after begin_time.
-  Timestamp TimestampAfter(absl::Time begin_time);
+  Timestamp TimestampAfter(abslx::Time begin_time);
 
   // Returns the graph of events between begin_time and end_time exclusive.
-  void GetTrace(absl::Time begin_time, absl::Time end_time, GraphTrace* result);
+  void GetTrace(abslx::Time begin_time, abslx::Time end_time, GraphTrace* result);
 
   // Returns trace events between begin_time and end_time exclusive.
-  void GetLog(absl::Time begin_time, absl::Time end_time, GraphTrace* result);
+  void GetLog(abslx::Time begin_time, abslx::Time end_time, GraphTrace* result);
 
   // Returns the logged TraceEvents.
   const TraceBuffer& GetTraceBuffer();

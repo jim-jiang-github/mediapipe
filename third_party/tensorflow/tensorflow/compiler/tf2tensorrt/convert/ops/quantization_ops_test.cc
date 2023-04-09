@@ -99,7 +99,7 @@ ops::Placeholder AddInput(Scope scope, int input_idx,
     LOG(FATAL) << "Unknown input shape type " << data_format;
   }
   auto input_attrs = ops::Placeholder::Attrs().Shape(input_shape);
-  return ops::Placeholder(scope.WithOpName(absl::StrCat("input_", input_idx)),
+  return ops::Placeholder(scope.WithOpName(abslx::StrCat("input_", input_idx)),
                           DT_FLOAT, input_attrs);
 }
 
@@ -250,7 +250,7 @@ struct QDQTestOptions {
 };
 
 std::ostream& operator<<(std::ostream& os, const QDQTestOptions opts) {
-  return os << absl::StrCat(
+  return os << abslx::StrCat(
              "QDQTestOptions(conv_has_bias=",
              static_cast<int>(opts.conv_has_bias),
              ", qdq_on_output=", static_cast<int>(opts.qdq_on_output),
@@ -376,9 +376,9 @@ class QDQExplicitTest : public ::testing::Test,
                                    /*fnlib_def=*/nullptr, &shape_info));
 
     for (const NodeDef& node : gdef.node()) {
-      if (absl::StartsWith(node.name(), "input_")) {
+      if (abslx::StartsWith(node.name(), "input_")) {
         inputs.push_back(&node);
-      } else if (absl::StartsWith(node.name(), "output_")) {
+      } else if (abslx::StartsWith(node.name(), "output_")) {
         outputs.push_back(&node);
       }
     }
@@ -480,7 +480,7 @@ TEST_P(TestQDQSuite, TestConv2DBasic) {
   std::array<int, 2> in_channels = {3, 16};
   std::array<int, 2> out_channels = {16, 32};
   for (int i = 0; i < num_conv; i++) {
-    out = AddConv2D(scope.WithOpName(absl::StrCat("conv_", i)), out,
+    out = AddConv2D(scope.WithOpName(abslx::StrCat("conv_", i)), out,
                     in_channels[i], out_channels[i], /*filter_size=*/{3, 3},
                     /*stride=*/{1, 1}, GetParam().data_format,
                     GetParam().conv_has_bias, GetParam().conv_epilogue,

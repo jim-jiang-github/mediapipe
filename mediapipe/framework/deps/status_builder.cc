@@ -74,34 +74,34 @@ StatusBuilder::operator Status() const& {
 
 StatusBuilder::operator Status() && { return JoinMessageToStatus(); }
 
-absl::Status StatusBuilder::JoinMessageToStatus() {
+abslx::Status StatusBuilder::JoinMessageToStatus() {
   if (!impl_) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   return impl_->JoinMessageToStatus();
 }
 
-absl::Status StatusBuilder::Impl::JoinMessageToStatus() {
+abslx::Status StatusBuilder::Impl::JoinMessageToStatus() {
   if (stream.str().empty() || no_logging) {
     return status;
   }
-  return absl::Status(status.code(), [this]() {
+  return abslx::Status(status.code(), [this]() {
     switch (join_style) {
       case MessageJoinStyle::kAnnotate:
-        return absl::StrCat(status.message(), "; ", stream.str());
+        return abslx::StrCat(status.message(), "; ", stream.str());
       case MessageJoinStyle::kAppend:
-        return absl::StrCat(status.message(), stream.str());
+        return abslx::StrCat(status.message(), stream.str());
       case MessageJoinStyle::kPrepend:
-        return absl::StrCat(stream.str(), status.message());
+        return abslx::StrCat(stream.str(), status.message());
     }
   }());
 }
 
-StatusBuilder::Impl::Impl(const absl::Status& status,
+StatusBuilder::Impl::Impl(const abslx::Status& status,
                           mediapipe::source_location location)
     : status(status), location(location), stream() {}
 
-StatusBuilder::Impl::Impl(absl::Status&& status,
+StatusBuilder::Impl::Impl(abslx::Status&& status,
                           mediapipe::source_location location)
     : status(std::move(status)), location(location), stream() {}
 

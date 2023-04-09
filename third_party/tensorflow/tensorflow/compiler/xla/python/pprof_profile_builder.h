@@ -44,9 +44,9 @@ class PprofProfileBuilder {
  private:
   tensorflow::tfprof::pprof::Profile profile_;
 
-  absl::flat_hash_map<std::string, int> strings_;
-  absl::flat_hash_map<PyCodeObject*, int> functions_;
-  absl::flat_hash_map<std::pair<PyCodeObject*, int>, int> locations_;
+  abslx::flat_hash_map<std::string, int> strings_;
+  abslx::flat_hash_map<PyCodeObject*, int> functions_;
+  abslx::flat_hash_map<std::pair<PyCodeObject*, int>, int> locations_;
 };
 
 // Converts the JSON representation of a pprof profile protocol buffer into

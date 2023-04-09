@@ -90,10 +90,10 @@ constexpr char kCorruptedModelPath[] =
     "corrupted_mobilenet_v1_0.25_224_1_default_1.tflite";
 
 void AssertStatusHasMediaPipeTasksStatusCode(
-    absl::Status status, MediaPipeTasksStatus mediapipe_tasks_code) {
+    abslx::Status status, MediaPipeTasksStatus mediapipe_tasks_code) {
   EXPECT_THAT(
       status.GetPayload(kMediaPipeTasksPayload),
-      testing::Optional(absl::Cord(absl::StrCat(mediapipe_tasks_code))));
+      testing::Optional(abslx::Cord(abslx::StrCat(mediapipe_tasks_code))));
 }
 
 void CheckModelResourcesPackets(const ModelResources* model_resources) {
@@ -153,7 +153,7 @@ TEST_F(ModelResourcesTest, CreateFromInvalidFile) {
       ModelResources::Create(kTestModelResourcesTag, std::move(model_file));
 
   EXPECT_EQ(status_or_model_resources.status().code(),
-            absl::StatusCode::kNotFound);
+            abslx::StatusCode::kNotFound);
   EXPECT_THAT(status_or_model_resources.status().message(),
               testing::HasSubstr("Unable to open file"));
   AssertStatusHasMediaPipeTasksStatusCode(
@@ -169,7 +169,7 @@ TEST_F(ModelResourcesTest, CreateFromInvalidFileDescriptor) {
       ModelResources::Create(kTestModelResourcesTag, std::move(model_file));
 
   EXPECT_EQ(status_or_model_resources.status().code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       status_or_model_resources.status().message(),
       testing::HasSubstr("Provided file descriptor is invalid: -1 < 0"));
@@ -185,7 +185,7 @@ TEST_F(ModelResourcesTest, CreateFailWithCorruptedFile) {
       ModelResources::Create(kTestModelResourcesTag, std::move(model_file));
 
   EXPECT_EQ(status_or_model_resources.status().code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status_or_model_resources.status().message(),
               testing::HasSubstr("The model is not a valid Flatbuffer"));
   AssertStatusHasMediaPipeTasksStatusCode(
@@ -209,7 +209,7 @@ TEST_F(ModelResourcesTest, CreateSuccessWithCustomOpsFromFile) {
       auto model_resources,
       ModelResources::Create(
           kTestModelResourcesTag, std::move(model_file),
-          absl::make_unique<tflite::MutableOpResolver>(resolver)));
+          abslx::make_unique<tflite::MutableOpResolver>(resolver)));
 
   EXPECT_EQ(kTestModelResourcesTag, model_resources->GetTag());
   CheckModelResourcesPackets(model_resources.get());
@@ -251,7 +251,7 @@ TEST_F(ModelResourcesTest, CreateWithEmptyOpResolverPacket) {
       kTestModelResourcesTag, std::move(model_file), empty_packet);
 
   EXPECT_EQ(status_or_model_resources.status().code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status_or_model_resources.status().message(),
               testing::HasSubstr("op resolver packet must be non-empty"));
   AssertStatusHasMediaPipeTasksStatusCode(
@@ -270,7 +270,7 @@ TEST_F(ModelResourcesTest, CreateSuccessWithCustomOpsPacket) {
   auto model_file = std::make_unique<proto::ExternalFile>();
   model_file->set_file_name(kTestModelWithCustomOpsPath);
   auto external_op_resolver_packet = api2::PacketAdopting<tflite::OpResolver>(
-      absl::make_unique<tflite::MutableOpResolver>(resolver));
+      abslx::make_unique<tflite::MutableOpResolver>(resolver));
   MP_ASSERT_OK_AND_ASSIGN(
       auto model_resources,
       ModelResources::Create(kTestModelResourcesTag, std::move(model_file),

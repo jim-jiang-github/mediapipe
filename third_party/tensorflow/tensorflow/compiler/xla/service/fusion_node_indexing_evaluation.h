@@ -26,7 +26,7 @@ class FusionNodeIndexingEvaluation {
  public:
   explicit FusionNodeIndexingEvaluation(
       const HloInstruction* fusion, int64_t root_usage_count = 1,
-      const absl::flat_hash_set<const HloInstruction*>*
+      const abslx::flat_hash_set<const HloInstruction*>*
           other_fusion_instructions = nullptr);
 
   // Evaluate the number of times 'producer' would be emitted if it is fused
@@ -49,7 +49,7 @@ class FusionNodeIndexingEvaluation {
   // of 'producer' which pass index values created by them.
   void UpdateEvaluationCache(
       const HloInstruction* producer,
-      absl::flat_hash_set<const HloInstruction*> indexing_users_of_producer);
+      abslx::flat_hash_set<const HloInstruction*> indexing_users_of_producer);
 
   // Prior to fusing, we need to erase the indexing_users_ entry of the
   // producer to be fused, because the HloInstruction pointer will be
@@ -57,13 +57,13 @@ class FusionNodeIndexingEvaluation {
   // values created by them to the fusion parameter corresponding to this
   // producer. This will be needed for updating the evaluation cache (see
   // UpdateEvaluationCache).
-  absl::flat_hash_set<const HloInstruction*> RemoveFusionOperand(
+  abslx::flat_hash_set<const HloInstruction*> RemoveFusionOperand(
       HloInstruction* fusion_operand);
 
   // All instructions which would appear in a potential fusion. Normally
   // this is identical to the keys in 'index_usage_count_', but can contain
   // nodes from a different fusion when evaluating whether to merge two fusions.
-  const absl::flat_hash_set<const HloInstruction*>* fusion_instructions()
+  const abslx::flat_hash_set<const HloInstruction*>* fusion_instructions()
       const {
     return &fusion_instructions_;
   }
@@ -88,19 +88,19 @@ class FusionNodeIndexingEvaluation {
   // (we may reuse also if the shape change is a bitcast, but we don't consider
   // that here). By ignoring potential reuses our estimate of which instruction
   // generates a new index value is a bit more conservative than necessary.
-  absl::flat_hash_map<const HloInstruction*,
-                      absl::flat_hash_set<const HloInstruction*>>
+  abslx::flat_hash_map<const HloInstruction*,
+                      abslx::flat_hash_set<const HloInstruction*>>
       indexing_users_;
 
   // Stores the number of different index accesses for each instruction in a
   // fusion node. The fusion emitter caches access with the same index, so this
   // value indicates how many times a specific instruction will be emitted.
-  absl::flat_hash_map<const HloInstruction*, int64_t> index_usage_count_;
+  abslx::flat_hash_map<const HloInstruction*, int64_t> index_usage_count_;
 
   // Stores all instructions which would appear in a potential fusion. Normally
   // this is identical to the keys in 'index_usage_count_', but can contain
   // nodes from a different fusion when evaluating whether to merge two fusions.
-  absl::flat_hash_set<const HloInstruction*> fusion_instructions_;
+  abslx::flat_hash_set<const HloInstruction*> fusion_instructions_;
 
   // The fusion instruction.
   const HloInstruction* fusion_;

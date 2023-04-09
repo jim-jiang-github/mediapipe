@@ -107,7 +107,7 @@ class CalculatorContext {
   // Returns the status of the graph run.
   //
   // NOTE: This method should only be called during CalculatorBase::Close().
-  absl::Status GraphStatus() const { return graph_status_; }
+  abslx::Status GraphStatus() const { return graph_status_; }
 
   ProfilingContext* GetProfilingContext() const {
     return calculator_state_->GetSharedProfilingContext().get();
@@ -135,7 +135,7 @@ class CalculatorContext {
     input_timestamps_.pop();
   }
 
-  void SetGraphStatus(const absl::Status& status) { graph_status_ = status; }
+  void SetGraphStatus(const abslx::Status& status) { graph_status_ = status; }
 
   // Interface for the friend class Calculator.
   const InputStreamSet& InputStreams() const;
@@ -156,7 +156,7 @@ class CalculatorContext {
   std::queue<Timestamp> input_timestamps_;
 
   // The status of the graph run. Only used when Close() is called.
-  absl::Status graph_status_;
+  abslx::Status graph_status_;
 
   // Accesses CalculatorContext for setting input timestamp.
   friend class CalculatorContextManager;

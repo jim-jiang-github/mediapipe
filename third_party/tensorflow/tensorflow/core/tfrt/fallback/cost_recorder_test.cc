@@ -26,7 +26,7 @@ namespace tensorflow {
 namespace tfrt_stub {
 namespace {
 
-constexpr absl::string_view kTestOpName = "test_op_name";
+constexpr abslx::string_view kTestOpName = "test_op_name";
 constexpr uint64_t kTestCost = 1234;
 constexpr uint64_t kTestAvgCost = 1851;
 

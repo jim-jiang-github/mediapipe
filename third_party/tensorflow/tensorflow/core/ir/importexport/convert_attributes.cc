@@ -237,7 +237,7 @@ Status ConvertAttributes(ArrayRef<NamedAttribute> attrs,
   for (const NamedAttribute& named_attr : attrs) {
     std::string name_str = named_attr.getName().str();
     auto attr = named_attr.getValue();
-    absl::string_view name = name_str;
+    abslx::string_view name = name_str;
     if (ignored_attrs.contains(name_str)) {
       // The name, device spec of a TF op or function are not stored as
       // AttrValue inside NodeDef, but we model them using attribute inside
@@ -263,7 +263,7 @@ Status ConvertAttributes(ArrayRef<NamedAttribute> attrs,
     // the attribute from MLIR, it is treated as an attribute from function
     // calls.
     std::vector<std::string> name_tokens =
-        absl::StrSplit(name, '.', absl::SkipEmpty());
+        abslx::StrSplit(name, '.', abslx::SkipEmpty());
     TF_RET_CHECK(name_tokens.size() <= 2);
     auto it = func_call_attrs.find(name_tokens[0]);
     if (it == func_call_attrs.end())
@@ -277,7 +277,7 @@ Status ConvertAttributes(ArrayRef<NamedAttribute> attrs,
   return ::tensorflow::OkStatus();
 }
 
-Status SetShapeAttribute(absl::string_view name, ShapedType shaped_type,
+Status SetShapeAttribute(abslx::string_view name, ShapedType shaped_type,
                          AttrValueMap* values) {
   AttrValue value;
   SetTensorShapeProto(shaped_type, value.mutable_shape());
@@ -324,7 +324,7 @@ StatusOr<Attribute> ConvertNonFuncAttributeValue(const AttrValue& value,
     case AttrValue::kTensor:
       return ConvertTensorProto(value.tensor(), builder);
     case AttrValue::kList: {
-      absl::InlinedVector<Attribute, 8> attrs;
+      abslx::InlinedVector<Attribute, 8> attrs;
       for (const auto& item : value.list().i())
         attrs.push_back(builder.getI64IntegerAttr(item));
       for (const auto& item : value.list().s())
@@ -368,7 +368,7 @@ StatusOr<Attribute> ConvertNonFuncAttributeValue(const AttrValue& value,
       return PlaceholderAttr::get(builder.getContext(), value.placeholder());
     default:
       return tensorflow::errors::Unimplemented(
-          absl::StrCat("Attribute ", value.DebugString()));
+          abslx::StrCat("Attribute ", value.DebugString()));
   }
 }
 

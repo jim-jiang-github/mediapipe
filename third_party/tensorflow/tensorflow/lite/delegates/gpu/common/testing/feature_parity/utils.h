@@ -40,7 +40,7 @@ namespace tflite {
 // These two functions implement usability printing for TfLiteTensor dimensions
 // and coordinates. By default dimensions are interpreted depending on the size:
 // 1:Linear, 2:HW, 3: HWC, 4:BHWC. If there are more than 4 dimensions,
-// absl::nullopt will be returned.
+// abslx::nullopt will be returned.
 std::optional<std::string> ShapeToString(TfLiteIntArray* shape);
 std::optional<std::string> CoordinateToString(TfLiteIntArray* shape,
                                               int linear);
@@ -128,8 +128,8 @@ class TensorEqMatcher {
       // 4. Proceed to data comparison. Iterate through elements as they lay
       // flat. If some pair of elements don't match, deduct the coordinate
       // basing on the dimensions, then return.
-      absl::Span<float> lhs_span(lhs.data.f, lhs.bytes / sizeof(float));
-      absl::Span<float> rhs_span(rhs_.data.f, rhs_.bytes / sizeof(float));
+      abslx::Span<float> lhs_span(lhs.data.f, lhs.bytes / sizeof(float));
+      abslx::Span<float> rhs_span(rhs_.data.f, rhs_.bytes / sizeof(float));
 
       auto left = lhs_span.begin();
       auto right = rhs_span.begin();
@@ -173,14 +173,14 @@ class TensorEqMatcher {
 };
 
 // Builds interpreter for a model, allocates tensors.
-absl::Status BuildInterpreter(const Model* model,
+abslx::Status BuildInterpreter(const Model* model,
                               std::unique_ptr<Interpreter>* interpreter);
 
 // Allocates tensors for a given interpreter.
-absl::Status AllocateTensors(std::unique_ptr<Interpreter>* interpreter);
+abslx::Status AllocateTensors(std::unique_ptr<Interpreter>* interpreter);
 
 // Modifies graph with given delegate.
-absl::Status ModifyGraphWithDelegate(std::unique_ptr<Interpreter>* interpreter,
+abslx::Status ModifyGraphWithDelegate(std::unique_ptr<Interpreter>* interpreter,
                                      TfLiteDelegate* delegate);
 
 // Initializes inputs with consequent values of some fixed range.
@@ -188,7 +188,7 @@ void InitializeInputs(int left, int right,
                       std::unique_ptr<Interpreter>* interpreter);
 
 // Invokes a prebuilt interpreter.
-absl::Status Invoke(std::unique_ptr<Interpreter>* interpreter);
+abslx::Status Invoke(std::unique_ptr<Interpreter>* interpreter);
 
 // Usability structure, which is used to pass parameters data to parameterized
 // tests.

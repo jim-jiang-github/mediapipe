@@ -199,7 +199,7 @@ void CreateFunctions(ModuleOp module_op,
     // Replaces ':' and '/' with '_' in the host name and uses the resulting
     // string as the function name.
     std::string func_name =
-        absl::StrCat(iter.second.original_name.str(), ":", host.str());
+        abslx::StrCat(iter.second.original_name.str(), ":", host.str());
     std::replace(func_name.begin(), func_name.end(), ':', '_');
     std::replace(func_name.begin(), func_name.end(), '/', '_');
 

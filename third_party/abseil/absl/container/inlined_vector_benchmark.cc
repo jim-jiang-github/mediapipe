@@ -26,7 +26,7 @@ namespace {
 
 void BM_InlinedVectorFill(benchmark::State& state) {
   const int len = state.range(0);
-  absl::InlinedVector<int, 8> v;
+  abslx::InlinedVector<int, 8> v;
   v.reserve(len);
   for (auto _ : state) {
     v.resize(0);  // Use resize(0) as InlinedVector releases storage on clear().
@@ -41,7 +41,7 @@ BENCHMARK(BM_InlinedVectorFill)->Range(1, 256);
 void BM_InlinedVectorFillRange(benchmark::State& state) {
   const int len = state.range(0);
   const std::vector<int> src(len, len);
-  absl::InlinedVector<int, 8> v;
+  abslx::InlinedVector<int, 8> v;
   v.reserve(len);
   for (auto _ : state) {
     benchmark::DoNotOptimize(src);
@@ -66,7 +66,7 @@ void BM_StdVectorFill(benchmark::State& state) {
 BENCHMARK(BM_StdVectorFill)->Range(1, 256);
 
 // The purpose of the next two benchmarks is to verify that
-// absl::InlinedVector is efficient when moving is more efficent than
+// abslx::InlinedVector is efficient when moving is more efficent than
 // copying. To do so, we use strings that are larger than the short
 // string optimization.
 bool StringRepresentedInline(std::string s) {
@@ -94,7 +94,7 @@ void BM_InlinedVectorFillString(benchmark::State& state) {
                             std::string(no_sso, 'C'), std::string(no_sso, 'D')};
 
   for (auto _ : state) {
-    absl::InlinedVector<std::string, 8> v;
+    abslx::InlinedVector<std::string, 8> v;
     for (int i = 0; i < len; i++) {
       v.push_back(strings[i & 3]);
     }
@@ -128,7 +128,7 @@ struct Buffer {  // some arbitrary structure for benchmarking.
 
 void BM_InlinedVectorAssignments(benchmark::State& state) {
   const int len = state.range(0);
-  using BufferVec = absl::InlinedVector<Buffer, 2>;
+  using BufferVec = abslx::InlinedVector<Buffer, 2>;
 
   BufferVec src;
   src.resize(len);
@@ -150,9 +150,9 @@ BENCHMARK(BM_InlinedVectorAssignments)
 
 void BM_CreateFromContainer(benchmark::State& state) {
   for (auto _ : state) {
-    absl::InlinedVector<int, 4> src{1, 2, 3};
+    abslx::InlinedVector<int, 4> src{1, 2, 3};
     benchmark::DoNotOptimize(src);
-    absl::InlinedVector<int, 4> dst(std::move(src));
+    abslx::InlinedVector<int, 4> dst(std::move(src));
     benchmark::DoNotOptimize(dst);
   }
 }
@@ -218,7 +218,7 @@ struct LargeCopyableMovableSwappable {
 template <typename ElementType>
 void BM_SwapElements(benchmark::State& state) {
   const int len = state.range(0);
-  using Vec = absl::InlinedVector<ElementType, 32>;
+  using Vec = abslx::InlinedVector<ElementType, 32>;
   Vec a(len);
   Vec b;
   for (auto _ : state) {
@@ -245,30 +245,30 @@ void BM_Sizeof(benchmark::State& state) {
     VecType vec;
     size = sizeof(vec);
   }
-  state.SetLabel(absl::StrCat("sz=", size));
+  state.SetLabel(abslx::StrCat("sz=", size));
 }
-BENCHMARK_TEMPLATE(BM_Sizeof, absl::InlinedVector<char, 1>);
-BENCHMARK_TEMPLATE(BM_Sizeof, absl::InlinedVector<char, 4>);
-BENCHMARK_TEMPLATE(BM_Sizeof, absl::InlinedVector<char, 7>);
-BENCHMARK_TEMPLATE(BM_Sizeof, absl::InlinedVector<char, 8>);
+BENCHMARK_TEMPLATE(BM_Sizeof, abslx::InlinedVector<char, 1>);
+BENCHMARK_TEMPLATE(BM_Sizeof, abslx::InlinedVector<char, 4>);
+BENCHMARK_TEMPLATE(BM_Sizeof, abslx::InlinedVector<char, 7>);
+BENCHMARK_TEMPLATE(BM_Sizeof, abslx::InlinedVector<char, 8>);
 
-BENCHMARK_TEMPLATE(BM_Sizeof, absl::InlinedVector<int, 1>);
-BENCHMARK_TEMPLATE(BM_Sizeof, absl::InlinedVector<int, 4>);
-BENCHMARK_TEMPLATE(BM_Sizeof, absl::InlinedVector<int, 7>);
-BENCHMARK_TEMPLATE(BM_Sizeof, absl::InlinedVector<int, 8>);
+BENCHMARK_TEMPLATE(BM_Sizeof, abslx::InlinedVector<int, 1>);
+BENCHMARK_TEMPLATE(BM_Sizeof, abslx::InlinedVector<int, 4>);
+BENCHMARK_TEMPLATE(BM_Sizeof, abslx::InlinedVector<int, 7>);
+BENCHMARK_TEMPLATE(BM_Sizeof, abslx::InlinedVector<int, 8>);
 
-BENCHMARK_TEMPLATE(BM_Sizeof, absl::InlinedVector<void*, 1>);
-BENCHMARK_TEMPLATE(BM_Sizeof, absl::InlinedVector<void*, 4>);
-BENCHMARK_TEMPLATE(BM_Sizeof, absl::InlinedVector<void*, 7>);
-BENCHMARK_TEMPLATE(BM_Sizeof, absl::InlinedVector<void*, 8>);
+BENCHMARK_TEMPLATE(BM_Sizeof, abslx::InlinedVector<void*, 1>);
+BENCHMARK_TEMPLATE(BM_Sizeof, abslx::InlinedVector<void*, 4>);
+BENCHMARK_TEMPLATE(BM_Sizeof, abslx::InlinedVector<void*, 7>);
+BENCHMARK_TEMPLATE(BM_Sizeof, abslx::InlinedVector<void*, 8>);
 
-BENCHMARK_TEMPLATE(BM_Sizeof, absl::InlinedVector<std::string, 1>);
-BENCHMARK_TEMPLATE(BM_Sizeof, absl::InlinedVector<std::string, 4>);
-BENCHMARK_TEMPLATE(BM_Sizeof, absl::InlinedVector<std::string, 7>);
-BENCHMARK_TEMPLATE(BM_Sizeof, absl::InlinedVector<std::string, 8>);
+BENCHMARK_TEMPLATE(BM_Sizeof, abslx::InlinedVector<std::string, 1>);
+BENCHMARK_TEMPLATE(BM_Sizeof, abslx::InlinedVector<std::string, 4>);
+BENCHMARK_TEMPLATE(BM_Sizeof, abslx::InlinedVector<std::string, 7>);
+BENCHMARK_TEMPLATE(BM_Sizeof, abslx::InlinedVector<std::string, 8>);
 
 void BM_InlinedVectorIndexInlined(benchmark::State& state) {
-  absl::InlinedVector<int, 8> v = {1, 2, 3, 4, 5, 6, 7};
+  abslx::InlinedVector<int, 8> v = {1, 2, 3, 4, 5, 6, 7};
   for (auto _ : state) {
     benchmark::DoNotOptimize(v);
     benchmark::DoNotOptimize(v[4]);
@@ -277,7 +277,7 @@ void BM_InlinedVectorIndexInlined(benchmark::State& state) {
 BENCHMARK(BM_InlinedVectorIndexInlined);
 
 void BM_InlinedVectorIndexExternal(benchmark::State& state) {
-  absl::InlinedVector<int, 8> v = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  abslx::InlinedVector<int, 8> v = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
   for (auto _ : state) {
     benchmark::DoNotOptimize(v);
     benchmark::DoNotOptimize(v[4]);
@@ -295,7 +295,7 @@ void BM_StdVectorIndex(benchmark::State& state) {
 BENCHMARK(BM_StdVectorIndex);
 
 void BM_InlinedVectorDataInlined(benchmark::State& state) {
-  absl::InlinedVector<int, 8> v = {1, 2, 3, 4, 5, 6, 7};
+  abslx::InlinedVector<int, 8> v = {1, 2, 3, 4, 5, 6, 7};
   for (auto _ : state) {
     benchmark::DoNotOptimize(v);
     benchmark::DoNotOptimize(v.data());
@@ -304,7 +304,7 @@ void BM_InlinedVectorDataInlined(benchmark::State& state) {
 BENCHMARK(BM_InlinedVectorDataInlined);
 
 void BM_InlinedVectorDataExternal(benchmark::State& state) {
-  absl::InlinedVector<int, 8> v = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  abslx::InlinedVector<int, 8> v = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
   for (auto _ : state) {
     benchmark::DoNotOptimize(v);
     benchmark::DoNotOptimize(v.data());
@@ -324,7 +324,7 @@ void BM_StdVectorData(benchmark::State& state) {
 BENCHMARK(BM_StdVectorData);
 
 void BM_InlinedVectorSizeInlined(benchmark::State& state) {
-  absl::InlinedVector<int, 8> v = {1, 2, 3, 4, 5, 6, 7};
+  abslx::InlinedVector<int, 8> v = {1, 2, 3, 4, 5, 6, 7};
   for (auto _ : state) {
     benchmark::DoNotOptimize(v);
     benchmark::DoNotOptimize(v.size());
@@ -333,7 +333,7 @@ void BM_InlinedVectorSizeInlined(benchmark::State& state) {
 BENCHMARK(BM_InlinedVectorSizeInlined);
 
 void BM_InlinedVectorSizeExternal(benchmark::State& state) {
-  absl::InlinedVector<int, 8> v = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  abslx::InlinedVector<int, 8> v = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
   for (auto _ : state) {
     benchmark::DoNotOptimize(v);
     benchmark::DoNotOptimize(v.size());
@@ -351,7 +351,7 @@ void BM_StdVectorSize(benchmark::State& state) {
 BENCHMARK(BM_StdVectorSize);
 
 void BM_InlinedVectorEmptyInlined(benchmark::State& state) {
-  absl::InlinedVector<int, 8> v = {1, 2, 3, 4, 5, 6, 7};
+  abslx::InlinedVector<int, 8> v = {1, 2, 3, 4, 5, 6, 7};
   for (auto _ : state) {
     benchmark::DoNotOptimize(v);
     benchmark::DoNotOptimize(v.empty());
@@ -360,7 +360,7 @@ void BM_InlinedVectorEmptyInlined(benchmark::State& state) {
 BENCHMARK(BM_InlinedVectorEmptyInlined);
 
 void BM_InlinedVectorEmptyExternal(benchmark::State& state) {
-  absl::InlinedVector<int, 8> v = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  abslx::InlinedVector<int, 8> v = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
   for (auto _ : state) {
     benchmark::DoNotOptimize(v);
     benchmark::DoNotOptimize(v.empty());
@@ -393,7 +393,7 @@ constexpr size_t kBatchSize = 100;
   BENCHMARK_TEMPLATE(BM_FunctionTemplate, T, kSmallSize, kSmallSize)
 
 template <typename T>
-using InlVec = absl::InlinedVector<T, kInlinedCapacity>;
+using InlVec = abslx::InlinedVector<T, kInlinedCapacity>;
 
 struct TrivialType {
   size_t val;

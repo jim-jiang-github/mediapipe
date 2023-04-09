@@ -26,18 +26,18 @@ limitations under the License.
 #include "tensorflow/core/platform/platform.h"
 
 #ifdef PLATFORM_WINDOWS
-const absl::string_view kPathSep = "\\";
+const abslx::string_view kPathSep = "\\";
 #else
-const absl::string_view kPathSep = "/";
+const abslx::string_view kPathSep = "/";
 #endif
 
 namespace tensorflow {
 namespace profiler {
 
 inline std::string ProfilerJoinPathImpl(
-    std::initializer_list<absl::string_view> paths) {
+    std::initializer_list<abslx::string_view> paths) {
   std::string result;
-  for (absl::string_view path : paths) {
+  for (abslx::string_view path : paths) {
     if (path.empty()) continue;
 
     if (result.empty()) {
@@ -45,11 +45,11 @@ inline std::string ProfilerJoinPathImpl(
       continue;
     }
 
-    path = absl::StripPrefix(path, kPathSep);
-    if (absl::EndsWith(result, kPathSep)) {
-      absl::StrAppend(&result, path);
+    path = abslx::StripPrefix(path, kPathSep);
+    if (abslx::EndsWith(result, kPathSep)) {
+      abslx::StrAppend(&result, path);
     } else {
-      absl::StrAppend(&result, kPathSep, path);
+      abslx::StrAppend(&result, kPathSep, path);
     }
   }
 

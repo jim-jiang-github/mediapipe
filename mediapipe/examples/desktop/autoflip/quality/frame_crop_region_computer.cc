@@ -22,7 +22,7 @@
 namespace mediapipe {
 namespace autoflip {
 
-absl::Status FrameCropRegionComputer::ExpandSegmentUnderConstraint(
+abslx::Status FrameCropRegionComputer::ExpandSegmentUnderConstraint(
     const Segment& segment_to_add, const Segment& base_segment,
     const int max_length, Segment* combined_segment,
     CoverType* cover_type) const {
@@ -75,10 +75,10 @@ absl::Status FrameCropRegionComputer::ExpandSegmentUnderConstraint(
 
   *combined_segment =
       std::make_pair(combined_segment_left, combined_segment_right);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FrameCropRegionComputer::ExpandRectUnderConstraints(
+abslx::Status FrameCropRegionComputer::ExpandRectUnderConstraints(
     const Rect& rect_to_add, const int max_width, const int max_height,
     Rect* base_rect, CoverType* cover_type) const {
   RET_CHECK(base_rect != nullptr) << "Base rect is null.";
@@ -129,7 +129,7 @@ absl::Status FrameCropRegionComputer::ExpandRectUnderConstraints(
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void FrameCropRegionComputer::UpdateCropRegionScore(
@@ -167,7 +167,7 @@ void FrameCropRegionComputer::UpdateCropRegionScore(
   }
 }
 
-absl::Status FrameCropRegionComputer::ComputeFrameCropRegion(
+abslx::Status FrameCropRegionComputer::ComputeFrameCropRegion(
     const KeyFrameInfo& frame_info, KeyFrameCropResult* crop_result) const {
   RET_CHECK(crop_result != nullptr) << "KeyFrameCropResult is null.";
 
@@ -254,7 +254,7 @@ absl::Status FrameCropRegionComputer::ComputeFrameCropRegion(
 
   crop_result->set_region_is_empty(crop_region_is_empty);
   crop_result->set_region_score(crop_region_score);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace autoflip

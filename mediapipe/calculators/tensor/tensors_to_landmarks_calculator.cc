@@ -100,17 +100,17 @@ class TensorsToLandmarksCalculator : public Node {
   MEDIAPIPE_NODE_CONTRACT(kInTensors, kFlipHorizontally, kFlipVertically,
                           kOutLandmarkList, kOutNormalizedLandmarkList);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
-  absl::Status LoadOptions(CalculatorContext* cc);
+  abslx::Status LoadOptions(CalculatorContext* cc);
   int num_landmarks_ = 0;
   ::mediapipe::TensorsToLandmarksCalculatorOptions options_;
 };
 MEDIAPIPE_REGISTER_NODE(TensorsToLandmarksCalculator);
 
-absl::Status TensorsToLandmarksCalculator::Open(CalculatorContext* cc) {
+abslx::Status TensorsToLandmarksCalculator::Open(CalculatorContext* cc) {
   MP_RETURN_IF_ERROR(LoadOptions(cc));
 
   if (kOutNormalizedLandmarkList(cc).IsConnected()) {
@@ -127,12 +127,12 @@ absl::Status TensorsToLandmarksCalculator::Open(CalculatorContext* cc) {
         << "Must provide input width/height for using flipping when outputing "
            "landmarks in absolute coordinates.";
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorsToLandmarksCalculator::Process(CalculatorContext* cc) {
+abslx::Status TensorsToLandmarksCalculator::Process(CalculatorContext* cc) {
   if (kInTensors(cc).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   bool flip_horizontally =
       kFlipHorizontally(cc).GetOr(options_.flip_horizontally());
@@ -205,16 +205,16 @@ absl::Status TensorsToLandmarksCalculator::Process(CalculatorContext* cc) {
     kOutLandmarkList(cc).Send(std::move(output_landmarks));
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorsToLandmarksCalculator::LoadOptions(CalculatorContext* cc) {
+abslx::Status TensorsToLandmarksCalculator::LoadOptions(CalculatorContext* cc) {
   // Get calculator options specified in the graph.
   options_ = cc->Options<::mediapipe::TensorsToLandmarksCalculatorOptions>();
   RET_CHECK(options_.has_num_landmarks());
   num_landmarks_ = options_.num_landmarks();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 }  // namespace api2
 }  // namespace mediapipe

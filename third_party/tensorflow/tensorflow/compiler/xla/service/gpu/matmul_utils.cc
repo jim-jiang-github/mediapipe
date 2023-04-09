@@ -48,13 +48,13 @@ namespace xla {
 namespace gpu {
 
 StatusOr<std::vector<int64_t>> GetNonContractingDims(
-    const Shape& shape, absl::Span<const int64_t> batch_dims,
-    absl::Span<const int64_t> contracting_dims) {
+    const Shape& shape, abslx::Span<const int64_t> batch_dims,
+    abslx::Span<const int64_t> contracting_dims) {
   std::vector<int64_t> non_contracting_dims;
   // This is O(rank**2), but we expect rank to be small.
   for (int64_t dim = 0; dim < shape.rank(); ++dim) {
-    bool is_batch = absl::c_count(batch_dims, dim) != 0;
-    bool is_contracting = absl::c_count(contracting_dims, dim) != 0;
+    bool is_batch = abslx::c_count(batch_dims, dim) != 0;
+    bool is_contracting = abslx::c_count(contracting_dims, dim) != 0;
     TF_RET_CHECK(!(is_batch && is_contracting));
     if (!(is_batch || is_contracting)) non_contracting_dims.push_back(dim);
   }
@@ -66,9 +66,9 @@ StatusOr<std::vector<int64_t>> GetNonContractingDims(
 }
 
 StatusOr<Shape> GetBatchRowColumnShape(const Shape& shape,
-                                       absl::Span<const int64_t> batch_dims,
-                                       absl::Span<const int64_t> row_dims,
-                                       absl::Span<const int64_t> col_dims) {
+                                       abslx::Span<const int64_t> batch_dims,
+                                       abslx::Span<const int64_t> row_dims,
+                                       abslx::Span<const int64_t> col_dims) {
   TF_RET_CHECK(shape.has_layout());
   TF_RET_CHECK(!row_dims.empty());
   TF_RET_CHECK(!col_dims.empty());
@@ -78,7 +78,7 @@ StatusOr<Shape> GetBatchRowColumnShape(const Shape& shape,
     // The GeMM output always has its layout set such that the batch, row, and
     // col dim groups are each laid out physically sequentially. GeMM operands
     // must, therefore, be laid out similarly.
-    auto check_physically_sequential = [&](absl::Span<const int64_t> dims) {
+    auto check_physically_sequential = [&](abslx::Span<const int64_t> dims) {
       for (auto it = dims.rbegin(); it != dims.rend(); ++it) {
         // NOTE: `i` is incremented as we check the dimensions.
         if (*it != shape.layout().minor_to_major()[i++])
@@ -104,8 +104,8 @@ StatusOr<Shape> GetBatchRowColumnShape(const Shape& shape,
 
   if (batch_dims.empty()) minor_to_major.push_back(0);
 
-  auto dim_size = [&](absl::Span<const int64_t> dims) {
-    return absl::c_accumulate(dims, 1, [&](int64_t size, int64_t dim) {
+  auto dim_size = [&](abslx::Span<const int64_t> dims) {
+    return abslx::c_accumulate(dims, 1, [&](int64_t size, int64_t dim) {
       return size * shape.dimensions(dim);
     });
   };
@@ -131,7 +131,7 @@ StatusOr<Shape> GetBatchRowColumnShape(const Shape& shape,
 
   // `MatrixLayout`, like BLAS, uses only two strides, so either the row or
   // column must be contiguous in memory (i.e. most minor physical dimension).
-  absl::Span<const int64_t> minor_to_major = shape.layout().minor_to_major();
+  abslx::Span<const int64_t> minor_to_major = shape.layout().minor_to_major();
   switch (64 * minor_to_major[2] + 8 * minor_to_major[1] + minor_to_major[0]) {
     case 012:  // (B,R,C) (major-to-minor)
       break;
@@ -160,8 +160,8 @@ StatusOr<Shape> GetBatchRowColumnShape(const Shape& shape,
 }
 
 /*static*/ StatusOr<MatrixLayout> MatrixLayout::For(
-    const Shape& shape, absl::Span<const int64_t> batch_dims,
-    absl::Span<const int64_t> row_dims, absl::Span<const int64_t> col_dims) {
+    const Shape& shape, abslx::Span<const int64_t> batch_dims,
+    abslx::Span<const int64_t> row_dims, abslx::Span<const int64_t> col_dims) {
   TF_ASSIGN_OR_RETURN(
       Shape batch_row_col_shape,
       GetBatchRowColumnShape(shape, batch_dims, row_dims, col_dims));
@@ -179,12 +179,12 @@ StatusOr<Shape> GetBatchRowColumnShape(const Shape& shape,
                num_batch_dims + lhs_num_row_dims + rhs_num_col_dims);
 
   std::vector<int64_t> dims(shape.rank());
-  absl::c_iota(dims, 0);
+  abslx::c_iota(dims, 0);
 
-  auto batch_dims = absl::Span<const int64_t>(dims).first(num_batch_dims);
+  auto batch_dims = abslx::Span<const int64_t>(dims).first(num_batch_dims);
   auto row_dims =
-      absl::Span<const int64_t>(dims).subspan(num_batch_dims, lhs_num_row_dims);
-  auto col_dims = absl::Span<const int64_t>(dims).last(rhs_num_col_dims);
+      abslx::Span<const int64_t>(dims).subspan(num_batch_dims, lhs_num_row_dims);
+  auto col_dims = abslx::Span<const int64_t>(dims).last(rhs_num_col_dims);
 
   return MatrixLayout::For(shape, batch_dims, row_dims, col_dims);
 }
@@ -231,13 +231,13 @@ StatusOr<bool> CanFoldTransposeOperandIntoDot(const HloInstruction& dot,
 }
 
 /*static*/ StatusOr<GemmConfig> GemmConfig::For(
-    const Shape& lhs_shape, absl::Span<const int64_t> lhs_batch_dims,
-    absl::Span<const int64_t> lhs_contracting_dims, const Shape& rhs_shape,
-    absl::Span<const int64_t> rhs_batch_dims,
-    absl::Span<const int64_t> rhs_contracting_dims, const Shape& output_shape,
+    const Shape& lhs_shape, abslx::Span<const int64_t> lhs_batch_dims,
+    abslx::Span<const int64_t> lhs_contracting_dims, const Shape& rhs_shape,
+    abslx::Span<const int64_t> rhs_batch_dims,
+    abslx::Span<const int64_t> rhs_contracting_dims, const Shape& output_shape,
     double alpha_real, double alpha_imag, double beta,
     std::optional<int64_t> algorithm, int64_t compute_precision) {
-  absl::Span<const int64_t> lhs_col_dims = lhs_contracting_dims;
+  abslx::Span<const int64_t> lhs_col_dims = lhs_contracting_dims;
   TF_ASSIGN_OR_RETURN(
       std::vector<int64_t> lhs_row_dims,
       GetNonContractingDims(lhs_shape, lhs_batch_dims, lhs_col_dims));
@@ -246,7 +246,7 @@ StatusOr<bool> CanFoldTransposeOperandIntoDot(const HloInstruction& dot,
       MatrixLayout lhs_layout,
       MatrixLayout::For(lhs_shape, lhs_batch_dims, lhs_row_dims, lhs_col_dims));
 
-  absl::Span<const int64_t> rhs_row_dims = rhs_contracting_dims;
+  abslx::Span<const int64_t> rhs_row_dims = rhs_contracting_dims;
   TF_ASSIGN_OR_RETURN(
       std::vector<int64_t> rhs_col_dims,
       GetNonContractingDims(rhs_shape, rhs_batch_dims, rhs_row_dims));
@@ -262,14 +262,14 @@ StatusOr<bool> CanFoldTransposeOperandIntoDot(const HloInstruction& dot,
                num_batch_dims + lhs_row_dims.size() + rhs_col_dims.size());
 
   std::vector<int64_t> output_dims(output_shape.rank());
-  absl::c_iota(output_dims, 0);
+  abslx::c_iota(output_dims, 0);
 
   auto output_batch_dims =
-      absl::Span<const int64_t>(output_dims).first(num_batch_dims);
-  auto output_row_dims = absl::Span<const int64_t>(output_dims)
+      abslx::Span<const int64_t>(output_dims).first(num_batch_dims);
+  auto output_row_dims = abslx::Span<const int64_t>(output_dims)
                              .subspan(num_batch_dims, lhs_row_dims.size());
   auto output_col_dims =
-      absl::Span<const int64_t>(output_dims).last(rhs_col_dims.size());
+      abslx::Span<const int64_t>(output_dims).last(rhs_col_dims.size());
 
   TF_ASSIGN_OR_RETURN(MatrixLayout output_layout,
                       MatrixLayout::For(output_shape, output_batch_dims,

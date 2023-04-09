@@ -298,7 +298,7 @@ class ShapeRefiner {
   GraphRunner graph_runner_;
 
   // Stores a map from a node to its ExtendedInferenceContext.
-  absl::flat_hash_map<const Node*, std::unique_ptr<ExtendedInferenceContext>,
+  abslx::flat_hash_map<const Node*, std::unique_ptr<ExtendedInferenceContext>,
                       hash<const Node*>>
       node_to_context_;
 
@@ -322,7 +322,7 @@ class ShapeRefiner {
 
   // Cache the graph corresponding to each function definition for which shapes
   // are refined.
-  absl::flat_hash_map<const FunctionDef*, std::unique_ptr<const Graph>,
+  abslx::flat_hash_map<const FunctionDef*, std::unique_ptr<const Graph>,
                       hash<const FunctionDef*>>
       functions_;
 

@@ -70,7 +70,7 @@ class PacketBase {
   // it relies on shared_ptr.unique(), which is deprecated and is not guaranteed
   // to give exact results.
   template <typename T>
-  absl::StatusOr<std::unique_ptr<T>> Consume() {
+  abslx::StatusOr<std::unique_ptr<T>> Consume() {
     // Using the implementation in the old Packet for now.
     mediapipe::Packet old =
         packet_internal::Create(std::move(payload_), timestamp_);
@@ -104,7 +104,7 @@ template <typename T>
 inline const T& PacketBase::Get() const {
   CHECK(payload_);
   packet_internal::Holder<T>* typed_payload = payload_->As<T>();
-  CHECK(typed_payload) << absl::StrCat(
+  CHECK(typed_payload) << abslx::StrCat(
       "The Packet stores \"", payload_->DebugTypeName(), "\", but \"",
       MediaPipeTypeStringOrDemangled<T>(), "\" was requested.");
   return typed_payload->data();
@@ -134,7 +134,7 @@ namespace internal {
 template <class T>
 inline void CheckCompatibleType(const HolderBase& holder, internal::Wrap<T>) {
   const packet_internal::Holder<T>* typed_payload = holder.As<T>();
-  CHECK(typed_payload) << absl::StrCat(
+  CHECK(typed_payload) << abslx::StrCat(
       "The Packet stores \"", holder.DebugTypeName(), "\", but \"",
       MediaPipeTypeStringOrDemangled<T>(), "\" was requested.");
   //  CHECK(payload_->has_type<T>());
@@ -146,8 +146,8 @@ inline void CheckCompatibleType(const HolderBase& holder,
   bool compatible = (holder.As<T>() || ...);
   CHECK(compatible)
       << "The Packet stores \"" << holder.DebugTypeName() << "\", but one of "
-      << absl::StrJoin(
-             {absl::StrCat("\"", MediaPipeTypeStringOrDemangled<T>(), "\"")...},
+      << abslx::StrJoin(
+             {abslx::StrCat("\"", MediaPipeTypeStringOrDemangled<T>(), "\"")...},
              ", ")
       << " was requested.";
 }
@@ -221,13 +221,13 @@ class Packet : public Packet<internal::Generic> {
 
   template <typename U, typename TT = T>
   std::enable_if_t<!std::is_abstract_v<TT>, TT> GetOr(U&& v) const {
-    return IsEmpty() ? static_cast<T>(absl::forward<U>(v)) : **this;
+    return IsEmpty() ? static_cast<T>(abslx::forward<U>(v)) : **this;
   }
 
   // Note: Consume is included for compatibility with the old Packet; however,
   // it relies on shared_ptr.unique(), which is deprecated and is not guaranteed
   // to give exact results.
-  absl::StatusOr<std::unique_ptr<T>> Consume() {
+  abslx::StatusOr<std::unique_ptr<T>> Consume() {
     return PacketBase::Consume<T>();
   }
 
@@ -290,7 +290,7 @@ struct CallAndAddStatusImpl<void, F, A...> {
 
 template <class F, class... A>
 auto CallAndAddStatus(const F& f, A&&... a) {
-  return CallAndAddStatusImpl<absl::result_of_t<F(A...)>, F, A...>()(
+  return CallAndAddStatusImpl<abslx::result_of_t<F(A...)>, F, A...>()(
       f, std::forward<A>(a)...);
 }
 
@@ -346,9 +346,9 @@ class Packet<OneOf<T...>> : public PacketBase {
     CHECK(payload_);
     auto f = internal::Overload{args...};
     using FirstT = typename internal::First<T...>::type;
-    using ResultType = absl::result_of_t<decltype(f)(const FirstT&)>;
+    using ResultType = abslx::result_of_t<decltype(f)(const FirstT&)>;
     static_assert(
-        (std::is_same_v<ResultType, absl::result_of_t<decltype(f)(const T&)>> &&
+        (std::is_same_v<ResultType, abslx::result_of_t<decltype(f)(const T&)>> &&
          ...),
         "All visitor overloads must have the same return type");
     return Invoke<decltype(f), T...>(f);
@@ -358,7 +358,7 @@ class Packet<OneOf<T...>> : public PacketBase {
   // it relies on shared_ptr.unique(), which is deprecated and is not guaranteed
   // to give exact results.
   template <class U, class = AllowedType<U>>
-  absl::StatusOr<std::unique_ptr<U>> Consume() {
+  abslx::StatusOr<std::unique_ptr<U>> Consume() {
     return PacketBase::Consume<U>();
   }
 
@@ -368,10 +368,10 @@ class Packet<OneOf<T...>> : public PacketBase {
     auto f = internal::Overload{args...};
     using FirstT = typename internal::First<T...>::type;
     using VisitorResultType =
-        absl::result_of_t<decltype(f)(std::unique_ptr<FirstT>)>;
+        abslx::result_of_t<decltype(f)(std::unique_ptr<FirstT>)>;
     static_assert(
         (std::is_same_v<VisitorResultType,
-                        absl::result_of_t<decltype(f)(std::unique_ptr<T>)>> &&
+                        abslx::result_of_t<decltype(f)(std::unique_ptr<T>)>> &&
          ...),
         "All visitor overloads must have the same return type");
     using ResultType = typename internal::AddStatus<VisitorResultType>::type;

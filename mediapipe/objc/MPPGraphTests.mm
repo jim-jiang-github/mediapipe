@@ -29,19 +29,19 @@ namespace mediapipe {
 
 class GrayscaleCalculator : public Calculator {
  public:
-  static absl::Status FillExpectations(const CalculatorOptions& options, PacketTypeSet* inputs,
+  static abslx::Status FillExpectations(const CalculatorOptions& options, PacketTypeSet* inputs,
                                        PacketTypeSet* outputs, PacketTypeSet* input_side_packets) {
     inputs->Index(0).Set<ImageFrame>();
     outputs->Index(0).Set<ImageFrame>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process() final {
+  abslx::Status Process() final {
     const auto& input = Input()->Get<ImageFrame>();
     int w = input.Width();
     int h = input.Height();
 
-    auto output = absl::make_unique<mediapipe::ImageFrame>(ImageFormat::GRAY8, w, h);
+    auto output = abslx::make_unique<mediapipe::ImageFrame>(ImageFormat::GRAY8, w, h);
 
     vImage_Buffer src = vImageForImageFrame(input);
     vImage_Buffer dst = vImageForImageFrame(*output);
@@ -49,7 +49,7 @@ class GrayscaleCalculator : public Calculator {
     NSCAssert(vErr == kvImageNoError, @"vImageRGBAToGray failed: %zd", vErr);
 
     Output()->Add(output.release(), InputTimestamp());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(GrayscaleCalculator);
@@ -58,37 +58,37 @@ REGISTER_CALCULATOR(GrayscaleCalculator);
 // if the video header is not present in the input stream.
 class VideoHeaderCalculator : public Calculator {
  public:
-  static absl::Status FillExpectations(const CalculatorOptions& options, PacketTypeSet* inputs,
+  static abslx::Status FillExpectations(const CalculatorOptions& options, PacketTypeSet* inputs,
                                        PacketTypeSet* outputs, PacketTypeSet* input_side_packets) {
     inputs->Index(0).Set<ImageFrame>();
     outputs->Index(0).Set<ImageFrame>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open() final {
+  abslx::Status Open() final {
     if (Input()->Header().IsEmpty()) {
-      return absl::UnknownError("No video header present.");
+      return abslx::UnknownError("No video header present.");
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process() final {
+  abslx::Status Process() final {
     Output()->AddPacket(Input()->Value());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(VideoHeaderCalculator);
 
 class ErrorCalculator : public Calculator {
  public:
-  static absl::Status FillExpectations(const CalculatorOptions& options, PacketTypeSet* inputs,
+  static abslx::Status FillExpectations(const CalculatorOptions& options, PacketTypeSet* inputs,
                                        PacketTypeSet* outputs, PacketTypeSet* input_side_packets) {
     inputs->Index(0).SetAny();
     outputs->Index(0).SetSameAs(&inputs->Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process() final { return absl::Status(absl::StatusCode::kUnknown, kExpectedError); }
+  abslx::Status Process() final { return abslx::Status(abslx::StatusCode::kUnknown, kExpectedError); }
 };
 REGISTER_CALCULATOR(ErrorCalculator);
 
@@ -123,7 +123,7 @@ REGISTER_CALCULATOR(ErrorCalculator);
   _graph = [[MPPGraph alloc] initWithGraphConfig:config];
   [_graph addFrameOutputStream:"output_frames" outputPacketType:MPPPacketTypePixelBuffer];
   CFHolder<CVPixelBufferRef> inputBuffer;
-  absl::Status status = CreateCVPixelBufferFromCGImage(_sourceImage.CGImage, &inputBuffer);
+  abslx::Status status = CreateCVPixelBufferFromCGImage(_sourceImage.CGImage, &inputBuffer);
   XCTAssert(status.ok());
   CVPixelBufferRef outputBuffer = [self runGraph:_graph
                                  withPixelBuffer:*inputBuffer
@@ -162,7 +162,7 @@ REGISTER_CALCULATOR(ErrorCalculator);
   [_graph addFrameOutputStream:"gray_frames" outputPacketType:MPPPacketTypeImageFrame];
 
   CFHolder<CVPixelBufferRef> inputBuffer;
-  absl::Status status = CreateCVPixelBufferFromCGImage(_sourceImage.CGImage, &inputBuffer);
+  abslx::Status status = CreateCVPixelBufferFromCGImage(_sourceImage.CGImage, &inputBuffer);
   XCTAssert(status.ok());
 
   WEAKIFY(self);
@@ -200,7 +200,7 @@ REGISTER_CALCULATOR(ErrorCalculator);
   _graph = [[MPPGraph alloc] initWithGraphConfig:config];
   [_graph addFrameOutputStream:"output_frames" outputPacketType:MPPPacketTypeImageFrame];
   CFHolder<CVPixelBufferRef> inputBuffer;
-  absl::Status status = CreateCVPixelBufferFromCGImage(grayImage.CGImage, &inputBuffer);
+  abslx::Status status = CreateCVPixelBufferFromCGImage(grayImage.CGImage, &inputBuffer);
   XCTAssert(status.ok());
   CVPixelBufferRef outputBuffer = [self runGraph:_graph
                                  withPixelBuffer:*inputBuffer
@@ -218,7 +218,7 @@ REGISTER_CALCULATOR(ErrorCalculator);
   node->add_input_stream("input_frames");
   node->add_output_stream("output_frames");
   CFHolder<CVPixelBufferRef> srcPixelBuffer;
-  absl::Status status = CreateCVPixelBufferFromCGImage(_sourceImage.CGImage, &srcPixelBuffer);
+  abslx::Status status = CreateCVPixelBufferFromCGImage(_sourceImage.CGImage, &srcPixelBuffer);
   XCTAssert(status.ok());
   _graph = [[MPPGraph alloc] initWithGraphConfig:config];
   [_graph addFrameOutputStream:"output_frames" outputPacketType:MPPPacketTypeImageFrame];
@@ -285,7 +285,7 @@ REGISTER_CALCULATOR(ErrorCalculator);
   _graph = [[MPPGraph alloc] initWithGraphConfig:config];
   [_graph addFrameOutputStream:"output_frames" outputPacketType:MPPPacketTypePixelBuffer];
   CFHolder<CVPixelBufferRef> inputBuffer;
-  absl::Status status = CreateCVPixelBufferFromCGImage(_sourceImage.CGImage, &inputBuffer);
+  abslx::Status status = CreateCVPixelBufferFromCGImage(_sourceImage.CGImage, &inputBuffer);
   XCTAssert(status.ok());
   [self runGraph:_graph withPixelBuffer:*inputBuffer packetType:MPPPacketTypePixelBuffer];
   __weak MPPGraph* weakGraph = _graph;
@@ -334,7 +334,7 @@ REGISTER_CALCULATOR(ErrorCalculator);
 
 - (void)testPixelBufferToImage {
   CFHolder<CVPixelBufferRef> pixelBufferIn;
-  absl::Status status = CreateCVPixelBufferFromCGImage(_sourceImage.CGImage, &pixelBufferIn);
+  abslx::Status status = CreateCVPixelBufferFromCGImage(_sourceImage.CGImage, &pixelBufferIn);
   XCTAssert(status.ok());
 
   mediapipe::CalculatorGraphConfig config;

@@ -73,18 +73,18 @@ struct AudioClassifierOutputStreams {
 };
 
 // Builds an AudioTensorSpecs for configuring the preprocessing calculators.
-absl::StatusOr<AudioTensorSpecs> BuildPreprocessingSpecs(
+abslx::StatusOr<AudioTensorSpecs> BuildPreprocessingSpecs(
     const core::ModelResources& model_resources) {
   const tflite::Model& model = *model_resources.GetTfLiteModel();
   if (model.subgraphs()->size() != 1) {
-    return CreateStatusWithPayload(absl::StatusCode::kInvalidArgument,
+    return CreateStatusWithPayload(abslx::StatusCode::kInvalidArgument,
                                    "Audio classification tflite models are "
                                    "assumed to have a single subgraph.",
                                    MediaPipeTasksStatus::kInvalidArgumentError);
   }
   const auto* primary_subgraph = (*model.subgraphs())[0];
   if (primary_subgraph->inputs()->size() != 1) {
-    return CreateStatusWithPayload(absl::StatusCode::kInvalidArgument,
+    return CreateStatusWithPayload(abslx::StatusCode::kInvalidArgument,
                                    "Audio classification tflite models are "
                                    "assumed to have a single input.",
                                    MediaPipeTasksStatus::kInvalidArgumentError);
@@ -152,7 +152,7 @@ void ConfigureAudioToTensorCalculator(
 // }
 class AudioClassifierGraph : public core::ModelTaskGraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     ASSIGN_OR_RETURN(
         const auto* model_resources,
@@ -163,7 +163,7 @@ class AudioClassifierGraph : public core::ModelTaskGraph {
         BuildAudioClassificationTask(
             sc->Options<proto::AudioClassifierGraphOptions>(), *model_resources,
             graph[Input<Matrix>(kAudioTag)],
-            absl::make_optional(graph[Input<double>(kSampleRateTag)]), graph));
+            abslx::make_optional(graph[Input<double>(kSampleRateTag)]), graph));
     output_streams.classifications >>
         graph[Output<ClassificationResult>(kClassificationsTag)];
     output_streams.timestamped_classifications >>
@@ -184,10 +184,10 @@ class AudioClassifierGraph : public core::ModelTaskGraph {
   // audio_in: (mediapipe::Matrix) stream to run audio classification on.
   // sample_rate_in: (double) optional stream of the input audio sample rate.
   // graph: the mediapipe builder::Graph instance to be updated.
-  absl::StatusOr<AudioClassifierOutputStreams> BuildAudioClassificationTask(
+  abslx::StatusOr<AudioClassifierOutputStreams> BuildAudioClassificationTask(
       const proto::AudioClassifierGraphOptions& task_options,
       const core::ModelResources& model_resources, Source<Matrix> audio_in,
-      absl::optional<Source<double>> sample_rate_in, Graph& graph) {
+      abslx::optional<Source<double>> sample_rate_in, Graph& graph) {
     const bool use_stream_mode = task_options.base_options().use_stream_mode();
     const auto* metadata_extractor = model_resources.GetMetadataExtractor();
     // Checks that metadata is available.
@@ -195,7 +195,7 @@ class AudioClassifierGraph : public core::ModelTaskGraph {
         metadata_extractor->GetModelMetadata()->subgraph_metadata() ==
             nullptr) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
+          abslx::StatusCode::kInvalidArgument,
           "Audio classifier models require TFLite Model Metadata but none was "
           "found",
           MediaPipeTasksStatus::kMetadataNotFoundError);

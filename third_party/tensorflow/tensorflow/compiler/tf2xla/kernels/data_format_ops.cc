@@ -37,12 +37,12 @@ class DataFormatDimMapOp : public XlaOpKernel {
     OP_REQUIRES_OK(context, context->GetAttr("dst_format", &dst_format));
     OP_REQUIRES(context, src_format.size() == 4 or src_format.size() == 5,
                 errors::InvalidArgument(
-                    absl::StrCat("Source format must of length 4 or 5, "
+                    abslx::StrCat("Source format must of length 4 or 5, "
                                  "received src_format = ",
                                  src_format)));
     OP_REQUIRES(
         context, dst_format.size() == 4 or dst_format.size() == 5,
-        errors::InvalidArgument(absl::StrCat(
+        errors::InvalidArgument(abslx::StrCat(
             "Destination format must of length 4 or 5, received dst_format = ",
             dst_format)));
     for (int i = 0; i < src_format.size(); ++i) {
@@ -56,7 +56,7 @@ class DataFormatDimMapOp : public XlaOpKernel {
         }
       }
       OP_REQUIRES(context, dst_idx_[i] != -1,
-                  errors::InvalidArgument(absl::StrCat(
+                  errors::InvalidArgument(abslx::StrCat(
                       src_format, " is not a permutation of ", dst_format)));
     }
   }
@@ -64,7 +64,7 @@ class DataFormatDimMapOp : public XlaOpKernel {
   void Compile(XlaOpKernelContext* context) override {
     auto builder = context->builder();
     xla::XlaOp dst_indices =
-        xla::ConstantR1(builder, absl::Span<const int32>(dst_idx_));
+        xla::ConstantR1(builder, abslx::Span<const int32>(dst_idx_));
     const int dims = dst_idx_.size();
     xla::XlaOp rank = xla::ConstantR0<int32>(builder, dims);
     xla::XlaOp src_indices =
@@ -168,7 +168,7 @@ class DataFormatVecPermuteOp : public XlaOpKernel {
       }
     }
     xla::XlaOp indices =
-        xla::ConstantR1(builder, absl::Span<const int32>(dst_indices));
+        xla::ConstantR1(builder, abslx::Span<const int32>(dst_indices));
     xla::XlaOp output = xla::TorchIndexSelect(ctx->Input(0), indices, 0);
     ctx->SetOutput(0, output);
   }

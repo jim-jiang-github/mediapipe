@@ -146,11 +146,11 @@ TEST(ClientSessionTest, MultiThreadedWithCustomThreadpool) {
   ClientSession session(root);
 
   auto inter_op_threadpool =
-      absl::make_unique<CustomThreadPoolImpl>(num_threads);
+      abslx::make_unique<CustomThreadPoolImpl>(num_threads);
   ASSERT_EQ(inter_op_threadpool->GetNumScheduleCalled(), 0);
 
   auto intra_op_threadpool =
-      absl::make_unique<CustomThreadPoolImpl>(num_threads);
+      abslx::make_unique<CustomThreadPoolImpl>(num_threads);
   ASSERT_EQ(intra_op_threadpool->GetNumScheduleCalled(), 0);
 
   tensorflow::thread::ThreadPoolOptions threadPoolOptions;
@@ -214,11 +214,11 @@ TEST(ClientSessionTest, CallableWithCustomThreadPool) {
   std::vector<Tensor> outputs;
 
   auto inter_op_threadpool =
-      absl::make_unique<CustomThreadPoolImpl>(num_threads);
+      abslx::make_unique<CustomThreadPoolImpl>(num_threads);
   ASSERT_EQ(inter_op_threadpool->GetNumScheduleCalled(), 0);
 
   auto intra_op_threadpool =
-      absl::make_unique<CustomThreadPoolImpl>(num_threads);
+      abslx::make_unique<CustomThreadPoolImpl>(num_threads);
   ASSERT_EQ(intra_op_threadpool->GetNumScheduleCalled(), 0);
 
   tensorflow::thread::ThreadPoolOptions threadPoolOptions;
@@ -234,7 +234,7 @@ TEST(ClientSessionTest, CallableWithCustomThreadPool) {
 
   // This is needed to have BatchMatMul computation be scheduled in the
   // intra_op_threadpool.
-  absl::Barrier barrier(num_threads + 1);
+  abslx::Barrier barrier(num_threads + 1);
   for (int i = 0; i < num_threads; i++) {
     intra_op_threadpool->Schedule([&barrier, num_threads]() {
       tensorflow::SetPerThreadMaxParallelism(num_threads - 1);

@@ -41,7 +41,7 @@ enum ActivationMode {
 Status GetActivationModeFromString(const string& str_value,
                                    ActivationMode* value);
 
-inline absl::string_view ToString(ActivationMode mode) {
+inline abslx::string_view ToString(ActivationMode mode) {
   switch (mode) {
     case NONE:
       return "NONE";

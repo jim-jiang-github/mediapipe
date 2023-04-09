@@ -28,7 +28,7 @@ namespace scale_image {
 // is a centered, cropped portion of the image that falls within the min
 // and max aspect ratio.  If either the min or max aspect ratio argument
 // is empty or has a 0 in the numerator or denominator then it is ignored.
-absl::Status FindCropDimensions(int input_width, int input_height,    //
+abslx::Status FindCropDimensions(int input_width, int input_height,    //
                                 const std::string& min_aspect_ratio,  //
                                 const std::string& max_aspect_ratio,  //
                                 int* crop_width, int* crop_height,    //
@@ -44,7 +44,7 @@ absl::Status FindCropDimensions(int input_width, int input_height,    //
 // reduced as necessary to preserve_aspect_ratio if the option is specified. If
 // preserving the aspect ratio is desired, you must set scale_to_multiple_of
 // to 2.
-absl::Status FindOutputDimensions(int input_width, int input_height,  //
+abslx::Status FindOutputDimensions(int input_width, int input_height,  //
                                   int target_width,
                                   int target_height,           //
                                   int target_max_area,         //
@@ -53,7 +53,7 @@ absl::Status FindOutputDimensions(int input_width, int input_height,  //
                                   int* output_width, int* output_height);
 
 // Backwards compatible helper.
-absl::Status FindOutputDimensions(int input_width, int input_height,  //
+abslx::Status FindOutputDimensions(int input_width, int input_height,  //
                                   int target_width,
                                   int target_height,           //
                                   bool preserve_aspect_ratio,  //

@@ -156,7 +156,7 @@ class SplitVOpBase : public OpKernel {
     // not using eigen for computation, its perfectly fine to avoid
     // the copying.
     if (SplitHasAlignedOutputsInFirstDimension(
-            input_shape, split_dim, absl::MakeConstSpan(*split_sizes_vec))) {
+            input_shape, split_dim, abslx::MakeConstSpan(*split_sizes_vec))) {
       Tlen start = 0;
       for (int i = 0; i < num_split; ++i) {
         context->set_output(i,
@@ -196,7 +196,7 @@ class SplitVOpBase : public OpKernel {
   // tensor from the slice is correctly aligned within the input tensor.
   static bool SplitHasAlignedOutputsInFirstDimension(
       const TensorShape& input_shape, int32_t split_dim,
-      absl::Span<const Tlen> split_sizes) {
+      abslx::Span<const Tlen> split_sizes) {
     if (split_dim != 0) {
       return false;
     }

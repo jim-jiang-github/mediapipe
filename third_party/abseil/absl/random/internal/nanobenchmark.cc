@@ -69,7 +69,7 @@
 #define ABSL_RANDOM_INTERNAL_ATTRIBUTE_NEVER_INLINE
 #endif
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal_nanobenchmark {
 namespace {
@@ -606,7 +606,7 @@ InputVec ReplicateInputs(const FuncInput* inputs, const size_t num_inputs,
   for (size_t i = 0; i < p.subset_ratio * num_skip; ++i) {
     full.insert(full.end(), inputs, inputs + num_inputs);
   }
-  absl::random_internal::randen_engine<uint32_t> rng;
+  abslx::random_internal::randen_engine<uint32_t> rng;
   std::shuffle(full.begin(), full.end(), rng);
   return full;
 }
@@ -625,7 +625,7 @@ void FillSubset(const InputVec& full, const FuncInput input_to_skip,
   }
   // omit[] is the same on every call, but that's OK because they identify the
   // Nth instance of input_to_skip, so the position within full[] differs.
-  absl::random_internal::randen_engine<uint32_t> rng;
+  abslx::random_internal::randen_engine<uint32_t> rng;
   std::shuffle(omit.begin(), omit.end(), rng);
   omit.resize(num_skip);
   std::sort(omit.begin(), omit.end());
@@ -801,4 +801,4 @@ size_t Measure(const Func func, const void* arg, const FuncInput* inputs,
 
 }  // namespace random_internal_nanobenchmark
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

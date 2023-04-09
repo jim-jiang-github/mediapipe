@@ -229,7 +229,7 @@ Status ZlibInputStream::ReadNBytes(int64_t bytes_to_read, tstring* result) {
 }
 
 #if defined(TF_CORD_SUPPORT)
-Status ZlibInputStream::ReadNBytes(int64_t bytes_to_read, absl::Cord* result) {
+Status ZlibInputStream::ReadNBytes(int64_t bytes_to_read, abslx::Cord* result) {
   // TODO(frankchn): Optimize this instead of bouncing through the buffer.
   tstring buf;
   TF_RETURN_IF_ERROR(ReadNBytes(bytes_to_read, &buf));

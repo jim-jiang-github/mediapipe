@@ -174,7 +174,7 @@ int64_t ParallelTaskAssignment::GetTargetParallelTaskCount(
 
 StatusOr<bool> ParallelTaskAssigner::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   XLA_VLOG_LINES(2, "ParallelTaskAssigner ENTRY");
   XLA_VLOG_LINES(3, module->ToString());
   // Compute target parallel task counts for all instructions in 'module'.
@@ -235,7 +235,7 @@ bool ParallelTaskAssigner::AssignParallelTasksHelper(
 
     // Outline 'instruction' in 'computation' for parallel task assignment.
     auto* call = module->OutlineExpressionFromComputation(
-        {instruction}, absl::StrCat("parallel_", instruction->name()),
+        {instruction}, abslx::StrCat("parallel_", instruction->name()),
         computation);
 
     // Set assigned dimension partitioning to 'instruction'.

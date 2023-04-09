@@ -160,7 +160,7 @@ class PerDeviceCollector {
     if (event.context_id != CuptiTracerEvent::kInvalidContextId) {
       xevent.AddStatValue(
           *plane->GetOrCreateStatMetadata(GetStatTypeStr(StatType::kContextId)),
-          absl::StrCat("$$", static_cast<uint64>(event.context_id)));
+          abslx::StrCat("$$", static_cast<uint64>(event.context_id)));
     }
 
     if (event.type == CuptiTracerEventType::Kernel &&
@@ -203,7 +203,7 @@ class PerDeviceCollector {
                event.type == CuptiTracerEventType::MemcpyP2P ||
                event.type == CuptiTracerEventType::MemcpyOther) {
       const auto& memcpy_info = event.memcpy_info;
-      std::string value = absl::StrCat(
+      std::string value = abslx::StrCat(
           "kind_src:", GetMemoryKindName(event.memcpy_info.src_mem_kind),
           " kind_dst:", GetMemoryKindName(event.memcpy_info.dst_mem_kind),
           " size:", memcpy_info.num_bytes, " dest:", memcpy_info.destination,
@@ -214,7 +214,7 @@ class PerDeviceCollector {
                           *plane->GetOrCreateStatMetadata(std::move(value)));
     } else if (event.type == CuptiTracerEventType::MemoryAlloc) {
       std::string value =
-          absl::StrCat("kind:", GetMemoryKindName(event.memalloc_info.mem_kind),
+          abslx::StrCat("kind:", GetMemoryKindName(event.memalloc_info.mem_kind),
                        " num_bytes:", event.memalloc_info.num_bytes);
       VLOG(7) << "Add MemAlloc stat. " << value;
       xevent.AddStatValue(*plane->GetOrCreateStatMetadata(
@@ -222,7 +222,7 @@ class PerDeviceCollector {
                           *plane->GetOrCreateStatMetadata(std::move(value)));
     } else if (event.type == CuptiTracerEventType::MemoryFree) {
       std::string value =
-          absl::StrCat("kind:", GetMemoryKindName(event.memfree_info.mem_kind),
+          abslx::StrCat("kind:", GetMemoryKindName(event.memfree_info.mem_kind),
                        " num_bytes:", event.memfree_info.num_bytes);
       VLOG(7) << "Add MemFree stat. " << value;
       xevent.AddStatValue(*plane->GetOrCreateStatMetadata(
@@ -230,7 +230,7 @@ class PerDeviceCollector {
                           *plane->GetOrCreateStatMetadata(std::move(value)));
     } else if (event.type == CuptiTracerEventType::Memset) {
       std::string value =
-          absl::StrCat("kind:", GetMemoryKindName(event.memset_info.mem_kind),
+          abslx::StrCat("kind:", GetMemoryKindName(event.memset_info.mem_kind),
                        " num_bytes:", event.memset_info.num_bytes,
                        " async:", event.memset_info.async);
       VLOG(7) << "Add Memset stat. " << value;
@@ -238,10 +238,10 @@ class PerDeviceCollector {
                               GetStatTypeStr(StatType::kMemsetDetails)),
                           *plane->GetOrCreateStatMetadata(std::move(value)));
     } else if (event.type == CuptiTracerEventType::MemoryResidency) {
-      std::string value = absl::StrCat(
+      std::string value = abslx::StrCat(
           "kind:", GetMemoryKindName(event.memory_residency_info.mem_kind),
           " num_bytes:", event.memory_residency_info.num_bytes, " addr:0x",
-          absl::Hex(event.memory_residency_info.address, absl::kZeroPad16));
+          abslx::Hex(event.memory_residency_info.address, abslx::kZeroPad16));
       VLOG(7) << "Add MemoryResidency stat. " << value;
       xevent.AddStatValue(*plane->GetOrCreateStatMetadata(GetStatTypeStr(
                               StatType::kMemoryResidencyDetails)),
@@ -258,7 +258,7 @@ class PerDeviceCollector {
     // If multiple metadata have the same key name, show the values from the top
     // of the stack (innermost annotation). Concatenate the values from
     // "hlo_op".
-    absl::flat_hash_set<absl::string_view> key_set;
+    abslx::flat_hash_set<abslx::string_view> key_set;
 
     for (auto annotation = annotation_stack.rbegin();
          annotation != annotation_stack.rend(); ++annotation) {
@@ -271,18 +271,18 @@ class PerDeviceCollector {
     }
   }
 
-  absl::optional<int> GetDeviceAttribute(CUdevice device,
+  abslx::optional<int> GetDeviceAttribute(CUdevice device,
                                          CUdevice_attribute attrib) {
     int ret_val;
     CUresult err = cuDeviceGetAttribute(&ret_val, attrib, device);
-    if (err != CUDA_SUCCESS) return absl::nullopt;
+    if (err != CUDA_SUCCESS) return abslx::nullopt;
     return ret_val;
   }
 
   std::string GetDeviceXLineName(
       int64_t stream_id,
-      absl::flat_hash_set<CuptiTracerEventType>& event_types) {
-    std::string line_name = absl::StrCat("Stream #", stream_id);
+      abslx::flat_hash_set<CuptiTracerEventType>& event_types) {
+    std::string line_name = abslx::StrCat("Stream #", stream_id);
     event_types.erase(CuptiTracerEventType::Unsupported);
     if (event_types.empty()) return line_name;
     if (event_types.count(CuptiTracerEventType::Overhead))
@@ -291,7 +291,7 @@ class PerDeviceCollector {
     for (const auto event_type : event_types) {
       type_names.emplace_back(GetTraceEventTypeName(event_type));
     }
-    return absl::StrCat(line_name, "(", absl::StrJoin(type_names, ","), ")");
+    return abslx::StrCat(line_name, "(", abslx::StrJoin(type_names, ","), ")");
   }
 
  public:
@@ -306,7 +306,7 @@ class PerDeviceCollector {
                XPlaneBuilder* device_plane, XPlaneBuilder* host_plane) {
     mutex_lock l(m_);
     // Tracking event types per line.
-    absl::flat_hash_map<int64_t, absl::flat_hash_set<CuptiTracerEventType>>
+    abslx::flat_hash_map<int64_t, abslx::flat_hash_set<CuptiTracerEventType>>
         events_types_per_line;
     for (auto& event : events_) {
       int64_t line_id = CuptiTracerEvent::kInvalidThreadId;
@@ -332,7 +332,7 @@ class PerDeviceCollector {
           GetDeviceXLineName(line.Id(), events_types_per_line[line.Id()]));
     });
     host_plane->ForEachLine([&](XLineBuilder line) {
-      line.SetName(absl::StrCat("Host Threads/", line.Id()));
+      line.SetName(abslx::StrCat("Host Threads/", line.Id()));
     });
     size_t num_events = events_.size();
     events_.clear();
@@ -446,21 +446,21 @@ class PerDeviceCollector {
   mutex m_;
   std::vector<CuptiTracerEvent> events_ TF_GUARDED_BY(m_);
   cudaOccDeviceProp device_properties_;
-  absl::flat_hash_map<DeviceOccupancyParams, OccupancyStats> occupancy_cache_;
+  abslx::flat_hash_map<DeviceOccupancyParams, OccupancyStats> occupancy_cache_;
 };
 
 }  // namespace
 
 void AnnotationMap::Add(uint32 device_id, uint32 correlation_id,
-                        const absl::string_view annotation,
-                        const absl::string_view nvtx_range) {
+                        const abslx::string_view annotation,
+                        const abslx::string_view nvtx_range) {
   if (annotation.empty() && nvtx_range.empty()) return;
   VLOG(3) << "Add annotation: device_id: " << device_id
           << " correlation_id: " << correlation_id
           << " annotation: " << annotation;
   if (device_id >= per_device_map_.size()) return;
   auto& per_device_map = per_device_map_[device_id];
-  absl::MutexLock lock(&per_device_map.mutex);
+  abslx::MutexLock lock(&per_device_map.mutex);
   if (per_device_map.annotations.size() < max_size_) {
     AnnotationInfo info;
     info.annotation = *per_device_map.annotations.emplace(annotation).first;
@@ -474,7 +474,7 @@ AnnotationMap::AnnotationInfo AnnotationMap::LookUp(uint32 device_id,
                                                     uint32 correlation_id) {
   if (device_id >= per_device_map_.size()) return AnnotationInfo();
   auto& per_device_map = per_device_map_[device_id];
-  absl::MutexLock lock(&per_device_map.mutex);
+  abslx::MutexLock lock(&per_device_map.mutex);
   auto it = per_device_map.correlation_map.find(correlation_id);
   return it != per_device_map.correlation_map.end() ? it->second
                                                     : AnnotationInfo();
@@ -512,7 +512,7 @@ class CuptiTraceCollectorImpl : public CuptiTraceCollector {
     per_device_collector_[event.device_id].AddEvent(std::move(event));
   }
   void OnEventsDropped(const std::string& reason, uint32 num_events) override {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     dropped_events_[reason] += num_events;
   }
   void Flush() override {}
@@ -544,10 +544,10 @@ class CuptiTraceCollectorImpl : public CuptiTraceCollector {
   }
 
   std::string ReportDroppedEvents() {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     string result;
     for (const auto& dropped : dropped_events_) {
-      absl::StrAppend(&result, " ", dropped.second, " events dropped because ",
+      abslx::StrAppend(&result, " ", dropped.second, " events dropped because ",
                       dropped.first, ";");
     }
     if (!result.empty()) result.back() = '.';
@@ -556,7 +556,7 @@ class CuptiTraceCollectorImpl : public CuptiTraceCollector {
   std::string ReportNumEventsIfDropped() override {
     std::string events_dropped = ReportDroppedEvents();
     if (events_dropped.empty()) return "";
-    return absl::StrCat("Detected GPU events dropped on ", port::Hostname(),
+    return abslx::StrCat("Detected GPU events dropped on ", port::Hostname(),
                         ": Profiler has collected ",
                         num_callback_events_.load(), " driver events and ",
                         num_activity_events_.load(), " device events.",
@@ -566,8 +566,8 @@ class CuptiTraceCollectorImpl : public CuptiTraceCollector {
  private:
   std::atomic<int> num_callback_events_;
   std::atomic<int> num_activity_events_;
-  absl::Mutex mutex_;
-  absl::flat_hash_map<std::string, uint64> dropped_events_
+  abslx::Mutex mutex_;
+  abslx::flat_hash_map<std::string, uint64> dropped_events_
       ABSL_GUARDED_BY(mutex_);
   uint64 start_walltime_ns_;
   uint64 start_gpu_ns_;
@@ -584,7 +584,7 @@ class CuptiTraceCollectorImpl : public CuptiTraceCollector {
         [&](XLineBuilder line) { line.SetTimestampNs(start_walltime_ns); });
   }
 
-  absl::FixedArray<PerDeviceCollector> per_device_collector_;
+  abslx::FixedArray<PerDeviceCollector> per_device_collector_;
 
   TF_DISALLOW_COPY_AND_ASSIGN(CuptiTraceCollectorImpl);
 };
@@ -597,7 +597,7 @@ std::unique_ptr<CuptiTraceCollector> CreateCuptiCollector(
 }
 
 // The strings are parser friendly and have no whitespaces in them.
-absl::string_view GetMemoryKindName(int8_t memory_kind) {
+abslx::string_view GetMemoryKindName(int8_t memory_kind) {
   switch (memory_kind) {
     case CUPTI_ACTIVITY_MEMORY_KIND_ARRAY:
       return "array";

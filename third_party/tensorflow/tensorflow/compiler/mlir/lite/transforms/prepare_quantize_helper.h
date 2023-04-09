@@ -110,7 +110,7 @@ LogicalResult GetLstmProperty(
   bool use_cifg =
       op.input_to_input_weights().getType().template isa<NoneType>();
   if (use_cifg) {
-    const absl::flat_hash_set<int> cifg_non_inputs = {1, 5, 9, 12, 20};
+    const abslx::flat_hash_set<int> cifg_non_inputs = {1, 5, 9, 12, 20};
     const int cifg_non_intermediate = 0;
     op_property->inputs.erase(
         std::remove_if(

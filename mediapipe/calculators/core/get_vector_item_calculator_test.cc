@@ -35,7 +35,7 @@ CalculatorRunner MakeRunnerWithStream() {
 CalculatorRunner MakeRunnerWithOptions(int set_index,
                                        bool output_empty_on_oob = false) {
   return CalculatorRunner(
-      absl::StrFormat(R"(
+      abslx::StrFormat(R"(
     calculator: "TestGetIntVectorItemCalculator"
     input_stream: "VECTOR:vector_stream"
     output_stream: "ITEM:item_stream"
@@ -126,7 +126,7 @@ TEST(TestGetIntVectorItemCalculatorTest, NoStreamNorOptionsExpectFail) {
     output_stream: "ITEM:item_stream"
   )");
 
-  absl::Status status = runner.Run();
+  abslx::Status status = runner.Run();
   ASSERT_FALSE(status.ok());
   EXPECT_THAT(
       status.message(),
@@ -141,7 +141,7 @@ TEST(TestGetIntVectorItemCalculatorTest, StreamIndexBoundsCheckFail1) {
   AddInputVector(runner, inputs, 1);
   AddInputIndex(runner, try_index, 1);
 
-  absl::Status status = runner.Run();
+  abslx::Status status = runner.Run();
   ASSERT_FALSE(status.ok());
   EXPECT_THAT(status.message(), testing::HasSubstr("idx >= 0"));
 }
@@ -154,7 +154,7 @@ TEST(TestGetIntVectorItemCalculatorTest, StreamIndexBoundsCheckFail2) {
   AddInputVector(runner, inputs, 1);
   AddInputIndex(runner, try_index, 1);
 
-  absl::Status status = runner.Run();
+  abslx::Status status = runner.Run();
   ASSERT_FALSE(status.ok());
   EXPECT_THAT(status.message(),
               testing::HasSubstr(
@@ -168,7 +168,7 @@ TEST(TestGetIntVectorItemCalculatorTest, OptionsIndexBoundsCheckFail1) {
 
   AddInputVector(runner, inputs, 1);
 
-  absl::Status status = runner.Run();
+  abslx::Status status = runner.Run();
   ASSERT_FALSE(status.ok());
   EXPECT_THAT(status.message(), testing::HasSubstr("idx >= 0"));
 }
@@ -180,7 +180,7 @@ TEST(TestGetIntVectorItemCalculatorTest, OptionsIndexBoundsCheckFail2) {
 
   AddInputVector(runner, inputs, 1);
 
-  absl::Status status = runner.Run();
+  abslx::Status status = runner.Run();
   ASSERT_FALSE(status.ok());
   EXPECT_THAT(status.message(),
               testing::HasSubstr(

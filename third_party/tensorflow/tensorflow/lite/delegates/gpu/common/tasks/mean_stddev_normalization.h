@@ -83,7 +83,7 @@ MeanStdDevNormalization CreateMeanStdDevNormalization(
 //    multiplication
 //          |
 //        output
-absl::Status TryMeanStdDevNormalization(
+abslx::Status TryMeanStdDevNormalization(
     const GpuInfo& gpu_info, CalculationsPrecision precision,
     const GraphFloat32& graph, NodeId first_node_id,
     const std::map<ValueId, TensorDescriptor>& tensor_descriptors,

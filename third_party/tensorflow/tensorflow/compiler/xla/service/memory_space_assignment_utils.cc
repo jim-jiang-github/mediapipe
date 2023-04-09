@@ -84,7 +84,7 @@ bool MemorySpaceAssignmentUtils::IsValueAllowedInAlternateMemory(
 bool MemorySpaceAssignmentUtils::IsIntervalAllowedInAlternateMemory(
     const GlobalDecreasingSizeBestFitHeap<HloValue>::BufferInterval& interval) {
   return IsValueAllowedInAlternateMemory(interval.buffer) &&
-         absl::c_all_of(interval.colocations, IsValueAllowedInAlternateMemory);
+         abslx::c_all_of(interval.colocations, IsValueAllowedInAlternateMemory);
 }
 
 }  // namespace xla

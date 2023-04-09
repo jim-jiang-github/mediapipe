@@ -192,7 +192,7 @@ Status GetInputOrientedData(T strided_slice,
     input_rank = input_shape[0];
   }
 
-  if (absl::popcount(ellipsis_mask) > 1)
+  if (abslx::popcount(ellipsis_mask) > 1)
     return errors::InvalidArgument(
         "strided slice only supports at most one ellipsis");
 
@@ -212,10 +212,10 @@ Status GetInputOrientedData(T strided_slice,
   // At this point total rank cannot be more than input_rank + number of
   // new axes plus the number of ellipses. Check that condition so that we know
   // the loop below won't have input_index >= input_rank.
-  if (spec_rank > input_rank + absl::popcount(new_axis_mask) + 1)
+  if (spec_rank > input_rank + abslx::popcount(new_axis_mask) + 1)
     return errors::InvalidArgument(
         "incompatible input rank, number of new axis and specification rank: ",
-        input_rank, ", ", absl::popcount(new_axis_mask), ", ", spec_rank);
+        input_rank, ", ", abslx::popcount(new_axis_mask), ", ", spec_rank);
 
   int64_t input_index = 0;
   for (int64_t spec_index = 0; spec_index < spec_rank; ++spec_index) {
@@ -368,7 +368,7 @@ StatusOr<Layout> GetStridedSliceIntermediateLayout(
 
   // Compute the new layout, its basically the old layout but replicated on some
   // axis.
-  absl::flat_hash_set<int> reduced_dims;
+  abslx::flat_hash_set<int> reduced_dims;
   for (int i = 0; i < rank; ++i)
     if (!can_shard[i]) reduced_dims.emplace(i);
   return layout.GetLayoutWithReducedDims(reduced_dims, /*keep_dims=*/true);

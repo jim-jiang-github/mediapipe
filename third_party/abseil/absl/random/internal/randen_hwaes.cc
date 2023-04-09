@@ -75,7 +75,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -109,7 +109,7 @@ void RandenHwAes::Generate(const void*, void*) {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #else  // defined(ABSL_RANDEN_HWAES_IMPL)
 //
@@ -118,7 +118,7 @@ ABSL_NAMESPACE_END
 //
 namespace {
 
-using absl::random_internal::RandenTraits;
+using abslx::random_internal::RandenTraits;
 
 // Randen operates on 128-bit vectors.
 struct alignas(16) u64x2 {
@@ -321,8 +321,8 @@ inline ABSL_TARGET_CRYPTO void SwapEndian(void*) {}
 // REQUIRES: Vector128 AesRound(Vector128, Vector128) {...}
 // REQUIRES: void SwapEndian(uint64_t*) {...}
 //
-// PROVIDES: absl::random_internal::RandenHwAes::Absorb
-// PROVIDES: absl::random_internal::RandenHwAes::Generate
+// PROVIDES: abslx::random_internal::RandenHwAes::Absorb
+// PROVIDES: abslx::random_internal::RandenHwAes::Generate
 namespace {
 
 // Block shuffles applies a shuffle to the entire state between AES rounds.
@@ -449,7 +449,7 @@ inline ABSL_TARGET_CRYPTO void Permute(
 
 }  // namespace
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -568,6 +568,6 @@ void ABSL_TARGET_CRYPTO RandenHwAes::Generate(const void* keys_void,
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // (ABSL_RANDEN_HWAES_IMPL)

@@ -63,8 +63,8 @@ namespace tensorflow {
 namespace tensorrt {
 namespace convert {
 
-using absl::StrAppend;
-using absl::StrCat;
+using abslx::StrAppend;
+using abslx::StrCat;
 using ::tensorflow::tensorrt::segment::ClusterProperty;
 using ::tensorflow::tensorrt::segment::NodePtrCompare;
 using ::tensorflow::tensorrt::segment::Segment;
@@ -806,18 +806,18 @@ Status ConvertGraph(const TRTOptimizationPass::ConversionParams& params,
   converted_segments.reserve(initial_segments.size());
   string engine_name_prefix =
       StrCat("TRTEngineOp_",
-             absl::StrFormat("%0*d", 3, GetNextGraphSequenceNumber()), "_");
+             abslx::StrFormat("%0*d", 3, GetNextGraphSequenceNumber()), "_");
   for (size_t t = 0; t < initial_segments.size(); t++) {
     auto& curr_segment = initial_segments.at(t);
     EngineInfo curr_engine;
     curr_engine.engine_name =
-        StrCat(engine_name_prefix, absl::StrFormat("%0*d", 3, t));
+        StrCat(engine_name_prefix, abslx::StrFormat("%0*d", 3, t));
 
     bool int8_no_calib = (!params.use_calibration &&
                           params.precision_mode == TrtPrecisionMode::INT8);
     bool has_qdq = false;
     if (int8_no_calib) {
-      has_qdq = absl::c_any_of(reverse_topo_order, IsQuantizeAndDequantizeOp);
+      has_qdq = abslx::c_any_of(reverse_topo_order, IsQuantizeAndDequantizeOp);
     }
 
     Status status = GetEngineInfo(&graph, static_graph_properties, curr_segment,

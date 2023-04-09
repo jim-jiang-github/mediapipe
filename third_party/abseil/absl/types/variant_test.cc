@@ -19,7 +19,7 @@
 
 #include "absl/types/variant.h"
 
-// This test is a no-op when absl::variant is an alias for std::variant.
+// This test is a no-op when abslx::variant is an alias for std::variant.
 #if !defined(ABSL_USES_STD_VARIANT)
 
 #include <algorithm>
@@ -55,7 +55,7 @@
 #endif  // ABSL_HAVE_EXCEPTIONS
 
 #define ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(...)                 \
-  ABSL_VARIANT_TEST_EXPECT_FAIL((void)(__VA_ARGS__), absl::bad_variant_access, \
+  ABSL_VARIANT_TEST_EXPECT_FAIL((void)(__VA_ARGS__), abslx::bad_variant_access, \
                                 "Bad variant access")
 
 struct Hashable {};
@@ -69,7 +69,7 @@ struct hash<Hashable> {
 
 struct NonHashable {};
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace {
 
@@ -130,7 +130,7 @@ struct ExceptionOnConversion {
 
 // Forces a variant into the valueless by exception state.
 template <class H, class... T>
-void ToValuelessByException(absl::variant<H, T...>& v) {  // NOLINT
+void ToValuelessByException(abslx::variant<H, T...>& v) {  // NOLINT
   try {
     v.template emplace<0>(ExceptionOnConversion<H>());
   } catch (ConversionException& /*e*/) {
@@ -282,7 +282,7 @@ TEST(VariantTest, TestDefaultConstructor) {
     constexpr variant<int> x{};
     ASSERT_FALSE(x.valueless_by_exception());
     ASSERT_EQ(0, x.index());
-    EXPECT_EQ(0, absl::get<0>(x));
+    EXPECT_EQ(0, abslx::get<0>(x));
     EXPECT_TRUE(std::is_nothrow_default_constructible<X>::value);
   }
 
@@ -291,7 +291,7 @@ TEST(VariantTest, TestDefaultConstructor) {
     X x{};
     ASSERT_FALSE(x.valueless_by_exception());
     ASSERT_EQ(0, x.index());
-    EXPECT_EQ(5, absl::get<0>(x).value);
+    EXPECT_EQ(5, abslx::get<0>(x).value);
     EXPECT_FALSE(std::is_nothrow_default_constructible<X>::value);
   }
 
@@ -300,7 +300,7 @@ TEST(VariantTest, TestDefaultConstructor) {
     X x{};
     ASSERT_FALSE(x.valueless_by_exception());
     ASSERT_EQ(0, x.index());
-    EXPECT_EQ(0, absl::get<0>(x));
+    EXPECT_EQ(0, abslx::get<0>(x));
     EXPECT_TRUE(std::is_nothrow_default_constructible<X>::value);
   }
 
@@ -309,7 +309,7 @@ TEST(VariantTest, TestDefaultConstructor) {
     X x{};
     ASSERT_FALSE(x.valueless_by_exception());
     ASSERT_EQ(0, x.index());
-    EXPECT_EQ(5, absl::get<0>(x).value);
+    EXPECT_EQ(5, abslx::get<0>(x).value);
     EXPECT_FALSE(std::is_nothrow_default_constructible<X>::value);
   }
   EXPECT_FALSE(
@@ -325,52 +325,52 @@ TEST(VariantTest, TestDefaultConstructor) {
 // that copies the provided value.
 TYPED_TEST(VariantTypesTest, TestCopyCtor) {
   typedef typename VariantFactory<typename TypeParam::value_type>::Type Variant;
-  using value_type1 = absl::variant_alternative_t<0, Variant>;
-  using value_type2 = absl::variant_alternative_t<1, Variant>;
-  using value_type3 = absl::variant_alternative_t<2, Variant>;
-  using value_type4 = absl::variant_alternative_t<3, Variant>;
+  using value_type1 = abslx::variant_alternative_t<0, Variant>;
+  using value_type2 = abslx::variant_alternative_t<1, Variant>;
+  using value_type3 = abslx::variant_alternative_t<2, Variant>;
+  using value_type4 = abslx::variant_alternative_t<3, Variant>;
   const TypeParam value(TypeParam::kIndex);
   Variant original(value);
   Variant copied(original);
-  EXPECT_TRUE(absl::holds_alternative<value_type1>(copied) ||
+  EXPECT_TRUE(abslx::holds_alternative<value_type1>(copied) ||
               TypeParam::kIndex != 1);
-  EXPECT_TRUE(absl::holds_alternative<value_type2>(copied) ||
+  EXPECT_TRUE(abslx::holds_alternative<value_type2>(copied) ||
               TypeParam::kIndex != 2);
-  EXPECT_TRUE(absl::holds_alternative<value_type3>(copied) ||
+  EXPECT_TRUE(abslx::holds_alternative<value_type3>(copied) ||
               TypeParam::kIndex != 3);
-  EXPECT_TRUE(absl::holds_alternative<value_type4>(copied) ||
+  EXPECT_TRUE(abslx::holds_alternative<value_type4>(copied) ||
               TypeParam::kIndex != 4);
-  EXPECT_TRUE((absl::get_if<value_type1>(&original) ==
-               absl::get_if<value_type1>(&copied)) ||
+  EXPECT_TRUE((abslx::get_if<value_type1>(&original) ==
+               abslx::get_if<value_type1>(&copied)) ||
               TypeParam::kIndex == 1);
-  EXPECT_TRUE((absl::get_if<value_type2>(&original) ==
-               absl::get_if<value_type2>(&copied)) ||
+  EXPECT_TRUE((abslx::get_if<value_type2>(&original) ==
+               abslx::get_if<value_type2>(&copied)) ||
               TypeParam::kIndex == 2);
-  EXPECT_TRUE((absl::get_if<value_type3>(&original) ==
-               absl::get_if<value_type3>(&copied)) ||
+  EXPECT_TRUE((abslx::get_if<value_type3>(&original) ==
+               abslx::get_if<value_type3>(&copied)) ||
               TypeParam::kIndex == 3);
-  EXPECT_TRUE((absl::get_if<value_type4>(&original) ==
-               absl::get_if<value_type4>(&copied)) ||
+  EXPECT_TRUE((abslx::get_if<value_type4>(&original) ==
+               abslx::get_if<value_type4>(&copied)) ||
               TypeParam::kIndex == 4);
-  EXPECT_TRUE((absl::get_if<value_type1>(&original) ==
-               absl::get_if<value_type1>(&copied)) ||
+  EXPECT_TRUE((abslx::get_if<value_type1>(&original) ==
+               abslx::get_if<value_type1>(&copied)) ||
               TypeParam::kIndex == 1);
-  EXPECT_TRUE((absl::get_if<value_type2>(&original) ==
-               absl::get_if<value_type2>(&copied)) ||
+  EXPECT_TRUE((abslx::get_if<value_type2>(&original) ==
+               abslx::get_if<value_type2>(&copied)) ||
               TypeParam::kIndex == 2);
-  EXPECT_TRUE((absl::get_if<value_type3>(&original) ==
-               absl::get_if<value_type3>(&copied)) ||
+  EXPECT_TRUE((abslx::get_if<value_type3>(&original) ==
+               abslx::get_if<value_type3>(&copied)) ||
               TypeParam::kIndex == 3);
-  EXPECT_TRUE((absl::get_if<value_type4>(&original) ==
-               absl::get_if<value_type4>(&copied)) ||
+  EXPECT_TRUE((abslx::get_if<value_type4>(&original) ==
+               abslx::get_if<value_type4>(&copied)) ||
               TypeParam::kIndex == 4);
-  const TypeParam* ovalptr = absl::get_if<TypeParam>(&original);
-  const TypeParam* cvalptr = absl::get_if<TypeParam>(&copied);
+  const TypeParam* ovalptr = abslx::get_if<TypeParam>(&original);
+  const TypeParam* cvalptr = abslx::get_if<TypeParam>(&copied);
   ASSERT_TRUE(ovalptr != nullptr);
   ASSERT_TRUE(cvalptr != nullptr);
   EXPECT_EQ(*ovalptr, *cvalptr);
-  TypeParam* mutable_ovalptr = absl::get_if<TypeParam>(&original);
-  TypeParam* mutable_cvalptr = absl::get_if<TypeParam>(&copied);
+  TypeParam* mutable_ovalptr = abslx::get_if<TypeParam>(&original);
+  TypeParam* mutable_cvalptr = abslx::get_if<TypeParam>(&copied);
   ASSERT_TRUE(mutable_ovalptr != nullptr);
   ASSERT_TRUE(mutable_cvalptr != nullptr);
   EXPECT_EQ(*mutable_ovalptr, *mutable_cvalptr);
@@ -389,8 +389,8 @@ TEST(VariantTest, TestMoveConstruct) {
   using V = variant<MoveOnly<class A>, MoveOnly<class B>, MoveOnly<class C>>;
 
   V v(in_place_index<1>, 10);
-  V v2 = absl::move(v);
-  EXPECT_EQ(10, absl::get<1>(v2).value);
+  V v2 = abslx::move(v);
+  EXPECT_EQ(10, abslx::get<1>(v2).value);
 }
 
 // Used internally to emulate missing triviality traits for tests.
@@ -407,7 +407,7 @@ struct is_trivially_move_constructible
 
 template <class T>
 struct is_trivially_move_assignable
-    : absl::is_move_assignable<SingleUnion<T>>::type {};
+    : abslx::is_move_assignable<SingleUnion<T>>::type {};
 
 TEST(VariantTest, NothrowMoveConstructible) {
   // Verify that variant is nothrow move constructible iff its template
@@ -426,93 +426,93 @@ TEST(VariantTest, NothrowMoveConstructible) {
 // that copies the provided value.
 TYPED_TEST(VariantTypesTest, TestValueCtor) {
   typedef typename VariantFactory<typename TypeParam::value_type>::Type Variant;
-  using value_type1 = absl::variant_alternative_t<0, Variant>;
-  using value_type2 = absl::variant_alternative_t<1, Variant>;
-  using value_type3 = absl::variant_alternative_t<2, Variant>;
-  using value_type4 = absl::variant_alternative_t<3, Variant>;
+  using value_type1 = abslx::variant_alternative_t<0, Variant>;
+  using value_type2 = abslx::variant_alternative_t<1, Variant>;
+  using value_type3 = abslx::variant_alternative_t<2, Variant>;
+  using value_type4 = abslx::variant_alternative_t<3, Variant>;
   const TypeParam value(TypeParam::kIndex);
   Variant v(value);
-  EXPECT_TRUE(absl::holds_alternative<value_type1>(v) ||
+  EXPECT_TRUE(abslx::holds_alternative<value_type1>(v) ||
               TypeParam::kIndex != 1);
-  EXPECT_TRUE(absl::holds_alternative<value_type2>(v) ||
+  EXPECT_TRUE(abslx::holds_alternative<value_type2>(v) ||
               TypeParam::kIndex != 2);
-  EXPECT_TRUE(absl::holds_alternative<value_type3>(v) ||
+  EXPECT_TRUE(abslx::holds_alternative<value_type3>(v) ||
               TypeParam::kIndex != 3);
-  EXPECT_TRUE(absl::holds_alternative<value_type4>(v) ||
+  EXPECT_TRUE(abslx::holds_alternative<value_type4>(v) ||
               TypeParam::kIndex != 4);
-  EXPECT_TRUE(nullptr != absl::get_if<value_type1>(&v) ||
+  EXPECT_TRUE(nullptr != abslx::get_if<value_type1>(&v) ||
               TypeParam::kIndex != 1);
-  EXPECT_TRUE(nullptr != absl::get_if<value_type2>(&v) ||
+  EXPECT_TRUE(nullptr != abslx::get_if<value_type2>(&v) ||
               TypeParam::kIndex != 2);
-  EXPECT_TRUE(nullptr != absl::get_if<value_type3>(&v) ||
+  EXPECT_TRUE(nullptr != abslx::get_if<value_type3>(&v) ||
               TypeParam::kIndex != 3);
-  EXPECT_TRUE(nullptr != absl::get_if<value_type4>(&v) ||
+  EXPECT_TRUE(nullptr != abslx::get_if<value_type4>(&v) ||
               TypeParam::kIndex != 4);
-  EXPECT_TRUE(nullptr != absl::get_if<value_type1>(&v) ||
+  EXPECT_TRUE(nullptr != abslx::get_if<value_type1>(&v) ||
               TypeParam::kIndex != 1);
-  EXPECT_TRUE(nullptr != absl::get_if<value_type2>(&v) ||
+  EXPECT_TRUE(nullptr != abslx::get_if<value_type2>(&v) ||
               TypeParam::kIndex != 2);
-  EXPECT_TRUE(nullptr != absl::get_if<value_type3>(&v) ||
+  EXPECT_TRUE(nullptr != abslx::get_if<value_type3>(&v) ||
               TypeParam::kIndex != 3);
-  EXPECT_TRUE(nullptr != absl::get_if<value_type4>(&v) ||
+  EXPECT_TRUE(nullptr != abslx::get_if<value_type4>(&v) ||
               TypeParam::kIndex != 4);
-  const TypeParam* valptr = absl::get_if<TypeParam>(&v);
+  const TypeParam* valptr = abslx::get_if<TypeParam>(&v);
   ASSERT_TRUE(nullptr != valptr);
   EXPECT_EQ(value.value, valptr->value);
-  const TypeParam* mutable_valptr = absl::get_if<TypeParam>(&v);
+  const TypeParam* mutable_valptr = abslx::get_if<TypeParam>(&v);
   ASSERT_TRUE(nullptr != mutable_valptr);
   EXPECT_EQ(value.value, mutable_valptr->value);
 }
 
 TEST(VariantTest, AmbiguousValueConstructor) {
-  EXPECT_FALSE((std::is_convertible<int, absl::variant<int, int>>::value));
-  EXPECT_FALSE((std::is_constructible<absl::variant<int, int>, int>::value));
+  EXPECT_FALSE((std::is_convertible<int, abslx::variant<int, int>>::value));
+  EXPECT_FALSE((std::is_constructible<abslx::variant<int, int>, int>::value));
 }
 
 TEST(VariantTest, InPlaceType) {
   using Var = variant<int, std::string, NonCopyable, std::vector<int>>;
 
   Var v1(in_place_type_t<int>(), 7);
-  ASSERT_TRUE(absl::holds_alternative<int>(v1));
-  EXPECT_EQ(7, absl::get<int>(v1));
+  ASSERT_TRUE(abslx::holds_alternative<int>(v1));
+  EXPECT_EQ(7, abslx::get<int>(v1));
 
   Var v2(in_place_type_t<std::string>(), "ABC");
-  ASSERT_TRUE(absl::holds_alternative<std::string>(v2));
-  EXPECT_EQ("ABC", absl::get<std::string>(v2));
+  ASSERT_TRUE(abslx::holds_alternative<std::string>(v2));
+  EXPECT_EQ("ABC", abslx::get<std::string>(v2));
 
   Var v3(in_place_type_t<std::string>(), "ABC", 2);
-  ASSERT_TRUE(absl::holds_alternative<std::string>(v3));
-  EXPECT_EQ("AB", absl::get<std::string>(v3));
+  ASSERT_TRUE(abslx::holds_alternative<std::string>(v3));
+  EXPECT_EQ("AB", abslx::get<std::string>(v3));
 
   Var v4(in_place_type_t<NonCopyable>{});
-  ASSERT_TRUE(absl::holds_alternative<NonCopyable>(v4));
+  ASSERT_TRUE(abslx::holds_alternative<NonCopyable>(v4));
 
   Var v5(in_place_type_t<std::vector<int>>(), {1, 2, 3});
-  ASSERT_TRUE(absl::holds_alternative<std::vector<int>>(v5));
-  EXPECT_THAT(absl::get<std::vector<int>>(v5), ::testing::ElementsAre(1, 2, 3));
+  ASSERT_TRUE(abslx::holds_alternative<std::vector<int>>(v5));
+  EXPECT_THAT(abslx::get<std::vector<int>>(v5), ::testing::ElementsAre(1, 2, 3));
 }
 
 TEST(VariantTest, InPlaceTypeVariableTemplate) {
   using Var = variant<int, std::string, NonCopyable, std::vector<int>>;
 
   Var v1(in_place_type<int>, 7);
-  ASSERT_TRUE(absl::holds_alternative<int>(v1));
-  EXPECT_EQ(7, absl::get<int>(v1));
+  ASSERT_TRUE(abslx::holds_alternative<int>(v1));
+  EXPECT_EQ(7, abslx::get<int>(v1));
 
   Var v2(in_place_type<std::string>, "ABC");
-  ASSERT_TRUE(absl::holds_alternative<std::string>(v2));
-  EXPECT_EQ("ABC", absl::get<std::string>(v2));
+  ASSERT_TRUE(abslx::holds_alternative<std::string>(v2));
+  EXPECT_EQ("ABC", abslx::get<std::string>(v2));
 
   Var v3(in_place_type<std::string>, "ABC", 2);
-  ASSERT_TRUE(absl::holds_alternative<std::string>(v3));
-  EXPECT_EQ("AB", absl::get<std::string>(v3));
+  ASSERT_TRUE(abslx::holds_alternative<std::string>(v3));
+  EXPECT_EQ("AB", abslx::get<std::string>(v3));
 
   Var v4(in_place_type<NonCopyable>);
-  ASSERT_TRUE(absl::holds_alternative<NonCopyable>(v4));
+  ASSERT_TRUE(abslx::holds_alternative<NonCopyable>(v4));
 
   Var v5(in_place_type<std::vector<int>>, {1, 2, 3});
-  ASSERT_TRUE(absl::holds_alternative<std::vector<int>>(v5));
-  EXPECT_THAT(absl::get<std::vector<int>>(v5), ::testing::ElementsAre(1, 2, 3));
+  ASSERT_TRUE(abslx::holds_alternative<std::vector<int>>(v5));
+  EXPECT_THAT(abslx::get<std::vector<int>>(v5), ::testing::ElementsAre(1, 2, 3));
 }
 
 TEST(VariantTest, InPlaceTypeInitializerList) {
@@ -520,8 +520,8 @@ TEST(VariantTest, InPlaceTypeInitializerList) {
       variant<int, std::string, NonCopyable, MoveOnlyWithListConstructor>;
 
   Var v1(in_place_type_t<MoveOnlyWithListConstructor>(), {1, 2, 3, 4, 5}, 6);
-  ASSERT_TRUE(absl::holds_alternative<MoveOnlyWithListConstructor>(v1));
-  EXPECT_EQ(6, absl::get<MoveOnlyWithListConstructor>(v1).value);
+  ASSERT_TRUE(abslx::holds_alternative<MoveOnlyWithListConstructor>(v1));
+  EXPECT_EQ(6, abslx::get<MoveOnlyWithListConstructor>(v1).value);
 }
 
 TEST(VariantTest, InPlaceTypeInitializerListVariabletemplate) {
@@ -529,62 +529,62 @@ TEST(VariantTest, InPlaceTypeInitializerListVariabletemplate) {
       variant<int, std::string, NonCopyable, MoveOnlyWithListConstructor>;
 
   Var v1(in_place_type<MoveOnlyWithListConstructor>, {1, 2, 3, 4, 5}, 6);
-  ASSERT_TRUE(absl::holds_alternative<MoveOnlyWithListConstructor>(v1));
-  EXPECT_EQ(6, absl::get<MoveOnlyWithListConstructor>(v1).value);
+  ASSERT_TRUE(abslx::holds_alternative<MoveOnlyWithListConstructor>(v1));
+  EXPECT_EQ(6, abslx::get<MoveOnlyWithListConstructor>(v1).value);
 }
 
 TEST(VariantTest, InPlaceIndex) {
   using Var = variant<int, std::string, NonCopyable, std::vector<int>>;
 
   Var v1(in_place_index_t<0>(), 7);
-  ASSERT_TRUE(absl::holds_alternative<int>(v1));
-  EXPECT_EQ(7, absl::get<int>(v1));
+  ASSERT_TRUE(abslx::holds_alternative<int>(v1));
+  EXPECT_EQ(7, abslx::get<int>(v1));
 
   Var v2(in_place_index_t<1>(), "ABC");
-  ASSERT_TRUE(absl::holds_alternative<std::string>(v2));
-  EXPECT_EQ("ABC", absl::get<std::string>(v2));
+  ASSERT_TRUE(abslx::holds_alternative<std::string>(v2));
+  EXPECT_EQ("ABC", abslx::get<std::string>(v2));
 
   Var v3(in_place_index_t<1>(), "ABC", 2);
-  ASSERT_TRUE(absl::holds_alternative<std::string>(v3));
-  EXPECT_EQ("AB", absl::get<std::string>(v3));
+  ASSERT_TRUE(abslx::holds_alternative<std::string>(v3));
+  EXPECT_EQ("AB", abslx::get<std::string>(v3));
 
   Var v4(in_place_index_t<2>{});
-  EXPECT_TRUE(absl::holds_alternative<NonCopyable>(v4));
+  EXPECT_TRUE(abslx::holds_alternative<NonCopyable>(v4));
 
   // Verify that a variant with only non-copyables can still be constructed.
-  EXPECT_TRUE(absl::holds_alternative<NonCopyable>(
+  EXPECT_TRUE(abslx::holds_alternative<NonCopyable>(
       variant<NonCopyable>(in_place_index_t<0>{})));
 
   Var v5(in_place_index_t<3>(), {1, 2, 3});
-  ASSERT_TRUE(absl::holds_alternative<std::vector<int>>(v5));
-  EXPECT_THAT(absl::get<std::vector<int>>(v5), ::testing::ElementsAre(1, 2, 3));
+  ASSERT_TRUE(abslx::holds_alternative<std::vector<int>>(v5));
+  EXPECT_THAT(abslx::get<std::vector<int>>(v5), ::testing::ElementsAre(1, 2, 3));
 }
 
 TEST(VariantTest, InPlaceIndexVariableTemplate) {
   using Var = variant<int, std::string, NonCopyable, std::vector<int>>;
 
   Var v1(in_place_index<0>, 7);
-  ASSERT_TRUE(absl::holds_alternative<int>(v1));
-  EXPECT_EQ(7, absl::get<int>(v1));
+  ASSERT_TRUE(abslx::holds_alternative<int>(v1));
+  EXPECT_EQ(7, abslx::get<int>(v1));
 
   Var v2(in_place_index<1>, "ABC");
-  ASSERT_TRUE(absl::holds_alternative<std::string>(v2));
-  EXPECT_EQ("ABC", absl::get<std::string>(v2));
+  ASSERT_TRUE(abslx::holds_alternative<std::string>(v2));
+  EXPECT_EQ("ABC", abslx::get<std::string>(v2));
 
   Var v3(in_place_index<1>, "ABC", 2);
-  ASSERT_TRUE(absl::holds_alternative<std::string>(v3));
-  EXPECT_EQ("AB", absl::get<std::string>(v3));
+  ASSERT_TRUE(abslx::holds_alternative<std::string>(v3));
+  EXPECT_EQ("AB", abslx::get<std::string>(v3));
 
   Var v4(in_place_index<2>);
-  EXPECT_TRUE(absl::holds_alternative<NonCopyable>(v4));
+  EXPECT_TRUE(abslx::holds_alternative<NonCopyable>(v4));
 
   // Verify that a variant with only non-copyables can still be constructed.
-  EXPECT_TRUE(absl::holds_alternative<NonCopyable>(
+  EXPECT_TRUE(abslx::holds_alternative<NonCopyable>(
       variant<NonCopyable>(in_place_index<0>)));
 
   Var v5(in_place_index<3>, {1, 2, 3});
-  ASSERT_TRUE(absl::holds_alternative<std::vector<int>>(v5));
-  EXPECT_THAT(absl::get<std::vector<int>>(v5), ::testing::ElementsAre(1, 2, 3));
+  ASSERT_TRUE(abslx::holds_alternative<std::vector<int>>(v5));
+  EXPECT_THAT(abslx::get<std::vector<int>>(v5), ::testing::ElementsAre(1, 2, 3));
 }
 
 TEST(VariantTest, InPlaceIndexInitializerList) {
@@ -592,8 +592,8 @@ TEST(VariantTest, InPlaceIndexInitializerList) {
       variant<int, std::string, NonCopyable, MoveOnlyWithListConstructor>;
 
   Var v1(in_place_index_t<3>(), {1, 2, 3, 4, 5}, 6);
-  ASSERT_TRUE(absl::holds_alternative<MoveOnlyWithListConstructor>(v1));
-  EXPECT_EQ(6, absl::get<MoveOnlyWithListConstructor>(v1).value);
+  ASSERT_TRUE(abslx::holds_alternative<MoveOnlyWithListConstructor>(v1));
+  EXPECT_EQ(6, abslx::get<MoveOnlyWithListConstructor>(v1).value);
 }
 
 TEST(VariantTest, InPlaceIndexInitializerListVariableTemplate) {
@@ -601,8 +601,8 @@ TEST(VariantTest, InPlaceIndexInitializerListVariableTemplate) {
       variant<int, std::string, NonCopyable, MoveOnlyWithListConstructor>;
 
   Var v1(in_place_index<3>, {1, 2, 3, 4, 5}, 6);
-  ASSERT_TRUE(absl::holds_alternative<MoveOnlyWithListConstructor>(v1));
-  EXPECT_EQ(6, absl::get<MoveOnlyWithListConstructor>(v1).value);
+  ASSERT_TRUE(abslx::holds_alternative<MoveOnlyWithListConstructor>(v1));
+  EXPECT_EQ(6, abslx::get<MoveOnlyWithListConstructor>(v1).value);
 }
 
 ////////////////////
@@ -612,10 +612,10 @@ TEST(VariantTest, InPlaceIndexInitializerListVariableTemplate) {
 // Make sure that the destructor destroys the contained value
 TEST(VariantTest, TestDtor) {
   typedef VariantFactory<IncrementInDtor>::Type Variant;
-  using value_type1 = absl::variant_alternative_t<0, Variant>;
-  using value_type2 = absl::variant_alternative_t<1, Variant>;
-  using value_type3 = absl::variant_alternative_t<2, Variant>;
-  using value_type4 = absl::variant_alternative_t<3, Variant>;
+  using value_type1 = abslx::variant_alternative_t<0, Variant>;
+  using value_type2 = abslx::variant_alternative_t<1, Variant>;
+  using value_type3 = abslx::variant_alternative_t<2, Variant>;
+  using value_type4 = abslx::variant_alternative_t<3, Variant>;
   int counter = 0;
   IncrementInDtor counter_adjuster(&counter);
   EXPECT_EQ(0, counter);
@@ -674,7 +674,7 @@ TEST(VariantTest, TestSelfAssignment) {
   typedef VariantFactory<IncrementInDtor>::Type Variant;
   int counter = 0;
   IncrementInDtor counter_adjuster(&counter);
-  absl::variant_alternative_t<0, Variant> value(counter_adjuster);
+  abslx::variant_alternative_t<0, Variant> value(counter_adjuster);
   Variant object(value);
   object.operator=(object);
   EXPECT_EQ(0, counter);
@@ -689,11 +689,11 @@ TEST(VariantTest, TestSelfAssignment) {
 
   variant<int, std::string> so = long_str;
   ASSERT_EQ(1, so.index());
-  EXPECT_EQ(long_str, absl::get<1>(so));
+  EXPECT_EQ(long_str, abslx::get<1>(so));
   so = *&so;
 
   ASSERT_EQ(1, so.index());
-  EXPECT_EQ(long_str, absl::get<1>(so));
+  EXPECT_EQ(long_str, abslx::get<1>(so));
 }
 
 // Test that assigning a variant<..., T, ...> to a variant<..., T, ...> produces
@@ -703,45 +703,45 @@ TYPED_TEST(VariantTypesTest, TestAssignmentCopiesValueSameTypes) {
   const TypeParam value(TypeParam::kIndex);
   const Variant source(value);
   Variant target(TypeParam(value.value + 1));
-  ASSERT_TRUE(absl::holds_alternative<TypeParam>(source));
-  ASSERT_TRUE(absl::holds_alternative<TypeParam>(target));
-  ASSERT_NE(absl::get<TypeParam>(source), absl::get<TypeParam>(target));
+  ASSERT_TRUE(abslx::holds_alternative<TypeParam>(source));
+  ASSERT_TRUE(abslx::holds_alternative<TypeParam>(target));
+  ASSERT_NE(abslx::get<TypeParam>(source), abslx::get<TypeParam>(target));
   target = source;
-  ASSERT_TRUE(absl::holds_alternative<TypeParam>(source));
-  ASSERT_TRUE(absl::holds_alternative<TypeParam>(target));
-  EXPECT_EQ(absl::get<TypeParam>(source), absl::get<TypeParam>(target));
+  ASSERT_TRUE(abslx::holds_alternative<TypeParam>(source));
+  ASSERT_TRUE(abslx::holds_alternative<TypeParam>(target));
+  EXPECT_EQ(abslx::get<TypeParam>(source), abslx::get<TypeParam>(target));
 }
 
 // Test that assisnging a variant<..., T, ...> to a variant<1, ...>
 // produces a variant<..., T, ...> with the correct value.
 TYPED_TEST(VariantTypesTest, TestAssignmentCopiesValuesVaryingSourceType) {
   typedef typename VariantFactory<typename TypeParam::value_type>::Type Variant;
-  using value_type1 = absl::variant_alternative_t<0, Variant>;
+  using value_type1 = abslx::variant_alternative_t<0, Variant>;
   const TypeParam value(TypeParam::kIndex);
   const Variant source(value);
-  ASSERT_TRUE(absl::holds_alternative<TypeParam>(source));
+  ASSERT_TRUE(abslx::holds_alternative<TypeParam>(source));
   Variant target(value_type1(1));
-  ASSERT_TRUE(absl::holds_alternative<value_type1>(target));
+  ASSERT_TRUE(abslx::holds_alternative<value_type1>(target));
   target = source;
-  EXPECT_TRUE(absl::holds_alternative<TypeParam>(source));
-  EXPECT_TRUE(absl::holds_alternative<TypeParam>(target));
-  EXPECT_EQ(absl::get<TypeParam>(source), absl::get<TypeParam>(target));
+  EXPECT_TRUE(abslx::holds_alternative<TypeParam>(source));
+  EXPECT_TRUE(abslx::holds_alternative<TypeParam>(target));
+  EXPECT_EQ(abslx::get<TypeParam>(source), abslx::get<TypeParam>(target));
 }
 
 // Test that assigning a variant<1, ...> to a variant<..., T, ...>
 // produces a variant<1, ...> with the correct value.
 TYPED_TEST(VariantTypesTest, TestAssignmentCopiesValuesVaryingTargetType) {
   typedef typename VariantFactory<typename TypeParam::value_type>::Type Variant;
-  using value_type1 = absl::variant_alternative_t<0, Variant>;
+  using value_type1 = abslx::variant_alternative_t<0, Variant>;
   const Variant source(value_type1(1));
-  ASSERT_TRUE(absl::holds_alternative<value_type1>(source));
+  ASSERT_TRUE(abslx::holds_alternative<value_type1>(source));
   const TypeParam value(TypeParam::kIndex);
   Variant target(value);
-  ASSERT_TRUE(absl::holds_alternative<TypeParam>(target));
+  ASSERT_TRUE(abslx::holds_alternative<TypeParam>(target));
   target = source;
-  EXPECT_TRUE(absl::holds_alternative<value_type1>(target));
-  EXPECT_TRUE(absl::holds_alternative<value_type1>(source));
-  EXPECT_EQ(absl::get<value_type1>(source), absl::get<value_type1>(target));
+  EXPECT_TRUE(abslx::holds_alternative<value_type1>(target));
+  EXPECT_TRUE(abslx::holds_alternative<value_type1>(source));
+  EXPECT_EQ(abslx::get<value_type1>(source), abslx::get<value_type1>(target));
 }
 
 // Test that operator=<T> works, that assigning a new value destroys
@@ -749,17 +749,17 @@ TYPED_TEST(VariantTypesTest, TestAssignmentCopiesValuesVaryingTargetType) {
 // the old
 TEST(VariantTest, TestAssign) {
   typedef VariantFactory<IncrementInDtor>::Type Variant;
-  using value_type1 = absl::variant_alternative_t<0, Variant>;
-  using value_type2 = absl::variant_alternative_t<1, Variant>;
-  using value_type3 = absl::variant_alternative_t<2, Variant>;
-  using value_type4 = absl::variant_alternative_t<3, Variant>;
+  using value_type1 = abslx::variant_alternative_t<0, Variant>;
+  using value_type2 = abslx::variant_alternative_t<1, Variant>;
+  using value_type3 = abslx::variant_alternative_t<2, Variant>;
+  using value_type4 = abslx::variant_alternative_t<3, Variant>;
 
   const int kSize = 4;
   int counter[kSize];
   std::unique_ptr<IncrementInDtor> counter_adjustor[kSize];
   for (int i = 0; i != kSize; i++) {
     counter[i] = 0;
-    counter_adjustor[i] = absl::make_unique<IncrementInDtor>(&counter[i]);
+    counter_adjustor[i] = abslx::make_unique<IncrementInDtor>(&counter[i]);
   }
 
   value_type1 v1(*counter_adjustor[0]);
@@ -815,10 +815,10 @@ TEST(VariantTest, TestAssign) {
 // cannot throw.
 TEST(VariantTest, TestBackupAssign) {
   typedef VariantFactory<IncrementInDtorCopyCanThrow>::Type Variant;
-  using value_type1 = absl::variant_alternative_t<0, Variant>;
-  using value_type2 = absl::variant_alternative_t<1, Variant>;
-  using value_type3 = absl::variant_alternative_t<2, Variant>;
-  using value_type4 = absl::variant_alternative_t<3, Variant>;
+  using value_type1 = abslx::variant_alternative_t<0, Variant>;
+  using value_type2 = abslx::variant_alternative_t<1, Variant>;
+  using value_type3 = abslx::variant_alternative_t<2, Variant>;
+  using value_type4 = abslx::variant_alternative_t<3, Variant>;
 
   const int kSize = 4;
   int counter[kSize];
@@ -887,26 +887,26 @@ TEST(VariantTest, TestBackupAssign) {
 TEST(VariantTest, TestEmplaceBasic) {
   using Variant = variant<int, char>;
 
-  Variant v(absl::in_place_index<0>, 0);
+  Variant v(abslx::in_place_index<0>, 0);
 
   {
     char& emplace_result = v.emplace<char>();
-    ASSERT_TRUE(absl::holds_alternative<char>(v));
-    EXPECT_EQ(absl::get<char>(v), 0);
-    EXPECT_EQ(&emplace_result, &absl::get<char>(v));
+    ASSERT_TRUE(abslx::holds_alternative<char>(v));
+    EXPECT_EQ(abslx::get<char>(v), 0);
+    EXPECT_EQ(&emplace_result, &abslx::get<char>(v));
   }
 
   // Make sure that another emplace does zero-initialization
-  absl::get<char>(v) = 'a';
+  abslx::get<char>(v) = 'a';
   v.emplace<char>('b');
-  ASSERT_TRUE(absl::holds_alternative<char>(v));
-  EXPECT_EQ(absl::get<char>(v), 'b');
+  ASSERT_TRUE(abslx::holds_alternative<char>(v));
+  EXPECT_EQ(abslx::get<char>(v), 'b');
 
   {
     int& emplace_result = v.emplace<int>();
-    EXPECT_TRUE(absl::holds_alternative<int>(v));
-    EXPECT_EQ(absl::get<int>(v), 0);
-    EXPECT_EQ(&emplace_result, &absl::get<int>(v));
+    EXPECT_TRUE(abslx::holds_alternative<int>(v));
+    EXPECT_EQ(abslx::get<int>(v), 0);
+    EXPECT_EQ(&emplace_result, &abslx::get<int>(v));
   }
 }
 
@@ -914,37 +914,37 @@ TEST(VariantTest, TestEmplaceInitializerList) {
   using Var =
       variant<int, std::string, NonCopyable, MoveOnlyWithListConstructor>;
 
-  Var v1(absl::in_place_index<0>, 555);
+  Var v1(abslx::in_place_index<0>, 555);
   MoveOnlyWithListConstructor& emplace_result =
       v1.emplace<MoveOnlyWithListConstructor>({1, 2, 3, 4, 5}, 6);
-  ASSERT_TRUE(absl::holds_alternative<MoveOnlyWithListConstructor>(v1));
-  EXPECT_EQ(6, absl::get<MoveOnlyWithListConstructor>(v1).value);
-  EXPECT_EQ(&emplace_result, &absl::get<MoveOnlyWithListConstructor>(v1));
+  ASSERT_TRUE(abslx::holds_alternative<MoveOnlyWithListConstructor>(v1));
+  EXPECT_EQ(6, abslx::get<MoveOnlyWithListConstructor>(v1).value);
+  EXPECT_EQ(&emplace_result, &abslx::get<MoveOnlyWithListConstructor>(v1));
 }
 
 TEST(VariantTest, TestEmplaceIndex) {
   using Variant = variant<int, char>;
 
-  Variant v(absl::in_place_index<0>, 555);
+  Variant v(abslx::in_place_index<0>, 555);
 
   {
     char& emplace_result = v.emplace<1>();
-    ASSERT_TRUE(absl::holds_alternative<char>(v));
-    EXPECT_EQ(absl::get<char>(v), 0);
-    EXPECT_EQ(&emplace_result, &absl::get<char>(v));
+    ASSERT_TRUE(abslx::holds_alternative<char>(v));
+    EXPECT_EQ(abslx::get<char>(v), 0);
+    EXPECT_EQ(&emplace_result, &abslx::get<char>(v));
   }
 
   // Make sure that another emplace does zero-initialization
-  absl::get<char>(v) = 'a';
+  abslx::get<char>(v) = 'a';
   v.emplace<1>('b');
-  ASSERT_TRUE(absl::holds_alternative<char>(v));
-  EXPECT_EQ(absl::get<char>(v), 'b');
+  ASSERT_TRUE(abslx::holds_alternative<char>(v));
+  EXPECT_EQ(abslx::get<char>(v), 'b');
 
   {
     int& emplace_result = v.emplace<0>();
-    EXPECT_TRUE(absl::holds_alternative<int>(v));
-    EXPECT_EQ(absl::get<int>(v), 0);
-    EXPECT_EQ(&emplace_result, &absl::get<int>(v));
+    EXPECT_TRUE(abslx::holds_alternative<int>(v));
+    EXPECT_EQ(abslx::get<int>(v), 0);
+    EXPECT_EQ(&emplace_result, &abslx::get<int>(v));
   }
 }
 
@@ -952,12 +952,12 @@ TEST(VariantTest, TestEmplaceIndexInitializerList) {
   using Var =
       variant<int, std::string, NonCopyable, MoveOnlyWithListConstructor>;
 
-  Var v1(absl::in_place_index<0>, 555);
+  Var v1(abslx::in_place_index<0>, 555);
   MoveOnlyWithListConstructor& emplace_result =
       v1.emplace<3>({1, 2, 3, 4, 5}, 6);
-  ASSERT_TRUE(absl::holds_alternative<MoveOnlyWithListConstructor>(v1));
-  EXPECT_EQ(6, absl::get<MoveOnlyWithListConstructor>(v1).value);
-  EXPECT_EQ(&emplace_result, &absl::get<MoveOnlyWithListConstructor>(v1));
+  ASSERT_TRUE(abslx::holds_alternative<MoveOnlyWithListConstructor>(v1));
+  EXPECT_EQ(6, abslx::get<MoveOnlyWithListConstructor>(v1).value);
+  EXPECT_EQ(&emplace_result, &abslx::get<MoveOnlyWithListConstructor>(v1));
 }
 
 //////////////////////
@@ -1001,10 +1001,10 @@ TEST(VariantTest, NotValuelessByException) {
 TEST(VariantTest, IndexValuelessByException) {
   using Var = variant<MoveCanThrow, std::string, double>;
 
-  Var v(absl::in_place_index<0>);
+  Var v(abslx::in_place_index<0>);
   EXPECT_EQ(0, v.index());
   ToValuelessByException(v);
-  EXPECT_EQ(absl::variant_npos, v.index());
+  EXPECT_EQ(abslx::variant_npos, v.index());
   v = "str";
   EXPECT_EQ(1, v.index());
 }
@@ -1012,7 +1012,7 @@ TEST(VariantTest, IndexValuelessByException) {
 TEST(VariantTest, ValuelessByException) {
   using Var = variant<MoveCanThrow, std::string, double>;
 
-  Var v(absl::in_place_index<0>);
+  Var v(abslx::in_place_index<0>);
   EXPECT_FALSE(v.valueless_by_exception());
   ToValuelessByException(v);
   EXPECT_TRUE(v.valueless_by_exception());
@@ -1038,7 +1038,7 @@ TEST(VariantTest, MemberSwap) {
   a.swap(b);
   EXPECT_THAT(a, VariantWith<SpecialSwap>(v2));
   EXPECT_THAT(b, VariantWith<SpecialSwap>(v1));
-  EXPECT_TRUE(absl::get<SpecialSwap>(a).special_swap);
+  EXPECT_TRUE(abslx::get<SpecialSwap>(a).special_swap);
 
   using V = variant<MoveCanThrow, std::string, int>;
   int i = 33;
@@ -1083,92 +1083,92 @@ TEST(VariantTest, MemberSwap) {
 
 TEST(VariantTest, VariantSize) {
   {
-    using Size1Variant = absl::variant<int>;
-    EXPECT_EQ(1, absl::variant_size<Size1Variant>::value);
-    EXPECT_EQ(1, absl::variant_size<const Size1Variant>::value);
-    EXPECT_EQ(1, absl::variant_size<volatile Size1Variant>::value);
-    EXPECT_EQ(1, absl::variant_size<const volatile Size1Variant>::value);
+    using Size1Variant = abslx::variant<int>;
+    EXPECT_EQ(1, abslx::variant_size<Size1Variant>::value);
+    EXPECT_EQ(1, abslx::variant_size<const Size1Variant>::value);
+    EXPECT_EQ(1, abslx::variant_size<volatile Size1Variant>::value);
+    EXPECT_EQ(1, abslx::variant_size<const volatile Size1Variant>::value);
   }
 
   {
-    using Size3Variant = absl::variant<int, float, int>;
-    EXPECT_EQ(3, absl::variant_size<Size3Variant>::value);
-    EXPECT_EQ(3, absl::variant_size<const Size3Variant>::value);
-    EXPECT_EQ(3, absl::variant_size<volatile Size3Variant>::value);
-    EXPECT_EQ(3, absl::variant_size<const volatile Size3Variant>::value);
+    using Size3Variant = abslx::variant<int, float, int>;
+    EXPECT_EQ(3, abslx::variant_size<Size3Variant>::value);
+    EXPECT_EQ(3, abslx::variant_size<const Size3Variant>::value);
+    EXPECT_EQ(3, abslx::variant_size<volatile Size3Variant>::value);
+    EXPECT_EQ(3, abslx::variant_size<const volatile Size3Variant>::value);
   }
 }
 
 TEST(VariantTest, VariantAlternative) {
   {
-    using V = absl::variant<float, int, const char*>;
+    using V = abslx::variant<float, int, const char*>;
     EXPECT_TRUE(
-        (std::is_same<float, absl::variant_alternative_t<0, V>>::value));
+        (std::is_same<float, abslx::variant_alternative_t<0, V>>::value));
     EXPECT_TRUE((std::is_same<const float,
-                              absl::variant_alternative_t<0, const V>>::value));
+                              abslx::variant_alternative_t<0, const V>>::value));
     EXPECT_TRUE(
         (std::is_same<volatile float,
-                      absl::variant_alternative_t<0, volatile V>>::value));
+                      abslx::variant_alternative_t<0, volatile V>>::value));
     EXPECT_TRUE((
         std::is_same<const volatile float,
-                     absl::variant_alternative_t<0, const volatile V>>::value));
+                     abslx::variant_alternative_t<0, const volatile V>>::value));
 
-    EXPECT_TRUE((std::is_same<int, absl::variant_alternative_t<1, V>>::value));
+    EXPECT_TRUE((std::is_same<int, abslx::variant_alternative_t<1, V>>::value));
     EXPECT_TRUE((std::is_same<const int,
-                              absl::variant_alternative_t<1, const V>>::value));
+                              abslx::variant_alternative_t<1, const V>>::value));
     EXPECT_TRUE(
         (std::is_same<volatile int,
-                      absl::variant_alternative_t<1, volatile V>>::value));
+                      abslx::variant_alternative_t<1, volatile V>>::value));
     EXPECT_TRUE((
         std::is_same<const volatile int,
-                     absl::variant_alternative_t<1, const volatile V>>::value));
+                     abslx::variant_alternative_t<1, const volatile V>>::value));
 
     EXPECT_TRUE(
-        (std::is_same<const char*, absl::variant_alternative_t<2, V>>::value));
+        (std::is_same<const char*, abslx::variant_alternative_t<2, V>>::value));
     EXPECT_TRUE((std::is_same<const char* const,
-                              absl::variant_alternative_t<2, const V>>::value));
+                              abslx::variant_alternative_t<2, const V>>::value));
     EXPECT_TRUE(
         (std::is_same<const char* volatile,
-                      absl::variant_alternative_t<2, volatile V>>::value));
+                      abslx::variant_alternative_t<2, volatile V>>::value));
     EXPECT_TRUE((
         std::is_same<const char* const volatile,
-                     absl::variant_alternative_t<2, const volatile V>>::value));
+                     abslx::variant_alternative_t<2, const volatile V>>::value));
   }
 
   {
-    using V = absl::variant<float, volatile int, const char*>;
+    using V = abslx::variant<float, volatile int, const char*>;
     EXPECT_TRUE(
-        (std::is_same<float, absl::variant_alternative_t<0, V>>::value));
+        (std::is_same<float, abslx::variant_alternative_t<0, V>>::value));
     EXPECT_TRUE((std::is_same<const float,
-                              absl::variant_alternative_t<0, const V>>::value));
+                              abslx::variant_alternative_t<0, const V>>::value));
     EXPECT_TRUE(
         (std::is_same<volatile float,
-                      absl::variant_alternative_t<0, volatile V>>::value));
+                      abslx::variant_alternative_t<0, volatile V>>::value));
     EXPECT_TRUE((
         std::is_same<const volatile float,
-                     absl::variant_alternative_t<0, const volatile V>>::value));
+                     abslx::variant_alternative_t<0, const volatile V>>::value));
 
     EXPECT_TRUE(
-        (std::is_same<volatile int, absl::variant_alternative_t<1, V>>::value));
+        (std::is_same<volatile int, abslx::variant_alternative_t<1, V>>::value));
     EXPECT_TRUE((std::is_same<const volatile int,
-                              absl::variant_alternative_t<1, const V>>::value));
+                              abslx::variant_alternative_t<1, const V>>::value));
     EXPECT_TRUE(
         (std::is_same<volatile int,
-                      absl::variant_alternative_t<1, volatile V>>::value));
+                      abslx::variant_alternative_t<1, volatile V>>::value));
     EXPECT_TRUE((
         std::is_same<const volatile int,
-                     absl::variant_alternative_t<1, const volatile V>>::value));
+                     abslx::variant_alternative_t<1, const volatile V>>::value));
 
     EXPECT_TRUE(
-        (std::is_same<const char*, absl::variant_alternative_t<2, V>>::value));
+        (std::is_same<const char*, abslx::variant_alternative_t<2, V>>::value));
     EXPECT_TRUE((std::is_same<const char* const,
-                              absl::variant_alternative_t<2, const V>>::value));
+                              abslx::variant_alternative_t<2, const V>>::value));
     EXPECT_TRUE(
         (std::is_same<const char* volatile,
-                      absl::variant_alternative_t<2, volatile V>>::value));
+                      abslx::variant_alternative_t<2, volatile V>>::value));
     EXPECT_TRUE((
         std::is_same<const char* const volatile,
-                     absl::variant_alternative_t<2, const volatile V>>::value));
+                     abslx::variant_alternative_t<2, const volatile V>>::value));
   }
 }
 
@@ -1180,110 +1180,110 @@ TEST(VariantTest, HoldsAlternative) {
   using Var = variant<int, std::string, double>;
 
   Var v = 1;
-  EXPECT_TRUE(absl::holds_alternative<int>(v));
-  EXPECT_FALSE(absl::holds_alternative<std::string>(v));
-  EXPECT_FALSE(absl::holds_alternative<double>(v));
+  EXPECT_TRUE(abslx::holds_alternative<int>(v));
+  EXPECT_FALSE(abslx::holds_alternative<std::string>(v));
+  EXPECT_FALSE(abslx::holds_alternative<double>(v));
   v = "str";
-  EXPECT_FALSE(absl::holds_alternative<int>(v));
-  EXPECT_TRUE(absl::holds_alternative<std::string>(v));
-  EXPECT_FALSE(absl::holds_alternative<double>(v));
+  EXPECT_FALSE(abslx::holds_alternative<int>(v));
+  EXPECT_TRUE(abslx::holds_alternative<std::string>(v));
+  EXPECT_FALSE(abslx::holds_alternative<double>(v));
   v = 0.;
-  EXPECT_FALSE(absl::holds_alternative<int>(v));
-  EXPECT_FALSE(absl::holds_alternative<std::string>(v));
-  EXPECT_TRUE(absl::holds_alternative<double>(v));
+  EXPECT_FALSE(abslx::holds_alternative<int>(v));
+  EXPECT_FALSE(abslx::holds_alternative<std::string>(v));
+  EXPECT_TRUE(abslx::holds_alternative<double>(v));
 
   Var v2 = v;
-  EXPECT_FALSE(absl::holds_alternative<int>(v2));
-  EXPECT_FALSE(absl::holds_alternative<std::string>(v2));
-  EXPECT_TRUE(absl::holds_alternative<double>(v2));
+  EXPECT_FALSE(abslx::holds_alternative<int>(v2));
+  EXPECT_FALSE(abslx::holds_alternative<std::string>(v2));
+  EXPECT_TRUE(abslx::holds_alternative<double>(v2));
   v2.emplace<int>(3);
-  EXPECT_TRUE(absl::holds_alternative<int>(v2));
-  EXPECT_FALSE(absl::holds_alternative<std::string>(v2));
-  EXPECT_FALSE(absl::holds_alternative<double>(v2));
+  EXPECT_TRUE(abslx::holds_alternative<int>(v2));
+  EXPECT_FALSE(abslx::holds_alternative<std::string>(v2));
+  EXPECT_FALSE(abslx::holds_alternative<double>(v2));
 }
 
 TEST(VariantTest, GetIndex) {
   using Var = variant<int, std::string, double, int>;
 
   {
-    Var v(absl::in_place_index<0>, 0);
+    Var v(abslx::in_place_index<0>, 0);
 
-    using LValueGetType = decltype(absl::get<0>(v));
-    using RValueGetType = decltype(absl::get<0>(absl::move(v)));
+    using LValueGetType = decltype(abslx::get<0>(v));
+    using RValueGetType = decltype(abslx::get<0>(abslx::move(v)));
 
     EXPECT_TRUE((std::is_same<LValueGetType, int&>::value));
     EXPECT_TRUE((std::is_same<RValueGetType, int&&>::value));
-    EXPECT_EQ(absl::get<0>(v), 0);
-    EXPECT_EQ(absl::get<0>(absl::move(v)), 0);
+    EXPECT_EQ(abslx::get<0>(v), 0);
+    EXPECT_EQ(abslx::get<0>(abslx::move(v)), 0);
 
     const Var& const_v = v;
-    using ConstLValueGetType = decltype(absl::get<0>(const_v));
-    using ConstRValueGetType = decltype(absl::get<0>(absl::move(const_v)));
+    using ConstLValueGetType = decltype(abslx::get<0>(const_v));
+    using ConstRValueGetType = decltype(abslx::get<0>(abslx::move(const_v)));
     EXPECT_TRUE((std::is_same<ConstLValueGetType, const int&>::value));
     EXPECT_TRUE((std::is_same<ConstRValueGetType, const int&&>::value));
-    EXPECT_EQ(absl::get<0>(const_v), 0);
-    EXPECT_EQ(absl::get<0>(absl::move(const_v)), 0);
+    EXPECT_EQ(abslx::get<0>(const_v), 0);
+    EXPECT_EQ(abslx::get<0>(abslx::move(const_v)), 0);
   }
 
   {
     Var v = std::string("Hello");
 
-    using LValueGetType = decltype(absl::get<1>(v));
-    using RValueGetType = decltype(absl::get<1>(absl::move(v)));
+    using LValueGetType = decltype(abslx::get<1>(v));
+    using RValueGetType = decltype(abslx::get<1>(abslx::move(v)));
 
     EXPECT_TRUE((std::is_same<LValueGetType, std::string&>::value));
     EXPECT_TRUE((std::is_same<RValueGetType, std::string&&>::value));
-    EXPECT_EQ(absl::get<1>(v), "Hello");
-    EXPECT_EQ(absl::get<1>(absl::move(v)), "Hello");
+    EXPECT_EQ(abslx::get<1>(v), "Hello");
+    EXPECT_EQ(abslx::get<1>(abslx::move(v)), "Hello");
 
     const Var& const_v = v;
-    using ConstLValueGetType = decltype(absl::get<1>(const_v));
-    using ConstRValueGetType = decltype(absl::get<1>(absl::move(const_v)));
+    using ConstLValueGetType = decltype(abslx::get<1>(const_v));
+    using ConstRValueGetType = decltype(abslx::get<1>(abslx::move(const_v)));
     EXPECT_TRUE((std::is_same<ConstLValueGetType, const std::string&>::value));
     EXPECT_TRUE((std::is_same<ConstRValueGetType, const std::string&&>::value));
-    EXPECT_EQ(absl::get<1>(const_v), "Hello");
-    EXPECT_EQ(absl::get<1>(absl::move(const_v)), "Hello");
+    EXPECT_EQ(abslx::get<1>(const_v), "Hello");
+    EXPECT_EQ(abslx::get<1>(abslx::move(const_v)), "Hello");
   }
 
   {
     Var v = 2.0;
 
-    using LValueGetType = decltype(absl::get<2>(v));
-    using RValueGetType = decltype(absl::get<2>(absl::move(v)));
+    using LValueGetType = decltype(abslx::get<2>(v));
+    using RValueGetType = decltype(abslx::get<2>(abslx::move(v)));
 
     EXPECT_TRUE((std::is_same<LValueGetType, double&>::value));
     EXPECT_TRUE((std::is_same<RValueGetType, double&&>::value));
-    EXPECT_EQ(absl::get<2>(v), 2.);
-    EXPECT_EQ(absl::get<2>(absl::move(v)), 2.);
+    EXPECT_EQ(abslx::get<2>(v), 2.);
+    EXPECT_EQ(abslx::get<2>(abslx::move(v)), 2.);
 
     const Var& const_v = v;
-    using ConstLValueGetType = decltype(absl::get<2>(const_v));
-    using ConstRValueGetType = decltype(absl::get<2>(absl::move(const_v)));
+    using ConstLValueGetType = decltype(abslx::get<2>(const_v));
+    using ConstRValueGetType = decltype(abslx::get<2>(abslx::move(const_v)));
     EXPECT_TRUE((std::is_same<ConstLValueGetType, const double&>::value));
     EXPECT_TRUE((std::is_same<ConstRValueGetType, const double&&>::value));
-    EXPECT_EQ(absl::get<2>(const_v), 2.);
-    EXPECT_EQ(absl::get<2>(absl::move(const_v)), 2.);
+    EXPECT_EQ(abslx::get<2>(const_v), 2.);
+    EXPECT_EQ(abslx::get<2>(abslx::move(const_v)), 2.);
   }
 
   {
-    Var v(absl::in_place_index<0>, 0);
+    Var v(abslx::in_place_index<0>, 0);
     v.emplace<3>(1);
 
-    using LValueGetType = decltype(absl::get<3>(v));
-    using RValueGetType = decltype(absl::get<3>(absl::move(v)));
+    using LValueGetType = decltype(abslx::get<3>(v));
+    using RValueGetType = decltype(abslx::get<3>(abslx::move(v)));
 
     EXPECT_TRUE((std::is_same<LValueGetType, int&>::value));
     EXPECT_TRUE((std::is_same<RValueGetType, int&&>::value));
-    EXPECT_EQ(absl::get<3>(v), 1);
-    EXPECT_EQ(absl::get<3>(absl::move(v)), 1);
+    EXPECT_EQ(abslx::get<3>(v), 1);
+    EXPECT_EQ(abslx::get<3>(abslx::move(v)), 1);
 
     const Var& const_v = v;
-    using ConstLValueGetType = decltype(absl::get<3>(const_v));
-    using ConstRValueGetType = decltype(absl::get<3>(absl::move(const_v)));
+    using ConstLValueGetType = decltype(abslx::get<3>(const_v));
+    using ConstRValueGetType = decltype(abslx::get<3>(abslx::move(const_v)));
     EXPECT_TRUE((std::is_same<ConstLValueGetType, const int&>::value));
     EXPECT_TRUE((std::is_same<ConstRValueGetType, const int&&>::value));
-    EXPECT_EQ(absl::get<3>(const_v), 1);
-    EXPECT_EQ(absl::get<3>(absl::move(const_v)), 1);  // NOLINT
+    EXPECT_EQ(abslx::get<3>(const_v), 1);
+    EXPECT_EQ(abslx::get<3>(abslx::move(const_v)), 1);  // NOLINT
   }
 }
 
@@ -1293,25 +1293,25 @@ TEST(VariantTest, BadGetIndex) {
   {
     Var v = 1;
 
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(absl::get<1>(v));
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(absl::get<1>(std::move(v)));
+    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(abslx::get<1>(v));
+    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(abslx::get<1>(std::move(v)));
 
     const Var& const_v = v;
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(absl::get<1>(const_v));
+    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(abslx::get<1>(const_v));
     ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
-        absl::get<1>(std::move(const_v)));  // NOLINT
+        abslx::get<1>(std::move(const_v)));  // NOLINT
   }
 
   {
     Var v = std::string("Hello");
 
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(absl::get<0>(v));
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(absl::get<0>(std::move(v)));
+    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(abslx::get<0>(v));
+    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(abslx::get<0>(std::move(v)));
 
     const Var& const_v = v;
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(absl::get<0>(const_v));
+    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(abslx::get<0>(const_v));
     ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
-        absl::get<0>(std::move(const_v)));  // NOLINT
+        abslx::get<0>(std::move(const_v)));  // NOLINT
   }
 }
 
@@ -1321,61 +1321,61 @@ TEST(VariantTest, GetType) {
   {
     Var v = 1;
 
-    using LValueGetType = decltype(absl::get<int>(v));
-    using RValueGetType = decltype(absl::get<int>(absl::move(v)));
+    using LValueGetType = decltype(abslx::get<int>(v));
+    using RValueGetType = decltype(abslx::get<int>(abslx::move(v)));
 
     EXPECT_TRUE((std::is_same<LValueGetType, int&>::value));
     EXPECT_TRUE((std::is_same<RValueGetType, int&&>::value));
-    EXPECT_EQ(absl::get<int>(v), 1);
-    EXPECT_EQ(absl::get<int>(absl::move(v)), 1);
+    EXPECT_EQ(abslx::get<int>(v), 1);
+    EXPECT_EQ(abslx::get<int>(abslx::move(v)), 1);
 
     const Var& const_v = v;
-    using ConstLValueGetType = decltype(absl::get<int>(const_v));
-    using ConstRValueGetType = decltype(absl::get<int>(absl::move(const_v)));
+    using ConstLValueGetType = decltype(abslx::get<int>(const_v));
+    using ConstRValueGetType = decltype(abslx::get<int>(abslx::move(const_v)));
     EXPECT_TRUE((std::is_same<ConstLValueGetType, const int&>::value));
     EXPECT_TRUE((std::is_same<ConstRValueGetType, const int&&>::value));
-    EXPECT_EQ(absl::get<int>(const_v), 1);
-    EXPECT_EQ(absl::get<int>(absl::move(const_v)), 1);
+    EXPECT_EQ(abslx::get<int>(const_v), 1);
+    EXPECT_EQ(abslx::get<int>(abslx::move(const_v)), 1);
   }
 
   {
     Var v = std::string("Hello");
 
-    using LValueGetType = decltype(absl::get<1>(v));
-    using RValueGetType = decltype(absl::get<1>(absl::move(v)));
+    using LValueGetType = decltype(abslx::get<1>(v));
+    using RValueGetType = decltype(abslx::get<1>(abslx::move(v)));
 
     EXPECT_TRUE((std::is_same<LValueGetType, std::string&>::value));
     EXPECT_TRUE((std::is_same<RValueGetType, std::string&&>::value));
-    EXPECT_EQ(absl::get<std::string>(v), "Hello");
-    EXPECT_EQ(absl::get<std::string>(absl::move(v)), "Hello");
+    EXPECT_EQ(abslx::get<std::string>(v), "Hello");
+    EXPECT_EQ(abslx::get<std::string>(abslx::move(v)), "Hello");
 
     const Var& const_v = v;
-    using ConstLValueGetType = decltype(absl::get<1>(const_v));
-    using ConstRValueGetType = decltype(absl::get<1>(absl::move(const_v)));
+    using ConstLValueGetType = decltype(abslx::get<1>(const_v));
+    using ConstRValueGetType = decltype(abslx::get<1>(abslx::move(const_v)));
     EXPECT_TRUE((std::is_same<ConstLValueGetType, const std::string&>::value));
     EXPECT_TRUE((std::is_same<ConstRValueGetType, const std::string&&>::value));
-    EXPECT_EQ(absl::get<std::string>(const_v), "Hello");
-    EXPECT_EQ(absl::get<std::string>(absl::move(const_v)), "Hello");
+    EXPECT_EQ(abslx::get<std::string>(const_v), "Hello");
+    EXPECT_EQ(abslx::get<std::string>(abslx::move(const_v)), "Hello");
   }
 
   {
     Var v = 2.0;
 
-    using LValueGetType = decltype(absl::get<2>(v));
-    using RValueGetType = decltype(absl::get<2>(absl::move(v)));
+    using LValueGetType = decltype(abslx::get<2>(v));
+    using RValueGetType = decltype(abslx::get<2>(abslx::move(v)));
 
     EXPECT_TRUE((std::is_same<LValueGetType, double&>::value));
     EXPECT_TRUE((std::is_same<RValueGetType, double&&>::value));
-    EXPECT_EQ(absl::get<double>(v), 2.);
-    EXPECT_EQ(absl::get<double>(absl::move(v)), 2.);
+    EXPECT_EQ(abslx::get<double>(v), 2.);
+    EXPECT_EQ(abslx::get<double>(abslx::move(v)), 2.);
 
     const Var& const_v = v;
-    using ConstLValueGetType = decltype(absl::get<2>(const_v));
-    using ConstRValueGetType = decltype(absl::get<2>(absl::move(const_v)));
+    using ConstLValueGetType = decltype(abslx::get<2>(const_v));
+    using ConstRValueGetType = decltype(abslx::get<2>(abslx::move(const_v)));
     EXPECT_TRUE((std::is_same<ConstLValueGetType, const double&>::value));
     EXPECT_TRUE((std::is_same<ConstRValueGetType, const double&&>::value));
-    EXPECT_EQ(absl::get<double>(const_v), 2.);
-    EXPECT_EQ(absl::get<double>(absl::move(const_v)), 2.);
+    EXPECT_EQ(abslx::get<double>(const_v), 2.);
+    EXPECT_EQ(abslx::get<double>(abslx::move(const_v)), 2.);
   }
 }
 
@@ -1385,27 +1385,27 @@ TEST(VariantTest, BadGetType) {
   {
     Var v = 1;
 
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(absl::get<std::string>(v));
+    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(abslx::get<std::string>(v));
     ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
-        absl::get<std::string>(std::move(v)));
+        abslx::get<std::string>(std::move(v)));
 
     const Var& const_v = v;
     ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
-        absl::get<std::string>(const_v));
+        abslx::get<std::string>(const_v));
     ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
-        absl::get<std::string>(std::move(const_v)));  // NOLINT
+        abslx::get<std::string>(std::move(const_v)));  // NOLINT
   }
 
   {
     Var v = std::string("Hello");
 
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(absl::get<int>(v));
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(absl::get<int>(std::move(v)));
+    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(abslx::get<int>(v));
+    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(abslx::get<int>(std::move(v)));
 
     const Var& const_v = v;
-    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(absl::get<int>(const_v));
+    ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(abslx::get<int>(const_v));
     ABSL_VARIANT_TEST_EXPECT_BAD_VARIANT_ACCESS(
-        absl::get<int>(std::move(const_v)));  // NOLINT
+        abslx::get<int>(std::move(const_v)));  // NOLINT
   }
 }
 
@@ -1413,52 +1413,52 @@ TEST(VariantTest, GetIfIndex) {
   using Var = variant<int, std::string, double, int>;
 
   {
-    Var v(absl::in_place_index<0>, 0);
-    EXPECT_TRUE(noexcept(absl::get_if<0>(&v)));
+    Var v(abslx::in_place_index<0>, 0);
+    EXPECT_TRUE(noexcept(abslx::get_if<0>(&v)));
 
     {
-      auto* elem = absl::get_if<0>(&v);
+      auto* elem = abslx::get_if<0>(&v);
       EXPECT_TRUE((std::is_same<decltype(elem), int*>::value));
       ASSERT_NE(elem, nullptr);
       EXPECT_EQ(*elem, 0);
       {
-        auto* bad_elem = absl::get_if<1>(&v);
+        auto* bad_elem = abslx::get_if<1>(&v);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), std::string*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
       {
-        auto* bad_elem = absl::get_if<2>(&v);
+        auto* bad_elem = abslx::get_if<2>(&v);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), double*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
       {
-        auto* bad_elem = absl::get_if<3>(&v);
+        auto* bad_elem = abslx::get_if<3>(&v);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), int*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
     }
 
     const Var& const_v = v;
-    EXPECT_TRUE(noexcept(absl::get_if<0>(&const_v)));
+    EXPECT_TRUE(noexcept(abslx::get_if<0>(&const_v)));
 
     {
-      auto* elem = absl::get_if<0>(&const_v);
+      auto* elem = abslx::get_if<0>(&const_v);
       EXPECT_TRUE((std::is_same<decltype(elem), const int*>::value));
       ASSERT_NE(elem, nullptr);
       EXPECT_EQ(*elem, 0);
       {
-        auto* bad_elem = absl::get_if<1>(&const_v);
+        auto* bad_elem = abslx::get_if<1>(&const_v);
         EXPECT_TRUE(
             (std::is_same<decltype(bad_elem), const std::string*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
       {
-        auto* bad_elem = absl::get_if<2>(&const_v);
+        auto* bad_elem = abslx::get_if<2>(&const_v);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), const double*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
       {
-        auto* bad_elem = absl::get_if<3>(&const_v);
+        auto* bad_elem = abslx::get_if<3>(&const_v);
         EXPECT_EQ(bad_elem, nullptr);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), const int*>::value));
       }
@@ -1467,50 +1467,50 @@ TEST(VariantTest, GetIfIndex) {
 
   {
     Var v = std::string("Hello");
-    EXPECT_TRUE(noexcept(absl::get_if<1>(&v)));
+    EXPECT_TRUE(noexcept(abslx::get_if<1>(&v)));
 
     {
-      auto* elem = absl::get_if<1>(&v);
+      auto* elem = abslx::get_if<1>(&v);
       EXPECT_TRUE((std::is_same<decltype(elem), std::string*>::value));
       ASSERT_NE(elem, nullptr);
       EXPECT_EQ(*elem, "Hello");
       {
-        auto* bad_elem = absl::get_if<0>(&v);
+        auto* bad_elem = abslx::get_if<0>(&v);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), int*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
       {
-        auto* bad_elem = absl::get_if<2>(&v);
+        auto* bad_elem = abslx::get_if<2>(&v);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), double*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
       {
-        auto* bad_elem = absl::get_if<3>(&v);
+        auto* bad_elem = abslx::get_if<3>(&v);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), int*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
     }
 
     const Var& const_v = v;
-    EXPECT_TRUE(noexcept(absl::get_if<1>(&const_v)));
+    EXPECT_TRUE(noexcept(abslx::get_if<1>(&const_v)));
 
     {
-      auto* elem = absl::get_if<1>(&const_v);
+      auto* elem = abslx::get_if<1>(&const_v);
       EXPECT_TRUE((std::is_same<decltype(elem), const std::string*>::value));
       ASSERT_NE(elem, nullptr);
       EXPECT_EQ(*elem, "Hello");
       {
-        auto* bad_elem = absl::get_if<0>(&const_v);
+        auto* bad_elem = abslx::get_if<0>(&const_v);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), const int*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
       {
-        auto* bad_elem = absl::get_if<2>(&const_v);
+        auto* bad_elem = abslx::get_if<2>(&const_v);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), const double*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
       {
-        auto* bad_elem = absl::get_if<3>(&const_v);
+        auto* bad_elem = abslx::get_if<3>(&const_v);
         EXPECT_EQ(bad_elem, nullptr);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), const int*>::value));
       }
@@ -1519,51 +1519,51 @@ TEST(VariantTest, GetIfIndex) {
 
   {
     Var v = 2.0;
-    EXPECT_TRUE(noexcept(absl::get_if<2>(&v)));
+    EXPECT_TRUE(noexcept(abslx::get_if<2>(&v)));
 
     {
-      auto* elem = absl::get_if<2>(&v);
+      auto* elem = abslx::get_if<2>(&v);
       EXPECT_TRUE((std::is_same<decltype(elem), double*>::value));
       ASSERT_NE(elem, nullptr);
       EXPECT_EQ(*elem, 2.0);
       {
-        auto* bad_elem = absl::get_if<0>(&v);
+        auto* bad_elem = abslx::get_if<0>(&v);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), int*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
       {
-        auto* bad_elem = absl::get_if<1>(&v);
+        auto* bad_elem = abslx::get_if<1>(&v);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), std::string*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
       {
-        auto* bad_elem = absl::get_if<3>(&v);
+        auto* bad_elem = abslx::get_if<3>(&v);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), int*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
     }
 
     const Var& const_v = v;
-    EXPECT_TRUE(noexcept(absl::get_if<2>(&const_v)));
+    EXPECT_TRUE(noexcept(abslx::get_if<2>(&const_v)));
 
     {
-      auto* elem = absl::get_if<2>(&const_v);
+      auto* elem = abslx::get_if<2>(&const_v);
       EXPECT_TRUE((std::is_same<decltype(elem), const double*>::value));
       ASSERT_NE(elem, nullptr);
       EXPECT_EQ(*elem, 2.0);
       {
-        auto* bad_elem = absl::get_if<0>(&const_v);
+        auto* bad_elem = abslx::get_if<0>(&const_v);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), const int*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
       {
-        auto* bad_elem = absl::get_if<1>(&const_v);
+        auto* bad_elem = abslx::get_if<1>(&const_v);
         EXPECT_TRUE(
             (std::is_same<decltype(bad_elem), const std::string*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
       {
-        auto* bad_elem = absl::get_if<3>(&const_v);
+        auto* bad_elem = abslx::get_if<3>(&const_v);
         EXPECT_EQ(bad_elem, nullptr);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), const int*>::value));
       }
@@ -1571,53 +1571,53 @@ TEST(VariantTest, GetIfIndex) {
   }
 
   {
-    Var v(absl::in_place_index<0>, 0);
+    Var v(abslx::in_place_index<0>, 0);
     v.emplace<3>(1);
-    EXPECT_TRUE(noexcept(absl::get_if<3>(&v)));
+    EXPECT_TRUE(noexcept(abslx::get_if<3>(&v)));
 
     {
-      auto* elem = absl::get_if<3>(&v);
+      auto* elem = abslx::get_if<3>(&v);
       EXPECT_TRUE((std::is_same<decltype(elem), int*>::value));
       ASSERT_NE(elem, nullptr);
       EXPECT_EQ(*elem, 1);
       {
-        auto* bad_elem = absl::get_if<0>(&v);
+        auto* bad_elem = abslx::get_if<0>(&v);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), int*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
       {
-        auto* bad_elem = absl::get_if<1>(&v);
+        auto* bad_elem = abslx::get_if<1>(&v);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), std::string*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
       {
-        auto* bad_elem = absl::get_if<2>(&v);
+        auto* bad_elem = abslx::get_if<2>(&v);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), double*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
     }
 
     const Var& const_v = v;
-    EXPECT_TRUE(noexcept(absl::get_if<3>(&const_v)));
+    EXPECT_TRUE(noexcept(abslx::get_if<3>(&const_v)));
 
     {
-      auto* elem = absl::get_if<3>(&const_v);
+      auto* elem = abslx::get_if<3>(&const_v);
       EXPECT_TRUE((std::is_same<decltype(elem), const int*>::value));
       ASSERT_NE(elem, nullptr);
       EXPECT_EQ(*elem, 1);
       {
-        auto* bad_elem = absl::get_if<0>(&const_v);
+        auto* bad_elem = abslx::get_if<0>(&const_v);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), const int*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
       {
-        auto* bad_elem = absl::get_if<1>(&const_v);
+        auto* bad_elem = abslx::get_if<1>(&const_v);
         EXPECT_TRUE(
             (std::is_same<decltype(bad_elem), const std::string*>::value));
         EXPECT_EQ(bad_elem, nullptr);
       }
       {
-        auto* bad_elem = absl::get_if<2>(&const_v);
+        auto* bad_elem = abslx::get_if<2>(&const_v);
         EXPECT_EQ(bad_elem, nullptr);
         EXPECT_TRUE((std::is_same<decltype(bad_elem), const double*>::value));
       }
@@ -1717,8 +1717,8 @@ TEST(VariantTest, OperatorRelational) {
 
 TEST(VariantTest, ValuelessOperatorEquals) {
   variant<MoveCanThrow, std::string> int_v(1), string_v("Hello"),
-      valueless(absl::in_place_index<0>),
-      other_valueless(absl::in_place_index<0>);
+      valueless(abslx::in_place_index<0>),
+      other_valueless(abslx::in_place_index<0>);
   ToValuelessByException(valueless);
   ToValuelessByException(other_valueless);
 
@@ -1739,8 +1739,8 @@ TEST(VariantTest, ValuelessOperatorEquals) {
 
 TEST(VariantTest, ValuelessOperatorRelational) {
   variant<MoveCanThrow, std::string> int_v(1), string_v("Hello"),
-      valueless(absl::in_place_index<0>),
-      other_valueless(absl::in_place_index<0>);
+      valueless(abslx::in_place_index<0>),
+      other_valueless(abslx::in_place_index<0>);
   ToValuelessByException(valueless);
   ToValuelessByException(other_valueless);
 
@@ -1790,12 +1790,12 @@ struct ConvertTo {
 TEST(VariantTest, VisitSimple) {
   variant<std::string, const char*> v = "A";
 
-  std::string str = absl::visit(ConvertTo<std::string>{}, v);
+  std::string str = abslx::visit(ConvertTo<std::string>{}, v);
   EXPECT_EQ("A", str);
 
   v = std::string("B");
 
-  absl::string_view piece = absl::visit(ConvertTo<absl::string_view>{}, v);
+  abslx::string_view piece = abslx::visit(ConvertTo<abslx::string_view>{}, v);
   EXPECT_EQ("B", piece);
 
   struct StrLen {
@@ -1804,9 +1804,9 @@ TEST(VariantTest, VisitSimple) {
   };
 
   v = "SomeStr";
-  EXPECT_EQ(7, absl::visit(StrLen{}, v));
+  EXPECT_EQ(7, abslx::visit(StrLen{}, v));
   v = std::string("VeryLargeThisTime");
-  EXPECT_EQ(17, absl::visit(StrLen{}, v));
+  EXPECT_EQ(17, abslx::visit(StrLen{}, v));
 }
 
 TEST(VariantTest, VisitRValue) {
@@ -1824,14 +1824,14 @@ TEST(VariantTest, VisitRValue) {
     }                                                                 // NOLINT
     int operator()(std::string&&, std::string&&) const { return 3; }  // NOLINT
   };
-  EXPECT_FALSE(absl::visit(Visitor{}, v));
-  EXPECT_TRUE(absl::visit(Visitor{}, absl::move(v)));
+  EXPECT_FALSE(abslx::visit(Visitor{}, v));
+  EXPECT_TRUE(abslx::visit(Visitor{}, abslx::move(v)));
 
   // Also test the variadic overload.
-  EXPECT_EQ(0, absl::visit(Visitor{}, v, v));
-  EXPECT_EQ(1, absl::visit(Visitor{}, v, absl::move(v)));
-  EXPECT_EQ(2, absl::visit(Visitor{}, absl::move(v), v));
-  EXPECT_EQ(3, absl::visit(Visitor{}, absl::move(v), absl::move(v)));
+  EXPECT_EQ(0, abslx::visit(Visitor{}, v, v));
+  EXPECT_EQ(1, abslx::visit(Visitor{}, v, abslx::move(v)));
+  EXPECT_EQ(2, abslx::visit(Visitor{}, abslx::move(v), v));
+  EXPECT_EQ(3, abslx::visit(Visitor{}, abslx::move(v), abslx::move(v)));
 }
 
 TEST(VariantTest, VisitRValueVisitor) {
@@ -1841,8 +1841,8 @@ TEST(VariantTest, VisitRValueVisitor) {
     bool operator()(const std::string&) && { return true; }
   };
   Visitor visitor;
-  EXPECT_FALSE(absl::visit(visitor, v));
-  EXPECT_TRUE(absl::visit(Visitor{}, v));
+  EXPECT_FALSE(abslx::visit(visitor, v));
+  EXPECT_TRUE(abslx::visit(Visitor{}, v));
 }
 
 TEST(VariantTest, VisitResultTypeDifferent) {
@@ -1859,52 +1859,52 @@ TEST(VariantTest, VisitResultTypeDifferent) {
   } visitor;
 
   EXPECT_TRUE(
-      (std::is_same<LValue_LValue, decltype(absl::visit(visitor, v))>::value));
+      (std::is_same<LValue_LValue, decltype(abslx::visit(visitor, v))>::value));
   EXPECT_TRUE(
       (std::is_same<RValue_LValue,
-                    decltype(absl::visit(visitor, absl::move(v)))>::value));
+                    decltype(abslx::visit(visitor, abslx::move(v)))>::value));
   EXPECT_TRUE((
-      std::is_same<LValue_RValue, decltype(absl::visit(Visitor{}, v))>::value));
+      std::is_same<LValue_RValue, decltype(abslx::visit(Visitor{}, v))>::value));
   EXPECT_TRUE(
       (std::is_same<RValue_RValue,
-                    decltype(absl::visit(Visitor{}, absl::move(v)))>::value));
+                    decltype(abslx::visit(Visitor{}, abslx::move(v)))>::value));
 }
 
 TEST(VariantTest, VisitVariadic) {
   using A = variant<int, std::string>;
-  using B = variant<std::unique_ptr<int>, absl::string_view>;
+  using B = variant<std::unique_ptr<int>, abslx::string_view>;
 
   struct Visitor {
     std::pair<int, int> operator()(int a, std::unique_ptr<int> b) const {
       return {a, *b};
     }
-    std::pair<int, int> operator()(absl::string_view a,
+    std::pair<int, int> operator()(abslx::string_view a,
                                    std::unique_ptr<int> b) const {
       return {static_cast<int>(a.size()), static_cast<int>(*b)};
     }
-    std::pair<int, int> operator()(int a, absl::string_view b) const {
+    std::pair<int, int> operator()(int a, abslx::string_view b) const {
       return {a, static_cast<int>(b.size())};
     }
-    std::pair<int, int> operator()(absl::string_view a,
-                                   absl::string_view b) const {
+    std::pair<int, int> operator()(abslx::string_view a,
+                                   abslx::string_view b) const {
       return {static_cast<int>(a.size()), static_cast<int>(b.size())};
     }
   };
 
-  EXPECT_THAT(absl::visit(Visitor(), A(1), B(std::unique_ptr<int>(new int(7)))),
+  EXPECT_THAT(abslx::visit(Visitor(), A(1), B(std::unique_ptr<int>(new int(7)))),
               ::testing::Pair(1, 7));
-  EXPECT_THAT(absl::visit(Visitor(), A(1), B(absl::string_view("ABC"))),
+  EXPECT_THAT(abslx::visit(Visitor(), A(1), B(abslx::string_view("ABC"))),
               ::testing::Pair(1, 3));
-  EXPECT_THAT(absl::visit(Visitor(), A(std::string("BBBBB")),
+  EXPECT_THAT(abslx::visit(Visitor(), A(std::string("BBBBB")),
                           B(std::unique_ptr<int>(new int(7)))),
               ::testing::Pair(5, 7));
-  EXPECT_THAT(absl::visit(Visitor(), A(std::string("BBBBB")),
-                          B(absl::string_view("ABC"))),
+  EXPECT_THAT(abslx::visit(Visitor(), A(std::string("BBBBB")),
+                          B(abslx::string_view("ABC"))),
               ::testing::Pair(5, 3));
 }
 
 TEST(VariantTest, VisitNoArgs) {
-  EXPECT_EQ(5, absl::visit([] { return 5; }));
+  EXPECT_EQ(5, abslx::visit([] { return 5; }));
 }
 
 struct ConstFunctor {
@@ -1925,38 +1925,38 @@ struct Class {
 TEST(VariantTest, VisitReferenceWrapper) {
   ConstFunctor cf;
   MutableFunctor mf;
-  absl::variant<int> three = 3;
-  absl::variant<int> two = 2;
+  abslx::variant<int> three = 3;
+  abslx::variant<int> two = 2;
 
-  EXPECT_EQ(1, absl::visit(std::cref(cf), three, two));
-  EXPECT_EQ(1, absl::visit(std::ref(cf), three, two));
-  EXPECT_EQ(1, absl::visit(std::ref(mf), three, two));
+  EXPECT_EQ(1, abslx::visit(std::cref(cf), three, two));
+  EXPECT_EQ(1, abslx::visit(std::ref(cf), three, two));
+  EXPECT_EQ(1, abslx::visit(std::ref(mf), three, two));
 }
 
 // libstdc++ std::variant doesn't support the INVOKE semantics.
 #if !(defined(ABSL_USES_STD_VARIANT) && defined(__GLIBCXX__))
 TEST(VariantTest, VisitMemberFunction) {
-  absl::variant<std::unique_ptr<Class>> p(absl::make_unique<Class>());
-  absl::variant<std::unique_ptr<const Class>> cp(
-      absl::make_unique<const Class>());
-  absl::variant<int> three = 3;
-  absl::variant<int> two = 2;
+  abslx::variant<std::unique_ptr<Class>> p(abslx::make_unique<Class>());
+  abslx::variant<std::unique_ptr<const Class>> cp(
+      abslx::make_unique<const Class>());
+  abslx::variant<int> three = 3;
+  abslx::variant<int> two = 2;
 
-  EXPECT_EQ(1, absl::visit(&Class::Method, p, three, two));
-  EXPECT_EQ(1, absl::visit(&Class::ConstMethod, p, three, two));
-  EXPECT_EQ(1, absl::visit(&Class::ConstMethod, cp, three, two));
+  EXPECT_EQ(1, abslx::visit(&Class::Method, p, three, two));
+  EXPECT_EQ(1, abslx::visit(&Class::ConstMethod, p, three, two));
+  EXPECT_EQ(1, abslx::visit(&Class::ConstMethod, cp, three, two));
 }
 
 TEST(VariantTest, VisitDataMember) {
-  absl::variant<std::unique_ptr<Class>> p(absl::make_unique<Class>(Class{42}));
-  absl::variant<std::unique_ptr<const Class>> cp(
-      absl::make_unique<const Class>(Class{42}));
-  EXPECT_EQ(42, absl::visit(&Class::member, p));
+  abslx::variant<std::unique_ptr<Class>> p(abslx::make_unique<Class>(Class{42}));
+  abslx::variant<std::unique_ptr<const Class>> cp(
+      abslx::make_unique<const Class>(Class{42}));
+  EXPECT_EQ(42, abslx::visit(&Class::member, p));
 
-  absl::visit(&Class::member, p) = 5;
-  EXPECT_EQ(5, absl::visit(&Class::member, p));
+  abslx::visit(&Class::member, p) = 5;
+  EXPECT_EQ(5, abslx::visit(&Class::member, p));
 
-  EXPECT_EQ(42, absl::visit(&Class::member, cp));
+  EXPECT_EQ(42, abslx::visit(&Class::member, cp));
 }
 #endif  // !(defined(ABSL_USES_STD_VARIANT) && defined(__GLIBCXX__))
 
@@ -1965,20 +1965,20 @@ TEST(VariantTest, VisitDataMember) {
 /////////////////////////
 
 TEST(VariantTest, MonostateBasic) {
-  absl::monostate mono;
+  abslx::monostate mono;
   (void)mono;
 
   // TODO(mattcalabrese) Expose move triviality metafunctions in absl.
-  EXPECT_TRUE(absl::is_trivially_default_constructible<absl::monostate>::value);
-  EXPECT_TRUE(is_trivially_move_constructible<absl::monostate>::value);
-  EXPECT_TRUE(absl::is_trivially_copy_constructible<absl::monostate>::value);
-  EXPECT_TRUE(is_trivially_move_assignable<absl::monostate>::value);
-  EXPECT_TRUE(absl::is_trivially_copy_assignable<absl::monostate>::value);
-  EXPECT_TRUE(absl::is_trivially_destructible<absl::monostate>::value);
+  EXPECT_TRUE(abslx::is_trivially_default_constructible<abslx::monostate>::value);
+  EXPECT_TRUE(is_trivially_move_constructible<abslx::monostate>::value);
+  EXPECT_TRUE(abslx::is_trivially_copy_constructible<abslx::monostate>::value);
+  EXPECT_TRUE(is_trivially_move_assignable<abslx::monostate>::value);
+  EXPECT_TRUE(abslx::is_trivially_copy_assignable<abslx::monostate>::value);
+  EXPECT_TRUE(abslx::is_trivially_destructible<abslx::monostate>::value);
 }
 
 TEST(VariantTest, VariantMonostateDefaultConstruction) {
-  absl::variant<absl::monostate, NonDefaultConstructible> var;
+  abslx::variant<abslx::monostate, NonDefaultConstructible> var;
   EXPECT_EQ(var.index(), 0);
 }
 
@@ -1987,7 +1987,7 @@ TEST(VariantTest, VariantMonostateDefaultConstruction) {
 ////////////////////////////////
 
 TEST(VariantTest, MonostateComparisons) {
-  absl::monostate lhs, rhs;
+  abslx::monostate lhs, rhs;
 
   EXPECT_EQ(lhs, lhs);
   EXPECT_EQ(lhs, rhs);
@@ -2004,18 +2004,18 @@ TEST(VariantTest, MonostateComparisons) {
   EXPECT_GE(lhs, lhs);
   EXPECT_GE(lhs, rhs);
 
-  EXPECT_TRUE(noexcept(std::declval<absl::monostate>() ==
-                       std::declval<absl::monostate>()));
-  EXPECT_TRUE(noexcept(std::declval<absl::monostate>() !=
-                       std::declval<absl::monostate>()));
-  EXPECT_TRUE(noexcept(std::declval<absl::monostate>() <
-                       std::declval<absl::monostate>()));
-  EXPECT_TRUE(noexcept(std::declval<absl::monostate>() >
-                       std::declval<absl::monostate>()));
-  EXPECT_TRUE(noexcept(std::declval<absl::monostate>() <=
-                       std::declval<absl::monostate>()));
-  EXPECT_TRUE(noexcept(std::declval<absl::monostate>() >=
-                       std::declval<absl::monostate>()));
+  EXPECT_TRUE(noexcept(std::declval<abslx::monostate>() ==
+                       std::declval<abslx::monostate>()));
+  EXPECT_TRUE(noexcept(std::declval<abslx::monostate>() !=
+                       std::declval<abslx::monostate>()));
+  EXPECT_TRUE(noexcept(std::declval<abslx::monostate>() <
+                       std::declval<abslx::monostate>()));
+  EXPECT_TRUE(noexcept(std::declval<abslx::monostate>() >
+                       std::declval<abslx::monostate>()));
+  EXPECT_TRUE(noexcept(std::declval<abslx::monostate>() <=
+                       std::declval<abslx::monostate>()));
+  EXPECT_TRUE(noexcept(std::declval<abslx::monostate>() >=
+                       std::declval<abslx::monostate>()));
 }
 
 ///////////////////////
@@ -2037,13 +2037,13 @@ TEST(VariantTest, NonmemberSwap) {
   EXPECT_THAT(a, VariantWith<SpecialSwap>(v2));
   EXPECT_THAT(b, VariantWith<SpecialSwap>(v1));
 #ifndef ABSL_USES_STD_VARIANT
-  EXPECT_FALSE(absl::get<SpecialSwap>(a).special_swap);
+  EXPECT_FALSE(abslx::get<SpecialSwap>(a).special_swap);
 #endif
 
   swap(a, b);
   EXPECT_THAT(a, VariantWith<SpecialSwap>(v1));
   EXPECT_THAT(b, VariantWith<SpecialSwap>(v2));
-  EXPECT_TRUE(absl::get<SpecialSwap>(b).special_swap);
+  EXPECT_TRUE(abslx::get<SpecialSwap>(b).special_swap);
 }
 
 //////////////////////////
@@ -2051,8 +2051,8 @@ TEST(VariantTest, NonmemberSwap) {
 //////////////////////////
 
 TEST(VariantTest, BadAccess) {
-  EXPECT_TRUE(noexcept(absl::bad_variant_access()));
-  absl::bad_variant_access exception_obj;
+  EXPECT_TRUE(noexcept(abslx::bad_variant_access()));
+  abslx::bad_variant_access exception_obj;
   std::exception* base = &exception_obj;
   (void)base;
 }
@@ -2062,8 +2062,8 @@ TEST(VariantTest, BadAccess) {
 ////////////////////
 
 TEST(VariantTest, MonostateHash) {
-  absl::monostate mono, other_mono;
-  std::hash<absl::monostate> const hasher{};
+  abslx::monostate mono, other_mono;
+  std::hash<abslx::monostate> const hasher{};
   static_assert(std::is_same<decltype(hasher(mono)), std::size_t>::value, "");
   EXPECT_EQ(hasher(mono), hasher(other_mono));
 }
@@ -2107,7 +2107,7 @@ TEST(VariantTest, Hash) {
                   "");
     static_assert(
         type_traits_internal::IsHashable<variant<const Hashable>>::value, "");
-    std::hash<absl::variant<const int>> c_hash;
+    std::hash<abslx::variant<const int>> c_hash;
     for (int i = 0; i < 100; ++i) {
       EXPECT_EQ(hash(i), c_hash(i));
     }
@@ -2125,9 +2125,9 @@ TEST(VariantTest, TestConvertingSet) {
   Variant v(1.0);
   const int two = 2;
   v = two;
-  EXPECT_TRUE(absl::holds_alternative<double>(v));
-  ASSERT_TRUE(nullptr != absl::get_if<double>(&v));
-  EXPECT_DOUBLE_EQ(2, absl::get<double>(v));
+  EXPECT_TRUE(abslx::holds_alternative<double>(v));
+  ASSERT_TRUE(nullptr != abslx::get_if<double>(&v));
+  EXPECT_DOUBLE_EQ(2, abslx::get<double>(v));
 }
 #endif  // ABSL_USES_STD_VARIANT
 
@@ -2150,8 +2150,8 @@ TEST(VariantTest, TestVariantWithNonCopyableType) {
   typedef variant<int, NonCopyable> Variant;
   const int kValue = 1;
   Variant v(kValue);
-  ASSERT_TRUE(absl::holds_alternative<int>(v));
-  EXPECT_EQ(kValue, absl::get<int>(v));
+  ASSERT_TRUE(abslx::holds_alternative<int>(v));
+  EXPECT_EQ(kValue, abslx::get<int>(v));
 }
 
 // Test that a variant with a non-copyable type can be transformed to
@@ -2165,55 +2165,55 @@ TEST(VariantTest, TestEmplace) {
   typedef variant<int, NonCopyable> Variant;
   const int kValue = 1;
   Variant v(kValue);
-  ASSERT_TRUE(absl::holds_alternative<int>(v));
-  EXPECT_EQ(kValue, absl::get<int>(v));
+  ASSERT_TRUE(abslx::holds_alternative<int>(v));
+  EXPECT_EQ(kValue, abslx::get<int>(v));
 
   // emplace with zero arguments, then back to 'int'
   v.emplace<NonCopyable>();
-  ASSERT_TRUE(absl::holds_alternative<NonCopyable>(v));
-  EXPECT_EQ(0, absl::get<NonCopyable>(v).value);
+  ASSERT_TRUE(abslx::holds_alternative<NonCopyable>(v));
+  EXPECT_EQ(0, abslx::get<NonCopyable>(v).value);
   v = kValue;
-  ASSERT_TRUE(absl::holds_alternative<int>(v));
+  ASSERT_TRUE(abslx::holds_alternative<int>(v));
 
   // emplace with one argument:
   v.emplace<NonCopyable>(1);
-  ASSERT_TRUE(absl::holds_alternative<NonCopyable>(v));
-  EXPECT_EQ(1, absl::get<NonCopyable>(v).value);
+  ASSERT_TRUE(abslx::holds_alternative<NonCopyable>(v));
+  EXPECT_EQ(1, abslx::get<NonCopyable>(v).value);
   v = kValue;
-  ASSERT_TRUE(absl::holds_alternative<int>(v));
+  ASSERT_TRUE(abslx::holds_alternative<int>(v));
 
   // emplace with two arguments:
   v.emplace<NonCopyable>(1, 2);
-  ASSERT_TRUE(absl::holds_alternative<NonCopyable>(v));
-  EXPECT_EQ(3, absl::get<NonCopyable>(v).value);
+  ASSERT_TRUE(abslx::holds_alternative<NonCopyable>(v));
+  EXPECT_EQ(3, abslx::get<NonCopyable>(v).value);
   v = kValue;
-  ASSERT_TRUE(absl::holds_alternative<int>(v));
+  ASSERT_TRUE(abslx::holds_alternative<int>(v));
 
   // emplace with three arguments
   v.emplace<NonCopyable>(1, 2, 3);
-  ASSERT_TRUE(absl::holds_alternative<NonCopyable>(v));
-  EXPECT_EQ(6, absl::get<NonCopyable>(v).value);
+  ASSERT_TRUE(abslx::holds_alternative<NonCopyable>(v));
+  EXPECT_EQ(6, abslx::get<NonCopyable>(v).value);
   v = kValue;
-  ASSERT_TRUE(absl::holds_alternative<int>(v));
+  ASSERT_TRUE(abslx::holds_alternative<int>(v));
 
   // emplace with four arguments
   v.emplace<NonCopyable>(1, 2, 3, 4);
-  ASSERT_TRUE(absl::holds_alternative<NonCopyable>(v));
-  EXPECT_EQ(10, absl::get<NonCopyable>(v).value);
+  ASSERT_TRUE(abslx::holds_alternative<NonCopyable>(v));
+  EXPECT_EQ(10, abslx::get<NonCopyable>(v).value);
   v = kValue;
-  ASSERT_TRUE(absl::holds_alternative<int>(v));
+  ASSERT_TRUE(abslx::holds_alternative<int>(v));
 }
 
 TEST(VariantTest, TestEmplaceDestroysCurrentValue) {
   typedef variant<int, IncrementInDtor, NonCopyable> Variant;
   int counter = 0;
   Variant v(0);
-  ASSERT_TRUE(absl::holds_alternative<int>(v));
+  ASSERT_TRUE(abslx::holds_alternative<int>(v));
   v.emplace<IncrementInDtor>(&counter);
-  ASSERT_TRUE(absl::holds_alternative<IncrementInDtor>(v));
+  ASSERT_TRUE(abslx::holds_alternative<IncrementInDtor>(v));
   ASSERT_EQ(0, counter);
   v.emplace<NonCopyable>();
-  ASSERT_TRUE(absl::holds_alternative<NonCopyable>(v));
+  ASSERT_TRUE(abslx::holds_alternative<NonCopyable>(v));
   EXPECT_EQ(1, counter);
 }
 
@@ -2221,31 +2221,31 @@ TEST(VariantTest, TestMoveSemantics) {
   typedef variant<std::unique_ptr<int>, std::unique_ptr<std::string>> Variant;
 
   // Construct a variant by moving from an element value.
-  Variant v(absl::WrapUnique(new int(10)));
-  EXPECT_TRUE(absl::holds_alternative<std::unique_ptr<int>>(v));
+  Variant v(abslx::WrapUnique(new int(10)));
+  EXPECT_TRUE(abslx::holds_alternative<std::unique_ptr<int>>(v));
 
   // Construct a variant by moving from another variant.
-  Variant v2(absl::move(v));
-  ASSERT_TRUE(absl::holds_alternative<std::unique_ptr<int>>(v2));
-  ASSERT_NE(nullptr, absl::get<std::unique_ptr<int>>(v2));
-  EXPECT_EQ(10, *absl::get<std::unique_ptr<int>>(v2));
+  Variant v2(abslx::move(v));
+  ASSERT_TRUE(abslx::holds_alternative<std::unique_ptr<int>>(v2));
+  ASSERT_NE(nullptr, abslx::get<std::unique_ptr<int>>(v2));
+  EXPECT_EQ(10, *abslx::get<std::unique_ptr<int>>(v2));
 
   // Moving from a variant object leaves it holding moved-from value of the
   // same element type.
-  EXPECT_TRUE(absl::holds_alternative<std::unique_ptr<int>>(v));
-  ASSERT_NE(nullptr, absl::get_if<std::unique_ptr<int>>(&v));
-  EXPECT_EQ(nullptr, absl::get<std::unique_ptr<int>>(v));
+  EXPECT_TRUE(abslx::holds_alternative<std::unique_ptr<int>>(v));
+  ASSERT_NE(nullptr, abslx::get_if<std::unique_ptr<int>>(&v));
+  EXPECT_EQ(nullptr, abslx::get<std::unique_ptr<int>>(v));
 
   // Assign a variant from an element value by move.
-  v = absl::make_unique<std::string>("foo");
-  ASSERT_TRUE(absl::holds_alternative<std::unique_ptr<std::string>>(v));
-  EXPECT_EQ("foo", *absl::get<std::unique_ptr<std::string>>(v));
+  v = abslx::make_unique<std::string>("foo");
+  ASSERT_TRUE(abslx::holds_alternative<std::unique_ptr<std::string>>(v));
+  EXPECT_EQ("foo", *abslx::get<std::unique_ptr<std::string>>(v));
 
   // Move-assign a variant.
-  v2 = absl::move(v);
-  ASSERT_TRUE(absl::holds_alternative<std::unique_ptr<std::string>>(v2));
-  EXPECT_EQ("foo", *absl::get<std::unique_ptr<std::string>>(v2));
-  EXPECT_TRUE(absl::holds_alternative<std::unique_ptr<std::string>>(v));
+  v2 = abslx::move(v);
+  ASSERT_TRUE(abslx::holds_alternative<std::unique_ptr<std::string>>(v2));
+  EXPECT_EQ("foo", *abslx::get<std::unique_ptr<std::string>>(v2));
+  EXPECT_TRUE(abslx::holds_alternative<std::unique_ptr<std::string>>(v));
 }
 
 variant<int, std::string> PassThrough(const variant<int, std::string>& arg) {
@@ -2253,12 +2253,12 @@ variant<int, std::string> PassThrough(const variant<int, std::string>& arg) {
 }
 
 TEST(VariantTest, TestImplicitConversion) {
-  EXPECT_TRUE(absl::holds_alternative<int>(PassThrough(0)));
+  EXPECT_TRUE(abslx::holds_alternative<int>(PassThrough(0)));
 
   // We still need the explicit cast for std::string, because C++ won't apply
   // two user-defined implicit conversions in a row.
   EXPECT_TRUE(
-      absl::holds_alternative<std::string>(PassThrough(std::string("foo"))));
+      abslx::holds_alternative<std::string>(PassThrough(std::string("foo"))));
 }
 
 struct Convertible2;
@@ -2285,46 +2285,46 @@ TEST(VariantTest, TestRvalueConversion) {
   variant<double, std::string> var(
       ConvertVariantTo<variant<double, std::string>>(
           variant<std::string, int>(0)));
-  ASSERT_TRUE(absl::holds_alternative<double>(var));
-  EXPECT_EQ(0.0, absl::get<double>(var));
+  ASSERT_TRUE(abslx::holds_alternative<double>(var));
+  EXPECT_EQ(0.0, abslx::get<double>(var));
 
   var = ConvertVariantTo<variant<double, std::string>>(
       variant<const char*, float>("foo"));
-  ASSERT_TRUE(absl::holds_alternative<std::string>(var));
-  EXPECT_EQ("foo", absl::get<std::string>(var));
+  ASSERT_TRUE(abslx::holds_alternative<std::string>(var));
+  EXPECT_EQ("foo", abslx::get<std::string>(var));
 
   variant<double> singleton(
       ConvertVariantTo<variant<double>>(variant<int, float>(42)));
-  ASSERT_TRUE(absl::holds_alternative<double>(singleton));
-  EXPECT_EQ(42.0, absl::get<double>(singleton));
+  ASSERT_TRUE(abslx::holds_alternative<double>(singleton));
+  EXPECT_EQ(42.0, abslx::get<double>(singleton));
 
   singleton = ConvertVariantTo<variant<double>>(variant<int, float>(3.14f));
-  ASSERT_TRUE(absl::holds_alternative<double>(singleton));
-  EXPECT_FLOAT_EQ(3.14f, static_cast<float>(absl::get<double>(singleton)));
+  ASSERT_TRUE(abslx::holds_alternative<double>(singleton));
+  EXPECT_FLOAT_EQ(3.14f, static_cast<float>(abslx::get<double>(singleton)));
 
   singleton = ConvertVariantTo<variant<double>>(variant<int>(0));
-  ASSERT_TRUE(absl::holds_alternative<double>(singleton));
-  EXPECT_EQ(0.0, absl::get<double>(singleton));
+  ASSERT_TRUE(abslx::holds_alternative<double>(singleton));
+  EXPECT_EQ(0.0, abslx::get<double>(singleton));
 
   variant<int32_t, uint32_t> variant2(
       ConvertVariantTo<variant<int32_t, uint32_t>>(variant<int32_t>(42)));
-  ASSERT_TRUE(absl::holds_alternative<int32_t>(variant2));
-  EXPECT_EQ(42, absl::get<int32_t>(variant2));
+  ASSERT_TRUE(abslx::holds_alternative<int32_t>(variant2));
+  EXPECT_EQ(42, abslx::get<int32_t>(variant2));
 
   variant2 =
       ConvertVariantTo<variant<int32_t, uint32_t>>(variant<uint32_t>(42));
-  ASSERT_TRUE(absl::holds_alternative<uint32_t>(variant2));
-  EXPECT_EQ(42, absl::get<uint32_t>(variant2));
+  ASSERT_TRUE(abslx::holds_alternative<uint32_t>(variant2));
+  EXPECT_EQ(42, abslx::get<uint32_t>(variant2));
 #endif  // !ABSL_USES_STD_VARIANT
 
   variant<Convertible1, Convertible2> variant3(
       ConvertVariantTo<variant<Convertible1, Convertible2>>(
           (variant<Convertible2, Convertible1>(Convertible1()))));
-  ASSERT_TRUE(absl::holds_alternative<Convertible1>(variant3));
+  ASSERT_TRUE(abslx::holds_alternative<Convertible1>(variant3));
 
   variant3 = ConvertVariantTo<variant<Convertible1, Convertible2>>(
       variant<Convertible2, Convertible1>(Convertible2()));
-  ASSERT_TRUE(absl::holds_alternative<Convertible2>(variant3));
+  ASSERT_TRUE(abslx::holds_alternative<Convertible2>(variant3));
 }
 
 TEST(VariantTest, TestLvalueConversion) {
@@ -2332,49 +2332,49 @@ TEST(VariantTest, TestLvalueConversion) {
   variant<std::string, int> source1 = 0;
   variant<double, std::string> destination(
       ConvertVariantTo<variant<double, std::string>>(source1));
-  ASSERT_TRUE(absl::holds_alternative<double>(destination));
-  EXPECT_EQ(0.0, absl::get<double>(destination));
+  ASSERT_TRUE(abslx::holds_alternative<double>(destination));
+  EXPECT_EQ(0.0, abslx::get<double>(destination));
 
   variant<const char*, float> source2 = "foo";
   destination = ConvertVariantTo<variant<double, std::string>>(source2);
-  ASSERT_TRUE(absl::holds_alternative<std::string>(destination));
-  EXPECT_EQ("foo", absl::get<std::string>(destination));
+  ASSERT_TRUE(abslx::holds_alternative<std::string>(destination));
+  EXPECT_EQ("foo", abslx::get<std::string>(destination));
 
   variant<int, float> source3(42);
   variant<double> singleton(ConvertVariantTo<variant<double>>(source3));
-  ASSERT_TRUE(absl::holds_alternative<double>(singleton));
-  EXPECT_EQ(42.0, absl::get<double>(singleton));
+  ASSERT_TRUE(abslx::holds_alternative<double>(singleton));
+  EXPECT_EQ(42.0, abslx::get<double>(singleton));
 
   source3 = 3.14f;
   singleton = ConvertVariantTo<variant<double>>(source3);
-  ASSERT_TRUE(absl::holds_alternative<double>(singleton));
-  EXPECT_FLOAT_EQ(3.14f, static_cast<float>(absl::get<double>(singleton)));
+  ASSERT_TRUE(abslx::holds_alternative<double>(singleton));
+  EXPECT_FLOAT_EQ(3.14f, static_cast<float>(abslx::get<double>(singleton)));
 
   variant<int> source4(0);
   singleton = ConvertVariantTo<variant<double>>(source4);
-  ASSERT_TRUE(absl::holds_alternative<double>(singleton));
-  EXPECT_EQ(0.0, absl::get<double>(singleton));
+  ASSERT_TRUE(abslx::holds_alternative<double>(singleton));
+  EXPECT_EQ(0.0, abslx::get<double>(singleton));
 
   variant<int32_t> source5(42);
   variant<int32_t, uint32_t> variant2(
       ConvertVariantTo<variant<int32_t, uint32_t>>(source5));
-  ASSERT_TRUE(absl::holds_alternative<int32_t>(variant2));
-  EXPECT_EQ(42, absl::get<int32_t>(variant2));
+  ASSERT_TRUE(abslx::holds_alternative<int32_t>(variant2));
+  EXPECT_EQ(42, abslx::get<int32_t>(variant2));
 
   variant<uint32_t> source6(42);
   variant2 = ConvertVariantTo<variant<int32_t, uint32_t>>(source6);
-  ASSERT_TRUE(absl::holds_alternative<uint32_t>(variant2));
-  EXPECT_EQ(42, absl::get<uint32_t>(variant2));
+  ASSERT_TRUE(abslx::holds_alternative<uint32_t>(variant2));
+  EXPECT_EQ(42, abslx::get<uint32_t>(variant2));
 #endif
 
   variant<Convertible2, Convertible1> source7((Convertible1()));
   variant<Convertible1, Convertible2> variant3(
       ConvertVariantTo<variant<Convertible1, Convertible2>>(source7));
-  ASSERT_TRUE(absl::holds_alternative<Convertible1>(variant3));
+  ASSERT_TRUE(abslx::holds_alternative<Convertible1>(variant3));
 
   source7 = Convertible2();
   variant3 = ConvertVariantTo<variant<Convertible1, Convertible2>>(source7);
-  ASSERT_TRUE(absl::holds_alternative<Convertible2>(variant3));
+  ASSERT_TRUE(abslx::holds_alternative<Convertible2>(variant3));
 }
 
 TEST(VariantTest, TestMoveConversion) {
@@ -2384,15 +2384,15 @@ TEST(VariantTest, TestMoveConversion) {
       variant<std::unique_ptr<int>, std::unique_ptr<std::string>>;
 
   Variant var(
-      ConvertVariantTo<Variant>(OtherVariant{absl::make_unique<int>(0)}));
-  ASSERT_TRUE(absl::holds_alternative<std::unique_ptr<const int>>(var));
-  ASSERT_NE(absl::get<std::unique_ptr<const int>>(var), nullptr);
-  EXPECT_EQ(0, *absl::get<std::unique_ptr<const int>>(var));
+      ConvertVariantTo<Variant>(OtherVariant{abslx::make_unique<int>(0)}));
+  ASSERT_TRUE(abslx::holds_alternative<std::unique_ptr<const int>>(var));
+  ASSERT_NE(abslx::get<std::unique_ptr<const int>>(var), nullptr);
+  EXPECT_EQ(0, *abslx::get<std::unique_ptr<const int>>(var));
 
   var = ConvertVariantTo<Variant>(
-      OtherVariant(absl::make_unique<std::string>("foo")));
-  ASSERT_TRUE(absl::holds_alternative<std::unique_ptr<const std::string>>(var));
-  EXPECT_EQ("foo", *absl::get<std::unique_ptr<const std::string>>(var));
+      OtherVariant(abslx::make_unique<std::string>("foo")));
+  ASSERT_TRUE(abslx::holds_alternative<std::unique_ptr<const std::string>>(var));
+  EXPECT_EQ("foo", *abslx::get<std::unique_ptr<const std::string>>(var));
 }
 
 TEST(VariantTest, DoesNotMoveFromLvalues) {
@@ -2408,25 +2408,25 @@ TEST(VariantTest, DoesNotMoveFromLvalues) {
 
   // Test copy constructor
   Variant v2(v1);
-  EXPECT_EQ(absl::get<std::shared_ptr<const int>>(v1),
-            absl::get<std::shared_ptr<const int>>(v2));
+  EXPECT_EQ(abslx::get<std::shared_ptr<const int>>(v1),
+            abslx::get<std::shared_ptr<const int>>(v2));
 
   // Test copy-assignment operator
   v1 = std::make_shared<const std::string>("foo");
   v2 = v1;
-  EXPECT_EQ(absl::get<std::shared_ptr<const std::string>>(v1),
-            absl::get<std::shared_ptr<const std::string>>(v2));
+  EXPECT_EQ(abslx::get<std::shared_ptr<const std::string>>(v1),
+            abslx::get<std::shared_ptr<const std::string>>(v2));
 
   // Test converting copy constructor
   OtherVariant other(std::make_shared<int>(0));
   Variant v3(ConvertVariantTo<Variant>(other));
-  EXPECT_EQ(absl::get<std::shared_ptr<int>>(other),
-            absl::get<std::shared_ptr<const int>>(v3));
+  EXPECT_EQ(abslx::get<std::shared_ptr<int>>(other),
+            abslx::get<std::shared_ptr<const int>>(v3));
 
   other = std::make_shared<std::string>("foo");
   v3 = ConvertVariantTo<Variant>(other);
-  EXPECT_EQ(absl::get<std::shared_ptr<std::string>>(other),
-            absl::get<std::shared_ptr<const std::string>>(v3));
+  EXPECT_EQ(abslx::get<std::shared_ptr<std::string>>(other),
+            abslx::get<std::shared_ptr<const std::string>>(v3));
 }
 
 TEST(VariantTest, TestRvalueConversionViaConvertVariantTo) {
@@ -2434,39 +2434,39 @@ TEST(VariantTest, TestRvalueConversionViaConvertVariantTo) {
   variant<double, std::string> var(
       ConvertVariantTo<variant<double, std::string>>(
           variant<std::string, int>(3)));
-  EXPECT_THAT(absl::get_if<double>(&var), Pointee(3.0));
+  EXPECT_THAT(abslx::get_if<double>(&var), Pointee(3.0));
 
   var = ConvertVariantTo<variant<double, std::string>>(
       variant<const char*, float>("foo"));
-  EXPECT_THAT(absl::get_if<std::string>(&var), Pointee(std::string("foo")));
+  EXPECT_THAT(abslx::get_if<std::string>(&var), Pointee(std::string("foo")));
 
   variant<double> singleton(
       ConvertVariantTo<variant<double>>(variant<int, float>(42)));
-  EXPECT_THAT(absl::get_if<double>(&singleton), Pointee(42.0));
+  EXPECT_THAT(abslx::get_if<double>(&singleton), Pointee(42.0));
 
   singleton = ConvertVariantTo<variant<double>>(variant<int, float>(3.14f));
-  EXPECT_THAT(absl::get_if<double>(&singleton), Pointee(DoubleEq(3.14f)));
+  EXPECT_THAT(abslx::get_if<double>(&singleton), Pointee(DoubleEq(3.14f)));
 
   singleton = ConvertVariantTo<variant<double>>(variant<int>(3));
-  EXPECT_THAT(absl::get_if<double>(&singleton), Pointee(3.0));
+  EXPECT_THAT(abslx::get_if<double>(&singleton), Pointee(3.0));
 
   variant<int32_t, uint32_t> variant2(
       ConvertVariantTo<variant<int32_t, uint32_t>>(variant<int32_t>(42)));
-  EXPECT_THAT(absl::get_if<int32_t>(&variant2), Pointee(42));
+  EXPECT_THAT(abslx::get_if<int32_t>(&variant2), Pointee(42));
 
   variant2 =
       ConvertVariantTo<variant<int32_t, uint32_t>>(variant<uint32_t>(42));
-  EXPECT_THAT(absl::get_if<uint32_t>(&variant2), Pointee(42));
+  EXPECT_THAT(abslx::get_if<uint32_t>(&variant2), Pointee(42));
 #endif
 
   variant<Convertible1, Convertible2> variant3(
       ConvertVariantTo<variant<Convertible1, Convertible2>>(
           (variant<Convertible2, Convertible1>(Convertible1()))));
-  ASSERT_TRUE(absl::holds_alternative<Convertible1>(variant3));
+  ASSERT_TRUE(abslx::holds_alternative<Convertible1>(variant3));
 
   variant3 = ConvertVariantTo<variant<Convertible1, Convertible2>>(
       variant<Convertible2, Convertible1>(Convertible2()));
-  ASSERT_TRUE(absl::holds_alternative<Convertible2>(variant3));
+  ASSERT_TRUE(abslx::holds_alternative<Convertible2>(variant3));
 }
 
 TEST(VariantTest, TestLvalueConversionViaConvertVariantTo) {
@@ -2474,44 +2474,44 @@ TEST(VariantTest, TestLvalueConversionViaConvertVariantTo) {
   variant<std::string, int> source1 = 3;
   variant<double, std::string> destination(
       ConvertVariantTo<variant<double, std::string>>(source1));
-  EXPECT_THAT(absl::get_if<double>(&destination), Pointee(3.0));
+  EXPECT_THAT(abslx::get_if<double>(&destination), Pointee(3.0));
 
   variant<const char*, float> source2 = "foo";
   destination = ConvertVariantTo<variant<double, std::string>>(source2);
-  EXPECT_THAT(absl::get_if<std::string>(&destination),
+  EXPECT_THAT(abslx::get_if<std::string>(&destination),
               Pointee(std::string("foo")));
 
   variant<int, float> source3(42);
   variant<double> singleton(ConvertVariantTo<variant<double>>(source3));
-  EXPECT_THAT(absl::get_if<double>(&singleton), Pointee(42.0));
+  EXPECT_THAT(abslx::get_if<double>(&singleton), Pointee(42.0));
 
   source3 = 3.14f;
   singleton = ConvertVariantTo<variant<double>>(source3);
-  EXPECT_FLOAT_EQ(3.14f, static_cast<float>(absl::get<double>(singleton)));
-  EXPECT_THAT(absl::get_if<double>(&singleton), Pointee(DoubleEq(3.14f)));
+  EXPECT_FLOAT_EQ(3.14f, static_cast<float>(abslx::get<double>(singleton)));
+  EXPECT_THAT(abslx::get_if<double>(&singleton), Pointee(DoubleEq(3.14f)));
 
   variant<int> source4(3);
   singleton = ConvertVariantTo<variant<double>>(source4);
-  EXPECT_THAT(absl::get_if<double>(&singleton), Pointee(3.0));
+  EXPECT_THAT(abslx::get_if<double>(&singleton), Pointee(3.0));
 
   variant<int32_t> source5(42);
   variant<int32_t, uint32_t> variant2(
       ConvertVariantTo<variant<int32_t, uint32_t>>(source5));
-  EXPECT_THAT(absl::get_if<int32_t>(&variant2), Pointee(42));
+  EXPECT_THAT(abslx::get_if<int32_t>(&variant2), Pointee(42));
 
   variant<uint32_t> source6(42);
   variant2 = ConvertVariantTo<variant<int32_t, uint32_t>>(source6);
-  EXPECT_THAT(absl::get_if<uint32_t>(&variant2), Pointee(42));
+  EXPECT_THAT(abslx::get_if<uint32_t>(&variant2), Pointee(42));
 #endif  // !ABSL_USES_STD_VARIANT
 
   variant<Convertible2, Convertible1> source7((Convertible1()));
   variant<Convertible1, Convertible2> variant3(
       ConvertVariantTo<variant<Convertible1, Convertible2>>(source7));
-  ASSERT_TRUE(absl::holds_alternative<Convertible1>(variant3));
+  ASSERT_TRUE(abslx::holds_alternative<Convertible1>(variant3));
 
   source7 = Convertible2();
   variant3 = ConvertVariantTo<variant<Convertible1, Convertible2>>(source7);
-  ASSERT_TRUE(absl::holds_alternative<Convertible2>(variant3));
+  ASSERT_TRUE(abslx::holds_alternative<Convertible2>(variant3));
 }
 
 TEST(VariantTest, TestMoveConversionViaConvertVariantTo) {
@@ -2521,13 +2521,13 @@ TEST(VariantTest, TestMoveConversionViaConvertVariantTo) {
       variant<std::unique_ptr<int>, std::unique_ptr<std::string>>;
 
   Variant var(
-      ConvertVariantTo<Variant>(OtherVariant{absl::make_unique<int>(3)}));
-  EXPECT_THAT(absl::get_if<std::unique_ptr<const int>>(&var),
+      ConvertVariantTo<Variant>(OtherVariant{abslx::make_unique<int>(3)}));
+  EXPECT_THAT(abslx::get_if<std::unique_ptr<const int>>(&var),
               Pointee(Pointee(3)));
 
   var = ConvertVariantTo<Variant>(
-      OtherVariant(absl::make_unique<std::string>("foo")));
-  EXPECT_THAT(absl::get_if<std::unique_ptr<const std::string>>(&var),
+      OtherVariant(abslx::make_unique<std::string>("foo")));
+  EXPECT_THAT(abslx::get_if<std::unique_ptr<const std::string>>(&var),
               Pointee(Pointee(std::string("foo"))));
 }
 
@@ -2542,21 +2542,21 @@ TEST(VariantTest, TestMoveConversionViaConvertVariantTo) {
 
 TEST(VariantTest, TestCopyAndMoveTypeTraits) {
   EXPECT_TRUE(std::is_copy_constructible<variant<std::string>>::value);
-  EXPECT_TRUE(absl::is_copy_assignable<variant<std::string>>::value);
+  EXPECT_TRUE(abslx::is_copy_assignable<variant<std::string>>::value);
   EXPECT_TRUE(std::is_move_constructible<variant<std::string>>::value);
-  EXPECT_TRUE(absl::is_move_assignable<variant<std::string>>::value);
+  EXPECT_TRUE(abslx::is_move_assignable<variant<std::string>>::value);
   EXPECT_TRUE(std::is_move_constructible<variant<std::unique_ptr<int>>>::value);
-  EXPECT_TRUE(absl::is_move_assignable<variant<std::unique_ptr<int>>>::value);
+  EXPECT_TRUE(abslx::is_move_assignable<variant<std::unique_ptr<int>>>::value);
   EXPECT_FALSE(
       std::is_copy_constructible<variant<std::unique_ptr<int>>>::value);
-  EXPECT_FALSE(absl::is_copy_assignable<variant<std::unique_ptr<int>>>::value);
+  EXPECT_FALSE(abslx::is_copy_assignable<variant<std::unique_ptr<int>>>::value);
 
   EXPECT_FALSE(
-      absl::is_trivially_copy_constructible<variant<std::string>>::value);
-  EXPECT_FALSE(absl::is_trivially_copy_assignable<variant<std::string>>::value);
+      abslx::is_trivially_copy_constructible<variant<std::string>>::value);
+  EXPECT_FALSE(abslx::is_trivially_copy_assignable<variant<std::string>>::value);
 #if ABSL_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
-  EXPECT_TRUE(absl::is_trivially_copy_constructible<variant<int>>::value);
-  EXPECT_TRUE(absl::is_trivially_copy_assignable<variant<int>>::value);
+  EXPECT_TRUE(abslx::is_trivially_copy_constructible<variant<int>>::value);
+  EXPECT_TRUE(abslx::is_trivially_copy_assignable<variant<int>>::value);
   EXPECT_TRUE(is_trivially_move_constructible<variant<int>>::value);
   EXPECT_TRUE(is_trivially_move_assignable<variant<int>>::value);
 #endif  // ABSL_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
@@ -2565,26 +2565,26 @@ TEST(VariantTest, TestCopyAndMoveTypeTraits) {
 TEST(VariantTest, TestVectorOfMoveonlyVariant) {
   // Verify that variant<MoveonlyType> works correctly as a std::vector element.
   std::vector<variant<std::unique_ptr<int>, std::string>> vec;
-  vec.push_back(absl::make_unique<int>(42));
+  vec.push_back(abslx::make_unique<int>(42));
   vec.emplace_back("Hello");
   vec.reserve(3);
-  auto another_vec = absl::move(vec);
+  auto another_vec = abslx::move(vec);
   // As a sanity check, verify vector contents.
   ASSERT_EQ(2, another_vec.size());
-  EXPECT_EQ(42, *absl::get<std::unique_ptr<int>>(another_vec[0]));
-  EXPECT_EQ("Hello", absl::get<std::string>(another_vec[1]));
+  EXPECT_EQ(42, *abslx::get<std::unique_ptr<int>>(another_vec[0]));
+  EXPECT_EQ("Hello", abslx::get<std::string>(another_vec[1]));
 }
 
 TEST(VariantTest, NestedVariant) {
 #if ABSL_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
-  static_assert(absl::is_trivially_copy_constructible<variant<int>>(), "");
-  static_assert(absl::is_trivially_copy_assignable<variant<int>>(), "");
+  static_assert(abslx::is_trivially_copy_constructible<variant<int>>(), "");
+  static_assert(abslx::is_trivially_copy_assignable<variant<int>>(), "");
   static_assert(is_trivially_move_constructible<variant<int>>(), "");
   static_assert(is_trivially_move_assignable<variant<int>>(), "");
 
-  static_assert(absl::is_trivially_copy_constructible<variant<variant<int>>>(),
+  static_assert(abslx::is_trivially_copy_constructible<variant<variant<int>>>(),
                 "");
-  static_assert(absl::is_trivially_copy_assignable<variant<variant<int>>>(),
+  static_assert(abslx::is_trivially_copy_assignable<variant<variant<int>>>(),
                 "");
   static_assert(is_trivially_move_constructible<variant<variant<int>>>(), "");
   static_assert(is_trivially_move_assignable<variant<variant<int>>>(), "");
@@ -2593,8 +2593,8 @@ TEST(VariantTest, NestedVariant) {
   variant<int> x(42);
   variant<variant<int>> y(x);
   variant<variant<int>> z(y);
-  EXPECT_TRUE(absl::holds_alternative<variant<int>>(z));
-  EXPECT_EQ(x, absl::get<variant<int>>(z));
+  EXPECT_TRUE(abslx::holds_alternative<variant<int>>(z));
+  EXPECT_EQ(x, abslx::get<variant<int>>(z));
 }
 
 struct TriviallyDestructible {
@@ -2631,60 +2631,60 @@ struct TriviallyCopyAssignable {};
 #if ABSL_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
 TEST(VariantTest, TestTriviality) {
   {
-    using TrivDestVar = absl::variant<TriviallyDestructible>;
+    using TrivDestVar = abslx::variant<TriviallyDestructible>;
 
     EXPECT_FALSE(is_trivially_move_constructible<TrivDestVar>::value);
-    EXPECT_FALSE(absl::is_trivially_copy_constructible<TrivDestVar>::value);
+    EXPECT_FALSE(abslx::is_trivially_copy_constructible<TrivDestVar>::value);
     EXPECT_FALSE(is_trivially_move_assignable<TrivDestVar>::value);
-    EXPECT_FALSE(absl::is_trivially_copy_assignable<TrivDestVar>::value);
-    EXPECT_TRUE(absl::is_trivially_destructible<TrivDestVar>::value);
+    EXPECT_FALSE(abslx::is_trivially_copy_assignable<TrivDestVar>::value);
+    EXPECT_TRUE(abslx::is_trivially_destructible<TrivDestVar>::value);
   }
 
   {
-    using TrivMoveVar = absl::variant<TriviallyMovable>;
+    using TrivMoveVar = abslx::variant<TriviallyMovable>;
 
     EXPECT_TRUE(is_trivially_move_constructible<TrivMoveVar>::value);
-    EXPECT_FALSE(absl::is_trivially_copy_constructible<TrivMoveVar>::value);
+    EXPECT_FALSE(abslx::is_trivially_copy_constructible<TrivMoveVar>::value);
     EXPECT_FALSE(is_trivially_move_assignable<TrivMoveVar>::value);
-    EXPECT_FALSE(absl::is_trivially_copy_assignable<TrivMoveVar>::value);
-    EXPECT_TRUE(absl::is_trivially_destructible<TrivMoveVar>::value);
+    EXPECT_FALSE(abslx::is_trivially_copy_assignable<TrivMoveVar>::value);
+    EXPECT_TRUE(abslx::is_trivially_destructible<TrivMoveVar>::value);
   }
 
   {
-    using TrivCopyVar = absl::variant<TriviallyCopyable>;
+    using TrivCopyVar = abslx::variant<TriviallyCopyable>;
 
     EXPECT_TRUE(is_trivially_move_constructible<TrivCopyVar>::value);
-    EXPECT_TRUE(absl::is_trivially_copy_constructible<TrivCopyVar>::value);
+    EXPECT_TRUE(abslx::is_trivially_copy_constructible<TrivCopyVar>::value);
     EXPECT_FALSE(is_trivially_move_assignable<TrivCopyVar>::value);
-    EXPECT_FALSE(absl::is_trivially_copy_assignable<TrivCopyVar>::value);
-    EXPECT_TRUE(absl::is_trivially_destructible<TrivCopyVar>::value);
+    EXPECT_FALSE(abslx::is_trivially_copy_assignable<TrivCopyVar>::value);
+    EXPECT_TRUE(abslx::is_trivially_destructible<TrivCopyVar>::value);
   }
 
   {
-    using TrivMoveAssignVar = absl::variant<TriviallyMoveAssignable>;
+    using TrivMoveAssignVar = abslx::variant<TriviallyMoveAssignable>;
 
     EXPECT_TRUE(is_trivially_move_constructible<TrivMoveAssignVar>::value);
     EXPECT_FALSE(
-        absl::is_trivially_copy_constructible<TrivMoveAssignVar>::value);
+        abslx::is_trivially_copy_constructible<TrivMoveAssignVar>::value);
     EXPECT_TRUE(is_trivially_move_assignable<TrivMoveAssignVar>::value);
-    EXPECT_FALSE(absl::is_trivially_copy_assignable<TrivMoveAssignVar>::value);
-    EXPECT_TRUE(absl::is_trivially_destructible<TrivMoveAssignVar>::value);
+    EXPECT_FALSE(abslx::is_trivially_copy_assignable<TrivMoveAssignVar>::value);
+    EXPECT_TRUE(abslx::is_trivially_destructible<TrivMoveAssignVar>::value);
   }
 
   {
-    using TrivCopyAssignVar = absl::variant<TriviallyCopyAssignable>;
+    using TrivCopyAssignVar = abslx::variant<TriviallyCopyAssignable>;
 
     EXPECT_TRUE(is_trivially_move_constructible<TrivCopyAssignVar>::value);
     EXPECT_TRUE(
-        absl::is_trivially_copy_constructible<TrivCopyAssignVar>::value);
+        abslx::is_trivially_copy_constructible<TrivCopyAssignVar>::value);
     EXPECT_TRUE(is_trivially_move_assignable<TrivCopyAssignVar>::value);
-    EXPECT_TRUE(absl::is_trivially_copy_assignable<TrivCopyAssignVar>::value);
-    EXPECT_TRUE(absl::is_trivially_destructible<TrivCopyAssignVar>::value);
+    EXPECT_TRUE(abslx::is_trivially_copy_assignable<TrivCopyAssignVar>::value);
+    EXPECT_TRUE(abslx::is_trivially_destructible<TrivCopyAssignVar>::value);
   }
 }
 #endif  // ABSL_VARIANT_PROPAGATE_COPY_MOVE_TRIVIALITY
 
-// To verify that absl::variant correctly use the nontrivial move ctor of its
+// To verify that abslx::variant correctly use the nontrivial move ctor of its
 // member rather than use the trivial copy constructor.
 TEST(VariantTest, MoveCtorBug) {
   // To simulate std::tuple in libstdc++.
@@ -2695,24 +2695,24 @@ TEST(VariantTest, MoveCtorBug) {
     bool called = false;
   };
   {
-    using V = absl::variant<TrivialCopyNontrivialMove, int>;
-    V v1(absl::in_place_index<0>);
+    using V = abslx::variant<TrivialCopyNontrivialMove, int>;
+    V v1(abslx::in_place_index<0>);
     // this should invoke the move ctor, rather than the trivial copy ctor.
     V v2(std::move(v1));
-    EXPECT_TRUE(absl::get<0>(v2).called);
+    EXPECT_TRUE(abslx::get<0>(v2).called);
   }
   {
     // this case failed to compile before our fix due to a GCC bug.
-    using V = absl::variant<int, TrivialCopyNontrivialMove>;
-    V v1(absl::in_place_index<1>);
+    using V = abslx::variant<int, TrivialCopyNontrivialMove>;
+    V v1(abslx::in_place_index<1>);
     // this should invoke the move ctor, rather than the trivial copy ctor.
     V v2(std::move(v1));
-    EXPECT_TRUE(absl::get<1>(v2).called);
+    EXPECT_TRUE(abslx::get<1>(v2).called);
   }
 }
 
 }  // namespace
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // #if !defined(ABSL_USES_STD_VARIANT)

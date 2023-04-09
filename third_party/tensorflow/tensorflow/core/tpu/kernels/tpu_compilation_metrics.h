@@ -26,13 +26,13 @@ class TpuCompilationMetrics {
  public:
   // Increments the number of cache lookup count.
   static void IncrementCacheLookupCount(bool is_cache_hit,
-                                        absl::string_view session_name);
+                                        abslx::string_view session_name);
 
   // Sets the total count of cache entries.
   static void SetCacheEntryCount(int64_t count);
 
   // Increments number of compilation.
-  static void IncrementCompilationCount(absl::string_view session_name);
+  static void IncrementCompilationCount(abslx::string_view session_name);
 };
 
 }  // namespace tpu

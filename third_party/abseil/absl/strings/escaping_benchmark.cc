@@ -31,7 +31,7 @@ void BM_CUnescapeHexString(benchmark::State& state) {
   }
   std::string dest;
   for (auto _ : state) {
-    absl::CUnescape(src, &dest);
+    abslx::CUnescape(src, &dest);
   }
 }
 BENCHMARK(BM_CUnescapeHexString);
@@ -39,7 +39,7 @@ BENCHMARK(BM_CUnescapeHexString);
 void BM_WebSafeBase64Escape_string(benchmark::State& state) {
   std::string raw;
   for (int i = 0; i < 10; ++i) {
-    for (const auto& test_set : absl::strings_internal::base64_strings()) {
+    for (const auto& test_set : abslx::strings_internal::base64_strings()) {
       raw += std::string(test_set.plaintext);
     }
   }
@@ -47,14 +47,14 @@ void BM_WebSafeBase64Escape_string(benchmark::State& state) {
   // The actual benchmark loop is tiny...
   std::string escaped;
   for (auto _ : state) {
-    absl::WebSafeBase64Escape(raw, &escaped);
+    abslx::WebSafeBase64Escape(raw, &escaped);
   }
 
   // We want to be sure the compiler doesn't throw away the loop above,
   // and the easiest way to ensure that is to round-trip the results and verify
   // them.
   std::string round_trip;
-  absl::WebSafeBase64Unescape(escaped, &round_trip);
+  abslx::WebSafeBase64Unescape(escaped, &round_trip);
   ABSL_RAW_CHECK(round_trip == raw, "");
 }
 BENCHMARK(BM_WebSafeBase64Escape_string);
@@ -68,11 +68,11 @@ void CEscapeBenchmarkHelper(benchmark::State& state, const char* string_value,
                             int max_len) {
   std::string src;
   while (src.size() < max_len) {
-    absl::StrAppend(&src, string_value);
+    abslx::StrAppend(&src, string_value);
   }
 
   for (auto _ : state) {
-    absl::CEscape(src);
+    abslx::CEscape(src);
   }
 }
 

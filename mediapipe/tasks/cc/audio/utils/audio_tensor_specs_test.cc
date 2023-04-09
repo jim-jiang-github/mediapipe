@@ -72,12 +72,12 @@ TEST_F(AudioTensorSpecsTest,
       *model_resources->GetMetadataExtractor();
   MP_ASSERT_OK_AND_ASSIGN(auto* metadata,
                           GetAudioTensorMetadataIfAny(metadata_extractor, 0));
-  absl::StatusOr<AudioTensorSpecs> input_specs_or =
+  abslx::StatusOr<AudioTensorSpecs> input_specs_or =
       BuildInputAudioTensorSpecs(*input_tensor, metadata);
-  EXPECT_THAT(input_specs_or, StatusIs(absl::StatusCode::kInternal));
+  EXPECT_THAT(input_specs_or, StatusIs(abslx::StatusCode::kInternal));
   EXPECT_THAT(input_specs_or.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(
-                  absl::StrCat(MediaPipeTasksStatus::kMetadataNotFoundError))));
+              Optional(abslx::Cord(
+                  abslx::StrCat(MediaPipeTasksStatus::kMetadataNotFoundError))));
 }
 
 TEST_F(AudioTensorSpecsTest, BuildInputAudioTensorSpecsWorks) {
@@ -98,7 +98,7 @@ TEST_F(AudioTensorSpecsTest, BuildInputAudioTensorSpecsWorks) {
       *model_resources->GetMetadataExtractor();
   MP_ASSERT_OK_AND_ASSIGN(auto* metadata,
                           GetAudioTensorMetadataIfAny(metadata_extractor, 0));
-  absl::StatusOr<AudioTensorSpecs> input_specs_or =
+  abslx::StatusOr<AudioTensorSpecs> input_specs_or =
       BuildInputAudioTensorSpecs(*input_tensor, metadata);
   MP_ASSERT_OK(input_specs_or);
 

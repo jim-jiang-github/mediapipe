@@ -214,7 +214,7 @@ class MarkForCompilationPassImpl {
 
     // Returns the TF graph node IDs for the resource variable operations in
     // this cluster.
-    absl::Span<const int> resource_var_operation_node_ids() const {
+    abslx::Span<const int> resource_var_operation_node_ids() const {
       return resource_var_operation_node_ids_;
     }
 
@@ -223,15 +223,15 @@ class MarkForCompilationPassImpl {
       if (!node) {
         // This should never happen but we try to be resilient because this is a
         // debugging aid.
-        return absl::StrCat("NULL NODE IN #", cycles_graph_node_id());
+        return abslx::StrCat("NULL NODE IN #", cycles_graph_node_id());
       }
 
       if (cluster_size() == 1) {
-        return absl::StrCat("<", node->name(), " #", cycles_graph_node_id(),
+        return abslx::StrCat("<", node->name(), " #", cycles_graph_node_id(),
                             ">");
       }
 
-      return absl::StrCat("<", node->name(), " + ", cluster_size() - 1,
+      return abslx::StrCat("<", node->name(), " + ", cluster_size() - 1,
                           " others #", cycles_graph_node_id(), ">");
     }
 
@@ -382,7 +382,7 @@ class MarkForCompilationPassImpl {
   }
 
   bool LogNotContractableAndReturnFalse(Cluster* from, Cluster* to,
-                                        absl::string_view reason);
+                                        abslx::string_view reason);
 
   // Finds a path in `cycles_graph_` from `from` to `to` that is not a direct
   // edge from `from` to `to`.
@@ -436,8 +436,8 @@ class MarkForCompilationPassImpl {
   }
 
   string EdgeContractionFailureMsg(Cluster* from, Cluster* to,
-                                   absl::string_view reason) {
-    return absl::StrCat("Could not contract ", from->DebugString(*graph_),
+                                   abslx::string_view reason) {
+    return abslx::StrCat("Could not contract ", from->DebugString(*graph_),
                         " -> ", to->DebugString(*graph_), " because ", reason,
                         ".");
   }
@@ -449,7 +449,7 @@ class MarkForCompilationPassImpl {
   Env* env_;
   OptimizerOptions::GlobalJitLevel global_jit_level_;
   bool cpu_global_jit_;
-  absl::flat_hash_map<const Cluster*, bool> should_compile_cluster_cache_;
+  abslx::flat_hash_map<const Cluster*, bool> should_compile_cluster_cache_;
   jit::DeviceInfoCache device_info_cache_;
 
   bool initialized_ = false;
@@ -458,25 +458,25 @@ class MarkForCompilationPassImpl {
 
   std::vector<std::unique_ptr<Cluster>> cluster_storage_;
   std::vector<UnionFind<Cluster*>> cluster_for_node_;
-  absl::flat_hash_set<const Node*> declustered_nodes_;
+  abslx::flat_hash_set<const Node*> declustered_nodes_;
   GraphCycles cycles_graph_;
   OrderedNodeSet compilation_candidates_;
   std::unique_ptr<DeadnessAnalysis> deadness_analysis_;
   int64_t iteration_count_ = 0;
-  absl::flat_hash_set<std::pair<int, int>> unsafe_resource_deps_;
+  abslx::flat_hash_set<std::pair<int, int>> unsafe_resource_deps_;
 };
 
 std::vector<int> MarkForCompilationPassImpl::FindAlternatePathForDebugging(
     int from, int to) {
   std::vector<int> rpo = cycles_graph_.AllNodesInPostOrder();
-  absl::c_reverse(rpo);
+  abslx::c_reverse(rpo);
 
   // best_pred_for_node[n] contains a predecessor of `n` that has an
   // unclusterable node in some path from `from` to itself.
   // best_pred_for_node[n] is unpopulated for nodes that are not reachable from
   // `from`.  We build this table up inductively by traversing the cycles graph
   // in RPO.
-  absl::flat_hash_map<int, int> best_pred_for_node;
+  abslx::flat_hash_map<int, int> best_pred_for_node;
   best_pred_for_node[from] = -1;
 
   int rpo_index = 0, current_rpo_node;
@@ -518,7 +518,7 @@ std::vector<int> MarkForCompilationPassImpl::FindAlternatePathForDebugging(
     current_path_node = get_best_pred(current_path_node);
   }
 
-  absl::c_reverse(path);
+  abslx::c_reverse(path);
   return path;
 }
 
@@ -531,12 +531,12 @@ string MarkForCompilationPassImpl::DebugStringForCyclesGraphNode(
 
   *found_unclustered = true;
   if (cycles_graph_node_id >= graph_->num_node_ids()) {
-    return absl::StrCat("<oob #", cycles_graph_node_id, ">");
+    return abslx::StrCat("<oob #", cycles_graph_node_id, ">");
   }
 
   Node* node = graph_->FindNodeId(cycles_graph_node_id);
   if (!node) {
-    return absl::StrCat("<bad #", cycles_graph_node_id, ">");
+    return abslx::StrCat("<bad #", cycles_graph_node_id, ">");
   }
 
   return node->name();
@@ -545,13 +545,13 @@ string MarkForCompilationPassImpl::DebugStringForCyclesGraphNode(
 string MarkForCompilationPassImpl::DescribePotentialCycle(int from, int to) {
   std::vector<string> path_str;
   bool found_unclustered = false;
-  absl::c_transform(FindAlternatePathForDebugging(from, to),
+  abslx::c_transform(FindAlternatePathForDebugging(from, to),
                     std::back_inserter(path_str), [&](int node_id) {
                       return DebugStringForCyclesGraphNode(node_id,
                                                            &found_unclustered);
                     });
-  return absl::StrCat(!found_unclustered ? "(all clusters) " : "", "[",
-                      absl::StrJoin(path_str, ","), "]");
+  return abslx::StrCat(!found_unclustered ? "(all clusters) " : "", "[",
+                      abslx::StrJoin(path_str, ","), "]");
 }
 
 void MarkForCompilationPassImpl::Cluster::Merge(Cluster* other) {
@@ -584,7 +584,7 @@ void MarkForCompilationPassImpl::Cluster::Merge(Cluster* other) {
   resource_var_operation_node_ids_.reserve(
       resource_var_operation_node_ids_.size() +
       other->resource_var_operation_node_ids_.size());
-  absl::c_copy(other->resource_var_operation_node_ids_,
+  abslx::c_copy(other->resource_var_operation_node_ids_,
                std::back_inserter(resource_var_operation_node_ids_));
   other->resource_var_operation_node_ids_.clear();
 }
@@ -890,7 +890,7 @@ Status MarkForCompilationPassImpl::DeclusterNodes() {
     // See b/221997940 for a real-world example of this.
     if (n->op_def().name() == "Fill" &&
         n->out_nodes().begin() != n->out_nodes().end() &&
-        absl::c_all_of(n->out_nodes(), [&](Node* user) {
+        abslx::c_all_of(n->out_nodes(), [&](Node* user) {
           return GetClusterForNode(user) != cluster;
         })) {
       declustered_nodes_.insert(n);
@@ -921,7 +921,7 @@ class ClusterSequenceNumberGenerator {
 
  private:
   mutex mu_;
-  absl::flat_hash_map<uint64, int64> sequence_numbers_;
+  abslx::flat_hash_map<uint64, int64> sequence_numbers_;
 };
 
 // Get a monotonic sequence numbers for a graph identified by its `fingerprint`.
@@ -968,10 +968,10 @@ Status MarkForCompilationPassImpl::CreateClusters() {
 
       if (name.empty()) {
         if (debug_options_.deterministic_cluster_names) {
-          name = absl::StrCat("cluster_", graph_fingerprint_, "_",
+          name = abslx::StrCat("cluster_", graph_fingerprint_, "_",
                               GetNextClusterSequenceNumber(graph_fingerprint_));
         } else {
-          name = absl::StrCat("cluster_",
+          name = abslx::StrCat("cluster_",
                               GetNextClusterSequenceNumber(graph_fingerprint_));
         }
       }
@@ -1089,7 +1089,7 @@ Status MarkForCompilationPassImpl::BuildInitialClusterSet() {
   std::vector<std::pair<int, int>> unsafe_resource_deps_vect;
   TF_RETURN_IF_ERROR(ComputeIncompatibleResourceOperationPairs(
       *graph_, flib_def_, ignore_resource_ops, &unsafe_resource_deps_vect));
-  absl::c_copy(
+  abslx::c_copy(
       unsafe_resource_deps_vect,
       std::inserter(unsafe_resource_deps_, unsafe_resource_deps_.begin()));
 
@@ -1162,7 +1162,7 @@ StatusOr<bool> IsIdentityDrivingConstsInLoop(Node* node) {
   }
 
   // Check if the Identity is driven by a Switch on its true path.
-  auto it = absl::c_find_if(node->in_edges(), [](const Edge* e) {
+  auto it = abslx::c_find_if(node->in_edges(), [](const Edge* e) {
     return e->src()->IsSwitch() && e->src_output() == 1;
   });
   if (it == node->in_edges().end()) {
@@ -1179,7 +1179,7 @@ StatusOr<bool> IsIdentityDrivingConstsInLoop(Node* node) {
 
   // Check if the Identity is driving any const nodes through a control edge.
   bool driving_any_consts =
-      absl::c_any_of(node->out_edges(), [](const Edge* e) {
+      abslx::c_any_of(node->out_edges(), [](const Edge* e) {
         return e->dst()->IsConstant() && e->IsControlEdge();
       });
   if (!driving_any_consts) {
@@ -1189,31 +1189,31 @@ StatusOr<bool> IsIdentityDrivingConstsInLoop(Node* node) {
   return true;
 }
 
-absl::flat_hash_set<string> GetOrCreateClusterExcludeList() {
+abslx::flat_hash_set<string> GetOrCreateClusterExcludeList() {
   MarkForCompilationPassFlags* flags = GetMarkForCompilationPassFlags();
-  absl::flat_hash_set<string> excludelist;
-  for (auto s : absl::StrSplit(flags->tf_xla_cluster_exclude_ops, ',')) {
+  abslx::flat_hash_set<string> excludelist;
+  for (auto s : abslx::StrSplit(flags->tf_xla_cluster_exclude_ops, ',')) {
     if (!s.empty()) {
       excludelist.insert(string(s));
     }
   }
   if (VLOG_IS_ON(2) && !excludelist.empty()) {
     std::vector<string> vexcludelist(excludelist.begin(), excludelist.end());
-    absl::c_sort(vexcludelist);
+    abslx::c_sort(vexcludelist);
     VLOG(2) << "XLA clustering will exclude following TF operations from auto "
                "clustering: "
-            << absl::StrJoin(vexcludelist, " ");
+            << abslx::StrJoin(vexcludelist, " ");
   }
   return excludelist;
 }
 
-absl::flat_hash_set<string> GetOrCreateAllowlist() {
-  absl::flat_hash_map<string, std::vector<string>>* allowlist_table =
+abslx::flat_hash_set<string> GetOrCreateAllowlist() {
+  abslx::flat_hash_map<string, std::vector<string>>* allowlist_table =
       tensorflow::GetAllowlistTable();
   MarkForCompilationPassFlags* flags = GetMarkForCompilationPassFlags();
-  absl::flat_hash_set<string> allowlist;
+  abslx::flat_hash_set<string> allowlist;
 
-  for (auto s : absl::StrSplit(flags->tf_xla_ops_to_cluster, ',')) {
+  for (auto s : abslx::StrSplit(flags->tf_xla_ops_to_cluster, ',')) {
     if (s == "FUSIBLE") {
       for (auto pair : *allowlist_table) {
         allowlist.insert(pair.second.begin(), pair.second.end());
@@ -1229,9 +1229,9 @@ absl::flat_hash_set<string> GetOrCreateAllowlist() {
 
   if (VLOG_IS_ON(2) && !allowlist.empty()) {
     std::vector<string> vallowlist(allowlist.begin(), allowlist.end());
-    absl::c_sort(vallowlist);
+    abslx::c_sort(vallowlist);
     VLOG(2) << "XLA clustering will only consider the following TF operations: "
-            << absl::StrJoin(vallowlist, " ");
+            << abslx::StrJoin(vallowlist, " ");
   }
   return allowlist;
 }
@@ -1270,7 +1270,7 @@ Status MarkForCompilationPassImpl::FindCompilationCandidates() {
   auto allowlist = GetOrCreateAllowlist();
 
   std::vector<string> vall_ops = XlaOpRegistry::GetAllRegisteredOps();
-  absl::flat_hash_set<string> all_ops(vall_ops.begin(), vall_ops.end());
+  abslx::flat_hash_set<string> all_ops(vall_ops.begin(), vall_ops.end());
   // Check that user's provided TF operation really exists.
   for (const auto& s : allowlist) {
     if (!all_ops.contains(s)) {
@@ -1469,7 +1469,7 @@ bool MarkForCompilationPassImpl::CompilationDisallowedByXlaCompileAttr(
 }
 
 bool MarkForCompilationPassImpl::LogNotContractableAndReturnFalse(
-    Cluster* from, Cluster* to, absl::string_view reason) {
+    Cluster* from, Cluster* to, abslx::string_view reason) {
   VLOG(3) << EdgeContractionFailureMsg(from, to, reason);
   return false;
 }
@@ -1481,7 +1481,7 @@ StatusOr<bool> MarkForCompilationPassImpl::TryToContractEdge(Cluster* from,
   if (from->deadness_predicate() != to->deadness_predicate()) {
     VLOG(3) << EdgeContractionFailureMsg(
         from, to,
-        absl::StrCat(
+        abslx::StrCat(
             "the two nodes have mismatching deadness: ",
             deadness_analysis_->DebugString(*from->deadness_predicate()),
             " and ",
@@ -1578,16 +1578,16 @@ void MarkForCompilationPassImpl::DumpPostClusteringGraphs() {
   CopyGraph(*graph_, &new_graph);
 
   for (Node* n : new_graph.nodes()) {
-    if (std::optional<absl::string_view> cluster_name =
+    if (std::optional<abslx::string_view> cluster_name =
             GetXlaClusterForNode(*n)) {
-      n->set_name(absl::StrCat(*cluster_name, "/", n->name()));
+      n->set_name(abslx::StrCat(*cluster_name, "/", n->name()));
     } else if (n->type_string() == "VarHandleOp") {
-      n->set_name(absl::StrCat("varhandle/", n->name()));
+      n->set_name(abslx::StrCat("varhandle/", n->name()));
     } else {
       // There is room for improvement here.  In particular, it may help to
       // split these unclustered nodes into classes where every node in a
       // specific class has edges to and from the same set of clusters.
-      n->set_name(absl::StrCat("unclustered/", n->name()));
+      n->set_name(abslx::StrCat("unclustered/", n->name()));
     }
   }
 
@@ -1595,7 +1595,7 @@ void MarkForCompilationPassImpl::DumpPostClusteringGraphs() {
 }
 
 string RatioToString(int numerator, int denominator) {
-  return absl::StrFormat("%d / %d (%.2f%%)", numerator, denominator,
+  return abslx::StrFormat("%d / %d (%.2f%%)", numerator, denominator,
                          (100.0 * numerator) / denominator);
 }
 
@@ -1615,7 +1615,7 @@ void MarkForCompilationPassImpl::VLogClusteringSummary() {
 
   for (const XlaAutoClusteringSummary::Cluster& cluster :
        auto_clustering_info.clusters()) {
-    absl::string_view cluster_name = cluster.name();
+    abslx::string_view cluster_name = cluster.name();
     int size = cluster.size();
     VLOG(2) << "  " << cluster_name << " "
             << RatioToString(size, graph_->num_nodes());
@@ -1638,14 +1638,14 @@ void MarkForCompilationPassImpl::VLogClusteringSummary() {
   }
 
   struct EdgeInfo {
-    absl::string_view node_name;
-    std::optional<absl::string_view> cluster_name;
+    abslx::string_view node_name;
+    std::optional<abslx::string_view> cluster_name;
 
-    absl::string_view GetClusterName() const {
+    abslx::string_view GetClusterName() const {
       return cluster_name ? *cluster_name : "[none]";
     }
 
-    std::pair<absl::string_view, std::optional<absl::string_view>> AsPair()
+    std::pair<abslx::string_view, std::optional<abslx::string_view>> AsPair()
         const {
       return {node_name, cluster_name};
     }
@@ -1655,20 +1655,20 @@ void MarkForCompilationPassImpl::VLogClusteringSummary() {
     }
   };
 
-  using EdgeInfoMap = std::map<absl::string_view, std::map<EdgeInfo, int64_t>>;
+  using EdgeInfoMap = std::map<abslx::string_view, std::map<EdgeInfo, int64_t>>;
 
   EdgeInfoMap incoming_edge_infos;
   EdgeInfoMap outgoing_edge_infos;
 
-  std::set<absl::string_view> cluster_names_to_print;
+  std::set<abslx::string_view> cluster_names_to_print;
 
   for (const Edge* e : graph_->edges()) {
     const Node* from = e->src();
-    std::optional<absl::string_view> from_cluster_name =
+    std::optional<abslx::string_view> from_cluster_name =
         GetXlaClusterForNode(*from);
 
     const Node* to = e->dst();
-    std::optional<absl::string_view> to_cluster_name =
+    std::optional<abslx::string_view> to_cluster_name =
         GetXlaClusterForNode(*to);
 
     if (to_cluster_name == from_cluster_name) {
@@ -1692,9 +1692,9 @@ void MarkForCompilationPassImpl::VLogClusteringSummary() {
     VLOG(4) << "   [none]";
   }
 
-  auto print_edge_info_set_for_cluster = [&](absl::string_view cluster_name,
+  auto print_edge_info_set_for_cluster = [&](abslx::string_view cluster_name,
                                              const EdgeInfoMap& edge_info_map,
-                                             absl::string_view desc) {
+                                             abslx::string_view desc) {
     auto it = edge_info_map.find(cluster_name);
     if (it != edge_info_map.end()) {
       VLOG(4) << "  " << it->second.size() << " " << desc << " edges";
@@ -1708,7 +1708,7 @@ void MarkForCompilationPassImpl::VLogClusteringSummary() {
     }
   };
 
-  for (absl::string_view cluster_name : cluster_names_to_print) {
+  for (abslx::string_view cluster_name : cluster_names_to_print) {
     VLOG(4) << " ** Cluster " << cluster_name;
     print_edge_info_set_for_cluster(cluster_name, incoming_edge_infos,
                                     "incoming");
@@ -1775,8 +1775,8 @@ StatusOr<bool> MarkForCompilationPassImpl::ShouldCompileClusterImpl(
 
   if (!should_compile && device_type.type_string() == DEVICE_CPU &&
       global_jit_level_ > OptimizerOptions::OFF) {
-    static absl::once_flag once;
-    absl::call_once(once, [] {
+    static abslx::once_flag once;
+    abslx::call_once(once, [] {
       LOG(WARNING) << R"((One-time warning): Not using XLA:CPU for cluster.
 
 If you want XLA:CPU, do one of the following:
@@ -1905,10 +1905,10 @@ Status MarkForCompilationPass::RunForTest(
   return MarkForCompilation(options, debug_options);
 }
 
-absl::flat_hash_map<string, std::vector<string>>* GetAllowlistTable() {
+abslx::flat_hash_map<string, std::vector<string>>* GetAllowlistTable() {
   // Table format: category name: {list of TF operations in that category}
-  static absl::flat_hash_map<string, std::vector<string>>* result =
-      new absl::flat_hash_map<string, std::vector<string>>{
+  static abslx::flat_hash_map<string, std::vector<string>>* result =
+      new abslx::flat_hash_map<string, std::vector<string>>{
           // Unary
           {"PW",
            {"ComplexAbs", "Angle", "Conj", "Abs", "Acos", "Acosh", "Asin",
@@ -1975,8 +1975,8 @@ void ResetClusterSequenceNumber() {
   ClusterSequenceNumberGenerator::Global().Reset();
 }
 
-absl::flat_hash_set<string> GetKnownXLAAllowlistOp() {
-  absl::flat_hash_set<string> result{
+abslx::flat_hash_set<string> GetKnownXLAAllowlistOp() {
+  abslx::flat_hash_set<string> result{
       "AdjustContrastv2",
       "AdjustHue",
       "AdjustSaturation",

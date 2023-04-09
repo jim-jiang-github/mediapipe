@@ -738,10 +738,10 @@ TEST(SceneCameraMotionAnalyzerTest,
   std::string csv_file_content;
   MP_ASSERT_OK(mediapipe::file::GetContents(scene_frame_results_file_path,
                                             &csv_file_content));
-  std::vector<std::string> lines = absl::StrSplit(csv_file_content, '\n');
+  std::vector<std::string> lines = abslx::StrSplit(csv_file_content, '\n');
   std::vector<std::string> records;
   for (const auto& line : lines) {
-    std::vector<std::string> r = absl::StrSplit(line, ',');
+    std::vector<std::string> r = abslx::StrSplit(line, ',');
     records.insert(records.end(), r.begin(), r.end());
   }
   CHECK_EQ(records.size(), kNumSceneFrames * 3 + 1);

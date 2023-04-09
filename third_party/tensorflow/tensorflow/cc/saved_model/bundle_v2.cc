@@ -160,7 +160,7 @@ Status SavedModelV2Bundle::VisitObjectsToRestore(
   const SavedObject* root_saved_object = &saved_object_graph().nodes(0);
   const TrackableObjectGraph::TrackableObject* root_trackable_object =
       &trackable_object_graph().nodes(0);
-  absl::flat_hash_set<int> trackable_node_ids;
+  abslx::flat_hash_set<int> trackable_node_ids;
   return RecurseObjectsToRestore(root_saved_object, 0, root_trackable_object,
                                  std::string(), &trackable_node_ids,
                                  std::move(callback));
@@ -169,7 +169,7 @@ Status SavedModelV2Bundle::VisitObjectsToRestore(
 Status SavedModelV2Bundle::RecurseObjectsToRestore(
     const SavedObject* saved_object, int saved_object_node_id,
     const TrackableObjectGraph::TrackableObject* trackable_object,
-    std::string object_name, absl::flat_hash_set<int>* seen_trackable_node_ids,
+    std::string object_name, abslx::flat_hash_set<int>* seen_trackable_node_ids,
     RestoreObjectsCallback callback) {
   // Callback if any attributes or slot variables.
   // Note that the root is always excluded from the search (it can never

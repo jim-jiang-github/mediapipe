@@ -48,7 +48,7 @@ Status CheckVirtualAddressManagementSupport(GpuDeviceHandle device,
   TF_ASSIGN_OR_RETURN(bool supports_virtual_address_management,
                       SupportsVirtualAddressManagement(device));
   if (!supports_virtual_address_management) {
-    return stream_executor::port::InternalError(absl::StrFormat(
+    return stream_executor::port::InternalError(abslx::StrFormat(
         "GPU %d does not support virtual memory address management.",
         gpu_id.value()));
   }

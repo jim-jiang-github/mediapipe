@@ -56,7 +56,7 @@ class Scheduler {
 
   // Sets the executor that will run the nodes assigned to the executor
   // named |name|. Must be called before the scheduler is started.
-  absl::Status SetNonDefaultExecutor(const std::string& name,
+  abslx::Status SetNonDefaultExecutor(const std::string& name,
                                      Executor* executor);
 
   // Resets the data members at the beginning of each graph run.
@@ -70,13 +70,13 @@ class Scheduler {
   // have been closed, and no more calculators can be run).
   // This function can be called only after Start().
   // Runs application thread tasks while waiting.
-  absl::Status WaitUntilDone() ABSL_LOCKS_EXCLUDED(state_mutex_);
+  abslx::Status WaitUntilDone() ABSL_LOCKS_EXCLUDED(state_mutex_);
 
   // Wait until the running graph is in the idle mode, which is when nothing can
   // be scheduled and nothing is running in the worker threads.  This function
   // can be called only after Start().
   // Runs application thread tasks while waiting.
-  absl::Status WaitUntilIdle() ABSL_LOCKS_EXCLUDED(state_mutex_);
+  abslx::Status WaitUntilIdle() ABSL_LOCKS_EXCLUDED(state_mutex_);
 
   // Wait until any graph input stream has been unthrottled.
   // This is meant to be used by CalculatorGraph::AddPacketToInputStream, which
@@ -85,7 +85,7 @@ class Scheduler {
   // secondary_mutex argument.
   // This function can be called by multiple threads concurrently.
   // Runs application thread tasks while waiting.
-  void WaitUntilGraphInputStreamUnthrottled(absl::Mutex* secondary_mutex)
+  void WaitUntilGraphInputStreamUnthrottled(abslx::Mutex* secondary_mutex)
       ABSL_LOCKS_EXCLUDED(state_mutex_)
           ABSL_EXCLUSIVE_LOCKS_REQUIRED(secondary_mutex);
 
@@ -93,8 +93,8 @@ class Scheduler {
   // this function returns immediately if an observed packet has already been
   // emitted since the previous call. This relies on the fact that the calls are
   // in sequence. Runs application thread tasks while waiting.
-  // Returns absl::OutOfRangeError if the graph terminated.
-  absl::Status WaitForObservedOutput() ABSL_LOCKS_EXCLUDED(state_mutex_);
+  // Returns abslx::OutOfRangeError if the graph terminated.
+  abslx::Status WaitForObservedOutput() ABSL_LOCKS_EXCLUDED(state_mutex_);
 
   // Callback that is invoked by a node when it wants to be scheduled.
   // If the node is throttled, the call is ignored.
@@ -279,7 +279,7 @@ class Scheduler {
   // These correspond to the Wait* methods in this class.
   // Not all state changes need to signal this, only those that enter one of
   // the waitable states.
-  absl::CondVar state_cond_var_ ABSL_GUARDED_BY(state_mutex_);
+  abslx::CondVar state_cond_var_ ABSL_GUARDED_BY(state_mutex_);
 
   // Number of queues which are not idle.
   // Note: this indicates two slightly different things:
@@ -307,7 +307,7 @@ class Scheduler {
   // Mutex for the scheduler state and related things.
   // Note: state_ is declared as atomic so that its getter methods don't need
   // to acquire state_mutex_.
-  absl::Mutex state_mutex_;
+  abslx::Mutex state_mutex_;
 
   // Current state of the scheduler.
   std::atomic<State> state_ = ATOMIC_VAR_INIT(STATE_NOT_STARTED);

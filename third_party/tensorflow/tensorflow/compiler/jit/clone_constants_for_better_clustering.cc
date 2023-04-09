@@ -36,27 +36,27 @@ class CloneConstantsForBetterClusteringPassImpl {
 
  private:
   Status CloneSmallHostConstantInputs(
-      const absl::flat_hash_set<string>& name_set, Node* n);
-  string GenerateUniqueName(const absl::flat_hash_set<string>& name_set,
-                            absl::string_view prefix);
+      const abslx::flat_hash_set<string>& name_set, Node* n);
+  string GenerateUniqueName(const abslx::flat_hash_set<string>& name_set,
+                            abslx::string_view prefix);
   se::port::StatusOr<Node*> CloneNode(
-      const absl::flat_hash_set<string>& name_set, Node* n);
+      const abslx::flat_hash_set<string>& name_set, Node* n);
 
   Graph* graph_;
   int unique_name_counter_;
 };
 
 string CloneConstantsForBetterClusteringPassImpl::GenerateUniqueName(
-    const absl::flat_hash_set<string>& name_set, absl::string_view prefix) {
+    const abslx::flat_hash_set<string>& name_set, abslx::string_view prefix) {
   string candidate;
   do {
-    candidate = absl::StrCat(prefix, "/clone_", unique_name_counter_++);
+    candidate = abslx::StrCat(prefix, "/clone_", unique_name_counter_++);
   } while (name_set.contains(candidate));
   return candidate;
 }
 
 StatusOr<Node*> CloneConstantsForBetterClusteringPassImpl::CloneNode(
-    const absl::flat_hash_set<string>& name_set, Node* n) {
+    const abslx::flat_hash_set<string>& name_set, Node* n) {
   NodeDef new_in_def = n->def();
   new_in_def.clear_input();
   new_in_def.set_name(GenerateUniqueName(name_set, new_in_def.name()));
@@ -120,18 +120,18 @@ StatusOr<bool> IsSmallHostConstant(Node* n) {
   return IsConstantSmall(n);
 }
 
-bool IsInPlaceOp(absl::string_view op_name) {
+bool IsInPlaceOp(abslx::string_view op_name) {
   return op_name == "InplaceUpdate" || op_name == "InplaceAdd" ||
          op_name == "InplaceSub";
 }
 }  // namespace
 
 Status CloneConstantsForBetterClusteringPassImpl::CloneSmallHostConstantInputs(
-    const absl::flat_hash_set<string>& name_set, Node* n) {
+    const abslx::flat_hash_set<string>& name_set, Node* n) {
   std::vector<const Edge*> in_edges;
   // Get the edges and sort them so we clone in a deterministic order.
-  absl::c_copy(n->in_edges(), std::back_inserter(in_edges));
-  absl::c_stable_sort(in_edges, [](const Edge* e1, const Edge* e2) {
+  abslx::c_copy(n->in_edges(), std::back_inserter(in_edges));
+  abslx::c_stable_sort(in_edges, [](const Edge* e1, const Edge* e2) {
     return e1->id() < e2->id();
   });
   for (const Edge* e : in_edges) {
@@ -158,8 +158,8 @@ Status CloneConstantsForBetterClusteringPassImpl::CloneSmallHostConstantInputs(
 }
 
 Status CloneConstantsForBetterClusteringPassImpl::Run() {
-  absl::flat_hash_set<string> name_set;
-  absl::c_transform(graph_->nodes(), std::inserter(name_set, name_set.begin()),
+  abslx::flat_hash_set<string> name_set;
+  abslx::c_transform(graph_->nodes(), std::inserter(name_set, name_set.begin()),
                     [](Node* n) { return n->name(); });
   std::vector<Node*> nodes;
   for (Node* n : graph_->nodes()) {

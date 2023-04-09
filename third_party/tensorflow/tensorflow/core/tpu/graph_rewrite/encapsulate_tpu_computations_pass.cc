@@ -438,7 +438,7 @@ Status MoveHeadOutsideCompilationToHost(
   for (Node* n : oc_nodes_at_head) {
     for (int replica_id = 0; replica_id < num_replicas; replica_id++) {
       NodeDef copy_def = n->def();
-      copy_def.set_name(absl::StrCat(n->name(), "_head_oc/R", replica_id));
+      copy_def.set_name(abslx::StrCat(n->name(), "_head_oc/R", replica_id));
       copy_def.clear_device();
 
       TF_ASSIGN_OR_RETURN(Node * copy_node, g->AddNode(copy_def));
@@ -633,7 +633,7 @@ Status MoveHeadOutsideCompilationToHost(
   // Create new _Arg nodes in `xla_graph`.
   for (int i = old_num_per_replica_inputs; i < new_num_per_replica_inputs;
        i++) {
-    NodeDefBuilder arg_builder(absl::StrCat("arg_", i),
+    NodeDefBuilder arg_builder(abslx::StrCat("arg_", i),
                                FunctionLibraryDefinition::kArgOp);
     arg_builder.Attr("T", new_arg_types[i - old_num_per_replica_inputs]);
     arg_builder.Attr("index", i);
@@ -664,7 +664,7 @@ Status MoveHeadOutsideCompilationToHost(
     }
 
     TF_RET_CHECK(n->IsIdentity());
-    NodeDefBuilder ph_builder(absl::StrCat("placeholder_", n->name()),
+    NodeDefBuilder ph_builder(abslx::StrCat("placeholder_", n->name()),
                               "Placeholder");
     DataType dtype;
     TF_RETURN_IF_ERROR(GetNodeAttr(n->def(), "T", &dtype));
@@ -689,7 +689,7 @@ Status MoveHeadOutsideCompilationToHost(
     const Edge* input_edge =
         new_input_edges.at(num_replicas * new_num_per_replica_inputs + index -
                            new_num_per_replica_inputs);
-    NodeDefBuilder id_builder(absl::StrCat("lifted_arg_input_", index),
+    NodeDefBuilder id_builder(abslx::StrCat("lifted_arg_input_", index),
                               "IdentityN");
     DataType input_dtype =
         input_edge->src()->output_type(input_edge->src_output());
@@ -715,10 +715,10 @@ Status MoveHeadOutsideCompilationToHost(
   }
 
   VLOG(4) << "MoveHeadOutsideCompilationToHost host graph: "
-          << DumpGraphToFile(absl::StrCat("move_head_oc_host_", xla_func_name),
+          << DumpGraphToFile(abslx::StrCat("move_head_oc_host_", xla_func_name),
                              *g);
   VLOG(4) << "MoveHeadOutsideCompilationToHost XLA graph: "
-          << DumpGraphToFile(absl::StrCat("move_head_oc_xla_", xla_func_name),
+          << DumpGraphToFile(abslx::StrCat("move_head_oc_xla_", xla_func_name),
                              *xla_graph);
 
   return OkStatus();
@@ -887,7 +887,7 @@ Status RemoveUnusedXlaInput(const string& xla_func_name, Graph* g,
 
   if (!mirrored_variable_indices.empty()) {
     std::vector<int> new_mirrored_variable_indices;
-    absl::flat_hash_set<int> old_mirrored_variable_indices_set;
+    abslx::flat_hash_set<int> old_mirrored_variable_indices_set;
     for (int index : mirrored_variable_indices) {
       old_mirrored_variable_indices_set.insert(index);
     }
@@ -950,10 +950,10 @@ Status RemoveUnusedXlaInput(const string& xla_func_name, Graph* g,
 
   VLOG(4) << "RemoveUnusedXlaInput host graph: "
           << DumpGraphToFile(
-                 absl::StrCat("remove_unused_input_host_", xla_func_name), *g);
+                 abslx::StrCat("remove_unused_input_host_", xla_func_name), *g);
   VLOG(4) << "RemoveUnusedXlaInput XLA graph: "
           << DumpGraphToFile(
-                 absl::StrCat("remove_unused_input_xla_", xla_func_name),
+                 abslx::StrCat("remove_unused_input_xla_", xla_func_name),
                  *xla_graph);
 
   return OkStatus();
@@ -1084,7 +1084,7 @@ Status MoveTailOutsideCompilationToHost(
   for (Node* n : oc_nodes_at_tail) {
     for (int replica_id = 0; replica_id < num_replicas; replica_id++) {
       NodeDef copy_def = n->def();
-      copy_def.set_name(absl::StrCat(n->name(), "_tail_oc/R", replica_id));
+      copy_def.set_name(abslx::StrCat(n->name(), "_tail_oc/R", replica_id));
       copy_def.clear_device();
 
       TF_ASSIGN_OR_RETURN(Node * copy_node, g->AddNode(copy_def));
@@ -1149,7 +1149,7 @@ Status MoveTailOutsideCompilationToHost(
   // Create new _Retval nodes in `xla_graph`.
   for (int i = old_num_replicated_outputs; i < new_num_replicated_outputs;
        i++) {
-    NodeDefBuilder ret_builder(absl::StrCat("ret_", i),
+    NodeDefBuilder ret_builder(abslx::StrCat("ret_", i),
                                FunctionLibraryDefinition::kRetOp);
     ret_builder.Attr("T", new_ret_types[i - old_num_replicated_outputs]);
     ret_builder.Attr("index", i);
@@ -1178,7 +1178,7 @@ Status MoveTailOutsideCompilationToHost(
     }
   }
   for (Node* n : unused_rets) {
-    NodeDefBuilder builder(absl::StrCat("placeholder_", n->name()),
+    NodeDefBuilder builder(abslx::StrCat("placeholder_", n->name()),
                            "Placeholder");
     DataType dtype;
     TF_RETURN_IF_ERROR(GetNodeAttr(n->def(), "T", &dtype));
@@ -1191,10 +1191,10 @@ Status MoveTailOutsideCompilationToHost(
   }
 
   VLOG(4) << "MoveTailOutsideCompilationToHost host graph: "
-          << DumpGraphToFile(absl::StrCat("move_tail_oc_host_", xla_func_name),
+          << DumpGraphToFile(abslx::StrCat("move_tail_oc_host_", xla_func_name),
                              *g);
   VLOG(4) << "MoveTaildOutsideCompilationToHost XLA graph: "
-          << DumpGraphToFile(absl::StrCat("move_tail_oc_xla_", xla_func_name),
+          << DumpGraphToFile(abslx::StrCat("move_tail_oc_xla_", xla_func_name),
                              *xla_graph);
 
   return OkStatus();
@@ -1249,8 +1249,8 @@ Status ReplaceArgUsedByOutsideCompilationWithPlaceholder(
     // Build an IdentityN node to record inputs for this _Arg node.
     int index;
     TF_RETURN_IF_ERROR(GetNodeAttr(n->def(), "index", &index));
-    string oc_identifier = absl::StrCat("oc_only_arg_", index);
-    NodeDefBuilder id_builder(absl::StrCat(oc_identifier, "_inputs"),
+    string oc_identifier = abslx::StrCat("oc_only_arg_", index);
+    NodeDefBuilder id_builder(abslx::StrCat(oc_identifier, "_inputs"),
                               "IdentityN");
     std::vector<DataType> dtypes(num_replicas, dtype);
     id_builder.Attr("T", dtypes);
@@ -1313,10 +1313,10 @@ Status ReplaceArgUsedByOutsideCompilationWithPlaceholder(
   }
   VLOG(4) << "ReplaceOutsideCompilationOnlyArgWithPlaceholder host graph: "
           << DumpGraphToFile(
-                 absl::StrCat("replace_oc_only_arg_host_", xla_func_name), *g);
+                 abslx::StrCat("replace_oc_only_arg_host_", xla_func_name), *g);
   VLOG(4) << "ReplaceOutsideCompilationOnlyArgWithPlaceholder XLA graph: "
           << DumpGraphToFile(
-                 absl::StrCat("replace_oc_only_arg_xla_", xla_func_name),
+                 abslx::StrCat("replace_oc_only_arg_xla_", xla_func_name),
                  *xla_graph);
   return OkStatus();
 }
@@ -1423,10 +1423,10 @@ Status RemoveUnusedXlaOutput(const string& xla_func_name, Graph* g,
 
   VLOG(4) << "RemoveUnusedXlaOutput host graph: "
           << DumpGraphToFile(
-                 absl::StrCat("remove_unused_output_host_", xla_func_name), *g);
+                 abslx::StrCat("remove_unused_output_host_", xla_func_name), *g);
   VLOG(4) << "RemoveUnusedXlaOutput XLA graph: "
           << DumpGraphToFile(
-                 absl::StrCat("remove_unused_output_xla_", xla_func_name),
+                 abslx::StrCat("remove_unused_output_xla_", xla_func_name),
                  *xla_graph);
 
   return OkStatus();
@@ -1506,7 +1506,7 @@ Status RemoveEdgesBetweenArgAndRetval(const string& xla_func_name, Graph* g,
   // which will be removed by `RemoveUnusedXlaOutput()` later.
   for (const Edge* e : edges) {
     NodeDefBuilder placeholder_builder(
-        absl::StrCat("placeholder_", e->dst()->name()), "Placeholder");
+        abslx::StrCat("placeholder_", e->dst()->name()), "Placeholder");
     placeholder_builder.Attr("dtype", e->src()->output_type(e->src_output()));
     placeholder_builder.Attr(kXlaIsPlaceholderForTailOcAttrName, true);
     NodeDef placeholder_def;
@@ -1522,11 +1522,11 @@ Status RemoveEdgesBetweenArgAndRetval(const string& xla_func_name, Graph* g,
 
   VLOG(4) << "RemoveUnusedArgRetvalPair host graph: "
           << DumpGraphToFile(
-                 absl::StrCat("remove_unused_arg_ret_host_", xla_func_name),
+                 abslx::StrCat("remove_unused_arg_ret_host_", xla_func_name),
                  *g);
   VLOG(4) << "RemoveUnusedArgRetvalPair XLA graph: "
           << DumpGraphToFile(
-                 absl::StrCat("remove_unused_arg_ret_xla_", xla_func_name),
+                 abslx::StrCat("remove_unused_arg_ret_xla_", xla_func_name),
                  *xla_graph);
 
   return OkStatus();
@@ -1590,7 +1590,7 @@ Status RenameClustersWithDuplicatedNames(Graph* g) {
       string new_cluster_name;
       int cluster_name_suffix = 1;
       while (true) {
-        new_cluster_name = absl::StrCat(iter.first, "_", cluster_name_suffix);
+        new_cluster_name = abslx::StrCat(iter.first, "_", cluster_name_suffix);
         if (cluster_names.find(new_cluster_name) == cluster_names.end()) {
           break;
         }
@@ -1638,7 +1638,7 @@ Status RenameClustersWithDuplicatedNames(Graph* g) {
 // node. The function name is found by looking up `function_name_attr` of given
 // node.
 xla::StatusOr<std::unique_ptr<FunctionBody>> InstantiateAssociatedFunction(
-    const Node& n, absl::string_view function_name_attr,
+    const Node& n, abslx::string_view function_name_attr,
     FunctionLibraryDefinition* fld) {
   std::unique_ptr<FunctionBody> fbody;
   NameAttrList func_attr_list;
@@ -1655,9 +1655,9 @@ xla::StatusOr<std::unique_ptr<FunctionBody>> InstantiateAssociatedFunction(
 
 // Find inputs of If node that are only used for outside compilation if used at
 // all in both if/else branches
-xla::StatusOr<absl::flat_hash_set<int>> FindArgsToLiftForIfNode(
+xla::StatusOr<abslx::flat_hash_set<int>> FindArgsToLiftForIfNode(
     const Node& if_node, FunctionLibraryDefinition* fld) {
-  absl::flat_hash_set<int> args_to_lift_indices;
+  abslx::flat_hash_set<int> args_to_lift_indices;
   std::vector<DataType> dtypes;
   TF_RETURN_IF_ERROR(GetNodeAttr(if_node.def(), "Tin", &dtypes));
 
@@ -1717,10 +1717,10 @@ xla::StatusOr<absl::flat_hash_set<int>> FindArgsToLiftForIfNode(
 // 2. only used for outside compilation in body func,
 // 3. loop invariant.
 // These inputs can be lifted out of the while loop.
-xla::StatusOr<absl::flat_hash_set<int>> FindArgsToLiftForWhileNode(
+xla::StatusOr<abslx::flat_hash_set<int>> FindArgsToLiftForWhileNode(
     Node* while_node, FunctionLibraryDefinition* fld) {
   // DT_RESOURCE inputs are candidates.
-  absl::flat_hash_set<int> result;
+  abslx::flat_hash_set<int> result;
   std::vector<DataType> dtypes;
   TF_RETURN_IF_ERROR(GetNodeAttr(while_node->def(), "T", &dtypes));
   for (int i = 0; i < dtypes.size(); i++) {
@@ -1800,10 +1800,10 @@ xla::StatusOr<absl::flat_hash_set<int>> FindArgsToLiftForWhileNode(
 
 // Find inputs of function call node that are only used for outside compilation.
 // These inputs can be lifted out of the function call node.
-xla::StatusOr<absl::flat_hash_set<int>> FindArgsToLiftForCallNode(
+xla::StatusOr<abslx::flat_hash_set<int>> FindArgsToLiftForCallNode(
     Node* call_node, const FunctionBody& fbody) {
   // DT_RESOURCE inputs are candidates.
-  absl::flat_hash_set<int> result;
+  abslx::flat_hash_set<int> result;
   std::vector<DataType> dtypes(call_node->input_types().begin(),
                                call_node->input_types().end());
   for (int i = 0; i < dtypes.size(); i++) {
@@ -1838,7 +1838,7 @@ Status LiftOutsideCompilationOnlyArgs(Graph* g, FunctionLibraryRuntime* flr,
 Status LiftOutsideCompilationOnlyArgsAndReplaceFunctionDef(
     const FunctionBody& fbody, FunctionLibraryRuntime* flr,
     FunctionLibraryDefinition* fld, int* lifted_arg_count,
-    absl::optional<string> new_func_name, bool* rewritten) {
+    abslx::optional<string> new_func_name, bool* rewritten) {
   *rewritten = false;
   TF_RETURN_IF_ERROR(LiftOutsideCompilationOnlyArgs(
       fbody.graph, flr, fld, lifted_arg_count, rewritten));
@@ -1860,9 +1860,9 @@ Status LiftOutsideCompilationOnlyArgsAndReplaceFunctionDef(
 }
 
 Status MakeIdentityNodesForArgsToLift(
-    const absl::flat_hash_set<int>& args_to_lift,
+    const abslx::flat_hash_set<int>& args_to_lift,
     const int arg_to_input_edge_offset, Graph* g, Node* n,
-    absl::flat_hash_map<int, string>* lifted_arg_index_to_oc_cluster_name,
+    abslx::flat_hash_map<int, string>* lifted_arg_index_to_oc_cluster_name,
     int* lifted_arg_count) {
   int num_input = n->num_inputs();
   for (int arg_index = 0; arg_index < num_input; ++arg_index) {
@@ -1873,7 +1873,7 @@ Status MakeIdentityNodesForArgsToLift(
     TF_RETURN_IF_ERROR(n->input_edge(input_edge_index, &arg_edge));
 
     string node_name =
-        g->NewName(absl::StrCat("lifted_arg", *lifted_arg_count));
+        g->NewName(abslx::StrCat("lifted_arg", *lifted_arg_count));
     (*lifted_arg_count)++;
     (*lifted_arg_index_to_oc_cluster_name)[arg_index] = node_name;
     NodeDefBuilder id_builder(node_name, "Identity");
@@ -1895,10 +1895,10 @@ Status MakeIdentityNodesForArgsToLift(
 // Replaces all usages of lifted args with placeholder nodes. Afterwards,
 // removing these args should be safe since they no longer have users.
 Status RemoveArgsToLiftFromFunctionBody(
-    const absl::flat_hash_set<int>& args_to_lift,
+    const abslx::flat_hash_set<int>& args_to_lift,
     const std::vector<DataType>& arg_dtypes,
-    const absl::flat_hash_map<int, string>& lifted_arg_index_to_oc_cluster_name,
-    const absl::flat_hash_map<int, int>& index_mapping,
+    const abslx::flat_hash_map<int, string>& lifted_arg_index_to_oc_cluster_name,
+    const abslx::flat_hash_map<int, int>& index_mapping,
     const FunctionBody* fbody) {
   for (int i = 0; i < fbody->arg_nodes.size(); ++i) {
     Node* arg_node = fbody->arg_nodes[i];
@@ -1948,7 +1948,7 @@ Status RemoveArgsToLiftFromFunctionBody(
   return OkStatus();
 }
 
-Status CleanUpInEdges(const absl::flat_hash_map<int, int>& index_mapping,
+Status CleanUpInEdges(const abslx::flat_hash_map<int, int>& index_mapping,
                       const int arg_to_input_edge_offset, Graph* g, Node* n) {
   int num_inputs = n->num_inputs();
   for (int i = 0; i < num_inputs; ++i) {
@@ -1975,7 +1975,7 @@ Status CleanUpInEdges(const absl::flat_hash_map<int, int>& index_mapping,
   return OkStatus();
 }
 
-Status UpdateTypeAttribute(const absl::flat_hash_map<int, int>& index_mapping,
+Status UpdateTypeAttribute(const abslx::flat_hash_map<int, int>& index_mapping,
                            const string& type_attr_name,
                            const std::vector<DataType>& dtypes, Node* n) {
   std::vector<DataType> new_dtypes;
@@ -2022,7 +2022,7 @@ void RemoveOutputIdentityNodesForWhileV2(Graph* g, Node* while_node) {
 // If corresponding While node output is used, change it to use While node input
 // instead.
 Status ReplaceOutputEdgesWithInputEdgeSourceForWhile(
-    const absl::flat_hash_set<int>& args_to_lift, Graph* g, Node* while_node) {
+    const abslx::flat_hash_set<int>& args_to_lift, Graph* g, Node* while_node) {
   std::vector<const Edge*> edges_to_replace;
   for (const Edge* e : while_node->out_edges()) {
     if (args_to_lift.contains(e->src_output())) {
@@ -2042,9 +2042,9 @@ Status ReplaceOutputEdgesWithInputEdgeSourceForWhile(
 }
 
 // Calculates mapping from argument index before lifting to index afterwards.
-absl::flat_hash_map<int, int> ArgIndexMapping(
-    const int num_args, const absl::flat_hash_set<int>& args_to_lift) {
-  absl::flat_hash_map<int, int> index_mapping;
+abslx::flat_hash_map<int, int> ArgIndexMapping(
+    const int num_args, const abslx::flat_hash_set<int>& args_to_lift) {
+  abslx::flat_hash_map<int, int> index_mapping;
   int new_index = 0;
   for (int i = 0; i < num_args; i++) {
     if (!args_to_lift.contains(i)) {
@@ -2058,7 +2058,7 @@ absl::flat_hash_map<int, int> ArgIndexMapping(
 
 // Remove outputs of While node body function that maps to lifted arguments.
 void CleanUpRetvalsForWhileBody(
-    const absl::flat_hash_map<int, int>& index_mapping,
+    const abslx::flat_hash_map<int, int>& index_mapping,
     const std::vector<DataType>& dtypes, FunctionBody* fbody) {
   for (int i = 0; i < fbody->ret_nodes.size(); i++) {
     Node* ret_node = fbody->ret_nodes[i];
@@ -2079,7 +2079,7 @@ Status LiftOutsideCompilationOnlyArgsFromWhileNode(
     int* lifted_arg_count, bool* rewritten) {
   *rewritten = false;
 
-  TF_ASSIGN_OR_RETURN(absl::flat_hash_set<int> args_to_lift,
+  TF_ASSIGN_OR_RETURN(abslx::flat_hash_set<int> args_to_lift,
                       FindArgsToLiftForWhileNode(while_node, fld));
   if (args_to_lift.empty()) return OkStatus();
 
@@ -2091,12 +2091,12 @@ Status LiftOutsideCompilationOnlyArgsFromWhileNode(
   std::vector<DataType> dtypes;
   TF_RETURN_IF_ERROR(GetNodeAttr(while_node->def(), "T", &dtypes));
 
-  absl::flat_hash_map<int, int> index_mapping =
+  abslx::flat_hash_map<int, int> index_mapping =
       ArgIndexMapping(dtypes.size(), args_to_lift);
 
   // For each lifted arg, add an outside compilation Identity node to send
   // it to host.
-  absl::flat_hash_map<int, string> lifted_arg_index_to_oc_cluster_name;
+  abslx::flat_hash_map<int, string> lifted_arg_index_to_oc_cluster_name;
   TF_RETURN_IF_ERROR(MakeIdentityNodesForArgsToLift(
       args_to_lift, /*arg_to_input_edge_offset=*/0, g, while_node,
       &lifted_arg_index_to_oc_cluster_name, lifted_arg_count));
@@ -2151,14 +2151,14 @@ Status LiftOutsideCompilationOnlyArgsFromIfNode(Graph* g, Node* if_node,
                                                 int* lifted_arg_count,
                                                 bool* rewritten) {
   *rewritten = false;
-  TF_ASSIGN_OR_RETURN(absl::flat_hash_set<int> args_to_lift,
+  TF_ASSIGN_OR_RETURN(abslx::flat_hash_set<int> args_to_lift,
                       FindArgsToLiftForIfNode(*if_node, fld));
   if (args_to_lift.empty()) return OkStatus();
 
   std::vector<DataType> dtypes;
   TF_RETURN_IF_ERROR(GetNodeAttr(if_node->def(), "Tin", &dtypes));
 
-  absl::flat_hash_map<int, int> index_mapping;
+  abslx::flat_hash_map<int, int> index_mapping;
   int new_index = 0;
   for (int i = 0; i < dtypes.size(); i++) {
     if (!args_to_lift.contains(i)) {
@@ -2169,7 +2169,7 @@ Status LiftOutsideCompilationOnlyArgsFromIfNode(Graph* g, Node* if_node,
 
   // For each lifted arg, add an outside compilation Identity node to send
   // it to host.
-  absl::flat_hash_map<int, string> lifted_arg_index_to_oc_cluster_name;
+  abslx::flat_hash_map<int, string> lifted_arg_index_to_oc_cluster_name;
   TF_RETURN_IF_ERROR(MakeIdentityNodesForArgsToLift(
       args_to_lift, /*arg_to_input_edge_offset=*/1, g, if_node,
       &lifted_arg_index_to_oc_cluster_name, lifted_arg_count));
@@ -2242,7 +2242,7 @@ Status LiftOutsideCompilationOnlyArgsFromCallNode(
   const FunctionBody* fbody = flr->GetFunctionBody(handle);
 
   // Find _Arg nodes to lift.
-  TF_ASSIGN_OR_RETURN(absl::flat_hash_set<int> args_to_lift,
+  TF_ASSIGN_OR_RETURN(abslx::flat_hash_set<int> args_to_lift,
                       FindArgsToLiftForCallNode(call_node, *fbody));
   if (args_to_lift.empty()) return OkStatus();
 
@@ -2250,12 +2250,12 @@ Status LiftOutsideCompilationOnlyArgsFromCallNode(
   dtypes = std::vector<DataType>(call_node->input_types().begin(),
                                  call_node->input_types().end());
 
-  absl::flat_hash_map<int, int> index_mapping =
+  abslx::flat_hash_map<int, int> index_mapping =
       ArgIndexMapping(dtypes.size(), args_to_lift);
 
   // For each lifted arg, add an outside compilation Identity node to send
   // it to host.
-  absl::flat_hash_map<int, string> lifted_arg_index_to_oc_cluster_name;
+  abslx::flat_hash_map<int, string> lifted_arg_index_to_oc_cluster_name;
   TF_RETURN_IF_ERROR(MakeIdentityNodesForArgsToLift(
       args_to_lift, /*arg_to_input_edge_offset=*/0, g, call_node,
       &lifted_arg_index_to_oc_cluster_name, lifted_arg_count));
@@ -2321,7 +2321,7 @@ Status LiftOutsideCompilationOnlyArgs(Graph* g, FunctionLibraryRuntime* flr,
       bool func_rewritten = false;
       TF_RETURN_IF_ERROR(LiftOutsideCompilationOnlyArgsAndReplaceFunctionDef(
           *body_fbody, flr, fld, lifted_arg_count,
-          /*new_func_name=*/absl::nullopt, &func_rewritten));
+          /*new_func_name=*/abslx::nullopt, &func_rewritten));
       *rewritten = *rewritten || func_rewritten;
 
       while_nodes.push_back(n);
@@ -2332,7 +2332,7 @@ Status LiftOutsideCompilationOnlyArgs(Graph* g, FunctionLibraryRuntime* flr,
       bool func_rewritten = false;
       TF_RETURN_IF_ERROR(LiftOutsideCompilationOnlyArgsAndReplaceFunctionDef(
           *then_branch_fbody, flr, fld, lifted_arg_count,
-          /*new_func_name=*/absl::nullopt, &func_rewritten));
+          /*new_func_name=*/abslx::nullopt, &func_rewritten));
       *rewritten |= func_rewritten;
 
       TF_ASSIGN_OR_RETURN(
@@ -2341,7 +2341,7 @@ Status LiftOutsideCompilationOnlyArgs(Graph* g, FunctionLibraryRuntime* flr,
       func_rewritten = false;
       TF_RETURN_IF_ERROR(LiftOutsideCompilationOnlyArgsAndReplaceFunctionDef(
           *else_branch_fbody, flr, fld, lifted_arg_count,
-          /*new_func_name=*/absl::nullopt, &func_rewritten));
+          /*new_func_name=*/abslx::nullopt, &func_rewritten));
       *rewritten |= func_rewritten;
 
       if_nodes.push_back(n);
@@ -2405,7 +2405,7 @@ Status LiftOutsideCompilationOnlyArgs(Graph* g, FunctionLibraryRuntime* flr,
           [&flr, &handle]() { flr->ReleaseHandle(handle).IgnoreError(); });
       bool func_rewritten = false;
       string new_func_name = fld->UniqueFunctionName(
-          absl::StrCat(call_node->name(), "_lift_args"));
+          abslx::StrCat(call_node->name(), "_lift_args"));
       const FunctionBody* function_fbody = flr->GetFunctionBody(handle);
       TF_RETURN_IF_ERROR(LiftOutsideCompilationOnlyArgsAndReplaceFunctionDef(
           *function_fbody, flr, fld, lifted_arg_count, new_func_name,
@@ -2481,7 +2481,7 @@ Status LiftOutsideCompilationOnlyArgs(Graph* g, FunctionLibraryRuntime* flr,
   TF_RETURN_IF_ERROR(
       PerformStaticShapeInferenceBeforeEncapsulation(graph->get()));
 
-  auto output = absl::make_unique<Graph>((*graph)->op_registry());
+  auto output = abslx::make_unique<Graph>((*graph)->op_registry());
   TF_RETURN_WITH_CONTEXT_IF_ERROR(
       EncapsulateSubgraphsInFunctions(
           kTPUReplicateAttr, **graph, RewriteSubgraph,
@@ -2832,7 +2832,7 @@ Status ExtractOutsideCompilationPass::ProcessHeadTailOutsideCompilation(
     std::unordered_map<string, XlaClusterInfo>* clusters, Graph* g,
     FunctionLibraryRuntime* flr, FunctionLibraryDefinition* fld) {
   // Gather a list of pivots by cluster so we can easily look them up.
-  absl::node_hash_map<string, Node*> pivots;
+  abslx::node_hash_map<string, Node*> pivots;
   string cluster_name;
   for (Node* node : g->nodes()) {
     if (TryGetNodeAttr(node->attrs(), kPivotForClusterAttr, &cluster_name)) {

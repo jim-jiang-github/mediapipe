@@ -40,7 +40,7 @@ class TensorDatasetParams : public DatasetParams {
     input_names->reserve(components_.size());
     for (int i = 0; i < components_.size(); ++i) {
       input_names->emplace_back(
-          absl::StrCat(TensorDatasetOp::kComponents, "_", i));
+          abslx::StrCat(TensorDatasetOp::kComponents, "_", i));
     }
     return OkStatus();
   }

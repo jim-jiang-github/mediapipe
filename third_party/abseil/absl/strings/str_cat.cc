@@ -24,7 +24,7 @@
 #include "absl/strings/internal/resize_uninitialized.h"
 #include "absl/strings/numbers.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 AlphaNum::AlphaNum(Hex hex) {
@@ -32,16 +32,16 @@ AlphaNum::AlphaNum(Hex hex) {
                 "This function only works when output buffer >= 32 bytes long");
   char* const end = &digits_[numbers_internal::kFastToBufferSize];
   auto real_width =
-      absl::numbers_internal::FastHexToBufferZeroPad16(hex.value, end - 16);
+      abslx::numbers_internal::FastHexToBufferZeroPad16(hex.value, end - 16);
   if (real_width >= hex.width) {
-    piece_ = absl::string_view(end - real_width, real_width);
+    piece_ = abslx::string_view(end - real_width, real_width);
   } else {
     // Pad first 16 chars because FastHexToBufferZeroPad16 pads only to 16 and
     // max pad width can be up to 20.
     std::memset(end - 32, hex.fill, 16);
     // Patch up everything else up to the real_width.
     std::memset(end - real_width - 16, hex.fill, 16);
-    piece_ = absl::string_view(end - hex.width, hex.width);
+    piece_ = abslx::string_view(end - hex.width, hex.width);
   }
 }
 
@@ -73,7 +73,7 @@ AlphaNum::AlphaNum(Dec dec) {
     if (add_sign_again) *--writer = '-';
   }
 
-  piece_ = absl::string_view(writer, end - writer);
+  piece_ = abslx::string_view(writer, end - writer);
 }
 
 // ----------------------------------------------------------------------
@@ -97,7 +97,7 @@ static char* Append(char* out, const AlphaNum& x) {
 
 std::string StrCat(const AlphaNum& a, const AlphaNum& b) {
   std::string result;
-  absl::strings_internal::STLStringResizeUninitialized(&result,
+  abslx::strings_internal::STLStringResizeUninitialized(&result,
                                                        a.size() + b.size());
   char* const begin = &result[0];
   char* out = begin;
@@ -138,15 +138,15 @@ std::string StrCat(const AlphaNum& a, const AlphaNum& b, const AlphaNum& c,
 namespace strings_internal {
 
 // Do not call directly - these are not part of the public API.
-std::string CatPieces(std::initializer_list<absl::string_view> pieces) {
+std::string CatPieces(std::initializer_list<abslx::string_view> pieces) {
   std::string result;
   size_t total_size = 0;
-  for (const absl::string_view& piece : pieces) total_size += piece.size();
+  for (const abslx::string_view& piece : pieces) total_size += piece.size();
   strings_internal::STLStringResizeUninitialized(&result, total_size);
 
   char* const begin = &result[0];
   char* out = begin;
-  for (const absl::string_view& piece : pieces) {
+  for (const abslx::string_view& piece : pieces) {
     const size_t this_size = piece.size();
     if (this_size != 0) {
       memcpy(out, piece.data(), this_size);
@@ -157,7 +157,7 @@ std::string CatPieces(std::initializer_list<absl::string_view> pieces) {
   return result;
 }
 
-// It's possible to call StrAppend with an absl::string_view that is itself a
+// It's possible to call StrAppend with an abslx::string_view that is itself a
 // fragment of the string we're appending to.  However the results of this are
 // random. Therefore, check for this in debug mode.  Use unsigned math so we
 // only have to do one comparison. Note, there's an exception case: appending an
@@ -167,10 +167,10 @@ std::string CatPieces(std::initializer_list<absl::string_view> pieces) {
          (uintptr_t((src).data() - (dest).data()) > uintptr_t((dest).size())))
 
 void AppendPieces(std::string* dest,
-                  std::initializer_list<absl::string_view> pieces) {
+                  std::initializer_list<abslx::string_view> pieces) {
   size_t old_size = dest->size();
   size_t total_size = old_size;
-  for (const absl::string_view& piece : pieces) {
+  for (const abslx::string_view& piece : pieces) {
     ASSERT_NO_OVERLAP(*dest, piece);
     total_size += piece.size();
   }
@@ -178,7 +178,7 @@ void AppendPieces(std::string* dest,
 
   char* const begin = &(*dest)[0];
   char* out = begin + old_size;
-  for (const absl::string_view& piece : pieces) {
+  for (const abslx::string_view& piece : pieces) {
     const size_t this_size = piece.size();
     if (this_size != 0) {
       memcpy(out, piece.data(), this_size);
@@ -243,4 +243,4 @@ void StrAppend(std::string* dest, const AlphaNum& a, const AlphaNum& b,
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -1919,9 +1919,9 @@ class Stream {
   // See DnnSupport::DoCtcLoss for more details.
   Stream &ThenCtcLoss(const dnn::RnnStateTensorDescriptor &probs_desc,
                       const DeviceMemory<float> &probs_data,
-                      absl::Span<const int> labels_data,
-                      absl::Span<const int> labels_lengths_data,
-                      absl::Span<const int> input_lengths_data,
+                      abslx::Span<const int> labels_data,
+                      abslx::Span<const int> labels_lengths_data,
+                      abslx::Span<const int> input_lengths_data,
                       DeviceMemory<float> *costs_data,
                       const dnn::RnnStateTensorDescriptor &grads_desc,
                       DeviceMemory<float> *grads_data,
@@ -2076,7 +2076,7 @@ class Stream {
     }();
 
     if (!valid_computation_type) {
-      return port::InternalError(absl::StrCat(
+      return port::InternalError(abslx::StrCat(
           "Invalid computation type ",
           blas::ComputationTypeString(computation_type), " for output type: ",
           blas::DataTypeString(blas::ToDataType<CType>::value)));
@@ -2085,7 +2085,7 @@ class Stream {
   }
 
   bool InErrorState() const TF_LOCKS_EXCLUDED(mu_) {
-    absl::ReaderMutexLock lock(&mu_);
+    abslx::ReaderMutexLock lock(&mu_);
     return !status_.ok();
   }
 
@@ -2117,7 +2117,7 @@ class Stream {
 
   // mutex that guards the allocation / error state flags.
   // Mutable so that it can be obtained via const reader lock.
-  mutable absl::Mutex mu_;
+  mutable abslx::Mutex mu_;
 
   // Whether Init() was successfully called to allocate this stream on the
   // underlying platform. It simply flips from 0 to 1 with a sanity check.

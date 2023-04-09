@@ -81,7 +81,7 @@ TEST(VideoPreStreamCalculatorTest, ProcessesWithFrameRateInPreStream) {
   MP_ASSERT_OK(poller_status.status());
   OutputStreamPoller& poller = poller_status.value();
   MP_ASSERT_OK(graph.StartRun({}));
-  auto input_header = absl::make_unique<VideoHeader>();
+  auto input_header = abslx::make_unique<VideoHeader>();
   input_header->frame_rate = 3.0;
   MP_ASSERT_OK(graph.AddPacketToInputStream(
       "input_header",
@@ -118,7 +118,7 @@ TEST(VideoPreStreamCalculatorTest, FailsWithoutFrameRateInOptions) {
       "frame",
       Adopt(new ImageFrame(ImageFormat::SRGB, 1, 2)).At(Timestamp(0))));
   MP_ASSERT_OK(graph.CloseInputStream("frame"));
-  absl::Status status = graph.WaitUntilDone();
+  abslx::Status status = graph.WaitUntilDone();
   EXPECT_FALSE(status.ok());
   EXPECT_THAT(status.ToString(),
               testing::HasSubstr("frame rate should be non-zero"));
@@ -144,7 +144,7 @@ TEST(VideoPreStreamCalculatorTest, FailsWithoutFrameRateInPreStream1) {
       Adopt(new ImageFrame(ImageFormat::SRGB, 1, 2)).At(Timestamp(0))));
   MP_ASSERT_OK(graph.CloseInputStream("frame"));
   MP_ASSERT_OK(graph.CloseInputStream("input_header"));
-  absl::Status status = graph.WaitUntilDone();
+  abslx::Status status = graph.WaitUntilDone();
   EXPECT_FALSE(status.ok());
   EXPECT_THAT(status.ToString(),
               testing::HasSubstr("frame rate should be non-zero"));
@@ -167,7 +167,7 @@ TEST(VideoPreStreamCalculatorTest, FailsWithoutFrameRateInPreStream2) {
     CalculatorGraph graph;
     MP_ASSERT_OK(graph.Initialize(config));
     MP_ASSERT_OK(graph.StartRun({}));
-    auto input_header = absl::make_unique<VideoHeader>();
+    auto input_header = abslx::make_unique<VideoHeader>();
     input_header->frame_rate = 3.0;
     MP_ASSERT_OK(graph.AddPacketToInputStream(
         "input_header",
@@ -177,7 +177,7 @@ TEST(VideoPreStreamCalculatorTest, FailsWithoutFrameRateInPreStream2) {
         "frame",
         Adopt(new ImageFrame(ImageFormat::SRGB, 1, 2)).At(Timestamp(0))));
     MP_ASSERT_OK(graph.CloseInputStream("frame"));
-    absl::Status status = graph.WaitUntilDone();
+    abslx::Status status = graph.WaitUntilDone();
     EXPECT_FALSE(status.ok());
   }
 }

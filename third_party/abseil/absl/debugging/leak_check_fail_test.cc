@@ -32,7 +32,7 @@ TEST(LeakCheckTest, LeakMemoryAfterDisablerScope) {
   // This test is expected to cause lsan failures on program exit. Therefore the
   // test will be run only by external_leak_check_test.sh, which will verify a
   // failed exit code.
-  { absl::LeakCheckDisabler disabler; }
+  { abslx::LeakCheckDisabler disabler; }
   char* foo = strdup("lsan should also complain about this leaked string");
   ABSL_RAW_LOG(INFO, "Re-enabled leak detection.Should detect leaked string %s",
                foo);

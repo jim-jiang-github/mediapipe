@@ -135,7 +135,7 @@ llvm::MDNode* AliasAnalysis::GetNoaliasMetadataForBuffer(
   //
   // This set can be increased as we need.
   std::vector<const HloValue*> worklist;
-  absl::flat_hash_set<const HloInstruction*> added_to_worklist;
+  abslx::flat_hash_set<const HloInstruction*> added_to_worklist;
   auto add_buffers_to_worklist =
       [&](const HloInstruction* instruction) {
         // Buffers of parameters cannot be added to the noalias set.

@@ -56,7 +56,7 @@ namespace {
 
 StatusOr<std::unique_ptr<se::MultiDeviceAdapter>> CreateCudaAsyncAllocator(
     se::Platform* platform,
-    absl::Span<std::unique_ptr<LocalDeviceState> const> addressable_devices,
+    abslx::Span<std::unique_ptr<LocalDeviceState> const> addressable_devices,
     double memory_fraction, bool preallocate) {
   CHECK_GT(addressable_devices.size(), 0);
   std::vector<se::MultiDeviceAdapter::AllocatorWithStream> allocators;
@@ -103,7 +103,7 @@ StatusOr<std::unique_ptr<se::MultiDeviceAdapter>> CreateCudaAsyncAllocator(
 
 StatusOr<std::unique_ptr<se::MultiDeviceAdapter>> CreateCudaAsyncAllocator(
     se::Platform* platform,
-    absl::Span<std::unique_ptr<LocalDeviceState> const> addressable_devices,
+    abslx::Span<std::unique_ptr<LocalDeviceState> const> addressable_devices,
     double memory_fraction, bool preallocate) {
   return FailedPrecondition("CUDA async allocator requires CUDA >= 11.2");
 }
@@ -118,7 +118,7 @@ class GpuClient : public xla::PjRtStreamExecutorClient {
   xla::StatusOr<xla::DeviceAssignment> GetDefaultDeviceAssignment(
       int num_replicas, int num_partitions) const override;
 
-  absl::string_view platform_version() const override {
+  abslx::string_view platform_version() const override {
 #define STRINGIFY2(X) #X
 #define STRINGIFY(X) STRINGIFY2(X)
 #if TENSORFLOW_USE_ROCM && defined(TF_ROCM_VERSION)  // rocm
@@ -163,7 +163,7 @@ StatusOr<LocalClient*> GetGpuXlaClient(
   return ClientLibrary::GetOrCreateLocalClient(options);
 }
 
-void EnablePeerAccess(absl::Span<se::StreamExecutor* const> executors) {
+void EnablePeerAccess(abslx::Span<se::StreamExecutor* const> executors) {
   for (int i = 0; i < executors.size(); ++i) {
     for (int j = 0; j < executors.size(); ++j) {
       if (i == j) {
@@ -200,7 +200,7 @@ StatusOr<std::vector<std::unique_ptr<LocalDeviceState>>> BuildLocalDeviceStates(
 
 // Builds a BFCAllocator for all local GPUs.
 StatusOr<std::unique_ptr<se::MultiDeviceAdapter>> CreateBFCAllocator(
-    absl::Span<std::unique_ptr<LocalDeviceState> const> addressable_devices,
+    abslx::Span<std::unique_ptr<LocalDeviceState> const> addressable_devices,
     double memory_fraction, bool preallocate) {
   CHECK_GT(addressable_devices.size(), 0);
   const se::Platform* platform =
@@ -250,7 +250,7 @@ StatusOr<std::unique_ptr<se::MultiDeviceAdapter>> CreateBFCAllocator(
     opts.allow_growth = !preallocate;
     auto gpu_bfc_allocator = std::make_unique<tensorflow::BFCAllocator>(
         std::move(sub_allocator), allocator_memory,
-        absl::StrCat("GPU_", device_ordinal, "_bfc"), opts);
+        abslx::StrCat("GPU_", device_ordinal, "_bfc"), opts);
     allocators.emplace_back(std::move(gpu_bfc_allocator),
                             local_device->compute_stream());
   }
@@ -262,7 +262,7 @@ StatusOr<std::unique_ptr<se::MultiDeviceAdapter>> CreateBFCAllocator(
 // configuration the client requested.
 StatusOr<std::unique_ptr<se::DeviceMemoryAllocator>> GetGpuDeviceAllocator(
     se::Platform* platform, const GpuAllocatorConfig& allocator_config,
-    absl::Span<std::unique_ptr<LocalDeviceState> const> addressable_devices) {
+    abslx::Span<std::unique_ptr<LocalDeviceState> const> addressable_devices) {
   std::unique_ptr<se::DeviceMemoryAllocator> allocator;
   switch (allocator_config.kind) {
     case GpuAllocatorConfig::Kind::kCudaAsync: {
@@ -355,7 +355,7 @@ Status BuildDistributedDevices(
       distributed_client->EnumerateDevices(local_topology, &global_topology));
 
   std::vector<GlobalDeviceId> gpu_device_ids(local_device_states.size());
-  absl::flat_hash_map<GlobalDeviceId, int> device_to_node;
+  abslx::flat_hash_map<GlobalDeviceId, int> device_to_node;
   for (const LocalTopologyProto& node : global_topology.nodes()) {
     for (const DeviceProto& device_proto : node.devices()) {
       GlobalDeviceId global_device_id(device_proto.global_device_id());
@@ -405,13 +405,13 @@ GpuDevice::GpuDevice(int id,
   attributes_ = {
       {"device_vendor", PjRtDeviceAttribute(device_vendor_)},
   };
-  to_string_ = absl::StrFormat("GpuDevice(id=%i, process_index=%i)", id,
+  to_string_ = abslx::StrFormat("GpuDevice(id=%i, process_index=%i)", id,
                                process_index());
 }
 
-absl::string_view GpuDevice::device_vendor() { return device_vendor_; }
+abslx::string_view GpuDevice::device_vendor() { return device_vendor_; }
 
-absl::string_view GpuDevice::ToString() const { return to_string_; }
+abslx::string_view GpuDevice::ToString() const { return to_string_; }
 
 StatusOr<std::unique_ptr<PjRtClient>> GetGpuClient(
     bool asynchronous, const GpuAllocatorConfig& allocator_config,

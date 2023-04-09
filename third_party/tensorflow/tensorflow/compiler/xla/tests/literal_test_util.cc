@@ -37,10 +37,10 @@ void WriteLiteralToTempFile(const LiteralSlice& literal,
 
   auto* env = tensorflow::Env::Default();
   std::string filename = tensorflow::io::JoinPath(
-      outdir, absl::StrFormat("tempfile-%d-%s", env->NowMicros(), name));
-  TF_CHECK_OK(tensorflow::WriteBinaryProto(env, absl::StrCat(filename, ".pb"),
+      outdir, abslx::StrFormat("tempfile-%d-%s", env->NowMicros(), name));
+  TF_CHECK_OK(tensorflow::WriteBinaryProto(env, abslx::StrCat(filename, ".pb"),
                                            literal.ToProto()));
-  TF_CHECK_OK(tensorflow::WriteStringToFile(env, absl::StrCat(filename, ".txt"),
+  TF_CHECK_OK(tensorflow::WriteStringToFile(env, abslx::StrCat(filename, ".txt"),
                                             literal.ToString()));
   LOG(ERROR) << "wrote Literal to " << name << " file: " << filename
              << ".{pb,txt}";

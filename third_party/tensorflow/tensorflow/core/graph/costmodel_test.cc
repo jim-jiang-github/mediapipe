@@ -92,7 +92,7 @@ TEST(CostModelTest, GlobalId) {
   TF_ASSERT_OK(
       cost_model_manager.AddToCostGraphDef(graph2.get(), &cost_graph_def));
   ASSERT_EQ(cost_graph_def.node_size(), 12);
-  absl::flat_hash_map<int32, const CostGraphDef::Node> ids;
+  abslx::flat_hash_map<int32, const CostGraphDef::Node> ids;
   for (auto node : cost_graph_def.node()) {
     int32_t index = node.id();
     auto result = ids.insert({index, node});

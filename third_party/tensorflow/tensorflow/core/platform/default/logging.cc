@@ -463,13 +463,13 @@ bool LogEveryPow2State::ShouldLog(int ignored) {
 
 bool LogEveryNSecState::ShouldLog(double seconds) {
   LossyIncrement(&counter_);
-  const int64_t now_cycles = absl::base_internal::CycleClock::Now();
+  const int64_t now_cycles = abslx::base_internal::CycleClock::Now();
   int64_t next_cycles = next_log_time_cycles_.load(std::memory_order_relaxed);
   do {
     if (now_cycles <= next_cycles) return false;
   } while (!next_log_time_cycles_.compare_exchange_weak(
       next_cycles,
-      now_cycles + seconds * absl::base_internal::CycleClock::Frequency(),
+      now_cycles + seconds * abslx::base_internal::CycleClock::Frequency(),
       std::memory_order_relaxed, std::memory_order_relaxed));
   return true;
 }
@@ -492,20 +492,20 @@ void TFDefaultLogSink::Send(const TFLogEntry& entry) {
 #ifdef PLATFORM_POSIX_ANDROID
   int android_log_level;
   switch (entry.log_severity()) {
-    case absl::LogSeverity::kInfo:
+    case abslx::LogSeverity::kInfo:
       android_log_level = ANDROID_LOG_INFO;
       break;
-    case absl::LogSeverity::kWarning:
+    case abslx::LogSeverity::kWarning:
       android_log_level = ANDROID_LOG_WARN;
       break;
-    case absl::LogSeverity::kError:
+    case abslx::LogSeverity::kError:
       android_log_level = ANDROID_LOG_ERROR;
       break;
-    case absl::LogSeverity::kFatal:
+    case abslx::LogSeverity::kFatal:
       android_log_level = ANDROID_LOG_FATAL;
       break;
     default:
-      if (entry.log_severity() < absl::LogSeverity::kInfo) {
+      if (entry.log_severity() < abslx::LogSeverity::kInfo) {
         android_log_level = ANDROID_LOG_VERBOSE;
       } else {
         android_log_level = ANDROID_LOG_ERROR;
@@ -526,7 +526,7 @@ void TFDefaultLogSink::Send(const TFLogEntry& entry) {
 
   // Android logging at level FATAL does not terminate execution, so abort()
   // is still required to stop the program.
-  if (entry.log_severity() == absl::LogSeverity::kFatal) {
+  if (entry.log_severity() == abslx::LogSeverity::kFatal) {
     abort();
   }
 #else   // PLATFORM_POSIX_ANDROID
@@ -543,24 +543,24 @@ void TFDefaultLogSink::Send(const TFLogEntry& entry) {
   char tid_buffer[tid_buffer_size] = "";
   if (log_thread_id) {
     snprintf(tid_buffer, sizeof(tid_buffer), " %7u",
-             absl::base_internal::GetTID());
+             abslx::base_internal::GetTID());
   }
 
   char sev;
   switch (entry.log_severity()) {
-    case absl::LogSeverity::kInfo:
+    case abslx::LogSeverity::kInfo:
       sev = 'I';
       break;
 
-    case absl::LogSeverity::kWarning:
+    case abslx::LogSeverity::kWarning:
       sev = 'W';
       break;
 
-    case absl::LogSeverity::kError:
+    case abslx::LogSeverity::kError:
       sev = 'E';
       break;
 
-    case absl::LogSeverity::kFatal:
+    case abslx::LogSeverity::kFatal:
       sev = 'F';
       break;
 

@@ -118,7 +118,7 @@ Timestamp CalculatorNode::SourceProcessOrder(
   return calculator_->SourceProcessOrder(cc);
 }
 
-absl::Status CalculatorNode::Initialize(
+abslx::Status CalculatorNode::Initialize(
     const ValidatedGraphConfig* validated_graph, NodeTypeInfo::NodeRef node_ref,
     InputStreamManager* input_stream_managers,
     OutputStreamManager* output_stream_managers,
@@ -136,12 +136,12 @@ absl::Status CalculatorNode::Initialize(
   } else if (node_ref.type == NodeTypeInfo::NodeType::PACKET_GENERATOR) {
     const PacketGeneratorConfig& pg_config =
         validated_graph_->Config().packet_generator(node_ref.index);
-    name_ = absl::StrCat("__pg_", node_ref.index, "_",
+    name_ = abslx::StrCat("__pg_", node_ref.index, "_",
                          pg_config.packet_generator());
     node_type_info_ = &validated_graph_->GeneratorInfos()[node_ref.index];
     node_config = &node_type_info_->Contract().GetWrapperConfig();
   } else {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "node_ref is not a calculator or packet generator");
   }
 
@@ -166,7 +166,7 @@ absl::Status CalculatorNode::Initialize(
                                     node_type_info_->OutputStreamTypes()));
   MP_RETURN_IF_ERROR(InitializeOutputStreams(output_stream_managers));
 
-  calculator_state_ = absl::make_unique<CalculatorState>(
+  calculator_state_ = abslx::make_unique<CalculatorState>(
       name_, node_ref.index, node_config->calculator(), *node_config,
       profiling_context_);
 
@@ -212,11 +212,11 @@ absl::Status CalculatorNode::Initialize(
   return InitializeInputStreams(input_stream_managers, output_stream_managers);
 }
 
-absl::Status CalculatorNode::InitializeOutputSidePackets(
+abslx::Status CalculatorNode::InitializeOutputSidePackets(
     const PacketTypeSet& output_side_packet_types,
     OutputSidePacketImpl* output_side_packets) {
   output_side_packets_ =
-      absl::make_unique<OutputSidePacketSet>(output_side_packet_types.TagMap());
+      abslx::make_unique<OutputSidePacketSet>(output_side_packet_types.TagMap());
   int base_index = node_type_info_->OutputSidePacketBaseIndex();
   RET_CHECK_LE(0, base_index);
   for (CollectionItemId id = output_side_packets_->BeginId();
@@ -224,10 +224,10 @@ absl::Status CalculatorNode::InitializeOutputSidePackets(
     output_side_packets_->GetPtr(id) =
         &output_side_packets[base_index + id.value()];
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorNode::InitializeInputSidePackets(
+abslx::Status CalculatorNode::InitializeInputSidePackets(
     OutputSidePacketImpl* output_side_packets) {
   int base_index = node_type_info_->InputSidePacketBaseIndex();
   RET_CHECK_LE(0, base_index);
@@ -250,10 +250,10 @@ absl::Status CalculatorNode::InitializeInputSidePackets(
             << output_side_packet_index;
     origin_output_side_packet->AddMirror(&input_side_packet_handler_, id);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorNode::InitializeOutputStreams(
+abslx::Status CalculatorNode::InitializeOutputStreams(
     OutputStreamManager* output_stream_managers) {
   RET_CHECK(output_stream_managers) << "output_stream_managers is NULL";
   RET_CHECK_LE(0, node_type_info_->OutputStreamBaseIndex());
@@ -263,7 +263,7 @@ absl::Status CalculatorNode::InitializeOutputStreams(
       current_output_stream_managers);
 }
 
-absl::Status CalculatorNode::InitializeInputStreams(
+abslx::Status CalculatorNode::InitializeInputStreams(
     InputStreamManager* input_stream_managers,
     OutputStreamManager* output_stream_managers) {
   RET_CHECK(input_stream_managers) << "input_stream_managers is NULL";
@@ -292,10 +292,10 @@ absl::Status CalculatorNode::InitializeInputStreams(
             << output_stream_index;
     origin_output_stream_manager->AddMirror(input_stream_handler_.get(), id);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorNode::InitializeInputStreamHandler(
+abslx::Status CalculatorNode::InitializeInputStreamHandler(
     const InputStreamHandlerConfig& handler_config,
     const PacketTypeSet& input_stream_types) {
   const ProtoString& input_stream_handler_name =
@@ -310,10 +310,10 @@ absl::Status CalculatorNode::InitializeInputStreamHandler(
                    _ << "\"" << input_stream_handler_name
                      << "\" is not a registered input stream handler.");
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorNode::InitializeOutputStreamHandler(
+abslx::Status CalculatorNode::InitializeOutputStreamHandler(
     const OutputStreamHandlerConfig& handler_config,
     const PacketTypeSet& output_stream_types) {
   const ProtoString& output_stream_handler_name =
@@ -327,10 +327,10 @@ absl::Status CalculatorNode::InitializeOutputStreamHandler(
                        /*calculator_run_in_parallel=*/max_in_flight_ > 1),
                    _ << "\"" << output_stream_handler_name
                      << "\" is not a registered output stream handler.");
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CalculatorNode::ConnectShardsToStreams(
+abslx::Status CalculatorNode::ConnectShardsToStreams(
     CalculatorContext* calculator_context) {
   RET_CHECK(calculator_context);
   MP_RETURN_IF_ERROR(
@@ -340,28 +340,28 @@ absl::Status CalculatorNode::ConnectShardsToStreams(
 }
 
 void CalculatorNode::SetExecutor(const std::string& executor) {
-  absl::MutexLock status_lock(&status_mutex_);
+  abslx::MutexLock status_lock(&status_mutex_);
   CHECK_LT(status_, kStateOpened);
   executor_ = executor;
 }
 
 bool CalculatorNode::Prepared() const {
-  absl::MutexLock status_lock(&status_mutex_);
+  abslx::MutexLock status_lock(&status_mutex_);
   return status_ >= kStatePrepared;
 }
 
 bool CalculatorNode::Opened() const {
-  absl::MutexLock status_lock(&status_mutex_);
+  abslx::MutexLock status_lock(&status_mutex_);
   return status_ >= kStateOpened;
 }
 
 bool CalculatorNode::Active() const {
-  absl::MutexLock status_lock(&status_mutex_);
+  abslx::MutexLock status_lock(&status_mutex_);
   return status_ >= kStateActive;
 }
 
 bool CalculatorNode::Closed() const {
-  absl::MutexLock status_lock(&status_mutex_);
+  abslx::MutexLock status_lock(&status_mutex_);
   return status_ >= kStateClosed;
 }
 
@@ -370,13 +370,13 @@ void CalculatorNode::SetMaxInputStreamQueueSize(int max_queue_size) {
   input_stream_handler_->SetMaxQueueSize(max_queue_size);
 }
 
-absl::Status CalculatorNode::PrepareForRun(
+abslx::Status CalculatorNode::PrepareForRun(
     const std::map<std::string, Packet>& all_side_packets,
     const std::map<std::string, Packet>& service_packets,
     std::function<void()> ready_for_open_callback,
     std::function<void()> source_node_opened_callback,
     std::function<void(CalculatorContext*)> schedule_callback,
-    std::function<void(absl::Status)> error_callback,
+    std::function<void(abslx::Status)> error_callback,
     CounterFactory* counter_factory) {
   RET_CHECK(ready_for_open_callback) << "ready_for_open_callback is NULL";
   RET_CHECK(schedule_callback) << "schedule_callback is NULL";
@@ -428,7 +428,7 @@ absl::Status CalculatorNode::PrepareForRun(
   needs_to_close_ = false;
 
   {
-    absl::MutexLock status_lock(&status_mutex_);
+    abslx::MutexLock status_lock(&status_mutex_);
     status_ = kStatePrepared;
     scheduling_state_ = kIdle;
     current_in_flight_ = 0;
@@ -439,7 +439,7 @@ absl::Status CalculatorNode::PrepareForRun(
     input_side_packets_ready_ =
         (input_side_packet_handler_.MissingInputSidePacketCount() == 0);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 namespace {
@@ -451,7 +451,7 @@ const Packet GetPacket(const OutputSidePacket& out) {
 }
 
 // Resends the output-side-packets from the previous graph run.
-absl::Status ResendSidePackets(CalculatorContext* cc) {
+abslx::Status ResendSidePackets(CalculatorContext* cc) {
   auto& outs = cc->OutputSidePackets();
   for (CollectionItemId id = outs.BeginId(); id < outs.EndId(); ++id) {
     Packet packet = GetPacket(outs.Get(id));
@@ -460,7 +460,7 @@ absl::Status ResendSidePackets(CalculatorContext* cc) {
       outs.Get(id).Set(packet);
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 }  // namespace
 
@@ -474,7 +474,7 @@ bool CalculatorNode::OutputsAreConstant(CalculatorContext* cc) {
   return true;
 }
 
-absl::Status CalculatorNode::OpenNode() {
+abslx::Status CalculatorNode::OpenNode() {
   VLOG(2) << "CalculatorNode::OpenNode() for " << DebugName();
 
   CalculatorContext* default_context =
@@ -489,7 +489,7 @@ absl::Status CalculatorNode::OpenNode() {
   calculator_context_manager_.PushInputTimestampToContext(
       default_context, Timestamp::Unstarted());
 
-  absl::Status result;
+  abslx::Status result;
   if (OutputsAreConstant(default_context)) {
     result = ResendSidePackets(default_context);
   } else {
@@ -506,11 +506,11 @@ absl::Status CalculatorNode::OpenNode() {
                                                             Timestamp(0));
   }
 
-  LOG_IF(FATAL, result == tool::StatusStop()) << absl::Substitute(
+  LOG_IF(FATAL, result == tool::StatusStop()) << abslx::Substitute(
       "Open() on node \"$0\" returned tool::StatusStop() which should only be "
       "used to signal that a source node is done producing data.",
       DebugName());
-  MP_RETURN_IF_ERROR(result).SetPrepend() << absl::Substitute(
+  MP_RETURN_IF_ERROR(result).SetPrepend() << abslx::Substitute(
       "Calculator::Open() for node \"$0\" failed: ", DebugName());
   needs_to_close_ = true;
 
@@ -519,7 +519,7 @@ absl::Status CalculatorNode::OpenNode() {
     offset_enabled = offset_enabled || stream->Spec()->offset_enabled;
   }
   if (offset_enabled && input_stream_handler_->SyncSetCount() > 1) {
-    LOG(WARNING) << absl::Substitute(
+    LOG(WARNING) << abslx::Substitute(
         "Calculator node \"$0\" is configured with multiple input sync-sets "
         "and an output timestamp-offset, which will often conflict due to "
         "the order of packet arrival.  With multiple input sync-sets, use "
@@ -530,22 +530,22 @@ absl::Status CalculatorNode::OpenNode() {
   output_stream_handler_->Open(outputs);
 
   {
-    absl::MutexLock status_lock(&status_mutex_);
+    abslx::MutexLock status_lock(&status_mutex_);
     status_ = kStateOpened;
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void CalculatorNode::ActivateNode() {
-  absl::MutexLock status_lock(&status_mutex_);
+  abslx::MutexLock status_lock(&status_mutex_);
   CHECK_EQ(status_, kStateOpened) << DebugName();
   status_ = kStateActive;
 }
 
 void CalculatorNode::CloseInputStreams() {
   {
-    absl::MutexLock status_lock(&status_mutex_);
+    abslx::MutexLock status_lock(&status_mutex_);
     if (status_ == kStateClosed) {
       return;
     }
@@ -559,7 +559,7 @@ void CalculatorNode::CloseInputStreams() {
 
 void CalculatorNode::CloseOutputStreams(OutputStreamShardSet* outputs) {
   {
-    absl::MutexLock status_lock(&status_mutex_);
+    abslx::MutexLock status_lock(&status_mutex_);
     if (status_ == kStateClosed) {
       return;
     }
@@ -568,10 +568,10 @@ void CalculatorNode::CloseOutputStreams(OutputStreamShardSet* outputs) {
   output_stream_handler_->Close(outputs);
 }
 
-absl::Status CalculatorNode::CloseNode(const absl::Status& graph_status,
+abslx::Status CalculatorNode::CloseNode(const abslx::Status& graph_status,
                                        bool graph_run_ended) {
   {
-    absl::MutexLock status_lock(&status_mutex_);
+    abslx::MutexLock status_lock(&status_mutex_);
     RET_CHECK_NE(status_, kStateClosed)
         << "CloseNode() must only be called once.";
   }
@@ -589,11 +589,11 @@ absl::Status CalculatorNode::CloseNode(const absl::Status& graph_status,
   calculator_context_manager_.SetGraphStatusInContext(default_context,
                                                       graph_status);
 
-  absl::Status result;
+  abslx::Status result;
 
   if (OutputsAreConstant(default_context)) {
     // Do nothing.
-    result = absl::OkStatus();
+    result = abslx::OkStatus();
   } else {
     MEDIAPIPE_PROFILING(CLOSE, default_context);
     LegacyCalculatorSupport::Scoped<CalculatorContext> s(default_context);
@@ -601,7 +601,7 @@ absl::Status CalculatorNode::CloseNode(const absl::Status& graph_status,
   }
   needs_to_close_ = false;
 
-  LOG_IF(FATAL, result == tool::StatusStop()) << absl::Substitute(
+  LOG_IF(FATAL, result == tool::StatusStop()) << abslx::Substitute(
       "Close() on node \"$0\" returned tool::StatusStop() which should only be "
       "used to signal that a source node is done producing data.",
       DebugName());
@@ -615,18 +615,18 @@ absl::Status CalculatorNode::CloseNode(const absl::Status& graph_status,
   }
 
   {
-    absl::MutexLock status_lock(&status_mutex_);
+    abslx::MutexLock status_lock(&status_mutex_);
     status_ = kStateClosed;
   }
 
-  MP_RETURN_IF_ERROR(result).SetPrepend() << absl::Substitute(
+  MP_RETURN_IF_ERROR(result).SetPrepend() << abslx::Substitute(
       "Calculator::Close() for node \"$0\" failed: ", DebugName());
 
   VLOG(2) << "Closed node " << DebugName();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-void CalculatorNode::CleanupAfterRun(const absl::Status& graph_status) {
+void CalculatorNode::CleanupAfterRun(const abslx::Status& graph_status) {
   if (needs_to_close_) {
     calculator_context_manager_.PushInputTimestampToContext(
         calculator_context_manager_.GetDefaultCalculatorContext(),
@@ -643,7 +643,7 @@ void CalculatorNode::CleanupAfterRun(const absl::Status& graph_status) {
   CloseOutputStreams(/*outputs=*/nullptr);
 
   {
-    absl::MutexLock lock(&status_mutex_);
+    abslx::MutexLock lock(&status_mutex_);
     status_ = kStateUninitialized;
     scheduling_state_ = kIdle;
     current_in_flight_ = 0;
@@ -653,7 +653,7 @@ void CalculatorNode::CleanupAfterRun(const absl::Status& graph_status) {
 void CalculatorNode::SchedulingLoop() {
   int max_allowance = 0;
   {
-    absl::MutexLock lock(&status_mutex_);
+    abslx::MutexLock lock(&status_mutex_);
     if (status_ == kStateClosed) {
       scheduling_state_ = kIdle;
       return;
@@ -672,7 +672,7 @@ void CalculatorNode::SchedulingLoop() {
     }
 
     {
-      absl::MutexLock lock(&status_mutex_);
+      abslx::MutexLock lock(&status_mutex_);
       if (scheduling_state_ == kSchedulingPending &&
           current_in_flight_ < max_in_flight_) {
         max_allowance = max_in_flight_ - current_in_flight_;
@@ -686,14 +686,14 @@ void CalculatorNode::SchedulingLoop() {
 }
 
 bool CalculatorNode::ReadyForOpen() const {
-  absl::MutexLock lock(&status_mutex_);
+  abslx::MutexLock lock(&status_mutex_);
   return input_stream_headers_ready_ && input_side_packets_ready_;
 }
 
 void CalculatorNode::InputStreamHeadersReady() {
   bool ready_for_open = false;
   {
-    absl::MutexLock lock(&status_mutex_);
+    abslx::MutexLock lock(&status_mutex_);
     CHECK_EQ(status_, kStatePrepared) << DebugName();
     CHECK(!input_stream_headers_ready_called_);
     input_stream_headers_ready_called_ = true;
@@ -708,7 +708,7 @@ void CalculatorNode::InputStreamHeadersReady() {
 void CalculatorNode::InputSidePacketsReady() {
   bool ready_for_open = false;
   {
-    absl::MutexLock lock(&status_mutex_);
+    abslx::MutexLock lock(&status_mutex_);
     CHECK_EQ(status_, kStatePrepared) << DebugName();
     CHECK(!input_side_packets_ready_called_);
     input_side_packets_ready_called_ = true;
@@ -722,7 +722,7 @@ void CalculatorNode::InputSidePacketsReady() {
 
 void CalculatorNode::CheckIfBecameReady() {
   {
-    absl::MutexLock lock(&status_mutex_);
+    abslx::MutexLock lock(&status_mutex_);
     // Doesn't check if status_ is kStateActive since the function can only be
     // invoked by non-source nodes.
     if (status_ != kStateOpened) {
@@ -755,7 +755,7 @@ void CalculatorNode::NodeOpened() {
 
 void CalculatorNode::EndScheduling() {
   {
-    absl::MutexLock lock(&status_mutex_);
+    abslx::MutexLock lock(&status_mutex_);
     if (status_ != kStateOpened && status_ != kStateActive) {
       return;
     }
@@ -777,7 +777,7 @@ void CalculatorNode::EndScheduling() {
 }
 
 bool CalculatorNode::TryToBeginScheduling() {
-  absl::MutexLock lock(&status_mutex_);
+  abslx::MutexLock lock(&status_mutex_);
   if (current_in_flight_ < max_in_flight_) {
     ++current_in_flight_;
     return true;
@@ -795,12 +795,12 @@ std::string CalculatorNode::DebugName() const {
 }
 
 // TODO: Split this function.
-absl::Status CalculatorNode::ProcessNode(
+abslx::Status CalculatorNode::ProcessNode(
     CalculatorContext* calculator_context) {
   if (IsSource()) {
     // This is a source Calculator.
     if (Closed()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     const Timestamp input_timestamp = calculator_context->InputTimestamp();
@@ -809,7 +809,7 @@ absl::Status CalculatorNode::ProcessNode(
     output_stream_handler_->PrepareOutputs(input_timestamp, outputs);
 
     VLOG(2) << "Calling Calculator::Process() for node: " << DebugName();
-    absl::Status result;
+    abslx::Status result;
 
     {
       MEDIAPIPE_PROFILING(PROCESS, calculator_context);
@@ -824,7 +824,7 @@ absl::Status CalculatorNode::ProcessNode(
         node_stopped = true;
       } else {
         return mediapipe::StatusBuilder(result, MEDIAPIPE_LOC).SetPrepend()
-               << absl::Substitute(
+               << abslx::Substitute(
                       "Calculator::Process() for node \"$0\" failed: ",
                       DebugName());
       }
@@ -832,15 +832,15 @@ absl::Status CalculatorNode::ProcessNode(
     output_stream_handler_->PostProcess(input_timestamp);
     if (node_stopped) {
       MP_RETURN_IF_ERROR(
-          CloseNode(absl::OkStatus(), /*graph_run_ended=*/false));
+          CloseNode(abslx::OkStatus(), /*graph_run_ended=*/false));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   } else {
     // This is not a source Calculator.
     InputStreamShardSet* const inputs = &calculator_context->Inputs();
     OutputStreamShardSet* const outputs = &calculator_context->Outputs();
-    absl::Status result =
-        absl::InternalError("Calculator context has no input packets.");
+    abslx::Status result =
+        abslx::InternalError("Calculator context has no input packets.");
 
     int num_invocations = calculator_context_manager_.NumberOfContextTimestamps(
         *calculator_context);
@@ -859,7 +859,7 @@ absl::Status CalculatorNode::ProcessNode(
 
         if (OutputsAreConstant(calculator_context)) {
           // Do nothing.
-          result = absl::OkStatus();
+          result = abslx::OkStatus();
         } else {
           MEDIAPIPE_PROFILING(PROCESS, calculator_context);
           LegacyCalculatorSupport::Scoped<CalculatorContext> s(
@@ -880,7 +880,7 @@ absl::Status CalculatorNode::ProcessNode(
         // streams will be processed before the graph is terminated.
         if (!result.ok() && result != tool::StatusStop()) {
           return mediapipe::StatusBuilder(result, MEDIAPIPE_LOC).SetPrepend()
-                 << absl::Substitute(
+                 << abslx::Substitute(
                         "Calculator::Process() for node \"$0\" failed: ",
                         DebugName());
         }
@@ -896,7 +896,7 @@ absl::Status CalculatorNode::ProcessNode(
         CHECK_EQ(calculator_context_manager_.NumberOfContextTimestamps(
                      *calculator_context),
                  1);
-        return CloseNode(absl::OkStatus(), /*graph_run_ended=*/false);
+        return CloseNode(abslx::OkStatus(), /*graph_run_ended=*/false);
       } else {
         RET_CHECK_FAIL()
             << "Invalid input timestamp in ProcessNode(). timestamp: "

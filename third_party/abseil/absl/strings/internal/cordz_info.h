@@ -27,7 +27,7 @@
 #include "absl/synchronization/mutex.h"
 #include "absl/types/span.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 
@@ -77,7 +77,7 @@ class CordzInfo : public CordzHandle {
   // instance. CordzInfo instances hold a weak reference to the rep pointer of
   // sampled cords, and rely on Cord logic to update the rep pointer when the
   // underlying root tree or ring of the cord changes.
-  absl::Mutex& mutex() const { return mutex_; }
+  abslx::Mutex& mutex() const { return mutex_; }
 
   // Updates the `rep' property of this instance. This methods is invoked by
   // Cord logic each time the root node of a sampled Cord changes, and before
@@ -99,12 +99,12 @@ class CordzInfo : public CordzHandle {
   // was first created. Some cords are created as inlined cords, and only as
   // data is added do they become a non-inlined cord. However, typically the
   // location represents reasonably well where the cord is 'created'.
-  absl::Span<void* const> GetStack() const;
+  abslx::Span<void* const> GetStack() const;
 
   // Returns the stack trace for a sampled cord's 'parent stack trace'. This
   // value may be set if the cord is sampled (promoted) after being created
   // from, or being assigned the value of an existing (sampled) cord.
-  absl::Span<void* const> GetParentStack() const;
+  abslx::Span<void* const> GetParentStack() const;
 
   // Retrieve the CordzStatistics associated with this Cord. The statistics are
   // only updated when a Cord goes through a mutation, such as an Append or
@@ -143,19 +143,19 @@ class CordzInfo : public CordzHandle {
     return ci_prev_.load(std::memory_order_acquire);
   }
 
-  static absl::Mutex ci_mutex_;
+  static abslx::Mutex ci_mutex_;
   static std::atomic<CordzInfo*> ci_head_ ABSL_GUARDED_BY(ci_mutex_);
   std::atomic<CordzInfo*> ci_prev_ ABSL_GUARDED_BY(ci_mutex_){nullptr};
   std::atomic<CordzInfo*> ci_next_ ABSL_GUARDED_BY(ci_mutex_){nullptr};
 
-  mutable absl::Mutex mutex_;
+  mutable abslx::Mutex mutex_;
   CordRep* rep_ ABSL_GUARDED_BY(mutex());
 
   void* stack_[kMaxStackDepth];
   void* parent_stack_[kMaxStackDepth];
   const int stack_depth_;
   int parent_stack_depth_;
-  const absl::Time create_time_;
+  const abslx::Time create_time_;
 
   // Last recorded size for the cord.
   std::atomic<int64_t> size_{0};
@@ -163,6 +163,6 @@ class CordzInfo : public CordzHandle {
 
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_CORDZ_INFO_H_

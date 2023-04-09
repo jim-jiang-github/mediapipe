@@ -16,7 +16,7 @@ DEFINE_SUBGRAPH(FaceDetectionShortRangeCpu, "../../mediapipe/modules/face_detect
     DEFINE_SUBGRAPH(FaceDetection, "../../mediapipe/modules/face_detection/face_detection.pbtxt");
 }
 
-absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
+abslx::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
   // register something...
   register_face_detection_options();
 
@@ -46,7 +46,7 @@ absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
 
     return graph.Initialize(config);
   }
-  return absl::NotFoundError(calculator_graph_config_file);
+  return abslx::NotFoundError(calculator_graph_config_file);
 }
 
 // the program entrance point, the main().

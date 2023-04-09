@@ -195,7 +195,7 @@ template <typename T>
 class SoftmaxOpGPU : public OpKernel {
  public:
   explicit SoftmaxOpGPU(OpKernelConstruction* context) : OpKernel(context) {
-    log_ = absl::StartsWith(type_string(), "Log");
+    log_ = abslx::StartsWith(type_string(), "Log");
   }
 
   void Compute(OpKernelContext* context) override {

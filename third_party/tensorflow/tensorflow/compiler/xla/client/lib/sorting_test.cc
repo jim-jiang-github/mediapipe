@@ -64,7 +64,7 @@ XLA_TEST_F(SortingTest, TopKFullSort) {
   auto x = ConstantR1<float>(&builder, inputs);
   xla::GetTupleElement(xla::TopK(x, kSize), 0);
 
-  absl::c_sort(inputs, std::greater<float>());
+  abslx::c_sort(inputs, std::greater<float>());
   ComputeAndCompareR1<float>(&builder, inputs, {});
 }
 

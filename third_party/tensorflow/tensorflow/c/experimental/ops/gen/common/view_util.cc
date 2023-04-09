@@ -21,15 +21,15 @@ namespace generator {
 
 string Call(const string& object, const string& method,
             std::vector<string> arguments, const char* oper) {
-  return absl::Substitute("$0$1$2($3)", object, oper, method,
-                          absl::StrJoin(arguments, ", "));
+  return abslx::Substitute("$0$1$2($3)", object, oper, method,
+                          abslx::StrJoin(arguments, ", "));
 }
 
 string Call(const string& function, std::vector<string> arguments) {
-  return absl::Substitute("$0($1)", function, absl::StrJoin(arguments, ", "));
+  return abslx::Substitute("$0($1)", function, abslx::StrJoin(arguments, ", "));
 }
 
-string Quoted(const string& s) { return absl::Substitute("\"$0\"", s); }
+string Quoted(const string& s) { return abslx::Substitute("\"$0\"", s); }
 
 }  // namespace generator
 }  // namespace tensorflow

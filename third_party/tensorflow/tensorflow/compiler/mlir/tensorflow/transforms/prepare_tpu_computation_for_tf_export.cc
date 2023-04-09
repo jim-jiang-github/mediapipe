@@ -183,7 +183,7 @@ LogicalResult SetTokenInputAttrs(ModuleOp module) {
   // ops are communication ops and all their parent ops via nesting or function
   // calls. For example, IfRegion op and PartitionedCall op.
   std::vector<Operation*> worklist;
-  absl::flat_hash_set<Operation*> ops_with_tokens;
+  abslx::flat_hash_set<Operation*> ops_with_tokens;
   module.walk([&](Operation* op) {
     if (IsCommunicationOp(op)) {
       ops_with_tokens.insert(op);
@@ -195,7 +195,7 @@ LogicalResult SetTokenInputAttrs(ModuleOp module) {
   SymbolUserMap symbol_map(table, module);
 
   // Regions that contains ops requiring token input attributes.
-  absl::flat_hash_set<Region*> regions_with_token;
+  abslx::flat_hash_set<Region*> regions_with_token;
   while (!worklist.empty()) {
     Operation* op = worklist.back();
     worklist.pop_back();

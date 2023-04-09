@@ -57,14 +57,14 @@ class YUVToImageCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kInput, kOutput);
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     const auto& yuv_image = *kInput(cc);
     // Check that the format is supported.
     auto format = yuv_image.fourcc();
     if (format != libyuv::FOURCC_NV12 && format != libyuv::FOURCC_NV21 &&
         format != libyuv::FOURCC_YV12 && format != libyuv::FOURCC_I420) {
-      return absl::InvalidArgumentError(
-          absl::StrFormat("Unsupported YUVImage format: %s. Only NV12, NV21, "
+      return abslx::InvalidArgumentError(
+          abslx::StrFormat("Unsupported YUVImage format: %s. Only NV12, NV21, "
                           "YV12 and I420 (aka YV21) are supported.",
                           FourCCToString(format)));
     }
@@ -109,12 +109,12 @@ class YUVToImageCalculator : public Node {
         break;
       default:
         // This should never happen (caught by checks above).
-        return absl::InternalError("Unsupported YUVImage format.");
+        return abslx::InternalError("Unsupported YUVImage format.");
     }
     // Finally, build and send an Image object that takes ownership of the
     // transient ImageFrameSharedPtr object.
     kOutput(cc).Send(std::make_unique<Image>(std::move(image_frame)));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 MEDIAPIPE_REGISTER_NODE(YUVToImageCalculator);

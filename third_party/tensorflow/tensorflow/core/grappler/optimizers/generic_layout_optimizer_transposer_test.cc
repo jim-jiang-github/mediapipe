@@ -72,7 +72,7 @@ class TransposerImpl : public Transposer {
 };
 
 void VerifyRegularFaninMatch(const utils::MutableNodeView* node, int port,
-                             absl::string_view fanin_name, int fanin_port) {
+                             abslx::string_view fanin_name, int fanin_port) {
   ASSERT_GT(node->NumRegularFanins(), port);
   const auto& fanin = node->GetRegularFanin(port);
   EXPECT_EQ(fanin.node_view()->GetName(), fanin_name);
@@ -80,14 +80,14 @@ void VerifyRegularFaninMatch(const utils::MutableNodeView* node, int port,
 }
 
 void VerifyShapeAttributeMatch(const utils::MutableNodeView* node,
-                               absl::string_view attr_value) {
+                               abslx::string_view attr_value) {
   const auto* attr = node->GetAttr(kAttrOutputShapes);
   ASSERT_NE(attr, nullptr);
   EXPECT_EQ(attr->shape().DebugString(), attr_value);
 }
 
 void VerifyShapeAttributeMatch(const utils::MutableNodeView* node,
-                               int shape_index, absl::string_view attr_value) {
+                               int shape_index, abslx::string_view attr_value) {
   const auto* attr = node->GetAttr(kAttrOutputShapes);
   ASSERT_NE(attr, nullptr);
   ASSERT_GT(attr->list().shape_size(), shape_index);
@@ -95,7 +95,7 @@ void VerifyShapeAttributeMatch(const utils::MutableNodeView* node,
 }
 
 void VerifyDataFormatAttributeMatch(const utils::MutableNodeView* node,
-                                    absl::string_view attr_value) {
+                                    abslx::string_view attr_value) {
   const auto* attr = node->GetAttr(kAttrDataFormat);
   ASSERT_NE(attr, nullptr);
   EXPECT_EQ(attr->s(), attr_value);
@@ -194,7 +194,7 @@ Status CreateSimpleBiasAddGrad(GraphDef* graph, const Input& shape) {
 
 Status CreateSimpleConv2DBackpropFilter(GraphDef* graph,
                                         const DataType& data_type = DT_FLOAT,
-                                        absl::string_view padding = "SAME") {
+                                        abslx::string_view padding = "SAME") {
   Scope scope = Scope::NewRootScope();
   auto input =
       ops::RandomUniform(scope.WithOpName("input"),
@@ -363,7 +363,7 @@ class TransposerTest : public ::testing::Test {
       gpu_device.set_type(kGPU);
       gpu_device.mutable_environment()->insert({"architecture", "6"});
       virtual_cluster_ =
-          absl::WrapUnique(new VirtualCluster({{"/GPU:1", gpu_device}}));
+          abslx::WrapUnique(new VirtualCluster({{"/GPU:1", gpu_device}}));
     }
     TF_ASSERT_OK(virtual_cluster_->Provision());
   }
@@ -537,7 +537,7 @@ TEST_F(TransposerTest, CreateConstPermNode) {
   ExpectTensorEqual<int32>(tensor, expected);
 }
 
-TensorShapeProto MakeTensorShapeFromDimensions(absl::Span<const int> dims) {
+TensorShapeProto MakeTensorShapeFromDimensions(abslx::Span<const int> dims) {
   TensorShapeProto shape_proto = TensorShapeProto();
   for (const int dim : dims) {
     TensorShapeProto_Dim dim_proto = TensorShapeProto_Dim();
@@ -610,7 +610,7 @@ TEST_F(TransposerTest, UpdateNode) {
 }
 
 AttrValue_ListValue MakeAttrValueListValueFromVector(
-    absl::Span<const int> vec) {
+    abslx::Span<const int> vec) {
   AttrValue_ListValue list_proto = AttrValue_ListValue();
   for (const int i : vec) {
     list_proto.add_i(i);
@@ -3832,7 +3832,7 @@ TEST(PermutationTest, PermutesString) {
 
 TEST(PermutationTest, GetNHWCToNCHWPermutation) {
   string src_format = "NHWC";
-  absl::flat_hash_map<char, int> src_dim_indices =
+  abslx::flat_hash_map<char, int> src_dim_indices =
       GetDimensionIndices(src_format);
   EXPECT_EQ(src_dim_indices.size(), 4);
   EXPECT_EQ(src_dim_indices['N'], 0);
@@ -3850,7 +3850,7 @@ TEST(PermutationTest, GetNHWCToNCHWPermutation) {
 
 TEST(PermutationTest, GetNCHWToNHWCPermutation) {
   string src_format = "NCHW";
-  absl::flat_hash_map<char, int> src_dim_indices =
+  abslx::flat_hash_map<char, int> src_dim_indices =
       GetDimensionIndices(src_format);
   EXPECT_EQ(src_dim_indices.size(), 4);
   EXPECT_EQ(src_dim_indices['N'], 0);

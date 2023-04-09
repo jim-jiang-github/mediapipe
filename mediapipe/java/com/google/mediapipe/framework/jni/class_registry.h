@@ -30,7 +30,7 @@ class ClassRegistry {
  public:
   static ClassRegistry& GetInstance();
   void InstallRenamingMap(
-      absl::node_hash_map<std::string, std::string> renaming_map);
+      abslx::node_hash_map<std::string, std::string> renaming_map);
   std::string GetClassName(std::string cls);
   std::string GetMethodName(std::string cls, std::string method);
   std::string GetFieldName(std::string cls, std::string field);
@@ -65,7 +65,7 @@ class ClassRegistry {
 
  private:
   ClassRegistry();
-  absl::node_hash_map<std::string, std::string> renaming_map_;
+  abslx::node_hash_map<std::string, std::string> renaming_map_;
 };
 
 }  // namespace android

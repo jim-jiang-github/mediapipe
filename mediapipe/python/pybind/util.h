@@ -33,20 +33,20 @@ inline py::error_already_set RaisePyError(PyObject* exc_class,
   return py::error_already_set();
 }
 
-inline PyObject* StatusCodeToPyError(const ::absl::StatusCode& code) {
+inline PyObject* StatusCodeToPyError(const ::abslx::StatusCode& code) {
   switch (code) {
-    case absl::StatusCode::kInvalidArgument:
+    case abslx::StatusCode::kInvalidArgument:
       return static_cast<PyObject*>(PyExc_ValueError);
-    case absl::StatusCode::kAlreadyExists:
+    case abslx::StatusCode::kAlreadyExists:
       return static_cast<PyObject*>(PyExc_FileExistsError);
-    case absl::StatusCode::kUnimplemented:
+    case abslx::StatusCode::kUnimplemented:
       return static_cast<PyObject*>(PyExc_NotImplementedError);
     default:
       return static_cast<PyObject*>(PyExc_RuntimeError);
   }
 }
 
-inline void RaisePyErrorIfNotOk(const absl::Status& status,
+inline void RaisePyErrorIfNotOk(const abslx::Status& status,
                                 bool acquire_gil = false) {
   if (!status.ok()) {
     if (acquire_gil) {
@@ -63,12 +63,12 @@ inline void RaisePyErrorIfNotOk(const absl::Status& status,
 inline void RaisePyErrorIfOverflow(int64 value, int64 min, int64 max) {
   if (value > max) {
     throw RaisePyError(PyExc_OverflowError,
-                       absl::StrCat(value, " execeeds the maximum value (", max,
+                       abslx::StrCat(value, " execeeds the maximum value (", max,
                                     ") the data type can have.")
                            .c_str());
   } else if (value < min) {
     throw RaisePyError(PyExc_OverflowError,
-                       absl::StrCat(value, " goes below the minimum value (",
+                       abslx::StrCat(value, " goes below the minimum value (",
                                     min, ") the data type can have.")
                            .c_str());
   }
@@ -111,7 +111,7 @@ inline ::mediapipe::CalculatorGraphConfig ReadCalculatorGraphConfigFromFile(
                                          graph_config_string.length())) {
     throw RaisePyError(
         PyExc_RuntimeError,
-        absl::StrCat("Failed to parse the binary graph: ", file_name).c_str());
+        abslx::StrCat("Failed to parse the binary graph: ", file_name).c_str());
   }
   return graph_config_proto;
 }

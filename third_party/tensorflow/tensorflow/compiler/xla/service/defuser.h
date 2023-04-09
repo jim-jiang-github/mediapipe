@@ -29,14 +29,14 @@ class Defuser : public HloModulePass {
  public:
   Defuser() {}
   ~Defuser() override {}
-  absl::string_view name() const override { return "defuser"; }
+  abslx::string_view name() const override { return "defuser"; }
 
   // Run defusion on the given module. Returns whether the module was
   // changed.
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 };
 
 }  // namespace xla

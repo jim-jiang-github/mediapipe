@@ -44,10 +44,10 @@ const int kMaxCallDepth = 100;
 
 Status AnalyzeResourceUsage(
     const Graph* graph, const std::optional<std::string>& function_name,
-    const int call_depth, const absl::flat_hash_set<int>& resource_arg_indices,
+    const int call_depth, const abslx::flat_hash_set<int>& resource_arg_indices,
     FunctionLibraryRuntime* lib_runtime,
-    absl::flat_hash_map<ResourceUsageAnalysis::NodeInfo,
-                        absl::flat_hash_set<ResourceUsageAnalysis::NodeInfo>>*
+    abslx::flat_hash_map<ResourceUsageAnalysis::NodeInfo,
+                        abslx::flat_hash_set<ResourceUsageAnalysis::NodeInfo>>*
         source_to_path);
 
 bool IsControlFlowV1Node(const Node* n) {
@@ -56,9 +56,9 @@ bool IsControlFlowV1Node(const Node* n) {
 }
 
 // TODO(ycao): Add this as Tensorflow Node method.
-StatusOr<absl::InlinedVector<const Edge*, 1>> OutputEdgesByIndex(const Node& n,
+StatusOr<abslx::InlinedVector<const Edge*, 1>> OutputEdgesByIndex(const Node& n,
                                                                  int idx) {
-  absl::InlinedVector<const Edge*, 1> res;
+  abslx::InlinedVector<const Edge*, 1> res;
   if (idx >= n.num_outputs()) {
     return errors::InvalidArgument("Invalid out_edge index: ", idx, ", Node ",
                                    n.name(), " only has ", n.num_outputs(),
@@ -83,7 +83,7 @@ bool IsStackOrTensorArraySource(const Node& n) {
 
 void PropagateFromStackOrTensorArraySourceOp(
     const Node& n, const std::optional<std::string>& function_name,
-    absl::flat_hash_map<const Edge*, ResourceUsageAnalysis::NodeInfo>*
+    abslx::flat_hash_map<const Edge*, ResourceUsageAnalysis::NodeInfo>*
         user_to_source) {
   ResourceUsageAnalysis::NodeInfo src_node_info(function_name, n.name(),
                                                 n.type_string());
@@ -98,8 +98,8 @@ void PropagateFromStackOrTensorArraySourceOp(
 
 Status PropagateFromArgOp(
     const Node& n, const std::optional<std::string>& function_name,
-    const absl::flat_hash_set<int>& resource_arg_indices,
-    absl::flat_hash_map<const Edge*, ResourceUsageAnalysis::NodeInfo>*
+    const abslx::flat_hash_set<int>& resource_arg_indices,
+    abslx::flat_hash_map<const Edge*, ResourceUsageAnalysis::NodeInfo>*
         user_to_source) {
   TF_RET_CHECK(n.type_string() == kArgOp);
 
@@ -128,16 +128,16 @@ Status PropagateFromArgOp(
 
 Status UpdateResourceUsageFromFunctionBodyAnalysis(
     const Node& call_node,
-    const std::optional<absl::string_view>& caller_function_name,
+    const std::optional<abslx::string_view>& caller_function_name,
     const FunctionBody& fbody,
-    const absl::flat_hash_map<
+    const abslx::flat_hash_map<
         ResourceUsageAnalysis::NodeInfo,
-        absl::flat_hash_set<ResourceUsageAnalysis::NodeInfo>>&
+        abslx::flat_hash_set<ResourceUsageAnalysis::NodeInfo>>&
         called_function_source_to_path,
-    absl::flat_hash_map<const Edge*, ResourceUsageAnalysis::NodeInfo>*
+    abslx::flat_hash_map<const Edge*, ResourceUsageAnalysis::NodeInfo>*
         user_to_source,
-    absl::flat_hash_map<ResourceUsageAnalysis::NodeInfo,
-                        absl::flat_hash_set<ResourceUsageAnalysis::NodeInfo>>*
+    abslx::flat_hash_map<ResourceUsageAnalysis::NodeInfo,
+                        abslx::flat_hash_set<ResourceUsageAnalysis::NodeInfo>>*
         caller_source_to_path) {
   std::unordered_map<std::string, Node*> node_name_index =
       fbody.graph->BuildNodeNameIndex();
@@ -166,7 +166,7 @@ Status UpdateResourceUsageFromFunctionBodyAnalysis(
         int index;
         TF_RETURN_IF_ERROR(GetNodeAttr(ret_user->attrs(), "index", &index));
 
-        absl::InlinedVector<const Edge*, 1> outs;
+        abslx::InlinedVector<const Edge*, 1> outs;
         // TODO(ycao): Allow overriding _Retval index to call node output edge
         // mapping. This is needed for cond function of while nodes.
         TF_ASSIGN_OR_RETURN(outs, OutputEdgesByIndex(call_node, index));
@@ -183,10 +183,10 @@ Status UpdateResourceUsageFromFunctionBodyAnalysis(
 Status PropagateThroughCallOp(
     const Node& n, const std::optional<std::string>& function_name,
     const int call_depth, FunctionLibraryRuntime* lib_runtime,
-    absl::flat_hash_map<const Edge*, ResourceUsageAnalysis::NodeInfo>*
+    abslx::flat_hash_map<const Edge*, ResourceUsageAnalysis::NodeInfo>*
         user_to_source,
-    absl::flat_hash_map<ResourceUsageAnalysis::NodeInfo,
-                        absl::flat_hash_set<ResourceUsageAnalysis::NodeInfo>>*
+    abslx::flat_hash_map<ResourceUsageAnalysis::NodeInfo,
+                        abslx::flat_hash_set<ResourceUsageAnalysis::NodeInfo>>*
         source_to_path) {
   if (call_depth > kMaxCallDepth) {
     return errors::InvalidArgument(
@@ -195,7 +195,7 @@ Status PropagateThroughCallOp(
   }
   // resource_arg_indices contains all indices of the input
   // arguments that carry Stack/TensorArray resource handles.
-  absl::flat_hash_set<int> resource_arg_indices;
+  abslx::flat_hash_set<int> resource_arg_indices;
   for (const Edge* e : n.in_edges()) {
     if (user_to_source->contains(e)) {
       resource_arg_indices.emplace(e->dst_input());
@@ -210,8 +210,8 @@ Status PropagateThroughCallOp(
   const FunctionBody* fbody = lib_runtime->GetFunctionBody(handle);
 
   // Recursively analyze called function for resource sources and users.
-  absl::flat_hash_map<ResourceUsageAnalysis::NodeInfo,
-                      absl::flat_hash_set<ResourceUsageAnalysis::NodeInfo>>
+  abslx::flat_hash_map<ResourceUsageAnalysis::NodeInfo,
+                      abslx::flat_hash_set<ResourceUsageAnalysis::NodeInfo>>
       called_function_source_to_path;
   TF_RETURN_IF_ERROR(AnalyzeResourceUsage(
       fbody->graph, n.type_string(), call_depth + 1, resource_arg_indices,
@@ -226,7 +226,7 @@ Status PropagateThroughCallOp(
 // Analyzes pass through values for Identity and IdentityN ops.
 Status PropagateThroughIdentityOp(
     const Node& n,
-    absl::flat_hash_map<const Edge*, ResourceUsageAnalysis::NodeInfo>*
+    abslx::flat_hash_map<const Edge*, ResourceUsageAnalysis::NodeInfo>*
         user_to_source) {
   TF_RET_CHECK(n.IsIdentity() || n.type_string() == kIdentityNOp);
   if (n.IsIdentity()) {
@@ -252,10 +252,10 @@ Status PropagateThroughIdentityOp(
 
 Status AnalyzeResourceUsage(
     const Graph* graph, const std::optional<std::string>& function_name,
-    const int call_depth, const absl::flat_hash_set<int>& resource_arg_indices,
+    const int call_depth, const abslx::flat_hash_set<int>& resource_arg_indices,
     FunctionLibraryRuntime* lib_runtime,
-    absl::flat_hash_map<ResourceUsageAnalysis::NodeInfo,
-                        absl::flat_hash_set<ResourceUsageAnalysis::NodeInfo>>*
+    abslx::flat_hash_map<ResourceUsageAnalysis::NodeInfo,
+                        abslx::flat_hash_set<ResourceUsageAnalysis::NodeInfo>>*
         source_to_path) {
   source_to_path->clear();
 
@@ -264,7 +264,7 @@ Status AnalyzeResourceUsage(
 
   // user_to_source maps from an edge carrying a Stack or TensorArray resource
   // to the node that created this resource.
-  absl::flat_hash_map<const Edge*, ResourceUsageAnalysis::NodeInfo>
+  abslx::flat_hash_map<const Edge*, ResourceUsageAnalysis::NodeInfo>
       user_to_source;
   for (const Node* n : reverse_post_order) {
     if (IsControlFlowV1Node(n)) {
@@ -321,11 +321,11 @@ Status AnalyzeResourceUsage(
 
 /*Static*/ Status ResourceUsageAnalysis::Analyze(
     const Graph* graph, FunctionLibraryRuntime* lib_runtime,
-    absl::flat_hash_map<NodeInfo, absl::flat_hash_set<NodeInfo>>*
+    abslx::flat_hash_map<NodeInfo, abslx::flat_hash_set<NodeInfo>>*
         source_to_path) {
   return AnalyzeResourceUsage(
       graph, /*function_name=*/{}, /*call_depth=*/0,
-      /*resource_arg_indices=*/absl::flat_hash_set<int>(), lib_runtime,
+      /*resource_arg_indices=*/abslx::flat_hash_set<int>(), lib_runtime,
       source_to_path);
 }
 

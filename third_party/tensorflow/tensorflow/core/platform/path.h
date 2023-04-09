@@ -71,7 +71,7 @@ tensorflow::StringPiece Extension(tensorflow::StringPiece path);
 // "/alpha/beta/".
 //
 // Does not perform any path normalization.
-std::string CommonPathPrefix(absl::Span<std::string const> paths);
+std::string CommonPathPrefix(abslx::Span<std::string const> paths);
 
 // Collapse duplicate "/"s, resolve ".." and "." path elements, remove
 // trailing "/".

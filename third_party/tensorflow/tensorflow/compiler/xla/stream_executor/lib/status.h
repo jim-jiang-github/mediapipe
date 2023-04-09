@@ -33,16 +33,16 @@ using Status = tensorflow::Status;  // TENSORFLOW_STATUS_OK
   ASSERT_EQ(::stream_executor::port::Status::OK(), (val))
 
 // Define some canonical error helpers.
-inline Status UnimplementedError(absl::string_view message) {
+inline Status UnimplementedError(abslx::string_view message) {
   return Status(error::UNIMPLEMENTED, message);
 }
-inline Status InvalidArgumentError(absl::string_view message) {
+inline Status InvalidArgumentError(abslx::string_view message) {
   return Status(error::INVALID_ARGUMENT, message);
 }
-inline Status InternalError(absl::string_view message) {
+inline Status InternalError(abslx::string_view message) {
   return Status(error::INTERNAL, message);
 }
-inline Status FailedPreconditionError(absl::string_view message) {
+inline Status FailedPreconditionError(abslx::string_view message) {
   return Status(error::FAILED_PRECONDITION, message);
 }
 

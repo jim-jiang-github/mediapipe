@@ -33,9 +33,9 @@ const char* const kTriple_android_arm = "armv7-none-android";
 
 struct IntrinsicTestSpec {
   HloOpcode opcode;
-  absl::string_view triple;
-  absl::string_view features;
-  absl::string_view check_lines;
+  abslx::string_view triple;
+  abslx::string_view features;
+  abslx::string_view check_lines;
 };
 
 // Tests that unary functions get lowered using intrinsic calls.
@@ -63,12 +63,12 @@ class CpuUnaryIntrinsicTest
     if (!features.empty()) {
       std::replace_if(
           features.begin(), features.end(),
-          [](char c) { return c != '_' && !absl::ascii_isalnum(c); }, '_');
+          [](char c) { return c != '_' && !abslx::ascii_isalnum(c); }, '_');
     } else {
       features = "";
     }
 
-    return absl::StrCat(opcode, "_On_", triple,
+    return abslx::StrCat(opcode, "_On_", triple,
                         (features.empty() ? "" : "_With"), features);
   }
 

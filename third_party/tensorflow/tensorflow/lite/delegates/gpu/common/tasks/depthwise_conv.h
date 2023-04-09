@@ -115,7 +115,7 @@ class DepthwiseConv : public GPUOperation {
 
 template <DataType S, typename T>
 void RearrangeWeightsForDWConv2D(const tflite::gpu::Tensor<OHWI, S>& weights,
-                                 absl::Span<T> dst) {
+                                 abslx::Span<T> dst) {
   const int dst_channels = weights.shape.i * weights.shape.o;
   const int dst_depth = DivideRoundUp(dst_channels, 4);
   const int kernel_x = weights.shape.w;
@@ -159,10 +159,10 @@ void DepthwiseConv::UploadWeightsForDWConv2D(
 
   if (fp32_weights) {
     float4* ptr = reinterpret_cast<float4*>(data.data());
-    RearrangeWeightsForDWConv2D(weights, absl::MakeSpan(ptr, elements_count));
+    RearrangeWeightsForDWConv2D(weights, abslx::MakeSpan(ptr, elements_count));
   } else {
     half4* ptr = reinterpret_cast<half4*>(data.data());
-    RearrangeWeightsForDWConv2D(weights, absl::MakeSpan(ptr, elements_count));
+    RearrangeWeightsForDWConv2D(weights, abslx::MakeSpan(ptr, elements_count));
   }
 
   if (weights_are_buffer) {
@@ -183,7 +183,7 @@ void DepthwiseConv::UploadWeightsForDWConv2D(
 
 template <DataType S, typename T>
 void RearrangeWeightsForDWConv3D(const tflite::gpu::Tensor<OHWDI, S>& weights,
-                                 absl::Span<T> dst) {
+                                 abslx::Span<T> dst) {
   const int dst_channels = weights.shape.i * weights.shape.o;
   const int dst_slices = DivideRoundUp(dst_channels, 4);
   const int kernel_x = weights.shape.w;
@@ -231,10 +231,10 @@ void DepthwiseConv::UploadWeightsForDWConv3D(
 
   if (fp32_weights) {
     float4* ptr = reinterpret_cast<float4*>(data.data());
-    RearrangeWeightsForDWConv3D(weights, absl::MakeSpan(ptr, elements_count));
+    RearrangeWeightsForDWConv3D(weights, abslx::MakeSpan(ptr, elements_count));
   } else {
     half4* ptr = reinterpret_cast<half4*>(data.data());
-    RearrangeWeightsForDWConv3D(weights, absl::MakeSpan(ptr, elements_count));
+    RearrangeWeightsForDWConv3D(weights, abslx::MakeSpan(ptr, elements_count));
   }
 
   if (weights_are_buffer) {

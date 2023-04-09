@@ -45,12 +45,12 @@ template <typename K>
 StatusOr<bool> CombineInstructionsByKey(
     HloComputation* computation,
     const std::function<std::optional<K>(const HloInstruction*)>& key_fn,
-    const std::function<Status(absl::Span<HloInstruction* const>)>& combine_fn,
+    const std::function<Status(abslx::Span<HloInstruction* const>)>& combine_fn,
     int64_t combine_threshold_bytes, int64_t combine_threshold_count) {
   // Cache keys for each instruction and build sets of instructions with the
   // same key that might be combined together.
-  absl::flat_hash_map<HloInstruction*, K> keys;
-  absl::flat_hash_map<K, absl::flat_hash_set<HloInstruction*>> groups;
+  abslx::flat_hash_map<HloInstruction*, K> keys;
+  abslx::flat_hash_map<K, abslx::flat_hash_set<HloInstruction*>> groups;
 
   for (HloInstruction* instruction : computation->instructions()) {
     std::optional<K> key = key_fn(instruction);
@@ -66,7 +66,7 @@ StatusOr<bool> CombineInstructionsByKey(
   while (!keys.empty()) {
     std::vector<HloInstruction*> to_combine;
     int64_t to_combine_bytes = 0;
-    absl::flat_hash_set<HloInstruction*>* group = nullptr;
+    abslx::flat_hash_set<HloInstruction*>* group = nullptr;
 
     // Recompute reachability after every combine group because we can't
     // maintain a cross group topological order to be able to rely on the
@@ -120,7 +120,7 @@ StatusOr<bool> CombineInstructionsByKey(
 
       // We can't combine dependent instructions.
       bool is_reachable =
-          absl::c_any_of(to_combine, [&](HloInstruction* to_combine_inst) {
+          abslx::c_any_of(to_combine, [&](HloInstruction* to_combine_inst) {
             return reachability->IsReachable(to_combine_inst, instruction);
           });
       if (is_reachable) {

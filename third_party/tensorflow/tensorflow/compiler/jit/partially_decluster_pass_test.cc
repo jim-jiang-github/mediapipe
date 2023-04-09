@@ -289,8 +289,8 @@ TEST(PartiallyDeclusterPassTest, DeclusterDependentNodes) {
   EXPECT_EQ(declustered_producer_1_inputs[1]->name(), "Input");
 }
 
-void AddToCluster(absl::Span<Node* const> nodes,
-                  absl::string_view cluster_name) {
+void AddToCluster(abslx::Span<Node* const> nodes,
+                  abslx::string_view cluster_name) {
   for (Node* n : nodes) {
     n->AddAttr(kXlaClusterAttr, string(cluster_name));
   }

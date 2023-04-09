@@ -49,7 +49,7 @@ Status ShapeAnnotationsMatch(
       missing.push_back(entry.first);
     }
     return errors::InvalidArgument("Missing shapes for nodes: ",
-                                   absl::StrJoin(missing, ","));
+                                   abslx::StrJoin(missing, ","));
   }
   return OkStatus();
 }

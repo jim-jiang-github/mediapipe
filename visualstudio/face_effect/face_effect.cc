@@ -34,7 +34,7 @@ DEFINE_SUBGRAPH(FaceLandmarkFrontCpu, "../../mediapipe/modules/face_landmark/fac
   DEFINE_SUBGRAPH(FaceLandmarkLandmarksToRoi, "../../mediapipe/modules/face_landmark/face_landmark_landmarks_to_roi.pbtxt");
 }
 
-absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
+abslx::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
   // register options
   register_face_detection_options();
 
@@ -45,7 +45,7 @@ absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
     download_mediapipe_asset_from_GCS("../mediapipe/modules/face_landmark/face_landmark_with_attention.tflite");
     return graph.Initialize(config);
   }
-  return absl::NotFoundError(calculator_graph_config_file);
+  return abslx::NotFoundError(calculator_graph_config_file);
 }
 
 // the program entrance point, the main().

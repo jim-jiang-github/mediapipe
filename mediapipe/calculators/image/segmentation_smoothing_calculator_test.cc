@@ -43,7 +43,7 @@ void RunGraph(Packet curr_packet, Packet prev_packet, bool use_gpu, float ratio,
               cv::Mat* result) {
   CalculatorGraphConfig graph_config;
   if (use_gpu) {
-    graph_config = ParseTextProtoOrDie<CalculatorGraphConfig>(absl::Substitute(
+    graph_config = ParseTextProtoOrDie<CalculatorGraphConfig>(abslx::Substitute(
         R"pb(
           input_stream: "curr_mask"
           input_stream: "prev_mask"
@@ -83,7 +83,7 @@ void RunGraph(Packet curr_packet, Packet prev_packet, bool use_gpu, float ratio,
         )pb",
         ratio));
   } else {
-    graph_config = ParseTextProtoOrDie<CalculatorGraphConfig>(absl::Substitute(
+    graph_config = ParseTextProtoOrDie<CalculatorGraphConfig>(abslx::Substitute(
         R"pb(
           input_stream: "curr_mask"
           input_stream: "prev_mask"

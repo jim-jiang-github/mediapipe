@@ -71,7 +71,7 @@ void FillInputTensor(tflite::Interpreter* interpreter) {
   }
 }
 
-absl::Status CompareCPUGPUResults(tflite::Interpreter* cpu, const std::vector<Value*>& outputs,
+abslx::Status CompareCPUGPUResults(tflite::Interpreter* cpu, const std::vector<Value*>& outputs,
                                   InferenceContext* gpu_context, float per_element_eps) {
   for (int i = 0; i < outputs.size(); ++i) {
     TfLiteTensor* tensor_ptr = cpu->tensor(outputs[i]->tensor.ref);
@@ -112,10 +112,10 @@ absl::Status CompareCPUGPUResults(tflite::Interpreter* cpu, const std::vector<Va
     std::cout << "Total " << total_different << " different elements, for output #" << i
               << ", threshhold - " << per_element_eps << std::endl;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TestCorrectnessVsTfliteCPU(const std::unique_ptr<FlatBufferModel>& flatbuffer,
+abslx::Status TestCorrectnessVsTfliteCPU(const std::unique_ptr<FlatBufferModel>& flatbuffer,
                                         GraphFloat32* graph, bool use_fp16 = true,
                                         float per_element_eps = 1e-4f) {
   id<MTLDevice> device = MTLCreateSystemDefaultDevice();
@@ -147,16 +147,16 @@ absl::Status TestCorrectnessVsTfliteCPU(const std::unique_ptr<FlatBufferModel>& 
   std::unique_ptr<tflite::Interpreter> cpu_inference;
   builder(&cpu_inference);
   if (!cpu_inference) {
-    return absl::InternalError("Failed to build CPU inference.");
+    return abslx::InternalError("Failed to build CPU inference.");
   }
   auto status = cpu_inference->AllocateTensors();
   if (status != kTfLiteOk) {
-    return absl::InternalError("Failed to AllocateTensors for CPU inference.");
+    return abslx::InternalError("Failed to AllocateTensors for CPU inference.");
   }
   FillInputTensor(cpu_inference.get());
   status = cpu_inference->Invoke();
   if (status != kTfLiteOk) {
-    return absl::InternalError("Failed to Invoke CPU inference.");
+    return abslx::InternalError("Failed to Invoke CPU inference.");
   }
 
   for (auto& input : graph->inputs()) {
@@ -180,10 +180,10 @@ absl::Status TestCorrectnessVsTfliteCPU(const std::unique_ptr<FlatBufferModel>& 
 
   RETURN_IF_ERROR(CompareCPUGPUResults(cpu_inference.get(), graph->outputs(), &inference_context,
                                        per_element_eps));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GPUBenchmark(GraphFloat32* graph, int num_tests, int iterations,
+abslx::Status GPUBenchmark(GraphFloat32* graph, int num_tests, int iterations,
                           bool use_fp16 = true) {
   id<MTLDevice> device = MTLCreateSystemDefaultDevice();
   std::string device_name = std::string([[device name] UTF8String]);
@@ -247,10 +247,10 @@ absl::Status GPUBenchmark(GraphFloat32* graph, int num_tests, int iterations,
                 iterations;
     std::cout << "  Test: #" << j << " - " << t0 << "ms" << std::endl;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GPUBenchmarkSerialized(GraphFloat32* graph, bool use_fp16 = true) {
+abslx::Status GPUBenchmarkSerialized(GraphFloat32* graph, bool use_fp16 = true) {
   id<MTLDevice> device = MTLCreateSystemDefaultDevice();
   std::string device_name = std::string([[device name] UTF8String]);
   GpuInfo gpu_info;
@@ -357,7 +357,7 @@ absl::Status GPUBenchmarkSerialized(GraphFloat32* graph, bool use_fp16 = true) {
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 class DelegateContext {
@@ -366,7 +366,7 @@ class DelegateContext {
             const TfLiteDelegateParams* delegate_params) {
     auto denormalized_graph =
         reinterpret_cast<GraphFloat32*>(delegate_params->delegate->data_);
-    absl::Status status =
+    abslx::Status status =
         BuildModel(context, delegate_params, denormalized_graph);
     if (!status.ok()) {
       TF_LITE_KERNEL_LOG(context, std::string(status.message()).c_str());
@@ -403,14 +403,14 @@ TfLiteStatus DelegatePrepare(TfLiteContext* context, TfLiteDelegate* delegate) {
   return status;
 }
 
-absl::Status FlatBufferToGPUGraph(
+abslx::Status FlatBufferToGPUGraph(
     const std::unique_ptr<tflite::FlatBufferModel>& flatbuffer,
     GraphFloat32* graph) {
   ops::builtin::BuiltinOpResolver op_resolver;
   std::unique_ptr<tflite::Interpreter> interpreter;
   tflite::InterpreterBuilder interpreter_builder(*flatbuffer, op_resolver);
   if (interpreter_builder(&interpreter) != kTfLiteOk || !interpreter) {
-    return absl::InternalError("Unable to prepare TfLite interpreter.");
+    return abslx::InternalError("Unable to prepare TfLite interpreter.");
   }
   TfLiteDelegate delegate;
   delegate.data_ = graph;
@@ -421,15 +421,15 @@ absl::Status FlatBufferToGPUGraph(
   delegate.FreeBufferHandle = nullptr;
 
   if (interpreter->ModifyGraphWithDelegate(&delegate) != kTfLiteOk) {
-    return absl::InternalError("Conversion from TfLite model failed.");
+    return abslx::InternalError("Conversion from TfLite model failed.");
   }
 
   ModelTransformer transformer(graph);
   if (!ApplyModelTransformations(&transformer)) {
-    return absl::InternalError("Graph transformations failed");
+    return abslx::InternalError("Graph transformations failed");
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace

@@ -32,7 +32,7 @@ class Any {
   bool Is() const {
     return false;
   }
-  absl::string_view type_url() const { return ""; }
+  abslx::string_view type_url() const { return ""; }
   static const Any& default_instance() {
     static Any _Any_default_instance_;
     return _Any_default_instance_;

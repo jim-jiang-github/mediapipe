@@ -57,7 +57,7 @@
 
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
@@ -127,6 +127,6 @@ bool ParsePosixSpec(const std::string& spec, PosixTimeZone* res);
 }  // namespace cctz
 }  // namespace time_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_POSIX_H_

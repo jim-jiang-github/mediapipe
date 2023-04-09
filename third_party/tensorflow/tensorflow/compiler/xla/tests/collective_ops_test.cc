@@ -73,22 +73,22 @@ class CollectiveOpsTest : public HloTestBase {
     replica_group_strs.reserve(replica_groups.size());
     for (const auto& g : replica_groups) {
       replica_group_strs.push_back(
-          absl::StrFormat("{%s}", absl::StrJoin(g, ",")));
+          abslx::StrFormat("{%s}", abslx::StrJoin(g, ",")));
     }
     std::string shape_str = shape.ToString(/*print_layout=*/false);
     if (shape_str == "f32[1]") {
       // Exercise the scalar codepath.
-      hlo_template = absl::StrReplaceAll(
+      hlo_template = abslx::StrReplaceAll(
           hlo_template,
           {{"DATATYPE[SHAPE] bitcast(p)", "DATATYPE[] bitcast(p)"},
            {"DATATYPE[SHAPE] all-reduce", "DATATYPE[] all-reduce"},
            {"DATATYPE[SHAPE] copy", "DATATYPE[] copy"}});
     }
-    std::string parameterized_hlo = absl::StrReplaceAll(
+    std::string parameterized_hlo = abslx::StrReplaceAll(
         hlo_template,
         {{"SHAPE", shape_str},
          {"REPLICA_GROUPS",
-          absl::StrFormat("{%s}", absl::StrJoin(replica_group_strs, ", "))},
+          abslx::StrFormat("{%s}", abslx::StrJoin(replica_group_strs, ", "))},
          {"OP", op},
          {"DATATYPE", datatype}});
     return ParseAndReturnVerifiedModule(parameterized_hlo, config).ValueOrDie();
@@ -119,7 +119,7 @@ class CollectiveOpsTest : public HloTestBase {
   template <typename LiteralType>
   void TestAllOpsForReduce() {
     auto cast = [&](int value) { return static_cast<LiteralType>(value); };
-    auto to_literal = [&](absl::Span<const LiteralType> values) {
+    auto to_literal = [&](abslx::Span<const LiteralType> values) {
       return LiteralUtil::CreateR1<LiteralType>(values);
     };
     Literal input_value = to_literal({cast(1), cast(2), cast(3)});
@@ -330,8 +330,8 @@ XLA_TEST_F(CollectiveOpsTest, AllReduce_AllCombinations) {
   const int64_t kNumElems = 1024;
 
   for (std::vector<int64_t> devices : PowerSetOfIota(kNumDevices)) {
-    SCOPED_TRACE(absl::StrFormat("Running on devices {%s}",
-                                 absl::StrJoin(devices, ", ")));
+    SCOPED_TRACE(abslx::StrFormat("Running on devices {%s}",
+                                 abslx::StrJoin(devices, ", ")));
 
     DeviceAssignment device_assn = MakeDeviceAssn(devices);
 
@@ -340,7 +340,7 @@ XLA_TEST_F(CollectiveOpsTest, AllReduce_AllCombinations) {
     config.set_static_device_assignment(device_assn);
 
     std::vector<float> input_vec(kNumElems);
-    absl::c_iota(input_vec, 0);
+    abslx::c_iota(input_vec, 0);
     auto input_literal = LiteralUtil::CreateR1<float>(input_vec);
 
     auto module = MakeCrsModule(input_literal.shape(),
@@ -362,7 +362,7 @@ XLA_TEST_F(CollectiveOpsTest, AllReduce_ManyConcurrentAllReduces) {
   const int64_t kRunsPerThread = 10;
 
   std::vector<float> input_vec(kNumElems);
-  absl::c_iota(input_vec, 0);
+  abslx::c_iota(input_vec, 0);
   auto input_literal = LiteralUtil::CreateR1<float>(input_vec);
 
   auto config = GetModuleConfigForTest();
@@ -455,7 +455,7 @@ XLA_TEST_F(CollectiveOpsTest, AllReduce_ThreeReplicaGroups) {
   auto config = GetModuleConfigForTest();
   config.set_replica_count(4);
   std::vector<float> input_vec(kNumElems);
-  absl::c_iota(input_vec, 0);
+  abslx::c_iota(input_vec, 0);
   auto input_literal = LiteralUtil::CreateR1<float>(input_vec);
   auto module = MakeCrsModule(
       /*shape=*/input_literal.shape(),
@@ -513,7 +513,7 @@ XLA_TEST_F(CollectiveOpsTest, AllReduce_Degenerate) {
 }
 
 XLA_TEST_F(CollectiveOpsTest, DISABLED_ON_CPU(AsyncAllReduce)) {
-  const absl::string_view kModuleStr = R"(
+  const abslx::string_view kModuleStr = R"(
       HloModule test
 
       apply_op {
@@ -545,7 +545,7 @@ XLA_TEST_F(CollectiveOpsTest, DISABLED_ON_CPU(AsyncAllReduce)) {
 }
 
 XLA_TEST_F(CollectiveOpsTest, DISABLED_ON_CPU(AsyncAllReduceTwoOperands)) {
-  const absl::string_view kModuleStr = R"(
+  const abslx::string_view kModuleStr = R"(
       HloModule test
 
       apply_op {

@@ -36,8 +36,8 @@ class HloToIrBindings {
       : is_nested_(is_nested), b_(b), module_(llvm_module) {}
 
   void EmitBasePointersForHlos(
-      absl::Span<const HloInstruction* const> io_hlos,
-      absl::Span<const HloInstruction* const> non_io_hlos);
+      abslx::Span<const HloInstruction* const> io_hlos,
+      abslx::Span<const HloInstruction* const> non_io_hlos);
 
   // Rebinds the given HLO to the LLVM IR value that represent its address.
   void BindHloToIrValue(const HloInstruction& hlo, llvm::Value* ir_value,
@@ -99,7 +99,7 @@ class HloToIrBindings {
   // For an instruction that generates multiple outputs, the root will be a
   // tuple shape. The IrArray for each element output is stored in the subnode
   // in the ShapeTree.
-  absl::flat_hash_map<const HloInstruction*, ShapeTree<llvm::Value*>>
+  abslx::flat_hash_map<const HloInstruction*, ShapeTree<llvm::Value*>>
       base_ptrs_;
 
   // The address of the memory block that contains all temporary buffers.

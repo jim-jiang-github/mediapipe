@@ -27,7 +27,7 @@ namespace tensorflow {
 namespace {
 
 using RegistrationMap =
-    absl::flat_hash_map<std::string, CostMeasurementRegistry::Creator>;
+    abslx::flat_hash_map<std::string, CostMeasurementRegistry::Creator>;
 
 RegistrationMap* GetRegistrationMap() {
   static RegistrationMap* registered_cost_measurements = new RegistrationMap;
@@ -46,7 +46,7 @@ std::unique_ptr<CostMeasurement> CostMeasurementRegistry::CreateByNameOrNull(
   return it->second(context);
 }
 
-void CostMeasurementRegistry::RegisterCostMeasurement(absl::string_view name,
+void CostMeasurementRegistry::RegisterCostMeasurement(abslx::string_view name,
                                                       Creator creator) {
   const auto it = GetRegistrationMap()->find(name);
   CHECK(it == GetRegistrationMap()->end())  // Crash OK

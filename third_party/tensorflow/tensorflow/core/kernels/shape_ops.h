@@ -165,7 +165,7 @@ class ExpandDimsOp : public OpKernel {
     }
 
     // Compute new shape with an additional dimension.
-    absl::InlinedVector<int64_t, 8> output_shape_vec(input_dims + 1);
+    abslx::InlinedVector<int64_t, 8> output_shape_vec(input_dims + 1);
     for (int64_t i = 0; i < dim; ++i) {
       output_shape_vec[i] = input_shape.dim_size(i);
     }

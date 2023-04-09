@@ -44,19 +44,19 @@ struct LandmarksToTransformMatrixV2Attributes {
 
 class LandmarksToTransformMatrixOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final;
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final;
 };
 
-absl::Status ParseLandmarksToTransformMatrixV1Attributes(
+abslx::Status ParseLandmarksToTransformMatrixV1Attributes(
     const void* data, uint32_t data_size,
     LandmarksToTransformMatrixV1Attributes* attr, BHWC* output_shape);
 
-absl::Status ParseLandmarksToTransformMatrixV2Attributes(
+abslx::Status ParseLandmarksToTransformMatrixV2Attributes(
     const void* data, uint32_t data_size,
     LandmarksToTransformMatrixV2Attributes* attr, BHWC* output_shape);
 

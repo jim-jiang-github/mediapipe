@@ -70,7 +70,7 @@ FindVectorizedFeatureDims(const ConvolutionDimensionNumbers& dnums,
 //
 // This is used to prevent other XLA instances from trying to autotune on a
 // device while another thread is using it.
-absl::Mutex& GetGpuMutex(const se::StreamExecutor* stream_exec);
+abslx::Mutex& GetGpuMutex(const se::StreamExecutor* stream_exec);
 
 // Creates a kernel with a provided name, based from provided PTX in ptx.
 // The kernel should be executed using the provided executor.
@@ -79,12 +79,12 @@ absl::Mutex& GetGpuMutex(const se::StreamExecutor* stream_exec);
 // The canonical storage for both ptx and cubin_data should outlive
 // the lifetime of the kernel.
 StatusOr<std::unique_ptr<se::KernelBase>> CreateKernel(
-    absl::string_view kernel_name, uint64_t num_args, absl::string_view ptx,
-    absl::Span<const uint8_t> cubin_data, se::StreamExecutor* stream_exec);
+    abslx::string_view kernel_name, uint64_t num_args, abslx::string_view ptx,
+    abslx::Span<const uint8_t> cubin_data, se::StreamExecutor* stream_exec);
 
 // Runs loaded kernel on the stream with the provided arguments.
 Status ExecuteKernelOnStream(const se::KernelBase& kernel,
-                             absl::Span<const se::DeviceMemoryBase> args,
+                             abslx::Span<const se::DeviceMemoryBase> args,
                              const LaunchDimensions& dims, se::Stream* stream);
 
 // Initializes `buffer` with random data on `stream`.
@@ -103,7 +103,7 @@ StatusOr<se::dnn::DataType> GetDNNDataTypeFromPrimitiveType(PrimitiveType type);
 // Returns result with the smallest time which has not failed.
 // If deterministic output is requested, returns first (not failing) result.
 StatusOr<tensorflow::AutotuneResult> PickBestResult(
-    absl::Span<tensorflow::AutotuneResult const> profile_results,
+    abslx::Span<tensorflow::AutotuneResult const> profile_results,
     const HloInstruction& instr);
 
 // Returns whether determinism is required.

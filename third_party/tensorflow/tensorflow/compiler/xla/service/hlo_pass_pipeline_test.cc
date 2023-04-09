@@ -33,7 +33,7 @@ using ::testing::StrEq;
 class HloPassPipelineTest : public HloTestBase {
  protected:
   StatusOr<HloModuleGroup> ParseModuleGroup(
-      absl::Span<const std::string> hlo_strings) {
+      abslx::Span<const std::string> hlo_strings) {
     HloModuleGroup group(TestName());
     for (const std::string& hlo_string : hlo_strings) {
       TF_ASSIGN_OR_RETURN(std::unique_ptr<VerifiedHloModule> module,
@@ -46,11 +46,11 @@ class HloPassPipelineTest : public HloTestBase {
 
 // A module pass which renames instructions named 'foo' to 'bar'.
 class FooToBarModulePass : public HloModulePass {
-  absl::string_view name() const override { return "foo2bar"; }
+  abslx::string_view name() const override { return "foo2bar"; }
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(HloModule* module,
-                     const absl::flat_hash_set<absl::string_view>&
+                     const abslx::flat_hash_set<abslx::string_view>&
                          execution_threads) override {
     bool changed = false;
     for (HloComputation* computation :
@@ -69,11 +69,11 @@ class FooToBarModulePass : public HloModulePass {
 // A module pass which renames root instructions names in reverse string order,
 // e.g. "xyz" becomes "zyx".
 class ReverseStringModulePass : public HloModulePass {
-  absl::string_view name() const override { return "reverse"; }
+  abslx::string_view name() const override { return "reverse"; }
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(HloModule* module,
-                     const absl::flat_hash_set<absl::string_view>&
+                     const abslx::flat_hash_set<abslx::string_view>&
                          execution_threads) override {
     bool changed = false;
     for (HloComputation* computation :
@@ -90,11 +90,11 @@ class ReverseStringModulePass : public HloModulePass {
 
 // A module group pass which renames instructions named 'baz' to 'qux'.
 class BazToQuxModuleGroupPass : public HloModuleGroupPass {
-  absl::string_view name() const override { return "baz2qux"; }
+  abslx::string_view name() const override { return "baz2qux"; }
 
   using HloPassInterface::RunOnModuleGroup;
   StatusOr<bool> RunOnModuleGroup(HloModuleGroup* module_group,
-                                  const absl::flat_hash_set<absl::string_view>&
+                                  const abslx::flat_hash_set<abslx::string_view>&
                                       execution_threads) override {
     bool changed = false;
     for (HloModule* module : module_group->modules()) {
@@ -115,11 +115,11 @@ class BazToQuxModuleGroupPass : public HloModuleGroupPass {
 // An invariant checker pass which returns an error if there exists an
 // instruction named 'bar'.
 class BarBlowerUpper : public HloModulePass {
-  absl::string_view name() const override { return "bar-blower-upper"; }
+  abslx::string_view name() const override { return "bar-blower-upper"; }
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(HloModule* module,
-                     const absl::flat_hash_set<absl::string_view>&
+                     const abslx::flat_hash_set<abslx::string_view>&
                          execution_threads) override {
     for (HloComputation* computation :
          module->computations(execution_threads)) {

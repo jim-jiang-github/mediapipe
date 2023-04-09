@@ -239,7 +239,7 @@ class SparseReduceOp : public OpKernel {
                       " which is outside of bounds of [0, ",
                       out_flat.size(), ")"));
       out_flat(idx) = reduced_val();
-      VLOG(2) << "coords: " << absl::StrJoin(g.group(), ",")
+      VLOG(2) << "coords: " << abslx::StrJoin(g.group(), ",")
               << "; idx: " << idx << "; group " << Op::Name() << ": "
               << reduced_val();
     }
@@ -330,7 +330,7 @@ class SparseReduceSparseOp : public OpKernel {
       }
       out_flat(i) = reduced_val();
       i++;
-      VLOG(2) << "coords: " << absl::StrJoin(g.group(), ",")
+      VLOG(2) << "coords: " << abslx::StrJoin(g.group(), ",")
               << "; group " << Op::Name() << ": "
               << reduced_val();
     }

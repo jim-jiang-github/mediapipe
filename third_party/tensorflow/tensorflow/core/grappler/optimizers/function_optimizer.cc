@@ -162,10 +162,10 @@ struct FunctionSpecializationSignature {
 
   string func_name;
   bool is_in_fetch_set;
-  absl::flat_hash_set<OutputPort> active_outputs;
-  absl::flat_hash_map<string, DataType> type_parameters;
-  absl::flat_hash_map<string, AttrValue> body_parameters;
-  absl::flat_hash_map<InputPort, string> const_inputs;
+  abslx::flat_hash_set<OutputPort> active_outputs;
+  abslx::flat_hash_map<string, DataType> type_parameters;
+  abslx::flat_hash_map<string, AttrValue> body_parameters;
+  abslx::flat_hash_map<InputPort, string> const_inputs;
 
   bool operator==(const FunctionSpecializationSignature& other) const {
     bool equals = func_name == other.func_name &&
@@ -203,11 +203,11 @@ struct FunctionSpecializationSignature {
                    + s.body_parameters.size() * 2  //
                    + s.const_inputs.size() * 2);
 
-    absl::c_transform(s.active_outputs, std::back_inserter(hashes),
+    abslx::c_transform(s.active_outputs, std::back_inserter(hashes),
                       hash<OutputPort>());
 
     using TypeParam = std::pair<const string, DataType>;
-    absl::c_for_each(s.type_parameters, [&hashes](const TypeParam& type_param) {
+    abslx::c_for_each(s.type_parameters, [&hashes](const TypeParam& type_param) {
       AttrValue attr_value;
       attr_value.set_type(type_param.second);
       hashes.push_back(Hash64(type_param.first));
@@ -215,19 +215,19 @@ struct FunctionSpecializationSignature {
     });
 
     using BodyParam = std::pair<const string, AttrValue>;
-    absl::c_for_each(s.body_parameters, [&hashes](const BodyParam& body_param) {
+    abslx::c_for_each(s.body_parameters, [&hashes](const BodyParam& body_param) {
       hashes.push_back(Hash64(body_param.first));
       hashes.push_back(FastAttrValueHash(body_param.second));
     });
 
     using ConstInput = std::pair<const InputPort, string>;
-    absl::c_for_each(s.const_inputs, [&hashes](const ConstInput& const_input) {
+    abslx::c_for_each(s.const_inputs, [&hashes](const ConstInput& const_input) {
       hashes.push_back(hash<InputPort>()(const_input.first));
       hashes.push_back(Hash64(const_input.second));
     });
 
     // Combine all pre-computed hashes in a deterministic order.
-    absl::c_sort(hashes);
+    abslx::c_sort(hashes);
     return H::combine_contiguous(std::move(base), hashes.data(), hashes.size());
   }
 };
@@ -237,13 +237,13 @@ struct FunctionSpecialization {
   // True if the function caller node is in GrapplerItem fetch set.
   bool is_in_fetch_set;
   // Names of the tensors that were pushed down into the function body.
-  absl::flat_hash_set<string> const_inputs;
+  abslx::flat_hash_set<string> const_inputs;
   // Control dependencies of pushed down const inputs have to be attached to
   // function caller node.
-  absl::flat_hash_set<string> control_deps;
+  abslx::flat_hash_set<string> control_deps;
   // Output tensors (ports) that consumed by other nodes in the graph or in a
   // GrapplerItem fetch set.
-  absl::flat_hash_set<int> active_outputs;
+  abslx::flat_hash_set<int> active_outputs;
   // Mapping from original function output port to the output port of
   // specialized function. If function specialization changes the number of
   // function outputs it's required to update all node consumers.
@@ -276,7 +276,7 @@ class FunctionOptimizerContext {
   }
   FunctionLibraryDefinition& function_library() { return function_library_; }
 
-  const absl::flat_hash_map<SafeTensorId, SafeTensorId, SafeTensorId::Hasher>&
+  const abslx::flat_hash_map<SafeTensorId, SafeTensorId, SafeTensorId::Hasher>&
   tensor_mapping() const {
     return tensor_mapping_;
   }
@@ -284,14 +284,14 @@ class FunctionOptimizerContext {
   const GraphView& graph_view() const { return graph_view_; }
 
   bool IsFeedNode(const string& node_name) const {
-    return absl::c_any_of(
+    return abslx::c_any_of(
         item_->feed, [&](const std::pair<std::string, Tensor>& feed) {
           return ParseTensorName(feed.first).node() == node_name;
         });
   }
 
   bool IsFetchNode(const string& node_name) const {
-    return absl::c_any_of(item_->fetch, [&](const string& fetch) {
+    return abslx::c_any_of(item_->fetch, [&](const string& fetch) {
       return ParseTensorName(fetch).node() == node_name;
     });
   }
@@ -340,14 +340,14 @@ class FunctionOptimizerContext {
   }
 
  private:
-  static absl::flat_hash_map<string, const NodeDef*> InferTrulyConstNodes(
+  static abslx::flat_hash_map<string, const NodeDef*> InferTrulyConstNodes(
       const GrapplerItem& item, const GraphDef& graph) {
-    absl::flat_hash_set<absl::string_view> feed_nodes;
+    abslx::flat_hash_set<abslx::string_view> feed_nodes;
     for (const auto& feed : item.feed) {
       feed_nodes.insert(feed.first);
     }
 
-    absl::flat_hash_map<string, const NodeDef*> const_nodes;
+    abslx::flat_hash_map<string, const NodeDef*> const_nodes;
     for (const NodeDef& node : graph.node()) {
       if (IsConstant(node) && !feed_nodes.contains(node.name())) {
         const_nodes[node.name()] = &node;
@@ -364,9 +364,9 @@ class FunctionOptimizerContext {
   FunctionLibraryDefinition function_library_;
 
   // Nodes that are Const and not in feed.
-  absl::flat_hash_map<string, const NodeDef*> truly_const_nodes_;
+  abslx::flat_hash_map<string, const NodeDef*> truly_const_nodes_;
   // Specialized functions.
-  absl::flat_hash_map<FunctionSpecializationSignature,
+  abslx::flat_hash_map<FunctionSpecializationSignature,
                       const FunctionSpecialization>
       specialized_functions_;
 
@@ -376,7 +376,7 @@ class FunctionOptimizerContext {
   //
   // Tensor mapping that has to be applied to the graph after all functions
   // optimizations (invalidated tensor id -> optimized graph tensor id).
-  absl::flat_hash_map<SafeTensorId, SafeTensorId, SafeTensorId::Hasher>
+  abslx::flat_hash_map<SafeTensorId, SafeTensorId, SafeTensorId::Hasher>
       tensor_mapping_;
 
   // Use graph view to find active outputs of the function caller nodes.
@@ -401,10 +401,10 @@ const FunctionDef* FindFunctionCall(const FunctionOptimizerContext& ctx,
   return ctx.function_library().Find(node.op());
 }
 
-absl::flat_hash_set<int> GetActiveOutputs(const NodeDef& node,
+abslx::flat_hash_set<int> GetActiveOutputs(const NodeDef& node,
                                           const FunctionOptimizerContext& ctx,
                                           int size_hint = 0) {
-  absl::flat_hash_set<int> active_outputs;
+  abslx::flat_hash_set<int> active_outputs;
   active_outputs.reserve(static_cast<size_t>(size_hint));
 
   // 1. Output can be consumed by the other graph node.
@@ -430,7 +430,7 @@ bool HasTrulyConstInputs(const NodeDef& node,
   const auto is_truly_const = [&ctx](const string& input) {
     return ctx.IsTrulyConst(NodeName(input));
   };
-  return absl::c_any_of(node.input(), is_truly_const);
+  return abslx::c_any_of(node.input(), is_truly_const);
 }
 
 bool HasUnusedOutputs(const NodeDef& func_node, const FunctionDef& func,
@@ -439,7 +439,7 @@ bool HasUnusedOutputs(const NodeDef& func_node, const FunctionDef& func,
   // number of output args is the same as number of possible function caller
   // node outputs.
   int num_outputs = func.signature().output_arg_size();
-  const absl::flat_hash_set<int> active_outputs =
+  const abslx::flat_hash_set<int> active_outputs =
       GetActiveOutputs(func_node, ctx, /*size_hind*/ num_outputs);
   int active_outputs_size = active_outputs.size();
   return active_outputs_size != num_outputs;
@@ -465,8 +465,8 @@ FunctionDefLibrary PruneFunctionLibrary(const FunctionLibraryDefinition& flib,
 Status PushDownConstInputs(const NodeDef& func_node,
                            const FunctionOptimizerContext& ctx,
                            GrapplerFunctionItem* item,
-                           absl::flat_hash_set<string>* const_inputs,
-                           absl::flat_hash_set<string>* control_deps) {
+                           abslx::flat_hash_set<string>* const_inputs,
+                           abslx::flat_hash_set<string>* control_deps) {
   // Record node control dependencies in the control_deps set.
   const auto record_control_deps = [&](const NodeDef* const_input) {
     for (int i = const_input->input_size() - 1; i >= 0; --i) {
@@ -505,7 +505,7 @@ void RemovePushedDownConstInputs(const FunctionSpecialization& specialization,
   // Keep only non-const inputs.
   std::vector<string> keep_inputs;
   const auto& inputs = specialized_func_node->input();
-  absl::c_copy_if(inputs, std::back_inserter(keep_inputs),
+  abslx::c_copy_if(inputs, std::back_inserter(keep_inputs),
                   [&](const string& input) {
                     return !specialization.const_inputs.contains(input);
                   });
@@ -515,7 +515,7 @@ void RemovePushedDownConstInputs(const FunctionSpecialization& specialization,
 
   // Attach control dependencies of pushed down const input to the caller node.
   if (!specialization.control_deps.empty()) {
-    absl::flat_hash_set<string> existing_control_deps;
+    abslx::flat_hash_set<string> existing_control_deps;
 
     for (const string& input : keep_inputs) {
       existing_control_deps.insert(AsControlDependency(NodeName(input)));
@@ -675,9 +675,9 @@ Status InitializeFunctionSpecializationSignature(
 string SpecializedFunctionName(const FunctionOptimizerContext& ctx,
                                const FunctionDef& func,
                                const NodeDef& func_node) {
-  return absl::Substitute(
+  return abslx::Substitute(
       "$0_specialized_for_$1_at_$2", func.signature().name(),
-      absl::StrReplaceAll(func_node.name(), {{"/", "_"}}), ctx.item().id);
+      abslx::StrReplaceAll(func_node.name(), {{"/", "_"}}), ctx.item().id);
 }
 
 Status SpecializeFunction(const NodeDef& func_node, const FunctionDef& func,
@@ -724,8 +724,8 @@ Status SpecializeFunction(const NodeDef& func_node, const FunctionDef& func,
 
   // Push const inputs into the function body, and keep track of their control
   // dependencies.
-  absl::flat_hash_set<string> const_inputs;
-  absl::flat_hash_set<string> control_deps;
+  abslx::flat_hash_set<string> const_inputs;
+  abslx::flat_hash_set<string> control_deps;
   TF_RETURN_IF_ERROR(PushDownConstInputs(func_node, *ctx, &item, &const_inputs,
                                          &control_deps));
 
@@ -735,7 +735,7 @@ Status SpecializeFunction(const NodeDef& func_node, const FunctionDef& func,
   if (!signature.is_in_fetch_set) {
     int num_func_outputs = item.output_size();
 
-    absl::flat_hash_set<int> remove;
+    abslx::flat_hash_set<int> remove;
     for (int i = 0; i < num_func_outputs; ++i) {
       if (!signature.active_outputs.count(i)) remove.insert(i);
     }
@@ -797,14 +797,14 @@ using KeepCallerNode = InlineFunctionBodyOptions::KeepCallerNode;
 using OutputControlSource = InlineFunctionBodyOptions::OutputControlSource;
 
 // Checks if boolean attribute is defined and its value is 'true'.
-bool CheckBoolAttr(const Node* n, absl::string_view attr_name) {
+bool CheckBoolAttr(const Node* n, abslx::string_view attr_name) {
   bool match;
   bool found = TryGetNodeAttr(n->attrs(), attr_name, &match);
   return found && match;
 }
 
 // Checks if string attribute is defined and it's not empty.
-bool CheckStringAttr(const Node* n, absl::string_view attr_name) {
+bool CheckStringAttr(const Node* n, abslx::string_view attr_name) {
   const string& value = GetNodeAttrString(n->attrs(), attr_name);
   return !value.empty();
 }
@@ -827,7 +827,7 @@ bool MarkedForXlaCompilation(const NodeDef& n) {
 }
 
 const bool IsExemptFromSideEffectsExecutionValidation(const string& op) {
-  static const auto* exemption = new absl::flat_hash_set<string>(
+  static const auto* exemption = new abslx::flat_hash_set<string>(
       {// LINT.IfChange
        // Op types that should not run in program order, e.g. because they need
        // to run asynchronously to avoid deadlock.
@@ -885,7 +885,7 @@ Status ValidateSideEffectsExecution(
   // Find all nodes that can produce side effects in the function body graph. We
   // use 'is_stateful()' bit as an approximation of "has side effects" property.
   std::vector<const Node*> fbody_side_effects;
-  absl::c_copy_if(
+  abslx::c_copy_if(
       fbody.graph->nodes(), std::back_inserter(fbody_side_effects),
       [](const Node* n) {
         return n->op_def().is_stateful() && !n->IsArg() && !n->IsRetval() &&
@@ -908,7 +908,7 @@ Status ValidateSideEffectsExecution(
   }
 
   // Find all nodes in the function body that will be used as control sources.
-  absl::flat_hash_set<const Node*> control_sources;
+  abslx::flat_hash_set<const Node*> control_sources;
   if (output_control_source == OutputControlSource::kDataOutputs) {
     control_sources = {fbody.ret_nodes.begin(), fbody.ret_nodes.end()};
   } else if (output_control_source == OutputControlSource::kControlOutputs) {
@@ -947,7 +947,7 @@ Status ValidateSideEffectsExecution(
 // Validates that no dead tensor can reach function output.
 Status ValidateNoDeadOutputs(const FunctionLibraryDefinition& flib_def,
                              const FunctionBody& fbody) {
-  absl::flat_hash_set<const Node*> output_nodes = {fbody.ret_nodes.begin(),
+  abslx::flat_hash_set<const Node*> output_nodes = {fbody.ret_nodes.begin(),
                                                    fbody.ret_nodes.end()};
 
   // Find all nodes that can produce dead tensors.
@@ -1106,7 +1106,7 @@ Status MakeFunctionBodyForInlining(const Node& node,
 // V2, however we have to guarantee that graphs constructed with Tensorflow V1
 // will produce correct results.
 void AddStrictInputSemantics(Node* caller, Graph* g) {
-  absl::flat_hash_set<const Node*> existing_control_sources;
+  abslx::flat_hash_set<const Node*> existing_control_sources;
   for (const Edge* edge : caller->in_edges()) {
     if (edge->IsControlEdge()) {
       existing_control_sources.insert(edge->src());
@@ -1116,11 +1116,11 @@ void AddStrictInputSemantics(Node* caller, Graph* g) {
   const bool has_incoming_control_edges = !existing_control_sources.empty();
 
   const bool has_resource_input =
-      absl::c_any_of(caller->input_types(),
+      abslx::c_any_of(caller->input_types(),
                      [](const DataType dtype) { return dtype == DT_RESOURCE; });
 
   const bool has_constant_enter_input =
-      absl::c_any_of(caller->in_edges(), [](const Edge* edge) {
+      abslx::c_any_of(caller->in_edges(), [](const Edge* edge) {
         Node* src = edge->src();
         return src->IsEnter() && CheckBoolAttr(src, "is_constant");
       });
@@ -1173,7 +1173,7 @@ void AddFrameForwardingControlEdge(const std::vector<ControlFlowInfo>& info,
   // already have an incoming control edge, it's guaranteed that it will "carry"
   // the same frame as all regular inputs.
   const bool has_incoming_control_edges =
-      absl::c_any_of(caller->in_edges(),
+      abslx::c_any_of(caller->in_edges(),
                      [](const Edge* edge) { return edge->IsControlEdge(); });
   if (has_incoming_control_edges) return;
 
@@ -1189,7 +1189,7 @@ void AddFrameForwardingControlEdge(const std::vector<ControlFlowInfo>& info,
     // Enter[is_constant=false] activates nodes only in 0th iteration so we
     // add an edge from the Merge node which is activated in every iteration.
     // A non-constant Enter node must have an edge to a Merge node.
-    auto it = absl::c_find_if(enter->out_edges(), [](const Edge* e) {
+    auto it = abslx::c_find_if(enter->out_edges(), [](const Edge* e) {
       return !e->IsControlEdge() && e->dst()->IsMerge();
     });
     if (it != enter->out_edges().end()) {
@@ -1223,7 +1223,7 @@ Status InlineFunctionCalls(const GrapplerItem& item,
   TF_RETURN_IF_ERROR(ConvertGraphDefToGraph(graph_constructor_options,
                                             item.graph, graph.get()));
 
-  using NodeNames = absl::flat_hash_set<absl::string_view>;
+  using NodeNames = abslx::flat_hash_set<abslx::string_view>;
   NodeNames fetch_nodes;
   fetch_nodes.reserve(item.fetch.size());
   for (const string& fetch : item.fetch) {
@@ -1326,7 +1326,7 @@ Status InlineFunctionCalls(const GrapplerItem& item,
     // Additional validation rules defined only in Grappler.
     // TODO(ezhulenev): Move it to common_runtime InlineFunctionBodyOptions?
     if (can_inline_function_call.ok()) {
-      bool has_outgoing_control_edges = absl::c_any_of(
+      bool has_outgoing_control_edges = abslx::c_any_of(
           n->out_edges(),
           [](const Edge* edge) { return edge->IsControlEdge(); });
 
@@ -1360,7 +1360,7 @@ Status InlineFunctionCalls(const GrapplerItem& item,
   }
 
   VLOG(4) << "Inlined " << inlined_function_names.size()
-          << " function calls: " << absl::StrJoin(inlined_function_names, ", ");
+          << " function calls: " << abslx::StrJoin(inlined_function_names, ", ");
 
   // ------------------------------------------------------------------------ //
   // Grappler receives the graph after PRE_PLACEMENT, Placer, and POST_PLACEMENT
@@ -1387,7 +1387,7 @@ Status InlineFunctionCalls(const GrapplerItem& item,
     // graph after initial placing is done, and we should have devices for the
     // placer.
     VLOG(3) << "Run placer for the graph after function inlining. "
-            << "Devices: [" << absl::StrJoin(item.devices(), ", ") << "]";
+            << "Devices: [" << abslx::StrJoin(item.devices(), ", ") << "]";
 
     DeviceSet device_set;                               // does not own devices
     std::vector<std::unique_ptr<Device>> fake_devices;  // owns fake devices

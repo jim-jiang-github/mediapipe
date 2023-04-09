@@ -84,11 +84,11 @@ TEST_F(CheckpointCallbackManagerTest,
 }
 
 TEST_F(CheckpointCallbackManagerTest, RegisterSaveCallbackTwice) {
-  SaveCallback first_callback = [](absl::string_view checkpoint_id) {
+  SaveCallback first_callback = [](abslx::string_view checkpoint_id) {
     return std::string("MockString");
   };
 
-  SaveCallback second_callback = [](absl::string_view checkpoint_id) {
+  SaveCallback second_callback = [](abslx::string_view checkpoint_id) {
     return std::string("MockString");
   };
 
@@ -101,12 +101,12 @@ TEST_F(CheckpointCallbackManagerTest, RegisterSaveCallbackTwice) {
 }
 
 TEST_F(CheckpointCallbackManagerTest, RegisterRestoreCallbackTwice) {
-  RestoreCallback first_callback = [](absl::string_view checkpoint_id,
-                                      absl::string_view str) {
+  RestoreCallback first_callback = [](abslx::string_view checkpoint_id,
+                                      abslx::string_view str) {
     return OkStatus();
   };
-  RestoreCallback second_callback = [](absl::string_view checkpoint_id,
-                                       absl::string_view str) {
+  RestoreCallback second_callback = [](abslx::string_view checkpoint_id,
+                                       abslx::string_view str) {
     return OkStatus();
   };
 
@@ -119,11 +119,11 @@ TEST_F(CheckpointCallbackManagerTest, RegisterRestoreCallbackTwice) {
 }
 
 TEST_F(CheckpointCallbackManagerTest, DoesSaveCallbackExist) {
-  SaveCallback first_callback = [](absl::string_view checkpoint_id) {
+  SaveCallback first_callback = [](abslx::string_view checkpoint_id) {
     return std::string("MockString");
   };
 
-  SaveCallback second_callback = [](absl::string_view checkpoint_id) {
+  SaveCallback second_callback = [](abslx::string_view checkpoint_id) {
     return std::string("MockString");
   };
 
@@ -140,12 +140,12 @@ TEST_F(CheckpointCallbackManagerTest, DoesSaveCallbackExist) {
 }
 
 TEST_F(CheckpointCallbackManagerTest, DoesRestoreCallbackExist) {
-  RestoreCallback first_callback = [](absl::string_view checkpoint_id,
-                                      absl::string_view str) {
+  RestoreCallback first_callback = [](abslx::string_view checkpoint_id,
+                                      abslx::string_view str) {
     return OkStatus();
   };
-  RestoreCallback second_callback = [](absl::string_view checkpoint_id,
-                                       absl::string_view str) {
+  RestoreCallback second_callback = [](abslx::string_view checkpoint_id,
+                                       abslx::string_view str) {
     return OkStatus();
   };
 
@@ -162,11 +162,11 @@ TEST_F(CheckpointCallbackManagerTest, DoesRestoreCallbackExist) {
 }
 
 TEST_F(CheckpointCallbackManagerTest, SaveTwoCallbacks) {
-  SaveCallback save_callback1 = [](absl::string_view checkpoint_id) {
-    return absl::StrCat("MockContent1::", checkpoint_id);
+  SaveCallback save_callback1 = [](abslx::string_view checkpoint_id) {
+    return abslx::StrCat("MockContent1::", checkpoint_id);
   };
-  SaveCallback save_callback2 = [](absl::string_view checkpoint_id) {
-    return absl::StrCat("MockContent2::", checkpoint_id);
+  SaveCallback save_callback2 = [](abslx::string_view checkpoint_id) {
+    return abslx::StrCat("MockContent2::", checkpoint_id);
   };
 
   TF_ASSERT_OK(checkpoint_callback_manager_->RegisterSaveCallback(
@@ -191,8 +191,8 @@ TEST_F(CheckpointCallbackManagerTest, SaveTwoCallbacks) {
 }
 
 TEST_F(CheckpointCallbackManagerTest, SaveMultipleTimes) {
-  SaveCallback save_callback = [](absl::string_view checkpoint_id) {
-    return absl::StrCat("MockContent::", checkpoint_id);
+  SaveCallback save_callback = [](abslx::string_view checkpoint_id) {
+    return abslx::StrCat("MockContent::", checkpoint_id);
   };
 
   TF_ASSERT_OK(checkpoint_callback_manager_->RegisterSaveCallback(
@@ -222,8 +222,8 @@ TEST_F(CheckpointCallbackManagerTest, SaveMultipleTimes) {
 TEST_F(CheckpointCallbackManagerTest, Restore) {
   int callback_call_count = 0;
   RestoreCallback restore_callback = [&callback_call_count](
-                                         absl::string_view checkpoint_id,
-                                         absl::string_view str) {
+                                         abslx::string_view checkpoint_id,
+                                         abslx::string_view str) {
     EXPECT_EQ(checkpoint_id, "model.ckpt-100");
     EXPECT_EQ(str, "Apple");
     ++callback_call_count;
@@ -248,7 +248,7 @@ TEST_F(CheckpointCallbackManagerTest, Restore) {
 }
 
 TEST_F(CheckpointCallbackManagerTest, SaveAndRestore) {
-  SaveCallback save_callback = [](absl::string_view checkpoint_id) {
+  SaveCallback save_callback = [](abslx::string_view checkpoint_id) {
     return std::string("Apple");
   };
 
@@ -257,8 +257,8 @@ TEST_F(CheckpointCallbackManagerTest, SaveAndRestore) {
 
   int restore_callback_count = 0;
   RestoreCallback restore_callback = [&restore_callback_count](
-                                         absl::string_view checkpoint_id,
-                                         absl::string_view str) {
+                                         abslx::string_view checkpoint_id,
+                                         abslx::string_view str) {
     EXPECT_EQ(checkpoint_id, "model.ckpt-500");
     EXPECT_EQ(str, "Apple");
     ++restore_callback_count;
@@ -278,8 +278,8 @@ TEST_F(CheckpointCallbackManagerTest, SaveAndRestore) {
 }
 
 TEST_F(CheckpointCallbackManagerTest, SaveLazyCallback) {
-  SaveCallback save_callback = [](absl::string_view checkpoint_id) {
-    return absl::StrCat("MockContent::", checkpoint_id);
+  SaveCallback save_callback = [](abslx::string_view checkpoint_id) {
+    return abslx::StrCat("MockContent::", checkpoint_id);
   };
 
   checkpoint_callback_manager_->Save(io::JoinPath(
@@ -298,8 +298,8 @@ TEST_F(CheckpointCallbackManagerTest, SaveLazyCallback) {
 TEST_F(CheckpointCallbackManagerTest, RestoreLazyCallback) {
   int callback_call_count = 0;
   RestoreCallback restore_callback = [&callback_call_count](
-                                         absl::string_view checkpoint_id,
-                                         absl::string_view str) {
+                                         abslx::string_view checkpoint_id,
+                                         abslx::string_view str) {
     EXPECT_EQ(checkpoint_id, "model.ckpt-100");
     EXPECT_EQ(str, "Apple");
     ++callback_call_count;

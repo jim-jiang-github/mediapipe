@@ -148,9 +148,9 @@ class AdaptiveSharedBatchScheduler
     // calling `ASBSQueue<TaskType>::Schedule` and used to form batches.
     //
     // If specified, it should be larger than or equal to 'max_batch_size'.
-    absl::optional<int> max_input_task_size = absl::nullopt;
+    abslx::optional<int> max_input_task_size = abslx::nullopt;
     // Maximum number of tasks to add to a specific batch.
-    absl::optional<int> max_tasks_per_batch = absl::nullopt;
+    abslx::optional<int> max_tasks_per_batch = abslx::nullopt;
     // Maximum number of enqueued (i.e. non-scheduled) batches.
     int max_enqueued_batches = 10;
     // Amount of time non-full batches must wait before becoming schedulable.

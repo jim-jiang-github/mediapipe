@@ -45,7 +45,7 @@ class MemorySpaceAssignmentRepacker {
     std::vector<AllocationBlock*> colocations;
 
     std::string ToString() const {
-      return absl::StrCat("[", start_time, ", ", end_time, "] : size = ", size,
+      return abslx::StrCat("[", start_time, ", ", end_time, "] : size = ", size,
                           ", offset = ", offset,
                           " initial offset = ", initial_offset);
     }
@@ -58,7 +58,7 @@ class MemorySpaceAssignmentRepacker {
   // Repack the AllocationBlocks provided in the parameter. Returns true if
   // allocations have been modified and false if not. Returns a non-ok status if
   // there was an error.
-  virtual StatusOr<bool> Repack(absl::Span<AllocationBlock*> allocations) = 0;
+  virtual StatusOr<bool> Repack(abslx::Span<AllocationBlock*> allocations) = 0;
 
  protected:
   int64_t max_size_;

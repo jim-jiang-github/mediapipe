@@ -83,7 +83,7 @@ class BFloat16NormalizationVisitor : public DfsHloVisitorWithDefault {
   // Inserts conversion HLOs to replace the called computations' BF16
   // operands/outputs to F32.
   Status ConvertCalledComputations(
-      HloInstruction* hlo, absl::Span<HloComputation* const> bf16_called_comps);
+      HloInstruction* hlo, abslx::Span<HloComputation* const> bf16_called_comps);
 
   HloComputation* computation_;
   const BFloat16Support* bfloat16_support_;
@@ -230,7 +230,7 @@ Status BFloat16NormalizationVisitor::InsertConvertBeforeOperand(
 }
 
 Status BFloat16NormalizationVisitor::ConvertCalledComputations(
-    HloInstruction* hlo, absl::Span<HloComputation* const> bf16_called_comps) {
+    HloInstruction* hlo, abslx::Span<HloComputation* const> bf16_called_comps) {
   std::map<HloComputation*, HloComputation*> cloned_computations;
   for (auto& comp : bf16_called_comps) {
     auto cloned = comp->parent()->AddEmbeddedComputation(comp->Clone());
@@ -523,7 +523,7 @@ Status BFloat16NormalizationVisitor::Preprocess(HloInstruction* hlo) {
 
 StatusOr<bool> BFloat16Normalization::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   XLA_VLOG_LINES(
       2, "BFloat16Normalization::Run(), before:\n" + module->ToString());
   BFloat16NormalizationVisitor visitor(bfloat16_support_, this);

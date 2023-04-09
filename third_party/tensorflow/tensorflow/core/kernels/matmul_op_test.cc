@@ -76,7 +76,7 @@ class FusedMatMulOpTest : public OpsTestBase {
 
     // Check if session has an available GPU device.
     const bool has_gpu_device =
-        absl::c_any_of(available_devices, [](const DeviceAttributes& device) {
+        abslx::c_any_of(available_devices, [](const DeviceAttributes& device) {
           return device.device_type() == DEVICE_GPU;
         });
 
@@ -164,7 +164,7 @@ class FusedMatMulOpTest : public OpsTestBase {
 
     std::vector<NodeDefBuilder::NodeOut> args;
     for (int i = 0; i < num_args; ++i) {
-      Output arg = ops::Const(root.WithOpName(absl::StrCat("arg", i)),
+      Output arg = ops::Const(root.WithOpName(abslx::StrCat("arg", i)),
                               Input::Initializer(args_data[i]));
       args.emplace_back(arg.name(), 0, dtype);
     }

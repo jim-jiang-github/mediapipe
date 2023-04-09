@@ -25,7 +25,7 @@
 // NOTE: The functions in this file are test only, and are should not be used in
 // non-test code.
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -42,7 +42,7 @@ struct DistributionMoments {
   double kurtosis = 0.0;
 };
 DistributionMoments ComputeDistributionMoments(
-    absl::Span<const double> data_points);
+    abslx::Span<const double> data_points);
 
 std::ostream& operator<<(std::ostream& os, const DistributionMoments& moments);
 
@@ -77,7 +77,7 @@ double beta(double p, double q);
 double InverseNormalSurvival(double x);
 
 // Returns whether actual is "near" expected, based on the bound.
-bool Near(absl::string_view msg, double actual, double expected, double bound);
+bool Near(abslx::string_view msg, double actual, double expected, double bound);
 
 // Implements the incomplete regularized beta function, AS63, BETAIN.
 //    https://www.jstor.org/stable/2346797
@@ -108,6 +108,6 @@ double BetaIncompleteInv(double p, double q, double alpha);
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_INTERNAL_DISTRIBUTION_TEST_UTIL_H_

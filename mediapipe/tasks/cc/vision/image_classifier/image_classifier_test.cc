@@ -171,7 +171,7 @@ TEST_F(CreateTest, FailsWithSelectiveOpResolverMissingOps) {
 
   // TODO: Make MediaPipe InferenceCalculator report the detailed
   // interpreter errors (e.g., "Encountered unresolved custom op").
-  EXPECT_EQ(image_classifier.status().code(), absl::StatusCode::kInternal);
+  EXPECT_EQ(image_classifier.status().code(), abslx::StatusCode::kInternal);
   EXPECT_THAT(image_classifier.status().message(),
               HasSubstr("interpreter_builder(&interpreter) == kTfLiteOk"));
 }
@@ -180,13 +180,13 @@ TEST_F(CreateTest, FailsWithMissingModel) {
       ImageClassifier::Create(std::make_unique<ImageClassifierOptions>());
 
   EXPECT_EQ(image_classifier.status().code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       image_classifier.status().message(),
       HasSubstr("ExternalFile must specify at least one of 'file_content', "
                 "'file_name', 'file_pointer_meta' or 'file_descriptor_meta'."));
   EXPECT_THAT(image_classifier.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInitializationError))));
 }
 
@@ -199,11 +199,11 @@ TEST_F(CreateTest, FailsWithInvalidMaxResults) {
   auto image_classifier = ImageClassifier::Create(std::move(options));
 
   EXPECT_EQ(image_classifier.status().code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(image_classifier.status().message(),
               HasSubstr("Invalid `max_results` option"));
   EXPECT_THAT(image_classifier.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInitializationError))));
 }
 
@@ -217,11 +217,11 @@ TEST_F(CreateTest, FailsWithCombinedAllowlistAndDenylist) {
   auto image_classifier = ImageClassifier::Create(std::move(options));
 
   EXPECT_EQ(image_classifier.status().code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(image_classifier.status().message(),
               HasSubstr("mutually exclusive options"));
   EXPECT_THAT(image_classifier.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInitializationError))));
 }
 
@@ -232,18 +232,18 @@ TEST_F(CreateTest, FailsWithIllegalCallbackInImageOrVideoMode) {
     options->base_options.model_asset_path =
         JoinPath("./", kTestDataDirectory, kMobileNetQuantizedWithMetadata);
     options->running_mode = running_mode;
-    options->result_callback = [](absl::StatusOr<ImageClassifierResult>,
+    options->result_callback = [](abslx::StatusOr<ImageClassifierResult>,
                                   const Image& image, int64 timestamp_ms) {};
 
     auto image_classifier = ImageClassifier::Create(std::move(options));
 
     EXPECT_EQ(image_classifier.status().code(),
-              absl::StatusCode::kInvalidArgument);
+              abslx::StatusCode::kInvalidArgument);
     EXPECT_THAT(
         image_classifier.status().message(),
         HasSubstr("a user-defined result callback shouldn't be provided"));
     EXPECT_THAT(image_classifier.status().GetPayload(kMediaPipeTasksPayload),
-                Optional(absl::Cord(absl::StrCat(
+                Optional(abslx::Cord(abslx::StrCat(
                     MediaPipeTasksStatus::kInvalidTaskGraphConfigError))));
   }
 }
@@ -257,11 +257,11 @@ TEST_F(CreateTest, FailsWithMissingCallbackInLiveStreamMode) {
   auto image_classifier = ImageClassifier::Create(std::move(options));
 
   EXPECT_EQ(image_classifier.status().code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(image_classifier.status().message(),
               HasSubstr("a user-defined result callback must be provided"));
   EXPECT_THAT(image_classifier.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kInvalidTaskGraphConfigError))));
 }
 
@@ -278,19 +278,19 @@ TEST_F(ImageModeTest, FailsWithCallingWrongMethod) {
                           ImageClassifier::Create(std::move(options)));
 
   auto results = image_classifier->ClassifyForVideo(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the video mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
 
   results = image_classifier->ClassifyAsync(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the live stream mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
   MP_ASSERT_OK(image_classifier->Close());
 }
@@ -559,12 +559,12 @@ TEST_F(ImageModeTest, FailsWithInvalidImageProcessingOptions) {
   ImageProcessingOptions image_processing_options{roi,
                                                   /*rotation_degrees=*/0};
   auto results = image_classifier->Classify(image, image_processing_options);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("Expected RectF with left < right and top < bottom"));
   EXPECT_THAT(
       results.status().GetPayload(kMediaPipeTasksPayload),
-      Optional(absl::Cord(absl::StrCat(
+      Optional(abslx::Cord(abslx::StrCat(
           MediaPipeTasksStatus::kImageProcessingInvalidArgumentError))));
 
   // Invalid: top > bottom.
@@ -572,12 +572,12 @@ TEST_F(ImageModeTest, FailsWithInvalidImageProcessingOptions) {
   image_processing_options = {roi,
                               /*rotation_degrees=*/0};
   results = image_classifier->Classify(image, image_processing_options);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("Expected RectF with left < right and top < bottom"));
   EXPECT_THAT(
       results.status().GetPayload(kMediaPipeTasksPayload),
-      Optional(absl::Cord(absl::StrCat(
+      Optional(abslx::Cord(abslx::StrCat(
           MediaPipeTasksStatus::kImageProcessingInvalidArgumentError))));
 
   // Invalid: coordinates out of [0,1] range.
@@ -585,24 +585,24 @@ TEST_F(ImageModeTest, FailsWithInvalidImageProcessingOptions) {
   image_processing_options = {roi,
                               /*rotation_degrees=*/0};
   results = image_classifier->Classify(image, image_processing_options);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("Expected RectF values to be in [0,1]"));
   EXPECT_THAT(
       results.status().GetPayload(kMediaPipeTasksPayload),
-      Optional(absl::Cord(absl::StrCat(
+      Optional(abslx::Cord(abslx::StrCat(
           MediaPipeTasksStatus::kImageProcessingInvalidArgumentError))));
 
   // Invalid: rotation not a multiple of 90°.
   image_processing_options = {/*region_of_interest=*/std::nullopt,
                               /*rotation_degrees=*/1};
   results = image_classifier->Classify(image, image_processing_options);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("Expected rotation to be a multiple of 90°"));
   EXPECT_THAT(
       results.status().GetPayload(kMediaPipeTasksPayload),
-      Optional(absl::Cord(absl::StrCat(
+      Optional(abslx::Cord(abslx::StrCat(
           MediaPipeTasksStatus::kImageProcessingInvalidArgumentError))));
 }
 
@@ -620,19 +620,19 @@ TEST_F(VideoModeTest, FailsWithCallingWrongMethod) {
                           ImageClassifier::Create(std::move(options)));
 
   auto results = image_classifier->Classify(image);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the image mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
 
   results = image_classifier->ClassifyAsync(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the live stream mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
   MP_ASSERT_OK(image_classifier->Close());
 }
@@ -651,11 +651,11 @@ TEST_F(VideoModeTest, FailsWithOutOfOrderInputTimestamps) {
 
   MP_ASSERT_OK(image_classifier->ClassifyForVideo(image, 1));
   auto results = image_classifier->ClassifyForVideo(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("timestamp must be monotonically increasing"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInvalidTimestampError))));
   MP_ASSERT_OK(image_classifier->ClassifyForVideo(image, 2));
   MP_ASSERT_OK(image_classifier->Close());
@@ -718,25 +718,25 @@ TEST_F(LiveStreamModeTest, FailsWithCallingWrongMethod) {
   options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kMobileNetFloatWithMetadata);
   options->running_mode = core::RunningMode::LIVE_STREAM;
-  options->result_callback = [](absl::StatusOr<ImageClassifierResult>,
+  options->result_callback = [](abslx::StatusOr<ImageClassifierResult>,
                                 const Image& image, int64 timestamp_ms) {};
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ImageClassifier> image_classifier,
                           ImageClassifier::Create(std::move(options)));
 
   auto results = image_classifier->Classify(image);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the image mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
 
   results = image_classifier->ClassifyForVideo(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the video mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
   MP_ASSERT_OK(image_classifier->Close());
 }
@@ -749,18 +749,18 @@ TEST_F(LiveStreamModeTest, FailsWithOutOfOrderInputTimestamps) {
   options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kMobileNetFloatWithMetadata);
   options->running_mode = core::RunningMode::LIVE_STREAM;
-  options->result_callback = [](absl::StatusOr<ImageClassifierResult>,
+  options->result_callback = [](abslx::StatusOr<ImageClassifierResult>,
                                 const Image& image, int64 timestamp_ms) {};
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ImageClassifier> image_classifier,
                           ImageClassifier::Create(std::move(options)));
 
   MP_ASSERT_OK(image_classifier->ClassifyAsync(image, 1));
   auto status = image_classifier->ClassifyAsync(image, 0);
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(),
               HasSubstr("timestamp must be monotonically increasing"));
   EXPECT_THAT(status.GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInvalidTimestampError))));
   MP_ASSERT_OK(image_classifier->ClassifyAsync(image, 2));
   MP_ASSERT_OK(image_classifier->Close());
@@ -784,7 +784,7 @@ TEST_F(LiveStreamModeTest, Succeeds) {
   options->running_mode = core::RunningMode::LIVE_STREAM;
   options->classifier_options.max_results = 3;
   options->result_callback =
-      [&results](absl::StatusOr<ImageClassifierResult> classification_result,
+      [&results](abslx::StatusOr<ImageClassifierResult> classification_result,
                  const Image& image, int64 timestamp_ms) {
         MP_ASSERT_OK(classification_result.status());
         results.push_back(
@@ -827,7 +827,7 @@ TEST_F(LiveStreamModeTest, SucceedsWithRegionOfInterest) {
   options->running_mode = core::RunningMode::LIVE_STREAM;
   options->classifier_options.max_results = 1;
   options->result_callback =
-      [&results](absl::StatusOr<ImageClassifierResult> classification_result,
+      [&results](abslx::StatusOr<ImageClassifierResult> classification_result,
                  const Image& image, int64 timestamp_ms) {
         MP_ASSERT_OK(classification_result.status());
         results.push_back(

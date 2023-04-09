@@ -87,7 +87,7 @@ class RandomIndexShuffleOp : public OpKernel {
                 (seed_t.dims() == 1 && seed_t.dim_size(0) == 3) ||
                     (seed_t.dims() == 2 && seed_t.dim_size(0) == num_outputs &&
                      seed_t.dim_size(1) == 3),
-                errors::InvalidArgument(absl::StrFormat(
+                errors::InvalidArgument(abslx::StrFormat(
                     "Seed must be a vector of size [3] "
                     "or a matrix of size [%d, 3] but got %s.",
                     num_outputs, seed_t.shape().DebugString())));
@@ -96,7 +96,7 @@ class RandomIndexShuffleOp : public OpKernel {
         max_index_t.dims() == 0 ||
             (max_index_t.dims() == 1 && max_index_t.dim_size(0) == num_outputs),
         errors::InvalidArgument(
-            absl::StrFormat("Maxval must be a scalar or a vector of "
+            abslx::StrFormat("Maxval must be a scalar or a vector of "
                             "the same size as index but got %s",
                             max_index_t.shape().DebugString())));
 

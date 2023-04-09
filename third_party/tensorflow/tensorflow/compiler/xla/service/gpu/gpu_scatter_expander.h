@@ -27,7 +27,7 @@ class GpuScatterExpander : public ScatterExpander {
   // InstruuctionMatchesPattern and select only some scatters to expand.
   GpuScatterExpander() : ScatterExpander(kEliminateAllScatters) {}
 
-  absl::string_view name() const override { return "gpu_scatter_expander"; }
+  abslx::string_view name() const override { return "gpu_scatter_expander"; }
 
  protected:
   bool InstructionMatchesPattern(HloInstruction* inst) override;

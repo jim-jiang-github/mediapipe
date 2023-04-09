@@ -53,7 +53,7 @@ TEST(IncrementalBarrierTest, RunInstantlyWhenZeroClosure) {
   EXPECT_EQ(counter.GetCount(), 0);
   {
     IncrementalBarrier::DoneCallback done_callback =
-        absl::bind_front(&Counter::Increment, &counter);
+        abslx::bind_front(&Counter::Increment, &counter);
     IncrementalBarrier barrier(done_callback);
     EXPECT_EQ(counter.GetCount(), 0);
   }
@@ -66,7 +66,7 @@ TEST(IncrementalBarrierTest, RunAfterNumClosuresOneNowTwoLater) {
   IncrementalBarrier::BarrierCallback bc1, bc2;
   {
     IncrementalBarrier::DoneCallback done_callback =
-        absl::bind_front(&Counter::Increment, &counter);
+        abslx::bind_front(&Counter::Increment, &counter);
     IncrementalBarrier barrier(done_callback);
 
     CHECK_EQ(counter.GetCount(), 0);
@@ -94,7 +94,7 @@ TEST(IncrementalBarrierTest, RunAfterNumClosuresConcurrency) {
 
   {
     IncrementalBarrier::DoneCallback done_callback =
-        absl::bind_front(&Counter::Increment, &counter);
+        abslx::bind_front(&Counter::Increment, &counter);
     IncrementalBarrier barrier(done_callback);
 
     CHECK_EQ(counter.GetCount(), 0);

@@ -100,7 +100,7 @@ class CalculatorState {
     counter_factory_ = counter_factory;
   }
 
-  absl::Status SetServicePacket(const GraphServiceBase& service,
+  abslx::Status SetServicePacket(const GraphServiceBase& service,
                                 Packet packet) {
     return graph_service_manager_.SetServicePacket(service, packet);
   }

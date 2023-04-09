@@ -65,7 +65,7 @@ Status ParseValue(StringPiece input, bool* value) {
 }
 
 Status ParseValue(StringPiece input, int32* value) {
-  bool parse_result = absl::SimpleAtoi(input, value);
+  bool parse_result = abslx::SimpleAtoi(input, value);
   if (!parse_result) {
     return errors::InvalidArgument("Could not parse int32 from ", input);
   }
@@ -87,7 +87,7 @@ Status ParseValue(StringPiece input, std::vector<int32>* value) {
   value->reserve(parts.size());
   for (const auto& value_str : parts) {
     int32_t value_int;
-    bool parse_result = absl::SimpleAtoi(value_str, &value_int);
+    bool parse_result = abslx::SimpleAtoi(value_str, &value_int);
     if (!parse_result) {
       return errors::InvalidArgument("Could not parse list of integers from ",
                                      input);
@@ -105,7 +105,7 @@ Status AddOpAttr(const std::string& name, const std::string& attr_value,
                  tfrt::OpAttrs* opattrs) {
   Status s;
   // Splits attr_value into type and value
-  std::vector<absl::string_view> value_split = tfd::AttrValueSplit(attr_value);
+  std::vector<abslx::string_view> value_split = tfd::AttrValueSplit(attr_value);
   auto& type = value_split[0];
   auto& value = value_split[1];
   if (type == "bool") {

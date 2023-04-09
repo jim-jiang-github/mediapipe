@@ -43,10 +43,10 @@ constexpr char kTestModelPath[] =
     "mediapipe/tasks/testdata/text/"
     "test_model_text_classifier_with_regex_tokenizer.tflite";
 
-absl::StatusOr<std::vector<int>> RunRegexPreprocessorCalculator(
-    absl::string_view text) {
+abslx::StatusOr<std::vector<int>> RunRegexPreprocessorCalculator(
+    abslx::string_view text) {
   auto graph_config =
-      ParseTextProtoOrDie<CalculatorGraphConfig>(absl::Substitute(
+      ParseTextProtoOrDie<CalculatorGraphConfig>(abslx::Substitute(
           R"pb(
             input_stream: "text"
             output_stream: "tensors"
@@ -82,17 +82,17 @@ absl::StatusOr<std::vector<int>> RunRegexPreprocessorCalculator(
   MP_RETURN_IF_ERROR(graph.WaitUntilIdle());
 
   if (output_packets.size() != 1) {
-    return absl::InvalidArgumentError(absl::Substitute(
+    return abslx::InvalidArgumentError(abslx::Substitute(
         "output_packets has size $0, expected 1", output_packets.size()));
   }
   const std::vector<Tensor>& tensor_vec =
       output_packets[0].Get<std::vector<Tensor>>();
   if (tensor_vec.size() != 1) {
-    return absl::InvalidArgumentError(absl::Substitute(
+    return abslx::InvalidArgumentError(abslx::Substitute(
         "tensor_vec has size $0, expected $1", tensor_vec.size(), 1));
   }
   if (tensor_vec[0].element_type() != Tensor::ElementType::kInt32) {
-    return absl::InvalidArgumentError("Expected tensor element type kInt32");
+    return abslx::InvalidArgumentError("Expected tensor element type kInt32");
   }
   auto* buffer = tensor_vec[0].GetCpuReadView().buffer<int>();
   std::vector<int> result(buffer, buffer + kMaxSeqLen);

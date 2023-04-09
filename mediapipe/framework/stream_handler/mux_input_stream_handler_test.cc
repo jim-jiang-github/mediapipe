@@ -140,7 +140,7 @@ constexpr char kGateAndMuxGraph[] = R"pb(
     input_stream_handler { input_stream_handler: "MuxInputStreamHandler" }
   })pb";
 
-absl::Status SendInput(GateAndMuxGraphInput in, CalculatorGraph& graph) {
+abslx::Status SendInput(GateAndMuxGraphInput in, CalculatorGraph& graph) {
   MP_RETURN_IF_ERROR(graph.AddPacketToInputStream(
       "input0", MakePacket<int>(in.input0).At(in.at)));
   MP_RETURN_IF_ERROR(graph.AddPacketToInputStream(

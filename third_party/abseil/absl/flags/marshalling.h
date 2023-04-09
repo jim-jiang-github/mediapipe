@@ -33,7 +33,7 @@
 // * `double`
 // * `std::string`
 // * `std::vector<std::string>`
-// * `absl::LogSeverity` (provided natively for layering reasons)
+// * `abslx::LogSeverity` (provided natively for layering reasons)
 //
 // Note that support for integral types is implemented using overloads for
 // variable-width fundamental types (`short`, `int`, `long`, etc.). However,
@@ -46,17 +46,17 @@
 //
 // The Abseil time library provides the following support for civil time values:
 //
-// * `absl::CivilSecond`
-// * `absl::CivilMinute`
-// * `absl::CivilHour`
-// * `absl::CivilDay`
-// * `absl::CivilMonth`
-// * `absl::CivilYear`
+// * `abslx::CivilSecond`
+// * `abslx::CivilMinute`
+// * `abslx::CivilHour`
+// * `abslx::CivilDay`
+// * `abslx::CivilMonth`
+// * `abslx::CivilYear`
 //
 // and also provides support for the following absolute time values:
 //
-// * `absl::Duration`
-// * `absl::Time`
+// * `abslx::Duration`
+// * `abslx::Time`
 //
 // Additional support for Abseil types will be noted here as it is added.
 //
@@ -86,7 +86,7 @@
 //   // Parses an OutputMode from the command line flag value `text`. Returns
 //   // `true` and sets `*mode` on success; returns `false` and sets `*error`
 //   // on failure.
-//   bool AbslParseFlag(absl::string_view text,
+//   bool AbslParseFlag(abslx::string_view text,
 //                      OutputMode* mode,
 //                      std::string* error) {
 //     if (text == "plaintext") {
@@ -110,7 +110,7 @@
 //      case kPlainText: return "plaintext";
 //      case kHtml: return "html";
 //    }
-//    return absl::StrCat(mode);
+//    return abslx::StrCat(mode);
 //  }
 //
 // Notice that neither `AbslParseFlag()` nor `AbslUnparseFlag()` are class
@@ -120,7 +120,7 @@
 // given type will be discovered via Argument-Dependent Lookup (ADL).
 //
 // `AbslParseFlag()` may need, in turn, to parse simpler constituent types
-// using `absl::ParseFlag()`. For example, a custom struct `MyFlagType`
+// using `abslx::ParseFlag()`. For example, a custom struct `MyFlagType`
 // consisting of a `std::pair<int, std::string>` would add an `AbslParseFlag()`
 // overload for its `MyFlagType` like so:
 //
@@ -132,32 +132,32 @@
 //     std::pair<int, std::string> my_flag_data;
 //   };
 //
-//   bool AbslParseFlag(absl::string_view text, MyFlagType* flag,
+//   bool AbslParseFlag(abslx::string_view text, MyFlagType* flag,
 //                      std::string* err);
 //
 //   std::string AbslUnparseFlag(const MyFlagType&);
 //
 //   // Within the implementation, `AbslParseFlag()` will, in turn invoke
-//   // `absl::ParseFlag()` on its constituent `int` and `std::string` types
+//   // `abslx::ParseFlag()` on its constituent `int` and `std::string` types
 //   // (which have built-in Abseil flag support).
 //
-//   bool AbslParseFlag(absl::string_view text, MyFlagType* flag,
+//   bool AbslParseFlag(abslx::string_view text, MyFlagType* flag,
 //                      std::string* err) {
-//     std::pair<absl::string_view, absl::string_view> tokens =
-//         absl::StrSplit(text, ',');
-//     if (!absl::ParseFlag(tokens.first, &flag->my_flag_data.first, err))
+//     std::pair<abslx::string_view, abslx::string_view> tokens =
+//         abslx::StrSplit(text, ',');
+//     if (!abslx::ParseFlag(tokens.first, &flag->my_flag_data.first, err))
 //         return false;
-//     if (!absl::ParseFlag(tokens.second, &flag->my_flag_data.second, err))
+//     if (!abslx::ParseFlag(tokens.second, &flag->my_flag_data.second, err))
 //         return false;
 //     return true;
 //   }
 //
-//   // Similarly, for unparsing, we can simply invoke `absl::UnparseFlag()` on
+//   // Similarly, for unparsing, we can simply invoke `abslx::UnparseFlag()` on
 //   // the constituent types.
 //   std::string AbslUnparseFlag(const MyFlagType& flag) {
-//     return absl::StrCat(absl::UnparseFlag(flag.my_flag_data.first),
+//     return abslx::StrCat(abslx::UnparseFlag(flag.my_flag_data.first),
 //                         ",",
-//                         absl::UnparseFlag(flag.my_flag_data.second));
+//                         abslx::UnparseFlag(flag.my_flag_data.second));
 //   }
 #ifndef ABSL_FLAGS_MARSHALLING_H_
 #define ABSL_FLAGS_MARSHALLING_H_
@@ -168,37 +168,37 @@
 #include "absl/base/config.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace flags_internal {
 
 // Overloads of `AbslParseFlag()` and `AbslUnparseFlag()` for fundamental types.
-bool AbslParseFlag(absl::string_view, bool*, std::string*);
-bool AbslParseFlag(absl::string_view, short*, std::string*);           // NOLINT
-bool AbslParseFlag(absl::string_view, unsigned short*, std::string*);  // NOLINT
-bool AbslParseFlag(absl::string_view, int*, std::string*);             // NOLINT
-bool AbslParseFlag(absl::string_view, unsigned int*, std::string*);    // NOLINT
-bool AbslParseFlag(absl::string_view, long*, std::string*);            // NOLINT
-bool AbslParseFlag(absl::string_view, unsigned long*, std::string*);   // NOLINT
-bool AbslParseFlag(absl::string_view, long long*, std::string*);       // NOLINT
-bool AbslParseFlag(absl::string_view, unsigned long long*,             // NOLINT
+bool AbslParseFlag(abslx::string_view, bool*, std::string*);
+bool AbslParseFlag(abslx::string_view, short*, std::string*);           // NOLINT
+bool AbslParseFlag(abslx::string_view, unsigned short*, std::string*);  // NOLINT
+bool AbslParseFlag(abslx::string_view, int*, std::string*);             // NOLINT
+bool AbslParseFlag(abslx::string_view, unsigned int*, std::string*);    // NOLINT
+bool AbslParseFlag(abslx::string_view, long*, std::string*);            // NOLINT
+bool AbslParseFlag(abslx::string_view, unsigned long*, std::string*);   // NOLINT
+bool AbslParseFlag(abslx::string_view, long long*, std::string*);       // NOLINT
+bool AbslParseFlag(abslx::string_view, unsigned long long*,             // NOLINT
                    std::string*);
-bool AbslParseFlag(absl::string_view, float*, std::string*);
-bool AbslParseFlag(absl::string_view, double*, std::string*);
-bool AbslParseFlag(absl::string_view, std::string*, std::string*);
-bool AbslParseFlag(absl::string_view, std::vector<std::string>*, std::string*);
+bool AbslParseFlag(abslx::string_view, float*, std::string*);
+bool AbslParseFlag(abslx::string_view, double*, std::string*);
+bool AbslParseFlag(abslx::string_view, std::string*, std::string*);
+bool AbslParseFlag(abslx::string_view, std::vector<std::string>*, std::string*);
 
 template <typename T>
-bool InvokeParseFlag(absl::string_view input, T* dst, std::string* err) {
+bool InvokeParseFlag(abslx::string_view input, T* dst, std::string* err) {
   // Comment on next line provides a good compiler error message if T
-  // does not have AbslParseFlag(absl::string_view, T*, std::string*).
+  // does not have AbslParseFlag(abslx::string_view, T*, std::string*).
   return AbslParseFlag(input, dst, err);  // Is T missing AbslParseFlag?
 }
 
 // Strings and std:: containers do not have the same overload resolution
 // considerations as fundamental types. Naming these 'AbslUnparseFlag' means we
 // can avoid the need for additional specializations of Unparse (below).
-std::string AbslUnparseFlag(absl::string_view v);
+std::string AbslUnparseFlag(abslx::string_view v);
 std::string AbslUnparseFlag(const std::vector<std::string>&);
 
 template <typename T>
@@ -231,9 +231,9 @@ std::string Unparse(double v);
 //
 // Some implementations of `AbslParseFlag()` for types which consist of other,
 // constituent types which already have Abseil flag support, may need to call
-// `absl::ParseFlag()` on those consituent string values. (See above.)
+// `abslx::ParseFlag()` on those consituent string values. (See above.)
 template <typename T>
-inline bool ParseFlag(absl::string_view input, T* dst, std::string* error) {
+inline bool ParseFlag(abslx::string_view input, T* dst, std::string* error) {
   return flags_internal::InvokeParseFlag(input, dst, error);
 }
 
@@ -245,20 +245,20 @@ inline bool ParseFlag(absl::string_view input, T* dst, std::string* error) {
 //
 // Some implementations of `AbslUnparseFlag()` for types which consist of other,
 // constituent types which already have Abseil flag support, may want to call
-// `absl::UnparseFlag()` on those constituent types. (See above.)
+// `abslx::UnparseFlag()` on those constituent types. (See above.)
 template <typename T>
 inline std::string UnparseFlag(const T& v) {
   return flags_internal::Unparse(v);
 }
 
-// Overloads for `absl::LogSeverity` can't (easily) appear alongside that type's
+// Overloads for `abslx::LogSeverity` can't (easily) appear alongside that type's
 // definition because it is layered below flags.  See proper documentation in
 // base/log_severity.h.
 enum class LogSeverity : int;
-bool AbslParseFlag(absl::string_view, absl::LogSeverity*, std::string*);
-std::string AbslUnparseFlag(absl::LogSeverity);
+bool AbslParseFlag(abslx::string_view, abslx::LogSeverity*, std::string*);
+std::string AbslUnparseFlag(abslx::LogSeverity);
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_FLAGS_MARSHALLING_H_

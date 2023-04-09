@@ -323,12 +323,12 @@ class GemmRewriterVisitor : public DfsHloRewriteVisitor {
     // We require the bias vector to have been broadcast in the most major
     // dimensions; i.e. its most minor physical dimensions align with most minor
     // physical dimensions of the matmul output.
-    absl::Span<const int64_t> broadcast_dims = broadcast_bias->dimensions();
+    abslx::Span<const int64_t> broadcast_dims = broadcast_bias->dimensions();
     for (size_t i = 0; i < num_col_dims; ++i) {
       int64_t dim = matmul->shape().layout().minor_to_major(i);
 
       // Find the corresponding dimension from the bias vector.
-      auto it = absl::c_find(broadcast_dims, dim);
+      auto it = abslx::c_find(broadcast_dims, dim);
 
       if (it == broadcast_dims.end()) {
         return false;
@@ -365,7 +365,7 @@ StatusOr<bool> RunOnComputation(HloComputation *computation) {
 
 StatusOr<bool> GemmRewriter::Run(
     HloModule *module,
-    const absl::flat_hash_set<absl::string_view> &execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view> &execution_threads) {
   bool changed = false;
   for (HloComputation *computation :
        module->MakeNonfusionComputations(execution_threads)) {

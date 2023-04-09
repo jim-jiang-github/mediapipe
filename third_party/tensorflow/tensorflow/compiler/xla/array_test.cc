@@ -137,7 +137,7 @@ TEST(ArrayTest, DataPointer) {
 
 TEST(ArrayTest, StringificationEmpty) {
   Array<int64_t> arr({}, 0);
-  constexpr absl::string_view expected = "";
+  constexpr abslx::string_view expected = "";
   EXPECT_EQ(expected, arr.ToString());
 }
 
@@ -149,7 +149,7 @@ TEST(ArrayTest, Stringification1D) {
 
 TEST(ArrayTest, StringificationEmpty1D) {
   Array<int64_t> arr({0}, 0);
-  constexpr absl::string_view expected = "[]";
+  constexpr abslx::string_view expected = "[]";
   EXPECT_EQ(expected, arr.ToString());
 }
 
@@ -161,7 +161,7 @@ TEST(ArrayTest, Stringification2D) {
 
 TEST(ArrayTest, StringificationEmpty2D) {
   Array<int64_t> arr({0, 0}, 0);
-  constexpr absl::string_view expected = "[[]]";
+  constexpr abslx::string_view expected = "[[]]";
   EXPECT_EQ(expected, arr.ToString());
 }
 
@@ -178,13 +178,13 @@ TEST(ArrayTest, Stringification3D) {
 
 TEST(ArrayTest, StringificationEmpty3D) {
   Array<int64_t> arr({0, 0, 0}, 0);
-  constexpr absl::string_view expected = "[[[]]]";
+  constexpr abslx::string_view expected = "[[[]]]";
   EXPECT_EQ(expected, arr.ToString());
 }
 
 TEST(ArrayTest, Stringification3DOneZeroDim) {
   Array<int64_t> arr({1, 0, 2}, 0);
-  constexpr absl::string_view expected = "[[[, ]]]";
+  constexpr abslx::string_view expected = "[[[, ]]]";
   EXPECT_EQ(expected, arr.ToString());
 }
 
@@ -193,7 +193,7 @@ TEST(ArrayTest, Each) {
   arr.FillWithMultiples(1);
 
   int64_t each_count = 0, each_sum = 0;
-  arr.Each([&](absl::Span<const int64_t> idx, int cell) {
+  arr.Each([&](abslx::Span<const int64_t> idx, int cell) {
     int64_t lin_idx = idx[0] * 12 + idx[1] * 4 + idx[2];
     EXPECT_EQ(lin_idx, cell);
     each_count++;

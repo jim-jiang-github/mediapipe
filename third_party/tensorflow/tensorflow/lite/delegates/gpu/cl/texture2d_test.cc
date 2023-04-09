@@ -35,7 +35,7 @@ TEST_F(OpenCLTest, Texture2DTestFloat) {
   Texture2D texture;
   ASSERT_OK(CreateTexture2DRGBA32F(1, 2, &env_.context(), &texture));
   ASSERT_OK(texture.WriteData(env_.queue(),
-                              absl::MakeConstSpan(data.data(), data.size())));
+                              abslx::MakeConstSpan(data.data(), data.size())));
   std::vector<float> gpu_data;
   ASSERT_OK(texture.ReadData<float>(env_.queue(), &gpu_data));
 
@@ -48,7 +48,7 @@ TEST_F(OpenCLTest, Texture2DTestHalf) {
   Texture2D texture;
   ASSERT_OK(CreateTexture2DRGBA16F(2, 1, &env_.context(), &texture));
   ASSERT_OK(texture.WriteData(env_.queue(),
-                              absl::MakeConstSpan(data.data(), data.size())));
+                              abslx::MakeConstSpan(data.data(), data.size())));
   std::vector<half> gpu_data;
   ASSERT_OK(texture.ReadData<half>(env_.queue(), &gpu_data));
 

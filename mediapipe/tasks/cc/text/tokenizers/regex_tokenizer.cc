@@ -35,8 +35,8 @@ constexpr char kPad[] = "<PAD>";
 constexpr char kUnknown[] = "<UNKNOWN>";
 
 void buildIndexTokenMap(
-    const absl::node_hash_map<std::string, int>& token_index_map,
-    absl::node_hash_map<int, absl::string_view>* index_token_map) {
+    const abslx::node_hash_map<std::string, int>& token_index_map,
+    abslx::node_hash_map<int, abslx::string_view>* index_token_map) {
   for (const auto& token : token_index_map) {
     (*index_token_map)[token.second] = token.first;
   }
@@ -50,7 +50,7 @@ void buildIndexTokenMap(
 // surrounded by parenthesis.
 RegexTokenizer::RegexTokenizer(const std::string& regex_pattern,
                                const std::string& path_to_vocab)
-    : delim_re_{absl::Substitute("($0)", regex_pattern)},
+    : delim_re_{abslx::Substitute("($0)", regex_pattern)},
       token_index_map_{LoadVocabAndIndexFromFile(path_to_vocab)} {
   buildIndexTokenMap(token_index_map_, &index_token_map_);
 }
@@ -58,22 +58,22 @@ RegexTokenizer::RegexTokenizer(const std::string& regex_pattern,
 RegexTokenizer::RegexTokenizer(const std::string& regex_pattern,
                                const char* vocab_buffer_data,
                                size_t vocab_buffer_size)
-    : delim_re_{absl::Substitute("($0)", regex_pattern)},
+    : delim_re_{abslx::Substitute("($0)", regex_pattern)},
       token_index_map_{
           LoadVocabAndIndexFromBuffer(vocab_buffer_data, vocab_buffer_size)} {
   buildIndexTokenMap(token_index_map_, &index_token_map_);
 }
 
 TokenizerResult RegexTokenizer::Tokenize(const std::string& input) {
-  absl::string_view leftover(input.data());
-  absl::string_view last_end = leftover;
+  abslx::string_view leftover(input.data());
+  abslx::string_view last_end = leftover;
 
   TokenizerResult result;
 
   // Keep looking for split points until we have reached the end of the input.
-  absl::string_view extracted_delim_token;
+  abslx::string_view extracted_delim_token;
   while (RE2::FindAndConsume(&leftover, delim_re_, &extracted_delim_token)) {
-    absl::string_view token(last_end.data(),
+    abslx::string_view token(last_end.data(),
                             extracted_delim_token.data() - last_end.data());
     bool has_non_empty_token = token.length() > 0;
 
@@ -93,7 +93,7 @@ TokenizerResult RegexTokenizer::Tokenize(const std::string& input) {
   return result;
 }
 
-bool RegexTokenizer::LookupId(absl::string_view key, int* result) const {
+bool RegexTokenizer::LookupId(abslx::string_view key, int* result) const {
   auto it = token_index_map_.find(key);
   if (it == token_index_map_.end()) {
     return false;
@@ -102,7 +102,7 @@ bool RegexTokenizer::LookupId(absl::string_view key, int* result) const {
   return true;
 }
 
-bool RegexTokenizer::LookupWord(int vocab_id, absl::string_view* result) const {
+bool RegexTokenizer::LookupWord(int vocab_id, abslx::string_view* result) const {
   auto it = index_token_map_.find(vocab_id);
   if (it == index_token_map_.end()) {
     return false;

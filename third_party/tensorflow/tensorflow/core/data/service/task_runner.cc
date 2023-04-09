@@ -124,7 +124,7 @@ void FirstComeFirstServedTaskRunner::RunPrefetchThread() {
       buffer_.Cancel(status);
     }
   };
-  prefetch_thread_ = absl::WrapUnique(Env::Default()->StartThread(
+  prefetch_thread_ = abslx::WrapUnique(Env::Default()->StartThread(
       /*thread_options=*/{}, /*name=*/"tf_data_service_fcfs_prefetch_thread",
       prefetch_fn));
 }
@@ -259,7 +259,7 @@ Status RoundRobinTaskRunner::PreparePartialRound()
 Status RoundRobinTaskRunner::PrepareRound(const GetElementRequest& req) {
   mutex_lock l(mu_);
   first_round_ = std::min(first_round_, req.round_index());
-  absl::flat_hash_map<int64_t, const GetElementRequest*>& round =
+  abslx::flat_hash_map<int64_t, const GetElementRequest*>& round =
       requests_[req.round_index()];
   round[req.consumer_index()] = &req;
   auto cleanup = gtl::MakeCleanup([&]() TF_EXCLUSIVE_LOCKS_REQUIRED(mu_) {
@@ -339,7 +339,7 @@ void RoundRobinTaskRunner::Cancel() {
 PrefetchThread::PrefetchThread(std::unique_ptr<TaskIterator> iterator,
                                int64_t round_size)
     : iterator_(std::move(iterator)), round_size_(round_size) {
-  thread_ = absl::WrapUnique(
+  thread_ = abslx::WrapUnique(
       Env::Default()->StartThread({}, "round-robin-prefetch", [&] { Run(); }));
 }
 

@@ -22,7 +22,7 @@
 #include "absl/strings/str_format.h"
 #include "benchmark/benchmark.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 
@@ -57,13 +57,13 @@ struct IntPolicy {
 class StringPolicy {
   template <class F, class K, class V,
             class = typename std::enable_if<
-                std::is_convertible<const K&, absl::string_view>::value>::type>
+                std::is_convertible<const K&, abslx::string_view>::value>::type>
   decltype(std::declval<F>()(
-      std::declval<const absl::string_view&>(), std::piecewise_construct,
+      std::declval<const abslx::string_view&>(), std::piecewise_construct,
       std::declval<std::tuple<K>>(),
       std::declval<V>())) static apply_impl(F&& f,
                                             std::pair<std::tuple<K>, V> p) {
-    const absl::string_view& key = std::get<0>(p.first);
+    const abslx::string_view& key = std::get<0>(p.first);
     return std::forward<F>(f)(key, std::piecewise_construct, std::move(p.first),
                               std::move(p.second));
   }
@@ -112,10 +112,10 @@ class StringPolicy {
   }
 };
 
-struct StringHash : container_internal::hash_default_hash<absl::string_view> {
+struct StringHash : container_internal::hash_default_hash<abslx::string_view> {
   using is_transparent = void;
 };
-struct StringEq : std::equal_to<absl::string_view> {
+struct StringEq : std::equal_to<abslx::string_view> {
   using is_transparent = void;
 };
 
@@ -181,7 +181,7 @@ void BM_CacheInSteadyState(benchmark::State& state) {
     }
   }
   state.SetItemsProcessed(state.iterations());
-  state.SetLabel(absl::StrFormat("load_factor=%.2f", t.load_factor()));
+  state.SetLabel(abslx::StrFormat("load_factor=%.2f", t.load_factor()));
 }
 
 template <typename Benchmark>
@@ -364,27 +364,27 @@ BENCHMARK(BM_DropDeletes);
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 // These methods are here to make it easy to examine the assembly for targeted
 // parts of the API.
-auto CodegenAbslRawHashSetInt64Find(absl::container_internal::IntTable* table,
+auto CodegenAbslRawHashSetInt64Find(abslx::container_internal::IntTable* table,
                                     int64_t key) -> decltype(table->find(key)) {
   return table->find(key);
 }
 
 bool CodegenAbslRawHashSetInt64FindNeEnd(
-    absl::container_internal::IntTable* table, int64_t key) {
+    abslx::container_internal::IntTable* table, int64_t key) {
   return table->find(key) != table->end();
 }
 
 bool CodegenAbslRawHashSetInt64Contains(
-    absl::container_internal::IntTable* table, int64_t key) {
+    abslx::container_internal::IntTable* table, int64_t key) {
   return table->contains(key);
 }
 
 void CodegenAbslRawHashSetInt64Iterate(
-    absl::container_internal::IntTable* table) {
+    abslx::container_internal::IntTable* table) {
   for (auto x : *table) benchmark::DoNotOptimize(x);
 }
 

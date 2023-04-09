@@ -40,9 +40,9 @@ limitations under the License.
 namespace tensorflow {
 namespace tensorrt {
 namespace convert {
-using absl::AsciiStrToUpper;
-using absl::StrAppend;
-using absl::StrCat;
+using abslx::AsciiStrToUpper;
+using abslx::StrAppend;
+using abslx::StrCat;
 
 namespace {
 
@@ -50,8 +50,8 @@ bool ShouldUseExplicitPrecision(const GraphDef& gdef) {
   if (!IS_TRT_VERSION_GE(8, 0, 0, 0)) {
     return false;
   }
-  return absl::c_any_of(gdef.node(), [](const auto& node) {
-    return (absl::c_find(kExplicitQuantizationOpNames, node.op()) !=
+  return abslx::c_any_of(gdef.node(), [](const auto& node) {
+    return (abslx::c_find(kExplicitQuantizationOpNames, node.op()) !=
             kExplicitQuantizationOpNames.end());
   });
 }
@@ -77,7 +77,7 @@ StatusOr<bool> ShouldConvertFunction(const grappler::GrapplerItem& item) {
 Status UpdateFunctionSpecificConversionParams(
     TRTOptimizationPass::ConversionParams& cp,
     const tensorflow::AttrSlice& attr) {
-  auto get_size_attr = [](const AttrSlice& attr, absl::string_view name,
+  auto get_size_attr = [](const AttrSlice& attr, abslx::string_view name,
                           size_t* dst) -> Status {
     int tmp = 0;
     TF_RETURN_IF_ERROR(GetNodeAttr(attr, name, &tmp));

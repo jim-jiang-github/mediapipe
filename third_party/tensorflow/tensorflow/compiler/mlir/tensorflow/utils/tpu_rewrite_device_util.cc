@@ -66,7 +66,7 @@ void FindMatchingDevices(Devices devices, const Device& spec,
 
 // Creates error message for a conflicting attribute of a device.
 template <typename T>
-Status MismatchedTPUSystemAttributeErr(absl::string_view attribute, T a, T b) {
+Status MismatchedTPUSystemAttributeErr(abslx::string_view attribute, T a, T b) {
   return errors::InvalidArgument("found ", kDeviceTPUSystem,
                                  " devices with conflicting ", attribute, "s '",
                                  a, "' and '", b, "'");
@@ -228,7 +228,7 @@ bool DeviceCoordinateOutOfBound(int x, int y, int z, int core, int bound_x,
 }
 
 // Creates error message for an out of bound device coordinate.
-Status DeviceCoordinateErrorMsg(absl::string_view attribute, int x, int y,
+Status DeviceCoordinateErrorMsg(abslx::string_view attribute, int x, int y,
                                 int z, int core, int bound_x, int bound_y,
                                 int bound_z, int bound_core) {
   return errors::InvalidArgument("device coordinate (", x, ", ", y, ", ", z,
@@ -238,7 +238,7 @@ Status DeviceCoordinateErrorMsg(absl::string_view attribute, int x, int y,
 }
 
 // Creates error message for a duplicate device coordinate.
-Status DuplicateCoordinateErrorMsg(absl::string_view attribute, int x, int y,
+Status DuplicateCoordinateErrorMsg(abslx::string_view attribute, int x, int y,
                                    int z, int core) {
   return errors::InvalidArgument("'", attribute,
                                  "' has duplicate device coordinate (", x, ", ",

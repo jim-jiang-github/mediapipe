@@ -58,7 +58,7 @@ StatefulRngSpmdPartitioner::CreateVisitor(
 
 Status StatefulRngSpmdPartitioner::PreprocessSharding(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   // For rng-get-and-update-status with no sharding, set sharding to be
   // replicated.
   for (HloComputation* computation : module->computations(execution_threads)) {

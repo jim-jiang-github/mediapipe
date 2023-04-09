@@ -36,7 +36,7 @@ void Decode(const data::TensorDescriptor* fb_desc, TensorDescriptor* desc);
 
 flatbuffers::Offset<data::GPUOperation> Encode(
     const GPUOperation& op, flatbuffers::FlatBufferBuilder* builder);
-absl::Status Decode(const data::GPUOperation* fb_op, GPUOperation* op);
+abslx::Status Decode(const data::GPUOperation* fb_op, GPUOperation* op);
 
 }  // namespace gpu
 }  // namespace tflite

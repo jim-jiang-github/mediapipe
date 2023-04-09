@@ -327,7 +327,7 @@ class RebatchDatasetV2Op : public UnaryDatasetOpKernel {
           output_types_(output_types),
           output_shapes_(output_shapes),
           traceme_metadata_(
-              {{"batch_sizes", absl::StrJoin(batch_sizes, ",")}}) {
+              {{"batch_sizes", abslx::StrJoin(batch_sizes, ",")}}) {
       input_->Ref();
     }
 

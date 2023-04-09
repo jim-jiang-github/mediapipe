@@ -123,16 +123,16 @@ std::string BatchGroupedConvolution2DTestDataToString(
         ::testing::tuple<BatchGroupedConvolution2DSpec, bool>>& data) {
   const auto& spec = ::testing::get<0>(data.param);
   const std::string data_type = GetFloatDataType(::testing::get<1>(data.param));
-  std::string str = absl::StrCat(
-      "activation_dims_", absl::StrJoin(spec.activation_dims, "x"),
-      "_kernel_dims_", absl::StrJoin(spec.kernel_dims, "x"),
+  std::string str = abslx::StrCat(
+      "activation_dims_", abslx::StrJoin(spec.activation_dims, "x"),
+      "_kernel_dims_", abslx::StrJoin(spec.kernel_dims, "x"),
       "_activation_layout_",
-      absl::StrJoin(spec.activation_and_kernel_layout, "_"), "_output_dims_",
-      absl::StrJoin(spec.output_dims, "x"), data_type, "_output_layout_",
-      absl::StrJoin(spec.output_layout, "_"));
+      abslx::StrJoin(spec.activation_and_kernel_layout, "_"), "_output_dims_",
+      abslx::StrJoin(spec.output_dims, "x"), data_type, "_output_layout_",
+      abslx::StrJoin(spec.output_layout, "_"));
 
   // Test names are not allowed to contain the '-' character.
-  absl::c_replace(str, '-', 'n');
+  abslx::c_replace(str, '-', 'n');
   return str;
 }
 
@@ -141,7 +141,7 @@ std::string BuildHloTextBatchGroupedConvolution2D(
     bool scheduled = false) {
   const std::string data_type = GetFloatDataType(use_bfloat16);
   const std::string scheduled_tag = scheduled ? ",is_scheduled=true" : "";
-  return absl::StrFormat(
+  return abslx::StrFormat(
       R"(
     HloModule TensorFlowDepthwiseConv %s
 
@@ -153,16 +153,16 @@ std::string BuildHloTextBatchGroupedConvolution2D(
           batch_group_count=%d
     }
     )",
-      scheduled_tag, data_type, absl::StrJoin(spec.activation_dims, ","),
-      absl::StrJoin(spec.activation_and_kernel_layout, ","), data_type,
-      absl::StrJoin(spec.kernel_dims, ","),
-      absl::StrJoin(spec.activation_and_kernel_layout, ","), data_type,
-      absl::StrJoin(spec.output_dims, ","),
-      absl::StrJoin(spec.output_layout, ","), data_type,
-      absl::StrJoin(spec.activation_dims, ","),
-      absl::StrJoin(spec.activation_and_kernel_layout, ","), data_type,
-      absl::StrJoin(spec.kernel_dims, ","),
-      absl::StrJoin(spec.activation_and_kernel_layout, ","), spec.window,
+      scheduled_tag, data_type, abslx::StrJoin(spec.activation_dims, ","),
+      abslx::StrJoin(spec.activation_and_kernel_layout, ","), data_type,
+      abslx::StrJoin(spec.kernel_dims, ","),
+      abslx::StrJoin(spec.activation_and_kernel_layout, ","), data_type,
+      abslx::StrJoin(spec.output_dims, ","),
+      abslx::StrJoin(spec.output_layout, ","), data_type,
+      abslx::StrJoin(spec.activation_dims, ","),
+      abslx::StrJoin(spec.activation_and_kernel_layout, ","), data_type,
+      abslx::StrJoin(spec.kernel_dims, ","),
+      abslx::StrJoin(spec.activation_and_kernel_layout, ","), spec.window,
       spec.window, spec.window_dilation, spec.window_dilation,
       spec.window_dilation, spec.window_dilation, spec.output_batch);
 }

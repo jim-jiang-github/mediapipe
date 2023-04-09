@@ -27,7 +27,7 @@
 #include "absl/memory/memory.h"
 #include "absl/synchronization/mutex.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 constexpr int HashtablezInfo::kMaxStackDepth;
@@ -40,7 +40,7 @@ ABSL_CONST_INIT std::atomic<int32_t> g_hashtablez_sample_parameter{1 << 10};
 ABSL_CONST_INIT std::atomic<int32_t> g_hashtablez_max_samples{1 << 20};
 
 #if defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
-ABSL_PER_THREAD_TLS_KEYWORD absl::base_internal::ExponentialBiased
+ABSL_PER_THREAD_TLS_KEYWORD abslx::base_internal::ExponentialBiased
     g_exponential_biased_generator;
 #endif
 
@@ -74,18 +74,18 @@ void HashtablezInfo::PrepareForSampling() {
   hashes_bitwise_and.store(~size_t{}, std::memory_order_relaxed);
   hashes_bitwise_xor.store(0, std::memory_order_relaxed);
 
-  create_time = absl::Now();
+  create_time = abslx::Now();
   // The inliner makes hardcoded skip_count difficult (especially when combined
   // with LTO).  We use the ability to exclude stacks by regex when encoding
   // instead.
-  depth = absl::GetStackTrace(stack, HashtablezInfo::kMaxStackDepth,
+  depth = abslx::GetStackTrace(stack, HashtablezInfo::kMaxStackDepth,
                               /* skip_count= */ 0);
   dead = nullptr;
 }
 
 HashtablezSampler::HashtablezSampler()
     : dropped_samples_(0), size_estimate_(0), all_(nullptr), dispose_(nullptr) {
-  absl::MutexLock l(&graveyard_.init_mu);
+  abslx::MutexLock l(&graveyard_.init_mu);
   graveyard_.dead = &graveyard_;
 }
 
@@ -111,14 +111,14 @@ void HashtablezSampler::PushDead(HashtablezInfo* sample) {
     dispose(*sample);
   }
 
-  absl::MutexLock graveyard_lock(&graveyard_.init_mu);
-  absl::MutexLock sample_lock(&sample->init_mu);
+  abslx::MutexLock graveyard_lock(&graveyard_.init_mu);
+  abslx::MutexLock sample_lock(&sample->init_mu);
   sample->dead = graveyard_.dead;
   graveyard_.dead = sample;
 }
 
 HashtablezInfo* HashtablezSampler::PopDead() {
-  absl::MutexLock graveyard_lock(&graveyard_.init_mu);
+  abslx::MutexLock graveyard_lock(&graveyard_.init_mu);
 
   // The list is circular, so eventually it collapses down to
   //   graveyard_.dead == &graveyard_
@@ -126,7 +126,7 @@ HashtablezInfo* HashtablezSampler::PopDead() {
   HashtablezInfo* sample = graveyard_.dead;
   if (sample == &graveyard_) return nullptr;
 
-  absl::MutexLock sample_lock(&sample->init_mu);
+  abslx::MutexLock sample_lock(&sample->init_mu);
   graveyard_.dead = sample->dead;
   sample->PrepareForSampling();
   return sample;
@@ -159,7 +159,7 @@ int64_t HashtablezSampler::Iterate(
     const std::function<void(const HashtablezInfo& stack)>& f) {
   HashtablezInfo* s = all_.load(std::memory_order_acquire);
   while (s != nullptr) {
-    absl::MutexLock l(&s->init_mu);
+    abslx::MutexLock l(&s->init_mu);
     if (s->dead == nullptr) {
       f(*s);
     }
@@ -271,4 +271,4 @@ void SetHashtablezMaxSamples(int32_t max) {
 
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

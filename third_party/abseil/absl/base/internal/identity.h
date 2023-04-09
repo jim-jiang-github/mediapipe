@@ -18,7 +18,7 @@
 
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace internal {
 
@@ -32,6 +32,6 @@ using identity_t = typename identity<T>::type;
 
 }  // namespace internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_BASE_INTERNAL_IDENTITY_H_

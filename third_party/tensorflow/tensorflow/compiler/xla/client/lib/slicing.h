@@ -25,30 +25,30 @@ namespace xla {
 // Slices input starting from the base_indices and within the window_sizes,
 // using the supplied strides. This is the equivalent of the Python slicing op
 // [base_indices : base_indices+window_sizes : stride].
-XlaOp DynamicStridedSlice(XlaOp input, absl::Span<const XlaOp> base_indices,
-                          absl::Span<const int64_t> window_sizes,
-                          absl::Span<const int64_t> strides);
+XlaOp DynamicStridedSlice(XlaOp input, abslx::Span<const XlaOp> base_indices,
+                          abslx::Span<const int64_t> window_sizes,
+                          abslx::Span<const int64_t> strides);
 
 // Updates a slice of 'x', i.e.,
 // x[start[0], ..., start[n]] = update
-XlaOp UpdateSlice(XlaOp x, XlaOp update, absl::Span<const int64_t> start);
+XlaOp UpdateSlice(XlaOp x, XlaOp update, abslx::Span<const int64_t> start);
 
 // Performs a slice in the minor dimensions of a tensor.
 // x[..., start[0]:end[0], ..., start[n]:end[n]]
-XlaOp SliceInMinorDims(XlaOp x, absl::Span<const int64_t> start,
-                       absl::Span<const int64_t> end);
+XlaOp SliceInMinorDims(XlaOp x, abslx::Span<const int64_t> start,
+                       abslx::Span<const int64_t> end);
 
 // Updates a slice of 'x', where 'start' contains a list of minor dimensions:
 // x[..., start[0]:..., ..., start[n]:...] = update
 XlaOp UpdateSliceInMinorDims(XlaOp x, XlaOp update,
-                             absl::Span<const int64_t> start);
+                             abslx::Span<const int64_t> start);
 
 // Performs a dynamic slice in the minor dimensions of a tensor.
-XlaOp DynamicSliceInMinorDims(XlaOp x, absl::Span<const XlaOp> starts,
-                              absl::Span<const int64_t> sizes);
+XlaOp DynamicSliceInMinorDims(XlaOp x, abslx::Span<const XlaOp> starts,
+                              abslx::Span<const int64_t> sizes);
 
 XlaOp DynamicUpdateSliceInMinorDims(XlaOp x, XlaOp update,
-                                    absl::Span<const XlaOp> starts);
+                                    abslx::Span<const XlaOp> starts);
 
 // Gathers values along an axis specified by dim.
 //

@@ -41,7 +41,7 @@
 
 namespace {
 
-using absl::base_internal::ScopedSetEnv;
+using abslx::base_internal::ScopedSetEnv;
 
 struct UDT {
   UDT() = default;
@@ -51,7 +51,7 @@ struct UDT {
   int value;
 };
 
-bool AbslParseFlag(absl::string_view in, UDT* udt, std::string* err) {
+bool AbslParseFlag(abslx::string_view in, UDT* udt, std::string* err) {
   if (in == "A") {
     udt->value = 1;
     return true;
@@ -102,10 +102,10 @@ const std::string& GetTestTempDir() {
       auto len = GetTempPathA(MAX_PATH, temp_path_buffer);
       if (len < MAX_PATH && len != 0) {
         std::string temp_dir_name = temp_path_buffer;
-        if (!absl::EndsWith(temp_dir_name, "\\")) {
+        if (!abslx::EndsWith(temp_dir_name, "\\")) {
           temp_dir_name.push_back('\\');
         }
-        absl::StrAppend(&temp_dir_name, "parse_test.", GetCurrentProcessId());
+        abslx::StrAppend(&temp_dir_name, "parse_test.", GetCurrentProcessId());
         if (CreateDirectoryA(temp_dir_name.c_str(), nullptr)) {
           *res = temp_dir_name;
         }
@@ -136,8 +136,8 @@ const std::string& GetTestTempDir() {
 }
 
 struct FlagfileData {
-  const absl::string_view file_name;
-  const absl::Span<const char* const> file_lines;
+  const abslx::string_view file_name;
+  const abslx::Span<const char* const> file_lines;
 };
 
 // clang-format off
@@ -174,17 +174,17 @@ constexpr const char* const ff2_data[] = {
 const char* GetFlagfileFlag(const std::vector<FlagfileData>& ffd,
                             std::string& flagfile_flag) {
   flagfile_flag = "--flagfile=";
-  absl::string_view separator;
+  abslx::string_view separator;
   for (const auto& flagfile_data : ffd) {
     std::string flagfile_name =
-        absl::StrCat(GetTestTempDir(), flagfile_data.file_name);
+        abslx::StrCat(GetTestTempDir(), flagfile_data.file_name);
 
     std::ofstream flagfile_out(flagfile_name);
     for (auto line : flagfile_data.file_lines) {
-      flagfile_out << absl::Substitute(line, GetTestTempDir()) << "\n";
+      flagfile_out << abslx::Substitute(line, GetTestTempDir()) << "\n";
     }
 
-    absl::StrAppend(&flagfile_flag, separator, flagfile_name);
+    abslx::StrAppend(&flagfile_flag, separator, flagfile_name);
     separator = ",";
   }
 
@@ -204,7 +204,7 @@ ABSL_RETIRED_FLAG(std::string, legacy_str, "l", "");
 
 namespace {
 
-namespace flags = absl::flags_internal;
+namespace flags = abslx::flags_internal;
 using testing::ElementsAreArray;
 
 class ParseTest : public testing::Test {
@@ -212,31 +212,31 @@ class ParseTest : public testing::Test {
   ~ParseTest() override { flags::SetFlagsHelpMode(flags::HelpMode::kNone); }
 
  private:
-  absl::FlagSaver flag_saver_;
+  abslx::FlagSaver flag_saver_;
 };
 
 // --------------------------------------------------------------------
 
 template <int N>
 std::vector<char*> InvokeParse(const char* (&in_argv)[N]) {
-  return absl::ParseCommandLine(N, const_cast<char**>(in_argv));
+  return abslx::ParseCommandLine(N, const_cast<char**>(in_argv));
 }
 
 // --------------------------------------------------------------------
 
 template <int N>
 void TestParse(const char* (&in_argv)[N], int int_flag_value,
-               double double_flag_val, absl::string_view string_flag_val,
+               double double_flag_val, abslx::string_view string_flag_val,
                bool bool_flag_val, int exp_position_args = 0) {
   auto out_args = InvokeParse(in_argv);
 
   EXPECT_EQ(out_args.size(), 1 + exp_position_args);
   EXPECT_STREQ(out_args[0], "testbin");
 
-  EXPECT_EQ(absl::GetFlag(FLAGS_int_flag), int_flag_value);
-  EXPECT_NEAR(absl::GetFlag(FLAGS_double_flag), double_flag_val, 0.0001);
-  EXPECT_EQ(absl::GetFlag(FLAGS_string_flag), string_flag_val);
-  EXPECT_EQ(absl::GetFlag(FLAGS_bool_flag), bool_flag_val);
+  EXPECT_EQ(abslx::GetFlag(FLAGS_int_flag), int_flag_value);
+  EXPECT_NEAR(abslx::GetFlag(FLAGS_double_flag), double_flag_val, 0.0001);
+  EXPECT_EQ(abslx::GetFlag(FLAGS_string_flag), string_flag_val);
+  EXPECT_EQ(abslx::GetFlag(FLAGS_bool_flag), bool_flag_val);
 }
 
 // --------------------------------------------------------------------
@@ -384,12 +384,12 @@ TEST_F(ParseTest, TestValidUDTArg) {
   };
   InvokeParse(in_args1);
 
-  EXPECT_EQ(absl::GetFlag(FLAGS_udt_flag).value, 1);
+  EXPECT_EQ(abslx::GetFlag(FLAGS_udt_flag).value, 1);
 
   const char* in_args2[] = {"testbin", "--udt_flag", "AAA"};
   InvokeParse(in_args2);
 
-  EXPECT_EQ(absl::GetFlag(FLAGS_udt_flag).value, 10);
+  EXPECT_EQ(abslx::GetFlag(FLAGS_udt_flag).value, 10);
 }
 
 // --------------------------------------------------------------------
@@ -591,14 +591,14 @@ TEST_F(ParseTest, TestSimpleValidFlagfile) {
 
   const char* in_args1[] = {
       "testbin",
-      GetFlagfileFlag({{"parse_test.ff1", absl::MakeConstSpan(ff1_data)}},
+      GetFlagfileFlag({{"parse_test.ff1", abslx::MakeConstSpan(ff1_data)}},
                       flagfile_flag),
   };
   TestParse(in_args1, -1, 0.1, "q2w2  ", true);
 
   const char* in_args2[] = {
       "testbin",
-      GetFlagfileFlag({{"parse_test.ff2", absl::MakeConstSpan(ff2_data)}},
+      GetFlagfileFlag({{"parse_test.ff2", abslx::MakeConstSpan(ff2_data)}},
                       flagfile_flag),
   };
   TestParse(in_args2, 100, 0.1, "q2w2  ", false);
@@ -611,8 +611,8 @@ TEST_F(ParseTest, TestValidMultiFlagfile) {
 
   const char* in_args1[] = {
       "testbin",
-      GetFlagfileFlag({{"parse_test.ff2", absl::MakeConstSpan(ff2_data)},
-                       {"parse_test.ff1", absl::MakeConstSpan(ff1_data)}},
+      GetFlagfileFlag({{"parse_test.ff2", abslx::MakeConstSpan(ff2_data)},
+                       {"parse_test.ff1", abslx::MakeConstSpan(ff1_data)}},
                       flagfile_flag),
   };
   TestParse(in_args1, -1, 0.1, "q2w2  ", true);
@@ -625,7 +625,7 @@ TEST_F(ParseTest, TestFlagfileMixedWithRegularFlags) {
 
   const char* in_args1[] = {
       "testbin", "--int_flag=3",
-      GetFlagfileFlag({{"parse_test.ff1", absl::MakeConstSpan(ff1_data)}},
+      GetFlagfileFlag({{"parse_test.ff1", abslx::MakeConstSpan(ff1_data)}},
                       flagfile_flag),
       "-double_flag=0.2"};
   TestParse(in_args1, -1, 0.2, "q2w2  ", true);
@@ -641,13 +641,13 @@ TEST_F(ParseTest, TestFlagfileInFlagfile) {
       "--flagfile=$0/parse_test.ff2",
   };
 
-  GetFlagfileFlag({{"parse_test.ff2", absl::MakeConstSpan(ff2_data)},
-                   {"parse_test.ff1", absl::MakeConstSpan(ff1_data)}},
+  GetFlagfileFlag({{"parse_test.ff2", abslx::MakeConstSpan(ff2_data)},
+                   {"parse_test.ff1", abslx::MakeConstSpan(ff1_data)}},
                       flagfile_flag);
 
   const char* in_args1[] = {
       "testbin",
-      GetFlagfileFlag({{"parse_test.ff3", absl::MakeConstSpan(ff3_data)}},
+      GetFlagfileFlag({{"parse_test.ff3", abslx::MakeConstSpan(ff3_data)}},
                       flagfile_flag),
   };
   TestParse(in_args1, 100, 0.1, "q2w2  ", false);
@@ -665,7 +665,7 @@ TEST_F(ParseDeathTest, TestInvalidFlagfiles) {
   const char* in_args1[] = {
       "testbin",
       GetFlagfileFlag({{"parse_test.ff4",
-                        absl::MakeConstSpan(ff4_data)}}, flagfile_flag),
+                        abslx::MakeConstSpan(ff4_data)}}, flagfile_flag),
   };
   EXPECT_DEATH_IF_SUPPORTED(InvokeParse(in_args1),
                "Unknown command line flag 'unknown_flag'");
@@ -677,7 +677,7 @@ TEST_F(ParseDeathTest, TestInvalidFlagfiles) {
   const char* in_args2[] = {
       "testbin",
       GetFlagfileFlag({{"parse_test.ff5",
-                        absl::MakeConstSpan(ff5_data)}}, flagfile_flag),
+                        abslx::MakeConstSpan(ff5_data)}}, flagfile_flag),
   };
   EXPECT_DEATH_IF_SUPPORTED(InvokeParse(in_args2),
                "Unknown command line flag 'int_flag 10'");
@@ -688,7 +688,7 @@ TEST_F(ParseDeathTest, TestInvalidFlagfiles) {
 
   const char* in_args3[] = {
       "testbin",
-      GetFlagfileFlag({{"parse_test.ff6", absl::MakeConstSpan(ff6_data)}},
+      GetFlagfileFlag({{"parse_test.ff6", abslx::MakeConstSpan(ff6_data)}},
                       flagfile_flag),
   };
   EXPECT_DEATH_IF_SUPPORTED(InvokeParse(in_args3),
@@ -709,7 +709,7 @@ TEST_F(ParseDeathTest, TestInvalidFlagfiles) {
 
   const char* in_args5[] = {
       "testbin",
-      GetFlagfileFlag({{"parse_test.ff7", absl::MakeConstSpan(ff7_data)}},
+      GetFlagfileFlag({{"parse_test.ff7", abslx::MakeConstSpan(ff7_data)}},
                       flagfile_flag),
   };
   EXPECT_DEATH_IF_SUPPORTED(InvokeParse(in_args5),
@@ -791,9 +791,9 @@ TEST_F(ParseTest, TestKeepParsedArgs) {
 
   EXPECT_THAT(
       out_args1,
-      ElementsAreArray({absl::string_view("testbin"), absl::string_view("arg1"),
-                        absl::string_view("arg2"), absl::string_view("arg3"),
-                        absl::string_view("arg4")}));
+      ElementsAreArray({abslx::string_view("testbin"), abslx::string_view("arg1"),
+                        abslx::string_view("arg2"), abslx::string_view("arg3"),
+                        abslx::string_view("arg4")}));
 
   auto out_args2 = flags::ParseCommandLineImpl(
       11, const_cast<char**>(in_args1), flags::ArgvListAction::kKeepParsedArgs,
@@ -802,14 +802,14 @@ TEST_F(ParseTest, TestKeepParsedArgs) {
 
   EXPECT_THAT(
       out_args2,
-      ElementsAreArray({absl::string_view("testbin"),
-                        absl::string_view("--bool_flag"),
-                        absl::string_view("--int_flag=211"),
-                        absl::string_view("--double_flag=1.1"),
-                        absl::string_view("--string_flag"),
-                        absl::string_view("asd"), absl::string_view("--"),
-                        absl::string_view("arg1"), absl::string_view("arg2"),
-                        absl::string_view("arg3"), absl::string_view("arg4")}));
+      ElementsAreArray({abslx::string_view("testbin"),
+                        abslx::string_view("--bool_flag"),
+                        abslx::string_view("--int_flag=211"),
+                        abslx::string_view("--double_flag=1.1"),
+                        abslx::string_view("--string_flag"),
+                        abslx::string_view("asd"), abslx::string_view("--"),
+                        abslx::string_view("arg1"), abslx::string_view("arg2"),
+                        abslx::string_view("arg3"), abslx::string_view("arg4")}));
 }
 
 // --------------------------------------------------------------------
@@ -827,10 +827,10 @@ TEST_F(ParseTest, TestIgnoreUndefinedFlags) {
       flags::UsageFlagsAction::kHandleUsage,
       flags::OnUndefinedFlag::kIgnoreUndefined);
 
-  EXPECT_THAT(out_args1, ElementsAreArray({absl::string_view("testbin"),
-                                           absl::string_view("arg1")}));
+  EXPECT_THAT(out_args1, ElementsAreArray({abslx::string_view("testbin"),
+                                           abslx::string_view("arg1")}));
 
-  EXPECT_EQ(absl::GetFlag(FLAGS_int_flag), 21);
+  EXPECT_EQ(abslx::GetFlag(FLAGS_int_flag), 21);
 
   const char* in_args2[] = {
       "testbin",
@@ -847,10 +847,10 @@ TEST_F(ParseTest, TestIgnoreUndefinedFlags) {
   EXPECT_THAT(
       out_args2,
       ElementsAreArray(
-          {absl::string_view("testbin"), absl::string_view("--undef_flag=aa"),
-           absl::string_view("--string_flag=AA"), absl::string_view("arg1")}));
+          {abslx::string_view("testbin"), abslx::string_view("--undef_flag=aa"),
+           abslx::string_view("--string_flag=AA"), abslx::string_view("arg1")}));
 
-  EXPECT_EQ(absl::GetFlag(FLAGS_string_flag), "AA");
+  EXPECT_EQ(abslx::GetFlag(FLAGS_string_flag), "AA");
 }
 
 // --------------------------------------------------------------------
@@ -875,7 +875,7 @@ TEST_F(ParseDeathTest, TestSimpleHelpFlagHandling) {
       flags::OnUndefinedFlag::kAbortIfUndefined);
 
   EXPECT_EQ(flags::GetFlagsHelpMode(), flags::HelpMode::kImportant);
-  EXPECT_EQ(absl::GetFlag(FLAGS_int_flag), 3);
+  EXPECT_EQ(abslx::GetFlag(FLAGS_int_flag), 3);
 }
 
 // --------------------------------------------------------------------

@@ -62,7 +62,7 @@ ConstructCacheService(ResourceMgr* rmgr, int serving_port,
 #endif
   TF_RETURN_IF_ERROR(server_builder.status());
 
-  auto cache_service = absl::make_unique<TpuCompilationCacheService>(
+  auto cache_service = abslx::make_unique<TpuCompilationCacheService>(
       server_builder.ValueOrDie().get(), compilation_cache);
   cache_service->SetMemoryQuota(1ul << 31);  // 2GB
   cache_service->Start();
@@ -73,7 +73,7 @@ ConstructCacheService(ResourceMgr* rmgr, int serving_port,
 Status GetServerAddressAndPort(std::string* server_address, int* serving_port) {
   TF_Status* status = TF_NewStatus();
   char* server_address_output = nullptr;
-  auto cleanup = absl::MakeCleanup([&status, &server_address_output]() {
+  auto cleanup = abslx::MakeCleanup([&status, &server_address_output]() {
     TF_DeleteStatus(status);
     tpu::OpsApiFn()->TpuConfigurationApi_FreeCharArrayFn(server_address_output);
   });
@@ -149,14 +149,14 @@ Status ConstructTpuPodState(
     std::string* host_config_proto) {
   TF_Status* status = TF_NewStatus();
   auto status_cleanup =
-      absl::MakeCleanup([&status]() { TF_DeleteStatus(status); });
+      abslx::MakeCleanup([&status]() { TF_DeleteStatus(status); });
 
   int serving_port;
   std::string server_address;
   TF_RETURN_IF_ERROR(GetServerAddressAndPort(&server_address, &serving_port));
 
   char* host_config_output = nullptr;
-  auto host_config_cleanup = absl::MakeCleanup([&host_config_output]() {
+  auto host_config_cleanup = abslx::MakeCleanup([&host_config_output]() {
     tpu::OpsApiFn()->TpuConfigurationApi_FreeCharArrayFn(host_config_output);
   });
   size_t host_config_output_size;

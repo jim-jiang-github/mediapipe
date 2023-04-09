@@ -47,10 +47,10 @@ class TensorView {
  protected:
   // Union over all data types
   using DataVariantType =
-      absl::variant<absl::Span<bool>, absl::Span<uint8_t>, absl::Span<uint64_t>,
-                    absl::Span<int8_t>, absl::Span<int16_t>,
-                    absl::Span<int32_t>, absl::Span<int64_t>, absl::Span<float>,
-                    absl::Span<double>, absl::Span<::tensorflow::tstring>>;
+      abslx::variant<abslx::Span<bool>, abslx::Span<uint8_t>, abslx::Span<uint64_t>,
+                    abslx::Span<int8_t>, abslx::Span<int16_t>,
+                    abslx::Span<int32_t>, abslx::Span<int64_t>, abslx::Span<float>,
+                    abslx::Span<double>, abslx::Span<::tensorflow::tstring>>;
 
   // An interface while provides convenient row-major indexing over the
   // underlying tensor.
@@ -100,8 +100,8 @@ class TensorView {
     }
 
     // Pointer accessor
-    typename absl::Span<DType>::pointer Ptr() { return data_.data(); }
-    constexpr typename absl::Span<DType>::const_pointer Ptr() const {
+    typename abslx::Span<DType>::pointer Ptr() { return data_.data(); }
+    constexpr typename abslx::Span<DType>::const_pointer Ptr() const {
       return data_.data();
     }
 
@@ -137,15 +137,15 @@ class TensorView {
       }
     }
 
-    absl::Span<DType> data_;
-    const absl::Span<int> shape_;
+    abslx::Span<DType> data_;
+    const abslx::Span<int> shape_;
     std::size_t row_sizes_[RANK]{};
   };
 
  public:
   // Factory which gets specialized for different wrapped tensor types.
   template <typename W>
-  static absl::StatusOr<typename TensorViewSubType<W>::Type> New(
+  static abslx::StatusOr<typename TensorViewSubType<W>::Type> New(
       W *wrapped_tensor);
 
  protected:
@@ -165,17 +165,17 @@ class TensorView {
   // Accessors
 
   // Shape
-  absl::Span<int> Shape() { return shape_; }
-  /*[[nodiscard]]*/ const absl::Span<int> Shape() const { return shape_; }
+  abslx::Span<int> Shape() { return shape_; }
+  /*[[nodiscard]]*/ const abslx::Span<int> Shape() const { return shape_; }
 
   // Data
   template <typename DType>
-  absl::Span<DType> &Data() {
-    return absl::get<absl::Span<DType>>(data_);
+  abslx::Span<DType> &Data() {
+    return abslx::get<abslx::Span<DType>>(data_);
   }
   template <typename DType>
-  constexpr absl::Span<DType> Data() const {
-    return absl::get<absl::Span<DType>>(data_);
+  constexpr abslx::Span<DType> Data() const {
+    return abslx::get<abslx::Span<DType>>(data_);
   }
 
   // Reads the tensor given the dtype and its rank and provides an indexing
@@ -203,14 +203,14 @@ class TensorView {
   // argument directly we place a dummy argument of that type so compiler
   // can deduce the right template parameter
   template <typename DType>
-  TensorView(const absl::Span<int> shape, void *data,
+  TensorView(const abslx::Span<int> shape, void *data,
              const std::size_t data_size, const DType &)
       : shape_(shape),
-        data_(absl::Span<DType>(reinterpret_cast<DType *>(data),
+        data_(abslx::Span<DType>(reinterpret_cast<DType *>(data),
                                 data_size / sizeof(DType))) {}
 
   // Return the total number of elements given the shape.
-  static constexpr std::size_t NumElements(const absl::Span<int> shape) {
+  static constexpr std::size_t NumElements(const abslx::Span<int> shape) {
     std::size_t ret = 1;
     for (const auto dim : shape) ret *= dim;
     return ret;
@@ -218,7 +218,7 @@ class TensorView {
 
   // Tensor shape
   // Note: using int rather than size_t to avoid conversion to from TfLite shape
-  absl::Span<int> shape_;
+  abslx::Span<int> shape_;
   // Tensor data
   DataVariantType data_;
 };

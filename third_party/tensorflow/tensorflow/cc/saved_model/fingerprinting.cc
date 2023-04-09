@@ -69,11 +69,11 @@ void CanonicalizeNodes(GraphDef* orig_graph_def) {
 }
 
 // Returns the suffix UID of `function_name`.
-StatusOr<int> GetSuffixUID(absl::string_view function_name) {
-  std::vector<std::string> v = absl::StrSplit(function_name, '_');
+StatusOr<int> GetSuffixUID(abslx::string_view function_name) {
+  std::vector<std::string> v = abslx::StrSplit(function_name, '_');
   int uid;
   if (!strings::safe_strto32(v.back(), &uid)) {
-    return errors::InvalidArgument(absl::StrCat(
+    return errors::InvalidArgument(abslx::StrCat(
         "Function name: `", function_name, "` does not end in an integer."));
   }
   return uid;
@@ -124,7 +124,7 @@ uint64 RegularizeAndHashSignatureDefs(
     const google::protobuf::Map<std::string, SignatureDef>& signature_def_map) {
   // Sort `signature_def_map`, which is an unordered map from string keys to
   // SignatureDefs.
-  absl::btree_map<std::string, SignatureDef> sorted_signature_defs;
+  abslx::btree_map<std::string, SignatureDef> sorted_signature_defs;
   sorted_signature_defs.insert(signature_def_map.begin(),
                                signature_def_map.end());
   uint64 result_hash = 0;
@@ -145,7 +145,7 @@ uint64 RegularizeAndHashSavedObjectGraph(
   // SavedConcreteFunction, using the suffix UID of the function name. Assumes
   // that the trackable children are listed in a deterministic order during
   // serialization.
-  absl::btree_map<int, std::string> uid_to_function_names;
+  abslx::btree_map<int, std::string> uid_to_function_names;
   for (const auto& [name, concrete_function] :
        object_graph_def.concrete_functions()) {
     StatusOr<int> uid = GetSuffixUID(name);
@@ -160,7 +160,7 @@ uint64 RegularizeAndHashSavedObjectGraph(
   for (const auto& [uid, function_name] : uid_to_function_names) {
     // Hash the function name (with the UID stripped).
     result_hash = FingerprintCat64(result_hash,
-                                   tensorflow::Fingerprint64(absl::StripSuffix(
+                                   tensorflow::Fingerprint64(abslx::StripSuffix(
                                        function_name, std::to_string(uid))));
     // Hash the serialized concrete function.
     std::string concrete_function_string;

@@ -178,8 +178,8 @@ static inline bool IsBF16SupportedByOneDNNOnThisCPU() {
 }
 
 static inline void BF16UnsupportedWarning() {
-  static absl::once_flag cpu_bfloat16_warn_once_flag;
-  absl::call_once(cpu_bfloat16_warn_once_flag, [] {
+  static abslx::once_flag cpu_bfloat16_warn_once_flag;
+  abslx::call_once(cpu_bfloat16_warn_once_flag, [] {
     LOG(ERROR) << "oneDNN BFloat16 support are only on platforms with AVX512. "
                   "Falling back to default implementation if present.";
   });
@@ -198,7 +198,7 @@ static inline bool IsMklOp(const string& op_name, DataType T,
                               : kMklLayoutDependentOpLabelPattern;
   string registered_kernels_key = op_name + label + std::to_string(T);
   thread_local static auto* registered_kernels_map =
-      new absl::flat_hash_map<string, bool>();
+      new abslx::flat_hash_map<string, bool>();
   auto kernel_element = registered_kernels_map->find(registered_kernels_key);
   bool kernel_registered = false;
 

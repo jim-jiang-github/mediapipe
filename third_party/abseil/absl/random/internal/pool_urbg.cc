@@ -33,10 +33,10 @@
 #include "absl/random/internal/seed_material.h"
 #include "absl/random/seed_gen_exception.h"
 
-using absl::base_internal::SpinLock;
-using absl::base_internal::SpinLockHolder;
+using abslx::base_internal::SpinLock;
+using abslx::base_internal::SpinLockHolder;
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 namespace {
@@ -53,7 +53,7 @@ class RandenPoolEntry {
   static constexpr size_t kCapacity =
       RandenTraits::kCapacityBytes / sizeof(uint32_t);
 
-  void Init(absl::Span<const uint32_t> data) {
+  void Init(abslx::Span<const uint32_t> data) {
     SpinLockHolder l(&mu_);  // Always uncontested.
     std::copy(data.begin(), data.end(), std::begin(state_));
     next_ = kState;
@@ -134,7 +134,7 @@ void RandenPoolEntry::Fill(uint8_t* out, size_t bytes) {
 static constexpr int kPoolSize = 8;
 
 // Shared pool entries.
-static absl::once_flag pool_once;
+static abslx::once_flag pool_once;
 ABSL_CACHELINE_ALIGNED static RandenPoolEntry* shared_pools[kPoolSize];
 
 // Returns an id in the range [0 ... kPoolSize), which indexes into the
@@ -213,19 +213,19 @@ void InitPoolURBG() {
   // Read the seed data from OS entropy once.
   uint32_t seed_material[kPoolSize * kSeedSize];
   if (!random_internal::ReadSeedMaterialFromOSEntropy(
-          absl::MakeSpan(seed_material))) {
+          abslx::MakeSpan(seed_material))) {
     random_internal::ThrowSeedGenException();
   }
   for (int i = 0; i < kPoolSize; i++) {
     shared_pools[i] = PoolAlignedAlloc();
     shared_pools[i]->Init(
-        absl::MakeSpan(&seed_material[i * kSeedSize], kSeedSize));
+        abslx::MakeSpan(&seed_material[i * kSeedSize], kSeedSize));
   }
 }
 
 // Returns the pool entry for the current thread.
 RandenPoolEntry* GetPoolForCurrentThread() {
-  absl::call_once(pool_once, InitPoolURBG);
+  abslx::call_once(pool_once, InitPoolURBG);
   return shared_pools[GetPoolID()];
 }
 
@@ -238,7 +238,7 @@ typename RandenPool<T>::result_type RandenPool<T>::Generate() {
 }
 
 template <typename T>
-void RandenPool<T>::Fill(absl::Span<result_type> data) {
+void RandenPool<T>::Fill(abslx::Span<result_type> data) {
   auto* pool = GetPoolForCurrentThread();
   pool->Fill(reinterpret_cast<uint8_t*>(data.data()),
              data.size() * sizeof(result_type));
@@ -251,4 +251,4 @@ template class RandenPool<uint64_t>;
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

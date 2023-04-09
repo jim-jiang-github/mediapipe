@@ -86,11 +86,11 @@ class ResourceHandle {
   }
 
   void set_definition_stack_trace(
-      const absl::optional<ManagedStackTrace>& definition_stack_trace) {
+      const abslx::optional<ManagedStackTrace>& definition_stack_trace) {
     definition_stack_trace_ = definition_stack_trace;
   }
 
-  const absl::optional<ManagedStackTrace>& definition_stack_trace() const {
+  const abslx::optional<ManagedStackTrace>& definition_stack_trace() const {
     return definition_stack_trace_;
   }
 
@@ -136,7 +136,7 @@ class ResourceHandle {
   static ResourceHandle MakeRefCountingHandle(
       T* resource, const string& device_name,
       const std::vector<DtypeAndPartialTensorShape>& dtypes_and_shapes = {},
-      const absl::optional<ManagedStackTrace>& definition_stack_trace = {}) {
+      const abslx::optional<ManagedStackTrace>& definition_stack_trace = {}) {
     return MakeRefCountingHandle(resource, device_name, TypeIndex::Make<T>(),
                                  dtypes_and_shapes, definition_stack_trace);
   }
@@ -145,7 +145,7 @@ class ResourceHandle {
       ResourceBase* resource, const string& device_name,
       const TypeIndex& type_index,
       const std::vector<DtypeAndPartialTensorShape>& dtypes_and_shapes = {},
-      const absl::optional<ManagedStackTrace>& definition_stack_trace = {});
+      const abslx::optional<ManagedStackTrace>& definition_stack_trace = {});
 
   // Pointer to the resource.
   const core::IntrusivePtr<ResourceBase>& resource() const { return resource_; }
@@ -180,7 +180,7 @@ class ResourceHandle {
   uint64 hash_code_ = 0;
   std::string maybe_type_name_;
   std::vector<DtypeAndPartialTensorShape> dtypes_and_shapes_;
-  absl::optional<ManagedStackTrace> definition_stack_trace_;
+  abslx::optional<ManagedStackTrace> definition_stack_trace_;
   // A smart pointer to the actual resource. When this field is not empty, the
   // handle is in a "ref-counting" mode, owning the resource; otherwise it's in
   // a "weak-ref" mode, only containing the name of the resource (conceptually a

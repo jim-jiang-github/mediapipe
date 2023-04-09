@@ -108,9 +108,9 @@ TEST(MuxInputStreamHandlerTest, AtomicAccessToControlAndDataStreams) {
 // ignored.
 class FixedPassThroughCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     if (!cc->Inputs().TagMap()->SameAs(*cc->Outputs().TagMap())) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Input and output streams to PassThroughCalculator must use "
           "matching tags and indexes.");
     }
@@ -126,7 +126,7 @@ class FixedPassThroughCalculator : public CalculatorBase {
     if (cc->OutputSidePackets().NumEntries() != 0) {
       if (!cc->InputSidePackets().TagMap()->SameAs(
               *cc->OutputSidePackets().TagMap())) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "Input and output side packets to PassThroughCalculator must use "
             "matching tags and indexes.");
       }
@@ -148,10 +148,10 @@ class FixedPassThroughCalculator : public CalculatorBase {
         ->set_target_queue_size(2);
     cc->SetInputStreamHandlerOptions(options);
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     for (CollectionItemId id = cc->Inputs().BeginId();
          id < cc->Inputs().EndId(); ++id) {
       if (!cc->Inputs().Get(id).Header().IsEmpty()) {
@@ -165,10 +165,10 @@ class FixedPassThroughCalculator : public CalculatorBase {
       }
     }
     cc->SetOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     cc->GetCounter("PassThrough")->Increment();
     if (cc->Inputs().NumEntries() == 0) {
       return tool::StatusStop();
@@ -182,7 +182,7 @@ class FixedPassThroughCalculator : public CalculatorBase {
         cc->Outputs().Get(id).AddPacket(cc->Inputs().Get(id).Value());
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(FixedPassThroughCalculator);
@@ -214,7 +214,7 @@ TEST(FixedSizeInputStreamHandlerTest, ParallelWriteAndRead) {
             })pb");
   std::vector<Packet> output_packets[NUM_STREAMS];
   for (int i = 0; i < NUM_STREAMS; ++i) {
-    tool::AddVectorSink(absl::StrCat("out_", i), &graph_config,
+    tool::AddVectorSink(abslx::StrCat("out_", i), &graph_config,
                         &output_packets[i]);
   }
   CalculatorGraph graph;
@@ -228,11 +228,11 @@ TEST(FixedSizeInputStreamHandlerTest, ParallelWriteAndRead) {
     // Start writers.
     for (int w = 0; w < NUM_STREAMS; ++w) {
       pool.Schedule([&, w]() {
-        std::string stream_name = absl::StrCat("in_", w);
+        std::string stream_name = abslx::StrCat("in_", w);
         for (int i = 0; i < 50; ++i) {
           Packet p = MakePacket<int>(i).At(Timestamp(i));
           MP_EXPECT_OK(graph.AddPacketToInputStream(stream_name, p));
-          absl::SleepFor(absl::Microseconds(100));
+          abslx::SleepFor(abslx::Microseconds(100));
         }
       });
     }

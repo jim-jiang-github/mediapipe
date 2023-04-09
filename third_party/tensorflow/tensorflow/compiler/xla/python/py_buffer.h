@@ -73,7 +73,7 @@ class PyBuffer {
   std::shared_ptr<PjRtBuffer> shared_ptr_buffer() const { return buffer_; }
 
   ClientAndPtr<PjRtDevice> device() const;
-  absl::string_view platform_name() const {
+  abslx::string_view platform_name() const {
     return buffer_->client()->platform_name();
   }
   bool is_deleted() const { return buffer_->IsDeleted(); }
@@ -81,7 +81,7 @@ class PyBuffer {
   StatusOr<pybind11::object> CopyToDevice(
       const ClientAndPtr<PjRtDevice>& dst_device) const;
   std::pair<Status, bool> CopyToRemoteDevice(
-      absl::string_view serialized_descriptor) const;
+      abslx::string_view serialized_descriptor) const;
 
   StatusOr<size_t> OnDeviceSizeInBytes() {
     return buffer_->GetOnDeviceSizeInBytes();
@@ -170,7 +170,7 @@ class PyBuffer {
   friend class PyClient;
 
   struct HostValue {
-    absl::Notification ready;
+    abslx::Notification ready;
     Status status;
     std::shared_ptr<xla::Literal> value;
   };

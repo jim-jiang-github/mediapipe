@@ -109,7 +109,7 @@ Status CopySubgraph(const Graph& graph, const WhileLoopFrame* frame,
 StatusOr<Node*> BuildArgNode(Graph* graph, DataType type, int index) {
   const char* const kArgOp = "_Arg";
   NodeDef arg_def;
-  NodeDefBuilder builder(absl::StrCat(kArgOp, index), kArgOp);
+  NodeDefBuilder builder(abslx::StrCat(kArgOp, index), kArgOp);
   builder.Attr("T", type);
   builder.Attr("index", index);
   TF_RETURN_IF_ERROR(builder.Finalize(&arg_def));
@@ -436,7 +436,7 @@ Status FunctionalizeLoop(Graph* graph, WhileLoopFrame* frame,
   builder.Attr("cond", cond_name);
   builder.Attr("body", body_name);
   // Add some internal attributes which need to be propagated.
-  for (absl::string_view attr_name : kAttrsToPropagate) {
+  for (abslx::string_view attr_name : kAttrsToPropagate) {
     string attr_val;
     if (GetNodeAttr(frame->loop_cond->def(), attr_name, &attr_val).ok()) {
       builder.Attr(attr_name, attr_val);

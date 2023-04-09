@@ -24,21 +24,21 @@
 #include "absl/container/internal/unordered_map_modifiers_test.h"
 #include "absl/types/any.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
-using ::absl::container_internal::hash_internal::Enum;
-using ::absl::container_internal::hash_internal::EnumClass;
+using ::abslx::container_internal::hash_internal::Enum;
+using ::abslx::container_internal::hash_internal::EnumClass;
 using ::testing::_;
 using ::testing::IsEmpty;
 using ::testing::Pair;
 using ::testing::UnorderedElementsAre;
 
-// Check that absl::flat_hash_map works in a global constructor.
+// Check that abslx::flat_hash_map works in a global constructor.
 struct BeforeMain {
   BeforeMain() {
-    absl::flat_hash_map<int, int> x;
+    abslx::flat_hash_map<int, int> x;
     x.insert({1, 1});
     ABSL_RAW_CHECK(x.find(0) == x.end(), "x should not contain 0");
     auto it = x.find(1);
@@ -108,9 +108,9 @@ struct balast {};
 TEST(FlatHashMap, IteratesMsan) {
   // Because SwissTable randomizes on pointer addresses, we keep old tables
   // around to ensure we don't reuse old memory.
-  std::vector<absl::flat_hash_map<int, balast>> garbage;
+  std::vector<abslx::flat_hash_map<int, balast>> garbage;
   for (int i = 0; i < 100; ++i) {
-    absl::flat_hash_map<int, balast> t;
+    abslx::flat_hash_map<int, balast> t;
     for (int j = 0; j < 100; ++j) {
       t[j];
       for (const auto& p : t) EXPECT_THAT(p, Pair(_, _));
@@ -218,7 +218,7 @@ TEST(FlatHashMap, BitfieldArgument) {
 TEST(FlatHashMap, MergeExtractInsert) {
   // We can't test mutable keys, or non-copyable keys with flat_hash_map.
   // Test that the nodes have the proper API.
-  absl::flat_hash_map<int, int> m = {{1, 7}, {2, 9}};
+  abslx::flat_hash_map<int, int> m = {{1, 7}, {2, 9}};
   auto node = m.extract(1);
   EXPECT_TRUE(node);
   EXPECT_EQ(node.key(), 1);
@@ -285,4 +285,4 @@ TEST(FlatHashMap, NodeHandleMutableKeyAccess) {
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -26,7 +26,7 @@ class StreamHandler {
 
   const const_str& name() { return name_; }
 
-  absl::Status AddToContract(CalculatorContract* cc) const {
+  abslx::Status AddToContract(CalculatorContract* cc) const {
     cc->SetInputStreamHandler(name_.data());
     return {};
   }
@@ -47,7 +47,7 @@ class TimestampChange {
     return TimestampChange(kUnset);
   }
 
-  absl::Status AddToContract(CalculatorContract* cc) const {
+  abslx::Status AddToContract(CalculatorContract* cc) const {
     if (offset_ != kUnset) cc->SetTimestampOffset(offset_);
     return {};
   }
@@ -72,7 +72,7 @@ struct HasProcessMethod : std::false_type {};
 template <class T>
 struct HasProcessMethod<
     T,
-    std::void_t<decltype(absl::Status(std::declval<std::decay_t<T>>().Process(
+    std::void_t<decltype(abslx::Status(std::declval<std::decay_t<T>>().Process(
         std::declval<mediapipe::CalculatorContext*>())))>> : std::true_type {};
 
 template <class T, class = void>
@@ -141,9 +141,9 @@ class Contract {
   constexpr Contract(T&&... args)
       : Contract(std::tuple<T...>{std::move(args)...}) {}
 
-  absl::Status GetContract(mediapipe::CalculatorContract* cc) const {
-    std::vector<absl::Status> statuses;
-    auto store_status = [&statuses](absl::Status status) {
+  abslx::Status GetContract(mediapipe::CalculatorContract* cc) const {
+    std::vector<abslx::Status> statuses;
+    auto store_status = [&statuses](abslx::Status status) {
       if (!status.ok()) statuses.push_back(std::move(status));
     };
     internal::tuple_for_each(
@@ -208,7 +208,7 @@ class TaggedContract {
  public:
   constexpr TaggedContract() = default;
 
-  static absl::Status GetContract(mediapipe::CalculatorContract* cc) {
+  static abslx::Status GetContract(mediapipe::CalculatorContract* cc) {
     return c2.GetContract(cc);
   }
 
@@ -271,7 +271,7 @@ class OutputSender {
   OutputSender(std::tuple<P...>&& args) : outputs_(args) {}
 
   template <class R, std::enable_if_t<sizeof...(P) == 1, int> = 0>
-  absl::Status operator()(CalculatorContext* cc, absl::StatusOr<R>&& result) {
+  abslx::Status operator()(CalculatorContext* cc, abslx::StatusOr<R>&& result) {
     if (result.ok()) {
       return this(cc, result.value());
     } else {
@@ -280,14 +280,14 @@ class OutputSender {
   }
 
   template <class R, std::enable_if_t<sizeof...(P) == 1, int> = 0>
-  absl::Status operator()(CalculatorContext* cc, R&& result) {
+  abslx::Status operator()(CalculatorContext* cc, R&& result) {
     std::get<0>(outputs_)(cc).Send(std::forward<R>(result));
     return {};
   }
 
   template <class... R>
-  absl::Status operator()(CalculatorContext* cc,
-                          absl::StatusOr<std::tuple<R...>>&& result) {
+  abslx::Status operator()(CalculatorContext* cc,
+                          abslx::StatusOr<std::tuple<R...>>&& result) {
     if (result.ok()) {
       return this(cc, result.value());
     } else {
@@ -296,7 +296,7 @@ class OutputSender {
   }
 
   template <class... R>
-  absl::Status operator()(CalculatorContext* cc, std::tuple<R...>&& result) {
+  abslx::Status operator()(CalculatorContext* cc, std::tuple<R...>&& result) {
     static_assert(sizeof...(P) == sizeof...(R), "");
     internal::tuple_for_each(
         [cc, &result](const auto& port, auto i_const) {
@@ -342,9 +342,9 @@ class FunCaller {
   auto inputs() const { return internal::filter_tuple<IsInputPort>(args_); }
   auto outputs() const { return internal::filter_tuple<IsOutputPort>(args_); }
 
-  absl::Status AddToContract(CalculatorContract* cc) const { return {}; }
+  abslx::Status AddToContract(CalculatorContract* cc) const { return {}; }
 
-  absl::Status Process(CalculatorContext* cc) const { return (*this)(cc); }
+  abslx::Status Process(CalculatorContext* cc) const { return (*this)(cc); }
 
   constexpr std::tuple<P...> nested_items() const { return args_; }
 
@@ -356,14 +356,14 @@ class FunCaller {
 
 // TODO: implement multiple callers for syncsets.
 template <class... T>
-absl::Status ProcessFnCallers(CalculatorContext* cc, std::tuple<T...> callers);
+abslx::Status ProcessFnCallers(CalculatorContext* cc, std::tuple<T...> callers);
 
-inline absl::Status ProcessFnCallers(CalculatorContext* cc, std::tuple<>) {
-  return absl::InternalError("Process unimplemented");
+inline abslx::Status ProcessFnCallers(CalculatorContext* cc, std::tuple<>) {
+  return abslx::InternalError("Process unimplemented");
 }
 
 template <class T>
-absl::Status ProcessFnCallers(CalculatorContext* cc, std::tuple<T> callers) {
+abslx::Status ProcessFnCallers(CalculatorContext* cc, std::tuple<T> callers) {
   return std::get<0>(callers).Process(cc);
 }
 

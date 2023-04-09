@@ -42,8 +42,8 @@ using tensorflow::StatusOr;
 // TODO(srbs): Move this to unified execution API.
 tensorflow::Status ExecuteFunction(
     AbstractFunctionPtr trace, AbstractContext* ctx,
-    absl::Span<tensorflow::AbstractTensorHandle* const> inputs,
-    absl::Span<tensorflow::AbstractTensorHandle*> outputs) {
+    abslx::Span<tensorflow::AbstractTensorHandle* const> inputs,
+    abslx::Span<tensorflow::AbstractTensorHandle*> outputs) {
   // TODO(srbs): Provide a function execution API on ctx so that we do not
   // expose the internals of how functions are to be executed here.
   std::string fname;
@@ -54,7 +54,7 @@ tensorflow::Status ExecuteFunction(
   }
   // TODO(srbs): Update RegisterFunction to accept AbstractFunctionPtr.
   TF_RETURN_IF_ERROR(ctx->RegisterFunction(trace.get()));
-  auto cleanup = absl::MakeCleanup(
+  auto cleanup = abslx::MakeCleanup(
       [fname, ctx]() { ctx->RemoveFunction(fname).IgnoreError(); });
   auto call_op = AbstractOperationPtr(ctx->CreateOperation());
   TF_RETURN_IF_ERROR(
@@ -163,7 +163,7 @@ void Flatten(const TaggedValue& value,
 }
 
 StatusOr<TaggedValue> Unflatten(
-    absl::Span<AbstractTensorHandle* const> flat_args, TaggedValue structure) {
+    abslx::Span<AbstractTensorHandle* const> flat_args, TaggedValue structure) {
   if (structure.type() == TaggedValue::Type::TENSOR_SPEC) {
     if (flat_args.size() != 1) {
       // Denotes a corrupted SavedModel in which output_signature does not match
@@ -236,8 +236,8 @@ StatusOr<TaggedValue> Function::Execute(AbstractContext* ctx,
   std::vector<AbstractTensorHandle*> outs(
       GetFlatSize(concrete_fn.output_signature));
   TF_RETURN_IF_ERROR(
-      ExecuteFunction(concrete_fn.trace, ctx, args, absl::MakeSpan(outs)));
-  auto cleanup_tensors = absl::MakeCleanup([outs]() {
+      ExecuteFunction(concrete_fn.trace, ctx, args, abslx::MakeSpan(outs)));
+  auto cleanup_tensors = abslx::MakeCleanup([outs]() {
     for (auto t : outs) {
       t->Unref();
     }

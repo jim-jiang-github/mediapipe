@@ -26,10 +26,10 @@
 #include "absl/random/internal/generate_real.h"
 #include "absl/random/internal/iostream_state_saver.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
-// absl::exponential_distribution:
+// abslx::exponential_distribution:
 // Generates a number conforming to an exponential distribution and is
 // equivalent to the standard [rand.dist.pois.exp] distribution.
 template <typename RealType = double>
@@ -64,7 +64,7 @@ class exponential_distribution {
 
     static_assert(
         std::is_floating_point<RealType>::value,
-        "Class-template absl::exponential_distribution<> must be parameterized "
+        "Class-template abslx::exponential_distribution<> must be parameterized "
         "using a floating-point type.");
   };
 
@@ -123,7 +123,7 @@ exponential_distribution<RealType>::operator()(
   using random_internal::GenerateNegativeTag;
   using random_internal::GenerateRealFromBits;
   using real_type =
-      absl::conditional_t<std::is_same<RealType, float>::value, float, double>;
+      abslx::conditional_t<std::is_same<RealType, float>::value, float, double>;
 
   const result_type u = GenerateRealFromBits<real_type, GenerateNegativeTag,
                                              false>(fast_u64_(g));  // U(-1, 0)
@@ -160,6 +160,6 @@ std::basic_istream<CharT, Traits>& operator>>(
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_EXPONENTIAL_DISTRIBUTION_H_

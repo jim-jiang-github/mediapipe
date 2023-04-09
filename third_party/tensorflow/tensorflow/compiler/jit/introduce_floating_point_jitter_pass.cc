@@ -25,13 +25,13 @@ limitations under the License.
 namespace tensorflow {
 namespace {
 std::vector<std::pair<Node*, std::vector<int>>> GetNodesToModify(
-    const Graph& g, absl::Span<const string> tensor_names) {
-  absl::flat_hash_map<string, Node*> name_to_node;
+    const Graph& g, abslx::Span<const string> tensor_names) {
+  abslx::flat_hash_map<string, Node*> name_to_node;
   for (Node* n : g.op_nodes()) {
     name_to_node[n->name()] = n;
   }
 
-  absl::flat_hash_map<Node*, std::vector<int>> nodes_to_modify_map;
+  abslx::flat_hash_map<Node*, std::vector<int>> nodes_to_modify_map;
 
   for (const string& tensor_name : tensor_names) {
     TensorId tensor_id = ParseTensorName(tensor_name);
@@ -41,16 +41,16 @@ std::vector<std::pair<Node*, std::vector<int>>> GetNodesToModify(
   }
 
   std::vector<std::pair<Node*, std::vector<int>>> nodes_to_modify;
-  absl::c_copy(nodes_to_modify_map, std::back_inserter(nodes_to_modify));
+  abslx::c_copy(nodes_to_modify_map, std::back_inserter(nodes_to_modify));
 
-  absl::c_sort(nodes_to_modify,
+  abslx::c_sort(nodes_to_modify,
                [](const std::pair<Node*, std::vector<int>>& a,
                   const std::pair<Node*, std::vector<int>>& b) {
                  return a.first->id() < b.first->id();
                });
 
   for (auto& p : nodes_to_modify) {
-    absl::c_sort(p.second);
+    abslx::c_sort(p.second);
     p.second.erase(std::unique(p.second.begin(), p.second.end()),
                    p.second.end());
   }
@@ -60,10 +60,10 @@ std::vector<std::pair<Node*, std::vector<int>>> GetNodesToModify(
 
 Status IntroduceJitterToTensor(
     Graph* g, Node* n, int oidx, float jitter_amount,
-    absl::flat_hash_map<std::pair<DataType, Node*>, Output>*
+    abslx::flat_hash_map<std::pair<DataType, Node*>, Output>*
         node_to_jitter_constant) {
   std::vector<const Edge*> edges_to_update;
-  absl::c_copy_if(n->out_edges(), std::back_inserter(edges_to_update),
+  abslx::c_copy_if(n->out_edges(), std::back_inserter(edges_to_update),
                   [&](const Edge* e) { return e->src_output() == oidx; });
 
   if (edges_to_update.empty()) {
@@ -76,7 +76,7 @@ Status IntroduceJitterToTensor(
 
   Status status;
   Scope s = NewInternalScope(g, &status, /*refiner=*/nullptr)
-                .NewSubScope(absl::StrCat(n->name(), "/jitter"));
+                .NewSubScope(abslx::StrCat(n->name(), "/jitter"));
 
   Output node_out(n, oidx);
   Output jitter_constant;
@@ -100,7 +100,7 @@ Status IntroduceJitterToTensor(
   }
 
   Output jittered_output =
-      ops::Add(s.NewSubScope(absl::StrCat(oidx)).WithOpName("jittered_output"),
+      ops::Add(s.NewSubScope(abslx::StrCat(oidx)).WithOpName("jittered_output"),
                jitter_constant, node_out);
 
   TF_RETURN_IF_ERROR(status);
@@ -120,7 +120,7 @@ Status IntroduceJitterToTensor(
 }  // namespace
 
 Status IntroduceFloatingPointJitter(Graph* graph,
-                                    absl::Span<string const> tensor_names,
+                                    abslx::Span<string const> tensor_names,
                                     float jitter_amount) {
   if (tensor_names.empty()) {
     VLOG(3) << "Nothing to do";
@@ -130,7 +130,7 @@ Status IntroduceFloatingPointJitter(Graph* graph,
   std::vector<std::pair<Node*, std::vector<int>>> nodes_to_modify =
       GetNodesToModify(*graph, tensor_names);
 
-  absl::flat_hash_map<std::pair<DataType, Node*>, Output>
+  abslx::flat_hash_map<std::pair<DataType, Node*>, Output>
       node_to_jitter_constant;
   for (const auto& p : nodes_to_modify) {
     for (int oidx : p.second) {

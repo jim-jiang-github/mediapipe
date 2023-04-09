@@ -71,7 +71,7 @@ XLA_TEST_F(DynamicUpdateSliceTest, ShardedInPlaceDUS) {
   fake_arguments[0] = LiteralUtil::CreateR0<int32_t>(0);
 
   std::vector<Literal*> fake_argument_ptrs;
-  absl::c_transform(
+  abslx::c_transform(
       fake_arguments, std::back_inserter(fake_argument_ptrs),
       [](const Literal& literal) { return &const_cast<Literal&>(literal); });
 
@@ -172,7 +172,7 @@ ENTRY main {
   Literal indices =
       Literal::CreateFromShape(ShapeUtil::MakeShape(S32, {8, 2, 4}));
   indices
-      .Populate<int>([&](absl::Span<const int64_t> indices) -> int {
+      .Populate<int>([&](abslx::Span<const int64_t> indices) -> int {
         auto i = indices[2] + indices[1] * 4 + indices[0] * 2 * 4;
         switch (indices[2]) {
           case 0:

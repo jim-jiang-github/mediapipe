@@ -73,12 +73,12 @@ class HloCloneContext {
     return FindOrDie(computations_, old_computation);
   }
 
-  const absl::flat_hash_map<const HloInstruction*, HloInstruction*>&
+  const abslx::flat_hash_map<const HloInstruction*, HloInstruction*>&
   cloned_instructions() const {
     return instructions_;
   }
 
-  const absl::flat_hash_map<const HloComputation*, HloComputation*>&
+  const abslx::flat_hash_map<const HloComputation*, HloComputation*>&
   cloned_computations() const {
     return computations_;
   }
@@ -89,8 +89,8 @@ class HloCloneContext {
 
   HloModule* module_;
   std::string suffix_;
-  absl::flat_hash_map<const HloInstruction*, HloInstruction*> instructions_;
-  absl::flat_hash_map<const HloComputation*, HloComputation*> computations_;
+  abslx::flat_hash_map<const HloInstruction*, HloInstruction*> instructions_;
+  abslx::flat_hash_map<const HloComputation*, HloComputation*> computations_;
 };
 
 }  // namespace xla

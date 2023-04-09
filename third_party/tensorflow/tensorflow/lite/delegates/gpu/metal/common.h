@@ -31,13 +31,13 @@ namespace metal {
 /// Returns system default device on iOS or Intel GPU on macOS.
 id<MTLDevice> GetBestSupportedMetalDevice();
 
-absl::Status CreateComputeProgram(
+abslx::Status CreateComputeProgram(
     id<MTLDevice> device, const std::string& code,
     const std::string& function_name,
     const std::map<std::string, std::string>& macros,
     id<MTLComputePipelineState>* program);
 
-absl::Status CreateComputeProgramWithArgumentBuffer(
+abslx::Status CreateComputeProgramWithArgumentBuffer(
     id<MTLDevice> device, const std::string& code,
     const std::string& function_name,
     const std::map<std::string, std::string>& macros,
@@ -45,14 +45,14 @@ absl::Status CreateComputeProgramWithArgumentBuffer(
     id<MTLArgumentEncoder>* arguments_encoder);
 
 // ICB - indirect command buffer
-absl::Status CreateComputeProgramWithICBSupport(
+abslx::Status CreateComputeProgramWithICBSupport(
     id<MTLDevice> device, const std::string& code,
     const std::string& function_name,
     const std::map<std::string, std::string>& macros,
     id<MTLComputePipelineState>* program,
     id<MTLArgumentEncoder>* arguments_encoder);
 
-absl::Status CreateFunction(id<MTLDevice> device, const std::string& code,
+abslx::Status CreateFunction(id<MTLDevice> device, const std::string& code,
                             const std::string& function_name,
                             const std::map<std::string, std::string>& macros,
                             id<MTLFunction>* function);

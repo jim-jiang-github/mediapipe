@@ -29,7 +29,7 @@ extern const char kPropagateCompileTimeConsts[];
 // input expression from context given the argument index in `args`.
 //
 // Returns a list of indices which were converted to constants.
-absl::InlinedVector<int, 5> ConvertCompileTimeConstArgumentsToConst(
+abslx::InlinedVector<int, 5> ConvertCompileTimeConstArgumentsToConst(
     XlaOpKernelContext* ctx, std::vector<XlaCompiler::Argument>* args,
     int xla_expression_offset,
     std::function<bool(int arg_idx)> should_resolve_constant);

@@ -23,10 +23,10 @@
 #include "absl/random/internal/fast_uniform_bits.h"
 #include "absl/random/internal/iostream_state_saver.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
-// absl::bernoulli_distribution is a drop in replacement for
+// abslx::bernoulli_distribution is a drop in replacement for
 // std::bernoulli_distribution. It guarantees that (given a perfect
 // UniformRandomBitGenerator) the acceptance probability is *exactly* equal to
 // the given double.
@@ -195,6 +195,6 @@ bool bernoulli_distribution::Generate(double p,
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_BERNOULLI_DISTRIBUTION_H_

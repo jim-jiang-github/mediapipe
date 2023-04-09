@@ -83,15 +83,15 @@ class ReductionRewriterVisitor : public DfsHloRewriteVisitor {
         GetReductionTiling(reduction_dimensions, cuda_compute_capability_);
     VLOG(5) << "Input: " << hlo->ToString();
     auto *reduce = Cast<HloReduceInstruction>(hlo);
-    absl::Span<int64_t const> input_shape_dims =
+    abslx::Span<int64_t const> input_shape_dims =
         reduce->inputs()[0]->shape().dimensions();
-    VLOG(3) << "Input dimensions: " << absl::StrJoin(input_shape_dims, ", ");
+    VLOG(3) << "Input dimensions: " << abslx::StrJoin(input_shape_dims, ", ");
 
     bool reduce_batch_dimension = hlo->dimensions().size() > 1;
     VLOG(3) << "reduce_batch_dimension = " << reduce_batch_dimension;
 
     std::vector<int64_t> reduced_dimensions = *hlo->mutable_dimensions();
-    absl::c_sort(reduced_dimensions);
+    abslx::c_sort(reduced_dimensions);
     CHECK_LE(reduced_dimensions.size(), 2);
     int64_t reduced_input_dimension =
         reduced_dimensions[reduced_dimensions.size() - 1];
@@ -127,7 +127,7 @@ class ReductionRewriterVisitor : public DfsHloRewriteVisitor {
 
     // Pad reduced dimension to the required number of elements.
     bool no_padding_necessary = reduced_dim_size % num_fit == 0;
-    using InstructionVector = absl::InlinedVector<HloInstruction *, 2>;
+    using InstructionVector = abslx::InlinedVector<HloInstruction *, 2>;
     auto padded = [&]() -> InstructionVector {
       if (no_padding_necessary) {
         return InstructionVector(reduce->inputs().begin(),
@@ -143,7 +143,7 @@ class ReductionRewriterVisitor : public DfsHloRewriteVisitor {
                                              input_shape_dims.end());
       padded_dimensions[reduced_input_dimension] = padded_num_elements;
 
-      absl::InlinedVector<HloInstruction *, 2> out;
+      abslx::InlinedVector<HloInstruction *, 2> out;
       out.reserve(reduce->input_count());
       for (int i = 0; i < reduce->input_count(); i++) {
         HloInstruction *in = reduce->inputs()[i];
@@ -157,7 +157,7 @@ class ReductionRewriterVisitor : public DfsHloRewriteVisitor {
     }();
 
     VLOG(2) << "Generated padding: " << padded[0]->ToString();
-    absl::InlinedVector<int64_t, 3> reshaped_dimensions;
+    abslx::InlinedVector<int64_t, 3> reshaped_dimensions;
     for (int64_t dim_idx = 0; dim_idx < padded[0]->shape().dimensions_size();
          dim_idx++) {
       if (dim_idx == reduced_input_dimension) {
@@ -173,7 +173,7 @@ class ReductionRewriterVisitor : public DfsHloRewriteVisitor {
       }
     }
 
-    absl::InlinedVector<int64_t, 3> inner_reduce_dimensions =
+    abslx::InlinedVector<int64_t, 3> inner_reduce_dimensions =
         reshaped_dimensions;
     int64_t inner_reduced_dimension = is_row_reduction
                                           ? inner_reduce_dimensions.size() - 1
@@ -191,7 +191,7 @@ class ReductionRewriterVisitor : public DfsHloRewriteVisitor {
     }
 
     InstructionVector reshaped_padded_inputs;
-    absl::InlinedVector<Shape, 2> inner_reduce_shapes;
+    abslx::InlinedVector<Shape, 2> inner_reduce_shapes;
     for (int i = 0; i < padded.size(); i++) {
       HloInstruction *p = padded[i];
       Shape reshaped_shape =
@@ -211,10 +211,10 @@ class ReductionRewriterVisitor : public DfsHloRewriteVisitor {
             reshaped_padded_inputs, reduce->init_values(), dims_to_reduce,
             hlo->to_apply()));
     VLOG(1) << "Generated inner reduction: " << inner_reduce->ToString();
-    absl::InlinedVector<int64_t, 3> outer_reduce_dimensions =
+    abslx::InlinedVector<int64_t, 3> outer_reduce_dimensions =
         inner_reduce_dimensions;
     VLOG(3) << "outer_reduce_dimensions = "
-            << absl::StrJoin(outer_reduce_dimensions, ", ");
+            << abslx::StrJoin(outer_reduce_dimensions, ", ");
     int64_t outer_reduced_dimension = is_row_reduction
                                           ? outer_reduce_dimensions.size() - 1
                                           : reduced_input_dimension;
@@ -240,7 +240,7 @@ class ReductionRewriterVisitor : public DfsHloRewriteVisitor {
     // undoing each other.
     CHECK(reduction_dimensions.is_row_reduction);
 
-    absl::InlinedVector<Shape, 2> tuple_shapes;
+    abslx::InlinedVector<Shape, 2> tuple_shapes;
     for (HloInstruction *input : hlo->inputs()) {
       tuple_shapes.push_back(
           ShapeUtil::DeleteDimension(reduced_input_dimension, input->shape()));
@@ -263,7 +263,7 @@ class ReductionRewriterVisitor : public DfsHloRewriteVisitor {
 
 StatusOr<bool> GpuTreeReductionRewriter::Run(
     HloModule *module,
-    const absl::flat_hash_set<absl::string_view> &execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view> &execution_threads) {
   VLOG(5) << "Rewriter input: " << module->ToString();
   TF_ASSIGN_OR_RETURN(bool changed,
                       ReductionRewriterVisitor(cuda_compute_capability_)

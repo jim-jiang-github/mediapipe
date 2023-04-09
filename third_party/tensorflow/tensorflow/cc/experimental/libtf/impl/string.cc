@@ -18,7 +18,7 @@ limitations under the License.
 
 // It is important for the container below to not invalidate pointers to
 // elements when elements are inserted, because the String class stores such
-// pointers. This rules out, for example, absl::flat_hash_set.
+// pointers. This rules out, for example, abslx::flat_hash_set.
 using StringTable = std::unordered_set<std::string>;
 
 namespace tf {

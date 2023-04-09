@@ -42,8 +42,8 @@ struct FusionInfoCache {
 
   // The rest of the members of this class are for internal use within
   // gpu_fusible. You shouldn't need to use them yourself.
-  absl::flat_hash_map<const HloInstruction*, int64_t> shared_memory_usage;
-  absl::flat_hash_map<const HloInstruction*, int64_t> num_unnested_reductions;
+  abslx::flat_hash_map<const HloInstruction*, int64_t> shared_memory_usage;
+  abslx::flat_hash_map<const HloInstruction*, int64_t> num_unnested_reductions;
 };
 
 inline constexpr int64_t MaxOperandsAndOutputsPerFusion() { return 64; }
@@ -131,7 +131,7 @@ bool IsConsumerTheOnlyNonRootUser(const HloInstruction& instr,
 size_t GetInstrCountOfFusible(const HloInstruction& instr);
 
 // Returns the outputs of the fusible `instr`.
-absl::InlinedVector<const HloInstruction*, 2> GetOutputsOfFusible(
+abslx::InlinedVector<const HloInstruction*, 2> GetOutputsOfFusible(
     const HloInstruction& instr);
 
 // Returns the output size of the fusible `instr`.

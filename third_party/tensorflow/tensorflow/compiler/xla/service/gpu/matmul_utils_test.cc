@@ -37,11 +37,11 @@ TEST(GetNonContractingDimsTest, Valid) {
 }
 
 struct GetBatchRowColumnShapeTestParams {
-  absl::string_view shape;
+  abslx::string_view shape;
   std::vector<int64_t> batch_dims;
   std::vector<int64_t> row_dims;
   std::vector<int64_t> col_dims;
-  absl::string_view expected_shape;
+  abslx::string_view expected_shape;
 };
 
 using GetBatchRowColumnShapeTest =
@@ -90,7 +90,7 @@ TEST(GetBatchRowColumnShapeTest, WrongPhysicalOrder) {
 using Order = MatrixLayout::Order;
 
 struct GetMatrixLayoutTestParams {
-  absl::string_view shape;
+  abslx::string_view shape;
   int64_t batch_size;
   int64_t num_rows;
   int64_t num_cols;

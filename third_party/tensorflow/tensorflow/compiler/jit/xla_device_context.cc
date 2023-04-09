@@ -207,7 +207,7 @@ void XlaDeviceContext::CopyCPUTensorToDevice(const Tensor* cpu_tensor,
 }
 
 void XlaDeviceContext::CopyDeviceTensorToCPU(const Tensor* device_tensor,
-                                             absl::string_view tensor_name,
+                                             abslx::string_view tensor_name,
                                              Device* device, Tensor* cpu_tensor,
                                              StatusCallback done) {
   if (device_tensor->NumElements() == 0) {
@@ -290,7 +290,7 @@ void XlaDeviceContext::CopyDeviceTensorToCPU(const Tensor* device_tensor,
 
 se::Stream* XlaDeviceContext::GetDeviceToDeviceStream() {
   DCHECK_GT(device_to_device_streams_.size(), 0);
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   int stream = next_stream_;
   next_stream_ = (next_stream_ + 1) % device_to_device_streams_.size();
   return device_to_device_stream(stream);

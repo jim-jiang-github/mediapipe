@@ -101,7 +101,7 @@ class OwningScratchAllocator : public ScratchAllocator {
  private:
   int device_ordinal_;
   DeviceMemoryAllocator* allocator_;
-  absl::InlinedVector<OwningDeviceMemory, N> buffers_;
+  abslx::InlinedVector<OwningDeviceMemory, N> buffers_;
 
   SE_DISALLOW_COPY_AND_ASSIGN(OwningScratchAllocator);
 };

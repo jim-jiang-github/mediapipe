@@ -104,7 +104,7 @@ std::string StringReplace(StringPiece s, StringPiece oldsub, StringPiece newsub,
 // Join functionality
 template <typename T>
 std::string Join(const T& s, const char* sep) {
-  return absl::StrJoin(s, sep);
+  return abslx::StrJoin(s, sep);
 }
 
 // A variant of Join where for each element of "s", f(&dest_string, elem)
@@ -112,7 +112,7 @@ std::string Join(const T& s, const char* sep) {
 //   [](string* result, ElemType elem)
 template <typename T, typename Formatter>
 std::string Join(const T& s, const char* sep, Formatter f) {
-  return absl::StrJoin(s, sep, f);
+  return abslx::StrJoin(s, sep, f);
 }
 
 struct AllowEmpty {
@@ -123,7 +123,7 @@ struct SkipEmpty {
 };
 struct SkipWhitespace {
   bool operator()(StringPiece sp) const {
-    return !absl::StripTrailingAsciiWhitespace(sp).empty();
+    return !abslx::StripTrailingAsciiWhitespace(sp).empty();
   }
 };
 
@@ -131,22 +131,22 @@ struct SkipWhitespace {
 // Split("a,b.c,d", ".,") would return {"a", "b", "c", "d"}.
 inline std::vector<string> Split(StringPiece text, StringPiece delims) {
   return text.empty() ? std::vector<string>()
-                      : absl::StrSplit(text, absl::ByAnyChar(delims));
+                      : abslx::StrSplit(text, abslx::ByAnyChar(delims));
 }
 
 template <typename Predicate>
 std::vector<string> Split(StringPiece text, StringPiece delims, Predicate p) {
   return text.empty() ? std::vector<string>()
-                      : absl::StrSplit(text, absl::ByAnyChar(delims), p);
+                      : abslx::StrSplit(text, abslx::ByAnyChar(delims), p);
 }
 
 inline std::vector<string> Split(StringPiece text, char delim) {
-  return text.empty() ? std::vector<string>() : absl::StrSplit(text, delim);
+  return text.empty() ? std::vector<string>() : abslx::StrSplit(text, delim);
 }
 
 template <typename Predicate>
 std::vector<string> Split(StringPiece text, char delim, Predicate p) {
-  return text.empty() ? std::vector<string>() : absl::StrSplit(text, delim, p);
+  return text.empty() ? std::vector<string>() : abslx::StrSplit(text, delim, p);
 }
 
 // StartsWith()

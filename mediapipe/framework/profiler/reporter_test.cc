@@ -60,7 +60,7 @@ std::unique_ptr<Reporter> loadReporter(const std::vector<std::string>& paths) {
   for (const auto path : paths) {
     GraphProfile profile;
     LoadGraphProfile(
-        absl::StrCat(GetTestDataDir("mediapipe/framework/profiler"), path),
+        abslx::StrCat(GetTestDataDir("mediapipe/framework/profiler"), path),
         &profile);
     reporter->Accumulate(profile);
   }

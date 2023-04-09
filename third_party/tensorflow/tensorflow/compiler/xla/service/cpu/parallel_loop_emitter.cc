@@ -30,7 +30,7 @@ ParallelLoopEmitter::ParallelLoopEmitter(
       dynamic_loop_bounds_(dynamic_loop_bounds) {}
 
 std::vector<llvm_ir::IrArray::Index>
-ParallelLoopEmitter::EmitIndexAndSetExitBasicBlock(absl::string_view loop_name,
+ParallelLoopEmitter::EmitIndexAndSetExitBasicBlock(abslx::string_view loop_name,
                                                    llvm::Type* index_type,
                                                    llvm::Value* base_index) {
   CHECK_NE(index_type, nullptr);
@@ -58,7 +58,7 @@ ParallelLoopEmitter::EmitIndexAndSetExitBasicBlock(absl::string_view loop_name,
       llvm::Value* end_index = (*dynamic_loop_bounds_)[bounds_index].second;
 
       std::unique_ptr<llvm_ir::ForLoop> loop = loop_nest.AddLoop(
-          /*suffix=*/absl::StrFormat("dim.%d", dimension), start_index,
+          /*suffix=*/abslx::StrFormat("dim.%d", dimension), start_index,
           end_index);
       array_multi_index[dimension] = loop->GetIndVarValue();
     } else {
@@ -66,7 +66,7 @@ ParallelLoopEmitter::EmitIndexAndSetExitBasicBlock(absl::string_view loop_name,
       std::unique_ptr<llvm_ir::ForLoop> loop = loop_nest.AddLoop(
           /*start_index=*/0,
           /*end_index=*/shape_.dimensions(dimension),
-          /*suffix=*/absl::StrFormat("dim.%d", dimension));
+          /*suffix=*/abslx::StrFormat("dim.%d", dimension));
       array_multi_index[dimension] = loop->GetIndVarValue();
     }
   }

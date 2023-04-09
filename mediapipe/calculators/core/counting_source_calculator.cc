@@ -37,7 +37,7 @@ constexpr char kErrorOnOpenTag[] = "ERROR_ON_OPEN";
 // provided, then batches are of size 1.
 class CountingSourceCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Outputs().Index(0).Set<int>();
 
     if (cc->InputSidePackets().HasTag(kErrorOnOpenTag)) {
@@ -62,13 +62,13 @@ class CountingSourceCalculator : public CalculatorBase {
     if (cc->InputSidePackets().HasTag(kIncrementTag)) {
       cc->InputSidePackets().Tag(kIncrementTag).Set<int>();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     if (cc->InputSidePackets().HasTag(kErrorOnOpenTag) &&
         cc->InputSidePackets().Tag(kErrorOnOpenTag).Get<bool>()) {
-      return absl::NotFoundError("expected error");
+      return abslx::NotFoundError("expected error");
     }
     if (cc->InputSidePackets().HasTag(kErrorCountTag)) {
       error_count_ = cc->InputSidePackets().Tag(kErrorCountTag).Get<int>();
@@ -90,12 +90,12 @@ class CountingSourceCalculator : public CalculatorBase {
       RET_CHECK_LT(0, increment_);
     }
     RET_CHECK(error_count_ >= 0 || max_count_ >= 0);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     if (error_count_ >= 0 && batch_counter_ >= error_count_) {
-      return absl::InternalError("expected error");
+      return abslx::InternalError("expected error");
     }
     if (max_count_ >= 0 && batch_counter_ >= max_count_) {
       return tool::StatusStop();
@@ -105,7 +105,7 @@ class CountingSourceCalculator : public CalculatorBase {
       counter_ += increment_;
     }
     ++batch_counter_;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

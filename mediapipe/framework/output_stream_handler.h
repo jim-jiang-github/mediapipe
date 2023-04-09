@@ -76,11 +76,11 @@ class OutputStreamHandler {
   // OutputStreamHandler::output_stream_managers_ (meaning it should
   // point to somewhere in the middle of the main flat array of all
   // output stream managers).
-  absl::Status InitializeOutputStreamManagers(
+  abslx::Status InitializeOutputStreamManagers(
       OutputStreamManager* flat_output_stream_managers);
 
   // Sets up output shards by connecting to the managers.
-  absl::Status SetupOutputShards(OutputStreamShardSet* output_shards);
+  abslx::Status SetupOutputShards(OutputStreamShardSet* output_shards);
 
   int NumOutputStreams() const { return output_stream_managers_.NumEntries(); }
 
@@ -91,7 +91,7 @@ class OutputStreamHandler {
 
   // Calls OutputStreamManager::PrepareForRun(error_callback) per stream, and
   // resets data memebers.
-  void PrepareForRun(const std::function<void(absl::Status)>& error_callback)
+  void PrepareForRun(const std::function<void(abslx::Status)>& error_callback)
       ABSL_LOCKS_EXCLUDED(timestamp_mutex_);
 
   // Marks the output streams as started and propagates any changes made in
@@ -146,7 +146,7 @@ class OutputStreamHandler {
   MediaPipeOptions options_;
   const bool calculator_run_in_parallel_;
 
-  absl::Mutex timestamp_mutex_;
+  abslx::Mutex timestamp_mutex_;
   // A set of the completed input timestamps in ascending order.
   std::set<Timestamp> completed_input_timestamps_
       ABSL_GUARDED_BY(timestamp_mutex_);
@@ -206,7 +206,7 @@ using OutputStreamHandlerRegistry = GlobalFactoryRegistry<
   REGISTER_FACTORY_FUNCTION_QUALIFIED(                                      \
       mediapipe::OutputStreamHandlerRegistry, output_handler_registration,  \
       name,                                                                 \
-      absl::make_unique<name, std::shared_ptr<tool::TagMap>,                \
+      abslx::make_unique<name, std::shared_ptr<tool::TagMap>,                \
                         CalculatorContextManager*, const MediaPipeOptions&, \
                         bool>)
 

@@ -102,7 +102,7 @@ void NodeExecStatsWrapper::Done(const string& device) {
                            tensor_name, " @", send_device, ")");
   } else {
     text = strings::StrCat(memory, node_->name(), " = ", node_->op(), "(",
-                           absl::StrJoin(node_->input(), ", "), ")");
+                           abslx::StrJoin(node_->input(), ", "), ")");
   }
   stats_->set_timeline_label(text);
   step_stats_collector_->Save(device, this);
@@ -174,7 +174,7 @@ void NodeExecStatsWrapper::AddAllocation(
   memory->set_peak_bytes(std::get<1>(sizes));
   memory->set_live_bytes(std::get<2>(sizes));
 
-  absl::optional<AllocatorStats> stats = allocator->GetStats();
+  abslx::optional<AllocatorStats> stats = allocator->GetStats();
   if (stats) {
     memory->set_allocator_bytes_in_use(stats->bytes_in_use);
   }

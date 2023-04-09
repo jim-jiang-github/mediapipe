@@ -48,10 +48,10 @@ TEST(TensorMapTest, Insert) {
   TensorKey k = Tensor(11);
   Tensor v = Tensor(22);
   tm.insert(k, v);
-  absl::flat_hash_map<TensorKey, Tensor> am;
+  abslx::flat_hash_map<TensorKey, Tensor> am;
   am.try_emplace(k, v);
 
-  absl::flat_hash_map<TensorKey, Tensor>::iterator map_it =
+  abslx::flat_hash_map<TensorKey, Tensor>::iterator map_it =
       tm.tensors().begin();
   EXPECT_EQ(map_it->first, k);
   test::ExpectTensorEqual<int32>(map_it->second, v);
@@ -64,7 +64,7 @@ TEST(TensorMapTest, Lookup) {
   TensorKey k = Tensor(11);
   Tensor v = Tensor(22);
   tm.insert(k, v);
-  absl::flat_hash_map<TensorKey, Tensor>::iterator map_it = tm.find(k);
+  abslx::flat_hash_map<TensorKey, Tensor>::iterator map_it = tm.find(k);
   Tensor f = map_it->second;
 
   EXPECT_EQ(map_it->first, k);
@@ -89,7 +89,7 @@ TEST(TensorMapTest, SameKeyInsert) {
   bool b2 = tm.insert(k, v2);
   EXPECT_EQ(b1, true);
   EXPECT_EQ(b2, false);
-  absl::flat_hash_map<TensorKey, Tensor>::iterator map_it = tm.find(k);
+  abslx::flat_hash_map<TensorKey, Tensor>::iterator map_it = tm.find(k);
   EXPECT_EQ(map_it->first, k);
   test::ExpectTensorEqual<int32>(map_it->second, v1);
 }
@@ -100,7 +100,7 @@ TEST(TensorMapTest, Replace) {
   Tensor v1 = Tensor(22);
   Tensor v2 = Tensor(23);
   tm[k] = v2;
-  absl::flat_hash_map<TensorKey, Tensor>::iterator map_it = tm.find(k);
+  abslx::flat_hash_map<TensorKey, Tensor>::iterator map_it = tm.find(k);
   EXPECT_EQ(map_it->first, k);
   test::ExpectTensorEqual<int32>(map_it->second, v2);
 }

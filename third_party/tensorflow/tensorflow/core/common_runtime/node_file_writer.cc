@@ -26,8 +26,8 @@ namespace {
 
 // Avoiding writing to disk very commonly executed ops that are known to be
 // deterministic. This reduces the filesize.
-const absl::flat_hash_set<std::string>* const kOpsToSkipWriting =
-    new absl::flat_hash_set<std::string>{"Add",
+const abslx::flat_hash_set<std::string>* const kOpsToSkipWriting =
+    new abslx::flat_hash_set<std::string>{"Add",
                                          "AddV2",
                                          "BroadcastTo",
                                          "Cast",
@@ -98,7 +98,7 @@ tensorflow::NodeFileWriter::GetNodeFileWriterIfEnabled(
   // total size of the outputted files, since it means if multiple Sessions run
   // the same op, the op is only written recorded to disk once.
   static auto* device_name_to_writer =
-      new absl::flat_hash_map<std::string, NodeFileWriter*>{};
+      new abslx::flat_hash_map<std::string, NodeFileWriter*>{};
   mutex_lock l(mu);
   auto it = device_name_to_writer->find(device_name);
   if (it == device_name_to_writer->end()) {
@@ -110,7 +110,7 @@ tensorflow::NodeFileWriter::GetNodeFileWriterIfEnabled(
     // Put the device name in the filename for debugging purposes. Also append
     // random number in case multiple processes write out nodes concurrently.
     std::string filename = strings::StrCat(
-        "node_defs", absl::StrReplaceAll(device_name, {{"/", "_"}, {":", "_"}}),
+        "node_defs", abslx::StrReplaceAll(device_name, {{"/", "_"}, {":", "_"}}),
         "_", random::New64());
 
     auto* writer = new NodeFileWriter{io::JoinPath(*node_dir, filename)};

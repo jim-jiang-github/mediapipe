@@ -134,7 +134,7 @@ class TestLinspaceMaxParametric
         MakeLinspaceArray2D<T>(from, to, rows, cols);
     auto arhs = std::make_unique<Array2D<T>>(rows, cols, static_cast<T>(1.0f));
 
-    XlaBuilder builder(absl::StrFormat("max_%dx%d_linspace", rows, cols));
+    XlaBuilder builder(abslx::StrFormat("max_%dx%d_linspace", rows, cols));
     auto lhs = ConstantR2FromArray2D<T>(&builder, *alhs);
     auto rhs = ConstantR2FromArray2D<T>(&builder, *arhs);
     Max(lhs, rhs);
@@ -156,7 +156,7 @@ class TestLinspaceMaxParametric
 std::string PrintTestLinspaceMaxParam(
     const ::testing::TestParamInfo<TestLinspaceMaxParam>& test_param) {
   const TestLinspaceMaxParam& param = test_param.param;
-  return absl::StrCat(param.rows, "r", param.cols, "c");
+  return abslx::StrCat(param.rows, "r", param.cols, "c");
 }
 
 #ifndef XLA_BACKEND_DOES_NOT_SUPPORT_FLOAT16

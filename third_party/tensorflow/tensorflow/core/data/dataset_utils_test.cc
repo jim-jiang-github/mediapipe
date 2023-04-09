@@ -211,7 +211,7 @@ TEST_P(GetExperimentsHashTest, DatasetUtils) {
   auto hash_func = [hash_result](const string& str) { return hash_result; };
   auto experiments = GetExperiments(job_name, hash_func);
 
-  absl::flat_hash_set<string> experiment_set(experiments.begin(),
+  abslx::flat_hash_set<string> experiment_set(experiments.begin(),
                                              experiments.end());
   for (const auto& experiment : test_case.expected_in) {
     EXPECT_TRUE(experiment_set.find(experiment) != experiment_set.end())
@@ -319,7 +319,7 @@ TEST_P(GetExperimentsOptTest, DatasetUtils) {
   auto hash_func = [](const string& str) { return 0; };
   auto experiments = GetExperiments(job_name, hash_func);
 
-  absl::flat_hash_set<string> experiment_set(experiments.begin(),
+  abslx::flat_hash_set<string> experiment_set(experiments.begin(),
                                              experiments.end());
   for (const auto& experiment : test_case.expected_in) {
     EXPECT_TRUE(experiment_set.find(experiment) != experiment_set.end())
@@ -450,7 +450,7 @@ TEST_P(GetExperimentsJobNameTest, DatasetUtils) {
   auto hash_func = [](const string& str) { return 0; };
   auto experiments = GetExperiments(job_name, hash_func);
 
-  absl::flat_hash_set<string> experiment_set(experiments.begin(),
+  abslx::flat_hash_set<string> experiment_set(experiments.begin(),
                                              experiments.end());
   for (const auto& experiment : test_case.expected_in) {
     EXPECT_TRUE(experiment_set.find(experiment) != experiment_set.end())
@@ -555,7 +555,7 @@ TEST_P(GetOptimizationsTest, DatasetUtils) {
   const GetOptimizationsTestCase test_case = GetParam();
   auto options = test_case.options;
 
-  absl::flat_hash_set<tstring> actual_enabled, actual_disabled, actual_default;
+  abslx::flat_hash_set<tstring> actual_enabled, actual_disabled, actual_default;
   GetOptimizations(options, &actual_enabled, &actual_disabled, &actual_default);
 
   EXPECT_THAT(std::vector<string>(actual_enabled.begin(), actual_enabled.end()),
@@ -578,7 +578,7 @@ TEST(DeterministicOpsTest, GetOptimizations) {
   Options options;
   // options.deterministic should be ignored when deterministic ops are enabled.
   options.set_deterministic(false);
-  absl::flat_hash_set<tstring> actual_enabled, actual_disabled, actual_default;
+  abslx::flat_hash_set<tstring> actual_enabled, actual_disabled, actual_default;
   GetOptimizations(options, &actual_enabled, &actual_disabled, &actual_default);
   EXPECT_THAT(std::vector<string>(actual_enabled.begin(), actual_enabled.end()),
               ::testing::UnorderedElementsAreArray({"make_deterministic"}));

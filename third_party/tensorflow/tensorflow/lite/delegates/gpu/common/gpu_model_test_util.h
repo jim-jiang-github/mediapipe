@@ -29,7 +29,7 @@ namespace gpu {
 //   cosinus
 //      |
 //   output
-absl::Status TestLinkingConvolutionAndCosOp(TestExecutionEnvironment* env);
+abslx::Status TestLinkingConvolutionAndCosOp(TestExecutionEnvironment* env);
 
 //      input0
 //        |
@@ -40,7 +40,7 @@ absl::Status TestLinkingConvolutionAndCosOp(TestExecutionEnvironment* env);
 //               multiplication1
 //                      |
 //                    output
-absl::Status TestLinkingConvolution2InputMul2InputMul(
+abslx::Status TestLinkingConvolution2InputMul2InputMul(
     TestExecutionEnvironment* env);
 
 //      input0(32x32x128)
@@ -56,7 +56,7 @@ absl::Status TestLinkingConvolution2InputMul2InputMul(
 //               multiplication
 //                      |
 //                    output(32x32x16)
-absl::Status TestLinkingConvolution2InputBroadcastMul2InputMul(
+abslx::Status TestLinkingConvolution2InputBroadcastMul2InputMul(
     TestExecutionEnvironment* env);
 
 //      input0(32x32x128)
@@ -72,7 +72,7 @@ absl::Status TestLinkingConvolution2InputBroadcastMul2InputMul(
 //               broadcast_mul
 //                      |
 //                    output(32x32x16)
-absl::Status TestLinkingConvolution2InputMul2InputBroadcastMul(
+abslx::Status TestLinkingConvolution2InputMul2InputBroadcastMul(
     TestExecutionEnvironment* env);
 
 //      input0
@@ -86,7 +86,7 @@ absl::Status TestLinkingConvolution2InputMul2InputBroadcastMul(
 //                   cosinus
 //                      |
 //                   output
-absl::Status TestLinkingConvolution2InputMul2InputMulCos(
+abslx::Status TestLinkingConvolution2InputMul2InputMulCos(
     TestExecutionEnvironment* env);
 
 }  // namespace gpu

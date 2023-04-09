@@ -28,14 +28,14 @@ inline char ascii_normalise(const unsigned char c) {
   if (c == ' ' || c == '-') {
     return '_';
   }
-  return absl::ascii_tolower(c);
+  return abslx::ascii_tolower(c);
 }
 
 }  // namespace
 
-std::string CanonicalizeValue(absl::string_view input) {
+std::string CanonicalizeValue(abslx::string_view input) {
   std::string output;
-  absl::c_transform(input, std::back_inserter(output),
+  abslx::c_transform(input, std::back_inserter(output),
                     tflite::acceleration::ascii_normalise);
   return output;
 }

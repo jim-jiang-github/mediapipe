@@ -33,7 +33,7 @@ class EglSync {
   // flushed.
   //
   // Depends on EGL_KHR_fence_sync extension.
-  static absl::Status NewFence(EGLDisplay display, EglSync* sync);
+  static abslx::Status NewFence(EGLDisplay display, EglSync* sync);
 
   // Creates invalid object.
   EglSync() : EglSync(EGL_NO_DISPLAY, EGL_NO_SYNC_KHR) {}
@@ -51,10 +51,10 @@ class EglSync {
 
   // Causes GPU to block and wait until this sync has been signaled.
   // This call does not block and returns immediately.
-  absl::Status ServerWait();
+  abslx::Status ServerWait();
 
   // Causes CPU to block and wait until this sync has been signaled.
-  absl::Status ClientWait();
+  abslx::Status ClientWait();
 
   // Returns the EGLDisplay on which this instance was created.
   EGLDisplay display() const { return display_; }

@@ -62,7 +62,7 @@ class CpuExecutable : public Executable {
   // arguments using the supplied buffers.
   Status ExecuteComputeFunction(
       const ExecutableRunOptions* run_options,
-      absl::Span<MaybeOwningDeviceMemory const> buffers,
+      abslx::Span<MaybeOwningDeviceMemory const> buffers,
       HloExecutionProfile* hlo_execution_profile);
 
   // This should be called after set_ir_module_string.
@@ -108,7 +108,7 @@ class CpuExecutable : public Executable {
   //    are to be freed by the caller.
   StatusOr<std::vector<MaybeOwningDeviceMemory>> CreateBufferTable(
       se::DeviceMemoryAllocator* memory_allocator, int device_ordinal,
-      absl::Span<ExecutionInput const> arguments);
+      abslx::Span<ExecutionInput const> arguments);
 
   // Creates an Execution output holding ScopedShapedBuffer for holding the
   // result of the computation, moving buffers out of allocated_buffers and into
@@ -116,8 +116,8 @@ class CpuExecutable : public Executable {
   // assignment.
   StatusOr<ExecutionOutput> CreateResultShapedBuffer(
       const ServiceExecutableRunOptions* run_options,
-      absl::Span<MaybeOwningDeviceMemory> buffers,
-      absl::Span<ExecutionInput> arguments);
+      abslx::Span<MaybeOwningDeviceMemory> buffers,
+      abslx::Span<ExecutionInput> arguments);
 
   // Returns the instruction value set of the root instruction of the entry
   // computation. Uses dataflow analysis from buffer assignment.

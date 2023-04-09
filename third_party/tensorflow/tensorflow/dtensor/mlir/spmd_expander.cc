@@ -67,12 +67,12 @@ InitOnStartupMarker SPMDExpanderRegistry::RegisterPropagateFn(
 
 Status SPMDExpanderBase::ExpandOpAndSetLayout(mlir::Operation* op,
                                               mlir::Operation** output) {
-  TF_ASSIGN_OR_RETURN(std::vector<absl::optional<Layout>> computed_layout,
+  TF_ASSIGN_OR_RETURN(std::vector<abslx::optional<Layout>> computed_layout,
                       ExtractLayoutFromOp(op));
 
   if (computed_layout.empty() && op->getNumResults() != 0) {
     return errors::InvalidArgument(
-        absl::StrCat("No attachced layout found for op : ", OpName(op),
+        abslx::StrCat("No attachced layout found for op : ", OpName(op),
                      " This might be due to an error in layout propagation.")
             .c_str());
   }
@@ -104,7 +104,7 @@ Status SPMDExpanderBase::ExpandOpAndSetLayout(mlir::Operation* op,
   TF_ASSIGN_OR_RETURN(*output, this->ExpandOp(op));
 
   // TODO(hthu): Use ToString() instead.
-  SetLayoutOnOp(*output, absl::Span<absl::optional<Layout>>(
+  SetLayoutOnOp(*output, abslx::Span<abslx::optional<Layout>>(
                              computed_layout.data(), computed_layout.size()));
 
   // Verify the local shape of the expanded operation matches the shape expected

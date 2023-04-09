@@ -115,7 +115,7 @@ class HloValue : public BufferValue {
   // Sets the positions in the module at which the HloValue appears. Should be
   // called once and only once. The defining position should not be included in
   // 'positions' as this is set at construction time.
-  void SetPositions(absl::Span<const HloPosition> positions);
+  void SetPositions(abslx::Span<const HloPosition> positions);
 
   // Returns whether this value is a phi value.
   bool is_phi() const { return is_phi_; }
@@ -148,7 +148,7 @@ class HloValue : public BufferValue {
   // overhead could be non-trivial for the first invocation. Therefore even
   // though it is marked `const`, it actually can mutate its data members. It is
   // kept this way to allow passing around const references.
-  absl::Span<const HloUse> GetUses() const {
+  abslx::Span<const HloUse> GetUses() const {
     return uses_.MaybeInitAndGet(
         [this](std::vector<HloUse>& uses) { ComputeUses(uses); });
   }
@@ -173,7 +173,7 @@ class HloValue : public BufferValue {
   class Lazy {
    public:
     Lazy() = default;
-    const T& MaybeInitAndGet(absl::FunctionRef<void(T&)> func) const {
+    const T& MaybeInitAndGet(abslx::FunctionRef<void(T&)> func) const {
       if (!initialized_) {
         func(uses_);
         initialized_ = true;
@@ -217,12 +217,12 @@ class HloValueSet {
  public:
   HloValueSet() = default;
 
-  explicit HloValueSet(absl::Span<const HloValue* const> values);
-  explicit HloValueSet(const absl::flat_hash_set<const HloValue*>& values);
+  explicit HloValueSet(abslx::Span<const HloValue* const> values);
+  explicit HloValueSet(const abslx::flat_hash_set<const HloValue*>& values);
 
   // Sets this value set to the union of the given value sets. Returns whether
   // this value set changed.
-  bool AssignUnionOf(absl::Span<const HloValueSet* const> inputs);
+  bool AssignUnionOf(abslx::Span<const HloValueSet* const> inputs);
 
   // Return the vector of HloValues in the set. Values in the vector are unique
   // and stably sorted by value id.
@@ -279,7 +279,7 @@ class InstructionValueSet : public ShapeTree<HloValueSet> {
 
   // Sets this value set to the union of the given value sets. Returns whether
   // this value set changed.
-  bool AssignUnionOf(absl::Span<const InstructionValueSet* const> inputs);
+  bool AssignUnionOf(abslx::Span<const InstructionValueSet* const> inputs);
 
   // Sets this value set to the input value set at the given index. Returns
   // whether this value set changed.

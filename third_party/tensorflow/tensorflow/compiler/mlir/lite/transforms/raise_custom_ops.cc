@@ -56,7 +56,7 @@ void RaiseCustomOpsPass::runOnOperation() {
   auto fn = getOperation();
   OpBuilder builder(fn.getContext());
 
-  absl::flat_hash_set<std::string> target_op_names(target_ops_.begin(),
+  abslx::flat_hash_set<std::string> target_op_names(target_ops_.begin(),
                                                    target_ops_.end());
 
   llvm::SmallVector<Operation *, 4> custom_ops;

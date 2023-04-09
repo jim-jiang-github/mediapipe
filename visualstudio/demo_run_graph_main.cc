@@ -48,7 +48,7 @@ ABSL_FLAG(std::string, output_video_path, "",
     "Full path of where to save result (.mp4 only). "
     "If not provided, show result in a window.");
 
-absl::Status RunMPPGraph() {
+abslx::Status RunMPPGraph() {
     LOG(INFO) << "Initialize the calculator graph.";
     mediapipe::CalculatorGraph graph;
     MP_RETURN_IF_ERROR(init_calculator_graph(graph));
@@ -59,7 +59,7 @@ absl::Status RunMPPGraph() {
     RET_CHECK(capture.isOpened());
 
     cv::VideoWriter writer;
-    const bool save_video = !absl::GetFlag(FLAGS_output_video_path).empty();
+    const bool save_video = !abslx::GetFlag(FLAGS_output_video_path).empty();
     if (!save_video) {
         cv::namedWindow(kWindowName, /*flags=WINDOW_AUTOSIZE*/ 1);
 #if ((CV_MAJOR_VERSION*10+CV_MINOR_VERSION) >= 32)
@@ -103,7 +103,7 @@ absl::Status RunMPPGraph() {
         mediapipe::Timestamp const timestamp(get_elapsed_time_microseconds(start_time));
 
         // Wrap Mat into an ImageFrame.
-        auto input_frame = absl::make_unique<mediapipe::ImageFrame>(
+        auto input_frame = abslx::make_unique<mediapipe::ImageFrame>(
             mediapipe::ImageFormat::SRGB, camera_frame.cols, camera_frame.rows,
             mediapipe::ImageFrame::kDefaultAlignmentBoundary);
         cv::Mat input_frame_mat = mediapipe::formats::MatView(input_frame.get());
@@ -164,13 +164,13 @@ int main(int argc, char** argv) {
         if (!find_resource_root) {
             argvv.push_back(resource_root_dir);
         }
-        absl::ParseCommandLine((int)argvv.size(), argvv.data());
+        abslx::ParseCommandLine((int)argvv.size(), argvv.data());
     }
     else {
-        absl::ParseCommandLine(argc, argv);
+        abslx::ParseCommandLine(argc, argv);
     }
 
-    absl::Status run_status = RunMPPGraph();
+    abslx::Status run_status = RunMPPGraph();
     if (!run_status.ok()) {
         std::cout << "Failed to run the graph: " << run_status.message() << "\n";
         system("pause");

@@ -55,7 +55,7 @@ int64 GetInputTimestampMs(::mediapipe::CalculatorContext* cc) {
 std::unique_ptr<TrackedDetection> GetTrackedDetectionFromDetection(
     const Detection& detection, int64 timestamp) {
   std::unique_ptr<TrackedDetection> tracked_detection =
-      absl::make_unique<TrackedDetection>(detection.detection_id(), timestamp);
+      abslx::make_unique<TrackedDetection>(detection.detection_id(), timestamp);
   const float top = detection.location_data().relative_bounding_box().ymin();
   const float bottom =
       detection.location_data().relative_bounding_box().ymin() +
@@ -149,10 +149,10 @@ Detection GetAxisAlignedDetectionFromTrackedDetection(
 // }
 class TrackedDetectionManagerCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
 
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   // Adds new list of detections to |waiting_for_update_detections_|.
@@ -166,12 +166,12 @@ class TrackedDetectionManagerCalculator : public CalculatorBase {
 
   // Set of detections that are not up to date yet. These detections will be
   // added to the detection manager until they got updated from the box tracker.
-  absl::node_hash_map<int, std::unique_ptr<TrackedDetection>>
+  abslx::node_hash_map<int, std::unique_ptr<TrackedDetection>>
       waiting_for_update_detections_;
 };
 REGISTER_CALCULATOR(TrackedDetectionManagerCalculator);
 
-absl::Status TrackedDetectionManagerCalculator::GetContract(
+abslx::Status TrackedDetectionManagerCalculator::GetContract(
     CalculatorContract* cc) {
   if (cc->Inputs().HasTag(kDetectionsTag)) {
     cc->Inputs().Tag(kDetectionsTag).Set<std::vector<Detection>>();
@@ -193,25 +193,25 @@ absl::Status TrackedDetectionManagerCalculator::GetContract(
     cc->Outputs().Tag(kDetectionBoxesTag).Set<std::vector<NormalizedRect>>();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TrackedDetectionManagerCalculator::Open(CalculatorContext* cc) {
+abslx::Status TrackedDetectionManagerCalculator::Open(CalculatorContext* cc) {
   mediapipe::TrackedDetectionManagerCalculatorOptions options =
       cc->Options<mediapipe::TrackedDetectionManagerCalculatorOptions>();
   tracked_detection_manager_.SetConfig(
       options.tracked_detection_manager_options());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TrackedDetectionManagerCalculator::Process(CalculatorContext* cc) {
+abslx::Status TrackedDetectionManagerCalculator::Process(CalculatorContext* cc) {
   if (cc->Inputs().HasTag(kTrackingBoxesTag) &&
       !cc->Inputs().Tag(kTrackingBoxesTag).IsEmpty()) {
     const TimedBoxProtoList& tracked_boxes =
         cc->Inputs().Tag(kTrackingBoxesTag).Get<TimedBoxProtoList>();
 
     // Collect all detections that are removed.
-    auto removed_detection_ids = absl::make_unique<std::vector<int>>();
+    auto removed_detection_ids = abslx::make_unique<std::vector<int>>();
     for (const TimedBoxProto& tracked_box : tracked_boxes.box()) {
       NormalizedRect bounding_box;
       bounding_box.set_x_center((tracked_box.left() + tracked_box.right()) /
@@ -263,8 +263,8 @@ absl::Status TrackedDetectionManagerCalculator::Process(CalculatorContext* cc) {
     // Output detections and corresponding bounding boxes.
     const auto& all_detections =
         tracked_detection_manager_.GetAllTrackedDetections();
-    auto output_detections = absl::make_unique<std::vector<Detection>>();
-    auto output_boxes = absl::make_unique<std::vector<NormalizedRect>>();
+    auto output_detections = abslx::make_unique<std::vector<Detection>>();
+    auto output_boxes = abslx::make_unique<std::vector<NormalizedRect>>();
 
     for (const auto& detection_ptr : all_detections) {
       const auto& detection = *detection_ptr.second;
@@ -304,7 +304,7 @@ absl::Status TrackedDetectionManagerCalculator::Process(CalculatorContext* cc) {
     AddDetectionList(detection_list, cc);
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void TrackedDetectionManagerCalculator::AddDetectionList(

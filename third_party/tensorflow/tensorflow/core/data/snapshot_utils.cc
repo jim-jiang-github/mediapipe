@@ -139,9 +139,9 @@ Status TFRecordWriter::WriteTensors(const std::vector<Tensor>& tensors) {
     // will result in proto_buffer == nullptr when WriteRecord happens.
     auto proto_buffer = new std::string();
     proto.SerializeToString(proto_buffer);
-    absl::Cord proto_serialized = absl::MakeCordFromExternal(
+    abslx::Cord proto_serialized = abslx::MakeCordFromExternal(
         *proto_buffer,
-        [proto_buffer](absl::string_view) { delete proto_buffer; });
+        [proto_buffer](abslx::string_view) { delete proto_buffer; });
     TF_RETURN_IF_ERROR(record_writer_->WriteRecord(proto_serialized));
 #else   // TF_CORD_SUPPORT
     TF_RETURN_IF_ERROR(record_writer_->WriteRecord(proto.SerializeAsString()));
@@ -224,9 +224,9 @@ Status CustomWriter::WriteTensors(const std::vector<Tensor>& tensors) {
 #if defined(TF_CORD_SUPPORT)
     auto record_buffer = new std::string();
     record.SerializeToString(record_buffer);
-    absl::Cord record_serialized = absl::MakeCordFromExternal(
+    abslx::Cord record_serialized = abslx::MakeCordFromExternal(
         *record_buffer,
-        [record_buffer](absl::string_view) { delete record_buffer; });
+        [record_buffer](abslx::string_view) { delete record_buffer; });
     return WriteRecord(record_serialized);
 #else   // TF_CORD_SUPPORT
     return WriteRecord(record.SerializeAsString());
@@ -286,9 +286,9 @@ Status CustomWriter::WriteTensors(const std::vector<Tensor>& tensors) {
 #if defined(TF_CORD_SUPPORT)
   auto metadata_buffer = new std::string();
   metadata.SerializeToString(metadata_buffer);
-  absl::Cord metadata_serialized = absl::MakeCordFromExternal(
+  abslx::Cord metadata_serialized = abslx::MakeCordFromExternal(
       *metadata_buffer,
-      [metadata_buffer](absl::string_view) { delete metadata_buffer; });
+      [metadata_buffer](abslx::string_view) { delete metadata_buffer; });
 #else
   std::string metadata_serialized = metadata.SerializeAsString();
 #endif  // TF_CORD_SUPPORT
@@ -326,7 +326,7 @@ Status CustomWriter::WriteRecord(const StringPiece& data) {
 }
 
 #if defined(TF_CORD_SUPPORT)
-Status CustomWriter::WriteRecord(const absl::Cord& data) {
+Status CustomWriter::WriteRecord(const abslx::Cord& data) {
   char header[kHeaderSize];
   core::EncodeFixed64(header, data.size());
   TF_RETURN_IF_ERROR(dest_->Append(StringPiece(header, sizeof(header))));
@@ -794,7 +794,7 @@ Status CustomReader::Initialize(Env* env) {
 
 Status CustomReader::ReadTensors(std::vector<Tensor>* read_tensors) {
   profiler::TraceMe activity(
-      [&]() { return absl::StrCat(kClassName, kSeparator, "ReadTensors"); },
+      [&]() { return abslx::StrCat(kClassName, kSeparator, "ReadTensors"); },
       profiler::TraceMeLevel::kInfo);
   if (version_ == 0 || compression_type_ != io::compression::kSnappy) {
     return ReadTensorsV0(read_tensors);
@@ -849,7 +849,7 @@ Status CustomReader::ReadTensors(std::vector<Tensor>* read_tensors) {
 Status CustomReader::ReadTensorsV0(std::vector<Tensor>* read_tensors) {
   experimental::SnapshotRecord record;
 #if defined(PLATFORM_GOOGLE)
-  absl::Cord c;
+  abslx::Cord c;
   TF_RETURN_IF_ERROR(ReadRecord(&c));
   record.ParseFromCord(c);
 #else   // PLATFORM_GOOGLE
@@ -925,7 +925,7 @@ Status CustomReader::ReadRecord(tstring* record) {
 }
 
 #if defined(TF_CORD_SUPPORT)
-Status CustomReader::ReadRecord(absl::Cord* record) {
+Status CustomReader::ReadRecord(abslx::Cord* record) {
   tstring header;
   TF_RETURN_IF_ERROR(input_stream_->ReadNBytes(kHeaderSize, &header));
   uint64 length = core::DecodeFixed64(header.data());
@@ -934,9 +934,9 @@ Status CustomReader::ReadRecord(absl::Cord* record) {
   } else {
     auto tmp_str = new tstring();
     TF_RETURN_IF_ERROR(input_stream_->ReadNBytes(length, tmp_str));
-    absl::string_view tmp_str_view(*tmp_str);
-    record->Append(absl::MakeCordFromExternal(
-        tmp_str_view, [tmp_str](absl::string_view) { delete tmp_str; }));
+    abslx::string_view tmp_str_view(*tmp_str);
+    record->Append(abslx::MakeCordFromExternal(
+        tmp_str_view, [tmp_str](abslx::string_view) { delete tmp_str; }));
     return OkStatus();
   }
 }
@@ -947,7 +947,7 @@ Status WriteMetadataFile(Env* env, const string& dir,
   string metadata_filename = io::JoinPath(dir, kMetadataFilename);
   TF_RETURN_IF_ERROR(env->RecursivelyCreateDir(dir));
   std::string tmp_filename =
-      absl::StrCat(metadata_filename, "-tmp-", random::New64());
+      abslx::StrCat(metadata_filename, "-tmp-", random::New64());
   TF_RETURN_IF_ERROR(WriteBinaryProto(env, tmp_filename, *metadata));
   return env->RenameFile(tmp_filename, metadata_filename);
 }
@@ -971,7 +971,7 @@ Status DumpDatasetGraph(Env* env, const std::string& path, uint64 hash,
   std::string hash_hex =
       strings::StrCat(strings::Hex(hash, strings::kZeroPad16));
   std::string graph_file =
-      io::JoinPath(path, absl::StrCat(hash_hex, "-graph.pbtxt"));
+      io::JoinPath(path, abslx::StrCat(hash_hex, "-graph.pbtxt"));
 
   LOG(INFO) << "Graph hash is " << hash_hex << ", writing to " << graph_file;
   TF_RETURN_IF_ERROR(env->RecursivelyCreateDir(path));
@@ -1034,8 +1034,8 @@ AsyncWriter::AsyncWriter(Env* env, int64_t file_index,
                          uint64 checkpoint_id, const std::string& compression,
                          int64_t version, const DataTypeVector& output_types,
                          std::function<void(Status)> done) {
-  thread_ = absl::WrapUnique(env->StartThread(
-      ThreadOptions(), absl::StrCat("writer_thread_", file_index),
+  thread_ = abslx::WrapUnique(env->StartThread(
+      ThreadOptions(), abslx::StrCat("writer_thread_", file_index),
       [this, env, shard_directory, checkpoint_id, compression, version,
        &output_types, done = std::move(done)] {
         done(WriterThread(env, shard_directory, checkpoint_id, compression,

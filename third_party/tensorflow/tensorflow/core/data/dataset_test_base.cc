@@ -147,7 +147,7 @@ Status WriteDataToFile(const string& filename, const char* data,
 }
 
 Status WriteDataToTFRecordFile(const string& filename,
-                               const std::vector<absl::string_view>& records,
+                               const std::vector<abslx::string_view>& records,
                                const CompressionParams& params) {
   Env* env = Env::Default();
   std::unique_ptr<WritableFile> file_writer;
@@ -1070,7 +1070,7 @@ std::vector<Tensor> MapDatasetParams::GetInputTensors() const {
 Status MapDatasetParams::GetInputNames(std::vector<string>* input_names) const {
   input_names->emplace_back("input_dataset");
   for (int i = 0; i < other_arguments_.size(); ++i) {
-    input_names->emplace_back(absl::StrCat("other_arguments_", i));
+    input_names->emplace_back(abslx::StrCat("other_arguments_", i));
   }
   return OkStatus();
 }
@@ -1107,7 +1107,7 @@ Status TensorSliceDatasetParams::GetInputNames(
     std::vector<string>* input_names) const {
   input_names->reserve(components_.size());
   for (int i = 0; i < components_.size(); ++i) {
-    input_names->emplace_back(absl::StrCat("components_", i));
+    input_names->emplace_back(abslx::StrCat("components_", i));
   }
   return OkStatus();
 }

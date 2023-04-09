@@ -49,28 +49,28 @@ using ::mediapipe::NormalizedRect;
 //
 class RectProjectionCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 };
 REGISTER_CALCULATOR(RectProjectionCalculator);
 
-absl::Status RectProjectionCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status RectProjectionCalculator::GetContract(CalculatorContract* cc) {
   cc->Inputs().Tag(kNormRectTag).Set<NormalizedRect>();
   cc->Inputs().Tag(kNormReferenceRectTag).Set<NormalizedRect>();
   cc->Outputs().Tag(kNormRectTag).Set<NormalizedRect>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RectProjectionCalculator::Open(CalculatorContext* cc) {
+abslx::Status RectProjectionCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RectProjectionCalculator::Process(CalculatorContext* cc) {
+abslx::Status RectProjectionCalculator::Process(CalculatorContext* cc) {
   if (cc->Inputs().Tag(kNormRectTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   const auto& rect = cc->Inputs().Tag(kNormRectTag).Get<NormalizedRect>();
@@ -93,7 +93,7 @@ absl::Status RectProjectionCalculator::Process(CalculatorContext* cc) {
   // Project rotation.
   const float new_rotation = rect.rotation() + reference_rect.rotation();
 
-  auto new_rect = absl::make_unique<NormalizedRect>();
+  auto new_rect = abslx::make_unique<NormalizedRect>();
   new_rect->set_x_center(new_x);
   new_rect->set_y_center(new_y);
   new_rect->set_width(new_width);
@@ -102,7 +102,7 @@ absl::Status RectProjectionCalculator::Process(CalculatorContext* cc) {
 
   cc->Outputs().Tag(kNormRectTag).Add(new_rect.release(), cc->InputTimestamp());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

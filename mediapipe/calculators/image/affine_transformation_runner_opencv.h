@@ -23,7 +23,7 @@
 
 namespace mediapipe {
 
-absl::StatusOr<
+abslx::StatusOr<
     std::unique_ptr<AffineTransformation::Runner<ImageFrame, ImageFrame>>>
 CreateAffineTransformationOpenCvRunner();
 

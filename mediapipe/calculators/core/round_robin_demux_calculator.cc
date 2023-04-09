@@ -81,19 +81,19 @@ class RoundRobinDemuxCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kIn, kSelect, kOut);
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     output_data_stream_index_ = 0;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     kOut(cc)[output_data_stream_index_].Send(kIn(cc).packet());
     if (kSelect(cc).IsConnected()) {
       kSelect(cc).Send(output_data_stream_index_);
     }
     output_data_stream_index_ =
         (output_data_stream_index_ + 1) % kOut(cc).Count();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

@@ -234,7 +234,7 @@ GpuExecutable::~GpuExecutable() {
     //
     // We need for the host->device memcpies to finish they are concurrently
     // reading memory (xla::Literal's) owned by the HLO module.
-    absl::MutexLock lock(&module_handle_mutex_);
+    abslx::MutexLock lock(&module_handle_mutex_);
     for (const auto& pair : module_globals_) {
       CHECK(pair.first->SynchronizeAllActivity());
     }
@@ -305,10 +305,10 @@ Status ExecuteThunks(const std::string& module_name,
   uint64_t start_micros = tensorflow::Env::Default()->NowMicros();
 
   tensorflow::profiler::TraceMe hlo_module_activity(
-      [&] { return absl::StrCat(module_name, ":XLA GPU module"); },
+      [&] { return abslx::StrCat(module_name, ":XLA GPU module"); },
       tensorflow::profiler::TraceMeLevel::kInfo);
 
-  absl::flat_hash_map<const Thunk*, std::unique_ptr<se::Event>>
+  abslx::flat_hash_map<const Thunk*, std::unique_ptr<se::Event>>
       thunk_to_finish_event;
   for (const std::unique_ptr<Thunk>& thunk : thunk_schedule.TotalOrder()) {
     // Annotate execution of this op if tracing was enabled when we started
@@ -383,7 +383,7 @@ StatusOr<const GpuExecutable::BufferAllocToDeviceMemoryMap*>
 GpuExecutable::ResolveConstantGlobals(se::Stream* stream) {
   se::StreamExecutor* executor = stream->parent();
 
-  absl::MutexLock lock(&module_handle_mutex_);
+  abslx::MutexLock lock(&module_handle_mutex_);
   auto it = module_globals_.find(executor);
   if (it != module_globals_.end()) {
     return &it->second;
@@ -395,7 +395,7 @@ GpuExecutable::ResolveConstantGlobals(se::Stream* stream) {
   }
   module_spec.AddCudaPtxInMemory(text().c_str());
 
-  absl::flat_hash_map<int64_t, se::DeviceMemoryBase> globals;
+  abslx::flat_hash_map<int64_t, se::DeviceMemoryBase> globals;
   se::ModuleHandle module_handle;
   // The CUDA driver isn't able to load empty PTX. It's okay if we skip loading
   // in this case; if the module isn't loaded, all symbol lookups will fail,
@@ -463,11 +463,11 @@ StatusOr<se::DeviceMemoryBase> GpuExecutable::BufferForAllocation(
     int64_t param_no = allocation.parameter_number();
     se::DeviceMemoryBase registered_buffer = [&] {
       if (auto unowned_shapedbuffers =
-              std::get_if<absl::Span<const ShapedBuffer* const>>(&arguments)) {
+              std::get_if<abslx::Span<const ShapedBuffer* const>>(&arguments)) {
         return (*unowned_shapedbuffers)[param_no]->buffers().element(
             allocation.param_shape_index());
       } else {
-        return std::get<absl::Span<ExecutionInput>>(arguments)[param_no]
+        return std::get<abslx::Span<ExecutionInput>>(arguments)[param_no]
             .Buffer(allocation.param_shape_index())
             .AsDeviceMemoryBase();
       }
@@ -553,12 +553,12 @@ StatusOr<ExecutionOutput> GpuExecutable::ExecuteAsyncOnStream(
     const ServiceExecutableRunOptions* run_options,
     std::vector<ExecutionInput> arguments,
     HloExecutionProfile* hlo_execution_profile) {
-  return ExecuteAsyncOnStreamImpl(run_options, absl::MakeSpan(arguments));
+  return ExecuteAsyncOnStreamImpl(run_options, abslx::MakeSpan(arguments));
 }
 
 StatusOr<ScopedShapedBuffer> GpuExecutable::ExecuteAsyncOnStream(
     const ServiceExecutableRunOptions* run_options,
-    absl::Span<const ShapedBuffer* const> arguments,
+    abslx::Span<const ShapedBuffer* const> arguments,
     HloExecutionProfile* hlo_execution_profile) {
   TF_ASSIGN_OR_RETURN(ExecutionOutput out,
                       ExecuteAsyncOnStreamImpl(run_options, arguments));
@@ -574,7 +574,7 @@ static Status ExecuteJitRt(const std::string& module_name,
   uint64_t start_micros = tensorflow::Env::Default()->NowMicros();
 
   tensorflow::profiler::TraceMe hlo_module_activity(
-      [&] { return absl::StrCat(module_name, ":XLA GPU module"); },
+      [&] { return abslx::StrCat(module_name, ":XLA GPU module"); },
       tensorflow::profiler::TraceMeLevel::kInfo);
 
   ScopedAnnotation annotation(
@@ -682,7 +682,7 @@ static Status ExecuteJitRt(const std::string& module_name,
 StatusOr<ExecutionOutput> GpuExecutable::ExecuteAsyncOnStreamImpl(
     const ServiceExecutableRunOptions* run_options,
     VariantArguments arguments) {
-  XLA_SCOPED_LOGGING_TIMER(absl::StrCat(
+  XLA_SCOPED_LOGGING_TIMER(abslx::StrCat(
       "GpuExecutable::ExecuteAsyncOnStreamImpl(", module_name_, ")"));
   se::DeviceMemoryAllocator* const memory_allocator = run_options->allocator();
   // Force synchronous execution if the allocator requires it.
@@ -694,7 +694,7 @@ StatusOr<ExecutionOutput> GpuExecutable::ExecuteAsyncOnStreamImpl(
   // Lock the GPU with a shared lock so that we don't interfere with autotuning
   // that may be running during JIT compilation while allowing multiple XLA
   // computations to use the same GPU simultaneously.
-  absl::ReaderMutexLock gpu_lock(&GetGpuMutex(executor));
+  abslx::ReaderMutexLock gpu_lock(&GetGpuMutex(executor));
 
   const GpuExecutable::BufferAllocToDeviceMemoryMap* globals;
   {
@@ -747,12 +747,12 @@ StatusOr<ExecutionOutput> GpuExecutable::ExecuteAsyncOnStreamImpl(
           [&]() -> xla::MaybeOwningDeviceMemory* {
         // ScopedBuffer is never an owned buffer.
         if (auto* unowned_shapedbuffers =
-                std::get_if<absl::Span<const ShapedBuffer* const>>(
+                std::get_if<abslx::Span<const ShapedBuffer* const>>(
                     &arguments)) {
           return nullptr;
         } else {
           auto unowned_execution_input =
-              std::get<absl::Span<ExecutionInput>>(arguments);
+              std::get<abslx::Span<ExecutionInput>>(arguments);
           ExecutionInput& input =
               unowned_execution_input[allocation->parameter_number()];
           return input.MutableBuffer(allocation->param_shape_index());
@@ -834,7 +834,7 @@ StatusOr<ExecutionOutput> GpuExecutable::ExecuteAsyncOnStreamImpl(
       buffer_allocations.TearDown(buffers_in_result, allocations_));
 
   // Free allocations for arguments.
-  if (auto args = std::get_if<absl::Span<ExecutionInput>>(&arguments)) {
+  if (auto args = std::get_if<abslx::Span<ExecutionInput>>(&arguments)) {
     MarkToBeReleasedArguments(*args, result);
   }
   return std::move(result);
@@ -885,7 +885,7 @@ int64_t GpuExecutable::SizeOfGeneratedCodeInBytes() const {
 Status GpuExecutable::SetUpMlirAllocation(
     mlir::func::FuncOp func, llvm::ArrayRef<int64_t> buffer_sizes,
     std::vector<BufferAllocation>* allocations,
-    absl::flat_hash_map<ShapeIndex, GpuExecutable::OutputInfo>* output_info,
+    abslx::flat_hash_map<ShapeIndex, GpuExecutable::OutputInfo>* output_info,
     Shape* output_shape, int buffer_param_offset) {
   for (int i = 0; i < buffer_sizes.size(); i++) {
     allocations->emplace_back(i, buffer_sizes[i], 0);
@@ -961,7 +961,7 @@ Status GpuExecutable::SetUpMlirAllocation(
   return OkStatus();
 }
 
-StatusOr<absl::flat_hash_map<ShapeIndex, GpuExecutable::OutputInfo>>
+StatusOr<abslx::flat_hash_map<ShapeIndex, GpuExecutable::OutputInfo>>
 GetOutputInfo(const HloModule& hlo_module, const BufferAssignment& assignment) {
   const HloInstruction* root =
       hlo_module.entry_computation()->root_instruction();
@@ -974,7 +974,7 @@ GetOutputInfo(const HloModule& hlo_module, const BufferAssignment& assignment) {
   }
 
   using OutputInfoMap =
-      absl::flat_hash_map<ShapeIndex, GpuExecutable::OutputInfo>;
+      abslx::flat_hash_map<ShapeIndex, GpuExecutable::OutputInfo>;
   OutputInfoMap output;
   TF_RETURN_IF_ERROR(ShapeUtil::ForEachSubshapeWithStatus(
       root->shape(),

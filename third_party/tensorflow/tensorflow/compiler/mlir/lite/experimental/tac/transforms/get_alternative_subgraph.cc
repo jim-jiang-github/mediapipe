@@ -57,7 +57,7 @@ namespace {
 std::string GetFunctionImplName(
     std::string interface_name,
     const InferenceDeviceType& device_inference_type) {
-  return absl::StrCat(interface_name, "_", device_inference_type.hardware, "_",
+  return abslx::StrCat(interface_name, "_", device_inference_type.hardware, "_",
                       GetInferenceString(device_inference_type.inference_type));
 }
 

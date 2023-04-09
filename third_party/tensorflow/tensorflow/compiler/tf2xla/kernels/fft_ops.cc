@@ -59,7 +59,7 @@ class GenericFftOp : public XlaOpKernel {
                                           fft_rank_, " vector"));
 
       // Zero pad or truncate the axes we're doing FFT on.
-      absl::InlinedVector<int64_t, 4> slice_sizes = input_shape.dim_sizes();
+      abslx::InlinedVector<int64_t, 4> slice_sizes = input_shape.dim_sizes();
       std::vector<std::pair<int64_t, int64_t>> padding_sizes(
           slice_sizes.size());
       std::vector<int64_t> expected_sizes = fft_length;

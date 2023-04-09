@@ -31,21 +31,21 @@ namespace mediapipe {
 namespace {
 class CountAndOutputSummarySidePacketInCloseCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).SetAny();
     cc->OutputSidePackets().Index(0).Set<int>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     ++count_;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Close(CalculatorContext* cc) final {
+  abslx::Status Close(CalculatorContext* cc) final {
     cc->OutputSidePackets().Index(0).Set(
         MakePacket<int>(count_).At(Timestamp::Unset()));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   int count_ = 0;
@@ -148,13 +148,13 @@ TEST(CallbackTest, TestAddMultiStreamCallback) {
 
 class TimestampBoundTestCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Outputs().Index(0).Set<int>();
     cc->Outputs().Index(1).Set<int>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Open(CalculatorContext* cc) final { return absl::OkStatus(); }
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final { return abslx::OkStatus(); }
+  abslx::Status Process(CalculatorContext* cc) final {
     if (count_ % 5 == 0) {
       cc->Outputs().Index(0).SetNextTimestampBound(Timestamp(count_ + 1));
       cc->Outputs().Index(1).SetNextTimestampBound(Timestamp(count_ + 1));
@@ -163,7 +163,7 @@ class TimestampBoundTestCalculator : public CalculatorBase {
     if (count_ == 13) {
       return tool::StatusStop();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

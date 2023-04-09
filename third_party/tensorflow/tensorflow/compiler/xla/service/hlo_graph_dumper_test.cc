@@ -29,7 +29,7 @@ limitations under the License.
 namespace xla {
 namespace {
 
-using absl::StrCat;
+using abslx::StrCat;
 using ::testing::HasSubstr;
 
 using HloGraphDumperTest = HloTestBase;

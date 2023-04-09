@@ -132,7 +132,7 @@ struct StepMarker {
   std::string event_name;  // name of this event.
   std::string step_name;
   Timespan span;           // timespan of this event.
-  StepMarker(StepMarkerType step_marker_type, absl::string_view name,
+  StepMarker(StepMarkerType step_marker_type, abslx::string_view name,
              Timespan s)
       : type(step_marker_type), event_name(name), span(s) {}
   // Equality test.
@@ -152,7 +152,7 @@ class StepDetails {
 
   const std::vector<StepMarker>& Markers() const { return markers_; }
   const std::vector<EventTypeSpan>& Events() const { return events_; }
-  const absl::flat_hash_map<uint32, AllReduceDbResult>& Collectives() const {
+  const abslx::flat_hash_map<uint32, AllReduceDbResult>& Collectives() const {
     return collectives_;
   }
   const std::vector<DeviceMemoryTransfer>& DeviceMemoryTransfers() const {
@@ -204,7 +204,7 @@ class StepDetails {
   // All events belonging to this step.
   std::vector<EventTypeSpan> events_;
   // Collective operation related events such as all-reduce etc.
-  absl::flat_hash_map<uint32, AllReduceDbResult> collectives_;
+  abslx::flat_hash_map<uint32, AllReduceDbResult> collectives_;
   // Device memory transfers (including time and bytes involved).
   // TODO(jiesun): Consider to use IntervalSet instead of just sum up the event
   // durations.
@@ -213,7 +213,7 @@ class StepDetails {
 };
 
 // Map from step_id to the events happened in that step.
-using StepEvents = absl::flat_hash_map<int64_t /*step_id*/, StepDetails>;
+using StepEvents = abslx::flat_hash_map<int64_t /*step_id*/, StepDetails>;
 
 // Equality test for StepEvents.
 bool operator==(const StepEvents& a, const StepEvents& b);
@@ -222,7 +222,7 @@ bool operator==(const StepEvents& a, const StepEvents& b);
 std::string PrintEventType(EventType event_type);
 
 // Returns the string of the given GenericEventType.
-absl::string_view GetGenericEventTypeStr(GenericEventType event_type);
+abslx::string_view GetGenericEventTypeStr(GenericEventType event_type);
 
 // Returns a string that prints the given EventTypeSpan.
 std::string PrintEventTypeSpan(const EventTypeSpan& event_type_span);

@@ -36,8 +36,8 @@ namespace xla {
 
 namespace {
 
-static void ExpectHasSubstr(absl::string_view s, absl::string_view expected) {
-  EXPECT_TRUE(absl::StrContains(s, expected))
+static void ExpectHasSubstr(abslx::string_view s, abslx::string_view expected) {
+  EXPECT_TRUE(abslx::StrContains(s, expected))
       << s << " does not contain " << expected;
 }
 

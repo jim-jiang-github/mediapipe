@@ -289,7 +289,7 @@ std::string convert_range_error_msg(float start, float limit, float delta) {
   const char* format_string =
       "For parameters (start, limit) = (%.2f, %.2f) "
       "of the Range operation delta cannot be %s, got %.2f";
-  return absl::StrFormat(format_string, start, limit,
+  return abslx::StrFormat(format_string, start, limit,
                          start < limit ? "negative" : "positive", delta);
 }
 

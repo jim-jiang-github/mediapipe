@@ -44,7 +44,7 @@ class RemoteExecuteNode : public AsyncRemoteExecuteNode {
                     CancellationManager* cancellation_manager,
                     const NodeDef& ndef, FunctionLibraryDefinition* lib_def,
                     const gtl::InlinedVector<TensorHandle*, 4>& inputs,
-                    absl::Span<TensorHandle*> retvals)
+                    abslx::Span<TensorHandle*> retvals)
       : AsyncRemoteExecuteNode(),
         eager_context_(eager_context),
         request_(std::move(request)),

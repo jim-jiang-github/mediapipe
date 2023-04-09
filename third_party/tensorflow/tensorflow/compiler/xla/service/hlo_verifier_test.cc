@@ -182,7 +182,7 @@ TEST_F(HloVerifierTest, CheckCallOperandParameterShapesMismatch) {
 }
 
 TEST_F(HloVerifierTest, CheckCallThreadMismatch) {
-  constexpr absl::string_view hlo = R"(
+  constexpr abslx::string_view hlo = R"(
     HloModule Module
 
     callme {
@@ -1382,9 +1382,9 @@ std::string ReplicaGroupsStr(std::vector<std::vector<int64_t>> replica_groups) {
   replica_group_strs.reserve(replica_groups.size());
   for (const auto& g : replica_groups) {
     replica_group_strs.push_back(
-        absl::StrFormat("{%s}", absl::StrJoin(g, ",")));
+        abslx::StrFormat("{%s}", abslx::StrJoin(g, ",")));
   }
-  return absl::StrFormat("{%s}", absl::StrJoin(replica_group_strs, ", "));
+  return abslx::StrFormat("{%s}", abslx::StrJoin(replica_group_strs, ", "));
 }
 
 int64_t ReplicaCount(const std::vector<std::vector<int64_t>>& replica_groups) {
@@ -1398,18 +1398,18 @@ int64_t ReplicaCount(const std::vector<std::vector<int64_t>>& replica_groups) {
 StatusOr<std::unique_ptr<HloModule>> MakeCollectiveCommOpComputation(
     std::vector<std::vector<int64_t>> replica_groups,
     std::optional<int64_t> replica_count, std::optional<int64_t> num_partitions,
-    absl::string_view other_attributes, absl::string_view template_str) {
+    abslx::string_view other_attributes, abslx::string_view template_str) {
   HloModuleConfig config;
   config.set_replica_count(
       replica_count.value_or(ReplicaCount(replica_groups)));
   config.set_num_partitions(num_partitions.value_or(1));
   return ParseAndReturnUnverifiedModule(
-      absl::StrReplaceAll(
+      abslx::StrReplaceAll(
           template_str,
           {{"REPLICA_GROUPS", ReplicaGroupsStr(replica_groups)},
            {"OTHER_ATTRIBUTES", other_attributes.empty()
                                     ? ""
-                                    : absl::StrCat(",", other_attributes)}}),
+                                    : abslx::StrCat(",", other_attributes)}}),
       config);
 }
 
@@ -1417,7 +1417,7 @@ StatusOr<std::unique_ptr<HloModule>> MakeAllReduceComputation(
     std::vector<std::vector<int64_t>> replica_groups,
     std::optional<int64_t> replica_count = std::nullopt,
     std::optional<int64_t> num_partitions = std::nullopt,
-    absl::string_view other_attributes = "") {
+    abslx::string_view other_attributes = "") {
   const char* kTemplate = R"(
   HloModule test
   add {
@@ -1610,7 +1610,7 @@ StatusOr<std::unique_ptr<HloModule>> MakeAllToAllComputation(
     std::vector<std::vector<int64_t>> replica_groups,
     std::optional<int64_t> replica_count = std::nullopt,
     std::optional<int64_t> num_partitions = std::nullopt,
-    absl::string_view other_attributes = "") {
+    abslx::string_view other_attributes = "") {
   const char* kTemplate = R"(
   HloModule test
   ENTRY entry {

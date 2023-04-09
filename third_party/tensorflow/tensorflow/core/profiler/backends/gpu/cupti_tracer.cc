@@ -762,7 +762,7 @@ void AddUnifiedMemoryActivityEvent(
 void AddMemoryActivityEvent(CuptiTraceCollector *collector,
                             const CUpti_ActivityMemory *memory) {
   CuptiTracerEvent event{};
-  event.name = absl::StrCat("Memory ", GetMemoryKindName(memory->memoryKind));
+  event.name = abslx::StrCat("Memory ", GetMemoryKindName(memory->memoryKind));
   event.type = CuptiTracerEventType::MemoryResidency;
   event.source = CuptiTracerEventSource::Activity;
   event.start_time_ns = memory->start;
@@ -786,7 +786,7 @@ void AddMemsetActivityEvent(CuptiTraceCollector *collector,
   CuptiTracerEvent event{};
   event.type = CuptiTracerEventType::Memset;
   event.source = CuptiTracerEventSource::Activity;
-  event.name = absl::StrCat("Memset ", mem_kind);
+  event.name = abslx::StrCat("Memset ", mem_kind);
   event.start_time_ns = memset->start;
   event.end_time_ns = std::max(memset->end, memset->start + 1);
   event.device_id = memset->deviceId;
@@ -871,7 +871,7 @@ class CuptiDriverApiHookWithActivityApi : public CuptiDriverApiHook {
   Status SyncAndFlush() override {
     if (option_.sync_devices_before_stop) {
       CuptiApiTracingDisabler disabler;
-      absl::MutexLock lock(&mutex_);
+      abslx::MutexLock lock(&mutex_);
       for (auto &ctx : contexts_) {
         cuCtxPushCurrent(ctx);
         cuCtxSynchronize();  // Ignore error here for best effort.
@@ -886,7 +886,7 @@ class CuptiDriverApiHookWithActivityApi : public CuptiDriverApiHook {
   void TrackContext(CUpti_CallbackId cbid, CUcontext ctx) {
     if (!option_.sync_devices_before_stop) return;
     if (ctx == nullptr) return;
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     if (cbid == CUPTI_DRIVER_TRACE_CBID_cuCtxDestroy_v2 ||
         cbid == CUPTI_DRIVER_TRACE_CBID_cuCtxDestroy) {
       contexts_.erase(ctx);
@@ -898,8 +898,8 @@ class CuptiDriverApiHookWithActivityApi : public CuptiDriverApiHook {
   const CuptiTracerOptions option_;
   CuptiInterface *cupti_interface_;
   CuptiTraceCollector *collector_;
-  absl::Mutex mutex_;
-  absl::flat_hash_set<CUcontext> contexts_ TF_GUARDED_BY(mutex_);
+  abslx::Mutex mutex_;
+  abslx::flat_hash_set<CUcontext> contexts_ TF_GUARDED_BY(mutex_);
 
   TF_DISALLOW_COPY_AND_ASSIGN(CuptiDriverApiHookWithActivityApi);
 };
@@ -957,17 +957,17 @@ class ScopedCudaContext {
   }
 
   // If successful, return the device ordinal of the relevant cuda stream.
-  // Otherwise absl::nullopt;
-  absl::optional<uint32> GetDeviceOrdinal() { return device_ordinal_; }
+  // Otherwise abslx::nullopt;
+  abslx::optional<uint32> GetDeviceOrdinal() { return device_ordinal_; }
 
   // If successful, return the cuda context of the relevant cuda stream.
-  // Otherwise absl::nullopt;
-  absl::optional<CUcontext> GetContext() { return context_; }
+  // Otherwise abslx::nullopt;
+  abslx::optional<CUcontext> GetContext() { return context_; }
 
  private:
   CUstream stream_;
-  absl::optional<CUcontext> context_;
-  absl::optional<uint32> device_ordinal_;
+  abslx::optional<CUcontext> context_;
+  abslx::optional<uint32> device_ordinal_;
   bool context_pushed_ = false;
 };
 #endif
@@ -980,7 +980,7 @@ class CudaEventRecorder {
       : cupti_interface_(cupti_interface),
         collector_(collector),
         ordinal_(ordinal) {
-    device_name_ = absl::StrCat("gpu ", ordinal);  // default.
+    device_name_ = abslx::StrCat("gpu ", ordinal);  // default.
     CUdevice device;
     if (cuDeviceGet(&device, ordinal) == CUDA_SUCCESS) {
       char name[100];
@@ -1008,13 +1008,13 @@ class CudaEventRecorder {
     record.details.grid_z = params->gridDimZ;
     record.start_timestamp = CuptiTracer::GetTimestamp();
     LogIfError(CreateAndRecordEvent(&record.start_event, stream));
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     if (stopped_) return -1;
     kernel_records_.push_back(record);
     return kernel_records_.size() - 1;
   }
   uint64 StopKernel(size_t index) {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     if (index >= kernel_records_.size()) return 0;
     auto &record = kernel_records_[index];
     LogIfError(CreateAndRecordEvent(&record.stop_event, record.stream));
@@ -1030,13 +1030,13 @@ class CudaEventRecorder {
                            stream, correlation_id, async};
     record.start_timestamp = CuptiTracer::GetTimestamp();
     LogIfError(CreateAndRecordEvent(&record.start_event, stream));
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     if (stopped_) return -1;
     memcpy_records_.push_back(record);
     return memcpy_records_.size() - 1;
   }
   uint64 StopMemcpy(size_t index) {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     if (index >= memcpy_records_.size()) return 0;
     auto &record = memcpy_records_[index];
     LogIfError(CreateAndRecordEvent(&record.stop_event, record.stream));
@@ -1045,7 +1045,7 @@ class CudaEventRecorder {
 
   Status Stop() {
     {
-      absl::MutexLock lock(&mutex_);
+      abslx::MutexLock lock(&mutex_);
       stopped_ = true;
       LOG(INFO) << "Collecting " << kernel_records_.size()
                 << " kernel records, " << memcpy_records_.size()
@@ -1090,11 +1090,11 @@ class CudaEventRecorder {
   }
 
   std::vector<KernelRecord> ConsumeKernelRecords() {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     return std::move(kernel_records_);
   }
   std::vector<MemcpyRecord> ConsumeMemcpyRecords() {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     return std::move(memcpy_records_);
   }
 
@@ -1141,7 +1141,7 @@ class CudaEventRecorder {
   // Adds element to stream_infos_ if not yet present. If present, clear name
   // if it doesn't match parameter.
   Status AddStreamInfo(CUcontext context, CUstream stream,
-                       absl::string_view name) {
+                       abslx::string_view name) {
     StreamKey key(context, stream);
     auto it = stream_infos_.find(key);
     if (it != stream_infos_.end()) {
@@ -1242,7 +1242,7 @@ class CudaEventRecorder {
     return OkStatus();
   }
 
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
   bool stopped_ TF_GUARDED_BY(mutex_) = false;
   std::vector<KernelRecord> kernel_records_ TF_GUARDED_BY(mutex_);
   std::vector<MemcpyRecord> memcpy_records_ TF_GUARDED_BY(mutex_);
@@ -1255,8 +1255,8 @@ class CudaEventRecorder {
   // Include context in key to distinguish null streams.
   using StreamKey = std::pair<CUcontext, CUstream>;
 
-  absl::node_hash_map<CUcontext, ContextInfo> context_infos_;
-  absl::flat_hash_map<StreamKey, StreamInfo> stream_infos_;
+  abslx::node_hash_map<CUcontext, ContextInfo> context_infos_;
+  abslx::flat_hash_map<StreamKey, StreamInfo> stream_infos_;
 };
 
 // This hook uses cuda events to measure device side activities.
@@ -1513,13 +1513,13 @@ class CuptiDriverApiHookWithCudaEvent : public CuptiDriverApiHook {
   const CuptiTracerOptions option_;
   CuptiInterface *cupti_interface_;
   CuptiTraceCollector *collector_;
-  absl::node_hash_set<CuptiApiCallbackContext *> callback_contexts_;
+  abslx::node_hash_set<CuptiApiCallbackContext *> callback_contexts_;
   std::vector<std::unique_ptr<CudaEventRecorder>> cuda_event_recorders_;
   TF_DISALLOW_COPY_AND_ASSIGN(CuptiDriverApiHookWithCudaEvent);
 };
 
-/*static*/ std::string ErrorWithHostname(absl::string_view error_message) {
-  return absl::StrCat(port::Hostname(), ": ", error_message);
+/*static*/ std::string ErrorWithHostname(abslx::string_view error_message) {
+  return abslx::StrCat(port::Hostname(), ": ", error_message);
 }
 
 }  // namespace
@@ -1879,7 +1879,7 @@ Status CuptiTracer::HandleCallback(CUpti_CallbackDomain domain,
                                             annotation, "");
         }
       } else {
-        absl::string_view nvtx_range = NVTXRangeTracker::CurrentRange();
+        abslx::string_view nvtx_range = NVTXRangeTracker::CurrentRange();
         collector_->annotation_map()->Add(device_id, cbdata->correlationId,
                                           annotation, nvtx_range);
       }

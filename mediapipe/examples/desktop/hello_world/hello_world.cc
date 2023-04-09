@@ -21,7 +21,7 @@
 
 namespace mediapipe {
 
-absl::Status PrintHelloWorld() {
+abslx::Status PrintHelloWorld() {
   // Configures a simple graph, which concatenates 2 PassThroughCalculators.
   CalculatorGraphConfig config =
       ParseTextProtoOrDie<CalculatorGraphConfig>(R"pb(

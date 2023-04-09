@@ -253,7 +253,7 @@ Status PluggableDeviceFactory::CreatePluggableDevice(
         "Failed to get memory allocator for TF PluggableDevice ",
         tf_device_id.value(), " with", memory_limit, " bytes of memory. ");
   }
-  absl::optional<AllocatorStats> stats = device_allocator->GetStats();
+  abslx::optional<AllocatorStats> stats = device_allocator->GetStats();
   if (!stats) {
     return errors::Internal("No allocator statistics");
   }
@@ -263,7 +263,7 @@ Status PluggableDeviceFactory::CreatePluggableDevice(
   // memory limit represented by 'stats.bytes_limit' used by that allocator
   // may be different (which should be an error).
   int64_t bytes_limit = stats->bytes_limit ? *stats->bytes_limit : 0;
-  auto pluggable_device = absl::make_unique<PluggableDevice>(
+  auto pluggable_device = abslx::make_unique<PluggableDevice>(
       options, device_name, device_type_, platform_name_,
       static_cast<Bytes>(bytes_limit), dev_locality, tf_device_id,
       GetShortDeviceDescription(platform_device_id, *desc), device_allocator,

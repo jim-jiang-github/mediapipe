@@ -38,7 +38,7 @@ class UnaryOpsTestBase : public OpsTestBase {
 
   template <typename T, typename OutT>
   void SetOpKernel(const std::string& op_name, const TensorShape& shape,
-                   const absl::InlinedVector<T, 10>& input,
+                   const abslx::InlinedVector<T, 10>& input,
                    const test::OpsTestConfig& config) {
     NodeDefBuilder builder("some_name", op_name);
     builder.Input(FakeInput(DataTypeToEnum<T>::v()));
@@ -56,8 +56,8 @@ class UnaryOpsTestBase : public OpsTestBase {
 
   template <typename T, typename OutT>
   void RunAndExpectResult(const std::string& op_name, const TensorShape& shape,
-                          const absl::InlinedVector<T, 10>& input,
-                          const absl::InlinedVector<OutT, 10>& expected_output,
+                          const abslx::InlinedVector<T, 10>& input,
+                          const abslx::InlinedVector<OutT, 10>& expected_output,
                           const test::OpsTestConfig& config) {
     SetOpKernel<T, OutT>(op_name, shape, input, config);
     TF_ASSERT_OK(RunOpKernel());
@@ -99,14 +99,14 @@ class UnaryOpsTestBase : public OpsTestBase {
   template <typename T, typename BaselineT, typename OutT,
             typename BaselineCallback>
   void TestImpl(const std::string& op_name, const TensorShape& shape,
-                const absl::InlinedVector<T, 10>& input,
+                const abslx::InlinedVector<T, 10>& input,
                 const BaselineCallback& baseline_callback,
                 const test::OpsTestConfig& config) {
     // Prepare inputs and compute expected results.
     CHECK(input.size() <= shape.num_elements());
     auto repeated_input =
         test::RepeatInputToMatchShape(input, shape.num_elements());
-    absl::InlinedVector<OutT, 10> expected_output =
+    abslx::InlinedVector<OutT, 10> expected_output =
         ComputeExpectedOutput<T, BaselineT, OutT>(repeated_input,
                                                   baseline_callback);
 
@@ -117,7 +117,7 @@ class UnaryOpsTestBase : public OpsTestBase {
   template <typename T, typename BaselineT, typename OutT,
             typename BaselineCallback>
   void Test(const std::string& op_name, const TensorShape& shape,
-            const absl::InlinedVector<T, 10>& input,
+            const abslx::InlinedVector<T, 10>& input,
             const BaselineCallback& baseline_callback,
             const test::OpsTestConfig& config) {
     TestImpl<T, BaselineT, OutT>(op_name, shape, input, baseline_callback,
@@ -128,7 +128,7 @@ class UnaryOpsTestBase : public OpsTestBase {
   template <typename T, typename BaselineT, typename OutT,
             typename BaselineOutT>
   void Test(const std::string& op_name, const TensorShape& shape,
-            const absl::InlinedVector<T, 10>& input,
+            const abslx::InlinedVector<T, 10>& input,
             BaselineOutT (*baseline_callback)(const BaselineT&),
             const test::OpsTestConfig& config) {
     TestImpl<T, BaselineT, OutT>(op_name, shape, input, baseline_callback,
@@ -139,7 +139,7 @@ class UnaryOpsTestBase : public OpsTestBase {
   template <typename T, typename BaselineT, typename OutT,
             typename BaselineOutT>
   void Test(const std::string& op_name, const TensorShape& shape,
-            const absl::InlinedVector<T, 10>& input,
+            const abslx::InlinedVector<T, 10>& input,
             BaselineOutT (*baseline_callback)(BaselineT),
             const test::OpsTestConfig& config) {
     TestImpl<T, BaselineT, OutT>(op_name, shape, input, baseline_callback,
@@ -150,8 +150,8 @@ class UnaryOpsTestBase : public OpsTestBase {
   void TestEmptyShape(const std::string& op_name,
                       const test::OpsTestConfig& config) {
     TensorShape shape{0, 1, 2};
-    absl::InlinedVector<T, 10> empty_input = {};
-    absl::InlinedVector<OutT, 10> expected_output = {};
+    abslx::InlinedVector<T, 10> empty_input = {};
+    abslx::InlinedVector<OutT, 10> expected_output = {};
     RunAndExpectResult<T, OutT>(op_name, shape, empty_input, expected_output,
                                 config);
   }
@@ -162,10 +162,10 @@ class UnaryOpsTestBase : public OpsTestBase {
 
   template <typename T, typename BaselineT, typename OutT,
             typename BaselineCallback>
-  absl::InlinedVector<OutT, 10> ComputeExpectedOutput(
-      absl::InlinedVector<T, 10> input,
+  abslx::InlinedVector<OutT, 10> ComputeExpectedOutput(
+      abslx::InlinedVector<T, 10> input,
       const BaselineCallback& baseline_callback) {
-    absl::InlinedVector<OutT, 10> expected_output;
+    abslx::InlinedVector<OutT, 10> expected_output;
     for (int i = 0; i < input.size(); i++) {
       auto arg = static_cast<BaselineT>(input[i]);
       auto result = static_cast<OutT>(baseline_callback(arg));

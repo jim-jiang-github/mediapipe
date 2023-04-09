@@ -71,7 +71,7 @@ class RecvTPUEmbeddingActivationsOp : public XlaOpKernel {
 
     TpuEmbeddingEngine_RecvActivationsComputation_Params recv_activation_params;
     TpuSerializedProto xla_computation_serialized;
-    auto proto_cleanup = absl::MakeCleanup([&xla_computation_serialized] {
+    auto proto_cleanup = abslx::MakeCleanup([&xla_computation_serialized] {
       StreamExecutor_Tpu_FreeSerializedProto(&xla_computation_serialized);
     });
     recv_activation_params.xla_computation = &xla_computation_serialized;
@@ -83,7 +83,7 @@ class RecvTPUEmbeddingActivationsOp : public XlaOpKernel {
     XLA_Shape c_shape;
     ApiConverter::ToC(shape, &c_shape);
     auto c_shape_cleanup =
-        absl::MakeCleanup([&c_shape] { ApiConverter::Destroy(&c_shape); });
+        abslx::MakeCleanup([&c_shape] { ApiConverter::Destroy(&c_shape); });
     recv_activation_params.deduplication_data_shape = &c_shape;
     tpu::OpsApiFn()->TpuEmbeddingEngine_RecvActivationsComputationFn(
         &recv_activation_params);
@@ -148,7 +148,7 @@ class RecvTPUEmbeddingDeduplicationDataOp : public XlaOpKernel {
     TpuEmbeddingEngine_RecvTPUEmbeddingDeduplicationDataComputation_Params
         recv_deduplication_params;
     TpuSerializedProto xla_computation_serialized;
-    auto proto_cleanup = absl::MakeCleanup([&xla_computation_serialized] {
+    auto proto_cleanup = abslx::MakeCleanup([&xla_computation_serialized] {
       StreamExecutor_Tpu_FreeSerializedProto(&xla_computation_serialized);
     });
     recv_deduplication_params.xla_computation = &xla_computation_serialized;
@@ -243,7 +243,7 @@ class SendTPUEmbeddingGradientsOp : public XlaOpKernel {
     TpuEmbeddingEngine_SendTPUEmbeddingGradientsComputation_Params
         send_gradients_params;
     TpuSerializedProto xla_computation_serialized;
-    auto proto_cleanup = absl::MakeCleanup([&xla_computation_serialized] {
+    auto proto_cleanup = abslx::MakeCleanup([&xla_computation_serialized] {
       StreamExecutor_Tpu_FreeSerializedProto(&xla_computation_serialized);
     });
     send_gradients_params.xla_computation = &xla_computation_serialized;
@@ -261,7 +261,7 @@ class SendTPUEmbeddingGradientsOp : public XlaOpKernel {
     XLA_Shape deduplication_c_shape;
     ApiConverter::ToC(deduplication_shape, &deduplication_c_shape);
 
-    auto c_shape_cleanup = absl::MakeCleanup([&gradient_tuple_c_shape,
+    auto c_shape_cleanup = abslx::MakeCleanup([&gradient_tuple_c_shape,
                                               &learning_rate_tuple_c_shape,
                                               &deduplication_c_shape] {
       ApiConverter::Destroy(&gradient_tuple_c_shape);

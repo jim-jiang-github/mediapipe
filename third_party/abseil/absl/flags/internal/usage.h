@@ -27,7 +27,7 @@
 // --------------------------------------------------------------------
 // Usage reporting interfaces
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace flags_internal {
 
@@ -50,8 +50,8 @@ void FlagHelp(std::ostream& out, const CommandLineFlag& flag,
 //  .../path/to/file.<ext>
 // for any extension 'ext'. If the filter is empty this function produces help
 // messages for all flags.
-void FlagsHelp(std::ostream& out, absl::string_view filter,
-               HelpFormat format, absl::string_view program_usage_message);
+void FlagsHelp(std::ostream& out, abslx::string_view filter,
+               HelpFormat format, abslx::string_view program_usage_message);
 
 // --------------------------------------------------------------------
 
@@ -64,7 +64,7 @@ void FlagsHelp(std::ostream& out, absl::string_view filter,
 // Non negative return values are expected to be used as an exit code for a
 // binary.
 int HandleUsageFlags(std::ostream& out,
-                     absl::string_view program_usage_message);
+                     abslx::string_view program_usage_message);
 
 // --------------------------------------------------------------------
 // Globals representing usage reporting flags
@@ -88,17 +88,17 @@ HelpMode GetFlagsHelpMode();
 HelpFormat GetFlagsHelpFormat();
 
 // These are corresponding setters to the attributes above.
-void SetFlagsHelpMatchSubstr(absl::string_view);
+void SetFlagsHelpMatchSubstr(abslx::string_view);
 void SetFlagsHelpMode(HelpMode);
 void SetFlagsHelpFormat(HelpFormat);
 
 // Deduces usage flags from the input argument in a form --name=value or
 // --name. argument is already split into name and value before we call this
 // function.
-bool DeduceUsageFlags(absl::string_view name, absl::string_view value);
+bool DeduceUsageFlags(abslx::string_view name, abslx::string_view value);
 
 }  // namespace flags_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_FLAGS_INTERNAL_USAGE_H_

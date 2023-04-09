@@ -70,7 +70,7 @@ using mediapipe::SwitchContainerOptions;
 class SwitchContainer : public Subgraph {
  public:
   SwitchContainer() = default;
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       const Subgraph::SubgraphOptions& options) override;
 };
 REGISTER_MEDIAPIPE_GRAPH(SwitchContainer);
@@ -81,7 +81,7 @@ using TagIndex = std::pair<std::string, int>;
 // This is the channel number followed by the stream name separated by "__".
 // For example, the channel-name for sream "frame" on channel 1 is "c1__frame".
 std::string ChannelName(const std::string& name, int channel) {
-  return absl::StrCat("c", channel, "__", name);
+  return abslx::StrCat("c", channel, "__", name);
 }
 
 // Returns a SwitchDemuxCalculator node.
@@ -152,7 +152,7 @@ std::string UniqueName(std::string name, std::set<std::string>* names) {
   std::string result = name;
   int suffix = 2;
   while (names->count(result) > 0) {
-    result = absl::StrCat(name, "_", suffix++);
+    result = abslx::StrCat(name, "_", suffix++);
   }
   names->insert(result);
   return result;
@@ -178,14 +178,14 @@ void ParseTags(const proto_ns::RepeatedPtrField<std::string>& streams,
 void EraseTag(const std::string& stream,
               std::map<TagIndex, std::string>* streams) {
   CHECK(streams != nullptr);
-  streams->erase(ParseTagIndexFromStream(absl::StrCat(stream, ":u")));
+  streams->erase(ParseTagIndexFromStream(abslx::StrCat(stream, ":u")));
 }
 
 // Removes the entry for a tag and index from a list.
 void EraseTag(const std::string& stream,
               proto_ns::RepeatedPtrField<std::string>* streams) {
   CHECK(streams != nullptr);
-  TagIndex stream_tag = ParseTagIndexFromStream(absl::StrCat(stream, ":u"));
+  TagIndex stream_tag = ParseTagIndexFromStream(abslx::StrCat(stream, ":u"));
   for (int i = streams->size() - 1; i >= 0; --i) {
     TagIndex tag = ParseTagIndexFromStream(streams->at(i));
     if (tag == stream_tag) {
@@ -209,7 +209,7 @@ void GetContainerNodeStreams(const CalculatorGraphConfig::Node& node,
 }
 
 // Validate all subgraph inputs and outputs.
-absl::Status ValidateContract(
+abslx::Status ValidateContract(
     const CalculatorGraphConfig::Node& subgraph_node,
     const Subgraph::SubgraphOptions& subgraph_options) {
   auto options =
@@ -218,17 +218,17 @@ absl::Status ValidateContract(
   ParseTags(subgraph_node.input_stream(), &input_tags);
   ParseTags(subgraph_node.input_side_packet(), &side_tags);
   if (options.has_select() && options.has_enable()) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "Only one of SwitchContainer options 'enable' and 'select' can be "
         "specified");
   }
   if (side_tags.count({"SELECT", 0}) + side_tags.count({"ENABLE", 0}) > 1 ||
       input_tags.count({"SELECT", 0}) + input_tags.count({"ENABLE", 0}) > 1) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "Only one of SwitchContainer inputs 'ENABLE' and 'SELECT' can be "
         "specified");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Returns true if a set of streams references a certain tag name.
@@ -248,7 +248,7 @@ bool ContainsTag(const proto_ns::RepeatedPtrField<std::string>& tags,
   return false;
 }
 
-absl::StatusOr<CalculatorGraphConfig> SwitchContainer::GetConfig(
+abslx::StatusOr<CalculatorGraphConfig> SwitchContainer::GetConfig(
     const Subgraph::SubgraphOptions& options) {
   CalculatorGraphConfig config;
   std::vector<CalculatorGraphConfig::Node*> subnodes;

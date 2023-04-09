@@ -54,10 +54,10 @@ TEST(ResizeUninit, WithAndWithout) {
     EXPECT_EQ(resize_call_count, 0);
     EXPECT_EQ(resize_default_init_call_count, 0);
     EXPECT_FALSE(
-        absl::strings_internal::STLStringSupportsNontrashingResize(&rs));
+        abslx::strings_internal::STLStringSupportsNontrashingResize(&rs));
     EXPECT_EQ(resize_call_count, 0);
     EXPECT_EQ(resize_default_init_call_count, 0);
-    absl::strings_internal::STLStringResizeUninitialized(&rs, 237);
+    abslx::strings_internal::STLStringResizeUninitialized(&rs, 237);
     EXPECT_EQ(resize_call_count, 1);
     EXPECT_EQ(resize_default_init_call_count, 0);
   }
@@ -70,10 +70,10 @@ TEST(ResizeUninit, WithAndWithout) {
     EXPECT_EQ(resize_call_count, 0);
     EXPECT_EQ(resize_default_init_call_count, 0);
     EXPECT_TRUE(
-        absl::strings_internal::STLStringSupportsNontrashingResize(&rus));
+        abslx::strings_internal::STLStringSupportsNontrashingResize(&rus));
     EXPECT_EQ(resize_call_count, 0);
     EXPECT_EQ(resize_default_init_call_count, 0);
-    absl::strings_internal::STLStringResizeUninitialized(&rus, 237);
+    abslx::strings_internal::STLStringResizeUninitialized(&rus, 237);
     EXPECT_EQ(resize_call_count, 0);
     EXPECT_EQ(resize_default_init_call_count, 1);
   }

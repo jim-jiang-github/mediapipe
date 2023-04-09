@@ -173,7 +173,7 @@ TEST_F(AsStringGraphTest, Variant) {
 TEST_F(AsStringGraphTest, String) {
   Status s = Init(DT_STRING);
   ASSERT_EQ(error::INVALID_ARGUMENT, s.code());
-  ASSERT_TRUE(absl::StrContains(
+  ASSERT_TRUE(abslx::StrContains(
       s.error_message(),
       "Value for attr 'T' of string is not in the list of allowed values"));
 }
@@ -183,7 +183,7 @@ TEST_F(AsStringGraphTest, OnlyOneOfScientificAndShortest) {
                   /*scientific=*/true, /*shortest=*/true);
   ASSERT_EQ(error::INVALID_ARGUMENT, s.code());
   ASSERT_TRUE(
-      absl::StrContains(s.error_message(),
+      abslx::StrContains(s.error_message(),
                         "Cannot select both scientific and shortest notation"));
 }
 
@@ -191,7 +191,7 @@ TEST_F(AsStringGraphTest, NoShortestForNonFloat) {
   Status s = Init(DT_INT32, /*fill=*/"", /*width=*/-1, /*precision=*/-1,
                   /*scientific=*/false, /*shortest=*/true);
   ASSERT_EQ(error::INVALID_ARGUMENT, s.code());
-  ASSERT_TRUE(absl::StrContains(
+  ASSERT_TRUE(abslx::StrContains(
       s.error_message(),
       "scientific and shortest format not supported for datatype"));
 }
@@ -200,7 +200,7 @@ TEST_F(AsStringGraphTest, NoScientificForNonFloat) {
   Status s = Init(DT_INT32, /*fill=*/"", /*width=*/-1, /*precision=*/-1,
                   /*scientific=*/true);
   ASSERT_EQ(error::INVALID_ARGUMENT, s.code());
-  ASSERT_TRUE(absl::StrContains(
+  ASSERT_TRUE(abslx::StrContains(
       s.error_message(),
       "scientific and shortest format not supported for datatype"));
 }
@@ -208,14 +208,14 @@ TEST_F(AsStringGraphTest, NoScientificForNonFloat) {
 TEST_F(AsStringGraphTest, NoPrecisionForNonFloat) {
   Status s = Init(DT_INT32, /*fill=*/"", /*width=*/-1, /*precision=*/5);
   ASSERT_EQ(error::INVALID_ARGUMENT, s.code());
-  ASSERT_TRUE(absl::StrContains(s.error_message(),
+  ASSERT_TRUE(abslx::StrContains(s.error_message(),
                                 "precision not supported for datatype"));
 }
 
 TEST_F(AsStringGraphTest, LongFill) {
   Status s = Init(DT_INT32, /*fill=*/"asdf");
   ASSERT_EQ(error::INVALID_ARGUMENT, s.code());
-  ASSERT_TRUE(absl::StrContains(s.error_message(),
+  ASSERT_TRUE(abslx::StrContains(s.error_message(),
                                 "Fill string must be one or fewer characters"));
 }
 
@@ -253,14 +253,14 @@ TEST_F(AsStringGraphTest, FillWithChar3) {
   Status s = Init(DT_INT32, /*fill=*/"s");
   ASSERT_EQ(error::INVALID_ARGUMENT, s.code());
   ASSERT_TRUE(
-      absl::StrContains(s.error_message(), "Fill argument not supported"));
+      abslx::StrContains(s.error_message(), "Fill argument not supported"));
 }
 
 TEST_F(AsStringGraphTest, FillWithChar4) {
   Status s = Init(DT_INT32, /*fill=*/"n");
   ASSERT_EQ(error::INVALID_ARGUMENT, s.code());
   ASSERT_TRUE(
-      absl::StrContains(s.error_message(), "Fill argument not supported"));
+      abslx::StrContains(s.error_message(), "Fill argument not supported"));
 }
 
 }  // end namespace

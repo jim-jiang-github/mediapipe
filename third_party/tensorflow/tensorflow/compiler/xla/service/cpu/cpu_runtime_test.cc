@@ -143,7 +143,7 @@ class EigenMatMulTest : public CpuRuntimeTest,
     bool transpose_rhs = std::get<2>(info.param);
     bool single_threaded = std::get<3>(info.param);
 
-    return absl::StrFormat("EigenMatMul_%d_%d_%d_%s%s%s_threaded", shape.m,
+    return abslx::StrFormat("EigenMatMul_%d_%d_%d_%s%s%s_threaded", shape.m,
                            shape.k, shape.n, transpose_lhs ? "Tlhs_" : "",
                            transpose_rhs ? "Trhs_" : "",
                            single_threaded ? "single" : "multi");
@@ -181,7 +181,7 @@ class MKLMatMulTest : public CpuRuntimeTest,
     bool transpose_rhs = std::get<2>(info.param);
     bool single_threaded = std::get<3>(info.param);
 
-    return absl::StrFormat("MKLMatMul_%d_%d_%d_%s%s%s_threaded", shape.m,
+    return abslx::StrFormat("MKLMatMul_%d_%d_%d_%s%s%s_threaded", shape.m,
                            shape.k, shape.n, transpose_lhs ? "Tlhs_" : "",
                            transpose_rhs ? "Trhs_" : "",
                            single_threaded ? "single" : "multi");

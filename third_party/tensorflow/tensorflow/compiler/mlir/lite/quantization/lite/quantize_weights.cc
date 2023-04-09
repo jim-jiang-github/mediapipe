@@ -59,7 +59,7 @@ void TfLiteBuiltinOpToMlir(const BuiltinOperatorSet& tflite_builtin_codes,
   }
 }
 
-std::string TfLiteToMlir(absl::string_view tflite_op_name) {
+std::string TfLiteToMlir(abslx::string_view tflite_op_name) {
   StringRef op_name(tflite_op_name.data(), tflite_op_name.size());
   return op_name.lower();
 }
@@ -145,7 +145,7 @@ TfLiteStatus QuantizeWeights(
   tensorflow::AddDynamicRangeQuantizationPasses(quant_specs, pm);
 
   if (failed(pm.run(module.get()))) {
-    absl::string_view err = statusHandler.ConsumeStatus().error_message();
+    abslx::string_view err = statusHandler.ConsumeStatus().error_message();
     error_reporter->Report("Failed to quantize: %s", err);
     return kTfLiteError;
   }

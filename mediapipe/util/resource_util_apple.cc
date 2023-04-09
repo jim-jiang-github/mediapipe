@@ -26,7 +26,7 @@
 namespace mediapipe {
 
 namespace {
-absl::StatusOr<std::string> PathToResourceAsFileInternal(
+abslx::StatusOr<std::string> PathToResourceAsFileInternal(
     const std::string& path) {
   NSString* ns_path = [NSString stringWithUTF8String:path.c_str()];
   Class mediapipeGraphClass = NSClassFromString(@"MPPGraph");
@@ -42,7 +42,7 @@ absl::StatusOr<std::string> PathToResourceAsFileInternal(
 }  // namespace
 
 namespace internal {
-absl::Status DefaultGetResourceContents(const std::string& path,
+abslx::Status DefaultGetResourceContents(const std::string& path,
                                         std::string* output,
                                         bool read_as_binary) {
   if (!read_as_binary) {
@@ -53,9 +53,9 @@ absl::Status DefaultGetResourceContents(const std::string& path,
 }
 }  // namespace internal
 
-absl::StatusOr<std::string> PathToResourceAsFile(const std::string& path) {
+abslx::StatusOr<std::string> PathToResourceAsFile(const std::string& path) {
   // Return full path.
-  if (absl::StartsWith(path, "/")) {
+  if (abslx::StartsWith(path, "/")) {
     return path;
   }
 
@@ -83,7 +83,7 @@ absl::StatusOr<std::string> PathToResourceAsFile(const std::string& path) {
 
   // Try the test environment.
   {
-    absl::string_view workspace = "mediapipe";
+    abslx::string_view workspace = "mediapipe";
     const char* test_srcdir = std::getenv("TEST_SRCDIR");
     auto test_path =
         file::JoinPath(test_srcdir ? test_srcdir : "", workspace, path);

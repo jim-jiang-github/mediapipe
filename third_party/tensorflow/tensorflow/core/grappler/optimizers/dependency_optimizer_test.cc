@@ -899,8 +899,8 @@ TEST_F(DependencyOptimizerTest, GroupCrossHostControlDeps) {
                                   {1, 2}, DT_FLOAT);
     for (int t = 0; t < 4; ++t) {
       for (int c = 0; c < 8; ++c) {
-        string opname = absl::StrCat("t", t, "/c", c);
-        string device = absl::StrCat("/task:", t, "/device:TPU:", c);
+        string opname = abslx::StrCat("t", t, "/c", c);
+        string device = abslx::StrCat("/task:", t, "/device:TPU:", c);
         Output output = ops::RandomUniform(
             s.WithOpName(opname).WithDevice(device), {1, 2}, DT_FLOAT);
         ops.push_back(output.op());
@@ -929,7 +929,7 @@ TEST_F(DependencyOptimizerTest, GroupCrossHostControlDeps) {
   std::set<string> tasks;
   for (const auto& n : output.node()) {
     if (n.op() == "NoOp") {
-      EXPECT_TRUE(absl::StartsWith(n.name(), "GroupCrossDeviceControlEdges"));
+      EXPECT_TRUE(abslx::StartsWith(n.name(), "GroupCrossDeviceControlEdges"));
       EXPECT_EQ(n.input_size(), 8);
       tasks.insert(n.device());
     }
@@ -938,7 +938,7 @@ TEST_F(DependencyOptimizerTest, GroupCrossHostControlDeps) {
       EXPECT_EQ(n.input_size(), 5);
       for (const auto& i : n.input()) {
         EXPECT_TRUE(i == "a" ||
-                    absl::StartsWith(i, "^GroupCrossDeviceControlEdges"));
+                    abslx::StartsWith(i, "^GroupCrossDeviceControlEdges"));
       }
     }
   }

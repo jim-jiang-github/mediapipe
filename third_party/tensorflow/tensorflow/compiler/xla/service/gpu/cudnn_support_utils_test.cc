@@ -47,7 +47,7 @@ class CudnnSupportUtilsTest : public HloTestBase {
   // Gets the custom call with `target` from the `module`. Expects that there is
   // one and only one matching call.
   StatusOr<HloCustomCallInstruction*> GetCustomCall(
-      xla::VerifiedHloModule* module, absl::string_view target) {
+      xla::VerifiedHloModule* module, abslx::string_view target) {
     HloCustomCallInstruction* call = nullptr;
     for (HloComputation* comp : module->MakeNonfusionComputations()) {
       for (HloInstruction* inst : comp->instructions()) {

@@ -23,7 +23,7 @@ namespace profiler {
 namespace {
 
 using PerHostStepDb =
-    absl::flat_hash_map<uint32 /*=host_id*/, StepDatabaseResult>;
+    abslx::flat_hash_map<uint32 /*=host_id*/, StepDatabaseResult>;
 
 constexpr uint64 kStepDurationPs = 2000000000;
 constexpr uint32 kNumStepsPerHost = 10;
@@ -127,9 +127,9 @@ PerHostStepDb CreateNoStep(uint32 num_hosts) {
   return result;
 }
 
-absl::flat_hash_map<uint32 /*=host_id*/, const StepDatabaseResult*> Convert(
+abslx::flat_hash_map<uint32 /*=host_id*/, const StepDatabaseResult*> Convert(
     const PerHostStepDb& perhost_stepdb) {
-  absl::flat_hash_map<uint32 /*=host_id*/, const StepDatabaseResult*> result;
+  abslx::flat_hash_map<uint32 /*=host_id*/, const StepDatabaseResult*> result;
   for (const auto& hostid_stepdb : perhost_stepdb) {
     auto host_id = hostid_stepdb.first;
     const auto& step_db = hostid_stepdb.second;

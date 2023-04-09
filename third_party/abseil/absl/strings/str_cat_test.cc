@@ -35,7 +35,7 @@
 
 namespace {
 
-// Test absl::StrCat of ints and longs of various sizes and signdedness.
+// Test abslx::StrCat of ints and longs of various sizes and signdedness.
 TEST(StrCat, Ints) {
   const short s = -1;  // NOLINT(runtime/int)
   const uint16_t us = 2;
@@ -50,30 +50,30 @@ TEST(StrCat, Ints) {
   const intptr_t intptr = -12;
   const uintptr_t uintptr = 13;
   std::string answer;
-  answer = absl::StrCat(s, us);
+  answer = abslx::StrCat(s, us);
   EXPECT_EQ(answer, "-12");
-  answer = absl::StrCat(i, ui);
+  answer = abslx::StrCat(i, ui);
   EXPECT_EQ(answer, "-34");
-  answer = absl::StrCat(l, ul);
+  answer = abslx::StrCat(l, ul);
   EXPECT_EQ(answer, "-56");
-  answer = absl::StrCat(ll, ull);
+  answer = abslx::StrCat(ll, ull);
   EXPECT_EQ(answer, "-78");
-  answer = absl::StrCat(ptrdiff, size);
+  answer = abslx::StrCat(ptrdiff, size);
   EXPECT_EQ(answer, "-910");
-  answer = absl::StrCat(ptrdiff, intptr);
+  answer = abslx::StrCat(ptrdiff, intptr);
   EXPECT_EQ(answer, "-9-12");
-  answer = absl::StrCat(uintptr, 0);
+  answer = abslx::StrCat(uintptr, 0);
   EXPECT_EQ(answer, "130");
 }
 
 TEST(StrCat, Enums) {
   enum SmallNumbers { One = 1, Ten = 10 } e = Ten;
-  EXPECT_EQ("10", absl::StrCat(e));
-  EXPECT_EQ("-5", absl::StrCat(SmallNumbers(-5)));
+  EXPECT_EQ("10", abslx::StrCat(e));
+  EXPECT_EQ("-5", abslx::StrCat(SmallNumbers(-5)));
 
   enum class Option { Boxers = 1, Briefs = -1 };
 
-  EXPECT_EQ("-1", absl::StrCat(Option::Briefs));
+  EXPECT_EQ("-1", abslx::StrCat(Option::Briefs));
 
   enum class Airplane : uint64_t {
     Airbus = 1,
@@ -81,27 +81,27 @@ TEST(StrCat, Enums) {
     Canary = 10000000000  // too big for "int"
   };
 
-  EXPECT_EQ("10000000000", absl::StrCat(Airplane::Canary));
+  EXPECT_EQ("10000000000", abslx::StrCat(Airplane::Canary));
 
   enum class TwoGig : int32_t {
     TwoToTheZero = 1,
     TwoToTheSixteenth = 1 << 16,
     TwoToTheThirtyFirst = INT32_MIN
   };
-  EXPECT_EQ("65536", absl::StrCat(TwoGig::TwoToTheSixteenth));
-  EXPECT_EQ("-2147483648", absl::StrCat(TwoGig::TwoToTheThirtyFirst));
-  EXPECT_EQ("-1", absl::StrCat(static_cast<TwoGig>(-1)));
+  EXPECT_EQ("65536", abslx::StrCat(TwoGig::TwoToTheSixteenth));
+  EXPECT_EQ("-2147483648", abslx::StrCat(TwoGig::TwoToTheThirtyFirst));
+  EXPECT_EQ("-1", abslx::StrCat(static_cast<TwoGig>(-1)));
 
   enum class FourGig : uint32_t {
     TwoToTheZero = 1,
     TwoToTheSixteenth = 1 << 16,
     TwoToTheThirtyFirst = 1U << 31  // too big for "int"
   };
-  EXPECT_EQ("65536", absl::StrCat(FourGig::TwoToTheSixteenth));
-  EXPECT_EQ("2147483648", absl::StrCat(FourGig::TwoToTheThirtyFirst));
-  EXPECT_EQ("4294967295", absl::StrCat(static_cast<FourGig>(-1)));
+  EXPECT_EQ("65536", abslx::StrCat(FourGig::TwoToTheSixteenth));
+  EXPECT_EQ("2147483648", abslx::StrCat(FourGig::TwoToTheThirtyFirst));
+  EXPECT_EQ("4294967295", abslx::StrCat(static_cast<FourGig>(-1)));
 
-  EXPECT_EQ("10000000000", absl::StrCat(Airplane::Canary));
+  EXPECT_EQ("10000000000", abslx::StrCat(Airplane::Canary));
 }
 
 TEST(StrCat, Basics) {
@@ -115,7 +115,7 @@ TEST(StrCat, Basics) {
     "std::World"
   };
 
-  absl::string_view pieces[] = {"Hello", "Cruel", "World"};
+  abslx::string_view pieces[] = {"Hello", "Cruel", "World"};
 
   const char* c_strs[] = {
     "Hello",
@@ -126,71 +126,71 @@ TEST(StrCat, Basics) {
   int32_t i32s[] = {'H', 'C', 'W'};
   uint64_t ui64s[] = {12345678910LL, 10987654321LL};
 
-  EXPECT_EQ(absl::StrCat(), "");
+  EXPECT_EQ(abslx::StrCat(), "");
 
-  result = absl::StrCat(false, true, 2, 3);
+  result = abslx::StrCat(false, true, 2, 3);
   EXPECT_EQ(result, "0123");
 
-  result = absl::StrCat(-1);
+  result = abslx::StrCat(-1);
   EXPECT_EQ(result, "-1");
 
-  result = absl::StrCat(absl::SixDigits(0.5));
+  result = abslx::StrCat(abslx::SixDigits(0.5));
   EXPECT_EQ(result, "0.5");
 
-  result = absl::StrCat(strs[1], pieces[2]);
+  result = abslx::StrCat(strs[1], pieces[2]);
   EXPECT_EQ(result, "CruelWorld");
 
-  result = absl::StrCat(stdstrs[1], " ", stdstrs[2]);
+  result = abslx::StrCat(stdstrs[1], " ", stdstrs[2]);
   EXPECT_EQ(result, "std::Cruel std::World");
 
-  result = absl::StrCat(strs[0], ", ", pieces[2]);
+  result = abslx::StrCat(strs[0], ", ", pieces[2]);
   EXPECT_EQ(result, "Hello, World");
 
-  result = absl::StrCat(strs[0], ", ", strs[1], " ", strs[2], "!");
+  result = abslx::StrCat(strs[0], ", ", strs[1], " ", strs[2], "!");
   EXPECT_EQ(result, "Hello, Cruel World!");
 
-  result = absl::StrCat(pieces[0], ", ", pieces[1], " ", pieces[2]);
+  result = abslx::StrCat(pieces[0], ", ", pieces[1], " ", pieces[2]);
   EXPECT_EQ(result, "Hello, Cruel World");
 
-  result = absl::StrCat(c_strs[0], ", ", c_strs[1], " ", c_strs[2]);
+  result = abslx::StrCat(c_strs[0], ", ", c_strs[1], " ", c_strs[2]);
   EXPECT_EQ(result, "Hello, Cruel World");
 
-  result = absl::StrCat("ASCII ", i32s[0], ", ", i32s[1], " ", i32s[2], "!");
+  result = abslx::StrCat("ASCII ", i32s[0], ", ", i32s[1], " ", i32s[2], "!");
   EXPECT_EQ(result, "ASCII 72, 67 87!");
 
-  result = absl::StrCat(ui64s[0], ", ", ui64s[1], "!");
+  result = abslx::StrCat(ui64s[0], ", ", ui64s[1], "!");
   EXPECT_EQ(result, "12345678910, 10987654321!");
 
   std::string one =
       "1";  // Actually, it's the size of this string that we want; a
             // 64-bit build distinguishes between size_t and uint64_t,
             // even though they're both unsigned 64-bit values.
-  result = absl::StrCat("And a ", one.size(), " and a ",
+  result = abslx::StrCat("And a ", one.size(), " and a ",
                         &result[2] - &result[0], " and a ", one, " 2 3 4", "!");
   EXPECT_EQ(result, "And a 1 and a 2 and a 1 2 3 4!");
 
-  // result = absl::StrCat("Single chars won't compile", '!');
-  // result = absl::StrCat("Neither will nullptrs", nullptr);
+  // result = abslx::StrCat("Single chars won't compile", '!');
+  // result = abslx::StrCat("Neither will nullptrs", nullptr);
   result =
-      absl::StrCat("To output a char by ASCII/numeric value, use +: ", '!' + 0);
+      abslx::StrCat("To output a char by ASCII/numeric value, use +: ", '!' + 0);
   EXPECT_EQ(result, "To output a char by ASCII/numeric value, use +: 33");
 
   float f = 100000.5;
-  result = absl::StrCat("A hundred K and a half is ", absl::SixDigits(f));
+  result = abslx::StrCat("A hundred K and a half is ", abslx::SixDigits(f));
   EXPECT_EQ(result, "A hundred K and a half is 100000");
 
   f = 100001.5;
   result =
-      absl::StrCat("A hundred K and one and a half is ", absl::SixDigits(f));
+      abslx::StrCat("A hundred K and one and a half is ", abslx::SixDigits(f));
   EXPECT_EQ(result, "A hundred K and one and a half is 100002");
 
   double d = 100000.5;
   d *= d;
   result =
-      absl::StrCat("A hundred K and a half squared is ", absl::SixDigits(d));
+      abslx::StrCat("A hundred K and a half squared is ", abslx::SixDigits(d));
   EXPECT_EQ(result, "A hundred K and a half squared is 1.00001e+10");
 
-  result = absl::StrCat(1, 2, 333, 4444, 55555, 666666, 7777777, 88888888,
+  result = abslx::StrCat(1, 2, 333, 4444, 55555, 666666, 7777777, 88888888,
                         999999999);
   EXPECT_EQ(result, "12333444455555666666777777788888888999999999");
 }
@@ -198,15 +198,15 @@ TEST(StrCat, Basics) {
 TEST(StrCat, CornerCases) {
   std::string result;
 
-  result = absl::StrCat("");  // NOLINT
+  result = abslx::StrCat("");  // NOLINT
   EXPECT_EQ(result, "");
-  result = absl::StrCat("", "");
+  result = abslx::StrCat("", "");
   EXPECT_EQ(result, "");
-  result = absl::StrCat("", "", "");
+  result = abslx::StrCat("", "", "");
   EXPECT_EQ(result, "");
-  result = absl::StrCat("", "", "", "");
+  result = abslx::StrCat("", "", "", "");
   EXPECT_EQ(result, "");
-  result = absl::StrCat("", "", "", "", "");
+  result = abslx::StrCat("", "", "", "", "");
   EXPECT_EQ(result, "");
 }
 
@@ -251,7 +251,7 @@ TEST(StrCat, CustomAllocator) {
 
   const mstring str2("Read this book about coffee tables");
 
-  std::string result = absl::StrCat(str1, str2);
+  std::string result = abslx::StrCat(str1, str2);
   EXPECT_EQ(result,
             "PARACHUTE OFF A BLIMP INTO MOSCONE!!"
             "Read this book about coffee tables");
@@ -260,54 +260,54 @@ TEST(StrCat, CustomAllocator) {
 TEST(StrCat, MaxArgs) {
   std::string result;
   // Test 10 up to 26 arguments, the old maximum
-  result = absl::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a");
+  result = abslx::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a");
   EXPECT_EQ(result, "123456789a");
-  result = absl::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b");
+  result = abslx::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b");
   EXPECT_EQ(result, "123456789ab");
-  result = absl::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c");
+  result = abslx::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c");
   EXPECT_EQ(result, "123456789abc");
-  result = absl::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d");
+  result = abslx::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d");
   EXPECT_EQ(result, "123456789abcd");
-  result = absl::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e");
+  result = abslx::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e");
   EXPECT_EQ(result, "123456789abcde");
   result =
-      absl::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f");
+      abslx::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f");
   EXPECT_EQ(result, "123456789abcdef");
-  result = absl::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+  result = abslx::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                         "g");
   EXPECT_EQ(result, "123456789abcdefg");
-  result = absl::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+  result = abslx::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                         "g", "h");
   EXPECT_EQ(result, "123456789abcdefgh");
-  result = absl::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+  result = abslx::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                         "g", "h", "i");
   EXPECT_EQ(result, "123456789abcdefghi");
-  result = absl::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+  result = abslx::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                         "g", "h", "i", "j");
   EXPECT_EQ(result, "123456789abcdefghij");
-  result = absl::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+  result = abslx::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                         "g", "h", "i", "j", "k");
   EXPECT_EQ(result, "123456789abcdefghijk");
-  result = absl::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+  result = abslx::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                         "g", "h", "i", "j", "k", "l");
   EXPECT_EQ(result, "123456789abcdefghijkl");
-  result = absl::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+  result = abslx::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                         "g", "h", "i", "j", "k", "l", "m");
   EXPECT_EQ(result, "123456789abcdefghijklm");
-  result = absl::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+  result = abslx::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                         "g", "h", "i", "j", "k", "l", "m", "n");
   EXPECT_EQ(result, "123456789abcdefghijklmn");
-  result = absl::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+  result = abslx::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                         "g", "h", "i", "j", "k", "l", "m", "n", "o");
   EXPECT_EQ(result, "123456789abcdefghijklmno");
-  result = absl::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+  result = abslx::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                         "g", "h", "i", "j", "k", "l", "m", "n", "o", "p");
   EXPECT_EQ(result, "123456789abcdefghijklmnop");
-  result = absl::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
+  result = abslx::StrCat(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c", "d", "e", "f",
                         "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q");
   EXPECT_EQ(result, "123456789abcdefghijklmnopq");
   // No limit thanks to C++11's variadic templates
-  result = absl::StrCat(
+  result = abslx::StrCat(
       1, 2, 3, 4, 5, 6, 7, 8, 9, 10, "a", "b", "c", "d", "e", "f", "g", "h",
       "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w",
       "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
@@ -327,7 +327,7 @@ TEST(StrAppend, Basics) {
     "std::World"
   };
 
-  absl::string_view pieces[] = {"Hello", "Cruel", "World"};
+  abslx::string_view pieces[] = {"Hello", "Cruel", "World"};
 
   const char* c_strs[] = {
     "Hello",
@@ -339,39 +339,39 @@ TEST(StrAppend, Basics) {
   uint64_t ui64s[] = {12345678910LL, 10987654321LL};
 
   std::string::size_type old_size = result.size();
-  absl::StrAppend(&result);
+  abslx::StrAppend(&result);
   EXPECT_EQ(result.size(), old_size);
 
   old_size = result.size();
-  absl::StrAppend(&result, strs[0]);
+  abslx::StrAppend(&result, strs[0]);
   EXPECT_EQ(result.substr(old_size), "Hello");
 
   old_size = result.size();
-  absl::StrAppend(&result, strs[1], pieces[2]);
+  abslx::StrAppend(&result, strs[1], pieces[2]);
   EXPECT_EQ(result.substr(old_size), "CruelWorld");
 
   old_size = result.size();
-  absl::StrAppend(&result, stdstrs[0], ", ", pieces[2]);
+  abslx::StrAppend(&result, stdstrs[0], ", ", pieces[2]);
   EXPECT_EQ(result.substr(old_size), "std::Hello, World");
 
   old_size = result.size();
-  absl::StrAppend(&result, strs[0], ", ", stdstrs[1], " ", strs[2], "!");
+  abslx::StrAppend(&result, strs[0], ", ", stdstrs[1], " ", strs[2], "!");
   EXPECT_EQ(result.substr(old_size), "Hello, std::Cruel World!");
 
   old_size = result.size();
-  absl::StrAppend(&result, pieces[0], ", ", pieces[1], " ", pieces[2]);
+  abslx::StrAppend(&result, pieces[0], ", ", pieces[1], " ", pieces[2]);
   EXPECT_EQ(result.substr(old_size), "Hello, Cruel World");
 
   old_size = result.size();
-  absl::StrAppend(&result, c_strs[0], ", ", c_strs[1], " ", c_strs[2]);
+  abslx::StrAppend(&result, c_strs[0], ", ", c_strs[1], " ", c_strs[2]);
   EXPECT_EQ(result.substr(old_size), "Hello, Cruel World");
 
   old_size = result.size();
-  absl::StrAppend(&result, "ASCII ", i32s[0], ", ", i32s[1], " ", i32s[2], "!");
+  abslx::StrAppend(&result, "ASCII ", i32s[0], ", ", i32s[1], " ", i32s[2], "!");
   EXPECT_EQ(result.substr(old_size), "ASCII 72, 67 87!");
 
   old_size = result.size();
-  absl::StrAppend(&result, ui64s[0], ", ", ui64s[1], "!");
+  abslx::StrAppend(&result, ui64s[0], ", ", ui64s[1], "!");
   EXPECT_EQ(result.substr(old_size), "12345678910, 10987654321!");
 
   std::string one =
@@ -379,27 +379,27 @@ TEST(StrAppend, Basics) {
             // 64-bit build distinguishes between size_t and uint64_t,
             // even though they're both unsigned 64-bit values.
   old_size = result.size();
-  absl::StrAppend(&result, "And a ", one.size(), " and a ",
+  abslx::StrAppend(&result, "And a ", one.size(), " and a ",
                   &result[2] - &result[0], " and a ", one, " 2 3 4", "!");
   EXPECT_EQ(result.substr(old_size), "And a 1 and a 2 and a 1 2 3 4!");
 
-  // result = absl::StrCat("Single chars won't compile", '!');
-  // result = absl::StrCat("Neither will nullptrs", nullptr);
+  // result = abslx::StrCat("Single chars won't compile", '!');
+  // result = abslx::StrCat("Neither will nullptrs", nullptr);
   old_size = result.size();
-  absl::StrAppend(&result,
+  abslx::StrAppend(&result,
                   "To output a char by ASCII/numeric value, use +: ", '!' + 0);
   EXPECT_EQ(result.substr(old_size),
             "To output a char by ASCII/numeric value, use +: 33");
 
   // Test 9 arguments, the old maximum
   old_size = result.size();
-  absl::StrAppend(&result, 1, 22, 333, 4444, 55555, 666666, 7777777, 88888888,
+  abslx::StrAppend(&result, 1, 22, 333, 4444, 55555, 666666, 7777777, 88888888,
                   9);
   EXPECT_EQ(result.substr(old_size), "1223334444555556666667777777888888889");
 
   // No limit thanks to C++11's variadic templates
   old_size = result.size();
-  absl::StrAppend(
+  abslx::StrAppend(
       &result, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,                           //
       "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",  //
       "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",  //
@@ -419,21 +419,21 @@ TEST(StrCat, VectorBoolReferenceTypes) {
   // Test that vector<bool>::reference and vector<bool>::const_reference
   // are handled as if the were really bool types and not the proxy types
   // they really are.
-  std::string result = absl::StrCat(v[0], v[1], cv[0], cv[1]); // NOLINT
+  std::string result = abslx::StrCat(v[0], v[1], cv[0], cv[1]); // NOLINT
   EXPECT_EQ(result, "1010");
 }
 
 // Passing nullptr to memcpy is undefined behavior and this test
 // provides coverage of codepaths that handle empty strings with nullptrs.
 TEST(StrCat, AvoidsMemcpyWithNullptr) {
-  EXPECT_EQ(absl::StrCat(42, absl::string_view{}), "42");
+  EXPECT_EQ(abslx::StrCat(42, abslx::string_view{}), "42");
 
   // Cover CatPieces code.
-  EXPECT_EQ(absl::StrCat(1, 2, 3, 4, 5, absl::string_view{}), "12345");
+  EXPECT_EQ(abslx::StrCat(1, 2, 3, 4, 5, abslx::string_view{}), "12345");
 
   // Cover AppendPieces.
   std::string result;
-  absl::StrAppend(&result, 1, 2, 3, 4, 5, absl::string_view{});
+  abslx::StrAppend(&result, 1, 2, 3, 4, 5, abslx::string_view{});
   EXPECT_EQ(result, "12345");
 }
 
@@ -442,38 +442,38 @@ TEST(StrAppend, Death) {
   std::string s = "self";
   // on linux it's "assertion", on mac it's "Assertion",
   // on chromiumos it's "Assertion ... failed".
-  ABSL_EXPECT_DEBUG_DEATH(absl::StrAppend(&s, s.c_str() + 1),
+  ABSL_EXPECT_DEBUG_DEATH(abslx::StrAppend(&s, s.c_str() + 1),
                           "ssertion.*failed");
-  ABSL_EXPECT_DEBUG_DEATH(absl::StrAppend(&s, s), "ssertion.*failed");
+  ABSL_EXPECT_DEBUG_DEATH(abslx::StrAppend(&s, s), "ssertion.*failed");
 }
 #endif  // GTEST_HAS_DEATH_TEST
 
 TEST(StrAppend, CornerCases) {
   std::string result;
-  absl::StrAppend(&result, "");
+  abslx::StrAppend(&result, "");
   EXPECT_EQ(result, "");
-  absl::StrAppend(&result, "", "");
+  abslx::StrAppend(&result, "", "");
   EXPECT_EQ(result, "");
-  absl::StrAppend(&result, "", "", "");
+  abslx::StrAppend(&result, "", "", "");
   EXPECT_EQ(result, "");
-  absl::StrAppend(&result, "", "", "", "");
+  abslx::StrAppend(&result, "", "", "", "");
   EXPECT_EQ(result, "");
-  absl::StrAppend(&result, "", "", "", "", "");
+  abslx::StrAppend(&result, "", "", "", "", "");
   EXPECT_EQ(result, "");
 }
 
 TEST(StrAppend, CornerCasesNonEmptyAppend) {
   for (std::string result : {"hello", "a string too long to fit in the SSO"}) {
     const std::string expected = result;
-    absl::StrAppend(&result, "");
+    abslx::StrAppend(&result, "");
     EXPECT_EQ(result, expected);
-    absl::StrAppend(&result, "", "");
+    abslx::StrAppend(&result, "", "");
     EXPECT_EQ(result, expected);
-    absl::StrAppend(&result, "", "", "");
+    abslx::StrAppend(&result, "", "", "");
     EXPECT_EQ(result, expected);
-    absl::StrAppend(&result, "", "", "", "");
+    abslx::StrAppend(&result, "", "", "", "");
     EXPECT_EQ(result, expected);
-    absl::StrAppend(&result, "", "", "", "", "");
+    abslx::StrAppend(&result, "", "", "", "", "");
     EXPECT_EQ(result, expected);
   }
 }
@@ -483,23 +483,23 @@ void CheckHex(IntType v, const char* nopad_format, const char* zeropad_format,
               const char* spacepad_format) {
   char expected[256];
 
-  std::string actual = absl::StrCat(absl::Hex(v, absl::kNoPad));
+  std::string actual = abslx::StrCat(abslx::Hex(v, abslx::kNoPad));
   snprintf(expected, sizeof(expected), nopad_format, v);
   EXPECT_EQ(expected, actual) << " decimal value " << v;
 
-  for (int spec = absl::kZeroPad2; spec <= absl::kZeroPad20; ++spec) {
+  for (int spec = abslx::kZeroPad2; spec <= abslx::kZeroPad20; ++spec) {
     std::string actual =
-        absl::StrCat(absl::Hex(v, static_cast<absl::PadSpec>(spec)));
+        abslx::StrCat(abslx::Hex(v, static_cast<abslx::PadSpec>(spec)));
     snprintf(expected, sizeof(expected), zeropad_format,
-             spec - absl::kZeroPad2 + 2, v);
+             spec - abslx::kZeroPad2 + 2, v);
     EXPECT_EQ(expected, actual) << " decimal value " << v;
   }
 
-  for (int spec = absl::kSpacePad2; spec <= absl::kSpacePad20; ++spec) {
+  for (int spec = abslx::kSpacePad2; spec <= abslx::kSpacePad20; ++spec) {
     std::string actual =
-        absl::StrCat(absl::Hex(v, static_cast<absl::PadSpec>(spec)));
+        abslx::StrCat(abslx::Hex(v, static_cast<abslx::PadSpec>(spec)));
     snprintf(expected, sizeof(expected), spacepad_format,
-             spec - absl::kSpacePad2 + 2, v);
+             spec - abslx::kSpacePad2 + 2, v);
     EXPECT_EQ(expected, actual) << " decimal value " << v;
   }
 }
@@ -509,28 +509,28 @@ void CheckDec(IntType v, const char* nopad_format, const char* zeropad_format,
               const char* spacepad_format) {
   char expected[256];
 
-  std::string actual = absl::StrCat(absl::Dec(v, absl::kNoPad));
+  std::string actual = abslx::StrCat(abslx::Dec(v, abslx::kNoPad));
   snprintf(expected, sizeof(expected), nopad_format, v);
   EXPECT_EQ(expected, actual) << " decimal value " << v;
 
-  for (int spec = absl::kZeroPad2; spec <= absl::kZeroPad20; ++spec) {
+  for (int spec = abslx::kZeroPad2; spec <= abslx::kZeroPad20; ++spec) {
     std::string actual =
-        absl::StrCat(absl::Dec(v, static_cast<absl::PadSpec>(spec)));
+        abslx::StrCat(abslx::Dec(v, static_cast<abslx::PadSpec>(spec)));
     snprintf(expected, sizeof(expected), zeropad_format,
-             spec - absl::kZeroPad2 + 2, v);
+             spec - abslx::kZeroPad2 + 2, v);
     EXPECT_EQ(expected, actual)
         << " decimal value " << v << " format '" << zeropad_format
-        << "' digits " << (spec - absl::kZeroPad2 + 2);
+        << "' digits " << (spec - abslx::kZeroPad2 + 2);
   }
 
-  for (int spec = absl::kSpacePad2; spec <= absl::kSpacePad20; ++spec) {
+  for (int spec = abslx::kSpacePad2; spec <= abslx::kSpacePad20; ++spec) {
     std::string actual =
-        absl::StrCat(absl::Dec(v, static_cast<absl::PadSpec>(spec)));
+        abslx::StrCat(abslx::Dec(v, static_cast<abslx::PadSpec>(spec)));
     snprintf(expected, sizeof(expected), spacepad_format,
-             spec - absl::kSpacePad2 + 2, v);
+             spec - abslx::kSpacePad2 + 2, v);
     EXPECT_EQ(expected, actual)
         << " decimal value " << v << " format '" << spacepad_format
-        << "' digits " << (spec - absl::kSpacePad2 + 2);
+        << "' digits " << (spec - abslx::kSpacePad2 + 2);
   }
 }
 
@@ -597,10 +597,10 @@ void TestFastPrints() {
   CheckAll(0x12345678);
 
   int8_t minus_one_8bit = -1;
-  EXPECT_EQ("ff", absl::StrCat(absl::Hex(minus_one_8bit)));
+  EXPECT_EQ("ff", abslx::StrCat(abslx::Hex(minus_one_8bit)));
 
   int16_t minus_one_16bit = -1;
-  EXPECT_EQ("ffff", absl::StrCat(absl::Hex(minus_one_16bit)));
+  EXPECT_EQ("ffff", abslx::StrCat(abslx::Hex(minus_one_16bit)));
 }
 
 TEST(Numbers, TestFunctionsMovedOverFromNumbersMain) {

@@ -96,7 +96,7 @@ class CalculatorNode {
   void SetExecutor(const std::string& executor);
 
   // Calls Process() on the Calculator corresponding to this node.
-  absl::Status ProcessNode(CalculatorContext* calculator_context);
+  abslx::Status ProcessNode(CalculatorContext* calculator_context);
 
   // Initializes the node.  The buffer_size_hint argument is
   // set to the value specified in the graph proto for this field.
@@ -106,7 +106,7 @@ class CalculatorNode {
   // output_side_packets is expected to point to a contiguous flat array with
   // OutputSidePacketImpls corresponding to the output side packet indexes in
   // validated_graph.
-  absl::Status Initialize(const ValidatedGraphConfig* validated_graph,
+  abslx::Status Initialize(const ValidatedGraphConfig* validated_graph,
                           NodeTypeInfo::NodeRef node_ref,
                           InputStreamManager* input_stream_managers,
                           OutputStreamManager* output_stream_managers,
@@ -123,22 +123,22 @@ class CalculatorNode {
   // can be scheduled. source_node_opened_callback is called when a source
   // node is opened. schedule_callback is passed to the InputStreamHandler
   // and is called each time a new invocation can be scheduled.
-  absl::Status PrepareForRun(
+  abslx::Status PrepareForRun(
       const std::map<std::string, Packet>& all_side_packets,
       const std::map<std::string, Packet>& service_packets,
       std::function<void()> ready_for_open_callback,
       std::function<void()> source_node_opened_callback,
       std::function<void(CalculatorContext*)> schedule_callback,
-      std::function<void(absl::Status)> error_callback,
+      std::function<void(abslx::Status)> error_callback,
       CounterFactory* counter_factory) ABSL_LOCKS_EXCLUDED(status_mutex_);
   // Opens the node.
-  absl::Status OpenNode() ABSL_LOCKS_EXCLUDED(status_mutex_);
+  abslx::Status OpenNode() ABSL_LOCKS_EXCLUDED(status_mutex_);
   // Called when a source node's layer becomes active.
   void ActivateNode() ABSL_LOCKS_EXCLUDED(status_mutex_);
   // Cleans up the node after the CalculatorGraph has been run. Deletes
   // the Calculator managed by this node. graph_status is the status of
   // the graph run.
-  void CleanupAfterRun(const absl::Status& graph_status)
+  void CleanupAfterRun(const abslx::Status& graph_status)
       ABSL_LOCKS_EXCLUDED(status_mutex_);
 
   // Returns true iff PrepareForRun() has been called (and types verified).
@@ -217,7 +217,7 @@ class CalculatorNode {
   // Closes the node's calculator and input and output streams.
   // graph_status is the current status of the graph run. graph_run_ended
   // indicates whether the graph run has ended.
-  absl::Status CloseNode(const absl::Status& graph_status, bool graph_run_ended)
+  abslx::Status CloseNode(const abslx::Status& graph_status, bool graph_run_ended)
       ABSL_LOCKS_EXCLUDED(status_mutex_);
 
   // Returns a pointer to the default calculator context that is used for
@@ -239,34 +239,34 @@ class CalculatorNode {
 
  private:
   // Sets up the output side packets from the main flat array.
-  absl::Status InitializeOutputSidePackets(
+  abslx::Status InitializeOutputSidePackets(
       const PacketTypeSet& output_side_packet_types,
       OutputSidePacketImpl* output_side_packets);
   // Connects the input side packets as mirrors on the output side packets.
   // Output side packets are looked up in the main flat array which is
   // provided.
-  absl::Status InitializeInputSidePackets(
+  abslx::Status InitializeInputSidePackets(
       OutputSidePacketImpl* output_side_packets);
   // Sets up the output streams from the main flat array.
-  absl::Status InitializeOutputStreams(
+  abslx::Status InitializeOutputStreams(
       OutputStreamManager* output_stream_managers);
   // Sets up the input streams and connects them as mirrors on the
   // output streams.  Both input streams and output streams are looked
   // up in the main flat arrays which are provided.
-  absl::Status InitializeInputStreams(
+  abslx::Status InitializeInputStreams(
       InputStreamManager* input_stream_managers,
       OutputStreamManager* output_stream_managers);
 
-  absl::Status InitializeInputStreamHandler(
+  abslx::Status InitializeInputStreamHandler(
       const InputStreamHandlerConfig& handler_config,
       const PacketTypeSet& input_stream_types);
-  absl::Status InitializeOutputStreamHandler(
+  abslx::Status InitializeOutputStreamHandler(
       const OutputStreamHandlerConfig& handler_config,
       const PacketTypeSet& output_stream_types);
 
   // Connects the input/output stream shards in the given calculator context to
   // the input/output streams of the node.
-  absl::Status ConnectShardsToStreams(CalculatorContext* calculator_context);
+  abslx::Status ConnectShardsToStreams(CalculatorContext* calculator_context);
 
   // The general scheduling logic shared by EndScheduling() and
   // CheckIfBecameReady().
@@ -351,7 +351,7 @@ class CalculatorNode {
   std::shared_ptr<ProfilingContext> profiling_context_;
 
   // Mutex for node status.
-  mutable absl::Mutex status_mutex_;
+  mutable abslx::Mutex status_mutex_;
 
   // Describes the input side packets required to run this node.
   std::unique_ptr<PacketTypeSet> input_side_packet_types_;

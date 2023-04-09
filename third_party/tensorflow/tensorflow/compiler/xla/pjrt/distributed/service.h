@@ -47,7 +47,7 @@ class DistributedRuntimeServiceImpl final
 
     // Interval at which the service should check for missed heartbeat RPCs
     // from the clients.
-    absl::Duration heartbeat_interval = absl::Seconds(10);
+    abslx::Duration heartbeat_interval = abslx::Seconds(10);
 
     // Number of heartbeats that a client may miss in a row before the
     // coordinator concludes that a client has vanished.
@@ -55,11 +55,11 @@ class DistributedRuntimeServiceImpl final
 
     // How long should we wait for all clients to call EnumerateDevices() before
     // giving up?
-    absl::Duration enumerate_devices_timeout = absl::Seconds(60);
+    abslx::Duration enumerate_devices_timeout = abslx::Seconds(60);
 
     // How long should we wait for all clients to call Shutdown() before giving
     // up and returning a failure?
-    absl::Duration shutdown_timeout = absl::Seconds(60);
+    abslx::Duration shutdown_timeout = abslx::Seconds(60);
   };
   explicit DistributedRuntimeServiceImpl(const Options& options);
   ~DistributedRuntimeServiceImpl() override;
@@ -112,7 +112,7 @@ class DistributedRuntimeServiceImpl final
   const Options options_;
   const uint64_t session_id_;
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   enum class State { kInitializing, kRunning, kClosed };
   State state_ ABSL_GUARDED_BY(mu_) = State::kInitializing;
   Status service_status_ ABSL_GUARDED_BY(mu_);
@@ -127,7 +127,7 @@ class DistributedRuntimeServiceImpl final
     uint64_t client_id = 0;
 
     // When did we last receive a heartbeat from this task?
-    absl::Time last_heartbeat = absl::InfinitePast();
+    abslx::Time last_heartbeat = abslx::InfinitePast();
   };
   int num_nodes_present_ ABSL_GUARDED_BY(mu_) = 0;
   std::vector<Node> nodes_ ABSL_GUARDED_BY(mu_);
@@ -142,14 +142,14 @@ class DistributedRuntimeServiceImpl final
   int num_nodes_shutting_down_ ABSL_GUARDED_BY(mu_) = 0;
 
   // This dictionary tracks the number of nodes per barrier.
-  absl::flat_hash_map<std::string, int> barrier_id_to_num_nodes_
+  abslx::flat_hash_map<std::string, int> barrier_id_to_num_nodes_
       ABSL_GUARDED_BY(mu_);
 
   // Key-value store, used by distributed GPU code to share NCCL state.
   KeyValueStore key_value_store_;
 
   // Notification that tells the heartbeat thread to stop.
-  absl::Notification stop_heartbeat_thread_;
+  abslx::Notification stop_heartbeat_thread_;
 
   // Thread that checks for missing hearbeats from the clients periodically.
   std::unique_ptr<tensorflow::Thread> heartbeat_thread_;
@@ -210,7 +210,7 @@ class DistributedRuntimeService {
 
 // Given a LocalTopologyProto object from each node, builds a
 // GlobalTopologyProto that describes all nodes.
-void BuildGlobalTopology(absl::Span<LocalTopologyProto> local_topologies,
+void BuildGlobalTopology(abslx::Span<LocalTopologyProto> local_topologies,
                          GlobalTopologyProto* global_topology);
 
 }  // namespace xla

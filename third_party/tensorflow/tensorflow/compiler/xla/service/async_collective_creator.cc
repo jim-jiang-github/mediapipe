@@ -27,7 +27,7 @@ namespace xla {
 
 StatusOr<bool> AsyncCollectiveCreator::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   struct ReplacedAsync {
     HloInstruction* start;
@@ -54,7 +54,7 @@ StatusOr<bool> AsyncCollectiveCreator::Run(
       continue;
     }
 
-    absl::flat_hash_map<HloInstruction*, ReplacedAsync> replaced_pairs;
+    abslx::flat_hash_map<HloInstruction*, ReplacedAsync> replaced_pairs;
     bool should_update_schedule =
         module->has_schedule() &&
         module->schedule().is_computation_scheduled(computation);
@@ -124,7 +124,7 @@ StatusOr<bool> AsyncCollectiveCreator::Run(
         } else {
           CHECK_EQ(cp->operand_count(), 4);
           std::vector<const Shape*> operand_shapes;
-          absl::c_transform(cp->operands(), std::back_inserter(operand_shapes),
+          abslx::c_transform(cp->operands(), std::back_inserter(operand_shapes),
                             [](const HloInstruction* operand) {
                               return &(operand->shape());
                             });

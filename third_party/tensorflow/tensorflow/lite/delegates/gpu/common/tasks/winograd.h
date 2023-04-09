@@ -39,7 +39,7 @@ class Winograd4x4To36 : public GPUOperation {
     work_groups->push_back(work_group_size_);
   }
   int3 GetGridSize() const override;
-  absl::Status BindArguments(ArgumentsBinder* args) override;
+  abslx::Status BindArguments(ArgumentsBinder* args) override;
 
   // Move only
   Winograd4x4To36(Winograd4x4To36&& kernel) = default;
@@ -66,7 +66,7 @@ class Winograd4x4To36TileX6 : public GPUOperation {
   Winograd4x4To36TileX6() = default;
   Winograd4x4To36TileX6(const OperationDef& definition,
                         const Padding2D& padding, const GpuInfo& gpu_info);
-  absl::Status BindArguments(ArgumentsBinder* args) override;
+  abslx::Status BindArguments(ArgumentsBinder* args) override;
   int3 GetGridSize() const override;
   void GetPossibleKernelWorkGroups(
       TuningType tuning_type, const GpuInfo& gpu_info,
@@ -133,7 +133,7 @@ class Winograd36To4x4Tile4x1 : public GPUOperation {
   Winograd36To4x4Tile4x1() = default;
   Winograd36To4x4Tile4x1(const OperationDef& definition,
                          const GpuInfo& gpu_info);
-  absl::Status BindArguments(ArgumentsBinder* args) override;
+  abslx::Status BindArguments(ArgumentsBinder* args) override;
   int3 GetGridSize() const override;
   void GetPossibleKernelWorkGroups(
       TuningType tuning_type, const GpuInfo& gpu_info,

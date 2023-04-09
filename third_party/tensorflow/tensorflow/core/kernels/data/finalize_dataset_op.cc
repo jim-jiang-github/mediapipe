@@ -72,9 +72,9 @@ void MakeDatasetHelper(OpKernelContext* ctx, bool has_captured_ref,
     input->Unref();
     input = *output;
   }
-  absl::flat_hash_set<tstring> optimizations_enabled;
-  absl::flat_hash_set<tstring> optimizations_disabled;
-  absl::flat_hash_set<tstring> optimizations_default;
+  abslx::flat_hash_set<tstring> optimizations_enabled;
+  abslx::flat_hash_set<tstring> optimizations_disabled;
+  abslx::flat_hash_set<tstring> optimizations_default;
   GetOptimizations(options, &optimizations_enabled, &optimizations_disabled,
                    &optimizations_default);
   if (ShouldApplyOptimizations(options, optimizations_enabled,
@@ -84,8 +84,8 @@ void MakeDatasetHelper(OpKernelContext* ctx, bool has_captured_ref,
       LOG(WARNING)
           << "tf.data graph rewrites are not compatible with reference "
              "variables. The following rewrites will be disabled: "
-          << absl::StrJoin(optimizations_enabled, ", ") << ", "
-          << absl::StrJoin(optimizations_default, ", ") << ". "
+          << abslx::StrJoin(optimizations_enabled, ", ") << ", "
+          << abslx::StrJoin(optimizations_default, ", ") << ". "
           << "To enable rewrites, use resource variables instead by calling "
              "`tf.enable_resource_variables()` at the start of the program.";
     } else {

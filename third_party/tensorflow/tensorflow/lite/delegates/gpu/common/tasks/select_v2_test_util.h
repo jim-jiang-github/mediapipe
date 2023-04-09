@@ -21,21 +21,21 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status SelectV2Test(TestExecutionEnvironment* env);
+abslx::Status SelectV2Test(TestExecutionEnvironment* env);
 
-absl::Status SelectV2BatchTest(TestExecutionEnvironment* env);
+abslx::Status SelectV2BatchTest(TestExecutionEnvironment* env);
 
-absl::Status SelectV2ChannelsTest(TestExecutionEnvironment* env);
+abslx::Status SelectV2ChannelsTest(TestExecutionEnvironment* env);
 
-absl::Status SelectV2ChannelsBatchTest(TestExecutionEnvironment* env);
+abslx::Status SelectV2ChannelsBatchTest(TestExecutionEnvironment* env);
 
-absl::Status SelectV2BroadcastTrueTest(TestExecutionEnvironment* env);
+abslx::Status SelectV2BroadcastTrueTest(TestExecutionEnvironment* env);
 
-absl::Status SelectV2BroadcastFalseTest(TestExecutionEnvironment* env);
+abslx::Status SelectV2BroadcastFalseTest(TestExecutionEnvironment* env);
 
-absl::Status SelectV2BroadcastBothTest(TestExecutionEnvironment* env);
+abslx::Status SelectV2BroadcastBothTest(TestExecutionEnvironment* env);
 
-absl::Status SelectV2ChannelsBroadcastFalseTest(TestExecutionEnvironment* env);
+abslx::Status SelectV2ChannelsBroadcastFalseTest(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

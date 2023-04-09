@@ -113,7 +113,7 @@ class GpuExecutable : public Executable {
     std::variant<OwnedThunkSchedule, OwnedJitRtProgram> executable;
     xla::EntryFunctionAttributes entry_func_attrs;
     std::vector<ConstantInfo> constants;
-    absl::flat_hash_map<ShapeIndex, OutputInfo> output_info;
+    abslx::flat_hash_map<ShapeIndex, OutputInfo> output_info;
     std::string module_name;
     xla::Shape output_shape;
     std::vector<BufferAllocation> allocations;
@@ -138,7 +138,7 @@ class GpuExecutable : public Executable {
   static Status SetUpMlirAllocation(
       mlir::func::FuncOp func, llvm::ArrayRef<int64_t> buffer_sizes,
       std::vector<BufferAllocation>* allocations,
-      absl::flat_hash_map<ShapeIndex, OutputInfo>* output_info,
+      abslx::flat_hash_map<ShapeIndex, OutputInfo>* output_info,
       Shape* output_shape, int buffer_param_offset = 0);
 
   static StatusOr<std::unique_ptr<GpuExecutable>> Create(Params params);
@@ -172,16 +172,16 @@ class GpuExecutable : public Executable {
 
   StatusOr<ScopedShapedBuffer> ExecuteAsyncOnStream(
       const ServiceExecutableRunOptions* run_options,
-      absl::Span<const ShapedBuffer* const> arguments,
+      abslx::Span<const ShapedBuffer* const> arguments,
       HloExecutionProfile* hlo_execution_profile) override;
 
-  using VariantArguments = std::variant<absl::Span<const ShapedBuffer* const>,
-                                        absl::Span<ExecutionInput>>;
+  using VariantArguments = std::variant<abslx::Span<const ShapedBuffer* const>,
+                                        abslx::Span<ExecutionInput>>;
   StatusOr<ExecutionOutput> ExecuteAsyncOnStreamImpl(
       const ServiceExecutableRunOptions* run_options,
       VariantArguments arguments);
 
-  absl::Span<const BufferAllocation> GetAllocations() const {
+  abslx::Span<const BufferAllocation> GetAllocations() const {
     return allocations_;
   }
 
@@ -201,7 +201,7 @@ class GpuExecutable : public Executable {
                               bool block_host_until_done);
 
   using BufferAllocToDeviceMemoryMap =
-      absl::flat_hash_map<BufferAllocation::Index, se::DeviceMemoryBase>;
+      abslx::flat_hash_map<BufferAllocation::Index, se::DeviceMemoryBase>;
 
   // Loads the PTX or CUBIN for this executable and initializes all
   // constants that haven't already been initialized by the CUDA driver. Loaded
@@ -270,7 +270,7 @@ class GpuExecutable : public Executable {
   std::shared_ptr<BufferAssignmentProto> debug_buffer_assignment_;
   std::function<std::string()> verbose_buffer_assignment_string_dumper_;
 
-  absl::Mutex module_handle_mutex_;
+  abslx::Mutex module_handle_mutex_;
   // Cache of module handles. Required to keep loaded modules alive until this
   // executable is destroyed.
   std::map<stream_executor::StreamExecutor*, se::ScopedModuleHandle>
@@ -280,7 +280,7 @@ class GpuExecutable : public Executable {
       module_globals_ ABSL_GUARDED_BY(module_handle_mutex_);
 
   std::vector<ConstantInfo> constants_;
-  const absl::flat_hash_map<ShapeIndex, OutputInfo> output_info_;
+  const abslx::flat_hash_map<ShapeIndex, OutputInfo> output_info_;
   // Retains shared ownership of on-device constants that are managed by XLA and
   // potentially shared with other executables.
   std::vector<std::shared_ptr<se::DeviceMemoryBase>> shared_constants_;
@@ -292,7 +292,7 @@ class GpuExecutable : public Executable {
   GpuExecutable& operator=(const GpuExecutable&) = delete;
 };
 
-StatusOr<absl::flat_hash_map<ShapeIndex, GpuExecutable::OutputInfo>>
+StatusOr<abslx::flat_hash_map<ShapeIndex, GpuExecutable::OutputInfo>>
 GetOutputInfo(const HloModule& hlo_module, const BufferAssignment& assignment);
 
 }  // namespace gpu

@@ -258,7 +258,7 @@ class PythonAPIInfo {
   InputsWithNumberAttr* FindInputsWithNumberAttr(const string& name);
 
   ABSL_MUST_USE_RESULT
-  bool InferLengthAttributes(const absl::Span<PyObject*> params,
+  bool InferLengthAttributes(const abslx::Span<PyObject*> params,
                              std::vector<int64_t>& inferred_length_attrs) const;
 
   // ==========================================================================

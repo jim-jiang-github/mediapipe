@@ -275,9 +275,9 @@ static Status XlaDotShapeFunction(shape_inference::InferenceContext* c) {
 
   const int32_t lhs_rank = c->Rank(lhs_shape_handle);
   for (int64_t i = 0; i < lhs_rank; ++i) {
-    if (absl::c_linear_search(dimension_numbers.lhs_contracting_dimensions(),
+    if (abslx::c_linear_search(dimension_numbers.lhs_contracting_dimensions(),
                               i) ||
-        absl::c_linear_search(dimension_numbers.lhs_batch_dimensions(), i)) {
+        abslx::c_linear_search(dimension_numbers.lhs_batch_dimensions(), i)) {
       continue;
     }
     output_dims.emplace_back(c->Dim(lhs_shape_handle, i));
@@ -285,9 +285,9 @@ static Status XlaDotShapeFunction(shape_inference::InferenceContext* c) {
 
   const int32_t rhs_rank = c->Rank(rhs_shape_handle);
   for (int64_t i = 0; i < rhs_rank; ++i) {
-    if (absl::c_linear_search(dimension_numbers.rhs_contracting_dimensions(),
+    if (abslx::c_linear_search(dimension_numbers.rhs_contracting_dimensions(),
                               i) ||
-        absl::c_linear_search(dimension_numbers.rhs_batch_dimensions(), i)) {
+        abslx::c_linear_search(dimension_numbers.rhs_batch_dimensions(), i)) {
       continue;
     }
     output_dims.emplace_back(c->Dim(rhs_shape_handle, i));
@@ -621,7 +621,7 @@ REGISTER_OP("XlaReduce")
         const int dimensions_to_reduce_size = dimensions_to_reduce.size();
         if (rank < dimensions_to_reduce_size ||
             dims_set.size() != dimensions_to_reduce.size() ||
-            !absl::c_all_of(dimensions_to_reduce, dim_in_range)) {
+            !abslx::c_all_of(dimensions_to_reduce, dim_in_range)) {
           return errors::InvalidArgument(
               "Invalid dimensions_to_reduce argument to XlaReduce");
         }
@@ -671,7 +671,7 @@ REGISTER_OP("XlaVariadicReduce")
         const int dimensions_to_reduce_size = dimensions_to_reduce.size();
         if (rank < dimensions_to_reduce_size ||
             dims_set.size() != dimensions_to_reduce.size() ||
-            !absl::c_all_of(dimensions_to_reduce, dim_in_range)) {
+            !abslx::c_all_of(dimensions_to_reduce, dim_in_range)) {
           return errors::InvalidArgument(
               "Invalid dimensions_to_reduce argument to XlaVariadicReduce");
         }
@@ -752,7 +752,7 @@ REGISTER_OP("XlaVariadicReduceV2")
         const int dimensions_to_reduce_size = dimensions_to_reduce.size();
         if (rank < dimensions_to_reduce_size ||
             dims_set.size() != dimensions_to_reduce.size() ||
-            !absl::c_all_of(dimensions_to_reduce, dim_in_range)) {
+            !abslx::c_all_of(dimensions_to_reduce, dim_in_range)) {
           return errors::InvalidArgument(
               "Invalid dimensions_to_reduce argument to XlaVariadicReduceV2");
         }
@@ -1017,7 +1017,7 @@ REGISTER_OP("XlaEinsum")
       string equation;
       TF_RETURN_IF_ERROR(context->GetAttr("equation", &equation));
       // XlaEinsum supports only two-input einsum equations.
-      if (!absl::StrContains(equation, ",")) {
+      if (!abslx::StrContains(equation, ",")) {
         return errors::InvalidArgument("Expected one \",\" in equation. Got: ",
                                        equation);
       }

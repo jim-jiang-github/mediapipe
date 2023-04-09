@@ -39,7 +39,7 @@ constexpr uint32_t RocmTracerEvent::kInvalidDeviceId;
     if (status != ROCTRACER_STATUS_SUCCESS) {                                \
       const char* errstr = wrap::roctracer_error_string();                   \
       LOG(ERROR) << "function " << #expr << "failed with error " << errstr;  \
-      return errors::Internal(absl::StrCat("roctracer call error", errstr)); \
+      return errors::Internal(abslx::StrCat("roctracer call error", errstr)); \
     }                                                                        \
   } while (false)
 
@@ -1327,18 +1327,18 @@ void AnnotationMap::Add(uint32_t correlation_id,
   VLOG(3) << "Add annotation: "
           << " correlation_id=" << correlation_id
           << ", annotation: " << annotation;
-  absl::MutexLock lock(&map_.mutex);
+  abslx::MutexLock lock(&map_.mutex);
   if (map_.annotations.size() < max_size_) {
-    absl::string_view annotation_str =
+    abslx::string_view annotation_str =
         *map_.annotations.insert(annotation).first;
     map_.correlation_map.emplace(correlation_id, annotation_str);
   }
 }
 
-absl::string_view AnnotationMap::LookUp(uint32_t correlation_id) {
-  absl::MutexLock lock(&map_.mutex);
+abslx::string_view AnnotationMap::LookUp(uint32_t correlation_id) {
+  abslx::MutexLock lock(&map_.mutex);
   auto it = map_.correlation_map.find(correlation_id);
-  return it != map_.correlation_map.end() ? it->second : absl::string_view();
+  return it != map_.correlation_map.end() ? it->second : abslx::string_view();
 }
 
 /* static */ RocmTracer* RocmTracer::GetRocmTracerSingleton() {

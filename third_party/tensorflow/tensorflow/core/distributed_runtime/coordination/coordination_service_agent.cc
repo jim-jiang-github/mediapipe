@@ -43,9 +43,9 @@ limitations under the License.
 namespace tensorflow {
 namespace {
 
-constexpr absl::Duration kDefaultClusterRegisterTimeout = absl::Hours(1);
-constexpr absl::Duration kDefaultHeartbeatTimeout = absl::Seconds(10);
-constexpr absl::Duration kDefaultShutdownTimeout = absl::Seconds(10);
+constexpr abslx::Duration kDefaultClusterRegisterTimeout = abslx::Hours(1);
+constexpr abslx::Duration kDefaultHeartbeatTimeout = abslx::Seconds(10);
+constexpr abslx::Duration kDefaultShutdownTimeout = abslx::Seconds(10);
 constexpr char kHeartbeatThread[] = "CoordinationServiceHeartbeatLoop";
 
 class CoordinationServiceAgentImpl : public CoordinationServiceAgent {
@@ -82,7 +82,7 @@ class CoordinationServiceAgentImpl : public CoordinationServiceAgent {
 
   StatusOr<std::string> GetKeyValue(const std::string& key) override;
   StatusOr<std::string> GetKeyValue(const std::string& key,
-                                    absl::Duration timeout) override;
+                                    abslx::Duration timeout) override;
   std::shared_ptr<CallOptions> GetKeyValueAsync(
       const std::string& key, StatusOrValueCallback done) override;
   StatusOr<std::string> TryGetKeyValue(const std::string& key) override;
@@ -99,9 +99,9 @@ class CoordinationServiceAgentImpl : public CoordinationServiceAgent {
   Status StartWatchKey(const std::string& key,
                        ChangedKeyValuesCallback on_change) override;
   Status StopWatchKey(const std::string& key) override;
-  Status WaitAtBarrier(const std::string& barrier_id, absl::Duration timeout,
+  Status WaitAtBarrier(const std::string& barrier_id, abslx::Duration timeout,
                        const std::vector<CoordinatedTask>& tasks) override;
-  void WaitAtBarrierAsync(const std::string& barrier_id, absl::Duration timeout,
+  void WaitAtBarrierAsync(const std::string& barrier_id, abslx::Duration timeout,
                           const std::vector<CoordinatedTask>& tasks,
                           StatusCallback done) override;
   Status CancelBarrier(const std::string& barrier_id) override;
@@ -139,7 +139,7 @@ class CoordinationServiceAgentImpl : public CoordinationServiceAgent {
   // Note: this set grows without bounds. For now, this is okay as most users
   // require < 100 barriers. If there is a use case that requires many barriers,
   // consider using a monotonic sequence number to track instead.
-  absl::flat_hash_set<std::string> used_barrier_ids_ TF_GUARDED_BY(state_mu_);
+  abslx::flat_hash_set<std::string> used_barrier_ids_ TF_GUARDED_BY(state_mu_);
 
   uint64_t leader_incarnation_ = 0;
   CoordinationServiceDeviceInfo cluster_devices_;
@@ -248,14 +248,14 @@ Status CoordinationServiceAgentImpl::Connect() {
   *request.mutable_source_task() = task_;
   request.set_incarnation(incarnation_id_);
   RegisterTaskResponse response;
-  absl::Notification n;
+  abslx::Notification n;
 
   // Block until the remote service is up and the task is registered.
   CallOptions call_opts;
   const int64_t register_timeout =
       configs_.cluster_register_timeout_in_ms() > 0
           ? configs_.cluster_register_timeout_in_ms()
-          : absl::ToInt64Milliseconds(kDefaultClusterRegisterTimeout);
+          : abslx::ToInt64Milliseconds(kDefaultClusterRegisterTimeout);
   call_opts.SetTimeout(register_timeout);
   leader_client_->RegisterTaskAsync(
       &call_opts, &request, &response, [&](Status s) {
@@ -288,7 +288,7 @@ Status CoordinationServiceAgentImpl::Connect() {
         const int64_t heartbeat_interval_ms =
             configs_.heartbeat_timeout_in_ms() > 0
                 ? configs_.heartbeat_timeout_in_ms() / 2
-                : absl::ToInt64Milliseconds(kDefaultHeartbeatTimeout) / 2;
+                : abslx::ToInt64Milliseconds(kDefaultHeartbeatTimeout) / 2;
         CallOptions call_opts;
         call_opts.SetTimeout(heartbeat_interval_ms);
 
@@ -302,7 +302,7 @@ Status CoordinationServiceAgentImpl::Connect() {
             }
           }
           Status status;
-          absl::Notification n;
+          abslx::Notification n;
           // Heartbeat RPC implementation automatically retries to tolerate
           // transient network failures.
           leader_client_->HeartbeatAsync(&call_opts, &request, &response,
@@ -334,7 +334,7 @@ Status CoordinationServiceAgentImpl::WaitForAllTasks(
   *request.mutable_local_device_info() = local_devices;
   WaitForAllTasksResponse response;
   Status status;
-  absl::Notification n;
+  abslx::Notification n;
   leader_client_->WaitForAllTasksAsync(&request, &response, [&](Status s) {
     status = s;
     n.Notify();
@@ -389,7 +389,7 @@ Status CoordinationServiceAgentImpl::ReportError(const Status& error) {
   *request.mutable_error_origin() = task_;
   ReportErrorToServiceResponse response;
 
-  absl::Notification n;
+  abslx::Notification n;
   leader_client_->ReportErrorToServiceAsync(&request, &response, [&](Status s) {
     if (!s.ok()) {
       LOG(ERROR) << "Encountered another error when reporting error to "
@@ -419,10 +419,10 @@ Status CoordinationServiceAgentImpl::Shutdown() {
     const int64_t shutdown_timeout =
         configs_.shutdown_barrier_timeout_in_ms() > 0
             ? configs_.shutdown_barrier_timeout_in_ms()
-            : absl::ToInt64Milliseconds(kDefaultShutdownTimeout);
+            : abslx::ToInt64Milliseconds(kDefaultShutdownTimeout);
     call_opts.SetTimeout(shutdown_timeout);
 
-    absl::Notification n;
+    abslx::Notification n;
     leader_client_->ShutdownTaskAsync(&call_opts, &request, &response,
                                       [&status, &n](Status s) {
                                         status = s;
@@ -443,7 +443,7 @@ Status CoordinationServiceAgentImpl::Shutdown() {
   {
     mutex_lock l(state_mu_);
     if (state_ == State::ERROR) {
-      status = MakeCoordinationError(errors::FailedPrecondition(absl::StrCat(
+      status = MakeCoordinationError(errors::FailedPrecondition(abslx::StrCat(
           "Shutdown() was called while coordination agent is in error state, "
           "implying that distributed execution failed. Note: agent will still "
           "shutdown anyway. Agent status: ",
@@ -471,7 +471,7 @@ Status CoordinationServiceAgentImpl::Reset() {
   ResetTaskResponse response;
 
   Status status;
-  absl::Notification n;
+  abslx::Notification n;
   leader_client_->ResetTaskAsync(&request, &response, [&status, &n](Status s) {
     status = s;
     n.Notify();
@@ -498,12 +498,12 @@ Status CoordinationServiceAgentImpl::Reset() {
 
 StatusOr<std::string> CoordinationServiceAgentImpl::GetKeyValue(
     const std::string& key) {
-  return GetKeyValue(key, /*timeout=*/absl::InfiniteDuration());
+  return GetKeyValue(key, /*timeout=*/abslx::InfiniteDuration());
 }
 
 StatusOr<std::string> CoordinationServiceAgentImpl::GetKeyValue(
-    const std::string& key, absl::Duration timeout) {
-  auto n = std::make_shared<absl::Notification>();
+    const std::string& key, abslx::Duration timeout) {
+  auto n = std::make_shared<abslx::Notification>();
   auto result = std::make_shared<StatusOr<std::string>>();
   GetKeyValueAsync(key,
                    [n, result](const StatusOr<std::string>& status_or_value) {
@@ -513,9 +513,9 @@ StatusOr<std::string> CoordinationServiceAgentImpl::GetKeyValue(
   bool call_completed_before_timeout =
       n->WaitForNotificationWithTimeout(timeout);
   if (!call_completed_before_timeout) {
-    return MakeCoordinationError(errors::DeadlineExceeded(absl::Substitute(
+    return MakeCoordinationError(errors::DeadlineExceeded(abslx::Substitute(
         "GetKeyValue() timed out with key: $0 and duration: $1", key,
-        absl::FormatDuration(timeout))));
+        abslx::FormatDuration(timeout))));
   }
   return *result;
 }
@@ -555,7 +555,7 @@ std::shared_ptr<CallOptions> CoordinationServiceAgentImpl::GetKeyValueAsync(
 
 StatusOr<std::string> CoordinationServiceAgentImpl::TryGetKeyValue(
     const std::string& key) {
-  absl::Notification n;
+  abslx::Notification n;
   StatusOr<std::string> result;
   TryGetKeyValueRequest request;
   request.set_key(key);
@@ -575,7 +575,7 @@ StatusOr<std::string> CoordinationServiceAgentImpl::TryGetKeyValue(
 
 StatusOr<std::vector<KeyValueEntry>>
 CoordinationServiceAgentImpl::GetKeyValueDir(const std::string& key) {
-  absl::Notification n;
+  abslx::Notification n;
   StatusOr<std::vector<KeyValueEntry>> result;
   GetKeyValueDirAsync(
       key, [&n, &result](StatusOr<std::vector<KeyValueEntry>> status_or_value) {
@@ -614,7 +614,7 @@ Status CoordinationServiceAgentImpl::InsertKeyValue(const std::string& key,
   InsertKeyValueResponse response;
 
   Status status;
-  absl::Notification n;
+  abslx::Notification n;
   leader_client_->InsertKeyValueAsync(&request, &response, [&](Status s) {
     status = s;
     n.Notify();
@@ -630,7 +630,7 @@ Status CoordinationServiceAgentImpl::DeleteKeyValue(const std::string& key) {
   DeleteKeyValueResponse response;
 
   Status status;
-  absl::Notification n;
+  abslx::Notification n;
   leader_client_->DeleteKeyValueAsync(&request, &response, [&](Status s) {
     status = s;
     n.Notify();
@@ -675,10 +675,10 @@ Status CoordinationServiceAgentImpl::ActivateWatch(
 }
 
 Status CoordinationServiceAgentImpl::WaitAtBarrier(
-    const std::string& barrier_id, absl::Duration timeout,
+    const std::string& barrier_id, abslx::Duration timeout,
     const std::vector<CoordinatedTask>& tasks) {
   Status status;
-  absl::Notification n;
+  abslx::Notification n;
   WaitAtBarrierAsync(barrier_id, timeout, tasks, [&](Status s) {
     status = s;
     n.Notify();
@@ -688,7 +688,7 @@ Status CoordinationServiceAgentImpl::WaitAtBarrier(
 }
 
 void CoordinationServiceAgentImpl::WaitAtBarrierAsync(
-    const std::string& barrier_id, absl::Duration timeout,
+    const std::string& barrier_id, abslx::Duration timeout,
     const std::vector<CoordinatedTask>& tasks, StatusCallback done) {
   Status agent_running_status =
       ValidateRunningAgent(/*allow_disconnected=*/true);
@@ -710,7 +710,7 @@ void CoordinationServiceAgentImpl::WaitAtBarrierAsync(
   auto request = std::make_shared<BarrierRequest>();
   auto response = std::make_shared<BarrierResponse>();
   request->set_barrier_id(barrier_id);
-  request->set_barrier_timeout_in_ms(timeout / absl::Milliseconds(1));
+  request->set_barrier_timeout_in_ms(timeout / abslx::Milliseconds(1));
   *request->mutable_source_task() = task_;
   *request->mutable_tasks() = {tasks.begin(), tasks.end()};
   leader_client_->BarrierAsync(request.get(), response.get(),
@@ -721,7 +721,7 @@ void CoordinationServiceAgentImpl::WaitAtBarrierAsync(
 Status CoordinationServiceAgentImpl::CancelBarrier(
     const std::string& barrier_id) {
   Status status;
-  absl::Notification n;
+  abslx::Notification n;
   CancelBarrierAsync(barrier_id, [&](const Status& s) {
     status = s;
     n.Notify();
@@ -775,7 +775,7 @@ Status CoordinationServiceAgentImpl::ValidateRunningAgent(
           "Agent must be in RUNNING state. It is currently in SHUTDOWN."));
 
     default:
-      return MakeCoordinationError(errors::FailedPrecondition(absl::StrCat(
+      return MakeCoordinationError(errors::FailedPrecondition(abslx::StrCat(
           "Agent is not in RUNNING state. Current state: ", state_)));
   }
 }

@@ -133,7 +133,7 @@ bool CreateMainFunction(ModuleOp& module) {
         std::string inputs_attr_str =
             inputs_attr.cast<StringAttr>().getValue().str();
         std::vector<std::string> inputs_attr_vec =
-            absl::StrSplit(inputs_attr_str, ',', absl::SkipEmpty());
+            abslx::StrSplit(inputs_attr_str, ',', abslx::SkipEmpty());
         input_names.insert(input_names.end(), inputs_attr_vec.begin(),
                            inputs_attr_vec.end());
       }
@@ -141,7 +141,7 @@ bool CreateMainFunction(ModuleOp& module) {
         std::string outputs_attr_str =
             outputs_attr.cast<StringAttr>().getValue().str();
         std::vector<std::string> outputs_attr_vec =
-            absl::StrSplit(outputs_attr_str, ',', absl::SkipEmpty());
+            abslx::StrSplit(outputs_attr_str, ',', abslx::SkipEmpty());
         output_names.insert(output_names.end(), outputs_attr_vec.begin(),
                             outputs_attr_vec.end());
       }
@@ -157,10 +157,10 @@ bool CreateMainFunction(ModuleOp& module) {
   SmallVector<NamedAttribute> func_attrs;
   func_attrs.push_back(
       {StringAttr::get(context, "inputs"),
-       StringAttr::get(context, absl::StrJoin(input_names, ","))});
+       StringAttr::get(context, abslx::StrJoin(input_names, ","))});
   func_attrs.push_back(
       {StringAttr::get(context, "outputs"),
-       StringAttr::get(context, absl::StrJoin(output_names, ","))});
+       StringAttr::get(context, abslx::StrJoin(output_names, ","))});
   auto dictAttr = DictionaryAttr::get(context, func_attrs);
   main_func->setAttr(StringAttr::get(context, kEntryFunctionAttr), dictAttr);
   main_func->setAttr(kExportedNameAttr, builder.getStrArrayAttr({"main"}));

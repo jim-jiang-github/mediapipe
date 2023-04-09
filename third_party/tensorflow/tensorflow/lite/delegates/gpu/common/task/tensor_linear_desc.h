@@ -48,14 +48,14 @@ struct TensorLinearDescriptor : public GPUObjectDescriptor {
       const tflite::gpu::Tensor<Linear, DataType::FLOAT32>& src,
       int aligned_size = 0);
 
-  absl::Status PerformSelector(const GpuInfo& gpu_info,
+  abslx::Status PerformSelector(const GpuInfo& gpu_info,
                                const std::string& selector,
                                const std::vector<std::string>& args,
                                const std::vector<std::string>& template_args,
                                std::string* result) const override;
 
   GPUResources GetGPUResources(const GpuInfo& gpu_info) const override;
-  absl::Status PerformReadSelector(const GpuInfo& gpu_info,
+  abslx::Status PerformReadSelector(const GpuInfo& gpu_info,
                                    const std::vector<std::string>& args,
                                    std::string* result) const;
 

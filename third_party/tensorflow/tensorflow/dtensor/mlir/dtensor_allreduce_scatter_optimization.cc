@@ -50,7 +50,7 @@ mlir::DenseIntElementsAttr GetScatterGroupAssignment(
     mlir::TF::DTensorAllScatterOp all_scatter, int scatter_dim) {
   const Layout original_layout = all_scatter.input_layout();
   const Layout desired_layout = all_scatter.output_layout();
-  absl::flat_hash_set<std::string> scattered_dims;
+  abslx::flat_hash_set<std::string> scattered_dims;
   scattered_dims.insert(desired_layout.sharding_spec(scatter_dim));
 
   auto partitions =

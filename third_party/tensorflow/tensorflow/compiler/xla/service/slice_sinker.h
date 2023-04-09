@@ -24,12 +24,12 @@ namespace xla {
 // operations and merges the group of elementwise operations.
 class SliceSinker : public HloModulePass {
  public:
-  absl::string_view name() const override { return "slice-sinker"; }
+  abslx::string_view name() const override { return "slice-sinker"; }
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 };
 
 }  // namespace xla

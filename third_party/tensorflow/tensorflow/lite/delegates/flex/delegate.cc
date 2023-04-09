@@ -161,7 +161,7 @@ TfLiteStatus FlexDelegate::CopyFromBufferHandle(
 
   if (output->bytes != t_data.size()) {
     TF_LITE_KERNEL_LOG(context,
-                       absl::StrCat("The given ", output->bytes,
+                       abslx::StrCat("The given ", output->bytes,
                                     " bytes are not enough to store "
                                     "TensorFlow's aligned buffer of size ",
                                     t_data.size(), " bytes.")

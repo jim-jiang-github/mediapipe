@@ -86,8 +86,8 @@ ConvertAudioEmbedderOptionsToProto(AudioEmbedderOptions* options) {
   return options_proto;
 }
 
-absl::StatusOr<std::vector<AudioEmbedderResult>> ConvertOutputPackets(
-    absl::StatusOr<tasks::core::PacketMap> status_or_packets) {
+abslx::StatusOr<std::vector<AudioEmbedderResult>> ConvertOutputPackets(
+    abslx::StatusOr<tasks::core::PacketMap> status_or_packets) {
   if (!status_or_packets.ok()) {
     return status_or_packets.status();
   }
@@ -101,8 +101,8 @@ absl::StatusOr<std::vector<AudioEmbedderResult>> ConvertOutputPackets(
   return results;
 }
 
-absl::StatusOr<AudioEmbedderResult> ConvertAsyncOutputPackets(
-    absl::StatusOr<tasks::core::PacketMap> status_or_packets) {
+abslx::StatusOr<AudioEmbedderResult> ConvertAsyncOutputPackets(
+    abslx::StatusOr<tasks::core::PacketMap> status_or_packets) {
   if (!status_or_packets.ok()) {
     return status_or_packets.status();
   }
@@ -112,14 +112,14 @@ absl::StatusOr<AudioEmbedderResult> ConvertAsyncOutputPackets(
 }  // namespace
 
 /* static */
-absl::StatusOr<std::unique_ptr<AudioEmbedder>> AudioEmbedder::Create(
+abslx::StatusOr<std::unique_ptr<AudioEmbedder>> AudioEmbedder::Create(
     std::unique_ptr<AudioEmbedderOptions> options) {
   auto options_proto = ConvertAudioEmbedderOptionsToProto(options.get());
   tasks::core::PacketsCallback packets_callback = nullptr;
   if (options->result_callback) {
     auto result_callback = options->result_callback;
     packets_callback =
-        [=](absl::StatusOr<tasks::core::PacketMap> status_or_packets) {
+        [=](abslx::StatusOr<tasks::core::PacketMap> status_or_packets) {
           result_callback(ConvertAsyncOutputPackets(status_or_packets));
         };
   }
@@ -130,14 +130,14 @@ absl::StatusOr<std::unique_ptr<AudioEmbedder>> AudioEmbedder::Create(
       std::move(packets_callback));
 }
 
-absl::StatusOr<std::vector<AudioEmbedderResult>> AudioEmbedder::Embed(
+abslx::StatusOr<std::vector<AudioEmbedderResult>> AudioEmbedder::Embed(
     Matrix audio_clip, double audio_sample_rate) {
   return ConvertOutputPackets(ProcessAudioClip(
       {{kAudioStreamName, MakePacket<Matrix>(std::move(audio_clip))},
        {kSampleRateName, MakePacket<double>(audio_sample_rate)}}));
 }
 
-absl::Status AudioEmbedder::EmbedAsync(Matrix audio_block,
+abslx::Status AudioEmbedder::EmbedAsync(Matrix audio_block,
                                        double audio_sample_rate,
                                        int64 timestamp_ms) {
   MP_RETURN_IF_ERROR(CheckOrSetSampleRate(kSampleRateName, audio_sample_rate));
@@ -147,7 +147,7 @@ absl::Status AudioEmbedder::EmbedAsync(Matrix audio_block,
             .At(Timestamp(timestamp_ms * kMicroSecondsPerMilliSecond))}});
 }
 
-absl::StatusOr<double> AudioEmbedder::CosineSimilarity(
+abslx::StatusOr<double> AudioEmbedder::CosineSimilarity(
     const components::containers::Embedding& u,
     const components::containers::Embedding& v) {
   return components::utils::CosineSimilarity(u, v);

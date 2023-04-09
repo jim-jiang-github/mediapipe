@@ -590,7 +590,7 @@ TEST(ShapeUtilTest, ForEachIndex) {
     Shape shape = ShapeUtil::MakeShape(F32, data.dimensions);
     // Increments at every invocation.
     int invocations = 0;
-    auto increment_func = [&invocations](absl::Span<const int64_t> indexes) {
+    auto increment_func = [&invocations](abslx::Span<const int64_t> indexes) {
       invocations++;
       return true;
     };
@@ -610,7 +610,7 @@ TEST(ShapeUtilTest, ForEachIndexWithStatus) {
   // Increments at every invocation.
   int invocations = 0;
   auto increment_func =
-      [&invocations](absl::Span<const int64_t> indexes) -> StatusOr<bool> {
+      [&invocations](abslx::Span<const int64_t> indexes) -> StatusOr<bool> {
     if (++invocations == 5) {
       return Unimplemented("Cannot increment beyond 5.");
     }
@@ -631,7 +631,7 @@ TEST(ShapeUtilTest, ForEachIndexParallel) {
   Shape shape = ShapeUtil::MakeShape(F32, {10, 10});
   int64_t output[10][10];
   int init = 5;
-  auto set_func = [&](absl::Span<const int64_t> indexes, int /*thread_id*/) {
+  auto set_func = [&](abslx::Span<const int64_t> indexes, int /*thread_id*/) {
     output[indexes[0]][indexes[1]] = init + indexes[0] + indexes[1];
   };
 
@@ -731,13 +731,13 @@ TEST(ShapeUtilTest, PermuteDimensionsLayout) {
   std::iota(layout.begin(), layout.end(), 0);
   do {
     Shape s = ShapeUtil::MakeShapeWithLayout(F32, {10, 100, 1000}, layout);
-    SCOPED_TRACE(absl::StrCat("s=", ShapeUtil::HumanString(s)));
+    SCOPED_TRACE(abslx::StrCat("s=", ShapeUtil::HumanString(s)));
 
     std::vector<int64_t> permutation(3);
     std::iota(permutation.begin(), permutation.end(), 0);
     do {
       SCOPED_TRACE(
-          absl::StrCat("permutation=", absl::StrJoin(permutation, ",")));
+          abslx::StrCat("permutation=", abslx::StrJoin(permutation, ",")));
 
       EXPECT_TRUE(ShapeUtil::TransposeIsBitcast(
           s, ShapeUtil::PermuteDimensions(permutation, s), permutation));
@@ -758,12 +758,12 @@ TEST(ShapeUtilTest, PermuteDynamicDimensions) {
   Shape shape =
       ShapeUtil::MakeShape(F32, {10, 100, 1000},
                            /*dynamic_dimensions*/ {false, true, true});
-  SCOPED_TRACE(absl::StrCat("shape=", shape.ToString()));
+  SCOPED_TRACE(abslx::StrCat("shape=", shape.ToString()));
 
   std::vector<int64_t> permutation(3);
   std::iota(permutation.begin(), permutation.end(), 0);
   do {
-    SCOPED_TRACE(absl::StrCat("permutation=", absl::StrJoin(permutation, ",")));
+    SCOPED_TRACE(abslx::StrCat("permutation=", abslx::StrJoin(permutation, ",")));
 
     auto permuted = ShapeUtil::PermuteDimensions(permutation, shape);
     for (int i = 0; i < shape.rank(); i++) {

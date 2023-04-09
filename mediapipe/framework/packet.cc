@@ -52,7 +52,7 @@ const HolderBase* GetHolder(const Packet& packet) {
   return packet.holder_.get();
 }
 
-absl::StatusOr<Packet> PacketFromDynamicProto(const std::string& type_name,
+abslx::StatusOr<Packet> PacketFromDynamicProto(const std::string& type_name,
                                               const std::string& serialized) {
   ASSIGN_OR_RETURN(
       auto message_holder,
@@ -96,41 +96,41 @@ std::string Packet::DebugTypeName() const {
 }
 
 std::string Packet::DebugString() const {
-  std::string result = absl::StrCat("mediapipe::Packet with timestamp: ",
+  std::string result = abslx::StrCat("mediapipe::Packet with timestamp: ",
                                     timestamp_.DebugString());
   if (IsEmpty()) {
-    absl::StrAppend(&result, " and no data");
+    abslx::StrAppend(&result, " and no data");
   } else {
-    absl::StrAppend(&result, " and type: ", holder_->DebugTypeName());
+    abslx::StrAppend(&result, " and type: ", holder_->DebugTypeName());
   }
   return result;
 }
 
-absl::Status Packet::ValidateAsType(TypeId type_id) const {
+abslx::Status Packet::ValidateAsType(TypeId type_id) const {
   if (ABSL_PREDICT_FALSE(IsEmpty())) {
-    return absl::InternalError(absl::StrCat(
+    return abslx::InternalError(abslx::StrCat(
         "Expected a Packet of type: ", MediaPipeTypeStringOrDemangled(type_id),
         ", but received an empty Packet."));
   }
   bool holder_is_right_type = holder_->GetTypeId() == type_id;
   if (ABSL_PREDICT_FALSE(!holder_is_right_type)) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "The Packet stores \"", holder_->DebugTypeName(), "\", but \"",
         MediaPipeTypeStringOrDemangled(type_id), "\" was requested."));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Packet::ValidateAsProtoMessageLite() const {
+abslx::Status Packet::ValidateAsProtoMessageLite() const {
   if (ABSL_PREDICT_FALSE(IsEmpty())) {
-    return absl::InternalError("Packet is empty.");
+    return abslx::InternalError("Packet is empty.");
   }
   if (ABSL_PREDICT_FALSE(holder_->GetProtoMessageLite() == nullptr)) {
-    return absl::InvalidArgumentError(
-        absl::StrCat("The Packet stores \"", holder_->DebugTypeName(), "\"",
+    return abslx::InvalidArgumentError(
+        abslx::StrCat("The Packet stores \"", holder_->DebugTypeName(), "\"",
                      "which is not convertible to proto_ns::MessageLite."));
   } else {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 }
 
@@ -145,7 +145,7 @@ const proto_ns::MessageLite& Packet::GetProtoMessageLite() const {
 StatusOr<std::vector<const proto_ns::MessageLite*>>
 Packet::GetVectorOfProtoMessageLitePtrs() const {
   if (holder_ == nullptr) {
-    return absl::InternalError("Packet is empty.");
+    return abslx::InternalError("Packet is empty.");
   }
   return holder_->GetVectorOfProtoMessageLite();
 }

@@ -45,7 +45,7 @@ void RunTest(const std::array<float, 16>& matrix,
   EXPECT_THAT(
       inverse_matrix,
       testing::Pointwise(testing::FloatEq(),
-                         absl::MakeSpan(expected_inverse_matrix.data(),
+                         abslx::MakeSpan(expected_inverse_matrix.data(),
                                         expected_inverse_matrix.size())));
 
   // Fully close graph at end, otherwise calculator+tensors are destroyed

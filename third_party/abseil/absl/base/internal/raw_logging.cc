@@ -67,7 +67,7 @@
 #undef ABSL_HAVE_RAW_IO
 #endif
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace raw_logging_internal {
 namespace {
@@ -77,10 +77,10 @@ namespace {
 // a selected set of platforms for which we expect not to be able to raw log.
 
 ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
-    absl::base_internal::AtomicHook<LogPrefixHook>
+    abslx::base_internal::AtomicHook<LogPrefixHook>
         log_prefix_hook;
 ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
-    absl::base_internal::AtomicHook<AbortHook>
+    abslx::base_internal::AtomicHook<AbortHook>
         abort_hook;
 
 #ifdef ABSL_LOW_LEVEL_WRITE_SUPPORTED
@@ -130,9 +130,9 @@ bool DoRawLog(char** buf, int* size, const char* format, ...) {
   return true;
 }
 
-void RawLogVA(absl::LogSeverity severity, const char* file, int line,
+void RawLogVA(abslx::LogSeverity severity, const char* file, int line,
               const char* format, va_list ap) ABSL_PRINTF_ATTRIBUTE(4, 0);
-void RawLogVA(absl::LogSeverity severity, const char* file, int line,
+void RawLogVA(abslx::LogSeverity severity, const char* file, int line,
               const char* format, va_list ap) {
   char buffer[kLogBufSize];
   char* buf = buffer;
@@ -144,8 +144,8 @@ void RawLogVA(absl::LogSeverity severity, const char* file, int line,
 #endif
 
 #ifdef ABSL_MIN_LOG_LEVEL
-  if (severity < static_cast<absl::LogSeverity>(ABSL_MIN_LOG_LEVEL) &&
-      severity < absl::LogSeverity::kFatal) {
+  if (severity < static_cast<abslx::LogSeverity>(ABSL_MIN_LOG_LEVEL) &&
+      severity < abslx::LogSeverity::kFatal) {
     enabled = false;
   }
 #endif
@@ -177,7 +177,7 @@ void RawLogVA(absl::LogSeverity severity, const char* file, int line,
 
   // Abort the process after logging a FATAL message, even if the output itself
   // was suppressed.
-  if (severity == absl::LogSeverity::kFatal) {
+  if (severity == abslx::LogSeverity::kFatal) {
     abort_hook(file, line, buffer, prefix_end, buffer + kLogBufSize);
     abort();
   }
@@ -187,7 +187,7 @@ void RawLogVA(absl::LogSeverity severity, const char* file, int line,
 //
 // TODO(gfalcon): When string_view no longer depends on base, change this
 // interface to take its message as a string_view instead.
-void DefaultInternalLog(absl::LogSeverity severity, const char* file, int line,
+void DefaultInternalLog(abslx::LogSeverity severity, const char* file, int line,
                         const std::string& message) {
   RawLog(severity, file, line, "%.*s", static_cast<int>(message.size()),
          message.data());
@@ -209,7 +209,7 @@ void SafeWriteToStderr(const char *s, size_t len) {
 #endif
 }
 
-void RawLog(absl::LogSeverity severity, const char* file, int line,
+void RawLog(abslx::LogSeverity severity, const char* file, int line,
             const char* format, ...) {
   va_list ap;
   va_start(ap, format);
@@ -226,7 +226,7 @@ bool RawLoggingFullySupported() {
 }
 
 ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES ABSL_DLL
-    absl::base_internal::AtomicHook<InternalLogFunction>
+    abslx::base_internal::AtomicHook<InternalLogFunction>
         internal_log_function(DefaultInternalLog);
 
 void RegisterLogPrefixHook(LogPrefixHook func) { log_prefix_hook.Store(func); }
@@ -239,4 +239,4 @@ void RegisterInternalLogFunction(InternalLogFunction func) {
 
 }  // namespace raw_logging_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

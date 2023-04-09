@@ -46,7 +46,7 @@ namespace {
 // Combines the elements of to_combine into a single AllGather op. All entries
 // in to_combine must be AllGather ops with exactly one operand and the same
 // all_gather_dimension.
-Status CombineAllGathers(absl::Span<HloInstruction* const> to_combine) {
+Status CombineAllGathers(abslx::Span<HloInstruction* const> to_combine) {
   if (to_combine.size() < 2) {
     return OkStatus();
   }
@@ -139,7 +139,7 @@ AllGatherCombiner::AllGatherCombiner(int64_t combine_threshold_in_bytes,
 
 StatusOr<bool> AllGatherCombiner::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   VLOG(1) << "Running AllGatherCombiner with threshold of "
           << combine_threshold_in_bytes_ << " bytes";
 

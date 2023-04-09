@@ -36,7 +36,7 @@ class ShardingMetadata : public DomainMetadata {
 
   std::unique_ptr<DomainMetadata> Clone() const override;
 
-  absl::string_view Kind() const override { return KindName(); }
+  abslx::string_view Kind() const override { return KindName(); }
 
   bool Matches(const DomainMetadata& other) const override;
 
@@ -49,13 +49,13 @@ class ShardingMetadata : public DomainMetadata {
     return H::combine(std::move(h), has_sharding);
   }
 
-  size_t Hash() const override { return absl::HashOf(*this); }
+  size_t Hash() const override { return abslx::HashOf(*this); }
 
   std::string ToString() const override;
 
   const HloSharding* sharding() const { return sharding_.get(); }
 
-  static absl::string_view KindName() { return "sharding"; }
+  static abslx::string_view KindName() { return "sharding"; }
 
   static StatusOr<const ShardingMetadata*> ToShardingMetadata(
       const DomainMetadata* metadata);
@@ -101,7 +101,7 @@ class ShardingDomainCreator {
       return H::combine(std::move(h), has_sharding);
     }
   };
-  absl::flat_hash_map<DomainCseMapKey, HloInstruction*> domain_cse_map_;
+  abslx::flat_hash_map<DomainCseMapKey, HloInstruction*> domain_cse_map_;
 };
 
 }  // namespace xla

@@ -31,20 +31,20 @@ class HloDomainVerifier::RunContext {
   RunContext(HloModule* module, HloDomainVerifier* verifier)
       : module_(module), verifier_(verifier) {}
 
-  Status Run(const absl::flat_hash_set<absl::string_view>& execution_threads);
+  Status Run(const abslx::flat_hash_set<abslx::string_view>& execution_threads);
 
  private:
   // If the verifier caller passed an empty vector for kinds, we collect all the
   // available domain types.
   Status PopulateDomainKinds(
-      const absl::flat_hash_set<absl::string_view>& execution_threads);
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads);
 
   HloModule* module_;
   HloDomainVerifier* verifier_;
 };
 
 Status HloDomainVerifier::RunContext::PopulateDomainKinds(
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   if (verifier_->kinds_.empty()) {
     // The caller specified no domain kinds, collect all the ones available.
     std::set<std::string> kinds;
@@ -66,7 +66,7 @@ Status HloDomainVerifier::RunContext::PopulateDomainKinds(
 }
 
 Status HloDomainVerifier::RunContext::Run(
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   VLOG(4) << "Running HLO Domain Verifier";
   TF_RETURN_IF_ERROR(PopulateDomainKinds(execution_threads));
   for (HloComputation* computation : module_->computations(execution_threads)) {
@@ -86,7 +86,7 @@ Status HloDomainVerifier::RunContext::Run(
 
 StatusOr<bool> HloDomainVerifier::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   RunContext run_context(module, this);
   TF_RETURN_IF_ERROR(run_context.Run(execution_threads));
   return false;

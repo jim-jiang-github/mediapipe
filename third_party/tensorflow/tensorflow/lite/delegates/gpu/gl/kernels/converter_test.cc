@@ -45,14 +45,14 @@ Dimensions ToDimensions(const BHWC& shape) {
   return Dimensions(shape.b, shape.h, shape.w, shape.c);
 }
 
-absl::Status RunFromTensorTest(const BHWC& shape) {
+abslx::Status RunFromTensorTest(const BHWC& shape) {
   // Create random input and calculate expected output for it.
   std::vector<float> input =
       GenerateFloats(0.01, GetElementsSizeForPHWC4(shape));
   std::vector<float> output(shape.DimensionsProduct(), 0);
   RETURN_IF_ERROR(
-      ConvertFromPHWC4(absl::MakeConstSpan(input.data(), input.size()), shape,
-                       absl::MakeSpan(output.data(), output.size())));
+      ConvertFromPHWC4(abslx::MakeConstSpan(input.data(), input.size()), shape,
+                       abslx::MakeSpan(output.data(), output.size())));
 
   std::unique_ptr<EglEnvironment> env;
   RETURN_IF_ERROR(EglEnvironment::NewEglEnvironment(&env));
@@ -60,7 +60,7 @@ absl::Status RunFromTensorTest(const BHWC& shape) {
   // Create input and output buffers
   GlBuffer input_buffer;
   RETURN_IF_ERROR(CreateReadOnlyShaderStorageBuffer(
-      absl::MakeConstSpan(input.data(), input.size()), &input_buffer));
+      abslx::MakeConstSpan(input.data(), input.size()), &input_buffer));
 
   GlBuffer output_buffer;
   RETURN_IF_ERROR(CreateReadWriteShaderStorageBuffer<float>(
@@ -83,11 +83,11 @@ absl::Status RunFromTensorTest(const BHWC& shape) {
   // Compare outputs.
   std::vector<float> converted_output(output.size(), 0);
   RETURN_IF_ERROR(output_buffer.Read(
-      absl::MakeSpan(converted_output.data(), converted_output.size())));
+      abslx::MakeSpan(converted_output.data(), converted_output.size())));
   if (output != converted_output) {
-    return absl::InternalError("Outputs don't match");
+    return abslx::InternalError("Outputs don't match");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 TEST(FromTensor, Smoke) {
@@ -103,13 +103,13 @@ TEST(FromTensor, Smoke) {
   }
 }
 
-absl::Status RunToTensorTest(const BHWC& shape) {
+abslx::Status RunToTensorTest(const BHWC& shape) {
   // Create random input and calculate expected output for it.
   std::vector<float> input = GenerateFloats(0.01, shape.DimensionsProduct());
   std::vector<float> output(GetElementsSizeForPHWC4(shape), 0);
   RETURN_IF_ERROR(
-      ConvertToPHWC4(absl::MakeConstSpan(input.data(), input.size()), shape,
-                     absl::MakeSpan(output.data(), output.size())));
+      ConvertToPHWC4(abslx::MakeConstSpan(input.data(), input.size()), shape,
+                     abslx::MakeSpan(output.data(), output.size())));
 
   std::unique_ptr<EglEnvironment> env;
   RETURN_IF_ERROR(EglEnvironment::NewEglEnvironment(&env));
@@ -117,7 +117,7 @@ absl::Status RunToTensorTest(const BHWC& shape) {
   // Create input and output buffers
   GlBuffer input_buffer;
   RETURN_IF_ERROR(CreateReadOnlyShaderStorageBuffer(
-      absl::MakeConstSpan(input.data(), input.size()), &input_buffer));
+      abslx::MakeConstSpan(input.data(), input.size()), &input_buffer));
 
   GlBuffer output_buffer;
   RETURN_IF_ERROR(CreateReadWriteShaderStorageBuffer<float>(
@@ -140,11 +140,11 @@ absl::Status RunToTensorTest(const BHWC& shape) {
   // Compare outputs.
   std::vector<float> converted_output(output.size(), 0);
   RETURN_IF_ERROR(output_buffer.Read(
-      absl::MakeSpan(converted_output.data(), converted_output.size())));
+      abslx::MakeSpan(converted_output.data(), converted_output.size())));
   if (output != converted_output) {
-    return absl::InternalError("Outputs don't match");
+    return abslx::InternalError("Outputs don't match");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 TEST(ToTensor, Smoke) {

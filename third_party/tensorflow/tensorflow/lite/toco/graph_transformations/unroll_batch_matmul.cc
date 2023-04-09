@@ -31,8 +31,8 @@ limitations under the License.
 namespace toco {
 namespace {
 
-absl::InlinedVector<int64_t, 4> ToInlinedVector(const std::vector<int>& vec) {
-  return absl::InlinedVector<int64_t, 4>(vec.begin(), vec.end());
+abslx::InlinedVector<int64_t, 4> ToInlinedVector(const std::vector<int>& vec) {
+  return abslx::InlinedVector<int64_t, 4>(vec.begin(), vec.end());
 }
 
 std::vector<std::string> SliceInput(
@@ -47,10 +47,10 @@ std::vector<std::string> SliceInput(
   auto* reshape_op = new TensorFlowReshapeOperator;
   reshape_op->inputs = {
       input,
-      CreateInt32Array(model, absl::StrCat(base_name, "/reshape_a/shape"),
+      CreateInt32Array(model, abslx::StrCat(base_name, "/reshape_a/shape"),
                        {batch_size, num_rows, num_cols})};
   reshape_op->outputs = {AvailableArrayName(
-      *model, absl::StrCat(base_name, "/reshape_", input_name, "/reshape"))};
+      *model, abslx::StrCat(base_name, "/reshape_", input_name, "/reshape"))};
   auto& reshape_op_output = model->GetOrCreateArray(reshape_op->outputs[0]);
   reshape_op_output.data_type = input_array.data_type;
   *tail_it = model->operators.emplace(*tail_it, reshape_op) + 1;
@@ -60,16 +60,16 @@ std::vector<std::string> SliceInput(
   slice_outputs.reserve(batch_size);
   for (int batch_idx = 0; batch_idx < batch_size; ++batch_idx) {
     std::string batch_name =
-        absl::StrCat(base_name, "_b", batch_idx, "/slice_", input_name);
+        abslx::StrCat(base_name, "_b", batch_idx, "/slice_", input_name);
     auto* slice_op = new SliceOperator;
     slice_op->inputs = {
         reshape_op->outputs[0],
-        CreateInt32Array(model, absl::StrCat(batch_name, "/slice/begin"),
+        CreateInt32Array(model, abslx::StrCat(batch_name, "/slice/begin"),
                          {batch_idx, 0, 0}),
-        CreateInt32Array(model, absl::StrCat(batch_name, "/slice/size"),
+        CreateInt32Array(model, abslx::StrCat(batch_name, "/slice/size"),
                          {1, num_rows, num_cols})};
     slice_op->outputs = {
-        AvailableArrayName(*model, absl::StrCat(batch_name, "/slice"))};
+        AvailableArrayName(*model, abslx::StrCat(batch_name, "/slice"))};
     auto& slice_op_output = model->GetOrCreateArray(slice_op->outputs[0]);
     slice_op_output.data_type = input_array.data_type;
     *tail_it = model->operators.emplace(*tail_it, slice_op) + 1;
@@ -78,10 +78,10 @@ std::vector<std::string> SliceInput(
     auto* slice_reshape_op = new TensorFlowReshapeOperator;
     slice_reshape_op->inputs = {
         slice_op->outputs[0],
-        CreateInt32Array(model, absl::StrCat(batch_name, "/reshape/shape"),
+        CreateInt32Array(model, abslx::StrCat(batch_name, "/reshape/shape"),
                          {num_rows, num_cols})};
     slice_reshape_op->outputs = {
-        AvailableArrayName(*model, absl::StrCat(batch_name, "/reshape"))};
+        AvailableArrayName(*model, abslx::StrCat(batch_name, "/reshape"))};
     auto& slice_reshape_op_output =
         model->GetOrCreateArray(slice_reshape_op->outputs[0]);
     slice_reshape_op_output.data_type = input_array.data_type;
@@ -181,8 +181,8 @@ TransposeOperator* TransposeInput(const std::string& input, Model* model) {
   CHECK_EQ(input_array_a.shape().dims(dims_a - 1),
            input_array_b.shape().dims(dims_b - 2))
       << "Input dimensions must be compatible for multiplication. shape a = ["
-      << absl::StrJoin(input_array_a.shape().dims(), ", ") << "], shape b = ["
-      << absl::StrJoin(input_array_b.shape().dims(), ", ") << "]";
+      << abslx::StrJoin(input_array_a.shape().dims(), ", ") << "], shape b = ["
+      << abslx::StrJoin(input_array_b.shape().dims(), ", ") << "]";
 
   if (dims_a == 2 && dims_b == 2) {
     // This is really just a MatMul.
@@ -214,7 +214,7 @@ TransposeOperator* TransposeInput(const std::string& input, Model* model) {
   for (int64_t batch_idx = 0; batch_idx < bcast.output_batch_size();
        ++batch_idx) {
     std::string batch_name =
-        absl::StrCat(batch_op->outputs[0], "_b", batch_idx);
+        abslx::StrCat(batch_op->outputs[0], "_b", batch_idx);
     const int a_batch_idx = bcast.IsBroadcastingRequired()
                                 ? bcast.x_batch_indices()[batch_idx]
                                 : batch_idx;

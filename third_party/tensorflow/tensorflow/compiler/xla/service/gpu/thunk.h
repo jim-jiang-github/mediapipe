@@ -121,7 +121,7 @@ class Thunk {
   // Precondition: Initialize(stream->parent()) has been called.
   virtual Status ExecuteOnStream(const ExecuteParams& params) = 0;
 
-  static absl::string_view KindToString(Thunk::Kind kind);
+  static abslx::string_view KindToString(Thunk::Kind kind);
 
  protected:
   std::optional<int64_t> profile_index() const { return profile_index_; }

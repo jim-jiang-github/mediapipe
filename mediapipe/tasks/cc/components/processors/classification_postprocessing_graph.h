@@ -58,7 +58,7 @@ namespace processors {
 //     The classification result aggregated by timestamp, then by head. Must be
 //     connected if the TIMESTAMPS input is connected, as it signals that
 //     timestamp aggregation is required.
-absl::Status ConfigureClassificationPostprocessingGraph(
+abslx::Status ConfigureClassificationPostprocessingGraph(
     const tasks::core::ModelResources& model_resources,
     const proto::ClassifierOptions& classifier_options,
     proto::ClassificationPostprocessingGraphOptions* options);
@@ -67,7 +67,7 @@ absl::Status ConfigureClassificationPostprocessingGraph(
 // based on the classifier options and the (optional) output tensor metadata.
 // This is meant to be used by other graphs that may also rely on this
 // calculator.
-absl::Status ConfigureTensorsToClassificationCalculator(
+abslx::Status ConfigureTensorsToClassificationCalculator(
     const proto::ClassifierOptions& options,
     const metadata::ModelMetadataExtractor& metadata_extractor,
     int tensor_index,

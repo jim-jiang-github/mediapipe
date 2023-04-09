@@ -69,7 +69,7 @@ void OpImplementationRenderer::RenderExecutionListOp() {
 void OpImplementationRenderer::RenderExecutionSingleOutput() {
   ArgView output_arg = op_.OnlyOutput();
   Statement("int num_retvals = 1");
-  Statement("return $0->Execute(absl::MakeSpan($1, 1), &num_retvals)",
+  Statement("return $0->Execute(abslx::MakeSpan($1, 1), &num_retvals)",
             op_.VariableName(), output_arg.VariableName());
 }
 
@@ -89,7 +89,7 @@ void OpImplementationRenderer::RenderExecutionMultipleOutputs() {
 void OpImplementationRenderer::RenderExecutionZeroOutputs() {
   Statement("int num_retvals = 0");
   Statement("std::vector<AbstractTensorHandle*> dummy_outputs");
-  Statement("return $0->Execute(absl::MakeSpan(dummy_outputs), &num_retvals)",
+  Statement("return $0->Execute(abslx::MakeSpan(dummy_outputs), &num_retvals)",
             op_.VariableName());
 }
 

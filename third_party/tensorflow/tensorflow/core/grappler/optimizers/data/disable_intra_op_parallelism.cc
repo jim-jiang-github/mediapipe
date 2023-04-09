@@ -53,7 +53,7 @@ Status DisableIntraOpParallelism::OptimizeAndCollectStats(
   if (item.fetch.size() != 1) {
     return errors::InvalidArgument(
         "Expected only one fetch node but there were ", item.fetch.size(), ": ",
-        absl::StrJoin(item.fetch, ", "));
+        abslx::StrJoin(item.fetch, ", "));
   }
 
   for (const NodeDef& node : item.graph.node()) {

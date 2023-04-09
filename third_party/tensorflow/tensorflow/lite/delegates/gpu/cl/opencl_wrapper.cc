@@ -56,15 +56,15 @@ void LoadOpenCLFunctions(HMODULE libopencl);
 void LoadOpenCLFunctions(void* libopencl, bool use_wrapper);
 #endif
 
-absl::Status LoadOpenCL() {
+abslx::Status LoadOpenCL() {
 #ifdef __WINDOWS__
   HMODULE libopencl = LoadLibraryA("OpenCL.dll");
   if (libopencl) {
     LoadOpenCLFunctions(libopencl);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   } else {
     DWORD error_code = GetLastError();
-    return absl::UnknownError(absl::StrCat(
+    return abslx::UnknownError(abslx::StrCat(
         "Can not open OpenCL library on this device, error code - ",
         error_code));
   }
@@ -82,7 +82,7 @@ absl::Status LoadOpenCL() {
         reinterpret_cast<enableOpenCL_t>(dlsym(libopencl, "enableOpenCL"));
     enableOpenCL();
     LoadOpenCLFunctions(libopencl, true);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 #endif
 #ifdef __APPLE__
@@ -94,12 +94,12 @@ absl::Status LoadOpenCL() {
   libopencl = dlopen(kClLibName, RTLD_NOW | RTLD_LOCAL);
   if (libopencl) {
     LoadOpenCLFunctions(libopencl, false);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   // record error
   std::string error(dlerror());
-  return absl::UnknownError(
-      absl::StrCat("Can not open OpenCL library on this device - ", error));
+  return abslx::UnknownError(
+      abslx::StrCat("Can not open OpenCL library on this device - ", error));
 #endif
 }
 

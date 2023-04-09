@@ -34,12 +34,12 @@ namespace gpu {
 namespace gl {
 namespace {
 
-absl::Status GenerateMaxPoolingCode(const Pooling2DAttributes& attr,
+abslx::Status GenerateMaxPoolingCode(const Pooling2DAttributes& attr,
                                     const NodeShader::GenerationContext& ctx,
                                     GeneratedCode* generated_code) {
   if (attr.padding.prepended.h > attr.kernel.h ||
       attr.padding.prepended.w > attr.kernel.w) {
-    return absl::InvalidArgumentError("Padding is bigger than kernel.");
+    return abslx::InvalidArgumentError("Padding is bigger than kernel.");
   }
 
   std::vector<Variable> parameters = {
@@ -95,10 +95,10 @@ absl::Status GenerateMaxPoolingCode(const Pooling2DAttributes& attr,
       /*input=*/IOStructure::ONLY_DEFINITIONS,
       /*output=*/IOStructure::AUTO,
   };
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GenerateAveragePoolingCode(
+abslx::Status GenerateAveragePoolingCode(
     const Pooling2DAttributes& attr, const NodeShader::GenerationContext& ctx,
     GeneratedCode* generated_code) {
   std::vector<Variable> parameters = {
@@ -171,12 +171,12 @@ absl::Status GenerateAveragePoolingCode(
       /*input=*/IOStructure::ONLY_DEFINITIONS,
       /*output=*/IOStructure::AUTO,
   };
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 class Pooling : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     const auto& attr = std::any_cast<const Pooling2DAttributes&>(ctx.op_attr);
     switch (attr.type) {
@@ -185,7 +185,7 @@ class Pooling : public NodeShader {
       case PoolingType::MAX:
         return GenerateMaxPoolingCode(attr, ctx, generated_code);
       default:
-        return absl::InvalidArgumentError("Incorrect attributes' type.");
+        return abslx::InvalidArgumentError("Incorrect attributes' type.");
     }
   }
 };

@@ -65,7 +65,7 @@ mlir::LogicalResult ExtractMeshFromCluster(mlir::tf_device::ClusterOp cluster,
   auto mesh_or_status = ExtractDeviceMeshFromOp(cluster);
   if (!mesh_or_status.ok()) return cluster.emitOpError(kMissingMeshErrorMsg);
 
-  const absl::optional<Mesh>& mesh_or_null = *mesh_or_status;
+  const abslx::optional<Mesh>& mesh_or_null = *mesh_or_status;
   if (!mesh_or_null.has_value())
     return cluster.emitOpError(kMissingMeshErrorMsg);
 
@@ -272,7 +272,7 @@ void CloneEmptyIfWithPredicate(mlir::TF::IfRegionOp if_region, const Mesh& mesh,
   mlir::TensorType predicate_tensor_type =
       if_region.cond().getType().cast<mlir::TensorType>();
   const std::string send_recv_key =
-      absl::StrCat(kSendRecvKeyPrefix, *num_send_recvs);
+      abslx::StrCat(kSendRecvKeyPrefix, *num_send_recvs);
   *num_send_recvs += 1;
 
   const Layout target_layout = Layout::ReplicatedOnMesh(mesh, 0);

@@ -68,7 +68,7 @@ static tensorflow::StatusOr<std::string> GetValueName(Value operand,
       return InvalidArgument(
           "Can't export graph with missing op-name for function parameter #",
           arg_num);
-    absl::StrAppend(&name, arg_name.getValue().str());
+    abslx::StrAppend(&name, arg_name.getValue().str());
     return name;
   }
   GetResultOp get_result = op_result.getDefiningOp<GetResultOp>();
@@ -90,9 +90,9 @@ static tensorflow::StatusOr<std::string> GetValueName(Value operand,
 
   std::string name;
   if (is_control) name = "^";
-  absl::StrAppend(&name, name_attr.getValue().str());
+  abslx::StrAppend(&name, name_attr.getValue().str());
   if (get_result)
-    absl::StrAppend(&name, ":", get_result.name().str(), ":",
+    abslx::StrAppend(&name, ":", get_result.name().str(), ":",
                     get_result.number());
   return name;
 }

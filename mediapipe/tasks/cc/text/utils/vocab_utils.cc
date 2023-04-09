@@ -39,12 +39,12 @@ void ReadIStreamLineByLine(
   }
 }
 
-absl::node_hash_map<std::string, int> ReadIStreamLineSplits(
+abslx::node_hash_map<std::string, int> ReadIStreamLineSplits(
     std::istream* istream) {
-  absl::node_hash_map<std::string, int> vocab_index_map;
+  abslx::node_hash_map<std::string, int> vocab_index_map;
   std::string str;
   ReadIStreamLineByLine(istream, [&vocab_index_map](const std::string& str) {
-    std::vector<std::string> v = absl::StrSplit(str, ' ');
+    std::vector<std::string> v = abslx::StrSplit(str, ' ');
     vocab_index_map[v[0]] = std::stoi(v[1]);
   });
   return vocab_index_map;
@@ -76,18 +76,18 @@ std::vector<std::string> LoadVocabFromBuffer(const char* vocab_buffer_data,
   return ReadIStreamByLine(&in);
 }
 
-absl::node_hash_map<std::string, int> LoadVocabAndIndexFromFile(
+abslx::node_hash_map<std::string, int> LoadVocabAndIndexFromFile(
     const std::string& path_to_vocab) {
-  absl::node_hash_map<std::string, int> vocab_index_map;
+  abslx::node_hash_map<std::string, int> vocab_index_map;
   std::ifstream in(path_to_vocab.c_str());
   return ReadIStreamLineSplits(&in);
 }
 
-absl::node_hash_map<std::string, int> LoadVocabAndIndexFromBuffer(
+abslx::node_hash_map<std::string, int> LoadVocabAndIndexFromBuffer(
     const char* vocab_buffer_data, const size_t vocab_buffer_size) {
   membuf sbuf(const_cast<char*>(vocab_buffer_data),
               const_cast<char*>(vocab_buffer_data + vocab_buffer_size));
-  absl::node_hash_map<std::string, int> vocab_index_map;
+  abslx::node_hash_map<std::string, int> vocab_index_map;
   std::istream in(&sbuf);
   return ReadIStreamLineSplits(&in);
 }

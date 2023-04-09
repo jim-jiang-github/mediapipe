@@ -234,12 +234,12 @@ TEST(DataServiceTest, GcMissingClientsWithSmallTimeout) {
 
   TF_ASSERT_OK(dataset_client.GetTasks(iteration_client_id).status());
   // Iteration should be garbage collected within 10 seconds.
-  absl::Time wait_start = absl::Now();
+  abslx::Time wait_start = abslx::Now();
   TF_ASSERT_OK(WaitWhile([&]() -> StatusOr<bool> {
     TF_ASSIGN_OR_RETURN(size_t num_iterations, cluster.NumActiveIterations());
     return num_iterations > 0;
   }));
-  EXPECT_LT(absl::Now(), wait_start + absl::Seconds(10));
+  EXPECT_LT(abslx::Now(), wait_start + abslx::Seconds(10));
 }
 
 TEST(DataServiceTest, DontGcMissingClientsWithLargeTimeout) {
@@ -314,7 +314,7 @@ TEST(DataServiceTest, WorkerStateExport) {
   TF_ASSERT_OK_AND_ASSIGN(
       auto result, dataset_client.Read(RangeDataset(10), ProcessingModeDef::OFF,
                                        TARGET_WORKERS_AUTO));
-  absl::SleepFor(absl::Seconds(3));
+  abslx::SleepFor(abslx::Seconds(3));
   server_state_export = cluster.ExportWorkerState(0);
   ASSERT_THAT(server_state_export.worker_state_export().finished_task_ids(),
               SizeIs(1));

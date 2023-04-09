@@ -27,7 +27,7 @@ namespace tflite {
 
 namespace {
 
-absl::Status CheckGpuDelegateCompatibility(const tflite::Model* model) {
+abslx::Status CheckGpuDelegateCompatibility(const tflite::Model* model) {
   auto subgraphs = model->subgraphs();
 
   for (int i = 0; i < subgraphs->Length(); ++i) {
@@ -42,7 +42,7 @@ absl::Status CheckGpuDelegateCompatibility(const tflite::Model* model) {
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace

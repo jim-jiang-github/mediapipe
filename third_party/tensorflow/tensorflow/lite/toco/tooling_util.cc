@@ -38,9 +38,9 @@ limitations under the License.
 namespace toco {
 
 // Find the longest common prefix of two strings.
-absl::string_view FindLongestCommonPrefix(absl::string_view a,
-                                          absl::string_view b) {
-  if (a.empty() || b.empty()) return absl::string_view();
+abslx::string_view FindLongestCommonPrefix(abslx::string_view a,
+                                          abslx::string_view b) {
+  if (a.empty() || b.empty()) return abslx::string_view();
 
   const char* pa = a.data();
   const char* pb = b.data();
@@ -52,7 +52,7 @@ absl::string_view FindLongestCommonPrefix(absl::string_view a,
     ++count;
   }
 
-  return absl::string_view(a.data(), count);
+  return abslx::string_view(a.data(), count);
 }
 
 std::string LogName(const Operator& op) {
@@ -601,7 +601,7 @@ void LogDump(int log_level, const std::string& message, const Model& model) {
     const auto result = port::file::SetContents(
         port::file::JoinPath(
             dump_options.dump_graphviz,
-            absl::StrCat("toco_", absl::StrReplaceAll(message, {{" ", "_"}}),
+            abslx::StrCat("toco_", abslx::StrReplaceAll(message, {{" ", "_"}}),
                          ".dot")),
         graphviz_dump, port::file::Defaults());
     QCHECK(result.ok()) << result.error_message();
@@ -880,7 +880,7 @@ void CheckInputArraysAreNotOutputArrays(const ModelFlags& model_flags) {
 
 bool IsAsciiPrintable(const std::string& name) {
   for (char c : name) {
-    if (!absl::ascii_isprint(c)) {
+    if (!abslx::ascii_isprint(c)) {
       return false;
     }
   }
@@ -892,7 +892,7 @@ std::string DumpAscii(const std::string& name) {
   port::AppendF(&result, "ASCII | Hex\n");
   port::AppendF(&result, "------+----\n");
   for (char c : name) {
-    if (absl::ascii_isprint(c)) {
+    if (abslx::ascii_isprint(c)) {
       port::AppendF(&result, "%c     | %x\n", c, c);
     } else {
       port::AppendF(&result, "      | %x   Not ASCII printable!\n", c);
@@ -1851,7 +1851,7 @@ std::string ShapeToString(const Shape& shape) {
     return "[]";
   }
 
-  return absl::StrCat("[ ", absl::StrJoin(shape.dims(), ", "), " ]");
+  return abslx::StrCat("[ ", abslx::StrJoin(shape.dims(), ", "), " ]");
 }
 
 void PrintArrayShape(Model* model, const std::string& name) {

@@ -49,7 +49,7 @@ template <typename Device, typename T>
 class SoftmaxOp : public OpKernel {
  public:
   explicit SoftmaxOp(OpKernelConstruction* context) : OpKernel(context) {
-    log_ = absl::StartsWith(type_string(), "Log");
+    log_ = abslx::StartsWith(type_string(), "Log");
   }
 
   void Compute(OpKernelContext* context) override {

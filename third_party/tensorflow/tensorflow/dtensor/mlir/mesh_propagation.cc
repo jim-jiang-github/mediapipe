@@ -53,7 +53,7 @@ namespace {
 // enclosing function. Mesh is inferred either using `tf._layout` or `tf._mesh`
 // attributes.
 mlir::LogicalResult ExtractMeshFromBlockArgument(mlir::BlockArgument block_arg,
-                                                 absl::optional<Mesh>* out) {
+                                                 abslx::optional<Mesh>* out) {
   auto func_op = mlir::dyn_cast_or_null<mlir::func::FuncOp>(
       block_arg.getOwner()->getParentOp());
   if (!func_op) {
@@ -87,7 +87,7 @@ mlir::LogicalResult ExtractMeshFromBlockArgument(mlir::BlockArgument block_arg,
 
 // Extracts mesh of operation that produces `value`.
 mlir::LogicalResult ExtractMeshFromOpOutput(mlir::Value value,
-                                            absl::optional<Mesh>* out) {
+                                            abslx::optional<Mesh>* out) {
   auto input_op = value.getDefiningOp();
   if (!input_op) return mlir::success();
 
@@ -115,12 +115,12 @@ mlir::LogicalResult ExtractMeshFromOpOutput(mlir::Value value,
 // configuration is extracted from the enclosing tf_device.Cluster op.
 mlir::LogicalResult ExtractMeshFromOperand(
     const llvm::DenseMap<mlir::OpOperand*, std::vector<mlir::Value>>& producers,
-    mlir::OpOperand* operand, absl::optional<Mesh>* out) {
+    mlir::OpOperand* operand, abslx::optional<Mesh>* out) {
   mlir::Value operand_value = operand->get();
 
   const auto check_and_assign_mesh =
-      [](mlir::Location loc, absl::optional<Mesh>& mesh,
-         absl::optional<Mesh>& operand_mesh) -> mlir::LogicalResult {
+      [](mlir::Location loc, abslx::optional<Mesh>& mesh,
+         abslx::optional<Mesh>& operand_mesh) -> mlir::LogicalResult {
     if (mesh && !operand_mesh) {
       operand_mesh.swap(mesh);
     } else if (mesh && operand_mesh && mesh != operand_mesh) {
@@ -142,10 +142,10 @@ mlir::LogicalResult ExtractMeshFromOperand(
       auto it = producers.find(operand);
       if (it != producers.end()) {
         auto producer_values = it->getSecond();
-        absl::optional<Mesh> operand_mesh;
+        abslx::optional<Mesh> operand_mesh;
         for (mlir::Value producer_value : producer_values) {
           if (auto arg = producer_value.dyn_cast<mlir::BlockArgument>()) {
-            absl::optional<Mesh> mesh;
+            abslx::optional<Mesh> mesh;
             if (mlir::failed(ExtractMeshFromBlockArgument(arg, &mesh)))
               return mlir::failure();
 
@@ -159,7 +159,7 @@ mlir::LogicalResult ExtractMeshFromOperand(
             auto output_from_producing_op = input_cluster.getResult(
                 producer_value.cast<mlir::OpResult>().getResultNumber());
 
-            absl::optional<Mesh> mesh;
+            abslx::optional<Mesh> mesh;
             if (mlir::failed(
                     ExtractMeshFromOpOutput(output_from_producing_op, &mesh)))
               return mlir::failure();
@@ -187,7 +187,7 @@ mlir::LogicalResult ExtractMeshFromOperand(
 // operands must have same mesh.
 mlir::LogicalResult InferMeshFromInputs(
     const llvm::DenseMap<mlir::OpOperand*, std::vector<mlir::Value>>& producers,
-    mlir::tf_device::ClusterOp cluster, absl::optional<Mesh>* mesh,
+    mlir::tf_device::ClusterOp cluster, abslx::optional<Mesh>* mesh,
     llvm::SmallVector<mlir::OpOperand*, 8>* inputs_with_inferred_mesh) {
   auto result = mlir::success();
 
@@ -201,7 +201,7 @@ mlir::LogicalResult InferMeshFromInputs(
   mlir::visitUsedValuesDefinedAbove(
       cluster.body(), cluster.body(), [&](mlir::OpOperand* operand) {
         if (mlir::failed(result)) return;
-        absl::optional<Mesh> extracted_config;
+        abslx::optional<Mesh> extracted_config;
 
         // If inputs to mesh is from DTensorLayout op, then use the mesh
         // extracted from the DTensorLayout op to infer the mesh of the cluster.
@@ -240,9 +240,9 @@ mlir::LogicalResult InferMeshFromInputs(
 // Extracts mesh from function return attributes. If `tf._default_layout`
 // attribute exists, mesh from the default layout is used. If not, mesh from
 // `tf._mesh` attribute is used.
-StatusOr<absl::optional<Mesh>> ExtractMeshFromFuctionOutput(
+StatusOr<abslx::optional<Mesh>> ExtractMeshFromFuctionOutput(
     const int output_index, mlir::func::FuncOp function) {
-  absl::optional<Mesh> function_mesh;
+  abslx::optional<Mesh> function_mesh;
   auto terminator = llvm::cast<mlir::func::ReturnOp>(
       function.getBody().front().getTerminator());
   TF_ASSIGN_OR_RETURN(auto layout, ExtractLayoutFromFunctionReturnAttr(
@@ -266,7 +266,7 @@ StatusOr<absl::optional<Mesh>> ExtractMeshFromFuctionOutput(
 // Infers mesh from users of `cluster` and records the usages that were used to
 // infer mesh configuration in `consumers_with_mesh`.
 mlir::LogicalResult InferMeshFromConsumers(
-    mlir::tf_device::ClusterOp cluster, absl::optional<Mesh>* mesh,
+    mlir::tf_device::ClusterOp cluster, abslx::optional<Mesh>* mesh,
     llvm::SmallVector<mlir::OpOperand*, 8>* consumers_with_mesh) {
   for (auto& use_value : cluster.getOperation()->getUses()) {
     mlir::Operation* consumer = use_value.getOwner();
@@ -330,7 +330,7 @@ mlir::LogicalResult InferMeshFromConsumers(
 mlir::LogicalResult InferFunctionDefaultMesh(
     const llvm::DenseMap<mlir::OpOperand*, std::vector<mlir::Value>>& producers,
     mlir::func::FuncOp function, mlir::OpBuilder* builder,
-    absl::optional<mlir::StringAttr>* inferred_default_mesh) {
+    abslx::optional<mlir::StringAttr>* inferred_default_mesh) {
   auto terminator = function.getCallableRegion()->front().getTerminator();
   for (auto& result_value : terminator->getOpOperands()) {
     auto result_defining_op = result_value.get().getDefiningOp();
@@ -350,7 +350,7 @@ mlir::LogicalResult InferFunctionDefaultMesh(
     inferred_default_mesh->emplace(result_mesh);
   }
 
-  absl::optional<Mesh> inferred_mesh_from_args;
+  abslx::optional<Mesh> inferred_mesh_from_args;
   for (auto function_arg : function.getArguments()) {
     auto uses = function_arg.getUses();
     if (uses.empty()) {
@@ -397,7 +397,7 @@ mlir::LogicalResult AnnotateFunctionReturnValuesWithMeshInformation(
     mlir::Operation* callsite_operation,
     mlir::func::FuncOp function_to_annotate, mlir::OpBuilder* builder) {
   for (auto value : return_values_from_mesh) {
-    absl::optional<mlir::StringAttr> result_mesh_attribute;
+    abslx::optional<mlir::StringAttr> result_mesh_attribute;
     if (llvm::isa<mlir::func::ReturnOp>(value->getOwner())) {
       auto parent_function =
           callsite_operation->getParentOfType<mlir::func::FuncOp>();
@@ -512,7 +512,7 @@ mlir::LogicalResult
 DTensorMeshPropagation::PropagateDefaultMeshToUnAssignedClusters(
     const llvm::DenseMap<mlir::OpOperand*, std::vector<mlir::Value>>& producers,
     mlir::func::FuncOp function, mlir::OpBuilder* builder, bool* mesh_changed) {
-  absl::optional<mlir::StringAttr> mesh;
+  abslx::optional<mlir::StringAttr> mesh;
   if (mlir::failed(
           InferFunctionDefaultMesh(producers, function, builder, &mesh)))
     return mlir::failure();
@@ -558,7 +558,7 @@ mlir::LogicalResult DTensorMeshPropagation::PropagateMeshFromInputs(
 
   // If mesh of `cluster` is not specified, infer mesh using inputs of mesh
   // cluster.
-  absl::optional<Mesh> extracted_mesh;
+  abslx::optional<Mesh> extracted_mesh;
   llvm::SmallVector<mlir::OpOperand*, 8> inputs_with_inferred_mesh;
   if (failed(InferMeshFromInputs(producers, cluster, &extracted_mesh,
                                  &inputs_with_inferred_mesh))) {
@@ -588,7 +588,7 @@ mlir::LogicalResult DTensorMeshPropagation::PropagateMeshFromInputs(
     // Once all clusters inside `inner_func` callable has been set, now we can
     // infer mesh of `cluster`. That is, mesh of call site operation is equal
     // to mesh of return values of the function.
-    absl::optional<mlir::StringAttr> function_mesh;
+    abslx::optional<mlir::StringAttr> function_mesh;
     if (mlir::failed(InferFunctionDefaultMesh(producers, inner_func.value(),
                                               builder, &function_mesh)))
       return mlir::failure();
@@ -617,7 +617,7 @@ mlir::LogicalResult DTensorMeshPropagation::PropagateMeshFromConsumers(
   if (!inner_func && cluster_mesh) return mlir::success();
 
   // Infer mesh of `cluster` from its output usages.
-  absl::optional<Mesh> extracted_mesh_from_consumers;
+  abslx::optional<Mesh> extracted_mesh_from_consumers;
   llvm::SmallVector<mlir::OpOperand*, 8> consumers_with_mesh_information;
   if (failed(InferMeshFromConsumers(cluster, &extracted_mesh_from_consumers,
                                     &consumers_with_mesh_information)))
@@ -635,7 +635,7 @@ mlir::LogicalResult DTensorMeshPropagation::PropagateMeshFromConsumers(
                                    mesh_changed)))
       return mlir::failure();
 
-    absl::optional<mlir::StringAttr> function_mesh;
+    abslx::optional<mlir::StringAttr> function_mesh;
     if (mlir::failed(InferFunctionDefaultMesh(producers, inner_func.value(),
                                               builder, &function_mesh)))
       return mlir::failure();

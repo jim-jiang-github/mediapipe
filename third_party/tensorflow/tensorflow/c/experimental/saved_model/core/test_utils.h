@@ -54,7 +54,7 @@ std::vector<std::vector<int64_t>> InterestingShapes();
 // CHECK fail. This should only be used for testing purposes.
 ImmediateTensorHandlePtr CreateTensorHandle(ImmediateExecutionContext* ctx,
                                             DataType dtype,
-                                            absl::Span<const int64_t> shape,
+                                            abslx::Span<const int64_t> shape,
                                             int8_t value);
 
 // Fills a numeric tensor's buffer with `value`.

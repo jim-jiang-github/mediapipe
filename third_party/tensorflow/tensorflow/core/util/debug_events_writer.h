@@ -250,7 +250,7 @@ class DebugEventsWriter {
       TF_GUARDED_BY(graph_execution_trace_buffer_mu_);
   mutex graph_execution_trace_buffer_mu_;
 
-  absl::flat_hash_map<string, int> device_name_to_id_ TF_GUARDED_BY(device_mu_);
+  abslx::flat_hash_map<string, int> device_name_to_id_ TF_GUARDED_BY(device_mu_);
   mutex device_mu_;
 
   std::unique_ptr<SingleDebugEventFileWriter> metadata_writer_;

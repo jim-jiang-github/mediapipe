@@ -39,12 +39,12 @@ class VectorToTensorFloatCalculatorTest : public ::testing::Test {
         VectorFloatToTensorCalculatorOptions::ext);
     options->set_input_size(input_size);
     options->set_transpose(transpose);
-    runner_ = ::absl::make_unique<CalculatorRunner>(config);
+    runner_ = ::abslx::make_unique<CalculatorRunner>(config);
   }
 
   void TestConvertFromVectoVectorFloat(const bool transpose) {
     SetUpRunner(VectorFloatToTensorCalculatorOptions::INPUT_2D, transpose);
-    auto input = ::absl::make_unique<std::vector<std::vector<float>>>(
+    auto input = ::abslx::make_unique<std::vector<std::vector<float>>>(
         2, std::vector<float>(2));
     for (int i = 0; i < 2; ++i) {
       for (int j = 0; j < 2; ++j) {
@@ -86,7 +86,7 @@ class VectorToTensorFloatCalculatorTest : public ::testing::Test {
 
 TEST_F(VectorToTensorFloatCalculatorTest, ConvertsFromVectorFloat) {
   SetUpRunner(VectorFloatToTensorCalculatorOptions::INPUT_1D, false);
-  auto input = ::absl::make_unique<std::vector<float>>(5);
+  auto input = ::abslx::make_unique<std::vector<float>>(5);
   for (int i = 0; i < 5; ++i) {
     // 2^i can be represented exactly in floating point numbers if 'i' is small.
     input->at(i) = static_cast<float>(1 << i);

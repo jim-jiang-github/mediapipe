@@ -504,7 +504,7 @@ TEST_F(HloOrderingTest,
 }
 
 TEST_F(HloOrderingTest, InterferenceWithOuterRoot) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule InterferenceWithOuterRoot, is_scheduled=true
 
 Embedded (embedded_param: f32[4096,4096]) -> f32[4096,4096] {
@@ -539,7 +539,7 @@ TEST_F(HloOrderingTest, RootNotLastInstruction) {
   // as the last instruction, it still lives out. If the only use of a value is
   // this early root, we want HloOrdering to tell us that it actually doesn't
   // execute before the operations that come after the root.
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module, is_scheduled=true
 
 body2 {

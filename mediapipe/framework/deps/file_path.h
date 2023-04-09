@@ -27,7 +27,7 @@ namespace internal {
 
 // Not part of the public API.
 std::string JoinPathImpl(bool honor_abs,
-                         std::initializer_list<absl::string_view> paths);
+                         std::initializer_list<abslx::string_view> paths);
 
 }  // namespace internal
 
@@ -47,7 +47,7 @@ std::string JoinPathImpl(bool honor_abs,
 // All paths will be treated as relative paths, regardless of whether or not
 // they start with a leading '/'.  That is, all paths will be concatenated
 // together, with the appropriate path separator inserted in between.
-// Arguments must be convertible to absl::string_view.
+// Arguments must be convertible to abslx::string_view.
 //
 // Usage:
 // std::string path = file::JoinPath("/cns", dirname, filename);
@@ -56,13 +56,13 @@ std::string JoinPathImpl(bool honor_abs,
 //
 // 0, 1, 2-path specializations exist to optimize common cases.
 inline std::string JoinPath() { return std::string(); }
-inline std::string JoinPath(absl::string_view path) {
+inline std::string JoinPath(abslx::string_view path) {
   return std::string(path.data(), path.size());
 }
-std::string JoinPath(absl::string_view path1, absl::string_view path2);
+std::string JoinPath(abslx::string_view path1, abslx::string_view path2);
 template <typename... T>
-inline std::string JoinPath(absl::string_view path1, absl::string_view path2,
-                            absl::string_view path3, const T&... args) {
+inline std::string JoinPath(abslx::string_view path1, abslx::string_view path2,
+                            abslx::string_view path3, const T&... args) {
   return internal::JoinPathImpl(false, {path1, path2, path3, args...});
 }
 
@@ -71,25 +71,25 @@ inline std::string JoinPath(absl::string_view path1, absl::string_view path2,
 //   leading "/".
 // * If there is no "/" in the path, the result is the empty prefix of the
 //   input string.
-absl::string_view Dirname(absl::string_view path);
+abslx::string_view Dirname(abslx::string_view path);
 
 // Return the parts of the path, split on the final "/".  If there is no
 // "/" in the path, the first part of the output is empty and the second
 // is the input. If the only "/" in the path is the first character, it is
 // the first part of the output.
-std::pair<absl::string_view, absl::string_view> SplitPath(
-    absl::string_view path);
+std::pair<abslx::string_view, abslx::string_view> SplitPath(
+    abslx::string_view path);
 
 // Returns the part of the path after the final "/".  If there is no
 // "/" in the path, the result is the same as the input.
 // Note that this function's behavior differs from the Unix basename
 // command if path ends with "/". For such paths, this function returns the
 // empty string.
-absl::string_view Basename(absl::string_view path);
+abslx::string_view Basename(abslx::string_view path);
 
 // Returns the part of the basename of path after the final ".".  If
 // there is no "." in the basename, the result is empty.
-absl::string_view Extension(absl::string_view path);
+abslx::string_view Extension(abslx::string_view path);
 
 }  // namespace file
 }  // namespace mediapipe

@@ -141,13 +141,13 @@ TEST(IndexUtilTest, LinearToMultiToLinear) {
 TEST(IndexUtilTest, BumpIndices2x2) {
   auto shape = ShapeUtil::MakeShape(S32, {2, 2});
   std::vector<int64_t> indices = {0, 0};
-  EXPECT_TRUE(IndexUtil::BumpIndices(shape, absl::MakeSpan(indices)));
+  EXPECT_TRUE(IndexUtil::BumpIndices(shape, abslx::MakeSpan(indices)));
   EXPECT_THAT(indices, ::testing::ElementsAre(0, 1));
-  EXPECT_TRUE(IndexUtil::BumpIndices(shape, absl::MakeSpan(indices)));
+  EXPECT_TRUE(IndexUtil::BumpIndices(shape, abslx::MakeSpan(indices)));
   EXPECT_THAT(indices, ::testing::ElementsAre(1, 0));
-  EXPECT_TRUE(IndexUtil::BumpIndices(shape, absl::MakeSpan(indices)));
+  EXPECT_TRUE(IndexUtil::BumpIndices(shape, abslx::MakeSpan(indices)));
   EXPECT_THAT(indices, ::testing::ElementsAre(1, 1));
-  EXPECT_FALSE(IndexUtil::BumpIndices(shape, absl::MakeSpan(indices)));
+  EXPECT_FALSE(IndexUtil::BumpIndices(shape, abslx::MakeSpan(indices)));
 }
 
 }  // namespace

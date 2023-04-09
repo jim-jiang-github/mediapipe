@@ -379,13 +379,13 @@ TEST_F(CallGraphTest, ComplexGraph) {
   EXPECT_EQ(visited.size(), 5);
   // All values in visited should be unique.
   EXPECT_EQ(
-      absl::flat_hash_set<const HloComputation*>(visited.begin(), visited.end())
+      abslx::flat_hash_set<const HloComputation*>(visited.begin(), visited.end())
           .size(),
       5);
 
   // Verify visitation order of some computations in the graph.
   auto index_of = [&visited](const HloComputation* comp) {
-    auto it = absl::c_find(visited, comp);
+    auto it = abslx::c_find(visited, comp);
     EXPECT_NE(it, visited.end());
     return std::distance(visited.begin(), it);
   };

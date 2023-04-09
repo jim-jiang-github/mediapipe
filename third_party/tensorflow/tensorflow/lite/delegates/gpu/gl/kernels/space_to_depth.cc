@@ -33,7 +33,7 @@ namespace {
 
 class SpaceToDepth : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     const auto& attr =
         std::any_cast<const SpaceToDepthAttributes&>(ctx.op_attr);
@@ -61,13 +61,13 @@ class SpaceToDepth : public NodeShader {
         /*input=*/IOStructure::ONLY_DEFINITIONS,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class DepthToSpace : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     const auto& attr =
         std::any_cast<const SpaceToDepthAttributes&>(ctx.op_attr);
@@ -97,7 +97,7 @@ class DepthToSpace : public NodeShader {
         /*input=*/IOStructure::ONLY_DEFINITIONS,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 }  // namespace

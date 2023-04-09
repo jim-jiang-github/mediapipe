@@ -458,7 +458,7 @@ struct BatchNormTestParam {
 
   friend ::std::ostream& operator<<(::std::ostream& os,
                                     const BatchNormTestParam& p) {
-    os << "bounds={" << absl::StrJoin(p.bounds, ", ") << "}, ";
+    os << "bounds={" << abslx::StrJoin(p.bounds, ", ") << "}, ";
     os << "feature_index=" << p.feature_index << ", ";
     os << "random_value_mean=" << p.random_value_mean << ", ";
     os << "random_value_var=" << p.random_value_var;

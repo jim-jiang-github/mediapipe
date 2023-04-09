@@ -159,7 +159,7 @@ class HostComputeOp : public XlaOpKernel {
     // Send values to the host.
     std::vector<xla::XlaOp> send_to_host_tokens;
     for (int i = 0; i < input_handles.size(); ++i) {
-      const string channel_name = absl::StrCat(send_key_, "_dtoh_", i);
+      const string channel_name = abslx::StrCat(send_key_, "_dtoh_", i);
       xla::Shape xla_shape;
       OP_REQUIRES_OK(ctx, TensorShapeToXLAShape(input_dtypes_[i],
                                                 input_shapes[i], &xla_shape));
@@ -224,7 +224,7 @@ class HostComputeOp : public XlaOpKernel {
     // Copy results to the device.
     std::vector<xla::XlaOp> recv_from_host_tokens;
     for (int i = 0; i < output_shapes->size(); ++i) {
-      const string channel_name = absl::StrCat(recv_key_, "_htod_", i);
+      const string channel_name = abslx::StrCat(recv_key_, "_htod_", i);
       // Specify frontend attributes.
       xla::FrontendAttributes attrs;
       (*attrs.mutable_map())[xla::kXlaHostTransferRendezvousNameAttr] =

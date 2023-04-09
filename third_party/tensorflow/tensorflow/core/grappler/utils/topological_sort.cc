@@ -33,7 +33,7 @@ namespace grappler {
 namespace {
 
 std::vector<GraphView::Edge> MakeEphemeralEdges(
-    const absl::Span<const TopologicalDependency> extra_dependencies) {
+    const abslx::Span<const TopologicalDependency> extra_dependencies) {
   std::vector<GraphView::Edge> ephemeral_edges;
   ephemeral_edges.reserve(extra_dependencies.size());
   for (const auto& dep : extra_dependencies) {
@@ -48,7 +48,7 @@ std::vector<GraphView::Edge> MakeEphemeralEdges(
 // For details, see https://en.wikipedia.org/wiki/Topological_sorting
 Status ComputeTopologicalOrder(
     const GraphDef& graph,
-    const absl::Span<const TopologicalDependency> extra_dependencies,
+    const abslx::Span<const TopologicalDependency> extra_dependencies,
     std::vector<int>* ready_nodes) {
   GraphTopologyView graph_view;
   TF_RETURN_IF_ERROR(graph_view.InitializeFromGraph(
@@ -112,7 +112,7 @@ Status ComputeTopologicalOrder(
 
 Status ComputeTopologicalOrder(
     const GraphDef& graph,
-    const absl::Span<const TopologicalDependency> extra_dependencies,
+    const abslx::Span<const TopologicalDependency> extra_dependencies,
     std::vector<const NodeDef*>* topo_order) {
   std::vector<int> ready_nodes;
   TF_RETURN_IF_ERROR(

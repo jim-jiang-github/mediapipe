@@ -88,7 +88,7 @@ struct HandLandmarkerOutputs {
 };
 
 // Sets the base options in the sub tasks.
-absl::Status SetSubTaskBaseOptions(const ModelAssetBundleResources& resources,
+abslx::Status SetSubTaskBaseOptions(const ModelAssetBundleResources& resources,
                                    HandLandmarkerGraphOptions* options,
                                    bool is_copy) {
   ASSIGN_OR_RETURN(const auto hand_detector_file,
@@ -117,7 +117,7 @@ absl::Status SetSubTaskBaseOptions(const ModelAssetBundleResources& resources,
       ->CopyFrom(options->base_options().acceleration());
   hand_landmarks_detector_graph_options->mutable_base_options()
       ->set_use_stream_mode(options->base_options().use_stream_mode());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace
@@ -202,7 +202,7 @@ absl::Status SetSubTaskBaseOptions(const ModelAssetBundleResources& resources,
 // }
 class HandLandmarkerGraph : public core::ModelTaskGraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     Graph graph;
     if (sc->Options<HandLandmarkerGraphOptions>()
@@ -261,7 +261,7 @@ class HandLandmarkerGraph : public core::ModelTaskGraph {
   // tasks_options: the mediapipe tasks module HandLandmarkerGraphOptions.
   // image_in: (mediapipe::Image) stream to run hand landmark detection on.
   // graph: the mediapipe graph instance to be updated.
-  absl::StatusOr<HandLandmarkerOutputs> BuildHandLandmarkerGraph(
+  abslx::StatusOr<HandLandmarkerOutputs> BuildHandLandmarkerGraph(
       const HandLandmarkerGraphOptions& tasks_options, Source<Image> image_in,
       Source<NormalizedRect> norm_rect_in, Graph& graph) {
     const int max_num_hands =

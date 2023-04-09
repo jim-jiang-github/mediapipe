@@ -203,7 +203,7 @@ TEST(ConvertXPlaneToOpStats, Hostnames) {
       op_stats.core_id_to_details().at(kDefaultGpuLocalCoreId).hostname());
 }
 
-void BuildXSpaceForTest(XSpace& xspace, absl::string_view hostname) {
+void BuildXSpaceForTest(XSpace& xspace, abslx::string_view hostname) {
   constexpr int64_t kStepNum = 123;
   constexpr int64_t kStepId = 456;
   // Create a host only XSpace for test.

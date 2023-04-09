@@ -23,7 +23,7 @@
 #include "absl/base/config.h"
 #include "absl/meta/type_traits.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 // Returns true if the input value is zero or a power of two. Useful for
@@ -124,7 +124,7 @@ FastUniformBits<UIntType>::operator()(URBG& g) {  // NOLINT(runtime/references)
   static_assert((URBG::max)() > (URBG::min)(),
                 "URBG::max and URBG::min may not be equal.");
 
-  using tag = absl::conditional_t<IsPowerOfTwoOrZero(RangeSize<URBG>()),
+  using tag = abslx::conditional_t<IsPowerOfTwoOrZero(RangeSize<URBG>()),
                                   SimplifiedLoopTag, RejectionLoopTag>;
   return Generate(g, tag{});
 }
@@ -263,6 +263,6 @@ FastUniformBits<UIntType>::Generate(URBG& g,  // NOLINT(runtime/references)
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_INTERNAL_FAST_UNIFORM_BITS_H_

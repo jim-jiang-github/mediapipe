@@ -231,7 +231,7 @@ Status SingleMachine::GetPeakMemoryUsage(
       return Status(error::INVALID_ARGUMENT,
                     "Tracking allocation is not enabled.");
     }
-    absl::optional<AllocatorStats> stats = allocator->GetStats();
+    abslx::optional<AllocatorStats> stats = allocator->GetStats();
     (*device_peak_memory)[device->name()] =
         (stats ? stats->peak_bytes_in_use : 0);
   }
@@ -462,7 +462,7 @@ Status SingleMachine::ClearAllocatorStats() const {
     if (!allocator->ClearStats()) {
       return Status(
           error::INVALID_ARGUMENT,
-          absl::StrCat("Clearing allocation stats is not supported for ",
+          abslx::StrCat("Clearing allocation stats is not supported for ",
                        device->name()));
     }
   }

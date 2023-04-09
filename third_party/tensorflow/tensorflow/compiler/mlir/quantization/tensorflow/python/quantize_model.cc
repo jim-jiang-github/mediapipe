@@ -94,13 +94,13 @@ Status PreprocessAndFreezeGraph(mlir::ModuleOp module,
 
 // Converts MLIR ModuleOp to TensorFlow GraphDef. Returns InternalError status
 // when the GraphDef conversion fails.
-absl::StatusOr<GraphDef> ConvertMlirModuleToGraphDef(
+abslx::StatusOr<GraphDef> ConvertMlirModuleToGraphDef(
     const mlir::ModuleOp module_op) {
   GraphExportConfig config{};
   StatusOr<std::unique_ptr<GraphDef>> graph =
       ConvertMlirToGraphdef(module_op, config);
   if (!graph.ok()) {
-    return absl::InternalError("Failed to convert MLIR to GraphDef: " +
+    return abslx::InternalError("Failed to convert MLIR to GraphDef: " +
                                graph.status().error_message());
   }
   return *std::move(*graph);
@@ -108,19 +108,19 @@ absl::StatusOr<GraphDef> ConvertMlirModuleToGraphDef(
 
 }  // namespace
 
-absl::StatusOr<GraphDef> QuantizeQatModel(
-    const absl::string_view saved_model_path,
-    const absl::string_view exported_names_str, const absl::string_view tags,
-    const absl::string_view quant_opts_serialized) {
+abslx::StatusOr<GraphDef> QuantizeQatModel(
+    const abslx::string_view saved_model_path,
+    const abslx::string_view exported_names_str, const abslx::string_view tags,
+    const abslx::string_view quant_opts_serialized) {
   const std::unordered_set<std::string> tag_set =
-      absl::StrSplit(tags, ',', absl::SkipEmpty());
+      abslx::StrSplit(tags, ',', abslx::SkipEmpty());
   std::vector<std::string> exported_names =
-      absl::StrSplit(exported_names_str, ',', absl::SkipEmpty());
+      abslx::StrSplit(exported_names_str, ',', abslx::SkipEmpty());
   QuantizationOptions quantization_options;
   if (!quantization_options.ParseFromString(
           // NOLINTNEXTLINE: std::string conversion required.
           std::string(quant_opts_serialized))) {
-    return absl::InternalError(
+    return abslx::InternalError(
         "Failed to parse QuantizationOptions from string.");
   }
 
@@ -139,12 +139,12 @@ absl::StatusOr<GraphDef> QuantizeQatModel(
   // TODO(b/213406917): Add support for the object graph based saved model input
   StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> module =
       SavedModelSignatureDefsToMlirImport(saved_model_path, tag_set,
-                                          absl::MakeSpan(exported_names),
+                                          abslx::MakeSpan(exported_names),
                                           &context, import_options,
                                           /*lift_variables=*/false, &bundle);
 
   if (!module.status().ok()) {
-    return absl::InternalError("Failed to import SavedModel: " +
+    return abslx::InternalError("Failed to import SavedModel: " +
                                module.status().error_message());
   }
 
@@ -153,7 +153,7 @@ absl::StatusOr<GraphDef> QuantizeQatModel(
   const Status status = PreprocessAndFreezeGraph(
       module_ref.get(), &context, bundle ? bundle->GetSession() : nullptr);
   if (!status.ok()) {
-    return absl::InternalError("Failed to preprocess graph: " +
+    return abslx::InternalError("Failed to preprocess graph: " +
                                status.error_message());
   }
 
@@ -195,7 +195,7 @@ absl::StatusOr<GraphDef> QuantizeQatModel(
 
   mlir::StatusScopedDiagnosticHandler diagnostic_handler(&context);
   if (failed(pm.run(*module_ref))) {
-    return absl::InternalError(
+    return abslx::InternalError(
         "failed to apply the quantization: " +
         diagnostic_handler.ConsumeStatus().error_message());
   }
@@ -203,13 +203,13 @@ absl::StatusOr<GraphDef> QuantizeQatModel(
   return ConvertMlirModuleToGraphDef(*module_ref);
 }
 
-absl::StatusOr<GraphDef> QuantizePtqModelPreCalibration(
-    const absl::string_view saved_model_path,
-    const absl::string_view exported_names_str, const absl::string_view tags) {
+abslx::StatusOr<GraphDef> QuantizePtqModelPreCalibration(
+    const abslx::string_view saved_model_path,
+    const abslx::string_view exported_names_str, const abslx::string_view tags) {
   const std::unordered_set<std::string> tag_set =
-      absl::StrSplit(tags, ',', absl::SkipEmpty());
+      abslx::StrSplit(tags, ',', abslx::SkipEmpty());
   std::vector<std::string> exported_names =
-      absl::StrSplit(exported_names_str, ',', absl::SkipEmpty());
+      abslx::StrSplit(exported_names_str, ',', abslx::SkipEmpty());
 
   // Convert the SavedModelBundle to an MLIR module.
   mlir::DialectRegistry registry;
@@ -226,12 +226,12 @@ absl::StatusOr<GraphDef> QuantizePtqModelPreCalibration(
   // TODO(b/213406917): Add support for the object graph based saved model input
   StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> module =
       SavedModelSignatureDefsToMlirImport(saved_model_path, tag_set,
-                                          absl::MakeSpan(exported_names),
+                                          abslx::MakeSpan(exported_names),
                                           &context, import_options,
                                           /*lift_variables=*/false, &bundle);
 
   if (!module.status().ok()) {
-    return absl::InternalError("Failed to import SavedModel: " +
+    return abslx::InternalError("Failed to import SavedModel: " +
                                module.status().error_message());
   }
   mlir::OwningOpRef<mlir::ModuleOp> module_ref = std::move(module).value();
@@ -239,7 +239,7 @@ absl::StatusOr<GraphDef> QuantizePtqModelPreCalibration(
   const Status status = PreprocessAndFreezeGraph(
       module_ref.get(), &context, bundle ? bundle->GetSession() : nullptr);
   if (!status.ok()) {
-    return absl::InternalError("Failed to preprocess graph: " +
+    return abslx::InternalError("Failed to preprocess graph: " +
                                status.error_message());
   }
 
@@ -258,7 +258,7 @@ absl::StatusOr<GraphDef> QuantizePtqModelPreCalibration(
 
   mlir::StatusScopedDiagnosticHandler diagnostic_handler(&context);
   if (failed(pm.run(*module_ref))) {
-    return absl::InternalError(
+    return abslx::InternalError(
         "Failed to apply the quantization at the pre-calibration stage: " +
         diagnostic_handler.ConsumeStatus().error_message());
   }
@@ -266,19 +266,19 @@ absl::StatusOr<GraphDef> QuantizePtqModelPreCalibration(
   return ConvertMlirModuleToGraphDef(*module_ref);
 }
 
-absl::StatusOr<GraphDef> QuantizePtqModelPostCalibration(
-    const absl::string_view saved_model_path,
-    const absl::string_view exported_names_str, const absl::string_view tags,
-    const absl::string_view quant_opts_serialized) {
+abslx::StatusOr<GraphDef> QuantizePtqModelPostCalibration(
+    const abslx::string_view saved_model_path,
+    const abslx::string_view exported_names_str, const abslx::string_view tags,
+    const abslx::string_view quant_opts_serialized) {
   const std::unordered_set<std::string> tag_set =
-      absl::StrSplit(tags, ',', absl::SkipEmpty());
+      abslx::StrSplit(tags, ',', abslx::SkipEmpty());
   std::vector<std::string> exported_names =
-      absl::StrSplit(exported_names_str, ',', absl::SkipEmpty());
+      abslx::StrSplit(exported_names_str, ',', abslx::SkipEmpty());
   QuantizationOptions quantization_options;
   if (!quantization_options.ParseFromString(
           // NOLINTNEXTLINE: std::string conversion required.
           std::string(quant_opts_serialized))) {
-    return absl::InternalError(
+    return abslx::InternalError(
         "Failed to parse QuantizationOptions from string.");
   }
 
@@ -297,12 +297,12 @@ absl::StatusOr<GraphDef> QuantizePtqModelPostCalibration(
   // TODO(b/213406917): Add support for the object graph based saved model input
   StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> module =
       SavedModelSignatureDefsToMlirImport(saved_model_path, tag_set,
-                                          absl::MakeSpan(exported_names),
+                                          abslx::MakeSpan(exported_names),
                                           &context, import_options,
                                           /*lift_variables=*/true, &bundle);
 
   if (!module.status().ok()) {
-    return absl::InternalError("Failed to import SavedModel: " +
+    return abslx::InternalError("Failed to import SavedModel: " +
                                module.status().error_message());
   }
 
@@ -340,7 +340,7 @@ absl::StatusOr<GraphDef> QuantizePtqModelPostCalibration(
 
   mlir::StatusScopedDiagnosticHandler diagnostic_handler(&context);
   if (failed(pm.run(*module_ref))) {
-    return absl::InternalError(
+    return abslx::InternalError(
         "Failed to apply the quantization at the post-calibation stage: " +
         diagnostic_handler.ConsumeStatus().error_message());
   }
@@ -348,19 +348,19 @@ absl::StatusOr<GraphDef> QuantizePtqModelPostCalibration(
   return ConvertMlirModuleToGraphDef(*module_ref);
 }
 
-absl::StatusOr<GraphDef> QuantizePtqDynamicRange(
-    const absl::string_view saved_model_path,
-    const absl::string_view exported_names_str, const absl::string_view tags,
-    const absl::string_view quant_opts_serialized) {
+abslx::StatusOr<GraphDef> QuantizePtqDynamicRange(
+    const abslx::string_view saved_model_path,
+    const abslx::string_view exported_names_str, const abslx::string_view tags,
+    const abslx::string_view quant_opts_serialized) {
   const std::unordered_set<std::string> tag_set =
-      absl::StrSplit(tags, ',', absl::SkipEmpty());
+      abslx::StrSplit(tags, ',', abslx::SkipEmpty());
   std::vector<std::string> exported_names =
-      absl::StrSplit(exported_names_str, ',', absl::SkipEmpty());
+      abslx::StrSplit(exported_names_str, ',', abslx::SkipEmpty());
   QuantizationOptions quantization_options;
   if (!quantization_options.ParseFromString(
           // NOLINTNEXTLINE: std::string conversion required.
           std::string(quant_opts_serialized))) {
-    return absl::InternalError(
+    return abslx::InternalError(
         "Failed to parse QuantizationOptions from string.");
   }
 
@@ -379,12 +379,12 @@ absl::StatusOr<GraphDef> QuantizePtqDynamicRange(
   // TODO(b/213406917): Add support for the object graph based saved model input
   StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> module =
       SavedModelSignatureDefsToMlirImport(saved_model_path, tag_set,
-                                          absl::MakeSpan(exported_names),
+                                          abslx::MakeSpan(exported_names),
                                           &context, import_options,
                                           /*lift_variables=*/false, &bundle);
 
   if (!module.status().ok()) {
-    return absl::InternalError("Failed to import SavedModel: " +
+    return abslx::InternalError("Failed to import SavedModel: " +
                                module.status().error_message());
   }
 
@@ -393,7 +393,7 @@ absl::StatusOr<GraphDef> QuantizePtqDynamicRange(
   const Status status = PreprocessAndFreezeGraph(
       module_ref.get(), &context, bundle ? bundle->GetSession() : nullptr);
   if (!status.ok()) {
-    return absl::InternalError("Failed to preprocess graph: " +
+    return abslx::InternalError("Failed to preprocess graph: " +
                                status.error_message());
   }
 
@@ -417,7 +417,7 @@ absl::StatusOr<GraphDef> QuantizePtqDynamicRange(
 
   mlir::StatusScopedDiagnosticHandler diagnostic_handler(&context);
   if (failed(pm.run(*module_ref))) {
-    return absl::InternalError(
+    return abslx::InternalError(
         "Failed to apply the quantization: " +
         diagnostic_handler.ConsumeStatus().error_message());
   }

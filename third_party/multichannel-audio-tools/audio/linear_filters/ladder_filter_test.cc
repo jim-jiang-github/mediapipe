@@ -37,7 +37,7 @@
 namespace linear_filters {
 namespace {
 
-using ::absl::StrFormat;
+using ::abslx::StrFormat;
 using ::audio_dsp::EigenArrayNear;
 using ::Eigen::Array;
 using ::Eigen::Array2Xf;

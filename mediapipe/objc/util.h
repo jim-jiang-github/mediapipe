@@ -63,7 +63,7 @@ vImage_Error vImageConvertCVPixelBuffers(CVPixelBufferRef src,
 // for creation functions that use pools.
 CVReturn CreateCVPixelBufferWithoutPool(int width, int height, OSType cv_format,
                                         CVPixelBufferRef* out_buffer);
-absl::StatusOr<CFHolder<CVPixelBufferRef>> CreateCVPixelBufferWithoutPool(
+abslx::StatusOr<CFHolder<CVPixelBufferRef>> CreateCVPixelBufferWithoutPool(
     int width, int height, OSType cv_format);
 
 /// Returns a CVPixelBuffer that references the data inside the packet. The
@@ -75,27 +75,27 @@ absl::StatusOr<CFHolder<CVPixelBufferRef>> CreateCVPixelBufferWithoutPool(
 /// necessary to convert the data. This is done by creating a new buffer.
 /// If the optional can_overwrite parameter is true, the old buffer may be
 /// modified instead.
-absl::Status CreateCVPixelBufferForImageFramePacket(
+abslx::Status CreateCVPixelBufferForImageFramePacket(
     const mediapipe::Packet& image_frame_packet,
     CFHolder<CVPixelBufferRef>* out_buffer);
-absl::Status CreateCVPixelBufferForImageFramePacket(
+abslx::Status CreateCVPixelBufferForImageFramePacket(
     const mediapipe::Packet& image_frame_packet, bool can_overwrite,
     CFHolder<CVPixelBufferRef>* out_buffer);
-absl::StatusOr<CFHolder<CVPixelBufferRef>> CreateCVPixelBufferCopyingImageFrame(
+abslx::StatusOr<CFHolder<CVPixelBufferRef>> CreateCVPixelBufferCopyingImageFrame(
     const mediapipe::ImageFrame& image_frame);
-absl::StatusOr<CFHolder<CVPixelBufferRef>> CreateCVPixelBufferForImageFrame(
+abslx::StatusOr<CFHolder<CVPixelBufferRef>> CreateCVPixelBufferForImageFrame(
     std::shared_ptr<mediapipe::ImageFrame> image_frame,
     bool can_overwrite = false);
 
 /// Creates a CVPixelBuffer with a copy of the contents of the CGImage.
-absl::Status CreateCVPixelBufferFromCGImage(
+abslx::Status CreateCVPixelBufferFromCGImage(
     CGImageRef image, CFHolder<CVPixelBufferRef>* out_buffer);
 
 /// Creates a CGImage with a copy of the contents of the CVPixelBuffer.
-absl::Status CreateCGImageFromCVPixelBuffer(CVPixelBufferRef image_buffer,
+abslx::Status CreateCGImageFromCVPixelBuffer(CVPixelBufferRef image_buffer,
                                             CFHolder<CGImageRef>* image);
 
-/// DEPRECATED: use the version that returns absl::Status instead.
+/// DEPRECATED: use the version that returns abslx::Status instead.
 CVPixelBufferRef CreateCVPixelBufferForImageFramePacket(
     const mediapipe::Packet& image_frame_packet);
 

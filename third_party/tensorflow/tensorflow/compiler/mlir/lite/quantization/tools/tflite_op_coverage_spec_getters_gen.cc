@@ -70,8 +70,8 @@ void EmitDynamicRangeOp(std::vector<Record *> &defs, raw_ostream *ostream) {
     auto op_name = op.getCppClassName();
     auto op_extra_declaration = op.getExtraClassDeclaration().str();
 
-    bool kernel_support = absl::StrContains(
-        absl::StrReplaceAll(op_extra_declaration, {{"\n", " "}}),
+    bool kernel_support = abslx::StrContains(
+        abslx::StrReplaceAll(op_extra_declaration, {{"\n", " "}}),
         dynamic_quant_kernel_support_regex);
 
     // Classify dynamic range and weight-only fallback
@@ -136,7 +136,7 @@ bool CheckTypeConstraints(llvm::Init *input_value,
       def_init->getDef()->getValueAsString("tflRuntimeTypeDescription");
 
   for (const std::string &type : required_types) {
-    if (!absl::StrContains(supported_types.str(), type)) return false;
+    if (!abslx::StrContains(supported_types.str(), type)) return false;
   }
   return true;
 }
@@ -191,7 +191,7 @@ void GenerateStaticQuantOp(std::vector<Record *> &defs,
       if (per_axis) {
         std::string op_extra_declaration = op.getExtraClassDeclaration().str();
         bool per_axis_support = std::regex_match(
-            absl::StrReplaceAll(op_extra_declaration, {{"\n", " "}}),
+            abslx::StrReplaceAll(op_extra_declaration, {{"\n", " "}}),
             per_channel_support_regex);
         if (per_axis_support) result.emplace_back(op_name);
       } else {

@@ -30,12 +30,12 @@ namespace gpu {
 class GpusolverRewriter : public HloModulePass {
  public:
   GpusolverRewriter();
-  absl::string_view name() const override { return "gpusolver-rewriter"; }
+  abslx::string_view name() const override { return "gpusolver-rewriter"; }
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   StatusOr<bool> RunOnComputation(HloComputation* computation);

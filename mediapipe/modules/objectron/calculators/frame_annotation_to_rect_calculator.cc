@@ -49,9 +49,9 @@ class FrameAnnotationToRectCalculator : public CalculatorBase {
     TOP_VIEW_OFF,
   };
 
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   void AddAnnotationToRect(const ObjectAnnotation& annotation,
@@ -66,7 +66,7 @@ class FrameAnnotationToRectCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(FrameAnnotationToRectCalculator);
 
-absl::Status FrameAnnotationToRectCalculator::GetContract(
+abslx::Status FrameAnnotationToRectCalculator::GetContract(
     CalculatorContract* cc) {
   RET_CHECK(!cc->Inputs().GetTags().empty());
   RET_CHECK(!cc->Outputs().GetTags().empty());
@@ -78,24 +78,24 @@ absl::Status FrameAnnotationToRectCalculator::GetContract(
   if (cc->Outputs().HasTag(kOutputNormRectsTag)) {
     cc->Outputs().Tag(kOutputNormRectsTag).Set<std::vector<NormalizedRect>>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FrameAnnotationToRectCalculator::Open(CalculatorContext* cc) {
+abslx::Status FrameAnnotationToRectCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
   status_ = TOP_VIEW_OFF;
   const auto& options = cc->Options<FrameAnnotationToRectCalculatorOptions>();
   off_threshold_ = options.off_threshold();
   on_threshold_ = options.on_threshold();
   RET_CHECK(off_threshold_ <= on_threshold_);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FrameAnnotationToRectCalculator::Process(CalculatorContext* cc) {
+abslx::Status FrameAnnotationToRectCalculator::Process(CalculatorContext* cc) {
   if (cc->Inputs().Tag(kInputFrameAnnotationTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  auto output_rects = absl::make_unique<std::vector<NormalizedRect>>();
+  auto output_rects = abslx::make_unique<std::vector<NormalizedRect>>();
   const auto& frame_annotation =
       cc->Inputs().Tag(kInputFrameAnnotationTag).Get<FrameAnnotation>();
   for (const auto& object_annotation : frame_annotation.annotations()) {
@@ -106,7 +106,7 @@ absl::Status FrameAnnotationToRectCalculator::Process(CalculatorContext* cc) {
   cc->Outputs()
       .Tag(kOutputNormRectsTag)
       .Add(output_rects.release(), cc->InputTimestamp());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void FrameAnnotationToRectCalculator::AddAnnotationToRect(

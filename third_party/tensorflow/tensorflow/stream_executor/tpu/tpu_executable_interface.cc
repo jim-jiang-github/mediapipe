@@ -217,7 +217,7 @@ StatusOr<ExecutionOutput> TpuExecutableInterface::ExecuteAsyncOnStream(
       auto it = arguments[parameter].MutableBuffers()->find({index});
       CHECK(it != arguments[parameter].MutableBuffers()->end());
       CHECK(!it->second.AsDeviceMemoryBase().is_null());
-      if (absl::c_none_of(result.Result().buffers(), [&](auto index_addr_pair) {
+      if (abslx::c_none_of(result.Result().buffers(), [&](auto index_addr_pair) {
             return index_addr_pair.second.IsSameAs(
                 it->second.AsDeviceMemoryBase());
           })) {
@@ -230,7 +230,7 @@ StatusOr<ExecutionOutput> TpuExecutableInterface::ExecuteAsyncOnStream(
   // MarkToBeReleasedArguments may std::move some elements of arguments, so it
   // must run after the cross program prefetch address is calculated from the
   // arguments.
-  MarkToBeReleasedArguments(absl::MakeSpan(arguments), result);
+  MarkToBeReleasedArguments(abslx::MakeSpan(arguments), result);
 
   TF_RETURN_IF_ERROR(LoadProgramAndEnqueueToStream(
       *run_options, memory_bases, result.Result().root_buffer(),

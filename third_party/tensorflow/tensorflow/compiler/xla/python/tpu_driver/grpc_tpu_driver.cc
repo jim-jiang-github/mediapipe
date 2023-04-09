@@ -39,7 +39,7 @@ using xla::OkStatus;
 using xla::Status;
 
 const int64_t kMaxStreamWriteSize = 10 * 1000 * 1000;
-const absl::Duration kWriteEpochDuration = absl::Microseconds(10);
+const abslx::Duration kWriteEpochDuration = abslx::Microseconds(10);
 
 constexpr char kGrpcProtocol[] = "grpc://";
 
@@ -53,7 +53,7 @@ class GrpcEvent : public Event {
   ~GrpcEvent() override;
 
   xla::Status Await() override;
-  std::optional<xla::Status> AwaitWithTimeout(absl::Duration duration) override;
+  std::optional<xla::Status> AwaitWithTimeout(abslx::Duration duration) override;
   void AddCallback(std::function<void(Status)> callback) override;
 
   EventId id() const { return id_; }
@@ -72,7 +72,7 @@ class ErrorEvent : public GrpcEvent {
 
   xla::Status Await() override { return status_; }
   std::optional<xla::Status> AwaitWithTimeout(
-      absl::Duration duration) override {
+      abslx::Duration duration) override {
     return status_;
   }
   void AddCallback(std::function<void(Status)> callback) override {
@@ -125,7 +125,7 @@ class GrpcCompiledProgramHandle : public CompiledProgramHandle {
   GrpcTpuStream* stream() const { return stream_; }
 
   Status program_shape(xla::ProgramShapeProto* program_shape) override {
-    auto opt_status = OnReady()->AwaitWithTimeout(absl::Hours(1));
+    auto opt_status = OnReady()->AwaitWithTimeout(abslx::Hours(1));
     if (!opt_status.has_value()) {
       return xla::InternalError("Compile failed to finish within 1 hour.");
     }
@@ -175,40 +175,40 @@ class GrpcTpuStream {
 
   std::unique_ptr<BufferHandle> Allocate(int32_t core_id, MemoryRegion region,
                                          int64_t num_bytes,
-                                         absl::Span<Event* const> wait_for);
+                                         abslx::Span<Event* const> wait_for);
   std::unique_ptr<BufferHandle> Allocate(int32_t core_id, MemoryRegion region,
                                          const xla::ShapeProto& shape,
-                                         absl::Span<Event* const> wait_for);
+                                         abslx::Span<Event* const> wait_for);
   std::unique_ptr<BufferHandle> AllocateTuple(
       int32_t core_id, MemoryRegion region,
-      absl::Span<BufferHandle* const> children,
-      absl::Span<Event* const> wait_for);
+      abslx::Span<BufferHandle* const> children,
+      abslx::Span<Event* const> wait_for);
   std::shared_ptr<Event> Deallocate(std::unique_ptr<BufferHandle> handle,
-                                    absl::Span<Event* const> wait_for);
+                                    abslx::Span<Event* const> wait_for);
 
   std::shared_ptr<Event> TransferToDevice(const void* src, BufferHandle* dst,
-                                          absl::Span<Event* const> wait_for);
+                                          abslx::Span<Event* const> wait_for);
   std::shared_ptr<Event> TransferFromDevice(const BufferHandle* src, void* dst,
-                                            absl::Span<Event* const> wait_for);
+                                            abslx::Span<Event* const> wait_for);
 
   std::shared_ptr<Event> TransferFromDeviceToDevice(
       const BufferHandle* src, BufferHandle* dst,
-      absl::Span<Event* const> wait_for);
+      abslx::Span<Event* const> wait_for);
 
   std::unique_ptr<CompiledProgramHandle> CompileProgram(
       const xla::HloProto& source, int32_t num_replicas,
-      absl::Span<Event* const> wait_for);
+      abslx::Span<Event* const> wait_for);
   std::unique_ptr<LoadedProgramHandle> LoadProgram(
       int32_t core_id, const CompiledProgramHandle* handle,
-      absl::Span<Event* const> wait_for);
+      abslx::Span<Event* const> wait_for);
   std::shared_ptr<Event> UnloadProgram(
       std::unique_ptr<LoadedProgramHandle> handle,
-      absl::Span<Event* const> wait_for);
+      abslx::Span<Event* const> wait_for);
   std::shared_ptr<Event> ExecuteProgram(
-      LoadedProgramHandle* program, absl::Span<BufferHandle* const> inputs,
-      absl::Span<BufferHandle* const> outputs,
+      LoadedProgramHandle* program, abslx::Span<BufferHandle* const> inputs,
+      abslx::Span<BufferHandle* const> outputs,
       const xla::DeviceAssignmentProto& device_assignment,
-      absl::Span<Event* const> wait_for);
+      abslx::Span<Event* const> wait_for);
 
  private:
   friend class GrpcEvent;
@@ -219,9 +219,9 @@ class GrpcTpuStream {
     bool done = false;     // response received
     bool deleted = false;  // deleted by the user
     Status status;
-    absl::InlinedVector<std::function<void(Status)>, 1> callbacks;
+    abslx::InlinedVector<std::function<void(Status)>, 1> callbacks;
     // Most events should have <= 2 requirement events.
-    absl::InlinedVector<EventId, 2> deps;
+    abslx::InlinedVector<EventId, 2> deps;
   };
 
   struct TransferInfo {
@@ -242,7 +242,7 @@ class GrpcTpuStream {
 
   // Every public method above should call this first.
   void InitializeRequest(StreamRequest::Entry* req,
-                         absl::Span<Event* const> wait_for)
+                         abslx::Span<Event* const> wait_for)
       ABSL_LOCKS_EXCLUDED(events_mutex_);
 
   // The first update to an event marks it done and calls registered callbacks.
@@ -258,14 +258,14 @@ class GrpcTpuStream {
 
   // Wait at most `duration` for event `id` to complete. Returns the event
   // status or an empty optional if the event does not complete in time.
-  std::optional<Status> WaitForEvent(EventId id, absl::Duration duration)
+  std::optional<Status> WaitForEvent(EventId id, abslx::Duration duration)
       ABSL_LOCKS_EXCLUDED(events_mutex_);
 
   void AddEventCallback(EventId id, std::function<void(Status)> callback)
       ABSL_LOCKS_EXCLUDED(events_mutex_);
 
   void AddWriteRequest(std::unique_ptr<StreamRequest::Entry> req) {
-    absl::MutexLock m(&request_lock_);
+    abslx::MutexLock m(&request_lock_);
     VLOG(2) << "Adding request: " << req->DebugString();
     requests_.push_back(std::move(req));
   }
@@ -281,7 +281,7 @@ class GrpcTpuStream {
       ::grpc::ClientReaderWriterInterface<StreamRequest, StreamResponse>>
       stream_;
 
-  absl::Mutex request_lock_;
+  abslx::Mutex request_lock_;
   std::deque<std::unique_ptr<StreamRequest::Entry>> requests_
       ABSL_GUARDED_BY(request_lock_);
   int64_t num_pending_requests_ ABSL_GUARDED_BY(request_lock_) = 0;
@@ -295,19 +295,19 @@ class GrpcTpuStream {
   Thread reader_thread_;
 
   // Map from operation ID to event information.
-  absl::Mutex events_mutex_;
-  absl::flat_hash_map<EventId, EventInfo> events_
+  abslx::Mutex events_mutex_;
+  abslx::flat_hash_map<EventId, EventInfo> events_
       ABSL_GUARDED_BY(events_mutex_);
 
   // Map from operation ID to transfer information.
   // When a D2H transfer completes, received data is copied into the `dst`
   // pointer in `TransferInfo`.
-  absl::Mutex transfers_mutex_;
-  absl::flat_hash_map<EventId, TransferInfo> transfers_
+  abslx::Mutex transfers_mutex_;
+  abslx::flat_hash_map<EventId, TransferInfo> transfers_
       ABSL_GUARDED_BY(transfers_mutex_);
 
-  absl::Mutex compiles_mutex_;
-  absl::flat_hash_map<EventId, CompileMetadataInfo> compiles_
+  abslx::Mutex compiles_mutex_;
+  abslx::flat_hash_map<EventId, CompileMetadataInfo> compiles_
       ABSL_GUARDED_BY(compiles_mutex_);
 };
 
@@ -346,71 +346,71 @@ class GrpcTpuDriver : public TpuDriver {
 
   std::unique_ptr<BufferHandle> Allocate(
       int32_t core_id, MemoryRegion region, int64_t num_bytes,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     return streams_[core_id]->Allocate(core_id, region, num_bytes, wait_for);
   }
   std::unique_ptr<BufferHandle> Allocate(
       int32_t core_id, MemoryRegion region, const xla::ShapeProto& shape,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     return streams_[core_id]->Allocate(core_id, region, shape, wait_for);
   }
   std::unique_ptr<BufferHandle> AllocateTuple(
       int32_t core_id, MemoryRegion region,
-      absl::Span<BufferHandle* const> children,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<BufferHandle* const> children,
+      abslx::Span<Event* const> wait_for) override {
     return streams_[core_id]->AllocateTuple(core_id, region, children,
                                             wait_for);
   }
   std::shared_ptr<Event> Deallocate(
       std::unique_ptr<BufferHandle> handle,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto* stream = static_cast<GrpcBufferHandle*>(handle.get())->stream();
     return stream->Deallocate(std::move(handle), wait_for);
   }
 
   std::shared_ptr<Event> TransferToDevice(
       const void* src, BufferHandle* dst,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto* stream = static_cast<GrpcBufferHandle*>(dst)->stream();
     return stream->TransferToDevice(src, dst, wait_for);
   }
   std::shared_ptr<Event> TransferFromDevice(
       const BufferHandle* src, void* dst,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto* stream = static_cast<const GrpcBufferHandle*>(src)->stream();
     return stream->TransferFromDevice(src, dst, wait_for);
   }
 
   std::shared_ptr<Event> TransferFromDeviceToDevice(
       const BufferHandle* src, BufferHandle* dst,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto* stream = static_cast<const GrpcBufferHandle*>(src)->stream();
     return stream->TransferFromDeviceToDevice(src, dst, wait_for);
   }
 
   std::unique_ptr<CompiledProgramHandle> CompileProgram(
       const xla::HloProto& source, int32_t num_replicas,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     // Always compile using the first/default core's stream.
     return streams_[0]->CompileProgram(source, num_replicas, wait_for);
   }
   std::unique_ptr<LoadedProgramHandle> LoadProgram(
       int32_t core_id, const CompiledProgramHandle* handle,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     return streams_[core_id]->LoadProgram(core_id, handle, wait_for);
   }
   std::shared_ptr<Event> UnloadProgram(
       std::unique_ptr<LoadedProgramHandle> handle,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto* stream =
         static_cast<const GrpcLoadedProgramHandle*>(handle.get())->stream();
     return stream->UnloadProgram(std::move(handle), wait_for);
   }
   std::shared_ptr<Event> ExecuteProgram(
-      LoadedProgramHandle* program, absl::Span<BufferHandle* const> inputs,
-      absl::Span<BufferHandle* const> outputs,
+      LoadedProgramHandle* program, abslx::Span<BufferHandle* const> inputs,
+      abslx::Span<BufferHandle* const> outputs,
       const xla::DeviceAssignmentProto& device_assignment,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto* stream =
         static_cast<const GrpcLoadedProgramHandle*>(program)->stream();
     return stream->ExecuteProgram(program, inputs, outputs, device_assignment,
@@ -433,7 +433,7 @@ class GrpcTpuDriver : public TpuDriver {
   std::shared_ptr<::grpc::ChannelCredentials> creds_;
   const uint32_t client_id_;
   // Map from stream IDs to streams.
-  absl::flat_hash_map<int32_t, std::unique_ptr<GrpcTpuStream>> streams_;
+  abslx::flat_hash_map<int32_t, std::unique_ptr<GrpcTpuStream>> streams_;
   std::unique_ptr<GrpcTpuStream> host_stream_;
   // Shared by all streams.
   std::atomic<uint64_t> operation_id_{0};
@@ -443,11 +443,11 @@ class GrpcTpuDriver : public TpuDriver {
 GrpcEvent::~GrpcEvent() { stream_->DeleteEvent(id_); }
 
 Status GrpcEvent::Await() {
-  auto opt_status = stream_->WaitForEvent(id_, absl::InfiniteDuration());
+  auto opt_status = stream_->WaitForEvent(id_, abslx::InfiniteDuration());
   return opt_status.value();
 }
 
-std::optional<Status> GrpcEvent::AwaitWithTimeout(absl::Duration duration) {
+std::optional<Status> GrpcEvent::AwaitWithTimeout(abslx::Duration duration) {
   return stream_->WaitForEvent(id_, duration);
 }
 
@@ -466,14 +466,14 @@ GrpcTpuStream::GrpcTpuStream(int32_t id, GrpcTpuDriver* driver,
 
 GrpcTpuStream::~GrpcTpuStream() {
   {
-    absl::MutexLock lock(&request_lock_);
+    abslx::MutexLock lock(&request_lock_);
     shutting_down_ = true;
   }
 
   VLOG(1) << "Shutting down stream.";
   {
     // Mark all remaining events invalid.
-    absl::MutexLock lock(&events_mutex_);
+    abslx::MutexLock lock(&events_mutex_);
     for (const auto& e : events_) {
       if (!e.second.done) {
         LOG(ERROR) << "Resetting: " << e.first;
@@ -492,7 +492,7 @@ GrpcTpuStream::~GrpcTpuStream() {
 }
 
 void GrpcTpuStream::InitializeRequest(StreamRequest::Entry* req,
-                                      absl::Span<Event* const> wait_for) {
+                                      abslx::Span<Event* const> wait_for) {
   auto operation_id = driver_->NewOperationId();
   EventInfo event_info;
 
@@ -508,7 +508,7 @@ void GrpcTpuStream::InitializeRequest(StreamRequest::Entry* req,
     }
   }
 
-  absl::MutexLock lock(&events_mutex_);
+  abslx::MutexLock lock(&events_mutex_);
   events_[operation_id] = event_info;
 }
 
@@ -550,7 +550,7 @@ void GrpcTpuStream::UpdateEventStatus(EventId id, Status status) {
 }
 
 void GrpcTpuStream::DeleteEvent(EventId id) {
-  absl::MutexLock lock(&events_mutex_);
+  abslx::MutexLock lock(&events_mutex_);
   auto it = events_.find(id);
   CHECK(it != events_.end());
   CHECK(!it->second.deleted);
@@ -562,7 +562,7 @@ void GrpcTpuStream::DeleteEvent(EventId id) {
 }
 
 std::optional<Status> GrpcTpuStream::WaitForEvent(EventId id,
-                                                  absl::Duration duration) {
+                                                  abslx::Duration duration) {
   events_mutex_.Lock();
   auto it = events_.find(id);
 
@@ -573,7 +573,7 @@ std::optional<Status> GrpcTpuStream::WaitForEvent(EventId id,
   }
 
   if (!it->second.all_deps_done) {
-    absl::InlinedVector<EventId, 2> deps = it->second.deps;
+    abslx::InlinedVector<EventId, 2> deps = it->second.deps;
     events_mutex_.Unlock();
     for (auto dep : deps) {
       // If a requirement event timed out, no point in any further waiting.
@@ -596,7 +596,7 @@ std::optional<Status> GrpcTpuStream::WaitForEvent(EventId id,
     events_mutex_.AssertHeld();
     return !events_.contains(id) || events_[id].done;
   };
-  if (events_mutex_.AwaitWithTimeout(absl::Condition(&done), duration)) {
+  if (events_mutex_.AwaitWithTimeout(abslx::Condition(&done), duration)) {
     auto status = events_.contains(id) ? events_[id].status : OkStatus();
     events_mutex_.Unlock();
     return status;
@@ -607,7 +607,7 @@ std::optional<Status> GrpcTpuStream::WaitForEvent(EventId id,
 
 void GrpcTpuStream::AddEventCallback(EventId id,
                                      std::function<void(Status)> callback) {
-  absl::MutexLock lock(&events_mutex_);
+  abslx::MutexLock lock(&events_mutex_);
   auto it = events_.find(id);
   if (it == events_.end()) {
     callback(Status());
@@ -627,7 +627,7 @@ static bool ShouldBeginWriting(int64_t* pending_requests) {
 void GrpcTpuStream::StreamWriterFn() {
   while (true) {
     request_lock_.LockWhenWithTimeout(
-        absl::Condition(&ShouldBeginWriting, &num_pending_requests_),
+        abslx::Condition(&ShouldBeginWriting, &num_pending_requests_),
         kWriteEpochDuration);
     if (shutting_down_) {
       request_lock_.Unlock();
@@ -676,18 +676,18 @@ void GrpcTpuStream::StreamReaderFn() {
       TraceMe activity("GrpcTpuStream::RequestComplete");
       if (entry.has_transfer_from()) {
         TraceMe activity("GrpcTpuStream::TransferFromComplete");
-        absl::MutexLock lock(&transfers_mutex_);
+        abslx::MutexLock lock(&transfers_mutex_);
         auto it = transfers_.find(event_id);
         CHECK(it != transfers_.end());
         VLOG(1) << "Copying: " << it->second.num_bytes << " to position "
                 << it->second.dst;
         if (entry.transfer_from().data().size() != it->second.num_bytes) {
-          absl::MutexLock lock(&events_mutex_);
+          abslx::MutexLock lock(&events_mutex_);
           UpdateEventStatus(
               event_id,
               Status(
                   tensorflow::error::Code::DATA_LOSS,
-                  absl::StrCat("Expected ", it->second.num_bytes, " received ",
+                  abslx::StrCat("Expected ", it->second.num_bytes, " received ",
                                entry.transfer_from().data().size())));
           continue;
         }
@@ -697,13 +697,13 @@ void GrpcTpuStream::StreamReaderFn() {
 
       if (entry.has_compile()) {
         TraceMe activity("GrpcTpuStream::CompileComplete");
-        absl::MutexLock lock(&compiles_mutex_);
+        abslx::MutexLock lock(&compiles_mutex_);
         auto it = compiles_.find(event_id);
         CHECK(it != compiles_.end());
         *it->second.compiled_metadata = entry.compile().metadata();
       }
 
-      absl::MutexLock lock(&events_mutex_);
+      abslx::MutexLock lock(&events_mutex_);
       if (entry.status().code() != tensorflow::error::Code::OK) {
         UpdateEventStatus(
             event_id,
@@ -718,7 +718,7 @@ void GrpcTpuStream::StreamReaderFn() {
 
 std::unique_ptr<BufferHandle> GrpcTpuStream::Allocate(
     int32_t core_id, MemoryRegion region, int64_t num_bytes,
-    absl::Span<Event* const> wait_for) {
+    abslx::Span<Event* const> wait_for) {
   auto req = std::make_unique<StreamRequest::Entry>();
   InitializeRequest(req.get(), wait_for);
   TraceMe activity("GrpcTpuStream::Allocate(num_bytes)");
@@ -734,7 +734,7 @@ std::unique_ptr<BufferHandle> GrpcTpuStream::Allocate(
 
 std::unique_ptr<BufferHandle> GrpcTpuStream::Allocate(
     int32_t core_id, MemoryRegion region, const xla::ShapeProto& shape,
-    absl::Span<Event* const> wait_for) {
+    abslx::Span<Event* const> wait_for) {
   auto req = std::make_unique<StreamRequest::Entry>();
   InitializeRequest(req.get(), wait_for);
   TraceMe activity("GrpcTpuStream::Allocate(shape)");
@@ -750,8 +750,8 @@ std::unique_ptr<BufferHandle> GrpcTpuStream::Allocate(
 
 std::unique_ptr<BufferHandle> GrpcTpuStream::AllocateTuple(
     int32_t core_id, MemoryRegion region,
-    absl::Span<BufferHandle* const> children,
-    absl::Span<Event* const> wait_for) {
+    abslx::Span<BufferHandle* const> children,
+    abslx::Span<Event* const> wait_for) {
   auto req = std::make_unique<StreamRequest::Entry>();
   InitializeRequest(req.get(), wait_for);
   TraceMe activity("GrpcTpuStream::AllocateTuple");
@@ -768,7 +768,7 @@ std::unique_ptr<BufferHandle> GrpcTpuStream::AllocateTuple(
 }
 
 std::shared_ptr<Event> GrpcTpuStream::Deallocate(
-    std::unique_ptr<BufferHandle> handle, absl::Span<Event* const> wait_for) {
+    std::unique_ptr<BufferHandle> handle, abslx::Span<Event* const> wait_for) {
   auto req = std::make_unique<StreamRequest::Entry>();
   InitializeRequest(req.get(), wait_for);
   TraceMe activity("GrpcTpuStream::Deallocate");
@@ -781,7 +781,7 @@ std::shared_ptr<Event> GrpcTpuStream::Deallocate(
 }
 
 std::shared_ptr<Event> GrpcTpuStream::TransferToDevice(
-    const void* src, BufferHandle* dst, absl::Span<Event* const> wait_for) {
+    const void* src, BufferHandle* dst, abslx::Span<Event* const> wait_for) {
   auto req = std::make_unique<StreamRequest::Entry>();
   InitializeRequest(req.get(), wait_for);
   TraceMe activity("GrpcTpuStream::TransferToDevice");
@@ -796,7 +796,7 @@ std::shared_ptr<Event> GrpcTpuStream::TransferToDevice(
 }
 
 std::shared_ptr<Event> GrpcTpuStream::TransferFromDevice(
-    const BufferHandle* src, void* dst, absl::Span<Event* const> wait_for) {
+    const BufferHandle* src, void* dst, abslx::Span<Event* const> wait_for) {
   auto req = std::make_unique<StreamRequest::Entry>();
   InitializeRequest(req.get(), wait_for);
   TraceMe activity("GrpcTpuStream::TransferFromDevice");
@@ -804,7 +804,7 @@ std::shared_ptr<Event> GrpcTpuStream::TransferFromDevice(
       static_cast<const GrpcBufferHandle*>(src)->id().AsInt());
   EventId event_id = EventId::FromInt(req->operation_id());
   {
-    absl::MutexLock lock(&transfers_mutex_);
+    abslx::MutexLock lock(&transfers_mutex_);
     TransferInfo info(dst, const_cast<BufferHandle*>(src)->size_in_bytes());
     transfers_.insert(std::make_pair(event_id, info));
   }
@@ -815,11 +815,11 @@ std::shared_ptr<Event> GrpcTpuStream::TransferFromDevice(
 
 std::shared_ptr<Event> GrpcTpuStream::TransferFromDeviceToDevice(
     const BufferHandle* src, BufferHandle* dst,
-    absl::Span<Event* const> wait_for) {
+    abslx::Span<Event* const> wait_for) {
   auto req = std::make_unique<StreamRequest::Entry>();
   InitializeRequest(req.get(), wait_for);
   TraceMe activity([&req] {
-    return absl::StrCat("GrpcTpuStream::TransferFromDeviceToDevice",
+    return abslx::StrCat("GrpcTpuStream::TransferFromDeviceToDevice",
                         req->operation_id());
   });
 
@@ -835,7 +835,7 @@ std::shared_ptr<Event> GrpcTpuStream::TransferFromDeviceToDevice(
 
 std::unique_ptr<CompiledProgramHandle> GrpcTpuStream::CompileProgram(
     const xla::HloProto& source, int32_t num_replicas,
-    absl::Span<Event* const> wait_for) {
+    abslx::Span<Event* const> wait_for) {
   auto req = std::make_unique<StreamRequest::Entry>();
   InitializeRequest(req.get(), wait_for);
   TraceMe activity("GrpcTpuStream::CompileProgram");
@@ -849,7 +849,7 @@ std::unique_ptr<CompiledProgramHandle> GrpcTpuStream::CompileProgram(
   auto handle = std::make_unique<GrpcCompiledProgramHandle>(event->id(),
                                                             std::move(event));
   {
-    absl::MutexLock lock(&compiles_mutex_);
+    abslx::MutexLock lock(&compiles_mutex_);
     CompileMetadataInfo info(handle->metadata());
     compiles_.insert(std::make_pair(event_id, info));
   }
@@ -860,7 +860,7 @@ std::unique_ptr<CompiledProgramHandle> GrpcTpuStream::CompileProgram(
 
 std::unique_ptr<LoadedProgramHandle> GrpcTpuStream::LoadProgram(
     int32_t core_id, const CompiledProgramHandle* handle,
-    absl::Span<Event* const> wait_for) {
+    abslx::Span<Event* const> wait_for) {
   auto req = std::make_unique<StreamRequest::Entry>();
   InitializeRequest(req.get(), wait_for);
   TraceMe activity("GrpcTpuStream::LoadProgram");
@@ -883,7 +883,7 @@ std::unique_ptr<LoadedProgramHandle> GrpcTpuStream::LoadProgram(
 
 std::shared_ptr<Event> GrpcTpuStream::UnloadProgram(
     std::unique_ptr<LoadedProgramHandle> handle,
-    absl::Span<Event* const> wait_for) {
+    abslx::Span<Event* const> wait_for) {
   auto req = std::make_unique<StreamRequest::Entry>();
   InitializeRequest(req.get(), wait_for);
   TraceMe activity("GrpcTpuStream::UnloadProgram");
@@ -896,10 +896,10 @@ std::shared_ptr<Event> GrpcTpuStream::UnloadProgram(
 }
 
 std::shared_ptr<Event> GrpcTpuStream::ExecuteProgram(
-    LoadedProgramHandle* program, absl::Span<BufferHandle* const> inputs,
-    absl::Span<BufferHandle* const> outputs,
+    LoadedProgramHandle* program, abslx::Span<BufferHandle* const> inputs,
+    abslx::Span<BufferHandle* const> outputs,
     const xla::DeviceAssignmentProto& device_assignment,
-    absl::Span<Event* const> wait_for) {
+    abslx::Span<Event* const> wait_for) {
   auto req = std::make_unique<StreamRequest::Entry>();
   InitializeRequest(req.get(), wait_for);
   auto program_handle = static_cast<GrpcLoadedProgramHandle*>(program);
@@ -980,7 +980,7 @@ GrpcTpuDriver::CreateTpuDriverStub(
   args.SetChannelArgs(&client_args);
 
   // strips out 'grpc://'
-  auto worker_addr = absl::StripPrefix(config.worker(), kGrpcProtocol);
+  auto worker_addr = abslx::StripPrefix(config.worker(), kGrpcProtocol);
   std::shared_ptr<::grpc::Channel> channel =
       ::grpc::CreateCustomChannel(std::string(worker_addr), creds, args);
   return grpc::CloudTpuDriver::NewStub(channel);
@@ -1025,7 +1025,7 @@ Status GrpcTpuDriver::Reset() {
                << ": " << status.error_message() << ": "
                << status.error_details();
     return xla::Status(tensorflow::error::Code(status.error_code()),
-                       absl::StrCat("Failed to reset TPU driver. Error was: ",
+                       abslx::StrCat("Failed to reset TPU driver. Error was: ",
                                     status.error_message(),
                                     ". Details: ", status.error_details()));
   }
@@ -1045,7 +1045,7 @@ Status GrpcTpuDriver::Close() {
   ::grpc::Status status = stub->Close(&ctx, req, &resp);
   if (!status.ok()) {
     return xla::Status(tensorflow::error::Code(status.error_code()),
-                       absl::StrCat("Failed to close TPU driver. Error was: ",
+                       abslx::StrCat("Failed to close TPU driver. Error was: ",
                                     status.error_message(),
                                     ". Details: ", status.error_details()));
   }
@@ -1072,7 +1072,7 @@ xla::StatusOr<std::unique_ptr<TpuDriver>> CreateGrpcTpuDriver(
                << status.error_details();
     return xla::Status(
         tensorflow::error::Code(status.error_code()),
-        absl::StrCat(
+        abslx::StrCat(
             "Failed to connect to remote server at address: ", config.worker(),
             ". Error from gRPC: ", status.error_message(),
             ". Details: ", status.error_details()));
@@ -1085,7 +1085,7 @@ REGISTER_TPU_DRIVER(
     "grpc://",
     [](const TpuDriverConfig& config)
         -> xla::StatusOr<std::unique_ptr<TpuDriver>> {
-      if (absl::StartsWith(config.worker(), "grpc://localhost")) {
+      if (abslx::StartsWith(config.worker(), "grpc://localhost")) {
         LOG(INFO) << "Using local credentials for localhost: connection.";
         return CreateGrpcTpuDriver(
             config, ::grpc::experimental::LocalCredentials(LOCAL_TCP));

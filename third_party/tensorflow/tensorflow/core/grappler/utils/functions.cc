@@ -155,7 +155,7 @@ bool IsParametrized(const FunctionDef& func) {
 
 Status InstantiationTypeParameters(
     const FunctionDef& func, const AttrSlice& func_instantiation_attr,
-    absl::flat_hash_map<string, DataType>* type_parameters) {
+    abslx::flat_hash_map<string, DataType>* type_parameters) {
   if (!type_parameters->empty()) {
     return errors::InvalidArgument("Type parameters output map must be empty");
   }
@@ -173,7 +173,7 @@ Status InstantiationTypeParameters(
           GetNodeAttr(func_instantiation_attr, arg.type_list_attr(), &dtypes));
       int index = 0;
       for (const DataType& dtype : dtypes) {
-        type_parameters->emplace(absl::StrCat(arg.type_list_attr(), ":", index),
+        type_parameters->emplace(abslx::StrCat(arg.type_list_attr(), ":", index),
                                  dtype);
         ++index;
       }
@@ -191,7 +191,7 @@ Status InstantiationTypeParameters(
 
 Status InstantiationBodyParameters(
     const FunctionDef& func, const AttrSlice& func_instantiation_attr,
-    absl::flat_hash_map<string, AttrValue>* body_parameters) {
+    abslx::flat_hash_map<string, AttrValue>* body_parameters) {
   if (!body_parameters->empty()) {
     return errors::InvalidArgument("Body parameters output map must be empty");
   }
@@ -250,7 +250,7 @@ Status MakeGrapplerFunctionItem(const FunctionDef& func,
   // not need a full copy of the function library, just the reachable subset.
   *function_body.mutable_library() = flib.ReachableDefinitions(func).ToProto();
 
-  VLOG(3) << absl::Substitute(
+  VLOG(3) << abslx::Substitute(
       "Deleted $0 unreachable functions from the Grappler function item "
       "instantiation of $1 (library size = $2)",
       flib.num_functions() - function_body.library().function_size(),
@@ -352,7 +352,7 @@ Status ReplaceInputWithConst(const NodeDef& input_const, int input_index,
   return OkStatus();
 }
 
-Status RemoveFunctionOutputs(const absl::flat_hash_set<int>& remove_outputs,
+Status RemoveFunctionOutputs(const abslx::flat_hash_set<int>& remove_outputs,
                              GrapplerFunctionItem* item,
                              std::vector<std::pair<int, int>>* output_mapping) {
   DCHECK(output_mapping->empty());
@@ -367,7 +367,7 @@ Status RemoveFunctionOutputs(const absl::flat_hash_set<int>& remove_outputs,
     }
   }
 
-  absl::flat_hash_set<const OutputArgInstantiation*> remove_output_args;
+  abslx::flat_hash_set<const OutputArgInstantiation*> remove_output_args;
   const auto is_remove_output_arg = [&](const OutputArgInstantiation& output) {
     return remove_output_args.find(&output) != remove_output_args.end();
   };
@@ -438,10 +438,10 @@ class MakeFunctionDefHelper {
   }
 
  private:
-  absl::flat_hash_set<absl::string_view> input_nodes_;
-  absl::flat_hash_set<absl::string_view> output_nodes_;
+  abslx::flat_hash_set<abslx::string_view> input_nodes_;
+  abslx::flat_hash_set<abslx::string_view> output_nodes_;
   // Mapping from function body node name to output names range map.
-  absl::flat_hash_map<string, tensorflow::NameRangeMap> function_body_outputs_;
+  abslx::flat_hash_map<string, tensorflow::NameRangeMap> function_body_outputs_;
 };
 
 Status MakeFunctionDefHelper::Initialize(
@@ -495,7 +495,7 @@ Status MakeFunctionDefHelper::AsFunctionDefInput(const string& graph_def_input,
       const auto& output_range = el.second;
       if (tensor.index() >= output_range.first &&
           tensor.index() < output_range.second) {
-        *func_def_input = absl::StrCat(tensor.node(), ":", output_name, ":",
+        *func_def_input = abslx::StrCat(tensor.node(), ":", output_name, ":",
                                        tensor.index() - output_range.first);
         return OkStatus();
       }
@@ -531,7 +531,7 @@ Status MakeFunctionDef(const GrapplerFunctionItem& item,
   TF_RETURN_IF_ERROR(helper.Initialize(item, flib));
 
   // Mapping from the '_Retval' node name to the output tensor.
-  absl::flat_hash_map<absl::string_view, string> output_tensors;
+  abslx::flat_hash_map<abslx::string_view, string> output_tensors;
   for (const NodeDef& func_body_node : item.function_body().node()) {
     if (!helper.IsOutputNode(func_body_node)) continue;
     if (func_body_node.input_size() != 1) {
@@ -552,7 +552,7 @@ Status MakeFunctionDef(const GrapplerFunctionItem& item,
   // Add function output arguments.
   for (const OutputArgInstantiation& output_arg : item.outputs()) {
     const string output_name =
-        absl::StrReplaceAll(output_arg.node_name, {{"_RetVal", ""}});
+        abslx::StrReplaceAll(output_arg.node_name, {{"_RetVal", ""}});
 
     OpDef::ArgDef arg_def;
     arg_def.set_name(output_name);

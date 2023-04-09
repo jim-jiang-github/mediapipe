@@ -26,7 +26,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status ReLUNoClipNoAlphaTest(TestExecutionEnvironment* env) {
+abslx::Status ReLUNoClipNoAlphaTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {-0.5f, 0.8f, -0.6f, 3.2f};
@@ -52,10 +52,10 @@ absl::Status ReLUNoClipNoAlphaTest(TestExecutionEnvironment* env) {
           PointWiseNear({0.0f, 0.8f, 0.0f, 3.2f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ReLUClipTest(TestExecutionEnvironment* env) {
+abslx::Status ReLUClipTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {-0.5f, 0.8f, -0.6f, 3.2f};
@@ -81,10 +81,10 @@ absl::Status ReLUClipTest(TestExecutionEnvironment* env) {
           PointWiseNear({0.0f, 0.8f, 0.0f, 0.9f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ReLUAlphaTest(TestExecutionEnvironment* env) {
+abslx::Status ReLUAlphaTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {-0.5f, 0.8f, -0.6f, 3.2f};
@@ -110,10 +110,10 @@ absl::Status ReLUAlphaTest(TestExecutionEnvironment* env) {
           PointWiseNear({-0.25f, 0.8f, -0.3f, 3.2f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ReLUAlphaClipTest(TestExecutionEnvironment* env) {
+abslx::Status ReLUAlphaClipTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {-0.5f, 0.8f, -0.6f, 3.2f};
@@ -139,7 +139,7 @@ absl::Status ReLUAlphaClipTest(TestExecutionEnvironment* env) {
           PointWiseNear({-0.25f, 0.5f, -0.3f, 0.5f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

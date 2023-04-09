@@ -32,7 +32,7 @@ namespace {
 
 class Tile : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     std::string code = R"(
       for (int i = 0; i < 4; ++i) {
@@ -58,7 +58,7 @@ class Tile : public NodeShader {
         /*input=*/IOStructure::ONLY_DEFINITIONS,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 }  // namespace

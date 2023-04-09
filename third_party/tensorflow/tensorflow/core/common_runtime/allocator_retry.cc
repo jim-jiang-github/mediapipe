@@ -42,7 +42,7 @@ class ScopedTimeTracker {
 
  private:
   Env* env_;
-  absl::optional<uint64> start_us_;
+  abslx::optional<uint64> start_us_;
 };
 }  // namespace
 

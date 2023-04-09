@@ -40,8 +40,8 @@ class UnifiedAPI
 
 // Checks that inputs[0] is a scalar.
 Status TestScalarShape(AbstractContext* ctx,
-                       absl::Span<AbstractTensorHandle* const> inputs,
-                       absl::Span<AbstractTensorHandle*> outputs) {
+                       abslx::Span<AbstractTensorHandle* const> inputs,
+                       abslx::Span<AbstractTensorHandle*> outputs) {
   PartialTensorShape shape;
   TF_RETURN_IF_ERROR(inputs[0]->Shape(&shape));
   if (shape.dims() != 0) {
@@ -82,8 +82,8 @@ TEST_P(UnifiedAPI, TestTensorShapeScalar) {
 
 // Checks that inputs[0] is a matrix with shape 2x4.
 Status TestTensorShape2x4(AbstractContext* ctx,
-                          absl::Span<AbstractTensorHandle* const> inputs,
-                          absl::Span<AbstractTensorHandle*> outputs) {
+                          abslx::Span<AbstractTensorHandle* const> inputs,
+                          abslx::Span<AbstractTensorHandle*> outputs) {
   PartialTensorShape shape;
   TF_RETURN_IF_ERROR(inputs[0]->Shape(&shape));
   if (shape.dims() != 2) {

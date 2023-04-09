@@ -2582,7 +2582,7 @@ ENTRY Entry {
 }
 
 TEST_F(CopyInsertionTest, DynamicUpdateSliceNoCopy) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule Module
 
 ENTRY main {
@@ -2601,7 +2601,7 @@ ENTRY main {
 }
 
 TEST_F(CopyInsertionTest, FusedDynamicUpdateSliceNoCopy) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule Module
 
 fused_computation {
@@ -2625,7 +2625,7 @@ ENTRY main {
 }
 
 TEST_F(CopyInsertionTest, DynamicUpdateSliceCopy) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule Module
 
 ENTRY main {
@@ -2646,7 +2646,7 @@ ENTRY main {
 }
 
 TEST_F(CopyInsertionTest, DynamicUpdateSliceParameterShareCopy) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule Module
 
 ENTRY main {
@@ -2664,7 +2664,7 @@ ENTRY main {
 }
 
 TEST_F(CopyInsertionTest, FusedDynamicUpdateSliceCopy) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule Module
 
 fused_computation {
@@ -2690,7 +2690,7 @@ ENTRY main {
 }
 
 TEST_F(CopyInsertionTest, ChainDynamicUpdateSliceCopy) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule Module
 
 ENTRY main {
@@ -2714,7 +2714,7 @@ ENTRY main {
 }
 
 TEST_F(CopyInsertionTest, FusedDynamicUpdateSliceCopy2) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule Module
 
 fused_computation.1 {
@@ -2749,7 +2749,7 @@ ENTRY main {
 
 TEST_F(CopyInsertionTest, MultiOutputFusedDynamicUpdateSliceCopy) {
   // Tests multi-output fusion with two DUS outputs, requiring two copies.
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule Module
 
 fused_computation {
@@ -2789,7 +2789,7 @@ ENTRY main {
 TEST_F(CopyInsertionTest, MultiOutputFusedDynamicUpdateSliceNoCopy) {
   // Same as above, but negate1 is not used beyond fusion, so it only needs one
   // copy for negate0.
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule Module
 
 fused_computation {
@@ -2829,7 +2829,7 @@ ENTRY main {
 TEST_F(CopyInsertionTest, ScatterSharedOperand) {
   // If an in-place op has an additional operand that has the same value as the
   // in-place buffer, a copy needs to be inserted on one of these values only.
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule Module
 
 update_s32 {
@@ -3205,7 +3205,7 @@ ENTRY entry {
 }
 
 TEST_F(CopyInsertionTest, InPlaceCollectivePermuteCopy) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule hlo_runner_test_0.1
 ENTRY hlo_runner_test_0.1 {
     replica_id = u32[] replica-id()
@@ -3239,7 +3239,7 @@ ENTRY hlo_runner_test_0.1 {
 }
 
 TEST_F(CopyInsertionTest, KeepCopyOfBroadcast) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule Module
 
 ENTRY main {

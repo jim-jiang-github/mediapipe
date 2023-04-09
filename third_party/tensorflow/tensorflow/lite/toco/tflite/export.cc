@@ -448,9 +448,9 @@ void ParseControlFlowErrors(std::set<std::string>* custom_ops,
     }
   }
   if (!unsupported_control_flow_ops.empty()) {
-    error_msgs->push_back(absl::StrCat(
+    error_msgs->push_back(abslx::StrCat(
         "TensorFlow Lite currently doesn't support control flow ops: ",
-        absl::StrJoin(unsupported_control_flow_ops, ", "), ".",
+        abslx::StrJoin(unsupported_control_flow_ops, ", "), ".",
         " We are working on supporting control flow ops, please see github "
         "issue at "
         "https://github.com/tensorflow/tensorflow/issues/28485."));
@@ -488,7 +488,7 @@ tensorflow::Status Export(
   for (const std::string& input_array : model.GetInvalidInputArrays()) {
     if (model.HasArray(input_array)) {
       return tensorflow::errors::InvalidArgument(
-          absl::StrCat("Placeholder ", input_array,
+          abslx::StrCat("Placeholder ", input_array,
                        " should be specified by "
                        "input_arrays."));
     }
@@ -572,7 +572,7 @@ tensorflow::Status Export(
 
       if (!custom_ops_final.empty()) {
         if (params.enable_select_tf_ops) {
-          error_msgs.push_back(absl::StrCat(
+          error_msgs.push_back(abslx::StrCat(
               "Some of the operators in the model are not supported by "
               "the standard TensorFlow Lite runtime and are not recognized "
               "by "
@@ -581,12 +581,12 @@ tensorflow::Status Export(
               "--allow_custom_ops, or by setting allow_custom_ops=True "
               "when calling tf.lite.TFLiteConverter(). Here is a list "
               "of builtin operators you are using: ",
-              absl::StrJoin(builtin_ops, ", "),
+              abslx::StrJoin(builtin_ops, ", "),
               ". Here is a list "
               "of operators for which you will need custom implementations: ",
-              absl::StrJoin(custom_ops_final, ", "), "."));
+              abslx::StrJoin(custom_ops_final, ", "), "."));
         } else {
-          error_msgs.push_back(absl::StrCat(
+          error_msgs.push_back(abslx::StrCat(
               "Some of the operators in the model are not supported by "
               "the standard TensorFlow Lite runtime. If those are native "
               "TensorFlow operators, you might be able to use the extended "
@@ -598,24 +598,24 @@ tensorflow::Status Export(
               "--allow_custom_ops, or by setting allow_custom_ops=True "
               "when calling tf.lite.TFLiteConverter(). Here is a list "
               "of builtin operators you are using: ",
-              absl::StrJoin(builtin_ops, ", "),
+              abslx::StrJoin(builtin_ops, ", "),
               ". Here is a list "
               "of operators for which you will need custom implementations: ",
-              absl::StrJoin(custom_ops_final, ", "), "."));
+              abslx::StrJoin(custom_ops_final, ", "), "."));
         }
       }
       if (!error_msgs.empty()) {
-        return tensorflow::errors::InvalidArgument(absl::StrCat(
-            please_report_bug_message(), absl::StrJoin(error_msgs, " ")));
+        return tensorflow::errors::InvalidArgument(abslx::StrCat(
+            please_report_bug_message(), abslx::StrJoin(error_msgs, " ")));
       }
     }
   }
 
   if (!unsupported_flex_ops.empty()) {
     return tensorflow::errors::InvalidArgument(
-        absl::StrCat("Some of the operators in the model are not supported by "
+        abslx::StrCat("Some of the operators in the model are not supported by "
                      "TensorFlow Flex runtime: ",
-                     absl::StrJoin(unsupported_flex_ops, ", "), "."));
+                     abslx::StrJoin(unsupported_flex_ops, ", "), "."));
   }
 
   std::set<int32_t> variable_tensor_indices;

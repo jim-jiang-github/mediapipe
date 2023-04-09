@@ -82,11 +82,11 @@ class DetectionsToRenderDataCalculator : public CalculatorBase {
   DetectionsToRenderDataCalculator& operator=(
       const DetectionsToRenderDataCalculator&) = delete;
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
 
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   // These utility methods are supposed to be used only by this class. No
@@ -122,7 +122,7 @@ class DetectionsToRenderDataCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(DetectionsToRenderDataCalculator);
 
-absl::Status DetectionsToRenderDataCalculator::GetContract(
+abslx::Status DetectionsToRenderDataCalculator::GetContract(
     CalculatorContract* cc) {
   RET_CHECK(cc->Inputs().HasTag(kDetectionListTag) ||
             cc->Inputs().HasTag(kDetectionsTag) ||
@@ -139,16 +139,16 @@ absl::Status DetectionsToRenderDataCalculator::GetContract(
     cc->Inputs().Tag(kDetectionsTag).Set<std::vector<Detection>>();
   }
   cc->Outputs().Tag(kRenderDataTag).Set<RenderData>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status DetectionsToRenderDataCalculator::Open(CalculatorContext* cc) {
+abslx::Status DetectionsToRenderDataCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status DetectionsToRenderDataCalculator::Process(CalculatorContext* cc) {
+abslx::Status DetectionsToRenderDataCalculator::Process(CalculatorContext* cc) {
   const auto& options = cc->Options<DetectionsToRenderDataCalculatorOptions>();
   const bool has_detection_from_list =
       cc->Inputs().HasTag(kDetectionListTag) && !cc->Inputs()
@@ -163,12 +163,12 @@ absl::Status DetectionsToRenderDataCalculator::Process(CalculatorContext* cc) {
                                     !cc->Inputs().Tag(kDetectionTag).IsEmpty();
   if (!options.produce_empty_packet() && !has_detection_from_list &&
       !has_detection_from_vector && !has_single_detection) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // TODO: Add score threshold to
   // DetectionsToRenderDataCalculatorOptions.
-  auto render_data = absl::make_unique<RenderData>();
+  auto render_data = abslx::make_unique<RenderData>();
   render_data->set_scene_class(options.scene_class());
   if (has_detection_from_list) {
     for (const auto& detection :
@@ -189,7 +189,7 @@ absl::Status DetectionsToRenderDataCalculator::Process(CalculatorContext* cc) {
   cc->Outputs()
       .Tag(kRenderDataTag)
       .Add(render_data.release(), cc->InputTimestamp());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void DetectionsToRenderDataCalculator::SetRenderAnnotationColorThickness(
@@ -246,27 +246,27 @@ void DetectionsToRenderDataCalculator::AddLabels(
   std::vector<std::string> label_and_scores = {};
   for (int i = 0; i < num_labels; ++i) {
     std::string label_str = detection.label().empty()
-                                ? absl::StrCat(detection.label_id(i))
+                                ? abslx::StrCat(detection.label_id(i))
                                 : detection.label(i);
     const float rounded_score =
         std::round(detection.score(i) * kNumScoreDecimalDigitsMultipler) /
         kNumScoreDecimalDigitsMultipler;
     std::string label_and_score =
-        absl::StrCat(label_str, options.text_delimiter(), rounded_score,
+        abslx::StrCat(label_str, options.text_delimiter(), rounded_score,
                      options.text_delimiter());
     label_and_scores.push_back(label_and_score);
   }
   std::vector<std::string> labels;
   if (options.render_detection_id()) {
     const std::string detection_id_str =
-        absl::StrCat("Id: ", detection.detection_id());
+        abslx::StrCat("Id: ", detection.detection_id());
     labels.push_back(detection_id_str);
   }
   if (options.one_label_per_line()) {
     labels.insert(labels.end(), label_and_scores.begin(),
                   label_and_scores.end());
   } else {
-    labels.push_back(absl::StrJoin(label_and_scores, ""));
+    labels.push_back(abslx::StrJoin(label_and_scores, ""));
   }
   // Add the render annotations for "label(_id),score".
   for (int i = 0; i < labels.size(); ++i) {

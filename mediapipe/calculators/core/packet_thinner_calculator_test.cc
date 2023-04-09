@@ -50,13 +50,13 @@ class SimpleRunner : public CalculatorRunner {
     MutableInputs()->Index(0).packets.clear();
     for (const int ts : timestamp_list) {
       MutableInputs()->Index(0).packets.push_back(
-          MakePacket<std::string>(absl::StrCat("Frame #", ts))
+          MakePacket<std::string>(abslx::StrCat("Frame #", ts))
               .At(Timestamp(ts)));
     }
   }
 
   void SetFrameRate(const double frame_rate) {
-    auto video_header = absl::make_unique<VideoHeader>();
+    auto video_header = abslx::make_unique<VideoHeader>();
     video_header->frame_rate = frame_rate;
     MutableInputs()->Index(0).header = Adopt(video_header.release());
   }

@@ -54,7 +54,7 @@ StatusOr<mlir::Operation*> EinsumSPMDExpander::ExpandOp(mlir::Operation* op) {
 
   std::vector<mlir::Value> new_inputs;
   Layout layout_after_einsum;
-  absl::flat_hash_set<std::string> reduce_dims;
+  abslx::flat_hash_set<std::string> reduce_dims;
   TF_RETURN_IF_ERROR(MaybeRelayoutInputs(input_layouts, op,
                                          output_layout.value(), reduce_dims,
                                          layout_after_einsum, new_inputs));
@@ -93,11 +93,11 @@ StatusOr<mlir::Operation*> EinsumSPMDExpander::ExpandOp(mlir::Operation* op) {
 //   to the tensor dimension of that label.
 // output_mapping: as above, but for the equation output.
 Status ExtractEquationRelations(
-    absl::string_view equation, absl::flat_hash_set<char>& reduced_dims,
-    std::vector<absl::flat_hash_map<char, std::vector<int>>>& input_mappings,
-    absl::flat_hash_map<char, std::vector<int>>& output_mapping) {
-  std::pair<std::string, std::string> parts = absl::StrSplit(equation, "->");
-  absl::flat_hash_set<char> non_reduced_dims;
+    abslx::string_view equation, abslx::flat_hash_set<char>& reduced_dims,
+    std::vector<abslx::flat_hash_map<char, std::vector<int>>>& input_mappings,
+    abslx::flat_hash_map<char, std::vector<int>>& output_mapping) {
+  std::pair<std::string, std::string> parts = abslx::StrSplit(equation, "->");
+  abslx::flat_hash_set<char> non_reduced_dims;
 
   // Mark kept dimensions from the output.
   for (const auto& char_and_index : llvm::enumerate(parts.second)) {
@@ -110,7 +110,7 @@ Status ExtractEquationRelations(
 
     // Construct the output mapping, note that output is not allowed to have
     // duplicate labels. This would mean that the datatype of output_mapping
-    // should really be absl::flat_hash_map<char, int>, but having the same
+    // should really be abslx::flat_hash_map<char, int>, but having the same
     // type as the input_mapping keeps GetSpecsFromLabelsAndMap simpler.
     if (output_mapping.contains(char_and_index.value()))
       return errors::InvalidArgument("received label ", char_and_index.value(),
@@ -121,7 +121,7 @@ Status ExtractEquationRelations(
     output_mapping[char_and_index.value()].emplace_back(char_and_index.index());
   }
 
-  std::vector<std::string> inputs = absl::StrSplit(parts.first, ',');
+  std::vector<std::string> inputs = abslx::StrSplit(parts.first, ',');
   // Note that the TF einsum op only supports at most 2 inputs. This is slightly
   // confusing as the tf.einsum interface actually supports > 2 inputs.
   if (inputs.size() > 2)
@@ -150,11 +150,11 @@ Status ExtractEquationRelations(
 // sharding specs we raise an error if replicate_incompatible_dimensions is
 // false. Otherwise we treat the dimension as if it were unsharded.
 // Labels with unsharded dimensions are not recorded in the output.
-StatusOr<absl::flat_hash_map<char, ShardingSpec>> GetLabelToShardingSpec(
+StatusOr<abslx::flat_hash_map<char, ShardingSpec>> GetLabelToShardingSpec(
     bool replicate_incompatible_dimensions, const std::vector<Layout>& layouts,
-    const std::vector<absl::flat_hash_map<char, std::vector<int>>>& mappings) {
-  absl::flat_hash_map<char, ShardingSpec> label_to_sharding_spec;
-  absl::flat_hash_set<char> incompatible_labels;
+    const std::vector<abslx::flat_hash_map<char, std::vector<int>>>& mappings) {
+  abslx::flat_hash_map<char, ShardingSpec> label_to_sharding_spec;
+  abslx::flat_hash_set<char> incompatible_labels;
 
   // For each mapping, identify the mesh dimension and whether it has been
   // reduced away.
@@ -205,11 +205,11 @@ StatusOr<absl::flat_hash_map<char, ShardingSpec>> GetLabelToShardingSpec(
 // multiple times. E.g. ab,bc->ac (i.e. matmul) with a and c sharded over the
 // same dim. In this case we mark all such dimensions as replicated.
 StatusOr<Layout> VerifyOrFixLayout(
-    std::pair<std::vector<ShardingSpec>, absl::flat_hash_map<std::string, int>>
+    std::pair<std::vector<ShardingSpec>, abslx::flat_hash_map<std::string, int>>
         pair,
     const Mesh& mesh) {
   std::vector<ShardingSpec> sharding_specs = pair.first;
-  absl::flat_hash_map<std::string, int> dimension_use_count = pair.second;
+  abslx::flat_hash_map<std::string, int> dimension_use_count = pair.second;
   for (int i = 0; i < sharding_specs.size(); ++i)
     if (Layout::IsShardedSpec(sharding_specs[i]) &&
         dimension_use_count[sharding_specs[i].sharding_spec()] > 1)
@@ -219,17 +219,17 @@ StatusOr<Layout> VerifyOrFixLayout(
 
 // Construct a layout on a given mesh from the label to tensor dimension map
 // and the label to mesh_dimension map.
-std::pair<std::vector<ShardingSpec>, absl::flat_hash_map<std::string, int>>
+std::pair<std::vector<ShardingSpec>, abslx::flat_hash_map<std::string, int>>
 GetSpecsFromLabelsAndMap(
-    const absl::flat_hash_map<char, std::vector<int>>& label_to_index,
-    const absl::flat_hash_map<char, ShardingSpec>& label_to_sharding_spec) {
+    const abslx::flat_hash_map<char, std::vector<int>>& label_to_index,
+    const abslx::flat_hash_map<char, ShardingSpec>& label_to_sharding_spec) {
   int layout_rank = 0;
   for (const auto& label_and_indices : label_to_index)
     layout_rank += label_and_indices.second.size();
 
   std::vector<ShardingSpec> sharding_specs(layout_rank);
-  absl::flat_hash_map<std::string, int> dimension_use_count;
-  absl::flat_hash_set<std::string> dimension_use_set;
+  abslx::flat_hash_map<std::string, int> dimension_use_count;
+  abslx::flat_hash_set<std::string> dimension_use_set;
   for (const auto& label_and_indices : label_to_index) {
     const auto& loc = label_to_sharding_spec.find(label_and_indices.first);
     if (loc != label_to_sharding_spec.end()) {
@@ -256,9 +256,9 @@ StatusOr<llvm::DenseMap<int, Layout>> EinsumSPMDExpander::ComputeLayoutForward(
   auto einsum_op = mlir::cast<mlir::TF::EinsumOp>(op);
   size_t num_inputs = einsum_op.getNumOperands();
   std::string equation = einsum_op.equation().str();
-  absl::flat_hash_set<char> reduced_dim_labels;
-  std::vector<absl::flat_hash_map<char, std::vector<int>>> input_mappings;
-  absl::flat_hash_map<char, std::vector<int>> output_mapping;
+  abslx::flat_hash_set<char> reduced_dim_labels;
+  std::vector<abslx::flat_hash_map<char, std::vector<int>>> input_mappings;
+  abslx::flat_hash_map<char, std::vector<int>> output_mapping;
 
   TF_RETURN_IF_ERROR(ExtractEquationRelations(equation, reduced_dim_labels,
                                               input_mappings, output_mapping));
@@ -311,9 +311,9 @@ StatusOr<llvm::DenseMap<int, Layout>> EinsumSPMDExpander::ComputeLayoutBackward(
   auto einsum_op = mlir::cast<mlir::TF::EinsumOp>(op);
   size_t num_inputs = einsum_op.getNumOperands();
   std::string equation = einsum_op.equation().str();
-  absl::flat_hash_set<char> reduced_dim_labels;
-  std::vector<absl::flat_hash_map<char, std::vector<int>>> input_mappings;
-  absl::flat_hash_map<char, std::vector<int>> output_mapping;
+  abslx::flat_hash_set<char> reduced_dim_labels;
+  std::vector<abslx::flat_hash_map<char, std::vector<int>>> input_mappings;
+  abslx::flat_hash_map<char, std::vector<int>> output_mapping;
 
   TF_RETURN_IF_ERROR(ExtractEquationRelations(equation, reduced_dim_labels,
                                               input_mappings, output_mapping));
@@ -332,7 +332,7 @@ StatusOr<llvm::DenseMap<int, Layout>> EinsumSPMDExpander::ComputeLayoutBackward(
   // Defines a set of labels that could be set to Any. The conditions for an
   // operand label to be set to any are that 1) is not present in the output
   // and 2) is not repeated in any operand.
-  absl::flat_hash_set<char> labels_for_any;
+  abslx::flat_hash_set<char> labels_for_any;
   for (const auto& operand_mapping : input_mappings)
     for (const auto& label_to_indices : operand_mapping)
       labels_for_any.insert(label_to_indices.first);
@@ -351,15 +351,15 @@ StatusOr<llvm::DenseMap<int, Layout>> EinsumSPMDExpander::ComputeLayoutBackward(
 
   // Derive operand sharding specs from output's sharding specs.
   for (size_t i = 0; i < num_inputs; ++i) {
-    absl::flat_hash_map<char, std::vector<int>> labels_to_indices =
+    abslx::flat_hash_map<char, std::vector<int>> labels_to_indices =
         input_mappings[i];
-    std::pair<std::vector<ShardingSpec>, absl::flat_hash_map<std::string, int>>
+    std::pair<std::vector<ShardingSpec>, abslx::flat_hash_map<std::string, int>>
         sharding_specs_and_dim_count = GetSpecsFromLabelsAndMap(
             labels_to_indices, output_label_to_sharding_spec);
 
     std::vector<ShardingSpec> sharding_specs =
         sharding_specs_and_dim_count.first;
-    absl::flat_hash_map<std::string, int> dim_count =
+    abslx::flat_hash_map<std::string, int> dim_count =
         sharding_specs_and_dim_count.second;
 
     // Flip "unsharded" specs to "any" if they are present in the set.
@@ -386,17 +386,17 @@ StatusOr<llvm::DenseMap<int, Layout>> EinsumSPMDExpander::ComputeLayoutBackward(
 //   the much smaller matrix.
 Status EinsumSPMDExpander::MaybeRelayoutInputs(
     const std::vector<Layout>& input_layouts, mlir::Operation* op,
-    const Layout& output_layout, absl::flat_hash_set<std::string>& reduce_dims,
+    const Layout& output_layout, abslx::flat_hash_set<std::string>& reduce_dims,
     Layout& einsum_layout, std::vector<mlir::Value>& new_inputs) {
   if (!mlir::isa<mlir::TF::EinsumOp>(op))
     return errors::InvalidArgument(
         "called einsum spmd expander but op is not Einsum.");
 
   mlir::TF::EinsumOp einsum = mlir::cast<mlir::TF::EinsumOp>(op);
-  std::vector<absl::flat_hash_map<char, std::vector<int>>> input_mappings;
-  absl::flat_hash_map<char, std::vector<int>> output_mapping;
-  absl::flat_hash_set<char> contracting_labels;
-  absl::flat_hash_set<char> all_labels;
+  std::vector<abslx::flat_hash_map<char, std::vector<int>>> input_mappings;
+  abslx::flat_hash_map<char, std::vector<int>> output_mapping;
+  abslx::flat_hash_set<char> contracting_labels;
+  abslx::flat_hash_set<char> all_labels;
   TF_RETURN_IF_ERROR(ExtractEquationRelations(einsum.equation().str(),
                                               contracting_labels,
                                               input_mappings, output_mapping));
@@ -441,9 +441,9 @@ Status EinsumSPMDExpander::MaybeRelayoutInputs(
         input_label_to_sharding_spec[char_and_positions.first]
             .set_sharding_spec(Layout::kUnshardedDim);
 
-  absl::flat_hash_map<std::string, absl::flat_hash_set<char>>
+  abslx::flat_hash_map<std::string, abslx::flat_hash_set<char>>
       sharding_dim_to_non_contracting_labels;
-  absl::flat_hash_map<std::string, absl::flat_hash_set<char>>
+  abslx::flat_hash_map<std::string, abslx::flat_hash_set<char>>
       sharding_dim_to_contracting_labels;
   for (const auto& label_and_spec : input_label_to_sharding_spec) {
     if (Layout::IsShardedSpec(label_and_spec.second)) {
@@ -486,7 +486,7 @@ Status EinsumSPMDExpander::MaybeRelayoutInputs(
   // sharding spec is impossible. Since there are at most two inputs, at least
   // one input would have two dimensions with the same sharing spec.
   // This handles the y,x . x,y -> *,y case.
-  absl::flat_hash_set<std::string> dims_with_multiple_labels;
+  abslx::flat_hash_set<std::string> dims_with_multiple_labels;
   for (const auto& spec_and_labels : sharding_dim_to_non_contracting_labels) {
     if (spec_and_labels.second.size() > 1) {
       assert(spec_and_labels.second.size() == 2);

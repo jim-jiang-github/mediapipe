@@ -40,7 +40,7 @@ class OptionalLiteral {
       : value_(std::move(value)), mask_(std::move(mask)) {}
 
   template <typename NativeT>
-  std::optional<NativeT> Get(absl::Span<const int64_t> element_index,
+  std::optional<NativeT> Get(abslx::Span<const int64_t> element_index,
                              ShapeIndex shape_index = {}) const {
     if (mask_.Get<bool>(element_index, shape_index)) {
       return std::nullopt;
@@ -104,7 +104,7 @@ class ValueInference {
   XlaBuilder* builder_;
   HloEvaluator evaluator_;
   // A map from instruction_hash to handle that helps perform CSE.
-  absl::flat_hash_map<int64_t, int64_t> cse_map_;
+  abslx::flat_hash_map<int64_t, int64_t> cse_map_;
 };
 }  // namespace xla
 

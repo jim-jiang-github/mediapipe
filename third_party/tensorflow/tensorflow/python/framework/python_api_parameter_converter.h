@@ -54,7 +54,7 @@ namespace tensorflow {
 ABSL_MUST_USE_RESULT
 bool ConvertPythonAPIParameters(
     const PythonAPIInfo& api_info,
-    const PythonTensorConverter& tensor_converter, absl::Span<PyObject*> params,
+    const PythonTensorConverter& tensor_converter, abslx::Span<PyObject*> params,
     PythonAPIInfo::InferredAttributes* inferred_attrs);
 
 // Copies any parameters that expect a list of tensors to a new list.
@@ -67,7 +67,7 @@ bool ConvertPythonAPIParameters(
 // Returns true on success, or sets an exception and returns false on error.
 ABSL_MUST_USE_RESULT
 bool CopyPythonAPITensorLists(const PythonAPIInfo& api_info,
-                              absl::Span<PyObject*> params);
+                              abslx::Span<PyObject*> params);
 
 }  // namespace tensorflow
 

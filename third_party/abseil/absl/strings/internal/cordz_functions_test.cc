@@ -18,7 +18,7 @@
 #include "gtest/gtest.h"
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 namespace {
@@ -128,4 +128,4 @@ TEST(CordzFunctionsTest, ShouldProfileDisabled) {
 }  // namespace
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

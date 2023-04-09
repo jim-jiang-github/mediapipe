@@ -28,7 +28,7 @@ class GemmTest : public MlirGpuTestBase {
   std::vector<std::vector<uint8_t>> Run2x2Gemm(
       std::vector<float> arg0, std::vector<float> arg1,
       std::string matmul_options = "") {
-    std::string mlir_text = absl::StrCat(
+    std::string mlir_text = abslx::StrCat(
         R"(
       module attributes {hlo.unique_id = 0 : i32} {
         func.func @main(%arg0: memref<2x2xf32> {lmhlo.params = 0 : index},

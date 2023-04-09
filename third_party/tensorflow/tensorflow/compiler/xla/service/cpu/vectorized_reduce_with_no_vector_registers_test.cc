@@ -44,7 +44,7 @@ StatusOr<unsigned> GetTargetVectorRegisterByteSize(std::string triple) {
       llvm::GlobalValue::ExternalLinkage, "test", &module);
 
   std::unique_ptr<llvm::TargetMachine> target_machine =
-      absl::WrapUnique(target->createTargetMachine(
+      abslx::WrapUnique(target->createTargetMachine(
           /*TT=*/triple, /*CPU=*/"", /*Features=*/"", llvm::TargetOptions{},
           /*RM=*/llvm::None));
   cpu::LLVMTargetMachineFeatures target_machine_features(target_machine.get());
@@ -52,7 +52,7 @@ StatusOr<unsigned> GetTargetVectorRegisterByteSize(std::string triple) {
 }
 
 TEST_F(CodegenReduceOnArchWithNoVectorRegisters, Test) {
-  absl::string_view text = R"(
+  abslx::string_view text = R"(
 HloModule Reduce
 
 add {

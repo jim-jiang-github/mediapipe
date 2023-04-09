@@ -50,8 +50,8 @@ port::Status HostExecutor::Init(int device_ordinal,
   auto it =
       device_options.non_portable_tags.find("host_thread_stack_size_in_bytes");
   if (it != device_options.non_portable_tags.end()) {
-    if (!absl::SimpleAtoi(it->second, &thread_stack_size_in_bytes_)) {
-      return port::InvalidArgumentError(absl::StrCat(
+    if (!abslx::SimpleAtoi(it->second, &thread_stack_size_in_bytes_)) {
+      return port::InvalidArgumentError(abslx::StrCat(
           "Unable to parse host_thread_stack_size_in_bytes as an integer: ",
           it->second));
     }
@@ -191,7 +191,7 @@ bool HostExecutor::AllocateStream(Stream* stream) { return true; }
 void HostExecutor::DeallocateStream(Stream* stream) {}
 
 bool HostExecutor::CreateStreamDependency(Stream* dependent, Stream* other) {
-  auto event = std::make_shared<absl::Notification>();
+  auto event = std::make_shared<abslx::Notification>();
   AsHostStream(other)->EnqueueTask([event]() { event->Notify(); });
   AsHostStream(dependent)->EnqueueTask(
       [event]() { event->WaitForNotification(); });
@@ -200,15 +200,15 @@ bool HostExecutor::CreateStreamDependency(Stream* dependent, Stream* other) {
 
 class HostEvent : public internal::EventInterface {
  public:
-  HostEvent() : notification_(std::make_shared<absl::Notification>()) {}
+  HostEvent() : notification_(std::make_shared<abslx::Notification>()) {}
 
-  std::shared_ptr<absl::Notification>& notification() { return notification_; }
+  std::shared_ptr<abslx::Notification>& notification() { return notification_; }
 
  private:
   // We use a std::shared_ptr here because the client may delete the HostEvent
   // object while there are still RecordEvent and WaitForEvent callbacks pending
   // on a stream.
-  std::shared_ptr<absl::Notification> notification_;
+  std::shared_ptr<abslx::Notification> notification_;
 };
 
 std::unique_ptr<internal::EventInterface>
@@ -230,7 +230,7 @@ port::Status HostExecutor::DeallocateEvent(Event* /*event*/) {
 }
 
 port::Status HostExecutor::RecordEvent(Stream* stream, Event* event) {
-  std::shared_ptr<absl::Notification> notification =
+  std::shared_ptr<abslx::Notification> notification =
       AsHostEvent(event)->notification();
   AsHostStream(stream)->EnqueueTask([notification]() {
     CHECK(!notification->HasBeenNotified());
@@ -240,7 +240,7 @@ port::Status HostExecutor::RecordEvent(Stream* stream, Event* event) {
 }
 
 port::Status HostExecutor::WaitForEvent(Stream* stream, Event* event) {
-  std::shared_ptr<absl::Notification> notification =
+  std::shared_ptr<abslx::Notification> notification =
       AsHostEvent(event)->notification();
   AsHostStream(stream)->EnqueueTask(
       [notification]() { notification->WaitForNotification(); });
@@ -248,7 +248,7 @@ port::Status HostExecutor::WaitForEvent(Stream* stream, Event* event) {
 }
 
 Event::Status HostExecutor::PollForEventStatus(Event* event) {
-  absl::Notification& notification = *AsHostEvent(event)->notification();
+  abslx::Notification& notification = *AsHostEvent(event)->notification();
   return notification.HasBeenNotified() ? Event::Status::kComplete
                                         : Event::Status::kPending;
 }

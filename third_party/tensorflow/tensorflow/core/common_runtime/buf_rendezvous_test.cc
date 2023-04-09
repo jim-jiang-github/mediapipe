@@ -166,7 +166,7 @@ TEST_F(BufRendezvousTest, ErrorDuplicatePut) {
       &cm_);
   note.WaitForNotification();
   EXPECT_FALSE(bad_status.ok());
-  EXPECT_EQ(absl::StrCat("BufRendezvous::ProvideBuf already called for key ",
+  EXPECT_EQ(abslx::StrCat("BufRendezvous::ProvideBuf already called for key ",
                          *kDefaultKey),
             bad_status.error_message());
   EXPECT_FALSE(prod_callback_called);
@@ -283,7 +283,7 @@ TEST_F(BufRendezvousTest, ProvideThenCancel) {
   note.WaitForNotification();
   EXPECT_TRUE(errors::IsCancelled(status));
   EXPECT_NE(
-      status.error_message().find(absl::StrCat(
+      status.error_message().find(abslx::StrCat(
           "Operation was cancelled for BufRendezvous key ", *kDefaultKey)),
       string::npos);
 }
@@ -302,7 +302,7 @@ TEST_F(BufRendezvousTest, CancelThenProvide) {
   note.WaitForNotification();
   EXPECT_TRUE(errors::IsCancelled(status));
   EXPECT_NE(
-      status.error_message().find(absl::StrCat(
+      status.error_message().find(abslx::StrCat(
           "Operation was cancelled for BufRendezvous key ", *kDefaultKey)),
       string::npos);
 }
@@ -321,7 +321,7 @@ TEST_F(BufRendezvousTest, ConsumeThenCancel) {
   note.WaitForNotification();
   EXPECT_TRUE(errors::IsCancelled(status));
   EXPECT_NE(
-      status.error_message().find(absl::StrCat(
+      status.error_message().find(abslx::StrCat(
           "Operation was cancelled for BufRendezvous key ", *kDefaultKey)),
       string::npos);
 }
@@ -340,7 +340,7 @@ TEST_F(BufRendezvousTest, CancelThenConsume) {
   note.WaitForNotification();
   EXPECT_TRUE(errors::IsCancelled(status));
   EXPECT_NE(
-      status.error_message().find(absl::StrCat(
+      status.error_message().find(abslx::StrCat(
           "Operation was cancelled for BufRendezvous key ", *kDefaultKey)),
       string::npos);
 }

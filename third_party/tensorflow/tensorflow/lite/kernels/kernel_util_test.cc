@@ -877,12 +877,12 @@ TEST_F(KernelUtilTest, ActivationRangeQuantizedOverflow) {
   ASSERT_NE(kTfLiteOk,
             CalculateActivationRangeQuantized(&context_, kTfLiteActRelu6,
                                               &output, &act_min, &act_max));
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       context_.error, "no_integer_overflow_from_quantization was not true"));
   ASSERT_NE(kTfLiteOk,
             CalculateActivationRangeQuantized(&context_, kTfLiteActReluN1To1,
                                               &output, &act_min, &act_max));
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       context_.error, "no_integer_overflow_from_quantization was not true"));
 
   // Release.

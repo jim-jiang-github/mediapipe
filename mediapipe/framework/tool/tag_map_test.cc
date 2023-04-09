@@ -322,7 +322,7 @@ TEST(TagMapTest, SameAs) {
 // debug string each satisfy a matcher.
 template <typename Matcher>
 void TestDebugString(
-    const absl::StatusOr<std::shared_ptr<tool::TagMap>>& statusor_tag_map,
+    const abslx::StatusOr<std::shared_ptr<tool::TagMap>>& statusor_tag_map,
     const std::vector<std::string>& canonical_entries,
     Matcher short_string_matcher) {
   MP_ASSERT_OK(statusor_tag_map);
@@ -341,7 +341,7 @@ void TestDebugString(
     EXPECT_THAT(debug_string, testing::Eq("empty"));
   } else {
     EXPECT_THAT(debug_string,
-                testing::Eq(absl::StrJoin(canonical_entries, "\n")));
+                testing::Eq(abslx::StrJoin(canonical_entries, "\n")));
   }
   EXPECT_THAT(short_string, short_string_matcher);
 }

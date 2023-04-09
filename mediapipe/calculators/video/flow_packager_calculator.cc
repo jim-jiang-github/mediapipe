@@ -66,11 +66,11 @@ class FlowPackagerCalculator : public CalculatorBase {
  public:
   ~FlowPackagerCalculator() override = default;
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
   // Writes passed chunk to disk.
   void WriteChunk(const TrackingDataChunk& chunk) const;
@@ -97,7 +97,7 @@ class FlowPackagerCalculator : public CalculatorBase {
 
 REGISTER_CALCULATOR(FlowPackagerCalculator);
 
-absl::Status FlowPackagerCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status FlowPackagerCalculator::GetContract(CalculatorContract* cc) {
   if (!cc->Inputs().HasTag(kFlowTag)) {
     return tool::StatusFail("No input flow was specified.");
   }
@@ -121,10 +121,10 @@ absl::Status FlowPackagerCalculator::GetContract(CalculatorContract* cc) {
     cc->InputSidePackets().Tag(kCacheDirTag).Set<std::string>();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FlowPackagerCalculator::Open(CalculatorContext* cc) {
+abslx::Status FlowPackagerCalculator::Open(CalculatorContext* cc) {
   options_ = cc->Options<FlowPackagerCalculatorOptions>();
 
   flow_packager_.reset(new FlowPackager(options_.flow_packager_options()));
@@ -135,10 +135,10 @@ absl::Status FlowPackagerCalculator::Open(CalculatorContext* cc) {
     cache_dir_ = cc->InputSidePackets().Tag(kCacheDirTag).Get<std::string>();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FlowPackagerCalculator::Process(CalculatorContext* cc) {
+abslx::Status FlowPackagerCalculator::Process(CalculatorContext* cc) {
   InputStream* flow_stream = &(cc->Inputs().Tag(kFlowTag));
   const RegionFlowFeatureList& flow = flow_stream->Get<RegionFlowFeatureList>();
 
@@ -200,10 +200,10 @@ absl::Status FlowPackagerCalculator::Process(CalculatorContext* cc) {
 
   prev_timestamp_ = timestamp;
   ++frame_idx_;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FlowPackagerCalculator::Close(CalculatorContext* cc) {
+abslx::Status FlowPackagerCalculator::Close(CalculatorContext* cc) {
   if (frame_idx_ > 0) {
     tracking_chunk_.set_last_chunk(true);
     if (cc->Outputs().HasTag(kTrackingChunkTag)) {
@@ -222,7 +222,7 @@ absl::Status FlowPackagerCalculator::Close(CalculatorContext* cc) {
     cc->Outputs().Tag(kCompleteTag).Add(new bool(true), Timestamp::PreStream());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void FlowPackagerCalculator::WriteChunk(const TrackingDataChunk& chunk) const {
@@ -235,15 +235,15 @@ void FlowPackagerCalculator::WriteChunk(const TrackingDataChunk& chunk) const {
   }
 
   auto format_runtime =
-      absl::ParsedFormat<'d'>::New(options_.cache_file_format());
+      abslx::ParsedFormat<'d'>::New(options_.cache_file_format());
 
   std::string chunk_file;
   if (format_runtime) {
     chunk_file =
-        cache_dir_ + "/" + absl::StrFormat(*format_runtime, chunk_idx_);
+        cache_dir_ + "/" + abslx::StrFormat(*format_runtime, chunk_idx_);
   } else {
     LOG(ERROR) << "chache_file_format wrong. fall back to chunk_%04d.";
-    chunk_file = cache_dir_ + "/" + absl::StrFormat("chunk_%04d", chunk_idx_);
+    chunk_file = cache_dir_ + "/" + abslx::StrFormat("chunk_%04d", chunk_idx_);
   }
 
   std::string data;

@@ -141,7 +141,7 @@ class GraphOperation : public TracingOperation {
     TF_AddInput(op_.get(), t->output_);
     return OkStatus();
   }
-  Status AddInputList(absl::Span<AbstractTensorHandle* const> inputs) override {
+  Status AddInputList(abslx::Span<AbstractTensorHandle* const> inputs) override {
     std::vector<TF_Output> tf_outputs(inputs.size());
     for (int i = 0; i < inputs.size(); i++) {
       GraphTensor* t = dyn_cast<GraphTensor>(inputs[i]);
@@ -154,7 +154,7 @@ class GraphOperation : public TracingOperation {
     TF_AddInputList(op_.get(), tf_outputs.data(), tf_outputs.size());
     return OkStatus();
   }
-  Status Execute(absl::Span<AbstractTensorHandle*> retvals,
+  Status Execute(abslx::Span<AbstractTensorHandle*> retvals,
                  int* num_retvals) override {
     auto* tf_opdesc = op_.release();
     if (tf_opdesc == nullptr) {
@@ -290,7 +290,7 @@ class GraphOperation : public TracingOperation {
   }
   Status SetAttrFunctionList(
       const char* attr_name,
-      absl::Span<const AbstractOperation*> values) override {
+      abslx::Span<const AbstractOperation*> values) override {
     return tensorflow::errors::Unimplemented(
         "SetAttrFunctionList has not been implemented yet.");
   }
@@ -332,7 +332,7 @@ class GraphContext : public TracingContext {
     TracingOperationPtr operation(CreateOperation());
     TF_RETURN_IF_ERROR(operation->Reset("Placeholder", nullptr));
     TF_RETURN_IF_ERROR(
-        operation->SetOpName(absl::StrCat("_input_", inputs_.size()).c_str()));
+        operation->SetOpName(abslx::StrCat("_input_", inputs_.size()).c_str()));
     TF_RETURN_IF_ERROR(operation->SetAttrType("dtype", dtype));
     if (!shape.unknown_rank()) {
       TF_RETURN_IF_ERROR(operation->SetAttrShape(
@@ -342,7 +342,7 @@ class GraphContext : public TracingContext {
     int num_outputs = 1;
     std::vector<AbstractTensorHandle*> outputs(num_outputs);
     TF_RETURN_IF_ERROR(operation->Execute(
-        absl::Span<AbstractTensorHandle*>(outputs), &num_outputs));
+        abslx::Span<AbstractTensorHandle*>(outputs), &num_outputs));
 
     if (num_outputs != 1) {
       return errors::Internal("Expected 1 output but found ", num_outputs);

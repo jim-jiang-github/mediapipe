@@ -66,18 +66,18 @@ class ClOperation {
   }
 
   // should be called after changes of inputs/outputs.
-  absl::Status UpdateParams();
+  abslx::Status UpdateParams();
 
-  absl::Status SetSrcTensor(int index, Tensor* tensor);
-  absl::Status SetDstTensor(int index, Tensor* tensor);
+  abslx::Status SetSrcTensor(int index, Tensor* tensor);
+  abslx::Status SetDstTensor(int index, Tensor* tensor);
 
-  absl::Status AddToQueue(CLCommandQueue* queue) {
+  abslx::Status AddToQueue(CLCommandQueue* queue) {
     RETURN_IF_ERROR(cl_args_.Bind(kernel_.kernel()));
     return queue->Dispatch(kernel_, operation_->GetWorkGroupsCount(),
                            operation_->work_group_size_);
   }
 
-  absl::Status AddToCommanBuffer(cl_command_buffer_khr cb) {
+  abslx::Status AddToCommanBuffer(cl_command_buffer_khr cb) {
     RETURN_IF_ERROR(cl_args_.Bind(kernel_.kernel()));
     std::array<size_t, 3> local;
     std::array<size_t, 3> global;
@@ -90,14 +90,14 @@ class ClOperation {
         cb, nullptr, nullptr, kernel_.kernel(), 3, nullptr, global.data(),
         local.data(), 0, nullptr, nullptr, nullptr);
     if (error_code != CL_SUCCESS) {
-      return absl::UnknownError(
-          absl::StrCat("Failed to clCommandNDRangeKernelKHR - ",
+      return abslx::UnknownError(
+          abslx::StrCat("Failed to clCommandNDRangeKernelKHR - ",
                        CLErrorCodeToString(error_code)));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status AddToQueue(ProfilingCommandQueue* queue, CLEvent* event) {
+  abslx::Status AddToQueue(ProfilingCommandQueue* queue, CLEvent* event) {
     RETURN_IF_ERROR(cl_args_.Bind(kernel_.kernel()));
     return queue->CLCommandQueue::Dispatch(kernel_,
                                            operation_->GetWorkGroupsCount(),
@@ -105,19 +105,19 @@ class ClOperation {
   }
 
   // for better profiling
-  absl::Status AddToQueueNTimes(ProfilingCommandQueue* queue, int n,
+  abslx::Status AddToQueueNTimes(ProfilingCommandQueue* queue, int n,
                                 int flush_period = 0) {
     RETURN_IF_ERROR(cl_args_.Bind(kernel_.kernel()));
     return queue->DispatchNTimes(kernel_, operation_->GetWorkGroupsCount(),
                                  operation_->work_group_size_, n, flush_period);
   }
 
-  absl::Status Tune(TuningType tuning_type, const GpuInfo& gpu_info,
+  abslx::Status Tune(TuningType tuning_type, const GpuInfo& gpu_info,
                     ProfilingCommandQueue* profiling_queue);
 
-  absl::Status Compile(const CreationContext& creation_context);
+  abslx::Status Compile(const CreationContext& creation_context);
 
-  absl::Status RestoreDeserialized(const ProgramCache& program_cache,
+  abslx::Status RestoreDeserialized(const ProgramCache& program_cache,
                                    uint64_t fingerprint,
                                    const GpuInfo& gpu_info,
                                    const int3& work_group_size,

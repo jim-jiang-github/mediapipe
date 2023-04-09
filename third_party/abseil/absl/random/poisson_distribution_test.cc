@@ -62,10 +62,10 @@
 
 namespace {
 
-using absl::random_internal::kChiSquared;
+using abslx::random_internal::kChiSquared;
 
 // The PoissonDistributionInterfaceTest provides a basic test that
-// absl::poisson_distribution conforms to the interface and serialization
+// abslx::poisson_distribution conforms to the interface and serialization
 // requirements imposed by [rand.req.dist] for the common integer types.
 
 template <typename IntType>
@@ -76,7 +76,7 @@ using IntTypes = ::testing::Types<int, int8_t, int16_t, int32_t, int64_t,
 TYPED_TEST_CASE(PoissonDistributionInterfaceTest, IntTypes);
 
 TYPED_TEST(PoissonDistributionInterfaceTest, SerializeTest) {
-  using param_type = typename absl::poisson_distribution<TypeParam>::param_type;
+  using param_type = typename abslx::poisson_distribution<TypeParam>::param_type;
   const double kMax =
       std::min(1e10 /* assertion limit */,
                static_cast<double>(std::numeric_limits<TypeParam>::max()));
@@ -108,17 +108,17 @@ TYPED_TEST(PoissonDistributionInterfaceTest, SerializeTest) {
 
 
   constexpr int kCount = 1000;
-  absl::InsecureBitGen gen;
+  abslx::InsecureBitGen gen;
   for (const double m : kParams) {
     const double mean = std::min(kMax, m);
     const param_type param(mean);
 
     // Validate parameters.
-    absl::poisson_distribution<TypeParam> before(mean);
+    abslx::poisson_distribution<TypeParam> before(mean);
     EXPECT_EQ(before.mean(), param.mean());
 
     {
-      absl::poisson_distribution<TypeParam> via_param(param);
+      abslx::poisson_distribution<TypeParam> via_param(param);
       EXPECT_EQ(via_param, before);
       EXPECT_EQ(via_param.param(), before.param());
     }
@@ -134,14 +134,14 @@ TYPED_TEST(PoissonDistributionInterfaceTest, SerializeTest) {
       if (sample < sample_min) sample_min = sample;
     }
 
-    ABSL_INTERNAL_LOG(INFO, absl::StrCat("Range {", param.mean(), "}: ",
+    ABSL_INTERNAL_LOG(INFO, abslx::StrCat("Range {", param.mean(), "}: ",
                                          +sample_min, ", ", +sample_max));
 
     // Validate stream serialization.
     std::stringstream ss;
     ss << before;
 
-    absl::poisson_distribution<TypeParam> after(3.8);
+    abslx::poisson_distribution<TypeParam> after(3.8);
 
     EXPECT_NE(before.mean(), after.mean());
     EXPECT_NE(before.param(), after.param());
@@ -188,10 +188,10 @@ class PoissonModel {
   }
 
   void LogCDF() {
-    ABSL_INTERNAL_LOG(INFO, absl::StrCat("CDF (mean = ", mean_, ")"));
+    ABSL_INTERNAL_LOG(INFO, abslx::StrCat("CDF (mean = ", mean_, ")"));
     for (const auto c : cdf_) {
       ABSL_INTERNAL_LOG(INFO,
-                        absl::StrCat(c.index, ": pmf=", c.pmf, " cdf=", c.cdf));
+                        abslx::StrCat(c.index, ": pmf=", c.pmf, " cdf=", c.cdf));
     }
   }
 
@@ -261,7 +261,7 @@ class PoissonDistributionZTest : public testing::TestWithParam<ZParam>,
   // We use a fixed bit generator for distribution accuracy tests.  This allows
   // these tests to be deterministic, while still testing the qualify of the
   // implementation.
-  absl::random_internal::pcg64_2018_engine rng_{0x2B7E151628AED2A6};
+  abslx::random_internal::pcg64_2018_engine rng_{0x2B7E151628AED2A6};
 };
 
 template <typename D>
@@ -269,7 +269,7 @@ bool PoissonDistributionZTest::SingleZTest(const double p,
                                            const size_t samples) {
   D dis(mean());
 
-  absl::flat_hash_map<int32_t, int> buckets;
+  abslx::flat_hash_map<int32_t, int> buckets;
   std::vector<double> data;
   data.reserve(samples);
   for (int j = 0; j < samples; j++) {
@@ -280,14 +280,14 @@ bool PoissonDistributionZTest::SingleZTest(const double p,
 
   // The null-hypothesis is that the distribution is a poisson distribution with
   // the provided mean (not estimated from the data).
-  const auto m = absl::random_internal::ComputeDistributionMoments(data);
-  const double max_err = absl::random_internal::MaxErrorTolerance(p);
-  const double z = absl::random_internal::ZScore(mean(), m);
-  const bool pass = absl::random_internal::Near("z", z, 0.0, max_err);
+  const auto m = abslx::random_internal::ComputeDistributionMoments(data);
+  const double max_err = abslx::random_internal::MaxErrorTolerance(p);
+  const double z = abslx::random_internal::ZScore(mean(), m);
+  const bool pass = abslx::random_internal::Near("z", z, 0.0, max_err);
 
   if (!pass) {
     ABSL_INTERNAL_LOG(
-        INFO, absl::StrFormat("p=%f max_err=%f\n"
+        INFO, abslx::StrFormat("p=%f max_err=%f\n"
                               " mean=%f vs. %f\n"
                               " stddev=%f vs. %f\n"
                               " skewness=%f vs. %f\n"
@@ -304,13 +304,13 @@ TEST_P(PoissonDistributionZTest, AbslPoissonDistribution) {
   const auto& param = GetParam();
   const int expected_failures =
       std::max(1, static_cast<int>(std::ceil(param.trials * param.p_fail)));
-  const double p = absl::random_internal::RequiredSuccessProbability(
+  const double p = abslx::random_internal::RequiredSuccessProbability(
       param.p_fail, param.trials);
 
   int failures = 0;
   for (int i = 0; i < param.trials; i++) {
     failures +=
-        SingleZTest<absl::poisson_distribution<int32_t>>(p, param.samples) ? 0
+        SingleZTest<abslx::poisson_distribution<int32_t>>(p, param.samples) ? 0
                                                                            : 1;
   }
   EXPECT_LE(failures, expected_failures);
@@ -339,8 +339,8 @@ std::vector<ZParam> GetZParams() {
 
 std::string ZParamName(const ::testing::TestParamInfo<ZParam>& info) {
   const auto& p = info.param;
-  std::string name = absl::StrCat("mean_", absl::SixDigits(p.mean));
-  return absl::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
+  std::string name = abslx::StrCat("mean_", abslx::SixDigits(p.mean));
+  return abslx::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
 }
 
 INSTANTIATE_TEST_SUITE_P(All, PoissonDistributionZTest,
@@ -367,7 +367,7 @@ class PoissonDistributionChiSquaredTest : public testing::TestWithParam<double>,
   // We use a fixed bit generator for distribution accuracy tests.  This allows
   // these tests to be deterministic, while still testing the qualify of the
   // implementation.
-  absl::random_internal::pcg64_2018_engine rng_{0x2B7E151628AED2A6};
+  abslx::random_internal::pcg64_2018_engine rng_{0x2B7E151628AED2A6};
 };
 
 void PoissonDistributionChiSquaredTest::InitChiSquaredTest(
@@ -428,27 +428,27 @@ double PoissonDistributionChiSquaredTest::ChiSquaredTestImpl() {
   const int dof = static_cast<int>(counts.size()) - 1;
 
   // The threshold for logging is 1-in-50.
-  const double threshold = absl::random_internal::ChiSquareValue(dof, 0.98);
+  const double threshold = abslx::random_internal::ChiSquareValue(dof, 0.98);
 
-  const double chi_square = absl::random_internal::ChiSquare(
+  const double chi_square = abslx::random_internal::ChiSquare(
       std::begin(counts), std::end(counts), std::begin(e), std::end(e));
 
-  const double p = absl::random_internal::ChiSquarePValue(chi_square, dof);
+  const double p = abslx::random_internal::ChiSquarePValue(chi_square, dof);
 
   // Log if the chi_squared value is above the threshold.
   if (chi_square > threshold) {
     LogCDF();
 
-    ABSL_INTERNAL_LOG(INFO, absl::StrCat("VALUES  buckets=", counts.size(),
+    ABSL_INTERNAL_LOG(INFO, abslx::StrCat("VALUES  buckets=", counts.size(),
                                          "  samples=", kSamples));
     for (size_t i = 0; i < counts.size(); i++) {
       ABSL_INTERNAL_LOG(
-          INFO, absl::StrCat(cutoffs_[i], ": ", counts[i], " vs. E=", e[i]));
+          INFO, abslx::StrCat(cutoffs_[i], ": ", counts[i], " vs. E=", e[i]));
     }
 
     ABSL_INTERNAL_LOG(
         INFO,
-        absl::StrCat(kChiSquared, "(data, dof=", dof, ") = ", chi_square, " (",
+        abslx::StrCat(kChiSquared, "(data, dof=", dof, ") = ", chi_square, " (",
                      p, ")\n", " vs.\n", kChiSquared, " @ 0.98 = ", threshold));
   }
   return p;
@@ -466,7 +466,7 @@ TEST_P(PoissonDistributionChiSquaredTest, AbslPoissonDistribution) {
 
   int failures = 0;
   for (int i = 0; i < kTrials; i++) {
-    double p_value = ChiSquaredTestImpl<absl::poisson_distribution<int32_t>>();
+    double p_value = ChiSquaredTestImpl<abslx::poisson_distribution<int32_t>>();
     if (p_value < 0.005) {
       failures++;
     }
@@ -480,13 +480,13 @@ INSTANTIATE_TEST_SUITE_P(All, PoissonDistributionChiSquaredTest,
                          ::testing::Values(0.5, 1.0, 2.0, 10.0, 50.0, 51.0,
                                            200.0));
 
-// NOTE: absl::poisson_distribution is not guaranteed to be stable.
+// NOTE: abslx::poisson_distribution is not guaranteed to be stable.
 TEST(PoissonDistributionTest, StabilityTest) {
   using testing::ElementsAre;
-  // absl::poisson_distribution stability relies on stability of
+  // abslx::poisson_distribution stability relies on stability of
   // std::exp, std::log, std::sqrt, std::ceil, std::floor, and
-  // absl::FastUniformBits, absl::StirlingLogFactorial, absl::RandU64ToDouble.
-  absl::random_internal::sequence_urbg urbg({
+  // abslx::FastUniformBits, abslx::StirlingLogFactorial, abslx::RandU64ToDouble.
+  abslx::random_internal::sequence_urbg urbg({
       0x035b0dc7e0a18acfull, 0x06cebe0d2653682eull, 0x0061e9b23861596bull,
       0x0003eb76f6f7f755ull, 0xFFCEA50FDB2F953Bull, 0xC332DDEFBE6C5AA5ull,
       0x6558218568AB9702ull, 0x2AEF7DAD5B6E2F84ull, 0x1521B62829076170ull,
@@ -517,7 +517,7 @@ TEST(PoissonDistributionTest, StabilityTest) {
 
   // Method 1.
   {
-    absl::poisson_distribution<int> dist(5);
+    abslx::poisson_distribution<int> dist(5);
     std::generate(std::begin(output), std::end(output),
                   [&] { return dist(urbg); });
   }
@@ -527,7 +527,7 @@ TEST(PoissonDistributionTest, StabilityTest) {
   // Method 2.
   {
     urbg.reset();
-    absl::poisson_distribution<int> dist(25);
+    abslx::poisson_distribution<int> dist(25);
     std::generate(std::begin(output), std::end(output),
                   [&] { return dist(urbg); });
   }
@@ -537,7 +537,7 @@ TEST(PoissonDistributionTest, StabilityTest) {
   // Method 3.
   {
     urbg.reset();
-    absl::poisson_distribution<int> dist(121);
+    abslx::poisson_distribution<int> dist(121);
     std::generate(std::begin(output), std::end(output),
                   [&] { return dist(urbg); });
   }
@@ -548,25 +548,25 @@ TEST(PoissonDistributionTest, StabilityTest) {
 TEST(PoissonDistributionTest, AlgorithmExpectedValue_1) {
   // This tests small values of the Knuth method.
   // The underlying uniform distribution will generate exactly 0.5.
-  absl::random_internal::sequence_urbg urbg({0x8000000000000001ull});
-  absl::poisson_distribution<int> dist(5);
+  abslx::random_internal::sequence_urbg urbg({0x8000000000000001ull});
+  abslx::poisson_distribution<int> dist(5);
   EXPECT_EQ(7, dist(urbg));
 }
 
 TEST(PoissonDistributionTest, AlgorithmExpectedValue_2) {
   // This tests larger values of the Knuth method.
   // The underlying uniform distribution will generate exactly 0.5.
-  absl::random_internal::sequence_urbg urbg({0x8000000000000001ull});
-  absl::poisson_distribution<int> dist(25);
+  abslx::random_internal::sequence_urbg urbg({0x8000000000000001ull});
+  abslx::poisson_distribution<int> dist(25);
   EXPECT_EQ(36, dist(urbg));
 }
 
 TEST(PoissonDistributionTest, AlgorithmExpectedValue_3) {
   // This variant uses the ratio of uniforms method.
-  absl::random_internal::sequence_urbg urbg(
+  abslx::random_internal::sequence_urbg urbg(
       {0x7fffffffffffffffull, 0x8000000000000000ull});
 
-  absl::poisson_distribution<int> dist(121);
+  abslx::poisson_distribution<int> dist(121);
   EXPECT_EQ(121, dist(urbg));
 }
 

@@ -280,7 +280,7 @@ TEST_F(EagerContextTest, FunctionErrorRecovery) {
   int num_retvals = retvals.size();
   StatusGroup op_and_sync_status;
   op_and_sync_status.Update(
-      fail_op->Execute(absl::MakeSpan(retvals), &num_retvals));
+      fail_op->Execute(abslx::MakeSpan(retvals), &num_retvals));
   op_and_sync_status.Update(context()->SyncExecutors());
   ASSERT_THAT(op_and_sync_status.as_summary_status().error_message(),
               HasSubstr("assertion failed"));
@@ -299,7 +299,7 @@ TEST_F(EagerContextTest, FunctionErrorRecovery) {
   TF_ASSERT_OK(success_op->AddInput(input_float.get()));
   TF_ASSERT_OK(success_op->AddInput(input_bool_true.get()));
   // A second run of the function should work, despite the previous failure.
-  TF_ASSERT_OK(success_op->Execute(absl::MakeSpan(retvals), &num_retvals));
+  TF_ASSERT_OK(success_op->Execute(abslx::MakeSpan(retvals), &num_retvals));
   TF_ASSERT_OK(context()->SyncExecutors());
   retvals[0]->Unref();
   retvals[0] = nullptr;
@@ -333,7 +333,7 @@ TEST_F(EagerContextTest, XlaCompileDeviceType) {
   TF_ASSERT_OK(op->AddInput(input_int.get()));
   std::vector<AbstractTensorHandle*> retvals(1);
   int num_retvals = retvals.size();
-  TF_ASSERT_OK(op->Execute(absl::MakeSpan(retvals), &num_retvals));
+  TF_ASSERT_OK(op->Execute(abslx::MakeSpan(retvals), &num_retvals));
   retvals[0]->Unref();
   retvals[0] = nullptr;
 }

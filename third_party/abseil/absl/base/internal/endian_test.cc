@@ -23,7 +23,7 @@
 #include "gtest/gtest.h"
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace {
 
@@ -158,13 +158,13 @@ TEST(EndianessTest, Uint64) {
 }
 
 TEST(EndianessTest, ghtonll_gntohll) {
-  // Test that absl::ghtonl compiles correctly
+  // Test that abslx::ghtonl compiles correctly
   uint32_t test = 0x01234567;
-  EXPECT_EQ(absl::gntohl(absl::ghtonl(test)), test);
+  EXPECT_EQ(abslx::gntohl(abslx::ghtonl(test)), test);
 
-  uint64_t comp = absl::ghtonll(kInitialNumber);
+  uint64_t comp = abslx::ghtonll(kInitialNumber);
   EXPECT_EQ(comp, kInitialInNetworkOrder);
-  comp = absl::gntohll(kInitialInNetworkOrder);
+  comp = abslx::gntohll(kInitialInNetworkOrder);
   EXPECT_EQ(comp, kInitialNumber);
 
   // Test that htonll and ntohll are each others' inverse functions on a
@@ -172,9 +172,9 @@ TEST(EndianessTest, ghtonll_gntohll) {
   // particularly nice base 2.
   uint64_t value = 1;
   for (int i = 0; i < 100; ++i) {
-    comp = absl::ghtonll(absl::gntohll(value));
+    comp = abslx::ghtonll(abslx::gntohll(value));
     EXPECT_EQ(value, comp);
-    comp = absl::gntohll(absl::ghtonll(value));
+    comp = abslx::gntohll(abslx::ghtonll(value));
     EXPECT_EQ(value, comp);
     value *= 37;
   }
@@ -260,4 +260,4 @@ TEST(EndianessTest, big_endian) {
 
 }  // namespace
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

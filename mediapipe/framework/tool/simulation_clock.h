@@ -42,13 +42,13 @@ class SimulationClock : public mediapipe::Clock {
   ~SimulationClock() override;
 
   // Returns the simulated time.
-  absl::Time TimeNow() override;
+  abslx::Time TimeNow() override;
 
   // Sleeps until the specified duration has elapsed according to this clock.
-  void Sleep(absl::Duration d) override;
+  void Sleep(abslx::Duration d) override;
 
   // Sleeps until the specifed wakeup_time.
-  void SleepUntil(absl::Time wakeup_time) override;
+  void SleepUntil(abslx::Time wakeup_time) override;
 
   // Informs this clock that a woken thread has started running.
   void ThreadStart();
@@ -58,7 +58,7 @@ class SimulationClock : public mediapipe::Clock {
 
  protected:
   // Queue up wake up waiter.
-  void SleepInternal(absl::Time wakeup_time)
+  void SleepInternal(abslx::Time wakeup_time)
       ABSL_EXCLUSIVE_LOCKS_REQUIRED(time_mutex_);
   // Advances to the next wake up time if no related threads are running.
   void TryAdvanceTime() ABSL_EXCLUSIVE_LOCKS_REQUIRED(time_mutex_);
@@ -66,13 +66,13 @@ class SimulationClock : public mediapipe::Clock {
   // Represents a thread blocked in SleepUntil.
   struct Waiter {
     bool sleeping = true;
-    absl::CondVar cond;
+    abslx::CondVar cond;
   };
 
  protected:
-  absl::Mutex time_mutex_;
-  absl::Time time_ ABSL_GUARDED_BY(time_mutex_);
-  std::multimap<absl::Time, Waiter*> waiters_ ABSL_GUARDED_BY(time_mutex_);
+  abslx::Mutex time_mutex_;
+  abslx::Time time_ ABSL_GUARDED_BY(time_mutex_);
+  std::multimap<abslx::Time, Waiter*> waiters_ ABSL_GUARDED_BY(time_mutex_);
   int num_running_ ABSL_GUARDED_BY(time_mutex_) = 0;
 };
 

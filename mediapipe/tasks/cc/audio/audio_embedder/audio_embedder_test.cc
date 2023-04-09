@@ -44,7 +44,7 @@ namespace audio {
 namespace audio_embedder {
 namespace {
 
-using ::absl::StatusOr;
+using ::abslx::StatusOr;
 using ::mediapipe::file::JoinPath;
 using ::testing::HasSubstr;
 using ::testing::Optional;
@@ -60,7 +60,7 @@ constexpr int kMilliSecondsPerSecond = 1000;
 constexpr int kYamnetNumOfAudioSamples = 15600;
 constexpr int kYamnetAudioSampleRate = 16000;
 
-Matrix GetAudioData(absl::string_view filename) {
+Matrix GetAudioData(abslx::string_view filename) {
   std::string wav_file_path = JoinPath("./", kTestDataDirectory, filename);
   int buffer_size;
   auto audio_data = internal::ReadWavFile(wav_file_path, &buffer_size);
@@ -74,13 +74,13 @@ TEST_F(CreateFromOptionsTest, FailsWithMissingModel) {
   auto audio_embedder =
       AudioEmbedder::Create(std::make_unique<AudioEmbedderOptions>());
 
-  EXPECT_EQ(audio_embedder.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(audio_embedder.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       audio_embedder.status().message(),
       HasSubstr("ExternalFile must specify at least one of 'file_content', "
                 "'file_name', 'file_pointer_meta' or 'file_descriptor_meta'."));
   EXPECT_THAT(audio_embedder.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInitializationError))));
 }
 
@@ -97,16 +97,16 @@ TEST_F(CreateFromOptionsTest, FailsWithIllegalCallbackInAudioClipsMode) {
   options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithMetadata);
   options->running_mode = core::RunningMode::AUDIO_CLIPS;
-  options->result_callback = [](absl::StatusOr<AudioEmbedderResult>) {};
+  options->result_callback = [](abslx::StatusOr<AudioEmbedderResult>) {};
 
   auto audio_embedder = AudioEmbedder::Create(std::move(options));
 
-  EXPECT_EQ(audio_embedder.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(audio_embedder.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       audio_embedder.status().message(),
       HasSubstr("a user-defined result callback shouldn't be provided"));
   EXPECT_THAT(audio_embedder.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kInvalidTaskGraphConfigError))));
 }
 
@@ -118,11 +118,11 @@ TEST_F(CreateFromOptionsTest, FailsWithMissingCallbackInAudioStreamMode) {
 
   auto audio_embedder = AudioEmbedder::Create(std::move(options));
 
-  EXPECT_EQ(audio_embedder.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(audio_embedder.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(audio_embedder.status().message(),
               HasSubstr("a user-defined result callback must be provided"));
   EXPECT_THAT(audio_embedder.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kInvalidTaskGraphConfigError))));
 }
 
@@ -210,7 +210,7 @@ class EmbedAsyncTest : public tflite_shims::testing::Test {
         JoinPath("./", kTestDataDirectory, kModelWithMetadata);
     options->running_mode = core::RunningMode::AUDIO_STREAM;
     options->result_callback =
-        [result](absl::StatusOr<AudioEmbedderResult> status_or_result) {
+        [result](abslx::StatusOr<AudioEmbedderResult> status_or_result) {
           MP_ASSERT_OK_AND_ASSIGN(result->emplace_back(), status_or_result);
         };
     MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<AudioEmbedder> audio_embedder,
@@ -237,18 +237,18 @@ TEST_F(EmbedAsyncTest, FailsWithOutOfOrderInputTimestamps) {
       JoinPath("./", kTestDataDirectory, kModelWithMetadata);
   options->running_mode = core::RunningMode::AUDIO_STREAM;
   options->result_callback =
-      [](absl::StatusOr<AudioEmbedderResult> status_or_result) { return; };
+      [](abslx::StatusOr<AudioEmbedderResult> status_or_result) { return; };
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<AudioEmbedder> audio_embedder,
                           AudioEmbedder::Create(std::move(options)));
   MP_ASSERT_OK(audio_embedder->EmbedAsync(Matrix(1, kYamnetNumOfAudioSamples),
                                           kYamnetAudioSampleRate, 100));
   auto status = audio_embedder->EmbedAsync(Matrix(1, kYamnetNumOfAudioSamples),
                                            kYamnetAudioSampleRate, 0);
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(),
               HasSubstr("timestamp must be monotonically increasing"));
   EXPECT_THAT(status.GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInvalidTimestampError))));
   MP_ASSERT_OK(audio_embedder->Close());
 }

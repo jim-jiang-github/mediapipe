@@ -175,8 +175,8 @@ TEST(XPlaneUtilsTest, SortXPlaneTest) {
 
 namespace {
 
-XLineBuilder CreateXLine(XPlaneBuilder* plane, absl::string_view name,
-                         absl::string_view display, int64_t id,
+XLineBuilder CreateXLine(XPlaneBuilder* plane, abslx::string_view name,
+                         abslx::string_view display, int64_t id,
                          int64_t timestamp_ns) {
   XLineBuilder line = plane->GetOrCreateLine(id);
   line.SetName(name);
@@ -186,8 +186,8 @@ XLineBuilder CreateXLine(XPlaneBuilder* plane, absl::string_view name,
 }
 
 XEventBuilder CreateXEvent(XPlaneBuilder* plane, XLineBuilder line,
-                           absl::string_view event_name,
-                           absl::optional<absl::string_view> display,
+                           abslx::string_view event_name,
+                           abslx::optional<abslx::string_view> display,
                            int64_t offset_ns, int64_t duration_ns) {
   XEventMetadata* event_metadata = plane->GetOrCreateEventMetadata(event_name);
   if (display) event_metadata->set_display_name(std::string(*display));
@@ -199,13 +199,13 @@ XEventBuilder CreateXEvent(XPlaneBuilder* plane, XLineBuilder line,
 
 template <typename T, typename V>
 void CreateXStats(XPlaneBuilder* plane, T* stats_owner,
-                  absl::string_view stats_name, V stats_value) {
+                  abslx::string_view stats_name, V stats_value) {
   stats_owner->AddStatValue(*plane->GetOrCreateStatMetadata(stats_name),
                             stats_value);
 }
 
-void CheckXLine(const XLine& line, absl::string_view name,
-                absl::string_view display, int64_t start_time_ns,
+void CheckXLine(const XLine& line, abslx::string_view name,
+                abslx::string_view display, int64_t start_time_ns,
                 int64_t events_size) {
   EXPECT_EQ(line.name(), name);
   EXPECT_EQ(line.display_name(), display);
@@ -214,7 +214,7 @@ void CheckXLine(const XLine& line, absl::string_view name,
 }
 
 void CheckXEvent(const XEvent& event, const XPlane& plane,
-                 absl::string_view name, absl::string_view display,
+                 abslx::string_view name, abslx::string_view display,
                  int64_t offset_ns, int64_t duration_ns, int64_t stats_size) {
   const XEventMetadata& event_metadata =
       plane.event_metadata().at(event.metadata_id());
@@ -241,19 +241,19 @@ TEST(XPlaneUtilsTest, MergeXPlaneTest) {
     auto l1 = CreateXLine(&src, "l1", "d1", kLineIdOnlyInSrcPlane, 100);
     auto e1 = CreateXEvent(&src, l1, "event1", "display1", 1, 2);
     CreateXStats(&src, &e1, "event_stat1", 2.0);
-    auto e2 = CreateXEvent(&src, l1, "event2", absl::nullopt, 3, 4);
+    auto e2 = CreateXEvent(&src, l1, "event2", abslx::nullopt, 3, 4);
     CreateXStats(&src, &e2, "event_stat2", 3);
 
     auto l2 = CreateXLine(&src, "l2", "d2", kLineIdInBothPlanes, 200);
-    auto e3 = CreateXEvent(&src, l2, "event3", absl::nullopt, 5, 7);
+    auto e3 = CreateXEvent(&src, l2, "event3", abslx::nullopt, 5, 7);
     CreateXStats(&src, &e3, "event_stat3", 2.0);
-    auto e4 = CreateXEvent(&src, l2, "event4", absl::nullopt, 6, 8);
+    auto e4 = CreateXEvent(&src, l2, "event4", abslx::nullopt, 6, 8);
     CreateXStats(&src, &e4, "event_stat4", 3);
     CreateXStats(&src, &e4, "event_stat5", 3);
 
     auto l5 = CreateXLine(&src, "l5", "d5", kLineIdInBothPlanes2, 700);
-    CreateXEvent(&src, l5, "event51", absl::nullopt, 9, 10);
-    CreateXEvent(&src, l5, "event52", absl::nullopt, 11, 12);
+    CreateXEvent(&src, l5, "event51", abslx::nullopt, 9, 10);
+    CreateXEvent(&src, l5, "event52", abslx::nullopt, 11, 12);
   }
 
   {  // Populate the destination plane.
@@ -262,20 +262,20 @@ TEST(XPlaneUtilsTest, MergeXPlaneTest) {
     CreateXStats(&dst, &dst, "plane_stat3", 4);  // shared but different.
 
     auto l3 = CreateXLine(&dst, "l3", "d3", kLineIdOnlyInDstPlane, 300);
-    auto e5 = CreateXEvent(&dst, l3, "event5", absl::nullopt, 11, 2);
+    auto e5 = CreateXEvent(&dst, l3, "event5", abslx::nullopt, 11, 2);
     CreateXStats(&dst, &e5, "event_stat6", 2.0);
-    auto e6 = CreateXEvent(&dst, l3, "event6", absl::nullopt, 13, 4);
+    auto e6 = CreateXEvent(&dst, l3, "event6", abslx::nullopt, 13, 4);
     CreateXStats(&dst, &e6, "event_stat7", 3);
 
     auto l2 = CreateXLine(&dst, "l4", "d4", kLineIdInBothPlanes, 400);
-    auto e7 = CreateXEvent(&dst, l2, "event7", absl::nullopt, 15, 7);
+    auto e7 = CreateXEvent(&dst, l2, "event7", abslx::nullopt, 15, 7);
     CreateXStats(&dst, &e7, "event_stat8", 2.0);
     auto e8 = CreateXEvent(&dst, l2, "event8", "display8", 16, 8);
     CreateXStats(&dst, &e8, "event_stat9", 3);
 
     auto l6 = CreateXLine(&dst, "l6", "d6", kLineIdInBothPlanes2, 300);
-    CreateXEvent(&dst, l6, "event61", absl::nullopt, 21, 10);
-    CreateXEvent(&dst, l6, "event62", absl::nullopt, 22, 12);
+    CreateXEvent(&dst, l6, "event61", abslx::nullopt, 21, 10);
+    CreateXEvent(&dst, l6, "event62", abslx::nullopt, 22, 12);
   }
 
   MergePlanes(src_plane, &dst_plane);
@@ -285,7 +285,7 @@ TEST(XPlaneUtilsTest, MergeXPlaneTest) {
 
   // Check plane level stats,
   EXPECT_EQ(dst_plane.stats_size(), 3);
-  absl::flat_hash_map<absl::string_view, absl::string_view> plane_stats;
+  abslx::flat_hash_map<abslx::string_view, abslx::string_view> plane_stats;
   plane.ForEachStat([&](const tensorflow::profiler::XStatVisitor& stat) {
     if (stat.Name() == "plane_stat1") {
       EXPECT_EQ(stat.IntValue(), 1);

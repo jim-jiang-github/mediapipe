@@ -63,7 +63,7 @@ struct OptimizationProfileConfig {
   std::vector<nvinfer1::Dims> max;
 
   string DebugString() const {
-    using absl::StrCat;
+    using abslx::StrCat;
     return StrCat("[min: ", tensorflow::tensorrt::DebugString(min),
                   ", opt: : ", tensorflow::tensorrt::DebugString(opt),
                   ", max: ", tensorflow::tensorrt::DebugString(max), "]");

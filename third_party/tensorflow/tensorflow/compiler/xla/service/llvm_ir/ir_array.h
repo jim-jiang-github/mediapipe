@@ -43,7 +43,7 @@ namespace llvm_ir {
 class IrArray {
  public:
   // A multidimensional index into an IrArray. All the runtime indices
-  // (multidim) and dimensions (Shape::dimensions(), absl::Span<const int64_t>)
+  // (multidim) and dimensions (Shape::dimensions(), abslx::Span<const int64_t>)
   // are major-first.
   //
   // This may also keep a linear index and the layout and dimensions it was
@@ -69,27 +69,27 @@ class IrArray {
     // == shape.rank() must be true.  If some of the multidim element
     // are null we will use the value that would be used if
     // deliearized from linear.
-    Index(llvm::Value* linear, absl::Span<llvm::Value* const> multidim,
+    Index(llvm::Value* linear, abslx::Span<llvm::Value* const> multidim,
           const Shape& shape, llvm::IRBuilder<>* b);
 
     // Similar to the above constructor except using "dynamic_dims" instead of
     // shape's static dimension to constructs the index.
     Index(llvm::Value* linear, const Shape& shape,
-          absl::Span<llvm::Value*> dynamic_dims, llvm::IRBuilder<>* b);
+          abslx::Span<llvm::Value*> dynamic_dims, llvm::IRBuilder<>* b);
 
     // Constructs an index from a multi-dimensional index. 'shape' is the shape
     // for which the multi-dimensional index is used. 'index_type' is the type
     // of the index.
     //
     // Precondition: "shape" has a layout.
-    Index(absl::Span<llvm::Value* const> multidim, const Shape& shape,
+    Index(abslx::Span<llvm::Value* const> multidim, const Shape& shape,
           llvm::Type* index_type);
 
     // Same as above, but only the dimensions of the shape without layout is
     // passed. The layout is assumed to be the default (descending
     // minor-to-major) layout.
-    Index(absl::Span<llvm::Value* const> multidim,
-          absl::Span<int64_t const> dimensions, llvm::Type* index_type);
+    Index(abslx::Span<llvm::Value* const> multidim,
+          abslx::Span<int64_t const> dimensions, llvm::Type* index_type);
 
     // Returns an index that adds `addend` to the given `dim` of the object.
     Index AddOffsetToDim(llvm::Value* addend, int64_t dim,
@@ -140,15 +140,15 @@ class IrArray {
     // Precondition: "this" is an index into a slice whose operand shape is
     // `operand_shape`.
     Index SourceIndexOfSlice(const Shape& operand_shape,
-                             absl::Span<const int64_t> starts,
-                             absl::Span<const int64_t> strides,
+                             abslx::Span<const int64_t> starts,
+                             abslx::Span<const int64_t> strides,
                              llvm::IRBuilder<>* builder) const;
 
     // Given that "this" is the target index of a transpose from `operand_shape`
     // to `shape` with the given dimension mapping, returns the source index.
     Index SourceIndexOfTranspose(
         const Shape& shape, const Shape& operand_shape,
-        absl::Span<const int64_t> dimension_mapping) const;
+        abslx::Span<const int64_t> dimension_mapping) const;
 
     // Given that "this" is the target index of a bitcast from `operand_shape`
     // to `shape`, returns the source index.
@@ -158,12 +158,12 @@ class IrArray {
     // Given that "this" is the target index of a broadcast from `operand_shape`
     // to `shape` with the given dimension mapping, returns the source index.
     Index SourceIndexOfBroadcast(const Shape& shape, const Shape& operand_shape,
-                                 absl::Span<const int64_t> dimension_mapping,
+                                 abslx::Span<const int64_t> dimension_mapping,
                                  llvm::IRBuilder<>* builder) const;
 
     // Linearizes the index into the given shape, i.e. reshapes it to rank-1 and
     // returns the index into the sole dimension 0 of the new shape.
-    llvm::Value* Linearize(absl::Span<const int64_t> dimensions,
+    llvm::Value* Linearize(abslx::Span<const int64_t> dimensions,
                            llvm::IRBuilder<>* builder) const;
 
     // Linearizes the index into the given dynamic dimensions.
@@ -185,7 +185,7 @@ class IrArray {
     // the type of the index.
     //
     // Precondition: "shape" has a layout.
-    Index(absl::Span<llvm::Value* const> multidim, llvm::Value* linear,
+    Index(abslx::Span<llvm::Value* const> multidim, llvm::Value* linear,
           const Shape& shape, llvm::Type* index_type);
 
     void Delinearize(std::vector<llvm::Value*>* multidim, llvm::Value* linear,
@@ -193,7 +193,7 @@ class IrArray {
 
     // Delinearize the linear index with the dynamic dimensions.
     void Delinearize(std::vector<llvm::Value*>* multidim, llvm::Value* linear,
-                     const Shape& shape, absl::Span<llvm::Value*> dynamic_dims,
+                     const Shape& shape, abslx::Span<llvm::Value*> dynamic_dims,
                      llvm::IRBuilder<>* b) const;
 
     std::vector<llvm::Value*> multidim_;
@@ -243,7 +243,7 @@ class IrArray {
   // The optional name is useful for debugging when looking at
   // the emitted LLVM IR.
   llvm::Value* EmitArrayElementAddress(const Index& index, llvm::IRBuilder<>* b,
-                                       absl::string_view name = "",
+                                       abslx::string_view name = "",
                                        bool use_linear_index = true) const;
 
   // Attach metadata this IrArray instance knows about to "instruction".
@@ -260,7 +260,7 @@ class IrArray {
   // 'use_linear_index' can be used to specify whether the linear index (if
   // available) or the multi-dimensional index should be used.
   llvm::Value* EmitReadArrayElement(const Index& index, llvm::IRBuilder<>* b,
-                                    absl::string_view name = "",
+                                    abslx::string_view name = "",
                                     bool use_linear_index = true) const;
 
   // Emit IR to write the given value to the array element at the given index.

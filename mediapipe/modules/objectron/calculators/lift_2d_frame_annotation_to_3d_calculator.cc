@@ -55,16 +55,16 @@ namespace mediapipe {
 // }
 class Lift2DFrameAnnotationTo3DCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
-  absl::Status ProcessCPU(CalculatorContext* cc,
+  abslx::Status ProcessCPU(CalculatorContext* cc,
                           FrameAnnotation* output_objects);
-  absl::Status LoadOptions(CalculatorContext* cc);
+  abslx::Status LoadOptions(CalculatorContext* cc);
 
   // Increment and assign object ID for each detected object.
   // In a single MediaPipe session, the IDs are unique.
@@ -78,17 +78,17 @@ class Lift2DFrameAnnotationTo3DCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(Lift2DFrameAnnotationTo3DCalculator);
 
-absl::Status Lift2DFrameAnnotationTo3DCalculator::GetContract(
+abslx::Status Lift2DFrameAnnotationTo3DCalculator::GetContract(
     CalculatorContract* cc) {
   RET_CHECK(cc->Inputs().HasTag(kInputStreamTag));
   RET_CHECK(cc->Outputs().HasTag(kOutputStreamTag));
   cc->Inputs().Tag(kInputStreamTag).Set<FrameAnnotation>();
   cc->Outputs().Tag(kOutputStreamTag).Set<FrameAnnotation>();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Lift2DFrameAnnotationTo3DCalculator::Open(CalculatorContext* cc) {
+abslx::Status Lift2DFrameAnnotationTo3DCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
   MP_RETURN_IF_ERROR(LoadOptions(cc));
   // Load camera intrinsic matrix.
@@ -102,18 +102,18 @@ absl::Status Lift2DFrameAnnotationTo3DCalculator::Open(CalculatorContext* cc) {
                         0., 0., -1., 0.,
                         0., 0., -1., 0.;
   // clang-format on
-  decoder_ = absl::make_unique<Decoder>(
+  decoder_ = abslx::make_unique<Decoder>(
       BeliefDecoderConfig(options_.decoder_config()));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Lift2DFrameAnnotationTo3DCalculator::Process(
+abslx::Status Lift2DFrameAnnotationTo3DCalculator::Process(
     CalculatorContext* cc) {
   if (cc->Inputs().Tag(kInputStreamTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  auto output_objects = absl::make_unique<FrameAnnotation>();
+  auto output_objects = abslx::make_unique<FrameAnnotation>();
 
   MP_RETURN_IF_ERROR(ProcessCPU(cc, output_objects.get()));
 
@@ -124,10 +124,10 @@ absl::Status Lift2DFrameAnnotationTo3DCalculator::Process(
         .Add(output_objects.release(), cc->InputTimestamp());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Lift2DFrameAnnotationTo3DCalculator::ProcessCPU(
+abslx::Status Lift2DFrameAnnotationTo3DCalculator::ProcessCPU(
     CalculatorContext* cc, FrameAnnotation* output_objects) {
   const auto& input_frame_annotations =
       cc->Inputs().Tag(kInputStreamTag).Get<FrameAnnotation>();
@@ -143,19 +143,19 @@ absl::Status Lift2DFrameAnnotationTo3DCalculator::ProcessCPU(
   AssignObjectIdAndTimestamp(cc->InputTimestamp().Microseconds(),
                              output_objects);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Lift2DFrameAnnotationTo3DCalculator::Close(CalculatorContext* cc) {
-  return absl::OkStatus();
+abslx::Status Lift2DFrameAnnotationTo3DCalculator::Close(CalculatorContext* cc) {
+  return abslx::OkStatus();
 }
 
-absl::Status Lift2DFrameAnnotationTo3DCalculator::LoadOptions(
+abslx::Status Lift2DFrameAnnotationTo3DCalculator::LoadOptions(
     CalculatorContext* cc) {
   // Get calculator options specified in the graph.
   options_ = cc->Options<Lift2DFrameAnnotationTo3DCalculatorOptions>();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void Lift2DFrameAnnotationTo3DCalculator::AssignObjectIdAndTimestamp(

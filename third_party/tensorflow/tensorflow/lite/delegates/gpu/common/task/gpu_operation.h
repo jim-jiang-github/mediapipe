@@ -93,7 +93,7 @@ class GPUOperation {
   GPUOperation(const GPUOperation&) = delete;
   GPUOperation& operator=(const GPUOperation&) = delete;
 
-  absl::Status AddOperation(const GpuInfo& gpu_info, GPUOperation* operation);
+  abslx::Status AddOperation(const GpuInfo& gpu_info, GPUOperation* operation);
 
   void SetSrc(GpuSpatialTensor* ptr, int index = 0);
   void SetDst(GpuSpatialTensor* ptr, int index = 0);
@@ -116,11 +116,11 @@ class GPUOperation {
   const std::vector<GpuSpatialTensor*>& GetDstTensors() const { return dst_; }
   const int3& GetWorkGroupsCount() const { return work_groups_count_; }
 
-  absl::Status AssembleCode(const GpuInfo& gpu_info);
+  abslx::Status AssembleCode(const GpuInfo& gpu_info);
 
-  virtual absl::Status PostCompileCheck(const GpuInfo& gpu_info,
+  virtual abslx::Status PostCompileCheck(const GpuInfo& gpu_info,
                                         const KernelInfo& kernel_info) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   const OperationDef& GetDefinition() const { return definition_; }
@@ -136,8 +136,8 @@ class GPUOperation {
 
   bool IsLinkable() const { return elementwise_; }
 
-  virtual absl::Status BindArguments(ArgumentsBinder* args) {
-    return absl::OkStatus();
+  virtual abslx::Status BindArguments(ArgumentsBinder* args) {
+    return abslx::OkStatus();
   }
   void RecalculateGridSize() { grid_size_ = GetGridSize(); }
   void RecalculateWorkGroupsCount();
@@ -160,7 +160,7 @@ class GPUOperation {
  protected:
   friend flatbuffers::Offset<tflite::gpu::data::GPUOperation> Encode(
       const GPUOperation& op, flatbuffers::FlatBufferBuilder* builder);
-  friend absl::Status Decode(const tflite::gpu::data::GPUOperation* fb_op,
+  friend abslx::Status Decode(const tflite::gpu::data::GPUOperation* fb_op,
                              GPUOperation* op);
   friend GPUOperation CreateGpuOperation(const OperationDef& definition,
                                          ElementwiseDescriptor&& descriptor);
@@ -184,9 +184,9 @@ class GPUOperation {
   std::vector<std::string> dst_tensors_names_;
 
  private:
-  absl::Status GetTensorDescriptor(const std::string& tensor_name,
+  abslx::Status GetTensorDescriptor(const std::string& tensor_name,
                                    TensorDescriptor** resutl);
-  absl::Status ResolveSecondElementwiseInput();
+  abslx::Status ResolveSecondElementwiseInput();
   int3 work_groups_count_ = int3(0, 0, 0);
   bool elementwise_ = false;      // temporary, used during op construction
   int elementwise_inputs_ = 0;    // can be {0, 1, 2}

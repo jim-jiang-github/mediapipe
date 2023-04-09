@@ -112,7 +112,7 @@ std::string ToString(enum OperationType op);
 
 OperationType OperationTypeFromString(const std::string& name);
 
-typedef absl::variant<absl::monostate, Tensor<HWC, DataType::FLOAT32>,
+typedef abslx::variant<abslx::monostate, Tensor<HWC, DataType::FLOAT32>,
                       Tensor<Linear, DataType::FLOAT32>, float>
     TensorOrScalar;
 
@@ -234,13 +234,13 @@ BHWDC CalculateOutputShape(const BHWDC& input, const Pooling3DAttributes& attr);
 
 // @return shape of a tensor after Concat operation is applied to the given
 //         input.
-absl::Status CalculateOutputShape(const std::vector<BHWC>& input,
+abslx::Status CalculateOutputShape(const std::vector<BHWC>& input,
                                   const ConcatAttributes& attr,
                                   BHWC* output_shape);
 
 // @return shape of a tensor after Concat operation is applied to the given
 //         input.
-absl::Status CalculateOutputShape(const std::vector<BHWDC>& input,
+abslx::Status CalculateOutputShape(const std::vector<BHWDC>& input,
                                   const ConcatAttributes& attr,
                                   BHWDC* output_shape);
 
@@ -405,7 +405,7 @@ struct ReLUAttributes {
 struct PReLUAttributes {
   // If alpha is linear, then it is sharded across CHANNELS axis, otherwise
   // full shape alpha is required.
-  absl::variant<Tensor<Linear, DataType::FLOAT32>,
+  abslx::variant<Tensor<Linear, DataType::FLOAT32>,
                 Tensor<HWC, DataType::FLOAT32>>
       alpha;
 };

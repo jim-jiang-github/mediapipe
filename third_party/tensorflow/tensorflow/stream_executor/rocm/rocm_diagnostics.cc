@@ -44,7 +44,7 @@ namespace stream_executor {
 namespace rocm {
 
 string DriverVersionToString(DriverVersion version) {
-  return absl::StrFormat("%d.%d.%d", std::get<0>(version), std::get<1>(version),
+  return abslx::StrFormat("%d.%d.%d", std::get<0>(version), std::get<1>(version),
                          std::get<2>(version));
 }
 
@@ -57,10 +57,10 @@ string DriverVersionStatusToString(port::StatusOr<DriverVersion> version) {
 }
 
 port::StatusOr<DriverVersion> StringToDriverVersion(const string& value) {
-  std::vector<string> pieces = absl::StrSplit(value, '.');
+  std::vector<string> pieces = abslx::StrSplit(value, '.');
   if (pieces.size() != 2 && pieces.size() != 3) {
     return port::Status{port::error::INVALID_ARGUMENT,
-                        absl::StrFormat("expected %%d.%%d or %%d.%%d.%%d form "
+                        abslx::StrFormat("expected %%d.%%d or %%d.%%d.%%d form "
                                         "for driver version; got \"%s\"",
                                         value.c_str())};
   }
@@ -71,21 +71,21 @@ port::StatusOr<DriverVersion> StringToDriverVersion(const string& value) {
   if (!port::safe_strto32(pieces[0], &major)) {
     return port::Status{
         port::error::INVALID_ARGUMENT,
-        absl::StrFormat("could not parse major version number \"%s\" as an "
+        abslx::StrFormat("could not parse major version number \"%s\" as an "
                         "integer from string \"%s\"",
                         pieces[0].c_str(), value.c_str())};
   }
   if (!port::safe_strto32(pieces[1], &minor)) {
     return port::Status{
         port::error::INVALID_ARGUMENT,
-        absl::StrFormat("could not parse minor version number \"%s\" as an "
+        abslx::StrFormat("could not parse minor version number \"%s\" as an "
                         "integer from string \"%s\"",
                         pieces[1].c_str(), value.c_str())};
   }
   if (pieces.size() == 3 && !port::safe_strto32(pieces[2], &patch)) {
     return port::Status{
         port::error::INVALID_ARGUMENT,
-        absl::StrFormat("could not parse patch version number \"%s\" as an "
+        abslx::StrFormat("could not parse patch version number \"%s\" as an "
                         "integer from string \"%s\"",
                         pieces[2].c_str(), value.c_str())};
   }
@@ -105,7 +105,7 @@ namespace gpu {
 // -- class Diagnostician
 
 string Diagnostician::GetDevNodePath(int dev_node_ordinal) {
-  return absl::StrCat("/dev/kfd", dev_node_ordinal);
+  return abslx::StrCat("/dev/kfd", dev_node_ordinal);
 }
 
 void Diagnostician::LogDiagnosticInformation() {
@@ -122,7 +122,7 @@ void Diagnostician::LogDiagnosticInformation() {
     string library_path = value == nullptr ? "" : value;
     VLOG(1) << "LD_LIBRARY_PATH is: \"" << library_path << "\"";
 
-    std::vector<string> pieces = absl::StrSplit(library_path, ':');
+    std::vector<string> pieces = abslx::StrSplit(library_path, ':');
     for (const auto& piece : pieces) {
       if (piece.empty()) {
         continue;
@@ -180,7 +180,7 @@ port::StatusOr<DriverVersion> Diagnostician::FindDsoVersion() {
       }
       string dso_version = dot + strlen(so_suffix);
       // TODO(b/22689637): Eliminate the explicit namespace if possible.
-      auto stripped_dso_version = absl::StripSuffix(dso_version, ".ld64");
+      auto stripped_dso_version = abslx::StripSuffix(dso_version, ".ld64");
       auto result = static_cast<port::StatusOr<DriverVersion>*>(data);
       *result = rocm::StringToDriverVersion(string(stripped_dso_version));
       return 1;
@@ -200,7 +200,7 @@ port::StatusOr<DriverVersion> Diagnostician::FindKernelModuleVersion(
   if (offset == string::npos) {
     return port::Status{
         port::error::NOT_FOUND,
-        absl::StrCat("could not find kernel module information in "
+        abslx::StrCat("could not find kernel module information in "
                      "driver version file contents: \"",
                      driver_version_file_contents, "\"")};
   }
@@ -210,7 +210,7 @@ port::StatusOr<DriverVersion> Diagnostician::FindKernelModuleVersion(
   size_t space_index = version_and_rest.find(" ");
   auto kernel_version = version_and_rest.substr(0, space_index);
   // TODO(b/22689637): Eliminate the explicit namespace if possible.
-  auto stripped_kernel_version = absl::StripSuffix(kernel_version, ".ld64");
+  auto stripped_kernel_version = abslx::StripSuffix(kernel_version, ".ld64");
   return rocm::StringToDriverVersion(string(stripped_kernel_version));
 }
 

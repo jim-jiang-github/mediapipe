@@ -224,8 +224,8 @@ class TRTNetworkBuilder {
   // The returned layer's output contains the cumulative elementwise product of
   // all tensors in the input.
   StatusOr<nvinfer1::ILayer*> CumulativeProd(
-      absl::Span<nvinfer1::ITensor*> inputs) noexcept {
-    TRT_ENSURE(!absl::c_any_of(
+      abslx::Span<nvinfer1::ITensor*> inputs) noexcept {
+    TRT_ENSURE(!abslx::c_any_of(
         inputs, [](nvinfer1::ITensor* x) { return x == nullptr; }));
     nvinfer1::ILayer* out = nullptr;
     if (inputs.size() == 1) {
@@ -254,7 +254,7 @@ class TRTNetworkBuilder {
     StatusOr<TRT_ShapedWeights> const_weights =
         weight_store_->GetTempWeights(nvinfer1::DataType::kINT32, shape_dims);
     TRT_ENSURE_OK(const_weights);
-    absl::c_copy(shape_data, const_weights->GetPointer<int32>());
+    abslx::c_copy(shape_data, const_weights->GetPointer<int32>());
     StatusOr<nvinfer1::Dims> trt_dims = const_weights->Shape().AsTrtDims();
     TRT_ENSURE_OK(trt_dims);
     nvinfer1::IConstantLayer* const_layer =
@@ -385,7 +385,7 @@ class TRTNetworkBuilder {
 
   // Adds a TensorRT Concatenate operation to the network.
   StatusOr<nvinfer1::IConcatenationLayer*> Concat(
-      absl::Span<nvinfer1::ITensor* const> inputs, const int axis) {
+      abslx::Span<nvinfer1::ITensor* const> inputs, const int axis) {
     for (nvinfer1::ITensor* input : inputs) {
       TRT_ENSURE(input);
     }
@@ -399,7 +399,7 @@ class TRTNetworkBuilder {
   // Adds a TensorRT Concatenate operation to the network.
   StatusOr<nvinfer1::IConcatenationLayer*> Concat(
       const std::vector<nvinfer1::ITensor*>& inputs, const int axis) {
-    return this->Concat(absl::MakeSpan(inputs), axis);
+    return this->Concat(abslx::MakeSpan(inputs), axis);
   }
 
   // Adds a TensorRT Shape operation, which determines the runtime shape of the
@@ -415,7 +415,7 @@ class TRTNetworkBuilder {
   // the gather operation is a 1D shape tensor where output[i] = (!sub_one ?
   // input_shape[i] : input_shape[i] -1) if i is in "indices", otherwise zero.
   StatusOr<nvinfer1::IGatherLayer*> GetPartialShapeOf(
-      nvinfer1::ITensor* input, absl::InlinedVector<int64, 4> indices,
+      nvinfer1::ITensor* input, abslx::InlinedVector<int64, 4> indices,
       bool sub_one = false) {
     TRT_ENSURE(input);
     TRT_ENSURE(indices.size() <= nvinfer1::Dims::MAX_DIMS);
@@ -607,14 +607,14 @@ class TRTNetworkBuilder {
 
     static int count = 0;
     TRT_ENSURE(input->getType() == nvinfer1::DataType::kFLOAT);
-    std::string quant_name = absl::StrCat(input->getName(), "_quant_", count);
+    std::string quant_name = abslx::StrCat(input->getName(), "_quant_", count);
 
     StatusOr<nvinfer1::ILayer*> quant =
         this->Quantize(input, quantize_scale, quant_name);
     TRT_ENSURE_PTR_OK(quant);
 
     std::string dequant_name =
-        absl::StrCat(input->getName(), "_dequant_", count);
+        abslx::StrCat(input->getName(), "_dequant_", count);
     StatusOr<nvinfer1::ILayer*> dequant = this->Dequantize(
         (*quant)->getOutput(0), dequantize_scale, dequant_name);
     TRT_ENSURE_PTR_OK(dequant);

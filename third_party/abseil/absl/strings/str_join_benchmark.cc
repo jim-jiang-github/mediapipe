@@ -29,7 +29,7 @@ void BM_Join2_Strings(benchmark::State& state) {
   const std::string s(string_len, 'x');
   const std::vector<std::string> v(num_strings, s);
   for (auto _ : state) {
-    std::string s = absl::StrJoin(v, "-");
+    std::string s = abslx::StrJoin(v, "-");
     benchmark::DoNotOptimize(s);
   }
 }
@@ -48,7 +48,7 @@ void BM_Join2_Ints(benchmark::State& state) {
   const int num_ints = state.range(0);
   const std::vector<int> v(num_ints, 42);
   for (auto _ : state) {
-    std::string s = absl::StrJoin(v, "-");
+    std::string s = abslx::StrJoin(v, "-");
     benchmark::DoNotOptimize(s);
   }
 }
@@ -61,7 +61,7 @@ void BM_Join2_KeysAndValues(benchmark::State& state) {
   const std::vector<std::pair<std::string, int>> v(num_pairs,
                                                    std::make_pair(s, 42));
   for (auto _ : state) {
-    std::string s = absl::StrJoin(v, ",", absl::PairFormatter("="));
+    std::string s = abslx::StrJoin(v, ",", abslx::PairFormatter("="));
     benchmark::DoNotOptimize(s);
   }
 }
@@ -81,7 +81,7 @@ void BM_JoinStreamable(benchmark::State& state) {
   const int num_strings = state.range(1);
   const std::vector<std::string> v(num_strings, std::string(string_len, 'x'));
   for (auto _ : state) {
-    std::string s = absl::StrJoin(v, "", absl::StreamFormatter());
+    std::string s = abslx::StrJoin(v, "", abslx::StreamFormatter());
     benchmark::DoNotOptimize(s);
   }
 }

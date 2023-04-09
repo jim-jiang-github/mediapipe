@@ -121,8 +121,8 @@ Status GetTensorArrayShape(const XlaResource* resource,
 // relevant slice of 'operand'.
 xla::XlaOp DynamicAddSlice(xla::XlaBuilder* builder, const xla::XlaOp& operand,
                            const xla::XlaOp& update,
-                           absl::Span<const int64_t> update_dims,
-                           absl::Span<const xla::XlaOp> start_indices,
+                           abslx::Span<const int64_t> update_dims,
+                           abslx::Span<const xla::XlaOp> start_indices,
                            DataType dtype) {
   xla::XlaOp current = xla::DynamicSlice(operand, start_indices, update_dims);
   xla::XlaOp sum =
@@ -168,7 +168,7 @@ class TensorArrayOp : public XlaOpKernel {
 
     XlaResource* var =
         ctx->xla_context()->AddResource(XlaResource::CreateTensorArray(
-            /*name=*/absl::StrCat("TensorArray: ", tensor_array_name_), dtype_,
+            /*name=*/abslx::StrCat("TensorArray: ", tensor_array_name_), dtype_,
             shape, /*initial_value=*/value, /*max_array_size=*/size));
     ctx->SetResourceOutput(0, var);
 

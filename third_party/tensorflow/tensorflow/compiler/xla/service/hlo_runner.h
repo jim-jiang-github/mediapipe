@@ -58,9 +58,9 @@ class HloRunner : public HloRunnerInterface {
   // Transfers data between the host and device.
   StatusOr<ScopedShapedBuffer> TransferLiteralToDevice(const Literal& literal);
   StatusOr<std::vector<ScopedShapedBuffer>> TransferLiteralsToDevice(
-      absl::Span<const Literal* const> literals);
+      abslx::Span<const Literal* const> literals);
   StatusOr<std::vector<ScopedShapedBuffer>> TransferLiteralsToDevice(
-      absl::Span<const Literal> literals);
+      abslx::Span<const Literal> literals);
   StatusOr<Literal> TransferLiteralFromDevice(const ShapedBuffer& buffer);
 
   // Executes the given module with given literals as input and returns the
@@ -72,25 +72,25 @@ class HloRunner : public HloRunnerInterface {
   using HloRunnerInterface::Execute;
 
   StatusOr<Literal> Execute(std::unique_ptr<HloModule> module,
-                            absl::Span<const Literal* const> arguments,
+                            abslx::Span<const Literal* const> arguments,
                             bool run_hlo_passes,
                             ExecutionProfile* profile) override;
 
   using HloRunnerInterface::ExecuteWithExecutable;
 
   StatusOr<Literal> ExecuteWithExecutable(
-      Executable* executable, absl::Span<const Literal* const> arguments,
+      Executable* executable, abslx::Span<const Literal* const> arguments,
       ExecutionProfile* profile) override;
 
   // As Execute(), but accepts and returns device buffers instead of host
   // buffers.
   StatusOr<ExecutionOutput> ExecuteWithDeviceBuffers(
       std::unique_ptr<HloModule> module,
-      absl::Span<ScopedShapedBuffer const> arguments,
+      abslx::Span<ScopedShapedBuffer const> arguments,
       bool run_hlo_passes = true, ExecutionProfile* profile = nullptr);
 
   StatusOr<ExecutionOutput> ExecuteWithDeviceBuffers(
-      Executable* executable, absl::Span<ScopedShapedBuffer const> arguments,
+      Executable* executable, abslx::Span<ScopedShapedBuffer const> arguments,
       ExecutionProfile* profile = nullptr);
 
   // Creates an executable object given an HLO module. If run_hlo_passes is
@@ -140,7 +140,7 @@ class HloRunner : public HloRunnerInterface {
   Backend& backend();
   const Backend& backend() const;
 
-  absl::string_view Name() const override;
+  abslx::string_view Name() const override;
 
   DeviceShapeRepresentationFn device_shape_representation_fn() {
     return device_shape_representation_fn_;
@@ -159,7 +159,7 @@ class HloRunner : public HloRunnerInterface {
   StatusOr<std::vector<Literal>> ExecuteReplicatedImpl(
       std::function<StatusOr<std::vector<ScopedShapedBuffer>>(
           const std::vector<ServiceExecutableRunOptions>&,
-          const std::vector<absl::Span<const ShapedBuffer* const>>&)>
+          const std::vector<abslx::Span<const ShapedBuffer* const>>&)>
           execution_helper,
       std::function<int64_t(int64_t)> argument_count_provider,
       std::function<const Literal*(int64_t, int64_t)> argument_provider,

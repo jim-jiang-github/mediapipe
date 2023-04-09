@@ -26,9 +26,9 @@ namespace tensorflow {
 // On a crash, this can help find the originating "query of death".
 class TfJitRtQueryOfDeathLogger {
  public:
-  TfJitRtQueryOfDeathLogger(absl::string_view kernel_name,
-                            absl::string_view kernel_serialized_operation,
-                            absl::string_view operands) {}
+  TfJitRtQueryOfDeathLogger(abslx::string_view kernel_name,
+                            abslx::string_view kernel_serialized_operation,
+                            abslx::string_view operands) {}
 };
 
 }  // namespace tensorflow

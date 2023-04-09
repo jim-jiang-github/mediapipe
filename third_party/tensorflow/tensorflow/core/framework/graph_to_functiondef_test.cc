@@ -140,9 +140,9 @@ TEST(GraphToFunctionDefTest, ControlOutputs) {
   TF_EXPECT_OK(ConvertGraphDefToGraph(options, graph_def, graph.get()));
 
   // Add a 'b' node to the control return set.
-  const auto control_ret = [](const Node* n) -> absl::optional<string> {
-    if (n->name() == "b") return absl::make_optional<string>("must_execute");
-    return absl::nullopt;
+  const auto control_ret = [](const Node* n) -> abslx::optional<string> {
+    if (n->name() == "b") return abslx::make_optional<string>("must_execute");
+    return abslx::nullopt;
   };
 
   FunctionDef fdef;

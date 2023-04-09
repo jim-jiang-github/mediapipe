@@ -58,16 +58,16 @@ class FromImageCalculator : public CalculatorBase {
   FromImageCalculator() = default;
   ~FromImageCalculator() override = default;
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
   // From Calculator.
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
-  absl::Status RenderGpu(CalculatorContext* cc);
-  absl::Status RenderCpu(CalculatorContext* cc);
+  abslx::Status RenderGpu(CalculatorContext* cc);
+  abslx::Status RenderCpu(CalculatorContext* cc);
 
   bool check_image_source_ = false;
   bool gpu_output_ = false;
@@ -78,14 +78,14 @@ class FromImageCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(FromImageCalculator);
 
-absl::Status FromImageCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status FromImageCalculator::GetContract(CalculatorContract* cc) {
   cc->Inputs().Tag(kImageTag).Set<mediapipe::Image>();
 
   bool gpu_output = false;
 
   if (cc->Outputs().HasTag(kImageFrameTag) &&
       cc->Outputs().HasTag(kGpuBufferTag)) {
-    return absl::InternalError("Cannot have multiple outputs.");
+    return abslx::InternalError("Cannot have multiple outputs.");
   }
 
   if (cc->Outputs().HasTag(kGpuBufferTag)) {
@@ -109,10 +109,10 @@ absl::Status FromImageCalculator::GetContract(CalculatorContract* cc) {
   if (cc->Outputs().HasTag(kSourceOnGpuTag)) {
     cc->Outputs().Tag(kSourceOnGpuTag).Set<bool>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FromImageCalculator::Open(CalculatorContext* cc) {
+abslx::Status FromImageCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
   if (cc->Outputs().HasTag(kGpuBufferTag)) {
@@ -127,10 +127,10 @@ absl::Status FromImageCalculator::Open(CalculatorContext* cc) {
 #endif
   }  //  !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FromImageCalculator::Process(CalculatorContext* cc) {
+abslx::Status FromImageCalculator::Process(CalculatorContext* cc) {
   if (check_image_source_) {
     auto& input = cc->Inputs().Tag(kImageTag).Get<mediapipe::Image>();
     cc->Outputs()
@@ -140,7 +140,7 @@ absl::Status FromImageCalculator::Process(CalculatorContext* cc) {
 
   if (gpu_output_) {
 #if !MEDIAPIPE_DISABLE_GPU
-    MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext([&cc]() -> absl::Status {
+    MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext([&cc]() -> abslx::Status {
       auto& input = cc->Inputs().Tag(kImageTag).Get<mediapipe::Image>();
       // Unwrap texture pointer; shallow copy.
       auto output =
@@ -148,7 +148,7 @@ absl::Status FromImageCalculator::Process(CalculatorContext* cc) {
       cc->Outputs()
           .Tag(kGpuBufferTag)
           .Add(output.release(), cc->InputTimestamp());
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }));
 #endif  // !MEDIAPIPE_DISABLE_GPU
   } else {
@@ -170,11 +170,11 @@ absl::Status FromImageCalculator::Process(CalculatorContext* cc) {
         .Add(output.release(), cc->InputTimestamp());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FromImageCalculator::Close(CalculatorContext* cc) {
-  return absl::OkStatus();
+abslx::Status FromImageCalculator::Close(CalculatorContext* cc) {
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

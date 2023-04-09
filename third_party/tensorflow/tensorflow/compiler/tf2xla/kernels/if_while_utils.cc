@@ -23,11 +23,11 @@ namespace tensorflow {
 
 const char kPropagateCompileTimeConsts[] = "_xla_propagate_compile_time_consts";
 
-absl::InlinedVector<int, 5> ConvertCompileTimeConstArgumentsToConst(
+abslx::InlinedVector<int, 5> ConvertCompileTimeConstArgumentsToConst(
     XlaOpKernelContext* ctx, std::vector<XlaCompiler::Argument>* args,
     int xla_expression_offset,
     std::function<bool(int arg_idx)> should_resolve_constant) {
-  absl::InlinedVector<int, 5> resolved_constant_idxs;
+  abslx::InlinedVector<int, 5> resolved_constant_idxs;
   for (int i = 0; i < args->size(); i++) {
     XlaCompiler::Argument* arg = &(*args)[i];
     const XlaExpression& expression =

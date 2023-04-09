@@ -566,9 +566,9 @@ class IteratorContext {
       // is an instance of `thread::ThreadPoolInterface`). Notably, the
       // ownership of `params_.thread_pool` is *not* transferred onto the newly
       // created `ThreadPool` instance.
-      return absl::make_unique<thread::ThreadPool>(params_.thread_pool);
+      return abslx::make_unique<thread::ThreadPool>(params_.thread_pool);
     } else {
-      return absl::make_unique<thread::ThreadPool>(params_.env, ThreadOptions(),
+      return abslx::make_unique<thread::ThreadPool>(params_.env, ThreadOptions(),
                                                    name, num_threads,
                                                    /*low_latency_hint=*/false);
     }
@@ -579,7 +579,7 @@ class IteratorContext {
     if (params_.thread_factory) {
       return params_.thread_factory->StartThread(name, std::move(fn));
     } else {
-      return absl::WrapUnique(
+      return abslx::WrapUnique(
           Env::Default()->StartThread({}, name, std::move(fn)));
     }
   }
@@ -1333,7 +1333,7 @@ class DatasetOpKernel : public OpKernel {
       std::string serialized_metadata;
       OP_REQUIRES_OK(ctx, ctx->GetAttr(kMetadata, &serialized_metadata));
       OP_REQUIRES(ctx, metadata_.ParseFromString(serialized_metadata),
-                  errors::InvalidArgument(absl::StrCat(
+                  errors::InvalidArgument(abslx::StrCat(
                       "Could not parse the 'metadata' attribute.")));
     }
   }

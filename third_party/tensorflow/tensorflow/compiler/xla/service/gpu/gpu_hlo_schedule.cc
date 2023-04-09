@@ -161,7 +161,7 @@ void BFSLaunchOrder(const HloComputation* computation,
   // The sorting algorithm repeatedly pops the top from the queue and deletes
   // that HLO from the graph, making more HLOs incoming-edge free.
   std::deque<HloInstruction*> queue;
-  absl::flat_hash_map<const HloInstruction*, int64_t> incoming_edge_count;
+  abslx::flat_hash_map<const HloInstruction*, int64_t> incoming_edge_count;
   for (auto* hlo : computation->instructions()) {
     if (hlo->operand_count() == 0) {
       queue.push_back(hlo);
@@ -202,8 +202,8 @@ bool ShouldScheduleAsEarlyAsPossible(const HloInstruction& instr) {
 bool ShouldScheduleSuccessor(const HloInstruction& sussessor,
                              const HloPredicate& is_scheduled) {
   return ShouldScheduleAsEarlyAsPossible(sussessor) &&
-         absl::c_all_of(sussessor.operands(), is_scheduled) &&
-         absl::c_all_of(sussessor.control_predecessors(), is_scheduled);
+         abslx::c_all_of(sussessor.operands(), is_scheduled) &&
+         abslx::c_all_of(sussessor.control_predecessors(), is_scheduled);
 }
 
 bool ShouldScheduleAsLateAsPossible(const HloInstruction& instr) {
@@ -221,8 +221,8 @@ bool ShouldScheduleAsLateAsPossible(const HloInstruction& instr) {
 bool ShouldSchedulePredecessor(const HloInstruction& predecessor,
                                const HloPredicate& is_scheduled) {
   return ShouldScheduleAsLateAsPossible(predecessor) &&
-         absl::c_all_of(predecessor.users(), is_scheduled) &&
-         absl::c_all_of(predecessor.control_successors(), is_scheduled);
+         abslx::c_all_of(predecessor.users(), is_scheduled) &&
+         abslx::c_all_of(predecessor.control_successors(), is_scheduled);
 }
 
 // Schedules certain ops as early or late as possible. This supports a
@@ -236,7 +236,7 @@ HloInstructionSequence PostprocessorToScheduleAsEarlyOrLateAsPossible(
     const HloInstructionSequence& input) {
   std::vector<HloInstruction*> earliest_scheduled;
   {
-    absl::flat_hash_set<HloInstruction*> scheduled;
+    abslx::flat_hash_set<HloInstruction*> scheduled;
     auto is_scheduled = [&](const HloInstruction* instr) -> bool {
       return scheduled.contains(instr);
     };
@@ -268,7 +268,7 @@ HloInstructionSequence PostprocessorToScheduleAsEarlyOrLateAsPossible(
 
   std::deque<HloInstruction*> latest_scheduled;
   {
-    absl::flat_hash_set<HloInstruction*> scheduled;
+    abslx::flat_hash_set<HloInstruction*> scheduled;
     auto is_scheduled = [&](const HloInstruction* instr) -> bool {
       return scheduled.contains(instr);
     };
@@ -300,7 +300,7 @@ HloInstructionSequence PostprocessorToScheduleAsEarlyOrLateAsPossible(
   }
 
   HloInstructionSequence result;
-  absl::c_for_each(latest_scheduled,
+  abslx::c_for_each(latest_scheduled,
                    [&](HloInstruction* i) { result.push_back(i); });
   return result;
 }

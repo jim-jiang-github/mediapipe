@@ -46,10 +46,10 @@ TEST(ServerLibTest, NewServerNoFactoriesAccept) {
   std::unique_ptr<ServerInterface> server;
   Status s = NewServer(server_def, &server);
   ASSERT_NE(s, OkStatus());
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.error_message(),
       "No server factory registered for the given ServerDef"));
-  EXPECT_TRUE(absl::StrContains(s.error_message(),
+  EXPECT_TRUE(abslx::StrContains(s.error_message(),
                                 "The available server factories are: ["));
 }
 

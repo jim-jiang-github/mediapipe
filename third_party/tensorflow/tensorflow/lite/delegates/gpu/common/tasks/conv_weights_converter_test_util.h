@@ -22,14 +22,14 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status ConverterToConvWeights1x1OutX4Test(TestExecutionEnvironment* env);
-absl::Status ConverterToConvWeights1x1OutX4UnalignedTest(
+abslx::Status ConverterToConvWeights1x1OutX4Test(TestExecutionEnvironment* env);
+abslx::Status ConverterToConvWeights1x1OutX4UnalignedTest(
     TestExecutionEnvironment* env);
-absl::Status ConverterToConvWeights1x1OutX2Test(TestExecutionEnvironment* env);
-absl::Status ConverterToConvWeightsOutX2Test(TestExecutionEnvironment* env);
-absl::Status ConverterToConvTransposedWeights4x4Test(
+abslx::Status ConverterToConvWeights1x1OutX2Test(TestExecutionEnvironment* env);
+abslx::Status ConverterToConvWeightsOutX2Test(TestExecutionEnvironment* env);
+abslx::Status ConverterToConvTransposedWeights4x4Test(
     TestExecutionEnvironment* env);
-absl::Status ConverterToConvWeights4xTexturesTest(
+abslx::Status ConverterToConvWeights4xTexturesTest(
     TestExecutionEnvironment* env);
 
 }  // namespace gpu

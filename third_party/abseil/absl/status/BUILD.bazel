@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This package contains `absl::Status`.
+# This package contains `abslx::Status`.
 # It will expand later to have utilities around `Status` like `StatusOr`,
 # `StatusBuilder` and macros.
 

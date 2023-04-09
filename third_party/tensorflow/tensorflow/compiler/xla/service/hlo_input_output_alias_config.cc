@@ -37,7 +37,7 @@ Status HloInputOutputAliasConfig::SetUpAlias(
   TF_RET_CHECK(!OutputHasAlias(output_index))
       << "Output index " << output_index << " already has an alias setup";
   // Output can't be aliased with multiple parameters.
-  TF_RET_CHECK(!alias_.element(output_index)) << absl::StrFormat(
+  TF_RET_CHECK(!alias_.element(output_index)) << abslx::StrFormat(
       "Trying to set up output alias for param %lld at %s but failed: output "
       "index %s is already aliased with param %lld at %s",
       param_number, param_index.ToString(), output_index.ToString(),
@@ -98,15 +98,15 @@ std::string HloInputOutputAliasConfig::ToString() const {
   std::vector<std::string> pieces;
   pieces.push_back("HloInputOutputAliasConfig");
   pieces.push_back(
-      absl::StrFormat("  Output shape: %s", alias_.shape().ToString()));
+      abslx::StrFormat("  Output shape: %s", alias_.shape().ToString()));
 
   ForEachAlias([&](const ShapeIndex& output_index, const Alias& alias) {
-    pieces.push_back(absl::StrFormat(
+    pieces.push_back(abslx::StrFormat(
         "  OutputIndex %s is %saliased with parameter %lld at %s:",
         output_index.ToString(), alias.kind == kMustAlias ? "must-" : "may-",
         alias.parameter_number, alias.parameter_index.ToString()));
   });
-  return absl::StrJoin(pieces, "\n");
+  return abslx::StrJoin(pieces, "\n");
 }
 
 std::string HloInputOutputAliasConfig::ToShortString() const {
@@ -115,10 +115,10 @@ std::string HloInputOutputAliasConfig::ToShortString() const {
     const ShapeIndex& index = p.first;
     if (std::optional<Alias> alias = p.second) {
       pieces.push_back(
-          absl::StrFormat("%s: %s", index.ToString(), alias->ToString()));
+          abslx::StrFormat("%s: %s", index.ToString(), alias->ToString()));
     }
   }
-  return absl::StrJoin(pieces, ", ");
+  return abslx::StrJoin(pieces, ", ");
 }
 
 bool HloInputOutputAliasConfig::ParameterMustAlias(

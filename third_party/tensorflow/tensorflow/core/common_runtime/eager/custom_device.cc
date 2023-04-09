@@ -38,7 +38,7 @@ Status CustomDeviceTensorHandle::NumElements(int64_t* num_elements) const {
     TF_RETURN_IF_ERROR(Dim(i, &dim));
     if (dim < 0) {
       return errors::InvalidArgument(
-          absl::StrCat("Tried to compute the number of elements of a tensor "
+          abslx::StrCat("Tried to compute the number of elements of a tensor "
                        "representing varying shapes. ",
                        DebugString()));
     }
@@ -82,7 +82,7 @@ const DeviceNameUtils::ParsedName* CustomDeviceTensorHandle::ParsedName(
     DeviceNameUtils::ParsedName parsed_name;
     if (!DeviceNameUtils::ParseFullOrLocalName(device_->name(), &parsed_name)) {
       *status = errors::InvalidArgument(
-          absl::StrCat("Invalid custom device name ", device_->name()));
+          abslx::StrCat("Invalid custom device name ", device_->name()));
       return nullptr;
     }
     parsed_name_.emplace(std::move(parsed_name));

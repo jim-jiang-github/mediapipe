@@ -36,7 +36,7 @@ static std::string GetCudaErrorMessage(CUresult result) {
   cuGetErrorString(result, &error);
   const char* name;
   cuGetErrorName(result, &name);
-  return absl::StrCat("CUDA error: ", error ? error : "<unknown>", " (",
+  return abslx::StrCat("CUDA error: ", error ? error : "<unknown>", " (",
                       name ? name : "Unknown", ")");
 }
 #endif  // GOOGLE_CUDA
@@ -49,7 +49,7 @@ void GpuCudaMallocAsyncAllocator::PrintAllocatorStatistics() {
   for (auto p : size_map_) {
     if (VLOG_IS_ON(8)) {
       ptr_size_string.push_back(
-          absl::StrCat("(", absl::Hex(p.first), ",", p.second) + ")");
+          abslx::StrCat("(", abslx::Hex(p.first), ",", p.second) + ")");
     }
     size_map_historgram[p.second]++;
   }
@@ -60,7 +60,7 @@ void GpuCudaMallocAsyncAllocator::PrintAllocatorStatistics() {
   }
 
   VLOG(8) << "\nThe sorted list of (ptr,size):";
-  VLOG(8) << absl::StrJoin(ptr_size_string, ",");
+  VLOG(8) << abslx::StrJoin(ptr_size_string, ",");
 
 #if CUDA_VERSION >= 11030
   cuuint64_t mem_reserved_current;
@@ -100,7 +100,7 @@ std::atomic<int> GpuCudaMallocAsyncAllocator::number_instantiated_(0);
 GpuCudaMallocAsyncAllocator::GpuCudaMallocAsyncAllocator(
     PlatformDeviceId platform_device_id, size_t pool_size, bool reserve_memory,
     bool compute_stats)
-    : name_(absl::StrCat("gpu_async_", platform_device_id.value())),
+    : name_(abslx::StrCat("gpu_async_", platform_device_id.value())),
       reserve_memory_(reserve_memory) {
   ++number_instantiated_;
 
@@ -369,8 +369,8 @@ size_t GpuCudaMallocAsyncAllocator::AllocatedSize(const void* ptr) const {
   return size_map_.at(ptr);
 }
 
-absl::optional<AllocatorStats> GpuCudaMallocAsyncAllocator::GetStats() {
-  if (!stats_) return absl::nullopt;
+abslx::optional<AllocatorStats> GpuCudaMallocAsyncAllocator::GetStats() {
+  if (!stats_) return abslx::nullopt;
   mutex_lock l(lock_);
   return *stats_;
 }

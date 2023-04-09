@@ -28,7 +28,7 @@ namespace xla {
 // reduction.
 class BitcastDtypesExpander : public OpExpanderPass {
  public:
-  absl::string_view name() const override { return "bitcast_dtypes_expander"; }
+  abslx::string_view name() const override { return "bitcast_dtypes_expander"; }
 
  protected:
   bool InstructionMatchesPattern(HloInstruction* instruction) override;
@@ -37,7 +37,7 @@ class BitcastDtypesExpander : public OpExpanderPass {
       HloInstruction* instruction) override;
 
  private:
-  absl::flat_hash_map<std::string, HloComputation*> computation_cache_;
+  abslx::flat_hash_map<std::string, HloComputation*> computation_cache_;
 };
 
 }  // namespace xla

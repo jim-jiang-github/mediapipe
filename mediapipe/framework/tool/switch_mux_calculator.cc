@@ -65,10 +65,10 @@ class SwitchMuxCalculator : public CalculatorBase {
   static constexpr char kEnableTag[] = "ENABLE";
 
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   // Stores any new input channel history.
@@ -93,7 +93,7 @@ class SwitchMuxCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(SwitchMuxCalculator);
 
-absl::Status SwitchMuxCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status SwitchMuxCalculator::GetContract(CalculatorContract* cc) {
   // Allow any one of kSelectTag, kEnableTag.
   cc->Inputs().Tag(kSelectTag).Set<int>().Optional();
   cc->Inputs().Tag(kEnableTag).Set<bool>().Optional();
@@ -140,7 +140,7 @@ absl::Status SwitchMuxCalculator::GetContract(CalculatorContract* cc) {
   }
   cc->SetInputStreamHandler("ImmediateInputStreamHandler");
   cc->SetProcessTimestampBounds(true);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Returns the last delivered timestamp for an input stream.
@@ -159,7 +159,7 @@ Timestamp ChannelSettledTimestamp(CalculatorContext* cc) {
   return result;
 }
 
-absl::Status SwitchMuxCalculator::Open(CalculatorContext* cc) {
+abslx::Status SwitchMuxCalculator::Open(CalculatorContext* cc) {
   // Initialize channel_index_ and channel_history_.
   options_ = cc->Options<mediapipe::SwitchContainerOptions>();
   channel_index_ = tool::GetChannelIndex(*cc, channel_index_);
@@ -175,7 +175,7 @@ absl::Status SwitchMuxCalculator::Open(CalculatorContext* cc) {
       cc->OutputSidePackets().Get(tag, index).Set(input);
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void SwitchMuxCalculator::RecordChannel(CalculatorContext* cc) {
@@ -255,7 +255,7 @@ void SwitchMuxCalculator::SendActivePackets(CalculatorContext* cc) {
   }
 }
 
-absl::Status SwitchMuxCalculator::Process(CalculatorContext* cc) {
+abslx::Status SwitchMuxCalculator::Process(CalculatorContext* cc) {
   // Normally packets will arrive on the active channel and will be passed
   // through immediately.  In the less common case in which the active input
   // channel is not known for an input packet timestamp, the input packet is
@@ -263,7 +263,7 @@ absl::Status SwitchMuxCalculator::Process(CalculatorContext* cc) {
   RecordChannel(cc);
   RecordPackets(cc);
   SendActivePackets(cc);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

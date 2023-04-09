@@ -93,7 +93,7 @@ Status FindStatefulOps(const GraphDef& graph_def,
     for (const auto& node : fdef.node_def()) {
       if (!IsNodeStateful(lib_def, node).ok()) {
         stateful_op_names->push_back(
-            absl::StrCat(node.op(), " in function: ", fdef.signature().name()));
+            abslx::StrCat(node.op(), " in function: ", fdef.signature().name()));
       }
     }
   }
@@ -112,7 +112,7 @@ Status ReadElementsFromCheckpoint(IteratorContext* ctx,
   DCHECK(elements->empty());
   elements->reserve(num_elements);
   for (int i = 0; i < num_elements; ++i) {
-    std::string element_prefix = absl::StrCat(key_prefix, "::", i);
+    std::string element_prefix = abslx::StrCat(key_prefix, "::", i);
     int64_t num_components;
     TF_RETURN_IF_ERROR(
         reader->ReadScalar(element_prefix, kNumComponents, &num_components));
@@ -122,7 +122,7 @@ Status ReadElementsFromCheckpoint(IteratorContext* ctx,
     for (int j = 0; j < num_components; ++j) {
       element.emplace_back();
       TF_RETURN_IF_ERROR(reader->ReadTensor(
-          ctx->flr(), element_prefix, absl::StrCat(kComponent, "[", j, "]"),
+          ctx->flr(), element_prefix, abslx::StrCat(kComponent, "[", j, "]"),
           &element.back()));
     }
   }
@@ -136,12 +136,12 @@ Status WriteElementsToCheckpoint(
       writer->WriteScalar(key_prefix, kNumElements, elements.size()));
   for (int i = 0; i < elements.size(); ++i) {
     const std::vector<Tensor>& element = elements[i];
-    std::string element_prefix = absl::StrCat(key_prefix, "::", i);
+    std::string element_prefix = abslx::StrCat(key_prefix, "::", i);
     TF_RETURN_IF_ERROR(
         writer->WriteScalar(element_prefix, kNumComponents, element.size()));
     for (int j = 0; j < elements[i].size(); ++j) {
       TF_RETURN_IF_ERROR(writer->WriteTensor(
-          element_prefix, absl::StrCat(kComponent, "[", j, "]"), element[j]));
+          element_prefix, abslx::StrCat(kComponent, "[", j, "]"), element[j]));
     }
   }
   return OkStatus();
@@ -453,7 +453,7 @@ Status AsGraphDef(const DatasetBase* dataset,
                       "construction graph whose state would not be "
                       "serialized and might "
                       "cause subtle bugs: "
-                   << absl::StrJoin(stateful_op_names, ", ");
+                   << abslx::StrJoin(stateful_op_names, ", ");
     }
   }
   GraphDefBuilder b;

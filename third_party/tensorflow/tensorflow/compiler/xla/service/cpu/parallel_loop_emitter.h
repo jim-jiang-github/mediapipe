@@ -61,7 +61,7 @@ class ParallelLoopEmitter : public llvm_ir::LoopEmitter {
   ~ParallelLoopEmitter() override = default;
 
   std::vector<llvm_ir::IrArray::Index> EmitIndexAndSetExitBasicBlock(
-      absl::string_view loop_name, llvm::Type* index_type,
+      abslx::string_view loop_name, llvm::Type* index_type,
       llvm::Value* base_index) override;
 
  private:

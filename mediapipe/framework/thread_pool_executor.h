@@ -25,7 +25,7 @@ namespace mediapipe {
 // A multithreaded executor based on a thread pool.
 class ThreadPoolExecutor : public Executor {
  public:
-  static absl::StatusOr<Executor*> Create(
+  static abslx::StatusOr<Executor*> Create(
       const MediaPipeOptions& extendable_options);
 
   explicit ThreadPoolExecutor(int num_threads);

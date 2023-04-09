@@ -79,7 +79,7 @@ bool NcclCollectiveConfig::IsDegenerate(int64_t replica_count,
   // not degenerate.
   bool all_groups_singleton =
       !groups_empty &&
-      absl::c_all_of(replica_groups, [](const ReplicaGroup& group) {
+      abslx::c_all_of(replica_groups, [](const ReplicaGroup& group) {
         return group.replica_ids_size() == 1;
       });
 
@@ -129,7 +129,7 @@ StatusOr<NcclComm::Lock> LockNcclComm(
         "environment configuration.");
   }
 
-  auto it = absl::c_find(participants, global_device_id);
+  auto it = abslx::c_find(participants, global_device_id);
   TF_RET_CHECK(it != participants.end());
   int rank = it - participants.begin();
 
@@ -171,7 +171,7 @@ StatusOr<std::vector<DeviceBufferPair>> ConvertToDeviceBuffers(
 
 Status NcclCollectiveThunk::ExecuteOnStream(const ExecuteParams& params) {
 #if XLA_ENABLE_XCCL
-  VLOG(1) << absl::StreamFormat("Starting %s.", Thunk::KindToString(kind()));
+  VLOG(1) << abslx::StreamFormat("Starting %s.", Thunk::KindToString(kind()));
   TF_ASSIGN_OR_RETURN(NcclComm::Lock comm,
                       LockNcclComm(params.nccl_params, config().replica_groups,
                                    config().group_mode, config().op_id));
@@ -202,7 +202,7 @@ std::string NcclCollectiveThunk::GetDeviceString(
   DeviceAssignment::LogicalID logical_id =
       nccl_params.device_assn->LogicalIdForDevice(global_device_id)
           .ValueOrDie();
-  return absl::StrFormat("(r%d, p%d) : GlobalID %d, ord %d",
+  return abslx::StrFormat("(r%d, p%d) : GlobalID %d, ord %d",
                          logical_id.replica_id, logical_id.computation_id,
                          global_device_id.value(), device_ordinal);
 }

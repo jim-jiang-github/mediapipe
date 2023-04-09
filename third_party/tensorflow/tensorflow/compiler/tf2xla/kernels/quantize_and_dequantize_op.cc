@@ -164,7 +164,7 @@ class QuantizeAndDequantizeOp : public XlaOpKernel {
     // explicit broadcast if the axis has a non-scalar shape.
     if (!xla::ShapeUtil::IsScalar(axis_shape)) {
       xla::Shape input_shape = b->GetShape(input).ValueOrDie();
-      absl::Span<const int64_t> input_dimensions = input_shape.dimensions();
+      abslx::Span<const int64_t> input_dimensions = input_shape.dimensions();
       auto convert_to_input_shape = [&](const xla::XlaOp op) {
         return xla::BroadcastInDim(op, input_dimensions, {axis_});
       };

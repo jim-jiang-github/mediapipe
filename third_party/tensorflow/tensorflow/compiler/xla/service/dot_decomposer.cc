@@ -57,9 +57,9 @@ Status CanonicalizeDot(HloInstruction* original_dot) {
   std::vector<int64_t> batch_dim_sizes;
   batch_dim_sizes.reserve(num_batch_dims);
   for (int64_t i = 0; i < lhs_rank; ++i) {
-    if (absl::c_linear_search(original_dnums.lhs_contracting_dimensions(), i)) {
+    if (abslx::c_linear_search(original_dnums.lhs_contracting_dimensions(), i)) {
       lhs_contracting_size *= lhs_shape.dimensions(i);
-    } else if (absl::c_linear_search(original_dnums.lhs_batch_dimensions(),
+    } else if (abslx::c_linear_search(original_dnums.lhs_batch_dimensions(),
                                      i)) {
       batch_dim_sizes.push_back(lhs_shape.dimensions(i));
     } else {
@@ -104,9 +104,9 @@ Status CanonicalizeDot(HloInstruction* original_dot) {
   int64_t rhs_non_contracting_size = 1;
   int64_t rhs_contracting_size = 1;
   for (int64_t i = 0; i < rhs_rank; ++i) {
-    if (absl::c_linear_search(original_dnums.rhs_contracting_dimensions(), i)) {
+    if (abslx::c_linear_search(original_dnums.rhs_contracting_dimensions(), i)) {
       rhs_contracting_size *= rhs_shape.dimensions(i);
-    } else if (!absl::c_linear_search(original_dnums.rhs_batch_dimensions(),
+    } else if (!abslx::c_linear_search(original_dnums.rhs_batch_dimensions(),
                                       i)) {
       rhs_non_contracting_dims.push_back(i);
       rhs_non_contracting_size *= rhs_shape.dimensions(i);
@@ -178,7 +178,7 @@ Status CanonicalizeDot(HloInstruction* original_dot) {
 
 StatusOr<bool> DotDecomposer::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   // Gather all Non-canonical Dot operations.
   std::vector<HloInstruction*> non_canonical_dots;
   for (auto* computation :
@@ -210,9 +210,9 @@ StatusOr<bool> DotDecomposer::Run(
       // Check that batch dims, if present, are canonical.
       std::vector<int64_t> canonical_batch_dims(
           dnums.lhs_batch_dimensions_size());
-      absl::c_iota(canonical_batch_dims, 0);
-      if (!absl::c_equal(dnums.lhs_batch_dimensions(), canonical_batch_dims) ||
-          !absl::c_equal(dnums.rhs_batch_dimensions(), canonical_batch_dims)) {
+      abslx::c_iota(canonical_batch_dims, 0);
+      if (!abslx::c_equal(dnums.lhs_batch_dimensions(), canonical_batch_dims) ||
+          !abslx::c_equal(dnums.rhs_batch_dimensions(), canonical_batch_dims)) {
         non_canonical_dots.push_back(instruction);
       }
     }

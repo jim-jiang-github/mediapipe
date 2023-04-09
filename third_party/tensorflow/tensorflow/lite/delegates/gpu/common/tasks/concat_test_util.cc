@@ -27,7 +27,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status ConcatWidthTest(TestExecutionEnvironment* env) {
+abslx::Status ConcatWidthTest(TestExecutionEnvironment* env) {
   TensorFloat32 src0, src1;
   src0.shape = BHWC(1, 2, 1, 2);
   src0.data = {half(0.0f), half(-1.0f), half(-0.05f), half(0.045f)};
@@ -58,10 +58,10 @@ absl::Status ConcatWidthTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConcatHeightTest(TestExecutionEnvironment* env) {
+abslx::Status ConcatHeightTest(TestExecutionEnvironment* env) {
   TensorFloat32 src0, src1;
   src0.shape = BHWC(1, 2, 1, 2);
   src0.data = {half(0.0f), half(-1.0f), half(-0.05f), half(0.045f)};
@@ -89,10 +89,10 @@ absl::Status ConcatHeightTest(TestExecutionEnvironment* env) {
                                     dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConcatChannelsTest(TestExecutionEnvironment* env) {
+abslx::Status ConcatChannelsTest(TestExecutionEnvironment* env) {
   TensorFloat32 src0, src1, src2;
   src0.shape = BHWC(1, 2, 1, 1);
   src0.data = {half(0.0f), half(-1.0f)};
@@ -128,10 +128,10 @@ absl::Status ConcatChannelsTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConcatChannelsAlignedx4Test(TestExecutionEnvironment* env) {
+abslx::Status ConcatChannelsAlignedx4Test(TestExecutionEnvironment* env) {
   TensorFloat32 src0, src1;
   src0.shape = BHWC(1, 2, 1, 4);
   src0.data = {half(-1.0f), half(-2.0f), half(-3.0f), half(-4.0f),
@@ -164,7 +164,7 @@ absl::Status ConcatChannelsAlignedx4Test(TestExecutionEnvironment* env) {
                         dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

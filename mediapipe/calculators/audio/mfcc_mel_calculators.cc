@@ -49,7 +49,7 @@ std::string PortableDebugString(const TimeSeriesHeader& header) {
     packet_rate: $3
     audio_sample_rate: $4
   )";
-  return absl::Substitute(unsubstituted_header_debug_str, header.sample_rate(),
+  return abslx::Substitute(unsubstituted_header_debug_str, header.sample_rate(),
                           header.num_channels(), header.num_samples(),
                           header.packet_rate(), header.audio_sample_rate());
 }
@@ -66,7 +66,7 @@ std::string PortableDebugString(const TimeSeriesHeader& header) {
 // rows corresponding to the new feature space).
 class FramewiseTransformCalculatorBase : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<Matrix>(
         // Sequence of Matrices, each column describing a particular time frame,
         // each row a feature dimension, with TimeSeriesHeader.
@@ -75,11 +75,11 @@ class FramewiseTransformCalculatorBase : public CalculatorBase {
         // Sequence of Matrices, each column describing a particular time frame,
         // each row a feature dimension, with TimeSeriesHeader.
     );
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final;
-  absl::Status Process(CalculatorContext* cc) final;
+  abslx::Status Open(CalculatorContext* cc) final;
+  abslx::Status Process(CalculatorContext* cc) final;
 
   int num_output_channels(void) { return num_output_channels_; }
 
@@ -90,7 +90,7 @@ class FramewiseTransformCalculatorBase : public CalculatorBase {
  private:
   // Takes header and options, and sets up state including calling
   // set_num_output_channels() on the base object.
-  virtual absl::Status ConfigureTransform(const TimeSeriesHeader& header,
+  virtual abslx::Status ConfigureTransform(const TimeSeriesHeader& header,
                                           CalculatorContext* cc) = 0;
 
   // Takes a vector<double> corresponding to an input frame, and
@@ -102,12 +102,12 @@ class FramewiseTransformCalculatorBase : public CalculatorBase {
   int num_output_channels_;
 };
 
-absl::Status FramewiseTransformCalculatorBase::Open(CalculatorContext* cc) {
+abslx::Status FramewiseTransformCalculatorBase::Open(CalculatorContext* cc) {
   TimeSeriesHeader input_header;
   MP_RETURN_IF_ERROR(time_series_util::FillTimeSeriesHeaderIfValid(
       cc->Inputs().Index(0).Header(), &input_header));
 
-  absl::Status status = ConfigureTransform(input_header, cc);
+  abslx::Status status = ConfigureTransform(input_header, cc);
 
   auto output_header = new TimeSeriesHeader(input_header);
   output_header->set_num_channels(num_output_channels_);
@@ -118,7 +118,7 @@ absl::Status FramewiseTransformCalculatorBase::Open(CalculatorContext* cc) {
   return status;
 }
 
-absl::Status FramewiseTransformCalculatorBase::Process(CalculatorContext* cc) {
+abslx::Status FramewiseTransformCalculatorBase::Process(CalculatorContext* cc) {
   const Matrix& input = cc->Inputs().Index(0).Get<Matrix>();
   const int num_frames = input.cols();
   std::unique_ptr<Matrix> output(new Matrix(num_output_channels_, num_frames));
@@ -145,7 +145,7 @@ absl::Status FramewiseTransformCalculatorBase::Process(CalculatorContext* cc) {
   }
   cc->Outputs().Index(0).Add(output.release(), cc->InputTimestamp());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Calculator wrapper around the dsp/mfcc/mfcc.cc routine.
@@ -170,12 +170,12 @@ absl::Status FramewiseTransformCalculatorBase::Process(CalculatorContext* cc) {
 // }
 class MfccCalculator : public FramewiseTransformCalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     return FramewiseTransformCalculatorBase::GetContract(cc);
   }
 
  private:
-  absl::Status ConfigureTransform(const TimeSeriesHeader& header,
+  abslx::Status ConfigureTransform(const TimeSeriesHeader& header,
                                   CalculatorContext* cc) override {
     MfccCalculatorOptions mfcc_options = cc->Options<MfccCalculatorOptions>();
     mfcc_.reset(new audio_dsp::Mfcc());
@@ -194,8 +194,8 @@ class MfccCalculator : public FramewiseTransformCalculatorBase {
     // audio_dsp::MelFilterBank needs to know this to
     // correctly interpret the spectrogram bins.
     if (!header.has_audio_sample_rate()) {
-      return absl::InvalidArgumentError(
-          absl::StrCat("No audio_sample_rate in input TimeSeriesHeader ",
+      return abslx::InvalidArgumentError(
+          abslx::StrCat("No audio_sample_rate in input TimeSeriesHeader ",
                        PortableDebugString(header)));
     }
     // Now we can initialize the Mfcc object.
@@ -203,9 +203,9 @@ class MfccCalculator : public FramewiseTransformCalculatorBase {
         mfcc_->Initialize(input_length, header.audio_sample_rate());
 
     if (initialized) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     } else {
-      return absl::Status(absl::StatusCode::kInternal,
+      return abslx::Status(abslx::StatusCode::kInternal,
                           "Mfcc::Initialize returned uninitialized");
     }
   }
@@ -228,12 +228,12 @@ REGISTER_CALCULATOR(MfccCalculator);
 // if you ask for too many channels.
 class MelSpectrumCalculator : public FramewiseTransformCalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     return FramewiseTransformCalculatorBase::GetContract(cc);
   }
 
  private:
-  absl::Status ConfigureTransform(const TimeSeriesHeader& header,
+  abslx::Status ConfigureTransform(const TimeSeriesHeader& header,
                                   CalculatorContext* cc) override {
     MelSpectrumCalculatorOptions mel_spectrum_options =
         cc->Options<MelSpectrumCalculatorOptions>();
@@ -245,8 +245,8 @@ class MelSpectrumCalculator : public FramewiseTransformCalculatorBase {
     // audio_dsp::MelFilterBank needs to know this to
     // correctly interpret the spectrogram bins.
     if (!header.has_audio_sample_rate()) {
-      return absl::InvalidArgumentError(
-          absl::StrCat("No audio_sample_rate in input TimeSeriesHeader ",
+      return abslx::InvalidArgumentError(
+          abslx::StrCat("No audio_sample_rate in input TimeSeriesHeader ",
                        PortableDebugString(header)));
     }
     bool initialized = mel_filterbank_->Initialize(
@@ -255,9 +255,9 @@ class MelSpectrumCalculator : public FramewiseTransformCalculatorBase {
         mel_spectrum_options.max_frequency_hertz());
 
     if (initialized) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     } else {
-      return absl::Status(absl::StatusCode::kInternal,
+      return abslx::Status(abslx::StatusCode::kInternal,
                           "mfcc::Initialize returned uninitialized");
     }
   }

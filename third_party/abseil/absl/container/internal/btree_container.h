@@ -26,7 +26,7 @@
 #include "absl/memory/memory.h"
 #include "absl/meta/type_traits.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 
@@ -73,7 +73,7 @@ class btree_container {
       : tree_(key_compare(), alloc) {}
 
   btree_container(const btree_container &other)
-      : btree_container(other, absl::allocator_traits<allocator_type>::
+      : btree_container(other, abslx::allocator_traits<allocator_type>::
                                    select_on_container_copy_construction(
                                        other.get_allocator())) {}
   btree_container(const btree_container &other, const allocator_type &alloc)
@@ -217,7 +217,7 @@ class btree_container {
   key_compare key_comp() const { return tree_.key_comp(); }
   value_compare value_comp() const { return tree_.value_comp(); }
 
-  // Support absl::Hash.
+  // Support abslx::Hash.
   template <typename State>
   friend State AbslHashValue(State h, const btree_container &b) {
     for (const auto &v : b) {
@@ -352,8 +352,8 @@ class btree_set_container : public btree_container<Tree> {
   // `this`, it is left unmodified in `src`.
   template <
       typename T,
-      typename absl::enable_if_t<
-          absl::conjunction<
+      typename abslx::enable_if_t<
+          abslx::conjunction<
               std::is_same<value_type, typename T::value_type>,
               std::is_same<allocator_type, typename T::allocator_type>,
               std::is_same<typename params_type::is_map_container,
@@ -371,8 +371,8 @@ class btree_set_container : public btree_container<Tree> {
 
   template <
       typename T,
-      typename absl::enable_if_t<
-          absl::conjunction<
+      typename abslx::enable_if_t<
+          abslx::conjunction<
               std::is_same<value_type, typename T::value_type>,
               std::is_same<allocator_type, typename T::allocator_type>,
               std::is_same<typename params_type::is_map_container,
@@ -447,13 +447,13 @@ class btree_map_container : public btree_set_container<Tree> {
   }
 
   template <typename K = key_type, typename... Args,
-            typename absl::enable_if_t<
+            typename abslx::enable_if_t<
                 !std::is_convertible<K, const_iterator>::value, int> = 0>
   std::pair<iterator, bool> try_emplace(const key_arg<K> &k, Args &&... args) {
     return try_emplace_impl(k, std::forward<Args>(args)...);
   }
   template <typename K = key_type, typename... Args,
-            typename absl::enable_if_t<
+            typename abslx::enable_if_t<
                 !std::is_convertible<K, const_iterator>::value, int> = 0>
   std::pair<iterator, bool> try_emplace(key_arg<K> &&k, Args &&... args) {
     return try_emplace_impl(std::forward<K>(k), std::forward<Args>(args)...);
@@ -482,14 +482,14 @@ class btree_map_container : public btree_set_container<Tree> {
   mapped_type &at(const key_arg<K> &key) {
     auto it = this->find(key);
     if (it == this->end())
-      base_internal::ThrowStdOutOfRange("absl::btree_map::at");
+      base_internal::ThrowStdOutOfRange("abslx::btree_map::at");
     return it->second;
   }
   template <typename K = key_type>
   const mapped_type &at(const key_arg<K> &key) const {
     auto it = this->find(key);
     if (it == this->end())
-      base_internal::ThrowStdOutOfRange("absl::btree_map::at");
+      base_internal::ThrowStdOutOfRange("abslx::btree_map::at");
     return it->second;
   }
 
@@ -633,8 +633,8 @@ class btree_multiset_container : public btree_container<Tree> {
   // Moves all elements from `src` into `this`.
   template <
       typename T,
-      typename absl::enable_if_t<
-          absl::conjunction<
+      typename abslx::enable_if_t<
+          abslx::conjunction<
               std::is_same<value_type, typename T::value_type>,
               std::is_same<allocator_type, typename T::allocator_type>,
               std::is_same<typename params_type::is_map_container,
@@ -649,8 +649,8 @@ class btree_multiset_container : public btree_container<Tree> {
 
   template <
       typename T,
-      typename absl::enable_if_t<
-          absl::conjunction<
+      typename abslx::enable_if_t<
+          abslx::conjunction<
               std::is_same<value_type, typename T::value_type>,
               std::is_same<allocator_type, typename T::allocator_type>,
               std::is_same<typename params_type::is_map_container,
@@ -677,6 +677,6 @@ class btree_multimap_container : public btree_multiset_container<Tree> {
 
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_CONTAINER_INTERNAL_BTREE_CONTAINER_H_

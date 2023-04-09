@@ -37,7 +37,7 @@ using uint = unsigned int;
 template <DataType S, typename T>
 void RearrangeWeightsToOHWIOGroupI4O4(
     const tflite::gpu::Tensor<OHWI, S>& weights, int out_group_size,
-    absl::Span<T> dst) {
+    abslx::Span<T> dst) {
   const int dst_slices = DivideRoundUp(weights.shape.o, 4);
   const int src_slices = DivideRoundUp(weights.shape.i, 4);
   const int dst_groups = DivideRoundUp(dst_slices, out_group_size);
@@ -73,7 +73,7 @@ void RearrangeWeightsToOHWIOGroupI4O4(
 template <DataType S, typename T>
 void RearrangeWeightsToODHWIOGroupI4O4(
     const tflite::gpu::Tensor<OHWDI, S>& weights, int out_group_size,
-    absl::Span<T> dst) {
+    abslx::Span<T> dst) {
   const int dst_slices = DivideRoundUp(weights.shape.o, 4);
   const int src_slices = DivideRoundUp(weights.shape.i, 4);
   const int dst_groups = DivideRoundUp(dst_slices, out_group_size);
@@ -111,7 +111,7 @@ void RearrangeWeightsToODHWIOGroupI4O4(
 template <DataType S, typename T>
 void RearrangeWeightsToOHWIOGroupO4I4(
     const tflite::gpu::Tensor<OHWI, S>& weights, int out_group_size,
-    absl::Span<T> dst) {
+    abslx::Span<T> dst) {
   const int dst_slices = DivideRoundUp(weights.shape.o, 4);
   const int src_slices = DivideRoundUp(weights.shape.i, 4);
   const int dst_groups = DivideRoundUp(dst_slices, out_group_size);
@@ -147,7 +147,7 @@ void RearrangeWeightsToOHWIOGroupO4I4(
 template <DataType S, typename T>
 void RearrangeWeightsToODHWIOGroupO4I4(
     const tflite::gpu::Tensor<OHWDI, S>& weights, int out_group_size,
-    absl::Span<T> dst) {
+    abslx::Span<T> dst) {
   const int dst_slices = DivideRoundUp(weights.shape.o, 4);
   const int src_slices = DivideRoundUp(weights.shape.i, 4);
   const int dst_groups = DivideRoundUp(dst_slices, out_group_size);
@@ -185,7 +185,7 @@ void RearrangeWeightsToODHWIOGroupO4I4(
 template <DataType S, typename T>
 void RearrangeWeightsToI4HWIOOGroupO4(
     const tflite::gpu::Tensor<OHWI, S>& weights, int out_group_size,
-    absl::Span<T> dst) {
+    abslx::Span<T> dst) {
   const int dst_slices = DivideRoundUp(weights.shape.o, 4);
   const int src_slices = DivideRoundUp(weights.shape.i, 4);
   const int dst_groups = DivideRoundUp(dst_slices, out_group_size);
@@ -221,7 +221,7 @@ void RearrangeWeightsToI4HWIOOGroupO4(
 template <DataType S, typename T>
 void RearrangeWeightsToI4DHWIOOGroupO4(
     const tflite::gpu::Tensor<OHWDI, S>& weights, int out_group_size,
-    absl::Span<T> dst) {
+    abslx::Span<T> dst) {
   const int dst_slices = DivideRoundUp(weights.shape.o, 4);
   const int src_slices = DivideRoundUp(weights.shape.i, 4);
   const int dst_groups = DivideRoundUp(dst_slices, out_group_size);
@@ -259,7 +259,7 @@ void RearrangeWeightsToI4DHWIOOGroupO4(
 template <DataType S, typename T>
 void RearrangeWeightsToO4HWIOOGroupI4(
     const tflite::gpu::Tensor<OHWI, S>& weights, int out_group_size,
-    absl::Span<T> dst) {
+    abslx::Span<T> dst) {
   const int dst_slices = DivideRoundUp(weights.shape.o, 4);
   const int src_slices = DivideRoundUp(weights.shape.i, 4);
   const int dst_groups = DivideRoundUp(dst_slices, out_group_size);
@@ -295,7 +295,7 @@ void RearrangeWeightsToO4HWIOOGroupI4(
 template <DataType S, typename T>
 void RearrangeWeightsToO4DHWIOOGroupI4(
     const tflite::gpu::Tensor<OHWDI, S>& weights, int out_group_size,
-    absl::Span<T> dst) {
+    abslx::Span<T> dst) {
   const int dst_slices = DivideRoundUp(weights.shape.o, 4);
   const int src_slices = DivideRoundUp(weights.shape.i, 4);
   const int dst_groups = DivideRoundUp(dst_slices, out_group_size);
@@ -333,7 +333,7 @@ void RearrangeWeightsToO4DHWIOOGroupI4(
 template <DataType S, typename T>
 void RearrangeWeightsToOICustomSpatialI4O4(
     const tflite::gpu::Tensor<OHWI, S>& weights,
-    const std::vector<int>& spatial_remap, absl::Span<T> dst) {
+    const std::vector<int>& spatial_remap, abslx::Span<T> dst) {
   const int dst_slices = DivideRoundUp(weights.shape.o, 4);
   const int src_slices = DivideRoundUp(weights.shape.i, 4);
 
@@ -369,7 +369,7 @@ void RearrangeWeightsToOICustomSpatialI4O4(
 template <DataType S, typename T>
 void RearrangeWeightsToOICustomSpatialI4O4(
     const tflite::gpu::Tensor<OHWDI, S>& weights,
-    const std::vector<int>& spatial_remap, absl::Span<T> dst) {
+    const std::vector<int>& spatial_remap, abslx::Span<T> dst) {
   const int dst_slices = DivideRoundUp(weights.shape.o, 4);
   const int src_slices = DivideRoundUp(weights.shape.i, 4);
 
@@ -411,7 +411,7 @@ void RearrangeWeightsToOICustomSpatialI4O4(
 template <DataType S, typename T>
 void RearrangeWeightsToOICustomSpatialO4I4(
     const tflite::gpu::Tensor<OHWI, S>& weights,
-    const std::vector<int>& spatial_remap, absl::Span<T> dst) {
+    const std::vector<int>& spatial_remap, abslx::Span<T> dst) {
   const int dst_slices = DivideRoundUp(weights.shape.o, 4);
   const int src_slices = DivideRoundUp(weights.shape.i, 4);
 
@@ -447,7 +447,7 @@ void RearrangeWeightsToOICustomSpatialO4I4(
 template <DataType S, typename T>
 void RearrangeWeightsToOICustomSpatialO4I4(
     const tflite::gpu::Tensor<OHWDI, S>& weights,
-    const std::vector<int>& spatial_remap, absl::Span<T> dst) {
+    const std::vector<int>& spatial_remap, abslx::Span<T> dst) {
   const int dst_slices = DivideRoundUp(weights.shape.o, 4);
   const int src_slices = DivideRoundUp(weights.shape.i, 4);
 
@@ -504,11 +504,11 @@ uint2 Get2dResourceSize(const WeightsDescription& weight_desc,
 
 void RearrangeWeights(
     const tflite::gpu::Tensor<OHWI, DataType::FLOAT32>& weights,
-    const WeightsDescription& dst_weight_desc, absl::Span<uint8_t> dst);
+    const WeightsDescription& dst_weight_desc, abslx::Span<uint8_t> dst);
 
 void RearrangeWeights(
     const tflite::gpu::Tensor<OHWDI, DataType::FLOAT32>& weights,
-    const WeightsDescription& dst_weight_desc, absl::Span<uint8_t> dst);
+    const WeightsDescription& dst_weight_desc, abslx::Span<uint8_t> dst);
 
 }  // namespace gpu
 }  // namespace tflite

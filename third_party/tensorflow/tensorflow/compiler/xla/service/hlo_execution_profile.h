@@ -37,7 +37,7 @@ class HloProfileIndexMap {
   explicit HloProfileIndexMap(const HloModule& module)
       : HloProfileIndexMap(module, {}) {}
   explicit HloProfileIndexMap(const HloModule& module,
-                              absl::Span<const std::string> extra_metrics);
+                              abslx::Span<const std::string> extra_metrics);
 
   HloProfileIndexMap(const HloProfileIndexMap&) = default;
   HloProfileIndexMap(HloProfileIndexMap&&) = default;
@@ -73,27 +73,27 @@ class HloProfileIndexMap {
     return instruction_count() + computation_count() + extra_metrics_count();
   }
 
-  const absl::flat_hash_map<const HloInstruction*, int64_t>&
+  const abslx::flat_hash_map<const HloInstruction*, int64_t>&
   instruction_to_profile_idx() const {
     return instruction_to_profile_idx_;
   }
 
-  const absl::flat_hash_map<const HloComputation*, int64_t>&
+  const abslx::flat_hash_map<const HloComputation*, int64_t>&
   computation_to_profile_idx() const {
     return computation_to_profile_idx_;
   }
 
-  const absl::flat_hash_map<std::string, int64_t>& extra_metric_to_profile_idx()
+  const abslx::flat_hash_map<std::string, int64_t>& extra_metric_to_profile_idx()
       const {
     return extra_metric_to_profile_idx_;
   }
 
  private:
-  absl::flat_hash_map<const HloInstruction*, int64_t>
+  abslx::flat_hash_map<const HloInstruction*, int64_t>
       instruction_to_profile_idx_;
-  absl::flat_hash_map<const HloComputation*, int64_t>
+  abslx::flat_hash_map<const HloComputation*, int64_t>
       computation_to_profile_idx_;
-  absl::flat_hash_map<std::string, int64_t> extra_metric_to_profile_idx_;
+  abslx::flat_hash_map<std::string, int64_t> extra_metric_to_profile_idx_;
 };
 
 // Create an instance of `HloProfilePrinterData`.

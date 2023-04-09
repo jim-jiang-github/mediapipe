@@ -127,21 +127,21 @@ void CopyEventMetadata(const XEventMetadata& src_event_metadata,
   });
 }
 
-bool IsOpLineName(absl::string_view line_name) {
+bool IsOpLineName(abslx::string_view line_name) {
   return line_name == kXlaOpLineName || line_name == kTensorFlowOpLineName;
 }
 
 }  // namespace
 
-const XPlane* FindPlaneWithName(const XSpace& space, absl::string_view name) {
+const XPlane* FindPlaneWithName(const XSpace& space, abslx::string_view name) {
   int i = Find(space.planes(),
                [name](const XPlane* plane) { return plane->name() == name; });
   return (i != -1) ? &space.planes(i) : nullptr;
 }
 
 std::vector<const XPlane*> FindPlanesWithNames(
-    const XSpace& space, const std::vector<absl::string_view>& names) {
-  absl::flat_hash_set<absl::string_view> names_set(names.begin(), names.end());
+    const XSpace& space, const std::vector<abslx::string_view>& names) {
+  abslx::flat_hash_set<abslx::string_view> names_set(names.begin(), names.end());
   std::vector<int> indices =
       FindAll(space.planes(), [&names_set](const XPlane* plane) {
         return names_set.contains(plane->name());
@@ -154,13 +154,13 @@ std::vector<const XPlane*> FindPlanesWithNames(
   return planes;
 }
 
-XPlane* FindMutablePlaneWithName(XSpace* space, absl::string_view name) {
+XPlane* FindMutablePlaneWithName(XSpace* space, abslx::string_view name) {
   int i = Find(space->planes(),
                [name](const XPlane* plane) { return plane->name() == name; });
   return (i != -1) ? space->mutable_planes(i) : nullptr;
 }
 
-XPlane* FindOrAddMutablePlaneWithName(XSpace* space, absl::string_view name) {
+XPlane* FindOrAddMutablePlaneWithName(XSpace* space, abslx::string_view name) {
   XPlane* plane = FindMutablePlaneWithName(space, name);
   if (plane == nullptr) {
     plane = space->add_planes();
@@ -170,16 +170,16 @@ XPlane* FindOrAddMutablePlaneWithName(XSpace* space, absl::string_view name) {
 }
 
 std::vector<const XPlane*> FindPlanesWithPrefix(const XSpace& space,
-                                                absl::string_view prefix) {
+                                                abslx::string_view prefix) {
   return FindPlanes(space, [&](const XPlane& plane) {
-    return absl::StartsWith(plane.name(), prefix);
+    return abslx::StartsWith(plane.name(), prefix);
   });
 }
 
 std::vector<XPlane*> FindMutablePlanesWithPrefix(XSpace* space,
-                                                 absl::string_view prefix) {
+                                                 abslx::string_view prefix) {
   return FindMutablePlanes(space, [&](XPlane& plane) {
-    return absl::StartsWith(plane.name(), prefix);
+    return abslx::StartsWith(plane.name(), prefix);
   });
 }
 
@@ -189,7 +189,7 @@ const XLine* FindLineWithId(const XPlane& plane, int64_t id) {
   return (i != -1) ? &plane.lines(i) : nullptr;
 }
 
-const XLine* FindLineWithName(const XPlane& plane, absl::string_view name) {
+const XLine* FindLineWithName(const XPlane& plane, abslx::string_view name) {
   int i = Find(plane.lines(),
                [name](const XLine* line) { return line->name() == name; });
   return (i != -1) ? &plane.lines(i) : nullptr;
@@ -212,7 +212,7 @@ void RemovePlane(XSpace* space, const XPlane* plane) {
 }
 
 void RemovePlanes(XSpace* space, const std::vector<const XPlane*>& planes) {
-  absl::flat_hash_set<const XPlane*> planes_set(planes.begin(), planes.end());
+  abslx::flat_hash_set<const XPlane*> planes_set(planes.begin(), planes.end());
   RemoveIf(space->mutable_planes(), [&planes_set](const XPlane* plane) {
     return planes_set.contains(plane);
   });
@@ -224,7 +224,7 @@ void RemoveLine(XPlane* plane, const XLine* line) {
 }
 
 void RemoveEvents(XLine* line,
-                  const absl::flat_hash_set<const XEvent*>& events) {
+                  const abslx::flat_hash_set<const XEvent*>& events) {
   RemoveIf(line->mutable_events(),
            [&](const XEvent* event) { return events.contains(event); });
 }
@@ -373,11 +373,11 @@ void AddFlowsToXplane(int32_t host_id, bool is_host_plane, bool connect_traceme,
 
   plane.ForEachLine([&](XLineBuilder line) {
     line.ForEachEvent([&](XEventBuilder event) {
-      absl::optional<uint64_t> correlation_id;
-      absl::optional<uint64_t> producer_type;
-      absl::optional<uint64_t> consumer_type;
-      absl::optional<uint64_t> producer_id;
-      absl::optional<uint64_t> consumer_id;
+      abslx::optional<uint64_t> correlation_id;
+      abslx::optional<uint64_t> producer_type;
+      abslx::optional<uint64_t> consumer_type;
+      abslx::optional<uint64_t> producer_id;
+      abslx::optional<uint64_t> consumer_id;
       event.ForEachStat([&](XStat* stat) {
         if (correlation_id_stats_metadata &&
             stat->metadata_id() == correlation_id_stats_metadata->id()) {
@@ -489,9 +489,9 @@ void AggregateXPlane(const XPlane& full_trace, XPlane& aggregated_trace) {
     Stat<int64_t> stat;
     int64_t children_duration;
   };
-  using StatByEvent = absl::flat_hash_map<int64_t /*event_id*/, EventStat>;
+  using StatByEvent = abslx::flat_hash_map<int64_t /*event_id*/, EventStat>;
 
-  absl::flat_hash_map<int64_t /*line_id*/, StatByEvent> stats;
+  abslx::flat_hash_map<int64_t /*line_id*/, StatByEvent> stats;
 
   XPlaneVisitor plane(&full_trace);
   XPlaneBuilder aggregated_plane(&aggregated_trace);

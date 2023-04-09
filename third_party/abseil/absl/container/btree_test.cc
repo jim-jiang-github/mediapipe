@@ -42,14 +42,14 @@
 
 ABSL_FLAG(int, test_values, 10000, "The number of values to use for tests");
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
 
-using ::absl::test_internal::CopyableMovableInstance;
-using ::absl::test_internal::InstanceTracker;
-using ::absl::test_internal::MovableOnlyInstance;
+using ::abslx::test_internal::CopyableMovableInstance;
+using ::abslx::test_internal::InstanceTracker;
+using ::abslx::test_internal::MovableOnlyInstance;
 using ::testing::ElementsAre;
 using ::testing::ElementsAreArray;
 using ::testing::IsEmpty;
@@ -594,7 +594,7 @@ void BtreeTest() {
 
   using V = typename remove_pair_const<typename T::value_type>::type;
   const std::vector<V> random_values = GenerateValuesWithSeed<V>(
-      absl::GetFlag(FLAGS_test_values), 4 * absl::GetFlag(FLAGS_test_values),
+      abslx::GetFlag(FLAGS_test_values), 4 * abslx::GetFlag(FLAGS_test_values),
       testing::GTEST_FLAG(random_seed));
 
   unique_checker<T, C> container;
@@ -618,7 +618,7 @@ void BtreeMultiTest() {
 
   using V = typename remove_pair_const<typename T::value_type>::type;
   const std::vector<V> random_values = GenerateValuesWithSeed<V>(
-      absl::GetFlag(FLAGS_test_values), 4 * absl::GetFlag(FLAGS_test_values),
+      abslx::GetFlag(FLAGS_test_values), 4 * abslx::GetFlag(FLAGS_test_values),
       testing::GTEST_FLAG(random_seed));
 
   multi_checker<T, C> container;
@@ -789,11 +789,11 @@ void BtreeMultiMapTest() {
 template <typename K, int N = 256>
 void SetTest() {
   EXPECT_EQ(
-      sizeof(absl::btree_set<K>),
-      2 * sizeof(void *) + sizeof(typename absl::btree_set<K>::size_type));
-  using BtreeSet = absl::btree_set<K>;
+      sizeof(abslx::btree_set<K>),
+      2 * sizeof(void *) + sizeof(typename abslx::btree_set<K>::size_type));
+  using BtreeSet = abslx::btree_set<K>;
   using CountingBtreeSet =
-      absl::btree_set<K, std::less<K>, PropagatingCountingAlloc<K>>;
+      abslx::btree_set<K, std::less<K>, PropagatingCountingAlloc<K>>;
   BtreeTest<BtreeSet, std::set<K>>();
   BtreeAllocatorTest<CountingBtreeSet>();
 }
@@ -801,11 +801,11 @@ void SetTest() {
 template <typename K, int N = 256>
 void MapTest() {
   EXPECT_EQ(
-      sizeof(absl::btree_map<K, K>),
-      2 * sizeof(void *) + sizeof(typename absl::btree_map<K, K>::size_type));
-  using BtreeMap = absl::btree_map<K, K>;
+      sizeof(abslx::btree_map<K, K>),
+      2 * sizeof(void *) + sizeof(typename abslx::btree_map<K, K>::size_type));
+  using BtreeMap = abslx::btree_map<K, K>;
   using CountingBtreeMap =
-      absl::btree_map<K, K, std::less<K>,
+      abslx::btree_map<K, K, std::less<K>,
                       PropagatingCountingAlloc<std::pair<const K, K>>>;
   BtreeTest<BtreeMap, std::map<K, K>>();
   BtreeAllocatorTest<CountingBtreeMap>();
@@ -815,34 +815,34 @@ void MapTest() {
 TEST(Btree, set_int32) { SetTest<int32_t>(); }
 TEST(Btree, set_int64) { SetTest<int64_t>(); }
 TEST(Btree, set_string) { SetTest<std::string>(); }
-TEST(Btree, set_cord) { SetTest<absl::Cord>(); }
+TEST(Btree, set_cord) { SetTest<abslx::Cord>(); }
 TEST(Btree, set_pair) { SetTest<std::pair<int, int>>(); }
 TEST(Btree, map_int32) { MapTest<int32_t>(); }
 TEST(Btree, map_int64) { MapTest<int64_t>(); }
 TEST(Btree, map_string) { MapTest<std::string>(); }
-TEST(Btree, map_cord) { MapTest<absl::Cord>(); }
+TEST(Btree, map_cord) { MapTest<abslx::Cord>(); }
 TEST(Btree, map_pair) { MapTest<std::pair<int, int>>(); }
 
 template <typename K, int N = 256>
 void MultiSetTest() {
   EXPECT_EQ(
-      sizeof(absl::btree_multiset<K>),
-      2 * sizeof(void *) + sizeof(typename absl::btree_multiset<K>::size_type));
-  using BtreeMSet = absl::btree_multiset<K>;
+      sizeof(abslx::btree_multiset<K>),
+      2 * sizeof(void *) + sizeof(typename abslx::btree_multiset<K>::size_type));
+  using BtreeMSet = abslx::btree_multiset<K>;
   using CountingBtreeMSet =
-      absl::btree_multiset<K, std::less<K>, PropagatingCountingAlloc<K>>;
+      abslx::btree_multiset<K, std::less<K>, PropagatingCountingAlloc<K>>;
   BtreeMultiTest<BtreeMSet, std::multiset<K>>();
   BtreeAllocatorTest<CountingBtreeMSet>();
 }
 
 template <typename K, int N = 256>
 void MultiMapTest() {
-  EXPECT_EQ(sizeof(absl::btree_multimap<K, K>),
+  EXPECT_EQ(sizeof(abslx::btree_multimap<K, K>),
             2 * sizeof(void *) +
-                sizeof(typename absl::btree_multimap<K, K>::size_type));
-  using BtreeMMap = absl::btree_multimap<K, K>;
+                sizeof(typename abslx::btree_multimap<K, K>::size_type));
+  using BtreeMMap = abslx::btree_multimap<K, K>;
   using CountingBtreeMMap =
-      absl::btree_multimap<K, K, std::less<K>,
+      abslx::btree_multimap<K, K, std::less<K>,
                            PropagatingCountingAlloc<std::pair<const K, K>>>;
   BtreeMultiTest<BtreeMMap, std::multimap<K, K>>();
   BtreeMultiMapTest<BtreeMMap>();
@@ -852,12 +852,12 @@ void MultiMapTest() {
 TEST(Btree, multiset_int32) { MultiSetTest<int32_t>(); }
 TEST(Btree, multiset_int64) { MultiSetTest<int64_t>(); }
 TEST(Btree, multiset_string) { MultiSetTest<std::string>(); }
-TEST(Btree, multiset_cord) { MultiSetTest<absl::Cord>(); }
+TEST(Btree, multiset_cord) { MultiSetTest<abslx::Cord>(); }
 TEST(Btree, multiset_pair) { MultiSetTest<std::pair<int, int>>(); }
 TEST(Btree, multimap_int32) { MultiMapTest<int32_t>(); }
 TEST(Btree, multimap_int64) { MultiMapTest<int64_t>(); }
 TEST(Btree, multimap_string) { MultiMapTest<std::string>(); }
-TEST(Btree, multimap_cord) { MultiMapTest<absl::Cord>(); }
+TEST(Btree, multimap_cord) { MultiMapTest<abslx::Cord>(); }
 TEST(Btree, multimap_pair) { MultiMapTest<std::pair<int, int>>(); }
 
 struct CompareIntToString {
@@ -865,10 +865,10 @@ struct CompareIntToString {
     return a < b;
   }
   bool operator()(const std::string &a, int b) const {
-    return a < absl::StrCat(b);
+    return a < abslx::StrCat(b);
   }
   bool operator()(int a, const std::string &b) const {
-    return absl::StrCat(a) < b;
+    return abslx::StrCat(a) < b;
   }
   using is_transparent = void;
 };
@@ -965,7 +965,7 @@ TEST(Btree, HeterogeneousLookup) {
 }
 
 TEST(Btree, NoHeterogeneousLookupWithoutAlias) {
-  using StringSet = absl::btree_set<std::string, NonTransparentCompare>;
+  using StringSet = abslx::btree_set<std::string, NonTransparentCompare>;
   StringSet s;
   ASSERT_TRUE(s.insert("hello").second);
   ASSERT_TRUE(s.insert("world").second);
@@ -977,7 +977,7 @@ TEST(Btree, NoHeterogeneousLookupWithoutAlias) {
   EXPECT_FALSE(s.contains("blah"));
 
   using StringMultiSet =
-      absl::btree_multiset<std::string, NonTransparentCompare>;
+      abslx::btree_multiset<std::string, NonTransparentCompare>;
   StringMultiSet ms;
   ms.insert("hello");
   ms.insert("world");
@@ -1003,8 +1003,8 @@ TEST(Btree, DefaultTransparent) {
   {
     // `std::string` has heterogeneous support.
     btree_set<std::string> s = {"A"};
-    EXPECT_EQ(s.begin(), s.find(absl::string_view("A")));
-    EXPECT_TRUE(s.contains(absl::string_view("A")));
+    EXPECT_EQ(s.begin(), s.find(abslx::string_view("A")));
+    EXPECT_TRUE(s.contains(abslx::string_view("A")));
   }
 }
 
@@ -1030,10 +1030,10 @@ class StringLike {
 int StringLike::constructor_calls_ = 0;
 
 TEST(Btree, HeterogeneousLookupDoesntDegradePerformance) {
-  using StringSet = absl::btree_set<StringLike>;
+  using StringSet = abslx::btree_set<StringLike>;
   StringSet s;
   for (int i = 0; i < 100; ++i) {
-    ASSERT_TRUE(s.insert(absl::StrCat(i).c_str()).second);
+    ASSERT_TRUE(s.insert(abslx::StrCat(i).c_str()).second);
   }
   StringLike::clear_constructor_call_count();
   s.find("50");
@@ -1070,14 +1070,14 @@ struct SubstringLess {
   SubstringLess() = delete;
   explicit SubstringLess(int length) : n(length) {}
   bool operator()(const std::string &a, const std::string &b) const {
-    return absl::string_view(a).substr(0, n) <
-           absl::string_view(b).substr(0, n);
+    return abslx::string_view(a).substr(0, n) <
+           abslx::string_view(b).substr(0, n);
   }
   int n;
 };
 
 TEST(Btree, SwapKeyCompare) {
-  using SubstringSet = absl::btree_set<std::string, SubstringLess>;
+  using SubstringSet = abslx::btree_set<std::string, SubstringLess>;
   SubstringSet s1(SubstringLess(1), SubstringSet::allocator_type());
   SubstringSet s2(SubstringLess(2), SubstringSet::allocator_type());
 
@@ -1101,7 +1101,7 @@ TEST(Btree, SwapKeyCompare) {
 TEST(Btree, UpperBoundRegression) {
   // Regress a bug where upper_bound would default-construct a new key_compare
   // instead of copying the existing one.
-  using SubstringSet = absl::btree_set<std::string, SubstringLess>;
+  using SubstringSet = abslx::btree_set<std::string, SubstringLess>;
   SubstringSet my_set(SubstringLess(3));
   my_set.insert("aab");
   my_set.insert("abb");
@@ -1116,11 +1116,11 @@ TEST(Btree, UpperBoundRegression) {
 
 TEST(Btree, Comparison) {
   const int kSetSize = 1201;
-  absl::btree_set<int64_t> my_set;
+  abslx::btree_set<int64_t> my_set;
   for (int i = 0; i < kSetSize; ++i) {
     my_set.insert(i);
   }
-  absl::btree_set<int64_t> my_set_copy(my_set);
+  abslx::btree_set<int64_t> my_set_copy(my_set);
   EXPECT_TRUE(my_set_copy == my_set);
   EXPECT_TRUE(my_set == my_set_copy);
   EXPECT_FALSE(my_set_copy != my_set);
@@ -1138,11 +1138,11 @@ TEST(Btree, Comparison) {
   EXPECT_TRUE(my_set_copy != my_set);
   EXPECT_TRUE(my_set != my_set_copy);
 
-  absl::btree_map<std::string, int64_t> my_map;
+  abslx::btree_map<std::string, int64_t> my_map;
   for (int i = 0; i < kSetSize; ++i) {
     my_map[std::string(i, 'a')] = i;
   }
-  absl::btree_map<std::string, int64_t> my_map_copy(my_map);
+  abslx::btree_map<std::string, int64_t> my_map_copy(my_map);
   EXPECT_TRUE(my_map_copy == my_map);
   EXPECT_TRUE(my_map == my_map_copy);
   EXPECT_FALSE(my_map_copy != my_map);
@@ -1173,10 +1173,10 @@ TEST(Btree, RangeCtorSanity) {
   ivec.push_back(1);
   std::map<int, int> imap;
   imap.insert(std::make_pair(1, 2));
-  absl::btree_multiset<int> tmset(ivec.begin(), ivec.end());
-  absl::btree_multimap<int, int> tmmap(imap.begin(), imap.end());
-  absl::btree_set<int> tset(ivec.begin(), ivec.end());
-  absl::btree_map<int, int> tmap(imap.begin(), imap.end());
+  abslx::btree_multiset<int> tmset(ivec.begin(), ivec.end());
+  abslx::btree_multimap<int, int> tmmap(imap.begin(), imap.end());
+  abslx::btree_set<int> tset(ivec.begin(), ivec.end());
+  abslx::btree_map<int, int> tmap(imap.begin(), imap.end());
   EXPECT_EQ(1, tmset.size());
   EXPECT_EQ(1, tmmap.size());
   EXPECT_EQ(1, tset.size());
@@ -1242,7 +1242,7 @@ class BtreeMapTest : public ::testing::Test {
 
   template <typename K, typename C>
   static bool IsLinear() {
-    return BtreeNodePeer::UsesLinearNodeSearch<absl::btree_map<K, int, C>>();
+    return BtreeNodePeer::UsesLinearNodeSearch<abslx::btree_map<K, int, C>>();
   }
 };
 
@@ -1281,7 +1281,7 @@ TEST_F(BtreeMapTest, LinearChoiceTree) {
 }
 
 TEST(Btree, BtreeMapCanHoldMoveOnlyTypes) {
-  absl::btree_map<std::string, std::unique_ptr<std::string>> m;
+  abslx::btree_map<std::string, std::unique_ptr<std::string>> m;
 
   std::unique_ptr<std::string> &v = m["A"];
   EXPECT_TRUE(v == nullptr);
@@ -1292,19 +1292,19 @@ TEST(Btree, BtreeMapCanHoldMoveOnlyTypes) {
 }
 
 TEST(Btree, InitializerListConstructor) {
-  absl::btree_set<std::string> set({"a", "b"});
+  abslx::btree_set<std::string> set({"a", "b"});
   EXPECT_EQ(set.count("a"), 1);
   EXPECT_EQ(set.count("b"), 1);
 
-  absl::btree_multiset<int> mset({1, 1, 4});
+  abslx::btree_multiset<int> mset({1, 1, 4});
   EXPECT_EQ(mset.count(1), 2);
   EXPECT_EQ(mset.count(4), 1);
 
-  absl::btree_map<int, int> map({{1, 5}, {2, 10}});
+  abslx::btree_map<int, int> map({{1, 5}, {2, 10}});
   EXPECT_EQ(map[1], 5);
   EXPECT_EQ(map[2], 10);
 
-  absl::btree_multimap<int, int> mmap({{1, 5}, {1, 10}});
+  abslx::btree_multimap<int, int> mmap({{1, 5}, {1, 10}});
   auto range = mmap.equal_range(1);
   auto it = range.first;
   ASSERT_NE(it, range.second);
@@ -1315,17 +1315,17 @@ TEST(Btree, InitializerListConstructor) {
 }
 
 TEST(Btree, InitializerListInsert) {
-  absl::btree_set<std::string> set;
+  abslx::btree_set<std::string> set;
   set.insert({"a", "b"});
   EXPECT_EQ(set.count("a"), 1);
   EXPECT_EQ(set.count("b"), 1);
 
-  absl::btree_multiset<int> mset;
+  abslx::btree_multiset<int> mset;
   mset.insert({1, 1, 4});
   EXPECT_EQ(mset.count(1), 2);
   EXPECT_EQ(mset.count(4), 1);
 
-  absl::btree_map<int, int> map;
+  abslx::btree_map<int, int> map;
   map.insert({{1, 5}, {2, 10}});
   // Test that inserting one element using an initializer list also works.
   map.insert({3, 15});
@@ -1333,7 +1333,7 @@ TEST(Btree, InitializerListInsert) {
   EXPECT_EQ(map[2], 10);
   EXPECT_EQ(map[3], 15);
 
-  absl::btree_multimap<int, int> mmap;
+  abslx::btree_multimap<int, int> mmap;
   mmap.insert({{1, 5}, {1, 10}});
   auto range = mmap.equal_range(1);
   auto it = range.first;
@@ -1350,8 +1350,8 @@ void AssertKeyCompareToAdapted() {
   static_assert(!std::is_same<Adapted, Compare>::value,
                 "key_compare_to_adapter should have adapted this comparator.");
   static_assert(
-      std::is_same<absl::weak_ordering,
-                   absl::result_of_t<Adapted(const K &, const K &)>>::value,
+      std::is_same<abslx::weak_ordering,
+                   abslx::result_of_t<Adapted(const K &, const K &)>>::value,
       "Adapted comparator should be a key-compare-to comparator.");
 }
 template <typename Compare, typename K>
@@ -1362,18 +1362,18 @@ void AssertKeyCompareToNotAdapted() {
       "key_compare_to_adapter shouldn't have adapted this comparator.");
   static_assert(
       std::is_same<bool,
-                   absl::result_of_t<Unadapted(const K &, const K &)>>::value,
+                   abslx::result_of_t<Unadapted(const K &, const K &)>>::value,
       "Un-adapted comparator should return bool.");
 }
 
 TEST(Btree, KeyCompareToAdapter) {
   AssertKeyCompareToAdapted<std::less<std::string>, std::string>();
   AssertKeyCompareToAdapted<std::greater<std::string>, std::string>();
-  AssertKeyCompareToAdapted<std::less<absl::string_view>, absl::string_view>();
-  AssertKeyCompareToAdapted<std::greater<absl::string_view>,
-                            absl::string_view>();
-  AssertKeyCompareToAdapted<std::less<absl::Cord>, absl::Cord>();
-  AssertKeyCompareToAdapted<std::greater<absl::Cord>, absl::Cord>();
+  AssertKeyCompareToAdapted<std::less<abslx::string_view>, abslx::string_view>();
+  AssertKeyCompareToAdapted<std::greater<abslx::string_view>,
+                            abslx::string_view>();
+  AssertKeyCompareToAdapted<std::less<abslx::Cord>, abslx::Cord>();
+  AssertKeyCompareToAdapted<std::greater<abslx::Cord>, abslx::Cord>();
   AssertKeyCompareToNotAdapted<std::less<int>, int>();
   AssertKeyCompareToNotAdapted<std::greater<int>, int>();
 }
@@ -1381,7 +1381,7 @@ TEST(Btree, KeyCompareToAdapter) {
 TEST(Btree, RValueInsert) {
   InstanceTracker tracker;
 
-  absl::btree_set<MovableOnlyInstance> set;
+  abslx::btree_set<MovableOnlyInstance> set;
   set.insert(MovableOnlyInstance(1));
   set.insert(MovableOnlyInstance(3));
   MovableOnlyInstance two(2);
@@ -1391,14 +1391,14 @@ TEST(Btree, RValueInsert) {
   ASSERT_NE(++it, set.end());
   EXPECT_EQ(it->value(), 3);
 
-  absl::btree_multiset<MovableOnlyInstance> mset;
+  abslx::btree_multiset<MovableOnlyInstance> mset;
   MovableOnlyInstance zero(0);
   MovableOnlyInstance zero2(0);
   mset.insert(std::move(zero));
   mset.insert(mset.find(MovableOnlyInstance(0)), std::move(zero2));
   EXPECT_EQ(mset.count(MovableOnlyInstance(0)), 2);
 
-  absl::btree_map<int, MovableOnlyInstance> map;
+  abslx::btree_map<int, MovableOnlyInstance> map;
   std::pair<const int, MovableOnlyInstance> p1 = {1, MovableOnlyInstance(5)};
   std::pair<const int, MovableOnlyInstance> p2 = {2, MovableOnlyInstance(10)};
   std::pair<const int, MovableOnlyInstance> p3 = {3, MovableOnlyInstance(15)};
@@ -1408,7 +1408,7 @@ TEST(Btree, RValueInsert) {
   ASSERT_NE(map.find(2), map.end());
   EXPECT_EQ(map.find(2)->second.value(), 10);
 
-  absl::btree_multimap<int, MovableOnlyInstance> mmap;
+  abslx::btree_multimap<int, MovableOnlyInstance> mmap;
   std::pair<const int, MovableOnlyInstance> p4 = {1, MovableOnlyInstance(5)};
   std::pair<const int, MovableOnlyInstance> p5 = {1, MovableOnlyInstance(10)};
   mmap.insert(std::move(p4));
@@ -1473,7 +1473,7 @@ TEST(Btree, MovesComparisonsCopiesSwapsTracking) {
   EXPECT_EQ(BtreeNodePeer::GetNumSlotsPerNode<decltype(set61)>(), 61);
   EXPECT_EQ(BtreeNodePeer::GetNumSlotsPerNode<decltype(set100)>(), 100);
   if (sizeof(void *) == 8) {
-    EXPECT_EQ(BtreeNodePeer::GetNumSlotsPerNode<absl::btree_set<int32_t>>(),
+    EXPECT_EQ(BtreeNodePeer::GetNumSlotsPerNode<abslx::btree_set<int32_t>>(),
               BtreeNodePeer::GetNumSlotsPerNode<decltype(set61)>());
   }
 
@@ -1496,7 +1496,7 @@ TEST(Btree, MovesComparisonsCopiesSwapsTracking) {
 }
 
 struct MovableOnlyInstanceThreeWayCompare {
-  absl::weak_ordering operator()(const MovableOnlyInstance &a,
+  abslx::weak_ordering operator()(const MovableOnlyInstance &a,
                                  const MovableOnlyInstance &b) const {
     return a.compare(b);
   }
@@ -1528,7 +1528,7 @@ TEST(Btree, MovesComparisonsCopiesSwapsTrackingThreeWayCompare) {
   EXPECT_EQ(BtreeNodePeer::GetNumSlotsPerNode<decltype(set61)>(), 61);
   EXPECT_EQ(BtreeNodePeer::GetNumSlotsPerNode<decltype(set100)>(), 100);
   if (sizeof(void *) == 8) {
-    EXPECT_EQ(BtreeNodePeer::GetNumSlotsPerNode<absl::btree_set<int32_t>>(),
+    EXPECT_EQ(BtreeNodePeer::GetNumSlotsPerNode<abslx::btree_set<int32_t>>(),
               BtreeNodePeer::GetNumSlotsPerNode<decltype(set61)>());
   }
 
@@ -1560,7 +1560,7 @@ struct NoDefaultCtor {
 };
 
 TEST(Btree, BtreeMapCanHoldNoDefaultCtorTypes) {
-  absl::btree_map<NoDefaultCtor, NoDefaultCtor> m;
+  abslx::btree_map<NoDefaultCtor, NoDefaultCtor> m;
 
   for (int i = 1; i <= 99; ++i) {
     SCOPED_TRACE(i);
@@ -1586,7 +1586,7 @@ TEST(Btree, BtreeMapCanHoldNoDefaultCtorTypes) {
 }
 
 TEST(Btree, BtreeMultimapCanHoldNoDefaultCtorTypes) {
-  absl::btree_multimap<NoDefaultCtor, NoDefaultCtor> m;
+  abslx::btree_multimap<NoDefaultCtor, NoDefaultCtor> m;
 
   for (int i = 1; i <= 99; ++i) {
     SCOPED_TRACE(i);
@@ -1611,23 +1611,23 @@ TEST(Btree, BtreeMultimapCanHoldNoDefaultCtorTypes) {
 }
 
 TEST(Btree, MapAt) {
-  absl::btree_map<int, int> map = {{1, 2}, {2, 4}};
+  abslx::btree_map<int, int> map = {{1, 2}, {2, 4}};
   EXPECT_EQ(map.at(1), 2);
   EXPECT_EQ(map.at(2), 4);
   map.at(2) = 8;
-  const absl::btree_map<int, int> &const_map = map;
+  const abslx::btree_map<int, int> &const_map = map;
   EXPECT_EQ(const_map.at(1), 2);
   EXPECT_EQ(const_map.at(2), 8);
 #ifdef ABSL_HAVE_EXCEPTIONS
   EXPECT_THROW(map.at(3), std::out_of_range);
 #else
-  EXPECT_DEATH_IF_SUPPORTED(map.at(3), "absl::btree_map::at");
+  EXPECT_DEATH_IF_SUPPORTED(map.at(3), "abslx::btree_map::at");
 #endif
 }
 
 TEST(Btree, BtreeMultisetEmplace) {
   const int value_to_insert = 123456;
-  absl::btree_multiset<int> s;
+  abslx::btree_multiset<int> s;
   auto iter = s.emplace(value_to_insert);
   ASSERT_NE(iter, s.end());
   EXPECT_EQ(*iter, value_to_insert);
@@ -1641,7 +1641,7 @@ TEST(Btree, BtreeMultisetEmplace) {
 
 TEST(Btree, BtreeMultisetEmplaceHint) {
   const int value_to_insert = 123456;
-  absl::btree_multiset<int> s;
+  abslx::btree_multiset<int> s;
   auto iter = s.emplace(value_to_insert);
   ASSERT_NE(iter, s.end());
   EXPECT_EQ(*iter, value_to_insert);
@@ -1654,7 +1654,7 @@ TEST(Btree, BtreeMultisetEmplaceHint) {
 TEST(Btree, BtreeMultimapEmplace) {
   const int key_to_insert = 123456;
   const char value0[] = "a";
-  absl::btree_multimap<int, std::string> s;
+  abslx::btree_multimap<int, std::string> s;
   auto iter = s.emplace(key_to_insert, value0);
   ASSERT_NE(iter, s.end());
   EXPECT_EQ(iter->first, key_to_insert);
@@ -1672,7 +1672,7 @@ TEST(Btree, BtreeMultimapEmplace) {
 TEST(Btree, BtreeMultimapEmplaceHint) {
   const int key_to_insert = 123456;
   const char value0[] = "a";
-  absl::btree_multimap<int, std::string> s;
+  abslx::btree_multimap<int, std::string> s;
   auto iter = s.emplace(key_to_insert, value0);
   ASSERT_NE(iter, s.end());
   EXPECT_EQ(iter->first, key_to_insert);
@@ -1686,7 +1686,7 @@ TEST(Btree, BtreeMultimapEmplaceHint) {
 }
 
 TEST(Btree, ConstIteratorAccessors) {
-  absl::btree_set<int> set;
+  abslx::btree_set<int> set;
   for (int i = 0; i < 100; ++i) {
     set.insert(i);
   }
@@ -1702,29 +1702,29 @@ TEST(Btree, ConstIteratorAccessors) {
 }
 
 TEST(Btree, StrSplitCompatible) {
-  const absl::btree_set<std::string> split_set = absl::StrSplit("a,b,c", ',');
-  const absl::btree_set<std::string> expected_set = {"a", "b", "c"};
+  const abslx::btree_set<std::string> split_set = abslx::StrSplit("a,b,c", ',');
+  const abslx::btree_set<std::string> expected_set = {"a", "b", "c"};
 
   EXPECT_EQ(split_set, expected_set);
 }
 
-// We can't use EXPECT_EQ/etc. to compare absl::weak_ordering because they
-// convert literal 0 to int and absl::weak_ordering can only be compared with
+// We can't use EXPECT_EQ/etc. to compare abslx::weak_ordering because they
+// convert literal 0 to int and abslx::weak_ordering can only be compared with
 // literal 0. Defining this function allows for avoiding ClangTidy warnings.
 bool Identity(const bool b) { return b; }
 
 TEST(Btree, ValueComp) {
-  absl::btree_set<int> s;
+  abslx::btree_set<int> s;
   EXPECT_TRUE(s.value_comp()(1, 2));
   EXPECT_FALSE(s.value_comp()(2, 2));
   EXPECT_FALSE(s.value_comp()(2, 1));
 
-  absl::btree_map<int, int> m1;
+  abslx::btree_map<int, int> m1;
   EXPECT_TRUE(m1.value_comp()(std::make_pair(1, 0), std::make_pair(2, 0)));
   EXPECT_FALSE(m1.value_comp()(std::make_pair(2, 0), std::make_pair(2, 0)));
   EXPECT_FALSE(m1.value_comp()(std::make_pair(2, 0), std::make_pair(1, 0)));
 
-  absl::btree_map<std::string, int> m2;
+  abslx::btree_map<std::string, int> m2;
   EXPECT_TRUE(Identity(
       m2.value_comp()(std::make_pair("a", 0), std::make_pair("b", 0)) < 0));
   EXPECT_TRUE(Identity(
@@ -1734,10 +1734,10 @@ TEST(Btree, ValueComp) {
 }
 
 TEST(Btree, DefaultConstruction) {
-  absl::btree_set<int> s;
-  absl::btree_map<int, int> m;
-  absl::btree_multiset<int> ms;
-  absl::btree_multimap<int, int> mm;
+  abslx::btree_set<int> s;
+  abslx::btree_map<int, int> m;
+  abslx::btree_multiset<int> ms;
+  abslx::btree_multimap<int, int> mm;
 
   EXPECT_TRUE(s.empty());
   EXPECT_TRUE(m.empty());
@@ -1752,8 +1752,8 @@ TEST(Btree, SwissTableHashable) {
   std::vector<std::pair<int, int>> map_values;
   for (int v : values) map_values.emplace_back(v, -v);
 
-  using set = absl::btree_set<int>;
-  EXPECT_TRUE(absl::VerifyTypeImplementsAbslHashCorrectly({
+  using set = abslx::btree_set<int>;
+  EXPECT_TRUE(abslx::VerifyTypeImplementsAbslHashCorrectly({
       set{},
       set{1},
       set{2},
@@ -1763,8 +1763,8 @@ TEST(Btree, SwissTableHashable) {
       set(values.rbegin(), values.rend()),
   }));
 
-  using mset = absl::btree_multiset<int>;
-  EXPECT_TRUE(absl::VerifyTypeImplementsAbslHashCorrectly({
+  using mset = abslx::btree_multiset<int>;
+  EXPECT_TRUE(abslx::VerifyTypeImplementsAbslHashCorrectly({
       mset{},
       mset{1},
       mset{1, 1},
@@ -1778,8 +1778,8 @@ TEST(Btree, SwissTableHashable) {
       mset(values.rbegin(), values.rend()),
   }));
 
-  using map = absl::btree_map<int, int>;
-  EXPECT_TRUE(absl::VerifyTypeImplementsAbslHashCorrectly({
+  using map = abslx::btree_map<int, int>;
+  EXPECT_TRUE(abslx::VerifyTypeImplementsAbslHashCorrectly({
       map{},
       map{{1, 0}},
       map{{1, 1}},
@@ -1790,8 +1790,8 @@ TEST(Btree, SwissTableHashable) {
       map(map_values.rbegin(), map_values.rend()),
   }));
 
-  using mmap = absl::btree_multimap<int, int>;
-  EXPECT_TRUE(absl::VerifyTypeImplementsAbslHashCorrectly({
+  using mmap = abslx::btree_multimap<int, int>;
+  EXPECT_TRUE(abslx::VerifyTypeImplementsAbslHashCorrectly({
       mmap{},
       mmap{{1, 0}},
       mmap{{1, 1}},
@@ -1806,8 +1806,8 @@ TEST(Btree, SwissTableHashable) {
 }
 
 TEST(Btree, ComparableSet) {
-  absl::btree_set<int> s1 = {1, 2};
-  absl::btree_set<int> s2 = {2, 3};
+  abslx::btree_set<int> s1 = {1, 2};
+  abslx::btree_set<int> s2 = {2, 3};
   EXPECT_LT(s1, s2);
   EXPECT_LE(s1, s2);
   EXPECT_LE(s1, s1);
@@ -1817,8 +1817,8 @@ TEST(Btree, ComparableSet) {
 }
 
 TEST(Btree, ComparableSetsDifferentLength) {
-  absl::btree_set<int> s1 = {1, 2};
-  absl::btree_set<int> s2 = {1, 2, 3};
+  abslx::btree_set<int> s1 = {1, 2};
+  abslx::btree_set<int> s2 = {1, 2, 3};
   EXPECT_LT(s1, s2);
   EXPECT_LE(s1, s2);
   EXPECT_GT(s2, s1);
@@ -1826,8 +1826,8 @@ TEST(Btree, ComparableSetsDifferentLength) {
 }
 
 TEST(Btree, ComparableMultiset) {
-  absl::btree_multiset<int> s1 = {1, 2};
-  absl::btree_multiset<int> s2 = {2, 3};
+  abslx::btree_multiset<int> s1 = {1, 2};
+  abslx::btree_multiset<int> s2 = {2, 3};
   EXPECT_LT(s1, s2);
   EXPECT_LE(s1, s2);
   EXPECT_LE(s1, s1);
@@ -1837,8 +1837,8 @@ TEST(Btree, ComparableMultiset) {
 }
 
 TEST(Btree, ComparableMap) {
-  absl::btree_map<int, int> s1 = {{1, 2}};
-  absl::btree_map<int, int> s2 = {{2, 3}};
+  abslx::btree_map<int, int> s1 = {{1, 2}};
+  abslx::btree_map<int, int> s2 = {{2, 3}};
   EXPECT_LT(s1, s2);
   EXPECT_LE(s1, s2);
   EXPECT_LE(s1, s1);
@@ -1848,8 +1848,8 @@ TEST(Btree, ComparableMap) {
 }
 
 TEST(Btree, ComparableMultimap) {
-  absl::btree_multimap<int, int> s1 = {{1, 2}};
-  absl::btree_multimap<int, int> s2 = {{2, 3}};
+  abslx::btree_multimap<int, int> s1 = {{1, 2}};
+  abslx::btree_multimap<int, int> s2 = {{2, 3}};
   EXPECT_LT(s1, s2);
   EXPECT_LE(s1, s2);
   EXPECT_LE(s1, s1);
@@ -1864,8 +1864,8 @@ TEST(Btree, ComparableSetWithCustomComparator) {
   // [container.requirements.general].12, ordering associative containers always
   // uses default '<' operator
   // - even if otherwise the container uses custom functor.
-  absl::btree_set<int, std::greater<int>> s1 = {1, 2};
-  absl::btree_set<int, std::greater<int>> s2 = {2, 3};
+  abslx::btree_set<int, std::greater<int>> s1 = {1, 2};
+  abslx::btree_set<int, std::greater<int>> s2 = {2, 3};
   EXPECT_LT(s1, s2);
   EXPECT_LE(s1, s2);
   EXPECT_LE(s1, s1);
@@ -1875,7 +1875,7 @@ TEST(Btree, ComparableSetWithCustomComparator) {
 }
 
 TEST(Btree, EraseReturnsIterator) {
-  absl::btree_set<int> set = {1, 2, 3, 4, 5};
+  abslx::btree_set<int> set = {1, 2, 3, 4, 5};
   auto result_it = set.erase(set.begin(), set.find(3));
   EXPECT_EQ(result_it, set.find(3));
   result_it = set.erase(set.find(5));
@@ -1883,17 +1883,17 @@ TEST(Btree, EraseReturnsIterator) {
 }
 
 TEST(Btree, ExtractAndInsertNodeHandleSet) {
-  absl::btree_set<int> src1 = {1, 2, 3, 4, 5};
+  abslx::btree_set<int> src1 = {1, 2, 3, 4, 5};
   auto nh = src1.extract(src1.find(3));
   EXPECT_THAT(src1, ElementsAre(1, 2, 4, 5));
-  absl::btree_set<int> other;
-  absl::btree_set<int>::insert_return_type res = other.insert(std::move(nh));
+  abslx::btree_set<int> other;
+  abslx::btree_set<int>::insert_return_type res = other.insert(std::move(nh));
   EXPECT_THAT(other, ElementsAre(3));
   EXPECT_EQ(res.position, other.find(3));
   EXPECT_TRUE(res.inserted);
   EXPECT_TRUE(res.node.empty());
 
-  absl::btree_set<int> src2 = {3, 4};
+  abslx::btree_set<int> src2 = {3, 4};
   nh = src2.extract(src2.find(3));
   EXPECT_THAT(src2, ElementsAre(4));
   res = other.insert(std::move(nh));
@@ -1972,24 +1972,24 @@ void TestExtractWithTrackingForMap() {
 }
 
 TEST(Btree, ExtractTracking) {
-  TestExtractWithTrackingForSet<absl::btree_set<MovableOnlyInstance>>();
-  TestExtractWithTrackingForSet<absl::btree_multiset<MovableOnlyInstance>>();
+  TestExtractWithTrackingForSet<abslx::btree_set<MovableOnlyInstance>>();
+  TestExtractWithTrackingForSet<abslx::btree_multiset<MovableOnlyInstance>>();
   TestExtractWithTrackingForMap<
-      absl::btree_map<CopyableMovableInstance, MovableOnlyInstance>>();
+      abslx::btree_map<CopyableMovableInstance, MovableOnlyInstance>>();
   TestExtractWithTrackingForMap<
-      absl::btree_multimap<CopyableMovableInstance, MovableOnlyInstance>>();
+      abslx::btree_multimap<CopyableMovableInstance, MovableOnlyInstance>>();
 }
 
 TEST(Btree, ExtractAndInsertNodeHandleMultiSet) {
-  absl::btree_multiset<int> src1 = {1, 2, 3, 3, 4, 5};
+  abslx::btree_multiset<int> src1 = {1, 2, 3, 3, 4, 5};
   auto nh = src1.extract(src1.find(3));
   EXPECT_THAT(src1, ElementsAre(1, 2, 3, 4, 5));
-  absl::btree_multiset<int> other;
+  abslx::btree_multiset<int> other;
   auto res = other.insert(std::move(nh));
   EXPECT_THAT(other, ElementsAre(3));
   EXPECT_EQ(res, other.find(3));
 
-  absl::btree_multiset<int> src2 = {3, 4};
+  abslx::btree_multiset<int> src2 = {3, 4};
   nh = src2.extract(src2.find(3));
   EXPECT_THAT(src2, ElementsAre(4));
   res = other.insert(std::move(nh));
@@ -1998,18 +1998,18 @@ TEST(Btree, ExtractAndInsertNodeHandleMultiSet) {
 }
 
 TEST(Btree, ExtractAndInsertNodeHandleMap) {
-  absl::btree_map<int, int> src1 = {{1, 2}, {3, 4}, {5, 6}};
+  abslx::btree_map<int, int> src1 = {{1, 2}, {3, 4}, {5, 6}};
   auto nh = src1.extract(src1.find(3));
   EXPECT_THAT(src1, ElementsAre(Pair(1, 2), Pair(5, 6)));
-  absl::btree_map<int, int> other;
-  absl::btree_map<int, int>::insert_return_type res =
+  abslx::btree_map<int, int> other;
+  abslx::btree_map<int, int>::insert_return_type res =
       other.insert(std::move(nh));
   EXPECT_THAT(other, ElementsAre(Pair(3, 4)));
   EXPECT_EQ(res.position, other.find(3));
   EXPECT_TRUE(res.inserted);
   EXPECT_TRUE(res.node.empty());
 
-  absl::btree_map<int, int> src2 = {{3, 6}};
+  abslx::btree_map<int, int> src2 = {{3, 6}};
   nh = src2.extract(src2.find(3));
   EXPECT_TRUE(src2.empty());
   res = other.insert(std::move(nh));
@@ -2022,15 +2022,15 @@ TEST(Btree, ExtractAndInsertNodeHandleMap) {
 }
 
 TEST(Btree, ExtractAndInsertNodeHandleMultiMap) {
-  absl::btree_multimap<int, int> src1 = {{1, 2}, {3, 4}, {5, 6}};
+  abslx::btree_multimap<int, int> src1 = {{1, 2}, {3, 4}, {5, 6}};
   auto nh = src1.extract(src1.find(3));
   EXPECT_THAT(src1, ElementsAre(Pair(1, 2), Pair(5, 6)));
-  absl::btree_multimap<int, int> other;
+  abslx::btree_multimap<int, int> other;
   auto res = other.insert(std::move(nh));
   EXPECT_THAT(other, ElementsAre(Pair(3, 4)));
   EXPECT_EQ(res, other.find(3));
 
-  absl::btree_multimap<int, int> src2 = {{3, 6}};
+  abslx::btree_multimap<int, int> src2 = {{3, 6}};
   nh = src2.extract(src2.find(3));
   EXPECT_TRUE(src2.empty());
   res = other.insert(std::move(nh));
@@ -2040,22 +2040,22 @@ TEST(Btree, ExtractAndInsertNodeHandleMultiMap) {
 
 TEST(Btree, ExtractMultiMapEquivalentKeys) {
   // Note: using string keys means a three-way comparator.
-  absl::btree_multimap<std::string, int> map;
+  abslx::btree_multimap<std::string, int> map;
   for (int i = 0; i < 100; ++i) {
     for (int j = 0; j < 100; ++j) {
-      map.insert({absl::StrCat(i), j});
+      map.insert({abslx::StrCat(i), j});
     }
   }
 
   for (int i = 0; i < 100; ++i) {
-    const std::string key = absl::StrCat(i);
+    const std::string key = abslx::StrCat(i);
     auto node_handle = map.extract(key);
     EXPECT_EQ(node_handle.key(), key);
     EXPECT_EQ(node_handle.mapped(), 0) << i;
   }
 
   for (int i = 0; i < 100; ++i) {
-    const std::string key = absl::StrCat(i);
+    const std::string key = abslx::StrCat(i);
     auto node_handle = map.extract(key);
     EXPECT_EQ(node_handle.key(), key);
     EXPECT_EQ(node_handle.mapped(), 1) << i;
@@ -2090,10 +2090,10 @@ TEST(Btree, InsertHintNodeHandle) {
   // For unique sets, insert with hint is just a performance optimization.
   // Test that insert works correctly when the hint is right or wrong.
   {
-    absl::btree_set<int> src = {1, 2, 3, 4, 5};
+    abslx::btree_set<int> src = {1, 2, 3, 4, 5};
     auto nh = src.extract(src.find(3));
     EXPECT_THAT(src, ElementsAre(1, 2, 4, 5));
-    absl::btree_set<int> other = {0, 100};
+    abslx::btree_set<int> other = {0, 100};
     // Test a correct hint.
     auto it = other.insert(other.lower_bound(3), std::move(nh));
     EXPECT_THAT(other, ElementsAre(0, 3, 100));
@@ -2106,11 +2106,11 @@ TEST(Btree, InsertHintNodeHandle) {
     EXPECT_EQ(it, other.find(5));
   }
 
-  absl::btree_multiset<InsertMultiHintData, InsertMultiHintDataKeyCompare> src =
+  abslx::btree_multiset<InsertMultiHintData, InsertMultiHintDataKeyCompare> src =
       {{1, 2}, {3, 4}, {3, 5}};
   auto nh = src.extract(src.lower_bound(3));
   EXPECT_EQ(nh.value(), (InsertMultiHintData{3, 4}));
-  absl::btree_multiset<InsertMultiHintData, InsertMultiHintDataKeyCompare>
+  abslx::btree_multiset<InsertMultiHintData, InsertMultiHintDataKeyCompare>
       other = {{3, 1}, {3, 2}, {3, 3}};
   auto it = other.insert(--other.end(), std::move(nh));
   EXPECT_THAT(
@@ -2129,17 +2129,17 @@ TEST(Btree, InsertHintNodeHandle) {
 }
 
 struct IntCompareToCmp {
-  absl::weak_ordering operator()(int a, int b) const {
-    if (a < b) return absl::weak_ordering::less;
-    if (a > b) return absl::weak_ordering::greater;
-    return absl::weak_ordering::equivalent;
+  abslx::weak_ordering operator()(int a, int b) const {
+    if (a < b) return abslx::weak_ordering::less;
+    if (a > b) return abslx::weak_ordering::greater;
+    return abslx::weak_ordering::equivalent;
   }
 };
 
 TEST(Btree, MergeIntoUniqueContainers) {
-  absl::btree_set<int, IntCompareToCmp> src1 = {1, 2, 3};
-  absl::btree_multiset<int> src2 = {3, 4, 4, 5};
-  absl::btree_set<int> dst;
+  abslx::btree_set<int, IntCompareToCmp> src1 = {1, 2, 3};
+  abslx::btree_multiset<int> src2 = {3, 4, 4, 5};
+  abslx::btree_set<int> dst;
 
   dst.merge(src1);
   EXPECT_TRUE(src1.empty());
@@ -2150,9 +2150,9 @@ TEST(Btree, MergeIntoUniqueContainers) {
 }
 
 TEST(Btree, MergeIntoUniqueContainersWithCompareTo) {
-  absl::btree_set<int, IntCompareToCmp> src1 = {1, 2, 3};
-  absl::btree_multiset<int> src2 = {3, 4, 4, 5};
-  absl::btree_set<int, IntCompareToCmp> dst;
+  abslx::btree_set<int, IntCompareToCmp> src1 = {1, 2, 3};
+  abslx::btree_multiset<int> src2 = {3, 4, 4, 5};
+  abslx::btree_set<int, IntCompareToCmp> dst;
 
   dst.merge(src1);
   EXPECT_TRUE(src1.empty());
@@ -2163,9 +2163,9 @@ TEST(Btree, MergeIntoUniqueContainersWithCompareTo) {
 }
 
 TEST(Btree, MergeIntoMultiContainers) {
-  absl::btree_set<int, IntCompareToCmp> src1 = {1, 2, 3};
-  absl::btree_multiset<int> src2 = {3, 4, 4, 5};
-  absl::btree_multiset<int> dst;
+  abslx::btree_set<int, IntCompareToCmp> src1 = {1, 2, 3};
+  abslx::btree_multiset<int> src2 = {3, 4, 4, 5};
+  abslx::btree_multiset<int> dst;
 
   dst.merge(src1);
   EXPECT_TRUE(src1.empty());
@@ -2176,9 +2176,9 @@ TEST(Btree, MergeIntoMultiContainers) {
 }
 
 TEST(Btree, MergeIntoMultiContainersWithCompareTo) {
-  absl::btree_set<int, IntCompareToCmp> src1 = {1, 2, 3};
-  absl::btree_multiset<int> src2 = {3, 4, 4, 5};
-  absl::btree_multiset<int, IntCompareToCmp> dst;
+  abslx::btree_set<int, IntCompareToCmp> src1 = {1, 2, 3};
+  abslx::btree_multiset<int> src2 = {3, 4, 4, 5};
+  abslx::btree_multiset<int, IntCompareToCmp> dst;
 
   dst.merge(src1);
   EXPECT_TRUE(src1.empty());
@@ -2189,10 +2189,10 @@ TEST(Btree, MergeIntoMultiContainersWithCompareTo) {
 }
 
 TEST(Btree, MergeIntoMultiMapsWithDifferentComparators) {
-  absl::btree_map<int, int, IntCompareToCmp> src1 = {{1, 1}, {2, 2}, {3, 3}};
-  absl::btree_multimap<int, int, std::greater<int>> src2 = {
+  abslx::btree_map<int, int, IntCompareToCmp> src1 = {{1, 1}, {2, 2}, {3, 3}};
+  abslx::btree_multimap<int, int, std::greater<int>> src2 = {
       {5, 5}, {4, 1}, {4, 4}, {3, 2}};
-  absl::btree_multimap<int, int> dst;
+  abslx::btree_multimap<int, int> dst;
 
   dst.merge(src1);
   EXPECT_TRUE(src1.empty());
@@ -2204,11 +2204,11 @@ TEST(Btree, MergeIntoMultiMapsWithDifferentComparators) {
 }
 
 TEST(Btree, MergeIntoSetMovableOnly) {
-  absl::btree_set<MovableOnlyInstance> src;
+  abslx::btree_set<MovableOnlyInstance> src;
   src.insert(MovableOnlyInstance(1));
-  absl::btree_multiset<MovableOnlyInstance> dst1;
+  abslx::btree_multiset<MovableOnlyInstance> dst1;
   dst1.insert(MovableOnlyInstance(2));
-  absl::btree_set<MovableOnlyInstance> dst2;
+  abslx::btree_set<MovableOnlyInstance> dst2;
 
   // Test merge into multiset.
   dst1.merge(src);
@@ -2230,34 +2230,34 @@ TEST(Btree, MergeIntoSetMovableOnly) {
 
 struct KeyCompareToWeakOrdering {
   template <typename T>
-  absl::weak_ordering operator()(const T &a, const T &b) const {
-    return a < b ? absl::weak_ordering::less
-                 : a == b ? absl::weak_ordering::equivalent
-                          : absl::weak_ordering::greater;
+  abslx::weak_ordering operator()(const T &a, const T &b) const {
+    return a < b ? abslx::weak_ordering::less
+                 : a == b ? abslx::weak_ordering::equivalent
+                          : abslx::weak_ordering::greater;
   }
 };
 
 struct KeyCompareToStrongOrdering {
   template <typename T>
-  absl::strong_ordering operator()(const T &a, const T &b) const {
-    return a < b ? absl::strong_ordering::less
-                 : a == b ? absl::strong_ordering::equal
-                          : absl::strong_ordering::greater;
+  abslx::strong_ordering operator()(const T &a, const T &b) const {
+    return a < b ? abslx::strong_ordering::less
+                 : a == b ? abslx::strong_ordering::equal
+                          : abslx::strong_ordering::greater;
   }
 };
 
 TEST(Btree, UserProvidedKeyCompareToComparators) {
-  absl::btree_set<int, KeyCompareToWeakOrdering> weak_set = {1, 2, 3};
+  abslx::btree_set<int, KeyCompareToWeakOrdering> weak_set = {1, 2, 3};
   EXPECT_TRUE(weak_set.contains(2));
   EXPECT_FALSE(weak_set.contains(4));
 
-  absl::btree_set<int, KeyCompareToStrongOrdering> strong_set = {1, 2, 3};
+  abslx::btree_set<int, KeyCompareToStrongOrdering> strong_set = {1, 2, 3};
   EXPECT_TRUE(strong_set.contains(2));
   EXPECT_FALSE(strong_set.contains(4));
 }
 
 TEST(Btree, TryEmplaceBasicTest) {
-  absl::btree_map<int, std::string> m;
+  abslx::btree_map<int, std::string> m;
 
   // Should construct a string from the literal.
   m.try_emplace(1, "one");
@@ -2282,7 +2282,7 @@ TEST(Btree, TryEmplaceWithHintWorks) {
   };
   using Cmp = decltype(cmp);
 
-  absl::btree_map<int, int, Cmp> m(cmp);
+  abslx::btree_map<int, int, Cmp> m(cmp);
   for (int i = 0; i < 128; ++i) {
     m.emplace(i, i);
   }
@@ -2334,7 +2334,7 @@ TEST(Btree, TryEmplaceWithHintWorks) {
 }
 
 TEST(Btree, TryEmplaceWithBadHint) {
-  absl::btree_map<int, int> m = {{1, 1}, {9, 9}};
+  abslx::btree_map<int, int> m = {{1, 1}, {9, 9}};
 
   // Bad hint (too small), should still emplace:
   auto it = m.try_emplace(m.begin(), 2, 2);
@@ -2350,7 +2350,7 @@ TEST(Btree, TryEmplaceWithBadHint) {
 }
 
 TEST(Btree, TryEmplaceMaintainsSortedOrder) {
-  absl::btree_map<int, std::string> m;
+  abslx::btree_map<int, std::string> m;
   std::pair<int, std::string> pair5 = {5, "five"};
 
   // Test both lvalue & rvalue emplace.
@@ -2367,13 +2367,13 @@ TEST(Btree, TryEmplaceMaintainsSortedOrder) {
 }
 
 TEST(Btree, TryEmplaceWithHintAndNoValueArgsWorks) {
-  absl::btree_map<int, int> m;
+  abslx::btree_map<int, int> m;
   m.try_emplace(m.end(), 1);
   EXPECT_EQ(0, m[1]);
 }
 
 TEST(Btree, TryEmplaceWithHintAndMultipleValueArgsWorks) {
-  absl::btree_map<int, std::string> m;
+  abslx::btree_map<int, std::string> m;
   m.try_emplace(m.end(), 1, 10, 'a');
   EXPECT_EQ(std::string(10, 'a'), m[1]);
 }
@@ -2388,7 +2388,7 @@ TEST(Btree, MoveAssignmentAllocatorPropagation) {
 
   // Test propagating allocator_type.
   {
-    absl::btree_set<MovableOnlyInstance, std::less<MovableOnlyInstance>,
+    abslx::btree_set<MovableOnlyInstance, std::less<MovableOnlyInstance>,
                     PropagatingCountingAlloc<MovableOnlyInstance>>
         set1(cmp, allocator1), set2(cmp, allocator2);
 
@@ -2400,7 +2400,7 @@ TEST(Btree, MoveAssignmentAllocatorPropagation) {
   }
   // Test non-propagating allocator_type with equal allocators.
   {
-    absl::btree_set<MovableOnlyInstance, std::less<MovableOnlyInstance>,
+    abslx::btree_set<MovableOnlyInstance, std::less<MovableOnlyInstance>,
                     CountingAllocator<MovableOnlyInstance>>
         set1(cmp, allocator1), set2(cmp, allocator1);
 
@@ -2412,7 +2412,7 @@ TEST(Btree, MoveAssignmentAllocatorPropagation) {
   }
   // Test non-propagating allocator_type with different allocators.
   {
-    absl::btree_set<MovableOnlyInstance, std::less<MovableOnlyInstance>,
+    abslx::btree_set<MovableOnlyInstance, std::less<MovableOnlyInstance>,
                     CountingAllocator<MovableOnlyInstance>>
         set1(cmp, allocator1), set2(cmp, allocator2);
 
@@ -2425,7 +2425,7 @@ TEST(Btree, MoveAssignmentAllocatorPropagation) {
 }
 
 TEST(Btree, EmptyTree) {
-  absl::btree_set<int> s;
+  abslx::btree_set<int> s;
   EXPECT_TRUE(s.empty());
   EXPECT_EQ(s.size(), 0);
   EXPECT_GT(s.max_size(), 0);
@@ -2436,22 +2436,22 @@ bool IsEven(int k) { return k % 2 == 0; }
 TEST(Btree, EraseIf) {
   // Test that erase_if works with all the container types and supports lambdas.
   {
-    absl::btree_set<int> s = {1, 3, 5, 6, 100};
+    abslx::btree_set<int> s = {1, 3, 5, 6, 100};
     erase_if(s, [](int k) { return k > 3; });
     EXPECT_THAT(s, ElementsAre(1, 3));
   }
   {
-    absl::btree_multiset<int> s = {1, 3, 3, 5, 6, 6, 100};
+    abslx::btree_multiset<int> s = {1, 3, 3, 5, 6, 6, 100};
     erase_if(s, [](int k) { return k <= 3; });
     EXPECT_THAT(s, ElementsAre(5, 6, 6, 100));
   }
   {
-    absl::btree_map<int, int> m = {{1, 1}, {3, 3}, {6, 6}, {100, 100}};
+    abslx::btree_map<int, int> m = {{1, 1}, {3, 3}, {6, 6}, {100, 100}};
     erase_if(m, [](std::pair<const int, int> kv) { return kv.first > 3; });
     EXPECT_THAT(m, ElementsAre(Pair(1, 1), Pair(3, 3)));
   }
   {
-    absl::btree_multimap<int, int> m = {{1, 1}, {3, 3}, {3, 6},
+    abslx::btree_multimap<int, int> m = {{1, 1}, {3, 3}, {3, 6},
                                         {6, 6}, {6, 7}, {100, 6}};
     erase_if(m, [](std::pair<const int, int> kv) { return kv.second == 6; });
     EXPECT_THAT(m, ElementsAre(Pair(1, 1), Pair(3, 3), Pair(6, 7)));
@@ -2459,21 +2459,21 @@ TEST(Btree, EraseIf) {
   // Test that erasing all elements from a large set works and test support for
   // function pointers.
   {
-    absl::btree_set<int> s;
+    abslx::btree_set<int> s;
     for (int i = 0; i < 1000; ++i) s.insert(2 * i);
     erase_if(s, IsEven);
     EXPECT_THAT(s, IsEmpty());
   }
   // Test that erase_if supports other format of function pointers.
   {
-    absl::btree_set<int> s = {1, 3, 5, 6, 100};
+    abslx::btree_set<int> s = {1, 3, 5, 6, 100};
     erase_if(s, &IsEven);
     EXPECT_THAT(s, ElementsAre(1, 3, 5));
   }
 }
 
 TEST(Btree, InsertOrAssign) {
-  absl::btree_map<int, int> m = {{1, 1}, {3, 3}};
+  abslx::btree_map<int, int> m = {{1, 1}, {3, 3}};
   using value_type = typename decltype(m)::value_type;
 
   auto ret = m.insert_or_assign(4, 4);
@@ -2496,7 +2496,7 @@ TEST(Btree, InsertOrAssign) {
 }
 
 TEST(Btree, InsertOrAssignMovableOnly) {
-  absl::btree_map<int, MovableOnlyInstance> m;
+  abslx::btree_map<int, MovableOnlyInstance> m;
   using value_type = typename decltype(m)::value_type;
 
   auto ret = m.insert_or_assign(4, MovableOnlyInstance(4));
@@ -2517,7 +2517,7 @@ TEST(Btree, BitfieldArgument) {
     int n : 1;
   };
   n = 0;
-  absl::btree_map<int, int> m;
+  abslx::btree_map<int, int> m;
   m.erase(n);
   m.count(n);
   m.find(n);
@@ -2532,12 +2532,12 @@ TEST(Btree, BitfieldArgument) {
 }
 
 TEST(Btree, SetRangeConstructorAndInsertSupportExplicitConversionComparable) {
-  const absl::string_view names[] = {"n1", "n2"};
+  const abslx::string_view names[] = {"n1", "n2"};
 
-  absl::btree_set<std::string> name_set1{std::begin(names), std::end(names)};
+  abslx::btree_set<std::string> name_set1{std::begin(names), std::end(names)};
   EXPECT_THAT(name_set1, ElementsAreArray(names));
 
-  absl::btree_set<std::string> name_set2;
+  abslx::btree_set<std::string> name_set2;
   name_set2.insert(std::begin(names), std::end(names));
   EXPECT_THAT(name_set2, ElementsAreArray(names));
 }
@@ -2567,7 +2567,7 @@ TEST(Btree,
   const int i[] = {0, 1, 1};
   ConstructorCounted::constructor_calls = 0;
 
-  absl::btree_set<ConstructorCounted, ConstructorCountedCompare> set{
+  abslx::btree_set<ConstructorCounted, ConstructorCountedCompare> set{
       std::begin(i), std::end(i)};
   EXPECT_THAT(set, ElementsAre(0, 1));
   EXPECT_EQ(ConstructorCounted::constructor_calls, 2);
@@ -2581,10 +2581,10 @@ TEST(Btree,
      SetRangeConstructorAndInsertSupportExplicitConversionNonComparable) {
   const int i[] = {0, 1};
 
-  absl::btree_set<std::vector<void *>> s1{std::begin(i), std::end(i)};
+  abslx::btree_set<std::vector<void *>> s1{std::begin(i), std::end(i)};
   EXPECT_THAT(s1, ElementsAre(IsEmpty(), ElementsAre(IsNull())));
 
-  absl::btree_set<std::vector<void *>> s2;
+  abslx::btree_set<std::vector<void *>> s2;
   s2.insert(std::begin(i), std::end(i));
   EXPECT_THAT(s2, ElementsAre(IsEmpty(), ElementsAre(IsNull())));
 }
@@ -2596,13 +2596,13 @@ TEST(Btree,
 #if !defined(__GLIBCXX__) || \
     (defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE >= 7)
 TEST(Btree, MapRangeConstructorAndInsertSupportExplicitConversionComparable) {
-  const std::pair<absl::string_view, int> names[] = {{"n1", 1}, {"n2", 2}};
+  const std::pair<abslx::string_view, int> names[] = {{"n1", 1}, {"n2", 2}};
 
-  absl::btree_map<std::string, int> name_map1{std::begin(names),
+  abslx::btree_map<std::string, int> name_map1{std::begin(names),
                                               std::end(names)};
   EXPECT_THAT(name_map1, ElementsAre(Pair("n1", 1), Pair("n2", 2)));
 
-  absl::btree_map<std::string, int> name_map2;
+  abslx::btree_map<std::string, int> name_map2;
   name_map2.insert(std::begin(names), std::end(names));
   EXPECT_THAT(name_map2, ElementsAre(Pair("n1", 1), Pair("n2", 2)));
 }
@@ -2612,7 +2612,7 @@ TEST(Btree,
   const std::pair<int, int> i[] = {{0, 1}, {1, 2}, {1, 3}};
   ConstructorCounted::constructor_calls = 0;
 
-  absl::btree_map<ConstructorCounted, int, ConstructorCountedCompare> map{
+  abslx::btree_map<ConstructorCounted, int, ConstructorCountedCompare> map{
       std::begin(i), std::end(i)};
   EXPECT_THAT(map, ElementsAre(Pair(0, 1), Pair(1, 2)));
   EXPECT_EQ(ConstructorCounted::constructor_calls, 2);
@@ -2626,20 +2626,20 @@ TEST(Btree,
      MapRangeConstructorAndInsertSupportExplicitConversionNonComparable) {
   const std::pair<int, int> i[] = {{0, 1}, {1, 2}};
 
-  absl::btree_map<std::vector<void *>, int> m1{std::begin(i), std::end(i)};
+  abslx::btree_map<std::vector<void *>, int> m1{std::begin(i), std::end(i)};
   EXPECT_THAT(m1,
               ElementsAre(Pair(IsEmpty(), 1), Pair(ElementsAre(IsNull()), 2)));
 
-  absl::btree_map<std::vector<void *>, int> m2;
+  abslx::btree_map<std::vector<void *>, int> m2;
   m2.insert(std::begin(i), std::end(i));
   EXPECT_THAT(m2,
               ElementsAre(Pair(IsEmpty(), 1), Pair(ElementsAre(IsNull()), 2)));
 }
 
 TEST(Btree, HeterogeneousTryEmplace) {
-  absl::btree_map<std::string, int> m;
+  abslx::btree_map<std::string, int> m;
   std::string s = "key";
-  absl::string_view sv = s;
+  abslx::string_view sv = s;
   m.try_emplace(sv, 1);
   EXPECT_EQ(m[s], 1);
 
@@ -2648,9 +2648,9 @@ TEST(Btree, HeterogeneousTryEmplace) {
 }
 
 TEST(Btree, HeterogeneousOperatorMapped) {
-  absl::btree_map<std::string, int> m;
+  abslx::btree_map<std::string, int> m;
   std::string s = "key";
-  absl::string_view sv = s;
+  abslx::string_view sv = s;
   m[sv] = 1;
   EXPECT_EQ(m[s], 1);
 
@@ -2659,9 +2659,9 @@ TEST(Btree, HeterogeneousOperatorMapped) {
 }
 
 TEST(Btree, HeterogeneousInsertOrAssign) {
-  absl::btree_map<std::string, int> m;
+  abslx::btree_map<std::string, int> m;
   std::string s = "key";
-  absl::string_view sv = s;
+  abslx::string_view sv = s;
   m.insert_or_assign(sv, 1);
   EXPECT_EQ(m[s], 1);
 
@@ -2674,7 +2674,7 @@ TEST(Btree, HeterogeneousInsertOrAssign) {
 #if defined(__cpp_lib_launder) && __cpp_lib_launder >= 201606
 TEST(Btree, NodeHandleMutableKeyAccess) {
   {
-    absl::btree_map<std::string, std::string> map;
+    abslx::btree_map<std::string, std::string> map;
 
     map["key1"] = "mapped";
 
@@ -2686,7 +2686,7 @@ TEST(Btree, NodeHandleMutableKeyAccess) {
   }
   // Also for multimap.
   {
-    absl::btree_multimap<std::string, std::string> map;
+    abslx::btree_multimap<std::string, std::string> map;
 
     map.emplace("key1", "mapped");
 
@@ -2724,22 +2724,22 @@ struct MultiKeyComp {
 // for different lookup types.
 struct MultiKeyThreeWayComp {
   using is_transparent = void;
-  absl::weak_ordering operator()(const MultiKey a, const MultiKey b) const {
-    if (a.i1 < b.i1) return absl::weak_ordering::less;
-    if (a.i1 > b.i1) return absl::weak_ordering::greater;
-    if (a.i2 < b.i2) return absl::weak_ordering::less;
-    if (a.i2 > b.i2) return absl::weak_ordering::greater;
-    return absl::weak_ordering::equivalent;
+  abslx::weak_ordering operator()(const MultiKey a, const MultiKey b) const {
+    if (a.i1 < b.i1) return abslx::weak_ordering::less;
+    if (a.i1 > b.i1) return abslx::weak_ordering::greater;
+    if (a.i2 < b.i2) return abslx::weak_ordering::less;
+    if (a.i2 > b.i2) return abslx::weak_ordering::greater;
+    return abslx::weak_ordering::equivalent;
   }
-  absl::weak_ordering operator()(const int a, const MultiKey b) const {
-    if (a < b.i1) return absl::weak_ordering::less;
-    if (a > b.i1) return absl::weak_ordering::greater;
-    return absl::weak_ordering::equivalent;
+  abslx::weak_ordering operator()(const int a, const MultiKey b) const {
+    if (a < b.i1) return abslx::weak_ordering::less;
+    if (a > b.i1) return abslx::weak_ordering::greater;
+    return abslx::weak_ordering::equivalent;
   }
-  absl::weak_ordering operator()(const MultiKey a, const int b) const {
-    if (a.i1 < b) return absl::weak_ordering::less;
-    if (a.i1 > b) return absl::weak_ordering::greater;
-    return absl::weak_ordering::equivalent;
+  abslx::weak_ordering operator()(const MultiKey a, const int b) const {
+    if (a.i1 < b) return abslx::weak_ordering::less;
+    if (a.i1 > b) return abslx::weak_ordering::greater;
+    return abslx::weak_ordering::equivalent;
   }
 };
 
@@ -2749,7 +2749,7 @@ using MultiKeyComps = ::testing::Types<MultiKeyComp, MultiKeyThreeWayComp>;
 TYPED_TEST_SUITE(BtreeMultiKeyTest, MultiKeyComps);
 
 TYPED_TEST(BtreeMultiKeyTest, EqualRange) {
-  absl::btree_set<MultiKey, TypeParam> set;
+  abslx::btree_set<MultiKey, TypeParam> set;
   for (int i = 0; i < 100; ++i) {
     for (int j = 0; j < 100; ++j) {
       set.insert({i, j});
@@ -2765,7 +2765,7 @@ TYPED_TEST(BtreeMultiKeyTest, EqualRange) {
 }
 
 TYPED_TEST(BtreeMultiKeyTest, Extract) {
-  absl::btree_set<MultiKey, TypeParam> set;
+  abslx::btree_set<MultiKey, TypeParam> set;
   for (int i = 0; i < 100; ++i) {
     for (int j = 0; j < 100; ++j) {
       set.insert({i, j});
@@ -2786,21 +2786,21 @@ TYPED_TEST(BtreeMultiKeyTest, Extract) {
 }
 
 TYPED_TEST(BtreeMultiKeyTest, Erase) {
-  absl::btree_set<MultiKey, TypeParam> set = {
+  abslx::btree_set<MultiKey, TypeParam> set = {
       {1, 1}, {2, 1}, {2, 2}, {3, 1}};
   EXPECT_EQ(set.erase(2), 2);
   EXPECT_THAT(set, ElementsAre(MultiKey{1, 1}, MultiKey{3, 1}));
 }
 
 TYPED_TEST(BtreeMultiKeyTest, Count) {
-  const absl::btree_set<MultiKey, TypeParam> set = {
+  const abslx::btree_set<MultiKey, TypeParam> set = {
       {1, 1}, {2, 1}, {2, 2}, {3, 1}};
   EXPECT_EQ(set.count(2), 2);
 }
 
 TEST(Btree, AllocConstructor) {
   using Alloc = CountingAllocator<int>;
-  using Set = absl::btree_set<int, std::less<int>, Alloc>;
+  using Set = abslx::btree_set<int, std::less<int>, Alloc>;
   int64_t bytes_used = 0;
   Alloc alloc(&bytes_used);
   Set set(alloc);
@@ -2813,7 +2813,7 @@ TEST(Btree, AllocConstructor) {
 
 TEST(Btree, AllocInitializerListConstructor) {
   using Alloc = CountingAllocator<int>;
-  using Set = absl::btree_set<int, std::less<int>, Alloc>;
+  using Set = abslx::btree_set<int, std::less<int>, Alloc>;
   int64_t bytes_used = 0;
   Alloc alloc(&bytes_used);
   Set set({1, 2, 3}, alloc);
@@ -2824,7 +2824,7 @@ TEST(Btree, AllocInitializerListConstructor) {
 
 TEST(Btree, AllocRangeConstructor) {
   using Alloc = CountingAllocator<int>;
-  using Set = absl::btree_set<int, std::less<int>, Alloc>;
+  using Set = abslx::btree_set<int, std::less<int>, Alloc>;
   int64_t bytes_used = 0;
   Alloc alloc(&bytes_used);
   std::vector<int> v = {1, 2, 3};
@@ -2836,7 +2836,7 @@ TEST(Btree, AllocRangeConstructor) {
 
 TEST(Btree, AllocCopyConstructor) {
   using Alloc = CountingAllocator<int>;
-  using Set = absl::btree_set<int, std::less<int>, Alloc>;
+  using Set = abslx::btree_set<int, std::less<int>, Alloc>;
   int64_t bytes_used1 = 0;
   Alloc alloc1(&bytes_used1);
   Set set1(alloc1);
@@ -2855,7 +2855,7 @@ TEST(Btree, AllocCopyConstructor) {
 
 TEST(Btree, AllocMoveConstructor_SameAlloc) {
   using Alloc = CountingAllocator<int>;
-  using Set = absl::btree_set<int, std::less<int>, Alloc>;
+  using Set = abslx::btree_set<int, std::less<int>, Alloc>;
   int64_t bytes_used = 0;
   Alloc alloc(&bytes_used);
   Set set1(alloc);
@@ -2873,7 +2873,7 @@ TEST(Btree, AllocMoveConstructor_SameAlloc) {
 
 TEST(Btree, AllocMoveConstructor_DifferentAlloc) {
   using Alloc = CountingAllocator<int>;
-  using Set = absl::btree_set<int, std::less<int>, Alloc>;
+  using Set = abslx::btree_set<int, std::less<int>, Alloc>;
   int64_t bytes_used1 = 0;
   Alloc alloc1(&bytes_used1);
   Set set1(alloc1);
@@ -2896,4 +2896,4 @@ TEST(Btree, AllocMoveConstructor_DifferentAlloc) {
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

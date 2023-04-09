@@ -97,7 +97,7 @@ const char* const kHaystack = MakeHaystack();
 void BM_Memmem(benchmark::State& state) {
   for (auto _ : state) {
     benchmark::DoNotOptimize(
-        absl::strings_internal::memmem(kHaystack, kHaystackSize, "b", 1));
+        abslx::strings_internal::memmem(kHaystack, kHaystackSize, "b", 1));
   }
   state.SetBytesProcessed(kHaystackSize64 * state.iterations());
 }
@@ -106,7 +106,7 @@ BENCHMARK(BM_Memmem);
 void BM_MemmemMedium(benchmark::State& state) {
   for (auto _ : state) {
     benchmark::DoNotOptimize(
-        absl::strings_internal::memmem(kHaystack, kHaystackSize, "ab", 2));
+        abslx::strings_internal::memmem(kHaystack, kHaystackSize, "ab", 2));
   }
   state.SetBytesProcessed(kHaystackSize64 * state.iterations());
 }
@@ -114,7 +114,7 @@ BENCHMARK(BM_MemmemMedium);
 
 void BM_MemmemPathological(benchmark::State& state) {
   for (auto _ : state) {
-    benchmark::DoNotOptimize(absl::strings_internal::memmem(
+    benchmark::DoNotOptimize(abslx::strings_internal::memmem(
         kHaystack, kHaystackSize, kHaystack + kHaystackSize / 2,
         kHaystackSize - kHaystackSize / 2));
   }
@@ -125,7 +125,7 @@ BENCHMARK(BM_MemmemPathological);
 void BM_Memcasemem(benchmark::State& state) {
   for (auto _ : state) {
     benchmark::DoNotOptimize(
-        absl::strings_internal::memcasemem(kHaystack, kHaystackSize, "b", 1));
+        abslx::strings_internal::memcasemem(kHaystack, kHaystackSize, "b", 1));
   }
   state.SetBytesProcessed(kHaystackSize64 * state.iterations());
 }
@@ -134,7 +134,7 @@ BENCHMARK(BM_Memcasemem);
 void BM_MemcasememMedium(benchmark::State& state) {
   for (auto _ : state) {
     benchmark::DoNotOptimize(
-        absl::strings_internal::memcasemem(kHaystack, kHaystackSize, "ab", 2));
+        abslx::strings_internal::memcasemem(kHaystack, kHaystackSize, "ab", 2));
   }
   state.SetBytesProcessed(kHaystackSize64 * state.iterations());
 }
@@ -142,7 +142,7 @@ BENCHMARK(BM_MemcasememMedium);
 
 void BM_MemcasememPathological(benchmark::State& state) {
   for (auto _ : state) {
-    benchmark::DoNotOptimize(absl::strings_internal::memcasemem(
+    benchmark::DoNotOptimize(abslx::strings_internal::memcasemem(
         kHaystack, kHaystackSize, kHaystack + kHaystackSize / 2,
         kHaystackSize - kHaystackSize / 2));
   }
@@ -151,7 +151,7 @@ void BM_MemcasememPathological(benchmark::State& state) {
 BENCHMARK(BM_MemcasememPathological);
 
 bool case_eq(const char a, const char b) {
-  return absl::ascii_tolower(a) == absl::ascii_tolower(b);
+  return abslx::ascii_tolower(a) == abslx::ascii_tolower(b);
 }
 
 void BM_Search(benchmark::State& state) {
@@ -215,9 +215,9 @@ void BM_SearchcasePathological(benchmark::State& state) {
 BENCHMARK(BM_SearchcasePathological);
 
 char* memcasechr(const char* s, int c, size_t slen) {
-  c = absl::ascii_tolower(c);
+  c = abslx::ascii_tolower(c);
   for (; slen; ++s, --slen) {
-    if (absl::ascii_tolower(*s) == c) return const_cast<char*>(s);
+    if (abslx::ascii_tolower(*s) == c) return const_cast<char*>(s);
   }
   return nullptr;
 }
@@ -233,7 +233,7 @@ const char* memcasematch(const char* phaystack, size_t haylen,
   const char* hayend = phaystack + haylen - neelen + 1;
   while ((match = static_cast<char*>(
               memcasechr(phaystack, pneedle[0], hayend - phaystack)))) {
-    if (absl::strings_internal::memcasecmp(match, pneedle, neelen) == 0)
+    if (abslx::strings_internal::memcasecmp(match, pneedle, neelen) == 0)
       return match;
     else
       phaystack = match + 1;
@@ -244,7 +244,7 @@ const char* memcasematch(const char* phaystack, size_t haylen,
 void BM_Memmatch(benchmark::State& state) {
   for (auto _ : state) {
     benchmark::DoNotOptimize(
-        absl::strings_internal::memmatch(kHaystack, kHaystackSize, "b", 1));
+        abslx::strings_internal::memmatch(kHaystack, kHaystackSize, "b", 1));
   }
   state.SetBytesProcessed(kHaystackSize64 * state.iterations());
 }
@@ -253,7 +253,7 @@ BENCHMARK(BM_Memmatch);
 void BM_MemmatchMedium(benchmark::State& state) {
   for (auto _ : state) {
     benchmark::DoNotOptimize(
-        absl::strings_internal::memmatch(kHaystack, kHaystackSize, "ab", 2));
+        abslx::strings_internal::memmatch(kHaystack, kHaystackSize, "ab", 2));
   }
   state.SetBytesProcessed(kHaystackSize64 * state.iterations());
 }
@@ -261,7 +261,7 @@ BENCHMARK(BM_MemmatchMedium);
 
 void BM_MemmatchPathological(benchmark::State& state) {
   for (auto _ : state) {
-    benchmark::DoNotOptimize(absl::strings_internal::memmatch(
+    benchmark::DoNotOptimize(abslx::strings_internal::memmatch(
         kHaystack, kHaystackSize, kHaystack + kHaystackSize / 2,
         kHaystackSize - kHaystackSize / 2));
   }
@@ -297,7 +297,7 @@ BENCHMARK(BM_MemcasematchPathological);
 
 void BM_MemmemStartup(benchmark::State& state) {
   for (auto _ : state) {
-    benchmark::DoNotOptimize(absl::strings_internal::memmem(
+    benchmark::DoNotOptimize(abslx::strings_internal::memmem(
         kHaystack + kHaystackSize - 10, 10, kHaystack + kHaystackSize - 1, 1));
   }
 }
@@ -314,7 +314,7 @@ BENCHMARK(BM_SearchStartup);
 
 void BM_MemmatchStartup(benchmark::State& state) {
   for (auto _ : state) {
-    benchmark::DoNotOptimize(absl::strings_internal::memmatch(
+    benchmark::DoNotOptimize(abslx::strings_internal::memmatch(
         kHaystack + kHaystackSize - 10, 10, kHaystack + kHaystackSize - 1, 1));
   }
 }

@@ -31,11 +31,11 @@ namespace mediapipe {
 struct MonotonicClock::State {
   // The clock whose time is being corrected.
   Clock* raw_clock;
-  absl::Mutex lock;
+  abslx::Mutex lock;
   // The largest time ever returned by Now().
-  absl::Time max_time ABSL_GUARDED_BY(lock);
+  abslx::Time max_time ABSL_GUARDED_BY(lock);
   explicit State(Clock* clock)
-      : raw_clock(clock), max_time(absl::UnixEpoch()) {}
+      : raw_clock(clock), max_time(abslx::UnixEpoch()) {}
 };
 
 using State = MonotonicClock::State;
@@ -47,9 +47,9 @@ class MonotonicClockImpl : public MonotonicClock {
   explicit MonotonicClockImpl(State* state)
       : state_(state),
         state_owned_(true),
-        last_raw_time_(absl::UnixEpoch()),
+        last_raw_time_(abslx::UnixEpoch()),
         correction_count_(0),
-        max_correction_(absl::ZeroDuration()) {}
+        max_correction_(abslx::ZeroDuration()) {}
 
   MonotonicClockImpl(const MonotonicClockImpl&) = delete;
   MonotonicClockImpl& operator=(const MonotonicClockImpl&) = delete;
@@ -69,15 +69,15 @@ class MonotonicClockImpl : public MonotonicClock {
   //
 
   // The logic in TimeNow() is based on GFS_NowMS().
-  virtual absl::Time TimeNow() {
+  virtual abslx::Time TimeNow() {
     // These variables save some state from the critical section below.
-    absl::Time raw_time;
-    absl::Time local_max_time;
-    absl::Time local_last_raw_time;
+    abslx::Time raw_time;
+    abslx::Time local_max_time;
+    abslx::Time local_last_raw_time;
 
-    // As there are several early exits from this function, use absl::MutexLock.
+    // As there are several early exits from this function, use abslx::MutexLock.
     {
-      absl::MutexLock m(&state_->lock);
+      abslx::MutexLock m(&state_->lock);
 
       // Check consistency of internal data with state_.
       CHECK_LE(last_raw_time_, state_->max_time)
@@ -106,8 +106,8 @@ class MonotonicClockImpl : public MonotonicClock {
       //
       // First, update correction metrics.
       ++correction_count_;
-      absl::Duration delta = state_->max_time - raw_time;
-      CHECK_LT(absl::ZeroDuration(), delta);
+      abslx::Duration delta = state_->max_time - raw_time;
+      CHECK_LT(abslx::ZeroDuration(), delta);
       if (delta > max_correction_) {
         max_correction_ = delta;
       }
@@ -117,7 +117,7 @@ class MonotonicClockImpl : public MonotonicClock {
       local_max_time = state_->max_time;
       local_last_raw_time = last_raw_time_;
       last_raw_time_ = raw_time;
-    }  // absl::MutexLock
+    }  // abslx::MutexLock
 
     // Return the saved maximum time.
     return local_max_time;
@@ -130,12 +130,12 @@ class MonotonicClockImpl : public MonotonicClock {
   // however the caller may sleep for much longer (in monotonic time) if
   // monotonic time jumps far into the future.  Whether or not this happens
   // depends on the behavior of the raw clock.
-  virtual void Sleep(absl::Duration d) {
-    absl::Time wakeup_time = TimeNow() + d;
+  virtual void Sleep(abslx::Duration d) {
+    abslx::Time wakeup_time = TimeNow() + d;
     SleepUntil(wakeup_time);
   }
 
-  virtual void SleepUntil(absl::Time wakeup_time) {
+  virtual void SleepUntil(abslx::Time wakeup_time) {
     while (TimeNow() < wakeup_time) {
       state_->raw_clock->SleepUntil(wakeup_time);
     }
@@ -149,17 +149,17 @@ class MonotonicClockImpl : public MonotonicClock {
   // Get metrics about time corrections.
   virtual void GetCorrectionMetrics(int* correction_count,
                                     double* max_correction) {
-    absl::MutexLock l(&state_->lock);
+    abslx::MutexLock l(&state_->lock);
     if (correction_count != nullptr) *correction_count = correction_count_;
     if (max_correction != nullptr)
-      *max_correction = absl::FDivDuration(max_correction_, absl::Seconds(1));
+      *max_correction = abslx::FDivDuration(max_correction_, abslx::Seconds(1));
   }
 
   // Reset values returned by GetCorrectionMetrics().
   virtual void ResetCorrectionMetrics() {
-    absl::MutexLock l(&state_->lock);
+    abslx::MutexLock l(&state_->lock);
     correction_count_ = 0;
-    max_correction_ = absl::ZeroDuration();
+    max_correction_ = abslx::ZeroDuration();
   }
 
   // The guts of the monotonic clock.  Caution: this may point to a static
@@ -171,13 +171,13 @@ class MonotonicClockImpl : public MonotonicClock {
   // last_raw_time_ remembers the last value obtained from raw_clock_.
   // It prevents spurious calls to ReportCorrection when time moves
   // forward by a smaller amount than a prior backward jump.
-  absl::Time last_raw_time_ ABSL_GUARDED_BY(state_->lock);
+  abslx::Time last_raw_time_ ABSL_GUARDED_BY(state_->lock);
 
   // Variables that keep track of time corrections made by this instance of
   // MonotonicClock.  (All such metrics are instance-local for reasons
   // described earlier.)
   int correction_count_ ABSL_GUARDED_BY(state_->lock);
-  absl::Duration max_correction_ ABSL_GUARDED_BY(state_->lock);
+  abslx::Duration max_correction_ ABSL_GUARDED_BY(state_->lock);
 };
 
 // Factory methods.
@@ -207,8 +207,8 @@ MonotonicClock* MonotonicClock::CreateSynchronizedMonotonicClock() {
 void MonotonicClockAccess::SynchronizedMonotonicClockReset() {
   LOG(INFO) << "Resetting SynchronizedMonotonicClock";
   State* sync_state = GlobalSyncState();
-  absl::MutexLock m(&sync_state->lock);
-  sync_state->max_time = absl::UnixEpoch();
+  abslx::MutexLock m(&sync_state->lock);
+  sync_state->max_time = abslx::UnixEpoch();
 }
 
 State* MonotonicClockAccess::CreateMonotonicClockState(Clock* raw_clock) {

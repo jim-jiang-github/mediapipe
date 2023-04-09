@@ -21,7 +21,7 @@ namespace mediapipe {
 
 namespace internal {
 
-absl::Status GraphOutputStream::Initialize(
+abslx::Status GraphOutputStream::Initialize(
     const std::string& stream_name, const PacketType* packet_type,
     OutputStreamManager* output_stream_manager, bool observe_timestamp_bounds) {
   RET_CHECK(output_stream_manager);
@@ -31,31 +31,31 @@ absl::Status GraphOutputStream::Initialize(
   input_stream_field.Add()->assign(stream_name);
   std::shared_ptr<tool::TagMap> tag_map =
       tool::TagMap::Create(input_stream_field).value();
-  input_stream_handler_ = absl::make_unique<GraphOutputStreamHandler>(
+  input_stream_handler_ = abslx::make_unique<GraphOutputStreamHandler>(
       tag_map, /*cc_manager=*/nullptr, MediaPipeOptions(),
       /*calculator_run_in_parallel=*/false);
   input_stream_handler_->SetProcessTimestampBounds(observe_timestamp_bounds);
   const CollectionItemId& id = tag_map->BeginId();
-  input_stream_ = absl::make_unique<InputStreamManager>();
+  input_stream_ = abslx::make_unique<InputStreamManager>();
   MP_RETURN_IF_ERROR(
       input_stream_->Initialize(stream_name, packet_type, /*back_edge=*/false));
   MP_RETURN_IF_ERROR(input_stream_handler_->InitializeInputStreamManagers(
       input_stream_.get()));
   output_stream_manager->AddMirror(input_stream_handler_.get(), id);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void GraphOutputStream::PrepareForRun(
     std::function<void()> notification_callback,
-    std::function<void(absl::Status)> error_callback) {
+    std::function<void(abslx::Status)> error_callback) {
   input_stream_handler_->PrepareForRun(
       /*headers_ready_callback=*/[] {}, std::move(notification_callback),
       /*schedule_callback=*/nullptr, std::move(error_callback));
 }
 
-absl::Status OutputStreamObserver::Initialize(
+abslx::Status OutputStreamObserver::Initialize(
     const std::string& stream_name, const PacketType* packet_type,
-    std::function<absl::Status(const Packet&)> packet_callback,
+    std::function<abslx::Status(const Packet&)> packet_callback,
     OutputStreamManager* output_stream_manager, bool observe_timestamp_bounds) {
   RET_CHECK(output_stream_manager);
 
@@ -66,16 +66,16 @@ absl::Status OutputStreamObserver::Initialize(
                                        observe_timestamp_bounds);
 }
 
-absl::Status OutputStreamObserver::Notify() {
+abslx::Status OutputStreamObserver::Notify() {
   // Lets one thread perform packets notification as much as possible.
   // Other threads should quit if a thread is already performing notification.
   {
-    absl::MutexLock l(&mutex_);
+    abslx::MutexLock l(&mutex_);
 
     if (notifying_ == false) {
       notifying_ = true;
     } else {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
   }
   while (true) {
@@ -98,7 +98,7 @@ absl::Status OutputStreamObserver::Notify() {
       // case of the min timestamp or bound getting updated, jumps to the
       // beginning of the notification loop for a new iteration.
       {
-        absl::MutexLock l(&mutex_);
+        abslx::MutexLock l(&mutex_);
         Timestamp new_min_timestamp =
             input_stream_->MinTimestampOrBound(&empty);
         if (new_min_timestamp == min_timestamp) {
@@ -114,15 +114,15 @@ absl::Status OutputStreamObserver::Notify() {
     Packet packet = input_stream_->PopPacketAtTimestamp(
         min_timestamp, &num_packets_dropped, &stream_is_done);
     RET_CHECK_EQ(num_packets_dropped, 0).SetNoLogging()
-        << absl::Substitute("Dropped $0 packet(s) on input stream \"$1\".",
+        << abslx::Substitute("Dropped $0 packet(s) on input stream \"$1\".",
                             num_packets_dropped, input_stream_->Name());
     MP_RETURN_IF_ERROR(packet_callback_(packet));
     last_processed_ts_ = min_timestamp;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status OutputStreamPollerImpl::Initialize(
+abslx::Status OutputStreamPollerImpl::Initialize(
     const std::string& stream_name, const PacketType* packet_type,
     std::function<void(InputStreamManager*, bool*)> queue_size_callback,
     OutputStreamManager* output_stream_manager, bool observe_timestamp_bounds) {
@@ -131,12 +131,12 @@ absl::Status OutputStreamPollerImpl::Initialize(
                                                    observe_timestamp_bounds));
   input_stream_handler_->SetQueueSizeCallbacks(queue_size_callback,
                                                queue_size_callback);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void OutputStreamPollerImpl::PrepareForRun(
     std::function<void()> notification_callback,
-    std::function<void(absl::Status)> error_callback) {
+    std::function<void(abslx::Status)> error_callback) {
   input_stream_handler_->PrepareForRun(
       /*headers_ready_callback=*/[] {}, std::move(notification_callback),
       /*schedule_callback=*/nullptr, std::move(error_callback));
@@ -160,11 +160,11 @@ void OutputStreamPollerImpl::SetMaxQueueSize(int queue_size) {
 
 int OutputStreamPollerImpl::QueueSize() { return input_stream_->QueueSize(); }
 
-absl::Status OutputStreamPollerImpl::Notify() {
+abslx::Status OutputStreamPollerImpl::Notify() {
   mutex_.Lock();
   handler_condvar_.Signal();
   mutex_.Unlock();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void OutputStreamPollerImpl::NotifyError() {
@@ -213,7 +213,7 @@ bool OutputStreamPollerImpl::Next(Packet* packet) {
     *packet = input_stream_->PopPacketAtTimestamp(
         min_timestamp, &num_packets_dropped, &stream_is_done);
     CHECK_EQ(num_packets_dropped, 0)
-        << absl::Substitute("Dropped $0 packet(s) on input stream \"$1\".",
+        << abslx::Substitute("Dropped $0 packet(s) on input stream \"$1\".",
                             num_packets_dropped, input_stream_->Name());
   } else if (timestamp_bound_changed) {
     *packet = Packet().At(min_timestamp.PreviousAllowedInStream());

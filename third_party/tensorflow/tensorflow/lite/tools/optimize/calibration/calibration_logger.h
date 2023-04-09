@@ -58,13 +58,13 @@ class Logger {
   }
 
   // Returns a map from tensor_index -> observed min max values.
-  const absl::flat_hash_map<std::tuple<int, int>, MinMax>&
+  const abslx::flat_hash_map<std::tuple<int, int>, MinMax>&
   GetCalibrationValues() const {
     return tensor_id_to_stats_map_;
   }
 
  private:
-  absl::flat_hash_map<std::tuple<int, int>, MinMax> tensor_id_to_stats_map_;
+  abslx::flat_hash_map<std::tuple<int, int>, MinMax> tensor_id_to_stats_map_;
 };
 
 }  // namespace calibration

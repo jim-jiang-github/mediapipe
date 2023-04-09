@@ -36,11 +36,11 @@ class HloPassInterface {
     // The current iteration number.
     int iteration = 0;
     // Set of all changed computations from all pass runs using this state.
-    absl::flat_hash_set<HloComputation*> changed;
+    abslx::flat_hash_set<HloComputation*> changed;
     // Set of changed computation from previous iteration.
-    absl::flat_hash_set<HloComputation*> changed_last_iteration;
+    abslx::flat_hash_set<HloComputation*> changed_last_iteration;
     // Set of changed computation from current iteration.
-    absl::flat_hash_set<HloComputation*> changed_this_iteration;
+    abslx::flat_hash_set<HloComputation*> changed_this_iteration;
 
     RunState() = default;
     explicit RunState(HloModule* module)
@@ -62,7 +62,7 @@ class HloPassInterface {
     }
   };
   virtual ~HloPassInterface() = default;
-  virtual absl::string_view name() const = 0;
+  virtual abslx::string_view name() const = 0;
 
   // Run the pass on the given HLO module with specified execution_threads.
   // Empty execution_threads list means all execution_threads are included.
@@ -74,12 +74,12 @@ class HloPassInterface {
   //   class MyNewPass : public HloModulePass {
   //    public:
   //      MyNewPass();
-  //      absl::string_view name() const override { return "my-new-pass"; }
+  //      abslx::string_view name() const override { return "my-new-pass"; }
   //
   //      using HloPassInterface::Run;
   //      StatusOr<bool> Run(
   //        HloModule* module,
-  //        const absl::flat_hash_set<absl::string_view>& execution_threads)
+  //        const abslx::flat_hash_set<abslx::string_view>& execution_threads)
   //        override;
   //   };
   //
@@ -88,7 +88,7 @@ class HloPassInterface {
   }
   virtual StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) = 0;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) = 0;
 
   // Run the pass on computation on changed computations from last iteration in
   // given HLO module for specified execution_threads, with caller provided
@@ -99,7 +99,7 @@ class HloPassInterface {
   // method instead of Run() and Run() will call into this method instead.
   virtual Status RunOnChangedComputations(
       HloModule* module, RunState* run_state,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) {
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
     TF_ASSIGN_OR_RETURN(bool changed, Run(module, execution_threads));
     if (changed) {
       auto computations = module->computations(execution_threads);
@@ -123,12 +123,12 @@ class HloPassInterface {
   //   class MyNewPass : public HloModuleGroupPass {
   //    public:
   //      MyNewPass();
-  //      absl::string_view name() const override { return "my-new-pass"; }
+  //      abslx::string_view name() const override { return "my-new-pass"; }
   //
   //      using HloPassInterface::RunOnModuleGroup;
   //      StatusOr<bool> RunOnModuleGroup(
   //        HloModuleGroup* module_group,
-  //        const absl::flat_hash_set<absl::string_view>& execution_threads)
+  //        const abslx::flat_hash_set<abslx::string_view>& execution_threads)
   //        override;
   //   };
   //
@@ -137,7 +137,7 @@ class HloPassInterface {
   }
   virtual StatusOr<bool> RunOnModuleGroup(
       HloModuleGroup* module_group,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) = 0;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) = 0;
 
   virtual bool IsPassPipeline() { return false; }
 };
@@ -148,7 +148,7 @@ class HloModulePass : public HloPassInterface {
   // Runs the pass on a module group by iterating through each module in the
   // group.
   StatusOr<bool> RunOnModuleGroup(HloModuleGroup* module_group,
-                                  const absl::flat_hash_set<absl::string_view>&
+                                  const abslx::flat_hash_set<abslx::string_view>&
                                       execution_threads) override {
     bool changed = false;
     for (HloModule* module : module_group->modules()) {
@@ -172,7 +172,7 @@ class HloModulePass : public HloPassInterface {
 class HloModuleGroupPass : public HloPassInterface {
  public:
   StatusOr<bool> Run(HloModule* module,
-                     const absl::flat_hash_set<absl::string_view>&
+                     const abslx::flat_hash_set<abslx::string_view>&
                          execution_threads) override {
     return InternalError("Module group pass cannot be run on a module");
   }

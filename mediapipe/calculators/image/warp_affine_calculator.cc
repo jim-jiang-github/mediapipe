@@ -61,8 +61,8 @@ template <>
 class WarpAffineRunnerHolder<ImageFrame> {
  public:
   using RunnerType = AffineTransformation::Runner<ImageFrame, ImageFrame>;
-  absl::Status Open(CalculatorContext* cc) { return absl::OkStatus(); }
-  absl::StatusOr<RunnerType*> GetRunner() {
+  abslx::Status Open(CalculatorContext* cc) { return abslx::OkStatus(); }
+  abslx::StatusOr<RunnerType*> GetRunner() {
     if (!runner_) {
       ASSIGN_OR_RETURN(runner_, CreateAffineTransformationOpenCvRunner());
     }
@@ -81,13 +81,13 @@ class WarpAffineRunnerHolder<mediapipe::GpuBuffer> {
   using RunnerType =
       AffineTransformation::Runner<mediapipe::GpuBuffer,
                                    std::unique_ptr<mediapipe::GpuBuffer>>;
-  absl::Status Open(CalculatorContext* cc) {
+  abslx::Status Open(CalculatorContext* cc) {
     gpu_origin_ =
         cc->Options<mediapipe::WarpAffineCalculatorOptions>().gpu_origin();
     gl_helper_ = std::make_shared<mediapipe::GlCalculatorHelper>();
     return gl_helper_->Open(cc);
   }
-  absl::StatusOr<RunnerType*> GetRunner() {
+  abslx::StatusOr<RunnerType*> GetRunner() {
     if (!runner_) {
       ASSIGN_OR_RETURN(
           runner_, CreateAffineTransformationGlRunner(gl_helper_, gpu_origin_));
@@ -105,8 +105,8 @@ class WarpAffineRunnerHolder<mediapipe::GpuBuffer> {
 template <>
 class WarpAffineRunnerHolder<mediapipe::Image> {
  public:
-  absl::Status Open(CalculatorContext* cc) { return runner_.Open(cc); }
-  absl::StatusOr<
+  abslx::Status Open(CalculatorContext* cc) { return runner_.Open(cc); }
+  abslx::StatusOr<
       AffineTransformation::Runner<mediapipe::Image, mediapipe::Image>*>
   GetRunner() {
     return &runner_;
@@ -116,16 +116,16 @@ class WarpAffineRunnerHolder<mediapipe::Image> {
   class Runner : public AffineTransformation::Runner<mediapipe::Image,
                                                      mediapipe::Image> {
    public:
-    absl::Status Open(CalculatorContext* cc) {
+    abslx::Status Open(CalculatorContext* cc) {
 #if !MEDIAPIPE_DISABLE_OPENCV
       MP_RETURN_IF_ERROR(cpu_holder_.Open(cc));
 #endif  // !MEDIAPIPE_DISABLE_OPENCV
 #if !MEDIAPIPE_DISABLE_GPU
       MP_RETURN_IF_ERROR(gpu_holder_.Open(cc));
 #endif  // !MEDIAPIPE_DISABLE_GPU
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
-    absl::StatusOr<mediapipe::Image> Run(
+    abslx::StatusOr<mediapipe::Image> Run(
         const mediapipe::Image& input, const std::array<float, 16>& matrix,
         const AffineTransformation::Size& size,
         AffineTransformation::BorderMode border_mode) override {
@@ -136,7 +136,7 @@ class WarpAffineRunnerHolder<mediapipe::Image> {
                                                   size, border_mode));
         return mediapipe::Image(*result);
 #else
-        return absl::UnavailableError("GPU support is disabled");
+        return abslx::UnavailableError("GPU support is disabled");
 #endif  // !MEDIAPIPE_DISABLE_GPU
       }
 #if !MEDIAPIPE_DISABLE_OPENCV
@@ -151,7 +151,7 @@ class WarpAffineRunnerHolder<mediapipe::Image> {
                        runner->Run(image_frame, matrix, size, border_mode));
       return mediapipe::Image(std::make_shared<ImageFrame>(std::move(result)));
 #else
-      return absl::UnavailableError("OpenCV support is disabled");
+      return abslx::UnavailableError("OpenCV support is disabled");
 #endif  // !MEDIAPIPE_DISABLE_OPENCV
     }
 
@@ -171,22 +171,22 @@ template <typename InterfaceT>
 class WarpAffineCalculatorImpl : public mediapipe::api2::NodeImpl<InterfaceT> {
  public:
 #if !MEDIAPIPE_DISABLE_GPU
-  static absl::Status UpdateContract(CalculatorContract* cc) {
+  static abslx::Status UpdateContract(CalculatorContract* cc) {
     if constexpr (std::is_same_v<InterfaceT, WarpAffineCalculatorGpu> ||
                   std::is_same_v<InterfaceT, WarpAffineCalculator>) {
       MP_RETURN_IF_ERROR(mediapipe::GlCalculatorHelper::UpdateContract(cc));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  absl::Status Open(CalculatorContext* cc) override { return holder_.Open(cc); }
+  abslx::Status Open(CalculatorContext* cc) override { return holder_.Open(cc); }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     if (InterfaceT::kInImage(cc).IsEmpty() ||
         InterfaceT::kMatrix(cc).IsEmpty() ||
         InterfaceT::kOutputSize(cc).IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     const std::array<float, 16>& transform = *InterfaceT::kMatrix(cc);
     auto [out_width, out_height] = *InterfaceT::kOutputSize(cc);
@@ -202,7 +202,7 @@ class WarpAffineCalculatorImpl : public mediapipe::api2::NodeImpl<InterfaceT> {
                               .border_mode())));
     InterfaceT::kOutImage(cc).Send(std::move(result));
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

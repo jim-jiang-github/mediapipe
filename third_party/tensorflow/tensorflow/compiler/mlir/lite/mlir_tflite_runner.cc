@@ -65,7 +65,7 @@ static opt<bool> dump_state("dump-interpreter-state",
 static std::string TfLiteTensorDimString(const TfLiteTensor& tensor) {
   auto begin = tensor.dims ? tensor.dims->data : nullptr;
   auto end = tensor.dims ? tensor.dims->data + tensor.dims->size : nullptr;
-  return absl::StrJoin(begin, end, ", ");
+  return abslx::StrJoin(begin, end, ", ");
 }
 
 template <typename T>
@@ -73,7 +73,7 @@ static std::string TfLiteTypedTensorString(const TfLiteTensor& tensor) {
   const T* data = reinterpret_cast<T*>(tensor.data.raw);
   if (!data) return "<null>";
   int count = tensor.bytes / sizeof(T);
-  return absl::StrJoin(data, data + count, ", ");
+  return abslx::StrJoin(data, data + count, ", ");
 }
 
 // TODO(jpienaar): This really feels like something that should exist already.

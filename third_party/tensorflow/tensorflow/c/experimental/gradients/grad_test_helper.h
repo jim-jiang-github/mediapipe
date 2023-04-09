@@ -24,11 +24,11 @@ namespace internal {
 
 void CompareNumericalAndAutodiffGradients(
     Model model, Model grad_model, AbstractContext* ctx,
-    absl::Span<AbstractTensorHandle* const> inputs, bool use_function,
+    abslx::Span<AbstractTensorHandle* const> inputs, bool use_function,
     double abs_error = 1e-2);
 
-void CheckTensorValue(AbstractTensorHandle* t, absl::Span<const float> manuals,
-                      absl::Span<const int64_t> dims, double abs_error = 1e-2);
+void CheckTensorValue(AbstractTensorHandle* t, abslx::Span<const float> manuals,
+                      abslx::Span<const int64_t> dims, double abs_error = 1e-2);
 
 Model BuildGradModel(Model forward, GradientRegistry registry);
 

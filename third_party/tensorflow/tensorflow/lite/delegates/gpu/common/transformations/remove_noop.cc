@@ -55,7 +55,7 @@ class RemoveOperation : public SequenceTransformation {
     if (!remove_predicate_(graph, op_node)) {
       return {TransformStatus::SKIPPED, ""};
     }
-    absl::Status status = RemoveFollowingNode(graph, op_node, prev_op_node);
+    abslx::Status status = RemoveFollowingNode(graph, op_node, prev_op_node);
     if (!status.ok()) {
       return {TransformStatus::INVALID,
               "Unable to remove a node: " + std::string(status.message())};
@@ -72,7 +72,7 @@ class RemoveOperation : public SequenceTransformation {
 std::unique_ptr<SequenceTransformation> NewRemoveSingleInputConcat() {
   // Using SequenceTransformation implies that CONCAT has a single input.
   auto type = ToString(OperationType::CONCAT);
-  return absl::make_unique<RemoveOperation>(
+  return abslx::make_unique<RemoveOperation>(
       [type](GraphFloat32* graph, Node* node) {
         return type == node->operation.type;
       });
@@ -81,24 +81,24 @@ std::unique_ptr<SequenceTransformation> NewRemoveSingleInputConcat() {
 std::unique_ptr<SequenceTransformation> NewRemoveSingleInputAdd() {
   // Using SequenceTransformation implies that ADD has a single input.
   auto type = ToString(OperationType::ADD);
-  return absl::make_unique<RemoveOperation>(
+  return abslx::make_unique<RemoveOperation>(
       [type](GraphFloat32* graph, Node* node) {
         if (node->operation.type != type) {
           return false;
         }
-        auto& attr = absl::any_cast<const ElementwiseAttributes&>(
+        auto& attr = abslx::any_cast<const ElementwiseAttributes&>(
             node->operation.attributes);
-        return !absl::holds_alternative<Tensor<HWC, DataType::FLOAT32>>(
+        return !abslx::holds_alternative<Tensor<HWC, DataType::FLOAT32>>(
                    attr.param) &&
-               !absl::holds_alternative<Tensor<Linear, DataType::FLOAT32>>(
+               !abslx::holds_alternative<Tensor<Linear, DataType::FLOAT32>>(
                    attr.param) &&
-               !absl::holds_alternative<float>(attr.param);
+               !abslx::holds_alternative<float>(attr.param);
       });
 }
 
 std::unique_ptr<SequenceTransformation> NewRemoveDegenerateUpsampling() {
   auto type = ToString(OperationType::RESIZE);
-  return absl::make_unique<RemoveOperation>(
+  return abslx::make_unique<RemoveOperation>(
       [type](GraphFloat32* graph, Node* node) {
         if (node->operation.type != type) {
           return false;
@@ -118,7 +118,7 @@ class RemoveIdentityReshape : public NodeTransformation {
     }
     auto input_shape = graph->FindInputs(node->id)[0]->tensor.shape;
     const auto& reshape_attr =
-        absl::any_cast<const ReshapeAttributes&>(node->operation.attributes);
+        abslx::any_cast<const ReshapeAttributes&>(node->operation.attributes);
     if (input_shape != reshape_attr.new_shape) {
       return {TransformStatus::SKIPPED, ""};
     }
@@ -129,7 +129,7 @@ class RemoveIdentityReshape : public NodeTransformation {
       return {TransformStatus::SKIPPED,
               "Can not apply transformation when node output is graph output"};
     }
-    absl::Status status = RemoveSimpleNodeKeepInput(graph, node);
+    abslx::Status status = RemoveSimpleNodeKeepInput(graph, node);
     if (!status.ok()) {
       return {TransformStatus::INVALID,
               "Unable to remove a node: " + std::string(status.message())};
@@ -140,7 +140,7 @@ class RemoveIdentityReshape : public NodeTransformation {
 };
 
 std::unique_ptr<NodeTransformation> NewRemoveIdentityReshape() {
-  return absl::make_unique<RemoveIdentityReshape>();
+  return abslx::make_unique<RemoveIdentityReshape>();
 }
 
 class RemoveIdentityStridedSlice : public NodeTransformation {
@@ -152,7 +152,7 @@ class RemoveIdentityStridedSlice : public NodeTransformation {
     auto input = graph->FindInputs(node->id)[0];
     auto output = graph->FindOutputs(node->id)[0];
     const auto& slice_attr =
-        absl::any_cast<const SliceAttributes&>(node->operation.attributes);
+        abslx::any_cast<const SliceAttributes&>(node->operation.attributes);
     if (input->tensor.shape != output->tensor.shape) {
       return {TransformStatus::SKIPPED, ""};
     }
@@ -184,14 +184,14 @@ class RemoveIdentityStridedSlice : public NodeTransformation {
                 "Can not apply transformation when node output is graph output "
                 "and input consumed by other nodes."};
       }
-      absl::Status status = RemoveSimpleNodeKeepOutput(graph, node);
+      abslx::Status status = RemoveSimpleNodeKeepOutput(graph, node);
       if (!status.ok()) {
         return {TransformStatus::INVALID,
                 "Unable to remove a node: " + std::string(status.message())};
       }
       return {TransformStatus::APPLIED, "Removed identity strided slice."};
     }
-    absl::Status status = RemoveSimpleNodeKeepInput(graph, node);
+    abslx::Status status = RemoveSimpleNodeKeepInput(graph, node);
     if (!status.ok()) {
       return {TransformStatus::INVALID,
               "Unable to remove a node: " + std::string(status.message())};
@@ -201,7 +201,7 @@ class RemoveIdentityStridedSlice : public NodeTransformation {
 };
 
 std::unique_ptr<NodeTransformation> NewRemoveIdentityStridedSlice() {
-  return absl::make_unique<RemoveIdentityStridedSlice>();
+  return abslx::make_unique<RemoveIdentityStridedSlice>();
 }
 
 }  // namespace gpu

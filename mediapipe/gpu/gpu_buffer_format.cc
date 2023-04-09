@@ -60,7 +60,7 @@ const GlTextureInfo& GlTextureInfoForGpuBufferFormat(GpuBufferFormat format,
   // TODO: check/add more cases using info from
   // CVPixelFormatDescriptionCreateWithPixelFormatType.
   static const mediapipe::NoDestructor<
-      absl::flat_hash_map<GpuBufferFormat, std::vector<GlTextureInfo>>>
+      abslx::flat_hash_map<GpuBufferFormat, std::vector<GlTextureInfo>>>
       gles3_format_info{{
           {GpuBufferFormat::kBGRA32,
            {
@@ -150,7 +150,7 @@ const GlTextureInfo& GlTextureInfoForGpuBufferFormat(GpuBufferFormat format,
 
   static const auto* gles2_format_info = ([] {
     auto formats =
-        new absl::flat_hash_map<GpuBufferFormat, std::vector<GlTextureInfo>>(
+        new abslx::flat_hash_map<GpuBufferFormat, std::vector<GlTextureInfo>>(
             *gles3_format_info);
 #ifdef GL_ES_VERSION_2_0
     for (auto& format_planes : *formats) {

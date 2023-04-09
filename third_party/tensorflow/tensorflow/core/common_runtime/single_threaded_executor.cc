@@ -102,7 +102,7 @@ class SingleThreadedExecutorImpl : public Executor {
     nodes_with_kernels.reserve(ordered_nodes.size() - 2);
 
     std::map<size_t, Node*> arg_index_to_node_map;
-    absl::flat_hash_map<Node*, size_t> node_to_index_map;
+    abslx::flat_hash_map<Node*, size_t> node_to_index_map;
 
     // Create the kernel and input-related structures for each node in `graph`.
     for (Node* n : ordered_nodes) {

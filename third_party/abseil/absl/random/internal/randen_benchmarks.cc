@@ -28,17 +28,17 @@
 
 namespace {
 
-using absl::random_internal::Randen;
-using absl::random_internal::RandenHwAes;
-using absl::random_internal::RandenSlow;
+using abslx::random_internal::Randen;
+using abslx::random_internal::RandenHwAes;
+using abslx::random_internal::RandenSlow;
 
-using absl::random_internal_nanobenchmark::FuncInput;
-using absl::random_internal_nanobenchmark::FuncOutput;
-using absl::random_internal_nanobenchmark::InvariantTicksPerSecond;
-using absl::random_internal_nanobenchmark::MeasureClosure;
-using absl::random_internal_nanobenchmark::Params;
-using absl::random_internal_nanobenchmark::PinThreadToCPU;
-using absl::random_internal_nanobenchmark::Result;
+using abslx::random_internal_nanobenchmark::FuncInput;
+using abslx::random_internal_nanobenchmark::FuncOutput;
+using abslx::random_internal_nanobenchmark::InvariantTicksPerSecond;
+using abslx::random_internal_nanobenchmark::MeasureClosure;
+using abslx::random_internal_nanobenchmark::Params;
+using abslx::random_internal_nanobenchmark::PinThreadToCPU;
+using abslx::random_internal_nanobenchmark::Result;
 
 // Local state parameters.
 static constexpr size_t kStateSizeT = Randen::kStateBytes / sizeof(uint64_t);
@@ -78,7 +78,7 @@ struct GenerateFn : public T {
 
 template <typename UInt>
 struct Engine {
-  mutable absl::random_internal::randen_engine<UInt> rng;
+  mutable abslx::random_internal::randen_engine<UInt> rng;
 
   static constexpr size_t bytes() { return sizeof(UInt); }
 
@@ -139,7 +139,7 @@ void Measure(const char* name, const FuncInput (&inputs)[N]) {
 void RunAll(const int argc, char* argv[]) {
   if (argc == 2) {
     int cpu = -1;
-    if (!absl::SimpleAtoi(argv[1], &cpu)) {
+    if (!abslx::SimpleAtoi(argv[1], &cpu)) {
       ABSL_RAW_LOG(FATAL, "The optional argument must be a CPU number >= 0.\n");
     }
     PinThreadToCPU(cpu);

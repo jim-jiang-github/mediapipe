@@ -39,7 +39,7 @@ namespace {
 class CompilationCacheTest : public ClientLibraryTestBase {
  public:
   void ExecuteComputationR0F32(const XlaComputation& computation,
-                               absl::Span<GlobalData* const> arguments,
+                               abslx::Span<GlobalData* const> arguments,
                                float expected_result, bool expect_cache_hit) {
     ExecutionProfile execution_profile;
     Literal result =
@@ -55,7 +55,7 @@ class CompilationCacheTest : public ClientLibraryTestBase {
 
   void ExecuteComputationR2F32(
       const XlaComputation& computation,
-      absl::Span<GlobalData* const> arguments,
+      abslx::Span<GlobalData* const> arguments,
       std::initializer_list<std::initializer_list<float>> expected_result,
       bool expect_cache_hit) {
     ExecutionProfile execution_profile;

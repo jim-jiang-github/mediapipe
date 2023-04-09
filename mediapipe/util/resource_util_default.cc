@@ -31,15 +31,15 @@ using mediapipe::file::JoinPath;
 
 namespace internal {
 
-absl::Status DefaultGetResourceContents(const std::string& path,
+abslx::Status DefaultGetResourceContents(const std::string& path,
                                         std::string* output,
                                         bool read_as_binary) {
   return GetContents(path, output, read_as_binary);
 }
 }  // namespace internal
 
-absl::StatusOr<std::string> PathToResourceAsFile(const std::string& path) {
-  if (absl::StartsWith(path, "/")) {
+abslx::StatusOr<std::string> PathToResourceAsFile(const std::string& path) {
+  if (abslx::StartsWith(path, "/")) {
     return path;
   }
 
@@ -49,7 +49,7 @@ absl::StatusOr<std::string> PathToResourceAsFile(const std::string& path) {
   if (file::Exists(bazel_path).ok()) {
     return bazel_path;
   }
-  return JoinPath(absl::GetFlag(FLAGS_resource_root_dir), path);
+  return JoinPath(abslx::GetFlag(FLAGS_resource_root_dir), path);
 }
 
 }  // namespace mediapipe

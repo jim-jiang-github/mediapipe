@@ -137,7 +137,7 @@ class GenEagerPythonOp : public python_op_gen_internal::GenPythonOp {
       : python_op_gen_internal::GenPythonOp(op_def, api_def, function_name,
                                             add_type_annotations) {
     op_name_ = function_name_;
-    absl::ConsumePrefix(&op_name_, "_");
+    abslx::ConsumePrefix(&op_name_, "_");
   }
   ~GenEagerPythonOp() override {}
 
@@ -699,7 +699,7 @@ bool GenEagerPythonOp::GetEagerFunctionSetup(const string& indentation,
       strings::StrAppend(function_setup, indentation, "  ", attr_api_name,
                          " = ", default_value, "\n");
     }
-    if (absl::StartsWith(attr_type, "list(")) {
+    if (abslx::StartsWith(attr_type, "list(")) {
       ExpectListArg(indentation, attr_api_name, function_setup);
     }
 

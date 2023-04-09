@@ -30,10 +30,10 @@ TEST(PjRtCompilerTest, CompilerNotRegistered) {
   class PjRtTestTopology : public PjRtDeviceTopology {
    public:
     PjRtPlatformId platform_id() const override { return 0; }
-    absl::string_view platform_name() const override {
+    abslx::string_view platform_name() const override {
       return "not_registered";
     }
-    absl::string_view platform_version() const override { return "test"; }
+    abslx::string_view platform_version() const override { return "test"; }
   };
   PjRtTestTopology topology;
 
@@ -48,8 +48,8 @@ TEST(PjRtCompilerTest, CompilerRegistered) {
   class PjRtTestTopology : public PjRtDeviceTopology {
    public:
     PjRtPlatformId platform_id() const override { return 0; }
-    absl::string_view platform_name() const override { return "registered"; }
-    absl::string_view platform_version() const override { return "test"; }
+    abslx::string_view platform_name() const override { return "registered"; }
+    abslx::string_view platform_version() const override { return "test"; }
   };
   PjRtTestTopology topology;
 

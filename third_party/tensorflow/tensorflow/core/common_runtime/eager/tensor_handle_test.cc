@@ -429,14 +429,14 @@ TEST(TensorHandle_DeviceNameTest, OnLocalDevice) {
       TensorHandle::CreateLocalHandle(std::move(tcpu), dcpu, dcpu, dcpu, ctx);
   const char* device_name = th_cpu->DeviceName(&s);
   TF_EXPECT_OK(s);
-  ASSERT_TRUE(absl::StrContains(device_name, "CPU")) << device_name;
+  ASSERT_TRUE(abslx::StrContains(device_name, "CPU")) << device_name;
   const char* backing_device_name = th_cpu->BackingDeviceName(&s);
   TF_EXPECT_OK(s);
-  ASSERT_TRUE(absl::StrContains(backing_device_name, "CPU"))
+  ASSERT_TRUE(abslx::StrContains(backing_device_name, "CPU"))
       << backing_device_name;
   const char* device_type = th_cpu->DeviceType(&s);
   TF_EXPECT_OK(s);
-  ASSERT_TRUE(absl::StrContains(device_type, "CPU")) << device_type;
+  ASSERT_TRUE(abslx::StrContains(device_type, "CPU")) << device_type;
   int device_id = th_cpu->DeviceId(&s);
   TF_EXPECT_OK(s);
   ASSERT_EQ(0, device_id) << device_id;
@@ -445,16 +445,16 @@ TEST(TensorHandle_DeviceNameTest, OnLocalDevice) {
       TensorHandle::CreateLocalHandle(std::move(tgpu), dgpu, dgpu, dgpu, ctx);
   device_name = th_gpu->DeviceName(&s);
   TF_EXPECT_OK(s);
-  ASSERT_TRUE(absl::StrContains(device_name, "GPU")) << device_name;
+  ASSERT_TRUE(abslx::StrContains(device_name, "GPU")) << device_name;
   backing_device_name = th_gpu->BackingDeviceName(&s);
   TF_EXPECT_OK(s);
   std::cout << "backing_device_name for GPU: " << backing_device_name
             << std::endl;
-  ASSERT_TRUE(absl::StrContains(backing_device_name, "GPU"))
+  ASSERT_TRUE(abslx::StrContains(backing_device_name, "GPU"))
       << backing_device_name;
   device_type = th_gpu->DeviceType(&s);
   TF_EXPECT_OK(s);
-  ASSERT_TRUE(absl::StrContains(device_type, "GPU")) << device_type;
+  ASSERT_TRUE(abslx::StrContains(device_type, "GPU")) << device_type;
   device_id = th_gpu->DeviceId(&s);
   TF_EXPECT_OK(s);
   ASSERT_EQ(0, device_id) << device_id;

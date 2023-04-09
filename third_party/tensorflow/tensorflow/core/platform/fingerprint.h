@@ -107,7 +107,7 @@ inline Fprint128 Fingerprint128(const StringPiece s) {
           ::util::Uint128High64(fingerprint)};
 #else
   const auto fingerprint = farmhash::Fingerprint128(s.data(), s.size());
-  return {absl::Uint128Low64(fingerprint), absl::Uint128High64(fingerprint)};
+  return {abslx::Uint128Low64(fingerprint), abslx::Uint128High64(fingerprint)};
 #endif
 }
 

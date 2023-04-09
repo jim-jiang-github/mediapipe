@@ -32,11 +32,11 @@ inline void CheckProtoType(const pybind11::handle& py_object,
     if (py_object_type == expected_proto_type) {
       return;
     }
-    throw pybind11::type_error(absl::StrCat("Expected an ", expected_proto_type,
+    throw pybind11::type_error(abslx::StrCat("Expected an ", expected_proto_type,
                                             " proto, but got ",
                                             py_object_type));
   }
-  throw pybind11::type_error(absl::StrCat(
+  throw pybind11::type_error(abslx::StrCat(
       std::string(py_object.get_type().str()), " is not a valid proto."));
 }
 

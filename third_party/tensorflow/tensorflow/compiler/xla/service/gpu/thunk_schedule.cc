@@ -30,7 +30,7 @@ namespace gpu {
 
 void ThunkSchedule::AddDependenciesOnTransitiveOperands(
     const Thunk& thunk, const HloInstruction& operand,
-    const absl::flat_hash_map<const HloInstruction*, Thunk*>& hlo_to_thunk) {
+    const abslx::flat_hash_map<const HloInstruction*, Thunk*>& hlo_to_thunk) {
   if (hlo_to_thunk.contains(&operand)) {
     // If `operand` is mapped to a thunk, adds `operand` to `thunk`'s dependency
     // list if `operand` is assigned to a different stream. As an optimization,
@@ -52,11 +52,11 @@ void ThunkSchedule::AddDependenciesOnTransitiveOperands(
 ThunkSchedule::ThunkSchedule(
     std::unique_ptr<ThunkSequence> thunks,
     std::unique_ptr<StreamAssignment> stream_assignment,
-    absl::flat_hash_map<const Thunk*, const HloInstruction*> thunk_to_hlo)
+    abslx::flat_hash_map<const Thunk*, const HloInstruction*> thunk_to_hlo)
     : thunks_(std::move(thunks)),
       stream_assignment_(std::move(stream_assignment)),
       thunk_to_hlo_(std::move(thunk_to_hlo)) {
-  absl::flat_hash_map<const HloInstruction*, Thunk*> hlo_to_thunk;
+  abslx::flat_hash_map<const HloInstruction*, Thunk*> hlo_to_thunk;
   for (const std::unique_ptr<Thunk>& thunk : TotalOrder()) {
     InsertOrDie(&hlo_to_thunk, thunk_to_hlo_.at(thunk.get()), thunk.get());
   }
@@ -83,7 +83,7 @@ ThunkSchedule::ThunkSchedule(std::unique_ptr<ThunkSequence> thunks)
     : thunks_(std::move(thunks)) {}
 
 void ThunkSchedule::RemoveRedundantDependencyEdges() {
-  absl::flat_hash_map<const Thunk*, int> thunk_to_total_order;
+  abslx::flat_hash_map<const Thunk*, int> thunk_to_total_order;
   for (int i = 0; i < thunks_->size(); ++i) {
     InsertOrDie(&thunk_to_total_order, thunks_->at(i).get(), i);
   }
@@ -162,8 +162,8 @@ std::string ThunkSchedule::ToString() const {
   };
 
   std::string result = "Total order:\n";
-  absl::StrAppend(&result, thunks_->ToString(0, get_thunk_annotation));
-  absl::StrAppend(&result, "\nDependencies:\n");
+  abslx::StrAppend(&result, thunks_->ToString(0, get_thunk_annotation));
+  abslx::StrAppend(&result, "\nDependencies:\n");
   for (const auto& entry : depends_on_) {
     const Thunk* dependent = entry.first;
     for (const Thunk* dependency : entry.second) {
@@ -171,7 +171,7 @@ std::string ThunkSchedule::ToString() const {
       auto dependency_iter = thunk_to_hlo_.find(dependency);
       if (dependent_iter != thunk_to_hlo_.end() &&
           dependency_iter != thunk_to_hlo_.end()) {
-        absl::StrAppend(&result, "\t", dependent_iter->second->name(),
+        abslx::StrAppend(&result, "\t", dependent_iter->second->name(),
                         " depends on ", dependency_iter->second->name(), "\n");
       }
     }

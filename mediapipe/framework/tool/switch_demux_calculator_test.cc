@@ -61,9 +61,9 @@ class SwitchDemuxCalculatorTest : public ::testing::Test {
     *result.add_input_stream() = "SELECT:select";
     for (int c = 0; c < 2; ++c) {
       *result.add_output_stream() =
-          absl::StrCat(tool::ChannelTag("FRAME", c), ":frame_", c);
+          abslx::StrCat(tool::ChannelTag("FRAME", c), ":frame_", c);
       *result.add_output_stream() =
-          absl::StrCat(tool::ChannelTag("MASK", c), ":mask_", c);
+          abslx::StrCat(tool::ChannelTag("MASK", c), ":mask_", c);
     }
     *result.add_input_stream() = "FRAME:frame";
     *result.add_input_stream() = "MASK:mask";
@@ -84,7 +84,7 @@ TEST_F(SwitchDemuxCalculatorTest, BasicDataFlow) {
                   .ObserveOutputStream("frame_0",
                                        [&](const Packet& p) {
                                          output_frames0.push_back(p);
-                                         return absl::OkStatus();
+                                         return abslx::OkStatus();
                                        })
                   .ok());
   std::vector<Packet> output_frames1;
@@ -92,7 +92,7 @@ TEST_F(SwitchDemuxCalculatorTest, BasicDataFlow) {
                   .ObserveOutputStream("frame_1",
                                        [&](const Packet& p) {
                                          output_frames1.push_back(p);
-                                         return absl::OkStatus();
+                                         return abslx::OkStatus();
                                        })
                   .ok());
   EXPECT_TRUE(

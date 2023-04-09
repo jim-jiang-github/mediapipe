@@ -27,7 +27,7 @@ limitations under the License.
 
 static const char* content = "abcdefghijklmnopqrstuvwxyz1234567890";
 // We will work with content_view instead of content.
-static const absl::string_view content_view = content;
+static const abslx::string_view content_view = content;
 
 namespace gcs = google::cloud::storage;
 
@@ -89,7 +89,7 @@ class GCSFilesystemTest : public ::testing::Test {
     delete filesystem_;
   }
 
-  std::string GetURIForPath(absl::string_view path) {
+  std::string GetURIForPath(abslx::string_view path) {
     const std::string translated_name =
         tensorflow::io::JoinPath(root_dir_, path);
     return translated_name;
@@ -202,16 +202,16 @@ class GCSFilesystemTest : public ::testing::Test {
 }
 
 ::testing::AssertionResult CompareSubString(int64_t offset, size_t length,
-                                            absl::string_view result,
+                                            abslx::string_view result,
                                             size_t read) {
   // Result isn't a null-terminated string so we have to wrap it inside a
   // `string_view`
   if (length == read && content_view.substr(offset, length) ==
-                            absl::string_view(result).substr(0, read))
+                            abslx::string_view(result).substr(0, read))
     return ::testing::AssertionSuccess();
   else
     return ::testing::AssertionFailure()
-           << "Result: " << absl::string_view(result).substr(0, read)
+           << "Result: " << abslx::string_view(result).substr(0, read)
            << " Read: " << read;
 }
 

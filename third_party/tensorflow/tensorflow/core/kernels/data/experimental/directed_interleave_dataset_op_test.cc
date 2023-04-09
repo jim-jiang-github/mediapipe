@@ -54,7 +54,7 @@ class DirectedInterleaveDatasetParams : public DatasetParams {
     input_names->emplace_back(
         DirectedInterleaveDatasetOp::kSelectorInputDataset);
     for (int i = 0; i < num_input_datasets_; ++i) {
-      input_names->emplace_back(absl::StrCat(
+      input_names->emplace_back(abslx::StrCat(
           DirectedInterleaveDatasetOp::kDataInputDatasets, "_", i));
     }
     return OkStatus();

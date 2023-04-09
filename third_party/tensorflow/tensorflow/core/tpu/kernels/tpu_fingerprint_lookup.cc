@@ -23,7 +23,7 @@ TpuFingerprintLookup* TpuFingerprintLookup::Create() {
 
 void TpuFingerprintLookup::RegisterKeyAndIntermediatePair(uint64 key,
                                                           uint64 intermediate) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   auto [it, emplaced] = intermediate_to_key_.try_emplace(intermediate, key);
   if (it->second != key) {
     VLOG(2) << "The key (" << it->second
@@ -34,7 +34,7 @@ void TpuFingerprintLookup::RegisterKeyAndIntermediatePair(uint64 key,
 
 bool TpuFingerprintLookup::RegisterIntermediateAndValuePair(uint64 intermediate,
                                                             std::string value) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   auto it = intermediate_to_key_.find(intermediate);
   if (it == intermediate_to_key_.end()) {
     VLOG(2) << "Cannot find the intermediate ( " << intermediate
@@ -79,12 +79,12 @@ bool TpuFingerprintLookup::RegisterIntermediateAndValuePair(uint64 intermediate,
   }
 }
 
-absl::optional<::tensorflow::StringPiece> TpuFingerprintLookup::Lookup(
+abslx::optional<::tensorflow::StringPiece> TpuFingerprintLookup::Lookup(
     uint64 key) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   auto it = key_to_value_.find(key);
   if (it == key_to_value_.end()) {
-    return absl::optional<::tensorflow::StringPiece>{};
+    return abslx::optional<::tensorflow::StringPiece>{};
   } else {
     return it->second;
   }

@@ -57,7 +57,7 @@ std::string MetricTableReport::MakeReport(double expected_metric_sum) {
   const auto metric_greater = [](const Entry& a, const Entry& b) {
     return a.metric > b.metric;
   };
-  absl::c_sort(entries_, metric_greater);
+  abslx::c_sort(entries_, metric_greater);
 
   // Create the report
   AppendLine();
@@ -89,7 +89,7 @@ void MetricTableReport::WriteReportToInfoLog(double expected_metric_sum) {
     if (end_of_line == _npos) {
       end_of_line = report.size();
     }
-    absl::string_view line(report.data() + pos, end_of_line - pos);
+    abslx::string_view line(report.data() + pos, end_of_line - pos);
 
     // TODO(b/34779244): Figure out how to do this without the verbose log-line
     // prefix. The usual way didn't compile on open source.
@@ -102,7 +102,7 @@ void MetricTableReport::WriteReportToInfoLog(double expected_metric_sum) {
 std::vector<MetricTableReport::Category> MetricTableReport::MakeCategories(
     const std::vector<Entry>* entries) {
   // Create the categories using a category_text -> category map.
-  absl::flat_hash_map<std::string, Category> category_map;
+  abslx::flat_hash_map<std::string, Category> category_map;
   for (const Entry& entry : *entries) {
     Category& category = category_map[entry.category_text];
     category.metric_sum += entry.metric;
@@ -121,7 +121,7 @@ std::vector<MetricTableReport::Category> MetricTableReport::MakeCategories(
   auto metric_sum_greater = [](const Category& a, const Category& b) {
     return a.metric_sum > b.metric_sum;
   };
-  absl::c_sort(categories, metric_sum_greater);
+  abslx::c_sort(categories, metric_sum_greater);
 
   return categories;
 }
@@ -157,7 +157,7 @@ void MetricTableReport::AppendCategoryTable() {
     if (text.empty()) {
       text = "[no category]";
     }
-    absl::StrAppend(&text, " (", category.entries.size(), " ", entry_name_,
+    abslx::StrAppend(&text, " (", category.entries.size(), " ", entry_name_,
                     ")");
     AppendTableRow(text, category.metric_sum, metric_sum);
 
@@ -184,7 +184,7 @@ void MetricTableReport::AppendCategoryTable() {
   const int64_t remaining_categories = categories.size() - categories_shown;
   if (remaining_categories > 0) {
     AppendTableRow(
-        absl::StrCat("... (", remaining_categories, " more categories)"),
+        abslx::StrCat("... (", remaining_categories, " more categories)"),
         expected_metric_sum_ - metric_sum, expected_metric_sum_);
   }
 }
@@ -213,7 +213,7 @@ void MetricTableReport::AppendEntryTable() {
   const int64_t remaining_entries = entries_.size() - entries_shown;
   if (remaining_entries > 0) {
     AppendTableRow(
-        absl::StrCat("... (", remaining_entries, " more ", entry_name_, ")"),
+        abslx::StrCat("... (", remaining_entries, " more ", entry_name_, ")"),
         expected_metric_sum_ - metric_sum, expected_metric_sum_);
   }
 }
@@ -249,14 +249,14 @@ double MetricTableReport::UnaccountedMetric() {
 
 std::string MetricTableReport::MetricString(double metric) {
   // Round to integer and stringify.
-  std::string s1 = absl::StrCat(std::llround(metric));
+  std::string s1 = abslx::StrCat(std::llround(metric));
 
   // Code below commafies the string, e.g. "1234" becomes "1,234".
-  absl::string_view sp1(s1);
+  abslx::string_view sp1(s1);
   std::string output;
   // Copy leading non-digit characters unconditionally.
   // This picks up the leading sign.
-  while (!sp1.empty() && !absl::ascii_isdigit(sp1[0])) {
+  while (!sp1.empty() && !abslx::ascii_isdigit(sp1[0])) {
     output.push_back(sp1[0]);
     sp1.remove_prefix(1);
   }
@@ -271,7 +271,7 @@ std::string MetricTableReport::MetricString(double metric) {
 }
 
 std::string MetricTableReport::MetricPercent(double metric) {
-  return absl::StrFormat("%5.2f%%", metric / expected_metric_sum_ * 100.0);
+  return abslx::StrFormat("%5.2f%%", metric / expected_metric_sum_ * 100.0);
 }
 
 }  // namespace xla

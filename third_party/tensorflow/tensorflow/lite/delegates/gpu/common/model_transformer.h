@@ -116,7 +116,7 @@ class ModelTransformer {
   // TODO(b/163423950): Clean up messaging mechanism.
   std::string last_transformation_message_;
   std::deque<NodeId> to_process_;
-  absl::flat_hash_set<NodeId> processed_;
+  abslx::flat_hash_set<NodeId> processed_;
 };
 
 }  // namespace gpu

@@ -30,7 +30,7 @@
 #include "absl/flags/commandlineflag.h"
 #include "absl/flags/internal/commandlineflag.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace flags_internal {
 class FlagSaverImpl;
@@ -41,11 +41,11 @@ class FlagSaverImpl;
 // Returns the reflection handle of an Abseil flag of the specified name, or
 // `nullptr` if not found. This function will emit a warning if the name of a
 // 'retired' flag is specified.
-absl::CommandLineFlag* FindCommandLineFlag(absl::string_view name);
+abslx::CommandLineFlag* FindCommandLineFlag(abslx::string_view name);
 
 // Returns current state of the Flags registry in a form of mapping from flag
 // name to a flag reflection handle.
-absl::flat_hash_map<absl::string_view, absl::CommandLineFlag*> GetAllFlags();
+abslx::flat_hash_map<abslx::string_view, abslx::CommandLineFlag*> GetAllFlags();
 
 //------------------------------------------------------------------------------
 // FlagSaver
@@ -62,9 +62,9 @@ absl::flat_hash_map<absl::string_view, absl::CommandLineFlag*> GetAllFlags();
 // Example:
 //
 //   void MyFunc() {
-//    absl::FlagSaver fs;
+//    abslx::FlagSaver fs;
 //    ...
-//    absl::SetFlag(&FLAGS_myFlag, otherValue);
+//    abslx::SetFlag(&FLAGS_myFlag, otherValue);
 //    ...
 //  } // scope of FlagSaver left, flags return to previous state
 //
@@ -85,6 +85,6 @@ class FlagSaver {
 //-----------------------------------------------------------------------------
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_FLAGS_REFLECTION_H_

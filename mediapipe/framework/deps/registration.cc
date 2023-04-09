@@ -36,9 +36,9 @@ inline size_t array_size(T (&arr)[SIZE]) {
 }  // namespace
 
 /*static*/
-const absl::flat_hash_set<std::string>& NamespaceAllowlist::TopNamespaces() {
-  static absl::flat_hash_set<std::string>* result =
-      new absl::flat_hash_set<std::string>(
+const abslx::flat_hash_set<std::string>& NamespaceAllowlist::TopNamespaces() {
+  static abslx::flat_hash_set<std::string>* result =
+      new abslx::flat_hash_set<std::string>(
           kTopNamespaces, kTopNamespaces + array_size(kTopNamespaces));
   return *result;
 }

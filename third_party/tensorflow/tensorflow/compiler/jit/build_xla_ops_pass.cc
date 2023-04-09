@@ -114,7 +114,7 @@ Operation DataToControl(const Scope& scope, Output data) {
 // Replaces each outgoing edge from `old_node` with a merge node that merges in
 // the corresponding output from `new_node`.
 void MergeOutgoingDataEdges(const Scope& s, Node* old_node, Node* new_node,
-                            absl::string_view cluster_name,
+                            abslx::string_view cluster_name,
                             const DebuggingOpts& debugging_opts) {
   if (!s.status().ok()) {
     return;
@@ -123,7 +123,7 @@ void MergeOutgoingDataEdges(const Scope& s, Node* old_node, Node* new_node,
   std::vector<Output> merged_outputs(old_node->num_outputs(), Output(nullptr));
 
   std::vector<const Edge*> data_edges;
-  absl::c_copy_if(old_node->out_edges(), std::back_inserter(data_edges),
+  abslx::c_copy_if(old_node->out_edges(), std::back_inserter(data_edges),
                   [](const Edge* e) { return !e->IsControlEdge(); });
 
   for (const Edge* e : data_edges) {
@@ -138,7 +138,7 @@ void MergeOutgoingDataEdges(const Scope& s, Node* old_node, Node* new_node,
                                 .WithAssignedDevice(cpu_device),
                             new_output, {new_output},
                             ops::Print::Attrs{}
-                                .Message(absl::StrCat("output ", oidx, " from ",
+                                .Message(abslx::StrCat("output ", oidx, " from ",
                                                       old_node->name(), " is "))
                                 .FirstN(1000)
                                 .Summarize(-1));
@@ -152,7 +152,7 @@ void MergeOutgoingDataEdges(const Scope& s, Node* old_node, Node* new_node,
                 .WithDevice(new_node->requested_device())
                 .WithAssignedDevice(new_node->assigned_device_name()),
             new_output,
-            absl::StrCat("CheckNumerics failed for output ", oidx, "(",
+            abslx::StrCat("CheckNumerics failed for output ", oidx, "(",
                          new_output.name(), ") from cluster ", cluster_name));
         new_output = check_numerics_op;
       }
@@ -179,7 +179,7 @@ void MergeOutgoingControlEdges(const Scope& s, Node* old_node, Node* new_node) {
   }
 
   std::vector<const Edge*> ctrl_edges;
-  absl::c_copy_if(old_node->out_edges(), std::back_inserter(ctrl_edges),
+  abslx::c_copy_if(old_node->out_edges(), std::back_inserter(ctrl_edges),
                   [](const Edge* e) { return e->IsControlEdge(); });
 
   if (ctrl_edges.empty()) {
@@ -243,17 +243,17 @@ Status GetXlaClusterInfo(Node* n, XlaClusterInfo* result) {
 
   std::vector<const Edge*> input_edges_vector;
   TF_RETURN_IF_ERROR(n->input_edges(&input_edges_vector));
-  absl::Span<const Edge*> input_edges(input_edges_vector);
+  abslx::Span<const Edge*> input_edges(input_edges_vector);
 
-  absl::c_transform(input_edges.subspan(0, num_constant_inputs),
+  abslx::c_transform(input_edges.subspan(0, num_constant_inputs),
                     std::back_inserter(result->constant_inputs),
                     IncomingEdgeAsOutput);
 
-  absl::c_transform(
+  abslx::c_transform(
       input_edges.subspan(num_constant_inputs, num_non_constant_inputs),
       std::back_inserter(result->non_constant_inputs), IncomingEdgeAsOutput);
 
-  absl::c_transform(
+  abslx::c_transform(
       input_edges.subspan(num_constant_inputs + num_non_constant_inputs,
                           num_resource_inputs),
       std::back_inserter(result->resource_inputs), IncomingEdgeAsOutput);
@@ -275,7 +275,7 @@ Status CopyIncomingControlEdges(Graph* g, Node* from, Node* to) {
 
 void RemoveAllIncomingControlEdges(Graph* g, Node* n) {
   std::vector<const Edge*> incoming_ctrl_edges;
-  absl::c_copy_if(n->in_edges(), std::back_inserter(incoming_ctrl_edges),
+  abslx::c_copy_if(n->in_edges(), std::back_inserter(incoming_ctrl_edges),
                   [](const Edge* e) { return e->IsControlEdge(); });
   for (const Edge* e : incoming_ctrl_edges) {
     g->RemoveControlEdge(e);
@@ -299,7 +299,7 @@ StatusOr<Node*> ReplaceFunctionCallWithPartitionedCall(
     const NameAttrList& func, const Scope& root) {
   string config_string = options.session_options->config.SerializeAsString();
 
-  int input_count = absl::c_count_if(
+  int input_count = abslx::c_count_if(
       n->in_edges(), [](const Edge* e) { return !e->IsControlEdge(); });
 
   std::vector<Output> args(input_count);
@@ -389,7 +389,7 @@ std::vector<Output> GetXlaRunArgs(const Scope& s,
     if (debugging_opts.check_input_numerics && DataTypeIsFloating(o.type())) {
       ops::CheckNumerics check_numerics_op(
           s.WithOpName("check_input_", input_idx), o,
-          absl::StrCat("CheckNumerics failed for input ", input_idx, "(",
+          abslx::StrCat("CheckNumerics failed for input ", input_idx, "(",
                        o.name(), ") into ", cluster_info.function.name()));
       xla_run_args.push_back(check_numerics_op);
     } else {
@@ -397,7 +397,7 @@ std::vector<Output> GetXlaRunArgs(const Scope& s,
     }
     input_idx++;
   }
-  absl::c_copy(cluster_info.resource_inputs, std::back_inserter(xla_run_args));
+  abslx::c_copy(cluster_info.resource_inputs, std::back_inserter(xla_run_args));
   return xla_run_args;
 }
 
@@ -574,7 +574,7 @@ Status BuildXlaOpsPass::Run(const GraphOptimizationPassOptions& options) {
   // Copy out the nodes we want to rewrite to avoid modifying the graph while we
   // iterate on graph->op_nodes().
   std::vector<Node*> xla_compiled_kernels;
-  absl::c_copy_if(graph->op_nodes(), std::back_inserter(xla_compiled_kernels),
+  abslx::c_copy_if(graph->op_nodes(), std::back_inserter(xla_compiled_kernels),
                   [](const Node* n) {
                     if (n->IsSend() || n->IsRecv() || n->IsControlFlow()) {
                       return false;

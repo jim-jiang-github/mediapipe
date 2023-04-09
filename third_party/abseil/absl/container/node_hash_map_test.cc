@@ -20,7 +20,7 @@
 #include "absl/container/internal/unordered_map_members_test.h"
 #include "absl/container/internal/unordered_map_modifiers_test.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
@@ -31,9 +31,9 @@ using ::testing::Pair;
 using ::testing::UnorderedElementsAre;
 
 using MapTypes = ::testing::Types<
-    absl::node_hash_map<int, int, StatefulTestingHash, StatefulTestingEqual,
+    abslx::node_hash_map<int, int, StatefulTestingHash, StatefulTestingEqual,
                         Alloc<std::pair<const int, int>>>,
-    absl::node_hash_map<std::string, std::string, StatefulTestingHash,
+    abslx::node_hash_map<std::string, std::string, StatefulTestingHash,
                         StatefulTestingEqual,
                         Alloc<std::pair<const std::string, std::string>>>>;
 
@@ -42,7 +42,7 @@ INSTANTIATE_TYPED_TEST_SUITE_P(NodeHashMap, LookupTest, MapTypes);
 INSTANTIATE_TYPED_TEST_SUITE_P(NodeHashMap, MembersTest, MapTypes);
 INSTANTIATE_TYPED_TEST_SUITE_P(NodeHashMap, ModifiersTest, MapTypes);
 
-using M = absl::node_hash_map<std::string, Tracked<int>>;
+using M = abslx::node_hash_map<std::string, Tracked<int>>;
 
 TEST(NodeHashMap, Emplace) {
   M m;
@@ -115,7 +115,7 @@ TEST(NodeHashMap, Emplace) {
 TEST(NodeHashMap, AssignRecursive) {
   struct Tree {
     // Verify that unordered_map<K, IncompleteType> can be instantiated.
-    absl::node_hash_map<int, Tree> children;
+    abslx::node_hash_map<int, Tree> children;
   };
   Tree root;
   const Tree& child = root.children.emplace().first->second;
@@ -135,7 +135,7 @@ TEST(FlatHashMap, MoveOnlyKey) {
   struct Hash {
     size_t operator()(const Key&) const { return 0; }
   };
-  absl::node_hash_map<Key, int, Hash, Eq> m;
+  abslx::node_hash_map<Key, int, Hash, Eq> m;
   m[Key()];
 }
 
@@ -158,7 +158,7 @@ struct NonMovableKeyEq {
 };
 
 TEST(NodeHashMap, MergeExtractInsert) {
-  absl::node_hash_map<NonMovableKey, int, NonMovableKeyHash, NonMovableKeyEq>
+  abslx::node_hash_map<NonMovableKey, int, NonMovableKeyHash, NonMovableKeyEq>
       set1, set2;
   set1.emplace(std::piecewise_construct, std::make_tuple(7),
                std::make_tuple(-7));
@@ -272,4 +272,4 @@ TEST(NodeHashMap, NodeHandleMutableKeyAccess) {
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

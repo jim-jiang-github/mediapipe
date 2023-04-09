@@ -20,9 +20,9 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::base_internal
-    absl::core_headers
-    absl::utility
+    abslx::base_internal
+    abslx::core_headers
+    abslx::utility
   PUBLIC
 )
 
@@ -34,9 +34,9 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::cleanup_internal
-    absl::config
-    absl::core_headers
+    abslx::cleanup_internal
+    abslx::config
+    abslx::core_headers
   PUBLIC
 )
 
@@ -48,8 +48,8 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::cleanup
-    absl::config
-    absl::utility
+    abslx::cleanup
+    abslx::config
+    abslx::utility
     gmock_main
 )

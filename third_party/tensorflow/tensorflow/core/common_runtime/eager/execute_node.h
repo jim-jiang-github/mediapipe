@@ -52,7 +52,7 @@ class ExecuteNodeArgs : public EagerKernelArgs {
   explicit ExecuteNodeArgs(int count) : EagerKernelArgs(count) {}
 
   Status Init(EagerContext* ctx,
-              const absl::InlinedVector<TensorHandle*, 4>& op_inputs,
+              const abslx::InlinedVector<TensorHandle*, 4>& op_inputs,
               const core::RefCountPtr<KernelAndDevice>& kernel);
 
   Status GetLocalArg(const FunctionArgIndex& index, Tensor* val) const override;
@@ -82,7 +82,7 @@ class ExecuteNodeArgs : public EagerKernelArgs {
   bool has_remote_inputs_ = false;
   bool has_packed_inputs_ = false;
   // Maps from the index of a packed arg to a list of sub-args.
-  absl::flat_hash_map<int, gtl::InlinedVector<TensorValue, 4>> packed_args_;
+  abslx::flat_hash_map<int, gtl::InlinedVector<TensorValue, 4>> packed_args_;
 #if !defined(IS_MOBILE_PLATFORM)
   std::function<Status(const FunctionArgIndex&, eager::RemoteTensorHandle*)>
       serialize_remote_handle_;
@@ -92,13 +92,13 @@ class ExecuteNodeArgs : public EagerKernelArgs {
 class ExecuteNode : public EagerNode {
  public:
   ExecuteNode(EagerContext* ctx,
-              const absl::InlinedVector<TensorHandle*, 4>& inputs,
-              const absl::optional<EagerFunctionParams>& eager_func_params,
+              const abslx::InlinedVector<TensorHandle*, 4>& inputs,
+              const abslx::optional<EagerFunctionParams>& eager_func_params,
               const core::RefCountPtr<KernelAndDevice>& kernel,
               GraphCollector* graph_collector,
               CancellationManager* cancellation_manager,
-              absl::Span<TensorHandle*> retvals,
-              absl::optional<ManagedStackTrace> stack_trace)
+              abslx::Span<TensorHandle*> retvals,
+              abslx::optional<ManagedStackTrace> stack_trace)
       : EagerNode(),
         ctx_(ctx),
         inputs_(inputs),
@@ -136,25 +136,25 @@ class ExecuteNode : public EagerNode {
 
  private:
   EagerContext* ctx_;
-  const absl::InlinedVector<TensorHandle*, 4>& inputs_;
-  const absl::optional<EagerFunctionParams>& eager_func_params_;
+  const abslx::InlinedVector<TensorHandle*, 4>& inputs_;
+  const abslx::optional<EagerFunctionParams>& eager_func_params_;
   const core::RefCountPtr<KernelAndDevice>& kernel_;
   GraphCollector* graph_collector_;
   CancellationManager* const cancellation_manager_;
-  absl::Span<TensorHandle*> retvals_;
-  absl::optional<ManagedStackTrace> stack_trace_;
+  abslx::Span<TensorHandle*> retvals_;
+  abslx::optional<ManagedStackTrace> stack_trace_;
 };
 
 class AsyncExecuteNode : public EagerNode {
  public:
   AsyncExecuteNode(EagerContext* ctx,
-                   const absl::InlinedVector<TensorHandle*, 4>& inputs,
-                   const absl::optional<EagerFunctionParams>& eager_func_params,
+                   const abslx::InlinedVector<TensorHandle*, 4>& inputs,
+                   const abslx::optional<EagerFunctionParams>& eager_func_params,
                    core::RefCountPtr<KernelAndDevice> kernel,
                    GraphCollector* graph_collector,
                    CancellationManager* cancellation_manager,
-                   absl::Span<TensorHandle*> retvals,
-                   absl::optional<ManagedStackTrace> stack_trace)
+                   abslx::Span<TensorHandle*> retvals,
+                   abslx::optional<ManagedStackTrace> stack_trace)
       : EagerNode(),
         ctx_(ctx),
         inputs_(inputs),
@@ -201,7 +201,7 @@ class AsyncExecuteNode : public EagerNode {
     }
     Status status = EagerKernelExecute(
         ctx_, inputs_, eager_func_params_, kernel_, graph_collector_,
-        cancellation_manager_, absl::MakeSpan(retvals_), stack_trace_);
+        cancellation_manager_, abslx::MakeSpan(retvals_), stack_trace_);
     if (!status.ok()) {
       if (stack_trace_.has_value()) {
         errors::SetStackTrace(status, stack_trace_->ToStackFrames({}, {}));
@@ -230,13 +230,13 @@ class AsyncExecuteNode : public EagerNode {
 
  private:
   EagerContext* ctx_;
-  absl::InlinedVector<TensorHandle*, 4> inputs_;
-  const absl::optional<EagerFunctionParams> eager_func_params_;
+  abslx::InlinedVector<TensorHandle*, 4> inputs_;
+  const abslx::optional<EagerFunctionParams> eager_func_params_;
   core::RefCountPtr<KernelAndDevice> kernel_;
   GraphCollector* graph_collector_;
   CancellationManager* const cancellation_manager_;
-  absl::optional<ManagedStackTrace> stack_trace_;
-  absl::InlinedVector<TensorHandle*, 2> retvals_;
+  abslx::optional<ManagedStackTrace> stack_trace_;
+  abslx::InlinedVector<TensorHandle*, 2> retvals_;
 };
 
 }  // namespace tensorflow

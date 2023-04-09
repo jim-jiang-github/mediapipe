@@ -25,7 +25,7 @@
 #include "absl/types/internal/conformance_archetype.h"
 #include "absl/types/internal/conformance_profile.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace types_internal {
 
@@ -33,11 +33,11 @@ namespace types_internal {
 #define ABSL_INTERNAL_PROFILE_AND_ARCHETYPE_ALIAS(name, ...)                \
   struct name##Profile : __VA_ARGS__ {};                                    \
                                                                             \
-  using name##Archetype = ::absl::types_internal::Archetype<name##Profile>; \
+  using name##Archetype = ::abslx::types_internal::Archetype<name##Profile>; \
                                                                             \
   template <class AbslInternalProfileTag>                                   \
-  using name##Archetype##_ = ::absl::types_internal::Archetype<             \
-      ::absl::types_internal::StrongProfileTypedef<name##Profile,           \
+  using name##Archetype##_ = ::abslx::types_internal::Archetype<             \
+      ::abslx::types_internal::StrongProfileTypedef<name##Profile,           \
                                                    AbslInternalProfileTag>>
 
 ABSL_INTERNAL_PROFILE_AND_ARCHETYPE_ALIAS(
@@ -440,7 +440,7 @@ using ExpandSupportedProfiles = Receiver<
 
 }  // namespace types_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #undef ABSL_INTERNAL_PROFILE_AND_ARCHETYPE_ALIAS
 

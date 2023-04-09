@@ -50,12 +50,12 @@ void TestWithAspectRatio(const double aspect_ratio,
                          const cv::Scalar* background_color_in_rgb = nullptr) {
   std::string test_image;
   const bool process_arbitrary_image =
-      !absl::GetFlag(FLAGS_input_image).empty();
+      !abslx::GetFlag(FLAGS_input_image).empty();
   if (!process_arbitrary_image) {
     std::string test_image_path = mediapipe::file::JoinPath("./", kTestImage);
     MP_ASSERT_OK(mediapipe::file::GetContents(test_image_path, &test_image));
   } else {
-    MP_ASSERT_OK(mediapipe::file::GetContents(absl::GetFlag(FLAGS_input_image),
+    MP_ASSERT_OK(mediapipe::file::GetContents(abslx::GetFlag(FLAGS_input_image),
                                               &test_image));
   }
 
@@ -83,7 +83,7 @@ void TestWithAspectRatio(const double aspect_ratio,
                    << "Unsupported number of channels: "
                    << decoded_mat.channels());
   }
-  std::unique_ptr<ImageFrame> test_frame = absl::make_unique<ImageFrame>(
+  std::unique_ptr<ImageFrame> test_frame = abslx::make_unique<ImageFrame>(
       image_format, decoded_mat.size().width, decoded_mat.size().height);
   output_mat.copyTo(formats::MatView(test_frame.get()));
 
@@ -127,12 +127,12 @@ void TestWithAspectRatio(const double aspect_ratio,
                  << "Fail to encode the image to be jpeg format.");
   }
 
-  std::string output_string(absl::string_view(
+  std::string output_string(abslx::string_view(
       reinterpret_cast<const char*>(&encode_buffer[0]), encode_buffer.size()));
 
   if (!process_arbitrary_image) {
     std::string result_string_path = mediapipe::file::JoinPath(
-        "./", absl::StrCat(kResultImagePrefix, aspect_ratio,
+        "./", abslx::StrCat(kResultImagePrefix, aspect_ratio,
                            background_color_in_rgb ? "_solid_background" : "",
                            ".jpg"));
     std::string result_image;
@@ -141,8 +141,8 @@ void TestWithAspectRatio(const double aspect_ratio,
     EXPECT_EQ(result_image, output_string);
   } else {
     std::string output_string_path = mediapipe::file::JoinPath(
-        absl::GetFlag(FLAGS_output_folder),
-        absl::StrCat("result_", aspect_ratio,
+        abslx::GetFlag(FLAGS_output_folder),
+        abslx::StrCat("result_", aspect_ratio,
                      background_color_in_rgb ? "_solid_background" : "",
                      ".jpg"));
     MP_ASSERT_OK(
@@ -174,7 +174,7 @@ TEST(PaddingEffectGeneratorTest, ScaleToMultipleOfTwo) {
   double target_aspect_ratio = 0.5;
   int expect_width = 14;
   int expect_height = input_height;
-  auto test_frame = absl::make_unique<ImageFrame>(/*format=*/ImageFormat::SRGB,
+  auto test_frame = abslx::make_unique<ImageFrame>(/*format=*/ImageFormat::SRGB,
                                                   input_width, input_height);
 
   PaddingEffectGenerator generator(test_frame->Width(), test_frame->Height(),

@@ -20,7 +20,7 @@ limitations under the License.
 namespace tensorflow {
 namespace calibrator {
 
-ABSL_CONST_INIT absl::Mutex CalibratorSingleton::lock_(absl::kConstInit);
+ABSL_CONST_INIT abslx::Mutex CalibratorSingleton::lock_(abslx::kConstInit);
 
 CalibratorSingleton& CalibratorSingleton::GetInstance() {
   static CalibratorSingleton* calibrator = new CalibratorSingleton();
@@ -28,15 +28,15 @@ CalibratorSingleton& CalibratorSingleton::GetInstance() {
 }
 
 void CalibratorSingleton::ClearCollectedInformation() {
-  absl::MutexLock lock(&lock_);
+  abslx::MutexLock lock(&lock_);
 
   CalibratorSingleton& instance = GetInstance();
   instance.id_to_min_.clear();
   instance.id_to_max_.clear();
 }
 
-void CalibratorSingleton::ClearData(absl::string_view id) {
-  absl::MutexLock lock(&lock_);
+void CalibratorSingleton::ClearData(abslx::string_view id) {
+  abslx::MutexLock lock(&lock_);
 
   CalibratorSingleton& instance = GetInstance();
 
@@ -45,10 +45,10 @@ void CalibratorSingleton::ClearData(absl::string_view id) {
   instance.id_to_max_.erase(id_str);
 }
 
-void CalibratorSingleton::ReportMinMax(absl::string_view id,
+void CalibratorSingleton::ReportMinMax(abslx::string_view id,
                                        const float min_val,
                                        const float max_val) {
-  absl::MutexLock lock(&lock_);
+  abslx::MutexLock lock(&lock_);
 
   CalibratorSingleton& instance = GetInstance();
 
@@ -72,8 +72,8 @@ void CalibratorSingleton::ReportMinMax(absl::string_view id,
 }
 
 std::optional<std::pair<float, float>> CalibratorSingleton::GetMinMax(
-    absl::string_view id) {
-  absl::MutexLock lock(&lock_);
+    abslx::string_view id) {
+  abslx::MutexLock lock(&lock_);
 
   CalibratorSingleton& instance = GetInstance();
 

@@ -177,8 +177,8 @@ class GpuBufferStorageRegistry {
                          std::vector<TypeId> provider_hashes,
                          TypeId source_storage);
 
-  absl::flat_hash_map<TypeId, StorageFactory> factory_for_view_provider_;
-  absl::flat_hash_map<std::pair<TypeId, TypeId>, StorageConverter>
+  abslx::flat_hash_map<TypeId, StorageFactory> factory_for_view_provider_;
+  abslx::flat_hash_map<std::pair<TypeId, TypeId>, StorageConverter>
       converter_for_view_provider_and_existing_storage_;
 };
 

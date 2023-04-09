@@ -49,7 +49,7 @@ class PaddingEffectGenerator {
   //   the opacity of the black layer.
   // - background_color_in_rgb: If not null, uses this solid color as background
   //   instead of blurring the image, and does not adjust contrast or opacity.
-  absl::Status Process(const ImageFrame& input_frame,
+  abslx::Status Process(const ImageFrame& input_frame,
                        const float background_contrast, const int blur_cv_size,
                        const float overlay_opacity, ImageFrame* output_frame,
                        const cv::Scalar* background_color_in_rgb = nullptr);

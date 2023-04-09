@@ -48,8 +48,8 @@ namespace xla {
 // use_bfloat16_params with that value. Returns the result.
 template <typename TestCase>
 std::vector<TestCase> ExpandUseBfloat16(
-    absl::Span<const bool> use_bfloat16_params,
-    absl::Span<const TestCase> specs) {
+    abslx::Span<const bool> use_bfloat16_params,
+    abslx::Span<const TestCase> specs) {
   std::vector<TestCase> expanded;
   for (bool use_bfloat16 : use_bfloat16_params) {
     for (const auto& spec : specs) {
@@ -93,15 +93,15 @@ class ClientLibraryTestBase : public ManifestCheckingTest {
   // execution options. Modify execution_options_ in your test if you want to
   // customize the options.
   StatusOr<std::unique_ptr<GlobalData>> Execute(
-      XlaBuilder* builder, absl::Span<GlobalData* const> arguments);
+      XlaBuilder* builder, abslx::Span<GlobalData* const> arguments);
 
   StatusOr<Literal> ExecuteAndTransfer(
-      XlaBuilder* builder, absl::Span<GlobalData* const> arguments,
+      XlaBuilder* builder, abslx::Span<GlobalData* const> arguments,
       const Shape* shape_with_output_layout = nullptr);
 
   StatusOr<Literal> ExecuteAndTransfer(
       const XlaComputation& computation,
-      absl::Span<GlobalData* const> arguments,
+      abslx::Span<GlobalData* const> arguments,
       const Shape* shape_with_output_layout = nullptr);
 
   // This executes the computation via the reference client (which connects a
@@ -109,13 +109,13 @@ class ClientLibraryTestBase : public ManifestCheckingTest {
   // computation.
   StatusOr<Literal> ExecuteAndTransferReference(
       const XlaComputation& computation,
-      absl::Span<GlobalData* const> arguments,
+      abslx::Span<GlobalData* const> arguments,
       const Shape* shape_with_output_layout = nullptr);
 
   // Run a computation and return its value as a string. If an error
   // occurs, then instead return the error as a string.
   std::string ExecuteToString(XlaBuilder* builder,
-                              absl::Span<GlobalData* const> arguments);
+                              abslx::Span<GlobalData* const> arguments);
 
   // Convenience methods for building and running a computation, transferring
   // the result, and comparing it to the expected value(s). Methods are
@@ -125,66 +125,66 @@ class ClientLibraryTestBase : public ManifestCheckingTest {
   // for integral types without the ErrorSpec parameter.
   template <typename NativeT>
   void ComputeAndCompareR0(XlaBuilder* builder, NativeT expected,
-                           absl::Span<GlobalData* const> arguments);
+                           abslx::Span<GlobalData* const> arguments);
   template <typename NativeT>
   void ComputeAndCompareR0(XlaBuilder* builder, NativeT expected,
-                           absl::Span<GlobalData* const> arguments,
+                           abslx::Span<GlobalData* const> arguments,
                            ErrorSpec error);
 
   template <typename NativeT>
   void ComputeAndCompareR1(XlaBuilder* builder,
-                           absl::Span<const NativeT> expected,
-                           absl::Span<GlobalData* const> arguments);
+                           abslx::Span<const NativeT> expected,
+                           abslx::Span<GlobalData* const> arguments);
   template <typename NativeT>
   void ComputeAndCompareR1(XlaBuilder* builder,
-                           absl::Span<const NativeT> expected,
-                           absl::Span<GlobalData* const> arguments,
+                           abslx::Span<const NativeT> expected,
+                           abslx::Span<GlobalData* const> arguments,
                            ErrorSpec error);
 
   // As above, but uses a bitmap to hold the predicate vector to avoid
   // deficiencies of vector<bool>.
   void ComputeAndCompareR1(XlaBuilder* builder,
                            const tensorflow::core::Bitmap& expected,
-                           absl::Span<GlobalData* const> arguments);
+                           abslx::Span<GlobalData* const> arguments);
 
   template <typename NativeT>
   void ComputeAndCompareR2(XlaBuilder* builder,
                            const Array2D<NativeT>& expected,
-                           absl::Span<GlobalData* const> arguments);
+                           abslx::Span<GlobalData* const> arguments);
   template <typename NativeT>
   void ComputeAndCompareR2(XlaBuilder* builder,
                            const Array2D<NativeT>& expected,
-                           absl::Span<GlobalData* const> arguments,
+                           abslx::Span<GlobalData* const> arguments,
                            ErrorSpec error);
 
   template <typename NativeT>
   void ComputeAndCompareR3(XlaBuilder* builder,
                            const Array3D<NativeT>& expected,
-                           absl::Span<GlobalData* const> arguments);
+                           abslx::Span<GlobalData* const> arguments);
   template <typename NativeT>
   void ComputeAndCompareR3(XlaBuilder* builder,
                            const Array3D<NativeT>& expected,
-                           absl::Span<GlobalData* const> arguments,
+                           abslx::Span<GlobalData* const> arguments,
                            ErrorSpec error);
 
   template <typename NativeT>
   void ComputeAndCompareR4(XlaBuilder* builder,
                            const Array4D<NativeT>& expected,
-                           absl::Span<GlobalData* const> arguments);
+                           abslx::Span<GlobalData* const> arguments);
   template <typename NativeT>
   void ComputeAndCompareR4(XlaBuilder* builder,
                            const Array4D<NativeT>& expected,
-                           absl::Span<GlobalData* const> arguments,
+                           abslx::Span<GlobalData* const> arguments,
                            ErrorSpec error);
 
   // Build and run the computation and compare the result with the given
   // literal. shape_with_layout indicates the result layout to request when
   // calling Execute.
   void ComputeAndCompareLiteral(XlaBuilder* builder, const Literal& expected,
-                                absl::Span<GlobalData* const> arguments,
+                                abslx::Span<GlobalData* const> arguments,
                                 const Shape* shape_with_layout = nullptr);
   void ComputeAndCompareLiteral(XlaBuilder* builder, const Literal& expected,
-                                absl::Span<GlobalData* const> arguments,
+                                abslx::Span<GlobalData* const> arguments,
                                 ErrorSpec error,
                                 const Shape* shape_with_layout = nullptr);
 
@@ -192,44 +192,44 @@ class ClientLibraryTestBase : public ManifestCheckingTest {
   // shape_with_layout indicates the result layout to request when calling
   // Execute.
   StatusOr<Literal> ComputeAndTransfer(
-      XlaBuilder* builder, absl::Span<GlobalData* const> arguments,
+      XlaBuilder* builder, abslx::Span<GlobalData* const> arguments,
       const Shape* shape_with_layout = nullptr);
 
   // ComputeAndCompare variant which returns an error status.
   Status ComputeAndCompareLiteralWithStatus(
       XlaBuilder* builder, const Literal& expected,
-      absl::Span<GlobalData* const> arguments,
+      abslx::Span<GlobalData* const> arguments,
       const Shape* shape_with_layout = nullptr);
   Status ComputeAndCompareLiteralWithStatus(
       XlaBuilder* builder, const Literal& expected,
-      absl::Span<GlobalData* const> arguments, ErrorSpec error,
+      abslx::Span<GlobalData* const> arguments, ErrorSpec error,
       const Shape* shape_with_layout = nullptr);
 
   // Compare the result of the computation to a strings. In XLA strings are
   // represented using rank-1 U8 shapes.
-  void ComputeAndCompareR1U8(XlaBuilder* builder, absl::string_view expected,
-                             absl::Span<GlobalData* const> arguments);
+  void ComputeAndCompareR1U8(XlaBuilder* builder, abslx::string_view expected,
+                             abslx::Span<GlobalData* const> arguments);
 
   // Convenience method for running a built computation, transferring the
   // result, and comparing it to the expected tuple literal.
   void ComputeAndCompareTuple(XlaBuilder* builder, const Literal& expected,
-                              absl::Span<GlobalData* const> arguments);
+                              abslx::Span<GlobalData* const> arguments);
   void ComputeAndCompareTuple(XlaBuilder* builder, const Literal& expected,
-                              absl::Span<GlobalData* const> arguments,
+                              abslx::Span<GlobalData* const> arguments,
                               ErrorSpec error);
 
   // Convenience method for running a built computation and comparing the result
   // with the reference result.
   void ComputeAndCompare(XlaBuilder* builder,
-                         absl::Span<const Literal> arguments);
+                         abslx::Span<const Literal> arguments);
   void ComputeAndCompare(XlaBuilder* builder,
-                         absl::Span<const Literal> arguments, ErrorSpec error);
+                         abslx::Span<const Literal> arguments, ErrorSpec error);
   template <typename NativeT>
   void ComputeAndCompare(XlaBuilder* builder, const Array<NativeT>& expected,
-                         absl::Span<GlobalData* const> arguments);
+                         abslx::Span<GlobalData* const> arguments);
   template <typename NativeT>
   void ComputeAndCompare(XlaBuilder* builder, const Array<NativeT>& expected,
-                         absl::Span<GlobalData* const> arguments,
+                         abslx::Span<GlobalData* const> arguments,
                          ErrorSpec error);
   // Create scalar operations for use in reductions.
   XlaComputation CreateScalarRelu();
@@ -346,7 +346,7 @@ class ClientLibraryTestBase : public ManifestCheckingTest {
   // converted to bfloat16.
   template <typename NativeT>
   std::unique_ptr<GlobalData> CreateR1Parameter(
-      absl::Span<const NativeT> values, int64_t parameter_number,
+      abslx::Span<const NativeT> values, int64_t parameter_number,
       const std::string& name, XlaBuilder* builder, XlaOp* data_handle);
 
   // Creates a parameter instruction that wraps the given constant array
@@ -410,7 +410,7 @@ class ClientLibraryTestBase : public ManifestCheckingTest {
   // the reference client. Returns two literals in the order of (expected,
   // actual).
   StatusOr<std::pair<Literal, Literal>> ComputeValueAndReference(
-      XlaBuilder* builder, absl::Span<const Literal> arguments);
+      XlaBuilder* builder, abslx::Span<const Literal> arguments);
 
   // Converts an f32 literal to bf16 if use_bfloat16_ is true.
   Literal MaybeConvertLiteralToBfloat16(const Literal& literal);
@@ -422,13 +422,13 @@ class ClientLibraryTestBase : public ManifestCheckingTest {
  private:
   Status ComputeAndCompareLiteralWithAllOutputLayouts(
       const xla::XlaComputation& computation, const Literal& expected,
-      absl::Span<GlobalData* const> arguments,
+      abslx::Span<GlobalData* const> arguments,
       const std::function<void(const Literal& actual,
                                const std::string& error_message)>&
           verify_output);
   Status ComputeAndCompareLiteralWithAllInputLayouts(
       const xla::XlaComputation& computation, const Literal& expected,
-      absl::Span<GlobalData* const> arguments,
+      abslx::Span<GlobalData* const> arguments,
       const std::function<void(const Literal& actual,
                                const std::string& error_message)>&
           verify_output,
@@ -448,7 +448,7 @@ class ClientLibraryTestBase : public ManifestCheckingTest {
 template <typename NativeT>
 void ClientLibraryTestBase::ComputeAndCompareR0(
     XlaBuilder* builder, NativeT expected,
-    absl::Span<GlobalData* const> arguments) {
+    abslx::Span<GlobalData* const> arguments) {
   Literal expected_literal = LiteralUtil::CreateR0<NativeT>(expected);
   ClientLibraryTestBase::ComputeAndCompareLiteral(builder, expected_literal,
                                                   arguments);
@@ -457,7 +457,7 @@ void ClientLibraryTestBase::ComputeAndCompareR0(
 template <typename NativeT>
 void ClientLibraryTestBase::ComputeAndCompareR0(
     XlaBuilder* builder, NativeT expected,
-    absl::Span<GlobalData* const> arguments, ErrorSpec error) {
+    abslx::Span<GlobalData* const> arguments, ErrorSpec error) {
   static_assert(std::is_same<NativeT, float>::value ||
                     std::is_same<NativeT, double>::value ||
                     std::is_same<NativeT, bfloat16>::value ||
@@ -472,8 +472,8 @@ void ClientLibraryTestBase::ComputeAndCompareR0(
 
 template <typename NativeT>
 void ClientLibraryTestBase::ComputeAndCompareR1(
-    XlaBuilder* builder, absl::Span<const NativeT> expected,
-    absl::Span<GlobalData* const> arguments) {
+    XlaBuilder* builder, abslx::Span<const NativeT> expected,
+    abslx::Span<GlobalData* const> arguments) {
   Literal expected_literal = LiteralUtil::CreateR1<NativeT>(expected);
   ClientLibraryTestBase::ComputeAndCompareLiteral(builder, expected_literal,
                                                   arguments);
@@ -481,8 +481,8 @@ void ClientLibraryTestBase::ComputeAndCompareR1(
 
 template <typename NativeT>
 void ClientLibraryTestBase::ComputeAndCompareR1(
-    XlaBuilder* builder, absl::Span<const NativeT> expected,
-    absl::Span<GlobalData* const> arguments, ErrorSpec error) {
+    XlaBuilder* builder, abslx::Span<const NativeT> expected,
+    abslx::Span<GlobalData* const> arguments, ErrorSpec error) {
   static_assert(std::is_same<NativeT, float>::value ||
                     std::is_same<NativeT, double>::value ||
                     std::is_same<NativeT, bfloat16>::value ||
@@ -498,7 +498,7 @@ void ClientLibraryTestBase::ComputeAndCompareR1(
 template <typename NativeT>
 void ClientLibraryTestBase::ComputeAndCompareR2(
     XlaBuilder* builder, const Array2D<NativeT>& expected,
-    absl::Span<GlobalData* const> arguments) {
+    abslx::Span<GlobalData* const> arguments) {
   Literal expected_literal =
       LiteralUtil::CreateR2FromArray2D<NativeT>(expected);
   ClientLibraryTestBase::ComputeAndCompareLiteral(builder, expected_literal,
@@ -508,7 +508,7 @@ void ClientLibraryTestBase::ComputeAndCompareR2(
 template <typename NativeT>
 void ClientLibraryTestBase::ComputeAndCompareR2(
     XlaBuilder* builder, const Array2D<NativeT>& expected,
-    absl::Span<GlobalData* const> arguments, ErrorSpec error) {
+    abslx::Span<GlobalData* const> arguments, ErrorSpec error) {
   static_assert(std::is_same<NativeT, float>::value ||
                     std::is_same<NativeT, double>::value ||
                     std::is_same<NativeT, bfloat16>::value ||
@@ -525,7 +525,7 @@ void ClientLibraryTestBase::ComputeAndCompareR2(
 template <typename NativeT>
 void ClientLibraryTestBase::ComputeAndCompareR3(
     XlaBuilder* builder, const Array3D<NativeT>& expected,
-    absl::Span<GlobalData* const> arguments) {
+    abslx::Span<GlobalData* const> arguments) {
   Literal expected_literal =
       LiteralUtil::CreateR3FromArray3D<NativeT>(expected);
   ClientLibraryTestBase::ComputeAndCompareLiteral(builder, expected_literal,
@@ -535,7 +535,7 @@ void ClientLibraryTestBase::ComputeAndCompareR3(
 template <typename NativeT>
 void ClientLibraryTestBase::ComputeAndCompareR3(
     XlaBuilder* builder, const Array3D<NativeT>& expected,
-    absl::Span<GlobalData* const> arguments, ErrorSpec error) {
+    abslx::Span<GlobalData* const> arguments, ErrorSpec error) {
   static_assert(std::is_same<NativeT, float>::value ||
                     std::is_same<NativeT, double>::value ||
                     std::is_same<NativeT, bfloat16>::value ||
@@ -552,7 +552,7 @@ void ClientLibraryTestBase::ComputeAndCompareR3(
 template <typename NativeT>
 void ClientLibraryTestBase::ComputeAndCompareR4(
     XlaBuilder* builder, const Array4D<NativeT>& expected,
-    absl::Span<GlobalData* const> arguments) {
+    abslx::Span<GlobalData* const> arguments) {
   Literal expected_literal =
       LiteralUtil::CreateR4FromArray4D<NativeT>(expected);
   ClientLibraryTestBase::ComputeAndCompareLiteral(builder, expected_literal,
@@ -562,7 +562,7 @@ void ClientLibraryTestBase::ComputeAndCompareR4(
 template <typename NativeT>
 void ClientLibraryTestBase::ComputeAndCompareR4(
     XlaBuilder* builder, const Array4D<NativeT>& expected,
-    absl::Span<GlobalData* const> arguments, ErrorSpec error) {
+    abslx::Span<GlobalData* const> arguments, ErrorSpec error) {
   static_assert(std::is_same<NativeT, float>::value ||
                     std::is_same<NativeT, double>::value ||
                     std::is_same<NativeT, bfloat16>::value ||
@@ -579,7 +579,7 @@ void ClientLibraryTestBase::ComputeAndCompareR4(
 template <typename NativeT>
 void ClientLibraryTestBase::ComputeAndCompare(
     XlaBuilder* builder, const Array<NativeT>& expected,
-    absl::Span<GlobalData* const> arguments) {
+    abslx::Span<GlobalData* const> arguments) {
   Literal expected_literal = LiteralUtil::CreateFromArray<NativeT>(expected);
   ClientLibraryTestBase::ComputeAndCompareLiteral(builder, expected_literal,
                                                   arguments);
@@ -588,7 +588,7 @@ void ClientLibraryTestBase::ComputeAndCompare(
 template <typename NativeT>
 void ClientLibraryTestBase::ComputeAndCompare(
     XlaBuilder* builder, const Array<NativeT>& expected,
-    absl::Span<GlobalData* const> arguments, ErrorSpec error) {
+    abslx::Span<GlobalData* const> arguments, ErrorSpec error) {
   static_assert(std::is_same<NativeT, float>::value ||
                     std::is_same<NativeT, double>::value ||
                     std::is_same<NativeT, bfloat16>::value ||
@@ -616,7 +616,7 @@ std::unique_ptr<GlobalData> ClientLibraryTestBase::CreateR0Parameter(
 
 template <typename NativeT>
 std::unique_ptr<GlobalData> ClientLibraryTestBase::CreateR1Parameter(
-    absl::Span<const NativeT> values, int64_t parameter_number,
+    abslx::Span<const NativeT> values, int64_t parameter_number,
     const std::string& name, XlaBuilder* builder, XlaOp* data_handle) {
   Literal literal = LiteralUtil::CreateR1(values);
   if (use_bfloat16_ && literal.shape().element_type() == F32) {

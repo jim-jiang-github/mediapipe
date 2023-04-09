@@ -224,7 +224,7 @@ class NodeViewInternal {
 
   // Returns an attribute of the node by key. If no attribute for such key
   // exists, a `nullptr` is returned.
-  const AttrValue* GetAttr(absl::string_view attr_name) const {
+  const AttrValue* GetAttr(abslx::string_view attr_name) const {
     return attrs_.Find(attr_name);
   }
 
@@ -235,7 +235,7 @@ class NodeViewInternal {
   int NumAttrs() const { return attrs_.size(); }
 
   // Checks if an attribute exist in the node.
-  bool HasAttr(absl::string_view attr_name) const {
+  bool HasAttr(abslx::string_view attr_name) const {
     return attrs_.Find(attr_name) != nullptr;
   }
 
@@ -268,7 +268,7 @@ class NodeViewInternal {
 // --------------------------- !!! WARNING !!! ---------------------------------
 //     Modifying the graph outside of implementations of GraphViewInternal
 //     (i.e. removing nodes from the GraphDef directly) may lead to
-//     segfaults! Guaranteed by absl::string_view!
+//     segfaults! Guaranteed by abslx::string_view!
 // -----------------------------------------------------------------------------
 //
 template <typename NodeViewT, typename FaninViewT, typename FanoutViewT,
@@ -308,7 +308,7 @@ class GraphViewInternal {
 
   // Finds node by name. If no such node exists in the graph, a `nullptr` is
   // returned.
-  const NodeViewT* GetNode(absl::string_view node_name) const {
+  const NodeViewT* GetNode(abslx::string_view node_name) const {
     auto it = node_index_by_name_.find(node_name);
     if (it == node_index_by_name_.end()) {
       return nullptr;
@@ -316,7 +316,7 @@ class GraphViewInternal {
     return &nodes_[it->second];
   }
 
-  NodeViewT* GetNode(absl::string_view node_name) {
+  NodeViewT* GetNode(abslx::string_view node_name) {
     auto it = node_index_by_name_.find(node_name);
     if (it == node_index_by_name_.end()) {
       return nullptr;
@@ -328,7 +328,7 @@ class GraphViewInternal {
   const std::vector<NodeViewT>& GetNodes() const { return nodes_; }
 
   // Checks if a node by name exists in the graph.
-  bool HasNode(absl::string_view node_name) const {
+  bool HasNode(abslx::string_view node_name) const {
     return node_index_by_name_.contains(node_name);
   }
 
@@ -339,12 +339,12 @@ class GraphViewInternal {
   // Reset allocated node vector and node map in case of failure.
   void Reset() {
     std::vector<NodeViewT>().swap(nodes_);
-    absl::flat_hash_map<absl::string_view, int>().swap(node_index_by_name_);
+    abslx::flat_hash_map<abslx::string_view, int>().swap(node_index_by_name_);
   }
 
   // nodes_[i] is a view of graph_.{mutable_}node(i).
   std::vector<NodeViewT> nodes_;
-  absl::flat_hash_map<absl::string_view, int> node_index_by_name_;
+  abslx::flat_hash_map<abslx::string_view, int> node_index_by_name_;
   GraphDefT* graph_;
   const FanoutViewT missing_fanin_;
   const std::vector<FaninViewT> missing_fanout_;
@@ -389,19 +389,19 @@ struct NodeViewDiff {
   // with `regular_inputs_to_remove` for if there will be any missing inputs
   // in the updated node.
   int num_regular_inputs_to_remove = 0;
-  absl::flat_hash_set<string> controlling_inputs_to_add;
+  abslx::flat_hash_set<string> controlling_inputs_to_add;
   std::set<int> controlling_inputs_to_remove;
-  absl::flat_hash_map<string, AttrValue> attrs_to_add;
-  absl::flat_hash_set<string> attrs_to_remove;
+  abslx::flat_hash_map<string, AttrValue> attrs_to_add;
+  abslx::flat_hash_set<string> attrs_to_remove;
   // AttrValueMap constructor and destructor are very expensive, we will
   // initialize it lazily only if needed.
-  absl::optional<AttrValueMap> processed_attrs;
+  abslx::optional<AttrValueMap> processed_attrs;
 };
 
 // Updates node name. If `name` is the same as the name in the original node,
 // the field will be cleared in the diff.
 template <typename GraphViewT>
-inline bool UpdateName(NodeViewDiff<GraphViewT>* diff, absl::string_view name) {
+inline bool UpdateName(NodeViewDiff<GraphViewT>* diff, abslx::string_view name) {
   if (diff->graph_view->GetNode(diff->node_index)->GetName() == name) {
     diff->name.clear();
     diff->update_name = false;
@@ -415,7 +415,7 @@ inline bool UpdateName(NodeViewDiff<GraphViewT>* diff, absl::string_view name) {
 // Updates node op. If `op` is the same as the op in the original node, the
 // field will be cleared in the diff.
 template <typename GraphViewT>
-inline bool UpdateOp(NodeViewDiff<GraphViewT>* diff, absl::string_view op) {
+inline bool UpdateOp(NodeViewDiff<GraphViewT>* diff, abslx::string_view op) {
   if (diff->graph_view->GetNode(diff->node_index)->GetOp() == op) {
     diff->op.clear();
     diff->update_op = false;
@@ -430,7 +430,7 @@ inline bool UpdateOp(NodeViewDiff<GraphViewT>* diff, absl::string_view op) {
 // node, the field will be cleared in the diff.
 template <typename GraphViewT>
 inline bool UpdateDevice(NodeViewDiff<GraphViewT>* diff,
-                         absl::string_view device) {
+                         abslx::string_view device) {
   if (diff->graph_view->GetNode(diff->node_index)->GetDevice() == device) {
     diff->device.clear();
     diff->update_device = false;
@@ -470,8 +470,8 @@ inline bool AddOrUpdateAtIndex(std::vector<T>* v, int i, const U& value,
 // Checks if a node with name `node_name` will exist in the final mutated graph.
 template <typename GraphViewT>
 inline bool CheckNodeNameExists(
-    absl::string_view node_name,
-    const absl::flat_hash_map<absl::string_view, int>& updated_node_names,
+    abslx::string_view node_name,
+    const abslx::flat_hash_map<abslx::string_view, int>& updated_node_names,
     const GraphViewT* graph_view) {
   auto it = updated_node_names.find(node_name);
   if (it != updated_node_names.end()) {
@@ -570,7 +570,7 @@ inline bool RemoveRegularFanin(NodeViewDiff<GraphViewT>* diff, int index) {
 template <typename GraphViewT>
 inline bool AddControllingFanin(NodeViewDiff<GraphViewT>* diff,
                                 int control_index,
-                                absl::string_view fanin_node_name) {
+                                abslx::string_view fanin_node_name) {
   if (control_index == kMissingIndex) {
     diff->controlling_inputs_to_add.emplace(fanin_node_name);
   } else {
@@ -586,7 +586,7 @@ inline bool AddControllingFanin(NodeViewDiff<GraphViewT>* diff,
 template <typename GraphViewT>
 inline bool RemoveControllingFanin(NodeViewDiff<GraphViewT>* diff,
                                    int control_index,
-                                   absl::string_view fanin_node_name) {
+                                   abslx::string_view fanin_node_name) {
   if (control_index == kMissingIndex) {
     diff->controlling_inputs_to_add.erase(fanin_node_name);
   } else {
@@ -599,7 +599,7 @@ inline bool RemoveControllingFanin(NodeViewDiff<GraphViewT>* diff,
 // node or diff (including those marked for removal), this will overwrite it.
 template <typename GraphViewT>
 inline bool AddOrUpdateAttribute(NodeViewDiff<GraphViewT>* diff,
-                                 absl::string_view attr_name,
+                                 abslx::string_view attr_name,
                                  const AttrValue& attr_value) {
   diff->attrs_to_add.empty() ? 0 : diff->attrs_to_remove.erase(attr_name);
   gtl::InsertOrUpdate(&diff->attrs_to_add, string(attr_name), attr_value);
@@ -610,7 +610,7 @@ inline bool AddOrUpdateAttribute(NodeViewDiff<GraphViewT>* diff,
 // diff, this will remove it.
 template <typename GraphViewT>
 inline bool RemoveAttribute(NodeViewDiff<GraphViewT>* diff,
-                            absl::string_view attr_name) {
+                            abslx::string_view attr_name) {
   const size_t num_erased =
       diff->attrs_to_add.empty() ? 0 : diff->attrs_to_add.erase(attr_name);
   auto* node_view = diff->graph_view->GetNode(diff->node_index);
@@ -666,17 +666,17 @@ inline void Reset(NodeViewDiff<GraphViewT>* diff) {
   std::map<int, SafeTensorId>().swap(diff->regular_inputs_to_update);
   std::vector<bool>().swap(diff->regular_inputs_to_remove);
   diff->num_regular_inputs_to_remove = 0;
-  absl::flat_hash_set<string>().swap(diff->controlling_inputs_to_add);
+  abslx::flat_hash_set<string>().swap(diff->controlling_inputs_to_add);
   std::set<int>().swap(diff->controlling_inputs_to_remove);
-  absl::flat_hash_map<string, AttrValue>().swap(diff->attrs_to_add);
-  absl::flat_hash_set<string>().swap(diff->attrs_to_remove);
+  abslx::flat_hash_map<string, AttrValue>().swap(diff->attrs_to_add);
+  abslx::flat_hash_set<string>().swap(diff->attrs_to_remove);
 }
 
 // Checks if changes to node will result in a valid node.
 template <typename GraphViewT>
 inline bool IsWellFormed(
     NodeViewDiff<GraphViewT>* diff,
-    const absl::flat_hash_map<absl::string_view, int>& updated_node_names) {
+    const abslx::flat_hash_map<abslx::string_view, int>& updated_node_names) {
   ResizeByTrimmingEndForValue(&diff->regular_inputs_to_remove, false);
   ResizeByTrimmingEndForValue(&diff->regular_inputs_to_add, EmptyTensorId());
   int diff_regular_inputs_to_add_size = diff->regular_inputs_to_add.size();
@@ -696,7 +696,7 @@ inline bool IsWellFormed(
   auto* node_view = diff->graph_view->GetNode(diff->node_index);
   const string& node_name =
       diff->update_name ? diff->name : node_view->GetName();
-  auto invalid_node_name = [&](absl::string_view fanin_node_name) -> bool {
+  auto invalid_node_name = [&](abslx::string_view fanin_node_name) -> bool {
     return fanin_node_name == node_name ||
            !CheckNodeNameExists(fanin_node_name, updated_node_names,
                                 diff->graph_view);
@@ -787,12 +787,12 @@ struct NewNode {
   NodeDef node;
   std::vector<SafeTensorId> regular_fanins;
   int num_regular_fanins = 0;
-  absl::flat_hash_set<string> controlling_fanins;
+  abslx::flat_hash_set<string> controlling_fanins;
 };
 
 // Updates new node name.
 template <typename GraphViewT>
-inline void UpdateName(NewNode<GraphViewT>* new_node, absl::string_view name) {
+inline void UpdateName(NewNode<GraphViewT>* new_node, abslx::string_view name) {
   if (name.empty()) {
     new_node->node.clear_name();
   } else {
@@ -802,7 +802,7 @@ inline void UpdateName(NewNode<GraphViewT>* new_node, absl::string_view name) {
 
 // Updates new node op.
 template <typename GraphViewT>
-inline void UpdateOp(NewNode<GraphViewT>* new_node, absl::string_view op) {
+inline void UpdateOp(NewNode<GraphViewT>* new_node, abslx::string_view op) {
   if (op.empty()) {
     new_node->node.clear_op();
   } else {
@@ -813,7 +813,7 @@ inline void UpdateOp(NewNode<GraphViewT>* new_node, absl::string_view op) {
 // Updates new node device.
 template <typename GraphViewT>
 inline void UpdateDevice(NewNode<GraphViewT>* new_node,
-                         absl::string_view device) {
+                         abslx::string_view device) {
   if (device.empty()) {
     new_node->node.clear_device();
   } else {
@@ -851,21 +851,21 @@ inline void RemoveRegularFanin(NewNode<GraphViewT>* new_node, int index) {
 // Adds controlling fanin to new node.
 template <typename GraphViewT>
 inline void AddControllingFanin(NewNode<GraphViewT>* new_node,
-                                absl::string_view fanin_node_name) {
+                                abslx::string_view fanin_node_name) {
   new_node->controlling_fanins.emplace(fanin_node_name);
 }
 
 // Removes controlling fanin to new node.
 template <typename GraphViewT>
 inline void RemoveControllingFanin(NewNode<GraphViewT>* new_node,
-                                   absl::string_view fanin_node_name) {
+                                   abslx::string_view fanin_node_name) {
   new_node->controlling_fanins.erase(fanin_node_name);
 }
 
 // Adds or updates an attribute by name to a new node.
 template <typename GraphViewT>
 inline void AddOrUpdateAttribute(NewNode<GraphViewT>* new_node,
-                                 absl::string_view attr_name,
+                                 abslx::string_view attr_name,
                                  const AttrValue& attr_value) {
   gtl::InsertOrUpdate(new_node->node.mutable_attr(), string(attr_name),
                       attr_value);
@@ -874,7 +874,7 @@ inline void AddOrUpdateAttribute(NewNode<GraphViewT>* new_node,
 // Removes an attribute by name to a new node.
 template <typename GraphViewT>
 inline void RemoveAttribute(NewNode<GraphViewT>* new_node,
-                            absl::string_view attr_name) {
+                            abslx::string_view attr_name) {
   new_node->node.mutable_attr()->erase(string(attr_name));
 }
 
@@ -882,7 +882,7 @@ inline void RemoveAttribute(NewNode<GraphViewT>* new_node,
 template <typename GraphViewT>
 inline bool IsWellFormed(
     NewNode<GraphViewT>* new_node,
-    const absl::flat_hash_map<absl::string_view, int>& updated_node_names) {
+    const abslx::flat_hash_map<abslx::string_view, int>& updated_node_names) {
   ResizeByTrimmingEndForValue(&new_node->regular_fanins, EmptyTensorId());
   int new_node_regular_fanins_size = new_node->regular_fanins.size();
   if (new_node_regular_fanins_size != new_node->num_regular_fanins) {
@@ -891,7 +891,7 @@ inline bool IsWellFormed(
 
   const string& node_name = new_node->node.name();
   auto invalid_node_name = [new_node, updated_node_names,
-                            node_name](absl::string_view fanin_node_name) {
+                            node_name](abslx::string_view fanin_node_name) {
     return fanin_node_name == node_name ||
            !CheckNodeNameExists(fanin_node_name, updated_node_names,
                                 new_node->graph_view);

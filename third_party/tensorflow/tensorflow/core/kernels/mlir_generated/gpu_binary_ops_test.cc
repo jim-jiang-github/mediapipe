@@ -1149,17 +1149,17 @@ GENERATE_DEFAULT_TESTS(NotEqual, /*test_name=*/UInt64, uint64_t, bool,
 /// Test `tf.Polygamma`.
 
 template <typename T>
-static absl::InlinedVector<T, 10> GetPolygammaValuesX() {
+static abslx::InlinedVector<T, 10> GetPolygammaValuesX() {
   return test::InputAsVector<T, double>({-3.5, -3.0, -2.4, -2.0, -1.3, -1.0,
                                          -0.2, -0.0, 0.0, 0.1, 1.0, 1.2, 2.0,
                                          2.3, 3.0, 3.4});
 }
 
 template <typename T>
-static absl::InlinedVector<T, 10> GetPolygammaValuesN() {
+static abslx::InlinedVector<T, 10> GetPolygammaValuesN() {
   int num_x_values = GetPolygammaValuesX<T>().size();
   auto n_values = {-4.0, -1.0, -0.0, 0.0, 3.0};
-  absl::InlinedVector<T, 10> repeated_n_values;
+  abslx::InlinedVector<T, 10> repeated_n_values;
   repeated_n_values.reserve(n_values.size() * num_x_values);
   for (double n : n_values) {
     for (int i = 0; i < num_x_values; i++) {
@@ -1245,14 +1245,14 @@ T baseline_pow(T lhs, T rhs) {
 template <typename T, std::enable_if_t<
                           llvm::is_one_of<T, Eigen::half, float, double>::value,
                           bool> = true>
-absl::InlinedVector<T, 10> PowInput() {
+abslx::InlinedVector<T, 10> PowInput() {
   return test::InputAsVector<T, double>({0.0, 0.1, 0.2, 0.3, 1.0, 2.0, 3.0});
 }
 
 template <typename T, std::enable_if_t<llvm::is_one_of<T, int8_t, int16_t,
                                                        int32_t, int64_t>::value,
                                        bool> = true>
-absl::InlinedVector<T, 10> PowInput() {
+abslx::InlinedVector<T, 10> PowInput() {
   return test::InputAsVector<T, double>({-2, -1, -1, 1, 1, 3});
 }
 
@@ -1548,7 +1548,7 @@ GENERATE_DEFAULT_TESTS(Xdivy, /*test_name=*/Complex128, std::complex<double>,
 /// Test `tf.Zeta`.
 
 template <typename T>
-static absl::InlinedVector<T, 10> GetZetaTestDataX() {
+static abslx::InlinedVector<T, 10> GetZetaTestDataX() {
   return test::InputAsVector<T, double>(
       {1.,           169.23969873, 105.93557562, 114.43259882, 179.62388639,
        172.80836494, 127.82036549, 163.07586688, 157.31865127, 121.55091407,
@@ -1559,7 +1559,7 @@ static absl::InlinedVector<T, 10> GetZetaTestDataX() {
 }
 
 template <typename T>
-static absl::InlinedVector<T, 10> GetZetaTestDataQ() {
+static abslx::InlinedVector<T, 10> GetZetaTestDataQ() {
   return test::InputAsVector<T, double>(
       {0.23672766, 0.92926068, 0.33551547, 0.53241745, 0.39939397, 0.73085145,
        0.91634121, 0.92935301, 0.90518735, 0.93155356, 0.31607971, 3.76257433,

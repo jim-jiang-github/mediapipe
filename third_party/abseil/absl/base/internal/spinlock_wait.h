@@ -23,7 +23,7 @@
 
 #include "absl/base/internal/scheduling_mode.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -62,7 +62,7 @@ int SpinLockSuggestedDelayNS(int loop);
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 // In some build configurations we pass --detect-odr-violations to the
 // gold linker.  This causes it to flag weak symbol overrides as ODR
@@ -75,17 +75,17 @@ void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockWake)(std::atomic<uint32_t> *w,
                                                       bool all);
 void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockDelay)(
     std::atomic<uint32_t> *w, uint32_t value, int loop,
-    absl::base_internal::SchedulingMode scheduling_mode);
+    abslx::base_internal::SchedulingMode scheduling_mode);
 }
 
-inline void absl::base_internal::SpinLockWake(std::atomic<uint32_t> *w,
+inline void abslx::base_internal::SpinLockWake(std::atomic<uint32_t> *w,
                                               bool all) {
   ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockWake)(w, all);
 }
 
-inline void absl::base_internal::SpinLockDelay(
+inline void abslx::base_internal::SpinLockDelay(
     std::atomic<uint32_t> *w, uint32_t value, int loop,
-    absl::base_internal::SchedulingMode scheduling_mode) {
+    abslx::base_internal::SchedulingMode scheduling_mode) {
   ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockDelay)
   (w, value, loop, scheduling_mode);
 }

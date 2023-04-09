@@ -26,7 +26,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status PaddingAppendWidthTest(TestExecutionEnvironment* env) {
+abslx::Status PaddingAppendWidthTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f};
@@ -53,10 +53,10 @@ absl::Status PaddingAppendWidthTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PaddingPrependWidthTest(TestExecutionEnvironment* env) {
+abslx::Status PaddingPrependWidthTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f};
@@ -83,10 +83,10 @@ absl::Status PaddingPrependWidthTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PaddingAppendHeightTest(TestExecutionEnvironment* env) {
+abslx::Status PaddingAppendHeightTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f};
@@ -112,10 +112,10 @@ absl::Status PaddingAppendHeightTest(TestExecutionEnvironment* env) {
                                     dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PaddingPrependHeightTest(TestExecutionEnvironment* env) {
+abslx::Status PaddingPrependHeightTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f};
@@ -141,10 +141,10 @@ absl::Status PaddingPrependHeightTest(TestExecutionEnvironment* env) {
                                     dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PaddingAppendChannelsTest(TestExecutionEnvironment* env) {
+abslx::Status PaddingAppendChannelsTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f};
@@ -170,10 +170,10 @@ absl::Status PaddingAppendChannelsTest(TestExecutionEnvironment* env) {
                                     dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PaddingPrependChannelsTest(TestExecutionEnvironment* env) {
+abslx::Status PaddingPrependChannelsTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f};
@@ -199,10 +199,10 @@ absl::Status PaddingPrependChannelsTest(TestExecutionEnvironment* env) {
                                     dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PaddingPrependChannelsX4Test(TestExecutionEnvironment* env) {
+abslx::Status PaddingPrependChannelsX4Test(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 1, 2);
   src_tensor.data = {1.0f, 2.0f};
@@ -228,10 +228,10 @@ absl::Status PaddingPrependChannelsX4Test(TestExecutionEnvironment* env) {
                                     dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PaddingComplexTest(TestExecutionEnvironment* env) {
+abslx::Status PaddingComplexTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f};
@@ -260,10 +260,10 @@ absl::Status PaddingComplexTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PaddingReflectWidthTest(TestExecutionEnvironment* env) {
+abslx::Status PaddingReflectWidthTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 3, 1);
   src_tensor.data = {1.0f, 2.0f, 3.0f};
@@ -290,10 +290,10 @@ absl::Status PaddingReflectWidthTest(TestExecutionEnvironment* env) {
                                     dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PaddingReflectChannelsTest(TestExecutionEnvironment* env) {
+abslx::Status PaddingReflectChannelsTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 1, 3);
   src_tensor.data = {1.0f, 2.0f, 3.0f};
@@ -320,7 +320,7 @@ absl::Status PaddingReflectChannelsTest(TestExecutionEnvironment* env) {
                                     dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

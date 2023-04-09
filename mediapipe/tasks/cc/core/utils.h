@@ -42,7 +42,7 @@ std::string LoadBinaryContent(const char* filename);
 int FindTensorIndexByMetadataName(
     const flatbuffers::Vector<flatbuffers::Offset<tflite::TensorMetadata>>*
         tensor_metadata,
-    absl::string_view name);
+    abslx::string_view name);
 
 // Finds the tensor index of the specified tensor name from a vector of tensors
 // by first checking the metadata tensor name, and then the model tensor name.
@@ -53,8 +53,8 @@ int FindTensorIndexByName(
     const std::vector<TensorType*>& tensors,
     const flatbuffers::Vector<flatbuffers::Offset<tflite::TensorMetadata>>*
         tensor_metadata,
-    absl::string_view metadata_tensor_name,
-    absl::string_view model_tensor_name) {
+    abslx::string_view metadata_tensor_name,
+    abslx::string_view model_tensor_name) {
   if (tensor_metadata != nullptr && tensor_metadata->size() == tensors.size()) {
     int index =
         FindTensorIndexByMetadataName(tensor_metadata, metadata_tensor_name);
@@ -71,9 +71,9 @@ static TensorType* FindTensorByName(
     const std::vector<TensorType*>& tensors,
     const flatbuffers::Vector<flatbuffers::Offset<tflite::TensorMetadata>>*
         tensor_metadata,
-    absl::string_view metadata_tensor_name) {
+    abslx::string_view metadata_tensor_name) {
   int index = FindTensorIndexByName(tensors, tensor_metadata,
-                                    metadata_tensor_name, absl::string_view());
+                                    metadata_tensor_name, abslx::string_view());
   return index == -1 ? nullptr : tensors[index];
 }
 

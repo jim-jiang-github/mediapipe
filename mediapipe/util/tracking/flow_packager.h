@@ -145,7 +145,7 @@ class FlowPackager {
 
   // Removes binary encoded container from string and parses it to container.
   // Returns header string of the parsed container. Useful for random seek.
-  std::string SplitContainerFromString(absl::string_view* binary_data,
+  std::string SplitContainerFromString(abslx::string_view* binary_data,
                                        TrackingContainer* container);
 
  private:

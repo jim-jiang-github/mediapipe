@@ -29,7 +29,7 @@ limitations under the License.
 
 namespace xla {
 
-using absl::StrCat;
+using abslx::StrCat;
 
 static StatusOr<HloComputation*> WidenWhileCondition(
     HloComputation* narrow_condition, const Shape& wide_shape) {
@@ -100,7 +100,7 @@ WidenWhileBody(HloComputation* narrow_body, const Shape& wide_shape) {
 /*static*/ StatusOr<WhileUtil::MakeInstructionsLiveInResult>
 WhileUtil::MakeInstructionsLiveIn(
     HloInstruction* while_instr,
-    absl::Span<HloInstruction* const> instructions) {
+    abslx::Span<HloInstruction* const> instructions) {
   CHECK(while_instr->shape().IsTuple());
 
   int elements_in_old_while_shape = while_instr->shape().tuple_shapes_size();
@@ -217,7 +217,7 @@ MakeInitTupleFromInitValues(const WhileUtil::LoopStateTy& init_values) {
   std::unique_ptr<HloInstruction> zero =
       HloInstruction::CreateConstant(LiteralUtil::CreateR0<int32_t>(0));
   init_values_with_indvar.push_back(zero.get());
-  absl::c_copy(init_values, std::back_inserter(init_values_with_indvar));
+  abslx::c_copy(init_values, std::back_inserter(init_values_with_indvar));
   return std::make_pair(std::move(zero),
                         HloInstruction::CreateTuple(init_values_with_indvar));
 }
@@ -230,7 +230,7 @@ static Shape MakeLoopStateShapeWithLayout(
   std::vector<Shape> loop_state_shape_components;
   loop_state_shape_components.reserve(init_values.size() + 1);
   loop_state_shape_components.push_back(ShapeUtil::MakeShape(S32, {}));
-  absl::c_transform(init_values,
+  abslx::c_transform(init_values,
                     std::back_inserter(loop_state_shape_components),
                     [](HloInstruction* instr) {
                       Shape shape = instr->shape();
@@ -315,10 +315,10 @@ static Shape MakeLoopStateShapeWithLayout(
   return result;
 }
 
-/*static*/ absl::flat_hash_map<int64_t, absl::InlinedVector<HloInstruction*, 1>>
+/*static*/ abslx::flat_hash_map<int64_t, abslx::InlinedVector<HloInstruction*, 1>>
 WhileUtil::GetGTEsMapForWhileConditional(
     const HloComputation& while_conditional) {
-  absl::flat_hash_map<int64_t, absl::InlinedVector<HloInstruction*, 1>> result;
+  abslx::flat_hash_map<int64_t, abslx::InlinedVector<HloInstruction*, 1>> result;
   for (HloInstruction* user :
        while_conditional.parameter_instruction(0)->users()) {
     if (user->opcode() == HloOpcode::kGetTupleElement) {

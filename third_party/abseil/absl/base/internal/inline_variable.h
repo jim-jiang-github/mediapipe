@@ -68,7 +68,7 @@
 //   types, etc..
 #if defined(__clang__)
 #define ABSL_INTERNAL_EXTERN_DECL(type, name) \
-  extern const ::absl::internal::identity_t<type> name;
+  extern const ::abslx::internal::identity_t<type> name;
 #else  // Otherwise, just define the macro to do nothing.
 #define ABSL_INTERNAL_EXTERN_DECL(type, name)
 #endif  // defined(__clang__)
@@ -76,7 +76,7 @@
 // See above comment at top of file for details.
 #define ABSL_INTERNAL_INLINE_CONSTEXPR(type, name, init) \
   ABSL_INTERNAL_EXTERN_DECL(type, name)                  \
-  inline constexpr ::absl::internal::identity_t<type> name = init
+  inline constexpr ::abslx::internal::identity_t<type> name = init
 
 #else
 
@@ -89,14 +89,14 @@
 #define ABSL_INTERNAL_INLINE_CONSTEXPR(var_type, name, init)                  \
   template <class /*AbslInternalDummy*/ = void>                               \
   struct AbslInternalInlineVariableHolder##name {                             \
-    static constexpr ::absl::internal::identity_t<var_type> kInstance = init; \
+    static constexpr ::abslx::internal::identity_t<var_type> kInstance = init; \
   };                                                                          \
                                                                               \
   template <class AbslInternalDummy>                                          \
-  constexpr ::absl::internal::identity_t<var_type>                            \
+  constexpr ::abslx::internal::identity_t<var_type>                            \
       AbslInternalInlineVariableHolder##name<AbslInternalDummy>::kInstance;   \
                                                                               \
-  static constexpr const ::absl::internal::identity_t<var_type>&              \
+  static constexpr const ::abslx::internal::identity_t<var_type>&              \
       name = /* NOLINT */                                                     \
       AbslInternalInlineVariableHolder##name<>::kInstance;                    \
   static_assert(sizeof(void (*)(decltype(name))) != 0,                        \

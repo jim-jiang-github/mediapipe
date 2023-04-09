@@ -172,7 +172,7 @@ TEST_F(GraphPartitionTest, InsertTransferOpsWithTwoDevice) {
               UnorderedElementsAre(partitioned_call_nodes[0]->name(),
                                    partitioned_call_nodes[1]->name()));
 
-  absl::flat_hash_map<std::string, FunctionDef> func_name_to_func;
+  abslx::flat_hash_map<std::string, FunctionDef> func_name_to_func;
 
   EXPECT_THAT(new_graphdef.library().function(), SizeIs(3));
   for (const FunctionDef& fdef : new_graphdef.library().function()) {

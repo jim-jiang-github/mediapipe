@@ -36,7 +36,7 @@ namespace {
 class PrngTest : public ClientLibraryTestBase {
  protected:
   template <typename T>
-  Literal UniformTest(T a, T b, absl::Span<const int64_t> dims,
+  Literal UniformTest(T a, T b, abslx::Span<const int64_t> dims,
                       int64_t seed = 42);
 
   // Computes the χ² statistic of a sample of the discrete uniform distribution
@@ -48,7 +48,7 @@ class PrngTest : public ClientLibraryTestBase {
 };
 
 template <typename T>
-Literal PrngTest::UniformTest(T a, T b, absl::Span<const int64_t> dims,
+Literal PrngTest::UniformTest(T a, T b, abslx::Span<const int64_t> dims,
                               int64_t seed) {
   XlaBuilder builder(TestName());
   RngUniform(
@@ -58,7 +58,7 @@ Literal PrngTest::UniformTest(T a, T b, absl::Span<const int64_t> dims,
   SetSeed(seed);
   auto actual = ExecuteAndTransfer(&builder, /*arguments=*/{}).value();
   EXPECT_THAT(dims, ::testing::ElementsAreArray(actual.shape().dimensions()));
-  actual.EachCell<T>([=](absl::Span<const int64_t>, T value) {
+  actual.EachCell<T>([=](abslx::Span<const int64_t>, T value) {
     EXPECT_LE(a, value);
     EXPECT_LT(value, b);
   });
@@ -124,7 +124,7 @@ XLA_TEST_F(PrngTest, DISABLED_ON_INTERPRETER(DISABLED_ON_GPU(
   constexpr int64_t count = 1000;
   for (int64_t seed = 0; seed < count; ++seed) {
     auto result = UniformTest<bfloat16>(low, high, {}, /*seed=*/seed);
-    result.EachCell<bfloat16>([&](absl::Span<const int64_t>, bfloat16 value) {
+    result.EachCell<bfloat16>([&](abslx::Span<const int64_t>, bfloat16 value) {
       int64_t index = static_cast<int64_t>((value - low) / interval);
       counts[index]++;
     });
@@ -156,7 +156,7 @@ double PrngTest::UniformChiSquared(int32_t range_size, int32_t expected_count,
   auto actual = ExecuteAndTransfer(&builder, /*arguments=*/{}).value();
   std::vector<int32_t> counts(range_size, 0);
   actual.EachCell<int32_t>(
-      [&counts](absl::Span<const int64_t>, int32_t value) { ++counts[value]; });
+      [&counts](abslx::Span<const int64_t>, int32_t value) { ++counts[value]; });
   int64_t sum = 0;
   for (int32_t i = 0; i < range_size; ++i) {
     sum += Square(static_cast<int64_t>(counts[i] - expected_count));

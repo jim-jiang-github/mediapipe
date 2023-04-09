@@ -91,8 +91,8 @@ class ThreadPool {
   std::vector<WorkerThread*> threads_;
   int num_threads_;
 
-  absl::Mutex mutex_;
-  absl::CondVar condition_;
+  abslx::Mutex mutex_;
+  abslx::CondVar condition_;
   bool stopped_ ABSL_GUARDED_BY(mutex_) = false;
   std::deque<std::function<void()>> tasks_ ABSL_GUARDED_BY(mutex_);
 

@@ -147,7 +147,7 @@ StatusOr<std::unique_ptr<Executable>> CompileLmhloToExecutable(
     GpuCompiler* compiler, mlir::ModuleOp module, std::string module_name,
     const HloModuleConfig& module_config,
     const Compiler::CompileOptions& options,
-    absl::string_view entry_function_name, se::StreamExecutor* stream_exec,
+    abslx::string_view entry_function_name, se::StreamExecutor* stream_exec,
     std::unique_ptr<llvm::Module> llvm_module,
     IrEmitterContext* ir_emitter_context);
 

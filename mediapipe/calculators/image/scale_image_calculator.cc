@@ -44,7 +44,7 @@ namespace {
 
 // Given an upscaling algorithm, determine which OpenCV interpolation algorithm
 // to use.
-absl::Status FindInterpolationAlgorithm(
+abslx::Status FindInterpolationAlgorithm(
     ScaleImageCalculatorOptions::ScaleAlgorithm upscaling_algorithm,
     int* interpolation_algorithm) {
   switch (upscaling_algorithm) {
@@ -67,10 +67,10 @@ absl::Status FindInterpolationAlgorithm(
       *interpolation_algorithm = -1;
       break;
     default:
-      RET_CHECK_FAIL() << absl::Substitute("Unknown upscaling algorithm: $0",
+      RET_CHECK_FAIL() << abslx::Substitute("Unknown upscaling algorithm: $0",
                                            upscaling_algorithm);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void CropImageFrame(const ImageFrame& original, int col_start, int row_start,
@@ -147,7 +147,7 @@ class ScaleImageCalculator : public CalculatorBase {
   ScaleImageCalculator();
   ~ScaleImageCalculator() override;
 
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     ScaleImageCalculatorOptions options =
         cc->Options<ScaleImageCalculatorOptions>();
 
@@ -184,34 +184,34 @@ class ScaleImageCalculator : public CalculatorBase {
     if (cc->Inputs().HasTag("OVERRIDE_OPTIONS")) {
       cc->Inputs().Tag("OVERRIDE_OPTIONS").Set<ScaleImageCalculatorOptions>();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // From Calculator.
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   // Initialize some data members from options_. This can be called either from
   // Open or Process depending on whether OVERRIDE_OPTIONS is used.
-  absl::Status InitializeFromOptions();
+  abslx::Status InitializeFromOptions();
   // Initialize crop and output parameters based on set member variable
   // values.  This function will also send the header information on
   // the VIDEO_HEADER stream if it hasn't been done yet.
-  absl::Status InitializeFrameInfo(CalculatorContext* cc);
+  abslx::Status InitializeFrameInfo(CalculatorContext* cc);
   // Validate that input_format_ and output_format_ are supported image
   // formats.
-  absl::Status ValidateImageFormats() const;
+  abslx::Status ValidateImageFormats() const;
   // Validate that the image frame has the proper format and dimensions.
   // If the dimensions and format weren't initialized by the header,
   // then the first frame on which this function is called is used
   // to initialize.
-  absl::Status ValidateImageFrame(CalculatorContext* cc,
+  abslx::Status ValidateImageFrame(CalculatorContext* cc,
                                   const ImageFrame& image_frame);
   // Validate that the YUV image has the proper dimensions. If the
   // dimensions weren't initialized by the header, then the first image
   // on which this function is called is used to initialize.
-  absl::Status ValidateYUVImage(CalculatorContext* cc,
+  abslx::Status ValidateYUVImage(CalculatorContext* cc,
                                 const YUVImage& yuv_image);
 
   bool has_header_;  // True if the input stream has a header.
@@ -251,7 +251,7 @@ ScaleImageCalculator::ScaleImageCalculator() {}
 
 ScaleImageCalculator::~ScaleImageCalculator() {}
 
-absl::Status ScaleImageCalculator::InitializeFrameInfo(CalculatorContext* cc) {
+abslx::Status ScaleImageCalculator::InitializeFrameInfo(CalculatorContext* cc) {
   MP_RETURN_IF_ERROR(
       scale_image::FindCropDimensions(input_width_, input_height_,  //
                                       options_.min_aspect_ratio(),  //
@@ -288,7 +288,7 @@ absl::Status ScaleImageCalculator::InitializeFrameInfo(CalculatorContext* cc) {
   if (!header_sent_ && cc->Outputs().UsesTags() &&
       cc->Outputs().HasTag("VIDEO_HEADER")) {
     header_sent_ = true;
-    auto header = absl::make_unique<VideoHeader>();
+    auto header = abslx::make_unique<VideoHeader>();
     *header = input_video_header_;
     header->width = output_width_;
     header->height = output_height_;
@@ -299,10 +299,10 @@ absl::Status ScaleImageCalculator::InitializeFrameInfo(CalculatorContext* cc) {
         .Add(header.release(), Timestamp::PreStream());
     cc->Outputs().Tag("VIDEO_HEADER").Close();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ScaleImageCalculator::Open(CalculatorContext* cc) {
+abslx::Status ScaleImageCalculator::Open(CalculatorContext* cc) {
   options_ = cc->Options<ScaleImageCalculatorOptions>();
 
   input_data_id_ = cc->Inputs().GetId("FRAMES", 0);
@@ -339,7 +339,7 @@ absl::Status ScaleImageCalculator::Open(CalculatorContext* cc) {
       // has a header. At this point in the code, the ScaleImageCalculator
       // config may be changed by the new options at PreStream, so the output
       // header can't be determined.
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "OVERRIDE_OPTIONS stream can't be used when the main input stream "
           "has a header.");
     }
@@ -406,10 +406,10 @@ absl::Status ScaleImageCalculator::Open(CalculatorContext* cc) {
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ScaleImageCalculator::InitializeFromOptions() {
+abslx::Status ScaleImageCalculator::InitializeFromOptions() {
   if (options_.has_input_format()) {
     input_format_ = options_.input_format();
   } else {
@@ -427,10 +427,10 @@ absl::Status ScaleImageCalculator::InitializeFromOptions() {
 
   downscaler_.reset(new ImageResizer(options_.post_sharpening_coefficient()));
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ScaleImageCalculator::ValidateImageFormats() const {
+abslx::Status ScaleImageCalculator::ValidateImageFormats() const {
   RET_CHECK_NE(input_format_, ImageFormat::UNKNOWN)
       << "The input image format was UNKNOWN.";
   RET_CHECK_NE(output_format_, ImageFormat::UNKNOWN)
@@ -448,10 +448,10 @@ absl::Status ScaleImageCalculator::ValidateImageFormats() const {
              output_format_ == ImageFormat::SRGBA))
       << "Conversion of the color space (except from "
          "YCbCr420P to SRGB or SRGB to SRBGA) is not yet supported.";
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ScaleImageCalculator::ValidateImageFrame(
+abslx::Status ScaleImageCalculator::ValidateImageFrame(
     CalculatorContext* cc, const ImageFrame& image_frame) {
   if (!has_header_) {
     if (input_width_ != image_frame.Width() ||
@@ -460,7 +460,7 @@ absl::Status ScaleImageCalculator::ValidateImageFrame(
       // Set the dimensions based on the image frame.  There was no header.
       input_width_ = image_frame.Width();
       input_height_ = image_frame.Height();
-      RET_CHECK(input_width_ > 0 && input_height_ > 0) << absl::StrCat(
+      RET_CHECK(input_width_ > 0 && input_height_ > 0) << abslx::StrCat(
           "The input image did not have positive dimensions. dimensions: ",
           input_width_, "x", input_height_);
       input_format_ = image_frame.Format();
@@ -479,7 +479,7 @@ absl::Status ScaleImageCalculator::ValidateImageFrame(
   } else {
     if (input_width_ != image_frame.Width() ||
         input_height_ != image_frame.Height()) {
-      return tool::StatusFail(absl::StrCat(
+      return tool::StatusFail(abslx::StrCat(
           "If a header specifies a width and a height, then image frames on "
           "the stream must have that size.  Received frame of size ",
           image_frame.Width(), "x", image_frame.Height(), " but expected ",
@@ -496,16 +496,16 @@ absl::Status ScaleImageCalculator::ValidateImageFrame(
           desc->FindValueByNumber(image_frame.Format())->DebugString();
       input_format_desc = desc->FindValueByNumber(input_format_)->DebugString();
 #endif  // MEDIAPIPE_MOBILE
-      return tool::StatusFail(absl::StrCat(
+      return tool::StatusFail(abslx::StrCat(
           "If a header specifies a format, then image frames on "
           "the stream must have that format.  Actual format ",
           image_frame_format_desc, " but expected ", input_format_desc));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ScaleImageCalculator::ValidateYUVImage(CalculatorContext* cc,
+abslx::Status ScaleImageCalculator::ValidateYUVImage(CalculatorContext* cc,
                                                     const YUVImage& yuv_image) {
   CHECK_EQ(input_format_, ImageFormat::YCBCR420P);
   if (!has_header_) {
@@ -514,7 +514,7 @@ absl::Status ScaleImageCalculator::ValidateYUVImage(CalculatorContext* cc,
       // Set the dimensions based on the YUV image.  There was no header.
       input_width_ = yuv_image.width();
       input_height_ = yuv_image.height();
-      RET_CHECK(input_width_ > 0 && input_height_ > 0) << absl::StrCat(
+      RET_CHECK(input_width_ > 0 && input_height_ > 0) << abslx::StrCat(
           "The input image did not have positive dimensions. dimensions: ",
           input_width_, "x", input_height_);
       if (options_.has_output_format()) {
@@ -528,7 +528,7 @@ absl::Status ScaleImageCalculator::ValidateYUVImage(CalculatorContext* cc,
   } else {
     if (input_width_ != yuv_image.width() ||
         input_height_ != yuv_image.height()) {
-      return tool::StatusFail(absl::StrCat(
+      return tool::StatusFail(abslx::StrCat(
           "If a header specifies a width and a height, then YUV images on "
           "the stream must have that size.  Additionally, all YUV images in "
           "a stream must have the same size.  Received frame of size ",
@@ -536,14 +536,14 @@ absl::Status ScaleImageCalculator::ValidateYUVImage(CalculatorContext* cc,
           input_width_, "x", input_height_));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ScaleImageCalculator::Process(CalculatorContext* cc) {
+abslx::Status ScaleImageCalculator::Process(CalculatorContext* cc) {
   if (cc->InputTimestamp() == Timestamp::PreStream()) {
     if (cc->Inputs().HasTag("OVERRIDE_OPTIONS")) {
       if (cc->Inputs().Tag("OVERRIDE_OPTIONS").IsEmpty()) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "The OVERRIDE_OPTIONS input stream must be non-empty at PreStream "
             "time if used.");
       }
@@ -557,7 +557,7 @@ absl::Status ScaleImageCalculator::Process(CalculatorContext* cc) {
       input_video_header_ = cc->Inputs().Tag("VIDEO_HEADER").Get<VideoHeader>();
     }
     if (cc->Inputs().Get(input_data_id_).IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
   }
 
@@ -601,7 +601,7 @@ absl::Status ScaleImageCalculator::Process(CalculatorContext* cc) {
                                 output_width_, u, output_width_ / 2, v,
                                 output_width_ / 2, output_width_,
                                 output_height_, libyuv::kFilterBox));
-      auto output_image = absl::make_unique<YUVImage>(
+      auto output_image = abslx::make_unique<YUVImage>(
           libyuv::FOURCC_I420, std::move(yuv_data), y, output_width_, u,
           output_width_ / 2, v, output_width_ / 2, output_width_,
           output_height_);
@@ -615,7 +615,7 @@ absl::Status ScaleImageCalculator::Process(CalculatorContext* cc) {
       cc->Outputs()
           .Get(output_data_id_)
           .Add(output_image.release(), cc->InputTimestamp());
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
   } else if (input_format_ == ImageFormat::SRGB &&
              output_format_ == ImageFormat::SRGBA) {
@@ -685,7 +685,7 @@ absl::Status ScaleImageCalculator::Process(CalculatorContext* cc) {
             .Add(output_frame.release(), cc->InputTimestamp());
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Rescale the image frame.
@@ -719,7 +719,7 @@ absl::Status ScaleImageCalculator::Process(CalculatorContext* cc) {
   cc->Outputs()
       .Get(output_data_id_)
       .Add(output_frame.release(), cc->InputTimestamp());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

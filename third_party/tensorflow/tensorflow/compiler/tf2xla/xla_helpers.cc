@@ -67,7 +67,7 @@ xla::XlaOp XlaHelpers::FloatLiteral(xla::XlaBuilder* b, DataType data_type,
 }
 
 /* static */ Status XlaHelpers::ReshapeLiteral(
-    const xla::Literal& input, absl::Span<const int64_t> dimensions,
+    const xla::Literal& input, abslx::Span<const int64_t> dimensions,
     xla::Literal* output) {
   if (input.shape().IsTuple()) {
     return errors::InvalidArgument("ReshapeLiteral does not support tuples.");
@@ -174,14 +174,14 @@ Status ResolveDeviceAssignment(
           << params->ToString();
 
   Status st;
-  absl::Notification n;
+  abslx::Notification n;
   ctx->collective_executor()->CompleteParamsAsync(
       ctx->device()->attributes(), params.get(), ctx->cancellation_manager(),
       [&](const Status& s) {
         st = s;
         n.Notify();
       });
-  if (!n.WaitForNotificationWithTimeout(absl::Seconds(kTimeoutSeconds))) {
+  if (!n.WaitForNotificationWithTimeout(abslx::Seconds(kTimeoutSeconds))) {
     return errors::InvalidArgument("Timeout reached");
   }
   TF_RETURN_IF_ERROR(st);
@@ -195,17 +195,17 @@ Status ResolveDeviceAssignment(
     if (device.xla_global_id() == -1) {
       if (params->group.device_type == DEVICE_TPU) {
         return errors::InvalidArgument(
-            absl::StrCat("No global ID was set for TPU device ", device.name(),
+            abslx::StrCat("No global ID was set for TPU device ", device.name(),
                          ". Try initializing the TPU system, e.g. "
                          "`tf.tpu.experimental.initialize_tpu_system()`."));
       } else if (params->group.device_type == DEVICE_GPU) {
         return errors::Internal(
-            absl::StrCat("No global ID was set for ", device.name(),
+            abslx::StrCat("No global ID was set for ", device.name(),
                          ". This is unexpected, please file a bug."));
       } else {
         // TODO(b/194942685): Implement CPU collectives.
         return errors::Unimplemented(
-            absl::StrCat("Collectives are not yet implemented for ",
+            abslx::StrCat("Collectives are not yet implemented for ",
                          params->group.device_type.type_string(),
                          " devices when compiling with XLA. Attempted to "
                          "compile a collective running on",

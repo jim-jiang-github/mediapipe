@@ -100,7 +100,7 @@ class VSpace {
       const string& op_type, BackwardFunction* backward_function,
       const std::vector<int64_t>& unneeded_gradients,
       gtl::ArraySlice<Gradient*> output_gradients,
-      absl::Span<Gradient*> result) const = 0;
+      abslx::Span<Gradient*> result) const = 0;
 
   // Builds a tensor filled with ones with the same shape and dtype as `t`.
   virtual Status BuildOnesLike(const TapeTensor& t,
@@ -175,7 +175,7 @@ class GradientTape {
       const gtl::ArraySlice<int64_t> target_tensor_ids,
       const gtl::ArraySlice<int64_t> source_tensor_ids,
       const std::unordered_map<int64, TapeTensor>& sources_that_are_targets,
-      gtl::ArraySlice<Gradient*> output_gradients, absl::Span<Gradient*> result,
+      gtl::ArraySlice<Gradient*> output_gradients, abslx::Span<Gradient*> result,
       bool build_default_zeros_grads = true);
 
   // Whether the tape is persistent. See ctor for detailed description.
@@ -331,7 +331,7 @@ class ForwardAccumulator {
       const string& op_type, const std::vector<TapeTensor>& output_tensors,
       const std::function<BackwardFunction*()>& backward_function_getter,
       const std::function<void(BackwardFunction*)>& backward_function_deleter,
-      const std::vector<Gradient*>& in_grads, absl::Span<Gradient*> out_grads);
+      const std::vector<Gradient*>& in_grads, abslx::Span<Gradient*> out_grads);
 
   // Maps from tensor IDs to corresponding JVPs.
   std::unordered_map<int64_t, Gradient*> accumulated_gradients_;
@@ -684,7 +684,7 @@ Status GradientTape<Gradient, BackwardFunction, TapeTensor>::ComputeGradient(
     const gtl::ArraySlice<int64_t> target_tensor_ids,
     const gtl::ArraySlice<int64_t> source_tensor_ids,
     const std::unordered_map<int64_t, TapeTensor>& sources_that_are_targets,
-    gtl::ArraySlice<Gradient*> output_gradients, absl::Span<Gradient*> result,
+    gtl::ArraySlice<Gradient*> output_gradients, abslx::Span<Gradient*> result,
     bool build_default_zeros_grads) {
   std::unordered_set<int64_t> sources_set(source_tensor_ids.begin(),
                                           source_tensor_ids.end());
@@ -783,7 +783,7 @@ Status GradientTape<Gradient, BackwardFunction, TapeTensor>::ComputeGradient(
       Status s;
       s = vspace.CallBackwardFunction(trace.op_type, trace.backward_function,
                                       unneeded_gradients, out_gradients,
-                                      absl::MakeSpan(in_gradients));
+                                      abslx::MakeSpan(in_gradients));
       if (!persistent_) {
         trace.backward_function_deleter(trace.backward_function);
       }
@@ -925,7 +925,7 @@ ForwardAccumulator<Gradient, BackwardFunction, TapeTensor>::ForwardpropFromTape(
     const string& op_type, const std::vector<TapeTensor>& output_tensors,
     const std::function<BackwardFunction*()>& backward_function_getter,
     const std::function<void(BackwardFunction*)>& backward_function_deleter,
-    const std::vector<Gradient*>& in_grads, absl::Span<Gradient*> out_grads) {
+    const std::vector<Gradient*>& in_grads, abslx::Span<Gradient*> out_grads) {
   /* This function is approximately equivalent to this Python code:
 
   forwardprop_aids = tf.ones_like(output_tensors)
@@ -982,7 +982,7 @@ ForwardAccumulator<Gradient, BackwardFunction, TapeTensor>::ForwardpropFromTape(
                           backward_function_deleter);
     TF_RETURN_IF_ERROR(vspace_.CallBackwardFunction(
         op_type, backward_function.get(), unneeded_gradients, forwardprop_aids,
-        absl::MakeSpan(grad)));
+        abslx::MakeSpan(grad)));
   }
 
   // Stop the tape from recording
@@ -1088,7 +1088,7 @@ Status ForwardAccumulator<Gradient, BackwardFunction, TapeTensor>::Accumulate(
     forward_grads.resize(output_tensors.size());
     TF_RETURN_IF_ERROR(ForwardpropFromTape(
         op_type, output_tensors, backward_function_getter,
-        backward_function_deleter, in_grads, absl::MakeSpan(forward_grads)));
+        backward_function_deleter, in_grads, abslx::MakeSpan(forward_grads)));
   } else {
     TF_RETURN_IF_ERROR(
         (*forward_function)(in_grads, &forward_grads, use_batch_));

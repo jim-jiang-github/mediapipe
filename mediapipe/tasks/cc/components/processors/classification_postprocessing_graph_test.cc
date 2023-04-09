@@ -93,8 +93,8 @@ constexpr char kTimestampedClassificationsName[] =
     "timestamped_classifications";
 
 // Helper function to get ModelResources.
-absl::StatusOr<std::unique_ptr<ModelResources>> CreateModelResourcesForModel(
-    absl::string_view model_name) {
+abslx::StatusOr<std::unique_ptr<ModelResources>> CreateModelResourcesForModel(
+    abslx::string_view model_name) {
   auto external_file = std::make_unique<core::proto::ExternalFile>();
   external_file->set_file_name(JoinPath("./", kTestDataDirectory, model_name));
   return ModelResources::Create(kTestModelResourcesTag,
@@ -114,7 +114,7 @@ TEST_F(ConfigureTest, FailsWithInvalidMaxResults) {
   auto status = ConfigureClassificationPostprocessingGraph(
       *model_resources, options_in, &options_out);
 
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(), HasSubstr("Invalid `max_results` option"));
 }
 
@@ -130,7 +130,7 @@ TEST_F(ConfigureTest, FailsWithBothAllowlistAndDenylist) {
   auto status = ConfigureClassificationPostprocessingGraph(
       *model_resources, options_in, &options_out);
 
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(), HasSubstr("mutually exclusive options"));
 }
 
@@ -145,7 +145,7 @@ TEST_F(ConfigureTest, FailsWithAllowlistAndNoMetadata) {
   auto status = ConfigureClassificationPostprocessingGraph(
       *model_resources, options_in, &options_out);
 
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       status.message(),
       HasSubstr("requires labels to be present in the TFLite Model Metadata"));
@@ -419,8 +419,8 @@ TEST_F(ConfigureTest, SucceedsWithMultipleHeads) {
 
 class PostprocessingTest : public tflite_shims::testing::Test {
  protected:
-  absl::StatusOr<OutputStreamPoller> BuildGraph(
-      absl::string_view model_name, const proto::ClassifierOptions& options,
+  abslx::StatusOr<OutputStreamPoller> BuildGraph(
+      abslx::string_view model_name, const proto::ClassifierOptions& options,
       bool connect_timestamps = false) {
     ASSIGN_OR_RETURN(auto model_resources,
                      CreateModelResourcesForModel(model_name));
@@ -473,32 +473,32 @@ class PostprocessingTest : public tflite_shims::testing::Test {
     std::copy(tensor.begin(), tensor.end(), buffer);
   }
 
-  absl::Status Run(
+  abslx::Status Run(
       std::optional<std::vector<int>> aggregation_timestamps = std::nullopt,
       int timestamp = 0) {
     MP_RETURN_IF_ERROR(calculator_graph_.AddPacketToInputStream(
         kTensorsName, Adopt(tensors_.release()).At(Timestamp(timestamp))));
     // Reset tensors for future calls.
-    tensors_ = absl::make_unique<std::vector<Tensor>>();
+    tensors_ = abslx::make_unique<std::vector<Tensor>>();
     if (aggregation_timestamps.has_value()) {
-      auto packet = absl::make_unique<std::vector<Timestamp>>();
+      auto packet = abslx::make_unique<std::vector<Timestamp>>();
       for (const auto& timestamp : *aggregation_timestamps) {
         packet->emplace_back(Timestamp(timestamp));
       }
       MP_RETURN_IF_ERROR(calculator_graph_.AddPacketToInputStream(
           kTimestampsName, Adopt(packet.release()).At(Timestamp(timestamp))));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   template <typename T>
-  absl::StatusOr<T> GetResult(OutputStreamPoller& poller) {
+  abslx::StatusOr<T> GetResult(OutputStreamPoller& poller) {
     MP_RETURN_IF_ERROR(calculator_graph_.WaitUntilIdle());
     MP_RETURN_IF_ERROR(calculator_graph_.CloseAllInputStreams());
 
     Packet packet;
     if (!poller.Next(&packet)) {
-      return absl::InternalError("Unable to get output packet");
+      return abslx::InternalError("Unable to get output packet");
     }
     auto result = packet.Get<T>();
     MP_RETURN_IF_ERROR(calculator_graph_.WaitUntilDone());
@@ -508,7 +508,7 @@ class PostprocessingTest : public tflite_shims::testing::Test {
  private:
   CalculatorGraph calculator_graph_;
   std::unique_ptr<std::vector<Tensor>> tensors_ =
-      absl::make_unique<std::vector<Tensor>>();
+      abslx::make_unique<std::vector<Tensor>>();
 };
 
 TEST_F(PostprocessingTest, SucceedsWithoutMetadata) {

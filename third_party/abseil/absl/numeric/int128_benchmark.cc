@@ -41,8 +41,8 @@ std::vector<std::pair<T, T>> GetRandomClass128SampleUniformDivisor() {
   std::uniform_int_distribution<H> uniform_h;
   values.reserve(kSampleSize);
   for (size_t i = 0; i < kSampleSize; ++i) {
-    T a{absl::MakeUint128(uniform_h(random), uniform_h(random))};
-    T b{absl::MakeUint128(uniform_h(random), uniform_h(random))};
+    T a{abslx::MakeUint128(uniform_h(random), uniform_h(random))};
+    T b{abslx::MakeUint128(uniform_h(random), uniform_h(random))};
     values.emplace_back(std::max(a, b), std::max(T(2), std::min(a, b)));
   }
   return values;
@@ -57,8 +57,8 @@ void BM_DivideClass128UniformDivisor(benchmark::State& state) {
     }
   }
 }
-BENCHMARK_TEMPLATE(BM_DivideClass128UniformDivisor, absl::uint128);
-BENCHMARK_TEMPLATE(BM_DivideClass128UniformDivisor, absl::int128);
+BENCHMARK_TEMPLATE(BM_DivideClass128UniformDivisor, abslx::uint128);
+BENCHMARK_TEMPLATE(BM_DivideClass128UniformDivisor, abslx::int128);
 
 template <typename T>
 void BM_RemainderClass128UniformDivisor(benchmark::State& state) {
@@ -69,8 +69,8 @@ void BM_RemainderClass128UniformDivisor(benchmark::State& state) {
     }
   }
 }
-BENCHMARK_TEMPLATE(BM_RemainderClass128UniformDivisor, absl::uint128);
-BENCHMARK_TEMPLATE(BM_RemainderClass128UniformDivisor, absl::int128);
+BENCHMARK_TEMPLATE(BM_RemainderClass128UniformDivisor, abslx::uint128);
+BENCHMARK_TEMPLATE(BM_RemainderClass128UniformDivisor, abslx::int128);
 
 template <typename T,
           typename H = typename std::conditional<
@@ -81,7 +81,7 @@ std::vector<std::pair<T, H>> GetRandomClass128SampleSmallDivisor() {
   std::uniform_int_distribution<H> uniform_h;
   values.reserve(kSampleSize);
   for (size_t i = 0; i < kSampleSize; ++i) {
-    T a{absl::MakeUint128(uniform_h(random), uniform_h(random))};
+    T a{abslx::MakeUint128(uniform_h(random), uniform_h(random))};
     H b{std::max(H{2}, uniform_h(random))};
     values.emplace_back(std::max(a, T(b)), b);
   }
@@ -97,8 +97,8 @@ void BM_DivideClass128SmallDivisor(benchmark::State& state) {
     }
   }
 }
-BENCHMARK_TEMPLATE(BM_DivideClass128SmallDivisor, absl::uint128);
-BENCHMARK_TEMPLATE(BM_DivideClass128SmallDivisor, absl::int128);
+BENCHMARK_TEMPLATE(BM_DivideClass128SmallDivisor, abslx::uint128);
+BENCHMARK_TEMPLATE(BM_DivideClass128SmallDivisor, abslx::int128);
 
 template <typename T>
 void BM_RemainderClass128SmallDivisor(benchmark::State& state) {
@@ -109,18 +109,18 @@ void BM_RemainderClass128SmallDivisor(benchmark::State& state) {
     }
   }
 }
-BENCHMARK_TEMPLATE(BM_RemainderClass128SmallDivisor, absl::uint128);
-BENCHMARK_TEMPLATE(BM_RemainderClass128SmallDivisor, absl::int128);
+BENCHMARK_TEMPLATE(BM_RemainderClass128SmallDivisor, abslx::uint128);
+BENCHMARK_TEMPLATE(BM_RemainderClass128SmallDivisor, abslx::int128);
 
-std::vector<std::pair<absl::uint128, absl::uint128>> GetRandomClass128Sample() {
-  std::vector<std::pair<absl::uint128, absl::uint128>> values;
+std::vector<std::pair<abslx::uint128, abslx::uint128>> GetRandomClass128Sample() {
+  std::vector<std::pair<abslx::uint128, abslx::uint128>> values;
   std::mt19937 random = MakeRandomEngine();
   std::uniform_int_distribution<uint64_t> uniform_uint64;
   values.reserve(kSampleSize);
   for (size_t i = 0; i < kSampleSize; ++i) {
     values.emplace_back(
-        absl::MakeUint128(uniform_uint64(random), uniform_uint64(random)),
-        absl::MakeUint128(uniform_uint64(random), uniform_uint64(random)));
+        abslx::MakeUint128(uniform_uint64(random), uniform_uint64(random)),
+        abslx::MakeUint128(uniform_uint64(random), uniform_uint64(random)));
   }
   return values;
 }

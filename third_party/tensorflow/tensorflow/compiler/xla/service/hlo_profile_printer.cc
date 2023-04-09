@@ -29,14 +29,14 @@ std::string PrintHloProfile(
   std::string result;
 
   for (const auto& item : hlo_profile_printer_data.extra_metrics()) {
-    absl::StrAppend(&result, "Extra metric ", item.first, ": ",
+    abslx::StrAppend(&result, "Extra metric ", item.first, ": ",
                     counters[item.second], "\n");
   }
 
   for (const HloComputationInfo& computation_info :
        hlo_profile_printer_data.computation_infos()) {
     const auto& instruction_infos = computation_info.instruction_infos();
-    bool any_instruction_profiled = absl::c_any_of(
+    bool any_instruction_profiled = abslx::c_any_of(
         instruction_infos, [&](const HloInstructionInfo& instruction_info) {
           return counters[instruction_info.profile_index()] != 0;
         });

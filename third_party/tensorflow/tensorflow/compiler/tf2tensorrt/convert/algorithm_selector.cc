@@ -151,17 +151,17 @@ bool AlgorithmSelectorImpl::IsAlgorithmSelectorRequired() const {
 namespace {
 
 string FormatAlgorithmList(const nvinfer1::IAlgorithmContext& ctx,
-                           absl::Span<const nvinfer1::IAlgorithm* const> algs) {
-  return absl::StrFormat(
-      "%s:\n\t%s", absl::FormatStreamed(ctx),
-      absl::StrJoin(
+                           abslx::Span<const nvinfer1::IAlgorithm* const> algs) {
+  return abslx::StrFormat(
+      "%s:\n\t%s", abslx::FormatStreamed(ctx),
+      abslx::StrJoin(
           algs, "\n\t",
           [&ctx](std::string* out, const nvinfer1::IAlgorithm* const alg) {
-            absl::StrAppendFormat(out, "%s", absl::FormatStreamed(*alg));
+            abslx::StrAppendFormat(out, "%s", abslx::FormatStreamed(*alg));
             for (int i = 0; i < ctx.getNbInputs() + ctx.getNbOutputs(); i++) {
-              absl::StrAppendFormat(
+              abslx::StrAppendFormat(
                   out, "\n\t\t%s",
-                  absl::FormatStreamed(ALGORITHM_IO_INFO_BY_IDX(*alg, i)));
+                  abslx::FormatStreamed(ALGORITHM_IO_INFO_BY_IDX(*alg, i)));
             }
           }));
 }
@@ -223,15 +223,15 @@ int32_t TftrtAlgorithmSelector::selectAlgorithms(
 
   VLOG(1) << "Algorithm selection choices: "
           << FormatAlgorithmList(algoContext,
-                                 absl::MakeSpan(algoChoices, nbChoices));
+                                 abslx::MakeSpan(algoChoices, nbChoices));
 
   for (int i = 0; i < nbChoices; i++) {
     const nvinfer1::IAlgorithm& alg = *algoChoices[i];
 
     // Check layer-specific issues.
     if (!AlgorithmPolicy(algoContext, alg)) {
-      LOG(WARNING) << absl::StrFormat("Rejecting Algorithm: %s ",
-                                      absl::FormatStreamed(alg));
+      LOG(WARNING) << abslx::StrFormat("Rejecting Algorithm: %s ",
+                                      abslx::FormatStreamed(alg));
       continue;
     }
     selection[num_selections++] = i;
@@ -247,9 +247,9 @@ void TftrtAlgorithmSelector::reportAlgorithms(
   if (VLOG_IS_ON(1)) {
     string selection_msg = "Algorithms selected:\n";
     for (int i = 0; i < nbAlgorithms; i++) {
-      absl::StrAppend(&selection_msg,
+      abslx::StrAppend(&selection_msg,
                       FormatAlgorithmList(*algoContexts[i],
-                                          absl::MakeSpan(algoChoices + i, 1)));
+                                          abslx::MakeSpan(algoChoices + i, 1)));
     }
     VLOG(1) << selection_msg;
   }

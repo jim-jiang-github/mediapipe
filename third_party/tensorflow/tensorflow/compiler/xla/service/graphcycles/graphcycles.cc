@@ -44,12 +44,12 @@ namespace tensorflow {
 
 namespace {
 
-using NodeSet = absl::flat_hash_set<int32_t>;
+using NodeSet = abslx::flat_hash_set<int32_t>;
 using OrderedNodeSet = OrderedSet<int32_t>;
 
 template <typename T>
 struct VecStruct {
-  typedef absl::InlinedVector<T, 4> type;
+  typedef abslx::InlinedVector<T, 4> type;
 };
 template <typename T>
 using Vec = typename VecStruct<T>::type;
@@ -411,28 +411,28 @@ std::optional<int32_t> GraphCycles::ContractEdge(int32_t a, int32_t b) {
   return a;
 }
 
-absl::Span<const int32_t> GraphCycles::Successors(int32_t node) const {
+abslx::Span<const int32_t> GraphCycles::Successors(int32_t node) const {
   return rep_->nodes_[node]->out.GetSequence();
 }
 
-absl::Span<const int32_t> GraphCycles::Predecessors(int32_t node) const {
+abslx::Span<const int32_t> GraphCycles::Predecessors(int32_t node) const {
   return rep_->nodes_[node]->in.GetSequence();
 }
 
 std::vector<int32_t> GraphCycles::SuccessorsCopy(int32_t node) const {
-  absl::Span<const int32_t> successors = Successors(node);
+  abslx::Span<const int32_t> successors = Successors(node);
   return std::vector<int32_t>(successors.begin(), successors.end());
 }
 
 std::vector<int32_t> GraphCycles::PredecessorsCopy(int32_t node) const {
-  absl::Span<const int32_t> predecessors = Predecessors(node);
+  abslx::Span<const int32_t> predecessors = Predecessors(node);
   return std::vector<int32_t>(predecessors.begin(), predecessors.end());
 }
 
 namespace {
-void SortInPostOrder(absl::Span<Node* const> nodes,
+void SortInPostOrder(abslx::Span<Node* const> nodes,
                      std::vector<int32_t>* to_sort) {
-  absl::c_sort(*to_sort, [&](int32_t a, int32_t b) {
+  abslx::c_sort(*to_sort, [&](int32_t a, int32_t b) {
     DCHECK(a == b || nodes[a]->rank != nodes[b]->rank);
     return nodes[a]->rank > nodes[b]->rank;
   });
@@ -440,8 +440,8 @@ void SortInPostOrder(absl::Span<Node* const> nodes,
 }  // namespace
 
 std::vector<int32_t> GraphCycles::AllNodesInPostOrder() const {
-  absl::flat_hash_set<int32_t> free_nodes_set;
-  absl::c_copy(rep_->free_nodes_,
+  abslx::flat_hash_set<int32_t> free_nodes_set;
+  abslx::c_copy(rep_->free_nodes_,
                std::inserter(free_nodes_set, free_nodes_set.begin()));
 
   std::vector<int32_t> all_nodes;
@@ -457,7 +457,7 @@ std::vector<int32_t> GraphCycles::AllNodesInPostOrder() const {
 }
 
 std::string GraphCycles::DebugString() const {
-  absl::flat_hash_set<int32_t> free_nodes_set;
+  abslx::flat_hash_set<int32_t> free_nodes_set;
   for (int32_t free_node : rep_->free_nodes_) {
     free_nodes_set.insert(free_node);
   }
@@ -469,11 +469,11 @@ std::string GraphCycles::DebugString() const {
     }
 
     for (int32_t succ : rep_->nodes_[i]->out.GetSequence()) {
-      absl::StrAppend(&result, "  \"", i, "\" -> \"", succ, "\"\n");
+      abslx::StrAppend(&result, "  \"", i, "\" -> \"", succ, "\"\n");
     }
   }
 
-  absl::StrAppend(&result, "}\n");
+  abslx::StrAppend(&result, "}\n");
 
   return result;
 }

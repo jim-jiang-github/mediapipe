@@ -66,19 +66,19 @@ std::optional<ReductionKind> MatchReductionComputation(
 
 StatusOr<std::vector<int>> GetParticipatingIDs(
     int current_id, std::optional<int> total_participant_count,
-    absl::Span<const ReplicaGroup> groups) {
+    abslx::Span<const ReplicaGroup> groups) {
   // Empty replica_groups() means that all replicas participate.
   if (groups.empty()) {
     TF_RET_CHECK(total_participant_count.has_value());
     std::vector<int> all_participants(*total_participant_count);
-    absl::c_iota(all_participants, 0);
+    abslx::c_iota(all_participants, 0);
     return all_participants;
   }
 
   // Figure out the other replicas that go together with this one.
   std::optional<ReplicaGroup> group;
   for (const ReplicaGroup& g : groups) {
-    if (absl::c_linear_search(g.replica_ids(), current_id)) {
+    if (abslx::c_linear_search(g.replica_ids(), current_id)) {
       TF_RET_CHECK(!group.has_value())
           << "ID " << current_id << " appears twice in replica groups";
       group = g;
@@ -112,7 +112,7 @@ StatusOr<CollectiveOpGroupMode> GetCollectiveOpGroupMode(
   }
 }
 
-absl::string_view CollectiveOpGroupModeToString(
+abslx::string_view CollectiveOpGroupModeToString(
     CollectiveOpGroupMode group_mode) {
   switch (group_mode) {
     case CollectiveOpGroupMode::kCrossReplica:
@@ -128,7 +128,7 @@ absl::string_view CollectiveOpGroupModeToString(
 
 StatusOr<std::vector<std::vector<GlobalDeviceId>>>
 GetParticipatingDevicesGroups(const DeviceAssignment& device_assignment,
-                              absl::Span<const ReplicaGroup> replica_groups,
+                              abslx::Span<const ReplicaGroup> replica_groups,
                               CollectiveOpGroupMode group_mode) {
   int replica_count = device_assignment.replica_count();
   int partition_count = device_assignment.computation_count();
@@ -237,7 +237,7 @@ GetParticipatingDevicesGroups(const DeviceAssignment& device_assignment,
 
 StatusOr<std::vector<GlobalDeviceId>> GetParticipatingDevices(
     GlobalDeviceId device_id, const DeviceAssignment& device_assignment,
-    absl::Span<const ReplicaGroup> replica_groups,
+    abslx::Span<const ReplicaGroup> replica_groups,
     CollectiveOpGroupMode group_mode) {
   int replica_count = device_assignment.replica_count();
   int partition_count = device_assignment.computation_count();
@@ -326,8 +326,8 @@ StatusOr<std::vector<GlobalDeviceId>> GetParticipatingDevices(
   }
 }
 
-bool ReplicaGroupsOrthogonal(absl::Span<const ReplicaGroup> first,
-                             absl::Span<const ReplicaGroup> second) {
+bool ReplicaGroupsOrthogonal(abslx::Span<const ReplicaGroup> first,
+                             abslx::Span<const ReplicaGroup> second) {
   if (first.size() != second[0].replica_ids_size()) {
     return false;
   }

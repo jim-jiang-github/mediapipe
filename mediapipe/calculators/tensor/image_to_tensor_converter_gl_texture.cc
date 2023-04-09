@@ -47,11 +47,11 @@ constexpr int kNumAttributes = 2;
 
 class GlProcessor : public ImageToTensorConverter {
  public:
-  absl::Status Init(CalculatorContext* cc, bool input_starts_at_bottom,
+  abslx::Status Init(CalculatorContext* cc, bool input_starts_at_bottom,
                     BorderMode border_mode) {
     MP_RETURN_IF_ERROR(gl_helper_.Open(cc));
     return gl_helper_.RunInGlContext([this, input_starts_at_bottom,
-                                      border_mode]() -> absl::Status {
+                                      border_mode]() -> abslx::Status {
       use_custom_zero_border_ =
           border_mode == BorderMode::kZero &&
           !IsGlClampToBorderSupported(gl_helper_.GetGlContext());
@@ -122,7 +122,7 @@ class GlProcessor : public ImageToTensorConverter {
 
       // Create program and set parameters.
       const std::string extract_sub_rect_vertex_src =
-          absl::StrCat(mediapipe::kMediaPipeVertexShaderPreamble,
+          abslx::StrCat(mediapipe::kMediaPipeVertexShaderPreamble,
                        starts_at_bottom_def, kExtractSubRectVertexShader);
 
       std::string custom_zero_border_mode_def;
@@ -132,7 +132,7 @@ class GlProcessor : public ImageToTensorConverter {
         )";
       }
       const std::string extract_sub_rect_frag_src =
-          absl::StrCat(mediapipe::kMediaPipeFragmentShaderPreamble,
+          abslx::StrCat(mediapipe::kMediaPipeFragmentShaderPreamble,
                        custom_zero_border_mode_def, kExtractSubRectFragBody);
       mediapipe::GlhCreateProgram(extract_sub_rect_vertex_src.c_str(),
                                   extract_sub_rect_frag_src.c_str(),
@@ -164,11 +164,11 @@ class GlProcessor : public ImageToTensorConverter {
 
       glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-      return absl::OkStatus();
+      return abslx::OkStatus();
     });
   }
 
-  absl::Status Convert(const mediapipe::Image& input, const RotatedRect& roi,
+  abslx::Status Convert(const mediapipe::Image& input, const RotatedRect& roi,
                        float range_min, float range_max,
                        int tensor_buffer_offset,
                        Tensor& output_tensor) override {
@@ -176,7 +176,7 @@ class GlProcessor : public ImageToTensorConverter {
         input.format() != mediapipe::GpuBufferFormat::kRGBAHalf64 &&
         input.format() != mediapipe::GpuBufferFormat::kRGBAFloat128 &&
         input.format() != mediapipe::GpuBufferFormat::kRGB24) {
-      return InvalidArgumentError(absl::StrCat(
+      return InvalidArgumentError(abslx::StrCat(
           "Unsupported format: ", static_cast<uint32_t>(input.format())));
     }
     // TODO: support tensor_buffer_offset > 0 scenario.
@@ -187,7 +187,7 @@ class GlProcessor : public ImageToTensorConverter {
 
     MP_RETURN_IF_ERROR(gl_helper_.RunInGlContext(
         [this, &output_tensor, &input, &roi, &output_shape, range_min,
-         range_max]() -> absl::Status {
+         range_max]() -> abslx::Status {
           auto input_texture = gl_helper_.CreateSourceTexture(input);
 
           constexpr float kInputImageRangeMin = 0.0f;
@@ -201,13 +201,13 @@ class GlProcessor : public ImageToTensorConverter {
                                             /*flip_horizontaly=*/false,
                                             transform.scale, transform.offset,
                                             output_shape, &tensor_view));
-          return absl::OkStatus();
+          return abslx::OkStatus();
         }));
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status ExtractSubRect(const mediapipe::GlTexture& texture,
+  abslx::Status ExtractSubRect(const mediapipe::GlTexture& texture,
                               const RotatedRect& sub_rect,
                               bool flip_horizontaly, float alpha, float beta,
                               const Tensor::Shape& output_shape,
@@ -304,7 +304,7 @@ class GlProcessor : public ImageToTensorConverter {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   ~GlProcessor() override {
@@ -318,7 +318,7 @@ class GlProcessor : public ImageToTensorConverter {
   }
 
  private:
-  absl::Status ValidateTensorShape(const Tensor::Shape& output_shape) {
+  abslx::Status ValidateTensorShape(const Tensor::Shape& output_shape) {
     RET_CHECK_EQ(output_shape.dims.size(), 4)
         << "Wrong output dims size: " << output_shape.dims.size();
     RET_CHECK_EQ(output_shape.dims[0], 1)
@@ -326,7 +326,7 @@ class GlProcessor : public ImageToTensorConverter {
            "converter.";
     RET_CHECK_EQ(output_shape.dims[3], 3)
         << "Wrong output channel: " << output_shape.dims[3];
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   mediapipe::GlCalculatorHelper gl_helper_;
@@ -343,11 +343,11 @@ class GlProcessor : public ImageToTensorConverter {
 
 }  // namespace
 
-absl::StatusOr<std::unique_ptr<ImageToTensorConverter>>
+abslx::StatusOr<std::unique_ptr<ImageToTensorConverter>>
 CreateImageToGlTextureTensorConverter(CalculatorContext* cc,
                                       bool input_starts_at_bottom,
                                       BorderMode border_mode) {
-  auto result = absl::make_unique<GlProcessor>();
+  auto result = abslx::make_unique<GlProcessor>();
   MP_RETURN_IF_ERROR(result->Init(cc, input_starts_at_bottom, border_mode));
   return result;
 }

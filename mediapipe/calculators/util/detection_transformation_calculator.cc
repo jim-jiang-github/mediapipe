@@ -38,7 +38,7 @@ T BoundedValue(T value, T upper_bound) {
   return output;
 }
 
-absl::Status ConvertRelativeBoundingBoxToBoundingBox(
+abslx::Status ConvertRelativeBoundingBoxToBoundingBox(
     const std::pair<int, int>& image_size, Detection* detection) {
   const int image_width = image_size.first;
   const int image_height = image_size.second;
@@ -55,10 +55,10 @@ absl::Status ConvertRelativeBoundingBoxToBoundingBox(
       BoundedValue<int>(relative_bbox.height() * image_height, image_height));
   detection->mutable_location_data()->set_format(LocationData::BOUNDING_BOX);
   detection->mutable_location_data()->clear_relative_bounding_box();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConvertBoundingBoxToRelativeBoundingBox(
+abslx::Status ConvertBoundingBoxToRelativeBoundingBox(
     const std::pair<int, int>& image_size, Detection* detection) {
   int image_width = image_size.first;
   int image_height = image_size.second;
@@ -76,13 +76,13 @@ absl::Status ConvertBoundingBoxToRelativeBoundingBox(
   detection->mutable_location_data()->clear_bounding_box();
   detection->mutable_location_data()->set_format(
       LocationData::RELATIVE_BOUNDING_BOX);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::StatusOr<LocationData::Format> GetLocationDataFormat(
+abslx::StatusOr<LocationData::Format> GetLocationDataFormat(
     const Detection& detection) {
   if (!detection.has_location_data()) {
-    return absl::InvalidArgumentError("Detection must have location data.");
+    return abslx::InvalidArgumentError("Detection must have location data.");
   }
   LocationData::Format format = detection.location_data().format();
   RET_CHECK(format == LocationData::RELATIVE_BOUNDING_BOX ||
@@ -92,7 +92,7 @@ absl::StatusOr<LocationData::Format> GetLocationDataFormat(
   return format;
 }
 
-absl::StatusOr<LocationData::Format> GetLocationDataFormat(
+abslx::StatusOr<LocationData::Format> GetLocationDataFormat(
     std::vector<Detection>& detections) {
   RET_CHECK(!detections.empty());
   LocationData::Format output_format;
@@ -101,17 +101,17 @@ absl::StatusOr<LocationData::Format> GetLocationDataFormat(
     ASSIGN_OR_RETURN(LocationData::Format format,
                      GetLocationDataFormat(detections[i]));
     if (output_format != format) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Input detections have different location data formats.");
     }
   }
   return output_format;
 }
 
-absl::Status ConvertBoundingBox(const std::pair<int, int>& image_size,
+abslx::Status ConvertBoundingBox(const std::pair<int, int>& image_size,
                                 Detection* detection) {
   if (!detection->has_location_data()) {
-    return absl::InvalidArgumentError("Detection must have location data.");
+    return abslx::InvalidArgumentError("Detection must have location data.");
   }
   switch (detection->location_data().format()) {
     case LocationData::RELATIVE_BOUNDING_BOX:
@@ -119,7 +119,7 @@ absl::Status ConvertBoundingBox(const std::pair<int, int>& image_size,
     case LocationData::BOUNDING_BOX:
       return ConvertBoundingBoxToRelativeBoundingBox(image_size, detection);
     default:
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Detection's location data format must be either "
           "RELATIVE_BOUNDING_BOX or BOUNDING_BOX.");
   }
@@ -189,7 +189,7 @@ class DetectionTransformationCalculator : public Node {
                           kOutPixelDetectionList, kOutRelativeDetection,
                           kOutRelativeDetections, kOutRelativeDetectionList);
 
-  static absl::Status UpdateContract(CalculatorContract* cc) {
+  static abslx::Status UpdateContract(CalculatorContract* cc) {
     RET_CHECK(kInImageSize(cc).IsConnected()) << "Image size must be provided.";
     RET_CHECK(kInDetections(cc).IsConnected() ^ kInDetection(cc).IsConnected());
     if (kInDetections(cc).IsConnected()) {
@@ -206,10 +206,10 @@ class DetectionTransformationCalculator : public Node {
               kOutRelativeDetectionList(cc).IsConnected() ||
               kOutRelativeDetection(cc).IsConnected())
         << "Must connect at least one output stream.";
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     output_pixel_bounding_boxes_ = kOutPixelDetections(cc).IsConnected() ||
                                    kOutPixelDetectionList(cc).IsConnected() ||
                                    kOutPixelDetection(cc).IsConnected();
@@ -220,10 +220,10 @@ class DetectionTransformationCalculator : public Node {
     RET_CHECK(output_pixel_bounding_boxes_ ^ output_relative_bounding_boxes_)
         << "All output streams must have the same stream tag prefix, either "
            "\"PIXEL\" or \"RELATIVE_\".";
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     std::pair<int, int> image_size = kInImageSize(cc).Get();
     std::vector<Detection> transformed_detections;
     LocationData::Format input_location_data_format;
@@ -238,7 +238,7 @@ class DetectionTransformationCalculator : public Node {
           });
       if (transformed_detections.empty()) {
         OutputEmptyDetections(cc);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
       ASSIGN_OR_RETURN(input_location_data_format,
                        GetLocationDataFormat(transformed_detections));
@@ -249,7 +249,7 @@ class DetectionTransformationCalculator : public Node {
       Detection transformed_detection(kInDetection(cc).Get());
       if (!transformed_detection.has_location_data()) {
         OutputEmptyDetections(cc);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
       ASSIGN_OR_RETURN(input_location_data_format,
                        GetLocationDataFormat(kInDetection(cc).Get()));
@@ -292,7 +292,7 @@ class DetectionTransformationCalculator : public Node {
         kOutRelativeDetectionList(cc).Send(detection_list);
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

@@ -50,7 +50,7 @@ class StringUpperOp : public OpKernel {
     if (encoding_.empty()) {
       for (int64_t i = 0; i < input.size(); ++i) {
         StringPiece entry(input(i));
-        output(i) = absl::AsciiStrToUpper(entry);
+        output(i) = abslx::AsciiStrToUpper(entry);
       }
     } else {
       // The validation of utf-8 has already been done in GetAttr above.

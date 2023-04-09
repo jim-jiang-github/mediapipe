@@ -33,34 +33,34 @@
 
 namespace {
 
-using absl::strings_internal::Pow10;
+using abslx::strings_internal::Pow10;
 
 #if ABSL_COMPILER_DOES_EXACT_ROUNDING
 
-// Tests that the given string is accepted by absl::from_chars, and that it
+// Tests that the given string is accepted by abslx::from_chars, and that it
 // converts exactly equal to the given number.
-void TestDoubleParse(absl::string_view str, double expected_number) {
+void TestDoubleParse(abslx::string_view str, double expected_number) {
   SCOPED_TRACE(str);
   double actual_number = 0.0;
-  absl::from_chars_result result =
-      absl::from_chars(str.data(), str.data() + str.length(), actual_number);
+  abslx::from_chars_result result =
+      abslx::from_chars(str.data(), str.data() + str.length(), actual_number);
   EXPECT_EQ(result.ec, std::errc());
   EXPECT_EQ(result.ptr, str.data() + str.length());
   EXPECT_EQ(actual_number, expected_number);
 }
 
-void TestFloatParse(absl::string_view str, float expected_number) {
+void TestFloatParse(abslx::string_view str, float expected_number) {
   SCOPED_TRACE(str);
   float actual_number = 0.0;
-  absl::from_chars_result result =
-      absl::from_chars(str.data(), str.data() + str.length(), actual_number);
+  abslx::from_chars_result result =
+      abslx::from_chars(str.data(), str.data() + str.length(), actual_number);
   EXPECT_EQ(result.ec, std::errc());
   EXPECT_EQ(result.ptr, str.data() + str.length());
   EXPECT_EQ(actual_number, expected_number);
 }
 
 // Tests that the given double or single precision floating point literal is
-// parsed correctly by absl::from_chars.
+// parsed correctly by abslx::from_chars.
 //
 // These convenience macros assume that the C++ compiler being used also does
 // fully correct decimal-to-binary conversions.
@@ -158,15 +158,15 @@ TEST(FromChars, NearRoundingCases) {
 #undef FROM_CHARS_TEST_FLOAT
 #endif
 
-float ToFloat(absl::string_view s) {
+float ToFloat(abslx::string_view s) {
   float f;
-  absl::from_chars(s.data(), s.data() + s.size(), f);
+  abslx::from_chars(s.data(), s.data() + s.size(), f);
   return f;
 }
 
-double ToDouble(absl::string_view s) {
+double ToDouble(abslx::string_view s) {
   double d;
-  absl::from_chars(s.data(), s.data() + s.size(), d);
+  abslx::from_chars(s.data(), s.data() + s.size(), d);
   return d;
 }
 
@@ -273,22 +273,22 @@ void TestHalfwayValue(const std::string& mantissa, int exponent,
                       FloatType expected_half) {
   std::string low_rep = mantissa;
   low_rep[low_rep.size() - 1] -= 1;
-  absl::StrAppend(&low_rep, std::string(1000, '9'), "e", exponent);
+  abslx::StrAppend(&low_rep, std::string(1000, '9'), "e", exponent);
 
   FloatType actual_low = 0;
-  absl::from_chars(low_rep.data(), low_rep.data() + low_rep.size(), actual_low);
+  abslx::from_chars(low_rep.data(), low_rep.data() + low_rep.size(), actual_low);
   EXPECT_EQ(expected_low, actual_low);
 
   std::string high_rep =
-      absl::StrCat(mantissa, std::string(1000, '0'), "1e", exponent);
+      abslx::StrCat(mantissa, std::string(1000, '0'), "1e", exponent);
   FloatType actual_high = 0;
-  absl::from_chars(high_rep.data(), high_rep.data() + high_rep.size(),
+  abslx::from_chars(high_rep.data(), high_rep.data() + high_rep.size(),
                    actual_high);
   EXPECT_EQ(expected_high, actual_high);
 
-  std::string halfway_rep = absl::StrCat(mantissa, "e", exponent);
+  std::string halfway_rep = abslx::StrCat(mantissa, "e", exponent);
   FloatType actual_half = 0;
-  absl::from_chars(halfway_rep.data(), halfway_rep.data() + halfway_rep.size(),
+  abslx::from_chars(halfway_rep.data(), halfway_rep.data() + halfway_rep.size(),
                    actual_half);
   EXPECT_EQ(expected_half, actual_half);
 }
@@ -436,19 +436,19 @@ TEST(FromChars, Underflow) {
   // in DR 3081.
   double d;
   float f;
-  absl::from_chars_result result;
+  abslx::from_chars_result result;
 
   std::string negative_underflow = "-1e-1000";
   const char* begin = negative_underflow.data();
   const char* end = begin + negative_underflow.size();
   d = 100.0;
-  result = absl::from_chars(begin, end, d);
+  result = abslx::from_chars(begin, end, d);
   EXPECT_EQ(result.ptr, end);
   EXPECT_EQ(result.ec, std::errc::result_out_of_range);
   EXPECT_TRUE(std::signbit(d));  // negative
   EXPECT_GE(d, -std::numeric_limits<double>::min());
   f = 100.0;
-  result = absl::from_chars(begin, end, f);
+  result = abslx::from_chars(begin, end, f);
   EXPECT_EQ(result.ptr, end);
   EXPECT_EQ(result.ec, std::errc::result_out_of_range);
   EXPECT_TRUE(std::signbit(f));  // negative
@@ -458,13 +458,13 @@ TEST(FromChars, Underflow) {
   begin = positive_underflow.data();
   end = begin + positive_underflow.size();
   d = -100.0;
-  result = absl::from_chars(begin, end, d);
+  result = abslx::from_chars(begin, end, d);
   EXPECT_EQ(result.ptr, end);
   EXPECT_EQ(result.ec, std::errc::result_out_of_range);
   EXPECT_FALSE(std::signbit(d));  // positive
   EXPECT_LE(d, std::numeric_limits<double>::min());
   f = -100.0;
-  result = absl::from_chars(begin, end, f);
+  result = abslx::from_chars(begin, end, f);
   EXPECT_EQ(result.ptr, end);
   EXPECT_EQ(result.ec, std::errc::result_out_of_range);
   EXPECT_FALSE(std::signbit(f));  // positive
@@ -476,19 +476,19 @@ TEST(FromChars, Overflow) {
   // in DR 3081.
   double d;
   float f;
-  absl::from_chars_result result;
+  abslx::from_chars_result result;
 
   std::string negative_overflow = "-1e1000";
   const char* begin = negative_overflow.data();
   const char* end = begin + negative_overflow.size();
   d = 100.0;
-  result = absl::from_chars(begin, end, d);
+  result = abslx::from_chars(begin, end, d);
   EXPECT_EQ(result.ptr, end);
   EXPECT_EQ(result.ec, std::errc::result_out_of_range);
   EXPECT_TRUE(std::signbit(d));  // negative
   EXPECT_EQ(d, -std::numeric_limits<double>::max());
   f = 100.0;
-  result = absl::from_chars(begin, end, f);
+  result = abslx::from_chars(begin, end, f);
   EXPECT_EQ(result.ptr, end);
   EXPECT_EQ(result.ec, std::errc::result_out_of_range);
   EXPECT_TRUE(std::signbit(f));  // negative
@@ -498,13 +498,13 @@ TEST(FromChars, Overflow) {
   begin = positive_overflow.data();
   end = begin + positive_overflow.size();
   d = -100.0;
-  result = absl::from_chars(begin, end, d);
+  result = abslx::from_chars(begin, end, d);
   EXPECT_EQ(result.ptr, end);
   EXPECT_EQ(result.ec, std::errc::result_out_of_range);
   EXPECT_FALSE(std::signbit(d));  // positive
   EXPECT_EQ(d, std::numeric_limits<double>::max());
   f = -100.0;
-  result = absl::from_chars(begin, end, f);
+  result = abslx::from_chars(begin, end, f);
   EXPECT_EQ(result.ptr, end);
   EXPECT_EQ(result.ec, std::errc::result_out_of_range);
   EXPECT_FALSE(std::signbit(f));  // positive
@@ -512,9 +512,9 @@ TEST(FromChars, Overflow) {
 }
 
 TEST(FromChars, RegressionTestsFromFuzzer) {
-  absl::string_view src = "0x21900000p00000000099";
+  abslx::string_view src = "0x21900000p00000000099";
   float f;
-  auto result = absl::from_chars(src.data(), src.data() + src.size(), f);
+  auto result = abslx::from_chars(src.data(), src.data() + src.size(), f);
   EXPECT_EQ(result.ec, std::errc::result_out_of_range);
 }
 
@@ -522,27 +522,27 @@ TEST(FromChars, ReturnValuePtr) {
   // Check that `ptr` points one past the number scanned, even if that number
   // is not representable.
   double d;
-  absl::from_chars_result result;
+  abslx::from_chars_result result;
 
   std::string normal = "3.14@#$%@#$%";
-  result = absl::from_chars(normal.data(), normal.data() + normal.size(), d);
+  result = abslx::from_chars(normal.data(), normal.data() + normal.size(), d);
   EXPECT_EQ(result.ec, std::errc());
   EXPECT_EQ(result.ptr - normal.data(), 4);
 
   std::string overflow = "1e1000@#$%@#$%";
-  result = absl::from_chars(overflow.data(),
+  result = abslx::from_chars(overflow.data(),
                             overflow.data() + overflow.size(), d);
   EXPECT_EQ(result.ec, std::errc::result_out_of_range);
   EXPECT_EQ(result.ptr - overflow.data(), 6);
 
   std::string garbage = "#$%@#$%";
-  result = absl::from_chars(garbage.data(),
+  result = abslx::from_chars(garbage.data(),
                             garbage.data() + garbage.size(), d);
   EXPECT_EQ(result.ec, std::errc::invalid_argument);
   EXPECT_EQ(result.ptr - garbage.data(), 0);
 }
 
-// Check for a wide range of inputs that strtod() and absl::from_chars() exactly
+// Check for a wide range of inputs that strtod() and abslx::from_chars() exactly
 // agree on the conversion amount.
 //
 // This test assumes the platform's strtod() uses perfect round_to_nearest
@@ -550,17 +550,17 @@ TEST(FromChars, ReturnValuePtr) {
 TEST(FromChars, TestVersusStrtod) {
   for (int mantissa = 1000000; mantissa <= 9999999; mantissa += 501) {
     for (int exponent = -300; exponent < 300; ++exponent) {
-      std::string candidate = absl::StrCat(mantissa, "e", exponent);
+      std::string candidate = abslx::StrCat(mantissa, "e", exponent);
       double strtod_value = strtod(candidate.c_str(), nullptr);
       double absl_value = 0;
-      absl::from_chars(candidate.data(), candidate.data() + candidate.size(),
+      abslx::from_chars(candidate.data(), candidate.data() + candidate.size(),
                        absl_value);
       ASSERT_EQ(strtod_value, absl_value) << candidate;
     }
   }
 }
 
-// Check for a wide range of inputs that strtof() and absl::from_chars() exactly
+// Check for a wide range of inputs that strtof() and abslx::from_chars() exactly
 // agree on the conversion amount.
 //
 // This test assumes the platform's strtof() uses perfect round_to_nearest
@@ -568,10 +568,10 @@ TEST(FromChars, TestVersusStrtod) {
 TEST(FromChars, TestVersusStrtof) {
   for (int mantissa = 1000000; mantissa <= 9999999; mantissa += 501) {
     for (int exponent = -43; exponent < 32; ++exponent) {
-      std::string candidate = absl::StrCat(mantissa, "e", exponent);
+      std::string candidate = abslx::StrCat(mantissa, "e", exponent);
       float strtod_value = strtof(candidate.c_str(), nullptr);
       float absl_value = 0;
-      absl::from_chars(candidate.data(), candidate.data() + candidate.size(),
+      abslx::from_chars(candidate.data(), candidate.data() + candidate.size(),
                        absl_value);
       ASSERT_EQ(strtod_value, absl_value) << candidate;
     }
@@ -597,10 +597,10 @@ TEST(FromChars, NaNDoubles) {
        {"", "1", "2", "3", "fff", "FFF", "200000", "400000", "4000000000000",
         "8000000000000", "abc123", "legal_but_unexpected",
         "99999999999999999999999", "_"}) {
-    std::string input = absl::StrCat("nan(", n_char_sequence, ")");
+    std::string input = abslx::StrCat("nan(", n_char_sequence, ")");
     SCOPED_TRACE(input);
     double from_chars_double;
-    absl::from_chars(input.data(), input.data() + input.size(),
+    abslx::from_chars(input.data(), input.data() + input.size(),
                      from_chars_double);
     double std_nan_double = std::nan(n_char_sequence.c_str());
     EXPECT_TRUE(Identical(from_chars_double, std_nan_double));
@@ -615,7 +615,7 @@ TEST(FromChars, NaNDoubles) {
     // Check that we can parse a negative NaN
     std::string negative_input = "-" + input;
     double negative_from_chars_double;
-    absl::from_chars(negative_input.data(),
+    abslx::from_chars(negative_input.data(),
                      negative_input.data() + negative_input.size(),
                      negative_from_chars_double);
     EXPECT_TRUE(std::signbit(negative_from_chars_double));
@@ -630,10 +630,10 @@ TEST(FromChars, NaNFloats) {
        {"", "1", "2", "3", "fff", "FFF", "200000", "400000", "4000000000000",
         "8000000000000", "abc123", "legal_but_unexpected",
         "99999999999999999999999", "_"}) {
-    std::string input = absl::StrCat("nan(", n_char_sequence, ")");
+    std::string input = abslx::StrCat("nan(", n_char_sequence, ")");
     SCOPED_TRACE(input);
     float from_chars_float;
-    absl::from_chars(input.data(), input.data() + input.size(),
+    abslx::from_chars(input.data(), input.data() + input.size(),
                      from_chars_float);
     float std_nan_float = std::nanf(n_char_sequence.c_str());
     EXPECT_TRUE(Identical(from_chars_float, std_nan_float));
@@ -648,7 +648,7 @@ TEST(FromChars, NaNFloats) {
     // Check that we can parse a negative NaN
     std::string negative_input = "-" + input;
     float negative_from_chars_float;
-    absl::from_chars(negative_input.data(),
+    abslx::from_chars(negative_input.data(),
                      negative_input.data() + negative_input.size(),
                      negative_from_chars_float);
     EXPECT_TRUE(std::signbit(negative_from_chars_float));
@@ -690,10 +690,10 @@ void TestOverflowAndUnderflow(
     Float expected = expected_generator(index);
     Float actual;
     auto result =
-        absl::from_chars(input.data(), input.data() + input.size(), actual);
+        abslx::from_chars(input.data(), input.data() + input.size(), actual);
     EXPECT_EQ(result.ec, std::errc());
     EXPECT_EQ(expected, actual)
-        << absl::StrFormat("%a vs %a", expected, actual);
+        << abslx::StrFormat("%a vs %a", expected, actual);
   }
   // test legal values near upper_bound
   for (index = upper_bound, step = 1; index > lower_bound;
@@ -703,10 +703,10 @@ void TestOverflowAndUnderflow(
     Float expected = expected_generator(index);
     Float actual;
     auto result =
-        absl::from_chars(input.data(), input.data() + input.size(), actual);
+        abslx::from_chars(input.data(), input.data() + input.size(), actual);
     EXPECT_EQ(result.ec, std::errc());
     EXPECT_EQ(expected, actual)
-        << absl::StrFormat("%a vs %a", expected, actual);
+        << abslx::StrFormat("%a vs %a", expected, actual);
   }
   // Test underflow values below lower_bound
   for (index = lower_bound - 1, step = 1; index > -1000000;
@@ -715,7 +715,7 @@ void TestOverflowAndUnderflow(
     SCOPED_TRACE(input);
     Float actual;
     auto result =
-        absl::from_chars(input.data(), input.data() + input.size(), actual);
+        abslx::from_chars(input.data(), input.data() + input.size(), actual);
     EXPECT_EQ(result.ec, std::errc::result_out_of_range);
     EXPECT_LT(actual, 1.0);  // check for underflow
   }
@@ -726,7 +726,7 @@ void TestOverflowAndUnderflow(
     SCOPED_TRACE(input);
     Float actual;
     auto result =
-        absl::from_chars(input.data(), input.data() + input.size(), actual);
+        abslx::from_chars(input.data(), input.data() + input.size(), actual);
     EXPECT_EQ(result.ec, std::errc::result_out_of_range);
     EXPECT_GT(actual, 1.0);  // check for overflow
   }
@@ -739,7 +739,7 @@ void TestOverflowAndUnderflow(
 // 0x1p-1074.  Therefore 1023 and -1074 are the limits of acceptable exponents
 // in this test.
 TEST(FromChars, HexdecimalDoubleLimits) {
-  auto input_gen = [](int index) { return absl::StrCat("0x1.0p", index); };
+  auto input_gen = [](int index) { return abslx::StrCat("0x1.0p", index); };
   auto expected_gen = [](int index) { return std::ldexp(1.0, index); };
   TestOverflowAndUnderflow<double>(input_gen, expected_gen, -1074, 1023);
 }
@@ -750,7 +750,7 @@ TEST(FromChars, HexdecimalDoubleLimits) {
 // representable subnormal is 0x0.000002p-126, which equals 0x1p-149.
 // Therefore 127 and -149 are the limits of acceptable exponents in this test.
 TEST(FromChars, HexdecimalFloatLimits) {
-  auto input_gen = [](int index) { return absl::StrCat("0x1.0p", index); };
+  auto input_gen = [](int index) { return abslx::StrCat("0x1.0p", index); };
   auto expected_gen = [](int index) { return std::ldexp(1.0f, index); };
   TestOverflowAndUnderflow<float>(input_gen, expected_gen, -149, 127);
 }
@@ -762,7 +762,7 @@ TEST(FromChars, HexdecimalFloatLimits) {
 // the smallest representable positive value.  -323 and 308 are the limits of
 // acceptable exponents in this test.
 TEST(FromChars, DecimalDoubleLimits) {
-  auto input_gen = [](int index) { return absl::StrCat("1.0e", index); };
+  auto input_gen = [](int index) { return abslx::StrCat("1.0e", index); };
   auto expected_gen = [](int index) { return Pow10(index); };
   TestOverflowAndUnderflow<double>(input_gen, expected_gen, -323, 308);
 }
@@ -774,7 +774,7 @@ TEST(FromChars, DecimalDoubleLimits) {
 // the smallest representable positive value.  -45 and 38 are the limits of
 // acceptable exponents in this test.
 TEST(FromChars, DecimalFloatLimits) {
-  auto input_gen = [](int index) { return absl::StrCat("1.0e", index); };
+  auto input_gen = [](int index) { return abslx::StrCat("1.0e", index); };
   auto expected_gen = [](int index) { return Pow10(index); };
   TestOverflowAndUnderflow<float>(input_gen, expected_gen, -45, 38);
 }

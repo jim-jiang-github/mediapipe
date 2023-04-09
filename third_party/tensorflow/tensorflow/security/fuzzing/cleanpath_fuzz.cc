@@ -30,9 +30,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   std::string clean_path = tensorflow::io::CleanPath(input_path);
 
   // Assert there are no '/./' no directory changes.
-  assert(!absl::StrContains(clean_path, "/./"));
+  assert(!abslx::StrContains(clean_path, "/./"));
   // Assert there are no duplicate '/'.
-  assert(!absl::StrContains(clean_path, "//"));
+  assert(!abslx::StrContains(clean_path, "//"));
   // Assert there are no higher up directories after entering a directory.
   std::regex higher_up_directory("[^.]{1}/[.]{2}");
   assert(!std::regex_match(clean_path, higher_up_directory));

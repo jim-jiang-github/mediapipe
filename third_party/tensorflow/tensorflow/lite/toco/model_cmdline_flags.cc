@@ -218,7 +218,7 @@ void ReadModelFlagsFromCommandLineFlags(
 
   if (parsed_model_flags.output_arrays.specified()) {
     std::vector<std::string> output_arrays =
-        absl::StrSplit(parsed_model_flags.output_arrays.value(), ',');
+        abslx::StrSplit(parsed_model_flags.output_arrays.value(), ',');
     for (const std::string& output_array : output_arrays) {
       model_flags->add_output_arrays(output_array);
     }
@@ -250,7 +250,7 @@ void ReadModelFlagsFromCommandLineFlags(
   if (parsed_model_flags.input_arrays.specified()) {
     QCHECK(uses_multi_input_flags);
     for (const auto& input_array :
-         absl::StrSplit(parsed_model_flags.input_arrays.value(), ',')) {
+         abslx::StrSplit(parsed_model_flags.input_arrays.value(), ',')) {
       model_flags->add_input_arrays()->set_name(std::string(input_array));
     }
   }
@@ -262,7 +262,7 @@ void ReadModelFlagsFromCommandLineFlags(
   if (parsed_model_flags.mean_values.specified()) {
     QCHECK(uses_multi_input_flags);
     std::vector<std::string> mean_values =
-        absl::StrSplit(parsed_model_flags.mean_values.value(), ',');
+        abslx::StrSplit(parsed_model_flags.mean_values.value(), ',');
     QCHECK(static_cast<int>(mean_values.size()) ==
            model_flags->input_arrays_size());
     for (size_t i = 0; i < mean_values.size(); ++i) {
@@ -280,7 +280,7 @@ void ReadModelFlagsFromCommandLineFlags(
   if (parsed_model_flags.std_values.specified()) {
     QCHECK(uses_multi_input_flags);
     std::vector<std::string> std_values =
-        absl::StrSplit(parsed_model_flags.std_values.value(), ',');
+        abslx::StrSplit(parsed_model_flags.std_values.value(), ',');
     QCHECK(static_cast<int>(std_values.size()) ==
            model_flags->input_arrays_size());
     for (size_t i = 0; i < std_values.size(); ++i) {
@@ -299,7 +299,7 @@ void ReadModelFlagsFromCommandLineFlags(
   if (parsed_model_flags.input_data_types.specified()) {
     QCHECK(uses_multi_input_flags);
     std::vector<std::string> input_data_types =
-        absl::StrSplit(parsed_model_flags.input_data_types.value(), ',');
+        abslx::StrSplit(parsed_model_flags.input_data_types.value(), ',');
     QCHECK(static_cast<int>(input_data_types.size()) ==
            model_flags->input_arrays_size());
     for (size_t i = 0; i < input_data_types.size(); ++i) {
@@ -323,7 +323,7 @@ void ReadModelFlagsFromCommandLineFlags(
   if (parsed_model_flags.input_shapes.specified()) {
     QCHECK(uses_multi_input_flags);
     std::vector<std::string> input_shapes =
-        absl::StrSplit(parsed_model_flags.input_shapes.value(), ':');
+        abslx::StrSplit(parsed_model_flags.input_shapes.value(), ':');
     QCHECK(static_cast<int>(input_shapes.size()) ==
            model_flags->input_arrays_size());
     for (size_t i = 0; i < input_shapes.size(); ++i) {
@@ -333,9 +333,9 @@ void ReadModelFlagsFromCommandLineFlags(
       if (input_shapes[i].empty()) {
         continue;
       }
-      for (const auto& dim_str : absl::StrSplit(input_shapes[i], ',')) {
+      for (const auto& dim_str : abslx::StrSplit(input_shapes[i], ',')) {
         int size;
-        CHECK(absl::SimpleAtoi(dim_str, &size))
+        CHECK(abslx::SimpleAtoi(dim_str, &size))
             << "Failed to parse input_shape: " << input_shapes[i];
         shape->add_dims(size);
       }
@@ -364,12 +364,12 @@ void ReadModelFlagsFromCommandLineFlags(
         rnn_state_proto->set_back_edge_source_array(value);
       } else if (key == "size") {
         int32_t size = 0;
-        CHECK(absl::SimpleAtoi(value, &size));
+        CHECK(abslx::SimpleAtoi(value, &size));
         CHECK_GT(size, 0);
         rnn_state_proto->set_size(size);
       } else if (key == "num_dims") {
         int32_t size = 0;
-        CHECK(absl::SimpleAtoi(value, &size));
+        CHECK(abslx::SimpleAtoi(value, &size));
         CHECK_GT(size, 0);
         rnn_state_proto->set_num_dims(size);
       } else {
@@ -392,12 +392,12 @@ void ReadModelFlagsFromCommandLineFlags(
         model_check_proto->set_count_type(value);
       } else if (key == "count_min") {
         int32_t count = 0;
-        CHECK(absl::SimpleAtoi(value, &count));
+        CHECK(abslx::SimpleAtoi(value, &count));
         CHECK_GE(count, -1);
         model_check_proto->set_count_min(count);
       } else if (key == "count_max") {
         int32_t count = 0;
-        CHECK(absl::SimpleAtoi(value, &count));
+        CHECK(abslx::SimpleAtoi(value, &count));
         CHECK_GE(count, -1);
         model_check_proto->set_count_max(count);
       } else {

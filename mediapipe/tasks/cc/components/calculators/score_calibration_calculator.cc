@@ -31,7 +31,7 @@
 namespace mediapipe {
 namespace api2 {
 
-using ::absl::StatusCode;
+using ::abslx::StatusCode;
 using ::mediapipe::tasks::CreateStatusWithPayload;
 using ::mediapipe::tasks::MediaPipeTasksStatus;
 using ::mediapipe::tasks::ScoreCalibrationCalculatorOptions;
@@ -86,8 +86,8 @@ class ScoreCalibrationCalculator : public Node {
   static constexpr Output<std::vector<Tensor>> kScoresOut{"CALIBRATED_SCORES"};
   MEDIAPIPE_NODE_CONTRACT(kScoresIn, kIndicesIn, kScoresOut);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   ScoreCalibrationCalculatorOptions options_;
@@ -97,10 +97,10 @@ class ScoreCalibrationCalculator : public Node {
   // out-of-bounds index.
   float ComputeCalibratedScore(int index, float score);
   // Same as above, but does check for out-of-bounds index.
-  absl::StatusOr<float> SafeComputeCalibratedScore(int index, float score);
+  abslx::StatusOr<float> SafeComputeCalibratedScore(int index, float score);
 };
 
-absl::Status ScoreCalibrationCalculator::Open(CalculatorContext* cc) {
+abslx::Status ScoreCalibrationCalculator::Open(CalculatorContext* cc) {
   options_ = cc->Options<ScoreCalibrationCalculatorOptions>();
   // Sanity checks.
   if (options_.sigmoids_size() == 0) {
@@ -112,7 +112,7 @@ absl::Status ScoreCalibrationCalculator::Open(CalculatorContext* cc) {
     if (sigmoid.has_scale() && sigmoid.scale() < 0.0) {
       return CreateStatusWithPayload(
           StatusCode::kInvalidArgument,
-          absl::StrFormat("The scale parameter of the sigmoids must be "
+          abslx::StrFormat("The scale parameter of the sigmoids must be "
                           "positive, found %f.",
                           sigmoid.scale()),
           MediaPipeTasksStatus::kInvalidArgumentError);
@@ -137,16 +137,16 @@ absl::Status ScoreCalibrationCalculator::Open(CalculatorContext* cc) {
     default:
       return CreateStatusWithPayload(
           StatusCode::kInvalidArgument,
-          absl::StrFormat(
+          abslx::StrFormat(
               "Unsupported ScoreTransformation type: %s",
               ScoreCalibrationCalculatorOptions::ScoreTransformation_Name(
                   options_.score_transformation())),
           MediaPipeTasksStatus::kInvalidArgumentError);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ScoreCalibrationCalculator::Process(CalculatorContext* cc) {
+abslx::Status ScoreCalibrationCalculator::Process(CalculatorContext* cc) {
   RET_CHECK_EQ(kScoresIn(cc)->size(), 1);
   const auto& scores = (*kScoresIn(cc))[0];
   RET_CHECK(scores.element_type() == Tensor::ElementType::kFloat32);
@@ -168,7 +168,7 @@ absl::Status ScoreCalibrationCalculator::Process(CalculatorContext* cc) {
     if (num_scores != indices.shape().num_elements()) {
       return CreateStatusWithPayload(
           StatusCode::kInvalidArgument,
-          absl::StrFormat("Mismatch between number of elements in the input "
+          abslx::StrFormat("Mismatch between number of elements in the input "
                           "scores tensor (%d) and indices tensor (%d).",
                           num_scores, indices.shape().num_elements()),
           MediaPipeTasksStatus::kMetadataInconsistencyError);
@@ -186,7 +186,7 @@ absl::Status ScoreCalibrationCalculator::Process(CalculatorContext* cc) {
     if (num_scores != options_.sigmoids_size()) {
       return CreateStatusWithPayload(
           StatusCode::kInvalidArgument,
-          absl::StrFormat("Mismatch between number of sigmoids (%d) and number "
+          abslx::StrFormat("Mismatch between number of sigmoids (%d) and number "
                           "of elements in the input scores tensor (%d).",
                           options_.sigmoids_size(), num_scores),
           MediaPipeTasksStatus::kMetadataInconsistencyError);
@@ -198,7 +198,7 @@ absl::Status ScoreCalibrationCalculator::Process(CalculatorContext* cc) {
     }
   }
   kScoresOut(cc).Send(std::move(output_tensors));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 float ScoreCalibrationCalculator::ComputeCalibratedScore(int index,
@@ -234,18 +234,18 @@ float ScoreCalibrationCalculator::ComputeCalibratedScore(int index,
   return std::max(std::min(calibrated_score, sigmoid.scale()), 0.0f);
 }
 
-absl::StatusOr<float> ScoreCalibrationCalculator::SafeComputeCalibratedScore(
+abslx::StatusOr<float> ScoreCalibrationCalculator::SafeComputeCalibratedScore(
     int index, float score) {
   if (index < 0) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        absl::StrFormat("Expected positive indices, found %d.", index),
+        abslx::StrFormat("Expected positive indices, found %d.", index),
         MediaPipeTasksStatus::kInvalidArgumentError);
   }
   if (index > options_.sigmoids_size()) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        absl::StrFormat("Unable to get score calibration parameters for index "
+        abslx::StrFormat("Unable to get score calibration parameters for index "
                         "%d : only %d sigmoids were provided.",
                         index, options_.sigmoids_size()),
         MediaPipeTasksStatus::kMetadataInconsistencyError);

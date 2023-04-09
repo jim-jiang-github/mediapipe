@@ -31,7 +31,7 @@ void CustomizeSortedBufferInterval(
   std::vector<uint64_t> config;
   if (!memory_space_assignment_config.has_value()) {
     config.resize(sorted_buffer_intervals_copy.size());
-    absl::c_iota(config, 0);
+    abslx::c_iota(config, 0);
   } else {
     config = *memory_space_assignment_config;
   }

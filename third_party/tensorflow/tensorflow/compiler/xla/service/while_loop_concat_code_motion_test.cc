@@ -38,7 +38,7 @@ namespace op = ::xla::testing::opcode_matchers;
 class WhileLoopConcatCodeMotionTest : public HloTestBase {};
 
 TEST_F(WhileLoopConcatCodeMotionTest, SimpleMotion) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule test
 
     %cond {
@@ -99,7 +99,7 @@ TEST_F(WhileLoopConcatCodeMotionTest, SimpleMotion) {
 }
 
 TEST_F(WhileLoopConcatCodeMotionTest, NoMotionWithChangedElementOrder) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule test
 
     %cond {
@@ -140,7 +140,7 @@ TEST_F(WhileLoopConcatCodeMotionTest, NoMotionWithChangedElementOrder) {
 }
 
 TEST_F(WhileLoopConcatCodeMotionTest, CascadedConcats) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule test
 
     %cond {
@@ -204,7 +204,7 @@ TEST_F(WhileLoopConcatCodeMotionTest, CascadedConcats) {
 }
 
 TEST_F(WhileLoopConcatCodeMotionTest, TwoConcatsSharedGroups) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule test
 
     %cond {
@@ -276,7 +276,7 @@ TEST_F(WhileLoopConcatCodeMotionTest, TwoConcatsSharedGroups) {
 // concatenated in different orders. So we expect only the other concat to be
 // optimized.
 TEST_F(WhileLoopConcatCodeMotionTest, TwoConcatsDifferentOrders) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule test
 
     %cond {
@@ -341,7 +341,7 @@ TEST_F(WhileLoopConcatCodeMotionTest, TwoConcatsDifferentOrders) {
 }
 
 TEST_F(WhileLoopConcatCodeMotionTest, NonElementwiseOps) {
-  constexpr absl::string_view kHloModule = R"(
+  constexpr abslx::string_view kHloModule = R"(
     HloModule test
 
     %cond {

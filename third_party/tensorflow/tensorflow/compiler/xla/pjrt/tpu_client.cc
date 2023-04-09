@@ -98,9 +98,9 @@ PjRtTpuClient::PjRtTpuClient(
         tf_tpu::TpuPlatformInterface* platform =
             tf_tpu::TpuPlatformInterface::GetRegisteredPlatform();
         TpuRuntimeVersion version = platform->version();
-        return absl::StrCat(
-            "libtpu version ", absl::StrJoin(version.version, "."), "\n",
-            absl::string_view(version.metadata, version.metadata_size));
+        return abslx::StrCat(
+            "libtpu version ", abslx::StrJoin(version.version, "."), "\n",
+            abslx::string_view(version.metadata, version.metadata_size));
       }()) {
   // We always initialize the tpu client even if libtpu isn't linked in or
   // initialized.
@@ -169,7 +169,7 @@ StatusOr<std::string> PjRtTpuClient::SerializeExecutable(
 }
 
 StatusOr<std::unique_ptr<PjRtLoadedExecutable>>
-PjRtTpuClient::DeserializeExecutable(absl::string_view serialized,
+PjRtTpuClient::DeserializeExecutable(abslx::string_view serialized,
                                      CompileOptions options) {
   TF_ASSIGN_OR_RETURN(std::unique_ptr<TpuExecutable> tpu_executable,
                       TpuExecutable::Deserialize(serialized));
@@ -246,7 +246,7 @@ GetTpuDevices(
 }
 
 StatusOr<std::shared_ptr<PjRtClient>> GetTpuClient(
-    int max_inflight_computations, absl::Duration init_retry_timeout) {
+    int max_inflight_computations, abslx::Duration init_retry_timeout) {
 #if !defined(PLATFORM_GOOGLE) || defined(LIBTPU_STATIC)
   TF_RETURN_IF_ERROR(tensorflow::tpu::FindAndLoadTpuLibrary());
 #endif
@@ -259,7 +259,7 @@ StatusOr<std::shared_ptr<PjRtClient>> GetTpuClient(
   // NOTE: We retry in a loop since some pod failures are transient (e.g. some
   // RPCs may timeout waiting for other hosts to come up, but will succeed
   // at a later point if retried).
-  auto start = absl::Now();
+  auto start = abslx::Now();
   while (true) {
     Status status = platform->Initialize({});
     if (status.ok()) {
@@ -274,10 +274,10 @@ StatusOr<std::shared_ptr<PjRtClient>> GetTpuClient(
       break;
     }
     LOG(INFO) << "TPU platform initialization failed: " << status;
-    if ((absl::Now() - start) >= init_retry_timeout) {
+    if ((abslx::Now() - start) >= init_retry_timeout) {
       return status;
     }
-    absl::SleepFor(absl::Microseconds(10));
+    abslx::SleepFor(abslx::Microseconds(10));
   }
   CHECK(platform->Initialized());
   if (platform->VisibleDeviceCount() <= 0) {

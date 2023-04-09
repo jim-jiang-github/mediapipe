@@ -87,7 +87,7 @@ TEST_F(StructureVerifierTest, OpNotRegistered) {
   Status status = verifier_->Verify(graph_);
   EXPECT_TRUE(errors::IsNotFound(status));
   EXPECT_TRUE(
-      absl::StrContains(status.error_message(), "Op type not registered"));
+      abslx::StrContains(status.error_message(), "Op type not registered"));
 }
 
 TEST_F(StructureVerifierTest, DuplicateNodeNames) {
@@ -97,7 +97,7 @@ TEST_F(StructureVerifierTest, DuplicateNodeNames) {
   Status status = verifier_->Verify(graph_);
   EXPECT_TRUE(errors::IsAlreadyExists(status));
   EXPECT_TRUE(
-      absl::StrContains(status.error_message(), "Node already exists:"));
+      abslx::StrContains(status.error_message(), "Node already exists:"));
 }
 
 TEST_F(StructureVerifierTest, GraphWithInvalidCycle) {
@@ -108,7 +108,7 @@ TEST_F(StructureVerifierTest, GraphWithInvalidCycle) {
   Status status = verifier_->Verify(graph_);
   EXPECT_TRUE(errors::IsInvalidArgument(status));
   EXPECT_TRUE(
-      absl::StrContains(status.error_message(),
+      abslx::StrContains(status.error_message(),
                         "The graph couldn't be sorted in topological order"));
 }
 

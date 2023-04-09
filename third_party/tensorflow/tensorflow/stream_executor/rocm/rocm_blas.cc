@@ -90,7 +90,7 @@ static string ToString(rocblas_status status) {
     case rocblas_status_internal_error:
       return "rocblas_status_internal_error";
     default:
-      return absl::StrCat("<invalid rocBLAS status: ", status, ">");
+      return abslx::StrCat("<invalid rocBLAS status: ", status, ">");
   }
 }
 
@@ -186,7 +186,7 @@ template <typename FuncT, typename... Args>
 bool ROCMBlas::DoBlasInternalImpl(FuncT rocblas_func, Stream *stream,
                                   bool pointer_mode_host, bool err_on_failure,
                                   Args... args) {
-  absl::MutexLock lock{&mu_};
+  abslx::MutexLock lock{&mu_};
 
   CHECK(blas_ != nullptr);
   if (!SetStream(stream)) {
@@ -1362,7 +1362,7 @@ port::Status ROCMBlas::DoBlasGemm(Stream *stream, blas::Transpose transa,
                                   const void *beta, DeviceMemoryBase *c,
                                   int ldc, blas::ComputePrecision precision) {
   blas_log("DoBlasGemm");
-  VLOG(1) << absl::StreamFormat(
+  VLOG(1) << abslx::StreamFormat(
       "doing rocBLAS GEMM: at=%d bt=%d m=%u n=%u "
       "k=%llu alpha=%p a=%p lda=%d b=%p ldb=%d beta=%p "
       "c=%p ldc=%d",
@@ -1472,7 +1472,7 @@ port::Status ROCMBlas::DoBlasGemm(Stream *stream, blas::Transpose transa,
           cb_beta, static_cast<rocblas_double_complex *>(c->opaque()), ldc);
     }
     default:
-      return port::InternalError(absl::StrCat("Unsupported datatype for GEMM: ",
+      return port::InternalError(abslx::StrCat("Unsupported datatype for GEMM: ",
                                               blas::DataTypeString(dtype)));
   }
 }
@@ -2318,7 +2318,7 @@ port::Status ROCMBlas::DoBlasGemmStridedBatched(
     const DeviceMemoryBase &a, int lda, int64_t stride_a,
     const DeviceMemoryBase &b, int ldb, int64_t stride_b, const void *beta,
     DeviceMemoryBase *c, int ldc, int64_t stride_c, int batch_count) {
-  VLOG(1) << absl::StreamFormat(
+  VLOG(1) << abslx::StreamFormat(
       "doing rocBLAS SGEMM Strided Batched<float>: at=%d bt=%d m=%u n=%u "
       "k=%llu alpha=%p a=%p lda=%d b=%p ldb=%d beta=%p "
       "c=%p ldc=%d",
@@ -2400,7 +2400,7 @@ port::Status ROCMBlas::DoBlasGemmStridedBatched(
           batch_count);
     }
     default:
-      return port::InternalError(absl::StrCat("Unsupported datatype for GEMM: ",
+      return port::InternalError(abslx::StrCat("Unsupported datatype for GEMM: ",
                                               blas::DataTypeString(dtype)));
   }
 }

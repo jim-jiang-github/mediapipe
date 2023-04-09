@@ -743,7 +743,7 @@ PREFIXED_FLOAT_CONTEXT_FEATURE(FeatureAudioSampleRate,
 // code verifies the number of elements matches the dimensions.
 // Reconciling bounding box annotations is optional because will remove
 // annotations if the sequence rate is lower than the annotation rate.
-absl::Status ReconcileMetadata(bool reconcile_bbox_annotations,
+abslx::Status ReconcileMetadata(bool reconcile_bbox_annotations,
                                bool reconcile_region_annotations,
                                tensorflow::SequenceExample* sequence);
 }  // namespace mediasequence

@@ -31,7 +31,7 @@ namespace TF {
 namespace internal {
 
 // The name prefix of Flex ops.
-constexpr absl::string_view kFlexOpNamePrefix = "Flex";
+constexpr abslx::string_view kFlexOpNamePrefix = "Flex";
 // Don't fallback to Flex op if this attribute is set. This attribute is
 // transient and is only used inside this pass. First, the pass looks for
 // predefined patterns and set this attribute to ops in the patterns. Then,

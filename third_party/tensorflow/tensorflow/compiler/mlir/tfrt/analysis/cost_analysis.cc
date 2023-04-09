@@ -81,10 +81,10 @@ int64_t InferSparseSegmentOpCost(const CostContext& context, OpType op) {
 }
 
 // CostFunctionRegistry is a map from op names to their cost functions.
-using CostFunctionRegistry = absl::flat_hash_map<std::string, CostFunction>;
+using CostFunctionRegistry = abslx::flat_hash_map<std::string, CostFunction>;
 
 void RegisterCostFunction(CostFunctionRegistry& registry,
-                          absl::string_view op_name,
+                          abslx::string_view op_name,
                           CostFunction cost_function) {
   auto r = registry.try_emplace(op_name, std::move(cost_function));
   assert(r.second);
@@ -121,7 +121,7 @@ CostFunctionRegistry& GetCostFunctionRegistry() {
 
 }  // namespace
 
-void RegisterCostFunction(absl::string_view op_name,
+void RegisterCostFunction(abslx::string_view op_name,
                           CostFunction cost_function) {
   RegisterCostFunction(GetCostFunctionRegistry(), op_name,
                        std::move(cost_function));
@@ -161,7 +161,7 @@ void CostAnalysis::EvaluateCost(mlir::Operation* op) {
 
   // Try to use its cost function if it is registered.
   const auto& registry = GetCostFunctionRegistry();
-  absl::string_view op_name = op->getName().getStringRef();
+  abslx::string_view op_name = op->getName().getStringRef();
   auto iter = registry.find(op_name);
   if (iter != registry.end()) {
     CostContext context;

@@ -29,7 +29,7 @@ limitations under the License.
 namespace tensorflow {
 namespace {
 
-constexpr absl::string_view kTPUEmbeddingOps[] = {
+constexpr abslx::string_view kTPUEmbeddingOps[] = {
     "EnqueueTPUEmbeddingBatch",
     "EnqueueTPUEmbeddingIntegerBatch",
     "EnqueueTPUEmbeddingSparseBatch",
@@ -37,10 +37,10 @@ constexpr absl::string_view kTPUEmbeddingOps[] = {
     "EnqueueTPUEmbeddingRaggedTensorBatch",
     "EnqueueTPUEmbeddingArbitraryTensorBatch"};
 
-constexpr absl::string_view kTPURecvOps[] = {"RecvTPUEmbeddingActivations",
+constexpr abslx::string_view kTPURecvOps[] = {"RecvTPUEmbeddingActivations",
                                              "XlaRecvTPUEmbeddingActivations"};
 
-constexpr absl::string_view kTPUGradientSendOps[] = {
+constexpr abslx::string_view kTPUGradientSendOps[] = {
     "SendTPUEmbeddingGradients", "XlaSendTPUEmbeddingGradients"};
 
 }  // namespace
@@ -67,7 +67,7 @@ Status UpdateTPUEmbeddingEnqueueOrdinalPass::Run(
 
   std::vector<Node*> embedding_nodes;
   for (Node* node : graph->op_nodes()) {
-    if (absl::c_linear_search(kTPUEmbeddingOps, node->type_string())) {
+    if (abslx::c_linear_search(kTPUEmbeddingOps, node->type_string())) {
       embedding_nodes.emplace_back(node);
     }
   }
@@ -133,7 +133,7 @@ Status UpdateMapsForModeOverride(
           << "Please ensure that you have only created one TPUEmbedding "
           << "layer.";
       (*found_grad_send_op)[layer_call_index] = true;
-    } else if (absl::c_linear_search(kTPUEmbeddingOps, op)) {
+    } else if (abslx::c_linear_search(kTPUEmbeddingOps, op)) {
       TF_RET_CHECK(enqueue_op->find(layer_call_index) == enqueue_op->end())
           << "Found second enqueue op for call " << layer_call_index << ". "
           << "This will happen if you create multiple TPUEmbedding layers. "
@@ -174,7 +174,7 @@ Status ComputeEnqueueTrainingStatus(
 // when the enqueue is part of a TPUEmbedding layer call that contains a send
 // gradients.
 Status UpdateTPUEmbeddingModePass::GetEnqueueOpsFromGraph(
-    Graph* graph, absl::flat_hash_map<Node*, bool>* enqueue) {
+    Graph* graph, abslx::flat_hash_map<Node*, bool>* enqueue) {
   // Maps are index by the TPUEmbedding layer's call number.
   std::map<std::string, Node*> enqueue_op;
   std::map<std::string, bool> found_recv_op;
@@ -256,7 +256,7 @@ Status UpdateTPUEmbeddingModePass::UpdateFunctionDefEnqueueOp(
 
   // Find input node
   string select_name = std::vector<std::string>(
-      absl::StrSplit(node->input(mode_override), ':'))[0];
+      abslx::StrSplit(node->input(mode_override), ':'))[0];
   int select = 0;
   while ((select < function->node_def_size()) &&
          (function->node_def(select).name() != select_name)) {
@@ -299,7 +299,7 @@ Status UpdateTPUEmbeddingModePass::Run(
 
   // First process the graph
   Graph* graph = options.graph->get();
-  absl::flat_hash_map<Node*, bool> enqueue_nodes;
+  abslx::flat_hash_map<Node*, bool> enqueue_nodes;
   TF_RETURN_IF_ERROR(GetEnqueueOpsFromGraph(graph, &enqueue_nodes));
   for (const auto& enqueue : enqueue_nodes) {
     TF_RETURN_IF_ERROR(

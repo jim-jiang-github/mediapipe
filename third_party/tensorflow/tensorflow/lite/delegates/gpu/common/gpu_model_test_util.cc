@@ -25,7 +25,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status TestLinkingConvolutionAndCosOp(TestExecutionEnvironment* env) {
+abslx::Status TestLinkingConvolutionAndCosOp(TestExecutionEnvironment* env) {
   GraphFloat32 graph;
   auto input = graph.NewValue();
   input->tensor.type = DataType::FLOAT32;
@@ -80,7 +80,7 @@ absl::Status TestLinkingConvolutionAndCosOp(TestExecutionEnvironment* env) {
           GraphToGpuModel(graph, create_info, env->GetGpuInfo(), &gpu_model));
 
       if (gpu_model.nodes.size() != 1) {
-        return absl::InternalError("Expected model with one node.");
+        return abslx::InternalError("Expected model with one node.");
       }
 
       TensorFloat32 src_tensor;
@@ -118,10 +118,10 @@ absl::Status TestLinkingConvolutionAndCosOp(TestExecutionEnvironment* env) {
           PointWiseNear(dst_tensor_v0.data, dst_tensor_v1.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TestLinkingConvolution2InputMul2InputMul(
+abslx::Status TestLinkingConvolution2InputMul2InputMul(
     TestExecutionEnvironment* env) {
   GraphFloat32 graph;
   auto input0 = graph.NewValue();
@@ -192,7 +192,7 @@ absl::Status TestLinkingConvolution2InputMul2InputMul(
           GraphToGpuModel(graph, create_info, env->GetGpuInfo(), &gpu_model));
 
       if (gpu_model.nodes.size() != 1) {
-        return absl::InternalError("Expected model with one node.");
+        return abslx::InternalError("Expected model with one node.");
       }
 
       TensorFloat32 src0_tensor;
@@ -257,10 +257,10 @@ absl::Status TestLinkingConvolution2InputMul2InputMul(
           PointWiseNear(dst_tensor_v0.data, dst_tensor_v1.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TestLinkingConvolution2InputBroadcastMul2InputMul(
+abslx::Status TestLinkingConvolution2InputBroadcastMul2InputMul(
     TestExecutionEnvironment* env) {
   GraphFloat32 graph;
   auto input0 = graph.NewValue();
@@ -331,7 +331,7 @@ absl::Status TestLinkingConvolution2InputBroadcastMul2InputMul(
           GraphToGpuModel(graph, create_info, env->GetGpuInfo(), &gpu_model));
 
       if (gpu_model.nodes.size() != 1) {
-        return absl::InternalError("Expected model with one node.");
+        return abslx::InternalError("Expected model with one node.");
       }
 
       TensorFloat32 src0_tensor;
@@ -396,10 +396,10 @@ absl::Status TestLinkingConvolution2InputBroadcastMul2InputMul(
           PointWiseNear(dst_tensor_v0.data, dst_tensor_v1.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TestLinkingConvolution2InputMul2InputBroadcastMul(
+abslx::Status TestLinkingConvolution2InputMul2InputBroadcastMul(
     TestExecutionEnvironment* env) {
   GraphFloat32 graph;
   auto input0 = graph.NewValue();
@@ -470,7 +470,7 @@ absl::Status TestLinkingConvolution2InputMul2InputBroadcastMul(
           GraphToGpuModel(graph, create_info, env->GetGpuInfo(), &gpu_model));
 
       if (gpu_model.nodes.size() != 1) {
-        return absl::InternalError("Expected model with one node.");
+        return abslx::InternalError("Expected model with one node.");
       }
 
       TensorFloat32 src0_tensor;
@@ -535,10 +535,10 @@ absl::Status TestLinkingConvolution2InputMul2InputBroadcastMul(
           PointWiseNear(dst_tensor_v0.data, dst_tensor_v1.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TestLinkingConvolution2InputMul2InputMulCos(
+abslx::Status TestLinkingConvolution2InputMul2InputMulCos(
     TestExecutionEnvironment* env) {
   GraphFloat32 graph;
   auto input0 = graph.NewValue();
@@ -616,7 +616,7 @@ absl::Status TestLinkingConvolution2InputMul2InputMulCos(
           GraphToGpuModel(graph, create_info, env->GetGpuInfo(), &gpu_model));
 
       if (gpu_model.nodes.size() != 1) {
-        return absl::InternalError("Expected model with one node.");
+        return abslx::InternalError("Expected model with one node.");
       }
 
       TensorFloat32 src0_tensor;
@@ -689,7 +689,7 @@ absl::Status TestLinkingConvolution2InputMul2InputMulCos(
           PointWiseNear(dst_tensor_v0.data, dst_tensor_v1.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

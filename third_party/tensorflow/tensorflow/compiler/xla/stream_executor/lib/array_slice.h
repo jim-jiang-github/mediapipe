@@ -22,9 +22,9 @@ namespace stream_executor {
 namespace port {
 
 template <typename T>
-using ArraySlice = absl::Span<const T>;  // non-absl ok
+using ArraySlice = abslx::Span<const T>;  // non-absl ok
 template <typename T>
-using MutableArraySlice = absl::Span<T>;
+using MutableArraySlice = abslx::Span<T>;
 
 }  // namespace port
 }  // namespace stream_executor

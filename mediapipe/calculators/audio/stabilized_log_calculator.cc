@@ -41,17 +41,17 @@ namespace mediapipe {
 // }
 class StabilizedLogCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<Matrix>(
         // Input stream with TimeSeriesHeader.
     );
     cc->Outputs().Index(0).Set<Matrix>(
         // Output stabilized log stream with TimeSeriesHeader.
     );
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     StabilizedLogCalculatorOptions stabilized_log_calculator_options =
         cc->Options<StabilizedLogCalculatorOptions>();
 
@@ -70,23 +70,23 @@ class StabilizedLogCalculator : public CalculatorBase {
       cc->Outputs().Index(0).SetHeader(
           Adopt(new TimeSeriesHeader(input_header)));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     auto input_matrix = cc->Inputs().Index(0).Get<Matrix>();
     if (input_matrix.array().isNaN().any()) {
-      return absl::InvalidArgumentError("NaN input to log operation.");
+      return abslx::InvalidArgumentError("NaN input to log operation.");
     }
     if (check_nonnegativity_) {
       if (input_matrix.minCoeff() < 0.0) {
-        return absl::OutOfRangeError("Negative input to log operation.");
+        return abslx::OutOfRangeError("Negative input to log operation.");
       }
     }
     std::unique_ptr<Matrix> output_frame(new Matrix(
         output_scale_ * (input_matrix.array() + stabilizer_).log().matrix()));
     cc->Outputs().Index(0).Add(output_frame.release(), cc->InputTimestamp());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

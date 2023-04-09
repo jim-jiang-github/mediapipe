@@ -19,7 +19,7 @@
 #include "gtest/gtest.h"
 #include "absl/strings/str_format.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace strings_internal {
 
@@ -110,7 +110,7 @@ TEST(Pow10HelperTest, Works) {
   for (const TestCase& test_case : kTestCases) {
     EXPECT_EQ(Pow10(test_case.power),
               std::ldexp(test_case.significand, test_case.radix))
-        << absl::StrFormat("Failure for Pow10(%d): %a vs %a", test_case.power,
+        << abslx::StrFormat("Failure for Pow10(%d): %a vs %a", test_case.power,
                            Pow10(test_case.power),
                            std::ldexp(test_case.significand, test_case.radix));
   }
@@ -119,4 +119,4 @@ TEST(Pow10HelperTest, Works) {
 }  // namespace
 }  // namespace strings_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

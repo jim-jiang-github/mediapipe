@@ -97,13 +97,13 @@ class PyClient : public std::enable_shared_from_this<PyClient> {
   PjRtClient* pjrt_client() const { return pjrt_client_.get(); }
   std::shared_ptr<PjRtClient> shared_pjrt_client() { return pjrt_client_; }
 
-  absl::string_view platform_name() const {
+  abslx::string_view platform_name() const {
     return pjrt_client_->platform_name();
   }
-  absl::string_view platform_version() const {
+  abslx::string_view platform_version() const {
     return pjrt_client_->platform_version();
   }
-  absl::string_view runtime_type() const {
+  abslx::string_view runtime_type() const {
     return PjRtRuntimeTypeString(pjrt_client_->runtime_type());
   }
   int addressable_device_count() const {
@@ -145,7 +145,7 @@ class PyClient : public std::enable_shared_from_this<PyClient> {
   }
 
   StatusOr<std::vector<std::pair<pybind11::bytes, pybind11::object>>>
-  MakeCrossHostReceiveBuffers(absl::Span<const Shape> shapes,
+  MakeCrossHostReceiveBuffers(abslx::Span<const Shape> shapes,
                               PjRtDevice* device);
 
   StatusOr<pybind11::object> BufferFromPyval(
@@ -191,18 +191,18 @@ class PyClient : public std::enable_shared_from_this<PyClient> {
   // functionality in different ways.
   StatusOr<std::pair<uint64_t, pybind11::object>>
   GetEmitPythonCallbackDescriptor(pybind11::function callable,
-                                  absl::Span<Shape const> operand_shapes,
-                                  absl::Span<Shape const> result_shapes);
+                                  abslx::Span<Shape const> operand_shapes,
+                                  abslx::Span<Shape const> result_shapes);
   // Deprecated; please switch to emitting an MHLO `CustomCallOp` directly.
   StatusOr<XlaOp> EmitPythonCallbackFromDescriptor(
       XlaBuilder& builder, uint64_t descriptor,
-      absl::Span<XlaOp const> operands, absl::Span<Shape const> result_shapes,
+      abslx::Span<XlaOp const> operands, abslx::Span<Shape const> result_shapes,
       std::optional<std::vector<Shape>> operand_layouts, bool has_side_effect);
   // Deprecated; please switch to using `GetEmitPythonCallbackDescriptor`
   // and then emitting a `CustomCall` op instead.
   StatusOr<std::pair<XlaOp, pybind11::object>> EmitPythonCallback(
       pybind11::function callable, XlaBuilder& builder,
-      absl::Span<XlaOp const> operands, absl::Span<Shape const> result_shapes,
+      abslx::Span<XlaOp const> operands, abslx::Span<Shape const> result_shapes,
       std::optional<std::vector<Shape>> operand_layouts, bool has_side_effect);
 
   // `MakePythonCallbackUsingHostSendAndRecv` takes in an input Python callable
@@ -214,10 +214,10 @@ class PyClient : public std::enable_shared_from_this<PyClient> {
   // callback can be passed to PyExecutable::Execute() so that the corresponding
   // Send/Recv ops can trigger the execution of this host callback.
   StatusOr<pybind11::object> MakePythonCallbackUsingHostSendAndRecv(
-      pybind11::function callable, absl::Span<Shape const> operand_shapes,
-      absl::Span<Shape const> result_shapes,
-      absl::Span<uint16_t const> send_channel_ids,
-      absl::Span<uint16_t const> recv_channel_ids);
+      pybind11::function callable, abslx::Span<Shape const> operand_shapes,
+      abslx::Span<Shape const> result_shapes,
+      abslx::Span<uint16_t const> send_channel_ids,
+      abslx::Span<uint16_t const> recv_channel_ids);
 
  private:
   friend class PyBuffer;

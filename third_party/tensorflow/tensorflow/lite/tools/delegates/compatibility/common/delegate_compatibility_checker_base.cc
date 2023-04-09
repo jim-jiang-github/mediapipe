@@ -21,7 +21,7 @@ limitations under the License.
 namespace tflite {
 namespace tools {
 
-absl::Status DelegateCompatibilityCheckerBase::checkCompatibility(
+abslx::Status DelegateCompatibilityCheckerBase::checkCompatibility(
     tflite::FlatBufferModel* model_buffer, proto::CompatibilityResult* result) {
   auto model = tflite::GetModel(model_buffer);
   auto subgraphs = model->subgraphs();
@@ -36,10 +36,10 @@ absl::Status DelegateCompatibilityCheckerBase::checkCompatibility(
       auto status = checkCompatibility(op_code, op, subgraph, model, op_result);
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status DelegateCompatibilityCheckerBase::checkCompatibility(
+abslx::Status DelegateCompatibilityCheckerBase::checkCompatibility(
     const tflite::OperatorCode* op_code, const tflite::Operator* op,
     const tflite::SubGraph* subgraph, const tflite::Model* model,
     proto::OpCompatibilityResult* op_result) {

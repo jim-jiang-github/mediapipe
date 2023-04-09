@@ -40,8 +40,8 @@ struct ImageFrameComparisonOptions {
 // Compares an output image with a golden file. Saves the output and difference
 // to the undeclared test outputs.
 // Returns ok if they are equal within the tolerances specified in options.
-absl::Status CompareAndSaveImageOutput(
-    absl::string_view golden_image_path, const ImageFrame& actual,
+abslx::Status CompareAndSaveImageOutput(
+    abslx::string_view golden_image_path, const ImageFrame& actual,
     const ImageFrameComparisonOptions& options);
 
 // Checks if two image frames are equal within the specified tolerance.
@@ -49,7 +49,7 @@ absl::Status CompareAndSaveImageOutput(
 // SRGB and SRGBA); in that case, only the channels available in both are
 // compared.
 // The diff arguments are as in ImageFrameComparisonOptions.
-absl::Status CompareImageFrames(const ImageFrame& image1,
+abslx::Status CompareImageFrames(const ImageFrame& image1,
                                 const ImageFrame& image2,
                                 const float max_color_diff,
                                 const float max_alpha_diff,
@@ -70,36 +70,36 @@ std::string GetTestRootDir();
 std::string GetTestOutputsDir();
 
 // Returns the absolute path to a file within TEST_SRCDIR.
-std::string GetTestFilePath(absl::string_view relative_path);
+std::string GetTestFilePath(abslx::string_view relative_path);
 
 // Returns the absolute path to the contents of the package's "testdata"
 // directory.
 // This handles the different paths where test data ends up when using
 // ion_cc_test on various platforms.
-std::string GetTestDataDir(absl::string_view package_base_path);
+std::string GetTestDataDir(abslx::string_view package_base_path);
 
 // Loads a binary graph from path. Returns true iff successful.
 bool LoadTestGraph(CalculatorGraphConfig* proto, const std::string& path);
 
 // Loads an image from memory.
-absl::StatusOr<std::unique_ptr<ImageFrame>> DecodeTestImage(
-    absl::string_view encoded, ImageFormat::Format format = ImageFormat::SRGBA);
+abslx::StatusOr<std::unique_ptr<ImageFrame>> DecodeTestImage(
+    abslx::string_view encoded, ImageFormat::Format format = ImageFormat::SRGBA);
 
 // Loads an image from path.
-absl::StatusOr<std::unique_ptr<ImageFrame>> LoadTestImage(
-    absl::string_view path, ImageFormat::Format format = ImageFormat::SRGBA);
+abslx::StatusOr<std::unique_ptr<ImageFrame>> LoadTestImage(
+    abslx::string_view path, ImageFormat::Format format = ImageFormat::SRGBA);
 
 // Loads a PNG image from path using the given ImageFormat. Returns nullptr in
 // case of failure.
 std::unique_ptr<ImageFrame> LoadTestPng(
-    absl::string_view path, ImageFormat::Format format = ImageFormat::SRGBA);
+    abslx::string_view path, ImageFormat::Format format = ImageFormat::SRGBA);
 
 // Write an ImageFrame as PNG to the test undeclared outputs directory.
 // The image's name will contain the given prefix and a timestamp.
 // If successful, returns the path to the output file relative to the output
 // directory.
-absl::StatusOr<std::string> SavePngTestOutput(
-    const mediapipe::ImageFrame& image, absl::string_view prefix);
+abslx::StatusOr<std::string> SavePngTestOutput(
+    const mediapipe::ImageFrame& image, abslx::string_view prefix);
 
 // Returns the luminance image of |original_image|.
 // The format of |original_image| must be sRGB or sRGBA.

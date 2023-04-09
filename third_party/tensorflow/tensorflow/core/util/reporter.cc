@@ -40,7 +40,7 @@ Status TestReportFile::Initialize() {
     return OkStatus();
   }
   string mangled_fname = strings::StrCat(
-      fname_, absl::StrJoin(str_util::Split(test_name_, '/'), "__"));
+      fname_, abslx::StrJoin(str_util::Split(test_name_, '/'), "__"));
   Env* env = Env::Default();
   if (env->FileExists(mangled_fname).ok()) {
     return errors::InvalidArgument(

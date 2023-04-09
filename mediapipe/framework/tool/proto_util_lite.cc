@@ -48,7 +48,7 @@ bool IsLengthDelimited(WireFormatLite::WireType wire_type) {
 }
 
 // Reads a single data value for a wire type.
-absl::Status ReadFieldValue(uint32 tag, CodedInputStream* in,
+abslx::Status ReadFieldValue(uint32 tag, CodedInputStream* in,
                             std::string* result) {
   WireFormatLite::WireType wire_type = WireFormatLite::GetTagWireType(tag);
   if (IsLengthDelimited(wire_type)) {
@@ -65,11 +65,11 @@ absl::Status ReadFieldValue(uint32 tag, CodedInputStream* in,
     cos.Trim();
     result->assign(field_data, tag_size, std::string::npos);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Reads the packed sequence of data values for a wire type.
-absl::Status ReadPackedValues(WireFormatLite::WireType wire_type,
+abslx::Status ReadPackedValues(WireFormatLite::WireType wire_type,
                               CodedInputStream* in,
                               std::vector<std::string>* field_values) {
   uint32 data_size;
@@ -83,12 +83,12 @@ absl::Status ReadPackedValues(WireFormatLite::WireType wire_type,
     field_values->push_back(number);
     data_size -= number.size();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Extracts the data value(s) for one field from a serialized message.
 // The message with these field values removed is written to |out|.
-absl::Status GetFieldValues(uint32 field_id, CodedInputStream* in,
+abslx::Status GetFieldValues(uint32 field_id, CodedInputStream* in,
                             CodedOutputStream* out,
                             std::vector<std::string>* field_values) {
   uint32 tag;
@@ -108,7 +108,7 @@ absl::Status GetFieldValues(uint32 field_id, CodedInputStream* in,
       RET_CHECK_NO_LOG(WireFormatLite::SkipField(in, tag, out));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Injects the data value(s) for one field into a serialized message.
@@ -128,7 +128,7 @@ void SetFieldValues(uint32 field_id, WireFormatLite::WireType wire_type,
 FieldAccess::FieldAccess(uint32 field_id, FieldType field_type)
     : field_id_(field_id), field_type_(field_type) {}
 
-absl::Status FieldAccess::SetMessage(const std::string& message) {
+abslx::Status FieldAccess::SetMessage(const std::string& message) {
   ArrayInputStream ais(message.data(), message.size());
   CodedInputStream in(&ais);
   StringOutputStream sos(&message_);
@@ -155,7 +155,7 @@ using ProtoPathEntry = ProtoUtilLite::ProtoPathEntry;
 // Returns the FieldAccess and index for a field-id or a map-id.
 // Returns access to the field-id if the field index is found,
 // to the map-id if the map entry is found, and to the field-id otherwise.
-absl::StatusOr<std::pair<FieldAccess, int>> AccessField(
+abslx::StatusOr<std::pair<FieldAccess, int>> AccessField(
     const ProtoPathEntry& entry, FieldType field_type,
     const FieldValue& message) {
   FieldAccess result(entry.field_id, field_type);
@@ -180,7 +180,7 @@ absl::StatusOr<std::pair<FieldAccess, int>> AccessField(
   if (entry.field_id >= 0) {
     return std::pair(result, entry.index);
   }
-  return absl::InvalidArgumentError(absl::StrCat(
+  return abslx::InvalidArgumentError(abslx::StrCat(
       "ProtoPath field missing, field-id: ", entry.field_id, ", map-id: ",
       entry.map_id, ", key: ", entry.key_value, " key_type: ", entry.key_type));
 }
@@ -188,7 +188,7 @@ absl::StatusOr<std::pair<FieldAccess, int>> AccessField(
 }  // namespace
 
 // Replaces a range of field values for one field nested within a protobuf.
-absl::Status ProtoUtilLite::ReplaceFieldRange(
+abslx::Status ProtoUtilLite::ReplaceFieldRange(
     FieldValue* message, ProtoPath proto_path, int length, FieldType field_type,
     const std::vector<FieldValue>& field_values) {
   ProtoPathEntry entry = proto_path.front();
@@ -211,11 +211,11 @@ absl::Status ProtoUtilLite::ReplaceFieldRange(
   }
   message->clear();
   access.GetMessage(message);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Returns a range of field values from one field nested within a protobuf.
-absl::Status ProtoUtilLite::GetFieldRange(
+abslx::Status ProtoUtilLite::GetFieldRange(
     const FieldValue& message, ProtoPath proto_path, int length,
     FieldType field_type, std::vector<FieldValue>* field_values) {
   ProtoPathEntry entry = proto_path.front();
@@ -239,11 +239,11 @@ absl::Status ProtoUtilLite::GetFieldRange(
     field_values->insert(field_values->begin(), v.begin() + index,
                          v.begin() + index + length);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Returns the number of field values in a repeated protobuf field.
-absl::Status ProtoUtilLite::GetFieldCount(const FieldValue& message,
+abslx::Status ProtoUtilLite::GetFieldCount(const FieldValue& message,
                                           ProtoPath proto_path,
                                           FieldType field_type,
                                           int* field_count) {
@@ -262,63 +262,63 @@ absl::Status ProtoUtilLite::GetFieldCount(const FieldValue& message,
   } else {
     *field_count = v.size();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // If ok, returns OkStatus, otherwise returns InvalidArgumentError.
 template <typename T>
-absl::Status SyntaxStatus(bool ok, const std::string& text, T* result) {
-  return ok ? absl::OkStatus()
-            : absl::InvalidArgumentError(absl::StrCat(
+abslx::Status SyntaxStatus(bool ok, const std::string& text, T* result) {
+  return ok ? abslx::OkStatus()
+            : abslx::InvalidArgumentError(abslx::StrCat(
                   "Syntax error: \"", text, "\"",
                   " for type: ", MediaPipeTypeStringOrDemangled<T>(), "."));
 }
 
 // Templated parsing of a string value.
 template <typename T>
-absl::Status ParseValue(const std::string& text, T* result) {
-  return SyntaxStatus(absl::SimpleAtoi(text, result), text, result);
+abslx::Status ParseValue(const std::string& text, T* result) {
+  return SyntaxStatus(abslx::SimpleAtoi(text, result), text, result);
 }
 template <>
-absl::Status ParseValue<double>(const std::string& text, double* result) {
-  return SyntaxStatus(absl::SimpleAtod(text, result), text, result);
+abslx::Status ParseValue<double>(const std::string& text, double* result) {
+  return SyntaxStatus(abslx::SimpleAtod(text, result), text, result);
 }
 template <>
-absl::Status ParseValue<float>(const std::string& text, float* result) {
-  return SyntaxStatus(absl::SimpleAtof(text, result), text, result);
+abslx::Status ParseValue<float>(const std::string& text, float* result) {
+  return SyntaxStatus(abslx::SimpleAtof(text, result), text, result);
 }
 template <>
-absl::Status ParseValue<bool>(const std::string& text, bool* result) {
-  return SyntaxStatus(absl::SimpleAtob(text, result), text, result);
+abslx::Status ParseValue<bool>(const std::string& text, bool* result) {
+  return SyntaxStatus(abslx::SimpleAtob(text, result), text, result);
 }
 template <>
-absl::Status ParseValue<std::string>(const std::string& text,
+abslx::Status ParseValue<std::string>(const std::string& text,
                                      std::string* result) {
   *result = text;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Templated formatting of a primitive value.
 template <typename T>
 std::string FormatValue(T v) {
-  return FieldValue(absl::StrCat(v));
+  return FieldValue(abslx::StrCat(v));
 }
 
 // A helper function to parse and serialize one primtive value.
 template <typename T>
-absl::Status WritePrimitive(void (*writer)(T, proto_ns::io::CodedOutputStream*),
+abslx::Status WritePrimitive(void (*writer)(T, proto_ns::io::CodedOutputStream*),
                             const std::string& text, CodedOutputStream* out) {
   T value;
   MP_RETURN_IF_ERROR(ParseValue<T>(text, &value));
   (*writer)(value, out);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Serializes a protobuf FieldValue.
-static absl::Status SerializeValue(const std::string& text,
+static abslx::Status SerializeValue(const std::string& text,
                                    FieldType field_type,
                                    FieldValue* field_value) {
-  absl::Status status;
+  abslx::Status status;
   StringOutputStream sos(field_value);
   CodedOutputStream out(&sos);
 
@@ -344,11 +344,11 @@ static absl::Status SerializeValue(const std::string& text,
     case W::TYPE_BYTES:
     case W::TYPE_STRING: {
       out.WriteRaw(text.data(), text.size());
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case W::TYPE_GROUP:
     case W::TYPE_MESSAGE:
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "SerializeValue cannot serialize a Message.");
     case W::TYPE_UINT32:
       return WritePrimitive(W::WriteUInt32NoTag, text, &out);
@@ -363,25 +363,25 @@ static absl::Status SerializeValue(const std::string& text,
     case W::TYPE_SINT64:
       return WritePrimitive(W::WriteSInt64NoTag, text, &out);
   }
-  return absl::UnimplementedError("SerializeValue unimplemented type.");
+  return abslx::UnimplementedError("SerializeValue unimplemented type.");
 }
 
 // A helper function for deserializing one text value.
 template <typename CType, FieldType DeclaredType>
-static absl::Status ReadPrimitive(CodedInputStream* input,
+static abslx::Status ReadPrimitive(CodedInputStream* input,
                                   std::string* result) {
   CType value;
   if (!WireFormatLite::ReadPrimitive<CType, DeclaredType>(input, &value)) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "Bad serialized value: ", MediaPipeTypeStringOrDemangled<CType>(),
         "."));
   }
   *result = FormatValue(value);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Deserializes a protobuf FieldValue.
-static absl::Status DeserializeValue(const FieldValue& bytes,
+static abslx::Status DeserializeValue(const FieldValue& bytes,
                                      FieldType field_type,
                                      std::string* result) {
   ArrayInputStream ais(bytes.data(), bytes.size());
@@ -407,7 +407,7 @@ static absl::Status DeserializeValue(const FieldValue& bytes,
     case W::TYPE_BYTES:
     case W::TYPE_STRING: {
       *result = bytes;
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case W::TYPE_GROUP:
     case W::TYPE_MESSAGE:
@@ -425,10 +425,10 @@ static absl::Status DeserializeValue(const FieldValue& bytes,
     case W::TYPE_SINT64:
       return ReadPrimitive<proto_int64, W::TYPE_SINT64>(&input, result);
   }
-  return absl::UnimplementedError("DeserializeValue unimplemented type.");
+  return abslx::UnimplementedError("DeserializeValue unimplemented type.");
 }
 
-absl::Status ProtoUtilLite::Serialize(
+abslx::Status ProtoUtilLite::Serialize(
     const std::vector<std::string>& text_values, FieldType field_type,
     std::vector<FieldValue>* result) {
   result->clear();
@@ -438,10 +438,10 @@ absl::Status ProtoUtilLite::Serialize(
     MP_RETURN_IF_ERROR(SerializeValue(text_value, field_type, &field_value));
     result->push_back(field_value);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ProtoUtilLite::Deserialize(
+abslx::Status ProtoUtilLite::Deserialize(
     const std::vector<FieldValue>& field_values, FieldType field_type,
     std::vector<std::string>* result) {
   result->clear();
@@ -451,10 +451,10 @@ absl::Status ProtoUtilLite::Deserialize(
     MP_RETURN_IF_ERROR(DeserializeValue(field_value, field_type, &text_value));
     result->push_back(text_value);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ProtoUtilLite::WriteValue(const FieldData& value,
+abslx::Status ProtoUtilLite::WriteValue(const FieldData& value,
                                        FieldType field_type,
                                        std::string* field_bytes) {
   StringOutputStream sos(field_bytes);
@@ -497,28 +497,28 @@ absl::Status ProtoUtilLite::WriteValue(const FieldData& value,
       out.WriteString(value.message_value().value());
       break;
     default:
-      return absl::UnimplementedError(
-          absl::StrCat("Cannot write type: ", field_type));
+      return abslx::UnimplementedError(
+          abslx::StrCat("Cannot write type: ", field_type));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <typename ValueT, FieldType kFieldType>
-static ValueT ReadValue(absl::string_view field_bytes, absl::Status* status) {
+static ValueT ReadValue(abslx::string_view field_bytes, abslx::Status* status) {
   ArrayInputStream ais(field_bytes.data(), field_bytes.size());
   CodedInputStream input(&ais);
   ValueT result;
   if (!WireFormatLite::ReadPrimitive<ValueT, kFieldType>(&input, &result)) {
-    status->Update(absl::InvalidArgumentError(absl::StrCat(
+    status->Update(abslx::InvalidArgumentError(abslx::StrCat(
         "Bad serialized value: ", MediaPipeTypeStringOrDemangled<ValueT>(),
         ".")));
   }
   return result;
 }
 
-absl::Status ReadValue(absl::string_view field_bytes, FieldType field_type,
-                       absl::string_view message_type, FieldData* result) {
-  absl::Status status;
+abslx::Status ReadValue(abslx::string_view field_bytes, FieldType field_type,
+                       abslx::string_view message_type, FieldData* result) {
+  abslx::Status status;
   result->Clear();
   switch (field_type) {
     case WireFormatLite::TYPE_INT32:
@@ -570,29 +570,29 @@ absl::Status ReadValue(absl::string_view field_bytes, FieldType field_type,
           ProtoUtilLite::TypeUrl(message_type));
       break;
     default:
-      status = absl::UnimplementedError(
-          absl::StrCat("Cannot read type: ", field_type));
+      status = abslx::UnimplementedError(
+          abslx::StrCat("Cannot read type: ", field_type));
       break;
   }
   return status;
 }
 
-absl::Status ProtoUtilLite::ReadValue(absl::string_view field_bytes,
+abslx::Status ProtoUtilLite::ReadValue(abslx::string_view field_bytes,
                                       FieldType field_type,
-                                      absl::string_view message_type,
+                                      abslx::string_view message_type,
                                       FieldData* result) {
   return mediapipe::tool::ReadValue(field_bytes, field_type, message_type,
                                     result);
 }
 
-std::string ProtoUtilLite::TypeUrl(absl::string_view type_name) {
+std::string ProtoUtilLite::TypeUrl(abslx::string_view type_name) {
   constexpr std::string_view kTypeUrlPrefix = "type.googleapis.com/";
-  return absl::StrCat(std::string(kTypeUrlPrefix), std::string(type_name));
+  return abslx::StrCat(std::string(kTypeUrlPrefix), std::string(type_name));
 }
 
-std::string ProtoUtilLite::ParseTypeUrl(absl::string_view type_url) {
+std::string ProtoUtilLite::ParseTypeUrl(abslx::string_view type_url) {
   constexpr std::string_view kTypeUrlPrefix = "type.googleapis.com/";
-  if (absl::StartsWith(std::string(type_url), std::string(kTypeUrlPrefix))) {
+  if (abslx::StartsWith(std::string(type_url), std::string(kTypeUrlPrefix))) {
     return std::string(type_url.substr(kTypeUrlPrefix.length()));
   }
   return std::string(type_url);

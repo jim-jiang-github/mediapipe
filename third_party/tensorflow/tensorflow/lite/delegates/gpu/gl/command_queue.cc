@@ -32,18 +32,18 @@ namespace {
 
 class DefaultCommandQueue : public CommandQueue {
  public:
-  absl::Status Dispatch(const GlProgram& program,
+  abslx::Status Dispatch(const GlProgram& program,
                         const uint3& workgroups) override {
     RETURN_IF_ERROR(program.Dispatch(workgroups));
     return TFLITE_GPU_CALL_GL(glMemoryBarrier, GL_ALL_BARRIER_BITS);
   }
 
-  absl::Status WaitForCompletion() override {
+  abslx::Status WaitForCompletion() override {
     // TODO(akulik): Maybe let the user choose which wait method to use.
     return GlActiveSyncWait();
   }
 
-  absl::Status Flush() override { return absl::OkStatus(); }
+  abslx::Status Flush() override { return abslx::OkStatus(); }
 };
 
 // On Adreno do flush periodically as this affects performance. Command queue
@@ -57,27 +57,27 @@ class AdrenoCommandQueue : public DefaultCommandQueue {
   explicit AdrenoCommandQueue(int flush_every_n)
       : flush_every_n_(flush_every_n) {}
 
-  absl::Status Dispatch(const GlProgram& program,
+  abslx::Status Dispatch(const GlProgram& program,
                         const uint3& workgroups) final {
     RETURN_IF_ERROR(DefaultCommandQueue::Dispatch(program, workgroups));
     if ((++program_counter_ % flush_every_n_) == 0) {
       glFlush();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status WaitForCompletion() override {
+  abslx::Status WaitForCompletion() override {
     program_counter_ = 0;
     return DefaultCommandQueue::WaitForCompletion();
   }
 
-  absl::Status Flush() final {
+  abslx::Status Flush() final {
     // Flush exactly once after the last dispatch.
     if (program_counter_ != 0) {
       program_counter_ = 0;
       glFlush();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

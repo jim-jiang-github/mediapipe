@@ -22,14 +22,14 @@
 namespace mediapipe {
 
 // Converts a NormalizedRect into a Rectangle_f.
-absl::StatusOr<Rectangle_f> ToRectangle(
+abslx::StatusOr<Rectangle_f> ToRectangle(
     const mediapipe::NormalizedRect& input) {
   if (!input.has_x_center() || !input.has_y_center() || !input.has_width() ||
       !input.has_height()) {
-    return absl::InvalidArgumentError("Missing dimensions in NormalizedRect.");
+    return abslx::InvalidArgumentError("Missing dimensions in NormalizedRect.");
   }
   if (input.width() < 0.0f || input.height() < 0.0f) {
-    return absl::InvalidArgumentError("Negative rectangle width or height.");
+    return abslx::InvalidArgumentError("Negative rectangle width or height.");
   }
 
   const float xmin = input.x_center() - input.width() / 2.0;
@@ -41,9 +41,9 @@ absl::StatusOr<Rectangle_f> ToRectangle(
 
 // If the new_rect overlaps with any of the rectangles in
 // existing_rects, then return true. Otherwise, return false.
-absl::StatusOr<bool> DoesRectOverlap(
+abslx::StatusOr<bool> DoesRectOverlap(
     const mediapipe::NormalizedRect& new_rect,
-    absl::Span<const mediapipe::NormalizedRect> existing_rects,
+    abslx::Span<const mediapipe::NormalizedRect> existing_rects,
     float min_similarity_threshold) {
   ASSIGN_OR_RETURN(Rectangle_f new_rectangle, ToRectangle(new_rect));
 

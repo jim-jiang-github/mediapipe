@@ -20,7 +20,7 @@
 #include "absl/base/config.h"
 #include "time_zone_if.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
@@ -50,6 +50,6 @@ class TimeZoneLibC : public TimeZoneIf {
 }  // namespace cctz
 }  // namespace time_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_LIBC_H_

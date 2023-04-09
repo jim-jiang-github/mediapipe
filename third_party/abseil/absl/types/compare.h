@@ -16,12 +16,12 @@
 // compare.h
 // -----------------------------------------------------------------------------
 //
-// This header file defines the `absl::weak_equality`, `absl::strong_equality`,
-// `absl::partial_ordering`, `absl::weak_ordering`, and `absl::strong_ordering`
+// This header file defines the `abslx::weak_equality`, `abslx::strong_equality`,
+// `abslx::partial_ordering`, `abslx::weak_ordering`, and `abslx::strong_ordering`
 // types for storing the results of three way comparisons.
 //
 // Example:
-//   absl::weak_ordering compare(const std::string& a, const std::string& b);
+//   abslx::weak_ordering compare(const std::string& a, const std::string& b);
 //
 // These are C++11 compatible versions of the C++20 corresponding types
 // (`std::weak_equality`, etc.) and are designed to be drop-in replacements
@@ -38,7 +38,7 @@
 #include "absl/base/attributes.h"
 #include "absl/meta/type_traits.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace compare_internal {
 
@@ -545,9 +545,9 @@ namespace compare_internal {
 // or three-way comparator.
 // SFINAE prevents implicit conversions to bool (such as from int).
 template <typename Bool,
-          absl::enable_if_t<std::is_same<bool, Bool>::value, int> = 0>
+          abslx::enable_if_t<std::is_same<bool, Bool>::value, int> = 0>
 constexpr bool compare_result_as_less_than(const Bool r) { return r; }
-constexpr bool compare_result_as_less_than(const absl::weak_ordering r) {
+constexpr bool compare_result_as_less_than(const abslx::weak_ordering r) {
   return r < 0;
 }
 
@@ -561,40 +561,40 @@ constexpr bool do_less_than_comparison(const Compare &compare, const K &x,
 // three-way comparator.
 // SFINAE prevents implicit conversions to int (such as from bool).
 template <typename Int,
-          absl::enable_if_t<std::is_same<int, Int>::value, int> = 0>
-constexpr absl::weak_ordering compare_result_as_ordering(const Int c) {
-  return c < 0 ? absl::weak_ordering::less
-               : c == 0 ? absl::weak_ordering::equivalent
-                        : absl::weak_ordering::greater;
+          abslx::enable_if_t<std::is_same<int, Int>::value, int> = 0>
+constexpr abslx::weak_ordering compare_result_as_ordering(const Int c) {
+  return c < 0 ? abslx::weak_ordering::less
+               : c == 0 ? abslx::weak_ordering::equivalent
+                        : abslx::weak_ordering::greater;
 }
-constexpr absl::weak_ordering compare_result_as_ordering(
-    const absl::weak_ordering c) {
+constexpr abslx::weak_ordering compare_result_as_ordering(
+    const abslx::weak_ordering c) {
   return c;
 }
 
 template <
     typename Compare, typename K, typename LK,
-    absl::enable_if_t<!std::is_same<bool, absl::result_of_t<Compare(
+    abslx::enable_if_t<!std::is_same<bool, abslx::result_of_t<Compare(
                                               const K &, const LK &)>>::value,
                       int> = 0>
-constexpr absl::weak_ordering do_three_way_comparison(const Compare &compare,
+constexpr abslx::weak_ordering do_three_way_comparison(const Compare &compare,
                                                       const K &x, const LK &y) {
   return compare_result_as_ordering(compare(x, y));
 }
 template <
     typename Compare, typename K, typename LK,
-    absl::enable_if_t<std::is_same<bool, absl::result_of_t<Compare(
+    abslx::enable_if_t<std::is_same<bool, abslx::result_of_t<Compare(
                                              const K &, const LK &)>>::value,
                       int> = 0>
-constexpr absl::weak_ordering do_three_way_comparison(const Compare &compare,
+constexpr abslx::weak_ordering do_three_way_comparison(const Compare &compare,
                                                       const K &x, const LK &y) {
-  return compare(x, y) ? absl::weak_ordering::less
-                       : compare(y, x) ? absl::weak_ordering::greater
-                                       : absl::weak_ordering::equivalent;
+  return compare(x, y) ? abslx::weak_ordering::less
+                       : compare(y, x) ? abslx::weak_ordering::greater
+                                       : abslx::weak_ordering::equivalent;
 }
 
 }  // namespace compare_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_TYPES_COMPARE_H_

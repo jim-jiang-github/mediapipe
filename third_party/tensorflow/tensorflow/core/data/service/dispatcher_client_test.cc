@@ -51,7 +51,7 @@ DataServiceMetadata GetDefaultMetadata() {
   TensorShapeProto::Dim* dim =
       decoded_spec.mutable_tensor_shape_value()->add_dim();
   dim->set_size(1);
-  dim->set_name(absl::StrCat("dim"));
+  dim->set_name(abslx::StrCat("dim"));
 
   DataServiceMetadata metadata;
   metadata.set_element_spec(decoded_spec.SerializeAsString());

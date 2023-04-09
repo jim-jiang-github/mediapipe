@@ -158,7 +158,7 @@ class GrpcDataTransferClient : public DataTransferClient {
   std::unique_ptr<WorkerService::Stub> stub_;
   // Set of all currently active clients contexts. Used to support
   // cancellation.
-  absl::flat_hash_set<::grpc::ClientContext*> active_contexts_
+  abslx::flat_hash_set<::grpc::ClientContext*> active_contexts_
       TF_GUARDED_BY(mu_);
   // Indicates that the client has been cancelled, so no further requests should
   // be accepted.
@@ -184,7 +184,7 @@ static GrpcTransferClientRegistrar gprc_client_registrar;
 
 class LocalDataTransferClient : public DataTransferClient {
  public:
-  explicit LocalDataTransferClient(absl::string_view worker_address)
+  explicit LocalDataTransferClient(abslx::string_view worker_address)
       : worker_address_(worker_address) {
     VLOG(2) << "Create LocalDataTransferClient for worker " << worker_address_
             << ".";
@@ -213,7 +213,7 @@ class LocalDataTransferClient : public DataTransferClient {
   Status VerifyClientIsNotCancelled() TF_LOCKS_EXCLUDED(mu_) {
     mutex_lock l(mu_);
     if (cancelled_) {
-      return errors::Cancelled(absl::Substitute(
+      return errors::Cancelled(abslx::Substitute(
           "Client for worker $0 has been cancelled.", worker_address_));
     }
     return OkStatus();
@@ -224,7 +224,7 @@ class LocalDataTransferClient : public DataTransferClient {
     std::shared_ptr<DataServiceWorkerImpl> worker =
         LocalWorkers::Get(worker_address_);
     if (!worker) {
-      return errors::Cancelled(absl::Substitute(
+      return errors::Cancelled(abslx::Substitute(
           "Local worker at address $0 is no longer available; cancel request "
           "for task $1.",
           worker_address_, req.task_id()));

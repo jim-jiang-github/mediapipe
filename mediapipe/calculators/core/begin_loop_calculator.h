@@ -61,7 +61,7 @@ class BeginLoopCalculator : public CalculatorBase {
   using ItemT = typename IterableT::value_type;
 
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     // The below enables processing of timestamp bound updates, and that enables
     // correct timestamp propagation by the companion EndLoopCalculator.
     //
@@ -106,10 +106,10 @@ class BeginLoopCalculator : public CalculatorBase {
       }
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     Timestamp last_timestamp = loop_internal_timestamp_;
     if (!cc->Inputs().Tag("ITERABLE").IsEmpty()) {
       const IterableT& collection =
@@ -139,7 +139,7 @@ class BeginLoopCalculator : public CalculatorBase {
         .AddPacket(MakePacket<Timestamp>(cc->InputTimestamp())
                        .At(Timestamp(loop_internal_timestamp_ - 1)));
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

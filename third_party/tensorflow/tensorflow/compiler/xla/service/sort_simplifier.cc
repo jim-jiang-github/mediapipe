@@ -42,7 +42,7 @@ StatusOr<bool> RemoveUnusedOperandFromSort(HloInstruction* sort) {
     return false;
   }
 
-  absl::flat_hash_set<int64_t> used_indices;
+  abslx::flat_hash_set<int64_t> used_indices;
   for (const HloInstruction* user : sort->users()) {
     if (user->opcode() != HloOpcode::kGetTupleElement) {
       // Can't analyse users other then get-tuple-element.
@@ -80,7 +80,7 @@ StatusOr<bool> RemoveUnusedOperandFromSort(HloInstruction* sort) {
                              : ShapeUtil::MakeTupleShapeWithPtrs(new_shapes);
   HloInstruction* new_sort = computation->AddInstruction(
       sort->CloneWithNewOperands(new_sort_shape, operands));
-  absl::flat_hash_map<const HloInstruction*, std::unique_ptr<HloInstruction>>
+  abslx::flat_hash_map<const HloInstruction*, std::unique_ptr<HloInstruction>>
       replacements;
   int64_t parameter_number = 0;
   for (int64_t i = 0; i < sort->operand_count(); ++i) {
@@ -91,11 +91,11 @@ StatusOr<bool> RemoveUnusedOperandFromSort(HloInstruction* sort) {
           ShapeUtil::MakeShape(sort->operand(i)->shape().element_type(), {});
       replacements[old_lhs_parameter] = HloInstruction::CreateParameter(
           parameter_number, scalar_shape,
-          absl::StrCat("p.", parameter_number / 2, ".lhs"));
+          abslx::StrCat("p.", parameter_number / 2, ".lhs"));
       ++parameter_number;
       replacements[old_rhs_parameter] = HloInstruction::CreateParameter(
           parameter_number, scalar_shape,
-          absl::StrCat("p.", parameter_number / 2, ".rhs"));
+          abslx::StrCat("p.", parameter_number / 2, ".rhs"));
       ++parameter_number;
     } else {
       replacements[old_lhs_parameter] = nullptr;
@@ -108,7 +108,7 @@ StatusOr<bool> RemoveUnusedOperandFromSort(HloInstruction* sort) {
   new_sort->set_to_apply(new_compare);
 
   // Map from original get-tuple-element tuple index to new HLO instruction
-  absl::flat_hash_map<int64_t, HloInstruction*> result_map;
+  abslx::flat_hash_map<int64_t, HloInstruction*> result_map;
   if (new_sort->shape().IsTuple()) {
     // Old sort key maps to new sort key.
     int64_t new_index = 0;
@@ -137,14 +137,14 @@ StatusOr<bool> RemoveUnusedOperandFromSort(HloInstruction* sort) {
 
 StatusOr<bool> SortSimplifier::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   VLOG(2) << "HLO module before SortSimplifier:";
   XLA_VLOG_LINES(2, module->ToString());
 
   bool changed = false;
   std::vector<HloInstruction*> sort_instrs;
   for (auto* comp : module->MakeNonfusionComputations(execution_threads)) {
-    absl::c_copy_if(comp->instructions(), std::back_inserter(sort_instrs),
+    abslx::c_copy_if(comp->instructions(), std::back_inserter(sort_instrs),
                     [](const HloInstruction* instr) {
                       return instr->opcode() == HloOpcode::kSort;
                     });

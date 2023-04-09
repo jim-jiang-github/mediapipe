@@ -1020,8 +1020,8 @@ class MklLayoutRewritePass : public GraphOptimizationPass {
     // If Op has been specifically assigned to a non-CPU or XLA_CPU device, then
     // No.
     if (!n->assigned_device_name().empty() &&
-        (!absl::StrContains(n->assigned_device_name(), kCPUDeviceSubStr) ||
-         absl::StrContains(n->assigned_device_name(), kXLACPUDeviceSubStr))) {
+        (!abslx::StrContains(n->assigned_device_name(), kCPUDeviceSubStr) ||
+         abslx::StrContains(n->assigned_device_name(), kXLACPUDeviceSubStr))) {
       result = false;
       reason = "Op has been assigned a runtime device that is not CPU.";
     }
@@ -1029,8 +1029,8 @@ class MklLayoutRewritePass : public GraphOptimizationPass {
     // If user has specifically assigned this op to a non-CPU or XLA_CPU device,
     // then No.
     if (!n->def().device().empty() &&
-        (!absl::StrContains(n->def().device(), kCPUDeviceSubStr) ||
-         absl::StrContains(n->def().device(), kXLACPUDeviceSubStr))) {
+        (!abslx::StrContains(n->def().device(), kCPUDeviceSubStr) ||
+         abslx::StrContains(n->def().device(), kXLACPUDeviceSubStr))) {
       result = false;
       reason = "User has assigned a device that is not CPU.";
     }

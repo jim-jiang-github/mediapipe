@@ -275,7 +275,7 @@ void BoxTracker::NewBoxTrack(const TimedBox& initial_pos, int id,
           << " from " << min_msec << " to " << max_msec;
 
   // Mark initialization with checkpoint -1.
-  absl::MutexLock lock(&status_mutex_);
+  abslx::MutexLock lock(&status_mutex_);
 
   if (canceling_) {
     LOG(WARNING) << "Box Tracker is in cancel state. Refusing request.";
@@ -291,7 +291,7 @@ void BoxTracker::NewBoxTrack(const TimedBox& initial_pos, int id,
 }
 
 std::pair<int64, int64> BoxTracker::TrackInterval(int id) {
-  absl::MutexLock lock(&path_mutex_);
+  abslx::MutexLock lock(&path_mutex_);
   const Path& path = paths_[id];
   if (path.empty()) {
     return std::make_pair(-1, -1);
@@ -317,7 +317,7 @@ void BoxTracker::NewBoxTrackAsync(const TimedBox& initial_pos, int id,
   AugmentedChunkPtr tracking_chunk(ReadChunk(id, kInitCheckpoint, chunk_idx));
 
   if (!tracking_chunk.first) {
-    absl::MutexLock lock(&status_mutex_);
+    abslx::MutexLock lock(&status_mutex_);
     --track_status_[id][kInitCheckpoint].tracks_ongoing;
     LOG(ERROR) << "Could not read tracking chunk from file: " << chunk_idx
                << " for start position: " << initial_pos.ToString();
@@ -354,7 +354,7 @@ void BoxTracker::NewBoxTrackAsync(const TimedBox& initial_pos, int id,
 
   // If another checkpoint is close by, cancel that one.
   VLOG(1) << "Removing close checkpoints";
-  absl::MutexLock lock(&status_mutex_);
+  abslx::MutexLock lock(&status_mutex_);
   RemoveCloseCheckpoints(id, checkpoint);
 
   VLOG(1) << "Cancel existing tracks";
@@ -439,7 +439,7 @@ void BoxTracker::RemoveCloseCheckpoints(int id, int checkpoint) {
 
 bool BoxTracker::WaitToScheduleId(int id) {
   VLOG(1) << "Wait to schedule id: " << id;
-  absl::MutexLock lock(&status_mutex_);
+  abslx::MutexLock lock(&status_mutex_);
   while (new_box_track_[id]) {
     // Box tracking is currently ongoing for this id.
     if (track_status_[id][kInitCheckpoint].canceled) {
@@ -499,7 +499,7 @@ bool BoxTracker::GetTimedPosition(int id, int64 time_msec, TimedBox* result,
 
   VLOG(1) << "Obtaining result at " << time_msec;
 
-  absl::MutexLock lock(&path_mutex_);
+  abslx::MutexLock lock(&path_mutex_);
   const Path& path = paths_[id];
   if (path.empty()) {
     LOG(ERROR) << "Empty path!";
@@ -554,7 +554,7 @@ bool BoxTracker::GetTimedPosition(int id, int64 time_msec, TimedBox* result,
 }
 
 bool BoxTracker::IsTrackingOngoingForId(int id) {
-  absl::MutexLock lock(&status_mutex_);
+  abslx::MutexLock lock(&status_mutex_);
   for (const auto& item : track_status_[id]) {
     if (item.second.tracks_ongoing > 0) {
       return true;
@@ -564,7 +564,7 @@ bool BoxTracker::IsTrackingOngoingForId(int id) {
 }
 
 bool BoxTracker::IsTrackingOngoing() {
-  absl::MutexLock lock(&status_mutex_);
+  abslx::MutexLock lock(&status_mutex_);
   return IsTrackingOngoingMutexHeld();
 }
 
@@ -601,14 +601,14 @@ std::unique_ptr<TrackingDataChunk> BoxTracker::ReadChunkFromCache(
   VLOG(1) << __FUNCTION__ << " id=" << id << " chunk_idx=" << chunk_idx;
 
   auto format_runtime =
-      absl::ParsedFormat<'d'>::New(options_.cache_file_format());
+      abslx::ParsedFormat<'d'>::New(options_.cache_file_format());
 
   std::string chunk_file;
   if (format_runtime) {
-    chunk_file = cache_dir_ + "/" + absl::StrFormat(*format_runtime, chunk_idx);
+    chunk_file = cache_dir_ + "/" + abslx::StrFormat(*format_runtime, chunk_idx);
   } else {
     LOG(ERROR) << "chache_file_format wrong. fall back to chunk_%04d.";
-    chunk_file = cache_dir_ + "/" + absl::StrFormat("chunk_%04d", chunk_idx);
+    chunk_file = cache_dir_ + "/" + abslx::StrFormat("chunk_%04d", chunk_idx);
   }
 
   VLOG(1) << "Reading chunk from cache: " << chunk_file;
@@ -661,13 +661,13 @@ bool BoxTracker::WaitForChunkFile(int id, int checkpoint,
   while (!file_exists && total_wait_msec < timeout_msec) {
     // Check if we got canceled.
     {
-      absl::MutexLock lock(&status_mutex_);
+      abslx::MutexLock lock(&status_mutex_);
       if (track_status_[id][checkpoint].canceled) {
         return false;
       }
     }
 
-    absl::SleepFor(absl::Milliseconds(wait_time_msec));
+    abslx::SleepFor(abslx::Milliseconds(wait_time_msec));
     total_wait_msec += wait_time_msec;
 
     struct stat tmp;
@@ -724,7 +724,7 @@ int BoxTracker::ClosestFrameIndex(int64 msec,
 
 void BoxTracker::AddBoxResult(const TimedBox& box, int id, int checkpoint,
                               const MotionBoxState& state) {
-  absl::MutexLock lock(&path_mutex_);
+  abslx::MutexLock lock(&path_mutex_);
   PathSegment& segment = paths_[id][checkpoint];
   auto insert_pos = std::lower_bound(segment.begin(), segment.end(), box);
   const bool store_state = options_.record_path_states();
@@ -738,7 +738,7 @@ void BoxTracker::AddBoxResult(const TimedBox& box, int id, int checkpoint,
 }
 
 void BoxTracker::ClearCheckpoint(int id, int checkpoint) {
-  absl::MutexLock lock(&path_mutex_);
+  abslx::MutexLock lock(&path_mutex_);
   PathSegment& segment = paths_[id][checkpoint];
   segment.clear();
 }
@@ -760,7 +760,7 @@ void BoxTracker::TrackingImpl(const TrackingImplArgs& a) {
   auto cleanup_func = [&a, this]() -> void {
     if (a.first_call) {
       // Signal we are done processing in this direction.
-      absl::MutexLock lock(&status_mutex_);
+      abslx::MutexLock lock(&status_mutex_);
       --track_status_[a.id][a.checkpoint].tracks_ongoing;
       status_condvar_.SignalAll();
     }
@@ -803,7 +803,7 @@ void BoxTracker::TrackingImpl(const TrackingImplArgs& a) {
       } else {
         // Test if current request is canceled.
         {
-          absl::MutexLock lock(&status_mutex_);
+          abslx::MutexLock lock(&status_mutex_);
           if (track_status_[a.id][a.checkpoint].canceled) {
             --track_status_[a.id][a.checkpoint].tracks_ongoing;
             status_condvar_.SignalAll();
@@ -861,7 +861,7 @@ void BoxTracker::TrackingImpl(const TrackingImplArgs& a) {
       } else {
         // Test if current request is canceled.
         {
-          absl::MutexLock lock(&status_mutex_);
+          abslx::MutexLock lock(&status_mutex_);
           if (track_status_[a.id][a.checkpoint].canceled) {
             --track_status_[a.id][a.checkpoint].tracks_ongoing;
             status_condvar_.SignalAll();
@@ -969,13 +969,13 @@ bool TimedBoxAtTime(const PathSegment& segment, int64 time_msec, TimedBox* box,
 }
 
 void BoxTracker::ResumeTracking() {
-  absl::MutexLock lock(&status_mutex_);
+  abslx::MutexLock lock(&status_mutex_);
   canceling_ = false;
 }
 
 void BoxTracker::CancelAllOngoingTracks() {
   // Get a list of items to be canceled (id, checkpoint)
-  absl::MutexLock lock(&status_mutex_);
+  abslx::MutexLock lock(&status_mutex_);
   canceling_ = true;
 
   std::vector<std::pair<int, int>> to_be_canceled;
@@ -1011,17 +1011,17 @@ void BoxTracker::CancelAllOngoingTracks() {
 
 bool BoxTracker::WaitForAllOngoingTracks(int timeout_us) {
   MEASURE_TIME << "Tracking time ...";
-  absl::MutexLock lock(&status_mutex_);
+  abslx::MutexLock lock(&status_mutex_);
 
   // Infinite wait for timeout <= 0.
-  absl::Duration timeout = timeout_us > 0 ? absl::Microseconds(timeout_us)
-                                          : absl::InfiniteDuration();
+  abslx::Duration timeout = timeout_us > 0 ? abslx::Microseconds(timeout_us)
+                                          : abslx::InfiniteDuration();
 
-  while (timeout > absl::ZeroDuration() && IsTrackingOngoingMutexHeld()) {
-    absl::Time start_wait = absl::Now();
+  while (timeout > abslx::ZeroDuration() && IsTrackingOngoingMutexHeld()) {
+    abslx::Time start_wait = abslx::Now();
     status_condvar_.WaitWithTimeout(&status_mutex_, timeout);
 
-    absl::Duration elapsed = absl::Now() - start_wait;
+    abslx::Duration elapsed = abslx::Now() - start_wait;
     timeout -= elapsed;
   }
 
@@ -1037,7 +1037,7 @@ bool BoxTracker::GetTrackingData(int id, int64 request_time_msec,
 
   AugmentedChunkPtr tracking_chunk(ReadChunk(id, kInitCheckpoint, chunk_idx));
   if (!tracking_chunk.first) {
-    absl::MutexLock lock(&status_mutex_);
+    abslx::MutexLock lock(&status_mutex_);
     --track_status_[id][kInitCheckpoint].tracks_ongoing;
     LOG(ERROR) << "Could not read tracking chunk from file.";
     return false;

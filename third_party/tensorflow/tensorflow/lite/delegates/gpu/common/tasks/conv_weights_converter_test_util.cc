@@ -26,7 +26,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 namespace {
-absl::Status ConvolutionWeightsConverterTest(
+abslx::Status ConvolutionWeightsConverterTest(
     const Tensor<OHWI, DataType::FLOAT32>& weights,
     const WeightsDescription& weight_desc, TestExecutionEnvironment* env,
     const OperationDef& op_def) {
@@ -65,7 +65,7 @@ absl::Status ConvolutionWeightsConverterTest(
   DataType weights_type = DataType::FLOAT32;
 
   std::vector<uint8_t> weights_data(flt_count * SizeOf(weights_type));
-  RearrangeWeights(weights, weight_desc_copy, absl::MakeSpan(weights_data));
+  RearrangeWeights(weights, weight_desc_copy, abslx::MakeSpan(weights_data));
 
   std::vector<TensorFloat32> dst_tensors;
   if (weight_desc_copy.layout ==
@@ -124,12 +124,12 @@ absl::Status ConvolutionWeightsConverterTest(
     RETURN_IF_ERROR(
         PointWiseNear(dst_tensors[i].data, dst_tensors_gpu[i].data, 0.0f));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace
 
-absl::Status ConverterToConvWeights1x1OutX4Test(TestExecutionEnvironment* env) {
+abslx::Status ConverterToConvWeights1x1OutX4Test(TestExecutionEnvironment* env) {
   const int kSrcChannels = 8;
   const int kDstChannels = 32;
   auto weights_shape = OHWI(kDstChannels, 1, 1, kSrcChannels);
@@ -159,10 +159,10 @@ absl::Status ConverterToConvWeights1x1OutX4Test(TestExecutionEnvironment* env) {
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConverterToConvWeights1x1OutX4UnalignedTest(
+abslx::Status ConverterToConvWeights1x1OutX4UnalignedTest(
     TestExecutionEnvironment* env) {
   const int kSrcChannels = 8;
   const int kDstChannels = 17;
@@ -193,10 +193,10 @@ absl::Status ConverterToConvWeights1x1OutX4UnalignedTest(
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConverterToConvWeights1x1OutX2Test(TestExecutionEnvironment* env) {
+abslx::Status ConverterToConvWeights1x1OutX2Test(TestExecutionEnvironment* env) {
   const int kSrcChannels = 7;
   const int kDstChannels = 37;
   auto weights_shape = OHWI(kDstChannels, 1, 1, kSrcChannels);
@@ -226,10 +226,10 @@ absl::Status ConverterToConvWeights1x1OutX2Test(TestExecutionEnvironment* env) {
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConverterToConvWeightsOutX2Test(TestExecutionEnvironment* env) {
+abslx::Status ConverterToConvWeightsOutX2Test(TestExecutionEnvironment* env) {
   const int kSrcChannels = 8;
   const int kDstChannels = 38;
   auto weights_shape = OHWI(kDstChannels, 3, 4, kSrcChannels);
@@ -259,10 +259,10 @@ absl::Status ConverterToConvWeightsOutX2Test(TestExecutionEnvironment* env) {
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConverterToConvTransposedWeights4x4Test(
+abslx::Status ConverterToConvTransposedWeights4x4Test(
     TestExecutionEnvironment* env) {
   const int kSrcChannels = 7;
   const int kDstChannels = 11;
@@ -294,10 +294,10 @@ absl::Status ConverterToConvTransposedWeights4x4Test(
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConverterToConvWeights4xTexturesTest(
+abslx::Status ConverterToConvWeights4xTexturesTest(
     TestExecutionEnvironment* env) {
   const int src_channels = 9;
   const int dst_channels = 17;
@@ -335,7 +335,7 @@ absl::Status ConverterToConvWeights4xTexturesTest(
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

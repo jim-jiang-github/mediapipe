@@ -58,7 +58,7 @@ class Semaphore {
   static bool CanAcquire(CanAcquireArgs* args)
       ABSL_EXCLUSIVE_LOCKS_REQUIRED(args->semaphore->mu_);
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   int64_t value_ ABSL_GUARDED_BY(mu_);
 };
 

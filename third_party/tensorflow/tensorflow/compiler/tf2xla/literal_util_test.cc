@@ -28,7 +28,7 @@ TEST(LiteralUtil, LiteralToHostTensor) {
   // int64 literal can only be converted to an int64 host tensor.
   std::vector<int64_t> int64_values = {1, 2, 3};
   xla::Literal int64_values_literal =
-      xla::LiteralUtil::CreateR1(absl::Span<const int64_t>(int64_values));
+      xla::LiteralUtil::CreateR1(abslx::Span<const int64_t>(int64_values));
   Tensor host_tensor;
   EXPECT_EQ("Cannot convert literal of type S64 to tensor of type int32",
             LiteralToHostTensor(int64_values_literal, DT_INT32, &host_tensor)
@@ -58,7 +58,7 @@ TYPED_TEST(LiteralUtilTest, LiteralToQuantizedHostTensor) {
   Tensor host_tensor;
   std::vector<int_type> int_values = {10, 11};
   xla::Literal int_values_literal =
-      xla::LiteralUtil::CreateR1(absl::Span<const int_type>(int_values));
+      xla::LiteralUtil::CreateR1(abslx::Span<const int_type>(int_values));
   EXPECT_TRUE(LiteralToHostTensor(int_values_literal,
                                   DataTypeToEnum<int_type>::value, &host_tensor)
                   .ok());

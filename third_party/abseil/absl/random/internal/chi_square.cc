@@ -18,7 +18,7 @@
 
 #include "absl/random/internal/distribution_test_util.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 namespace {
@@ -229,4 +229,4 @@ double ChiSquarePValue(double chi_square, int dof) {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

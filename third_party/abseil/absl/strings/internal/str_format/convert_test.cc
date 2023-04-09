@@ -29,7 +29,7 @@
 #include "absl/strings/match.h"
 #include "absl/types/optional.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace str_format_internal {
 namespace {
@@ -220,7 +220,7 @@ void TestStringConvert(const T& str) {
   };
   for (const Expectation &e : kExpect) {
     UntypedFormatSpecImpl format(e.fmt);
-    EXPECT_EQ(e.out, FormatPack(format, absl::MakeSpan(args)));
+    EXPECT_EQ(e.out, FormatPack(format, abslx::MakeSpan(args)));
   }
 }
 
@@ -281,7 +281,7 @@ TEST_F(FormatConvertTest, Pointer) {
       FormatArgImpl(cnil), FormatArgImpl(mcp), FormatArgImpl(fp),
       FormatArgImpl(fnil), FormatArgImpl(vcp), FormatArgImpl(vcnil),
   };
-  auto args = absl::MakeConstSpan(args_array);
+  auto args = abslx::MakeConstSpan(args_array);
 
   EXPECT_THAT(FormatPack(UntypedFormatSpecImpl("%p"), args),
               MatchesPointerString(&x));
@@ -343,8 +343,8 @@ TEST_F(FormatConvertTest, Enum) {
   const FormatArgImpl args[] = {FormatArgImpl(k3), FormatArgImpl(km3)};
   UntypedFormatSpecImpl format("%1$d");
   UntypedFormatSpecImpl format2("%2$d");
-  EXPECT_EQ("3", FormatPack(format, absl::MakeSpan(args)));
-  EXPECT_EQ("-3", FormatPack(format2, absl::MakeSpan(args)));
+  EXPECT_EQ("3", FormatPack(format, abslx::MakeSpan(args)));
+  EXPECT_EQ("-3", FormatPack(format2, abslx::MakeSpan(args)));
 }
 
 template <typename T>
@@ -443,7 +443,7 @@ TYPED_TEST_P(TypedFormatConvertTest, AllIntsWithFlags) {
                          " new_fmt: \"" +
                          new_fmt + "\"");
             UntypedFormatSpecImpl format(new_fmt);
-            EXPECT_EQ(old_result, FormatPack(format, absl::MakeSpan(args)));
+            EXPECT_EQ(old_result, FormatPack(format, abslx::MakeSpan(args)));
           }
         }
       }
@@ -466,7 +466,7 @@ TYPED_TEST_P(TypedFormatConvertTest, Char) {
   for (const T &c : kVals) {
     const FormatArgImpl args[] = {FormatArgImpl(c)};
     UntypedFormatSpecImpl format("%c");
-    EXPECT_EQ(StrPrint("%c", c), FormatPack(format, absl::MakeSpan(args)));
+    EXPECT_EQ(StrPrint("%c", c), FormatPack(format, abslx::MakeSpan(args)));
   }
 }
 
@@ -487,16 +487,16 @@ TEST_F(FormatConvertTest, VectorBool) {
   const std::vector<bool> cv = {true, false};
   EXPECT_EQ("1,0,1,0",
             FormatPack(UntypedFormatSpecImpl("%d,%d,%d,%d"),
-                       absl::Span<const FormatArgImpl>(
+                       abslx::Span<const FormatArgImpl>(
                            {FormatArgImpl(v[0]), FormatArgImpl(v[1]),
                             FormatArgImpl(cv[0]), FormatArgImpl(cv[1])})));
 }
 
 
 TEST_F(FormatConvertTest, Int128) {
-  absl::int128 positive = static_cast<absl::int128>(0x1234567890abcdef) * 1979;
-  absl::int128 negative = -positive;
-  absl::int128 max = absl::Int128Max(), min = absl::Int128Min();
+  abslx::int128 positive = static_cast<abslx::int128>(0x1234567890abcdef) * 1979;
+  abslx::int128 negative = -positive;
+  abslx::int128 max = abslx::Int128Max(), min = abslx::Int128Min();
   const FormatArgImpl args[] = {FormatArgImpl(positive),
                                 FormatArgImpl(negative), FormatArgImpl(max),
                                 FormatArgImpl(min)};
@@ -524,13 +524,13 @@ TEST_F(FormatConvertTest, Int128) {
 
   for (auto c : cases) {
     UntypedFormatSpecImpl format(c.format);
-    EXPECT_EQ(c.expected, FormatPack(format, absl::MakeSpan(args)));
+    EXPECT_EQ(c.expected, FormatPack(format, abslx::MakeSpan(args)));
   }
 }
 
 TEST_F(FormatConvertTest, Uint128) {
-  absl::uint128 v = static_cast<absl::uint128>(0x1234567890abcdef) * 1979;
-  absl::uint128 max = absl::Uint128Max();
+  abslx::uint128 v = static_cast<abslx::uint128>(0x1234567890abcdef) * 1979;
+  abslx::uint128 max = abslx::Uint128Max();
   const FormatArgImpl args[] = {FormatArgImpl(v), FormatArgImpl(max)};
 
   struct Case {
@@ -549,7 +549,7 @@ TEST_F(FormatConvertTest, Uint128) {
 
   for (auto c : cases) {
     UntypedFormatSpecImpl format(c.format);
-    EXPECT_EQ(c.expected, FormatPack(format, absl::MakeSpan(args)));
+    EXPECT_EQ(c.expected, FormatPack(format, abslx::MakeSpan(args)));
   }
 }
 
@@ -574,7 +574,7 @@ void TestWithMultipleFormatsHelper(const std::vector<Floating> &floats,
                    'e', 'E'}) {
       std::string fmt_str = std::string(fmt) + f;
 
-      if (fmt == absl::string_view("%.5000") && f != 'f' && f != 'F' &&
+      if (fmt == abslx::string_view("%.5000") && f != 'f' && f != 'F' &&
           f != 'a' && f != 'A') {
         // This particular test takes way too long with snprintf.
         // Disable for the case we are not implementing natively.
@@ -600,7 +600,7 @@ void TestWithMultipleFormatsHelper(const std::vector<Floating> &floats,
         str_format_result.clear();
 
         {
-          AppendPack(&str_format_result, format, absl::MakeSpan(args));
+          AppendPack(&str_format_result, format, abslx::MakeSpan(args));
         }
 
 #ifdef _MSC_VER
@@ -751,7 +751,7 @@ TEST_F(FormatConvertTest, DoubleRound) {
   const auto format = [&](const char *fmt, double d) -> std::string & {
     s.clear();
     FormatArgImpl args[1] = {FormatArgImpl(d)};
-    AppendPack(&s, UntypedFormatSpecImpl(fmt), absl::MakeSpan(args));
+    AppendPack(&s, UntypedFormatSpecImpl(fmt), abslx::MakeSpan(args));
 #if !defined(_MSC_VER)
     // MSVC has a different rounding policy than us so we can't test our
     // implementation against the native one there.
@@ -857,7 +857,7 @@ TEST_F(FormatConvertTest, DoubleRoundA) {
   const auto format = [&](const char *fmt, double d) -> std::string & {
     s.clear();
     FormatArgImpl args[1] = {FormatArgImpl(d)};
-    AppendPack(&s, UntypedFormatSpecImpl(fmt), absl::MakeSpan(args));
+    AppendPack(&s, UntypedFormatSpecImpl(fmt), abslx::MakeSpan(args));
     if (native_traits.hex_float_has_glibc_rounding) {
       EXPECT_EQ(StrPrint(fmt, d), s);
     }
@@ -968,7 +968,7 @@ TEST_F(FormatConvertTest, LongDoubleRoundA) {
   const auto format = [&](const char *fmt, long double d) -> std::string & {
     s.clear();
     FormatArgImpl args[1] = {FormatArgImpl(d)};
-    AppendPack(&s, UntypedFormatSpecImpl(fmt), absl::MakeSpan(args));
+    AppendPack(&s, UntypedFormatSpecImpl(fmt), abslx::MakeSpan(args));
     if (native_traits.hex_float_has_glibc_rounding &&
         native_traits.hex_float_optimizes_leading_digit_bit_count) {
       EXPECT_EQ(StrPrint(fmt, d), s);
@@ -1045,10 +1045,10 @@ struct NullSink {
 };
 
 template <typename... T>
-bool FormatWithNullSink(absl::string_view fmt, const T &... a) {
+bool FormatWithNullSink(abslx::string_view fmt, const T &... a) {
   NullSink sink;
   FormatArgImpl args[] = {FormatArgImpl(a)...};
-  return FormatUntyped(&sink, UntypedFormatSpecImpl(fmt), absl::MakeSpan(args));
+  return FormatUntyped(&sink, UntypedFormatSpecImpl(fmt), abslx::MakeSpan(args));
 }
 
 TEST_F(FormatConvertTest, ExtremeWidthPrecision) {
@@ -1107,7 +1107,7 @@ TEST_F(FormatConvertTest, LongDouble) {
                    'e', 'E'}) {
       std::string fmt_str = std::string(fmt) + 'L' + f;
 
-      if (fmt == absl::string_view("%.5000") && f != 'f' && f != 'F' &&
+      if (fmt == abslx::string_view("%.5000") && f != 'f' && f != 'F' &&
           f != 'a' && f != 'A') {
         // This particular test takes way too long with snprintf.
         // Disable for the case we are not implementing natively.
@@ -1174,7 +1174,7 @@ TEST_F(FormatConvertTest, IntAsDouble) {
       SCOPED_TRACE(e.line);
       SCOPED_TRACE(e.fmt);
       UntypedFormatSpecImpl format(e.fmt);
-      EXPECT_EQ(e.out, FormatPack(format, absl::MakeSpan(args)));
+      EXPECT_EQ(e.out, FormatPack(format, abslx::MakeSpan(args)));
     }
   }
 }
@@ -1186,9 +1186,9 @@ bool FormatFails(const char* test_format, T value) {
 
   int one = 1;
   const FormatArgImpl args[] = {FormatArgImpl(value), FormatArgImpl(one)};
-  EXPECT_EQ(FormatPack(format, absl::MakeSpan(args)), "")
+  EXPECT_EQ(FormatPack(format, abslx::MakeSpan(args)), "")
       << "format=" << test_format << " value=" << value;
-  return FormatPack(format, absl::MakeSpan(args)).empty();
+  return FormatPack(format, abslx::MakeSpan(args)).empty();
 }
 
 TEST_F(FormatConvertTest, ExpectedFailures) {
@@ -1237,4 +1237,4 @@ TEST_F(FormatConvertTest, GlibcHasCorrectTraits) {
 }  // namespace
 }  // namespace str_format_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

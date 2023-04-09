@@ -31,7 +31,7 @@
 namespace linear_filters {
 namespace {
 
-using ::absl::StrFormat;
+using ::abslx::StrFormat;
 using ::Eigen::Infinity;
 using ::std::complex;
 using ::std::vector;

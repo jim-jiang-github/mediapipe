@@ -83,7 +83,7 @@ class PackMediaSequenceCalculatorTest : public ::testing::Test {
     options->set_output_only_if_all_present(output_only_if_all_present);
     options->set_replace_data_instead_of_append(replace_instead_of_append);
     options->set_output_as_zero_timestamp(output_as_zero_timestamp);
-    runner_ = ::absl::make_unique<CalculatorRunner>(config);
+    runner_ = ::abslx::make_unique<CalculatorRunner>(config);
   }
 
   std::unique_ptr<CalculatorRunner> runner_;
@@ -91,7 +91,7 @@ class PackMediaSequenceCalculatorTest : public ::testing::Test {
 
 TEST_F(PackMediaSequenceCalculatorTest, PacksTwoImages) {
   SetUpCalculator({"IMAGE:images"}, {}, false, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
   cv::Mat image(2, 3, CV_8UC3, cv::Scalar(0, 0, 255));
@@ -105,7 +105,7 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksTwoImages) {
   int num_images = 2;
   for (int i = 0; i < num_images; ++i) {
     auto image_ptr =
-        ::absl::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_image);
+        ::abslx::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_image);
     runner_->MutableInputs()->Tag(kImageTag).packets.push_back(
         Adopt(image_ptr.release()).At(Timestamp(i)));
   }
@@ -134,7 +134,7 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksTwoImages) {
 TEST_F(PackMediaSequenceCalculatorTest, PacksTwoPrefixedImages) {
   std::string prefix = "PREFIX";
   SetUpCalculator({"IMAGE_PREFIX:images"}, {}, false, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
   cv::Mat image(2, 3, CV_8UC3, cv::Scalar(0, 0, 255));
@@ -148,7 +148,7 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksTwoPrefixedImages) {
   int num_images = 2;
   for (int i = 0; i < num_images; ++i) {
     auto image_ptr =
-        ::absl::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_image);
+        ::abslx::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_image);
     runner_->MutableInputs()
         ->Tag(kImagePrefixTag)
         .packets.push_back(Adopt(image_ptr.release()).At(Timestamp(i)));
@@ -178,15 +178,15 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksTwoPrefixedImages) {
 TEST_F(PackMediaSequenceCalculatorTest, PacksTwoFloatLists) {
   SetUpCalculator({"FLOAT_FEATURE_TEST:test", "FLOAT_FEATURE_OTHER:test2"}, {},
                   false, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
 
   int num_timesteps = 2;
   for (int i = 0; i < num_timesteps; ++i) {
-    auto vf_ptr = ::absl::make_unique<std::vector<float>>(2, 2 << i);
+    auto vf_ptr = ::abslx::make_unique<std::vector<float>>(2, 2 << i);
     runner_->MutableInputs()
         ->Tag(kFloatFeatureTestTag)
         .packets.push_back(Adopt(vf_ptr.release()).At(Timestamp(i)));
-    vf_ptr = ::absl::make_unique<std::vector<float>>(2, 2 << i);
+    vf_ptr = ::abslx::make_unique<std::vector<float>>(2, 2 << i);
     runner_->MutableInputs()
         ->Tag(kFloatFeatureOtherTag)
         .packets.push_back(Adopt(vf_ptr.release()).At(Timestamp(i)));
@@ -223,15 +223,15 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksTwoFloatLists) {
 TEST_F(PackMediaSequenceCalculatorTest, PacksTwoIntLists) {
   SetUpCalculator({"INT_FEATURE_TEST:test", "INT_FEATURE_OTHER:test2"}, {},
                   false, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
 
   int num_timesteps = 2;
   for (int i = 0; i < num_timesteps; ++i) {
-    auto vi_ptr = ::absl::make_unique<std::vector<int64>>(2, 2 << i);
+    auto vi_ptr = ::abslx::make_unique<std::vector<int64>>(2, 2 << i);
     runner_->MutableInputs()
         ->Tag(kIntFeatureTestTag)
         .packets.push_back(Adopt(vi_ptr.release()).At(Timestamp(i)));
-    vi_ptr = ::absl::make_unique<std::vector<int64>>(2, 2 << i);
+    vi_ptr = ::abslx::make_unique<std::vector<int64>>(2, 2 << i);
     runner_->MutableInputs()
         ->Tag(kIntFeatureOtherTag)
         .packets.push_back(Adopt(vi_ptr.release()).At(Timestamp(i)));
@@ -267,17 +267,17 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksTwoIntLists) {
 TEST_F(PackMediaSequenceCalculatorTest, PacksTwoBytesLists) {
   SetUpCalculator({"BYTES_FEATURE_TEST:test", "BYTES_FEATURE_OTHER:test2"}, {},
                   false, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
 
   int num_timesteps = 2;
   for (int i = 0; i < num_timesteps; ++i) {
-    auto vs_ptr = ::absl::make_unique<std::vector<std::string>>(
-        2, absl::StrCat("foo", 2 << i));
+    auto vs_ptr = ::abslx::make_unique<std::vector<std::string>>(
+        2, abslx::StrCat("foo", 2 << i));
     runner_->MutableInputs()
         ->Tag(kBytesFeatureTestTag)
         .packets.push_back(Adopt(vs_ptr.release()).At(Timestamp(i)));
-    vs_ptr = ::absl::make_unique<std::vector<std::string>>(
-        2, absl::StrCat("bar", 2 << i));
+    vs_ptr = ::abslx::make_unique<std::vector<std::string>>(
+        2, abslx::StrCat("bar", 2 << i));
     runner_->MutableInputs()
         ->Tag(kBytesFeatureOtherTag)
         .packets.push_back(Adopt(vs_ptr.release()).At(Timestamp(i)));
@@ -304,21 +304,21 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksTwoBytesLists) {
     ASSERT_EQ(i, mpms::GetFeatureTimestampAt("TEST", output_sequence, i));
     ASSERT_THAT(mpms::GetFeatureBytesAt("TEST", output_sequence, i),
                 ::testing::ElementsAreArray(
-                    std::vector<std::string>(2, absl::StrCat("foo", 2 << i))));
+                    std::vector<std::string>(2, abslx::StrCat("foo", 2 << i))));
     ASSERT_EQ(i, mpms::GetFeatureTimestampAt("OTHER", output_sequence, i));
     ASSERT_THAT(mpms::GetFeatureBytesAt("OTHER", output_sequence, i),
                 ::testing::ElementsAreArray(
-                    std::vector<std::string>(2, absl::StrCat("bar", 2 << i))));
+                    std::vector<std::string>(2, abslx::StrCat("bar", 2 << i))));
   }
 }
 
 TEST_F(PackMediaSequenceCalculatorTest, OutputAsZeroTimestamp) {
   SetUpCalculator({"FLOAT_FEATURE_TEST:test"}, {}, false, true, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
 
   int num_timesteps = 2;
   for (int i = 0; i < num_timesteps; ++i) {
-    auto vf_ptr = ::absl::make_unique<std::vector<float>>(2, 2 << i);
+    auto vf_ptr = ::abslx::make_unique<std::vector<float>>(2, 2 << i);
     runner_->MutableInputs()
         ->Tag("FLOAT_FEATURE_TEST")
         .packets.push_back(Adopt(vf_ptr.release()).At(Timestamp(i)));
@@ -339,13 +339,13 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksTwoContextFloatLists) {
   SetUpCalculator(
       {"FLOAT_CONTEXT_FEATURE_TEST:test", "FLOAT_CONTEXT_FEATURE_OTHER:test2"},
       {}, false, true);
-  auto input_sequence = absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = abslx::make_unique<tf::SequenceExample>();
 
-  auto vf_ptr = absl::make_unique<std::vector<float>>(2, 3);
+  auto vf_ptr = abslx::make_unique<std::vector<float>>(2, 3);
   runner_->MutableInputs()
       ->Tag(kFloatContextFeatureTestTag)
       .packets.push_back(Adopt(vf_ptr.release()).At(Timestamp::PostStream()));
-  vf_ptr = absl::make_unique<std::vector<float>>(2, 4);
+  vf_ptr = abslx::make_unique<std::vector<float>>(2, 4);
   runner_->MutableInputs()
       ->Tag(kFloatContextFeatureOtherTag)
       .packets.push_back(Adopt(vf_ptr.release()).At(Timestamp::PostStream()));
@@ -373,7 +373,7 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksAdditionalContext) {
   (*context.mutable_feature())["OTHER"].mutable_bytes_list()->add_value("NO");
   SetUpCalculator({"IMAGE:images"}, context, false, true);
 
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
   runner_->MutableSidePackets()->Tag(kSequenceExampleTag) =
       Adopt(input_sequence.release());
   cv::Mat image(2, 3, CV_8UC3, cv::Scalar(0, 0, 255));
@@ -382,7 +382,7 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksAdditionalContext) {
   OpenCvImageEncoderCalculatorResults encoded_image;
   encoded_image.set_encoded_image(bytes.data(), bytes.size());
   auto image_ptr =
-      ::absl::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_image);
+      ::abslx::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_image);
   runner_->MutableInputs()->Tag(kImageTag).packets.push_back(
       Adopt(image_ptr.release()).At(Timestamp(0)));
 
@@ -404,7 +404,7 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksAdditionalContext) {
 
 TEST_F(PackMediaSequenceCalculatorTest, PacksTwoForwardFlowEncodeds) {
   SetUpCalculator({"FORWARD_FLOW_ENCODED:flow"}, {}, false, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
 
@@ -420,7 +420,7 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksTwoForwardFlowEncodeds) {
   int num_flows = 2;
   for (int i = 0; i < num_flows; ++i) {
     auto flow_ptr =
-        ::absl::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_flow);
+        ::abslx::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_flow);
     runner_->MutableInputs()
         ->Tag(kForwardFlowEncodedTag)
         .packets.push_back(Adopt(flow_ptr.release()).At(Timestamp(i)));
@@ -449,7 +449,7 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksTwoForwardFlowEncodeds) {
 
 TEST_F(PackMediaSequenceCalculatorTest, PacksTwoBBoxDetections) {
   SetUpCalculator({"BBOX_PREDICTED:detections"}, {}, false, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
   int height = 480;
@@ -459,7 +459,7 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksTwoBBoxDetections) {
 
   int num_vectors = 2;
   for (int i = 0; i < num_vectors; ++i) {
-    auto detections = ::absl::make_unique<::std::vector<Detection>>();
+    auto detections = ::abslx::make_unique<::std::vector<Detection>>();
     Detection detection;
     detection.add_label("absolute bbox");
     detection.add_label_id(0);
@@ -531,14 +531,14 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksTwoBBoxDetections) {
 
 TEST_F(PackMediaSequenceCalculatorTest, PacksBBoxWithoutImageDims) {
   SetUpCalculator({"BBOX_PREDICTED:detections"}, {}, false, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
   int height = 480;
   int width = 640;
   int num_vectors = 2;
   for (int i = 0; i < num_vectors; ++i) {
-    auto detections = ::absl::make_unique<::std::vector<Detection>>();
+    auto detections = ::abslx::make_unique<::std::vector<Detection>>();
     Detection detection;
     detection.add_label("absolute bbox");
     detection.add_label_id(0);
@@ -573,20 +573,20 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksBBoxWithoutImageDims) {
       Adopt(input_sequence.release());
 
   auto status = runner_->Run();
-  EXPECT_EQ(absl::StatusCode::kInvalidArgument, status.code());
+  EXPECT_EQ(abslx::StatusCode::kInvalidArgument, status.code());
 }
 
 TEST_F(PackMediaSequenceCalculatorTest, PacksBBoxWithImages) {
   SetUpCalculator({"BBOX_PREDICTED:detections", "IMAGE:images"}, {}, false,
                   true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
   int height = 480;
   int width = 640;
   int num_vectors = 2;
   for (int i = 0; i < num_vectors; ++i) {
-    auto detections = ::absl::make_unique<::std::vector<Detection>>();
+    auto detections = ::abslx::make_unique<::std::vector<Detection>>();
     Detection detection;
     detection.add_label("absolute bbox");
     detection.add_label_id(0);
@@ -627,7 +627,7 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksBBoxWithImages) {
   int num_images = 2;
   for (int i = 0; i < num_images; ++i) {
     auto image_ptr =
-        ::absl::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_image);
+        ::abslx::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_image);
     runner_->MutableInputs()->Tag(kImageTag).packets.push_back(
         Adopt(image_ptr.release()).At(Timestamp(i)));
   }
@@ -672,11 +672,11 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksBBoxWithImages) {
 
 TEST_F(PackMediaSequenceCalculatorTest, PacksTwoKeypoints) {
   SetUpCalculator({"KEYPOINTS_TEST:keypoints"}, {}, false, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
 
-  absl::flat_hash_map<std::string, std::vector<std::pair<float, float>>>
+  abslx::flat_hash_map<std::string, std::vector<std::pair<float, float>>>
       points = {{"HEAD", {{0.1, 0.2}, {0.3, 0.4}}}, {"TAIL", {{0.5, 0.6}}}};
   runner_->MutableInputs()
       ->Tag(kKeypointsTestTag)
@@ -708,7 +708,7 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksTwoKeypoints) {
 
 TEST_F(PackMediaSequenceCalculatorTest, PacksTwoMaskDetections) {
   SetUpCalculator({"CLASS_SEGMENTATION:detections"}, {}, false, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
   int height = 480;
@@ -718,7 +718,7 @@ TEST_F(PackMediaSequenceCalculatorTest, PacksTwoMaskDetections) {
 
   int num_vectors = 2;
   for (int i = 0; i < num_vectors; ++i) {
-    auto detections = ::absl::make_unique<::std::vector<Detection>>();
+    auto detections = ::abslx::make_unique<::std::vector<Detection>>();
     Detection detection;
     detection = Detection();
     detection.add_label("mask");
@@ -761,7 +761,7 @@ TEST_F(PackMediaSequenceCalculatorTest, MissingStreamOK) {
   SetUpCalculator(
       {"FORWARD_FLOW_ENCODED:flow", "FLOAT_FEATURE_I3D_FLOW:feature"}, {},
       false, false);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
 
@@ -777,7 +777,7 @@ TEST_F(PackMediaSequenceCalculatorTest, MissingStreamOK) {
   int num_flows = 2;
   for (int i = 0; i < num_flows; ++i) {
     auto flow_ptr =
-        ::absl::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_flow);
+        ::abslx::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_flow);
     runner_->MutableInputs()
         ->Tag(kForwardFlowEncodedTag)
         .packets.push_back(Adopt(flow_ptr.release()).At(Timestamp(i)));
@@ -808,7 +808,7 @@ TEST_F(PackMediaSequenceCalculatorTest, MissingStreamNotOK) {
   SetUpCalculator(
       {"FORWARD_FLOW_ENCODED:flow", "FLOAT_FEATURE_I3D_FLOW:feature"}, {}, true,
       false);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
   cv::Mat image(2, 3, CV_8UC3, cv::Scalar(0, 0, 255));
@@ -823,7 +823,7 @@ TEST_F(PackMediaSequenceCalculatorTest, MissingStreamNotOK) {
   int num_flows = 2;
   for (int i = 0; i < num_flows; ++i) {
     auto flow_ptr =
-        ::absl::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_flow);
+        ::abslx::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_flow);
     runner_->MutableInputs()
         ->Tag(kForwardFlowEncodedTag)
         .packets.push_back(Adopt(flow_ptr.release()).At(Timestamp(i)));
@@ -832,13 +832,13 @@ TEST_F(PackMediaSequenceCalculatorTest, MissingStreamNotOK) {
   runner_->MutableSidePackets()->Tag(kSequenceExampleTag) =
       Adopt(input_sequence.release());
 
-  absl::Status status = runner_->Run();
+  abslx::Status status = runner_->Run();
   EXPECT_FALSE(status.ok());
 }
 
 TEST_F(PackMediaSequenceCalculatorTest, TestReplacingImages) {
   SetUpCalculator({"IMAGE:images"}, {}, false, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
   mpms::AddImageEncoded("one", input_sequence.get());
@@ -864,7 +864,7 @@ TEST_F(PackMediaSequenceCalculatorTest, TestReplacingImages) {
 
 TEST_F(PackMediaSequenceCalculatorTest, TestReplacingFlowImages) {
   SetUpCalculator({"FORWARD_FLOW_ENCODED:images"}, {}, false, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
   std::string test_video_id = "test_video_id";
   mpms::SetClipMediaId(test_video_id, input_sequence.get());
   mpms::AddForwardFlowEncoded("one", input_sequence.get());
@@ -891,14 +891,14 @@ TEST_F(PackMediaSequenceCalculatorTest, TestReplacingFlowImages) {
 TEST_F(PackMediaSequenceCalculatorTest, TestReplacingFloatVectors) {
   SetUpCalculator({"FLOAT_FEATURE_TEST:test", "FLOAT_FEATURE_OTHER:test2"}, {},
                   false, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
 
   int num_timesteps = 2;
   for (int i = 0; i < num_timesteps; ++i) {
-    auto vf_ptr = ::absl::make_unique<std::vector<float>>(2, 2 << i);
+    auto vf_ptr = ::abslx::make_unique<std::vector<float>>(2, 2 << i);
     mpms::AddFeatureFloats("TEST", *vf_ptr, input_sequence.get());
     mpms::AddFeatureTimestamp("TEST", i, input_sequence.get());
-    vf_ptr = ::absl::make_unique<std::vector<float>>(2, 2 << i);
+    vf_ptr = ::abslx::make_unique<std::vector<float>>(2, 2 << i);
     mpms::AddFeatureFloats("OTHER", *vf_ptr, input_sequence.get());
     mpms::AddFeatureTimestamp("OTHER", i, input_sequence.get());
   }
@@ -929,16 +929,16 @@ TEST_F(PackMediaSequenceCalculatorTest, TestReplacingFloatVectors) {
 TEST_F(PackMediaSequenceCalculatorTest, TestReplacingBytesVectors) {
   SetUpCalculator({"BYTES_FEATURE_TEST:test", "BYTES_FEATURE_OTHER:test2"}, {},
                   false, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
 
   int num_timesteps = 2;
   for (int i = 0; i < num_timesteps; ++i) {
-    auto vs_ptr = ::absl::make_unique<std::vector<std::string>>(
-        2, absl::StrCat("foo", 2 << i));
+    auto vs_ptr = ::abslx::make_unique<std::vector<std::string>>(
+        2, abslx::StrCat("foo", 2 << i));
     mpms::AddFeatureBytes("TEST", *vs_ptr, input_sequence.get());
     mpms::AddFeatureTimestamp("TEST", i, input_sequence.get());
-    vs_ptr = ::absl::make_unique<std::vector<std::string>>(
-        2, absl::StrCat("bar", 2 << i));
+    vs_ptr = ::abslx::make_unique<std::vector<std::string>>(
+        2, abslx::StrCat("bar", 2 << i));
     mpms::AddFeatureBytes("OTHER", *vs_ptr, input_sequence.get());
     mpms::AddFeatureTimestamp("OTHER", i, input_sequence.get());
   }
@@ -967,7 +967,7 @@ TEST_F(PackMediaSequenceCalculatorTest, TestReplacingBytesVectors) {
 
 TEST_F(PackMediaSequenceCalculatorTest, TestReconcilingAnnotations) {
   SetUpCalculator({"IMAGE:images"}, {}, false, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
   cv::Mat image(2, 3, CV_8UC3, cv::Scalar(0, 0, 255));
   std::vector<uchar> bytes;
   ASSERT_TRUE(cv::imencode(".jpg", image, bytes, {80}));
@@ -979,7 +979,7 @@ TEST_F(PackMediaSequenceCalculatorTest, TestReconcilingAnnotations) {
   int num_images = 5;  // Timestamps: 10, 20, 30, 40, 50
   for (int i = 0; i < num_images; ++i) {
     auto image_ptr =
-        ::absl::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_image);
+        ::abslx::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_image);
     runner_->MutableInputs()->Tag(kImageTag).packets.push_back(
         Adopt(image_ptr.release()).At(Timestamp((i + 1) * 10)));
   }
@@ -1018,7 +1018,7 @@ TEST_F(PackMediaSequenceCalculatorTest, TestReconcilingAnnotations) {
 
 TEST_F(PackMediaSequenceCalculatorTest, TestOverwritingAndReconciling) {
   SetUpCalculator({"IMAGE:images", "BBOX:bbox"}, {}, false, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
   cv::Mat image(2, 3, CV_8UC3, cv::Scalar(0, 0, 255));
   std::vector<uchar> bytes;
   ASSERT_TRUE(cv::imencode(".jpg", image, bytes, {80}));
@@ -1032,13 +1032,13 @@ TEST_F(PackMediaSequenceCalculatorTest, TestOverwritingAndReconciling) {
   int num_images = 5;  // Timestamps: 10, 20, 30, 40, 50
   for (int i = 0; i < num_images; ++i) {
     auto image_ptr =
-        ::absl::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_image);
+        ::abslx::make_unique<OpenCvImageEncoderCalculatorResults>(encoded_image);
     runner_->MutableInputs()->Tag(kImageTag).packets.push_back(
         Adopt(image_ptr.release()).At(Timestamp(i)));
   }
 
   for (int i = 0; i < num_images; ++i) {
-    auto detections = ::absl::make_unique<::std::vector<Detection>>();
+    auto detections = ::abslx::make_unique<::std::vector<Detection>>();
     Detection detection;
     detection = Detection();
     detection.add_label("relative bbox");
@@ -1071,13 +1071,13 @@ TEST_F(PackMediaSequenceCalculatorTest, TestOverwritingAndReconciling) {
 
 TEST_F(PackMediaSequenceCalculatorTest, TestTooLargeInputFailsSoftly) {
   SetUpCalculator({"FLOAT_FEATURE_TEST:test"}, {}, false, true);
-  auto input_sequence = ::absl::make_unique<tf::SequenceExample>();
+  auto input_sequence = ::abslx::make_unique<tf::SequenceExample>();
 
   // 1 billion floats should be > 1GB which can't be serialized. It should fail
   // gracefully with this input.
   int num_timesteps = 1000;
   for (int i = 0; i < num_timesteps; ++i) {
-    auto vf_ptr = ::absl::make_unique<std::vector<float>>(1000000, i);
+    auto vf_ptr = ::abslx::make_unique<std::vector<float>>(1000000, i);
     runner_->MutableInputs()
         ->Tag(kFloatFeatureTestTag)
         .packets.push_back(Adopt(vf_ptr.release()).At(Timestamp(i)));

@@ -28,8 +28,8 @@ limitations under the License.
 namespace tensorflow {
 namespace {
 
-absl::InlinedVector<xla::XlaOp, 4> SliceVector(xla::XlaOp input, int64_t rank) {
-  absl::InlinedVector<xla::XlaOp, 4> scalar_indices;
+abslx::InlinedVector<xla::XlaOp, 4> SliceVector(xla::XlaOp input, int64_t rank) {
+  abslx::InlinedVector<xla::XlaOp, 4> scalar_indices;
   scalar_indices.reserve(rank);
   for (int i = 0; i < rank; i++)
     scalar_indices.push_back(

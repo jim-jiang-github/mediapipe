@@ -40,14 +40,14 @@ class GpuHorizontalInputFusion : public HloModulePass {
  public:
   GpuHorizontalInputFusion() {}
 
-  absl::string_view name() const override {
+  abslx::string_view name() const override {
     return "gpu_horizontal_input_fusion";
   }
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   StatusOr<bool> RunOnComputation(HloComputation*);

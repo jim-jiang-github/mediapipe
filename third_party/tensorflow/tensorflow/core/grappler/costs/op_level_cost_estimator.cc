@@ -237,7 +237,7 @@ int64_t CwiseOutputElementCount(const OpInfo& op_info) {
 
 // Helper function for determining whether there are repeated indices in the
 // input Einsum equation.
-bool CheckRepeatedDimensions(const absl::string_view dim_str) {
+bool CheckRepeatedDimensions(const abslx::string_view dim_str) {
   int str_size = dim_str.size();
   for (int idx = 0; idx < str_size - 1; idx++) {
     if (dim_str.find(dim_str[idx], idx + 1) != std::string::npos) {
@@ -254,15 +254,15 @@ bool IsEinsumCorrectlyFormed(const OpContext& einsum_context) {
 
   auto it = op_info.attr().find("equation");
   if (it == op_info.attr().end()) return false;
-  const absl::string_view equation = it->second.s();
-  std::vector<std::string> equation_split = absl::StrSplit(equation, "->");
+  const abslx::string_view equation = it->second.s();
+  std::vector<std::string> equation_split = abslx::StrSplit(equation, "->");
 
   if (equation_split.empty()) {
     LOG(WARNING) << "Einsum with malformed equation";
     return false;
   }
-  std::vector<absl::string_view> input_split =
-      absl::StrSplit(equation_split[0], ',');
+  std::vector<abslx::string_view> input_split =
+      abslx::StrSplit(equation_split[0], ',');
 
   // The current model covers Einsum operations with two operands and a RHS
   if (op_info.inputs_size() != 2 || equation_split.size() != 2) {
@@ -271,13 +271,13 @@ bool IsEinsumCorrectlyFormed(const OpContext& einsum_context) {
   }
   const auto& a_input = op_info.inputs(0);
   const auto& b_input = op_info.inputs(1);
-  absl::string_view rhs_str = equation_split[1];
-  absl::string_view a_input_str = input_split[0];
-  absl::string_view b_input_str = input_split[1];
+  abslx::string_view rhs_str = equation_split[1];
+  abslx::string_view a_input_str = input_split[0];
+  abslx::string_view b_input_str = input_split[1];
 
   // Ellipsis are not currently supported
-  if (absl::StrContains(a_input_str, "...") ||
-      absl::StrContains(b_input_str, "...")) {
+  if (abslx::StrContains(a_input_str, "...") ||
+      abslx::StrContains(b_input_str, "...")) {
     VLOG(1) << "Missing accurate estimator for op: " << op_info.op()
             << ", ellipsis not supported";
     return false;
@@ -1150,14 +1150,14 @@ bool OpLevelCostEstimator::GenerateBatchMatmulContextFromEinsum(
   if (!IsEinsumCorrectlyFormed(einsum_context)) return false;
   const auto& op_info = einsum_context.op_info;
   std::vector<std::string> equation_split =
-      absl::StrSplit(op_info.attr().find("equation")->second.s(), "->");
-  std::vector<absl::string_view> input_split =
-      absl::StrSplit(equation_split[0], ',');
+      abslx::StrSplit(op_info.attr().find("equation")->second.s(), "->");
+  std::vector<abslx::string_view> input_split =
+      abslx::StrSplit(equation_split[0], ',');
   const auto& a_input = op_info.inputs(0);
   const auto& b_input = op_info.inputs(1);
-  absl::string_view rhs_str = equation_split[1];
-  absl::string_view a_input_str = input_split[0];
-  absl::string_view b_input_str = input_split[1];
+  abslx::string_view rhs_str = equation_split[1];
+  abslx::string_view a_input_str = input_split[0];
+  abslx::string_view b_input_str = input_split[1];
 
   constexpr int kMatrixRank = 2;
 

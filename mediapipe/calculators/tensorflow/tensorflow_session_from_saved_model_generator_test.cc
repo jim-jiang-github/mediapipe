@@ -75,7 +75,7 @@ TEST_F(TensorFlowSessionFromSavedModelGeneratorTest,
   PacketSet input_side_packets(tool::CreateTagMap({}).value());
   PacketSet output_side_packets(
       tool::CreateTagMap({"SESSION:session"}).value());
-  absl::Status run_status = tool::RunGenerateAndValidateTypes(
+  abslx::Status run_status = tool::RunGenerateAndValidateTypes(
       "TensorFlowSessionFromSavedModelGenerator", extendable_options_,
       input_side_packets, &output_side_packets);
   MP_EXPECT_OK(run_status) << run_status.message();
@@ -116,7 +116,7 @@ TEST_F(TensorFlowSessionFromSavedModelGeneratorTest,
       Adopt(new std::string(GetSavedModelDir()));
   PacketSet output_side_packets(
       tool::CreateTagMap({"SESSION:session"}).value());
-  absl::Status run_status = tool::RunGenerateAndValidateTypes(
+  abslx::Status run_status = tool::RunGenerateAndValidateTypes(
       "TensorFlowSessionFromSavedModelGenerator", extendable_options_,
       input_side_packets, &output_side_packets);
   MP_EXPECT_OK(run_status) << run_status.message();
@@ -139,7 +139,7 @@ TEST_F(TensorFlowSessionFromSavedModelGeneratorTest,
       Adopt(new std::string("serving_default"));
   PacketSet output_side_packets(
       tool::CreateTagMap({"SESSION:session"}).value());
-  absl::Status run_status = tool::RunGenerateAndValidateTypes(
+  abslx::Status run_status = tool::RunGenerateAndValidateTypes(
       "TensorFlowSessionFromSavedModelGenerator", extendable_options_,
       input_side_packets, &output_side_packets);
   MP_EXPECT_OK(run_status) << run_status.message();
@@ -162,10 +162,10 @@ TEST_F(TensorFlowSessionFromSavedModelGeneratorTest,
       Adopt(new std::string("wrong_signature_name"));
   PacketSet output_side_packets(
       tool::CreateTagMap({"SESSION:session"}).value());
-  absl::Status run_status = tool::RunGenerateAndValidateTypes(
+  abslx::Status run_status = tool::RunGenerateAndValidateTypes(
       "TensorFlowSessionFromSavedModelGenerator", extendable_options_,
       input_side_packets, &output_side_packets);
-  EXPECT_THAT(run_status, StatusIs(absl::StatusCode::kNotFound));
+  EXPECT_THAT(run_status, StatusIs(abslx::StatusCode::kNotFound));
 }
 
 // Integration test. Verifies that TensorFlowInferenceCalculator correctly
@@ -174,7 +174,7 @@ TEST_F(TensorFlowSessionFromSavedModelGeneratorTest,
        ProducesPacketUsableByTensorFlowInferenceCalculator) {
   CalculatorGraphConfig graph_config =
       mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(
-          absl::Substitute(R"(
+          abslx::Substitute(R"(
       node {
         calculator: "TensorFlowInferenceCalculator"
         input_side_packet: "SESSION:tf_model"
@@ -234,7 +234,7 @@ TEST_F(TensorFlowSessionFromSavedModelGeneratorTest,
   PacketSet input_side_packets(tool::CreateTagMap({}).value());
   PacketSet output_side_packets(
       tool::CreateTagMap({"SESSION:session"}).value());
-  absl::Status run_status = tool::RunGenerateAndValidateTypes(
+  abslx::Status run_status = tool::RunGenerateAndValidateTypes(
       "TensorFlowSessionFromSavedModelGenerator", extendable_options_,
       input_side_packets, &output_side_packets);
   MP_EXPECT_OK(run_status) << run_status.message();
@@ -255,7 +255,7 @@ TEST_F(TensorFlowSessionFromSavedModelGeneratorTest,
   PacketSet input_side_packets(tool::CreateTagMap({}).value());
   PacketSet output_side_packets(
       tool::CreateTagMap({"SESSION:session"}).value());
-  absl::Status run_status = tool::RunGenerateAndValidateTypes(
+  abslx::Status run_status = tool::RunGenerateAndValidateTypes(
       "TensorFlowSessionFromSavedModelGenerator", extendable_options_,
       input_side_packets, &output_side_packets);
   MP_EXPECT_OK(run_status) << run_status.message();

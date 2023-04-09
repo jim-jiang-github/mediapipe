@@ -17,29 +17,29 @@ class GraphProcessor : public PacketProcessor {
   GraphProcessor() = default;
 
   // Configures this GraphProcessor to create a run a CalculatorGraph.
-  absl::Status Initialize(CalculatorGraphConfig graph_config);
+  abslx::Status Initialize(CalculatorGraphConfig graph_config);
 
  public:
   // The PacketProcessor interface.
-  absl::Status AddPacket(CollectionItemId id, Packet packet) override;
+  abslx::Status AddPacket(CollectionItemId id, Packet packet) override;
   std::shared_ptr<tool::TagMap> InputTags() override;
-  absl::Status SetSidePacket(CollectionItemId id, Packet packet) override;
+  abslx::Status SetSidePacket(CollectionItemId id, Packet packet) override;
   std::shared_ptr<tool::TagMap> SideInputTags() override;
   void SetConsumer(PacketConsumer* consumer) override;
   void SetSideConsumer(SidePacketConsumer* consumer) override;
-  absl::Status Start() override;
-  absl::Status Shutdown() override;
-  absl::Status WaitUntilIdle() override;
+  abslx::Status Start() override;
+  abslx::Status Shutdown() override;
+  abslx::Status WaitUntilIdle() override;
 
  private:
   // Sends a tagged output packet.
-  absl::Status SendPacket(CollectionItemId id, Packet packet);
+  abslx::Status SendPacket(CollectionItemId id, Packet packet);
 
   // Observes output packets from the calculator graph.
-  absl::Status ObserveGraph() ABSL_SHARED_LOCKS_REQUIRED(graph_mutex_);
+  abslx::Status ObserveGraph() ABSL_SHARED_LOCKS_REQUIRED(graph_mutex_);
 
   // Blocks until this GraphProcessor is initialized.
-  absl::Status WaitUntilInitialized();
+  abslx::Status WaitUntilInitialized();
 
  private:
   CalculatorGraphConfig graph_config_;
@@ -51,7 +51,7 @@ class GraphProcessor : public PacketProcessor {
   std::map<std::string, Packet> side_packets_;
   std::unique_ptr<CalculatorGraph> graph_ ABSL_GUARDED_BY(graph_mutex_) =
       nullptr;
-  absl::Mutex graph_mutex_;
+  abslx::Mutex graph_mutex_;
 };
 
 }  // namespace mediapipe

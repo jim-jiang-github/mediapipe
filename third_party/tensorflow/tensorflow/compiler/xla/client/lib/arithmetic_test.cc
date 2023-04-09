@@ -33,13 +33,13 @@ class ArithmeticTest : public ClientLibraryTestBase {
  public:
   template <typename NativeT>
   void TestArgMin(std::initializer_list<std::initializer_list<NativeT>> input,
-                  absl::Span<NativeT const> expected_output, int axis) {
+                  abslx::Span<NativeT const> expected_output, int axis) {
     TestArgMinMax(input, expected_output, axis, /*is_min=*/true);
   }
 
   template <typename NativeT>
   void TestArgMax(std::initializer_list<std::initializer_list<NativeT>> input,
-                  absl::Span<NativeT const> expected_output, int axis) {
+                  abslx::Span<NativeT const> expected_output, int axis) {
     TestArgMinMax(input, expected_output, axis, /*is_min=*/false);
   }
 
@@ -48,7 +48,7 @@ class ArithmeticTest : public ClientLibraryTestBase {
   template <typename NativeT>
   void TestArgMinMax(
       std::initializer_list<std::initializer_list<NativeT>> input,
-      absl::Span<NativeT const> expected_output, int axis, bool is_min) {
+      abslx::Span<NativeT const> expected_output, int axis, bool is_min) {
     XlaBuilder builder(TestName());
     XlaOp x = ConstantR2<NativeT>(&builder, input);
     ArgMinMax(x, primitive_util::NativeToPrimitiveType<NativeT>(), axis,
@@ -59,7 +59,7 @@ class ArithmeticTest : public ClientLibraryTestBase {
   template <typename NativeT>
   void TestArgMinMaxImpl(
       std::initializer_list<std::initializer_list<NativeT>> input,
-      absl::Span<NativeT const> expected_output,
+      abslx::Span<NativeT const> expected_output,
       std::function<void(XlaOp, PrimitiveType)> MinMaxImpl) {}
 };
 

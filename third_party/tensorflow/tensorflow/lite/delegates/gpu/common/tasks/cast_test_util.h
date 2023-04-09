@@ -22,11 +22,11 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status CastTests(TestExecutionEnvironment* env);
+abslx::Status CastTests(TestExecutionEnvironment* env);
 
-absl::Status CastToBoolTests(TestExecutionEnvironment* env);
+abslx::Status CastToBoolTests(TestExecutionEnvironment* env);
 
-absl::Status CastFromBoolTests(TestExecutionEnvironment* env);
+abslx::Status CastFromBoolTests(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

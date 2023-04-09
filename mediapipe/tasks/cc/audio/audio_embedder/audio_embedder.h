@@ -54,7 +54,7 @@ struct AudioEmbedderOptions {
   // The user-defined result callback for processing audio stream data.
   // The result callback should only be specified when the running mode is set
   // to RunningMode::AUDIO_STREAM.
-  std::function<void(absl::StatusOr<AudioEmbedderResult>)> result_callback =
+  std::function<void(abslx::StatusOr<AudioEmbedderResult>)> result_callback =
       nullptr;
 };
 
@@ -82,7 +82,7 @@ class AudioEmbedder : core::BaseAudioTaskApi {
   // Creates an AudioEmbedder from the provided options. A non-default
   // OpResolver can be specified in the BaseOptions in order to support custom
   // Ops or specify a subset of built-in Ops.
-  static absl::StatusOr<std::unique_ptr<AudioEmbedder>> Create(
+  static abslx::StatusOr<std::unique_ptr<AudioEmbedder>> Create(
       std::unique_ptr<AudioEmbedderOptions> options);
 
   // Performs embedding extraction on the provided audio clips. Only use this
@@ -100,7 +100,7 @@ class AudioEmbedder : core::BaseAudioTaskApi {
   // function returns a vector of EmbeddingResult objects, each associated
   // with a timestamp corresponding to the start (in milliseconds) of the chunk
   // data that was extracted.
-  absl::StatusOr<std::vector<AudioEmbedderResult>> Embed(
+  abslx::StatusOr<std::vector<AudioEmbedderResult>> Embed(
       Matrix audio_clip, double audio_sample_rate);
 
   // Sends audio stream data to embedder, and the results will be available via
@@ -120,11 +120,11 @@ class AudioEmbedder : core::BaseAudioTaskApi {
   // in a single inference. When this occurs, the input audio block is split
   // into multiple chunks. For this reason, the callback may be called multiple
   // times (once per chunk) for each call to this function.
-  absl::Status EmbedAsync(Matrix audio_block, double audio_sample_rate,
+  abslx::Status EmbedAsync(Matrix audio_block, double audio_sample_rate,
                           int64 timestamp_ms);
 
   // Shuts down the AudioEmbedder when all works are done.
-  absl::Status Close() { return runner_->Close(); }
+  abslx::Status Close() { return runner_->Close(); }
 
   // Utility function to compute cosine similarity [1] between two embeddings.
   // May return an InvalidArgumentError if e.g. the embeddings are of different
@@ -132,7 +132,7 @@ class AudioEmbedder : core::BaseAudioTaskApi {
   // 0.
   //
   // [1]: https://en.wikipedia.org/wiki/Cosine_similarity
-  static absl::StatusOr<double> CosineSimilarity(
+  static abslx::StatusOr<double> CosineSimilarity(
       const components::containers::Embedding& u,
       const components::containers::Embedding& v);
 };

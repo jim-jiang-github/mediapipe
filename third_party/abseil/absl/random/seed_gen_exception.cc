@@ -18,7 +18,7 @@
 
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 static constexpr const char kExceptionMessage[] =
@@ -34,7 +34,7 @@ namespace random_internal {
 
 void ThrowSeedGenException() {
 #ifdef ABSL_HAVE_EXCEPTIONS
-  throw absl::SeedGenException();
+  throw abslx::SeedGenException();
 #else
   std::cerr << kExceptionMessage << std::endl;
   std::terminate();
@@ -43,4 +43,4 @@ void ThrowSeedGenException() {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -32,8 +32,8 @@ Status Identity(AbstractContext* ctx, AbstractTensorHandle* const input,
 
 // Returns a list of tensors with the same shapes and contents as the input
 Status IdentityN(AbstractContext* ctx,
-                 absl::Span<AbstractTensorHandle* const> input,
-                 absl::Span<AbstractTensorHandle*> output,
+                 abslx::Span<AbstractTensorHandle* const> input,
+                 abslx::Span<AbstractTensorHandle*> output,
                  const char* name = nullptr,
                  const char* raw_device_name = nullptr);
 

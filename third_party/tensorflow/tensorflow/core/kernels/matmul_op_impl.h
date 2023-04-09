@@ -293,7 +293,7 @@ struct BlasLtMatmulAutoTuneGroup {
 
 typedef AutotuneSingleton<BlasLtMatmulAutoTuneGroup, BlasLtMatmulPlanParams,
                           se::blas::AlgorithmConfig,
-                          absl::Hash<BlasLtMatmulPlanParams>>
+                          abslx::Hash<BlasLtMatmulPlanParams>>
     AutoTuneBatchMatmul;
 
 }  // namespace
@@ -321,7 +321,7 @@ class BlasScratchAllocator : public se::ScratchAllocator {
     if (memory_limit_ > 0 && byte_size > memory_limit_) {
       return se::port::Status{
           se::port::error::UNAVAILABLE,
-          absl::StrCat("Requested memory size (", byte_size,
+          abslx::StrCat("Requested memory size (", byte_size,
                        ") exceeds the memory limit (", memory_limit_, ").")};
     }
     AllocationAttributes allocation_attr;
@@ -331,7 +331,7 @@ class BlasScratchAllocator : public se::ScratchAllocator {
     if (!allocation_status.ok()) {
       return se::port::Status{
           se::port::error::UNAVAILABLE,
-          absl::StrCat("Failed to allocate requested memory of (", byte_size,
+          abslx::StrCat("Failed to allocate requested memory of (", byte_size,
                        ").")};
     }
     // Hold the reference of the allocated tensors until the end of the

@@ -302,18 +302,18 @@ class DeviceResDistTest : public ::testing::Test {
   FakeNcclCommunicator nccl_communicator_;
   CancellationManager cm_;
   // Below are keyed by task names.
-  absl::flat_hash_map<string, std::unique_ptr<DeviceMgr>> device_mgrs_;
-  absl::flat_hash_map<string, std::unique_ptr<DeviceResolverDistributed>>
+  abslx::flat_hash_map<string, std::unique_ptr<DeviceMgr>> device_mgrs_;
+  abslx::flat_hash_map<string, std::unique_ptr<DeviceResolverDistributed>>
       dev_resolvers_;
-  absl::flat_hash_map<string,
+  abslx::flat_hash_map<string,
                       std::unique_ptr<CollectiveParamResolverDistributed>>
       cp_resolvers_;
-  absl::flat_hash_map<string, std::vector<string>> dev_by_task_;
-  absl::flat_hash_map<string, std::unique_ptr<WorkerEnv>> worker_envs_;
-  absl::flat_hash_map<string, std::unique_ptr<Worker>> workers_;
+  abslx::flat_hash_map<string, std::vector<string>> dev_by_task_;
+  abslx::flat_hash_map<string, std::unique_ptr<WorkerEnv>> worker_envs_;
+  abslx::flat_hash_map<string, std::unique_ptr<Worker>> workers_;
   // Below are keyed by device names;
-  absl::flat_hash_map<string, CollectiveParams*> cp_;
-  absl::flat_hash_map<string, Status> status_;
+  abslx::flat_hash_map<string, CollectiveParams*> cp_;
+  abslx::flat_hash_map<string, Status> status_;
   mutex mu_;
   int num_done_ TF_GUARDED_BY(mu_);
   condition_variable done_;
@@ -345,7 +345,7 @@ TEST_F(DeviceResDistTest, DifferentIncarnation) {
   IssueRequests(num_workers, num_devices);
   RestartWorker(1, num_workers, num_devices, "CPU", /*nccl*/ false);
   const string task_name = "/job:worker/replica:0/task:1";
-  const string device_name = absl::StrCat(task_name, "/device:CPU:0");
+  const string device_name = abslx::StrCat(task_name, "/device:CPU:0");
   IssueRequest(task_name, device_name, num_workers * num_devices);
   EXPECT_TRUE(errors::IsFailedPrecondition(status_[device_name]));
 }

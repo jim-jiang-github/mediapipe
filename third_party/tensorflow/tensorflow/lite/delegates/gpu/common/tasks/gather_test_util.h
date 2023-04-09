@@ -22,7 +22,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status GatherWidthTest(TestExecutionEnvironment* env);
+abslx::Status GatherWidthTest(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

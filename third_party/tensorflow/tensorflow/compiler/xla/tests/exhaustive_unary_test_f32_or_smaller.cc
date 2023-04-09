@@ -206,7 +206,7 @@ class Exhaustive32BitOrLessUnaryTest
     VLOG(2) << "Checking range [" << begin << ", " << end << ")";
     CHECK_EQ(input_size, end - begin);
 
-    absl::Span<NativeT> input_arr = (*input_literal)[0].data<NativeT>();
+    abslx::Span<NativeT> input_arr = (*input_literal)[0].data<NativeT>();
     for (int64_t i = 0; i < input_size; i++) {
       IntegralT input_val = i + begin;
       input_arr[i] =

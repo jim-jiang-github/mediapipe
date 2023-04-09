@@ -25,7 +25,7 @@
 
 #include "absl/base/optimization.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace flags_internal {
 
@@ -182,6 +182,6 @@ class SequenceLock {
 
 }  // namespace flags_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_FLAGS_INTERNAL_SEQUENCE_LOCK_H_

@@ -63,7 +63,7 @@ class ParallelFilterDatasetParams : public DatasetParams {
     input_names->emplace_back(ParallelFilterDatasetOp::kInputDataset);
     for (int i = 0; i < other_arguments_.size(); ++i) {
       input_names->emplace_back(
-          absl::StrCat(ParallelFilterDatasetOp::kOtherArguments, "_", i));
+          abslx::StrCat(ParallelFilterDatasetOp::kOtherArguments, "_", i));
     }
     input_names->emplace_back(ParallelFilterDatasetOp::kNumParallelCalls);
     return OkStatus();

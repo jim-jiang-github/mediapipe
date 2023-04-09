@@ -69,7 +69,7 @@ std::unique_ptr<CompositeDevice> CompositeDevice::MakeDevice(
   device_attributes.set_name(device_name);
   device_attributes.set_device_type(kCompositeDeviceType);
 
-  return absl::WrapUnique(
+  return abslx::WrapUnique(
       new CompositeDevice(device_attributes, underlying_devices));
 }
 

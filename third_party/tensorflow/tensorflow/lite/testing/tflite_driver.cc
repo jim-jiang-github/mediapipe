@@ -261,7 +261,7 @@ class TfLiteDriver::ShapeExpectation {
 
 template <>
 void TfLiteDriver::DataExpectation::SetData<string>(const string& csv_values) {
-  string s = absl::HexStringToBytes(csv_values);
+  string s = abslx::HexStringToBytes(csv_values);
   data_ = make_type_erased_array<char>(s.size());
   memcpy(data_.get(), s.data(), s.size());
 }
@@ -655,7 +655,7 @@ void TfLiteDriver::SetInput(const string& name, const string& csv_values) {
       break;
     }
     case kTfLiteString: {
-      string s = absl::HexStringToBytes(csv_values);
+      string s = abslx::HexStringToBytes(csv_values);
 
       DeallocateStringTensor(tensors_to_deallocate_[id]);
       AllocateStringTensor(id, s.size(), tensor);
@@ -679,7 +679,7 @@ void TfLiteDriver::SetInput(const string& name, const string& csv_values) {
       break;
     }
     default:
-      Invalidate(absl::StrCat("Unsupported tensor type ",
+      Invalidate(abslx::StrCat("Unsupported tensor type ",
                               TfLiteTypeGetName(tensor->type),
                               " in TfLiteDriver::SetInput"));
       return;
@@ -702,7 +702,7 @@ void TfLiteDriver::SetExpectation(const string& name,
   auto id = signature_outputs_[name];
   auto* tensor = signature_runner_->output_tensor(name.c_str());
   if (expected_output_.count(id) != 0) {
-    Invalidate(absl::StrCat("Overridden expectation for tensor '", id, "'"));
+    Invalidate(abslx::StrCat("Overridden expectation for tensor '", id, "'"));
   }
   expected_output_[id] = std::make_unique<DataExpectation>(
       relative_threshold_, absolute_threshold_, quantization_error_multiplier_);
@@ -756,7 +756,7 @@ void TfLiteDriver::SetExpectation(const string& name,
       expected_output_[id]->SetData<std::complex<double>>(csv_values);
       break;
     default:
-      Invalidate(absl::StrCat("Unsupported tensor type ",
+      Invalidate(abslx::StrCat("Unsupported tensor type ",
                               TfLiteTypeGetName(tensor->type),
                               " in TfLiteDriver::SetExpectation"));
       return;
@@ -768,7 +768,7 @@ void TfLiteDriver::SetShapeExpectation(const string& name,
   auto id = signature_outputs_[name];
   if (expected_output_shape_.count(id) != 0) {
     Invalidate(
-        absl::StrCat("Overridden shape expectation for tensor '", id, "'"));
+        abslx::StrCat("Overridden shape expectation for tensor '", id, "'"));
   }
   expected_output_shape_[id] = std::make_unique<ShapeExpectation>(csv_values);
 }
@@ -806,7 +806,7 @@ string TfLiteDriver::TensorValueToCsvString(const TfLiteTensor* tensor) {
     case kTfLiteBool:
       return JoinDefault(tensor->data.b, num_elements, ",");
     default:
-      Invalidate(absl::StrCat("Unsupported tensor type ",
+      Invalidate(abslx::StrCat("Unsupported tensor type ",
                               TfLiteTypeGetName(tensor->type),
                               " in TfLiteDriver::ReadOutput"));
       return "";

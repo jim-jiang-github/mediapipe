@@ -19,15 +19,15 @@ namespace mediapipe {
 
 class SimpleCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Outputs().Index(0).Set<int>();
     if (cc->InputSidePackets().HasTag("MAX_COUNT")) {
       cc->InputSidePackets().Tag("MAX_COUNT").Set<int>();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     LOG(WARNING) << "Simple Calculator Process called, count_: " << count_;
     int max_count = 1;
     if (cc->InputSidePackets().HasTag("MAX_COUNT")) {
@@ -38,7 +38,7 @@ class SimpleCalculator : public CalculatorBase {
     }
     cc->Outputs().Index(0).Add(new int(count_), Timestamp(count_));
     ++count_;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

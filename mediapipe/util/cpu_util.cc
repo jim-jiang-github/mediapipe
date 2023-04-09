@@ -45,16 +45,16 @@ namespace {
 
 constexpr uint32 kBufferLength = 64;
 
-absl::StatusOr<std::string> GetFilePath(int cpu) {
-  if (!absl::StrContains(absl::GetFlag(FLAGS_system_cpu_max_freq_file), "$0")) {
-    return absl::InvalidArgumentError(
-        absl::StrCat("Invalid frequency file: ",
-                     absl::GetFlag(FLAGS_system_cpu_max_freq_file)));
+abslx::StatusOr<std::string> GetFilePath(int cpu) {
+  if (!abslx::StrContains(abslx::GetFlag(FLAGS_system_cpu_max_freq_file), "$0")) {
+    return abslx::InvalidArgumentError(
+        abslx::StrCat("Invalid frequency file: ",
+                     abslx::GetFlag(FLAGS_system_cpu_max_freq_file)));
   }
-  return absl::Substitute(absl::GetFlag(FLAGS_system_cpu_max_freq_file), cpu);
+  return abslx::Substitute(abslx::GetFlag(FLAGS_system_cpu_max_freq_file), cpu);
 }
 
-absl::StatusOr<uint64> GetCpuMaxFrequency(int cpu) {
+abslx::StatusOr<uint64> GetCpuMaxFrequency(int cpu) {
   auto path_or_status = GetFilePath(cpu);
   if (!path_or_status.ok()) {
     return path_or_status.status();
@@ -66,15 +66,15 @@ absl::StatusOr<uint64> GetCpuMaxFrequency(int cpu) {
     file.getline(buffer, kBufferLength);
     file.close();
     uint64 frequency;
-    if (absl::SimpleAtoi(buffer, &frequency)) {
+    if (abslx::SimpleAtoi(buffer, &frequency)) {
       return frequency;
     } else {
-      return absl::InvalidArgumentError(
-          absl::StrCat("Invalid frequency: ", buffer));
+      return abslx::InvalidArgumentError(
+          abslx::StrCat("Invalid frequency: ", buffer));
     }
   } else {
-    return absl::NotFoundError(
-        absl::StrCat("Couldn't read ", path_or_status.value()));
+    return abslx::NotFoundError(
+        abslx::StrCat("Couldn't read ", path_or_status.value()));
   }
 }
 
@@ -90,7 +90,7 @@ std::set<int> InferLowerOrHigherCoreIds(bool lower) {
     return {};
   }
 
-  absl::c_sort(cpu_freq_pairs, [lower](const std::pair<int, uint64>& left,
+  abslx::c_sort(cpu_freq_pairs, [lower](const std::pair<int, uint64>& left,
                                        const std::pair<int, uint64>& right) {
     return (lower && left.second < right.second) ||
            (!lower && left.second > right.second);

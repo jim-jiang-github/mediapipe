@@ -68,9 +68,9 @@ void XlaReductionOp::Compile(XlaOpKernelContext* ctx) {
   OP_REQUIRES_OK(ctx, ctx->ConstantInputReshapedToIntVector(1, &axes));
 
   VLOG(1) << "data shape: " << data_shape.DebugString();
-  VLOG(1) << "axes      : " << absl::StrJoin(axes, ",");
+  VLOG(1) << "axes      : " << abslx::StrJoin(axes, ",");
 
-  absl::InlinedVector<bool, 4> bitmap(data_shape.dims(), false);
+  abslx::InlinedVector<bool, 4> bitmap(data_shape.dims(), false);
   std::vector<int64_t> xla_axes;
   auto num_elements = axes_tensor_shape.num_elements();
   xla_axes.reserve(num_elements);
@@ -109,7 +109,7 @@ void XlaReductionOp::Compile(XlaOpKernelContext* ctx) {
 
   xla::XlaBuilder* const b = ctx->builder();
   // Construct the builder for the reduction lambda.
-  xla::XlaBuilder r(absl::StrCat(desc, "-reduction"));
+  xla::XlaBuilder r(abslx::StrCat(desc, "-reduction"));
   xla::PrimitiveType type;
   TF_CHECK_OK(DataTypeToPrimitiveType(reduction_type_, &type));
 

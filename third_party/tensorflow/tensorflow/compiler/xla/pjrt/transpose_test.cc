@@ -42,12 +42,12 @@ class TestTransposePlan : public TransposePlan {
 };
 
 TEST(TransposeTest, RemoveTrivialDimensions) {
-  absl::InlinedVector<int64_t, 4> dims = {4, 5, 1, 3, 1, 2, 5};
-  absl::InlinedVector<int64_t, 4> perm = {0, 2, 1, 4, 3, 6, 5};
-  absl::InlinedVector<int64_t, 4> lda = {2, 5, 7, 100, 3, 0, 1};
-  absl::InlinedVector<int64_t, 4> lda_tile = {1, 1, 1, 1, 1, 1, 1};
-  absl::InlinedVector<int64_t, 4> input_tiling = {1, 1, 1, 1, 1, 1, 1};
-  absl::InlinedVector<int64_t, 4> output_tiling = {1, 1, 1, 1, 1, 1, 1};
+  abslx::InlinedVector<int64_t, 4> dims = {4, 5, 1, 3, 1, 2, 5};
+  abslx::InlinedVector<int64_t, 4> perm = {0, 2, 1, 4, 3, 6, 5};
+  abslx::InlinedVector<int64_t, 4> lda = {2, 5, 7, 100, 3, 0, 1};
+  abslx::InlinedVector<int64_t, 4> lda_tile = {1, 1, 1, 1, 1, 1, 1};
+  abslx::InlinedVector<int64_t, 4> input_tiling = {1, 1, 1, 1, 1, 1, 1};
+  abslx::InlinedVector<int64_t, 4> output_tiling = {1, 1, 1, 1, 1, 1, 1};
   TestTransposePlan::RemoveTrivialDimensions(dims, perm, lda, lda_tile,
                                              input_tiling, output_tiling);
   EXPECT_THAT(dims, testing::ElementsAre(4, 5, 3, 2, 5));
@@ -66,12 +66,12 @@ TEST(TransposeTest, RemoveTrivialDimensions) {
 }
 
 TEST(TransposeTest, CoalesceDimensions) {
-  absl::InlinedVector<int64_t, 4> dims = {4, 5, 1, 3, 1, 2, 5};
-  absl::InlinedVector<int64_t, 4> perm = {0, 2, 1, 4, 3, 6, 5};
-  absl::InlinedVector<int64_t, 4> lda = {50, 30, 30, 10, 10, 5, 1};
-  absl::InlinedVector<int64_t, 4> lda_tile = {1, 1, 1, 1, 1, 1, 1};
-  absl::InlinedVector<int64_t, 4> input_tiling = {1, 1, 1, 1, 1, 1, 1};
-  absl::InlinedVector<int64_t, 4> output_tiling = {1, 1, 1, 1, 1, 1, 1};
+  abslx::InlinedVector<int64_t, 4> dims = {4, 5, 1, 3, 1, 2, 5};
+  abslx::InlinedVector<int64_t, 4> perm = {0, 2, 1, 4, 3, 6, 5};
+  abslx::InlinedVector<int64_t, 4> lda = {50, 30, 30, 10, 10, 5, 1};
+  abslx::InlinedVector<int64_t, 4> lda_tile = {1, 1, 1, 1, 1, 1, 1};
+  abslx::InlinedVector<int64_t, 4> input_tiling = {1, 1, 1, 1, 1, 1, 1};
+  abslx::InlinedVector<int64_t, 4> output_tiling = {1, 1, 1, 1, 1, 1, 1};
   TestTransposePlan::CoalesceDimensions(dims, perm, lda, lda_tile, input_tiling,
                                         output_tiling);
   EXPECT_THAT(dims, testing::ElementsAre(4, 5, 1, 3, 1, 2, 5));
@@ -128,8 +128,8 @@ TEST(TransposeTest, InvalidTilings) {
 }
 
 // Computes the size in elements of a tiled array.
-int64_t SizeOfTiledArray(absl::Span<int64_t const> shape,
-                         absl::Span<int64_t const> tiling) {
+int64_t SizeOfTiledArray(abslx::Span<int64_t const> shape,
+                         abslx::Span<int64_t const> tiling) {
   int64_t size = 1;
   for (size_t i = 0; i < shape.size(); ++i) {
     if (i >= shape.size() - tiling.size()) {
@@ -143,7 +143,7 @@ int64_t SizeOfTiledArray(absl::Span<int64_t const> shape,
 
 // Advances 'indices' in the lexicographical order of the multidimensional
 // array with `shape`. Returns false if the end of the array has been reached.
-bool BumpIndices(absl::Span<int64_t const> shape, absl::Span<int64_t> indices) {
+bool BumpIndices(abslx::Span<int64_t const> shape, abslx::Span<int64_t> indices) {
   CHECK_EQ(shape.size(), indices.size());
   for (int dimno = indices.size() - 1; dimno >= 0; --dimno) {
     if (indices[dimno] + 1 < shape[dimno]) {
@@ -159,9 +159,9 @@ bool BumpIndices(absl::Span<int64_t const> shape, absl::Span<int64_t> indices) {
 
 // Converts a multidimensional index `indices` into an array with `shape` and
 // tiling `tiling` into a linear offset into a buffer.
-int64_t IndexToLinearIndex(absl::Span<int64_t const> shape,
-                           absl::Span<int64_t const> tiling,
-                           absl::Span<int64_t const> indices) {
+int64_t IndexToLinearIndex(abslx::Span<int64_t const> shape,
+                           abslx::Span<int64_t const> tiling,
+                           abslx::Span<int64_t const> indices) {
   CHECK_LE(tiling.size(), shape.size());
   CHECK_EQ(shape.size(), indices.size());
   int64_t stride = 1;
@@ -190,7 +190,7 @@ int64_t IndexToLinearIndex(absl::Span<int64_t const> shape,
 // Slow reference code that converts an array from an untiled layout into a
 // tiled layout.
 template <typename T>
-std::vector<T> TileArray(const Array<T>& in, absl::Span<int64_t const> tiling) {
+std::vector<T> TileArray(const Array<T>& in, abslx::Span<int64_t const> tiling) {
   std::vector<T> out(SizeOfTiledArray(in.dimensions(), tiling), -1);
   if (in.num_elements() == 0) {
     return out;
@@ -199,16 +199,16 @@ std::vector<T> TileArray(const Array<T>& in, absl::Span<int64_t const> tiling) {
   do {
     int64_t i = IndexToLinearIndex(in.dimensions(), tiling, indices);
     out.at(i) = in(indices);
-  } while (BumpIndices(in.dimensions(), absl::MakeSpan(indices)));
+  } while (BumpIndices(in.dimensions(), abslx::MakeSpan(indices)));
   return out;
 }
 
 // Reference implementation: transpose using Eigen.
 template <typename T, int NDIMS>
 void TransposeUsingEigenNd(const T* input, T* output,
-                           absl::Span<int64_t const> dims,
-                           absl::Span<int64_t const> dims_out,
-                           absl::Span<int64_t const> permutation) {
+                           abslx::Span<int64_t const> dims,
+                           abslx::Span<int64_t const> dims_out,
+                           abslx::Span<int64_t const> permutation) {
   typedef Eigen::TensorMap<
       Eigen::Tensor<T, NDIMS, Eigen::RowMajor, Eigen::DenseIndex>,
       Eigen::Aligned>
@@ -233,9 +233,9 @@ void TransposeUsingEigenNd(const T* input, T* output,
 
 template <typename T>
 void TransposeUsingEigen(const T* input, T* output,
-                         absl::Span<int64_t const> dims,
-                         absl::Span<int64_t const> dims_out,
-                         absl::Span<int64_t const> permutation) {
+                         abslx::Span<int64_t const> dims,
+                         abslx::Span<int64_t const> dims_out,
+                         abslx::Span<int64_t const> permutation) {
   switch (dims.size()) {
     case 0:
       return;
@@ -271,10 +271,10 @@ struct TransposeTestCase {
   std::vector<int64_t> output_tiling;
 
   std::string ToString() const {
-    return absl::StrFormat(
-        "[%s],perm=[%s],tiling=[%s]/[%s]", absl::StrJoin(dims, ","),
-        absl::StrJoin(permutation, ","), absl::StrJoin(input_tiling, ","),
-        absl::StrJoin(output_tiling, ","));
+    return abslx::StrFormat(
+        "[%s],perm=[%s],tiling=[%s]/[%s]", abslx::StrJoin(dims, ","),
+        abslx::StrJoin(permutation, ","), abslx::StrJoin(input_tiling, ","),
+        abslx::StrJoin(output_tiling, ","));
   }
 };
 
@@ -388,7 +388,7 @@ TEST_P(TransposeTest, TransposeInt8) { TestTranspose<int8_t>(1); }
 TEST_P(TransposeTest, TransposeInt16) { TestTranspose<int16_t>(1); }
 TEST_P(TransposeTest, TransposeInt32) { TestTranspose<int32_t>(1); }
 TEST_P(TransposeTest, TransposeInt64) { TestTranspose<int64_t>(1); }
-TEST_P(TransposeTest, TransposeInt128) { TestTranspose<absl::int128>(1); }
+TEST_P(TransposeTest, TransposeInt128) { TestTranspose<abslx::int128>(1); }
 
 TEST_P(TransposeTest, ParallelTransposeInt8) { TestTranspose<int8_t>(16); }
 TEST_P(TransposeTest, ParallelTransposeInt32) { TestTranspose<int32_t>(16); }
@@ -401,7 +401,7 @@ TEST(TransposeTest, NegativeStrides1D) {
   std::vector<int32_t> input(n);
   std::vector<int32_t> output(n);
   std::vector<int32_t> expected(n);
-  absl::c_iota(input, int32_t{7});
+  abslx::c_iota(input, int32_t{7});
   std::iota(expected.rbegin(), expected.rend(), 7);
   TF_ASSERT_OK_AND_ASSIGN(
       auto plan, TransposePlan::Create(
@@ -536,9 +536,9 @@ static void* benchmarks = []() {
     for (const auto& variant : variants) {
       for (int num_threads : std::get<2>(variant)) {
         std::string name =
-            absl::StrCat(std::get<0>(variant), "_threads_", num_threads, "_",
-                         absl::StrJoin(benchmark_case.dims, "_"), "_perm_",
-                         absl::StrJoin(benchmark_case.permutation, "_"));
+            abslx::StrCat(std::get<0>(variant), "_threads_", num_threads, "_",
+                         abslx::StrJoin(benchmark_case.dims, "_"), "_perm_",
+                         abslx::StrJoin(benchmark_case.permutation, "_"));
 
         TransposeTestCase testcase = benchmark_case;
         BenchmarkFn fn = std::get<1>(variant);

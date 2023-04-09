@@ -62,22 +62,22 @@ constexpr char kOpResolverTag[] = "OP_RESOLVER";
 constexpr char kTensorsTag[] = "TENSORS";
 
 std::string CreateModelResourcesTag(const CalculatorGraphConfig::Node& node) {
-  std::vector<std::string> names = absl::StrSplit(node.name(), "__");
+  std::vector<std::string> names = abslx::StrSplit(node.name(), "__");
   std::string node_type = node.calculator();
   std::replace(node_type.begin(), node_type.end(), '.', '_');
-  absl::AsciiStrToLower(&node_type);
-  return absl::StrFormat("%s_%s_model_resources",
+  abslx::AsciiStrToLower(&node_type);
+  return abslx::StrFormat("%s_%s_model_resources",
                          names.back().empty() ? "unnamed" : names.back(),
                          node_type);
 }
 
 std::string CreateModelAssetBundleResourcesTag(
     const CalculatorGraphConfig::Node& node) {
-  std::vector<std::string> names = absl::StrSplit(node.name(), "__");
+  std::vector<std::string> names = abslx::StrSplit(node.name(), "__");
   std::string node_type = node.calculator();
   std::replace(node_type.begin(), node_type.end(), '.', '_');
-  absl::AsciiStrToLower(&node_type);
-  return absl::StrFormat("%s_%s_model_asset_bundle_resources",
+  abslx::AsciiStrToLower(&node_type);
+  return abslx::StrFormat("%s_%s_model_asset_bundle_resources",
                          names.back().empty() ? "unnamed" : names.back(),
                          node_type);
 }
@@ -89,7 +89,7 @@ std::string CreateModelAssetBundleResourcesTag(
 // an InferenceCalculator (for single model inference).
 class InferenceSubgraph : public Subgraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     auto* subgraph_options = sc->MutableOptions<InferenceSubgraphOptions>();
     ASSIGN_OR_RETURN(auto inference_delegate,
@@ -121,7 +121,7 @@ class InferenceSubgraph : public Subgraph {
   }
 
  private:
-  absl::StatusOr<mediapipe::InferenceCalculatorOptions::Delegate>
+  abslx::StatusOr<mediapipe::InferenceCalculatorOptions::Delegate>
   DecideInferenceSettings(const InferenceSubgraphOptions& options) {
     // TODO: Fills in the inference delegate options based on the
     // model, acceleration settings, and device hardware info.
@@ -146,16 +146,16 @@ class InferenceSubgraph : public Subgraph {
 };
 REGISTER_MEDIAPIPE_GRAPH(::mediapipe::tasks::core::InferenceSubgraph);
 
-absl::StatusOr<CalculatorGraphConfig> ModelTaskGraph::GetConfig(
+abslx::StatusOr<CalculatorGraphConfig> ModelTaskGraph::GetConfig(
     SubgraphContext* sc) {
   return CreateStatusWithPayload(
-      absl::StatusCode::kUnimplemented,
+      abslx::StatusCode::kUnimplemented,
       "The task graph is not implemented. Please override the GetConfig() "
       "method in the subclass.",
       MediaPipeTasksStatus::kTaskGraphNotImplementedError);
 }
 
-absl::StatusOr<const ModelResources*> ModelTaskGraph::CreateModelResources(
+abslx::StatusOr<const ModelResources*> ModelTaskGraph::CreateModelResources(
     SubgraphContext* sc, std::unique_ptr<proto::ExternalFile> external_file,
     const std::string tag_suffix) {
   auto model_resources_cache_service = sc->Service(kModelResourcesCacheService);
@@ -173,7 +173,7 @@ absl::StatusOr<const ModelResources*> ModelTaskGraph::CreateModelResources(
       auto op_resolver_packet,
       model_resources_cache_service.GetObject().GetGraphOpResolverPacket());
   const std::string tag =
-      absl::StrCat(CreateModelResourcesTag(sc->OriginalNode()), tag_suffix);
+      abslx::StrCat(CreateModelResourcesTag(sc->OriginalNode()), tag_suffix);
   ASSIGN_OR_RETURN(auto model_resources,
                    ModelResources::Create(tag, std::move(external_file),
                                           op_resolver_packet));
@@ -183,7 +183,7 @@ absl::StatusOr<const ModelResources*> ModelTaskGraph::CreateModelResources(
   return model_resources_cache_service.GetObject().GetModelResources(tag);
 }
 
-absl::StatusOr<const ModelAssetBundleResources*>
+abslx::StatusOr<const ModelAssetBundleResources*>
 ModelTaskGraph::CreateModelAssetBundleResources(
     SubgraphContext* sc, std::unique_ptr<proto::ExternalFile> external_file,
     std::string tag_suffix) {
@@ -206,7 +206,7 @@ ModelTaskGraph::CreateModelAssetBundleResources(
         std::move(local_model_asset_bundle_resource));
     return local_model_asset_bundle_resources_.back().get();
   }
-  const std::string tag = absl::StrCat(
+  const std::string tag = abslx::StrCat(
       CreateModelAssetBundleResourcesTag(sc->OriginalNode()), tag_suffix);
   ASSIGN_OR_RETURN(
       auto model_bundle_resources,

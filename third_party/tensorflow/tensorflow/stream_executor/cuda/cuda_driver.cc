@@ -50,7 +50,7 @@ bool FLAGS_gpuexec_cuda_device_0_only = false;
   do {                                                                 \
     CUresult _res = (expr);                                            \
     if (TF_PREDICT_FALSE(_res != CUDA_SUCCESS)) {                      \
-      return port::InternalError(absl::StrCat(                         \
+      return port::InternalError(abslx::StrCat(                         \
           __VA_ARGS__, ": ", ::stream_executor::gpu::ToString(_res))); \
     }                                                                  \
   } while (0)
@@ -59,7 +59,7 @@ bool FLAGS_gpuexec_cuda_device_0_only = false;
   do {                                                      \
     CUresult _res = (expr);                                 \
     if (TF_PREDICT_FALSE(_res != CUDA_SUCCESS)) {           \
-      LOG(FATAL) << absl::StrCat(__VA_ARGS__) << ": "       \
+      LOG(FATAL) << abslx::StrCat(__VA_ARGS__) << ": "       \
                  << ::stream_executor::gpu::ToString(_res); \
     }                                                       \
   } while (0)
@@ -71,7 +71,7 @@ constexpr bool kVerifyGpuContext = false;
 namespace stream_executor {
 namespace gpu {
 
-/* static */ absl::Mutex CreatedContexts::mu_{absl::kConstInit};
+/* static */ abslx::Mutex CreatedContexts::mu_{abslx::kConstInit};
 /* static */ int64_t CreatedContexts::next_id_ = 1;  // 0 means "no context"
 
 namespace {
@@ -206,7 +206,7 @@ namespace {
 std::string CUDAPointerToDeviceString(CUdeviceptr pointer) {
   auto value = GpuDriver::GetPointerDevice(pointer);
   if (value.ok()) {
-    return absl::StrCat(value.ValueOrDie());
+    return abslx::StrCat(value.ValueOrDie());
   }
   LOG(ERROR) << "could not query device: " << value.status();
   return "?";
@@ -267,7 +267,7 @@ static port::Status InternalInit() {
 
   Diagnostician::LogDiagnosticInformation();
   return port::Status(port::error::ABORTED,
-                      absl::StrCat("failed call to cuInit: ", ToString(res)));
+                      abslx::StrCat("failed call to cuInit: ", ToString(res)));
 }
 
 }  // namespace
@@ -291,7 +291,7 @@ static port::Status InternalInit() {
 /* static */ port::Status GpuDriver::GetDeviceName(CUdevice device,
                                                    std::string* device_name) {
   static const size_t kCharLimit = 64;
-  absl::InlinedVector<char, 4> chars(kCharLimit);
+  abslx::InlinedVector<char, 4> chars(kCharLimit);
   RETURN_IF_CUDA_RES_ERROR(
       cuDeviceGetName(chars.begin(), kCharLimit - 1, device),
       "Failed to get device name");
@@ -393,9 +393,9 @@ bool DeviceOptionsToContextFlags(const DeviceOptions& device_options,
   if (res == CUDA_ERROR_OUT_OF_MEMORY) {
     uint64_t total_memory;
     if (GetDeviceTotalMemory(device, &total_memory)) {
-      absl::StrAppend(&message, "; total memory reported: ", total_memory);
+      abslx::StrAppend(&message, "; total memory reported: ", total_memory);
     } else {
-      absl::StrAppend(&message, "; could not query total memory");
+      abslx::StrAppend(&message, "; could not query total memory");
     }
   }
 
@@ -457,7 +457,7 @@ GpuDriver::ContextGetSharedMemConfig(GpuContext* context) {
 }
 
 /* static */ port::Status GpuDriver::LaunchKernel(
-    GpuContext* context, absl::string_view kernel_name, CUfunction function,
+    GpuContext* context, abslx::string_view kernel_name, CUfunction function,
     unsigned int grid_dim_x, unsigned int grid_dim_y, unsigned int grid_dim_z,
     unsigned int block_dim_x, unsigned int block_dim_y,
     unsigned int block_dim_z, unsigned int shared_mem_bytes, CUstream stream,
@@ -490,7 +490,7 @@ GpuDriver::ContextGetSharedMemConfig(GpuContext* context) {
 /* static */ port::Status GpuDriver::LoadPtx(GpuContext* context,
                                              const char* ptx_contents,
                                              CUmodule* module) {
-  absl::Notification notification;
+  abslx::Notification notification;
   port::Status ret = ::tensorflow::OkStatus();
   GetDriverExecutor()->Schedule([context, ptx_contents, module, &ret,
                                  &notification]() {
@@ -499,8 +499,8 @@ GpuDriver::ContextGetSharedMemConfig(GpuContext* context) {
     static const unsigned int kLogBufferBytesLimit = 1024;
     unsigned int error_log_buffer_bytes = kLogBufferBytesLimit;
     unsigned int info_log_buffer_bytes = kLogBufferBytesLimit;
-    absl::InlinedVector<char, 4> error_log_buffer(error_log_buffer_bytes);
-    absl::InlinedVector<char, 4> info_log_buffer(info_log_buffer_bytes);
+    abslx::InlinedVector<char, 4> error_log_buffer(error_log_buffer_bytes);
+    abslx::InlinedVector<char, 4> info_log_buffer(info_log_buffer_bytes);
     bool log_verbose = true;
     CUjit_option options[] = {CU_JIT_ERROR_LOG_BUFFER_SIZE_BYTES,
                               CU_JIT_ERROR_LOG_BUFFER,
@@ -509,18 +509,18 @@ GpuDriver::ContextGetSharedMemConfig(GpuContext* context) {
     // Note that the driver API wants the contents of this values to be stored
     // in an array of void*s, so we coerce them accordingly.
     void* option_values[] = {
-        absl::bit_cast<void*>(uintptr_t(error_log_buffer_bytes)),
-        absl::bit_cast<void*>(error_log_buffer.data()),
-        absl::bit_cast<void*>(uintptr_t(info_log_buffer_bytes)),
-        absl::bit_cast<void*>(info_log_buffer.data()),
-        absl::bit_cast<void*>(uintptr_t(log_verbose))};
+        abslx::bit_cast<void*>(uintptr_t(error_log_buffer_bytes)),
+        abslx::bit_cast<void*>(error_log_buffer.data()),
+        abslx::bit_cast<void*>(uintptr_t(info_log_buffer_bytes)),
+        abslx::bit_cast<void*>(info_log_buffer.data()),
+        abslx::bit_cast<void*>(uintptr_t(log_verbose))};
     CHECK(TF_ARRAYSIZE(options) == TF_ARRAYSIZE(option_values));
 
     CUresult res;
     {
       // TODO(leary) Need to see if NVIDIA can expunge the leakiness in their
       // module loading: see http://b/13248943
-      absl::LeakCheckDisabler disabler;
+      abslx::LeakCheckDisabler disabler;
       res = cuModuleLoadDataEx(module, ptx_data, TF_ARRAYSIZE(options), options,
                                option_values);
     }
@@ -542,7 +542,7 @@ GpuDriver::ContextGetSharedMemConfig(GpuContext* context) {
       LOG(ERROR) << "error log buffer (" << error_log_buffer_bytes
                  << " bytes): " << error_log_buffer.data();
       ret = port::InternalError(
-          absl::StrCat("Failed to load PTX text as a module: ", ToString(res)));
+          abslx::StrCat("Failed to load PTX text as a module: ", ToString(res)));
       notification.Notify();
     }
 
@@ -671,7 +671,7 @@ GpuDriver::ContextGetSharedMemConfig(GpuContext* context) {
 
   return port::Status(
       port::error::INTERNAL,
-      absl::StrCat("failed to get device for context: ", ToString(result)));
+      abslx::StrCat("failed to get device for context: ", ToString(result)));
 }
 
 /* static */ bool GpuDriver::CreateStream(GpuContext* context, CUstream* stream,
@@ -744,7 +744,7 @@ GpuDriver::ContextGetSharedMemConfig(GpuContext* context) {
 /* static */ void GpuDriver::DeviceDeallocate(GpuContext* context,
                                               void* location) {
   ScopedActivateContext activation(context);
-  CUdeviceptr pointer = absl::bit_cast<CUdeviceptr>(location);
+  CUdeviceptr pointer = abslx::bit_cast<CUdeviceptr>(location);
   CUresult res = cuMemFree(pointer);
   if (res != CUDA_SUCCESS) {
     LOG(ERROR) << "failed to free device memory at " << location
@@ -775,7 +775,7 @@ GpuDriver::ContextGetSharedMemConfig(GpuContext* context) {
 /* static */ void GpuDriver::UnifiedMemoryDeallocate(GpuContext* context,
                                                      void* location) {
   ScopedActivateContext activation(context);
-  CUdeviceptr pointer = absl::bit_cast<CUdeviceptr>(location);
+  CUdeviceptr pointer = abslx::bit_cast<CUdeviceptr>(location);
   CUresult res = cuMemFree(pointer);
   if (res != CUDA_SUCCESS) {
     LOG(ERROR) << "failed to free unified memory at " << location
@@ -844,7 +844,7 @@ GpuDriver::ReserveVirtualMemory(GpuContext* context, uint64_t bytes) {
                                      /*addr=*/0, /*flags=*/0);
   if (res != CUDA_SUCCESS) {
     return port::InternalError(
-        absl::StrFormat("error reserving %d bytes of virtual GPU memory: %s",
+        abslx::StrFormat("error reserving %d bytes of virtual GPU memory: %s",
                         bytes, ToString(res)));
   }
   return {{base, bytes}};
@@ -871,7 +871,7 @@ GpuDriver::ReserveVirtualMemory(GpuContext* context, uint64_t bytes) {
   CUresult res = cuMemGetAllocationGranularity(
       &granularity, &props, CU_MEM_ALLOC_GRANULARITY_MINIMUM);
   if (res != CUDA_SUCCESS) {
-    return port::InternalError(absl::StrCat(
+    return port::InternalError(abslx::StrCat(
         "failed to get min allocation granularity: ", ToString(res)));
   }
   return granularity;
@@ -895,7 +895,7 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
   CUresult res = cuMemCreate(&mem_handle, bytes, &props, 0);
   if (res != CUDA_SUCCESS) {
     return port::InternalError(
-        absl::StrFormat("failed to create memory allocation of size %d: %s",
+        abslx::StrFormat("failed to create memory allocation of size %d: %s",
                         bytes, ToString(res)));
   }
   return GpuDriver::GenericMemoryHandle{mem_handle, bytes};
@@ -927,7 +927,7 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
   CUresult res =
       cuMemMap(va, handle.bytes, /*offset=*/0, handle.handle, /*flags=*/0);
   if (res != CUDA_SUCCESS) {
-    return port::InternalError(absl::StrFormat(
+    return port::InternalError(abslx::StrFormat(
         "Failed to map %d bytes at %d: %s", handle.bytes, va, ToString(res)));
   }
 
@@ -946,7 +946,7 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
       LOG(ERROR)
           << "Failed to unmap memory in GpuDriver::MapMemory error path.";
     }
-    return port::InternalError(absl::StrFormat(
+    return port::InternalError(abslx::StrFormat(
         "Failed to set read/write access on memory mapped at %d: %s", va,
         ToString(res)));
   }
@@ -995,7 +995,7 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
   if (res != CUDA_SUCCESS && res != CUDA_ERROR_NOT_READY) {
     return port::Status(
         port::error::INTERNAL,
-        absl::StrFormat("failed to query event: %s", ToString(res)));
+        abslx::StrFormat("failed to query event: %s", ToString(res)));
   }
 
   return res;
@@ -1077,9 +1077,9 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
   ScopedActivateContext activation(context);
   RETURN_IF_CUDA_RES_ERROR(
       cuMemcpyDtoH(host_dst, gpu_src, size),
-      absl::StrFormat("failed to synchronous memcpy from device to host "
+      abslx::StrFormat("failed to synchronous memcpy from device to host "
                       "host dst: %p; GPU src: %p; size: %u=0x%x",
-                      host_dst, absl::bit_cast<void*>(gpu_src), size, size));
+                      host_dst, abslx::bit_cast<void*>(gpu_src), size, size));
   VLOG(2) << "successfully sync memcpy'd d2h of " << size << " bytes to "
           << host_dst;
   return ::tensorflow::OkStatus();
@@ -1092,10 +1092,10 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
   ScopedActivateContext activation(context);
   RETURN_IF_CUDA_RES_ERROR(
       cuMemcpyHtoD(gpu_dst, host_src, size),
-      absl::StrFormat(
+      abslx::StrFormat(
           "failed to synchronous memcpy from host to device: GPU dst: %p;"
           " host src: %p; size: %u=0x%x",
-          absl::bit_cast<void*>(gpu_dst), host_src, size, size));
+          abslx::bit_cast<void*>(gpu_dst), host_src, size, size));
   VLOG(2) << "successfully enqueued sync memcpy h2d of " << size << " bytes";
   return ::tensorflow::OkStatus();
 }
@@ -1114,9 +1114,9 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
   } else {
     // Any context work here.
     CUcontext dst_context =
-        CreatedContexts::GetAnyContext(absl::bit_cast<void*>(gpu_dst));
+        CreatedContexts::GetAnyContext(abslx::bit_cast<void*>(gpu_dst));
     CUcontext src_context =
-        CreatedContexts::GetAnyContext(absl::bit_cast<void*>(gpu_src));
+        CreatedContexts::GetAnyContext(abslx::bit_cast<void*>(gpu_src));
 
     if (static_cast<void*>(dst_context) == nullptr) {
       port::StatusOr<GpuContext*> tmp_context = GetPointerContext(gpu_dst);
@@ -1137,10 +1137,10 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
 
   RETURN_IF_CUDA_RES_ERROR(
       result,
-      absl::StrFormat(
+      abslx::StrFormat(
           "failed to synchronous memcpy from host to device: GPU dst: %p; "
           "GPU src: %p; size: %u=0x%x",
-          absl::bit_cast<void*>(gpu_dst), absl::bit_cast<void*>(gpu_src), size,
+          abslx::bit_cast<void*>(gpu_dst), abslx::bit_cast<void*>(gpu_src), size,
           size));
   VLOG(2) << "successfully sync memcpy'd d2d of " << size << " bytes";
   return ::tensorflow::OkStatus();
@@ -1154,14 +1154,14 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
   ScopedActivateContext activation(context);
   CUresult res = cuMemcpyDtoHAsync(host_dst, gpu_src, size, stream);
   if (res != CUDA_SUCCESS) {
-    LOG(ERROR) << absl::StrFormat(
+    LOG(ERROR) << abslx::StrFormat(
         "failed to enqueue async memcpy from device to host: %s; host dst: %p; "
         "GPU src: %p; size: %u=0x%x",
-        ToString(res), host_dst, absl::bit_cast<void*>(gpu_src), size, size);
+        ToString(res), host_dst, abslx::bit_cast<void*>(gpu_src), size, size);
     return false;
   }
   VLOG(2) << "successfully enqueued async memcpy d2h of " << size
-          << " bytes from " << absl::bit_cast<void*>(gpu_src) << " to "
+          << " bytes from " << abslx::bit_cast<void*>(gpu_src) << " to "
           << host_dst << " on stream " << stream;
   return true;
 }
@@ -1174,10 +1174,10 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
   ScopedActivateContext activation(context);
   CUresult res = cuMemcpyHtoDAsync(gpu_dst, host_src, size, stream);
   if (res != CUDA_SUCCESS) {
-    LOG(ERROR) << absl::StrFormat(
+    LOG(ERROR) << abslx::StrFormat(
         "failed to enqueue async memcpy from host to device: %s; GPU dst: %p; "
         "host src: %p; size: %u=0x%x",
-        ToString(res), absl::bit_cast<void*>(gpu_dst), host_src, size, size);
+        ToString(res), abslx::bit_cast<void*>(gpu_dst), host_src, size, size);
     return false;
   }
   VLOG(2) << "successfully enqueued async memcpy h2d of " << size << " bytes"
@@ -1199,9 +1199,9 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
   } else {
     // Any context work here.
     CUcontext dst_context =
-        CreatedContexts::GetAnyContext(absl::bit_cast<void*>(gpu_dst));
+        CreatedContexts::GetAnyContext(abslx::bit_cast<void*>(gpu_dst));
     CUcontext src_context =
-        CreatedContexts::GetAnyContext(absl::bit_cast<void*>(gpu_src));
+        CreatedContexts::GetAnyContext(abslx::bit_cast<void*>(gpu_src));
 
     if (static_cast<void*>(dst_context) == nullptr) {
       port::StatusOr<GpuContext*> tmp_context = GetPointerContext(gpu_dst);
@@ -1221,14 +1221,14 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
                                stream);
   }
   if (result != CUDA_SUCCESS) {
-    LOG(ERROR) << absl::StrFormat(
+    LOG(ERROR) << abslx::StrFormat(
         "failed to enqueue async memcpy from device to device: %s"
         "; GPU dst: %p on %s %s"
         "; GPU src: %p on %s %s"
         "; can access? %s; size: %u=0x%x",
-        ToString(result), absl::bit_cast<void*>(gpu_dst),
+        ToString(result), abslx::bit_cast<void*>(gpu_dst),
         CUDAPointerToMemorySpaceString(gpu_dst),
-        CUDAPointerToDeviceString(gpu_dst), absl::bit_cast<void*>(gpu_src),
+        CUDAPointerToDeviceString(gpu_dst), abslx::bit_cast<void*>(gpu_src),
         CUDAPointerToMemorySpaceString(gpu_src),
         CUDAPointerToDeviceString(gpu_src),
         CUDAPointersToCanAccessString(gpu_src, gpu_dst), size, size);
@@ -1265,7 +1265,7 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
   } else {
     return port::Status(
         port::error::FAILED_PRECONDITION,
-        absl::StrCat("could not create CUDA event: ", ToString(res)));
+        abslx::StrCat("could not create CUDA event: ", ToString(res)));
   }
 }
 
@@ -1304,7 +1304,7 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
 
   return port::Status(
       port::error::INTERNAL,
-      absl::StrCat("failed to query context for device pointer: ",
+      abslx::StrCat("failed to query context for device pointer: ",
                    ToString(result)));
 }
 
@@ -1322,13 +1322,13 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
       default:
         return port::Status(
             port::error::INTERNAL,
-            absl::StrCat("unknown memory space provided by CUDA API: ", value));
+            abslx::StrCat("unknown memory space provided by CUDA API: ", value));
     }
   }
 
   return port::Status(
       port::error::INTERNAL,
-      absl::StrCat("failed to query device pointer for memory space: ",
+      abslx::StrCat("failed to query device pointer for memory space: ",
                    ToString(result)));
 }
 
@@ -1344,13 +1344,13 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
     // below).
     return port::Status(
         port::error::NOT_FOUND,
-        absl::StrFormat("not a device pointer %p; %s",
+        abslx::StrFormat("not a device pointer %p; %s",
                         reinterpret_cast<void*>(dptr), ToString(result)));
   }
 
   return port::Status(
       port::error::INTERNAL,
-      absl::StrFormat("failed to get pointer into for device pointer %p; %s",
+      abslx::StrFormat("failed to get pointer into for device pointer %p; %s",
                       reinterpret_cast<void*>(dptr), ToString(result)));
 }
 
@@ -1375,7 +1375,7 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
   if (res != CUDA_SUCCESS) {
     return port::Status(
         port::error::INTERNAL,
-        absl::StrFormat(
+        abslx::StrFormat(
             "failed to get compute capability major for device: %s; %d",
             ToString(res), device));
   }
@@ -1385,7 +1385,7 @@ GpuDriver::CreateMemoryHandle(GpuContext* context, uint64_t bytes) {
   if (res != CUDA_SUCCESS) {
     return port::Status(
         port::error::INTERNAL,
-        absl::StrFormat(
+        abslx::StrFormat(
             "failed to get compute capability minor for device: %s; %d",
             ToString(res), device));
   }
@@ -1517,7 +1517,7 @@ static port::StatusOr<T> GetSimpleAttribute(CUdevice device,
   if (res != CUDA_SUCCESS) {
     return port::Status(
         port::error::INTERNAL,
-        absl::StrFormat("failed to get device attribute %d for device %d: %s",
+        abslx::StrFormat("failed to get device attribute %d for device %d: %s",
                         attribute, device, ToString(res)));
   }
   return val;
@@ -1569,7 +1569,7 @@ static port::StatusOr<T> GetSimpleAttribute(CUdevice device,
 /* static */ std::string GpuDriver::GetPCIBusID(CUdevice device) {
   std::string pci_bus_id;
   static const int kBufferSize = 64;
-  absl::InlinedVector<char, 4> chars(kBufferSize);
+  abslx::InlinedVector<char, 4> chars(kBufferSize);
   chars[kBufferSize - 1] = '\0';
   CUresult res = cuDeviceGetPCIBusId(chars.begin(), kBufferSize - 1, device);
   if (res != CUDA_SUCCESS) {
@@ -1626,7 +1626,7 @@ static port::StatusOr<T> GetSimpleAttribute(CUdevice device,
       result != CUDA_ERROR_PEER_ACCESS_ALREADY_ENABLED) {
     return port::Status(
         port::error::INTERNAL,
-        absl::StrFormat("failed to enable peer access from %p to %p: %s", from,
+        abslx::StrFormat("failed to enable peer access from %p to %p: %s", from,
                         to, ToString(result)));
   }
 
@@ -1642,7 +1642,7 @@ static port::StatusOr<T> GetSimpleAttribute(CUdevice device,
   RETURN_IF_CUDA_RES_ERROR(
       cuOccupancyMaxActiveBlocksPerMultiprocessor(
           &max_blocks, kernel, threads_per_block, dynamic_shared_memory_bytes),
-      absl::StrFormat("Failed to calculate occupancy of kernel %p", kernel));
+      abslx::StrFormat("Failed to calculate occupancy of kernel %p", kernel));
   return max_blocks;
 }
 

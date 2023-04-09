@@ -65,9 +65,9 @@ class SwitchMuxCalculatorTest : public ::testing::Test {
     *result.add_input_stream() = "SELECT:select";
     for (int c = 0; c < 3; ++c) {
       *result.add_input_stream() =
-          absl::StrCat(tool::ChannelTag("FRAME", c), ":frame_", c);
+          abslx::StrCat(tool::ChannelTag("FRAME", c), ":frame_", c);
       *result.add_input_stream() =
-          absl::StrCat(tool::ChannelTag("MASK", c), ":mask_", c);
+          abslx::StrCat(tool::ChannelTag("MASK", c), ":mask_", c);
     }
     *result.add_output_stream() = "FRAME:frame";
     *result.add_output_stream() = "MASK:mask";
@@ -87,7 +87,7 @@ TEST_F(SwitchMuxCalculatorTest, ChannelEarly) {
   std::vector<Packet> output_frames;
   MP_ASSERT_OK(graph.ObserveOutputStream("frame", [&](const Packet& p) {
     output_frames.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
 
@@ -134,7 +134,7 @@ TEST_F(SwitchMuxCalculatorTest, ChannelsLate) {
   std::vector<Packet> output_frames;
   MP_ASSERT_OK(graph.ObserveOutputStream("frame", [&](const Packet& p) {
     output_frames.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
 
@@ -183,7 +183,7 @@ TEST_F(SwitchMuxCalculatorTest, ChannelsOnTime) {
   std::vector<Packet> output_frames;
   MP_ASSERT_OK(graph.ObserveOutputStream("frame", [&](const Packet& p) {
     output_frames.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
 
@@ -227,7 +227,7 @@ TEST_F(SwitchMuxCalculatorTest, ChannelNeverCompletes) {
   std::vector<Packet> output_frames;
   MP_ASSERT_OK(graph.ObserveOutputStream("frame", [&](const Packet& p) {
     output_frames.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
 
@@ -270,7 +270,7 @@ TEST_F(SwitchMuxCalculatorTest, OneChannelIsSlow) {
   std::vector<Packet> output_frames;
   MP_ASSERT_OK(graph.ObserveOutputStream("frame", [&](const Packet& p) {
     output_frames.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
 

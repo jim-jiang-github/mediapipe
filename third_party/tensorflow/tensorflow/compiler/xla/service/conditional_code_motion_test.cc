@@ -40,7 +40,7 @@ using ConditionalCodeMotionTest = HloTestBase;
 namespace op = xla::testing::opcode_matchers;
 
 TEST_F(ConditionalCodeMotionTest, MoveSubsetTupleOut) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveDotOpOut
 
@@ -80,7 +80,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, VerifyConditionalAnalysisWithWhileTuple) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveDotOpOut
 
@@ -126,7 +126,7 @@ HloModule RemoveDotOpOut
 }
 
 TEST_F(ConditionalCodeMotionTest, MoveConvertOutConditionalRoot) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveDotOpOut
 
@@ -165,7 +165,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, MoveConvertOutConditional) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveDotOpOut
 
@@ -206,7 +206,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, ConditionalShapeNotMutable) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveDotOpOut
 
@@ -244,7 +244,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, MoveConvertOut) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveDotOpOut
 
@@ -295,7 +295,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, UserShareOperandCannotBeMoved) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveIdenticalInstruction
 
@@ -377,7 +377,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, ConditionalBoundaryAliasingBug) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveIdenticalInstruction
 
@@ -443,7 +443,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, ConditionalRootElementChanged) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveIdenticalInstruction
 
@@ -527,7 +527,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, ConditionalIsRootInstruction) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveIdenticalInstruction
 
@@ -580,7 +580,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, LayoutMisMatchCannotMovedOut) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule LayoutMisMatchCannotMovedOut
 
@@ -635,7 +635,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, MoveCrossModuleAllReduceOut) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveIdenticalInstruction
 
@@ -729,7 +729,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, DoNotMoveAllReduceIn) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveIdenticalInstruction
 
@@ -812,7 +812,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, MovePowOpIn) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveIdenticalInstruction
 
@@ -856,7 +856,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, MoveInWithMultipleGTE) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveIdenticalInstruction
 
@@ -896,7 +896,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, MoveOutWithSharedBranch) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveIdenticalInstruction
 
@@ -937,7 +937,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, MovePowInWithNonTupleRoot) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveIdenticalInstruction
 
@@ -972,7 +972,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, MovePowInWithEmptyBranch) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveIdenticalInstruction
 
@@ -1013,7 +1013,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, MovePowInWithNonTupleParameter) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveIdenticalInstruction
 
@@ -1047,7 +1047,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, MoveCopyInBranch) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveIdenticalInstruction
 
@@ -1107,7 +1107,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, MoveCopy2InBranch) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveIdenticalInstruction
 
@@ -1156,7 +1156,7 @@ ENTRY %f32_8_3_2__1-1.32 (idxs.1: s32[2], single_io.2: f32[8,3,2], repeated_io_0
 }
 
 TEST_F(ConditionalCodeMotionTest, MoveReplicatedTupleEntryOut) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveIdenticalInstruction
 
@@ -1249,7 +1249,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, DoNotMoveWithExtraOperand) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveIdenticalInstruction
 
@@ -1274,7 +1274,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, MultipleIndependentMoveIns) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule FromNMT
 
@@ -1347,7 +1347,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, TestConfigurationFlag) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveDotOpOut
 
@@ -1468,7 +1468,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, TestMultipleConfigurationFlags) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveDotOpOut
 
@@ -1612,7 +1612,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, ShapeChangingMovePreservesSharding) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveIdenticalInstruction
 
@@ -1658,7 +1658,7 @@ ENTRY %main (pred.1: pred[], tuple.1: (f32[10]), tuple.2: (f32[10])) -> (f32[10]
 }
 
 TEST_F(ConditionalCodeMotionTest, ConvertDuplicate) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveDotOpOut
 
@@ -1695,7 +1695,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalCodeMotionTest, NestedConvert) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveDotOpOut
 
@@ -1739,7 +1739,7 @@ ENTRY main {
 // Do not move converts that have differently shaped operands from inside
 // conditional branches.
 TEST_F(ConditionalCodeMotionTest, NestedConditionalDisableMoveConvert) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule xla_computation_unknown.45
 

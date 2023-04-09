@@ -16,7 +16,7 @@
 // bad_optional_access.h
 // -----------------------------------------------------------------------------
 //
-// This header file defines the `absl::bad_optional_access` type.
+// This header file defines the `abslx::bad_optional_access` type.
 
 #ifndef ABSL_TYPES_BAD_OPTIONAL_ACCESS_H_
 #define ABSL_TYPES_BAD_OPTIONAL_ACCESS_H_
@@ -29,32 +29,32 @@
 
 #include <optional>
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 using std::bad_optional_access;
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #else  // ABSL_USES_STD_OPTIONAL
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // -----------------------------------------------------------------------------
 // bad_optional_access
 // -----------------------------------------------------------------------------
 //
-// An `absl::bad_optional_access` type is an exception type that is thrown when
-// attempting to access an `absl::optional` object that does not contain a
+// An `abslx::bad_optional_access` type is an exception type that is thrown when
+// attempting to access an `abslx::optional` object that does not contain a
 // value.
 //
 // Example:
 //
-//   absl::optional<int> o;
+//   abslx::optional<int> o;
 //
 //   try {
 //     int n = o.value();
-//   } catch(const absl::bad_optional_access& e) {
+//   } catch(const abslx::bad_optional_access& e) {
 //     std::cout << "Bad optional access: " << e.what() << '\n';
 //   }
 class bad_optional_access : public std::exception {
@@ -71,7 +71,7 @@ namespace optional_internal {
 
 }  // namespace optional_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_USES_STD_OPTIONAL
 

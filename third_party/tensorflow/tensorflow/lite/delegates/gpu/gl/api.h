@@ -51,7 +51,7 @@ class CompiledModel {
   //
   // NewRun call as well as subsequent calls to InferenceContext methods should
   // be done from the same EGL context.
-  virtual absl::Status NewRun(
+  virtual abslx::Status NewRun(
       const RuntimeOptions& options, const ObjectManager* objects,
       CommandQueue* command_queue,
       std::unique_ptr<InferenceContext>* inference_context) const = 0;
@@ -59,13 +59,13 @@ class CompiledModel {
 #ifndef TFLITE_GPU_BINARY_RELEASE
   // Serializes compiled model to a string.
   // @return true if serialization finished successfully.
-  virtual absl::Status Serialize(
+  virtual abslx::Status Serialize(
       std::vector<uint8_t>* serialized_compiled_model) const = 0;
 #endif  // TFLITE_GPU_BINARY_RELEASE
 };
 
 // Turns the given model into "compiled" form that is suitable for inference.
-absl::Status Compile(const CompilationOptions& options,
+abslx::Status Compile(const CompilationOptions& options,
                      const GraphFloat32& model,
                      const std::unordered_set<int>& tflite_graph_io,  // NOLINT
                      const NodeShader& node_shader,
@@ -75,7 +75,7 @@ absl::Status Compile(const CompilationOptions& options,
 #ifndef TFLITE_GPU_BINARY_RELEASE
 // Reads serialized representation previously created with
 // CompiledModel::Serialize call.
-absl::Status ReadSerializedModel(
+abslx::Status ReadSerializedModel(
     const std::vector<uint8_t>& serialized_model,
     std::unique_ptr<CompiledModel>* compiled_model);
 #endif  // TFLITE_GPU_BINARY_RELEASE
@@ -91,13 +91,13 @@ class InferenceContext {
   virtual RuntimeStats stats() const = 0;
 
   // Executes inference.
-  virtual absl::Status Execute() = 0;
+  virtual abslx::Status Execute() = 0;
 
   // Asks context to reset it for another round. Keep in mind that does not
   // affect inputs nor outputs which are not cleared, so it is possible to
   // re-use them.
   // It is an error to call Reset while previous run is still in progress.
-  virtual absl::Status Reset() = 0;
+  virtual abslx::Status Reset() = 0;
 };
 
 }  // namespace gl

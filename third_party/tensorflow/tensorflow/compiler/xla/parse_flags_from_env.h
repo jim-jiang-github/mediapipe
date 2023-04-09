@@ -62,10 +62,10 @@ namespace xla {
 //
 // Raises a fatal error if any flags in `envvar` were not recognized.
 bool ParseFlagsFromEnvAndDieIfUnknown(
-    absl::string_view envvar, const std::vector<tensorflow::Flag>& flag_list);
+    abslx::string_view envvar, const std::vector<tensorflow::Flag>& flag_list);
 
 // Used only for testing.  Not to be used by clients.
-void ResetFlagsFromEnvForTesting(absl::string_view envvar, int** pargc,
+void ResetFlagsFromEnvForTesting(abslx::string_view envvar, int** pargc,
                                  std::vector<char*>** pargv);
 
 }  // namespace xla

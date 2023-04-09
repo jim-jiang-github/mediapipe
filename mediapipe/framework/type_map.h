@@ -79,9 +79,9 @@ class HolderBase;
 // These functions use HolderBase to hide the type T from the function
 // definition.  This allows these functions to be placed into an untyped
 // struct in the map of MediaPipeTypeData objects.
-using SerializeFn = std::function<absl::Status(
+using SerializeFn = std::function<abslx::Status(
     const packet_internal::HolderBase& holder_base, std::string* output)>;
-using DeserializeFn = std::function<absl::Status(
+using DeserializeFn = std::function<abslx::Status(
     const std::string& encoding,
     std::unique_ptr<packet_internal::HolderBase>* holder_base)>;
 
@@ -147,7 +147,7 @@ class StaticMap {
     ValueInserter(const char* file_and_line, const KeyType& key,
                   const MediaPipeTypeData& value) {
       MapName* static_map = GetMap();
-      absl::MutexLock l(&(static_map->map_lock_));
+      abslx::MutexLock l(&(static_map->map_lock_));
 
       typename MapType::iterator it = static_map->internal_map_.find(key);
       if (it == static_map->internal_map_.end()) {
@@ -214,7 +214,7 @@ class StaticMap {
     return instance;
   }
 
-  absl::Mutex map_lock_;
+  abslx::Mutex map_lock_;
   MapType internal_map_;
 };
 }  // namespace type_map_internal
@@ -294,18 +294,18 @@ DEFINE_MEDIAPIPE_TYPE_MAP(PacketTypeStringToMediaPipeTypeData, std::string);
 //     seperated by double colons.
 //
 // Example 1: register type with non-string proxy.
-//   absl::Status ToProxyFn(
+//   abslx::Status ToProxyFn(
 //       const ClassType& obj, ProxyType* proxy)
 //   {
 //     ...
-//     return absl::OkStatus();
+//     return abslx::OkStatus();
 //   }
 //
-//   absl::Status FromProxyFn(
+//   abslx::Status FromProxyFn(
 //       const ProxyType& proxy, ClassType* obj)
 //   {
 //     ...
-//     return absl::OkStatus();
+//     return abslx::OkStatus();
 //   }
 //
 //   MEDIAPIPE_REGISTER_TYPE_WITH_PROXY(
@@ -316,16 +316,16 @@ DEFINE_MEDIAPIPE_TYPE_MAP(PacketTypeStringToMediaPipeTypeData, std::string);
 //      ProxyType>, ToProxyFn, FromProxyFn);
 //
 // Example 2: register type with string proxy.
-//   absl::Status ToProxyFn(const ClassType& obj, string* encoding)
+//   abslx::Status ToProxyFn(const ClassType& obj, string* encoding)
 //   {
 //     ...
-//     return absl::OkStatus();
+//     return abslx::OkStatus();
 //   }
 //
-//   absl::Status FromProxyFn(
+//   abslx::Status FromProxyFn(
 //       const ProxyType& proxy, string* encoding) {
 //     ...
-//     return absl::OkStatus();
+//     return abslx::OkStatus();
 //   }
 //
 //   MEDIAPIPE_REGISTER_TYPE_WITH_PROXY(

@@ -26,12 +26,12 @@
 
 using ::testing::Ge;
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
 MATCHER_P2(IsBetween, a, b,
-           absl::StrCat(std::string(negation ? "isn't" : "is"), " between ", a,
+           abslx::StrCat(std::string(negation ? "isn't" : "is"), " between ", a,
                         " and ", b)) {
   return a <= arg && arg <= b;
 }
@@ -196,4 +196,4 @@ TEST(ExponentialBiasedTest, InitializationModes) {
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -249,7 +249,7 @@ class DistributedTPURewritePass : public GraphOptimizationPass {
 
   // Mapping from TPUReplicate cluster name to tpu device names. Value is a
   // mapping from [replica][core] to a TF device name.
-  typedef absl::flat_hash_map<string, std::vector<std::vector<string>>>
+  typedef abslx::flat_hash_map<string, std::vector<std::vector<string>>>
       TPUReplicateDeviceNamesMapping;
 
   // Determines which devices to use to run the computation.
@@ -275,7 +275,7 @@ class DistributedTPURewritePass : public GraphOptimizationPass {
       const tpu::TpuTopologyExternal& topology, int num_tpus_per_task,
       const std::vector<std::vector<Device*>>& tpu_devices, int num_replicas,
       int num_cores_per_replica, const string& topology_attr,
-      absl::Span<const int> device_assignment_attr,
+      abslx::Span<const int> device_assignment_attr,
       std::vector<std::vector<string>>* tf_device_assignment,
       std::vector<int>* devices_to_lock,
       std::unique_ptr<xla::DeviceAssignment>* xla_device_assignment);
@@ -378,12 +378,12 @@ class DistributedTPURewritePass : public GraphOptimizationPass {
   // succeeded and replaces the TPUCompilationStatus node in the graph.
   static Status BuildCompilationStatusReturnNodes(
       Node* replicate_node, Node* compile_node,
-      absl::Span<const int> devices_to_lock, Node** control_after_compilation,
+      abslx::Span<const int> devices_to_lock, Node** control_after_compilation,
       Node** multilock_acquire, Graph* graph);
 
   // Builds ReadVariableOp nodes that read `variables`, with a control
   // edges that ensure they happen after `control_predecessor`.
-  static Status BuildVariableReads(absl::Span<const VariableInput> variables,
+  static Status BuildVariableReads(abslx::Span<const VariableInput> variables,
                                    Node* control_predecessor, Graph* graph,
                                    std::vector<Node*>* variable_reads);
 
@@ -408,8 +408,8 @@ class DistributedTPURewritePass : public GraphOptimizationPass {
   // `variable_writes`, with control edges that ensure the writes happen before
   // `control_successor`.
   static Status BuildVariableWrites(
-      absl::Span<const VariableInput> variables, Node* control_successor,
-      absl::Span<const VariableWrite> variable_writes, Graph* graph);
+      abslx::Span<const VariableInput> variables, Node* control_successor,
+      abslx::Span<const VariableWrite> variable_writes, Graph* graph);
 
   // Builds TPUExecute operators assigned to each TPU device
   // involved in the computation.
@@ -466,7 +466,7 @@ class DistributedTPURewritePass : public GraphOptimizationPass {
   // Map from a Node in an outside_compilation cluster in the original graph to
   // the list of Nodes, one for each replica, that it is expanded into during
   // replication.
-  typedef absl::node_hash_map<Node*, std::vector<Node*>> NodeToNodeReplicasMap;
+  typedef abslx::node_hash_map<Node*, std::vector<Node*>> NodeToNodeReplicasMap;
 
   // Map from the name of an outside_compilation cluster to the model-parallel
   // core index that the HostCompute Op should be placed on in that cluster.
@@ -548,7 +548,7 @@ class DistributedTPURewritePass : public GraphOptimizationPass {
   static Status DealWithConstantsAndVariables(
       const Node& replicate_node, const NameRangeMap& input_name_map,
       Graph* graph, Node* host_transfer_sequencer, Node* control_before,
-      Node* control_after, absl::Span<const VariableInput> variable_nodes,
+      Node* control_after, abslx::Span<const VariableInput> variable_nodes,
       std::vector<Node*>* guaranteed_constant_nodes,
       std::vector<Node*>* variable_reads);
 

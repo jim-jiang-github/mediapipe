@@ -36,7 +36,7 @@ void BM_Sum_By_StrCat(benchmark::State& state) {
   char foo[100];
   for (auto _ : state) {
     // NOLINTNEXTLINE(runtime/printf)
-    strcpy(foo, absl::StrCat(kStringOne, i, kStringTwo, i * 65536ULL).c_str());
+    strcpy(foo, abslx::StrCat(kStringOne, i, kStringTwo, i * 65536ULL).c_str());
     int sum = 0;
     for (char* f = &foo[0]; *f != 0; ++f) {
       sum += *f;
@@ -61,7 +61,7 @@ void BM_StrCat_By_Strings(benchmark::State& state) {
   int i = 0;
   for (auto _ : state) {
     std::string result =
-        std::string(kStringOne) + " " + kStringTwo + ":" + absl::StrCat(i);
+        std::string(kStringOne) + " " + kStringTwo + ":" + abslx::StrCat(i);
     benchmark::DoNotOptimize(result);
     i = IncrementAlternatingSign(i);
   }
@@ -75,7 +75,7 @@ void BM_StrCat_By_StringOpPlus(benchmark::State& state) {
     result += " ";
     result += kStringTwo;
     result += ":";
-    result += absl::StrCat(i);
+    result += abslx::StrCat(i);
     benchmark::DoNotOptimize(result);
     i = IncrementAlternatingSign(i);
   }
@@ -85,7 +85,7 @@ BENCHMARK(BM_StrCat_By_StringOpPlus);
 void BM_StrCat_By_StrCat(benchmark::State& state) {
   int i = 0;
   for (auto _ : state) {
-    std::string result = absl::StrCat(kStringOne, " ", kStringTwo, ":", i);
+    std::string result = abslx::StrCat(kStringOne, " ", kStringTwo, ":", i);
     benchmark::DoNotOptimize(result);
     i = IncrementAlternatingSign(i);
   }
@@ -96,7 +96,7 @@ void BM_HexCat_By_StrCat(benchmark::State& state) {
   int i = 0;
   for (auto _ : state) {
     std::string result =
-        absl::StrCat(kStringOne, " ", absl::Hex(int64_t{i} + 0x10000000));
+        abslx::StrCat(kStringOne, " ", abslx::Hex(int64_t{i} + 0x10000000));
     benchmark::DoNotOptimize(result);
     i = IncrementAlternatingSign(i);
   }
@@ -106,7 +106,7 @@ BENCHMARK(BM_HexCat_By_StrCat);
 void BM_HexCat_By_Substitute(benchmark::State& state) {
   int i = 0;
   for (auto _ : state) {
-    std::string result = absl::Substitute(
+    std::string result = abslx::Substitute(
         "$0 $1", kStringOne, reinterpret_cast<void*>(int64_t{i} + 0x10000000));
     benchmark::DoNotOptimize(result);
     i = IncrementAlternatingSign(i);
@@ -118,7 +118,7 @@ void BM_FloatToString_By_StrCat(benchmark::State& state) {
   int i = 0;
   float foo = 0.0f;
   for (auto _ : state) {
-    std::string result = absl::StrCat(foo += 1.001f, " != ", int64_t{i});
+    std::string result = abslx::StrCat(foo += 1.001f, " != ", int64_t{i});
     benchmark::DoNotOptimize(result);
     i = IncrementAlternatingSign(i);
   }
@@ -130,7 +130,7 @@ void BM_DoubleToString_By_SixDigits(benchmark::State& state) {
   double foo = 0.0;
   for (auto _ : state) {
     std::string result =
-        absl::StrCat(absl::SixDigits(foo += 1.001), " != ", int64_t{i});
+        abslx::StrCat(abslx::SixDigits(foo += 1.001), " != ", int64_t{i});
     benchmark::DoNotOptimize(result);
     i = IncrementAlternatingSign(i);
   }
@@ -143,7 +143,7 @@ void BM_StrAppendImpl(benchmark::State& state, size_t total_bytes,
   for (auto s : state) {
     std::string result;
     while (result.size() < total_bytes) {
-      absl::StrAppend(&result, chunks...);
+      abslx::StrAppend(&result, chunks...);
       benchmark::DoNotOptimize(result);
     }
   }
@@ -152,7 +152,7 @@ void BM_StrAppendImpl(benchmark::State& state, size_t total_bytes,
 void BM_StrAppend(benchmark::State& state) {
   const int total_bytes = state.range(0);
   const int chunks_at_a_time = state.range(1);
-  const absl::string_view kChunk = "0123456789";
+  const abslx::string_view kChunk = "0123456789";
 
   switch (chunks_at_a_time) {
     case 1:

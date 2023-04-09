@@ -66,7 +66,7 @@ class DepthwiseConv3x3 : public GPUOperation {
   template <DataType S, typename T>
   void RearrangeWeightsAndBiasesData(
       const tflite::gpu::Tensor<OHWI, S>& weights,
-      const tflite::gpu::Tensor<Linear, S>& biases, absl::Span<T> dst);
+      const tflite::gpu::Tensor<Linear, S>& biases, abslx::Span<T> dst);
 
   std::string GenerateDepthwiseConvCode(const GpuInfo& gpu_info,
                                         const OperationDef& op_def,
@@ -91,11 +91,11 @@ void DepthwiseConv3x3::UploadWeightsAndBiases(
   if (fp32_weights) {
     float4* ptr = reinterpret_cast<float4*>(data.data());
     RearrangeWeightsAndBiasesData(weights, biases,
-                                  absl::MakeSpan(ptr, elements_count));
+                                  abslx::MakeSpan(ptr, elements_count));
   } else {
     half4* ptr = reinterpret_cast<half4*>(data.data());
     RearrangeWeightsAndBiasesData(weights, biases,
-                                  absl::MakeSpan(ptr, elements_count));
+                                  abslx::MakeSpan(ptr, elements_count));
   }
 
   if (weights_are_buffer) {
@@ -119,7 +119,7 @@ void DepthwiseConv3x3::UploadWeightsAndBiases(
 template <DataType S, typename T>
 void DepthwiseConv3x3::RearrangeWeightsAndBiasesData(
     const tflite::gpu::Tensor<OHWI, S>& weights,
-    const tflite::gpu::Tensor<Linear, S>& biases, absl::Span<T> dst) {
+    const tflite::gpu::Tensor<Linear, S>& biases, abslx::Span<T> dst) {
   const int src_depth = DivideRoundUp(weights.shape.i, 4);
 
   int counter = 0;

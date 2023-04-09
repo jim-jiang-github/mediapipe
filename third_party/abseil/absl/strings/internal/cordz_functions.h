@@ -21,7 +21,7 @@
 #include "absl/base/config.h"
 #include "absl/base/optimization.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 
@@ -80,6 +80,6 @@ inline void cordz_set_next_sample_for_testing(int64_t) {}
 
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_CORDZ_FUNCTIONS_H_

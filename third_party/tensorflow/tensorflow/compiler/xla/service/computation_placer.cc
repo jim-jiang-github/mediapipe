@@ -37,8 +37,8 @@ limitations under the License.
 #include "tensorflow/stream_executor/host/host_platform_id.h"
 #include "tensorflow/stream_executor/rocm/rocm_platform_id.h"
 
-using absl::StrAppend;
-using absl::StrCat;
+using abslx::StrAppend;
+using abslx::StrCat;
 
 namespace xla {
 
@@ -72,9 +72,9 @@ StatusOr<int> DeviceAssignment::ReplicaIdForDevice(
   return logical_id.replica_id;
 }
 
-absl::flat_hash_map<GlobalDeviceId, DeviceAssignment::LogicalID>
+abslx::flat_hash_map<GlobalDeviceId, DeviceAssignment::LogicalID>
 DeviceAssignment::GetDeviceToLogicalIdMap() const {
-  absl::flat_hash_map<GlobalDeviceId, DeviceAssignment::LogicalID>
+  abslx::flat_hash_map<GlobalDeviceId, DeviceAssignment::LogicalID>
       device_to_logical_id;
   for (int r = 0; r < replica_count(); ++r) {
     for (int c = 0; c < computation_count(); ++c) {
@@ -161,7 +161,7 @@ StatusOr<DeviceAssignment> ComputationPlacer::AssignDevices(
 /* static */ void ComputationPlacer::RegisterComputationPlacer(
     se::Platform::Id platform_id,
     ComputationPlacerCreationFunction creation_function) {
-  absl::MutexLock lock(&ComputationPlacer::platform_computation_placer_mutex_);
+  abslx::MutexLock lock(&ComputationPlacer::platform_computation_placer_mutex_);
   auto* computation_placers = GetPlatformComputationPlacers();
   CHECK(computation_placers->find(platform_id) == computation_placers->end());
   (*computation_placers)[platform_id].creation_function = creation_function;
@@ -169,7 +169,7 @@ StatusOr<DeviceAssignment> ComputationPlacer::AssignDevices(
 
 /* static */ StatusOr<ComputationPlacer*> ComputationPlacer::GetForPlatform(
     const se::Platform* platform) {
-  absl::MutexLock lock(&ComputationPlacer::platform_computation_placer_mutex_);
+  abslx::MutexLock lock(&ComputationPlacer::platform_computation_placer_mutex_);
   auto* computation_placers = GetPlatformComputationPlacers();
 
   auto it = computation_placers->find(platform->id());
@@ -188,8 +188,8 @@ StatusOr<DeviceAssignment> ComputationPlacer::AssignDevices(
   return it->second.placer.get();
 }
 
-/* static */ absl::Mutex ComputationPlacer::platform_computation_placer_mutex_(
-    absl::kConstInit);
+/* static */ abslx::Mutex ComputationPlacer::platform_computation_placer_mutex_(
+    abslx::kConstInit);
 
 /* static */ std::map<se::Platform::Id, ComputationPlacer::State>*
 ComputationPlacer::GetPlatformComputationPlacers() {

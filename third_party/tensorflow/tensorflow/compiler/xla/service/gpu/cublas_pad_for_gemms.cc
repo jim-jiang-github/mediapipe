@@ -133,10 +133,10 @@ bool CheckCanonical(HloDotInstruction* dot) {
 
   std::vector<int64_t> canonical_batch_dims(
       dimension_numbers.lhs_batch_dimensions_size());
-  absl::c_iota(canonical_batch_dims, 0);
-  if (!absl::c_equal(dimension_numbers.lhs_batch_dimensions(),
+  abslx::c_iota(canonical_batch_dims, 0);
+  if (!abslx::c_equal(dimension_numbers.lhs_batch_dimensions(),
                      canonical_batch_dims) ||
-      !absl::c_equal(dimension_numbers.rhs_batch_dimensions(),
+      !abslx::c_equal(dimension_numbers.rhs_batch_dimensions(),
                      canonical_batch_dims)) {
     LOG(ERROR) << "Dot is not canonical: Expected batch dimensions to be all "
                   "dimensions except for the last 2 ones.";
@@ -166,7 +166,7 @@ static std::vector<HloDotInstruction*> GetRelevantDots(HloComputation* comp,
 
 StatusOr<bool> CublasPadForGemms::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   for (HloComputation* comp :
        module->MakeNonfusionComputations(execution_threads)) {

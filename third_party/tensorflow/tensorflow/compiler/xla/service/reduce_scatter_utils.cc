@@ -71,7 +71,7 @@ int64_t GetIndexForId(const HloInstruction* index, int64_t id,
   return *table.GetIntegralAsS64({inner_index});
 }
 
-bool IsPerIdOffsets(absl::Span<const HloInstruction*> offsets,
+bool IsPerIdOffsets(abslx::Span<const HloInstruction*> offsets,
                     int64_t shard_size, const MapIdToTableOffset& map_id,
                     std::vector<int64_t> slice_group_sizes,
                     const HloAllReduceInstruction* ar) {
@@ -276,7 +276,7 @@ std::optional<ReduceScatterSpec> MatchReduceScatter(
     VLOG(2) << "Unsupported all-reduce: " << ar->ToString();
     return std::nullopt;
   }
-  if (ar->shape().rank() - absl::c_count(ar->shape().dimensions(), 1) <
+  if (ar->shape().rank() - abslx::c_count(ar->shape().dimensions(), 1) <
       min_rank) {
     VLOG(2) << " Should be at least rank-" << min_rank
             << " excluding trivial dimensions " << ar->ToString();
@@ -288,8 +288,8 @@ std::optional<ReduceScatterSpec> MatchReduceScatter(
   }
   if (ar->replica_groups().size() > 1) {
     const int64_t size = ar->replica_groups()[0].replica_ids_size();
-    absl::Span<const ReplicaGroup> rgs = ar->replica_groups();
-    const bool has_uniform_size = absl::c_all_of(
+    abslx::Span<const ReplicaGroup> rgs = ar->replica_groups();
+    const bool has_uniform_size = abslx::c_all_of(
         rgs.subspan(1, size - 1), [size](const ReplicaGroup& group) {
           return group.replica_ids_size() == size;
         });
@@ -467,7 +467,7 @@ std::optional<ReduceScatterSpec> MatchReduceScatter(
       shard_size *= user->dynamic_slice_sizes()[dim];
     }
 
-    if (!IsPerIdOffsets(absl::MakeSpan(offsets), shard_size, map_id,
+    if (!IsPerIdOffsets(abslx::MakeSpan(offsets), shard_size, map_id,
                         group_sizes, ar)) {
       VLOG(2) << "IsPerIdOffsets() failed " << ar->ToString();
       return std::nullopt;
@@ -489,13 +489,13 @@ std::optional<ReduceScatterSpec> MatchReduceScatter(
         ShapeUtil::DimensionsUnmodifiedByReshape(reshape->operand(0)->shape(),
                                                  reshape->shape());
     // Map each unmodified output dim of reshape to the corresponding input dim.
-    absl::flat_hash_map<int64_t, int64_t> unmodified_output_to_input_map;
+    abslx::flat_hash_map<int64_t, int64_t> unmodified_output_to_input_map;
     for (const std::pair<int64_t, int64_t>& io_pair : unmodified_dims) {
       unmodified_output_to_input_map.insert({io_pair.second, io_pair.first});
     }
 
     bool all_split_dims_unmodified =
-        absl::c_all_of(split_dims, [&](int64_t out_dim) {
+        abslx::c_all_of(split_dims, [&](int64_t out_dim) {
           return unmodified_output_to_input_map.count(out_dim) != 0;
         });
     if (!all_split_dims_unmodified) {

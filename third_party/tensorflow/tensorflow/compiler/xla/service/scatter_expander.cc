@@ -95,13 +95,13 @@ static StatusOr<HloInstruction*> CanonicalizeScatterIndices(
 // major dimensions and all the window dimensions appear in the minor
 // dimensions.
 static StatusOr<HloInstruction*> PermuteScatterAndWindowDims(
-    HloInstruction* updates, absl::Span<const int64_t> update_window_dims) {
+    HloInstruction* updates, abslx::Span<const int64_t> update_window_dims) {
   std::vector<int64_t> permutation;
   const int64_t updates_rank = updates->shape().rank();
   permutation.reserve(updates_rank);
 
   for (int64_t i = 0; i < updates_rank; ++i) {
-    bool is_scatter_dim = !absl::c_binary_search(update_window_dims, i);
+    bool is_scatter_dim = !abslx::c_binary_search(update_window_dims, i);
     if (is_scatter_dim) {
       permutation.push_back(i);
     }
@@ -173,8 +173,8 @@ static StatusOr<HloInstruction*> ExpandIndexVectorIntoOperandSpace(
 
 static StatusOr<HloInstruction*> CheckIndexValidity(
     HloComputation* computation, HloInstruction* index,
-    absl::Span<const int64_t> operand_dims,
-    absl::Span<const int64_t> window_sizes, HloModule* module) {
+    abslx::Span<const int64_t> operand_dims,
+    abslx::Span<const int64_t> window_sizes, HloModule* module) {
   DCHECK_NE(nullptr, module);
   DCHECK_EQ(operand_dims.size(), window_sizes.size());
 
@@ -225,7 +225,7 @@ static StatusOr<HloComputation*> CallAndGetOutput(HloComputation* original,
   }
   HloComputation* new_comp = [&] {
     HloComputation::Builder builder(
-        absl::StrCat(original->name(), ".dup.", output_index));
+        abslx::StrCat(original->name(), ".dup.", output_index));
     for (int i = 0, n = original->num_parameters(); i < n; ++i) {
       HloInstruction* original_param = original->parameter_instruction(i);
       builder.AddInstruction(HloInstruction::CreateParameter(
@@ -247,7 +247,7 @@ static StatusOr<HloComputation*> CallAndGetOutput(HloComputation* original,
 // Body of the while loop that performs the scatter operation using other HLOs.
 static StatusOr<std::vector<HloInstruction*>> ScatterLoopBody(
     HloScatterInstruction* scatter, HloInstruction* induction_var,
-    absl::Span<HloInstruction* const> loop_state) {
+    abslx::Span<HloInstruction* const> loop_state) {
   const ScatterDimensionNumbers& dim_numbers =
       scatter->scatter_dimension_numbers();
   CHECK_EQ(loop_state.size(), scatter->operand_count());
@@ -299,13 +299,13 @@ static StatusOr<std::vector<HloInstruction*>> ScatterLoopBody(
       updates[0]->shape().dimensions().end());
   update_slice_bounds[0] = 1;
 
-  absl::InlinedVector<HloInstruction*, 2> map_operands(
+  abslx::InlinedVector<HloInstruction*, 2> map_operands(
       operands.size() + updates.size(), nullptr);
   auto operand_slices_to_update =
-      absl::MakeSpan(map_operands).first(operands.size());
+      abslx::MakeSpan(map_operands).first(operands.size());
   auto update_slices_with_dims_inserted =
-      absl::MakeSpan(map_operands).last(updates.size());
-  absl::Span<const int64_t> actual_update_slice_dims;
+      abslx::MakeSpan(map_operands).last(updates.size());
+  abslx::Span<const int64_t> actual_update_slice_dims;
   for (int i = 0, n = operands.size(); i < n; ++i) {
     HloInstruction* update = updates[i];
     TF_ASSIGN_OR_RETURN(
@@ -371,7 +371,7 @@ static StatusOr<std::vector<HloInstruction*>> ScatterLoopBody(
     updated_loop_state.push_back(updated_operand);
   }
   updated_loop_state.push_back(scatter_indices);
-  absl::c_copy(updates, std::back_inserter(updated_loop_state));
+  abslx::c_copy(updates, std::back_inserter(updated_loop_state));
 
   return updated_loop_state;
 }
@@ -466,9 +466,9 @@ StatusOr<HloInstruction*> ScatterExpander::ExpandInstruction(
   // The while loop that implements the scatter operation.
   std::vector<HloInstruction*> loop_state;
   loop_state.reserve(scatter->operand_count());
-  absl::c_copy(scatter_operands, std::back_inserter(loop_state));
+  abslx::c_copy(scatter_operands, std::back_inserter(loop_state));
   loop_state.push_back(canonical_scatter_indices);
-  absl::c_copy(adjusted_canonical_updates, std::back_inserter(loop_state));
+  abslx::c_copy(adjusted_canonical_updates, std::back_inserter(loop_state));
   StatusOr<std::vector<HloInstruction*>> scatter_loop_result_status =
       WhileUtil::MakeCountedLoop(
           scatter->parent(), scatter_loop_trip_count, loop_state,
@@ -480,7 +480,7 @@ StatusOr<HloInstruction*> ScatterExpander::ExpandInstruction(
   TF_ASSIGN_OR_RETURN(std::vector<HloInstruction*> scatter_loop_result,
                       scatter_loop_result_status);
   auto results =
-      absl::MakeSpan(scatter_loop_result).first(scatter_operands.size());
+      abslx::MakeSpan(scatter_loop_result).first(scatter_operands.size());
   return MaybeMakeTuple(results);
 }
 

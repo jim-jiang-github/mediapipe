@@ -44,7 +44,7 @@ class ScatterExpander : public OpExpanderPass {
 
   explicit ScatterExpander(Mode m) : mode_(m) {}
 
-  absl::string_view name() const override { return "scatter_expander"; }
+  abslx::string_view name() const override { return "scatter_expander"; }
 
  protected:
   bool InstructionMatchesPattern(HloInstruction* inst) override;

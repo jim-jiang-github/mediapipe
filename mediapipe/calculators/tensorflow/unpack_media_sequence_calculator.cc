@@ -118,7 +118,7 @@ namespace mpms = mediapipe::mediasequence;
 // }
 class UnpackMediaSequenceCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     const auto& options = cc->Options<UnpackMediaSequenceCalculatorOptions>();
     RET_CHECK(cc->InputSidePackets().HasTag(kSequenceExampleTag));
     cc->InputSidePackets().Tag(kSequenceExampleTag).Set<tf::SequenceExample>();
@@ -155,7 +155,7 @@ class UnpackMediaSequenceCalculator : public CalculatorBase {
       cc->Outputs().Tag(kForwardFlowImageTag).Set<std::string>();
     }
     for (const auto& tag : cc->Outputs().GetTags()) {
-      if (absl::StartsWith(tag, kImageTag)) {
+      if (abslx::StartsWith(tag, kImageTag)) {
         std::string key = "";
         if (tag != kImageTag) {
           int tag_length = sizeof(kImageTag) / sizeof(*kImageTag) - 1;
@@ -167,7 +167,7 @@ class UnpackMediaSequenceCalculator : public CalculatorBase {
         }
         cc->Outputs().Tag(tag).Set<std::string>();
       }
-      if (absl::StartsWith(tag, kBBoxTag)) {
+      if (abslx::StartsWith(tag, kBBoxTag)) {
         std::string key = "";
         if (tag != kBBoxTag) {
           int tag_length = sizeof(kBBoxTag) / sizeof(*kBBoxTag) - 1;
@@ -179,14 +179,14 @@ class UnpackMediaSequenceCalculator : public CalculatorBase {
         }
         cc->Outputs().Tag(tag).Set<std::vector<Location>>();
       }
-      if (absl::StartsWith(tag, kFloatFeaturePrefixTag)) {
+      if (abslx::StartsWith(tag, kFloatFeaturePrefixTag)) {
         cc->Outputs().Tag(tag).Set<std::vector<float>>();
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     // Copy the packet to copy the otherwise inaccessible shared ptr.
     example_packet_holder_ = cc->InputSidePackets().Tag(kSequenceExampleTag);
     sequence_ = &example_packet_holder_.Get<tf::SequenceExample>();
@@ -200,7 +200,7 @@ class UnpackMediaSequenceCalculator : public CalculatorBase {
     int64 last_timestamp_seen = Timestamp::PreStream().Value();
     first_timestamp_seen_ = Timestamp::OneOverPostStream().Value();
     for (const auto& map_kv : sequence_->feature_lists().feature_list()) {
-      if (absl::StrContains(map_kv.first, "/timestamp")) {
+      if (abslx::StrContains(map_kv.first, "/timestamp")) {
         LOG(INFO) << "Found feature timestamps: " << map_kv.first
                   << " with size: " << map_kv.second.feature_size();
         int64 recent_timestamp = Timestamp::PreStream().Value();
@@ -295,7 +295,7 @@ class UnpackMediaSequenceCalculator : public CalculatorBase {
       }
     }
     if (cc->OutputSidePackets().HasTag(kAudioDecoderOptions)) {
-      auto audio_decoder_options = absl::make_unique<AudioDecoderOptions>(
+      auto audio_decoder_options = abslx::make_unique<AudioDecoderOptions>(
           options.base_audio_decoder_options());
       if (mpms::HasClipStartTimestamp(sequence)) {
         if (options.force_decoding_from_start_of_media()) {
@@ -316,7 +316,7 @@ class UnpackMediaSequenceCalculator : public CalculatorBase {
           .Set(Adopt(audio_decoder_options.release()));
     }
     if (cc->OutputSidePackets().HasTag(kPacketResamplerOptions)) {
-      auto resampler_options = absl::make_unique<CalculatorOptions>();
+      auto resampler_options = abslx::make_unique<CalculatorOptions>();
       *(resampler_options->MutableExtension(
           PacketResamplerCalculatorOptions::ext)) =
           options.base_packet_resampler_options();
@@ -345,10 +345,10 @@ class UnpackMediaSequenceCalculator : public CalculatorBase {
           .Set(MakePacket<double>(mpms::GetImageFrameRate(sequence)));
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     if (timestamps_.empty()) {
       // This occurs when we only have metadata to unpack.
       LOG(INFO) << "only unpacking metadata because there are no timestamps.";
@@ -395,13 +395,13 @@ class UnpackMediaSequenceCalculator : public CalculatorBase {
             current_timestamp = Timestamp(map_kv.second[i]);
           }
 
-          if (absl::StrContains(map_kv.first, mpms::GetImageTimestampKey())) {
-            std::vector<std::string> pieces = absl::StrSplit(map_kv.first, '/');
+          if (abslx::StrContains(map_kv.first, mpms::GetImageTimestampKey())) {
+            std::vector<std::string> pieces = abslx::StrSplit(map_kv.first, '/');
             std::string feature_key = "";
             std::string possible_tag = kImageTag;
             if (pieces[0] != "image") {
               feature_key = pieces[0];
-              possible_tag = absl::StrCat(kImageTag, "_", feature_key);
+              possible_tag = abslx::StrCat(kImageTag, "_", feature_key);
             }
             if (cc->Outputs().HasTag(possible_tag)) {
               cc->Outputs()
@@ -420,13 +420,13 @@ class UnpackMediaSequenceCalculator : public CalculatorBase {
                          mpms::GetForwardFlowEncodedAt(*sequence_, i)),
                      current_timestamp);
           }
-          if (absl::StrContains(map_kv.first, mpms::GetBBoxTimestampKey())) {
-            std::vector<std::string> pieces = absl::StrSplit(map_kv.first, '/');
+          if (abslx::StrContains(map_kv.first, mpms::GetBBoxTimestampKey())) {
+            std::vector<std::string> pieces = abslx::StrSplit(map_kv.first, '/');
             std::string feature_key = "";
             std::string possible_tag = kBBoxTag;
             if (pieces[0] != "region") {
               feature_key = pieces[0];
-              possible_tag = absl::StrCat(kBBoxTag, "_", feature_key);
+              possible_tag = abslx::StrCat(kBBoxTag, "_", feature_key);
             }
             if (cc->Outputs().HasTag(possible_tag)) {
               const auto& bboxes = mpms::GetBBoxAt(feature_key, *sequence_, i);
@@ -437,8 +437,8 @@ class UnpackMediaSequenceCalculator : public CalculatorBase {
             }
           }
 
-          if (absl::StrContains(map_kv.first, "feature")) {
-            std::vector<std::string> pieces = absl::StrSplit(map_kv.first, '/');
+          if (abslx::StrContains(map_kv.first, "feature")) {
+            std::vector<std::string> pieces = abslx::StrSplit(map_kv.first, '/');
             RET_CHECK_GT(pieces.size(), 1)
                 << "Failed to parse the feature substring before / from key "
                 << map_kv.first;
@@ -460,7 +460,7 @@ class UnpackMediaSequenceCalculator : public CalculatorBase {
 
     ++current_timestamp_index_;
     if (current_timestamp_index_ < timestamps_[last_timestamp_key_].size()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     } else {
       if (process_poststream_) {
         // Once we've processed the PostStream timestamp we can stop.
@@ -468,7 +468,7 @@ class UnpackMediaSequenceCalculator : public CalculatorBase {
       } else {
         // Otherwise, we still need to do one more pass to process it.
         process_poststream_ = true;
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
     }
   }

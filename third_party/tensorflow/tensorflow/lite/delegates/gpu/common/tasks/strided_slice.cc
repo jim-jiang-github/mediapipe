@@ -153,7 +153,7 @@ std::string StridedSlice::GetStridedSliceCode(const OperationDef& op_def,
   return c;
 }
 
-absl::Status StridedSlice::BindArguments(ArgumentsBinder* args) {
+abslx::Status StridedSlice::BindArguments(ArgumentsBinder* args) {
   int4 offset = GetOffset(attributes_, src_[0]->Width(), src_[0]->Height(),
                           src_[0]->Channels(), src_[0]->Batch());
   RETURN_IF_ERROR(args->SetInt("offset_x", offset.x));
@@ -164,7 +164,7 @@ absl::Status StridedSlice::BindArguments(ArgumentsBinder* args) {
   RETURN_IF_ERROR(args->SetInt("stride_y", attributes_.strides.h));
   RETURN_IF_ERROR(args->SetInt("stride_z", attributes_.strides.c));
   RETURN_IF_ERROR(args->SetInt("stride_b", attributes_.strides.b));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 int3 StridedSlice::GetGridSize() const {

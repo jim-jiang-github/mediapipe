@@ -43,8 +43,8 @@ Status ConvertGraphDefToXla(GraphDef graph_def, const tf2xla::Config& config,
 //   marker.
 Status ConvertGraphDefToXlaViaMlir(
     GraphDef graph_def, const tf2xla::Config& config,
-    xla::XlaComputation* computation, absl::string_view debug_info_filename,
-    absl::string_view debug_info_path_begin_marker);
+    xla::XlaComputation* computation, abslx::string_view debug_info_filename,
+    abslx::string_view debug_info_path_begin_marker);
 
 }  // namespace tensorflow
 

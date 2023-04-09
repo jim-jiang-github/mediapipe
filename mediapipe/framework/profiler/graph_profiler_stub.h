@@ -58,7 +58,7 @@ class TraceEvent {
   };
   TraceEvent(const EventType& event_type) {}
   TraceEvent() {}
-  inline TraceEvent& set_event_time(absl::Time event_time) { return *this; }
+  inline TraceEvent& set_event_time(abslx::Time event_time) { return *this; }
   inline TraceEvent& set_event_type(const EventType& event_type) {
     return *this;
   }
@@ -84,23 +84,23 @@ class GraphProfilerStub {
   inline void Initialize(const ValidatedGraphConfig& validated_graph_config) {}
   inline void SetClock(const std::shared_ptr<mediapipe::Clock>& clock) {}
   inline void LogEvent(const TraceEvent& event) {}
-  inline absl::Status GetCalculatorProfiles(
+  inline abslx::Status GetCalculatorProfiles(
       std::vector<CalculatorProfile>*) const {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status CaptureProfile(
+  abslx::Status CaptureProfile(
       GraphProfile* result,
       PopulateGraphConfig populate_config = PopulateGraphConfig::kNo) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  inline absl::Status WriteProfile() { return absl::OkStatus(); }
+  inline abslx::Status WriteProfile() { return abslx::OkStatus(); }
   inline void Pause() {}
   inline void Resume() {}
   inline void Reset() {}
-  inline absl::Status Start(mediapipe::Executor* executor) {
-    return absl::OkStatus();
+  inline abslx::Status Start(mediapipe::Executor* executor) {
+    return abslx::OkStatus();
   }
-  inline absl::Status Stop() { return absl::OkStatus(); }
+  inline abslx::Status Stop() { return abslx::OkStatus(); }
   inline GraphTracer* tracer() { return nullptr; }
   inline std::unique_ptr<GlProfilingHelper> CreateGlProfilingHelper() {
     return nullptr;

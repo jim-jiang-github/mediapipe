@@ -53,24 +53,24 @@ using mediapipe::Packet;
 
 class InfiniteSequenceCalculator : public mediapipe::CalculatorBase {
  public:
-  static absl::Status GetContract(mediapipe::CalculatorContract* cc) {
+  static abslx::Status GetContract(mediapipe::CalculatorContract* cc) {
     cc->Outputs().Tag(kOutTag).Set<int>();
     cc->Outputs().Tag(kEventTag).Set<int>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->Outputs().Tag(kEventTag).AddPacket(MakePacket<int>(1).At(Timestamp(1)));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     cc->Outputs().Tag(kOutTag).AddPacket(
         MakePacket<int>(count_).At(Timestamp(count_)));
     count_++;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Close(CalculatorContext* cc) override {
+  abslx::Status Close(CalculatorContext* cc) override {
     cc->Outputs().Tag(kEventTag).AddPacket(MakePacket<int>(2).At(Timestamp(2)));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -80,30 +80,30 @@ REGISTER_CALCULATOR(::testing_ns::InfiniteSequenceCalculator);
 
 class StoppingPassThroughCalculator : public mediapipe::CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     for (int i = 0; i < cc->Inputs().NumEntries(""); ++i) {
       cc->Inputs().Get("", i).SetAny();
       cc->Outputs().Get("", i).SetSameAs(&cc->Inputs().Get("", i));
     }
     cc->Outputs().Tag(kEventTag).Set<int>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->Outputs().Tag(kEventTag).AddPacket(MakePacket<int>(1).At(Timestamp(1)));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     for (int i = 0; i < cc->Inputs().NumEntries(""); ++i) {
       if (!cc->Inputs().Get("", i).IsEmpty()) {
         cc->Outputs().Get("", i).AddPacket(cc->Inputs().Get("", i).Value());
       }
     }
-    return (++count_ <= max_count_) ? absl::OkStatus()
+    return (++count_ <= max_count_) ? abslx::OkStatus()
                                     : mediapipe::tool::StatusStop();
   }
-  absl::Status Close(CalculatorContext* cc) override {
+  abslx::Status Close(CalculatorContext* cc) override {
     cc->Outputs().Tag(kEventTag).AddPacket(MakePacket<int>(2).At(Timestamp(2)));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -128,39 +128,39 @@ class AtomicSemaphore {
 };
 
 // A ProcessFunction that passes through all packets.
-absl::Status DoProcess(const InputStreamShardSet& inputs,
+abslx::Status DoProcess(const InputStreamShardSet& inputs,
                        OutputStreamShardSet* outputs) {
   for (int i = 0; i < inputs.NumEntries(); ++i) {
     if (!inputs.Index(i).Value().IsEmpty()) {
       outputs->Index(i).AddPacket(inputs.Index(i).Value());
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-typedef std::function<absl::Status(const InputStreamShardSet&,
+typedef std::function<abslx::Status(const InputStreamShardSet&,
                                    OutputStreamShardSet*)>
     ProcessFunction;
 
 // A Calculator that delegates its Process function to a callback function.
 class ProcessCallbackCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     for (int i = 0; i < cc->Inputs().NumEntries(); ++i) {
       cc->Inputs().Index(i).SetAny();
       cc->Outputs().Index(i).SetSameAs(&cc->Inputs().Index(0));
     }
     cc->InputSidePackets().Index(0).Set<std::unique_ptr<ProcessFunction>>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     callback_ =
         *GetFromUniquePtr<ProcessFunction>(cc->InputSidePackets().Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     return callback_(cc->Inputs(), &(cc->Outputs()));
   }
 
@@ -206,22 +206,22 @@ TEST(CalculatorGraphStoppingTest, CloseAllPacketSources) {
         if (out_packets.size() >= kNumPackets) {
           MP_EXPECT_OK(graph.CloseAllPacketSources());
         }
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
   MP_ASSERT_OK(graph.ObserveOutputStream(  //
       "count_out", [&](const Packet& packet) {
         count_packets.push_back(packet);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
   MP_ASSERT_OK(graph.ObserveOutputStream(  //
       "event", [&](const Packet& packet) {
         event_packets.push_back(packet.Get<int>());
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
   MP_ASSERT_OK(graph.ObserveOutputStream(  //
       "event_out", [&](const Packet& packet) {
         event_out_packets.push_back(packet.Get<int>());
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
   MP_ASSERT_OK(graph.StartRun({}));
   for (int i = 0; i < kNumPackets; ++i) {
@@ -265,7 +265,7 @@ TEST(CalculatorGraphStoppingTest, DeadlockReporting) {
   MP_ASSERT_OK(
       graph.ObserveOutputStream("out_1", [&out_packets](const Packet& packet) {
         out_packets.push_back(packet);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
 
   // Lambda that waits for a local semaphore.
@@ -293,8 +293,8 @@ TEST(CalculatorGraphStoppingTest, DeadlockReporting) {
   MP_EXPECT_OK(add_packet("in_1", 2));
   EXPECT_FALSE(add_packet("in_1", 3).ok());
 
-  absl::Status status = graph.WaitUntilIdle();
-  EXPECT_EQ(status.code(), absl::StatusCode::kUnavailable);
+  abslx::Status status = graph.WaitUntilIdle();
+  EXPECT_EQ(status.code(), abslx::StatusCode::kUnavailable);
   EXPECT_THAT(
       status.message(),
       testing::HasSubstr("Detected a deadlock due to input throttling"));
@@ -330,7 +330,7 @@ TEST(CalculatorGraphStoppingTest, DeadlockResolution) {
   MP_ASSERT_OK(
       graph.ObserveOutputStream("out_1", [&out_packets](const Packet& packet) {
         out_packets.push_back(packet);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
 
   // Lambda that waits for a local semaphore.

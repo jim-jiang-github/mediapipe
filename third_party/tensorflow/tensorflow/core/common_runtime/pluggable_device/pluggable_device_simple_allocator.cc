@@ -32,7 +32,7 @@ void PluggableDeviceSimpleAllocator::DeallocateRaw(void* ptr) {
   return sub_allocator_->Free(ptr, 0);
 }
 
-absl::optional<AllocatorStats> PluggableDeviceSimpleAllocator::GetStats() {
+abslx::optional<AllocatorStats> PluggableDeviceSimpleAllocator::GetStats() {
   AllocatorStats stats_;
   stats_.num_allocs = 0;
   stats_.peak_bytes_in_use = 0;

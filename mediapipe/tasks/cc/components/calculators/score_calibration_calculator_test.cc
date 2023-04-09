@@ -96,7 +96,7 @@ TEST(ScoreCalibrationCalculatorTest, FailsWithNoSigmoid) {
   BuildGraph(&runner, {0.5, 0.5, 0.5});
   auto status = runner.Run();
 
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(),
               HasSubstr("Expected at least one sigmoid, found none"));
 }
@@ -116,7 +116,7 @@ TEST(ScoreCalibrationCalculatorTest, FailsWithNegativeScale) {
   BuildGraph(&runner, {0.5, 0.5, 0.5});
   auto status = runner.Run();
 
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       status.message(),
       HasSubstr("The scale parameter of the sigmoids must be positive"));
@@ -138,7 +138,7 @@ TEST(ScoreCalibrationCalculatorTest, FailsWithUnspecifiedTransformation) {
   BuildGraph(&runner, {0.5, 0.5, 0.5});
   auto status = runner.Run();
 
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(),
               HasSubstr("Unsupported ScoreTransformation type"));
 }
@@ -155,7 +155,7 @@ class CalibrationWithoutIndicesTest
     : public TestWithParam<CalibrationTestParams> {};
 
 TEST_P(CalibrationWithoutIndicesTest, Succeeds) {
-  CalculatorRunner runner(ParseTextProtoOrDie<Node>(absl::StrFormat(
+  CalculatorRunner runner(ParseTextProtoOrDie<Node>(abslx::StrFormat(
       R"pb(
         calculator: "ScoreCalibrationCalculator"
         input_stream: "SCORES:scores"
@@ -218,7 +218,7 @@ TEST(ScoreCalibrationCalculatorTest, FailsWithMissingSigmoids) {
   BuildGraph(&runner, {0.2, 0.3, 0.4, 0.5, 0.6});
   auto status = runner.Run();
 
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(),
               HasSubstr("Mismatch between number of sigmoids"));
 }
@@ -273,7 +273,7 @@ TEST(ScoreCalibrationCalculatorTest, FailsWithNegativeIndex) {
   BuildGraph(&runner, {0.2, 0.3, 0.4, 0.5}, indices);
   auto status = runner.Run();
 
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(), HasSubstr("Expected positive indices"));
 }
 
@@ -299,7 +299,7 @@ TEST(ScoreCalibrationCalculatorTest, FailsWithOutOfBoundsIndex) {
   BuildGraph(&runner, {0.2, 0.3, 0.4, 0.5}, indices);
   auto status = runner.Run();
 
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       status.message(),
       HasSubstr("Unable to get score calibration parameters for index"));

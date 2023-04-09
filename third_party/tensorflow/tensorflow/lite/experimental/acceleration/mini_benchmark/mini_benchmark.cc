@@ -41,7 +41,7 @@ class NoopMiniBenchmark : public MiniBenchmark {
 std::unique_ptr<MiniBenchmark> CreateMiniBenchmark(
     const MinibenchmarkSettings& settings, const std::string& model_namespace,
     const std::string& model_id) {
-  absl::StatusOr<std::unique_ptr<MiniBenchmark>> s_or_mb =
+  abslx::StatusOr<std::unique_ptr<MiniBenchmark>> s_or_mb =
       MinibenchmarkImplementationRegistry::CreateByName(
           "Impl", settings, model_namespace, model_id);
   if (!s_or_mb.ok()) {
@@ -53,14 +53,14 @@ std::unique_ptr<MiniBenchmark> CreateMiniBenchmark(
 
 void MinibenchmarkImplementationRegistry::RegisterImpl(
     const std::string& name, CreatorFunction creator_function) {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   factories_[name] = creator_function;
 }
 
 std::unique_ptr<MiniBenchmark> MinibenchmarkImplementationRegistry::CreateImpl(
     const std::string& name, const MinibenchmarkSettings& settings,
     const std::string& model_namespace, const std::string& model_id) {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   auto it = factories_.find(name);
   return (it != factories_.end())
              ? it->second(settings, model_namespace, model_id)

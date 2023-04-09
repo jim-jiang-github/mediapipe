@@ -41,7 +41,7 @@ namespace xla {
 namespace experimental {
 namespace {
 
-std::string CompileHloConvAndGetMlir(absl::string_view hlo_text) {
+std::string CompileHloConvAndGetMlir(abslx::string_view hlo_text) {
   xla::HloModuleConfig hlo_config;
   VerifiedHloModule hlo_module(
       "Conv", hlo_config, /*verifier_layout_sensitive=*/false,

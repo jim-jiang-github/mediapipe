@@ -12,13 +12,13 @@ namespace mediapipe {
 class GraphServiceManager {
  public:
   template <typename T>
-  absl::Status SetServiceObject(const GraphService<T>& service,
+  abslx::Status SetServiceObject(const GraphService<T>& service,
                                 std::shared_ptr<T> object) {
     return SetServicePacket(service,
                             MakePacket<std::shared_ptr<T>>(std::move(object)));
   }
 
-  absl::Status SetServicePacket(const GraphServiceBase& service, Packet p);
+  abslx::Status SetServicePacket(const GraphServiceBase& service, Packet p);
 
   template <typename T>
   std::shared_ptr<T> GetServiceObject(const GraphService<T>& service) const {

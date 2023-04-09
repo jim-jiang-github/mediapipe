@@ -70,7 +70,7 @@ class GraphTracerTest : public ::testing::Test {
   void SetUpGraphTracer() {
     ProfilerConfig profiler_config;
     profiler_config.set_trace_enabled(true);
-    tracer_ = absl::make_unique<GraphTracer>(profiler_config);
+    tracer_ = abslx::make_unique<GraphTracer>(profiler_config);
   }
 
   // Initializes the input and output stream specs for a calculator node.
@@ -86,7 +86,7 @@ class GraphTracerTest : public ::testing::Test {
 
   // Invokes LogInputEvents with some input packets.
   void LogInputPackets(const std::string& node_name,
-                       GraphTrace::EventType event_type, absl::Time event_time,
+                       GraphTrace::EventType event_type, abslx::Time event_time,
                        const std::vector<Packet>& packets) {
     context_builders_[node_name].AddInputs(packets);
     tracer_->LogInputEvents(event_type, context_builders_[node_name].get(),
@@ -95,7 +95,7 @@ class GraphTracerTest : public ::testing::Test {
 
   // Invokes LogOutputEvents some output packets.
   void LogOutputPackets(const std::string& node_name,
-                        GraphTrace::EventType event_type, absl::Time event_time,
+                        GraphTrace::EventType event_type, abslx::Time event_time,
                         const std::vector<std::vector<Packet>>& packets) {
     context_builders_[node_name].AddOutputs(packets);
     tracer_->LogOutputEvents(event_type, context_builders_[node_name].get(),
@@ -105,13 +105,13 @@ class GraphTracerTest : public ::testing::Test {
   // Returns the GraphTrace for the logged events.
   GraphTrace GetTrace() {
     GraphTrace result;
-    tracer_->GetTrace(absl::InfinitePast(), absl::InfiniteFuture(), &result);
+    tracer_->GetTrace(abslx::InfinitePast(), abslx::InfiniteFuture(), &result);
     return result;
   }
 
   std::unique_ptr<GraphTracer> tracer_;
   std::map<std::string, TestContextBuilder> context_builders_;
-  absl::Time start_time_;
+  abslx::Time start_time_;
   Timestamp start_timestamp_;
 };
 
@@ -133,12 +133,12 @@ TEST_F(GraphTracerTest, CalculatorTrace) {
   SetUpGraphTracer();
   SetUpCalculatorContext("PCalculator_1", /*node_id=*/0, {"input_stream"},
                          {"output_stream"});
-  absl::Time curr_time = start_time_;
+  abslx::Time curr_time = start_time_;
 
   // PCalculator_1 processes one packet from stream "input_stream".
   LogInputPackets("PCalculator_1", GraphTrace::PROCESS, curr_time,
                   {MakePacket<std::string>("hello").At(start_timestamp_)});
-  curr_time += absl::Microseconds(10000);
+  curr_time += abslx::Microseconds(10000);
   LogOutputPackets("PCalculator_1", GraphTrace::PROCESS, curr_time,
                    {{MakePacket<std::string>("goodbye").At(start_timestamp_)}});
 
@@ -173,12 +173,12 @@ TEST_F(GraphTracerTest, GraphTrace) {
   SetUpGraphTracer();
   SetUpCalculatorContext("PCalculator_1", /*node_id=*/0, {"input_stream"},
                          {"up_1", "up_2"});
-  absl::Time curr_time = start_time_;
+  abslx::Time curr_time = start_time_;
 
   // PCalculator_1 sends one packet to stream "up_1", and two to "up_2".
   LogInputPackets("PCalculator_1", GraphTrace::PROCESS, curr_time,
                   {MakePacket<std::string>("hello").At(start_timestamp_)});
-  curr_time += absl::Microseconds(10000);
+  curr_time += abslx::Microseconds(10000);
   LogOutputPackets(
       "PCalculator_1", GraphTrace::PROCESS, curr_time,
       {
@@ -186,25 +186,25 @@ TEST_F(GraphTracerTest, GraphTrace) {
           {MakePacket<std::string>("up").At(start_timestamp_),
            MakePacket<std::string>("pup").At(start_timestamp_ + 5)},
       });
-  curr_time += absl::Microseconds(1000);
+  curr_time += abslx::Microseconds(1000);
 
   // PCalculator_2 processes one packet from stream "up_1".
   SetUpCalculatorContext("PCalculator_2", /*node_id=*/1, {"up_1"}, {"down_1"});
   LogInputPackets("PCalculator_2", GraphTrace::PROCESS, curr_time,
                   {MakePacket<std::string>("up").At(start_timestamp_)});
-  curr_time += absl::Microseconds(10000);
+  curr_time += abslx::Microseconds(10000);
   LogOutputPackets("PCalculator_2", GraphTrace::PROCESS, curr_time,
                    {{MakePacket<std::string>("down_1").At(start_timestamp_)}});
-  curr_time -= absl::Microseconds(5000);
+  curr_time -= abslx::Microseconds(5000);
 
   // PCalculator_3 processes two packets from stream "up_2".
   SetUpCalculatorContext("PCalculator_3", /*node_id=*/2, {"up_2"}, {"down_2"});
   LogInputPackets("PCalculator_3", GraphTrace::PROCESS, curr_time,
                   {MakePacket<std::string>("up").At(start_timestamp_)});
-  curr_time += absl::Microseconds(20000);
+  curr_time += abslx::Microseconds(20000);
   LogOutputPackets("PCalculator_3", GraphTrace::PROCESS, curr_time,
                    {{MakePacket<std::string>("out").At(start_timestamp_)}});
-  curr_time += absl::Microseconds(2000);
+  curr_time += abslx::Microseconds(2000);
 
   // Note: the packet data ID is based on the packet's payload address, which
   // means the same ID can be reused if data is allocated in the same location
@@ -217,11 +217,11 @@ TEST_F(GraphTracerTest, GraphTrace) {
   SetUpCalculatorContext("PCalculator_3a", /*node_id=*/2, {"up_2"}, {"down_2"});
   LogInputPackets("PCalculator_3a", GraphTrace::PROCESS, curr_time,
                   {MakePacket<std::string>("pup").At(start_timestamp_ + 5)});
-  curr_time += absl::Microseconds(20000);
+  curr_time += abslx::Microseconds(20000);
   LogOutputPackets(
       "PCalculator_3a", GraphTrace::PROCESS, curr_time,
       {{MakePacket<std::string>("pout").At(start_timestamp_ + 5)}});
-  curr_time += absl::Microseconds(1000);
+  curr_time += abslx::Microseconds(1000);
 
   // Validate the GraphTrace data.
   EXPECT_THAT(
@@ -307,18 +307,18 @@ TEST_F(GraphTracerTest, GraphTrace) {
   Timestamp ts_0 = tracer_->TimestampAfter(start_time_);
   EXPECT_EQ(Timestamp::Min() + 1, ts_0);
   Timestamp ts_1 =
-      tracer_->TimestampAfter(start_time_ + absl::Microseconds(10000));
+      tracer_->TimestampAfter(start_time_ + abslx::Microseconds(10000));
   EXPECT_EQ(start_timestamp_ + 1, ts_1);
   Timestamp ts_2 =
-      tracer_->TimestampAfter(start_time_ + absl::Microseconds(48000));
+      tracer_->TimestampAfter(start_time_ + abslx::Microseconds(48000));
   EXPECT_EQ(start_timestamp_ + 5 + 1, ts_2);
 
   // 3 calculators run at start_timestamp_.
   // 1 calculator runs at start_timestamp_ + 5.
   // 4 calculators run between start_timestamp_ and start_timestamp_ + 5 + 1;
-  absl::Time t_0 = start_time_;
-  absl::Time t_1 = start_time_ + absl::Microseconds(10000);
-  absl::Time t_2 = start_time_ + absl::Microseconds(48000);
+  abslx::Time t_0 = start_time_;
+  abslx::Time t_1 = start_time_ + abslx::Microseconds(10000);
+  abslx::Time t_2 = start_time_ + abslx::Microseconds(48000);
   GraphTrace trace;
   tracer_->GetTrace(t_0, t_1, &trace);
   EXPECT_EQ(1, trace.calculator_trace().size());
@@ -407,13 +407,13 @@ class GraphTracerE2ETest : public ::testing::Test {
                                                 &graph_config_));
   }
 
-  absl::Time ParseTime(const std::string& date_time_str) {
-    absl::Time result;
-    absl::ParseTime(absl::RFC3339_sec, date_time_str, &result, nullptr);
+  abslx::Time ParseTime(const std::string& date_time_str) {
+    abslx::Time result;
+    abslx::ParseTime(abslx::RFC3339_sec, date_time_str, &result, nullptr);
     return result;
   }
 
-  absl::Time StartTime() { return ParseTime("2018-12-06T09:00:00Z"); }
+  abslx::Time StartTime() { return ParseTime("2018-12-06T09:00:00Z"); }
 
   void SetUpSimulationClock() {
     auto executor = std::make_shared<SimulationClockExecutor>(8);
@@ -475,19 +475,19 @@ class GraphTracerE2ETest : public ::testing::Test {
   }
 
   // A Calculator::Process callback function.
-  typedef std::function<absl::Status(const InputStreamShardSet&,
+  typedef std::function<abslx::Status(const InputStreamShardSet&,
                                      OutputStreamShardSet*)>
       ProcessFunction;
 
   // A testing callback function that passes through all packets.
-  absl::Status PassThrough(const InputStreamShardSet& inputs,
+  abslx::Status PassThrough(const InputStreamShardSet& inputs,
                            OutputStreamShardSet* outputs) {
     for (int i = 0; i < inputs.NumEntries(); ++i) {
       if (!inputs.Index(i).Value().IsEmpty()) {
         outputs->Index(i).AddPacket(inputs.Index(i).Value());
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   void RunPassThroughGraph() {
@@ -497,7 +497,7 @@ class GraphTracerE2ETest : public ::testing::Test {
     // Callbacks to control the LambdaCalculators.
     ProcessFunction wait_0 = [&](const InputStreamShardSet& inputs,
                                  OutputStreamShardSet* outputs) {
-      clock_->Sleep(absl::Microseconds(20001));
+      clock_->Sleep(abslx::Microseconds(20001));
       return PassThrough(inputs, outputs);
     };
 
@@ -511,20 +511,20 @@ class GraphTracerE2ETest : public ::testing::Test {
     MP_ASSERT_OK(
         graph_.ObserveOutputStream("output_0", [&](const Packet& packet) {
           out_packets.push_back(packet);
-          return absl::OkStatus();
+          return abslx::OkStatus();
         }));
     simulation_clock_->ThreadStart();
     MP_ASSERT_OK(graph_.StartRun({}));
 
     // The first 6 packets to send into the graph at 5001 us intervals.
     for (int ts = 10000; ts < 70000; ts += 10000) {
-      clock_->Sleep(absl::Microseconds(5001));
+      clock_->Sleep(abslx::Microseconds(5001));
       MP_EXPECT_OK(graph_.AddPacketToInputStream("input_0", PacketAt(ts)));
     }
 
     // Wait for all packets to be processed.
     MP_ASSERT_OK(graph_.CloseAllPacketSources());
-    clock_->Sleep(absl::Microseconds(240000 + 0));
+    clock_->Sleep(abslx::Microseconds(240000 + 0));
     MP_ASSERT_OK(graph_.WaitUntilDone());
     simulation_clock_->ThreadFinish();
 
@@ -540,12 +540,12 @@ class GraphTracerE2ETest : public ::testing::Test {
     // Callbacks to control the LambdaCalculators.
     ProcessFunction wait_0 = [&](const InputStreamShardSet& inputs,
                                  OutputStreamShardSet* outputs) {
-      clock_->Sleep(absl::Microseconds(20001));
+      clock_->Sleep(abslx::Microseconds(20001));
       return PassThrough(inputs, outputs);
     };
     ProcessFunction wait_1 = [&](const InputStreamShardSet& inputs,
                                  OutputStreamShardSet* outputs) {
-      clock_->Sleep(absl::Microseconds(30001));
+      clock_->Sleep(abslx::Microseconds(30001));
       return PassThrough(inputs, outputs);
     };
 
@@ -554,10 +554,10 @@ class GraphTracerE2ETest : public ::testing::Test {
     ProcessFunction wait_2 = [&](const InputStreamShardSet& inputs,
                                  OutputStreamShardSet* outputs) {
       if (!packets.empty()) {
-        clock_->Sleep(absl::Microseconds(packets.front().first));
+        clock_->Sleep(abslx::Microseconds(packets.front().first));
         outputs->Index(0).AddPacket(packets.front().second);
         packets.erase(packets.begin());
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
       return tool::StatusStop();
     };
@@ -580,13 +580,13 @@ class GraphTracerE2ETest : public ::testing::Test {
     MP_ASSERT_OK(graph_.ObserveOutputStream("output_packets_0",
                                             [&](const Packet& packet) {
                                               out_packets.push_back(packet);
-                                              return absl::OkStatus();
+                                              return abslx::OkStatus();
                                             }));
     simulation_clock_->ThreadStart();
     MP_ASSERT_OK(graph_.StartRun({}));
 
     // Wait for all packets to be added and processed.
-    clock_->Sleep(absl::Microseconds(160000 + 0));
+    clock_->Sleep(abslx::Microseconds(160000 + 0));
     MP_ASSERT_OK(graph_.WaitUntilDone());
     simulation_clock_->ThreadFinish();
 
@@ -654,8 +654,8 @@ TEST_F(GraphTracerE2ETest, DemuxGraphLog) {
 
   // Validate a summary of the event trace.
   GraphTrace trace;
-  graph_.profiler()->tracer()->GetLog(absl::InfinitePast(),
-                                      absl::InfiniteFuture(), &trace);
+  graph_.profiler()->tracer()->GetLog(abslx::InfinitePast(),
+                                      abslx::InfiniteFuture(), &trace);
   GraphTrace node_timestamps = NodeTimestamps(trace);
   EXPECT_THAT(node_timestamps,
               EqualsProto(mediapipe::ParseTextProtoOrDie<GraphTrace>(R"pb(
@@ -808,8 +808,8 @@ TEST_F(GraphTracerE2ETest, DemuxGraphLog) {
 
   // Validate a one-timestamp slice of the event trace.
   GraphTrace trace_2;
-  graph_.profiler()->tracer()->GetLog(StartTime() + absl::Microseconds(25000),
-                                      StartTime() + absl::Microseconds(30005),
+  graph_.profiler()->tracer()->GetLog(StartTime() + abslx::Microseconds(25000),
+                                      StartTime() + abslx::Microseconds(30005),
                                       &trace_2);
   StripThreadIds(&trace_2);
   StripDataIds(&trace_2);
@@ -989,29 +989,29 @@ TEST_F(GraphTracerE2ETest, DemuxGraphLog) {
 }
 
 // Read a GraphProfile from a file path.
-absl::Status ReadGraphProfile(const std::string& path, GraphProfile* profile) {
+abslx::Status ReadGraphProfile(const std::string& path, GraphProfile* profile) {
   std::ifstream ifs;
   ifs.open(path);
   proto_ns::io::IstreamInputStream in_stream(&ifs);
   profile->ParseFromZeroCopyStream(&in_stream);
-  return ifs.is_open() ? absl::OkStatus()
-                       : absl::UnavailableError("Cannot open");
+  return ifs.is_open() ? abslx::OkStatus()
+                       : abslx::UnavailableError("Cannot open");
 }
 
 TEST_F(GraphTracerE2ETest, DemuxGraphLogFile) {
-  std::string log_path = absl::StrCat(getenv("TEST_TMPDIR"), "/log_file_");
+  std::string log_path = abslx::StrCat(getenv("TEST_TMPDIR"), "/log_file_");
   SetUpDemuxInFlightGraph();
   graph_config_.mutable_profiler_config()->set_trace_log_path(log_path);
   graph_config_.mutable_profiler_config()->set_trace_log_interval_usec(-1);
   RunDemuxInFlightGraph();
   GraphProfile profile;
   MP_EXPECT_OK(
-      ReadGraphProfile(absl::StrCat(log_path, 0, ".binarypb"), &profile));
+      ReadGraphProfile(abslx::StrCat(log_path, 0, ".binarypb"), &profile));
   EXPECT_EQ(113, profile.graph_trace(0).calculator_trace().size());
 }
 
 TEST_F(GraphTracerE2ETest, DemuxGraphLogFiles) {
-  std::string log_path = absl::StrCat(getenv("TEST_TMPDIR"), "/log_files_");
+  std::string log_path = abslx::StrCat(getenv("TEST_TMPDIR"), "/log_files_");
   SetUpDemuxInFlightGraph();
   graph_config_.mutable_profiler_config()->set_trace_log_path(log_path);
   graph_config_.mutable_profiler_config()->set_trace_log_count(100);
@@ -1022,7 +1022,7 @@ TEST_F(GraphTracerE2ETest, DemuxGraphLogFiles) {
   std::vector<GraphProfile> graph_profiles;
   for (int i = 0; i < 7; ++i) {
     GraphProfile profile;
-    std::string log_file_name = absl::StrCat(log_path, i, ".binarypb");
+    std::string log_file_name = abslx::StrCat(log_path, i, ".binarypb");
     if (ReadGraphProfile(log_file_name, &profile).ok()) {
       int count = 0;
       for (auto trace : *profile.mutable_graph_trace()) {
@@ -1237,13 +1237,13 @@ TEST_F(GraphTracerE2ETest, DemuxGraphLogFiles) {
 
 TEST_F(GraphTracerE2ETest, DisableLoggingToDisk) {
   std::string log_path =
-      absl::StrCat(getenv("TEST_TMPDIR"), "/log_file_disabled_");
+      abslx::StrCat(getenv("TEST_TMPDIR"), "/log_file_disabled_");
   SetUpDemuxInFlightGraph();
   graph_config_.mutable_profiler_config()->set_trace_log_path(log_path);
   graph_config_.mutable_profiler_config()->set_trace_log_disabled(true);
   RunDemuxInFlightGraph();
-  EXPECT_TRUE(absl::IsNotFound(
-      mediapipe::file::Exists(absl::StrCat(log_path, 0, ".binarypb"))));
+  EXPECT_TRUE(abslx::IsNotFound(
+      mediapipe::file::Exists(abslx::StrCat(log_path, 0, ".binarypb"))));
 }
 
 TEST_F(GraphTracerE2ETest, LoggingHappensWithDefaultPath) {
@@ -1259,28 +1259,28 @@ TEST_F(GraphTracerE2ETest, GpuTaskTrace) {
   std::string stream_2 = "stream_2";
   TraceBuffer buffer(10000);
   buffer.push_back(TraceEvent(TraceEvent::PROCESS)
-                       .set_event_time(absl::FromUnixMicros(1100))
+                       .set_event_time(abslx::FromUnixMicros(1100))
                        .set_node_id(333)
                        .set_stream_id(&stream_1)
                        .set_input_ts(Timestamp(1000))
                        .set_packet_ts(Timestamp(1000))
                        .set_is_finish(false));
   buffer.push_back(TraceEvent(TraceEvent::GPU_TASK)
-                       .set_event_time(absl::FromUnixMicros(1200))
+                       .set_event_time(abslx::FromUnixMicros(1200))
                        .set_node_id(333)
                        .set_stream_id(&stream_1)
                        .set_input_ts(Timestamp(1000))
                        .set_packet_ts(Timestamp(1000))
                        .set_is_finish(false));
   buffer.push_back(TraceEvent(TraceEvent::GPU_TASK)
-                       .set_event_time(absl::FromUnixMicros(3200))
+                       .set_event_time(abslx::FromUnixMicros(3200))
                        .set_node_id(333)
                        .set_stream_id(&stream_1)
                        .set_input_ts(Timestamp(1000))
                        .set_packet_ts(Timestamp(1000))
                        .set_is_finish(true));
   buffer.push_back(TraceEvent(TraceEvent::PROCESS)
-                       .set_event_time(absl::FromUnixMicros(2100))
+                       .set_event_time(abslx::FromUnixMicros(2100))
                        .set_node_id(333)
                        .set_stream_id(&stream_2)
                        .set_input_ts(Timestamp(1000))
@@ -1289,7 +1289,7 @@ TEST_F(GraphTracerE2ETest, GpuTaskTrace) {
 
   TraceBuilder builder;
   GraphTrace trace_1;
-  builder.CreateTrace(buffer, absl::InfinitePast(), absl::InfiniteFuture(),
+  builder.CreateTrace(buffer, abslx::InfinitePast(), abslx::InfiniteFuture(),
                       &trace_1);
   EXPECT_THAT(
       trace_1,
@@ -1326,7 +1326,7 @@ TEST_F(GraphTracerE2ETest, GpuTaskTrace) {
           )pb")));
 
   GraphTrace trace_2;
-  builder.CreateLog(buffer, absl::InfinitePast(), absl::InfiniteFuture(),
+  builder.CreateLog(buffer, abslx::InfinitePast(), abslx::InfiniteFuture(),
                     &trace_2);
   EXPECT_THAT(
       trace_2,
@@ -1399,7 +1399,7 @@ TEST_F(GraphTracerE2ETest, GpuTracing) {
 // the periodic profiler output is enabled.  If periodic profiler output is not
 // stopped in ~CalculatorGraph(), it will deadlock at ~Executor().
 TEST_F(GraphTracerE2ETest, DestructGraph) {
-  std::string log_path = absl::StrCat(getenv("TEST_TMPDIR"), "/log_file_");
+  std::string log_path = abslx::StrCat(getenv("TEST_TMPDIR"), "/log_file_");
   SetUpPassThroughGraph();
   graph_config_.mutable_profiler_config()->set_trace_enabled(true);
   graph_config_.mutable_profiler_config()->set_trace_log_path(log_path);

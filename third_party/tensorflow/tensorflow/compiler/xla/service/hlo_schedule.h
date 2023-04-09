@@ -34,7 +34,7 @@ class HloInstructionSequence {
  public:
   HloInstructionSequence() = default;
   explicit HloInstructionSequence(
-      absl::Span<HloInstruction* const> instructions) {
+      abslx::Span<HloInstruction* const> instructions) {
     for (HloInstruction* instruction : instructions) {
       push_back(instruction);
     }
@@ -124,13 +124,13 @@ class HloSchedule {
 
   // Sets the sequence for the given computation to the given sequence.
   void set_sequence(const HloComputation* computation,
-                    absl::Span<HloInstruction* const> sequence);
+                    abslx::Span<HloInstruction* const> sequence);
   void set_sequence(const HloComputation* computation,
                     HloInstructionSequence sequence);
 
   // Returns a map from HloComputation unique ID to instruction sequence. The
   // map contains all sequences in the schedule.
-  const absl::flat_hash_map<int64_t, HloInstructionSequence>& sequences()
+  const abslx::flat_hash_map<int64_t, HloInstructionSequence>& sequences()
       const {
     return sequences_;
   }
@@ -197,7 +197,7 @@ class HloSchedule {
   // A map from computation unique ID to instruction sequence. Unique IDs are
   // used rather than HloComputation pointers because HLO pointers are not
   // unique across HLO transformations because pointers may be recycled.
-  absl::flat_hash_map<int64_t, HloInstructionSequence> sequences_;
+  abslx::flat_hash_map<int64_t, HloInstructionSequence> sequences_;
 };
 
 std::ostream& operator<<(std::ostream& out, const HloSchedule& schedule);

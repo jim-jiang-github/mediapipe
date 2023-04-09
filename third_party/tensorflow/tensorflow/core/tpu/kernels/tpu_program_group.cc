@@ -82,7 +82,7 @@ xla::HloProto TpuProgramGroup::ConstructHloMetadata(
 }
 
 void TpuProgramGroup::Initialize(
-    absl::Span<XLA_TpuProgram* const> xla_tpu_programs) {
+    abslx::Span<XLA_TpuProgram* const> xla_tpu_programs) {
   CHECK_GT(xla_tpu_programs.size(), 0);
   CHECK_EQ(program_count(), 0) << "Reinitialization of an existing "
                                   "`TpuProgramGroup` instance is prohibited.";
@@ -163,7 +163,7 @@ TpuProgramGroup::TpuProgramGroup(TpuProgramGroup&& other)
 }
 
 void TpuProgramGroup::set_hlo_metadatas(
-    absl::Span<const xla::HloProto> hlo_metadatas) {
+    abslx::Span<const xla::HloProto> hlo_metadatas) {
   hlo_metadatas_.resize(hlo_metadatas.size());
   for (size_t i = 0; i < hlo_metadatas.size(); ++i) {
     hlo_metadatas_[i] = hlo_metadatas[i];
@@ -171,7 +171,7 @@ void TpuProgramGroup::set_hlo_metadatas(
   RefreshHloMetadatasPtrs();
 }
 
-absl::Span<const xla::HloProto* const> TpuProgramGroup::hlo_metadatas() const {
+abslx::Span<const xla::HloProto* const> TpuProgramGroup::hlo_metadatas() const {
   return hlo_metadatas_ptrs_;
 }
 
@@ -235,7 +235,7 @@ const XLA_TpuProgram* TpuProgramGroup::tpu_program(int index) const {
 }
 
 void TpuProgramGroup::set_tpu_programs(
-    absl::Span<XLA_TpuProgram* const> tpu_programs) {
+    abslx::Span<XLA_TpuProgram* const> tpu_programs) {
   tpu_programs_.resize(tpu_programs.size());
   for (size_t i = 0; i < tpu_programs.size(); ++i) {
     tpu_programs_[i] = tpu_programs[i];
@@ -285,7 +285,7 @@ Status TpuProgramGroup::CompileAndBuild(
   TpuProgramGroup* tpu_program_group =
       tensorflow::down_cast<TpuProgramGroup*>(tpu_program_group_interface);
   tpu_program_group->Initialize(
-      absl::MakeConstSpan(&xla_tpu_programs[0], count));
+      abslx::MakeConstSpan(&xla_tpu_programs[0], count));
   OpsApiFn()->TpuProgram_FreeArrayFn(xla_tpu_programs);
   return status.status();
 }
@@ -321,7 +321,7 @@ Status TpuProgramGroup::CompileAndBuild(
   TpuProgramGroup* tpu_program_group =
       tensorflow::down_cast<TpuProgramGroup*>(tpu_program_group_interface);
   tpu_program_group->Initialize(
-      absl::MakeConstSpan(&xla_tpu_programs[0], count));
+      abslx::MakeConstSpan(&xla_tpu_programs[0], count));
   OpsApiFn()->TpuProgram_FreeArrayFn(xla_tpu_programs);
   return status.status();
 }

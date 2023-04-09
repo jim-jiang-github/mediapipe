@@ -35,9 +35,9 @@ namespace xla {
 // call is partially specified.
 StatusOr<bool> ProcessShardingInstruction(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads,
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads,
     bool replace_sharding_with_copy,
-    absl::flat_hash_map<const HloInstruction*, std::vector<int64_t>>*
+    abslx::flat_hash_map<const HloInstruction*, std::vector<int64_t>>*
         unspecified_dims);
 
 // Infers broadcast ops' operand sharding, based on its output sharding.
@@ -50,7 +50,7 @@ std::optional<HloSharding> InferBroadcastOperandSharding(
 class ShardingPropagation : public HloModulePass {
  public:
   using ComputationMap =
-      absl::flat_hash_map<const HloComputation*, HloInstruction*>;
+      abslx::flat_hash_map<const HloComputation*, HloInstruction*>;
   explicit ShardingPropagation(
       bool is_spmd = false, bool propagate_metadata = false,
       bool allow_spmd_sharding_propagation_to_output = false,
@@ -67,11 +67,11 @@ class ShardingPropagation : public HloModulePass {
       sharding_helper_ = std::make_unique<CustomCallShardingHelper>();
     }
   }
-  absl::string_view name() const override { return "sharding-propagation"; }
+  abslx::string_view name() const override { return "sharding-propagation"; }
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
   // Function which can be used to apply a spatially partitioned sharding onto a
   // given domain. It will apply the sharding into the exit edges of the domain

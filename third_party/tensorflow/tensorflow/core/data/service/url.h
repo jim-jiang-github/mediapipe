@@ -33,14 +33,14 @@ namespace data {
 //   url.port() == "worker";
 class URL {
  public:
-  explicit URL(absl::string_view url);
+  explicit URL(abslx::string_view url);
 
-  absl::string_view host() const { return host_; }
+  abslx::string_view host() const { return host_; }
   bool has_port() const { return !port_.empty(); }
-  absl::string_view port() const { return port_; }
+  abslx::string_view port() const { return port_; }
 
  private:
-  void Parse(absl::string_view url);
+  void Parse(abslx::string_view url);
 
   std::string host_;
   std::string port_;

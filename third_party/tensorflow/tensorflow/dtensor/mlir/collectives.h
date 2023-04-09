@@ -56,8 +56,8 @@ StatusOr<mlir::Value> EmitRelayout(
 // Emits collective ops to reduce `input` over `reduced_dims`.
 StatusOr<mlir::Operation*> EmitAllReduce(
     mlir::OpBuilder& builder, const dtensor::Layout& output_layout,
-    const absl::flat_hash_set<std::string>& reduced_dims,
-    mlir::Operation* input, absl::string_view reduce_op);
+    const abslx::flat_hash_set<std::string>& reduced_dims,
+    mlir::Operation* input, abslx::string_view reduce_op);
 
 // Given input `tensor` that is sharded across spatial dimensions, conduct
 // halo exchange such that each spatially sharded input blocks exchange

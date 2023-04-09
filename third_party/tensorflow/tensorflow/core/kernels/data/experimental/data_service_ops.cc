@@ -157,7 +157,7 @@ void RegisterDatasetOp::Compute(OpKernelContext* ctx) {
     output_dataset_id() = dataset_id;
   } else {
     int64_t dataset_id_int = 0;
-    OP_REQUIRES(ctx, absl::SimpleAtoi(dataset_id, &dataset_id_int),
+    OP_REQUIRES(ctx, abslx::SimpleAtoi(dataset_id, &dataset_id_int),
                 errors::InvalidArgument("Failed to parse dataset ID: ",
                                         dataset_id, ". Expect integers."));
 

@@ -73,9 +73,9 @@ tensorflow::Status RegisterCustomOps(
 StatusOr<OwningOpRef<ModuleOp>> LoadFromGraphdefOrMlirSource(
     const std::string& input_filename, bool input_mlir,
     const std::vector<std::string>& extra_tf_opdefs,
-    absl::string_view debug_info_file, absl::string_view input_arrays,
-    absl::string_view input_dtypes, absl::string_view input_shapes,
-    absl::string_view output_arrays, bool prune_unused_nodes,
+    abslx::string_view debug_info_file, abslx::string_view input_arrays,
+    abslx::string_view input_dtypes, abslx::string_view input_shapes,
+    abslx::string_view output_arrays, bool prune_unused_nodes,
     llvm::SourceMgr* source_mgr, MLIRContext* context) {
   // Set up the input file.
   std::string error_message;
@@ -127,13 +127,13 @@ StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> ImportSavedModel(
     const std::vector<std::string>& extra_tf_opdefs,
     const std::string& input_filename, const std::string& saved_model_tags,
     const std::string& saved_model_exported_names, mlir::MLIRContext* context) {
-  std::unordered_set<std::string> tags = absl::StrSplit(saved_model_tags, ',');
+  std::unordered_set<std::string> tags = abslx::StrSplit(saved_model_tags, ',');
   std::vector<std::string> exported_names_in_vector =
-      absl::StrSplit(saved_model_exported_names, ',', absl::SkipEmpty());
-  absl::Span<std::string> exported_names(exported_names_in_vector);
+      abslx::StrSplit(saved_model_exported_names, ',', abslx::SkipEmpty());
+  abslx::Span<std::string> exported_names(exported_names_in_vector);
   if (import_saved_model) {
     auto module_or = tensorflow::SavedModelObjectGraphToMlirImport(
-        input_filename, tags, absl::Span<std::string>(exported_names), context);
+        input_filename, tags, abslx::Span<std::string>(exported_names), context);
     if (!module_or.status().ok()) return module_or.status();
     TF_RETURN_IF_ERROR(RegisterCustomOps(extra_tf_opdefs));
     return std::move(module_or).value();

@@ -40,16 +40,16 @@ namespace {
 
 class Convolution : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     if (ctx.input_shapes.size() != 1) {
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "Convolution does not support more than 1 runtime tensor");
     }
     const auto& attr =
         std::any_cast<const Convolution2DAttributes&>(ctx.op_attr);
     if (attr.groups != 1) {
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "Convolution does not support more than 1 group");
     }
     auto weights = attr.weights.shape;
@@ -149,7 +149,7 @@ class Convolution : public NodeShader {
         /*input=*/IOStructure::ONLY_DEFINITIONS,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
@@ -172,26 +172,26 @@ int SelectMultiplier(int32_t input_width,
 
 class Convolution1x1 : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     if (ctx.input_shapes.size() != 1) {
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "Convolution does not support more than 1 runtime tensor");
     }
     const auto& attr =
         std::any_cast<const Convolution2DAttributes&>(ctx.op_attr);
     if (attr.weights.shape.h != 1 || attr.weights.shape.w != 1) {
-      return absl::UnimplementedError("Height and width should be 1.");
+      return abslx::UnimplementedError("Height and width should be 1.");
     }
     if (attr.dilations.h != 1 || attr.dilations.w != 1) {
-      return absl::UnimplementedError("Dilations are not supported.");
+      return abslx::UnimplementedError("Dilations are not supported.");
     }
     if (attr.strides.h != 1 || attr.strides.w != 1) {
-      return absl::UnimplementedError("Strides are not supported.");
+      return abslx::UnimplementedError("Strides are not supported.");
     }
     if (attr.padding.appended.h != 0 || attr.padding.appended.w != 0 ||
         attr.padding.prepended.h != 0 || attr.padding.prepended.w != 0) {
-      return absl::UnimplementedError("Padding is not supported.");
+      return abslx::UnimplementedError("Padding is not supported.");
     }
 
     int multiplier = SelectMultiplier(ctx.input_shapes[0][2], ctx);
@@ -208,37 +208,37 @@ class Convolution1x1 : public NodeShader {
                             ConvertToPHWO4I4(attr.weights))}};
     std::string source;
     for (int i = 0; i < multiplier; i++) {
-      absl::StrAppend(&source, "highp vec4 result", i, " = vec4(0);\n");
+      abslx::StrAppend(&source, "highp vec4 result", i, " = vec4(0);\n");
     }
-    absl::StrAppend(&source, "vec4 f;\n");
-    absl::StrAppend(&source, "for (int l = 0; l < $src_depth$; ++l) {\n");
+    abslx::StrAppend(&source, "vec4 f;\n");
+    abslx::StrAppend(&source, "for (int l = 0; l < $src_depth$; ++l) {\n");
     for (int i = 0; i < multiplier; i++) {
-      absl::StrAppend(&source, "  vec4 input", i, " = $input_data_0[gid.x * ",
+      abslx::StrAppend(&source, "  vec4 input", i, " = $input_data_0[gid.x * ",
                       multiplier, " + ", i, ",gid.y,l]$;\n");
     }
     for (int k = 0; k < 4; k++) {
-      absl::StrAppend(&source, "  f = $weights[", k, ", l, gid.z]$;\n");
+      abslx::StrAppend(&source, "  f = $weights[", k, ", l, gid.z]$;\n");
       for (int i = 0; i < multiplier; i++) {
-        absl::StrAppend(&source, "  result", i, "[", k, "] += dot(input", i,
+        abslx::StrAppend(&source, "  result", i, "[", k, "] += dot(input", i,
                         ", f);\n");
       }
     }
-    absl::StrAppend(&source, "}\n");
+    abslx::StrAppend(&source, "}\n");
     if (!attr.bias.data.empty()) {
       objects.push_back({"bias", MakeReadonlyObject(attr.bias.data)});
-      absl::StrAppend(&source, "vec4 b = $bias[gid.z]$;\n");
+      abslx::StrAppend(&source, "vec4 b = $bias[gid.z]$;\n");
       for (int i = 0; i < multiplier; i++) {
-        absl::StrAppend(&source, "result", i, " += b;\n");
+        abslx::StrAppend(&source, "result", i, " += b;\n");
       }
     }
     if (multiplier != 1) {
       for (int i = 0; i < multiplier; i++) {
-        absl::StrAppend(&source, "$inplace_update:result", i, "$\n");
-        absl::StrAppend(&source, "$output_data_0[gid.x * ", multiplier, " + ",
+        abslx::StrAppend(&source, "$inplace_update:result", i, "$\n");
+        abslx::StrAppend(&source, "$output_data_0[gid.x * ", multiplier, " + ",
                         i, ",gid.y,gid.z] = result", i, "$;\n");
       }
     } else {
-      absl::StrAppend(&source, "value_0 = result0;\n");
+      abslx::StrAppend(&source, "value_0 = result0;\n");
     }
 
     auto dst_depth = DivideRoundUp(ctx.output_shapes[0][3], 4);
@@ -295,7 +295,7 @@ class Convolution1x1 : public NodeShader {
         /*output=*/multiplier == 1 ? IOStructure::AUTO
                                    : IOStructure::ONLY_DEFINITIONS,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

@@ -268,7 +268,7 @@ std::string CameraMotionFlagToString(const CameraMotion& camera_motion) {
   }
 
   if (camera_motion.flags() & CameraMotion::FLAG_BLURRY_FRAME) {
-    text += absl::StrFormat("BLURRY_FRAME %.2f|", camera_motion.bluriness());
+    text += abslx::StrFormat("BLURRY_FRAME %.2f|", camera_motion.bluriness());
   }
 
   if (camera_motion.flags() & CameraMotion::FLAG_MAJOR_OVERLAY) {

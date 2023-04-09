@@ -38,7 +38,7 @@ RemoteProfilerSessionManager::Create(
     const ProfileRequest& request, tensorflow::Status& out_status,
     AddressResolver resolver) {
   VLOG(1) << "Creating a RemoteProfilerSessionManager.";
-  auto session_manager = absl::WrapUnique(
+  auto session_manager = abslx::WrapUnique(
       new RemoteProfilerSessionManager(options, request, resolver));
   out_status = session_manager->Init();
   if (!out_status.ok()) {
@@ -54,7 +54,7 @@ RemoteProfilerSessionManager::RemoteProfilerSessionManager(
   if (resolver) {
     resolver_ = resolver;
   } else {
-    resolver_ = [](absl::string_view addr) { return std::string(addr); };
+    resolver_ = [](abslx::string_view addr) { return std::string(addr); };
   }
 }
 
@@ -66,11 +66,11 @@ Status RemoteProfilerSessionManager::Init() {
   mutex_lock lock(mutex_);
   VLOG(1) << "SessionManager initializing.";
 
-  const absl::Time session_created_ts =
-      absl::FromUnixNanos(options_.session_creation_timestamp_ns());
-  const absl::Time deadline =
+  const abslx::Time session_created_ts =
+      abslx::FromUnixNanos(options_.session_creation_timestamp_ns());
+  const abslx::Time deadline =
       session_created_ts +
-      absl::Milliseconds(options_.max_session_duration_ms());
+      abslx::Milliseconds(options_.max_session_duration_ms());
 
   LOG(INFO) << "Deadline set to " << deadline
             << " because max_session_duration_ms was "

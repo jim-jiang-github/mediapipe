@@ -74,7 +74,7 @@ TEST(CredentialsFactory, MissingServerProtocol) {
                                                          &server_credentials);
   ASSERT_EQ(error::Code::NOT_FOUND, s.code());
   ASSERT_TRUE(
-      absl::StrContains(s.ToString(),
+      abslx::StrContains(s.ToString(),
                         "No credentials factory has been registered for "
                         "protocol unknown_protocol"));
 }
@@ -85,7 +85,7 @@ TEST(CredentialsFactory, MissingClientProtocol) {
                                                          &client_credentials);
   ASSERT_EQ(error::Code::NOT_FOUND, s.code());
   ASSERT_TRUE(
-      absl::StrContains(s.ToString(),
+      abslx::StrContains(s.ToString(),
                         "No credentials factory has been registered for "
                         "protocol unknown_protocol"));
 }

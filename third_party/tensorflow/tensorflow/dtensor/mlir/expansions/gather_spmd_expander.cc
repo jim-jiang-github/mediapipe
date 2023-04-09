@@ -173,10 +173,10 @@ GatherV2SPMDExpander::ComputeLayoutForward(
   TF_ASSIGN_OR_RETURN(int64_t axis, ExtractConstIntFromValue(gather_op.axis()));
   int batch_dims = gather_op.batch_dims();
 
-  absl::optional<Layout> params_layout;
+  abslx::optional<Layout> params_layout;
   if (input_layouts.find(0) != input_layouts.end())
     params_layout.emplace(input_layouts.lookup(0));
-  absl::optional<Layout> indices_layout;
+  abslx::optional<Layout> indices_layout;
   if (input_layouts.find(1) != input_layouts.end())
     indices_layout.emplace(input_layouts.lookup(1));
 
@@ -202,7 +202,7 @@ GatherV2SPMDExpander::ComputeLayoutForward(
           params_mesh_dims.insert(params_layout->sharding_spec(i));
     }
 
-    auto add_mesh_dim_if = [&](const absl::optional<Layout>& input_layout,
+    auto add_mesh_dim_if = [&](const abslx::optional<Layout>& input_layout,
                                int64 dim, bool indices = false) {
       // Only add the mesh dimension to the output_layout if 1) the input layout
       // exists and 2) when the input is indices and the params dims don't
@@ -302,8 +302,8 @@ GatherV2SPMDExpander::ComputeLayoutBackward(
 namespace {
 
 StatusOr<Layout> GatherNdGetOutputLayoutFromInput(
-    const absl::optional<Layout>& params_layout, int params_rank,
-    const absl::optional<Layout>& indices_layout, int indices_rank,
+    const abslx::optional<Layout>& params_layout, int params_rank,
+    const abslx::optional<Layout>& indices_layout, int indices_rank,
     int index_dimensions, const Mesh& mesh) {
   // The layout of the output should be the layout of the first rank-1
   // dimensions of the indices plus the layout of the last params.rank -
@@ -313,7 +313,7 @@ StatusOr<Layout> GatherNdGetOutputLayoutFromInput(
   // layout will be respected as generally params is larger than indices.
   std::vector<ShardingSpec> output_specs(params_rank - index_dimensions +
                                          indices_rank - 1);
-  absl::flat_hash_set<std::string> used_dimensions;
+  abslx::flat_hash_set<std::string> used_dimensions;
   const int params_offset = -index_dimensions + indices_rank - 1;
 
   for (int i = index_dimensions; i < params_rank; ++i) {
@@ -470,10 +470,10 @@ GatherNdSPMDExpander::ComputeLayoutForward(
   auto gather_op = llvm::cast<mlir::TF::GatherNdOp>(op);
   TF_ASSIGN_OR_RETURN(Mesh mesh, ExtractDeviceMeshEnclosingCluster(op));
 
-  absl::optional<Layout> params_layout;
+  abslx::optional<Layout> params_layout;
   if (input_layouts.find(0) != input_layouts.end())
     params_layout.emplace(input_layouts.lookup(0));
-  absl::optional<Layout> indices_layout;
+  abslx::optional<Layout> indices_layout;
   if (input_layouts.find(1) != input_layouts.end())
     indices_layout.emplace(input_layouts.lookup(1));
 

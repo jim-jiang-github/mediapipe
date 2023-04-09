@@ -51,7 +51,7 @@
 
 #ifdef ABSL_INTERNAL_HAVE_FUTEX
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
@@ -147,7 +147,7 @@ class Futex : public FutexImpl {};
 
 }  // namespace synchronization_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_INTERNAL_HAVE_FUTEX
 

@@ -47,7 +47,7 @@ class XlaResourceOpInfo {
   XlaResourceOpKind kind() const { return op_kind_; }
   XlaResourceKind resource_kind() const { return resource_kind_; }
 
-  static absl::string_view XlaResourceOpKindToString(XlaResourceOpKind op_kind);
+  static abslx::string_view XlaResourceOpKindToString(XlaResourceOpKind op_kind);
 
  private:
   XlaResourceOpKind op_kind_;
@@ -57,13 +57,13 @@ class XlaResourceOpInfo {
 // Returns a XlaResourceOpInfo describing `op` if it is a resource operation
 // supported by tf2xla, otherwise returns null (i.e. if this returns null then
 // `op` is either not a resource operation or is unsupported by XLA).
-const XlaResourceOpInfo* GetResourceOpInfoForOp(absl::string_view op);
+const XlaResourceOpInfo* GetResourceOpInfoForOp(abslx::string_view op);
 
 namespace resource_op_table_internal {
 // NB! Implementation detail exposed for unit testing, do not use.
 //
 // Returns the set of resource operations known by this module.
-std::vector<absl::string_view> GetKnownResourceOps();
+std::vector<abslx::string_view> GetKnownResourceOps();
 }  // namespace resource_op_table_internal
 
 }  // namespace tensorflow

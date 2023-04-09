@@ -122,7 +122,7 @@ Status WriteDataToFile(const string& filename, const char* data,
 
 // Writes the input data into the TFRecord file with the specified compression.
 Status WriteDataToTFRecordFile(const string& filename,
-                               const std::vector<absl::string_view>& records,
+                               const std::vector<abslx::string_view>& records,
                                const CompressionParams& params);
 
 // Provides the parameters for running the dataset op.

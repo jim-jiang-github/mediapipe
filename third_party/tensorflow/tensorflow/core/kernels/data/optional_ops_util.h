@@ -84,7 +84,7 @@ class OptionalVariant {
   string DebugString() const {
     if (values_) {
       return strings::StrCat("OptionalVariant<", "values: (",
-                             absl::StrJoin(*values_, ", ",
+                             abslx::StrJoin(*values_, ", ",
                                            [](string* s, const Tensor& elem) {
                                              *s = elem.DebugString();
                                            }),

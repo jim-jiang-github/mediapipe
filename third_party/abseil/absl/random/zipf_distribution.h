@@ -25,10 +25,10 @@
 #include "absl/random/internal/iostream_state_saver.h"
 #include "absl/random/uniform_real_distribution.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
-// absl::zipf_distribution produces random integer-values in the range [0, k],
+// abslx::zipf_distribution produces random integer-values in the range [0, k],
 // distributed according to the discrete probability function:
 //
 //  P(x) = (v + x) ^ -q
@@ -95,7 +95,7 @@ class zipf_distribution {
     double hx0_minus_hxm_;    // h(x0) - h(k + 0.5)
 
     static_assert(std::is_integral<IntType>::value,
-                  "Class-template absl::zipf_distribution<> must be "
+                  "Class-template abslx::zipf_distribution<> must be "
                   "parameterized using an integral type.");
   };
 
@@ -214,7 +214,7 @@ template <typename URBG>
 typename zipf_distribution<IntType>::result_type
 zipf_distribution<IntType>::operator()(
     URBG& g, const param_type& p) {  // NOLINT(runtime/references)
-  absl::uniform_real_distribution<double> uniform_double;
+  abslx::uniform_real_distribution<double> uniform_double;
   double k;
   for (;;) {
     const double v = uniform_double(g);
@@ -266,6 +266,6 @@ std::basic_istream<CharT, Traits>& operator>>(
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_ZIPF_DISTRIBUTION_H_

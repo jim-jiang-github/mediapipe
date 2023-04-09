@@ -58,7 +58,7 @@ class RefcountingHashMap {
   std::shared_ptr<V> GetOrCreateIfAbsent(
       const K& key,
       const std::function<std::unique_ptr<V>(const K&)>& value_factory) {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     auto it = map_.find(key);
     if (it != map_.end()) {
       // We ensure that the entry has not expired in case deleter was running
@@ -84,7 +84,7 @@ class RefcountingHashMap {
 
     void operator()(V* v) {
       delete v;
-      absl::MutexLock lock(&parent.mu_);
+      abslx::MutexLock lock(&parent.mu_);
       // We must check if that the entry is still expired in case the value was
       // replaced while the deleter was running.
       auto it = parent.map_.find(key);
@@ -94,8 +94,8 @@ class RefcountingHashMap {
     }
   };
 
-  absl::Mutex mu_;
-  absl::node_hash_map<K, std::weak_ptr<V>> map_ ABSL_GUARDED_BY(mu_);
+  abslx::Mutex mu_;
+  abslx::node_hash_map<K, std::weak_ptr<V>> map_ ABSL_GUARDED_BY(mu_);
 };
 
 }  // namespace xla

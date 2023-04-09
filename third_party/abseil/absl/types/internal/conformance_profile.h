@@ -52,14 +52,14 @@
 
 // TODO(calabrese) Add support for extending profiles.
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace types_internal {
 
 // Converts an enum to its underlying integral value.
 template <typename Enum>
-constexpr absl::underlying_type_t<Enum> UnderlyingValue(Enum value) {
-  return static_cast<absl::underlying_type_t<Enum>>(value);
+constexpr abslx::underlying_type_t<Enum> UnderlyingValue(Enum value) {
+  return static_cast<abslx::underlying_type_t<Enum>>(value);
 }
 
 // A tag type used in place of a matcher when checking that an assertion result
@@ -87,8 +87,8 @@ class ConformanceErrors {
   // previously reported as failing. This behavior is useful for tests that
   // have multiple parts, where failures and successes are reported individually
   // with the same test name.
-  void addTestSuccess(absl::string_view test_name) {
-    auto normalized_test_name = absl::AsciiStrToLower(test_name);
+  void addTestSuccess(abslx::string_view test_name) {
+    auto normalized_test_name = abslx::AsciiStrToLower(test_name);
 
     // If the test is already reported as failing, do not add it to the list of
     // successes.
@@ -105,7 +105,7 @@ class ConformanceErrors {
   //
   // TODO(calabrese) Determine desired behavior when if this function throws.
   template <class... P>
-  void addTestFailure(absl::string_view test_name, const P&... args) {
+  void addTestFailure(abslx::string_view test_name, const P&... args) {
     // Output a message related to the test failure.
     assertion_result_ << "\n\n"
                          "Failed test: "
@@ -114,7 +114,7 @@ class ConformanceErrors {
     assertion_result_ << "\n\n";
     outputDivider();
 
-    auto normalized_test_name = absl::AsciiStrToLower(test_name);
+    auto normalized_test_name = abslx::AsciiStrToLower(test_name);
 
     // If previous parts of this test succeeded, remove it from that set.
     test_successes_.erase(normalized_test_name);
@@ -148,12 +148,12 @@ class ConformanceErrors {
     // Get a list of all expected failures that did not actually fail
     // (or that were not run).
     std::vector<std::string> nonfailing_tests;
-    absl::c_set_difference(test_names, test_failures_,
+    abslx::c_set_difference(test_names, test_failures_,
                            std::back_inserter(nonfailing_tests));
 
     // Get a list of all "expected failures" that were never actually run.
     std::vector<std::string> unrun_tests;
-    absl::c_set_difference(nonfailing_tests, test_successes_,
+    abslx::c_set_difference(nonfailing_tests, test_successes_,
                            std::back_inserter(unrun_tests));
 
     // Report when the user specified tests that were not run.
@@ -241,12 +241,12 @@ template <class T, class /*Enabler*/ = void>
 struct PropertiesOfImpl {};
 
 template <class T>
-struct PropertiesOfImpl<T, absl::void_t<typename T::properties>> {
+struct PropertiesOfImpl<T, abslx::void_t<typename T::properties>> {
   using type = typename T::properties;
 };
 
 template <class T>
-struct PropertiesOfImpl<T, absl::void_t<typename T::profile_alias_of>> {
+struct PropertiesOfImpl<T, abslx::void_t<typename T::profile_alias_of>> {
   using type = typename PropertiesOfImpl<typename T::profile_alias_of>::type;
 };
 
@@ -278,7 +278,7 @@ inline std::string ExpectedFunctionKindList(function_support min,
                                             function_support max) {
   if (min == max) {
     std::string result =
-        absl::StrCat("Expected:\n  ",
+        abslx::StrCat("Expected:\n  ",
                      PessimisticPropertyDescription(
                          static_cast<function_support>(UnderlyingValue(min))),
                      "\n");
@@ -288,7 +288,7 @@ inline std::string ExpectedFunctionKindList(function_support min,
   std::string result = "Expected one of:\n";
   for (auto curr_support = UnderlyingValue(min);
        curr_support <= UnderlyingValue(max); ++curr_support) {
-    absl::StrAppend(&result, "  ",
+    abslx::StrAppend(&result, "  ",
                     PessimisticPropertyDescription(
                         static_cast<function_support>(curr_support)),
                     "\n");
@@ -371,7 +371,7 @@ using AlwaysFalse = std::false_type;
   constexpr property property##_support_of() {                              \
     return std::is_##property<T>::value                                     \
                ? std::is_nothrow_##property<T>::value                       \
-                     ? absl::is_trivially_##property<T>::value              \
+                     ? abslx::is_trivially_##property<T>::value              \
                            ? property::trivial                              \
                            : property::nothrow                              \
                      : property::yes                                        \
@@ -415,7 +415,7 @@ template <class T, template <class...> class Op, class = void>
 struct IsOpableImpl : std::false_type {};
 
 template <class T, template <class...> class Op>
-struct IsOpableImpl<T, Op, absl::void_t<Op<T>>> : std::true_type {};
+struct IsOpableImpl<T, Op, abslx::void_t<Op<T>>> : std::true_type {};
 
 template <template <class...> class Op>
 struct IsOpable {
@@ -435,7 +435,7 @@ template <class T, template <class...> class Op, class = void>
 struct IsNothrowOpableImpl : std::false_type {};
 
 template <class T, template <class...> class Op>
-struct IsNothrowOpableImpl<T, Op, absl::enable_if_t<Op<T>::value>>
+struct IsNothrowOpableImpl<T, Op, abslx::enable_if_t<Op<T>::value>>
     : std::true_type {};
 
 template <template <class...> class Op>
@@ -908,7 +908,7 @@ template <class T, class /*Enabler*/ = void>
 struct IsProfileImpl : std::false_type {};
 
 template <class T>
-struct IsProfileImpl<T, absl::void_t<PropertiesOfT<T>>> : std::true_type {};
+struct IsProfileImpl<T, abslx::void_t<PropertiesOfT<T>>> : std::true_type {};
 
 template <class T>
 struct IsProfile : IsProfileImpl<T>::type {};
@@ -926,6 +926,6 @@ struct RegularityDomain {};
 
 }  // namespace types_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_TYPES_INTERNAL_CONFORMANCE_PROFILE_H_

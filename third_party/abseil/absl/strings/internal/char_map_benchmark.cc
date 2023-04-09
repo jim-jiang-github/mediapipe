@@ -20,13 +20,13 @@
 
 namespace {
 
-absl::strings_internal::Charmap MakeBenchmarkMap() {
-  absl::strings_internal::Charmap m;
+abslx::strings_internal::Charmap MakeBenchmarkMap() {
+  abslx::strings_internal::Charmap m;
   uint32_t x[] = {0x0, 0x1, 0x2, 0x3, 0xf, 0xe, 0xd, 0xc};
   for (uint32_t& t : x) t *= static_cast<uint32_t>(0x11111111UL);
   for (uint32_t i = 0; i < 256; ++i) {
     if ((x[i / 32] >> (i % 32)) & 1)
-      m = m | absl::strings_internal::Charmap::Char(i);
+      m = m | abslx::strings_internal::Charmap::Char(i);
   }
   return m;
 }
@@ -35,7 +35,7 @@ absl::strings_internal::Charmap MakeBenchmarkMap() {
 void BM_Contains(benchmark::State& state) {
   // Loop-body replicated 10 times to increase time per iteration.
   // Argument continuously changed to avoid generating common subexpressions.
-  const absl::strings_internal::Charmap benchmark_map = MakeBenchmarkMap();
+  const abslx::strings_internal::Charmap benchmark_map = MakeBenchmarkMap();
   unsigned char c = 0;
   int ops = 0;
   for (auto _ : state) {

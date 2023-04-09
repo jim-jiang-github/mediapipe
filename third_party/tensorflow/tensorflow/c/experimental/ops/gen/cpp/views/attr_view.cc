@@ -33,7 +33,7 @@ string AttrView::VariableType() const {
     return "const char*";
   }
   if (attr_.full_type() == "list(string)") {
-    return "absl::Span<string const>";
+    return "abslx::Span<string const>";
   }
 
   // Normal path: translate base type to C++ ...
@@ -46,7 +46,7 @@ string AttrView::VariableType() const {
 
   // ... and wrap in a Span<> if it's a list.
   if (attr_.is_list()) {
-    return absl::Substitute("absl::Span<$0>", c_base_type);
+    return abslx::Substitute("abslx::Span<$0>", c_base_type);
   } else {
     return c_base_type;
   }
@@ -102,17 +102,17 @@ string AttrView::VariableSpanLen() const {
 string AttrView::InputArg(bool with_default_value) const {
   string default_value = DefaultValue();
   if (!with_default_value || default_value.empty()) {
-    return absl::Substitute("$0 $1", VariableType(), attr_.name());
+    return abslx::Substitute("$0 $1", VariableType(), attr_.name());
   }
-  return absl::Substitute("$0 $1 = $2", VariableType(), attr_.name(),
+  return abslx::Substitute("$0 $1 = $2", VariableType(), attr_.name(),
                           default_value);
 }
 
 string AttrView::SetterMethod() const {
   if (!attr_.is_list()) {
-    return absl::StrCat("SetAttr", toUpperCamel(attr_.full_type()));
+    return abslx::StrCat("SetAttr", toUpperCamel(attr_.full_type()));
   } else {
-    return absl::StrCat("SetAttr", toUpperCamel(attr_.base_type()), "List");
+    return abslx::StrCat("SetAttr", toUpperCamel(attr_.base_type()), "List");
   }
 }
 

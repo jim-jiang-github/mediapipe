@@ -25,7 +25,7 @@ namespace xla {
 StatusOr<std::vector<XlaOp>> WhileLoopHelper(
     const WhileLoopHelperConditionFunction& condition_function,
     const WhileLoopHelperBodyFunction& body_function,
-    absl::Span<const XlaOp> initial_values, absl::string_view name,
+    abslx::Span<const XlaOp> initial_values, abslx::string_view name,
     XlaBuilder* builder) {
   int arity = initial_values.size();
   std::vector<Shape> var_shapes;
@@ -47,7 +47,7 @@ StatusOr<std::vector<XlaOp>> WhileLoopHelper(
 
   // Build the condition.
   std::unique_ptr<XlaBuilder> cond_builder =
-      builder->CreateSubBuilder(absl::StrCat(name, "_condition"));
+      builder->CreateSubBuilder(abslx::StrCat(name, "_condition"));
   {
     auto parameter = Parameter(cond_builder.get(), 0, tuple_shape, "parameter");
 
@@ -60,7 +60,7 @@ StatusOr<std::vector<XlaOp>> WhileLoopHelper(
 
   // Build the body.
   std::unique_ptr<XlaBuilder> body_builder =
-      builder->CreateSubBuilder(absl::StrCat(name, "_body"));
+      builder->CreateSubBuilder(abslx::StrCat(name, "_body"));
   {
     auto parameter = Parameter(body_builder.get(), 0, tuple_shape, "parameter");
 
@@ -82,15 +82,15 @@ StatusOr<std::vector<XlaOp>> WhileLoopHelper(
 StatusOr<std::vector<XlaOp>> ForEachIndex(
     int64_t num_iterations, PrimitiveType num_iterations_type,
     const ForEachIndexBodyFunction& body_function,
-    absl::Span<const XlaOp> initial_values, absl::string_view name,
+    abslx::Span<const XlaOp> initial_values, abslx::string_view name,
     XlaBuilder* builder) {
-  auto while_cond_fn = [&](absl::Span<const XlaOp> values,
+  auto while_cond_fn = [&](abslx::Span<const XlaOp> values,
                            XlaBuilder* cond_builder) -> StatusOr<XlaOp> {
     return Lt(values[0], ConstantR0WithType(cond_builder, num_iterations_type,
                                             num_iterations));
   };
   auto while_body_fn =
-      [&](absl::Span<const XlaOp> values,
+      [&](abslx::Span<const XlaOp> values,
           XlaBuilder* body_builder) -> StatusOr<std::vector<XlaOp>> {
     XlaOp iteration = values[0];
 

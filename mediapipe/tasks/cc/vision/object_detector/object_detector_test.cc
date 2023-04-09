@@ -165,7 +165,7 @@ TEST_F(CreateFromOptionsTest, SucceedsWithSelectiveOpResolver) {
   options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kMobileSsdWithMetadata);
   options->base_options.op_resolver =
-      absl::make_unique<MobileSsdQuantizedOpResolver>();
+      abslx::make_unique<MobileSsdQuantizedOpResolver>();
   MP_ASSERT_OK(ObjectDetector::Create(std::move(options)));
 }
 
@@ -197,28 +197,28 @@ TEST_F(CreateFromOptionsTest, FailsWithSelectiveOpResolverMissingOps) {
   options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kMobileSsdWithMetadata);
   options->base_options.op_resolver =
-      absl::make_unique<MobileSsdQuantizedOpResolverMissingOps>();
+      abslx::make_unique<MobileSsdQuantizedOpResolverMissingOps>();
   auto object_detector = ObjectDetector::Create(std::move(options));
   // TODO: Make MediaPipe InferenceCalculator report the detailed.
   // interpreter errors (e.g., "Encountered unresolved custom op").
-  EXPECT_EQ(object_detector.status().code(), absl::StatusCode::kInternal);
+  EXPECT_EQ(object_detector.status().code(), abslx::StatusCode::kInternal);
   EXPECT_THAT(object_detector.status().message(),
               HasSubstr("interpreter->AllocateTensors() == kTfLiteOk"));
 }
 
 TEST_F(CreateFromOptionsTest, FailsWithMissingModel) {
   auto options = std::make_unique<ObjectDetectorOptions>();
-  absl::StatusOr<std::unique_ptr<ObjectDetector>> object_detector =
+  abslx::StatusOr<std::unique_ptr<ObjectDetector>> object_detector =
       ObjectDetector::Create(std::move(options));
 
   EXPECT_EQ(object_detector.status().code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       object_detector.status().message(),
       HasSubstr("ExternalFile must specify at least one of 'file_content', "
                 "'file_name', 'file_pointer_meta' or 'file_descriptor_meta'."));
   EXPECT_THAT(object_detector.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInitializationError))));
 }
 
@@ -228,15 +228,15 @@ TEST_F(CreateFromOptionsTest, FailsWithInvalidMaxResults) {
       JoinPath("./", kTestDataDirectory, kMobileSsdWithMetadata);
   options->max_results = 0;
 
-  absl::StatusOr<std::unique_ptr<ObjectDetector>> object_detector =
+  abslx::StatusOr<std::unique_ptr<ObjectDetector>> object_detector =
       ObjectDetector::Create(std::move(options));
 
   EXPECT_EQ(object_detector.status().code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(object_detector.status().message(),
               HasSubstr("Invalid `max_results` option"));
   EXPECT_THAT(object_detector.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInitializationError))));
 }
 
@@ -246,15 +246,15 @@ TEST_F(CreateFromOptionsTest, FailsWithCombinedAllowlistAndDenylist) {
       JoinPath("./", kTestDataDirectory, kMobileSsdWithMetadata);
   options->category_allowlist.push_back("foo");
   options->category_denylist.push_back("bar");
-  absl::StatusOr<std::unique_ptr<ObjectDetector>> object_detector =
+  abslx::StatusOr<std::unique_ptr<ObjectDetector>> object_detector =
       ObjectDetector::Create(std::move(options));
 
   EXPECT_EQ(object_detector.status().code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(object_detector.status().message(),
               HasSubstr("mutually exclusive options"));
   EXPECT_THAT(object_detector.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInitializationError))));
 }
 
@@ -266,17 +266,17 @@ TEST_F(CreateFromOptionsTest, FailsWithIllegalCallbackInImageOrVideoMode) {
         JoinPath("./", kTestDataDirectory, kMobileSsdWithMetadata);
     options->running_mode = running_mode;
     options->result_callback =
-        [](absl::StatusOr<ObjectDetectorResult> detections, const Image& image,
+        [](abslx::StatusOr<ObjectDetectorResult> detections, const Image& image,
            int64 timestamp_ms) {};
-    absl::StatusOr<std::unique_ptr<ObjectDetector>> object_detector =
+    abslx::StatusOr<std::unique_ptr<ObjectDetector>> object_detector =
         ObjectDetector::Create(std::move(options));
     EXPECT_EQ(object_detector.status().code(),
-              absl::StatusCode::kInvalidArgument);
+              abslx::StatusCode::kInvalidArgument);
     EXPECT_THAT(
         object_detector.status().message(),
         HasSubstr("a user-defined result callback shouldn't be provided"));
     EXPECT_THAT(object_detector.status().GetPayload(kMediaPipeTasksPayload),
-                Optional(absl::Cord(absl::StrCat(
+                Optional(abslx::Cord(abslx::StrCat(
                     MediaPipeTasksStatus::kInvalidTaskGraphConfigError))));
   }
 }
@@ -286,15 +286,15 @@ TEST_F(CreateFromOptionsTest, FailsWithMissingCallbackInLiveStreamMode) {
   options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kMobileSsdWithMetadata);
   options->running_mode = core::RunningMode::LIVE_STREAM;
-  absl::StatusOr<std::unique_ptr<ObjectDetector>> object_detector =
+  abslx::StatusOr<std::unique_ptr<ObjectDetector>> object_detector =
       ObjectDetector::Create(std::move(options));
 
   EXPECT_EQ(object_detector.status().code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(object_detector.status().message(),
               HasSubstr("a user-defined result callback must be provided"));
   EXPECT_THAT(object_detector.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kInvalidTaskGraphConfigError))));
 }
 
@@ -313,19 +313,19 @@ TEST_F(ImageModeTest, FailsWithCallingWrongMethod) {
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ObjectDetector> object_detector,
                           ObjectDetector::Create(std::move(options)));
   auto results = object_detector->DetectForVideo(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the video mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
 
   results = object_detector->DetectAsync(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the live stream mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
   MP_ASSERT_OK(object_detector->Close());
 }
@@ -579,12 +579,12 @@ TEST_F(ImageModeTest, FailsWithRegionOfInterest) {
   ImageProcessingOptions image_processing_options{roi, /*rotation_degrees=*/0};
 
   auto results = object_detector->Detect(image, image_processing_options);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("This task doesn't support region-of-interest"));
   EXPECT_THAT(
       results.status().GetPayload(kMediaPipeTasksPayload),
-      Optional(absl::Cord(absl::StrCat(
+      Optional(abslx::Cord(abslx::StrCat(
           MediaPipeTasksStatus::kImageProcessingInvalidArgumentError))));
 }
 
@@ -602,19 +602,19 @@ TEST_F(VideoModeTest, FailsWithCallingWrongMethod) {
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ObjectDetector> object_detector,
                           ObjectDetector::Create(std::move(options)));
   auto results = object_detector->Detect(image);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the image mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
 
   results = object_detector->DetectAsync(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the live stream mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
   MP_ASSERT_OK(object_detector->Close());
 }
@@ -653,25 +653,25 @@ TEST_F(LiveStreamModeTest, FailsWithCallingWrongMethod) {
   options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kMobileSsdWithMetadata);
   options->running_mode = core::RunningMode::LIVE_STREAM;
-  options->result_callback = [](absl::StatusOr<ObjectDetectorResult> detections,
+  options->result_callback = [](abslx::StatusOr<ObjectDetectorResult> detections,
                                 const Image& image, int64 timestamp_ms) {};
 
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ObjectDetector> object_detector,
                           ObjectDetector::Create(std::move(options)));
   auto results = object_detector->Detect(image);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the image mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
 
   results = object_detector->DetectForVideo(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the video mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
   MP_ASSERT_OK(object_detector->Close());
 }
@@ -684,18 +684,18 @@ TEST_F(LiveStreamModeTest, FailsWithOutOfOrderInputTimestamps) {
   options->running_mode = core::RunningMode::LIVE_STREAM;
   options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kMobileSsdWithMetadata);
-  options->result_callback = [](absl::StatusOr<ObjectDetectorResult> detections,
+  options->result_callback = [](abslx::StatusOr<ObjectDetectorResult> detections,
                                 const Image& image, int64 timestamp_ms) {};
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ObjectDetector> object_detector,
                           ObjectDetector::Create(std::move(options)));
   MP_ASSERT_OK(object_detector->DetectAsync(image, 1));
 
   auto status = object_detector->DetectAsync(image, 0);
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(),
               HasSubstr("timestamp must be monotonically increasing"));
   EXPECT_THAT(status.GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInvalidTimestampError))));
   MP_ASSERT_OK(object_detector->DetectAsync(image, 2));
   MP_ASSERT_OK(object_detector->Close());
@@ -716,7 +716,7 @@ TEST_F(LiveStreamModeTest, Succeeds) {
       JoinPath("./", kTestDataDirectory, kMobileSsdWithMetadata);
   options->result_callback =
       [&detection_results, &image_sizes, &timestamps](
-          absl::StatusOr<ObjectDetectorResult> detections, const Image& image,
+          abslx::StatusOr<ObjectDetectorResult> detections, const Image& image,
           int64 timestamp_ms) {
         MP_ASSERT_OK(detections.status());
         detection_results.push_back(std::move(detections).value());

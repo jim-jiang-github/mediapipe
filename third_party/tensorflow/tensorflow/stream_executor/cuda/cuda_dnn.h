@@ -63,7 +63,7 @@ class CudnnSupport : public dnn::DnnSupport {
   port::StatusOr<std::unique_ptr<dnn::RnnSequenceTensorDescriptor>>
   createRnnSequenceTensorDescriptor(int max_seq_length, int batch_size,
                                     int data_size,
-                                    const absl::Span<const int>& seq_lengths,
+                                    const abslx::Span<const int>& seq_lengths,
                                     bool time_major,
                                     dnn::DataType data_type) override;
 
@@ -502,9 +502,9 @@ class CudnnSupport : public dnn::DnnSupport {
   port::Status DoCtcLoss(Stream* stream, dnn::DataType element_type,
                          const dnn::RnnStateTensorDescriptor& probs_desc,
                          const DeviceMemoryBase probs_data,
-                         absl::Span<const int> labels_data,
-                         absl::Span<const int> labels_lengths_data,
-                         absl::Span<const int> input_lengths_data,
+                         abslx::Span<const int> labels_data,
+                         abslx::Span<const int> labels_lengths_data,
+                         abslx::Span<const int> input_lengths_data,
                          DeviceMemoryBase costs_data,
                          const dnn::RnnStateTensorDescriptor& grads_desc,
                          DeviceMemoryBase grads_data,
@@ -605,9 +605,9 @@ class CudnnSupport : public dnn::DnnSupport {
 
   port::Status DoCtcLossImpl(
       Stream* stream, const CudnnRnnStateTensorDescriptor& probs_desc,
-      const DeviceMemoryBase probs_data, absl::Span<const int> labels_data,
-      absl::Span<const int> labels_lengths_data,
-      absl::Span<const int> input_lengths_data, DeviceMemoryBase costs_data,
+      const DeviceMemoryBase probs_data, abslx::Span<const int> labels_data,
+      abslx::Span<const int> labels_lengths_data,
+      abslx::Span<const int> input_lengths_data, DeviceMemoryBase costs_data,
       const CudnnRnnStateTensorDescriptor& grads_desc,
       DeviceMemoryBase grads_data, const CudnnCtcLossDescriptor& ctc_loss_desc,
       DeviceMemory<uint8> scratch_memory, int ctc_loss_algo_id);
@@ -629,9 +629,9 @@ class CudnnSupport : public dnn::DnnSupport {
       Stream* stream, dnn::DataType element_type,
       const dnn::RnnStateTensorDescriptor& probs_desc,
       const dnn::RnnStateTensorDescriptor& grads_desc,
-      absl::Span<const int> labels_data,
-      absl::Span<const int> labels_lengths_data,
-      absl::Span<const int> input_lengths_data,
+      abslx::Span<const int> labels_data,
+      abslx::Span<const int> labels_lengths_data,
+      abslx::Span<const int> input_lengths_data,
       ScratchAllocator* scratch_allocator, DeviceMemory<uint8>* scratch_memory,
       int* ctc_loss_algo_id) override;
 

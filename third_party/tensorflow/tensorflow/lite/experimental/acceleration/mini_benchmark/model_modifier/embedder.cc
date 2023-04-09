@@ -50,7 +50,7 @@ std::string DescribeShape(const fb::Vector<int32_t>* shape) {
     if (i != 0) {
       desc += ", ";
     }
-    desc += absl::StrFormat("%d", shape->Get(i));
+    desc += abslx::StrFormat("%d", shape->Get(i));
   }
   desc += "]";
   return desc;
@@ -71,10 +71,10 @@ Embedder::Embedder(const Model* main_model,
       schema_(schema),
       use_ondevice_cpu_for_golden_(use_ondevice_cpu_for_golden) {}
 
-absl::Status Embedder::ValidateInputs() {
+abslx::Status Embedder::ValidateInputs() {
 #define VALIDATE(condition, ...)                                     \
   if (!(condition)) {                                                \
-    return absl::InvalidArgumentError(absl::StrFormat(__VA_ARGS__)); \
+    return abslx::InvalidArgumentError(abslx::StrFormat(__VA_ARGS__)); \
   }
   VALIDATE(main_model_, "main_model may not be null");
   VALIDATE(main_model_->subgraphs()->size(), "main model must have subgraphs");
@@ -191,10 +191,10 @@ absl::Status Embedder::ValidateInputs() {
   VALIDATE(seen_ok, "validation must have an output named 'ok' (saw %s)",
            names);
 #undef VALIDATE
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Embedder::CreateModelWithEmbeddedValidation(
+abslx::Status Embedder::CreateModelWithEmbeddedValidation(
     fb::FlatBufferBuilder* fbb, ops::builtin::BuiltinOpResolver* resolver) {
   auto status = ValidateInputs();
   if (!status.ok()) {
@@ -212,22 +212,22 @@ absl::Status Embedder::CreateModelWithEmbeddedValidation(
       reinterpret_cast<const char*>(intermediate_fbb.GetBufferPointer()),
       intermediate_fbb.GetSize());
   if (!intermediate_model) {
-    return absl::InternalError("Failed to load intermediate model");
+    return abslx::InternalError("Failed to load intermediate model");
   }
   std::unique_ptr<Interpreter> interpreter;
   InterpreterBuilder(*intermediate_model, *resolver)(&interpreter);
   if (!interpreter) {
-    return absl::InternalError(
+    return abslx::InternalError(
         "Failed to build interpreter from intermediate model");
   }
   Subgraph* subgraph = interpreter->subgraph(1);
   if (subgraph->AllocateTensors() != kTfLiteOk) {
-    return absl::InternalError(
+    return abslx::InternalError(
         "Failed to AllocateTensors() on validation subgraph of intermediate "
         "model");
   }
   if (subgraph->Invoke() != kTfLiteOk) {
-    return absl::InternalError(
+    return abslx::InternalError(
         "Failed to Invoke() on validation subgraph of intermediate model");
   }
   return builder.BuildFinalModel(fbb, subgraph);

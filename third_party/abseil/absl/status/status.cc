@@ -24,7 +24,7 @@
 #include "absl/strings/str_format.h"
 #include "absl/strings/str_split.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 std::string StatusCodeToString(StatusCode code) {
@@ -75,7 +75,7 @@ std::ostream& operator<<(std::ostream& os, StatusCode code) {
 namespace status_internal {
 
 static int FindPayloadIndexByUrl(const Payloads* payloads,
-                                 absl::string_view type_url) {
+                                 abslx::string_view type_url) {
   if (payloads == nullptr) return -1;
 
   for (size_t i = 0; i < payloads->size(); ++i) {
@@ -86,50 +86,50 @@ static int FindPayloadIndexByUrl(const Payloads* payloads,
 }
 
 // Convert canonical code to a value known to this binary.
-absl::StatusCode MapToLocalCode(int value) {
-  absl::StatusCode code = static_cast<absl::StatusCode>(value);
+abslx::StatusCode MapToLocalCode(int value) {
+  abslx::StatusCode code = static_cast<abslx::StatusCode>(value);
   switch (code) {
-    case absl::StatusCode::kOk:
-    case absl::StatusCode::kCancelled:
-    case absl::StatusCode::kUnknown:
-    case absl::StatusCode::kInvalidArgument:
-    case absl::StatusCode::kDeadlineExceeded:
-    case absl::StatusCode::kNotFound:
-    case absl::StatusCode::kAlreadyExists:
-    case absl::StatusCode::kPermissionDenied:
-    case absl::StatusCode::kResourceExhausted:
-    case absl::StatusCode::kFailedPrecondition:
-    case absl::StatusCode::kAborted:
-    case absl::StatusCode::kOutOfRange:
-    case absl::StatusCode::kUnimplemented:
-    case absl::StatusCode::kInternal:
-    case absl::StatusCode::kUnavailable:
-    case absl::StatusCode::kDataLoss:
-    case absl::StatusCode::kUnauthenticated:
+    case abslx::StatusCode::kOk:
+    case abslx::StatusCode::kCancelled:
+    case abslx::StatusCode::kUnknown:
+    case abslx::StatusCode::kInvalidArgument:
+    case abslx::StatusCode::kDeadlineExceeded:
+    case abslx::StatusCode::kNotFound:
+    case abslx::StatusCode::kAlreadyExists:
+    case abslx::StatusCode::kPermissionDenied:
+    case abslx::StatusCode::kResourceExhausted:
+    case abslx::StatusCode::kFailedPrecondition:
+    case abslx::StatusCode::kAborted:
+    case abslx::StatusCode::kOutOfRange:
+    case abslx::StatusCode::kUnimplemented:
+    case abslx::StatusCode::kInternal:
+    case abslx::StatusCode::kUnavailable:
+    case abslx::StatusCode::kDataLoss:
+    case abslx::StatusCode::kUnauthenticated:
       return code;
     default:
-      return absl::StatusCode::kUnknown;
+      return abslx::StatusCode::kUnknown;
   }
 }
 }  // namespace status_internal
 
-absl::optional<absl::Cord> Status::GetPayload(
-    absl::string_view type_url) const {
+abslx::optional<abslx::Cord> Status::GetPayload(
+    abslx::string_view type_url) const {
   const auto* payloads = GetPayloads();
   int index = status_internal::FindPayloadIndexByUrl(payloads, type_url);
   if (index != -1) return (*payloads)[index].payload;
 
-  return absl::nullopt;
+  return abslx::nullopt;
 }
 
-void Status::SetPayload(absl::string_view type_url, absl::Cord payload) {
+void Status::SetPayload(abslx::string_view type_url, abslx::Cord payload) {
   if (ok()) return;
 
   PrepareToModify();
 
   status_internal::StatusRep* rep = RepToPointer(rep_);
   if (!rep->payloads) {
-    rep->payloads = absl::make_unique<status_internal::Payloads>();
+    rep->payloads = abslx::make_unique<status_internal::Payloads>();
   }
 
   int index =
@@ -142,7 +142,7 @@ void Status::SetPayload(absl::string_view type_url, absl::Cord payload) {
   rep->payloads->push_back({std::string(type_url), std::move(payload)});
 }
 
-bool Status::ErasePayload(absl::string_view type_url) {
+bool Status::ErasePayload(abslx::string_view type_url) {
   int index = status_internal::FindPayloadIndexByUrl(GetPayloads(), type_url);
   if (index != -1) {
     PrepareToModify();
@@ -161,7 +161,7 @@ bool Status::ErasePayload(absl::string_view type_url) {
 }
 
 void Status::ForEachPayload(
-    const std::function<void(absl::string_view, const absl::Cord&)>& visitor)
+    const std::function<void(abslx::string_view, const abslx::Cord&)>& visitor)
     const {
   if (auto* payloads = GetPayloads()) {
     bool in_reverse =
@@ -207,9 +207,9 @@ void Status::UnrefNonInlined(uintptr_t rep) {
   }
 }
 
-Status::Status(absl::StatusCode code, absl::string_view msg)
+Status::Status(abslx::StatusCode code, abslx::string_view msg)
     : rep_(CodeToInlinedRep(code)) {
-  if (code != absl::StatusCode::kOk && !msg.empty()) {
+  if (code != abslx::StatusCode::kOk && !msg.empty()) {
     rep_ = PointerToRep(new status_internal::StatusRep(code, msg, nullptr));
   }
 }
@@ -222,7 +222,7 @@ int Status::raw_code() const {
   return static_cast<int>(rep->code);
 }
 
-absl::StatusCode Status::code() const {
+abslx::StatusCode Status::code() const {
   return status_internal::MapToLocalCode(raw_code());
 }
 
@@ -230,7 +230,7 @@ void Status::PrepareToModify() {
   ABSL_RAW_CHECK(!ok(), "PrepareToModify shouldn't be called on OK status.");
   if (IsInlined(rep_)) {
     rep_ = PointerToRep(new status_internal::StatusRep(
-        static_cast<absl::StatusCode>(raw_code()), absl::string_view(),
+        static_cast<abslx::StatusCode>(raw_code()), abslx::string_view(),
         nullptr));
     return;
   }
@@ -240,7 +240,7 @@ void Status::PrepareToModify() {
   if (rep->ref.load(std::memory_order_acquire) != 1) {
     std::unique_ptr<status_internal::Payloads> payloads;
     if (rep->payloads) {
-      payloads = absl::make_unique<status_internal::Payloads>(*rep->payloads);
+      payloads = abslx::make_unique<status_internal::Payloads>(*rep->payloads);
     }
     status_internal::StatusRep* const new_rep = new status_internal::StatusRep(
         rep->code, message(), std::move(payloads));
@@ -249,7 +249,7 @@ void Status::PrepareToModify() {
   }
 }
 
-bool Status::EqualsSlow(const absl::Status& a, const absl::Status& b) {
+bool Status::EqualsSlow(const abslx::Status& a, const abslx::Status& b) {
   if (IsInlined(a.rep_) != IsInlined(b.rep_)) return false;
   if (a.message() != b.message()) return false;
   if (a.raw_code() != b.raw_code()) return false;
@@ -285,7 +285,7 @@ bool Status::EqualsSlow(const absl::Status& a, const absl::Status& b) {
 
 std::string Status::ToStringSlow(StatusToStringMode mode) const {
   std::string text;
-  absl::StrAppend(&text, absl::StatusCodeToString(code()), ": ", message());
+  abslx::StrAppend(&text, abslx::StatusCodeToString(code()), ": ", message());
 
   const bool with_payload = (mode & StatusToStringMode::kWithPayload) ==
                       StatusToStringMode::kWithPayload;
@@ -293,13 +293,13 @@ std::string Status::ToStringSlow(StatusToStringMode mode) const {
   if (with_payload) {
     status_internal::StatusPayloadPrinter printer =
         status_internal::GetStatusPayloadPrinter();
-    this->ForEachPayload([&](absl::string_view type_url,
-                             const absl::Cord& payload) {
-      absl::optional<std::string> result;
+    this->ForEachPayload([&](abslx::string_view type_url,
+                             const abslx::Cord& payload) {
+      abslx::optional<std::string> result;
       if (printer) result = printer(type_url, payload);
-      absl::StrAppend(
+      abslx::StrAppend(
           &text, " [", type_url, "='",
-          result.has_value() ? *result : absl::CHexEscape(std::string(payload)),
+          result.has_value() ? *result : abslx::CHexEscape(std::string(payload)),
           "']");
     });
   }
@@ -312,133 +312,133 @@ std::ostream& operator<<(std::ostream& os, const Status& x) {
   return os;
 }
 
-Status AbortedError(absl::string_view message) {
-  return Status(absl::StatusCode::kAborted, message);
+Status AbortedError(abslx::string_view message) {
+  return Status(abslx::StatusCode::kAborted, message);
 }
 
-Status AlreadyExistsError(absl::string_view message) {
-  return Status(absl::StatusCode::kAlreadyExists, message);
+Status AlreadyExistsError(abslx::string_view message) {
+  return Status(abslx::StatusCode::kAlreadyExists, message);
 }
 
-Status CancelledError(absl::string_view message) {
-  return Status(absl::StatusCode::kCancelled, message);
+Status CancelledError(abslx::string_view message) {
+  return Status(abslx::StatusCode::kCancelled, message);
 }
 
-Status DataLossError(absl::string_view message) {
-  return Status(absl::StatusCode::kDataLoss, message);
+Status DataLossError(abslx::string_view message) {
+  return Status(abslx::StatusCode::kDataLoss, message);
 }
 
-Status DeadlineExceededError(absl::string_view message) {
-  return Status(absl::StatusCode::kDeadlineExceeded, message);
+Status DeadlineExceededError(abslx::string_view message) {
+  return Status(abslx::StatusCode::kDeadlineExceeded, message);
 }
 
-Status FailedPreconditionError(absl::string_view message) {
-  return Status(absl::StatusCode::kFailedPrecondition, message);
+Status FailedPreconditionError(abslx::string_view message) {
+  return Status(abslx::StatusCode::kFailedPrecondition, message);
 }
 
-Status InternalError(absl::string_view message) {
-  return Status(absl::StatusCode::kInternal, message);
+Status InternalError(abslx::string_view message) {
+  return Status(abslx::StatusCode::kInternal, message);
 }
 
-Status InvalidArgumentError(absl::string_view message) {
-  return Status(absl::StatusCode::kInvalidArgument, message);
+Status InvalidArgumentError(abslx::string_view message) {
+  return Status(abslx::StatusCode::kInvalidArgument, message);
 }
 
-Status NotFoundError(absl::string_view message) {
-  return Status(absl::StatusCode::kNotFound, message);
+Status NotFoundError(abslx::string_view message) {
+  return Status(abslx::StatusCode::kNotFound, message);
 }
 
-Status OutOfRangeError(absl::string_view message) {
-  return Status(absl::StatusCode::kOutOfRange, message);
+Status OutOfRangeError(abslx::string_view message) {
+  return Status(abslx::StatusCode::kOutOfRange, message);
 }
 
-Status PermissionDeniedError(absl::string_view message) {
-  return Status(absl::StatusCode::kPermissionDenied, message);
+Status PermissionDeniedError(abslx::string_view message) {
+  return Status(abslx::StatusCode::kPermissionDenied, message);
 }
 
-Status ResourceExhaustedError(absl::string_view message) {
-  return Status(absl::StatusCode::kResourceExhausted, message);
+Status ResourceExhaustedError(abslx::string_view message) {
+  return Status(abslx::StatusCode::kResourceExhausted, message);
 }
 
-Status UnauthenticatedError(absl::string_view message) {
-  return Status(absl::StatusCode::kUnauthenticated, message);
+Status UnauthenticatedError(abslx::string_view message) {
+  return Status(abslx::StatusCode::kUnauthenticated, message);
 }
 
-Status UnavailableError(absl::string_view message) {
-  return Status(absl::StatusCode::kUnavailable, message);
+Status UnavailableError(abslx::string_view message) {
+  return Status(abslx::StatusCode::kUnavailable, message);
 }
 
-Status UnimplementedError(absl::string_view message) {
-  return Status(absl::StatusCode::kUnimplemented, message);
+Status UnimplementedError(abslx::string_view message) {
+  return Status(abslx::StatusCode::kUnimplemented, message);
 }
 
-Status UnknownError(absl::string_view message) {
-  return Status(absl::StatusCode::kUnknown, message);
+Status UnknownError(abslx::string_view message) {
+  return Status(abslx::StatusCode::kUnknown, message);
 }
 
 bool IsAborted(const Status& status) {
-  return status.code() == absl::StatusCode::kAborted;
+  return status.code() == abslx::StatusCode::kAborted;
 }
 
 bool IsAlreadyExists(const Status& status) {
-  return status.code() == absl::StatusCode::kAlreadyExists;
+  return status.code() == abslx::StatusCode::kAlreadyExists;
 }
 
 bool IsCancelled(const Status& status) {
-  return status.code() == absl::StatusCode::kCancelled;
+  return status.code() == abslx::StatusCode::kCancelled;
 }
 
 bool IsDataLoss(const Status& status) {
-  return status.code() == absl::StatusCode::kDataLoss;
+  return status.code() == abslx::StatusCode::kDataLoss;
 }
 
 bool IsDeadlineExceeded(const Status& status) {
-  return status.code() == absl::StatusCode::kDeadlineExceeded;
+  return status.code() == abslx::StatusCode::kDeadlineExceeded;
 }
 
 bool IsFailedPrecondition(const Status& status) {
-  return status.code() == absl::StatusCode::kFailedPrecondition;
+  return status.code() == abslx::StatusCode::kFailedPrecondition;
 }
 
 bool IsInternal(const Status& status) {
-  return status.code() == absl::StatusCode::kInternal;
+  return status.code() == abslx::StatusCode::kInternal;
 }
 
 bool IsInvalidArgument(const Status& status) {
-  return status.code() == absl::StatusCode::kInvalidArgument;
+  return status.code() == abslx::StatusCode::kInvalidArgument;
 }
 
 bool IsNotFound(const Status& status) {
-  return status.code() == absl::StatusCode::kNotFound;
+  return status.code() == abslx::StatusCode::kNotFound;
 }
 
 bool IsOutOfRange(const Status& status) {
-  return status.code() == absl::StatusCode::kOutOfRange;
+  return status.code() == abslx::StatusCode::kOutOfRange;
 }
 
 bool IsPermissionDenied(const Status& status) {
-  return status.code() == absl::StatusCode::kPermissionDenied;
+  return status.code() == abslx::StatusCode::kPermissionDenied;
 }
 
 bool IsResourceExhausted(const Status& status) {
-  return status.code() == absl::StatusCode::kResourceExhausted;
+  return status.code() == abslx::StatusCode::kResourceExhausted;
 }
 
 bool IsUnauthenticated(const Status& status) {
-  return status.code() == absl::StatusCode::kUnauthenticated;
+  return status.code() == abslx::StatusCode::kUnauthenticated;
 }
 
 bool IsUnavailable(const Status& status) {
-  return status.code() == absl::StatusCode::kUnavailable;
+  return status.code() == abslx::StatusCode::kUnavailable;
 }
 
 bool IsUnimplemented(const Status& status) {
-  return status.code() == absl::StatusCode::kUnimplemented;
+  return status.code() == abslx::StatusCode::kUnimplemented;
 }
 
 bool IsUnknown(const Status& status) {
-  return status.code() == absl::StatusCode::kUnknown;
+  return status.code() == abslx::StatusCode::kUnknown;
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

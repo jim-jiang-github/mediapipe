@@ -48,7 +48,7 @@ namespace {
 // instruction based the postorder dependency.
 int64_t CalculatePostOrderScheduleHelper(
     const HloComputation* comp, int64_t start_ordinal,
-    absl::flat_hash_map<HloInstruction*, int64_t>* ordinal_map) {
+    abslx::flat_hash_map<HloInstruction*, int64_t>* ordinal_map) {
   int64_t ordinal = start_ordinal;
   for (HloInstruction* instruction : comp->MakeInstructionPostOrder()) {
     if (instruction->opcode() == HloOpcode::kCall ||
@@ -74,16 +74,16 @@ int64_t CalculatePostOrderScheduleHelper(
   return ordinal;
 }
 
-absl::flat_hash_map<HloInstruction*, int64_t> CalculatePostOrderSchedule(
+abslx::flat_hash_map<HloInstruction*, int64_t> CalculatePostOrderSchedule(
     const HloModule& module) {
-  absl::flat_hash_map<HloInstruction*, int64_t> map;
+  abslx::flat_hash_map<HloInstruction*, int64_t> map;
   CalculatePostOrderScheduleHelper(module.entry_computation(), 0, &map);
   return map;
 }
 
 }  // namespace
-using absl::StrAppend;
-using absl::StrCat;
+using abslx::StrAppend;
+using abslx::StrCat;
 
 HloDataflowAnalysis::HloDataflowAnalysis(const HloModule& module, bool ssa_form,
                                          bool bitcast_defines_value,
@@ -96,8 +96,8 @@ HloDataflowAnalysis::HloDataflowAnalysis(const HloModule& module, bool ssa_form,
 
 bool HloDataflowAnalysis::AreTransitiveUsesElementwiseOrTuple(
     const HloInstruction* inst) {
-  absl::flat_hash_set<const HloInstruction*> visited;
-  absl::InlinedVector<const HloInstruction*, 4> stack;
+  abslx::flat_hash_set<const HloInstruction*> visited;
+  abslx::InlinedVector<const HloInstruction*, 4> stack;
   stack.push_back(inst);
   while (!stack.empty()) {
     const HloInstruction* current = stack.back();
@@ -136,7 +136,7 @@ bool IsSliceInputFusion(const HloInstruction& unnested_hlo) {
   if (root->opcode() != HloOpcode::kTuple) {
     return false;
   }
-  return absl::c_all_of(root->operands(), [](const HloInstruction* instr) {
+  return abslx::c_all_of(root->operands(), [](const HloInstruction* instr) {
     return Is1dSliceWithoutStrides(instr);
   });
 }
@@ -165,7 +165,7 @@ std::optional<ConcatUsageInfo> ConcatIsEffectivelyElementwise(
   //   Slice Slice
   //
   std::vector<HloInstruction*> users = concat.users();
-  if (!absl::c_all_of(users, Is1dSliceWithoutStrides)) {
+  if (!abslx::c_all_of(users, Is1dSliceWithoutStrides)) {
     // Limit our supported cases to 1 dimensional slices.
     return std::optional<ConcatUsageInfo>();
   }
@@ -174,7 +174,7 @@ std::optional<ConcatUsageInfo> ConcatIsEffectivelyElementwise(
       concat.operand_count() != concat.unique_operands().size()) {
     return std::optional<ConcatUsageInfo>();
   }
-  absl::c_sort(users, [](const HloInstruction* a, const HloInstruction* b) {
+  abslx::c_sort(users, [](const HloInstruction* a, const HloInstruction* b) {
     return a->slice_starts().at(0) < b->slice_starts().at(0);
   });
   int64_t prev_limit = 0;
@@ -223,8 +223,8 @@ bool AreTransitiveUsesEffectivelyElementwise(const HloInstruction* param,
                                              const ShapeIndex& out_shape_idx) {
   CHECK_EQ(root_tuple->opcode(), HloOpcode::kTuple);
   CHECK_EQ(out_shape_idx.size(), 1);
-  absl::flat_hash_set<const HloInstruction*> visited;
-  absl::InlinedVector<const HloInstruction*, 4> stack;
+  abslx::flat_hash_set<const HloInstruction*> visited;
+  abslx::InlinedVector<const HloInstruction*, 4> stack;
   stack.push_back(param);
   ConcatUsageInfo concat_usage_info{nullptr, 0, nullptr};
   bool is_output_reachable = false;
@@ -332,7 +332,7 @@ void HloDataflowAnalysis::MarkValueForDeletion(HloValue::Id value_id) {
 
 void HloDataflowAnalysis::DeleteMarkedValues() {
   // Use a set to prevent deleting an id twice.
-  absl::flat_hash_set<HloValue::Id> id_set(value_ids_to_delete_.begin(),
+  abslx::flat_hash_set<HloValue::Id> id_set(value_ids_to_delete_.begin(),
                                            value_ids_to_delete_.end());
 #ifndef NDEBUG
   // Verify that no marked-for-deletion values are in any of the value sets.
@@ -396,7 +396,7 @@ std::string HloDataflowAnalysis::ToString() const {
 
 bool HloDataflowAnalysis::Phi(
     HloInstruction* instruction,
-    absl::Span<const InstructionValueSet* const> inputs) {
+    abslx::Span<const InstructionValueSet* const> inputs) {
   CHECK(ssa_form_);
   VLOG(4) << "Phi(" << instruction->name() << ")";
   VLOG(5) << "instruction value set = "
@@ -406,14 +406,14 @@ bool HloDataflowAnalysis::Phi(
   }
 
   if (bitcast_defines_value_) {
-    absl::c_for_each(inputs, [&](const InstructionValueSet* input) {
+    abslx::c_for_each(inputs, [&](const InstructionValueSet* input) {
       DCHECK(ShapeUtil::Compatible(instruction->shape(), input->shape()));
     });
   } else {
     const Shape& shape = instruction->shape();
     PrimitiveType ty = shape.element_type();
     bool is_array = shape.IsArray();
-    absl::c_for_each(inputs, [&](const InstructionValueSet* input) {
+    abslx::c_for_each(inputs, [&](const InstructionValueSet* input) {
       DCHECK(ty == input->shape().element_type() &&
              (!is_array || ShapeUtil::ElementsIn(shape) ==
                                ShapeUtil::ElementsIn(input->shape())));
@@ -1198,7 +1198,7 @@ void HloDataflowAnalysis::Propagate() {
   // schedule. Intuitively, we start from entry parameters and propagate buffers
   // updates throughout the module only once.
   std::priority_queue<Work, std::vector<Work>, std::greater<Work>> worklist;
-  absl::flat_hash_set<HloInstruction*> workset;
+  abslx::flat_hash_set<HloInstruction*> workset;
   auto priority_map = CalculatePostOrderSchedule(module_);
   auto add_to_worklist = [&priority_map, &worklist,
                           &workset](HloInstruction* instruction) {
@@ -1538,7 +1538,7 @@ StatusOr<std::unique_ptr<HloDataflowAnalysis>> HloDataflowAnalysis::Run(
   VLOG(1) << "HloDataflowAnalysis::Run on module " << module.name();
   XLA_VLOG_LINES(2, module.ToString());
 
-  auto dataflow_analysis = absl::WrapUnique(new HloDataflowAnalysis(
+  auto dataflow_analysis = abslx::WrapUnique(new HloDataflowAnalysis(
       module, ssa_form, bitcast_defines_value, can_share_buffer));
 
   TF_RETURN_IF_ERROR(dataflow_analysis->InitializeInstructionValueSets());
@@ -1580,7 +1580,7 @@ StatusOr<std::unique_ptr<HloDataflowAnalysis>> HloDataflowAnalysis::Run(
   for (const auto& pair : dataflow_analysis->values_) {
     dataflow_analysis->values_vector_.push_back(pair.second.get());
   }
-  absl::c_sort(dataflow_analysis->values_vector_, HloValue::IdLessThan);
+  abslx::c_sort(dataflow_analysis->values_vector_, HloValue::IdLessThan);
 
   TF_DCHECK_OK(dataflow_analysis->Verify());
 
@@ -1595,7 +1595,7 @@ Status HloDataflowAnalysis::Verify() const {
   for (const HloValue* value : values()) {
     for (const HloPosition& position : value->positions()) {
       const HloValueSet& value_set = GetValueSet(position);
-      TF_RET_CHECK(absl::c_linear_search(value_set.values(), value))
+      TF_RET_CHECK(abslx::c_linear_search(value_set.values(), value))
           << "Value set at position " << position << " does not contain value "
           << value->ToShortString();
     }
@@ -1610,7 +1610,7 @@ Status HloDataflowAnalysis::Verify() const {
         const HloValueSet& value_set = pair.second;
         const HloPosition position{instruction, index};
         for (const HloValue* value : value_set.values()) {
-          TF_RET_CHECK(absl::c_linear_search(value->positions(), position))
+          TF_RET_CHECK(abslx::c_linear_search(value->positions(), position))
               << "Value set at position " << position
               << " unexpectedly contains value " << value->ToShortString();
         }
@@ -1914,7 +1914,7 @@ bool HloDataflowAnalysis::CanShareOperandBufferWithUser(
       // Check if one operand of kAdd fused root is kDot or kConvolution.
       auto* add = user->fused_expression_root();
       auto add_operand_it =
-          absl::c_find_if(add->operands(), [&](HloInstruction* operand) {
+          abslx::c_find_if(add->operands(), [&](HloInstruction* operand) {
             return operand->opcode() == HloOpcode::kConvolution ||
                    operand->opcode() == HloOpcode::kDot;
           });
@@ -1985,12 +1985,12 @@ bool HloDataflowAnalysis::CanShareOperandBufferWithUser(
     // *) The root instruction of the called computation is element-wise on
     //    'operand'.
     const bool found_caller_use =
-        absl::c_find_if(uses, [user](const HloUse& use) {
+        abslx::c_find_if(uses, [user](const HloUse& use) {
           return use.instruction == user;
         }) != uses.end();
     auto* callee_root = user->to_apply()->root_instruction();
     const bool found_elementwise_callee_use =
-        absl::c_find_if(uses, [callee_root](const HloUse& use) {
+        abslx::c_find_if(uses, [callee_root](const HloUse& use) {
           return use.instruction == callee_root &&
                  callee_root->IsElementwiseOnOperand(use.operand_number);
         }) != uses.end();

@@ -57,7 +57,7 @@ class BarrierProxy {
   // connected tasks.
   BarrierProxy(CoordinationServiceAgent* agent,
                std::vector<CoordinatedTask> tasks, int num_local_threads,
-               absl::string_view key, absl::Duration timeout)
+               abslx::string_view key, abslx::Duration timeout)
       : key_(key),
         agent_(agent),
         tasks_(std::move(tasks)),
@@ -75,7 +75,7 @@ class BarrierProxy {
   const std::string key_;
   CoordinationServiceAgent* agent_;
   const std::vector<CoordinatedTask> tasks_;
-  absl::Duration timeout_;
+  abslx::Duration timeout_;
 
   mutex mu_;
   condition_variable cv_ TF_GUARDED_BY(mu_);
@@ -106,13 +106,13 @@ class BarrierProxyManager {
   // connected tasks.
   Status Wait(CoordinationServiceAgent* agent,
               const std::vector<CoordinatedTask>& tasks, int num_local_threads,
-              absl::string_view key, absl::Duration timeout);
+              abslx::string_view key, abslx::Duration timeout);
   // The number of active BarrierProxies.
   size_t size() const;
 
  private:
   mutable mutex mu_;
-  absl::flat_hash_map<std::string, std::shared_ptr<BarrierProxy>> barriers_
+  abslx::flat_hash_map<std::string, std::shared_ptr<BarrierProxy>> barriers_
       TF_GUARDED_BY(mu_);
 };
 

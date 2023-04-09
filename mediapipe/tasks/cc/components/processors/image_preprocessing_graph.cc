@@ -72,19 +72,19 @@ struct ImagePreprocessingOutputStreams {
 };
 
 // Builds an ImageTensorSpecs for configuring the preprocessing calculators.
-absl::StatusOr<ImageTensorSpecs> BuildImageTensorSpecs(
+abslx::StatusOr<ImageTensorSpecs> BuildImageTensorSpecs(
     const ModelResources& model_resources) {
   const tflite::Model& model = *model_resources.GetTfLiteModel();
   if (model.subgraphs()->size() != 1) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "Image tflite models are assumed to have a single subgraph.",
         MediaPipeTasksStatus::kInvalidArgumentError);
   }
   const auto* primary_subgraph = (*model.subgraphs())[0];
   if (primary_subgraph->inputs()->size() != 1) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "Image tflite models are assumed to have a single input.",
         MediaPipeTasksStatus::kInvalidArgumentError);
   }
@@ -98,7 +98,7 @@ absl::StatusOr<ImageTensorSpecs> BuildImageTensorSpecs(
 }
 
 // Fills in the ImageToTensorCalculatorOptions based on the ImageTensorSpecs.
-absl::Status ConfigureImageToTensorCalculator(
+abslx::Status ConfigureImageToTensorCalculator(
     const ImageTensorSpecs& image_tensor_specs,
     mediapipe::ImageToTensorCalculatorOptions* options) {
   options->set_output_tensor_width(image_tensor_specs.image_width);
@@ -116,13 +116,13 @@ absl::Status ConfigureImageToTensorCalculator(
       if (normalization_options->mean_values[i] != mean ||
           normalization_options->std_values[i] != std) {
         return CreateStatusWithPayload(
-            absl::StatusCode::kUnimplemented,
+            abslx::StatusCode::kUnimplemented,
             "Per-channel image normalization is not available.");
       }
     }
     if (std::abs(std) < std::numeric_limits<float>::epsilon()) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInternal,
+          abslx::StatusCode::kInternal,
           "NormalizationOptions.std_values can't be 0. Please check if the "
           "tensor metadata has been populated correctly.");
     }
@@ -136,7 +136,7 @@ absl::Status ConfigureImageToTensorCalculator(
   // TODO: need to support different GPU origin on differnt
   // platforms or applications.
   options->set_gpu_origin(mediapipe::GpuOrigin::TOP_LEFT);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace
@@ -146,7 +146,7 @@ bool DetermineImagePreprocessingGpuBackend(
   return acceleration.has_gpu();
 }
 
-absl::Status ConfigureImagePreprocessingGraph(
+abslx::Status ConfigureImagePreprocessingGraph(
     const ModelResources& model_resources, bool use_gpu,
     proto::ImagePreprocessingGraphOptions* options) {
   ASSIGN_OR_RETURN(auto image_tensor_specs,
@@ -160,7 +160,7 @@ absl::Status ConfigureImagePreprocessingGraph(
   } else {
     options->set_backend(proto::ImagePreprocessingGraphOptions::CPU_BACKEND);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 Source<Image> AddDataConverter(Source<Image> image_in, Graph& graph,
@@ -205,7 +205,7 @@ Source<Image> AddDataConverter(Source<Image> image_in, Graph& graph,
 // more details.
 class ImagePreprocessingGraph : public Subgraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     Graph graph;
     auto output_streams = BuildImagePreprocessing(

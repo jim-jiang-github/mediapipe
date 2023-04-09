@@ -99,25 +99,25 @@ LBB0_2:
 template <typename... KernelArgs>
 class LazyKernel {
  public:
-  LazyKernel(absl::string_view kernel_name, const char* ptx,
+  LazyKernel(abslx::string_view kernel_name, const char* ptx,
              const se::GpuAsmOpts& asm_opts)
       : kernel_name_(kernel_name), ptx_(ptx), asm_opts_(asm_opts) {}
 
   StatusOr<se::TypedKernel<KernelArgs...>*> Get(
       se::StreamExecutor* stream_exec) {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
 
     auto result = kernels_.emplace(stream_exec, nullptr);
     if (result.second) {
-      absl::Span<const uint8_t> compiled_ptx;
-      StatusOr<absl::Span<const uint8_t>> compiled_ptx_or =
+      abslx::Span<const uint8_t> compiled_ptx;
+      StatusOr<abslx::Span<const uint8_t>> compiled_ptx_or =
           se::CompileGpuAsmOrGetCached(stream_exec->device_ordinal(), ptx_,
                                        asm_opts_);
       if (compiled_ptx_or.ok()) {
         compiled_ptx = std::move(compiled_ptx_or).value();
       } else {
-        static absl::once_flag logged_once;
-        absl::call_once(logged_once, [&]() {
+        static abslx::once_flag logged_once;
+        abslx::call_once(logged_once, [&]() {
           LOG(WARNING)
               << compiled_ptx_or.status().ToString()
               << "\nRelying on driver to perform ptx compilation. "
@@ -144,11 +144,11 @@ class LazyKernel {
   const char* ptx_;
   se::GpuAsmOpts asm_opts_;
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
 
   // A mutex keyed on StreamExecutor* is ok because StreamExecutors are never
   // destroyed.
-  absl::flat_hash_map<se::StreamExecutor*,
+  abslx::flat_hash_map<se::StreamExecutor*,
                       std::unique_ptr<se::TypedKernel<KernelArgs...>>>
       kernels_ ABSL_GUARDED_BY(mu_);
 };

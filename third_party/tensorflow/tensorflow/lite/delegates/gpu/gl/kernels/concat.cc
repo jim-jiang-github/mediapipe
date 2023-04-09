@@ -61,10 +61,10 @@ class AlignedConcatByChannels : public NodeShader {
     return true;
   }
 
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     if (!IsSupported(ctx)) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "This case is not supported by aligned concat");
     }
 
@@ -88,7 +88,7 @@ class AlignedConcatByChannels : public NodeShader {
         /*input=*/IOStructure::ONLY_DEFINITIONS,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
@@ -114,10 +114,10 @@ class ConcatByAnyChannel : public NodeShader {
     return true;
   }
 
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     if (!IsSupported(ctx)) {
-      return absl::UnimplementedError("This case is not supported by concat");
+      return abslx::UnimplementedError("This case is not supported by concat");
     }
 
     std::string code = DeclareVariables();
@@ -168,7 +168,7 @@ class ConcatByAnyChannel : public NodeShader {
         /*input=*/IOStructure::ONLY_DEFINITIONS,
         /*output=*/IOStructure::ONLY_DEFINITIONS,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -327,7 +327,7 @@ class FlatConcatByHeight : public NodeShader {
     return true;
   }
 
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     std::string code;
     std::vector<Variable> params;
@@ -360,7 +360,7 @@ class FlatConcatByHeight : public NodeShader {
         /*input=*/IOStructure::ONLY_DEFINITIONS,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
@@ -386,7 +386,7 @@ class FlatConcatByWidth : public NodeShader {
     return true;
   }
 
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     std::string code;
     std::vector<Variable> params;
@@ -419,13 +419,13 @@ class FlatConcatByWidth : public NodeShader {
         /*input=*/IOStructure::ONLY_DEFINITIONS,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class FlatConcat : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     if (FlatConcatByHeight::IsSupported(ctx)) {
       return flat_concat_by_height_.GenerateCode(ctx, generated_code);
@@ -433,7 +433,7 @@ class FlatConcat : public NodeShader {
     if (FlatConcatByWidth::IsSupported(ctx)) {
       return flat_concat_by_width_.GenerateCode(ctx, generated_code);
     }
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "This case is not supported by flat concat");
   }
 

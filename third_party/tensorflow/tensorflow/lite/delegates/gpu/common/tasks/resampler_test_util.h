@@ -22,7 +22,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status ResamplerIdentityTest(const BHWC& shape,
+abslx::Status ResamplerIdentityTest(const BHWC& shape,
                                    TestExecutionEnvironment* env);
 
 }  // namespace gpu

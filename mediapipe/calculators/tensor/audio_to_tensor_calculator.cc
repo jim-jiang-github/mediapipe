@@ -50,7 +50,7 @@ std::vector<float> HannWindow(int window_size, bool sqrt_hann) {
   std::vector<float> hann_window(window_size);
   audio_dsp::HannWindow().GetPeriodicSamples(window_size, &hann_window);
   if (sqrt_hann) {
-    absl::c_transform(hann_window, hann_window.begin(),
+    abslx::c_transform(hann_window, hann_window.begin(),
                       [](double x) { return std::sqrt(x); });
   }
   return hann_window;
@@ -171,10 +171,10 @@ class AudioToTensorCalculator : public Node {
   MEDIAPIPE_NODE_CONTRACT(kAudioIn, kAudioSampleRateIn, kTensorsOut,
                           kDcAndNyquistOut, kTimestampsOut);
 
-  static absl::Status UpdateContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc);
-  absl::Status Process(CalculatorContext* cc);
-  absl::Status Close(CalculatorContext* cc);
+  static abslx::Status UpdateContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc);
+  abslx::Status Process(CalculatorContext* cc);
+  abslx::Status Close(CalculatorContext* cc);
 
  private:
   // The target number of channels.
@@ -213,27 +213,27 @@ class AudioToTensorCalculator : public Node {
   std::vector<float, Eigen::aligned_allocator<float>> fft_workplace_;
   std::vector<float, Eigen::aligned_allocator<float>> fft_output_;
 
-  absl::Status ProcessStreamingData(CalculatorContext* cc, const Matrix& input);
-  absl::Status ProcessNonStreamingData(CalculatorContext* cc,
+  abslx::Status ProcessStreamingData(CalculatorContext* cc, const Matrix& input);
+  abslx::Status ProcessNonStreamingData(CalculatorContext* cc,
                                        const Matrix& input);
 
-  absl::Status SetupStreamingResampler(double input_sample_rate_);
+  abslx::Status SetupStreamingResampler(double input_sample_rate_);
   void AppendToSampleBuffer(Matrix buffer_to_append);
   void AppendZerosToSampleBuffer(int num_samples);
 
-  absl::StatusOr<std::vector<Tensor>> ConvertToTensor(
+  abslx::StatusOr<std::vector<Tensor>> ConvertToTensor(
       const Matrix& block, std::vector<int> tensor_dims);
-  absl::Status OutputTensor(const Matrix& block, Timestamp timestamp,
+  abslx::Status OutputTensor(const Matrix& block, Timestamp timestamp,
                             CalculatorContext* cc);
-  absl::Status ProcessBuffer(const Matrix& buffer, bool should_flush,
+  abslx::Status ProcessBuffer(const Matrix& buffer, bool should_flush,
                              CalculatorContext* cc);
 };
 
-absl::Status AudioToTensorCalculator::UpdateContract(CalculatorContract* cc) {
+abslx::Status AudioToTensorCalculator::UpdateContract(CalculatorContract* cc) {
   const auto& options = cc->Options<Options>();
   if (!options.has_num_channels() || !options.has_num_samples() ||
       !options.has_target_sample_rate()) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "AudioToTensorCalculatorOptions must specifiy "
         "`num_channels`, `num_samples`, and `target_sample_rate`.");
   }
@@ -247,16 +247,16 @@ absl::Status AudioToTensorCalculator::UpdateContract(CalculatorContract* cc) {
   }
   if (options.padding_samples_before() < 0 ||
       options.padding_samples_after() < 0) {
-    return absl::InvalidArgumentError("Negative zero padding unsupported");
+    return abslx::InvalidArgumentError("Negative zero padding unsupported");
   }
   if (options.flush_mode() != Options::ENTIRE_TAIL_AT_TIMESTAMP_MAX &&
       options.flush_mode() != Options::PROCEED_AS_USUAL) {
-    return absl::InvalidArgumentError("Unsupported flush mode");
+    return abslx::InvalidArgumentError("Unsupported flush mode");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AudioToTensorCalculator::Open(CalculatorContext* cc) {
+abslx::Status AudioToTensorCalculator::Open(CalculatorContext* cc) {
   const auto& options =
       cc->Options<mediapipe::AudioToTensorCalculatorOptions>();
   num_channels_ = options.num_channels();
@@ -312,10 +312,10 @@ absl::Status AudioToTensorCalculator::Open(CalculatorContext* cc) {
         << "The DC_AND_NYQUIST output stream can only be connected when the "
            "calculator outputs fft tensors";
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AudioToTensorCalculator::Process(CalculatorContext* cc) {
+abslx::Status AudioToTensorCalculator::Process(CalculatorContext* cc) {
   if (cc->InputTimestamp() == Timestamp::PreStream()) {
     double current_source_sample_rate = kAudioSampleRateIn(cc).Get();
     if (cc->Options<mediapipe::AudioToTensorCalculatorOptions>()
@@ -323,7 +323,7 @@ absl::Status AudioToTensorCalculator::Process(CalculatorContext* cc) {
       return SetupStreamingResampler(current_source_sample_rate);
     } else {
       source_sample_rate_ = current_source_sample_rate;
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
   }
   // Sanity checks.
@@ -332,12 +332,12 @@ absl::Status AudioToTensorCalculator::Process(CalculatorContext* cc) {
   // The special case of `num_channels_ == 1` is automatic mixdown to mono.
   const bool mono_output = num_channels_ == 1;
   if (!mono_output && !channels_match) {
-    return absl::InvalidArgumentError(absl::StrFormat(
+    return abslx::InvalidArgumentError(abslx::StrFormat(
         "Audio input has %d channel(s) but the model requires %d channel(s).",
         input_frame.rows(), num_channels_));
   }
   if (!mono_output && input_frame.IsRowMajor) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "The audio data should be stored in column-major.");
   }
   CHECK(channels_match || mono_output);
@@ -348,9 +348,9 @@ absl::Status AudioToTensorCalculator::Process(CalculatorContext* cc) {
                       : ProcessNonStreamingData(cc, input);
 }
 
-absl::Status AudioToTensorCalculator::Close(CalculatorContext* cc) {
+abslx::Status AudioToTensorCalculator::Close(CalculatorContext* cc) {
   if (!stream_mode_) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   if (resampler_) {
     Matrix resampled_buffer(num_channels_, 0);
@@ -362,10 +362,10 @@ absl::Status AudioToTensorCalculator::Close(CalculatorContext* cc) {
   if (fft_state_) {
     pffft_destroy_setup(fft_state_);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AudioToTensorCalculator::ProcessStreamingData(
+abslx::Status AudioToTensorCalculator::ProcessStreamingData(
     CalculatorContext* cc, const Matrix& input) {
   const auto& input_buffer = input;
   if (initial_timestamp_ == Timestamp::Unstarted()) {
@@ -407,10 +407,10 @@ absl::Status AudioToTensorCalculator::ProcessStreamingData(
   // Removes the processed samples from the global sample buffer.
   sample_buffer_ = Matrix(sample_buffer_.rightCols(sample_buffer_.cols() -
                                                    processed_buffer_cols_ - 1));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AudioToTensorCalculator::ProcessNonStreamingData(
+abslx::Status AudioToTensorCalculator::ProcessNonStreamingData(
     CalculatorContext* cc, const Matrix& input) {
   initial_timestamp_ = cc->InputTimestamp();
   next_output_timestamp_ = initial_timestamp_;
@@ -428,20 +428,20 @@ absl::Status AudioToTensorCalculator::ProcessNonStreamingData(
   return ProcessBuffer(input_frame, /*should_flush=*/true, cc);
 }
 
-absl::Status AudioToTensorCalculator::SetupStreamingResampler(
+abslx::Status AudioToTensorCalculator::SetupStreamingResampler(
     double input_sample_rate) {
   if (input_sample_rate == source_sample_rate_) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   source_sample_rate_ = input_sample_rate;
   if (source_sample_rate_ != target_sample_rate_) {
-    resampler_ = absl::make_unique<audio_dsp::QResampler<float>>(
+    resampler_ = abslx::make_unique<audio_dsp::QResampler<float>>(
         source_sample_rate_, target_sample_rate_, num_channels_, params_);
     if (!resampler_) {
-      return absl::InternalError("Failed to initialize resampler.");
+      return abslx::InternalError("Failed to initialize resampler.");
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void AudioToTensorCalculator::AppendZerosToSampleBuffer(int num_samples) {
@@ -460,7 +460,7 @@ void AudioToTensorCalculator::AppendToSampleBuffer(Matrix buffer_to_append) {
   sample_buffer_.rightCols(buffer_to_append.cols()).swap(buffer_to_append);
 }
 
-absl::StatusOr<std::vector<Tensor>> AudioToTensorCalculator::ConvertToTensor(
+abslx::StatusOr<std::vector<Tensor>> AudioToTensorCalculator::ConvertToTensor(
     const Matrix& block, std::vector<int> tensor_dims) {
   Tensor tensor(Tensor::ElementType::kFloat32, Tensor::Shape(tensor_dims));
   auto buffer_view = tensor.GetCpuWriteView();
@@ -478,7 +478,7 @@ absl::StatusOr<std::vector<Tensor>> AudioToTensorCalculator::ConvertToTensor(
   return tensor_vector;
 }
 
-absl::Status AudioToTensorCalculator::OutputTensor(const Matrix& block,
+abslx::Status AudioToTensorCalculator::OutputTensor(const Matrix& block,
                                                    Timestamp timestamp,
                                                    CalculatorContext* cc) {
   std::vector<Tensor> output_tensor;
@@ -530,7 +530,7 @@ absl::Status AudioToTensorCalculator::OutputTensor(const Matrix& block,
         break;
       }
       default:
-        return absl::InvalidArgumentError("Unsupported dft tensor format.");
+        return abslx::InvalidArgumentError("Unsupported dft tensor format.");
     }
 
   } else {
@@ -538,10 +538,10 @@ absl::Status AudioToTensorCalculator::OutputTensor(const Matrix& block,
                      ConvertToTensor(block, {num_channels_, num_samples_}));
   }
   kTensorsOut(cc).Send(std::move(output_tensor), timestamp);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AudioToTensorCalculator::ProcessBuffer(const Matrix& buffer,
+abslx::Status AudioToTensorCalculator::ProcessBuffer(const Matrix& buffer,
                                                     bool should_flush,
                                                     CalculatorContext* cc) {
   const bool should_flush_at_timestamp_max =
@@ -579,7 +579,7 @@ absl::Status AudioToTensorCalculator::ProcessBuffer(const Matrix& buffer,
     kTimestampsOut(cc).Send(std::move(timestamps), timestamp);
   }
   processed_buffer_cols_ = next_frame_first_col - 1;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 MEDIAPIPE_REGISTER_NODE(AudioToTensorCalculator);

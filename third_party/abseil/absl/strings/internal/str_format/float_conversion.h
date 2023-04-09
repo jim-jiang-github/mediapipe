@@ -17,7 +17,7 @@
 
 #include "absl/strings/internal/str_format/extension.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace str_format_internal {
 
@@ -32,6 +32,6 @@ bool ConvertFloatImpl(long double v, const FormatConversionSpecImpl &conv,
 
 }  // namespace str_format_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_INTERNAL_STR_FORMAT_FLOAT_CONVERSION_H_

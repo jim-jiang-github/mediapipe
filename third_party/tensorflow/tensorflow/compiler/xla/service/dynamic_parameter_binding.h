@@ -116,7 +116,7 @@ class DynamicParameterBinding {
   // direction of is chosen so that we can easily query if a dimension is
   // dynamic and which dynamic parameter represents the real size of that
   // dimension.
-  absl::flat_hash_map<DynamicDimension, DynamicParameter> bindings_;
+  abslx::flat_hash_map<DynamicDimension, DynamicParameter> bindings_;
 };
 
 std::ostream& operator<<(std::ostream& out,

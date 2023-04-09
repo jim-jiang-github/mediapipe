@@ -31,7 +31,7 @@ PYBIND11_MODULE(pywrap_quantize_model, m) {
     )pbdoc");
   m.def(
       "clear_data_from_calibrator",
-      [](const absl::string_view id) {
+      [](const abslx::string_view id) {
         tensorflow::quantization::ClearDataFromCalibrator(id);
       },
       R"pbdoc(
@@ -39,7 +39,7 @@ PYBIND11_MODULE(pywrap_quantize_model, m) {
     )pbdoc");
   m.def(
       "get_max_from_calibrator",
-      [](const absl::string_view id) {
+      [](const abslx::string_view id) {
         return tensorflow::quantization::GetMaxFromCalibrator(id);
       },
       R"pbdoc(
@@ -47,7 +47,7 @@ PYBIND11_MODULE(pywrap_quantize_model, m) {
     )pbdoc");
   m.def(
       "get_min_from_calibrator",
-      [](const absl::string_view id) {
+      [](const abslx::string_view id) {
         return tensorflow::quantization::GetMinFromCalibrator(id);
       },
       R"pbdoc(
@@ -55,10 +55,10 @@ PYBIND11_MODULE(pywrap_quantize_model, m) {
     )pbdoc");
   m.def(
       "quantize_qat_model",
-      [](const absl::string_view saved_model_path,
-         const absl::string_view exported_names_str,
-         const absl::string_view tags,
-         const absl::string_view quant_opts_serialized) {
+      [](const abslx::string_view saved_model_path,
+         const abslx::string_view exported_names_str,
+         const abslx::string_view tags,
+         const abslx::string_view quant_opts_serialized) {
         return tensorflow::PyoOrThrow(
             tensorflow::quantization::QuantizeQatModel(saved_model_path,
                                                        exported_names_str, tags,
@@ -69,10 +69,10 @@ PYBIND11_MODULE(pywrap_quantize_model, m) {
     )pbdoc");
   m.def(
       "quantize_ptq_dynamic_range",
-      [](const absl::string_view saved_model_path,
-         const absl::string_view exported_names_str,
-         const absl::string_view tags,
-         const absl::string_view quant_opts_serialized) {
+      [](const abslx::string_view saved_model_path,
+         const abslx::string_view exported_names_str,
+         const abslx::string_view tags,
+         const abslx::string_view quant_opts_serialized) {
         return tensorflow::PyoOrThrow(
             tensorflow::quantization::QuantizePtqDynamicRange(
                 saved_model_path, exported_names_str, tags,
@@ -83,9 +83,9 @@ PYBIND11_MODULE(pywrap_quantize_model, m) {
     )pbdoc");
   m.def(
       "quantize_ptq_model_pre_calibration",
-      [](const absl::string_view saved_model_path,
-         const absl::string_view exported_names_str,
-         const absl::string_view tags) {
+      [](const abslx::string_view saved_model_path,
+         const abslx::string_view exported_names_str,
+         const abslx::string_view tags) {
         return tensorflow::PyoOrThrow(
             tensorflow::quantization::QuantizePtqModelPreCalibration(
                 saved_model_path, exported_names_str, tags));
@@ -95,10 +95,10 @@ PYBIND11_MODULE(pywrap_quantize_model, m) {
     )pbdoc");
   m.def(
       "quantize_ptq_model_post_calibration",
-      [](const absl::string_view saved_model_path,
-         const absl::string_view exported_names_str,
-         const absl::string_view tags,
-         const absl::string_view quant_opts_serialized) {
+      [](const abslx::string_view saved_model_path,
+         const abslx::string_view exported_names_str,
+         const abslx::string_view tags,
+         const abslx::string_view quant_opts_serialized) {
         return tensorflow::PyoOrThrow(
             tensorflow::quantization::QuantizePtqModelPostCalibration(
                 saved_model_path, exported_names_str, tags,

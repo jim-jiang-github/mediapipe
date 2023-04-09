@@ -41,7 +41,7 @@ class TfInitContext : public InitContext<TfInitContext> {
  public:
   explicit TfInitContext(const ::tensorflow::OpKernelConstruction* context);
   // Read a given attribute
-  absl::StatusOr<AttrValue> GetAttr(const std::string& attr_name) const;
+  abslx::StatusOr<AttrValue> GetAttr(const std::string& attr_name) const;
 
  private:
   const ::tensorflow::OpKernelConstruction* context_;
@@ -73,11 +73,11 @@ class TfShapeInferenceContext
   // Read an input tensor shape
   ShapeOr GetInputShape(const int idx) const;
   // Set an output tensor shape
-  absl::Status SetOutputShape(const int idx, const Shape& shape);
+  abslx::Status SetOutputShape(const int idx, const Shape& shape);
   // Read an input tensor during shape inference
   ConstTensorViewOr GetInputTensor(const int idx) const;
   // Read a given attribute
-  absl::StatusOr<AttrValue> GetAttr(const std::string& attr_name) const;
+  abslx::StatusOr<AttrValue> GetAttr(const std::string& attr_name) const;
   // Number of input tensors
   int NumInputs() const;
   // Number of output tensors
@@ -87,10 +87,10 @@ class TfShapeInferenceContext
   ::tensorflow::shape_inference::InferenceContext* context_;
 };
 
-// Converts absl::Status to tensorflow::Status
-::tensorflow::Status FromAbslStatus(const ::absl::Status& s);
-// Converts to tensorflow::Status to absl::Status
-::absl::Status ToAbslStatus(const ::tensorflow::Status& s);
+// Converts abslx::Status to tensorflow::Status
+::tensorflow::Status FromAbslStatus(const ::abslx::Status& s);
+// Converts to tensorflow::Status to abslx::Status
+::abslx::Status ToAbslStatus(const ::tensorflow::Status& s);
 
 // The adaptor between an op implementation (OpKernelShim subclass) and TF
 // runtime

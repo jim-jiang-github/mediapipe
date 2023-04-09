@@ -138,11 +138,11 @@ Status PopulateConvMap(
 
     const AlgorithmConfigProto &algorithm_config_proto = kv.value();
     const AlgorithmDesc primary(algorithm_config_proto.algorithm());
-    const absl::optional<AlgorithmDesc> fallback =
+    const abslx::optional<AlgorithmDesc> fallback =
         algorithm_config_proto.has_algorithm_no_scratch()
-            ? absl::optional<AlgorithmDesc>(
+            ? abslx::optional<AlgorithmDesc>(
                   AlgorithmDesc(algorithm_config_proto.algorithm_no_scratch()))
-            : absl::nullopt;
+            : abslx::nullopt;
 
     for (int device_id : device_ids) {
       AutotuneEntry<Op> entry;
@@ -189,7 +189,7 @@ Status SerializeAutotuneMaps(std::string *output) {
   return OkStatus();
 }
 
-Status LoadSerializedAutotuneMaps(absl::string_view s) {
+Status LoadSerializedAutotuneMaps(abslx::string_view s) {
 #if GOOGLE_CUDA || TENSORFLOW_USE_ROCM
   AutotuneMapsProto proto;
   // The explicit string conversion here is a workaround for

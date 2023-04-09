@@ -287,7 +287,7 @@ Status ShouldIgnoreErrors(const TransformFuncParameters& transform_params,
   if (transform_params.count("ignore_errors") &&
       (!transform_params.at("ignore_errors").empty())) {
     const string& ignore_errors_string =
-        absl::AsciiStrToLower(transform_params.at("ignore_errors").at(0));
+        abslx::AsciiStrToLower(transform_params.at("ignore_errors").at(0));
     if (ignore_errors_string == "true") {
       *ignore_errors = true;
     } else if (ignore_errors_string == "false") {

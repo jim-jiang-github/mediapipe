@@ -620,7 +620,7 @@ TEST_F(GpuConvRewriterTest, BackwardInputConvolveConstantFilter) {
   std::string constant_str =
       LiteralUtil::CreateR4FromArray4D(constant_arr).ToStringWithoutShape();
 
-  const std::string module_str = absl::StrFormat(R"(
+  const std::string module_str = abslx::StrFormat(R"(
     HloModule test
 
     ENTRY entry_computation {
@@ -642,7 +642,7 @@ TEST_F(GpuConvRewriterTest, BackwardInputConvolveConstantFilter) {
 }
 
 TEST_F(GpuConvRewriterTest, TestBackwardFilterPattern) {
-  const std::string module_str = absl::StrFormat(R"(
+  const std::string module_str = abslx::StrFormat(R"(
     HloModule Test
 
     ENTRY Test {

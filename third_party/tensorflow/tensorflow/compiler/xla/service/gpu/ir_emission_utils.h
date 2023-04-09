@@ -101,8 +101,8 @@ std::array<int64_t, 3> GetReductionTiling(
     se::CudaComputeCapability cuda_compute_capability);
 
 // Emits call to "vprintf" with given format and arguments.
-llvm::Value* EmitPrintf(absl::string_view fmt,
-                        absl::Span<llvm::Value* const> arguments,
+llvm::Value* EmitPrintf(abslx::string_view fmt,
+                        abslx::Span<llvm::Value* const> arguments,
                         llvm::IRBuilder<>* builder);
 
 // Emits code to shuffle data between threads of a warp. This has the same
@@ -127,9 +127,9 @@ llvm::Value* IsBlock0Thread0(llvm::IRBuilder<>* b);
 bool IsFusedReductionOutputConsistent(const HloInstruction* inst,
                                       const HloInstruction* first_reduce);
 inline bool AreFusedReductionOutputsConsistent(
-    absl::Span<const HloInstruction* const> output_instructions,
+    abslx::Span<const HloInstruction* const> output_instructions,
     const HloInstruction* first_reduce) {
-  return absl::c_all_of(output_instructions, [=](const HloInstruction* inst) {
+  return abslx::c_all_of(output_instructions, [=](const HloInstruction* inst) {
     return IsFusedReductionOutputConsistent(inst, first_reduce);
   });
 }
@@ -164,12 +164,12 @@ std::vector<T> ToStdVector(const llvm::SmallVectorImpl<T>& v) {
 }
 
 StatusOr<BufferAllocation::Slice> GetAllocationSlice(
-    mlir::Value v, absl::Span<const BufferAllocation> allocations,
+    mlir::Value v, abslx::Span<const BufferAllocation> allocations,
     std::string* constant_name = nullptr);
 
 bool CanEmitFusedDynamicUpdateSliceInPlaceForGpu(
     mlir::lmhlo::FusionOp fusion,
-    absl::Span<const BufferAllocation> allocations);
+    abslx::Span<const BufferAllocation> allocations);
 
 Shape GetShape(mlir::Value value);
 
@@ -200,9 +200,9 @@ struct TransposeDimsAndParams {
   std::vector<int64_t> params;
 
   std::string ToString() const {
-    return absl::StrFormat("{dims={%s}, params={%s}}",
-                           absl::StrJoin(dims, ", "),
-                           absl::StrJoin(params, ", "));
+    return abslx::StrFormat("{dims={%s}, params={%s}}",
+                           abslx::StrJoin(dims, ", "),
+                           abslx::StrJoin(params, ", "));
   }
 };
 
@@ -216,7 +216,7 @@ std::optional<TransposeDimsAndParams> Match021Transpose(
 // If one or multiple `operand_shapes` are the same 0-2-1 transpose of
 // `output_shape` in 0-1-2, return the dimensions of the normalized shape.
 std::optional<TransposeDimsAndParams> FindTranspose021DimsAndParameters(
-    const absl::Span<Shape const>& operand_shapes, const Shape& output_shape);
+    const abslx::Span<Shape const>& operand_shapes, const Shape& output_shape);
 
 // Whether fusing `producer` into `consumer` results in a fusion op that will be
 // emitted as shared memory transpose.

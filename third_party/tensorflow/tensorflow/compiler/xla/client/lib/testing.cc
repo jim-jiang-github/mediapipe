@@ -62,7 +62,7 @@ XlaOp BuildFakeDataOpOnDevice(const Shape& shape, XlaBuilder* builder) {
 
 std::unique_ptr<GlobalData> MakeFakeDataViaDeviceOrDie(
     const Shape& shape, Client* client, DebugOptions* debug_opts) {
-  XlaBuilder b(absl::StrCat("make_fake_", ShapeUtil::HumanString(shape)));
+  XlaBuilder b(abslx::StrCat("make_fake_", ShapeUtil::HumanString(shape)));
   BuildFakeDataOpOnDevice(shape, &b);
   XlaComputation computation = b.Build().value();
 

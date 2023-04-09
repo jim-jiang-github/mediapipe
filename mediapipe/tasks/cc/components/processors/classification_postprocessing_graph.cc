@@ -85,23 +85,23 @@ struct ClassificationPostprocessingOutputStreams {
 };
 
 // Performs sanity checks on provided ClassifierOptions.
-absl::Status SanityCheckClassifierOptions(
+abslx::Status SanityCheckClassifierOptions(
     const proto::ClassifierOptions& options) {
   if (options.max_results() == 0) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "Invalid `max_results` option: value must be != 0.",
         MediaPipeTasksStatus::kInvalidArgumentError);
   }
   if (options.category_allowlist_size() > 0 &&
       options.category_denylist_size() > 0) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "`category_allowlist` and `category_denylist` are mutually "
         "exclusive options.",
         MediaPipeTasksStatus::kInvalidArgumentError);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 struct ClassificationHeadsProperties {
@@ -111,11 +111,11 @@ struct ClassificationHeadsProperties {
 
 // Identifies the number of classification heads and whether they are quantized
 // or not.
-absl::StatusOr<ClassificationHeadsProperties> GetClassificationHeadsProperties(
+abslx::StatusOr<ClassificationHeadsProperties> GetClassificationHeadsProperties(
     const ModelResources& model_resources) {
   const tflite::Model& model = *model_resources.GetTfLiteModel();
   if (model.subgraphs()->size() != 1) {
-    return CreateStatusWithPayload(absl::StatusCode::kInvalidArgument,
+    return CreateStatusWithPayload(abslx::StatusCode::kInvalidArgument,
                                    "Classification tflite models are "
                                    "assumed to have a single subgraph.",
                                    MediaPipeTasksStatus::kInvalidArgumentError);
@@ -131,8 +131,8 @@ absl::StatusOr<ClassificationHeadsProperties> GetClassificationHeadsProperties(
         tensor->type() != tflite::TensorType_UINT8 &&
         tensor->type() != tflite::TensorType_BOOL) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
-          absl::StrFormat("Expected output tensor at index %d to have type "
+          abslx::StatusCode::kInvalidArgument,
+          abslx::StrFormat("Expected output tensor at index %d to have type "
                           "UINT8 or FLOAT32 or BOOL, found %s instead.",
                           i, tflite::EnumNameTensorType(tensor->type())),
           MediaPipeTasksStatus::kInvalidOutputTensorTypeError);
@@ -145,8 +145,8 @@ absl::StatusOr<ClassificationHeadsProperties> GetClassificationHeadsProperties(
   if (num_quantized_tensors != num_output_tensors &&
       num_quantized_tensors != 0) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat(
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrFormat(
             "Expected either all or none of the output tensors to be "
             "quantized, but found %d quantized outputs for %d total outputs.",
             num_quantized_tensors, num_output_tensors),
@@ -158,8 +158,8 @@ absl::StatusOr<ClassificationHeadsProperties> GetClassificationHeadsProperties(
   if (output_tensors_metadata != nullptr &&
       num_output_tensors != output_tensors_metadata->size()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat("Mismatch between number of output tensors (%d) and "
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrFormat("Mismatch between number of output tensors (%d) and "
                         "output tensors metadata (%d).",
                         num_output_tensors, output_tensors_metadata->size()),
         MediaPipeTasksStatus::kMetadataInconsistencyError);
@@ -170,9 +170,9 @@ absl::StatusOr<ClassificationHeadsProperties> GetClassificationHeadsProperties(
 }
 
 // Builds the label map from the tensor metadata, if available.
-absl::StatusOr<LabelItems> GetLabelItemsIfAny(
+abslx::StatusOr<LabelItems> GetLabelItemsIfAny(
     const ModelMetadataExtractor& metadata_extractor,
-    const TensorMetadata& tensor_metadata, absl::string_view locale) {
+    const TensorMetadata& tensor_metadata, abslx::string_view locale) {
   const std::string labels_filename =
       ModelMetadataExtractor::FindFirstAssociatedFileName(
           tensor_metadata, tflite::AssociatedFileType_TENSOR_AXIS_LABELS);
@@ -180,13 +180,13 @@ absl::StatusOr<LabelItems> GetLabelItemsIfAny(
     LabelItems empty_label_items;
     return empty_label_items;
   }
-  ASSIGN_OR_RETURN(absl::string_view labels_file,
+  ASSIGN_OR_RETURN(abslx::string_view labels_file,
                    metadata_extractor.GetAssociatedFile(labels_filename));
   const std::string display_names_filename =
       ModelMetadataExtractor::FindFirstAssociatedFileName(
           tensor_metadata, tflite::AssociatedFileType_TENSOR_AXIS_LABELS,
           locale);
-  absl::string_view display_names_file;
+  abslx::string_view display_names_file;
   if (!display_names_filename.empty()) {
     ASSIGN_OR_RETURN(display_names_file, metadata_extractor.GetAssociatedFile(
                                              display_names_filename));
@@ -196,7 +196,7 @@ absl::StatusOr<LabelItems> GetLabelItemsIfAny(
 
 // Gets the score threshold from metadata, if any. Returns
 // kDefaultScoreThreshold otherwise.
-absl::StatusOr<float> GetScoreThreshold(
+abslx::StatusOr<float> GetScoreThreshold(
     const ModelMetadataExtractor& metadata_extractor,
     const TensorMetadata& tensor_metadata) {
   ASSIGN_OR_RETURN(const ProcessUnit* score_thresholding_process_unit,
@@ -211,9 +211,9 @@ absl::StatusOr<float> GetScoreThreshold(
 }
 
 // Gets the category allowlist or denylist (if any) as a set of indices.
-absl::StatusOr<absl::flat_hash_set<int>> GetAllowOrDenyCategoryIndicesIfAny(
+abslx::StatusOr<abslx::flat_hash_set<int>> GetAllowOrDenyCategoryIndicesIfAny(
     const proto::ClassifierOptions& options, const LabelItems& label_items) {
-  absl::flat_hash_set<int> category_indices;
+  abslx::flat_hash_set<int> category_indices;
   // Exit early if no denylist/allowlist.
   if (options.category_denylist_size() == 0 &&
       options.category_allowlist_size() == 0) {
@@ -221,7 +221,7 @@ absl::StatusOr<absl::flat_hash_set<int>> GetAllowOrDenyCategoryIndicesIfAny(
   }
   if (label_items.empty()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "Using `category_allowlist` or `category_denylist` requires labels to "
         "be present in the TFLite Model Metadata but none was found.",
         MediaPipeTasksStatus::kMetadataMissingLabelsError);
@@ -246,13 +246,13 @@ absl::StatusOr<absl::flat_hash_set<int>> GetAllowOrDenyCategoryIndicesIfAny(
   return category_indices;
 }
 
-absl::Status ConfigureScoreCalibrationIfAny(
+abslx::Status ConfigureScoreCalibrationIfAny(
     const ModelMetadataExtractor& metadata_extractor, int tensor_index,
     proto::ClassificationPostprocessingGraphOptions* options) {
   const auto* tensor_metadata =
       metadata_extractor.GetOutputTensorMetadata(tensor_index);
   if (tensor_metadata == nullptr) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   // Get ScoreCalibrationOptions, if any.
   ASSIGN_OR_RETURN(const ProcessUnit* score_calibration_process_unit,
@@ -260,7 +260,7 @@ absl::Status ConfigureScoreCalibrationIfAny(
                        *tensor_metadata,
                        tflite::ProcessUnitOptions_ScoreCalibrationOptions));
   if (score_calibration_process_unit == nullptr) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   auto* score_calibration_options =
       score_calibration_process_unit->options_as_ScoreCalibrationOptions();
@@ -271,13 +271,13 @@ absl::Status ConfigureScoreCalibrationIfAny(
           tflite::AssociatedFileType_TENSOR_AXIS_SCORE_CALIBRATION);
   if (score_calibration_filename.empty()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kNotFound,
+        abslx::StatusCode::kNotFound,
         "Found ScoreCalibrationOptions but missing required associated "
         "parameters file with type TENSOR_AXIS_SCORE_CALIBRATION.",
         MediaPipeTasksStatus::kMetadataAssociatedFileNotFoundError);
   }
   ASSIGN_OR_RETURN(
-      absl::string_view score_calibration_file,
+      abslx::string_view score_calibration_file,
       metadata_extractor.GetAssociatedFile(score_calibration_filename));
   ScoreCalibrationCalculatorOptions calculator_options;
   MP_RETURN_IF_ERROR(ConfigureScoreCalibration(
@@ -286,7 +286,7 @@ absl::Status ConfigureScoreCalibrationIfAny(
       &calculator_options));
   (*options->mutable_score_calibration_options())[tensor_index] =
       calculator_options;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void ConfigureClassificationAggregationCalculator(
@@ -305,7 +305,7 @@ void ConfigureClassificationAggregationCalculator(
 
 // Fills in the TensorsToClassificationCalculatorOptions based on the
 // classifier options and the (optional) output tensor metadata.
-absl::Status ConfigureTensorsToClassificationCalculator(
+abslx::Status ConfigureTensorsToClassificationCalculator(
     const proto::ClassifierOptions& options,
     const ModelMetadataExtractor& metadata_extractor, int tensor_index,
     TensorsToClassificationCalculatorOptions* calculator_options) {
@@ -351,10 +351,10 @@ absl::Status ConfigureTensorsToClassificationCalculator(
   *calculator_options->mutable_label_items() = std::move(label_items);
   // Always sort results.
   calculator_options->set_sort_by_descending_score(true);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConfigureClassificationPostprocessingGraph(
+abslx::Status ConfigureClassificationPostprocessingGraph(
     const ModelResources& model_resources,
     const proto::ClassifierOptions& classifier_options,
     proto::ClassificationPostprocessingGraphOptions* options) {
@@ -372,7 +372,7 @@ absl::Status ConfigureClassificationPostprocessingGraph(
       *model_resources.GetMetadataExtractor(),
       options->mutable_classification_aggregation_options());
   options->set_has_quantized_outputs(heads_properties.quantized);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // A "ClassificationPostprocessingGraph" converts raw tensors into
@@ -403,7 +403,7 @@ absl::Status ConfigureClassificationPostprocessingGraph(
 // file for more details.
 class ClassificationPostprocessingGraph : public mediapipe::Subgraph {
  public:
-  absl::StatusOr<mediapipe::CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<mediapipe::CalculatorGraphConfig> GetConfig(
       mediapipe::SubgraphContext* sc) override {
     Graph graph;
     ASSIGN_OR_RETURN(
@@ -437,7 +437,7 @@ class ClassificationPostprocessingGraph : public mediapipe::Subgraph {
   // timestamps_in: (std::vector<mediapipe::Timestamp>) optional collection of
   //   timestamps that should be used to aggregate classification results.
   // graph: the mediapipe builder::Graph instance to be updated.
-  absl::StatusOr<ClassificationPostprocessingOutputStreams>
+  abslx::StatusOr<ClassificationPostprocessingOutputStreams>
   BuildClassificationPostprocessing(
       const proto::ClassificationPostprocessingGraphOptions& options,
       Source<std::vector<Tensor>> tensors_in,
@@ -447,7 +447,7 @@ class ClassificationPostprocessingGraph : public mediapipe::Subgraph {
     // Sanity check.
     if (num_heads == 0) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
+          abslx::StatusCode::kInvalidArgument,
           "ClassificationPostprocessingOptions must contain at least one "
           "TensorsToClassificationCalculatorOptions.",
           MediaPipeTasksStatus::kInvalidArgumentError);
@@ -525,7 +525,7 @@ class ClassificationPostprocessingGraph : public mediapipe::Subgraph {
     for (int i = 0; i < num_heads; ++i) {
       tensors_to_classification_nodes[i]->Out(kClassificationsTag) >>
           result_aggregation.In(
-              absl::StrFormat("%s:%d", kClassificationsTag, i));
+              abslx::StrFormat("%s:%d", kClassificationsTag, i));
     }
     timestamps_in >> result_aggregation.In(kTimestampsTag);
 

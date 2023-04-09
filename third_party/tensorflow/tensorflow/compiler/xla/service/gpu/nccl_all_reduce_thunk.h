@@ -90,9 +90,9 @@ class NcclAllReduceStartThunk : public NcclAllReduceThunkBase {
                            ncclComm_t comm) override;
 
  private:
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   // Store done events (by device ordinal) for the done thunk to wait on.
-  absl::flat_hash_map<int, se::Event> done_events_ ABSL_GUARDED_BY(mu_);
+  abslx::flat_hash_map<int, se::Event> done_events_ ABSL_GUARDED_BY(mu_);
 };
 
 class NcclAllReduceDoneThunk : public Thunk {

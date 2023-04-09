@@ -39,7 +39,7 @@ class CoreMLPlugin : public DelegatePluginInterface {
   }
   static std::unique_ptr<CoreMLPlugin> New(
       const TFLiteSettings& tflite_settings) {
-    return absl::make_unique<CoreMLPlugin>(tflite_settings);
+    return abslx::make_unique<CoreMLPlugin>(tflite_settings);
   }
   explicit CoreMLPlugin(const TFLiteSettings& tflite_settings) {
     const CoreMLSettings* settings = tflite_settings.coreml_settings();

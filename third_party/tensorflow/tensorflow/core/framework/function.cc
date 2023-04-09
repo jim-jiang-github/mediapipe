@@ -324,7 +324,7 @@ class FunctionInstantiationHelper {
       // must lie in the range [node_name, node_colon_bound).
       auto it = index_.lower_bound(node_name);
       while (it != index_.end() && it->first <= node_colon_bound) {
-        if (it->first == node_name || absl::StartsWith(it->first, node_colon)) {
+        if (it->first == node_name || abslx::StartsWith(it->first, node_colon)) {
           nid = it->second.nid;
           break;
         }
@@ -548,7 +548,7 @@ string Print(const AttrValue& attr_value,
     }
     std::sort(entries.begin(), entries.end());
     return strings::StrCat(attr_value.func().name(), "[",
-                           absl::StrJoin(entries, ", "), "]");
+                           abslx::StrJoin(entries, ", "), "]");
   } else if (attr_value.value_case() == AttrValue::kS && hash_string_attrs) {
     return strings::StrCat(Fingerprint64(attr_value.s()));
   }
@@ -575,21 +575,21 @@ string Print(const NodeDef& n) {
         entries.push_back("device=<FAILED_TO_PARSE>");
       }
     }
-    strings::StrAppend(&out, "[", absl::StrJoin(entries, ", "), "]");
+    strings::StrAppend(&out, "[", abslx::StrJoin(entries, ", "), "]");
   }
   strings::StrAppend(&out, "(");
   std::vector<StringPiece> dat;
   std::vector<string> dep;
   for (StringPiece s : n.input()) {
-    if (absl::ConsumePrefix(&s, "^")) {
+    if (abslx::ConsumePrefix(&s, "^")) {
       dep.emplace_back(s);
     } else {
       dat.push_back(s);
     }
   }
-  strings::StrAppend(&out, absl::StrJoin(dat, ", "), ")");
+  strings::StrAppend(&out, abslx::StrJoin(dat, ", "), ")");
   if (!dep.empty()) {
-    strings::StrAppend(&out, " @ ", absl::StrJoin(dep, ", "));
+    strings::StrAppend(&out, " @ ", abslx::StrJoin(dep, ", "));
   }
   return out;
 }
@@ -699,14 +699,14 @@ string Print(gtl::ArraySlice<const NodeDef*> nodes) {
       if (!input.empty() && input[0] != '^') {
         DCHECK_EQ(found_non_control_input, false)
             << "RetVal node has more than one non-control input: "
-            << absl::StrJoin(n->input(), ", ");
+            << abslx::StrJoin(n->input(), ", ");
         strings::StrAppend(&out, n->input(0), ":", get_type_and_device(*n));
         found_non_control_input = true;
       }
     }
     DCHECK_EQ(found_non_control_input, true)
         << "RetVal did not have any non-control inputs: "
-        << absl::StrJoin(n->input(), ", ");
+        << abslx::StrJoin(n->input(), ", ");
   }
   strings::StrAppend(&out, ") {\n");
   for (size_t i = 0; i < body.size(); ++i) {
@@ -980,7 +980,7 @@ class AttrKeyAndValue {
     kRaw,
     kCEscape,
   };
-  AttrKeyAndValue(absl::string_view key_name, int key_suffix, string value,
+  AttrKeyAndValue(abslx::string_view key_name, int key_suffix, string value,
                   ValueRepresentationOp value_op = kRaw)
       : key_name_(key_name),
         key_suffix_(key_suffix),
@@ -998,7 +998,7 @@ class AttrKeyAndValue {
   }
 
   void AppendTo(bool first, string* s) const {
-    absl::string_view v;
+    abslx::string_view v;
     bool add_escaped = false;
     if ((value_op_ == kCEscape) && NeedsEscaping(value_)) {
       // Use CEscape call below
@@ -1013,7 +1013,7 @@ class AttrKeyAndValue {
       strings::StrAppend(s, first ? "" : ",", key_name_, "=", v);
     }
     if (add_escaped) {
-      strings::StrAppend(s, absl::CEscape(value_));
+      strings::StrAppend(s, abslx::CEscape(value_));
     }
   }
 
@@ -1027,7 +1027,7 @@ class AttrKeyAndValue {
     return false;
   }
 
-  absl::string_view key_name_;
+  abslx::string_view key_name_;
   int key_suffix_;  // -1 if missing
   ValueRepresentationOp value_op_;
   string value_;
@@ -1036,7 +1036,7 @@ class AttrKeyAndValue {
 
 string GetFunctionResourceInputDevice(
     const Tensor& input, const int arg_index, const FunctionDef& function_def,
-    absl::flat_hash_map<string, std::vector<string>>* composite_devices) {
+    abslx::flat_hash_map<string, std::vector<string>>* composite_devices) {
   const auto& handles = input.flat<ResourceHandle>();
   const ResourceHandle& handle0 = handles(0);
   string composite_device;
@@ -1061,7 +1061,7 @@ string GetFunctionResourceInputDevice(
 
 string Canonicalize(const string& funcname, AttrSlice attrs,
                     const FunctionLibraryRuntime::InstantiateOptions& options) {
-  absl::InlinedVector<AttrKeyAndValue, 8> entries;
+  abslx::InlinedVector<AttrKeyAndValue, 8> entries;
   entries.reserve(attrs.size() + static_cast<int>(!options.target.empty()) +
                   options.input_devices.size());
   for (const auto& p : attrs) {
@@ -1093,7 +1093,7 @@ string Canonicalize(const string& funcname, AttrSlice attrs,
   if (options.lib_def) {
     entries.push_back(AttrKeyAndValue(
         "_lib_def", -1,
-        absl::StrCat("", reinterpret_cast<uintptr_t>(options.lib_def))));
+        abslx::StrCat("", reinterpret_cast<uintptr_t>(options.lib_def))));
   }
   if (!options.state_handle.empty()) {
     entries.push_back(
@@ -1678,7 +1678,7 @@ std::set<string> ReachableFunctions(
   // "some_interface" and it is reachable, then it means any other
   // function with same attribute name and value could also be potentially
   // reachable, eg via implementation_selector swapping the nodedef.
-  absl::flat_hash_set<string> reachable_api_interface;
+  abslx::flat_hash_set<string> reachable_api_interface;
 
   // Functions might be reachable from the nested function calls, so we keep a
   // queue of functions that we have to check.
@@ -1818,7 +1818,7 @@ FunctionLibraryDefinition FunctionLibraryDefinition::ReachableDefinitions(
 }
 
 string FunctionLibraryRuntime::Options::DebugString() const {
-  return absl::StrCat(
+  return abslx::StrCat(
       "FLR::Options(step_id=", step_id, " rendezvous=", IsSet(rendezvous),
       " cancellation_manager=", IsSet(cancellation_manager),
       " collective_executor=", IsSet(collective_executor),

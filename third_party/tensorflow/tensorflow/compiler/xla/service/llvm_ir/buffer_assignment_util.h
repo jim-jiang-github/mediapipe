@@ -24,10 +24,10 @@ namespace llvm_ir {
 // name of the corresponding constant buffer. In particular, it replaces . and
 // - with _.
 std::string SanitizeConstantName(const HloInstruction& instr);
-std::string SanitizeConstantName(absl::string_view name);
+std::string SanitizeConstantName(abslx::string_view name);
 
 std::string ConstantHloToGlobalName(const HloInstruction& instr);
-std::string ConstantNameToGlobalName(absl::string_view name);
+std::string ConstantNameToGlobalName(abslx::string_view name);
 
 // In XLA:GPU we map constant buffer allocations to globals in the generated
 // LLVM IR.  This function gives us the name of the global variable a constant

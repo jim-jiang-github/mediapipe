@@ -39,7 +39,7 @@ class HostOpMetricsDbBuilder : public OpMetricsDbBuilder {
   //             the execution time of its children.
   //   children_time_ps = the execution time of the children of this OP in
   //                      picoseconds
-  void EnterOp(absl::string_view name, absl::string_view category,
+  void EnterOp(abslx::string_view name, abslx::string_view category,
                bool is_eager, uint64 time_ps, uint64 children_time_ps);
 
   // Updates total_host_infeed_enq_duration_ps_ and
@@ -71,8 +71,8 @@ class DeviceOpMetricsDbBuilder : public OpMetricsDbBuilder {
   //   bytes_accessed = the sum of bytes read and bytes written by this OP.
   //   memory_accessed_breakdown = the breakdown of memory accessed by operation
   //                               type and memory space.
-  void EnterOp(uint64 program_id, absl::string_view name,
-               absl::string_view category, absl::string_view provenance,
+  void EnterOp(uint64 program_id, abslx::string_view name,
+               abslx::string_view category, abslx::string_view provenance,
                bool is_eager, uint64 occurrences, uint64 time_ps,
                uint64 children_time_ps, int64_t flops, int64_t bytes_accessed,
                const protobuf::RepeatedPtrField<OpMetrics::MemoryAccessed>&

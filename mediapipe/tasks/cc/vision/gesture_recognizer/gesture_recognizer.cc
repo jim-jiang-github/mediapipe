@@ -161,13 +161,13 @@ ConvertGestureRecognizerGraphOptionsProto(GestureRecognizerOptions* options) {
 
 }  // namespace
 
-absl::StatusOr<std::unique_ptr<GestureRecognizer>> GestureRecognizer::Create(
+abslx::StatusOr<std::unique_ptr<GestureRecognizer>> GestureRecognizer::Create(
     std::unique_ptr<GestureRecognizerOptions> options) {
   auto options_proto = ConvertGestureRecognizerGraphOptionsProto(options.get());
   tasks::core::PacketsCallback packets_callback = nullptr;
   if (options->result_callback) {
     auto result_callback = options->result_callback;
-    packets_callback = [=](absl::StatusOr<tasks::core::PacketMap>
+    packets_callback = [=](abslx::StatusOr<tasks::core::PacketMap>
                                status_or_packets) {
       if (!status_or_packets.ok()) {
         Image image;
@@ -213,12 +213,12 @@ absl::StatusOr<std::unique_ptr<GestureRecognizer>> GestureRecognizer::Create(
       std::move(packets_callback));
 }
 
-absl::StatusOr<GestureRecognizerResult> GestureRecognizer::Recognize(
+abslx::StatusOr<GestureRecognizerResult> GestureRecognizer::Recognize(
     mediapipe::Image image,
     std::optional<core::ImageProcessingOptions> image_processing_options) {
   if (image.UsesGpu()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "GPU input images are currently not supported.",
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }
@@ -249,13 +249,13 @@ absl::StatusOr<GestureRecognizerResult> GestureRecognizer::Recognize(
   };
 }
 
-absl::StatusOr<GestureRecognizerResult> GestureRecognizer::RecognizeForVideo(
+abslx::StatusOr<GestureRecognizerResult> GestureRecognizer::RecognizeForVideo(
     mediapipe::Image image, int64 timestamp_ms,
     std::optional<core::ImageProcessingOptions> image_processing_options) {
   if (image.UsesGpu()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrCat("GPU input images are currently not supported."),
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrCat("GPU input images are currently not supported."),
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }
   ASSIGN_OR_RETURN(
@@ -288,13 +288,13 @@ absl::StatusOr<GestureRecognizerResult> GestureRecognizer::RecognizeForVideo(
   };
 }
 
-absl::Status GestureRecognizer::RecognizeAsync(
+abslx::Status GestureRecognizer::RecognizeAsync(
     mediapipe::Image image, int64 timestamp_ms,
     std::optional<core::ImageProcessingOptions> image_processing_options) {
   if (image.UsesGpu()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrCat("GPU input images are currently not supported."),
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrCat("GPU input images are currently not supported."),
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }
   ASSIGN_OR_RETURN(

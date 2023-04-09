@@ -67,16 +67,16 @@ std::vector<int64_t> ReorderDims(const std::vector<int64_t>& input,
                                  const DataLayout& from, const DataLayout& to);
 
 // Helper functions to make methods more readable.
-inline int64_t GetDim(absl::Span<const int64_t> data, DimIndex dim) {
+inline int64_t GetDim(abslx::Span<const int64_t> data, DimIndex dim) {
   return data.rbegin()[static_cast<int64_t>(dim)];
 }
 
-inline void SetDim(absl::Span<int64_t> data, DimIndex dim, int64_t value) {
+inline void SetDim(abslx::Span<int64_t> data, DimIndex dim, int64_t value) {
   data.rbegin()[static_cast<int64_t>(dim)] = value;
 }
 
 inline void SetDim(std::vector<int64_t>* data, DimIndex dim, int64_t value) {
-  return SetDim(absl::MakeSpan(*data), dim, value);
+  return SetDim(abslx::MakeSpan(*data), dim, value);
 }
 
 // int64_t is not the same type as tensorflow::protobuf_int64 in open-source.
@@ -85,26 +85,26 @@ inline void SetDim(std::vector<int64_t>* data, DimIndex dim, int64_t value) {
 //
 // T should be a protobuf RepeatedField.
 template <typename T>
-inline absl::Span<const int64_t> AsInt64Slice(const T& repeated_field) {
+inline abslx::Span<const int64_t> AsInt64Slice(const T& repeated_field) {
   using data_ty =
       typename std::remove_reference<decltype(*repeated_field.data())>::type;
   static_assert(std::is_integral<data_ty>::value &&
                     std::is_signed<data_ty>::value && sizeof(data_ty) == 8,
                 "repeated_field.data() must return a pointer to a signed "
                 "64-bit integer type.");
-  return absl::Span<const int64_t>(
+  return abslx::Span<const int64_t>(
       reinterpret_cast<const int64_t*>(repeated_field.data()),
       repeated_field.size());
 }
 template <typename T>
-inline absl::Span<int64_t> AsInt64Slice(T* repeated_field) {
+inline abslx::Span<int64_t> AsInt64Slice(T* repeated_field) {
   using data_ty =
       typename std::remove_reference<decltype(*repeated_field->data())>::type;
   static_assert(std::is_integral<data_ty>::value &&
                     std::is_signed<data_ty>::value && sizeof(data_ty) == 8,
                 "repeated_field->data() must return a pointer to a signed "
                 "64-bit integer type.");
-  return absl::Span<int64_t>(
+  return abslx::Span<int64_t>(
       reinterpret_cast<int64_t*>(repeated_field->mutable_data()),
       repeated_field->size());
 }
@@ -356,11 +356,11 @@ class BatchDescriptor {
       port::ArraySlice<dnn::BatchDescriptor> inputs);  // non-absl ok
 
  private:
-  absl::Span<const int64_t> spatial_size() const {
+  abslx::Span<const int64_t> spatial_size() const {
     return AsInt64Slice(tensor_.dimensions()).subspan(2);
   }
 
-  absl::Span<int64_t> spatial_size() {
+  abslx::Span<int64_t> spatial_size() {
     return AsInt64Slice(tensor_.mutable_dimensions()).subspan(2);
   }
 
@@ -462,7 +462,7 @@ class FilterDescriptor {
 
   FilterLayout layout() const { return tensor_.filter_layout(); }
 
-  absl::Span<const int64_t> input_filter_dims() const {
+  abslx::Span<const int64_t> input_filter_dims() const {
     return AsInt64Slice(tensor_.dimensions()).subspan(2);
   }
 
@@ -485,7 +485,7 @@ class FilterDescriptor {
                                           int vector_dim) const;
 
  private:
-  absl::Span<int64_t> input_filter_dims() {
+  abslx::Span<int64_t> input_filter_dims() {
     return AsInt64Slice(tensor_.mutable_dimensions()).subspan(2);
   }
 
@@ -624,30 +624,30 @@ class ConvolutionDescriptor {
     return proto_.convolution_mode() == ConvolutionMode::CONVOLUTION;
   }
 
-  absl::Span<const int64_t> strides() const {
+  abslx::Span<const int64_t> strides() const {
     return AsInt64Slice(proto_.strides());
   }
 
-  absl::Span<const int64_t> dilations() const {
+  abslx::Span<const int64_t> dilations() const {
     return AsInt64Slice(proto_.dilations());
   }
 
-  absl::Span<const int64_t> padding() const {
+  abslx::Span<const int64_t> padding() const {
     return AsInt64Slice(proto_.paddings());
   }
 
   std::string name() const { return proto_.name(); }
 
  private:
-  absl::Span<int64_t> strides() {
+  abslx::Span<int64_t> strides() {
     return AsInt64Slice(proto_.mutable_strides());
   }
 
-  absl::Span<int64_t> dilations() {
+  abslx::Span<int64_t> dilations() {
     return AsInt64Slice(proto_.mutable_dilations());
   }
 
-  absl::Span<int64_t> padding() {
+  abslx::Span<int64_t> padding() {
     return AsInt64Slice(proto_.mutable_paddings());
   }
 
@@ -760,9 +760,9 @@ class PoolingDescriptor {
   int64_t vertical_stride() const { return GetDim(strides_, DimIndex::Y); }
   int64_t horizontal_stride() const { return GetDim(strides_, DimIndex::X); }
   int64_t stride(DimIndex dim) const { return GetDim(strides_, dim); }
-  absl::Span<const int64_t> window() const { return window_; }
-  absl::Span<const int64_t> padding() const { return padding_; }
-  absl::Span<const int64_t> strides() const { return strides_; }
+  abslx::Span<const int64_t> window() const { return window_; }
+  abslx::Span<const int64_t> padding() const { return padding_; }
+  abslx::Span<const int64_t> strides() const { return strides_; }
   bool propagate_nans() const { return propagate_nans_; }
   std::string name() const { return name_; }
 
@@ -2065,7 +2065,7 @@ class DnnSupport {
   virtual port::StatusOr<std::unique_ptr<dnn::RnnSequenceTensorDescriptor>>
   createRnnSequenceTensorDescriptor(int max_seq_length, int batch_size,
                                     int data_size,
-                                    const absl::Span<const int>& seq_lengths,
+                                    const abslx::Span<const int>& seq_lengths,
                                     bool time_major, dnn::DataType data_type) {
     return port::Status(port::error::UNIMPLEMENTED,
                         "createRnnSequenceTensorDescriptor is unimplemented");
@@ -2307,9 +2307,9 @@ class DnnSupport {
                                  const RnnStateTensorDescriptor& probs_desc,
                                  DeviceMemory<ElementType> probs_data,
                                  const RnnStateTensorDescriptor& grads_desc,
-                                 absl::Span<const int> labels_data,
-                                 absl::Span<const int> labels_lengths_data,
-                                 absl::Span<const int> input_lengths_data,
+                                 abslx::Span<const int> labels_data,
+                                 abslx::Span<const int> labels_lengths_data,
+                                 abslx::Span<const int> input_lengths_data,
                                  ScratchAllocator* workspace_allocator,
                                  DeviceMemory<uint8>* scratch_memory,
                                  int* ctc_loss_algo_id) {
@@ -2343,9 +2343,9 @@ class DnnSupport {
   virtual port::Status DoCtcLoss(
       Stream* stream, dnn::DataType element_type,
       const RnnStateTensorDescriptor& probs_desc,
-      const DeviceMemoryBase probs_data, absl::Span<const int> labels_data,
-      absl::Span<const int> labels_lengths_data,
-      absl::Span<const int> input_lengths_data, DeviceMemoryBase costs_data,
+      const DeviceMemoryBase probs_data, abslx::Span<const int> labels_data,
+      abslx::Span<const int> labels_lengths_data,
+      abslx::Span<const int> input_lengths_data, DeviceMemoryBase costs_data,
       const RnnStateTensorDescriptor& grads_desc, DeviceMemoryBase grads_data,
       DeviceMemory<uint8> scratch_memory, int ctc_loss_algo_id);
 
@@ -2353,9 +2353,9 @@ class DnnSupport {
   bool DoCtcLoss(Stream* stream,
                  const dnn::RnnStateTensorDescriptor& probs_desc,
                  const DeviceMemory<ElementType>& probs_data,
-                 absl::Span<const int> labels_data,
-                 absl::Span<const int> labels_lengths_data,
-                 absl::Span<const int> input_lengths_data,
+                 abslx::Span<const int> labels_data,
+                 abslx::Span<const int> labels_lengths_data,
+                 abslx::Span<const int> input_lengths_data,
                  DeviceMemory<ElementType>* costs_data,
                  const dnn::RnnStateTensorDescriptor& grads_desc,
                  DeviceMemory<ElementType>* grads_data,
@@ -2633,9 +2633,9 @@ class DnnSupport {
       Stream* stream, DataType element_type,
       const RnnStateTensorDescriptor& probs_desc,
       const RnnStateTensorDescriptor& grads_desc,
-      absl::Span<const int> labels_data,
-      absl::Span<const int> labels_lengths_data,
-      absl::Span<const int> input_lengths_data,
+      abslx::Span<const int> labels_data,
+      abslx::Span<const int> labels_lengths_data,
+      abslx::Span<const int> input_lengths_data,
       ScratchAllocator* scratch_allocator, DeviceMemory<uint8>* scratch_memory,
       int* ctc_loss_algo_id) {
     *scratch_memory = {};

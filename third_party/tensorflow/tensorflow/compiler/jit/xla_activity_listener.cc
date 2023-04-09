@@ -24,7 +24,7 @@ namespace tensorflow {
 namespace {
 // The list of all registered `XlaActivityListener`s.
 struct XlaActivityListenerList {
-  absl::Mutex mutex;
+  abslx::Mutex mutex;
   std::vector<std::unique_ptr<XlaActivityListener>> listeners
       TF_GUARDED_BY(mutex);
 };
@@ -41,7 +41,7 @@ XlaActivityListenerList* GetXlaActivityListenerList() {
 template <typename FnTy>
 Status ForEachListener(FnTy fn) {
   XlaActivityListenerList* listener_list = GetXlaActivityListenerList();
-  absl::ReaderMutexLock reader_lock(&listener_list->mutex);
+  abslx::ReaderMutexLock reader_lock(&listener_list->mutex);
 
   for (const std::unique_ptr<XlaActivityListener>& listener :
        listener_list->listeners) {
@@ -92,7 +92,7 @@ Status BroadcastOptimizationRemark(
 void RegisterXlaActivityListener(
     std::unique_ptr<XlaActivityListener> listener) {
   XlaActivityListenerList* listener_list = GetXlaActivityListenerList();
-  absl::WriterMutexLock writer_lock(&listener_list->mutex);
+  abslx::WriterMutexLock writer_lock(&listener_list->mutex);
 
   listener_list->listeners.push_back(std::move(listener));
 }

@@ -31,9 +31,9 @@
 #include "absl/time/time.h"
 
 // In this test we explicitly avoid the use of synchronization
-// primitives which might use PerThreadSem, most notably absl::Mutex.
+// primitives which might use PerThreadSem, most notably abslx::Mutex.
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
@@ -94,7 +94,7 @@ class PerThreadSemTest : public testing::Test {
     ThreadData t;
     t.num_iterations = kNumIterations;
     t.timeout = timeout ?
-        KernelTimeout(absl::Now() + absl::Seconds(10000))  // far in the future
+        KernelTimeout(abslx::Now() + abslx::Seconds(10000))  // far in the future
         : KernelTimeout::Never();
     t.identity1 = GetOrCreateCurrentThreadIdentity();
 
@@ -108,7 +108,7 @@ class PerThreadSemTest : public testing::Test {
     int64_t min_cycles = std::numeric_limits<int64_t>::max();
     int64_t total_cycles = 0;
     for (int i = 0; i < kNumIterations; ++i) {
-      absl::SleepFor(absl::Milliseconds(20));
+      abslx::SleepFor(abslx::Milliseconds(20));
       int64_t cycles = base_internal::CycleClock::Now();
       Post(t.identity2);
       Wait(t.timeout);
@@ -118,7 +118,7 @@ class PerThreadSemTest : public testing::Test {
     }
     std::string out = StrCat(
         msg, "min cycle count=", min_cycles, " avg cycle count=",
-        absl::SixDigits(static_cast<double>(total_cycles) / kNumIterations));
+        abslx::SixDigits(static_cast<double>(total_cycles) / kNumIterations));
     printf("%s\n", out.c_str());
 
     partner_thread.join();
@@ -133,7 +133,7 @@ class PerThreadSemTest : public testing::Test {
   }
 
   // convenience overload
-  static bool Wait(absl::Time t) {
+  static bool Wait(abslx::Time t) {
     return Wait(KernelTimeout(t));
   }
 
@@ -153,20 +153,20 @@ TEST_F(PerThreadSemTest, WithTimeout) {
 }
 
 TEST_F(PerThreadSemTest, Timeouts) {
-  const absl::Duration delay = absl::Milliseconds(50);
-  const absl::Time start = absl::Now();
+  const abslx::Duration delay = abslx::Milliseconds(50);
+  const abslx::Time start = abslx::Now();
   EXPECT_FALSE(Wait(start + delay));
-  const absl::Duration elapsed = absl::Now() - start;
+  const abslx::Duration elapsed = abslx::Now() - start;
   // Allow for a slight early return, to account for quality of implementation
   // issues on various platforms.
-  const absl::Duration slop = absl::Microseconds(200);
+  const abslx::Duration slop = abslx::Microseconds(200);
   EXPECT_LE(delay - slop, elapsed)
       << "Wait returned " << delay - elapsed
       << " early (with " << slop << " slop), start time was " << start;
 
-  absl::Time negative_timeout = absl::UnixEpoch() - absl::Milliseconds(100);
+  abslx::Time negative_timeout = abslx::UnixEpoch() - abslx::Milliseconds(100);
   EXPECT_FALSE(Wait(negative_timeout));
-  EXPECT_LE(negative_timeout, absl::Now() + slop);  // trivially true :)
+  EXPECT_LE(negative_timeout, abslx::Now() + slop);  // trivially true :)
 
   Post(GetOrCreateCurrentThreadIdentity());
   // The wait here has an expired timeout, but we have a wake to consume,
@@ -178,4 +178,4 @@ TEST_F(PerThreadSemTest, Timeouts) {
 
 }  // namespace synchronization_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

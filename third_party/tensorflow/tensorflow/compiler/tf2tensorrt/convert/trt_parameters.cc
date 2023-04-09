@@ -63,7 +63,7 @@ Status TrtPrecisionModeFromName(const string& name, TrtPrecisionMode* mode) {
 string DebugString(const TrtPrecisionMode mode) {
   string mode_str;
   TF_CHECK_OK(TrtPrecisionModeToName(mode, &mode_str));
-  return absl::StrCat("TrtPrecisionMode::", mode_str);
+  return abslx::StrCat("TrtPrecisionMode::", mode_str);
 }
 
 string ProfileStrategyToName(const ProfileStrategy strategy) {

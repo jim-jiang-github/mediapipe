@@ -25,19 +25,19 @@ struct TransformTensorBilinearAttributes {
 
 class TransformTensorBilinearOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final;
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final;
 };
 
-absl::Status ParseTransformTensorBilinearV1Attributes(
+abslx::Status ParseTransformTensorBilinearV1Attributes(
     const void* data, uint32_t data_size,
     TransformTensorBilinearAttributes* attr, BHWC* output_shape);
 
-absl::Status ParseTransformTensorBilinearV2Attributes(
+abslx::Status ParseTransformTensorBilinearV2Attributes(
     const void* data, uint32_t data_size,
     TransformTensorBilinearAttributes* attr, BHWC* output_shape);
 

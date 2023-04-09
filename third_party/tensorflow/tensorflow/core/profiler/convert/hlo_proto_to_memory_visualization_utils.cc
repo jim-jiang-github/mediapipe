@@ -42,7 +42,7 @@ namespace tensorflow {
 namespace profiler {
 namespace {
 
-using absl::StrFormat;
+using abslx::StrFormat;
 using ::xla::BufferAllocationProto;
 using ::xla::HloInstructionProto;
 using ::xla::HloProto;
@@ -80,9 +80,9 @@ std::string GetInstructionName(const LogicalBufferProto* logical_buffer) {
   if (logical_buffer->defined_at().shape_index().empty()) {
     return logical_buffer->defined_at().instruction_name();
   } else {
-    return absl::StrCat(
+    return abslx::StrCat(
         logical_buffer->defined_at().instruction_name(), "{",
-        absl::StrJoin(logical_buffer->defined_at().shape_index(), ""), "}");
+        abslx::StrJoin(logical_buffer->defined_at().shape_index(), ""), "}");
   }
 }
 
@@ -135,7 +135,7 @@ BufferSpan MakeBufferSpan(int32 start, int32 limit) {
 }
 
 const Shape* ResolveShapeIndex(const Shape* shape,
-                               absl::Span<const int64_t> shape_index) {
+                               abslx::Span<const int64_t> shape_index) {
   for (int64_t value : shape_index) {
     shape = &shape->tuple_shapes(value);
   }
@@ -155,9 +155,9 @@ int64_t UnpaddedSize(Shape shape) {
 }
 
 void Convert(const xla::BufferAllocationProto_Assigned& assigned,
-             const absl::flat_hash_map<int64_t, const LogicalBufferProto*>&
+             const abslx::flat_hash_map<int64_t, const LogicalBufferProto*>&
                  id_to_logical_buffer,
-             const absl::node_hash_map<std::string, const HloInstructionProto*>&
+             const abslx::node_hash_map<std::string, const HloInstructionProto*>&
                  name_to_hlo,
              LogicalBuffer* result) {
   result->set_id(assigned.logical_buffer_id()),
@@ -178,9 +178,9 @@ bool IsReusable(const BufferAllocationProto& buffer_allocation) {
 }
 
 void Convert(const BufferAllocationProto& proto,
-             const absl::flat_hash_map<int64_t, const LogicalBufferProto*>&
+             const abslx::flat_hash_map<int64_t, const LogicalBufferProto*>&
                  id_to_logical_buffer,
-             const absl::node_hash_map<std::string, const HloInstructionProto*>&
+             const abslx::node_hash_map<std::string, const HloInstructionProto*>&
                  name_to_hlo,
              BufferAllocation* result) {
   result->set_id(proto.index());
@@ -215,12 +215,12 @@ void Convert(const BufferAllocationProto& proto,
 }
 
 void NoteSpecialAllocations(
-    const absl::flat_hash_set<const BufferAllocationProto*>&
+    const abslx::flat_hash_set<const BufferAllocationProto*>&
         all_buffer_allocations,
-    const absl::flat_hash_map<int64_t, const LogicalBufferProto*>&
+    const abslx::flat_hash_map<int64_t, const LogicalBufferProto*>&
         id_to_logical_buffer,
 
-    const absl::node_hash_map<std::string, const HloInstructionProto*>&
+    const abslx::node_hash_map<std::string, const HloInstructionProto*>&
         name_to_hlo,
     int64_t small_buffer_size, PreprocessResult* result) {
   int64_t entry_parameters_bytes = 0;
@@ -254,11 +254,11 @@ void NoteSpecialAllocations(
 
 }  // namespace
 
-absl::StatusOr<PreprocessResult> ConvertHloProtoToPreprocessResult(
+abslx::StatusOr<PreprocessResult> ConvertHloProtoToPreprocessResult(
     const HloProto& hlo_proto, int64_t small_buffer_size,
     int64_t heap_simulator_trace_id, int64_t memory_color) {
   // Construct a mapping from name to HLO proto.
-  absl::node_hash_map<std::string, const HloInstructionProto*> name_to_hlo;
+  abslx::node_hash_map<std::string, const HloInstructionProto*> name_to_hlo;
   for (const auto& computation : hlo_proto.hlo_module().computations()) {
     for (const auto& instruction : computation.instructions()) {
       name_to_hlo[instruction.name()] = &instruction;
@@ -268,8 +268,8 @@ absl::StatusOr<PreprocessResult> ConvertHloProtoToPreprocessResult(
 
   // Mapping from logical buffer ID to logical buffer, and set of all logical
   // buffer protos.
-  absl::flat_hash_map<int64_t, const LogicalBufferProto*> id_to_logical_buffer;
-  absl::flat_hash_set<const LogicalBufferProto*> all_logical_buffers;
+  abslx::flat_hash_map<int64_t, const LogicalBufferProto*> id_to_logical_buffer;
+  abslx::flat_hash_set<const LogicalBufferProto*> all_logical_buffers;
   for (const auto& logical_buffer :
        hlo_proto.buffer_assignment().logical_buffers()) {
     VLOG(1) << "Logical buffer: " << logical_buffer.ShortDebugString();
@@ -282,12 +282,12 @@ absl::StatusOr<PreprocessResult> ConvertHloProtoToPreprocessResult(
   //
   // Also a reverse mapping from buffer allocation proto to the set of logical
   // buffer protos that exist inside of it.
-  absl::flat_hash_map<const LogicalBufferProto*, const BufferAllocationProto*>
+  abslx::flat_hash_map<const LogicalBufferProto*, const BufferAllocationProto*>
       logical_buffer_to_buffer_allocation;
-  absl::node_hash_map<const BufferAllocationProto*,
-                      absl::flat_hash_set<const LogicalBufferProto*>>
+  abslx::node_hash_map<const BufferAllocationProto*,
+                      abslx::flat_hash_set<const LogicalBufferProto*>>
       buffer_allocation_to_logical_buffers;
-  absl::flat_hash_set<const BufferAllocationProto*> all_buffer_allocations;
+  abslx::flat_hash_set<const BufferAllocationProto*> all_buffer_allocations;
   for (const BufferAllocationProto& buffer_allocation :
        hlo_proto.buffer_assignment().buffer_allocations()) {
     all_buffer_allocations.insert(&buffer_allocation);
@@ -300,7 +300,7 @@ absl::StatusOr<PreprocessResult> ConvertHloProtoToPreprocessResult(
       auto insert_result = logical_buffer_to_buffer_allocation.insert(
           {logical_buffer, &buffer_allocation});
       if (!insert_result.second) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "A logical buffer appears to be associated with multiple buffer "
             "allocations.");
       }
@@ -319,10 +319,10 @@ absl::StatusOr<PreprocessResult> ConvertHloProtoToPreprocessResult(
   std::vector<double> heap_sizes;
   std::vector<double> unpadded_heap_sizes;
 
-  absl::node_hash_map<int64_t, std::pair<int64_t, absl::optional<int64_t>>>
+  abslx::node_hash_map<int64_t, std::pair<int64_t, abslx::optional<int64_t>>>
       logical_buffer_spans;
-  absl::flat_hash_set<const LogicalBufferProto*> seen;
-  absl::flat_hash_set<const BufferAllocationProto*> seen_buffer_allocations;
+  abslx::flat_hash_set<const LogicalBufferProto*> seen;
+  abslx::flat_hash_set<const BufferAllocationProto*> seen_buffer_allocations;
 
   // Run through all the simulator events in the given trace, and simulate the
   // heap in order to find the point of peak memory usage and record its
@@ -373,12 +373,12 @@ absl::StatusOr<PreprocessResult> ConvertHloProtoToPreprocessResult(
         unpadded_heap_size_bytes -= UnpaddedSize(*shape);
         logical_buffer_spans[event.buffer_id()].second = heap_sizes.size() - 1;
         if (heap_size_bytes < 0) {
-          return absl::InvalidArgumentError(absl::StrCat(
+          return abslx::InvalidArgumentError(abslx::StrCat(
               "heap_size_bytes should be non-negative: ", heap_size_bytes));
         }
       } else {
-        return absl::InvalidArgumentError(
-            absl::StrCat("Unhandled event kind: ", event.kind()));
+        return abslx::InvalidArgumentError(
+            abslx::StrCat("Unhandled event kind: ", event.kind()));
       }
     }
 
@@ -387,8 +387,8 @@ absl::StatusOr<PreprocessResult> ConvertHloProtoToPreprocessResult(
     unpadded_heap_sizes.push_back(BytesToMiB(unpadded_heap_size_bytes));
 
     if (seen_buffer_allocations.size() != 1) {
-      return absl::InvalidArgumentError(
-          absl::StrCat("All heap simulation should work out of a single buffer "
+      return abslx::InvalidArgumentError(
+          abslx::StrCat("All heap simulation should work out of a single buffer "
                        "allocation, actual seen_buffer_allocations.size():",
                        seen_buffer_allocations.size()));
     }
@@ -398,7 +398,7 @@ absl::StatusOr<PreprocessResult> ConvertHloProtoToPreprocessResult(
           << " logical buffers alive at point of peak heap usage.";
 
   VLOG(1) << "Peak logical buffers: ["
-          << absl::StrJoin(peak_logical_buffers, ",") << "]";
+          << abslx::StrJoin(peak_logical_buffers, ",") << "]";
 
   int64_t indefinite_memory_usage_bytes = 0;
   std::vector<HeapObject> max_heap;
@@ -434,7 +434,7 @@ absl::StatusOr<PreprocessResult> ConvertHloProtoToPreprocessResult(
   // Now look for all logical buffers which have not been seen, and assume they
   // have indefinite lifetime if they are not in thread-local buffer
   // allocations.
-  absl::flat_hash_set<const LogicalBufferProto*> unseen;
+  abslx::flat_hash_set<const LogicalBufferProto*> unseen;
   for (const LogicalBufferProto* logical_buffer : all_logical_buffers) {
     if (!seen.contains(logical_buffer)) {
       unseen.insert(logical_buffer);
@@ -566,7 +566,7 @@ absl::StatusOr<PreprocessResult> ConvertHloProtoToPreprocessResult(
 // during preprocess.
 int64_t GetHeapSimulatorTraceIdFromEvents(const HloProto& proto,
                                           int64_t memory_color) {
-  absl::flat_hash_map<int64_t, const xla::LogicalBufferProto*>
+  abslx::flat_hash_map<int64_t, const xla::LogicalBufferProto*>
       id_to_logical_buffer;
   for (const auto& logical_buffer :
        proto.buffer_assignment().logical_buffers()) {
@@ -601,7 +601,7 @@ int64_t GetHeapSimulatorTraceIdFromEvents(const HloProto& proto,
 // buffer_allocation_index.
 int64_t GetHeapSimulatorTraceIdFromBufferAllocationIndex(const HloProto& proto,
                                                          int64_t memory_color) {
-  absl::flat_hash_map<int64_t, const xla::BufferAllocationProto*>
+  abslx::flat_hash_map<int64_t, const xla::BufferAllocationProto*>
       id_to_buffer_allocation;
   for (const auto& buffer_allocation :
        proto.buffer_assignment().buffer_allocations()) {

@@ -41,7 +41,7 @@ limitations under the License.
 namespace mlir {
 namespace lite {
 
-std::string TfLiteToMlir(const absl::string_view tflite_op_name) {
+std::string TfLiteToMlir(const abslx::string_view tflite_op_name) {
   llvm::StringRef op_name(tflite_op_name.data(), tflite_op_name.size());
   return llvm::Twine("tfl.", op_name.lower()).str();
 }

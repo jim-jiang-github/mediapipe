@@ -103,13 +103,13 @@ bool ContainsKey(const Collection& collection, const Key& key) {
 
 // Returns a function that returns whether the map contains the given key.
 template <class Key, class Value>
-auto IsKeyIn(const absl::flat_hash_map<Key, Value>& map) {
+auto IsKeyIn(const abslx::flat_hash_map<Key, Value>& map) {
   return [&](const Key& key) { return map.contains(key); };
 }
 
 // Returns a function that returns whether the set contains the given value.
 template <class T>
-auto IsValueIn(const absl::flat_hash_set<T>& set) {
+auto IsValueIn(const abslx::flat_hash_set<T>& set) {
   return [&](const T& value) { return set.contains(value); };
 }
 

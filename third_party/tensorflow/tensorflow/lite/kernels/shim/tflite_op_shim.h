@@ -42,7 +42,7 @@ class TfLiteInitContext : public InitContext<TfLiteInitContext> {
   TfLiteInitContext(const TfLiteContext* context,
                     const flexbuffers::Map* attr_map);
   // Read a given attribute
-  absl::StatusOr<AttrValue> GetAttr(const std::string& attr_name) const;
+  abslx::StatusOr<AttrValue> GetAttr(const std::string& attr_name) const;
 
  private:
   const flexbuffers::Map* attr_map_;
@@ -62,7 +62,7 @@ class TfLiteInvokeContext : public InvokeContext<TfLiteInvokeContext> {
   int NumOutputs() const;
 
  private:
-  absl::Status AssertShapesEqual(const TfLiteIntArray* dims,
+  abslx::Status AssertShapesEqual(const TfLiteIntArray* dims,
                                  const Shape& output_shape) const;
 
   std::string ShapeMismatchErrorMsg(const TfLiteIntArray* actual_shape,
@@ -82,11 +82,11 @@ class TfLiteShapeInferenceContext
   // Read an input tensor shape
   ShapeOr GetInputShape(const int idx) const;
   // Set an output tensor shape
-  absl::Status SetOutputShape(const int idx, const Shape& shape);
+  abslx::Status SetOutputShape(const int idx, const Shape& shape);
   // Read an input tensor during shape inference
   ConstTensorViewOr GetInputTensor(const int idx) const;
   // Read a given attribute
-  absl::StatusOr<AttrValue> GetAttr(const std::string& attr_name) const;
+  abslx::StatusOr<AttrValue> GetAttr(const std::string& attr_name) const;
   // Number of input tensors
   int NumInputs() const;
   // Number of output tensors
@@ -99,9 +99,9 @@ class TfLiteShapeInferenceContext
   std::vector<Shape>* inferred_shapes_;
 };
 
-// Convert the absl::Status to a TfLiteStatus and report the error message.
+// Convert the abslx::Status to a TfLiteStatus and report the error message.
 TfLiteStatus StatusToTfLiteStatus(TfLiteContext* context,
-                                  const absl::Status& status);
+                                  const abslx::Status& status);
 
 // Converts a vector of dims into an int array for TFLite use.
 TfLiteIntArray* ShapeToTfLiteShape(const std::vector<int>& shape);

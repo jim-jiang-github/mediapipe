@@ -38,7 +38,7 @@ struct NcclCollectivePermuteConfig {
   };
 
   using IdToSourceTargetMap =
-      absl::flat_hash_map<int64_t, SourceTargetMapEntry>;
+      abslx::flat_hash_map<int64_t, SourceTargetMapEntry>;
 
   // Returns the source and target ID corresponding to the given ID (these IDs
   // are replica_ids for cross replica permute or partition_ids for cross
@@ -95,7 +95,7 @@ class NcclCollectivePermuteThunk : public NcclCollectiveThunk {
 Status RunCollectivePermute(
     NcclCollectivePermuteConfig::SourceTargetMapEntry source_target,
     DeviceBufferPair& buffer, se::Stream& stream, ncclComm_t comm,
-    absl::string_view device_string, int64_t current_id);
+    abslx::string_view device_string, int64_t current_id);
 
 }  // namespace gpu
 }  // namespace xla

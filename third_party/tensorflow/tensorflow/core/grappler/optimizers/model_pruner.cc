@@ -102,7 +102,7 @@ bool IsOutputPortRefValue(const NodeDef& node, int port_id,
 }
 
 bool CanRemoveNode(const NodeDef& node, const GraphView& graph_view,
-                   const absl::flat_hash_set<string>& function_names,
+                   const abslx::flat_hash_set<string>& function_names,
                    const OpRegistryInterface& op_registry) {
   if (IsNoOp(node) &&
       (node.input().empty() ||
@@ -143,9 +143,9 @@ bool CanRemoveNode(const NodeDef& node, const GraphView& graph_view,
 
 void ForwardInputsInternal(
     const NodeDef& node,
-    const absl::flat_hash_set<const NodeDef*>& nodes_to_delete,
+    const abslx::flat_hash_set<const NodeDef*>& nodes_to_delete,
     bool add_as_control, NodeDef* new_node,
-    const absl::flat_hash_map<string, const NodeDef*>& optimized_nodes,
+    const abslx::flat_hash_map<string, const NodeDef*>& optimized_nodes,
     const GraphView& graph_view) {
   // To speed things up, use the optimized version of the node if
   // available.
@@ -177,9 +177,9 @@ void ForwardInputsInternal(
 }
 
 void ForwardInputs(const NodeDef& original_node,
-                   const absl::flat_hash_set<const NodeDef*>& nodes_to_delete,
+                   const abslx::flat_hash_set<const NodeDef*>& nodes_to_delete,
                    NodeDef* new_node,
-                   absl::flat_hash_map<string, const NodeDef*>* optimized_nodes,
+                   abslx::flat_hash_map<string, const NodeDef*>* optimized_nodes,
                    const GraphView& graph_view) {
   // Forwards inputs of nodes to be deleted to their respective outputs.
   ForwardInputsInternal(original_node, nodes_to_delete,
@@ -199,7 +199,7 @@ void ForwardInputs(const NodeDef& original_node,
   DedupControlInputs(new_node);
 }
 
-absl::flat_hash_map<string, absl::flat_hash_set<int>> IdentityNTerminalPorts(
+abslx::flat_hash_map<string, abslx::flat_hash_set<int>> IdentityNTerminalPorts(
     const NodeMap& node_map, const std::vector<string>& terminal_nodes,
     int graph_size) {
   // Determines which ports for IdentityN nodes (that can be rewritten) lead to
@@ -208,7 +208,7 @@ absl::flat_hash_map<string, absl::flat_hash_set<int>> IdentityNTerminalPorts(
   to_visit.reserve(graph_size);
   // Set terminal nodes as visited so terminal nodes that may be IdentityN don't
   // get pruned later on.
-  absl::flat_hash_set<string> visited(terminal_nodes.begin(),
+  abslx::flat_hash_set<string> visited(terminal_nodes.begin(),
                                       terminal_nodes.end());
   for (const string& terminal_node : terminal_nodes) {
     NodeDef* node = node_map.GetNode(terminal_node);
@@ -220,7 +220,7 @@ absl::flat_hash_map<string, absl::flat_hash_set<int>> IdentityNTerminalPorts(
     }
   }
 
-  absl::flat_hash_set<string> identity_n_fanouts;
+  abslx::flat_hash_set<string> identity_n_fanouts;
   while (!to_visit.empty()) {
     string curr = to_visit.back();
     to_visit.pop_back();
@@ -255,7 +255,7 @@ absl::flat_hash_map<string, absl::flat_hash_set<int>> IdentityNTerminalPorts(
     }
   }
 
-  absl::flat_hash_map<string, absl::flat_hash_set<int>> identity_n_ports;
+  abslx::flat_hash_map<string, abslx::flat_hash_set<int>> identity_n_ports;
   for (const auto& fanout : identity_n_fanouts) {
     int pos;
     string node_name = ParseNodeName(fanout, &pos);
@@ -297,7 +297,7 @@ string NewIdentityFromIdentityN(int pos, const NodeDef& identity_n,
 
 Status RewriteIdentityNAndInputsOutputs(
     NodeDef* node, int num_non_control_inputs,
-    const absl::flat_hash_set<int>& terminal_ports, GraphDef* graph,
+    const abslx::flat_hash_set<int>& terminal_ports, GraphDef* graph,
     NodeMap* node_map) {
   // Rewrite IdentityN node and associated inputs and outputs. For inputs and
   // outputs that don't lead to a terminal node, a new Identity node is created
@@ -310,8 +310,8 @@ Status RewriteIdentityNAndInputsOutputs(
     string output;
   };
 
-  absl::flat_hash_map<int, int> terminal_input_pos;
-  absl::flat_hash_map<int, string> new_identities;
+  abslx::flat_hash_map<int, int> terminal_input_pos;
+  abslx::flat_hash_map<int, string> new_identities;
   int new_idx = 0;
   for (int i = 0; i < num_non_control_inputs; i++) {
     if (terminal_ports.find(i) != terminal_ports.end()) {
@@ -451,14 +451,14 @@ Status ModelPruner::Optimize(Cluster* cluster, const GrapplerItem& item,
   }
 
   GraphView graph_view(pruned_graph);
-  absl::flat_hash_set<string> function_names;
+  abslx::flat_hash_set<string> function_names;
   for (const auto& function : item.graph.library().function()) {
     function_names.insert(function.signature().name());
   }
   OpRegistryInterface* op_registry = OpRegistry::Global();
 
   // Check if we can further prune the graph, by removing the trivial ops.
-  absl::flat_hash_set<const NodeDef*> nodes_to_delete;
+  abslx::flat_hash_set<const NodeDef*> nodes_to_delete;
   for (int i = 0; i < pruned_graph->node_size(); ++i) {
     NodeDef* node = pruned_graph->mutable_node(i);
     // Remove redundant control inputs, since they may prevent pruning below.
@@ -508,7 +508,7 @@ Status ModelPruner::Optimize(Cluster* cluster, const GrapplerItem& item,
   }
 
   const bool fetches_are_known = !item.fetch.empty();
-  absl::flat_hash_map<string, const NodeDef*> optimized_nodes;
+  abslx::flat_hash_map<string, const NodeDef*> optimized_nodes;
   optimized_graph->mutable_node()->Reserve(pruned_graph->node_size());
   for (const auto& node : pruned_graph->node()) {
     if (!fetches_are_known ||

@@ -63,10 +63,10 @@ limitations under the License.
 namespace xla {
 namespace {
 
-using absl::StrAppend;
-using absl::StrCat;
-using absl::StrFormat;
-using absl::StrJoin;
+using abslx::StrAppend;
+using abslx::StrCat;
+using abslx::StrFormat;
+using abslx::StrJoin;
 using std::nullopt;
 using std::optional;
 
@@ -214,8 +214,8 @@ std::string NodeColorAttributes(ColorScheme color) {
 
 // Replaces <> with &lt;&gt;, so that this string is safe(er) for use in a
 // graphviz HTML-like string.
-std::string HtmlLikeStringSanitize(absl::string_view s) {
-  return absl::StrReplaceAll(s, {{"<", "&lt;"}, {">", "&gt;"}});
+std::string HtmlLikeStringSanitize(abslx::string_view s) {
+  return abslx::StrReplaceAll(s, {{"<", "&lt;"}, {">", "&gt;"}});
 }
 
 bool IsFusedBroadcastOfConstantEffectiveScalar(const HloInstruction* instr) {
@@ -327,7 +327,7 @@ optional<std::string> MatchTrivialComputation(
 // Encapsulates logic for dumping an HLO module to DOT (i.e. graphviz syntax).
 class HloDotDumper {
  public:
-  HloDotDumper(const HloComputation* computation, absl::string_view label,
+  HloDotDumper(const HloComputation* computation, abslx::string_view label,
                const DebugOptions& debug_options,
                HloRenderOptions hlo_render_options,
                const HloExecutionProfile* profile, NodeFilter filter)
@@ -425,7 +425,7 @@ class HloDotDumper {
   // Each HloInstruction dumped gets a monotonically-increasing node ID.  This
   // must start at 1, because that's where graphviz's accounting starts.
   int64_t next_node_id_ = 1;
-  absl::flat_hash_map<const HloInstruction*, int64_t> node_ids_;
+  abslx::flat_hash_map<const HloInstruction*, int64_t> node_ids_;
 
   // The "root" tag doesn't have an associated HloInstruction pointer, so we
   // need to store it outside the map.
@@ -437,12 +437,12 @@ class HloDotDumper {
   int64_t next_edge_id_ = 1;
   std::unordered_multimap<
       std::pair<const HloInstruction*, const HloInstruction*>, int64_t,
-      absl::Hash<std::pair<const HloInstruction*, const HloInstruction*>>>
+      abslx::Hash<std::pair<const HloInstruction*, const HloInstruction*>>>
       edge_ids_;
 
   // Each HloComputation that's emitted gets a monotonically-increasing ID.
   int64_t next_cluster_id_ = 1;
-  absl::flat_hash_map<const HloComputation*, int64_t> cluster_ids_;
+  abslx::flat_hash_map<const HloComputation*, int64_t> cluster_ids_;
 
   // Edges to print from Footer().  Edges come at the end because graphviz is
   // unhappy if an edge from a subcomputation to a node in the outer computation
@@ -452,7 +452,7 @@ class HloDotDumper {
 
   // When coloring by sharding information, we track the sharding string
   // representation to color association, by round-robin the color schemes.
-  absl::flat_hash_map<HloSharding, ColorScheme> sharding_colors_;
+  abslx::flat_hash_map<HloSharding, ColorScheme> sharding_colors_;
   int64_t next_shard_color_ = 0;
 };
 
@@ -502,7 +502,7 @@ stylesheet=<
   }
   if (profile_ != nullptr) {
     auto cycles = profile_->total_cycles_executed(*computation_);
-    absl::StrAppendFormat(&graph_label, "<br/>total cycles = %d (%s)", cycles,
+    abslx::StrAppendFormat(&graph_label, "<br/>total cycles = %d (%s)", cycles,
                           tensorflow::strings::HumanReadableNum(cycles));
   }
 
@@ -585,7 +585,7 @@ stylesheet=<
   // need to escape '#'.
   return StrFormat(
       fmt, graph_label,
-      absl::StrReplaceAll(StrJoin(edge_css_rules, "\n"), {{"#", "%23"}}));
+      abslx::StrReplaceAll(StrJoin(edge_css_rules, "\n"), {{"#", "%23"}}));
 }
 
 std::string HloDotDumper::Footer() {
@@ -613,7 +613,7 @@ bool HloDotDumper::ShouldShowSubcomputation(const HloComputation* subcomp) {
   }
 
   // Show the subcomputation if we're showing any of its members.
-  return absl::c_any_of(
+  return abslx::c_any_of(
       subcomp->instructions(),
       [&](const HloInstruction* instr) { return filter_.Show(instr); });
 }
@@ -791,11 +791,11 @@ bool HloDotDumper::ShouldMergeIntoUsers(const HloInstruction* instr) const {
   const int kMinUsersToOmit = 3;
   return instr->opcode() == HloOpcode::kParameter && instr->shape().IsTuple() &&
          !instr->IsFused() &&
-         absl::c_count_if(instr->users(),
+         abslx::c_count_if(instr->users(),
                           [&](const HloInstruction* user) {
                             return filter_.Show(user);
                           }) > kMinUsersToOmit &&
-         absl::c_all_of(instr->users(), [&](const HloInstruction* user) {
+         abslx::c_all_of(instr->users(), [&](const HloInstruction* user) {
            return !filter_.Show(user) ||
                   user->opcode() == HloOpcode::kGetTupleElement;
          });
@@ -897,7 +897,7 @@ std::string HloDotDumper::GetInstructionNodeInlinedOperands(
 
     // Otherwise, print e.g. "%constant.42 (s32[100])".
     std::string constant_name;
-    if (absl::StartsWith(constant->name(), "constant")) {
+    if (abslx::StartsWith(constant->name(), "constant")) {
       constant_name = constant->name();
     } else {
       constant_name = StrCat("constant ", constant->name());
@@ -988,7 +988,7 @@ ColorScheme HloDotDumper::GetInstructionColor(const HloInstruction* instr) {
   // the same color as a parameter.  Unless the merged-in parameter is a
   // parameter to a fusion node that is bound to a constant -- these aren't
   // "real" parameters from the user's perspective.
-  if (absl::c_any_of(instr->operands(), [&](const HloInstruction* operand) {
+  if (abslx::c_any_of(instr->operands(), [&](const HloInstruction* operand) {
         return operand->opcode() == HloOpcode::kParameter &&
                ShouldMergeIntoUsers(operand) &&
                TryGetFusionParameterConstant(operand) == nullptr;
@@ -1178,7 +1178,7 @@ std::string HloDotDumper::GetInstructionNodeLabel(const HloInstruction* instr) {
 
   // The HLO instruction name contains usually the opcode, e.g. "%add.42" is
   // an add instruction.  In this case we render just the name.
-  if (absl::StartsWith(instr->name(), HloOpcodeString(instr->opcode()))) {
+  if (abslx::StartsWith(instr->name(), HloOpcodeString(instr->opcode()))) {
     return StrFormat("<b>%s</b>", HtmlLikeStringSanitize(instr->name()));
   }
   std::string extended_opcode =
@@ -1250,7 +1250,7 @@ ExtractGemmBackendConfigProps(const gpu::GemmBackendConfig& config,
     props.emplace_back("beta", StrCat(config.beta()));
   }
   props.emplace_back(
-      "", absl::StrReplaceAll(
+      "", abslx::StrReplaceAll(
               DotDimensionNumbersToString(config.dot_dimension_numbers()),
               {{", ", "<br/>"}}));
   if (config.algorithm_case() == gpu::GemmBackendConfig::kSelectedAlgorithm) {
@@ -1317,8 +1317,8 @@ std::string HloDotDumper::GetInstructionNodeExtraInfo(
     // Some instructions have giant device identifier fields, so truncate their
     // length to 128.
     constexpr int kMaxDeviceIdFieldLen = 128;
-    if ((absl::StartsWith(line, "replica_groups=") ||
-         absl::StartsWith(line, "source_target_pairs=")) &&
+    if ((abslx::StartsWith(line, "replica_groups=") ||
+         abslx::StartsWith(line, "source_target_pairs=")) &&
         line.length() > kMaxDeviceIdFieldLen) {
       lines.push_back(HtmlLikeStringSanitize(
           StrCat(line.substr(0, kMaxDeviceIdFieldLen - 3), "...")));
@@ -1351,7 +1351,7 @@ std::string HloDotDumper::GetInstructionNodeExtraInfo(
     constexpr int kMaxShapeLen = 64;
     if (instr_shape.length() > kMaxShapeLen) {
       instr_shape = StrCat(
-          absl::string_view(instr_shape).substr(0, kMaxShapeLen - 3), "...");
+          abslx::string_view(instr_shape).substr(0, kMaxShapeLen - 3), "...");
     }
     lines.push_back(HtmlLikeStringSanitize(instr_shape));
   }
@@ -1467,10 +1467,10 @@ const HloInstruction* HloDotDumper::GetNodeForEdge(
 // root is <= radius.
 NodeFilter MakeNodeRadiusAroundFilter(
     const HloInstruction* root, int64_t radius,
-    const absl::flat_hash_set<const HloInstruction*>& boundary) {
+    const abslx::flat_hash_set<const HloInstruction*>& boundary) {
   // First, find the neighborhood of nodes with distance from root <= radius.
   // These nodes are our initial set of "normal" nodes.
-  absl::flat_hash_map<const HloInstruction*, NodeFilterResult> nodes;
+  abslx::flat_hash_map<const HloInstruction*, NodeFilterResult> nodes;
   std::deque<std::pair<const HloInstruction*, /*depth*/ int64_t>> worklist;
   worklist.push_back({root, 0});
   while (!worklist.empty()) {
@@ -1542,11 +1542,11 @@ NodeFilter MakeNodeRadiusAroundFilter(
     NodeFilterResult& filter_result = kv.second;
     const auto& operands = instr->operands();
 
-    if (absl::c_any_of(operands, is_displayed) &&
-        !absl::c_all_of(operands, is_displayed)) {
+    if (abslx::c_any_of(operands, is_displayed) &&
+        !abslx::c_all_of(operands, is_displayed)) {
       // Mark nodes with some operands omitted appropriately.
       filter_result = kSomeOperandsOmitted;
-    } else if (!operands.empty() && absl::c_none_of(operands, is_displayed)) {
+    } else if (!operands.empty() && abslx::c_none_of(operands, is_displayed)) {
       // Mark nodes with *all* operands omitted appropriately.
       filter_result = kOmitNodeOperands;
     }
@@ -1554,7 +1554,7 @@ NodeFilter MakeNodeRadiusAroundFilter(
     // Promote nodes with type kSomeUsersOmitted to kNormalNode if all of their
     // users made it into the graph.
     if (filter_result == kSomeUsersOmitted &&
-        absl::c_all_of(instr->users(), is_displayed)) {
+        abslx::c_all_of(instr->users(), is_displayed)) {
       filter_result = kNormalNode;
     }
   }
@@ -1591,8 +1591,8 @@ NodeFilter MakeNodeFromToFilter(const HloInstruction* from,
   // Djikstra's algorithm.  The only real difference is, rather than stopping
   // when we find a (shortest) path, we continue until we've found max_nodes
   // nodes on some path.
-  absl::flat_hash_set<const HloInstruction*> visited;
-  absl::flat_hash_set<const HloInstruction*> to_display = {from, to};
+  abslx::flat_hash_set<const HloInstruction*> visited;
+  abslx::flat_hash_set<const HloInstruction*> to_display = {from, to};
   while (!queue.empty() && to_display.size() < max_nodes) {
     std::vector<const HloInstruction*> path = std::move(queue.front());
     queue.pop_front();
@@ -1641,9 +1641,9 @@ static const char* kRenderDotJS = R"(
      crossorigin="anonymous"></script>
 )";
 
-std::string WrapDotInHtml(absl::string_view dot) {
+std::string WrapDotInHtml(abslx::string_view dot) {
   std::string html_prefix =
-      absl::StrReplaceAll(R"html(
+      abslx::StrReplaceAll(R"html(
 <!DOCTYPE html>
 <html>
 <head>
@@ -1745,23 +1745,23 @@ std::string WrapDotInHtml(absl::string_view dot) {
 </html>
 )html";
 
-  return absl::StrCat(html_prefix, dot, html_suffix);
+  return abslx::StrCat(html_prefix, dot, html_suffix);
 }
 
-absl::Mutex url_renderer_mu(absl::kConstInit);
-std::function<StatusOr<std::string>(absl::string_view)>* url_renderer
+abslx::Mutex url_renderer_mu(abslx::kConstInit);
+std::function<StatusOr<std::string>(abslx::string_view)>* url_renderer
     ABSL_GUARDED_BY(url_renderer_mu) = nullptr;
 
 // Storage for fusion visualization: (module_id, computation_id) -> sequence of
 // fusion states.
-absl::Mutex fusion_visualizer_state_mu(absl::kConstInit);
+abslx::Mutex fusion_visualizer_state_mu(abslx::kConstInit);
 namespace {
 
 // Fusion state: a sequence of rendered graphs in DOT formats with explanations.
 // Rendered graphs can be shared across frames, hence the storage indirection.
 struct FusionVisualizerProgress {
   // Creates a frame with a new rendered graph.
-  void AddState(absl::string_view dot, absl::string_view explanation,
+  void AddState(abslx::string_view dot, abslx::string_view explanation,
                 std::optional<std::string> to_highlight) {
     if (dot_graphs.empty() || dot_graphs.back() != dot) {
       dot_graphs.push_back(std::string(dot));
@@ -1784,7 +1784,7 @@ struct FusionVisualizerProgress {
 }  // namespace
 
 static auto& fusion_visualizer_states
-    TF_GUARDED_BY(fusion_visualizer_state_mu) = *new absl::flat_hash_map<
+    TF_GUARDED_BY(fusion_visualizer_state_mu) = *new abslx::flat_hash_map<
         std::pair<int64_t, int64_t>, FusionVisualizerProgress>();
 
 // Generates a key to the fusion visualizer state mapping.
@@ -1801,7 +1801,7 @@ static std::pair<int, int> FusionVisualizerStateKey(
 // renderer available, and this function runs only after we've done all the work
 // of producing dot for the graph.)
 StatusOr<std::string> WrapDotInFormat(const HloComputation& computation,
-                                      absl::string_view dot,
+                                      abslx::string_view dot,
                                       RenderedGraphFormat format)
     ABSL_EXCLUSIVE_LOCKS_REQUIRED(url_renderer_mu) {
   switch (format) {
@@ -1819,14 +1819,14 @@ StatusOr<std::string> WrapDotInFormat(const HloComputation& computation,
 }  // namespace
 
 // Compress with zlib + b64 encode.
-static StatusOr<std::string> CompressAndEncode(absl::string_view input) {
+static StatusOr<std::string> CompressAndEncode(abslx::string_view input) {
   class WritableStringFile : public tensorflow::WritableFile {
    public:
     explicit WritableStringFile(std::string* data) : data_(data){};
     ~WritableStringFile() override = default;
 
-    Status Append(absl::string_view data) override {
-      absl::StrAppend(data_, data);
+    Status Append(abslx::string_view data) override {
+      abslx::StrAppend(data_, data);
       return OkStatus();
     }
 
@@ -1850,21 +1850,21 @@ static StatusOr<std::string> CompressAndEncode(absl::string_view input) {
 
   std::string encoded;
   TF_RETURN_IF_ERROR(tensorflow::Base64Encode(compressed, &encoded));
-  return absl::StrReplaceAll(encoded, {{"_", "/"}, {"-", "+"}});
+  return abslx::StrReplaceAll(encoded, {{"_", "/"}, {"-", "+"}});
 }
 
-static std::string EscapeJSONString(absl::string_view raw) {
-  return absl::StrCat(
+static std::string EscapeJSONString(abslx::string_view raw) {
+  return abslx::StrCat(
       "\"",
-      absl::StrReplaceAll(raw, {{"\n", "\\n"}, {"\"", "\\\""}, {"\\", "\\\\"}}),
+      abslx::StrReplaceAll(raw, {{"\n", "\\n"}, {"\"", "\\\""}, {"\\", "\\\\"}}),
       "\"");
 }
 
 StatusOr<std::string> WrapFusionExplorer(const HloComputation& computation) {
-  absl::MutexLock lock(&fusion_visualizer_state_mu);
-  using absl::StrAppend;
-  using absl::StrFormat;
-  using absl::StrJoin;
+  abslx::MutexLock lock(&fusion_visualizer_state_mu);
+  using abslx::StrAppend;
+  using abslx::StrFormat;
+  using abslx::StrJoin;
   const FusionVisualizerProgress& visualizer_progress =
       fusion_visualizer_states[FusionVisualizerStateKey(computation)];
   if (visualizer_progress.frames.empty()) {
@@ -1887,7 +1887,7 @@ StatusOr<std::string> WrapFusionExplorer(const HloComputation& computation) {
   TF_ASSIGN_OR_RETURN(std::string dot_graphs_compressed,
                       CompressAndEncode(dot_graphs));
 
-  return absl::StrReplaceAll(
+  return abslx::StrReplaceAll(
       R"(
 <!DOCTYPE html>
 <html>
@@ -2056,34 +2056,34 @@ StatusOr<std::string> WrapFusionExplorer(const HloComputation& computation) {
       {{"$DOTS", dot_graphs_compressed},
        {"$FRAMES", frames},
        {"$TITLE",
-        absl::StrCat(computation.parent()->name(), "_", computation.name())}});
+        abslx::StrCat(computation.parent()->name(), "_", computation.name())}});
 }
 
 void RegisterGraphToURLRenderer(
-    std::function<StatusOr<std::string>(absl::string_view)> renderer) {
-  absl::MutexLock lock(&url_renderer_mu);
+    std::function<StatusOr<std::string>(abslx::string_view)> renderer) {
+  abslx::MutexLock lock(&url_renderer_mu);
   if (url_renderer != nullptr) {
     LOG(WARNING) << "Multiple calls to RegisterGraphToURLRenderer.  Last call "
                     "wins, but because order of initialization in C++ is "
                     "nondeterministic, this may not be what you want.";
   }
   delete url_renderer;
-  url_renderer = new std::function<StatusOr<std::string>(absl::string_view)>(
+  url_renderer = new std::function<StatusOr<std::string>(abslx::string_view)>(
       std::move(renderer));
 }
 
 void RegisterFusionState(const HloComputation& computation,
-                         absl::string_view label,
+                         abslx::string_view label,
                          const HloInstruction& consumer,
                          const HloInstruction* producer) {
-  absl::MutexLock lock(&fusion_visualizer_state_mu);
+  abslx::MutexLock lock(&fusion_visualizer_state_mu);
   FusionVisualizerProgress& fusion_progress =
       fusion_visualizer_states[FusionVisualizerStateKey(computation)];
 
   // Radius size in which to render.
   static constexpr int kRenderRadius = 4;
 
-  absl::flat_hash_set<const HloInstruction*> render_boundary;
+  abslx::flat_hash_set<const HloInstruction*> render_boundary;
   for (const HloInstruction* user : consumer.users()) {
     render_boundary.insert(user);
   }
@@ -2104,11 +2104,11 @@ void RegisterFusionState(const HloComputation& computation,
 }
 
 StatusOr<std::string> RenderGraph(
-    const HloComputation& computation, absl::string_view label,
+    const HloComputation& computation, abslx::string_view label,
     const DebugOptions& debug_options, RenderedGraphFormat format,
     const HloExecutionProfile* hlo_execution_profile,
     HloRenderOptions hlo_render_options) {
-  absl::MutexLock lock(&url_renderer_mu);
+  abslx::MutexLock lock(&url_renderer_mu);
   if (format == RenderedGraphFormat::kUrl && url_renderer == nullptr) {
     return Unavailable("Can't render as URL; no URL renderer was registered.");
   }
@@ -2123,8 +2123,8 @@ StatusOr<std::string> RenderGraph(
 StatusOr<std::string> RenderNeighborhoodAround(
     const HloInstruction& node, int radius, RenderedGraphFormat format,
     HloRenderOptions hlo_render_options,
-    const absl::flat_hash_set<const HloInstruction*>& boundary) {
-  absl::MutexLock lock(&url_renderer_mu);
+    const abslx::flat_hash_set<const HloInstruction*>& boundary) {
+  abslx::MutexLock lock(&url_renderer_mu);
   if (format == RenderedGraphFormat::kUrl && url_renderer == nullptr) {
     return FailedPrecondition(
         "Can't render as URL; no URL renderer was registered.");
@@ -2144,7 +2144,7 @@ StatusOr<std::string> RenderNeighborhoodAround(
 StatusOr<std::string> RenderAllPathsFromTo(
     const HloInstruction& from, const HloInstruction& to, int64_t max_nodes,
     RenderedGraphFormat format, HloRenderOptions hlo_render_options) {
-  absl::MutexLock lock(&url_renderer_mu);
+  abslx::MutexLock lock(&url_renderer_mu);
   if (format == RenderedGraphFormat::kUrl && url_renderer == nullptr) {
     return FailedPrecondition(
         "Can't render as URL; no URL renderer was registered.");

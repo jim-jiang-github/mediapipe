@@ -66,7 +66,7 @@ struct TimedBox {
                         double beta);
 
   std::string ToString() const {
-    return absl::StrFormat(
+    return abslx::StrFormat(
         "top: %.3f left: %.3f bottom: %.3f right: %.3f "
         "rot: %.3f t: %d",
         top, left, bottom, right, rotation, static_cast<int64_t>(time_msec));
@@ -339,7 +339,7 @@ class BoxTracker {
  private:
   // Stores computed tracking paths_ for all boxes.
   std::unordered_map<int, Path> paths_ ABSL_GUARDED_BY(path_mutex_);
-  absl::Mutex path_mutex_;
+  abslx::Mutex path_mutex_;
 
   // For each id and each checkpoint stores current tracking status.
   std::unordered_map<int, std::map<int, TrackStatus>> track_status_
@@ -347,12 +347,12 @@ class BoxTracker {
 
   // Keeps track which ids are currently processing in NewBoxTrack.
   std::unordered_map<int, bool> new_box_track_ ABSL_GUARDED_BY(status_mutex_);
-  absl::Mutex status_mutex_;
+  abslx::Mutex status_mutex_;
 
   bool canceling_ ABSL_GUARDED_BY(status_mutex_) = false;
 
   // Use to signal changes to status_condvar_;
-  absl::CondVar status_condvar_ ABSL_GUARDED_BY(status_mutex_);
+  abslx::CondVar status_condvar_ ABSL_GUARDED_BY(status_mutex_);
 
   BoxTrackerOptions options_;
 

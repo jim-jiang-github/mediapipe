@@ -28,9 +28,9 @@ namespace {
 
 // Given input string and a delimiter returns back a substring including
 // delimiters. If there was only starting delimiter found, returns single char.
-absl::string_view FindInlineBlock(absl::string_view s, char delimiter) {
+abslx::string_view FindInlineBlock(abslx::string_view s, char delimiter) {
   size_t start = s.find(delimiter);
-  if (start != absl::string_view::npos) {
+  if (start != abslx::string_view::npos) {
     size_t end = s.find(delimiter, start + 1);
     if (end != std::string::npos) {
       return s.substr(start, end - start + 1);
@@ -43,24 +43,24 @@ absl::string_view FindInlineBlock(absl::string_view s, char delimiter) {
 
 // For the given 's' and its substring 'subs' returns new substring of 's' that
 // begins past 'subs'.
-absl::string_view PastSubstr(absl::string_view s, absl::string_view subs) {
+abslx::string_view PastSubstr(abslx::string_view s, abslx::string_view subs) {
   return s.substr(subs.data() + subs.size() - s.data());
 }
 
 }  // namespace
 
-absl::Status TextPreprocessor::Rewrite(const std::string& input,
+abslx::Status TextPreprocessor::Rewrite(const std::string& input,
                                        std::string* output) {
-  absl::string_view s = input;
+  abslx::string_view s = input;
   std::string result;
   while (true) {
-    absl::string_view inline_block = FindInlineBlock(s, inline_delimiter_);
+    abslx::string_view inline_block = FindInlineBlock(s, inline_delimiter_);
     result.append(s.data(), inline_block.data() - s.data());
     if (inline_block.empty()) {
       break;
     }
     if (inline_block.size() == 1) {
-      return absl::NotFoundError("Unable to find end of inline block");
+      return abslx::NotFoundError("Unable to find end of inline block");
     }
     s = PastSubstr(s, inline_block);
     bool processed = false;
@@ -77,20 +77,20 @@ absl::Status TextPreprocessor::Rewrite(const std::string& input,
           processed = true;
           break;
         case RewriteStatus::ERROR:
-          return absl::InternalError(absl::StrCat("Error while rewriting '",
+          return abslx::InternalError(abslx::StrCat("Error while rewriting '",
                                                   inline_block, "': ", result));
       }
     }
     if (!processed) {
       if (!keep_unknown_rewrites_) {
-        return absl::NotFoundError(absl::StrCat(
+        return abslx::NotFoundError(abslx::StrCat(
             "Didn't find inline rewrite for '", inline_block, "'"));
       }
-      absl::StrAppend(&result, inline_block);
+      abslx::StrAppend(&result, inline_block);
     }
   }
   *output = std::move(result);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gl

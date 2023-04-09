@@ -26,7 +26,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status ConvolutionTransposed3x3Test(TestExecutionEnvironment* env) {
+abslx::Status ConvolutionTransposed3x3Test(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 1);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f};
@@ -61,7 +61,7 @@ absl::Status ConvolutionTransposed3x3Test(TestExecutionEnvironment* env) {
                         dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

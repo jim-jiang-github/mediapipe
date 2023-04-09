@@ -34,7 +34,7 @@ void FrameAnnotationTracker::AddDetectionResult(
 
 FrameAnnotation FrameAnnotationTracker::ConsolidateTrackingResult(
     const TimedBoxProtoList& tracked_boxes,
-    absl::flat_hash_set<int>* cancel_object_ids) {
+    abslx::flat_hash_set<int>* cancel_object_ids) {
   CHECK(cancel_object_ids != nullptr);
   FrameAnnotation frame_annotation;
   std::vector<int64> keys_to_be_deleted;

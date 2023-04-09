@@ -48,7 +48,7 @@ class EinsumSPMDExpander : public SPMDExpanderBase {
   // * The new inputs to fed into the einsum.
   Status MaybeRelayoutInputs(const std::vector<Layout>& input_layouts,
                              mlir::Operation* op, const Layout& output_layout,
-                             absl::flat_hash_set<std::string>& reduce_dims,
+                             abslx::flat_hash_set<std::string>& reduce_dims,
                              Layout& einsum_layout,
                              std::vector<mlir::Value>& new_inputs);
 };

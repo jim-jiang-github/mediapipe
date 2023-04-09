@@ -58,7 +58,7 @@ bool CheckDType(DataType actual_dtype, DataType& expected_dtype) {
     expected_dtype = actual_dtype;  // set output parameter.
   } else if (expected_dtype != actual_dtype) {
     PyErr_SetString(PyExc_TypeError,
-                    absl::StrCat("Expected ", DataType_Name(expected_dtype),
+                    abslx::StrCat("Expected ", DataType_Name(expected_dtype),
                                  " but got ", DataType_Name(actual_dtype))
                         .c_str());
     return false;

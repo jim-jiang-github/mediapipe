@@ -57,7 +57,7 @@ const string RegisteredFactoriesErrorMessageLocked() {
     factory_types.push_back(session_factory.first);
   }
   return strings::StrCat("Registered factories are {",
-                         absl::StrJoin(factory_types, ", "), "}.");
+                         abslx::StrJoin(factory_types, ", "), "}.");
 }
 string SessionOptionsToString(const SessionOptions& options) {
   return strings::StrCat("target: \"", options.target,
@@ -102,7 +102,7 @@ Status SessionFactory::GetFactory(const SessionOptions& options,
         "Multiple session factories registered for the given session "
         "options: {",
         SessionOptionsToString(options), "} Candidate factories are {",
-        absl::StrJoin(factory_types, ", "), "}. ",
+        abslx::StrJoin(factory_types, ", "), "}. ",
         RegisteredFactoriesErrorMessageLocked());
   } else {
     return errors::NotFound(

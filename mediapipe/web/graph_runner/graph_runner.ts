@@ -131,7 +131,7 @@ export type ImageSource =
     HTMLCanvasElement|HTMLVideoElement|HTMLImageElement|ImageData|ImageBitmap;
 
 
-/** A listener that will be invoked with an absl::StatusCode and message. */
+/** A listener that will be invoked with an abslx::StatusCode and message. */
 export type ErrorListener = (code: number, message: string) => void;
 
 /**

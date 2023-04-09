@@ -37,7 +37,7 @@ inline const int64 GetPacketDataId(const HolderBase* holder) {
 // Packet trace log event.
 struct TraceEvent {
   using EventType = GraphTrace::EventType;
-  absl::Time event_time;
+  abslx::Time event_time;
   EventType event_type = UNKNOWN;
   bool is_finish = false;
   Timestamp input_ts = Timestamp::Unset();
@@ -50,7 +50,7 @@ struct TraceEvent {
   TraceEvent(const EventType& event_type) : event_type(event_type) {}
   TraceEvent() {}
 
-  inline TraceEvent& set_event_time(absl::Time event_time) {
+  inline TraceEvent& set_event_time(abslx::Time event_time) {
     this->event_time = event_time;
     return *this;
   }

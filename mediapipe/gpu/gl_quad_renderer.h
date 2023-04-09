@@ -49,11 +49,11 @@ class QuadRenderer {
   QuadRenderer() {}
   // Creates the rendering program. Must be called within the GL context that
   // will be used for rendering.
-  absl::Status GlSetup();
+  abslx::Status GlSetup();
   // Creates the rendering program. Must be called within the GL context that
   // will be used for rendering.
   // This version allows you to customize the fragment shader.
-  absl::Status GlSetup(const GLchar* custom_frag_shader,
+  abslx::Status GlSetup(const GLchar* custom_frag_shader,
                        const std::vector<const GLchar*>& custom_frame_uniforms);
   // Renders the texture bound to texture unit 1 onto the current viewport.
   // Note: mirroring and flipping are handled differently, by design.
@@ -69,7 +69,7 @@ class QuadRenderer {
   //   what's needed for the front-camera use case.
   // - flip_vertical is meant to be used to flip the output image vertically.
   //   This flipping is applied AFTER rotation.
-  absl::Status GlRender(float frame_width, float frame_height, float view_width,
+  abslx::Status GlRender(float frame_width, float frame_height, float view_width,
                         float view_height, FrameScaleMode scale_mode,
                         FrameRotation rotation, bool flip_horizontal,
                         bool flip_vertical, bool flip_texture) const;
@@ -85,7 +85,7 @@ class QuadRenderer {
   GLuint vbo_[2] = {0, 0};  // for vertex buffer storage
 };
 
-absl::Status FrameRotationFromInt(FrameRotation* rotation, int degrees_ccw);
+abslx::Status FrameRotationFromInt(FrameRotation* rotation, int degrees_ccw);
 
 // Input degrees must be one of: [0, 90, 180, 270].
 FrameRotation FrameRotationFromDegrees(int degrees_ccw);

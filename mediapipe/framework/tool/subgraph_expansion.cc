@@ -43,22 +43,22 @@ namespace mediapipe {
 
 namespace tool {
 
-absl::Status TransformStreamNames(
+abslx::Status TransformStreamNames(
     proto_ns::RepeatedPtrField<ProtoString>* streams,
-    const std::function<std::string(absl::string_view)>& transform) {
+    const std::function<std::string(abslx::string_view)>& transform) {
   for (auto& stream : *streams) {
-    absl::string_view port_and_name(stream);
+    abslx::string_view port_and_name(stream);
     auto colon_pos = port_and_name.find_last_of(':');
-    auto name_pos = colon_pos == absl::string_view::npos ? 0 : colon_pos + 1;
+    auto name_pos = colon_pos == abslx::string_view::npos ? 0 : colon_pos + 1;
     stream =
-        absl::StrCat(port_and_name.substr(0, name_pos),
-                     transform(absl::ClippedSubstr(port_and_name, name_pos)));
+        abslx::StrCat(port_and_name.substr(0, name_pos),
+                     transform(abslx::ClippedSubstr(port_and_name, name_pos)));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Returns subgraph streams not requested by a subgraph-node.
-absl::Status FindIgnoredStreams(
+abslx::Status FindIgnoredStreams(
     const proto_ns::RepeatedPtrField<ProtoString>& src_streams,
     const proto_ns::RepeatedPtrField<ProtoString>& dst_streams,
     std::set<std::string>* result) {
@@ -70,11 +70,11 @@ absl::Status FindIgnoredStreams(
       result->insert(src_map->Names()[id.value()]);
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Removes subgraph streams not requested by a subgraph-node.
-absl::Status RemoveIgnoredStreams(
+abslx::Status RemoveIgnoredStreams(
     proto_ns::RepeatedPtrField<ProtoString>* streams,
     const std::set<std::string>& missing_streams) {
   for (int i = streams->size() - 1; i >= 0; --i) {
@@ -85,12 +85,12 @@ absl::Status RemoveIgnoredStreams(
       streams->DeleteSubrange(i, 1);
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TransformNames(
+abslx::Status TransformNames(
     CalculatorGraphConfig* config,
-    const std::function<std::string(absl::string_view)>& transform) {
+    const std::function<std::string(abslx::string_view)>& transform) {
   RET_CHECK_EQ(config->packet_factory().size(), 0);
   for (auto* streams :
        {config->mutable_input_stream(), config->mutable_output_stream(),
@@ -123,7 +123,7 @@ absl::Status TransformNames(
     MP_RETURN_IF_ERROR(TransformStreamNames(
         status_handler.mutable_input_side_packet(), transform));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Adds a prefix to the name of each stream, side packet and node in the
@@ -132,20 +132,20 @@ absl::Status TransformNames(
 //   2, { foo, bar }  --PrefixNames-> { rsg__foo, rsg__bar }
 // This means that two copies of the same subgraph will not interfere with
 // each other.
-static absl::Status PrefixNames(std::string prefix,
+static abslx::Status PrefixNames(std::string prefix,
                                 CalculatorGraphConfig* config) {
   std::transform(prefix.begin(), prefix.end(), prefix.begin(), ::tolower);
   std::replace(prefix.begin(), prefix.end(), '.', '_');
   std::replace(prefix.begin(), prefix.end(), ' ', '_');
   std::replace(prefix.begin(), prefix.end(), ':', '_');
-  absl::StrAppend(&prefix, "__");
-  auto add_prefix = [&prefix](absl::string_view s) {
-    return absl::StrCat(prefix, s);
+  abslx::StrAppend(&prefix, "__");
+  auto add_prefix = [&prefix](abslx::string_view s) {
+    return abslx::StrCat(prefix, s);
   };
   return TransformNames(config, add_prefix);
 }
 
-absl::Status FindCorrespondingStreams(
+abslx::Status FindCorrespondingStreams(
     std::map<std::string, std::string>* stream_map,
     const proto_ns::RepeatedPtrField<ProtoString>& src_streams,
     const proto_ns::RepeatedPtrField<ProtoString>& dst_streams) {
@@ -176,14 +176,14 @@ absl::Status FindCorrespondingStreams(
       (*stream_map)[src_name] = dst_name;
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // The following fields can be used in a Node message for a subgraph:
 //   name, calculator, input_stream, output_stream, input_side_packet,
 //   output_side_packet, options.
 // All other fields are only applicable to calculators.
-absl::Status ValidateSubgraphFields(
+abslx::Status ValidateSubgraphFields(
     const CalculatorGraphConfig::Node& subgraph_node) {
   if (subgraph_node.source_layer() || subgraph_node.buffer_size_hint() ||
       subgraph_node.has_output_stream_handler() ||
@@ -193,10 +193,10 @@ absl::Status ValidateSubgraphFields(
            << "Subgraph \"" << subgraph_node.name()
            << "\" has a field that is only applicable to calculators.";
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConnectSubgraphStreams(
+abslx::Status ConnectSubgraphStreams(
     const CalculatorGraphConfig::Node& subgraph_node,
     CalculatorGraphConfig* subgraph_config) {
   std::map<std::string, std::string> stream_map;
@@ -235,7 +235,7 @@ absl::Status ConnectSubgraphStreams(
                                         subgraph_node.input_side_packet(),
                                         &ignored_input_side_packets));
   std::map<std::string, std::string>* name_map;
-  auto replace_names = [&name_map](absl::string_view s) {
+  auto replace_names = [&name_map](abslx::string_view s) {
     std::string original(s);
     std::string* replacement = mediapipe::FindOrNull(*name_map, original);
     return replacement ? *replacement : original;
@@ -269,10 +269,10 @@ absl::Status ConnectSubgraphStreams(
     MP_RETURN_IF_ERROR(RemoveIgnoredStreams(
         generator.mutable_input_side_packet(), ignored_input_side_packets));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ExpandSubgraphs(CalculatorGraphConfig* config,
+abslx::Status ExpandSubgraphs(CalculatorGraphConfig* config,
                              const GraphRegistry* graph_registry,
                              const Subgraph::SubgraphOptions* graph_options,
                              const GraphServiceManager* service_manager) {
@@ -320,7 +320,7 @@ absl::Status ExpandSubgraphs(CalculatorGraphConfig* config,
                     config->mutable_status_handler()));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 CalculatorGraphConfig MakeSingleNodeGraph(CalculatorGraphConfig::Node node) {

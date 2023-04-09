@@ -92,7 +92,7 @@ std::set<std::string> GetUniqueOpcodes(HloComputation* computation) {
 std::string HloOpcodeHistogram::ToString() {
   std::string result;
   for (const auto& entry : *this) {
-    absl::StrAppend(&result, "{", absl::StrJoin(entry.first, ", "),
+    abslx::StrAppend(&result, "{", abslx::StrJoin(entry.first, ", "),
                     "}: ", entry.second, "\n");
   }
   return result;
@@ -104,7 +104,7 @@ Status HloFusionStatsVisitor::RunOnModule(HloModule* module) {
 }
 
 std::string HloFusionStatsVisitor::ToString() {
-  return absl::StrCat("HLO Fusion Stats:\n",
+  return abslx::StrCat("HLO Fusion Stats:\n",
                       "Number of fusion ops: ", num_fusions_, "\n",
                       "Number of kLoop fusions: ", num_loop_fusions_, "\n",
                       loop_fusion_opcode_histogram_.ToString(), "\n",

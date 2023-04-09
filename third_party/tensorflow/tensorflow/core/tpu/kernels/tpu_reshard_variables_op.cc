@@ -178,7 +178,7 @@ Status TPUReshardVariablesOpKernel::DoTpuExecute(
   // freed.
   TF_RETURN_IF_ERROR(stream->BlockHostUntilDone());
   // Lock variables to prevent concurrent access.
-  TF_RETURN_IF_ERROR(LockVariables(absl::MakeSpan(variables)));
+  TF_RETURN_IF_ERROR(LockVariables(abslx::MakeSpan(variables)));
 
   // Build input buffers.
   TF_ASSIGN_OR_RETURN(auto input_buffers, reshard_util::BuildInputBuffers(

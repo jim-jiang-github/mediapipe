@@ -67,7 +67,7 @@ static StatusOr<Tensor> TensorFromProto(const TensorProto& proto) {
 static StatusOr<TfCallbackData> CallbackDataFromProto(const char* opaque,
                                                       size_t opaque_len) {
   TfCallbackData callback_data;
-  absl::string_view data{opaque, opaque_len};
+  abslx::string_view data{opaque, opaque_len};
   callback_data.ParseFromString(std::string{data});  // NOLINT: OSS req
   return callback_data;
 }
@@ -98,13 +98,13 @@ Status LightOutsideCompilationOp::CompileToCustomCallCallingTfKernel(
   TF_ASSIGN_OR_RETURN(
       std::vector<int> constant_inputs,
       XlaOpRegistry::CompileTimeConstantInputs(node_def, data->op_def));
-  VLOG(1) << "Constant inputs we got: " << absl::StrJoin(constant_inputs, ", ");
+  VLOG(1) << "Constant inputs we got: " << abslx::StrJoin(constant_inputs, ", ");
 
   std::vector<xla::Shape> operand_shapes_with_layout;
   std::vector<xla::XlaOp> operands;
   for (int i = 0; i < num_inputs; ++i) {
     TF_ASSIGN_OR_RETURN(xla::Shape xla_shape, ctx->InputXlaShape(i));
-    if (absl::c_any_of(xla_shape.dynamic_dimensions(),
+    if (abslx::c_any_of(xla_shape.dynamic_dimensions(),
                        [](const bool is_dynamic) { return is_dynamic; })) {
       // TODO(cheshire): Support input dynamic dimensions.
       return se::port::InternalError(
@@ -120,7 +120,7 @@ Status LightOutsideCompilationOp::CompileToCustomCallCallingTfKernel(
     input_description.mutable_buffer_description()->set_type(
         ctx->input_type(i));
 
-    if (absl::c_linear_search(constant_inputs, i)) {
+    if (abslx::c_linear_search(constant_inputs, i)) {
       // Assuming kernels want to read INT32 datatypes.
       TF_ASSIGN_OR_RETURN(Tensor input_tensor, ctx->ConstantInputTensor(i));
       tensor_storage[i] = input_tensor;
@@ -157,7 +157,7 @@ Status LightOutsideCompilationOp::CompileToCustomCallCallingTfKernel(
         ic.ShapeHandleToProto(ic.output(i));
     if (output_tensor_shape_proto.unknown_rank()) {
       return se::port::InternalError(
-          absl::StrCat("Output ", i, " has unknown rank"));
+          abslx::StrCat("Output ", i, " has unknown rank"));
     }
 
     int rank = output_tensor_shape_proto.dim_size();
@@ -171,7 +171,7 @@ Status LightOutsideCompilationOp::CompileToCustomCallCallingTfKernel(
 
       if (dim->size() < 0) {
         if (it == dimension_bounds.end()) {
-          return se::port::InternalError(absl::StrCat(
+          return se::port::InternalError(abslx::StrCat(
               "Bound for unknown dimension not found for dimension ", d));
         }
         dim->set_size(it->second);
@@ -236,13 +236,13 @@ namespace {
 class WriteIntoXlaBufferAllocator : public Allocator {
  public:
   WriteIntoXlaBufferAllocator(void* xla_buffer, size_t buffer_size,
-                              absl::string_view description)
+                              abslx::string_view description)
       : xla_buffer_(xla_buffer),
         buffer_size_(buffer_size),
         description_(description) {}
 
   std::string Name() override {
-    return absl::StrCat("allocator-xla-", description_);
+    return abslx::StrCat("allocator-xla-", description_);
   }
 
   void* AllocateRaw(size_t alignment, size_t num_bytes) override {
@@ -269,7 +269,7 @@ class WriteIntoXlaBufferAllocator : public Allocator {
 };
 
 int GetNumConstants(const TfCallbackData& callback_data) {
-  return absl::c_count_if(callback_data.inputs(),
+  return abslx::c_count_if(callback_data.inputs(),
                           [&](const auto& input) { return input.has_value(); });
 }
 
@@ -300,7 +300,7 @@ class TfCallbackDevice : public DeviceBase {
       int64_t buffer_size =
           BufferSize(callback_data.outputs(i).buffer_description());
       allocators_.emplace_back(buffers[buffer_num], buffer_size,
-                               absl::StrCat("xla-output-", i));
+                               abslx::StrCat("xla-output-", i));
     }
 
     accelerator_device_info_.stream = stream;
@@ -453,7 +453,7 @@ Status CallTfKernel(void* stream_handle, void** buffers, const char* opaque,
   params.ensure_eigen_gpu_device();
   params.op_device_context = device_context.get();
 
-  absl::InlinedVector<TensorValue, 4> inputs;
+  abslx::InlinedVector<TensorValue, 4> inputs;
 
   // Deque usage is important to avoid moving objects.
   std::deque<WriteIntoXlaBufferAllocator> input_allocators;
@@ -485,7 +485,7 @@ Status CallTfKernel(void* stream_handle, void** buffers, const char* opaque,
       // We only get backing input buffer for those inputs which are *not*
       // forced to be constant at compile time.
       input_allocators.emplace_back(buffers[i - constant_offset], input_size,
-                                    absl::StrCat("input-", i));
+                                    abslx::StrCat("input-", i));
       input_tensors.emplace_back(&input_allocators[i], dt, shape);
     }
     inputs.emplace_back(&input_tensors.back());
@@ -495,7 +495,7 @@ Status CallTfKernel(void* stream_handle, void** buffers, const char* opaque,
   OpKernelContext ctx(&params, callback_data.outputs_size());
   kernel->Compute(&ctx);
 
-  bool has_dynamic_outputs = absl::c_any_of(
+  bool has_dynamic_outputs = abslx::c_any_of(
       callback_data.outputs(),
       [](const auto& out) { return out.is_dynamically_padded(); });
 

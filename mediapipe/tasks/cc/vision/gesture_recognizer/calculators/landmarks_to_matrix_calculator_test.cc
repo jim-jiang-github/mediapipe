@@ -69,7 +69,7 @@ TEST_P(Landmarks2dToMatrixCalculatorTest, OutputsCorrectResult) {
   const Landmarks2dToMatrixCalculatorTestCase& test_case = GetParam();
 
   auto node_config =
-      ParseTextProtoOrDie<CalculatorGraphConfig::Node>(absl::Substitute(
+      ParseTextProtoOrDie<CalculatorGraphConfig::Node>(abslx::Substitute(
           R"pb(
             calculator: "LandmarksToMatrixCalculator"
             input_stream: "LANDMARKS:landmarks"
@@ -156,7 +156,7 @@ TEST_P(LandmarksWorld3dToMatrixCalculatorTest, OutputsCorrectResult) {
   const LandmarksWorld3dToMatrixCalculatorTestCase& test_case = GetParam();
 
   auto node_config =
-      ParseTextProtoOrDie<CalculatorGraphConfig::Node>(absl::Substitute(
+      ParseTextProtoOrDie<CalculatorGraphConfig::Node>(abslx::Substitute(
           R"pb(
             calculator: "LandmarksToMatrixCalculator"
             input_stream: "WORLD_LANDMARKS:landmarks"

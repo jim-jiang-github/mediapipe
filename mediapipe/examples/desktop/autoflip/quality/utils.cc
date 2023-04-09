@@ -53,11 +53,11 @@ void NormalizedRectToRect(const RectF& normalized_location, const int width,
   ScaleRect(normalized_location, width, height, location);
 }
 
-absl::Status ClampRect(const int width, const int height, Rect* location) {
+abslx::Status ClampRect(const int width, const int height, Rect* location) {
   return ClampRect(0, 0, width, height, location);
 }
 
-absl::Status ClampRect(const int x0, const int y0, const int x1, const int y1,
+abslx::Status ClampRect(const int x0, const int y0, const int x1, const int y1,
                        Rect* location) {
   RET_CHECK(!(location->x() >= x1 || location->x() + location->width() <= x0 ||
               location->y() >= y1 || location->y() + location->height() <= y0));
@@ -73,7 +73,7 @@ absl::Status ClampRect(const int x0, const int y0, const int x1, const int y1,
   location->set_y(clamped_top);
   location->set_width(std::max(0, clamped_right - clamped_left));
   location->set_height(std::max(0, clamped_bottom - clamped_top));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void RectUnion(const Rect& rect_to_add, Rect* rect) {
@@ -89,7 +89,7 @@ void RectUnion(const Rect& rect_to_add, Rect* rect) {
   rect->set_height(y2 - y1);
 }
 
-absl::Status PackKeyFrameInfo(const int64 frame_timestamp_ms,
+abslx::Status PackKeyFrameInfo(const int64 frame_timestamp_ms,
                               const DetectionSet& detections,
                               const int original_frame_width,
                               const int original_frame_height,
@@ -135,10 +135,10 @@ absl::Status PackKeyFrameInfo(const int64 frame_timestamp_ms,
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SortDetections(const DetectionSet& detections,
+abslx::Status SortDetections(const DetectionSet& detections,
                             std::vector<SalientRegion>* required_regions,
                             std::vector<SalientRegion>* non_required_regions) {
   required_regions->clear();
@@ -173,10 +173,10 @@ absl::Status SortDetections(const DetectionSet& detections,
     non_required_regions->push_back(detections.detections(original_idx));
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SetKeyFrameCropTarget(const int frame_width,
+abslx::Status SetKeyFrameCropTarget(const int frame_width,
                                    const int frame_height,
                                    const double target_aspect_ratio,
                                    KeyFrameCropOptions* crop_options) {
@@ -197,10 +197,10 @@ absl::Status SetKeyFrameCropTarget(const int frame_width,
           : std::round(frame_width / target_aspect_ratio);
   crop_options->set_target_width(crop_target_width);
   crop_options->set_target_height(crop_target_height);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AggregateKeyFrameResults(
+abslx::Status AggregateKeyFrameResults(
     const KeyFrameCropOptions& key_frame_crop_options,
     const std::vector<KeyFrameCropResult>& key_frame_crop_results,
     const int scene_frame_width, const int scene_frame_height,
@@ -230,7 +230,7 @@ absl::Status AggregateKeyFrameResults(
   // Handles the corner case of no key frames.
   if (num_key_frames == 0) {
     scene_summary->set_has_salient_region(false);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   scene_summary->set_num_key_frames(num_key_frames);
@@ -264,7 +264,7 @@ absl::Status AggregateKeyFrameResults(
     if (!result.required_region_is_empty()) {
       if (required_crop_region_union == nullptr) {
         required_crop_region_union =
-            absl::make_unique<Rect>(result.required_region());
+            abslx::make_unique<Rect>(result.required_region());
       } else {
         RectUnion(result.required_region(), required_crop_region_union.get());
       }
@@ -326,10 +326,10 @@ absl::Status AggregateKeyFrameResults(
                          scene_summary->key_frame_center_min_y()) /
       scene_frame_height;
   scene_summary->set_vertical_motion_amount(motion_y);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ComputeSceneStaticBordersSize(
+abslx::Status ComputeSceneStaticBordersSize(
     const std::vector<StaticFeatures>& static_features, int* top_border_size,
     int* bottom_border_size) {
   RET_CHECK(top_border_size) << "Output top border size is null.";
@@ -373,10 +373,10 @@ absl::Status ComputeSceneStaticBordersSize(
 
   *top_border_size = std::max(0, *top_border_size);
   *bottom_border_size = std::max(0, *bottom_border_size);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FindSolidBackgroundColor(
+abslx::Status FindSolidBackgroundColor(
     const std::vector<StaticFeatures>& static_features,
     const std::vector<int64>& static_features_timestamps,
     const double min_fraction_solid_background_color,
@@ -421,10 +421,10 @@ absl::Status FindSolidBackgroundColor(
           min_fraction_solid_background_color) {
     *has_solid_background = true;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AffineRetarget(const cv::Size& output_size,
+abslx::Status AffineRetarget(const cv::Size& output_size,
                             const std::vector<cv::Mat>& frames,
                             const std::vector<cv::Mat>& affine_projection,
                             std::vector<cv::Mat>* cropped_frames) {
@@ -441,7 +441,7 @@ absl::Status AffineRetarget(const cv::Size& output_size,
     RET_CHECK(affine.rows == 2) << "Affine matrix must be 2x3";
     cv::warpAffine(frames[i], (*cropped_frames)[i], affine, output_size);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 }  // namespace autoflip
 }  // namespace mediapipe

@@ -53,8 +53,8 @@ class Exhaustive16BitBinaryTest
     std::tie(begin, end) = GetParam();
     VLOG(2) << "Checking range [" << begin << ", " << end << "]";
 
-    absl::Span<NativeT> input_arr_0 = (*input_literals)[0].data<NativeT>();
-    absl::Span<NativeT> input_arr_1 = (*input_literals)[1].data<NativeT>();
+    abslx::Span<NativeT> input_arr_0 = (*input_literals)[0].data<NativeT>();
+    abslx::Span<NativeT> input_arr_1 = (*input_literals)[1].data<NativeT>();
     for (int64_t i = 0; i < input_size; i++) {
       uint32_t input_val = i + begin;
       // Convert the lower 16 bits to the NativeT and replaced known incorrect

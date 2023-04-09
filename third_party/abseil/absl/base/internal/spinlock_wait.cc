@@ -31,7 +31,7 @@
 #include "absl/base/internal/spinlock_posix.inc"
 #endif
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -78,4 +78,4 @@ int SpinLockSuggestedDelayNS(int loop) {
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

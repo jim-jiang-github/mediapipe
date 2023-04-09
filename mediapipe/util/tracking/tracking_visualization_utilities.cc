@@ -80,20 +80,20 @@ void RenderState(const MotionBoxState& box_state, bool print_stats,
 
   std::vector<std::string> stats;
   stats.push_back(
-      absl::StrFormat("Motion: %.4f, %.4f", box_state.dx(), box_state.dy()));
+      abslx::StrFormat("Motion: %.4f, %.4f", box_state.dx(), box_state.dy()));
   stats.push_back(
-      absl::StrFormat("KinEnergy: %.4f", box_state.kinetic_energy()));
+      abslx::StrFormat("KinEnergy: %.4f", box_state.kinetic_energy()));
   stats.push_back(
-      absl::StrFormat("Disparity: %.2f", box_state.motion_disparity()));
-  stats.push_back(absl::StrFormat("Discrimination: %.2f",
+      abslx::StrFormat("Disparity: %.2f", box_state.motion_disparity()));
+  stats.push_back(abslx::StrFormat("Discrimination: %.2f",
                                   box_state.background_discrimination()));
   stats.push_back(
-      absl::StrFormat("InlierRatio: %2.2f", box_state.inlier_ratio()));
+      abslx::StrFormat("InlierRatio: %2.2f", box_state.inlier_ratio()));
   stats.push_back(
-      absl::StrFormat("InlierNum: %3d", box_state.inlier_ids_size()));
+      abslx::StrFormat("InlierNum: %3d", box_state.inlier_ids_size()));
 
-  stats.push_back(absl::StrFormat("Prior: %.2f", box_state.prior_weight()));
-  stats.push_back(absl::StrFormat("TrackingConfidence: %.2f",
+  stats.push_back(abslx::StrFormat("Prior: %.2f", box_state.prior_weight()));
+  stats.push_back(abslx::StrFormat("TrackingConfidence: %.2f",
                                   box_state.tracking_confidence()));
 
   for (int k = 0; k < stats.size(); ++k) {

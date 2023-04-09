@@ -135,14 +135,14 @@ Status GpuTransferManager::ReadDynamicShapes(se::Stream* stream,
   std::vector<std::unique_ptr<char[]>> fallback_buffers;
 
   // Return checked-out buffers at the end of this function.
-  absl::Cleanup cleanup = [&] {
-    absl::MutexLock lock(&mu_);
+  abslx::Cleanup cleanup = [&] {
+    abslx::MutexLock lock(&mu_);
     pinned_buffers_.insert(pinned_buffers_.end(), checked_out_buffers.begin(),
                            checked_out_buffers.end());
   };
 
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     EnsurePinnedBuffersAllocated(stream->parent());
 
     for (const auto& src_dst : copies) {

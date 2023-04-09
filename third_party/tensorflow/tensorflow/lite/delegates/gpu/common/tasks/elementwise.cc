@@ -138,7 +138,7 @@ $0.w = $1.w < INIT_FLT(0.0f) ? exp($1.w) - INIT_FLT(1.0f) : $1.w;)";
     default:
       return "Unknown operation type;";
   }
-  return absl::Substitute(result, output_value, input_value);
+  return abslx::Substitute(result, output_value, input_value);
 }
 
 std::string GetTwoInputCode(const OperationType& op_type,
@@ -219,9 +219,9 @@ std::string GetTwoInputCode(const OperationType& op_type,
       return "Unknown operation type;";
   }
   if (swap_inputs) {
-    return absl::Substitute(result, result_var, input1, input0);
+    return abslx::Substitute(result, result_var, input1, input0);
   } else {
-    return absl::Substitute(result, result_var, input0, input1);
+    return abslx::Substitute(result, result_var, input0, input1);
   }
 }
 
@@ -255,7 +255,7 @@ GPUOperation CreateElementwiseTwoInput(
   op_desc.args.AddObject("second_tensor", std::make_unique<TensorDescriptor>(
                                               std::move(const_tensor_desc)));
   const std::string s_coord = constant_tensor.shape.v == 1 ? "0" : "S_COORD";
-  op_desc.code = absl::StrCat(
+  op_desc.code = abslx::StrCat(
       "args.second_tensor::type second_val = args.second_tensor.Read(", s_coord,
       ");\n");
   if (constant_tensor.shape.v == 1) {
@@ -287,7 +287,7 @@ GPUOperation CreateElementwiseTwoInput(
   const std::string x_coord = shape.w == 1 ? "0" : "X_COORD";
   const std::string y_coord = shape.h == 1 ? "0" : "Y_COORD";
   const std::string s_coord = shape.c == 1 ? "0" : "S_COORD";
-  op_desc.code = absl::StrCat(
+  op_desc.code = abslx::StrCat(
       "args.second_tensor::type second_val = args.second_tensor.Read(", x_coord,
       ", ", y_coord, ", ", s_coord, ");\n");
   if (shape.c == 1) {
@@ -316,11 +316,11 @@ GPUOperation CreateElementwise(const GpuInfo& gpu_info,
                                const OperationDef& definition,
                                const OperationType& op_type,
                                const ElementwiseAttributes& attr) {
-  const float* scalar = absl::get_if<float>(&attr.param);
+  const float* scalar = abslx::get_if<float>(&attr.param);
   const auto* linear_tensor =
-      absl::get_if<tflite::gpu::Tensor<Linear, DataType::FLOAT32>>(&attr.param);
+      abslx::get_if<tflite::gpu::Tensor<Linear, DataType::FLOAT32>>(&attr.param);
   const auto* hwc_tensor =
-      absl::get_if<tflite::gpu::Tensor<HWC, DataType::FLOAT32>>(&attr.param);
+      abslx::get_if<tflite::gpu::Tensor<HWC, DataType::FLOAT32>>(&attr.param);
 
   if (scalar) {
     return CreateElementwiseOneRuntimeOneScalar(definition, op_type, *scalar,

@@ -98,7 +98,7 @@ INSTANTIATE_TEST_SUITE_P(
       bool restrict_to_tpu_nodes = std::get<0>(info.param);
       bool wrap_cond_in_function = std::get<1>(info.param);
       string name =
-          absl::StrCat(restrict_to_tpu_nodes ? "with_filter" : "without_filter",
+          abslx::StrCat(restrict_to_tpu_nodes ? "with_filter" : "without_filter",
                        wrap_cond_in_function ? "_in_function" : "_in_graph");
       return name;
     });
@@ -137,7 +137,7 @@ void ConditionalTestFixture::BuildCondGraph(Graph* cond_graph) {
     // if propagation works. Note that this includes `_tpu_replicate`.
     for (Node* n : cond_graph->nodes()) {
       std::string dummy_value = "value";
-      for (absl::string_view attr_name : kAttrsToPropagate) {
+      for (abslx::string_view attr_name : kAttrsToPropagate) {
         n->AddAttr(std::string(attr_name), dummy_value);
       }
     }
@@ -219,7 +219,7 @@ void ConditionalTestFixture::CheckGraphDef(
     // (such attributes are ignored in the above graph equality check).
     for (const NodeDef& node : graph_def.node()) {
       if (node.op() == "If") {
-        for (absl::string_view attr_name : kAttrsToPropagate) {
+        for (abslx::string_view attr_name : kAttrsToPropagate) {
           std::string attr_val;
           TF_EXPECT_OK(GetNodeAttr(node, attr_name, &attr_val));
           EXPECT_EQ(attr_val, "value");
@@ -929,7 +929,7 @@ INSTANTIATE_TEST_SUITE_P(
       else
         node_string = mark_inner_loop_tpu ? "inner_loop_tpu" : "outer_loop_tpu";
 
-      string name = absl::StrCat(
+      string name = abslx::StrCat(
           restrict_to_tpu_nodes ? "restricted_" : "unrestricted_", node_string);
       return name;
     });
@@ -1049,7 +1049,7 @@ void ComplexTestFixture::RunTest() {
     auto one = ops::Const<int32>(
         scope.WithOpName("outer/inner/One")
             .WithControlDependencies(
-                absl::Span<const Operation>{assign.operation}),
+                abslx::Span<const Operation>{assign.operation}),
         1);
     auto add_j =
         ops::Add(scope.WithOpName("outer/inner/add_j"), identity_j, one);
@@ -1064,7 +1064,7 @@ void ComplexTestFixture::RunTest() {
         scope.WithOpName("outer/add/y").WithControlDependencies(identity_i), 1);
     auto add_i =
         ops::Add(scope.WithOpName("outer/add")
-                     .WithControlDependencies(absl::Span<const Operation>{
+                     .WithControlDependencies(abslx::Span<const Operation>{
                          exit_j.output.op(), exit_k.output.op()}),
                  identity_i, one_outer);
     auto next_iteration_i =
@@ -1229,7 +1229,7 @@ void ComplexTestFixture::CheckOuterNodesFunctionalized(
         scope.WithOpName("outer/add/y").WithControlDependencies(identity_i), 1);
     auto add_i =
         ops::Add(scope.WithOpName("outer/add")
-                     .WithControlDependencies(absl::Span<const Operation>{
+                     .WithControlDependencies(abslx::Span<const Operation>{
                          while_op[0].op(), while_op[1].op()}),
                  identity_i, one_outer);
 
@@ -1300,7 +1300,7 @@ void ComplexTestFixture::CheckInnerNodesFunctionalized(
     auto one = ops::Const<int32>(
         scope.WithOpName("outer/inner/One")
             .WithControlDependencies(
-                absl::Span<const Operation>{assign.operation}),
+                abslx::Span<const Operation>{assign.operation}),
         1);
     auto add_j =
         ops::Add(scope.WithOpName("outer/inner/add_j"), identity_j, one);

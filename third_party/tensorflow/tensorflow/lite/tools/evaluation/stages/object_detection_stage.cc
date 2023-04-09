@@ -163,7 +163,7 @@ EvaluationStageMetrics ObjectDetectionStage::LatestMetrics() {
 
 TfLiteStatus PopulateGroundTruth(
     const std::string& grouth_truth_proto_file,
-    absl::flat_hash_map<std::string, ObjectDetectionResult>*
+    abslx::flat_hash_map<std::string, ObjectDetectionResult>*
         ground_truth_mapping) {
   if (ground_truth_mapping == nullptr) {
     return kTfLiteError;

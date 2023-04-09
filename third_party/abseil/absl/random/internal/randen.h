@@ -22,7 +22,7 @@
 #include "absl/random/internal/randen_slow.h"
 #include "absl/random/internal/randen_traits.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -97,6 +97,6 @@ class Randen {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_INTERNAL_RANDEN_H_

@@ -245,7 +245,7 @@ void StackPushOp::ComputeAsync(OpKernelContext* ctx, DoneCallback done) {
     DeviceContext* device_ctxt = ctx->op_device_context();
     auto device = static_cast<tensorflow::Device*>(ctx->device());
     Allocator* allocator = device->GetAllocator(alloc_attrs);
-    absl::optional<AllocatorStats> stats = allocator->GetStats();
+    abslx::optional<AllocatorStats> stats = allocator->GetStats();
     if (stats && *stats->bytes_limit &&
         stats->bytes_in_use > (*stats->bytes_limit * kOccupancy)) {
       // Asynchronously copy the tensor from GPU to CPU memory.

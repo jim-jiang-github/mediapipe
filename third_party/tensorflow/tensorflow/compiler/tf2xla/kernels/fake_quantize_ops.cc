@@ -262,7 +262,7 @@ class FakeQuantWithMinMaxVarsPerChannelOp : public XlaOpKernel {
     xla::XlaOp input_max = ctx->Input(2);
 
     xla::Shape input_shape = b->GetShape(input).ValueOrDie();
-    absl::Span<const int64_t> input_dimensions = input_shape.dimensions();
+    abslx::Span<const int64_t> input_dimensions = input_shape.dimensions();
     auto convert_to_input_shape = [&](const xla::XlaOp op) {
       return xla::BroadcastInDim(op, input_dimensions,
                                  {input_shape.rank() - 1});
@@ -317,7 +317,7 @@ class FakeQuantWithMinMaxVarsPerChannelGradOp : public XlaOpKernel {
 
     xla::XlaBuilder* b = ctx->builder();
     xla::Shape input_shape = b->GetShape(input).ValueOrDie();
-    absl::Span<const int64_t> input_dimensions = input_shape.dimensions();
+    abslx::Span<const int64_t> input_dimensions = input_shape.dimensions();
 
     std::vector<int64_t> reduce_axes;
     for (int64_t i = 0; i + 1 < input_shape.rank(); ++i) {

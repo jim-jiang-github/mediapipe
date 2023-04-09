@@ -94,7 +94,7 @@ class DeviceThread {
                     std::vector<TFE_TensorHandle*> inputs,
                     const TFE_OpAttrs* attributes, int expected_max_outputs,
                     CancellationManager& cancellation_manager,
-                    absl::optional<int64_t> step_id = absl::nullopt);
+                    abslx::optional<int64_t> step_id = abslx::nullopt);
   // Block until the previous `StartExecute` operation has executed. Forwards
   // the status from `TFE_Execute` and returns outputs if the status is OK.
   std::vector<TensorHandlePtr> Join(TF_Status* status);
@@ -134,8 +134,8 @@ class DeviceThread {
   //   are expected to live at least until `Join` finishes:
   TFE_Context* context_ TF_GUARDED_BY(execution_mutex_);
   const char* operation_name_ TF_GUARDED_BY(execution_mutex_);
-  absl::optional<int64_t> step_id_ TF_GUARDED_BY(execution_mutex_) =
-      absl::nullopt;
+  abslx::optional<int64_t> step_id_ TF_GUARDED_BY(execution_mutex_) =
+      abslx::nullopt;
   std::vector<TFE_TensorHandle*> op_inputs_ TF_GUARDED_BY(execution_mutex_);
   const TFE_OpAttrs* attributes_ TF_GUARDED_BY(execution_mutex_);
   int expected_max_outputs_ TF_GUARDED_BY(execution_mutex_);
@@ -195,7 +195,7 @@ void DeviceThread::StartExecute(TFE_Context* context,
                                 const TFE_OpAttrs* attributes,
                                 int expected_max_outputs,
                                 CancellationManager& cancellation_manager,
-                                absl::optional<int64_t> step_id) {
+                                abslx::optional<int64_t> step_id) {
   {
     tensorflow::mutex_lock l(execution_mutex_);
     while (execution_state_ != ExecutionState::kIdle) {
@@ -284,7 +284,7 @@ void DeviceThread::Execute(TFE_Context* context, const char* operation_name,
 ParallelDevice::ParallelDevice(const std::vector<std::string>& devices,
                                const bool is_async)
     : underlying_devices_(devices),
-      default_cancellation_manager_(absl::make_unique<CancellationManager>()) {
+      default_cancellation_manager_(abslx::make_unique<CancellationManager>()) {
   device_threads_.reserve(devices.size());
   for (int device_index = 0; device_index < devices.size(); ++device_index) {
     device_threads_.emplace_back(
@@ -319,7 +319,7 @@ std::unique_ptr<ParallelTensor> ParallelDevice::DeviceIDs(
   return ScalarsFromSequence<int32_t>(ids, context, status);
 }
 
-absl::optional<std::vector<std::unique_ptr<ParallelTensor>>>
+abslx::optional<std::vector<std::unique_ptr<ParallelTensor>>>
 ParallelDevice::Execute(TFE_Context* context,
                         const std::vector<ParallelTensor*>& inputs,
                         const char* operation_name,
@@ -338,7 +338,7 @@ ParallelDevice::Execute(TFE_Context* context,
     TFE_ContextAsyncWait(context, await_status.get());
     // Reset the cancellation manager on a bad status. Otherwise we'll cancel
     // all future operations.
-    default_cancellation_manager_ = absl::make_unique<CancellationManager>();
+    default_cancellation_manager_ = abslx::make_unique<CancellationManager>();
   }
   return result;
 }
@@ -349,7 +349,7 @@ void ParallelDevice::StartExecute(TFE_Context* context,
                                   const TFE_OpAttrs* attributes,
                                   int expected_max_outputs,
                                   CancellationManager& cancellation_manager,
-                                  absl::optional<int64_t> step_id) const {
+                                  abslx::optional<int64_t> step_id) const {
   for (int device_index = 0; device_index < underlying_devices_.size();
        ++device_index) {
     DeviceThread* device_thread = device_threads_[device_index].get();
@@ -387,11 +387,11 @@ void ParallelDevice::AsyncWait(TFE_Context* context, TF_Status* status) const {
   }
 }
 
-absl::optional<std::vector<std::unique_ptr<ParallelTensor>>>
+abslx::optional<std::vector<std::unique_ptr<ParallelTensor>>>
 ParallelDevice::Join(
     const std::vector<PartialTensorShape>& expected_output_shapes,
     TF_Status* status) const {
-  absl::optional<std::vector<std::unique_ptr<ParallelTensor>>> result;
+  abslx::optional<std::vector<std::unique_ptr<ParallelTensor>>> result;
   // Compute per-device per-output tensors
   std::vector<std::vector<TensorHandlePtr>> per_device_output_tensors;
   per_device_output_tensors.reserve(underlying_devices_.size());
@@ -443,7 +443,7 @@ ParallelDevice::Join(
     if (expected_output_shapes[i].IsFullyDefined()) {
       per_device_outputs.push_back(ParallelTensor::FromTensorHandles(
           *this, std::move(components),
-          absl::Span<const int64_t>(expected_output_shapes[i].dim_sizes()),
+          abslx::Span<const int64_t>(expected_output_shapes[i].dim_sizes()),
           status));
     } else {
       per_device_outputs.push_back(ParallelTensor::FromTensorHandles(
@@ -474,14 +474,14 @@ std::vector<std::string> ParallelDevice::SummarizeDeviceNames() const {
   for (const DeviceNameUtils::ParsedName& parsed_component :
        parsed_components) {
     local_names.push_back(
-        absl::StrCat(parsed_component.type, ":", parsed_component.id));
+        abslx::StrCat(parsed_component.type, ":", parsed_component.id));
   }
   return local_names;
 }
 
 std::unique_ptr<ParallelTensor> ParallelTensor::FromTensorHandles(
     const ParallelDevice& parallel_device,
-    std::vector<TensorHandlePtr> components, absl::Span<const int64_t> shape,
+    std::vector<TensorHandlePtr> components, abslx::Span<const int64_t> shape,
     TF_Status* status) {
   TFE_TensorHandleGetStatus(components[0].get(), status);
   if (!status->status.ok()) {
@@ -547,7 +547,7 @@ Status ParallelTensor::Shape(const std::vector<int64_t>** shape) const {
           combined_shape.dims() != component_shape.dims()) {
         PartialTensorShape first_shape;
         TF_RETURN_IF_ERROR(unwrap(tensors_[0].get())->Shape(&first_shape));
-        return errors::Unimplemented(absl::StrCat(
+        return errors::Unimplemented(abslx::StrCat(
             "Computing the shape of a ParallelTensor when the components do "
             "not all have the same rank is not supported. One tensor had "
             "shape ",
@@ -585,7 +585,7 @@ Status ParallelTensor::SummarizeValue(std::string& summary) {
         tensorflow::unwrap(tensors_[component_index].get());
     std::string component_summary;
     TF_RETURN_IF_ERROR(component->SummarizeValue(component_summary));
-    absl::StrAppend(&summary, component_index == 0 ? "" : ", ", "\"",
+    abslx::StrAppend(&summary, component_index == 0 ? "" : ", ", "\"",
                     summarized_devices[component_index],
                     "\": ", component_summary);
   }

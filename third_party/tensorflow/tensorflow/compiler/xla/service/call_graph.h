@@ -56,7 +56,7 @@ CallContext GetInstructionCallContext(HloOpcode opcode);
 class CallSite {
  public:
   CallSite(HloInstruction* instruction,
-           absl::Span<HloComputation* const> called_computations,
+           abslx::Span<HloComputation* const> called_computations,
            CallContext context)
       : instruction_(CHECK_NOTNULL(instruction)),
         called_computations_(called_computations.begin(),
@@ -67,7 +67,7 @@ class CallSite {
   HloInstruction* instruction() const { return instruction_; }
 
   // Returns the computations called at this call site.
-  absl::Span<HloComputation* const> called_computations() const {
+  abslx::Span<HloComputation* const> called_computations() const {
     return called_computations_;
   }
 
@@ -81,7 +81,7 @@ class CallSite {
   HloInstruction* instruction_;
 
   // The computations called by this callsite.
-  const absl::InlinedVector<HloComputation*, 2> called_computations_;
+  const abslx::InlinedVector<HloComputation*, 2> called_computations_;
 
   // The context in which the computations are called.
   const CallContext context_;
@@ -97,7 +97,7 @@ class CallGraphNode {
 
   // Returns the call sites in this computation. These are the instructions in
   // this computation which call other computations.
-  absl::Span<const CallSite> callsites() const { return callsites_; }
+  abslx::Span<const CallSite> callsites() const { return callsites_; }
 
   // Returns the callsite associated with the given instruction. If this
   // instruction calls no computations nullptr is returned.
@@ -106,15 +106,15 @@ class CallGraphNode {
   const CallSite* GetCallSite(const HloInstruction* instruction) const;
 
   // Returns the computations called by this computation.
-  absl::Span<HloComputation* const> callees() const { return callees_; }
+  abslx::Span<HloComputation* const> callees() const { return callees_; }
 
   // Returns the call sites in other computations which call this computation.
-  absl::Span<const CallSite> caller_callsites() const {
+  abslx::Span<const CallSite> caller_callsites() const {
     return caller_callsites_;
   }
 
   // Returns the computations which call this computation.
-  absl::Span<HloComputation* const> callers() const { return callers_; }
+  abslx::Span<HloComputation* const> callers() const { return callers_; }
 
   // Returns the context in which this computation is called.
   CallContext context() const { return context_; }
@@ -155,23 +155,23 @@ class CallGraphNode {
 
   // The computations called by this computation. The vector is used for a
   // stable ordering and the set enables fast membership testing.
-  absl::InlinedVector<HloComputation*, 1> callees_;
-  absl::flat_hash_set<HloComputation*> callee_set_;
+  abslx::InlinedVector<HloComputation*, 1> callees_;
+  abslx::flat_hash_set<HloComputation*> callee_set_;
 
   // The computations which call this computation. The vector is used for a
   // stable ordering and the set enables fast membership testing.
-  absl::InlinedVector<HloComputation*, 1> callers_;
-  absl::flat_hash_set<HloComputation*> caller_set_;
+  abslx::InlinedVector<HloComputation*, 1> callers_;
+  abslx::flat_hash_set<HloComputation*> caller_set_;
 
   // The call sites in this computation
-  absl::InlinedVector<CallSite, 1> callsites_;
+  abslx::InlinedVector<CallSite, 1> callsites_;
 
   // The map from instruction to index in callsites_ for looking up the callsite
   // (if any) associated with a particular instruction in this computation.
-  absl::flat_hash_map<const HloInstruction*, int64_t> callsite_instructions_;
+  abslx::flat_hash_map<const HloInstruction*, int64_t> callsite_instructions_;
 
   // The call sites in other computations which call this computation.
-  absl::InlinedVector<CallSite, 1> caller_callsites_;
+  abslx::InlinedVector<CallSite, 1> caller_callsites_;
 
   // The context in which this computation is called.
   CallContext context_ = CallContext::kNone;
@@ -275,14 +275,14 @@ class CallGraph {
   // 'visited'.
   Status VisitNodesInternal(
       const VisitorFunction& visitor_func, const CallGraphNode& node,
-      absl::flat_hash_set<const CallGraphNode*>* visited) const;
+      abslx::flat_hash_set<const CallGraphNode*>* visited) const;
 
   // Recursive helper for computing whether 'a' dominates 'b' in the call
   // graph. 'b_ancestor' is the currently visited node (which starts at 'b'),
   // and 'visited' is the set of computations which have been visited.
   bool DominatesHelper(
       const HloComputation* a, const HloComputation* b,
-      absl::flat_hash_set<const HloComputation*>* visited) const;
+      abslx::flat_hash_set<const HloComputation*>* visited) const;
 
   // The HLO module represented by this call graph.
   const HloModule* module_ = nullptr;
@@ -292,7 +292,7 @@ class CallGraph {
 
   // Map from HLO computation to the index of the corresponding call graph node
   // in nodes_.
-  absl::flat_hash_map<const HloComputation*, int64_t> node_indices_;
+  abslx::flat_hash_map<const HloComputation*, int64_t> node_indices_;
 };
 
 }  // namespace xla

@@ -22,7 +22,7 @@
 
 #include "absl/strings/internal/cord_internal.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 
@@ -141,6 +141,6 @@ inline const CordRepFlat* CordRep::flat() const {
 
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_INTERNAL_CORD_REP_FLAT_H_

@@ -172,7 +172,7 @@ TEST_F(ConditionalSimplifierTest, NotRemovedIfContainsNonRemovableInstruction) {
 }
 
 TEST_F(ConditionalSimplifierTest, TrivalOperandsRemoved) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule UnusedTupleOperands
 on_false {
@@ -222,7 +222,7 @@ ENTRY main {
 
 TEST_F(ConditionalSimplifierTest,
        TwoConditionalsCreatedInReversedLexicalOrder) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule DeadConditional
     computation.1 {
       param.1 = s64[] parameter(0)
@@ -279,7 +279,7 @@ TEST_F(ConditionalSimplifierTest,
 }
 
 TEST_F(ConditionalSimplifierTest, RemoveDeadRoots) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule RemoveDeadRoots
 on_false {
@@ -322,7 +322,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalSimplifierTest, SecondTupleElementUnusedAndRemoved) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule SecondTupleElementUnusedAndRemoved
 
@@ -368,7 +368,7 @@ ENTRY main {
 }
 
 TEST_F(ConditionalSimplifierTest, FirstTupleElementUnusedAndRemoved) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule FirstTupleElementUnusedAndRemoved
 
@@ -437,7 +437,7 @@ ENTRY main {
 // The 'rng' in on_false is to add side-effect so that conditional is not being
 // simplified and replaced with 'select' instruction by TryRemoveConditional.
 TEST_F(ConditionalSimplifierTest, MergeDuplicateTupleElements) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule MergeDuplicateTupleElements
 
@@ -484,7 +484,7 @@ ENTRY main {
 
 // Since select can only be used on arrays, use after-all for token types.
 TEST_F(ConditionalSimplifierTest, SimplifyConditionalWithTokens) {
-  absl::string_view hlo_string =
+  abslx::string_view hlo_string =
       R"(
 HloModule SimplifyConditionalWithTokens
 

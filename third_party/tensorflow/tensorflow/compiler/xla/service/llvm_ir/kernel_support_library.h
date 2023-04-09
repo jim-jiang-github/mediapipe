@@ -49,13 +49,13 @@ class KernelSupportLibrary {
   //       `for_body_generator(/*ind_var=*/,i, /*is_first_iteration=*/false)`;
   //   }
   Status ForWithStatus(
-      absl::string_view name, llvm::Value* start, llvm::Value* end,
+      abslx::string_view name, llvm::Value* start, llvm::Value* end,
       llvm::Value* step,
       const std::function<Status(llvm::Value* ind_var,
                                  bool is_first_iteration)>& for_body_generator);
 
   void For(
-      absl::string_view name, llvm::Value* start, llvm::Value* end,
+      abslx::string_view name, llvm::Value* start, llvm::Value* end,
       llvm::Value* step,
       const std::function<void(llvm::Value* ind_var, bool is_first_iteration)>&
           for_body_generator) {
@@ -69,7 +69,7 @@ class KernelSupportLibrary {
   }
 
   Status ForWithStatus(
-      absl::string_view name, int64_t start, int64_t end, int64_t step,
+      abslx::string_view name, int64_t start, int64_t end, int64_t step,
       const std::function<Status(
           llvm::Value* ind_var, bool is_first_iteration)>& for_body_generator) {
     return ForWithStatus(name, /*start=*/b_->getInt64(start),
@@ -78,7 +78,7 @@ class KernelSupportLibrary {
   }
 
   void For(
-      absl::string_view name, int64_t start, int64_t end, int64_t step,
+      abslx::string_view name, int64_t start, int64_t end, int64_t step,
       const std::function<void(llvm::Value* ind_var, bool is_first_iteration)>&
           for_body_generator) {
     For(name, /*start=*/b_->getInt64(start),
@@ -101,13 +101,13 @@ class KernelSupportLibrary {
   //     `for_body_generator(/*ind_var=*/,i,
   //                         /*is_first_iteration=*/,(i != `start`))`;
   Status ForWithStatus(
-      absl::string_view name, llvm::Value* start, llvm::Value* end,
+      abslx::string_view name, llvm::Value* start, llvm::Value* end,
       llvm::Value* step, bool peel_first_iteration,
       const std::function<Status(llvm::Value* ind_var,
                                  llvm::Value* is_first_iteration)>&
           for_body_generator);
 
-  void For(absl::string_view name, llvm::Value* start, llvm::Value* end,
+  void For(abslx::string_view name, llvm::Value* start, llvm::Value* end,
            llvm::Value* step, bool peel_first_iteration,
            const std::function<void(llvm::Value* ind_var,
                                     llvm::Value* is_first_iteration)>&
@@ -121,7 +121,7 @@ class KernelSupportLibrary {
   }
 
   Status ForWithStatus(
-      absl::string_view name, llvm::Value* start, llvm::Value* end,
+      abslx::string_view name, llvm::Value* start, llvm::Value* end,
       int64_t step, bool peel_first_iteration,
       const std::function<Status(llvm::Value* ind_var,
                                  llvm::Value* is_first_iteration)>&
@@ -132,7 +132,7 @@ class KernelSupportLibrary {
         peel_first_iteration, for_body_generator);
   }
 
-  void For(absl::string_view name, llvm::Value* start, llvm::Value* end,
+  void For(abslx::string_view name, llvm::Value* start, llvm::Value* end,
            int64_t step, bool peel_first_iteration,
            const std::function<void(llvm::Value* ind_var,
                                     llvm::Value* is_first_iteration)>&
@@ -143,7 +143,7 @@ class KernelSupportLibrary {
   }
 
   Status ForWithStatus(
-      absl::string_view name, llvm::Value* start, llvm::Value* end,
+      abslx::string_view name, llvm::Value* start, llvm::Value* end,
       llvm::Value* step,
       const std::function<Status(llvm::Value* ind_var)>& for_body_generator) {
     return ForWithStatus(name, start, end, step,
@@ -154,7 +154,7 @@ class KernelSupportLibrary {
   }
 
   void For(
-      absl::string_view name, llvm::Value* start, llvm::Value* end,
+      abslx::string_view name, llvm::Value* start, llvm::Value* end,
       llvm::Value* step,
       const std::function<void(llvm::Value* ind_var)>& for_body_generator) {
     For(name, start, end, step,
@@ -164,7 +164,7 @@ class KernelSupportLibrary {
   }
 
   Status ForWithStatus(
-      absl::string_view name, llvm::Value* start, llvm::Value* end,
+      abslx::string_view name, llvm::Value* start, llvm::Value* end,
       int64_t step,
       const std::function<Status(llvm::Value* ind_var)>& for_body_generator) {
     return ForWithStatus(name, start, end,
@@ -176,7 +176,7 @@ class KernelSupportLibrary {
   }
 
   void For(
-      absl::string_view name, llvm::Value* start, llvm::Value* end,
+      abslx::string_view name, llvm::Value* start, llvm::Value* end,
       int64_t step,
       const std::function<void(llvm::Value* ind_var)>& for_body_generator) {
     For(name, start, end, llvm::ConstantInt::get(start->getType(), step),
@@ -184,7 +184,7 @@ class KernelSupportLibrary {
   }
 
   Status ForWithStatus(
-      absl::string_view name, int64_t start, int64_t end, int64_t step,
+      abslx::string_view name, int64_t start, int64_t end, int64_t step,
       const std::function<Status(llvm::Value* ind_var)>& for_body_generator) {
     return ForWithStatus(name, /*start=*/b_->getInt64(start),
                          /*end=*/b_->getInt64(end),
@@ -192,7 +192,7 @@ class KernelSupportLibrary {
   }
 
   void For(
-      absl::string_view name, int64_t start, int64_t end, int64_t step,
+      abslx::string_view name, int64_t start, int64_t end, int64_t step,
       const std::function<void(llvm::Value* ind_var)>& for_body_generator) {
     For(name, /*start=*/b_->getInt64(start),
         /*end=*/b_->getInt64(end),
@@ -207,7 +207,7 @@ class KernelSupportLibrary {
   //      `false_block_generator()`;
   // The else is skipped if false_block_generator is null.
   Status IfWithStatus(
-      absl::string_view name, llvm::Value* condition,
+      abslx::string_view name, llvm::Value* condition,
       const std::function<Status()>& true_block_generator,
       const std::function<Status()>& false_block_generator = nullptr);
 
@@ -227,7 +227,7 @@ class KernelSupportLibrary {
     If("", condition, true_block_generator, false_block_generator);
   }
 
-  void If(absl::string_view name, llvm::Value* condition,
+  void If(abslx::string_view name, llvm::Value* condition,
           const std::function<void()>& true_block_generator,
           const std::function<void()>& false_block_generator = nullptr) {
     if (false_block_generator != nullptr) {
@@ -249,7 +249,7 @@ class KernelSupportLibrary {
     }
   }
 
-  using ArgumentVector = absl::Span<llvm::Value* const>;
+  using ArgumentVector = abslx::Span<llvm::Value* const>;
 
   // Generates the following control flow structure:
   //
@@ -271,13 +271,13 @@ class KernelSupportLibrary {
   // Currently we only support at most one nullptr value in `arguments`.
   static void EmitAndCallOutlinedKernel(
       const HloModuleConfig& module_config, llvm::IRBuilder<>* b,
-      absl::string_view kernel_name, ArgumentVector arguments,
+      abslx::string_view kernel_name, ArgumentVector arguments,
       const std::function<void(ArgumentVector)>& kernel_body_generator);
 
   // Thin wrappers around the more general EmitAndCallOutlinedKernel above.
   static void EmitAndCallOutlinedKernel(
       const HloModuleConfig& module_config, llvm::IRBuilder<>* b,
-      absl::string_view kernel_name, llvm::Value* arg0, llvm::Value* arg1,
+      abslx::string_view kernel_name, llvm::Value* arg0, llvm::Value* arg1,
       llvm::Value* arg2,
       const std::function<void(llvm::Value*, llvm::Value*, llvm::Value*)>&
           kernel_body_generator) {
@@ -290,7 +290,7 @@ class KernelSupportLibrary {
 
   static void EmitAndCallOutlinedKernel(
       const HloModuleConfig& module_config, llvm::IRBuilder<>* b,
-      absl::string_view kernel_name, llvm::Value* arg0, llvm::Value* arg1,
+      abslx::string_view kernel_name, llvm::Value* arg0, llvm::Value* arg1,
       llvm::Value* arg2, llvm::Value* arg3,
       const std::function<void(llvm::Value*, llvm::Value*, llvm::Value*,
                                llvm::Value*)>& kernel_body_generator) {

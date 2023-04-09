@@ -71,7 +71,7 @@ StatusOr<bool> MoveConvertPrecisionOps(HloComputation* comp) {
   for (HloInstruction* instr : comp->MakeInstructionPostOrder()) {
     if (!OpCommutesWithConvert(instr->opcode()) ||
         instr->operand_count() == 0 ||
-        !absl::c_all_of(instr->operands(), [](const HloInstruction* operand) {
+        !abslx::c_all_of(instr->operands(), [](const HloInstruction* operand) {
           // TODO(jlebar): Is the user_count == 1 constraint too restrictive?
           return (operand->opcode() == HloOpcode::kConvert &&
                   operand->user_count() == 1) ||
@@ -82,14 +82,14 @@ StatusOr<bool> MoveConvertPrecisionOps(HloComputation* comp) {
     // At least one of the operands must be a kConvert op, and all of the
     // kConverts must have the same src data type.
     auto convert_op_it =
-        absl::c_find_if(instr->operands(), [](const HloInstruction* operand) {
+        abslx::c_find_if(instr->operands(), [](const HloInstruction* operand) {
           return operand->opcode() == HloOpcode::kConvert;
         });
     if (convert_op_it == instr->operands().end()) {
       continue;
     }
     const HloInstruction* convert_op = *convert_op_it;
-    if (!absl::c_all_of(instr->operands(), [&](const HloInstruction* operand) {
+    if (!abslx::c_all_of(instr->operands(), [&](const HloInstruction* operand) {
           return operand->opcode() != HloOpcode::kConvert ||
                  operand->operand(0)->shape().element_type() ==
                      convert_op->operand(0)->shape().element_type();
@@ -108,7 +108,7 @@ StatusOr<bool> MoveConvertPrecisionOps(HloComputation* comp) {
     // iff const_f32 == convert_to_f32(convert_to_f16(const_f32)) -- that is, if
     // the constant doesn't lose any information by being converted to a lower
     // precision.
-    if (absl::c_any_of(instr->operands(), [&](const HloInstruction* operand) {
+    if (abslx::c_any_of(instr->operands(), [&](const HloInstruction* operand) {
           return operand->opcode() == HloOpcode::kConstant &&
                  !IsLosslesslyConvertibleTo(operand->literal(), src_ty);
         })) {
@@ -118,7 +118,7 @@ StatusOr<bool> MoveConvertPrecisionOps(HloComputation* comp) {
     VLOG(2) << "Moving increase-precision convert op " << convert_op->ToString()
             << " down the graph: " << instr->ToString();
 
-    absl::InlinedVector<HloInstruction*, 8> new_operands;
+    abslx::InlinedVector<HloInstruction*, 8> new_operands;
     new_operands.reserve(instr->operand_count());
     for (HloInstruction* operand : instr->operands()) {
       // All operands are either kConvert or kConstant. Unwrap kConvert ops, and
@@ -170,7 +170,7 @@ StatusOr<bool> MoveConvertPrecisionOps(HloComputation* comp) {
 
     HloInstruction* to_convert = instr->mutable_operand(0);
 
-    absl::InlinedVector<HloInstruction*, 8> new_operands;
+    abslx::InlinedVector<HloInstruction*, 8> new_operands;
     new_operands.reserve(to_convert->operand_count());
     for (HloInstruction* operand : to_convert->operands()) {
       work_queue.push_front(MakeConvertToHlo(operand, dst_ty));
@@ -190,7 +190,7 @@ StatusOr<bool> MoveConvertPrecisionOps(HloComputation* comp) {
 
 StatusOr<bool> ConvertMover::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   for (HloComputation* comp :
        module->MakeNonfusionComputations(execution_threads)) {

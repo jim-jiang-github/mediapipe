@@ -85,7 +85,7 @@ Status ReplaceWithContiguousAllReduce(HloAllReduceInstruction* all_reduce) {
 
 StatusOr<bool> AllReduceContiguous::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   VLOG(1) << "Running AllReduceContiguous";
 
   if (hlo_query::ContainsLayoutConstrainedAllReduce(*module)) {

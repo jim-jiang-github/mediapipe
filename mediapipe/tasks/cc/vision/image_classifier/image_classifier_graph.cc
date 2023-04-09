@@ -101,7 +101,7 @@ struct ImageClassifierOutputStreams {
 
 class ImageClassifierGraph : public core::ModelTaskGraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     ASSIGN_OR_RETURN(
         const auto* model_resources,
@@ -130,7 +130,7 @@ class ImageClassifierGraph : public core::ModelTaskGraph {
   // classification model file with model metadata.
   // image_in: (mediapipe::Image) stream to run classification on.
   // graph: the mediapipe builder::Graph instance to be updated.
-  absl::StatusOr<ImageClassifierOutputStreams> BuildImageClassificationTask(
+  abslx::StatusOr<ImageClassifierOutputStreams> BuildImageClassificationTask(
       const proto::ImageClassifierGraphOptions& task_options,
       const core::ModelResources& model_resources, Source<Image> image_in,
       Source<NormalizedRect> norm_rect_in, Graph& graph) {

@@ -36,15 +36,15 @@ namespace gl {
 namespace {
 
 // Wraps given SSBO into GlBuffer object that does not have ownership.
-absl::Status WrapSSBO(OpenGlBuffer ssbo, GlBuffer* buffer) {
+abslx::Status WrapSSBO(OpenGlBuffer ssbo, GlBuffer* buffer) {
   int64_t size_bytes;
   RETURN_IF_ERROR(GetSSBOSize(ssbo.id, &size_bytes));
   *buffer = GlBuffer(GL_SHADER_STORAGE_BUFFER, ssbo.id, size_bytes, 0, false);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 std::string GetShaderHeader(const uint3& localsize) {
-  return absl::StrCat("#version 310 es\nlayout(local_size_x = ", localsize.x,
+  return abslx::StrCat("#version 310 es\nlayout(local_size_x = ", localsize.x,
                       ", local_size_y = ", localsize.y,
                       ", local_size_z = ", localsize.z, ") in;\n");
 }
@@ -54,11 +54,11 @@ class OpenGlConverterImpl : public TensorObjectConverter {
   explicit OpenGlConverterImpl(CommandQueue* command_queue)
       : command_queue_(command_queue) {}
 
-  virtual absl::Status Init(const TensorObjectDef& input_def,
+  virtual abslx::Status Init(const TensorObjectDef& input_def,
                             const TensorObjectDef& output_def) = 0;
 
  protected:
-  absl::Status InitializeProgram(const uint3& workgroup_size,
+  abslx::Status InitializeProgram(const uint3& workgroup_size,
                                  const std::string& shader_source) {
     workgroup_size_ = workgroup_size;
     GlShader shader;
@@ -68,7 +68,7 @@ class OpenGlConverterImpl : public TensorObjectConverter {
     return GlProgram::CreateWithShader(shader, &program_);
   }
 
-  absl::Status Dispatch(const uint3& workload) {
+  abslx::Status Dispatch(const uint3& workload) {
     uint3 num_workgroups = DivideRoundUp(workload, workgroup_size_);
     if (command_queue_) {
       return command_queue_->Dispatch(program_, num_workgroups);
@@ -108,12 +108,12 @@ class FromTensorConverter : public OpenGlConverterImpl {
            input.data_layout == DataLayout::DHWC4;
   }
 
-  absl::Status Init(const TensorObjectDef& input_def,
+  abslx::Status Init(const TensorObjectDef& input_def,
                     const TensorObjectDef& output_def) final {
     shape_ = BHWC(output_def.dimensions.b, output_def.dimensions.h,
                   output_def.dimensions.w, output_def.dimensions.c);
     if (shape_.b != 1) {
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "FromTensorConverter: Batch size != 1 is not supported.");
     }
 
@@ -140,18 +140,18 @@ class FromTensorConverter : public OpenGlConverterImpl {
     })");
   }
 
-  absl::Status Convert(const TensorObject& input_obj,
+  abslx::Status Convert(const TensorObject& input_obj,
                        const TensorObject& output_obj) override {
     auto output = std::get_if<OpenGlBuffer>(&output_obj);
     if (!output || !output->id) {
-      return absl::InvalidArgumentError("Missing output in converter");
+      return abslx::InvalidArgumentError("Missing output in converter");
     }
     auto input = std::get_if<OpenGlBuffer>(&input_obj);
     if (!input || !input->id) {
-      return absl::InvalidArgumentError("Missing input in converter");
+      return abslx::InvalidArgumentError("Missing input in converter");
     }
     if (input->id == output->id) {
-      return absl::InvalidArgumentError("Can not execute inplace conversion");
+      return abslx::InvalidArgumentError("Can not execute inplace conversion");
     }
     GlBuffer input_ssbo;
     RETURN_IF_ERROR(WrapSSBO(*input, &input_ssbo));
@@ -159,11 +159,11 @@ class FromTensorConverter : public OpenGlConverterImpl {
     RETURN_IF_ERROR(WrapSSBO(*output, &output_ssbo));
 
     if (input_ssbo.bytes_size() != SizeInBytesDHWC4(shape_)) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "FromTensorConverter: input data size does not match expected size.");
     }
     if (output_ssbo.bytes_size() != SizeInBytesBHWC(shape_)) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "FromTensorConverter: output data size does not match expected "
           "size.");
     }
@@ -196,12 +196,12 @@ class ToTensorConverter : public OpenGlConverterImpl {
            output.data_layout == DataLayout::DHWC4;
   }
 
-  absl::Status Init(const TensorObjectDef& input_def,
+  abslx::Status Init(const TensorObjectDef& input_def,
                     const TensorObjectDef& output_def) final {
     shape_ = BHWC(output_def.dimensions.b, output_def.dimensions.h,
                   output_def.dimensions.w, output_def.dimensions.c);
     if (shape_.b != 1) {
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "FromTensorConverter: Batch size != 1 is not supported.");
     }
 
@@ -235,18 +235,18 @@ class ToTensorConverter : public OpenGlConverterImpl {
     })");
   }
 
-  absl::Status Convert(const TensorObject& input_obj,
+  abslx::Status Convert(const TensorObject& input_obj,
                        const TensorObject& output_obj) override {
     auto output = std::get_if<OpenGlBuffer>(&output_obj);
     if (!output || !output->id) {
-      return absl::InvalidArgumentError("Missing output in converter");
+      return abslx::InvalidArgumentError("Missing output in converter");
     }
     auto input = std::get_if<OpenGlBuffer>(&input_obj);
     if (!input || !input->id) {
-      return absl::InvalidArgumentError("Missing input in converter");
+      return abslx::InvalidArgumentError("Missing input in converter");
     }
     if (input->id == output->id) {
-      return absl::InvalidArgumentError("Can not execute inplace conversion");
+      return abslx::InvalidArgumentError("Can not execute inplace conversion");
     }
     GlBuffer input_ssbo;
     RETURN_IF_ERROR(WrapSSBO(*input, &input_ssbo));
@@ -254,11 +254,11 @@ class ToTensorConverter : public OpenGlConverterImpl {
     RETURN_IF_ERROR(WrapSSBO(*output, &output_ssbo));
 
     if (input_ssbo.bytes_size() != SizeInBytesBHWC(shape_)) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "ToTensorConverter: input data size does not match expected size.");
     }
     if (output_ssbo.bytes_size() != SizeInBytesDHWC4(shape_)) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "ToTensorConverter: output data size does not match expected size.");
     }
     auto d = DivideRoundUp(shape_.c, 4);
@@ -284,19 +284,19 @@ class TrivialCopier : public TensorObjectConverter {
            input.data_layout == output.data_layout;
   }
 
-  absl::Status Convert(const TensorObject& input_obj,
+  abslx::Status Convert(const TensorObject& input_obj,
                        const TensorObject& output_obj) override {
     auto ssbo_input = std::get_if<OpenGlBuffer>(&input_obj);
     auto ssbo_output = std::get_if<OpenGlBuffer>(&output_obj);
     if (ssbo_input && ssbo_output) {
       return Copy(*ssbo_input, *ssbo_output);
     }
-    return absl::InternalError("Unexpected object");
+    return abslx::InternalError("Unexpected object");
   }
 
-  absl::Status Copy(OpenGlBuffer input, OpenGlBuffer output) {
+  abslx::Status Copy(OpenGlBuffer input, OpenGlBuffer output) {
     if (input.id == output.id) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     GlBuffer input_obj;
     RETURN_IF_ERROR(WrapSSBO(input, &input_obj));
@@ -318,7 +318,7 @@ class CpuCopier : public TensorObjectConverter {
              input.object_type == ObjectType::OPENGL_SSBO));
   }
 
-  absl::Status Convert(const TensorObject& input_obj,
+  abslx::Status Convert(const TensorObject& input_obj,
                        const TensorObject& output_obj) override {
     auto cpu_input = std::get_if<CpuMemory>(&input_obj);
     auto cpu_output = std::get_if<CpuMemory>(&output_obj);
@@ -328,7 +328,7 @@ class CpuCopier : public TensorObjectConverter {
         GlBuffer gl_buffer;
         RETURN_IF_ERROR(WrapSSBO(*ssbo_output, &gl_buffer));
         return gl_buffer.Write(
-            absl::MakeConstSpan(static_cast<const uint8_t*>(cpu_input->data),
+            abslx::MakeConstSpan(static_cast<const uint8_t*>(cpu_input->data),
                                 cpu_input->size_bytes));
       }
     } else if (cpu_output) {
@@ -336,11 +336,11 @@ class CpuCopier : public TensorObjectConverter {
       if (ssbo_input) {
         GlBuffer gl_buffer;
         RETURN_IF_ERROR(WrapSSBO(*ssbo_input, &gl_buffer));
-        return gl_buffer.Read(absl::MakeSpan(
+        return gl_buffer.Read(abslx::MakeSpan(
             static_cast<uint8_t*>(cpu_output->data), cpu_output->size_bytes));
       }
     }
-    return absl::InternalError("Unexpected object");
+    return abslx::InternalError("Unexpected object");
   }
 };
 
@@ -360,7 +360,7 @@ class TensorConverterBuilderImpl : public TensorObjectConverterBuilder {
             ToTensorConverter::IsSupported(input_def, output_def));
   }
 
-  absl::Status MakeConverter(
+  abslx::Status MakeConverter(
       const TensorObjectDef& input, const TensorObjectDef& output,
       std::unique_ptr<TensorObjectConverter>* converter) final {
     std::unique_ptr<OpenGlConverterImpl> impl;
@@ -368,22 +368,22 @@ class TensorConverterBuilderImpl : public TensorObjectConverterBuilder {
     const auto& output_def = output.object_def;
     if (TrivialCopier::IsSupported(input_def, output_def)) {
       *converter = std::make_unique<TrivialCopier>();
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     if (CpuCopier::IsSupported(input_def, output_def)) {
       *converter = std::make_unique<CpuCopier>();
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     if (FromTensorConverter::IsSupported(input_def, output_def)) {
       impl = std::make_unique<FromTensorConverter>(command_queue_);
     } else if (ToTensorConverter::IsSupported(input_def, output_def)) {
       impl = std::make_unique<ToTensorConverter>(command_queue_);
     } else {
-      return absl::UnimplementedError("Unsupported conversion");
+      return abslx::UnimplementedError("Unsupported conversion");
     }
     RETURN_IF_ERROR(impl->Init(input, output));
     *converter = std::move(impl);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

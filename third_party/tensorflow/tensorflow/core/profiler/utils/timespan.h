@@ -100,7 +100,7 @@ class Timespan {
 
   // Returns a string that shows the begin and end times.
   std::string DebugString() const {
-    return absl::StrCat("[", begin_ps(), ", ", end_ps(), "]");
+    return abslx::StrCat("[", begin_ps(), ", ", end_ps(), "]");
   }
 
   // Compares timespans by their duration_ps (ascending), begin time

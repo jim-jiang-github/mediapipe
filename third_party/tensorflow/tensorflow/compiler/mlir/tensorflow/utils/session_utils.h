@@ -37,7 +37,7 @@ tensorflow::Var* GetVariableFromSession(mlir::TF::VarHandleOp var_handle_op,
                                         const tensorflow::DeviceMgr* mgr);
 
 // Returns resource tensors from session for all variables in 'module'.
-absl::StatusOr<std::vector<tensorflow::Tensor>> GetResourcesFromSession(
+abslx::StatusOr<std::vector<tensorflow::Tensor>> GetResourcesFromSession(
     llvm::ArrayRef<TF::VarHandleOp> var_handle_ops,
     tensorflow::Session* session);
 

@@ -39,7 +39,7 @@ class XfeedQueue {
   // the elements of a tuple and may be nullptr if the buffer is a tuple index
   // buffer.
   void EnqueueDestination(BufferType buffers) {
-    absl::MutexLock l(&mu_);
+    abslx::MutexLock l(&mu_);
     enqueued_buffers_.push_back(std::move(buffers));
     enqueue_cv_.Signal();
 
@@ -56,7 +56,7 @@ class XfeedQueue {
     bool became_empty;
     BufferType current_buffer;
     {
-      absl::MutexLock l(&mu_);
+      abslx::MutexLock l(&mu_);
       while (enqueued_buffers_.empty()) {
         enqueue_cv_.Wait(&mu_);
       }
@@ -87,14 +87,14 @@ class XfeedQueue {
   virtual void DequeueHook() ABSL_EXCLUSIVE_LOCKS_REQUIRED(this->mu_) {}
   virtual void EnqueueHook() ABSL_EXCLUSIVE_LOCKS_REQUIRED(this->mu_) {}
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
 
   // The queue of trees of buffers. Buffer* queue contents are not owned.
   std::deque<BufferType> enqueued_buffers_ ABSL_GUARDED_BY(mu_);
 
  private:
   // Condition variable that is signaled every time a buffer is enqueued.
-  absl::CondVar enqueue_cv_;
+  abslx::CondVar enqueue_cv_;
 
   // List of callbacks which will be called when 'enqueued_buffers_' becomes
   // empty.
@@ -121,7 +121,7 @@ class BlockingXfeedQueue : public XfeedQueue<BufferType> {
       : max_pending_xfeeds_(max_pending_xfeeds) {}
 
   void BlockUntilEnqueueSlotAvailable() {
-    absl::MutexLock l{&this->mu_};
+    abslx::MutexLock l{&this->mu_};
     while (pending_buffers_ + this->enqueued_buffers_.size() >=
            max_pending_xfeeds_) {
       VLOG(2) << "Capacity "
@@ -146,7 +146,7 @@ class BlockingXfeedQueue : public XfeedQueue<BufferType> {
   const int max_pending_xfeeds_;
 
   // Condition variable that is signaled every time a buffer is dequeued.
-  absl::CondVar dequeue_cv_;
+  abslx::CondVar dequeue_cv_;
 
   // Keeps track of the number of buffers reserved but not added to
   // enqueued_buffers_.

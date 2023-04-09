@@ -109,7 +109,7 @@ Status BatchOpRewriter::Init(
     VLOG(2) << "Empty batch-op rewrite config";
     return OkStatus();
   }
-  if (!absl::Base64Unescape(params.s(), &unencoded)) {
+  if (!abslx::Base64Unescape(params.s(), &unencoded)) {
     return ::tensorflow::errors::Internal(
         "Failed to unencode batch_op_rewrite_config from params.");
   }

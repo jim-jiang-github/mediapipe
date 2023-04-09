@@ -56,7 +56,7 @@ class EglSurface {
 };
 
 // Creates off-screen pbuffer-based surface of the given height and width.
-absl::Status CreatePbufferRGBSurface(EGLConfig config, EGLDisplay display,
+abslx::Status CreatePbufferRGBSurface(EGLConfig config, EGLDisplay display,
                                      uint32_t height, uint32_t width,
                                      EglSurface* egl_surface);
 

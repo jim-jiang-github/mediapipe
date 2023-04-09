@@ -148,7 +148,7 @@ Status ConvertAttribute(const mlir::TF::FuncAttr& attr, bool remove_ref_type,
 }
 
 Status ConvertAttribute(const mlir::StringAttr& attr, AttrValue* value) {
-  absl::string_view attr_value(attr.getValue().data(), attr.getValue().size());
+  abslx::string_view attr_value(attr.getValue().data(), attr.getValue().size());
   switch (mangling_util::GetMangledKind(attr_value)) {
     case mangling_util::MangledKind::kUnknown: {
       value->set_s(std::string(attr_value));
@@ -368,13 +368,13 @@ StatusOr<std::unique_ptr<NodeDef>> GetOperationNodeDef(
 
 Status ConvertAttributes(
     const llvm::ArrayRef<mlir::NamedAttribute> attrs,
-    const absl::flat_hash_set<absl::string_view>& attrs_to_ignore,
+    const abslx::flat_hash_set<abslx::string_view>& attrs_to_ignore,
     bool remove_ref_type, AttrValueMap* values) {
   AttrValueMap func_call_attrs;
   for (const mlir::NamedAttribute& named_attr : attrs) {
     auto name_strref = named_attr.getName().str();
     auto attr = named_attr.getValue();
-    absl::string_view name(name_strref.data(), name_strref.size());
+    abslx::string_view name(name_strref.data(), name_strref.size());
     if (name == "name" || name == "device" || attrs_to_ignore.contains(name)) {
       // The name, device spec of a TF op or function are not stored as
       // AttrValue inside NodeDef, but we model them using attribute inside
@@ -425,7 +425,7 @@ Status ConvertAttributes(
     // the attribute from MLIR, it is treated as an attribute from function
     // calls.
     std::vector<string> name_tokens =
-        absl::StrSplit(name, '.', absl::SkipEmpty());
+        abslx::StrSplit(name, '.', abslx::SkipEmpty());
     TF_RET_CHECK(name_tokens.size() <= 2);
     auto it = func_call_attrs.find(name_tokens[0]);
     if (it == func_call_attrs.end()) {
@@ -440,7 +440,7 @@ Status ConvertAttributes(
   return OkStatus();
 }
 
-Status SetShapeAttribute(absl::string_view name, mlir::ShapedType shaped_type,
+Status SetShapeAttribute(abslx::string_view name, mlir::ShapedType shaped_type,
                          AttrValueMap* values) {
   AttrValue value;
   SetTensorShapeProto(shaped_type, value.mutable_list()->add_shape());

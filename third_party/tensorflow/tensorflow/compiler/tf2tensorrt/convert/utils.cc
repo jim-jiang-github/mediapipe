@@ -94,8 +94,8 @@ string DebugString(const nvinfer1::ITensor& tensor) {
 }
 
 string DebugString(const std::vector<nvinfer1::Dims>& dimvec) {
-  return absl::StrCat("[",
-                      absl::StrJoin(dimvec, ",",
+  return abslx::StrCat("[",
+                      abslx::StrJoin(dimvec, ",",
                                     [](std::string* out, nvinfer1::Dims in) {
                                       out->append(DebugString(in));
                                     }),
@@ -210,7 +210,7 @@ int GetNumberOfEngineInputs(const nvinfer1::ICudaEngine* engine) {
   return n_input / n_profiles;
 }
 
-absl::string_view GetDeviceName(const Node* node) {
+abslx::string_view GetDeviceName(const Node* node) {
   if (node->has_assigned_device_name()) {
     return node->assigned_device_name();
   }
@@ -219,7 +219,7 @@ absl::string_view GetDeviceName(const Node* node) {
 
 std::optional<DeviceNameUtils::ParsedName> GetDeviceParsedName(
     const Node* node) {
-  absl::string_view device_name = GetDeviceName(node);
+  abslx::string_view device_name = GetDeviceName(node);
   DeviceNameUtils::ParsedName parsed_name;
   if (!DeviceNameUtils::ParseFullName(device_name, &parsed_name)) {
     return std::nullopt;
@@ -240,7 +240,7 @@ std::optional<DeviceNameUtils::ParsedName> MergeIfCompatible(
 }
 
 std::optional<DeviceNameUtils::ParsedName> MergeIfCompatible(
-    const DeviceNameUtils::ParsedName& a, absl::string_view b) {
+    const DeviceNameUtils::ParsedName& a, abslx::string_view b) {
   DeviceNameUtils::ParsedName b_parsed_name;
   if (!DeviceNameUtils::ParseFullName(b, &b_parsed_name)) {
     return std::nullopt;

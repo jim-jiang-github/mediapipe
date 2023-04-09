@@ -71,11 +71,11 @@ LoggingOpResolver::LoggingOpResolver(
     std::string error_message =
         "Failed to initialize op resolver for calibration:";
     if (!unresolved_builtin_ops.empty())
-      absl::StrAppend(&error_message, "\nThere are unresolved builtin ops: [",
-                      absl::StrJoin(unresolved_builtin_ops, ", "), "]");
+      abslx::StrAppend(&error_message, "\nThere are unresolved builtin ops: [",
+                      abslx::StrJoin(unresolved_builtin_ops, ", "), "]");
     if (!unresolved_custom_ops.empty()) {
-      absl::StrAppend(&error_message, "\nThere are unresolved custom ops: [",
-                      absl::StrJoin(unresolved_custom_ops, ", "), "]");
+      abslx::StrAppend(&error_message, "\nThere are unresolved custom ops: [",
+                      abslx::StrJoin(unresolved_custom_ops, ", "), "]");
     }
     TF_LITE_REPORT_ERROR(error_reporter, error_message.c_str());
   }

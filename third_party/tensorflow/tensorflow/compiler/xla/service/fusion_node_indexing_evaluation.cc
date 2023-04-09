@@ -26,7 +26,7 @@ namespace xla {
 
 FusionNodeIndexingEvaluation::FusionNodeIndexingEvaluation(
     const HloInstruction* fusion, int64_t root_usage_count,
-    const absl::flat_hash_set<const HloInstruction*>* other_fusion_instructions)
+    const abslx::flat_hash_set<const HloInstruction*>* other_fusion_instructions)
     : fusion_(fusion) {
   HloInstruction* root = fusion->fused_expression_root();
   indexing_users_[root].insert(fusion);
@@ -71,7 +71,7 @@ bool OpInvalidatesCache(const HloInstruction* hlo) {
 // the real users.
 int64_t UserCount(
     const HloInstruction* hlo,
-    const absl::flat_hash_set<const HloInstruction*>& fusion_instructions,
+    const abslx::flat_hash_set<const HloInstruction*>& fusion_instructions,
     bool skip_outside_users) {
   // If 'hlo' is the root of the fusion computation, check the fusion
   // instruction instead. This is needed in case 'hlo' is part of a fusion we
@@ -140,14 +140,14 @@ int64_t FusionNodeIndexingEvaluation::EvaluateEmittedInstructions(
 
 void FusionNodeIndexingEvaluation::UpdateEvaluationCache(
     const HloInstruction* producer,
-    absl::flat_hash_set<const HloInstruction*> indexing_users_of_producer) {
+    abslx::flat_hash_set<const HloInstruction*> indexing_users_of_producer) {
   CHECK(!indexing_users_.contains(producer));
   indexing_users_[producer] = std::move(indexing_users_of_producer);
   UpdateIndexUsageCount(producer);
   UpdateIndexingUsersOfOperands(producer);
 }
 
-absl::flat_hash_set<const HloInstruction*>
+abslx::flat_hash_set<const HloInstruction*>
 FusionNodeIndexingEvaluation::RemoveFusionOperand(
     HloInstruction* fusion_operand) {
   auto indexing_users_of_operand =

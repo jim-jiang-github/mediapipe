@@ -21,13 +21,13 @@
 #include <array>
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace strings_internal {
 
 struct base64_testcase {
-  absl::string_view plaintext;
-  absl::string_view cyphertext;
+  abslx::string_view plaintext;
+  abslx::string_view cyphertext;
 };
 
 inline const std::array<base64_testcase, 5>& base64_strings() {
@@ -128,6 +128,6 @@ inline const std::array<base64_testcase, 5>& base64_strings() {
 
 }  // namespace strings_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_INTERNAL_ESCAPING_TEST_COMMON_H_

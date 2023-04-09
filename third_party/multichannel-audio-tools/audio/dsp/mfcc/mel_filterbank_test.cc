@@ -187,9 +187,9 @@ TEST(MelFilterbankTest, InverseIsCloseToOriginal) {
   EXPECT_THAT(recomputed_mel_filterbank, Each(0.0));
 
   // Generate array of smoothed random mel values.
-  absl::BitGen gen;
+  abslx::BitGen gen;
   for (int i = 1; i < kChannelCount - 1; ++i) {
-    mel_filterbank[i] = absl::Uniform<double>(gen, 0.0, 1.0);
+    mel_filterbank[i] = abslx::Uniform<double>(gen, 0.0, 1.0);
   }
   SmoothVector(SmootherCoefficientFromScale(2.0f), &mel_filterbank);
 

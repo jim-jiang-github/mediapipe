@@ -32,14 +32,14 @@
 #include "absl/strings/internal/str_format/extension.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 class Cord;
 class FormatCountCapture;
 class FormatSink;
 
-template <absl::FormatConversionCharSet C>
+template <abslx::FormatConversionCharSet C>
 struct FormatConvertResult;
 class FormatConversionSpec;
 
@@ -63,9 +63,9 @@ auto FormatConvertImpl(const T& v, FormatConversionSpecImpl conv,
                                   std::declval<const FormatConversionSpec&>(),
                                   std::declval<FormatSink*>())) {
   using FormatConversionSpecT =
-      absl::enable_if_t<sizeof(const T& (*)()) != 0, FormatConversionSpec>;
+      abslx::enable_if_t<sizeof(const T& (*)()) != 0, FormatConversionSpec>;
   using FormatSinkT =
-      absl::enable_if_t<sizeof(const T& (*)()) != 0, FormatSink>;
+      abslx::enable_if_t<sizeof(const T& (*)()) != 0, FormatSink>;
   auto fcs = conv.Wrap<FormatConversionSpecT>();
   auto fs = sink->Wrap<FormatSinkT>();
   return AbslFormatConvert(v, fcs, &fs);
@@ -128,7 +128,7 @@ FormatConvertImpl(const char* v, const FormatConversionSpecImpl conv,
                   FormatSinkImpl* sink);
 
 template <class AbslCord, typename std::enable_if<std::is_same<
-                              AbslCord, absl::Cord>::value>::type* = nullptr>
+                              AbslCord, abslx::Cord>::value>::type* = nullptr>
 StringConvertResult FormatConvertImpl(const AbslCord& value,
                                       FormatConversionSpecImpl conv,
                                       FormatSinkImpl* sink) {
@@ -251,7 +251,7 @@ struct FormatCountCaptureHelper {
   static ArgConvertResult<FormatConversionCharSetInternal::n> ConvertHelper(
       const FormatCountCapture& v, FormatConversionSpecImpl conv,
       FormatSinkImpl* sink) {
-    const absl::enable_if_t<sizeof(T) != 0, FormatCountCapture>& v2 = v;
+    const abslx::enable_if_t<sizeof(T) != 0, FormatCountCapture>& v2 = v;
 
     if (conv.conversion_char() !=
         str_format_internal::FormatConversionCharInternal::n) {
@@ -293,7 +293,7 @@ struct FormatArgImplFriend {
 
 template <typename Arg>
 constexpr FormatConversionCharSet ArgumentToConv() {
-  return absl::str_format_internal::ExtractCharSet(
+  return abslx::str_format_internal::ExtractCharSet(
       decltype(str_format_internal::FormatConvertImpl(
           std::declval<const Arg&>(),
           std::declval<const FormatConversionSpecImpl&>(),
@@ -513,6 +513,6 @@ ABSL_INTERNAL_FORMAT_DISPATCH_OVERLOADS_EXPAND_(extern);
 
 }  // namespace str_format_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_INTERNAL_STR_FORMAT_ARG_H_

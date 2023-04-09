@@ -33,27 +33,27 @@ class TFLiteOperationParser {
 
   // Parses TFLite operation. This method allows expanding fused operations
   // into more than one node.
-  virtual absl::Status Parse(const TfLiteNode* tflite_node,
+  virtual abslx::Status Parse(const TfLiteNode* tflite_node,
                              const TfLiteRegistration* registration,
                              GraphFloat32* graph, ObjectReader* reader) = 0;
 
   // Verifies whether passed tflite node may be built by GPU delegate or not.
-  virtual absl::Status IsSupported(const TfLiteContext* context,
+  virtual abslx::Status IsSupported(const TfLiteContext* context,
                                    const TfLiteNode* tflite_node,
                                    const TfLiteRegistration* registration) = 0;
 
   // Returns the value IDs in the graph that correspond to the updated values of
   // the variable input tensor.
-  virtual absl::flat_hash_map<int, ValueId>
+  virtual abslx::flat_hash_map<int, ValueId>
   GetNewValueIdsForVariableInputNodes() {
     return {};
   }
 };
 
-absl::Status CheckMaxSupportedOpVersion(const TfLiteRegistration* registration,
+abslx::Status CheckMaxSupportedOpVersion(const TfLiteRegistration* registration,
                                         int max_version);
 HW ToHW(int32_t h, int32_t w);
-absl::Status ParsePoolingAttributes(const TfLitePoolParams* tf_options,
+abslx::Status ParsePoolingAttributes(const TfLitePoolParams* tf_options,
                                     const BHWC& input_shape,
                                     Pooling2DAttributes* attr);
 

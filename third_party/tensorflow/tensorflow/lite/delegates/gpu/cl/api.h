@@ -83,18 +83,18 @@ class InferenceEnvironment {
   // method (see below).
   // Normally BuildSerializedModel method need to be called whenever a model or
   // OS GPU driver is updated.
-  virtual absl::Status BuildSerializedModel(
+  virtual abslx::Status BuildSerializedModel(
       const InferenceOptions& options, GraphFloat32 model,
       std::vector<uint8_t>* serialized_model) = 0;
 
   // Serialized model can became invalid when environment changes. In this case
   // this call will fail and model must be regenerated(with
   // BuildSerializedModel).
-  virtual absl::Status NewInferenceBuilder(
-      const absl::Span<const uint8_t> serialized_model,
+  virtual abslx::Status NewInferenceBuilder(
+      const abslx::Span<const uint8_t> serialized_model,
       std::unique_ptr<InferenceBuilder>* builder) = 0;
 
-  virtual absl::Status NewInferenceBuilder(
+  virtual abslx::Status NewInferenceBuilder(
       const InferenceOptions& options, GraphFloat32 model,
       std::unique_ptr<InferenceBuilder>* builder) = 0;
 
@@ -127,7 +127,7 @@ struct InferenceEnvironmentOptions {
   // InferenceEnvironment::GetSerializedBinaryCache method.
   // Invalid or incompatible data will be discarded. Compiled binary may become
   // incompatible when GPU driver is updated.
-  absl::Span<const uint8_t> serialized_binary_cache;
+  abslx::Span<const uint8_t> serialized_binary_cache;
 
   bool IsGlAware() const {
     return egl_context != EGL_NO_CONTEXT && egl_display != EGL_NO_DISPLAY;
@@ -136,7 +136,7 @@ struct InferenceEnvironmentOptions {
 
 // Creates new OpenCL environment that needs to stay around until all inference
 // runners are destroyed.
-absl::Status NewInferenceEnvironment(
+abslx::Status NewInferenceEnvironment(
     const InferenceEnvironmentOptions& options,
     std::unique_ptr<InferenceEnvironment>* environment,
     InferenceEnvironmentProperties* properties /* optional */);
@@ -153,19 +153,19 @@ class CLInferenceRunner : public ::tflite::gpu::InferenceRunner {
   // The user of this interface is responsible for copying the inputs prior to
   // running the GPU kernels and outputs post running with the other interfaces
   // provided here.
-  virtual absl::Status RunWithoutExternalBufferCopy() = 0;
+  virtual abslx::Status RunWithoutExternalBufferCopy() = 0;
 
   // Copies from the external input tensor (normally CPU buffer) to the internal
   // OpenCL buffer.  The call only guarantees a queueing of the command. The
   // caller is expected to hold a copy of the queue and wait for completion if
   // the external buffer is a CPU buffer.
-  virtual absl::Status CopyFromExternalInput(int index) = 0;
+  virtual abslx::Status CopyFromExternalInput(int index) = 0;
 
   // Copies from the internal output OpenCL buffer to the external output
   // tensor.  The call only guarantees a queueing of the command. The caller
   // is expected to hold a copy of the queue and wait for completion if the
   // external buffer is a CPU buffer.
-  virtual absl::Status CopyToExternalOutput(int index) = 0;
+  virtual abslx::Status CopyToExternalOutput(int index) = 0;
 };
 
 }  // namespace cl

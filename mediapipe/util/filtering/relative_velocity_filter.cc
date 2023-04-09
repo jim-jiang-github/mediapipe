@@ -22,9 +22,9 @@
 
 namespace mediapipe {
 
-float RelativeVelocityFilter::Apply(absl::Duration timestamp, float value_scale,
+float RelativeVelocityFilter::Apply(abslx::Duration timestamp, float value_scale,
                                     float value) {
-  const int64_t new_timestamp = absl::ToInt64Nanoseconds(timestamp);
+  const int64_t new_timestamp = abslx::ToInt64Nanoseconds(timestamp);
   if (last_timestamp_ >= new_timestamp) {
     // Results are unpredictable in this case, so nothing to do but
     // return same value

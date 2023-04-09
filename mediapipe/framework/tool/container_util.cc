@@ -6,7 +6,7 @@ namespace mediapipe {
 namespace tool {
 
 std::string ChannelTag(const std::string& tag, int channel) {
-  return absl::StrCat("C", channel, "__", tag);
+  return abslx::StrCat("C", channel, "__", tag);
 }
 
 // Parses a tag name starting with a channel prefix, like "C2__".
@@ -39,7 +39,7 @@ int ChannelCount(const std::shared_ptr<tool::TagMap>& map) {
     std::string name, num;
     int channel = -1;
     if (ParseChannelTag(tag, &name, &num)) {
-      if (absl::SimpleAtoi(num, &channel)) {
+      if (abslx::SimpleAtoi(num, &channel)) {
         count = std::max(count, channel + 1);
       }
     }

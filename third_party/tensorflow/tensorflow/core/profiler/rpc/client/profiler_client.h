@@ -30,7 +30,7 @@ namespace tensorflow {
 namespace profiler {
 
 // Note that tensorflow/tools/def_file_filter/symbols_pybind.txt is incompatible
-// with absl::string_view.
+// with abslx::string_view.
 Status ProfileGrpc(const std::string& service_address,
                    const ProfileRequest& request, ProfileResponse* response);
 
@@ -47,7 +47,7 @@ class RemoteProfilerSession {
   // This is a non-blocking call and does not wait for a response.
   // Response must outlive the instantiation.
   static std::unique_ptr<RemoteProfilerSession> Create(
-      const std::string& service_address, absl::Time deadline,
+      const std::string& service_address, abslx::Time deadline,
       const ProfileRequest& profile_request);
 
   // Not copyable or movable.
@@ -56,7 +56,7 @@ class RemoteProfilerSession {
 
   ~RemoteProfilerSession();
 
-  absl::string_view GetServiceAddress() const { return service_address_; }
+  abslx::string_view GetServiceAddress() const { return service_address_; }
 
   // Blocks until a response has been received or until deadline expiry,
   // whichever is first. Subsequent calls after the first will yield nullptr and
@@ -65,7 +65,7 @@ class RemoteProfilerSession {
 
  private:
   explicit RemoteProfilerSession(const std::string& service_addr,
-                                 absl::Time deadline,
+                                 abslx::Time deadline,
                                  const ProfileRequest& profile_request);
 
   // Starts a remote profiling session. This is a non-blocking call.
@@ -80,7 +80,7 @@ class RemoteProfilerSession {
   // Client address and connection attributes.
   std::string service_address_;
   std::unique_ptr<grpc::ProfilerService::Stub> stub_;
-  absl::Time deadline_;
+  abslx::Time deadline_;
   ::grpc::ClientContext grpc_context_;
   std::unique_ptr<::grpc::ClientAsyncResponseReader<ProfileResponse>> rpc_;
   ::grpc::Status grpc_status_ = ::grpc::Status::OK;

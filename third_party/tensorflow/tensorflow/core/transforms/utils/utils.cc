@@ -39,7 +39,7 @@ bool NodeIsOnCpu(Operation *op) {
   std::string task, device;
   return tensorflow::DeviceNameUtils::SplitDeviceName(TFOp(op).device().data(),
                                                       &task, &device) &&
-         absl::StartsWith(device, tensorflow::DEVICE_CPU);
+         abslx::StartsWith(device, tensorflow::DEVICE_CPU);
 }
 
 void EraseRegularNodeAttributes(NamedAttrList &attr_list) {

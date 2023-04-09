@@ -51,8 +51,8 @@ class SummaryFileWriter : public SummaryWriterInterface {
     int32_t pid = env_->GetProcessId();
     static std::atomic<int64_t> file_id_counter(0);
     // Precede filename_suffix with "." if it doesn't already start with one.
-    string sep = absl::StartsWith(filename_suffix, ".") ? "" : ".";
-    const string uniquified_filename_suffix = absl::StrCat(
+    string sep = abslx::StartsWith(filename_suffix, ".") ? "" : ".";
+    const string uniquified_filename_suffix = abslx::StrCat(
         ".", pid, ".", file_id_counter.fetch_add(1), sep, filename_suffix);
     mutex_lock ml(mu_);
     events_writer_ =

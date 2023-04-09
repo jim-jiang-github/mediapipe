@@ -111,7 +111,7 @@ Status SetUpKernelFallbackCompatRequestContext(
     const tensorflow::DeviceMgr* device_manager,
     const tensorflow::ProcessFunctionLibraryRuntime* pflr,
     tensorflow::thread::ThreadPoolInterface* user_intra_op_threadpool,
-    const absl::optional<SessionMetadata>& model_metadata,
+    const abslx::optional<SessionMetadata>& model_metadata,
     std::function<void(std::function<void()>)>* runner) {
   DCHECK(builder);
   DCHECK(device_manager);
@@ -137,7 +137,7 @@ Status SetUpKernelFallbackCompatRequestContext(
     tfrt::RequestContextBuilder* builder, OpKernelRunnerTable* runner_table,
     tensorflow::EagerContext* eager_context,
     tensorflow::thread::ThreadPoolInterface* user_intra_op_threadpool,
-    const absl::optional<SessionMetadata>& model_metadata) {
+    const abslx::optional<SessionMetadata>& model_metadata) {
   auto* resource_array =
       builder->resource_context()->GetOrCreateResource<FallbackResourceArray>(
           kFallbackResourceArray);
@@ -389,8 +389,8 @@ tfrt::AsyncValueRef<tfrt::Chain> KernelFallbackExecuteCompatCoreRuntimeDispatch(
   return op_chain;
 }
 
-static absl::string_view StripTfPrefix(tfrt::string_view op_name) {
-  return absl::StripPrefix(ToAbslStringView(op_name), "tf.");
+static abslx::string_view StripTfPrefix(tfrt::string_view op_name) {
+  return abslx::StripPrefix(ToAbslStringView(op_name), "tf.");
 }
 
 // Generate metadata for an execution op event
@@ -631,7 +631,7 @@ tfrt::AsyncValueRef<tfrt::Chain> KernelFallbackCreateOp(
                             std::move(statusor_runner).ValueOrDie())) {
     return tfrt::EmitErrorAsync(
         exec_ctx,
-        absl::StrCat("KernelFallbackCreateOp: OpKernelRunner already exists: ",
+        abslx::StrCat("KernelFallbackCreateOp: OpKernelRunner already exists: ",
                      op_name_attr.GetValue().str()));
   }
 

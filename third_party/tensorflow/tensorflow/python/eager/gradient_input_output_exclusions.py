@@ -325,7 +325,7 @@ def get_entries(attr_name):
 def get_function(name, entries):
   """Generates lookup function with given name and lookup table entries."""
   contents = """
-absl::optional<tensorflow::gtl::FlatSet<int>> {name}(
+abslx::optional<tensorflow::gtl::FlatSet<int>> {name}(
     const tensorflow::string &op_name) {{
   static std::array<OpIndexInfo, {count}> a = {{{{
 """.format(
@@ -341,7 +341,7 @@ absl::optional<tensorflow::gtl::FlatSet<int>> {name}(
   if (it != m.end()) {
     return it->second;
   }
-  return absl::nullopt;
+  return abslx::nullopt;
 }
 """
   return contents

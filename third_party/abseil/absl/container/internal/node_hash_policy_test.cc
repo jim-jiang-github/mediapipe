@@ -20,7 +20,7 @@
 #include "gtest/gtest.h"
 #include "absl/container/internal/hash_policy_traits.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
@@ -66,4 +66,4 @@ TEST_F(NodeTest, transfer) {
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

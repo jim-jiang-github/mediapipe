@@ -30,7 +30,7 @@ limitations under the License.
 
 namespace tensorflow {
 
-using StringPiece = absl::string_view;
+using StringPiece = abslx::string_view;
 
 }  // namespace tensorflow
 

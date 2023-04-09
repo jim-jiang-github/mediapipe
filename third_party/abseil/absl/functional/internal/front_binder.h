@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Implementation details for `absl::bind_front()`.
+// Implementation details for `abslx::bind_front()`.
 
 #ifndef ABSL_FUNCTIONAL_INTERNAL_FRONT_BINDER_H_
 #define ABSL_FUNCTIONAL_INTERNAL_FRONT_BINDER_H_
@@ -26,35 +26,35 @@
 #include "absl/meta/type_traits.h"
 #include "absl/utility/utility.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace functional_internal {
 
 // Invoke the method, expanding the tuple of bound arguments.
 template <class R, class Tuple, size_t... Idx, class... Args>
-R Apply(Tuple&& bound, absl::index_sequence<Idx...>, Args&&... free) {
+R Apply(Tuple&& bound, abslx::index_sequence<Idx...>, Args&&... free) {
   return base_internal::invoke(
-      absl::forward<Tuple>(bound).template get<Idx>()...,
-      absl::forward<Args>(free)...);
+      abslx::forward<Tuple>(bound).template get<Idx>()...,
+      abslx::forward<Args>(free)...);
 }
 
 template <class F, class... BoundArgs>
 class FrontBinder {
-  using BoundArgsT = absl::container_internal::CompressedTuple<F, BoundArgs...>;
-  using Idx = absl::make_index_sequence<sizeof...(BoundArgs) + 1>;
+  using BoundArgsT = abslx::container_internal::CompressedTuple<F, BoundArgs...>;
+  using Idx = abslx::make_index_sequence<sizeof...(BoundArgs) + 1>;
 
   BoundArgsT bound_args_;
 
  public:
   template <class... Ts>
-  constexpr explicit FrontBinder(absl::in_place_t, Ts&&... ts)
-      : bound_args_(absl::forward<Ts>(ts)...) {}
+  constexpr explicit FrontBinder(abslx::in_place_t, Ts&&... ts)
+      : bound_args_(abslx::forward<Ts>(ts)...) {}
 
   template <class... FreeArgs, class R = base_internal::invoke_result_t<
                                    F&, BoundArgs&..., FreeArgs&&...>>
   R operator()(FreeArgs&&... free_args) & {
     return functional_internal::Apply<R>(bound_args_, Idx(),
-                                         absl::forward<FreeArgs>(free_args)...);
+                                         abslx::forward<FreeArgs>(free_args)...);
   }
 
   template <class... FreeArgs,
@@ -62,7 +62,7 @@ class FrontBinder {
                 const F&, const BoundArgs&..., FreeArgs&&...>>
   R operator()(FreeArgs&&... free_args) const& {
     return functional_internal::Apply<R>(bound_args_, Idx(),
-                                         absl::forward<FreeArgs>(free_args)...);
+                                         abslx::forward<FreeArgs>(free_args)...);
   }
 
   template <class... FreeArgs, class R = base_internal::invoke_result_t<
@@ -70,8 +70,8 @@ class FrontBinder {
   R operator()(FreeArgs&&... free_args) && {
     // This overload is called when *this is an rvalue. If some of the bound
     // arguments are stored by value or rvalue reference, we move them.
-    return functional_internal::Apply<R>(absl::move(bound_args_), Idx(),
-                                         absl::forward<FreeArgs>(free_args)...);
+    return functional_internal::Apply<R>(abslx::move(bound_args_), Idx(),
+                                         abslx::forward<FreeArgs>(free_args)...);
   }
 
   template <class... FreeArgs,
@@ -80,16 +80,16 @@ class FrontBinder {
   R operator()(FreeArgs&&... free_args) const&& {
     // This overload is called when *this is an rvalue. If some of the bound
     // arguments are stored by value or rvalue reference, we move them.
-    return functional_internal::Apply<R>(absl::move(bound_args_), Idx(),
-                                         absl::forward<FreeArgs>(free_args)...);
+    return functional_internal::Apply<R>(abslx::move(bound_args_), Idx(),
+                                         abslx::forward<FreeArgs>(free_args)...);
   }
 };
 
 template <class F, class... BoundArgs>
-using bind_front_t = FrontBinder<decay_t<F>, absl::decay_t<BoundArgs>...>;
+using bind_front_t = FrontBinder<decay_t<F>, abslx::decay_t<BoundArgs>...>;
 
 }  // namespace functional_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_FUNCTIONAL_INTERNAL_FRONT_BINDER_H_

@@ -27,10 +27,10 @@
 #include "absl/random/internal/generate_real.h"
 #include "absl/random/internal/iostream_state_saver.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
-// absl::poisson_distribution:
+// abslx::poisson_distribution:
 // Generates discrete variates conforming to a Poisson distribution.
 //   p(n) = (mean^n / n!) exp(-mean)
 //
@@ -81,7 +81,7 @@ class poisson_distribution {
     int split_;
 
     static_assert(std::is_integral<IntType>::value,
-                  "Class-template absl::poisson_distribution<> must be "
+                  "Class-template abslx::poisson_distribution<> must be "
                   "parameterized using an integral type.");
   };
 
@@ -155,7 +155,7 @@ poisson_distribution<IntType>::param_type::param_type(double mean)
     double a = mean_ + 0.5;
     s_ = kSA + std::sqrt(k2E * a);
     const double mode = std::ceil(mean_) - 1;
-    log_k_ = lmu_ * mode - absl::random_internal::StirlingLogFactorial(mode);
+    log_k_ = lmu_ * mode - abslx::random_internal::StirlingLogFactorial(mode);
   }
 }
 
@@ -218,7 +218,7 @@ poisson_distribution<IntType>::operator()(
     // clang-format off
     double s = (x <= 1.0) ? 0.0
              : (x == 2.0) ? 0.693147180559945
-             : absl::random_internal::StirlingLogFactorial(x);
+             : abslx::random_internal::StirlingLogFactorial(x);
     // clang-format on
     const double lhs = 2.0 * std::log(u) + p.log_k_ + s;
     if (lhs < rhs) {
@@ -253,6 +253,6 @@ std::basic_istream<CharT, Traits>& operator>>(
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_POISSON_DISTRIBUTION_H_

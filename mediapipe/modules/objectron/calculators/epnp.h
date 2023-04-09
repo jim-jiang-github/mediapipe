@@ -36,7 +36,7 @@ namespace mediapipe {
 //     portrait orientation or not.
 //   input_points_2d: input 2D points to be lifted to 3D.
 //   output_points_3d: ouput 3D points in camera coordinate.
-absl::Status SolveEpnp(const float focal_x, const float focal_y,
+abslx::Status SolveEpnp(const float focal_x, const float focal_y,
                        const float center_x, const float center_y,
                        const bool portrait,
                        const std::vector<Eigen::Vector2f>& input_points_2d,
@@ -52,7 +52,7 @@ absl::Status SolveEpnp(const float focal_x, const float focal_y,
 //     portrait orientation or not.
 //   input_points_2d: input 2D points to be lifted to 3D.
 //   output_points_3d: ouput 3D points in camera coordinate.
-absl::Status SolveEpnp(const Eigen::Matrix4f& projection_matrix,
+abslx::Status SolveEpnp(const Eigen::Matrix4f& projection_matrix,
                        const bool portrait,
                        const std::vector<Eigen::Vector2f>& input_points_2d,
                        std::vector<Eigen::Vector3f>* output_points_3d);

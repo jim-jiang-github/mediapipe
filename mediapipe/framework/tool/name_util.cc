@@ -39,7 +39,7 @@ std::string GetUnusedNodeName(const CalculatorGraphConfig& config,
   int iter = 2;
   while (ContainsKey(node_names, candidate)) {
     candidate =
-        absl::StrCat(node_name_base, "_", absl::StrFormat("%02d", iter));
+        abslx::StrCat(node_name_base, "_", abslx::StrFormat("%02d", iter));
     ++iter;
   }
   return candidate;
@@ -48,7 +48,7 @@ std::string GetUnusedNodeName(const CalculatorGraphConfig& config,
 std::string GetUnusedSidePacketName(
     const CalculatorGraphConfig& config,
     const std::string& input_side_packet_name_base) {
-  absl::flat_hash_set<std::string> input_side_packets;
+  abslx::flat_hash_set<std::string> input_side_packets;
   for (const ::mediapipe::CalculatorGraphConfig::Node& node : config.node()) {
     for (const auto& tag_and_name : node.input_side_packet()) {
       std::string tag;
@@ -61,8 +61,8 @@ std::string GetUnusedSidePacketName(
   std::string candidate = input_side_packet_name_base;
   int iter = 2;
   while (mediapipe::ContainsKey(input_side_packets, candidate)) {
-    candidate = absl::StrCat(input_side_packet_name_base, "_",
-                             absl::StrFormat("%02d", iter));
+    candidate = abslx::StrCat(input_side_packet_name_base, "_",
+                             abslx::StrFormat("%02d", iter));
     ++iter;
   }
   return candidate;
@@ -90,7 +90,7 @@ std::string CanonicalNodeName(const CalculatorGraphConfig& graph_config,
   if (count <= 1) {
     return node_name;
   }
-  return absl::StrCat(node_name, "_", sequence + 1);
+  return abslx::StrCat(node_name, "_", sequence + 1);
 }
 
 std::string ParseNameFromStream(const std::string& stream) {
@@ -116,15 +116,15 @@ std::pair<std::string, int> ParseTagIndexFromStream(const std::string& stream) {
 
 std::string CatTag(const std::string& tag, int index) {
   std::string colon_index =
-      (index <= 0 || tag.empty()) ? "" : absl::StrCat(":", index);
-  return absl::StrCat(tag, colon_index);
+      (index <= 0 || tag.empty()) ? "" : abslx::StrCat(":", index);
+  return abslx::StrCat(tag, colon_index);
 }
 
 std::string CatStream(const std::pair<std::string, int>& tag_index,
                       const std::string& name) {
   std::string tag = CatTag(tag_index.first, tag_index.second);
-  tag = tag.empty() ? tag : absl::StrCat(tag, ":");
-  return absl::StrCat(tag, name);
+  tag = tag.empty() ? tag : abslx::StrCat(tag, ":");
+  return abslx::StrCat(tag, name);
 }
 
 }  // namespace tool

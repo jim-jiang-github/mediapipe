@@ -27,7 +27,7 @@ static const char binary_graph[] =
 
 class {{SUBGRAPH_CLASS_NAME}} : public Subgraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
         const SubgraphOptions& /*options*/) {
     CalculatorGraphConfig config;
     // Note: this is a binary protobuf serialization, and may include NUL
@@ -35,7 +35,7 @@ class {{SUBGRAPH_CLASS_NAME}} : public Subgraph {
     if (config.ParseFromArray(binary_graph, sizeof(binary_graph) - 1)) {
       return config;
     } else {
-      return absl::InternalError("Could not parse subgraph.");
+      return abslx::InternalError("Could not parse subgraph.");
     }
   }
 };

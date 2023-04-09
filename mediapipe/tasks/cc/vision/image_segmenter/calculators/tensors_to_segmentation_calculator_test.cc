@@ -55,7 +55,7 @@ void PushTensorsToRunner(int tensor_height, int tensor_width,
                          const std::vector<float>& test_values,
                          CalculatorRunner* runner) {
   // Creates input tensor.
-  auto tensors = absl::make_unique<std::vector<Tensor>>();
+  auto tensors = abslx::make_unique<std::vector<Tensor>>();
   tensors->emplace_back(Tensor::ElementType::kFloat32,
                         Tensor::Shape{tensor_height, tensor_width,
                                       static_cast<int>(test_values.size())});
@@ -66,8 +66,8 @@ void PushTensorsToRunner(int tensor_height, int tensor_width,
   const int tensor_size = tensor_height * tensor_width;
   const int channels = test_values.size();
   for (int i = 0; i < tensor_size; ++i) {
-    absl::Span<float> channel_buffer =
-        absl::MakeSpan(tensor_buffer + i * channels, channels);
+    abslx::Span<float> channel_buffer =
+        abslx::MakeSpan(tensor_buffer + i * channels, channels);
     std::copy(test_values.begin(), test_values.end(), channel_buffer.begin());
   }
   // Pushs input to the runner.
@@ -128,13 +128,13 @@ TEST(TensorsToSegmentationCalculatorTest, FailsInvalidTensorDimensionOne) {
               }
             }
           )pb"));
-  auto tensors = absl::make_unique<std::vector<Tensor>>();
+  auto tensors = abslx::make_unique<std::vector<Tensor>>();
   tensors->emplace_back(Tensor::ElementType::kFloat32, Tensor::Shape{2});
   auto& input_stream_packets = runner.MutableInputs()->Tag("TENSORS").packets;
   input_stream_packets.push_back(
       mediapipe::Adopt(tensors.release()).At(Timestamp(0)));
-  absl::Status status = runner.Run();
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  abslx::Status status = runner.Run();
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(),
               HasSubstr("Tensor should have 2, 3, or 4 dims"));
 }
@@ -155,14 +155,14 @@ TEST(TensorsToSegmentationCalculatorTest, FailsInvalidTensorDimensionFive) {
               }
             }
           )pb"));
-  auto tensors = absl::make_unique<std::vector<Tensor>>();
+  auto tensors = abslx::make_unique<std::vector<Tensor>>();
   tensors->emplace_back(Tensor::ElementType::kFloat32,
                         Tensor::Shape{2, 2, 1, 3, 5});
   auto& input_stream_packets = runner.MutableInputs()->Tag("TENSORS").packets;
   input_stream_packets.push_back(
       mediapipe::Adopt(tensors.release()).At(Timestamp(0)));
-  absl::Status status = runner.Run();
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  abslx::Status status = runner.Run();
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(),
               HasSubstr("Tensor should have 2, 3, or 4 dims"));
 }

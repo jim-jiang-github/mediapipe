@@ -79,7 +79,7 @@ const tac::TargetHardware* TacModule::GetTargetHardware(
   return nullptr;
 }
 
-absl::Status TacModule::RunTacPasses(mlir::ModuleOp* module, bool debug_mode) {
+abslx::Status TacModule::RunTacPasses(mlir::ModuleOp* module, bool debug_mode) {
   mlir::PassManager pm(module->getContext(),
                        mlir::OpPassManager::Nesting::Implicit);
   AddTACPass(&pm, options_.hardware_backends);
@@ -90,9 +90,9 @@ absl::Status TacModule::RunTacPasses(mlir::ModuleOp* module, bool debug_mode) {
   mlir::StatusScopedDiagnosticHandler statusHandler(module->getContext(),
                                                     /*propagate=*/true);
   if (failed(pm.run(*module))) {
-    return absl::InternalError("conversion error");
+    return abslx::InternalError("conversion error");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 std::vector<std::unique_ptr<tac::TargetHardware>>
@@ -106,7 +106,7 @@ TacModule::InstantiateBackends() {
   return backends;
 }
 
-absl::Status TacModule::Run() {
+abslx::Status TacModule::Run() {
   // Construct all backends.
   backends_ = InstantiateBackends();
   const_backends_.resize(backends_.size());
@@ -114,11 +114,11 @@ absl::Status TacModule::Run() {
     const_backends_.emplace_back(backend.get());
 
   if (!importer_) {
-    return absl::Status(absl::StatusCode::kFailedPrecondition,
+    return abslx::Status(abslx::StatusCode::kFailedPrecondition,
                         "Null Importer provided");
   }
   if (!exporter_) {
-    return absl::Status(absl::StatusCode::kFailedPrecondition,
+    return abslx::Status(abslx::StatusCode::kFailedPrecondition,
                         "Null Exporter provided");
   }
 

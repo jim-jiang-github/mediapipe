@@ -36,7 +36,7 @@ TEST(TensorSpecTest, TestSupportsAbslHash) {
   ts3.shape = tensorflow::PartialTensorShape({1, 2});
   ts3.dtype = tensorflow::DT_FLOAT;
 
-  EXPECT_TRUE(absl::VerifyTypeImplementsAbslHashCorrectly({ts1, ts2, ts3}));
+  EXPECT_TRUE(abslx::VerifyTypeImplementsAbslHashCorrectly({ts1, ts2, ts3}));
 }
 
 }  // namespace impl

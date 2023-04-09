@@ -47,7 +47,7 @@ class ZipDatasetParams : public DatasetParams {
     input_names->clear();
     for (int i = 0; i < num_input_datasets_; ++i) {
       input_names->emplace_back(
-          absl::StrCat(ZipDatasetOp::kDatasetType, "_", i));
+          abslx::StrCat(ZipDatasetOp::kDatasetType, "_", i));
     }
     return OkStatus();
   }

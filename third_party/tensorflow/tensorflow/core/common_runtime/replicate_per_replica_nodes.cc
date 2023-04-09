@@ -151,7 +151,7 @@ class ReplicateHelper {
         // Add '/Packed' as a substring to the name of the new node, which
         // could be helpful when debugging the graph.
         NodeDefBuilder pack_builder(
-            graph->NewName(absl::StrCat(edge->src()->name(), "/Packed")),
+            graph->NewName(abslx::StrCat(edge->src()->name(), "/Packed")),
             "Pack");
         const int num_replicas = src_replicated_nodes.size();
         pack_builder.Attr("N", num_replicas);
@@ -187,12 +187,12 @@ class ReplicateHelper {
 
  private:
   // Map from original nodes to corresponding replicated nodes.
-  absl::flat_hash_map<const Node*, std::vector<Node*>> replicated_nodes_map_;
+  abslx::flat_hash_map<const Node*, std::vector<Node*>> replicated_nodes_map_;
 };
 
 // Replicate the nodes in cluster_nodes and update edges.
 Status ReplicateNodesAndEdges(const std::vector<string>& allowed_devices,
-                              absl::flat_hash_map<Node*, int>* cluster_nodes,
+                              abslx::flat_hash_map<Node*, int>* cluster_nodes,
                               ReplicateHelper* helper, Graph* graph) {
   // Contains nodes in cluster_nodes whose out nodes are all on physical
   // devices.
@@ -246,7 +246,7 @@ Status ReplicateNodesAndEdges(const std::vector<string>& allowed_devices,
 }  // namespace
 
 Status ReplicatePerReplicaNodesInFunctionGraph(
-    const absl::flat_hash_map<string, const std::vector<string>*>&
+    const abslx::flat_hash_map<string, const std::vector<string>*>&
         composite_devices,
     Graph* graph) {
   std::set<string> composite_device_names;
@@ -255,7 +255,7 @@ Status ReplicatePerReplicaNodesInFunctionGraph(
   }
   // Map from a composite device to a cluster of nodes assigned to the
   // composite device and the numbers of their out edges to process.
-  absl::flat_hash_map<string, absl::flat_hash_map<Node*, int>>
+  abslx::flat_hash_map<string, abslx::flat_hash_map<Node*, int>>
       composite_device_to_cluster_nodes;
   for (Node* n : graph->op_nodes()) {
     if (composite_device_names.find(n->assigned_device_name()) !=
@@ -275,7 +275,7 @@ Status ReplicatePerReplicaNodesInFunctionGraph(
       return errors::InvalidArgument("No allowed device of composite device: ",
                                      it.first);
     }
-    absl::flat_hash_map<Node*, int>& cluster_nodes = it.second;
+    abslx::flat_hash_map<Node*, int>& cluster_nodes = it.second;
     if (allowed_devices.size() == 1) {
       // Reuse the original nodes if there is only one allowed device.
       for (const auto& pair : it.second) {

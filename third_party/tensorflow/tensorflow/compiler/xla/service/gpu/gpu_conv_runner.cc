@@ -285,7 +285,7 @@ int64_t GetVectCSize(FilterLayout layout) {
 }  // anonymous namespace
 
 StatusOr<GpuConvConfig> GetGpuConvConfig(
-    const GpuConvDescriptor& desc, const absl::string_view inst_as_string) {
+    const GpuConvDescriptor& desc, const abslx::string_view inst_as_string) {
   GpuConvConfig config;
 
   const Shape& operand0_shape = desc.operand0_shape;
@@ -477,7 +477,7 @@ StatusOr<GpuConvConfig> GetGpuConvConfig(
 
 StatusOr<GpuConvParams> GetGpuConvParams(
     const GpuConvConfig& config,
-    absl::Span<const se::DeviceMemoryBase> operand_buffers,
+    abslx::Span<const se::DeviceMemoryBase> operand_buffers,
     se::DeviceMemoryBase result_buffer) {
   GpuConvParams params;
   params.config = &config;
@@ -514,7 +514,7 @@ StatusOr<GpuConvParams> GetGpuConvParams(
 }
 
 Status RunGpuConv(const gpu::GpuConvConfig& config,
-                  absl::Span<const se::DeviceMemoryBase> operand_buffers,
+                  abslx::Span<const se::DeviceMemoryBase> operand_buffers,
                   se::DeviceMemoryBase result_buffer,
                   se::DeviceMemoryBase scratch_memory, se::Stream* stream,
                   RunConvOptions options) {

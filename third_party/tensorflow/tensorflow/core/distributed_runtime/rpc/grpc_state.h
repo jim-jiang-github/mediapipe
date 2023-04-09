@@ -64,7 +64,7 @@ class RPCState : public GrpcClientCQTag {
               string fail_fast_env;
               TF_CHECK_OK(ReadStringFromEnvVar("GRPC_FAIL_FAST", "use_caller",
                                                &fail_fast_env));
-              string fail_fast_env_lower = absl::AsciiStrToLower(fail_fast_env);
+              string fail_fast_env_lower = abslx::AsciiStrToLower(fail_fast_env);
               if (fail_fast_env_lower == "true") {
                 return true;
               } else if (fail_fast_env_lower == "use_caller") {

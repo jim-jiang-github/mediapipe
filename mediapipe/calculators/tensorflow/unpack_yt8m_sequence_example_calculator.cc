@@ -64,7 +64,7 @@ std::string GetQuantizedFeature(
 // }
 class UnpackYt8mSequenceExampleCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->InputSidePackets()
         .Tag(kYt8mSequenceExample)
         .Set<tensorflow::SequenceExample>();
@@ -84,10 +84,10 @@ class UnpackYt8mSequenceExampleCalculator : public CalculatorBase {
     if (cc->OutputSidePackets().HasTag(kSegmentSize)) {
       cc->OutputSidePackets().Tag(kSegmentSize).Set<int>();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     const tensorflow::SequenceExample& sequence_example =
         cc->InputSidePackets()
             .Tag(kYt8mSequenceExample)
@@ -108,7 +108,7 @@ class UnpackYt8mSequenceExampleCalculator : public CalculatorBase {
                                         .feature_size();
 
     if (rgb_feature_list_length != audio_feature_list_length) {
-      return absl::FailedPreconditionError(absl::StrCat(
+      return abslx::FailedPreconditionError(abslx::StrCat(
           "Data corruption: the length of audio features and rgb features are "
           "not equal. Please check the sequence example that contains yt8m "
           "id: ",
@@ -131,7 +131,7 @@ class UnpackYt8mSequenceExampleCalculator : public CalculatorBase {
       }
       if (cc->OutputSidePackets().HasTag(
               kLappedTensorBufferCalculatorOptions)) {
-        auto lapped_tensor_buffer_calculator_options = absl::make_unique<
+        auto lapped_tensor_buffer_calculator_options = abslx::make_unique<
             ::mediapipe::LappedTensorBufferCalculatorOptions>();
         lapped_tensor_buffer_calculator_options->set_add_batch_dim_to_tensors(
             true);
@@ -151,10 +151,10 @@ class UnpackYt8mSequenceExampleCalculator : public CalculatorBase {
     }
     LOG(INFO) << "Reading the sequence example that contains yt8m id: "
               << yt8m_id << ". Feature list length: " << feature_list_length_;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     if (current_index_ >= feature_list_length_) {
       return mediapipe::tool::StatusStop();
     }
@@ -179,7 +179,7 @@ class UnpackYt8mSequenceExampleCalculator : public CalculatorBase {
                 GetQuantizedFeature(sequence_example, kAudio, current_index_))
                 .At(timestamp));
     ++current_index_;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

@@ -45,7 +45,7 @@ limitations under the License.
 namespace stream_executor {
 namespace interpreter {
 
-using Args = absl::Span<const DeviceMemoryBase>;
+using Args = abslx::Span<const DeviceMemoryBase>;
 
 class XlaInterpreterExecutor : public internal::StreamExecutorInterface {
  public:

@@ -212,7 +212,7 @@ class HloCostAnalysis : public ConstDfsHloVisitor {
   }
 
   // Returns the specified per-second rate used by cost analysis.
-  const float per_second_rate(absl::string_view key) const {
+  const float per_second_rate(abslx::string_view key) const {
     return GetProperty(key, options_.per_second_rates);
   }
 
@@ -236,7 +236,7 @@ class HloCostAnalysis : public ConstDfsHloVisitor {
                              const DotDimensionNumbers& dnums);
 
  protected:
-  typedef absl::flat_hash_map<const HloInstruction*, Properties>
+  typedef abslx::flat_hash_map<const HloInstruction*, Properties>
       HloToProperties;
 
   // An FMA counts as two floating point operations in these analyzes.
@@ -257,7 +257,7 @@ class HloCostAnalysis : public ConstDfsHloVisitor {
   // Returns the default value if the key is not present in the
   // properties. Otherwise, returns the value that the key maps to from the
   // properties parameter.
-  static float GetProperty(absl::string_view key, const Properties& properties,
+  static float GetProperty(abslx::string_view key, const Properties& properties,
                            float default_value = 0.0f);
 
   // Returns 0.0f if the hlo is not present in hlo_to_properties or if the key

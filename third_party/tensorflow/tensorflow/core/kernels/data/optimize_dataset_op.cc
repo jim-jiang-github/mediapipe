@@ -51,8 +51,8 @@ namespace {
 // Applies given optimizations and optimizatin_config in dataset graph rewrite
 // to return the OptimizeDataset.
 void MakeDatasetHelper(OpKernelContext* ctx,
-                       absl::flat_hash_set<tstring>& optimizations,
-                       const absl::flat_hash_set<tstring>& optimization_configs,
+                       abslx::flat_hash_set<tstring>& optimizations,
+                       const abslx::flat_hash_set<tstring>& optimization_configs,
                        DatasetBase* input, DatasetBase** output) {
   // The vector stores the graduated experiment names which will be turned on
   // for all input pipelines.
@@ -103,10 +103,10 @@ void MakeDatasetHelper(OpKernelContext* ctx,
 // static
 void OptimizeDatasetOp::MakeDatasetFromOptions(
     OpKernelContext* ctx, DatasetBase* input,
-    const absl::flat_hash_set<tstring>& optimizations_enabled,
-    const absl::flat_hash_set<tstring>& optimizations_disabled,
-    const absl::flat_hash_set<tstring>& optimizations_default,
-    const absl::flat_hash_set<tstring>& optimization_configs,
+    const abslx::flat_hash_set<tstring>& optimizations_enabled,
+    const abslx::flat_hash_set<tstring>& optimizations_disabled,
+    const abslx::flat_hash_set<tstring>& optimizations_default,
+    const abslx::flat_hash_set<tstring>& optimization_configs,
     DatasetBase** output) {
   auto experiments = GetExperiments();
   LogAndRecordExperiments(experiments);
@@ -133,7 +133,7 @@ OptimizeDatasetOp::OptimizeDatasetOp(OpKernelConstruction* ctx)
 
 void OptimizeDatasetOp::MakeDataset(OpKernelContext* ctx, DatasetBase* input,
                                     DatasetBase** output) {
-  absl::flat_hash_set<tstring> optimizations;
+  abslx::flat_hash_set<tstring> optimizations;
   if (op_version_ == 1) {
     std::vector<tstring> optimizations_enabled;
     OP_REQUIRES_OK(ctx, ParseVectorArgument<tstring>(ctx, kOptimizations,
@@ -179,10 +179,10 @@ namespace data {
 // static
 void OptimizeDatasetOp::MakeDatasetFromOptions(
     OpKernelContext* ctx, DatasetBase* input,
-    const absl::flat_hash_set<tstring>& optimizations_enabled,
-    const absl::flat_hash_set<tstring>& optimizations_disabled,
-    const absl::flat_hash_set<tstring>& optimizations_default,
-    const absl::flat_hash_set<tstring>& optimization_configs,
+    const abslx::flat_hash_set<tstring>& optimizations_enabled,
+    const abslx::flat_hash_set<tstring>& optimizations_disabled,
+    const abslx::flat_hash_set<tstring>& optimizations_default,
+    const abslx::flat_hash_set<tstring>& optimization_configs,
     DatasetBase** output) {
   input->Ref();
   *output = input;

@@ -43,7 +43,7 @@ using ::mediapipe::Rect;
 constexpr float kMinFloat = std::numeric_limits<float>::lowest();
 constexpr float kMaxFloat = std::numeric_limits<float>::max();
 
-absl::Status NormRectFromKeyPoints(const LocationData& location_data,
+abslx::Status NormRectFromKeyPoints(const LocationData& location_data,
                                    NormalizedRect* rect) {
   RET_CHECK_GT(location_data.relative_keypoints_size(), 1)
       << "2 or more key points required to calculate a rect.";
@@ -62,7 +62,7 @@ absl::Status NormRectFromKeyPoints(const LocationData& location_data,
   rect->set_y_center((ymin + ymax) / 2);
   rect->set_width(xmax - xmin);
   rect->set_height(ymax - ymin);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <class B, class R>
@@ -75,7 +75,7 @@ void RectFromBox(B box, R* rect) {
 
 }  // namespace
 
-absl::Status DetectionsToRectsCalculator::DetectionToRect(
+abslx::Status DetectionsToRectsCalculator::DetectionToRect(
     const Detection& detection, const DetectionSpec& detection_spec,
     Rect* rect) {
   const LocationData location_data = detection.location_data();
@@ -104,10 +104,10 @@ absl::Status DetectionsToRectsCalculator::DetectionToRect(
       break;
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status DetectionsToRectsCalculator::DetectionToNormalizedRect(
+abslx::Status DetectionsToRectsCalculator::DetectionToNormalizedRect(
     const Detection& detection, const DetectionSpec& detection_spec,
     NormalizedRect* rect) {
   const LocationData location_data = detection.location_data();
@@ -127,10 +127,10 @@ absl::Status DetectionsToRectsCalculator::DetectionToNormalizedRect(
       break;
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status DetectionsToRectsCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status DetectionsToRectsCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK(cc->Inputs().HasTag(kDetectionTag) ^
             cc->Inputs().HasTag(kDetectionsTag))
       << "Exactly one of DETECTION or DETECTIONS input stream should be "
@@ -166,10 +166,10 @@ absl::Status DetectionsToRectsCalculator::GetContract(CalculatorContract* cc) {
     cc->Outputs().Tag(kNormRectsTag).Set<std::vector<NormalizedRect>>();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status DetectionsToRectsCalculator::Open(CalculatorContext* cc) {
+abslx::Status DetectionsToRectsCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
   options_ = cc->Options<DetectionsToRectsCalculatorOptions>();
@@ -194,20 +194,20 @@ absl::Status DetectionsToRectsCalculator::Open(CalculatorContext* cc) {
   output_zero_rect_for_empty_detections_ =
       options_.output_zero_rect_for_empty_detections();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status DetectionsToRectsCalculator::Process(CalculatorContext* cc) {
+abslx::Status DetectionsToRectsCalculator::Process(CalculatorContext* cc) {
   if (cc->Inputs().HasTag(kDetectionTag) &&
       cc->Inputs().Tag(kDetectionTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   if (cc->Inputs().HasTag(kDetectionsTag) &&
       cc->Inputs().Tag(kDetectionsTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   if (rotate_ && !HasTagValue(cc, kImageSizeTag)) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   std::vector<Detection> detections;
@@ -228,14 +228,14 @@ absl::Status DetectionsToRectsCalculator::Process(CalculatorContext* cc) {
               .AddPacket(MakePacket<NormalizedRect>().At(cc->InputTimestamp()));
         }
         if (cc->Outputs().HasTag(kNormRectsTag)) {
-          auto rect_vector = absl::make_unique<std::vector<NormalizedRect>>();
+          auto rect_vector = abslx::make_unique<std::vector<NormalizedRect>>();
           rect_vector->emplace_back(NormalizedRect());
           cc->Outputs()
               .Tag(kNormRectsTag)
               .Add(rect_vector.release(), cc->InputTimestamp());
         }
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
   }
 
@@ -243,7 +243,7 @@ absl::Status DetectionsToRectsCalculator::Process(CalculatorContext* cc) {
   const DetectionSpec detection_spec = GetDetectionSpec(cc);
 
   if (cc->Outputs().HasTag(kRectTag)) {
-    auto output_rect = absl::make_unique<Rect>();
+    auto output_rect = abslx::make_unique<Rect>();
     MP_RETURN_IF_ERROR(
         DetectionToRect(detections[0], detection_spec, output_rect.get()));
     if (rotate_) {
@@ -256,7 +256,7 @@ absl::Status DetectionsToRectsCalculator::Process(CalculatorContext* cc) {
                                     cc->InputTimestamp());
   }
   if (cc->Outputs().HasTag(kNormRectTag)) {
-    auto output_rect = absl::make_unique<NormalizedRect>();
+    auto output_rect = abslx::make_unique<NormalizedRect>();
     MP_RETURN_IF_ERROR(DetectionToNormalizedRect(detections[0], detection_spec,
                                                  output_rect.get()));
     if (rotate_) {
@@ -270,7 +270,7 @@ absl::Status DetectionsToRectsCalculator::Process(CalculatorContext* cc) {
         .Add(output_rect.release(), cc->InputTimestamp());
   }
   if (cc->Outputs().HasTag(kRectsTag)) {
-    auto output_rects = absl::make_unique<std::vector<Rect>>(detections.size());
+    auto output_rects = abslx::make_unique<std::vector<Rect>>(detections.size());
     for (int i = 0; i < detections.size(); ++i) {
       MP_RETURN_IF_ERROR(DetectionToRect(detections[i], detection_spec,
                                          &(output_rects->at(i))));
@@ -286,7 +286,7 @@ absl::Status DetectionsToRectsCalculator::Process(CalculatorContext* cc) {
   }
   if (cc->Outputs().HasTag(kNormRectsTag)) {
     auto output_rects =
-        absl::make_unique<std::vector<NormalizedRect>>(detections.size());
+        abslx::make_unique<std::vector<NormalizedRect>>(detections.size());
     for (int i = 0; i < detections.size(); ++i) {
       MP_RETURN_IF_ERROR(DetectionToNormalizedRect(
           detections[i], detection_spec, &(output_rects->at(i))));
@@ -302,10 +302,10 @@ absl::Status DetectionsToRectsCalculator::Process(CalculatorContext* cc) {
         .Add(output_rects.release(), cc->InputTimestamp());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status DetectionsToRectsCalculator::ComputeRotation(
+abslx::Status DetectionsToRectsCalculator::ComputeRotation(
     const Detection& detection, const DetectionSpec& detection_spec,
     float* rotation) {
   const auto& location_data = detection.location_data();
@@ -323,12 +323,12 @@ absl::Status DetectionsToRectsCalculator::ComputeRotation(
 
   *rotation = NormalizeRadians(target_angle_ - std::atan2(-(y1 - y0), x1 - x0));
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 DetectionSpec DetectionsToRectsCalculator::GetDetectionSpec(
     const CalculatorContext* cc) {
-  absl::optional<std::pair<int, int>> image_size;
+  abslx::optional<std::pair<int, int>> image_size;
   if (HasTagValue(cc->Inputs(), kImageSizeTag)) {
     image_size = cc->Inputs().Tag(kImageSizeTag).Get<std::pair<int, int>>();
   }

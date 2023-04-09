@@ -138,7 +138,7 @@ const TfLiteRegistration* MyFindBuiltinOp(void* user_data,
 
 const TfLiteRegistration* MyFindCustomOp(void*, const char* custom_op,
                                          int version) {
-  if (absl::string_view(custom_op) == "foo" && version == 1) {
+  if (abslx::string_view(custom_op) == "foo" && version == 1) {
     return GetDummyRegistration();
   }
   return nullptr;

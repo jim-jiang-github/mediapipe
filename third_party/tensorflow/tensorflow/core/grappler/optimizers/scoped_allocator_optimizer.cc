@@ -483,9 +483,9 @@ class UnaryElementwiseRewriter : public ScopedAllocatorOptimizer::Rewriter {
   Status TransitiveFanoutWithinFrame(
       GraphDef* graph, NodeMap* node_map,
       const std::vector<const NodeDef*>& source_nodes,
-      absl::flat_hash_set<const NodeDef*>* fanout) {
+      abslx::flat_hash_set<const NodeDef*>* fanout) {
     std::deque<const NodeDef*> queue(source_nodes.begin(), source_nodes.end());
-    absl::flat_hash_set<const NodeDef*> visited;
+    abslx::flat_hash_set<const NodeDef*> visited;
     while (!queue.empty()) {
       const NodeDef* node = queue.front();
       queue.pop_front();
@@ -531,7 +531,7 @@ class UnaryElementwiseRewriter : public ScopedAllocatorOptimizer::Rewriter {
     for (const auto& input : inputs) {
       fanout_sources.push_back(input.from_node_def);
     }
-    absl::flat_hash_set<const NodeDef*> fanout;
+    abslx::flat_hash_set<const NodeDef*> fanout;
     TF_RETURN_IF_ERROR(
         TransitiveFanoutWithinFrame(graph, node_map, fanout_sources, &fanout));
 
@@ -603,7 +603,7 @@ class UnaryElementwiseRewriter : public ScopedAllocatorOptimizer::Rewriter {
                            std::vector<NodeDefBuilder::NodeOut>* sac_inputs) {
     VLOG(2) << "BuildSAConcatNode " << sac_name;
     // control input: edge name -> source node name
-    absl::flat_hash_map<string, string> sac_ctl_inputs;
+    abslx::flat_hash_map<string, string> sac_ctl_inputs;
     for (int i = 0, end = ops.size(); i < end; ++i) {
       NodeDef* old_op = ops[i];
       for (const string& old_op_input : old_op->input()) {
@@ -1010,7 +1010,7 @@ class Tree {
   string edge_;
   int depth_;
   std::vector<NodeDef*> nodes_;
-  absl::flat_hash_map<string, Tree*> subtrees_;
+  abslx::flat_hash_map<string, Tree*> subtrees_;
 };
 
 // Applies a function to every Tree in DFS order.  Terminates early
@@ -1046,7 +1046,7 @@ void PartitionByLoopStructure(const FrameView& frame_view,
                               std::vector<std::vector<NodeDef*>>* loop_groups) {
   // It is assumed that two nodes with identical loop containment have
   // identical integer vectors. Represent those by 64 bit hashes.
-  absl::flat_hash_map<uint64, std::vector<NodeDef*>> loop_sets;
+  abslx::flat_hash_map<uint64, std::vector<NodeDef*>> loop_sets;
   for (NodeDef* nd : nodes) {
     uint64 hash = 0;
     const std::vector<int>& loop_ids = frame_view.Frames(*nd);
@@ -1062,8 +1062,8 @@ void PartitionByLoopStructure(const FrameView& frame_view,
 
 // Identify outputs that are inputs to multiple sets of nodes.
 void IdentifyRepeatedInputs(const std::vector<NodeDef*>& nodes,
-                            absl::flat_hash_set<string>* seen_outputs,
-                            absl::flat_hash_set<string>* repeated_outputs) {
+                            abslx::flat_hash_set<string>* seen_outputs,
+                            abslx::flat_hash_set<string>* repeated_outputs) {
   for (NodeDef* node : nodes) {
     for (const auto& input_name : node->input()) {
       if (!seen_outputs->insert(input_name).second) {
@@ -1109,7 +1109,7 @@ Status ScopedAllocatorOptimizer::ProcessGraphDef(
         rewriter->SetGraphProperties(graph_properties);
         std::unique_ptr<Tree> root(ComputeScopeTree(it.first, it.second));
         // Record outputs that are inputs to multiple Tree nodes.
-        absl::flat_hash_set<string> seen_outputs;
+        abslx::flat_hash_set<string> seen_outputs;
         status = ApplyToAll(root.get(), [this, &seen_outputs](Tree* t) {
           IdentifyRepeatedInputs(t->nodes_, &seen_outputs, &repeated_outputs_);
           return OkStatus();

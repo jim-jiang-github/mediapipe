@@ -54,12 +54,12 @@ constexpr char kTensorsTag[] = "TENSORS";
 
 // Gets the name of the MediaPipe preprocessor calculator associated with
 // `model_type`.
-absl::StatusOr<std::string> GetCalculatorNameFromModelType(
+abslx::StatusOr<std::string> GetCalculatorNameFromModelType(
     TextModelType::ModelType model_type) {
   switch (model_type) {
     case TextModelType::UNSPECIFIED_MODEL:
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument, "Unspecified model type",
+          abslx::StatusCode::kInvalidArgument, "Unspecified model type",
           MediaPipeTasksStatus::kInvalidArgumentError);
     case TextModelType::BERT_MODEL:
       return "BertPreprocessorCalculator";
@@ -75,7 +75,7 @@ absl::StatusOr<std::string> GetCalculatorNameFromModelType(
 // tensors' shape is invalid for text preprocessing. This util assumes that the
 // model has the correct input tensors type and count for the
 // BertPreprocessorCalculator or the RegexPreprocessorCalculator.
-absl::StatusOr<int> GetMaxSeqLen(const tflite::SubGraph& model_graph) {
+abslx::StatusOr<int> GetMaxSeqLen(const tflite::SubGraph& model_graph) {
   const flatbuffers::Vector<int32_t>& input_indices = *model_graph.inputs();
   const flatbuffers::Vector<flatbuffers::Offset<tflite::Tensor>>&
       model_tensors = *model_graph.tensors();
@@ -84,8 +84,8 @@ absl::StatusOr<int> GetMaxSeqLen(const tflite::SubGraph& model_graph) {
 
     if (tensor->shape()->size() != 2) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
-          absl::Substitute(
+          abslx::StatusCode::kInvalidArgument,
+          abslx::Substitute(
               "Model should take 2-D input tensors, got dimension: $0",
               tensor->shape()->size()),
           MediaPipeTasksStatus::kInvalidInputTensorDimensionsError);
@@ -93,8 +93,8 @@ absl::StatusOr<int> GetMaxSeqLen(const tflite::SubGraph& model_graph) {
 
     if ((*tensor->shape())[0] != 1) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
-          absl::Substitute(
+          abslx::StatusCode::kInvalidArgument,
+          abslx::Substitute(
               "Input tensors should all have batch size 1, got: $0",
               (*tensor->shape())[0]),
           MediaPipeTasksStatus::kInvalidInputTensorSizeError);
@@ -102,11 +102,11 @@ absl::StatusOr<int> GetMaxSeqLen(const tflite::SubGraph& model_graph) {
   }
 
   int max_seq_len = (*model_tensors[input_indices[0]]->shape())[1];
-  if (!absl::c_all_of(input_indices, [&model_tensors, max_seq_len](int i) {
+  if (!abslx::c_all_of(input_indices, [&model_tensors, max_seq_len](int i) {
         return (*model_tensors[i]->shape())[1] == max_seq_len;
       })) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "Input tensors don't have the same size",
         MediaPipeTasksStatus::kInvalidInputTensorSizeError);
   }
@@ -114,12 +114,12 @@ absl::StatusOr<int> GetMaxSeqLen(const tflite::SubGraph& model_graph) {
 }
 }  // namespace
 
-absl::Status ConfigureTextPreprocessingGraph(
+abslx::Status ConfigureTextPreprocessingGraph(
     const ModelResources& model_resources,
     TextPreprocessingGraphOptions& options) {
   if (model_resources.GetTfLiteModel()->subgraphs()->size() != 1) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
+        abslx::StatusCode::kInvalidArgument,
         "Text tflite models are assumed to have a single subgraph.",
         MediaPipeTasksStatus::kInvalidArgumentError);
   }
@@ -141,7 +141,7 @@ absl::Status ConfigureTextPreprocessingGraph(
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // A TextPreprocessingGraph performs text preprocessing.
@@ -163,7 +163,7 @@ absl::Status ConfigureTextPreprocessingGraph(
 // more details.
 class TextPreprocessingGraph : public mediapipe::Subgraph {
  public:
-  absl::StatusOr<mediapipe::CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<mediapipe::CalculatorGraphConfig> GetConfig(
       mediapipe::SubgraphContext* sc) override {
     Graph graph;
     ASSIGN_OR_RETURN(
@@ -178,7 +178,7 @@ class TextPreprocessingGraph : public mediapipe::Subgraph {
   }
 
  private:
-  absl::StatusOr<Source<std::vector<Tensor>>> BuildTextPreprocessing(
+  abslx::StatusOr<Source<std::vector<Tensor>>> BuildTextPreprocessing(
       const TextPreprocessingGraphOptions& options, Source<std::string> text_in,
       SideSource<ModelMetadataExtractor> metadata_extractor_in, Graph& graph) {
     ASSIGN_OR_RETURN(std::string preprocessor_name,

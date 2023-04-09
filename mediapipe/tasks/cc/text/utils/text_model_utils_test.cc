@@ -39,31 +39,31 @@ using ::mediapipe::tasks::components::processors::proto::TextModelType;
 using ::mediapipe::tasks::core::ModelResources;
 using ::mediapipe::tasks::core::proto::ExternalFile;
 
-constexpr absl::string_view kTestModelResourcesTag = "test_model_resources";
+constexpr abslx::string_view kTestModelResourcesTag = "test_model_resources";
 
-constexpr absl::string_view kTestDataDirectory =
+constexpr abslx::string_view kTestDataDirectory =
     "/mediapipe/tasks/testdata/text/";
 // Classification model with BERT preprocessing.
-constexpr absl::string_view kBertClassifierPath = "bert_text_classifier.tflite";
+constexpr abslx::string_view kBertClassifierPath = "bert_text_classifier.tflite";
 // Embedding model with BERT preprocessing.
-constexpr absl::string_view kMobileBert =
+constexpr abslx::string_view kMobileBert =
     "mobilebert_embedding_with_metadata.tflite";
 // Classification model with regex preprocessing.
-constexpr absl::string_view kRegexClassifierPath =
+constexpr abslx::string_view kRegexClassifierPath =
     "test_model_text_classifier_with_regex_tokenizer.tflite";
 // Embedding model with regex preprocessing.
-constexpr absl::string_view kRegexOneEmbeddingModel =
+constexpr abslx::string_view kRegexOneEmbeddingModel =
     "regex_one_embedding_with_metadata.tflite";
 // Classification model that takes a string tensor and outputs a bool tensor.
-constexpr absl::string_view kStringToBoolModelPath =
+constexpr abslx::string_view kStringToBoolModelPath =
     "test_model_text_classifier_bool_output.tflite";
 
-std::string GetFullPath(absl::string_view file_name) {
+std::string GetFullPath(abslx::string_view file_name) {
   return JoinPath("./", kTestDataDirectory, file_name);
 }
 
-absl::StatusOr<TextModelType::ModelType> GetModelTypeFromFile(
-    absl::string_view file_name) {
+abslx::StatusOr<TextModelType::ModelType> GetModelTypeFromFile(
+    abslx::string_view file_name) {
   auto model_file = std::make_unique<ExternalFile>();
   model_file->set_file_name(GetFullPath(file_name));
   ASSIGN_OR_RETURN(auto model_resources,

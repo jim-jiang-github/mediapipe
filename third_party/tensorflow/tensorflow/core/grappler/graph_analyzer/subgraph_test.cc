@@ -124,7 +124,7 @@ TEST(SubgraphTest, Iteration) {
       sit2.Next();
       EXPECT_FALSE(sit == sit2);
 
-      links.push_back(absl::StrFormat("[%s,%s,%s]", string(sit.GetPort()),
+      links.push_back(abslx::StrFormat("[%s,%s,%s]", string(sit.GetPort()),
                                       sit.GetNeighbor().node->name(),
                                       string(sit.GetNeighbor().port)));
     }

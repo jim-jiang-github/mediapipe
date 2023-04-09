@@ -124,10 +124,10 @@ class BoxTrackerCalculator : public CalculatorBase {
  public:
   ~BoxTrackerCalculator() override = default;
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  protected:
   void RenderStates(const std::vector<MotionBoxState>& states, cv::Mat* mat);
@@ -168,7 +168,7 @@ class BoxTrackerCalculator : public CalculatorBase {
   };
 
   // MotionBoxPath per unique id that we are tracking.
-  typedef absl::node_hash_map<int, MotionBoxPath> MotionBoxMap;
+  typedef abslx::node_hash_map<int, MotionBoxPath> MotionBoxMap;
 
   // Performs tracking of all MotionBoxes in box_map by one frame forward or
   // backward to or from data_frame_num using passed TrackingData.
@@ -197,19 +197,19 @@ class BoxTrackerCalculator : public CalculatorBase {
   TimedBoxProtoList initial_pos_;
 
   // Keeps tracks boxes that have already been initialized.
-  absl::node_hash_set<int> initialized_ids_;
+  abslx::node_hash_set<int> initialized_ids_;
 
   // Non empty for batch mode tracking.
   std::string cache_dir_;
   // Ids to be tracked in batch_mode.
-  absl::node_hash_set<int> batch_track_ids_;
+  abslx::node_hash_set<int> batch_track_ids_;
 
   int frame_num_ = 0;
 
   // Boxes that are tracked in streaming mode.
   MotionBoxMap streaming_motion_boxes_;
 
-  absl::node_hash_map<int, std::pair<TimedBox, TimedBox>> last_tracked_boxes_;
+  abslx::node_hash_map<int, std::pair<TimedBox, TimedBox>> last_tracked_boxes_;
   int frame_num_since_reset_ = 0;
 
   // Cache used during streaming mode for fast forward tracking.
@@ -244,7 +244,7 @@ class BoxTrackerCalculator : public CalculatorBase {
   // Stores the tracked ids that have been discarded actively, from continuous
   // tracking data. It may accumulate across multiple frames. Once consumed, it
   // should be cleared immediately.
-  absl::flat_hash_set<int> actively_discarded_tracked_ids_;
+  abslx::flat_hash_set<int> actively_discarded_tracked_ids_;
 
   // Add smooth transition between re-acquisition and previous tracked boxes.
   // `result_box` is the tracking result of one specific timestamp. The smoothed
@@ -390,7 +390,7 @@ void AddStateToPath(const MotionBoxState& state, int64 time_msec,
 
 }  // namespace.
 
-absl::Status BoxTrackerCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status BoxTrackerCalculator::GetContract(CalculatorContract* cc) {
   if (cc->Inputs().HasTag(kTrackingTag)) {
     cc->Inputs().Tag(kTrackingTag).Set<TrackingData>();
   }
@@ -469,10 +469,10 @@ absl::Status BoxTrackerCalculator::GetContract(CalculatorContract* cc) {
     cc->InputSidePackets().Tag(kOptionsTag).Set<CalculatorOptions>();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status BoxTrackerCalculator::Open(CalculatorContext* cc) {
+abslx::Status BoxTrackerCalculator::Open(CalculatorContext* cc) {
   options_ = tool::RetrieveOptions(cc->Options<BoxTrackerCalculatorOptions>(),
                                    cc->InputSidePackets(), kOptionsTag);
 
@@ -533,10 +533,10 @@ absl::Status BoxTrackerCalculator::Open(CalculatorContext* cc) {
         << "Streaming mode not compatible with cache dir.";
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status BoxTrackerCalculator::Process(CalculatorContext* cc) {
+abslx::Status BoxTrackerCalculator::Process(CalculatorContext* cc) {
   // Batch mode, issue tracking requests.
   if (box_tracker_ && !tracking_issued_) {
     for (const auto& pos : initial_pos_.box()) {
@@ -548,7 +548,7 @@ absl::Status BoxTrackerCalculator::Process(CalculatorContext* cc) {
   const Timestamp& timestamp = cc->InputTimestamp();
   if (timestamp == Timestamp::PreStream()) {
     // Indicator packet.
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   InputStream* track_stream = cc->Inputs().HasTag(kTrackingTag)
@@ -910,7 +910,7 @@ absl::Status BoxTrackerCalculator::Process(CalculatorContext* cc) {
     cc->Outputs().Tag(kVizTag).Add(viz_frame.release(), timestamp);
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void BoxTrackerCalculator::AddSmoothTransitionToOutputBox(

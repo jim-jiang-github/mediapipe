@@ -75,7 +75,7 @@ TEST(OpenCvEncodedImageToImageFrameCalculatorTest, TestGrayscaleJpeg) {
   parameters.push_back(cv::IMWRITE_JPEG_QUALITY);
   parameters.push_back(100);
   cv::imencode(".jpg", input_mat, encode_buffer, parameters);
-  Packet input_packet = MakePacket<std::string>(std::string(absl::string_view(
+  Packet input_packet = MakePacket<std::string>(std::string(abslx::string_view(
       reinterpret_cast<const char*>(&encode_buffer[0]), encode_buffer.size())));
 
   CalculatorGraphConfig::Node node_config =

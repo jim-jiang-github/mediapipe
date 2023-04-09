@@ -73,7 +73,7 @@ Status ConvertInputInfo(
     }
     std::vector<int> dims;
     dims.reserve(feed.shape().dim_size());
-    absl::c_for_each(feed.shape().dim(), [&](const TensorShapeProto::Dim d) {
+    abslx::c_for_each(feed.shape().dim(), [&](const TensorShapeProto::Dim d) {
       dims.push_back(d.size());
     });
     shapes.push_back(dims);
@@ -98,8 +98,8 @@ Status ConvertOutputInfo(const tf2xla::Config& config,
 
 Status ConvertGraphDefToXlaViaMlir(
     GraphDef graph_def, const tf2xla::Config& config,
-    xla::XlaComputation* computation, absl::string_view debug_info_filename,
-    absl::string_view debug_info_path_begin_marker) {
+    xla::XlaComputation* computation, abslx::string_view debug_info_filename,
+    abslx::string_view debug_info_path_begin_marker) {
   // AddPlaceholdersForFeeds prepares for PruneGraphDefInto and serves two
   // purposes: (1) It creates a placeholder node for each feed, so that
   // PruneGraphDefInfo can prune away the node containing the feed. (2) It

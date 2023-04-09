@@ -264,8 +264,8 @@ Status KernelAndDeviceOp::Run(
     ScopedStepContainer* step_container, const EagerKernelArgs& inputs,
     std::vector<EagerKernelRet>* outputs,
     CancellationManager* cancellation_manager,
-    const absl::optional<EagerFunctionParams>& eager_func_params,
-    const absl::optional<ManagedStackTrace>& stack_trace,
+    const abslx::optional<EagerFunctionParams>& eager_func_params,
+    const abslx::optional<ManagedStackTrace>& stack_trace,
     CoordinationServiceAgent* coordination_service_agent) {
   OpKernelContext::Params params;
   params.device = device_;
@@ -352,8 +352,8 @@ std::shared_ptr<FunctionLibraryRuntime::Options>
 KernelAndDeviceFunc::PrepareForRun(
     ScopedStepContainer* step_container, std::vector<EagerKernelRet>* outputs,
     CancellationManager* cancellation_manager,
-    const absl::optional<EagerFunctionParams>& eager_func_params,
-    const absl::optional<ManagedStackTrace>& stack_trace,
+    const abslx::optional<EagerFunctionParams>& eager_func_params,
+    const abslx::optional<ManagedStackTrace>& stack_trace,
     CoordinationServiceAgent* coordination_service_agent) {
   std::shared_ptr<FunctionLibraryRuntime::Options> opts = nullptr;
   if (eager_func_params.has_value()) {
@@ -413,8 +413,8 @@ Status KernelAndDeviceFunc::Run(
     ScopedStepContainer* step_container, const EagerKernelArgs& inputs,
     std::vector<EagerKernelRet>* outputs,
     CancellationManager* cancellation_manager,
-    const absl::optional<EagerFunctionParams>& eager_func_params,
-    const absl::optional<ManagedStackTrace>& stack_trace,
+    const abslx::optional<EagerFunctionParams>& eager_func_params,
+    const abslx::optional<ManagedStackTrace>& stack_trace,
     CoordinationServiceAgent* coordination_service_agent) {
   profiler::TraceMe activity("KernelAndDeviceFunc::Run",
                              profiler::TraceMeLevel::kInfo);
@@ -458,14 +458,14 @@ void KernelAndDeviceFunc::RunAsync(
     ScopedStepContainer* step_container, const EagerKernelArgs& inputs,
     std::vector<EagerKernelRet>* outputs,
     CancellationManager* cancellation_manager,
-    const absl::optional<EagerFunctionParams>& eager_func_params,
+    const abslx::optional<EagerFunctionParams>& eager_func_params,
     CoordinationServiceAgent* coordination_service_agent,
     std::function<void(const Status&)> done) {
   profiler::TraceMe activity("KernelAndDeviceFunc::RunAsync",
                              profiler::TraceMeLevel::kInfo);
   std::shared_ptr<FunctionLibraryRuntime::Options> opts = PrepareForRun(
       step_container, outputs, cancellation_manager, eager_func_params,
-      absl::nullopt, coordination_service_agent);
+      abslx::nullopt, coordination_service_agent);
 
   pflr_->Run(
       *opts, handle_, inputs, outputs,

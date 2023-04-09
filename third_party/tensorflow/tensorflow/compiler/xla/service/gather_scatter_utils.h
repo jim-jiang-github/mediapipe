@@ -38,13 +38,13 @@ StatusOr<HloInstruction*> TransformStartIndices(HloInstruction* indices,
 // In gather, the map is called `start_index_map`. In scatter, it's
 // `scatter_dims_to_operand_dims`.
 std::pair<std::vector<int64_t>, std::vector<int64_t>>
-MakeOperandStartIndexPermutations(absl::Span<const int64_t>, int operand_rank);
+MakeOperandStartIndexPermutations(abslx::Span<const int64_t>, int operand_rank);
 
 StatusOr<HloInstruction*> MaybeTranspose(HloInstruction* operand,
-                                         absl::Span<const int64_t> permutation);
+                                         abslx::Span<const int64_t> permutation);
 
 StatusOr<std::vector<HloInstruction*>> MaybeTranspose(
-    absl::Span<HloInstruction* const> operands,
+    abslx::Span<HloInstruction* const> operands,
     const std::vector<int64_t>& operand_permutation);
 
 // Moves the given dimension to the last dimension.

@@ -120,7 +120,7 @@ class ScreenToMetricSpaceConverter {
   //
   //       To keep the logic correct, the landmark set handedness is changed any
   //       time the screen-to-metric semantic barrier is passed.
-  absl::Status Convert(const NormalizedLandmarkList& screen_landmark_list,  //
+  abslx::Status Convert(const NormalizedLandmarkList& screen_landmark_list,  //
                        const PerspectiveCameraFrustum& pcf,                 //
                        LandmarkList& metric_landmark_list,                  //
                        Eigen::Matrix4f& pose_transform_mat) const {
@@ -211,7 +211,7 @@ class ScreenToMetricSpaceConverter {
 
     ConvertEigenMatrixToLandmarkList(metric_landmarks, metric_landmark_list);
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -231,7 +231,7 @@ class ScreenToMetricSpaceConverter {
     landmarks.colwise() += Eigen::Vector3f(x_translation, y_translation, 0.f);
   }
 
-  absl::StatusOr<float> EstimateScale(Eigen::Matrix3Xf& landmarks) const {
+  abslx::StatusOr<float> EstimateScale(Eigen::Matrix3Xf& landmarks) const {
     Eigen::Matrix4f transform_mat;
     MP_RETURN_IF_ERROR(procrustes_solver_->SolveWeightedOrthogonalProblem(
         canonical_metric_landmarks_, landmarks, landmark_weights_,
@@ -309,7 +309,7 @@ class GeometryPipelineImpl : public GeometryPipeline {
             canonical_mesh_vertex_position_offset),
         space_converter_(std::move(space_converter)) {}
 
-  absl::StatusOr<std::vector<FaceGeometry>> EstimateFaceGeometry(
+  abslx::StatusOr<std::vector<FaceGeometry>> EstimateFaceGeometry(
       const std::vector<NormalizedLandmarkList>& multi_face_landmarks,
       int frame_width, int frame_height) const override {
     MP_RETURN_IF_ERROR(ValidateFrameDimensions(frame_width, frame_height))
@@ -402,7 +402,7 @@ class GeometryPipelineImpl : public GeometryPipeline {
 
 }  // namespace
 
-absl::StatusOr<std::unique_ptr<GeometryPipeline>> CreateGeometryPipeline(
+abslx::StatusOr<std::unique_ptr<GeometryPipeline>> CreateGeometryPipeline(
     const Environment& environment, const GeometryPipelineMetadata& metadata) {
   MP_RETURN_IF_ERROR(ValidateEnvironment(environment))
       << "Invalid environment!";
@@ -450,11 +450,11 @@ absl::StatusOr<std::unique_ptr<GeometryPipeline>> CreateGeometryPipeline(
   }
 
   std::unique_ptr<GeometryPipeline> result =
-      absl::make_unique<GeometryPipelineImpl>(
+      abslx::make_unique<GeometryPipelineImpl>(
           environment.perspective_camera(), canonical_mesh,
           canonical_mesh_vertex_size, canonical_mesh_num_vertices,
           canonical_mesh_vertex_position_offset,
-          absl::make_unique<ScreenToMetricSpaceConverter>(
+          abslx::make_unique<ScreenToMetricSpaceConverter>(
               environment.origin_point_location(),
               metadata.input_source() == InputSource::DEFAULT
                   ? InputSource::FACE_LANDMARK_PIPELINE

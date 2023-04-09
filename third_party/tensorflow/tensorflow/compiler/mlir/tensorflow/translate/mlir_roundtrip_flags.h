@@ -106,7 +106,7 @@ struct GraphExportConfig {
 
 // Parses the command line flag strings to the specification of nodes in
 // the Graph.
-Status ParseOutputArrayInfo(absl::string_view array_names,
+Status ParseOutputArrayInfo(abslx::string_view array_names,
                             std::vector<string>* outputs);
 
 Status ParseOutputArrayInfo(const std::vector<string>& output_names,
@@ -114,9 +114,9 @@ Status ParseOutputArrayInfo(const std::vector<string>& output_names,
 
 // Parses the command line flag strings to the specification of nodes in
 // the Graph. `data_types` input string can be empty since the flag is optional.
-Status ParseInputArrayInfo(absl::string_view array_names,
-                           absl::string_view data_types,
-                           absl::string_view shapes,
+Status ParseInputArrayInfo(abslx::string_view array_names,
+                           abslx::string_view data_types,
+                           abslx::string_view shapes,
                            GraphImportConfig::InputArrays* inputs);
 
 Status ParseInputArrayInfo(
@@ -129,17 +129,17 @@ Status ParseInputArrayInfo(
 // format.
 // NOTE: If shapes_str is empty, shapes_vector will also be empty.
 Status ParseNodeShapes(
-    absl::string_view shapes_str,
+    abslx::string_view shapes_str,
     std::vector<llvm::Optional<std::vector<int>>>& shapes_vector);
 
 // Parses names from the given string into the names_vector.
 // NOTE: If names_str is empty, names_vector will also be empty.
-Status ParseNodeNames(absl::string_view names_str,
+Status ParseNodeNames(abslx::string_view names_str,
                       std::vector<std::string>& names_vector);
 
 // Parses data types from the given string into the data_type_vector.
 // NOTE: If data_types_str is empty, data_type_vector will also be empty.
-Status ParseNodeDataTypes(absl::string_view data_types_str,
+Status ParseNodeDataTypes(abslx::string_view data_types_str,
                           std::vector<std::string>& data_type_vector);
 
 }  // namespace tensorflow

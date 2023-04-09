@@ -332,7 +332,7 @@ TEST_F(FusionMergerTest, AvoidsLargeFusion) {
     entry_params.push_back(
         b.AddInstruction(HloInstruction::CreateParameter(i, shape, "p")));
   }
-  auto make_fusion = [&](absl::Span<HloInstruction* const> params) {
+  auto make_fusion = [&](abslx::Span<HloInstruction* const> params) {
     // Build a fusion computation for calculating the sum of all parameters.
     HloComputation::Builder sub_builder("subcomp");
     HloInstruction* sum = nullptr;
@@ -352,7 +352,7 @@ TEST_F(FusionMergerTest, AvoidsLargeFusion) {
         shape, HloInstruction::FusionKind::kLoop, params, subcomp);
   };
   auto fusion = b.AddInstruction(
-      make_fusion(absl::MakeSpan(entry_params)
+      make_fusion(abslx::MakeSpan(entry_params)
                       .subspan(0, MaxOperandsAndOutputsPerFusion())));
   b.AddInstruction(make_fusion({entry_params.back(), fusion}));
   module->AddEntryComputation(b.Build());

@@ -34,7 +34,7 @@ namespace op = xla::testing::opcode_matchers;
 
 class AllGatherCanonicalizeTest : public HloTestBase {
  public:
-  StatusOr<std::unique_ptr<HloModule>> RunPass(absl::string_view hlo_module) {
+  StatusOr<std::unique_ptr<HloModule>> RunPass(abslx::string_view hlo_module) {
     TF_ASSIGN_OR_RETURN(auto module, ParseAndReturnVerifiedModule(
                                          hlo_module, GetModuleConfigForTest()));
     HloPassPipeline pipeline("all-gather-cse");
@@ -51,7 +51,7 @@ class AllGatherCanonicalizeTest : public HloTestBase {
 };
 
 TEST_F(AllGatherCanonicalizeTest, SimpleReshape) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY entry {
@@ -70,7 +70,7 @@ ENTRY entry {
 }
 
 TEST_F(AllGatherCanonicalizeTest, MultipleDegenerateReshapes) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY entry {
@@ -89,7 +89,7 @@ ENTRY entry {
 }
 
 TEST_F(AllGatherCanonicalizeTest, MultipleDegenerateReshapes2) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY entry {
@@ -108,7 +108,7 @@ ENTRY entry {
 }
 
 TEST_F(AllGatherCanonicalizeTest, MultipleDegenerateReshapesNoDim0) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY entry {
@@ -127,7 +127,7 @@ ENTRY entry {
 }
 
 TEST_F(AllGatherCanonicalizeTest, NonDegenerateReshape) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY entry {

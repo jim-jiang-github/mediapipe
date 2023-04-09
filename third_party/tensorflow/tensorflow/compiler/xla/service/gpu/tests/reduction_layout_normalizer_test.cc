@@ -32,7 +32,7 @@ namespace {
 class ReductionLayoutNormalizerTest : public HloTestBase {
  public:
   void CheckReductionLayoutNormalizer(
-      absl::string_view hlo, std::optional<absl::string_view> expected) {
+      abslx::string_view hlo, std::optional<abslx::string_view> expected) {
     RunAndFilecheckHloRewrite(hlo, gpu::ReductionLayoutNormalizer{}, expected);
   }
 };

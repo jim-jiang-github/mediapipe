@@ -27,17 +27,17 @@
 namespace {
 
 void BM_Mutex(benchmark::State& state) {
-  static absl::Mutex* mu = new absl::Mutex;
+  static abslx::Mutex* mu = new abslx::Mutex;
   for (auto _ : state) {
-    absl::MutexLock lock(mu);
+    abslx::MutexLock lock(mu);
   }
 }
 BENCHMARK(BM_Mutex)->UseRealTime()->Threads(1)->ThreadPerCpu();
 
 static void DelayNs(int64_t ns, int* data) {
-  int64_t end = absl::base_internal::CycleClock::Now() +
-                ns * absl::base_internal::CycleClock::Frequency() / 1e9;
-  while (absl::base_internal::CycleClock::Now() < end) {
+  int64_t end = abslx::base_internal::CycleClock::Now() +
+                ns * abslx::base_internal::CycleClock::Frequency() / 1e9;
+  while (abslx::base_internal::CycleClock::Now() < end) {
     ++(*data);
     benchmark::DoNotOptimize(*data);
   }
@@ -65,8 +65,8 @@ class RaiiLocker<std::mutex> {
 class ScopedThreadMutexPriority {
  public:
   explicit ScopedThreadMutexPriority(int priority) {
-    absl::base_internal::ThreadIdentity* identity =
-        absl::synchronization_internal::GetOrCreateCurrentThreadIdentity();
+    abslx::base_internal::ThreadIdentity* identity =
+        abslx::synchronization_internal::GetOrCreateCurrentThreadIdentity();
     identity->per_thread_synch.priority = priority;
     // Bump next_priority_read_cycles to the infinite future so that the
     // implementation doesn't re-read the thread's actual scheduler priority
@@ -79,7 +79,7 @@ class ScopedThreadMutexPriority {
     // the next time the Mutex implementation wants to know this thread's
     // priority, it re-reads it from the OS instead of using our overridden
     // priority.
-    absl::synchronization_internal::GetOrCreateCurrentThreadIdentity()
+    abslx::synchronization_internal::GetOrCreateCurrentThreadIdentity()
         ->per_thread_synch.next_priority_read_cycles =
         std::numeric_limits<int64_t>::min();
   }
@@ -100,7 +100,7 @@ void BM_MutexEnqueue(benchmark::State& state) {
       (multiple_priorities && state.thread_index != 0) ? 1 : 0);
 
   struct Shared {
-    absl::Mutex mu;
+    abslx::Mutex mu;
     std::atomic<int> looping_threads{0};
     std::atomic<int> blocked_threads{0};
     std::atomic<bool> thread_has_mutex{false};
@@ -116,7 +116,7 @@ void BM_MutexEnqueue(benchmark::State& state) {
   // Benchmark uses its own synchronization primitives based on std::mutex, not
   // Abseil synchronization primitives. If at some point the benchmark library
   // merges into Abseil, this code may break.
-  absl::synchronization_internal::PerThreadSem::SetThreadBlockedCounter(
+  abslx::synchronization_internal::PerThreadSem::SetThreadBlockedCounter(
       &shared->blocked_threads);
 
   // The benchmark framework may run several iterations in the same process,
@@ -134,7 +134,7 @@ void BM_MutexEnqueue(benchmark::State& state) {
     shared->looping_threads.fetch_add(1);
     for (int i = 0; i < kBatchSize; i++) {
       {
-        absl::MutexLock l(&shared->mu);
+        abslx::MutexLock l(&shared->mu);
         shared->thread_has_mutex.store(true, std::memory_order_relaxed);
         // Spin until all other threads are either out of the benchmark loop
         // or blocked on the mutex. This ensures that the mutex queue is kept
@@ -161,7 +161,7 @@ void BM_MutexEnqueue(benchmark::State& state) {
     // block on the mutex while we in fact are waiting to exit.
     shared->looping_threads.fetch_add(-1);
   }
-  absl::synchronization_internal::PerThreadSem::SetThreadBlockedCounter(
+  abslx::synchronization_internal::PerThreadSem::SetThreadBlockedCounter(
       nullptr);
 }
 
@@ -232,12 +232,12 @@ void SetupBenchmarkArgs(benchmark::internal::Benchmark* bm,
   }
 }
 
-BENCHMARK_TEMPLATE(BM_Contended, absl::Mutex)
+BENCHMARK_TEMPLATE(BM_Contended, abslx::Mutex)
     ->Apply([](benchmark::internal::Benchmark* bm) {
       SetupBenchmarkArgs(bm, /*do_test_priorities=*/true);
     });
 
-BENCHMARK_TEMPLATE(BM_Contended, absl::base_internal::SpinLock)
+BENCHMARK_TEMPLATE(BM_Contended, abslx::base_internal::SpinLock)
     ->Apply([](benchmark::internal::Benchmark* bm) {
       SetupBenchmarkArgs(bm, /*do_test_priorities=*/false);
     });
@@ -258,9 +258,9 @@ void BM_ConditionWaiters(benchmark::State& state) {
   int num_waiters = state.range(1);
 
   struct Helper {
-    static void Waiter(absl::BlockingCounter* init, absl::Mutex* m, int* p) {
+    static void Waiter(abslx::BlockingCounter* init, abslx::Mutex* m, int* p) {
       init->DecrementCount();
-      m->LockWhen(absl::Condition(
+      m->LockWhen(abslx::Condition(
           static_cast<bool (*)(int*)>([](int* v) { return *v == 0; }), p));
       m->Unlock();
     }
@@ -271,12 +271,12 @@ void BM_ConditionWaiters(benchmark::State& state) {
     num_classes = num_waiters;
   }
 
-  absl::BlockingCounter init(num_waiters);
-  absl::Mutex mu;
+  abslx::BlockingCounter init(num_waiters);
+  abslx::Mutex mu;
   std::vector<int> equivalence_classes(num_classes, 1);
 
   // Must be declared last to be destroyed first.
-  absl::synchronization_internal::ThreadPool pool(num_waiters);
+  abslx::synchronization_internal::ThreadPool pool(num_waiters);
 
   for (int i = 0; i < num_waiters; i++) {
     // Mutex considers Conditions with the same function and argument

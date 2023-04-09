@@ -46,8 +46,8 @@ class TfrtGraphExecutionState {
  public:
   struct OptimizationResult {
     std::unique_ptr<tensorflow::Graph> graph;
-    absl::Duration functionalization_duration;
-    absl::Duration grappler_duration;
+    abslx::Duration functionalization_duration;
+    abslx::Duration grappler_duration;
   };
 
   struct Options {
@@ -65,7 +65,7 @@ class TfrtGraphExecutionState {
       const Options& options,
       std::unique_ptr<tensorflow::GraphExecutionState> graph_execution_state,
       const FallbackState& fallback_state,
-      absl::flat_hash_set<std::string> functions_to_optimize)
+      abslx::flat_hash_set<std::string> functions_to_optimize)
       : options_(options),
         graph_execution_state_(std::move(graph_execution_state)),
         fallback_state_(fallback_state),
@@ -82,21 +82,21 @@ class TfrtGraphExecutionState {
   // Return the preprocessed full graph. Note that it does not contain the
   // function library in the original graph.
   const tensorflow::Graph& graph() const {
-    absl::MutexLock lock(&graph_execution_state_mu_);
+    abslx::MutexLock lock(&graph_execution_state_mu_);
     DCHECK(graph_execution_state_->full_graph());
     return *graph_execution_state_->full_graph();
   }
 
   // The original graph.
   const GraphDef* original_graph_def() const {
-    absl::MutexLock lock(&graph_execution_state_mu_);
+    abslx::MutexLock lock(&graph_execution_state_mu_);
     return graph_execution_state_->original_graph_def();
   }
 
  private:
   // Return the function library in the original graph.
   const FunctionLibraryDefinition& flib_def() const {
-    absl::MutexLock lock(&graph_execution_state_mu_);
+    abslx::MutexLock lock(&graph_execution_state_mu_);
     return graph_execution_state_->flib_def();
   }
 
@@ -110,11 +110,11 @@ class TfrtGraphExecutionState {
       ABSL_GUARDED_BY(graph_execution_state_mu_);
   // We need this mutex even thought `GraphExecutionState` is thread-safe,
   // because `swap()` is not thread-safe.
-  mutable absl::Mutex graph_execution_state_mu_;
+  mutable abslx::Mutex graph_execution_state_mu_;
 
   const FallbackState& fallback_state_;
   // Only valid if `options_.run_placer_grappler_on_functions` is true.
-  absl::flat_hash_set<std::string> functions_to_optimize_;
+  abslx::flat_hash_set<std::string> functions_to_optimize_;
 };
 
 // Prunes the `graph_def` using the feed/fetch nodes specified in

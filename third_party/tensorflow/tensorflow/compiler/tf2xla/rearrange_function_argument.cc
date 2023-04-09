@@ -364,7 +364,7 @@ Status MaybeRewriteWhileNode(
     // Save the new FunctionDef.
     FunctionDef new_fdef;
     string new_name =
-        fld->UniqueFunctionName(absl::StrCat(attr_value.name(), "_rearrange_"));
+        fld->UniqueFunctionName(abslx::StrCat(attr_value.name(), "_rearrange_"));
     TF_RETURN_IF_ERROR(GraphToFunctionDef(*fbody->graph, new_name, &new_fdef));
     TF_RETURN_IF_ERROR(
         fld->AddFunctionDef(new_fdef, fld->GetStackTraces(attr_value.name())));
@@ -455,7 +455,7 @@ Status MaybeRewriteIfNode(
     // Save the new FunctionDef.
     FunctionDef new_fdef;
     string new_name =
-        fld->UniqueFunctionName(absl::StrCat(f.name(), "_rearrange_"));
+        fld->UniqueFunctionName(abslx::StrCat(f.name(), "_rearrange_"));
     TF_RETURN_IF_ERROR(GraphToFunctionDef(*fbody->graph, new_name, &new_fdef));
     const StackTracesMap& stack_traces =
         fld->GetStackTraces(f.name()).empty() && global_fld

@@ -69,7 +69,7 @@ std::string SideString(Side s) {
 // -- AlgorithmConfig
 
 std::string AlgorithmConfig::ToString() const {
-  return absl::StrCat(algorithm_);
+  return abslx::StrCat(algorithm_);
 }
 
 std::string ComputationTypeString(ComputationType ty) {

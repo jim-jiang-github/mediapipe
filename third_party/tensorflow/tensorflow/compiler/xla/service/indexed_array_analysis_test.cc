@@ -43,7 +43,7 @@ class IndexedArrayAnalysisTest : public HloTestBase {
     std::string result;
 
     for (char c : text) {
-      if (!absl::ascii_isspace(c)) {
+      if (!abslx::ascii_isspace(c)) {
         result.push_back(c);
       } else if (!result.empty() && result.back() != ' ') {
         result.push_back(' ');

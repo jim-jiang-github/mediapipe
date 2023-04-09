@@ -45,12 +45,12 @@ TYPED_TEST(UniformIntDistributionTest, ParamSerializeTest) {
   // not that the values generated cover the full range.
   using Limits = std::numeric_limits<TypeParam>;
   using param_type =
-      typename absl::uniform_int_distribution<TypeParam>::param_type;
+      typename abslx::uniform_int_distribution<TypeParam>::param_type;
   const TypeParam kMin = std::is_unsigned<TypeParam>::value ? 37 : -105;
   const TypeParam kNegOneOrZero = std::is_unsigned<TypeParam>::value ? 0 : -1;
 
   constexpr int kCount = 1000;
-  absl::InsecureBitGen gen;
+  abslx::InsecureBitGen gen;
   for (const auto& param : {
            param_type(),
            param_type(2, 2),  // Same
@@ -63,13 +63,13 @@ TYPED_TEST(UniformIntDistributionTest, ParamSerializeTest) {
        }) {
     const auto a = param.a();
     const auto b = param.b();
-    absl::uniform_int_distribution<TypeParam> before(a, b);
+    abslx::uniform_int_distribution<TypeParam> before(a, b);
     EXPECT_EQ(before.a(), param.a());
     EXPECT_EQ(before.b(), param.b());
 
     {
       // Initialize via param_type
-      absl::uniform_int_distribution<TypeParam> via_param(param);
+      abslx::uniform_int_distribution<TypeParam> via_param(param);
       EXPECT_EQ(via_param, before);
     }
 
@@ -77,7 +77,7 @@ TYPED_TEST(UniformIntDistributionTest, ParamSerializeTest) {
     std::stringstream ss;
     ss << before;
 
-    absl::uniform_int_distribution<TypeParam> after(Limits::min() + 3,
+    abslx::uniform_int_distribution<TypeParam> after(Limits::min() + 3,
                                                     Limits::max() - 5);
 
     EXPECT_NE(before.a(), after.a());
@@ -106,7 +106,7 @@ TYPED_TEST(UniformIntDistributionTest, ParamSerializeTest) {
         sample_min = sample;
       }
     }
-    std::string msg = absl::StrCat("Range: ", +sample_min, ", ", +sample_max);
+    std::string msg = abslx::StrCat("Range: ", +sample_min, ", ", +sample_max);
     ABSL_RAW_LOG(INFO, "%s", msg.c_str());
   }
 }
@@ -114,18 +114,18 @@ TYPED_TEST(UniformIntDistributionTest, ParamSerializeTest) {
 TYPED_TEST(UniformIntDistributionTest, ViolatesPreconditionsDeathTest) {
 #if GTEST_HAS_DEATH_TEST
   // Hi < Lo
-  EXPECT_DEBUG_DEATH({ absl::uniform_int_distribution<TypeParam> dist(10, 1); },
+  EXPECT_DEBUG_DEATH({ abslx::uniform_int_distribution<TypeParam> dist(10, 1); },
                      "");
 #endif  // GTEST_HAS_DEATH_TEST
 #if defined(NDEBUG)
   // opt-mode, for invalid parameters, will generate a garbage value,
   // but should not enter an infinite loop.
-  absl::InsecureBitGen gen;
-  absl::uniform_int_distribution<TypeParam> dist(10, 1);
+  abslx::InsecureBitGen gen;
+  abslx::uniform_int_distribution<TypeParam> dist(10, 1);
   auto x = dist(gen);
 
   // Any value will generate a non-empty string.
-  EXPECT_FALSE(absl::StrCat(+x).empty()) << x;
+  EXPECT_FALSE(abslx::StrCat(+x).empty()) << x;
 #endif  // NDEBUG
 }
 
@@ -133,17 +133,17 @@ TYPED_TEST(UniformIntDistributionTest, TestMoments) {
   constexpr int kSize = 100000;
   using Limits = std::numeric_limits<TypeParam>;
   using param_type =
-      typename absl::uniform_int_distribution<TypeParam>::param_type;
+      typename abslx::uniform_int_distribution<TypeParam>::param_type;
 
   // We use a fixed bit generator for distribution accuracy tests.  This allows
   // these tests to be deterministic, while still testing the qualify of the
   // implementation.
-  absl::random_internal::pcg64_2018_engine rng{0x2B7E151628AED2A6};
+  abslx::random_internal::pcg64_2018_engine rng{0x2B7E151628AED2A6};
 
   std::vector<double> values(kSize);
   for (const auto& param :
        {param_type(0, Limits::max()), param_type(13, 127)}) {
-    absl::uniform_int_distribution<TypeParam> dist(param);
+    abslx::uniform_int_distribution<TypeParam> dist(param);
     for (int i = 0; i < kSize; i++) {
       const auto sample = dist(rng);
       ASSERT_LE(dist.param().a(), sample);
@@ -151,7 +151,7 @@ TYPED_TEST(UniformIntDistributionTest, TestMoments) {
       values[i] = sample;
     }
 
-    auto moments = absl::random_internal::ComputeDistributionMoments(values);
+    auto moments = abslx::random_internal::ComputeDistributionMoments(values);
     const double a = dist.param().a();
     const double b = dist.param().b();
     const double n = (b - a + 1);
@@ -169,7 +169,7 @@ TYPED_TEST(UniformIntDistributionTest, TestMoments) {
 }
 
 TYPED_TEST(UniformIntDistributionTest, ChiSquaredTest50) {
-  using absl::random_internal::kChiSquared;
+  using abslx::random_internal::kChiSquared;
 
   constexpr size_t kTrials = 1000;
   constexpr int kBuckets = 50;  // inclusive, so actally +1
@@ -178,7 +178,7 @@ TYPED_TEST(UniformIntDistributionTest, ChiSquaredTest50) {
 
   // Empirically validated with --runs_per_test=10000.
   const int kThreshold =
-      absl::random_internal::ChiSquareValue(kBuckets, 0.999999);
+      abslx::random_internal::ChiSquareValue(kBuckets, 0.999999);
 
   const TypeParam min = std::is_unsigned<TypeParam>::value ? 37 : -37;
   const TypeParam max = min + kBuckets;
@@ -186,28 +186,28 @@ TYPED_TEST(UniformIntDistributionTest, ChiSquaredTest50) {
   // We use a fixed bit generator for distribution accuracy tests.  This allows
   // these tests to be deterministic, while still testing the qualify of the
   // implementation.
-  absl::random_internal::pcg64_2018_engine rng{0x2B7E151628AED2A6};
+  abslx::random_internal::pcg64_2018_engine rng{0x2B7E151628AED2A6};
 
-  absl::uniform_int_distribution<TypeParam> dist(min, max);
+  abslx::uniform_int_distribution<TypeParam> dist(min, max);
 
   std::vector<int32_t> counts(kBuckets + 1, 0);
   for (size_t i = 0; i < kTrials; i++) {
     auto x = dist(rng);
     counts[x - min]++;
   }
-  double chi_square = absl::random_internal::ChiSquareWithExpected(
+  double chi_square = abslx::random_internal::ChiSquareWithExpected(
       std::begin(counts), std::end(counts), kExpected);
   if (chi_square > kThreshold) {
     double p_value =
-        absl::random_internal::ChiSquarePValue(chi_square, kBuckets);
+        abslx::random_internal::ChiSquarePValue(chi_square, kBuckets);
 
     // Chi-squared test failed. Output does not appear to be uniform.
     std::string msg;
     for (const auto& a : counts) {
-      absl::StrAppend(&msg, a, "\n");
+      abslx::StrAppend(&msg, a, "\n");
     }
-    absl::StrAppend(&msg, kChiSquared, " p-value ", p_value, "\n");
-    absl::StrAppend(&msg, "High ", kChiSquared, " value: ", chi_square, " > ",
+    abslx::StrAppend(&msg, kChiSquared, " p-value ", p_value, "\n");
+    abslx::StrAppend(&msg, "High ", kChiSquared, " value: ", chi_square, " > ",
                     kThreshold);
     ABSL_RAW_LOG(INFO, "%s", msg.c_str());
     FAIL() << msg;
@@ -215,8 +215,8 @@ TYPED_TEST(UniformIntDistributionTest, ChiSquaredTest50) {
 }
 
 TEST(UniformIntDistributionTest, StabilityTest) {
-  // absl::uniform_int_distribution stability relies only on integer operations.
-  absl::random_internal::sequence_urbg urbg(
+  // abslx::uniform_int_distribution stability relies only on integer operations.
+  abslx::random_internal::sequence_urbg urbg(
       {0x0003eb76f6f7f755ull, 0xFFCEA50FDB2F953Bull, 0xC332DDEFBE6C5AA5ull,
        0x6558218568AB9702ull, 0x2AEF7DAD5B6E2F84ull, 0x1521B62829076170ull,
        0xECDD4775619F1510ull, 0x13CCA830EB61BD96ull, 0x0334FE1EAA0363CFull,
@@ -225,7 +225,7 @@ TEST(UniformIntDistributionTest, StabilityTest) {
   std::vector<int> output(12);
 
   {
-    absl::uniform_int_distribution<int32_t> dist(0, 4);
+    abslx::uniform_int_distribution<int32_t> dist(0, 4);
     for (auto& v : output) {
       v = dist(urbg);
     }
@@ -235,7 +235,7 @@ TEST(UniformIntDistributionTest, StabilityTest) {
 
   {
     urbg.reset();
-    absl::uniform_int_distribution<int32_t> dist(0, 100);
+    abslx::uniform_int_distribution<int32_t> dist(0, 100);
     for (auto& v : output) {
       v = dist(urbg);
     }
@@ -246,7 +246,7 @@ TEST(UniformIntDistributionTest, StabilityTest) {
 
   {
     urbg.reset();
-    absl::uniform_int_distribution<int32_t> dist(0, 10000);
+    abslx::uniform_int_distribution<int32_t> dist(0, 10000);
     for (auto& v : output) {
       v = dist(urbg);
     }

@@ -43,21 +43,21 @@ class DistributedRuntimeClient {
     tensorflow::Env* env = tensorflow::Env::Default();
 
     // RPC timeout used for RPC that don't have their own timeouts.
-    absl::Duration rpc_timeout = absl::Seconds(120);
+    abslx::Duration rpc_timeout = abslx::Seconds(120);
 
     // Time period for which Connect() should be retried. The client will keep
     // trying to open the initial connection for this period, even if any
     // individual Connect() RPC fails. May be zero, in which case Connect() will
     // only be attempted once.
-    absl::Duration init_timeout = absl::ZeroDuration();
+    abslx::Duration init_timeout = abslx::ZeroDuration();
 
     // How long to wait for all nodes to call Shutdown(). If the timeout
     // expires, then shutdown() reports an error and returns control.
-    absl::Duration shutdown_timeout = absl::Seconds(60);
+    abslx::Duration shutdown_timeout = abslx::Seconds(60);
 
     // Interval at which the client should send heartbeat RPCs to the
     // coordinator.
-    absl::Duration heartbeat_interval = absl::Seconds(10);
+    abslx::Duration heartbeat_interval = abslx::Seconds(10);
 
     // How many failed heartbeat RPCs may fail due to a possibly-ephemeral
     // reason before we decide the coordinator has vanished and that we should
@@ -113,14 +113,14 @@ class DistributedRuntimeClient {
 
   // The following APIs are thread-safe.
   virtual xla::StatusOr<std::string> BlockingKeyValueGet(
-      std::string key, absl::Duration timeout) = 0;
+      std::string key, abslx::Duration timeout) = 0;
 
   virtual xla::Status KeyValueSet(std::string key, std::string value) = 0;
 
   // Blocks until all nodes are at the barrier or the barrier times out.
   // `barrier_id` should be unique across barriers.
   virtual xla::Status WaitAtBarrier(std::string barrier_id,
-                                    absl::Duration timeout) = 0;
+                                    abslx::Duration timeout) = 0;
 
   // Returns pointer to coordination service agent, or InternalError if the
   // client does not use coordination service.

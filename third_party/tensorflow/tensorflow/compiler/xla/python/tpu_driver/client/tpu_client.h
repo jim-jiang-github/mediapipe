@@ -55,9 +55,9 @@ class TpuDevice : public PjRtDevice {
   const std::array<int, 3>& coords() const { return coords_; }
   int core_on_chip() const { return core_on_chip_; }
 
-  absl::string_view DebugString() const override;
+  abslx::string_view DebugString() const override;
 
-  absl::string_view ToString() const override;
+  abslx::string_view ToString() const override;
 
   static xla::StatusOr<std::vector<std::shared_ptr<xla::PjRtDevice>>>
   GetTpuDevices(const tpu_driver::SystemInfo& system_info);
@@ -74,7 +74,7 @@ class TpuDevice : public PjRtDevice {
 
   int local_hardware_id() const override { return -1; }
 
-  absl::string_view device_kind() const override { return device_kind_; }
+  abslx::string_view device_kind() const override { return device_kind_; }
 
   Status TransferToInfeed(const LiteralSlice& literal) override {
     return Unimplemented("Infeed not yet implemented via this API");
@@ -85,11 +85,11 @@ class TpuDevice : public PjRtDevice {
   }
 
   std::unique_ptr<ScopedAsyncTrackingEvent> CreateAsyncTrackingEvent(
-      absl::string_view description) const override {
+      abslx::string_view description) const override {
     return nullptr;
   }
 
-  const absl::flat_hash_map<std::string, PjRtDeviceAttribute>& Attributes()
+  const abslx::flat_hash_map<std::string, PjRtDeviceAttribute>& Attributes()
       const override {
     return attributes_;
   }
@@ -101,7 +101,7 @@ class TpuDevice : public PjRtDevice {
   const std::string device_kind_ = "Cloud TPU";
   std::string debug_string_;
   std::string to_string_;
-  const absl::flat_hash_map<std::string, PjRtDeviceAttribute> attributes_ = {};
+  const abslx::flat_hash_map<std::string, PjRtDeviceAttribute> attributes_ = {};
   // Index of the core of the same chip.
   int core_on_chip_;
   PyTpuClient* tpu_client_;
@@ -141,8 +141,8 @@ class PyTpuClient : public std::enable_shared_from_this<PyTpuClient> {
     return id_to_device_;
   }
   int process_index() const { return process_index_; }
-  const absl::string_view platform_name() const { return platform_name_; }
-  const absl::string_view platform_version() const { return platform_version_; }
+  const abslx::string_view platform_name() const { return platform_name_; }
+  const abslx::string_view platform_version() const { return platform_version_; }
 
   StatusOr<Shape> ChooseCompactLayoutForShape(Shape subshape) {
     return Unimplemented("ChooseCompactLayoutForShape not implemented.");
@@ -150,7 +150,7 @@ class PyTpuClient : public std::enable_shared_from_this<PyTpuClient> {
 
   // Returns a bad status containing `caller_name` if `device_id` doesn't
   // correspond to a valid device at the POD-slice boundary.
-  Status CheckDeviceId(int device_id, absl::string_view caller_name);
+  Status CheckDeviceId(int device_id, abslx::string_view caller_name);
 
   tpu_driver::TpuDriver* driver() { return driver_.get(); }
 
@@ -218,7 +218,7 @@ class PyTpuBuffer {
 
   // Supports nested tuple creation.
   static StatusOr<std::unique_ptr<PyTpuBuffer>> MakeTuple(
-      absl::Span<PyTpuBuffer* const> buffers,
+      abslx::Span<PyTpuBuffer* const> buffers,
       std::shared_ptr<PyTpuClient> client, std::shared_ptr<PjRtDevice> device);
 
   PyTpuBuffer() = delete;
@@ -234,7 +234,7 @@ class PyTpuBuffer {
 
   const Shape& on_host_shape() const { return on_host_shape_; }
   std::shared_ptr<PjRtDevice> device() const { return device_; }
-  const absl::string_view platform_name() const {
+  const abslx::string_view platform_name() const {
     return client_->platform_name();
   }
   std::shared_ptr<PyTpuClient> client() const { return client_; }
@@ -294,7 +294,7 @@ class PyTpuBuffer {
   // If this is a tuple, `device_buffer_` stores the tuple buffer and
   // `child_buffers_` stores the child buffers; else, `device_buffer_` stores
   // the data content and `child_buffers_` is empty.
-  mutable absl::Mutex mu_;
+  mutable abslx::Mutex mu_;
   std::shared_ptr<TpuSharedBuffer> device_buffer_ ABSL_GUARDED_BY(mu_);
   std::vector<std::shared_ptr<TpuSharedBuffer>> child_buffers_
       ABSL_GUARDED_BY(mu_);
@@ -302,8 +302,8 @@ class PyTpuBuffer {
   // CopyToHost or from a call to ToLiteral. Once a value has been fetched to
   // the host, it persists Delete() is called or the PyTpuBuffer is destroyed.
   struct HostValue {
-    absl::Mutex mutex;
-    absl::Notification ready;
+    abslx::Mutex mutex;
+    abslx::Notification ready;
     int pending_ops;
     // status and value are valid for reading only after `ready` has been
     // notified.
@@ -377,10 +377,10 @@ class PyTpuExecutable {
   // inside for computation to finish. Coordinate with JAX code change to see if
   // we can make both Execute and ExecutePerReplica non-blocking.
   StatusOr<std::vector<std::unique_ptr<PyTpuBuffer>>> Execute(
-      absl::Span<PyTpuBuffer* const> argument_handles);
+      abslx::Span<PyTpuBuffer* const> argument_handles);
 
   StatusOr<std::pair<std::vector<std::unique_ptr<PyTpuBuffer>>, PyTpuToken>>
-  ExecuteWithToken(absl::Span<PyTpuBuffer* const> argument_handles) {
+  ExecuteWithToken(abslx::Span<PyTpuBuffer* const> argument_handles) {
     TF_ASSIGN_OR_RETURN(auto results, Execute(argument_handles));
     return std::pair<std::vector<std::unique_ptr<PyTpuBuffer>>, PyTpuToken>(
         std::move(results), PyTpuToken());
@@ -392,16 +392,16 @@ class PyTpuExecutable {
   // count.
   StatusOr<std::vector<std::vector<std::unique_ptr<PyTpuBuffer>>>>
   ExecuteOnLocalDevices(
-      absl::Span<const std::vector<PyTpuBuffer*>> argument_handles);
+      abslx::Span<const std::vector<PyTpuBuffer*>> argument_handles);
 
   StatusOr<std::vector<std::vector<std::unique_ptr<PyTpuBuffer>>>>
   ExecuteShardedOnLocalDevices(
-      absl::Span<const std::vector<PyTpuBuffer*>> args);
+      abslx::Span<const std::vector<PyTpuBuffer*>> args);
 
   StatusOr<std::pair<std::vector<std::vector<std::unique_ptr<PyTpuBuffer>>>,
                      std::vector<PyTpuToken>>>
   ExecuteShardedOnLocalDevicesWithTokens(
-      absl::Span<const std::vector<PyTpuBuffer*>> args) {
+      abslx::Span<const std::vector<PyTpuBuffer*>> args) {
     TF_ASSIGN_OR_RETURN(auto results, ExecuteShardedOnLocalDevices(args));
 
     TF_RET_CHECK(!args.empty());
@@ -422,8 +422,8 @@ class PyTpuExecutable {
   };
 
   ExecuteResult ExecuteHelper(
-      absl::Span<const std::vector<PyTpuBuffer*>> all_core_arguments,
-      absl::Span<PyTpuBuffer* const> this_core_arguments, int replica,
+      abslx::Span<const std::vector<PyTpuBuffer*>> all_core_arguments,
+      abslx::Span<PyTpuBuffer* const> this_core_arguments, int replica,
       int partition, const RunId& run_id);
 
   std::shared_ptr<PyTpuClient> const client_;

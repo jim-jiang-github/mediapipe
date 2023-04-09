@@ -129,7 +129,7 @@ TEST(StatusGroup, AggregateWithSingleErrorStatus) {
 
   Status concat_status = c.as_concatenated_status();
   ASSERT_EQ(concat_status.code(), internal.code());
-  ASSERT_TRUE(absl::StrContains(concat_status.error_message(),
+  ASSERT_TRUE(abslx::StrContains(concat_status.error_message(),
                                 internal.error_message()));
 
   // Add derived error status
@@ -141,7 +141,7 @@ TEST(StatusGroup, AggregateWithSingleErrorStatus) {
 
   concat_status = c.as_concatenated_status();
   ASSERT_EQ(concat_status.code(), internal.code());
-  ASSERT_TRUE(absl::StrContains(concat_status.error_message(),
+  ASSERT_TRUE(abslx::StrContains(concat_status.error_message(),
                                 internal.error_message()));
 }
 
@@ -159,19 +159,19 @@ TEST(StatusGroup, AggregateWithMultipleErrorStatus) {
 
   ASSERT_EQ(summary.code(), internal.code());
   ASSERT_TRUE(
-      absl::StrContains(summary.error_message(), internal.error_message()));
+      abslx::StrContains(summary.error_message(), internal.error_message()));
   ASSERT_TRUE(
-      absl::StrContains(summary.error_message(), cancelled.error_message()));
+      abslx::StrContains(summary.error_message(), cancelled.error_message()));
   ASSERT_TRUE(
-      absl::StrContains(summary.error_message(), aborted.error_message()));
+      abslx::StrContains(summary.error_message(), aborted.error_message()));
 
   Status concat_status = c.as_concatenated_status();
   ASSERT_EQ(concat_status.code(), internal.code());
-  ASSERT_TRUE(absl::StrContains(concat_status.error_message(),
+  ASSERT_TRUE(abslx::StrContains(concat_status.error_message(),
                                 internal.error_message()));
-  ASSERT_TRUE(absl::StrContains(concat_status.error_message(),
+  ASSERT_TRUE(abslx::StrContains(concat_status.error_message(),
                                 cancelled.error_message()));
-  ASSERT_TRUE(absl::StrContains(concat_status.error_message(),
+  ASSERT_TRUE(abslx::StrContains(concat_status.error_message(),
                                 aborted.error_message()));
 }
 
@@ -186,9 +186,9 @@ TEST(Status, InvalidPayloadGetsIgnored) {
 TEST(Status, SetPayloadSetsOrUpdatesIt) {
   Status s(error::INTERNAL, "Error message");
   s.SetPayload("Error key", "Original");
-  ASSERT_EQ(s.GetPayload("Error key"), absl::Cord("Original"));
+  ASSERT_EQ(s.GetPayload("Error key"), abslx::Cord("Original"));
   s.SetPayload("Error key", "Updated");
-  ASSERT_EQ(s.GetPayload("Error key"), absl::Cord("Updated"));
+  ASSERT_EQ(s.GetPayload("Error key"), abslx::Cord("Updated"));
 }
 
 TEST(Status, ErasePayloadRemovesIt) {

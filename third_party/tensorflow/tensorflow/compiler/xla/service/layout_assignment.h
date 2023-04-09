@@ -227,7 +227,7 @@ class ChannelLayoutConstraints {
   }
 
  private:
-  absl::flat_hash_map<int64_t, Layout> constraints_;
+  abslx::flat_hash_map<int64_t, Layout> constraints_;
 };
 
 // HLO pass which assigns layouts to all instructions in the HLO module while
@@ -252,14 +252,14 @@ class LayoutAssignment : public HloModulePass {
   const TuplePointsToAnalysis& points_to_analysis() const {
     return *points_to_analysis_;
   }
-  absl::string_view name() const override { return "layout-assignment"; }
+  abslx::string_view name() const override { return "layout-assignment"; }
 
   // Assign layouts to the given module. Returns whether the module was changed
   // (any layouts were changed).
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
   // Class encapsulating the layout constraints of the values in a HLO
   // computation.
@@ -525,7 +525,7 @@ class LayoutAssignment : public HloModulePass {
   // necessary conditions.
   Status CheckLayouts(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads);
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads);
 
   // Computes the ComputationLayout of the given constraints based of the
   // layouts assigned to parameters and root instruction. Also propagate
@@ -538,7 +538,7 @@ class LayoutAssignment : public HloModulePass {
   // Clears the side effects of a previous pass, like added copy instructions.
   Status ClearPreviousPassSideEffects(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads);
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads);
 
   // Propagates the layouts computed by the layout assignment pass on the given
   // computation, to the computation layout passed in to this API.
@@ -615,7 +615,7 @@ class LayoutAssignment : public HloModulePass {
 
   // The set of HLO instructions which lacked any layout constraint, thus
   // receiving propagated default layouts.
-  absl::flat_hash_set<const HloInstruction*> unconstrained_layout_instructions_;
+  abslx::flat_hash_set<const HloInstruction*> unconstrained_layout_instructions_;
 
   HloPredicate instruction_can_change_layout_func_;
 
@@ -629,15 +629,15 @@ class LayoutAssignment : public HloModulePass {
   // far. Computations are handled in a topological sort where computations are
   // handled before their caller instructions so the layouts of caller
   // instructions can be set to match the computation.
-  absl::flat_hash_map<const HloComputation*, std::unique_ptr<LayoutConstraints>>
+  abslx::flat_hash_map<const HloComputation*, std::unique_ptr<LayoutConstraints>>
       computation_layouts_;
 
   // Map from branch computations to the result layout they should apply.
-  absl::flat_hash_map<HloComputation*, ComputationLayout> conditional_mismatch_;
+  abslx::flat_hash_map<HloComputation*, ComputationLayout> conditional_mismatch_;
 
   // Every copy added to the module by the layout assignment pass is registered
   // here.
-  absl::flat_hash_set<HloInstruction*> added_copies_;
+  abslx::flat_hash_set<HloInstruction*> added_copies_;
 
   // The pointer to the channel layout constraints passed in with the
   // constructor. If not nullptr, this is an input/output argument.
@@ -655,12 +655,12 @@ class LayoutAssignment : public HloModulePass {
   // Array-shaped buffers which have not yet been constrained.
   std::set<LogicalBuffer::Id> unconstrained_buffer_ids_;
 
-  mutable absl::flat_hash_map<const HloInstruction*,
+  mutable abslx::flat_hash_map<const HloInstruction*,
                               std::unique_ptr<PointsToSet::BufferSet>>
       buffer_sets_cache_;
 
   // The set of BufferLayoutConstraints applied to the computation.
-  absl::node_hash_map<const LogicalBuffer*, BufferLayoutConstraint>
+  abslx::node_hash_map<const LogicalBuffer*, BufferLayoutConstraint>
       buffer_constraints_;
 
   // A vector which holds constraints as they are added. Can be cleared with

@@ -59,7 +59,7 @@ class IrEmitterContext {
   const BufferAssignment& buffer_assignment() const {
     return *buffer_assignment_;
   }
-  absl::string_view platform_name() const { return platform_name_; }
+  abslx::string_view platform_name() const { return platform_name_; }
   GpuDeviceInfo gpu_device_info() const { return gpu_device_info_; }
   se::CudaComputeCapability cuda_compute_capability() const {
     return cuda_compute_capability_;
@@ -73,14 +73,14 @@ class IrEmitterContext {
 
   std::vector<GpuExecutable::ConstantInfo>& constants() { return constants_; }
 
-  absl::Span<const BufferAllocation> allocations() const {
+  abslx::Span<const BufferAllocation> allocations() const {
     if (buffer_assignment_) {
       return buffer_assignment_->Allocations();
     }
     return allocations_;
   }
 
-  void set_allocations(absl::Span<const BufferAllocation> allocations) {
+  void set_allocations(abslx::Span<const BufferAllocation> allocations) {
     CHECK_EQ(nullptr, buffer_assignment_);
     allocations_ = allocations;
   }
@@ -88,7 +88,7 @@ class IrEmitterContext {
  private:
   const HloModule* hlo_module_;
   const BufferAssignment* buffer_assignment_;
-  absl::Span<const BufferAllocation> allocations_;
+  abslx::Span<const BufferAllocation> allocations_;
   std::string platform_name_;
   GpuDeviceInfo gpu_device_info_;
   se::CudaComputeCapability cuda_compute_capability_;

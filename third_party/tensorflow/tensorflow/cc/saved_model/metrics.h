@@ -32,39 +32,39 @@ namespace metrics {
 // has 1 field "write_version", which is equal to the
 // `tensorflow::libexport::GetWriteVersion` of the protobuf and should be
 // incremented when a SavedModel has been successfully written.
-monitoring::CounterCell& SavedModelWrite(absl::string_view write_version);
+monitoring::CounterCell& SavedModelWrite(abslx::string_view write_version);
 
 // Returns "/tensorflow/core/saved_model/read/count" cell. This metric
 // has 1 field "write_version", which is equal to the
 // `tensorflow::libexport::GetWriteVersion` of the protobuf, and should be
 // incremented when a SavedModel has been successfully read.
-monitoring::CounterCell& SavedModelRead(absl::string_view write_version);
+monitoring::CounterCell& SavedModelRead(abslx::string_view write_version);
 
 // Returns "/tensorflow/core/saved_model/write/api" cell. This metric has 1
 // field "api_label" which corresponds to a SavedModel write API. The cell for
 // `foo` should be incremented when the write API `foo` is called.
-monitoring::CounterCell& SavedModelWriteApi(absl::string_view api_label);
+monitoring::CounterCell& SavedModelWriteApi(abslx::string_view api_label);
 
 // Returns "/tensorflow/core/saved_model/read/api" cell. This metric has 1
 // field "api_label" which corresponds to a SavedModel read API. The cell for
 // `foo` should be incremented when the read API `foo` is called.
-monitoring::CounterCell& SavedModelReadApi(absl::string_view api_label);
+monitoring::CounterCell& SavedModelReadApi(abslx::string_view api_label);
 
 // Returns "/tensorflow/core/checkpoint/read/read_durations" cell belonging to
 // field `api_label`.
-monitoring::SamplerCell& CheckpointReadDuration(absl::string_view api_label);
+monitoring::SamplerCell& CheckpointReadDuration(abslx::string_view api_label);
 
 // Returns "/tensorflow/core/checkpoint/write/write_durations" cell belonging to
 // field `api_label`.
-monitoring::SamplerCell& CheckpointWriteDuration(absl::string_view api_label);
+monitoring::SamplerCell& CheckpointWriteDuration(abslx::string_view api_label);
 
 // Returns  "/tensorflow/core/checkpoint/write/training_time_saved" cell
 // belonging to field `api_label`.
-monitoring::CounterCell& TrainingTimeSaved(absl::string_view api_label);
+monitoring::CounterCell& TrainingTimeSaved(abslx::string_view api_label);
 
 // Returns  "/tensorflow/core/checkpoint/write/checkpoint_size" cell
 // belonging to field (`api_label`, `filesize`).
-monitoring::CounterCell& CheckpointSize(absl::string_view api_label,
+monitoring::CounterCell& CheckpointSize(abslx::string_view api_label,
                                         int64_t filesize);
 
 }  // namespace metrics

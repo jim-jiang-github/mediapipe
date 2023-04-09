@@ -97,8 +97,8 @@ class Tensor {
     View(View&& src) = default;
 
    protected:
-    View(std::unique_ptr<absl::MutexLock>&& lock) : lock_(std::move(lock)) {}
-    std::unique_ptr<absl::MutexLock> lock_;
+    View(std::unique_ptr<abslx::MutexLock>&& lock) : lock_(std::move(lock)) {}
+    std::unique_ptr<abslx::MutexLock> lock_;
   };
 
  public:
@@ -164,7 +164,7 @@ class Tensor {
 
    protected:
     friend class Tensor;
-    CpuView(T* buffer, std::unique_ptr<absl::MutexLock>&& lock,
+    CpuView(T* buffer, std::unique_ptr<abslx::MutexLock>&& lock,
             std::function<void()> release_callback = nullptr)
         : View(std::move(lock)),
           buffer_(buffer),
@@ -213,7 +213,7 @@ class Tensor {
     AHardwareBufferView(AHardwareBuffer* handle, int file_descriptor,
                         int* fence_fd, FinishingFunc* ahwb_written,
                         std::function<void()>* release_callback,
-                        std::unique_ptr<absl::MutexLock>&& lock)
+                        std::unique_ptr<abslx::MutexLock>&& lock)
         : View(std::move(lock)),
           handle_(handle),
           file_descriptor_(file_descriptor),
@@ -259,7 +259,7 @@ class Tensor {
 
    protected:
     friend class Tensor;
-    OpenGlTexture2dView(GLuint name, std::unique_ptr<absl::MutexLock>&& lock)
+    OpenGlTexture2dView(GLuint name, std::unique_ptr<abslx::MutexLock>&& lock)
         : View(std::move(lock)), name_(name) {}
     GLuint name_;
   };
@@ -285,7 +285,7 @@ class Tensor {
 
    protected:
     friend class Tensor;
-    OpenGlBufferView(GLuint name, std::unique_ptr<absl::MutexLock>&& lock,
+    OpenGlBufferView(GLuint name, std::unique_ptr<abslx::MutexLock>&& lock,
                      GLsync* ssbo_read)
         : View(std::move(lock)), name_(name), ssbo_read_(ssbo_read) {}
     GLuint name_;
@@ -363,7 +363,7 @@ class Tensor {
   // each-other: valid_ = kValidCpu | kValidMetalBuffer;
   mutable int valid_ = 0;
   // The mutex is locked by Get*View and is kept by all Views.
-  mutable absl::Mutex view_mutex_;
+  mutable abslx::Mutex view_mutex_;
 
   mutable void* cpu_buffer_ = nullptr;
   void AllocateCpuBuffer() const;
@@ -397,7 +397,7 @@ class Tensor {
   // TODO: Tracks all unique tensors. Can grow to a large number. LRU
   // (Least Recently Used) can be more predicted.
   // The value contains the size alignment parameter.
-  static inline absl::flat_hash_map<uint64_t, int> ahwb_usage_track_;
+  static inline abslx::flat_hash_map<uint64_t, int> ahwb_usage_track_;
   // Expects the target SSBO to be already bound.
   bool AllocateAhwbMapToSsbo() const;
   bool InsertAhwbToSsboFence() const;

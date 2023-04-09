@@ -151,7 +151,7 @@ int64_t ComputeMaxBufferedElements(int64_t prefetch_input_elements,
   return (prefetch_input_elements + cycle_length) * buffer_output_elements;
 }
 
-int64_t OpVersionFromOpName(absl::string_view op_name) {
+int64_t OpVersionFromOpName(abslx::string_view op_name) {
   if (op_name == kParallelInterleaveDatasetV2) {
     return 2;
   } else if (op_name == kParallelInterleaveDatasetV3) {
@@ -612,7 +612,7 @@ class ParallelInterleaveDatasetOp::Dataset : public DatasetBase {
 
       std::string DebugString()
           TF_EXCLUSIVE_LOCKS_REQUIRED(&ParallelInterleaveIterator::mu_) {
-        return absl::StrFormat(
+        return abslx::StrFormat(
             "Element(id: %d, iterator_null: %d, results_size: %d, "
             "cycle_index: %d, active: %d, initialized: %d, no_input: %d)",
             id, iterator == nullptr, results.size(), cycle_index, active,
@@ -1235,11 +1235,11 @@ class ParallelInterleaveDatasetOp::Dataset : public DatasetBase {
     }
 
     string CodeKey(size_t idx) {
-      return absl::StrCat(kResultsSuffix, "[", idx, "]", kCodeSuffix);
+      return abslx::StrCat(kResultsSuffix, "[", idx, "]", kCodeSuffix);
     }
 
     string ErrorMessageKey(size_t idx) {
-      return absl::StrCat(kResultsSuffix, "[", idx, "]", kErrorMessageSuffix);
+      return abslx::StrCat(kResultsSuffix, "[", idx, "]", kErrorMessageSuffix);
     }
 
     Status WriteElement(SerializationContext* ctx,
@@ -1247,22 +1247,22 @@ class ParallelInterleaveDatasetOp::Dataset : public DatasetBase {
                         const string& key_prefix, IteratorStateWriter* writer)
         TF_EXCLUSIVE_LOCKS_REQUIRED(*mu_) {
       const auto& iterator_name =
-          absl::StrCat(prefix(), "::", key_prefix, "::", idx);
+          abslx::StrCat(prefix(), "::", key_prefix, "::", idx);
       if (element->iterator) {
         TF_RETURN_IF_ERROR(SaveInput(ctx, writer, element->iterator));
         TF_RETURN_IF_ERROR(
             writer->WriteScalar(iterator_name, kIdSuffix, element->id));
         TF_RETURN_IF_ERROR(writer->WriteScalar(
-            iterator_name, absl::StrCat(kInputsSuffix, kSizeSuffix),
+            iterator_name, abslx::StrCat(kInputsSuffix, kSizeSuffix),
             element->inputs->size()));
         for (int i = 0; i < element->inputs->size(); i++) {
           TF_RETURN_IF_ERROR(writer->WriteTensor(
-              iterator_name, absl::StrCat(kInputsSuffix, "[", i, "]"),
+              iterator_name, abslx::StrCat(kInputsSuffix, "[", i, "]"),
               element->inputs->at(i)));
         }
       }
       TF_RETURN_IF_ERROR(writer->WriteScalar(
-          iterator_name, absl::StrCat(kResultsSuffix, kSizeSuffix),
+          iterator_name, abslx::StrCat(kResultsSuffix, kSizeSuffix),
           element->results.size()));
       for (size_t i = 0; i < element->results.size(); i++) {
         std::shared_ptr<Result> result = element->results[i];
@@ -1270,16 +1270,16 @@ class ParallelInterleaveDatasetOp::Dataset : public DatasetBase {
             WriteStatusLocked(writer, iterator_name, i, result->status));
         TF_RETURN_IF_ERROR(writer->WriteScalar(
             iterator_name,
-            absl::StrCat(kResultsSuffix, "[", i, "]", kSizeSuffix),
+            abslx::StrCat(kResultsSuffix, "[", i, "]", kSizeSuffix),
             result->return_values.size()));
         for (size_t j = 0; j < result->return_values.size(); j++) {
           TF_RETURN_IF_ERROR(writer->WriteTensor(
-              iterator_name, absl::StrCat(kResultsSuffix, "[", i, "][", j, "]"),
+              iterator_name, abslx::StrCat(kResultsSuffix, "[", i, "][", j, "]"),
               result->return_values[j]));
         }
         TF_RETURN_IF_ERROR(writer->WriteScalar(
             iterator_name,
-            absl::StrCat(kResultsSuffix, "[", i, "]", kIsReadySuffix), ""));
+            abslx::StrCat(kResultsSuffix, "[", i, "]", kIsReadySuffix), ""));
       }
       return OkStatus();
     }
@@ -1320,14 +1320,14 @@ class ParallelInterleaveDatasetOp::Dataset : public DatasetBase {
       {
         mutex_lock l(*mu_);
         const auto& iterator_name =
-            absl::StrCat(prefix(), "::", key_prefix, "::", idx);
+            abslx::StrCat(prefix(), "::", key_prefix, "::", idx);
         if (!reader->Contains(iterator_name,
-                              absl::StrCat(kResultsSuffix, kSizeSuffix))) {
+                              abslx::StrCat(kResultsSuffix, kSizeSuffix))) {
           return OkStatus();
         }
         int64_t results_size;
         TF_RETURN_IF_ERROR(reader->ReadScalar(
-            iterator_name, absl::StrCat(kResultsSuffix, kSizeSuffix),
+            iterator_name, abslx::StrCat(kResultsSuffix, kSizeSuffix),
             &results_size));
         element->results.resize(results_size);
         for (size_t i = 0; i < results_size; i++) {
@@ -1337,34 +1337,34 @@ class ParallelInterleaveDatasetOp::Dataset : public DatasetBase {
           int64_t num_return_values;
           TF_RETURN_IF_ERROR(reader->ReadScalar(
               iterator_name,
-              absl::StrCat(kResultsSuffix, "[", i, "]", kSizeSuffix),
+              abslx::StrCat(kResultsSuffix, "[", i, "]", kSizeSuffix),
               &num_return_values));
           result->return_values.reserve(num_return_values);
           for (size_t j = 0; j < num_return_values; j++) {
             result->return_values.emplace_back();
             TF_RETURN_IF_ERROR(reader->ReadTensor(
                 ctx->flr(), iterator_name,
-                absl::StrCat(kResultsSuffix, "[", i, "][", j, "]"),
+                abslx::StrCat(kResultsSuffix, "[", i, "][", j, "]"),
                 &result->return_values.back()));
           }
           RecordBufferEnqueue(ctx, result->return_values);
           element->results[i] = std::move(result);
         }
         if (!reader->Contains(iterator_name,
-                              absl::StrCat(kInputsSuffix, kSizeSuffix))) {
+                              abslx::StrCat(kInputsSuffix, kSizeSuffix))) {
           element->iterator.reset();
           *out = std::move(element);
           return OkStatus();
         }
         int64_t inputs_size;
         TF_RETURN_IF_ERROR(reader->ReadScalar(
-            iterator_name, absl::StrCat(kInputsSuffix, kSizeSuffix),
+            iterator_name, abslx::StrCat(kInputsSuffix, kSizeSuffix),
             &inputs_size));
         element->inputs = std::make_unique<std::vector<Tensor>>(inputs_size);
         for (int i = 0; i < inputs_size; i++) {
           TF_RETURN_IF_ERROR(
               reader->ReadTensor(ctx->flr(), iterator_name,
-                                 absl::StrCat(kInputsSuffix, "[", i, "]"),
+                                 abslx::StrCat(kInputsSuffix, "[", i, "]"),
                                  &element->inputs->at(i)));
         }
         TF_RETURN_IF_ERROR(
@@ -1491,7 +1491,7 @@ class ParallelInterleaveDatasetOp::Dataset : public DatasetBase {
           if (current_elements_[i]) {
             element_string = current_elements_[i]->DebugString();
           }
-          result.append(absl::StrFormat("%d: %s\n", i, element_string));
+          result.append(abslx::StrFormat("%d: %s\n", i, element_string));
         }
       }
       {
@@ -1501,7 +1501,7 @@ class ParallelInterleaveDatasetOp::Dataset : public DatasetBase {
           if (future_elements_[i]) {
             element_string = future_elements_[i]->DebugString();
           }
-          result.append(absl::StrFormat("%d: %s\n", i, element_string));
+          result.append(abslx::StrFormat("%d: %s\n", i, element_string));
         }
       }
       return result;

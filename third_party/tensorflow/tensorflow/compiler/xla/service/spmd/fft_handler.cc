@@ -281,7 +281,7 @@ HloInstruction* GetFinalFftUsingCollectivePermute(
   // collective permute for source partition_id and source_transfrom.
   std::vector<std::pair<int64_t, int64_t>> src_dst_pairs;
   sharding.tile_assignment().Each(
-      [&](absl::Span<const int64_t> indices, int64_t src_device) {
+      [&](abslx::Span<const int64_t> indices, int64_t src_device) {
         std::vector<int64_t> target_indices(indices.begin(), indices.end());
         target_indices.back() = (indices.back() + 1) % num_partitions;
         int64_t dst_device = sharding.tile_assignment()(target_indices);

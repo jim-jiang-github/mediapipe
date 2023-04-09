@@ -39,7 +39,7 @@ using ::mediapipe::tasks::vision::gesture_recognizer::GetLeftHandScore;
 constexpr char kHandednessTag[] = "HANDEDNESS";
 constexpr char kHandednessMatrixTag[] = "HANDEDNESS_MATRIX";
 
-absl::StatusOr<std::unique_ptr<Matrix>> HandednessToMatrix(
+abslx::StatusOr<std::unique_ptr<Matrix>> HandednessToMatrix(
     const mediapipe::ClassificationList& classification_list) {
   // Feature value is the probability that the hand is a left hand.
   ASSIGN_OR_RETURN(float score, GetLeftHandScore(classification_list));
@@ -67,27 +67,27 @@ absl::StatusOr<std::unique_ptr<Matrix>> HandednessToMatrix(
 // }
 class HandednessToMatrixCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Tag(kHandednessTag).Set<mediapipe::ClassificationList>();
     cc->Outputs().Tag(kHandednessMatrixTag).Set<Matrix>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // TODO remove this after change to API2, because Setting offset
   // to 0 is the default in API2
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 };
 
 REGISTER_CALCULATOR(HandednessToMatrixCalculator);
 
-absl::Status HandednessToMatrixCalculator::Process(CalculatorContext* cc) {
+abslx::Status HandednessToMatrixCalculator::Process(CalculatorContext* cc) {
   if (cc->Inputs().Tag(kHandednessTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   auto handedness =
       cc->Inputs().Tag(kHandednessTag).Get<mediapipe::ClassificationList>();
@@ -96,7 +96,7 @@ absl::Status HandednessToMatrixCalculator::Process(CalculatorContext* cc) {
   cc->Outputs()
       .Tag(kHandednessMatrixTag)
       .Add(handedness_matrix.release(), cc->InputTimestamp());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace api2

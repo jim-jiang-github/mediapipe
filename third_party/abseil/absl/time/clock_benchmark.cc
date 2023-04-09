@@ -27,28 +27,28 @@ namespace {
 
 void BM_Clock_Now_AbslTime(benchmark::State& state) {
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(absl::Now());
+    benchmark::DoNotOptimize(abslx::Now());
   }
 }
 BENCHMARK(BM_Clock_Now_AbslTime);
 
 void BM_Clock_Now_GetCurrentTimeNanos(benchmark::State& state) {
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(absl::GetCurrentTimeNanos());
+    benchmark::DoNotOptimize(abslx::GetCurrentTimeNanos());
   }
 }
 BENCHMARK(BM_Clock_Now_GetCurrentTimeNanos);
 
 void BM_Clock_Now_AbslTime_ToUnixNanos(benchmark::State& state) {
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(absl::ToUnixNanos(absl::Now()));
+    benchmark::DoNotOptimize(abslx::ToUnixNanos(abslx::Now()));
   }
 }
 BENCHMARK(BM_Clock_Now_AbslTime_ToUnixNanos);
 
 void BM_Clock_Now_CycleClock(benchmark::State& state) {
   while (state.KeepRunning()) {
-    benchmark::DoNotOptimize(absl::base_internal::CycleClock::Now());
+    benchmark::DoNotOptimize(abslx::base_internal::CycleClock::Now());
   }
 }
 BENCHMARK(BM_Clock_Now_CycleClock);

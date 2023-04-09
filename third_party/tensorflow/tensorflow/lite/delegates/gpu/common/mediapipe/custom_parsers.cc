@@ -15,7 +15,7 @@ namespace tflite {
 namespace gpu {
 
 std::unique_ptr<TFLiteOperationParser> NewCustomOperationParser(
-    absl::string_view op_name) {
+    abslx::string_view op_name) {
   if (op_name == "Landmarks2TransformMatrix" ||
       op_name == "Landmarks2TransformMatrixV2") {
     return std::make_unique<LandmarksToTransformMatrixOperationParser>();
@@ -27,7 +27,7 @@ std::unique_ptr<TFLiteOperationParser> NewCustomOperationParser(
       op_name == "TransformTensorBilinear" /*for version 2*/) {
     return std::make_unique<TransformTensorBilinearOperationParser>();
   }
-  return absl::make_unique<UnimplementedOperationParser>(op_name);
+  return abslx::make_unique<UnimplementedOperationParser>(op_name);
 }
 
 }  // namespace gpu

@@ -27,7 +27,7 @@ namespace tflite {
 namespace gpu {
 
 std::unique_ptr<TFLiteOperationParser> NewCustomOperationParser(
-    absl::string_view op_name) {
+    abslx::string_view op_name) {
   return std::make_unique<UnimplementedOperationParser>(op_name);
 }
 

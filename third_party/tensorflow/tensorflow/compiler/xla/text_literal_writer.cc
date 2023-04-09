@@ -29,7 +29,7 @@ limitations under the License.
 namespace xla {
 
 /* static */ Status TextLiteralWriter::WriteToPath(const Literal& literal,
-                                                   absl::string_view path) {
+                                                   abslx::string_view path) {
   std::unique_ptr<tensorflow::WritableFile> f;
   auto s = tensorflow::Env::Default()->NewWritableFile(std::string(path), &f);
   if (!s.ok()) {
@@ -43,15 +43,15 @@ namespace xla {
 
   Status status;
   tensorflow::WritableFile* f_ptr = f.get();
-  literal.EachCellAsString([f_ptr, &status](absl::Span<const int64_t> indices,
+  literal.EachCellAsString([f_ptr, &status](abslx::Span<const int64_t> indices,
                                             const std::string& value) {
     if (!status.ok()) {
       return;
     }
     std::string coordinates =
-        absl::StrCat("(", absl::StrJoin(indices, ", "), ")");
+        abslx::StrCat("(", abslx::StrJoin(indices, ", "), ")");
 
-    status = f_ptr->Append(absl::StrCat(coordinates, ": ", value, "\n"));
+    status = f_ptr->Append(abslx::StrCat(coordinates, ": ", value, "\n"));
   });
   auto ignored = f->Close();
   return status;

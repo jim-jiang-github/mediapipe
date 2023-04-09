@@ -33,7 +33,7 @@ Status CanonicalizeNonTupleConditional(HloInstruction* conditional) {
   }
   auto parent = conditional->parent();
   const Shape& root_shape = conditional->shape();
-  auto new_shape = ShapeUtil::MakeTupleShape(absl::MakeSpan(&root_shape, 1));
+  auto new_shape = ShapeUtil::MakeTupleShape(abslx::MakeSpan(&root_shape, 1));
   auto new_conditional =
       parent->AddInstruction(conditional->CloneWithNewShape(new_shape));
   auto gte = parent->AddInstruction(
@@ -45,7 +45,7 @@ Status CanonicalizeNonTupleConditional(HloInstruction* conditional) {
 
 StatusOr<bool> ConditionalCanonicalizer::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   XLA_VLOG_LINES(
       2, "ConditionalCanonicalizer::Run(), before:\n" + module->ToString());
   bool changed = false;

@@ -26,7 +26,7 @@
 #include "absl/time/clock.h"
 #include "absl/time/time.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 namespace {
@@ -144,11 +144,11 @@ TEST(CordzSampleTokenTest, MultiThreaded) {
   static constexpr int kNumThreads = 4;
   static constexpr int kNumCords = 3;
   static constexpr int kNumTokens = 3;
-  absl::synchronization_internal::ThreadPool pool(kNumThreads);
+  abslx::synchronization_internal::ThreadPool pool(kNumThreads);
 
   for (int i = 0; i < kNumThreads; ++i) {
     pool.Schedule([&stop]() {
-      absl::BitGen gen;
+      abslx::BitGen gen;
       TestCordRep reps[kNumCords];
       CordzInfo* infos[kNumCords] = {nullptr};
       std::vector<std::unique_ptr<CordzSampleToken>> tokens;
@@ -161,8 +161,8 @@ TEST(CordzSampleTokenTest, MultiThreaded) {
         //   3) Iterate over Cords visible to a token.
         //   4) Unsample
         //   5) Sample
-        int index = absl::Uniform(gen, 0, kNumCords);
-        if (absl::Bernoulli(gen, 0.5)) {
+        int index = abslx::Uniform(gen, 0, kNumCords);
+        if (abslx::Bernoulli(gen, 0.5)) {
           // Track/untrack.
           if (infos[index]) {
             // 1) Untrack
@@ -174,7 +174,7 @@ TEST(CordzSampleTokenTest, MultiThreaded) {
           }
         } else {
           if (tokens[index]) {
-            if (absl::Bernoulli(gen, 0.5)) {
+            if (abslx::Bernoulli(gen, 0.5)) {
               // 3) Iterate over Cords visible to a token.
               for (const CordzInfo& info : *tokens[index]) {
                 // This is trivial work to allow us to compile the loop.
@@ -186,7 +186,7 @@ TEST(CordzSampleTokenTest, MultiThreaded) {
             }
           } else {
             // 5) Sample
-            tokens[index] = absl::make_unique<CordzSampleToken>();
+            tokens[index] = abslx::make_unique<CordzSampleToken>();
           }
         }
       }
@@ -199,11 +199,11 @@ TEST(CordzSampleTokenTest, MultiThreaded) {
   }
   // The threads will hammer away.  Give it a little bit of time for tsan to
   // spot errors.
-  absl::SleepFor(absl::Seconds(3));
+  abslx::SleepFor(abslx::Seconds(3));
   stop.Notify();
 }
 
 }  // namespace
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

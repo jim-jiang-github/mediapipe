@@ -36,7 +36,7 @@ class DeallocationTest : public ClientLibraryTestBase {
   // Build and execute the given computation then verify the results can be
   // transferred from the device successfully.
   std::unique_ptr<GlobalData> ExecuteAndCheckTransfer(
-      XlaBuilder* builder, absl::Span<GlobalData* const> arguments) {
+      XlaBuilder* builder, abslx::Span<GlobalData* const> arguments) {
     XlaComputation computation = builder->Build().value();
     auto global_data =
         client_->Execute(computation, arguments, &execution_options_).value();

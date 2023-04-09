@@ -90,8 +90,8 @@ class UniqueNodes {
   uint64 ComputeSignature(const NodeDef& node);
   bool SameNode(const NodeDef& node1, const NodeDef& node2) const;
 
-  absl::flat_hash_map<uint64, std::vector<NodeDef*>> rep_;
-  absl::flat_hash_map<const NodeDef*, uint64> memoized_signatures_;
+  abslx::flat_hash_map<uint64, std::vector<NodeDef*>> rep_;
+  abslx::flat_hash_map<const NodeDef*, uint64> memoized_signatures_;
 };
 
 uint64 UniqueNodes::ComputeSignature(const NodeDef& node) {
@@ -184,7 +184,7 @@ Status CommonSubgraphElimination::DedupComputations(GraphDef* optimized_graph) {
   // races. For example: If we dedup nodes initializing two independent
   // inplace accumulations, they will write to the same buffer, clobbering
   // each other's results.
-  absl::flat_hash_set<const NodeDef*> feeds_inplace_op;
+  abslx::flat_hash_set<const NodeDef*> feeds_inplace_op;
   for (int i = 0; i < optimized_graph->node_size(); ++i) {
     const NodeDef& root = optimized_graph->node(i);
     if (feeds_inplace_op.find(&root) != feeds_inplace_op.end()) continue;

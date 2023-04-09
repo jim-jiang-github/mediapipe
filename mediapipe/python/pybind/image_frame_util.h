@@ -38,11 +38,11 @@ std::unique_ptr<ImageFrame> CreateImageFrame(
   int width_step = ImageFrame::NumberOfChannelsForFormat(format) *
                    ImageFrame::ByteDepthForFormat(format) * cols;
   if (copy) {
-    auto image_frame = absl::make_unique<ImageFrame>(
+    auto image_frame = abslx::make_unique<ImageFrame>(
         format, /*width=*/cols, /*height=*/rows, width_step,
         static_cast<uint8*>(data.request().ptr),
         ImageFrame::PixelDataDeleter::kNone);
-    auto image_frame_copy = absl::make_unique<ImageFrame>();
+    auto image_frame_copy = abslx::make_unique<ImageFrame>();
     // Set alignment_boundary to kGlDefaultAlignmentBoundary so that both
     // GPU and CPU can process it.
     image_frame_copy->CopyFrom(*image_frame,
@@ -50,7 +50,7 @@ std::unique_ptr<ImageFrame> CreateImageFrame(
     return image_frame_copy;
   }
   PyObject* data_pyobject = data.ptr();
-  auto image_frame = absl::make_unique<ImageFrame>(
+  auto image_frame = abslx::make_unique<ImageFrame>(
       format, /*width=*/cols, /*height=*/rows, width_step,
       static_cast<uint8*>(data.request().ptr),
       /*deleter=*/[data_pyobject](uint8*) { Py_XDECREF(data_pyobject); });
@@ -71,7 +71,7 @@ py::array GenerateContiguousDataArrayHelper(const ImageFrame& image_frame,
         shape, reinterpret_cast<const T*>(image_frame.PixelData()), py_object);
   } else {
     auto contiguous_data_copy =
-        absl::make_unique<T[]>(image_frame.Width() * image_frame.Height() *
+        abslx::make_unique<T[]>(image_frame.Width() * image_frame.Height() *
                                image_frame.NumberOfChannels());
     image_frame.CopyToBuffer(contiguous_data_copy.get(),
                              image_frame.PixelDataSizeStoredContiguously());

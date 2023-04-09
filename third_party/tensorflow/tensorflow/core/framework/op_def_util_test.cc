@@ -60,7 +60,7 @@ void ExpectFailure(const Status& status, const string& message) {
   EXPECT_FALSE(status.ok()) << "Did not see error with: " << message;
   if (!status.ok()) {
     LOG(INFO) << "message: " << status;
-    EXPECT_TRUE(absl::StrContains(status.ToString(), message))
+    EXPECT_TRUE(abslx::StrContains(status.ToString(), message))
         << "Actual: " << status << "\nExpected to contain: " << message;
   }
 }

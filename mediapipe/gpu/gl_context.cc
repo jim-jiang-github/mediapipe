@@ -90,7 +90,7 @@ void GlContext::DedicatedThread::SelfDestruct() {
 }
 
 GlContext::DedicatedThread::Job GlContext::DedicatedThread::GetJob() {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   while (jobs_.empty()) {
     has_jobs_cv_.Wait(&mutex_);
   }
@@ -100,7 +100,7 @@ GlContext::DedicatedThread::Job GlContext::DedicatedThread::GetJob() {
 }
 
 void GlContext::DedicatedThread::PutJob(Job job) {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   jobs_.push_back(std::move(job));
   has_jobs_cv_.SignalAll();
 }
@@ -142,21 +142,21 @@ void GlContext::DedicatedThread::ThreadBody() {
 #endif
 }
 
-absl::Status GlContext::DedicatedThread::Run(GlStatusFunction gl_func) {
+abslx::Status GlContext::DedicatedThread::Run(GlStatusFunction gl_func) {
   // Neither ENDO_SCOPE nor ENDO_TASK seem to work here.
   if (IsCurrentThread()) {
     return gl_func();
   }
   bool done = false;  // Guarded by mutex_ after initialization.
-  absl::Status status;
+  abslx::Status status;
   PutJob([this, gl_func, &done, &status]() {
     status = gl_func();
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     done = true;
     gl_job_done_cv_.SignalAll();
   });
 
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   while (!done) {
     gl_job_done_cv_.Wait(&mutex_);
   }
@@ -176,10 +176,10 @@ bool GlContext::DedicatedThread::IsCurrentThread() {
   return pthread_equal(gl_thread_id_, pthread_self());
 }
 
-bool GlContext::ParseGlVersion(absl::string_view version_string, GLint* major,
+bool GlContext::ParseGlVersion(abslx::string_view version_string, GLint* major,
                                GLint* minor) {
   size_t pos = version_string.find('.');
-  if (pos == absl::string_view::npos || pos < 1) {
+  if (pos == abslx::string_view::npos || pos < 1) {
     return false;
   }
   // GL_VERSION is supposed to start with the version number; see, e.g.,
@@ -190,17 +190,17 @@ bool GlContext::ParseGlVersion(absl::string_view version_string, GLint* major,
   // backwards from the dot.
   size_t start = pos - 1;
   while (start > 0 && isdigit(version_string[start - 1])) --start;
-  if (!absl::SimpleAtoi(version_string.substr(start, (pos - start)), major)) {
+  if (!abslx::SimpleAtoi(version_string.substr(start, (pos - start)), major)) {
     return false;
   }
   auto rest = version_string.substr(pos + 1);
   pos = rest.find(' ');
   size_t pos2 = rest.find('.');
-  if (pos == absl::string_view::npos ||
-      (pos2 != absl::string_view::npos && pos2 < pos)) {
+  if (pos == abslx::string_view::npos ||
+      (pos2 != abslx::string_view::npos && pos2 < pos)) {
     pos = pos2;
   }
-  if (!absl::SimpleAtoi(rest.substr(0, pos), minor)) {
+  if (!abslx::SimpleAtoi(rest.substr(0, pos), minor)) {
     return false;
   }
   return true;
@@ -214,7 +214,7 @@ GlVersion GlContext::GetGlVersion() const {
 #endif
 }
 
-bool GlContext::HasGlExtension(absl::string_view extension) const {
+bool GlContext::HasGlExtension(abslx::string_view extension) const {
   return gl_extensions_.find(extension) != gl_extensions_.end();
 }
 
@@ -222,7 +222,7 @@ bool GlContext::HasGlExtension(absl::string_view extension) const {
 // in an easily-accessible set.  The glGetString call is actually *not* required
 // to work with GL_EXTENSIONS for newer GL versions, so we must maintain both
 // variations of this function.
-absl::Status GlContext::GetGlExtensions() {
+abslx::Status GlContext::GetGlExtensions() {
   // RET_CHECK logs by default, but here we just want to check the precondition;
   // we'll fall back to the alternative implementation for older versions.
   RET_CHECK(gl_major_version_ >= 3).SetNoLogging();
@@ -239,58 +239,58 @@ absl::Status GlContext::GetGlExtensions() {
     LOG(ERROR) << "GL major version > 3.0 indicated, but glGetStringi not "
                << "defined. Falling back to deprecated GL extensions querying "
                << "method.";
-    return absl::InternalError("glGetStringi not defined, but queried");
+    return abslx::InternalError("glGetStringi not defined, but queried");
   }
   int num_extensions = 0;
   glGetIntegerv(GL_NUM_EXTENSIONS, &num_extensions);
   if (glGetError() != 0) {
-    return absl::InternalError("Error querying for number of extensions");
+    return abslx::InternalError("Error querying for number of extensions");
   }
 
   for (int i = 0; i < num_extensions; ++i) {
     const GLubyte* res = glGetStringi(GL_EXTENSIONS, i);
     if (glGetError() != 0 || res == nullptr) {
-      return absl::InternalError("Error querying for an extension by index");
+      return abslx::InternalError("Error querying for an extension by index");
     }
     const char* signed_res = reinterpret_cast<const char*>(res);
     gl_extensions_.insert(signed_res);
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 #else
-  return absl::InternalError("GL version mismatch in GlGetExtensions");
+  return abslx::InternalError("GL version mismatch in GlGetExtensions");
 #endif  // (GL_VERSION_3_0 || GL_ES_VERSION_3_0) && !defined(__EMSCRIPTEN__)
 }
 
 // Same as GetGlExtensions() above, but for pre-GL3.0, where glGetStringi did
 // not exist.
-absl::Status GlContext::GetGlExtensionsCompat() {
+abslx::Status GlContext::GetGlExtensionsCompat() {
   gl_extensions_.clear();
 
   const GLubyte* res = glGetString(GL_EXTENSIONS);
   if (glGetError() != 0 || res == nullptr) {
     LOG(ERROR) << "Error querying for GL extensions";
-    return absl::InternalError("Error querying for GL extensions");
+    return abslx::InternalError("Error querying for GL extensions");
   }
   const char* signed_res = reinterpret_cast<const char*>(res);
-  gl_extensions_ = absl::StrSplit(signed_res, ' ');
+  gl_extensions_ = abslx::StrSplit(signed_res, ' ');
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GlContext::FinishInitialization(bool create_thread) {
+abslx::Status GlContext::FinishInitialization(bool create_thread) {
   if (create_thread) {
-    thread_ = absl::make_unique<GlContext::DedicatedThread>();
+    thread_ = abslx::make_unique<GlContext::DedicatedThread>();
     MP_RETURN_IF_ERROR(thread_->Run([this] { return EnterContext(nullptr); }));
   }
 
-  return Run([this]() -> absl::Status {
+  return Run([this]() -> abslx::Status {
     // Clear any GL errors at this point: as this is a fresh context
     // there shouldn't be any, but if we adopted an existing context (e.g. in
     // some Emscripten cases), there might be some existing tripped error.
     ForceClearExistingGlErrors();
 
-    absl::string_view version_string;
+    abslx::string_view version_string;
     const GLubyte* version_string_ptr = glGetString(GL_VERSION);
     if (version_string_ptr != nullptr) {
       version_string = reinterpret_cast<const char*>(version_string_ptr);
@@ -359,7 +359,7 @@ absl::Status GlContext::FinishInitialization(bool create_thread) {
     can_linear_filter_float_textures_ = true;
 #endif  // GL_ES_VERSION_2_0
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   });
 }
 
@@ -399,7 +399,7 @@ GlContext::~GlContext() {
       ContextBinding saved_context;
       auto status = SwitchContextAndRun([&clear_attachments] {
         clear_attachments();
-        return absl::OkStatus();
+        return abslx::OkStatus();
       });
       LOG_IF(ERROR, !status.ok()) << status;
     }
@@ -415,7 +415,7 @@ void GlContext::SetProfilingContext(
   }
 }
 
-absl::Status GlContext::SwitchContextAndRun(GlStatusFunction gl_func) {
+abslx::Status GlContext::SwitchContextAndRun(GlStatusFunction gl_func) {
   ContextBinding saved_context;
   MP_RETURN_IF_ERROR(EnterContext(&saved_context)) << " (entering GL context)";
   auto status = gl_func();
@@ -424,9 +424,9 @@ absl::Status GlContext::SwitchContextAndRun(GlStatusFunction gl_func) {
   return status;
 }
 
-absl::Status GlContext::Run(GlStatusFunction gl_func, int node_id,
+abslx::Status GlContext::Run(GlStatusFunction gl_func, int node_id,
                             Timestamp input_timestamp) {
-  absl::Status status;
+  abslx::Status status;
   if (profiling_helper_) {
     gl_func = [=] {
       profiling_helper_->MarkTimestamp(node_id, input_timestamp,
@@ -463,7 +463,7 @@ void GlContext::RunWithoutWaiting(GlVoidFunction gl_func) {
     // TODO: queue up task instead.
     auto status = SwitchContextAndRun([gl_func] {
       gl_func();
-      return absl::OkStatus();
+      return abslx::OkStatus();
     });
     if (!status.ok()) {
       LOG(ERROR) << "Error in RunWithoutWaiting: " << status;
@@ -474,13 +474,13 @@ void GlContext::RunWithoutWaiting(GlVoidFunction gl_func) {
 std::weak_ptr<GlContext>& GlContext::CurrentContext() {
   // Workaround for b/67878799.
 #ifndef __EMSCRIPTEN__
-  absl::LeakCheckDisabler disable_leak_check;
+  abslx::LeakCheckDisabler disable_leak_check;
 #endif
   ABSL_CONST_INIT thread_local std::weak_ptr<GlContext> current_context;
   return current_context;
 }
 
-absl::Status GlContext::SwitchContext(ContextBinding* saved_context,
+abslx::Status GlContext::SwitchContext(ContextBinding* saved_context,
                                       const ContextBinding& new_context)
     ABSL_NO_THREAD_SAFETY_ANALYSIS {
   std::shared_ptr<GlContext> old_context_obj = CurrentContext().lock();
@@ -499,7 +499,7 @@ absl::Status GlContext::SwitchContext(ContextBinding* saved_context,
   }
 
   if (new_context_obj && (old_context_obj == new_context_obj)) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   if (old_context_obj) {
@@ -534,12 +534,12 @@ GlContext::ContextBinding GlContext::ThisContextBinding() {
   return result;
 }
 
-absl::Status GlContext::EnterContext(ContextBinding* saved_context) {
+abslx::Status GlContext::EnterContext(ContextBinding* saved_context) {
   DCHECK(HasContext());
   return SwitchContext(saved_context, ThisContextBinding());
 }
 
-absl::Status GlContext::ExitContext(const ContextBinding* saved_context) {
+abslx::Status GlContext::ExitContext(const ContextBinding* saved_context) {
   ContextBinding no_context;
   if (!saved_context) {
     saved_context = &no_context;
@@ -552,7 +552,7 @@ std::shared_ptr<GlContext> GlContext::GetCurrent() {
 }
 
 void GlContext::GlFinishCalled() {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   ++gl_finish_count_;
   wait_for_gl_finish_cv_.SignalAll();
 }
@@ -884,7 +884,7 @@ void GlContext::WaitForGlFinishCountPast(int64_t count_to_pass) {
   // If we've been asked to do a glFinish, note the count we need to reach and
   // signal the context our thread may currently be blocked on.
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     assign_larger_value(&gl_finish_count_target_, count_to_pass + 1);
     wait_for_gl_finish_cv_.SignalAll();
     if (context_waiting_on_) {
@@ -917,7 +917,7 @@ void GlContext::WaitForGlFinishCountPast(int64_t count_to_pass) {
     // If another context is current, make a note that it is blocked on us, so
     // it can signal the right condition variable if it is asked to do a
     // glFinish.
-    absl::MutexLock other_lock(&other->mutex_);
+    abslx::MutexLock other_lock(&other->mutex_);
     DCHECK(!other->context_waiting_on_);
     other->context_waiting_on_ = this;
   }
@@ -926,7 +926,7 @@ void GlContext::WaitForGlFinishCountPast(int64_t count_to_pass) {
   // sooner, we are done.
   RunWithoutWaiting(std::move(finish_task));
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     while (gl_finish_count_ <= count_to_pass) {
       if (other && other->gl_finish_count_ < other->gl_finish_count_target_) {
         // If another context's dedicated thread is current, it is blocked
@@ -956,7 +956,7 @@ void GlContext::WaitForGlFinishCountPast(int64_t count_to_pass) {
 
   if (other) {
     // The other context is no longer waiting on us.
-    absl::MutexLock other_lock(&other->mutex_);
+    abslx::MutexLock other_lock(&other->mutex_);
     other->context_waiting_on_ = nullptr;
   }
 }

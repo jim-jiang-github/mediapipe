@@ -25,22 +25,22 @@ namespace tensorflow {
 namespace quantization {
 namespace internal {
 
-absl::StatusOr<GraphDef> QuantizeQatModel(
-    absl::string_view saved_model_path, absl::string_view exported_names_str,
-    absl::string_view tags, absl::string_view quant_opts_serialized);
+abslx::StatusOr<GraphDef> QuantizeQatModel(
+    abslx::string_view saved_model_path, abslx::string_view exported_names_str,
+    abslx::string_view tags, abslx::string_view quant_opts_serialized);
 
 // Apply post-training dynamic range quantization to the model.
-absl::StatusOr<GraphDef> QuantizePtqDynamicRange(
-    absl::string_view saved_model_path, absl::string_view exported_names_str,
-    absl::string_view tags, absl::string_view quant_opts_serialized);
+abslx::StatusOr<GraphDef> QuantizePtqDynamicRange(
+    abslx::string_view saved_model_path, abslx::string_view exported_names_str,
+    abslx::string_view tags, abslx::string_view quant_opts_serialized);
 
-absl::StatusOr<GraphDef> QuantizePtqModelPreCalibration(
-    absl::string_view saved_model_path, absl::string_view exported_names_str,
-    absl::string_view tags);
+abslx::StatusOr<GraphDef> QuantizePtqModelPreCalibration(
+    abslx::string_view saved_model_path, abslx::string_view exported_names_str,
+    abslx::string_view tags);
 
-absl::StatusOr<GraphDef> QuantizePtqModelPostCalibration(
-    absl::string_view saved_model_path, absl::string_view exported_names_str,
-    absl::string_view tags, absl::string_view quant_opts_serialized);
+abslx::StatusOr<GraphDef> QuantizePtqModelPostCalibration(
+    abslx::string_view saved_model_path, abslx::string_view exported_names_str,
+    abslx::string_view tags, abslx::string_view quant_opts_serialized);
 
 }  // namespace internal
 }  // namespace quantization

@@ -73,7 +73,7 @@ Status ReluGrad(AbstractContext* ctx, AbstractTensorHandle* const gradients,
   TF_RETURN_IF_ERROR(op_ptr->AddInput(gradients));
   TF_RETURN_IF_ERROR(op_ptr->AddInput(features));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(backprops, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(backprops, 1), &num_retvals);
 }
 
 // Op: Relu()
@@ -92,7 +92,7 @@ Status Relu(AbstractContext* ctx, AbstractTensorHandle* const features,
   TF_RETURN_IF_ERROR(MaybeSetOpName(op_ptr.get(), name));
   TF_RETURN_IF_ERROR(op_ptr->AddInput(features));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(activations, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(activations, 1), &num_retvals);
 }
 
 // Op: BiasAdd()
@@ -113,7 +113,7 @@ Status BiasAdd(AbstractContext* ctx, AbstractTensorHandle* const value,
   TF_RETURN_IF_ERROR(
       op_ptr->SetAttrString("data_format", data_format, strlen(data_format)));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(output, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(output, 1), &num_retvals);
 }
 
 // Op: BiasAddGrad()
@@ -134,7 +134,7 @@ Status BiasAddGrad(AbstractContext* ctx,
   TF_RETURN_IF_ERROR(
       op_ptr->SetAttrString("data_format", data_format, strlen(data_format)));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(output, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(output, 1), &num_retvals);
 }
 
 }  // namespace ops

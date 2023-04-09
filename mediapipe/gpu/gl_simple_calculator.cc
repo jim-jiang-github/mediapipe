@@ -17,7 +17,7 @@
 namespace mediapipe {
 
 // static
-absl::Status GlSimpleCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status GlSimpleCalculator::GetContract(CalculatorContract* cc) {
   TagOrIndex(&cc->Inputs(), "VIDEO", 0).Set<GpuBuffer>();
   TagOrIndex(&cc->Outputs(), "VIDEO", 0).Set<GpuBuffer>();
   // Currently we pass GL context information and other stuff as external
@@ -25,7 +25,7 @@ absl::Status GlSimpleCalculator::GetContract(CalculatorContract* cc) {
   return GlCalculatorHelper::UpdateContract(cc);
 }
 
-absl::Status GlSimpleCalculator::Open(CalculatorContext* cc) {
+abslx::Status GlSimpleCalculator::Open(CalculatorContext* cc) {
   // Inform the framework that we always output at the same timestamp
   // as we receive a packet at.
   cc->SetOffset(mediapipe::TimestampDiff(0));
@@ -34,8 +34,8 @@ absl::Status GlSimpleCalculator::Open(CalculatorContext* cc) {
   return helper_.Open(cc);
 }
 
-absl::Status GlSimpleCalculator::Process(CalculatorContext* cc) {
-  return RunInGlContext([this, cc]() -> absl::Status {
+abslx::Status GlSimpleCalculator::Process(CalculatorContext* cc) {
+  return RunInGlContext([this, cc]() -> abslx::Status {
     const auto& input = TagOrIndex(cc->Inputs(), "VIDEO", 0).Get<GpuBuffer>();
     if (!initialized_) {
       MP_RETURN_IF_ERROR(GlSetup());
@@ -69,12 +69,12 @@ absl::Status GlSimpleCalculator::Process(CalculatorContext* cc) {
     TagOrIndex(&cc->Outputs(), "VIDEO", 0)
         .Add(output.release(), cc->InputTimestamp());
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   });
 }
 
-absl::Status GlSimpleCalculator::Close(CalculatorContext* cc) {
-  return RunInGlContext([this]() -> absl::Status { return GlTeardown(); });
+abslx::Status GlSimpleCalculator::Close(CalculatorContext* cc) {
+  return RunInGlContext([this]() -> abslx::Status { return GlTeardown(); });
 }
 
 }  // namespace mediapipe

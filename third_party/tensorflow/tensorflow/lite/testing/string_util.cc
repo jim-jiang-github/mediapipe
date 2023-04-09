@@ -34,7 +34,7 @@ PyObject* SerializeAsHexString(PyObject* value) {
 
   char* char_buffer = nullptr;
   size_t size = dynamic_buffer.WriteToBuffer(&char_buffer);
-  string s = absl::BytesToHexString({char_buffer, size});
+  string s = abslx::BytesToHexString({char_buffer, size});
   free(char_buffer);
 
   return python_utils::ConvertToPyString(s.data(), s.size());

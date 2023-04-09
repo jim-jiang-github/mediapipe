@@ -25,14 +25,14 @@
 
 namespace {
 
-namespace ti = absl::types_internal;
+namespace ti = abslx::types_internal;
 
 template <class T>
 using DefaultConstructibleWithNewImpl = decltype(::new (std::nothrow) T);
 
 template <class T>
 using DefaultConstructibleWithNew =
-    absl::type_traits_internal::is_detected<DefaultConstructibleWithNewImpl, T>;
+    abslx::type_traits_internal::is_detected<DefaultConstructibleWithNewImpl, T>;
 
 template <class T>
 using MoveConstructibleWithNewImpl =
@@ -40,7 +40,7 @@ using MoveConstructibleWithNewImpl =
 
 template <class T>
 using MoveConstructibleWithNew =
-    absl::type_traits_internal::is_detected<MoveConstructibleWithNewImpl, T>;
+    abslx::type_traits_internal::is_detected<MoveConstructibleWithNewImpl, T>;
 
 template <class T>
 using CopyConstructibleWithNewImpl =
@@ -48,7 +48,7 @@ using CopyConstructibleWithNewImpl =
 
 template <class T>
 using CopyConstructibleWithNew =
-    absl::type_traits_internal::is_detected<CopyConstructibleWithNewImpl, T>;
+    abslx::type_traits_internal::is_detected<CopyConstructibleWithNewImpl, T>;
 
 template <class T,
           class Result =
@@ -58,7 +58,7 @@ using NothrowDefaultConstructibleWithNewImpl =
 
 template <class T>
 using NothrowDefaultConstructibleWithNew =
-    absl::type_traits_internal::is_detected<
+    abslx::type_traits_internal::is_detected<
         NothrowDefaultConstructibleWithNewImpl, T>;
 
 template <class T,
@@ -69,7 +69,7 @@ using NothrowMoveConstructibleWithNewImpl =
 
 template <class T>
 using NothrowMoveConstructibleWithNew =
-    absl::type_traits_internal::is_detected<NothrowMoveConstructibleWithNewImpl,
+    abslx::type_traits_internal::is_detected<NothrowMoveConstructibleWithNewImpl,
                                             T>;
 
 template <class T,
@@ -80,7 +80,7 @@ using NothrowCopyConstructibleWithNewImpl =
 
 template <class T>
 using NothrowCopyConstructibleWithNew =
-    absl::type_traits_internal::is_detected<NothrowCopyConstructibleWithNewImpl,
+    abslx::type_traits_internal::is_detected<NothrowCopyConstructibleWithNewImpl,
                                             T>;
 
 // NOTE: ?: is used to verify contextually-convertible to bool and not simply
@@ -93,7 +93,7 @@ using NothrowCopyConstructibleWithNew =
   using name##Impl = decltype(ABSL_INTERNAL_COMPARISON_OP_EXPR(op));        \
                                                                             \
   template <class T>                                                        \
-  using name = absl::type_traits_internal::is_detected<name##Impl, T>;      \
+  using name = abslx::type_traits_internal::is_detected<name##Impl, T>;      \
                                                                             \
   template <class T,                                                        \
             class Result = std::integral_constant<                          \
@@ -102,7 +102,7 @@ using NothrowCopyConstructibleWithNew =
                                                                             \
   template <class T>                                                        \
   using Nothrow##name =                                                     \
-      absl::type_traits_internal::is_detected<Nothrow##name##Impl, T>
+      abslx::type_traits_internal::is_detected<Nothrow##name##Impl, T>
 
 ABSL_INTERNAL_COMPARISON_OP_TRAIT(EqualityComparable, ==);
 ABSL_INTERNAL_COMPARISON_OP_TRAIT(InequalityComparable, !=);
@@ -176,7 +176,7 @@ TYPED_TEST_P(ProfileTest, HasAppropriateConstructionProperties) {
       if (std::is_destructible<arch>::value) {
         EXPECT_FALSE(std::is_default_constructible<arch>::value);
         EXPECT_FALSE(std::is_nothrow_default_constructible<arch>::value);
-        EXPECT_FALSE(absl::is_trivially_default_constructible<arch>::value);
+        EXPECT_FALSE(abslx::is_trivially_default_constructible<arch>::value);
       }
       break;
     case ti::default_constructible::yes:
@@ -187,7 +187,7 @@ TYPED_TEST_P(ProfileTest, HasAppropriateConstructionProperties) {
       if (std::is_destructible<arch>::value) {
         EXPECT_TRUE(std::is_default_constructible<arch>::value);
         EXPECT_FALSE(std::is_nothrow_default_constructible<arch>::value);
-        EXPECT_FALSE(absl::is_trivially_default_constructible<arch>::value);
+        EXPECT_FALSE(abslx::is_trivially_default_constructible<arch>::value);
       }
       break;
     case ti::default_constructible::nothrow:
@@ -198,7 +198,7 @@ TYPED_TEST_P(ProfileTest, HasAppropriateConstructionProperties) {
       if (std::is_destructible<arch>::value) {
         EXPECT_TRUE(std::is_default_constructible<arch>::value);
         EXPECT_TRUE(std::is_nothrow_default_constructible<arch>::value);
-        EXPECT_FALSE(absl::is_trivially_default_constructible<arch>::value);
+        EXPECT_FALSE(abslx::is_trivially_default_constructible<arch>::value);
 
         // Constructor traits also check the destructor.
         if (std::is_nothrow_destructible<arch>::value) {
@@ -216,8 +216,8 @@ TYPED_TEST_P(ProfileTest, HasAppropriateConstructionProperties) {
         EXPECT_TRUE(std::is_nothrow_default_constructible<arch>::value);
 
         // Constructor triviality traits require trivially destructible types.
-        if (absl::is_trivially_destructible<arch>::value) {
-          EXPECT_TRUE(absl::is_trivially_default_constructible<arch>::value);
+        if (abslx::is_trivially_destructible<arch>::value) {
+          EXPECT_TRUE(abslx::is_trivially_default_constructible<arch>::value);
         }
       }
       break;
@@ -238,7 +238,7 @@ TYPED_TEST_P(ProfileTest, HasAppropriateConstructionProperties) {
       if (std::is_destructible<arch>::value) {
         EXPECT_FALSE(std::is_move_constructible<arch>::value);
         EXPECT_FALSE(std::is_nothrow_move_constructible<arch>::value);
-        EXPECT_FALSE(absl::is_trivially_move_constructible<arch>::value);
+        EXPECT_FALSE(abslx::is_trivially_move_constructible<arch>::value);
       }
       break;
     case ti::move_constructible::yes:
@@ -249,7 +249,7 @@ TYPED_TEST_P(ProfileTest, HasAppropriateConstructionProperties) {
       if (std::is_destructible<arch>::value) {
         EXPECT_TRUE(std::is_move_constructible<arch>::value);
         EXPECT_FALSE(std::is_nothrow_move_constructible<arch>::value);
-        EXPECT_FALSE(absl::is_trivially_move_constructible<arch>::value);
+        EXPECT_FALSE(abslx::is_trivially_move_constructible<arch>::value);
       }
       break;
     case ti::move_constructible::nothrow:
@@ -260,7 +260,7 @@ TYPED_TEST_P(ProfileTest, HasAppropriateConstructionProperties) {
       if (std::is_destructible<arch>::value) {
         EXPECT_TRUE(std::is_move_constructible<arch>::value);
         EXPECT_TRUE(std::is_nothrow_move_constructible<arch>::value);
-        EXPECT_FALSE(absl::is_trivially_move_constructible<arch>::value);
+        EXPECT_FALSE(abslx::is_trivially_move_constructible<arch>::value);
 
         // Constructor traits also check the destructor.
         if (std::is_nothrow_destructible<arch>::value) {
@@ -278,8 +278,8 @@ TYPED_TEST_P(ProfileTest, HasAppropriateConstructionProperties) {
         EXPECT_TRUE(std::is_nothrow_move_constructible<arch>::value);
 
         // Constructor triviality traits require trivially destructible types.
-        if (absl::is_trivially_destructible<arch>::value) {
-          EXPECT_TRUE(absl::is_trivially_move_constructible<arch>::value);
+        if (abslx::is_trivially_destructible<arch>::value) {
+          EXPECT_TRUE(abslx::is_trivially_move_constructible<arch>::value);
         }
       }
       break;
@@ -300,7 +300,7 @@ TYPED_TEST_P(ProfileTest, HasAppropriateConstructionProperties) {
       if (std::is_destructible<arch>::value) {
         EXPECT_FALSE(std::is_copy_constructible<arch>::value);
         EXPECT_FALSE(std::is_nothrow_copy_constructible<arch>::value);
-        EXPECT_FALSE(absl::is_trivially_copy_constructible<arch>::value);
+        EXPECT_FALSE(abslx::is_trivially_copy_constructible<arch>::value);
       }
       break;
     case ti::copy_constructible::yes:
@@ -311,7 +311,7 @@ TYPED_TEST_P(ProfileTest, HasAppropriateConstructionProperties) {
       if (std::is_destructible<arch>::value) {
         EXPECT_TRUE(std::is_copy_constructible<arch>::value);
         EXPECT_FALSE(std::is_nothrow_copy_constructible<arch>::value);
-        EXPECT_FALSE(absl::is_trivially_copy_constructible<arch>::value);
+        EXPECT_FALSE(abslx::is_trivially_copy_constructible<arch>::value);
       }
       break;
     case ti::copy_constructible::nothrow:
@@ -322,7 +322,7 @@ TYPED_TEST_P(ProfileTest, HasAppropriateConstructionProperties) {
       if (std::is_destructible<arch>::value) {
         EXPECT_TRUE(std::is_copy_constructible<arch>::value);
         EXPECT_TRUE(std::is_nothrow_copy_constructible<arch>::value);
-        EXPECT_FALSE(absl::is_trivially_copy_constructible<arch>::value);
+        EXPECT_FALSE(abslx::is_trivially_copy_constructible<arch>::value);
 
         // Constructor traits also check the destructor.
         if (std::is_nothrow_destructible<arch>::value) {
@@ -340,8 +340,8 @@ TYPED_TEST_P(ProfileTest, HasAppropriateConstructionProperties) {
         EXPECT_TRUE(std::is_nothrow_copy_constructible<arch>::value);
 
         // Constructor triviality traits require trivially destructible types.
-        if (absl::is_trivially_destructible<arch>::value) {
-          EXPECT_TRUE(absl::is_trivially_copy_constructible<arch>::value);
+        if (abslx::is_trivially_destructible<arch>::value) {
+          EXPECT_TRUE(abslx::is_trivially_copy_constructible<arch>::value);
         }
       }
       break;
@@ -356,22 +356,22 @@ TYPED_TEST_P(ProfileTest, HasAppropriateConstructionProperties) {
     case ti::destructible::maybe:
       EXPECT_FALSE(std::is_destructible<arch>::value);
       EXPECT_FALSE(std::is_nothrow_destructible<arch>::value);
-      EXPECT_FALSE(absl::is_trivially_destructible<arch>::value);
+      EXPECT_FALSE(abslx::is_trivially_destructible<arch>::value);
       break;
     case ti::destructible::yes:
       EXPECT_TRUE(std::is_destructible<arch>::value);
       EXPECT_FALSE(std::is_nothrow_destructible<arch>::value);
-      EXPECT_FALSE(absl::is_trivially_destructible<arch>::value);
+      EXPECT_FALSE(abslx::is_trivially_destructible<arch>::value);
       break;
     case ti::destructible::nothrow:
       EXPECT_TRUE(std::is_destructible<arch>::value);
       EXPECT_TRUE(std::is_nothrow_destructible<arch>::value);
-      EXPECT_FALSE(absl::is_trivially_destructible<arch>::value);
+      EXPECT_FALSE(abslx::is_trivially_destructible<arch>::value);
       break;
     case ti::destructible::trivial:
       EXPECT_TRUE(std::is_destructible<arch>::value);
       EXPECT_TRUE(std::is_nothrow_destructible<arch>::value);
-      EXPECT_TRUE(absl::is_trivially_destructible<arch>::value);
+      EXPECT_TRUE(abslx::is_trivially_destructible<arch>::value);
       break;
   }
 }
@@ -418,22 +418,22 @@ TYPED_TEST_P(ProfileTest, HasAppropriateAssignmentProperties) {
     case ti::move_assignable::maybe:
       EXPECT_FALSE(std::is_move_assignable<arch>::value);
       EXPECT_FALSE(std::is_nothrow_move_assignable<arch>::value);
-      EXPECT_FALSE(absl::is_trivially_move_assignable<arch>::value);
+      EXPECT_FALSE(abslx::is_trivially_move_assignable<arch>::value);
       break;
     case ti::move_assignable::yes:
       EXPECT_TRUE(std::is_move_assignable<arch>::value);
       EXPECT_FALSE(std::is_nothrow_move_assignable<arch>::value);
-      EXPECT_FALSE(absl::is_trivially_move_assignable<arch>::value);
+      EXPECT_FALSE(abslx::is_trivially_move_assignable<arch>::value);
       break;
     case ti::move_assignable::nothrow:
       EXPECT_TRUE(std::is_move_assignable<arch>::value);
       EXPECT_TRUE(std::is_nothrow_move_assignable<arch>::value);
-      EXPECT_FALSE(absl::is_trivially_move_assignable<arch>::value);
+      EXPECT_FALSE(abslx::is_trivially_move_assignable<arch>::value);
       break;
     case ti::move_assignable::trivial:
       EXPECT_TRUE(std::is_move_assignable<arch>::value);
       EXPECT_TRUE(std::is_nothrow_move_assignable<arch>::value);
-      EXPECT_TRUE(absl::is_trivially_move_assignable<arch>::value);
+      EXPECT_TRUE(abslx::is_trivially_move_assignable<arch>::value);
       break;
   }
 
@@ -447,22 +447,22 @@ TYPED_TEST_P(ProfileTest, HasAppropriateAssignmentProperties) {
     case ti::copy_assignable::maybe:
       EXPECT_FALSE(std::is_copy_assignable<arch>::value);
       EXPECT_FALSE(std::is_nothrow_copy_assignable<arch>::value);
-      EXPECT_FALSE(absl::is_trivially_copy_assignable<arch>::value);
+      EXPECT_FALSE(abslx::is_trivially_copy_assignable<arch>::value);
       break;
     case ti::copy_assignable::yes:
       EXPECT_TRUE(std::is_copy_assignable<arch>::value);
       EXPECT_FALSE(std::is_nothrow_copy_assignable<arch>::value);
-      EXPECT_FALSE(absl::is_trivially_copy_assignable<arch>::value);
+      EXPECT_FALSE(abslx::is_trivially_copy_assignable<arch>::value);
       break;
     case ti::copy_assignable::nothrow:
       EXPECT_TRUE(std::is_copy_assignable<arch>::value);
       EXPECT_TRUE(std::is_nothrow_copy_assignable<arch>::value);
-      EXPECT_FALSE(absl::is_trivially_copy_assignable<arch>::value);
+      EXPECT_FALSE(abslx::is_trivially_copy_assignable<arch>::value);
       break;
     case ti::copy_assignable::trivial:
       EXPECT_TRUE(std::is_copy_assignable<arch>::value);
       EXPECT_TRUE(std::is_nothrow_copy_assignable<arch>::value);
-      EXPECT_TRUE(absl::is_trivially_copy_assignable<arch>::value);
+      EXPECT_TRUE(abslx::is_trivially_copy_assignable<arch>::value);
       break;
   }
 }
@@ -665,16 +665,16 @@ TYPED_TEST_P(ProfileTest, HasAppropriateAuxilliaryProperties) {
   //////////////////////////////////////////////////////////////////////////////
   switch (expected_props::swappable_support) {
     case ti::swappable::maybe:
-      EXPECT_FALSE(absl::type_traits_internal::IsSwappable<arch>::value);
-      EXPECT_FALSE(absl::type_traits_internal::IsNothrowSwappable<arch>::value);
+      EXPECT_FALSE(abslx::type_traits_internal::IsSwappable<arch>::value);
+      EXPECT_FALSE(abslx::type_traits_internal::IsNothrowSwappable<arch>::value);
       break;
     case ti::swappable::yes:
-      EXPECT_TRUE(absl::type_traits_internal::IsSwappable<arch>::value);
-      EXPECT_FALSE(absl::type_traits_internal::IsNothrowSwappable<arch>::value);
+      EXPECT_TRUE(abslx::type_traits_internal::IsSwappable<arch>::value);
+      EXPECT_FALSE(abslx::type_traits_internal::IsNothrowSwappable<arch>::value);
       break;
     case ti::swappable::nothrow:
-      EXPECT_TRUE(absl::type_traits_internal::IsSwappable<arch>::value);
-      EXPECT_TRUE(absl::type_traits_internal::IsNothrowSwappable<arch>::value);
+      EXPECT_TRUE(abslx::type_traits_internal::IsSwappable<arch>::value);
+      EXPECT_TRUE(abslx::type_traits_internal::IsNothrowSwappable<arch>::value);
       break;
   }
 
@@ -684,11 +684,11 @@ TYPED_TEST_P(ProfileTest, HasAppropriateAuxilliaryProperties) {
   switch (expected_props::hashable_support) {
     case ti::hashable::maybe:
 #if ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
-      EXPECT_FALSE(absl::type_traits_internal::IsHashable<arch>::value);
+      EXPECT_FALSE(abslx::type_traits_internal::IsHashable<arch>::value);
 #endif  // ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
       break;
     case ti::hashable::yes:
-      EXPECT_TRUE(absl::type_traits_internal::IsHashable<arch>::value);
+      EXPECT_TRUE(abslx::type_traits_internal::IsHashable<arch>::value);
       break;
   }
 }
@@ -1200,7 +1200,7 @@ TEST(ConformanceTestingTest, Basic) {
       .INITIALIZER(1.f)
       .INITIALIZER(lim::max())
       .INITIALIZER(lim::infinity())
-      .WITH_STRICT_PROFILE(absl::types_internal::RegularityDomain, profile);
+      .WITH_STRICT_PROFILE(abslx::types_internal::RegularityDomain, profile);
 }
 
 struct BadMoveConstruct {

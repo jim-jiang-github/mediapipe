@@ -29,7 +29,7 @@ namespace xla {
 namespace gpu {
 namespace {
 // Utility functions to obtain NVPTX/AMDGPU specific information.
-using absl::StrCat;
+using abslx::StrCat;
 
 // Wrapper structure for carrying llvm intrinsic ids for NVPTX/AMDGPU platforms.
 // On AMDGPU, some of these operations are made as device functions instead of
@@ -192,10 +192,10 @@ std::string ObtainDeviceFunctionName(TargetDeviceFunctionID func_id,
 }
 
 llvm::CallInst* EmitDeviceFunctionCall(
-    const std::string& callee_name, absl::Span<llvm::Value* const> operands,
-    absl::Span<const PrimitiveType> input_types, PrimitiveType output_type,
-    absl::Span<const llvm::Attribute::AttrKind> attributes,
-    llvm::IRBuilder<>* b, absl::string_view name) {
+    const std::string& callee_name, abslx::Span<llvm::Value* const> operands,
+    abslx::Span<const PrimitiveType> input_types, PrimitiveType output_type,
+    abslx::Span<const llvm::Attribute::AttrKind> attributes,
+    llvm::IRBuilder<>* b, abslx::string_view name) {
   std::vector<llvm::Type*> ir_input_types;
   llvm::Module* module = b->GetInsertBlock()->getModule();
   for (PrimitiveType input_type : input_types) {
@@ -222,8 +222,8 @@ llvm::CallInst* EmitDeviceFunctionCall(
 }
 
 llvm::CallInst* EmitCallToTargetIntrinsic(
-    TargetIntrinsicID intrinsic_id, absl::Span<llvm::Value* const> operands,
-    absl::Span<llvm::Type* const> overloaded_types, llvm::IRBuilder<>* b) {
+    TargetIntrinsicID intrinsic_id, abslx::Span<llvm::Value* const> operands,
+    abslx::Span<llvm::Type* const> overloaded_types, llvm::IRBuilder<>* b) {
   llvm::Module* module = b->GetInsertBlock()->getModule();
   struct TargetIntrinsics gpu_intrinsic_id = GetIntrinsic(intrinsic_id);
   llvm::Triple target_triple = llvm::Triple(module->getTargetTriple());

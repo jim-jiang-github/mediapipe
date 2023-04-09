@@ -333,7 +333,7 @@ std::string ConvolutionTransposed3x3::GenerateConvolutionTransposedCode(
   return c;
 }
 
-absl::Status ConvolutionTransposed3x3::BindArguments(ArgumentsBinder* args) {
+abslx::Status ConvolutionTransposed3x3::BindArguments(ArgumentsBinder* args) {
   RETURN_IF_ERROR(args->SetInt("filter_offset", 4 * 9 * src_[0]->Slices()));
   const int padding_x =
       padding_.x >= 1 ? (padding_.x - 1) / 2 : (padding_.x - 2) / 2;
@@ -395,7 +395,7 @@ void ConvolutionTransposed3x3::UploadWeights(
   desc.size = flt_count * SizeOf(desc.element_type);
   desc.data.resize(desc.size);
 
-  RearrangeWeights(weights, weights_desc, absl::MakeSpan(desc.data));
+  RearrangeWeights(weights, weights_desc, abslx::MakeSpan(desc.data));
 
   args_.AddObject("weights",
                   std::make_unique<BufferDescriptor>(std::move(desc)));

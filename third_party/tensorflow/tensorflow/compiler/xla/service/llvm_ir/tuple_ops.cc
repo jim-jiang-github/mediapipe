@@ -35,7 +35,7 @@ static llvm::Module* getModuleFromBuilder(llvm::IRBuilder<>* b) {
   return b->GetInsertBlock()->getModule();
 }
 
-void EmitTuple(const IrArray& tuple, absl::Span<llvm::Value* const> operands,
+void EmitTuple(const IrArray& tuple, abslx::Span<llvm::Value* const> operands,
                llvm::IRBuilder<>* b) {
   llvm::Module* module = getModuleFromBuilder(b);
   for (size_t i = 0; i < operands.size(); ++i) {
@@ -49,11 +49,11 @@ void EmitTuple(const IrArray& tuple, absl::Span<llvm::Value* const> operands,
   }
 }
 
-void EmitTuple(const IrArray& tuple, absl::Span<const IrArray> buffers,
+void EmitTuple(const IrArray& tuple, abslx::Span<const IrArray> buffers,
                llvm::IRBuilder<>* b) {
   std::vector<llvm::Value*> buffer_ptrs;
   buffer_ptrs.reserve(buffers.size());
-  absl::c_transform(
+  abslx::c_transform(
       buffers, std::back_inserter(buffer_ptrs),
       [](const llvm_ir::IrArray& buffer) { return buffer.GetBasePointer(); });
   llvm_ir::EmitTuple(tuple, buffer_ptrs, b);
@@ -78,7 +78,7 @@ std::vector<llvm::Value*> EmitTupleAllocasAtFunctionEntry(
         llvm_ir::PrimitiveTypeToIrType(element_shape.element_type(), module);
     llvm::AllocaInst* alloca = b->CreateAlloca(
         type,
-        /*ArraySize=*/nullptr, AsStringRef(absl::StrCat("tuple_element_", i)));
+        /*ArraySize=*/nullptr, AsStringRef(abslx::StrCat("tuple_element_", i)));
     generated_allocas.push_back(alloca);
   }
 

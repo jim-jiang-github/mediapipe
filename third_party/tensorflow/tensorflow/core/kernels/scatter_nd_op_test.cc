@@ -184,7 +184,7 @@ TEST_F(ScatterNdUpdateOpTest, Error_IndexOutOfRange) {
   AddInputFromArray<float>(TensorShape({3, 3}),
                            {100, 101, 102, 777, 778, 779, 10000, 10001, 10002});
   Status s = RunOpKernel();
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.ToString(), "indices[2] = [99] does not index into shape [5,3]"))
       << s;
 }
@@ -198,7 +198,7 @@ TEST_F(ScatterNdUpdateOpTest, Error_WrongDimsIndices) {
   AddInputFromArray<float>(TensorShape({3, 3}),
                            {100, 101, 102, 777, 778, 779, 10000, 10001, 10002});
   Status s = RunOpKernel();
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.ToString(),
       "Dimensions [0,1) of indices[shape=[1,3,1]] = 1 must match dimensions "
       "[0,1) of updates[shape=[3,3]] = 3"))
@@ -216,7 +216,7 @@ TEST_F(ScatterNdUpdateOpTest, Error_MismatchedParamsAndUpdateDimensions) {
       TensorShape({3, 4}),
       {100, 101, 102, 103, 777, 778, 779, 780, 10000, 10001, 10002, 10004});
   Status s = RunOpKernel();
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.ToString(),
       "Dimensions [1,2) of input[shape=[5,3]] must match dimensions [1,2) of "
       "updates[shape=[3,4]]"))
@@ -233,7 +233,7 @@ TEST_F(ScatterNdUpdateOpTest, Error_MismatchedIndicesAndUpdateDimensions) {
   AddInputFromArray<float>(TensorShape({2, 3}),
                            {100, 101, 102, 10000, 10001, 10002});
   Status s = RunOpKernel();
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.ToString(),
       "Dimensions [0,1) of indices[shape=[3,1]] = 3 must match dimensions [0,1)"
       " of updates[shape=[2,3]] = 2"))

@@ -49,8 +49,8 @@ enum GpuEventType {
   kMemcpyP2P,
 };
 
-GpuEventType ParseMemcpyName(absl::string_view memcpy_name) {
-  if (absl::ConsumePrefix(&memcpy_name, "Memcpy")) {
+GpuEventType ParseMemcpyName(abslx::string_view memcpy_name) {
+  if (abslx::ConsumePrefix(&memcpy_name, "Memcpy")) {
     if (memcpy_name == "H2D") return GpuEventType::kMemcpyH2D;
     if (memcpy_name == "D2H") return GpuEventType::kMemcpyD2H;
     if (memcpy_name == "D2D") return GpuEventType::kMemcpyD2D;
@@ -79,10 +79,10 @@ void ConvertGpuXSpaceToStepStats(const XSpace& xspace, StepStats* step_stats) {
       xspace, {kCuptiDriverApiPlaneName, kRoctracerApiPlaneName});
   DCHECK_LE(host_planes.size(), 1);
 
-  absl::flat_hash_map<int64_t /*correlation_id*/, CorrelationInfo>
+  abslx::flat_hash_map<int64_t /*correlation_id*/, CorrelationInfo>
       correlation_info_map;
   for (const XPlane* host_plane : host_planes) {
-    absl::flat_hash_map<uint32_t /*device_id*/, DeviceStepStats*>
+    abslx::flat_hash_map<uint32_t /*device_id*/, DeviceStepStats*>
         sync_dev_stats_map;
     XPlaneVisitor plane = CreateTfXPlaneVisitor(host_plane);
     plane.ForEachLine([&](const XLineVisitor& line) {
@@ -97,12 +97,12 @@ void ConvertGpuXSpaceToStepStats(const XSpace& xspace, StepStats* step_stats) {
             if (sync_dev_stats == nullptr) {
               sync_dev_stats = step_stats->add_dev_stats();
               sync_dev_stats->set_device(
-                  absl::StrCat("/device:GPU:", device_ordinal, "/sync"));
+                  abslx::StrCat("/device:GPU:", device_ordinal, "/sync"));
             }
             NodeExecStats* ns = sync_dev_stats->add_node_stats();
             SetNodeTimes(event, ns);
             ns->set_node_name(std::string(event.Name()));
-            ns->set_timeline_label(absl::StrCat("ThreadId ", thread_id));
+            ns->set_timeline_label(abslx::StrCat("ThreadId ", thread_id));
             ns->set_thread_id(thread_id);
           }
         } else {
@@ -116,7 +116,7 @@ void ConvertGpuXSpaceToStepStats(const XSpace& xspace, StepStats* step_stats) {
     });
   }
   for (const XPlane* device_plane : device_planes) {
-    absl::flat_hash_map<std::pair<int64_t /*stream_id*/, GpuEventType>,
+    abslx::flat_hash_map<std::pair<int64_t /*stream_id*/, GpuEventType>,
                         DeviceStepStats*>
         stream_dev_stats_map;
     DeviceStepStats* unknown_stream_dev_stats = nullptr;
@@ -129,7 +129,7 @@ void ConvertGpuXSpaceToStepStats(const XSpace& xspace, StepStats* step_stats) {
       line.ForEachEvent([&](const XEventVisitor& event) {
         GpuEventStats stats(&event);
 
-        auto ns = absl::make_unique<NodeExecStats>();
+        auto ns = abslx::make_unique<NodeExecStats>();
         SetNodeTimes(event, ns.get());
 
         // Get launch information if available.
@@ -143,33 +143,33 @@ void ConvertGpuXSpaceToStepStats(const XSpace& xspace, StepStats* step_stats) {
           }
         }
 
-        absl::string_view node_name =
+        abslx::string_view node_name =
             stats.IsTfOp() ? stats.tf_op_fullname : event.Name();
         ns->set_node_name(std::string(node_name));
 
         if (stats.IsKernel()) {
-          absl::string_view kernel_name = event.Name();
+          abslx::string_view kernel_name = event.Name();
           ns->set_timeline_label(
-              absl::StrCat(kernel_name, " ", stats.kernel_details));
+              abslx::StrCat(kernel_name, " ", stats.kernel_details));
           DeviceStepStats*& stream_dev_stats =
               stream_dev_stats_map[{stream_id, GpuEventType::kKernel}];
           if (stream_dev_stats == nullptr) {
             stream_dev_stats = step_stats->add_dev_stats();
-            stream_dev_stats->set_device(absl::StrCat(
+            stream_dev_stats->set_device(abslx::StrCat(
                 "/device:GPU:", device_ordinal, "/stream:", stream_id));
           }
           *stream_dev_stats->add_node_stats() = *ns;
           if (all_streams_dev_stats == nullptr) {
             all_streams_dev_stats = step_stats->add_dev_stats();
             all_streams_dev_stats->set_device(
-                absl::StrCat("/device:GPU:", device_ordinal, "/stream:all"));
+                abslx::StrCat("/device:GPU:", device_ordinal, "/stream:all"));
           }
           all_streams_dev_stats->add_node_stats()->Swap(ns.get());
 
         } else if (stats.IsMemCpy()) {
-          absl::string_view memcpy_name = event.Name();
+          abslx::string_view memcpy_name = event.Name();
           ns->set_timeline_label(
-              absl::StrCat(memcpy_name, " ", stats.memcpy_details));
+              abslx::StrCat(memcpy_name, " ", stats.memcpy_details));
           GpuEventType gpu_event_type = ParseMemcpyName(memcpy_name);
           DCHECK_NE(gpu_event_type, GpuEventType::kUnknown);
           DeviceStepStats*& stream_dev_stats =
@@ -177,14 +177,14 @@ void ConvertGpuXSpaceToStepStats(const XSpace& xspace, StepStats* step_stats) {
           if (stream_dev_stats == nullptr) {
             stream_dev_stats = step_stats->add_dev_stats();
             stream_dev_stats->set_device(
-                absl::StrCat("/device:GPU:", device_ordinal,
+                abslx::StrCat("/device:GPU:", device_ordinal,
                              "/stream:", stream_id, "<", memcpy_name, ">"));
           }
           *stream_dev_stats->add_node_stats() = *ns;
           if (memcpy_dev_stats == nullptr) {
             memcpy_dev_stats = step_stats->add_dev_stats();
             memcpy_dev_stats->set_device(
-                absl::StrCat("/device:GPU:", device_ordinal, "/memcpy"));
+                abslx::StrCat("/device:GPU:", device_ordinal, "/memcpy"));
           }
           memcpy_dev_stats->add_node_stats()->Swap(ns.get());
 
@@ -193,7 +193,7 @@ void ConvertGpuXSpaceToStepStats(const XSpace& xspace, StepStats* step_stats) {
           if (unknown_stream_dev_stats == nullptr) {
             unknown_stream_dev_stats = step_stats->add_dev_stats();
             unknown_stream_dev_stats->set_device(
-                absl::StrCat("/device:GPU:", device_ordinal, "/stream:"));
+                abslx::StrCat("/device:GPU:", device_ordinal, "/stream:"));
           }
           unknown_stream_dev_stats->add_node_stats()->Swap(ns.get());
         }

@@ -49,7 +49,7 @@ DEFINE_SUBGRAPH(HolisticTrackingToRenderData, "../../mediapipe/graphs/holistic_t
   DEFINE_SUBGRAPH(HandWristForPose, "../../mediapipe/modules/holistic_landmark/hand_wrist_for_pose.pbtxt");
 } // namespace mediapipe
 
-absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
+abslx::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
   // register options
   register_face_detection_options();
 
@@ -62,7 +62,7 @@ absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
     download_mediapipe_asset_from_GCS("../mediapipe/modules/holistic_landmark/hand_recrop.tflite");
     return graph.Initialize(config);
   }
-  return absl::NotFoundError(calculator_graph_config_file);
+  return abslx::NotFoundError(calculator_graph_config_file);
 }
 
 // the program entrance point, the main().

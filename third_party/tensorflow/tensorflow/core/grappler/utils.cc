@@ -89,7 +89,7 @@ bool IsSameInput(const string& name1, const string& name2) {
   return tensor1 == tensor2;
 }
 
-bool IsControlInput(absl::string_view name) {
+bool IsControlInput(abslx::string_view name) {
   return !name.empty() && name[0] == '^';
 }
 
@@ -99,10 +99,10 @@ string AddPrefixToNodeName(const string& name, const string& prefix,
                            const string& delimiter) {
   if (!name.empty()) {
     if (name[0] == '^') {
-      return absl::StrCat("^", prefix, delimiter, name.substr(1));
+      return abslx::StrCat("^", prefix, delimiter, name.substr(1));
     }
   }
-  return absl::StrCat(prefix, delimiter, name);
+  return abslx::StrCat(prefix, delimiter, name);
 }
 
 string AddPrefixToNodeName(const string& name, const string& prefix) {
@@ -126,26 +126,26 @@ bool ExecuteWithTimeout(std::function<void()> fn, const int64_t timeout_in_ms,
 }
 
 string AsControlDependency(const NodeDef& node) {
-  return absl::StrCat("^", node.name());
+  return abslx::StrCat("^", node.name());
 }
 
 string AsControlDependency(const string& node_name) {
   CHECK(!node_name.empty());
   return (!node_name.empty() && node_name[0] == '^')
              ? node_name
-             : absl::StrCat("^", node_name);
+             : abslx::StrCat("^", node_name);
 }
 
 bool NodeIsOnCpu(const NodeDef* node) {
   string task, device;
   return DeviceNameUtils::SplitDeviceName(node->device(), &task, &device) &&
-         absl::StartsWith(device, DEVICE_CPU);
+         abslx::StartsWith(device, DEVICE_CPU);
 }
 
 bool NodeIsOnGpu(const NodeDef* node) {
   string task, device;
   return DeviceNameUtils::SplitDeviceName(node->device(), &task, &device) &&
-         absl::StartsWith(device, DEVICE_GPU);
+         abslx::StartsWith(device, DEVICE_GPU);
 }
 
 int NumOutputs(const NodeDef& node, GraphDef* graph) {
@@ -347,7 +347,7 @@ void PermuteNodesInPlace(GraphDef* graph, std::vector<int>* permutation,
 }
 
 void DedupControlInputs(NodeDef* node) {
-  absl::flat_hash_set<string> inputs;
+  abslx::flat_hash_set<string> inputs;
   int pos = 0;
   while (pos < node->input_size()) {
     const string& input = node->input(pos);
@@ -467,7 +467,7 @@ Status CheckAttrExists(const NodeDef& node, const string& key) {
   return OkStatus();
 }
 
-Status CheckAttrsExist(const NodeDef& node, absl::Span<const string> keys) {
+Status CheckAttrsExist(const NodeDef& node, abslx::Span<const string> keys) {
   for (const string& key : keys) {
     TF_RETURN_IF_ERROR(CheckAttrExists(node, key));
   }
@@ -475,9 +475,9 @@ Status CheckAttrsExist(const NodeDef& node, absl::Span<const string> keys) {
 }
 
 Status IsKernelRegisteredForNode(
-    absl::string_view node_name, bool has_experimental_debug_info,
+    abslx::string_view node_name, bool has_experimental_debug_info,
     const NodeDef_ExperimentalDebugInfo& experimental_debug_info,
-    absl::string_view node_op, absl::string_view node_device,
+    abslx::string_view node_op, abslx::string_view node_device,
     AttrSlice node_attrs) {
   DeviceNameUtils::ParsedName parsed_name;
   if (!DeviceNameUtils::ParseFullName(node_device, &parsed_name)) {
@@ -497,7 +497,7 @@ Status IsKernelRegisteredForNode(const NodeDef& node) {
 }
 
 namespace {
-void RemoveAttributes(const std::vector<absl::string_view>& to_remove,
+void RemoveAttributes(const std::vector<abslx::string_view>& to_remove,
                       NodeDef* node) {
   if (to_remove.size() == node->attr_size()) {
     node->clear_attr();
@@ -510,7 +510,7 @@ void RemoveAttributes(const std::vector<absl::string_view>& to_remove,
 }  // namespace
 
 int EraseRegularNodeAttributes(NodeDef* node) {
-  std::vector<absl::string_view> to_remove;
+  std::vector<abslx::string_view> to_remove;
   for (const auto& attr : node->attr()) {
     if (!attr.first.empty() && (attr.first)[0] != '_') {
       to_remove.push_back(attr.first);
@@ -521,11 +521,11 @@ int EraseRegularNodeAttributes(NodeDef* node) {
 }
 
 int EraseNodeOutputAttributes(NodeDef* node) {
-  std::vector<absl::string_view> to_remove;
+  std::vector<abslx::string_view> to_remove;
   for (const auto& attr : node->attr()) {
     const string& attr_name = attr.first;
     if (attr_name == "_xla_inferred_shapes" ||
-        absl::StartsWith(attr_name, "_output_")) {
+        abslx::StartsWith(attr_name, "_output_")) {
       to_remove.push_back(attr_name);
     }
   }

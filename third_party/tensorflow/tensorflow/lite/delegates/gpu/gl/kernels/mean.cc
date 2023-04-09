@@ -240,18 +240,18 @@ void GenerateTiledMean(const NodeShader::GenerationContext& ctx,
 
 class Mean : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     const auto& attr = std::any_cast<const MeanAttributes&>(ctx.op_attr);
     if (attr.dims != std::set<Axis>({Axis::HEIGHT, Axis::WIDTH})) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Mean calculation is supported only for height and width.");
     }
 
     if (!(ctx.input_shapes.size() == 1 && ctx.output_shapes.size() == 1 &&
           ctx.output_shapes[0][1] == 1 && ctx.output_shapes[0][2] == 1 &&
           ctx.output_shapes[0][3] == ctx.input_shapes[0][3])) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Mean calculation is supported for one input and one 1x1 output with "
           "the same channel count.");
     }
@@ -263,7 +263,7 @@ class Mean : public NodeShader {
     } else {
       GenerateTrivialMean(ctx, generated_code);
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

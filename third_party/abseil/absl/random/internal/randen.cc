@@ -40,7 +40,7 @@
 // We combine these three ideas and also change Simpira's subround keys from
 // structured/low-entropy counters to digits of Pi.
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 namespace {
@@ -88,4 +88,4 @@ Randen::Randen() {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

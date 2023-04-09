@@ -382,7 +382,7 @@ void TransformQuadInMotionBoxState(const MotionBoxState& curr_pos,
   }
   const int kQuadVerticesSize = 8;
   const MotionBoxState::Quad* curr_quad_ptr = nullptr;
-  auto quad = absl::make_unique<MotionBoxState::Quad>();
+  auto quad = abslx::make_unique<MotionBoxState::Quad>();
   if (curr_pos.has_quad() &&
       curr_pos.quad().vertices_size() == kQuadVerticesSize) {
     curr_quad_ptr = &curr_pos.quad();
@@ -3273,7 +3273,7 @@ void FeatureAndDescriptorFromTrackingData(
          r < r_end; ++r) {
       const std::string& descriptor = motion_data.feature_descriptors(r).data();
 
-      if (absl::c_all_of(descriptor, [](char c) { return c == 0; })) {
+      if (abslx::c_all_of(descriptor, [](char c) { return c == 0; })) {
         continue;
       }
 

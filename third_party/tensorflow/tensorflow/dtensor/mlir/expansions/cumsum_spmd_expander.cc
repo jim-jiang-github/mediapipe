@@ -40,7 +40,7 @@ StatusOr<int64_t> GetAxisDimension(mlir::Operation* op) {
   auto cumsum = llvm::dyn_cast<mlir::TF::CumsumOp>(op);
   if (cumsum == nullptr) {
     return errors::Internal(
-        absl::StrCat("Expected Cumsum op but got : ", OpName(op)).c_str());
+        abslx::StrCat("Expected Cumsum op but got : ", OpName(op)).c_str());
   }
   TF_ASSIGN_OR_RETURN(int64_t axis_dim,
                       ExtractConstIntFromValue(cumsum.axis()));

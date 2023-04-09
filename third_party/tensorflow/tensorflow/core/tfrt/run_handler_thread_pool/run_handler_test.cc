@@ -49,7 +49,7 @@ TEST(RunHandlerUtilTest, TestBasicScheduling) {
   std::unique_ptr<RunHandlerPool> pool(new RunHandlerPool(options));
 
   // RunHandler should always be able to run num_threads inter closures
-  absl::Barrier barrier(num_threads);
+  abslx::Barrier barrier(num_threads);
 
   tensorflow::BlockingCounter counter(2 * num_handlers * num_threads);
 
@@ -129,7 +129,7 @@ TEST(RunHandlerUtilTest, IntraOpThreadPool) {
   auto handler = pool->Get(/*step_id=*/1, /*timeout_in_ms=*/0, options);
   auto* intra_pool = handler->AsIntraThreadPoolInterface();
 
-  absl::Notification notification;
+  abslx::Notification notification;
   intra_pool->Schedule([&notification]() { notification.Notify(); });
   notification.WaitForNotification();
 }

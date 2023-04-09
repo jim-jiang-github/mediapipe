@@ -197,15 +197,15 @@ Status UpdateNodeDef(utils::MutableNodeView* node_view, const string& funcName,
       //   # New input should be "unified_lstm/StatefulPartitionedCall:5"
       // }
       const string last_input = FindForwardNode(node_view);
-      const std::vector<string> name_index = ::absl::StrSplit(last_input, ':');
+      const std::vector<string> name_index = ::abslx::StrSplit(last_input, ':');
       if (name_index.size() != 2) {
         return errors::InvalidArgument(
             "Invalid format of input node name: ", last_input,
             " Expected: {forward_node_name}:{index}");
       }
-      const absl::string_view node_name = name_index[0];
+      const abslx::string_view node_name = name_index[0];
       int last_index;
-      if (!::absl::SimpleAtoi(name_index[1], &last_index)) {
+      if (!::abslx::SimpleAtoi(name_index[1], &last_index)) {
         return errors::InvalidArgument(
             "The index of input node is expected to be number, got: ",
             name_index[1]);
@@ -271,7 +271,7 @@ Status ImplementationSelector::MaybeOptimizeFunctionCall(
   for (const auto& attr_name : function_attribute_names) {
     string function_name = node_def->attr().at(attr_name).func().name();
     // Skip the function if its already optimized by function optimizer.
-    if (::absl::StrContains(function_name, "_specialized_for_")) continue;
+    if (::abslx::StrContains(function_name, "_specialized_for_")) continue;
     std::vector<string> equiv_func_names;
     TF_RETURN_IF_ERROR(lib_info_->GetEquivalentImplementations(
         function_name, &equiv_func_names));
@@ -286,7 +286,7 @@ Status ImplementationSelector::MaybeOptimizeFunctionCall(
   }
 
   if (lib_info_->GetApiInfo(node_def->op()) != nullptr &&
-      !::absl::StrContains(node_def->op(), "_specialized_for_")) {
+      !::abslx::StrContains(node_def->op(), "_specialized_for_")) {
     std::vector<string> equiv_func_names;
     TF_RETURN_IF_ERROR(lib_info_->GetEquivalentImplementations(
         node_def->op(), &equiv_func_names));
@@ -311,7 +311,7 @@ Status FindDeviceIndex(const utils::MutableNodeView* device_index_node,
   }
   const auto& device_list =
       device_index_node->GetAttr("device_names")->list().s();
-  auto it = absl::c_find(device_list, parsed_name.type);
+  auto it = abslx::c_find(device_list, parsed_name.type);
   if (it != device_list.end()) {
     *index = it - device_list.begin();
   } else {

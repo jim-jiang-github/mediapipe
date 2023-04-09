@@ -36,9 +36,9 @@ class CompilationStats {
 
   static std::unique_ptr<CompilationStats> MakeStats();
 
-  virtual void StartPass(absl::string_view pass_name) = 0;
+  virtual void StartPass(abslx::string_view pass_name) = 0;
 
-  virtual void EndPass(absl::string_view pass_name) = 0;
+  virtual void EndPass(abslx::string_view pass_name) = 0;
 
   virtual void CompilationReport() = 0;
 

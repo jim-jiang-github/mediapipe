@@ -19,7 +19,7 @@ namespace xla {
 
 StatusOr<bool> MemorySpacePropagation::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool modified = false;
   // Configure bitcasts to define values. Otherwise, if there is only a bitcast
   // between a fusion input and output and these two values are in different

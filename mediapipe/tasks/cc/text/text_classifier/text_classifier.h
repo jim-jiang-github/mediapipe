@@ -81,14 +81,14 @@ class TextClassifier : core::BaseTaskApi {
   using BaseTaskApi::BaseTaskApi;
 
   // Creates a TextClassifier from the provided `options`.
-  static absl::StatusOr<std::unique_ptr<TextClassifier>> Create(
+  static abslx::StatusOr<std::unique_ptr<TextClassifier>> Create(
       std::unique_ptr<TextClassifierOptions> options);
 
   // Performs classification on the input `text`.
-  absl::StatusOr<TextClassifierResult> Classify(absl::string_view text);
+  abslx::StatusOr<TextClassifierResult> Classify(abslx::string_view text);
 
   // Shuts down the TextClassifier when all the work is done.
-  absl::Status Close() { return runner_->Close(); }
+  abslx::Status Close() { return runner_->Close(); }
 };
 
 }  // namespace text_classifier

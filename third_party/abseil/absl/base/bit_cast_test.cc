@@ -21,7 +21,7 @@
 #include "absl/base/casts.h"
 #include "absl/base/macros.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace {
 
@@ -32,9 +32,9 @@ template <typename T>
 void TestMarshall(const T values[], int num_values) {
   for (int i = 0; i < num_values; ++i) {
     T t0 = values[i];
-    marshall<sizeof(T)> m0 = absl::bit_cast<marshall<sizeof(T)> >(t0);
-    T t1 = absl::bit_cast<T>(m0);
-    marshall<sizeof(T)> m1 = absl::bit_cast<marshall<sizeof(T)> >(t1);
+    marshall<sizeof(T)> m0 = abslx::bit_cast<marshall<sizeof(T)> >(t0);
+    T t1 = abslx::bit_cast<T>(m0);
+    marshall<sizeof(T)> m1 = abslx::bit_cast<marshall<sizeof(T)> >(t1);
     ASSERT_EQ(0, memcmp(&t0, &t1, sizeof(T)));
     ASSERT_EQ(0, memcmp(&m0, &m1, sizeof(T)));
   }
@@ -52,9 +52,9 @@ template <typename T, typename I>
 void TestIntegral(const T values[], int num_values) {
   for (int i = 0; i < num_values; ++i) {
     T t0 = values[i];
-    I i0 = absl::bit_cast<I>(t0);
-    T t1 = absl::bit_cast<T>(i0);
-    I i1 = absl::bit_cast<I>(t1);
+    I i0 = abslx::bit_cast<I>(t0);
+    T t1 = abslx::bit_cast<T>(i0);
+    I i1 = abslx::bit_cast<I>(t1);
     ASSERT_EQ(0, memcmp(&t0, &t1, sizeof(T)));
     ASSERT_EQ(i0, i1);
   }
@@ -106,4 +106,4 @@ TEST(BitCast, Double) {
 
 }  // namespace
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

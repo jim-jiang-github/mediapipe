@@ -112,13 +112,13 @@ class StringIdMap {
     return string_id->second;
   }
   void clear() { pointer_id_map_.clear(), string_id_map_.clear(); }
-  const absl::node_hash_map<std::string, int32>& map() {
+  const abslx::node_hash_map<std::string, int32>& map() {
     return string_id_map_;
   }
 
  private:
   std::unordered_map<const std::string*, int32> pointer_id_map_;
-  absl::node_hash_map<std::string, int32> string_id_map_;
+  abslx::node_hash_map<std::string, int32> string_id_map_;
   int32 next_id = 0;
 };
 
@@ -133,10 +133,10 @@ class AddressIdMap {
     return pointer_id_map_[id] = next_id++;
   }
   void clear() { pointer_id_map_.clear(); }
-  const absl::node_hash_map<int64, int32>& map() { return pointer_id_map_; }
+  const abslx::node_hash_map<int64, int32>& map() { return pointer_id_map_; }
 
  private:
-  absl::node_hash_map<int64, int32> pointer_id_map_;
+  abslx::node_hash_map<int64, int32> pointer_id_map_;
   int32 next_id = 0;
 };
 
@@ -171,7 +171,7 @@ class TraceBuilder::Impl {
   TraceEventRegistry* trace_event_registry() { return &trace_event_registry_; }
 
   static Timestamp TimestampAfter(const TraceBuffer& buffer,
-                                  absl::Time begin_time) {
+                                  abslx::Time begin_time) {
     Timestamp max_ts = Timestamp::Min();
     for (auto iter = buffer.begin(); iter < buffer.end(); ++iter) {
       TraceEvent event = *iter;
@@ -181,8 +181,8 @@ class TraceBuilder::Impl {
     return max_ts + 1;
   }
 
-  void CreateTrace(const TraceBuffer& buffer, absl::Time begin_time,
-                   absl::Time end_time, GraphTrace* result) {
+  void CreateTrace(const TraceBuffer& buffer, abslx::Time begin_time,
+                   abslx::Time end_time, GraphTrace* result) {
     // Snapshot recent TraceEvents
     std::vector<TraceEvent> snapshot;
     snapshot.reserve(10000);
@@ -232,8 +232,8 @@ class TraceBuilder::Impl {
     }
   }
 
-  void CreateLog(const TraceBuffer& buffer, absl::Time begin_time,
-                 absl::Time end_time, GraphTrace* result) {
+  void CreateLog(const TraceBuffer& buffer, abslx::Time begin_time,
+                 abslx::Time end_time, GraphTrace* result) {
     // Snapshot recent TraceEvents
     std::vector<TraceEvent> snapshot;
     snapshot.reserve(10000);
@@ -289,7 +289,7 @@ class TraceBuilder::Impl {
   int64 LogTimestamp(Timestamp ts) { return ts.Value() - base_ts_; }
 
   // Return a time in micros relative to the base time.
-  int64 LogTime(absl::Time time) { return ToUnixMicros(time) - base_time_; }
+  int64 LogTime(abslx::Time time) { return ToUnixMicros(time) - base_time_; }
 
   // Returns the output event that produced an input packet.
   const TraceEvent* FindOutputEvent(const TraceEvent& event) {
@@ -313,8 +313,8 @@ class TraceBuilder::Impl {
   // Construct the CalculatorTrace for a set of TraceEvents.
   void BuildCalculatorTrace(const EventList& task_events,
                             GraphTrace::CalculatorTrace* result) {
-    absl::Time start_time = absl::InfiniteFuture();
-    absl::Time finish_time = absl::InfiniteFuture();
+    abslx::Time start_time = abslx::InfiniteFuture();
+    abslx::Time finish_time = abslx::InfiniteFuture();
     for (const TraceEvent* event : task_events) {
       if (result->event_type() == TraceEvent::UNKNOWN) {
         result->set_node_id(event->node_id);
@@ -346,10 +346,10 @@ class TraceBuilder::Impl {
         }
       }
     }
-    if (finish_time < absl::InfiniteFuture()) {
+    if (finish_time < abslx::InfiniteFuture()) {
       result->set_finish_time(LogTime(finish_time));
     }
-    if (start_time < absl::InfiniteFuture()) {
+    if (start_time < abslx::InfiniteFuture()) {
       result->set_start_time(LogTime(start_time));
     }
   }
@@ -401,15 +401,15 @@ TraceEventRegistry* TraceBuilder::trace_event_registry() {
 }
 
 Timestamp TraceBuilder::TimestampAfter(const TraceBuffer& buffer,
-                                       absl::Time begin_time) {
+                                       abslx::Time begin_time) {
   return Impl::TimestampAfter(buffer, begin_time);
 }
-void TraceBuilder::CreateTrace(const TraceBuffer& buffer, absl::Time begin_time,
-                               absl::Time end_time, GraphTrace* result) {
+void TraceBuilder::CreateTrace(const TraceBuffer& buffer, abslx::Time begin_time,
+                               abslx::Time end_time, GraphTrace* result) {
   impl_->CreateTrace(buffer, begin_time, end_time, result);
 }
-void TraceBuilder::CreateLog(const TraceBuffer& buffer, absl::Time begin_time,
-                             absl::Time end_time, GraphTrace* result) {
+void TraceBuilder::CreateLog(const TraceBuffer& buffer, abslx::Time begin_time,
+                             abslx::Time end_time, GraphTrace* result) {
   impl_->CreateLog(buffer, begin_time, end_time, result);
 }
 void TraceBuilder::Clear() { impl_->Clear(); }

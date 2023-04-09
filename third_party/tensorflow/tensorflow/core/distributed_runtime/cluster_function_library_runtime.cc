@@ -194,7 +194,7 @@ void ClusterFunctionLibraryRuntime::Instantiate(
     worker_session_->worker_cache()->ListWorkers(&workers);
     done(errors::InvalidArgument(
         "Could not find worker with target: ", target,
-        " Available workers: ", absl::StrJoin(workers, ", ")));
+        " Available workers: ", abslx::StrJoin(workers, ", ")));
     return;
   }
 
@@ -337,7 +337,7 @@ void ClusterFunctionLibraryRuntime::Run(
   std::vector<Tensor> tensors;
   for (const auto& arg : args) {
     if (arg.index() == 0) {
-      tensors.push_back(absl::get<Tensor>(arg));
+      tensors.push_back(abslx::get<Tensor>(arg));
     } else {
       done(
           errors::Internal("ClusterFunctionLibraryRuntime doesn't support "

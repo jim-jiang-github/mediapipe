@@ -136,9 +136,9 @@ Status CheckConvAttrs(const ConvOpAttrs& attrs) {
 Status ConvBackpropComputeDimensionsV2XlaShapes(
     StringPiece label, int num_spatial_dims, const xla::Shape& input_shape,
     const xla::Shape& filter_shape, const xla::Shape& out_backprop_shape,
-    absl::Span<const int32> dilations, const std::vector<int32>& strides,
+    abslx::Span<const int32> dilations, const std::vector<int32>& strides,
     Padding padding, TensorFormat data_format, ConvBackpropDimensions* dims,
-    absl::Span<const int64_t> explicit_paddings) {
+    abslx::Span<const int64_t> explicit_paddings) {
   TensorShape input_tensor_shape, filter_tensor_shape,
       out_backprop_tensor_shape;
   TF_RETURN_IF_ERROR(XLAShapeToTensorShape(input_shape, &input_tensor_shape));

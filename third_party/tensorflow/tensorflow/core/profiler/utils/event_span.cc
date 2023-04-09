@@ -71,7 +71,7 @@ std::vector<EventBoundary> GenerateEventBoundaries(
         {event.span.begin_ps(), event.type, /*is_start=*/true});
     boundaries.push_back({event.span.end_ps(), event.type, /*is_start=*/false});
   }
-  absl::c_sort(boundaries, CmpEventBoundaries);
+  abslx::c_sort(boundaries, CmpEventBoundaries);
   return boundaries;
 }
 
@@ -124,7 +124,7 @@ constexpr int kNumGenericEventTypes = GenericEventType::kLastGenericEventType -
                                       1;
 
 using GenericEventTypeStrMap =
-    absl::flat_hash_map<GenericEventType, absl::string_view>;
+    abslx::flat_hash_map<GenericEventType, abslx::string_view>;
 
 const GenericEventTypeStrMap& GetGenericEventTypeStrMap() {
   static const auto* generic_event_type_str_map = new GenericEventTypeStrMap({
@@ -144,7 +144,7 @@ const GenericEventTypeStrMap& GetGenericEventTypeStrMap() {
 
 }  // namespace
 
-absl::string_view GetGenericEventTypeStr(GenericEventType event_type) {
+abslx::string_view GetGenericEventTypeStr(GenericEventType event_type) {
   return GetGenericEventTypeStrMap().at(event_type);
 }
 
@@ -184,11 +184,11 @@ std::string PrintEventType(EventType event_type) {
 }
 
 std::string PrintEventTypeSpan(const EventTypeSpan& event_type_span) {
-  return absl::StrCat("(", PrintEventType(event_type_span.type), ", ",
+  return abslx::StrCat("(", PrintEventType(event_type_span.type), ", ",
                       event_type_span.span.DebugString(), ")");
 }
 
-absl::string_view PrintStepMarkerType(StepMarkerType type) {
+abslx::string_view PrintStepMarkerType(StepMarkerType type) {
   switch (type) {
     case StepMarkerType::kExplicitHostStepMarker:
       return "ExplicitHostStepMarker";
@@ -200,7 +200,7 @@ absl::string_view PrintStepMarkerType(StepMarkerType type) {
 }
 
 std::string PrintStepMarker(const StepMarker& step_marker) {
-  return absl::StrCat("(", PrintStepMarkerType(step_marker.type), ", ",
+  return abslx::StrCat("(", PrintStepMarkerType(step_marker.type), ", ",
                       step_marker.event_name, ", ",
                       step_marker.span.DebugString(), ")");
 }
@@ -211,15 +211,15 @@ std::string PrintStepEvents(const StepEvents& step_events) {
   for (const auto& id_details : step_events) {
     step_ids.push_back(id_details.first);
   }
-  absl::c_sort(step_ids);
+  abslx::c_sort(step_ids);
   std::string result = "{";
   for (auto id : step_ids) {
-    absl::StrAppend(&result, "\n");
+    abslx::StrAppend(&result, "\n");
     auto* details = gtl::FindOrNull(step_events, id);
     std::string details_str = details ? details->DebugString() : "()";
-    absl::StrAppend(&result, id, ":", details_str);
+    abslx::StrAppend(&result, id, ":", details_str);
   }
-  return absl::StrCat(result, "\n}");
+  return abslx::StrCat(result, "\n}");
 }
 
 void CombineStepEvents(const StepEvents& src, StepEvents* dst) {
@@ -359,15 +359,15 @@ void StepDetails::Combine(const StepDetails& other) {
 std::string StepDetails::DebugString() const {
   std::string result = "([";
   for (int i = 0, end = markers_.size(); i < end; i++) {
-    if (i > 0) absl::StrAppend(&result, ", ");
-    absl::StrAppend(&result, PrintStepMarker(markers_[i]));
+    if (i > 0) abslx::StrAppend(&result, ", ");
+    abslx::StrAppend(&result, PrintStepMarker(markers_[i]));
   }
-  absl::StrAppend(&result, "], [");
+  abslx::StrAppend(&result, "], [");
   for (int i = 0, end = events_.size(); i < end; i++) {
-    if (i > 0) absl::StrAppend(&result, ", ");
-    absl::StrAppend(&result, PrintEventTypeSpan(events_[i]));
+    if (i > 0) abslx::StrAppend(&result, ", ");
+    abslx::StrAppend(&result, PrintEventTypeSpan(events_[i]));
   }
-  return absl::StrCat(result, "])");
+  return abslx::StrCat(result, "])");
 }
 
 bool StepDetails::operator==(const StepDetails& other) const {

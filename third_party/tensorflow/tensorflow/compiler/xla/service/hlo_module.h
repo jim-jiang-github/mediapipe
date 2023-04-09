@@ -105,7 +105,7 @@ class HloModule {
   // computations to replace. We could speed it up by keeping track of users of
   // computations.
   void ReplaceComputations(
-      const absl::flat_hash_map<HloComputation*, HloComputation*>&
+      const abslx::flat_hash_map<HloComputation*, HloComputation*>&
           replacements);
 
   const std::string& name() const { return name_; }
@@ -220,7 +220,7 @@ class HloModule {
       std::vector<std::unique_ptr<HloComputation>>::const_iterator,
       std::function<bool(const HloComputation*)>>>
   computations(
-      const absl::flat_hash_set<absl::string_view>& execution_threads) const {
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) const {
     // Pass execution_threads by value to the predicate to ensure it lives
     // beyond this function.
     std::function<bool(const HloComputation*)> pred =
@@ -236,7 +236,7 @@ class HloModule {
 
   // Returns the computation in this module that has the name `name`.  Returns
   // null if there is no such computation.
-  HloComputation* GetComputationWithName(absl::string_view name);
+  HloComputation* GetComputationWithName(abslx::string_view name);
 
   // Gets the number of computations in this module.
   int64_t computation_count() const { return computations_.size(); }
@@ -267,14 +267,14 @@ class HloModule {
   // `execution_threads`. Empty `execution_threads` list means all execution
   // threads are included.
   std::vector<HloComputation*> MakeComputationPostOrder(
-      const absl::flat_hash_set<absl::string_view>& execution_threads) const;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) const;
   // Same as MakeComputationPostOrder() but only returns the computations that
   // are on specified `execution_threads` and are also found in the passed in
   // allowList. Empty `execution_threads` list means all execution threads are
   // included.
   std::vector<HloComputation*> MakeComputationPostOrder(
-      const absl::flat_hash_set<absl::string_view>& execution_threads,
-      const absl::flat_hash_set<HloComputation*>& allow_list) const;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads,
+      const abslx::flat_hash_set<HloComputation*>& allow_list) const;
 
   // Same as MakeComputationPostOrder() but sorting the computations by their
   // contents. The order is longer post order.
@@ -284,7 +284,7 @@ class HloModule {
   // Same as above but only for specified `execution_threads`. Empty
   // `execution_threads` list means all execution threads are included.
   std::vector<HloComputation*> MakeComputationSorted(
-      const absl::flat_hash_set<absl::string_view>& execution_threads) const;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) const;
 
   // Gets the computations in this module which aren't for fusion nodes.
   //
@@ -301,7 +301,7 @@ class HloModule {
   // Same as above but only for specified `execution_threads`. Empty
   // `execution_threads` list means all execution threads are included.
   std::vector<HloComputation*> MakeNonfusionComputations(
-      const absl::flat_hash_set<absl::string_view>& execution_threads) const;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) const;
 
   // Same as MakeNonfusionComputations() but sorting computations by content.
   std::vector<HloComputation*> MakeNonfusionComputationsSorted() const {
@@ -310,7 +310,7 @@ class HloModule {
   // Same as above but only for specified `execution_threads`. Empty
   // `execution_threads` list means all execution threads are included.
   std::vector<HloComputation*> MakeNonfusionComputationsSorted(
-      const absl::flat_hash_set<absl::string_view>& execution_threads) const;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) const;
 
   HloModuleConfig& config() { return config_; }
   const HloModuleConfig& config() const { return config_; }
@@ -330,8 +330,8 @@ class HloModule {
   //
   // (We express the default options using an overload rather than a default
   // param because gdb ignores default params, but does resolve overloads.)
-  absl::Cord ToCord() const { return ToCord(HloPrintOptions()); }
-  absl::Cord ToCord(const HloPrintOptions& options) const;
+  abslx::Cord ToCord() const { return ToCord(HloPrintOptions()); }
+  abslx::Cord ToCord(const HloPrintOptions& options) const;
 
   // Convert an HloModule to or from a proto.
   HloModuleProto ToProto() const;
@@ -358,7 +358,7 @@ class HloModule {
   // order (root of outlined instructions last). TODO(jingyue): takes a set of
   // instructions and topologically sorts them.
   HloInstruction* OutlineExpressionFromComputation(
-      absl::Span<HloInstruction* const> instructions_to_outline,
+      abslx::Span<HloInstruction* const> instructions_to_outline,
       const std::string& outlined_computation_name,
       HloComputation* computation);
 
@@ -422,7 +422,7 @@ class HloModule {
                                   /*preserve_entry_layouts=*/true);
   }
 
-  void SetAndUniquifyInstrName(HloInstruction* instr, absl::string_view name) {
+  void SetAndUniquifyInstrName(HloInstruction* instr, abslx::string_view name) {
     instr->SetAndSanitizeName(name);
     instr->UniquifyName(&instruction_name_uniquer_);
   }
@@ -467,7 +467,7 @@ class HloModule {
   }
 
   // Get the list of program arguments to be prefetch across programs.
-  const absl::Span<const std::pair<int64_t, ShapeIndex>>
+  const abslx::Span<const std::pair<int64_t, ShapeIndex>>
   CrossProgramPrefetches() const {
     return cross_program_prefetches_;
   }
@@ -507,11 +507,11 @@ class HloModule {
 
   // Sets the **unoptimized** fingerprint for the module. This fingerprint is
   // prior to any optimizations.
-  void set_autofdo_fingerprint(absl::string_view fingerprint) {
+  void set_autofdo_fingerprint(abslx::string_view fingerprint) {
     autofdo_fingerprint_ = std::string(fingerprint);
   }
 
-  absl::string_view autofdo_fingerprint() const { return autofdo_fingerprint_; }
+  abslx::string_view autofdo_fingerprint() const { return autofdo_fingerprint_; }
 
   CompilationEnvironments& comp_envs() const { return *comp_envs_; }
 
@@ -535,7 +535,7 @@ class HloModule {
   // TODO(b/25995601): Replace with better seed setting or dev/random for
   // where we don't need deterministic execution.
   mutable std::mt19937_64 rng_{42};
-  mutable absl::Mutex rng_mutex_;
+  mutable abslx::Mutex rng_mutex_;
 
   // Unique name generator for computation and instruction names, which are
   // unique per module.

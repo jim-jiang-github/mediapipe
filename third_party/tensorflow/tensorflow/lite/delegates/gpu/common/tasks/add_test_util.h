@@ -22,12 +22,12 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status AddTwoEqualTensorsTest(TestExecutionEnvironment* env);
+abslx::Status AddTwoEqualTensorsTest(TestExecutionEnvironment* env);
 
-absl::Status AddFirstTensorHasMoreChannelsThanSecondTest(
+abslx::Status AddFirstTensorHasMoreChannelsThanSecondTest(
     TestExecutionEnvironment* env);
 
-absl::Status AddFirstTensorHasLessChannelsThanSecond(
+abslx::Status AddFirstTensorHasLessChannelsThanSecond(
     TestExecutionEnvironment* env);
 
 }  // namespace gpu

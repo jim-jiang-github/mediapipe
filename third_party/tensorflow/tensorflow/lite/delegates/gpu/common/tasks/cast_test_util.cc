@@ -24,7 +24,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status CastTests(TestExecutionEnvironment* env) {
+abslx::Status CastTests(TestExecutionEnvironment* env) {
   tflite::gpu::Tensor<BHWC, DataType::FLOAT32> src;
   src.shape = BHWC(1, 2, 1, 2);
   src.data = {0.0f, -1.3f, -7.4f, 12.45f};
@@ -52,14 +52,14 @@ absl::Status CastTests(TestExecutionEnvironment* env) {
       tflite::gpu::Tensor<BHWC, DataType::INT32> dst_tensor;
       dst_desc.DownloadData(&dst_tensor);
       if (dst_tensor.data != ref_tensor.data) {
-        return absl::InternalError("not equal");
+        return abslx::InternalError("not equal");
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CastToBoolTests(TestExecutionEnvironment* env) {
+abslx::Status CastToBoolTests(TestExecutionEnvironment* env) {
   tflite::gpu::Tensor<BHWC, DataType::FLOAT32> src;
   src.shape = BHWC(1, 2, 1, 2);
   src.data = {0.0f, -1.3f, -7.4f, 12.45f};
@@ -87,14 +87,14 @@ absl::Status CastToBoolTests(TestExecutionEnvironment* env) {
       tflite::gpu::Tensor<BHWC, DataType::BOOL> dst_tensor;
       dst_desc.DownloadData(&dst_tensor);
       if (dst_tensor.data != ref_tensor.data) {
-        return absl::InternalError("not equal");
+        return abslx::InternalError("not equal");
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CastFromBoolTests(TestExecutionEnvironment* env) {
+abslx::Status CastFromBoolTests(TestExecutionEnvironment* env) {
   tflite::gpu::Tensor<BHWC, DataType::BOOL> src;
   src.shape = BHWC(1, 2, 1, 2);
   src.data = {false, true, true, true};
@@ -122,11 +122,11 @@ absl::Status CastFromBoolTests(TestExecutionEnvironment* env) {
       tflite::gpu::Tensor<BHWC, DataType::FLOAT32> dst_tensor;
       dst_desc.DownloadData(&dst_tensor);
       if (dst_tensor.data != ref_tensor.data) {
-        return absl::InternalError("not equal");
+        return abslx::InternalError("not equal");
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

@@ -55,7 +55,7 @@ class Boundary {
     return res;
   }
   bool operator==(const Boundary& that) const {
-    return absl::c_equal(operands_, that.operands_);
+    return abslx::c_equal(operands_, that.operands_);
   }
   template <typename H>
   friend H AbslHashValue(H h, const Boundary& boundary) {
@@ -165,11 +165,11 @@ class ConditionalCodeMotion : public HloModulePass {
     return max_flip;
   }
 
-  absl::string_view name() const override { return "conditional-code-motion"; }
+  abslx::string_view name() const override { return "conditional-code-motion"; }
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
   // Optimization decision for each boundary of the conditional instruction.
   class Decision {
@@ -195,7 +195,7 @@ class ConditionalCodeMotion : public HloModulePass {
   virtual Decision ConsiderCodeMotion(
       HloInstruction* conditional, const Boundary& cur_boundary,
       std::vector<Boundary>& to_move, std::vector<Boundary>& new_boundaries,
-      absl::flat_hash_map<HloInstruction*, int>& visited_count);
+      abslx::flat_hash_map<HloInstruction*, int>& visited_count);
 
  private:
   const bool is_layout_sensitive_;
@@ -207,7 +207,7 @@ class ConditionalCodeMotion : public HloModulePass {
   // the map is the index number of the conditional in a module when traversed
   // in post order, and the value of the map is the sequence of search
   // configurations specified with the same index number for the conditional.
-  absl::flat_hash_map<int64_t, std::vector<int64_t>> search_config_map_;
+  abslx::flat_hash_map<int64_t, std::vector<int64_t>> search_config_map_;
   std::vector<std::vector<int64_t>> move_config_, reuse_config_;
 
   StatusOr<bool> MoveInstructionOut(HloInstruction* conditional,

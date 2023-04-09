@@ -33,14 +33,14 @@ namespace crc32c {
 extern uint32 Extend(uint32 init_crc, const char* buf, size_t size);
 
 #if defined(TF_CORD_SUPPORT)
-extern uint32 Extend(uint32 init_crc, const absl::Cord& cord);
+extern uint32 Extend(uint32 init_crc, const abslx::Cord& cord);
 #endif
 
 // Return the crc32c of data[0,n-1]
 inline uint32 Value(const char* data, size_t n) { return Extend(0, data, n); }
 
 #if defined(TF_CORD_SUPPORT)
-inline uint32 Value(const absl::Cord& cord) { return Extend(0, cord); }
+inline uint32 Value(const abslx::Cord& cord) { return Extend(0, cord); }
 #endif
 
 static const uint32 kMaskDelta = 0xa282ead8ul;

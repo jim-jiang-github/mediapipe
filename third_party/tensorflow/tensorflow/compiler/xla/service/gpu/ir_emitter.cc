@@ -152,7 +152,7 @@ Status IrEmitter::HandleTuple(HloInstruction* tuple) {
 
 Status IrEmitter::EmitCallToNestedComputation(
     const HloComputation& nested_computation,
-    absl::Span<llvm::Value* const> operands, llvm::Value* output) {
+    abslx::Span<llvm::Value* const> operands, llvm::Value* output) {
   TF_RET_CHECK(nested_computation.num_parameters() > 0);
   llvm::Function*& emitted_function =
       computation_to_ir_function_[&nested_computation];
@@ -169,7 +169,7 @@ Status IrEmitter::EmitCallToNestedComputation(
   // However for AMDGPU target, addrspacecast alloca variables from
   // addrspace 5 to addrspace 0 is needed.
   std::vector<llvm::Value*> arguments;
-  absl::c_transform(
+  abslx::c_transform(
       operands, std::back_inserter(arguments),
       [this](llvm::Value* arg) { return AddrCastToDefault(arg, b_); });
 
@@ -613,7 +613,7 @@ Status IrEmitter::HandleBatchNormGrad(HloInstruction*) {
 
 StatusOr<std::vector<llvm::Value*>> IrEmitter::ComputeNestedElement(
     const HloComputation& computation,
-    absl::Span<llvm::Value* const> parameter_elements) {
+    abslx::Span<llvm::Value* const> parameter_elements) {
   std::vector<llvm::Value*> parameter_buffers;
   for (llvm::Value* parameter_element : parameter_elements) {
     parameter_buffers.push_back(llvm_ir::EmitAllocaAtFunctionEntry(
@@ -626,7 +626,7 @@ StatusOr<std::vector<llvm::Value*>> IrEmitter::ComputeNestedElement(
 
 StatusOr<std::vector<llvm::Value*>> IrEmitter::ComputeNestedElementFromAddrs(
     const HloComputation& computation,
-    absl::Span<llvm::Value* const> parameter_elements_addrs) {
+    abslx::Span<llvm::Value* const> parameter_elements_addrs) {
   const Shape& return_shape = computation.root_instruction()->shape();
   llvm::Type* return_buffer_type =
       llvm_ir::ShapeToIrType(return_shape, module_);

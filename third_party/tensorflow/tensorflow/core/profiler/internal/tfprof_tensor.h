@@ -57,19 +57,19 @@ class TFProfTensor {
     sstream << value;
     if (typeid(value) == typeid(double)) {
       double double_val = 0.0;
-      CHECK(absl::SimpleAtod(sstream.str(), &double_val));  // Crash OK
+      CHECK(abslx::SimpleAtod(sstream.str(), &double_val));  // Crash OK
       dim->add_value_double(double_val);
-      absl::StrAppendFormat(&formatted_str_, "%.2f ",
+      abslx::StrAppendFormat(&formatted_str_, "%.2f ",
                             dim->value_double(dim->value_double_size() - 1));
     } else if (typeid(value) == typeid(int64_t)) {
       int64_t int64_val = 0;
-      CHECK(absl::SimpleAtoi(sstream.str(), &int64_val));  // Crash OK
+      CHECK(abslx::SimpleAtoi(sstream.str(), &int64_val));  // Crash OK
       dim->add_value_int64(int64_val);
-      absl::StrAppendFormat(&formatted_str_, "%d ",
+      abslx::StrAppendFormat(&formatted_str_, "%d ",
                             dim->value_int64(dim->value_int64_size() - 1));
     } else if (typeid(value) == typeid(string)) {
       dim->add_value_str(sstream.str());
-      absl::StrAppend(&formatted_str_, "'",
+      abslx::StrAppend(&formatted_str_, "'",
                       dim->value_str(dim->value_str_size() - 1), "' ");
     } else {
       CHECK(false) << "Unsupported type: " << typeid(value).name();
@@ -90,19 +90,19 @@ class TFProfTensor {
 
       if (typeid(values[nstart]) == typeid(double)) {
         double double_val = 0.0;
-        CHECK(absl::SimpleAtod(sstream.str(), &double_val));  // Crash OK
+        CHECK(abslx::SimpleAtod(sstream.str(), &double_val));  // Crash OK
         dim->add_value_double(double_val);
-        absl::StrAppendFormat(&formatted_str_, "%.2f ",
+        abslx::StrAppendFormat(&formatted_str_, "%.2f ",
                               dim->value_double(dim->value_double_size() - 1));
       } else if (typeid(values[nstart]) == typeid(int64_t)) {
         int64_t int64_val = 0;
-        CHECK(absl::SimpleAtoi(sstream.str(), &int64_val));  // Crash OK
+        CHECK(abslx::SimpleAtoi(sstream.str(), &int64_val));  // Crash OK
         dim->add_value_int64(int64_val);
-        absl::StrAppendFormat(&formatted_str_, "%d ",
+        abslx::StrAppendFormat(&formatted_str_, "%d ",
                               dim->value_int64(dim->value_int64_size() - 1));
       } else if (typeid(values[nstart]) == typeid(string)) {
         dim->add_value_str(sstream.str());
-        absl::StrAppend(&formatted_str_, "'",
+        abslx::StrAppend(&formatted_str_, "'",
                         dim->value_str(dim->value_str_size() - 1), "' ");
       } else {
         CHECK(false) << "Unsupported type: " << typeid(values[nstart]).name();
@@ -116,21 +116,21 @@ class TFProfTensor {
 
           if (typeid(values[nstart]) == typeid(double)) {
             double double_val = 0.0;
-            CHECK(absl::SimpleAtod(sstream.str(), &double_val));  // Crash OK
+            CHECK(abslx::SimpleAtod(sstream.str(), &double_val));  // Crash OK
             dim->add_value_double(double_val);
-            absl::StrAppendFormat(
+            abslx::StrAppendFormat(
                 &formatted_str_, "%.2f ",
                 dim->value_double(dim->value_double_size() - 1));
           } else if (typeid(values[nstart]) == typeid(int64_t)) {
             int64_t int64_val = 0;
-            CHECK(absl::SimpleAtoi(sstream.str(), &int64_val));  // Crash OK
+            CHECK(abslx::SimpleAtoi(sstream.str(), &int64_val));  // Crash OK
             dim->add_value_int64(int64_val);
-            absl::StrAppendFormat(
+            abslx::StrAppendFormat(
                 &formatted_str_, "%d ",
                 dim->value_int64(dim->value_int64_size() - 1));
           } else if (typeid(values[nstart]) == typeid(string)) {
             dim->add_value_str(sstream.str());
-            absl::StrAppend(&formatted_str_, "'",
+            abslx::StrAppend(&formatted_str_, "'",
                             dim->value_str(dim->value_str_size() - 1), "' ");
           } else {
             CHECK(false) << "Unsupported type: "
@@ -154,7 +154,7 @@ class TFProfTensor {
   void GetValueVec(std::vector<U>* value_vec) {
     // TODO(xpan): Address the huge tensor problem.
     if (tensor_->NumElements() > kTFProfTensorMaxWarnLen) {
-      absl::FPrintF(stderr, "Showing huge tensor, the tool might halt...\n");
+      abslx::FPrintF(stderr, "Showing huge tensor, the tool might halt...\n");
     }
     auto values = tensor_->flat<T>();
     for (int64_t i = 0; i < tensor_->NumElements(); i++) {

@@ -63,17 +63,17 @@ class ImagePropertiesCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kIn, kInCpu, kInGpu, kOut);
 
-  static absl::Status UpdateContract(CalculatorContract* cc) {
+  static abslx::Status UpdateContract(CalculatorContract* cc) {
     RET_CHECK_EQ(kIn(cc).IsConnected() + kInCpu(cc).IsConnected() +
                      kInGpu(cc).IsConnected(),
                  1)
         << "One and only one of IMAGE, IMAGE_CPU and IMAGE_GPU input is "
            "expected.";
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     std::pair<int, int> size;
 
     if (kIn(cc).IsConnected()) {
@@ -102,7 +102,7 @@ class ImagePropertiesCalculator : public Node {
 
     kOut(cc).Send(size);
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

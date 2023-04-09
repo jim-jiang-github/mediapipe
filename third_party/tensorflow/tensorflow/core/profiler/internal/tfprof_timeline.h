@@ -141,7 +141,7 @@ class Timeline {
   void EmitTreeNode(const Node* node, int64_t start_time, int64_t duration,
                     int64_t depth, std::set<int64_t>* visited_depth) {
     if (visited_depth->find(depth) == visited_depth->end()) {
-      chrome_formatter_.EmitPID(absl::StrCat("Scope:", depth), depth);
+      chrome_formatter_.EmitPID(abslx::StrCat("Scope:", depth), depth);
       visited_depth->insert(depth);
     }
 

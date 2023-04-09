@@ -41,8 +41,8 @@ enum class IrExportStage {
 // using library runtime `runtime` on a device `dev` with given `inputs`.
 StatusOr<std::string> GetCompilerIr(
     IrExportStage stage, ProcessFunctionLibraryRuntime* pflr,
-    absl::string_view func_name, Device* dev, EagerContext* context,
-    absl::Span<const TensorHandle* const> inputs);
+    abslx::string_view func_name, Device* dev, EagerContext* context,
+    abslx::Span<const TensorHandle* const> inputs);
 
 }  // namespace tensorflow
 

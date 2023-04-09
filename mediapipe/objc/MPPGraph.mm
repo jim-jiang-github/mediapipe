@@ -62,7 +62,7 @@
     // Turn on Cocoa multithreading, since MediaPipe uses threads.
     // Not needed on iOS, but we may want to have OS X clients in the future.
     [[[NSThread alloc] init] start];
-    _graph = absl::make_unique<mediapipe::CalculatorGraph>();
+    _graph = abslx::make_unique<mediapipe::CalculatorGraph>();
     _config = config;
   }
   return self;
@@ -218,7 +218,7 @@ if ([wrapper.delegate
 }
 
 - (BOOL)startWithError:(NSError**)error {
-  absl::Status status = [self performStart];
+  abslx::Status status = [self performStart];
   if (!status.ok()) {
     if (error) {
       *error = [NSError gus_errorWithStatus:status];
@@ -229,8 +229,8 @@ if ([wrapper.delegate
   return YES;
 }
 
-- (absl::Status)performStart {
-  absl::Status status;
+- (abslx::Status)performStart {
+  abslx::Status status;
   for (const auto& service_packet : _servicePackets) {
     status = _graph->SetServicePacket(*service_packet.first, service_packet.second);
     if (!status.ok()) {
@@ -257,13 +257,13 @@ if ([wrapper.delegate
 }
 
 - (BOOL)closeInputStream:(const std::string&)inputName error:(NSError**)error {
-  absl::Status status = _graph->CloseInputStream(inputName);
+  abslx::Status status = _graph->CloseInputStream(inputName);
   if (!status.ok() && error) *error = [NSError gus_errorWithStatus:status];
   return status.ok();
 }
 
 - (BOOL)closeAllInputStreamsWithError:(NSError**)error {
-  absl::Status status = _graph->CloseAllInputStreams();
+  abslx::Status status = _graph->CloseAllInputStreams();
   if (!status.ok() && error) *error = [NSError gus_errorWithStatus:status];
   return status.ok();
 }
@@ -274,14 +274,14 @@ if ([wrapper.delegate
   // TODO: is this too heavy-handed? Maybe a warning would be fine.
   _GTMDevAssert(![NSThread isMainThread] || (NSClassFromString(@"XCTest")),
                 @"waitUntilDoneWithError: should not be called on the main thread");
-  absl::Status status = _graph->WaitUntilDone();
+  abslx::Status status = _graph->WaitUntilDone();
   _started = NO;
   if (!status.ok() && error) *error = [NSError gus_errorWithStatus:status];
   return status.ok();
 }
 
 - (BOOL)waitUntilIdleWithError:(NSError**)error {
-  absl::Status status = _graph->WaitUntilIdle();
+  abslx::Status status = _graph->WaitUntilIdle();
   if (!status.ok() && error) *error = [NSError gus_errorWithStatus:status];
   return status.ok();
 }
@@ -289,7 +289,7 @@ if ([wrapper.delegate
 - (BOOL)movePacket:(mediapipe::Packet&&)packet
         intoStream:(const std::string&)streamName
              error:(NSError**)error {
-  absl::Status status = _graph->AddPacketToInputStream(streamName, std::move(packet));
+  abslx::Status status = _graph->AddPacketToInputStream(streamName, std::move(packet));
   if (!status.ok() && error) *error = [NSError gus_errorWithStatus:status];
   return status.ok();
 }
@@ -297,7 +297,7 @@ if ([wrapper.delegate
 - (BOOL)sendPacket:(const mediapipe::Packet&)packet
         intoStream:(const std::string&)streamName
              error:(NSError**)error {
-  absl::Status status = _graph->AddPacketToInputStream(streamName, packet);
+  abslx::Status status = _graph->AddPacketToInputStream(streamName, packet);
   if (!status.ok() && error) *error = [NSError gus_errorWithStatus:status];
   return status.ok();
 }
@@ -305,7 +305,7 @@ if ([wrapper.delegate
 - (BOOL)setMaxQueueSize:(int)maxQueueSize
               forStream:(const std::string&)streamName
                   error:(NSError**)error {
-  absl::Status status = _graph->SetInputStreamMaxQueueSize(streamName, maxQueueSize);
+  abslx::Status status = _graph->SetInputStreamMaxQueueSize(streamName, maxQueueSize);
   if (!status.ok() && error) *error = [NSError gus_errorWithStatus:status];
   return status.ok();
 }
@@ -416,7 +416,7 @@ if ([wrapper.delegate
   NSString* extensionString;
   (void)gpu_resources->gl_context()->Run([&extensionString]{
     extensionString = [NSString stringWithUTF8String:(char*)glGetString(GL_EXTENSIONS)];
-    return absl::OkStatus();
+    return abslx::OkStatus();
   });
 
   NSArray* extensions = [extensionString componentsSeparatedByCharactersInSet:

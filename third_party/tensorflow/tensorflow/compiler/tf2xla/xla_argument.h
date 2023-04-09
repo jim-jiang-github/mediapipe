@@ -70,7 +70,7 @@ struct XlaArgument {
   // * an initialized TensorArray or Stack resource: the shape of an entry in
   //   the TensorArray/Stack. Note this is the size of a single entry, not the
   //   XLA data structure that represents the complete stack/array.
-  absl::variant<TensorShape, xla::Shape> shape;
+  abslx::variant<TensorShape, xla::Shape> shape;
 
   // The value of the argument, if it is a compile-time constant. Must be a
   // host-memory tensor.
@@ -116,7 +116,7 @@ struct XlaArgument {
 
   // Returns the dimension sizes for either TensorShape or xla::Shape.
   std::vector<int64_t> DimensionSizes() const;
-  absl::InlinedVector<int64_t, 4> DimensionSizesAsInlinedVector() const;
+  abslx::InlinedVector<int64_t, 4> DimensionSizesAsInlinedVector() const;
 
   // Returns the human-readable string for either TensorShape or xla::Shape.
   string ShapeHumanString() const;
@@ -129,7 +129,7 @@ struct XlaArgument {
 };
 
 // Returns true if any of `args` is an uninitialized resource variable.
-bool AnyUninitializedResourceArg(absl::Span<const XlaArgument> args);
+bool AnyUninitializedResourceArg(abslx::Span<const XlaArgument> args);
 
 }  // end namespace tensorflow
 

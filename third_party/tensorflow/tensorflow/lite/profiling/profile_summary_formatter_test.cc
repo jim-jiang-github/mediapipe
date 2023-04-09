@@ -66,14 +66,14 @@ TEST(SummaryWriterTest, SingleSubgraphOutputString) {
   std::string output = writer.GetOutputString(
       stats_calculator_map,
       tensorflow::StatsCalculator(writer.GetStatSummarizerOptions()));
-  ASSERT_TRUE(absl::StrContains(output, "Run Order"));
-  ASSERT_TRUE(absl::StrContains(output, "Top by Computation Time"));
-  ASSERT_TRUE(!absl::StrContains(output, "Top by Memory Use"));
-  ASSERT_TRUE(absl::StrContains(output, "Summary by node type"));
-  ASSERT_TRUE(absl::StrContains(output, "nodes observed"));
-  ASSERT_TRUE(!absl::StrContains(output, "Primary graph"));
-  ASSERT_TRUE(!absl::StrContains(output, "Subgraph"));
-  ASSERT_TRUE(!absl::StrContains(output, "Delegate internal"));
+  ASSERT_TRUE(abslx::StrContains(output, "Run Order"));
+  ASSERT_TRUE(abslx::StrContains(output, "Top by Computation Time"));
+  ASSERT_TRUE(!abslx::StrContains(output, "Top by Memory Use"));
+  ASSERT_TRUE(abslx::StrContains(output, "Summary by node type"));
+  ASSERT_TRUE(abslx::StrContains(output, "nodes observed"));
+  ASSERT_TRUE(!abslx::StrContains(output, "Primary graph"));
+  ASSERT_TRUE(!abslx::StrContains(output, "Subgraph"));
+  ASSERT_TRUE(!abslx::StrContains(output, "Delegate internal"));
 }
 
 TEST(SummaryWriterTest, SingleSubgraphShortSummary) {
@@ -85,14 +85,14 @@ TEST(SummaryWriterTest, SingleSubgraphShortSummary) {
   std::string output = writer.GetShortSummary(
       stats_calculator_map,
       tensorflow::StatsCalculator(writer.GetStatSummarizerOptions()));
-  ASSERT_TRUE(!absl::StrContains(output, "Run Order"));
-  ASSERT_TRUE(!absl::StrContains(output, "Top by Computation Time"));
-  ASSERT_TRUE(!absl::StrContains(output, "Top by Memory Use"));
-  ASSERT_TRUE(!absl::StrContains(output, "Summary by node type"));
-  ASSERT_TRUE(absl::StrContains(output, "nodes observed"));
-  ASSERT_TRUE(!absl::StrContains(output, "Primary graph"));
-  ASSERT_TRUE(!absl::StrContains(output, "Subgraph"));
-  ASSERT_TRUE(!absl::StrContains(output, "Delegate internal"));
+  ASSERT_TRUE(!abslx::StrContains(output, "Run Order"));
+  ASSERT_TRUE(!abslx::StrContains(output, "Top by Computation Time"));
+  ASSERT_TRUE(!abslx::StrContains(output, "Top by Memory Use"));
+  ASSERT_TRUE(!abslx::StrContains(output, "Summary by node type"));
+  ASSERT_TRUE(abslx::StrContains(output, "nodes observed"));
+  ASSERT_TRUE(!abslx::StrContains(output, "Primary graph"));
+  ASSERT_TRUE(!abslx::StrContains(output, "Subgraph"));
+  ASSERT_TRUE(!abslx::StrContains(output, "Delegate internal"));
 }
 
 TEST(SummaryWriterTest, MultiSubgraphOutputString) {
@@ -106,9 +106,9 @@ TEST(SummaryWriterTest, MultiSubgraphOutputString) {
   std::string output = writer.GetOutputString(
       stats_calculator_map,
       tensorflow::StatsCalculator(writer.GetStatSummarizerOptions()));
-  ASSERT_TRUE(absl::StrContains(output, "Primary graph"));
-  ASSERT_TRUE(absl::StrContains(output, "Subgraph"));
-  ASSERT_TRUE(!absl::StrContains(output, "Delegate internal"));
+  ASSERT_TRUE(abslx::StrContains(output, "Primary graph"));
+  ASSERT_TRUE(abslx::StrContains(output, "Subgraph"));
+  ASSERT_TRUE(!abslx::StrContains(output, "Delegate internal"));
 }
 
 TEST(SummaryWriterTest, MultiSubgraphShortSummary) {
@@ -122,9 +122,9 @@ TEST(SummaryWriterTest, MultiSubgraphShortSummary) {
   std::string output = writer.GetShortSummary(
       stats_calculator_map,
       tensorflow::StatsCalculator(writer.GetStatSummarizerOptions()));
-  ASSERT_TRUE(absl::StrContains(output, "Primary graph"));
-  ASSERT_TRUE(absl::StrContains(output, "Subgraph"));
-  ASSERT_TRUE(!absl::StrContains(output, "Delegate internal"));
+  ASSERT_TRUE(abslx::StrContains(output, "Primary graph"));
+  ASSERT_TRUE(abslx::StrContains(output, "Subgraph"));
+  ASSERT_TRUE(!abslx::StrContains(output, "Delegate internal"));
 }
 
 TEST(SummaryWriterTest, DelegationOutputString) {
@@ -135,9 +135,9 @@ TEST(SummaryWriterTest, DelegationOutputString) {
   std::string output = writer.GetOutputString(
       std::map<uint32_t, std::unique_ptr<tensorflow::StatsCalculator>>(),
       delegate_stats_calculator);
-  ASSERT_TRUE(!absl::StrContains(output, "Primary graph"));
-  ASSERT_TRUE(!absl::StrContains(output, "Subgraph"));
-  ASSERT_TRUE(absl::StrContains(output, "Delegate internal"));
+  ASSERT_TRUE(!abslx::StrContains(output, "Primary graph"));
+  ASSERT_TRUE(!abslx::StrContains(output, "Subgraph"));
+  ASSERT_TRUE(abslx::StrContains(output, "Delegate internal"));
 }
 
 TEST(SummaryWriterTest, DelegationShortSummary) {
@@ -148,9 +148,9 @@ TEST(SummaryWriterTest, DelegationShortSummary) {
   std::string output = writer.GetShortSummary(
       std::map<uint32_t, std::unique_ptr<tensorflow::StatsCalculator>>(),
       delegate_stats_calculator);
-  ASSERT_TRUE(!absl::StrContains(output, "Primary graph"));
-  ASSERT_TRUE(!absl::StrContains(output, "Subgraph"));
-  ASSERT_TRUE(absl::StrContains(output, "Delegate internal"));
+  ASSERT_TRUE(!abslx::StrContains(output, "Primary graph"));
+  ASSERT_TRUE(!abslx::StrContains(output, "Subgraph"));
+  ASSERT_TRUE(abslx::StrContains(output, "Delegate internal"));
 }
 
 }  // namespace

@@ -28,7 +28,7 @@ int ClientId() {
   char* client_id_str = std::getenv("DTENSOR_CLIENT_ID");
   if (client_id_str == nullptr) return 0;
   int client_id;
-  if (absl::SimpleAtoi(client_id_str, &client_id)) return client_id;
+  if (abslx::SimpleAtoi(client_id_str, &client_id)) return client_id;
   LOG(WARNING) << "Invalid DTENSOR_CLIENT_ID, using the default value 0.";
   return 0;
 }
@@ -39,7 +39,7 @@ int NumClients() {
   char* num_clients_str = std::getenv("DTENSOR_NUM_CLIENTS");
   if (num_clients_str == nullptr) return 1;
   int num_clients;
-  if (absl::SimpleAtoi(num_clients_str, &num_clients)) return num_clients;
+  if (abslx::SimpleAtoi(num_clients_str, &num_clients)) return num_clients;
   LOG(WARNING) << "Invalid DTENSOR_NUM_CLIENTS, using the default value 1.";
   return 1;
 }
@@ -62,7 +62,7 @@ int LayoutPropagationMaxSteps() {
       std::getenv("DTENSOR_LAYOUT_PROPAGATION_MAX_STEPS");
   if (dtensor_layout_propagation_max_steps_str == nullptr) return 500;
   int dtensor_layout_propagation_max_steps;
-  if (absl::SimpleAtoi(dtensor_layout_propagation_max_steps_str,
+  if (abslx::SimpleAtoi(dtensor_layout_propagation_max_steps_str,
                        &dtensor_layout_propagation_max_steps))
     return dtensor_layout_propagation_max_steps;
   LOG(WARNING) << "Invalid DTENSOR_LAYOUT_PROPAGATION_MAX_STEPS, using "
@@ -89,7 +89,7 @@ int ReduceInBfloat16MaxGroupSize() {
       std::getenv("DTENSOR_REDUCE_IN_BFLOAT16_MAX_GROUP_SIZE");
   if (dtensor_reduce_in_bfloat16_max_group_size_str == nullptr) return 8;
   int dtensor_reduce_in_bfloat16_max_group_size;
-  if (absl::SimpleAtoi(dtensor_reduce_in_bfloat16_max_group_size_str,
+  if (abslx::SimpleAtoi(dtensor_reduce_in_bfloat16_max_group_size_str,
                        &dtensor_reduce_in_bfloat16_max_group_size))
     return dtensor_reduce_in_bfloat16_max_group_size;
   LOG(WARNING) << "Invalid DTENSOR_REDUCE_IN_BFLOAT16_MAX_GROUP_SIZE, using "

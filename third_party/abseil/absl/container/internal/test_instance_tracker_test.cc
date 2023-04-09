@@ -18,10 +18,10 @@
 
 namespace {
 
-using absl::test_internal::CopyableMovableInstance;
-using absl::test_internal::CopyableOnlyInstance;
-using absl::test_internal::InstanceTracker;
-using absl::test_internal::MovableOnlyInstance;
+using abslx::test_internal::CopyableMovableInstance;
+using abslx::test_internal::CopyableOnlyInstance;
+using abslx::test_internal::InstanceTracker;
+using abslx::test_internal::MovableOnlyInstance;
 
 TEST(TestInstanceTracker, CopyableMovable) {
   InstanceTracker tracker;

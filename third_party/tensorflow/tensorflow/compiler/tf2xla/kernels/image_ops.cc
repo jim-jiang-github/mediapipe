@@ -344,7 +344,7 @@ struct WhileCondFn {
   explicit WhileCondFn(int64_t num_boxes, int64_t output_size)
       : num_boxes(num_boxes), output_size(output_size) {}
 
-  StatusOr<xla::XlaOp> operator()(absl::Span<const xla::XlaOp> values,
+  StatusOr<xla::XlaOp> operator()(abslx::Span<const xla::XlaOp> values,
                                   xla::XlaBuilder* cond_builder) const {
     xla::XlaOp row_idx = values[0];
     xla::XlaOp row_in_bounds =
@@ -366,7 +366,7 @@ struct SuppressBodyFn {
   explicit SuppressBodyFn(int64_t num_boxes) : num_boxes(num_boxes) {}
 
   StatusOr<std::vector<xla::XlaOp>> operator()(
-      absl::Span<const xla::XlaOp> values, xla::XlaBuilder* builder) const {
+      abslx::Span<const xla::XlaOp> values, xla::XlaBuilder* builder) const {
     auto row_idx = values[0];
     auto num_outputs_so_far = values[1];
     auto iou_mask = values[2];

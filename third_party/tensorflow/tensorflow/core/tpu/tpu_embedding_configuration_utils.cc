@@ -21,7 +21,7 @@ limitations under the License.
 namespace tensorflow {
 namespace tpu {
 
-absl::StatusOr<int32_t> ComputeTotalTagCountForDynamicLearningRates(
+abslx::StatusOr<int32_t> ComputeTotalTagCountForDynamicLearningRates(
     const tensorflow::tpu::TPUEmbeddingConfiguration& tpu_embedding_config) {
   // Ordering of tag elements helps make the subsequent error checking simpler.
   std::set<int32_t> tag_set;
@@ -38,7 +38,7 @@ absl::StatusOr<int32_t> ComputeTotalTagCountForDynamicLearningRates(
   int32_t next_tag = 0;
   for (const int32_t tag : tag_set) {
     if (tag != next_tag) {
-      return absl::InvalidArgumentError(absl::StrFormat(
+      return abslx::InvalidArgumentError(abslx::StrFormat(
           "Dynamic learning rate tag: %d not found in the TPU embedding "
           "configuration, instead found: %d. tag set size: %d",
           next_tag, tag, tag_set.size()));

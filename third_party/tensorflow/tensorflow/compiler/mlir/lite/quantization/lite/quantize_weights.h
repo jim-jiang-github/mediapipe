@@ -44,8 +44,8 @@ struct CustomOpInfo {
   bool no_side_effect = true;
 };
 
-using StringSet = absl::flat_hash_set<std::string>;
-using BuiltinOperatorSet = absl::flat_hash_set<tflite::BuiltinOperator>;
+using StringSet = abslx::flat_hash_set<std::string>;
+using BuiltinOperatorSet = abslx::flat_hash_set<tflite::BuiltinOperator>;
 // Map from custom op code to custom op quantization information.
 using CustomOpMap = std::unordered_map<std::string, CustomOpInfo>;
 

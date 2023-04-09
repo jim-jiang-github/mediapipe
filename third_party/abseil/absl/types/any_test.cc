@@ -14,7 +14,7 @@
 
 #include "absl/types/any.h"
 
-// This test is a no-op when absl::any is an alias for std::any.
+// This test is a no-op when abslx::any is an alias for std::any.
 #if !defined(ABSL_USES_STD_ANY)
 
 #include <initializer_list>
@@ -29,8 +29,8 @@
 #include "absl/container/internal/test_instance_tracker.h"
 
 namespace {
-using absl::test_internal::CopyableOnlyInstance;
-using absl::test_internal::InstanceTracker;
+using abslx::test_internal::CopyableOnlyInstance;
+using abslx::test_internal::InstanceTracker;
 
 template <typename T>
 const T& AsConst(const T& t) {
@@ -88,27 +88,27 @@ using FunctionType = void();
 void FunctionToEmplace() {}
 
 using ArrayType = int[2];
-using DecayedArray = absl::decay_t<ArrayType>;
+using DecayedArray = abslx::decay_t<ArrayType>;
 
 TEST(AnyTest, Noexcept) {
-  static_assert(std::is_nothrow_default_constructible<absl::any>(), "");
-  static_assert(std::is_nothrow_move_constructible<absl::any>(), "");
-  static_assert(std::is_nothrow_move_assignable<absl::any>(), "");
-  static_assert(noexcept(std::declval<absl::any&>().has_value()), "");
-  static_assert(noexcept(std::declval<absl::any&>().type()), "");
-  static_assert(noexcept(absl::any_cast<int>(std::declval<absl::any*>())), "");
+  static_assert(std::is_nothrow_default_constructible<abslx::any>(), "");
+  static_assert(std::is_nothrow_move_constructible<abslx::any>(), "");
+  static_assert(std::is_nothrow_move_assignable<abslx::any>(), "");
+  static_assert(noexcept(std::declval<abslx::any&>().has_value()), "");
+  static_assert(noexcept(std::declval<abslx::any&>().type()), "");
+  static_assert(noexcept(abslx::any_cast<int>(std::declval<abslx::any*>())), "");
   static_assert(
-      noexcept(std::declval<absl::any&>().swap(std::declval<absl::any&>())),
+      noexcept(std::declval<abslx::any&>().swap(std::declval<abslx::any&>())),
       "");
 
   using std::swap;
   static_assert(
-      noexcept(swap(std::declval<absl::any&>(), std::declval<absl::any&>())),
+      noexcept(swap(std::declval<abslx::any&>(), std::declval<abslx::any&>())),
       "");
 }
 
 TEST(AnyTest, HasValue) {
-  absl::any o;
+  abslx::any o;
   EXPECT_FALSE(o.has_value());
   o.emplace<int>();
   EXPECT_TRUE(o.has_value());
@@ -117,7 +117,7 @@ TEST(AnyTest, HasValue) {
 }
 
 TEST(AnyTest, Type) {
-  absl::any o;
+  abslx::any o;
   EXPECT_EQ(typeid(void), o.type());
   o.emplace<int>(5);
   EXPECT_EQ(typeid(int), o.type());
@@ -130,127 +130,127 @@ TEST(AnyTest, Type) {
 TEST(AnyTest, EmptyPointerCast) {
   // pointer-to-unqualified overload
   {
-    absl::any o;
-    EXPECT_EQ(nullptr, absl::any_cast<int>(&o));
+    abslx::any o;
+    EXPECT_EQ(nullptr, abslx::any_cast<int>(&o));
     o.emplace<int>();
-    EXPECT_NE(nullptr, absl::any_cast<int>(&o));
+    EXPECT_NE(nullptr, abslx::any_cast<int>(&o));
     o.reset();
-    EXPECT_EQ(nullptr, absl::any_cast<int>(&o));
+    EXPECT_EQ(nullptr, abslx::any_cast<int>(&o));
   }
 
   // pointer-to-const overload
   {
-    absl::any o;
-    EXPECT_EQ(nullptr, absl::any_cast<int>(&AsConst(o)));
+    abslx::any o;
+    EXPECT_EQ(nullptr, abslx::any_cast<int>(&AsConst(o)));
     o.emplace<int>();
-    EXPECT_NE(nullptr, absl::any_cast<int>(&AsConst(o)));
+    EXPECT_NE(nullptr, abslx::any_cast<int>(&AsConst(o)));
     o.reset();
-    EXPECT_EQ(nullptr, absl::any_cast<int>(&AsConst(o)));
+    EXPECT_EQ(nullptr, abslx::any_cast<int>(&AsConst(o)));
   }
 }
 
 TEST(AnyTest, InPlaceConstruction) {
   const CopyOnly copy_only{};
-  absl::any o(absl::in_place_type_t<IntMoveOnlyCopyOnly>(), 5, MoveOnly(),
+  abslx::any o(abslx::in_place_type_t<IntMoveOnlyCopyOnly>(), 5, MoveOnly(),
               copy_only);
-  IntMoveOnlyCopyOnly& v = absl::any_cast<IntMoveOnlyCopyOnly&>(o);
+  IntMoveOnlyCopyOnly& v = abslx::any_cast<IntMoveOnlyCopyOnly&>(o);
   EXPECT_EQ(5, v.value);
 }
 
 TEST(AnyTest, InPlaceConstructionVariableTemplate) {
   const CopyOnly copy_only{};
-  absl::any o(absl::in_place_type<IntMoveOnlyCopyOnly>, 5, MoveOnly(),
+  abslx::any o(abslx::in_place_type<IntMoveOnlyCopyOnly>, 5, MoveOnly(),
               copy_only);
-  auto& v = absl::any_cast<IntMoveOnlyCopyOnly&>(o);
+  auto& v = abslx::any_cast<IntMoveOnlyCopyOnly&>(o);
   EXPECT_EQ(5, v.value);
 }
 
 TEST(AnyTest, InPlaceConstructionWithCV) {
   const CopyOnly copy_only{};
-  absl::any o(absl::in_place_type_t<const volatile IntMoveOnlyCopyOnly>(), 5,
+  abslx::any o(abslx::in_place_type_t<const volatile IntMoveOnlyCopyOnly>(), 5,
               MoveOnly(), copy_only);
-  IntMoveOnlyCopyOnly& v = absl::any_cast<IntMoveOnlyCopyOnly&>(o);
+  IntMoveOnlyCopyOnly& v = abslx::any_cast<IntMoveOnlyCopyOnly&>(o);
   EXPECT_EQ(5, v.value);
 }
 
 TEST(AnyTest, InPlaceConstructionWithCVVariableTemplate) {
   const CopyOnly copy_only{};
-  absl::any o(absl::in_place_type<const volatile IntMoveOnlyCopyOnly>, 5,
+  abslx::any o(abslx::in_place_type<const volatile IntMoveOnlyCopyOnly>, 5,
               MoveOnly(), copy_only);
-  auto& v = absl::any_cast<IntMoveOnlyCopyOnly&>(o);
+  auto& v = abslx::any_cast<IntMoveOnlyCopyOnly&>(o);
   EXPECT_EQ(5, v.value);
 }
 
 TEST(AnyTest, InPlaceConstructionWithFunction) {
-  absl::any o(absl::in_place_type_t<FunctionType>(), FunctionToEmplace);
-  FunctionType*& construction_result = absl::any_cast<FunctionType*&>(o);
+  abslx::any o(abslx::in_place_type_t<FunctionType>(), FunctionToEmplace);
+  FunctionType*& construction_result = abslx::any_cast<FunctionType*&>(o);
   EXPECT_EQ(&FunctionToEmplace, construction_result);
 }
 
 TEST(AnyTest, InPlaceConstructionWithFunctionVariableTemplate) {
-  absl::any o(absl::in_place_type<FunctionType>, FunctionToEmplace);
-  auto& construction_result = absl::any_cast<FunctionType*&>(o);
+  abslx::any o(abslx::in_place_type<FunctionType>, FunctionToEmplace);
+  auto& construction_result = abslx::any_cast<FunctionType*&>(o);
   EXPECT_EQ(&FunctionToEmplace, construction_result);
 }
 
 TEST(AnyTest, InPlaceConstructionWithArray) {
   ArrayType ar = {5, 42};
-  absl::any o(absl::in_place_type_t<ArrayType>(), ar);
-  DecayedArray& construction_result = absl::any_cast<DecayedArray&>(o);
+  abslx::any o(abslx::in_place_type_t<ArrayType>(), ar);
+  DecayedArray& construction_result = abslx::any_cast<DecayedArray&>(o);
   EXPECT_EQ(&ar[0], construction_result);
 }
 
 TEST(AnyTest, InPlaceConstructionWithArrayVariableTemplate) {
   ArrayType ar = {5, 42};
-  absl::any o(absl::in_place_type<ArrayType>, ar);
-  auto& construction_result = absl::any_cast<DecayedArray&>(o);
+  abslx::any o(abslx::in_place_type<ArrayType>, ar);
+  auto& construction_result = abslx::any_cast<DecayedArray&>(o);
   EXPECT_EQ(&ar[0], construction_result);
 }
 
 TEST(AnyTest, InPlaceConstructionIlist) {
   const CopyOnly copy_only{};
-  absl::any o(absl::in_place_type_t<ListMoveOnlyCopyOnly>(), {1, 2, 3, 4},
+  abslx::any o(abslx::in_place_type_t<ListMoveOnlyCopyOnly>(), {1, 2, 3, 4},
               MoveOnly(), copy_only);
-  ListMoveOnlyCopyOnly& v = absl::any_cast<ListMoveOnlyCopyOnly&>(o);
+  ListMoveOnlyCopyOnly& v = abslx::any_cast<ListMoveOnlyCopyOnly&>(o);
   std::vector<int> expected_values = {1, 2, 3, 4};
   EXPECT_EQ(expected_values, v.values);
 }
 
 TEST(AnyTest, InPlaceConstructionIlistVariableTemplate) {
   const CopyOnly copy_only{};
-  absl::any o(absl::in_place_type<ListMoveOnlyCopyOnly>, {1, 2, 3, 4},
+  abslx::any o(abslx::in_place_type<ListMoveOnlyCopyOnly>, {1, 2, 3, 4},
               MoveOnly(), copy_only);
-  auto& v = absl::any_cast<ListMoveOnlyCopyOnly&>(o);
+  auto& v = abslx::any_cast<ListMoveOnlyCopyOnly&>(o);
   std::vector<int> expected_values = {1, 2, 3, 4};
   EXPECT_EQ(expected_values, v.values);
 }
 
 TEST(AnyTest, InPlaceConstructionIlistWithCV) {
   const CopyOnly copy_only{};
-  absl::any o(absl::in_place_type_t<const volatile ListMoveOnlyCopyOnly>(),
+  abslx::any o(abslx::in_place_type_t<const volatile ListMoveOnlyCopyOnly>(),
               {1, 2, 3, 4}, MoveOnly(), copy_only);
-  ListMoveOnlyCopyOnly& v = absl::any_cast<ListMoveOnlyCopyOnly&>(o);
+  ListMoveOnlyCopyOnly& v = abslx::any_cast<ListMoveOnlyCopyOnly&>(o);
   std::vector<int> expected_values = {1, 2, 3, 4};
   EXPECT_EQ(expected_values, v.values);
 }
 
 TEST(AnyTest, InPlaceConstructionIlistWithCVVariableTemplate) {
   const CopyOnly copy_only{};
-  absl::any o(absl::in_place_type<const volatile ListMoveOnlyCopyOnly>,
+  abslx::any o(abslx::in_place_type<const volatile ListMoveOnlyCopyOnly>,
               {1, 2, 3, 4}, MoveOnly(), copy_only);
-  auto& v = absl::any_cast<ListMoveOnlyCopyOnly&>(o);
+  auto& v = abslx::any_cast<ListMoveOnlyCopyOnly&>(o);
   std::vector<int> expected_values = {1, 2, 3, 4};
   EXPECT_EQ(expected_values, v.values);
 }
 
 TEST(AnyTest, InPlaceNoArgs) {
-  absl::any o(absl::in_place_type_t<int>{});
-  EXPECT_EQ(0, absl::any_cast<int&>(o));
+  abslx::any o(abslx::in_place_type_t<int>{});
+  EXPECT_EQ(0, abslx::any_cast<int&>(o));
 }
 
 TEST(AnyTest, InPlaceNoArgsVariableTemplate) {
-  absl::any o(absl::in_place_type<int>);
-  EXPECT_EQ(0, absl::any_cast<int&>(o));
+  abslx::any o(abslx::in_place_type<int>);
+  EXPECT_EQ(0, abslx::any_cast<int&>(o));
 }
 
 template <typename Enabler, typename T, typename... Args>
@@ -258,8 +258,8 @@ struct CanEmplaceAnyImpl : std::false_type {};
 
 template <typename T, typename... Args>
 struct CanEmplaceAnyImpl<
-    absl::void_t<decltype(
-        std::declval<absl::any&>().emplace<T>(std::declval<Args>()...))>,
+    abslx::void_t<decltype(
+        std::declval<abslx::any&>().emplace<T>(std::declval<Args>()...))>,
     T, Args...> : std::true_type {};
 
 template <typename T, typename... Args>
@@ -267,14 +267,14 @@ using CanEmplaceAny = CanEmplaceAnyImpl<void, T, Args...>;
 
 TEST(AnyTest, Emplace) {
   const CopyOnly copy_only{};
-  absl::any o;
+  abslx::any o;
   EXPECT_TRUE((std::is_same<decltype(o.emplace<IntMoveOnlyCopyOnly>(
                                 5, MoveOnly(), copy_only)),
                             IntMoveOnlyCopyOnly&>::value));
   IntMoveOnlyCopyOnly& emplace_result =
       o.emplace<IntMoveOnlyCopyOnly>(5, MoveOnly(), copy_only);
   EXPECT_EQ(5, emplace_result.value);
-  IntMoveOnlyCopyOnly& v = absl::any_cast<IntMoveOnlyCopyOnly&>(o);
+  IntMoveOnlyCopyOnly& v = abslx::any_cast<IntMoveOnlyCopyOnly&>(o);
   EXPECT_EQ(5, v.value);
   EXPECT_EQ(&emplace_result, &v);
 
@@ -284,7 +284,7 @@ TEST(AnyTest, Emplace) {
 
 TEST(AnyTest, EmplaceWithCV) {
   const CopyOnly copy_only{};
-  absl::any o;
+  abslx::any o;
   EXPECT_TRUE(
       (std::is_same<decltype(o.emplace<const volatile IntMoveOnlyCopyOnly>(
                         5, MoveOnly(), copy_only)),
@@ -292,13 +292,13 @@ TEST(AnyTest, EmplaceWithCV) {
   IntMoveOnlyCopyOnly& emplace_result =
       o.emplace<const volatile IntMoveOnlyCopyOnly>(5, MoveOnly(), copy_only);
   EXPECT_EQ(5, emplace_result.value);
-  IntMoveOnlyCopyOnly& v = absl::any_cast<IntMoveOnlyCopyOnly&>(o);
+  IntMoveOnlyCopyOnly& v = abslx::any_cast<IntMoveOnlyCopyOnly&>(o);
   EXPECT_EQ(5, v.value);
   EXPECT_EQ(&emplace_result, &v);
 }
 
 TEST(AnyTest, EmplaceWithFunction) {
-  absl::any o;
+  abslx::any o;
   EXPECT_TRUE(
       (std::is_same<decltype(o.emplace<FunctionType>(FunctionToEmplace)),
                     FunctionType*&>::value));
@@ -307,7 +307,7 @@ TEST(AnyTest, EmplaceWithFunction) {
 }
 
 TEST(AnyTest, EmplaceWithArray) {
-  absl::any o;
+  abslx::any o;
   ArrayType ar = {5, 42};
   EXPECT_TRUE(
       (std::is_same<decltype(o.emplace<ArrayType>(ar)), DecayedArray&>::value));
@@ -317,13 +317,13 @@ TEST(AnyTest, EmplaceWithArray) {
 
 TEST(AnyTest, EmplaceIlist) {
   const CopyOnly copy_only{};
-  absl::any o;
+  abslx::any o;
   EXPECT_TRUE((std::is_same<decltype(o.emplace<ListMoveOnlyCopyOnly>(
                                 {1, 2, 3, 4}, MoveOnly(), copy_only)),
                             ListMoveOnlyCopyOnly&>::value));
   ListMoveOnlyCopyOnly& emplace_result =
       o.emplace<ListMoveOnlyCopyOnly>({1, 2, 3, 4}, MoveOnly(), copy_only);
-  ListMoveOnlyCopyOnly& v = absl::any_cast<ListMoveOnlyCopyOnly&>(o);
+  ListMoveOnlyCopyOnly& v = abslx::any_cast<ListMoveOnlyCopyOnly&>(o);
   EXPECT_EQ(&v, &emplace_result);
   std::vector<int> expected_values = {1, 2, 3, 4};
   EXPECT_EQ(expected_values, v.values);
@@ -336,7 +336,7 @@ TEST(AnyTest, EmplaceIlist) {
 
 TEST(AnyTest, EmplaceIlistWithCV) {
   const CopyOnly copy_only{};
-  absl::any o;
+  abslx::any o;
   EXPECT_TRUE(
       (std::is_same<decltype(o.emplace<const volatile ListMoveOnlyCopyOnly>(
                         {1, 2, 3, 4}, MoveOnly(), copy_only)),
@@ -344,48 +344,48 @@ TEST(AnyTest, EmplaceIlistWithCV) {
   ListMoveOnlyCopyOnly& emplace_result =
       o.emplace<const volatile ListMoveOnlyCopyOnly>({1, 2, 3, 4}, MoveOnly(),
                                                      copy_only);
-  ListMoveOnlyCopyOnly& v = absl::any_cast<ListMoveOnlyCopyOnly&>(o);
+  ListMoveOnlyCopyOnly& v = abslx::any_cast<ListMoveOnlyCopyOnly&>(o);
   EXPECT_EQ(&v, &emplace_result);
   std::vector<int> expected_values = {1, 2, 3, 4};
   EXPECT_EQ(expected_values, v.values);
 }
 
 TEST(AnyTest, EmplaceNoArgs) {
-  absl::any o;
+  abslx::any o;
   o.emplace<int>();
-  EXPECT_EQ(0, absl::any_cast<int>(o));
+  EXPECT_EQ(0, abslx::any_cast<int>(o));
 }
 
 TEST(AnyTest, ConversionConstruction) {
   {
-    absl::any o = 5;
-    EXPECT_EQ(5, absl::any_cast<int>(o));
+    abslx::any o = 5;
+    EXPECT_EQ(5, abslx::any_cast<int>(o));
   }
 
   {
     const CopyOnly copy_only(5);
-    absl::any o = copy_only;
-    EXPECT_EQ(5, absl::any_cast<CopyOnly&>(o).value);
+    abslx::any o = copy_only;
+    EXPECT_EQ(5, abslx::any_cast<CopyOnly&>(o).value);
   }
 
-  static_assert(!std::is_convertible<MoveOnly, absl::any>::value, "");
+  static_assert(!std::is_convertible<MoveOnly, abslx::any>::value, "");
 }
 
 TEST(AnyTest, ConversionAssignment) {
   {
-    absl::any o;
+    abslx::any o;
     o = 5;
-    EXPECT_EQ(5, absl::any_cast<int>(o));
+    EXPECT_EQ(5, abslx::any_cast<int>(o));
   }
 
   {
     const CopyOnly copy_only(5);
-    absl::any o;
+    abslx::any o;
     o = copy_only;
-    EXPECT_EQ(5, absl::any_cast<CopyOnly&>(o).value);
+    EXPECT_EQ(5, abslx::any_cast<CopyOnly&>(o).value);
   }
 
-  static_assert(!std::is_assignable<MoveOnly, absl::any>::value, "");
+  static_assert(!std::is_assignable<MoveOnly, abslx::any>::value, "");
 }
 
 // Suppress MSVC warnings.
@@ -397,7 +397,7 @@ TEST(AnyTest, ConversionAssignment) {
 #endif
 
 // Weird type for testing, only used to make sure we "properly" perfect-forward
-// when being placed into an absl::any (use the l-value constructor if given an
+// when being placed into an abslx::any (use the l-value constructor if given an
 // l-value rather than use the copy constructor).
 struct WeirdConstructor42 {
   explicit WeirdConstructor42(int value) : value(value) {}
@@ -419,30 +419,30 @@ struct WeirdConstructor42 {
 TEST(AnyTest, WeirdConversionConstruction) {
   {
     const WeirdConstructor42 source(5);
-    absl::any o = source;  // Actual copy
-    EXPECT_EQ(5, absl::any_cast<WeirdConstructor42&>(o).value);
+    abslx::any o = source;  // Actual copy
+    EXPECT_EQ(5, abslx::any_cast<WeirdConstructor42&>(o).value);
   }
 
   {
     WeirdConstructor42 source(5);
-    absl::any o = source;  // Weird "conversion"
-    EXPECT_EQ(42, absl::any_cast<WeirdConstructor42&>(o).value);
+    abslx::any o = source;  // Weird "conversion"
+    EXPECT_EQ(42, abslx::any_cast<WeirdConstructor42&>(o).value);
   }
 }
 
 TEST(AnyTest, WeirdConversionAssignment) {
   {
     const WeirdConstructor42 source(5);
-    absl::any o;
+    abslx::any o;
     o = source;  // Actual copy
-    EXPECT_EQ(5, absl::any_cast<WeirdConstructor42&>(o).value);
+    EXPECT_EQ(5, abslx::any_cast<WeirdConstructor42&>(o).value);
   }
 
   {
     WeirdConstructor42 source(5);
-    absl::any o;
+    abslx::any o;
     o = source;  // Weird "conversion"
-    EXPECT_EQ(42, absl::any_cast<WeirdConstructor42&>(o).value);
+    EXPECT_EQ(42, abslx::any_cast<WeirdConstructor42&>(o).value);
   }
 }
 
@@ -450,20 +450,20 @@ struct Value {};
 
 TEST(AnyTest, AnyCastValue) {
   {
-    absl::any o;
+    abslx::any o;
     o.emplace<int>(5);
-    EXPECT_EQ(5, absl::any_cast<int>(o));
-    EXPECT_EQ(5, absl::any_cast<int>(AsConst(o)));
+    EXPECT_EQ(5, abslx::any_cast<int>(o));
+    EXPECT_EQ(5, abslx::any_cast<int>(AsConst(o)));
     static_assert(
-        std::is_same<decltype(absl::any_cast<Value>(o)), Value>::value, "");
+        std::is_same<decltype(abslx::any_cast<Value>(o)), Value>::value, "");
   }
 
   {
-    absl::any o;
+    abslx::any o;
     o.emplace<int>(5);
-    EXPECT_EQ(5, absl::any_cast<const int>(o));
-    EXPECT_EQ(5, absl::any_cast<const int>(AsConst(o)));
-    static_assert(std::is_same<decltype(absl::any_cast<const Value>(o)),
+    EXPECT_EQ(5, abslx::any_cast<const int>(o));
+    EXPECT_EQ(5, abslx::any_cast<const int>(AsConst(o)));
+    static_assert(std::is_same<decltype(abslx::any_cast<const Value>(o)),
                                const Value>::value,
                   "");
   }
@@ -471,39 +471,39 @@ TEST(AnyTest, AnyCastValue) {
 
 TEST(AnyTest, AnyCastReference) {
   {
-    absl::any o;
+    abslx::any o;
     o.emplace<int>(5);
-    EXPECT_EQ(5, absl::any_cast<int&>(o));
-    EXPECT_EQ(5, absl::any_cast<const int&>(AsConst(o)));
+    EXPECT_EQ(5, abslx::any_cast<int&>(o));
+    EXPECT_EQ(5, abslx::any_cast<const int&>(AsConst(o)));
     static_assert(
-        std::is_same<decltype(absl::any_cast<Value&>(o)), Value&>::value, "");
+        std::is_same<decltype(abslx::any_cast<Value&>(o)), Value&>::value, "");
   }
 
   {
-    absl::any o;
+    abslx::any o;
     o.emplace<int>(5);
-    EXPECT_EQ(5, absl::any_cast<const int>(o));
-    EXPECT_EQ(5, absl::any_cast<const int>(AsConst(o)));
-    static_assert(std::is_same<decltype(absl::any_cast<const Value&>(o)),
+    EXPECT_EQ(5, abslx::any_cast<const int>(o));
+    EXPECT_EQ(5, abslx::any_cast<const int>(AsConst(o)));
+    static_assert(std::is_same<decltype(abslx::any_cast<const Value&>(o)),
                                const Value&>::value,
                   "");
   }
 
   {
-    absl::any o;
+    abslx::any o;
     o.emplace<int>(5);
-    EXPECT_EQ(5, absl::any_cast<int&&>(std::move(o)));
-    static_assert(std::is_same<decltype(absl::any_cast<Value&&>(std::move(o))),
+    EXPECT_EQ(5, abslx::any_cast<int&&>(std::move(o)));
+    static_assert(std::is_same<decltype(abslx::any_cast<Value&&>(std::move(o))),
                                Value&&>::value,
                   "");
   }
 
   {
-    absl::any o;
+    abslx::any o;
     o.emplace<int>(5);
-    EXPECT_EQ(5, absl::any_cast<const int>(std::move(o)));
+    EXPECT_EQ(5, abslx::any_cast<const int>(std::move(o)));
     static_assert(
-        std::is_same<decltype(absl::any_cast<const Value&&>(std::move(o))),
+        std::is_same<decltype(abslx::any_cast<const Value&&>(std::move(o))),
                      const Value&&>::value,
         "");
   }
@@ -511,24 +511,24 @@ TEST(AnyTest, AnyCastReference) {
 
 TEST(AnyTest, AnyCastPointer) {
   {
-    absl::any o;
-    EXPECT_EQ(nullptr, absl::any_cast<char>(&o));
+    abslx::any o;
+    EXPECT_EQ(nullptr, abslx::any_cast<char>(&o));
     o.emplace<int>(5);
-    EXPECT_EQ(nullptr, absl::any_cast<char>(&o));
+    EXPECT_EQ(nullptr, abslx::any_cast<char>(&o));
     o.emplace<char>('a');
-    EXPECT_EQ('a', *absl::any_cast<char>(&o));
+    EXPECT_EQ('a', *abslx::any_cast<char>(&o));
     static_assert(
-        std::is_same<decltype(absl::any_cast<Value>(&o)), Value*>::value, "");
+        std::is_same<decltype(abslx::any_cast<Value>(&o)), Value*>::value, "");
   }
 
   {
-    absl::any o;
-    EXPECT_EQ(nullptr, absl::any_cast<const char>(&o));
+    abslx::any o;
+    EXPECT_EQ(nullptr, abslx::any_cast<const char>(&o));
     o.emplace<int>(5);
-    EXPECT_EQ(nullptr, absl::any_cast<const char>(&o));
+    EXPECT_EQ(nullptr, abslx::any_cast<const char>(&o));
     o.emplace<char>('a');
-    EXPECT_EQ('a', *absl::any_cast<const char>(&o));
-    static_assert(std::is_same<decltype(absl::any_cast<const Value>(&o)),
+    EXPECT_EQ('a', *abslx::any_cast<const char>(&o));
+    static_assert(std::is_same<decltype(abslx::any_cast<const Value>(&o)),
                                const Value*>::value,
                   "");
   }
@@ -536,17 +536,17 @@ TEST(AnyTest, AnyCastPointer) {
 
 TEST(AnyTest, MakeAny) {
   const CopyOnly copy_only{};
-  auto o = absl::make_any<IntMoveOnlyCopyOnly>(5, MoveOnly(), copy_only);
-  static_assert(std::is_same<decltype(o), absl::any>::value, "");
-  EXPECT_EQ(5, absl::any_cast<IntMoveOnlyCopyOnly&>(o).value);
+  auto o = abslx::make_any<IntMoveOnlyCopyOnly>(5, MoveOnly(), copy_only);
+  static_assert(std::is_same<decltype(o), abslx::any>::value, "");
+  EXPECT_EQ(5, abslx::any_cast<IntMoveOnlyCopyOnly&>(o).value);
 }
 
 TEST(AnyTest, MakeAnyIList) {
   const CopyOnly copy_only{};
   auto o =
-      absl::make_any<ListMoveOnlyCopyOnly>({1, 2, 3}, MoveOnly(), copy_only);
-  static_assert(std::is_same<decltype(o), absl::any>::value, "");
-  ListMoveOnlyCopyOnly& v = absl::any_cast<ListMoveOnlyCopyOnly&>(o);
+      abslx::make_any<ListMoveOnlyCopyOnly>({1, 2, 3}, MoveOnly(), copy_only);
+  static_assert(std::is_same<decltype(o), abslx::any>::value, "");
+  ListMoveOnlyCopyOnly& v = abslx::any_cast<ListMoveOnlyCopyOnly&>(o);
   std::vector<int> expected_values = {1, 2, 3};
   EXPECT_EQ(expected_values, v.values);
 }
@@ -556,71 +556,71 @@ TEST(AnyTest, Copy) {
   InstanceTracker tracker_raii;
 
   {
-    absl::any o(absl::in_place_type<CopyableOnlyInstance>, 123);
-    CopyableOnlyInstance* f1 = absl::any_cast<CopyableOnlyInstance>(&o);
+    abslx::any o(abslx::in_place_type<CopyableOnlyInstance>, 123);
+    CopyableOnlyInstance* f1 = abslx::any_cast<CopyableOnlyInstance>(&o);
 
-    absl::any o2(o);
-    const CopyableOnlyInstance* f2 = absl::any_cast<CopyableOnlyInstance>(&o2);
+    abslx::any o2(o);
+    const CopyableOnlyInstance* f2 = abslx::any_cast<CopyableOnlyInstance>(&o2);
     EXPECT_EQ(123, f2->value());
     EXPECT_NE(f1, f2);
 
-    absl::any o3;
+    abslx::any o3;
     o3 = o2;
-    const CopyableOnlyInstance* f3 = absl::any_cast<CopyableOnlyInstance>(&o3);
+    const CopyableOnlyInstance* f3 = abslx::any_cast<CopyableOnlyInstance>(&o3);
     EXPECT_EQ(123, f3->value());
     EXPECT_NE(f2, f3);
 
-    const absl::any o4(4);
+    const abslx::any o4(4);
     // copy construct from const lvalue ref.
-    absl::any o5 = o4;
-    EXPECT_EQ(4, absl::any_cast<int>(o4));
-    EXPECT_EQ(4, absl::any_cast<int>(o5));
+    abslx::any o5 = o4;
+    EXPECT_EQ(4, abslx::any_cast<int>(o4));
+    EXPECT_EQ(4, abslx::any_cast<int>(o5));
 
     // Copy construct from const rvalue ref.
-    absl::any o6 = std::move(o4);  // NOLINT
-    EXPECT_EQ(4, absl::any_cast<int>(o4));
-    EXPECT_EQ(4, absl::any_cast<int>(o6));
+    abslx::any o6 = std::move(o4);  // NOLINT
+    EXPECT_EQ(4, abslx::any_cast<int>(o4));
+    EXPECT_EQ(4, abslx::any_cast<int>(o6));
   }
 }
 
 TEST(AnyTest, Move) {
   InstanceTracker tracker_raii;
 
-  absl::any any1;
+  abslx::any any1;
   any1.emplace<CopyableOnlyInstance>(5);
 
   // This is a copy, so copy count increases to 1.
-  absl::any any2 = any1;
-  EXPECT_EQ(5, absl::any_cast<CopyableOnlyInstance&>(any1).value());
-  EXPECT_EQ(5, absl::any_cast<CopyableOnlyInstance&>(any2).value());
+  abslx::any any2 = any1;
+  EXPECT_EQ(5, abslx::any_cast<CopyableOnlyInstance&>(any1).value());
+  EXPECT_EQ(5, abslx::any_cast<CopyableOnlyInstance&>(any2).value());
   EXPECT_EQ(1, tracker_raii.copies());
 
   // This isn't a copy, so copy count doesn't increase.
-  absl::any any3 = std::move(any2);
-  EXPECT_EQ(5, absl::any_cast<CopyableOnlyInstance&>(any3).value());
+  abslx::any any3 = std::move(any2);
+  EXPECT_EQ(5, abslx::any_cast<CopyableOnlyInstance&>(any3).value());
   EXPECT_EQ(1, tracker_raii.copies());
 
-  absl::any any4;
+  abslx::any any4;
   any4 = std::move(any3);
-  EXPECT_EQ(5, absl::any_cast<CopyableOnlyInstance&>(any4).value());
+  EXPECT_EQ(5, abslx::any_cast<CopyableOnlyInstance&>(any4).value());
   EXPECT_EQ(1, tracker_raii.copies());
 
-  absl::any tmp4(4);
-  absl::any o4(std::move(tmp4));  // move construct
-  EXPECT_EQ(4, absl::any_cast<int>(o4));
+  abslx::any tmp4(4);
+  abslx::any o4(std::move(tmp4));  // move construct
+  EXPECT_EQ(4, abslx::any_cast<int>(o4));
   o4 = *&o4;  // self assign
-  EXPECT_EQ(4, absl::any_cast<int>(o4));
+  EXPECT_EQ(4, abslx::any_cast<int>(o4));
   EXPECT_TRUE(o4.has_value());
 
-  absl::any o5;
-  absl::any tmp5(5);
+  abslx::any o5;
+  abslx::any tmp5(5);
   o5 = std::move(tmp5);  // move assign
-  EXPECT_EQ(5, absl::any_cast<int>(o5));
+  EXPECT_EQ(5, abslx::any_cast<int>(o5));
 }
 
 // Reset the ObjectOwner with an object of a different type
 TEST(AnyTest, Reset) {
-  absl::any o;
+  abslx::any o;
   o.emplace<int>();
 
   o.reset();
@@ -633,8 +633,8 @@ TEST(AnyTest, Reset) {
 TEST(AnyTest, ConversionConstructionCausesOneCopy) {
   InstanceTracker tracker_raii;
   CopyableOnlyInstance counter(5);
-  absl::any o(counter);
-  EXPECT_EQ(5, absl::any_cast<CopyableOnlyInstance&>(o).value());
+  abslx::any o(counter);
+  EXPECT_EQ(5, abslx::any_cast<CopyableOnlyInstance&>(o).value());
   EXPECT_EQ(1, tracker_raii.copies());
 }
 
@@ -646,52 +646,52 @@ TEST(AnyTest, ConversionConstructionCausesOneCopy) {
 
 // If using a std `any` implementation, we can't check for a specific message.
 #define ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(...)                      \
-  ABSL_BASE_INTERNAL_EXPECT_FAIL((__VA_ARGS__), absl::bad_any_cast, \
+  ABSL_BASE_INTERNAL_EXPECT_FAIL((__VA_ARGS__), abslx::bad_any_cast, \
                                  "")
 
 #else
 
 // If using the absl `any` implementation, we can rely on a specific message.
 #define ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(...)                      \
-  ABSL_BASE_INTERNAL_EXPECT_FAIL((__VA_ARGS__), absl::bad_any_cast, \
+  ABSL_BASE_INTERNAL_EXPECT_FAIL((__VA_ARGS__), abslx::bad_any_cast, \
                                  "Bad any cast")
 
 #endif  // defined(ABSL_USES_STD_ANY)
 
 TEST(AnyTest, ThrowBadAlloc) {
   {
-    absl::any a;
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<int&>(a));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<const int&>(a));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<int&&>(absl::any{}));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<const int&&>(absl::any{}));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<int>(a));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<const int>(a));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<int>(absl::any{}));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<const int>(absl::any{}));
+    abslx::any a;
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<int&>(a));
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<const int&>(a));
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<int&&>(abslx::any{}));
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<const int&&>(abslx::any{}));
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<int>(a));
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<const int>(a));
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<int>(abslx::any{}));
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<const int>(abslx::any{}));
 
-    // const absl::any operand
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<const int&>(AsConst(a)));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<int>(AsConst(a)));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<const int>(AsConst(a)));
+    // const abslx::any operand
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<const int&>(AsConst(a)));
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<int>(AsConst(a)));
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<const int>(AsConst(a)));
   }
 
   {
-    absl::any a(absl::in_place_type<int>);
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<float&>(a));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<const float&>(a));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<float&&>(absl::any{}));
+    abslx::any a(abslx::in_place_type<int>);
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<float&>(a));
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<const float&>(a));
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<float&&>(abslx::any{}));
     ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(
-        absl::any_cast<const float&&>(absl::any{}));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<float>(a));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<const float>(a));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<float>(absl::any{}));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<const float>(absl::any{}));
+        abslx::any_cast<const float&&>(abslx::any{}));
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<float>(a));
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<const float>(a));
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<float>(abslx::any{}));
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<const float>(abslx::any{}));
 
-    // const absl::any operand
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<const float&>(AsConst(a)));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<float>(AsConst(a)));
-    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(absl::any_cast<const float>(AsConst(a)));
+    // const abslx::any operand
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<const float&>(AsConst(a)));
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<float>(AsConst(a)));
+    ABSL_ANY_TEST_EXPECT_BAD_ANY_CAST(abslx::any_cast<const float>(AsConst(a)));
   }
 }
 
@@ -716,37 +716,37 @@ struct BadCopyable {
 TEST(AnyTest, FailedCopy) {
   {
     const BadCopyable bad{};
-    ABSL_ANY_TEST_EXPECT_BAD_COPY(absl::any{bad});
+    ABSL_ANY_TEST_EXPECT_BAD_COPY(abslx::any{bad});
   }
 
   {
-    absl::any src(absl::in_place_type<BadCopyable>);
-    ABSL_ANY_TEST_EXPECT_BAD_COPY(absl::any{src});
+    abslx::any src(abslx::in_place_type<BadCopyable>);
+    ABSL_ANY_TEST_EXPECT_BAD_COPY(abslx::any{src});
   }
 
   {
     BadCopyable bad;
-    absl::any target;
+    abslx::any target;
     ABSL_ANY_TEST_EXPECT_BAD_COPY(target = bad);
   }
 
   {
     BadCopyable bad;
-    absl::any target(absl::in_place_type<BadCopyable>);
+    abslx::any target(abslx::in_place_type<BadCopyable>);
     ABSL_ANY_TEST_EXPECT_BAD_COPY(target = bad);
     EXPECT_TRUE(target.has_value());
   }
 
   {
-    absl::any src(absl::in_place_type<BadCopyable>);
-    absl::any target;
+    abslx::any src(abslx::in_place_type<BadCopyable>);
+    abslx::any target;
     ABSL_ANY_TEST_EXPECT_BAD_COPY(target = src);
     EXPECT_FALSE(target.has_value());
   }
 
   {
-    absl::any src(absl::in_place_type<BadCopyable>);
-    absl::any target(absl::in_place_type<BadCopyable>);
+    abslx::any src(abslx::in_place_type<BadCopyable>);
+    abslx::any target(abslx::in_place_type<BadCopyable>);
     ABSL_ANY_TEST_EXPECT_BAD_COPY(target = src);
     EXPECT_TRUE(target.has_value());
   }
@@ -756,13 +756,13 @@ TEST(AnyTest, FailedCopy) {
 TEST(AnyTest, FailedEmplace) {
   {
     BadCopyable bad;
-    absl::any target;
+    abslx::any target;
     ABSL_ANY_TEST_EXPECT_BAD_COPY(target.emplace<BadCopyable>(bad));
   }
 
   {
     BadCopyable bad;
-    absl::any target(absl::in_place_type<int>);
+    abslx::any target(abslx::in_place_type<int>);
     ABSL_ANY_TEST_EXPECT_BAD_COPY(target.emplace<BadCopyable>(bad));
 #if defined(ABSL_USES_STD_ANY) && defined(__GLIBCXX__)
     // libstdc++ std::any::emplace() implementation (as of 7.2) has a bug: if an

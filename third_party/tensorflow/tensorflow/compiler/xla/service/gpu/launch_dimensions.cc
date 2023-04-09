@@ -29,7 +29,7 @@ std::ostream& operator<<(std::ostream& out,
                          const LaunchDimensions& launch_dims) {
   LaunchDimensions::Dim3D block_counts = launch_dims.block_counts();
   LaunchDimensions::Dim3D thread_counts = launch_dims.thread_counts_per_block();
-  out << absl::StrFormat("[block: {%d, %d, %d}, thread: {%d, %d, %d}]",
+  out << abslx::StrFormat("[block: {%d, %d, %d}, thread: {%d, %d, %d}]",
                          block_counts.x, block_counts.y, block_counts.z,
                          thread_counts.x, thread_counts.y, thread_counts.z);
   return out;
@@ -171,7 +171,7 @@ StatusOr<LaunchDimensions> CalculateLaunchDimensions(
         ").");
   }
 
-  VLOG(2) << absl::StrFormat(
+  VLOG(2) << abslx::StrFormat(
       "Initialized the block count to %d, the block size .x=%d and .y=%d"
       " for %d elements in the tensor.",
       block_count, threads_per_block_x, threads_per_block_y, num_elements);

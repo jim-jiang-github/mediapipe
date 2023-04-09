@@ -658,7 +658,7 @@ struct Register {
     // after TF 2.6+.
     if (try_modular_filesystems) {
       const char* env_value = getenv("TF_USE_MODULAR_FILESYSTEM");
-      string load_plugin = env_value ? absl::AsciiStrToLower(env_value) : "";
+      string load_plugin = env_value ? abslx::AsciiStrToLower(env_value) : "";
       if (load_plugin == "true" || load_plugin == "1") {
         // We don't register the static filesystem and wait for SIG IO one
         LOG(WARNING) << "Using modular file system for '" << scheme << "'."

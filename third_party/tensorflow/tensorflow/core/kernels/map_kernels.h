@@ -227,7 +227,7 @@ Status TensorMapBinaryAdd(OpKernelContext* ctx, const TensorMap& a,
   // Values with keys in the intersection are added.
   out->tensors() = a.tensors();
   for (const std::pair<TensorKey, Tensor>& p : b.tensors()) {
-    absl::flat_hash_map<TensorKey, Tensor>::iterator it =
+    abslx::flat_hash_map<TensorKey, Tensor>::iterator it =
         out->tensors().find(p.first);
     if (it != out->tensors().end()) {
       Tensor out_tensor;

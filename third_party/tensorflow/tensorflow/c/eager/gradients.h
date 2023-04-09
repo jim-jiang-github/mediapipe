@@ -32,8 +32,8 @@ namespace gradients {
 // class AddGradientFunction : public GradientFunction {
 //  public:
 //   Status Compute(Context* ctx,
-//                  absl::Span<AbstractTensorHandle* const> grad_inputs,
-//                  absl::Span<AbstractTensorHandle*> grad_outputs) override {
+//                  abslx::Span<AbstractTensorHandle* const> grad_inputs,
+//                  abslx::Span<AbstractTensorHandle*> grad_outputs) override {
 //     grad_outputs[0] = grad_inputs[0];
 //     grad_outputs[1] = grad_inputs[0];
 //     grad_outputs[0]->Ref();
@@ -55,8 +55,8 @@ namespace gradients {
 class GradientFunction {
  public:
   virtual Status Compute(AbstractContext* ctx,
-                         absl::Span<AbstractTensorHandle* const> grad_outputs,
-                         absl::Span<AbstractTensorHandle*> grad_inputs) = 0;
+                         abslx::Span<AbstractTensorHandle* const> grad_outputs,
+                         abslx::Span<AbstractTensorHandle*> grad_inputs) = 0;
   virtual ~GradientFunction() {}
 };
 
@@ -83,7 +83,7 @@ class GradientRegistry {
                 std::unique_ptr<GradientFunction>* gradient_function) const;
 
  private:
-  absl::flat_hash_map<string, GradientFunctionFactory> registry_;
+  abslx::flat_hash_map<string, GradientFunctionFactory> registry_;
 };
 
 // TODO(srbs): Figure out if we can avoid declaring this in the public header.
@@ -146,14 +146,14 @@ class Tape : protected eager::GradientTape<AbstractTensorHandle,
   // on the tape and marks all its outputs as watched if at
   // least one input of the op is watched and has a trainable dtype.
   // op_name is optional and is used for debugging only.
-  void RecordOperation(absl::Span<AbstractTensorHandle* const> inputs,
-                       absl::Span<AbstractTensorHandle* const> outputs,
+  void RecordOperation(abslx::Span<AbstractTensorHandle* const> inputs,
+                       abslx::Span<AbstractTensorHandle* const> outputs,
                        GradientFunction* gradient_function,
                        const string& op_name = "");
   // Returns whether any tensor in a list of tensors is being watched and has
   // a trainable dtype.
   bool ShouldRecord(
-      absl::Span<const AbstractTensorHandle* const> tensors) const;
+      abslx::Span<const AbstractTensorHandle* const> tensors) const;
   // Unwatches this tensor on the tape. Mainly used for cleanup when deleting
   // eager tensors.
   void DeleteTrace(const AbstractTensorHandle*);
@@ -164,10 +164,10 @@ class Tape : protected eager::GradientTape<AbstractTensorHandle,
   // if not empty and not null. The result is populated with one tensor per
   // target element.
   Status ComputeGradient(
-      AbstractContext* ctx, absl::Span<AbstractTensorHandle* const> targets,
-      absl::Span<AbstractTensorHandle* const> sources,
-      absl::Span<AbstractTensorHandle* const> output_gradients,
-      absl::Span<AbstractTensorHandle*> result);
+      AbstractContext* ctx, abslx::Span<AbstractTensorHandle* const> targets,
+      abslx::Span<AbstractTensorHandle* const> sources,
+      abslx::Span<AbstractTensorHandle* const> output_gradients,
+      abslx::Span<AbstractTensorHandle*> result);
 };
 
 }  // namespace gradients

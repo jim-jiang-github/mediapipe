@@ -102,7 +102,7 @@ class GraphDefImporter {
   // Convert a function. This function must be thread-safe.
   Status ConvertFunctionDef(
       GraphFuncOp func_op,
-      const absl::flat_hash_map<StringPiece, StringPiece> &gradient_map,
+      const abslx::flat_hash_map<StringPiece, StringPiece> &gradient_map,
       const FunctionDef &function);
 
   // A result ID representing an output of `node`. E.g.
@@ -140,14 +140,14 @@ class GraphDefImporter {
     // All data results.
     ValueRange data;
     // Data results organized by output name.
-    absl::flat_hash_map<StringPiece, ValueRange> outputs;
+    abslx::flat_hash_map<StringPiece, ValueRange> outputs;
     // A list of unresolved backedges.
     std::vector<Backedge> backedges;
   };
 
   // State when converting a list of nodes.
   class ConversionState
-      : public absl::flat_hash_map<StringPiece, std::unique_ptr<ResultInfo>> {
+      : public abslx::flat_hash_map<StringPiece, std::unique_ptr<ResultInfo>> {
    public:
     // Create a conversion state with a placeholder value. Put the plaecholder
     // in the block so that it is owned.
@@ -205,7 +205,7 @@ class GraphDefImporter {
                                 SmallVectorImpl<Type> &types);
   // Convert function attributes to MLIR attributes.
   Status ConvertFunctionAttributes(
-      const absl::flat_hash_map<StringPiece, StringPiece> &gradient_map,
+      const abslx::flat_hash_map<StringPiece, StringPiece> &gradient_map,
       const FunctionDef &function, GraphFuncOp op, NamedAttrList &attrs);
   // Convert function argument attributes to MLIR attributes.
   Status ConvertArgumentAttributes(const OpDef::ArgDef &def,
@@ -232,7 +232,7 @@ class GraphDefImporter {
   OperationState placeholder_state_;
 
   // Map of function OpDefs.
-  absl::flat_hash_map<StringPiece, const OpDef *> function_op_defs_;
+  abslx::flat_hash_map<StringPiece, const OpDef *> function_op_defs_;
 };
 }  // namespace
 
@@ -280,7 +280,7 @@ StatusOr<OwningOpRef<ModuleOp>> GraphDefImporter::ConvertGraphDef(
   }
 
   // Build a map from function name to gradient function name.
-  absl::flat_hash_map<StringPiece, StringPiece> gradient_map;
+  abslx::flat_hash_map<StringPiece, StringPiece> gradient_map;
   gradient_map.reserve(graph.library().gradient_size());
   for (const tensorflow::GradientDef &gradient : graph.library().gradient())
     gradient_map.emplace(gradient.function_name(), gradient.gradient_func());
@@ -352,7 +352,7 @@ StatusOr<OwningOpRef<ModuleOp>> GraphDefImporter::ConvertGraphDef(
 }
 
 Status GraphDefImporter::ConvertFunctionAttributes(
-    const absl::flat_hash_map<StringPiece, StringPiece> &gradient_map,
+    const abslx::flat_hash_map<StringPiece, StringPiece> &gradient_map,
     const FunctionDef &function, GraphFuncOp op, NamedAttrList &attrs) {
   // Import the function attributes with a `tf.` prefix to match the current
   // infratructure expectations.
@@ -365,7 +365,7 @@ Status GraphDefImporter::ConvertFunctionAttributes(
     // `ConvertTensorProto` and `ConvertTensorShapeProto`.
     TF_ASSIGN_OR_RETURN(Attribute attr,
                         ConvertAttributeValue(name_attr.second, b_));
-    attrs.append(absl::StrCat("tf.", name_attr.first), attr);
+    attrs.append(abslx::StrCat("tf.", name_attr.first), attr);
   }
 
   // Convert the first-class attributes.
@@ -533,7 +533,7 @@ StatusOr<GraphDefImporter::Result> GraphDefImporter::GetResult(
 
 Status GraphDefImporter::ConvertFunctionDef(
     GraphFuncOp func_op,
-    const absl::flat_hash_map<StringPiece, StringPiece> &gradient_map,
+    const abslx::flat_hash_map<StringPiece, StringPiece> &gradient_map,
     const FunctionDef &function) {
   const OpDef &signature = function.signature();
   // TODO(jeffniu): Does the name need to be mangled?
@@ -654,10 +654,10 @@ Status GraphDefImporter::ConvertNodes(
     // Stringify a result ID.
     const auto id_to_str = [](const ResultId &id) {
       std::string name = id.node.str();
-      if (id.IsControl()) return absl::StrCat("^", name);
+      if (id.IsControl()) return abslx::StrCat("^", name);
       if (id.output.empty())
-        return id.index ? absl::StrCat(id.node.str(), ":", id.index) : name;
-      return absl::StrCat(name, ":", id.output.str(), ":", id.index);
+        return id.index ? abslx::StrCat(id.node.str(), ":", id.index) : name;
+      return abslx::StrCat(name, ":", id.output.str(), ":", id.index);
     };
     // Gather all missing input edges.
     std::vector<std::pair<std::string, std::string>> missing_edges;
@@ -747,7 +747,7 @@ Status GraphDefImporter::ConvertNodeDef(OpBuilder &builder, ConversionState &s,
   if (node.op().empty())
     return InvalidArgument("Node ", node.name(), " has an empty op name");
 
-  OperationState state(ConvertLocation(node), absl::StrCat("tfg.", node.op()));
+  OperationState state(ConvertLocation(node), abslx::StrCat("tfg.", node.op()));
 
   // The GraphImporter does light shape inference, but here we will defer all of
   // that to the shape inference pass.

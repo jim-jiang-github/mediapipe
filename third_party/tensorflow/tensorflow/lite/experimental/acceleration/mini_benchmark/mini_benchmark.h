@@ -110,7 +110,7 @@ class MinibenchmarkImplementationRegistry {
       const std::string& model_namespace, const std::string& model_id);
   static MinibenchmarkImplementationRegistry* GetSingleton();
 
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
   std::unordered_map<std::string, CreatorFunction> factories_
       ABSL_GUARDED_BY(mutex_);
 };

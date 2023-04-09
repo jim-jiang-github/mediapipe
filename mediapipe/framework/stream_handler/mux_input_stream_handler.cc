@@ -55,7 +55,7 @@ class MuxInputStreamHandler : public InputStreamHandler {
   //   stream at the next timestamp.
   NodeReadiness GetNodeReadiness(Timestamp* min_stream_timestamp) override {
     DCHECK(min_stream_timestamp);
-    absl::MutexLock lock(&input_streams_mutex_);
+    abslx::MutexLock lock(&input_streams_mutex_);
 
     const auto& control_stream =
         input_stream_managers_.Get(input_stream_managers_.EndId() - 1);
@@ -109,7 +109,7 @@ class MuxInputStreamHandler : public InputStreamHandler {
                     InputStreamShardSet* input_set) override {
     CHECK(input_timestamp.IsAllowedInStream());
     CHECK(input_set);
-    absl::MutexLock lock(&input_streams_mutex_);
+    abslx::MutexLock lock(&input_streams_mutex_);
 
     const CollectionItemId control_stream_id =
         input_stream_managers_.EndId() - 1;
@@ -119,7 +119,7 @@ class MuxInputStreamHandler : public InputStreamHandler {
     Packet control_packet = control_stream->PopPacketAtTimestamp(
         input_timestamp, &num_packets_dropped, &stream_is_done);
     CHECK_EQ(num_packets_dropped, 0)
-        << absl::Substitute("Dropped $0 packet(s) on input stream \"$1\".",
+        << abslx::Substitute("Dropped $0 packet(s) on input stream \"$1\".",
                             num_packets_dropped, control_stream->Name());
     CHECK(!control_packet.IsEmpty());
     int control_value = control_packet.Get<int>();
@@ -135,7 +135,7 @@ class MuxInputStreamHandler : public InputStreamHandler {
     Packet data_packet = data_stream->PopPacketAtTimestamp(
         input_timestamp, &num_packets_dropped, &stream_is_done);
     CHECK_EQ(num_packets_dropped, 0)
-        << absl::Substitute("Dropped $0 packet(s) on input stream \"$1\".",
+        << abslx::Substitute("Dropped $0 packet(s) on input stream \"$1\".",
                             num_packets_dropped, data_stream->Name());
     AddPacketToShard(&input_set->Get(data_stream_id), std::move(data_packet),
                      stream_is_done);
@@ -154,7 +154,7 @@ class MuxInputStreamHandler : public InputStreamHandler {
  private:
   // Must be acquired when manipulating the control and data streams to ensure
   // we have a consistent view of the two streams.
-  absl::Mutex input_streams_mutex_;
+  abslx::Mutex input_streams_mutex_;
 };
 
 REGISTER_INPUT_STREAM_HANDLER(MuxInputStreamHandler);

@@ -68,9 +68,9 @@ class BorderDetectionCalculator : public CalculatorBase {
   BorderDetectionCalculator& operator=(const BorderDetectionCalculator&) =
       delete;
 
-  static absl::Status GetContract(mediapipe::CalculatorContract* cc);
-  absl::Status Open(mediapipe::CalculatorContext* cc) override;
-  absl::Status Process(mediapipe::CalculatorContext* cc) override;
+  static abslx::Status GetContract(mediapipe::CalculatorContract* cc);
+  abslx::Status Open(mediapipe::CalculatorContext* cc) override;
+  abslx::Status Process(mediapipe::CalculatorContext* cc) override;
 
  private:
   // Given a color and image direction, check to see if a border of that color
@@ -83,7 +83,7 @@ class BorderDetectionCalculator : public CalculatorBase {
   double ColorCount(const Color& mask_color, const cv::Mat& image) const;
 
   // Set member vars (image size) and confirm no changes frame-to-frame.
-  absl::Status SetAndCheckInputs(const cv::Mat& frame);
+  abslx::Status SetAndCheckInputs(const cv::Mat& frame);
 
   // Find the dominant color for a input image.
   double FindDominantColor(const cv::Mat& image, Color* dominant_color);
@@ -97,14 +97,14 @@ class BorderDetectionCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(BorderDetectionCalculator);
 
-absl::Status BorderDetectionCalculator::Open(mediapipe::CalculatorContext* cc) {
+abslx::Status BorderDetectionCalculator::Open(mediapipe::CalculatorContext* cc) {
   options_ = cc->Options<BorderDetectionCalculatorOptions>();
   RET_CHECK_LT(options_.vertical_search_distance(), 0.5)
       << "Search distance must be less than half the full image.";
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status BorderDetectionCalculator::SetAndCheckInputs(
+abslx::Status BorderDetectionCalculator::SetAndCheckInputs(
     const cv::Mat& frame) {
   if (frame_width_ < 0) {
     frame_width_ = frame.cols;
@@ -117,10 +117,10 @@ absl::Status BorderDetectionCalculator::SetAndCheckInputs(
   RET_CHECK_EQ(frame.rows, frame_height_)
       << "Input frame dimensions must remain constant throughout the video.";
   RET_CHECK_EQ(frame.channels(), 3) << "Input video type must be 3-channel";
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status BorderDetectionCalculator::Process(
+abslx::Status BorderDetectionCalculator::Process(
     mediapipe::CalculatorContext* cc) {
   if (!cc->Inputs().HasTag(kVideoInputTag) ||
       cc->Inputs().Tag(kVideoInputTag).Value().IsEmpty()) {
@@ -134,7 +134,7 @@ absl::Status BorderDetectionCalculator::Process(
 
   // Initialize output and set default values.
   std::unique_ptr<StaticFeatures> features =
-      absl::make_unique<StaticFeatures>();
+      abslx::make_unique<StaticFeatures>();
   features->mutable_non_static_area()->set_x(0);
   features->mutable_non_static_area()->set_width(frame_width_);
   features->mutable_non_static_area()->set_y(options_.default_padding_px());
@@ -172,7 +172,7 @@ absl::Status BorderDetectionCalculator::Process(
       .Tag(kDetectedBorders)
       .AddPacket(Adopt(features.release()).At(cc->InputTimestamp()));
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 //  Find the dominant color within an image.
@@ -290,11 +290,11 @@ void BorderDetectionCalculator::DetectBorder(
   }
 }
 
-absl::Status BorderDetectionCalculator::GetContract(
+abslx::Status BorderDetectionCalculator::GetContract(
     mediapipe::CalculatorContract* cc) {
   cc->Inputs().Tag(kVideoInputTag).Set<ImageFrame>();
   cc->Outputs().Tag(kDetectedBorders).Set<StaticFeatures>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace autoflip

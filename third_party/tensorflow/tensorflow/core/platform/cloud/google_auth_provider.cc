@@ -160,7 +160,7 @@ Status GoogleAuthProvider::GetToken(string* t) {
 
   char* no_gce_check_var = std::getenv(kNoGceCheck);
   bool skip_gce_check = no_gce_check_var != nullptr &&
-                        absl::EqualsIgnoreCase(no_gce_check_var, "true");
+                        abslx::EqualsIgnoreCase(no_gce_check_var, "true");
   Status token_from_gce_status;
   if (skip_gce_check) {
     token_from_gce_status =

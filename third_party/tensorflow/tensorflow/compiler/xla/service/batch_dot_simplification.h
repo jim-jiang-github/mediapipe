@@ -30,8 +30,8 @@ class BatchDotSimplification : public HloModulePass {
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
-  absl::string_view name() const override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
+  abslx::string_view name() const override;
 
  private:
   StatusOr<bool> ElideDegenerateBatchDimensionFromBatchDot(

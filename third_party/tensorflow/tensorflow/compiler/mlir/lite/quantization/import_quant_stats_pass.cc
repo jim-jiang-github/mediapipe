@@ -126,12 +126,12 @@ bool ImportQuantStatsPass::ParseQuantStats(const std::string &stats_str) {
   for (const auto &entry : quant_stats.entries()) {
     if (!entry.name().empty()) {
       std::vector<std::string> name_and_port =
-          absl::StrSplit(entry.name(), ':');
+          abslx::StrSplit(entry.name(), ':');
       int port = name_and_port.size() == 2 ? std::stoi(name_and_port[1]) : -1;
       name_to_info_.insert({name_and_port[0], {port, entry}});
     } else if (!entry.name_regex().empty()) {
       std::vector<std::string> name_and_port =
-          absl::StrSplit(entry.name_regex(), ':');
+          abslx::StrSplit(entry.name_regex(), ':');
       int port = name_and_port.size() == 2 ? std::stoi(name_and_port[1]) : -1;
       regex_to_info_.insert({name_and_port[0], {port, entry}});
     }

@@ -25,7 +25,7 @@
 
 namespace mediapipe {
 
-absl::StatusOr<std::unique_ptr<AffineTransformation::Runner<
+abslx::StatusOr<std::unique_ptr<AffineTransformation::Runner<
     mediapipe::GpuBuffer, std::unique_ptr<mediapipe::GpuBuffer>>>>
 CreateAffineTransformationGlRunner(
     std::shared_ptr<mediapipe::GlCalculatorHelper> gl_helper,

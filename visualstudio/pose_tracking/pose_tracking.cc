@@ -24,7 +24,7 @@ DEFINE_SUBGRAPH(PoseRendererCpu, "../../mediapipe/graphs/pose_tracking/subgraphs
   DEFINE_SUBGRAPH(PoseLandmarksToRenderData, "../../mediapipe/graphs/pose_tracking/subgraphs/pose_landmarks_to_render_data.pbtxt");
 }
 
-absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
+abslx::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
   mediapipe::CalculatorGraphConfig config;
   if (read_config_from_pbtxt(config, calculator_graph_config_file)) {
     download_mediapipe_asset_from_GCS("../mediapipe/modules/pose_landmark/pose_landmark_lite.tflite");
@@ -33,7 +33,7 @@ absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
     download_mediapipe_asset_from_GCS("../mediapipe/modules/pose_detection/pose_detection.tflite");
     return graph.Initialize(config);
   }
-  return absl::NotFoundError(calculator_graph_config_file);
+  return abslx::NotFoundError(calculator_graph_config_file);
 }
 
 // the program entrance point, the main().

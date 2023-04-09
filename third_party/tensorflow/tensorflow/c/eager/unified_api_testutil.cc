@@ -35,7 +35,7 @@ AbstractContext* BuildFunction(const char* fn_name) {
 }
 
 Status CreateParamsForInputs(AbstractContext* ctx,
-                             absl::Span<AbstractTensorHandle* const> inputs,
+                             abslx::Span<AbstractTensorHandle* const> inputs,
                              std::vector<AbstractTensorHandle*>* params) {
   tracing::TracingTensorHandle* handle = nullptr;
   for (auto input : inputs) {
@@ -50,8 +50,8 @@ Status CreateParamsForInputs(AbstractContext* ctx,
 
 // Runs `model` maybe wrapped in a function.
 Status RunModel(Model model, AbstractContext* ctx,
-                absl::Span<AbstractTensorHandle* const> inputs,
-                absl::Span<AbstractTensorHandle*> outputs, bool use_function) {
+                abslx::Span<AbstractTensorHandle* const> inputs,
+                abslx::Span<AbstractTensorHandle*> outputs, bool use_function) {
   if (use_function) {
     const char* fn_name = "test_fn";
     core::RefCountPtr<AbstractFunction> scoped_func;
@@ -59,7 +59,7 @@ Status RunModel(Model model, AbstractContext* ctx,
     // track of indices in the model's outputs are nullptr in this set.
     // The FunctionDef only outputs the non-null tensors. We later pad the
     // function op outputs to have nullptrs at the `null_indices`.
-    absl::flat_hash_set<int> null_indices;
+    abslx::flat_hash_set<int> null_indices;
     {
       AbstractContextPtr func_ctx(BuildFunction(fn_name));
       std::vector<AbstractTensorHandle*> func_inputs;
@@ -68,8 +68,8 @@ Status RunModel(Model model, AbstractContext* ctx,
           CreateParamsForInputs(func_ctx.get(), inputs, &func_inputs));
       std::vector<AbstractTensorHandle*> model_outputs;
       model_outputs.resize(outputs.size());
-      TF_RETURN_IF_ERROR(model(func_ctx.get(), absl::MakeSpan(func_inputs),
-                               absl::MakeSpan(model_outputs)));
+      TF_RETURN_IF_ERROR(model(func_ctx.get(), abslx::MakeSpan(func_inputs),
+                               abslx::MakeSpan(model_outputs)));
       for (auto func_input : func_inputs) {
         func_input->Unref();
       }
@@ -102,7 +102,7 @@ Status RunModel(Model model, AbstractContext* ctx,
     int retvals = outputs.size() - null_indices.size();
     std::vector<AbstractTensorHandle*> fn_outputs(retvals);
     TF_RETURN_IF_ERROR(fn_op->Execute(
-        absl::Span<AbstractTensorHandle*>(fn_outputs.data(), fn_outputs.size()),
+        abslx::Span<AbstractTensorHandle*>(fn_outputs.data(), fn_outputs.size()),
         &retvals));
     int skipped_indices = 0;
     for (int i = 0; i < outputs.size(); i++) {

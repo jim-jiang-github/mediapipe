@@ -42,7 +42,7 @@ class TensorsToAudioCalculatorFftTest : public ::testing::Test {
 
   void ConfigGraph(int num_samples, double sample_rate, int fft_size) {
     graph_config_ = ParseTextProtoOrDie<CalculatorGraphConfig>(
-        absl::Substitute(R"(
+        abslx::Substitute(R"(
         input_stream: "audio_in"
         input_stream: "sample_rate"
         output_stream: "audio_out"
@@ -101,7 +101,7 @@ TEST_F(TensorsToAudioCalculatorFftTest, TestInvalidFftSize) {
   MP_ASSERT_OK(graph_.Initialize(graph_config_));
   MP_ASSERT_OK(graph_.StartRun({}));
   auto status = graph_.WaitUntilIdle();
-  EXPECT_EQ(status.code(), absl::StatusCode::kInternal);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInternal);
   EXPECT_THAT(status.message(),
               ::testing::HasSubstr("FFT size must be of the form"));
 }

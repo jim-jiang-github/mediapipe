@@ -54,7 +54,7 @@ constexpr char kTimestampedEmbeddingsName[] = "timestamped_embeddings_out";
 
 class EmbeddingAggregationCalculatorTest : public tflite_shims::testing::Test {
  protected:
-  absl::StatusOr<OutputStreamPoller> BuildGraph(bool connect_timestamps) {
+  abslx::StatusOr<OutputStreamPoller> BuildGraph(bool connect_timestamps) {
     Graph graph;
     auto& calculator = graph.AddNode("EmbeddingAggregationCalculator");
     graph[Input<EmbeddingResult>(kEmbeddingsTag)].SetName(kEmbeddingsInName) >>
@@ -85,7 +85,7 @@ class EmbeddingAggregationCalculatorTest : public tflite_shims::testing::Test {
     return poller;
   }
 
-  absl::Status Send(
+  abslx::Status Send(
       const EmbeddingResult& embeddings, int timestamp = 0,
       std::optional<std::vector<int>> aggregation_timestamps = std::nullopt) {
     MP_RETURN_IF_ERROR(calculator_graph_.AddPacketToInputStream(
@@ -99,17 +99,17 @@ class EmbeddingAggregationCalculatorTest : public tflite_shims::testing::Test {
       MP_RETURN_IF_ERROR(calculator_graph_.AddPacketToInputStream(
           kTimestampsName, Adopt(packet.release()).At(Timestamp(timestamp))));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   template <typename T>
-  absl::StatusOr<T> GetResult(OutputStreamPoller& poller) {
+  abslx::StatusOr<T> GetResult(OutputStreamPoller& poller) {
     MP_RETURN_IF_ERROR(calculator_graph_.WaitUntilIdle());
     MP_RETURN_IF_ERROR(calculator_graph_.CloseAllInputStreams());
 
     Packet packet;
     if (!poller.Next(&packet)) {
-      return absl::InternalError("Unable to get output packet");
+      return abslx::InternalError("Unable to get output packet");
     }
     auto result = packet.Get<T>();
     MP_RETURN_IF_ERROR(calculator_graph_.WaitUntilDone());

@@ -51,7 +51,7 @@ struct Endpoint {
 // functions are transformed.
 static Node* AddNoOp(StringPiece name, Graph* g) {
   NodeDef ndef;
-  ndef.set_name(g->NewName(absl::StrCat(kNodeLabel, "/", name)));
+  ndef.set_name(g->NewName(abslx::StrCat(kNodeLabel, "/", name)));
   ndef.set_op("NoOp");
   Status s;
   Node* ret = g->AddNode(ndef, &s);
@@ -62,7 +62,7 @@ static Node* AddNoOp(StringPiece name, Graph* g) {
 static Node* AddIdentity(StringPiece name, Graph* g, Endpoint input) {
   DCHECK_LT(0, input.dtype());
   NodeDef ndef;
-  ndef.set_name(g->NewName(absl::StrCat(kNodeLabel, "/", name)));
+  ndef.set_name(g->NewName(abslx::StrCat(kNodeLabel, "/", name)));
   ndef.set_op("Identity");
   ndef.add_input(input.name());
   AddNodeAttr("T", BaseType(input.dtype()), &ndef);
@@ -178,11 +178,11 @@ bool RemoveListArrayConverter(Graph* g) {
       gtl::InlinedVector<Node*, 8> identity_nodes(n->num_inputs(), nullptr);
 
       const auto no_op = [&](StringPiece name) -> Node* {
-        return AddNoOp(absl::StrCat(n->name(), "/", name), g);
+        return AddNoOp(abslx::StrCat(n->name(), "/", name), g);
       };
 
       const auto identity = [&](StringPiece name, Endpoint input) -> Node* {
-        Node* node = AddIdentity(absl::StrCat(n->name(), "/", name), g, input);
+        Node* node = AddIdentity(abslx::StrCat(n->name(), "/", name), g, input);
         node->set_requested_device(input.node->def().device());
         return node;
       };

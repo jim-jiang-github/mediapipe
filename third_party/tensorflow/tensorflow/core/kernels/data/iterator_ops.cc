@@ -136,7 +136,7 @@ Status IteratorResource::GetNext(OpKernelContext* ctx,
       &deregister_fn));
   auto cleanup = gtl::MakeCleanup(std::move(deregister_fn));
 
-  const absl::Time start_time = metrics_collector_.RecordStart();
+  const abslx::Time start_time = metrics_collector_.RecordStart();
   auto iterator_ = captured_state->iterator();
   auto status = iterator_->GetNext(IteratorContext(std::move(params)),
                                    out_tensors, end_of_sequence);
@@ -1105,7 +1105,7 @@ void DeserializeIteratorOp::Compute(OpKernelContext* ctx) {
     OP_REQUIRES_OK(
         ctx,
         errors::CreateWithUpdatedMessage(
-            s, absl::StrCat(
+            s, abslx::StrCat(
                    "Failed to restore dataset iterator from checkpoint: ",
                    s.error_message(),
                    ". Make sure the dataset definition has not changed between "

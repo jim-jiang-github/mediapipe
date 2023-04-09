@@ -24,7 +24,7 @@ namespace tflite {
 namespace gpu {
 
 template <Axis axis>
-absl::Status CumsumHWC(TestExecutionEnvironment* env) {
+abslx::Status CumsumHWC(TestExecutionEnvironment* env) {
   Tensor<HWC, DataType::FLOAT32> src_tensor;
   src_tensor.shape = HWC(8, 6, 4);
   BHWC shape = BHWC(1, 8, 6, 4);
@@ -106,11 +106,11 @@ absl::Status CumsumHWC(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear(expected[axis], dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <Axis axis>
-absl::Status CumsumBHWC(TestExecutionEnvironment* env) {
+abslx::Status CumsumBHWC(TestExecutionEnvironment* env) {
   Tensor<BHWC, DataType::FLOAT32> src_tensor;
   src_tensor.shape = BHWC(6, 8, 1, 4);
   BHWC shape = BHWC(6, 8, 1, 4);
@@ -203,22 +203,22 @@ absl::Status CumsumBHWC(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear(expected[axis], dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CumsumHWCTest(TestExecutionEnvironment* env) {
+abslx::Status CumsumHWCTest(TestExecutionEnvironment* env) {
   RETURN_IF_ERROR(CumsumHWC<Axis::HEIGHT>(env));
   RETURN_IF_ERROR(CumsumHWC<Axis::WIDTH>(env));
   RETURN_IF_ERROR(CumsumHWC<Axis::CHANNELS>(env));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CumsumBHWCTest(TestExecutionEnvironment* env) {
+abslx::Status CumsumBHWCTest(TestExecutionEnvironment* env) {
   RETURN_IF_ERROR(CumsumBHWC<Axis::BATCH>(env));
   RETURN_IF_ERROR(CumsumBHWC<Axis::HEIGHT>(env));
   RETURN_IF_ERROR(CumsumBHWC<Axis::WIDTH>(env));
   RETURN_IF_ERROR(CumsumBHWC<Axis::CHANNELS>(env));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

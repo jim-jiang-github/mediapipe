@@ -24,7 +24,7 @@ namespace mediapipe {
 namespace {
 
 void RunParallelTest() {
-  absl::Mutex numbers_mutex;
+  abslx::Mutex numbers_mutex;
   std::vector<int> numbers;
   const int kArraySize = 5000;
 
@@ -32,7 +32,7 @@ void RunParallelTest() {
   ParallelFor(0, kArraySize, 1,
               [&numbers_mutex, &numbers](const BlockedRange& b) {
                 for (int k = b.begin(); k != b.end(); ++k) {
-                  absl::MutexLock lock(&numbers_mutex);
+                  abslx::MutexLock lock(&numbers_mutex);
                   numbers.push_back(k);
                 }
               });

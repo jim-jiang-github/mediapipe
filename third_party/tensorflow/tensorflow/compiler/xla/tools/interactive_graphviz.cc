@@ -116,21 +116,21 @@ constexpr int64_t kDefaultWidth = 2;
 // all-paths set.
 constexpr int64_t kDefaultMaxNumNodesInAllPaths = 100;
 
-using absl::EqualsIgnoreCase;
+using abslx::EqualsIgnoreCase;
 
 HloRenderOptions hlo_render_options;
 
 HloInstruction* FindInstruction(const HloModule& module,
                                 std::string node_name) {
-  if (absl::StartsWith(node_name, "%")) {
+  if (abslx::StartsWith(node_name, "%")) {
     node_name.erase(node_name.begin());
   }
   for (const auto& computation : module.computations()) {
     auto instrs = computation->instructions();
-    auto it = absl::c_find_if(instrs, [&](const HloInstruction* instr) {
+    auto it = abslx::c_find_if(instrs, [&](const HloInstruction* instr) {
       // Try with and without "%" at the beginning of the node name.
       return EqualsIgnoreCase(instr->name(), node_name) ||
-             EqualsIgnoreCase(instr->name(), absl::StrCat("%", node_name));
+             EqualsIgnoreCase(instr->name(), abslx::StrCat("%", node_name));
     });
     if (it != instrs.end()) {
       return *it;
@@ -321,7 +321,7 @@ void DoInfoCommand(const HloModule& module,
     // Find which computations reference comp as an embedded computation.
     std::vector<const HloComputation*> users;
     for (const HloComputation* c : module.computations()) {
-      if (absl::c_linear_search(c->MakeEmbeddedComputationsList(), comp)) {
+      if (abslx::c_linear_search(c->MakeEmbeddedComputationsList(), comp)) {
         users.push_back(c);
       }
     }
@@ -374,7 +374,7 @@ void DoInfoCommand(const HloModule& module,
 }
 
 void DoExtractCommand(const HloModule& module,
-                      absl::Span<const std::string> tokens) {
+                      abslx::Span<const std::string> tokens) {
   if (tokens.size() > 3) {
     std::cerr << R"(Illegal input.  Enter e.g. "extract %fusion.1 2")"
               << std::endl;
@@ -392,7 +392,7 @@ void DoExtractCommand(const HloModule& module,
 
   int64_t height = -1;
   if (tokens.size() == 3) {
-    if (!absl::SimpleAtoi(tokens[2], &height)) {
+    if (!abslx::SimpleAtoi(tokens[2], &height)) {
       std::cerr << "Can't parse '" << tokens[2] << "' as an integer."
                 << std::endl;
       return;
@@ -408,7 +408,7 @@ void DoExtractCommand(const HloModule& module,
 
 // Checks if there is a use-def path from `from` to `to`.
 bool ExistsPathFromTo(const HloInstruction* from, const HloInstruction* to) {
-  absl::flat_hash_set<const HloInstruction*> visited;
+  abslx::flat_hash_set<const HloInstruction*> visited;
   std::vector<const HloInstruction*> to_visit = {from};
   while (!to_visit.empty()) {
     auto* n = to_visit.back();
@@ -426,13 +426,13 @@ bool ExistsPathFromTo(const HloInstruction* from, const HloInstruction* to) {
   return false;
 }
 
-void OpenUrl(const Options& opts, absl::string_view url) {
+void OpenUrl(const Options& opts, abslx::string_view url) {
   std::cout << url << std::endl;
 
   // If it is a url, try to open it up in the user's browser too.
-  if (absl::StartsWithIgnoreCase(url, "http://") ||
-      absl::StartsWithIgnoreCase(url, "https://") ||
-      absl::StartsWithIgnoreCase(url, "file://")) {
+  if (abslx::StartsWithIgnoreCase(url, "http://") ||
+      abslx::StartsWithIgnoreCase(url, "https://") ||
+      abslx::StartsWithIgnoreCase(url, "file://")) {
     const char* browser_bin = opts.browser.empty() ? "/usr/bin/sensible-browser"
                                                    : opts.browser.c_str();
     tensorflow::SubProcess p;
@@ -489,11 +489,11 @@ void RenderAndDisplayGraph(
   // plain text, so we can't use Env::CreateUniqueFileName().
   std::string temp_file_path = tensorflow::io::JoinPath(
       temp_dirs.front(),
-      absl::StrFormat("interactive_graphviz.%d.html", env->NowMicros()));
+      abslx::StrFormat("interactive_graphviz.%d.html", env->NowMicros()));
   auto status = tensorflow::WriteStringToFile(
       env, temp_file_path, std::move(html_result).ValueOrDie());
   if (status.ok()) {
-    OpenUrl(opts, absl::StrCat("file://", temp_file_path));
+    OpenUrl(opts, abslx::StrCat("file://", temp_file_path));
     return;
   }
 
@@ -514,7 +514,7 @@ void DoAllPathsCommand(const Options& opts, const HloModule& module,
   }
 
   int64_t max_nodes = kDefaultMaxNumNodesInAllPaths;
-  if (tokens.size() == 4 && !absl::SimpleAtoi(tokens[3], &max_nodes)) {
+  if (tokens.size() == 4 && !abslx::SimpleAtoi(tokens[3], &max_nodes)) {
     std::cerr << "Can't parse '" << tokens[3] << "' as an integer."
               << std::endl;
     return;
@@ -565,7 +565,7 @@ void DoPlotCommand(const Options& opts, const HloModule& module,
   }
 
   uint64_t graph_width = kDefaultWidth;
-  absl::flat_hash_set<const HloInstruction*> boundary;
+  abslx::flat_hash_set<const HloInstruction*> boundary;
   if (tokens.size() >= 2) {
     if (comp) {
       std::cerr << "Can only use graph-size parameter with instructions, but "
@@ -575,7 +575,7 @@ void DoPlotCommand(const Options& opts, const HloModule& module,
 
     int bound_index = 1;
     // Get the <width> if present.
-    if (absl::SimpleAtoi(tokens[bound_index], &graph_width)) {
+    if (abslx::SimpleAtoi(tokens[bound_index], &graph_width)) {
       bound_index++;
     } else {
       // <width> not found, need to reset graph_width.
@@ -638,7 +638,7 @@ void InteractiveDumpGraphs(const Options& opts, const HloModule& module) {
       continue;
     }
     std::vector<std::string> tokens =
-        absl::StrSplit(line, ' ', absl::SkipEmpty());
+        abslx::StrSplit(line, ' ', abslx::SkipEmpty());
     if (tokens[0] == "quit" || tokens[0] == "exit") {
       break;
     } else if (tokens[0] == "help") {

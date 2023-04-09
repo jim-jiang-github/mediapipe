@@ -91,7 +91,7 @@ class BFCAllocator : public Allocator {
 
   int64_t AllocationId(const void* ptr) const override;
 
-  absl::optional<AllocatorStats> GetStats() override;
+  abslx::optional<AllocatorStats> GetStats() override;
 
   bool ClearStats() override;
 
@@ -142,11 +142,11 @@ class BFCAllocator : public Allocator {
   // Add TraceMe (in memory allocation and deallocation) for memory stats
   // profiling. The chunk_ptr is passed to get information such as address,
   // chunk size and requested_size.
-  void AddTraceMe(absl::string_view traceme_name, const void* ptr)
+  void AddTraceMe(abslx::string_view traceme_name, const void* ptr)
       TF_EXCLUSIVE_LOCKS_REQUIRED(lock_);
 
   // Overloaded AddTraceMe function with chunk information.
-  void AddTraceMe(absl::string_view traceme_name, const void* chunk_ptr,
+  void AddTraceMe(abslx::string_view traceme_name, const void* chunk_ptr,
                   int64_t req_bytes, int64_t alloc_bytes)
       TF_EXCLUSIVE_LOCKS_REQUIRED(lock_);
 
@@ -460,7 +460,7 @@ class BFCAllocator : public Allocator {
   bool DeallocateFreeRegions(size_t rounded_bytes);
 
   // Helper function to deallocate regions.
-  void DeallocateRegions(const absl::flat_hash_set<void*>& region_ptrs)
+  void DeallocateRegions(const abslx::flat_hash_set<void*>& region_ptrs)
       TF_EXCLUSIVE_LOCKS_REQUIRED(lock_);
 
   // Returns a pointer to an underlying allocated chunk of size

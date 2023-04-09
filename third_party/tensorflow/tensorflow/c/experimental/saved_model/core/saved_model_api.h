@@ -47,7 +47,7 @@ class SavedModelAPI {
   // 0 is the root node.
   virtual Status GetFunctions(
       int node_id,
-      absl::flat_hash_map<std::string, ConcreteFunction*>* functions) = 0;
+      abslx::flat_hash_map<std::string, ConcreteFunction*>* functions) = 0;
 
   // Retrieve a SignatureDefFunction from a SavedModel, using the key of the
   // SignatureDef map:

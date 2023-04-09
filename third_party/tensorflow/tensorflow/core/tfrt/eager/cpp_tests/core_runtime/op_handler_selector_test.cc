@@ -198,17 +198,17 @@ class FakeOperation : public ImmediateExecutionOperation {
                   tensorflow::ImmediateExecutionTensorHandle* input) override {
     llvm_unreachable("unimplemented method.");
   }
-  Status AddInputList(absl::Span<AbstractTensorHandle* const> inputs) override {
+  Status AddInputList(abslx::Span<AbstractTensorHandle* const> inputs) override {
     llvm_unreachable("unimplemented method.");
   }
-  absl::Span<tensorflow::ImmediateExecutionTensorHandle* const> GetInputs()
+  abslx::Span<tensorflow::ImmediateExecutionTensorHandle* const> GetInputs()
       const override {
-    return absl::MakeSpan(
+    return abslx::MakeSpan(
         reinterpret_cast<tensorflow::ImmediateExecutionTensorHandle* const*>(
             args_.data()),
         args_.size());
   }
-  Status Execute(absl::Span<AbstractTensorHandle*> retvals,
+  Status Execute(abslx::Span<AbstractTensorHandle*> retvals,
                  int* num_retvals) override {
     llvm_unreachable("unimplemented method.");
   }
@@ -281,7 +281,7 @@ class FakeOperation : public ImmediateExecutionOperation {
   }
   Status SetAttrFunctionList(
       const char* attr_name,
-      absl::Span<const AbstractOperation*> values) override {
+      abslx::Span<const AbstractOperation*> values) override {
     llvm_unreachable("unimplemented method.");
   }
 
@@ -301,7 +301,7 @@ class FakeOperation : public ImmediateExecutionOperation {
     llvm_unreachable("unimplemented method.");
   }
 
-  absl::optional<tensorflow::ManagedStackTrace> GetStackTrace() override {
+  abslx::optional<tensorflow::ManagedStackTrace> GetStackTrace() override {
     llvm_unreachable("unimplemented method.");
   }
 
@@ -462,7 +462,7 @@ TEST_F(SelectorTest, InvalidDeviceNameTest) {
   ASSERT_EQ(s.code(), tensorflow::error::INVALID_ARGUMENT);
   ASSERT_FALSE(static_cast<bool>(op_handler));
   EXPECT_TRUE(
-      absl::StrContains(s.error_message(), "Failed to parse device name"));
+      abslx::StrContains(s.error_message(), "Failed to parse device name"));
 }
 
 TEST_F(SelectorTest, SoftPlacementTest) {

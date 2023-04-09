@@ -259,7 +259,7 @@ class ProcessFunctionLibraryRuntimeTest : public ::testing::Test {
     });
     done2.WaitForNotification();
     EXPECT_TRUE(errors::IsNotFound(status)) << "Actual status: " << status;
-    EXPECT_TRUE(absl::StrContains(status.error_message(), "not found."));
+    EXPECT_TRUE(abslx::StrContains(status.error_message(), "not found."));
 
     return OkStatus();
   }
@@ -588,7 +588,7 @@ void TestTwoDeviceMult(
   if (!error.empty()) {
     EXPECT_TRUE(errors::IsInvalidArgument(status))
         << "Actual status: " << status;
-    EXPECT_TRUE(absl::StrContains(status.error_message(), error))
+    EXPECT_TRUE(abslx::StrContains(status.error_message(), error))
         << "Actual error message: " << status.error_message();
     return;
   }
@@ -622,13 +622,13 @@ void TestControlFlow(
 
   FunctionLibraryRuntime::Options opts;
   Tensor x1 = test::AsTensor<float>({3, 5, 17, 257});
-  if (absl::StrContains(inst_opts.input_devices[0], "GPU")) {
+  if (abslx::StrContains(inst_opts.input_devices[0], "GPU")) {
     x1 = fixture->CPUToGPU(x1);
   }
   Tensor y1;
   TF_CHECK_OK(fixture->Run("ControlFlow", opts, {}, inst_opts, {x1}, {&y1}));
 
-  if (absl::StrContains(inst_opts.output_devices[0], "GPU")) {
+  if (abslx::StrContains(inst_opts.output_devices[0], "GPU")) {
     EXPECT_TRUE(IsCUDATensor(y1));
     y1 = fixture->GPUToCPU(y1);
   }
@@ -645,11 +645,11 @@ void TestTwoDeviceInputOutput(
 
   FunctionLibraryRuntime::Options opts;
   Tensor x1 = test::AsTensor<float>({1, 2});
-  if (absl::StrContains(inst_opts.input_devices[0], "GPU")) {
+  if (abslx::StrContains(inst_opts.input_devices[0], "GPU")) {
     x1 = fixture->CPUToGPU(x1);
   }
   Tensor x2 = test::AsTensor<float>({10, 20});
-  if (absl::StrContains(inst_opts.input_devices[1], "GPU")) {
+  if (abslx::StrContains(inst_opts.input_devices[1], "GPU")) {
     x2 = fixture->CPUToGPU(x2);
   }
   Tensor y1;
@@ -657,7 +657,7 @@ void TestTwoDeviceInputOutput(
   TF_CHECK_OK(fixture->Run("TwoDeviceInputOutput", opts, {{"T", DT_FLOAT}},
                            inst_opts, {x1, x2}, {&y1, &y2}));
 
-  if (absl::StrContains(inst_opts.output_devices[0], "GPU")) {
+  if (abslx::StrContains(inst_opts.output_devices[0], "GPU")) {
     EXPECT_TRUE(IsCUDATensor(y1));
     y1 = fixture->GPUToCPU(y1);
   } else {
@@ -665,7 +665,7 @@ void TestTwoDeviceInputOutput(
   }
   test::ExpectTensorEqual<float>(y1, test::AsTensor<float>({2, 4}));
 
-  if (absl::StrContains(inst_opts.output_devices[1], "GPU")) {
+  if (abslx::StrContains(inst_opts.output_devices[1], "GPU")) {
     EXPECT_TRUE(IsCUDATensor(y2));
     y2 = fixture->GPUToCPU(y2);
   } else {
@@ -747,7 +747,7 @@ TEST_F(ProcessFunctionLibraryRuntimeTest, MultiDevice_ErrorWhenListInput) {
       "FuncWithListInput", test::function::Attrs({{"T", DT_FLOAT}, {"N", 1}}),
       MakeOptions("CPU:0", {"CPU:0"}, {}), &handle);
   ASSERT_TRUE(errors::IsInvalidArgument(status)) << "Actual status: " << status;
-  ASSERT_TRUE(absl::StrContains(
+  ASSERT_TRUE(abslx::StrContains(
       status.error_message(),
       "FuncWithListInput has an input named \"x1\" that is a list of tensors"))
       << "Actual error message: " << status.error_message();
@@ -761,7 +761,7 @@ TEST_F(ProcessFunctionLibraryRuntimeTest, MultiDevice_ErrorWhenListOutput) {
       "FuncWithListOutput", test::function::Attrs({{"T", DT_FLOAT}, {"N", 1}}),
       MakeOptions("CPU:0", {}, {"CPU:0"}), &handle);
   ASSERT_TRUE(errors::IsInvalidArgument(status)) << "Actual status: " << status;
-  ASSERT_TRUE(absl::StrContains(
+  ASSERT_TRUE(abslx::StrContains(
       status.error_message(),
       "FuncWithListOutput has an output named \"y\" that is a list of tensors"))
       << "Actual error message: " << status.error_message();
@@ -880,7 +880,7 @@ class TestFunctionPackedArgs : public FunctionArgsInterface {
   std::vector<Tensor> GetLocalTensors() const override { return {}; }
 
  private:
-  absl::flat_hash_map<int, gtl::InlinedVector<TensorValue, 4>> packed_args_;
+  abslx::flat_hash_map<int, gtl::InlinedVector<TensorValue, 4>> packed_args_;
 };
 
 TEST_F(ProcessFunctionLibraryRuntimeTest, MultiDevice_CompositeDevice) {
@@ -931,7 +931,7 @@ TEST_F(ProcessFunctionLibraryRuntimeTest, MultiDevice_CompositeDevice) {
     TF_CHECK_OK(RunWithPackedArgs("AddVarAcrossDevices", opts,
                                   {{"T", DT_FLOAT}}, inst_opts, args, {&ret}));
     EXPECT_EQ(ret.index(), 0);
-    test::ExpectTensorEqual<float>(absl::get<Tensor>(ret),
+    test::ExpectTensorEqual<float>(abslx::get<Tensor>(ret),
                                    test::AsTensor<float>({40, 60}));
   }
 
@@ -1010,7 +1010,7 @@ TEST_F(ProcessFunctionLibraryRuntimeTest, MultiDevice_PlacerError) {
       "ResourceOutput", test::function::Attrs({{"T", DT_FLOAT}}), inst_opts,
       &handle);
   ASSERT_TRUE(errors::IsInvalidArgument(status)) << "Actual status: " << status;
-  ASSERT_TRUE(absl::StrContains(status.error_message(), "Cannot place"));
+  ASSERT_TRUE(abslx::StrContains(status.error_message(), "Cannot place"));
 }
 
 REGISTER_OP("BrokenOp")

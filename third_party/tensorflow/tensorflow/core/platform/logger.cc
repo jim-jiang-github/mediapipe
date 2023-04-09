@@ -38,20 +38,20 @@ Logger::FactoryFunc Logger::singleton_factory_ = []() -> Logger* {
 struct LoggerSingletonContainer {
   // Used to kick off the construction of a new thread that will asynchronously
   // construct a Logger.
-  absl::once_flag start_initialization_thread_flag;
+  abslx::once_flag start_initialization_thread_flag;
 
   // The constructed logger, if there is one.
   Logger* logger;
 
   // The initializing thread notifies `logger_initialized` after storing the
   // constructed logger to `logger`.
-  absl::Notification logger_initialized;
+  abslx::Notification logger_initialized;
 
   // The thread used to construct the Logger instance asynchronously.
   std::unique_ptr<Thread> initialization_thread;
 
   // Used to kick off the joining and destruction of `initialization_thread`.
-  absl::once_flag delete_initialization_thread_flag;
+  abslx::once_flag delete_initialization_thread_flag;
 };
 
 LoggerSingletonContainer* GetLoggerSingletonContainer() {
@@ -80,7 +80,7 @@ struct AsyncSingletonImpl {
 
   // And wait for the thread to finish.
   LoggerSingletonContainer* container = GetLoggerSingletonContainer();
-  absl::call_once(container->delete_initialization_thread_flag,
+  abslx::call_once(container->delete_initialization_thread_flag,
                   [container]() { container->initialization_thread.reset(); });
 
   return container->logger;
@@ -88,12 +88,12 @@ struct AsyncSingletonImpl {
 
 /*static*/ Logger* Logger::GetSingletonAsync() {
   LoggerSingletonContainer* container = GetLoggerSingletonContainer();
-  absl::call_once(container->start_initialization_thread_flag,
+  abslx::call_once(container->start_initialization_thread_flag,
                   AsyncSingletonImpl::StartInitializationThread, container);
 
   if (container->logger_initialized.HasBeenNotified()) {
     // Wait for the initializing thread to finish to reclaim resources.
-    absl::call_once(
+    abslx::call_once(
         container->delete_initialization_thread_flag,
         [container]() { container->initialization_thread.reset(); });
     return container->logger;

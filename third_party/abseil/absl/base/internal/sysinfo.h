@@ -33,7 +33,7 @@
 #include "absl/base/config.h"
 #include "absl/base/port.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -69,6 +69,6 @@ pid_t GetCachedTID();
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_BASE_INTERNAL_SYSINFO_H_

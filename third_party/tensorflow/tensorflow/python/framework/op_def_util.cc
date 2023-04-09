@@ -327,7 +327,7 @@ Safe_PyObjectPtr ConvertPyObjectToAttributeType(PyObject* value,
                                                 AttributeType type) {
   Safe_PyObjectPtr result = ConvertAttrOrNull(value, type);
   if (!result) {
-    auto err = absl::StrCat("Failed to convert value of type '",
+    auto err = abslx::StrCat("Failed to convert value of type '",
                             value->ob_type->tp_name, "' to type '",
                             AttributeTypeToName(type), "'.");
     PyErr_SetString(PyExc_TypeError, err.c_str());

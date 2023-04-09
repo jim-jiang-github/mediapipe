@@ -30,7 +30,7 @@ class TfLiteModelLoader {
  public:
   // Returns a Packet containing a TfLiteModelPtr, pointing to a model loaded
   // from the specified file path.
-  static absl::StatusOr<api2::Packet<TfLiteModelPtr>> LoadFromPath(
+  static abslx::StatusOr<api2::Packet<TfLiteModelPtr>> LoadFromPath(
       const std::string& path);
 };
 

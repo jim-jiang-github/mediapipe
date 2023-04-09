@@ -37,17 +37,17 @@ class MergeToVectorCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kIn, kOut);
 
-  static absl::Status UpdateContract(CalculatorContract* cc) {
+  static abslx::Status UpdateContract(CalculatorContract* cc) {
     RET_CHECK_GT(kIn(cc).Count(), 0) << "Needs at least one input stream";
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(::mediapipe::CalculatorContext* cc) {
+  abslx::Status Open(::mediapipe::CalculatorContext* cc) {
     cc->SetOffset(::mediapipe::TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) {
+  abslx::Status Process(CalculatorContext* cc) {
     const int input_num = kIn(cc).Count();
     std::vector<T> output_vector;
     for (auto it = kIn(cc).begin(); it != kIn(cc).end(); it++) {
@@ -57,7 +57,7 @@ class MergeToVectorCalculator : public Node {
       }
     }
     kOut(cc).Send(output_vector);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

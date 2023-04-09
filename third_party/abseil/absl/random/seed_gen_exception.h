@@ -30,7 +30,7 @@
 
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 //------------------------------------------------------------------------------
@@ -50,6 +50,6 @@ namespace random_internal {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_SEED_GEN_EXCEPTION_H_

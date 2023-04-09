@@ -66,10 +66,10 @@ struct OpConverterParams {
 using OpConverter = std::function<Status(OpConverterParams*)>;
 
 struct InputArgSpec {
-  absl::string_view name;
+  abslx::string_view name;
   TrtInputArg allowed_roles;
 
-  static constexpr InputArgSpec Create(absl::string_view n, TrtInputArg role) {
+  static constexpr InputArgSpec Create(abslx::string_view n, TrtInputArg role) {
     return InputArgSpec{n, role};
   }
 };
@@ -95,7 +95,7 @@ class OpConverterBase {
   // Validate data type of the given NodeDef against allowed types.
   Status ValidateNodeDefDataType() {
     // If the attribute name is empty, we should skip this check.
-    if (absl::string_view(Impl::NodeDefDataTypeAttributeName()).empty()) {
+    if (abslx::string_view(Impl::NodeDefDataTypeAttributeName()).empty()) {
       return Status::OK();
     }
 
@@ -112,9 +112,9 @@ class OpConverterBase {
     const auto& allowed_dtypes = Impl::AllowedDataTypes();
     if (std::find(allowed_dtypes.begin(), allowed_dtypes.end(), *dtype) ==
         allowed_dtypes.end()) {
-      std::string allowed_types_string = absl::StrJoin(
+      std::string allowed_types_string = abslx::StrJoin(
           allowed_dtypes, ", ", [](std::string* out, const DataType& type) {
-            absl::StrAppendFormat(out, "%s", DataTypeString(type));
+            abslx::StrAppendFormat(out, "%s", DataTypeString(type));
           });
       return errors::Unimplemented("Data type ", DataTypeString(*dtype),
                                    " is not supported for ", node_def.op(),
@@ -174,7 +174,7 @@ class OpConverterBase {
   }
 
   template <typename T>
-  StatusOr<T> GetAttrValue(absl::string_view key) const {
+  StatusOr<T> GetAttrValue(abslx::string_view key) const {
     T result;
     TF_RETURN_IF_ERROR(GetNodeAttr(node_def_attrs_, key, &result));
     return result;

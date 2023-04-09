@@ -70,23 +70,23 @@ constexpr char kScoresTag[] = "SCORES";
 // }
 class TopKScoresCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
 
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
-  absl::Status LoadLabelmap(std::string label_map_path);
+  abslx::Status LoadLabelmap(std::string label_map_path);
 
   int top_k_ = -1;
   float threshold_ = 0.0;
-  absl::node_hash_map<int, std::string> label_map_;
+  abslx::node_hash_map<int, std::string> label_map_;
   bool label_map_loaded_ = false;
 };
 REGISTER_CALCULATOR(TopKScoresCalculator);
 
-absl::Status TopKScoresCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status TopKScoresCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK(cc->Inputs().HasTag(kScoresTag));
   cc->Inputs().Tag(kScoresTag).Set<std::vector<float>>();
   if (cc->Outputs().HasTag(kTopKIndexesTag)) {
@@ -104,10 +104,10 @@ absl::Status TopKScoresCalculator::GetContract(CalculatorContract* cc) {
   if (cc->Outputs().HasTag(kSummaryTag)) {
     cc->Outputs().Tag(kSummaryTag).Set<std::string>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TopKScoresCalculator::Open(CalculatorContext* cc) {
+abslx::Status TopKScoresCalculator::Open(CalculatorContext* cc) {
   const auto& options = cc->Options<::mediapipe::TopKScoresCalculatorOptions>();
   RET_CHECK(options.has_top_k() || options.has_threshold())
       << "Must specify at least one of the top_k and threshold fields in "
@@ -125,10 +125,10 @@ absl::Status TopKScoresCalculator::Open(CalculatorContext* cc) {
   if (cc->Outputs().HasTag(kTopKLabelsTag)) {
     RET_CHECK(!label_map_.empty());
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TopKScoresCalculator::Process(CalculatorContext* cc) {
+abslx::Status TopKScoresCalculator::Process(CalculatorContext* cc) {
   const std::vector<float>& input_vector =
       cc->Inputs().Tag(kScoresTag).Get<std::vector<float>>();
   std::vector<int> top_k_indexes;
@@ -198,20 +198,20 @@ absl::Status TopKScoresCalculator::Process(CalculatorContext* cc) {
     for (int index = 0; index < top_k_indexes.size(); ++index) {
       if (label_map_loaded_) {
         results.push_back(
-            absl::StrCat(top_k_labels[index], ":", top_k_scores[index]));
+            abslx::StrCat(top_k_labels[index], ":", top_k_scores[index]));
       } else {
         results.push_back(
-            absl::StrCat(top_k_indexes[index], ":", top_k_scores[index]));
+            abslx::StrCat(top_k_indexes[index], ":", top_k_scores[index]));
       }
     }
     cc->Outputs()
         .Tag(kSummaryTag)
-        .AddPacket(MakePacket<std::string>(absl::StrJoin(results, ","))
+        .AddPacket(MakePacket<std::string>(abslx::StrJoin(results, ","))
                        .At(cc->InputTimestamp()));
   }
 
   if (cc->Outputs().HasTag(kTopKClassificationTag)) {
-    auto classification_list = absl::make_unique<ClassificationList>();
+    auto classification_list = abslx::make_unique<ClassificationList>();
     for (int index = 0; index < top_k_indexes.size(); ++index) {
       Classification* classification =
           classification_list->add_classification();
@@ -222,10 +222,10 @@ absl::Status TopKScoresCalculator::Process(CalculatorContext* cc) {
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TopKScoresCalculator::LoadLabelmap(std::string label_map_path) {
+abslx::Status TopKScoresCalculator::LoadLabelmap(std::string label_map_path) {
   std::string string_path;
   ASSIGN_OR_RETURN(string_path, PathToResourceAsFile(label_map_path));
   std::string label_map_string;
@@ -238,7 +238,7 @@ absl::Status TopKScoresCalculator::LoadLabelmap(std::string label_map_path) {
     label_map_[i++] = line;
   }
   label_map_loaded_ = true;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

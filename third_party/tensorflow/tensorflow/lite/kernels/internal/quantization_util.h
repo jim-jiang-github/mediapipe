@@ -123,7 +123,7 @@ QuantizationParams ChooseQuantizationParams(double rmin, double rmax) {
 //
 // The range of FloatIn must include the range of IntOut, otherwise
 // the results are undefined.
-// TODO(sfeuz): Replace by absl::SafeCast once available.
+// TODO(sfeuz): Replace by abslx::SafeCast once available.
 template <class IntOut, class FloatIn>
 IntOut SafeCast(FloatIn x) {
   static_assert(!std::numeric_limits<FloatIn>::is_integer,

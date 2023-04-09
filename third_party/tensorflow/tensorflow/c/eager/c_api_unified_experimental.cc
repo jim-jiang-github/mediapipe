@@ -32,7 +32,7 @@ using tensorflow::string;
 
 namespace tensorflow {
 namespace tracing {
-typedef absl::flat_hash_map<std::string, tracing::FactoryFunction> FactoriesMap;
+typedef abslx::flat_hash_map<std::string, tracing::FactoryFunction> FactoriesMap;
 
 static FactoriesMap& GetFactories() {
   static FactoriesMap* factories = new FactoriesMap;
@@ -54,7 +54,7 @@ Status SetDefaultTracingEngine(const char* name) {
     default_factory = GetFactories().find(name)->second;
     return OkStatus();
   }
-  string msg = absl::StrCat(
+  string msg = abslx::StrCat(
       "No tracing engine factory has been registered with the key '", name,
       "' (available: ");
   // Ensure deterministic (sorted) order in the error message
@@ -229,7 +229,7 @@ void TF_ExecuteOperation(TF_AbstractOp* op, int num_inputs,
   int num_outputs = unwrap(o)->expected_num_outputs;
   Set_TF_Status_from_Status(
       s, unwrap(op)->Execute(
-             absl::MakeSpan(reinterpret_cast<AbstractTensorHandle**>(
+             abslx::MakeSpan(reinterpret_cast<AbstractTensorHandle**>(
                                 unwrap(o)->outputs.data()),
                             unwrap(o)->outputs.size()),
              &num_outputs));

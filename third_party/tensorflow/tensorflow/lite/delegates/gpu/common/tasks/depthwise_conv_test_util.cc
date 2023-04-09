@@ -26,7 +26,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status DepthwiseConvSimpleWeightsTest(TestExecutionEnvironment* env) {
+abslx::Status DepthwiseConvSimpleWeightsTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 2);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f};
@@ -60,10 +60,10 @@ absl::Status DepthwiseConvSimpleWeightsTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status DepthwiseConvNoMultiplierTest(TestExecutionEnvironment* env) {
+abslx::Status DepthwiseConvNoMultiplierTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 2);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f};
@@ -97,10 +97,10 @@ absl::Status DepthwiseConvNoMultiplierTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status DepthwiseConvMultiplier2Test(TestExecutionEnvironment* env) {
+abslx::Status DepthwiseConvMultiplier2Test(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 2);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f};
@@ -136,7 +136,7 @@ absl::Status DepthwiseConvMultiplier2Test(TestExecutionEnvironment* env) {
           dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

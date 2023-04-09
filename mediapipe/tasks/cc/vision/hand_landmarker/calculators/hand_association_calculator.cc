@@ -49,34 +49,34 @@ using ::mediapipe::NormalizedRect;
 // TODO: Upgrade this to latest API for calculators
 class HandAssociationCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     // Initialize input and output streams.
     for (auto& input_stream : cc->Inputs()) {
       input_stream.Set<std::vector<NormalizedRect>>();
     }
     cc->Outputs().Index(0).Set<std::vector<NormalizedRect>>();
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
 
     options_ = cc->Options<HandAssociationCalculatorOptions>();
     CHECK_GT(options_.min_similarity_threshold(), 0.0);
     CHECK_LE(options_.min_similarity_threshold(), 1.0);
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     ASSIGN_OR_RETURN(auto result, GetNonOverlappingElements(cc));
 
     auto output =
         std::make_unique<std::vector<NormalizedRect>>(std::move(result));
     cc->Outputs().Index(0).Add(output.release(), cc->InputTimestamp());
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -85,7 +85,7 @@ class HandAssociationCalculator : public CalculatorBase {
   // Return a list of non-overlapping elements from all input streams, with
   // decreasing order of priority based on input stream index and indices
   // within an input stream.
-  absl::StatusOr<std::vector<NormalizedRect>> GetNonOverlappingElements(
+  abslx::StatusOr<std::vector<NormalizedRect>> GetNonOverlappingElements(
       CalculatorContext* cc) {
     std::vector<NormalizedRect> result;
 

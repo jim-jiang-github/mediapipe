@@ -61,11 +61,11 @@ struct OutputTensorParams {
 
 // Generates a new ROI or converts it from normalized rect.
 RotatedRect GetRoi(int input_width, int input_height,
-                   absl::optional<mediapipe::NormalizedRect> norm_rect);
+                   abslx::optional<mediapipe::NormalizedRect> norm_rect);
 
 // Pads ROI, so extraction happens correctly if aspect ratio is to be kept.
 // Returns letterbox padding applied.
-absl::StatusOr<std::array<float, 4>> PadRoi(int input_tensor_width,
+abslx::StatusOr<std::array<float, 4>> PadRoi(int input_tensor_width,
                                             int input_tensor_height,
                                             bool keep_aspect_ratio,
                                             RotatedRect* roi);
@@ -83,7 +83,7 @@ struct ValueTransformation {
 // [from_range_min, from_range_max] into [to_range_min, to_range_max] range.
 // from_range_min must be less than from_range_max
 // to_range_min must be less than to_range_max
-absl::StatusOr<ValueTransformation> GetValueRangeTransformation(
+abslx::StatusOr<ValueTransformation> GetValueRangeTransformation(
     float from_range_min, float from_range_max, float to_range_min,
     float to_range_max);
 
@@ -129,7 +129,7 @@ void GetTransposedRotatedSubRectToRectTransformMatrix(
 //  output_tensor_width, output_tensor_height.
 // See ImageToTensorCalculatorOptions for the description of each field.
 template <typename T>
-absl::Status ValidateOptionOutputDims(const T& options) {
+abslx::Status ValidateOptionOutputDims(const T& options) {
   RET_CHECK(options.has_output_tensor_float_range() ||
             options.has_output_tensor_int_range() ||
             options.has_output_tensor_uint_range())
@@ -165,7 +165,7 @@ absl::Status ValidateOptionOutputDims(const T& options) {
       << "Valid output tensor width is required.";
   RET_CHECK_GT(options.output_tensor_height(), 0)
       << "Valid output tensor height is required.";
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <typename T>
@@ -211,12 +211,12 @@ int GetNumOutputChannels(const mediapipe::Image& image);
 
 // Converts the packet that hosts different format (Image, ImageFrame,
 // GpuBuffer) into the mediapipe::Image format.
-absl::StatusOr<std::shared_ptr<const mediapipe::Image>> GetInputImage(
+abslx::StatusOr<std::shared_ptr<const mediapipe::Image>> GetInputImage(
     const api2::Packet<api2::OneOf<Image, mediapipe::ImageFrame>>&
         image_packet);
 
 #if !MEDIAPIPE_DISABLE_GPU
-absl::StatusOr<std::shared_ptr<const mediapipe::Image>> GetInputImage(
+abslx::StatusOr<std::shared_ptr<const mediapipe::Image>> GetInputImage(
     const api2::Packet<mediapipe::GpuBuffer>& image_gpu_packet);
 #endif  // !MEDIAPIPE_DISABLE_GPU
 

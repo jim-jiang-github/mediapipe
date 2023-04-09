@@ -55,7 +55,7 @@ namespace tensorflow {
 //
 //    // Register callback that will be invoked once preempted
 //    notifier->WillBePreemptedAtAsync(
-//      [](StatusOr<absl::Time> status_or_time) {
+//      [](StatusOr<abslx::Time> status_or_time) {
 //        if (status_or_time.ok()) {
 //          LOG(INFO) << "Preempted at time: " << status_or_time.value();
 //        } else {
@@ -64,7 +64,7 @@ namespace tensorflow {
 //      });
 //
 //    // Block current thread until preemption
-//    absl::Time preempt_time = notifier->WillBePreemptedAt().ValueOrDie();
+//    abslx::Time preempt_time = notifier->WillBePreemptedAt().ValueOrDie();
 //
 // Users can extend this class to support custom preemption signals, by subclass
 // `PreemptionNotifier` with a custom constructor, register its creator (factory
@@ -75,7 +75,7 @@ namespace tensorflow {
 
 class PreemptionNotifier {
  public:
-  typedef std::function<void(StatusOr<absl::Time>)> PreemptTimeCallback;
+  typedef std::function<void(StatusOr<abslx::Time>)> PreemptTimeCallback;
   using PreemptionNotifierFactory =
       std::function<std::unique_ptr<PreemptionNotifier>(Env* env)>;
 
@@ -101,7 +101,7 @@ class PreemptionNotifier {
       LOG(ERROR) << "No preemption notifier factory found for notifier type "
                  << notifier_type
                  << ". All registered preemption notifier types are: "
-                 << absl::StrJoin(registered_types, ", ")
+                 << abslx::StrJoin(registered_types, ", ")
                  << ". Make sure the library is loaded to the program.";
       return nullptr;
     }
@@ -110,13 +110,13 @@ class PreemptionNotifier {
 
   // This is a blocking call that returns a death time when preemption /
   // termination will occur once the listener receives the preemption
-  // notification. If no death time is specified, absl::Now() is returned.
+  // notification. If no death time is specified, abslx::Now() is returned.
   // Returns error::Cancelled if UnregisterListeners() is called.
-  StatusOr<absl::Time> WillBePreemptedAt();
+  StatusOr<abslx::Time> WillBePreemptedAt();
 
   // Registers a callback that takes the death time as input once the listener
   // receives the preemption notification.
-  // If no death time is specified, absl::Now() is specified as input.
+  // If no death time is specified, abslx::Now() is specified as input.
   // Note: callback should be kept as simple and fast as possible (e.g. simply
   // retrieve result). It should not wait for work done by another callback, and
   // invoke ahy PreemptionNotifier method (e.g. Reset(), destructor).
@@ -126,7 +126,7 @@ class PreemptionNotifier {
   Env* GetEnv() { return env_; }
   // Invokes all pending callbacks upon receipt of preemption notice with death
   // time or errors (e.g. cancellation during shutdown).
-  void NotifyRegisteredListeners(StatusOr<absl::Time> death_time);
+  void NotifyRegisteredListeners(StatusOr<abslx::Time> death_time);
 
  private:
   static std::unordered_map<std::string, PreemptionNotifierFactory>*
@@ -138,7 +138,7 @@ class PreemptionNotifier {
 
   Env* env_;  // Not owned.
   mutex mu_;
-  absl::Time death_time_ TF_GUARDED_BY(mu_) = absl::InfinitePast();
+  abslx::Time death_time_ TF_GUARDED_BY(mu_) = abslx::InfinitePast();
   std::vector<PreemptTimeCallback> callbacks_ TF_GUARDED_BY(mu_);
 };
 

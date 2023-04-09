@@ -14,7 +14,7 @@
 
 #include "absl/hash/internal/hash.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace hash_internal {
 
@@ -23,7 +23,7 @@ uint64_t HashState::CombineLargeContiguousImpl32(uint64_t state,
                                                  size_t len) {
   while (len >= PiecewiseChunkSize()) {
     state =
-        Mix(state, absl::hash_internal::CityHash32(reinterpret_cast<const char*>(first),
+        Mix(state, abslx::hash_internal::CityHash32(reinterpret_cast<const char*>(first),
                                          PiecewiseChunkSize()));
     len -= PiecewiseChunkSize();
     first += PiecewiseChunkSize();
@@ -49,7 +49,7 @@ uint64_t HashState::CombineLargeContiguousImpl64(uint64_t state,
 ABSL_CONST_INIT const void* const HashState::kSeed = &kSeed;
 
 // The salt array used by Wyhash. This array is NOT the mechanism used to make
-// absl::Hash non-deterministic between program invocations.  See `Seed()` for
+// abslx::Hash non-deterministic between program invocations.  See `Seed()` for
 // that mechanism.
 //
 // Any random values are fine. These values are just digits from the decimal
@@ -67,4 +67,4 @@ uint64_t HashState::WyhashImpl(const unsigned char* data, size_t len) {
 
 }  // namespace hash_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -71,8 +71,8 @@ class AsyncSleepOp : public AsyncOpKernel {
         ctx, ctx->allocate_output(0, delay_tensor.shape(), &output_tensor),
         done);  // Important: call `done` in every execution path
 
-    absl::Time now = absl::Now();
-    absl::Time when = now + absl::Seconds(delay);
+    abslx::Time now = abslx::Now();
+    abslx::Time when = now + abslx::Seconds(delay);
     VLOG(1) << "BEFORE ASYNC SLEEP " << ctx->op_kernel().name() << " now "
             << now << " when " << when;
     thread_pool->Schedule([this, output_tensor, when, done] {
@@ -83,13 +83,13 @@ class AsyncSleepOp : public AsyncOpKernel {
   }
 
  private:
-  void sleeper(Tensor* output_tensor, absl::Time when, DoneCallback done) {
-    absl::Time now = absl::Now();
+  void sleeper(Tensor* output_tensor, abslx::Time when, DoneCallback done) {
+    abslx::Time now = abslx::Now();
     int64_t delay_us = 0;
     if (now < when) {
-      delay_us = absl::ToInt64Microseconds(when - now);
+      delay_us = abslx::ToInt64Microseconds(when - now);
       VLOG(1) << "MIDDLE ASYNC SLEEP " << delay_us;
-      absl::SleepFor(when - now);
+      abslx::SleepFor(when - now);
       VLOG(1) << "AFTER ASYNC SLEEP " << delay_us;
     } else {
       VLOG(1) << "MIDDLE/AFTER ASYNC SKIP SLEEP";
@@ -116,7 +116,7 @@ class SyncSleepOp : public OpKernel {
     OP_REQUIRES(ctx, delay >= 0.0,
                 InvalidArgument("Input `delay` must be non-negative."));
     VLOG(1) << "BEFORE SYNC SLEEP" << ctx->op_kernel().name();
-    absl::SleepFor(absl::Seconds(delay));
+    abslx::SleepFor(abslx::Seconds(delay));
     VLOG(1) << "AFTER SYNC SLEEP" << ctx->op_kernel().name();
 
     Tensor* output_tensor = nullptr;

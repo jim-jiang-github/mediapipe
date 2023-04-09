@@ -32,19 +32,19 @@ limitations under the License.
 int main(int argc, char** argv) {
   tensorflow::port::InitMain(argv[0], &argc, &argv);
 
-  std::string input_filename = absl::GetFlag(FLAGS_input_filename);
+  std::string input_filename = abslx::GetFlag(FLAGS_input_filename);
 
   // Ignore the positional argument if --input_filename is provided.
   if (argc > 1 && input_filename == tfrt::kDefaultInputFilename) {
     input_filename = argv[1];
   }
 
-  // By default, absl::StrSplit includes empty string in its output.
+  // By default, abslx::StrSplit includes empty string in its output.
   std::vector<std::string> shared_libs =
-      absl::StrSplit(absl::GetFlag(FLAGS_shared_libs), ',', absl::SkipEmpty());
+      abslx::StrSplit(abslx::GetFlag(FLAGS_shared_libs), ',', abslx::SkipEmpty());
   std::vector<std::string> functions =
-      absl::StrSplit(absl::GetFlag(FLAGS_functions), ',', absl::SkipEmpty());
-  std::string test_init_function = absl::GetFlag(FLAGS_test_init_function);
+      abslx::StrSplit(abslx::GetFlag(FLAGS_functions), ',', abslx::SkipEmpty());
+  std::string test_init_function = abslx::GetFlag(FLAGS_test_init_function);
 
   tfrt::RunBefConfig run_config;
   run_config.program_name = argv[0];
@@ -52,8 +52,8 @@ int main(int argc, char** argv) {
   run_config.shared_libs = shared_libs;
   run_config.functions = functions;
   run_config.test_init_function = test_init_function;
-  run_config.work_queue_type = absl::GetFlag(FLAGS_work_queue_type);
-  run_config.host_allocator_type = absl::GetFlag(FLAGS_host_allocator_type);
+  run_config.work_queue_type = abslx::GetFlag(FLAGS_work_queue_type);
+  run_config.host_allocator_type = abslx::GetFlag(FLAGS_host_allocator_type);
 
   return RunBefExecutor(
       run_config,

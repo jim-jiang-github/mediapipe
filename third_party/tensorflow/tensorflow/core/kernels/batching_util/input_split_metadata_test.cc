@@ -51,7 +51,7 @@ TEST(InputSplitUtilTest, Basic) {
         input_size, open_batch_remaining_slot, batch_size_limit);
     EXPECT_EQ(input_split_metadata.task_sizes().size(), expected_num_batches);
 
-    absl::FixedArray<int> expected_task_sizes(expected_num_batches);
+    abslx::FixedArray<int> expected_task_sizes(expected_num_batches);
     for (int i = 0; i < expected_num_batches; i++) {
       if (i == 0) {
         expected_task_sizes[i] = expected_head_batch_task_size;
@@ -65,7 +65,7 @@ TEST(InputSplitUtilTest, Basic) {
     EXPECT_THAT(input_split_metadata.task_sizes(),
                 ::testing::ElementsAreArray(expected_task_sizes));
     EXPECT_EQ(input_split_metadata.DebugString(),
-              absl::StrJoin(expected_task_sizes, ", "));
+              abslx::StrJoin(expected_task_sizes, ", "));
   }
 }
 }  // namespace

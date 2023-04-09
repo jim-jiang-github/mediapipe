@@ -57,7 +57,7 @@ constexpr char kTestRegexModelPath[] =
 constexpr char kStringToBoolModelPath[] =
     "test_model_text_classifier_bool_output.tflite";
 
-std::string GetFullPath(absl::string_view file_name) {
+std::string GetFullPath(abslx::string_view file_name) {
   return JoinPath("./", kTestDataDirectory, file_name);
 }
 
@@ -100,13 +100,13 @@ TEST_F(TextClassifierTest, CreateFailsWithMissingBaseOptions) {
   StatusOr<std::unique_ptr<TextClassifier>> classifier =
       TextClassifier::Create(std::move(options));
 
-  EXPECT_EQ(classifier.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(classifier.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       classifier.status().message(),
       HasSubstr("ExternalFile must specify at least one of 'file_content', "
                 "'file_name', 'file_pointer_meta' or 'file_descriptor_meta'."));
   EXPECT_THAT(classifier.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInitializationError))));
 }
 
@@ -116,11 +116,11 @@ TEST_F(TextClassifierTest, CreateFailsWithMissingModel) {
   StatusOr<std::unique_ptr<TextClassifier>> classifier =
       TextClassifier::Create(std::move(options));
 
-  EXPECT_EQ(classifier.status().code(), absl::StatusCode::kNotFound);
+  EXPECT_EQ(classifier.status().code(), abslx::StatusCode::kNotFound);
   EXPECT_THAT(classifier.status().message(),
               HasSubstr("Unable to open file at"));
   EXPECT_THAT(classifier.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInitializationError))));
 }
 

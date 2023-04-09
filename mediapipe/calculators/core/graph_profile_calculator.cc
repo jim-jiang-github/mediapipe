@@ -48,11 +48,11 @@ class GraphProfileCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kFrameIn, kProfileOut);
 
-  static absl::Status UpdateContract(CalculatorContract* cc) {
-    return absl::OkStatus();
+  static abslx::Status UpdateContract(CalculatorContract* cc) {
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     auto options = cc->Options<::mediapipe::GraphProfileCalculatorOptions>();
 
     bool first_profile = prev_profile_ts_ == Timestamp::Unset();
@@ -65,7 +65,7 @@ class GraphProfileCalculator : public Node {
                                  : PopulateGraphConfig::kNo));
       kProfileOut(cc).Send(result);
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

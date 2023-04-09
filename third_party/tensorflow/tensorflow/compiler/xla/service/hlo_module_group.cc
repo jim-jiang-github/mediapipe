@@ -22,8 +22,8 @@ HloModuleGroup::HloModuleGroup(std::unique_ptr<HloModule> module)
   push_back(std::move(module));
 }
 
-HloModuleGroup::HloModuleGroup(absl::string_view name,
-                               absl::Span<std::unique_ptr<HloModule>> modules)
+HloModuleGroup::HloModuleGroup(abslx::string_view name,
+                               abslx::Span<std::unique_ptr<HloModule>> modules)
     : name_(name) {
   for (auto& module : modules) {
     push_back(std::move(module));
@@ -31,7 +31,7 @@ HloModuleGroup::HloModuleGroup(absl::string_view name,
 }
 
 HloModuleGroup::HloModuleGroup(
-    absl::string_view name, std::vector<std::unique_ptr<HloModule>>&& modules)
+    abslx::string_view name, std::vector<std::unique_ptr<HloModule>>&& modules)
     : name_(name) {
   for (auto& module : modules) {
     push_back(std::move(module));
@@ -67,7 +67,7 @@ HloModuleGroupProto HloModuleGroup::ToProto() const {
 
 /* static */ StatusOr<HloModuleGroup> HloModuleGroup::CreateFromProto(
     const HloModuleGroupProto& proto,
-    absl::Span<const HloModuleConfig> module_configs) {
+    abslx::Span<const HloModuleConfig> module_configs) {
   TF_RET_CHECK(!proto.name().empty()) << "Module group name cannot be empty";
   TF_RET_CHECK(proto.hlo_modules_size() > 0)
       << "Module group must have at least one HLO module";
@@ -82,7 +82,7 @@ HloModuleGroupProto HloModuleGroup::ToProto() const {
     modules.push_back(std::move(module));
   }
 
-  return HloModuleGroup(proto.name(), absl::MakeSpan(modules));
+  return HloModuleGroup(proto.name(), abslx::MakeSpan(modules));
 }
 
 void HloModuleGroup::push_back(std::unique_ptr<HloModule> module) {

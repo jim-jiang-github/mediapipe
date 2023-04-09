@@ -155,7 +155,7 @@ TEST_F(DynamicPartitionOpTest, Error_IndexOutOfRange) {
   AddInputFromArray<int32>(TensorShape({5}), {0, 2, 99, 2, 2});
   Status s = RunOpKernel();
   EXPECT_TRUE(
-      absl::StrContains(s.ToString(), "partitions[2] = 99 is not in [0, 4)"))
+      abslx::StrContains(s.ToString(), "partitions[2] = 99 is not in [0, 4)"))
       << s;
 }
 

@@ -37,22 +37,22 @@ struct GpuEventStats {
   bool IsTfOp() const { return !tf_op_fullname.empty(); }
 
   // Stats from TensorFlow.
-  absl::string_view tf_op_fullname;
-  absl::string_view equation;
-  absl::string_view tensor_shapes;
+  abslx::string_view tf_op_fullname;
+  abslx::string_view equation;
+  abslx::string_view tensor_shapes;
 
   // Stats from XLA.
-  std::vector<absl::string_view> hlo_op_names;
-  absl::string_view hlo_module_name;
-  absl::optional<uint64_t> program_id;
+  std::vector<abslx::string_view> hlo_op_names;
+  abslx::string_view hlo_module_name;
+  abslx::optional<uint64_t> program_id;
 
   // Stats from CUPTI.
-  absl::string_view kernel_details;
-  absl::string_view memcpy_details;
-  absl::optional<int64_t> correlation_id;
+  abslx::string_view kernel_details;
+  abslx::string_view memcpy_details;
+  abslx::optional<int64_t> correlation_id;
 
   // Stats derived by grouping.
-  absl::optional<int64_t> group_id;
+  abslx::optional<int64_t> group_id;
   bool is_eager = false;
 };
 
@@ -65,11 +65,11 @@ struct LaunchEventStats {
   }
 
   // Stats from CUPTI.
-  absl::optional<int64_t> device_id;
-  absl::optional<int64_t> correlation_id;
+  abslx::optional<int64_t> device_id;
+  abslx::optional<int64_t> correlation_id;
 
   // Stat derived by grouping.
-  absl::optional<int64_t> group_id;
+  abslx::optional<int64_t> group_id;
 };
 
 }  // namespace profiler

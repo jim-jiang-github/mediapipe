@@ -20,7 +20,7 @@
 #include "gtest/gtest.h"
 #include "absl/base/macros.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace str_format_internal {
 
@@ -424,4 +424,4 @@ TEST_F(ParsedFormatTest, ParsingFlagOrder) {
 }  // namespace
 }  // namespace str_format_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

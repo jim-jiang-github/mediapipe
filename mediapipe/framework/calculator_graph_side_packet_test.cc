@@ -38,16 +38,16 @@ namespace {
 // output side packet.
 class OutputSidePacketInProcessCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).SetAny();
     cc->OutputSidePackets().Index(0).SetSameAs(&cc->Inputs().Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     cc->OutputSidePackets().Index(0).Set(
         cc->Inputs().Index(0).Value().At(Timestamp::Unset()));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(OutputSidePacketInProcessCalculator);
@@ -55,19 +55,19 @@ REGISTER_CALCULATOR(OutputSidePacketInProcessCalculator);
 // Takes an input side packet and passes it as an output side packet.
 class OutputSidePacketInOpenCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->InputSidePackets().Index(0).SetAny();
     cc->OutputSidePackets().Index(0).SetSameAs(
         &cc->InputSidePackets().Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     cc->OutputSidePackets().Index(0).Set(cc->InputSidePackets().Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final { return absl::OkStatus(); }
+  abslx::Status Process(CalculatorContext* cc) final { return abslx::OkStatus(); }
 };
 REGISTER_CALCULATOR(OutputSidePacketInOpenCalculator);
 
@@ -75,22 +75,22 @@ REGISTER_CALCULATOR(OutputSidePacketInOpenCalculator);
 // receives. Outputs the total number of packets as a side packet in Close.
 class CountAndOutputSummarySidePacketInCloseCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).SetAny();
     cc->OutputSidePackets().Index(0).Set<int>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     ++count_;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Close(CalculatorContext* cc) final {
-    absl::SleepFor(absl::Milliseconds(300));  // For GetOutputSidePacket test.
+  abslx::Status Close(CalculatorContext* cc) final {
+    abslx::SleepFor(abslx::Milliseconds(300));  // For GetOutputSidePacket test.
     cc->OutputSidePackets().Index(0).Set(
         MakePacket<int>(count_).At(Timestamp::Unset()));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   int count_ = 0;
@@ -101,15 +101,15 @@ REGISTER_CALCULATOR(CountAndOutputSummarySidePacketInCloseCalculator);
 // output side packet. This triggers an error in the graph.
 class OutputSidePacketWithTimestampCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).SetAny();
     cc->OutputSidePackets().Index(0).SetSameAs(&cc->Inputs().Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     cc->OutputSidePackets().Index(0).Set(cc->Inputs().Index(0).Value());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(OutputSidePacketWithTimestampCalculator);
@@ -117,19 +117,19 @@ REGISTER_CALCULATOR(OutputSidePacketWithTimestampCalculator);
 // Generates an output side packet containing the integer 1.
 class IntegerOutputSidePacketCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->OutputSidePackets().Index(0).Set<int>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     cc->OutputSidePackets().Index(0).Set(MakePacket<int>(1));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     LOG(FATAL) << "Not reached.";
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(IntegerOutputSidePacketCalculator);
@@ -138,23 +138,23 @@ REGISTER_CALCULATOR(IntegerOutputSidePacketCalculator);
 // side packets.
 class SidePacketAdderCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->InputSidePackets().Index(0).Set<int>();
     cc->InputSidePackets().Index(1).Set<int>();
     cc->OutputSidePackets().Index(0).Set<int>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     cc->OutputSidePackets().Index(0).Set(
         MakePacket<int>(cc->InputSidePackets().Index(1).Get<int>() +
                         cc->InputSidePackets().Index(0).Get<int>()));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     LOG(FATAL) << "Not reached.";
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(SidePacketAdderCalculator);
@@ -163,20 +163,20 @@ REGISTER_CALCULATOR(SidePacketAdderCalculator);
 // input side packet.
 class SidePacketToStreamPacketCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->InputSidePackets().Index(0).SetAny();
     cc->Outputs().Index(0).SetSameAs(&cc->InputSidePackets().Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     cc->Outputs().Index(0).AddPacket(
         cc->InputSidePackets().Index(0).At(Timestamp::PostStream()));
     cc->Outputs().Index(0).Close();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     return mediapipe::tool::StatusStop();
   }
 };
@@ -185,18 +185,18 @@ REGISTER_CALCULATOR(SidePacketToStreamPacketCalculator);
 // Packet generator for an arbitrary unit64 packet.
 class Uint64PacketGenerator : public PacketGenerator {
  public:
-  static absl::Status FillExpectations(
+  static abslx::Status FillExpectations(
       const PacketGeneratorOptions& extendable_options,
       PacketTypeSet* input_side_packets, PacketTypeSet* output_side_packets) {
     output_side_packets->Index(0).Set<uint64>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  static absl::Status Generate(const PacketGeneratorOptions& extendable_options,
+  static abslx::Status Generate(const PacketGeneratorOptions& extendable_options,
                                const PacketSet& input_side_packets,
                                PacketSet* output_side_packets) {
     output_side_packets->Index(0) = Adopt(new uint64(15LL << 32 | 5));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_PACKET_GENERATOR(Uint64PacketGenerator);
@@ -223,7 +223,7 @@ TEST(CalculatorGraph, OutputSidePacketInProcess) {
   MP_ASSERT_OK(graph.ObserveOutputStream(
       "output", [&output_packets](const Packet& packet) {
         output_packets.push_back(packet);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
 
   // Run the graph twice.
@@ -245,11 +245,11 @@ TEST(CalculatorGraph, OutputSidePacketInProcess) {
 // also be ignored.
 class PassThroughGenerator : public PacketGenerator {
  public:
-  static absl::Status FillExpectations(
+  static abslx::Status FillExpectations(
       const PacketGeneratorOptions& extendable_options, PacketTypeSet* inputs,
       PacketTypeSet* outputs) {
     if (!inputs->TagMap()->SameAs(*outputs->TagMap())) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Input and outputs to PassThroughGenerator must use the same tags "
           "and indexes.");
     }
@@ -257,17 +257,17 @@ class PassThroughGenerator : public PacketGenerator {
       inputs->Get(id).SetAny();
       outputs->Get(id).SetSameAs(&inputs->Get(id));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  static absl::Status Generate(const PacketGeneratorOptions& extendable_options,
+  static abslx::Status Generate(const PacketGeneratorOptions& extendable_options,
                                const PacketSet& input_side_packets,
                                PacketSet* output_side_packets) {
     for (CollectionItemId id = input_side_packets.BeginId();
          id < input_side_packets.EndId(); ++id) {
       output_side_packets->Get(id) = input_side_packets.Get(id);
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_PACKET_GENERATOR(PassThroughGenerator);
@@ -371,7 +371,7 @@ TEST(CalculatorGraph, SharePacketGeneratorGraph) {
   // Create a bunch of graphs.
   std::vector<std::unique_ptr<CalculatorGraph>> graphs;
   for (int i = 0; i < 100; ++i) {
-    graphs.emplace_back(absl::make_unique<CalculatorGraph>());
+    graphs.emplace_back(abslx::make_unique<CalculatorGraph>());
     // Do not pass extra side packets here.
     // Note that validated_calculator_config must outlive the graph.
     MP_ASSERT_OK(graphs.back()->Initialize(calculator_config, {}));
@@ -421,8 +421,8 @@ TEST(CalculatorGraph, OutputSidePacketAlreadySet) {
       "offset", MakePacket<TimestampDiff>(offset).At(Timestamp(1))));
   MP_ASSERT_OK(graph.CloseInputStream("offset"));
 
-  absl::Status status = graph.WaitUntilDone();
-  EXPECT_EQ(status.code(), absl::StatusCode::kAlreadyExists);
+  abslx::Status status = graph.WaitUntilDone();
+  EXPECT_EQ(status.code(), abslx::StatusCode::kAlreadyExists);
   EXPECT_THAT(status.message(), testing::HasSubstr("was already set."));
 }
 
@@ -447,8 +447,8 @@ TEST(CalculatorGraph, OutputSidePacketWithTimestamp) {
   MP_ASSERT_OK(graph.AddPacketToInputStream(
       "offset", MakePacket<TimestampDiff>(offset).At(Timestamp(237))));
   MP_ASSERT_OK(graph.CloseInputStream("offset"));
-  absl::Status status = graph.WaitUntilDone();
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  abslx::Status status = graph.WaitUntilDone();
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(), testing::HasSubstr("has a timestamp 237."));
 }
 
@@ -479,7 +479,7 @@ TEST(CalculatorGraph, OutputSidePacketConsumedBySourceNode) {
   MP_ASSERT_OK(graph.ObserveOutputStream(
       "output", [&output_packets](const Packet& packet) {
         output_packets.push_back(packet);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
   MP_ASSERT_OK(graph.StartRun({}));
   // Wait until the graph is idle so that
@@ -487,7 +487,7 @@ TEST(CalculatorGraph, OutputSidePacketConsumedBySourceNode) {
   // Scheduler::TryToScheduleNextSourceLayer() should not activate source
   // nodes that haven't been opened. We can't call graph.WaitUntilIdle()
   // because the graph has a source node.
-  absl::SleepFor(absl::Milliseconds(10));
+  abslx::SleepFor(abslx::Milliseconds(10));
   MP_ASSERT_OK(graph.AddPacketToInputStream(
       "max_count", MakePacket<int>(max_count).At(Timestamp(0))));
   MP_ASSERT_OK(graph.CloseInputStream("max_count"));
@@ -505,19 +505,19 @@ class FirstPacketFilterCalculator : public CalculatorBase {
   FirstPacketFilterCalculator() {}
   ~FirstPacketFilterCalculator() override {}
 
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).SetAny();
     cc->Outputs().Index(0).SetSameAs(&cc->Inputs().Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     if (!seen_first_packet_) {
       cc->Outputs().Index(0).AddPacket(cc->Inputs().Index(0).Value());
       cc->Outputs().Index(0).Close();
       seen_first_packet_ = true;
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -587,8 +587,8 @@ TEST(CalculatorGraph, SourceLayerInversion) {
   MP_ASSERT_OK(graph.Initialize(
       config, {{"max_count", MakePacket<int>(max_count)},
                {"initial_value1", MakePacket<int>(initial_value1)}}));
-  absl::Status status = graph.Run();
-  EXPECT_EQ(status.code(), absl::StatusCode::kUnknown);
+  abslx::Status status = graph.Run();
+  EXPECT_EQ(status.code(), abslx::StatusCode::kUnknown);
   EXPECT_THAT(status.message(), testing::HasSubstr("deadlock"));
 }
 
@@ -633,7 +633,7 @@ TEST(CalculatorGraph, PacketGeneratorLikeCalculators) {
   MP_ASSERT_OK(graph.ObserveOutputStream(
       "output", [&output_packets](const Packet& packet) {
         output_packets.push_back(packet);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
   MP_ASSERT_OK(graph.Run());
   ASSERT_EQ(1, output_packets.size());
@@ -662,7 +662,7 @@ TEST(CalculatorGraph, OutputSummarySidePacketInClose) {
   MP_ASSERT_OK(graph.ObserveOutputStream(
       "output", [&output_packets](const Packet& packet) {
         output_packets.push_back(packet);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
 
   // Run the graph twice.
@@ -705,14 +705,14 @@ TEST(CalculatorGraph, GetOutputSidePacket) {
   MP_ASSERT_OK(graph.Initialize(config));
   // Check a packet generated by the PacketGenerator, which is available after
   // graph initialization, can be fetched before graph starts.
-  absl::StatusOr<Packet> status_or_packet =
+  abslx::StatusOr<Packet> status_or_packet =
       graph.GetOutputSidePacket("output_uint64");
   MP_ASSERT_OK(status_or_packet);
   EXPECT_EQ(Timestamp::Unset(), status_or_packet.value().Timestamp());
   // IntSplitterPacketGenerator is missing its input side packet and we
   // won't be able to get its output side packet now.
   status_or_packet = graph.GetOutputSidePacket("output_uint32_pair");
-  EXPECT_EQ(absl::StatusCode::kUnavailable, status_or_packet.status().code());
+  EXPECT_EQ(abslx::StatusCode::kUnavailable, status_or_packet.status().code());
   // Run the graph twice.
   int max_count = 100;
   std::map<std::string, Packet> extra_side_packets;
@@ -731,7 +731,7 @@ TEST(CalculatorGraph, GetOutputSidePacket) {
     // Should return NOT_FOUND for invalid side packets.
     status_or_packet = graph.GetOutputSidePacket("unknown");
     EXPECT_FALSE(status_or_packet.ok());
-    EXPECT_EQ(absl::StatusCode::kNotFound, status_or_packet.status().code());
+    EXPECT_EQ(abslx::StatusCode::kNotFound, status_or_packet.status().code());
     // Should return the packet after the graph becomes idle.
     MP_ASSERT_OK(graph.WaitUntilIdle());
     status_or_packet = graph.GetOutputSidePacket("num_of_packets");
@@ -766,20 +766,20 @@ typedef std::string HugeModel;
 // Generates an output-side-packet once for each calculator-graph.
 class OutputSidePacketCachedCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->OutputSidePackets().Index(0).Set<HugeModel>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     cc->OutputSidePackets().Index(0).Set(MakePacket<HugeModel>(
         R"(An expensive side-packet created only once per graph)"));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     LOG(FATAL) << "Not reached.";
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(OutputSidePacketCachedCalculator);
@@ -808,7 +808,7 @@ TEST(CalculatorGraph, OutputSidePacketCached) {
   MP_ASSERT_OK(graph.ObserveOutputStream(
       "output", [&output_packets](const Packet& packet) {
         output_packets.push_back(packet);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
 
   // Run the graph three times.
@@ -848,7 +848,7 @@ TEST(CalculatorGraph, GeneratorAfterCalculatorOpen) {
   MP_ASSERT_OK(graph.ObserveOutputStream(
       "output", [&output_packets](const Packet& packet) {
         output_packets.push_back(packet);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
   MP_ASSERT_OK(graph.StartRun({{"offset", MakePacket<TimestampDiff>(100)}}));
   MP_ASSERT_OK(graph.WaitUntilDone());
@@ -882,7 +882,7 @@ TEST(CalculatorGraph, GeneratorAfterCalculatorProcess) {
   MP_ASSERT_OK(graph.ObserveOutputStream(
       "output", [&output_packets](const Packet& packet) {
         output_packets.push_back(packet);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
   // Run twice to verify that we don't duplicate wrapper nodes.
   for (int run = 0; run < 2; ++run) {
@@ -910,7 +910,7 @@ TEST(CalculatorGraph, GetOutputSidePacketAfterCalculatorIsOpened) {
   MP_ASSERT_OK(graph.StartRun({}));
   // Must be called to ensure that the calculator is opened.
   MP_ASSERT_OK(graph.WaitUntilIdle());
-  absl::StatusOr<Packet> status_or_packet = graph.GetOutputSidePacket("offset");
+  abslx::StatusOr<Packet> status_or_packet = graph.GetOutputSidePacket("offset");
   MP_ASSERT_OK(status_or_packet);
   EXPECT_EQ(1, status_or_packet.value().Get<int>());
 }

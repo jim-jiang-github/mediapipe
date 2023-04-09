@@ -50,7 +50,7 @@ limitations under the License.
 
 namespace xla {
 
-using absl::StrCat;
+using abslx::StrCat;
 using llvm_ir::IrArray;
 using llvm_ir::IrName;
 using llvm_ir::SetToFirstInsertPoint;
@@ -1428,13 +1428,13 @@ StatusOr<llvm::Value*> ElementalIrEmitter::EmitComplexBinaryOp(
 
 llvm::Value* ElementalIrEmitter::EmitFloatMax(llvm::Value* lhs_value,
                                               llvm::Value* rhs_value,
-                                              absl::string_view name) {
+                                              abslx::string_view name) {
   return llvm_ir::EmitFloatMax(lhs_value, rhs_value, b_, fast_min_max(), name);
 }
 
 llvm::Value* ElementalIrEmitter::EmitFloatMin(llvm::Value* lhs_value,
                                               llvm::Value* rhs_value,
-                                              absl::string_view name) {
+                                              abslx::string_view name) {
   return llvm_ir::EmitFloatMin(lhs_value, rhs_value, b_, fast_min_max(), name);
 }
 
@@ -1520,7 +1520,7 @@ StatusOr<llvm::Value*> ElementalIrEmitter::EmitCos(PrimitiveType prim_type,
 
 StatusOr<llvm::Value*> ElementalIrEmitter::EmitExp(PrimitiveType prim_type,
                                                    llvm::Value* value,
-                                                   absl::string_view name) {
+                                                   abslx::string_view name) {
   return llvm_ir::EmitCallToIntrinsic(llvm::Intrinsic::exp, {value},
                                       {value->getType()}, b_, name);
 }
@@ -1554,7 +1554,7 @@ StatusOr<llvm::Value*> ElementalIrEmitter::EmitExpm1(PrimitiveType prim_type,
 StatusOr<llvm::Value*> ElementalIrEmitter::EmitPow(PrimitiveType prim_type,
                                                    llvm::Value* lhs,
                                                    llvm::Value* rhs,
-                                                   absl::string_view name) {
+                                                   abslx::string_view name) {
   return llvm_ir::EmitCallToIntrinsic(llvm::Intrinsic::pow, {lhs, rhs},
                                       {lhs->getType()}, b_, name);
 }
@@ -1574,7 +1574,7 @@ StatusOr<llvm::Value*> ElementalIrEmitter::EmitCbrt(PrimitiveType prim_type,
 
 StatusOr<llvm::Value*> ElementalIrEmitter::EmitAtan2(
     PrimitiveType prim_type, llvm::Value* lhs, llvm::Value* /*rhs*/,
-    absl::string_view /*name*/) {
+    abslx::string_view /*name*/) {
   return Unimplemented("atan2");
 }
 
@@ -1939,7 +1939,7 @@ StatusOr<llvm::Value*> ElementalIrEmitter::EmitElementalConcatenate(
   // Assign a unique id for each *different* operand, and count how often each
   // operand is used. If all operands are different, the usage count will be 1
   // for each operand.
-  absl::flat_hash_map<const HloInstruction*, int64_t> to_unique_operand_id;
+  abslx::flat_hash_map<const HloInstruction*, int64_t> to_unique_operand_id;
   std::vector<int64_t> operand_usage_count;
   for (const HloInstruction* operand : hlo->operands()) {
     if (to_unique_operand_id.contains(operand)) {
@@ -2001,9 +2001,9 @@ StatusOr<llvm::Value*> ElementalIrEmitter::EmitElementalConcatenate(
   CHECK_EQ(current_offset, hlo->shape().dimensions(concat_dim));
 
   std::function<llvm::BasicBlock*(
-      absl::Span<const std::pair<int64_t, const HloInstruction*>> operands)>
+      abslx::Span<const std::pair<int64_t, const HloInstruction*>> operands)>
       emit_tree =
-          [&](absl::Span<const std::pair<int64_t, const HloInstruction*>>
+          [&](abslx::Span<const std::pair<int64_t, const HloInstruction*>>
                   operands) {
             llvm::IRBuilder<>::InsertPointGuard guard(*b_);
             size_t mid = operands.size() / 2;
@@ -2011,7 +2011,7 @@ StatusOr<llvm::Value*> ElementalIrEmitter::EmitElementalConcatenate(
                 operands[mid];
             llvm::BasicBlock* block = llvm_ir::CreateBasicBlock(
                 exit_block,
-                absl::StrCat("concatenate.pivot.", pivot.first, "."), b_);
+                abslx::StrCat("concatenate.pivot.", pivot.first, "."), b_);
             b_->SetInsertPoint(block);
 
             // If there's only one element we're done. The range is contiguous
@@ -2122,7 +2122,7 @@ StatusOr<llvm::Value*> ElementalIrEmitter::EmitElementalGather(
   for (int64_t i = 0, e = operand_shape.dimensions_size(),
                operand_index_dim = 0;
        i < e; i++) {
-    if (absl::c_binary_search(dim_numbers.collapsed_slice_dims(), i)) {
+    if (abslx::c_binary_search(dim_numbers.collapsed_slice_dims(), i)) {
       operand_multi_index.push_back(index.GetConstantWithIndexType(0));
     } else {
       int64_t output_window_dim = dim_numbers.offset_dims(operand_index_dim++);
@@ -2135,7 +2135,7 @@ StatusOr<llvm::Value*> ElementalIrEmitter::EmitElementalGather(
   std::vector<llvm::Value*> gather_index_index_components;
   {
     for (int64_t i = 0, e = output_shape.dimensions_size(); i < e; i++) {
-      if (!absl::c_binary_search(dim_numbers.offset_dims(), i)) {
+      if (!abslx::c_binary_search(dim_numbers.offset_dims(), i)) {
         gather_index_index_components.push_back(index[i]);
       }
     }
@@ -2771,7 +2771,7 @@ llvm::Value* ElementalIrEmitter::EmitMulAdd(llvm::Value* lhs, llvm::Value* rhs,
 
 StatusOr<llvm::Value*> ElementalIrEmitter::EmitElementalMap(
     const HloMapInstruction* map_instr,
-    absl::Span<llvm::Value* const> elemental_operands) {
+    abslx::Span<llvm::Value* const> elemental_operands) {
   TF_ASSIGN_OR_RETURN(
       std::vector<llvm::Value*> values,
       EmitThreadLocalCall(*map_instr->to_apply(), elemental_operands,
@@ -2919,7 +2919,7 @@ StatusOr<llvm::Value*> ElementalIrEmitter::EmitElementalReduce(
     accumulators_count = out_shape.tuple_shapes_size();
   }
 
-  absl::Span<const int64_t> reduced_dimensions(reduce->dimensions());
+  abslx::Span<const int64_t> reduced_dimensions(reduce->dimensions());
 
   std::vector<llvm::Value*> accumulator_addrs;
   std::vector<llvm::Type*> accumulator_types;
@@ -2998,7 +2998,7 @@ StatusOr<llvm::Value*> ElementalIrEmitter::EmitElementalReduce(
 }
 
 StatusOr<llvm::Value*> ElementalIrEmitter::EmitAccumResult(
-    absl::Span<llvm::Value* const> accumulator_addrs,
+    abslx::Span<llvm::Value* const> accumulator_addrs,
     llvm::ArrayRef<llvm::Type*> accumulator_types, bool is_variadic) {
   TF_RET_CHECK(accumulator_addrs.size() == accumulator_types.size());
   if (is_variadic) {
@@ -3059,7 +3059,7 @@ StatusOr<llvm::Value*> ElementalIrEmitter::EmitConvolution(
         loops
             .AddLoop(
                 0, rhs->shape().dimensions(dnums.kernel_spatial_dimensions(i)),
-                absl::StrCat("k", i))
+                abslx::StrCat("k", i))
             ->GetIndVarValue();
   }
   const int64_t input_group_size =
@@ -3178,7 +3178,7 @@ StatusOr<llvm::Value*> ElementalIrEmitter::EmitConvolution(
 
 // Evaluate polynomial using Horner's method.
 StatusOr<llvm::Value*> ElementalIrEmitter::EvaluatePolynomial(
-    llvm::Type* type, llvm::Value* x, absl::Span<const double> coefficients) {
+    llvm::Type* type, llvm::Value* x, abslx::Span<const double> coefficients) {
   llvm::Value* poly = llvm::ConstantFP::get(type, 0.0);
   for (const double c : coefficients) {
     poly = FAdd(FMul(poly, x), llvm::ConstantFP::get(type, c));

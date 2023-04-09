@@ -138,12 +138,12 @@ float GetTransferCost(const std::string& from_hardware_str,
   auto from_hardware = GetTargetHardware(from_hardware_str);
   auto to_hardware = GetTargetHardware(to_hardware_str);
   if (from_hardware == nullptr) {
-    from_graph.emitError(absl::StrCat(
+    from_graph.emitError(abslx::StrCat(
         "we cannot find the registered hardware: ", from_hardware_str));
   }
 
   if (to_hardware == nullptr) {
-    to_graph.emitError(absl::StrCat("we cannot find the registered hardware: ",
+    to_graph.emitError(abslx::StrCat("we cannot find the registered hardware: ",
                                     to_hardware_str));
   }
 

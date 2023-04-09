@@ -981,11 +981,11 @@ TEST_F(DatasetHashUtilsTest, HashNodeWithManyControlDependencies) {
 
   for (int i = 0; i < 1000; ++i) {
     n = gd.add_node();
-    NodeDefBuilder ndb(absl::StrCat("graph_1/node_", i), "Const");
+    NodeDefBuilder ndb(abslx::StrCat("graph_1/node_", i), "Const");
     ndb.Attr("value", 1);
     ndb.Device("CPU:0");
     for (int j = 0; j < i; ++j) {
-      ndb.ControlInput(absl::StrCat("graph_1/node_", j));
+      ndb.ControlInput(abslx::StrCat("graph_1/node_", j));
     }
     TF_CHECK_OK(ndb.Finalize(n));
   }
@@ -1207,7 +1207,7 @@ static void BM_ParallelFunctionCallsGraph(benchmark::State& state) {
   config_pb.set_allow_soft_placement(true);
   for (int i = 0; i < 100; ++i) {
     NodeDef* node = graph_def.add_node();
-    node->set_name(absl::StrCat("PartitionedCall_", i));
+    node->set_name(abslx::StrCat("PartitionedCall_", i));
     node->set_op("PartitionedCall");
     *node->add_input() = input->name();
     AddNodeAttr("Tin", DT_FLOAT, node);
@@ -1217,7 +1217,7 @@ static void BM_ParallelFunctionCallsGraph(benchmark::State& state) {
     NameAttrList func;
     func.set_name(fd->signature().name());
     AddNodeAttr("f", func, node);
-    *target->add_input() = absl::StrCat("^", node->name());
+    *target->add_input() = abslx::StrCat("^", node->name());
   }
 
   uint64 hash_value;
@@ -1254,10 +1254,10 @@ static void BM_ChainedFunctionCallsGraph(benchmark::State& state) {
   config_pb.set_allow_soft_placement(true);
   for (int i = 0; i < 100; ++i) {
     NodeDef* node = graph_def.add_node();
-    node->set_name(absl::StrCat("PartitionedCall_", i));
+    node->set_name(abslx::StrCat("PartitionedCall_", i));
     node->set_op("PartitionedCall");
     if (i > 0) {
-      *node->add_input() = absl::StrCat("PartitionedCall_", i - 1);
+      *node->add_input() = abslx::StrCat("PartitionedCall_", i - 1);
     } else {
       *node->add_input() = input->name();
     }
@@ -1304,7 +1304,7 @@ static void BM_ComposedFunctionCallsGraph(benchmark::State& state) {
 
     FunctionDef* fd = fl->add_function();
     *fd = FunctionDefHelper::Create(
-        /*function_name=*/absl::StrCat("F_", i),
+        /*function_name=*/abslx::StrCat("F_", i),
         /*in_def=*/{"i: float"},
         /*out_def=*/{"o: float"},
         /*attr_def=*/{},

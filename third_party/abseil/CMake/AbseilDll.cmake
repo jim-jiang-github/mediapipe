@@ -458,7 +458,7 @@ function(absl_internal_dll_contains)
     ${ARGN}
   )
 
-  STRING(REGEX REPLACE "^absl::" "" _target ${ABSL_INTERNAL_DLL_TARGET})
+  STRING(REGEX REPLACE "^abslx::" "" _target ${ABSL_INTERNAL_DLL_TARGET})
 
   list(FIND
     ABSL_INTERNAL_DLL_TARGETS

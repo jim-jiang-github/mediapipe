@@ -150,8 +150,8 @@ class AotCompilationOptions {
     profile_version_ = profile_version;
   }
 
-  absl::string_view cache_key() const { return cache_key_; }
-  void set_cache_key(absl::string_view cache_key) {
+  abslx::string_view cache_key() const { return cache_key_; }
+  void set_cache_key(abslx::string_view cache_key) {
     cache_key_ = std::string(cache_key);
   }
 
@@ -371,7 +371,7 @@ class Compiler {
 
  private:
   // Mutex that guards the platform-compiler map.
-  static absl::Mutex platform_compiler_mutex_;
+  static abslx::Mutex platform_compiler_mutex_;
 
   // Map from platform kind to compiler factory.
   static std::map<se::Platform::Id, CompilerFactory>*

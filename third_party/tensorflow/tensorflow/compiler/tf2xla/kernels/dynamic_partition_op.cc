@@ -168,7 +168,7 @@ class DynamicPartitionOp : public XlaOpKernel {
     for (int64_t i = 0; i < num_partitions_; ++i) {
       auto reshape = xla::Reshape(output[i], output_shape_bound_dims);
       if (partitions_are_static) {
-        int64_t size = absl::c_count(partitions_static, i);
+        int64_t size = abslx::c_count(partitions_static, i);
         ctx->SetOutput(i, xla::SliceInDim(reshape, 0, size, 1, 0));
       } else {
         xla::XlaOp length;

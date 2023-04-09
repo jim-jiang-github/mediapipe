@@ -24,11 +24,11 @@ namespace internal {
 
 void CompareNumericalAndAutodiffGradients(
     Model model, Model grad_model, AbstractContext* ctx,
-    absl::Span<AbstractTensorHandle* const> inputs, bool use_function,
+    abslx::Span<AbstractTensorHandle* const> inputs, bool use_function,
     double abs_error) {
   auto num_inputs = inputs.size();
   std::vector<AbstractTensorHandle*> outputs(num_inputs);
-  auto s = RunModel(grad_model, ctx, inputs, absl::MakeSpan(outputs),
+  auto s = RunModel(grad_model, ctx, inputs, abslx::MakeSpan(outputs),
                     /*use_function=*/use_function);
   ASSERT_EQ(errors::OK, s.code()) << s.error_message();
 
@@ -75,8 +75,8 @@ void CompareNumericalAndAutodiffGradients(
   }
 }
 
-void CheckTensorValue(AbstractTensorHandle* t, absl::Span<const float> manuals,
-                      absl::Span<const int64_t> dims, double abs_error) {
+void CheckTensorValue(AbstractTensorHandle* t, abslx::Span<const float> manuals,
+                      abslx::Span<const int64_t> dims, double abs_error) {
   TF_Tensor* analytical_tensor;
   auto s = GetValue(t, &analytical_tensor);
   ASSERT_EQ(errors::OK, s.code()) << s.error_message();
@@ -110,8 +110,8 @@ Model BuildGradModel(Model forward, GradientRegistry registry) {
   return [forward_model = std::move(forward),
           grad_registry = std::move(registry)](
              AbstractContext* ctx,
-             absl::Span<AbstractTensorHandle* const> inputs,
-             absl::Span<AbstractTensorHandle*> outputs) -> Status {
+             abslx::Span<AbstractTensorHandle* const> inputs,
+             abslx::Span<AbstractTensorHandle*> outputs) -> Status {
     Tape tape(/*persistent=*/false);
     for (size_t i{}; i < inputs.size(); ++i) {
       tape.Watch(inputs[i]);
@@ -119,7 +119,7 @@ Model BuildGradModel(Model forward, GradientRegistry registry) {
     std::vector<AbstractTensorHandle*> temp_outputs(1);
     AbstractContextPtr tape_ctx(new TapeContext(ctx, &tape, grad_registry));
     TF_RETURN_IF_ERROR(
-        forward_model(tape_ctx.get(), inputs, absl::MakeSpan(temp_outputs)));
+        forward_model(tape_ctx.get(), inputs, abslx::MakeSpan(temp_outputs)));
 
     TF_RETURN_IF_ERROR(tape.ComputeGradient(ctx, /*targets=*/temp_outputs,
                                             /*sources=*/inputs,

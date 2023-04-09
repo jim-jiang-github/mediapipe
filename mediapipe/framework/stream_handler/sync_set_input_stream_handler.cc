@@ -47,7 +47,7 @@ class SyncSetInputStreamHandler : public InputStreamHandler {
   void PrepareForRun(std::function<void()> headers_ready_callback,
                      std::function<void()> notification_callback,
                      std::function<void(CalculatorContext*)> schedule_callback,
-                     std::function<void(absl::Status)> error_callback) override;
+                     std::function<void(abslx::Status)> error_callback) override;
 
  protected:
   // In SyncSetInputStreamHandler, a node is "ready" if any
@@ -70,7 +70,7 @@ class SyncSetInputStreamHandler : public InputStreamHandler {
   int SyncSetCount() override;
 
  private:
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
   // The ids of each set of inputs.
   std::vector<SyncSet> sync_sets_ ABSL_GUARDED_BY(mutex_);
   // The index of the ready sync set.  A value of -1 indicates that no
@@ -93,11 +93,11 @@ void SyncSetInputStreamHandler::PrepareForRun(
     std::function<void()> headers_ready_callback,
     std::function<void()> notification_callback,
     std::function<void(CalculatorContext*)> schedule_callback,
-    std::function<void(absl::Status)> error_callback) {
+    std::function<void(abslx::Status)> error_callback) {
   const auto& handler_options =
       options_.GetExtension(SyncSetInputStreamHandlerOptions::ext);
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     sync_sets_.clear();
     std::set<CollectionItemId> used_ids;
     for (const auto& sync_set : handler_options.sync_set()) {
@@ -138,7 +138,7 @@ void SyncSetInputStreamHandler::PrepareForRun(
 NodeReadiness SyncSetInputStreamHandler::GetNodeReadiness(
     Timestamp* min_stream_timestamp) {
   DCHECK(min_stream_timestamp);
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   if (ready_sync_set_index_ >= 0) {
     *min_stream_timestamp = ready_timestamp_;
     // TODO: Return kNotReady unless a new ready syncset is found.
@@ -184,7 +184,7 @@ NodeReadiness SyncSetInputStreamHandler::GetNodeReadiness(
 void SyncSetInputStreamHandler::FillInputSet(Timestamp input_timestamp,
                                              InputStreamShardSet* input_set) {
   // Assume that all current packets are already cleared.
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   CHECK_LE(0, ready_sync_set_index_);
   sync_sets_[ready_sync_set_index_].FillInputSet(input_timestamp, input_set);
   for (int i = 0; i < sync_sets_.size(); ++i) {
@@ -197,7 +197,7 @@ void SyncSetInputStreamHandler::FillInputSet(Timestamp input_timestamp,
 }
 
 int SyncSetInputStreamHandler::SyncSetCount() {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   return sync_sets_.size();
 }
 

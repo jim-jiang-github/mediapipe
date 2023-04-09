@@ -23,7 +23,7 @@ namespace {
 
 inline float Sigmoid(float value) { return 1.0f / (1.0f + std::exp(-value)); }
 
-absl::StatusOr<std::tuple<int, int, int>> GetHwcFromDims(
+abslx::StatusOr<std::tuple<int, int, int>> GetHwcFromDims(
     const std::vector<int>& dims) {
   if (dims.size() == 3) {
     return std::make_tuple(dims[0], dims[1], dims[2]);
@@ -52,17 +52,17 @@ class RefineLandmarksFromHeatmapCalculatorImpl
     : public NodeImpl<RefineLandmarksFromHeatmapCalculator,
                       RefineLandmarksFromHeatmapCalculatorImpl> {
  public:
-  absl::Status Open(CalculatorContext* cc) override { return absl::OkStatus(); }
+  abslx::Status Open(CalculatorContext* cc) override { return abslx::OkStatus(); }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     // Make sure we bypass landmarks if there is no detection.
     if (kInLandmarks(cc).IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     // If for some reason heatmap is missing, just return original landmarks.
     if (kInTensors(cc).IsEmpty()) {
       kOutLandmarks(cc).Send(*kInLandmarks(cc));
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     // Check basic prerequisites.
@@ -85,7 +85,7 @@ class RefineLandmarksFromHeatmapCalculatorImpl
             options.refine_visibility()));
 
     kOutLandmarks(cc).Send(std::move(out_lms));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
@@ -103,7 +103,7 @@ class RefineLandmarksFromHeatmapCalculatorImpl
 // from heatmap we calculate an weighted average inside the kernel. We update
 // the landmark iff heatmap is confident in it's prediction i.e. max(heatmap) in
 // kernel is at least options.min_confidence_to_refine big.
-absl::StatusOr<mediapipe::NormalizedLandmarkList> RefineLandmarksFromHeatMap(
+abslx::StatusOr<mediapipe::NormalizedLandmarkList> RefineLandmarksFromHeatMap(
     const mediapipe::NormalizedLandmarkList& in_lms,
     const float* heatmap_raw_data, const std::vector<int>& heatmap_dims,
     int kernel_size, float min_confidence_to_refine, bool refine_presence,

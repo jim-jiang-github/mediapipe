@@ -116,10 +116,10 @@ TEST(EigenTypesTest, IsContiguous1DEigenType) {
                decltype(RowMajorMatrixXf().col(0))>::Value);
 }
 
-// Test WrapContainer(absl::Span).
+// Test WrapContainer(abslx::Span).
 TEST(EigenTypesTest, ContainerWrapperSpan) {
   int buffer[8];
-  auto buffer_const_span = absl::MakeConstSpan(buffer);
+  auto buffer_const_span = abslx::MakeConstSpan(buffer);
   auto x = WrapContainer(buffer_const_span);
   using XType = decltype(x);
   EXPECT_EQ(XType::Dims, 1);
@@ -130,7 +130,7 @@ TEST(EigenTypesTest, ContainerWrapperSpan) {
   EXPECT_FALSE(x.resize(7));
   EXPECT_EQ(x.AsMatrix(1).data(), buffer);
 
-  auto buffer_span = absl::MakeSpan(buffer);
+  auto buffer_span = abslx::MakeSpan(buffer);
   auto y = WrapContainer(buffer_span);
   EXPECT_EQ(y.AsMatrix(1).data(), buffer);
 }

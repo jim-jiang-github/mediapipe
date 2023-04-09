@@ -48,7 +48,7 @@ std::string HloModuleGroupMetadata::TrackedInstruction::ToString() const {
       repr += ":WHILE_BODY";
       break;
     case ComputationKind::kConditionalBranch:
-      repr += absl::StrCat(":CONDITIONAL_BRANCH_", index_);
+      repr += abslx::StrCat(":CONDITIONAL_BRANCH_", index_);
       break;
     case ComputationKind::kCallFunction:
       repr += ":CALL";
@@ -58,7 +58,7 @@ std::string HloModuleGroupMetadata::TrackedInstruction::ToString() const {
 }
 
 /* static */ StatusOr<std::unique_ptr<HloModuleGroupMetadata>>
-HloModuleGroupMetadata::Build(absl::Span<HloModule* const> modules) {
+HloModuleGroupMetadata::Build(abslx::Span<HloModule* const> modules) {
   auto metadata = std::make_unique<HloModuleGroupMetadata>(modules);
   TF_RETURN_IF_ERROR(metadata->Build());
   return std::move(metadata);
@@ -163,7 +163,7 @@ Status HloModuleGroupMetadata::VerifyCompanionSets() const {
   for (const auto& companions : companion_sets_) {
     // A companion set must be composed at most of an instruction per
     // device/module.
-    absl::flat_hash_set<int64_t> devices;
+    abslx::flat_hash_set<int64_t> devices;
     for (HloInstruction* instruction : *companions) {
       // Go through all the communicating instructions (send, recv) of the given
       // companion, and record their device.
@@ -173,7 +173,7 @@ Status HloModuleGroupMetadata::VerifyCompanionSets() const {
         // instructions, if they are parent of companions.
         continue;
       }
-      absl::flat_hash_set<int64_t> comm_devices;
+      abslx::flat_hash_set<int64_t> comm_devices;
       for (HloInstruction* comm_instruction : it->second) {
         auto device = GetInstructionDevice(*comm_instruction);
         TF_RET_CHECK(device) << "Instruction " << comm_instruction->ToString()
@@ -428,7 +428,7 @@ Status HloModuleGroupMetadata::AddCompanion(HloInstruction* instruction1,
     // At any point while building the companion sets, each instruction belongs
     // to at most 1 companion set, so the union of two companion sets is
     // concatenating two disjoint sets.
-    absl::c_copy(Companions(instruction2),
+    abslx::c_copy(Companions(instruction2),
                  std::back_inserter(
                      *companion_sets_[companion_set_index_[instruction1]]));
     int64_t index_to_remove = companion_set_index_[instruction2];

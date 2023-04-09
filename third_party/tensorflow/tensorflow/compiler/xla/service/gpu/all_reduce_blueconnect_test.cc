@@ -42,7 +42,7 @@ void SetModuleConfig(HloModule& module, size_t replica_count) {
 }
 
 TEST_F(AllReduceBlueConnectTest, OneStage) {
-  constexpr absl::string_view hlo_string = R"(
+  constexpr abslx::string_view hlo_string = R"(
 HloModule module
 
 %add {
@@ -81,7 +81,7 @@ ENTRY %comp {
 }
 
 TEST_F(AllReduceBlueConnectTest, TwoStage) {
-  constexpr absl::string_view hlo_string = R"(
+  constexpr abslx::string_view hlo_string = R"(
 HloModule module
 
 %add {
@@ -126,7 +126,7 @@ ENTRY %comp {
 }
 
 TEST_F(AllReduceBlueConnectTest, TwoOperands) {
-  constexpr absl::string_view hlo_string = R"(
+  constexpr abslx::string_view hlo_string = R"(
 HloModule module
 
 %add {
@@ -176,7 +176,7 @@ ENTRY %comp {
 }
 
 TEST_F(AllReduceBlueConnectTest, DifferentNumLocalDevicesWithinReplicaGroup) {
-  constexpr absl::string_view hlo_string = R"(
+  constexpr abslx::string_view hlo_string = R"(
 HloModule module
 
 %add {
@@ -199,7 +199,7 @@ ENTRY %comp {
 }
 
 TEST_F(AllReduceBlueConnectTest, DifferentNumLocalDevicesAcrossReplicaGroups) {
-  constexpr absl::string_view hlo_string = R"(
+  constexpr abslx::string_view hlo_string = R"(
 HloModule module
 
 %add {
@@ -222,7 +222,7 @@ ENTRY %comp {
 }
 
 TEST_F(AllReduceBlueConnectTest, OperandIndivisible) {
-  constexpr absl::string_view hlo_string = R"(
+  constexpr abslx::string_view hlo_string = R"(
 HloModule module
 
 %add {

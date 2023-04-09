@@ -313,7 +313,7 @@ class RationalFactorResampler: public Resampler<ValueType> {
     return valid_;
   }
 
-  void ProcessSamplesImpl(absl::Span<const ValueType> input,
+  void ProcessSamplesImpl(abslx::Span<const ValueType> input,
                           std::vector<ValueType>* output) override {
     output->resize(ComputeOutputSizeFromCurrentState(
         static_cast<int>(input.size())));

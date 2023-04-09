@@ -44,7 +44,7 @@ bool AreCompatible(const HloAllReduceInstruction *ar0,
 
 StatusOr<bool> AllReduceReassociate::Run(
     HloModule *module,
-    const absl::flat_hash_set<absl::string_view> &execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view> &execution_threads) {
   if (hlo_query::ContainsLayoutConstrainedAllReduce(*module)) {
     VLOG(1)
         << "Skip AllReduceReassociate because the module contains all-reduce "

@@ -339,7 +339,7 @@ TEST_F(LiteralUtilTest, EachCellR2F32) {
   // clang-format on
   std::vector<std::tuple<int64_t, int64_t, std::string>> seen;
   literal.EachCellAsString(
-      [&seen](absl::Span<const int64_t> indices, const std::string& value) {
+      [&seen](abslx::Span<const int64_t> indices, const std::string& value) {
         seen.emplace_back(indices[0], indices[1], value);
       });
 
@@ -725,7 +725,7 @@ TEST_F(LiteralUtilTest, TransposeR4) {
   // clang-format on
   auto reshape = original.Transpose(/*permutation=*/{2, 3, 0, 1});
 
-  reshape.EachCell<float>([&](absl::Span<const int64_t> indices, float value) {
+  reshape.EachCell<float>([&](abslx::Span<const int64_t> indices, float value) {
     EXPECT_EQ(value, original.Get<float>(
                          {indices[2], indices[3], indices[0], indices[1]}));
   });
@@ -738,7 +738,7 @@ TEST_F(LiteralUtilTest, TransposeDynamicR2) {
   // F32[<=3, 2] (1, 2)
   auto reshape = original.Transpose(/*permutation=*/{1, 0});
 
-  reshape.EachCell<float>([&](absl::Span<const int64_t> indices, float value) {
+  reshape.EachCell<float>([&](abslx::Span<const int64_t> indices, float value) {
     EXPECT_EQ(value, original.Get<float>({indices[1], indices[0]}));
   });
 }
@@ -753,7 +753,7 @@ TEST_F(LiteralUtilTest, ToStaticR2) {
   EXPECT_TRUE(static_literal.shape().is_static());
 
   static_literal.EachCell<float>(
-      [&](absl::Span<const int64_t> indices, float value) {
+      [&](abslx::Span<const int64_t> indices, float value) {
         EXPECT_EQ(value, original.Get<float>({indices[0], indices[1]}));
       });
 }
@@ -767,7 +767,7 @@ TEST_F(LiteralUtilTest, ToBoundedDynamicR2) {
   EXPECT_EQ(dynamic_literal.shape(), dynamic_shape);
 
   dynamic_literal.EachCell<float>(
-      [&](absl::Span<const int64_t> indices, float value) {
+      [&](abslx::Span<const int64_t> indices, float value) {
         EXPECT_EQ(value, original.Get<float>({indices[0], indices[1]}));
       });
 }
@@ -1053,7 +1053,7 @@ TEST_F(LiteralUtilTest, CopySliceFrom) {
     const int64_t zero_base[] = {0, 0, 0, 0};
     const int64_t step[] = {1, 1, 1, 1};
     uint32_t seqnr = 0;
-    auto init_proc = [&](absl::Span<const int64_t> indexes) {
+    auto init_proc = [&](abslx::Span<const int64_t> indexes) {
       source.Set(indexes, ++seqnr);
       return true;
     };
@@ -1069,7 +1069,7 @@ TEST_F(LiteralUtilTest, CopySliceFrom) {
     std::vector<int64_t> source_indexes(TF_ARRAYSIZE(dimensions), 0);
     std::vector<int64_t> blank_indexes(TF_ARRAYSIZE(dimensions), 0);
     bool matched = true;
-    auto check_proc = [&](absl::Span<const int64_t> indexes) {
+    auto check_proc = [&](abslx::Span<const int64_t> indexes) {
       std::copy(indexes.begin(), indexes.end(), source_indexes.begin());
       std::transform(source_indexes.begin(), source_indexes.end(), src_base,
                      source_indexes.begin(), std::plus<int64_t>());
@@ -1253,7 +1253,7 @@ TEST_F(LiteralUtilTest, Populate) {
         primitive_util::NativeToPrimitiveType<uint32_t>(), data.dimensions,
         data.layout);
     Literal literal(shape);
-    auto generator = [&](absl::Span<const int64_t> indexes) -> uint32_t {
+    auto generator = [&](abslx::Span<const int64_t> indexes) -> uint32_t {
       // Offsets from linear index just to avoid R0 literals to be initialized
       // with zero.
       return IndexUtil::MultidimensionalIndexToLinearIndex(literal.shape(),
@@ -1265,7 +1265,7 @@ TEST_F(LiteralUtilTest, Populate) {
     std::vector<int64_t> zero_base(data.dimensions.size(), 0);
     std::vector<int64_t> step(data.dimensions.size(), 1);
     bool matched = true;
-    auto check_function = [&](absl::Span<const int64_t> indexes) {
+    auto check_function = [&](abslx::Span<const int64_t> indexes) {
       auto value = literal.Get<uint32_t>(indexes);
       matched = matched && (value == generator(indexes));
       return matched;
@@ -1295,7 +1295,7 @@ TEST_F(LiteralUtilTest, PopulateParallel) {
         primitive_util::NativeToPrimitiveType<uint32_t>(), data.dimensions,
         data.layout);
     Literal literal(shape);
-    auto generator = [&](absl::Span<const int64_t> indexes,
+    auto generator = [&](abslx::Span<const int64_t> indexes,
                          int /*thread_id*/) -> uint32_t {
       // Offsets from linear index just to avoid R0 literals to be initialized
       // with zero.
@@ -1308,7 +1308,7 @@ TEST_F(LiteralUtilTest, PopulateParallel) {
     std::vector<int64_t> zero_base(data.dimensions.size(), 0);
     std::vector<int64_t> step(data.dimensions.size(), 1);
     bool matched = true;
-    auto check_function = [&](absl::Span<const int64_t> indexes) {
+    auto check_function = [&](abslx::Span<const int64_t> indexes) {
       auto value = literal.Get<uint32_t>(indexes);
       matched = matched && (value == generator(indexes, /*thread_id=*/-1));
       return matched;
@@ -1503,10 +1503,10 @@ TEST_F(LiteralUtilTest, ConvertIfTypesMatch) {
 
 TEST_F(LiteralUtilTest, BitcastConvert) {
   Literal original = LiteralUtil::CreateR1<uint32_t>(
-      {absl::bit_cast<uint32_t>(2.5f), absl::bit_cast<uint32_t>(-42.25f),
-       absl::bit_cast<uint32_t>(100.f), 0xbeef});
+      {abslx::bit_cast<uint32_t>(2.5f), abslx::bit_cast<uint32_t>(-42.25f),
+       abslx::bit_cast<uint32_t>(100.f), 0xbeef});
   Literal expected = LiteralUtil::CreateR1<float>(
-      {2.5f, -42.25f, 100.0f, absl::bit_cast<float>(0xbeef)});
+      {2.5f, -42.25f, 100.0f, abslx::bit_cast<float>(0xbeef)});
   TF_ASSERT_OK_AND_ASSIGN(Literal converted,
                           original.BitcastConvert(ShapeUtil::ChangeElementType(
                               original.shape(), F32)));
@@ -1518,7 +1518,7 @@ TEST_F(LiteralUtilTest, BitcastConvertBetweenInvalidTypes) {
       literal.BitcastConvert(ShapeUtil::ChangeElementType(literal.shape(), F64))
           .status();
   EXPECT_NE(OkStatus(), status);
-  EXPECT_TRUE(absl::StrContains(status.error_message(),
+  EXPECT_TRUE(abslx::StrContains(status.error_message(),
                                 "to a shape of different size"));
 }
 
@@ -1787,7 +1787,7 @@ TEST_F(LiteralUtilTest, MoveIntoTuple) {
   elements.push_back(
       LiteralUtil::MakeTuple({&inner_elements[0], &inner_elements[1]}));
 
-  Literal literal = Literal::MoveIntoTuple(absl::MakeSpan(elements));
+  Literal literal = Literal::MoveIntoTuple(abslx::MakeSpan(elements));
   ASSERT_TRUE(literal.shape().IsTuple());
   ASSERT_EQ(ShapeUtil::TupleElementCount(literal.shape()), 3);
 

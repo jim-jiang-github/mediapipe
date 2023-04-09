@@ -72,7 +72,7 @@ ENTRY entry {
                                            module_str, /*replica_count=*/4));
   auto param = module->entry_computation()->parameter_instruction(0);
   param->set_parameter_replicated_at_leaf_buffers(
-      absl::Span<const bool>{false, true});
+      abslx::Span<const bool>{false, true});
   TF_ASSERT_OK_AND_ASSIGN(std::unique_ptr<HloReplicationAnalysis> analysis,
                           HloReplicationAnalysis::Run(
                               module.get(), /*cross_partition_spmd=*/false));
@@ -162,7 +162,7 @@ ENTRY entry {
                                            module_str, /*replica_count=*/4));
   auto param = module->entry_computation()->parameter_instruction(0);
   param->set_parameter_replicated_at_leaf_buffers(
-      absl::Span<const bool>{false, true, false});
+      abslx::Span<const bool>{false, true, false});
   TF_ASSERT_OK_AND_ASSIGN(
       std::unique_ptr<HloReplicationAnalysis> analysis,
       HloReplicationAnalysis::Run(module.get(), /*cross_partition_spmd=*/true));
@@ -238,7 +238,7 @@ ENTRY entry {
                           ParseAndReturnVerifiedModule(module_str));
   auto param = module->entry_computation()->parameter_instruction(0);
   param->set_parameter_replicated_at_leaf_buffers(
-      absl::Span<const bool>{true, false});
+      abslx::Span<const bool>{true, false});
   TF_ASSERT_OK_AND_ASSIGN(std::unique_ptr<HloReplicationAnalysis> analysis,
                           HloReplicationAnalysis::Run(
                               module.get(), /*cross_partition_spmd=*/false));
@@ -291,7 +291,7 @@ ENTRY SimpleWhileLoop {
                           ParseAndReturnVerifiedModule(module_str));
   auto param = module->entry_computation()->parameter_instruction(0);
   param->set_parameter_replicated_at_leaf_buffers(
-      absl::Span<const bool>{true, true});
+      abslx::Span<const bool>{true, true});
   TF_ASSERT_OK_AND_ASSIGN(std::unique_ptr<HloReplicationAnalysis> analysis,
                           HloReplicationAnalysis::Run(
                               module.get(), /*cross_partition_spmd=*/false));
@@ -341,7 +341,7 @@ ENTRY WhileLoopParameterAliasingNonReplicatedOutput {
                           ParseAndReturnVerifiedModule(module_str));
   auto param = module->entry_computation()->parameter_instruction(0);
   param->set_parameter_replicated_at_leaf_buffers(
-      absl::Span<const bool>{true, true});
+      abslx::Span<const bool>{true, true});
   TF_ASSERT_OK_AND_ASSIGN(std::unique_ptr<HloReplicationAnalysis> analysis,
                           HloReplicationAnalysis::Run(
                               module.get(), /*cross_partition_spmd=*/false));
@@ -388,7 +388,7 @@ ENTRY WhileLoopDifferentCondition {
                           ParseAndReturnVerifiedModule(module_str));
   auto param = module->entry_computation()->parameter_instruction(0);
   param->set_parameter_replicated_at_leaf_buffers(
-      absl::Span<const bool>{true, true});
+      abslx::Span<const bool>{true, true});
   TF_ASSERT_OK_AND_ASSIGN(std::unique_ptr<HloReplicationAnalysis> analysis,
                           HloReplicationAnalysis::Run(
                               module.get(), /*cross_partition_spmd=*/false));
@@ -438,7 +438,7 @@ ENTRY entry {
                           ParseAndReturnVerifiedModule(module_str));
   auto param = module->entry_computation()->parameter_instruction(0);
   param->set_parameter_replicated_at_leaf_buffers(
-      absl::Span<const bool>{true, true, true, true, false, true, true});
+      abslx::Span<const bool>{true, true, true, true, false, true, true});
   TF_ASSERT_OK_AND_ASSIGN(std::unique_ptr<HloReplicationAnalysis> analysis,
                           HloReplicationAnalysis::Run(
                               module.get(), /*cross_partition_spmd=*/false));
@@ -503,7 +503,7 @@ ENTRY entry {
                           ParseAndReturnVerifiedModule(module_str));
   auto param = module->entry_computation()->parameter_instruction(0);
   param->set_parameter_replicated_at_leaf_buffers(
-      absl::Span<const bool>{true, true, true, true, true, true});
+      abslx::Span<const bool>{true, true, true, true, true, true});
   TF_ASSERT_OK_AND_ASSIGN(std::unique_ptr<HloReplicationAnalysis> analysis,
                           HloReplicationAnalysis::Run(
                               module.get(), /*cross_partition_spmd=*/false));
@@ -541,7 +541,7 @@ ENTRY entry {
   TF_ASSERT_OK_AND_ASSIGN(auto module,
                           ParseAndReturnVerifiedModule(module_str));
   auto param = module->entry_computation()->parameter_instruction(0);
-  param->set_parameter_replicated_at_leaf_buffers(absl::Span<const bool>{true});
+  param->set_parameter_replicated_at_leaf_buffers(abslx::Span<const bool>{true});
   TF_ASSERT_OK_AND_ASSIGN(std::unique_ptr<HloReplicationAnalysis> analysis,
                           HloReplicationAnalysis::Run(
                               module.get(), /*cross_partition_spmd=*/false));

@@ -253,7 +253,7 @@ void AddDetectionFrameSize(const cv::Rect_<float>& position, const int64 time,
       ->Tag(kDetectionsTag)
       .packets.push_back(Adopt(detections.release()).At(Timestamp(time)));
 
-  auto input_size = ::absl::make_unique<std::pair<int, int>>(width, height);
+  auto input_size = ::abslx::make_unique<std::pair<int, int>>(width, height);
   runner->MutableInputs()
       ->Tag(kVideoSizeTag)
       .packets.push_back(Adopt(input_size.release()).At(Timestamp(time)));
@@ -306,7 +306,7 @@ void CheckCropRect(const int x_center, const int y_center, const int width,
   EXPECT_EQ(rect.height(), height);
 }
 TEST(ContentZoomingCalculatorTest, ZoomTest) {
-  auto runner = ::absl::make_unique<CalculatorRunner>(
+  auto runner = ::abslx::make_unique<CalculatorRunner>(
       ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfigA));
   auto detection_set = std::make_unique<DetectionSet>();
   auto* detection = detection_set->add_detections();
@@ -318,7 +318,7 @@ TEST(ContentZoomingCalculatorTest, ZoomTest) {
   location->set_y(.5);
 
   auto input_frame =
-      ::absl::make_unique<ImageFrame>(ImageFormat::SRGB, 1000, 1000);
+      ::abslx::make_unique<ImageFrame>(ImageFormat::SRGB, 1000, 1000);
   runner->MutableInputs()->Tag(kVideoTag).packets.push_back(
       Adopt(input_frame.release()).At(Timestamp(0)));
 
@@ -337,7 +337,7 @@ TEST(ContentZoomingCalculatorTest, ZoomTest) {
 }
 
 TEST(ContentZoomingCalculatorTest, ZoomTestFullPTZ) {
-  auto runner = ::absl::make_unique<CalculatorRunner>(
+  auto runner = ::abslx::make_unique<CalculatorRunner>(
       ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfigD));
   AddDetection(cv::Rect_<float>(.4, .5, .1, .1), 0, runner.get());
   MP_ASSERT_OK(runner->Run());
@@ -353,7 +353,7 @@ TEST(ContentZoomingCalculatorTest, PanConfig) {
   options->mutable_kinematic_options_pan()->set_update_rate_seconds(2);
   options->mutable_kinematic_options_tilt()->set_min_motion_to_reframe(50.0);
   options->mutable_kinematic_options_zoom()->set_min_motion_to_reframe(50.0);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   AddDetection(cv::Rect_<float>(.4, .5, .1, .1), 0, runner.get());
   AddDetection(cv::Rect_<float>(.45, .55, .15, .15), 1000000, runner.get());
   MP_ASSERT_OK(runner->Run());
@@ -374,7 +374,7 @@ TEST(ContentZoomingCalculatorTest, PanConfigWithCache) {
   options->mutable_kinematic_options_tilt()->set_min_motion_to_reframe(50.0);
   options->mutable_kinematic_options_zoom()->set_min_motion_to_reframe(50.0);
   {
-    auto runner = ::absl::make_unique<CalculatorRunner>(config);
+    auto runner = ::abslx::make_unique<CalculatorRunner>(config);
     runner->MutableSidePackets()->Tag(kStateCacheTag) = MakePacket<
         mediapipe::autoflip::ContentZoomingCalculatorStateCacheType*>(&cache);
     AddDetection(cv::Rect_<float>(.4, .5, .1, .1), 0, runner.get());
@@ -383,7 +383,7 @@ TEST(ContentZoomingCalculatorTest, PanConfigWithCache) {
                   runner->Outputs().Tag(kCropRectTag).packets);
   }
   {
-    auto runner = ::absl::make_unique<CalculatorRunner>(config);
+    auto runner = ::abslx::make_unique<CalculatorRunner>(config);
     runner->MutableSidePackets()->Tag(kStateCacheTag) = MakePacket<
         mediapipe::autoflip::ContentZoomingCalculatorStateCacheType*>(&cache);
     AddDetection(cv::Rect_<float>(.45, .55, .15, .15), 1000000, runner.get());
@@ -393,7 +393,7 @@ TEST(ContentZoomingCalculatorTest, PanConfigWithCache) {
   }
   // Now repeat the last frame for a new runner without the cache to see a reset
   {
-    auto runner = ::absl::make_unique<CalculatorRunner>(config);
+    auto runner = ::abslx::make_unique<CalculatorRunner>(config);
     runner->MutableSidePackets()->Tag(kStateCacheTag) = MakePacket<
         mediapipe::autoflip::ContentZoomingCalculatorStateCacheType*>(nullptr);
     AddDetection(cv::Rect_<float>(.45, .55, .15, .15), 2000000, runner.get());
@@ -411,7 +411,7 @@ TEST(ContentZoomingCalculatorTest, TiltConfig) {
   options->mutable_kinematic_options_tilt()->set_min_motion_to_reframe(0.0);
   options->mutable_kinematic_options_tilt()->set_update_rate_seconds(2);
   options->mutable_kinematic_options_zoom()->set_min_motion_to_reframe(50.0);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   AddDetection(cv::Rect_<float>(.4, .5, .1, .1), 0, runner.get());
   AddDetection(cv::Rect_<float>(.45, .55, .15, .15), 1000000, runner.get());
   MP_ASSERT_OK(runner->Run());
@@ -429,7 +429,7 @@ TEST(ContentZoomingCalculatorTest, ZoomConfig) {
   options->mutable_kinematic_options_tilt()->set_min_motion_to_reframe(50.0);
   options->mutable_kinematic_options_zoom()->set_min_motion_to_reframe(0.0);
   options->mutable_kinematic_options_zoom()->set_update_rate_seconds(2);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   AddDetection(cv::Rect_<float>(.4, .5, .1, .1), 0, runner.get());
   AddDetection(cv::Rect_<float>(.45, .55, .15, .15), 1000000, runner.get());
   MP_ASSERT_OK(runner->Run());
@@ -450,7 +450,7 @@ TEST(ContentZoomingCalculatorTest, ZoomConfigWithCache) {
   options->mutable_kinematic_options_zoom()->set_min_motion_to_reframe(0.0);
   options->mutable_kinematic_options_zoom()->set_update_rate_seconds(2);
   {
-    auto runner = ::absl::make_unique<CalculatorRunner>(config);
+    auto runner = ::abslx::make_unique<CalculatorRunner>(config);
     runner->MutableSidePackets()->Tag(kStateCacheTag) = MakePacket<
         mediapipe::autoflip::ContentZoomingCalculatorStateCacheType*>(&cache);
     AddDetection(cv::Rect_<float>(.4, .5, .1, .1), 0, runner.get());
@@ -459,7 +459,7 @@ TEST(ContentZoomingCalculatorTest, ZoomConfigWithCache) {
                   runner->Outputs().Tag(kCropRectTag).packets);
   }
   {
-    auto runner = ::absl::make_unique<CalculatorRunner>(config);
+    auto runner = ::abslx::make_unique<CalculatorRunner>(config);
     runner->MutableSidePackets()->Tag(kStateCacheTag) = MakePacket<
         mediapipe::autoflip::ContentZoomingCalculatorStateCacheType*>(&cache);
     AddDetection(cv::Rect_<float>(.45, .55, .15, .15), 1000000, runner.get());
@@ -469,7 +469,7 @@ TEST(ContentZoomingCalculatorTest, ZoomConfigWithCache) {
   }
   // Now repeat the last frame for a new runner without the cache to see a reset
   {
-    auto runner = ::absl::make_unique<CalculatorRunner>(config);
+    auto runner = ::abslx::make_unique<CalculatorRunner>(config);
     runner->MutableSidePackets()->Tag(kStateCacheTag) = MakePacket<
         mediapipe::autoflip::ContentZoomingCalculatorStateCacheType*>(nullptr);
     AddDetection(cv::Rect_<float>(.45, .55, .15, .15), 2000000, runner.get());
@@ -480,7 +480,7 @@ TEST(ContentZoomingCalculatorTest, ZoomConfigWithCache) {
 }
 
 TEST(ContentZoomingCalculatorTest, MinAspectBorderValues) {
-  auto runner = ::absl::make_unique<CalculatorRunner>(
+  auto runner = ::abslx::make_unique<CalculatorRunner>(
       ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfigB));
   auto detection_set = std::make_unique<DetectionSet>();
   auto* detection = detection_set->add_detections();
@@ -492,7 +492,7 @@ TEST(ContentZoomingCalculatorTest, MinAspectBorderValues) {
   location->set_y(0);
 
   auto input_frame =
-      ::absl::make_unique<ImageFrame>(ImageFormat::SRGB, 1000, 1000);
+      ::abslx::make_unique<ImageFrame>(ImageFormat::SRGB, 1000, 1000);
   runner->MutableInputs()->Tag(kVideoTag).packets.push_back(
       Adopt(input_frame.release()).At(Timestamp(0)));
 
@@ -511,7 +511,7 @@ TEST(ContentZoomingCalculatorTest, MinAspectBorderValues) {
 }
 
 TEST(ContentZoomingCalculatorTest, TwoFacesWide) {
-  auto runner = ::absl::make_unique<CalculatorRunner>(
+  auto runner = ::abslx::make_unique<CalculatorRunner>(
       ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfigA));
   auto detection_set = std::make_unique<DetectionSet>();
   auto* detection = detection_set->add_detections();
@@ -529,7 +529,7 @@ TEST(ContentZoomingCalculatorTest, TwoFacesWide) {
   location->set_y(.4);
 
   auto input_frame =
-      ::absl::make_unique<ImageFrame>(ImageFormat::SRGB, 1000, 1000);
+      ::abslx::make_unique<ImageFrame>(ImageFormat::SRGB, 1000, 1000);
   runner->MutableInputs()->Tag(kVideoTag).packets.push_back(
       Adopt(input_frame.release()).At(Timestamp(0)));
 
@@ -549,12 +549,12 @@ TEST(ContentZoomingCalculatorTest, TwoFacesWide) {
 }
 
 TEST(ContentZoomingCalculatorTest, NoDetectionOnInit) {
-  auto runner = ::absl::make_unique<CalculatorRunner>(
+  auto runner = ::abslx::make_unique<CalculatorRunner>(
       ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfigA));
   auto detection_set = std::make_unique<DetectionSet>();
 
   auto input_frame =
-      ::absl::make_unique<ImageFrame>(ImageFormat::SRGB, 1000, 1000);
+      ::abslx::make_unique<ImageFrame>(ImageFormat::SRGB, 1000, 1000);
   runner->MutableInputs()->Tag(kVideoTag).packets.push_back(
       Adopt(input_frame.release()).At(Timestamp(0)));
 
@@ -574,7 +574,7 @@ TEST(ContentZoomingCalculatorTest, NoDetectionOnInit) {
 }
 
 TEST(ContentZoomingCalculatorTest, ZoomTestPairSize) {
-  auto runner = ::absl::make_unique<CalculatorRunner>(
+  auto runner = ::abslx::make_unique<CalculatorRunner>(
       ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfigC));
   auto detection_set = std::make_unique<DetectionSet>();
   auto* detection = detection_set->add_detections();
@@ -585,7 +585,7 @@ TEST(ContentZoomingCalculatorTest, ZoomTestPairSize) {
   location->set_x(.4);
   location->set_y(.5);
 
-  auto input_size = ::absl::make_unique<std::pair<int, int>>(1000, 1000);
+  auto input_size = ::abslx::make_unique<std::pair<int, int>>(1000, 1000);
   runner->MutableInputs()
       ->Tag(kVideoSizeTag)
       .packets.push_back(Adopt(input_size.release()).At(Timestamp(0)));
@@ -611,7 +611,7 @@ TEST(ContentZoomingCalculatorTest, ZoomTestNearOutsideBorder) {
   options->mutable_kinematic_options_pan()->set_update_rate_seconds(2);
   options->mutable_kinematic_options_tilt()->set_update_rate_seconds(2);
   options->mutable_kinematic_options_zoom()->set_update_rate_seconds(2);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   AddDetection(cv::Rect_<float>(.95, .95, .05, .05), 0, runner.get());
   AddDetection(cv::Rect_<float>(.9, .9, .1, .1), 1000000, runner.get());
   MP_ASSERT_OK(runner->Run());
@@ -628,7 +628,7 @@ TEST(ContentZoomingCalculatorTest, ZoomTestNearInsideBorder) {
   options->mutable_kinematic_options_pan()->set_update_rate_seconds(2);
   options->mutable_kinematic_options_tilt()->set_update_rate_seconds(2);
   options->mutable_kinematic_options_zoom()->set_update_rate_seconds(2);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   AddDetection(cv::Rect_<float>(0, 0, .05, .05), 0, runner.get());
   AddDetection(cv::Rect_<float>(0, 0, .1, .1), 1000000, runner.get());
   MP_ASSERT_OK(runner->Run());
@@ -641,7 +641,7 @@ TEST(ContentZoomingCalculatorTest, VerticalShift) {
   auto* options = config.mutable_options()->MutableExtension(
       ContentZoomingCalculatorOptions::ext);
   options->set_detection_shift_vertical(0.2);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   AddDetection(cv::Rect_<float>(.1, .1, .1, .1), 0, runner.get());
   MP_ASSERT_OK(runner->Run());
   // 1000px * .1 offset + 1000*.1*.1 shift = 170
@@ -656,7 +656,7 @@ TEST(ContentZoomingCalculatorTest, HorizontalShift) {
   auto* options = config.mutable_options()->MutableExtension(
       ContentZoomingCalculatorOptions::ext);
   options->set_detection_shift_horizontal(0.2);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   AddDetection(cv::Rect_<float>(.1, .1, .1, .1), 0, runner.get());
   MP_ASSERT_OK(runner->Run());
   // 1000px * .1 offset + 1000*.1*.1 shift = 170
@@ -672,7 +672,7 @@ TEST(ContentZoomingCalculatorTest, ShiftOutsideBounds) {
       ContentZoomingCalculatorOptions::ext);
   options->set_detection_shift_vertical(-0.2);
   options->set_detection_shift_horizontal(0.2);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   AddDetection(cv::Rect_<float>(.9, 0, .1, .1), 0, runner.get());
   MP_ASSERT_OK(runner->Run());
   CheckCropRect(944, 56, 111, 111, 0,
@@ -681,15 +681,15 @@ TEST(ContentZoomingCalculatorTest, ShiftOutsideBounds) {
 
 TEST(ContentZoomingCalculatorTest, EmptySize) {
   auto config = ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfigD);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   MP_ASSERT_OK(runner->Run());
   ASSERT_EQ(runner->Outputs().Tag(kCropRectTag).packets.size(), 0);
 }
 
 TEST(ContentZoomingCalculatorTest, EmptyDetections) {
   auto config = ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfigD);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
-  auto input_size = ::absl::make_unique<std::pair<int, int>>(1000, 1000);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
+  auto input_size = ::abslx::make_unique<std::pair<int, int>>(1000, 1000);
   runner->MutableInputs()
       ->Tag(kVideoSizeTag)
       .packets.push_back(Adopt(input_size.release()).At(Timestamp(0)));
@@ -700,7 +700,7 @@ TEST(ContentZoomingCalculatorTest, EmptyDetections) {
 
 TEST(ContentZoomingCalculatorTest, ResolutionChangeStationary) {
   auto config = ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfigD);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   AddDetectionFrameSize(cv::Rect_<float>(.4, .4, .2, .2), 0, 1000, 1000,
                         runner.get());
   AddDetectionFrameSize(cv::Rect_<float>(.4, .4, .2, .2), 1, 500, 500,
@@ -717,7 +717,7 @@ TEST(ContentZoomingCalculatorTest, ResolutionChangeStationaryWithCache) {
   auto config = ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfigD);
   config.add_input_side_packet("STATE_CACHE:state_cache");
   {
-    auto runner = ::absl::make_unique<CalculatorRunner>(config);
+    auto runner = ::abslx::make_unique<CalculatorRunner>(config);
     runner->MutableSidePackets()->Tag(kStateCacheTag) = MakePacket<
         mediapipe::autoflip::ContentZoomingCalculatorStateCacheType*>(&cache);
     AddDetectionFrameSize(cv::Rect_<float>(.4, .4, .2, .2), 0, 1000, 1000,
@@ -727,7 +727,7 @@ TEST(ContentZoomingCalculatorTest, ResolutionChangeStationaryWithCache) {
                   runner->Outputs().Tag(kCropRectTag).packets);
   }
   {
-    auto runner = ::absl::make_unique<CalculatorRunner>(config);
+    auto runner = ::abslx::make_unique<CalculatorRunner>(config);
     runner->MutableSidePackets()->Tag(kStateCacheTag) = MakePacket<
         mediapipe::autoflip::ContentZoomingCalculatorStateCacheType*>(&cache);
     AddDetectionFrameSize(cv::Rect_<float>(.4, .4, .2, .2), 1, 500, 500,
@@ -740,7 +740,7 @@ TEST(ContentZoomingCalculatorTest, ResolutionChangeStationaryWithCache) {
 
 TEST(ContentZoomingCalculatorTest, ResolutionChangeZooming) {
   auto config = ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfigD);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   AddDetectionFrameSize(cv::Rect_<float>(.1, .1, .8, .8), 0, 1000, 1000,
                         runner.get());
   AddDetectionFrameSize(cv::Rect_<float>(.4, .4, .2, .2), 1000000, 1000, 1000,
@@ -761,7 +761,7 @@ TEST(ContentZoomingCalculatorTest, ResolutionChangeZoomingWithCache) {
   auto config = ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfigD);
   config.add_input_side_packet("STATE_CACHE:state_cache");
   {
-    auto runner = ::absl::make_unique<CalculatorRunner>(config);
+    auto runner = ::abslx::make_unique<CalculatorRunner>(config);
     runner->MutableSidePackets()->Tag(kStateCacheTag) = MakePacket<
         mediapipe::autoflip::ContentZoomingCalculatorStateCacheType*>(&cache);
     AddDetectionFrameSize(cv::Rect_<float>(.1, .1, .8, .8), 0, 1000, 1000,
@@ -772,7 +772,7 @@ TEST(ContentZoomingCalculatorTest, ResolutionChangeZoomingWithCache) {
   }
   // The second runner should just resume based on state from the first runner.
   {
-    auto runner = ::absl::make_unique<CalculatorRunner>(config);
+    auto runner = ::abslx::make_unique<CalculatorRunner>(config);
     runner->MutableSidePackets()->Tag(kStateCacheTag) = MakePacket<
         mediapipe::autoflip::ContentZoomingCalculatorStateCacheType*>(&cache);
     AddDetectionFrameSize(cv::Rect_<float>(.4, .4, .2, .2), 1000000, 1000, 1000,
@@ -792,7 +792,7 @@ TEST(ContentZoomingCalculatorTest, MaxZoomValue) {
   auto* options = config.mutable_options()->MutableExtension(
       ContentZoomingCalculatorOptions::ext);
   options->set_max_zoom_value_deg(55);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   AddDetectionFrameSize(cv::Rect_<float>(.4, .4, .2, .2), 0, 1000, 1000,
                         runner.get());
   MP_ASSERT_OK(runner->Run());
@@ -806,7 +806,7 @@ TEST(ContentZoomingCalculatorTest, MaxZoomValueOverride) {
   auto* options = config.mutable_options()->MutableExtension(
       ContentZoomingCalculatorOptions::ext);
   options->set_max_zoom_value_deg(30);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   AddDetectionFrameSize(cv::Rect_<float>(.4, .4, .2, .2), 0, 640, 480,
                         runner.get(), {.max_zoom_factor_percent = 133});
   // Change resolution and allow more zoom, and give time to use the new limit
@@ -834,7 +834,7 @@ TEST(ContentZoomingCalculatorTest, MaxZoomOutValue) {
       ContentZoomingCalculatorOptions::ext);
   options->set_scale_factor(1.0);
   options->mutable_kinematic_options_zoom()->set_min_motion_to_reframe(5.0);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   AddDetectionFrameSize(cv::Rect_<float>(.025, .025, .95, .95), 0, 1000, 1000,
                         runner.get());
   AddDetectionFrameSize(cv::Rect_<float>(0, 0, -1, -1), 1000000, 1000, 1000,
@@ -854,7 +854,7 @@ TEST(ContentZoomingCalculatorTest, StartZoomedOut) {
   auto* options = config.mutable_options()->MutableExtension(
       ContentZoomingCalculatorOptions::ext);
   options->set_start_zoomed_out(true);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   AddDetectionFrameSize(cv::Rect_<float>(.4, .4, .2, .2), 0, 1000, 1000,
                         runner.get());
   AddDetectionFrameSize(cv::Rect_<float>(.4, .4, .2, .2), 400000, 1000, 1000,
@@ -880,7 +880,7 @@ TEST(ContentZoomingCalculatorTest, AnimateToFirstRect) {
       ContentZoomingCalculatorOptions::ext);
   options->set_us_to_first_rect(1000000);
   options->set_us_to_first_rect_delay(500000);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   AddDetectionFrameSize(cv::Rect_<float>(.4, .4, .2, .2), 0, 1000, 1000,
                         runner.get());
   AddDetectionFrameSize(cv::Rect_<float>(.4, .4, .2, .2), 400000, 1000, 1000,
@@ -911,7 +911,7 @@ TEST(ContentZoomingCalculatorTest, CanControlAnimation) {
   options->set_start_zoomed_out(true);
   options->set_us_to_first_rect(1000000);
   options->set_us_to_first_rect_delay(500000);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   // Request the animation for the first frame.
   AddDetectionFrameSize(cv::Rect_<float>(.4, .4, .2, .2), 0, 1000, 1000,
                         runner.get(), {.animated_zoom = true});
@@ -946,7 +946,7 @@ TEST(ContentZoomingCalculatorTest, DoesNotAnimateIfDisabledViaInput) {
   options->set_start_zoomed_out(true);
   options->set_us_to_first_rect(1000000);
   options->set_us_to_first_rect_delay(500000);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   // Disable the animation already for the first frame.
   AddDetectionFrameSize(cv::Rect_<float>(.4, .4, .2, .2), 0, 1000, 1000,
                         runner.get(), {.animated_zoom = false});
@@ -965,9 +965,9 @@ TEST(ContentZoomingCalculatorTest, DoesNotAnimateIfDisabledViaInput) {
 
 TEST(ContentZoomingCalculatorTest, ProvidesZeroSizeFirstRectWithoutDetections) {
   auto config = ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfigD);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
 
-  auto input_size = ::absl::make_unique<std::pair<int, int>>(1000, 1000);
+  auto input_size = ::abslx::make_unique<std::pair<int, int>>(1000, 1000);
   runner->MutableInputs()
       ->Tag(kVideoSizeTag)
       .packets.push_back(Adopt(input_size.release()).At(Timestamp(0)));
@@ -989,7 +989,7 @@ TEST(ContentZoomingCalculatorTest, ProvidesConstantFirstRect) {
   auto* options = config.mutable_options()->MutableExtension(
       ContentZoomingCalculatorOptions::ext);
   options->set_us_to_first_rect(500000);
-  auto runner = ::absl::make_unique<CalculatorRunner>(config);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(config);
   AddDetectionFrameSize(cv::Rect_<float>(.4, .4, .2, .2), 0, 1000, 1000,
                         runner.get());
   AddDetectionFrameSize(cv::Rect_<float>(.4, .4, .2, .2), 500000, 1000, 1000,

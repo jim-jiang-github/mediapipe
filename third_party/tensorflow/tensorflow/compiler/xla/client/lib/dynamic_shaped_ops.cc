@@ -36,7 +36,7 @@ namespace {
 //
 // result = f32[max(shape_a[0], shape_b[0]), max(shape_a[1], shape_b[1])]
 //        = f32[100, 50]
-Shape FindMaxShape(absl::Span<const Shape*> shapes) {
+Shape FindMaxShape(abslx::Span<const Shape*> shapes) {
   CHECK(!shapes.empty());
   if (shapes[0]->IsTuple()) {
     // Recurse into sub-element.
@@ -48,7 +48,7 @@ Shape FindMaxShape(absl::Span<const Shape*> shapes) {
       for (int64_t j = 0; j < shapes.size(); ++j) {
         subshapes.push_back(&shapes[j]->tuple_shapes(i));
       }
-      results.push_back(FindMaxShape(absl::MakeSpan(subshapes)));
+      results.push_back(FindMaxShape(abslx::MakeSpan(subshapes)));
     }
     return ShapeUtil::MakeTupleShape(results);
   }
@@ -165,8 +165,8 @@ XlaOp DynamicConditional(XlaBuilder* builder, XlaOp predicate,
 
 XlaOp DynamicConditional(
     XlaBuilder* builder, XlaOp branch_index,
-    absl::Span<const XlaComputation* const> branch_computations,
-    absl::Span<const XlaOp> branch_operands) {
+    abslx::Span<const XlaComputation* const> branch_computations,
+    abslx::Span<const XlaOp> branch_operands) {
   return builder->ReportErrorOrReturn([&]() -> StatusOr<XlaOp> {
     std::vector<Shape> root_shapes;
     root_shapes.reserve(branch_computations.size());
@@ -177,7 +177,7 @@ XlaOp DynamicConditional(
     }
     TF_RET_CHECK(!root_shapes.empty());
     bool all_shapes_compatible =
-        absl::c_all_of(root_shapes, [&](const Shape& shape) {
+        abslx::c_all_of(root_shapes, [&](const Shape& shape) {
           return ShapeUtil::Compatible(root_shapes[0], shape);
         });
     if (all_shapes_compatible) {
@@ -192,7 +192,7 @@ XlaOp DynamicConditional(
       root_shapes_ptrs.push_back(&root_shapes[i]);
     }
 
-    Shape max_shape = FindMaxShape(absl::MakeSpan(root_shapes_ptrs));
+    Shape max_shape = FindMaxShape(abslx::MakeSpan(root_shapes_ptrs));
 
     auto reconsile_branch =
         [](const Shape& root_shape, const Shape& operand_shape,

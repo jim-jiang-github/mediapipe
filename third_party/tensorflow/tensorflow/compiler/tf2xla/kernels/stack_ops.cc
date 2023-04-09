@@ -109,7 +109,7 @@ class StackOp : public XlaOpKernel {
     // Otherwise we do not know the shape of the stack elements.
     XlaResource* resource =
         ctx->xla_context()->AddResource(XlaResource::CreateStack(
-            /*name=*/absl::StrCat("Stack: ", stack_name_), dtype_, max_size));
+            /*name=*/abslx::StrCat("Stack: ", stack_name_), dtype_, max_size));
     ctx->SetResourceOutput(0, resource);
   }
 

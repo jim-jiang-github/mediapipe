@@ -59,7 +59,7 @@ Status TestCluster::Initialize() {
   dispatcher_config.set_client_timeout_ms(config_.client_timeout_ms);
   TF_RETURN_IF_ERROR(NewDispatchServer(dispatcher_config, dispatcher_));
   TF_RETURN_IF_ERROR(dispatcher_->Start());
-  dispatcher_address_ = absl::StrCat("localhost:", dispatcher_->BoundPort());
+  dispatcher_address_ = abslx::StrCat("localhost:", dispatcher_->BoundPort());
   workers_.reserve(num_workers_);
   worker_addresses_.reserve(num_workers_);
   for (int i = 0; i < num_workers_; ++i) {
@@ -77,7 +77,7 @@ Status TestCluster::AddWorker() {
   config.set_heartbeat_interval_ms(config_.worker_heartbeat_interval_ms);
   TF_RETURN_IF_ERROR(NewWorkerServer(config, worker));
   TF_RETURN_IF_ERROR(worker->Start());
-  worker_addresses_.push_back(absl::StrCat("localhost:", worker->BoundPort()));
+  worker_addresses_.push_back(abslx::StrCat("localhost:", worker->BoundPort()));
   workers_.push_back(std::move(worker));
   return OkStatus();
 }

@@ -54,38 +54,38 @@ class ModelResourcesCache {
   // Adds a ModelResources object into the cache.
   // The tag of the ModelResources must be unique; the ownership of the
   // ModelResources will be transferred into the cache.
-  absl::Status AddModelResources(
+  abslx::Status AddModelResources(
       std::unique_ptr<ModelResources> model_resources);
 
   // Adds a collection of the ModelResources objects into the cache.
   // The tag of the each ModelResources must be unique; the ownership of
   // every ModelResource will be transferred into the cache.
-  absl::Status AddModelResourcesCollection(
+  abslx::Status AddModelResourcesCollection(
       std::vector<std::unique_ptr<ModelResources>>& model_resources_collection);
 
   // Retrieves a const ModelResources pointer by the unique tag.
-  absl::StatusOr<const ModelResources*> GetModelResources(
+  abslx::StatusOr<const ModelResources*> GetModelResources(
       const std::string& tag) const;
 
   // Adds a ModelAssetBundleResources object into the cache.
   // The tag of the ModelAssetBundleResources must be unique; the ownership of
   // the ModelAssetBundleResources will be transferred into the cache.
-  absl::Status AddModelAssetBundleResources(
+  abslx::Status AddModelAssetBundleResources(
       std::unique_ptr<ModelAssetBundleResources> model_asset_bundle_resources);
 
   // Adds a collection of the ModelAssetBundleResources objects into the cache.
   // The tag of the each ModelAssetBundleResources must be unique; the ownership
   // of every ModelAssetBundleResources will be transferred into the cache.
-  absl::Status AddModelAssetBundleResourcesCollection(
+  abslx::Status AddModelAssetBundleResourcesCollection(
       std::vector<std::unique_ptr<ModelAssetBundleResources>>&
           model_asset_bundle_resources_collection);
 
   // Retrieves a const ModelAssetBundleResources pointer by the unique tag.
-  absl::StatusOr<const ModelAssetBundleResources*> GetModelAssetBundleResources(
+  abslx::StatusOr<const ModelAssetBundleResources*> GetModelAssetBundleResources(
       const std::string& tag) const;
 
   // Retrieves the graph op resolver packet.
-  absl::StatusOr<api2::Packet<tflite::OpResolver>> GetGraphOpResolverPacket()
+  abslx::StatusOr<api2::Packet<tflite::OpResolver>> GetGraphOpResolverPacket()
       const;
 
  private:
@@ -93,12 +93,12 @@ class ModelResourcesCache {
   api2::Packet<tflite::OpResolver> graph_op_resolver_packet_;
 
   // A collection of ModelResources objects for the models in the graph.
-  absl::flat_hash_map<std::string, std::unique_ptr<ModelResources>>
+  abslx::flat_hash_map<std::string, std::unique_ptr<ModelResources>>
       model_resources_collection_;
 
   // A collection of ModelAssetBundleResources objects for the model bundles in
   // the graph.
-  absl::flat_hash_map<std::string, std::unique_ptr<ModelAssetBundleResources>>
+  abslx::flat_hash_map<std::string, std::unique_ptr<ModelAssetBundleResources>>
       model_asset_bundle_resources_collection_;
 };
 

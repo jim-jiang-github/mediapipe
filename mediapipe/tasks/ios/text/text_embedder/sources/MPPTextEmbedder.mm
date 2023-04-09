@@ -82,7 +82,7 @@ static NSString *const kTaskGraphName = @"mediapipe.tasks.text.text_embedder.Tex
   Packet packet = [MPPTextPacketCreator createWithText:text];
 
   std::map<std::string, Packet> packetMap = {{kTextInStreamName.cppString, packet}};
-  absl::StatusOr<PacketMap> statusOrOutputPacketMap = [_textTaskRunner process:packetMap];
+  abslx::StatusOr<PacketMap> statusOrOutputPacketMap = [_textTaskRunner process:packetMap];
 
   if (![MPPCommonUtils checkCppError:statusOrOutputPacketMap.status() toError:error]) {
     return nil;

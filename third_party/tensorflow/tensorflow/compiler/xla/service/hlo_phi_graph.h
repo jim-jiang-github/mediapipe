@@ -42,13 +42,13 @@ class PhiGraph {
  public:
   // Register an hlo value into the phi node.
   void RegisterPhi(const HloValue& value,
-                   absl::Span<const HloValue* const> inputs);
+                   abslx::Span<const HloValue* const> inputs);
 
   HloValue::Id GetOptimizedId(const HloValue& value);
 
   // Returns true if the input to a hlo value is the same as `inputs`.
   bool InputsEqualTo(const HloValue& value,
-                     absl::Span<const HloValue* const> inputs);
+                     abslx::Span<const HloValue* const> inputs);
 
   // Given `id`, returns the new id that `id` should be replaced with. If the
   // node is not optimized, returns the same value.
@@ -88,10 +88,10 @@ class PhiGraph {
 
   // A reverse mapping of a node in the phi graph and all HloValues pointing
   // to that phi.
-  absl::flat_hash_map<Node*, std::vector<HloValue::Id>> node_to_value_id_;
+  abslx::flat_hash_map<Node*, std::vector<HloValue::Id>> node_to_value_id_;
 
   // A mapping from a HloValue to node in the phi graph.
-  absl::flat_hash_map<HloValue::Id, Node*> value_id_to_node_;
+  abslx::flat_hash_map<HloValue::Id, Node*> value_id_to_node_;
   std::vector<std::unique_ptr<Node>> node_storage_;
 };
 

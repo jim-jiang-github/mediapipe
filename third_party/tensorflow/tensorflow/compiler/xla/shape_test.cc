@@ -214,7 +214,7 @@ TEST_F(ShapeTest, ProgramShapeToString) {
 }
 
 TEST_F(ShapeTest, SupportsAbslHash) {
-  EXPECT_TRUE(absl::VerifyTypeImplementsAbslHashCorrectly(
+  EXPECT_TRUE(abslx::VerifyTypeImplementsAbslHashCorrectly(
       {opaque_, token_, scalar_, scalar_with_tile_, matrix_, matrix2_, tuple_,
        nested_tuple_, dynamic_matrix_}));
 }

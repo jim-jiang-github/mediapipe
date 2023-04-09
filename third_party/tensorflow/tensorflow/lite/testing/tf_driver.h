@@ -72,14 +72,14 @@ class TfDriver : public TestRunner {
   std::unique_ptr<tensorflow::Session> session_;
   std::vector<int> input_ids_;
   std::vector<string> input_names_;
-  absl::flat_hash_map<string, int> input_name_to_id_;
+  abslx::flat_hash_map<string, int> input_name_to_id_;
   std::vector<std::vector<int64_t>> input_shapes_;
   std::vector<tensorflow::DataType> input_types_;
   std::unordered_map<string, tensorflow::Tensor> input_tensors_;
 
   std::vector<int> output_ids_;
   std::vector<string> output_names_;
-  absl::flat_hash_map<string, int> output_name_to_id_;
+  abslx::flat_hash_map<string, int> output_name_to_id_;
   std::vector<::tensorflow::Tensor> output_tensors_;
 };
 

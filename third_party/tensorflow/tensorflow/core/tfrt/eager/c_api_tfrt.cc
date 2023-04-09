@@ -108,7 +108,7 @@ constexpr char kGpuDeviceName[] = "GPU";
 constexpr char kEnableNativeOpsAttr[] = "TFRT_TEST_enable_native_ops";
 constexpr char kEnableGrapplerAttr[] = "TFRT_TEST_enable_grappler";
 
-TensorMetadata CreateMetadata(DType dtype, absl::Span<const Index> dim_sizes) {
+TensorMetadata CreateMetadata(DType dtype, abslx::Span<const Index> dim_sizes) {
   return TensorMetadata(
       DType(dtype),
       TensorShape(llvm::ArrayRef<Index>(
@@ -684,7 +684,7 @@ tensorflow::AbstractTensorInterface* ContextInterface::CreateBoolScalar(
 }
 
 tensorflow::AbstractTensorInterface* ContextInterface::CreateTensor(
-    tensorflow::DataType dtype, absl::Span<const int64_t> dim_sizes) {
+    tensorflow::DataType dtype, abslx::Span<const int64_t> dim_sizes) {
   std::vector<Index> dimvec(dim_sizes.size());
   for (int i = 0; i < dim_sizes.size(); ++i) {
     dimvec[i] = static_cast<int64_t>(dim_sizes[i]);
@@ -984,7 +984,7 @@ tensorflow::Status ContextInterface::EnableCollectiveOps(
   CreateDummyTfDevices(virtual_device_names, &dummy_tf_devices);
 
   std::string name_prefix =
-      absl::StrCat("/job:", server_def.job_name(),
+      abslx::StrCat("/job:", server_def.job_name(),
                    "/replica:0/task:", server_def.task_index());
 
   // Update host device in TFRT HostContext.
@@ -992,7 +992,7 @@ tensorflow::Status ContextInterface::EnableCollectiveOps(
       GetHostContext()
           ->GetDeviceManager()
           ->MaybeAddDevice(TakeRef(
-              new CpuDevice(absl::StrCat(name_prefix, "/device:CPU:0"))))
+              new CpuDevice(abslx::StrCat(name_prefix, "/device:CPU:0"))))
           .release());
 
   // Update virtual devices in TFRT HostContext.
@@ -1248,27 +1248,27 @@ void OpAttrsInterface::GetNameAttrList(
 }
 
 Status OpAttrsInterface::GetTypeList(
-    absl::string_view attr_name,
-    absl::InlinedVector<tensorflow::DataType, 4>* type_list) const {
+    abslx::string_view attr_name,
+    abslx::InlinedVector<tensorflow::DataType, 4>* type_list) const {
   return tensorflow::errors::Unimplemented("OpAttrsInterface::GetTypeList");
 }
 
-bool OpAttrsInterface::GetInt(absl::string_view attr_name,
+bool OpAttrsInterface::GetInt(abslx::string_view attr_name,
                               int64_t* result) const {
   return attrs_->Get<int64_t>({attr_name.data(), attr_name.size()}, result);
 }
 
-bool OpAttrsInterface::GetFloat(absl::string_view attr_name,
+bool OpAttrsInterface::GetFloat(abslx::string_view attr_name,
                                 float* result) const {
   return attrs_->Get<float>({attr_name.data(), attr_name.size()}, result);
 }
 
-bool OpAttrsInterface::GetBool(absl::string_view attr_name,
+bool OpAttrsInterface::GetBool(abslx::string_view attr_name,
                                bool* result) const {
   return attrs_->Get<bool>({attr_name.data(), attr_name.size()}, result);
 }
 
-bool OpAttrsInterface::GetType(absl::string_view attr_name,
+bool OpAttrsInterface::GetType(abslx::string_view attr_name,
                                tensorflow::DataType* result) const {
   auto optional_type =
       attrs_->GetOptional<OpAttrType>({attr_name.data(), attr_name.size()});
@@ -1299,10 +1299,10 @@ tensorflow::Status OperationInterface::Reset(const char* op,
 }
 
 tensorflow::Status OperationInterface::Execute(
-    absl::Span<tensorflow::AbstractTensorHandle*> retvals, int* num_retvals) {
+    abslx::Span<tensorflow::AbstractTensorHandle*> retvals, int* num_retvals) {
   tensorflow::profiler::TraceMe trace(
       [&] {
-        return absl::StrCat("TFRT_Execute:", Name(), " device:", DeviceName());
+        return abslx::StrCat("TFRT_Execute:", Name(), " device:", DeviceName());
       },
       tensorflow::profiler::TraceMeLevel::kInfo);
   if (custom_device_tensor_handle_count_ > 0) {
@@ -1601,14 +1601,14 @@ tensorflow::Status OperationInterface::SetInput(
 }
 
 tensorflow::Status OperationInterface::AddInputList(
-    absl::Span<tensorflow::AbstractTensorHandle* const> inputs) {
+    abslx::Span<tensorflow::AbstractTensorHandle* const> inputs) {
   return tensorflow::errors::Unimplemented(
       "Unimplemented OperationInterface::AddInputList");
 }
 
-absl::Span<tensorflow::ImmediateExecutionTensorHandle* const>
+abslx::Span<tensorflow::ImmediateExecutionTensorHandle* const>
 OperationInterface::GetInputs() const {
-  return absl::MakeSpan(
+  return abslx::MakeSpan(
       reinterpret_cast<tensorflow::ImmediateExecutionTensorHandle* const*>(
           args_.data()),
       args_.size());
@@ -1899,7 +1899,7 @@ tensorflow::Status OperationInterface::SetAttrShapeList(const char* attr_name,
 }
 
 tensorflow::Status OperationInterface::SetAttrFunctionList(
-    const char* attr_name, absl::Span<const AbstractOperation*> values) {
+    const char* attr_name, abslx::Span<const AbstractOperation*> values) {
   size_t num_values = values.size();
   std::vector<const void*> func_attrs(num_values);
   std::vector<size_t> lengths(num_values);

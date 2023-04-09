@@ -60,7 +60,7 @@ struct ImageClassifierOptions {
   // The user-defined result callback for processing live stream data.
   // The result callback should only be specified when the running mode is set
   // to RunningMode::LIVE_STREAM.
-  std::function<void(absl::StatusOr<ImageClassifierResult>, const Image&,
+  std::function<void(abslx::StatusOr<ImageClassifierResult>, const Image&,
                      int64)>
       result_callback = nullptr;
 };
@@ -105,7 +105,7 @@ class ImageClassifier : tasks::vision::core::BaseVisionTaskApi {
   // Creates an ImageClassifier from the provided options. A non-default
   // OpResolver can be specified in the BaseOptions in order to support custom
   // Ops or specify a subset of built-in Ops.
-  static absl::StatusOr<std::unique_ptr<ImageClassifier>> Create(
+  static abslx::StatusOr<std::unique_ptr<ImageClassifier>> Create(
       std::unique_ptr<ImageClassifierOptions> options);
 
   // Performs image classification on the provided single image.
@@ -125,7 +125,7 @@ class ImageClassifier : tasks::vision::core::BaseVisionTaskApi {
   // The image can be of any size with format RGB or RGBA.
   // TODO: describe exact preprocessing steps once
   // YUVToImageCalculator is integrated.
-  absl::StatusOr<ImageClassifierResult> Classify(
+  abslx::StatusOr<ImageClassifierResult> Classify(
       mediapipe::Image image,
       std::optional<core::ImageProcessingOptions> image_processing_options =
           std::nullopt);
@@ -147,7 +147,7 @@ class ImageClassifier : tasks::vision::core::BaseVisionTaskApi {
   // The image can be of any size with format RGB or RGBA. It's required to
   // provide the video frame's timestamp (in milliseconds). The input timestamps
   // must be monotonically increasing.
-  absl::StatusOr<ImageClassifierResult> ClassifyForVideo(
+  abslx::StatusOr<ImageClassifierResult> ClassifyForVideo(
       mediapipe::Image image, int64 timestamp_ms,
       std::optional<core::ImageProcessingOptions> image_processing_options =
           std::nullopt);
@@ -179,12 +179,12 @@ class ImageClassifier : tasks::vision::core::BaseVisionTaskApi {
   //     longer be valid when the callback returns. To access the image data
   //     outside of the callback, callers need to make a copy of the image.
   //   - The input timestamp in milliseconds.
-  absl::Status ClassifyAsync(mediapipe::Image image, int64 timestamp_ms,
+  abslx::Status ClassifyAsync(mediapipe::Image image, int64 timestamp_ms,
                              std::optional<core::ImageProcessingOptions>
                                  image_processing_options = std::nullopt);
 
   // Shuts down the ImageClassifier when all works are done.
-  absl::Status Close() { return runner_->Close(); }
+  abslx::Status Close() { return runner_->Close(); }
 };
 
 }  // namespace image_classifier

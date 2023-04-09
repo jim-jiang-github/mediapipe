@@ -19,7 +19,7 @@
 #include "absl/container/internal/layout.h"
 #include "benchmark/benchmark.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
@@ -119,4 +119,4 @@ OFFSET_BENCHMARK(BM_OffsetVariable, 82, Int128, int32_t, int16_t, int8_t);
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

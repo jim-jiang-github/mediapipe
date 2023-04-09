@@ -120,7 +120,7 @@ class EagerContext : public ImmediateExecutionContext, public core::RefCounted {
   AbstractTensorInterface* CreateBoolScalar(bool value) override;
 
   AbstractTensorInterface* CreateTensor(
-      DataType dtype, absl::Span<const int64_t> dim_sizes) override;
+      DataType dtype, abslx::Span<const int64_t> dim_sizes) override;
   AbstractTensorInterface* CreateTensor(DataType dtype, const int64_t* dims,
                                         int num_dims, void* data, size_t len,
                                         MemoryReleaser memory_releaser,
@@ -578,7 +578,7 @@ class EagerContext : public ImmediateExecutionContext, public core::RefCounted {
 
    private:
     mutable mutex table_lock_;
-    absl::flat_hash_map<int64_t, IntraProcessRendezvous*> table_
+    abslx::flat_hash_map<int64_t, IntraProcessRendezvous*> table_
         TF_GUARDED_BY(table_lock_);
   };
 
@@ -689,7 +689,7 @@ class EagerContext : public ImmediateExecutionContext, public core::RefCounted {
   // Maps from the fingerprint of a set of device names to a virtual
   // CompositeDevice.
   // TODO(b/145922293): Consider taking device names as keys.
-  absl::flat_hash_map<uint64, std::unique_ptr<CompositeDevice>>
+  abslx::flat_hash_map<uint64, std::unique_ptr<CompositeDevice>>
       composite_devices_ ABSL_GUARDED_BY(composite_devices_mu_);
 
   FunctionLibraryDefinition func_lib_def_{OpRegistry::Global(), {}};
@@ -719,7 +719,7 @@ class EagerContext : public ImmediateExecutionContext, public core::RefCounted {
       kernel_cache_ TF_GUARDED_BY(cache_mu_);
   std::unordered_map<string, RegisteredFunction*> registered_functions_
       TF_GUARDED_BY(cache_mu_);
-  absl::flat_hash_map<Fprint128, Device*, Fprint128Hasher> device_cache_
+  abslx::flat_hash_map<Fprint128, Device*, Fprint128Hasher> device_cache_
       TF_GUARDED_BY(device_cache_mu_);
 
   // Whether we should compute RunMetadata.

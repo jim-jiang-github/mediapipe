@@ -23,7 +23,7 @@
 #include "absl/debugging/internal/stack_consumption.h"
 #include "absl/memory/memory.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace debugging_internal {
 namespace {
@@ -195,7 +195,7 @@ TEST(Demangle, DemangleStackConsumption) {
 
 static void TestOnInput(const char* input) {
   static const int kOutSize = 1048576;
-  auto out = absl::make_unique<char[]>(kOutSize);
+  auto out = abslx::make_unique<char[]>(kOutSize);
   Demangle(input, out.get(), kOutSize);
 }
 
@@ -216,4 +216,4 @@ TEST(DemangleRegression, DeeplyNestedArrayType) {
 }  // namespace
 }  // namespace debugging_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

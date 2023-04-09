@@ -39,8 +39,8 @@ class SequenceShiftCalculator : public Node {
   MEDIAPIPE_NODE_CONTRACT(kIn, kOffset, kOut, TimestampChange::Arbitrary());
 
   // Reads from options to set cache_size_ and packet_offset_.
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   // A positive offset means we want a packet to be output with the timestamp of
@@ -70,7 +70,7 @@ class SequenceShiftCalculator : public Node {
 };
 MEDIAPIPE_REGISTER_NODE(SequenceShiftCalculator);
 
-absl::Status SequenceShiftCalculator::Open(CalculatorContext* cc) {
+abslx::Status SequenceShiftCalculator::Open(CalculatorContext* cc) {
   packet_offset_ = kOffset(cc).GetOr(
       cc->Options<mediapipe::SequenceShiftCalculatorOptions>().packet_offset());
   emit_empty_packets_before_first_packet_ =
@@ -81,10 +81,10 @@ absl::Status SequenceShiftCalculator::Open(CalculatorContext* cc) {
   if (packet_offset_ == 0) {
     cc->Outputs().Index(0).SetOffset(0);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SequenceShiftCalculator::Process(CalculatorContext* cc) {
+abslx::Status SequenceShiftCalculator::Process(CalculatorContext* cc) {
   if (packet_offset_ > 0) {
     ProcessPositiveOffset(cc);
   } else if (packet_offset_ < 0) {
@@ -92,7 +92,7 @@ absl::Status SequenceShiftCalculator::Process(CalculatorContext* cc) {
   } else {
     kOut(cc).Send(kIn(cc).packet());
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void SequenceShiftCalculator::ProcessPositiveOffset(CalculatorContext* cc) {

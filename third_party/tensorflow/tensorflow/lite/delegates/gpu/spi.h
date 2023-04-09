@@ -33,7 +33,7 @@ class TensorObjectConverter {
  public:
   virtual ~TensorObjectConverter() = default;
 
-  virtual absl::Status Convert(const TensorObject& input,
+  virtual abslx::Status Convert(const TensorObject& input,
                                const TensorObject& output) = 0;
 };
 
@@ -44,7 +44,7 @@ class TensorObjectConverterBuilder {
   virtual bool IsSupported(const TensorObjectDef& input,
                            const TensorObjectDef& output) const = 0;
 
-  virtual absl::Status MakeConverter(
+  virtual abslx::Status MakeConverter(
       const TensorObjectDef& input, const TensorObjectDef& output,
       std::unique_ptr<TensorObjectConverter>* converter) = 0;
 };
@@ -66,13 +66,13 @@ class TensorTie {
 
   virtual ~TensorTie() = default;
 
-  virtual absl::Status SetExternalObject(TensorObject obj) = 0;
+  virtual abslx::Status SetExternalObject(TensorObject obj) = 0;
 
   virtual TensorObject GetExternalObject() = 0;
 
-  virtual absl::Status CopyToExternalObject() = 0;
+  virtual abslx::Status CopyToExternalObject() = 0;
 
-  virtual absl::Status CopyFromExternalObject() = 0;
+  virtual abslx::Status CopyFromExternalObject() = 0;
 
   const TensorTieDef& def() const { return def_; }
 

@@ -22,11 +22,11 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status PReLUAlphaTest(TestExecutionEnvironment* env);
+abslx::Status PReLUAlphaTest(TestExecutionEnvironment* env);
 
-absl::Status PReLUAlphaClipTest(TestExecutionEnvironment* env);
+abslx::Status PReLUAlphaClipTest(TestExecutionEnvironment* env);
 
-absl::Status PReLUHWCAlphaTest(TestExecutionEnvironment* env);
+abslx::Status PReLUHWCAlphaTest(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

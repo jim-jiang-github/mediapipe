@@ -26,7 +26,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status SplitChannelsTest(TestExecutionEnvironment* env) {
+abslx::Status SplitChannelsTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 3, 2, 5);
   src_tensor.data = {
@@ -66,10 +66,10 @@ absl::Status SplitChannelsTest(TestExecutionEnvironment* env) {
           dst_tensor1.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SplitChannelsX4Test(TestExecutionEnvironment* env) {
+abslx::Status SplitChannelsX4Test(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 8);
   src_tensor.data = {half(0.1f),  half(0.2f),  half(0.3f),  half(0.4),
@@ -111,10 +111,10 @@ absl::Status SplitChannelsX4Test(TestExecutionEnvironment* env) {
                         dst_tensor1.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SplitWidthTest(TestExecutionEnvironment* env) {
+abslx::Status SplitWidthTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 6, 5, 1);
   src_tensor.data = {
@@ -154,10 +154,10 @@ absl::Status SplitWidthTest(TestExecutionEnvironment* env) {
           dst_tensor1.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SplitHeightTest(TestExecutionEnvironment* env) {
+abslx::Status SplitHeightTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 6, 5, 1);
   src_tensor.data = {
@@ -196,10 +196,10 @@ absl::Status SplitHeightTest(TestExecutionEnvironment* env) {
           dst_tensor1.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SplitBatchTest(TestExecutionEnvironment* env) {
+abslx::Status SplitBatchTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(6, 1, 5, 1);
   src_tensor.data = {
@@ -238,10 +238,10 @@ absl::Status SplitBatchTest(TestExecutionEnvironment* env) {
           dst_tensor1.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SplitDepthTest(TestExecutionEnvironment* env) {
+abslx::Status SplitDepthTest(TestExecutionEnvironment* env) {
   Tensor5DFloat32 src_tensor;
   src_tensor.shape = BHWDC(1, 6, 1, 5, 1);
   src_tensor.data = {
@@ -282,7 +282,7 @@ absl::Status SplitDepthTest(TestExecutionEnvironment* env) {
           dst_tensor1.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

@@ -260,7 +260,7 @@ StatusOr<std::vector<int>> ComputeParametersThatMustBeDonated(
         }
         return OkStatus();
       }));
-  absl::c_sort(parameters_to_donate);
+  abslx::c_sort(parameters_to_donate);
   return parameters_to_donate;
 }
 
@@ -271,17 +271,17 @@ int DefaultThreadPoolSize() {
   // parallelism.
   const char* nproc_str = std::getenv("NPROC");
   int nproc = 0;
-  if (nproc_str && absl::SimpleAtoi(nproc_str, &nproc)) {
+  if (nproc_str && abslx::SimpleAtoi(nproc_str, &nproc)) {
     return std::max(0, nproc);
   }
   return tensorflow::port::MaxParallelism();
 }
 
-bool HasMajorToMinorLayout(PrimitiveType type, absl::Span<int64_t const> dims,
-                           absl::Span<int64_t const> byte_strides) {
+bool HasMajorToMinorLayout(PrimitiveType type, abslx::Span<int64_t const> dims,
+                           abslx::Span<int64_t const> byte_strides) {
   CHECK_EQ(dims.size(), byte_strides.size());
   // If the array is size 0, the strides are irrelevant.
-  if (absl::c_find(dims, 0) != dims.end()) {
+  if (abslx::c_find(dims, 0) != dims.end()) {
     return true;
   }
   int64_t stride = primitive_util::ByteWidth(type);

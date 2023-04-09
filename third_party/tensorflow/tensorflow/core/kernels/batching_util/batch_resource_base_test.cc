@@ -32,8 +32,8 @@ class TestTpuCostMeasurement : public CostMeasurement {
  public:
   using CostMeasurement::CostMeasurement;
 
-  absl::Duration GetTotalCost() override { return absl::Milliseconds(100); }
-  absl::string_view GetCostType() const override { return "test_tpu"; }
+  abslx::Duration GetTotalCost() override { return abslx::Milliseconds(100); }
+  abslx::string_view GetCostType() const override { return "test_tpu"; }
 };
 REGISTER_COST_MEASUREMENT("test_tpu", TestTpuCostMeasurement);
 
@@ -41,14 +41,14 @@ class TestGcuCostMeasurement : public CostMeasurement {
  public:
   using CostMeasurement::CostMeasurement;
 
-  absl::Duration GetTotalCost() override { return absl::Milliseconds(200); }
-  absl::string_view GetCostType() const override { return "test_gcu"; }
+  abslx::Duration GetTotalCost() override { return abslx::Milliseconds(200); }
+  abslx::string_view GetCostType() const override { return "test_gcu"; }
 };
 REGISTER_COST_MEASUREMENT("test_gcu", TestGcuCostMeasurement);
 
 std::unique_ptr<BatchResourceBase::BatchTask> MakeBatchTask(
     const int64_t task_size, RequestCost* request_cost) {
-  auto task = absl::make_unique<BatchResourceBase::BatchTask>();
+  auto task = abslx::make_unique<BatchResourceBase::BatchTask>();
   task->inputs.push_back(Tensor(DT_DOUBLE, TensorShape({task_size, 1})));
   task->request_cost = request_cost;
   return task;
@@ -126,12 +126,12 @@ TEST(SplitBatchCostTest, SplitSingleCostType) {
 
   EXPECT_THAT(
       batch.task(0).request_cost->GetCosts(),
-      UnorderedElementsAre(Pair("test_tpu_with_smear", absl::Milliseconds(10)),
-                           Pair("test_tpu_no_smear", absl::Milliseconds(5))));
+      UnorderedElementsAre(Pair("test_tpu_with_smear", abslx::Milliseconds(10)),
+                           Pair("test_tpu_no_smear", abslx::Milliseconds(5))));
   EXPECT_THAT(
       batch.task(1).request_cost->GetCosts(),
-      UnorderedElementsAre(Pair("test_tpu_with_smear", absl::Milliseconds(90)),
-                           Pair("test_tpu_no_smear", absl::Milliseconds(45))));
+      UnorderedElementsAre(Pair("test_tpu_with_smear", abslx::Milliseconds(90)),
+                           Pair("test_tpu_no_smear", abslx::Milliseconds(45))));
 }
 
 TEST(SplitBatchCostTest, SplitMultiCostTypes) {
@@ -152,16 +152,16 @@ TEST(SplitBatchCostTest, SplitMultiCostTypes) {
 
   EXPECT_THAT(
       batch.task(0).request_cost->GetCosts(),
-      UnorderedElementsAre(Pair("test_tpu_with_smear", absl::Milliseconds(10)),
-                           Pair("test_tpu_no_smear", absl::Milliseconds(5)),
-                           Pair("test_gcu_with_smear", absl::Milliseconds(20)),
-                           Pair("test_gcu_no_smear", absl::Milliseconds(10))));
+      UnorderedElementsAre(Pair("test_tpu_with_smear", abslx::Milliseconds(10)),
+                           Pair("test_tpu_no_smear", abslx::Milliseconds(5)),
+                           Pair("test_gcu_with_smear", abslx::Milliseconds(20)),
+                           Pair("test_gcu_no_smear", abslx::Milliseconds(10))));
   EXPECT_THAT(
       batch.task(1).request_cost->GetCosts(),
-      UnorderedElementsAre(Pair("test_tpu_with_smear", absl::Milliseconds(90)),
-                           Pair("test_tpu_no_smear", absl::Milliseconds(45)),
-                           Pair("test_gcu_with_smear", absl::Milliseconds(180)),
-                           Pair("test_gcu_no_smear", absl::Milliseconds(90))));
+      UnorderedElementsAre(Pair("test_tpu_with_smear", abslx::Milliseconds(90)),
+                           Pair("test_tpu_no_smear", abslx::Milliseconds(45)),
+                           Pair("test_gcu_with_smear", abslx::Milliseconds(180)),
+                           Pair("test_gcu_no_smear", abslx::Milliseconds(90))));
 }
 
 }  // namespace

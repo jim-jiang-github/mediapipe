@@ -133,7 +133,7 @@ StepsAlignment FindStepsAlignment(const StepDatabaseResult& subordinate,
 }
 
 std::string StringStepsAlignment(const StepsAlignment& alignment) {
-  return absl::StrCat(
+  return abslx::StrCat(
       "[begin_subordinate_idx: ", alignment.begin_subordinate_idx,
       ", begin_chief_idx: ", alignment.begin_chief_idx,
       ", num_steps: ", alignment.num_steps, "]");
@@ -141,24 +141,24 @@ std::string StringStepsAlignment(const StepsAlignment& alignment) {
 
 std::string StringDstStepNumbers(const std::vector<uint32>& step_numbers) {
   std::string str;
-  absl::StrAppend(&str, "[");
+  abslx::StrAppend(&str, "[");
   for (auto i = 0; i < step_numbers.size(); i++) {
-    if (i > 0) absl::StrAppend(&str, ", ");
-    absl::StrAppend(&str, step_numbers[i]);
+    if (i > 0) abslx::StrAppend(&str, ", ");
+    abslx::StrAppend(&str, step_numbers[i]);
   }
-  absl::StrAppend(&str, "]");
+  abslx::StrAppend(&str, "]");
   return str;
 }
 
 std::string StringSrcToDstIndexMap(uint32 src_first_step_idx,
                                    uint32 num_steps) {
   std::string str;
-  absl::StrAppend(&str, "[");
+  abslx::StrAppend(&str, "[");
   for (auto i = 0; i < num_steps; i++) {
-    if (i > 0) absl::StrAppend(&str, ", ");
-    absl::StrAppend(&str, src_first_step_idx + i, ":", i);
+    if (i > 0) abslx::StrAppend(&str, ", ");
+    abslx::StrAppend(&str, src_first_step_idx + i, ":", i);
   }
-  absl::StrAppend(&str, "]");
+  abslx::StrAppend(&str, "]");
   return str;
 }
 
@@ -166,7 +166,7 @@ std::string StringSrcToDstIndexMap(uint32 src_first_step_idx,
 
 StepIntersection::StepIntersection(
     uint32 max_steps,
-    const absl::flat_hash_map<uint32, const StepDatabaseResult*>&
+    const abslx::flat_hash_map<uint32, const StepDatabaseResult*>&
         perhost_stepdb) {
   empty_intersect_ = false;
 
@@ -261,10 +261,10 @@ uint32 StepIntersection::FirstStepIndex(uint32 host_id) const {
 
 std::string StepIntersection::DebugString() const {
   std::string str;
-  absl::StrAppend(&str, "chief host id_: ", chief_host_id_, "\n");
-  absl::StrAppend(&str, "begin_chief_idx_: ", begin_chief_idx_,
+  abslx::StrAppend(&str, "chief host id_: ", chief_host_id_, "\n");
+  abslx::StrAppend(&str, "begin_chief_idx_: ", begin_chief_idx_,
                   ", num_steps: ", NumSteps(), "\n");
-  absl::StrAppend(
+  abslx::StrAppend(
       &str, "DstStepNumbers(): ", StringDstStepNumbers(DstStepNumbers()), "\n");
 
   std::vector<uint32> host_ids;
@@ -273,18 +273,18 @@ std::string StepIntersection::DebugString() const {
     auto host_id = hostid_alignment.first;
     host_ids.push_back(host_id);
   }
-  absl::c_sort(host_ids);
+  abslx::c_sort(host_ids);
 
-  absl::StrAppend(&str, "perhost_alignment:\n");
+  abslx::StrAppend(&str, "perhost_alignment:\n");
   for (const auto host_id : host_ids) {
     const auto* ptr = gtl::FindOrNull(perhost_alignment_, host_id);
     if (ptr == nullptr) continue;
-    absl::StrAppend(&str, "host: ", host_id,
+    abslx::StrAppend(&str, "host: ", host_id,
                     ", step-alignment: ", StringStepsAlignment(*ptr), "\n");
   }
-  absl::StrAppend(&str, "SrcToDstIndexMap():\n");
+  abslx::StrAppend(&str, "SrcToDstIndexMap():\n");
   for (const auto host_id : host_ids) {
-    absl::StrAppend(&str, "host: ", host_id, ", src-to-dst-index-map: ",
+    abslx::StrAppend(&str, "host: ", host_id, ", src-to-dst-index-map: ",
                     StringSrcToDstIndexMap(FirstStepIndex(host_id), NumSteps()),
                     "\n");
   }

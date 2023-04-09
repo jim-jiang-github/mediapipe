@@ -52,7 +52,7 @@ namespace xla {
 //
 // and FromMixedRadix(digits) == n. The mixed radix representation is unique
 // modulo the product of the entries of bounds.
-std::vector<int64_t> ToMixedRadix(int64_t n, absl::Span<const int64_t> bounds);
+std::vector<int64_t> ToMixedRadix(int64_t n, abslx::Span<const int64_t> bounds);
 
 // Logs the provided status message with a backtrace.
 //
@@ -66,7 +66,7 @@ Status WithLogBacktrace(const Status& status);
 // the InlinedVector will just behave like an std::vector<> and allocate the
 // memory to store its values.
 inline constexpr int InlineRank() { return 6; }
-using DimensionVector = absl::InlinedVector<int64_t, InlineRank()>;
+using DimensionVector = abslx::InlinedVector<int64_t, InlineRank()>;
 
 // RAII timer that logs with a given label the wall clock time duration in human
 // readable form. This differs from base's ElapsedTimer primarily in that it
@@ -101,7 +101,7 @@ using DimensionVector = absl::InlinedVector<int64_t, InlineRank()>;
       &XLA_TimerStats##counter);
 
 struct TimerStats {
-  absl::Mutex stats_mutex;
+  abslx::Mutex stats_mutex;
   double cumulative_secs ABSL_GUARDED_BY(stats_mutex) = 0;
   double max_secs ABSL_GUARDED_BY(stats_mutex) = 0;
   uint64_t times_called ABSL_GUARDED_BY(stats_mutex) = 0;
@@ -118,7 +118,7 @@ class ScopedLoggingTimer {
   // line: Line number to display in logging.
   // `timer_stats`: unowned non-null pointer which is used to populate the
   // global timer statistics.
-  ScopedLoggingTimer(absl::string_view label, bool enabled, const char* file,
+  ScopedLoggingTimer(abslx::string_view label, bool enabled, const char* file,
                      int line, TimerStats* timer_stats);
 
   // Stop the timer and log the tracked time. Timer is disabled after this
@@ -142,25 +142,25 @@ class ScopedLoggingTimer {
 // Warning: if the vector is updated its storage pointer may change, so use this
 // with caution (ideally in limited scopes with temporary lifetimes).
 template <typename T>
-absl::Span<uint8_t> MutableByteSlice(std::vector<T>* v) {
-  return absl::Span<uint8_t>(reinterpret_cast<uint8_t*>(v->data()),
+abslx::Span<uint8_t> MutableByteSlice(std::vector<T>* v) {
+  return abslx::Span<uint8_t>(reinterpret_cast<uint8_t*>(v->data()),
                              v->size() * sizeof(T));
 }
 
 // Turns an immutable slice of type T into an immutable slice of bytes with the
 // same byte size.
 template <typename T>
-absl::Span<const uint8_t> CastToByteSlice(absl::Span<const T> slice) {
-  return absl::Span<const uint8_t>(
+abslx::Span<const uint8_t> CastToByteSlice(abslx::Span<const T> slice) {
+  return abslx::Span<const uint8_t>(
       reinterpret_cast<const uint8_t*>(slice.data()), slice.size() * sizeof(T));
 }
 
 // Casts a byte slice to a non-byte type T, checking that the original slice
 // length is a multiple of sizeof(T).
 template <typename T>
-absl::Span<const T> CastByteSlice(absl::Span<const uint8_t> slice) {
+abslx::Span<const T> CastByteSlice(abslx::Span<const uint8_t> slice) {
   CHECK_EQ(0, slice.size() % sizeof(T));
-  return absl::Span<const T>(reinterpret_cast<const T*>(slice.data()),
+  return abslx::Span<const T>(reinterpret_cast<const T*>(slice.data()),
                              slice.size() / sizeof(T));
 }
 
@@ -171,8 +171,8 @@ template <typename Container1T,
           typename ElementType = typename Container1T::value_type>
 bool ContainersEqual(const Container1T& c1,
                      std::initializer_list<ElementType> il) {
-  absl::Span<const ElementType> c2{il};
-  return absl::c_equal(c1, c2);
+  abslx::Span<const ElementType> c2{il};
+  return abslx::c_equal(c1, c2);
 }
 
 #if defined(__cpp_lib_to_underlying) && __cpp_lib_to_underlying >= 202102L
@@ -189,8 +189,8 @@ constexpr std::underlying_type_t<T> to_underlying(T value) noexcept {
 // source and destination. The source starting index is src_base, while the
 // destination one is dest_base.
 template <typename D, typename S>
-void StridedCopy(absl::Span<D> dest, int64_t dest_base, int64_t dest_stride,
-                 absl::Span<const S> src, int64_t src_base, int64_t src_stride,
+void StridedCopy(abslx::Span<D> dest, int64_t dest_base, int64_t dest_stride,
+                 abslx::Span<const S> src, int64_t src_base, int64_t src_stride,
                  int64_t count) {
   for (; count > 0; --count, dest_base += dest_stride, src_base += src_stride) {
     dest[dest_base] = static_cast<D>(src[src_base]);
@@ -200,86 +200,86 @@ void StridedCopy(absl::Span<D> dest, int64_t dest_base, int64_t dest_stride,
 // Adds some context information to the error message in a
 // Status.  This is useful as Statuses are
 // propagated upwards.
-Status AddStatus(Status prior, absl::string_view context);
-Status AppendStatus(Status prior, absl::string_view context);
+Status AddStatus(Status prior, abslx::string_view context);
+Status AppendStatus(Status prior, abslx::string_view context);
 
 // Status error shorthands -- StrFormat's the arguments to be used as an error
 // message and returns a status in the canonical error space.
 template <typename... Args>
-Status InvalidArgument(const absl::FormatSpec<Args...>& format,
+Status InvalidArgument(const abslx::FormatSpec<Args...>& format,
                        const Args&... args) {
   return WithLogBacktrace(
-      tensorflow::errors::InvalidArgument(absl::StrFormat(format, args...)));
+      tensorflow::errors::InvalidArgument(abslx::StrFormat(format, args...)));
 }
 template <typename... Args>
-Status Unimplemented(const absl::FormatSpec<Args...>& format,
+Status Unimplemented(const abslx::FormatSpec<Args...>& format,
                      const Args&... args) {
   return WithLogBacktrace(
-      tensorflow::errors::Unimplemented(absl::StrFormat(format, args...)));
+      tensorflow::errors::Unimplemented(abslx::StrFormat(format, args...)));
 }
 template <typename... Args>
-Status InternalError(const absl::FormatSpec<Args...>& format,
+Status InternalError(const abslx::FormatSpec<Args...>& format,
                      const Args&... args) {
   return WithLogBacktrace(
-      tensorflow::errors::Internal(absl::StrFormat(format, args...)));
+      tensorflow::errors::Internal(abslx::StrFormat(format, args...)));
 }
 template <typename... Args>
-Status FailedPrecondition(const absl::FormatSpec<Args...>& format,
+Status FailedPrecondition(const abslx::FormatSpec<Args...>& format,
                           const Args&... args) {
   return WithLogBacktrace(
-      tensorflow::errors::FailedPrecondition(absl::StrFormat(format, args...)));
+      tensorflow::errors::FailedPrecondition(abslx::StrFormat(format, args...)));
 }
 template <typename... Args>
-Status Cancelled(const absl::FormatSpec<Args...>& format, const Args&... args) {
+Status Cancelled(const abslx::FormatSpec<Args...>& format, const Args&... args) {
   return WithLogBacktrace(
-      tensorflow::errors::Cancelled(absl::StrFormat(format, args...)));
+      tensorflow::errors::Cancelled(abslx::StrFormat(format, args...)));
 }
 template <typename... Args>
-Status ResourceExhausted(const absl::FormatSpec<Args...>& format,
+Status ResourceExhausted(const abslx::FormatSpec<Args...>& format,
                          const Args&... args) {
   return WithLogBacktrace(
-      tensorflow::errors::ResourceExhausted(absl::StrFormat(format, args...)));
+      tensorflow::errors::ResourceExhausted(abslx::StrFormat(format, args...)));
 }
 template <typename... Args>
-Status NotFound(const absl::FormatSpec<Args...>& format, const Args&... args) {
+Status NotFound(const abslx::FormatSpec<Args...>& format, const Args&... args) {
   return WithLogBacktrace(
-      tensorflow::errors::NotFound(absl::StrFormat(format, args...)));
+      tensorflow::errors::NotFound(abslx::StrFormat(format, args...)));
 }
 template <typename... Args>
-Status Unavailable(const absl::FormatSpec<Args...>& format,
+Status Unavailable(const abslx::FormatSpec<Args...>& format,
                    const Args&... args) {
   return WithLogBacktrace(
-      tensorflow::errors::Unavailable(absl::StrFormat(format, args...)));
+      tensorflow::errors::Unavailable(abslx::StrFormat(format, args...)));
 }
 template <typename... Args>
-Status Unknown(const absl::FormatSpec<Args...>& format, const Args&... args) {
+Status Unknown(const abslx::FormatSpec<Args...>& format, const Args&... args) {
   return WithLogBacktrace(
-      tensorflow::errors::Unknown(absl::StrFormat(format, args...)));
+      tensorflow::errors::Unknown(abslx::StrFormat(format, args...)));
 }
 template <typename... Args>
-Status Internal(const absl::FormatSpec<Args...>& format, const Args&... args) {
+Status Internal(const abslx::FormatSpec<Args...>& format, const Args&... args) {
   return WithLogBacktrace(
-      tensorflow::errors::Internal(absl::StrFormat(format, args...)));
+      tensorflow::errors::Internal(abslx::StrFormat(format, args...)));
 }
 
 template <typename... Args>
 Status InvalidArgumentStrCat(Args&&... concat) {
-  return InvalidArgument("%s", absl::StrCat(std::forward<Args>(concat)...));
+  return InvalidArgument("%s", abslx::StrCat(std::forward<Args>(concat)...));
 }
 
 template <typename... Args>
 Status UnimplementedStrCat(Args&&... concat) {
-  return Unimplemented("%s", absl::StrCat(std::forward<Args>(concat)...));
+  return Unimplemented("%s", abslx::StrCat(std::forward<Args>(concat)...));
 }
 
 template <typename... Args>
 Status InternalErrorStrCat(Args&&... concat) {
-  return InternalError("%s", absl::StrCat(std::forward<Args>(concat)...));
+  return InternalError("%s", abslx::StrCat(std::forward<Args>(concat)...));
 }
 
 template <typename... Args>
 Status ResourceExhaustedStrCat(Args&&... concat) {
-  return ResourceExhausted("%s", absl::StrCat(std::forward<Args>(concat)...));
+  return ResourceExhausted("%s", abslx::StrCat(std::forward<Args>(concat)...));
 }
 
 // Splits the lines of the original, replaces leading whitespace with the prefix
@@ -288,11 +288,11 @@ Status ResourceExhaustedStrCat(Args&&... concat) {
 //
 // Note: even different amounts of leading whitespace on different lines will be
 // uniformly replaced with "indentation".
-std::string Reindent(absl::string_view original, absl::string_view indentation);
+std::string Reindent(abslx::string_view original, abslx::string_view indentation);
 
 template <typename Container>
 int64_t PositionInContainer(const Container& container, int64_t value) {
-  return std::distance(container.begin(), absl::c_find(container, value));
+  return std::distance(container.begin(), abslx::c_find(container, value));
 }
 
 // Formats the container as a comma-separated string. StrAppend must support
@@ -306,7 +306,7 @@ std::string CommaSeparatedString(const Container& c, const char* prefix = "",
   std::string comma_separated = prefix;
   const char* separator = "";
   for (const auto& entry : c) {
-    absl::StrAppend(&comma_separated, separator, entry);
+    abslx::StrAppend(&comma_separated, separator, entry);
     separator = ", ";
   }
   comma_separated += suffix;
@@ -354,7 +354,7 @@ PaddingConfig MakeNoPaddingConfig(int64_t rank);
 // Returns a PaddingConfig object where 'padding' contains
 // (low edge padding, high edge padding) pairs for each dimension.
 PaddingConfig MakeEdgePaddingConfig(
-    absl::Span<const std::pair<int64_t, int64_t>> padding);
+    abslx::Span<const std::pair<int64_t, int64_t>> padding);
 
 // Returns true if the padding configuration has at least one dimension with
 // non-zero interior padding.
@@ -417,7 +417,7 @@ std::string HumanReadableNumTranscendentalOps(double trops, double nanoseconds);
 
 // Split the text into multiple lines and log each line with the given
 // severity, filename, and line number.
-void LogLines(int sev, absl::string_view text, const char* fname, int lineno);
+void LogLines(int sev, abslx::string_view text, const char* fname, int lineno);
 
 // Returns a mask with "width" number of least significant bits set.
 template <typename T>
@@ -436,7 +436,7 @@ template <typename T>
 constexpr inline int Log2Floor(T x) {
   static_assert(std::is_unsigned<T>::value,
                 "T should be an unsigned integer type");
-  return absl::bit_width(x) - 1;
+  return abslx::bit_width(x) - 1;
 }
 
 // Return ceiling(log2(n)) for positive integer n.  Returns -1 iff n == 0.
@@ -444,7 +444,7 @@ template <typename T>
 constexpr inline int Log2Ceiling(T x) {
   static_assert(std::is_unsigned<T>::value,
                 "T should be an unsigned integer type");
-  return x == 0 ? -1 : absl::bit_width(x - 1);
+  return x == 0 ? -1 : abslx::bit_width(x - 1);
 }
 
 // Return the number of sign bits (i.e. the number of leading ones for negative
@@ -453,8 +453,8 @@ template <typename T>
 constexpr inline int CountLeadingSignBits(T x) {
   static_assert(std::is_signed<T>::value, "T should be a signed integer type");
   using UnsignedType = std::make_unsigned_t<T>;
-  return x < T{0} ? absl::countl_one<UnsignedType>(x)
-                  : absl::countl_zero<UnsignedType>(x);
+  return x < T{0} ? abslx::countl_one<UnsignedType>(x)
+                  : abslx::countl_zero<UnsignedType>(x);
 }
 
 // Returns `value` with the low `width` bits set and the remaining bits set to
@@ -517,9 +517,9 @@ struct SignedIntegerTypeForSize {
 template <typename T>
 typename SignedIntegerTypeForSize<sizeof(T)>::type ToSignMagnitude(T input) {
   auto as_bits =
-      absl::bit_cast<typename SignedIntegerTypeForSize<sizeof(T)>::type>(input);
+      abslx::bit_cast<typename SignedIntegerTypeForSize<sizeof(T)>::type>(input);
   auto sign_mask =
-      absl::bit_cast<typename UnsignedIntegerTypeForSize<sizeof(T)>::type>(
+      abslx::bit_cast<typename UnsignedIntegerTypeForSize<sizeof(T)>::type>(
           tensorflow::MathUtil::Sign(as_bits));
   return as_bits ^ (sign_mask >> 1);
 }
@@ -553,7 +553,7 @@ template <typename T>
 T NanWithSignAndPayload(bool sign, uint64_t nan_payload) {
   using RepT = typename UnsignedIntegerTypeForSize<sizeof(T)>::type;
   const T val = std::numeric_limits<T>::quiet_NaN();
-  auto rep = absl::bit_cast<RepT>(val);
+  auto rep = abslx::bit_cast<RepT>(val);
   rep &= LsbMask<RepT>(std::numeric_limits<RepT>::digits - 1);
   rep |= uint64_t{sign} << (std::numeric_limits<RepT>::digits - 1);
   constexpr int kPayloadBits = NanPayloadBits<T>();
@@ -563,7 +563,7 @@ T NanWithSignAndPayload(bool sign, uint64_t nan_payload) {
     CHECK_NE(nan_payload, 0);
     rep |= nan_payload;
   }
-  return absl::bit_cast<T>(rep);
+  return abslx::bit_cast<T>(rep);
 }
 
 // Utility for performing a static_cast<> on a std::unique_ptr<>.
@@ -572,7 +572,7 @@ std::unique_ptr<Derived> unique_ptr_static_cast(std::unique_ptr<Base> ptr) {
   return std::unique_ptr<Derived>(static_cast<Derived*>(ptr.release()));
 }
 
-int64_t Product(absl::Span<const int64_t> xs);
+int64_t Product(abslx::Span<const int64_t> xs);
 
 // Returns the start indices of consecutive non-overlapping subsequences of `a`
 // and `b` with the same product, i.e. `(i, j)` so
@@ -587,8 +587,8 @@ int64_t Product(absl::Span<const int64_t> xs);
 // b.size}}, otherwise if the given shapes have non-zero size, returns the
 // bounds of the shortest possible such subsequences; else, returns `{(0, 0),
 // (a.size, b.size)}`.
-absl::InlinedVector<std::pair<int64_t, int64_t>, 8> CommonFactors(
-    absl::Span<const int64_t> a, absl::Span<const int64_t> b);
+abslx::InlinedVector<std::pair<int64_t, int64_t>, 8> CommonFactors(
+    abslx::Span<const int64_t> a, abslx::Span<const int64_t> b);
 
 struct ConvertedDimensionNumbers {
   DimensionVector transformed_from_dimensions;
@@ -602,15 +602,15 @@ struct ConvertedDimensionNumbers {
 // Convert and unsorted list of dimensions from one shapes dimension sizes to
 // another shapes dimensions sizes.
 ConvertedDimensionNumbers ConvertDimensionNumbers(
-    absl::Span<const int64_t> from_dimensions,
-    absl::Span<const int64_t> from_sizes, absl::Span<const int64_t> to_sizes);
+    abslx::Span<const int64_t> from_dimensions,
+    abslx::Span<const int64_t> from_sizes, abslx::Span<const int64_t> to_sizes);
 
 // Removes illegal characters from filenames.
 std::string SanitizeFileName(std::string file_name);
 
 template <typename C, typename Value>
 int64_t FindIndex(const C& c, Value&& value) {
-  auto it = absl::c_find(c, std::forward<Value>(value));
+  auto it = abslx::c_find(c, std::forward<Value>(value));
   return std::distance(c.begin(), it);
 }
 
@@ -625,13 +625,13 @@ void EraseAt(C* c, int64_t index) {
 }
 
 template <typename T>
-std::vector<T> SpanToVector(absl::Span<const T> slice) {
+std::vector<T> SpanToVector(abslx::Span<const T> slice) {
   return std::vector<T>(slice.begin(), slice.end());
 }
 
 template <typename T, size_t N>
 std::vector<T> InlinedVectorToVector(
-    const absl::InlinedVector<T, N>& inlined_vector) {
+    const abslx::InlinedVector<T, N>& inlined_vector) {
   return std::vector<T>(inlined_vector.begin(), inlined_vector.end());
 }
 
@@ -646,7 +646,7 @@ bool IsInt32(T x) {
 
 template <typename T>
 Status EraseElementFromVector(std::vector<T>* container, const T& value) {
-  // absl::c_find returns a const_iterator which does not seem to work on
+  // abslx::c_find returns a const_iterator which does not seem to work on
   // gcc 4.8.4, and this breaks the ubuntu/xla_gpu build bot.
   auto it = std::find(container->begin(), container->end(), value);
   TF_RET_CHECK(it != container->end());

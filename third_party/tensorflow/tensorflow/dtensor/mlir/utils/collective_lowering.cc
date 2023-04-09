@@ -562,7 +562,7 @@ mlir::LogicalResult LowerAllGatherOp(mlir::TF::DTensorAllGatherOp all_gather) {
   }
 
   // All reduce among concatenated dimensions.
-  absl::flat_hash_set<std::string> reduced_dims;
+  abslx::flat_hash_set<std::string> reduced_dims;
   for (int i : concat_dims) reduced_dims.insert(src_layout.sharding_spec(i));
 
   auto partitions_or_status =
@@ -611,7 +611,7 @@ mlir::LogicalResult LowerAllGatherOp(mlir::TF::DTensorAllGatherOp all_gather) {
   // This is sufficient.
   const mlir::TensorType type =
       update_result.getType().dyn_cast<mlir::TensorType>();
-  absl::string_view reduce_type = kReduceOpAdd;
+  abslx::string_view reduce_type = kReduceOpAdd;
   if (type && type.getElementType().isInteger(1)) reduce_type = kReduceOpAny;
   mlir::TF::DTensorAllReduceOp all_reduce =
       builder.create<mlir::TF::DTensorAllReduceOp>(

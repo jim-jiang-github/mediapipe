@@ -153,7 +153,7 @@ Status EmitCompareLoopBody(
 
 Status EmitTiledCompareLoop(
     const IrArray::Index& tiled_keys_index, int64_t dimension_to_sort,
-    int64_t dimension_to_sort_bound, absl::Span<const int64_t> xor_masks,
+    int64_t dimension_to_sort_bound, abslx::Span<const int64_t> xor_masks,
     const std::vector<IrArray>& params,
     const std::vector<llvm::GlobalVariable*>& param_shmem_buffers,
     int64_t tile_size,
@@ -317,7 +317,7 @@ Status EmitTiledCompareLoop(
 
 Status EmitSortInPlace(
     int64_t dimension_to_sort, const std::vector<IrArray>& values_arrays,
-    absl::string_view name, absl::Span<const int64_t> xor_masks,
+    abslx::string_view name, abslx::Span<const int64_t> xor_masks,
     llvm::IRBuilder<>* b, const gpu::LaunchDimensions& launch_dimensions,
     int64_t num_iterations_in_sort_dim, const int64_t tile_size,
     const EmitCallToNestedComputationCallback& emit_compare_callback) {
@@ -359,7 +359,7 @@ Status EmitSortInPlace(
               values_arrays[i].GetShape().element_type(), module),
           tile_size);
       param_shmem_buffers[i] = llvm_ir::AllocateSharedMemoryTile(
-          module, tile_type, absl::StrCat(name, "_tile_param_", i));
+          module, tile_type, abslx::StrCat(name, "_tile_param_", i));
     }
   }
 

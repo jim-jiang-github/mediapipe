@@ -32,8 +32,8 @@ namespace xla {
 namespace hlo_sharding_util {
 
 struct GatherParallelDims {
-  absl::InlinedVector<int64_t, 1> indices_parallel_dims;
-  absl::InlinedVector<int64_t, 1> operand_parallel_dims;
+  abslx::InlinedVector<int64_t, 1> indices_parallel_dims;
+  abslx::InlinedVector<int64_t, 1> operand_parallel_dims;
   std::vector<int64_t> index_parallel_in_dim;
 };
 
@@ -69,7 +69,7 @@ Status AssignComputationDevice(HloComputation* computation, int64_t device);
 // Given an instruction container, returns the device which is most commonly
 // occurring among the instructions.
 std::optional<int64_t> GetMostOccurringDevice(
-    absl::Span<HloInstruction* const> instructions);
+    abslx::Span<HloInstruction* const> instructions);
 
 // Given a set of computations, tries to extract the dominant device. A device
 // is dominant if the combined occurrence among all the instructions of the
@@ -79,13 +79,13 @@ std::optional<int64_t> GetMostOccurringDevice(
 // If no device exists that satisfies the condition, the returned optional will
 // hold no value.
 StatusOr<std::optional<int64_t>> GetDominantDevice(
-    absl::Span<HloComputation* const> computations, double dominant_factor);
+    abslx::Span<HloComputation* const> computations, double dominant_factor);
 
 // Returns the HloSharding with the tile dimensions and tile assignment
 // transposed based on the specified dimension numbers. In case of a tile
 // maximal sharding returns the original sharding.
 HloSharding TransposeSharding(const HloSharding& sharding,
-                              absl::Span<const int64_t> dimensions);
+                              abslx::Span<const int64_t> dimensions);
 
 // Returns the HloSharding with the tile shape reshaped based on the source and
 // target shapes and the tile assignment adjusted to correspond to the new tile
@@ -100,14 +100,14 @@ std::optional<HloSharding> ReshapeSharding(const Shape& source_shape,
 // reversed based on the specified dimension numbers. In case of a tile
 // maximal sharding returns the original sharding.
 HloSharding ReverseSharding(const HloSharding& sharding,
-                            absl::Span<const int64_t> dimensions);
+                            abslx::Span<const int64_t> dimensions);
 
 // Returns a sharding tiled on unique dimension dim by reshaping the tile
 // assignment of the sharding argument. Only dimensions in the dims span
 // argument are considered for reshaping, the others are ignored.
 // Assumptions: sharding is tile sharded, and dim must be included in dims.
 HloSharding ReshapeToTileDimension(const HloSharding& sharding, int64_t dim,
-                                   absl::Span<const int64_t> dims);
+                                   abslx::Span<const int64_t> dims);
 
 // Returns true if the provided module includes one or more instructions with
 // a tile sharding.
@@ -157,7 +157,7 @@ HloSharding ScatterEffectiveDataSharding(const HloSharding& data_sharding,
 // sharding.
 std::optional<HloSharding> GatherOutputShardingFromDataOperand(
     const HloSharding& data_operand_sharding, const HloInstruction& hlo,
-    absl::Span<const int64_t> slice_sizes, const Shape& output_shape,
+    abslx::Span<const int64_t> slice_sizes, const Shape& output_shape,
     const Shape& operand_shape);
 
 // Returns a data operand sharding of gather by passing through the output's
@@ -195,17 +195,17 @@ IdentityValueAndHloOpcodeForScatterReduceComputation(
 // Given a sharding and a list of devices in the topology, return a
 // list of the devices that `sharding` applies to.
 std::vector<int64_t> DevicesForSharding(
-    const HloSharding& sharding, absl::Span<const int64_t> available_devices);
+    const HloSharding& sharding, abslx::Span<const int64_t> available_devices);
 
 // Returns a sharding that replicates data across devices along the given
 // dimensions in the original sharding.
 HloSharding PartiallyReplicateTiledShardingOnDims(
-    const HloSharding& sharding, absl::Span<const int64_t> dims_to_replicate);
+    const HloSharding& sharding, abslx::Span<const int64_t> dims_to_replicate);
 
 // Returns a sharding that replicates data across devices along all dimensions
 // but the given ones to keep in the original sharding.
 HloSharding PartiallyReplicateTiledShardingOnAllDimsExcept(
-    const HloSharding& sharding, absl::Span<const int64_t> dims_to_keep);
+    const HloSharding& sharding, abslx::Span<const int64_t> dims_to_keep);
 
 // Returns a sharding that replicates all data dimensions, but keep manual
 // subgroups. If data_rank is provided >= 0, the result sharding's data rank
@@ -217,14 +217,14 @@ HloSharding ReplicateAllDataDims(const HloSharding& sharding,
 //
 // Precondition: if not tile maximal, the size of each tile dimension must be 1.
 HloSharding RemoveShapeDimensions(const HloSharding& sharding,
-                                  absl::Span<const int64_t> dims_to_remove);
+                                  abslx::Span<const int64_t> dims_to_remove);
 
 // Similar to TransposeSharding(), but allows removing/adding non-partitioned
 // dimensions. In src_to_tgt and tgt_to_src, -1 represents a non-existing
 // dimension.
 std::optional<HloSharding> TransposeShardingWithCollapsedDims(
-    const HloSharding& source, absl::Span<int64_t const> src_to_tgt,
-    absl::Span<int64_t const> tgt_to_src);
+    const HloSharding& source, abslx::Span<int64_t const> src_to_tgt,
+    abslx::Span<int64_t const> tgt_to_src);
 
 // Returns the iota dimension if maybe_iota is an kIota instruction or
 // equivalent to kIota.
@@ -236,13 +236,13 @@ std::optional<GatherParallelDims> GetGatherBatchParallelDims(
 
 // Returns the parallel dimensions of the output of a gather based on the
 // parallel dimensions of the input.
-absl::InlinedVector<int64_t, 1> GatherParallelOutputDims(
+abslx::InlinedVector<int64_t, 1> GatherParallelOutputDims(
     const HloInstruction& gather, const GatherParallelDims& parallel_dim);
 
 // Returns the parallel dimensions of the data operand of a gather with the
 // order of the parallel dimensions matching that of the parallel dimensions
 // of the output.
-absl::InlinedVector<int64_t, 1> GatherOutputAlignedOperandParallelDims(
+abslx::InlinedVector<int64_t, 1> GatherOutputAlignedOperandParallelDims(
     const HloInstruction& gather, const GatherParallelDims& parallel_dims);
 
 // Represents grouping devices in a tiled sharding along certain dimensions.
@@ -270,13 +270,13 @@ struct GroupedSharding {
 
 // Creates a GroupedSharding for a tiled sharding with group dim shard sizes.
 GroupedSharding GroupShardingOnDims(const HloSharding& sharding,
-                                    absl::Span<const int64_t> group_dims,
-                                    absl::Span<const int64_t> group_dim_shards,
+                                    abslx::Span<const int64_t> group_dims,
+                                    abslx::Span<const int64_t> group_dim_shards,
                                     bool subgroup_manual = false);
 
 // Creates a GroupedSharding for a tiled sharding.
 GroupedSharding GroupShardingOnDims(const HloSharding& sharding,
-                                    absl::Span<const int64_t> group_dims,
+                                    abslx::Span<const int64_t> group_dims,
                                     bool subgroup_manual = false);
 
 // Get group sharding for each manual subgroup.

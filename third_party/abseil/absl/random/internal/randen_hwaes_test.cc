@@ -24,8 +24,8 @@
 
 namespace {
 
-using absl::random_internal::RandenHwAes;
-using absl::random_internal::RandenTraits;
+using abslx::random_internal::RandenHwAes;
+using abslx::random_internal::RandenTraits;
 
 // Local state parameters.
 constexpr size_t kSeedBytes =
@@ -39,7 +39,7 @@ struct alignas(16) randen {
 };
 
 TEST(RandenHwAesTest, Default) {
-  EXPECT_TRUE(absl::random_internal::CPUSupportsRandenHwAes());
+  EXPECT_TRUE(abslx::random_internal::CPUSupportsRandenHwAes());
 
   constexpr uint64_t kGolden[] = {
       0x6c6534090ee6d3ee, 0x044e2b9b9d5333c6, 0xc3c14f134e433977,
@@ -61,8 +61,8 @@ TEST(RandenHwAesTest, Default) {
 
   uint64_t* id = d.state;
   for (const auto& elem : kGolden) {
-    auto a = absl::StrFormat("%#x", elem);
-    auto b = absl::StrFormat("%#x", *id++);
+    auto a = abslx::StrFormat("%#x", elem);
+    auto b = abslx::StrFormat("%#x", *id++);
     EXPECT_EQ(a, b);
   }
 }
@@ -90,10 +90,10 @@ int main(int argc, char* argv[]) {
   ABSL_RAW_LOG(INFO, "ARCH Unknown");
 #endif
 
-  int x = absl::random_internal::HasRandenHwAesImplementation();
+  int x = abslx::random_internal::HasRandenHwAesImplementation();
   ABSL_RAW_LOG(INFO, "HasRandenHwAesImplementation = %d", x);
 
-  int y = absl::random_internal::CPUSupportsRandenHwAes();
+  int y = abslx::random_internal::CPUSupportsRandenHwAes();
   ABSL_RAW_LOG(INFO, "CPUSupportsRandenHwAes = %d", x);
 
   if (!x || !y) {

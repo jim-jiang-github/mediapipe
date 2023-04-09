@@ -56,7 +56,7 @@ class HloModuleGroupUtil {
 
   // Returns the root instructions of the computations.
   std::vector<HloInstruction*> RootInstructions(
-      absl::Span<HloComputation* const> computations);
+      abslx::Span<HloComputation* const> computations);
 
   // Visit state of each instruction during DFS traversal.
   enum VisitState {
@@ -87,20 +87,20 @@ class HloModuleGroupUtil {
   // * visit_state: map from each instruction to its visit state.
   // * visit_function: function called when each instruction group.
   // * root: the root instruction of the traversal.
-  using VisitStates = absl::flat_hash_map<HloInstruction*, VisitState>;
+  using VisitStates = abslx::flat_hash_map<HloInstruction*, VisitState>;
   Status VisitTopologicalOrder(VisitStates* visit_state,
                                const VisitFunction& visit_function,
                                HloInstruction* root);
 
   // Verifies that the computations are well-formed (e.g., no cycles).
-  Status VerifyComputations(absl::Span<HloComputation* const> computations);
+  Status VerifyComputations(abslx::Span<HloComputation* const> computations);
 
   // Below Reachability utils resemble those in HloComputation, except that
   // they can handle instructions across multiple computations.
   //
   // Creates the reachability map for the instructions in the computations.
   StatusOr<std::unique_ptr<HloReachabilityMap>> ComputeReachability(
-      absl::Span<HloComputation* const> computations);
+      abslx::Span<HloComputation* const> computations);
 
   // Updates the reachability of the given instruction, taking the global
   // predecessors and successors into account.

@@ -58,9 +58,9 @@ StatusOr<std::unique_ptr<RequestInfo>> SetUpRequestContext(
 tensorflow::Status GraphExecutionRunOnFunction(
     const GraphExecutionOptions& options,
     const GraphExecutionRunOptions& run_options,
-    absl::string_view signature_name, const tfrt::Function& func,
-    absl::Span<const tensorflow::Tensor> inputs,
-    absl::Span<const tensorflow::Tensor> captures,
+    abslx::string_view signature_name, const tfrt::Function& func,
+    abslx::Span<const tensorflow::Tensor> inputs,
+    abslx::Span<const tensorflow::Tensor> captures,
     std::vector<tensorflow::Tensor>* outputs,
     tfrt::ResourceContext* resource_context, const Runtime& runtime,
     const FallbackState& fallback_state,
@@ -124,9 +124,9 @@ class GraphExecutor {
   // Runs on the graph according to given input/output.
   tensorflow::Status Run(
       const RunOptions& run_options,
-      absl::Span<const std::pair<std::string, tensorflow::Tensor>> inputs,
-      absl::Span<const std::string> output_tensor_names,
-      absl::Span<const std::string> target_tensor_names,
+      abslx::Span<const std::pair<std::string, tensorflow::Tensor>> inputs,
+      abslx::Span<const std::string> output_tensor_names,
+      abslx::Span<const std::string> target_tensor_names,
       std::vector<tensorflow::Tensor>* outputs);
 
   // Extends the current graph by `graph`.
@@ -164,10 +164,10 @@ class GraphExecutor {
   // no existing one yet, creates one first.
   StatusOr<std::reference_wrapper<const GraphExecutor::LoadedClientGraph>>
   GetOrCreateLoadedClientGraph(
-      absl::Span<const std::string> input_tensor_names,
-      absl::Span<const tensorflow::DataType> input_tensor_dtypes,
-      absl::Span<const std::string> output_tensor_names,
-      absl::Span<const std::string> target_tensor_names,
+      abslx::Span<const std::string> input_tensor_names,
+      abslx::Span<const tensorflow::DataType> input_tensor_dtypes,
+      abslx::Span<const std::string> output_tensor_names,
+      abslx::Span<const std::string> target_tensor_names,
       tensorflow::tfrt_stub::WorkQueueInterface* work_queue)
       TF_LOCKS_EXCLUDED(loaded_client_graphs_mu_);
 
@@ -182,9 +182,9 @@ class GraphExecutor {
 
   tensorflow::mutex loaded_client_graphs_mu_;
   // Caches `LoadedClientGraph` by the joined name.
-  // For pointer stability of values in `absl::flat_hash_map<>`, additional
+  // For pointer stability of values in `abslx::flat_hash_map<>`, additional
   // `std::unique_ptr<>` is necessary. (See https://abseil.io/tips/136.)
-  absl::flat_hash_map<std::string /*joined_name*/,
+  abslx::flat_hash_map<std::string /*joined_name*/,
                       std::unique_ptr<LoadedClientGraph>>
       loaded_client_graphs_ TF_GUARDED_BY(loaded_client_graphs_mu_);
 };

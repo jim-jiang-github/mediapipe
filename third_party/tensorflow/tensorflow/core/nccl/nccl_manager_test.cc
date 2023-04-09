@@ -335,7 +335,7 @@ class NcclManagerTest : public ::testing::Test {
             auto* stream = device->tensorflow_accelerator_device_info()->stream;
             const int global_rank =
                 GlobalRank(num_ranks_per_node, node, local_rank);
-            auto participant = absl::make_unique<NcclManager::Participant>(
+            auto participant = abslx::make_unique<NcclManager::Participant>(
                 device->executor(), stream, info, &test_case->ins[global_rank],
                 &test_case->outs[global_rank], global_rank,
                 this->CreateDoneCallback(test_case.get()));
@@ -390,7 +390,7 @@ class NcclManagerTest : public ::testing::Test {
           auto* output = test_case->outs[global_rank].NumElements() == 0
                              ? nullptr
                              : &test_case->outs[global_rank];
-          auto participant = absl::make_unique<NcclManager::Participant>(
+          auto participant = abslx::make_unique<NcclManager::Participant>(
               device->executor(), stream, info, input, output, global_rank,
               this->CreateDoneCallback(test_case.get()));
           if (global_rank == src_global_rank) {
@@ -477,7 +477,7 @@ TYPED_TEST(NcclManagerTest, BasicSumReduction) {
       VLOG(2) << "rank " << rank << " device " << device->name();
       auto* info = device->tensorflow_accelerator_device_info();
       auto* stream = device->tensorflow_accelerator_device_info()->stream;
-      auto participant = absl::make_unique<NcclManager::Participant>(
+      auto participant = abslx::make_unique<NcclManager::Participant>(
           device->executor(), stream, info, &test_case->ins[rank],
           &test_case->outs[rank], /*global_rank=*/-1,
           this->CreateDoneCallback(test_case.get()));
@@ -544,7 +544,7 @@ TYPED_TEST(NcclManagerTest, MultipleCallers) {
         auto* info = device->tensorflow_accelerator_device_info();
         auto* stream = device->tensorflow_accelerator_device_info()->stream;
         typename TestFixture::TestCase* test_case = test_cases[test_num].get();
-        auto participant = absl::make_unique<NcclManager::Participant>(
+        auto participant = abslx::make_unique<NcclManager::Participant>(
             device->executor(), stream, info, &test_case->ins[rank],
             &test_case->outs[rank], /*global_rank=*/-1,
             this->CreateDoneCallback(test_case));
@@ -586,7 +586,7 @@ TYPED_TEST(NcclManagerTest, BasicAllGather) {
       VLOG(2) << "rank " << rank << " device " << device->name();
       auto* info = device->tensorflow_accelerator_device_info();
       auto* stream = device->tensorflow_accelerator_device_info()->stream;
-      auto participant = absl::make_unique<NcclManager::Participant>(
+      auto participant = abslx::make_unique<NcclManager::Participant>(
           device->executor(), stream, info, &test_case->ins[rank],
           &test_case->outs[rank], rank,
           this->CreateDoneCallback(test_case.get()));
@@ -693,7 +693,7 @@ TYPED_TEST(NcclManagerTest, ConsistentCollectiveType) {
     auto* device = this->GetDevice(num_ranks, /*node=*/0, rank);
     auto* info = device->tensorflow_accelerator_device_info();
     auto* stream = device->tensorflow_accelerator_device_info()->stream;
-    auto participant = absl::make_unique<NcclManager::Participant>(
+    auto participant = abslx::make_unique<NcclManager::Participant>(
         device->executor(), stream, info, &test_case->ins[rank],
         &test_case->outs[rank], /*global_rank=*/-1,
         this->CreateDoneCallback(test_case.get()));
@@ -730,7 +730,7 @@ TYPED_TEST(NcclManagerTest, ConsistentCommunicatorKey) {
     auto* device = this->GetDevice(num_ranks, /*node=*/0, rank);
     auto* info = device->tensorflow_accelerator_device_info();
     auto* stream = device->tensorflow_accelerator_device_info()->stream;
-    auto participant = absl::make_unique<NcclManager::Participant>(
+    auto participant = abslx::make_unique<NcclManager::Participant>(
         device->executor(), stream, info, &test_case->ins[rank],
         &test_case->outs[rank], /*global_rank=*/-1,
         this->CreateDoneCallback(test_case.get()));
@@ -760,7 +760,7 @@ TYPED_TEST(NcclManagerTest, ConsistentNumberOfDevices) {
     auto* info = device->tensorflow_accelerator_device_info();
     auto* stream = device->tensorflow_accelerator_device_info()->stream;
     int num_devices = rank == 0 ? num_ranks : num_ranks + 1;
-    auto participant = absl::make_unique<NcclManager::Participant>(
+    auto participant = abslx::make_unique<NcclManager::Participant>(
         device->executor(), stream, info, &test_case->ins[rank],
         &test_case->outs[rank], /*global_rank=*/-1,
         this->CreateDoneCallback(test_case.get()));
@@ -788,7 +788,7 @@ TYPED_TEST(NcclManagerTest, BroadcastNoSource) {
     auto* device = this->GetDevice(num_ranks, /*node=*/0, rank);
     auto* info = device->tensorflow_accelerator_device_info();
     auto* stream = device->tensorflow_accelerator_device_info()->stream;
-    auto participant = absl::make_unique<NcclManager::Participant>(
+    auto participant = abslx::make_unique<NcclManager::Participant>(
         device->executor(), stream, info, nullptr, &test_case->outs[rank], rank,
         this->CreateDoneCallback(test_case.get()));
     NcclManager::instance()->AddBroadcastRecv(std::move(participant),
@@ -814,7 +814,7 @@ TYPED_TEST(NcclManagerTest, BroadcastMultipleSends) {
     auto* device = this->GetDevice(num_ranks, /*node=*/0, rank);
     auto* info = device->tensorflow_accelerator_device_info();
     auto* stream = device->tensorflow_accelerator_device_info()->stream;
-    auto participant = absl::make_unique<NcclManager::Participant>(
+    auto participant = abslx::make_unique<NcclManager::Participant>(
         device->executor(), stream, info, &test_case->outs[rank],
         &test_case->outs[rank], rank,
         this->CreateDoneCallback(test_case.get()));
@@ -842,7 +842,7 @@ TYPED_TEST(NcclManagerTest, BroadcastInconsistentSource) {
     auto* device = this->GetDevice(num_ranks, /*node=*/0, rank);
     auto* info = device->tensorflow_accelerator_device_info();
     auto* stream = device->tensorflow_accelerator_device_info()->stream;
-    auto participant = absl::make_unique<NcclManager::Participant>(
+    auto participant = abslx::make_unique<NcclManager::Participant>(
         device->executor(), stream, info, &test_case->outs[rank],
         &test_case->outs[rank], rank,
         this->CreateDoneCallback(test_case.get()));
@@ -879,7 +879,7 @@ TYPED_TEST(NcclManagerTest, AbortThenReset) {
                                    /* local_rank */ 0);
     auto* info = device->tensorflow_accelerator_device_info();
     auto* stream = device->tensorflow_accelerator_device_info()->stream;
-    auto participant = absl::make_unique<NcclManager::Participant>(
+    auto participant = abslx::make_unique<NcclManager::Participant>(
         device->executor(), stream, info, &test_case->ins[node],
         &test_case->outs[node], /* global_rank */ node,
         this->CreateDoneCallback(test_case));

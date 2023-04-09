@@ -43,7 +43,7 @@ using ::tensorflow::profiler::RemoteProfilerSessionManager;
 using Response = ::tensorflow::profiler::RemoteProfilerSessionManager::Response;
 
 constexpr uint64 kMaxEvents = 1000000;
-const absl::string_view kXPlanePb = "xplane.pb";
+const abslx::string_view kXPlanePb = "xplane.pb";
 
 MonitorRequest PopulateMonitorRequest(int duration_ms, int monitoring_level,
                                       bool timestamp) {
@@ -55,8 +55,8 @@ MonitorRequest PopulateMonitorRequest(int duration_ms, int monitoring_level,
 }
 
 ProfileRequest PopulateProfileRequest(
-    absl::string_view repository_root, absl::string_view session_id,
-    absl::string_view host_name,
+    abslx::string_view repository_root, abslx::string_view session_id,
+    abslx::string_view host_name,
     const RemoteProfilerSessionManagerOptions& options) {
   ProfileRequest request;
   // TODO(b/169976117) Remove duration from request.
@@ -83,11 +83,11 @@ ProfileRequest PopulateProfileRequest(
 }
 
 NewProfileSessionRequest PopulateNewProfileSessionRequest(
-    absl::string_view repository_root, absl::string_view session_id,
+    abslx::string_view repository_root, abslx::string_view session_id,
     const RemoteProfilerSessionManagerOptions& opts) {
   NewProfileSessionRequest request;
-  std::vector<absl::string_view> parts =
-      absl::StrSplit(opts.service_addresses(0), ':');
+  std::vector<abslx::string_view> parts =
+      abslx::StrSplit(opts.service_addresses(0), ':');
   DCHECK(!parts.empty());
 
   *request.mutable_request() =
@@ -158,8 +158,8 @@ Status Profile(const std::string& repository_root,
 // Start a new profiling session that include all the hosts included in
 // hostnames, for the time interval of duration_ms. Possibly save the profiling
 // result in the directory specified by repository_root and session_id.
-Status NewSession(absl::string_view repository_root,
-                  absl::string_view session_id,
+Status NewSession(abslx::string_view repository_root,
+                  abslx::string_view session_id,
                   const RemoteProfilerSessionManagerOptions& opts) {
   NewProfileSessionRequest request =
       PopulateNewProfileSessionRequest(repository_root, session_id, opts);
@@ -168,7 +168,7 @@ Status NewSession(absl::string_view repository_root,
       NewSessionGrpc(opts.service_addresses(0), request, &response));
 
   std::cout << "Profile session succeed for host(s):"
-            << absl::StrJoin(opts.service_addresses(), ",") << std::endl;
+            << abslx::StrJoin(opts.service_addresses(), ",") << std::endl;
   if (response.empty_trace()) {
     return errors::Unavailable("No trace event is collected");
   }
@@ -192,9 +192,9 @@ Status Trace(const std::string& logdir, int num_tracing_attempts,
   Status status;
   int remaining_attempts = num_tracing_attempts;
   while (true) {
-    auto start_timestamp = absl::Now() + absl::Milliseconds(opts.delay_ms());
+    auto start_timestamp = abslx::Now() + abslx::Milliseconds(opts.delay_ms());
     opts.mutable_profiler_options()->set_start_timestamp_ns(
-        absl::ToUnixNanos(start_timestamp));
+        abslx::ToUnixNanos(start_timestamp));
     LOG(INFO) << "Profiler delay_ms was " << opts.delay_ms()
               << ", start_timestamp_ns set to "
               << opts.profiler_options().start_timestamp_ns() << " ["

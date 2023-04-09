@@ -37,13 +37,13 @@ class RequestCostAccessorRegistry {
   // Creates an instance of registered RequestCostAccessor by name. If the named
   // RequestCostAccessor is not registered yet, returns nullptr.
   static std::unique_ptr<RequestCostAccessor> CreateByNameOrNull(
-      absl::string_view name);
+      abslx::string_view name);
 
   using Creator = std::function<std::unique_ptr<RequestCostAccessor>()>;
 
   // Registers a RequestCostAccessor type to the global map. Registering
   // different types of RequestCostAccessor with the same name is prohibited.
-  static void RegisterRequestCostAccessor(absl::string_view name,
+  static void RegisterRequestCostAccessor(abslx::string_view name,
                                           Creator creator);
 };
 
@@ -52,7 +52,7 @@ class RequestCostAccessorRegistry {
 class RequestCostAccessorRegistrar {
  public:
   explicit RequestCostAccessorRegistrar(
-      absl::string_view name, RequestCostAccessorRegistry::Creator creator) {
+      abslx::string_view name, RequestCostAccessorRegistry::Creator creator) {
     RequestCostAccessorRegistry::RegisterRequestCostAccessor(
         name, std::move(creator));
   }

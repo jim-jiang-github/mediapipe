@@ -104,7 +104,7 @@ std::vector<float> SetUpData(Tensor<BHWC, cond_type>& cond_tensor,
 }
 
 template <DataType cond_type>
-absl::Status RunSelectV2(TestExecutionEnvironment* env,
+abslx::Status RunSelectV2(TestExecutionEnvironment* env,
                          const DataType& data_type,
                          const TensorStorageType& storage,
                          const CalculationsPrecision& precision,
@@ -134,11 +134,11 @@ absl::Status RunSelectV2(TestExecutionEnvironment* env,
       {&cond_descriptor, &true_descriptor, &else_descriptor}, {&dst_descriptor},
       std::make_unique<GPUOperation>(std::move(operation))));
   dst_descriptor.DownloadData(&dst_tensor);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <DataType cond_type>
-absl::Status SelectV2TestTemplate(TestExecutionEnvironment* env) {
+abslx::Status SelectV2TestTemplate(TestExecutionEnvironment* env) {
   const int kBatch = 1;
   const int kHeight = 1;
   const int kWidth = 10;
@@ -163,11 +163,11 @@ absl::Status SelectV2TestTemplate(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear(expected_data, dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <DataType cond_type>
-absl::Status SelectV2BatchTestTemplate(TestExecutionEnvironment* env) {
+abslx::Status SelectV2BatchTestTemplate(TestExecutionEnvironment* env) {
   const int kBatch = 4;
   const int kHeight = 1;
   const int kWidth = 10;
@@ -191,11 +191,11 @@ absl::Status SelectV2BatchTestTemplate(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear(expected_data, dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <DataType cond_type>
-absl::Status SelectV2BroadcastFalseTestTemplate(TestExecutionEnvironment* env) {
+abslx::Status SelectV2BroadcastFalseTestTemplate(TestExecutionEnvironment* env) {
   const int kBatch = 1;
   const int kHeight = 1;
   const int kWidth = 10;
@@ -221,11 +221,11 @@ absl::Status SelectV2BroadcastFalseTestTemplate(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear(expected_data, dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <DataType cond_type>
-absl::Status SelectV2BroadcastTrueTestTemplate(TestExecutionEnvironment* env) {
+abslx::Status SelectV2BroadcastTrueTestTemplate(TestExecutionEnvironment* env) {
   const int kBatch = 1;
   const int kHeight = 1;
   const int kWidth = 10;
@@ -251,11 +251,11 @@ absl::Status SelectV2BroadcastTrueTestTemplate(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear(expected_data, dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <DataType cond_type>
-absl::Status SelectV2BroadcastBothTestTemplate(TestExecutionEnvironment* env) {
+abslx::Status SelectV2BroadcastBothTestTemplate(TestExecutionEnvironment* env) {
   const int kBatch = 1;
   const int kHeight = 1;
   const int kWidth = 10;
@@ -281,11 +281,11 @@ absl::Status SelectV2BroadcastBothTestTemplate(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear(expected_data, dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <DataType cond_type>
-absl::Status SelectV2ChannelsTestTemplate(TestExecutionEnvironment* env) {
+abslx::Status SelectV2ChannelsTestTemplate(TestExecutionEnvironment* env) {
   const int kBatch = 1;
   const int kHeight = 1;
   const int kWidth = 2;
@@ -310,11 +310,11 @@ absl::Status SelectV2ChannelsTestTemplate(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear(expected_data, dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <DataType cond_type>
-absl::Status SelectV2ChannelsBatchTestTemplate(TestExecutionEnvironment* env) {
+abslx::Status SelectV2ChannelsBatchTestTemplate(TestExecutionEnvironment* env) {
   const int kBatch = 3;
   const int kHeight = 1;
   const int kWidth = 2;
@@ -339,11 +339,11 @@ absl::Status SelectV2ChannelsBatchTestTemplate(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear(expected_data, dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <DataType cond_type>
-absl::Status SelectV2ChannelsBroadcastFalseTestTemplate(
+abslx::Status SelectV2ChannelsBroadcastFalseTestTemplate(
     TestExecutionEnvironment* env) {
   const int kBatch = 1;
   const int kHeight = 3;
@@ -369,57 +369,57 @@ absl::Status SelectV2ChannelsBroadcastFalseTestTemplate(
       RETURN_IF_ERROR(PointWiseNear(expected_data, dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SelectV2Test(TestExecutionEnvironment* env) {
+abslx::Status SelectV2Test(TestExecutionEnvironment* env) {
   RETURN_IF_ERROR(SelectV2TestTemplate<DataType::FLOAT32>(env));
   RETURN_IF_ERROR(SelectV2TestTemplate<DataType::BOOL>(env));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SelectV2BatchTest(TestExecutionEnvironment* env) {
+abslx::Status SelectV2BatchTest(TestExecutionEnvironment* env) {
   RETURN_IF_ERROR(SelectV2BatchTestTemplate<DataType::FLOAT32>(env));
   RETURN_IF_ERROR(SelectV2BatchTestTemplate<DataType::BOOL>(env));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SelectV2ChannelsTest(TestExecutionEnvironment* env) {
+abslx::Status SelectV2ChannelsTest(TestExecutionEnvironment* env) {
   RETURN_IF_ERROR(SelectV2ChannelsTestTemplate<DataType::FLOAT32>(env));
   RETURN_IF_ERROR(SelectV2ChannelsTestTemplate<DataType::BOOL>(env));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SelectV2ChannelsBatchTest(TestExecutionEnvironment* env) {
+abslx::Status SelectV2ChannelsBatchTest(TestExecutionEnvironment* env) {
   RETURN_IF_ERROR(SelectV2ChannelsBatchTestTemplate<DataType::FLOAT32>(env));
   RETURN_IF_ERROR(SelectV2ChannelsBatchTestTemplate<DataType::BOOL>(env));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SelectV2BroadcastTrueTest(TestExecutionEnvironment* env) {
+abslx::Status SelectV2BroadcastTrueTest(TestExecutionEnvironment* env) {
   RETURN_IF_ERROR(SelectV2BroadcastTrueTestTemplate<DataType::FLOAT32>(env));
   RETURN_IF_ERROR(SelectV2BroadcastTrueTestTemplate<DataType::BOOL>(env));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SelectV2BroadcastFalseTest(TestExecutionEnvironment* env) {
+abslx::Status SelectV2BroadcastFalseTest(TestExecutionEnvironment* env) {
   RETURN_IF_ERROR(SelectV2BroadcastFalseTestTemplate<DataType::FLOAT32>(env));
   RETURN_IF_ERROR(SelectV2BroadcastFalseTestTemplate<DataType::BOOL>(env));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SelectV2BroadcastBothTest(TestExecutionEnvironment* env) {
+abslx::Status SelectV2BroadcastBothTest(TestExecutionEnvironment* env) {
   RETURN_IF_ERROR(SelectV2BroadcastBothTestTemplate<DataType::FLOAT32>(env));
   RETURN_IF_ERROR(SelectV2BroadcastBothTestTemplate<DataType::BOOL>(env));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SelectV2ChannelsBroadcastFalseTest(TestExecutionEnvironment* env) {
+abslx::Status SelectV2ChannelsBroadcastFalseTest(TestExecutionEnvironment* env) {
   RETURN_IF_ERROR(
       SelectV2ChannelsBroadcastFalseTestTemplate<DataType::FLOAT32>(env));
   RETURN_IF_ERROR(
       SelectV2ChannelsBroadcastFalseTestTemplate<DataType::BOOL>(env));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

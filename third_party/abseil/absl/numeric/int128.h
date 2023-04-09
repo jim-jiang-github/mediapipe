@@ -48,7 +48,7 @@
 #define ABSL_INTERNAL_WCHAR_T wchar_t
 #endif  // defined(_MSC_VER)
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 class int128;
@@ -90,10 +90,10 @@ class int128;
 //
 // Example:
 //
-//     float y = absl::Uint128Max();  // Error. uint128 cannot be implicitly
+//     float y = abslx::Uint128Max();  // Error. uint128 cannot be implicitly
 //                                    // converted to float.
 //
-//     absl::uint128 v;
+//     abslx::uint128 v;
 //     uint64_t i = v;                         // Error
 //     uint64_t i = static_cast<uint64_t>(v);  // OK
 //
@@ -199,7 +199,7 @@ class
   //
   // Example:
   //
-  //   absl::uint128 big = absl::MakeUint128(1, 0);
+  //   abslx::uint128 big = abslx::MakeUint128(1, 0);
   friend constexpr uint128 MakeUint128(uint64_t high, uint64_t low);
 
   // Uint128Max()
@@ -207,7 +207,7 @@ class
   // Returns the highest value for a 128-bit unsigned integer.
   friend constexpr uint128 Uint128Max();
 
-  // Support for absl::Hash.
+  // Support for abslx::Hash.
   template <typename H>
   friend H AbslHashValue(H h, uint128 v) {
     return H::combine(std::move(h), Uint128High64(v), Uint128Low64(v));
@@ -247,12 +247,12 @@ constexpr uint128 Uint128Max() {
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 // Specialized numeric_limits for uint128.
 namespace std {
 template <>
-class numeric_limits<absl::uint128> {
+class numeric_limits<abslx::uint128> {
  public:
   static constexpr bool is_specialized = true;
   static constexpr bool is_signed = false;
@@ -282,19 +282,19 @@ class numeric_limits<absl::uint128> {
 #endif  // ABSL_HAVE_INTRINSIC_INT128
   static constexpr bool tinyness_before = false;
 
-  static constexpr absl::uint128 (min)() { return 0; }
-  static constexpr absl::uint128 lowest() { return 0; }
-  static constexpr absl::uint128 (max)() { return absl::Uint128Max(); }
-  static constexpr absl::uint128 epsilon() { return 0; }
-  static constexpr absl::uint128 round_error() { return 0; }
-  static constexpr absl::uint128 infinity() { return 0; }
-  static constexpr absl::uint128 quiet_NaN() { return 0; }
-  static constexpr absl::uint128 signaling_NaN() { return 0; }
-  static constexpr absl::uint128 denorm_min() { return 0; }
+  static constexpr abslx::uint128 (min)() { return 0; }
+  static constexpr abslx::uint128 lowest() { return 0; }
+  static constexpr abslx::uint128 (max)() { return abslx::Uint128Max(); }
+  static constexpr abslx::uint128 epsilon() { return 0; }
+  static constexpr abslx::uint128 round_error() { return 0; }
+  static constexpr abslx::uint128 infinity() { return 0; }
+  static constexpr abslx::uint128 quiet_NaN() { return 0; }
+  static constexpr abslx::uint128 signaling_NaN() { return 0; }
+  static constexpr abslx::uint128 denorm_min() { return 0; }
 };
 }  // namespace std
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // int128
@@ -324,10 +324,10 @@ ABSL_NAMESPACE_BEGIN
 //
 // Example:
 //
-//     float y = absl::int128(17);  // Error. int128 cannot be implicitly
+//     float y = abslx::int128(17);  // Error. int128 cannot be implicitly
 //                                  // converted to float.
 //
-//     absl::int128 v;
+//     abslx::int128 v;
 //     int64_t i = v;                        // Error
 //     int64_t i = static_cast<int64_t>(v);  // OK
 //
@@ -423,15 +423,15 @@ class int128 {
   // Constructs a `int128` numeric value from two 64-bit integers. Note that
   // signedness is conveyed in the upper `high` value.
   //
-  //   (absl::int128(1) << 64) * high + low
+  //   (abslx::int128(1) << 64) * high + low
   //
   // Note that this factory function is the only way to construct a `int128`
   // from integer values greater than 2^64 or less than -2^64.
   //
   // Example:
   //
-  //   absl::int128 big = absl::MakeInt128(1, 0);
-  //   absl::int128 big_n = absl::MakeInt128(-1, 0);
+  //   abslx::int128 big = abslx::MakeInt128(1, 0);
+  //   abslx::int128 big_n = abslx::MakeInt128(-1, 0);
   friend constexpr int128 MakeInt128(int64_t high, uint64_t low);
 
   // Int128Max()
@@ -444,7 +444,7 @@ class int128 {
   // Returns the minimum value for a 128-bit signed integer.
   friend constexpr int128 Int128Min();
 
-  // Support for absl::Hash.
+  // Support for abslx::Hash.
   template <typename H>
   friend H AbslHashValue(H h, int128 v) {
     return H::combine(std::move(h), Int128High64(v), Int128Low64(v));
@@ -482,12 +482,12 @@ constexpr int128 Int128Min() {
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 // Specialized numeric_limits for int128.
 namespace std {
 template <>
-class numeric_limits<absl::int128> {
+class numeric_limits<abslx::int128> {
  public:
   static constexpr bool is_specialized = true;
   static constexpr bool is_signed = true;
@@ -517,22 +517,22 @@ class numeric_limits<absl::int128> {
 #endif  // ABSL_HAVE_INTRINSIC_INT128
   static constexpr bool tinyness_before = false;
 
-  static constexpr absl::int128 (min)() { return absl::Int128Min(); }
-  static constexpr absl::int128 lowest() { return absl::Int128Min(); }
-  static constexpr absl::int128 (max)() { return absl::Int128Max(); }
-  static constexpr absl::int128 epsilon() { return 0; }
-  static constexpr absl::int128 round_error() { return 0; }
-  static constexpr absl::int128 infinity() { return 0; }
-  static constexpr absl::int128 quiet_NaN() { return 0; }
-  static constexpr absl::int128 signaling_NaN() { return 0; }
-  static constexpr absl::int128 denorm_min() { return 0; }
+  static constexpr abslx::int128 (min)() { return abslx::Int128Min(); }
+  static constexpr abslx::int128 lowest() { return abslx::Int128Min(); }
+  static constexpr abslx::int128 (max)() { return abslx::Int128Max(); }
+  static constexpr abslx::int128 epsilon() { return 0; }
+  static constexpr abslx::int128 round_error() { return 0; }
+  static constexpr abslx::int128 infinity() { return 0; }
+  static constexpr abslx::int128 quiet_NaN() { return 0; }
+  static constexpr abslx::int128 signaling_NaN() { return 0; }
+  static constexpr abslx::int128 denorm_min() { return 0; }
 };
 }  // namespace std
 
 // --------------------------------------------------------------------------
 //                      Implementation details follow
 // --------------------------------------------------------------------------
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 constexpr uint128 MakeUint128(uint64_t high, uint64_t low) {
@@ -1085,7 +1085,7 @@ constexpr int64_t BitCastToSigned(uint64_t v) {
 #endif  // ABSL_HAVE_INTRINSIC_INT128
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #undef ABSL_INTERNAL_WCHAR_T
 

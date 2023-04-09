@@ -35,20 +35,20 @@ namespace {
 
 class Reshape : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     if (ctx.input_shapes[0][1] * ctx.input_shapes[0][2] *
             ctx.input_shapes[0][3] !=
         ctx.output_shapes[0][1] * ctx.output_shapes[0][2] *
             ctx.output_shapes[0][3]) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Number of elements in input & output tensors don't match.");
     }
     const auto& attr = std::any_cast<const ReshapeAttributes&>(ctx.op_attr);
     if (attr.new_shape.h != ctx.output_shapes[0][1] ||
         attr.new_shape.w != ctx.output_shapes[0][2] ||
         attr.new_shape.c != ctx.output_shapes[0][3]) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Dimensions for output does not match new_shape attribute");
     }
 
@@ -84,7 +84,7 @@ class Reshape : public NodeShader {
         /*input=*/IOStructure::ONLY_DEFINITIONS,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

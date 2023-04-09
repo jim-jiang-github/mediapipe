@@ -126,7 +126,7 @@ class XlaExecutableClosureStore {
 
   KeyT Produce(XlaExecutableClosure result) {
     mutex_lock l(mutex_);
-    KeyT key = absl::StrCat(key_counter_++);
+    KeyT key = abslx::StrCat(key_counter_++);
     bool insert_successful = closures_.emplace(key, std::move(result)).second;
     DCHECK(insert_successful);
     (void)insert_successful;
@@ -150,7 +150,7 @@ class XlaExecutableClosureStore {
  private:
   mutex mutex_;
   int64_t key_counter_ TF_GUARDED_BY(mutex_);
-  absl::flat_hash_map<KeyT, XlaExecutableClosure> closures_
+  abslx::flat_hash_map<KeyT, XlaExecutableClosure> closures_
       TF_GUARDED_BY(mutex_);
 
   TF_DISALLOW_COPY_AND_ASSIGN(XlaExecutableClosureStore);
@@ -222,9 +222,9 @@ XlaLocalLaunchBase::XlaLocalLaunchBase(OpKernelConstruction* ctx,
 static Status CompileToLocalExecutable(
     OpKernelContext* ctx, const NameAttrList& function, bool has_ref_vars,
     const XlaPlatformInfo& platform_info,
-    absl::Span<const Tensor* const> inputs,
-    absl::Span<VariableInfo const> variable_infos,
-    absl::Span<const int> constants,
+    abslx::Span<const Tensor* const> inputs,
+    abslx::Span<VariableInfo const> variable_infos,
+    abslx::Span<const int> constants,
     XlaCompilationCache::CompileMode compile_mode,
     bool may_alias_resource_update, xla::LocalClient** client,
     const XlaCompiler::CompilationResult** compilation_result,
@@ -287,7 +287,7 @@ void XlaLocalLaunchBase::Compute(OpKernelContext* ctx) {
     OP_REQUIRES_OK(
         ctx, GetVariableInfosFromInputs(ctx->resource_manager(), ctx->device(),
                                         inputs, resources_, &variable_infos));
-    OP_REQUIRES_OK(ctx, LockVariables(absl::MakeSpan(variable_infos)));
+    OP_REQUIRES_OK(ctx, LockVariables(abslx::MakeSpan(variable_infos)));
     Status s = CompileToLocalExecutable(
         ctx, function_, /*has_ref_vars=*/has_ref_vars_, platform_info_, inputs,
         variable_infos, constants_, XlaCompilationCache::CompileMode::kStrict,
@@ -340,7 +340,7 @@ void XlaLocalLaunchBase::Compute(OpKernelContext* ctx) {
   OP_REQUIRES_OK(
       ctx, launch_context.PopulateOutputs(
                ctx, compilation_result, execution_output->ConsumeResult(),
-               /*missing_ctx_input_prefix=*/0, absl::MakeSpan(variable_infos),
+               /*missing_ctx_input_prefix=*/0, abslx::MakeSpan(variable_infos),
                input_output_alias, resource_var_ptrs));
 
   VLOG(1) << "Done";
@@ -447,7 +447,7 @@ void XlaCompileOp::Compute(OpKernelContext* ctx) {
     OP_REQUIRES_OK(
         ctx, GetVariableInfosFromInputs(ctx->resource_manager(), ctx->device(),
                                         inputs, resources_, &variable_infos));
-    OP_REQUIRES_OK(ctx, LockVariables(absl::MakeSpan(variable_infos)));
+    OP_REQUIRES_OK(ctx, LockVariables(abslx::MakeSpan(variable_infos)));
 
     // Do not alias resource updates as locking variables in XlaCompile and
     // unlocking them in XlaRun may lead to deadlocks.
@@ -535,7 +535,7 @@ void XlaRunOp::Compute(OpKernelContext* ctx) {
   {
     tensorflow::profiler::TraceMe hlo_module_activity(
         [&] {
-          return absl::StrCat(
+          return abslx::StrCat(
               "Populate Inputs (",
               closure.compilation_result()->xla_input_shapes.size(), ")");
         },
@@ -560,20 +560,20 @@ void XlaRunOp::Compute(OpKernelContext* ctx) {
 
   tensorflow::profiler::TraceMe hlo_module_activity(
       [&] {
-        return absl::StrCat("Populate Outputs (", ctx->num_outputs(), ")");
+        return abslx::StrCat("Populate Outputs (", ctx->num_outputs(), ")");
       },
       tensorflow::profiler::TraceMeLevel::kInfo);
 
   StatusOr<std::vector<VariableInfo>> variable_infos = GatherVariableInfo(
       ctx, *closure.compilation_result(), closure.num_constant_args());
   OP_REQUIRES_OK(ctx, variable_infos.status());
-  OP_REQUIRES_OK(ctx, LockVariables(absl::MakeSpan(*variable_infos)));
+  OP_REQUIRES_OK(ctx, LockVariables(abslx::MakeSpan(*variable_infos)));
   OP_REQUIRES_OK(
       ctx,
       launch_context.PopulateOutputs(
           ctx, closure.compilation_result(), execution_output->ConsumeResult(),
           /*missing_ctx_input_prefix=*/closure.num_constant_args(),
-          absl::MakeSpan(*variable_infos), input_output_alias, snapshot_ptrs));
+          abslx::MakeSpan(*variable_infos), input_output_alias, snapshot_ptrs));
 }
 
 XlaMergeOp::XlaMergeOp(OpKernelConstruction* ctx) : OpKernel(ctx) {}

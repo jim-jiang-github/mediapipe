@@ -508,7 +508,7 @@ class PropagatorState {
   // child frame is a hash composed of the ID of the parent frame, the iteration
   // number at which the parent frame is creating the new frame, and the
   // name of the new frame from nodedef.
-  absl::flat_hash_map<uint64, FrameState*> outstanding_frames_
+  abslx::flat_hash_map<uint64, FrameState*> outstanding_frames_
       TF_GUARDED_BY(mu_);
 
   TF_DISALLOW_COPY_AND_ASSIGN(PropagatorState);

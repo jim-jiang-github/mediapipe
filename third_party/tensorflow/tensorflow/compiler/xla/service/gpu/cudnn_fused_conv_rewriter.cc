@@ -41,7 +41,7 @@ namespace m = match;
 // match `log_pattern`.  You can use this to explain "near-hits".
 template <typename FilterPattern, typename LogPattern>
 void VlogIfFailureToMatch(HloInstruction* instr, const LogPattern& log_pattern,
-                          absl::string_view desc,
+                          abslx::string_view desc,
                           const FilterPattern& filter_pattern) {
   if (!VLOG_IS_ON(3) || !Match(instr, filter_pattern)) {
     return;
@@ -147,7 +147,7 @@ StatusOr<HloInstruction*> EnsureIsConvBiasActivation(HloInstruction* conv) {
     }
     auto bias = BroadcastZeros(comp, bias_ty, {num_output_features});
 
-    absl::InlinedVector<HloInstruction*, 3> new_operands(
+    abslx::InlinedVector<HloInstruction*, 3> new_operands(
         conv->operands().begin(), conv->operands().end());
     new_operands.push_back(bias);
 
@@ -178,7 +178,7 @@ StatusOr<bool> FuseConvertToFloat(HloComputation* comp) {
       continue;
     }
     if (!ConsumeFuel("cudnn-fused-convolution-rewriter", [&] {
-          return absl::StrCat("FuseConvertToFloat: ", conv->ToString());
+          return abslx::StrCat("FuseConvertToFloat: ", conv->ToString());
         })) {
       continue;
     }
@@ -228,7 +228,7 @@ StatusOr<bool> FuseConvAlpha(HloComputation* comp) {
       continue;
     }
     if (!ConsumeFuel("cudnn-fused-convolution-rewriter", [&] {
-          return absl::StrCat("FuseConvAlpha: ", conv->ToString());
+          return abslx::StrCat("FuseConvAlpha: ", conv->ToString());
         })) {
       continue;
     }
@@ -305,7 +305,7 @@ StatusOr<bool> FuseBiasOrSideInput(HloComputation* comp) {
                                     addend->dimensions().empty() &&
                                     IsLosslesslyConvertibleTo(addend, bias_ty);
 
-    absl::InlinedVector<HloInstruction*, 4> new_operands(
+    abslx::InlinedVector<HloInstruction*, 4> new_operands(
         conv->operands().begin(), conv->operands().end());
     if (can_accept_bias && addend_may_be_rank1_bias) {
       new_operands[2] = MakeConvertToHlo(addend->mutable_operand(0), bias_ty);
@@ -326,7 +326,7 @@ StatusOr<bool> FuseBiasOrSideInput(HloComputation* comp) {
     }
 
     if (!ConsumeFuel("cudnn-fused-convolution-rewriter", [&] {
-          return absl::StrCat("FuseBiasOrSideInput: ", conv->ToString());
+          return abslx::StrCat("FuseBiasOrSideInput: ", conv->ToString());
         })) {
       continue;
     }
@@ -400,7 +400,7 @@ StatusOr<bool> FuseSideInputAlpha(HloComputation* comp) {
       continue;
     }
     if (!ConsumeFuel("cudnn-fused-convolution-rewriter", [&] {
-          return absl::StrCat("FuseSideInputAlpha: ", conv->ToString());
+          return abslx::StrCat("FuseSideInputAlpha: ", conv->ToString());
         })) {
       continue;
     }
@@ -440,7 +440,7 @@ StatusOr<bool> FuseSideInputAlpha(HloComputation* comp) {
           return comp->AddInstruction(instr->CloneWithNewOperands(
               instr->shape(), {clone(instr->operand(0))}));
         };
-    absl::InlinedVector<HloInstruction*, 4> new_operands(
+    abslx::InlinedVector<HloInstruction*, 4> new_operands(
         conv->operands().begin(), conv->operands().end());
     new_operands[3] = clone(side_input);
 
@@ -480,7 +480,7 @@ StatusOr<bool> FuseRelu(HloComputation* comp) {
     }
 
     if (!ConsumeFuel("cudnn-fused-convolution-rewriter", [&] {
-          return absl::StrCat("FuseRelu: ", conv->ToString());
+          return abslx::StrCat("FuseRelu: ", conv->ToString());
         })) {
       continue;
     }
@@ -523,7 +523,7 @@ StatusOr<bool> FuseConvertToF16(HloComputation* comp) {
       continue;
     }
     if (!ConsumeFuel("cudnn-fused-convolution-rewriter", [&] {
-          return absl::StrCat("FuseConvertToF16: ", conv->ToString());
+          return abslx::StrCat("FuseConvertToF16: ", conv->ToString());
         })) {
       continue;
     }
@@ -534,7 +534,7 @@ StatusOr<bool> FuseConvertToF16(HloComputation* comp) {
     // different from int8 convs, where the bias is fp32.  See table of
     // supported datatypes at
     // https://docs.nvidia.com/deeplearning/cudnn/api/index.html#cudnnConvolutionBiasActivationForward
-    absl::InlinedVector<HloInstruction*, 4> new_operands;
+    abslx::InlinedVector<HloInstruction*, 4> new_operands;
     for (HloInstruction* operand : conv->operands()) {
       new_operands.push_back(MakeConvertToHlo(operand, F16));
     }
@@ -608,12 +608,12 @@ StatusOr<bool> FuseConvertToS8(HloComputation* comp) {
       continue;
     }
     if (!ConsumeFuel("cudnn-fused-convolution-rewriter", [&] {
-          return absl::StrCat("FuseConvertToS8: ", conv->ToString());
+          return abslx::StrCat("FuseConvertToS8: ", conv->ToString());
         })) {
       continue;
     }
 
-    absl::InlinedVector<HloInstruction*, 4> new_operands(
+    abslx::InlinedVector<HloInstruction*, 4> new_operands(
         conv->operands().begin(), conv->operands().end());
     new_operands[0] = MakeConvertToHlo(new_operands[0], S8);
     new_operands[1] = MakeConvertToHlo(new_operands[1], S8);
@@ -688,9 +688,9 @@ Unsupported convs:
 ******* Full HLO module *******
 %s
 )",
-      absl::StrJoin(bad_convs, "\n",
+      abslx::StrJoin(bad_convs, "\n",
                     [](std::string* out, HloInstruction* instr) {
-                      absl::StrAppend(out, " - ", instr->ToString());
+                      abslx::StrAppend(out, " - ", instr->ToString());
                     }),
       comp->parent()->ToString());
 }
@@ -701,7 +701,7 @@ void VlogStats(HloModule* module) {
   }
 
   VLOG(1) << "Results of CudnnFusedConvRewriter for " << module->name();
-  absl::flat_hash_map<std::string, int> stats;
+  abslx::flat_hash_map<std::string, int> stats;
   for (HloComputation* comp : module->MakeNonfusionComputations()) {
     for (HloInstruction* instr : comp->instructions()) {
       if (!Match(instr, m::Op().WithPredicate(IsConvCustomCall))) {
@@ -756,7 +756,7 @@ void VlogStats(HloModule* module) {
       if (config->side_input_scale() != 0 && config->side_input_scale() != 1) {
         stats["31 convs with side-input scale"]++;
       }
-      stats[absl::StrCat(
+      stats[abslx::StrCat(
           "32 convs with activation mode ",
           se::dnn::ActivationMode_Name(config->activation_mode()))]++;
     }
@@ -764,10 +764,10 @@ void VlogStats(HloModule* module) {
 
   std::vector<std::pair<std::string, int>> stats_sorted(stats.begin(),
                                                         stats.end());
-  absl::c_sort(stats_sorted);
+  abslx::c_sort(stats_sorted);
   for (const auto& kv : stats_sorted) {
-    VLOG(1) << absl::StreamFormat("%4d %s", kv.second,
-                                  absl::string_view(kv.first).substr(3));
+    VLOG(1) << abslx::StreamFormat("%4d %s", kv.second,
+                                  abslx::string_view(kv.first).substr(3));
   }
 }
 
@@ -775,7 +775,7 @@ void VlogStats(HloModule* module) {
 
 StatusOr<bool> CudnnFusedConvRewriter::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool any_changed = false;
 
   for (HloComputation* comp :

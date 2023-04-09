@@ -38,9 +38,9 @@ namespace m = ::xla::match;
 
 std::vector<Shape> AllPermutationsOfShape(const Shape& s) {
   std::vector<int64_t> dims_perm(s.dimensions_size());
-  absl::c_iota(dims_perm, 0);
+  abslx::c_iota(dims_perm, 0);
   std::vector<int64_t> layout_perm(s.dimensions_size());
-  absl::c_iota(layout_perm, 0);
+  abslx::c_iota(layout_perm, 0);
 
   std::vector<Shape> ret;
   do {
@@ -50,8 +50,8 @@ std::vector<Shape> AllPermutationsOfShape(const Shape& s) {
           ComposePermutations(s.dimensions(), dims_perm),
           ComposePermutations(s.layout().minor_to_major(), layout_perm));
       ret.push_back(new_shape);
-    } while (absl::c_next_permutation(layout_perm));
-  } while (absl::c_next_permutation(dims_perm));
+    } while (abslx::c_next_permutation(layout_perm));
+  } while (abslx::c_next_permutation(dims_perm));
   return ret;
 }
 
@@ -76,7 +76,7 @@ class BitcastDecomposerParameterizedTest
                     /*allow_mixed_precision_in_hlo_verifier=*/false) {}
 
  protected:
-  absl::BitGen rand_;
+  abslx::BitGen rand_;
 };
 
 INSTANTIATE_TEST_SUITE_P(
@@ -138,7 +138,7 @@ TEST_P(BitcastDecomposerParameterizedTest, DoIt) {
     ROOT fusion = $1 fusion($0 parameter(0)), kind=kLoop, calls=fused_comp
   })";
   std::string module_string =
-      absl::Substitute(kModuleTemplate, ShapeUtil::HumanStringWithLayout(src),
+      abslx::Substitute(kModuleTemplate, ShapeUtil::HumanStringWithLayout(src),
                        ShapeUtil::HumanStringWithLayout(dst));
 
   TF_ASSERT_OK_AND_ASSIGN(std::unique_ptr<HloModule> module,
@@ -147,7 +147,7 @@ TEST_P(BitcastDecomposerParameterizedTest, DoIt) {
   // Actually compiling and running the module is expensive; we can't afford to
   // do it for all 9000 (as of writing) tests. Pick a random 1% of them to
   // execute.
-  bool execute_module = absl::Bernoulli(this->rand_, 0.01);
+  bool execute_module = abslx::Bernoulli(this->rand_, 0.01);
   Literal param, expected_val;
   if (execute_module) {
     param = MakeFakeLiteral(src).ValueOrDie();

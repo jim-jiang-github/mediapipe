@@ -49,13 +49,13 @@ const char kSequenceExampleTag[] = "SEQUENCE_EXAMPLE";
 // }
 class TFRecordReaderCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 };
 
-absl::Status TFRecordReaderCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status TFRecordReaderCalculator::GetContract(CalculatorContract* cc) {
   cc->InputSidePackets().Tag(kTFRecordPath).Set<std::string>();
   if (cc->InputSidePackets().HasTag(kRecordIndex)) {
     cc->InputSidePackets().Tag(kRecordIndex).Set<int>();
@@ -72,10 +72,10 @@ absl::Status TFRecordReaderCalculator::GetContract(CalculatorContract* cc) {
         .Tag(kSequenceExampleTag)
         .Set<tensorflow::SequenceExample>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TFRecordReaderCalculator::Open(CalculatorContext* cc) {
+abslx::Status TFRecordReaderCalculator::Open(CalculatorContext* cc) {
   std::unique_ptr<tensorflow::RandomAccessFile> file;
   auto tf_status = tensorflow::Env::Default()->NewRandomAccessFile(
       cc->InputSidePackets().Tag(kTFRecordPath).Get<std::string>(), &file);
@@ -113,11 +113,11 @@ absl::Status TFRecordReaderCalculator::Open(CalculatorContext* cc) {
     ++current_idx;
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TFRecordReaderCalculator::Process(CalculatorContext* cc) {
-  return absl::OkStatus();
+abslx::Status TFRecordReaderCalculator::Process(CalculatorContext* cc) {
+  return abslx::OkStatus();
 }
 
 REGISTER_CALCULATOR(TFRecordReaderCalculator);

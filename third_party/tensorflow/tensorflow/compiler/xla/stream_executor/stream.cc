@@ -119,24 +119,24 @@ std::string ToVlogString(const DeviceMemoryBase *memory) {
 }
 
 std::string ToVlogString(const Eigen::half &h) {
-  return absl::StrCat(static_cast<float>(h));
+  return abslx::StrCat(static_cast<float>(h));
 }
 
-std::string ToVlogString(int i) { return absl::StrCat(i); }
+std::string ToVlogString(int i) { return abslx::StrCat(i); }
 
-std::string ToVlogString(uint32 i) { return absl::StrCat(i); }
+std::string ToVlogString(uint32 i) { return abslx::StrCat(i); }
 
-std::string ToVlogString(uint64_t i) { return absl::StrCat(i); }
+std::string ToVlogString(uint64_t i) { return abslx::StrCat(i); }
 
-std::string ToVlogString(int64_t i) { return absl::StrCat(i); }
+std::string ToVlogString(int64_t i) { return abslx::StrCat(i); }
 
-std::string ToVlogString(float f) { return absl::StrCat(f); }
+std::string ToVlogString(float f) { return abslx::StrCat(f); }
 
-std::string ToVlogString(double d) { return absl::StrCat(d); }
+std::string ToVlogString(double d) { return abslx::StrCat(d); }
 
 template <class T>
 std::string ToVlogString(port::ArraySlice<T> elements) {  // non-absl ok
-  std::string str = absl::StrCat(
+  std::string str = abslx::StrCat(
       ToVlogString(reinterpret_cast<const void *>(elements.data())), "[",
       elements.size(), "]{");
   const char *separator = "";
@@ -153,7 +153,7 @@ std::string ToVlogString(port::ArraySlice<T> elements) {  // non-absl ok
       str += ", ...";
       break;
     }
-    absl::StrAppend(&str, separator, ToVlogString(elements[i]));
+    abslx::StrAppend(&str, separator, ToVlogString(elements[i]));
     separator = ", ";
   }
   str += "}";
@@ -206,16 +206,16 @@ std::string CallStr(const char *function_name, Stream *stream,
   // constructing all the strings in params is expensive.
   CHECK(VLOG_IS_ON(1));
 
-  std::string str = absl::StrCat(stream->DebugStreamPointers(),
+  std::string str = abslx::StrCat(stream->DebugStreamPointers(),
                                  " Called Stream::", function_name, "(");
   const char *separator = "";
   for (const auto &param : params) {
-    absl::StrAppend(&str, separator, param.first, "=", param.second);
+    abslx::StrAppend(&str, separator, param.first, "=", param.second);
     separator = ", ";
   }
-  absl::StrAppend(&str, ")");
+  abslx::StrAppend(&str, ")");
   if (VLOG_IS_ON(10)) {
-    absl::StrAppend(&str, " ", port::CurrentStackTrace(), "\n");
+    abslx::StrAppend(&str, " ", port::CurrentStackTrace(), "\n");
   }
   return str;
 }
@@ -283,7 +283,7 @@ port::Status Stream::RefreshStatus() {
 Stream &Stream::Init() {
   VLOG_CALL();
 
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   CHECK_EQ(false, allocated_)
       << "stream appears to already have been initialized";
   CHECK(!status_.ok()) << "stream should be in !ok() state pre-initialization";
@@ -924,7 +924,7 @@ Stream *Stream::GetOrCreateSubStream() {
   // BlockHostUntilDone and it's host callbacks might attempt to acquire mu_.
   std::vector<std::unique_ptr<Stream>> bad_streams;
 
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
 
   // Look for the first reusable sub_stream that is ok, dropping !ok sub_streams
   // we encounter along the way.
@@ -976,7 +976,7 @@ void Stream::ReturnSubStream(Stream *sub_stream) {
   // BlockHostUntilDone and it's host callbacks might attempt to acquire mu_.
   std::unique_ptr<Stream> bad_stream;
 
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
 
   // Look for the sub-stream.
   for (int64_t index = 0, end = sub_streams_.size(); index < end; ++index) {
@@ -4083,9 +4083,9 @@ Stream &Stream::ThenRnnBackward(
 
 Stream &Stream::ThenCtcLoss(const dnn::RnnStateTensorDescriptor &probs_desc,
                             const DeviceMemory<float> &probs_data,
-                            absl::Span<const int> labels_data,
-                            absl::Span<const int> labels_lengths_data,
-                            absl::Span<const int> input_lengths_data,
+                            abslx::Span<const int> labels_data,
+                            abslx::Span<const int> labels_lengths_data,
+                            abslx::Span<const int> input_lengths_data,
                             DeviceMemory<float> *costs_data,
                             const dnn::RnnStateTensorDescriptor &grads_desc,
                             DeviceMemory<float> *grads_data,
@@ -4165,7 +4165,7 @@ Stream &Stream::ThenRunAfterNextBlockHostUntilDone(
               << " was in error state before adding callback to be run after "
                  "next block-host-until-done.";
   }
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   after_block_host_until_done_callbacks_.push_back(std::move(callback));
   return *this;
 }
@@ -4174,7 +4174,7 @@ void Stream::CheckError(bool operation_retcode) {
   if (operation_retcode) {
     return;
   }
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   status_ = port::InternalError("Unknown error");
 }
 
@@ -4290,7 +4290,7 @@ port::Status Stream::BlockHostUntilDone() {
   VLOG_CALL();
 
   if (!ok()) {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     LOG(INFO) << status_.ToString();
     port::Status status = port::Status(
         port::error::INTERNAL,
@@ -4311,7 +4311,7 @@ port::Status Stream::BlockHostUntilDone() {
 void Stream::RunAfterBlockHostUntilDoneCallbacks() {
   std::vector<std::function<void()>> callbacks;
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     std::swap(callbacks, after_block_host_until_done_callbacks_);
   }
   for (const auto &fn : callbacks) {
@@ -4321,7 +4321,7 @@ void Stream::RunAfterBlockHostUntilDoneCallbacks() {
 
 std::string Stream::DebugStreamPointers() const {
   // Relies on the ToVlogString(const void*) overload above.
-  return absl::StrCat("[stream=", ToVlogString(this),
+  return abslx::StrCat("[stream=", ToVlogString(this),
                       ",impl=", ToVlogString(implementation_.get()), "]");
 }
 
@@ -4330,7 +4330,7 @@ void Stream::CheckStatus(port::Status status) {
     return;
   }
   LOG(ERROR) << status;
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   status_ = status;
 }
 

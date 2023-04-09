@@ -38,7 +38,7 @@ namespace tensorflow {
 namespace {
 
 xla::BitGeneratorTy GetBitGeneratorForDevice(
-    absl::string_view device_type_string) {
+    abslx::string_view device_type_string) {
   // The Philox algorithm may cause performance regression on other devices.
   // Turn on the Philox algorithm for the CPU and GPU backends only.
   if (device_type_string == DEVICE_GPU_XLA_JIT ||
@@ -76,7 +76,7 @@ xla::XlaOp MaybeConvertF32ToBF16(xla::XlaOp input, DataType dtype) {
   }
 }
 
-xla::XlaOp StatelessRngUniform(absl::string_view device_type_string,
+xla::XlaOp StatelessRngUniform(abslx::string_view device_type_string,
                                xla::XlaOp seeds, const xla::Shape& shape,
                                xla::XlaOp minval, xla::XlaOp maxval) {
   xla::XlaBuilder* builder = seeds.builder();
@@ -112,7 +112,7 @@ xla::XlaOp StatelessRngUniform(absl::string_view device_type_string,
 
 namespace {
 
-xla::XlaOp StatelessRngUniformFullInt(absl::string_view device_type_string,
+xla::XlaOp StatelessRngUniformFullInt(abslx::string_view device_type_string,
                                       xla::XlaOp seeds,
                                       const xla::Shape& shape) {
   xla::XlaBuilder* builder = seeds.builder();

@@ -218,14 +218,14 @@ class AlgebraicSimplifier : public HloModulePass {
   explicit AlgebraicSimplifier(const AlgebraicSimplifierOptions& options)
       : options_(options) {}
   ~AlgebraicSimplifier() override = default;
-  absl::string_view name() const override { return "algsimp"; }
+  abslx::string_view name() const override { return "algsimp"; }
 
   // Run algebraic simplification on the given computation. Returns whether the
   // computation was changed.
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
   // Create constant from literal with tiles and element size updated in the
   // constant's layout.
@@ -397,8 +397,8 @@ class AlgebraicSimplifierVisitor : public DfsHloRewriteVisitor {
   // Transposes a dot operand such that the batch dimensions are the most major,
   // and the contracting dimensions are most minor.
   StatusOr<HloInstruction*> NormalizeDotOperandToBatchMajorAndContractingMinor(
-      HloInstruction* dot_operand, absl::Span<const int64_t> batch_dimensions,
-      absl::Span<const int64_t> contracting_dimensions);
+      HloInstruction* dot_operand, abslx::Span<const int64_t> batch_dimensions,
+      abslx::Span<const int64_t> contracting_dimensions);
 
   // Simplify dot(transpose(a), transpose(b)) to transpose(dot(b,a)) (or
   // transpose(dot(a,b)) if only the batch dims are transposed).
@@ -410,7 +410,7 @@ class AlgebraicSimplifierVisitor : public DfsHloRewriteVisitor {
   StatusOr<bool> RemoveTransposesFromDotOperands(HloInstruction* dot);
 
   // Helper method to perform and add reduction on a list of dimensions.
-  HloInstruction* AddReduce(HloInstruction* hlo, absl::Span<const int64_t> dims,
+  HloInstruction* AddReduce(HloInstruction* hlo, abslx::Span<const int64_t> dims,
                             PrimitiveType type);
 
   // Move scalar multiply to the smallest side of convolution to
@@ -437,7 +437,7 @@ class AlgebraicSimplifierVisitor : public DfsHloRewriteVisitor {
   // instructions.
   bool ReplaceInstructionIfCompatible(
       HloInstruction* old_instruction,
-      absl::Span<HloInstruction* const> new_instructions);
+      abslx::Span<HloInstruction* const> new_instructions);
 
   // Returns whether the shape of the output of the given instructions are the
   // same for the purposes of simplification. If options_.is_layout_sensitive()
@@ -524,7 +524,7 @@ class AlgebraicSimplifierVisitor : public DfsHloRewriteVisitor {
   HloComputation* computation_;
 
   // Cached computation for adding two scalars of a given type.
-  absl::flat_hash_map<PrimitiveType, HloComputation*> scalar_add_computations_;
+  abslx::flat_hash_map<PrimitiveType, HloComputation*> scalar_add_computations_;
 
   AlgebraicSimplifier* simplifier_ = nullptr;
 };

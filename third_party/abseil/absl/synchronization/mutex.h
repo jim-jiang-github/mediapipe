@@ -73,7 +73,7 @@
 #include "absl/synchronization/internal/per_thread_sem.h"
 #include "absl/time/time.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 class Condition;
@@ -135,7 +135,7 @@ class ABSL_LOCKABLE Mutex {
   //
   // To create `Mutex` instances with static storage duration
   // (e.g. a namespace-scoped or global variable), see
-  // `Mutex::Mutex(absl::kConstInit)` below instead.
+  // `Mutex::Mutex(abslx::kConstInit)` below instead.
   Mutex();
 
   // Creates a mutex with static storage duration.  A global variable
@@ -147,9 +147,9 @@ class ABSL_LOCKABLE Mutex {
   //
   // Example usage:
   //   namespace foo {
-  //   ABSL_CONST_INIT absl::Mutex mu(absl::kConstInit);
+  //   ABSL_CONST_INIT abslx::Mutex mu(abslx::kConstInit);
   //   }
-  explicit constexpr Mutex(absl::ConstInitType);
+  explicit constexpr Mutex(abslx::ConstInitType);
 
   ~Mutex();
 
@@ -337,9 +337,9 @@ class ABSL_LOCKABLE Mutex {
   // Negative timeouts are equivalent to a zero timeout.
   //
   // This method requires that this thread holds this `Mutex` in some mode.
-  bool AwaitWithTimeout(const Condition &cond, absl::Duration timeout);
+  bool AwaitWithTimeout(const Condition &cond, abslx::Duration timeout);
 
-  bool AwaitWithDeadline(const Condition &cond, absl::Time deadline);
+  bool AwaitWithDeadline(const Condition &cond, abslx::Time deadline);
 
   // Mutex::LockWhenWithTimeout()
   // Mutex::ReaderLockWhenWithTimeout()
@@ -352,11 +352,11 @@ class ABSL_LOCKABLE Mutex {
   // `true` on return.
   //
   // Negative timeouts are equivalent to a zero timeout.
-  bool LockWhenWithTimeout(const Condition &cond, absl::Duration timeout)
+  bool LockWhenWithTimeout(const Condition &cond, abslx::Duration timeout)
       ABSL_EXCLUSIVE_LOCK_FUNCTION();
-  bool ReaderLockWhenWithTimeout(const Condition &cond, absl::Duration timeout)
+  bool ReaderLockWhenWithTimeout(const Condition &cond, abslx::Duration timeout)
       ABSL_SHARED_LOCK_FUNCTION();
-  bool WriterLockWhenWithTimeout(const Condition &cond, absl::Duration timeout)
+  bool WriterLockWhenWithTimeout(const Condition &cond, abslx::Duration timeout)
       ABSL_EXCLUSIVE_LOCK_FUNCTION() {
     return this->LockWhenWithTimeout(cond, timeout);
   }
@@ -372,11 +372,11 @@ class ABSL_LOCKABLE Mutex {
   // on return.
   //
   // Deadlines in the past are equivalent to an immediate deadline.
-  bool LockWhenWithDeadline(const Condition &cond, absl::Time deadline)
+  bool LockWhenWithDeadline(const Condition &cond, abslx::Time deadline)
       ABSL_EXCLUSIVE_LOCK_FUNCTION();
-  bool ReaderLockWhenWithDeadline(const Condition &cond, absl::Time deadline)
+  bool ReaderLockWhenWithDeadline(const Condition &cond, abslx::Time deadline)
       ABSL_SHARED_LOCK_FUNCTION();
-  bool WriterLockWhenWithDeadline(const Condition &cond, absl::Time deadline)
+  bool WriterLockWhenWithDeadline(const Condition &cond, abslx::Time deadline)
       ABSL_EXCLUSIVE_LOCK_FUNCTION() {
     return this->LockWhenWithDeadline(cond, deadline);
   }
@@ -675,16 +675,16 @@ class Condition {
   // `Condition(object, &Class::Method)` constructs a `Condition` that evaluates
   // `object->Method()`.
   //
-  // Implementation Note: `absl::internal::identity` is used to allow methods to
+  // Implementation Note: `abslx::internal::identity` is used to allow methods to
   // come from base classes. A simpler signature like
   // `Condition(T*, bool (T::*)())` does not suffice.
   template<typename T>
-  Condition(T *object, bool (absl::internal::identity<T>::type::* method)());
+  Condition(T *object, bool (abslx::internal::identity<T>::type::* method)());
 
   // Same as above, for const members
   template<typename T>
   Condition(const T *object,
-            bool (absl::internal::identity<T>::type::* method)() const);
+            bool (abslx::internal::identity<T>::type::* method)() const);
 
   // A Condition that returns the value of `*cond`
   explicit Condition(const bool *cond);
@@ -817,7 +817,7 @@ class CondVar {
   // to return `true` or `false`.
   //
   // Requires and ensures that the current thread holds the `Mutex`.
-  bool WaitWithTimeout(Mutex *mu, absl::Duration timeout);
+  bool WaitWithTimeout(Mutex *mu, abslx::Duration timeout);
 
   // CondVar::WaitWithDeadline()
   //
@@ -834,7 +834,7 @@ class CondVar {
   // to return `true` or `false`.
   //
   // Requires and ensures that the current thread holds the `Mutex`.
-  bool WaitWithDeadline(Mutex *mu, absl::Time deadline);
+  bool WaitWithDeadline(Mutex *mu, abslx::Time deadline);
 
   // CondVar::Signal()
   //
@@ -935,7 +935,7 @@ inline Mutex::Mutex() : mu_(0) {
   ABSL_TSAN_MUTEX_CREATE(this, __tsan_mutex_not_static);
 }
 
-inline constexpr Mutex::Mutex(absl::ConstInitType) : mu_(0) {}
+inline constexpr Mutex::Mutex(abslx::ConstInitType) : mu_(0) {}
 
 inline CondVar::CondVar() : cv_(0) {}
 
@@ -966,7 +966,7 @@ inline Condition::Condition(bool (*func)(T *), T *arg)
 
 template <typename T>
 inline Condition::Condition(T *object,
-                            bool (absl::internal::identity<T>::type::*method)())
+                            bool (abslx::internal::identity<T>::type::*method)())
     : eval_(&CastAndCallMethod<T>),
       function_(nullptr),
       method_(reinterpret_cast<InternalMethodType>(method)),
@@ -974,7 +974,7 @@ inline Condition::Condition(T *object,
 
 template <typename T>
 inline Condition::Condition(const T *object,
-                            bool (absl::internal::identity<T>::type::*method)()
+                            bool (abslx::internal::identity<T>::type::*method)()
                                 const)
     : eval_(&CastAndCallMethod<T>),
       function_(nullptr),
@@ -1032,10 +1032,10 @@ void RegisterCondVarTracer(void (*fn)(const char *msg, const void *cv));
 //
 // This has the same memory ordering concerns as RegisterMutexProfiler() above.
 //
-// DEPRECATED: The default symbolizer function is absl::Symbolize() and the
+// DEPRECATED: The default symbolizer function is abslx::Symbolize() and the
 // ability to register a different hook for symbolizing stack traces will be
 // removed on or after 2023-05-01.
-ABSL_DEPRECATED("absl::RegisterSymbolizer() is deprecated and will be removed "
+ABSL_DEPRECATED("abslx::RegisterSymbolizer() is deprecated and will be removed "
                 "on or after 2023-05-01")
 void RegisterSymbolizer(bool (*fn)(const void *pc, char *out, int out_size));
 
@@ -1067,7 +1067,7 @@ enum class OnDeadlockCycle {
 void SetMutexDeadlockDetectionMode(OnDeadlockCycle mode);
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 // In some build configurations we pass --detect-odr-violations to the
 // gold linker.  This causes it to flag weak symbol overrides as ODR

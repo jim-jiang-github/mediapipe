@@ -22,14 +22,14 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status QuantAndDequant_Dim2Bits8Test(TestExecutionEnvironment* env);
+abslx::Status QuantAndDequant_Dim2Bits8Test(TestExecutionEnvironment* env);
 
-absl::Status QuantAndDequant_Dim3Bits8_NegativeRangeTest(
+abslx::Status QuantAndDequant_Dim3Bits8_NegativeRangeTest(
     TestExecutionEnvironment* env);
 
-absl::Status QuantAndDequant_Dim3Bits16Test(TestExecutionEnvironment* env);
+abslx::Status QuantAndDequant_Dim3Bits16Test(TestExecutionEnvironment* env);
 
-absl::Status QuantAndDequant_Dim2Bits16_NegativeRangeTest(
+abslx::Status QuantAndDequant_Dim2Bits16_NegativeRangeTest(
     TestExecutionEnvironment* env);
 
 }  // namespace gpu

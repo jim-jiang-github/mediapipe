@@ -176,7 +176,7 @@ class CrossTrainerCache {
   // Maps trainer IDs to element indices. The indices are absolute indices
   // within the dataset. The actual index to use with `cache_` would be
   // `trainer_to_element_index_map_[trainer_id] - cache_start_index_`.
-  absl::flat_hash_map<std::string, size_t> trainer_to_element_index_map_
+  abslx::flat_hash_map<std::string, size_t> trainer_to_element_index_map_
       TF_GUARDED_BY(mu_);
 };
 

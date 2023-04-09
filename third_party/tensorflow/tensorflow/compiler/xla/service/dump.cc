@@ -42,9 +42,9 @@ namespace xla {
 
 namespace {
 
-using absl::StrCat;
-using absl::StrFormat;
-using absl::string_view;
+using abslx::StrCat;
+using abslx::StrFormat;
+using abslx::string_view;
 
 struct CanonicalDebugOptions {
   explicit CanonicalDebugOptions(const DebugOptions& opts)
@@ -141,7 +141,7 @@ struct CanonicalDebugOptions {
     // Output dirs "sponge" and "test_undeclared_outputs_dir" (case-insensitive)
     // have a special meaning: Dump into the directory specified by the
     // environment variable TEST_UNDECLARED_OUTPUTS_DIR.
-    std::string dump_to_lower = absl::AsciiStrToLower(dump_to);
+    std::string dump_to_lower = abslx::AsciiStrToLower(dump_to);
     if (dump_to_lower == "sponge" ||
         dump_to_lower == "test_undeclared_outputs_dir") {
       if (!tensorflow::io::GetTestUndeclaredOutputsDir(&dump_to)) {
@@ -224,7 +224,7 @@ static Status WriteStringToFile(tensorflow::Env* env, const std::string& fname,
 }
 
 static Status WriteStringToFile(tensorflow::Env* env, const std::string& fname,
-                                absl::string_view data, bool compressed) {
+                                abslx::string_view data, bool compressed) {
   if (!compressed) {
     return tensorflow::WriteStringToFile(env, fname, data);
   }
@@ -278,7 +278,7 @@ static std::optional<std::string> GetDumpFilePath(
                  << ": " << status;
     }
     static const LazyRE2 module_id_regex = {R"(.*module_(\d+)\..*)"};
-    absl::flat_hash_set<int64_t> dumped_module_ids;
+    abslx::flat_hash_set<int64_t> dumped_module_ids;
     for (const std::string& match : matches) {
       int64_t dumped_module_id;
       if (RE2::FullMatch(match, *module_id_regex, &dumped_module_id)) {
@@ -370,7 +370,7 @@ static std::optional<std::string> DumpToFileInDirOrStdoutImpl(
 // as operands AND is not a fusion.
 static bool IsTrivial(const HloComputation& computation) {
   const HloInstruction* root = computation.root_instruction();
-  return absl::c_all_of(root->operands(),
+  return abslx::c_all_of(root->operands(),
                         [&](const HloInstruction* op) {
                           return op->opcode() == HloOpcode::kParameter;
                         }) &&
@@ -487,12 +487,12 @@ static std::vector<std::string> DumpHloModuleImpl(
 
 static void DumpHloModuleMetadata(
     const HloModuleMetadataProto& metadata, const CanonicalDebugOptions& opts,
-    absl::flat_hash_set<int64_t>* dumped_module_ids) {
+    abslx::flat_hash_set<int64_t>* dumped_module_ids) {
   // Return if metadata for this module has already been dumped.
   if (!dumped_module_ids->insert(metadata.canonical_module_id()).second) {
     return;
   }
-  std::string filename = absl::StrFormat("module_%04d.metadata.textproto",
+  std::string filename = abslx::StrFormat("module_%04d.metadata.textproto",
                                          metadata.canonical_module_id());
   std::string content;
   if (tensorflow::protobuf::TextFormat::PrintToString(metadata, &content)) {
@@ -502,7 +502,7 @@ static void DumpHloModuleMetadata(
   }
 }
 
-static absl::Mutex mu(absl::kConstInit);
+static abslx::Mutex mu(abslx::kConstInit);
 
 // Maps a module's unique ID to a counter indicating how many times we've dumped
 // this module during the compilation pipeline.  This lets us keep the filenames
@@ -513,7 +513,7 @@ static absl::Mutex mu(absl::kConstInit);
 // dumping a module leaks buffer space in stdout or bytes on disk *way* faster
 // than this hashtable leaks memory.
 static auto& module_id_to_step_number ABSL_GUARDED_BY(mu) =
-    *new absl::flat_hash_map<int64_t, int64_t>();
+    *new abslx::flat_hash_map<int64_t, int64_t>();
 
 // Maps a module's unique ID to a timestamp indicating when we've first dumped
 // this module during the compilation pipeline and when we first started
@@ -524,10 +524,10 @@ static auto& module_id_to_step_number ABSL_GUARDED_BY(mu) =
 // dumping a module leaks buffer space in stdout or bytes on disk *way* faster
 // than this hashtable leaks memory.
 static auto& module_id_to_timestamp ABSL_GUARDED_BY(mu) =
-    *new absl::flat_hash_map<int64_t, uint64_t>();
+    *new abslx::flat_hash_map<int64_t, uint64_t>();
 
 int64_t StepNumberForModule(const HloModule& module) {
-  absl::MutexLock lock(&mu);
+  abslx::MutexLock lock(&mu);
   return module_id_to_step_number[module.unique_id()]++;
 }
 
@@ -539,7 +539,7 @@ std::string TimestampFor(const HloModule& module) {
   if (!module.config().debug_options().xla_dump_include_timestamp()) {
     return "";
   }
-  absl::MutexLock lock(&mu);
+  abslx::MutexLock lock(&mu);
   auto timestamp_emplace = module_id_to_timestamp.try_emplace(
       module.unique_id(), tensorflow::Env::Default()->NowMicros());
   return std::to_string(timestamp_emplace.first->second);
@@ -549,13 +549,13 @@ static std::string FilenameFor(int unique_id, string_view module_name,
                                string_view prefix, string_view suffix) {
   std::string filename;
   if (!prefix.empty()) {
-    absl::StrAppend(&filename, prefix, ".");
+    abslx::StrAppend(&filename, prefix, ".");
   }
-  absl::StrAppendFormat(&filename, "module_%04d", unique_id);
+  abslx::StrAppendFormat(&filename, "module_%04d", unique_id);
   if (!module_name.empty()) {
-    absl::StrAppend(&filename, ".", module_name);
+    abslx::StrAppend(&filename, ".", module_name);
   }
-  absl::StrAppend(&filename, ".", suffix);
+  abslx::StrAppend(&filename, ".", suffix);
   // Skip the module name if the resulting length is too long.
   if (!module_name.empty() && filename.size() > 255) {
     return FilenameFor(unique_id, "", prefix, suffix);
@@ -575,7 +575,7 @@ void DumpToFileInDir(const HloModule& module, string_view file_prefix,
 }
 
 void DumpToFileInDir(const DebugOptions& debug_options,
-                     absl::string_view filename, absl::string_view contents) {
+                     abslx::string_view filename, abslx::string_view contents) {
   DumpToFileInDirImpl(filename, contents, CanonicalDebugOptions(debug_options));
 }
 
@@ -618,7 +618,7 @@ void DumpToFileInDirOrStdout(const HloModule& module, string_view file_prefix,
 
 void DumpProtobufToFile(const tensorflow::protobuf::Message& proto,
                         const DebugOptions& debug_options,
-                        absl::string_view filename) {
+                        abslx::string_view filename) {
   CanonicalDebugOptions opts(debug_options);
   tensorflow::Env* env = tensorflow::Env::Default();
   const std::string& dir = opts.dump_to;
@@ -635,10 +635,10 @@ void DumpProtobufToFile(const tensorflow::protobuf::Message& proto,
     Status status;
     if (opts.dump_as_text) {
       status =
-          tensorflow::WriteTextProto(env, absl::StrCat(path, ".txt"), proto);
+          tensorflow::WriteTextProto(env, abslx::StrCat(path, ".txt"), proto);
     } else {
       status =
-          tensorflow::WriteBinaryProto(env, absl::StrCat(path, ".pb"), proto);
+          tensorflow::WriteBinaryProto(env, abslx::StrCat(path, ".pb"), proto);
     }
     if (!status.ok()) {
       LOG(ERROR) << "Could not write XLA debug data to " << filename << ": "
@@ -650,7 +650,7 @@ void DumpProtobufToFile(const tensorflow::protobuf::Message& proto,
 void DumpPerModuleProtobufToFile(const HloModule& module,
                                  const tensorflow::protobuf::Message& proto,
                                  const DebugOptions& debug_options,
-                                 absl::string_view name) {
+                                 abslx::string_view name) {
   const std::string filename = FilenameFor(module, TimestampFor(module), name);
   DumpProtobufToFile(proto, debug_options, filename);
 }
@@ -747,8 +747,8 @@ void DumpHloSnapshotIfEnabled(const HloModule& module,
   uint64_t timestamp;
   {
     static auto& module_id_to_execution_count ABSL_GUARDED_BY(mu) =
-        *new absl::flat_hash_map<int64_t, int64_t>();
-    absl::MutexLock lock(&mu);
+        *new abslx::flat_hash_map<int64_t, int64_t>();
+    abslx::MutexLock lock(&mu);
     execution_count = module_id_to_execution_count[module.unique_id()]++;
     auto timestamp_emplace = module_id_to_timestamp.try_emplace(
         module.unique_id(), tensorflow::Env::Default()->NowMicros());
@@ -784,8 +784,8 @@ void DumpHloSnapshotIfEnabled(const HloSnapshot& snapshot,
   int64_t execution_count;
   {
     static auto& module_name_to_execution_count ABSL_GUARDED_BY(mu) =
-        *new absl::flat_hash_map<std::string, int64_t>();
-    absl::MutexLock lock(&mu);
+        *new abslx::flat_hash_map<std::string, int64_t>();
+    abslx::MutexLock lock(&mu);
     execution_count = module_name_to_execution_count[name]++;
   }
   std::string filename = StrFormat("module_%s.execution_%04d.hlo_snapshot.pb",
@@ -803,7 +803,7 @@ void DumpHloSnapshotIfEnabled(const HloSnapshot& snapshot,
 }
 
 void DumpHloModuleMetadataIfEnabled(const std::vector<HloModule*>& modules) {
-  absl::flat_hash_set<int64_t> dumped_module_ids;
+  abslx::flat_hash_set<int64_t> dumped_module_ids;
   for (const HloModule* module : modules) {
     CanonicalDebugOptions opts(module->config().debug_options());
     if (!opts.dump_module_metadata) {

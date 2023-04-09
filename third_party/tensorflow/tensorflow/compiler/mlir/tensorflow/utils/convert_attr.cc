@@ -49,7 +49,7 @@ StatusOr<mlir::Attribute> ConvertNonFuncAttributeValue(const AttrValue& value,
     case AttrValue::kTensor:
       return ConvertTensorProto(value.tensor(), builder);
     case AttrValue::kList: {
-      absl::InlinedVector<mlir::Attribute, 8> attrs;
+      abslx::InlinedVector<mlir::Attribute, 8> attrs;
       for (const auto& item : value.list().i())
         attrs.push_back(builder->getI64IntegerAttr(item));
       for (const auto& item : value.list().s())
@@ -74,7 +74,7 @@ StatusOr<mlir::Attribute> ConvertNonFuncAttributeValue(const AttrValue& value,
       }
       if (!value.list().func().empty()) {
         return tensorflow::errors::Unimplemented(
-            absl::StrCat("Attribute ", value.DebugString()));
+            abslx::StrCat("Attribute ", value.DebugString()));
       }
       return builder->getArrayAttr(
           llvm::makeArrayRef(attrs.begin(), attrs.end()));
@@ -87,7 +87,7 @@ StatusOr<mlir::Attribute> ConvertNonFuncAttributeValue(const AttrValue& value,
                                             value.placeholder());
     default:
       return tensorflow::errors::Unimplemented(
-          absl::StrCat("Attribute ", value.DebugString()));
+          abslx::StrCat("Attribute ", value.DebugString()));
   }
 }
 

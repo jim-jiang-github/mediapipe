@@ -17,12 +17,12 @@
 // File: string_view.h
 // -----------------------------------------------------------------------------
 //
-// This file contains the definition of the `absl::string_view` class. A
+// This file contains the definition of the `abslx::string_view` class. A
 // `string_view` points to a contiguous span of characters, often part or all of
 // another `std::string`, double-quoted string literal, character array, or even
 // another `string_view`.
 //
-// This `absl::string_view` abstraction is designed to be a drop-in
+// This `abslx::string_view` abstraction is designed to be a drop-in
 // replacement for the C++17 `std::string_view` abstraction.
 #ifndef ABSL_STRINGS_STRING_VIEW_H_
 #define ABSL_STRINGS_STRING_VIEW_H_
@@ -47,11 +47,11 @@
 
 #include <string_view>  // IWYU pragma: export
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 using string_view = std::string_view;
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #else  // ABSL_USES_STD_STRING_VIEW
 
@@ -62,10 +62,10 @@ ABSL_NAMESPACE_END
 #define ABSL_INTERNAL_STRING_VIEW_MEMCMP memcmp
 #endif  // ABSL_HAVE_BUILTIN(__builtin_memcmp)
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
-// absl::string_view
+// abslx::string_view
 //
 // A `string_view` provides a lightweight view into the string data provided by
 // a `std::string`, double-quoted string literal, character array, or even
@@ -74,17 +74,17 @@ ABSL_NAMESPACE_BEGIN
 //
 // You can use `string_view` as a function or method parameter anywhere a
 // parameter can receive a double-quoted string literal, `const char*`,
-// `std::string`, or another `absl::string_view` argument with no need to copy
+// `std::string`, or another `abslx::string_view` argument with no need to copy
 // the string data. Systematic use of `string_view` within function arguments
 // reduces data copies and `strlen()` calls.
 //
 // Because of its small size, prefer passing `string_view` by value:
 //
-//   void MyFunction(absl::string_view arg);
+//   void MyFunction(abslx::string_view arg);
 //
 // If circumstances require, you may also pass one by const reference:
 //
-//   void MyFunction(const absl::string_view& arg);  // not preferred
+//   void MyFunction(const abslx::string_view& arg);  // not preferred
 //
 // Passing by value generates slightly smaller code for many architectures.
 //
@@ -97,11 +97,11 @@ ABSL_NAMESPACE_BEGIN
 // temporary value:
 //
 //   // BAD use of string_view: lifetime problem
-//   absl::string_view sv = obj.ReturnAString();
+//   abslx::string_view sv = obj.ReturnAString();
 //
 //   // GOOD use of string_view: str outlives sv
 //   std::string str = obj.ReturnAString();
-//   absl::string_view sv = str;
+//   abslx::string_view sv = str;
 //
 // Due to lifetime issues, a `string_view` is sometimes a poor choice for a
 // return value and usually a poor choice for a data member. If you do use a
@@ -109,7 +109,7 @@ ABSL_NAMESPACE_BEGIN
 // pointed to by the `string_view` outlives the `string_view`.
 //
 // A `string_view` may represent a whole string or just part of a string. For
-// example, when splitting a string, `std::vector<absl::string_view>` is a
+// example, when splitting a string, `std::vector<abslx::string_view>` is a
 // natural data type for the output.
 //
 // For another example, a Cord is a non-contiguous, potentially very
@@ -127,8 +127,8 @@ ABSL_NAMESPACE_BEGIN
 //
 // You may create a null `string_view` in two ways:
 //
-//   absl::string_view sv;
-//   absl::string_view sv(nullptr, 0);
+//   abslx::string_view sv;
+//   abslx::string_view sv(nullptr, 0);
 //
 // For the above, `sv.data() == nullptr`, `sv.length() == 0`, and
 // `sv.empty() == true`. Also, if you create a `string_view` with a non-null
@@ -146,17 +146,17 @@ ABSL_NAMESPACE_BEGIN
 //
 //   const char* nullcp = nullptr;
 //   // string_view.size() will return 0 in all cases.
-//   absl::string_view();
-//   absl::string_view(nullcp, 0);
-//   absl::string_view("");
-//   absl::string_view("", 0);
-//   absl::string_view("abcdef", 0);
-//   absl::string_view("abcdef" + 6, 0);
+//   abslx::string_view();
+//   abslx::string_view(nullcp, 0);
+//   abslx::string_view("");
+//   abslx::string_view("", 0);
+//   abslx::string_view("abcdef", 0);
+//   abslx::string_view("abcdef" + 6, 0);
 //
 // All empty `string_view` objects whether null or not, are equal:
 //
-//   absl::string_view() == absl::string_view("", 0)
-//   absl::string_view(nullptr, 0) == absl::string_view("abcdef"+6, 0)
+//   abslx::string_view() == abslx::string_view("", 0)
+//   abslx::string_view(nullptr, 0) == abslx::string_view("abcdef"+6, 0)
 class string_view {
  public:
   using traits_type = std::char_traits<char>;
@@ -188,7 +188,7 @@ class string_view {
       : string_view(str.data(), str.size()) {}
 
   // Implicit constructor of a `string_view` from NUL-terminated `str`. When
-  // accepting possibly null strings, use `absl::NullSafeStringView(str)`
+  // accepting possibly null strings, use `abslx::NullSafeStringView(str)`
   // instead (see below).
   constexpr string_view(const char* str)  // NOLINT(runtime/explicit)
       : ptr_(str),
@@ -301,7 +301,7 @@ class string_view {
     return ABSL_PREDICT_TRUE(i < size())
                ? ptr_[i]
                : ((void)base_internal::ThrowStdOutOfRange(
-                      "absl::string_view::at"),
+                      "abslx::string_view::at"),
                   ptr_[i]);
   }
 
@@ -373,7 +373,7 @@ class string_view {
   // into `buf`.
   size_type copy(char* buf, size_type n, size_type pos = 0) const {
     if (ABSL_PREDICT_FALSE(pos > length_)) {
-      base_internal::ThrowStdOutOfRange("absl::string_view::copy");
+      base_internal::ThrowStdOutOfRange("abslx::string_view::copy");
     }
     size_type rlen = (std::min)(length_ - pos, n);
     if (rlen > 0) {
@@ -388,11 +388,11 @@ class string_view {
   // Returns a "substring" of the `string_view` (at offset `pos` and length
   // `n`) as another string_view. This function throws `std::out_of_bounds` if
   // `pos > size`.
-  // Use absl::ClippedSubstr if you need a truncating substr operation.
+  // Use abslx::ClippedSubstr if you need a truncating substr operation.
   constexpr string_view substr(size_type pos, size_type n = npos) const {
     return ABSL_PREDICT_FALSE(pos > length_)
                ? (base_internal::ThrowStdOutOfRange(
-                      "absl::string_view::substr"),
+                      "abslx::string_view::substr"),
                   string_view())
                : string_view(ptr_ + pos, Min(n, length_ - pos));
   }
@@ -412,13 +412,13 @@ class string_view {
   }
 
   // Overload of `string_view::compare()` for comparing a substring of the
-  // 'string_view` and another `absl::string_view`.
+  // 'string_view` and another `abslx::string_view`.
   int compare(size_type pos1, size_type count1, string_view v) const {
     return substr(pos1, count1).compare(v);
   }
 
   // Overload of `string_view::compare()` for comparing a substring of the
-  // `string_view` and a substring of another `absl::string_view`.
+  // `string_view` and a substring of another `abslx::string_view`.
   int compare(size_type pos1, size_type count1, string_view v, size_type pos2,
               size_type count2) const {
     return substr(pos1, count1).compare(v.substr(pos2, count2));
@@ -594,13 +594,13 @@ constexpr bool operator>=(string_view x, string_view y) noexcept {
 std::ostream& operator<<(std::ostream& o, string_view piece);
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #undef ABSL_INTERNAL_STRING_VIEW_MEMCMP
 
 #endif  // ABSL_USES_STD_STRING_VIEW
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // ClippedSubstr()
@@ -615,14 +615,14 @@ inline string_view ClippedSubstr(string_view s, size_t pos,
 
 // NullSafeStringView()
 //
-// Creates an `absl::string_view` from a pointer `p` even if it's null-valued.
-// This function should be used where an `absl::string_view` can be created from
+// Creates an `abslx::string_view` from a pointer `p` even if it's null-valued.
+// This function should be used where an `abslx::string_view` can be created from
 // a possibly-null pointer.
 constexpr string_view NullSafeStringView(const char* p) {
   return p ? string_view(p) : string_view();
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_STRING_VIEW_H_

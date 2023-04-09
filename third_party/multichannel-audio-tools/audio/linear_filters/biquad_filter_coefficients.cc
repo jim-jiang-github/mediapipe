@@ -381,9 +381,9 @@ double BiquadFilterCoefficients::EstimateDecayTime(double decay_db) const {
 }
 
 std::string BiquadFilterCoefficients::ToString() const {
-  return absl::StrCat("{{", absl::StrJoin(b, ", "),
+  return abslx::StrCat("{{", abslx::StrJoin(b, ", "),
                       "}, {",
-                      absl::StrJoin(a, ", "), "}}");
+                      abslx::StrJoin(a, ", "), "}}");
 }
 
 bool BiquadFilterCascadeCoefficients::IsStable() const {
@@ -467,9 +467,9 @@ std::pair<double, double>
 
 std::string BiquadFilterCascadeCoefficients::ToString() const {
   auto formatter = [](std::string* out, const BiquadFilterCoefficients& coeff) {
-    absl::StrAppend(out, coeff.ToString());
+    abslx::StrAppend(out, coeff.ToString());
   };
-  return absl::StrCat("{", absl::StrJoin(coeffs, ", ", formatter), "}");
+  return abslx::StrCat("{", abslx::StrJoin(coeffs, ", ", formatter), "}");
 }
 
 }  // namespace linear_filters

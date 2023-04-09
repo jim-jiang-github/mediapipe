@@ -125,7 +125,7 @@ class BufRendezvous {
   const DeviceMgr* const dev_mgr_;  // Not owned.
   mutex mu_;
   Status status_ TF_GUARDED_BY(mu_);
-  typedef absl::flat_hash_map<string, Hook*> HookTable;
+  typedef abslx::flat_hash_map<string, Hook*> HookTable;
   HookTable hook_table_ TF_GUARDED_BY(mu_);
 
   void PurgeTable(const Status& s, HookTable* table);

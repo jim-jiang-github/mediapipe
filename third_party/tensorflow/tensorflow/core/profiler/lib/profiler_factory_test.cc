@@ -37,7 +37,7 @@ class TestProfiler : public ProfilerInterface {
 
 std::unique_ptr<ProfilerInterface> TestFactoryFunction(
     const ProfileOptions& options) {
-  return absl::make_unique<TestProfiler>();
+  return abslx::make_unique<TestProfiler>();
 }
 
 TEST(ProfilerFactoryTest, FactoryFunctionPointer) {
@@ -50,7 +50,7 @@ TEST(ProfilerFactoryTest, FactoryFunctionPointer) {
 TEST(ProfilerFactoryTest, FactoryLambda) {
   ClearRegisteredProfilersForTest();
   RegisterProfilerFactory([](const ProfileOptions& options) {
-    return absl::make_unique<TestProfiler>();
+    return abslx::make_unique<TestProfiler>();
   });
   auto profilers = CreateProfilers(ProfileOptions());
   EXPECT_EQ(profilers.size(), 1);
@@ -76,7 +76,7 @@ class FactoryClass {
 
   std::unique_ptr<ProfilerInterface> CreateProfiler(
       const ProfileOptions& options) const {
-    return absl::make_unique<TestProfiler>();
+    return abslx::make_unique<TestProfiler>();
   }
 
  private:

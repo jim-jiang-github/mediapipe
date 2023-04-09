@@ -49,7 +49,7 @@ class CheckPreemptionOp : public OpKernel {
     LOG(INFO) << "Preemption reported by task: " << preempted_task;
     OP_REQUIRES_OK(ctx,
                    errors::AbortedWithPayloads(
-                       absl::StrCat("Task ", preempted_task, " was preempted."),
+                       abslx::StrCat("Task ", preempted_task, " was preempted."),
                        {{kWorkerPreemption, preempted_task}}));
   }
 

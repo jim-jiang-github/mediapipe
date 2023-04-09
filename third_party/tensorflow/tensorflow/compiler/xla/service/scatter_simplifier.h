@@ -40,7 +40,7 @@ namespace xla {
 // performance implications.
 class ScatterSimplifier : public OpExpanderPass {
  public:
-  absl::string_view name() const override { return "scatter_simplifier"; }
+  abslx::string_view name() const override { return "scatter_simplifier"; }
 
  protected:
   bool InstructionMatchesPattern(HloInstruction* inst) override;

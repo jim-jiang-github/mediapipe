@@ -39,7 +39,7 @@ bool IsFunctionCall(const Node& node) {
 
 // Utility to set node's value in `cache` and `is_deep` to `value`.
 Status Set(const Node& node, bool value, bool* is_deep,
-           std::vector<absl::optional<bool>>* cache) {
+           std::vector<abslx::optional<bool>>* cache) {
   *is_deep = value;
   (*cache)[node.id()] = value;
   return OkStatus();
@@ -121,22 +121,22 @@ string FunctionStack::FormatForError() const {
     if (frames_[i].function_name.empty()) {
       // Empty function body should only happen at the top level, i.e. i = 0.
       // All internal frames should have valid function names.
-      msgs.push_back(absl::StrCat("Graph contains node ",
+      msgs.push_back(abslx::StrCat("Graph contains node ",
                                   FormatNodeForError(*frames_[i].node)));
 
     } else {
-      msgs.push_back(absl::StrCat(
+      msgs.push_back(abslx::StrCat(
           "Function ", errors::FormatFunctionForError(frames_[i].function_name),
           " contains node ", FormatNodeForError(*frames_[i].node)));
     }
     const string& fname = (i + 1 < frames_.size())
                               ? frames_[i + 1].function_name
                               : current_function_name_;
-    msgs.push_back(absl::StrCat("Node ", FormatNodeForError(*frames_[i].node),
+    msgs.push_back(abslx::StrCat("Node ", FormatNodeForError(*frames_[i].node),
                                 " calls function ",
                                 errors::FormatFunctionForError(fname)));
   }
-  return absl::StrJoin(msgs, "\n  ");
+  return abslx::StrJoin(msgs, "\n  ");
 }
 
 namespace {
@@ -153,7 +153,7 @@ string Uniquify(const string& candidate_name,
   }
 
   for (int counter = 0;; ++counter) {
-    string candidate = absl::StrCat(candidate_name, "_", counter);
+    string candidate = abslx::StrCat(candidate_name, "_", counter);
     if (node_names->find(candidate) == node_names->end()) {
       node_names->insert(candidate);
       return candidate;
@@ -167,7 +167,7 @@ Status AddInputIdentity(Node* node, int input_idx, Graph* graph,
   TF_RETURN_IF_ERROR(node->input_edge(input_idx, &edge));
 
   string identity_name = Uniquify(
-      absl::StrCat(edge->src()->name(), "_", node->name()), node_names);
+      abslx::StrCat(edge->src()->name(), "_", node->name()), node_names);
 
   NodeDefBuilder builder(identity_name, kIdentityOp);
   builder.Attr("T", node->input_type(input_idx));
@@ -236,7 +236,7 @@ Status AddOutputIdentities(Node* node, Graph* graph,
     int dst_input = edge->dst_input();
     int src_output = edge->src_output();
     string identity_name =
-        Uniquify(absl::StrCat(node->name(), "_", dst->name()), node_names);
+        Uniquify(abslx::StrCat(node->name(), "_", dst->name()), node_names);
     Node* identity_node;
     TF_RETURN_IF_ERROR(add_identity(src_output, identity_name, &identity_node));
     VLOG(6) << "Adding identity into " << node->name() << ":" << src_output

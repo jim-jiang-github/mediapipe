@@ -24,7 +24,7 @@ namespace xla {
 
 class CholeskyExpander : public OpExpanderPass {
  public:
-  absl::string_view name() const override { return "cholesky_expander"; }
+  abslx::string_view name() const override { return "cholesky_expander"; }
 
  protected:
   bool InstructionMatchesPattern(HloInstruction* instruction) override;
@@ -40,7 +40,7 @@ class CholeskyExpander : public OpExpanderPass {
                       PrecisionConfig::Precision precision);
 
   // Mapping from op signatures to existing computations.
-  absl::flat_hash_map<std::string, HloComputation*> computation_cache_;
+  abslx::flat_hash_map<std::string, HloComputation*> computation_cache_;
 };
 
 }  // namespace xla

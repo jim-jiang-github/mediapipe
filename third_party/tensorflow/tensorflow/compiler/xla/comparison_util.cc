@@ -193,9 +193,9 @@ std::string ComparisonOrderToString(Comparison::Order order) {
 }
 
 StatusOr<Comparison::Direction> StringToComparisonDirection(
-    absl::string_view direction) {
+    abslx::string_view direction) {
   static auto* map =
-      new absl::flat_hash_map<std::string, Comparison::Direction>({
+      new abslx::flat_hash_map<std::string, Comparison::Direction>({
           {"EQ", Comparison::Direction::kEq},
           {"NE", Comparison::Direction::kNe},
           {"GE", Comparison::Direction::kGe},
@@ -210,8 +210,8 @@ StatusOr<Comparison::Direction> StringToComparisonDirection(
   return it->second;
 }
 
-StatusOr<Comparison::Order> StringToComparisonOrder(absl::string_view order) {
-  static auto* map = new absl::flat_hash_map<std::string, Comparison::Order>({
+StatusOr<Comparison::Order> StringToComparisonOrder(abslx::string_view order) {
+  static auto* map = new abslx::flat_hash_map<std::string, Comparison::Order>({
       {"TOTALORDER", Comparison::Order::kTotal},
       {"PARTIALORDER", Comparison::Order::kPartial},
   });
@@ -223,8 +223,8 @@ StatusOr<Comparison::Order> StringToComparisonOrder(absl::string_view order) {
 }
 
 StatusOr<Comparison::Type> StringToComparisonType(
-    absl::string_view comparison) {
-  static auto* map = new absl::flat_hash_map<std::string, Comparison::Type>({
+    abslx::string_view comparison) {
+  static auto* map = new abslx::flat_hash_map<std::string, Comparison::Type>({
       {"FLOAT", Comparison::Type::kFloat},
       {"TOTALORDER", Comparison::Type::kFloatTotalOrder},
       {"SIGNED", Comparison::Type::kSigned},
@@ -353,7 +353,7 @@ bool Comparison::IsAntireflexive() const {
 
 std::string Comparison::ToString(std::string prefix1, std::string prefix2,
                                  std::string prefix3) const {
-  return absl::StrCat(prefix1, ComparisonDirectionToString(dir_), prefix2,
+  return abslx::StrCat(prefix1, ComparisonDirectionToString(dir_), prefix2,
                       ComparisonPrimitiveTypeToString(primitive_type_), prefix3,
                       ComparisonOrderToString(order_));
 }

@@ -125,11 +125,11 @@ StatusOr<int64_t> ExtractConstIntFromValue(mlir::Value value) {
     return errors::Internal("unable get constant value from block argument");
   mlir::DenseIntElementsAttr attr;
   if (!matchPattern(value, m_Constant(&attr))) {
-    return errors::Internal(absl::StrCat("required constant value for ",
+    return errors::Internal(abslx::StrCat("required constant value for ",
                                          OpName(value.getDefiningOp())));
   }
   if (attr.size() != 1) {
-    return errors::Internal(absl::StrCat("expected 1 element, got ",
+    return errors::Internal(abslx::StrCat("expected 1 element, got ",
                                          attr.size(), " for ",
                                          OpName(value.getDefiningOp())));
   }
@@ -145,7 +145,7 @@ Status ExtractConstVectorFromValue(mlir::Value value,
   mlir::DenseIntElementsAttr attr;
   if (!matchPattern(value, m_Constant(&attr))) {
     return errors::Internal(
-        absl::StrCat("failed to extract constant value from ",
+        abslx::StrCat("failed to extract constant value from ",
                      value.getDefiningOp()->getName().getStringRef().str()));
   }
   for (const mlir::APInt& index : attr)
@@ -167,7 +167,7 @@ mlir::Value CreateIntScalarConst(const int64_t value, mlir::OpBuilder builder,
   }
 }
 
-absl::optional<mlir::Value> CreateZeroScalarConst(mlir::OpBuilder& builder,
+abslx::optional<mlir::Value> CreateZeroScalarConst(mlir::OpBuilder& builder,
                                                   mlir::Location loc,
                                                   mlir::Type type) {
   if (type.isF64()) {
@@ -191,7 +191,7 @@ absl::optional<mlir::Value> CreateZeroScalarConst(mlir::OpBuilder& builder,
                  mlir::RankedTensorType::get({}, builder.getI64Type()),
                  static_cast<int64_t>(0)));
   } else {
-    return absl::nullopt;
+    return abslx::nullopt;
   }
 }
 

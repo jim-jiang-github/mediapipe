@@ -35,7 +35,7 @@ namespace tensorrt {
 template <typename TensorShapeType>
 std::vector<nvinfer1::Dims> GetDimVec(std::vector<TensorShapeType> shape_vec) {
   std::vector<nvinfer1::Dims> dimvec(shape_vec.size());
-  absl::c_transform(shape_vec, dimvec.begin(), [](TensorShapeType shape) {
+  abslx::c_transform(shape_vec, dimvec.begin(), [](TensorShapeType shape) {
     auto adap = DimsAdapter::Create(shape);
     TF_CHECK_OK(adap.status());
     return adap->AsTrtDims();
@@ -402,7 +402,7 @@ Status TrtShapeOptimizationProfile::AddProfiles(
   // the mask will be correct.
   SetShapeTensorMask(network);
   is_pruned_input_.resize(network->getNbInputs());
-  absl::c_fill(is_pruned_input_, false);
+  abslx::c_fill(is_pruned_input_, false);
   return Status::OK();
 }
 
@@ -429,7 +429,7 @@ void TrtShapeOptimizationProfile::SetShapeTensorMask(
     }
   }
   has_shape_tensor_ =
-      absl::c_any_of(is_shape_tensor_, [](bool b) { return b; });
+      abslx::c_any_of(is_shape_tensor_, [](bool b) { return b; });
 }
 
 // Sets the shape tensor mask using the network definition.
@@ -445,7 +445,7 @@ void TrtShapeOptimizationProfile::SetShapeTensorMask(
     }
   }
   has_shape_tensor_ =
-      absl::c_any_of(is_shape_tensor_, [](bool b) { return b; });
+      abslx::c_any_of(is_shape_tensor_, [](bool b) { return b; });
 }
 
 // Sets the shape tensor mask using the input partial shapes. This only tells
@@ -465,7 +465,7 @@ void TrtShapeOptimizationProfile::SetShapeTensorMask(
     }
   }
   has_shape_tensor_ =
-      absl::c_any_of(is_shape_tensor_, [](bool b) { return b; });
+      abslx::c_any_of(is_shape_tensor_, [](bool b) { return b; });
 }
 
 int TrtShapeOptimizationProfile::GetProfileNumber(
@@ -564,7 +564,7 @@ nvinfer1::Dims GetDimsFromShapeVal(int prof_idx, int binding_idx,
 Status TrtShapeOptimizationProfile::SetPrunedMask(
     const nvinfer1::ICudaEngine* engine, int n_network_inputs) {
   is_pruned_input_.resize(n_network_inputs);
-  absl::c_fill(is_pruned_input_, false);
+  abslx::c_fill(is_pruned_input_, false);
   for (int j = 0; j < n_network_inputs; j++) {
     int binding_idx;
     Status status = GetTrtBindingIndex(j, 0, engine, &binding_idx);

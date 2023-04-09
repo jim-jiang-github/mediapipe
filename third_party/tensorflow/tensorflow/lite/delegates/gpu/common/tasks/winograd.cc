@@ -234,7 +234,7 @@ int3 Winograd4x4To36::GetGridSize() const {
   return int3(tiles_x, tiles_y, src_[0]->Slices());
 }
 
-absl::Status Winograd4x4To36::BindArguments(ArgumentsBinder* args) {
+abslx::Status Winograd4x4To36::BindArguments(ArgumentsBinder* args) {
   int new_width =
       src_[0]->Width() + padding_.prepended.w + padding_.appended.w - 2;
   int new_height =
@@ -243,7 +243,7 @@ absl::Status Winograd4x4To36::BindArguments(ArgumentsBinder* args) {
   int tiles_y = DivideRoundUp(new_height, 4);
   RETURN_IF_ERROR(args->SetInt("tiles_x", tiles_x));
   RETURN_IF_ERROR(args->SetInt("tiles_y", tiles_y));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 Winograd4x4To36 CreateWinograd4x4To36(const OperationDef& definition,
@@ -490,7 +490,7 @@ int3 Winograd4x4To36TileX6::SelectBestWorkGroup(
   return GetFirstSuitableWorkGroup(wgs, kernel_info.max_work_group_size);
 }
 
-absl::Status Winograd4x4To36TileX6::BindArguments(ArgumentsBinder* args) {
+abslx::Status Winograd4x4To36TileX6::BindArguments(ArgumentsBinder* args) {
   const int tiles_x = DivideRoundUp(
       src_[0]->Width() + padding_.prepended.w + padding_.appended.w - 2, 4);
   const int tiles_y = DivideRoundUp(
@@ -500,7 +500,7 @@ absl::Status Winograd4x4To36TileX6::BindArguments(ArgumentsBinder* args) {
   RETURN_IF_ERROR(args->SetInt("padding_y", -padding_.prepended.h));
   RETURN_IF_ERROR(args->SetInt("tiles_total", tiles_total));
   RETURN_IF_ERROR(args->SetInt("tiles_x", tiles_x));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 int3 Winograd4x4To36TileX6::GetGridSize() const {
@@ -713,10 +713,10 @@ int3 Winograd36To4x4Tile4x1::SelectBestWorkGroup(
   return GetFirstSuitableWorkGroup(wgs, kernel_info.max_work_group_size);
 }
 
-absl::Status Winograd36To4x4Tile4x1::BindArguments(ArgumentsBinder* args) {
+abslx::Status Winograd36To4x4Tile4x1::BindArguments(ArgumentsBinder* args) {
   const int tiles_x = DivideRoundUp(dst_[0]->Width(), 4);
   RETURN_IF_ERROR(args->SetInt("tiles_x", tiles_x));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 int3 Winograd36To4x4Tile4x1::GetGridSize() const {

@@ -35,7 +35,7 @@ char very_long_str_variable_name[] ABSL_INTERNAL_UNIQUE_SMALL_NAME() = "abc";
 
 TEST(UniqueSmallName, NonAutomaticVar) {
   EXPECT_EQ(very_long_int_variable_name, 0);
-  EXPECT_EQ(absl::string_view(very_long_str_variable_name), "abc");
+  EXPECT_EQ(abslx::string_view(very_long_str_variable_name), "abc");
 }
 
 int VeryLongFreeFunctionName() ABSL_INTERNAL_UNIQUE_SMALL_NAME();

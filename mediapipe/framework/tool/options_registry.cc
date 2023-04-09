@@ -14,11 +14,11 @@ namespace {
 
 // Returns a canonical message type name, with any leading "." removed.
 std::string CanonicalTypeName(const std::string& type_name) {
-  return (absl::StartsWith(type_name, ".")) ? type_name.substr(1) : type_name;
+  return (abslx::StartsWith(type_name, ".")) ? type_name.substr(1) : type_name;
 }
 
 // Returns the values from a protobuf field as typed FieldData.
-absl::StatusOr<std::vector<FieldData>> GetFieldValues(
+abslx::StatusOr<std::vector<FieldData>> GetFieldValues(
     const FieldData& message_data, std::string field_name) {
   std::string type_name =
       ProtoUtilLite::ParseTypeUrl(message_data.message_value().type_url());
@@ -64,7 +64,7 @@ std::string GetFieldString(const FieldData& message_data,
 // This implementation avoids a code size problem introduced by
 // proto_ns::DescriptorProto.
 void RegisterDescriptorProtos(
-    absl::flat_hash_map<std::string, Descriptor>& result) {
+    abslx::flat_hash_map<std::string, Descriptor>& result) {
   std::vector<Descriptor> descriptors = {
       {"google::protobufx.FileDescriptorSet",
        {
@@ -119,10 +119,10 @@ RegistrationToken OptionsRegistry::Register(
 void OptionsRegistry::Register(const FieldData& message_type,
                                const std::string& parent_name) {
   std::string name = GetFieldString(message_type, "name");
-  std::string full_name = absl::StrCat(parent_name, ".", name);
+  std::string full_name = abslx::StrCat(parent_name, ".", name);
   Descriptor descriptor(full_name, message_type);
   {
-    absl::MutexLock lock(&mutex());
+    abslx::MutexLock lock(&mutex());
     descriptors()[full_name] = descriptor;
   }
   auto nested_types = GetFieldValues(message_type, "nested_type");
@@ -134,7 +134,7 @@ void OptionsRegistry::Register(const FieldData& message_type,
     FieldDescriptor field(extension);
     std::string extendee = GetFieldString(extension, "extendee");
     {
-      absl::MutexLock lock(&mutex());
+      abslx::MutexLock lock(&mutex());
       extensions()[CanonicalTypeName(extendee)].push_back(field);
     }
   }
@@ -145,14 +145,14 @@ const Descriptor* OptionsRegistry::GetProtobufDescriptor(
   if (descriptors().count("google::protobufx.DescriptorProto") == 0) {
     RegisterDescriptorProtos(descriptors());
   }
-  absl::ReaderMutexLock lock(&mutex());
+  abslx::ReaderMutexLock lock(&mutex());
   auto it = descriptors().find(CanonicalTypeName(type_name));
   return (it == descriptors().end()) ? nullptr : &it->second;
 }
 
 void OptionsRegistry::FindAllExtensions(
-    absl::string_view extendee, std::vector<const FieldDescriptor*>* result) {
-  absl::ReaderMutexLock lock(&mutex());
+    abslx::string_view extendee, std::vector<const FieldDescriptor*>* result) {
+  abslx::ReaderMutexLock lock(&mutex());
   result->clear();
   if (extensions().count(extendee) > 0) {
     for (const FieldDescriptor& field : extensions().at(extendee)) {
@@ -161,20 +161,20 @@ void OptionsRegistry::FindAllExtensions(
   }
 }
 
-absl::flat_hash_map<std::string, Descriptor>& OptionsRegistry::descriptors() {
-  static auto* descriptors = new absl::flat_hash_map<std::string, Descriptor>();
+abslx::flat_hash_map<std::string, Descriptor>& OptionsRegistry::descriptors() {
+  static auto* descriptors = new abslx::flat_hash_map<std::string, Descriptor>();
   return *descriptors;
 }
 
-absl::flat_hash_map<std::string, std::vector<FieldDescriptor>>&
+abslx::flat_hash_map<std::string, std::vector<FieldDescriptor>>&
 OptionsRegistry::extensions() {
   static auto* extensions =
-      new absl::flat_hash_map<std::string, std::vector<FieldDescriptor>>();
+      new abslx::flat_hash_map<std::string, std::vector<FieldDescriptor>>();
   return *extensions;
 }
 
-absl::Mutex& OptionsRegistry::mutex() {
-  static auto* mutex = new absl::Mutex();
+abslx::Mutex& OptionsRegistry::mutex() {
+  static auto* mutex = new abslx::Mutex();
   return *mutex;
 }
 

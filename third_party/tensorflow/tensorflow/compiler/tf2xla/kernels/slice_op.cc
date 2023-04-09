@@ -143,7 +143,7 @@ class SliceOp : public XlaOpKernel {
         }
       }
 
-      absl::InlinedVector<xla::XlaOp, 4> begin_indices;
+      abslx::InlinedVector<xla::XlaOp, 4> begin_indices;
       begin_indices.reserve(input_dims);
       xla::XlaOp begin = ctx->Input("begin");
       for (int i = 0; i < input_dims; i++) {

@@ -167,11 +167,11 @@ void DoSmokeTest(const std::string& graph_proto) {
 // Tests a simple add model that adds an input tensor to itself.
 TEST(InferenceCalculatorTest, SmokeTest) {
   // Test CPU inference only.
-  DoSmokeTest(/*graph_proto=*/absl::StrReplaceAll(
+  DoSmokeTest(/*graph_proto=*/abslx::StrReplaceAll(
       kGraphWithModelPathInOption, {{"$delegate", "delegate { tflite {} }"}}));
-  DoSmokeTest(absl::StrReplaceAll(kGraphWithModelPathInOption,
+  DoSmokeTest(abslx::StrReplaceAll(kGraphWithModelPathInOption,
                                   {{"$delegate", "delegate { xnnpack {} }"}}));
-  DoSmokeTest(absl::StrReplaceAll(
+  DoSmokeTest(abslx::StrReplaceAll(
       kGraphWithModelPathInOption,
       {{"$delegate", "delegate { xnnpack { num_threads: 10 } }"}}));
 }

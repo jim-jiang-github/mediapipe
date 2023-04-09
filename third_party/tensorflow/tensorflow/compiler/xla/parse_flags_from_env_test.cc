@@ -94,7 +94,7 @@ TEST(ParseFlagsFromEnv, File) {
     tmp_dir = kTempDir;
   }
   std::string tmp_file =
-      absl::StrFormat("%s/parse_flags_from_env.%d", tmp_dir, getpid());
+      abslx::StrFormat("%s/parse_flags_from_env.%d", tmp_dir, getpid());
   FILE* fp = fopen(tmp_file.c_str(), "w");
   CHECK_NE(fp, nullptr) << "can't write to " << tmp_file;
   for (int i = 0; kTestFlagString[i] != '\0'; i++) {

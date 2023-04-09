@@ -30,7 +30,7 @@ class StringFormatOp : public OpKernel {
     OP_REQUIRES_OK(ctx, ctx->GetAttr("placeholder", &placeholder_));
     OP_REQUIRES_OK(ctx, ctx->GetAttr("summarize", &summarize_));
 
-    split_template_ = absl::StrSplit(template_, placeholder_);
+    split_template_ = abslx::StrSplit(template_, placeholder_);
     int64_t num_placeholders = split_template_.size() - 1;
     OP_REQUIRES(ctx, ctx->num_inputs() == num_placeholders,
                 errors::InvalidArgument(strings::StrCat(

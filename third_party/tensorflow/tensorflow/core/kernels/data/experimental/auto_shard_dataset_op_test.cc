@@ -205,7 +205,7 @@ static void add_identity_nodes(Node* node, Graph& graph,
                                std::vector<Node*>& identity_nodes) {
   for (int i = 0; i < node->num_outputs(); i++) {
     Node* new_node;
-    std::string name = absl::StrCat("Identity", i);
+    std::string name = abslx::StrCat("Identity", i);
     TF_EXPECT_OK(NodeBuilder(name, "Identity")
                      .Attr("T", node->output_type(i))
                      .Input(node, i)

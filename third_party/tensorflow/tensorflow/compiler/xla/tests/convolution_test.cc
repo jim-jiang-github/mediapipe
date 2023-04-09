@@ -313,7 +313,7 @@ XLA_TEST_F(ConvolutionTest, Convolve3D_1x4x2x3x3_2x2x2x3x3_Valid) {
 // servers. The error message is missing the operator ++.
 template <typename T>
 void iota_int_init_value(std::vector<T>& values, int init_value) {
-  absl::c_for_each(values,
+  abslx::c_for_each(values,
                    [&](T& value) { value = static_cast<T>(init_value++); });
 }
 

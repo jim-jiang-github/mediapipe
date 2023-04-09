@@ -82,7 +82,7 @@ class SimpleStepStatsCollector : public StepStatsCollectorInterface {
     }
 
     void RecordExecutorStarted() override {
-      start_time_ns_ = absl::GetCurrentTimeNanos();
+      start_time_ns_ = abslx::GetCurrentTimeNanos();
     }
 
     void RecordComputeStarted() override {}
@@ -90,7 +90,7 @@ class SimpleStepStatsCollector : public StepStatsCollectorInterface {
     void RecordComputeEnded() override {}
 
     void RecordExecutorEnded() override {
-      end_time_ns_ = absl::GetCurrentTimeNanos();
+      end_time_ns_ = abslx::GetCurrentTimeNanos();
     }
 
     bool TrackAllocations() const override { return false; }
@@ -495,7 +495,7 @@ Status CapturedFunction::Create(
     OpKernelContext* ctx, std::shared_ptr<const FunctionMetadata> metadata,
     std::vector<Tensor>&& captured_inputs,
     std::unique_ptr<CapturedFunction>* out_function) {
-  *out_function = absl::WrapUnique(
+  *out_function = abslx::WrapUnique(
       new CapturedFunction(std::move(metadata), std::move(captured_inputs)));
   return OkStatus();
 }
@@ -562,7 +562,7 @@ Status CapturedFunction::Instantiate(
   inst_opts.target = lib->device()->name();
 
   // Maps from a CompositeDevice name to underlying physical device names.
-  absl::flat_hash_map<string, std::vector<string>> composite_devices;
+  abslx::flat_hash_map<string, std::vector<string>> composite_devices;
 
   if (inst_opts.is_multi_device_function) {
     // Compute devices of non-captured inputs.
@@ -673,7 +673,7 @@ Status CapturedFunction::Instantiate(
 
   bool is_multi_device;
   TF_RETURN_IF_ERROR(IsMultiDevice(lib, &is_multi_device));
-  *instantiated_captured_function = absl::WrapUnique(
+  *instantiated_captured_function = abslx::WrapUnique(
       new InstantiatedCapturedFunction(lib, f_handle, std::move(ret_types),
                                        *params.runner, this, is_multi_device));
   return OkStatus();

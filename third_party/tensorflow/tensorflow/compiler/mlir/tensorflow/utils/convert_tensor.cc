@@ -307,7 +307,7 @@ void ConvertComplexElementsAttr(const mlir::DenseElementsAttr attr,
 Status ConvertTensorProtoAttr(const mlir::TF::TensorProtoAttr attr,
                               TensorProto* output_tensor) {
   auto mangled_tensor = attr.getValue();
-  absl::string_view tensor_view(mangled_tensor.data(), mangled_tensor.size());
+  abslx::string_view tensor_view(mangled_tensor.data(), mangled_tensor.size());
   return mangling_util::DemangleTensor(tensor_view, output_tensor);
 }
 
@@ -472,7 +472,7 @@ Status ConvertToTensorProto(const ElementsAttr attr, TensorProto* output) {
                               output->mutable_tensor_content());
       break;
     default:
-      return errors::Unimplemented(absl::StrCat("Unimplemented data type ",
+      return errors::Unimplemented(abslx::StrCat("Unimplemented data type ",
                                                 DataTypeString(output_dtype)));
   }
   return OkStatus();

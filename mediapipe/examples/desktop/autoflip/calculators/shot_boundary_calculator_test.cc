@@ -56,7 +56,7 @@ const int kTestFrameWidth = 640;
 const int kTestFrameHeight = 480;
 
 void AddFrames(const int number_of_frames,
-               const absl::btree_set<int>& skip_frames,
+               const abslx::btree_set<int>& skip_frames,
                CalculatorRunner* runner) {
   cv::Mat image =
       cv::imread(file::JoinPath("./",
@@ -64,7 +64,7 @@ void AddFrames(const int number_of_frames,
                                 "autoflip/calculators/testdata/dino.jpg"));
 
   for (int i = 0; i < number_of_frames; i++) {
-    auto input_frame = ::absl::make_unique<ImageFrame>(
+    auto input_frame = ::abslx::make_unique<ImageFrame>(
         ImageFormat::SRGB, kTestFrameWidth, kTestFrameHeight);
     cv::Mat input_mat = mediapipe::formats::MatView(input_frame.get());
     input_mat.setTo(cv::Scalar(0, 0, 0));
@@ -81,7 +81,7 @@ void AddFrames(const int number_of_frames,
 }
 
 void CheckOutput(const int number_of_frames,
-                 const absl::btree_set<int>& shot_frames,
+                 const abslx::btree_set<int>& shot_frames,
                  const std::vector<Packet>& output_packets) {
   ASSERT_EQ(number_of_frames, output_packets.size());
   for (int i = 0; i < number_of_frames; i++) {
@@ -99,7 +99,7 @@ TEST(ShotBoundaryCalculatorTest, NoShotChange) {
   node.mutable_options()
       ->MutableExtension(ShotBoundaryCalculatorOptions::ext)
       ->set_output_only_on_change(false);
-  auto runner = ::absl::make_unique<CalculatorRunner>(node);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(node);
 
   AddFrames(10, {}, runner.get());
   MP_ASSERT_OK(runner->Run());
@@ -112,7 +112,7 @@ TEST(ShotBoundaryCalculatorTest, ShotChangeSingle) {
   node.mutable_options()
       ->MutableExtension(ShotBoundaryCalculatorOptions::ext)
       ->set_output_only_on_change(false);
-  auto runner = ::absl::make_unique<CalculatorRunner>(node);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(node);
 
   AddFrames(20, {10}, runner.get());
   MP_ASSERT_OK(runner->Run());
@@ -125,7 +125,7 @@ TEST(ShotBoundaryCalculatorTest, ShotChangeDouble) {
   node.mutable_options()
       ->MutableExtension(ShotBoundaryCalculatorOptions::ext)
       ->set_output_only_on_change(false);
-  auto runner = ::absl::make_unique<CalculatorRunner>(node);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(node);
 
   AddFrames(20, {14, 17}, runner.get());
   MP_ASSERT_OK(runner->Run());
@@ -142,7 +142,7 @@ TEST(ShotBoundaryCalculatorTest, ShotChangeFiltered) {
       ->MutableExtension(ShotBoundaryCalculatorOptions::ext)
       ->set_output_only_on_change(false);
 
-  auto runner = ::absl::make_unique<CalculatorRunner>(node);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(node);
 
   AddFrames(24, {16, 19}, runner.get());
   MP_ASSERT_OK(runner->Run());
@@ -155,7 +155,7 @@ TEST(ShotBoundaryCalculatorTest, ShotChangeSingleOnOnChange) {
   node.mutable_options()
       ->MutableExtension(ShotBoundaryCalculatorOptions::ext)
       ->set_output_only_on_change(true);
-  auto runner = ::absl::make_unique<CalculatorRunner>(node);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(node);
 
   AddFrames(20, {15}, runner.get());
   MP_ASSERT_OK(runner->Run());

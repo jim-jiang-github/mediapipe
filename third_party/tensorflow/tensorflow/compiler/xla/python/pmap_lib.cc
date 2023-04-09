@@ -107,7 +107,7 @@ struct ShardArgResult {
 //
 // Both `devices` and `sharding_spec` has the same length.
 xla::StatusOr<ShardArgResult> ShardArg(
-    py::handle arg, absl::Span<xla::PjRtDevice* const> devices,
+    py::handle arg, abslx::Span<xla::PjRtDevice* const> devices,
     const InputSpec& input_spec, py::handle py_devices,
     const py::function& python_fallback) {
   if (ShardedDeviceArray::IsShardedDeviceArray(arg)) {
@@ -116,7 +116,7 @@ xla::StatusOr<ShardArgResult> ShardArg(
     const ShardingSpec& sharding_spec = input_spec.sharding_spec;
     if (sharding_spec == sda->GetShardingSpec()) {
       const int num_devices = devices.size();
-      TF_ASSIGN_OR_RETURN(absl::Span<xla::PjRtBuffer* const> sda_buffers,
+      TF_ASSIGN_OR_RETURN(abslx::Span<xla::PjRtBuffer* const> sda_buffers,
                           sda->GetPjRtBuffers());
       CHECK_EQ(sda_buffers.size(), num_devices);
 
@@ -180,7 +180,7 @@ struct PmapCacheEntry {
   // The first thread (holding the GIL) will create the CacheEntry associated to
   // a signature and if the object has been inserted already, other threads
   // will wait for the notification.
-  absl::Notification compilation_complete;
+  abslx::Notification compilation_complete;
 
   bool fall_back_to_python = false;
 };
@@ -308,12 +308,12 @@ class PmapFunction {
   // The format can change at any time.
   std::string DebugCacheKeys() const {
     std::vector<std::string> key_strings = {
-        absl::StrCat("The cache contains ", executables_.size(), " elements:")};
+        abslx::StrCat("The cache contains ", executables_.size(), " elements:")};
     // We will be able to use auto& [key, _] when TF uses C++ 17.
     for (auto& pair : executables_) {
       key_strings.push_back(pair.first.DebugString());
     }
-    return absl::StrJoin(key_strings, "\n\n");
+    return abslx::StrJoin(key_strings, "\n\n");
   }
 
  private:
@@ -333,7 +333,7 @@ class PmapFunction {
   // passed to the underlying PyExecutable. In sorted order.
   std::vector<int> static_argnums_;
   // We need a `unique_ptr` here to ensure value pointer stability.
-  absl::flat_hash_map<CallSignature, std::unique_ptr<PmapCacheEntry>>
+  abslx::flat_hash_map<CallSignature, std::unique_ptr<PmapCacheEntry>>
       executables_;
 
   // The fallback function to use with `ShardArgs`.
@@ -352,7 +352,7 @@ void PmapFunction::PopulateCacheEntry(PmapCacheEntry& cache_entry,
 
   py::tuple pmap_data = py::cast<py::tuple>(out_and_fastpath_data[1]);
   if (py::cast<int>(pmap_data.attr("version")) != 1) {
-    throw xla::XlaRuntimeError(absl::StrCat(
+    throw xla::XlaRuntimeError(abslx::StrCat(
         "The versions of jaxlib and Jax are incompatible (pmap cpp version 1 "
         "expected, but got ",
         py::cast<int>(pmap_data.attr("version")),
@@ -429,7 +429,7 @@ xla::StatusOr<py::object> PmapFunction::Call(py::args args, py::kwargs kwargs) {
   }
 
   // Retrieve/Maybe add the executable to the cache.
-  absl::flat_hash_map<CallSignature, std::unique_ptr<PmapCacheEntry>>::iterator
+  abslx::flat_hash_map<CallSignature, std::unique_ptr<PmapCacheEntry>>::iterator
       it;
   bool inserted;
   std::tie(it, inserted) = executables_.try_emplace(
@@ -679,7 +679,7 @@ PyObject* JaxPmapFunction_tp_call(PyObject* self, PyObject* args,
                                   PyObject* kwargs) {
   JaxPmapFunctionObject* o = reinterpret_cast<JaxPmapFunctionObject*>(self);
   tensorflow::profiler::TraceMe traceme([&] {
-    return absl::StrCat("JaxPmapFunction(", o->fun.function_name(), ")");
+    return abslx::StrCat("JaxPmapFunction(", o->fun.function_name(), ")");
   });
   py::kwargs py_kwargs;
   if (kwargs) {
@@ -747,7 +747,7 @@ void BuildPmapSubmodule(py::module& m) {
              return py::isinstance<NoSharding>(obj);
            })
       .def("__hash__", [](const NoSharding& self) {
-        const size_t hash = absl::HashOf(self);
+        const size_t hash = abslx::HashOf(self);
         return py::int_(hash);
       });
 
@@ -756,8 +756,8 @@ void BuildPmapSubmodule(py::module& m) {
       .def_readonly("chunks", &Chunked::chunks)
       .def("__repr__",
            [](const Chunked& chuncked) {
-             return absl::StrCat("Chunked(",
-                                 absl::StrJoin(chuncked.chunks, ","), ")");
+             return abslx::StrCat("Chunked(",
+                                 abslx::StrJoin(chuncked.chunks, ","), ")");
            })
       .def("__eq__", [](const Chunked& self, py::object other) {
         if (!py::isinstance<Chunked>(other)) {
@@ -771,7 +771,7 @@ void BuildPmapSubmodule(py::module& m) {
       .def_readonly("size", &Unstacked::size)
       .def("__repr__",
            [](const Unstacked& x) {
-             return absl::StrCat("Unstacked(", x.size, ")");
+             return abslx::StrCat("Unstacked(", x.size, ")");
            })
       .def("__eq__", [](const Unstacked& self, py::object other) {
         if (!py::isinstance<Unstacked>(other)) {
@@ -785,7 +785,7 @@ void BuildPmapSubmodule(py::module& m) {
   sharded_axis
       .def("__repr__",
            [](const ShardedAxis& x) {
-             return absl::StrCat("ShardedAxis(axis=", x.axis, ")");
+             return abslx::StrCat("ShardedAxis(axis=", x.axis, ")");
            })
       .def("__eq__", [](const ShardedAxis& self, const ShardedAxis& other) {
         return self == other;
@@ -796,7 +796,7 @@ void BuildPmapSubmodule(py::module& m) {
       .def_readonly("replicas", &Replicated::replicas)
       .def("__repr__",
            [](const Replicated& x) {
-             return absl::StrCat("Replicated(replicas=", x.replicas, ")");
+             return abslx::StrCat("Replicated(replicas=", x.replicas, ")");
            })
       .def("__eq__", [](const Replicated& self, const Replicated& other) {
         return self == other;
@@ -809,17 +809,17 @@ void BuildPmapSubmodule(py::module& m) {
       .def_property_readonly(
           "sharding",
           [](const ShardingSpec& self) {
-            return xla::SpanToTuple(absl::MakeConstSpan(self.GetSharding()));
+            return xla::SpanToTuple(abslx::MakeConstSpan(self.GetSharding()));
           })
       .def_property_readonly(
           "mesh_mapping",
           [](const ShardingSpec& self) {
-            return xla::SpanToTuple(absl::MakeConstSpan(self.GetMeshMapping()));
+            return xla::SpanToTuple(abslx::MakeConstSpan(self.GetMeshMapping()));
           })
       .def("__eq__", [](const ShardingSpec& self,
                         const ShardingSpec& other) { return self == other; })
       .def("__hash__", [](const ShardingSpec& self) {
-        const size_t hash = absl::HashOf(self);
+        const size_t hash = abslx::HashOf(self);
         return py::int_(hash);
       });
 
@@ -890,7 +890,7 @@ void BuildPmapSubmodule(py::module& m) {
       [](PmapFunction::object& self, const py::dict& pickle) {
         int version = py::cast<int>(pickle["version"]);
         if (version != kPmapFunctionPickleVersion) {
-          throw std::invalid_argument(absl::StrFormat(
+          throw std::invalid_argument(abslx::StrFormat(
               "Invalid PmapFunction pickle version, got %d, expected %d. "
               "Pickling/Unpickling jitted functions using different JAX "
               "versions is not supported.",

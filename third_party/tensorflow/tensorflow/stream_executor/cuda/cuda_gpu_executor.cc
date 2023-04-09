@@ -149,14 +149,14 @@ port::Status GpuExecutor::Init(int device_ordinal,
 }
 
 bool GpuExecutor::FindOnDiskForComputeCapability(
-    absl::string_view filename, absl::string_view canonical_suffix,
+    abslx::string_view filename, abslx::string_view canonical_suffix,
     std::string* found_filename) const {
   if (cc_major_ == 0 && cc_minor_ == 0) {
     return false;
   }
 
   std::string cc_specific =
-      absl::StrCat(filename, ".cc", cc_major_, cc_minor_, canonical_suffix);
+      abslx::StrCat(filename, ".cc", cc_major_, cc_minor_, canonical_suffix);
   if (port::FileExists(cc_specific).ok()) {
     VLOG(2) << "found compute-capability-specific file, using that: "
             << cc_specific;
@@ -174,8 +174,8 @@ bool GpuExecutor::FindOnDiskForComputeCapability(
   return false;
 }
 
-bool GpuExecutor::FindOnDiskForISAVersion(absl::string_view filename,
-                                          absl::string_view canonical_suffix,
+bool GpuExecutor::FindOnDiskForISAVersion(abslx::string_view filename,
+                                          abslx::string_view canonical_suffix,
                                           std::string* found_filename) const {
   LOG(ERROR)
       << "Feature not supported on CUDA platform (FindOnDiskForISAVersion)";
@@ -190,9 +190,9 @@ static std::string GetBinaryDir(bool strip_exe) {
   std::string exe_path = port::GetExecutablePath();
   if (strip_exe) {
     // The exe is the last component of the path, so remove one component.
-    std::vector<std::string> components = absl::StrSplit(exe_path, '/');
+    std::vector<std::string> components = abslx::StrSplit(exe_path, '/');
     components.pop_back();
-    return absl::StrJoin(components, "/");
+    return abslx::StrJoin(components, "/");
   }
   return exe_path;
 }
@@ -249,7 +249,7 @@ port::Status GpuExecutor::GetKernel(const MultiKernelLoaderSpec& spec,
   VLOG(3) << "GetKernel on kernel " << kernel << " : " << kernel->name();
 
   if (spec.has_cuda_cubin_in_memory()) {
-    absl::MutexLock lock{&in_memory_modules_mu_};
+    abslx::MutexLock lock{&in_memory_modules_mu_};
     kernelname = &spec.cuda_cubin_in_memory().kernelname();
     const char* cubin = spec.cuda_cubin_in_memory().bytes();
     TF_RETURN_IF_ERROR(LoadModuleFromCuBin(cubin, &module));
@@ -269,7 +269,7 @@ port::Status GpuExecutor::GetKernel(const MultiKernelLoaderSpec& spec,
       LOG(FATAL) << "Loader spec has no ptx for kernel " << *kernelname;
     }
 
-    absl::MutexLock lock{&in_memory_modules_mu_};
+    abslx::MutexLock lock{&in_memory_modules_mu_};
     TF_RETURN_IF_ERROR(LoadModuleFromPtx(ptx, &module));
     kernel_to_gpu_binary_[kernel] = ptx;
   } else {
@@ -312,7 +312,7 @@ bool GpuExecutor::UnloadGpuBinary(const void* gpu_binary) {
 void GpuExecutor::UnloadKernel(const KernelBase* kernel) {
   VLOG(3) << "Unloading kernel " << kernel << " : " << kernel->name();
 
-  absl::MutexLock lock{&in_memory_modules_mu_};
+  abslx::MutexLock lock{&in_memory_modules_mu_};
   auto gpu_binary_it = kernel_to_gpu_binary_.find(kernel);
   if (kernel_to_gpu_binary_.end() == gpu_binary_it) {
     VLOG(3) << "Kernel " << kernel << " : " << kernel->name()
@@ -331,7 +331,7 @@ port::Status GpuExecutor::LoadModule(const MultiModuleLoaderSpec& spec,
   // ModuleHandle::id().
   CUmodule cu_module;
   if (spec.has_cuda_cubin_in_memory()) {
-    absl::MutexLock lock{&in_memory_modules_mu_};
+    abslx::MutexLock lock{&in_memory_modules_mu_};
     TF_RETURN_IF_ERROR(LoadModuleFromCuBin(
         reinterpret_cast<const char*>(spec.cuda_cubin_in_memory().data()),
         &cu_module));
@@ -347,7 +347,7 @@ port::Status GpuExecutor::LoadModule(const MultiModuleLoaderSpec& spec,
       return port::InternalError("PTX not found in spec");
     }
 
-    absl::MutexLock lock{&in_memory_modules_mu_};
+    abslx::MutexLock lock{&in_memory_modules_mu_};
     TF_RETURN_IF_ERROR(
         LoadModuleFromPtx(spec.cuda_ptx_in_memory(), &cu_module));
     *module_handle = ModuleHandle(
@@ -359,26 +359,26 @@ port::Status GpuExecutor::LoadModule(const MultiModuleLoaderSpec& spec,
 
 bool GpuExecutor::UnloadModule(ModuleHandle module_handle) {
   const char* gpu_binary = reinterpret_cast<const char*>(module_handle.id());
-  absl::MutexLock lock{&in_memory_modules_mu_};
+  abslx::MutexLock lock{&in_memory_modules_mu_};
   return UnloadGpuBinary(gpu_binary);
 }
 
 namespace {
-absl::uint128 Fingerprint128(const absl::string_view s) {
+abslx::uint128 Fingerprint128(const abslx::string_view s) {
   auto fp = tensorflow::Fingerprint128(s);
-  return absl::MakeUint128(fp.high64, fp.low64);
+  return abslx::MakeUint128(fp.high64, fp.low64);
 }
 }  // namespace
 
 port::StatusOr<std::shared_ptr<DeviceMemoryBase>>
 GpuExecutor::CreateOrShareConstant(Stream* stream,
                                    const std::vector<uint8_t>& content) {
-  absl::MutexLock lock{&shared_constants_mu_};
+  abslx::MutexLock lock{&shared_constants_mu_};
   // We assume all constants are uniquely identified by this hash. In the
   // (highly unlikely) event of a hash collision, the program will likely crash
   // (because the cached constant that will be returned by mistake is unlikely
   // to have the correct size).
-  absl::uint128 fingerprint = Fingerprint128(absl::string_view(
+  abslx::uint128 fingerprint = Fingerprint128(abslx::string_view(
       reinterpret_cast<const char*>(content.data()), content.size()));
   // Must insert nullptr first to get an iterator to the insertion point.
   auto insert_result = shared_constants_.insert(
@@ -397,7 +397,7 @@ GpuExecutor::CreateOrShareConstant(Stream* stream,
     DeviceMemoryBase* new_constant =
         new DeviceMemoryBase(Allocate(content.size(), /*memory_space=*/0));
     if (new_constant->opaque() == nullptr) {
-      return port::InternalError(absl::StrFormat(
+      return port::InternalError(abslx::StrFormat(
           "Failed to allocate %d bytes for new constant", content.size()));
     }
 
@@ -406,7 +406,7 @@ GpuExecutor::CreateOrShareConstant(Stream* stream,
             .BlockHostUntilDone();
     if (!status.ok()) {
       Deallocate(new_constant);
-      status.Update(port::InternalError(absl::StrFormat(
+      status.Update(port::InternalError(abslx::StrFormat(
           "Memcpy to device address %p failed", new_constant->opaque())));
       return status;
     }
@@ -451,7 +451,7 @@ port::Status GpuExecutor::Launch(Stream* stream, const ThreadDim& thread_dims,
   // whether we've done an occupancy check on this kernel before isn't free
   // (because we have to synchronize), so we only do this at -v 2+.
   if (VLOG_IS_ON(2)) {
-    absl::MutexLock lock(&launched_kernels_mu_);
+    abslx::MutexLock lock(&launched_kernels_mu_);
     if (!launched_kernels_.count(cufunc)) {
       VlogOccupancyInfo(kernel, thread_dims, block_dims);
       // TODO(rspringer): Remove elements from launched_kernels_...if we ever
@@ -730,7 +730,7 @@ port::Status GpuExecutor::WaitForEvent(Stream* stream, Event* event) {
   } else {
     return port::Status(
         port::error::INTERNAL,
-        absl::StrFormat("error recording waiting for CUDA event on stream %p",
+        abslx::StrFormat("error recording waiting for CUDA event on stream %p",
                         stream));
   }
 }
@@ -740,7 +740,7 @@ Event::Status GpuExecutor::PollForEventStatus(Event* event) {
 }
 
 bool GpuExecutor::AllocateStream(Stream* stream) {
-  absl::MutexLock l(&alive_gpu_streams_mu_);
+  abslx::MutexLock l(&alive_gpu_streams_mu_);
   bool out = AsGpuStream(stream)->Init();
   alive_gpu_streams_[stream->implementation()->GpuStreamHack()] = stream;
   return out;
@@ -748,7 +748,7 @@ bool GpuExecutor::AllocateStream(Stream* stream) {
 
 void GpuExecutor::DeallocateStream(Stream* stream) {
   GpuStream* cuda_stream = AsGpuStream(stream);
-  absl::MutexLock l(&alive_gpu_streams_mu_);
+  abslx::MutexLock l(&alive_gpu_streams_mu_);
   alive_gpu_streams_.erase(cuda_stream->GpuStreamHack());
   if (!cuda_stream->IsIdle()) {
     LOG(ERROR) << "Deallocating stream with pending work";
@@ -877,7 +877,7 @@ bool GpuExecutor::GetSymbol(const std::string& symbol_name,
   };
 
   {  // give limited scope to mutex_lock
-    absl::MutexLock lock{&in_memory_modules_mu_};
+    abslx::MutexLock lock{&in_memory_modules_mu_};
     auto it = gpu_binary_to_module_.find(module_handle.id());
     CHECK(it != gpu_binary_to_module_.end());
     return lookup_in_module(it->second.first);
@@ -956,7 +956,7 @@ static int TryToReadNumaNode(const std::string& pci_bus_id,
   }
 
   std::string filename =
-      absl::StrFormat("/sys/bus/pci/devices/%s/numa_node", pci_bus_id);
+      abslx::StrFormat("/sys/bus/pci/devices/%s/numa_node", pci_bus_id);
 
   // We have to use fopen/fread here so that the device properties can be
   // populated before InitGoogle procedure has been completed (at which point we
@@ -1017,7 +1017,7 @@ GpuExecutor::CreateDeviceDescription(int device_ordinal) {
   {
     int driver_version = 0;
     (void)GpuDriver::GetDriverVersion(&driver_version);
-    std::string augmented_driver_version = absl::StrFormat(
+    std::string augmented_driver_version = abslx::StrFormat(
         "%d (%s)", driver_version,
         cuda::DriverVersionStatusToString(Diagnostician::FindDsoVersion()));
     builder.set_driver_version(augmented_driver_version);
@@ -1027,7 +1027,7 @@ GpuExecutor::CreateDeviceDescription(int device_ordinal) {
     std::string pci_bus_id = GpuDriver::GetPCIBusID(device);
 
     // Lower the hex characters to match sysfs.
-    pci_bus_id = absl::AsciiStrToLower(pci_bus_id);
+    pci_bus_id = abslx::AsciiStrToLower(pci_bus_id);
     builder.set_pci_bus_id(pci_bus_id);
 
     // Read the NUMA node corresponding to the PCI bus ID out of sysfs.
@@ -1096,7 +1096,7 @@ GpuExecutor::CreateDeviceDescription(int device_ordinal) {
   }
 
   builder.set_platform_version(
-      absl::StrCat("Compute Capability ", cc_major, ".", cc_minor));
+      abslx::StrCat("Compute Capability ", cc_major, ".", cc_minor));
 
   // TODO(leary) should be a way to query this from the driver, but this is
   // unlikely to change for us any time soon.

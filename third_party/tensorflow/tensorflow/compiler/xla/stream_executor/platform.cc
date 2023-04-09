@@ -36,7 +36,7 @@ std::string PlatformKindString(PlatformKind kind) {
     case PlatformKind::kMock:
       return "Mock";
     default:
-      return absl::StrCat("InvalidPlatformKind(", static_cast<int>(kind), ")");
+      return abslx::StrCat("InvalidPlatformKind(", static_cast<int>(kind), ")");
   }
 }
 

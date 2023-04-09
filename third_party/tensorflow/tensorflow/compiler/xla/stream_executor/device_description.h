@@ -90,7 +90,7 @@ struct CudaComputeCapability {
     return 64;
   }
 
-  std::string ToString() const { return absl::StrCat(major, ".", minor); }
+  std::string ToString() const { return abslx::StrCat(major, ".", minor); }
 
   std::pair<int, int> ToPair() const { return std::make_pair(major, minor); }
 };
@@ -108,7 +108,7 @@ class RocmComputeCapability {
   std::string gcn_arch_name() { return gcn_arch_name_; }
 
   std::string gfx_version() {
-    std::vector<std::string> tokens = absl::StrSplit(gcn_arch_name_, ':');
+    std::vector<std::string> tokens = abslx::StrSplit(gcn_arch_name_, ':');
     return tokens[0];
   }
 
@@ -117,7 +117,7 @@ class RocmComputeCapability {
   }
 
   std::string supported_gfx_versions_str() {
-    return absl::StrJoin(supported_gfx_versions(), ", ");
+    return abslx::StrJoin(supported_gfx_versions(), ", ");
   }
 
   bool has_nhwc_layout_support() {

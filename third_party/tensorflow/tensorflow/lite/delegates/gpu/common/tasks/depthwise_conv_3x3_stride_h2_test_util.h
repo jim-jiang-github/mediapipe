@@ -22,7 +22,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status DepthWiseConv3x3StrideH2SimpleWeightsTest(
+abslx::Status DepthWiseConv3x3StrideH2SimpleWeightsTest(
     TestExecutionEnvironment* env);
 
 }  // namespace gpu

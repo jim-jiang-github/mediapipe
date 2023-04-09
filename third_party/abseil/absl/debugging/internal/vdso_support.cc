@@ -37,7 +37,7 @@
 #define AT_SYSINFO_EHDR 33  // for crosstoolv10
 #endif
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace debugging_internal {
 
@@ -168,6 +168,6 @@ int GetCPU() {
 
 }  // namespace debugging_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_HAVE_VDSO_SUPPORT

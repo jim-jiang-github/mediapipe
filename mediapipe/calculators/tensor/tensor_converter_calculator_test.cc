@@ -53,7 +53,7 @@ class TensorConverterCalculatorTest : public ::testing::Test {
                        bool row_major_matrix = false) {
     RandomEngine random(kSeed);
     std::uniform_real_distribution<> uniform_dist(0, 1.0);
-    auto matrix = ::absl::make_unique<Matrix>();
+    auto matrix = ::abslx::make_unique<Matrix>();
     matrix->resize(num_rows, num_columns);
     if (row_major_matrix) {
       for (int y = 0; y < num_rows; ++y) {
@@ -101,7 +101,7 @@ TEST_F(TensorConverterCalculatorTest, RandomMatrixColMajor) {
     tool::AddVectorSink("tensor", &graph_config, &output_packets);
 
     // Run the graph.
-    graph_ = absl::make_unique<CalculatorGraph>();
+    graph_ = abslx::make_unique<CalculatorGraph>();
     MP_ASSERT_OK(graph_->Initialize(graph_config));
     MP_ASSERT_OK(graph_->StartRun({}));
 
@@ -163,7 +163,7 @@ TEST_F(TensorConverterCalculatorTest, RandomMatrixRowMajor) {
     tool::AddVectorSink("tensor", &graph_config, &output_packets);
 
     // Run the graph.
-    graph_ = absl::make_unique<CalculatorGraph>();
+    graph_ = abslx::make_unique<CalculatorGraph>();
     MP_ASSERT_OK(graph_->Initialize(graph_config));
     MP_ASSERT_OK(graph_->StartRun({}));
 
@@ -227,7 +227,7 @@ TEST_F(TensorConverterCalculatorTest, CustomDivAndSub) {
   // Run the graph.
   MP_ASSERT_OK(graph.Initialize(graph_config));
   MP_ASSERT_OK(graph.StartRun({}));
-  auto input_image = absl::make_unique<ImageFrame>(ImageFormat::GRAY8, 1, 1);
+  auto input_image = abslx::make_unique<ImageFrame>(ImageFormat::GRAY8, 1, 1);
   cv::Mat mat = mediapipe::formats::MatView(input_image.get());
   mat.at<uint8>(0, 0) = 200;
   MP_ASSERT_OK(graph.AddPacketToInputStream(
@@ -260,7 +260,7 @@ TEST_F(TensorConverterCalculatorTest, SetOutputRange) {
     CalculatorGraph graph;
     CalculatorGraphConfig graph_config =
         mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(
-            absl::Substitute(R"(
+            abslx::Substitute(R"(
         input_stream: "input_image"
         node {
           calculator: "TensorConverterCalculator"
@@ -284,7 +284,7 @@ TEST_F(TensorConverterCalculatorTest, SetOutputRange) {
     // Run the graph.
     MP_ASSERT_OK(graph.Initialize(graph_config));
     MP_ASSERT_OK(graph.StartRun({}));
-    auto input_image = absl::make_unique<ImageFrame>(ImageFormat::GRAY8, 1, 1);
+    auto input_image = abslx::make_unique<ImageFrame>(ImageFormat::GRAY8, 1, 1);
     cv::Mat mat = mediapipe::formats::MatView(input_image.get());
     mat.at<uint8>(0, 0) = 200;
     MP_ASSERT_OK(graph.AddPacketToInputStream(

@@ -29,25 +29,25 @@ namespace {
 
 bool IsAllowed(char character) {
   auto c = static_cast<unsigned char>(character);
-  return (absl::ascii_isalnum(c) != 0) || c == '_' || c == '.' || c == '-';
+  return (abslx::ascii_isalnum(c) != 0) || c == '_' || c == '.' || c == '-';
 }
 
 }  // namespace
 
 NameUniquer::NameUniquer(const std::string& separator) {
-  CHECK(absl::c_all_of(separator, IsAllowed))
+  CHECK(abslx::c_all_of(separator, IsAllowed))
       << "separator should comprises allowed characters only";
   separator_ = separator;
 }
 
-/*static*/ std::string NameUniquer::GetSanitizedName(absl::string_view name) {
+/*static*/ std::string NameUniquer::GetSanitizedName(abslx::string_view name) {
   if (name.empty()) {
     return "";
   }
 
   std::string result(name);
   char c = static_cast<unsigned char>(result[0]);
-  if (!absl::ascii_isalpha(c) && c != '_') {
+  if (!abslx::ascii_isalpha(c) && c != '_') {
     result[0] = '_';
   }
   for (int i = 1, iter_limit = result.length(); i < iter_limit; i++) {
@@ -63,7 +63,7 @@ NameUniquer::NameUniquer(const std::string& separator) {
     result += "_";
   }
 
-  if (absl::StartsWith(result, "__") && !absl::StartsWith(result, "__xla_")) {
+  if (abslx::StartsWith(result, "__") && !abslx::StartsWith(result, "__xla_")) {
     // Morph name prefix __ that is not __xla_, to avoid using name prefixes
     // reserved by the backends, such as __llvm_retpoline_ reserved by the LLVM
     // x86 backend.
@@ -73,7 +73,7 @@ NameUniquer::NameUniquer(const std::string& separator) {
   return result;
 }
 
-std::string NameUniquer::GetUniqueName(absl::string_view prefix) {
+std::string NameUniquer::GetUniqueName(abslx::string_view prefix) {
   std::string root =
       GetSanitizedName(prefix.empty() ? "name" : std::string(prefix));
 
@@ -85,12 +85,12 @@ std::string NameUniquer::GetUniqueName(absl::string_view prefix) {
   if (separator_index != std::string::npos && (separator_index > 0) &&
       (separator_index < root.size() - 1)) {
     std::string after_suffix = root.substr(separator_index + 1);
-    if (absl::SimpleAtoi(after_suffix, &numeric_suffix)) {
+    if (abslx::SimpleAtoi(after_suffix, &numeric_suffix)) {
       has_numeric_suffix = true;
       // Remove numeric suffix from root.
       root = root.substr(0, separator_index);
     } else {
-      // absl::SimpleAtoi may modify numeric_suffix even if it returns false.
+      // abslx::SimpleAtoi may modify numeric_suffix even if it returns false.
       numeric_suffix = 0;
     }
   }
@@ -98,9 +98,9 @@ std::string NameUniquer::GetUniqueName(absl::string_view prefix) {
   SequentialIdGenerator& id_generator = generated_names_[root];
   numeric_suffix = id_generator.RegisterId(numeric_suffix);
   if (numeric_suffix == 0) {
-    return has_numeric_suffix ? absl::StrCat(root, separator_, 0) : root;
+    return has_numeric_suffix ? abslx::StrCat(root, separator_, 0) : root;
   }
-  absl::StrAppend(&root, separator_, numeric_suffix);
+  abslx::StrAppend(&root, separator_, numeric_suffix);
   return root;
 }
 

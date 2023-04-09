@@ -29,32 +29,32 @@ limitations under the License.
 namespace tensorflow {
 namespace str_util {
 
-string CEscape(StringPiece src) { return absl::CEscape(src); }
+string CEscape(StringPiece src) { return abslx::CEscape(src); }
 
 bool CUnescape(StringPiece source, string* dest, string* error) {
-  return absl::CUnescape(source, dest, error);
+  return abslx::CUnescape(source, dest, error);
 }
 
 void StripTrailingWhitespace(string* s) {
-  absl::StripTrailingAsciiWhitespace(s);
+  abslx::StripTrailingAsciiWhitespace(s);
 }
 
 size_t RemoveLeadingWhitespace(StringPiece* text) {
-  absl::string_view new_text = absl::StripLeadingAsciiWhitespace(*text);
+  abslx::string_view new_text = abslx::StripLeadingAsciiWhitespace(*text);
   size_t count = text->size() - new_text.size();
   *text = new_text;
   return count;
 }
 
 size_t RemoveTrailingWhitespace(StringPiece* text) {
-  absl::string_view new_text = absl::StripTrailingAsciiWhitespace(*text);
+  abslx::string_view new_text = abslx::StripTrailingAsciiWhitespace(*text);
   size_t count = text->size() - new_text.size();
   *text = new_text;
   return count;
 }
 
 size_t RemoveWhitespaceContext(StringPiece* text) {
-  absl::string_view new_text = absl::StripAsciiWhitespace(*text);
+  abslx::string_view new_text = abslx::StripAsciiWhitespace(*text);
   size_t count = text->size() - new_text.size();
   *text = new_text;
   return count;
@@ -105,26 +105,26 @@ bool ConsumeNonWhitespace(StringPiece* s, StringPiece* val) {
 }
 
 bool ConsumePrefix(StringPiece* s, StringPiece expected) {
-  return absl::ConsumePrefix(s, expected);
+  return abslx::ConsumePrefix(s, expected);
 }
 
 bool ConsumeSuffix(StringPiece* s, StringPiece expected) {
-  return absl::ConsumeSuffix(s, expected);
+  return abslx::ConsumeSuffix(s, expected);
 }
 
 StringPiece StripPrefix(StringPiece s, StringPiece expected) {
-  return absl::StripPrefix(s, expected);
+  return abslx::StripPrefix(s, expected);
 }
 
 StringPiece StripSuffix(StringPiece s, StringPiece expected) {
-  return absl::StripSuffix(s, expected);
+  return abslx::StripSuffix(s, expected);
 }
 
 // Return lower-cased version of s.
-string Lowercase(StringPiece s) { return absl::AsciiStrToLower(s); }
+string Lowercase(StringPiece s) { return abslx::AsciiStrToLower(s); }
 
 // Return upper-cased version of s.
-string Uppercase(StringPiece s) { return absl::AsciiStrToUpper(s); }
+string Uppercase(StringPiece s) { return abslx::AsciiStrToUpper(s); }
 
 void TitlecaseString(string* s, StringPiece delimiters) {
   bool upper = true;
@@ -156,15 +156,15 @@ string StringReplace(StringPiece s, StringPiece oldsub, StringPiece newsub,
 }
 
 bool StartsWith(StringPiece text, StringPiece prefix) {
-  return absl::StartsWith(text, prefix);
+  return abslx::StartsWith(text, prefix);
 }
 
 bool EndsWith(StringPiece text, StringPiece suffix) {
-  return absl::EndsWith(text, suffix);
+  return abslx::EndsWith(text, suffix);
 }
 
 bool StrContains(StringPiece haystack, StringPiece needle) {
-  return absl::StrContains(haystack, needle);
+  return abslx::StrContains(haystack, needle);
 }
 
 size_t Strnlen(const char* str, const size_t string_max_len) {

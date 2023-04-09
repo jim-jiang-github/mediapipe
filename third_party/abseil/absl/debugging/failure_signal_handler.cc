@@ -57,7 +57,7 @@
 #endif
 #endif
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 ABSL_CONST_INIT static FailureSignalHandlerOptions fsh_options;
@@ -216,8 +216,8 @@ static void InstallOneFailureHandler(FailureSignalData* data,
 #endif
 
 static void WriteToStderr(const char* data) {
-  absl::base_internal::ErrnoSaver errno_saver;
-  absl::raw_logging_internal::SafeWriteToStderr(data, strlen(data));
+  abslx::base_internal::ErrnoSaver errno_saver;
+  abslx::raw_logging_internal::SafeWriteToStderr(data, strlen(data));
 }
 
 static void WriteSignalMessage(int signo, int cpu,
@@ -247,7 +247,7 @@ struct WriterFnStruct {
   void (*writerfn)(const char*);
 };
 
-// Many of the absl::debugging_internal::Dump* functions in
+// Many of the abslx::debugging_internal::Dump* functions in
 // examine_stack.h take a writer function pointer that has a void* arg
 // for historical reasons. failure_signal_handler_writer only takes a
 // data pointer. This function converts between these types.
@@ -265,12 +265,12 @@ ABSL_ATTRIBUTE_NOINLINE static void WriteStackTrace(
   void* stack[kNumStackFrames];
   int frame_sizes[kNumStackFrames];
   int min_dropped_frames;
-  int depth = absl::GetStackFramesWithContext(
+  int depth = abslx::GetStackFramesWithContext(
       stack, frame_sizes, kNumStackFrames,
       1,  // Do not include this function in stack trace.
       ucontext, &min_dropped_frames);
-  absl::debugging_internal::DumpPCAndFrameSizesAndStackTrace(
-      absl::debugging_internal::GetProgramCounter(ucontext), stack, frame_sizes,
+  abslx::debugging_internal::DumpPCAndFrameSizesAndStackTrace(
+      abslx::debugging_internal::GetProgramCounter(ucontext), stack, frame_sizes,
       depth, min_dropped_frames, symbolize_stacktrace, writerfn, writerfn_arg);
 }
 
@@ -285,7 +285,7 @@ static void WriteFailureInfo(int signo, void* ucontext, int cpu,
                   &writerfn_struct);
 }
 
-// absl::SleepFor() can't be used here since AbslInternalSleepFor()
+// abslx::SleepFor() can't be used here since AbslInternalSleepFor()
 // may be overridden to do something that isn't async-signal-safe on
 // some platforms.
 static void PortableSleepForSeconds(int seconds) {
@@ -310,9 +310,9 @@ static void ImmediateAbortSignalHandler(int) {
 }
 #endif
 
-// absl::base_internal::GetTID() returns pid_t on most platforms, but
-// returns absl::base_internal::pid_t on Windows.
-using GetTidType = decltype(absl::base_internal::GetTID());
+// abslx::base_internal::GetTID() returns pid_t on most platforms, but
+// returns abslx::base_internal::pid_t on Windows.
+using GetTidType = decltype(abslx::base_internal::GetTID());
 ABSL_CONST_INIT static std::atomic<GetTidType> failed_tid(0);
 
 #ifndef ABSL_HAVE_SIGACTION
@@ -322,7 +322,7 @@ static void AbslFailureSignalHandler(int signo) {
 static void AbslFailureSignalHandler(int signo, siginfo_t*, void* ucontext) {
 #endif
 
-  const GetTidType this_tid = absl::base_internal::GetTID();
+  const GetTidType this_tid = abslx::base_internal::GetTID();
   GetTidType previous_failed_tid = 0;
   if (!failed_tid.compare_exchange_strong(
           previous_failed_tid, static_cast<intptr_t>(this_tid),
@@ -330,7 +330,7 @@ static void AbslFailureSignalHandler(int signo, siginfo_t*, void* ucontext) {
     ABSL_RAW_LOG(
         ERROR,
         "Signal %d raised at PC=%p while already in AbslFailureSignalHandler()",
-        signo, absl::debugging_internal::GetProgramCounter(ucontext));
+        signo, abslx::debugging_internal::GetProgramCounter(ucontext));
     if (this_tid != previous_failed_tid) {
       // Another thread is already in AbslFailureSignalHandler(), so wait
       // a bit for it to finish. If the other thread doesn't kill us,
@@ -384,4 +384,4 @@ void InstallFailureSignalHandler(const FailureSignalHandlerOptions& options) {
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -45,7 +45,7 @@ class Combiner : FlatbufferHelper {
         models_(models),
         subgraph_names_(subgraph_names),
         schema_(schema) {}
-  absl::Status Combine() {
+  abslx::Status Combine() {
     auto operator_codes = OperatorCodes();
     if (!operator_codes.ok()) {
       return operator_codes.status();
@@ -71,11 +71,11 @@ class Combiner : FlatbufferHelper {
         fbb_->CreateString(models_[0]->description()->str()), *buffers,
         /* metadata_buffer */ 0, *metadata, *signature_defs);
     fbb_->Finish(model, "TFL3");
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
-  absl::StatusOr<fb::Offset<fb::Vector<fb::Offset<OperatorCode>>>>
+  abslx::StatusOr<fb::Offset<fb::Vector<fb::Offset<OperatorCode>>>>
   OperatorCodes() {
     std::vector<fb::Offset<OperatorCode>> codes;
     for (const Model* model : models_) {
@@ -89,14 +89,14 @@ class Combiner : FlatbufferHelper {
     }
     return fbb_->CreateVector(codes);
   }
-  absl::StatusOr<fb::Offset<fb::Vector<fb::Offset<SubGraph>>>> SubGraphs() {
+  abslx::StatusOr<fb::Offset<fb::Vector<fb::Offset<SubGraph>>>> SubGraphs() {
     std::vector<fb::Offset<SubGraph>> graphs;
     int buffer_offset = 0;
     int operator_code_offset = 0;
     int subgraph_index = 0;
     for (const Model* model : models_) {
       if (model->subgraphs()->size() != 1) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "Every model to be combined must have a single subgraph.");
       }
       auto graph =
@@ -112,7 +112,7 @@ class Combiner : FlatbufferHelper {
     }
     return fbb_->CreateVector(graphs);
   }
-  absl::StatusOr<fb::Offset<fb::Vector<fb::Offset<Buffer>>>> Buffers() {
+  abslx::StatusOr<fb::Offset<fb::Vector<fb::Offset<Buffer>>>> Buffers() {
     std::vector<fb::Offset<Buffer>> buffers;
     for (const Model* model : models_) {
       for (int i = 0; i < model->buffers()->size(); i++) {
@@ -125,7 +125,7 @@ class Combiner : FlatbufferHelper {
     }
     return fbb_->CreateVector(buffers);
   }
-  absl::StatusOr<fb::Offset<fb::Vector<fb::Offset<Metadata>>>> Metadatas() {
+  abslx::StatusOr<fb::Offset<fb::Vector<fb::Offset<Metadata>>>> Metadatas() {
     std::vector<fb::Offset<Metadata>> metadatas;
     int buffer_offset = 0;
     for (const Model* model : models_) {
@@ -141,7 +141,7 @@ class Combiner : FlatbufferHelper {
     }
     return fbb_->CreateVector(metadatas);
   }
-  absl::StatusOr<fb::Offset<fb::Vector<fb::Offset<SignatureDef>>>>
+  abslx::StatusOr<fb::Offset<fb::Vector<fb::Offset<SignatureDef>>>>
   SignatureDefs() {
     std::vector<fb::Offset<SignatureDef>> signature_defs;
     const Model* model = models_[0];
@@ -157,7 +157,7 @@ class Combiner : FlatbufferHelper {
     return fbb_->CreateVector(signature_defs);
   }
 
-  absl::StatusOr<fb::Offset<SubGraph>> AdjustSubGraph(const SubGraph* graph,
+  abslx::StatusOr<fb::Offset<SubGraph>> AdjustSubGraph(const SubGraph* graph,
                                                       int buffer_offset,
                                                       int operator_code_offset,
                                                       const std::string& name) {
@@ -175,7 +175,7 @@ class Combiner : FlatbufferHelper {
                           fbb_->CreateVector(*ops), fbb_->CreateString(name));
   }
 
-  absl::StatusOr<std::vector<fb::Offset<Operator>>> AdjustOps(
+  abslx::StatusOr<std::vector<fb::Offset<Operator>>> AdjustOps(
       const SubGraph* graph, int operator_code_offset) {
     std::vector<fb::Offset<Operator>> ops;
     auto op_object = FindObject("tflite.Operator");
@@ -189,7 +189,7 @@ class Combiner : FlatbufferHelper {
       }
     }
     if (!builtin_options_field) {
-      return absl::UnknownError(
+      return abslx::UnknownError(
           "Wasn't able to find the builtin_options field on tflite.Operator");
     }
     for (int i = 0; i < graph->operators()->size(); i++) {
@@ -215,7 +215,7 @@ class Combiner : FlatbufferHelper {
     return ops;
   }
 
-  absl::StatusOr<std::vector<fb::Offset<Tensor>>> AdjustTensors(
+  abslx::StatusOr<std::vector<fb::Offset<Tensor>>> AdjustTensors(
       const SubGraph* graph, int buffer_offset) {
     std::vector<fb::Offset<Tensor>> tensors;
     auto orig_tensors = graph->tensors();
@@ -246,7 +246,7 @@ class Combiner : FlatbufferHelper {
     return tensors;
   }
 
-  absl::StatusOr<fb::Offset<Metadata>> AdjustMetadata(const Metadata* metadata,
+  abslx::StatusOr<fb::Offset<Metadata>> AdjustMetadata(const Metadata* metadata,
                                                       int buffer_offset) {
     return CreateMetadata(*fbb_,
                           metadata->name()
@@ -264,16 +264,16 @@ class Combiner : FlatbufferHelper {
 
 }  // namespace
 
-absl::Status CombineModels(flatbuffers::FlatBufferBuilder* fbb,
+abslx::Status CombineModels(flatbuffers::FlatBufferBuilder* fbb,
                            std::vector<const Model*> models,
                            std::vector<std::string> subgraph_names,
                            const reflection::Schema* schema) {
   if (!fbb || !schema) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "Must provide FlatBufferBuilder and Schema");
   }
   if (models.size() < 2) {
-    return absl::InvalidArgumentError("Must have 2+ models to combine");
+    return abslx::InvalidArgumentError("Must have 2+ models to combine");
   }
   Combiner combiner(fbb, models, subgraph_names, schema);
   return combiner.Combine();

@@ -105,7 +105,7 @@ Shape MakeNonPaddedShapeForGivenPartition(const Shape& shape,
 std::vector<HloInstruction*> MakePartitionOffsets(
     const Shape& shape, const HloSharding& sharding,
     HloInstruction* partition_id, SpmdBuilder* b,
-    absl::Span<const int64_t> dims = {});
+    abslx::Span<const int64_t> dims = {});
 
 // Returns the offsets of the partition in the tile assignment.
 std::vector<HloInstruction*> MakeTiledPartitionOrdinals(
@@ -265,7 +265,7 @@ std::optional<HloInstruction*> ExchangeHaloAndGetValidData(
 // partitioned data on the right, but we need to swap it to the left for
 // kReverse or kConvolution with window reversal.
 HloInstruction* HaloExchangeToPadOnLeft(PartitionedHlo& original,
-                                        absl::Span<const int64_t> dims);
+                                        abslx::Span<const int64_t> dims);
 
 // Check if the computation is GT comparison and safe for NaNs.
 bool IsNanSafeGt(HloComputation* computation);
@@ -302,9 +302,9 @@ hlo_sharding_util::GroupedSharding AlignGroupsWith(
 // GroupShardingOnDims on the two sharding AlignGroupsWith and then
 // UngroupSharding
 HloSharding AlignShardingOnDims(const HloSharding& sharding,
-                                absl::Span<const int64_t> sharding_dims,
+                                abslx::Span<const int64_t> sharding_dims,
                                 const HloSharding& reference,
-                                absl::Span<const int64_t> reference_dims);
+                                abslx::Span<const int64_t> reference_dims);
 
 // AlignShardingOnDims only if it doesn't change the sharding when ungrouped.
 std::optional<hlo_sharding_util::GroupedSharding> AlignGroupsWithIfCompatible(
@@ -327,8 +327,8 @@ PartitionedHlo::PartitioningState CreatePerGroupPartitioningState(
 HloInstruction* PerGroupSliceFromReplicated(
     HloInstruction* replicated, HloInstruction* partition_id,
     const std::vector<std::vector<int64_t>>& device_groups,
-    absl::Span<const int64_t> group_dims,
-    absl::Span<const int64_t> group_dim_sizes, SpmdBuilder* b);
+    abslx::Span<const int64_t> group_dims,
+    abslx::Span<const int64_t> group_dim_sizes, SpmdBuilder* b);
 
 // Returns the opcode if `reduction_comp` represents a simple binary elementwise
 // computation on the two operands.
@@ -382,8 +382,8 @@ std::optional<std::vector<int64_t>> FindMatchingPartitionedDimsForGrouping(
 // is employed to make sure the number of devices for the two sharding match.
 HloSharding CreateMatchingShardingOnDims(const Shape& target_shape,
                                          const HloSharding& source_sharding,
-                                         absl::Span<const int64_t> target_dims,
-                                         absl::Span<const int64_t> source_dims);
+                                         abslx::Span<const int64_t> target_dims,
+                                         abslx::Span<const int64_t> source_dims);
 
 // Returns if the sharding across operand and indices of a gather is across
 // parallel dimensions and matches what SPMD partitioner supports.

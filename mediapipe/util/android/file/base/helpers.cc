@@ -43,15 +43,15 @@ class FdCloser {
 }  // namespace
 
 // Read contents of a file to a string.
-absl::Status GetContents(int fd, std::string* output) {
+abslx::Status GetContents(int fd, std::string* output) {
   // Determine the length of the file.
   struct stat buf;
   if (fstat(fd, &buf) != 0) {
-    return absl::Status(absl::StatusCode::kUnknown,
+    return abslx::Status(abslx::StatusCode::kUnknown,
                         "Failed to get file status");
   }
   if (buf.st_size < 0 || buf.st_size > SIZE_MAX) {
-    return absl::Status(absl::StatusCode::kInternal, "Invalid file size");
+    return abslx::Status(abslx::StatusCode::kInternal, "Invalid file size");
   }
   size_t length = buf.st_size;
 
@@ -61,20 +61,20 @@ absl::Status GetContents(int fd, std::string* output) {
   while (length != 0) {
     const ssize_t nread = read(fd, output_ptr, length);
     if (nread <= 0) {
-      return absl::Status(absl::StatusCode::kUnknown, "Failed to read file");
+      return abslx::Status(abslx::StatusCode::kUnknown, "Failed to read file");
     }
     output_ptr += nread;
     length -= nread;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Read contents of a file to a string.
-absl::Status GetContents(absl::string_view file_name, std::string* output,
+abslx::Status GetContents(abslx::string_view file_name, std::string* output,
                          const file::Options& /*options*/) {
   int fd = open(std::string(file_name).c_str(), O_RDONLY);
   if (fd < 0) {
-    return absl::Status(absl::StatusCode::kUnknown,
+    return abslx::Status(abslx::StatusCode::kUnknown,
                         "Failed to open file: " + std::string(file_name));
   }
 
@@ -82,11 +82,11 @@ absl::Status GetContents(absl::string_view file_name, std::string* output,
   return GetContents(fd, output);
 }
 
-absl::Status GetContents(absl::string_view file_name, std::string* output) {
+abslx::Status GetContents(abslx::string_view file_name, std::string* output) {
   return GetContents(file_name, output, file::Defaults());
 }
 
-absl::Status SetContents(absl::string_view file_name, absl::string_view content,
+abslx::Status SetContents(abslx::string_view file_name, abslx::string_view content,
                          const file::Options& options) {
   // Options are currently ignored.
   return SetContents(file_name, content);

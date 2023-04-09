@@ -88,7 +88,7 @@ class GateCalculator : public CalculatorBase {
  public:
   GateCalculator() {}
 
-  static absl::Status CheckAndInitAllowDisallowInputs(CalculatorContract* cc) {
+  static abslx::Status CheckAndInitAllowDisallowInputs(CalculatorContract* cc) {
     bool input_via_side_packet = cc->InputSidePackets().HasTag(kAllowTag) ||
                                  cc->InputSidePackets().HasTag(kDisallowTag);
     bool input_via_stream =
@@ -118,10 +118,10 @@ class GateCalculator : public CalculatorBase {
         cc->Inputs().Tag(kDisallowTag).Set<bool>();
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     RET_CHECK_OK(CheckAndInitAllowDisallowInputs(cc));
 
     const int num_data_streams = cc->Inputs().NumEntries("");
@@ -138,10 +138,10 @@ class GateCalculator : public CalculatorBase {
       cc->Outputs().Tag(kStateChangeTag).Set<bool>();
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     if (cc->InputSidePackets().HasTag(kAllowTag)) {
       use_side_packet_for_allow_disallow_ = true;
       allow_by_side_packet_decision_ =
@@ -166,10 +166,10 @@ class GateCalculator : public CalculatorBase {
       allow_by_option_decision_ = options.allow();
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     bool allow = empty_packets_as_allow_;
     if (use_option_for_allow_disallow_) {
       allow = allow_by_option_decision_;
@@ -210,7 +210,7 @@ class GateCalculator : public CalculatorBase {
           cc->Outputs().Get("", i).Close();
         }
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     // Process data streams.
@@ -220,7 +220,7 @@ class GateCalculator : public CalculatorBase {
       }
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

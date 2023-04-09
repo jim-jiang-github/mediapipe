@@ -63,9 +63,9 @@ bool CanEmitFusedDynamicUpdateSliceInPlace(HloInstruction* fusion,
 // Emits IR for running the given dynamic-update-slice op in-place -- that is,
 // where the input and output buffers share the same slice, so we can simply
 // modify the input/output buffer without touching any of the other elements.
-Status EmitDynamicUpdateSliceInPlace(absl::Span<const IrArray> operand_arrays,
+Status EmitDynamicUpdateSliceInPlace(abslx::Span<const IrArray> operand_arrays,
                                      const IrArray& output_array,
-                                     absl::string_view name,
+                                     abslx::string_view name,
                                      llvm::IRBuilder<>* b);
 
 // Given a loop-fusion node whose root is a dynamic-update-slice op whose

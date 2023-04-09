@@ -267,7 +267,7 @@ class Tensor final : public Handle {
   /// @param data Buffer in which to copy contents of the handle.
   /// @throws InvalidArgument Raises error if `data` is of invalid size.
   template <class T>
-  tensorflow::Status GetValue(absl::Span<T> data) const;
+  tensorflow::Status GetValue(abslx::Span<T> data) const;
 
  private:
   // Private since it is in general unsafe.
@@ -277,7 +277,7 @@ class Tensor final : public Handle {
 };
 
 template <class T>
-tensorflow::Status Tensor::GetValue(absl::Span<T> data) const {
+tensorflow::Status Tensor::GetValue(abslx::Span<T> data) const {
   tensorflow::AbstractTensorPtr t;
   {
     const auto abstract_t = value_.tensor().get();
@@ -294,7 +294,7 @@ tensorflow::Status Tensor::GetValue(absl::Span<T> data) const {
     }
   }
   if (data.size() != t->NumElements()) {
-    return tensorflow::errors::InvalidArgument(absl::StrCat(
+    return tensorflow::errors::InvalidArgument(abslx::StrCat(
         "Mismatched number of elements: \n", "Expected: ", data.size(), "\n",
         "Actual: ", t->NumElements(), "\n"));
   }

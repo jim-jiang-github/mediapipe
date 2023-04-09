@@ -618,7 +618,7 @@ TEST(TFunc, IntsOnDeviceArgSet) {
 }
 
 static void HasError(const Status& s, const string& substr) {
-  EXPECT_TRUE(absl::StrContains(s.ToString(), substr))
+  EXPECT_TRUE(abslx::StrContains(s.ToString(), substr))
       << ">>" << s << "<<, expected substring >>" << substr << "<<";
 }
 
@@ -1642,7 +1642,7 @@ TEST(InstantiateFunctionTest, ResourceInputDevice) {
   *(*arg_attrs.mutable_attr())["_composite_device"].mutable_s() =
       "/device:COMPOSITE:0";
   (*fdef.mutable_arg_attr())[0] = arg_attrs;
-  absl::flat_hash_map<string, std::vector<string>> composite_devices;
+  abslx::flat_hash_map<string, std::vector<string>> composite_devices;
 
   Tensor arg0(DT_RESOURCE, TensorShape({2}));
   ResourceHandle resource_handle0;

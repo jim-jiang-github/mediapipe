@@ -49,12 +49,12 @@ void XlaPythonGpuCallback(gpuStreamHandle stream, void** buffers,
   // Ignore `descriptor` arg to callback
   buffers += 1;
   uint64_t descriptor;
-  if (!absl::SimpleAtoi(opaque, &descriptor)) {
+  if (!abslx::SimpleAtoi(opaque, &descriptor)) {
     throw xla::XlaRuntimeError("Invalid callback descriptor");
     return;
   }
   CpuCallback* callback =
-      absl::bit_cast<CpuCallback*>(static_cast<uintptr_t>(descriptor));
+      abslx::bit_cast<CpuCallback*>(static_cast<uintptr_t>(descriptor));
   size_t arity = callback->num_args();
   std::vector<void*> host_input_buffers(arity);
   // Copy input GPU buffers to host
@@ -101,9 +101,9 @@ void XlaPythonGpuCallback(gpuStreamHandle stream, void** buffers,
     py::object output = py::reinterpret_borrow<py::object>(
         PyTuple_GetItem(result_tuple.ptr(), i));
     py::array array = py::cast<py::array>(std::move(output));
-    absl::Span<int64_t const> dims(
+    abslx::Span<int64_t const> dims(
         reinterpret_cast<const int64_t*>(array.shape()), array.ndim());
-    absl::Span<int64_t const> strides(
+    abslx::Span<int64_t const> strides(
         reinterpret_cast<const int64_t*>(array.strides()), array.ndim());
     if (strides == result.expected_strides) {
       gpuMemcpyAsync(buffers[arity + i], array.data(), result.size_in_bytes,

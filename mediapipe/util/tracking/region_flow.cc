@@ -529,7 +529,7 @@ void IntersectRegionFlowFeatureList(
   CHECK(to.long_tracks()) << "Intersection only works for long features";
 
   // Hash features in to, based on track_id.
-  absl::node_hash_map<int, const RegionFlowFeature*> track_map;
+  abslx::node_hash_map<int, const RegionFlowFeature*> track_map;
   for (const auto& feature : to.feature()) {
     track_map[feature.track_id()] = &feature;
   }
@@ -581,7 +581,7 @@ void LongFeatureStream::AddFeatures(const RegionFlowFeatureList& feature_list,
   }
 
   // Record id of each track that is present in the current feature_list.
-  absl::node_hash_set<int> present_tracks;
+  abslx::node_hash_set<int> present_tracks;
   for (auto feature : feature_list.feature()) {  // Copy feature.
     if (feature.track_id() < 0) {
       LOG_IF(WARNING, []() {

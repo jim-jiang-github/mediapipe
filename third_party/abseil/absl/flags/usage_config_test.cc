@@ -30,32 +30,32 @@ class FlagsUsageConfigTest : public testing::Test {
   void SetUp() override {
     // Install Default config for the use on this unit test.
     // Binary may install a custom config before tests are run.
-    absl::FlagsUsageConfig default_config;
-    absl::SetFlagsUsageConfig(default_config);
+    abslx::FlagsUsageConfig default_config;
+    abslx::SetFlagsUsageConfig(default_config);
   }
 };
 
-namespace flags = absl::flags_internal;
+namespace flags = abslx::flags_internal;
 
-bool TstContainsHelpshortFlags(absl::string_view f) {
-  return absl::StartsWith(flags::Basename(f), "progname.");
+bool TstContainsHelpshortFlags(abslx::string_view f) {
+  return abslx::StartsWith(flags::Basename(f), "progname.");
 }
 
-bool TstContainsHelppackageFlags(absl::string_view f) {
-  return absl::EndsWith(flags::Package(f), "aaa/");
+bool TstContainsHelppackageFlags(abslx::string_view f) {
+  return abslx::EndsWith(flags::Package(f), "aaa/");
 }
 
-bool TstContainsHelpFlags(absl::string_view f) {
-  return absl::EndsWith(flags::Package(f), "zzz/");
+bool TstContainsHelpFlags(abslx::string_view f) {
+  return abslx::EndsWith(flags::Package(f), "zzz/");
 }
 
 std::string TstVersionString() { return "program 1.0.0"; }
 
-std::string TstNormalizeFilename(absl::string_view filename) {
+std::string TstNormalizeFilename(abslx::string_view filename) {
   return std::string(filename.substr(2));
 }
 
-void TstReportUsageMessage(absl::string_view msg) {}
+void TstReportUsageMessage(abslx::string_view msg) {}
 
 // --------------------------------------------------------------------
 
@@ -66,13 +66,13 @@ TEST_F(FlagsUsageConfigTest, TestGetSetFlagsUsageConfig) {
   EXPECT_TRUE(flags::GetUsageConfig().version_string);
   EXPECT_TRUE(flags::GetUsageConfig().normalize_filename);
 
-  absl::FlagsUsageConfig empty_config;
+  abslx::FlagsUsageConfig empty_config;
   empty_config.contains_helpshort_flags = &TstContainsHelpshortFlags;
   empty_config.contains_help_flags = &TstContainsHelpFlags;
   empty_config.contains_helppackage_flags = &TstContainsHelppackageFlags;
   empty_config.version_string = &TstVersionString;
   empty_config.normalize_filename = &TstNormalizeFilename;
-  absl::SetFlagsUsageConfig(empty_config);
+  abslx::SetFlagsUsageConfig(empty_config);
 
   EXPECT_TRUE(flags::GetUsageConfig().contains_helpshort_flags);
   EXPECT_TRUE(flags::GetUsageConfig().contains_help_flags);
@@ -97,9 +97,9 @@ TEST_F(FlagsUsageConfigTest, TestContainsHelpshortFlags) {
   EXPECT_TRUE(config.contains_helpshort_flags("abc/usage_config_test_main.cc"));
   EXPECT_FALSE(config.contains_helpshort_flags("usage_config_main.cc"));
 
-  absl::FlagsUsageConfig empty_config;
+  abslx::FlagsUsageConfig empty_config;
   empty_config.contains_helpshort_flags = &TstContainsHelpshortFlags;
-  absl::SetFlagsUsageConfig(empty_config);
+  abslx::SetFlagsUsageConfig(empty_config);
 
   EXPECT_TRUE(
       flags::GetUsageConfig().contains_helpshort_flags("aaa/progname.cpp"));
@@ -120,9 +120,9 @@ TEST_F(FlagsUsageConfigTest, TestContainsHelpFlags) {
       config.contains_help_flags("//aqse/zzz/usage_config_test_main.cc"));
   EXPECT_FALSE(config.contains_help_flags("zzz/aa/usage_config_main.cc"));
 
-  absl::FlagsUsageConfig empty_config;
+  abslx::FlagsUsageConfig empty_config;
   empty_config.contains_help_flags = &TstContainsHelpFlags;
-  absl::SetFlagsUsageConfig(empty_config);
+  abslx::SetFlagsUsageConfig(empty_config);
 
   EXPECT_TRUE(flags::GetUsageConfig().contains_help_flags("zzz/main-body.c"));
   EXPECT_FALSE(
@@ -142,9 +142,9 @@ TEST_F(FlagsUsageConfigTest, TestContainsHelppackageFlags) {
       "//aqswde/aaa/usage_config_test_main.cc"));
   EXPECT_FALSE(config.contains_helppackage_flags("aadir/usage_config_main.cc"));
 
-  absl::FlagsUsageConfig empty_config;
+  abslx::FlagsUsageConfig empty_config;
   empty_config.contains_helppackage_flags = &TstContainsHelppackageFlags;
-  absl::SetFlagsUsageConfig(empty_config);
+  abslx::SetFlagsUsageConfig(empty_config);
 
   EXPECT_TRUE(
       flags::GetUsageConfig().contains_helppackage_flags("aaa/main-body.c"));
@@ -166,9 +166,9 @@ TEST_F(FlagsUsageConfigTest, TestVersionString) {
 
   EXPECT_EQ(flags::GetUsageConfig().version_string(), expected_output);
 
-  absl::FlagsUsageConfig empty_config;
+  abslx::FlagsUsageConfig empty_config;
   empty_config.version_string = &TstVersionString;
-  absl::SetFlagsUsageConfig(empty_config);
+  abslx::SetFlagsUsageConfig(empty_config);
 
   EXPECT_EQ(flags::GetUsageConfig().version_string(), "program 1.0.0");
 }
@@ -183,16 +183,16 @@ TEST_F(FlagsUsageConfigTest, TestNormalizeFilename) {
   EXPECT_EQ(flags::GetUsageConfig().normalize_filename("/"), "");
 
   // This tests that the custom implementation is called.
-  absl::FlagsUsageConfig empty_config;
+  abslx::FlagsUsageConfig empty_config;
   empty_config.normalize_filename = &TstNormalizeFilename;
-  absl::SetFlagsUsageConfig(empty_config);
+  abslx::SetFlagsUsageConfig(empty_config);
 
   EXPECT_EQ(flags::GetUsageConfig().normalize_filename("a/a.cc"), "a.cc");
   EXPECT_EQ(flags::GetUsageConfig().normalize_filename("aaa/a.cc"), "a/a.cc");
 
   // This tests that the default implementation is called.
   empty_config.normalize_filename = nullptr;
-  absl::SetFlagsUsageConfig(empty_config);
+  abslx::SetFlagsUsageConfig(empty_config);
 
   EXPECT_EQ(flags::GetUsageConfig().normalize_filename("a/a.cc"), "a/a.cc");
   EXPECT_EQ(flags::GetUsageConfig().normalize_filename("/a/a.cc"), "a/a.cc");

@@ -29,7 +29,7 @@ class MainConfig {
 
     // Parse known flags
     string usage = tensorflow::Flags::Usage(
-        absl::StrCat(*argv[0], " Op1 [Op2 ...]"), flags);
+        abslx::StrCat(*argv[0], " Op1 [Op2 ...]"), flags);
     QCHECK(tensorflow::Flags::Parse(argc, *argv, flags)) << usage;  // Crash OK
 
     // Initialize any TensorFlow support, parsing boilerplate flags (e.g. logs)

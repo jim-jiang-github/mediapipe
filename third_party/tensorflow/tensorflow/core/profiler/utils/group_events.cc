@@ -79,21 +79,21 @@ int64_t GetEventType(bool is_host_plane, const XEventVisitor& event) {
 }
 
 bool IsLegacyProducerEvent(const XEventVisitor& event) {
-  static const auto* const kProducerEvents = new absl::flat_hash_set<int64_t>{
+  static const auto* const kProducerEvents = new abslx::flat_hash_set<int64_t>{
       HostEventType::kTraceContext, HostEventType::kFunctionRun,
       HostEventType::kSessionRun, HostEventType::kRunGraph};
   return event.Type().has_value() && kProducerEvents->contains(*event.Type());
 }
 
 bool IsLegacyConsumerEvent(const XEventVisitor& event) {
-  static const auto* const kConsumerEvents = new absl::flat_hash_set<int64_t>{
+  static const auto* const kConsumerEvents = new abslx::flat_hash_set<int64_t>{
       HostEventType::kExecutorStateProcess,
       HostEventType::kExecutorDoneCallback, HostEventType::kRunGraphDone};
   return event.Type().has_value() && kConsumerEvents->contains(*event.Type());
 }
 
 bool IsLegacyRootEvent(const XEventVisitor& event) {
-  static const auto* const kRootEvents = new absl::flat_hash_set<int64_t>{
+  static const auto* const kRootEvents = new abslx::flat_hash_set<int64_t>{
       HostEventType::kTraceContext, HostEventType::kFunctionRun,
       HostEventType::kSessionRun, HostEventType::kRunGraph};
   return event.Type().has_value() && kRootEvents->contains(*event.Type());
@@ -194,7 +194,7 @@ bool HasFunctionRun(EventNode* event_node) {
 
 bool IsImplicitRootEvent(const XEventVisitor& event) {
   static const auto* const kImplicitRootEvents =
-      new absl::flat_hash_set<int64_t>{
+      new abslx::flat_hash_set<int64_t>{
           HostEventType::kFunctionRun, HostEventType::kSessionRun,
           HostEventType::kRunGraph, HostEventType::kExecutorStateProcess};
   return event.Type().has_value() &&
@@ -221,7 +221,7 @@ const EventNode* FindParentWithComparator(const Comparator& comparator,
                                           const EventNode* node,
                                           bool include_self) {
   std::queue<const EventNode*> nodes;
-  absl::flat_hash_set<const EventNode*> seen = {node};
+  abslx::flat_hash_set<const EventNode*> seen = {node};
   if (include_self) {
     nodes.push(node);
   } else {
@@ -248,7 +248,7 @@ bool HasJaxEvent(const EventNodeMap& event_node_map) {
   return event_node_map.contains(HostEventType::kExecuteOnLocalDevices);
 }
 
-bool IsIteratorEventType(absl::optional<int64_t> event_type) {
+bool IsIteratorEventType(abslx::optional<int64_t> event_type) {
   return event_type == HostEventType::kIterator ||
          event_type == HostEventType::kDeviceInputPipelineSecondIterator;
 }
@@ -259,7 +259,7 @@ bool IsIteratorEventType(absl::optional<int64_t> event_type) {
 bool CheckLoopOp(const XSpace& space) {
   for (const XPlane& plane : space.planes()) {
     for (const auto& event_metadata : plane.event_metadata()) {
-      absl::optional<int64_t> event_type =
+      abslx::optional<int64_t> event_type =
           FindHostEventType(event_metadata.second.name());
       if (!event_type.has_value()) continue;
       switch (*event_type) {
@@ -277,15 +277,15 @@ bool CheckLoopOp(const XSpace& space) {
   return false;
 }
 
-absl::optional<XStatVisitor> EventNode::GetContextStat(
+abslx::optional<XStatVisitor> EventNode::GetContextStat(
     int64_t stat_type) const {
   std::queue<const EventNode*> nodes;
-  absl::flat_hash_set<const EventNode*> seen = {this};
+  abslx::flat_hash_set<const EventNode*> seen = {this};
   nodes.push(this);
   while (!nodes.empty()) {
     const EventNode* node = nodes.front();
     nodes.pop();
-    if (absl::optional<XStatVisitor> stat = node->visitor_.GetStat(stat_type)) {
+    if (abslx::optional<XStatVisitor> stat = node->visitor_.GetStat(stat_type)) {
       return stat;
     }
     for (const EventNode* parent : node->GetParents()) {
@@ -294,25 +294,25 @@ absl::optional<XStatVisitor> EventNode::GetContextStat(
       seen.insert(parent);
     }
   }
-  return absl::nullopt;
+  return abslx::nullopt;
 }
 
 std::string EventNode::GetGroupName() const {
   std::string name;
-  if (absl::optional<XStatVisitor> stat =
+  if (abslx::optional<XStatVisitor> stat =
           GetContextStat(StatType::kGraphType)) {
-    absl::StrAppend(&name, stat->StrOrRefValue(), " ");
+    abslx::StrAppend(&name, stat->StrOrRefValue(), " ");
   } else if (!(IsImplicitRootEvent(visitor_))) {
-    absl::StrAppend(&name, GetEventVisitor().Name(), " ");
+    abslx::StrAppend(&name, GetEventVisitor().Name(), " ");
   }
   int64_t step_num = group_id_.value_or(0);
-  if (absl::optional<XStatVisitor> stat = GetContextStat(StatType::kIterNum)) {
+  if (abslx::optional<XStatVisitor> stat = GetContextStat(StatType::kIterNum)) {
     step_num = stat->IntValue();
-  } else if (absl::optional<XStatVisitor> stat =
+  } else if (abslx::optional<XStatVisitor> stat =
                  GetContextStat(StatType::kStepNum)) {
     step_num = stat->IntValue();
   }
-  absl::StrAppend(&name, step_num);
+  abslx::StrAppend(&name, step_num);
   return name;
 }
 
@@ -332,12 +332,12 @@ void EventNode::SetGroupId(int64_t group_id) {
 void EventNode::PropagateGroupId(int64_t group_id,
                                  GroupMetadataMap* group_metadata_map) {
   std::queue<EventNode*> nodes;
-  absl::flat_hash_set<EventNode*> seen = {this};
+  abslx::flat_hash_set<EventNode*> seen = {this};
   nodes.push(this);
   while (!nodes.empty()) {
     EventNode* node = nodes.front();
     nodes.pop();
-    absl::optional<int64_t> node_group_id = node->GetGroupId();
+    abslx::optional<int64_t> node_group_id = node->GetGroupId();
     if (node_group_id.has_value()) {
       if (*node_group_id != group_id) {
         (*group_metadata_map)[group_id].children.insert(*node_group_id);
@@ -354,7 +354,7 @@ void EventNode::PropagateGroupId(int64_t group_id,
   }
 }
 
-void EventNode::AddStepName(absl::string_view step_name) {
+void EventNode::AddStepName(abslx::string_view step_name) {
   FindOrAddStatByType(StatType::kStepName)
       ->set_str_value(step_name.data(), step_name.size());
 }
@@ -431,7 +431,7 @@ void EventForest::ConnectIntraThread(XPlane* plane, XPlaneVisitor* visitor,
 void EventForest::ConnectInterThread(
     const std::vector<InterThreadConnectInfo>& connect_info_list) {
   for (const auto& connect_info : connect_info_list) {
-    absl::flat_hash_map<std::vector<uint64>, EventNode*> connect_map;
+    abslx::flat_hash_map<std::vector<uint64>, EventNode*> connect_map;
     const std::vector<int64_t>& parent_stat_types =
         connect_info.parent_stat_types;
     const std::vector<int64_t>* child_stat_types =
@@ -444,7 +444,7 @@ void EventForest::ConnectInterThread(
       for (EventNode& parent_event_node : *parent_event_node_list) {
         std::vector<uint64> stats;
         for (auto stat_type : parent_stat_types) {
-          absl::optional<XStatVisitor> stat =
+          abslx::optional<XStatVisitor> stat =
               parent_event_node.GetContextStat(stat_type);
           if (!stat) break;
           stats.push_back(stat->IntOrUintValue());
@@ -459,7 +459,7 @@ void EventForest::ConnectInterThread(
       for (EventNode& child_event_node : *child_event_node_list) {
         std::vector<uint64> stats;
         for (auto stat_type : *child_stat_types) {
-          absl::optional<XStatVisitor> stat =
+          abslx::optional<XStatVisitor> stat =
               child_event_node.GetContextStat(stat_type);
           if (!stat) break;
           stats.push_back(stat->IntOrUintValue());
@@ -494,7 +494,7 @@ bool RootNeedsGrouping(const EventNode* root) {
 
 // Sorts root events based on root level and timestamp.
 void SortRootEventList(EventList* event_list) {
-  absl::c_sort(*event_list, [](const EventNode* e1, const EventNode* e2) {
+  abslx::c_sort(*event_list, [](const EventNode* e1, const EventNode* e2) {
     // If two root events have the same root level, the root event with an
     // earlier timestamp will be processed first. Otherwise, the event with a
     // larger root level will be processed first.
@@ -519,7 +519,7 @@ void EventForest::CreateEventGroups() {
   for (auto& [event_type, events] : event_node_map_) {
     for (EventNode& event : events) {
       if (!event.RootLevel()) continue;
-      absl::optional<XStatVisitor> step_id_stat =
+      abslx::optional<XStatVisitor> step_id_stat =
           event.GetEventVisitor().GetStat(StatType::kStepId);
       // If this is a root event that associated with tf.data, skip.
       if (step_id_stat && tf_data_step_ids_.contains(step_id_stat->IntValue()))
@@ -568,7 +568,7 @@ void EventForest::ProcessTfDataSteps() {
     auto tf_data_events = gtl::FindOrNull(event_node_map_, tf_data_event_type);
     if (!tf_data_events) continue;
     for (const EventNode& tf_data_event : *tf_data_events) {
-      absl::optional<XStatVisitor> step_id_stat =
+      abslx::optional<XStatVisitor> step_id_stat =
           tf_data_event.GetEventVisitor().GetStat(StatType::kStepId);
       if (!step_id_stat) continue;
       tf_data_step_ids_.insert(step_id_stat->IntValue());
@@ -582,17 +582,17 @@ void EventForest::ProcessTensorFlowLoop() {
     std::vector<EventNode*> events;
   };
   using TensorFlowLoop =
-      absl::flat_hash_map<int64_t /*iter_num*/, TensorFlowLoopIteration>;
-  absl::flat_hash_map<int64_t /*step_id*/, TensorFlowLoop> tf_loops;
+      abslx::flat_hash_map<int64_t /*iter_num*/, TensorFlowLoopIteration>;
+  abslx::flat_hash_map<int64_t /*step_id*/, TensorFlowLoop> tf_loops;
 
   // Sort the TF executor events by TF function/session (step_id) and iter_num.
   auto executor_event_list =
       gtl::FindOrNull(event_node_map_, HostEventType::kExecutorStateProcess);
   if (!executor_event_list) return;
   for (EventNode& executor_event : *executor_event_list) {
-    absl::optional<XStatVisitor> step_id_stat =
+    abslx::optional<XStatVisitor> step_id_stat =
         executor_event.GetEventVisitor().GetStat(StatType::kStepId);
-    absl::optional<XStatVisitor> iter_num_stat =
+    abslx::optional<XStatVisitor> iter_num_stat =
         executor_event.GetEventVisitor().GetStat(StatType::kIterNum);
     if (!step_id_stat || !iter_num_stat) continue;
     int64_t step_id = step_id_stat->IntValue();
@@ -617,7 +617,7 @@ void EventForest::ProcessTensorFlowLoop() {
   }
 
   // Sort iterations based on timestamp of the first event in the iteration.
-  absl::c_sort(iters, [](const auto& iter1, const auto& iter2) {
+  abslx::c_sort(iters, [](const auto& iter1, const auto& iter2) {
     return *iter1->first_event < *iter2->first_event;
   });
 
@@ -687,7 +687,7 @@ void EventForest::ConnectEvents(
 }
 
 void EventForest::ConnectTfDataEvents() {
-  absl::flat_hash_map<
+  abslx::flat_hash_map<
       std::pair<int64_t /*iterator_id*/, int64_t /*element_id*/>,
       std::vector<EventNode*>>
       produce_iterator_map;
@@ -703,12 +703,12 @@ void EventForest::ConnectTfDataEvents() {
     VLOG(1) << produce_event_list->size() << " "
             << GetHostEventTypeStr(event_type) << " events found.";
     for (EventNode& produce_event : *produce_event_list) {
-      absl::optional<XStatVisitor> element_id =
+      abslx::optional<XStatVisitor> element_id =
           produce_event.GetEventVisitor().GetStat(StatType::kElementId);
       if (!element_id.has_value()) continue;
       for (EventNode* produce_iterator : produce_event.GetChildren()) {
         if (IsIteratorEventType(produce_iterator->GetEventVisitor().Type())) {
-          absl::optional<XStatVisitor> iterator_id =
+          abslx::optional<XStatVisitor> iterator_id =
               produce_iterator->GetEventVisitor().GetStat(StatType::kParentId);
           if (!iterator_id.has_value()) break;
           produce_iterator_map[{iterator_id->IntValue(),
@@ -733,7 +733,7 @@ void EventForest::ConnectTfDataEvents() {
     VLOG(1) << consume_event_list->size() << " "
             << GetHostEventTypeStr(event_type) << " events found.";
     for (EventNode& consume_event : *consume_event_list) {
-      absl::optional<XStatVisitor> element_id =
+      abslx::optional<XStatVisitor> element_id =
           consume_event.GetEventVisitor().GetStat(StatType::kElementId);
       if (!element_id.has_value()) continue;
       if (consume_event.GetParents().empty()) continue;
@@ -744,7 +744,7 @@ void EventForest::ConnectTfDataEvents() {
           !IsIteratorEventType(consume_iterator->GetEventVisitor().Type())) {
         continue;
       }
-      absl::optional<XStatVisitor> iterator_id =
+      abslx::optional<XStatVisitor> iterator_id =
           consume_iterator->GetEventVisitor().GetStat(StatType::kStepId);
       if (!iterator_id.has_value()) continue;
       if (auto produce_iterators = gtl::FindOrNull(

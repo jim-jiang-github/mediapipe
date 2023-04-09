@@ -57,10 +57,10 @@ void PrintSupportedOps(const string& device, const string& regen_run) {
       }
       std::sort(types.begin(), types.end());
       constraints.push_back("`" + constraint.name() + "={" +
-                            absl::StrJoin(types, ",") + "}`");
+                            abslx::StrJoin(types, ",") + "}`");
     }
     std::cout << "`" << kdef->op() << "` | "
-              << absl::StrJoin(constraints, "<br>") << std::endl;
+              << abslx::StrJoin(constraints, "<br>") << std::endl;
   }
 
   std::cout << "\nTo regenerate this table, run:\n\n```shell\n"
@@ -79,7 +79,7 @@ void SupportedOpsMain(int argc, char** argv, const char* regen_run) {
       {"device", &device,
        "Name of the compilation device for which to print supported ops, "
        "one of: " +
-           absl::StrJoin(device_names, ",")},
+           abslx::StrJoin(device_names, ",")},
   };
   string usage = Flags::Usage(argv[0], flag_list);
   bool parsed_flags_ok = Flags::Parse(&argc, argv, flag_list);

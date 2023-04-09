@@ -41,7 +41,7 @@ class ConvolutionTransposed3x3 : public GPUOperation {
       TuningType tuning_type, const GpuInfo& gpu_info,
       const KernelInfo& kernel_info,
       std::vector<int3>* work_groups) const override;
-  absl::Status BindArguments(ArgumentsBinder* args) override;
+  abslx::Status BindArguments(ArgumentsBinder* args) override;
   int3 GetGridSize() const override;
 
   // Move only

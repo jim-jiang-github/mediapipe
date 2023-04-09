@@ -28,7 +28,7 @@
 #include "absl/base/config.h"
 #include "absl/time/internal/cctz/include/cctz/civil_time.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
@@ -381,6 +381,6 @@ inline bool parse(const std::string& fmt, const std::string& input,
 }  // namespace cctz
 }  // namespace time_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_TIME_INTERNAL_CCTZ_TIME_ZONE_H_

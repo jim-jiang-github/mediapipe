@@ -230,7 +230,7 @@ RenderAnnotation* AddPointRenderData(const Color& landmark_color,
 
 }  // namespace
 
-absl::Status LandmarksToRenderDataCalculator::GetContract(
+abslx::Status LandmarksToRenderDataCalculator::GetContract(
     CalculatorContract* cc) {
   RET_CHECK(cc->Inputs().HasTag(kLandmarksTag) ||
             cc->Inputs().HasTag(kNormLandmarksTag))
@@ -250,10 +250,10 @@ absl::Status LandmarksToRenderDataCalculator::GetContract(
     cc->Inputs().Tag(kRenderScaleTag).Set<float>();
   }
   cc->Outputs().Tag(kRenderDataTag).Set<RenderData>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LandmarksToRenderDataCalculator::Open(CalculatorContext* cc) {
+abslx::Status LandmarksToRenderDataCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
   options_ = cc->Options<LandmarksToRenderDataCalculatorOptions>();
 
@@ -265,22 +265,22 @@ absl::Status LandmarksToRenderDataCalculator::Open(CalculatorContext* cc) {
     landmark_connections_.push_back(options_.landmark_connections(i));
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LandmarksToRenderDataCalculator::Process(CalculatorContext* cc) {
+abslx::Status LandmarksToRenderDataCalculator::Process(CalculatorContext* cc) {
   // Check that landmarks are not empty and skip rendering if so.
   // Don't emit an empty packet for this timestamp.
   if (cc->Inputs().HasTag(kLandmarksTag) &&
       cc->Inputs().Tag(kLandmarksTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   if (cc->Inputs().HasTag(kNormLandmarksTag) &&
       cc->Inputs().Tag(kNormLandmarksTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  auto render_data = absl::make_unique<RenderData>();
+  auto render_data = abslx::make_unique<RenderData>();
   bool visualize_depth = options_.visualize_landmark_depth();
   float z_min = 0.f;
   float z_max = 0.f;
@@ -395,7 +395,7 @@ absl::Status LandmarksToRenderDataCalculator::Process(CalculatorContext* cc) {
   cc->Outputs()
       .Tag(kRenderDataTag)
       .Add(render_data.release(), cc->InputTimestamp());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 REGISTER_CALCULATOR(LandmarksToRenderDataCalculator);

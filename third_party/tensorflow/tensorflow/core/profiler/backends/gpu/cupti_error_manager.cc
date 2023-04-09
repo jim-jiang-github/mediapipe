@@ -114,7 +114,7 @@ CUptiResult CuptiErrorManager::ActivityRegisterCallbacks(
     CUpti_BuffersCallbackCompleteFunc func_buffer_completed) {
   IGNORE_CALL_IF_DISABLED;
   // Disable heap checking for the first CUPTI activity API. See b/22091576.
-  absl::LeakCheckDisabler disabler;
+  abslx::LeakCheckDisabler disabler;
   CUptiResult error = interface_->ActivityRegisterCallbacks(
       func_buffer_requested, func_buffer_completed);
   LOG_AND_DISABLE_IF_ERROR(error);
@@ -183,7 +183,7 @@ CUptiResult CuptiErrorManager::Subscribe(CUpti_SubscriberHandle* subscriber,
                                          void* userdata) {
   IGNORE_CALL_IF_DISABLED;
   // Disable heap checking for the first CUPTI callback API. See b/22091576.
-  absl::LeakCheckDisabler disabler;
+  abslx::LeakCheckDisabler disabler;
   CUptiResult error = interface_->Subscribe(subscriber, callback, userdata);
   if (error == CUPTI_SUCCESS) {
     auto f = std::bind(&CuptiErrorManager::Unsubscribe, this, *subscriber);
@@ -376,7 +376,7 @@ CUptiResult CuptiErrorManager::DeviceGetNumMetrics(CUdevice device,
                                                    uint32_t* num_metrics) {
   IGNORE_CALL_IF_DISABLED;
   // Disable heap checking for the first CUPTI metric API. See b/22091576.
-  absl::LeakCheckDisabler disabler;
+  abslx::LeakCheckDisabler disabler;
   CUptiResult error = interface_->DeviceGetNumMetrics(device, num_metrics);
   LOG_AND_DISABLE_IF_ERROR(error);
   return error;

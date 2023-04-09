@@ -60,8 +60,8 @@ inline bool IsGpuTensorHandle(const tensorflow::TensorHandle& handle) {
   // BackingDeviceName is where the tensor is physically located, not where the
   // op that produces the tensor is.
   // Note that dummy_status is never set in TensorHandle::BackingDeviceName.
-  absl::string_view device_name = handle.BackingDeviceName(&dummy_status);
-  return absl::StrContains(device_name, "GPU");
+  abslx::string_view device_name = handle.BackingDeviceName(&dummy_status);
+  return abslx::StrContains(device_name, "GPU");
 }
 
 // TODO(zhangqiaorjc): Allowlist more dtypes as tfrt GPU supports more.

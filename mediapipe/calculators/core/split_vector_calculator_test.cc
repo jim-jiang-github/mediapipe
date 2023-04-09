@@ -61,7 +61,7 @@ class SplitTfLiteTensorVectorCalculatorTest : public ::testing::Test {
     interpreter_->AddTensors(vector_size);
     interpreter_->SetInputs(indices);
 
-    input_vec_ = absl::make_unique<std::vector<TfLiteTensor>>();
+    input_vec_ = abslx::make_unique<std::vector<TfLiteTensor>>();
     for (int i = 0; i < vector_size; ++i) {
       interpreter_->SetTensorParametersReadWrite(i, kTfLiteFloat32, "", {3},
                                                  TfLiteQuantization());
@@ -148,7 +148,7 @@ class SplitTfLiteTensorVectorCalculatorTest : public ::testing::Test {
     }
   }
 
-  std::unique_ptr<Interpreter> interpreter_ = absl::make_unique<Interpreter>();
+  std::unique_ptr<Interpreter> interpreter_ = abslx::make_unique<Interpreter>();
   std::unique_ptr<std::vector<TfLiteTensor>> input_vec_ = nullptr;
   std::vector<float*> input_buffers_;
   std::unique_ptr<CalculatorRunner> runner_ = nullptr;
@@ -568,9 +568,9 @@ TEST_F(MovableSplitUniqueIntPtrCalculatorTest, SmokeTest) {
 
   // input_vector : {0, 1, 2, 3, 4, 5}
   std::unique_ptr<std::vector<std::unique_ptr<int>>> input_vector =
-      absl::make_unique<std::vector<std::unique_ptr<int>>>(6);
+      abslx::make_unique<std::vector<std::unique_ptr<int>>>(6);
   for (int i = 0; i < 6; ++i) {
-    input_vector->at(i) = absl::make_unique<int>(i);
+    input_vector->at(i) = abslx::make_unique<int>(i);
   }
 
   MP_ASSERT_OK(graph.AddPacketToInputStream(
@@ -625,9 +625,9 @@ TEST_F(MovableSplitUniqueIntPtrCalculatorTest, SmokeTestElementOnly) {
 
   // input_vector : {0, 1, 2, 3, 4, 5}
   std::unique_ptr<std::vector<std::unique_ptr<int>>> input_vector =
-      absl::make_unique<std::vector<std::unique_ptr<int>>>(6);
+      abslx::make_unique<std::vector<std::unique_ptr<int>>>(6);
   for (int i = 0; i < 6; ++i) {
-    input_vector->at(i) = absl::make_unique<int>(i);
+    input_vector->at(i) = abslx::make_unique<int>(i);
   }
 
   MP_ASSERT_OK(graph.AddPacketToInputStream(
@@ -673,9 +673,9 @@ TEST_F(MovableSplitUniqueIntPtrCalculatorTest, SmokeTestCombiningOutputs) {
 
   // input_vector : {0, 1, 2, 3, 4, 5}
   std::unique_ptr<std::vector<std::unique_ptr<int>>> input_vector =
-      absl::make_unique<std::vector<std::unique_ptr<int>>>(6);
+      abslx::make_unique<std::vector<std::unique_ptr<int>>>(6);
   for (int i = 0; i < 6; ++i) {
-    input_vector->at(i) = absl::make_unique<int>(i);
+    input_vector->at(i) = abslx::make_unique<int>(i);
   }
 
   MP_ASSERT_OK(graph.AddPacketToInputStream(

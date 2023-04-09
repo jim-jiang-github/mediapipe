@@ -69,7 +69,7 @@ static HloInstruction* PadInstruction(HloInstruction* instr,
 
 // Modifies the given convolution to have the given input and result shapes.
 static Status PadConv(HloCustomCallInstruction* conv,
-                      absl::Span<const Shape> new_input_shapes,
+                      abslx::Span<const Shape> new_input_shapes,
                       const Shape& new_result_shape) {
   CHECK_EQ(0, conv->shape().tuple_shapes(1).dimensions(0))
       << "conv must use 0 scratch bytes, i.e. this pass must be run "
@@ -465,7 +465,7 @@ StatusOr<bool> TryResolvePaddedShapesForIntegerConvolution(
 
 StatusOr<bool> CudnnPadForConvolutions::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   for (HloComputation* comp :
        module->MakeNonfusionComputations(execution_threads)) {
@@ -476,14 +476,14 @@ StatusOr<bool> CudnnPadForConvolutions::Run(
       if (compute_capability_.IsAtLeast(7, 5)) {
         TF_ASSIGN_OR_RETURN(
             local_changed,
-            ResolveAndPad(conv, absl::bind_front(
+            ResolveAndPad(conv, abslx::bind_front(
                                     TryResolvePaddedShapesForIntegerConvolution,
                                     32, compute_capability_)));
       }
       if (!local_changed) {
         TF_ASSIGN_OR_RETURN(
             local_changed,
-            ResolveAndPad(conv, absl::bind_front(
+            ResolveAndPad(conv, abslx::bind_front(
                                     TryResolvePaddedShapesForIntegerConvolution,
                                     4, compute_capability_)));
       }

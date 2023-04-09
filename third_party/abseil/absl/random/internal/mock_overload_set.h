@@ -22,7 +22,7 @@
 #include "absl/random/internal/mock_helpers.h"
 #include "absl/random/mocking_bit_gen.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -49,7 +49,7 @@ struct MockSingleOverload<DistrT, Ret(MockingBitGen&, Args...)> {
   auto gmock_Call(MockURBG& gen, const ::testing::Matcher<Args>&... matchers)
       -> decltype(MockHelpers::MockFor<KeyT>(gen).gmock_Call(matchers...)) {
     static_assert(std::is_base_of<MockingBitGen, MockURBG>::value,
-                  "Mocking requires an absl::MockingBitGen");
+                  "Mocking requires an abslx::MockingBitGen");
     return MockHelpers::MockFor<KeyT>(gen).gmock_Call(matchers...);
   }
 };
@@ -67,7 +67,7 @@ struct MockSingleOverload<DistrT, Ret(Arg, MockingBitGen&, Args...)> {
       -> decltype(MockHelpers::MockFor<KeyT>(gen).gmock_Call(matcher,
                                                              matchers...)) {
     static_assert(std::is_base_of<MockingBitGen, MockURBG>::value,
-                  "Mocking requires an absl::MockingBitGen");
+                  "Mocking requires an abslx::MockingBitGen");
     return MockHelpers::MockFor<KeyT>(gen).gmock_Call(matcher, matchers...);
   }
 };
@@ -96,5 +96,5 @@ struct MockOverloadSet<DistrT, FirstSig, Rest...>
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 #endif  // ABSL_RANDOM_INTERNAL_MOCK_OVERLOAD_SET_H_

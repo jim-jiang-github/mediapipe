@@ -27,7 +27,7 @@ namespace xla {
 // e.g. s32 hlo(s32 convert(s8), s32 convert(s8)) -> s32 hlo(s8, s8)
 class ConvertOperandFolding : public OpExpanderPass {
  public:
-  absl::string_view name() const override { return "convert_operand_folding"; }
+  abslx::string_view name() const override { return "convert_operand_folding"; }
 
  protected:
   bool InstructionMatchesPattern(HloInstruction* instruction) override;

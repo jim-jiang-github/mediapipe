@@ -73,7 +73,7 @@ class ApproxTopKOpBase : public XlaOpKernel {
       reduction_dim += op_shape.dimensions_size();
     }
     auto cmp_builder = ctx->builder()->CreateSubBuilder(
-        absl::StrFormat("top_k_%s_comparator", is_max_k_ ? "gt" : "lt"));
+        abslx::StrFormat("top_k_%s_comparator", is_max_k_ ? "gt" : "lt"));
     xla::XlaComputation comparator =
         ComparatorBuilder(cmp_builder.get(), op_type, is_max_k_);
 
@@ -95,8 +95,8 @@ class ApproxTopKOpBase : public XlaOpKernel {
 
  protected:
   virtual xla::XlaOp ApproxTopKFn(
-      xla::XlaBuilder* builder, absl::Span<const xla::XlaOp> operands,
-      absl::Span<const xla::XlaOp> init_values, int64_t top_k,
+      xla::XlaBuilder* builder, abslx::Span<const xla::XlaOp> operands,
+      abslx::Span<const xla::XlaOp> init_values, int64_t top_k,
       int64_t reduction_dim, const xla::XlaComputation& comparator,
       float recall_target, bool aggregate_to_topk,
       int64_t reduction_input_size_override) const = 0;
@@ -118,8 +118,8 @@ class TpuApproxTopKOp : public ApproxTopKOpBase {
 
  protected:
   xla::XlaOp ApproxTopKFn(
-      xla::XlaBuilder* builder, absl::Span<const xla::XlaOp> operands,
-      absl::Span<const xla::XlaOp> init_values, int64_t top_k,
+      xla::XlaBuilder* builder, abslx::Span<const xla::XlaOp> operands,
+      abslx::Span<const xla::XlaOp> init_values, int64_t top_k,
       int64_t reduction_dim, const xla::XlaComputation& comparator,
       float recall_target, bool aggregate_to_topk,
       int64_t reduction_input_size_override) const override {
@@ -136,8 +136,8 @@ class FallbackApproxTopKOp : public ApproxTopKOpBase {
 
  protected:
   xla::XlaOp ApproxTopKFn(
-      xla::XlaBuilder* builder, absl::Span<const xla::XlaOp> operands,
-      absl::Span<const xla::XlaOp> init_values, int64_t top_k,
+      xla::XlaBuilder* builder, abslx::Span<const xla::XlaOp> operands,
+      abslx::Span<const xla::XlaOp> init_values, int64_t top_k,
       int64_t reduction_dim, const xla::XlaComputation& comparator,
       float recall_target, bool aggregate_to_topk,
       int64_t reduction_input_size_override) const override {
@@ -149,7 +149,7 @@ class FallbackApproxTopKOp : public ApproxTopKOpBase {
 
 // Register for TPU
 REGISTER_XLA_OP(Name("ApproxTopK")
-                    .Device(absl::Span<const absl::string_view>{
+                    .Device(abslx::Span<const abslx::string_view>{
                         DEVICE_TPU, DEVICE_TPU_XLA_JIT})
                     .TypeConstraint("T", {DT_FLOAT, DT_HALF, DT_BFLOAT16}),
                 TpuApproxTopKOp);

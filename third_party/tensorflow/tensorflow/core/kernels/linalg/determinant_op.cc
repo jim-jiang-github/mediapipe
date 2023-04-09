@@ -164,7 +164,7 @@ class DeterminantOpGpu : public AsyncOpKernel {
       return;
     }
 
-    // TODO(rmlarsen): Convert to absl::make_unique when available.
+    // TODO(rmlarsen): Convert to abslx::make_unique when available.
     std::unique_ptr<GpuSolver> solver(new GpuSolver(context));
 
     // Reuse the input buffer or make a copy for the factorization step,
@@ -309,7 +309,7 @@ class LogDeterminantOpGpu : public AsyncOpKernel {
       return;
     }
 
-    // TODO(rmlarsen): Convert to absl::make_unique when available.
+    // TODO(rmlarsen): Convert to abslx::make_unique when available.
     std::unique_ptr<GpuSolver> solver(new GpuSolver(context));
 
     // Reuse the input buffer or make a copy for the factorization step,

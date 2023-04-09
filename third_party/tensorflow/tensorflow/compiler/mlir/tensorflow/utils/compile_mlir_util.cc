@@ -71,15 +71,15 @@ limitations under the License.
 namespace tensorflow {
 namespace {
 
-constexpr absl::string_view kGroupSizeAttrName =
+constexpr abslx::string_view kGroupSizeAttrName =
     "tf2xla.collective_info.group_size";
-constexpr absl::string_view kGroupKeyAttrName =
+constexpr abslx::string_view kGroupKeyAttrName =
     "tf2xla.collective_info.group_key";
 
 // Extracts shape from XlaArgument as TensorShape. If shape is a xla::Shape,
 // that is converted to a TensorShape.
 StatusOr<TensorShape> GetTensorShapeFromXlaArgument(const XlaArgument& arg) {
-  if (absl::holds_alternative<xla::Shape>(arg.shape)) {
+  if (abslx::holds_alternative<xla::Shape>(arg.shape)) {
     TensorShape arg_shape;
     TF_RETURN_IF_ERROR(
         XLAShapeToTensorShape(std::get<xla::Shape>(arg.shape), &arg_shape));
@@ -623,7 +623,7 @@ static StatusOr<std::vector<int>> RewriteWithArgs(
     if (xla_arg.kind == XlaArgument::kResource) {
       mlir::Type element_type;
       if (xla_arg.type == DT_INVALID) {
-        return errors::Unimplemented(absl::StrCat(
+        return errors::Unimplemented(abslx::StrCat(
             "Argument ", idx,
             " is an uninitialized resource variable which is currently"
             " unsupported in the MLIR-based TPU bridge"));

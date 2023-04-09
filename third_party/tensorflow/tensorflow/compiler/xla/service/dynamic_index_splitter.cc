@@ -31,7 +31,7 @@ namespace xla {
 
 StatusOr<bool> DynamicIndexSplitter::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
 
   std::vector<HloComputation*> computations =
@@ -87,10 +87,10 @@ StatusOr<bool> DynamicIndexSplitter::Run(
           is_update
               ? HloInstruction::CreateDynamicUpdateSlice(
                     dynamic_op->shape(), dynamic_op->mutable_operand(0),
-                    dynamic_op->mutable_operand(1), absl::MakeSpan(index_array))
+                    dynamic_op->mutable_operand(1), abslx::MakeSpan(index_array))
               : HloInstruction::CreateDynamicSlice(
                     dynamic_op->shape(), dynamic_op->mutable_operand(0),
-                    absl::MakeSpan(index_array),
+                    abslx::MakeSpan(index_array),
                     dynamic_op->dynamic_slice_sizes());
       TF_CHECK_OK(parent->ReplaceWithNewInstruction(dynamic_op,
                                                     std::move(new_dynamic_op)));

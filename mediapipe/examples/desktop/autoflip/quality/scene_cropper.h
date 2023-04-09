@@ -60,7 +60,7 @@ class SceneCropper {
   // on the transform matrix if |cropped_frames| is not nullptr and
   // |scene_frames_or_empty| isn't empty.
   // TODO: split this function into two separate functions.
-  absl::Status CropFrames(
+  abslx::Status CropFrames(
       const SceneKeyFrameCropSummary& scene_summary,
       const std::vector<int64>& scene_timestamps,
       const std::vector<bool>& is_key_frames,
@@ -71,7 +71,7 @@ class SceneCropper {
       const bool continue_last_scene, std::vector<cv::Rect>* crop_from_location,
       std::vector<cv::Mat>* cropped_frames);
 
-  absl::Status ProcessKinematicPathSolver(
+  abslx::Status ProcessKinematicPathSolver(
       const SceneKeyFrameCropSummary& scene_summary,
       const std::vector<int64>& scene_timestamps,
       const std::vector<bool>& is_key_frames,

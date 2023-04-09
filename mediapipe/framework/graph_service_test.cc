@@ -60,7 +60,7 @@ class GraphServiceTest : public ::testing::Test {
     MP_ASSERT_OK(
         graph_.ObserveOutputStream("out", [this](const Packet& packet) {
           output_packets_.push_back(packet);
-          return absl::OkStatus();
+          return abslx::OkStatus();
         }));
   }
 

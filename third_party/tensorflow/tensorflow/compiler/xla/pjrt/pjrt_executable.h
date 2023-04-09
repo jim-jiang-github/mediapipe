@@ -55,7 +55,7 @@ class PjRtExecutable {
   virtual int64_t SizeOfGeneratedCodeInBytes() const = 0;
 
   // Unique name for this executable, e.g., HloModule name.
-  virtual absl::string_view name() const = 0;
+  virtual abslx::string_view name() const = 0;
 
   // Return an HloModule (optimized) per partition.
   virtual StatusOr<std::vector<std::shared_ptr<HloModule>>> GetHloModules()

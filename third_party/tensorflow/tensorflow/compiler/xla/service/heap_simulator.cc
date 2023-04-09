@@ -35,8 +35,8 @@ limitations under the License.
 
 namespace xla {
 
-using absl::flat_hash_map;
-using absl::flat_hash_set;
+using abslx::flat_hash_map;
+using abslx::flat_hash_set;
 
 bool HeapSimulator::Chunk::OverlapsWith(Chunk other_chunk) const {
   CHECK_NE(size, 0);
@@ -73,7 +73,7 @@ StatusOr<int64_t> HeapSimulator::MinimumMemoryForComputation(
     const HloComputation& computation, const HloInstructionSequence& sequence,
     const HloAliasAnalysis& alias_analysis,
     const LogicalBuffer::SizeFunction& size_function,
-    const absl::flat_hash_map<const HloComputation*, int64_t>*
+    const abslx::flat_hash_map<const HloComputation*, int64_t>*
         memory_by_computation) {
   TF_ASSIGN_OR_RETURN(
       HeapSimulator::Result<HloValue> result,
@@ -121,7 +121,7 @@ StatusOr<HeapSimulator::Result<HloValue>> HeapSimulator::Run(
     const HloInstructionSequence& instruction_sequence,
     const HloAliasAnalysis& alias_analysis,
     const BufferValue::SizeFunction& size_fn, const Options& options,
-    const absl::flat_hash_map<const HloComputation*, int64_t>*
+    const abslx::flat_hash_map<const HloComputation*, int64_t>*
         memory_by_computation) {
   HeapSimulator heap(std::move(algorithm), size_fn, options,
                      /*schedule=*/nullptr, memory_by_computation);
@@ -201,7 +201,7 @@ Status HeapSimulator::RunComputation(
     values_to_assign.push_back(value);
   }
 
-  absl::c_sort(values_to_assign,
+  abslx::c_sort(values_to_assign,
                [&](const HloValue* value1, const HloValue* value2) {
                  const auto& live_range1 = buffer_live_ranges.at(value1);
                  const auto& live_range2 = buffer_live_ranges.at(value2);
@@ -221,7 +221,7 @@ Status HeapSimulator::RunComputation(
 
   // All HloValues in a hlo buffer should be allocated to the same address. This
   // map tracks the first value that got allocated in a buffer.
-  absl::flat_hash_map<const HloBuffer*, const HloValue*> first_allocated_value;
+  abslx::flat_hash_map<const HloBuffer*, const HloValue*> first_allocated_value;
 
   VLOG(1) << "Program time" << hlo_live_range->schedule_end_time();
 
@@ -277,7 +277,7 @@ Status HeapSimulator::RunComputation(
               continue;
             }
 
-            if (!absl::c_linear_search(buffers_freed[i], operand_value)) {
+            if (!abslx::c_linear_search(buffers_freed[i], operand_value)) {
               // If the operand buffer is not being freed (either because it has
               // existing users, or it has been reused by other buffers), don't
               // consider the operand as a candidate of buffer sharing.
@@ -338,7 +338,7 @@ HeapSimulator::HeapSimulator(
     std::unique_ptr<HeapAlgorithm<HloValue>> algorithm,
     const BufferValue::SizeFunction& size_fn, const Options& options,
     const HloSchedule* schedule,
-    const absl::flat_hash_map<const HloComputation*, int64_t>*
+    const abslx::flat_hash_map<const HloComputation*, int64_t>*
         memory_by_computation)
     : no_fragmentation_stats_(
           std::make_unique<NoFragmentationStatsHeap<HloValue>>()),
@@ -412,7 +412,7 @@ HeapSimulator::Result<HloValue> HeapSimulator::Finish() {
   // Post-process the result to add chunks for shared buffers.  An empty chunk
   // map means that either no buffers were allocated, or the heap was only
   // collecting statistics, e.g. NoFragmentationStatsHeap.
-  size_t total_chunk_count = absl::c_accumulate(
+  size_t total_chunk_count = abslx::c_accumulate(
       result.heap_results, static_cast<size_t>(0),
       [&](size_t lhs, const HeapResult<HloValue>& rhs) -> size_t {
         return lhs + rhs.chunk_map.size();
@@ -464,7 +464,7 @@ void NoFragmentationStatsHeap<BufferType>::Alloc(const BufferType* buffer,
 template <typename BufferType>
 void NoFragmentationStatsHeap<BufferType>::AccountForSubcomputationMemory(
     const HloInstruction* instruction, int64_t alloc_size_by_instruction,
-    const absl::flat_hash_map<const HloComputation*, int64_t>&
+    const abslx::flat_hash_map<const HloComputation*, int64_t>&
         memory_by_computation) {
   // We only count the memory usage of the largest subcomputation, instead of
   // adding them all, because subcomputations won't execute in parallel.
@@ -574,10 +574,10 @@ void GlobalDecreasingSizeBestFitHeap<BufferType>::ShareWith(
 }
 
 template <typename BufferType>
-absl::flat_hash_set<const BufferType*>
+abslx::flat_hash_set<const BufferType*>
 GlobalDecreasingSizeBestFitHeap<BufferType>::GetTransitiveColocations(
     const BufferInterval& interval) const {
-  absl::flat_hash_set<const BufferType*> result;
+  abslx::flat_hash_set<const BufferType*> result;
   std::vector<const BufferInterval*> worklist = {&interval};
   while (!worklist.empty()) {
     const BufferInterval* item = worklist.back();
@@ -832,7 +832,7 @@ GlobalDecreasingSizeBestFitHeap<BufferType>::GetSortedBufferIntervals() const {
   for (auto& entry : buffer_intervals_) {
     sorted_buffer_intervals.push_back(entry.second);
   }
-  absl::c_sort(sorted_buffer_intervals, buffer_interval_compare_);
+  abslx::c_sort(sorted_buffer_intervals, buffer_interval_compare_);
 
   return sorted_buffer_intervals;
 }
@@ -869,7 +869,7 @@ GlobalDecreasingSizeBestFitHeap<BufferType>::FindChunkCandidate(
   // Map free chunk offsets -> ends.
   // We use `greater` for the comparison so that we can use `lower_bound` to
   // find the largest key less than or equal to the lookup value.
-  absl::btree_map<int64_t, int64_t, std::greater<int64_t>> free_chunks{
+  abslx::btree_map<int64_t, int64_t, std::greater<int64_t>> free_chunks{
       {0, INT64_MAX}};  // Initialize with "infinite" free memory.
 
   // Find the max size of interval across its colocations and use this value to
@@ -936,7 +936,7 @@ GlobalDecreasingSizeBestFitHeap<BufferType>::FindChunkCandidate(
     // Otherwise, find the smallest free chunk. In the case of a tie, prefer the
     // smallest offset. We ensure above that all of the free chunks are large
     // enough to store the buffer.
-    chunk.offset = absl::c_min_element(free_chunks, [](auto a, auto b) {
+    chunk.offset = abslx::c_min_element(free_chunks, [](auto a, auto b) {
                      return std::forward_as_tuple(a.second - a.first, a.first) <
                             std::forward_as_tuple(b.second - b.first, b.first);
                    })->first;

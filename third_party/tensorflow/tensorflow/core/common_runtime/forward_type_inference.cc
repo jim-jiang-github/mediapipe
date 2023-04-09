@@ -33,14 +33,14 @@ namespace {
 
 int MAX_VISITS_PER_NODE = 3;
 
-typedef absl::flat_hash_map<
+typedef abslx::flat_hash_map<
     int, std::reference_wrapper<ForwardTypeInferenceFn const>>
     ForwardInferMap;
-typedef absl::flat_hash_map<
+typedef abslx::flat_hash_map<
     int, std::pair<int, std::reference_wrapper<ForwardTypeInferenceFn const>>>
     ReverseInferMap;
 
-bool all_sources_closed(const Node& n, const absl::flat_hash_set<int>& closed,
+bool all_sources_closed(const Node& n, const abslx::flat_hash_set<int>& closed,
                         const ForwardInferMap& forward,
                         const ReverseInferMap& reverse) {
   for (const auto& e : n.out_edges()) {
@@ -111,7 +111,7 @@ Status updated_inferred_type(Node* target, const FullTypeDef& t,
       // specialize the existing type.
       return Status(
           error::INVALID_ARGUMENT,
-          absl::StrCat("type mismatch for node '", target->name(),
+          abslx::StrCat("type mismatch for node '", target->name(),
                        "': expected a subtype of:\n", existing.DebugString(),
                        "\n  got:\n", t.DebugString(), "\n  "));
     }
@@ -174,7 +174,7 @@ Status ForwardTypeInferencePass::Run(
 
     TF_RETURN_WITH_CONTEXT_IF_ERROR(
         infer_ret.status(),
-        absl::StrCat("while inferring type of node '", n->name(), "'"));
+        abslx::StrCat("while inferring type of node '", n->name(), "'"));
 
     TF_RETURN_WITH_CONTEXT_IF_ERROR(
         updated_inferred_type(n, *infer_ret, updated),
@@ -198,29 +198,29 @@ Status ForwardTypeInferencePass::Run(
     const Edge* e;
     TF_RETURN_WITH_CONTEXT_IF_ERROR(
         n->input_edge(rev_idx_and_fn.first, &e),
-        absl::StrCat("while querying input ", rev_idx_and_fn.first, " of '",
+        abslx::StrCat("while querying input ", rev_idx_and_fn.first, " of '",
                      n->name(), "'"));
 
     TF_RETURN_WITH_CONTEXT_IF_ERROR(
         infer_ret.status(),
-        absl::StrCat("while inferring type of node '", e->src()->name(),
+        abslx::StrCat("while inferring type of node '", e->src()->name(),
                      "' via '", n->name(), "'"));
 
     TF_RETURN_WITH_CONTEXT_IF_ERROR(
         updated_inferred_type(e->src(), *infer_ret, updated),
-        absl::StrCat("while updating its output type inferred from '",
+        abslx::StrCat("while updating its output type inferred from '",
                      n->name(), ","));
 
     return OkStatus();
   };
 
   std::list<int> queue;
-  absl::flat_hash_set<int> in_queue;
-  absl::flat_hash_map<int, int> visit_count;
+  abslx::flat_hash_set<int> in_queue;
+  abslx::flat_hash_map<int, int> visit_count;
   // Open nodes. A node is open if it has never been visited.
-  absl::flat_hash_set<int> open;
+  abslx::flat_hash_set<int> open;
   // Closed nodes. A closed node will never be visited again.
-  absl::flat_hash_set<int> closed;
+  abslx::flat_hash_set<int> closed;
 
   // Upper bound. Worst-case is a cycle in which no nodes have type info,
   // case in which there will be max_passes iterations, each visiting one node.

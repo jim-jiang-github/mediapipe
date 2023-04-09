@@ -26,7 +26,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status TileChannelsTest(TestExecutionEnvironment* env) {
+abslx::Status TileChannelsTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 3);
   src_tensor.data = {half(1.0f), half(2.0f), half(3.0f),
@@ -50,10 +50,10 @@ absl::Status TileChannelsTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TileChannelsX4Test(TestExecutionEnvironment* env) {
+abslx::Status TileChannelsX4Test(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 4);
   src_tensor.data = {half(1.0f), half(2.0f), half(3.0f), half(7.0f),
@@ -78,10 +78,10 @@ absl::Status TileChannelsX4Test(TestExecutionEnvironment* env) {
                         dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TileWidthTest(TestExecutionEnvironment* env) {
+abslx::Status TileWidthTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 2, 3);
   src_tensor.data = {half(1.0f), half(2.0f), half(3.0f),
@@ -105,10 +105,10 @@ absl::Status TileWidthTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TileHeightTest(TestExecutionEnvironment* env) {
+abslx::Status TileHeightTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 3);
   src_tensor.data = {half(1.0f), half(2.0f), half(3.0f),
@@ -132,10 +132,10 @@ absl::Status TileHeightTest(TestExecutionEnvironment* env) {
                         dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TileHWCTest(TestExecutionEnvironment* env) {
+abslx::Status TileHWCTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 3);
   src_tensor.data = {half(1.0f), half(2.0f),  half(3.0f),  half(4.0f),
@@ -177,7 +177,7 @@ absl::Status TileHWCTest(TestExecutionEnvironment* env) {
           dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

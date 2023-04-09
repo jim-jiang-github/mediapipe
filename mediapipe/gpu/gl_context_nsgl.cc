@@ -44,7 +44,7 @@ GlContext::StatusOrGlContext GlContext::Create(NSOpenGLContext* share_context,
   return std::move(context);
 }
 
-absl::Status GlContext::CreateContext(NSOpenGLContext* share_context) {
+abslx::Status GlContext::CreateContext(NSOpenGLContext* share_context) {
   // TODO: choose a better list?
   NSOpenGLPixelFormatAttribute attrs[] = {
   // This is required to get any OpenGL version 3.2 or higher. Note that
@@ -96,7 +96,7 @@ absl::Status GlContext::CreateContext(NSOpenGLContext* share_context) {
         [[NSOpenGLPixelFormat alloc] initWithAttributes:attrs_no_accel];
   }
   if (!pixel_format_)
-    return absl::InternalError("Could not create an NSOpenGLPixelFormat");
+    return abslx::InternalError("Could not create an NSOpenGLPixelFormat");
   context_ = [[NSOpenGLContext alloc] initWithFormat:pixel_format_
                                         shareContext:share_context];
 
@@ -122,7 +122,7 @@ absl::Status GlContext::CreateContext(NSOpenGLContext* share_context) {
   RET_CHECK_EQ(err, kCVReturnSuccess) << "Error at CVOpenGLTextureCacheCreate";
   texture_cache_.adopt(cache);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void GlContext::DestroyContext() {
@@ -144,14 +144,14 @@ void GlContext::GetCurrentContextBinding(GlContext::ContextBinding* binding) {
   binding->context = [NSOpenGLContext currentContext];
 }
 
-absl::Status GlContext::SetCurrentContextBinding(
+abslx::Status GlContext::SetCurrentContextBinding(
     const ContextBinding& new_binding) {
   if (new_binding.context) {
     [new_binding.context makeCurrentContext];
   } else {
     [NSOpenGLContext clearCurrentContext];
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 bool GlContext::HasContext() const { return context_ != nil; }

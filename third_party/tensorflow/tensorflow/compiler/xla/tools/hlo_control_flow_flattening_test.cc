@@ -33,7 +33,7 @@ using HloControlFlowFlatteningTest = HloTestBase;
 constexpr int kDefaultMaxLoopCount = 1000;
 
 TEST_F(HloControlFlowFlatteningTest, WhileRoot) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule While
   While.body {
     loop_var.1 = (s32[], s32[3]{0}) parameter(0)
@@ -87,7 +87,7 @@ TEST_F(HloControlFlowFlatteningTest, WhileRoot) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, WhileConditionCallComputation) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule While
   While.body {
     loop_var.1 = (s32[], s32[3]{0}) parameter(0)
@@ -148,7 +148,7 @@ TEST_F(HloControlFlowFlatteningTest, WhileConditionCallComputation) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, WhileRootScheduled) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule While, is_scheduled=true
   While.body {
     loop_var.1 = (s32[], s32[3]{0}) parameter(0)
@@ -196,7 +196,7 @@ TEST_F(HloControlFlowFlatteningTest, WhileRootScheduled) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, WhileUser) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule While
   While.body {
     loop_var.1 = (s32[], s32[3]{0}) parameter(0)
@@ -245,7 +245,7 @@ TEST_F(HloControlFlowFlatteningTest, WhileUser) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, Infeed) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule Infeed
   ENTRY Infeed {
     after-all = token[] after-all()
@@ -266,7 +266,7 @@ TEST_F(HloControlFlowFlatteningTest, Infeed) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, InfeedPreserveLayout) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule Infeed
   ENTRY Infeed {
     after-all = token[] after-all()
@@ -289,7 +289,7 @@ TEST_F(HloControlFlowFlatteningTest, InfeedPreserveLayout) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, Outfeed) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule Outfeed
   ENTRY Outfeed {
     param = (bf16[3]{0}, s32[12,5]{0,1}) parameter(0)
@@ -311,7 +311,7 @@ TEST_F(HloControlFlowFlatteningTest, Outfeed) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, AllReduce) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule AllReduce
   sum {
     p0 = f32[] parameter(0)
@@ -340,7 +340,7 @@ TEST_F(HloControlFlowFlatteningTest, AllReduce) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, AllReduceStartAndDone) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule CRS
 
   add {
@@ -370,7 +370,7 @@ TEST_F(HloControlFlowFlatteningTest, AllReduceStartAndDone) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, AllGather) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule AllGather
 
   ENTRY AllGather {
@@ -393,7 +393,7 @@ TEST_F(HloControlFlowFlatteningTest, AllGather) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, AllToAll) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule AllToAll
 
   ENTRY AllToAll {
@@ -416,7 +416,7 @@ TEST_F(HloControlFlowFlatteningTest, AllToAll) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, CollectivePermute) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule CollectivePermute
 
   ENTRY CollectivePermute {
@@ -439,7 +439,7 @@ TEST_F(HloControlFlowFlatteningTest, CollectivePermute) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, CollectivePermuteInPlaceUpdate) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule CollectivePermuteInPlaceUpdate
 
   ENTRY CollectivePermuteInPlaceUpdate {
@@ -470,7 +470,7 @@ TEST_F(HloControlFlowFlatteningTest, CollectivePermuteInPlaceUpdate) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, CollectivePermuteStartAndDone) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule CollectivePermuteStartAndDone
 
   ENTRY CollectivePermuteStartAndDone {
@@ -494,7 +494,7 @@ TEST_F(HloControlFlowFlatteningTest, CollectivePermuteStartAndDone) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, Recv) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule Recv
 
   ENTRY %Recv () -> (f32[], token[]) {
@@ -522,7 +522,7 @@ TEST_F(HloControlFlowFlatteningTest, Recv) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, RecvHostTransfer) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule Recv
 
   ENTRY %Recv () -> (f32[], token[]) {
@@ -553,7 +553,7 @@ TEST_F(HloControlFlowFlatteningTest, RecvHostTransfer) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, Send) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule Send
 
   ENTRY %Send () -> token[] {
@@ -582,7 +582,7 @@ TEST_F(HloControlFlowFlatteningTest, Send) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, SendHostTransfer) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule Send
 
   ENTRY %Send () -> token[] {
@@ -614,7 +614,7 @@ TEST_F(HloControlFlowFlatteningTest, SendHostTransfer) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, AllGatherStartAndDone) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule AllGatherStartAndDone
 
   ENTRY AllGatherStartAndDone {
@@ -642,7 +642,7 @@ TEST_F(HloControlFlowFlatteningTest, AllGatherStartAndDone) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, CollectiveFusion) {
-  absl::string_view hlo_template = R"(
+  abslx::string_view hlo_template = R"(
 HloModule collective-fusion, is_scheduled=true
 
 %sum (a: f32[], b: f32[]) -> f32[] {
@@ -677,9 +677,9 @@ ENTRY main {
   ROOT %fusion = (f32[unpadded_size,1,8,128]{3,2,1,0}, f32[full_size,8,128]{2,1,0}) fusion(%add.1, %add.2), kind=kCustom, calls=%all-gather
 }
   )";
-  auto hlo_string = absl::StrReplaceAll(
-      hlo_template, {{"full_size", absl::StrCat(12288)},
-                     {"unpadded_size", absl::StrCat(12285)}});
+  auto hlo_string = abslx::StrReplaceAll(
+      hlo_template, {{"full_size", abslx::StrCat(12288)},
+                     {"unpadded_size", abslx::StrCat(12285)}});
   TF_ASSERT_OK_AND_ASSIGN(auto module,
                           ParseAndReturnVerifiedModule(hlo_string));
   EXPECT_TRUE(IsCollective(module->entry_computation()->root_instruction()));
@@ -706,7 +706,7 @@ void CheckWhileBound(HloInstruction* while_op, int expected_bound) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, MaxOuterLoopCount) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule NestedWhileComp
 
   InnerBody {
@@ -795,7 +795,7 @@ TEST_F(HloControlFlowFlatteningTest, MaxOuterLoopCount) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, MatchLtUseInferedLoopCount) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule While
   While.body {
     loop_var.1 = (s32[], s32[3]{0}) parameter(0)
@@ -828,7 +828,7 @@ TEST_F(HloControlFlowFlatteningTest, MatchLtUseInferedLoopCount) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, MatchGtUseInferedLoopCount) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule While
   While.body {
     loop_var.1 = (s32[], s32[3]{0}) parameter(0)
@@ -861,7 +861,7 @@ TEST_F(HloControlFlowFlatteningTest, MatchGtUseInferedLoopCount) {
 }
 
 TEST_F(HloControlFlowFlatteningTest, NotMatchEqUseDefaultLoopCount) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule While
   While.body {
     loop_var.1 = (s32[], s32[3]{0}) parameter(0)

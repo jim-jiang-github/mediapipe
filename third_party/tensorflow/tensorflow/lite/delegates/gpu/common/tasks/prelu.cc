@@ -31,7 +31,7 @@ ElementwiseDescriptor CreatePReLU(const PReLUAttributes& attr,
   ElementwiseDescriptor op_desc;
   std::string alpha_read;
   auto alpha_linear =
-      absl::get_if<tflite::gpu::Tensor<Linear, DataType::FLOAT32>>(&attr.alpha);
+      abslx::get_if<tflite::gpu::Tensor<Linear, DataType::FLOAT32>>(&attr.alpha);
   if (alpha_linear) {
     TensorDescriptor alpha_tensor_desc = CreateConstantLinearTensorDescriptor(
         tensor_desc.GetDataType(), tensor_desc.GetStorageType(), *alpha_linear);
@@ -41,7 +41,7 @@ ElementwiseDescriptor CreatePReLU(const PReLUAttributes& attr,
   }
 
   auto alpha_hwc =
-      absl::get_if<tflite::gpu::Tensor<HWC, DataType::FLOAT32>>(&attr.alpha);
+      abslx::get_if<tflite::gpu::Tensor<HWC, DataType::FLOAT32>>(&attr.alpha);
   if (alpha_hwc) {
     const BHWC shape =
         BHWC(1, alpha_hwc->shape.h, alpha_hwc->shape.w, alpha_hwc->shape.c);
@@ -52,7 +52,7 @@ ElementwiseDescriptor CreatePReLU(const PReLUAttributes& attr,
     const std::string x_coord = shape.w == 1 ? "0" : "X_COORD";
     const std::string y_coord = shape.h == 1 ? "0" : "Y_COORD";
     const std::string s_coord = shape.c == 1 ? "0" : "S_COORD";
-    alpha_read = absl::StrCat("FLT4 alpha_val = args.alpha.Read(", x_coord,
+    alpha_read = abslx::StrCat("FLT4 alpha_val = args.alpha.Read(", x_coord,
                               ", ", y_coord, ", ", s_coord, ");\n");
     if (shape.c == 1) {
       alpha_read += "  alpha_val.y = alpha_val.x;\n";

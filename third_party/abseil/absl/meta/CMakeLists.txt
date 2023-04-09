@@ -22,7 +22,7 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::config
+    abslx::config
   PUBLIC
 )
 
@@ -34,7 +34,7 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::type_traits
+    abslx::type_traits
     gmock_main
 )
 
@@ -45,6 +45,6 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::type_traits
+    abslx::type_traits
   PUBLIC
 )

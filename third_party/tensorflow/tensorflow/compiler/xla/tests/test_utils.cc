@@ -177,10 +177,10 @@ void PopulateWithComplexData(Literal* result, std::minstd_rand0* engine,
   PopulateWithFloatingPointData<InnerFloatT>(&imaginary_lit, engine,
                                              no_duplicates, use_large_range);
 
-  absl::Span<const InnerFloatT> real_data = real_lit.data<InnerFloatT>();
-  absl::Span<const InnerFloatT> imaginary_data =
+  abslx::Span<const InnerFloatT> real_data = real_lit.data<InnerFloatT>();
+  abslx::Span<const InnerFloatT> imaginary_data =
       imaginary_lit.data<InnerFloatT>();
-  absl::Span<ComplexT> result_data = result->data<ComplexT>();
+  abslx::Span<ComplexT> result_data = result->data<ComplexT>();
   for (int i = 0; i < real_lit.data<InnerFloatT>().size(); i++) {
     result_data[i] = ComplexT(real_data[i], imaginary_data[i]);
   }
@@ -340,7 +340,7 @@ StatusOr<Literal> MakeFakeLiteralInternal(const Shape& shape,
     case PRED: {
       std::uniform_int_distribution<int> generator(0, 1);
       TF_CHECK_OK(
-          literal.Populate<bool>([&](absl::Span<const int64_t> /*indices*/) {
+          literal.Populate<bool>([&](abslx::Span<const int64_t> /*indices*/) {
             return generator(*engine);
           }));
       break;
@@ -607,7 +607,7 @@ std::vector<HloInstruction*> FindConstrainedUses(
 // generate a constrained literal (either bounded in the case of indices, or
 // zero in the case of init_values for reductions).
 StatusOr<Literal> CreateLiteralForConstrainedUses(
-    const absl::Span<HloInstruction* const> constrained_uses,
+    const abslx::Span<HloInstruction* const> constrained_uses,
     const HloInstruction& param, const Shape& param_shape,
     std::minstd_rand0* engine, bool use_large_range) {
   int64_t index_bound = INT64_MAX;

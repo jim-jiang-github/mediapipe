@@ -63,7 +63,7 @@ class XfeedQueueManager {
   // called when the buffer will no longer be accessed by the XfeedManager,
   // either as a result of a call to Reset or because the runtime has dequeued
   // and used the buffer.
-  void EnqueueBuffersAtomically(absl::Span<XfeedBuffer* const> buffers);
+  void EnqueueBuffersAtomically(abslx::Span<XfeedBuffer* const> buffers);
 
   // Blocks until the queue is non-empty, then returns the buffer at the head of
   // the queue. Sets the current buffer to be the returned buffer. It is an
@@ -87,11 +87,11 @@ class XfeedQueueManager {
  private:
   const std::string queue_name_;
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
 
   // Condition variable that is signaled every time a buffer is
   // enqueued to an empty queue.
-  absl::CondVar cv_;
+  abslx::CondVar cv_;
 
   // XfeedBuffer* queue contents are not owned, but buffer->Done must
   // be called when the buffer is no longer needed by the runtime.

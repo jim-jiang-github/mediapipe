@@ -149,11 +149,11 @@ StatusOr<mlir::Operation*> ResourceSPMDExpander::ExpandOp(mlir::Operation* op) {
                  mlir::TF::AssignSubVariableOp>(op))
     TF_RETURN_WITH_CONTEXT(errors::Internal("unsupported resource op"));
 
-  TF_ASSIGN_OR_RETURN(absl::optional<Layout> output_layout,
+  TF_ASSIGN_OR_RETURN(abslx::optional<Layout> output_layout,
                       ExtractSingleLayoutFromOp(op));
-  TF_ASSIGN_OR_RETURN(absl::optional<Layout> resource_layout,
+  TF_ASSIGN_OR_RETURN(abslx::optional<Layout> resource_layout,
                       ExtractLayoutFromOperand(op->getOperand(0)));
-  TF_ASSIGN_OR_RETURN(absl::optional<Layout> value_layout,
+  TF_ASSIGN_OR_RETURN(abslx::optional<Layout> value_layout,
                       ExtractLayoutFromOperand(op->getOperand(1)));
 
   // For assignment operations, the layout for the resource (first operand),

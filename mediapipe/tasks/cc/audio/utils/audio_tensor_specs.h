@@ -51,7 +51,7 @@ struct AudioTensorSpecs {
 };
 
 // Gets the audio tensor metadata from the metadata extractor by tensor index.
-absl::StatusOr<const tflite::TensorMetadata*> GetAudioTensorMetadataIfAny(
+abslx::StatusOr<const tflite::TensorMetadata*> GetAudioTensorMetadataIfAny(
     const metadata::ModelMetadataExtractor& metadata_extractor,
     int tensor_index);
 
@@ -63,7 +63,7 @@ absl::StatusOr<const tflite::TensorMetadata*> GetAudioTensorMetadataIfAny(
 // initialized before calling this function by means of (respectively):
 // - `tflite::GetModel`,
 // - `mediapipe::metadata::ModelMetadataExtractor::CreateFromModelBuffer`.
-absl::StatusOr<AudioTensorSpecs> BuildInputAudioTensorSpecs(
+abslx::StatusOr<AudioTensorSpecs> BuildInputAudioTensorSpecs(
     const tflite::Tensor& audio_tensor,
     const tflite::TensorMetadata* audio_tensor_metadata);
 

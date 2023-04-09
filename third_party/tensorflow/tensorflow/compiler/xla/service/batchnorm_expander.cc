@@ -563,7 +563,7 @@ Status BatchNormExpanderVisitor::HandleBatchNormGrad(
 
 StatusOr<bool> BatchNormExpander::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   XLA_VLOG_LINES(2, "BatchNormExpander::Run(), before:\n" + module->ToString());
   bool changed = false;
   for (HloComputation* computation :

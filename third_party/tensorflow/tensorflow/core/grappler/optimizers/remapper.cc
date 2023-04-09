@@ -496,7 +496,7 @@ inline bool HasAtMostOneDataFanoutAtPort0(
     const NodeDef* node = fanout.node_view()->node();
     return !IsShape(*node) && !IsRank(*node);
   };
-  return absl::c_count_if(node_view.GetRegularFanout(0), predicate) <= 1;
+  return abslx::c_count_if(node_view.GetRegularFanout(0), predicate) <= 1;
 }
 
 bool IsConvOrMatMul(const NodeDef& node) {
@@ -2128,7 +2128,7 @@ void CopyBatchMatMulAttributes(const NodeDef& batchmatmul,
 }
 
 void SetFusedOpAttributes(NodeDef* fused,
-                          const absl::Span<const absl::string_view> fused_ops,
+                          const abslx::Span<const abslx::string_view> fused_ops,
                           int num_args = 1, float epsilon = 0.0) {
   auto* attr = fused->mutable_attr();
   SetAttrValue(fused_ops, &(*attr)["fused_ops"]);
@@ -2812,7 +2812,7 @@ Status AddFusedBatchNormGradExNode(RemapperContext* ctx,
   identity_op.set_op("Identity");
   identity_op.set_name(activation_grad.name());
   identity_op.set_device(fused_batch_norm_grad.device());
-  identity_op.add_input(absl::StrCat(fused_batch_norm_grad.name(), ":5"));
+  identity_op.add_input(abslx::StrCat(fused_batch_norm_grad.name(), ":5"));
   (*identity_op.mutable_attr())["T"] = attrs->at("T");
 
   utils::Mutation* mutation = ctx->graph_view.GetMutationBuilder();

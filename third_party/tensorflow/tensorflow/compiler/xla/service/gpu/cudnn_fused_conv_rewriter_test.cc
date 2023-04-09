@@ -59,7 +59,7 @@ class CudnnFusedConvRewriterHloTest : public HloTestBase {
 
 class CudnnFusedConvRewriterTest : public GpuCodegenTest {
  protected:
-  std::string GetOptimizedHlo(absl::string_view hlo_string) {
+  std::string GetOptimizedHlo(abslx::string_view hlo_string) {
     // cudnn_vectorize_convolutions transforms convolutions, making it hard to
     // match them here in this test.  What's worse, the transforms it does
     // depends on the GPU that's available!  So just disable them for this
@@ -83,10 +83,10 @@ class CudnnFusedConvRewriterTest : public GpuCodegenTest {
     return (*result)->ToString(print_opts);
   }
 
-  void TestMatchWithAllTypes(absl::string_view hlo_string) {
-    for (absl::string_view type : {"f16", "f32", "f64"}) {
+  void TestMatchWithAllTypes(abslx::string_view hlo_string) {
+    for (abslx::string_view type : {"f16", "f32", "f64"}) {
       const std::string hlo_with_new_type =
-          absl::StrReplaceAll(hlo_string, {{"TYPE", type}});
+          abslx::StrReplaceAll(hlo_string, {{"TYPE", type}});
       std::string optimized_hlo_string = GetOptimizedHlo(hlo_with_new_type);
       EXPECT_THAT(optimized_hlo_string,
                   Not(HasSubstr(kCudnnConvForwardCallTarget)))
@@ -98,8 +98,8 @@ class CudnnFusedConvRewriterTest : public GpuCodegenTest {
     }
   }
 
-  void TestClamp(absl::string_view pre_hlo_string,
-                 absl::string_view post_hlo_string) {
+  void TestClamp(abslx::string_view pre_hlo_string,
+                 abslx::string_view post_hlo_string) {
     std::string alpha_conv_scalar, alpha_side_input_scalar;
     std::string elementwise_type;
 
@@ -115,10 +115,10 @@ class CudnnFusedConvRewriterTest : public GpuCodegenTest {
     EXPECT_TRUE(*filecheck_result);
   }
 
-  void TestNotMatchWithAllTypes(absl::string_view hlo_string) {
-    for (absl::string_view type : {"f16", "f32", "f64"}) {
+  void TestNotMatchWithAllTypes(abslx::string_view hlo_string) {
+    for (abslx::string_view type : {"f16", "f32", "f64"}) {
       const std::string hlo_with_new_type =
-          absl::StrReplaceAll(hlo_string, {{"TYPE", type}});
+          abslx::StrReplaceAll(hlo_string, {{"TYPE", type}});
       std::string optimized_hlo_string = GetOptimizedHlo(hlo_with_new_type);
       SCOPED_TRACE(optimized_hlo_string);
       EXPECT_THAT(optimized_hlo_string, HasSubstr(kCudnnConvForwardCallTarget));
@@ -1793,7 +1793,7 @@ TEST_F(CudnnFusedConvRewriterTest, TestConvInt8ToInt8NoClamp) {
   // Check that integer convolution without clamp to int8_t is not allowed.
   // convert<int8_t>(custom_call<int32_t>(int32_x, int32_w,
   // cudnnConvolutionForward))
-  const std::string module_str = absl::StrFormat(R"(
+  const std::string module_str = abslx::StrFormat(R"(
     HloModule Test
 
     ENTRY Test (input: s8[1,17,9,9], filter: s8[3,3,17,32]) -> s8[1,32,9,9] {
@@ -1817,7 +1817,7 @@ TEST_F(CudnnFusedConvRewriterTest, TestFusedConvInt8ToInt8NoClamp) {
   // max(0, alpha_conv * conv(x, w) + alpha_side * side_input + bias); for
   // int8_t
 
-  const std::string module_str = absl::StrFormat(R"(
+  const std::string module_str = abslx::StrFormat(R"(
     HloModule Test
 
     ENTRY Test (input: s8[1,17,9,9], filter: s8[3,3,17,32]) -> s8[1,32,9,9] {

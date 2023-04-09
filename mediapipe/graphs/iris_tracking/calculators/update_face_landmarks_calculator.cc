@@ -215,27 +215,27 @@ constexpr int kEyeLandmarkIndicesInFaceLandmarks[] = {
 //
 class UpdateFaceLandmarksCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Tag(kFaceLandmarksTag).Set<NormalizedLandmarkList>();
     cc->Inputs().Tag(kNewEyeLandmarksTag).Set<NormalizedLandmarkList>();
 
     cc->Outputs().Tag(kUpdatedFaceLandmarksTag).Set<NormalizedLandmarkList>();
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Open(CalculatorContext* cc) {
+  abslx::Status Open(CalculatorContext* cc) {
     cc->SetOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 };
 REGISTER_CALCULATOR(UpdateFaceLandmarksCalculator);
 
-absl::Status UpdateFaceLandmarksCalculator::Process(CalculatorContext* cc) {
+abslx::Status UpdateFaceLandmarksCalculator::Process(CalculatorContext* cc) {
   if (cc->Inputs().Tag(kFaceLandmarksTag).IsEmpty() ||
       cc->Inputs().Tag(kNewEyeLandmarksTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   const auto& face_landmarks =
       cc->Inputs().Tag(kFaceLandmarksTag).Get<NormalizedLandmarkList>();
@@ -248,7 +248,7 @@ absl::Status UpdateFaceLandmarksCalculator::Process(CalculatorContext* cc) {
       << "Wrong number of face landmarks";
 
   auto refined_face_landmarks =
-      absl::make_unique<NormalizedLandmarkList>(face_landmarks);
+      abslx::make_unique<NormalizedLandmarkList>(face_landmarks);
   for (int i = 0; i < kNumEyeLandmarks; ++i) {
     const auto& refined_ld = new_eye_landmarks.landmark(i);
     const int id = kEyeLandmarkIndicesInFaceLandmarks[i];
@@ -262,7 +262,7 @@ absl::Status UpdateFaceLandmarksCalculator::Process(CalculatorContext* cc) {
       .Tag(kUpdatedFaceLandmarksTag)
       .Add(refined_face_landmarks.release(), cc->InputTimestamp());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

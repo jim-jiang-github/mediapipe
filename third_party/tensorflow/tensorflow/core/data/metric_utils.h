@@ -35,7 +35,7 @@ namespace data {
 //
 //   ```
 //   IteratorMetricsCollector metrics_collector(DEVICE_CPU, env);
-//   absl::Time start_time = metrics_collector.RecordStart();
+//   abslx::Time start_time = metrics_collector.RecordStart();
 //   auto status = iterator_->GetNext(IteratorContext(std::move(params)),
 //                                    out_tensors, end_of_sequence);
 //   metrics_collector.RecordStop(start_time, *out_tensors);
@@ -51,12 +51,12 @@ class IteratorMetricsCollector {
                                     const Env& env);
 
   // Starts the timer for the next `GetNext` call. Returns the start time.
-  absl::Time RecordStart();
+  abslx::Time RecordStart();
 
   // Records metrics for the most recent `GetNext` call, including the latency,
   // bytes fetched, iterator life time, etc. `start_time` is the start time
   // returned by `RecordStart`. `output` is the output of the `GetNext` call.
-  void RecordStop(absl::Time start_time, const std::vector<Tensor>& output);
+  void RecordStop(abslx::Time start_time, const std::vector<Tensor>& output);
 
  private:
   // We only collect metrics for CPU devices.

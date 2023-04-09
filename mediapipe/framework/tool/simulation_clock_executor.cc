@@ -24,7 +24,7 @@ SimulationClockExecutor::SimulationClockExecutor(int num_threads)
 void SimulationClockExecutor::Schedule(std::function<void()> task) {
   clock_->ThreadStart();
   executor_.Schedule([this, task] {
-    clock_->Sleep(absl::ZeroDuration());
+    clock_->Sleep(abslx::ZeroDuration());
     task();
     clock_->ThreadFinish();
   });

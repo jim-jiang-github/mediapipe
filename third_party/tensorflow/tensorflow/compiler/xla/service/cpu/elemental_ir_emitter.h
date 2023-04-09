@@ -38,13 +38,13 @@ class CpuElementalIrEmitter : public ElementalIrEmitter {
  protected:
   StatusOr<llvm::Value*> EmitAtan2(PrimitiveType prim_type, llvm::Value* lhs,
                                    llvm::Value* rhs,
-                                   absl::string_view name) override;
+                                   abslx::string_view name) override;
   StatusOr<llvm::Value*> EmitTanh(PrimitiveType prim_type,
                                   llvm::Value* value) override;
 
   StatusOr<std::vector<llvm::Value*>> EmitThreadLocalCall(
-      const HloComputation& callee, absl::Span<llvm::Value* const> parameters,
-      absl::string_view name, bool is_reducer) override {
+      const HloComputation& callee, abslx::Span<llvm::Value* const> parameters,
+      abslx::string_view name, bool is_reducer) override {
     return ir_emitter_->EmitThreadLocalCall(callee, parameters, name,
                                             is_reducer);
   }

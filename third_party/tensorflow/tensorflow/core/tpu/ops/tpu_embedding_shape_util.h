@@ -44,8 +44,8 @@ class TpuEmbeddingShapeUtil {
   // config. On success, shapes is populated with the shape of each embedding
   // table that will be loaded or retrieved using Ops such as
   // {Load,Retrieve}AllTpuEmbeddingParameters.
-  static Status ComputeTableShapes(absl::Span<const int64> vocabulary_sizes,
-                                   absl::Span<const int> table_dimensions,
+  static Status ComputeTableShapes(abslx::Span<const int64> vocabulary_sizes,
+                                   abslx::Span<const int> table_dimensions,
                                    int shard_id, int num_shards,
                                    std::vector<TensorShapeProto>* shapes);
 

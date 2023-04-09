@@ -24,7 +24,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 void InitializeSymbolizer(const char*) {}
@@ -32,7 +32,7 @@ void InitializeSymbolizer(const char*) {}
 namespace debugging_internal {
 namespace {
 
-static std::string GetSymbolString(absl::string_view backtrace_line) {
+static std::string GetSymbolString(abslx::string_view backtrace_line) {
   // Example Backtrace lines:
   // 0   libimaging_shared.dylib             0x018c152a
   // _ZNSt11_Deque_baseIN3nik7mediadb4PageESaIS2_EE17_M_initialize_mapEm + 3478
@@ -44,15 +44,15 @@ static std::string GetSymbolString(absl::string_view backtrace_line) {
   // or
   // 0   mysterious_app                      0x0124000120120009 main + 17
   auto address_pos = backtrace_line.find(" 0x");
-  if (address_pos == absl::string_view::npos) return std::string();
-  absl::string_view symbol_view = backtrace_line.substr(address_pos + 1);
+  if (address_pos == abslx::string_view::npos) return std::string();
+  abslx::string_view symbol_view = backtrace_line.substr(address_pos + 1);
 
   auto space_pos = symbol_view.find(" ");
-  if (space_pos == absl::string_view::npos) return std::string();
+  if (space_pos == abslx::string_view::npos) return std::string();
   symbol_view = symbol_view.substr(space_pos + 1);  // to mangled symbol
 
   auto plus_pos = symbol_view.find(" + ");
-  if (plus_pos == absl::string_view::npos) return std::string();
+  if (plus_pos == abslx::string_view::npos) return std::string();
   symbol_view = symbol_view.substr(0, plus_pos);  // strip remainng
 
   return std::string(symbol_view);
@@ -98,4 +98,4 @@ bool Symbolize(const void* pc, char* out, int out_size) {
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

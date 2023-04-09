@@ -50,7 +50,7 @@ std::vector<RegistrationInfo>* MutableCollectiveRegistry() {
 
 string CollGroupRuntimeDetails::ToString() const {
   return strings::StrCat("CollGroupRuntimeDetails {communicator_key=",
-                         absl::CEscape(communicator_key), "}");
+                         abslx::CEscape(communicator_key), "}");
 }
 
 string CollGroupParams::ToString() const {

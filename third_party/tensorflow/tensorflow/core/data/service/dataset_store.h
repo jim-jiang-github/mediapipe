@@ -71,7 +71,7 @@ class MemoryDatasetStore : public DatasetStore {
 
  private:
   // Mapping from key to dataset definition.
-  absl::flat_hash_map<std::string, std::shared_ptr<const DatasetDef>> datasets_;
+  abslx::flat_hash_map<std::string, std::shared_ptr<const DatasetDef>> datasets_;
 };
 
 }  // namespace data

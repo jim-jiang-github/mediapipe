@@ -159,7 +159,7 @@ DEFINE_GET_ATTR(tensorflow::DataType, type, "type");
 
 template <>
 Status AttrBuilder::Get(StringPiece attr_name,
-                        absl::InlinedVector<DataType, 4>* value) const {
+                        abslx::InlinedVector<DataType, 4>* value) const {
   auto it = encoded_attrs_.find(string(attr_name));
   if (it == encoded_attrs_.end()) {
     return errors::NotFound("No attr named '", attr_name,
@@ -332,25 +332,25 @@ void AttrBuilder::GetNameAttrList(
 }
 
 Status AttrBuilder::GetTypeList(
-    absl::string_view attr_name,
-    absl::InlinedVector<DataType, 4>* type_list) const {
+    abslx::string_view attr_name,
+    abslx::InlinedVector<DataType, 4>* type_list) const {
   return Get(attr_name, type_list);
 }
 
-bool AttrBuilder::GetInt(absl::string_view attr_name, int64_t* result) const {
+bool AttrBuilder::GetInt(abslx::string_view attr_name, int64_t* result) const {
   Status s = Get(attr_name, result);
   return s.ok();
 }
-bool AttrBuilder::GetFloat(absl::string_view attr_name, float* result) const {
+bool AttrBuilder::GetFloat(abslx::string_view attr_name, float* result) const {
   Status s = Get(attr_name, result);
   return s.ok();
 }
-bool AttrBuilder::GetBool(absl::string_view attr_name, bool* result) const {
+bool AttrBuilder::GetBool(abslx::string_view attr_name, bool* result) const {
   Status s = Get(attr_name, result);
   return s.ok();
 }
 
-bool AttrBuilder::GetType(absl::string_view attr_name,
+bool AttrBuilder::GetType(abslx::string_view attr_name,
                           tensorflow::DataType* result) const {
   Status s = Get(attr_name, result);
   return s.ok();

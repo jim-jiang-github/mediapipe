@@ -44,7 +44,7 @@ namespace convert {
 Status HandleDynamicStridedSliceInput(
     TRTNetworkBuilder* builder, nvinfer1::ISliceLayer* slice_layer,
     const StridedSliceShapeSpec& strided_slice_spec,
-    const absl::InlinedVector<int64, 4>& dynamic_input_size_indices,
+    const abslx::InlinedVector<int64, 4>& dynamic_input_size_indices,
     nvinfer1::Dims begin_dims, nvinfer1::Dims stride_dims,
     nvinfer1::Dims end_dims);
 
@@ -66,8 +66,8 @@ Status ConvertStridedSliceHelper(
   // For each dimension, gather information about static vs dynamic dimension
   // and slice size.
   nvinfer1::Dims size_dims = begin_dims->AsTrtDims();
-  absl::InlinedVector<int64, 4> static_input_size_indices;
-  absl::InlinedVector<int64, 4> dynamic_input_size_indices;
+  abslx::InlinedVector<int64, 4> static_input_size_indices;
+  abslx::InlinedVector<int64, 4> dynamic_input_size_indices;
   for (int i = 0; i < begin_dims->NumDims(); i++) {
     size_dims.d[i] = (std::abs(end_dims->dim(i) - begin_dims->dim(i)) +
                       std::abs(stride_dims->dim(i)) - 1) /
@@ -143,7 +143,7 @@ Status ConvertStridedSliceHelper(
 Status HandleDynamicStridedSliceInput(
     TRTNetworkBuilder* builder, nvinfer1::ISliceLayer* slice_layer,
     const StridedSliceShapeSpec& strided_slice_spec,
-    const absl::InlinedVector<int64, 4>& dynamic_input_size_indices,
+    const abslx::InlinedVector<int64, 4>& dynamic_input_size_indices,
     nvinfer1::Dims begin_dims, nvinfer1::Dims stride_dims,
     nvinfer1::Dims end_dims) {
   TRT_ENSURE(builder);
@@ -165,8 +165,8 @@ Status HandleDynamicStridedSliceInput(
   //     begin_dims[dynamic_idx] to zero.
   //   - If "end_mask[dynamic_idx]" is set, we need to adjust slice end to the
   //     dynamic size of dimension "dynamic_idx".
-  absl::InlinedVector<int64, 4> dynamic_begin_indices;
-  absl::InlinedVector<int64, 4> dynamic_end_indices;
+  abslx::InlinedVector<int64, 4> dynamic_begin_indices;
+  abslx::InlinedVector<int64, 4> dynamic_end_indices;
   const auto begin_mask = std::bitset<32>(strided_slice_spec.begin_dense_mask);
   const auto end_mask = std::bitset<32>(strided_slice_spec.end_dense_mask);
   for (int i = 0; i < dynamic_input_size_indices.size(); i++) {

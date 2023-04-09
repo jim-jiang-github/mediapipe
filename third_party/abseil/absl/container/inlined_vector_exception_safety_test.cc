@@ -37,13 +37,13 @@ using Thrower = testing::ThrowingValue<>;
 using MovableThrower = testing::ThrowingValue<testing::TypeSpec::kNoThrowMove>;
 using ThrowAlloc = testing::ThrowingAllocator<Thrower>;
 
-using ThrowerVec = absl::InlinedVector<Thrower, kInlinedCapacity>;
-using MovableThrowerVec = absl::InlinedVector<MovableThrower, kInlinedCapacity>;
+using ThrowerVec = abslx::InlinedVector<Thrower, kInlinedCapacity>;
+using MovableThrowerVec = abslx::InlinedVector<MovableThrower, kInlinedCapacity>;
 
 using ThrowAllocThrowerVec =
-    absl::InlinedVector<Thrower, kInlinedCapacity, ThrowAlloc>;
+    abslx::InlinedVector<Thrower, kInlinedCapacity, ThrowAlloc>;
 using ThrowAllocMovableThrowerVec =
-    absl::InlinedVector<MovableThrower, kInlinedCapacity, ThrowAlloc>;
+    abslx::InlinedVector<MovableThrower, kInlinedCapacity, ThrowAlloc>;
 
 // In GCC, if an element of a `std::initializer_list` throws during construction
 // the elements that were constructed before it are not destroyed. This causes
@@ -218,7 +218,7 @@ TYPED_TEST(OneSizeTest, MoveConstructor) {
   using allocator_type = typename VecT::allocator_type;
   constexpr static auto size = TypeParam::GetSizeAt(0);
 
-  if (!absl::allocator_is_nothrow<allocator_type>::value) {
+  if (!abslx::allocator_is_nothrow<allocator_type>::value) {
     testing::TestThrowingCtor<VecT>(VecT{size});
 
     testing::TestThrowingCtor<VecT>(VecT{size}, allocator_type{});

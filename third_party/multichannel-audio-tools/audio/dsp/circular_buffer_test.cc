@@ -92,7 +92,7 @@ TEST(CircularBufferTest, CircularBufferTest) {
       vector<int> expected = {-1, 9, 8, -1, 9, 8, -1, 9, 8, -1, 9, 8, 0, 0,
                               0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4};
       read_data.resize(expected.size());
-      absl::Span<int> data_slice(read_data.data(), expected.size());
+      abslx::Span<int> data_slice(read_data.data(), expected.size());
       buffer.Read(data_slice);
       ASSERT_THAT(read_data, testing::ElementsAreArray(expected));
       ASSERT_EQ(buffer.NumReadableEntries(), 0);
@@ -130,18 +130,18 @@ TEST(CircularBufferTest, PlanarCircularBufferTest) {
   for (int i = 0; i < 3; ++i) {
     // Write 3 samples in per channel.
     vector<vector<int>> samples1 = {{1, 2, 3}, {3, 4, 5}, {6, 7, 8}};
-    buffer.Write(absl::MakeSpan(samples1));
+    buffer.Write(abslx::MakeSpan(samples1));
     ASSERT_EQ(buffer.NumReadableEntries(), 3);
     ASSERT_FALSE(buffer.IsFull());
     // Write 2 more samples, a total of 5.
     vector<vector<int>> samples2 = {{8, 8}, {8, 8}, {8, 8}};
-    buffer.Write(absl::MakeSpan(samples2));
+    buffer.Write(abslx::MakeSpan(samples2));
     ASSERT_EQ(buffer.NumReadableEntries(), 5);
     ASSERT_FALSE(buffer.IsFull());
     // Write 4 more samples, a total of 5.
     vector<vector<int>> samples3 =
         {{-1, -1, -1, -1}, {9, 9, 9, 9}, {8, 8, 8, 8}};
-    buffer.Write(absl::MakeSpan(samples3));
+    buffer.Write(abslx::MakeSpan(samples3));
     ASSERT_EQ(buffer.NumReadableEntries(), 9);
     ASSERT_TRUE(buffer.IsFull());
     vector<vector<int>> read_data;
@@ -166,7 +166,7 @@ TEST(CircularBufferTest, PlanarCircularBufferTest) {
     // Write 5 more samples.
     vector<vector<int>> samples =
         {{0, 1, 2, 3, 4}, {0, 1, 2, 3, 4}, {0, 1, 2, 3, 4}};
-    buffer.Write(absl::MakeSpan(samples));
+    buffer.Write(abslx::MakeSpan(samples));
     ASSERT_EQ(buffer.NumReadableEntries(), 9);
     ASSERT_TRUE(buffer.IsFull());
     {

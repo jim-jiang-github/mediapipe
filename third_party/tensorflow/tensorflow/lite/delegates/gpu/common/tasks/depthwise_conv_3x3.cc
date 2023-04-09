@@ -319,7 +319,7 @@ bool IsDepthwiseConv3x3Supported(const GpuInfo& gpu_info,
     const std::string kBadDriver =
         "OpenCL 2.0 QUALCOMM build: commit #7daed58 changeid #I7ece6fe30d "
         "Date: 10/19/16";
-    if (absl::StrContains(gpu_info.opencl_info.platform_version, kBadDriver)) {
+    if (abslx::StrContains(gpu_info.opencl_info.platform_version, kBadDriver)) {
       return false;
     }
   }

@@ -43,11 +43,11 @@ class AnnotationStack {
   // Append name to the current annotation, separated by "::".
   // The choice of separator "::" is based on characters not used by
   // TensorFlow for its TensorOps.
-  static size_t PushAnnotation(absl::string_view name) {
+  static size_t PushAnnotation(abslx::string_view name) {
     string* annotation_stack = ThreadAnnotationStack();
     size_t old_length = annotation_stack->size();
     if (old_length != 0) {
-      absl::StrAppend(annotation_stack, "::", name);
+      abslx::StrAppend(annotation_stack, "::", name);
     } else {
       *annotation_stack = string(name);
     }
@@ -58,7 +58,7 @@ class AnnotationStack {
     string* annotation_stack = ThreadAnnotationStack();
     size_t old_length = annotation_stack->size();
     if (old_length != 0) {
-      absl::StrAppend(annotation_stack, "::", name);
+      abslx::StrAppend(annotation_stack, "::", name);
     } else {
       *annotation_stack = std::move(name);
     }

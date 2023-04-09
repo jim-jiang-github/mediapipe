@@ -61,7 +61,7 @@ Status RunAllReduce(ReductionKind reduction_kind,
     ncclDataType_t dtype = dtype_and_multiplier.first;
     int element_count = buffer.element_count * dtype_and_multiplier.second;
 
-    VLOG(3) << absl::StreamFormat(
+    VLOG(3) << abslx::StreamFormat(
         "Calling ncclAllReduce(send_buffer=%p, recv_buffer=%p, count=%d, "
         "comm=%p, stream=%p)",
         send_buffer, recv_buffer, element_count, static_cast<const void*>(comm),
@@ -109,7 +109,7 @@ StatusOr<mlir::Operation*> FindReductionOp(mlir::Block& block) {
   }
 
   // Standard case.
-  if (absl::c_is_permutation(result_op->getOperands(), block.getArguments())) {
+  if (abslx::c_is_permutation(result_op->getOperands(), block.getArguments())) {
     return result_op;
   }
 
@@ -129,7 +129,7 @@ StatusOr<mlir::Operation*> FindReductionOp(mlir::Block& block) {
   TF_RET_CHECK(operand1_op->getNumOperands() == 1);
   std::array<mlir::Value, 2> operands{operand0_op->getOperand(0),
                                       operand1_op->getOperand(0)};
-  TF_RET_CHECK(absl::c_is_permutation(operands, block.getArguments()));
+  TF_RET_CHECK(abslx::c_is_permutation(operands, block.getArguments()));
   return reduction_op;
 }
 
@@ -139,7 +139,7 @@ namespace impl {
 
 template <typename OpT>
 bool CanImplement(OpT op) {
-  return absl::c_all_of(op.getInputs(), IsValidOperand) &&
+  return abslx::c_all_of(op.getInputs(), IsValidOperand) &&
          NcclAllReduceThunkBase::MatchAllReduceComputation(op.getComputation())
              .has_value();
 }
@@ -302,7 +302,7 @@ Status NcclAllReduceStartThunk::RunNcclCollective(const ExecuteParams& params,
   int device_ordinal = async_comms_stream.parent()->device_ordinal();
 
   {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     auto result = done_events_.emplace(device_ordinal, std::move(done_event));
     TF_RET_CHECK(result.second) << "done event has not been consumed";
   }
@@ -312,7 +312,7 @@ Status NcclAllReduceStartThunk::RunNcclCollective(const ExecuteParams& params,
 }
 
 StatusOr<se::Event> NcclAllReduceStartThunk::TakeDoneEvent(int device_ordinal) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   auto it = done_events_.find(device_ordinal);
   TF_RET_CHECK(it != done_events_.end()) << "done event not found";
   // Take ownership of the event.
@@ -399,7 +399,7 @@ Status RunReduceScatter(ReductionKind reduction_kind,
            "participants.";
 
     int64_t recv_count = element_count / num_participants;
-    VLOG(3) << absl::StreamFormat(
+    VLOG(3) << abslx::StreamFormat(
         "Calling ncclReduceScatter(send_buffer=%p, recv_buffer=%p, "
         "recvcount=%d, "
         "comm=%p, stream=%p)",

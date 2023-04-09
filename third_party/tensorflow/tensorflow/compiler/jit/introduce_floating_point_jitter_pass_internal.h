@@ -20,7 +20,7 @@ limitations under the License.
 
 namespace tensorflow {
 Status IntroduceFloatingPointJitter(Graph* graph,
-                                    absl::Span<string const> tensor_names,
+                                    abslx::Span<string const> tensor_names,
                                     float jitter_amount);
 }
 

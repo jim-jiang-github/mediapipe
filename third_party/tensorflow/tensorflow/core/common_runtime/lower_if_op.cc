@@ -198,7 +198,7 @@ Status CondBuilder::AddInput(Node* src, int src_output) {
           .Input(pred_)
           .Device(src->requested_device())
           .Attr(kColocationAttrName,
-                {absl::StrCat(kColocationGroupPrefix, src->name())})
+                {abslx::StrCat(kColocationGroupPrefix, src->name())})
           .Finalize(graph_, &input));
   then_call_builder_.Input(input, kThenBranch);
   else_call_builder_.Input(input, kElseBranch);

@@ -32,13 +32,13 @@ namespace {
 class TaskTracker {
  public:
   // Creates a functor that invokes Run() with the given arguments.
-  std::function<void()> MakeTask(int task_id, absl::Duration sleep_duration) {
-    return absl::bind_front(&TaskTracker::Run, this, task_id, sleep_duration);
+  std::function<void()> MakeTask(int task_id, abslx::Duration sleep_duration) {
+    return abslx::bind_front(&TaskTracker::Run, this, task_id, sleep_duration);
   }
 
   // Updates run counts, sleeps for a short time and then returns.
   // Exits early if fiber is cancelled.
-  void Run(int task_id, absl::Duration sleep_duration) {
+  void Run(int task_id, abslx::Duration sleep_duration) {
     LOG(INFO) << "Entering task " << task_id;
     // Update run counters.
     {
@@ -54,7 +54,7 @@ class TaskTracker {
     // total sleep time is very large.
 
     Env::Default()->SleepForMicroseconds(
-        absl::ToInt64Microseconds(sleep_duration));
+        abslx::ToInt64Microseconds(sleep_duration));
     // Update run counters.
     {
       mutex_lock l(mutex_);
@@ -140,7 +140,7 @@ TEST(BoundedExecutorTest, MaxInflightLimit) {
   const int num_tasks = 100;
   TaskTracker task_tracker;
   for (int i = 0; i < num_tasks; i++) {
-    executor->Schedule(task_tracker.MakeTask(i, absl::Seconds(1)));
+    executor->Schedule(task_tracker.MakeTask(i, abslx::Seconds(1)));
   }
   executor.reset();
 

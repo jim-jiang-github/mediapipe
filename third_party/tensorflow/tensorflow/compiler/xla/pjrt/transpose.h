@@ -71,10 +71,10 @@ class TransposePlan {
   // num_threads: is the number of threads requested. The actual number of
   //   threads used may be smaller if there isn't enough work per thread.
   struct Tiling {
-    absl::Span<int64_t const> tiling;
+    abslx::Span<int64_t const> tiling;
   };
   struct Striding {
-    absl::Span<int64_t const> strides_in_bytes;
+    abslx::Span<int64_t const> strides_in_bytes;
   };
   enum class Transformation {
     // Apply no transformations to the data.
@@ -86,8 +86,8 @@ class TransposePlan {
   };
 
   static StatusOr<std::unique_ptr<TransposePlan>> Create(
-      size_t elem_size_in_bytes, absl::Span<int64_t const> dims,
-      absl::Span<int64_t const> permutation,
+      size_t elem_size_in_bytes, abslx::Span<int64_t const> dims,
+      abslx::Span<int64_t const> permutation,
       std::variant<Tiling, Striding> input_layout = Tiling{},
       Tiling output_tiling = Tiling{},
       Transformation transformation = Transformation::kNone,
@@ -115,10 +115,10 @@ class TransposePlan {
   int64_t InputNumElems() const;
   int64_t OutputNumElems() const;
 
-  absl::Span<int64_t const> InputDims() const { return original_a_dims_; }
-  absl::Span<int64_t const> OutputDims() const { return original_b_dims_; }
+  abslx::Span<int64_t const> InputDims() const { return original_a_dims_; }
+  abslx::Span<int64_t const> OutputDims() const { return original_b_dims_; }
 
-  absl::Span<int64_t const> InputStrides() const { return original_a_strides_; }
+  abslx::Span<int64_t const> InputStrides() const { return original_a_strides_; }
 
   // Returns the number of items of parallel work in the plan.
   int Parallelism() const { return nodes_.size(); }
@@ -130,37 +130,37 @@ class TransposePlan {
 
   // Removes any size-1 dimensions.
   static void RemoveTrivialDimensions(
-      absl::InlinedVector<int64_t, 4>& a_dims,
-      absl::InlinedVector<int64_t, 4>& permutation,
-      absl::InlinedVector<int64_t, 4>& lda,
-      absl::InlinedVector<int64_t, 4>& lda_tile,
-      absl::InlinedVector<int64_t, 4>& a_tiling,
-      absl::InlinedVector<int64_t, 4>& b_tiling);
+      abslx::InlinedVector<int64_t, 4>& a_dims,
+      abslx::InlinedVector<int64_t, 4>& permutation,
+      abslx::InlinedVector<int64_t, 4>& lda,
+      abslx::InlinedVector<int64_t, 4>& lda_tile,
+      abslx::InlinedVector<int64_t, 4>& a_tiling,
+      abslx::InlinedVector<int64_t, 4>& b_tiling);
 
   // Collapses together dimensions that are adjacent both in `dims` and
   // `permutation`.
-  static void CoalesceDimensions(absl::InlinedVector<int64_t, 4>& a_dims,
-                                 absl::InlinedVector<int64_t, 4>& permutation,
-                                 absl::InlinedVector<int64_t, 4>& lda,
-                                 absl::InlinedVector<int64_t, 4>& lda_tile,
-                                 absl::InlinedVector<int64_t, 4>& a_tiling,
-                                 absl::InlinedVector<int64_t, 4>& b_tiling);
+  static void CoalesceDimensions(abslx::InlinedVector<int64_t, 4>& a_dims,
+                                 abslx::InlinedVector<int64_t, 4>& permutation,
+                                 abslx::InlinedVector<int64_t, 4>& lda,
+                                 abslx::InlinedVector<int64_t, 4>& lda_tile,
+                                 abslx::InlinedVector<int64_t, 4>& a_tiling,
+                                 abslx::InlinedVector<int64_t, 4>& b_tiling);
 
  private:
   // Performs plan initialization that cannot fail.
   void Initialize();
 
-  void BuildPlanNodes(absl::Span<int64_t const> inverse_permutation,
+  void BuildPlanNodes(abslx::Span<int64_t const> inverse_permutation,
                       int thread_id, std::vector<Node>& output_nodes);
 
   std::vector<int> ChooseParallelizationStrategy(
-      absl::Span<int64_t const> inverse_permutation);
+      abslx::Span<int64_t const> inverse_permutation);
 
   // The signature of ExecuteTyped uses char* pointers because we perform
   // address calculations with strides in bytes; the strides need not be
   // multiples of the element size.
   template <typename T, Transformation transformation>
-  void ExecuteTyped(const char* a, char* b, absl::Span<Node const> nodes) const;
+  void ExecuteTyped(const char* a, char* b, abslx::Span<Node const> nodes) const;
 
   // Number of threads requested.
   int num_threads_requested_ = 1;
@@ -173,31 +173,31 @@ class TransposePlan {
 
   // Description of the transpose, before any optimizations such as coalescing
   // dimensions have been applied.
-  absl::InlinedVector<int64_t, 4> original_a_dims_;
-  absl::InlinedVector<int64_t, 4> original_a_strides_;
+  abslx::InlinedVector<int64_t, 4> original_a_dims_;
+  abslx::InlinedVector<int64_t, 4> original_a_strides_;
   std::vector<int64_t> original_b_dims_;
 
   // Dimensions of the input array A.
-  absl::InlinedVector<int64_t, 4> a_dims_;
-  absl::InlinedVector<int64_t, 4> a_strides_;
+  abslx::InlinedVector<int64_t, 4> a_dims_;
+  abslx::InlinedVector<int64_t, 4> a_strides_;
 
   // Dimensions of the output array B.
   std::vector<int64_t> b_dims_;
 
   // Dimension permutation to apply to form B. For each dimension of B, what is
   // the corresponding dimension of A?
-  absl::InlinedVector<int64_t, 4> permutation_;
+  abslx::InlinedVector<int64_t, 4> permutation_;
 
   // Leading-dimension sizes (byte strides) of each dimension.
-  absl::InlinedVector<int64_t, 4> lda_;
-  absl::InlinedVector<int64_t, 4> lda_tile_;
-  absl::InlinedVector<int64_t, 4> ldb_;
-  absl::InlinedVector<int64_t, 4> ldb_tile_;
+  abslx::InlinedVector<int64_t, 4> lda_;
+  abslx::InlinedVector<int64_t, 4> lda_tile_;
+  abslx::InlinedVector<int64_t, 4> ldb_;
+  abslx::InlinedVector<int64_t, 4> ldb_tile_;
 
   // Tile sizes in each dimension. Has size equal to the number of dimensions.
   // A 1 entry means that dimension is not tiled.
-  absl::InlinedVector<int64_t, 4> a_tiling_;
-  absl::InlinedVector<int64_t, 4> b_tiling_;
+  abslx::InlinedVector<int64_t, 4> a_tiling_;
+  abslx::InlinedVector<int64_t, 4> b_tiling_;
   bool a_is_tiled_;
   bool b_is_tiled_;
 
@@ -213,7 +213,7 @@ class TransposePlan {
 
   // Root nodes of the plan, i.e., pointing to the outermost loops in the loop
   // nest. The outer vector is indexed on the thread ID.
-  absl::InlinedVector<std::vector<Node>, 1> nodes_;
+  abslx::InlinedVector<std::vector<Node>, 1> nodes_;
 
   // Are the innermost (stride-1) dimensions the same dimension? This determines
   // whether the inner kernel is a transpose or a memcpy.
@@ -261,8 +261,8 @@ class TransposePlanCache {
 
   // Creates or returns a cached copy of a transpose plan.
   StatusOr<std::shared_ptr<TransposePlan>> GetOrCreate(
-      size_t elem_size_in_bytes, absl::Span<int64_t const> dims,
-      absl::Span<int64_t const> permutation,
+      size_t elem_size_in_bytes, abslx::Span<int64_t const> dims,
+      abslx::Span<int64_t const> permutation,
       std::variant<TransposePlan::Tiling, TransposePlan::Striding>
           input_layout = TransposePlan::Tiling{},
       TransposePlan::Tiling output_tiling = TransposePlan::Tiling{},

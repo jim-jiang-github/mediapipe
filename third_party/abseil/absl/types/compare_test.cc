@@ -17,7 +17,7 @@
 #include "gtest/gtest.h"
 #include "absl/base/casts.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace {
 
@@ -240,22 +240,22 @@ TEST(Compare, Conversions) {
 
 struct WeakOrderingLess {
   template <typename T>
-  absl::weak_ordering operator()(const T& a, const T& b) const {
-    return a < b ? absl::weak_ordering::less
-                 : a == b ? absl::weak_ordering::equivalent
-                          : absl::weak_ordering::greater;
+  abslx::weak_ordering operator()(const T& a, const T& b) const {
+    return a < b ? abslx::weak_ordering::less
+                 : a == b ? abslx::weak_ordering::equivalent
+                          : abslx::weak_ordering::greater;
   }
 };
 
 TEST(CompareResultAsLessThan, SanityTest) {
-  EXPECT_FALSE(absl::compare_internal::compare_result_as_less_than(false));
-  EXPECT_TRUE(absl::compare_internal::compare_result_as_less_than(true));
+  EXPECT_FALSE(abslx::compare_internal::compare_result_as_less_than(false));
+  EXPECT_TRUE(abslx::compare_internal::compare_result_as_less_than(true));
 
   EXPECT_TRUE(
-      absl::compare_internal::compare_result_as_less_than(weak_ordering::less));
-  EXPECT_FALSE(absl::compare_internal::compare_result_as_less_than(
+      abslx::compare_internal::compare_result_as_less_than(weak_ordering::less));
+  EXPECT_FALSE(abslx::compare_internal::compare_result_as_less_than(
       weak_ordering::equivalent));
-  EXPECT_FALSE(absl::compare_internal::compare_result_as_less_than(
+  EXPECT_FALSE(abslx::compare_internal::compare_result_as_less_than(
       weak_ordering::greater));
 }
 
@@ -263,54 +263,54 @@ TEST(DoLessThanComparison, SanityTest) {
   std::less<int> less;
   WeakOrderingLess weak;
 
-  EXPECT_TRUE(absl::compare_internal::do_less_than_comparison(less, -1, 0));
-  EXPECT_TRUE(absl::compare_internal::do_less_than_comparison(weak, -1, 0));
+  EXPECT_TRUE(abslx::compare_internal::do_less_than_comparison(less, -1, 0));
+  EXPECT_TRUE(abslx::compare_internal::do_less_than_comparison(weak, -1, 0));
 
-  EXPECT_FALSE(absl::compare_internal::do_less_than_comparison(less, 10, 10));
-  EXPECT_FALSE(absl::compare_internal::do_less_than_comparison(weak, 10, 10));
+  EXPECT_FALSE(abslx::compare_internal::do_less_than_comparison(less, 10, 10));
+  EXPECT_FALSE(abslx::compare_internal::do_less_than_comparison(weak, 10, 10));
 
-  EXPECT_FALSE(absl::compare_internal::do_less_than_comparison(less, 10, 5));
-  EXPECT_FALSE(absl::compare_internal::do_less_than_comparison(weak, 10, 5));
+  EXPECT_FALSE(abslx::compare_internal::do_less_than_comparison(less, 10, 5));
+  EXPECT_FALSE(abslx::compare_internal::do_less_than_comparison(weak, 10, 5));
 }
 
 TEST(CompareResultAsOrdering, SanityTest) {
   EXPECT_TRUE(
-      Identity(absl::compare_internal::compare_result_as_ordering(-1) < 0));
+      Identity(abslx::compare_internal::compare_result_as_ordering(-1) < 0));
   EXPECT_FALSE(
-      Identity(absl::compare_internal::compare_result_as_ordering(-1) == 0));
+      Identity(abslx::compare_internal::compare_result_as_ordering(-1) == 0));
   EXPECT_FALSE(
-      Identity(absl::compare_internal::compare_result_as_ordering(-1) > 0));
-  EXPECT_TRUE(Identity(absl::compare_internal::compare_result_as_ordering(
+      Identity(abslx::compare_internal::compare_result_as_ordering(-1) > 0));
+  EXPECT_TRUE(Identity(abslx::compare_internal::compare_result_as_ordering(
                            weak_ordering::less) < 0));
-  EXPECT_FALSE(Identity(absl::compare_internal::compare_result_as_ordering(
+  EXPECT_FALSE(Identity(abslx::compare_internal::compare_result_as_ordering(
                             weak_ordering::less) == 0));
-  EXPECT_FALSE(Identity(absl::compare_internal::compare_result_as_ordering(
+  EXPECT_FALSE(Identity(abslx::compare_internal::compare_result_as_ordering(
                             weak_ordering::less) > 0));
 
   EXPECT_FALSE(
-      Identity(absl::compare_internal::compare_result_as_ordering(0) < 0));
+      Identity(abslx::compare_internal::compare_result_as_ordering(0) < 0));
   EXPECT_TRUE(
-      Identity(absl::compare_internal::compare_result_as_ordering(0) == 0));
+      Identity(abslx::compare_internal::compare_result_as_ordering(0) == 0));
   EXPECT_FALSE(
-      Identity(absl::compare_internal::compare_result_as_ordering(0) > 0));
-  EXPECT_FALSE(Identity(absl::compare_internal::compare_result_as_ordering(
+      Identity(abslx::compare_internal::compare_result_as_ordering(0) > 0));
+  EXPECT_FALSE(Identity(abslx::compare_internal::compare_result_as_ordering(
                             weak_ordering::equivalent) < 0));
-  EXPECT_TRUE(Identity(absl::compare_internal::compare_result_as_ordering(
+  EXPECT_TRUE(Identity(abslx::compare_internal::compare_result_as_ordering(
                            weak_ordering::equivalent) == 0));
-  EXPECT_FALSE(Identity(absl::compare_internal::compare_result_as_ordering(
+  EXPECT_FALSE(Identity(abslx::compare_internal::compare_result_as_ordering(
                             weak_ordering::equivalent) > 0));
 
   EXPECT_FALSE(
-      Identity(absl::compare_internal::compare_result_as_ordering(1) < 0));
+      Identity(abslx::compare_internal::compare_result_as_ordering(1) < 0));
   EXPECT_FALSE(
-      Identity(absl::compare_internal::compare_result_as_ordering(1) == 0));
+      Identity(abslx::compare_internal::compare_result_as_ordering(1) == 0));
   EXPECT_TRUE(
-      Identity(absl::compare_internal::compare_result_as_ordering(1) > 0));
-  EXPECT_FALSE(Identity(absl::compare_internal::compare_result_as_ordering(
+      Identity(abslx::compare_internal::compare_result_as_ordering(1) > 0));
+  EXPECT_FALSE(Identity(abslx::compare_internal::compare_result_as_ordering(
                             weak_ordering::greater) < 0));
-  EXPECT_FALSE(Identity(absl::compare_internal::compare_result_as_ordering(
+  EXPECT_FALSE(Identity(abslx::compare_internal::compare_result_as_ordering(
                             weak_ordering::greater) == 0));
-  EXPECT_TRUE(Identity(absl::compare_internal::compare_result_as_ordering(
+  EXPECT_TRUE(Identity(abslx::compare_internal::compare_result_as_ordering(
                            weak_ordering::greater) > 0));
 }
 
@@ -319,43 +319,43 @@ TEST(DoThreeWayComparison, SanityTest) {
   WeakOrderingLess weak;
 
   EXPECT_TRUE(Identity(
-      absl::compare_internal::do_three_way_comparison(less, -1, 0) < 0));
+      abslx::compare_internal::do_three_way_comparison(less, -1, 0) < 0));
   EXPECT_FALSE(Identity(
-      absl::compare_internal::do_three_way_comparison(less, -1, 0) == 0));
+      abslx::compare_internal::do_three_way_comparison(less, -1, 0) == 0));
   EXPECT_FALSE(Identity(
-      absl::compare_internal::do_three_way_comparison(less, -1, 0) > 0));
+      abslx::compare_internal::do_three_way_comparison(less, -1, 0) > 0));
   EXPECT_TRUE(Identity(
-      absl::compare_internal::do_three_way_comparison(weak, -1, 0) < 0));
+      abslx::compare_internal::do_three_way_comparison(weak, -1, 0) < 0));
   EXPECT_FALSE(Identity(
-      absl::compare_internal::do_three_way_comparison(weak, -1, 0) == 0));
+      abslx::compare_internal::do_three_way_comparison(weak, -1, 0) == 0));
   EXPECT_FALSE(Identity(
-      absl::compare_internal::do_three_way_comparison(weak, -1, 0) > 0));
+      abslx::compare_internal::do_three_way_comparison(weak, -1, 0) > 0));
 
   EXPECT_FALSE(Identity(
-      absl::compare_internal::do_three_way_comparison(less, 10, 10) < 0));
+      abslx::compare_internal::do_three_way_comparison(less, 10, 10) < 0));
   EXPECT_TRUE(Identity(
-      absl::compare_internal::do_three_way_comparison(less, 10, 10) == 0));
+      abslx::compare_internal::do_three_way_comparison(less, 10, 10) == 0));
   EXPECT_FALSE(Identity(
-      absl::compare_internal::do_three_way_comparison(less, 10, 10) > 0));
+      abslx::compare_internal::do_three_way_comparison(less, 10, 10) > 0));
   EXPECT_FALSE(Identity(
-      absl::compare_internal::do_three_way_comparison(weak, 10, 10) < 0));
+      abslx::compare_internal::do_three_way_comparison(weak, 10, 10) < 0));
   EXPECT_TRUE(Identity(
-      absl::compare_internal::do_three_way_comparison(weak, 10, 10) == 0));
+      abslx::compare_internal::do_three_way_comparison(weak, 10, 10) == 0));
   EXPECT_FALSE(Identity(
-      absl::compare_internal::do_three_way_comparison(weak, 10, 10) > 0));
+      abslx::compare_internal::do_three_way_comparison(weak, 10, 10) > 0));
 
   EXPECT_FALSE(Identity(
-      absl::compare_internal::do_three_way_comparison(less, 10, 5) < 0));
+      abslx::compare_internal::do_three_way_comparison(less, 10, 5) < 0));
   EXPECT_FALSE(Identity(
-      absl::compare_internal::do_three_way_comparison(less, 10, 5) == 0));
+      abslx::compare_internal::do_three_way_comparison(less, 10, 5) == 0));
   EXPECT_TRUE(Identity(
-      absl::compare_internal::do_three_way_comparison(less, 10, 5) > 0));
+      abslx::compare_internal::do_three_way_comparison(less, 10, 5) > 0));
   EXPECT_FALSE(Identity(
-      absl::compare_internal::do_three_way_comparison(weak, 10, 5) < 0));
+      abslx::compare_internal::do_three_way_comparison(weak, 10, 5) < 0));
   EXPECT_FALSE(Identity(
-      absl::compare_internal::do_three_way_comparison(weak, 10, 5) == 0));
+      abslx::compare_internal::do_three_way_comparison(weak, 10, 5) == 0));
   EXPECT_TRUE(Identity(
-      absl::compare_internal::do_three_way_comparison(weak, 10, 5) > 0));
+      abslx::compare_internal::do_three_way_comparison(weak, 10, 5) > 0));
 }
 
 #ifdef __cpp_inline_variables
@@ -386,4 +386,4 @@ TEST(Compare, StaticAsserts) {
 
 }  // namespace
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

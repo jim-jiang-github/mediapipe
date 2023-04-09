@@ -41,7 +41,7 @@ Status Identity(AbstractContext* ctx, AbstractTensorHandle* const input,
   TF_RETURN_IF_ERROR(MaybeSetOpName(op_ptr.get(), name));
   TF_RETURN_IF_ERROR(op_ptr->AddInput(input));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(output, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(output, 1), &num_retvals);
 }
 
 // Op: IdentityN()
@@ -65,8 +65,8 @@ Status Identity(AbstractContext* ctx, AbstractTensorHandle* const input,
 //     return [None, g(dy)]  # Do not backprop to f(x).
 //   ```
 Status IdentityN(AbstractContext* ctx,
-                 absl::Span<AbstractTensorHandle* const> input,
-                 absl::Span<AbstractTensorHandle*> output, const char* name,
+                 abslx::Span<AbstractTensorHandle* const> input,
+                 abslx::Span<AbstractTensorHandle*> output, const char* name,
                  const char* raw_device_name) {
   AbstractOperationPtr op_ptr(ctx->CreateOperation());
   TF_RETURN_IF_ERROR(op_ptr->Reset("IdentityN", raw_device_name));
@@ -88,7 +88,7 @@ Status ZerosLike(AbstractContext* ctx, AbstractTensorHandle* const x,
   TF_RETURN_IF_ERROR(MaybeSetOpName(op_ptr.get(), name));
   TF_RETURN_IF_ERROR(op_ptr->AddInput(x));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(y, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(y, 1), &num_retvals);
 }
 
 // Op: Shape()
@@ -113,7 +113,7 @@ Status Shape(AbstractContext* ctx, AbstractTensorHandle* const input,
   TF_RETURN_IF_ERROR(op_ptr->AddInput(input));
   TF_RETURN_IF_ERROR(op_ptr->SetAttrType("out_type", out_type));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(output, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(output, 1), &num_retvals);
 }
 
 // Op: ExpandDims()
@@ -160,7 +160,7 @@ Status ExpandDims(AbstractContext* ctx, AbstractTensorHandle* const input,
   TF_RETURN_IF_ERROR(op_ptr->AddInput(input));
   TF_RETURN_IF_ERROR(op_ptr->AddInput(dim));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(output, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(output, 1), &num_retvals);
 }
 
 // Op: OnesLike()
@@ -175,7 +175,7 @@ Status OnesLike(AbstractContext* ctx, AbstractTensorHandle* const x,
   TF_RETURN_IF_ERROR(MaybeSetOpName(op_ptr.get(), name));
   TF_RETURN_IF_ERROR(op_ptr->AddInput(x));
   int num_retvals = 1;
-  return op_ptr->Execute(absl::MakeSpan(y, 1), &num_retvals);
+  return op_ptr->Execute(abslx::MakeSpan(y, 1), &num_retvals);
 }
 
 }  // namespace ops

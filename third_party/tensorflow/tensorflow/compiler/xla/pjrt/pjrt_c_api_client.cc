@@ -111,22 +111,22 @@ int PjRtCApiClient::addressable_device_count() const {
   return addressable_devices_.size();
 }
 
-absl::Span<PjRtDevice* const> PjRtCApiClient::devices() const {
+abslx::Span<PjRtDevice* const> PjRtCApiClient::devices() const {
   return devices_;
 }
 
-absl::Span<PjRtDevice* const> PjRtCApiClient::addressable_devices() const {
+abslx::Span<PjRtDevice* const> PjRtCApiClient::addressable_devices() const {
   return addressable_devices_;
 }
 
-absl::string_view PjRtCApiClient::platform_name() const {
+abslx::string_view PjRtCApiClient::platform_name() const {
   PJRT_Client_PlatformName_Args args;
   args.client = c_client_.get();
   args.struct_size = PJRT_Client_PlatformName_Args_STRUCT_SIZE;
   args.priv = nullptr;
   pjrt::LogFatalIfPjrtError(c_api_->PJRT_Client_PlatformName(&args), c_api_);
 
-  absl::string_view platform_name(args.platform_name, args.platform_name_size);
+  abslx::string_view platform_name(args.platform_name, args.platform_name_size);
   return platform_name;
 }
 
@@ -141,14 +141,14 @@ int PjRtCApiClient::process_index() const {
   return process_index_args.process_index;
 }
 
-absl::string_view PjRtCApiClient::platform_version() const {
+abslx::string_view PjRtCApiClient::platform_version() const {
   PJRT_Client_PlatformVersion_Args args;
   args.struct_size = PJRT_Client_PlatformVersion_Args_STRUCT_SIZE;
   args.priv = nullptr;
   args.client = c_client_.get();
   pjrt::LogFatalIfPjrtError(c_api_->PJRT_Client_PlatformVersion(&args), c_api_);
 
-  absl::string_view platform_version(args.platform_version,
+  abslx::string_view platform_version(args.platform_version,
                                      args.platform_version_size);
   return platform_version;
 }
@@ -256,7 +256,7 @@ StatusOr<std::string> PjRtCApiClient::SerializeExecutable(
 }
 
 StatusOr<std::unique_ptr<PjRtLoadedExecutable>>
-PjRtCApiClient::DeserializeExecutable(absl::string_view serialized,
+PjRtCApiClient::DeserializeExecutable(abslx::string_view serialized,
                                       CompileOptions options) {
 #ifdef PJRT_C_API_BYPASS
   return WrapExecutable(wrapped_->DeserializeExecutable(serialized, options));
@@ -363,12 +363,12 @@ void PjRtCApiDevice::InitAttributes() {
   }
 }
 
-const absl::flat_hash_map<std::string, PjRtDeviceAttribute>&
+const abslx::flat_hash_map<std::string, PjRtDeviceAttribute>&
 PjRtCApiDevice::Attributes() const {
   return attributes_;
 }
 
-absl::string_view PjRtCApiDevice::device_kind() const {
+abslx::string_view PjRtCApiDevice::device_kind() const {
   PJRT_Device_Kind_Args args;
   args.struct_size = PJRT_Device_Kind_Args_STRUCT_SIZE;
   args.priv = nullptr;
@@ -377,7 +377,7 @@ absl::string_view PjRtCApiDevice::device_kind() const {
   const PJRT_Api* c_api = client_->pjrt_c_api();
   pjrt::LogFatalIfPjrtError(c_api->PJRT_Device_Kind(&args), c_api);
 
-  absl::string_view device_kind(args.device_kind, args.device_kind_size);
+  abslx::string_view device_kind(args.device_kind, args.device_kind_size);
   return device_kind;
 }
 
@@ -391,25 +391,25 @@ int PjRtCApiDevice::local_hardware_id() const {
   return args.local_hardware_id;
 }
 
-absl::string_view PjRtCApiDevice::DebugString() const {
+abslx::string_view PjRtCApiDevice::DebugString() const {
   PJRT_Device_DebugString_Args args;
   args.struct_size = PJRT_Device_DebugString_Args_STRUCT_SIZE;
   args.priv = nullptr;
   args.device = device_;
   const PJRT_Api* c_api = client_->pjrt_c_api();
   pjrt::LogFatalIfPjrtError(c_api->PJRT_Device_DebugString(&args), c_api);
-  absl::string_view debug_string(args.debug_string, args.debug_string_size);
+  abslx::string_view debug_string(args.debug_string, args.debug_string_size);
   return debug_string;
 }
 
-absl::string_view PjRtCApiDevice::ToString() const {
+abslx::string_view PjRtCApiDevice::ToString() const {
   PJRT_Device_ToString_Args args;
   args.struct_size = PJRT_Device_ToString_Args_STRUCT_SIZE;
   args.priv = nullptr;
   args.device = device_;
   const PJRT_Api* c_api = client_->pjrt_c_api();
   pjrt::LogFatalIfPjrtError(c_api->PJRT_Device_ToString(&args), c_api);
-  absl::string_view to_string(args.to_string, args.to_string_size);
+  abslx::string_view to_string(args.to_string, args.to_string_size);
   return to_string;
 }
 
@@ -461,7 +461,7 @@ PjRtCApiExecutable::~PjRtCApiExecutable() {
 }
 
 static std::vector<std::vector<PJRT_Buffer*>> Convert2DCppBuffersToCBuffers(
-    absl::Span<const std::vector<PjRtBuffer*>> cpp_lists) {
+    abslx::Span<const std::vector<PjRtBuffer*>> cpp_lists) {
   std::vector<std::vector<PJRT_Buffer*>> c_lists;
   c_lists.reserve(cpp_lists.size());
   for (const auto& cpp_list : cpp_lists) {
@@ -514,7 +514,7 @@ static StatusOr<int> GetNumOutputsPerDevice(
 
 StatusOr<std::vector<std::vector<std::unique_ptr<PjRtBuffer>>>>
 PjRtCApiExecutable::Execute(
-    absl::Span<const std::vector<PjRtBuffer*>> argument_handles,
+    abslx::Span<const std::vector<PjRtBuffer*>> argument_handles,
     const ExecuteOptions& options,
     std::optional<std::vector<PjRtFuture<Status>>>& returned_futures) {
   PJRT_Executable_Execute_Args args;
@@ -562,7 +562,7 @@ PjRtCApiExecutable::Execute(
 
 StatusOr<std::vector<std::unique_ptr<PjRtBuffer>>>
 PjRtCApiExecutable::ExecuteSharded(
-    absl::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
+    abslx::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
     const ExecuteOptions& options,
     std::optional<PjRtFuture<Status>>& returned_future, bool fill_future) {
 #ifdef PJRT_C_API_BYPASS
@@ -585,7 +585,7 @@ PjRtCApiExecutable::ExecuteSharded(
 
 StatusOr<std::vector<std::unique_ptr<PjRtBuffer>>>
 PjRtCApiExecutable::ExecutePortable(
-    absl::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
+    abslx::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
     const ExecuteOptions& options,
     std::optional<PjRtFuture<Status>>& returned_future, bool fill_future) {
 #ifdef PJRT_C_API_BYPASS
@@ -610,7 +610,7 @@ PjRtLoadedExecutable* PjRtCApiExecutable::wrapped() const {
   return executable_->executable.get();
 }
 
-absl::string_view PjRtCApiExecutable::name() const {
+abslx::string_view PjRtCApiExecutable::name() const {
   const PJRT_Api* c_api = pjrt_c_api();
   PJRT_Executable_Name_Args args;
   args.executable = executable_;
@@ -618,7 +618,7 @@ absl::string_view PjRtCApiExecutable::name() const {
   args.priv = nullptr;
   pjrt::LogFatalIfPjrtError(c_api->PJRT_Executable_Name(&args), c_api);
 
-  absl::string_view executable_name(args.executable_name,
+  abslx::string_view executable_name(args.executable_name,
                                     args.executable_name_size);
   return executable_name;
 }
@@ -673,8 +673,8 @@ void PjRtCApiBuffer::set_shape() {
 
   CHECK_NE(element_type, xla::PrimitiveType::TUPLE);
 
-  absl::Span<const int64_t> dims = ApiConverter::MakeSpan(args.dimensions);
-  absl::Span<const bool> dynamic_dims =
+  abslx::Span<const int64_t> dims = ApiConverter::MakeSpan(args.dimensions);
+  abslx::Span<const bool> dynamic_dims =
       ApiConverter::MakeSpan(args.dynamic_dimensions);
 
   Shape trimmed_shape = Shape(element_type, dims, dynamic_dims, {});

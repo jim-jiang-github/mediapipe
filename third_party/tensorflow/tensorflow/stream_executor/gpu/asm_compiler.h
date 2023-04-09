@@ -59,7 +59,7 @@ port::StatusOr<std::vector<uint8>> CompileGpuAsm(int cc_major, int cc_minor,
 // the compiled binary.
 //
 // A copy of the string provided in ptx will be made.
-port::StatusOr<absl::Span<const uint8>> CompileGpuAsmOrGetCached(
+port::StatusOr<abslx::Span<const uint8>> CompileGpuAsmOrGetCached(
     int device_ordinal, const char* ptx, GpuAsmOpts compilation_options);
 
 struct CubinOrPTXImage {
@@ -91,15 +91,15 @@ port::StatusOr<std::vector<uint8>> LinkGpuAsm(
 // Maintains a cache of pointers to loaded kernels
 template <typename... Args>
 port::StatusOr<std::shared_ptr<TypedKernel<Args...>>> LoadKernelOrGetPtr(
-    StreamExecutor* executor, absl::string_view kernel_name,
-    absl::string_view ptx, absl::Span<const uint8> cubin_data) {
+    StreamExecutor* executor, abslx::string_view kernel_name,
+    abslx::string_view ptx, abslx::Span<const uint8> cubin_data) {
   using KernelPtrCacheKey =
-      std::tuple<CUcontext, absl::string_view, absl::string_view>;
+      std::tuple<CUcontext, abslx::string_view, abslx::string_view>;
 
   static tensorflow::mutex kernel_ptr_cache_mutex(
       tensorflow::LINKER_INITIALIZED);
   static auto& kernel_ptr_cache TF_GUARDED_BY(kernel_ptr_cache_mutex) =
-      *new absl::flat_hash_map<KernelPtrCacheKey,
+      *new abslx::flat_hash_map<KernelPtrCacheKey,
                                std::shared_ptr<TypedKernel<Args...>>>();
   CUcontext current_context = cuda::CurrentContextOrDie();
   KernelPtrCacheKey kernel_ptr_cache_key{current_context, kernel_name, ptx};

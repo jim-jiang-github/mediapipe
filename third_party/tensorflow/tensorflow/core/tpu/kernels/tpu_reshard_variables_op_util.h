@@ -49,7 +49,7 @@ Status PerformCompaction(stream_executor::Stream* stream);
 
 Status UpdateOutputVariables(
     OpKernelContext* context, xla::ScopedShapedBuffer result_buffers,
-    absl::Span<const TensorShapeProto* const> output_tensor_shape_protos,
+    abslx::Span<const TensorShapeProto* const> output_tensor_shape_protos,
     xla::Backend* backend, se::Stream* stream, int device_ordinal,
     const std::vector<VariableInfo>& variables,
     const std::shared_ptr<se::Event>& definition_event);

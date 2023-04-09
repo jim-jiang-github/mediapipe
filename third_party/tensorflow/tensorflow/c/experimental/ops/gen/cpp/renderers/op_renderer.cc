@@ -28,7 +28,7 @@ string OpRenderer::Signature() const {
   for (OpArgumentView const& argument : op_.AllArguments()) {
     string text = argument.Declaration();
     if (context_.mode == RendererContext::kHeader) {
-      absl::StrAppend(&text, argument.Initializer());
+      abslx::StrAppend(&text, argument.Initializer());
     }
     if (argument.HasDefaultValue()) {
       args_with_default_val.push_back(text);
@@ -45,8 +45,8 @@ string OpRenderer::Signature() const {
   arguments.insert(arguments.end(),
                    std::make_move_iterator(args_with_default_val.begin()),
                    std::make_move_iterator(args_with_default_val.end()));
-  return absl::Substitute("$0 $1($2)", "Status", op_.FunctionName(),
-                          absl::StrJoin(arguments, ", "));
+  return abslx::Substitute("$0 $1($2)", "Status", op_.FunctionName(),
+                          abslx::StrJoin(arguments, ", "));
 }
 
 OpRenderer::OpRenderer(RendererContext context, OpView op)

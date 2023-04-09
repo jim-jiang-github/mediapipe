@@ -135,14 +135,14 @@ class DataServiceWorkerImpl {
   condition_variable cv_;
   // Information about tasks, keyed by task ids. The tasks are updated based on
   // the heartbeat responses from the dispatcher.
-  absl::flat_hash_map<int64_t, std::shared_ptr<Task>> tasks_ TF_GUARDED_BY(mu_);
+  abslx::flat_hash_map<int64_t, std::shared_ptr<Task>> tasks_ TF_GUARDED_BY(mu_);
   // Ids of tasks that have finished.
-  absl::flat_hash_set<int64_t> finished_tasks_ TF_GUARDED_BY(mu_);
+  abslx::flat_hash_set<int64_t> finished_tasks_ TF_GUARDED_BY(mu_);
   // Completed tasks which haven't yet been communicated to the dispatcher.
-  absl::flat_hash_set<int64_t> pending_completed_tasks_ TF_GUARDED_BY(mu_);
+  abslx::flat_hash_set<int64_t> pending_completed_tasks_ TF_GUARDED_BY(mu_);
   // Tasks deleted by the local client. If the client tries to read from them
   // again, the worker will return a non-retriable FailedPrecondition error.
-  absl::flat_hash_set<int64_t> deleted_tasks_ TF_GUARDED_BY(mu_);
+  abslx::flat_hash_set<int64_t> deleted_tasks_ TF_GUARDED_BY(mu_);
   bool cancelled_ TF_GUARDED_BY(mu_) = false;
   // Whether the worker has registered with the dispatcher yet.
   bool registered_ TF_GUARDED_BY(mu_) = false;
@@ -166,24 +166,24 @@ class LocalWorkers {
   // Adds a `worker` at `worker_address`. If a worker already exists at the
   // address, it will be updated to the new `worker`.
   // REQUIRES: worker != nullptr.
-  static void Add(absl::string_view worker_address,
+  static void Add(abslx::string_view worker_address,
                   std::shared_ptr<DataServiceWorkerImpl> worker);
 
   // Gets a local worker at `worker_address`. Returns nullptr if a worker is not
   // found.
   static std::shared_ptr<DataServiceWorkerImpl> Get(
-      absl::string_view worker_address);
+      abslx::string_view worker_address);
 
   // Returns if there are any local workers in the process.
   static bool Empty();
 
   // Removes a worker at `worker_address`. It is no-op if a worker is not found
   // at the address.
-  static void Remove(absl::string_view worker_address);
+  static void Remove(abslx::string_view worker_address);
 
  private:
   using AddressToWorkerMap =
-      absl::flat_hash_map<std::string, std::shared_ptr<DataServiceWorkerImpl>>;
+      abslx::flat_hash_map<std::string, std::shared_ptr<DataServiceWorkerImpl>>;
   static mutex mu_;
   static AddressToWorkerMap* local_workers_ TF_GUARDED_BY(mu_);
 };

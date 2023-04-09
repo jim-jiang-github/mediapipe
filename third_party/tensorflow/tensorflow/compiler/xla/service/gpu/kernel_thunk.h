@@ -46,7 +46,7 @@ class KernelThunk : public Thunk {
   //
   // `hlo_instruction` is as in Thunk. Other arguments are as the class members.
   KernelThunk(ThunkInfo thunk_info,
-              absl::Span<const BufferAllocation* const> args,
+              abslx::Span<const BufferAllocation* const> args,
               const std::string& kernel_name,
               const LaunchDimensions& launch_dimensions);
   KernelThunk(const KernelThunk&) = delete;
@@ -77,11 +77,11 @@ class KernelThunk : public Thunk {
   // The thread and block dimension used to launch the kernel.
   const LaunchDimensions launch_dimensions_;
 
-  mutable absl::Mutex mutex_;
+  mutable abslx::Mutex mutex_;
 
   // Loaded kernels for each `StreamExecutor`.  Requires pointer stability of
   // values.
-  absl::flat_hash_map<se::StreamExecutor*, std::unique_ptr<se::KernelBase>>
+  abslx::flat_hash_map<se::StreamExecutor*, std::unique_ptr<se::KernelBase>>
       kernel_cache_ ABSL_GUARDED_BY(mutex_);
 };
 

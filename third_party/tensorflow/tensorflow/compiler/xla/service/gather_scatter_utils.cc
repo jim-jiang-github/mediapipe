@@ -49,13 +49,13 @@ StatusOr<HloInstruction*> TransformStartIndices(HloInstruction* indices,
 }
 
 std::pair<std::vector<int64_t>, std::vector<int64_t>>
-MakeOperandStartIndexPermutations(absl::Span<const int64_t> dim_map,
+MakeOperandStartIndexPermutations(abslx::Span<const int64_t> dim_map,
                                   int operand_rank) {
   std::vector<int64_t> perm;
   perm.reserve(operand_rank);
-  absl::c_copy(dim_map, std::back_inserter(perm));
+  abslx::c_copy(dim_map, std::back_inserter(perm));
   for (int i = 0; i < operand_rank; ++i) {
-    if (!absl::c_linear_search(dim_map, i)) {
+    if (!abslx::c_linear_search(dim_map, i)) {
       perm.push_back(i);
     }
   }
@@ -63,7 +63,7 @@ MakeOperandStartIndexPermutations(absl::Span<const int64_t> dim_map,
 }
 
 StatusOr<HloInstruction*> MaybeTranspose(
-    HloInstruction* operand, absl::Span<const int64_t> permutation) {
+    HloInstruction* operand, abslx::Span<const int64_t> permutation) {
   if (IsIdentityPermutation(permutation)) {
     return operand;
   }
@@ -72,7 +72,7 @@ StatusOr<HloInstruction*> MaybeTranspose(
 }
 
 StatusOr<std::vector<HloInstruction*>> MaybeTranspose(
-    absl::Span<HloInstruction* const> operands,
+    abslx::Span<HloInstruction* const> operands,
     const std::vector<int64_t>& operand_permutation) {
   std::vector<HloInstruction*> result;
   result.reserve(operands.size());

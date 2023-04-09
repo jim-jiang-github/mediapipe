@@ -60,7 +60,7 @@ class ConvolutionTransposedThin : public GPUOperation {
 
   template <DataType S, typename T>
   void RearrangeWeightsData(const tflite::gpu::Tensor<OHWI, S>& weights,
-                            absl::Span<T> dst);
+                            abslx::Span<T> dst);
   std::string GenerateConvolutionTransposedCode(const OperationDef& op_def,
                                                 int src_depth, int dst_channels,
                                                 const int2& kernel_size);
@@ -86,7 +86,7 @@ void ConvolutionTransposedThin::UploadData(
 
   if (f32_weights) {
     float4* gpu_data = reinterpret_cast<float4*>(desc.data.data());
-    RearrangeWeightsData(weights, absl::MakeSpan(gpu_data, flt4_count));
+    RearrangeWeightsData(weights, abslx::MakeSpan(gpu_data, flt4_count));
     float4 bias_value(0.0f);
     for (int i = 0; i < weights.shape.o; ++i) {
       bias_value[i] = biases.data[i];
@@ -94,7 +94,7 @@ void ConvolutionTransposedThin::UploadData(
     gpu_data[flt4_count] = bias_value;
   } else {
     half4* gpu_data = reinterpret_cast<half4*>(desc.data.data());
-    RearrangeWeightsData(weights, absl::MakeSpan(gpu_data, flt4_count));
+    RearrangeWeightsData(weights, abslx::MakeSpan(gpu_data, flt4_count));
     half4 bias_value(0.0f);
     for (int i = 0; i < weights.shape.o; ++i) {
       bias_value[i] = biases.data[i];
@@ -108,7 +108,7 @@ void ConvolutionTransposedThin::UploadData(
 
 template <DataType S, typename T>
 void ConvolutionTransposedThin::RearrangeWeightsData(
-    const tflite::gpu::Tensor<OHWI, S>& weights, absl::Span<T> dst) {
+    const tflite::gpu::Tensor<OHWI, S>& weights, abslx::Span<T> dst) {
   const int src_depth = DivideRoundUp(weights.shape.i, 4);
   const int kernel_x = weights.shape.w;
   const int kernel_y = weights.shape.h;

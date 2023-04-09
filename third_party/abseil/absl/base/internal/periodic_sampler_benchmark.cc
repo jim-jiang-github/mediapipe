@@ -15,7 +15,7 @@
 #include "benchmark/benchmark.h"
 #include "absl/base/internal/periodic_sampler.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 namespace {
@@ -76,4 +76,4 @@ BENCHMARK(BM_PeriodicSampler_Disabled);
 }  // namespace
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

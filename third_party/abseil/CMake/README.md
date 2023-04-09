@@ -31,7 +31,7 @@ CMake project.
 [`add_subdirectory()`](https://cmake.org/cmake/help/latest/command/add_subdirectory.html)
 to include Abseil directly in your CMake project.
 
-4. Add the **absl::** target you wish to use to the
+4. Add the **abslx::** target you wish to use to the
 [`target_link_libraries()`](https://cmake.org/cmake/help/latest/command/target_link_libraries.html)
 section of your executable or of your library.<br>
 Here is a short CMakeLists.txt example of a project file using Abseil.
@@ -47,7 +47,7 @@ set(CMAKE_CXX_STANDARD 11)
 add_subdirectory(abseil-cpp)
 
 add_executable(my_exe source.cpp)
-target_link_libraries(my_exe absl::base absl::synchronization absl::strings)
+target_link_libraries(my_exe abslx::base abslx::synchronization abslx::strings)
 ```
 
 ### Running Abseil Tests with CMake
@@ -85,17 +85,17 @@ https://github.com/abseil/abseil-cpp/issues/109 for more information.
 Here's a non-exhaustive list of Abseil CMake public targets:
 
 ```cmake
-absl::algorithm
-absl::base
-absl::debugging
-absl::flat_hash_map
-absl::flags
-absl::memory
-absl::meta
-absl::numeric
-absl::random_random
-absl::strings
-absl::synchronization
-absl::time
-absl::utility
+abslx::algorithm
+abslx::base
+abslx::debugging
+abslx::flat_hash_map
+abslx::flags
+abslx::memory
+abslx::meta
+abslx::numeric
+abslx::random_random
+abslx::strings
+abslx::synchronization
+abslx::time
+abslx::utility
 ```

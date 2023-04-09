@@ -28,7 +28,7 @@ namespace mediapipe {
 namespace {
 using EventType = GraphTrace::EventType;
 
-const absl::Duration kDefaultTraceLogInterval = absl::Milliseconds(500);
+const abslx::Duration kDefaultTraceLogInterval = abslx::Milliseconds(500);
 
 // Returns a unique identifier for the current thread.
 inline int GetCurrentThreadId() {
@@ -39,9 +39,9 @@ inline int GetCurrentThreadId() {
 
 }  // namespace
 
-absl::Duration GraphTracer::GetTraceLogInterval() {
+abslx::Duration GraphTracer::GetTraceLogInterval() {
   return profiler_config_.trace_log_interval_usec()
-             ? absl::Microseconds(profiler_config_.trace_log_interval_usec())
+             ? abslx::Microseconds(profiler_config_.trace_log_interval_usec())
              : kDefaultTraceLogInterval;
 }
 
@@ -73,7 +73,7 @@ void GraphTracer::LogEvent(TraceEvent event) {
 
 void GraphTracer::LogInputEvents(GraphTrace::EventType event_type,
                                  const CalculatorContext* context,
-                                 absl::Time event_time) {
+                                 abslx::Time event_time) {
   Timestamp input_ts = context->InputTimestamp();
   for (const InputStreamShard& in_stream : context->Inputs()) {
     const Packet& packet = in_stream.Value();
@@ -93,7 +93,7 @@ void GraphTracer::LogInputEvents(GraphTrace::EventType event_type,
 
 void GraphTracer::LogOutputEvents(GraphTrace::EventType event_type,
                                   const CalculatorContext* context,
-                                  absl::Time event_time) {
+                                  abslx::Time event_time) {
   // For source nodes, the first output timestamp is used as the input_ts.
   Timestamp input_ts = (context->Inputs().NumEntries() > 0)
                            ? context->InputTimestamp()
@@ -113,26 +113,26 @@ void GraphTracer::LogOutputEvents(GraphTrace::EventType event_type,
   }
 }
 
-Timestamp GraphTracer::TimestampAfter(absl::Time begin_time) {
+Timestamp GraphTracer::TimestampAfter(abslx::Time begin_time) {
   return TraceBuilder::TimestampAfter(trace_buffer_, begin_time);
 }
 
 // The mutex to guard GraphTracer::trace_builder_.
-absl::Mutex* trace_builder_mutex() {
-  static absl::Mutex trace_builder_mutex(absl::kConstInit);
+abslx::Mutex* trace_builder_mutex() {
+  static abslx::Mutex trace_builder_mutex(abslx::kConstInit);
   return &trace_builder_mutex;
 }
 
-void GraphTracer::GetTrace(absl::Time begin_time, absl::Time end_time,
+void GraphTracer::GetTrace(abslx::Time begin_time, abslx::Time end_time,
                            GraphTrace* result) {
-  absl::MutexLock lock(trace_builder_mutex());
+  abslx::MutexLock lock(trace_builder_mutex());
   trace_builder_.CreateTrace(trace_buffer_, begin_time, end_time, result);
   trace_builder_.Clear();
 }
 
-void GraphTracer::GetLog(absl::Time begin_time, absl::Time end_time,
+void GraphTracer::GetLog(abslx::Time begin_time, abslx::Time end_time,
                          GraphTrace* result) {
-  absl::MutexLock lock(trace_builder_mutex());
+  abslx::MutexLock lock(trace_builder_mutex());
   trace_builder_.CreateLog(trace_buffer_, begin_time, end_time, result);
   trace_builder_.Clear();
 }

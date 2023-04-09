@@ -57,7 +57,7 @@ class RollOp : public XlaOpKernel {
                                                 : *axis.GetIntegralAsS64({i});
       OP_REQUIRES(ctx, cur_axis >= -input_dims && cur_axis < input_dims,
                   errors::InvalidArgument(
-                      absl::StrCat("axis ", cur_axis, " is out of range [-",
+                      abslx::StrCat("axis ", cur_axis, " is out of range [-",
                                    input_dims, ", ", input_dims, ").")));
       if (cur_axis < 0) {
         cur_axis += input_dims;

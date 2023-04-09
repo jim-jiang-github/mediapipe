@@ -46,12 +46,12 @@ class FeedbackTensorsCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kFeedbackTensorsIn, kInputTensorsIn, kTensorsOut);
 
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->SetProcessTimestampBounds(true);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     const auto& options =
         cc->Options<mediapipe::FeedbackTensorsCalculatorOptions>();
 
@@ -63,14 +63,14 @@ class FeedbackTensorsCalculator : public Node {
 
     feedback_tensors_location_ = options.location();
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     if (feedback_tensors_location_ ==
         mediapipe::FeedbackTensorsCalculatorOptions::NONE) {
       kTensorsOut(cc).Send(kInputTensorsIn(cc).packet().As<Tensors>());
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     std::vector<Tensor> outputs;
@@ -84,32 +84,32 @@ class FeedbackTensorsCalculator : public Node {
         MP_RETURN_IF_ERROR(AddFeedbackTensors(cc, outputs));
         break;
       default:
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "Unsupported feedback tensors location");
     }
     kTensorsOut(cc).Send(std::move(outputs));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
-  absl::Status AddInputTensors(CalculatorContext* cc,
+  abslx::Status AddInputTensors(CalculatorContext* cc,
                                std::vector<Tensor>& outputs) {
-    absl::StatusOr<std::unique_ptr<std::vector<Tensor>>> input_tensors =
+    abslx::StatusOr<std::unique_ptr<std::vector<Tensor>>> input_tensors =
         cc->Inputs()
             .Tag(kInputTensorsTag)
             .Value()
             .Consume<std::vector<Tensor>>();
     if (!input_tensors.ok()) {
-      return absl::InternalError("The input tensors packet is not consumable");
+      return abslx::InternalError("The input tensors packet is not consumable");
     }
     RET_CHECK(*input_tensors);
     std::vector<Tensor>& inputs = **input_tensors;
     outputs.insert(outputs.end(), std::make_move_iterator(inputs.begin()),
                    std::make_move_iterator(inputs.end()));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status AddFeedbackTensors(CalculatorContext* cc,
+  abslx::Status AddFeedbackTensors(CalculatorContext* cc,
                                   std::vector<Tensor>& outputs) {
     if (first_run_) {
       for (int index = 0; index < num_feedback_tensors_; ++index) {
@@ -120,34 +120,34 @@ class FeedbackTensorsCalculator : public Node {
         outputs.push_back(std::move(initial_feedback_tensor));
       }
       first_run_ = false;
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     if (num_feedback_tensors_ != kFeedbackTensorsIn(cc)->size()) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "The number of tensors fed back differs from the configuration");
     }
-    absl::StatusOr<std::unique_ptr<std::vector<Tensor>>> feedback_tensors =
+    abslx::StatusOr<std::unique_ptr<std::vector<Tensor>>> feedback_tensors =
         cc->Inputs()
             .Tag(kFeedbackTensorsTag)
             .Value()
             .Consume<std::vector<Tensor>>();
     if (!feedback_tensors.ok()) {
-      return absl::InternalError(
+      return abslx::InternalError(
           "The feedback tensors packet is not consumable");
     }
     RET_CHECK(*feedback_tensors);
     std::vector<Tensor>& feedbacks = **feedback_tensors;
     for (const auto& feedback : feedbacks) {
       if (feedback.shape().dims != feedback_tensor_shape_.dims) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "The shape of a tensor fed back differs from the configuration");
       }
     }
     outputs.insert(outputs.end(), std::make_move_iterator(feedbacks.begin()),
                    std::make_move_iterator(feedbacks.end()));
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   Tensor::Shape feedback_tensor_shape_;

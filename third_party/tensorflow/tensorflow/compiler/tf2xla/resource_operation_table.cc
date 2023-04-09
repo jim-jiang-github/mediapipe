@@ -19,7 +19,7 @@ limitations under the License.
 #include "absl/container/flat_hash_map.h"
 
 namespace tensorflow {
-/*static*/ absl::string_view XlaResourceOpInfo::XlaResourceOpKindToString(
+/*static*/ abslx::string_view XlaResourceOpInfo::XlaResourceOpKindToString(
     XlaResourceOpKind op_kind) {
   switch (op_kind) {
     case XlaResourceOpKind::kRead:
@@ -31,11 +31,11 @@ namespace tensorflow {
   }
 }
 
-static absl::flat_hash_map<absl::string_view, XlaResourceOpInfo>*
+static abslx::flat_hash_map<abslx::string_view, XlaResourceOpInfo>*
 CreateResourceOpInfoMap() {
-  auto* result = new absl::flat_hash_map<absl::string_view, XlaResourceOpInfo>;
+  auto* result = new abslx::flat_hash_map<abslx::string_view, XlaResourceOpInfo>;
 
-  auto add = [&](absl::string_view op, XlaResourceOpKind op_kind,
+  auto add = [&](abslx::string_view op, XlaResourceOpKind op_kind,
                  XlaResourceKind resource_kind) {
     auto insert_result =
         result->insert({op, XlaResourceOpInfo(op_kind, resource_kind)});
@@ -117,27 +117,27 @@ CreateResourceOpInfoMap() {
   return result;
 }
 
-static const absl::flat_hash_map<absl::string_view, XlaResourceOpInfo>&
+static const abslx::flat_hash_map<abslx::string_view, XlaResourceOpInfo>&
 GetStaticResourceOpInfoMap() {
-  static absl::flat_hash_map<absl::string_view, XlaResourceOpInfo>*
+  static abslx::flat_hash_map<abslx::string_view, XlaResourceOpInfo>*
       op_info_map = CreateResourceOpInfoMap();
   return *op_info_map;
 }
 
-const XlaResourceOpInfo* GetResourceOpInfoForOp(absl::string_view op) {
-  const absl::flat_hash_map<absl::string_view, XlaResourceOpInfo>& op_infos =
+const XlaResourceOpInfo* GetResourceOpInfoForOp(abslx::string_view op) {
+  const abslx::flat_hash_map<abslx::string_view, XlaResourceOpInfo>& op_infos =
       GetStaticResourceOpInfoMap();
   auto it = op_infos.find(op);
   return it == op_infos.end() ? nullptr : &it->second;
 }
 
 namespace resource_op_table_internal {
-std::vector<absl::string_view> GetKnownResourceOps() {
-  std::vector<absl::string_view> result;
+std::vector<abslx::string_view> GetKnownResourceOps() {
+  std::vector<abslx::string_view> result;
   for (const auto& p : GetStaticResourceOpInfoMap()) {
     result.push_back(p.first);
   }
-  absl::c_sort(result);
+  abslx::c_sort(result);
   return result;
 }
 }  // namespace resource_op_table_internal

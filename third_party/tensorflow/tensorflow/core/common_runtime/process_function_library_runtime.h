@@ -501,7 +501,7 @@ class ProcessFunctionLibraryRuntime {
   mutable mutex mu_;
 
   Env* const env_;
-  const absl::optional<const ConfigProto> config_;
+  const abslx::optional<const ConfigProto> config_;
   const DeviceMgr* const device_mgr_;
   const FunctionLibraryDefinition* lib_def_;
   thread::ThreadPool* default_thread_pool_;

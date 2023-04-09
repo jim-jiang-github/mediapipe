@@ -49,7 +49,7 @@
 #include "absl/synchronization/internal/kernel_timeout.h"
 
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
@@ -425,4 +425,4 @@ void Waiter::InternalCondVarPoke() {
 
 }  // namespace synchronization_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

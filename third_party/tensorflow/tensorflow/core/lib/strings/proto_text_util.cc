@@ -53,7 +53,7 @@ bool ProtoParseStringLiteralFromScanner(Scanner* scanner, string* value) {
     return false;
   }
   ProtoSpaceAndComments(scanner);
-  return absl::CUnescape(value_sp, value, nullptr /* error */);
+  return abslx::CUnescape(value_sp, value, nullptr /* error */);
 }
 
 }  // namespace strings

@@ -27,8 +27,8 @@ namespace {
 class LayoutUtilTest : public ::testing::Test {
  protected:
   Shape MakeShapeWithLayout(PrimitiveType element_type,
-                            absl::Span<const int64_t> dimensions,
-                            absl::Span<const int64_t> minor_to_major) {
+                            abslx::Span<const int64_t> dimensions,
+                            abslx::Span<const int64_t> minor_to_major) {
     Shape shape = ShapeUtil::MakeShape(element_type, dimensions);
     *shape.mutable_layout() = LayoutUtil::MakeLayout(minor_to_major);
     return shape;

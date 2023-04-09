@@ -428,10 +428,10 @@ TEST_F(ConvertTest, ConvertReshape) {
 
 std::vector<float> GetInterestingF16ConversionTestCases() {
   float infinity = std::numeric_limits<float>::infinity();
-  float half_min_positive_normal = absl::bit_cast<float, uint32_t>(0x38800000);
-  float half_max_subnormal = absl::bit_cast<float, uint32_t>(0x387fc000);
+  float half_min_positive_normal = abslx::bit_cast<float, uint32_t>(0x38800000);
+  float half_max_subnormal = abslx::bit_cast<float, uint32_t>(0x387fc000);
   float half_min_positive_subnormal =
-      absl::bit_cast<float, uint32_t>(0x33800000);
+      abslx::bit_cast<float, uint32_t>(0x33800000);
   float half_max = 65504.0f;
 
   std::vector<float> test_cases(
@@ -446,10 +446,10 @@ std::vector<float> GetInterestingF16ConversionTestCases() {
 XLA_TEST_F(ConvertTest, ConvertR1F16ToR1F32) {
   std::vector<float> test_cases = GetInterestingF16ConversionTestCases();
   std::vector<half> input;
-  absl::c_transform(test_cases, std::back_inserter(input),
+  abslx::c_transform(test_cases, std::back_inserter(input),
                     [](float f) { return Eigen::half(f); });
   std::vector<float> expected_output;
-  absl::c_transform(input, std::back_inserter(expected_output),
+  abslx::c_transform(input, std::back_inserter(expected_output),
                     [](Eigen::half h) { return static_cast<float>(h); });
 
   TF_ASSERT_OK_AND_ASSIGN(
@@ -469,7 +469,7 @@ XLA_TEST_F(ConvertTest, ConvertR1F16ToR1F32) {
 XLA_TEST_F(ConvertTest, ConvertR1F32ToR1F16) {
   std::vector<float> input = GetInterestingF16ConversionTestCases();
   std::vector<half> expected_output;
-  absl::c_transform(input, std::back_inserter(expected_output),
+  abslx::c_transform(input, std::back_inserter(expected_output),
                     [](float f) { return Eigen::half(f); });
 
   TF_ASSERT_OK_AND_ASSIGN(

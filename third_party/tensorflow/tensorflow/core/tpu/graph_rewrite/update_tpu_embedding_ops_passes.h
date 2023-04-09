@@ -35,7 +35,7 @@ class UpdateTPUEmbeddingModePass : public GraphOptimizationPass {
   Status Run(const GraphOptimizationPassOptions& options) override;
 
   static Status GetEnqueueOpsFromGraph(
-      Graph* graph, absl::flat_hash_map<Node*, bool>* enqueue);
+      Graph* graph, abslx::flat_hash_map<Node*, bool>* enqueue);
   static Status UpdateGraphEnqueueOp(bool training, Graph* graph,
                                      Node* enqueue);
   static Status GetEnqueueOpsFromFunctionDef(FunctionDef* function,

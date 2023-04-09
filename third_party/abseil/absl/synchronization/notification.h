@@ -56,7 +56,7 @@
 #include "absl/synchronization/mutex.h"
 #include "absl/time/time.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // -----------------------------------------------------------------------------
@@ -90,14 +90,14 @@ class Notification {
   // Blocks until either the notification's "notified" state is `true` (which
   // may occur immediately) or the timeout has elapsed, returning the value of
   // its "notified" state in either case.
-  bool WaitForNotificationWithTimeout(absl::Duration timeout) const;
+  bool WaitForNotificationWithTimeout(abslx::Duration timeout) const;
 
   // Notification::WaitForNotificationWithDeadline()
   //
   // Blocks until either the notification's "notified" state is `true` (which
   // may occur immediately) or the deadline has expired, returning the value of
   // its "notified" state in either case.
-  bool WaitForNotificationWithDeadline(absl::Time deadline) const;
+  bool WaitForNotificationWithDeadline(abslx::Time deadline) const;
 
   // Notification::Notify()
   //
@@ -118,6 +118,6 @@ class Notification {
 };
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_SYNCHRONIZATION_NOTIFICATION_H_

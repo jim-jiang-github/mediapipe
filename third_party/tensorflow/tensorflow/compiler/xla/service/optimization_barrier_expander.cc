@@ -19,7 +19,7 @@ namespace xla {
 
 StatusOr<bool> OptimizationBarrierExpander::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   std::vector<HloInstruction*> barriers;
   for (HloComputation* computation :
        module->MakeNonfusionComputations(execution_threads)) {
@@ -37,7 +37,7 @@ StatusOr<bool> OptimizationBarrierExpander::Run(
       if (it != sequences.end()) {
         std::vector<HloInstruction*> sequence;
         sequence.reserve(it->second.instructions().size());
-        absl::c_copy_if(it->second.instructions(), std::back_inserter(sequence),
+        abslx::c_copy_if(it->second.instructions(), std::back_inserter(sequence),
                         [](HloInstruction* inst) {
                           return inst->opcode() !=
                                  HloOpcode::kOptimizationBarrier;

@@ -32,25 +32,25 @@ template <typename K, typename V>
 class ThreadSafeMap {
  public:
   V& operator[](const K& key) {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     std::unique_ptr<V>& value = map_[key];
     if (value == nullptr) value = std::make_unique<V>();
     return *value;
   }
 
   void ForEachValue(const std::function<void(V&)>& fn) {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     for (const auto& [_, value] : map_) fn(*value);
   }
 
  private:
-  absl::Mutex mutex_;
-  absl::flat_hash_map<K, std::unique_ptr<V>> map_ ABSL_GUARDED_BY(mutex_);
+  abslx::Mutex mutex_;
+  abslx::flat_hash_map<K, std::unique_ptr<V>> map_ ABSL_GUARDED_BY(mutex_);
 };
 
-void AwaitAndLogIfStuck(absl::Mutex& mutex, const absl::Condition& condition,
-                        absl::Duration warn_stuck_timeout,
-                        absl::Duration terminate_timeout);
+void AwaitAndLogIfStuck(abslx::Mutex& mutex, const abslx::Condition& condition,
+                        abslx::Duration warn_stuck_timeout,
+                        abslx::Duration terminate_timeout);
 
 // A rendezvous for a group of threads.
 //
@@ -62,14 +62,14 @@ void AwaitAndLogIfStuck(absl::Mutex& mutex, const absl::Condition& condition,
 template <typename R, typename K, typename V>
 std::shared_ptr<R> RendezvousSingle(
     const K& key, const V& value, size_t num_threads,
-    const std::function<R(absl::Span<const V* const>)>& fn,
-    absl::Duration warn_stuck_timeout = absl::InfiniteDuration(),
-    absl::Duration terminate_timeout = absl::InfiniteDuration()) {
+    const std::function<R(abslx::Span<const V* const>)>& fn,
+    abslx::Duration warn_stuck_timeout = abslx::InfiniteDuration(),
+    abslx::Duration terminate_timeout = abslx::InfiniteDuration()) {
   // Fast-path (DO NOT REMOVE: the logic below doesn't work for single thread).
   if (num_threads == 1) return std::make_shared<R>(fn({&value}));
 
   struct State {
-    absl::Mutex mutex;
+    abslx::Mutex mutex;
     std::vector<const V*> values ABSL_GUARDED_BY(mutex);
     std::shared_ptr<R> result ABSL_GUARDED_BY(mutex);
   };
@@ -77,7 +77,7 @@ std::shared_ptr<R> RendezvousSingle(
   static auto& states = *new ThreadSafeMap<K, State>;
   State& state = states[key];
 
-  absl::MutexLock lock(&state.mutex);
+  abslx::MutexLock lock(&state.mutex);
   state.values.push_back(&value);
 
   std::shared_ptr<R> result;
@@ -88,7 +88,7 @@ std::shared_ptr<R> RendezvousSingle(
     state.result = result;
     state.values.clear();
   } else {
-    absl::Condition result_ready(
+    abslx::Condition result_ready(
         +[](std::shared_ptr<R>* ptr) { return ptr->get() != nullptr; },
         &state.result);
     AwaitAndLogIfStuck(state.mutex, result_ready, warn_stuck_timeout,
@@ -108,7 +108,7 @@ std::shared_ptr<R> RendezvousSingle(
   // Wait for all threads to have retrieved the result. Without this, a thread
   // could duplicate or delete its copy of the result, invalidating the use
   // count logic above.
-  absl::Condition result_taken(
+  abslx::Condition result_taken(
       +[](std::shared_ptr<R>* ptr) { return ptr->get() == nullptr; },
       &state.result);
   AwaitAndLogIfStuck(state.mutex, result_taken, warn_stuck_timeout,
@@ -125,11 +125,11 @@ std::shared_ptr<R> RendezvousSingle(
 template <typename R, typename K>
 std::shared_ptr<R> RendezvousSingle(
     const K& key, size_t num_threads, const std::function<R()>& fn,
-    absl::Duration warn_stuck_timeout = absl::InfiniteDuration(),
-    absl::Duration terminate_timeout = absl::InfiniteDuration()) {
+    abslx::Duration warn_stuck_timeout = abslx::InfiniteDuration(),
+    abslx::Duration terminate_timeout = abslx::InfiniteDuration()) {
   // Pass an arbitrary value that is ignored.
   return RendezvousSingle<R, K, int>(
-      key, 0, num_threads, [fn](absl::Span<const int* const>) { return fn(); },
+      key, 0, num_threads, [fn](abslx::Span<const int* const>) { return fn(); },
       warn_stuck_timeout, terminate_timeout);
 }
 

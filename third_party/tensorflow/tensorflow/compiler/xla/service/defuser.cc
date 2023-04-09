@@ -48,7 +48,7 @@ Status Defuse(HloInstruction* fusion_instruction) {
       fusion_instruction->fused_instructions_computation();
 
   // A map from fused instruction to its defused clone.
-  absl::flat_hash_map<const HloInstruction*, HloInstruction*>
+  abslx::flat_hash_map<const HloInstruction*, HloInstruction*>
       defused_instructions;
   // Initialize map to contain the fusion instruction parameters mapping
   // to the operands of the fusion instruction.
@@ -90,7 +90,7 @@ Status Defuse(HloInstruction* fusion_instruction) {
 
 StatusOr<bool> Defuser::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   VLOG(1) << "Defusing module " << module->name();
   XLA_VLOG_LINES(2, "Before defusion:\n" + module->ToString());
 

@@ -19,12 +19,12 @@
 #include "absl/container/internal/unordered_set_members_test.h"
 #include "absl/container/internal/unordered_set_modifiers_test.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
-using ::absl::container_internal::hash_internal::Enum;
-using ::absl::container_internal::hash_internal::EnumClass;
+using ::abslx::container_internal::hash_internal::Enum;
+using ::abslx::container_internal::hash_internal::EnumClass;
 using ::testing::IsEmpty;
 using ::testing::Pointee;
 using ::testing::UnorderedElementsAre;
@@ -58,12 +58,12 @@ TEST(NodeHashSet, MergeExtractInsert) {
       return *a == *b;
     }
   };
-  absl::node_hash_set<std::unique_ptr<int>, Hash, Eq> set1, set2;
-  set1.insert(absl::make_unique<int>(7));
-  set1.insert(absl::make_unique<int>(17));
+  abslx::node_hash_set<std::unique_ptr<int>, Hash, Eq> set1, set2;
+  set1.insert(abslx::make_unique<int>(7));
+  set1.insert(abslx::make_unique<int>(17));
 
-  set2.insert(absl::make_unique<int>(7));
-  set2.insert(absl::make_unique<int>(19));
+  set2.insert(abslx::make_unique<int>(7));
+  set2.insert(abslx::make_unique<int>(19));
 
   EXPECT_THAT(set1, UnorderedElementsAre(Pointee(7), Pointee(17)));
   EXPECT_THAT(set2, UnorderedElementsAre(Pointee(7), Pointee(19)));
@@ -73,7 +73,7 @@ TEST(NodeHashSet, MergeExtractInsert) {
   EXPECT_THAT(set1, UnorderedElementsAre(Pointee(7), Pointee(17), Pointee(19)));
   EXPECT_THAT(set2, UnorderedElementsAre(Pointee(7)));
 
-  auto node = set1.extract(absl::make_unique<int>(7));
+  auto node = set1.extract(abslx::make_unique<int>(7));
   EXPECT_TRUE(node);
   EXPECT_THAT(node.value(), Pointee(7));
   EXPECT_THAT(set1, UnorderedElementsAre(Pointee(17), Pointee(19)));
@@ -87,12 +87,12 @@ TEST(NodeHashSet, MergeExtractInsert) {
   EXPECT_NE(insert_result.position->get(), insert_result.node.value().get());
   EXPECT_THAT(set2, UnorderedElementsAre(Pointee(7)));
 
-  node = set1.extract(absl::make_unique<int>(17));
+  node = set1.extract(abslx::make_unique<int>(17));
   EXPECT_TRUE(node);
   EXPECT_THAT(node.value(), Pointee(17));
   EXPECT_THAT(set1, UnorderedElementsAre(Pointee(19)));
 
-  node.value() = absl::make_unique<int>(23);
+  node.value() = abslx::make_unique<int>(23);
 
   insert_result = set2.insert(std::move(node));
   EXPECT_FALSE(node);
@@ -140,4 +140,4 @@ TEST(NodeHashSet, EraseIf) {
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

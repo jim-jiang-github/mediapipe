@@ -58,7 +58,7 @@ class TFConcreteFunction : public ConcreteFunction {
                        std::unique_ptr<TFConcreteFunction>* out);
 
   // This method returns the "Call" Op used to execute the function.
-  Status MakeCallOp(absl::Span<AbstractTensorHandle* const> inputs,
+  Status MakeCallOp(abslx::Span<AbstractTensorHandle* const> inputs,
                     ImmediateOpPtr* out) const override;
 
   const FunctionMetadata& GetFunctionMetadata() const override;

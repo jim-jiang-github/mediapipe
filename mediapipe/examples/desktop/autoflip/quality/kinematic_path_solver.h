@@ -43,33 +43,33 @@ class KinematicPathSolver {
         initialized_(false),
         pixels_per_degree_(pixels_per_degree) {}
   // Add an observation (detection) at a position and time.
-  absl::Status AddObservation(int position, const uint64 time_us);
+  abslx::Status AddObservation(int position, const uint64 time_us);
   // Get the predicted position at a time.
-  absl::Status UpdatePrediction(const int64 time_us);
+  abslx::Status UpdatePrediction(const int64 time_us);
   // Get the state at a time, as an int.
-  absl::Status GetState(int* position);
+  abslx::Status GetState(int* position);
   // Get the state at a time, as a float.
-  absl::Status GetState(float* position);
+  abslx::Status GetState(float* position);
   // Overwrite the current state value.
-  absl::Status SetState(const float position);
+  abslx::Status SetState(const float position);
   // Update PixelPerDegree value.
-  absl::Status UpdatePixelsPerDegree(const float pixels_per_degree);
+  abslx::Status UpdatePixelsPerDegree(const float pixels_per_degree);
   // Provide the current target position of the reframe action.
-  absl::Status GetTargetPosition(int* target_position);
+  abslx::Status GetTargetPosition(int* target_position);
   // Change min/max location and update state based on new scaling.
-  absl::Status UpdateMinMaxLocation(const int min_location,
+  abslx::Status UpdateMinMaxLocation(const int min_location,
                                     const int max_location);
   // Check if motion is within the reframe window, return false if not.
   bool IsMotionTooSmall(double delta_degs);
   // Check if a position measurement will cause the camera to be in motion
   // without updating the internal state.
-  absl::Status PredictMotionState(int position, const uint64 time_us,
+  abslx::Status PredictMotionState(int position, const uint64 time_us,
                                   bool* state);
   // Clear any history buffer of positions that are used when
   // filtering_time_window_us is set to a non-zero value.
   void ClearHistory();
   // Provides the change in position from last state.
-  absl::Status GetDeltaState(float* delta_position);
+  abslx::Status GetDeltaState(float* delta_position);
 
   bool IsInitialized() { return initialized_; }
 

@@ -46,14 +46,14 @@ class GpuConvAlgorithmPicker : public HloModulePass {
                          se::DeviceMemoryAllocator* allocator)
       : stream_exec_(stream_exec), allocator_(allocator) {}
 
-  absl::string_view name() const override {
+  abslx::string_view name() const override {
     return "gpu-conv-algorithm-picker";
   }
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   StatusOr<bool> RunOnComputation(HloComputation* computation);
@@ -74,10 +74,10 @@ class GpuConvAlgorithmPicker : public HloModulePass {
       se::DeviceMemoryAllocator* allocator,
       se::RedzoneAllocator* input_output_allocator, se::Stream* stream,
       MaybeFusedConvRunner* const runner,
-      absl::Span<const stream_executor::DeviceMemoryBase> operand_buffers,
+      abslx::Span<const stream_executor::DeviceMemoryBase> operand_buffers,
       stream_executor::DeviceMemoryBase result_buffer,
       std::optional<ReferenceResult>* reference_result,
-      absl::Span<const stream_executor::dnn::AlgorithmDesc> disabled_algos);
+      abslx::Span<const stream_executor::dnn::AlgorithmDesc> disabled_algos);
   StatusOr<tensorflow::AutotuneResult> PickBestAlgorithmNoCacheCuda(
       const HloCustomCallInstruction* instr,
       se::DeviceMemoryAllocator* allocator, se::Stream* stream);

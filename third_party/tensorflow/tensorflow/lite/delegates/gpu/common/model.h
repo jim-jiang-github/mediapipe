@@ -51,12 +51,12 @@ struct QuantizationParams {
 struct Value {
   const ValueId id;
   TensorRef<BHWC> tensor;
-  absl::optional<QuantizationParams> quant_params;
+  abslx::optional<QuantizationParams> quant_params;
 };
 
 struct Operation {
   std::string type;
-  absl::any attributes;
+  abslx::any attributes;
 };
 
 struct Node {
@@ -126,7 +126,7 @@ class GraphFloat32 {
   Node* NewNode();
 
   // Insert Node after another in the execution plan.
-  absl::Status InsertNodeAfter(NodeId id, Node** new_node);
+  abslx::Status InsertNodeAfter(NodeId id, Node** new_node);
 
   // @return new value created in this graph
   Value* NewValue();
@@ -135,34 +135,34 @@ class GraphFloat32 {
   // for a value. If a value had another producer, it will reassign producer
   // appropriately. If a value didn't have a producer, it will be removed
   // from a graph's input.
-  absl::Status SetProducer(NodeId producer, ValueId value);
+  abslx::Status SetProducer(NodeId producer, ValueId value);
 
   // Removes a producer for the given value. Value becomes producer-less and
   // therefore becomes graph's input.
-  absl::Status RemoveProducer(ValueId value);
+  abslx::Status RemoveProducer(ValueId value);
 
   // Sets a consumer for the given value. There could be multiple consumers
   // for a value.
-  absl::Status AddConsumer(NodeId consumer, ValueId value);
+  abslx::Status AddConsumer(NodeId consumer, ValueId value);
 
   // Replace input value for given node.
-  absl::Status ReplaceInput(NodeId node, ValueId old_value, ValueId new_value);
+  abslx::Status ReplaceInput(NodeId node, ValueId old_value, ValueId new_value);
 
   // Removes a consumer for the given value. If value does not have any
   // consumers it becomes graph's output.
-  absl::Status RemoveConsumer(NodeId consumer, ValueId value);
+  abslx::Status RemoveConsumer(NodeId consumer, ValueId value);
 
   // Removes node from this graph. For all input values this node will be
   // removed from consumers and for all output values a producer will be
   // removed.
-  absl::Status DeleteNode(NodeId id);
+  abslx::Status DeleteNode(NodeId id);
 
   // Removes value from this graph. It will be removed from inputs for all
   // dependent nodes. A node that was a producer of this value will loose its
   // output.
-  absl::Status DeleteValue(ValueId id);
+  abslx::Status DeleteValue(ValueId id);
 
-  absl::Status MakeExactCopy(GraphFloat32* model) const;
+  abslx::Status MakeExactCopy(GraphFloat32* model) const;
 
  private:
   struct NodeDef {
@@ -185,10 +185,10 @@ class GraphFloat32 {
   }
 
   // @return non-nullptr NodeDef that has valid Node or an error
-  absl::Status LookupNode(NodeId id, NodeDef** node_def);
+  abslx::Status LookupNode(NodeId id, NodeDef** node_def);
 
   // @return non-nullptr ValueDef that has valid Value or an error
-  absl::Status LookupValue(ValueId id, ValueDef** value_def);
+  abslx::Status LookupValue(ValueId id, ValueDef** value_def);
 
   template <typename Pred>
   std::vector<Value*> FilterValues(const Pred& predicate) const {
@@ -228,38 +228,38 @@ class GraphFloat32 {
 // Removes to_remove node that precedes to_keep node only if to_remove has
 // outputs that are consumed only by to_keep. In such case to_keep inherits all
 // to_remove inputs.
-absl::Status RemovePrecedingNode(GraphFloat32* graph, const Node* to_remove,
+abslx::Status RemovePrecedingNode(GraphFloat32* graph, const Node* to_remove,
                                  const Node* to_keep);
 
 // Removes to_remove node that follows to_keep node only if to_remove has inputs
 // that are produced by to_keep. to_keep inherits all to_remove inputs.
-absl::Status RemoveFollowingNode(GraphFloat32* graph, const Node* to_remove,
+abslx::Status RemoveFollowingNode(GraphFloat32* graph, const Node* to_remove,
                                  const Node* to_keep);
 
 // Removes simple_node and its output value from the graph. Node is considered
 // simple if it has only one input and one output value. Input value is kept.
-absl::Status RemoveSimpleNodeKeepInput(GraphFloat32* graph,
+abslx::Status RemoveSimpleNodeKeepInput(GraphFloat32* graph,
                                        const Node* simple_node);
 
 // Removes simple_node and its input value from the graph. Node is considered
 // simple if it has only one input and one output value. Output value is kept.
 // simple_node should be an exclusive consumer of its input value.
-absl::Status RemoveSimpleNodeKeepOutput(GraphFloat32* graph,
+abslx::Status RemoveSimpleNodeKeepOutput(GraphFloat32* graph,
                                         const Node* simple_node);
 
-absl::Status AddOutput(GraphFloat32* graph, const Node* from_node,
+abslx::Status AddOutput(GraphFloat32* graph, const Node* from_node,
                        Value** output);
 
 // Makes a direct connection between from_node and to_node. All input parameters
 // except output are expected to be initialized before passing to the function.
 // If from_node already has an output value, which is not yet consumed by
 // to_node, it may be passed as output parameter.
-absl::Status ConnectTwoNodes(GraphFloat32* graph, const Node* from_node,
+abslx::Status ConnectTwoNodes(GraphFloat32* graph, const Node* from_node,
                              const Node* to_node, Value** output);
 
 // @return OkStatus if all tensors have the same batch value, otherwise an
 // invalid argument error is returned.
-absl::Status CheckBatchSizeForAllValues(const GraphFloat32& model);
+abslx::Status CheckBatchSizeForAllValues(const GraphFloat32& model);
 
 }  // namespace gpu
 }  // namespace tflite

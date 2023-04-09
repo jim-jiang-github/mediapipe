@@ -40,13 +40,13 @@ void RemoteExecuteNode::RunAsync(StatusCallback done) {
       if (item.has_operation()) {
         ops.push_back(item.operation().name());
       } else {
-        ops.push_back(absl::StrCat("DeleteHandle(",
+        ops.push_back(abslx::StrCat("DeleteHandle(",
                                    item.handle_to_decref().op_id(), ":",
                                    item.handle_to_decref().output_num(), ")"));
       }
     }
     rpc_description =
-        absl::StrCat("RemoteOperation(", absl::StrJoin(ops, ", "), ")");
+        abslx::StrCat("RemoteOperation(", abslx::StrJoin(ops, ", "), ")");
   }
   VLOG(3) << "Issuing: " << rpc_description;
 

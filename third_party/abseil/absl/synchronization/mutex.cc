@@ -58,16 +58,16 @@
 #include "absl/synchronization/internal/per_thread_sem.h"
 #include "absl/time/time.h"
 
-using absl::base_internal::CurrentThreadIdentityIfPresent;
-using absl::base_internal::PerThreadSynch;
-using absl::base_internal::SchedulingGuard;
-using absl::base_internal::ThreadIdentity;
-using absl::synchronization_internal::GetOrCreateCurrentThreadIdentity;
-using absl::synchronization_internal::GraphCycles;
-using absl::synchronization_internal::GraphId;
-using absl::synchronization_internal::InvalidGraphId;
-using absl::synchronization_internal::KernelTimeout;
-using absl::synchronization_internal::PerThreadSem;
+using abslx::base_internal::CurrentThreadIdentityIfPresent;
+using abslx::base_internal::PerThreadSynch;
+using abslx::base_internal::SchedulingGuard;
+using abslx::base_internal::ThreadIdentity;
+using abslx::synchronization_internal::GetOrCreateCurrentThreadIdentity;
+using abslx::synchronization_internal::GraphCycles;
+using abslx::synchronization_internal::GraphId;
+using abslx::synchronization_internal::InvalidGraphId;
+using abslx::synchronization_internal::KernelTimeout;
+using abslx::synchronization_internal::PerThreadSem;
 
 extern "C" {
 ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(AbslInternalMutexYield)() {
@@ -75,7 +75,7 @@ ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(AbslInternalMutexYield)() {
 }
 }  // extern "C"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 namespace {
@@ -91,17 +91,17 @@ ABSL_CONST_INIT std::atomic<OnDeadlockCycle> synch_deadlock_detection(
 ABSL_CONST_INIT std::atomic<bool> synch_check_invariants(false);
 
 ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
-absl::base_internal::AtomicHook<void (*)(int64_t wait_cycles)>
+abslx::base_internal::AtomicHook<void (*)(int64_t wait_cycles)>
     submit_profile_data;
-ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES absl::base_internal::AtomicHook<void (*)(
+ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES abslx::base_internal::AtomicHook<void (*)(
     const char *msg, const void *obj, int64_t wait_cycles)>
     mutex_tracer;
 ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES
-    absl::base_internal::AtomicHook<void (*)(const char *msg, const void *cv)>
+    abslx::base_internal::AtomicHook<void (*)(const char *msg, const void *cv)>
         cond_var_tracer;
-ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES absl::base_internal::AtomicHook<
+ABSL_INTERNAL_ATOMIC_HOOK_ATTRIBUTES abslx::base_internal::AtomicHook<
     bool (*)(const void *pc, char *out, int out_size)>
-    symbolizer(absl::Symbolize);
+    symbolizer(abslx::Symbolize);
 
 }  // namespace
 
@@ -132,15 +132,15 @@ namespace {
 enum DelayMode { AGGRESSIVE, GENTLE };
 
 struct ABSL_CACHELINE_ALIGNED MutexGlobals {
-  absl::once_flag once;
+  abslx::once_flag once;
   int spinloop_iterations = 0;
   int32_t mutex_sleep_limit[2] = {};
 };
 
 const MutexGlobals &GetMutexGlobals() {
   ABSL_CONST_INIT static MutexGlobals data;
-  absl::base_internal::LowLevelCallOnce(&data.once, [&]() {
-    const int num_cpus = absl::base_internal::NumCPUs();
+  abslx::base_internal::LowLevelCallOnce(&data.once, [&]() {
+    const int num_cpus = abslx::base_internal::NumCPUs();
     data.spinloop_iterations = num_cpus > 1 ? 1500 : 0;
     // If this a uniprocessor, only yield/sleep.  Otherwise, if the mode is
     // aggressive then spin many times before yielding.  If the mode is
@@ -176,7 +176,7 @@ int MutexDelay(int32_t c, int mode) {
       c++;
     } else {
       // Then wait.
-      absl::SleepFor(absl::Microseconds(10));
+      abslx::SleepFor(abslx::Microseconds(10));
       c = 0;
     }
     ABSL_TSAN_MUTEX_POST_DIVERT(nullptr, 0);
@@ -221,8 +221,8 @@ static void AtomicClearBits(std::atomic<intptr_t>* pv, intptr_t bits,
 //------------------------------------------------------------------
 
 // Data for doing deadlock detection.
-ABSL_CONST_INIT static absl::base_internal::SpinLock deadlock_graph_mu(
-    absl::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
+ABSL_CONST_INIT static abslx::base_internal::SpinLock deadlock_graph_mu(
+    abslx::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
 
 // Graph used to detect deadlocks.
 ABSL_CONST_INIT static GraphCycles *deadlock_graph
@@ -287,8 +287,8 @@ static const struct {
     {0, "SignalAll on "},
 };
 
-ABSL_CONST_INIT static absl::base_internal::SpinLock synch_event_mu(
-    absl::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
+ABSL_CONST_INIT static abslx::base_internal::SpinLock synch_event_mu(
+    abslx::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
 
 // Hash table size; should be prime > 2.
 // Can't be too small, as it's used for deadlock detection information.
@@ -424,7 +424,7 @@ static void PostSynchEvent(void *obj, int ev) {
   // or it explicitly says to log
   if (e == nullptr || e->log) {
     void *pcs[40];
-    int n = absl::GetStackTrace(pcs, ABSL_ARRAYSIZE(pcs), 1);
+    int n = abslx::GetStackTrace(pcs, ABSL_ARRAYSIZE(pcs), 1);
     // A buffer with enough space for the ASCII for all the PCs, even on a
     // 64-bit machine.
     char buffer[ABSL_ARRAYSIZE(pcs) * 24];
@@ -605,13 +605,13 @@ void Mutex::InternalAttemptToUseMutexInFatalSignalHandler() {
 // Return the current time plus the timeout.  Use the same clock as
 // PerThreadSem::Wait() for consistency.  Unfortunately, we don't have
 // such a choice when a deadline is given directly.
-static absl::Time DeadlineFromTimeout(absl::Duration timeout) {
+static abslx::Time DeadlineFromTimeout(abslx::Duration timeout) {
 #ifndef _WIN32
   struct timeval tv;
   gettimeofday(&tv, nullptr);
-  return absl::TimeFromTimeval(tv) + timeout;
+  return abslx::TimeFromTimeval(tv) + timeout;
 #else
-  return absl::Now() + timeout;
+  return abslx::Now() + timeout;
 #endif
 }
 
@@ -1290,7 +1290,7 @@ static char *StackString(void **pcs, int n, char *buf, int maxlen,
 
 static char *CurrentStackString(char *buf, int maxlen, bool symbolize) {
   void *pcs[40];
-  return StackString(pcs, absl::GetStackTrace(pcs, ABSL_ARRAYSIZE(pcs), 2), buf,
+  return StackString(pcs, abslx::GetStackTrace(pcs, ABSL_ARRAYSIZE(pcs), 2), buf,
                      maxlen, symbolize);
 }
 
@@ -1315,7 +1315,7 @@ struct ScopedDeadlockReportBuffers {
 
 // Helper to pass to GraphCycles::UpdateStackTrace.
 int GetStack(void** stack, int max_depth) {
-  return absl::GetStackTrace(stack, max_depth, 3);
+  return abslx::GetStackTrace(stack, max_depth, 3);
 }
 }  // anonymous namespace
 
@@ -1329,7 +1329,7 @@ static GraphId DeadlockCheck(Mutex *mu) {
 
   SynchLocksHeld *all_locks = Synch_GetAllLocks();
 
-  absl::base_internal::SpinLockHolder lock(&deadlock_graph_mu);
+  abslx::base_internal::SpinLockHolder lock(&deadlock_graph_mu);
   const GraphId mu_id = GetGraphIdLocked(mu);
 
   if (all_locks->n == 0) {
@@ -1375,7 +1375,7 @@ static GraphId DeadlockCheck(Mutex *mu) {
         }
       }
       ABSL_RAW_LOG(ERROR,
-                   "Acquiring absl::Mutex %p while holding %s; a cycle in the "
+                   "Acquiring abslx::Mutex %p while holding %s; a cycle in the "
                    "historical lock ordering graph has been observed",
                    static_cast<void *>(mu), b->buf);
       ABSL_RAW_LOG(ERROR, "Cycle: ");
@@ -1508,11 +1508,11 @@ void Mutex::LockWhen(const Condition &cond) {
   ABSL_TSAN_MUTEX_POST_LOCK(this, 0, 0);
 }
 
-bool Mutex::LockWhenWithTimeout(const Condition &cond, absl::Duration timeout) {
+bool Mutex::LockWhenWithTimeout(const Condition &cond, abslx::Duration timeout) {
   return LockWhenWithDeadline(cond, DeadlineFromTimeout(timeout));
 }
 
-bool Mutex::LockWhenWithDeadline(const Condition &cond, absl::Time deadline) {
+bool Mutex::LockWhenWithDeadline(const Condition &cond, abslx::Time deadline) {
   ABSL_TSAN_MUTEX_PRE_LOCK(this, 0);
   GraphId id = DebugOnlyDeadlockCheck(this);
   bool res = LockSlowWithDeadline(kExclusive, &cond,
@@ -1531,12 +1531,12 @@ void Mutex::ReaderLockWhen(const Condition &cond) {
 }
 
 bool Mutex::ReaderLockWhenWithTimeout(const Condition &cond,
-                                      absl::Duration timeout) {
+                                      abslx::Duration timeout) {
   return ReaderLockWhenWithDeadline(cond, DeadlineFromTimeout(timeout));
 }
 
 bool Mutex::ReaderLockWhenWithDeadline(const Condition &cond,
-                                       absl::Time deadline) {
+                                       abslx::Time deadline) {
   ABSL_TSAN_MUTEX_PRE_LOCK(this, __tsan_mutex_read_lock);
   GraphId id = DebugOnlyDeadlockCheck(this);
   bool res = LockSlowWithDeadline(kShared, &cond, KernelTimeout(deadline), 0);
@@ -1556,11 +1556,11 @@ void Mutex::Await(const Condition &cond) {
   }
 }
 
-bool Mutex::AwaitWithTimeout(const Condition &cond, absl::Duration timeout) {
+bool Mutex::AwaitWithTimeout(const Condition &cond, abslx::Duration timeout) {
   return AwaitWithDeadline(cond, DeadlineFromTimeout(timeout));
 }
 
-bool Mutex::AwaitWithDeadline(const Condition &cond, absl::Time deadline) {
+bool Mutex::AwaitWithDeadline(const Condition &cond, abslx::Time deadline) {
   if (cond.Eval()) {      // condition already true; nothing to do
     if (kDebugMode) {
       this->AssertReaderHeld();
@@ -2582,11 +2582,11 @@ bool CondVar::WaitCommon(Mutex *mutex, KernelTimeout t) {
   return rc;
 }
 
-bool CondVar::WaitWithTimeout(Mutex *mu, absl::Duration timeout) {
+bool CondVar::WaitWithTimeout(Mutex *mu, abslx::Duration timeout) {
   return WaitWithDeadline(mu, DeadlineFromTimeout(timeout));
 }
 
-bool CondVar::WaitWithDeadline(Mutex *mu, absl::Time deadline) {
+bool CondVar::WaitWithDeadline(Mutex *mu, abslx::Time deadline) {
   return WaitCommon(mu, KernelTimeout(deadline));
 }
 
@@ -2748,4 +2748,4 @@ bool Condition::GuaranteedEqual(const Condition *a, const Condition *b) {
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

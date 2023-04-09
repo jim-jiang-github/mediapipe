@@ -48,14 +48,14 @@ class GpuLayoutAssignment : public LayoutAssignment {
 
   Status SetOperandBatchRowsColsLayout(const HloInstruction* instruction,
                                        int64_t operand,
-                                       absl::Span<const int64_t> batch_dims,
-                                       absl::Span<const int64_t> row_dims,
-                                       absl::Span<const int64_t> col_dims);
+                                       abslx::Span<const int64_t> batch_dims,
+                                       abslx::Span<const int64_t> row_dims,
+                                       abslx::Span<const int64_t> col_dims);
 
   Status SetDotOperandLayout(const HloInstruction* instruction, int64_t operand,
-                             absl::Span<const int64_t> batch_dims,
-                             absl::Span<const int64_t> row_dims,
-                             absl::Span<const int64_t> col_dims);
+                             abslx::Span<const int64_t> batch_dims,
+                             abslx::Span<const int64_t> row_dims,
+                             abslx::Span<const int64_t> col_dims);
 
   Status SetDotLayout(const HloInstruction* instruction,
                       LayoutConstraints* constraints);

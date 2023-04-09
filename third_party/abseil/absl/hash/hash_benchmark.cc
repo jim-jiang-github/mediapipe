@@ -28,7 +28,7 @@
 
 namespace {
 
-using absl::Hash;
+using abslx::Hash;
 
 template <template <typename> class H, typename T>
 void RunBenchmark(benchmark::State& state, T value) {
@@ -42,7 +42,7 @@ void RunBenchmark(benchmark::State& state, T value) {
 }  // namespace
 
 template <typename T>
-using AbslHash = absl::Hash<T>;
+using AbslHash = abslx::Hash<T>;
 
 class TypeErasedInterface {
  public:
@@ -51,12 +51,12 @@ class TypeErasedInterface {
   template <typename H>
   friend H AbslHashValue(H state, const TypeErasedInterface& wrapper) {
     state = H::combine(std::move(state), std::type_index(typeid(wrapper)));
-    wrapper.HashValue(absl::HashState::Create(&state));
+    wrapper.HashValue(abslx::HashState::Create(&state));
     return state;
   }
 
  private:
-  virtual void HashValue(absl::HashState state) const = 0;
+  virtual void HashValue(abslx::HashState state) const = 0;
 };
 
 template <typename T>
@@ -66,15 +66,15 @@ struct TypeErasedAbslHash {
     explicit Wrapper(const T& value) : value_(value) {}
 
    private:
-    void HashValue(absl::HashState state) const override {
-      absl::HashState::combine(std::move(state), value_);
+    void HashValue(abslx::HashState state) const override {
+      abslx::HashState::combine(std::move(state), value_);
     }
 
     const T& value_;
   };
 
   size_t operator()(const T& value) {
-    return absl::Hash<Wrapper>{}(Wrapper(value));
+    return abslx::Hash<Wrapper>{}(Wrapper(value));
   }
 };
 
@@ -84,13 +84,13 @@ inline FuncType* ODRUseFunction(FuncType* ptr) {
   return dummy;
 }
 
-absl::Cord FlatCord(size_t size) {
-  absl::Cord result(std::string(size, 'a'));
+abslx::Cord FlatCord(size_t size) {
+  abslx::Cord result(std::string(size, 'a'));
   result.Flatten();
   return result;
 }
 
-absl::Cord FragmentedCord(size_t size) {
+abslx::Cord FragmentedCord(size_t size) {
   const size_t orig_size = size;
   std::vector<std::string> chunks;
   size_t chunk_size = std::max<size_t>(1, size / 10);
@@ -101,7 +101,7 @@ absl::Cord FragmentedCord(size_t size) {
   if (size > 0) {
     chunks.push_back(std::string(size, 'a'));
   }
-  absl::Cord result = absl::MakeFragmentedCord(chunks);
+  abslx::Cord result = abslx::MakeFragmentedCord(chunks);
   (void) orig_size;
   assert(result.size() == orig_size);
   return result;
@@ -137,7 +137,7 @@ MAKE_BENCHMARK(AbslHash, String_30, std::string(30, 'a'));
 MAKE_BENCHMARK(AbslHash, String_90, std::string(90, 'a'));
 MAKE_BENCHMARK(AbslHash, String_200, std::string(200, 'a'));
 MAKE_BENCHMARK(AbslHash, String_5000, std::string(5000, 'a'));
-MAKE_BENCHMARK(AbslHash, Cord_Flat_0, absl::Cord());
+MAKE_BENCHMARK(AbslHash, Cord_Flat_0, abslx::Cord());
 MAKE_BENCHMARK(AbslHash, Cord_Flat_10, FlatCord(10));
 MAKE_BENCHMARK(AbslHash, Cord_Flat_30, FlatCord(30));
 MAKE_BENCHMARK(AbslHash, Cord_Flat_90, FlatCord(90));
@@ -198,10 +198,10 @@ namespace {
 static constexpr size_t kEntropySize = 16 << 10;
 static char entropy[kEntropySize + 1024];
 ABSL_ATTRIBUTE_UNUSED static const bool kInitialized = [] {
-  absl::BitGen gen;
+  abslx::BitGen gen;
   static_assert(sizeof(entropy) % sizeof(uint64_t) == 0, "");
   for (int i = 0; i != sizeof(entropy); i += sizeof(uint64_t)) {
-    auto rand = absl::Uniform<uint64_t>(gen);
+    auto rand = abslx::Uniform<uint64_t>(gen);
     memcpy(&entropy[i], &rand, sizeof(uint64_t));
   }
   return true;
@@ -224,7 +224,7 @@ template <size_t N>
 struct StringRand {
   static_assert(kEntropySize + N < sizeof(entropy), "");
 
-  absl::string_view Get(size_t i) const {
+  abslx::string_view Get(size_t i) const {
     // This has a small bias towards small numbers. Because max N is ~200 this
     // is very small and prefer to be very fast instead of absolutely accurate.
     // Also we pass N = 2^K+1 so that mod reduces to a bitand.

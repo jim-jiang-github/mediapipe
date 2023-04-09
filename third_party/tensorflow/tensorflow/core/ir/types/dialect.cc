@@ -872,7 +872,7 @@ Attribute TensorProtoAttr::parse(AsmParser &parser, Type type) {
     return nullptr;
   }
 
-  std::string bytes_data = absl::HexStringToBytes(data.substr(2));
+  std::string bytes_data = abslx::HexStringToBytes(data.substr(2));
   return TensorProtoAttr::get(type, bytes_data);
 }
 

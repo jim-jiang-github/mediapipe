@@ -223,7 +223,7 @@ struct MotionVectorFrame {
 
   // Stores the tracked ids that have been discarded actively. This information
   // will be used to avoid misjudgement on tracking continuity.
-  absl::flat_hash_set<int>* actively_discarded_tracked_ids = nullptr;
+  abslx::flat_hash_set<int>* actively_discarded_tracked_ids = nullptr;
 };
 
 // Transforms TrackingData to MotionVectorFrame, ready to be used by tracking

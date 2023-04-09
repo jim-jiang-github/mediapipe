@@ -137,7 +137,7 @@ static double ConvertAPFloat(llvm::APFloat value) {
 
 static inline bool Convertbool(bool value) { return value; }
 
-static absl::string_view ConvertStringRef(mlir::StringRef value) {
+static abslx::string_view ConvertStringRef(mlir::StringRef value) {
   return {value.data(), value.size()};
 }
 
@@ -247,7 +247,7 @@ static xla::Layout ExtractLayout(
 static xla::Shape ExtractXlaShape(mlir::Operation* op) {
   if (auto attr = op->getAttrOfType<mlir::StringAttr>(kDefaultLayoutAttrName)) {
     return *xla::ParseShape(
-        absl::string_view(attr.getValue().data(), attr.getValue().size()));
+        abslx::string_view(attr.getValue().data(), attr.getValue().size()));
   } else {
     std::vector<xla::Shape> subshapes;
     for (mlir::Value result : op->getResults()) {
@@ -1685,7 +1685,7 @@ LogicalResult ExportXlaOp(FusionOp op, OpLoweringContext ctx) {
       mlir::mhlo::stringifyFusionKind(op.fusion_kind().getValue());
   xla::XlaOp fusion = xla::internal::XlaBuilderFriend::BuildFusion(
       ctx.builder, operands,
-      absl::string_view(fusion_kind_string.data(), fusion_kind_string.size()),
+      abslx::string_view(fusion_kind_string.data(), fusion_kind_string.size()),
       fused_computation);
   if (op.getNumResults() == 1) {
     values[op.getResult(0)] = fusion;
@@ -1800,7 +1800,7 @@ StatusOr<xla::Literal> CreateArrayLiteralFromAttr(ElementsAttr attr,
     ELEMENTS_ATTR_TO_LITERAL(xla::PrimitiveType::F16, Eigen::half)
     ELEMENTS_ATTR_TO_LITERAL(xla::PrimitiveType::BF16, Eigen::bfloat16)
     default:
-      return tensorflow::errors::Internal(absl::StrCat(
+      return tensorflow::errors::Internal(abslx::StrCat(
           "Unsupported type: ", xla::PrimitiveType_Name(shape.element_type())));
   }
 #undef ELEMENTS_ATTR_TO_LITERAL
@@ -2463,10 +2463,10 @@ LogicalResult ConvertToHloModule::LowerBasicBlockAsFunction(
         }
         if (entry_args_same_across_replicas.empty()) {
           lowering[arg] =
-              xla::Parameter(builder, num, shape, absl::StrCat("Arg_", num));
+              xla::Parameter(builder, num, shape, abslx::StrCat("Arg_", num));
         } else {
           lowering[arg] = xla::Parameter(
-              builder, num, shape, absl::StrCat("Arg_", num),
+              builder, num, shape, abslx::StrCat("Arg_", num),
               std::vector<bool>(entry_args_same_across_replicas[num],
                                 xla::ShapeUtil::GetLeafCount(shape)));
         }
@@ -2498,7 +2498,7 @@ LogicalResult ConvertToHloModule::LowerRegionAsComputation(
     llvm::Optional<llvm::ArrayRef<mlir::Value>> implicit_operands,
     bool ensure_single_arg) {
   std::unique_ptr<xla::XlaBuilder> builder =
-      module_builder_.CreateSubBuilder(absl::StrCat("region_", region_id_++));
+      module_builder_.CreateSubBuilder(abslx::StrCat("region_", region_id_++));
   return LowerBasicBlockAsFunction(&region->front(), builder.get(),
                                    /*is_entry_function=*/false,
                                    /*ensure_single_arg*/ ensure_single_arg,

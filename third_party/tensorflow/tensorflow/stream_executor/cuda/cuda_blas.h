@@ -133,7 +133,7 @@ class CUDABlas : public blas::BlasSupport {
                                    blas::ProfileResult *output_profile_result);
 
   // Guards the cuBLAS handle for this device.
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
 
   // GpuExecutor which instantiated this CUDABlas.
   // Immutable post-initialization.

@@ -28,7 +28,7 @@ namespace xla {
 // implemented using custom call to cuDNN, which only supports FP and S8 inputs.
 class ConvolutionPredExpander : public OpExpanderPass {
  public:
-  absl::string_view name() const override {
+  abslx::string_view name() const override {
     return "convolution-pred-expander";
   }
 

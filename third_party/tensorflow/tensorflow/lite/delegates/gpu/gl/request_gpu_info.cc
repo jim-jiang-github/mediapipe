@@ -28,7 +28,7 @@ namespace tflite {
 namespace gpu {
 namespace gl {
 
-absl::Status RequestOpenGlInfo(OpenGlInfo* gl_info) {
+abslx::Status RequestOpenGlInfo(OpenGlInfo* gl_info) {
   const GLubyte* renderer_name = glGetString(GL_RENDERER);
   if (renderer_name) {
     gl_info->renderer_name = reinterpret_cast<const char*>(renderer_name);
@@ -47,10 +47,10 @@ absl::Status RequestOpenGlInfo(OpenGlInfo* gl_info) {
   glGetIntegerv(GL_MAJOR_VERSION, &gl_info->major_version);
   glGetIntegerv(GL_MINOR_VERSION, &gl_info->minor_version);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RequestGpuInfo(GpuInfo* gpu_info) {
+abslx::Status RequestGpuInfo(GpuInfo* gpu_info) {
   GpuInfo info;
   RETURN_IF_ERROR(RequestOpenGlInfo(&info.opengl_info));
 
@@ -98,7 +98,7 @@ absl::Status RequestGpuInfo(GpuInfo* gpu_info) {
       std::min(max_color_atttachments, max_draw_buffers);
   RETURN_IF_ERROR(GetOpenGlErrors());
   *gpu_info = info;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gl

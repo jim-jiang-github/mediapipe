@@ -40,7 +40,7 @@ class TransposerFactory {
     return transposer;
   }
 
-  absl::flat_hash_map<string, std::shared_ptr<Transposer>> transposer_map_;
+  abslx::flat_hash_map<string, std::shared_ptr<Transposer>> transposer_map_;
 };
 
 }  // end namespace grappler

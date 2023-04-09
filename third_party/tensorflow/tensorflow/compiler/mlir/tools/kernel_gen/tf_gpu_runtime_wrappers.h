@@ -53,7 +53,7 @@ class GPURuntimeCache : public tensorflow::ResourceBase {
 
  private:
   tensorflow::mutex mu_;
-  absl::flat_hash_map<void*, GPUModule> gpu_module_by_data_ptr_
+  abslx::flat_hash_map<void*, GPUModule> gpu_module_by_data_ptr_
       TF_GUARDED_BY(mu_);
 };
 

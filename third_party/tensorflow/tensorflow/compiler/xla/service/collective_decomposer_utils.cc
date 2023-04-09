@@ -33,7 +33,7 @@ namespace xla {
 StatusOr<std::vector<HloInstruction *>>
 CreateStartIndicesForCollectiveDecomposition(
     CollectiveOpGroupMode group_mode,
-    absl::Span<const ReplicaGroup> replica_groups, const Shape &shard_shape,
+    abslx::Span<const ReplicaGroup> replica_groups, const Shape &shard_shape,
     int64_t shard_dimension, HloComputation *computation,
     std::function<void(Shape &)> update_layout) {
   HloInstruction *zero = computation->AddInstruction(
@@ -91,7 +91,7 @@ CreateStartIndicesForCollectiveDecomposition(
       break;
   }
 
-  auto is_trivial_group = [](absl::Span<const ReplicaGroup> replica_groups) {
+  auto is_trivial_group = [](abslx::Span<const ReplicaGroup> replica_groups) {
     if (replica_groups.empty()) {
       return true;
     }

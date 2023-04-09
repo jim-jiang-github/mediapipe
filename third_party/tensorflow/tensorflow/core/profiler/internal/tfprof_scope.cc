@@ -79,7 +79,7 @@ void TFScope::Build() {
 const ShowNode* TFScope::ShowInternal(const Options& opts, Timeline* timeline) {
   root_->ResetTotalStats();
   if (opts.output_type == kOutput[3]) {
-    absl::FPrintF(stderr, "Only 'code' view supports pprof output now.\n");
+    abslx::FPrintF(stderr, "Only 'code' view supports pprof output now.\n");
     return root_;
   }
 
@@ -170,7 +170,7 @@ std::vector<ScopeNode*> TFScope::PrintScope(const std::vector<ScopeNode*> roots,
         }
       }
 
-      node->formatted_str = absl::StrFormat(
+      node->formatted_str = abslx::StrFormat(
           "%s%s\n", std::string(last_ident, ' '), FormatNode(node, opts));
 
       if (opts.select.find(kShown[4]) != opts.select.end()) {

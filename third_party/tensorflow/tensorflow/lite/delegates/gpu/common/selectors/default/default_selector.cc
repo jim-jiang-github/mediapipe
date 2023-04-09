@@ -26,12 +26,12 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status SelectDefault(const GpuInfo& gpu_info, const OperationDef& op_def,
+abslx::Status SelectDefault(const GpuInfo& gpu_info, const OperationDef& op_def,
                            ModelHints hints, const std::vector<Value*>& inputs,
                            const std::vector<Value*>& outputs, const Node& node,
                            GPUOperationsSubgraph* gpu_subgraph) {
-  return absl::UnimplementedError(
-      absl::StrCat("No selector for ", node.operation.type));
+  return abslx::UnimplementedError(
+      abslx::StrCat("No selector for ", node.operation.type));
 }
 
 }  // namespace gpu

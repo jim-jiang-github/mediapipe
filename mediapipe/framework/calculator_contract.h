@@ -49,10 +49,10 @@ namespace mediapipe {
 //
 class CalculatorContract {
  public:
-  absl::Status Initialize(const CalculatorGraphConfig::Node& node);
-  absl::Status Initialize(const PacketGeneratorConfig& node,
+  abslx::Status Initialize(const CalculatorGraphConfig::Node& node);
+  abslx::Status Initialize(const PacketGeneratorConfig& node,
                           const std::string& package);
-  absl::Status Initialize(const StatusHandlerConfig& node);
+  abslx::Status Initialize(const StatusHandlerConfig& node);
   void SetNodeName(const std::string& node_name) { node_name_ = node_name; }
 
   // Returns the options given to this node.
@@ -161,7 +161,7 @@ class CalculatorContract {
   // A GraphService's key is always a static constant, so we can use string_view
   // as the key type without lifetime issues.
   using ServiceReqMap =
-      absl::flat_hash_map<absl::string_view, GraphServiceRequest>;
+      abslx::flat_hash_map<abslx::string_view, GraphServiceRequest>;
 
   const ServiceReqMap& ServiceRequests() const { return service_requests_; }
 

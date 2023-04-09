@@ -51,16 +51,16 @@ class Texture2D : public GPUObject {
   // Writes data to a texture. Data should point to a region that
   // has exact width * height * sizeof(pixel) bytes.
   template <typename T>
-  absl::Status WriteData(CLCommandQueue* queue, const absl::Span<T> data);
+  abslx::Status WriteData(CLCommandQueue* queue, const abslx::Span<T> data);
 
   // Reads data from Texture2D into CPU memory.
   template <typename T>
-  absl::Status ReadData(CLCommandQueue* queue, std::vector<T>* result) const;
+  abslx::Status ReadData(CLCommandQueue* queue, std::vector<T>* result) const;
 
-  absl::Status GetGPUResources(const GPUObjectDescriptor* obj_ptr,
+  abslx::Status GetGPUResources(const GPUObjectDescriptor* obj_ptr,
                                GPUResourcesWithValue* resources) const override;
 
-  absl::Status CreateFromTexture2DDescriptor(const Texture2DDescriptor& desc,
+  abslx::Status CreateFromTexture2DDescriptor(const Texture2DDescriptor& desc,
                                              CLContext* context);
 
  private:
@@ -75,45 +75,45 @@ class Texture2D : public GPUObject {
 using Texture2DPtr = std::shared_ptr<Texture2D>;
 
 // Creates new 4-channel 2D texture with f32 elements
-absl::Status CreateTexture2DRGBA32F(int width, int height, CLContext* context,
+abslx::Status CreateTexture2DRGBA32F(int width, int height, CLContext* context,
                                     Texture2D* result);
 
 // Creates new 4-channel 2D texture with f16 elements
-absl::Status CreateTexture2DRGBA16F(int width, int height, CLContext* context,
+abslx::Status CreateTexture2DRGBA16F(int width, int height, CLContext* context,
                                     Texture2D* result);
 
-absl::Status CreateTexture2DRGBA(DataType type, int width, int height,
+abslx::Status CreateTexture2DRGBA(DataType type, int width, int height,
                                  CLContext* context, Texture2D* result);
 
-absl::Status CreateTexture2DRGBA(DataType type, int width, int height,
+abslx::Status CreateTexture2DRGBA(DataType type, int width, int height,
                                  void* data, CLContext* context,
                                  Texture2D* result);
 
 template <typename T>
-absl::Status Texture2D::WriteData(CLCommandQueue* queue,
-                                  const absl::Span<T> data) {
+abslx::Status Texture2D::WriteData(CLCommandQueue* queue,
+                                  const abslx::Span<T> data) {
   const int element_size = ChannelTypeToSizeInBytes(channel_type_);
   if (sizeof(T) % element_size != 0) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "Template type T has not suitable element type for created texture.");
   }
   if (4 * width_ * height_ * element_size != data.size() * sizeof(T)) {
-    return absl::InvalidArgumentError(
-        "absl::Span<T> data size is different from texture allocated size.");
+    return abslx::InvalidArgumentError(
+        "abslx::Span<T> data size is different from texture allocated size.");
   }
 
   RETURN_IF_ERROR(queue->EnqueueWriteImage(texture_, int3(width_, height_, 1),
                                            data.data()));
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <typename T>
-absl::Status Texture2D::ReadData(CLCommandQueue* queue,
+abslx::Status Texture2D::ReadData(CLCommandQueue* queue,
                                  std::vector<T>* result) const {
   const int element_size = ChannelTypeToSizeInBytes(channel_type_);
   if (sizeof(T) != element_size) {
-    return absl::InvalidArgumentError("Pixel format is different.");
+    return abslx::InvalidArgumentError("Pixel format is different.");
   }
 
   const int elements_count = width_ * height_ * 4;

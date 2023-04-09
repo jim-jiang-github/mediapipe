@@ -28,18 +28,18 @@ namespace mediapipe {
 using DistanceEstimationMode =
     mediapipe::RelativeVelocityFilter::DistanceEstimationMode;
 
-absl::Duration DurationFromNanos(int64_t nanos) {
-  return absl::FromChrono(std::chrono::nanoseconds{nanos});
+abslx::Duration DurationFromNanos(int64_t nanos) {
+  return abslx::FromChrono(std::chrono::nanoseconds{nanos});
 }
 
-absl::Duration DurationFromMillis(int64_t millis) {
-  return absl::FromChrono(std::chrono::milliseconds{millis});
+abslx::Duration DurationFromMillis(int64_t millis) {
+  return abslx::FromChrono(std::chrono::milliseconds{millis});
 }
 
 TEST(RelativeVelocityFilterTest, ApplyIncorrectTimestamp) {
-  auto filter = absl::make_unique<RelativeVelocityFilter>(1, 1.0);
+  auto filter = abslx::make_unique<RelativeVelocityFilter>(1, 1.0);
 
-  absl::Duration timestamp1 = DurationFromNanos(1);
+  abslx::Duration timestamp1 = DurationFromNanos(1);
 
   EXPECT_FLOAT_EQ(95.5f, filter->Apply(timestamp1, 0.5f, 95.5f));
   EXPECT_FLOAT_EQ(200.5f, filter->Apply(timestamp1, 0.5f, 200.5f));
@@ -53,11 +53,11 @@ void TestSameValueScaleDifferentVelocityScales(
   // Changing the distance estimation mode has no effect with constant scales.
 
   // More sensitive filter.
-  auto filter1 = absl::make_unique<RelativeVelocityFilter>(
+  auto filter1 = abslx::make_unique<RelativeVelocityFilter>(
       /*window_size=*/5, /*velocity_scale=*/45.0f,
       /*distance_mode=*/distance_mode);
   // Less sensitive filter.
-  auto filter2 = absl::make_unique<RelativeVelocityFilter>(
+  auto filter2 = abslx::make_unique<RelativeVelocityFilter>(
       /*window_size=*/5, /*velocity_scale=*/0.1f,
       /*distance_mode=*/distance_mode);
 
@@ -116,10 +116,10 @@ TEST(RelativeVelocityFilterTest,
 void TestDifferentConstantValueScalesSameVelocityScale(
     DistanceEstimationMode distance_mode) {
   const float same_velocity_scale = 1.0f;
-  auto filter1 = absl::make_unique<RelativeVelocityFilter>(
+  auto filter1 = abslx::make_unique<RelativeVelocityFilter>(
       /*window_size=*/3, /*velocity_scale=*/same_velocity_scale,
       /*distance_mode=*/distance_mode);
-  auto filter2 = absl::make_unique<RelativeVelocityFilter>(
+  auto filter2 = abslx::make_unique<RelativeVelocityFilter>(
       /*window_size=*/3, /*velocity_scale=*/same_velocity_scale,
       /*distance_mode=*/distance_mode);
 
@@ -193,7 +193,7 @@ void TestTranslationInvariance(DistanceEstimationMode distance_mode) {
   const float kValueOffset = 100.0f;
 
   // The uniform time delta.
-  const absl::Duration time_delta = DurationFromMillis(1);
+  const abslx::Duration time_delta = DurationFromMillis(1);
 
   // The filter parameters are the same between the two filters.
   const size_t kWindowSize = 5;
@@ -205,10 +205,10 @@ void TestTranslationInvariance(DistanceEstimationMode distance_mode) {
     point.value += kValueOffset;
   }
 
-  auto original_points_filter = absl::make_unique<RelativeVelocityFilter>(
+  auto original_points_filter = abslx::make_unique<RelativeVelocityFilter>(
       /*window_size=*/kWindowSize, /*velocity_scale=*/kVelocityScale,
       /*distance_mode=*/distance_mode);
-  auto translated_points_filter = absl::make_unique<RelativeVelocityFilter>(
+  auto translated_points_filter = abslx::make_unique<RelativeVelocityFilter>(
       /*window_size=*/kWindowSize, /*velocity_scale=*/kVelocityScale,
       /*distance_mode=*/distance_mode);
 
@@ -233,7 +233,7 @@ void TestTranslationInvariance(DistanceEstimationMode distance_mode) {
 
   size_t times_diverged = 0;
   size_t times_largely_diverged = 0;
-  absl::Duration timestamp;
+  abslx::Duration timestamp;
   for (size_t iteration = 0; iteration < original_data_points.size();
        ++iteration, timestamp += time_delta) {
     const ValueAtScale& original_data_point = original_data_points[iteration];

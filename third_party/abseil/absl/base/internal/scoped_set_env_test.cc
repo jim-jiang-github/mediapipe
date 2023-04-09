@@ -21,7 +21,7 @@
 
 namespace {
 
-using absl::base_internal::ScopedSetEnv;
+using abslx::base_internal::ScopedSetEnv;
 
 std::string GetEnvVar(const char* name) {
 #ifdef _WIN32

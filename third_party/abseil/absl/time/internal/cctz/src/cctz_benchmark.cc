@@ -27,7 +27,7 @@
 
 namespace {
 
-namespace cctz = absl::time_internal::cctz;
+namespace cctz = abslx::time_internal::cctz;
 
 void BM_Difference_Days(benchmark::State& state) {
   const cctz::civil_day c(2014, 8, 22);

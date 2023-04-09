@@ -69,7 +69,7 @@ double CalculateBytesReadByFusionParameter(HloInstruction* param) {
   // Slice for a more accurate estimate of bytes read.
   double bytes = 0.0;
   for (auto& instruction : instructions) {
-    if (absl::c_all_of(
+    if (abslx::c_all_of(
             instruction->users(), [](const HloInstruction* instruction) {
               return instruction->opcode() == HloOpcode::kSlice ||
                      instruction->opcode() == HloOpcode::kDynamicSlice;
@@ -172,7 +172,7 @@ Status FusionInstructionMerger::FuseIntoAllUsers(HloInstruction* instruction) {
     if (dump_fusion_visualization_) {
       RegisterFusionState(
           *computation_,
-          absl::StrCat("About to fuse |", instruction->name(), "| into |",
+          abslx::StrCat("About to fuse |", instruction->name(), "| into |",
                        user->name(), "| inside FusionMerger"),
           /*consumer=*/*user,
           /*producer=*/instruction);
@@ -189,7 +189,7 @@ Status FusionInstructionMerger::FuseIntoAllUsers(HloInstruction* instruction) {
     if (dump_fusion_visualization_) {
       RegisterFusionState(
           *computation_,
-          absl::StrCat("Fused |", instruction->name(), "| into |", user->name(),
+          abslx::StrCat("Fused |", instruction->name(), "| into |", user->name(),
                        "| inside FusionMerger"),
           *consumer);
     }
@@ -200,9 +200,9 @@ Status FusionInstructionMerger::FuseIntoAllUsers(HloInstruction* instruction) {
   TF_RETURN_IF_ERROR(computation_->RemoveInstruction(instruction));
   VLOG(2) << "Merged fusion instruction: " << instruction->name()
           << " into users { "
-          << absl::StrJoin(users, ", ",
+          << abslx::StrJoin(users, ", ",
                            [](std::string* out, HloInstruction* user) {
-                             absl::StrAppend(out, user->name());
+                             abslx::StrAppend(out, user->name());
                            })
           << " }";
   return OkStatus();
@@ -218,7 +218,7 @@ Status FusionInstructionMerger::Run() {
         if (dump_fusion_visualization_ && !instruction->users().empty()) {
           RegisterFusionState(
               *computation_,
-              absl::StrCat(
+              abslx::StrCat(
                   "Not fusing fusion |", instruction->name(),
                   "| into all of its users due to: ", was_fused.Explain()),
               // Just pick any consumer, since we are trying to merge into all.
@@ -305,7 +305,7 @@ FusionDecision FusionInstructionMerger::HandleFusion(HloInstruction* fusion) {
   bool allow_expensive_ops =
       (fusion->user_count() == 1 || (merged_to_current_bytes_ratio < 0.3 &&
                                      current_bytes_transferred > 1024)) &&
-      !absl::c_any_of(fusion->users(), [fusion](const HloInstruction* user) {
+      !abslx::c_any_of(fusion->users(), [fusion](const HloInstruction* user) {
         int64_t operand_index = user->operand_index(fusion);
         return user->ReusesOperandElements(operand_index);
       });
@@ -349,7 +349,7 @@ FusionDecision FusionInstructionMerger::HandleFusion(HloInstruction* fusion) {
 
 StatusOr<bool> FusionMerger::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   VLOG(2) << "FusionMerger for module: " << module->name();
   for (auto* computation :

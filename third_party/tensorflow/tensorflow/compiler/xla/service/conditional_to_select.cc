@@ -68,7 +68,7 @@ static StatusOr<bool> DoConditionalToSelect(HloInstruction* conditional) {
 
 StatusOr<bool> ConditionalToSelect::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   std::unique_ptr<CallGraph> call_graph = CallGraph::Build(module);
   bool did_mutate = false;
   VLOG(1) << "Running conditional-to-select pass";

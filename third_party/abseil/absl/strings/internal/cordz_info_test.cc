@@ -26,7 +26,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/types/span.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 namespace {
@@ -52,13 +52,13 @@ std::vector<const CordzHandle*> DeleteQueue() {
   return CordzHandle::DiagnosticsGetDeleteQueue();
 }
 
-std::string FormatStack(absl::Span<void* const> raw_stack) {
+std::string FormatStack(abslx::Span<void* const> raw_stack) {
   static constexpr size_t buf_size = 1 << 14;
   std::unique_ptr<char[]> buf(new char[buf_size]);
   std::string output;
   for (void* stackp : raw_stack) {
-    if (absl::Symbolize(stackp, buf.get(), buf_size)) {
-      absl::StrAppend(&output, "    ", buf.get(), "\n");
+    if (abslx::Symbolize(stackp, buf.get(), buf_size)) {
+      abslx::StrAppend(&output, "    ", buf.get(), "\n");
     }
   }
   return output;
@@ -91,7 +91,7 @@ TEST(CordzInfoTest, SetCordRep) {
 
   TestCordRep rep2;
   {
-    absl::MutexLock lock(&info->mutex());
+    abslx::MutexLock lock(&info->mutex());
     info->SetCordRep(rep2.rep);
   }
   EXPECT_THAT(info->GetCordRepForTesting(), Eq(rep2.rep));
@@ -171,11 +171,11 @@ TEST(CordzInfoTest, StackV2) {
   std::vector<void*> local_stack;
   local_stack.resize(kMaxStackDepth);
   // In some environments we don't get stack traces. For example in Android
-  // absl::GetStackTrace will return 0 indicating it didn't find any stack. The
+  // abslx::GetStackTrace will return 0 indicating it didn't find any stack. The
   // resultant formatted stack will be "", but that still equals the stack
   // recorded in CordzInfo, which is also empty. The skip_count is 1 so that the
   // line number of the current stack isn't included in the HasSubstr check.
-  local_stack.resize(absl::GetStackTrace(local_stack.data(), kMaxStackDepth,
+  local_stack.resize(abslx::GetStackTrace(local_stack.data(), kMaxStackDepth,
                                          /*skip_count=*/1));
 
   std::string got_stack = FormatStack(info->GetStack());
@@ -234,4 +234,4 @@ TEST(CordzInfoTest, CordzStatisticsV2) {
 }  // namespace
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

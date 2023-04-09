@@ -59,7 +59,7 @@ int64_t CreatePacketWithContext(jlong context,
 }
 
 #if !MEDIAPIPE_DISABLE_GPU
-absl::StatusOr<mediapipe::GpuBuffer> CreateGpuBuffer(
+abslx::StatusOr<mediapipe::GpuBuffer> CreateGpuBuffer(
     JNIEnv* env, jobject thiz, jlong context, jint name, jint width,
     jint height, jobject texture_release_callback) {
   mediapipe::android::Graph* mediapipe_graph =
@@ -109,14 +109,14 @@ absl::StatusOr<mediapipe::GpuBuffer> CreateGpuBuffer(
 
 // Create a 1, 3, or 4 channel 8-bit ImageFrame shared pointer from a Java
 // ByteBuffer.
-absl::StatusOr<std::unique_ptr<mediapipe::ImageFrame>>
+abslx::StatusOr<std::unique_ptr<mediapipe::ImageFrame>>
 CreateImageFrameFromByteBuffer(JNIEnv* env, jobject byte_buffer, jint width,
                                jint height, jint width_step,
                                mediapipe::ImageFormat::Format format) {
   const int64_t buffer_size = env->GetDirectBufferCapacity(byte_buffer);
   const void* buffer_data = env->GetDirectBufferAddress(byte_buffer);
   if (buffer_data == nullptr || buffer_size < 0) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "Cannot get direct access to the input buffer. It should be created "
         "using allocateDirect.");
   }
@@ -166,13 +166,13 @@ JNIEXPORT jlong JNICALL PACKET_CREATOR_METHOD(nativeCreateRgbImage)(
   return CreatePacketWithContext(context, packet);
 }
 
-absl::StatusOr<std::unique_ptr<mediapipe::ImageFrame>> CreateRgbImageFromRgba(
+abslx::StatusOr<std::unique_ptr<mediapipe::ImageFrame>> CreateRgbImageFromRgba(
     JNIEnv* env, jobject byte_buffer, jint width, jint height) {
   const uint8_t* rgba_data =
       static_cast<uint8_t*>(env->GetDirectBufferAddress(byte_buffer));
   int64_t buffer_size = env->GetDirectBufferCapacity(byte_buffer);
   if (rgba_data == nullptr || buffer_size < 0) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "Cannot get direct access to the input buffer. It should be created "
         "using allocateDirect.");
   }
@@ -182,7 +182,7 @@ absl::StatusOr<std::unique_ptr<mediapipe::ImageFrame>> CreateRgbImageFromRgba(
       << "Input buffer size should be " << expected_buffer_size
       << " but is: " << buffer_size;
 
-  auto image_frame = absl::make_unique<mediapipe::ImageFrame>(
+  auto image_frame = abslx::make_unique<mediapipe::ImageFrame>(
       mediapipe::ImageFormat::SRGB, width, height,
       mediapipe::ImageFrame::kGlDefaultAlignmentBoundary);
   mediapipe::android::RgbaToRgb(rgba_data, width * 4, width, height,
@@ -276,7 +276,7 @@ JNIEXPORT jlong JNICALL PACKET_CREATOR_METHOD(nativeCreateAudioPacketDirect)(
   const uint8_t* audio_sample =
       reinterpret_cast<uint8_t*>(env->GetDirectBufferAddress(data));
   if (!audio_sample) {
-    ThrowIfError(env, absl::InvalidArgumentError(
+    ThrowIfError(env, abslx::InvalidArgumentError(
                           "Cannot get direct access to the input buffer. It "
                           "should be created using allocateDirect."));
     return 0L;
@@ -351,7 +351,7 @@ JNIEXPORT jlong JNICALL PACKET_CREATOR_METHOD(nativeCreateMatrix)(
     jfloatArray data) {
   if (env->GetArrayLength(data) != rows * cols) {
     ThrowIfError(
-        env, absl::InvalidArgumentError(absl::StrCat(
+        env, abslx::InvalidArgumentError(abslx::StrCat(
                  "Please check the matrix data size, has to be rows * cols = ",
                  rows * cols)));
     return 0L;
@@ -384,7 +384,7 @@ JNIEXPORT jlong JNICALL PACKET_CREATOR_METHOD(nativeCreateCpuImage)(
       format = mediapipe::ImageFormat::GRAY8;
       break;
     default:
-      ThrowIfError(env, absl::InvalidArgumentError(absl::StrCat(
+      ThrowIfError(env, abslx::InvalidArgumentError(abslx::StrCat(
                             "Channels must be either 1, 3, or 4, but are ",
                             num_channels)));
       return 0L;
@@ -457,7 +457,7 @@ JNIEXPORT jlong JNICALL PACKET_CREATOR_METHOD(nativeCreateFloat32Vector)(
   // floats), but on all architectures we care about this is a float.
   static_assert(std::is_same<float, jfloat>::value, "jfloat must be float");
   std::unique_ptr<std::vector<float>> floats =
-      absl::make_unique<std::vector<float>>(data_ref, data_ref + count);
+      abslx::make_unique<std::vector<float>>(data_ref, data_ref + count);
 
   env->ReleaseFloatArrayElements(data, data_ref, JNI_ABORT);
   mediapipe::Packet packet = mediapipe::Adopt(floats.release());
@@ -494,9 +494,9 @@ JNIEXPORT jlong JNICALL PACKET_CREATOR_METHOD(nativeCreateCalculatorOptions)(
     JNIEnv* env, jobject thiz, jlong context, jbyteArray data) {
   jsize count = env->GetArrayLength(data);
   jbyte* data_ref = env->GetByteArrayElements(data, nullptr);
-  auto options = absl::make_unique<mediapipe::CalculatorOptions>();
+  auto options = abslx::make_unique<mediapipe::CalculatorOptions>();
   if (!options->ParseFromArray(data_ref, count)) {
-    ThrowIfError(env, absl::InvalidArgumentError(absl::StrCat(
+    ThrowIfError(env, abslx::InvalidArgumentError(abslx::StrCat(
                           "Parsing binary-encoded CalculatorOptions failed.")));
     return 0L;
   }

@@ -30,7 +30,7 @@ namespace {
 // The signature contains namespaces (Ex: mlir::TFL::(anonymous namespace)::).
 // So only extract the function name as the pass name.
 inline std::string extract_pass_name(const std::string &signature) {
-  const std::vector<std::string> &v = absl::StrSplit(signature, "::");
+  const std::vector<std::string> &v = abslx::StrSplit(signature, "::");
   return v.back();
 }
 
@@ -40,8 +40,8 @@ inline std::string extract_pass_name(const std::string &signature) {
 inline std::string extract_op_name_from_error_message(
     const std::string &error_message) {
   int end_pos = error_message.find("' op");
-  if ((absl::StartsWith(error_message, "'tf.") ||
-       absl::StartsWith(error_message, "'tfl.")) &&
+  if ((abslx::StartsWith(error_message, "'tf.") ||
+       abslx::StartsWith(error_message, "'tfl.")) &&
       end_pos != std::string::npos) {
     return error_message.substr(1, end_pos - 1);
   }
@@ -103,7 +103,7 @@ void ErrorCollectorInstrumentation::runBeforePass(Pass *pass,
   // Find the op names with tf or tfl dialect prefix, Ex: "tf.Abs" or "tfl.Abs".
   auto collectOps = [this](Operation *op) {
     const auto &op_name = op->getName().getStringRef().str();
-    if (absl::StartsWith(op_name, "tf.") || absl::StartsWith(op_name, "tfl.")) {
+    if (abslx::StartsWith(op_name, "tf.") || abslx::StartsWith(op_name, "tfl.")) {
       loc_to_name_.emplace(op->getLoc(), op_name);
     }
   };

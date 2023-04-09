@@ -34,14 +34,14 @@ class HloCSE : public HloModulePass {
       : is_layout_sensitive_(is_layout_sensitive),
         only_fusion_computations_(only_fusion_computations) {}
   ~HloCSE() override = default;
-  absl::string_view name() const override { return "cse"; }
+  abslx::string_view name() const override { return "cse"; }
 
   // Run CSE on the given module. Returns whether the module was changed (common
   // subexpressions were found and eliminated).
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   const bool is_layout_sensitive_;

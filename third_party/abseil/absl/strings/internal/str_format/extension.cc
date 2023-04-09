@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <string>
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace str_format_internal {
 
@@ -34,11 +34,11 @@ std::string Flags::ToString() const {
 }
 
 #define ABSL_INTERNAL_X_VAL(id) \
-  constexpr absl::FormatConversionChar FormatConversionCharInternal::id;
+  constexpr abslx::FormatConversionChar FormatConversionCharInternal::id;
 ABSL_INTERNAL_CONVERSION_CHARS_EXPAND_(ABSL_INTERNAL_X_VAL, )
 #undef ABSL_INTERNAL_X_VAL
 // NOLINTNEXTLINE(readability-redundant-declaration)
-constexpr absl::FormatConversionChar FormatConversionCharInternal::kNone;
+constexpr abslx::FormatConversionChar FormatConversionCharInternal::kNone;
 
 #define ABSL_INTERNAL_CHAR_SET_CASE(c) \
   constexpr FormatConversionCharSet FormatConversionCharSetInternal::c;
@@ -72,4 +72,4 @@ bool FormatSinkImpl::PutPaddedString(string_view value, int width,
 
 }  // namespace str_format_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -138,7 +138,7 @@ class DirectoryListing {
 
 }  // namespace
 
-absl::Status GetContents(absl::string_view file_name, std::string* output,
+abslx::Status GetContents(abslx::string_view file_name, std::string* output,
                          bool read_as_binary) {
   FILE* fp = fopen(file_name.data(), read_as_binary ? "rb" : "r");
   if (fp == NULL) {
@@ -157,11 +157,11 @@ absl::Status GetContents(absl::string_view file_name, std::string* output,
     output->append(std::string(buf, ret));
   }
   fclose(fp);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SetContents(absl::string_view file_name,
-                         absl::string_view content) {
+abslx::Status SetContents(abslx::string_view file_name,
+                         abslx::string_view content) {
   FILE* fp = fopen(file_name.data(), "w");
   if (fp == NULL) {
     return mediapipe::InvalidArgumentErrorBuilder(MEDIAPIPE_LOC)
@@ -175,10 +175,10 @@ absl::Status SetContents(absl::string_view file_name,
            << "Error while writing file: " << file_name
            << ". Error message: " << strerror(write_error);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MatchInTopSubdirectories(const std::string& parent_directory,
+abslx::Status MatchInTopSubdirectories(const std::string& parent_directory,
                                       const std::string& file_name,
                                       std::vector<std::string>* results) {
   DirectoryListing parent_listing(parent_directory);
@@ -189,41 +189,41 @@ absl::Status MatchInTopSubdirectories(const std::string& parent_directory,
     DirectoryListing subdirectory_listing(subdirectory);
     while (subdirectory_listing.HasNextEntry()) {
       std::string next_entry = subdirectory_listing.NextEntry();
-      if (absl::EndsWith(next_entry, file_name)) {
+      if (abslx::EndsWith(next_entry, file_name)) {
         results->push_back(JoinPath(subdirectory, next_entry));
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MatchFileTypeInDirectory(const std::string& directory,
+abslx::Status MatchFileTypeInDirectory(const std::string& directory,
                                       const std::string& file_suffix,
                                       std::vector<std::string>* results) {
   DirectoryListing directory_listing(directory);
 
   while (directory_listing.HasNextEntry()) {
     std::string next_entry = directory_listing.NextEntry();
-    if (absl::EndsWith(next_entry, file_suffix)) {
+    if (abslx::EndsWith(next_entry, file_suffix)) {
       results->push_back(JoinPath(directory, next_entry));
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Exists(absl::string_view file_name) {
+abslx::Status Exists(abslx::string_view file_name) {
   struct stat buffer;
   int status;
   status = stat(std::string(file_name).c_str(), &buffer);
   if (status == 0) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   switch (errno) {
     case EACCES:
       return mediapipe::PermissionDeniedError("Insufficient permissions.");
     default:
-      return absl::NotFoundError("The path does not exist.");
+      return abslx::NotFoundError("The path does not exist.");
   }
 }
 
@@ -235,9 +235,9 @@ int mkdir(std::string path) {
 int mkdir(std::string path) { return _mkdir(path.c_str()); }
 #endif
 
-absl::Status RecursivelyCreateDir(absl::string_view path) {
+abslx::Status RecursivelyCreateDir(abslx::string_view path) {
   if (path.empty() || Exists(path).ok()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   auto split_path = file::SplitPath(path);
   MP_RETURN_IF_ERROR(RecursivelyCreateDir(split_path.first));
@@ -246,10 +246,10 @@ absl::Status RecursivelyCreateDir(absl::string_view path) {
       case EACCES:
         return mediapipe::PermissionDeniedError("Insufficient permissions.");
       default:
-        return absl::UnavailableError("Failed to create directory.");
+        return abslx::UnavailableError("Failed to create directory.");
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace file

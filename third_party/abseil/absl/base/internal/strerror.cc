@@ -24,7 +24,7 @@
 
 #include "absl/base/internal/errno_saver.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 namespace {
@@ -75,7 +75,7 @@ std::array<std::string, kSysNerr>* NewStrErrorTable() {
 }  // namespace
 
 std::string StrError(int errnum) {
-  absl::base_internal::ErrnoSaver errno_saver;
+  abslx::base_internal::ErrnoSaver errno_saver;
   static const auto* table = NewStrErrorTable();
   if (errnum >= 0 && errnum < static_cast<int>(table->size())) {
     return (*table)[errnum];
@@ -85,4 +85,4 @@ std::string StrError(int errnum) {
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

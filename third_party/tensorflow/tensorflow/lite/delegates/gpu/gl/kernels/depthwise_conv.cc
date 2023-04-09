@@ -39,10 +39,10 @@ namespace {
 
 class DepthwiseConvolution : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     if (ctx.input_shapes.size() != 1) {
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "DepthWise Convolution does not support more than 1 runtime tensor");
     }
     const auto& attr =
@@ -149,7 +149,7 @@ class DepthwiseConvolution : public NodeShader {
         /*input=*/IOStructure::ONLY_DEFINITIONS,
         /*output=*/IOStructure::AUTO,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

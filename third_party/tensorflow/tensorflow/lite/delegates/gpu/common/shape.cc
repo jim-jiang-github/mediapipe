@@ -128,8 +128,8 @@ bool HasAxis(Layout layout, Axis axis) {
 int Size(Layout layout) { return DispatchByLayout(layout, NumAxisFunc()); }
 
 std::string ToString(const Shape& s) {
-  return absl::StrCat("{", ToString(s.layout), ", {",
-                      absl::StrJoin(s.dimensions, ", "), "}}");
+  return abslx::StrCat("{", ToString(s.layout), ", {",
+                      abslx::StrJoin(s.dimensions, ", "), "}}");
 }
 
 }  // namespace gpu

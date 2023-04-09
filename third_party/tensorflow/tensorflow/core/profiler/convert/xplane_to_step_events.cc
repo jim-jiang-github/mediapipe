@@ -37,55 +37,55 @@ namespace tensorflow {
 namespace profiler {
 namespace {
 
-inline bool IsExplicitHostStepMarker(absl::string_view event_name) {
-  return (absl::StartsWith(event_name, "train") ||
-          absl::StartsWith(event_name, "test") ||
-          absl::StartsWith(event_name, "TraceContext")) &&
-         !absl::StrContains(event_name, "/");
+inline bool IsExplicitHostStepMarker(abslx::string_view event_name) {
+  return (abslx::StartsWith(event_name, "train") ||
+          abslx::StartsWith(event_name, "test") ||
+          abslx::StartsWith(event_name, "TraceContext")) &&
+         !abslx::StrContains(event_name, "/");
 }
 
 // Returns true if the given event_name should be considered as real computation
 // on CPU.
-inline bool IsRealCpuCompute(absl::string_view event_name) {
-  bool not_real = absl::StartsWith(event_name, "EagerExecute") ||
-                  absl::StartsWith(event_name, "EagerLocalExecute") ||
-                  absl::StartsWith(event_name, "EagerKernelExecute") ||
-                  absl::StartsWith(event_name, "FunctionRun") ||
+inline bool IsRealCpuCompute(abslx::string_view event_name) {
+  bool not_real = abslx::StartsWith(event_name, "EagerExecute") ||
+                  abslx::StartsWith(event_name, "EagerLocalExecute") ||
+                  abslx::StartsWith(event_name, "EagerKernelExecute") ||
+                  abslx::StartsWith(event_name, "FunctionRun") ||
                   IsExplicitHostStepMarker(event_name);
   return !not_real;
 }
 
-uint64 ParseNumBytesFromMemcpyDetail(absl::string_view memcpy_detail) {
-  const std::vector<absl::string_view> params =
-      absl::StrSplit(memcpy_detail, absl::ByAnyChar(":\n"));
+uint64 ParseNumBytesFromMemcpyDetail(abslx::string_view memcpy_detail) {
+  const std::vector<abslx::string_view> params =
+      abslx::StrSplit(memcpy_detail, abslx::ByAnyChar(":\n"));
 
   // Processes value pairs.
   for (uint32 ii = 0; ii < params.size(); ii += 2) {
     if (params[ii] != "num_bytes") continue;
     uint64 value = 0;
-    if (absl::SimpleAtoi(params[ii + 1], &value)) return value;
+    if (abslx::SimpleAtoi(params[ii + 1], &value)) return value;
     break;
   }
   return 0ULL;
 }
 
-EventType ClassifyGpuCompute(absl::string_view event_name,
-                             absl::string_view tensor_shapes) {
+EventType ClassifyGpuCompute(abslx::string_view event_name,
+                             abslx::string_view tensor_shapes) {
   if (tensor_shapes.empty()) {
     // Deduces the precision from the name.
-    return (absl::StrContains(event_name, "half") ||
-            absl::StrContains(event_name, "fp16"))
+    return (abslx::StrContains(event_name, "half") ||
+            abslx::StrContains(event_name, "fp16"))
                ? DEVICE_COMPUTE_16
                : DEVICE_COMPUTE_32;
   } else {
     // Deduces the precision from the shapes.
-    return (absl::StrContains(tensor_shapes, "half")) ? DEVICE_COMPUTE_16
+    return (abslx::StrContains(tensor_shapes, "half")) ? DEVICE_COMPUTE_16
                                                       : DEVICE_COMPUTE_32;
   }
 }
 
-EventType ClassifyGpuEvent(absl::string_view event_name,
-                           absl::string_view tensor_shapes) {
+EventType ClassifyGpuEvent(abslx::string_view event_name,
+                           abslx::string_view tensor_shapes) {
   TfOp tf_op = ParseTfOpFullname(event_name);
   if (IsMemcpyHToDOp(tf_op)) {
     return HOST_TO_DEVICE;
@@ -93,14 +93,14 @@ EventType ClassifyGpuEvent(absl::string_view event_name,
     return DEVICE_TO_HOST;
   } else if (IsMemcpyDToDOp(tf_op)) {
     return DEVICE_TO_DEVICE;
-  } else if (absl::StartsWithIgnoreCase(event_name, "nccl")) {
+  } else if (abslx::StartsWithIgnoreCase(event_name, "nccl")) {
     return DEVICE_COLLECTIVES;
   } else {
     return ClassifyGpuCompute(event_name, tensor_shapes);
   }
 }
 
-EventType ClassifyCpuEvent(absl::string_view event_name, bool has_device,
+EventType ClassifyCpuEvent(abslx::string_view event_name, bool has_device,
                            bool has_correlation_id) {
   TfOp tf_op = ParseTfOpFullname(event_name);
   if (IsInfeedEnqueueOp(tf_op) || IsMemcpyHToDOp(tf_op)) {
@@ -108,12 +108,12 @@ EventType ClassifyCpuEvent(absl::string_view event_name, bool has_device,
   } else if (IsMemcpyHToHOp(tf_op)) {
     return HOST_TO_HOST;
   } else if (has_device && (has_correlation_id ||
-                            absl::StartsWithIgnoreCase(
+                            abslx::StartsWithIgnoreCase(
                                 event_name, "ExecutorState::Process"))) {
     // TODO(b/150420972): Separate runtime overhead from actual compute for
     // CPU-only.
     return HOST_PREPARE;
-  } else if (absl::StartsWithIgnoreCase(event_name, "IteratorGetNext")) {
+  } else if (abslx::StartsWithIgnoreCase(event_name, "IteratorGetNext")) {
     return HOST_WAIT_INPUT;
   } else {
     return HOST_COMPUTE;
@@ -128,7 +128,7 @@ StepEvents ConvertHostThreadsXLineToStepEvents(
   line.ForEachEvent([&](const XEventVisitor& event) {
     int64_t correlation_id = -1;
     int64_t group_id = -1;
-    absl::string_view step_name;
+    abslx::string_view step_name;
     event.ForEachStat([&](const XStatVisitor& stat) {
       if (!stat.Type().has_value()) return;
       switch (stat.Type().value()) {
@@ -186,7 +186,7 @@ StepEvents ConvertHostThreadsXPlaneToStepEvents(
 StepEvents ConvertDeviceStepInfoToStepMarkers(const XLineVisitor& line) {
   StepEvents result;
   line.ForEachEvent([&](const XEventVisitor& event) {
-    if (absl::optional<XStatVisitor> stat = event.GetStat(StatType::kGroupId)) {
+    if (abslx::optional<XStatVisitor> stat = event.GetStat(StatType::kGroupId)) {
       result[stat->IntValue()].AddMarker(
           StepMarker(StepMarkerType::kDeviceStepMarker, event.Name(),
                      event.GetTimespan()));
@@ -201,8 +201,8 @@ StepEvents ConvertDeviceTraceXLineToStepEvents(const uint64 device_id,
   line.ForEachEvent([&](const XEventVisitor& event) {
     int64_t correlation_id = -1;
     int64_t group_id = -1;
-    absl::string_view tensor_shapes;
-    absl::string_view memcpy_details;
+    abslx::string_view tensor_shapes;
+    abslx::string_view memcpy_details;
     event.ForEachStat([&](const XStatVisitor& stat) {
       if (!stat.Type().has_value()) return;
       switch (stat.Type().value()) {

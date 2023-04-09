@@ -80,13 +80,13 @@ void LandmarksToNormalizedLandmarks(const LandmarkList& landmarks,
 // Object scale is calculated as average between bounding box width and height
 // with sides parallel to axis.
 float GetObjectScale(const LandmarkList& landmarks) {
-  const auto& lm_minmax_x = absl::c_minmax_element(
+  const auto& lm_minmax_x = abslx::c_minmax_element(
       landmarks.landmark(),
       [](const auto& a, const auto& b) { return a.x() < b.x(); });
   const float x_min = lm_minmax_x.first->x();
   const float x_max = lm_minmax_x.second->x();
 
-  const auto& lm_minmax_y = absl::c_minmax_element(
+  const auto& lm_minmax_y = abslx::c_minmax_element(
       landmarks.landmark(),
       [](const auto& a, const auto& b) { return a.y() < b.y(); });
   const float y_min = lm_minmax_y.first->y();
@@ -115,23 +115,23 @@ class LandmarksFilter {
  public:
   virtual ~LandmarksFilter() = default;
 
-  virtual absl::Status Reset() { return absl::OkStatus(); }
+  virtual abslx::Status Reset() { return abslx::OkStatus(); }
 
-  virtual absl::Status Apply(const LandmarkList& in_landmarks,
-                             const absl::Duration& timestamp,
-                             const absl::optional<float> object_scale_opt,
+  virtual abslx::Status Apply(const LandmarkList& in_landmarks,
+                             const abslx::Duration& timestamp,
+                             const abslx::optional<float> object_scale_opt,
                              LandmarkList* out_landmarks) = 0;
 };
 
 // Returns landmarks as is without smoothing.
 class NoFilter : public LandmarksFilter {
  public:
-  absl::Status Apply(const LandmarkList& in_landmarks,
-                     const absl::Duration& timestamp,
-                     const absl::optional<float> object_scale_opt,
+  abslx::Status Apply(const LandmarkList& in_landmarks,
+                     const abslx::Duration& timestamp,
+                     const abslx::optional<float> object_scale_opt,
                      LandmarkList* out_landmarks) override {
     *out_landmarks = in_landmarks;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
@@ -145,16 +145,16 @@ class VelocityFilter : public LandmarksFilter {
         min_allowed_object_scale_(min_allowed_object_scale),
         disable_value_scaling_(disable_value_scaling) {}
 
-  absl::Status Reset() override {
+  abslx::Status Reset() override {
     x_filters_.clear();
     y_filters_.clear();
     z_filters_.clear();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Apply(const LandmarkList& in_landmarks,
-                     const absl::Duration& timestamp,
-                     const absl::optional<float> object_scale_opt,
+  abslx::Status Apply(const LandmarkList& in_landmarks,
+                     const abslx::Duration& timestamp,
+                     const abslx::optional<float> object_scale_opt,
                      LandmarkList* out_landmarks) override {
     // Get value scale as inverse value of the object scale.
     // If value is too small smoothing will be disabled and landmarks will be
@@ -165,7 +165,7 @@ class VelocityFilter : public LandmarksFilter {
           object_scale_opt ? *object_scale_opt : GetObjectScale(in_landmarks);
       if (object_scale < min_allowed_object_scale_) {
         *out_landmarks = in_landmarks;
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
       value_scale = 1.0f / object_scale;
     }
@@ -187,18 +187,18 @@ class VelocityFilter : public LandmarksFilter {
           z_filters_[i].Apply(timestamp, value_scale, in_landmark.z()));
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
   // Initializes filters for the first time or after Reset. If initialized then
   // check the size.
-  absl::Status InitializeFiltersIfEmpty(const int n_landmarks) {
+  abslx::Status InitializeFiltersIfEmpty(const int n_landmarks) {
     if (!x_filters_.empty()) {
       RET_CHECK_EQ(x_filters_.size(), n_landmarks);
       RET_CHECK_EQ(y_filters_.size(), n_landmarks);
       RET_CHECK_EQ(z_filters_.size(), n_landmarks);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     x_filters_.resize(n_landmarks,
@@ -208,7 +208,7 @@ class VelocityFilter : public LandmarksFilter {
     z_filters_.resize(n_landmarks,
                       RelativeVelocityFilter(window_size_, velocity_scale_));
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   int window_size_;
@@ -234,16 +234,16 @@ class OneEuroFilterImpl : public LandmarksFilter {
         min_allowed_object_scale_(min_allowed_object_scale),
         disable_value_scaling_(disable_value_scaling) {}
 
-  absl::Status Reset() override {
+  abslx::Status Reset() override {
     x_filters_.clear();
     y_filters_.clear();
     z_filters_.clear();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Apply(const LandmarkList& in_landmarks,
-                     const absl::Duration& timestamp,
-                     const absl::optional<float> object_scale_opt,
+  abslx::Status Apply(const LandmarkList& in_landmarks,
+                     const abslx::Duration& timestamp,
+                     const abslx::optional<float> object_scale_opt,
                      LandmarkList* out_landmarks) override {
     // Initialize filters once.
     MP_RETURN_IF_ERROR(InitializeFiltersIfEmpty(in_landmarks.landmark_size()));
@@ -257,7 +257,7 @@ class OneEuroFilterImpl : public LandmarksFilter {
           object_scale_opt ? *object_scale_opt : GetObjectScale(in_landmarks);
       if (object_scale < min_allowed_object_scale_) {
         *out_landmarks = in_landmarks;
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
       value_scale = 1.0f / object_scale;
     }
@@ -276,18 +276,18 @@ class OneEuroFilterImpl : public LandmarksFilter {
           z_filters_[i].Apply(timestamp, value_scale, in_landmark.z()));
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
   // Initializes filters for the first time or after Reset. If initialized then
   // check the size.
-  absl::Status InitializeFiltersIfEmpty(const int n_landmarks) {
+  abslx::Status InitializeFiltersIfEmpty(const int n_landmarks) {
     if (!x_filters_.empty()) {
       RET_CHECK_EQ(x_filters_.size(), n_landmarks);
       RET_CHECK_EQ(y_filters_.size(), n_landmarks);
       RET_CHECK_EQ(z_filters_.size(), n_landmarks);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     for (int i = 0; i < n_landmarks; ++i) {
@@ -299,7 +299,7 @@ class OneEuroFilterImpl : public LandmarksFilter {
           OneEuroFilter(frequency_, min_cutoff_, beta_, derivate_cutoff_));
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   double frequency_;
@@ -350,16 +350,16 @@ class OneEuroFilterImpl : public LandmarksFilter {
 //
 class LandmarksSmoothingCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   std::unique_ptr<LandmarksFilter> landmarks_filter_;
 };
 REGISTER_CALCULATOR(LandmarksSmoothingCalculator);
 
-absl::Status LandmarksSmoothingCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status LandmarksSmoothingCalculator::GetContract(CalculatorContract* cc) {
   if (cc->Inputs().HasTag(kNormalizedLandmarksTag)) {
     cc->Inputs().Tag(kNormalizedLandmarksTag).Set<NormalizedLandmarkList>();
     cc->Inputs().Tag(kImageSizeTag).Set<std::pair<int, int>>();
@@ -379,24 +379,24 @@ absl::Status LandmarksSmoothingCalculator::GetContract(CalculatorContract* cc) {
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LandmarksSmoothingCalculator::Open(CalculatorContext* cc) {
+abslx::Status LandmarksSmoothingCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
   // Pick landmarks filter.
   const auto& options = cc->Options<LandmarksSmoothingCalculatorOptions>();
   if (options.has_no_filter()) {
-    landmarks_filter_ = absl::make_unique<NoFilter>();
+    landmarks_filter_ = abslx::make_unique<NoFilter>();
   } else if (options.has_velocity_filter()) {
-    landmarks_filter_ = absl::make_unique<VelocityFilter>(
+    landmarks_filter_ = abslx::make_unique<VelocityFilter>(
         options.velocity_filter().window_size(),
         options.velocity_filter().velocity_scale(),
         options.velocity_filter().min_allowed_object_scale(),
         options.velocity_filter().disable_value_scaling());
   } else if (options.has_one_euro_filter()) {
-    landmarks_filter_ = absl::make_unique<OneEuroFilterImpl>(
+    landmarks_filter_ = abslx::make_unique<OneEuroFilterImpl>(
         options.one_euro_filter().frequency(),
         options.one_euro_filter().min_cutoff(),
         options.one_euro_filter().beta(),
@@ -408,10 +408,10 @@ absl::Status LandmarksSmoothingCalculator::Open(CalculatorContext* cc) {
         << "Landmarks filter is either not specified or not supported";
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LandmarksSmoothingCalculator::Process(CalculatorContext* cc) {
+abslx::Status LandmarksSmoothingCalculator::Process(CalculatorContext* cc) {
   // Check that landmarks are not empty and reset the filter if so.
   // Don't emit an empty packet for this timestamp.
   if ((cc->Inputs().HasTag(kNormalizedLandmarksTag) &&
@@ -419,11 +419,11 @@ absl::Status LandmarksSmoothingCalculator::Process(CalculatorContext* cc) {
       (cc->Inputs().HasTag(kLandmarksTag) &&
        cc->Inputs().Tag(kLandmarksTag).IsEmpty())) {
     MP_RETURN_IF_ERROR(landmarks_filter_->Reset());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   const auto& timestamp =
-      absl::Microseconds(cc->InputTimestamp().Microseconds());
+      abslx::Microseconds(cc->InputTimestamp().Microseconds());
 
   if (cc->Inputs().HasTag(kNormalizedLandmarksTag)) {
     const auto& in_norm_landmarks =
@@ -434,22 +434,22 @@ absl::Status LandmarksSmoothingCalculator::Process(CalculatorContext* cc) {
     std::tie(image_width, image_height) =
         cc->Inputs().Tag(kImageSizeTag).Get<std::pair<int, int>>();
 
-    absl::optional<float> object_scale;
+    abslx::optional<float> object_scale;
     if (cc->Inputs().HasTag(kObjectScaleRoiTag) &&
         !cc->Inputs().Tag(kObjectScaleRoiTag).IsEmpty()) {
       auto& roi = cc->Inputs().Tag(kObjectScaleRoiTag).Get<NormalizedRect>();
       object_scale = GetObjectScale(roi, image_width, image_height);
     }
 
-    auto in_landmarks = absl::make_unique<LandmarkList>();
+    auto in_landmarks = abslx::make_unique<LandmarkList>();
     NormalizedLandmarksToLandmarks(in_norm_landmarks, image_width, image_height,
                                    in_landmarks.get());
 
-    auto out_landmarks = absl::make_unique<LandmarkList>();
+    auto out_landmarks = abslx::make_unique<LandmarkList>();
     MP_RETURN_IF_ERROR(landmarks_filter_->Apply(
         *in_landmarks, timestamp, object_scale, out_landmarks.get()));
 
-    auto out_norm_landmarks = absl::make_unique<NormalizedLandmarkList>();
+    auto out_norm_landmarks = abslx::make_unique<NormalizedLandmarkList>();
     LandmarksToNormalizedLandmarks(*out_landmarks, image_width, image_height,
                                    out_norm_landmarks.get());
 
@@ -460,14 +460,14 @@ absl::Status LandmarksSmoothingCalculator::Process(CalculatorContext* cc) {
     const auto& in_landmarks =
         cc->Inputs().Tag(kLandmarksTag).Get<LandmarkList>();
 
-    absl::optional<float> object_scale;
+    abslx::optional<float> object_scale;
     if (cc->Inputs().HasTag(kObjectScaleRoiTag) &&
         !cc->Inputs().Tag(kObjectScaleRoiTag).IsEmpty()) {
       auto& roi = cc->Inputs().Tag(kObjectScaleRoiTag).Get<Rect>();
       object_scale = GetObjectScale(roi);
     }
 
-    auto out_landmarks = absl::make_unique<LandmarkList>();
+    auto out_landmarks = abslx::make_unique<LandmarkList>();
     MP_RETURN_IF_ERROR(landmarks_filter_->Apply(
         in_landmarks, timestamp, object_scale, out_landmarks.get()));
 
@@ -476,7 +476,7 @@ absl::Status LandmarksSmoothingCalculator::Process(CalculatorContext* cc) {
         .Add(out_landmarks.release(), cc->InputTimestamp());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

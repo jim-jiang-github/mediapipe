@@ -16,7 +16,7 @@
 
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
@@ -28,9 +28,9 @@ std::string ZoneInfoSource::Version() const { return std::string(); }
 }  // namespace cctz
 }  // namespace time_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz_extension {
@@ -39,10 +39,10 @@ namespace {
 
 // A default for cctz_extension::zone_info_source_factory, which simply
 // defers to the fallback factory.
-std::unique_ptr<absl::time_internal::cctz::ZoneInfoSource> DefaultFactory(
+std::unique_ptr<abslx::time_internal::cctz::ZoneInfoSource> DefaultFactory(
     const std::string& name,
     const std::function<
-        std::unique_ptr<absl::time_internal::cctz::ZoneInfoSource>(
+        std::unique_ptr<abslx::time_internal::cctz::ZoneInfoSource>(
             const std::string& name)>& fallback_factory) {
   return fallback_factory(name);
 }
@@ -113,4 +113,4 @@ ZoneInfoSourceFactory zone_info_source_factory = DefaultFactory;
 }  // namespace cctz_extension
 }  // namespace time_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -127,7 +127,7 @@ int MaxParallelism(int numa_node) {
 }
 
 int NumTotalCPUs() {
-  int count = absl::base_internal::NumCPUs();
+  int count = abslx::base_internal::NumCPUs();
   return (count <= 0) ? kUnknownCPU : count;
 }
 

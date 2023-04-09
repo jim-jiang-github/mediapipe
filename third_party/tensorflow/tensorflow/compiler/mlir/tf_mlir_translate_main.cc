@@ -114,10 +114,10 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  std::unordered_set<std::string> tags = absl::StrSplit(saved_model_tags, ',');
+  std::unordered_set<std::string> tags = abslx::StrSplit(saved_model_tags, ',');
   std::vector<std::string> exported_names_vector =
-      absl::StrSplit(saved_model_exported_names, ',', absl::SkipEmpty());
-  absl::Span<std::string> exported_names(exported_names_vector);
+      abslx::StrSplit(saved_model_exported_names, ',', abslx::SkipEmpty());
+  abslx::Span<std::string> exported_names(exported_names_vector);
 
   if (import_saved_model_object_graph) {
     mlir::MLIRContext context;

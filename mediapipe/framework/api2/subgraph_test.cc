@@ -16,7 +16,7 @@ namespace test {
 
 class FooBarImpl1 : public SubgraphImpl<FooBar1, FooBarImpl1> {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       const SubgraphOptions& /*options*/) {
     builder::Graph graph;
     auto& foo = graph.AddNode("Foo");
@@ -30,7 +30,7 @@ class FooBarImpl1 : public SubgraphImpl<FooBar1, FooBarImpl1> {
 
 class FooBarImpl2 : public SubgraphImpl<FooBar2, FooBarImpl2> {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       const SubgraphOptions& /*options*/) {
     builder::Graph graph;
     auto& foo = graph.AddNode<Foo>();

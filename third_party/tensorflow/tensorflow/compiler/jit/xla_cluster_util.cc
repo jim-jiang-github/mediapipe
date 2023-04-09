@@ -68,7 +68,7 @@ string DescribeCycle(const GraphCycles* cycles, const Graph& graph, int src,
   };
 
   string description;
-  absl::StrAppend(&description, "Edge from ", node_name(src), " to ",
+  abslx::StrAppend(&description, "Edge from ", node_name(src), " to ",
                   node_name(dst), " would create a cycle.\n");
   path.resize(path_size);
   for (int32_t node_id : path) {
@@ -80,7 +80,7 @@ string DescribeCycle(const GraphCycles* cycles, const Graph& graph, int src,
     } else {
       ascii_art = "+-- ";
     }
-    absl::StrAppend(&description, ascii_art, node_name(node_id), "\n");
+    abslx::StrAppend(&description, ascii_art, node_name(node_id), "\n");
   }
   return description;
 }
@@ -197,7 +197,7 @@ StatusOr<bool> CreateCycleDetectionGraph(const Graph* graph,
   return true;
 }
 
-std::optional<absl::string_view> GetXlaClusterForNode(const Node& node) {
+std::optional<abslx::string_view> GetXlaClusterForNode(const Node& node) {
   const AttrValue* attr_value = node.attrs().Find(kXlaClusterAttr);
   if (attr_value == nullptr) {
     return std::nullopt;
@@ -265,7 +265,7 @@ int GetGpuNumber(const string& device_name) {
 
 bool IsSingleGpuGraph(const Graph& g) {
   int gpus_seen = 0;
-  absl::flat_hash_set<string> devices_seen;
+  abslx::flat_hash_set<string> devices_seen;
 
   for (Node* n : g.op_nodes()) {
     if (devices_seen.contains(n->assigned_device_name())) {
@@ -312,7 +312,7 @@ bool MayCallFunction(const Node& n, const FunctionLibraryDefinition* flib_def) {
 
   // This is a conservative check: there may be nodes with a `func`
   // attribute that do not make function calls.
-  return absl::c_any_of(n.def().attr(),
+  return abslx::c_any_of(n.def().attr(),
                         [](const std::pair<string, AttrValue>& name_attr_pair) {
                           return name_attr_pair.second.has_func();
                         });
@@ -327,26 +327,26 @@ struct ClusterInfo {
   int size;
 
   // Maps op names to the number of times they appear in the cluster.
-  absl::flat_hash_map<absl::string_view, int> op_histogram;
+  abslx::flat_hash_map<abslx::string_view, int> op_histogram;
 };
 
 void HistogramMapToRepeatedOpAndCount(
     protobuf::RepeatedPtrField<XlaAutoClusteringSummary::OpAndCount>* result,
-    const absl::flat_hash_map<absl::string_view, int>& histogram) {
+    const abslx::flat_hash_map<abslx::string_view, int>& histogram) {
   for (const auto& pair : histogram) {
     XlaAutoClusteringSummary::OpAndCount* new_entry = result->Add();
     new_entry->set_op(std::string(pair.first));
     new_entry->set_count(pair.second);
   }
 
-  absl::c_sort(*result, [](const XlaAutoClusteringSummary::OpAndCount& a,
+  abslx::c_sort(*result, [](const XlaAutoClusteringSummary::OpAndCount& a,
                            const XlaAutoClusteringSummary::OpAndCount& b) {
     return a.op() < b.op();
   });
 }
 
 void ClusterInfoToProtobuf(XlaAutoClusteringSummary::Cluster* result,
-                           absl::string_view name, const ClusterInfo& info) {
+                           abslx::string_view name, const ClusterInfo& info) {
   result->set_name(std::string(name));
   result->set_size(info.size);
   HistogramMapToRepeatedOpAndCount(result->mutable_op_histogram(),
@@ -355,13 +355,13 @@ void ClusterInfoToProtobuf(XlaAutoClusteringSummary::Cluster* result,
 }  // namespace
 
 XlaAutoClusteringSummary GetXlaAutoClusteringSummary(const Graph& graph) {
-  absl::flat_hash_map<absl::string_view, ClusterInfo> cluster_name_to_info;
+  abslx::flat_hash_map<abslx::string_view, ClusterInfo> cluster_name_to_info;
   XlaAutoClusteringSummary result;
 
-  absl::flat_hash_map<absl::string_view, int> unclustered_op_histogram;
+  abslx::flat_hash_map<abslx::string_view, int> unclustered_op_histogram;
 
   for (Node* n : graph.nodes()) {
-    std::optional<absl::string_view> cluster_name = GetXlaClusterForNode(*n);
+    std::optional<abslx::string_view> cluster_name = GetXlaClusterForNode(*n);
     if (cluster_name) {
       result.set_clustered_node_count(result.clustered_node_count() + 1);
       ClusterInfo* info = &cluster_name_to_info[*cluster_name];
@@ -378,7 +378,7 @@ XlaAutoClusteringSummary GetXlaAutoClusteringSummary(const Graph& graph) {
     ClusterInfoToProtobuf(new_cluster, pair.first, pair.second);
   }
 
-  absl::c_sort(*result.mutable_clusters(),
+  abslx::c_sort(*result.mutable_clusters(),
                [&](const XlaAutoClusteringSummary::Cluster& a,
                    const XlaAutoClusteringSummary::Cluster& b) {
                  return a.name() < b.name();
@@ -391,7 +391,7 @@ XlaAutoClusteringSummary GetXlaAutoClusteringSummary(const Graph& graph) {
 }
 
 namespace {
-using CallTargetListTy = absl::InlinedVector<NameAttrList, 2>;
+using CallTargetListTy = abslx::InlinedVector<NameAttrList, 2>;
 
 CallTargetListTy GetCallTargetListFromNode(
     const Node& n, FunctionLibraryRuntime* lib_runtime) {
@@ -422,7 +422,7 @@ enum class Direction { kForward, kBackward };
 
 Status GetNodesRelatedToRefVariablesInDirection(
     const Graph& graph, FunctionLibraryRuntime* lib_runtime,
-    Direction direction, int depth, absl::flat_hash_set<Node*>* result);
+    Direction direction, int depth, abslx::flat_hash_set<Node*>* result);
 
 StatusOr<bool> DoesAnyCalleeHaveRefNodes(
     const CallTargetListTy& call_target_list,
@@ -434,12 +434,12 @@ StatusOr<bool> DoesAnyCalleeHaveRefNodes(
     return true;
   }
 
-  absl::flat_hash_set<Node*> callee_ref_nodes;
+  abslx::flat_hash_set<Node*> callee_ref_nodes;
   for (const NameAttrList& call_target : call_target_list) {
     const OpRegistrationData* op_reg;
     if (OpRegistry::Global()->LookUp(call_target.name(), &op_reg).ok()) {
       const OpDef& op = op_reg->op_def;
-      if (absl::c_any_of(op.output_arg(), [](const OpDef::ArgDef arg) {
+      if (abslx::c_any_of(op.output_arg(), [](const OpDef::ArgDef arg) {
             return arg.is_ref();
           })) {
         return true;
@@ -482,7 +482,7 @@ StatusOr<bool> DoesAnyCalleeHaveRefNodes(
 // direction.
 Status GetNodesRelatedToRefVariablesInDirection(
     const Graph& graph, FunctionLibraryRuntime* lib_runtime,
-    Direction direction, int depth, absl::flat_hash_set<Node*>* result) {
+    Direction direction, int depth, abslx::flat_hash_set<Node*>* result) {
   std::vector<Node*> nodes_in_order;
   if (direction == Direction::kForward) {
     GetReversePostOrder(graph, &nodes_in_order,
@@ -539,7 +539,7 @@ Status GetNodesRelatedToRefVariablesInDirection(
       }
 
       if (direction == Direction::kForward &&
-          absl::c_any_of(n->output_types(), IsRefType)) {
+          abslx::c_any_of(n->output_types(), IsRefType)) {
         result->insert(n);
         continue;
       }
@@ -570,8 +570,8 @@ void SortControlInputs(GraphDef* gdef) {
     std::stable_sort(node->mutable_input()->begin(),
                      node->mutable_input()->end(),
                      [](const string& a, const string& b) {
-                       bool a_is_control = absl::StartsWith(a, "^");
-                       bool b_is_control = absl::StartsWith(b, "^");
+                       bool a_is_control = abslx::StartsWith(a, "^");
+                       bool b_is_control = abslx::StartsWith(b, "^");
                        return (!a_is_control && b_is_control) ||
                               (a_is_control && b_is_control && a < b);
                      });
@@ -579,9 +579,9 @@ void SortControlInputs(GraphDef* gdef) {
 }
 }  // namespace
 
-StatusOr<absl::flat_hash_set<Node*>> GetNodesRelatedToRefVariables(
+StatusOr<abslx::flat_hash_set<Node*>> GetNodesRelatedToRefVariables(
     const Graph& graph, FunctionLibraryRuntime* lib_runtime) {
-  absl::flat_hash_set<Node*> result;
+  abslx::flat_hash_set<Node*> result;
   TF_RETURN_IF_ERROR(GetNodesRelatedToRefVariablesInDirection(
       graph, lib_runtime, Direction::kForward, 0, &result));
   TF_RETURN_IF_ERROR(GetNodesRelatedToRefVariablesInDirection(

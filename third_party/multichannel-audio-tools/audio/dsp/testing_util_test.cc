@@ -34,7 +34,7 @@ namespace {
 using ::Eigen::ColMajor;
 using ::Eigen::Dynamic;
 using ::Eigen::RowMajor;
-using ::absl::Span;
+using ::abslx::Span;
 using ::std::complex;
 using ::testing::DoubleEq;
 using ::testing::FloatEq;

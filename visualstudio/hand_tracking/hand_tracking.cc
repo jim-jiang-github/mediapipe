@@ -21,7 +21,7 @@ DEFINE_SUBGRAPH(HandRendererSubgraph, "../../mediapipe/graphs/hand_tracking/subg
 }
 
 // load graph
-absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
+abslx::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
   mediapipe::CalculatorGraphConfig config;
   if (read_config_from_pbtxt(config, calculator_graph_config_file)) {
     download_mediapipe_asset_from_GCS("../mediapipe/modules/palm_detection/palm_detection_full.tflite");
@@ -29,7 +29,7 @@ absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
     download_mediapipe_asset_from_GCS("../mediapipe/modules/hand_landmark/handedness.txt");
     return graph.Initialize(config);
   }
-  return absl::NotFoundError(calculator_graph_config_file);
+  return abslx::NotFoundError(calculator_graph_config_file);
 }
 
 // the program entrance point, the main().

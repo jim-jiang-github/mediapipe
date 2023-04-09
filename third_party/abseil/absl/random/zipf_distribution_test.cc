@@ -36,7 +36,7 @@
 
 namespace {
 
-using ::absl::random_internal::kChiSquared;
+using ::abslx::random_internal::kChiSquared;
 using ::testing::ElementsAre;
 
 template <typename IntType>
@@ -47,10 +47,10 @@ using IntTypes = ::testing::Types<int, int8_t, int16_t, int32_t, int64_t,
 TYPED_TEST_CASE(ZipfDistributionTypedTest, IntTypes);
 
 TYPED_TEST(ZipfDistributionTypedTest, SerializeTest) {
-  using param_type = typename absl::zipf_distribution<TypeParam>::param_type;
+  using param_type = typename abslx::zipf_distribution<TypeParam>::param_type;
 
   constexpr int kCount = 1000;
-  absl::InsecureBitGen gen;
+  abslx::InsecureBitGen gen;
   for (const auto& param : {
            param_type(),
            param_type(32),
@@ -63,20 +63,20 @@ TYPED_TEST(ZipfDistributionTypedTest, SerializeTest) {
     const auto q = param.q();
     const auto v = param.v();
 
-    absl::zipf_distribution<TypeParam> before(k, q, v);
+    abslx::zipf_distribution<TypeParam> before(k, q, v);
     EXPECT_EQ(before.k(), param.k());
     EXPECT_EQ(before.q(), param.q());
     EXPECT_EQ(before.v(), param.v());
 
     {
-      absl::zipf_distribution<TypeParam> via_param(param);
+      abslx::zipf_distribution<TypeParam> via_param(param);
       EXPECT_EQ(via_param, before);
     }
 
     // Validate stream serialization.
     std::stringstream ss;
     ss << before;
-    absl::zipf_distribution<TypeParam> after(4, 5.5, 4.4);
+    abslx::zipf_distribution<TypeParam> after(4, 5.5, 4.4);
 
     EXPECT_NE(before.k(), after.k());
     EXPECT_NE(before.q(), after.q());
@@ -103,7 +103,7 @@ TYPED_TEST(ZipfDistributionTypedTest, SerializeTest) {
       if (sample < sample_min) sample_min = sample;
     }
     ABSL_INTERNAL_LOG(INFO,
-                      absl::StrCat("Range: ", +sample_min, ", ", +sample_max));
+                      abslx::StrCat("Range: ", +sample_min, ", ", +sample_max));
   }
 }
 
@@ -207,7 +207,7 @@ class ZipfModel {
   double sum_hnq_;
 };
 
-using zipf_u64 = absl::zipf_distribution<uint64_t>;
+using zipf_u64 = abslx::zipf_distribution<uint64_t>;
 
 class ZipfTest : public testing::TestWithParam<zipf_u64::param_type>,
                  public ZipfModel {
@@ -217,7 +217,7 @@ class ZipfTest : public testing::TestWithParam<zipf_u64::param_type>,
   // We use a fixed bit generator for distribution accuracy tests.  This allows
   // these tests to be deterministic, while still testing the qualify of the
   // implementation.
-  absl::random_internal::pcg64_2018_engine rng_{0x2B7E151628AED2A6};
+  abslx::random_internal::pcg64_2018_engine rng_{0x2B7E151628AED2A6};
 };
 
 TEST_P(ZipfTest, ChiSquaredTest) {
@@ -292,29 +292,29 @@ TEST_P(ZipfTest, ChiSquaredTest) {
   // NOTE: This test runs about 15x per invocation, so a value of 0.9995 is
   // approximately correct for a test suite failure rate of 1 in 100.  In
   // practice we see failures slightly higher than that.
-  const double threshold = absl::random_internal::ChiSquareValue(dof, 0.9999);
+  const double threshold = abslx::random_internal::ChiSquareValue(dof, 0.9999);
 
-  const double chi_square = absl::random_internal::ChiSquare(
+  const double chi_square = abslx::random_internal::ChiSquare(
       std::begin(buckets), std::end(buckets), std::begin(expected),
       std::end(expected));
 
   const double p_actual =
-      absl::random_internal::ChiSquarePValue(chi_square, dof);
+      abslx::random_internal::ChiSquarePValue(chi_square, dof);
 
   // Log if the chi_squared value is above the threshold.
   if (chi_square > threshold) {
     ABSL_INTERNAL_LOG(INFO, "values");
     for (size_t i = 0; i < expected.size(); i++) {
-      ABSL_INTERNAL_LOG(INFO, absl::StrCat(points[i], ": ", buckets[i],
+      ABSL_INTERNAL_LOG(INFO, abslx::StrCat(points[i], ": ", buckets[i],
                                            " vs. E=", expected[i]));
     }
-    ABSL_INTERNAL_LOG(INFO, absl::StrCat("trials ", trials));
+    ABSL_INTERNAL_LOG(INFO, abslx::StrCat("trials ", trials));
     ABSL_INTERNAL_LOG(INFO,
-                      absl::StrCat("mean ", avg, " vs. expected ", mean()));
-    ABSL_INTERNAL_LOG(INFO, absl::StrCat(kChiSquared, "(data, ", dof, ") = ",
+                      abslx::StrCat("mean ", avg, " vs. expected ", mean()));
+    ABSL_INTERNAL_LOG(INFO, abslx::StrCat(kChiSquared, "(data, ", dof, ") = ",
                                          chi_square, " (", p_actual, ")"));
     ABSL_INTERNAL_LOG(INFO,
-                      absl::StrCat(kChiSquared, " @ 0.9995 = ", threshold));
+                      abslx::StrCat(kChiSquared, " @ 0.9995 = ", threshold));
     FAIL() << kChiSquared << " value of " << chi_square
            << " is above the threshold.";
   }
@@ -342,19 +342,19 @@ std::vector<zipf_u64::param_type> GenParams() {
 std::string ParamName(
     const ::testing::TestParamInfo<zipf_u64::param_type>& info) {
   const auto& p = info.param;
-  std::string name = absl::StrCat("k_", p.k(), "__q_", absl::SixDigits(p.q()),
-                                  "__v_", absl::SixDigits(p.v()));
-  return absl::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
+  std::string name = abslx::StrCat("k_", p.k(), "__q_", abslx::SixDigits(p.q()),
+                                  "__v_", abslx::SixDigits(p.v()));
+  return abslx::StrReplaceAll(name, {{"+", "_"}, {"-", "_"}, {".", "_"}});
 }
 
 INSTANTIATE_TEST_SUITE_P(All, ZipfTest, ::testing::ValuesIn(GenParams()),
                          ParamName);
 
-// NOTE: absl::zipf_distribution is not guaranteed to be stable.
+// NOTE: abslx::zipf_distribution is not guaranteed to be stable.
 TEST(ZipfDistributionTest, StabilityTest) {
-  // absl::zipf_distribution stability relies on
-  // absl::uniform_real_distribution, std::log, std::exp, std::log1p
-  absl::random_internal::sequence_urbg urbg(
+  // abslx::zipf_distribution stability relies on
+  // abslx::uniform_real_distribution, std::log, std::exp, std::log1p
+  abslx::random_internal::sequence_urbg urbg(
       {0x0003eb76f6f7f755ull, 0xFFCEA50FDB2F953Bull, 0xC332DDEFBE6C5AA5ull,
        0x6558218568AB9702ull, 0x2AEF7DAD5B6E2F84ull, 0x1521B62829076170ull,
        0xECDD4775619F1510ull, 0x13CCA830EB61BD96ull, 0x0334FE1EAA0363CFull,
@@ -363,14 +363,14 @@ TEST(ZipfDistributionTest, StabilityTest) {
   std::vector<int> output(10);
 
   {
-    absl::zipf_distribution<int32_t> dist;
+    abslx::zipf_distribution<int32_t> dist;
     std::generate(std::begin(output), std::end(output),
                   [&] { return dist(urbg); });
     EXPECT_THAT(output, ElementsAre(10031, 0, 0, 3, 6, 0, 7, 47, 0, 0));
   }
   urbg.reset();
   {
-    absl::zipf_distribution<int32_t> dist(std::numeric_limits<int32_t>::max(),
+    abslx::zipf_distribution<int32_t> dist(std::numeric_limits<int32_t>::max(),
                                           3.3);
     std::generate(std::begin(output), std::end(output),
                   [&] { return dist(urbg); });
@@ -379,9 +379,9 @@ TEST(ZipfDistributionTest, StabilityTest) {
 }
 
 TEST(ZipfDistributionTest, AlgorithmBounds) {
-  absl::zipf_distribution<int32_t> dist;
+  abslx::zipf_distribution<int32_t> dist;
 
-  // Small values from absl::uniform_real_distribution map to larger Zipf
+  // Small values from abslx::uniform_real_distribution map to larger Zipf
   // distribution values.
   const std::pair<uint64_t, int32_t> kInputs[] = {
       {0xffffffffffffffff, 0x0}, {0x7fffffffffffffff, 0x0},
@@ -419,7 +419,7 @@ TEST(ZipfDistributionTest, AlgorithmBounds) {
   };
 
   for (const auto& instance : kInputs) {
-    absl::random_internal::sequence_urbg urbg({instance.first});
+    abslx::random_internal::sequence_urbg urbg({instance.first});
     EXPECT_EQ(instance.second, dist(urbg));
   }
 }

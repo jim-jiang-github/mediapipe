@@ -27,7 +27,7 @@ namespace {
 
 using ::testing::ElementsAre;
 
-absl::Status RunGraph(std::vector<Detection>& input_detections,
+abslx::Status RunGraph(std::vector<Detection>& input_detections,
                       std::vector<Detection>* output_detections) {
   CalculatorRunner runner(R"pb(
     calculator: "FilterDetectionsCalculator"
@@ -50,7 +50,7 @@ absl::Status RunGraph(std::vector<Detection>& input_detections,
   RET_CHECK_EQ(output_packets.size(), 1);
 
   *output_detections = output_packets[0].Get<std::vector<Detection>>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 TEST(FilterDetectionsCalculatorTest, TestFilterDetections) {

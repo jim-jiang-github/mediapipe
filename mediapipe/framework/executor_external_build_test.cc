@@ -45,7 +45,7 @@ class MyExecutor : public mediapipe::Executor {
 };
 
 MyExecutor::MyExecutor() {
-  thread_pool_ = absl::make_unique<mediapipe::ThreadPool>("my_executor", 1);
+  thread_pool_ = abslx::make_unique<mediapipe::ThreadPool>("my_executor", 1);
   thread_pool_->StartWorkers();
 }
 

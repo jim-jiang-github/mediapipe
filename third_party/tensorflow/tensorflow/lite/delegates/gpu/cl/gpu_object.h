@@ -59,7 +59,7 @@ class GPUObject {
   GPUObject(const GPUObject&) = delete;
   GPUObject& operator=(const GPUObject&) = delete;
   virtual ~GPUObject() = default;
-  virtual absl::Status GetGPUResources(
+  virtual abslx::Status GetGPUResources(
       const GPUObjectDescriptor* obj_ptr,
       GPUResourcesWithValue* resources) const = 0;
 };

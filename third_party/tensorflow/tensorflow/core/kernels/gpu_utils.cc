@@ -45,8 +45,8 @@ se::DeviceMemoryBase WrapRedzoneBestEffort(se::RedzoneAllocator* rz_allocator,
   }
   auto output_rz_or = rz_allocator->AllocateBytes(buffer.size());
   if (!output_rz_or.ok()) {
-    static absl::once_flag rz_allocation_failure_logged;
-    absl::call_once(rz_allocation_failure_logged, []() {
+    static abslx::once_flag rz_allocation_failure_logged;
+    abslx::call_once(rz_allocation_failure_logged, []() {
       LOG(WARNING) << "Failed to allocate memory for convolution redzone "
                    << "checking; skipping this check. This is benign and only "
                    << "means that we won't check cudnn for out-of-bounds reads "
@@ -65,8 +65,8 @@ void CheckRedzones(const se::RedzoneAllocator& rz_allocator,
   se::port::StatusOr<se::RedzoneAllocator::RedzoneCheckStatus> rz_status =
       rz_allocator.CheckRedzones();
   if (!rz_status.ok()) {
-    static absl::once_flag failure_logged;
-    absl::call_once(failure_logged, [&]() {
+    static abslx::once_flag failure_logged;
+    abslx::call_once(failure_logged, [&]() {
       LOG(WARNING) << "Failed to check cudnn convolutions for out-of-bounds "
                    << "reads and writes with an error message: '"
                    << rz_status.status().error_message()
@@ -144,7 +144,7 @@ void LogConvAutotuneResults(se::dnn::ConvolutionKind kind,
                             const se::dnn::BatchDescriptor& output_desc,
                             const se::dnn::ConvolutionDescriptor& conv_desc,
                             se::StreamExecutor* stream_exec,
-                            absl::Span<const AutotuneResult> results) {
+                            abslx::Span<const AutotuneResult> results) {
   AutotuningLog log;
   {
     ConvolutionProto instr;
@@ -187,7 +187,7 @@ void LogFusedConvForwardAutotuneResults(
     const se::dnn::BatchDescriptor& output_desc,
     const se::dnn::ConvolutionDescriptor& conv_desc, double conv_scale,
     double side_value_scale, se::dnn::ActivationMode activation_mode,
-    se::StreamExecutor* stream_exec, absl::Span<const AutotuneResult> results) {
+    se::StreamExecutor* stream_exec, abslx::Span<const AutotuneResult> results) {
   AutotuningLog log;
   {
     ConvolutionProto instr;
@@ -227,7 +227,7 @@ void LogFusedConvForwardAutotuneResults(
 
 namespace {
 StatusOr<std::tuple<int, int>> BestCudnnConvAlgorithmIndices(
-    absl::Span<const AutotuneResult> results) {
+    abslx::Span<const AutotuneResult> results) {
   auto compare_run_times = [](const AutotuneResult& lhs,
                               const AutotuneResult& rhs) {
     return proto_utils::FromDurationProto(lhs.run_time()) <
@@ -269,7 +269,7 @@ StatusOr<std::tuple<int, int>> BestCudnnConvAlgorithmIndices(
 }  // namespace
 
 StatusOr<se::dnn::AlgorithmConfig> BestCudnnConvAlgorithm(
-    absl::Span<const AutotuneResult> results) {
+    abslx::Span<const AutotuneResult> results) {
   int idx;
   int idx_no_scratch;
   TF_ASSIGN_OR_RETURN(std::tie(idx, idx_no_scratch),
@@ -292,7 +292,7 @@ StatusOr<se::dnn::AlgorithmConfig> BestCudnnConvAlgorithm(
 
 template <typename Op>
 StatusOr<AutotuneEntry<Op>> BestCudnnConvAlgorithm(
-    absl::Span<const AutotuneResult> results,
+    abslx::Span<const AutotuneResult> results,
     std::vector<
         std::unique_ptr<const se::dnn::OpRunner<typename Op::Signature>>>
         runners) {
@@ -316,14 +316,14 @@ StatusOr<AutotuneEntry<Op>> BestCudnnConvAlgorithm(
 
 template StatusOr<AutotuneEntry<se::dnn::ConvOp>>
 BestCudnnConvAlgorithm<se::dnn::ConvOp>(
-    absl::Span<const AutotuneResult> results,
+    abslx::Span<const AutotuneResult> results,
     std::vector<
         std::unique_ptr<const se::dnn::OpRunner<se::dnn::ConvSignature>>>
         runners);
 
 template StatusOr<AutotuneEntry<se::dnn::FusedConvOp>>
 BestCudnnConvAlgorithm<se::dnn::FusedConvOp>(
-    absl::Span<const AutotuneResult> results,
+    abslx::Span<const AutotuneResult> results,
     std::vector<
         std::unique_ptr<const se::dnn::OpRunner<se::dnn::FusedConvSignature>>>
         runners);

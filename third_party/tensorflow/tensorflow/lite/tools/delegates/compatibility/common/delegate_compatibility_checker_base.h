@@ -37,7 +37,7 @@ class DelegateCompatibilityCheckerBase {
   // Iterates over the model, for each operator, call checkCompatibility with
   // op_code, op, subgraph, model, and op_result as parameters.
   // Stores the compatibility for each operation in the result structure.
-  absl::Status checkCompatibility(tflite::FlatBufferModel* model_buffer,
+  abslx::Status checkCompatibility(tflite::FlatBufferModel* model_buffer,
                                   tflite::proto::CompatibilityResult* result);
 
   // This function gets the operation signature (OpSignature) from the
@@ -53,9 +53,9 @@ class DelegateCompatibilityCheckerBase {
   //   model: Used to get the buffer in order to check if the tensor is
   //               a constant tensor.
   //   op_result: Stores whether the operation is compatible or not and why.
-  // Returns: absl::OkStatus() if the operation is compatible with the delegate,
+  // Returns: abslx::OkStatus() if the operation is compatible with the delegate,
   //               and the corresponding status in case it is not.
-  absl::Status checkCompatibility(
+  abslx::Status checkCompatibility(
       const tflite::OperatorCode* op_code, const tflite::Operator* op,
       const tflite::SubGraph* subgraph, const tflite::Model* model,
       tflite::proto::OpCompatibilityResult* op_result);
@@ -68,7 +68,7 @@ class DelegateCompatibilityCheckerBase {
 
   // Sets the parameters needed in the specific DCC. Also checks if the
   // value types are correct.
-  virtual absl::Status setDccConfigurations(
+  virtual abslx::Status setDccConfigurations(
       const std::unordered_map<std::string, std::string>& dcc_configs) = 0;
 
  private:
@@ -76,7 +76,7 @@ class DelegateCompatibilityCheckerBase {
   // they will contain the logic for checking if the operation in op_sig is
   // compatible for that specific DCC. op_result stores whether the operation
   // is supported or not.
-  virtual absl::Status checkCompatibility(
+  virtual abslx::Status checkCompatibility(
       const tflite::OpSignature& op_sig,
       tflite::proto::OpCompatibilityResult* op_result) = 0;
 };

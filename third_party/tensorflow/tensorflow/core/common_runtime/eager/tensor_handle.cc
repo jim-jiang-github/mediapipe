@@ -102,7 +102,7 @@ Status TensorHandle::PackedTensorHandleData::NumElements(
 
 Status TensorHandle::PackedTensorHandleData::Unprotect() {
   for (auto* handle : handles_) {
-    TF_RETURN_IF_ERROR(absl::visit([](auto& data) { return data.Unprotect(); },
+    TF_RETURN_IF_ERROR(abslx::visit([](auto& data) { return data.Unprotect(); },
                                    handle->data_));
   }
   return OkStatus();
@@ -146,7 +146,7 @@ string TensorHandle::PackedTensorHandleData::DebugString() const {
   string debug_str = "PackedTensorHandleData: ";
   for (const auto* handle : handles_) {
     debug_str.append(
-        absl::StrCat(absl::visit([](auto& data) { return data.DebugString(); },
+        abslx::StrCat(abslx::visit([](auto& data) { return data.DebugString(); },
                                  handle->data_),
                      "; "));
   }
@@ -189,7 +189,7 @@ Status TensorHandle::GetResourceHandleDtypesAndShapes(
   // Wait for this TensorHandle to be ready.
   profiler::TraceMe activity("TensorHandle::GetResourceHandleInfo WaitReady",
                              profiler::TraceMeLevel::kVerbose);
-  auto& data = absl::get<LocalTensorHandleData>(data_);
+  auto& data = abslx::get<LocalTensorHandleData>(data_);
   TF_RETURN_IF_ERROR(data.WaitReady("TensorHandle::GetResourceHandleInfo"));
 
   *result = handle_dtypes_and_shapes_;
@@ -200,7 +200,7 @@ int TensorHandle::NumPackedHandles() const {
   if (Type() != PACKED) {
     return 0;
   }
-  return absl::get<PackedTensorHandleData>(data_).NumPackedHandles();
+  return abslx::get<PackedTensorHandleData>(data_).NumPackedHandles();
 }
 
 Status TensorHandle::ExtractPackedHandle(const int index,
@@ -209,7 +209,7 @@ Status TensorHandle::ExtractPackedHandle(const int index,
     return errors::Internal("Invalid ExtractPackedHandleOnDevice call on a",
                             TypeString(), " handle: ", this);
   }
-  return absl::get<PackedTensorHandleData>(data_).ExtractPackedHandle(index,
+  return abslx::get<PackedTensorHandleData>(data_).ExtractPackedHandle(index,
                                                                       handle);
 }
 
@@ -249,7 +249,7 @@ TensorHandle::TensorHandle(tensorflow::Tensor&& t, Device* d, Device* op_device,
       resource_remote_device_incarnation_(
           GetRemoteDeviceIncarnation(resource_device_)),
       ctx_(ctx),
-      data_(absl::in_place_type<LocalTensorHandleData>, std::move(t)) {
+      data_(abslx::in_place_type<LocalTensorHandleData>, std::move(t)) {
   DVLOG(3) << "Creating Local TensorHandle: " << this
            << " device: " << SafeDeviceDebugString(device_)
            << " tensor: " << t.DeviceSafeDebugString();
@@ -268,7 +268,7 @@ TensorHandle::TensorHandle(tensorflow::Tensor&& t, Device* d, Device* op_device,
       ctx_(ctx),
       handle_dtypes_and_shapes_(
           t.flat<class ResourceHandle>()(0).dtypes_and_shapes()),
-      data_(absl::in_place_type<LocalTensorHandleData>, std::move(t)) {
+      data_(abslx::in_place_type<LocalTensorHandleData>, std::move(t)) {
   DVLOG(3) << "Creating Local TensorHandle: " << this
            << " device: " << SafeDeviceDebugString(device_)
            << " tensor: " << t.DeviceSafeDebugString();
@@ -293,7 +293,7 @@ TensorHandle::TensorHandle(Device* d, Device* op_device,
       resource_remote_device_incarnation_(
           GetRemoteDeviceIncarnation(resource_device_)),
       ctx_(ctx),
-      data_(absl::in_place_type<LocalTensorHandleData>) {
+      data_(abslx::in_place_type<LocalTensorHandleData>) {
   DVLOG(3) << "Creating empty Local TensorHandle: " << this
            << " device: " << SafeDeviceDebugString(device_);
 }
@@ -358,7 +358,7 @@ TensorHandle::TensorHandle(std::vector<TensorHandle*>&& handles, Device* device,
       resource_remote_device_incarnation_(
           GetRemoteDeviceIncarnation(resource_device_)),
       ctx_(ctx),
-      data_(absl::in_place_type<PackedTensorHandleData>, std::move(handles),
+      data_(abslx::in_place_type<PackedTensorHandleData>, std::move(handles),
             shape) {
   DVLOG(3) << "Creating a packed TensorHandle: " << this
            << " device: " << SafeDeviceDebugString(device_);
@@ -386,7 +386,7 @@ TensorHandle::TensorHandle(int64_t op_id, int32_t output_num,
           GetRemoteDeviceIncarnation(resource_device_)),
       unknown_device_(unknown_device),
       ctx_(ctx),
-      data_(absl::in_place_type<RemoteTensorHandleData>, op_id, output_num,
+      data_(abslx::in_place_type<RemoteTensorHandleData>, op_id, output_num,
             remote_task, ctx) {
   DVLOG(3) << "Creating Unshaped Remote TensorHandle: " << this
            << " device: " << SafeDeviceDebugString(device_);
@@ -409,7 +409,7 @@ TensorHandle::TensorHandle(int64_t op_id, int32_t output_num,
       resource_remote_device_incarnation_(
           GetRemoteDeviceIncarnation(resource_device_)),
       ctx_(ctx),
-      data_(absl::in_place_type<RemoteTensorHandleData>, op_id, output_num,
+      data_(abslx::in_place_type<RemoteTensorHandleData>, op_id, output_num,
             ctx->GetContextViewId(), is_ready) {
   DVLOG(3) << "Creating Lazy Remote TensorHandle: " << this
            << " device: " << SafeDeviceDebugString(device_);
@@ -426,11 +426,11 @@ void TensorHandle::Release() {
 tensorflow::DataType TensorHandle::DataType() const { return dtype; }
 
 bool TensorHandle::IsReady() const {
-  return absl::visit([](auto& data) { return data.IsReady(); }, data_);
+  return abslx::visit([](auto& data) { return data.IsReady(); }, data_);
 }
 
 Status TensorHandle::WaitReady(const char* caller) const {
-  return absl::visit([caller](auto& data) { return data.WaitReady(caller); },
+  return abslx::visit([caller](auto& data) { return data.WaitReady(caller); },
                      data_);
 }
 
@@ -462,7 +462,7 @@ Status TensorHandle::Tensor(const tensorflow::Tensor** t) const {
                             " handle: ", this);
   }
 
-  auto& data = absl::get<LocalTensorHandleData>(data_);
+  auto& data = abslx::get<LocalTensorHandleData>(data_);
   return data.Tensor(t);
 }
 
@@ -476,7 +476,7 @@ Status TensorHandle::TensorFromDevice(const Device* d,
                               " handle: ", this);
     }
 
-    auto& data = absl::get<LocalTensorHandleData>(data_);
+    auto& data = abslx::get<LocalTensorHandleData>(data_);
     return data.Tensor(t);
   }
 
@@ -500,7 +500,7 @@ Status TensorHandle::TensorValue(const Device* d, tensorflow::TensorValue* t) {
                               " handle: ", this);
     }
 
-    auto& data = absl::get<LocalTensorHandleData>(data_);
+    auto& data = abslx::get<LocalTensorHandleData>(data_);
     return data.TensorValue(t);
   }
 
@@ -517,7 +517,7 @@ Status TensorHandle::TensorValue(const Device* d, tensorflow::TensorValue* t) {
 
 Status TensorHandle::WaitUnknownDevice() const {
   if (unknown_device_) {
-    TF_RETURN_IF_ERROR(absl::visit(
+    TF_RETURN_IF_ERROR(abslx::visit(
         [](auto& data) {
           return data.WaitReady("TensorHandle::UnknownDevice");
         },
@@ -536,7 +536,7 @@ Status TensorHandle::Shape(tensorflow::TensorShape* shape) {
     DCHECK(fill);
     return OkStatus();
   } else {
-    return absl::visit([shape](auto& data) { return data.Shape(shape); },
+    return abslx::visit([shape](auto& data) { return data.Shape(shape); },
                        data_);
   }
 }
@@ -611,7 +611,7 @@ Status TensorHandle::Shape(tensorflow::PartialTensorShape* shape) const {
     *shape = inference_shape_;
     return OkStatus();
   } else {
-    auto result = absl::visit(
+    auto result = abslx::visit(
         [](auto& data) {
           TensorShape shape;
           Status s = data.Shape(&shape);
@@ -630,7 +630,7 @@ Status TensorHandle::NumDims(int* num_dims) const {
     *num_dims = inference_shape_.dims();
     return OkStatus();
   } else {
-    return absl::visit(
+    return abslx::visit(
         [num_dims](auto& data) { return data.NumDims(num_dims); }, data_);
   }
 }
@@ -642,7 +642,7 @@ Status TensorHandle::Dim(int dim_index, int64_t* dim) const {
     *dim = inference_shape_.dim_size(dim_index);
     return OkStatus();
   } else {
-    return absl::visit(
+    return abslx::visit(
         [dim_index, dim](auto& data) { return data.Dim(dim_index, dim); },
         data_);
   }
@@ -654,7 +654,7 @@ Status TensorHandle::NumElements(int64_t* num_elements) const {
     *num_elements = inference_shape_.num_elements();
     return OkStatus();
   } else {
-    return absl::visit(
+    return abslx::visit(
         [num_elements](auto& data) { return data.NumElements(num_elements); },
         data_);
   }
@@ -664,7 +664,7 @@ Status TensorHandle::Unprotect(const Device* d) {
   DVLOG(3) << "Unprotect on TensorHandle: " << this << " device: " << d;
 
   if (d == device_) {
-    return absl::visit([](auto& data) { return data.Unprotect(); }, data_);
+    return abslx::visit([](auto& data) { return data.Unprotect(); }, data_);
   }
 
   tf_shared_lock l(mu_);
@@ -727,7 +727,7 @@ Status TensorHandle::RemoteAddress(const Device* d, const bool wait_until_ready,
     return errors::InvalidArgument("Primary device is not remote");
   }
 
-  auto& data = absl::get<RemoteTensorHandleData>(data_);
+  auto& data = abslx::get<RemoteTensorHandleData>(data_);
   return data.OpIdAndOutputNum(wait_until_ready, op_id, output_num);
 }
 
@@ -837,7 +837,7 @@ Status TensorHandle::SetRemoteShapeAndDevice(const TensorShape& shape,
       return mirror.SetShape(shape);
     } else if (mirror.context_view_id() < context_view_id) {
       return errors::Internal(
-          absl::Substitute("Unexpected context_view_id ($0) which should not "
+          abslx::Substitute("Unexpected context_view_id ($0) which should not "
                            "be newer than the "
                            "one ($1) associated to the remote mirror.",
                            context_view_id, mirror.context_view_id()));
@@ -851,7 +851,7 @@ Status TensorHandle::SetRemoteShapeAndDevice(const TensorShape& shape,
   DCHECK(Type() == REMOTE)
       << "SetRemoteShape is only called on remote handles.";
 
-  auto& data = absl::get<RemoteTensorHandleData>(data_);
+  auto& data = abslx::get<RemoteTensorHandleData>(data_);
   // context_view_id is currently used to validate mirrors. The shape of
   // RemoteTensorHandleData should be set without checking context_view_id.
   // The reason behind it is that for the primary copy of data, if the remote
@@ -892,7 +892,7 @@ void TensorHandle::PoisonRemote(Status status, const Device* d,
     DCHECK(Type() == REMOTE)
         << "Poison can only be on remote handles: " << this;
 
-    auto& data = absl::get<RemoteTensorHandleData>(data_);
+    auto& data = abslx::get<RemoteTensorHandleData>(data_);
     data.Poison(status);
   } else {
     tf_shared_lock l(mu_);
@@ -934,7 +934,7 @@ Status TensorHandle::SetTensor(tensorflow::Tensor&& t, const Device* d) {
       auto& resource_handle = t.flat<class ResourceHandle>()(0);
       handle_dtypes_and_shapes_ = resource_handle.dtypes_and_shapes();
     }
-    auto& data = absl::get<LocalTensorHandleData>(data_);
+    auto& data = abslx::get<LocalTensorHandleData>(data_);
     return data.SetTensor(std::move(t));
   } else {
     tf_shared_lock l(mu_);
@@ -956,7 +956,7 @@ void TensorHandle::Poison(Status status, const Device* d) {
 
   if (d == device_) {
     DCHECK(Type() != REMOTE) << "Poison can only be on local handles: " << this;
-    absl::visit([status](auto& data) { data.Poison(status); }, data_);
+    abslx::visit([status](auto& data) { data.Poison(status); }, data_);
   } else {
     tf_shared_lock l(mu_);
     auto elem = local_mirrors_.find(d);

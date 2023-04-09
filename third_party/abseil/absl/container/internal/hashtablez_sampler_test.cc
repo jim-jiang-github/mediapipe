@@ -35,7 +35,7 @@ constexpr int kProbeLength = 16;
 constexpr int kProbeLength = 8;
 #endif
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 #if defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
@@ -56,7 +56,7 @@ class HashtablezInfoHandlePeer {
 #endif  // defined(ABSL_INTERNAL_HASHTABLEZ_SAMPLE)
 
 namespace {
-using ::absl::synchronization_internal::ThreadPool;
+using ::abslx::synchronization_internal::ThreadPool;
 using ::testing::IsEmpty;
 using ::testing::UnorderedElementsAre;
 
@@ -76,9 +76,9 @@ HashtablezInfo* Register(HashtablezSampler* s, size_t size) {
 }
 
 TEST(HashtablezInfoTest, PrepareForSampling) {
-  absl::Time test_start = absl::Now();
+  abslx::Time test_start = abslx::Now();
   HashtablezInfo info;
-  absl::MutexLock l(&info.init_mu);
+  abslx::MutexLock l(&info.init_mu);
   info.PrepareForSampling();
 
   EXPECT_EQ(info.capacity.load(), 0);
@@ -100,7 +100,7 @@ TEST(HashtablezInfoTest, PrepareForSampling) {
   info.hashes_bitwise_or.store(1, std::memory_order_relaxed);
   info.hashes_bitwise_and.store(1, std::memory_order_relaxed);
   info.hashes_bitwise_xor.store(1, std::memory_order_relaxed);
-  info.create_time = test_start - absl::Hours(20);
+  info.create_time = test_start - abslx::Hours(20);
 
   info.PrepareForSampling();
   EXPECT_EQ(info.capacity.load(), 0);
@@ -117,7 +117,7 @@ TEST(HashtablezInfoTest, PrepareForSampling) {
 
 TEST(HashtablezInfoTest, RecordStorageChanged) {
   HashtablezInfo info;
-  absl::MutexLock l(&info.init_mu);
+  abslx::MutexLock l(&info.init_mu);
   info.PrepareForSampling();
   RecordStorageChangedSlow(&info, 17, 47);
   EXPECT_EQ(info.size.load(), 17);
@@ -129,7 +129,7 @@ TEST(HashtablezInfoTest, RecordStorageChanged) {
 
 TEST(HashtablezInfoTest, RecordInsert) {
   HashtablezInfo info;
-  absl::MutexLock l(&info.init_mu);
+  abslx::MutexLock l(&info.init_mu);
   info.PrepareForSampling();
   EXPECT_EQ(info.max_probe_length.load(), 0);
   RecordInsertSlow(&info, 0x0000FF00, 6 * kProbeLength);
@@ -151,7 +151,7 @@ TEST(HashtablezInfoTest, RecordInsert) {
 
 TEST(HashtablezInfoTest, RecordErase) {
   HashtablezInfo info;
-  absl::MutexLock l(&info.init_mu);
+  abslx::MutexLock l(&info.init_mu);
   info.PrepareForSampling();
   EXPECT_EQ(info.num_erases.load(), 0);
   EXPECT_EQ(info.size.load(), 0);
@@ -164,7 +164,7 @@ TEST(HashtablezInfoTest, RecordErase) {
 
 TEST(HashtablezInfoTest, RecordRehash) {
   HashtablezInfo info;
-  absl::MutexLock l(&info.init_mu);
+  abslx::MutexLock l(&info.init_mu);
   info.PrepareForSampling();
   RecordInsertSlow(&info, 0x1, 0);
   RecordInsertSlow(&info, 0x2, kProbeLength);
@@ -329,11 +329,11 @@ TEST(HashtablezSamplerTest, MultiThreaded) {
             break;
           }
           case 2: {
-            absl::Duration oldest = absl::ZeroDuration();
+            abslx::Duration oldest = abslx::ZeroDuration();
             sampler.Iterate([&](const HashtablezInfo& info) {
-              oldest = std::max(oldest, absl::Now() - info.create_time);
+              oldest = std::max(oldest, abslx::Now() - info.create_time);
             });
-            ASSERT_GE(oldest, absl::ZeroDuration());
+            ASSERT_GE(oldest, abslx::ZeroDuration());
             break;
           }
         }
@@ -342,7 +342,7 @@ TEST(HashtablezSamplerTest, MultiThreaded) {
   }
   // The threads will hammer away.  Give it a little bit of time for tsan to
   // spot errors.
-  absl::SleepFor(absl::Seconds(3));
+  abslx::SleepFor(abslx::Seconds(3));
   stop.Notify();
 }
 
@@ -374,4 +374,4 @@ TEST(HashtablezSamplerTest, Callback) {
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

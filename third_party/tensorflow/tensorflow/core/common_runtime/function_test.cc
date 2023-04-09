@@ -70,7 +70,7 @@ Status GetOpSig(const string& op, const OpDef** sig) {
 
 void HasError(const Status& s, const error::Code code, StringPiece substr) {
   EXPECT_EQ(s.code(), code) << s;
-  EXPECT_TRUE(absl::StrContains(s.error_message(), substr))
+  EXPECT_TRUE(abslx::StrContains(s.error_message(), substr))
       << s << ", expected substring " << substr;
 }
 
@@ -250,8 +250,8 @@ class FunctionLibraryRuntimeTest : public ::testing::Test {
     Status status2 = Run(flr, handle, opts, args, std::move(rets));
     EXPECT_TRUE(errors::IsNotFound(status2))
         << "Actual status: " << status2.ToString();
-    EXPECT_TRUE(absl::StrContains(status2.error_message(), "Handle"));
-    EXPECT_TRUE(absl::StrContains(status2.error_message(), "not found"));
+    EXPECT_TRUE(abslx::StrContains(status2.error_message(), "Handle"));
+    EXPECT_TRUE(abslx::StrContains(status2.error_message(), "not found"));
 
     return status;
   }
@@ -308,8 +308,8 @@ class FunctionLibraryRuntimeTest : public ::testing::Test {
 
     Status status2 = Run(flr, handle, opts, args, std::move(rets));
     EXPECT_TRUE(errors::IsNotFound(status2));
-    EXPECT_TRUE(absl::StrContains(status2.error_message(), "Handle"));
-    EXPECT_TRUE(absl::StrContains(status2.error_message(), "not found"));
+    EXPECT_TRUE(abslx::StrContains(status2.error_message(), "Handle"));
+    EXPECT_TRUE(abslx::StrContains(status2.error_message(), "not found"));
 
     return status;
   }
@@ -378,7 +378,7 @@ TEST_F(FunctionLibraryRuntimeTest, XTimesTwo) {
 
 TEST_F(FunctionLibraryRuntimeTest, InstantiationStackTraceCopying) {
   class DummyStackTrace : public AbstractStackTrace {
-    absl::Span<StackFrame const> ToFrames() const override { return {}; }
+    abslx::Span<StackFrame const> ToFrames() const override { return {}; }
 
     std::string ToString(const TracePrintingOptions& opts) const override {
       return "DummyStackTrace";

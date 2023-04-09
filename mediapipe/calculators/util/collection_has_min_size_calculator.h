@@ -42,7 +42,7 @@ namespace mediapipe {
 template <typename IterableT>
 class CollectionHasMinSizeCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     RET_CHECK(cc->Inputs().HasTag("ITERABLE"));
     RET_CHECK_EQ(1, cc->Inputs().NumEntries());
 
@@ -60,10 +60,10 @@ class CollectionHasMinSizeCalculator : public CalculatorBase {
     if (cc->InputSidePackets().NumEntries() > 0) {
       cc->InputSidePackets().Index(0).Set<int>();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
     min_size_ =
         cc->Options<::mediapipe::CollectionHasMinSizeCalculatorOptions>()
@@ -73,17 +73,17 @@ class CollectionHasMinSizeCalculator : public CalculatorBase {
         !cc->InputSidePackets().Index(0).IsEmpty()) {
       min_size_ = cc->InputSidePackets().Index(0).Get<int>();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     const IterableT& input = cc->Inputs().Tag("ITERABLE").Get<IterableT>();
     bool has_min_size = input.size() >= min_size_;
 
     cc->Outputs().Index(0).AddPacket(
         MakePacket<bool>(has_min_size).At(cc->InputTimestamp()));
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:

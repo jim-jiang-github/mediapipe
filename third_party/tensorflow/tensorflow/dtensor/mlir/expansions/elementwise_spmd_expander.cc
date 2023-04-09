@@ -102,7 +102,7 @@ StatusOr<mlir::Operation*> ElementwiseSPMDExpander::ExpandOp(
     auto truncated_layout = output_layout->Truncate(rank_offset, /*end=*/true);
     mlir::Value output;
     TF_ASSIGN_OR_RETURN(const auto& shape, ExtractGlobalInputShape(operand));
-    absl::flat_hash_set<int> size_one_dims;
+    abslx::flat_hash_set<int> size_one_dims;
     for (int i = 0; i < shape.size(); ++i)
       if (shape[i] == 1) size_one_dims.emplace(i);
     truncated_layout = truncated_layout.GetLayoutWithReducedDims(
@@ -122,7 +122,7 @@ StatusOr<mlir::Operation*> ElementwiseSPMDExpander::ExpandOp(
 StatusOr<llvm::DenseMap<int, Layout>>
 ElementwiseSPMDExpander::ComputeLayoutForward(
     mlir::Operation* op, const llvm::DenseMap<int, Layout>& input_layouts) {
-  TF_ASSIGN_OR_RETURN(absl::optional<Layout> merged_operand_layout,
+  TF_ASSIGN_OR_RETURN(abslx::optional<Layout> merged_operand_layout,
                       GetMergedOperandLayout(input_layouts, op));
 
   if (merged_operand_layout) {

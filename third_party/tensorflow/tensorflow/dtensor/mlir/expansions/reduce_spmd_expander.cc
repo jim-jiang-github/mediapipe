@@ -59,11 +59,11 @@ namespace tensorflow {
 namespace dtensor {
 namespace {
 
-absl::string_view StringRefToView(llvm::StringRef ref) {
-  return absl::string_view(ref.data(), ref.size());
+abslx::string_view StringRefToView(llvm::StringRef ref) {
+  return abslx::string_view(ref.data(), ref.size());
 }
 
-absl::string_view DefiningOpName(mlir::Value operand) {
+abslx::string_view DefiningOpName(mlir::Value operand) {
   return StringRefToView(operand.getDefiningOp()->getName().getStringRef());
 }
 
@@ -79,9 +79,9 @@ Status AssertReplicated(mlir::Value operand) {
   return OkStatus();
 }
 
-absl::flat_hash_set<std::string> ReducedMeshDimensions(
+abslx::flat_hash_set<std::string> ReducedMeshDimensions(
     const dtensor::Layout& input, const dtensor::Layout& output) {
-  absl::flat_hash_set<std::string> mesh_dims;
+  abslx::flat_hash_set<std::string> mesh_dims;
   for (const auto& dim : input.sharding_specs()) {
     mesh_dims.insert(dim.sharding_spec());
   }
@@ -134,7 +134,7 @@ Status ExtractDims<mlir::TF::BiasAddGradOp>(
 }
 
 Status ExtractReductionParameters(mlir::Operation* op,
-                                  absl::flat_hash_set<int>& reduced_dims_set,
+                                  abslx::flat_hash_set<int>& reduced_dims_set,
                                   bool& keep_dims) {
   llvm::SmallVector<int64_t, 4> reduced_dims;
   bool matched = false;
@@ -169,7 +169,7 @@ StatusOr<Layout> ComputeResultLayout(mlir::Operation* op,
   if (mlir::isa<mlir::TF::L2LossOp>(op))
     return Layout::ReplicatedOnMesh(input_layout.mesh(), /*rank=*/0);
 
-  absl::flat_hash_set<int> reduced_dims_set;
+  abslx::flat_hash_set<int> reduced_dims_set;
   bool keep_dims;
   TF_RETURN_IF_ERROR(
       ExtractReductionParameters(op, reduced_dims_set, keep_dims));
@@ -204,7 +204,7 @@ StatusOr<mlir::Operation*> ReduceSPMDExpander::ExpandOp(mlir::Operation* op) {
   TF_ASSIGN_OR_RETURN(auto output_layout,
                       ComputeResultLayout(op, input_layout.value()));
 
-  absl::flat_hash_set<std::string> reduced_dims =
+  abslx::flat_hash_set<std::string> reduced_dims =
       ReducedMeshDimensions(*input_layout, output_layout);
   InferSPMDExpandedLocalShape(op);
 
@@ -290,7 +290,7 @@ StatusOr<llvm::DenseMap<int, Layout>> ReduceSPMDExpander::ComputeLayoutBackward(
 
   std::vector<std::string> inferred_operand_layout_str;
 
-  absl::flat_hash_set<int> reduced_dims_set;
+  abslx::flat_hash_set<int> reduced_dims_set;
   bool keep_dims;
   TF_RETURN_IF_ERROR(
       ExtractReductionParameters(op, reduced_dims_set, keep_dims));

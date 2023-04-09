@@ -45,8 +45,8 @@ class CustomGradientTest
 class PassThroughGradientFunction : public GradientFunction {
  public:
   Status Compute(AbstractContext* ctx,
-                 absl::Span<AbstractTensorHandle* const> grad_outputs,
-                 absl::Span<AbstractTensorHandle*> grad_inputs) override {
+                 abslx::Span<AbstractTensorHandle* const> grad_outputs,
+                 abslx::Span<AbstractTensorHandle*> grad_inputs) override {
     CHECK_EQ(grad_outputs.size(), 1);
     CHECK_EQ(grad_inputs.size(), 1);
     grad_inputs[0] = grad_outputs[0];
@@ -66,8 +66,8 @@ class PassThroughGradientFunction : public GradientFunction {
 //   return tf.exp(input), grad
 // outputs = [f(inputs[0])]
 Status ExpWithPassThroughGrad(AbstractContext* ctx,
-                              absl::Span<AbstractTensorHandle* const> inputs,
-                              absl::Span<AbstractTensorHandle*> outputs) {
+                              abslx::Span<AbstractTensorHandle* const> inputs,
+                              abslx::Span<AbstractTensorHandle*> outputs) {
   Tape tape(/*persistent=*/false);
   tape.Watch(inputs[0]);  // Watch x.
   AbstractTensorHandle* exp_output;
@@ -111,7 +111,7 @@ TEST_P(CustomGradientTest, ExpWithPassThroughGrad) {
   // outputs = tape.gradient(y, x)
   std::vector<AbstractTensorHandle*> outputs(1);
   Status s = RunModel(ExpWithPassThroughGrad, ctx.get(), {x.get()},
-                      absl::MakeSpan(outputs),
+                      abslx::MakeSpan(outputs),
                       /*use_function=*/!std::get<2>(GetParam()));
   ASSERT_EQ(errors::OK, s.code()) << s.error_message();
 

@@ -201,7 +201,7 @@ class Delegate {
     }
   }
 
-  absl::Status BindBufferToTensor(id<MTLBuffer> buffer, int tensor_index) {
+  abslx::Status BindBufferToTensor(id<MTLBuffer> buffer, int tensor_index) {
     // The tensor index is expected to be an input or output tensor of the interpreter.
     // For quantized model, the buffer should be linked with their dequantized counterpart.
     if (quant_conversion_map_.find(tensor_index) != quant_conversion_map_.end()) {
@@ -217,7 +217,7 @@ class Delegate {
           RETURN_IF_ERROR(inference_context_.SetTensor(input.id, in_out_tensors_[input.id].get()));
         }
         input.set_externally = true;
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
     }
     for (auto& output : graph_outputs_) {
@@ -228,10 +228,10 @@ class Delegate {
               inference_context_.SetTensor(output.id, in_out_tensors_[output.id].get()));
         }
         output.set_externally = true;
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
     }
-    return absl::NotFoundError("Couldn't find tensor: " + std::to_string(tensor_index));
+    return abslx::NotFoundError("Couldn't find tensor: " + std::to_string(tensor_index));
   }
 
   void SetCommandBuffer(id<MTLCommandBuffer> command_buffer) {
@@ -240,9 +240,9 @@ class Delegate {
 
   // This directs the runtime to allocate memory for input/output temporary
   // tensors that require dequantization/quantization.
-  absl::Status GetRequiredTemporaries(TfLiteContext* context, TfLiteNode* node,
+  abslx::Status GetRequiredTemporaries(TfLiteContext* context, TfLiteNode* node,
                                       TfLiteIntArray** temporaries_array_ptr) {
-    if (quant_conversion_map_.empty()) return absl::OkStatus();
+    if (quant_conversion_map_.empty()) return abslx::OkStatus();
 
     std::vector<int> temporary_tensor_ids;
     for (auto index : input_tensor_ids_) {
@@ -259,10 +259,10 @@ class Delegate {
     for (int i = 0; i < temporary_tensor_ids.size(); ++i) {
       (*temporaries_array_ptr)->data[i] = temporary_tensor_ids[i];
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Prepare(TfLiteContext* context, const TfLiteDelegateParams* delegate_params) {
+  abslx::Status Prepare(TfLiteContext* context, const TfLiteDelegateParams* delegate_params) {
     // Extract TFLite delegate execution plan from the context and convert it into GraphFloat32.
     GraphFloat32 graph;
     quant_conversion_map_.clear();
@@ -305,7 +305,7 @@ class Delegate {
       }
       const auto* input = find_value(tensor_index);
       if (!input || tensor->type != TfLiteType::kTfLiteFloat32) {
-        return absl::NotFoundError("Input tensor is not found in the graph.");
+        return abslx::NotFoundError("Input tensor is not found in the graph.");
       }
 
       inputs_.push_back(input->id);
@@ -330,7 +330,7 @@ class Delegate {
       }
       const auto* output = find_value(tensor_index);
       if (!output || tensor->type != TfLiteType::kTfLiteFloat32) {
-        return absl::NotFoundError("Output tensor is not found in the graph.");
+        return abslx::NotFoundError("Output tensor is not found in the graph.");
       }
 
       outputs_.push_back(output->id);
@@ -448,7 +448,7 @@ class Delegate {
                                                           isFloat16:options_.allow_precision_loss
                                                     convertToPBHWC4:true];
     if (converter_to_BPHWC4_ == nil) {
-      return absl::InternalError("Error initialization of input buffer converter");
+      return abslx::InternalError("Error initialization of input buffer converter");
     }
 
     // allocate converter bphwc4->bhwc
@@ -456,7 +456,7 @@ class Delegate {
                                                             isFloat16:options_.allow_precision_loss
                                                       convertToPBHWC4:false];
     if (converter_from_BPHWC4_ == nil) {
-      return absl::InternalError("Error initialization of output buffer converter");
+      return abslx::InternalError("Error initialization of output buffer converter");
     }
 
     RETURN_IF_ERROR(
@@ -465,10 +465,10 @@ class Delegate {
       RETURN_IF_ERROR(
           inference_context_.SetTensor(external_tensor.first, external_tensor.second.get()));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Invoke(TfLiteContext* context) {
+  abslx::Status Invoke(TfLiteContext* context) {
     if (options_.wait_type == TFLGpuDelegateWaitType::TFLGpuDelegateWaitTypeAggressive)
       gpu_alarm_clock_->Stop();
     // We need only synchronization so volatile works better than atomic which reads from global
@@ -569,11 +569,11 @@ class Delegate {
       // External command buffer is assigned so all output buffers are controlled by a user.
       for (const auto& output : graph_outputs_) {
         if (!output.set_externally) {
-          return absl::InternalError(
+          return abslx::InternalError(
               "External command encoder is used, but not all output buffers are bound.");
         }
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     // Retrieve data from GPU and convert from PHWC4 to HWC.
@@ -587,7 +587,7 @@ class Delegate {
     if (is_quantized_model) {
       RETURN_IF_ERROR(QuantizeOutputs(context, output_tensor_ids_, quant_conversion_map_));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   const TFLGpuDelegateOptions options() const { return options_; }
@@ -616,7 +616,7 @@ class Delegate {
   // Whenever quantized inference is enabled, this maps the tensor index of each
   // originally quantized (8-bit) tensor to its float version added in
   // model_builder - and vice versa.
-  absl::flat_hash_map<int, int> quant_conversion_map_;
+  abslx::flat_hash_map<int, int> quant_conversion_map_;
 
   InferenceContext inference_context_;
   // Metal bhwc f32 input and output buffers for better conversion performance from cpu tensors

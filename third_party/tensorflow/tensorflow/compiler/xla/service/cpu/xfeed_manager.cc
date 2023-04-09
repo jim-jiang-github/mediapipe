@@ -28,7 +28,7 @@ void XfeedManager::Reset() {
 }
 
 void XfeedQueueManager::Reset() {
-  absl::MutexLock l(&mu_);
+  abslx::MutexLock l(&mu_);
   CHECK(current_buffer_ == nullptr);
   for (auto buffer : enqueued_buffers_) {
     buffer->Done(ShapeUtil::MakeNil());
@@ -37,8 +37,8 @@ void XfeedQueueManager::Reset() {
 }
 
 void XfeedQueueManager::EnqueueBuffersAtomically(
-    absl::Span<XfeedBuffer* const> buffers) {
-  absl::MutexLock l(&mu_);
+    abslx::Span<XfeedBuffer* const> buffers) {
+  abslx::MutexLock l(&mu_);
   bool was_empty = enqueued_buffers_.empty();
   for (XfeedBuffer* b : buffers) {
     VLOG(3) << "Enqueueing " << queue_name_ << " buffer (of " << buffers.size()
@@ -55,7 +55,7 @@ void XfeedQueueManager::EnqueueBuffersAtomically(
 }
 
 XfeedBuffer* XfeedQueueManager::BlockingDequeueBuffer() {
-  absl::MutexLock l(&mu_);
+  abslx::MutexLock l(&mu_);
   VLOG(3) << "Waiting for an available buffer.";
   while (enqueued_buffers_.empty()) {
     cv_.Wait(&mu_);
@@ -72,7 +72,7 @@ void XfeedQueueManager::ReleaseCurrentBuffer(int32_t length, void* data,
   VLOG(3) << "Releasing buffer with shape: "
           << (shape.ok() ? ShapeUtil::HumanString(shape.ValueOrDie())
                          : "<error status>");
-  absl::MutexLock l(&mu_);
+  abslx::MutexLock l(&mu_);
   CHECK(current_buffer_ != nullptr);
   CHECK_EQ(length, current_buffer_->length());
   CHECK_EQ(data, current_buffer_->data());

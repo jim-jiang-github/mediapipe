@@ -246,7 +246,7 @@ AbstractTensorInterface* EagerContext::CreateBoolScalar(bool value) {
 }
 
 AbstractTensorInterface* EagerContext::CreateTensor(
-    DataType dtype, absl::Span<const int64_t> dim_sizes) {
+    DataType dtype, abslx::Span<const int64_t> dim_sizes) {
   return new TensorInterface(Tensor(dtype, TensorShape(dim_sizes)));
 }
 
@@ -297,8 +297,8 @@ void EagerContext::InitPrioritizedDeviceTypeList() {
 }
 
 namespace {
-// Using absl::StrJoin with lambda does not work in tf-lite builds.
-// TODO(b/148160441): Replace with absl::StrJoin once DeviceBase has operator<<.
+// Using abslx::StrJoin with lambda does not work in tf-lite builds.
+// TODO(b/148160441): Replace with abslx::StrJoin once DeviceBase has operator<<.
 std::vector<string> DevicesToString(const PrioritizedDeviceVector& devices) {
   std::vector<string> v;
   v.reserve(devices.size());
@@ -391,16 +391,16 @@ Status EagerContext::SelectDevice(DeviceNameUtils::ParsedName preferred,
         "Could not satisfy device specification '", preferred,
         "'. enable_soft_placement=", AllowSoftPlacement(),
         ". Supported device types [",
-        absl::StrJoin(DeviceTypesToString(supported_devs), ", "),
+        abslx::StrJoin(DeviceTypesToString(supported_devs), ", "),
         "]. All available devices [",
-        absl::StrJoin(DevicesToString(existing), ", "), "].");
+        abslx::StrJoin(DevicesToString(existing), ", "), "].");
   }
   return errors::InvalidArgument(
       "No supported device found in available devices [",
-      absl::StrJoin(DevicesToString(existing), ", "),
+      abslx::StrJoin(DevicesToString(existing), ", "),
       "]. enable_soft_placement=", AllowSoftPlacement(),
       ". Supported devices types [",
-      absl::StrJoin(DeviceTypesToString(supported_devs), ", "), "].");
+      abslx::StrJoin(DeviceTypesToString(supported_devs), ", "), "].");
 }
 
 void EagerContext::ResetClusterFLR(
@@ -1156,7 +1156,7 @@ Status EagerContext::FindOrCreateCompositeDevice(
     return OkStatus();
   }
 
-  const uint64 hash_key = Fingerprint64(absl::StrJoin(underlying_devices, ","));
+  const uint64 hash_key = Fingerprint64(abslx::StrJoin(underlying_devices, ","));
 
   mutex_lock l(composite_devices_mu_);
   auto iter = composite_devices_.find(hash_key);

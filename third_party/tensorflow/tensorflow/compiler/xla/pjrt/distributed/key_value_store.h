@@ -37,15 +37,15 @@ class KeyValueStore {
   // Looks up `key`. If present, returns its value. If the key is not present,
   // waits until `timeout` expires for the key to arrive. If the key does not
   // arrive by the expiry of `timeout`, returns NOT_FOUND.
-  ::grpc::Status Get(const std::string& key, absl::Duration timeout,
+  ::grpc::Status Get(const std::string& key, abslx::Duration timeout,
                      std::string* value);
 
   // Replaces the value of `key` with `value`.
   ::grpc::Status Set(const std::string& key, std::string value);
 
  private:
-  absl::Mutex mu_;
-  absl::flat_hash_map<std::string, std::string> entries_ ABSL_GUARDED_BY(mu_);
+  abslx::Mutex mu_;
+  abslx::flat_hash_map<std::string, std::string> entries_ ABSL_GUARDED_BY(mu_);
 };
 
 }  // namespace xla

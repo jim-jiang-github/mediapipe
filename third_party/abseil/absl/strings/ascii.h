@@ -59,7 +59,7 @@
 #include "absl/base/config.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace ascii_internal {
 
@@ -167,10 +167,10 @@ inline char ascii_tolower(unsigned char c) {
 // Converts the characters in `s` to lowercase, changing the contents of `s`.
 void AsciiStrToLower(std::string* s);
 
-// Creates a lowercase string from a given absl::string_view.
-ABSL_MUST_USE_RESULT inline std::string AsciiStrToLower(absl::string_view s) {
+// Creates a lowercase string from a given abslx::string_view.
+ABSL_MUST_USE_RESULT inline std::string AsciiStrToLower(abslx::string_view s) {
   std::string result(s);
-  absl::AsciiStrToLower(&result);
+  abslx::AsciiStrToLower(&result);
   return result;
 }
 
@@ -185,45 +185,45 @@ inline char ascii_toupper(unsigned char c) {
 // Converts the characters in `s` to uppercase, changing the contents of `s`.
 void AsciiStrToUpper(std::string* s);
 
-// Creates an uppercase string from a given absl::string_view.
-ABSL_MUST_USE_RESULT inline std::string AsciiStrToUpper(absl::string_view s) {
+// Creates an uppercase string from a given abslx::string_view.
+ABSL_MUST_USE_RESULT inline std::string AsciiStrToUpper(abslx::string_view s) {
   std::string result(s);
-  absl::AsciiStrToUpper(&result);
+  abslx::AsciiStrToUpper(&result);
   return result;
 }
 
-// Returns absl::string_view with whitespace stripped from the beginning of the
+// Returns abslx::string_view with whitespace stripped from the beginning of the
 // given string_view.
-ABSL_MUST_USE_RESULT inline absl::string_view StripLeadingAsciiWhitespace(
-    absl::string_view str) {
-  auto it = std::find_if_not(str.begin(), str.end(), absl::ascii_isspace);
+ABSL_MUST_USE_RESULT inline abslx::string_view StripLeadingAsciiWhitespace(
+    abslx::string_view str) {
+  auto it = std::find_if_not(str.begin(), str.end(), abslx::ascii_isspace);
   return str.substr(it - str.begin());
 }
 
 // Strips in place whitespace from the beginning of the given string.
 inline void StripLeadingAsciiWhitespace(std::string* str) {
-  auto it = std::find_if_not(str->begin(), str->end(), absl::ascii_isspace);
+  auto it = std::find_if_not(str->begin(), str->end(), abslx::ascii_isspace);
   str->erase(str->begin(), it);
 }
 
-// Returns absl::string_view with whitespace stripped from the end of the given
+// Returns abslx::string_view with whitespace stripped from the end of the given
 // string_view.
-ABSL_MUST_USE_RESULT inline absl::string_view StripTrailingAsciiWhitespace(
-    absl::string_view str) {
-  auto it = std::find_if_not(str.rbegin(), str.rend(), absl::ascii_isspace);
+ABSL_MUST_USE_RESULT inline abslx::string_view StripTrailingAsciiWhitespace(
+    abslx::string_view str) {
+  auto it = std::find_if_not(str.rbegin(), str.rend(), abslx::ascii_isspace);
   return str.substr(0, str.rend() - it);
 }
 
 // Strips in place whitespace from the end of the given string
 inline void StripTrailingAsciiWhitespace(std::string* str) {
-  auto it = std::find_if_not(str->rbegin(), str->rend(), absl::ascii_isspace);
+  auto it = std::find_if_not(str->rbegin(), str->rend(), abslx::ascii_isspace);
   str->erase(str->rend() - it);
 }
 
-// Returns absl::string_view with whitespace stripped from both ends of the
+// Returns abslx::string_view with whitespace stripped from both ends of the
 // given string_view.
-ABSL_MUST_USE_RESULT inline absl::string_view StripAsciiWhitespace(
-    absl::string_view str) {
+ABSL_MUST_USE_RESULT inline abslx::string_view StripAsciiWhitespace(
+    abslx::string_view str) {
   return StripTrailingAsciiWhitespace(StripLeadingAsciiWhitespace(str));
 }
 
@@ -237,6 +237,6 @@ inline void StripAsciiWhitespace(std::string* str) {
 void RemoveExtraAsciiWhitespace(std::string*);
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_ASCII_H_

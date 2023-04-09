@@ -54,7 +54,7 @@ Status HostTensorToMutableBorrowingLiteral(
 
 // Returns a BorrowingLiteral tuple that utilizes the same underlying buffers
 // owned by 'host_tensors'.
-Status HostTensorsToBorrowingLiteralTuple(absl::Span<const Tensor> host_tensors,
+Status HostTensorsToBorrowingLiteralTuple(abslx::Span<const Tensor> host_tensors,
                                           xla::BorrowingLiteral* literal);
 
 // Copies 'literal' to freshly allocated 'host_tensor', which is allocated of

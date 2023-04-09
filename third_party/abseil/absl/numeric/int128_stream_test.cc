@@ -22,7 +22,7 @@
 namespace {
 
 struct Uint128TestCase {
-  absl::uint128 value;
+  abslx::uint128 value;
   std::ios_base::fmtflags flags;
   std::streamsize width;
   const char* expected;
@@ -119,23 +119,23 @@ TEST(Uint128, OStreamValueTest) {
   CheckUint128Case({std::numeric_limits<uint64_t>::max(), kHex,
                     /*width = */ 0, "ffffffffffffffff"});
   CheckUint128Case(
-      {absl::MakeUint128(1, 0), kDec, /*width = */ 0, "18446744073709551616"});
-  CheckUint128Case({absl::MakeUint128(1, 0), kOct, /*width = */ 0,
+      {abslx::MakeUint128(1, 0), kDec, /*width = */ 0, "18446744073709551616"});
+  CheckUint128Case({abslx::MakeUint128(1, 0), kOct, /*width = */ 0,
                     "2000000000000000000000"});
   CheckUint128Case(
-      {absl::MakeUint128(1, 0), kHex, /*width = */ 0, "10000000000000000"});
-  CheckUint128Case({absl::MakeUint128(0x8000000000000000, 0), kDec,
+      {abslx::MakeUint128(1, 0), kHex, /*width = */ 0, "10000000000000000"});
+  CheckUint128Case({abslx::MakeUint128(0x8000000000000000, 0), kDec,
                     /*width = */ 0, "170141183460469231731687303715884105728"});
-  CheckUint128Case({absl::MakeUint128(0x8000000000000000, 0), kOct,
+  CheckUint128Case({abslx::MakeUint128(0x8000000000000000, 0), kOct,
                     /*width = */ 0,
                     "2000000000000000000000000000000000000000000"});
-  CheckUint128Case({absl::MakeUint128(0x8000000000000000, 0), kHex,
+  CheckUint128Case({abslx::MakeUint128(0x8000000000000000, 0), kHex,
                     /*width = */ 0, "80000000000000000000000000000000"});
-  CheckUint128Case({absl::kuint128max, kDec, /*width = */ 0,
+  CheckUint128Case({abslx::kuint128max, kDec, /*width = */ 0,
                     "340282366920938463463374607431768211455"});
-  CheckUint128Case({absl::kuint128max, kOct, /*width = */ 0,
+  CheckUint128Case({abslx::kuint128max, kOct, /*width = */ 0,
                     "3777777777777777777777777777777777777777777"});
-  CheckUint128Case({absl::kuint128max, kHex, /*width = */ 0,
+  CheckUint128Case({abslx::kuint128max, kHex, /*width = */ 0,
                     "ffffffffffffffffffffffffffffffff"});
 }
 
@@ -148,7 +148,7 @@ TEST(Uint128, OStreamFormatTest) {
 }
 
 struct Int128TestCase {
-  absl::int128 value;
+  abslx::int128 value;
   std::ios_base::fmtflags flags;
   std::streamsize width;
   const char* expected;
@@ -187,30 +187,30 @@ TEST(Int128, OStreamValueTest) {
   CheckInt128Case({std::numeric_limits<uint64_t>::max(), kHex,
                    /*width = */ 0, "ffffffffffffffff"});
   CheckInt128Case(
-      {absl::MakeInt128(1, 0), kDec, /*width = */ 0, "18446744073709551616"});
+      {abslx::MakeInt128(1, 0), kDec, /*width = */ 0, "18446744073709551616"});
   CheckInt128Case(
-      {absl::MakeInt128(1, 0), kOct, /*width = */ 0, "2000000000000000000000"});
+      {abslx::MakeInt128(1, 0), kOct, /*width = */ 0, "2000000000000000000000"});
   CheckInt128Case(
-      {absl::MakeInt128(1, 0), kHex, /*width = */ 0, "10000000000000000"});
-  CheckInt128Case({absl::MakeInt128(std::numeric_limits<int64_t>::max(),
+      {abslx::MakeInt128(1, 0), kHex, /*width = */ 0, "10000000000000000"});
+  CheckInt128Case({abslx::MakeInt128(std::numeric_limits<int64_t>::max(),
                                     std::numeric_limits<uint64_t>::max()),
                    std::ios::dec, /*width = */ 0,
                    "170141183460469231731687303715884105727"});
-  CheckInt128Case({absl::MakeInt128(std::numeric_limits<int64_t>::max(),
+  CheckInt128Case({abslx::MakeInt128(std::numeric_limits<int64_t>::max(),
                                     std::numeric_limits<uint64_t>::max()),
                    std::ios::oct, /*width = */ 0,
                    "1777777777777777777777777777777777777777777"});
-  CheckInt128Case({absl::MakeInt128(std::numeric_limits<int64_t>::max(),
+  CheckInt128Case({abslx::MakeInt128(std::numeric_limits<int64_t>::max(),
                                     std::numeric_limits<uint64_t>::max()),
                    std::ios::hex, /*width = */ 0,
                    "7fffffffffffffffffffffffffffffff"});
-  CheckInt128Case({absl::MakeInt128(std::numeric_limits<int64_t>::min(), 0),
+  CheckInt128Case({abslx::MakeInt128(std::numeric_limits<int64_t>::min(), 0),
                    std::ios::dec, /*width = */ 0,
                    "-170141183460469231731687303715884105728"});
-  CheckInt128Case({absl::MakeInt128(std::numeric_limits<int64_t>::min(), 0),
+  CheckInt128Case({abslx::MakeInt128(std::numeric_limits<int64_t>::min(), 0),
                    std::ios::oct, /*width = */ 0,
                    "2000000000000000000000000000000000000000000"});
-  CheckInt128Case({absl::MakeInt128(std::numeric_limits<int64_t>::min(), 0),
+  CheckInt128Case({abslx::MakeInt128(std::numeric_limits<int64_t>::min(), 0),
                    std::ios::hex, /*width = */ 0,
                    "80000000000000000000000000000000"});
   CheckInt128Case({-1, std::ios::dec, /*width = */ 0, "-1"});

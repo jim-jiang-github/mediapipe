@@ -136,8 +136,8 @@ struct RocmTracerEvent {
   std::string name;
   // This points to strings in AnnotationMap, which should outlive the point
   // where serialization happens.
-  absl::string_view annotation;
-  absl::string_view roctx_range;
+  abslx::string_view annotation;
+  abslx::string_view roctx_range;
   uint64_t start_time_ns = 0;
   uint64_t end_time_ns = 0;
   uint32_t device_id = kInvalidDeviceId;
@@ -162,11 +162,11 @@ struct RocmTracerOptions {
 
   // map of domain --> ops for which we need to enable the API callbacks
   // If the ops vector is empty, then enable API callbacks for entire domain
-  absl::flat_hash_map<activity_domain_t, std::vector<uint32_t> > api_callbacks;
+  abslx::flat_hash_map<activity_domain_t, std::vector<uint32_t> > api_callbacks;
 
   // map of domain --> ops for which we need to enable the Activity records
   // If the ops vector is empty, then enable Activity records for entire domain
-  absl::flat_hash_map<activity_domain_t, std::vector<uint32_t> >
+  abslx::flat_hash_map<activity_domain_t, std::vector<uint32_t> >
       activity_tracing;
 };
 
@@ -187,17 +187,17 @@ class AnnotationMap {
  public:
   explicit AnnotationMap(uint64_t max_size) : max_size_(max_size) {}
   void Add(uint32_t correlation_id, const std::string& annotation);
-  absl::string_view LookUp(uint32_t correlation_id);
+  abslx::string_view LookUp(uint32_t correlation_id);
 
  private:
   struct AnnotationMapImpl {
     // The population/consumption of annotations might happen from multiple
     // callback/activity api related threads.
-    absl::Mutex mutex;
+    abslx::Mutex mutex;
     // Annotation tends to be repetitive, use a hash_set to store the strings,
     // an use the reference to the string in the map.
-    absl::node_hash_set<std::string> annotations;
-    absl::flat_hash_map<uint32_t, absl::string_view> correlation_map;
+    abslx::node_hash_set<std::string> annotations;
+    abslx::flat_hash_map<uint32_t, abslx::string_view> correlation_map;
   };
   const uint64_t max_size_;
   AnnotationMapImpl map_;
@@ -341,7 +341,7 @@ class RocmTracer {
   Status DisableActivityTracing();
 
   int num_gpus_;
-  absl::optional<RocmTracerOptions> options_;
+  abslx::optional<RocmTracerOptions> options_;
   RocmTraceCollector* collector_ = nullptr;
 
   bool api_tracing_enabled_ = false;
@@ -354,32 +354,32 @@ class RocmTracer {
    public:
     // add a correlation id to the pending set
     void Add(uint32_t correlation_id) {
-      absl::MutexLock lock(&mutex);
+      abslx::MutexLock lock(&mutex);
       pending_set.insert(correlation_id);
     }
     // remove a correlation id from the pending set
     void Remove(uint32_t correlation_id) {
-      absl::MutexLock lock(&mutex);
+      abslx::MutexLock lock(&mutex);
       pending_set.erase(correlation_id);
     }
     // clear the pending set
     void Clear() {
-      absl::MutexLock lock(&mutex);
+      abslx::MutexLock lock(&mutex);
       pending_set.clear();
     }
     // count the number of correlation ids in the pending set
     size_t Count() {
-      absl::MutexLock lock(&mutex);
+      abslx::MutexLock lock(&mutex);
       return pending_set.size();
     }
 
    private:
     // set of co-relation ids for which the hcc activity record is pending
-    absl::flat_hash_set<uint32_t> pending_set;
+    abslx::flat_hash_set<uint32_t> pending_set;
     // the callback which processes the activity records (and consequently
     // removes items from the pending set) is called in a separate thread
     // from the one that adds item to the list.
-    absl::Mutex mutex;
+    abslx::Mutex mutex;
   };
   PendingActivityRecords pending_activity_records_;
 

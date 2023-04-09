@@ -316,7 +316,7 @@ XRTMemoryManager::DeviceContext* XRTMemoryManager::GetDeviceContext(
   }
   DeviceContext* device_context = device_contexts_[device_ordinal].get();
   if (device_context == nullptr && create_if_missing) {
-    device_contexts_[device_ordinal] = absl::make_unique<DeviceContext>();
+    device_contexts_[device_ordinal] = abslx::make_unique<DeviceContext>();
     device_context = device_contexts_[device_ordinal].get();
   }
   return device_context;

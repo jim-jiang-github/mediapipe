@@ -48,13 +48,13 @@ constexpr char kFrameTag[] = "FRAME";
 // }
 class VideoPreStreamCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
-  absl::Status ProcessWithFrameRateInPreStream(CalculatorContext* cc);
-  absl::Status ProcessWithFrameRateInOptions(CalculatorContext* cc);
+  abslx::Status ProcessWithFrameRateInPreStream(CalculatorContext* cc);
+  abslx::Status ProcessWithFrameRateInOptions(CalculatorContext* cc);
 
   std::unique_ptr<VideoHeader> header_;
   bool frame_rate_in_prestream_ = false;
@@ -63,7 +63,7 @@ class VideoPreStreamCalculator : public CalculatorBase {
 
 REGISTER_CALCULATOR(VideoPreStreamCalculator);
 
-absl::Status VideoPreStreamCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status VideoPreStreamCalculator::GetContract(CalculatorContract* cc) {
   if (!cc->Inputs().UsesTags()) {
     cc->Inputs().Index(0).Set<ImageFrame>();
   } else {
@@ -71,17 +71,17 @@ absl::Status VideoPreStreamCalculator::GetContract(CalculatorContract* cc) {
     cc->Inputs().Tag(kVideoPrestreamTag).Set<VideoHeader>();
   }
   cc->Outputs().Index(0).Set<VideoHeader>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status VideoPreStreamCalculator::Open(CalculatorContext* cc) {
+abslx::Status VideoPreStreamCalculator::Open(CalculatorContext* cc) {
   frame_rate_in_prestream_ = cc->Inputs().UsesTags() &&
                              cc->Inputs().HasTag(kFrameTag) &&
                              cc->Inputs().HasTag(kVideoPrestreamTag);
-  header_ = absl::make_unique<VideoHeader>();
-  return absl::OkStatus();
+  header_ = abslx::make_unique<VideoHeader>();
+  return abslx::OkStatus();
 }
-absl::Status VideoPreStreamCalculator::ProcessWithFrameRateInPreStream(
+abslx::Status VideoPreStreamCalculator::ProcessWithFrameRateInPreStream(
     CalculatorContext* cc) {
   cc->GetCounter("ProcessWithFrameRateInPreStream")->Increment();
   if (cc->InputTimestamp() == Timestamp::PreStream()) {
@@ -101,13 +101,13 @@ absl::Status VideoPreStreamCalculator::ProcessWithFrameRateInPreStream(
     cc->Outputs().Index(0).Add(header_.release(), Timestamp::PreStream());
     emitted_ = true;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status VideoPreStreamCalculator::Process(CalculatorContext* cc) {
+abslx::Status VideoPreStreamCalculator::Process(CalculatorContext* cc) {
   cc->GetCounter("Process")->Increment();
   if (emitted_) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   if (frame_rate_in_prestream_) {
     return ProcessWithFrameRateInPreStream(cc);
@@ -116,7 +116,7 @@ absl::Status VideoPreStreamCalculator::Process(CalculatorContext* cc) {
   }
 }
 
-absl::Status VideoPreStreamCalculator::ProcessWithFrameRateInOptions(
+abslx::Status VideoPreStreamCalculator::ProcessWithFrameRateInOptions(
     CalculatorContext* cc) {
   cc->GetCounter("ProcessWithFrameRateInOptions")->Increment();
   RET_CHECK_NE(cc->InputTimestamp(), Timestamp::PreStream());
@@ -138,7 +138,7 @@ absl::Status VideoPreStreamCalculator::ProcessWithFrameRateInOptions(
   RET_CHECK_NE(header_->frame_rate, 0.0) << "frame rate should be non-zero";
   cc->Outputs().Index(0).Add(header_.release(), Timestamp::PreStream());
   emitted_ = true;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

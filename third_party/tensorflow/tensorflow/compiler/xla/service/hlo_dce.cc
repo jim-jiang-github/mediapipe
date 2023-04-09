@@ -98,7 +98,7 @@ bool IsRemovableWhile(HloInstruction* instruction,
 
 Status HloDCE::RecursivelyRemoveDeadComputation(
     HloModule* module, HloComputation* computation,
-    absl::flat_hash_map<HloComputation*, int>& live_call_counts) {
+    abslx::flat_hash_map<HloComputation*, int>& live_call_counts) {
   // First loops all the sub-instructions/sub-computations.
   for (HloInstruction* instruction : computation->instructions()) {
     for (HloComputation* subcomp : instruction->called_computations()) {
@@ -126,7 +126,7 @@ Status HloDCE::RecursivelyRemoveDeadComputation(
 
 StatusOr<bool> HloDCE::RecursivelyRemoveDeadComputations(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   // Tracks whether any dead code is eliminated by this pass.
   bool module_contains_dead_code = false;
 
@@ -134,7 +134,7 @@ StatusOr<bool> HloDCE::RecursivelyRemoveDeadComputations(
   // referenced by some remaining instruction. We need to record this as a
   // refcount map rather than a set since we cannot guarantee that control
   // flow flattening has been done and there may be multiple call sites.
-  absl::flat_hash_map<HloComputation*, int> live_computation_call_count;
+  abslx::flat_hash_map<HloComputation*, int> live_computation_call_count;
   if (HloComputation* entry_computation = module->entry_computation()) {
     ++live_computation_call_count[entry_computation];
   }
@@ -148,7 +148,7 @@ StatusOr<bool> HloDCE::RecursivelyRemoveDeadComputations(
   }
 
   // Find dead computations.
-  absl::flat_hash_set<HloComputation*> dead_computations;
+  abslx::flat_hash_set<HloComputation*> dead_computations;
   for (auto* computation :
        module->MakeComputationPostOrder(execution_threads)) {
     // Finds all "top-level" dead computations not called by any instructions.
@@ -167,7 +167,7 @@ StatusOr<bool> HloDCE::RecursivelyRemoveDeadComputations(
 
 StatusOr<bool> HloDCE::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
 
   VLOG(2) << "Before dce:";

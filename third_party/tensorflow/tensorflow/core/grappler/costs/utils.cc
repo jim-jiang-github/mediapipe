@@ -142,7 +142,7 @@ static void ExtractExtraProperties(
         }
         AttrValue attr;
         attr.set_i(stat.length);
-        string attr_key = absl::StrCat("input_", i, "_filesize");
+        string attr_key = abslx::StrCat("input_", i, "_filesize");
         (*op_info->mutable_attr())[attr_key] = attr;
       }
     }
@@ -151,7 +151,7 @@ static void ExtractExtraProperties(
     // in the op itself is not sufficient to predict the op memory.
     if (op_def && i < op_def->input_arg_size() &&
         op_def->input_arg(i).name().find("handle") != string::npos) {
-      string new_key = absl::StrCat("parent_", i, "_op");
+      string new_key = abslx::StrCat("parent_", i, "_op");
       AttrValue attr;
       attr.set_s(input_node->op());
       (*op_info->mutable_attr())[new_key] = attr;
@@ -362,7 +362,7 @@ void TensorSizeHistogram::Merge(const TensorSizeHistogram& src) {
 }
 
 string TensorSizeHistogram::ToString() const {
-  string r = absl::StrFormat(
+  string r = abslx::StrFormat(
       "Count: %lld, Average: %s, Min: %s, Max: %s"
       "\n------------------------------------------------------\n",
       num_elem_, strings::HumanReadableNumBytes(Average()),
@@ -376,7 +376,7 @@ string TensorSizeHistogram::ToString() const {
     cumul_sum += buckets_[i];
     uint64 left = i == 0 ? 0ULL : 1ULL << (i - 1);
     uint64 right = 1ULL << i;
-    absl::StrAppendFormat(&r, "[ %12s, %12s) %7d %7.3f%% %7.3f%% ",
+    abslx::StrAppendFormat(&r, "[ %12s, %12s) %7d %7.3f%% %7.3f%% ",
                           strings::HumanReadableNumBytes(left),
                           strings::HumanReadableNumBytes(right),
                           buckets_[i],         // count
@@ -386,7 +386,7 @@ string TensorSizeHistogram::ToString() const {
     // Add hash marks based on percentage; 40 marks for 100%.
     auto marks = static_cast<int>(
         (static_cast<double>(40 * buckets_[i] + (num_elem_ >> 1)) / num_elem_));
-    absl::StrAppendFormat(&r, "%s\n", std::string(marks, '#'));
+    abslx::StrAppendFormat(&r, "%s\n", std::string(marks, '#'));
   }
   return r;
 }
@@ -413,7 +413,7 @@ string GetDeviceClassForNonChannelDevice(const string& device_name) {
   }
   if (parsed) {
     const string jobname = parsed_name.has_job ? parsed_name.job : "";
-    return absl::StrCat("/", jobname, "/", parsed_name.type);
+    return abslx::StrCat("/", jobname, "/", parsed_name.type);
   } else {
     return "Unclassified";
   }
@@ -431,7 +431,7 @@ string GetDeviceClass(const string& device_name) {
     const auto src_device_full = device_name.substr(
         from_loc + from.size(), to_loc - (from_loc + from.size()));
     const auto dst_device_full = device_name.substr(to_loc + to.size());
-    return absl::StrCat(
+    return abslx::StrCat(
         "Channel", ": ", GetDeviceClassForNonChannelDevice(src_device_full),
         " -> ", GetDeviceClassForNonChannelDevice(dst_device_full));
   } else {

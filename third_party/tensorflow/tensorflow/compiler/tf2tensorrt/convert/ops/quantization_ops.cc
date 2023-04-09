@@ -31,7 +31,7 @@ namespace tensorrt {
 namespace convert {
 
 bool IsQuantizeAndDequantizeOp(const Node* node) {
-  return absl::c_find(kQuantizationOpNames, node->def().op()) !=
+  return abslx::c_find(kQuantizationOpNames, node->def().op()) !=
          kQuantizationOpNames.end();
 }
 
@@ -88,7 +88,7 @@ StatusOr<nvinfer1::ITensor*> ExlicitQDQInputToTensor(
     return input.tensor()->trt_tensor();
   }
   if (!IS_TRT_VERSION_GE(8, 0, 0, 0) && input.weights().count() > 1) {
-    LOG(WARNING) << absl::StrCat(
+    LOG(WARNING) << abslx::StrCat(
         "QDQ per-channel for weights not "
         "implemented, assuming uniform scaling");
   }
@@ -99,7 +99,7 @@ StatusOr<nvinfer1::ITensor*> ExlicitQDQInputToTensor(
   TRT_ENSURE_PTR_OK(weights_const);
   params->converter->SetLayerName(*weights_const, params->node_def, "const");
   nvinfer1::ITensor* qdq_input = (*weights_const)->getOutput(0);
-  std::string name = absl::StrCat((*weights_const)->getName(), "_output");
+  std::string name = abslx::StrCat((*weights_const)->getName(), "_output");
   qdq_input->setName(name.c_str());
   return qdq_input;
 }
@@ -193,7 +193,7 @@ struct QDQOpSpec<ops::QuantizeAndDequantizeV2> {
         std::copy_n(idims.d, idims.nbDims, intermediate_dims.d + ones.size());
       }
 
-      LOG(WARNING) << absl::StrCat(
+      LOG(WARNING) << abslx::StrCat(
           node_def.name(), ":", node_def.op(), ": tensor ",
           (*qdq_input)->getName(), " has shape ", DebugString(idims),
           " but TRT scale layer requires at least 3 dims excluding batch dim, "

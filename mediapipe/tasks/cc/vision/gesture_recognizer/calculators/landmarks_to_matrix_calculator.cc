@@ -47,12 +47,12 @@ constexpr char kLandmarksMatrixTag[] = "LANDMARKS_MATRIX";
 constexpr int kFeaturesPerLandmark = 3;
 
 template <class LandmarkListT>
-absl::StatusOr<LandmarkListT> NormalizeLandmarkAspectRatio(
+abslx::StatusOr<LandmarkListT> NormalizeLandmarkAspectRatio(
     const LandmarkListT& landmarks, float width, float height) {
   const float max_dim = std::max(width, height);
   if (max_dim <= 0) {
-    return ::absl::InvalidArgumentError(
-        absl::StrCat("Invalid image dimensions: [", width, ",", height, "]"));
+    return ::abslx::InvalidArgumentError(
+        abslx::StrCat("Invalid image dimensions: [", width, ",", height, "]"));
   }
   const float width_scale_factor = width / max_dim;
   const float height_scale_factor = height / max_dim;
@@ -68,7 +68,7 @@ absl::StatusOr<LandmarkListT> NormalizeLandmarkAspectRatio(
 }
 
 template <class LandmarkListT>
-absl::StatusOr<LandmarkListT> RotateLandmarks(const LandmarkListT& landmarks,
+abslx::StatusOr<LandmarkListT> RotateLandmarks(const LandmarkListT& landmarks,
                                               float rotation) {
   float cos = std::cos(rotation);
   // Negate because Y-axis points down and not up.
@@ -87,10 +87,10 @@ absl::StatusOr<LandmarkListT> RotateLandmarks(const LandmarkListT& landmarks,
 }
 
 template <class LandmarkListT>
-absl::StatusOr<LandmarkListT> NormalizeObject(const LandmarkListT& landmarks,
+abslx::StatusOr<LandmarkListT> NormalizeObject(const LandmarkListT& landmarks,
                                               int origin_offset) {
   if (landmarks.landmark_size() == 0) {
-    return ::absl::InvalidArgumentError(
+    return ::abslx::InvalidArgumentError(
         "Expected non-zero number of input landmarks.");
   }
   LandmarkListT canonicalized_landmarks;
@@ -148,7 +148,7 @@ bool IsNormalized() {
 }
 
 template <class LandmarkListT>
-absl::Status ProcessLandmarks(LandmarkListT landmarks, CalculatorContext* cc) {
+abslx::Status ProcessLandmarks(LandmarkListT landmarks, CalculatorContext* cc) {
   if (IsNormalized<LandmarkListT>()) {
     RET_CHECK(cc->Inputs().HasTag(kImageSizeTag) &&
               !cc->Inputs().Tag(kImageSizeTag).IsEmpty());
@@ -178,7 +178,7 @@ absl::Status ProcessLandmarks(LandmarkListT landmarks, CalculatorContext* cc) {
   cc->Outputs()
       .Tag(kLandmarksMatrixTag)
       .Add(landmarks_matrix.release(), cc->InputTimestamp());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace
@@ -214,30 +214,30 @@ absl::Status ProcessLandmarks(LandmarkListT landmarks, CalculatorContext* cc) {
 // }
 class LandmarksToMatrixCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Tag(kLandmarksTag).Set<NormalizedLandmarkList>().Optional();
     cc->Inputs().Tag(kWorldLandmarksTag).Set<LandmarkList>().Optional();
     cc->Inputs().Tag(kImageSizeTag).Set<std::pair<int, int>>().Optional();
     cc->Inputs().Tag(kNormRectTag).Set<NormalizedRect>().Optional();
     cc->Outputs().Tag(kLandmarksMatrixTag).Set<Matrix>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
     RET_CHECK(cc->Inputs().HasTag(kLandmarksTag) ^
               cc->Inputs().HasTag(kWorldLandmarksTag));
     const auto& options = cc->Options<LandmarksToMatrixCalculatorOptions>();
     RET_CHECK(options.has_object_normalization());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 };
 
 REGISTER_CALCULATOR(LandmarksToMatrixCalculator);
 
-absl::Status LandmarksToMatrixCalculator::Process(CalculatorContext* cc) {
+abslx::Status LandmarksToMatrixCalculator::Process(CalculatorContext* cc) {
   if (cc->Inputs().HasTag(kLandmarksTag)) {
     if (!cc->Inputs().Tag(kLandmarksTag).IsEmpty()) {
       auto landmarks =
@@ -250,7 +250,7 @@ absl::Status LandmarksToMatrixCalculator::Process(CalculatorContext* cc) {
       return ProcessLandmarks(landmarks, cc);
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace api2

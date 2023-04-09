@@ -203,7 +203,7 @@ Status FunctionLibraryApiInfo::GetEquivalentImplementations(
   if (func_it == func_info_.end()) return OkStatus();
   const FunctionApiInfo* func_info = func_it->second.get();
 
-  absl::flat_hash_map<string, std::vector<string>>::const_iterator it;
+  abslx::flat_hash_map<string, std::vector<string>>::const_iterator it;
   switch (func_info->function_type()) {
     case FunctionApiInfo::FunctionType::INFERENCE:
       it = intf_to_inference_funcs_.find(func_info->interface_name());

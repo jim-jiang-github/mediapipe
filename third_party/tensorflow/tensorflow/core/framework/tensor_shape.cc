@@ -1016,7 +1016,7 @@ Status TensorShapeUtils::NumElements(gtl::ArraySlice<int64_t> shape,
     n = MultiplyWithoutOverflow(n, dim);
     if (n < 0) {
       return errors::InvalidArgument("Can't compute total size of shape [",
-                                     absl::StrJoin(shape, ","),
+                                     abslx::StrJoin(shape, ","),
                                      "]; product would overflow int64");
     }
   }

@@ -69,7 +69,7 @@ bool IsNonIdentityTranspose(const HloInstruction* instruction) {
 }
 
 void TransposeDims(tensorflow::protobuf::RepeatedField<int64_t>& dims,
-                   absl::Span<const int64_t> transpose_dims) {
+                   abslx::Span<const int64_t> transpose_dims) {
   for (auto& dim : dims) {
     dim = transpose_dims[dim];
   }
@@ -126,7 +126,7 @@ bool FoldTransposeIntoConvolution(InstructionOperandsPair& pair) {
 
   HloInstruction* new_lhs;
   const int64_t kLhsIdx = 0;
-  if (absl::c_linear_search(operand_indices, kLhsIdx)) {
+  if (abslx::c_linear_search(operand_indices, kLhsIdx)) {
     HloInstruction& transpose = *convolution.mutable_operand(kLhsIdx);
     const auto& transpose_dimensions = transpose.dimensions();
     HloInstruction& transpose_operand = *transpose.mutable_operand(0);
@@ -149,7 +149,7 @@ bool FoldTransposeIntoConvolution(InstructionOperandsPair& pair) {
 
   HloInstruction* new_rhs;
   const int64_t kRhsIdx = 1;
-  if (absl::c_linear_search(operand_indices, kRhsIdx)) {
+  if (abslx::c_linear_search(operand_indices, kRhsIdx)) {
     HloInstruction& transpose = *convolution.mutable_operand(kRhsIdx);
     const auto& transpose_dimensions = transpose.dimensions();
     HloInstruction& transpose_operand = *transpose.mutable_operand(0);
@@ -191,7 +191,7 @@ TransposeFolding::TransposeFolding(
 
 StatusOr<bool> TransposeFolding::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   // Modifying the graph while traversing is dangerous, so we find all folding
   // opportunities before actually folding them.
   std::vector<InstructionOperandsPair> foldable_dots;
@@ -269,7 +269,7 @@ StatusOr<bool> TransposeFolding::Run(
 
   return (batch_dims.size() == transpose.shape().rank() - 2) &&
          (contracting_dims.size() == 1) &&
-         absl::c_all_of(batch_dims, [&](int64_t dim) {
+         abslx::c_all_of(batch_dims, [&](int64_t dim) {
            return transpose.dimensions(dim) == dim;
          });
 }

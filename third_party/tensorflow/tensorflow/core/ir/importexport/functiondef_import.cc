@@ -72,7 +72,7 @@ class ValueMapManager {
       Operation* placeholder = base_operation[0].getDefiningOp();
       if (!placeholder ||
           placeholder->getName().getStringRef() != "tfg.__mlir_placeholder")
-        return InvalidArgument(absl::StrCat(
+        return InvalidArgument(abslx::StrCat(
             "Duplicated node (or function argument) with the same name: `",
             node_name.str(), "`"));
 
@@ -166,7 +166,7 @@ Status ImportNodes(ValueMapManager value_manager,
   for (const NodeDef& node : nodes) {
     DVLOG(1) << "Processing node " << node.name() << "\n";
     if (node.op().empty()) return InvalidArgument("empty op type");
-    OperationState state(unknown_loc, absl::StrCat("tfg.", node.op()));
+    OperationState state(unknown_loc, abslx::StrCat("tfg.", node.op()));
     // Fetch the inputs, creating placeholder if an input hasn't been visited.
     for (const std::string& input : node.input()) {
       if (input.empty())
@@ -209,7 +209,7 @@ Status ImportNodes(ValueMapManager value_manager,
   // We don't expect any placeholder left at this point, fail if any.
   for (Operation& op : *builder.getInsertionBlock()) {
     if (op.getName().getStringRef() == "tfg.__mlir_placeholder") {
-      return InvalidArgument(absl::StrCat(
+      return InvalidArgument(abslx::StrCat(
           "Couldn't import graph: placeholder left ",
           op.getAttrOfType<StringAttr>(name_attr).getValue().str()));
     }

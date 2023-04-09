@@ -58,8 +58,8 @@ void CompareGraphNodes(protobuf::RepeatedPtrField<NodeDef>* want,
 
     auto want_inputs = want_node.mutable_input();
     auto got_inputs = got_node.mutable_input();
-    std::sort(absl::c_find_if(*want_inputs, is_control), want_inputs->end());
-    std::sort(absl::c_find_if(*got_inputs, is_control), got_inputs->end());
+    std::sort(abslx::c_find_if(*want_inputs, is_control), want_inputs->end());
+    std::sort(abslx::c_find_if(*got_inputs, is_control), got_inputs->end());
 
     for (int j = 0; j < want_node.input_size(); ++j) {
       const TensorId want_tensor = ParseTensorName(want_node.input(j));
@@ -181,10 +181,10 @@ void GrapplerTest::CompareNodes(const NodeDef& want, const NodeDef& got) const {
 
   std::vector<string> want_attrs;
   std::vector<string> got_attrs;
-  absl::c_transform(want.attr(), std::back_inserter(want_attrs), attr_name);
-  absl::c_transform(got.attr(), std::back_inserter(got_attrs), attr_name);
-  absl::c_sort(want_attrs);
-  absl::c_sort(got_attrs);
+  abslx::c_transform(want.attr(), std::back_inserter(want_attrs), attr_name);
+  abslx::c_transform(got.attr(), std::back_inserter(got_attrs), attr_name);
+  abslx::c_sort(want_attrs);
+  abslx::c_sort(got_attrs);
   EXPECT_EQ(want_attrs, got_attrs);
 
   for (const string& attr : want_attrs) {

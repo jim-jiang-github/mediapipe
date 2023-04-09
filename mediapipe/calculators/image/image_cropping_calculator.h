@@ -58,23 +58,23 @@ class ImageCroppingCalculator : public CalculatorBase {
   ImageCroppingCalculator() = default;
   ~ImageCroppingCalculator() override = default;
 
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
   static RectSpec GetCropSpecs(const CalculatorContext* cc, int src_width,
                                int src_height);
 
  private:
-  absl::Status ValidateBorderModeForCPU(CalculatorContext* cc);
-  absl::Status ValidateBorderModeForGPU(CalculatorContext* cc);
-  absl::Status RenderCpu(CalculatorContext* cc);
-  absl::Status RenderGpu(CalculatorContext* cc);
-  absl::Status InitGpu(CalculatorContext* cc);
+  abslx::Status ValidateBorderModeForCPU(CalculatorContext* cc);
+  abslx::Status ValidateBorderModeForGPU(CalculatorContext* cc);
+  abslx::Status RenderCpu(CalculatorContext* cc);
+  abslx::Status RenderGpu(CalculatorContext* cc);
+  abslx::Status InitGpu(CalculatorContext* cc);
   void GlRender();
   void GetOutputDimensions(CalculatorContext* cc, int src_width, int src_height,
                            int* dst_width, int* dst_height);
-  absl::Status GetBorderModeForOpenCV(CalculatorContext* cc, int* border_mode);
+  abslx::Status GetBorderModeForOpenCV(CalculatorContext* cc, int* border_mode);
 
   mediapipe::ImageCroppingCalculatorOptions options_;
 

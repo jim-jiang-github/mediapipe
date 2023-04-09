@@ -49,7 +49,7 @@ string CalibrationContext::TerminateCalibration() {
   return calibration_table_;
 }
 
-const absl::string_view kTfTrtContainerName = "TF-TRT";
+const abslx::string_view kTfTrtContainerName = "TF-TRT";
 
 Logger& TRTEngineCacheResource::GetLogger() {
   static Logger* logger = new Logger();
@@ -88,7 +88,7 @@ string TRTEngineCacheResource::DebugString() const {
     oss << TensorShapeUtils::ShapeListString(item.first) << ": " << hex
         << "ICudaEngine: " << item.second->GetCudaEngine() << ", "
         << "IExecutionContext: ";
-    absl::c_for_each(
+    abslx::c_for_each(
         item.second->execution_contexts,
         [&](const ExecutionContext& ctx) { oss << ctx.get() << ","; });
     oss << dec << endl;

@@ -209,7 +209,7 @@ class OutputWriterImpl : public OutputWriter {
     for (int i = 0; i < combination.size(); ++i) {
       features_[i]->ReadValue(batch_index, combination[i], &cross_vec[i]);
     }
-    *out = absl::StrJoin(cross_vec, k_feature_separator);
+    *out = abslx::StrJoin(cross_vec, k_feature_separator);
   }
 
   // Joins the specified combination of input features into a single

@@ -105,7 +105,7 @@ class PacketType {
   bool IsConsistentWith(const PacketType& other) const;
 
   // Returns OK if the packet contains an object of the appropriate type.
-  absl::Status Validate(const Packet& packet) const;
+  abslx::Status Validate(const Packet& packet) const;
 
   // Returns a pointer to the Registered type name, or nullptr if the type
   // is not registered.  Do not use this for validation, use Validate()
@@ -121,7 +121,7 @@ class PacketType {
     // We don't do union-find optimizations in order to avoid a mutex.
     const PacketType* other;
   };
-  using TypeIdSpan = absl::Span<const TypeId>;
+  using TypeIdSpan = abslx::Span<const TypeId>;
   struct MultiType {
     TypeIdSpan types;
     // TODO: refactor RegisteredTypeName, remove.
@@ -129,15 +129,15 @@ class PacketType {
   };
   struct SpecialType;
   using TypeSpec =
-      absl::variant<absl::monostate, TypeId, MultiType, SameAs, SpecialType>;
-  typedef absl::Status (*AcceptsTypeFn)(const TypeSpec& type);
+      abslx::variant<abslx::monostate, TypeId, MultiType, SameAs, SpecialType>;
+  typedef abslx::Status (*AcceptsTypeFn)(const TypeSpec& type);
   struct SpecialType {
     std::string name_;
     AcceptsTypeFn accept_fn_;
   };
 
-  static absl::Status AcceptAny(const TypeSpec& type);
-  static absl::Status AcceptNone(const TypeSpec& type);
+  static abslx::Status AcceptAny(const TypeSpec& type);
+  static abslx::Status AcceptNone(const TypeSpec& type);
 
   const PacketType* SameAsPtr() const;
   static TypeIdSpan GetTypeSpan(const TypeSpec& type_spec);
@@ -158,17 +158,17 @@ class PacketTypeSetErrorHandler {
   // Returns a usable PacketType.  A different PacketType object is
   // returned for each different invalid location and the same object
   // is returned for multiple accesses to the same invalid location.
-  PacketType& GetFallback(const absl::string_view tag, int index) {
+  PacketType& GetFallback(const abslx::string_view tag, int index) {
     if (!missing_) {
-      missing_ = absl::make_unique<Missing>();
+      missing_ = abslx::make_unique<Missing>();
     }
     CHECK(!missing_->initialized_errors);
-    std::string key = absl::StrCat(tag, ":", index);
+    std::string key = abslx::StrCat(tag, ":", index);
     return missing_->entries[key];
   }
 
   // In the const setting produce a FATAL error.
-  const PacketType& GetFallback(const absl::string_view tag, int index) const {
+  const PacketType& GetFallback(const abslx::string_view tag, int index) const {
     LOG(FATAL) << "Failed to get tag \"" << tag << "\" index " << index
                << ".  Unable to defer error due to const specifier.";
     std::abort();
@@ -190,8 +190,8 @@ class PacketTypeSetErrorHandler {
         if (!entry.second.IsOptional()) {
           // Split them to keep the error string unchanged.
           std::pair<std::string, std::string> tag_idx =
-              absl::StrSplit(entry.first, ':');
-          missing_->errors.push_back(absl::StrCat("Failed to get tag \"",
+              abslx::StrSplit(entry.first, ':');
+          missing_->errors.push_back(abslx::StrCat("Failed to get tag \"",
                                                   tag_idx.first, "\" index ",
                                                   tag_idx.second));
         }
@@ -245,7 +245,7 @@ using PacketTypeSet =
 // Returns OK if the packets in the PacketSet are of the appropriate type.
 // packet_type_set must be valid before this is called (but packet_set
 // may be in any state).
-absl::Status ValidatePacketSet(const PacketTypeSet& packet_type_set,
+abslx::Status ValidatePacketSet(const PacketTypeSet& packet_type_set,
                                const PacketSet& packet_set);
 
 // Validates that the PacketTypeSet was initialized properly.
@@ -253,7 +253,7 @@ absl::Status ValidatePacketSet(const PacketTypeSet& packet_type_set,
 // 1) Tag() or Index() is called with an invalid argument (however,
 //    a valid PacketType is still returned by the function).
 // 2) Any PacketType is not initialized.
-absl::Status ValidatePacketTypeSet(const PacketTypeSet& packet_type_set);
+abslx::Status ValidatePacketTypeSet(const PacketTypeSet& packet_type_set);
 
 // Templated function definitions.
 

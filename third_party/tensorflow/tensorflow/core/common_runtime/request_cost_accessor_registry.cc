@@ -25,7 +25,7 @@ namespace tensorflow {
 namespace {
 
 using RegistrationMap =
-    absl::flat_hash_map<std::string, RequestCostAccessorRegistry::Creator>;
+    abslx::flat_hash_map<std::string, RequestCostAccessorRegistry::Creator>;
 
 RegistrationMap* GetRegistrationMap() {
   static RegistrationMap* registered_request_cost_accessors =
@@ -36,14 +36,14 @@ RegistrationMap* GetRegistrationMap() {
 }  // namespace
 
 std::unique_ptr<RequestCostAccessor>
-RequestCostAccessorRegistry::CreateByNameOrNull(absl::string_view name) {
+RequestCostAccessorRegistry::CreateByNameOrNull(abslx::string_view name) {
   const auto it = GetRegistrationMap()->find(name);
   if (it == GetRegistrationMap()->end()) return nullptr;
   return std::unique_ptr<RequestCostAccessor>(it->second());
 }
 
 void RequestCostAccessorRegistry::RegisterRequestCostAccessor(
-    absl::string_view name, Creator creator) {
+    abslx::string_view name, Creator creator) {
   const auto it = GetRegistrationMap()->find(name);
   CHECK(it == GetRegistrationMap()->end())  // Crash OK
       << "RequestCostAccessor " << name << " is registered twice.";

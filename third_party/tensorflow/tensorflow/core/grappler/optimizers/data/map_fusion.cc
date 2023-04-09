@@ -88,7 +88,7 @@ Status MapFusion::OptimizeAndCollectStats(Cluster* cluster,
   *output = sorted_old_graph;
 
   MutableGraphView graph(output);
-  absl::flat_hash_set<string> nodes_to_delete;
+  abslx::flat_hash_set<string> nodes_to_delete;
   FunctionLibraryDefinition function_library(OpRegistry::Global(),
                                              item.graph.library());
 

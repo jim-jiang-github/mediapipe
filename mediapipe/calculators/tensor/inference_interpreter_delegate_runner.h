@@ -35,7 +35,7 @@ using TfLiteDelegatePtr =
 //
 // `delegate` can be nullptr, in that case newly initialized interpreter will
 // use what is available by default.
-absl::StatusOr<std::unique_ptr<InferenceRunner>>
+abslx::StatusOr<std::unique_ptr<InferenceRunner>>
 CreateInferenceInterpreterDelegateRunner(
     api2::Packet<TfLiteModelPtr> model,
     api2::Packet<tflite::OpResolver> op_resolver, TfLiteDelegatePtr delegate,

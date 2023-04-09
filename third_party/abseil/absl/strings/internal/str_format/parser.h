@@ -31,7 +31,7 @@
 #include "absl/strings/internal/str_format/checker.h"
 #include "absl/strings/internal/str_format/extension.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace str_format_internal {
 
@@ -344,6 +344,6 @@ class ExtendedParsedFormat : public str_format_internal::ParsedFormatBase {
 };
 }  // namespace str_format_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_INTERNAL_STR_FORMAT_PARSER_H_

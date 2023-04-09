@@ -181,16 +181,16 @@ class ImageTransformationCalculator : public CalculatorBase {
   ImageTransformationCalculator() = default;
   ~ImageTransformationCalculator() override = default;
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
-  absl::Status RenderCpu(CalculatorContext* cc);
-  absl::Status RenderGpu(CalculatorContext* cc);
-  absl::Status GlSetup();
+  abslx::Status RenderCpu(CalculatorContext* cc);
+  abslx::Status RenderGpu(CalculatorContext* cc);
+  abslx::Status GlSetup();
 
   void ComputeOutputDimensions(int input_width, int input_height,
                                int* output_width, int* output_height);
@@ -217,7 +217,7 @@ class ImageTransformationCalculator : public CalculatorBase {
 REGISTER_CALCULATOR(ImageTransformationCalculator);
 
 // static
-absl::Status ImageTransformationCalculator::GetContract(
+abslx::Status ImageTransformationCalculator::GetContract(
     CalculatorContract* cc) {
   // Only one input can be set, and the output type must match.
   RET_CHECK(cc->Inputs().HasTag(kImageFrameTag) ^
@@ -291,10 +291,10 @@ absl::Status ImageTransformationCalculator::GetContract(
 #endif  // !MEDIAPIPE_DISABLE_GPU
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ImageTransformationCalculator::Open(CalculatorContext* cc) {
+abslx::Status ImageTransformationCalculator::Open(CalculatorContext* cc) {
   // Inform the framework that we always output at the same timestamp
   // as we receive a packet at.
   cc->SetOffset(TimestampDiff(0));
@@ -348,10 +348,10 @@ absl::Status ImageTransformationCalculator::Open(CalculatorContext* cc) {
 #endif  // !MEDIAPIPE_DISABLE_GPU
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ImageTransformationCalculator::Process(CalculatorContext* cc) {
+abslx::Status ImageTransformationCalculator::Process(CalculatorContext* cc) {
   // First update the video header if it is given, based on the rotation and
   // dimensions specified as side packets or options. This will only be done
   // once, so streaming transformation changes will not be reflected in
@@ -386,7 +386,7 @@ absl::Status ImageTransformationCalculator::Process(CalculatorContext* cc) {
   }
   if (cc->Inputs().HasTag("OUTPUT_DIMENSIONS")) {
     if (cc->Inputs().Tag("OUTPUT_DIMENSIONS").IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     } else {
       const auto& image_size =
           cc->Inputs().Tag("OUTPUT_DIMENSIONS").Get<std::pair<int, int>>();
@@ -398,21 +398,21 @@ absl::Status ImageTransformationCalculator::Process(CalculatorContext* cc) {
   if (use_gpu_) {
 #if !MEDIAPIPE_DISABLE_GPU
     if (cc->Inputs().Tag(kGpuBufferTag).IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     return gpu_helper_.RunInGlContext(
-        [this, cc]() -> absl::Status { return RenderGpu(cc); });
+        [this, cc]() -> abslx::Status { return RenderGpu(cc); });
 #endif  // !MEDIAPIPE_DISABLE_GPU
   } else {
     if (cc->Inputs().Tag(kImageFrameTag).IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     return RenderCpu(cc);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ImageTransformationCalculator::Close(CalculatorContext* cc) {
+abslx::Status ImageTransformationCalculator::Close(CalculatorContext* cc) {
   if (use_gpu_) {
 #if !MEDIAPIPE_DISABLE_GPU
     QuadRenderer* rgb_renderer = rgb_renderer_.release();
@@ -435,10 +435,10 @@ absl::Status ImageTransformationCalculator::Close(CalculatorContext* cc) {
 #endif  // !MEDIAPIPE_DISABLE_GPU
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ImageTransformationCalculator::RenderCpu(CalculatorContext* cc) {
+abslx::Status ImageTransformationCalculator::RenderCpu(CalculatorContext* cc) {
   cv::Mat input_mat;
   mediapipe::ImageFormat::Format format;
 
@@ -492,7 +492,7 @@ absl::Status ImageTransformationCalculator::RenderCpu(CalculatorContext* cc) {
   }
 
   if (cc->Outputs().HasTag("LETTERBOX_PADDING")) {
-    auto padding = absl::make_unique<std::array<float, 4>>();
+    auto padding = abslx::make_unique<std::array<float, 4>>();
     ComputeOutputLetterboxPadding(input_width, input_height, output_width,
                                   output_height, padding.get());
     cc->Outputs()
@@ -542,10 +542,10 @@ absl::Status ImageTransformationCalculator::RenderCpu(CalculatorContext* cc) {
       .Tag(kImageFrameTag)
       .Add(output_frame.release(), cc->InputTimestamp());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ImageTransformationCalculator::RenderGpu(CalculatorContext* cc) {
+abslx::Status ImageTransformationCalculator::RenderGpu(CalculatorContext* cc) {
 #if !MEDIAPIPE_DISABLE_GPU
   const auto& input = cc->Inputs().Tag(kGpuBufferTag).Get<GpuBuffer>();
   const int input_width = input.width();
@@ -565,7 +565,7 @@ absl::Status ImageTransformationCalculator::RenderGpu(CalculatorContext* cc) {
   }
 
   if (cc->Outputs().HasTag("LETTERBOX_PADDING")) {
-    auto padding = absl::make_unique<std::array<float, 4>>();
+    auto padding = abslx::make_unique<std::array<float, 4>>();
     ComputeOutputLetterboxPadding(input_width, input_height, output_width,
                                   output_height, padding.get());
     cc->Outputs()
@@ -580,7 +580,7 @@ absl::Status ImageTransformationCalculator::RenderGpu(CalculatorContext* cc) {
   if (input.format() == GpuBufferFormat::kBiPlanar420YpCbCr8VideoRange ||
       input.format() == GpuBufferFormat::kBiPlanar420YpCbCr8FullRange) {
     if (!yuv_renderer_) {
-      yuv_renderer_ = absl::make_unique<QuadRenderer>();
+      yuv_renderer_ = abslx::make_unique<QuadRenderer>();
       MP_RETURN_IF_ERROR(
           yuv_renderer_->GlSetup(::mediapipe::kYUV2TexToRGBFragmentShader,
                                  {"video_frame_y", "video_frame_uv"}));
@@ -594,7 +594,7 @@ absl::Status ImageTransformationCalculator::RenderGpu(CalculatorContext* cc) {
 #if defined(TEXTURE_EXTERNAL_OES)
     if (src1.target() == GL_TEXTURE_EXTERNAL_OES) {
       if (!ext_rgb_renderer_) {
-        ext_rgb_renderer_ = absl::make_unique<QuadRenderer>();
+        ext_rgb_renderer_ = abslx::make_unique<QuadRenderer>();
         MP_RETURN_IF_ERROR(ext_rgb_renderer_->GlSetup(
             ::mediapipe::kBasicTexturedFragmentShaderOES, {"video_frame"}));
       }
@@ -603,7 +603,7 @@ absl::Status ImageTransformationCalculator::RenderGpu(CalculatorContext* cc) {
 #endif      // TEXTURE_EXTERNAL_OES
     {
       if (!rgb_renderer_) {
-        rgb_renderer_ = absl::make_unique<QuadRenderer>();
+        rgb_renderer_ = abslx::make_unique<QuadRenderer>();
         MP_RETURN_IF_ERROR(rgb_renderer_->GlSetup());
       }
       renderer = rgb_renderer_.get();
@@ -639,7 +639,7 @@ absl::Status ImageTransformationCalculator::RenderGpu(CalculatorContext* cc) {
 
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void ImageTransformationCalculator::ComputeOutputDimensions(

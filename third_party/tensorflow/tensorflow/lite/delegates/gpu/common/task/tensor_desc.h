@@ -65,11 +65,11 @@ class TensorDescriptor : public GPUObjectDescriptor {
   void GetGpuResources(const BHWDC& tensor_shape,
                        GenericGPUResourcesWithValue* resources) const;
 
-  absl::Status PerformConstExpr(const GpuInfo& gpu_info,
+  abslx::Status PerformConstExpr(const GpuInfo& gpu_info,
                                 const std::string& const_expr,
                                 std::string* result) const override;
 
-  absl::Status PerformSelector(const GpuInfo& gpu_info,
+  abslx::Status PerformSelector(const GpuInfo& gpu_info,
                                const std::string& selector,
                                const std::vector<std::string>& args,
                                const std::vector<std::string>& template_args,
@@ -83,7 +83,7 @@ class TensorDescriptor : public GPUObjectDescriptor {
 
   bool HasAxis(Axis axis) const;
 
-  absl::Status GetLinkingContextFromWriteSelector(
+  abslx::Status GetLinkingContextFromWriteSelector(
       const std::vector<std::string>& args, std::string* value_name,
       std::string* x_coord, std::string* y_coord, std::string* z_coord,
       std::string* s_coord, std::string* b_coord) const;
@@ -115,10 +115,10 @@ class TensorDescriptor : public GPUObjectDescriptor {
   // function returns true, otherwise false
   bool ReturnsZeroForNegOneRead(const GpuInfo& gpu_info) const;
 
-  absl::Status CanCreateTensorWithShape(const GpuInfo& gpu_info,
+  abslx::Status CanCreateTensorWithShape(const GpuInfo& gpu_info,
                                         const BHWDC& shape) const;
 
-  absl::Status CanCreateTensorWithShape(const GpuInfo& gpu_info,
+  abslx::Status CanCreateTensorWithShape(const GpuInfo& gpu_info,
                                         const BHWC& shape) const;
 
   // Can udate storage type if in the current storage type this tensor can not
@@ -126,7 +126,7 @@ class TensorDescriptor : public GPUObjectDescriptor {
   // Usual scenario is to create new tensor_desc on base of another and may be
   // update storage type for new tensor_desc shape because it can be unsuported
   // with old storage type
-  absl::Status UpdateToSupportedStorageType(const GpuInfo& gpu_info,
+  abslx::Status UpdateToSupportedStorageType(const GpuInfo& gpu_info,
                                             const BHWC& shape);
 
   // shape must be initialized when using this function
@@ -173,36 +173,36 @@ class TensorDescriptor : public GPUObjectDescriptor {
       DataType data_type, TensorStorageType storage_type,
       const tflite::gpu::Tensor<Linear, DataType::FLOAT32>& src);
 
-  absl::Status PerformReadSelector(
+  abslx::Status PerformReadSelector(
       const GpuInfo& gpu_info, const std::vector<std::string>& args,
       const std::vector<std::string>& template_args, std::string* result) const;
-  absl::Status PerformReadNearestSelector(const GpuInfo& gpu_info,
+  abslx::Status PerformReadNearestSelector(const GpuInfo& gpu_info,
                                           const std::vector<std::string>& args,
                                           std::string* result) const;
-  absl::Status PerformReadBilinearSelector(const GpuInfo& gpu_info,
+  abslx::Status PerformReadBilinearSelector(const GpuInfo& gpu_info,
                                            const std::vector<std::string>& args,
                                            std::string* result) const;
-  absl::Status PerformReadPerChannelSelector(
+  abslx::Status PerformReadPerChannelSelector(
       const GpuInfo& gpu_info, const std::vector<std::string>& args,
       const std::vector<std::string>& template_args, std::string* result) const;
 
-  absl::Status PerformGetAddressSelector(const std::vector<std::string>& args,
+  abslx::Status PerformGetAddressSelector(const std::vector<std::string>& args,
                                          std::string* result) const;
 
-  absl::Status PerformGetHandleSelector(const std::vector<std::string>& args,
+  abslx::Status PerformGetHandleSelector(const std::vector<std::string>& args,
                                         std::string* result) const;
 
   std::string StorageTypeToAddressType() const;
 
-  absl::Status PerformWriteSelector(
+  abslx::Status PerformWriteSelector(
       const GpuInfo& gpu_info, const std::vector<std::string>& args,
       const std::vector<std::string>& template_args, std::string* result) const;
 
-  absl::Status PerformWriteLinearSelector(
+  abslx::Status PerformWriteLinearSelector(
       const GpuInfo& gpu_info, const std::vector<std::string>& args,
       const std::vector<std::string>& template_args, std::string* result) const;
 
-  absl::Status PerformWrite2DSelector(
+  abslx::Status PerformWrite2DSelector(
       const GpuInfo& gpu_info, const std::vector<std::string>& args,
       const std::vector<std::string>& template_args, std::string* result) const;
 
@@ -212,7 +212,7 @@ class TensorDescriptor : public GPUObjectDescriptor {
                     const std::string& var_name,
                     const std::vector<std::string>& coords) const;
 
-  absl::Status MaybeGetDataTypeFromTemplateArgs(
+  abslx::Status MaybeGetDataTypeFromTemplateArgs(
       const std::vector<std::string>& template_args, DataType* result) const;
 
   std::string GetGlobalAddressNoDeclaration(const std::string& xc,

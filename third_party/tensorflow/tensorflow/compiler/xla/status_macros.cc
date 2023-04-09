@@ -44,7 +44,7 @@ static void LogError(const Status& status, const char* filename, int line,
   if (ABSL_PREDICT_TRUE(log_severity != tensorflow::NUM_SEVERITIES)) {
     std::string stack_trace;
     if (should_log_stack_trace) {
-      stack_trace = absl::StrCat("\n", tensorflow::CurrentStackTrace());
+      stack_trace = abslx::StrCat("\n", tensorflow::CurrentStackTrace());
     }
     switch (log_severity) {
       case tensorflow::INFO:
@@ -149,12 +149,12 @@ Status MakeErrorStream::Impl::GetStatus() {
 
   const std::string& stream_str = stream_.str();
   const std::string str = prior_message_handling_ == kAppendToPriorMessage
-                              ? absl::StrCat(prior_message_, stream_str)
-                              : absl::StrCat(stream_str, prior_message_);
+                              ? abslx::StrCat(prior_message_, stream_str)
+                              : abslx::StrCat(stream_str, prior_message_);
   if (ABSL_PREDICT_FALSE(str.empty())) {
     return MakeError(
         file_, line_, code_,
-        absl::StrCat(str, "Error without message at ", file_, ":", line_),
+        abslx::StrCat(str, "Error without message at ", file_, ":", line_),
         true /* should_log */, tensorflow::ERROR /* log_severity */,
         should_log_stack_trace_);
   } else {

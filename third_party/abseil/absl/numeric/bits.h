@@ -47,7 +47,7 @@
 #include "absl/base/config.h"
 #include "absl/numeric/internal/bits.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 #if !(defined(__cpp_lib_bitops) && __cpp_lib_bitops >= 201907L)
@@ -172,6 +172,6 @@ using std::has_single_bit;
 #endif
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_NUMERIC_BITS_H_

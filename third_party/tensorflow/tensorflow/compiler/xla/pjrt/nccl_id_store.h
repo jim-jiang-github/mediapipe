@@ -37,7 +37,7 @@ namespace xla {
 class NcclIdStore {
  public:
   NcclIdStore(int node_id, std::shared_ptr<DistributedRuntimeClient> client,
-              absl::flat_hash_map<GlobalDeviceId, int> device_to_node)
+              abslx::flat_hash_map<GlobalDeviceId, int> device_to_node)
       : node_id_(node_id),
         client_(std::move(client)),
         device_to_node_(std::move(device_to_node)) {}
@@ -47,10 +47,10 @@ class NcclIdStore {
  private:
   const int node_id_;
   const std::shared_ptr<DistributedRuntimeClient> client_;
-  const absl::flat_hash_map<GlobalDeviceId, int> device_to_node_;
+  const abslx::flat_hash_map<GlobalDeviceId, int> device_to_node_;
 
-  absl::Mutex mu_;
-  absl::flat_hash_map<gpu::NcclCliqueKey, std::string> cache_
+  abslx::Mutex mu_;
+  abslx::flat_hash_map<gpu::NcclCliqueKey, std::string> cache_
       ABSL_GUARDED_BY(mu_);
 };
 

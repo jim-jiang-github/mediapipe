@@ -30,12 +30,12 @@ namespace xla {
 // accuracy (e.g. `f32 -> bf16 -> f32` is removed).
 class SimplifyFPConversions : public HloModulePass {
  public:
-  absl::string_view name() const override { return "simplify-fp-conversions"; }
+  abslx::string_view name() const override { return "simplify-fp-conversions"; }
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 };
 
 }  // namespace xla

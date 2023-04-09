@@ -89,11 +89,11 @@ TEST_F(HloFusionStatsTest, LoopFusionAndReduceFusion) {
   SCOPED_TRACE(module->ToString());
 
   std::string stats = fusion_stats_visitor.ToString();
-  ASSERT_TRUE(absl::StrContains(stats, "Number of fusion ops: 3"));
-  ASSERT_TRUE(absl::StrContains(stats, "Number of kLoop fusions: 2"));
-  ASSERT_TRUE(absl::StrContains(stats, "{broadcast, compare, select}: 2"));
-  ASSERT_TRUE(absl::StrContains(stats, "Number of kInput fusions: 1"));
-  ASSERT_TRUE(absl::StrContains(stats, "{cwise, reduce, tuple}: 1"));
+  ASSERT_TRUE(abslx::StrContains(stats, "Number of fusion ops: 3"));
+  ASSERT_TRUE(abslx::StrContains(stats, "Number of kLoop fusions: 2"));
+  ASSERT_TRUE(abslx::StrContains(stats, "{broadcast, compare, select}: 2"));
+  ASSERT_TRUE(abslx::StrContains(stats, "Number of kInput fusions: 1"));
+  ASSERT_TRUE(abslx::StrContains(stats, "{cwise, reduce, tuple}: 1"));
 }
 
 TEST_F(HloFusionStatsTest, AggregateCwiseOps) {
@@ -118,7 +118,7 @@ TEST_F(HloFusionStatsTest, AggregateCwiseOps) {
   SCOPED_TRACE(module->ToString());
 
   std::string stats = fusion_stats_visitor.ToString();
-  ASSERT_TRUE(absl::StrContains(stats, "{cwise}: 1")) << stats;
+  ASSERT_TRUE(abslx::StrContains(stats, "{cwise}: 1")) << stats;
 }
 
 }  // namespace

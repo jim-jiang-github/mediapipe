@@ -50,7 +50,7 @@ namespace {
 //   node(output)
 // will turn into:
 //   node(copy(output)) <- passthrough_node(output)
-absl::Status NewPassthroughNode(GraphFloat32* graph, Node* node,
+abslx::Status NewPassthroughNode(GraphFloat32* graph, Node* node,
                                 const Value* output, Node** passthru_node) {
   *passthru_node = graph->NewNode();
   // Make copies for every output in the original node.
@@ -60,20 +60,20 @@ absl::Status NewPassthroughNode(GraphFloat32* graph, Node* node,
   RETURN_IF_ERROR(graph->AddConsumer((*passthru_node)->id, copy_output->id));
   copy_output->tensor = output->tensor;
   copy_output->tensor.ref = -1;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace
 
-absl::Status GetNodeAndRegistration(TfLiteContext* context, int node_id,
+abslx::Status GetNodeAndRegistration(TfLiteContext* context, int node_id,
                                     TfLiteNode** tflite_node,
                                     TfLiteRegistration** registration) {
   if (context->GetNodeAndRegistration(context, node_id, tflite_node,
                                       registration) != kTfLiteOk) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "Couldn't get node and registration info for op: ", node_id));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 DataType ToDataType(TfLiteType type) {
@@ -95,40 +95,40 @@ DataType ToDataType(TfLiteType type) {
   }
 }
 
-absl::Status ExtractTensorShape(const TfLiteTensor& tflite_tensor, BHWC* bhwc) {
+abslx::Status ExtractTensorShape(const TfLiteTensor& tflite_tensor, BHWC* bhwc) {
   const TfLiteIntArray* dims = tflite_tensor.dims;
   switch (dims->size) {
     case 1:
       // B layout
       *bhwc = BHWC(dims->data[0], 1, 1, 1);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     case 2:
       // BC layout
       *bhwc = BHWC(dims->data[0], 1, 1, dims->data[1]);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     case 3:
       // BWC layout
       *bhwc = BHWC(dims->data[0], 1, dims->data[1], dims->data[2]);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     case 4:
       // BHWC layout
       *bhwc = BHWC(dims->data[0], dims->data[1], dims->data[2], dims->data[3]);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     default:
-      return absl::InvalidArgumentError(absl::StrCat(
+      return abslx::InvalidArgumentError(abslx::StrCat(
           "Tensor \"", tflite_tensor.name ? tflite_tensor.name : "nullptr",
           "\" has bad input dims size: ", dims->size, "."));
   }
 }
 
-absl::Status ExtractAxisFromIndex(const TfLiteTensor& tflite_tensor, int index,
+abslx::Status ExtractAxisFromIndex(const TfLiteTensor& tflite_tensor, int index,
                                   Axis* axis) {
   const TfLiteIntArray* dims = tflite_tensor.dims;
   if (index < 0) {
     index = dims->size + index;
   }
   if (index < 0 || index >= dims->size) {
-    return absl::OutOfRangeError("Index for axis out of range");
+    return abslx::OutOfRangeError("Index for axis out of range");
   }
   std::vector<Axis> index_to_axis;
   switch (dims->size) {
@@ -149,30 +149,30 @@ absl::Status ExtractAxisFromIndex(const TfLiteTensor& tflite_tensor, int index,
       index_to_axis = {Axis::BATCH, Axis::HEIGHT, Axis::WIDTH, Axis::CHANNELS};
       break;
     default:
-      return absl::UnavailableError("Unknown layout.");
+      return abslx::UnavailableError("Unknown layout.");
   }
   *axis = index_to_axis[index];
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConvertTfLiteTensorToTensorRef(const TfLiteTensor& tflite_tensor,
+abslx::Status ConvertTfLiteTensorToTensorRef(const TfLiteTensor& tflite_tensor,
                                             TensorRef<BHWC>* tensor_ref) {
   tensor_ref->type = ToDataType(tflite_tensor.type);
   return ExtractTensorShape(tflite_tensor, &tensor_ref->shape);
 }
 
-absl::Status PopulateQuantParams(const TfLiteTensor& tensor,
+abslx::Status PopulateQuantParams(const TfLiteTensor& tensor,
                                  QuantizationParams* quant_params) {
   const TfLiteQuantization& quant = tensor.quantization;
   if (quant.type != TfLiteQuantizationType::kTfLiteAffineQuantization) {
-    return absl::InvalidArgumentError(
-        absl::StrCat("Tensor not quantized: ", std::string(tensor.name)));
+    return abslx::InvalidArgumentError(
+        abslx::StrCat("Tensor not quantized: ", std::string(tensor.name)));
   }
   const TfLiteAffineQuantization* params =
       static_cast<const TfLiteAffineQuantization*>(quant.params);
   if (params->scale->size > 1) {
-    return absl::InvalidArgumentError(
-        absl::StrCat("Non-constant per-channel quantized tensor: ",
+    return abslx::InvalidArgumentError(
+        abslx::StrCat("Non-constant per-channel quantized tensor: ",
                      std::string(tensor.name)));
   }
   const float scale = params->scale->data[0];
@@ -187,14 +187,14 @@ absl::Status PopulateQuantParams(const TfLiteTensor& tensor,
     qmin_value = static_cast<float>(std::numeric_limits<int8_t>::min());
     qmax_value = static_cast<float>(std::numeric_limits<int8_t>::max());
   } else {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "Type invalid for quantized tensor: ", std::string(tensor.name)));
   }
   quant_params->min = scale * (static_cast<float>(qmin_value) - zero_point);
   quant_params->max = scale * (static_cast<float>(qmax_value) - zero_point);
   quant_params->scale = scale;
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 int GetNumberOfRuntimeInputsForNode(const TfLiteContext* context,
@@ -216,33 +216,33 @@ int GetNumberOfConstInputsForNode(const TfLiteContext* context,
          GetNumberOfRuntimeInputsForNode(context, tflite_node);
 }
 
-absl::Status CheckInputsOutputs(const TfLiteContext* context,
+abslx::Status CheckInputsOutputs(const TfLiteContext* context,
                                 const TfLiteNode* tflite_node,
                                 int runtime_inputs, int outputs) {
   const int runtime_inputs_from_model =
       GetNumberOfRuntimeInputsForNode(context, tflite_node);
   if (runtime_inputs_from_model != runtime_inputs) {
-    return absl::InternalError(absl::StrCat(
+    return abslx::InternalError(abslx::StrCat(
         "Expected ", runtime_inputs, " runtime input tensor(s), but node has ",
         runtime_inputs_from_model, " runtime input(s)."));
   }
   const int outputs_from_model = NumOutputs(tflite_node);
   if (outputs_from_model != outputs) {
-    return absl::InternalError(absl::StrCat("Expected ", outputs,
+    return abslx::InternalError(abslx::StrCat("Expected ", outputs,
                                             " output tensor(s), but node has ",
                                             outputs_from_model, " output(s)."));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CheckInputsConstsOutputs(const TfLiteContext* context,
+abslx::Status CheckInputsConstsOutputs(const TfLiteContext* context,
                                       const TfLiteNode* tflite_node,
                                       int runtime_inputs, int const_inputs,
                                       int outputs) {
   const int const_inputs_from_model =
       GetNumberOfConstInputsForNode(context, tflite_node);
   if (const_inputs_from_model != const_inputs) {
-    return absl::InternalError(absl::StrCat(
+    return abslx::InternalError(abslx::StrCat(
         "Expected ", const_inputs, " const input tensor(s), but node has ",
         const_inputs_from_model, " const input(s)."));
   }
@@ -257,7 +257,7 @@ void ConvertFloat16ToFloat32(size_t num_elements, const uint16_t* src,
 }
 
 template <>
-absl::Status CreateVectorCopyData<float>(const TfLiteTensor& tensor,
+abslx::Status CreateVectorCopyData<float>(const TfLiteTensor& tensor,
                                          float* tensor_data) {
   switch (tensor.type) {
     case kTfLiteFloat32:
@@ -278,121 +278,121 @@ absl::Status CreateVectorCopyData<float>(const TfLiteTensor& tensor,
       DequantizeConstantTensor(tensor, tensor.data.i32, tensor_data);
       break;
     default:
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Unsupported data type for float32 tensor");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 const std::string GetDimensionString(const TfLiteIntArray* dimensions) {
-  return absl::StrJoin(TfLiteIntArrayView(dimensions), "x");
+  return abslx::StrJoin(TfLiteIntArrayView(dimensions), "x");
 }
 
-absl::Status SetAllDimensions(const TfLiteIntArray* dimensions, Scalar* shape) {
+abslx::Status SetAllDimensions(const TfLiteIntArray* dimensions, Scalar* shape) {
   if (dimensions->size < 0) {
-    return absl::InvalidArgumentError("Invalid Scalar dimensions");
+    return abslx::InvalidArgumentError("Invalid Scalar dimensions");
   }
   for (int i = 0; i < dimensions->size; ++i) {
     if (dimensions->data[i] != 1) {
-      return absl::InvalidArgumentError(absl::StrCat(
+      return abslx::InvalidArgumentError(abslx::StrCat(
           GetDimensionString(dimensions), "  cannot be reduced to scalar."));
     }
   }
   shape->v = 1;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CheckIfLinearConvertible(const TfLiteIntArray* dimensions) {
+abslx::Status CheckIfLinearConvertible(const TfLiteIntArray* dimensions) {
   if (dimensions->size <= 0) {
-    return absl::InvalidArgumentError("Dimension is empty.");
+    return abslx::InvalidArgumentError("Dimension is empty.");
   }
   for (int i = 0; i < dimensions->size - 1; ++i) {
     if (dimensions->data[i] != 1) {
-      return absl::InvalidArgumentError(absl::StrCat(
+      return abslx::InvalidArgumentError(abslx::StrCat(
           GetDimensionString(dimensions), "  cannot be reduced to linear."));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SetAllDimensions(const TfLiteIntArray* dimensions, Linear* shape) {
+abslx::Status SetAllDimensions(const TfLiteIntArray* dimensions, Linear* shape) {
   RETURN_IF_ERROR(CheckIfLinearConvertible(dimensions));
   shape->v = dimensions->data[dimensions->size - 1];
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SetAllDimensions(const TfLiteIntArray* dimensions, HWC* shape) {
+abslx::Status SetAllDimensions(const TfLiteIntArray* dimensions, HWC* shape) {
   if (dimensions->size == 3) {
     shape->h = dimensions->data[0];
     shape->w = dimensions->data[1];
     shape->c = dimensions->data[2];
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   if (dimensions->size == 4) {
     if (dimensions->data[0] != 1) {
-      return absl::UnimplementedError("Batch size is not equal to 1.");
+      return abslx::UnimplementedError("Batch size is not equal to 1.");
     }
     shape->h = dimensions->data[1];
     shape->w = dimensions->data[2];
     shape->c = dimensions->data[3];
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  return absl::InvalidArgumentError(
-      absl::StrCat("Expected a 3D tensor of shape HxWxC or a 4D tensor of "
+  return abslx::InvalidArgumentError(
+      abslx::StrCat("Expected a 3D tensor of shape HxWxC or a 4D tensor of "
                    "shape 1xHxWxC but got ",
                    GetDimensionString(dimensions)));
 }
 
-absl::Status SetAllDimensions(const TfLiteIntArray* dimensions, HW* shape) {
+abslx::Status SetAllDimensions(const TfLiteIntArray* dimensions, HW* shape) {
   if (dimensions->size != 2) {
-    return absl::InvalidArgumentError(
-        absl::StrCat("Expected a 2D tensor of shape HxW but got ",
+    return abslx::InvalidArgumentError(
+        abslx::StrCat("Expected a 2D tensor of shape HxW but got ",
                      GetDimensionString(dimensions)));
   }
   shape->h = dimensions->data[0];
   shape->w = dimensions->data[1];
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SetAllDimensions(const TfLiteIntArray* dimensions, OHWI* shape) {
+abslx::Status SetAllDimensions(const TfLiteIntArray* dimensions, OHWI* shape) {
   if (dimensions->size != 4) {
-    return absl::InvalidArgumentError(
-        absl::StrCat("Expected a 4D tensor of shape OxHxWxI but got ",
+    return abslx::InvalidArgumentError(
+        abslx::StrCat("Expected a 4D tensor of shape OxHxWxI but got ",
                      GetDimensionString(dimensions)));
   }
   shape->o = dimensions->data[0];
   shape->h = dimensions->data[1];
   shape->w = dimensions->data[2];
   shape->i = dimensions->data[3];
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SetAllDimensions(const TfLiteIntArray* dimensions, BHWC* shape) {
+abslx::Status SetAllDimensions(const TfLiteIntArray* dimensions, BHWC* shape) {
   if (dimensions->size != 4) {
-    return absl::InvalidArgumentError(
-        absl::StrCat("Expected a 4D tensor of shape BxHxWxC but got ",
+    return abslx::InvalidArgumentError(
+        abslx::StrCat("Expected a 4D tensor of shape BxHxWxC but got ",
                      GetDimensionString(dimensions)));
   }
   shape->b = dimensions->data[0];
   shape->h = dimensions->data[1];
   shape->w = dimensions->data[2];
   shape->c = dimensions->data[3];
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // If there is fused activation present, then there will be another node created
 // that will have identical output as the given node. New operation node will
 // depend on the given node output.
-absl::Status MaybeFuseActivation(TfLiteFusedActivation fused_activation,
+abslx::Status MaybeFuseActivation(TfLiteFusedActivation fused_activation,
                                  GraphFloat32* graph, Node* node) {
   const auto outputs = graph->FindOutputs(node->id);
   if (outputs.size() != 1) {
-    return absl::InternalError("Number of outputs != 1");
+    return abslx::InternalError("Number of outputs != 1");
   }
   switch (fused_activation) {
     case kTfLiteActNone:
       // Nothing to do here
-      return absl::OkStatus();
+      return abslx::OkStatus();
     case kTfLiteActRelu:
     case kTfLiteActReluN1To1:
     case kTfLiteActRelu6: {
@@ -405,25 +405,25 @@ absl::Status MaybeFuseActivation(TfLiteFusedActivation fused_activation,
           NewPassthroughNode(graph, node, outputs[0], &activation_node));
       activation_node->operation.type = ToString(OperationType::RELU);
       activation_node->operation.attributes = attr;
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case kTfLiteActTanh: {
       Node* activation_node;
       RETURN_IF_ERROR(
           NewPassthroughNode(graph, node, outputs[0], &activation_node));
       activation_node->operation.type = ToString(OperationType::TANH);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     case kTfLiteActSigmoid: {
       Node* activation_node;
       RETURN_IF_ERROR(
           NewPassthroughNode(graph, node, outputs[0], &activation_node));
       activation_node->operation.type = ToString(OperationType::SIGMOID);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     } break;
     default:
-      return absl::NotFoundError(
-          absl::StrCat("Unsupported fused activation: ", fused_activation));
+      return abslx::NotFoundError(
+          abslx::StrCat("Unsupported fused activation: ", fused_activation));
   }
 }
 

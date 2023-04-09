@@ -193,7 +193,7 @@ bool MaybeLoadPtxFromFile(const HloModuleConfig module_config,
     // To ease comparing many PTX versions, accept different suffixes then
     // the original filename.
     auto filename = tensorflow::io::Basename(full_filename);
-    if (absl::StartsWith(filename, prefix)) {
+    if (abslx::StartsWith(filename, prefix)) {
       matched_filename = full_filename;
       VLOG(1) << "RunBackend() - Will load PTX from file: " << full_filename;
       break;
@@ -229,11 +229,11 @@ std::unique_ptr<llvm::Module> MaybeLoadLLVMFromFile(const HloModule* module,
   std::string prefix = xla::FilenameFor(*module, "", "");
   auto xla_gpu_llvm_ir_file =
       module->config().debug_options().xla_gpu_llvm_ir_file();
-  auto matched_filename = absl::c_find_if(
+  auto matched_filename = abslx::c_find_if(
       xla_gpu_llvm_ir_file, [prefix](const std::string& full_filename) {
         // To ease comparing many LLVM versions, accept different suffixes then
         // the original filename.
-        return absl::StartsWith(tensorflow::io::Basename(full_filename),
+        return abslx::StartsWith(tensorflow::io::Basename(full_filename),
                                 prefix);
       });
   if (!xla_gpu_llvm_ir_file.empty() &&
@@ -270,8 +270,8 @@ std::unique_ptr<llvm::Module> MaybeLoadLLVMFromFile(const HloModule* module,
 //
 // Only prints a warning the first time it's called.
 void WarnIfBadDriverJITVersion() {
-  static absl::once_flag run_once;
-  absl::call_once(run_once, [] {
+  static abslx::once_flag run_once;
+  abslx::call_once(run_once, [] {
     auto version_or_status = se::cuda::Diagnostician::FindKernelDriverVersion();
     if (!version_or_status.ok()) {
       LOG(WARNING) << "Couldn't read CUDA driver version.";
@@ -323,7 +323,7 @@ NVPTXCompiler::CompileTargetBinary(const HloModuleConfig& module_config,
                                    const HloModule* debug_module) {
   std::string libdevice_dir;
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
 
     // Find the directory containing libdevice.  To avoid searching for it every
     // time, we have a one-element cache, keyed on the module's config's
@@ -381,7 +381,7 @@ std::vector<uint8_t> NVPTXCompiler::CompileGpuAsmOrGetCachedResult(
   CompilationCacheValue* cache_value = nullptr;
 
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     std::tie(iter, inserted) = compilation_cache_.emplace(
         std::piecewise_construct,
         std::forward_as_tuple(ptx, cc.major, cc.minor, relocatable),
@@ -394,7 +394,7 @@ std::vector<uint8_t> NVPTXCompiler::CompileGpuAsmOrGetCachedResult(
   // Other threads asking for the same compilation key will block on
   // cache_value->mutex_ until compilation is done.
   {
-    absl::MutexLock lock(&cache_value->mutex);
+    abslx::MutexLock lock(&cache_value->mutex);
     if (inserted) {
       CHECK(!cache_value->compilation_done);
       if (!ptx.empty()) {

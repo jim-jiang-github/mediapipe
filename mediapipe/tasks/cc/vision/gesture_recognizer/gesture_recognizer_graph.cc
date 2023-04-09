@@ -88,7 +88,7 @@ struct GestureRecognizerOutputs {
 };
 
 // Sets the base options in the sub tasks.
-absl::Status SetSubTaskBaseOptions(const ModelAssetBundleResources& resources,
+abslx::Status SetSubTaskBaseOptions(const ModelAssetBundleResources& resources,
                                    GestureRecognizerGraphOptions* options,
                                    bool is_copy) {
   ASSIGN_OR_RETURN(const auto hand_landmarker_file,
@@ -131,7 +131,7 @@ absl::Status SetSubTaskBaseOptions(const ModelAssetBundleResources& resources,
   }
   hand_gesture_recognizer_graph_options->mutable_base_options()
       ->set_use_stream_mode(options->base_options().use_stream_mode());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace
@@ -198,7 +198,7 @@ absl::Status SetSubTaskBaseOptions(const ModelAssetBundleResources& resources,
 // }
 class GestureRecognizerGraph : public core::ModelTaskGraph {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     Graph graph;
     if (sc->Options<GestureRecognizerGraphOptions>()
@@ -241,7 +241,7 @@ class GestureRecognizerGraph : public core::ModelTaskGraph {
   }
 
  private:
-  absl::StatusOr<GestureRecognizerOutputs> BuildGestureRecognizerGraph(
+  abslx::StatusOr<GestureRecognizerOutputs> BuildGestureRecognizerGraph(
       GestureRecognizerGraphOptions& graph_options, Source<Image> image_in,
       Source<NormalizedRect> norm_rect_in, Graph& graph) {
     auto& image_property = graph.AddNode("ImagePropertiesCalculator");

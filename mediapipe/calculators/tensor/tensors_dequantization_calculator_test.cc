@@ -90,7 +90,7 @@ TEST_F(TensorsDequantizationCalculatorTest, FailsWithFloatTensors) {
 
   auto status = runner_.Run();
 
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(), HasSubstr("Unsupported input tensor type"));
 }
 
@@ -100,7 +100,7 @@ TEST_F(TensorsDequantizationCalculatorTest, FailsWithInt32Tensors) {
 
   auto status = runner_.Run();
 
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(), HasSubstr("Unsupported input tensor type"));
 }
 

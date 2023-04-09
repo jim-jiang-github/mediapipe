@@ -33,7 +33,7 @@ struct ConvPointwiseAttributes {
 GPUOperation CreateConvPointwise(const OperationDef& definition,
                                  const ConvPointwiseAttributes& attr);
 
-absl::Status TryFusedPointwiseConv(
+abslx::Status TryFusedPointwiseConv(
     const GraphFloat32& graph, NodeId first_node_id,
     CalculationsPrecision precision,
     const std::map<ValueId, TensorDescriptor>& tensor_descriptors,

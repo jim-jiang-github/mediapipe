@@ -20,7 +20,7 @@ limitations under the License.
 namespace xla {
 
 /*static*/ StatusOr<std::unique_ptr<HloModule>>
-HloRunnerInterface::CreateModuleFromString(const absl::string_view hlo_string,
+HloRunnerInterface::CreateModuleFromString(const abslx::string_view hlo_string,
                                            const DebugOptions& debug_options) {
   HloModuleConfig config;
   config.set_debug_options(debug_options);
@@ -86,7 +86,7 @@ HloRunnerInterface::ReadModuleFromModuleBinaryProtofile(
 }
 
 StatusOr<Literal> HloRunnerInterface::Execute(
-    std::unique_ptr<HloModule> module, absl::Span<const Literal> arguments,
+    std::unique_ptr<HloModule> module, abslx::Span<const Literal> arguments,
     bool run_hlo_passes, ExecutionProfile* profile) {
   // Construct a vector of plain pointers for the arguments.
   std::vector<const Literal*> argument_pointers;
@@ -102,7 +102,7 @@ StatusOr<Literal> HloRunnerInterface::Execute(
 }
 
 StatusOr<Literal> HloRunnerInterface::ExecuteWithExecutable(
-    Executable* executable, absl::Span<const Literal> arguments,
+    Executable* executable, abslx::Span<const Literal> arguments,
     ExecutionProfile* profile) {
   // Construct a vector of plain pointers for the arguments.
   std::vector<const Literal*> argument_pointers;

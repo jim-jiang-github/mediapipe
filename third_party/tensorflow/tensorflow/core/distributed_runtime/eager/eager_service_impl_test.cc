@@ -855,7 +855,7 @@ TEST_F(FunctionWithRemoteInputsTest, EagerPFLRTest) {
   for (const string& func_name : ctx->FuncLibDef()->ListFunctionNames()) {
     const FunctionDef* fdef = ctx->FuncLibDef()->Find(func_name);
     EXPECT_TRUE(fdef != nullptr);
-    if (absl::StartsWith(func_name, "MatMulFunction")) {
+    if (abslx::StartsWith(func_name, "MatMulFunction")) {
       EXPECT_FALSE(MatMulHasAttrWithDefaultValue(*fdef));
     }
   }
@@ -916,7 +916,7 @@ TEST_F(FunctionWithRemoteInputsTest,
   for (const string& func_name : ctx->FuncLibDef()->ListFunctionNames()) {
     const FunctionDef* fdef = ctx->FuncLibDef()->Find(func_name);
     EXPECT_TRUE(fdef != nullptr);
-    if (absl::StartsWith(func_name, "MatMulFunction")) {
+    if (abslx::StartsWith(func_name, "MatMulFunction")) {
       EXPECT_FALSE(MatMulHasAttrWithDefaultValue(*fdef));
     }
   }
@@ -1262,7 +1262,7 @@ TEST_F(EagerServiceImplTest, RequestsToMasterTest) {
   Status status = eager_service_impl.Enqueue(nullptr, &remote_enqueue_request,
                                              &remote_enqueue_response);
   EXPECT_EQ(error::ABORTED, status.code());
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       status.error_message(),
       "Unable to find a context_id matching the specified one"));
 

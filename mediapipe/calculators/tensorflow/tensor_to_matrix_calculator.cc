@@ -34,28 +34,28 @@ constexpr char kMatrix[] = "MATRIX";
 constexpr char kTensor[] = "TENSOR";
 constexpr char kReference[] = "REFERENCE";
 
-absl::Status FillTimeSeriesHeaderIfValid(const Packet& header_packet,
+abslx::Status FillTimeSeriesHeaderIfValid(const Packet& header_packet,
                                          TimeSeriesHeader* header) {
   CHECK(header);
   if (header_packet.IsEmpty()) {
-    return absl::UnknownError("No header found.");
+    return abslx::UnknownError("No header found.");
   }
   if (!header_packet.ValidateAsType<TimeSeriesHeader>().ok()) {
-    return absl::UnknownError("Packet does not contain TimeSeriesHeader.");
+    return abslx::UnknownError("Packet does not contain TimeSeriesHeader.");
   }
   *header = header_packet.Get<TimeSeriesHeader>();
   if (header->has_sample_rate() && header->sample_rate() >= 0 &&
       header->has_num_channels() && header->num_channels() >= 0) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   } else {
     std::string error_message =
         "TimeSeriesHeader is missing necessary fields: "
         "sample_rate or num_channels, or one of their values is negative. ";
 #ifndef MEDIAPIPE_MOBILE
-    absl::StrAppend(&error_message, "Got header:\n",
+    abslx::StrAppend(&error_message, "Got header:\n",
                     header->ShortDebugString());
 #endif
-    return absl::InvalidArgumentError(error_message);
+    return abslx::InvalidArgumentError(error_message);
   }
 }
 
@@ -107,17 +107,17 @@ absl::Status FillTimeSeriesHeaderIfValid(const Packet& header_packet,
 // }
 class TensorToMatrixCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
   // Store header information so that we can verify the inputs in process().
   TimeSeriesHeader header_;
 };
 REGISTER_CALCULATOR(TensorToMatrixCalculator);
 
-absl::Status TensorToMatrixCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status TensorToMatrixCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK_LE(cc->Inputs().NumEntries(), 2)
       << "Only one or two input streams are supported.";
   RET_CHECK_GT(cc->Inputs().NumEntries(), 0)
@@ -143,12 +143,12 @@ absl::Status TensorToMatrixCalculator::GetContract(CalculatorContract* cc) {
   cc->Outputs().Tag(kMatrix).Set<Matrix>(
       // Output Matrix.
   );
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorToMatrixCalculator::Open(CalculatorContext* cc) {
-  auto input_header = absl::make_unique<TimeSeriesHeader>();
-  absl::Status header_status;
+abslx::Status TensorToMatrixCalculator::Open(CalculatorContext* cc) {
+  auto input_header = abslx::make_unique<TimeSeriesHeader>();
+  abslx::Status header_status;
   if (cc->Inputs().HasTag(kReference)) {
     header_status = FillTimeSeriesHeaderIfValid(
         cc->Inputs().Tag(kReference).Header(), input_header.get());
@@ -175,10 +175,10 @@ absl::Status TensorToMatrixCalculator::Open(CalculatorContext* cc) {
     cc->Outputs().Tag(kMatrix).SetHeader(Adopt(input_header.release()));
   }
   cc->SetOffset(TimestampDiff(0));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorToMatrixCalculator::Process(CalculatorContext* cc) {
+abslx::Status TensorToMatrixCalculator::Process(CalculatorContext* cc) {
   // Verify that each reference stream packet corresponds to a tensor packet
   // otherwise the header information is invalid. If we don't have a reference
   // stream, Process() is only called when we have an input tensor and this is
@@ -203,11 +203,11 @@ absl::Status TensorToMatrixCalculator::Process(CalculatorContext* cc) {
     RET_CHECK_EQ(width, header_.num_samples())
         << "The number of samples at runtime does not match the header.";
   }
-  auto output = absl::make_unique<Matrix>(width, length);
+  auto output = abslx::make_unique<Matrix>(width, length);
   *output =
       Eigen::MatrixXf::Map(input_tensor.flat<float>().data(), length, width);
   cc->Outputs().Tag(kMatrix).Add(output.release(), cc->InputTimestamp());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

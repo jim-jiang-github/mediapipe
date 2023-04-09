@@ -37,7 +37,7 @@ using ::mediapipe::tasks::core::TaskRunner;
 
 // A mutex to guard the python callback function. Only one python callback can
 // run at once.
-absl::Mutex callback_mutex;
+abslx::Mutex callback_mutex;
 
 void TaskRunnerSubmodule(py::module* module) {
   pybind11_protobuf::ImportNativeProtoCasters();
@@ -65,18 +65,18 @@ mode) or not (synchronous mode).)doc");
         PacketsCallback callback = nullptr;
         if (packets_callback.has_value()) {
           callback =
-              [packets_callback](absl::StatusOr<PacketMap> output_packets) {
-                absl::MutexLock lock(&callback_mutex);
+              [packets_callback](abslx::StatusOr<PacketMap> output_packets) {
+                abslx::MutexLock lock(&callback_mutex);
                 // Acquires GIL before calling Python callback.
                 py::gil_scoped_acquire gil_acquire;
                 RaisePyErrorIfNotOk(output_packets.status());
                 packets_callback.value()(output_packets.value());
-                return absl::OkStatus();
+                return abslx::OkStatus();
               };
         }
         auto task_runner = TaskRunner::Create(
             std::move(graph_config),
-            absl::make_unique<core::MediaPipeBuiltinOpResolver>(),
+            abslx::make_unique<core::MediaPipeBuiltinOpResolver>(),
             std::move(callback));
         RaisePyErrorIfNotOk(task_runner.status());
         return std::move(*task_runner);

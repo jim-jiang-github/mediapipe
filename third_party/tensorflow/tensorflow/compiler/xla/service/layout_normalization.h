@@ -34,11 +34,11 @@ namespace xla {
 // normalized ones, e.g. f32[5,1,4]{0,1,2} is converted to f32[4,5]{1,0}.
 class LayoutNormalization : public HloModulePass {
  public:
-  absl::string_view name() const override { return "layout_normalization"; }
+  abslx::string_view name() const override { return "layout_normalization"; }
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 };
 
 }  // end namespace xla

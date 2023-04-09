@@ -110,7 +110,7 @@ class ImageMultiPool {
   SimplePoolGpu MakeSimplePoolGpu(IBufferSpec spec);
   Image GetBufferFromSimplePool(IBufferSpec spec, const SimplePoolGpu& pool);
 
-  absl::Mutex mutex_gpu_;
+  abslx::Mutex mutex_gpu_;
   std::unordered_map<IBufferSpec, SimplePoolGpu, IBufferSpecHash> pools_gpu_
       ABSL_GUARDED_BY(mutex_gpu_);
   // A queue of IBufferSpecs to keep track of the age of each IBufferSpec added
@@ -122,7 +122,7 @@ class ImageMultiPool {
   SimplePoolCpu MakeSimplePoolCpu(IBufferSpec spec);
   Image GetBufferFromSimplePool(IBufferSpec spec, const SimplePoolCpu& pool);
 
-  absl::Mutex mutex_cpu_;
+  abslx::Mutex mutex_cpu_;
   std::unordered_map<IBufferSpec, SimplePoolCpu, IBufferSpecHash> pools_cpu_
       ABSL_GUARDED_BY(mutex_cpu_);
   // A queue of IBufferSpecs to keep track of the age of each IBufferSpec added

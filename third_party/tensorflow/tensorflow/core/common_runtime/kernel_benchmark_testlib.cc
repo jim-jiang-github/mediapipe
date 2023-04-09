@@ -61,7 +61,7 @@ Benchmark::Benchmark(const string& device, Graph* g,
 
   CHECK(!old_benchmark_api) << "Expected new API only";
 
-  string t = absl::AsciiStrToUpper(device);
+  string t = abslx::AsciiStrToUpper(device);
   // Allow NewDevice to allocate a new threadpool with different number of
   // threads for each new benchmark.
   LocalDevice::set_use_global_threadpool(false);

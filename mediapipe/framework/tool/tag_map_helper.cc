@@ -31,7 +31,7 @@ namespace mediapipe {
 namespace tool {
 
 // Create using a vector of TAG:<index>:name.
-absl::StatusOr<std::shared_ptr<TagMap>> CreateTagMap(
+abslx::StatusOr<std::shared_ptr<TagMap>> CreateTagMap(
     const std::vector<std::string>& tag_index_names) {
   proto_ns::RepeatedPtrField<ProtoString> fields;
   for (const auto& tag_index_name : tag_index_names) {
@@ -41,21 +41,21 @@ absl::StatusOr<std::shared_ptr<TagMap>> CreateTagMap(
 }
 
 // Create using an integer number of entries (for tag "").
-absl::StatusOr<std::shared_ptr<TagMap>> CreateTagMap(int num_entries) {
+abslx::StatusOr<std::shared_ptr<TagMap>> CreateTagMap(int num_entries) {
   RET_CHECK_LE(0, num_entries);
   proto_ns::RepeatedPtrField<ProtoString> fields;
   for (int i = 0; i < num_entries; ++i) {
-    *fields.Add() = absl::StrCat("name", i);
+    *fields.Add() = abslx::StrCat("name", i);
   }
   return TagMap::Create(fields);
 }
 
 // Create using a vector of just tag names.
-absl::StatusOr<std::shared_ptr<TagMap>> CreateTagMapFromTags(
+abslx::StatusOr<std::shared_ptr<TagMap>> CreateTagMapFromTags(
     const std::vector<std::string>& tags) {
   proto_ns::RepeatedPtrField<ProtoString> fields;
   for (int i = 0; i < tags.size(); ++i) {
-    *fields.Add() = absl::StrCat(tags[i], ":name", i);
+    *fields.Add() = abslx::StrCat(tags[i], ":name", i);
   }
   return TagMap::Create(fields);
 }

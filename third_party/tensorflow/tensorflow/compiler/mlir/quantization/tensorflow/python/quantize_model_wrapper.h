@@ -27,31 +27,31 @@ limitations under the License.
 namespace tensorflow {
 namespace quantization {
 
-PyObject* QuantizeQatModel(absl::string_view saved_model_path,
-                           absl::string_view exported_names_str,
-                           absl::string_view tags,
-                           absl::string_view quant_opts_serialized);
+PyObject* QuantizeQatModel(abslx::string_view saved_model_path,
+                           abslx::string_view exported_names_str,
+                           abslx::string_view tags,
+                           abslx::string_view quant_opts_serialized);
 
-PyObject* QuantizePtqDynamicRange(absl::string_view saved_model_path,
-                                  absl::string_view exported_names_str,
-                                  absl::string_view tags,
-                                  absl::string_view quant_opts_serialized);
+PyObject* QuantizePtqDynamicRange(abslx::string_view saved_model_path,
+                                  abslx::string_view exported_names_str,
+                                  abslx::string_view tags,
+                                  abslx::string_view quant_opts_serialized);
 
-PyObject* QuantizePtqModelPreCalibration(absl::string_view saved_model_path,
-                                         absl::string_view exported_names_str,
-                                         absl::string_view tags);
+PyObject* QuantizePtqModelPreCalibration(abslx::string_view saved_model_path,
+                                         abslx::string_view exported_names_str,
+                                         abslx::string_view tags);
 
 PyObject* QuantizePtqModelPostCalibration(
-    absl::string_view saved_model_path, absl::string_view exported_names_str,
-    absl::string_view tags, absl::string_view quant_opts_serialized);
+    abslx::string_view saved_model_path, abslx::string_view exported_names_str,
+    abslx::string_view tags, abslx::string_view quant_opts_serialized);
 
 void ClearCollectedInformationFromCalibrator();
 
-void ClearDataFromCalibrator(absl::string_view id);
+void ClearDataFromCalibrator(abslx::string_view id);
 
-float GetMinFromCalibrator(absl::string_view id);
+float GetMinFromCalibrator(abslx::string_view id);
 
-float GetMaxFromCalibrator(absl::string_view id);
+float GetMaxFromCalibrator(abslx::string_view id);
 
 }  // namespace quantization
 }  // namespace tensorflow

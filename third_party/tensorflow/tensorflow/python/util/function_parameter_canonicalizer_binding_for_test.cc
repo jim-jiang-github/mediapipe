@@ -28,8 +28,8 @@ namespace py = pybind11;
 
 class FunctionParameterCanonicalizerWrapper {
  public:
-  FunctionParameterCanonicalizerWrapper(absl::Span<const char*> arg_names,
-                                        absl::Span<PyObject*> defaults)
+  FunctionParameterCanonicalizerWrapper(abslx::Span<const char*> arg_names,
+                                        abslx::Span<PyObject*> defaults)
       : function_parameter_canonicalizer_(arg_names, defaults) {}
 
   tensorflow::FunctionParameterCanonicalizer function_parameter_canonicalizer_;
@@ -48,8 +48,8 @@ PYBIND11_MODULE(_function_parameter_canonicalizer_binding_for_test, m) {
         if (!defaults) throw py::error_already_set();
         PyObject** default_items = PySequence_Fast_ITEMS(defaults_fast.get());
         return new FunctionParameterCanonicalizerWrapper(
-            absl::MakeSpan(arg_names_c_str),
-            absl::MakeSpan(default_items,
+            abslx::MakeSpan(arg_names_c_str),
+            abslx::MakeSpan(default_items,
                            PySequence_Fast_GET_SIZE(defaults_fast.get())));
       }))
       .def("canonicalize", [](FunctionParameterCanonicalizerWrapper& self,
@@ -58,7 +58,7 @@ PYBIND11_MODULE(_function_parameter_canonicalizer_binding_for_test, m) {
             self.function_parameter_canonicalizer_.GetArgSize());
 
         bool is_suceeded = self.function_parameter_canonicalizer_.Canonicalize(
-            args.ptr(), kwargs.ptr(), absl::MakeSpan(result_raw));
+            args.ptr(), kwargs.ptr(), abslx::MakeSpan(result_raw));
 
         if (!is_suceeded) {
           CHECK(PyErr_Occurred());

@@ -31,7 +31,7 @@ xla::XlaOp FloatLiteral(xla::XlaBuilder* builder, xla::PrimitiveType type,
 // Makes a 1D tensor [0, ..., x, y] from two tensors x and y with zeros
 // prepended until the array is length n_dims.
 xla::XlaOp PrependZerosInMajorDims(xla::XlaOp x,
-                                   absl::Span<const xla::XlaOp> starts);
+                                   abslx::Span<const xla::XlaOp> starts);
 
 // Returns a integer scalar constant of 'type' with 'value'.
 // If 'type' is complex, returns a real value with zero imaginary component.

@@ -43,14 +43,14 @@ constexpr const char* const kTpuReplicateAttr = "_tpu_replicate";
 constexpr const char* const kXlaClusterAttr = "_xla_compile_id";
 
 // Checks if boolean attribute is defined and it's value is 'true'.
-bool CheckBoolAttr(const Node* n, absl::string_view attr_name) {
+bool CheckBoolAttr(const Node* n, abslx::string_view attr_name) {
   bool match;
   bool found = TryGetNodeAttr(n->attrs(), attr_name, &match);
   return found && match;
 }
 
 // Checks if string attribute is defined and it's not empty.
-bool CheckStringAttr(const Node* n, absl::string_view attr_name) {
+bool CheckStringAttr(const Node* n, abslx::string_view attr_name) {
   string match;
   bool found = TryGetNodeAttr(n->attrs(), attr_name, &match);
   return found && !match.empty();
@@ -79,10 +79,10 @@ bool HasArgsOrRetvals(const Graph& g) {
   return false;
 }
 
-const absl::flat_hash_set<std::string>& DevicePropagationOpList() {
+const abslx::flat_hash_set<std::string>& DevicePropagationOpList() {
   // Control flow ops and Identity ops which are inserted by function call
   // inlining.
-  static const auto op_list = new absl::flat_hash_set<std::string>(
+  static const auto op_list = new abslx::flat_hash_set<std::string>(
       {"Identity", "IdentityN", "Enter", "Exit", "Switch", "Merge",
        "NextIteration"});
   return *op_list;

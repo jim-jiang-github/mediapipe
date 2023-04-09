@@ -55,7 +55,7 @@ typedef struct GcsFileStat {
 typedef struct GCSFile {
   google::cloud::storage::Client gcs_client;  // owned
   bool compose;
-  absl::Mutex block_cache_lock;
+  abslx::Mutex block_cache_lock;
   std::shared_ptr<RamFileBlockCache> file_block_cache
       ABSL_GUARDED_BY(block_cache_lock);
   uint64_t block_size;  // Reads smaller than block_size will trigger a read

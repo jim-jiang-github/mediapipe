@@ -25,7 +25,7 @@ namespace TF {
 
 // TODO(b/229028654) Use definitions from tf2xla_defs.h directly. We currently
 // don't do this to avoid explicit casts (implicit conversion from
-// `absl::string_view` to `llvm::StringRef` is not supported until C++17).
+// `abslx::string_view` to `llvm::StringRef` is not supported until C++17).
 
 // Marks a node for XLA compilation. The attribute value indicates the
 // compilation device type.

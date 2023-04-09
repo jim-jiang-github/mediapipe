@@ -83,7 +83,7 @@ class PacketMatcher : public testing::MatcherInterface<const Packet&> {
 inline std::string SourceString(Timestamp t) {
   return (t.IsSpecialValue())
              ? t.DebugString()
-             : absl::StrCat("Timestamp(", t.DebugString(), ")");
+             : abslx::StrCat("Timestamp(", t.DebugString(), ")");
 }
 
 template <typename T>

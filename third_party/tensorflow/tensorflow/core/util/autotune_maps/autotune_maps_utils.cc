@@ -52,7 +52,7 @@ StatusOr<string> DeviceIdToIdentifierHelper(int device_id) {
 
   TF_ASSIGN_OR_RETURN(int core_count,
                       GpuDriver::GetMultiprocessorCount(device));
-  return absl::StrFormat("%s sm_%d.%d with %dB RAM and %d cores", device_name,
+  return abslx::StrFormat("%s sm_%d.%d with %dB RAM and %d cores", device_name,
                          cc_major, cc_minor, device_memory_size, core_count);
 }
 

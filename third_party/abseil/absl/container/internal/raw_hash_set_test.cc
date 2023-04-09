@@ -38,7 +38,7 @@
 #include "absl/container/internal/hashtable_debug.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 
@@ -266,13 +266,13 @@ struct ValuePolicy {
 
   template <class Allocator, class... Args>
   static void construct(Allocator* alloc, slot_type* slot, Args&&... args) {
-    absl::allocator_traits<Allocator>::construct(*alloc, slot,
+    abslx::allocator_traits<Allocator>::construct(*alloc, slot,
                                                  std::forward<Args>(args)...);
   }
 
   template <class Allocator>
   static void destroy(Allocator* alloc, slot_type* slot) {
-    absl::allocator_traits<Allocator>::destroy(*alloc, slot);
+    abslx::allocator_traits<Allocator>::destroy(*alloc, slot);
   }
 
   template <class Allocator>
@@ -285,10 +285,10 @@ struct ValuePolicy {
   static T& element(slot_type* slot) { return *slot; }
 
   template <class F, class... Args>
-  static decltype(absl::container_internal::DecomposeValue(
+  static decltype(abslx::container_internal::DecomposeValue(
       std::declval<F>(), std::declval<Args>()...))
   apply(F&& f, Args&&... args) {
-    return absl::container_internal::DecomposeValue(
+    return abslx::container_internal::DecomposeValue(
         std::forward<F>(f), std::forward<Args>(args)...);
   }
 };
@@ -298,13 +298,13 @@ using IntPolicy = ValuePolicy<int64_t>;
 class StringPolicy {
   template <class F, class K, class V,
             class = typename std::enable_if<
-                std::is_convertible<const K&, absl::string_view>::value>::type>
+                std::is_convertible<const K&, abslx::string_view>::value>::type>
   decltype(std::declval<F>()(
-      std::declval<const absl::string_view&>(), std::piecewise_construct,
+      std::declval<const abslx::string_view&>(), std::piecewise_construct,
       std::declval<std::tuple<K>>(),
       std::declval<V>())) static apply_impl(F&& f,
                                             std::pair<std::tuple<K>, V> p) {
-    const absl::string_view& key = std::get<0>(p.first);
+    const abslx::string_view& key = std::get<0>(p.first);
     return std::forward<F>(f)(key, std::piecewise_construct, std::move(p.first),
                               std::move(p.second));
   }
@@ -353,10 +353,10 @@ class StringPolicy {
   }
 };
 
-struct StringHash : absl::Hash<absl::string_view> {
+struct StringHash : abslx::Hash<abslx::string_view> {
   using is_transparent = void;
 };
-struct StringEq : std::equal_to<absl::string_view> {
+struct StringEq : std::equal_to<abslx::string_view> {
   using is_transparent = void;
 };
 
@@ -408,7 +408,7 @@ struct BadTable : raw_hash_set<IntPolicy, BadFastHash, std::equal_to<int>,
 };
 
 TEST(Table, EmptyFunctorOptimization) {
-  static_assert(std::is_empty<std::equal_to<absl::string_view>>::value, "");
+  static_assert(std::is_empty<std::equal_to<abslx::string_view>>::value, "");
   static_assert(std::is_empty<std::allocator<int>>::value, "");
 
   struct MockTable {
@@ -427,7 +427,7 @@ TEST(Table, EmptyFunctorOptimization) {
     size_t growth_left;
   };
   struct StatelessHash {
-    size_t operator()(absl::string_view) const { return 0; }
+    size_t operator()(abslx::string_view) const { return 0; }
   };
   struct StatefulHash : StatelessHash {
     size_t dummy;
@@ -436,22 +436,22 @@ TEST(Table, EmptyFunctorOptimization) {
   if (std::is_empty<HashtablezInfoHandle>::value) {
     EXPECT_EQ(sizeof(MockTableInfozDisabled),
               sizeof(raw_hash_set<StringPolicy, StatelessHash,
-                                  std::equal_to<absl::string_view>,
+                                  std::equal_to<abslx::string_view>,
                                   std::allocator<int>>));
 
     EXPECT_EQ(sizeof(MockTableInfozDisabled) + sizeof(StatefulHash),
               sizeof(raw_hash_set<StringPolicy, StatefulHash,
-                                  std::equal_to<absl::string_view>,
+                                  std::equal_to<abslx::string_view>,
                                   std::allocator<int>>));
   } else {
     EXPECT_EQ(sizeof(MockTable),
               sizeof(raw_hash_set<StringPolicy, StatelessHash,
-                                  std::equal_to<absl::string_view>,
+                                  std::equal_to<abslx::string_view>,
                                   std::allocator<int>>));
 
     EXPECT_EQ(sizeof(MockTable) + sizeof(StatefulHash),
               sizeof(raw_hash_set<StringPolicy, StatefulHash,
-                                  std::equal_to<absl::string_view>,
+                                  std::equal_to<abslx::string_view>,
                                   std::allocator<int>>));
   }
 }
@@ -1544,29 +1544,29 @@ TEST(Table, ReplacingDeletedSlotDoesNotRehash) {
 
 TEST(Table, NoThrowMoveConstruct) {
   ASSERT_TRUE(
-      std::is_nothrow_copy_constructible<absl::Hash<absl::string_view>>::value);
+      std::is_nothrow_copy_constructible<abslx::Hash<abslx::string_view>>::value);
   ASSERT_TRUE(std::is_nothrow_copy_constructible<
-              std::equal_to<absl::string_view>>::value);
+              std::equal_to<abslx::string_view>>::value);
   ASSERT_TRUE(std::is_nothrow_copy_constructible<std::allocator<int>>::value);
   EXPECT_TRUE(std::is_nothrow_move_constructible<StringTable>::value);
 }
 
 TEST(Table, NoThrowMoveAssign) {
   ASSERT_TRUE(
-      std::is_nothrow_move_assignable<absl::Hash<absl::string_view>>::value);
+      std::is_nothrow_move_assignable<abslx::Hash<abslx::string_view>>::value);
   ASSERT_TRUE(
-      std::is_nothrow_move_assignable<std::equal_to<absl::string_view>>::value);
+      std::is_nothrow_move_assignable<std::equal_to<abslx::string_view>>::value);
   ASSERT_TRUE(std::is_nothrow_move_assignable<std::allocator<int>>::value);
   ASSERT_TRUE(
-      absl::allocator_traits<std::allocator<int>>::is_always_equal::value);
+      abslx::allocator_traits<std::allocator<int>>::is_always_equal::value);
   EXPECT_TRUE(std::is_nothrow_move_assignable<StringTable>::value);
 }
 
 TEST(Table, NoThrowSwappable) {
   ASSERT_TRUE(
-      container_internal::IsNoThrowSwappable<absl::Hash<absl::string_view>>());
+      container_internal::IsNoThrowSwappable<abslx::Hash<abslx::string_view>>());
   ASSERT_TRUE(container_internal::IsNoThrowSwappable<
-              std::equal_to<absl::string_view>>());
+              std::equal_to<abslx::string_view>>());
   ASSERT_TRUE(container_internal::IsNoThrowSwappable<std::allocator<int>>());
   EXPECT_TRUE(container_internal::IsNoThrowSwappable<StringTable>());
 }
@@ -1636,12 +1636,12 @@ template <template <typename> class C, class Table, class = void>
 struct VerifyResultOf : std::false_type {};
 
 template <template <typename> class C, class Table>
-struct VerifyResultOf<C, Table, absl::void_t<C<Table>>> : std::true_type {};
+struct VerifyResultOf<C, Table, abslx::void_t<C<Table>>> : std::true_type {};
 
 TEST(Table, HeterogeneousLookupOverloads) {
   using NonTransparentTable =
-      raw_hash_set<StringPolicy, absl::Hash<absl::string_view>,
-                   std::equal_to<absl::string_view>, std::allocator<int>>;
+      raw_hash_set<StringPolicy, abslx::Hash<abslx::string_view>,
+                   std::equal_to<abslx::string_view>, std::allocator<int>>;
 
   EXPECT_FALSE((VerifyResultOf<CallFind, NonTransparentTable>()));
   EXPECT_FALSE((VerifyResultOf<CallErase, NonTransparentTable>()));
@@ -1651,8 +1651,8 @@ TEST(Table, HeterogeneousLookupOverloads) {
 
   using TransparentTable = raw_hash_set<
       StringPolicy,
-      absl::container_internal::hash_default_hash<absl::string_view>,
-      absl::container_internal::hash_default_eq<absl::string_view>,
+      abslx::container_internal::hash_default_hash<abslx::string_view>,
+      abslx::container_internal::hash_default_eq<abslx::string_view>,
       std::allocator<int>>;
 
   EXPECT_TRUE((VerifyResultOf<CallFind, TransparentTable>()));
@@ -1702,14 +1702,14 @@ TEST(Table, Merge) {
 
 TEST(Table, IteratorEmplaceConstructibleRequirement) {
   struct Value {
-    explicit Value(absl::string_view view) : value(view) {}
+    explicit Value(abslx::string_view view) : value(view) {}
     std::string value;
 
     bool operator==(const Value& other) const { return value == other.value; }
   };
   struct H {
     size_t operator()(const Value& v) const {
-      return absl::Hash<std::string>{}(v.value);
+      return abslx::Hash<std::string>{}(v.value);
     }
   };
 
@@ -1981,4 +1981,4 @@ TEST(Sanitizer, PoisoningOnErase) {
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -91,7 +91,7 @@ TfrtContext::TfrtContext(
   cpu_name_prefix.pop_back();  // remove the `id` from host cpu device name.
   for (int i = 1; i < requested_num_cpus; ++i) {
     host_context_->GetDeviceManager()->MaybeAddDevice(TakeRef(
-        new CpuDevice(absl::StrCat(cpu_name_prefix, std::to_string(i)))));
+        new CpuDevice(abslx::StrCat(cpu_name_prefix, std::to_string(i)))));
   }
 
   // Specifically register RuntimeFallbackOpHandler.

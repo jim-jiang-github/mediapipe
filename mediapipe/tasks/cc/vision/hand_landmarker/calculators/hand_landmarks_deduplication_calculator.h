@@ -89,7 +89,7 @@ class HandLandmarksDeduplicationCalculator : public Node {
   MEDIAPIPE_NODE_CONTRACT(kInLandmarks, kInRois, kInWorldLandmarks,
                           kInClassifications, kInSize, kOutLandmarks, kOutRois,
                           kOutWorldLandmarks, kOutClassifications);
-  absl::Status Process(mediapipe::CalculatorContext* cc) override;
+  abslx::Status Process(mediapipe::CalculatorContext* cc) override;
 };
 
 }  // namespace mediapipe::api2

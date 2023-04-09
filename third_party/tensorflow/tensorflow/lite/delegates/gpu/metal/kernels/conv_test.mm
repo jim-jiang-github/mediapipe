@@ -46,7 +46,7 @@ namespace tflite {
 namespace gpu {
 namespace metal {
 
-absl::Status Winograd4x4To6x6Test(TestExecutionEnvironment* env) {
+abslx::Status Winograd4x4To6x6Test(TestExecutionEnvironment* env) {
   const int src_channels = 7;
   const int dst_channels = 13;
   Convolution2DAttributes attr;
@@ -126,10 +126,10 @@ absl::Status Winograd4x4To6x6Test(TestExecutionEnvironment* env) {
           << "Failed using precision " << ToString(precision);
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConvolutionGroupedTest(TestExecutionEnvironment* env) {
+abslx::Status ConvolutionGroupedTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 1, 1, 8);
   src_tensor.data = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f};
@@ -165,10 +165,10 @@ absl::Status ConvolutionGroupedTest(TestExecutionEnvironment* env) {
           << "Failed using precision " << ToString(precision);
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConvolutionSimdMatrixMultiplyTest(TestExecutionEnvironment* env) {
+abslx::Status ConvolutionSimdMatrixMultiplyTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 32, 32, 1024);
   const BHWC dst_shape(1, 32, 32, 1024);
@@ -226,10 +226,10 @@ absl::Status ConvolutionSimdMatrixMultiplyTest(TestExecutionEnvironment* env) {
           << "Failed using precision " << ToString(precision);
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConvolutionSimdMatrixMultiplyBatchTest(TestExecutionEnvironment* env) {
+abslx::Status ConvolutionSimdMatrixMultiplyBatchTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(8, 8, 8, 128);
   const BHWC dst_shape(8, 8, 8, 256);
@@ -287,10 +287,10 @@ absl::Status ConvolutionSimdMatrixMultiplyBatchTest(TestExecutionEnvironment* en
           << "Failed using precision " << ToString(precision);
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ConvolutionSimdMatrixMultiplyPerfTest() {
+abslx::Status ConvolutionSimdMatrixMultiplyPerfTest() {
   const BHWC src_shape(1, 32, 32, 1024);
   const BHWC dst_shape(1, 32, 32, 1024);
   Convolution2DAttributes attr;
@@ -375,7 +375,7 @@ absl::Status ConvolutionSimdMatrixMultiplyPerfTest() {
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace metal

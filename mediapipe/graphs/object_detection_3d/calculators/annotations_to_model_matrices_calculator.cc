@@ -67,14 +67,14 @@ class AnnotationsToModelMatricesCalculator : public CalculatorBase {
   AnnotationsToModelMatricesCalculator& operator=(
       const AnnotationsToModelMatricesCalculator&) = delete;
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
 
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
-  absl::Status GetModelMatricesForAnnotations(
+  abslx::Status GetModelMatricesForAnnotations(
       const FrameAnnotation& annotations,
       TimedModelMatrixProtoList* model_matrix_list);
 
@@ -84,7 +84,7 @@ class AnnotationsToModelMatricesCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(AnnotationsToModelMatricesCalculator);
 
-absl::Status AnnotationsToModelMatricesCalculator::GetContract(
+abslx::Status AnnotationsToModelMatricesCalculator::GetContract(
     CalculatorContract* cc) {
   RET_CHECK(cc->Inputs().HasTag(kAnnotationTag)) << "No input stream found.";
   if (cc->Inputs().HasTag(kAnnotationTag)) {
@@ -102,10 +102,10 @@ absl::Status AnnotationsToModelMatricesCalculator::GetContract(
   if (cc->InputSidePackets().HasTag("MODEL_TRANSFORMATION")) {
     cc->InputSidePackets().Tag("MODEL_TRANSFORMATION").Set<float[]>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AnnotationsToModelMatricesCalculator::Open(CalculatorContext* cc) {
+abslx::Status AnnotationsToModelMatricesCalculator::Open(CalculatorContext* cc) {
   RET_CHECK(cc->Inputs().HasTag(kAnnotationTag));
 
   cc->SetOffset(TimestampDiff(0));
@@ -131,10 +131,10 @@ absl::Status AnnotationsToModelMatricesCalculator::Open(CalculatorContext* cc) {
     model_transformation_.setIdentity();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AnnotationsToModelMatricesCalculator::Process(
+abslx::Status AnnotationsToModelMatricesCalculator::Process(
     CalculatorContext* cc) {
   auto model_matrices = std::make_unique<TimedModelMatrixProtoList>();
 
@@ -142,21 +142,21 @@ absl::Status AnnotationsToModelMatricesCalculator::Process(
       cc->Inputs().Tag(kAnnotationTag).Get<FrameAnnotation>();
 
   if (!GetModelMatricesForAnnotations(annotations, model_matrices.get()).ok()) {
-    return absl::InvalidArgumentError("Error in GetModelMatricesForBoxes");
+    return abslx::InvalidArgumentError("Error in GetModelMatricesForBoxes");
   }
   cc->Outputs()
       .Tag(kModelMatricesTag)
       .Add(model_matrices.release(), cc->InputTimestamp());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status
+abslx::Status
 AnnotationsToModelMatricesCalculator::GetModelMatricesForAnnotations(
     const FrameAnnotation& annotations,
     TimedModelMatrixProtoList* model_matrix_list) {
   if (model_matrix_list == nullptr) {
-    return absl::InvalidArgumentError("model_matrix_list is nullptr");
+    return abslx::InvalidArgumentError("model_matrix_list is nullptr");
   }
   model_matrix_list->clear_model_matrix();
 
@@ -209,7 +209,7 @@ AnnotationsToModelMatricesCalculator::GetModelMatricesForAnnotations(
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

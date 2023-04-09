@@ -133,13 +133,13 @@ std::string Softmax1x1::GetSoftmaxKernelCode(const OperationDef& op_def) {
   return c;
 }
 
-absl::Status Softmax1x1::BindArguments(ArgumentsBinder* args) {
+abslx::Status Softmax1x1::BindArguments(ArgumentsBinder* args) {
   float4 mask = GetMaskForLastPlane(src_[0]->Channels());
   RETURN_IF_ERROR(args->SetFloat("mask_x", mask.x));
   RETURN_IF_ERROR(args->SetFloat("mask_y", mask.y));
   RETURN_IF_ERROR(args->SetFloat("mask_z", mask.z));
   RETURN_IF_ERROR(args->SetFloat("mask_w", mask.w));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 int3 Softmax1x1::GetGridSize() const {

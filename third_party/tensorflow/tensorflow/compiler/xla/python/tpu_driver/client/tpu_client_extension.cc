@@ -121,7 +121,7 @@ PYBIND11_MODULE(tpu_client_extension, m) {
                                 GetPythonBufferTree(argument));
             std::shared_ptr<PythonRefManager::ManagedPyObjects> py_buffer_ref =
                 GlobalPyRefManager()->ManageReferences(
-                    absl::MakeSpan(tree.arrays));
+                    abslx::MakeSpan(tree.arrays));
             tree.arrays.clear();
 
             std::vector<BorrowingLiteral> leaves;
@@ -273,7 +273,7 @@ PYBIND11_MODULE(tpu_client_extension, m) {
           "platform",
           [](const TpuDevice& device) -> std::string { return TpuPlatform(); })
       .def("__repr__", [](const TpuDevice& device) {
-        return absl::StrFormat(
+        return abslx::StrFormat(
             "TpuDevice(id=%i, process_index=%i, coords=(%i,%i,%i), "
             "core_on_chip=%i)",
             device.id(), device.process_index(), device.coords()[0],

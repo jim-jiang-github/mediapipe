@@ -73,7 +73,7 @@ class SavedModelV2Bundle {
       const SavedObject* saved_object, int saved_object_node_id,
       const TrackableObjectGraph::TrackableObject* trackable_object,
       std::string object_name,
-      absl::flat_hash_set<int>* seen_trackable_node_ids,
+      abslx::flat_hash_set<int>* seen_trackable_node_ids,
       RestoreObjectsCallback callback);
 
   MetaGraphDef meta_graph_def_;

@@ -94,7 +94,7 @@ StatusOr<std::optional<size_t>> GetBestAlgorithm(
     se::Stream* stream, se::RedzoneAllocator& allocator,
     const HloInstruction& gemm, const AutotuneConfig& autotune_config,
     se::DeviceMemoryBase lhs_buffer, se::DeviceMemoryBase rhs_buffer,
-    se::DeviceMemoryBase output_buffer, absl::Span<const AlgoT> algorithms,
+    se::DeviceMemoryBase output_buffer, abslx::Span<const AlgoT> algorithms,
     const std::function<StatusOr<se::blas::ProfileResult>(const AlgoT&)>&
         run_benchmark) {
   if (!stream->parent()->SynchronizeAllActivity()) {
@@ -142,7 +142,7 @@ StatusOr<std::optional<size_t>> GetBestAlgorithm(
             << profile_result.elapsed_time_in_ms() << "ms";
 
     *result.mutable_run_time() = tensorflow::proto_utils::ToDurationProto(
-        absl::Milliseconds(profile_result.elapsed_time_in_ms()));
+        abslx::Milliseconds(profile_result.elapsed_time_in_ms()));
 
     if (!autotune_config.should_check_correctness()) {
       continue;
@@ -215,20 +215,20 @@ StatusOr<std::optional<se::blas::AlgorithmType>> DoGemmAutotune(
 
   TF_ASSIGN_OR_RETURN(GemmConfig config, GemmConfig::For(gemm));
   // Don't run autotuning concurrently on the same GPU.
-  absl::MutexLock gpu_lock(&GetGpuMutex(stream->parent()));
+  abslx::MutexLock gpu_lock(&GetGpuMutex(stream->parent()));
 
   auto key = std::make_tuple(stream->parent(), lhs->shape(), rhs->shape(),
                              gemm->shape(), gemm_config.SerializeAsString(),
                              IsCublasLtMatmul(*gemm));
 
-  static absl::Mutex mutex(absl::kConstInit);
+  static abslx::Mutex mutex(abslx::kConstInit);
   static auto& cache ABSL_GUARDED_BY(mutex) =
-      *new absl::flat_hash_map<decltype(key),
+      *new abslx::flat_hash_map<decltype(key),
                                std::optional<se::blas::AlgorithmType>>();
   static int64_t cache_hits ABSL_GUARDED_BY(mutex) = 0;
   static int64_t cache_misses ABSL_GUARDED_BY(mutex) = 0;
 
-  absl::MutexLock lock(&mutex);
+  abslx::MutexLock lock(&mutex);
   auto it = cache.find(key);
   int64_t requests = cache_hits + cache_misses;
   if (requests && requests % 10 == 0) {
@@ -239,7 +239,7 @@ StatusOr<std::optional<se::blas::AlgorithmType>> DoGemmAutotune(
   if (it != cache.end()) {
     cache_hits++;
     VLOG(4) << "Autotuning cache hit, using algorithm: "
-            << (it->second.has_value() ? absl::StrCat(*(it->second))
+            << (it->second.has_value() ? abslx::StrCat(*(it->second))
                                        : "<generic>");
     return it->second;
   }
@@ -379,7 +379,7 @@ StatusOr<bool> RunOnComputation(HloComputation* computation,
 
 StatusOr<bool> GemmAlgorithmPicker::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   XLA_SCOPED_LOGGING_TIMER("GemmAlgorithmPicker");
 
   if (module->config().debug_options().xla_gpu_autotune_level() == 0) {

@@ -45,7 +45,7 @@ Status ForceXlaConstantsOnHostPass::Run(
       TF_RETURN_IF_ERROR(GetBodyAndConstantsAndResources(
           flr, function, &fbody, &constant_arg_indices, &resource_arg_indices));
       VLOG(3) << "Found constant arg indices: "
-              << absl::StrJoin(constant_arg_indices, ", ");
+              << abslx::StrJoin(constant_arg_indices, ", ");
 
       node->AddAttr("_input_hostmem", constant_arg_indices);
     }

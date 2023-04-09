@@ -208,7 +208,7 @@ class CalibrationContext {
   std::string calibration_table_ TF_GUARDED_BY(mu_);
 };
 
-ABSL_CONST_INIT extern const absl::string_view kTfTrtContainerName;
+ABSL_CONST_INIT extern const abslx::string_view kTfTrtContainerName;
 
 class TRTEngineCacheResource : public ResourceBase {
  public:

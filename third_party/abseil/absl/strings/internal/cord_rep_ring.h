@@ -26,7 +26,7 @@
 #include "absl/strings/internal/cord_internal.h"
 #include "absl/strings/internal/cord_rep_flat.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 
@@ -240,14 +240,14 @@ class CordRepRing : public CordRep {
   // Returns true if this instance manages a single contiguous buffer, in which
   // case the (optional) output parameter `fragment` is set. Otherwise, the
   // function returns false, and `fragment` is left unchanged.
-  bool IsFlat(absl::string_view* fragment) const;
+  bool IsFlat(abslx::string_view* fragment) const;
 
   // Returns true if the data starting at `offset` with length `length` is
   // managed by this instance inside a single contiguous buffer, in which case
   // the (optional) output parameter `fragment` is set to the contiguous memory
   // starting at offset `offset` with length `length`. Otherwise, the function
   // returns false, and `fragment` is left unchanged.
-  bool IsFlat(size_t offset, size_t length, absl::string_view* fragment) const;
+  bool IsFlat(size_t offset, size_t length, abslx::string_view* fragment) const;
 
   // Testing only: set capacity to requested capacity.
   void SetCapacityForTesting(size_t capacity);
@@ -297,7 +297,7 @@ class CordRepRing : public CordRep {
   }
 
   // Returns the data for entry `index`
-  absl::string_view entry_data(index_type index) const;
+  abslx::string_view entry_data(index_type index) const;
 
   // Returns the position for `offset` as {index, prefix}. `index` holds the
   // index of the entry at the specified offset and `prefix` holds the relative
@@ -535,7 +535,7 @@ inline CordRepRing::index_type CordRepRing::retreat(index_type index,
   return index >= n ? index - n : capacity_ - n + index;
 }
 
-inline absl::string_view CordRepRing::entry_data(index_type index) const {
+inline abslx::string_view CordRepRing::entry_data(index_type index) const {
   size_t data_offset = entry_data_offset(index);
   return {GetRepData(entry_child(index)) + data_offset, entry_length(index)};
 }
@@ -588,7 +588,7 @@ inline const CordRepRing* CordRep::ring() const {
   return static_cast<const CordRepRing*>(this);
 }
 
-inline bool CordRepRing::IsFlat(absl::string_view* fragment) const {
+inline bool CordRepRing::IsFlat(abslx::string_view* fragment) const {
   if (entries() == 1) {
     if (fragment) *fragment = entry_data(head());
     return true;
@@ -597,9 +597,9 @@ inline bool CordRepRing::IsFlat(absl::string_view* fragment) const {
 }
 
 inline bool CordRepRing::IsFlat(size_t offset, size_t length,
-                                absl::string_view* fragment) const {
+                                abslx::string_view* fragment) const {
   const Position pos = Find(offset);
-  const absl::string_view data = entry_data(pos.index);
+  const abslx::string_view data = entry_data(pos.index);
   if (data.length() >= length && data.length() - length >= pos.offset) {
     if (fragment) *fragment = data.substr(pos.offset, length);
     return true;
@@ -615,6 +615,6 @@ std::ostream& operator<<(std::ostream& s, const CordRepRing& rep);
 
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_INTERNAL_CORD_REP_RING_H_

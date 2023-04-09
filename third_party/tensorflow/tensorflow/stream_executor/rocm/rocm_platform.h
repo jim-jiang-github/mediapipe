@@ -89,7 +89,7 @@ class ROCmPlatform : public Platform {
   string name_;
 
   // mutex that guards internal state.
-  mutable absl::Mutex mu_;
+  mutable abslx::Mutex mu_;
 
   // Cache of created executors.
   ExecutorCache executor_cache_;

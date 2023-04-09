@@ -21,16 +21,16 @@ namespace file {
 
 // 40% of the time in JoinPath() is from calls with 2 arguments, so we
 // specialize that case.
-std::string JoinPath(absl::string_view path1, absl::string_view path2) {
+std::string JoinPath(abslx::string_view path1, abslx::string_view path2) {
   if (path1.empty()) return std::string(path2);
   if (path2.empty()) return std::string(path1);
   if (path1.back() == '/') {
     if (path2.front() == '/')
-      return absl::StrCat(path1, absl::ClippedSubstr(path2, 1));
+      return abslx::StrCat(path1, abslx::ClippedSubstr(path2, 1));
   } else {
-    if (path2.front() != '/') return absl::StrCat(path1, "/", path2);
+    if (path2.front() != '/') return abslx::StrCat(path1, "/", path2);
   }
-  return absl::StrCat(path1, path2);
+  return abslx::StrCat(path1, path2);
 }
 
 namespace internal {
@@ -38,20 +38,20 @@ namespace internal {
 // Given a collection of file paths, append them all together,
 // ensuring that the proper path separators are inserted between them.
 std::string JoinPathImpl(bool honor_abs,
-                         std::initializer_list<absl::string_view> paths) {
+                         std::initializer_list<abslx::string_view> paths) {
   std::string result;
 
   if (paths.size() != 0) {
     // This size calculation is worst-case: it assumes one extra "/" for every
     // path other than the first.
     size_t total_size = paths.size() - 1;
-    for (const absl::string_view& path : paths) total_size += path.size();
+    for (const abslx::string_view& path : paths) total_size += path.size();
     result.resize(total_size);
 
     auto begin = result.begin();
     auto out = begin;
     bool trailing_slash = false;
-    for (absl::string_view path : paths) {
+    for (abslx::string_view path : paths) {
       if (path.empty()) continue;
       if (path.front() == '/') {
         if (honor_abs) {
@@ -75,44 +75,44 @@ std::string JoinPathImpl(bool honor_abs,
 // Return the parts of the basename of path, split on the final ".".
 // If there is no "." in the basename or "." is the final character in the
 // basename, the second value will be empty.
-std::pair<absl::string_view, absl::string_view> SplitBasename(
-    absl::string_view path) {
+std::pair<abslx::string_view, abslx::string_view> SplitBasename(
+    abslx::string_view path) {
   path = Basename(path);
 
-  absl::string_view::size_type pos = path.find_last_of('.');
-  if (pos == absl::string_view::npos)
-    return std::make_pair(path, absl::ClippedSubstr(path, path.size(), 0));
+  abslx::string_view::size_type pos = path.find_last_of('.');
+  if (pos == abslx::string_view::npos)
+    return std::make_pair(path, abslx::ClippedSubstr(path, path.size(), 0));
   return std::make_pair(path.substr(0, pos),
-                        absl::ClippedSubstr(path, pos + 1));
+                        abslx::ClippedSubstr(path, pos + 1));
 }
 
 }  // namespace internal
 
-absl::string_view Dirname(absl::string_view path) {
+abslx::string_view Dirname(abslx::string_view path) {
   return SplitPath(path).first;
 }
 
-absl::string_view Basename(absl::string_view path) {
+abslx::string_view Basename(abslx::string_view path) {
   return SplitPath(path).second;
 }
 
-std::pair<absl::string_view, absl::string_view> SplitPath(
-    absl::string_view path) {
-  absl::string_view::size_type pos = path.find_last_of('/');
+std::pair<abslx::string_view, abslx::string_view> SplitPath(
+    abslx::string_view path) {
+  abslx::string_view::size_type pos = path.find_last_of('/');
 
   // Handle the case with no '/' in 'path'.
-  if (pos == absl::string_view::npos)
+  if (pos == abslx::string_view::npos)
     return std::make_pair(path.substr(0, 0), path);
 
   // Handle the case with a single leading '/' in 'path'.
   if (pos == 0)
-    return std::make_pair(path.substr(0, 1), absl::ClippedSubstr(path, 1));
+    return std::make_pair(path.substr(0, 1), abslx::ClippedSubstr(path, 1));
 
   return std::make_pair(path.substr(0, pos),
-                        absl::ClippedSubstr(path, pos + 1));
+                        abslx::ClippedSubstr(path, pos + 1));
 }
 
-absl::string_view Extension(absl::string_view path) {
+abslx::string_view Extension(abslx::string_view path) {
   return internal::SplitBasename(path).second;
 }
 

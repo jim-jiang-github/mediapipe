@@ -71,21 +71,21 @@ TEST_F(GraphTopologyViewTest, SimpleGraph) {
   ASSERT_TRUE(b_by_idx);
   EXPECT_EQ(b_by_name, b_by_idx);
 
-  const absl::optional<int> b_idx = graph_view.GetNodeIndex(*b_by_name);
+  const abslx::optional<int> b_idx = graph_view.GetNodeIndex(*b_by_name);
   ASSERT_TRUE(b_idx.has_value());
   EXPECT_EQ(b_idx.value(), 1);
 
-  const absl::optional<int> c_idx = graph_view.GetNodeIndex("c");
+  const abslx::optional<int> c_idx = graph_view.GetNodeIndex("c");
   ASSERT_TRUE(c_idx.has_value());
   EXPECT_EQ(c_idx.value(), 2);
 
-  using Fanin = absl::InlinedVector<int, 4>;
+  using Fanin = abslx::InlinedVector<int, 4>;
   EXPECT_EQ(graph_view.GetFanin(0), Fanin());
   EXPECT_EQ(graph_view.GetFanin(1), Fanin());
   EXPECT_EQ(graph_view.GetFanin(2), Fanin({0, 1}));
   EXPECT_EQ(graph_view.GetFanin(3), Fanin({0, 2}));
 
-  using Fanout = absl::InlinedVector<int, 2>;
+  using Fanout = abslx::InlinedVector<int, 2>;
   EXPECT_EQ(graph_view.GetFanout(0), Fanout({2, 3}));
   EXPECT_EQ(graph_view.GetFanout(1), Fanout({2}));
   EXPECT_EQ(graph_view.GetFanout(2), Fanout({3}));
@@ -104,11 +104,11 @@ TEST_F(GraphTopologyViewTest, GraphWithALoop) {
   TF_CHECK_OK(graph_view.InitializeFromGraph(graph));
   EXPECT_TRUE(graph_view.is_initialized());
 
-  using Fanin = absl::InlinedVector<int, 4>;
+  using Fanin = abslx::InlinedVector<int, 4>;
   EXPECT_EQ(graph_view.GetFanin(2), Fanin({0, 1, 3}));
   EXPECT_EQ(graph_view.GetFanin(3), Fanin({0, 2}));
 
-  using Fanout = absl::InlinedVector<int, 2>;
+  using Fanout = abslx::InlinedVector<int, 2>;
   EXPECT_EQ(graph_view.GetFanout(2), Fanout({3}));
   EXPECT_EQ(graph_view.GetFanout(3), Fanout({2}));
 }
@@ -126,11 +126,11 @@ TEST_F(GraphTopologyViewTest, GraphWithControls) {
     TF_CHECK_OK(graph_view.InitializeFromGraph(graph));
     EXPECT_TRUE(graph_view.is_initialized());
 
-    using Fanin = absl::InlinedVector<int, 4>;
+    using Fanin = abslx::InlinedVector<int, 4>;
     EXPECT_EQ(graph_view.GetFanin(2), Fanin({0, 1, 3}));
     EXPECT_EQ(graph_view.GetFanin(3), Fanin({0, 2}));
 
-    using Fanout = absl::InlinedVector<int, 2>;
+    using Fanout = abslx::InlinedVector<int, 2>;
     EXPECT_EQ(graph_view.GetFanout(2), Fanout({3}));
     EXPECT_EQ(graph_view.GetFanout(3), Fanout({2}));
   }
@@ -139,11 +139,11 @@ TEST_F(GraphTopologyViewTest, GraphWithControls) {
     TF_CHECK_OK(
         graph_view.InitializeFromGraph(graph, /*ignore_controls*/ true));
     EXPECT_TRUE(graph_view.is_initialized());
-    using Fanin = absl::InlinedVector<int, 4>;
+    using Fanin = abslx::InlinedVector<int, 4>;
     EXPECT_EQ(graph_view.GetFanin(2), Fanin({0, 1}));
     EXPECT_EQ(graph_view.GetFanin(3), Fanin({0, 2}));
 
-    using Fanout = absl::InlinedVector<int, 2>;
+    using Fanout = abslx::InlinedVector<int, 2>;
     EXPECT_EQ(graph_view.GetFanout(2), Fanout({3}));
     EXPECT_EQ(graph_view.GetFanout(3), Fanout({}));
   }

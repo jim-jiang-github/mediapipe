@@ -18,7 +18,7 @@
 // -----------------------------------------------------------------------------
 //
 // This file defines the ABSL_DECLARE_FLAG macro, allowing you to declare an
-// `absl::Flag` for use within a translation unit. You should place this
+// `abslx::Flag` for use within a translation unit. You should place this
 // declaration within the header file associated with the .cc file that defines
 // and owns the `Flag`.
 
@@ -27,11 +27,11 @@
 
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace flags_internal {
 
-// absl::Flag<T> represents a flag of type 'T' created by ABSL_FLAG.
+// abslx::Flag<T> represents a flag of type 'T' created by ABSL_FLAG.
 template <typename T>
 class Flag;
 
@@ -39,7 +39,7 @@ class Flag;
 
 // Flag
 //
-// Forward declaration of the `absl::Flag` type for use in defining the macro.
+// Forward declaration of the `abslx::Flag` type for use in defining the macro.
 #if defined(_MSC_VER) && !defined(__clang__)
 template <typename T>
 class Flag;
@@ -49,17 +49,17 @@ using Flag = flags_internal::Flag<T>;
 #endif
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 // ABSL_DECLARE_FLAG()
 //
-// This macro is a convenience for declaring use of an `absl::Flag` within a
+// This macro is a convenience for declaring use of an `abslx::Flag` within a
 // translation unit. This macro should be used within a header file to
 // declare usage of the flag within any .cc file including that header file.
 //
 // The ABSL_DECLARE_FLAG(type, name) macro expands to:
 //
-//   extern absl::Flag<type> FLAGS_name;
-#define ABSL_DECLARE_FLAG(type, name) extern ::absl::Flag<type> FLAGS_##name
+//   extern abslx::Flag<type> FLAGS_name;
+#define ABSL_DECLARE_FLAG(type, name) extern ::abslx::Flag<type> FLAGS_##name
 
 #endif  // ABSL_FLAGS_DECLARE_H_

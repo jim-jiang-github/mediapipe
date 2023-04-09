@@ -29,19 +29,19 @@ namespace gpu {
 
 class UnimplementedOperationParser : public TFLiteOperationParser {
  public:
-  explicit UnimplementedOperationParser(absl::string_view op_name)
+  explicit UnimplementedOperationParser(abslx::string_view op_name)
       : op_name_(op_name) {}
 
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
-    return absl::UnimplementedError(op_name_);
+    return abslx::UnimplementedError(op_name_);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
-    return absl::UnimplementedError(op_name_);
+    return abslx::UnimplementedError(op_name_);
   }
 
  private:

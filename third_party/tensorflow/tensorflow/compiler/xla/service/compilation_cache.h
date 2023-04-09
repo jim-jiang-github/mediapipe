@@ -43,11 +43,11 @@ class CompilationCache {
       const ExecutionHandle& handle) const;
 
  protected:
-  mutable absl::Mutex mutex_;
+  mutable abslx::Mutex mutex_;
 
   using CacheKey = int64_t;
 
-  absl::flat_hash_map<CacheKey, std::shared_ptr<Executable>> cache_
+  abslx::flat_hash_map<CacheKey, std::shared_ptr<Executable>> cache_
       ABSL_GUARDED_BY(mutex_);
 
  private:

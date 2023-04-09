@@ -123,7 +123,7 @@ TEST_F(CreateTest, FailsWithSelectiveOpResolverMissingOps) {
 
   auto image_embedder = ImageEmbedder::Create(std::move(options));
 
-  EXPECT_EQ(image_embedder.status().code(), absl::StatusCode::kInternal);
+  EXPECT_EQ(image_embedder.status().code(), abslx::StatusCode::kInternal);
   EXPECT_THAT(image_embedder.status().message(),
               HasSubstr("interpreter_builder(&interpreter) == kTfLiteOk"));
 }
@@ -132,13 +132,13 @@ TEST_F(CreateTest, FailsWithMissingModel) {
   auto image_embedder =
       ImageEmbedder::Create(std::make_unique<ImageEmbedderOptions>());
 
-  EXPECT_EQ(image_embedder.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(image_embedder.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(
       image_embedder.status().message(),
       HasSubstr("ExternalFile must specify at least one of 'file_content', "
                 "'file_name', 'file_pointer_meta' or 'file_descriptor_meta'."));
   EXPECT_THAT(image_embedder.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInitializationError))));
 }
 
@@ -149,18 +149,18 @@ TEST_F(CreateTest, FailsWithIllegalCallbackInImageOrVideoMode) {
     options->base_options.model_asset_path =
         JoinPath("./", kTestDataDirectory, kMobileNetV3Embedder);
     options->running_mode = running_mode;
-    options->result_callback = [](absl::StatusOr<ImageEmbedderResult>,
+    options->result_callback = [](abslx::StatusOr<ImageEmbedderResult>,
                                   const Image& image, int64 timestamp_ms) {};
 
     auto image_embedder = ImageEmbedder::Create(std::move(options));
 
     EXPECT_EQ(image_embedder.status().code(),
-              absl::StatusCode::kInvalidArgument);
+              abslx::StatusCode::kInvalidArgument);
     EXPECT_THAT(
         image_embedder.status().message(),
         HasSubstr("a user-defined result callback shouldn't be provided"));
     EXPECT_THAT(image_embedder.status().GetPayload(kMediaPipeTasksPayload),
-                Optional(absl::Cord(absl::StrCat(
+                Optional(abslx::Cord(abslx::StrCat(
                     MediaPipeTasksStatus::kInvalidTaskGraphConfigError))));
   }
 }
@@ -173,11 +173,11 @@ TEST_F(CreateTest, FailsWithMissingCallbackInLiveStreamMode) {
 
   auto image_embedder = ImageEmbedder::Create(std::move(options));
 
-  EXPECT_EQ(image_embedder.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(image_embedder.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(image_embedder.status().message(),
               HasSubstr("a user-defined result callback must be provided"));
   EXPECT_THAT(image_embedder.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kInvalidTaskGraphConfigError))));
 }
 
@@ -194,19 +194,19 @@ TEST_F(ImageModeTest, FailsWithCallingWrongMethod) {
                           ImageEmbedder::Create(std::move(options)));
 
   auto results = image_embedder->EmbedForVideo(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the video mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
 
   results = image_embedder->EmbedAsync(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the live stream mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
   MP_ASSERT_OK(image_embedder->Close());
 }
@@ -424,19 +424,19 @@ TEST_F(VideoModeTest, FailsWithCallingWrongMethod) {
                           ImageEmbedder::Create(std::move(options)));
 
   auto results = image_embedder->Embed(image);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the image mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
 
   results = image_embedder->EmbedAsync(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the live stream mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
   MP_ASSERT_OK(image_embedder->Close());
 }
@@ -454,11 +454,11 @@ TEST_F(VideoModeTest, FailsWithOutOfOrderInputTimestamps) {
 
   MP_ASSERT_OK(image_embedder->EmbedForVideo(image, 1));
   auto results = image_embedder->EmbedForVideo(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("timestamp must be monotonically increasing"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInvalidTimestampError))));
   MP_ASSERT_OK(image_embedder->EmbedForVideo(image, 2));
   MP_ASSERT_OK(image_embedder->Close());
@@ -504,25 +504,25 @@ TEST_F(LiveStreamModeTest, FailsWithCallingWrongMethod) {
   options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kMobileNetV3Embedder);
   options->running_mode = core::RunningMode::LIVE_STREAM;
-  options->result_callback = [](absl::StatusOr<ImageEmbedderResult>,
+  options->result_callback = [](abslx::StatusOr<ImageEmbedderResult>,
                                 const Image& image, int64 timestamp_ms) {};
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ImageEmbedder> image_embedder,
                           ImageEmbedder::Create(std::move(options)));
 
   auto results = image_embedder->Embed(image);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the image mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
 
   results = image_embedder->EmbedForVideo(image, 0);
-  EXPECT_EQ(results.status().code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(results.status().code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(results.status().message(),
               HasSubstr("not initialized with the video mode"));
   EXPECT_THAT(results.status().GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerApiCalledInWrongModeError))));
   MP_ASSERT_OK(image_embedder->Close());
 }
@@ -535,18 +535,18 @@ TEST_F(LiveStreamModeTest, FailsWithOutOfOrderInputTimestamps) {
   options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kMobileNetV3Embedder);
   options->running_mode = core::RunningMode::LIVE_STREAM;
-  options->result_callback = [](absl::StatusOr<ImageEmbedderResult>,
+  options->result_callback = [](abslx::StatusOr<ImageEmbedderResult>,
                                 const Image& image, int64 timestamp_ms) {};
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<ImageEmbedder> image_embedder,
                           ImageEmbedder::Create(std::move(options)));
 
   MP_ASSERT_OK(image_embedder->EmbedAsync(image, 1));
   auto status = image_embedder->EmbedAsync(image, 0);
-  EXPECT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   EXPECT_THAT(status.message(),
               HasSubstr("timestamp must be monotonically increasing"));
   EXPECT_THAT(status.GetPayload(kMediaPipeTasksPayload),
-              Optional(absl::Cord(absl::StrCat(
+              Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kRunnerInvalidTimestampError))));
   MP_ASSERT_OK(image_embedder->EmbedAsync(image, 2));
   MP_ASSERT_OK(image_embedder->Close());
@@ -569,7 +569,7 @@ TEST_F(LiveStreamModeTest, Succeeds) {
       JoinPath("./", kTestDataDirectory, kMobileNetV3Embedder);
   options->running_mode = core::RunningMode::LIVE_STREAM;
   options->result_callback =
-      [&results](absl::StatusOr<ImageEmbedderResult> embedding_result,
+      [&results](abslx::StatusOr<ImageEmbedderResult> embedding_result,
                  const Image& image, int64 timestamp_ms) {
         MP_ASSERT_OK(embedding_result.status());
         results.push_back(

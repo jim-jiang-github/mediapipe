@@ -220,7 +220,7 @@ static tensorflow::Status InjectTfGpuResourcesHelper(
     constexpr char gpu_device_type[] = "GPU";
     int num_gpu = ctx->local_device_mgr()->NumDeviceType(gpu_device_type);
     for (int gpu_ordinal = 0; gpu_ordinal < num_gpu; gpu_ordinal++) {
-      auto gpu_device_name = absl::StrCat(gpu_device_type, ":", gpu_ordinal);
+      auto gpu_device_name = abslx::StrCat(gpu_device_type, ":", gpu_ordinal);
       Device* device;
       TF_RETURN_IF_ERROR(
           ctx->local_device_mgr()->LookupDevice(gpu_device_name, &device));
@@ -275,9 +275,9 @@ tensorflow::Status InjectTfGpuResources() {
   // locally scoped and an implementation detail of injecting GPU resources, and
   // not is the same EagerContext set in RequestContext.
   static bool already_injected_gpu_devices = false;
-  static absl::Mutex* mutex = new absl::Mutex();
+  static abslx::Mutex* mutex = new abslx::Mutex();
 
-  absl::MutexLock lock(mutex);
+  abslx::MutexLock lock(mutex);
   if (!already_injected_gpu_devices) {
     tfrt::Expected<OwnedEagerContext> ctx = InitEagerContext();
     if (!ctx) {
@@ -511,7 +511,7 @@ static tensorflow::Status PrepareAttributes(EagerOperation* eager_op,
             funcs[i] = new_op;
           }
           *status_ptr =
-              eager_op->SetAttrFunctionList(entry.name, absl::MakeSpan(funcs));
+              eager_op->SetAttrFunctionList(entry.name, abslx::MakeSpan(funcs));
         } else if (attr_base.type() == BEFAttributeType::kShape) {
           // Handle list(TensorShape).
           llvm::SmallVector<int, 8> ranks;
@@ -567,7 +567,7 @@ Status CallEagerExecute(const tfrt::ExecutionContext& exec_ctx,
 
   int num_retvals = result_tensor_handles.size();
   TF_RETURN_IF_ERROR(eager_op->Execute(
-      absl::MakeSpan(result_tensor_handles.data(), num_retvals), &num_retvals));
+      abslx::MakeSpan(result_tensor_handles.data(), num_retvals), &num_retvals));
 
   return OkStatus();
 }
@@ -724,9 +724,9 @@ static void RuntimeFallbackKernel(
     // Make a copy for `attr_name` to ensure null-termination.
     std::string attr_name =
         remaining_attributes.GetStringAttribute(i * 2).str();
-    absl::string_view attr_value = ToAbslStringView(
+    abslx::string_view attr_value = ToAbslStringView(
         remaining_attributes.GetStringAttribute(i * 2 + 1).get());
-    std::vector<absl::string_view> value_split =
+    std::vector<abslx::string_view> value_split =
         tfd::AttrValueSplit(attr_value);
 
     // Handle different TF attribute types.
@@ -778,7 +778,7 @@ static void RuntimeFallbackKernel(
   llvm::SmallVector<tensorflow::AbstractTensorHandle*, 4> retvals(num_retvals);
 
   tensorflow::Status status = eager_op->Execute(
-      absl::MakeSpan(retvals.data(), num_retvals), &num_retvals);
+      abslx::MakeSpan(retvals.data(), num_retvals), &num_retvals);
   TFD_REPORT_AND_RETURN_IF_ERROR(handler, status);
 
   // Handle outputs.
@@ -931,7 +931,7 @@ void CoreRTTensorHandleToFallbackTensorInternal(
 // Returns true if the tensorflow::DataType is trivially copyable.
 static bool IsTriviallyCopyableTensorflowDataType(tensorflow::DataType dtype) {
   static const auto* const non_trivially_copyable_dtypes =
-      new absl::flat_hash_set<tensorflow::DataType>{
+      new abslx::flat_hash_set<tensorflow::DataType>{
           tensorflow::DataType::DT_STRING, tensorflow::DataType::DT_RESOURCE,
           tensorflow::DataType::DT_VARIANT};
   return !non_trivially_copyable_dtypes->contains(dtype);
@@ -997,7 +997,7 @@ static void FallbackTensorToCoreRTTensorHandleInternal(
     llvm::ArrayRef<tfrt::AsyncValue*> tf_tensor_args,
     llvm::MutableArrayRef<tfrt::RCReference<tfrt::AsyncValue>>
         tensorhandle_results,
-    absl::string_view device, const tfrt::ExecutionContext& exec_ctx) {
+    abslx::string_view device, const tfrt::ExecutionContext& exec_ctx) {
   auto* host = exec_ctx.host();
 
   assert(tf_tensor_args.size() == tensorhandle_results.size());
@@ -1094,7 +1094,7 @@ static void RuntimeFallbackExecuteOp(
   // TODO(tfrt-devs): Make sure device names passed to fallback kernels are in
   // the tensorflow format.
   std::string device_name = device_attr.GetValue().str();
-  if (!absl::StartsWith(device_name, "/")) device_name = kDefaultCpuDevice;
+  if (!abslx::StartsWith(device_name, "/")) device_name = kDefaultCpuDevice;
 
   auto* host = exec_ctx.host();
 

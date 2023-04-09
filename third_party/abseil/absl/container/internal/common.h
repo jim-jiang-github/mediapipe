@@ -21,14 +21,14 @@
 #include "absl/meta/type_traits.h"
 #include "absl/types/optional.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 
 template <class, class = void>
 struct IsTransparent : std::false_type {};
 template <class T>
-struct IsTransparent<T, absl::void_t<typename T::is_transparent>>
+struct IsTransparent<T, abslx::void_t<typename T::is_transparent>>
     : std::true_type {};
 
 template <bool is_transparent>
@@ -99,7 +99,7 @@ class node_handle_base {
 
   void reset() {
     assert(alloc_.has_value());
-    alloc_ = absl::nullopt;
+    alloc_ = abslx::nullopt;
   }
 
   slot_type* slot() const {
@@ -109,7 +109,7 @@ class node_handle_base {
   allocator_type* alloc() { return std::addressof(*alloc_); }
 
  private:
-  absl::optional<allocator_type> alloc_ = {};
+  abslx::optional<allocator_type> alloc_ = {};
   alignas(slot_type) mutable unsigned char slot_space_[sizeof(slot_type)] = {};
 };
 
@@ -135,7 +135,7 @@ class node_handle : public node_handle_base<PolicyTraits, Alloc> {
 // For maps.
 template <typename Policy, typename PolicyTraits, typename Alloc>
 class node_handle<Policy, PolicyTraits, Alloc,
-                  absl::void_t<typename Policy::mapped_type>>
+                  abslx::void_t<typename Policy::mapped_type>>
     : public node_handle_base<PolicyTraits, Alloc> {
   using Base = node_handle_base<PolicyTraits, Alloc>;
   using slot_type = typename PolicyTraits::slot_type;
@@ -201,6 +201,6 @@ struct InsertReturnType {
 
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_CONTAINER_INTERNAL_CONTAINER_H_

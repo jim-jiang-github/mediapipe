@@ -92,7 +92,7 @@ class ContextInterface : public tensorflow::ImmediateExecutionContext {
   tensorflow::AbstractTensorInterface* CreateBoolScalar(bool value) override;
 
   tensorflow::AbstractTensorInterface* CreateTensor(
-      tensorflow::DataType dtype, absl::Span<const int64_t> dim_sizes) override;
+      tensorflow::DataType dtype, abslx::Span<const int64_t> dim_sizes) override;
   tensorflow::AbstractTensorInterface* CreateTensor(
       tensorflow::DataType dtype, const int64_t* dims, int num_dims, void* data,
       size_t len, MemoryReleaser memory_releaser,
@@ -452,13 +452,13 @@ class OpAttrsInterface : public tensorflow::AbstractOpAttrs {
 
   void GetNameAttrList(tensorflow::NameAttrList* name_and_attrs) const override;
   tensorflow::Status GetTypeList(
-      absl::string_view attr_name,
-      absl::InlinedVector<tensorflow::DataType, 4>* type_list) const override;
+      abslx::string_view attr_name,
+      abslx::InlinedVector<tensorflow::DataType, 4>* type_list) const override;
 
-  bool GetInt(absl::string_view attr_name, int64_t* result) const override;
-  bool GetFloat(absl::string_view attr_name, float* result) const override;
-  bool GetBool(absl::string_view attr_name, bool* result) const override;
-  bool GetType(absl::string_view attr_name,
+  bool GetInt(abslx::string_view attr_name, int64_t* result) const override;
+  bool GetFloat(abslx::string_view attr_name, float* result) const override;
+  bool GetBool(abslx::string_view attr_name, bool* result) const override;
+  bool GetType(abslx::string_view attr_name,
                tensorflow::DataType* result) const override;
 
   const OpAttrs* GetAttrs() const { return attrs_; }
@@ -501,13 +501,13 @@ class OperationInterface : public tensorflow::ImmediateExecutionOperation {
 
   tensorflow::Status AddInput(tensorflow::AbstractTensorHandle* input) override;
   tensorflow::Status AddInputList(
-      absl::Span<tensorflow::AbstractTensorHandle* const> inputs) override;
+      abslx::Span<tensorflow::AbstractTensorHandle* const> inputs) override;
   tensorflow::Status SetInput(
       size_t index, tensorflow::ImmediateExecutionTensorHandle* input) override;
-  absl::Span<tensorflow::ImmediateExecutionTensorHandle* const> GetInputs()
+  abslx::Span<tensorflow::ImmediateExecutionTensorHandle* const> GetInputs()
       const override;
   tensorflow::Status Execute(
-      absl::Span<tensorflow::AbstractTensorHandle*> retvals,
+      abslx::Span<tensorflow::AbstractTensorHandle*> retvals,
       int* num_retvals) override;
   const tensorflow::OpDef* OpDef() const override { return op_def_; }
   const tensorflow::NodeDef NodeDef() { return fallback_attrs_.BuildNodeDef(); }
@@ -550,7 +550,7 @@ class OperationInterface : public tensorflow::ImmediateExecutionOperation {
                                       int num_values) override;
   tensorflow::Status SetAttrFunctionList(
       const char* attr_name,
-      absl::Span<const AbstractOperation*> values) override;
+      abslx::Span<const AbstractOperation*> values) override;
 
   tensorflow::Status InputLength(const char* input_name, int* length) override;
   tensorflow::Status OutputLength(const char* output_name,
@@ -568,7 +568,7 @@ class OperationInterface : public tensorflow::ImmediateExecutionOperation {
     // TODO(b/181368626): Support cancellation.
   }
 
-  absl::optional<tensorflow::ManagedStackTrace> GetStackTrace() override {
+  abslx::optional<tensorflow::ManagedStackTrace> GetStackTrace() override {
     return stack_trace_;
   }
 
@@ -611,7 +611,7 @@ class OperationInterface : public tensorflow::ImmediateExecutionOperation {
   AbortLocationHandler abort_location_handler_;
   ContextInterface* const context_;
   // TODO(kkb): Use tfrt::Location and implement TFRT async stack tracing.
-  absl::optional<tensorflow::ManagedStackTrace> stack_trace_;
+  abslx::optional<tensorflow::ManagedStackTrace> stack_trace_;
 
   int custom_device_tensor_handle_count_ = 0;
 };

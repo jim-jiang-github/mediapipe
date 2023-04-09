@@ -31,12 +31,12 @@ class TopkRewriter : public HloModulePass {
                             is_profitable_to_convert)
       : is_profitable_to_convert_(std::move(is_profitable_to_convert)) {}
 
-  absl::string_view name() const override { return "topk-rewriter"; }
+  abslx::string_view name() const override { return "topk-rewriter"; }
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  protected:
   // Check if the sort instruction is in TopK.
@@ -45,7 +45,7 @@ class TopkRewriter : public HloModulePass {
   // Transform to CustomCall.
   StatusOr<bool> TransformToCustomCall(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads);
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads);
 
  private:
   // Predicate that returns true if a sort instruction is profitable to be

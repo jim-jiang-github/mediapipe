@@ -26,7 +26,7 @@ namespace py = pybind11;
 
 xla::StatusOr<PrimitiveType> DtypeToPrimitiveType(const py::dtype& np_type) {
   static auto* types =
-      new absl::flat_hash_map<std::pair<char, int>, PrimitiveType>({
+      new abslx::flat_hash_map<std::pair<char, int>, PrimitiveType>({
           {{'b', 1}, PRED},
           {{'i', 1}, S8},
           {{'i', 2}, S16},
@@ -299,7 +299,7 @@ StatusOr<PythonBufferTree> GetPythonBufferTree(const py::object& argument) {
 }
 
 template <typename IntType>
-static py::tuple IntSpanToTupleHelper(absl::Span<IntType const> xs) {
+static py::tuple IntSpanToTupleHelper(abslx::Span<IntType const> xs) {
   py::tuple out(xs.size());
   for (int i = 0; i < xs.size(); ++i) {
     out[i] = py::int_(xs[i]);
@@ -308,11 +308,11 @@ static py::tuple IntSpanToTupleHelper(absl::Span<IntType const> xs) {
 }
 
 template <>
-pybind11::tuple SpanToTuple(absl::Span<int const> xs) {
+pybind11::tuple SpanToTuple(abslx::Span<int const> xs) {
   return IntSpanToTupleHelper(xs);
 }
 template <>
-pybind11::tuple SpanToTuple(absl::Span<int64_t const> xs) {
+pybind11::tuple SpanToTuple(abslx::Span<int64_t const> xs) {
   return IntSpanToTupleHelper(xs);
 }
 
@@ -328,13 +328,13 @@ std::optional<CastToArrayResult> CastToArray(py::handle h) {
   }
   PrimitiveType type = type_or_status.ValueOrDie();
 
-  absl::InlinedVector<int64_t, 4> dims(array.ndim());
+  abslx::InlinedVector<int64_t, 4> dims(array.ndim());
   for (int i = 0; i < array.ndim(); ++i) {
     dims[i] = array.shape(i);
   }
   Shape shape = ShapeUtil::MakeShape(type, dims);
   if (array.size() * array.itemsize() != ShapeUtil::ByteSizeOf(shape)) {
-    throw xla::XlaRuntimeError(absl::StrCat(
+    throw xla::XlaRuntimeError(abslx::StrCat(
         "Size mismatch for buffer: ", array.size() * array.itemsize(), " vs. ",
         ShapeUtil::ByteSizeOf(shape)));
   }

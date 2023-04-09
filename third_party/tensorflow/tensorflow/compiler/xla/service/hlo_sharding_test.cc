@@ -33,8 +33,8 @@ limitations under the License.
 namespace xla {
 namespace {
 
-Array<int64_t> MakeArray(absl::Span<const int64_t> dimensions,
-                         absl::Span<const int64_t> contents) {
+Array<int64_t> MakeArray(abslx::Span<const int64_t> dimensions,
+                         abslx::Span<const int64_t> contents) {
   Array<int64_t> a(dimensions);
   std::copy(contents.begin(), contents.end(), a.begin());
   return a;
@@ -198,7 +198,7 @@ TEST_F(HloShardingTest, NormalizeTrivialSubgroupToManual) {
 
 TEST_F(HloShardingTest, Hash) {
   auto hash_compare_equal = [](const HloSharding& a, const HloSharding& b) {
-    if (absl::HashOf(a) != absl::HashOf(b)) {
+    if (abslx::HashOf(a) != abslx::HashOf(b)) {
       return false;
     }
     return a == b;

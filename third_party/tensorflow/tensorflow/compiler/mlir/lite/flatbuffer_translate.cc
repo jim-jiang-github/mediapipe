@@ -147,7 +147,7 @@ static OwningOpRef<mlir::ModuleOp> FlatBufferFileToMlirTrans(
            nullptr;
   }
   return tflite::FlatBufferToMlir(
-      absl::string_view(input->getBufferStart(), input->getBufferSize()),
+      abslx::string_view(input->getBufferStart(), input->getBufferSize()),
       context, loc, use_external_constant, inputs, outputs,
       experimental_prune_unreachable_nodes_unconditionally);
 }

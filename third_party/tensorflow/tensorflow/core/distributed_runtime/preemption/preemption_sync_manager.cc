@@ -39,13 +39,13 @@ constexpr int64_t kPreemptionSyncUnsetCounter = -1;
 constexpr char kPreemptionNoticeKey[] = "RECEIVED_PREEMPTION_NOTICE";
 constexpr char kPreemptionCounterDirKey[] = "PREEMPTION_CURRENT_COUNTER/";
 constexpr char kPreemptionBarrier[] = "PREEMPTION_SYNC_BARRIER";
-constexpr absl::Duration kPreemptionBarrierTimeout = absl::Minutes(3);
+constexpr abslx::Duration kPreemptionBarrierTimeout = abslx::Minutes(3);
 
 // Only start protocol if death time is within `kProtocolDuration`, so that we
 // don't synchronize too early.
 // TODO(b/230630494): Make this configurable so that users can extend this to
 // accommodate higher checkpoint durations.
-constexpr absl::Duration kProtocolDuration = absl::Minutes(15);
+constexpr abslx::Duration kProtocolDuration = abslx::Minutes(15);
 
 class PreemptionSyncManagerImpl : public PreemptionSyncManager {
  public:
@@ -63,7 +63,7 @@ class PreemptionSyncManagerImpl : public PreemptionSyncManager {
 
  private:
   // Determine the sync point upon receipt of preemption notice (death time).
-  void ComputeSyncCallCounter(absl::Time death_time);
+  void ComputeSyncCallCounter(abslx::Time death_time);
   // Notify other tasks to not wait at the barrier if the sync protocol failed
   // midway.
   void CancelPreemptionBarrier();
@@ -78,7 +78,7 @@ class PreemptionSyncManagerImpl : public PreemptionSyncManager {
 
   Env* env_;                         // Not owned;
   CoordinationServiceAgent* agent_;  // Not owned.
-  absl::Notification shutdown_;
+  abslx::Notification shutdown_;
   std::unique_ptr<Thread> sync_protocol_thread_;
   std::unique_ptr<PreemptionNotifier> preemption_notifier_;
   std::shared_ptr<CallOptions> call_opts_;
@@ -112,14 +112,14 @@ Status PreemptionSyncManagerImpl::Initialize(
   preemption_notifier_ = std::move(notifier);
   TF_ASSIGN_OR_RETURN(CoordinatedTask own_task, agent->GetOwnTask());
   const std::string task_name =
-      absl::StrCat("/job:", own_task.job_name(), "/task:", own_task.task_id());
-  current_call_counter_key_ = absl::StrCat(kPreemptionCounterDirKey, task_name);
+      abslx::StrCat("/job:", own_task.job_name(), "/task:", own_task.task_id());
+  current_call_counter_key_ = abslx::StrCat(kPreemptionCounterDirKey, task_name);
 
   /* Listen for preemption notice within this task, then notify coordination
    * service when death time is within kProtocolDuration.
    */
   preemption_notifier_->WillBePreemptedAtAsync(
-      [agent = agent_, task_name](StatusOr<absl::Time> death_time) {
+      [agent = agent_, task_name](StatusOr<abslx::Time> death_time) {
         if (!death_time.ok()) {
           // The preemption notifier invokes callback with Cancelled error when
           // its being destructed.
@@ -134,7 +134,7 @@ Status PreemptionSyncManagerImpl::Initialize(
         }
         // Notify coordination service about preemption notice.
         const Status s = agent->InsertKeyValue(kPreemptionNoticeKey,
-                                               absl::FormatTime(*death_time));
+                                               abslx::FormatTime(*death_time));
         LOG(INFO) << "Notified coordination service that this task will "
                      "be preempted at "
                   << *death_time << ". Status: " << s;
@@ -168,8 +168,8 @@ Status PreemptionSyncManagerImpl::Initialize(
           return;
         }
         std::string err;
-        absl::Time death_time;
-        if (absl::ParseTime(absl::RFC3339_full, *status_or_death_time,
+        abslx::Time death_time;
+        if (abslx::ParseTime(abslx::RFC3339_full, *status_or_death_time,
                             &death_time, &err)) {
           LOG(INFO) << "Received preemption notice with death_time "
                     << death_time;
@@ -184,7 +184,7 @@ Status PreemptionSyncManagerImpl::Initialize(
                   << death_time;
 
         // Trigger protocol in a separate thread: compute max call counter.
-        sync_protocol_thread_ = absl::WrapUnique(env_->StartThread(
+        sync_protocol_thread_ = abslx::WrapUnique(env_->StartThread(
             {}, "PreemptionSyncManager_SyncProtocol",
             std::bind(&PreemptionSyncManagerImpl::ComputeSyncCallCounter, this,
                       death_time)));
@@ -193,13 +193,13 @@ Status PreemptionSyncManagerImpl::Initialize(
   return Status::OK();
 }
 
-void PreemptionSyncManagerImpl::ComputeSyncCallCounter(absl::Time death_time) {
+void PreemptionSyncManagerImpl::ComputeSyncCallCounter(abslx::Time death_time) {
   // 1. If death time is in the distant future, sleep until there's
   // `kProtocolDuration` left until death time before we begin the protocol.
-  const absl::Duration remaining_time = death_time - absl::Now();
+  const abslx::Duration remaining_time = death_time - abslx::Now();
   if (remaining_time > kProtocolDuration) {
     LOG(INFO) << "Will begin preemption sync protocol in " << remaining_time;
-    const absl::Duration sleep_time = remaining_time - kProtocolDuration;
+    const abslx::Duration sleep_time = remaining_time - kProtocolDuration;
 
     if (shutdown_.WaitForNotificationWithTimeout(sleep_time)) {
       // If shutdown is triggered midway, exit thread immediately.
@@ -251,7 +251,7 @@ void PreemptionSyncManagerImpl::ComputeSyncCallCounter(absl::Time death_time) {
   int64_t max_counter = kPreemptionSyncUnsetCounter;
   for (const auto& kv : *all_counters) {
     int64_t call_counter;
-    if (!absl::SimpleAtoi(kv.value(), &call_counter)) {
+    if (!abslx::SimpleAtoi(kv.value(), &call_counter)) {
       LOG(ERROR) << "Preemption sync failed - failed to parse preemption call "
                     "counter: "
                  << kv.DebugString();

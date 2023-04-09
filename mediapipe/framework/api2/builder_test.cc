@@ -159,7 +159,7 @@ void BuildGraphTypedTest() {
 
   CalculatorGraphConfig expected =
       mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(
-          absl::Substitute(R"(
+          abslx::Substitute(R"(
         input_stream: "IN:base"
         input_side_packet: "SIDE:side"
         output_stream: "OUT:out"
@@ -356,7 +356,7 @@ TEST(BuilderTest, EmptyTag) {
 TEST(BuilderTest, StringLikeTags) {
   const char kA[] = "A";
   const std::string kB = "B";
-  constexpr absl::string_view kC = "C";
+  constexpr abslx::string_view kC = "C";
 
   Graph graph;
   // Graph inputs.

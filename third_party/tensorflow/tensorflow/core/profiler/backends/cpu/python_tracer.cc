@@ -94,7 +94,7 @@ std::unique_ptr<ProfilerInterface> CreatePythonTracer(
       options.enable_trace_python_function;
   pyhooks_options.enable_python_traceme = options.enable_python_traceme;
   pyhooks_options.end_to_end_mode = options.end_to_end_mode;
-  return absl::make_unique<PythonTracer>(pyhooks_options);
+  return abslx::make_unique<PythonTracer>(pyhooks_options);
 }
 
 }  // namespace profiler

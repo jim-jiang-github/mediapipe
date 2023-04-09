@@ -77,7 +77,7 @@ static void Convert8to16(const uint8* p8, int num_comps, int p8_row_bytes,
 
 void ErrorHandler(png_structp png_ptr, png_const_charp msg) {
   DecodeContext* const ctx =
-      absl::bit_cast<DecodeContext*>(png_get_io_ptr(png_ptr));
+      abslx::bit_cast<DecodeContext*>(png_get_io_ptr(png_ptr));
   ctx->error_condition = true;
   // To prevent log spam, errors are logged as VLOG(1) instead of ERROR.
   VLOG(1) << "PNG error: " << msg;
@@ -90,7 +90,7 @@ void WarningHandler(png_structp png_ptr, png_const_charp msg) {
 
 void StringReader(png_structp png_ptr, png_bytep data, png_size_t length) {
   DecodeContext* const ctx =
-      absl::bit_cast<DecodeContext*>(png_get_io_ptr(png_ptr));
+      abslx::bit_cast<DecodeContext*>(png_get_io_ptr(png_ptr));
   if (static_cast<png_size_t>(ctx->data_left) < length) {
     // Don't zero out the data buffer as it has been lazily allocated (copy on
     // write) and zeroing it out here can produce an OOM. Since the buffer is
@@ -107,8 +107,8 @@ void StringReader(png_structp png_ptr, png_bytep data, png_size_t length) {
 
 template <typename T>
 void StringWriter(png_structp png_ptr, png_bytep data, png_size_t length) {
-  T* const s = absl::bit_cast<T*>(png_get_io_ptr(png_ptr));
-  s->append(absl::bit_cast<const char*>(data), length);
+  T* const s = abslx::bit_cast<T*>(png_get_io_ptr(png_ptr));
+  s->append(abslx::bit_cast<const char*>(data), length);
 }
 
 void StringWriterFlush(png_structp png_ptr) {}
@@ -222,7 +222,7 @@ bool CommonInitDecode(StringPiece png_string, int desired_channels,
     CommonFreeDecode(context);
     return false;
   }
-  context->data = absl::bit_cast<const uint8*>(png_string.data());
+  context->data = abslx::bit_cast<const uint8*>(png_string.data());
   context->data_left = png_string.size();
   png_set_read_fn(context->png_ptr, context, StringReader);
   png_read_info(context->png_ptr, context->info_ptr);
@@ -335,8 +335,8 @@ bool CommonFinishDecode(png_bytep data, int row_bytes, DecodeContext* context) {
 
   // Synthesize 16 bits from 8 if requested.
   if (context->need_to_synthesize_16)
-    Convert8to16(absl::bit_cast<uint8*>(data), context->channels, row_bytes,
-                 context->width, context->height, absl::bit_cast<uint16*>(data),
+    Convert8to16(abslx::bit_cast<uint8*>(data), context->channels, row_bytes,
+                 context->width, context->height, abslx::bit_cast<uint16*>(data),
                  row_bytes);
   return ok;
 }

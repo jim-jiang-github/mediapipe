@@ -32,7 +32,7 @@ TEST(ThreadPoolTest, EmptyThread) {
 }
 
 TEST(ThreadPoolTest, SingleThread) {
-  absl::Mutex mu;
+  abslx::Mutex mu;
   int n = 100;
   {
     ThreadPool thread_pool("testpool", 1);
@@ -41,7 +41,7 @@ TEST(ThreadPoolTest, SingleThread) {
 
     for (int i = 0; i < 100; ++i) {
       thread_pool.Schedule([&n, &mu]() mutable {
-        absl::MutexLock l(&mu);
+        abslx::MutexLock l(&mu);
         --n;
       });
     }
@@ -51,7 +51,7 @@ TEST(ThreadPoolTest, SingleThread) {
 }
 
 TEST(ThreadPoolTest, MultiThreads) {
-  absl::Mutex mu;
+  abslx::Mutex mu;
   int n = 100;
   {
     ThreadPool thread_pool("testpool", 10);
@@ -60,7 +60,7 @@ TEST(ThreadPoolTest, MultiThreads) {
 
     for (int i = 0; i < 100; ++i) {
       thread_pool.Schedule([&n, &mu]() mutable {
-        absl::MutexLock l(&mu);
+        abslx::MutexLock l(&mu);
         --n;
       });
     }

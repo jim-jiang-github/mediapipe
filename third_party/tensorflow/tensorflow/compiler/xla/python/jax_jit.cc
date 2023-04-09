@@ -137,7 +137,7 @@ std::string CallSignature::DebugString() const {
                                 const xla::PyArgSignature& s) {
     out->append(s.DebugString());
   };
-  return absl::StrFormat(
+  return abslx::StrFormat(
       "static args (positional + keyword): %s\nstatic arg keyword names: %s\n"
       "dynamic arg signatures (positional + keyword): %s\n"
       "dynamic arg keyword names: %s\ndynamic arg treedefs: %s\n"
@@ -145,11 +145,11 @@ std::string CallSignature::DebugString() const {
       "jax_enable_x64: %d\n"
       "global_extra_jit_context: %s\n"
       "thread_local_extra_jit_context: %s\n",
-      absl::StrJoin(static_args, ",", py_object_formatter),
-      absl::StrJoin(static_arg_names, ",", py_object_formatter),
-      absl::StrJoin(dynamic_arg_signatures, ", ", signature_formatter),
-      absl::StrJoin(dynamic_arg_names, ",", py_object_formatter),
-      absl::StrJoin(dynamic_arg_treedefs, "| ", treedef_formatter),  // new line
+      abslx::StrJoin(static_args, ",", py_object_formatter),
+      abslx::StrJoin(static_arg_names, ",", py_object_formatter),
+      abslx::StrJoin(dynamic_arg_signatures, ", ", signature_formatter),
+      abslx::StrJoin(dynamic_arg_names, ",", py_object_formatter),
+      abslx::StrJoin(dynamic_arg_treedefs, "| ", treedef_formatter),  // new line
       device != nullptr ? device->DebugString() : "nullptr", jax_enable_x64,
       OptionalDebugString(global_extra_jit_context),
       OptionalDebugString(thread_local_extra_jit_context));
@@ -171,7 +171,7 @@ bool CallSignature::operator==(const CallSignature& other) const {
                  return py::type::handle_of(a) == py::type::handle_of(b) &&
                         a.equal(b);
                } catch (const py::error_already_set& e) {
-                 throw std::invalid_argument(absl::StrCat(
+                 throw std::invalid_argument(abslx::StrCat(
                      "static arguments should be comparable using __eq__."
                      "The following error was raised during a call to '",
                      function_name, "' when comparing two objects of types ",
@@ -205,7 +205,7 @@ H AbslHashValue(H h, const CallSignature& s) {
       hash = py::hash(static_arg);
     } catch (const py::error_already_set& e) {
       if (!e.matches(PyExc_TypeError)) throw;
-      throw std::invalid_argument(absl::StrCat(
+      throw std::invalid_argument(abslx::StrCat(
           "Non-hashable static arguments are not supported. An error occurred "
           "during a call to '",
           s.function_name, "' while trying to hash an object of type ",
@@ -232,8 +232,8 @@ H AbslHashValue(H h, const CallSignature& s) {
 // dynamic positional and keyword arguments), filling `arguments` in place.
 xla::Status ParseArguments(py::handle args,
                            const std::optional<py::kwargs>& py_kwargs,
-                           absl::Span<int const> static_argnums,
-                           absl::Span<py::str const> static_argnames,
+                           abslx::Span<int const> static_argnums,
+                           abslx::Span<py::str const> static_argnames,
                            ParsedArgumentsAsBuffers& arguments) {
   tensorflow::profiler::TraceMe traceme("ParseArguments");
   int num_args = PyTuple_GET_SIZE(args.ptr());
@@ -327,7 +327,7 @@ struct CacheEntry {
   // a signature and fill it. Other threads will wait for the notification.
   // If an error occurred during the compilation, `fall_back_to_python` is set
   // to `true`, and other threads will fail with the same error.
-  absl::Notification compilation_complete;
+  abslx::Notification compilation_complete;
 
   std::shared_ptr<xla::PyExecutable> executable;
   xla::PyTreeDef out_pytree_def;
@@ -373,7 +373,7 @@ class CompiledFunctionCache {
   // We include as part of the cache key `donate_argnums` (and any other fields
   // that aren't subsumed by the CallSignature we compute for each call).
   std::shared_ptr<Cache> Lookup(py::handle function,
-                                absl::Span<const int> donate_argnums);
+                                abslx::Span<const int> donate_argnums);
 
   int Size() const { return lru_list_.Size(); }
   int Capacity() const { return lru_list_.Capacity(); }
@@ -413,14 +413,14 @@ class CompiledFunctionCache {
   };
 
   Cache::LRUList lru_list_;
-  absl::flat_hash_map<Key, std::unique_ptr<Value>> functions_;
+  abslx::flat_hash_map<Key, std::unique_ptr<Value>> functions_;
 };
 
 CompiledFunctionCache::CompiledFunctionCache(int capacity)
     : lru_list_(capacity) {}
 
 std::shared_ptr<CompiledFunctionCache::Cache> CompiledFunctionCache::Lookup(
-    py::handle function, absl::Span<const int> donate_argnums) {
+    py::handle function, abslx::Span<const int> donate_argnums) {
   Key key;
   key.function = function;
   key.donate_argnums =
@@ -593,7 +593,7 @@ class CompiledFunctionStore {
   }
 
  private:
-  absl::flat_hash_set<CompiledFunction*> compiled_functions_;
+  abslx::flat_hash_set<CompiledFunction*> compiled_functions_;
 };
 
 // Protected by GIL.
@@ -667,7 +667,7 @@ static xla::StatusOr<xla::PjRtDevice*> GetJitArgumentStickyDevice(
       return buffer->buffer()->device();
     } catch (const py::cast_error& e) {
       return xla::InvalidArgument(
-          "%s", absl::StrCat("[jaxjit] Unsupported subclass of `DeviceArray`: "
+          "%s", abslx::StrCat("[jaxjit] Unsupported subclass of `DeviceArray`: "
                              "`device_buffer` field is of type ",
                              py::cast<std::string>(
                                  arg.attr("device_buffer").get_type().str()),
@@ -704,7 +704,7 @@ xla::Status ComputeSignature(bool jax_enable_x64,
           GetJitArgumentStickyDevice(arguments.flat_dynamic_args[i]));
       if (device) {
         if (data_device && (device != data_device)) {
-          throw std::invalid_argument(absl::StrCat(
+          throw std::invalid_argument(abslx::StrCat(
               "primitive arguments must be colocated on the same device ("
               "C++ jax.jit). Arguments are on devices: ",
               device->DebugString(), " and ", data_device->DebugString()));
@@ -1005,7 +1005,7 @@ xla::StatusOr<py::object> CompiledFunction::Call(
   auto traceback = xla::Traceback::Get();
 
   int num_outputs = output_buffers[0].size();
-  absl::InlinedVector<py::object, 1> flat_device_arrays;
+  abslx::InlinedVector<py::object, 1> flat_device_arrays;
   flat_device_arrays.reserve(num_outputs);
   for (int i = 0; i < output_buffers[0].size(); ++i) {
     bool last = (i == (num_outputs - 1));
@@ -1156,7 +1156,7 @@ PyObject* JaxCompiledFunction_tp_call(PyObject* self, PyObject* args,
   JaxCompiledFunctionObject* o =
       reinterpret_cast<JaxCompiledFunctionObject*>(self);
   tensorflow::profiler::TraceMe traceme([&] {
-    return absl::StrCat("JaxCompiledFunction(", o->fun.function_name(), ")");
+    return abslx::StrCat("JaxCompiledFunction(", o->fun.function_name(), ")");
   });
   std::optional<py::kwargs> py_kwargs;
   if (kwargs) {
@@ -1186,7 +1186,7 @@ PyObject* JaxCompiledFunction_tp_call(PyObject* self, PyObject* args,
 
 PyObject* JaxCompiledFunction_tp_repr(PyObject* self) {
   try {
-    const std::string& repr = absl::StrFormat(
+    const std::string& repr = abslx::StrFormat(
         "<CompiledFunction of %s>",
         static_cast<std::string>(py::repr(py::getattr(self, "__wrapped__"))));
     return PyUnicode_FromString(repr.c_str());
@@ -1268,7 +1268,7 @@ void BuildJaxjitSubmodule(py::module& m) {
       [](const py::dict& pickle) {
         int version = py::cast<int>(pickle["version"]);
         if (version != kCompiledFunctionCachePickleVersion) {
-          throw std::invalid_argument(absl::StrFormat(
+          throw std::invalid_argument(abslx::StrFormat(
               "Invalid CompiledFunction pickle version, got %d, expected %d",
               version, kCompiledFunctionCachePickleVersion));
         }
@@ -1346,7 +1346,7 @@ void BuildJaxjitSubmodule(py::module& m) {
       [](CompiledFunction::object& self, const py::dict& pickle) {
         int version = py::cast<int>(pickle["version"]);
         if (version != kCompiledFunctionPickleVersion) {
-          throw std::invalid_argument(absl::StrFormat(
+          throw std::invalid_argument(abslx::StrFormat(
               "Invalid CompiledFunction pickle version, got %d, expected %d. "
               "Pickling/Unpickling jitted functions using different JAX "
               "versions is not supported.",
@@ -1457,7 +1457,7 @@ void BuildJaxjitSubmodule(py::module& m) {
       .def_property_readonly(
           "shape",
           [](const xla::PyArgSignature& sig) {
-            return xla::SpanToTuple(absl::MakeConstSpan(sig.shape));
+            return xla::SpanToTuple(abslx::MakeConstSpan(sig.shape));
           })
       .def_readonly("weak_type", &xla::PyArgSignature::weak_type);
   jitlib.def("_ArgSignatureOfValue", &xla::PyArgSignatureOfValue);

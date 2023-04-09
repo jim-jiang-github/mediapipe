@@ -62,7 +62,7 @@ class ExecuteTPUEmbeddingPartitionerOp : public OpKernel {
     params.tpu_embedding_config.size = config_string_.size();
 
     char* common_config_output = nullptr;
-    auto cleanup = absl::MakeCleanup([&common_config_output]() {
+    auto cleanup = abslx::MakeCleanup([&common_config_output]() {
       tpu::OpsApiFn()->TpuConfigurationApi_FreeCharArrayFn(
           common_config_output);
     });
@@ -115,7 +115,7 @@ class ConfigureTPUEmbeddingMemoryOp : public OpKernel {
     params.common_config_size = common_config_string.size();
 
     char* memory_config_output = nullptr;
-    auto cleanup = absl::MakeCleanup([&memory_config_output]() {
+    auto cleanup = abslx::MakeCleanup([&memory_config_output]() {
       tpu::OpsApiFn()->TpuConfigurationApi_FreeCharArrayFn(
           memory_config_output);
     });
@@ -175,7 +175,7 @@ class CollateTPUEmbeddingMemoryOp : public OpKernel {
     params.memory_configs_size = memory_configs.size();
 
     char* merged_memory_config_output = nullptr;
-    auto cleanup = absl::MakeCleanup([&merged_memory_config_output]() {
+    auto cleanup = abslx::MakeCleanup([&merged_memory_config_output]() {
       tpu::OpsApiFn()->TpuConfigurationApi_FreeCharArrayFn(
           merged_memory_config_output);
     });
@@ -246,7 +246,7 @@ class ConfigureTPUEmbeddingHostOp : public OpKernel {
     params.tpu_embedding_config.size = config_string_.size();
 
     char* network_config_output = nullptr;
-    auto cleanup = absl::MakeCleanup([&network_config_output]() {
+    auto cleanup = abslx::MakeCleanup([&network_config_output]() {
       tpu::OpsApiFn()->TpuConfigurationApi_FreeCharArrayFn(
           network_config_output);
     });

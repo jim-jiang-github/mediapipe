@@ -36,41 +36,41 @@ namespace gpu {
 // stored in quant_conversion_map.
 class ObjectReader {
  public:
-  static absl::Status ReadNonConstantTensor(
-      TfLiteContext* context, absl::flat_hash_map<int, Value*>* tensor_to_value,
-      absl::flat_hash_map<int, int>* quant_conversion_map, GraphFloat32* graph,
+  static abslx::Status ReadNonConstantTensor(
+      TfLiteContext* context, abslx::flat_hash_map<int, Value*>* tensor_to_value,
+      abslx::flat_hash_map<int, int>* quant_conversion_map, GraphFloat32* graph,
       uint32_t tensor_idx, Value** value = nullptr);
 
   ObjectReader(GraphFloat32* graph, TfLiteContext* context,
                const TfLiteNode* node,
-               absl::flat_hash_map<int, Value*>* tensor_to_value,
-               absl::flat_hash_map<int, int>* quant_conversion_map = nullptr)
+               abslx::flat_hash_map<int, Value*>* tensor_to_value,
+               abslx::flat_hash_map<int, int>* quant_conversion_map = nullptr)
       : graph_(graph),
         context_(context),
         node_(node),
         tensor_to_value_(tensor_to_value),
         quant_conversion_map_(quant_conversion_map) {}
 
-  absl::Status ReadValue(uint32_t idx, Value** value);
+  abslx::Status ReadValue(uint32_t idx, Value** value);
 
-  absl::Status ReadValueByTensorIdx(uint32_t tensor_idx, Value** value);
+  abslx::Status ReadValueByTensorIdx(uint32_t tensor_idx, Value** value);
 
   int GetNumberOfRuntimeInputs() const;
 
-  absl::Status GetTensorId(uint32_t input_id, int* tensor_id) const;
+  abslx::Status GetTensorId(uint32_t input_id, int* tensor_id) const;
 
-  absl::Status GetTensorDims(uint32_t idx, TfLiteIntArray* dimensions) const;
+  abslx::Status GetTensorDims(uint32_t idx, TfLiteIntArray* dimensions) const;
 
   template <typename TensorT>
-  absl::Status ReadTensor(uint32_t index, TensorT* tensor) const {
+  abslx::Status ReadTensor(uint32_t index, TensorT* tensor) const {
     if (index < 0 || index >= node_->inputs->size) {
       // If larger, this can be an older model with fewer input tensors than the
       // current implementation.
-      return absl::OutOfRangeError("Invalid data index found.");
+      return abslx::OutOfRangeError("Invalid data index found.");
     }
     const int32_t tensor_id = node_->inputs->data[index];
     if (tensor_id < 0) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Invalid data index found. Possibly an unset optional tensor is "
           "being read.");
     }
@@ -106,7 +106,7 @@ class ObjectReader {
           break;
         }
         default: {
-          return absl::InvalidArgumentError(
+          return abslx::InvalidArgumentError(
               "Unexpected data type in sparse tensor");
         }
       }
@@ -120,19 +120,19 @@ class ObjectReader {
     return SetAllDimensions(tflite_tensor->dims, &tensor->shape);
   }
 
-  absl::Status AddOutput(const Node* node, int id);
+  abslx::Status AddOutput(const Node* node, int id);
 
-  absl::Status AddOutputs(const Node* node);
+  abslx::Status AddOutputs(const Node* node);
 
-  absl::Status AddInput(const Node* node, uint32_t idx);
+  abslx::Status AddInput(const Node* node, uint32_t idx);
 
-  absl::Status AddUpdate(const Node* node, uint32_t idx);
+  abslx::Status AddUpdate(const Node* node, uint32_t idx);
 
   TfLiteTensor* GetInputTensor(int index) const;
 
   TfLiteTensor* GetOutputTensor(int index) const;
 
-  absl::Status VerifyInputsConstsOutputs(const TfLiteNode* node,
+  abslx::Status VerifyInputsConstsOutputs(const TfLiteNode* node,
                                          int runtime_inputs, int const_inputs,
                                          int outputs);
 
@@ -140,8 +140,8 @@ class ObjectReader {
   GraphFloat32* graph_;
   TfLiteContext* context_;
   const TfLiteNode* node_;
-  absl::flat_hash_map<int, Value*>* tensor_to_value_;
-  absl::flat_hash_map<int, int>* quant_conversion_map_;
+  abslx::flat_hash_map<int, Value*>* tensor_to_value_;
+  abslx::flat_hash_map<int, int>* quant_conversion_map_;
 };
 
 }  // namespace gpu

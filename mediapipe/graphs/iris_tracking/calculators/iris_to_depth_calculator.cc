@@ -89,7 +89,7 @@ float CalculateDepth(const NormalizedLandmark& center, float focal_length,
 // }
 class IrisToDepthCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Tag(kIrisTag).Set<NormalizedLandmarkList>();
     cc->Inputs().Tag(kImageSizeTag).Set<std::pair<int, int>>();
 
@@ -111,12 +111,12 @@ class IrisToDepthCalculator : public CalculatorBase {
     if (cc->Outputs().HasTag(kRightIrisDepthTag)) {
       cc->Outputs().Tag(kRightIrisDepthTag).Set<float>();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
 
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   float focal_length_pixels_ = -1.f;
@@ -134,7 +134,7 @@ class IrisToDepthCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(IrisToDepthCalculator);
 
-absl::Status IrisToDepthCalculator::Open(CalculatorContext* cc) {
+abslx::Status IrisToDepthCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
   if (cc->InputSidePackets().HasTag(kFocalLengthPixelTag)) {
 #if defined(__APPLE__)
@@ -155,13 +155,13 @@ absl::Status IrisToDepthCalculator::Open(CalculatorContext* cc) {
   }
 
   options_ = cc->Options<::mediapipe::IrisToDepthCalculatorOptions>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status IrisToDepthCalculator::Process(CalculatorContext* cc) {
+abslx::Status IrisToDepthCalculator::Process(CalculatorContext* cc) {
   // Only process if there's input landmarks.
   if (cc->Inputs().Tag(kIrisTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   const auto& iris_landmarks =
@@ -173,8 +173,8 @@ absl::Status IrisToDepthCalculator::Process(CalculatorContext* cc) {
   RET_CHECK(!cc->Inputs().Tag(kImageSizeTag).IsEmpty());
   image_size = cc->Inputs().Tag(kImageSizeTag).Get<std::pair<int, int>>();
 
-  auto left_iris = absl::make_unique<NormalizedLandmarkList>();
-  auto right_iris = absl::make_unique<NormalizedLandmarkList>();
+  auto left_iris = abslx::make_unique<NormalizedLandmarkList>();
+  auto right_iris = abslx::make_unique<NormalizedLandmarkList>();
   GetLeftIris(iris_landmarks, left_iris.get());
   GetRightIris(iris_landmarks, right_iris.get());
 
@@ -220,7 +220,7 @@ absl::Status IrisToDepthCalculator::Process(CalculatorContext* cc) {
                          .At(cc->InputTimestamp()));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void IrisToDepthCalculator::GetLeftIris(const NormalizedLandmarkList& lds,

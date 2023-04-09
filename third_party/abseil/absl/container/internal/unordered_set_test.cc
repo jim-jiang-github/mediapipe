@@ -19,7 +19,7 @@
 #include "absl/container/internal/unordered_set_members_test.h"
 #include "absl/container/internal/unordered_set_modifiers_test.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
@@ -38,4 +38,4 @@ INSTANTIATE_TYPED_TEST_SUITE_P(UnorderedSet, ModifiersTest, SetTypes);
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

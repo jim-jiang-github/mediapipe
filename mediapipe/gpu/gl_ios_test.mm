@@ -98,7 +98,7 @@
 
 - (void)testGlConverters {
   CFHolder<CVPixelBufferRef> originalPixelBuffer;
-  absl::Status status =
+  abslx::Status status =
       CreateCVPixelBufferFromCGImage([_sourceImage CGImage], &originalPixelBuffer);
   XCTAssert(status.ok());
 
@@ -121,7 +121,7 @@
 
 - (void)testGlConvertersNoOpInserted {
   CFHolder<CVPixelBufferRef> originalPixelBuffer;
-  absl::Status status =
+  abslx::Status status =
       CreateCVPixelBufferFromCGImage([_sourceImage CGImage], &originalPixelBuffer);
   XCTAssert(status.ok());
 
@@ -149,7 +149,7 @@
 
 - (void)testGlConvertersWithOptionalSidePackets {
   CFHolder<CVPixelBufferRef> originalPixelBuffer;
-  absl::Status status =
+  abslx::Status status =
       CreateCVPixelBufferFromCGImage([_sourceImage CGImage], &originalPixelBuffer);
   XCTAssert(status.ok());
 
@@ -189,7 +189,7 @@
 
 - (void)testSimpleConversionFromFormat:(OSType)cvPixelFormat {
   CFHolder<CVPixelBufferRef> originalPixelBuffer;
-  absl::Status status =
+  abslx::Status status =
       CreateCVPixelBufferFromCGImage([_sourceImage CGImage], &originalPixelBuffer);
   XCTAssert(status.ok());
   CVPixelBufferRef convertedPixelBuffer =
@@ -223,7 +223,7 @@
   NSLog(@"Metal tests skipped on Simulator.");
 #else
   CFHolder<CVPixelBufferRef> originalPixelBuffer;
-  absl::Status status =
+  abslx::Status status =
       CreateCVPixelBufferFromCGImage([_sourceImage CGImage], &originalPixelBuffer);
   XCTAssert(status.ok());
   CVPixelBufferRef redPixelBuffer = [self redPixelBuffer:*originalPixelBuffer];

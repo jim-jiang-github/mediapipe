@@ -39,7 +39,7 @@ TFE_TensorHandleCache* TFE_TensorHandleCache::Get() {
 
 TFE_TensorHandle* TFE_TensorHandleCache::Lookup(
     PyObject* value, tensorflow::DataType dtype, TFE_Context* ctx,
-    absl::string_view device_name) const {
+    abslx::string_view device_name) const {
   CHECK_NOTNULL(value);
   const auto it = cache.find(Key{PyObjectPtr{value}, dtype, ctx, device_name});
   if (it == cache.end()) {
@@ -54,7 +54,7 @@ TFE_TensorHandle* TFE_TensorHandleCache::Lookup(
 
 void TFE_TensorHandleCache::Insert(PyObject* value, tensorflow::DataType dtype,
                                    TFE_Context* ctx,
-                                   absl::string_view device_name,
+                                   abslx::string_view device_name,
                                    TFE_TensorHandle* h) {
   Py_INCREF(value);
   cache.emplace(Key{PyObjectPtr{value}, dtype, ctx, device_name},

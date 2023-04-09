@@ -22,12 +22,12 @@ extern "C" {
 
 void ABSL_INTERNAL_C_SYMBOL(AbslInternalSpinLockDelay)(
     std::atomic<uint32_t>* /* lock_word */, uint32_t /* value */, int loop,
-    absl::base_internal::SchedulingMode /* mode */) {
+    abslx::base_internal::SchedulingMode /* mode */) {
   if (loop == 0) {
   } else if (loop == 1) {
     Sleep(0);
   } else {
-    Sleep(absl::base_internal::SpinLockSuggestedDelayNS(loop) / 1000000);
+    Sleep(abslx::base_internal::SpinLockSuggestedDelayNS(loop) / 1000000);
   }
 }
 

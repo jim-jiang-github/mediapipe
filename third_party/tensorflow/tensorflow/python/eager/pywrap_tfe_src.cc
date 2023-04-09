@@ -1189,20 +1189,20 @@ class PyTapeTensor {
       : id_(id), dtype_(dtype), shape_(shape) {}
   PyTapeTensor(int64_t id, tensorflow::DataType dtype, PyObject* shape)
       : id_(id), dtype_(dtype), shape_(shape) {
-    Py_INCREF(absl::get<1>(shape_));
+    Py_INCREF(abslx::get<1>(shape_));
   }
   PyTapeTensor(const PyTapeTensor& other) {
     id_ = other.id_;
     dtype_ = other.dtype_;
     shape_ = other.shape_;
     if (shape_.index() == 1) {
-      Py_INCREF(absl::get<1>(shape_));
+      Py_INCREF(abslx::get<1>(shape_));
     }
   }
 
   ~PyTapeTensor() {
     if (shape_.index() == 1) {
-      Py_DECREF(absl::get<1>(shape_));
+      Py_DECREF(abslx::get<1>(shape_));
     }
   }
   PyObject* GetShape() const;
@@ -1221,7 +1221,7 @@ class PyTapeTensor {
   // PyObject is the tensor itself. This is used to support tf.shape(tensor) for
   // partially-defined shapes and tf.zeros_like(tensor) for variant-dtype
   // tensors.
-  absl::variant<tensorflow::TensorShape, PyObject*> shape_;
+  abslx::variant<tensorflow::TensorShape, PyObject*> shape_;
 };
 
 static PyTapeTensor TapeTensorFromTensor(PyObject* tensor);
@@ -1370,7 +1370,7 @@ class PyVSpace : public tensorflow::eager::VSpace<PyObject, PyBackwardFunction,
       const string& op_type, PyBackwardFunction* backward_function,
       const std::vector<int64_t>& unneeded_gradients,
       tensorflow::gtl::ArraySlice<PyObject*> output_gradients,
-      absl::Span<PyObject*> result) const final {
+      abslx::Span<PyObject*> result) const final {
     PyObject* grads = PyTuple_New(output_gradients.size());
     for (int i = 0; i < output_gradients.size(); ++i) {
       if (output_gradients[i] == nullptr) {
@@ -1462,7 +1462,7 @@ PyObject* TFE_Py_RegisterVSpace(PyObject* e) {
 
 PyObject* PyTapeTensor::GetShape() const {
   if (shape_.index() == 0) {
-    auto& shape = absl::get<0>(shape_);
+    auto& shape = abslx::get<0>(shape_);
     PyObject* py_shape = PyTuple_New(shape.dims());
     for (int i = 0; i < shape.dims(); ++i) {
       PyTuple_SET_ITEM(py_shape, i, PyLong_FromLong(shape.dim_size(i)));
@@ -1471,12 +1471,12 @@ PyObject* PyTapeTensor::GetShape() const {
     return py_shape;
   }
 
-  return py_vspace->GraphShape(absl::get<1>(shape_));
+  return py_vspace->GraphShape(abslx::get<1>(shape_));
 }
 
 PyObject* PyTapeTensor::OnesLike() const {
   if (shape_.index() == 1) {
-    PyObject* tensor = absl::get<1>(shape_);
+    PyObject* tensor = abslx::get<1>(shape_);
     return py_vspace->OnesLike(tensor);
   }
   PyObject* py_shape = GetShape();
@@ -1495,7 +1495,7 @@ PyObject* PyTapeTensor::ZerosLike() const {
     Py_RETURN_NONE;
   }
   if (shape_.index() == 1) {
-    PyObject* tensor = absl::get<1>(shape_);
+    PyObject* tensor = abslx::get<1>(shape_);
     return py_vspace->ZerosLike(tensor);
   }
   PyObject* py_shape = GetShape();
@@ -2859,7 +2859,7 @@ PyObject* TFE_Py_TapeGradient(PyObject* tape, PyObject* target,
   std::vector<PyObject*> result(sources_vec.size());
   status->status = tape_obj->tape->ComputeGradient(
       *py_vspace, target_vec, sources_vec, source_tensors_that_are_targets,
-      outgrad_vec, absl::MakeSpan(result));
+      outgrad_vec, abslx::MakeSpan(result));
   if (!status->status.ok()) {
     if (PyErr_Occurred()) {
       // Do not propagate the erroneous status as that would swallow the
@@ -4106,14 +4106,14 @@ struct EagerContextThreadLocalDataDefaults {
 // its handle object), because the handle object isn't created until the
 // context is initialized; but thread_local_data is potentially accessed
 // before then.
-using EagerContextThreadLocalDataMap = absl::flat_hash_map<
+using EagerContextThreadLocalDataMap = abslx::flat_hash_map<
     PyObject*, std::unique_ptr<tensorflow::EagerContextThreadLocalData>>;
 thread_local EagerContextThreadLocalDataMap*
     eager_context_thread_local_data_map = nullptr;
 
 // Maps each py_eager_context object to default values.
 using EagerContextThreadLocalDataDefaultsMap =
-    absl::flat_hash_map<PyObject*, EagerContextThreadLocalDataDefaults>;
+    abslx::flat_hash_map<PyObject*, EagerContextThreadLocalDataDefaults>;
 EagerContextThreadLocalDataDefaultsMap*
     eager_context_thread_local_data_defaults = nullptr;
 
@@ -4126,7 +4126,7 @@ void MakeEagerContextThreadLocalData(PyObject* py_eager_context,
                                      PyObject* device_spec) {
   DCheckPyGilState();
   if (eager_context_thread_local_data_defaults == nullptr) {
-    absl::LeakCheckDisabler disabler;
+    abslx::LeakCheckDisabler disabler;
     eager_context_thread_local_data_defaults =
         new EagerContextThreadLocalDataDefaultsMap();
   }
@@ -4162,7 +4162,7 @@ EagerContextThreadLocalData* GetEagerContextThreadLocalData(
   }
 
   if (eager_context_thread_local_data_map == nullptr) {
-    absl::LeakCheckDisabler disabler;
+    abslx::LeakCheckDisabler disabler;
     eager_context_thread_local_data_map = new EagerContextThreadLocalDataMap();
   }
   auto& thread_local_data =

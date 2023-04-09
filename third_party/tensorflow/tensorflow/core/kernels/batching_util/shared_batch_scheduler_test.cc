@@ -160,7 +160,7 @@ class SharedBatchSchedulerTest
             const internal::InputSplitMetadata input_split_metadata(
                 input_task_size, open_batch_remaining_slot, max_batch_size);
 
-            const absl::FixedArray<int> task_sizes =
+            const abslx::FixedArray<int> task_sizes =
                 input_split_metadata.task_sizes();
             const int num_batches = task_sizes.size();
 
@@ -882,8 +882,8 @@ void CreateQueues() {
 }
 
 void BM_QueueSchedule(::testing::benchmark::State& state) {
-  static absl::once_flag once;
-  absl::call_once(once, []() { CreateQueues(); });
+  static abslx::once_flag once;
+  abslx::call_once(once, []() { CreateQueues(); });
 
   const int queue_index = state.range(1);
   Queue* queue = (*queues)[queue_index].get();

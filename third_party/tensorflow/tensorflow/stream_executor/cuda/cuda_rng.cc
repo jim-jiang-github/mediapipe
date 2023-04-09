@@ -71,7 +71,7 @@ GpuRng::~GpuRng() {
 }
 
 bool GpuRng::Init() {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   CHECK(rng_ == nullptr);
 
   cuda::ScopedActivateExecutorContext sac(parent_);
@@ -106,7 +106,7 @@ constexpr bool ComplexIsConsecutiveFloats() {
 
 template <typename T>
 bool GpuRng::DoPopulateRandUniformInternal(Stream* stream, DeviceMemory<T>* v) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   static_assert(ComplexIsConsecutiveFloats(),
                 "std::complex values are not stored as consecutive values");
 
@@ -164,7 +164,7 @@ bool GpuRng::DoPopulateRandGaussianInternal(Stream* stream, ElemT mean,
                                             ElemT stddev,
                                             DeviceMemory<ElemT>* v,
                                             FuncT func) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
 
   if (!SetStream(stream)) {
     return false;
@@ -197,7 +197,7 @@ bool GpuRng::DoPopulateRandGaussian(Stream* stream, double mean, double stddev,
 }
 
 bool GpuRng::SetSeed(Stream* stream, const uint8* seed, uint64_t seed_bytes) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   CHECK(rng_ != nullptr);
 
   if (!CheckSeed(seed, seed_bytes)) {

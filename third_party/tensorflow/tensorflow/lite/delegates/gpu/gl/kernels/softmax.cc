@@ -42,15 +42,15 @@ float4 GetMask(int num_channels) {
 
 class Softmax : public NodeShader {
  public:
-  absl::Status GenerateCode(const GenerationContext& ctx,
+  abslx::Status GenerateCode(const GenerationContext& ctx,
                             GeneratedCode* generated_code) const final {
     const auto& attr = std::any_cast<const SoftmaxAttributes&>(ctx.op_attr);
     if (ctx.input_shapes[0] != ctx.output_shapes[0]) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Input and output shapes do not match.");
     }
     if (attr.axis != Axis::CHANNELS) {
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "Softmax is only supported for channels axis.");
     }
     return ctx.input_shapes[0][1] == 1 && ctx.input_shapes[0][2] == 1
@@ -59,7 +59,7 @@ class Softmax : public NodeShader {
   }
 
  private:
-  absl::Status GenerateCodeFor1x1(const GenerationContext& ctx,
+  abslx::Status GenerateCodeFor1x1(const GenerationContext& ctx,
                                   GeneratedCode* generated_code) const {
     const int depth = DivideRoundUp(ctx.output_shapes[0][3], 4);
     std::vector<Variable> shared_variables = {
@@ -160,10 +160,10 @@ class Softmax : public NodeShader {
         /*input=*/IOStructure::ONLY_DEFINITIONS,
         /*output=*/IOStructure::ONLY_DEFINITIONS,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status GenerateCodeGeneral(const GenerationContext& ctx,
+  abslx::Status GenerateCodeGeneral(const GenerationContext& ctx,
                                    GeneratedCode* generated_code) const {
     std::vector<Variable> parameters = {
         {"src_depth",
@@ -208,7 +208,7 @@ class Softmax : public NodeShader {
         /*input=*/IOStructure::ONLY_DEFINITIONS,
         /*output=*/IOStructure::ONLY_DEFINITIONS,
     };
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

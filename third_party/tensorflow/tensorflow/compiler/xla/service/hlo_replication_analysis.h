@@ -43,7 +43,7 @@ class HloReplicationAnalysis {
   // replicas or partitions.
   static StatusOr<std::unique_ptr<HloReplicationAnalysis>> Run(
       const HloModule* module, bool cross_partition_spmd,
-      const absl::flat_hash_set<const HloInstruction*>*
+      const abslx::flat_hash_set<const HloInstruction*>*
           loops_known_with_same_iterations);
 
   // Same as above but supports finding partially replicated HLOs.
@@ -57,7 +57,7 @@ class HloReplicationAnalysis {
 
   bool HloInstructionIsReplicatedAt(
       const HloInstruction* inst, const ShapeIndex& index,
-      absl::Span<const ReplicaGroup> replica_groups) const;
+      abslx::Span<const ReplicaGroup> replica_groups) const;
 
  private:
   // A data structure that represents how an HLO is replicated among a set of
@@ -69,7 +69,7 @@ class HloReplicationAnalysis {
     static HloReplication ReplicatedOnAllDevices();
     static HloReplication UniqueOnAllDevices();
     static HloReplication PartiallyReplicated(
-        absl::Span<const absl::Span<const int64_t>> device_sets);
+        abslx::Span<const abslx::Span<const int64_t>> device_sets);
     HloReplication();
     HloReplication(const HloReplication& other) = default;
     HloReplication(HloReplication&& other) = default;
@@ -78,7 +78,7 @@ class HloReplicationAnalysis {
     bool Equal(const HloReplication& other) const;
     bool IsReplicatedOnAllDevices() const;
     bool IsUniqueOnAllDevices() const;
-    bool IsReplicatedWithinSubgroup(absl::Span<const int64_t> device_ids) const;
+    bool IsReplicatedWithinSubgroup(abslx::Span<const int64_t> device_ids) const;
     std::string ToString() const;
 
    private:
@@ -88,7 +88,7 @@ class HloReplicationAnalysis {
       kPartiallyReplicated = 2,
     };
     explicit HloReplication(State state,
-                            absl::Span<const int64_t> device_set_root);
+                            abslx::Span<const int64_t> device_set_root);
     State state_;
     // Empty if state_ is kReplicatedOnAllDevices or kUniqueOnAllDevices.
     // Otherwise, its size equals to the number of devices (either partitions
@@ -100,12 +100,12 @@ class HloReplicationAnalysis {
   static HloReplication DetermineHloInstructionIsReplicated(
       const HloInstruction* hlo, const ShapeIndex& index,
       bool cross_partition_spmd,
-      const absl::flat_hash_map<const HloInstruction*,
+      const abslx::flat_hash_map<const HloInstruction*,
                                 ShapeTree<HloReplication>>& hlo_replication,
       bool support_partial_replication);
 
   HloReplicationAnalysis(const HloModule* module, bool cross_partition_spmd,
-                         const absl::flat_hash_set<const HloInstruction*>*
+                         const abslx::flat_hash_set<const HloInstruction*>*
                              loops_known_with_same_iterations,
                          bool support_partial_replication)
       : module_(module),
@@ -136,7 +136,7 @@ class HloReplicationAnalysis {
   // A set of while loops that are known to have the same iteration counts
   // across replicas or partitions. This is provided by the caller as additional
   // annotations.
-  const absl::flat_hash_set<const HloInstruction*>&
+  const abslx::flat_hash_set<const HloInstruction*>&
       loops_known_with_same_iterations_;
 
   const bool support_partial_replication_;
@@ -144,7 +144,7 @@ class HloReplicationAnalysis {
   // A map from each analyzed HLO instruction to a shape tree that represents
   // whether the instruction outputs the same value across replicas or
   // partitions at each shape index.
-  absl::flat_hash_map<const HloInstruction*, ShapeTree<HloReplication>>
+  abslx::flat_hash_map<const HloInstruction*, ShapeTree<HloReplication>>
       hlo_replication_;
 };
 

@@ -40,9 +40,9 @@ limitations under the License.
 namespace tensorflow {
 namespace {
 
-void ExpectErrorContains(const Status& status, absl::string_view str) {
+void ExpectErrorContains(const Status& status, abslx::string_view str) {
   EXPECT_NE(OkStatus(), status);
-  EXPECT_TRUE(absl::StrContains(status.error_message(), str))
+  EXPECT_TRUE(abslx::StrContains(status.error_message(), str))
       << "expected error: " << status.error_message() << " to contain: " << str;
 }
 
@@ -161,7 +161,7 @@ static tf2xla::Config FetchesConfig(std::vector<string> fetches) {
   tf2xla::Config config;
   for (const auto& fetch_node_name : fetches) {
     auto* fetch = config.add_fetch();
-    fetch->set_name(absl::StrCat("fetch_", fetch_node_name));
+    fetch->set_name(abslx::StrCat("fetch_", fetch_node_name));
     fetch->mutable_id()->set_node_name(fetch_node_name);
   }
   return config;

@@ -84,7 +84,7 @@ StatusOr<ExecutionOutput> TpuExecutable::ExecuteAsyncOnStream(
 
     ApiConverter::ToC(arg.shape(), &se_args[i]->shape_tree.shape);
     auto* arg_buffers = arg.MutableBuffers();
-    absl::InlinedVector<SE_MaybeOwningDeviceMemory, 2> se_buffers;
+    abslx::InlinedVector<SE_MaybeOwningDeviceMemory, 2> se_buffers;
     for (auto& pair : *arg_buffers) {
       bool aliased = arg.unowned_indices().count(pair.first) > 0;
       se_buffers.push_back(ApiConverter::ToC(pair.second, aliased));
@@ -154,16 +154,16 @@ StatusOr<ExecutionOutput> TpuExecutable::ExecuteAsyncOnStream(
   return output;
 }
 
-absl::string_view TpuExecutable::fingerprint() const {
+abslx::string_view TpuExecutable::fingerprint() const {
   const char* data;
   size_t size;
   ExecutorApiFn()->TpuExecutable_FingerprintFn(se_executable_, &data, &size);
-  return absl::string_view(data, size);
+  return abslx::string_view(data, size);
 }
 
 StatusOr<std::string> TpuExecutable::Serialize() const {
   SE_ExecutableSerializationHandle* handle = nullptr;
-  absl::Cleanup cleanup = [&handle]() {
+  abslx::Cleanup cleanup = [&handle]() {
     ExecutorApiFn()->TpuExecutableSerialize_FreeHandleFn(handle);
   };
   StatusHelper status;
@@ -190,7 +190,7 @@ StatusOr<std::string> TpuExecutable::Serialize() const {
 }
 
 StatusOr<std::unique_ptr<TpuExecutable>> TpuExecutable::Deserialize(
-    absl::string_view serialized) {
+    abslx::string_view serialized) {
   SE_Executable* se_executable;
   StatusHelper status;
   ExecutorApiFn()->TpuExecutable_DeserializeFn(
@@ -201,12 +201,12 @@ StatusOr<std::unique_ptr<TpuExecutable>> TpuExecutable::Deserialize(
   }
   XLA_HloModule c_module =
       ExecutorApiFn()->TpuExecutable_HloModuleFn(se_executable);
-  absl::Cleanup cleanup_c_module = [&c_module]() {
+  abslx::Cleanup cleanup_c_module = [&c_module]() {
     ApiConverter::Destroy(&c_module);
   };
   TF_ASSIGN_OR_RETURN(std::unique_ptr<HloModule> hlo_module,
                       ApiConverter::FromC(c_module));
-  return absl::make_unique<TpuExecutable>(se_executable, std::move(hlo_module));
+  return abslx::make_unique<TpuExecutable>(se_executable, std::move(hlo_module));
 }
 
 }  // namespace xla

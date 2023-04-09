@@ -101,10 +101,10 @@ class PacketLatencyCalculator : public CalculatorBase {
  public:
   PacketLatencyCalculator() {}
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   // Resets the histogram and running average variables by initializing them to
@@ -139,7 +139,7 @@ class PacketLatencyCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(PacketLatencyCalculator);
 
-absl::Status PacketLatencyCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status PacketLatencyCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK_GT(cc->Inputs().NumEntries(), 1);
 
   // Input and output streams.
@@ -160,7 +160,7 @@ absl::Status PacketLatencyCalculator::GetContract(CalculatorContract* cc) {
         .Set<std::shared_ptr<::mediapipe::Clock>>();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void PacketLatencyCalculator::ResetStatistics() {
@@ -177,7 +177,7 @@ void PacketLatencyCalculator::ResetStatistics() {
   }
 }
 
-absl::Status PacketLatencyCalculator::Open(CalculatorContext* cc) {
+abslx::Status PacketLatencyCalculator::Open(CalculatorContext* cc) {
   options_ = cc->Options<PacketLatencyCalculatorOptions>();
   num_packet_streams_ = cc->Inputs().NumEntries() - 1;
 
@@ -224,25 +224,25 @@ absl::Status PacketLatencyCalculator::Open(CalculatorContext* cc) {
         ::mediapipe::MonotonicClock::CreateSynchronizedMonotonicClock());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PacketLatencyCalculator::Process(CalculatorContext* cc) {
+abslx::Status PacketLatencyCalculator::Process(CalculatorContext* cc) {
   // Record first process timestamp if this is the first call.
   if (first_process_time_usec_ < 0 &&
       !cc->Inputs().Tag(kReferenceSignalTag).IsEmpty()) {
-    first_process_time_usec_ = absl::ToUnixMicros(clock_->TimeNow());
+    first_process_time_usec_ = abslx::ToUnixMicros(clock_->TimeNow());
     first_reference_timestamp_usec_ = cc->InputTimestamp().Value();
     last_reset_time_usec_ = first_process_time_usec_;
   }
 
   if (first_process_time_usec_ < 0) {
     LOG(WARNING) << "No reference packet received.";
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   if (options_.reset_duration_usec() > 0) {
-    const int64 time_now_usec = absl::ToUnixMicros(clock_->TimeNow());
+    const int64 time_now_usec = abslx::ToUnixMicros(clock_->TimeNow());
     if (time_now_usec - last_reset_time_usec_ >=
         options_.reset_duration_usec()) {
       ResetStatistics();
@@ -256,7 +256,7 @@ absl::Status PacketLatencyCalculator::Process(CalculatorContext* cc) {
       const auto& packet_timestamp_usec = cc->InputTimestamp().Value();
 
       // Update latency statistics for this stream.
-      int64 current_clock_time_usec = absl::ToUnixMicros(clock_->TimeNow());
+      int64 current_clock_time_usec = abslx::ToUnixMicros(clock_->TimeNow());
       int64 current_calibrated_timestamp_usec =
           (current_clock_time_usec - first_process_time_usec_) +
           first_reference_timestamp_usec_;
@@ -286,13 +286,13 @@ absl::Status PacketLatencyCalculator::Process(CalculatorContext* cc) {
 
       // Push the latency packet to output.
       auto packet_latency =
-          absl::make_unique<PacketLatency>(packet_latencies_[i]);
+          abslx::make_unique<PacketLatency>(packet_latencies_[i]);
       cc->Outputs().Index(i).Add(packet_latency.release(),
                                  cc->InputTimestamp());
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

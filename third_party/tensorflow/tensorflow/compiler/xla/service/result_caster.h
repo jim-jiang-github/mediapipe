@@ -29,7 +29,7 @@ class ResultCaster : public OpExpanderPass {
   explicit ResultCaster(HloPredicate extra_filter = nullptr)
       : OpExpanderPass(std::move(extra_filter)) {}
 
-  absl::string_view name() const override { return "result_caster"; }
+  abslx::string_view name() const override { return "result_caster"; }
 
  protected:
   bool InstructionMatchesPattern(HloInstruction* instruction) override;

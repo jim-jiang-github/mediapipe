@@ -69,7 +69,7 @@ class ZlibInputStream : public InputStreamInterface {
   Status ReadNBytes(int64_t bytes_to_read, tstring* result) override;
 
 #if defined(TF_CORD_SUPPORT)
-  Status ReadNBytes(int64_t bytes_to_read, absl::Cord* result) override;
+  Status ReadNBytes(int64_t bytes_to_read, abslx::Cord* result) override;
 #endif
 
   int64_t Tell() const override;

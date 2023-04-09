@@ -43,7 +43,7 @@ class DeviceResolverDistributed : public DeviceResolverInterface {
  protected:
   const string task_name_;
   mutex mu_;
-  absl::flat_hash_map<string, DeviceAttributes> attr_table_ TF_GUARDED_BY(mu_);
+  abslx::flat_hash_map<string, DeviceAttributes> attr_table_ TF_GUARDED_BY(mu_);
 };
 
 }  // namespace tensorflow

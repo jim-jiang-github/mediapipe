@@ -91,7 +91,7 @@ ENTRY %entry (a: f32[]) -> f32[] {
   std::vector<std::unique_ptr<HloModule>> modules;
   modules.push_back(std::move(module_0));
   modules.push_back(std::move(module_1));
-  HloModuleGroup group(TestName(), absl::MakeSpan(modules));
+  HloModuleGroup group(TestName(), abslx::MakeSpan(modules));
   EXPECT_EQ(group.modules().size(), 2);
   EXPECT_THAT(
       group.module(0).entry_computation()->instructions(),
@@ -180,7 +180,7 @@ ENTRY entry {
       const int64_t send_channel = i;
       const int64_t recv_channel = i == 0 ? kDeviceCount - 1 : i - 1;
       TF_ASSERT_OK_AND_ASSIGN(std::unique_ptr<HloModule> module,
-                              ParseAndReturnVerifiedModule(absl::StrFormat(
+                              ParseAndReturnVerifiedModule(abslx::StrFormat(
                                   text, i, send_channel, send_channel,
                                   recv_channel, recv_channel)));
       group.push_back(std::move(module));
@@ -201,7 +201,7 @@ ENTRY entry {
     if (t == 0) {
       companion_order = module_ids;
     } else {
-      EXPECT_TRUE(absl::c_equal(companion_order, module_ids));
+      EXPECT_TRUE(abslx::c_equal(companion_order, module_ids));
     }
   }
 }

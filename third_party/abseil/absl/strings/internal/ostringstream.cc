@@ -14,7 +14,7 @@
 
 #include "absl/strings/internal/ostringstream.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace strings_internal {
 
@@ -33,4 +33,4 @@ std::streamsize OStringStream::xsputn(const char* s, std::streamsize n) {
 
 }  // namespace strings_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -42,10 +42,10 @@ class ChangeOpDataType : public HloModulePass {
                    std::function<bool(const HloInstruction*)> op_matcher)
       : from_ty_(from_ty), to_ty_(to_ty), op_matcher_(op_matcher) {}
 
-  absl::string_view name() const override { return "change-op-data-type"; }
+  abslx::string_view name() const override { return "change-op-data-type"; }
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   PrimitiveType from_ty_;

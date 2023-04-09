@@ -182,7 +182,7 @@ PYBIND11_MODULE(xla_extension, m) {
               return std::visit([](auto&& v) { return py::cast(v); },
                                 it->second);
             }
-            throw py::attribute_error(absl::StrCat("Unknown attribute ", name));
+            throw py::attribute_error(abslx::StrCat("Unknown attribute ", name));
           });
 
   // Local XLA client methods.
@@ -448,7 +448,7 @@ PYBIND11_MODULE(xla_extension, m) {
              int64_t timeout_in_ms) {
             py::gil_scoped_release gil_release;
             return client.BlockingKeyValueGet(
-                key, absl::Milliseconds(timeout_in_ms));
+                key, abslx::Milliseconds(timeout_in_ms));
           },
           py::arg("key"), py::arg("timeout_in_ms"))
       .def(
@@ -457,7 +457,7 @@ PYBIND11_MODULE(xla_extension, m) {
              int64_t timeout_in_ms) {
             py::gil_scoped_release gil_release;
             return client.WaitAtBarrier(barrier_id,
-                                        absl::Milliseconds(timeout_in_ms));
+                                        abslx::Milliseconds(timeout_in_ms));
           },
           py::arg("barrier_id"), py::arg("timeout_in_ms"))
       .def(
@@ -480,17 +480,17 @@ PYBIND11_MODULE(xla_extension, m) {
         DistributedRuntimeServiceImpl::Options options;
         options.num_nodes = num_nodes;
         if (heartbeat_interval.has_value()) {
-          options.heartbeat_interval = absl::Seconds(*heartbeat_interval);
+          options.heartbeat_interval = abslx::Seconds(*heartbeat_interval);
         }
         if (max_missing_heartbeats.has_value()) {
           options.max_missing_heartbeats = *max_missing_heartbeats;
         }
         if (enumerate_devices_timeout.has_value()) {
           options.enumerate_devices_timeout =
-              absl::Seconds(*enumerate_devices_timeout);
+              abslx::Seconds(*enumerate_devices_timeout);
         }
         if (shutdown_timeout.has_value()) {
-          options.shutdown_timeout = absl::Seconds(*shutdown_timeout);
+          options.shutdown_timeout = abslx::Seconds(*shutdown_timeout);
         }
         TF_ASSIGN_OR_RETURN(std::unique_ptr<DistributedRuntimeService> service,
                             GetDistributedRuntimeService(
@@ -519,16 +519,16 @@ PYBIND11_MODULE(xla_extension, m) {
         DistributedRuntimeClient::Options options;
         options.node_id = node_id;
         if (rpc_timeout.has_value()) {
-          options.rpc_timeout = absl::Seconds(*rpc_timeout);
+          options.rpc_timeout = abslx::Seconds(*rpc_timeout);
         }
         if (init_timeout.has_value()) {
-          options.init_timeout = absl::Seconds(*init_timeout);
+          options.init_timeout = abslx::Seconds(*init_timeout);
         }
         if (shutdown_timeout.has_value()) {
-          options.shutdown_timeout = absl::Seconds(*shutdown_timeout);
+          options.shutdown_timeout = abslx::Seconds(*shutdown_timeout);
         }
         if (heartbeat_interval.has_value()) {
-          options.heartbeat_interval = absl::Seconds(*heartbeat_interval);
+          options.heartbeat_interval = abslx::Seconds(*heartbeat_interval);
         }
         if (max_missing_heartbeats.has_value()) {
           options.max_missing_heartbeats = *max_missing_heartbeats;

@@ -22,10 +22,10 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status Winograd4x4To36TileX6Test(TestExecutionEnvironment* env);
-absl::Status Winograd36To4x4Tile4x1Test(TestExecutionEnvironment* env);
-absl::Status Winograd4x4To36Test(TestExecutionEnvironment* env);
-absl::Status Winograd36To4x4Test(TestExecutionEnvironment* env);
+abslx::Status Winograd4x4To36TileX6Test(TestExecutionEnvironment* env);
+abslx::Status Winograd36To4x4Tile4x1Test(TestExecutionEnvironment* env);
+abslx::Status Winograd4x4To36Test(TestExecutionEnvironment* env);
+abslx::Status Winograd36To4x4Test(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

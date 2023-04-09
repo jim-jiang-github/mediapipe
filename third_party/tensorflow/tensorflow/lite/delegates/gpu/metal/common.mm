@@ -37,7 +37,7 @@ namespace metal {
 
 id<MTLDevice> GetBestSupportedMetalDevice() { return MTLCreateSystemDefaultDevice(); }
 
-absl::Status CreateComputeProgram(id<MTLDevice> device, const std::string& code,
+abslx::Status CreateComputeProgram(id<MTLDevice> device, const std::string& code,
                                   const std::string& function_name,
                                   const std::map<std::string, std::string>& macros,
                                   id<MTLComputePipelineState>* program) {
@@ -50,12 +50,12 @@ absl::Status CreateComputeProgram(id<MTLDevice> device, const std::string& code,
     NSString* errorString =
         [NSString stringWithFormat:@"newComputePipelineStateWithFunction error: %@",
                                    [error localizedDescription]];
-    return absl::InternalError([errorString UTF8String]);
+    return abslx::InternalError([errorString UTF8String]);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CreateComputeProgramWithArgumentBuffer(
+abslx::Status CreateComputeProgramWithArgumentBuffer(
     id<MTLDevice> device, const std::string& code, const std::string& function_name,
     const std::map<std::string, std::string>& macros, id<MTLComputePipelineState>* program,
     id<MTLArgumentEncoder>* arguments_encoder) {
@@ -64,7 +64,7 @@ absl::Status CreateComputeProgramWithArgumentBuffer(
     RETURN_IF_ERROR(CreateFunction(device, code, "ComputeFunction", macros, &function));
     *arguments_encoder = [function newArgumentEncoderWithBufferIndex:0];
     if (!*arguments_encoder) {
-      return absl::InternalError("Failed to get MTLArgumentEncoder.");
+      return abslx::InternalError("Failed to get MTLArgumentEncoder.");
     }
     MTLComputePipelineDescriptor* pipeline_desc = [[MTLComputePipelineDescriptor alloc] init];
     pipeline_desc.computeFunction = function;
@@ -77,16 +77,16 @@ absl::Status CreateComputeProgramWithArgumentBuffer(
       NSString* error_string =
           [NSString stringWithFormat:@"newComputePipelineStateWithDescriptor: %@",
                                      [error localizedDescription]];
-      return absl::InternalError([error_string UTF8String]);
+      return abslx::InternalError([error_string UTF8String]);
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   } else {
-    return absl::InternalError("Metal argument buffers available since ios 11, tvos 11 or macos "
+    return abslx::InternalError("Metal argument buffers available since ios 11, tvos 11 or macos "
                                "10.13.");
   }
 }
 
-absl::Status CreateComputeProgramWithICBSupport(id<MTLDevice> device, const std::string& code,
+abslx::Status CreateComputeProgramWithICBSupport(id<MTLDevice> device, const std::string& code,
                                                 const std::string& function_name,
                                                 const std::map<std::string, std::string>& macros,
                                                 id<MTLComputePipelineState>* program,
@@ -96,7 +96,7 @@ absl::Status CreateComputeProgramWithICBSupport(id<MTLDevice> device, const std:
     RETURN_IF_ERROR(CreateFunction(device, code, "ComputeFunction", macros, &function));
     *arguments_encoder = [function newArgumentEncoderWithBufferIndex:0];
     if (!*arguments_encoder) {
-      return absl::InternalError("Failed to get MTLArgumentEncoder.");
+      return abslx::InternalError("Failed to get MTLArgumentEncoder.");
     }
     MTLComputePipelineDescriptor* pipeline_desc = [[MTLComputePipelineDescriptor alloc] init];
     pipeline_desc.computeFunction = function;
@@ -110,16 +110,16 @@ absl::Status CreateComputeProgramWithICBSupport(id<MTLDevice> device, const std:
       NSString* error_string =
           [NSString stringWithFormat:@"newComputePipelineStateWithDescriptor: %@",
                                      [error localizedDescription]];
-      return absl::InternalError([error_string UTF8String]);
+      return abslx::InternalError([error_string UTF8String]);
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   } else {
-    return absl::InternalError("Indirect compute command buffer available since ios 13, tvos 13 "
+    return abslx::InternalError("Indirect compute command buffer available since ios 13, tvos 13 "
                                "or macos 11.00");
   }
 }
 
-absl::Status CreateFunction(id<MTLDevice> device, const std::string& code,
+abslx::Status CreateFunction(id<MTLDevice> device, const std::string& code,
                             const std::string& function_name,
                             const std::map<std::string, std::string>& macros,
                             id<MTLFunction>* function) {
@@ -157,10 +157,10 @@ absl::Status CreateFunction(id<MTLDevice> device, const std::string& code,
   for (const auto& pair : macros) {
     std::string key = pair.first;
     std::string value = pair.second;
-    if (absl::StrContains(key, ' ')) {
+    if (abslx::StrContains(key, ' ')) {
       key = "\"" + key + "\"";
     }
-    if (absl::StrContains(value, ' ')) {
+    if (abslx::StrContains(value, ' ')) {
       value = "\"" + value + "\"";
     }
     [macros_dict setObject:[NSString stringWithCString:value.c_str()
@@ -178,7 +178,7 @@ absl::Status CreateFunction(id<MTLDevice> device, const std::string& code,
   if (!library) {
     NSString* errorString =
         [NSString stringWithFormat:@"newLibraryWithSource: %@", [error localizedDescription]];
-    return absl::InternalError([errorString UTF8String]);
+    return abslx::InternalError([errorString UTF8String]);
   }
 
   NSString* function_name_ns = [NSString stringWithCString:function_name.c_str()
@@ -187,9 +187,9 @@ absl::Status CreateFunction(id<MTLDevice> device, const std::string& code,
   if (!*function) {
     NSString* errorString =
         [NSString stringWithFormat:@"newFunctionWithName: %@", [error localizedDescription]];
-    return absl::InternalError([errorString UTF8String]);
+    return abslx::InternalError([errorString UTF8String]);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 int PixelFormatToSizeInBytes(MTLPixelFormat pixel_format) {

@@ -49,7 +49,7 @@ class ModelTaskGraph : public Subgraph {
   // Returns the graph config to use for one instantiation of the model task
   // graph. Must be overridden by subclasses in which the graph authors define
   // the concrete task graphs based on user settings and model metadata.
-  absl::StatusOr<mediapipe::CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<mediapipe::CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override;
 
  protected:
@@ -62,7 +62,7 @@ class ModelTaskGraph : public Subgraph {
   // If more than one model resources are created in a graph, the model
   // resources graph service add the tag_suffix to support multiple resources.
   template <typename Options>
-  absl::StatusOr<const ModelResources*> CreateModelResources(
+  abslx::StatusOr<const ModelResources*> CreateModelResources(
       SubgraphContext* sc, std::string tag_suffix = "") {
     auto external_file = std::make_unique<proto::ExternalFile>();
     external_file->Swap(sc->MutableOptions<Options>()
@@ -83,7 +83,7 @@ class ModelTaskGraph : public Subgraph {
   // resource. If more than one model resources are created in a graph, the
   // model resources graph service add the tag_suffix to support multiple
   // resources.
-  absl::StatusOr<const ModelResources*> CreateModelResources(
+  abslx::StatusOr<const ModelResources*> CreateModelResources(
       SubgraphContext* sc, std::unique_ptr<proto::ExternalFile> external_file,
       std::string tag_suffix = "");
 
@@ -95,7 +95,7 @@ class ModelTaskGraph : public Subgraph {
   // resources pointer will provide graph authors with the access to extracted
   // model files.
   template <typename Options>
-  absl::StatusOr<const ModelAssetBundleResources*>
+  abslx::StatusOr<const ModelAssetBundleResources*>
   CreateModelAssetBundleResources(SubgraphContext* sc) {
     auto external_file = std::make_unique<proto::ExternalFile>();
     external_file->Swap(sc->MutableOptions<Options>()
@@ -116,7 +116,7 @@ class ModelTaskGraph : public Subgraph {
   // asscoiated with the created model asset bundle resource. If more than one
   // model asset bundle resources are created in a graph, the model resources
   // graph service add the tag_suffix to support multiple resources.
-  absl::StatusOr<const ModelAssetBundleResources*>
+  abslx::StatusOr<const ModelAssetBundleResources*>
   CreateModelAssetBundleResources(
       SubgraphContext* sc, std::unique_ptr<proto::ExternalFile> external_file,
       const std::string tag_suffix = "");

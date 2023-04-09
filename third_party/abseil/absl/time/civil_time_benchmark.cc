@@ -39,18 +39,18 @@ namespace {
 // BM_CivilSecondAbslHash           4.10           4.10   171800000
 
 void BM_Difference_Days(benchmark::State& state) {
-  const absl::CivilDay c(2014, 8, 22);
-  const absl::CivilDay epoch(1970, 1, 1);
+  const abslx::CivilDay c(2014, 8, 22);
+  const abslx::CivilDay epoch(1970, 1, 1);
   while (state.KeepRunning()) {
-    const absl::civil_diff_t n = c - epoch;
+    const abslx::civil_diff_t n = c - epoch;
     benchmark::DoNotOptimize(n);
   }
 }
 BENCHMARK(BM_Difference_Days);
 
 void BM_Step_Days(benchmark::State& state) {
-  const absl::CivilDay kStart(2014, 8, 22);
-  absl::CivilDay c = kStart;
+  const abslx::CivilDay kStart(2014, 8, 22);
+  abslx::CivilDay c = kStart;
   while (state.KeepRunning()) {
     benchmark::DoNotOptimize(++c);
   }
@@ -58,9 +58,9 @@ void BM_Step_Days(benchmark::State& state) {
 BENCHMARK(BM_Step_Days);
 
 void BM_Format(benchmark::State& state) {
-  const absl::CivilSecond c(2014, 1, 2, 3, 4, 5);
+  const abslx::CivilSecond c(2014, 1, 2, 3, 4, 5);
   while (state.KeepRunning()) {
-    const std::string s = absl::FormatCivilTime(c);
+    const std::string s = abslx::FormatCivilTime(c);
     benchmark::DoNotOptimize(s);
   }
 }
@@ -68,19 +68,19 @@ BENCHMARK(BM_Format);
 
 void BM_Parse(benchmark::State& state) {
   const std::string f = "2014-01-02T03:04:05";
-  absl::CivilSecond c;
+  abslx::CivilSecond c;
   while (state.KeepRunning()) {
-    const bool b = absl::ParseCivilTime(f, &c);
+    const bool b = abslx::ParseCivilTime(f, &c);
     benchmark::DoNotOptimize(b);
   }
 }
 BENCHMARK(BM_Parse);
 
 void BM_RoundTripFormatParse(benchmark::State& state) {
-  const absl::CivilSecond c(2014, 1, 2, 3, 4, 5);
-  absl::CivilSecond out;
+  const abslx::CivilSecond c(2014, 1, 2, 3, 4, 5);
+  abslx::CivilSecond out;
   while (state.KeepRunning()) {
-    const bool b = absl::ParseCivilTime(absl::FormatCivilTime(c), &out);
+    const bool b = abslx::ParseCivilTime(abslx::FormatCivilTime(c), &out);
     benchmark::DoNotOptimize(b);
   }
 }
@@ -92,7 +92,7 @@ void BM_CivilTimeAbslHash(benchmark::State& state) {
   std::vector<T> civil_times(kSize);
   std::iota(civil_times.begin(), civil_times.end(), T(2018));
 
-  absl::Hash<T> absl_hasher;
+  abslx::Hash<T> absl_hasher;
   while (state.KeepRunningBatch(kSize)) {
     for (const T civil_time : civil_times) {
       benchmark::DoNotOptimize(absl_hasher(civil_time));
@@ -100,22 +100,22 @@ void BM_CivilTimeAbslHash(benchmark::State& state) {
   }
 }
 void BM_CivilYearAbslHash(benchmark::State& state) {
-  BM_CivilTimeAbslHash<absl::CivilYear>(state);
+  BM_CivilTimeAbslHash<abslx::CivilYear>(state);
 }
 void BM_CivilMonthAbslHash(benchmark::State& state) {
-  BM_CivilTimeAbslHash<absl::CivilMonth>(state);
+  BM_CivilTimeAbslHash<abslx::CivilMonth>(state);
 }
 void BM_CivilDayAbslHash(benchmark::State& state) {
-  BM_CivilTimeAbslHash<absl::CivilDay>(state);
+  BM_CivilTimeAbslHash<abslx::CivilDay>(state);
 }
 void BM_CivilHourAbslHash(benchmark::State& state) {
-  BM_CivilTimeAbslHash<absl::CivilHour>(state);
+  BM_CivilTimeAbslHash<abslx::CivilHour>(state);
 }
 void BM_CivilMinuteAbslHash(benchmark::State& state) {
-  BM_CivilTimeAbslHash<absl::CivilMinute>(state);
+  BM_CivilTimeAbslHash<abslx::CivilMinute>(state);
 }
 void BM_CivilSecondAbslHash(benchmark::State& state) {
-  BM_CivilTimeAbslHash<absl::CivilSecond>(state);
+  BM_CivilTimeAbslHash<abslx::CivilSecond>(state);
 }
 BENCHMARK(BM_CivilYearAbslHash);
 BENCHMARK(BM_CivilMonthAbslHash);

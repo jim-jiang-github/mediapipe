@@ -321,9 +321,9 @@ void TF_MaybeLockVariableInputMutexesInOrder(
   std::sort(acquire_order.begin(), acquire_order.end(),
             [&mutexes](int a, int b) { return mutexes[a] < mutexes[b]; });
 
-  auto locks = absl::make_unique<std::vector<tensorflow::mutex_lock>>();
+  auto locks = abslx::make_unique<std::vector<tensorflow::mutex_lock>>();
   auto shared_locks =
-      absl::make_unique<std::vector<tensorflow::tf_shared_lock>>();
+      abslx::make_unique<std::vector<tensorflow::tf_shared_lock>>();
   locks->reserve(acquire_order.size());
 
   for (auto input : acquire_order) {

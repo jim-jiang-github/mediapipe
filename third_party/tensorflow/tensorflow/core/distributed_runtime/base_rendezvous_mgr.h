@@ -99,7 +99,7 @@ class BaseRendezvousMgr : public RendezvousMgrInterface {
 
  private:
   // Maps step_id to rendezvous.
-  typedef absl::flat_hash_map<int64_t, BaseRemoteRendezvous*> Table;
+  typedef abslx::flat_hash_map<int64_t, BaseRemoteRendezvous*> Table;
 
   // Not owned.
   const WorkerEnv* const worker_env_;
@@ -214,9 +214,9 @@ class BaseRemoteRendezvous : public RemoteRendezvous {
   // manager.
   //
   // Note: pointer to CancellationManager can be nullptr in certain use cases.
-  absl::flat_hash_map<
+  abslx::flat_hash_map<
       CancellationManager*,
-      std::pair<CancellationToken, absl::flat_hash_set<BaseRecvTensorCall*>>>
+      std::pair<CancellationToken, abslx::flat_hash_set<BaseRecvTensorCall*>>>
       calls_ TF_GUARDED_BY(calls_mu_);
 
   bool is_initialized_locked() TF_SHARED_LOCKS_REQUIRED(mu_) {

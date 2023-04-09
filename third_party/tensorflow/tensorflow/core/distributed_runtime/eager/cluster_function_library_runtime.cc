@@ -95,7 +95,7 @@ void EagerClusterFunctionLibraryRuntime::Instantiate(
           .ToProto();
   StripDefaultAttributesInRegisterFunctionOp(register_function);
 
-  const absl::optional<std::vector<int>>& ret_indices = options.ret_indices;
+  const abslx::optional<std::vector<int>>& ret_indices = options.ret_indices;
   eager_client->EnqueueAsync(
       /*call_opts=*/nullptr, request.get(), response.get(),
       [this, request, response, handle, released_op = released_op.release(),
@@ -105,7 +105,7 @@ void EagerClusterFunctionLibraryRuntime::Instantiate(
           mutex_lock l(mu_);
           *handle = function_data_.size();
           function_data_.emplace_back(target, ret_indices, eager_client,
-                                      absl::WrapUnique(released_op));
+                                      abslx::WrapUnique(released_op));
         }
         done(s);
       });

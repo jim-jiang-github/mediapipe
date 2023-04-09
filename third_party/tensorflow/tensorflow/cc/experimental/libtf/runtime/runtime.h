@@ -44,7 +44,7 @@ class Runtime : public Object {
   ///
   /// @param name The name of the module / file path to load
   /// @return An `Object` representing the module, if successful.  Otherwise, a
-  /// non-ok `absl::Status`.
+  /// non-ok `abslx::Status`.
   tensorflow::StatusOr<Object> Load(const String& name);
   // TODO(b/186787000): Loading a module with identically-named functions as
   // a previously loaded module results in undefined behavior. This
@@ -59,24 +59,24 @@ class Runtime : public Object {
   // device tensors b/187222691 and enable buffer re-use b/187223179.
   // TODO(b/190715501): Make this available via a soft API as well.
   template <class T>
-  tensorflow::StatusOr<Tensor> CreateHostTensor(absl::Span<const int64_t> shape,
+  tensorflow::StatusOr<Tensor> CreateHostTensor(abslx::Span<const int64_t> shape,
                                                 int dtype,
-                                                absl::Span<const T> data);
+                                                abslx::Span<const T> data);
 };
 
 template <class T>
 tensorflow::StatusOr<Tensor> Runtime::CreateHostTensor(
-    absl::Span<const int64_t> shape, int dtype, absl::Span<const T> data) {
+    abslx::Span<const int64_t> shape, int dtype, abslx::Span<const T> data) {
   size_t num_elements = 1;
   for (int dim = 0; dim < shape.size(); dim++) {
     if (shape[dim] < 0) {
-      return tensorflow::errors::InvalidArgument(absl::StrCat(
+      return tensorflow::errors::InvalidArgument(abslx::StrCat(
           "Shape must be fully-defined, got: shape[", dim, "] = ", shape[dim]));
     }
     num_elements *= shape[dim];
   }
   if (data.size() != num_elements) {
-    return tensorflow::errors::InvalidArgument(absl::StrCat(
+    return tensorflow::errors::InvalidArgument(abslx::StrCat(
         "Mismatched shape and data size: \n", "Shape num_elements: ",
         num_elements, "\n", "Data size: ", data.size(), "\n"));
   }
@@ -91,7 +91,7 @@ tensorflow::StatusOr<Tensor> Runtime::CreateHostTensor(
   // TODO(srbs): This is still a weak check. Check that dtype and T are
   // compatible.
   if (t->ByteSize() != sizeof(T) * data.size()) {
-    return tensorflow::errors::InvalidArgument(absl::StrCat(
+    return tensorflow::errors::InvalidArgument(abslx::StrCat(
         "Invalid number of bytes in data buffer\n", "Expected bytes: ",
         t->ByteSize(), "\n", "Actual bytes: ", sizeof(T) * data.size()));
   }

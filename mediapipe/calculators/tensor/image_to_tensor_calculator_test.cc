@@ -45,7 +45,7 @@ constexpr char kTestDataDir[] =
     "/mediapipe/calculators/tensor/testdata/"
     "image_to_tensor/";
 
-std::string GetFilePath(absl::string_view filename) {
+std::string GetFilePath(abslx::string_view filename) {
   return file::JoinPath("./", kTestDataDir, filename);
 }
 
@@ -55,7 +55,7 @@ void RunTestWithInputImagePacket(const Packet& input_image_packet,
                                  cv::Mat expected_result, float range_min,
                                  float range_max, int tensor_width,
                                  int tensor_height, bool keep_aspect,
-                                 absl::optional<BorderMode> border_mode,
+                                 abslx::optional<BorderMode> border_mode,
                                  const mediapipe::NormalizedRect& roi,
                                  bool output_int_tensor) {
   std::string border_mode_str;
@@ -72,14 +72,14 @@ void RunTestWithInputImagePacket(const Packet& input_image_packet,
   std::string output_tensor_range;
   if (output_int_tensor) {
     if (range_min < 0) {
-      output_tensor_range = absl::Substitute(R"(output_tensor_int_range {
+      output_tensor_range = abslx::Substitute(R"(output_tensor_int_range {
                 min: $0
                 max: $1
               })",
                                              static_cast<int>(range_min),
                                              static_cast<int>(range_max));
     } else {
-      output_tensor_range = absl::Substitute(R"(output_tensor_uint_range {
+      output_tensor_range = abslx::Substitute(R"(output_tensor_uint_range {
                 min: $0
                 max: $1
               })",
@@ -87,14 +87,14 @@ void RunTestWithInputImagePacket(const Packet& input_image_packet,
                                              static_cast<uint>(range_max));
     }
   } else {
-    output_tensor_range = absl::Substitute(R"(output_tensor_float_range {
+    output_tensor_range = abslx::Substitute(R"(output_tensor_float_range {
                 min: $0
                 max: $1
               })",
                                            range_min, range_max);
   }
   auto graph_config = mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(
-      absl::Substitute(R"(
+      abslx::Substitute(R"(
         input_stream: "input_image"
         input_stream: "roi"
         node {
@@ -218,7 +218,7 @@ void RunTest(cv::Mat input, cv::Mat expected_result,
              std::vector<std::pair<float, float>> float_ranges,
              std::vector<std::pair<int, int>> int_ranges, int tensor_width,
              int tensor_height, bool keep_aspect,
-             absl::optional<BorderMode> border_mode,
+             abslx::optional<BorderMode> border_mode,
              const mediapipe::NormalizedRect& roi) {
   for (auto input_type : kInputTypesToTest) {
     for (auto float_range : float_ranges) {

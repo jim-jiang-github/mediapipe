@@ -30,8 +30,8 @@ class TestCostMeasurement : public CostMeasurement {
  public:
   using CostMeasurement::CostMeasurement;
 
-  absl::Duration GetTotalCost() override { return absl::ZeroDuration(); }
-  absl::string_view GetCostType() const override { return kTestCostName; }
+  abslx::Duration GetTotalCost() override { return abslx::ZeroDuration(); }
+  abslx::string_view GetCostType() const override { return kTestCostName; }
 };
 
 REGISTER_COST_MEASUREMENT(kTestCostName, TestCostMeasurement);
@@ -53,7 +53,7 @@ TEST(CostMeasurementRegistryDeathTest, CrashWhenRegisterTwice) {
   };
   EXPECT_DEATH(
       CostMeasurementRegistry::RegisterCostMeasurement(kTestCostName, creator),
-      absl::StrCat("CostMeasurement ", kTestCostName, " is registered twice."));
+      abslx::StrCat("CostMeasurement ", kTestCostName, " is registered twice."));
 }
 
 }  // namespace

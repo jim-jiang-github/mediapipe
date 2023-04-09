@@ -120,7 +120,7 @@ Status PropagateShapes(Graph* graph,
           Node* var_node;
           TF_RETURN_IF_ERROR(n->input_node(0, &var_node));
           const_def.set_name(
-              graph->NewName(absl::StrCat("var_shape_", var_node->name())));
+              graph->NewName(abslx::StrCat("var_shape_", var_node->name())));
           DataType dtype = n->output_type(0);
           AddNodeAttr("dtype", dtype, &const_def);
           TensorProto value;

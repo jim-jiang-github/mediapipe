@@ -84,7 +84,7 @@ int RunEmbedder(const EmbedderOptions& options) {
       flatbuffers::GetRoot<Model>(metrics_model_contents.data());
 
   // Load sample images.
-  std::vector<std::string> jpeg_paths = absl::StrSplit(options.jpegs_arg, ',');
+  std::vector<std::string> jpeg_paths = abslx::StrSplit(options.jpegs_arg, ',');
   std::vector<std::string> jpeg_data;
   for (const std::string& jpeg_path : jpeg_paths) {
     std::string data;

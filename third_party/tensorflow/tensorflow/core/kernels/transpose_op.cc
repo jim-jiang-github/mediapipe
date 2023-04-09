@@ -163,7 +163,7 @@ void TransposeOp::Compute(OpKernelContext* ctx) {
   for (int i = 0; i < dims; ++i) {
     OP_REQUIRES(ctx, bits[i],
                 errors::InvalidArgument(i, " is missing from {",
-                                        absl::StrJoin(permutation, ","), "}."));
+                                        abslx::StrJoin(permutation, ","), "}."));
   }
 
   // 0-D, 1-D, and identity transposes do nothing.

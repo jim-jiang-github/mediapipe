@@ -27,7 +27,7 @@ limitations under the License.
 static bool Conv2dUseFp16Accumulate() {
   static bool use_fp16_accumulate = []() {
     const char* env = std::getenv("TF_CONV2D_USE_FP16_ACCUMULATE");
-    return (env != nullptr) && (absl::string_view(env) == "1");
+    return (env != nullptr) && (abslx::string_view(env) == "1");
   }();
   return use_fp16_accumulate;
 }

@@ -31,7 +31,7 @@
 //    trying to use the unwinder to instrument malloc().
 //
 // Note: if you add a new implementation here, make sure it works
-// correctly when absl::GetStackTrace() is called with max_depth == 0.
+// correctly when abslx::GetStackTrace() is called with max_depth == 0.
 // Some code may do that.
 
 #include "absl/debugging/stacktrace.h"
@@ -56,7 +56,7 @@
 # include "absl/debugging/internal/stacktrace_x86-inl.inc"
 #endif
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace {
 
@@ -137,4 +137,4 @@ int DefaultStackUnwinder(void** pcs, int* sizes, int depth, int skip,
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

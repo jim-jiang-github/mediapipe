@@ -46,12 +46,12 @@ TYPED_TEST_SUITE(DiscreteDistributionTypeTest, IntTypes);
 
 TYPED_TEST(DiscreteDistributionTypeTest, ParamSerializeTest) {
   using param_type =
-      typename absl::discrete_distribution<TypeParam>::param_type;
+      typename abslx::discrete_distribution<TypeParam>::param_type;
 
-  absl::discrete_distribution<TypeParam> empty;
+  abslx::discrete_distribution<TypeParam> empty;
   EXPECT_THAT(empty.probabilities(), testing::ElementsAre(1.0));
 
-  absl::discrete_distribution<TypeParam> before({1.0, 2.0, 1.0});
+  abslx::discrete_distribution<TypeParam> before({1.0, 2.0, 1.0});
 
   // Validate that the probabilities sum to 1.0. We picked values which
   // can be represented exactly to avoid floating-point roundoff error.
@@ -66,7 +66,7 @@ TYPED_TEST(DiscreteDistributionTypeTest, ParamSerializeTest) {
   {
     std::vector<double> data({1.0, 2.0, 1.0});
 
-    absl::discrete_distribution<TypeParam> via_param{
+    abslx::discrete_distribution<TypeParam> via_param{
         param_type(std::begin(data), std::end(data))};
 
     EXPECT_EQ(via_param, before);
@@ -74,7 +74,7 @@ TYPED_TEST(DiscreteDistributionTypeTest, ParamSerializeTest) {
 
   std::stringstream ss;
   ss << before;
-  absl::discrete_distribution<TypeParam> after;
+  abslx::discrete_distribution<TypeParam> after;
 
   EXPECT_NE(before, after);
 
@@ -86,12 +86,12 @@ TYPED_TEST(DiscreteDistributionTypeTest, ParamSerializeTest) {
 TYPED_TEST(DiscreteDistributionTypeTest, Constructor) {
   auto fn = [](double x) { return x; };
   {
-    absl::discrete_distribution<int> unary(0, 1.0, 9.0, fn);
+    abslx::discrete_distribution<int> unary(0, 1.0, 9.0, fn);
     EXPECT_THAT(unary.probabilities(), testing::ElementsAre(1.0));
   }
 
   {
-    absl::discrete_distribution<int> unary(2, 1.0, 9.0, fn);
+    abslx::discrete_distribution<int> unary(2, 1.0, 9.0, fn);
     // => fn(1.0 + 0 * 4 + 2) => 3
     // => fn(1.0 + 1 * 4 + 2) => 7
     EXPECT_THAT(unary.probabilities(), testing::ElementsAre(0.3, 0.7));
@@ -104,7 +104,7 @@ TEST(DiscreteDistributionTest, InitDiscreteDistribution) {
   {
     std::vector<double> p({1.0, 2.0, 3.0});
     std::vector<std::pair<double, size_t>> q =
-        absl::random_internal::InitDiscreteDistribution(&p);
+        abslx::random_internal::InitDiscreteDistribution(&p);
 
     EXPECT_THAT(p, testing::ElementsAre(1 / 6.0, 2 / 6.0, 3 / 6.0));
 
@@ -119,7 +119,7 @@ TEST(DiscreteDistributionTest, InitDiscreteDistribution) {
     std::vector<double> p({1.0, 2.0, 3.0, 5.0, 2.0});
 
     std::vector<std::pair<double, size_t>> q =
-        absl::random_internal::InitDiscreteDistribution(&p);
+        abslx::random_internal::InitDiscreteDistribution(&p);
 
     EXPECT_THAT(p, testing::ElementsAre(1 / 13.0, 2 / 13.0, 3 / 13.0, 5 / 13.0,
                                         2 / 13.0));
@@ -142,7 +142,7 @@ TEST(DiscreteDistributionTest, InitDiscreteDistribution) {
 }
 
 TEST(DiscreteDistributionTest, ChiSquaredTest50) {
-  using absl::random_internal::kChiSquared;
+  using abslx::random_internal::kChiSquared;
 
   constexpr size_t kTrials = 10000;
   constexpr int kBuckets = 50;  // inclusive, so actally +1
@@ -151,16 +151,16 @@ TEST(DiscreteDistributionTest, ChiSquaredTest50) {
   // in this file. And the test could fail for other reasons.
   // Empirically validated with --runs_per_test=10000.
   const int kThreshold =
-      absl::random_internal::ChiSquareValue(kBuckets, 0.99999);
+      abslx::random_internal::ChiSquareValue(kBuckets, 0.99999);
 
   std::vector<double> weights(kBuckets, 0);
   std::iota(std::begin(weights), std::end(weights), 1);
-  absl::discrete_distribution<int> dist(std::begin(weights), std::end(weights));
+  abslx::discrete_distribution<int> dist(std::begin(weights), std::end(weights));
 
   // We use a fixed bit generator for distribution accuracy tests.  This allows
   // these tests to be deterministic, while still testing the qualify of the
   // implementation.
-  absl::random_internal::pcg64_2018_engine rng(0x2B7E151628AED2A6);
+  abslx::random_internal::pcg64_2018_engine rng(0x2B7E151628AED2A6);
 
   std::vector<int32_t> counts(kBuckets, 0);
   for (size_t i = 0; i < kTrials; i++) {
@@ -178,20 +178,20 @@ TEST(DiscreteDistributionTest, ChiSquaredTest50) {
   }
 
   double chi_square =
-      absl::random_internal::ChiSquare(std::begin(counts), std::end(counts),
+      abslx::random_internal::ChiSquare(std::begin(counts), std::end(counts),
                                        std::begin(weights), std::end(weights));
 
   if (chi_square > kThreshold) {
     double p_value =
-        absl::random_internal::ChiSquarePValue(chi_square, kBuckets);
+        abslx::random_internal::ChiSquarePValue(chi_square, kBuckets);
 
     // Chi-squared test failed. Output does not appear to be uniform.
     std::string msg;
     for (size_t i = 0; i < counts.size(); i++) {
-      absl::StrAppend(&msg, i, ": ", counts[i], " vs ", weights[i], "\n");
+      abslx::StrAppend(&msg, i, ": ", counts[i], " vs ", weights[i], "\n");
     }
-    absl::StrAppend(&msg, kChiSquared, " p-value ", p_value, "\n");
-    absl::StrAppend(&msg, "High ", kChiSquared, " value: ", chi_square, " > ",
+    abslx::StrAppend(&msg, kChiSquared, " p-value ", p_value, "\n");
+    abslx::StrAppend(&msg, "High ", kChiSquared, " value: ", chi_square, " > ",
                     kThreshold);
     ABSL_RAW_LOG(INFO, "%s", msg.c_str());
     FAIL() << msg;
@@ -199,9 +199,9 @@ TEST(DiscreteDistributionTest, ChiSquaredTest50) {
 }
 
 TEST(DiscreteDistributionTest, StabilityTest) {
-  // absl::discrete_distribution stabilitiy relies on
-  // absl::uniform_int_distribution and absl::bernoulli_distribution.
-  absl::random_internal::sequence_urbg urbg(
+  // abslx::discrete_distribution stabilitiy relies on
+  // abslx::uniform_int_distribution and abslx::bernoulli_distribution.
+  abslx::random_internal::sequence_urbg urbg(
       {0x0003eb76f6f7f755ull, 0xFFCEA50FDB2F953Bull, 0xC332DDEFBE6C5AA5ull,
        0x6558218568AB9702ull, 0x2AEF7DAD5B6E2F84ull, 0x1521B62829076170ull,
        0xECDD4775619F1510ull, 0x13CCA830EB61BD96ull, 0x0334FE1EAA0363CFull,
@@ -210,7 +210,7 @@ TEST(DiscreteDistributionTest, StabilityTest) {
   std::vector<int> output(6);
 
   {
-    absl::discrete_distribution<int32_t> dist({1.0, 2.0, 3.0, 5.0, 2.0});
+    abslx::discrete_distribution<int32_t> dist({1.0, 2.0, 3.0, 5.0, 2.0});
     EXPECT_EQ(0, dist.min());
     EXPECT_EQ(4, dist.max());
     for (auto& v : output) {
@@ -236,7 +236,7 @@ TEST(DiscreteDistributionTest, StabilityTest) {
 
   {
     urbg.reset();
-    absl::discrete_distribution<int64_t> dist({1.0, 2.0, 3.0, 5.0, 2.0});
+    abslx::discrete_distribution<int64_t> dist({1.0, 2.0, 3.0, 5.0, 2.0});
     EXPECT_EQ(0, dist.min());
     EXPECT_EQ(4, dist.max());
     for (auto& v : output) {

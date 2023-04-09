@@ -211,7 +211,7 @@ bool HloOrdering::IsDefinedBefore(const HloValue& a, const HloValue& b) const {
 
 /* static */
 bool HloOrdering::UsesBeforeValueDefinition(
-    absl::Span<const HloUse* const> uses, const HloValue& value,
+    abslx::Span<const HloUse* const> uses, const HloValue& value,
     const HloDataflowAnalysis& dataflow,
     bool use_is_always_before_def_in_same_instr) const {
   bool has_use_in_exclusive_branches = false;
@@ -462,20 +462,20 @@ std::string PredecessorHloOrdering::ToStringHelper(
   std::vector<std::string> pieces;
   pieces.push_back(name);
   for (auto* computation : module_->MakeNonfusionComputations()) {
-    pieces.push_back(absl::StrFormat("computation %s:", computation->name()));
+    pieces.push_back(abslx::StrFormat("computation %s:", computation->name()));
     const auto all = computation->MakeInstructionPostOrder();
     for (auto instruction : all) {
       pieces.push_back(
-          absl::StrFormat("  %s predecessors:", instruction->name()));
+          abslx::StrFormat("  %s predecessors:", instruction->name()));
       for (auto predecessor : all) {
         if (predecessors_.at(computation)
                 ->IsReachable(predecessor, instruction)) {
-          pieces.push_back(absl::StrFormat("    %s", predecessor->name()));
+          pieces.push_back(abslx::StrFormat("    %s", predecessor->name()));
         }
       }
     }
   }
-  return absl::StrJoin(pieces, "\n");
+  return abslx::StrJoin(pieces, "\n");
 }
 
 DependencyHloOrdering::DependencyHloOrdering(const HloModule* module)
@@ -536,7 +536,7 @@ const HloInstructionSequence* SequentialHloOrdering::SequentialOrder(
 }
 
 std::string SequentialHloOrdering::ToString() const {
-  return absl::StrCat("SequentialHloOrdering\n", schedule_.ToString());
+  return abslx::StrCat("SequentialHloOrdering\n", schedule_.ToString());
 }
 
 }  // namespace xla

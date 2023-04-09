@@ -43,7 +43,7 @@ xla::Status CheckNumInputsOrOutputs(
     const tpu::TPUEmbeddingConfiguration& tpu_embedding_config) {
   if (tpu_embedding_config.feature_descriptor_size() == 0 &&
       num_input_or_outputs != tpu_embedding_config.table_descriptor_size()) {
-    return errors::InvalidArgument(absl::StrFormat(
+    return errors::InvalidArgument(abslx::StrFormat(
         "Number of tables in the TPU embedding config: %d does not match the "
         "%s attribute: %d in the %s node.",
         tpu_embedding_config.table_descriptor_size(), attribute_name,
@@ -52,7 +52,7 @@ xla::Status CheckNumInputsOrOutputs(
 
   if (tpu_embedding_config.feature_descriptor_size() > 0 &&
       num_input_or_outputs != tpu_embedding_config.feature_descriptor_size()) {
-    return errors::InvalidArgument(absl::StrFormat(
+    return errors::InvalidArgument(abslx::StrFormat(
         "Feature descriptor is set in tpu embedding config. But number of "
         "features in the TPU embedding config: %d does not match the "
         "%s attribute: %d in the %s node.",
@@ -65,14 +65,14 @@ xla::Status CheckNumInputsOrOutputs(
 // Constructs a NodeDef proto for the XlaRecvTPUEmbeddingDeduplicationData node
 // to be added to the graph or function def.
 xla::StatusOr<NodeDef> MakeRecvDeduplicationDataNodeDef(
-    absl::string_view device_name, absl::string_view tpu_replicate_attr,
-    absl::string_view tpu_embedding_config_str,
-    absl::Span<const std::string> control_inputs) {
+    abslx::string_view device_name, abslx::string_view tpu_replicate_attr,
+    abslx::string_view tpu_embedding_config_str,
+    abslx::Span<const std::string> control_inputs) {
   DeviceNameUtils::ParsedName parsed_name;
   TF_RET_CHECK(DeviceNameUtils::ParseFullName(device_name, &parsed_name));
 
   NodeDefBuilder builder(
-      absl::StrFormat("RecvTPUEmbeddingDeduplicationData_%s_%s_%d",
+      abslx::StrFormat("RecvTPUEmbeddingDeduplicationData_%s_%s_%d",
                       tpu_replicate_attr, parsed_name.type, parsed_name.id),
       "XlaRecvTPUEmbeddingDeduplicationData");
   if (!device_name.empty()) {
@@ -97,14 +97,14 @@ xla::StatusOr<NodeDef> MakeRecvDeduplicationDataNodeDef(
 // added to the graph or function def.
 xla::StatusOr<NodeDef> MakeRecvActivationsNodeDef(
     const NodeDef& old_activations_node_def,
-    absl::string_view deduplication_data_node_name,
-    absl::string_view device_name, absl::string_view tpu_replicate_attr,
-    absl::string_view tpu_embedding_config_str,
-    absl::Span<const NodeDefBuilder::NodeOut> data_inputs,
-    absl::Span<const std::string> control_inputs) {
+    abslx::string_view deduplication_data_node_name,
+    abslx::string_view device_name, abslx::string_view tpu_replicate_attr,
+    abslx::string_view tpu_embedding_config_str,
+    abslx::Span<const NodeDefBuilder::NodeOut> data_inputs,
+    abslx::Span<const std::string> control_inputs) {
   if (!data_inputs.empty()) {
     return errors::InvalidArgument(
-        absl::StrFormat("Expected to have zero inputs for "
+        abslx::StrFormat("Expected to have zero inputs for "
                         "RecvTPUEmbeddingActivations node, found %d inputs.",
                         data_inputs.size()));
   }
@@ -142,7 +142,7 @@ xla::StatusOr<NodeDef> MakeRecvActivationsNodeDef(
     builder.Attr("_tpu_embedding_layer", embedding_layer);
   }
 
-  builder.Input(absl::StrCat(deduplication_data_node_name, ":output"),
+  builder.Input(abslx::StrCat(deduplication_data_node_name, ":output"),
                 /*src_index=*/0, DT_VARIANT);
   for (const std::string& control_input : control_inputs) {
     builder.ControlInput(control_input);
@@ -161,11 +161,11 @@ xla::StatusOr<NodeDef> MakeRecvActivationsNodeDef(
 // to be added to the graph or function def.
 xla::StatusOr<NodeDef> MakeSendGradientsNodeDef(
     const NodeDef& old_gradients_node_def,
-    absl::string_view deduplication_data_node_name,
-    absl::string_view device_name, absl::string_view tpu_replicate_attr,
-    absl::string_view tpu_embedding_config_str,
-    absl::Span<const NodeDefBuilder::NodeOut> data_inputs,
-    absl::Span<const std::string> control_inputs) {
+    abslx::string_view deduplication_data_node_name,
+    abslx::string_view device_name, abslx::string_view tpu_replicate_attr,
+    abslx::string_view tpu_embedding_config_str,
+    abslx::Span<const NodeDefBuilder::NodeOut> data_inputs,
+    abslx::Span<const std::string> control_inputs) {
   tpu::TPUEmbeddingConfiguration tpu_embedding_config;
   if (!tpu_embedding_config.ParseFromString(
           std::string(tpu_embedding_config_str))) {  // NOLINT
@@ -199,7 +199,7 @@ xla::StatusOr<NodeDef> MakeSendGradientsNodeDef(
   const int32 expected_learning_rate_tag_count = status_or_lr_tag_count.value();
 
   if (learning_rate_tag_count != expected_learning_rate_tag_count) {
-    return errors::InvalidArgument(absl::StrFormat(
+    return errors::InvalidArgument(abslx::StrFormat(
         "Number of dynamic learning rate tags in the TPU embedding config: %d "
         "does not match the NN attribute: %d in the SendTPUEmbeddingGradients "
         "node.",
@@ -208,7 +208,7 @@ xla::StatusOr<NodeDef> MakeSendGradientsNodeDef(
 
   if (data_inputs.size() !=
       static_cast<uint64>(num_inputs + learning_rate_tag_count)) {
-    return errors::InvalidArgument(absl::StrFormat(
+    return errors::InvalidArgument(abslx::StrFormat(
         "Mismatch in the number of inputs for SendTPUEmbeddingGradients node, "
         "expected: %d, actual: %d",
         num_inputs + learning_rate_tag_count, data_inputs.size()));
@@ -234,10 +234,10 @@ xla::StatusOr<NodeDef> MakeSendGradientsNodeDef(
     builder.Attr("_tpu_embedding_layer", embedding_layer);
   }
 
-  builder.Input(absl::MakeConstSpan(data_inputs.data(), num_inputs))
-      .Input(absl::MakeConstSpan(data_inputs.data() + num_inputs,
+  builder.Input(abslx::MakeConstSpan(data_inputs.data(), num_inputs))
+      .Input(abslx::MakeConstSpan(data_inputs.data() + num_inputs,
                                  learning_rate_tag_count))
-      .Input(absl::StrCat(deduplication_data_node_name, ":output"),
+      .Input(abslx::StrCat(deduplication_data_node_name, ":output"),
              /*src_index=*/0, DT_VARIANT);
   for (const std::string& control_input : control_inputs) {
     builder.ControlInput(control_input);
@@ -284,7 +284,7 @@ struct SendRecvNodes {
 // Maps a _tpu_replicate attribute to the corresponding
 // RecvTPUEmbeddingActivations and SendTPUEmbeddingGradients nodes in the graph.
 using SendRecvNodesMap =
-    absl::flat_hash_map<SendRecvNodesMapKey, SendRecvNodes>;
+    abslx::flat_hash_map<SendRecvNodesMapKey, SendRecvNodes>;
 
 // Gets the src nodes for the incoming control edges of the node.
 std::vector<Node*> GetControlInputNodes(const Node* node) {
@@ -316,7 +316,7 @@ std::vector<NodeDefBuilder::NodeOut> GetDataInputs(const Node* node,
 // name, and index are the same on both nodes.
 Status ValidateAndGetTPUEmbeddingConfiguration(
     const Node* activations_node, const Node* gradients_node,
-    absl::string_view tpu_replicate_attr,
+    abslx::string_view tpu_replicate_attr,
     std::string* tpu_embedding_config_str) {
   if (activations_node != nullptr && gradients_node != nullptr) {
     std::string activations_config_str;
@@ -327,7 +327,7 @@ Status ValidateAndGetTPUEmbeddingConfiguration(
         GetNodeAttr(gradients_node->def(), "config", &gradients_config_str));
 
     if (activations_config_str != gradients_config_str) {
-      return errors::InvalidArgument(absl::StrFormat(
+      return errors::InvalidArgument(abslx::StrFormat(
           "TPU embedding config attributes of RecvTPUEmbeddingActivations and "
           "SendTPUEmbeddingGradients nodes with the same tpu_replicate attr: "
           "%s are not identical.",
@@ -335,7 +335,7 @@ Status ValidateAndGetTPUEmbeddingConfiguration(
     }
     if (activations_node->assigned_device_name() !=
         gradients_node->assigned_device_name()) {
-      return errors::InvalidArgument(absl::StrFormat(
+      return errors::InvalidArgument(abslx::StrFormat(
           "Mismatch in assigned device names for the "
           "RecvTPUEmbeddingActivations (%s) and SendTPUEmbeddingGradients (%s) "
           "nodes with the same tpu_replicate attr: %s.",
@@ -344,7 +344,7 @@ Status ValidateAndGetTPUEmbeddingConfiguration(
     }
     if (activations_node->assigned_device_name_index() !=
         gradients_node->assigned_device_name_index()) {
-      return errors::InvalidArgument(absl::StrFormat(
+      return errors::InvalidArgument(abslx::StrFormat(
           "Mismatch in assigned device name indices for the "
           "RecvTPUEmbeddingActivations (%d) and SendTPUEmbeddingGradients (%d) "
           "nodes with the same tpu_replicate attr: %s.",
@@ -354,7 +354,7 @@ Status ValidateAndGetTPUEmbeddingConfiguration(
   }
 
   if (activations_node == nullptr && gradients_node == nullptr) {
-    return errors::Internal(absl::StrFormat(
+    return errors::Internal(abslx::StrFormat(
         "Found tpu_replicate attr: %s with no corresponding "
         "RecvTPUEmbeddingActivations or SendTPUEmbeddingGradients nodes",
         tpu_replicate_attr));
@@ -377,8 +377,8 @@ Status ValidateAndGetTPUEmbeddingConfiguration(
 Status AddRecvDeduplicationDataNode(const Node* old_activations_node,
                                     const Node* old_gradients_node,
                                     const std::string& requested_device,
-                                    absl::string_view tpu_replicate_attr,
-                                    absl::string_view tpu_embedding_config_str,
+                                    abslx::string_view tpu_replicate_attr,
+                                    abslx::string_view tpu_embedding_config_str,
                                     Node** deduplication_data_node,
                                     Graph* graph) {
   // Note that control inputs added later while constructing the Node are copied
@@ -397,11 +397,11 @@ Status AddRecvDeduplicationDataNode(const Node* old_activations_node,
   // control frame.
   std::vector<Node*> control_inputs;
   if (old_activations_node != nullptr) {
-    absl::c_copy(GetControlInputNodes(old_activations_node),
+    abslx::c_copy(GetControlInputNodes(old_activations_node),
                  std::back_inserter(control_inputs));
   }
   if (old_gradients_node != nullptr) {
-    absl::c_copy(GetControlInputNodes(old_gradients_node),
+    abslx::c_copy(GetControlInputNodes(old_gradients_node),
                  std::back_inserter(control_inputs));
   }
   for (Node* control_input : control_inputs) {
@@ -427,8 +427,8 @@ Status AddRecvDeduplicationDataNode(const Node* old_activations_node,
 // specified tpu_replicate and tpu_embedding_config_str attributes. Connects the
 // output of the deduplication_data_node to the input of the newly added node.
 Status ReplaceRecvActivationsNodeAndAddDeduplicationInputs(
-    absl::string_view tpu_replicate_attr,
-    absl::string_view tpu_embedding_config_str, Node* old_activations_node,
+    abslx::string_view tpu_replicate_attr,
+    abslx::string_view tpu_embedding_config_str, Node* old_activations_node,
     Node* deduplication_data_node, Graph* graph) {
   VLOG(1) << "Removing old RecvTPUEmbeddingActivations node: "
           << old_activations_node->DebugString();
@@ -469,8 +469,8 @@ Status ReplaceRecvActivationsNodeAndAddDeduplicationInputs(
 // tpu_replicate and tpu_embedding_config_str attributes. Connects the output of
 // the deduplication_data_node to the last input of the newly added node.
 Status ReplaceSendGradientsNodeAndAddDeduplicationInputs(
-    absl::string_view tpu_replicate_attr,
-    absl::string_view tpu_embedding_config_str, Node* old_gradients_node,
+    abslx::string_view tpu_replicate_attr,
+    abslx::string_view tpu_embedding_config_str, Node* old_gradients_node,
     Node* deduplication_data_node, Graph* graph) {
   VLOG(1) << "Removing old SendTPUEmbeddingGradients node: "
           << old_gradients_node->DebugString();
@@ -510,7 +510,7 @@ Status ReplaceSendGradientsNodeAndAddDeduplicationInputs(
 
 // Rewrites the graph for a particular _tpu_replicate attribute.
 Status RewriteGraphForTpuReplicateAttrAndDevice(
-    absl::string_view tpu_replicate_attr, const std::string& requested_device,
+    abslx::string_view tpu_replicate_attr, const std::string& requested_device,
     Node* old_activations_node, Node* old_gradients_node, Graph* graph) {
   VLOG(1) << "Rewriting graph for _tpu_replicate attribute: "
           << tpu_replicate_attr << ", activations node: "
@@ -552,7 +552,7 @@ Status InsertActivationsNodeIntoMap(Node* activations_node,
   TF_RETURN_IF_ERROR(GetNodeAttr(activations_node->def(), "_tpu_replicate",
                                  &tpu_replicate_attr));
   const std::string& requested_device = activations_node->requested_device();
-  VLOG(1) << absl::StrFormat(
+  VLOG(1) << abslx::StrFormat(
       "Inserting RecvTPUEmbeddingActivations node with _tpu_replicate "
       "attribute: %s and requested_device: %s",
       tpu_replicate_attr, requested_device);
@@ -562,13 +562,13 @@ Status InsertActivationsNodeIntoMap(Node* activations_node,
   const SendRecvNodesMap::iterator it = send_recv_nodes_map->find(key);
   if (it != send_recv_nodes_map->end()) {
     if (it->second.activations_node != nullptr) {
-      return errors::AlreadyExists(absl::StrFormat(
+      return errors::AlreadyExists(abslx::StrFormat(
           "Found duplicate RecvTPUEmbeddingActivations node in graph with "
           "tpu_replicate attr: %s and requested_device: %s",
           tpu_replicate_attr, requested_device));
     }
     if (it->second.gradients_node == nullptr) {
-      return errors::Internal(absl::StrFormat(
+      return errors::Internal(abslx::StrFormat(
           "Found map object with no RecvTPUEmbeddingActivations or "
           "SendTPUEmbeddingGradients nodes and tpu_replicate attr: %s and "
           "requested_device: %s",
@@ -592,7 +592,7 @@ Status InsertGradientsNodeIntoMap(Node* gradients_node,
   TF_RETURN_IF_ERROR(GetNodeAttr(gradients_node->def(), "_tpu_replicate",
                                  &tpu_replicate_attr));
   const std::string& requested_device = gradients_node->requested_device();
-  VLOG(1) << absl::StrFormat(
+  VLOG(1) << abslx::StrFormat(
       "Inserting SendTPUEmbeddingGradients node with _tpu_replicate "
       "attribute: %s and requested_device: %s",
       tpu_replicate_attr, requested_device);
@@ -602,13 +602,13 @@ Status InsertGradientsNodeIntoMap(Node* gradients_node,
   const SendRecvNodesMap::iterator it = send_recv_nodes_map->find(key);
   if (it != send_recv_nodes_map->end()) {
     if (it->second.gradients_node != nullptr) {
-      return errors::AlreadyExists(absl::StrFormat(
+      return errors::AlreadyExists(abslx::StrFormat(
           "Found duplicate SendTPUEmbeddingGradients node in graph with "
           "tpu_replicate attr: %s and requested_device: %s",
           tpu_replicate_attr, requested_device));
     }
     if (it->second.activations_node == nullptr) {
-      return errors::Internal(absl::StrFormat(
+      return errors::Internal(abslx::StrFormat(
           "Found map object with no RecvTPUEmbeddingActivations or "
           "SendTPUEmbeddingGradients nodes and tpu_replicate attr: %s and "
           "requested_device: %s",
@@ -765,14 +765,14 @@ Status MergeRewriterConfigs(const RewriterConfig& rewriter_config,
         rewriter_config.tpu_embedding_config_str;
   } else {
     if (final_rewriter_config->device_name != rewriter_config.device_name) {
-      return errors::InvalidArgument(absl::StrFormat(
+      return errors::InvalidArgument(abslx::StrFormat(
           "Mismatch in device names for TPU embedding nodes: %s != %s",
           final_rewriter_config->device_name, rewriter_config.device_name));
     }
     if (final_rewriter_config->tpu_replicate_attr !=
         rewriter_config.tpu_replicate_attr) {
       return errors::InvalidArgument(
-          absl::StrFormat("Mismatch in _tpu_replicate attributes for TPU "
+          abslx::StrFormat("Mismatch in _tpu_replicate attributes for TPU "
                           "embedding nodes: %s != %s",
                           final_rewriter_config->tpu_replicate_attr,
                           rewriter_config.tpu_replicate_attr));
@@ -780,19 +780,19 @@ Status MergeRewriterConfigs(const RewriterConfig& rewriter_config,
     if (final_rewriter_config->tpu_embedding_config_str !=
         rewriter_config.tpu_embedding_config_str) {
       return errors::InvalidArgument(
-          absl::StrFormat("Mismatch in config attributes for TPU "
+          abslx::StrFormat("Mismatch in config attributes for TPU "
                           "embedding nodes: %s != %s",
                           final_rewriter_config->tpu_embedding_config_str,
                           rewriter_config.tpu_embedding_config_str));
     }
   }
-  absl::c_copy(rewriter_config.control_inputs,
+  abslx::c_copy(rewriter_config.control_inputs,
                std::back_inserter(final_rewriter_config->control_inputs));
 
   if (!rewriter_config.activations_node_def_name.empty()) {
     if (!final_rewriter_config->activations_node_def_name.empty()) {
       return errors::InvalidArgument(
-          absl::StrFormat("Found duplicate RecvTPUEmbeddingActivations nodes "
+          abslx::StrFormat("Found duplicate RecvTPUEmbeddingActivations nodes "
                           "%s and %s in function.",
                           rewriter_config.activations_node_def_name,
                           final_rewriter_config->activations_node_def_name));
@@ -803,7 +803,7 @@ Status MergeRewriterConfigs(const RewriterConfig& rewriter_config,
   if (!rewriter_config.gradients_node_def_name.empty()) {
     if (!final_rewriter_config->gradients_node_def_name.empty()) {
       return errors::InvalidArgument(
-          absl::StrFormat("Found duplicate SendTPUEmbeddingGradients nodes %s "
+          abslx::StrFormat("Found duplicate SendTPUEmbeddingGradients nodes %s "
                           "and %s in function.",
                           rewriter_config.gradients_node_def_name,
                           final_rewriter_config->gradients_node_def_name));
@@ -817,7 +817,7 @@ Status MergeRewriterConfigs(const RewriterConfig& rewriter_config,
 
 // Data type for map from device name to RewriterConfig.
 using RewriterConfigsByDevice =
-    absl::flat_hash_map<std::string, RewriterConfig>;
+    abslx::flat_hash_map<std::string, RewriterConfig>;
 
 // Computes the RewriterConfigs for the specified FunctionDef (fdef) for each
 // device (multiple devices can be used for model parallelism).
@@ -885,7 +885,7 @@ Status RewriteFunctionDefs(FunctionLibraryDefinition* flib_def) {
 
     // Build a receive deduplication data node for each device that uses TPU
     // embeddings.
-    absl::flat_hash_map<std::string, std::string>
+    abslx::flat_hash_map<std::string, std::string>
         deduplication_data_node_names_by_device;
     for (const auto& device_and_rewriter_config : rewriter_configs_by_device) {
       const RewriterConfig& rewriter_config = device_and_rewriter_config.second;

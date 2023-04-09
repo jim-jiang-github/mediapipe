@@ -24,7 +24,7 @@ namespace {
 // correctness.
 bool HoistParameters(
     HloModule& module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   CHECK(module.has_schedule());
   HloSchedule& schedule = module.schedule();
   bool modified = false;
@@ -78,7 +78,7 @@ bool HoistParameters(
 // operations. This increases the opportunities to prefetch constant ops.
 bool HoistConstantOperations(
     HloModule& module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   CHECK(module.has_schedule());
   HloSchedule& schedule = module.schedule();
   bool modified = false;
@@ -101,10 +101,10 @@ bool HoistConstantOperations(
           return inst->opcode() == HloOpcode::kConstant;
         };
         contains_constant_successor_or_predecessors |=
-            absl::c_find_if(instruction->control_predecessors(), is_constant) !=
+            abslx::c_find_if(instruction->control_predecessors(), is_constant) !=
             instruction->control_predecessors().end();
         contains_constant_successor_or_predecessors |=
-            absl::c_find_if(instruction->control_successors(), is_constant) !=
+            abslx::c_find_if(instruction->control_successors(), is_constant) !=
             instruction->control_successors().end();
       }
     }
@@ -133,7 +133,7 @@ bool HoistConstantOperations(
 
 StatusOr<bool> InstructionHoister::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool modified = false;
   if (hoist_parameters_) {
     modified |= HoistParameters(*module, execution_threads);

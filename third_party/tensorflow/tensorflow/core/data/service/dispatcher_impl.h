@@ -228,7 +228,7 @@ class DataServiceDispatcherImpl {
   // Finds tasks that should be deleted from a worker, updating the heartbeat
   // response.
   Status FindTasksToDelete(
-      const absl::flat_hash_set<int64_t>& current_tasks,
+      const abslx::flat_hash_set<int64_t>& current_tasks,
       const std::vector<std::shared_ptr<const DispatcherState::Task>>
           assigned_tasks,
       WorkerHeartbeatResponse* response);
@@ -236,7 +236,7 @@ class DataServiceDispatcherImpl {
   // the heartbeat response.
   Status FindNewTasks(
       const std::string& worker_address,
-      const absl::flat_hash_set<int64_t>& current_tasks,
+      const abslx::flat_hash_set<int64_t>& current_tasks,
       std::vector<std::shared_ptr<const DispatcherState::Task>>& assigned_tasks,
       WorkerHeartbeatResponse* response);
   // Acquires an iteration client id to read from the given iteration and sets
@@ -324,22 +324,22 @@ class DataServiceDispatcherImpl {
   bool cancelled_ TF_GUARDED_BY(mu_) = false;
 
   // Cached worker stubs for communicating with workers.
-  absl::flat_hash_map<std::string, std::unique_ptr<WorkerService::Stub>>
+  abslx::flat_hash_map<std::string, std::unique_ptr<WorkerService::Stub>>
       worker_stubs_ TF_GUARDED_BY(mu_);
   // Store of dataset definitions.
   std::unique_ptr<DatasetStore> dataset_store_ TF_GUARDED_BY(mu_);
   // Mapping from iteration id to the split providers for the iteration.
-  absl::flat_hash_map<int64_t, std::vector<std::unique_ptr<SplitProvider>>>
+  abslx::flat_hash_map<int64_t, std::vector<std::unique_ptr<SplitProvider>>>
       split_providers_ TF_GUARDED_BY(mu_);
   // Mapping from round robin iteration id to the round the iteration is
   // currently on. This is based on the data provided by client heartbeats, and
   // may be stale.
-  absl::flat_hash_map<int64_t, int64_t> round_robin_rounds_ TF_GUARDED_BY(mu_);
+  abslx::flat_hash_map<int64_t, int64_t> round_robin_rounds_ TF_GUARDED_BY(mu_);
   // Map from task id to a TaskRemover which determines when to remove the task.
-  absl::flat_hash_map<int64_t, std::shared_ptr<TaskRemover>>
+  abslx::flat_hash_map<int64_t, std::shared_ptr<TaskRemover>>
       remove_task_requests_ TF_GUARDED_BY(mu_);
   // Map from client id to the time of the client's last heartbeat.
-  absl::flat_hash_map<int64_t, absl::Time> latest_client_heartbeats_time_
+  abslx::flat_hash_map<int64_t, abslx::Time> latest_client_heartbeats_time_
       TF_GUARDED_BY(mu_);
 
   std::optional<std::unique_ptr<JournalWriter>> journal_writer_

@@ -135,7 +135,7 @@ bool RegisterCustomOpByName(const char* registerer_name,
 }
 
 // Returns the dimension from the stored list in the PyObject. If the given
-// PyObject is not a list, it will return absl::optional and set the Python
+// PyObject is not a list, it will return abslx::optional and set the Python
 // error message to notify users.
 std::optional<std::vector<int>> ConvertInputShapeToVector(
     PyObject* input_shapes, size_t index) {
@@ -662,7 +662,7 @@ PyObject* CalibrationWrapper::QuantizeModel(int input_py_type,
   for (const auto& registerer : registerers_by_name) {
     if (!RegisterCustomOpByName(registerer.c_str(), resolver.get())) {
       *error_msg =
-          absl::StrFormat("Looking up symbol '%s' failed with error '%s'.",
+          abslx::StrFormat("Looking up symbol '%s' failed with error '%s'.",
                           registerer.c_str(), SharedLibrary::GetError());
       return nullptr;
     }

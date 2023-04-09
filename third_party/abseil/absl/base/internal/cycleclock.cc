@@ -27,7 +27,7 @@
 
 #include "absl/base/internal/unscaledcycleclock.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -104,4 +104,4 @@ double CycleClock::Frequency() {
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

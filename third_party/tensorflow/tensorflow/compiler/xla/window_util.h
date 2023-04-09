@@ -25,17 +25,17 @@ namespace window_util {
 
 // Creates a window with the given sizes in the dimensions and all strides set
 // to 1.
-Window MakeWindow(absl::Span<const int64_t> sizes);
+Window MakeWindow(abslx::Span<const int64_t> sizes);
 
 // Creates a window with the given sizes in the dimensions and given strides.
-Window MakeWindow(absl::Span<const int64_t> sizes,
-                  absl::Span<const int64_t> strides);
+Window MakeWindow(abslx::Span<const int64_t> sizes,
+                  abslx::Span<const int64_t> strides);
 
 // Creates a padding config with symmetrical padding in each dimension, of value
 // given by sizes; e.g. {0, 1, 2} would create a R3 padding config that had zero
 // pixels of padding in dimension 0, one pixel of padding symmetrically, on each
 // side of dimension 1, and two pixels of padding symmetrically on dimension 2.
-PaddingConfig MakeSymmetricPadding(absl::Span<const int64_t> sizes);
+PaddingConfig MakeSymmetricPadding(abslx::Span<const int64_t> sizes);
 
 std::string ToString(const WindowDimension& dim);
 std::string ToString(const Window& window);

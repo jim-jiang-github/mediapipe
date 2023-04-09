@@ -84,7 +84,7 @@ void ExecStep::AddMemoryStats(const string& dev,
     exec_mem.set_memory_micros(step_stat.all_start_micros() +
                                step_stat.op_end_rel_micros());
   } else {
-    absl::FPrintF(stderr, "%s has no start time, skipping\n",
+    abslx::FPrintF(stderr, "%s has no start time, skipping\n",
                   step_stat.node_name());
     return;
   }
@@ -105,7 +105,7 @@ void ExecStep::AddMemoryStats(const string& dev,
     }
   }
   if (accelerator_allocator_cnt > 1) {
-    absl::FPrintF(stderr, "found %d gpu allocator for 1 node\n",
+    abslx::FPrintF(stderr, "found %d gpu allocator for 1 node\n",
                   accelerator_allocator_cnt);
   }
 
@@ -190,7 +190,7 @@ void ExecStep::AddMemoryStats(const string& dev,
 
 void TFGraphNode::AddStepStat(int64_t step, const string& device,
                               const NodeExecStats& step_stat) {
-  string dev = absl::AsciiStrToLower(device);
+  string dev = abslx::AsciiStrToLower(device);
 
   // TODO(xpan): Make this more robust?
   // See run_metadata_test.py

@@ -26,7 +26,7 @@
 #include "absl/base/attributes.h"
 #include "absl/base/internal/raw_logging.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace debugging_internal {
 namespace {
@@ -180,6 +180,6 @@ int GetSignalHandlerStackConsumption(void (*signal_handler)(int)) {
 
 }  // namespace debugging_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_INTERNAL_HAVE_DEBUGGING_STACK_CONSUMPTION

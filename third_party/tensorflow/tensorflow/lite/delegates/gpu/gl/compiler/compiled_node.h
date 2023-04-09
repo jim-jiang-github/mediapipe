@@ -42,7 +42,7 @@ struct CompiledNodeAttributes {
 // Moves all code objects, parameters and node indices from attr to merged_attr.
 // Parameters and objects in attr.code.source_code are renamed to ensure
 // uniqueness.
-absl::Status MergeCode(CompiledNodeAttributes* attr,
+abslx::Status MergeCode(CompiledNodeAttributes* attr,
                        CompiledNodeAttributes* merged_attr);
 
 }  // namespace gl

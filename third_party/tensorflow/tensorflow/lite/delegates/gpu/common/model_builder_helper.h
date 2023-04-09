@@ -37,24 +37,24 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status GetNodeAndRegistration(TfLiteContext* context, int node_id,
+abslx::Status GetNodeAndRegistration(TfLiteContext* context, int node_id,
                                     TfLiteNode** tflite_node,
                                     TfLiteRegistration** registration);
 
 DataType ToDataType(TfLiteType type);
 
-absl::Status ExtractTensorShape(const TfLiteTensor& tflite_tensor, BHWC* bhwc);
+abslx::Status ExtractTensorShape(const TfLiteTensor& tflite_tensor, BHWC* bhwc);
 
-absl::Status ExtractAxisFromIndex(const TfLiteTensor& tflite_tensor, int index,
+abslx::Status ExtractAxisFromIndex(const TfLiteTensor& tflite_tensor, int index,
                                   Axis* axis);
 
-absl::Status ConvertTfLiteTensorToTensorRef(const TfLiteTensor& tflite_tensor,
+abslx::Status ConvertTfLiteTensorToTensorRef(const TfLiteTensor& tflite_tensor,
                                             TensorRef<BHWC>* tensor_ref);
 
 // Populates quantization parameters for non-constant UInt8/Int8 tensors.
 // This helps the delegate emulate quantized inference with
 // QuantizeAndDequantize.
-absl::Status PopulateQuantParams(const TfLiteTensor& tensor,
+abslx::Status PopulateQuantParams(const TfLiteTensor& tensor,
                                  QuantizationParams* quant_params);
 
 int GetNumberOfRuntimeInputsForNode(const TfLiteContext* context,
@@ -63,11 +63,11 @@ int GetNumberOfRuntimeInputsForNode(const TfLiteContext* context,
 int GetNumberOfConstInputsForNode(const TfLiteContext* context,
                                   const TfLiteNode* tflite_node);
 
-absl::Status CheckInputsOutputs(const TfLiteContext* context,
+abslx::Status CheckInputsOutputs(const TfLiteContext* context,
                                 const TfLiteNode* tflite_node,
                                 int runtime_inputs, int outputs);
 
-absl::Status CheckInputsConstsOutputs(const TfLiteContext* context,
+abslx::Status CheckInputsConstsOutputs(const TfLiteContext* context,
                                       const TfLiteNode* tflite_node,
                                       int runtime_inputs, int const_inputs,
                                       int outputs);
@@ -100,38 +100,38 @@ inline void DequantizeConstantTensor(const TfLiteTensor& tensor,
 }
 
 template <typename T>
-absl::Status CreateVectorCopyData(const TfLiteTensor& tensor, T* tensor_data) {
+abslx::Status CreateVectorCopyData(const TfLiteTensor& tensor, T* tensor_data) {
   if (tensor.bytes % sizeof(T) != 0) {
-    return absl::InvalidArgumentError(
-        absl::StrCat("Input data size ", tensor.bytes,
+    return abslx::InvalidArgumentError(
+        abslx::StrCat("Input data size ", tensor.bytes,
                      " is not aligned to expected type: ", sizeof(T)));
   }
   std::memcpy(tensor_data, tensor.data.uint8, tensor.bytes);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <>
-absl::Status CreateVectorCopyData<float>(const TfLiteTensor& tensor,
+abslx::Status CreateVectorCopyData<float>(const TfLiteTensor& tensor,
                                          float* tensor_data);
 
-absl::Status SetAllDimensions(const TfLiteIntArray* dimensions, Scalar* shape);
+abslx::Status SetAllDimensions(const TfLiteIntArray* dimensions, Scalar* shape);
 
-absl::Status CheckIfLinearConvertible(const TfLiteIntArray* dimensions);
+abslx::Status CheckIfLinearConvertible(const TfLiteIntArray* dimensions);
 
-absl::Status SetAllDimensions(const TfLiteIntArray* dimensions, Linear* shape);
+abslx::Status SetAllDimensions(const TfLiteIntArray* dimensions, Linear* shape);
 
-absl::Status SetAllDimensions(const TfLiteIntArray* dimensions, HWC* shape);
+abslx::Status SetAllDimensions(const TfLiteIntArray* dimensions, HWC* shape);
 
-absl::Status SetAllDimensions(const TfLiteIntArray* dimensions, HW* shape);
+abslx::Status SetAllDimensions(const TfLiteIntArray* dimensions, HW* shape);
 
-absl::Status SetAllDimensions(const TfLiteIntArray* dimensions, OHWI* shape);
+abslx::Status SetAllDimensions(const TfLiteIntArray* dimensions, OHWI* shape);
 
-absl::Status SetAllDimensions(const TfLiteIntArray* dimensions, BHWC* shape);
+abslx::Status SetAllDimensions(const TfLiteIntArray* dimensions, BHWC* shape);
 
 // If there is fused activation present, then there will be another node created
 // that will have identical output as the given node. New operation node will
 // depend on the given node output.
-absl::Status MaybeFuseActivation(TfLiteFusedActivation fused_activation,
+abslx::Status MaybeFuseActivation(TfLiteFusedActivation fused_activation,
                                  GraphFloat32* graph, Node* node);
 
 }  // namespace gpu

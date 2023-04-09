@@ -83,14 +83,14 @@ StatusOr<std::vector<tensorflow::AutotuneResult>> AutotuneConvImpl(
               ? rz_scratch_allocator.TotalAllocatedBytesExcludingRedzones()
               : scratch_allocator.TotalByteSize());
       *result.mutable_run_time() = proto_utils::ToDurationProto(
-          absl::Milliseconds(profile_result.elapsed_time_in_ms()));
+          abslx::Milliseconds(profile_result.elapsed_time_in_ms()));
 
       CheckRedzones(rz_scratch_allocator, &result);
       CheckRedzones(rz_allocator, &result);
     } else {
       result.mutable_failure()->set_kind(AutotuneResult::UNKNOWN);
       result.mutable_failure()->set_msg(
-          absl::StrCat("Profiling failure on CUDNN engine ", desc.ToString(),
+          abslx::StrCat("Profiling failure on CUDNN engine ", desc.ToString(),
                        ": ", cudnn_launch_status.ToString()));
     }
   }
@@ -331,7 +331,7 @@ StatusOr<AutotuneEntry<se::dnn::ConvOp>> AutotuneUnfusedConv(
         break;
       default:
         return errors::InvalidArgument(
-            absl::StrFormat("Unknown ConvolutionKind %d", kind));
+            abslx::StrFormat("Unknown ConvolutionKind %d", kind));
     }
 
     const auto element_type = se::dnn::ToDataType<T>::value;
@@ -424,7 +424,7 @@ StatusOr<AutotuneEntry<se::dnn::ConvOp>> AutotuneUnfusedConv(
 
       result.set_scratch_bytes(profile_result.scratch_size());
       *result.mutable_run_time() = proto_utils::ToDurationProto(
-          absl::Milliseconds(profile_result.elapsed_time_in_ms()));
+          abslx::Milliseconds(profile_result.elapsed_time_in_ms()));
     } else {
       for (auto miopen_algorithm : algorithms) {
         auto profile_algorithm = miopen_algorithm.algorithm();
@@ -442,7 +442,7 @@ StatusOr<AutotuneEntry<se::dnn::ConvOp>> AutotuneUnfusedConv(
 
           result.set_scratch_bytes(scratch_allocator.TotalByteSize());
           *result.mutable_run_time() = proto_utils::ToDurationProto(
-              absl::Milliseconds(profile_result.elapsed_time_in_ms()));
+              abslx::Milliseconds(profile_result.elapsed_time_in_ms()));
         }
       }
     }

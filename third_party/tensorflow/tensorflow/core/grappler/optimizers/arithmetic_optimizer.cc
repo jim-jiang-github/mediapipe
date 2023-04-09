@@ -198,7 +198,7 @@ bool NodeIsOnCpu(const NodeDef& node) {
   string task;
   string device;
   return DeviceNameUtils::SplitDeviceName(node.device(), &task, &device) &&
-         absl::StrContains(device, DEVICE_CPU);
+         abslx::StrContains(device, DEVICE_CPU);
 }
 
 // True if all regular (non-control) inputs reference the same node or if there
@@ -271,7 +271,7 @@ class ArithmeticOptimizerStage : public GraphOptimizerStage<string> {
                 " with control input ", new_tensor.ToString());
           }
           consumer->set_input(i, input_tensor.index() < 0
-                                     ? absl::StrCat("^", new_tensor.node())
+                                     ? abslx::StrCat("^", new_tensor.node())
                                      : new_input);
           ctx().node_map->UpdateInput(consumer->name(), node->name(),
                                       new_input);
@@ -619,7 +619,7 @@ class AddOpsRewriteStage : public ArithmeticNodesGroupOptimizerStage {
     using SigKV = decltype(shape_sig_to_inputs)::value_type;
     VLOG(3) << "Add/AddN group has " << shape_sig_to_inputs.size()
             << " unique shapes: "
-            << absl::StrJoin(shape_sig_to_inputs, ", ",
+            << abslx::StrJoin(shape_sig_to_inputs, ", ",
                              [](string* out, SigKV p) {
                                strings::StrAppend(out, p.first);
                              });
@@ -1570,7 +1570,7 @@ class HoistCWiseUnaryChainsStage : public ArithmeticOptimizerStage {
  private:
   bool FirstNInputsAreUnique(const NodeDef& node, int n) const {
     if (n > node.input_size()) return false;
-    absl::flat_hash_set<string> unique_inputs;
+    abslx::flat_hash_set<string> unique_inputs;
     const int start = node.op() == "Concat" ? 1 : 0;
     const int end = start + n;
     for (int i = start; i < end; ++i) {
@@ -1618,7 +1618,7 @@ class HoistCWiseUnaryChainsStage : public ArithmeticOptimizerStage {
     VLOG(3) << "Hoist unary op chain:"
             << " root=" << root_node->DebugString()
             << " prefix_length=" << prefix_length << " ctrl_inputs=["
-            << absl::StrJoin(*ctrl_inputs, ", ") << "]";
+            << abslx::StrJoin(*ctrl_inputs, ", ") << "]";
 
     if (tails.empty()) {
       return OkStatus();
@@ -2219,7 +2219,7 @@ class ReorderCastLikeAndValuePreserving : public ArithmeticOptimizerStage {
   // GPU. The transpose might not be implemented for image.type, or
   // might be slower with image.type than with cast_dst_type.
   bool NodeIsOnCpuOrGpu(const NodeDef* node) const {
-    using absl::StrContains;
+    using abslx::StrContains;
 
     string task;
     string device;
@@ -3647,7 +3647,7 @@ class UnaryOpsComposition : public ArithmeticOptimizerStage {
     std::reverse(op_names.begin(), op_names.end());
 
     VLOG(2) << "Fuse unary ops: root=" << root->name() << " op_names=["
-            << absl::StrJoin(op_names, ", ") << "]";
+            << abslx::StrJoin(op_names, ", ") << "]";
 
     NodeDef* composition_node = ctx().optimized_graph->add_node();
     composition_node->set_name(OptimizedNodeName(*root));
@@ -4058,7 +4058,7 @@ class RemoveStackSliceSameAxis : public ArithmeticOptimizerStage {
       // We need to add a control edge from input slice to guarantee that axis
       // constant will be executed in the same frame as `input_slice`, otherwise
       // ExpandDims might have mismatched input frames.
-      axis->add_input(absl::StrCat("^", ParseTensorName(input_slice).node()));
+      axis->add_input(abslx::StrCat("^", ParseTensorName(input_slice).node()));
       auto axis_attr = axis->mutable_attr();
       SetDataTypeToAttr(DT_INT32, "dtype", axis);
       auto* axis_t = (*axis_attr)["value"].mutable_tensor();
@@ -4370,7 +4370,7 @@ Status ArithmeticOptimizer::SimplifyArithmeticOps(bool can_use_shapes) {
     pipeline.AddStage<FuseSquaredDiffStage>(ctx, ctx_ext);
 
   VLOG(1) << "Run " << pipeline.NumStages() << " arithmetic optimizer stages: "
-          << absl::StrJoin(pipeline.StageNames(), ", ");
+          << abslx::StrJoin(pipeline.StageNames(), ", ");
 
   while (!nodes_to_simplify.Empty()) {
     GRAPPLER_RETURN_IF_DEADLINE_EXCEEDED();

@@ -25,18 +25,18 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
     DEPS
-    absl::city
-    absl::config
-    absl::core_headers
-    absl::endian
-    absl::fixed_array
-    absl::meta
-    absl::int128
-    absl::strings
-    absl::optional
-    absl::variant
-    absl::utility
-    absl::wyhash
+    abslx::city
+    abslx::config
+    abslx::core_headers
+    abslx::endian
+    abslx::fixed_array
+    abslx::meta
+    abslx::int128
+    abslx::strings
+    abslx::optional
+    abslx::variant
+    abslx::utility
+    abslx::wyhash
   PUBLIC
 )
 
@@ -48,10 +48,10 @@ absl_cc_library(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::spy_hash_state
-    absl::meta
-    absl::strings
-    absl::variant
+    abslx::spy_hash_state
+    abslx::meta
+    abslx::strings
+    abslx::variant
     gmock
   TESTONLY
 )
@@ -64,14 +64,14 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::cord_test_helpers
-    absl::hash
-    absl::hash_testing
-    absl::core_headers
-    absl::flat_hash_set
-    absl::spy_hash_state
-    absl::meta
-    absl::int128
+    abslx::cord_test_helpers
+    abslx::hash
+    abslx::hash_testing
+    abslx::core_headers
+    abslx::flat_hash_set
+    abslx::spy_hash_state
+    abslx::meta
+    abslx::int128
     gmock_main
 )
 
@@ -83,9 +83,9 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::hash
-    absl::strings
-    absl::str_format
+    abslx::hash
+    abslx::strings
+    abslx::str_format
   TESTONLY
 )
 
@@ -99,9 +99,9 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::config
-    absl::core_headers
-    absl::endian
+    abslx::config
+    abslx::core_headers
+    abslx::endian
 )
 
 absl_cc_test(
@@ -112,7 +112,7 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::city
+    abslx::city
     gmock_main
 )
 
@@ -126,9 +126,9 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::config
-    absl::endian
-    absl::int128
+    abslx::config
+    abslx::endian
+    abslx::int128
 )
 
 absl_cc_test(
@@ -139,7 +139,7 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::wyhash
-    absl::strings
+    abslx::wyhash
+    abslx::strings
     gmock_main
 )

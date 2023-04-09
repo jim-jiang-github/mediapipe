@@ -33,7 +33,7 @@ constexpr char kTestSPModelPath[] =
 }  // namespace
 
 TEST(SentencePieceTokenizerTest, TestTokenize) {
-  auto tokenizer = absl::make_unique<SentencePieceTokenizer>(kTestSPModelPath);
+  auto tokenizer = abslx::make_unique<SentencePieceTokenizer>(kTestSPModelPath);
   auto results = tokenizer->Tokenize("good morning, i'm your teacher.\n");
   EXPECT_THAT(results.subwords, ElementsAre("▁good", "▁morning", ",", "▁i", "'",
                                             "m", "▁your", "▁teacher", "."));
@@ -42,14 +42,14 @@ TEST(SentencePieceTokenizerTest, TestTokenize) {
 TEST(SentencePieceTokenizerTest, TestTokenizeFromFileBuffer) {
   std::string buffer = LoadBinaryContent(kTestSPModelPath);
   auto tokenizer =
-      absl::make_unique<SentencePieceTokenizer>(buffer.data(), buffer.size());
+      abslx::make_unique<SentencePieceTokenizer>(buffer.data(), buffer.size());
   EXPECT_THAT(tokenizer->Tokenize("good morning, i'm your teacher.\n").subwords,
               ElementsAre("▁good", "▁morning", ",", "▁i", "'", "m", "▁your",
                           "▁teacher", "."));
 }
 
 TEST(SentencePieceTokenizerTest, TestLookupId) {
-  auto tokenizer = absl::make_unique<SentencePieceTokenizer>(kTestSPModelPath);
+  auto tokenizer = abslx::make_unique<SentencePieceTokenizer>(kTestSPModelPath);
   std::vector<std::string> subwords = {"▁good", "▁morning", ",", "▁i", "'", "m",
                                        "▁your", "▁teacher", "."};
   std::vector<int> true_ids = {254, 959, 15, 31, 22, 79, 154, 2197, 9};
@@ -61,11 +61,11 @@ TEST(SentencePieceTokenizerTest, TestLookupId) {
 }
 
 TEST(SentencePieceTokenizerTest, TestLookupWord) {
-  auto tokenizer = absl::make_unique<SentencePieceTokenizer>(kTestSPModelPath);
+  auto tokenizer = abslx::make_unique<SentencePieceTokenizer>(kTestSPModelPath);
   std::vector<int> ids = {254, 959, 15, 31, 22, 79, 154, 2197, 9};
   std::vector<std::string> subwords = {"▁good", "▁morning", ",", "▁i", "'", "m",
                                        "▁your", "▁teacher", "."};
-  absl::string_view result;
+  abslx::string_view result;
   for (int i = 0; i < ids.size(); i++) {
     tokenizer->LookupWord(ids[i], &result);
     ASSERT_EQ(result, subwords[i]);

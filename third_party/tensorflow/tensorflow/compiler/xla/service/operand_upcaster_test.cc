@@ -39,7 +39,7 @@ bool ShouldUpcast(PrimitiveType operand_type, PrimitiveType result_type) {
 TEST_P(OperandUpcasterTest, ConvertInserted) {
   PrimitiveType lhs_type, rhs_type, result_type;
   std::tie(lhs_type, rhs_type, result_type) = GetParam();
-  absl::string_view module_tmpl = R"(
+  abslx::string_view module_tmpl = R"(
   HloModule module
 
   ENTRY main {
@@ -48,7 +48,7 @@ TEST_P(OperandUpcasterTest, ConvertInserted) {
     ROOT dot = $2[2,2]{1,0} dot(p0, p1), lhs_contracting_dims={1},
                                          rhs_contracting_dims={0}
   })";
-  auto module_string = absl::Substitute(
+  auto module_string = abslx::Substitute(
       module_tmpl, primitive_util::LowercasePrimitiveTypeName(lhs_type),
       primitive_util::LowercasePrimitiveTypeName(rhs_type),
       primitive_util::LowercasePrimitiveTypeName(result_type));
@@ -62,21 +62,21 @@ TEST_P(OperandUpcasterTest, ConvertInserted) {
   auto upcasted_lhs =
       ShouldUpcast(lhs_type, result_type)
           ? AllOf(op::Convert(original_lhs),
-                  op::Shape(absl::Substitute(
+                  op::Shape(abslx::Substitute(
                       "$0[2,3]{1,0}",
                       primitive_util::LowercasePrimitiveTypeName(result_type))))
           : original_lhs;
   auto upcasted_rhs =
       ShouldUpcast(rhs_type, result_type)
           ? AllOf(op::Convert(original_rhs),
-                  op::Shape(absl::Substitute(
+                  op::Shape(abslx::Substitute(
                       "$0[3,2]{1,0}",
                       primitive_util::LowercasePrimitiveTypeName(result_type))))
           : original_rhs;
   EXPECT_THAT(
       module->entry_computation()->root_instruction(),
       AllOf(op::Dot(upcasted_lhs, upcasted_rhs),
-            op::Shape(absl::Substitute(
+            op::Shape(abslx::Substitute(
                 "$0[2,2]{1,0}",
                 primitive_util::LowercasePrimitiveTypeName(result_type)))));
 }

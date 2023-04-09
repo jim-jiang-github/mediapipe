@@ -62,7 +62,7 @@ class ConstantFolding : public GraphOptimizer {
                   GraphDef* output) override;
 
  private:
-  bool ForwardInputs(NodeDef* node, absl::Span<const int> inputs_to_forward);
+  bool ForwardInputs(NodeDef* node, abslx::Span<const int> inputs_to_forward);
   string OptimizedNodeName(const NodeDef& node, StringPiece suffix) const;
   bool OptimizedNodeExists(const NodeDef& node, StringPiece suffix) const;
 
@@ -127,12 +127,12 @@ class ConstantFolding : public GraphOptimizer {
 
   void ReplaceDivisionOfOnesByReciprocal(NodeDef* node, GraphDef* graph);
   Status FoldGraph(const GraphProperties& properties, GraphDef* output,
-                   absl::flat_hash_set<string>* nodes_to_not_simplify);
+                   abslx::flat_hash_set<string>* nodes_to_not_simplify);
 
   Status IsSimplifiableReshape(const NodeDef& node,
                                const GraphProperties& properties) const;
   Status SimplifyGraph(GraphDef* optimized_graph, GraphProperties* properties,
-                       absl::flat_hash_set<string>* nodes_to_not_simplify);
+                       abslx::flat_hash_set<string>* nodes_to_not_simplify);
   Status SimplifyNode(NodeDef* node, GraphDef* optimized_graph,
                       GraphProperties* properties);
 
@@ -331,10 +331,10 @@ class ConstantFolding : public GraphOptimizer {
   GraphDef* graph_;
   std::unique_ptr<NodeMap> node_map_;
   std::unordered_set<string> nodes_to_preserve_;
-  // TODO(rmlarsen): Could these be keyed on absl::string_view?
-  absl::flat_hash_set<string> nodes_allowlist_;
-  absl::flat_hash_set<string> feed_nodes_;
-  absl::flat_hash_map<string, bool> maybe_foldable_nodes_;
+  // TODO(rmlarsen): Could these be keyed on abslx::string_view?
+  abslx::flat_hash_set<string> nodes_allowlist_;
+  abslx::flat_hash_set<string> feed_nodes_;
+  abslx::flat_hash_map<string, bool> maybe_foldable_nodes_;
   bool has_fetch_;
   bool graph_modified_;
   bool graph_contains_assign_or_inplace_op_;

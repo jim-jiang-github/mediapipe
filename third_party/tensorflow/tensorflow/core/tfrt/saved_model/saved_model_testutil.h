@@ -57,8 +57,8 @@ class TFRTSavedModelTest {
 };
 
 template <typename T, typename U = T>
-tensorflow::Tensor CreateTfTensor(absl::Span<const int64_t> shape,
-                                  absl::Span<const U> data) {
+tensorflow::Tensor CreateTfTensor(abslx::Span<const int64_t> shape,
+                                  abslx::Span<const U> data) {
   tensorflow::Tensor tensor(tensorflow::DataTypeToEnum<T>::value,
                             tensorflow::TensorShape(shape));
   auto flat = tensor.flat<T>();
@@ -75,7 +75,7 @@ std::vector<T> GetTfTensorData(const tensorflow::Tensor& tensor) {
 }
 
 inline tensorflow::Tensor CreateTfStringTensor(
-    absl::Span<const int64_t> shape, absl::Span<const std::string> data) {
+    abslx::Span<const int64_t> shape, abslx::Span<const std::string> data) {
   return CreateTfTensor<tensorflow::tstring>(shape, data);
 }
 
@@ -103,14 +103,14 @@ void ComputeCurrentTFResult(const std::string& saved_model_dir,
                             bool disable_grappler = false);
 
 void ExpectTensorEqual(const tensorflow::Tensor& x, const tensorflow::Tensor& y,
-                       absl::optional<double> error = absl::nullopt);
+                       abslx::optional<double> error = abslx::nullopt);
 
 SavedModel::Options DefaultTpuModelOptions(
     tensorflow::tfrt_stub::Runtime* runtime,
     tensorflow::TfrtTpuInfraTarget tpu_target);
 
 tensorflow::StatusOr<std::vector<tensorflow::serving::PredictRequest>>
-GetWarmupRequests(absl::string_view saved_model_dir);
+GetWarmupRequests(abslx::string_view saved_model_dir);
 
 void ProcessPredictRequestsAndMaybeProfile(
     const std::vector<tensorflow::serving::PredictRequest>& requests,

@@ -31,8 +31,8 @@ namespace {
 // Folds the given two sets of non-empty replica groups into a single set if
 // possible.
 std::optional<std::vector<ReplicaGroup>> FoldReplicaGroups(
-    absl::Span<const ReplicaGroup> replica_groups0,
-    absl::Span<const ReplicaGroup> replica_groups1) {
+    abslx::Span<const ReplicaGroup> replica_groups0,
+    abslx::Span<const ReplicaGroup> replica_groups1) {
   // For a valid all-reduce with non-empty replica groups, the groups should
   // list each replica exactly once.
   int64_t num_replicas = 0;
@@ -63,7 +63,7 @@ std::optional<std::vector<ReplicaGroup>> FoldReplicaGroups(
   // Note: Using std::vector<bool> instead of flat_hash_set for contributor sets
   // since flat_hash_set cannot be used as a flat_hash_map key.
   // Map to a contributor set to its unique id.
-  absl::flat_hash_map<std::vector<bool>, int64_t> contributor_set_id;
+  abslx::flat_hash_map<std::vector<bool>, int64_t> contributor_set_id;
 
   // Map each replica to the unique id for the set of its contributors.
   std::vector<int64_t> contributing_replicas_set_id(num_replicas, 0);
@@ -127,7 +127,7 @@ std::optional<std::vector<ReplicaGroup>> FoldReplicaGroups(
   // Sort the replica groups by the first id for stable behavior. Otherwise,
   // groups are formed according to the order in the contributer_set_id map,
   // which is not stable.
-  absl::c_sort(new_replica_groups,
+  abslx::c_sort(new_replica_groups,
                [](const ReplicaGroup &a, const ReplicaGroup &b) {
                  return a.replica_ids(0) < b.replica_ids(0);
                });
@@ -138,7 +138,7 @@ std::optional<std::vector<ReplicaGroup>> FoldReplicaGroups(
 
 StatusOr<bool> AllReduceFolder::Run(
     HloModule *module,
-    const absl::flat_hash_set<absl::string_view> &execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view> &execution_threads) {
   if (hlo_query::ContainsLayoutConstrainedAllReduce(*module)) {
     VLOG(1) << "Skip AllReduceFolder because the module contains all-reduce "
                "with constrained layouts";

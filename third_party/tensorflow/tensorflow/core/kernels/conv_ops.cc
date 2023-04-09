@@ -181,7 +181,7 @@ struct LaunchGrouped {
 
     auto& device = ctx->eigen_device<CPUDevice>();
 
-    absl::BlockingCounter shuffles_completed(2);
+    abslx::BlockingCounter shuffles_completed(2);
     auto on_shuffled = [&]() { shuffles_completed.DecrementCount(); };
 
     // Shuffle input into temporary tensor.

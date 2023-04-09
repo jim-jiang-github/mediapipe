@@ -233,13 +233,13 @@ StatusOr<std::vector<HloInstruction*>> GatherLoopBody(
 
 HloInstruction* CreateGatherLoopAccumulatorInitValue(
     HloComputation* computation, PrimitiveType element_type,
-    absl::Span<const int64_t> slice_sizes, int64_t gather_loop_trip_count,
+    abslx::Span<const int64_t> slice_sizes, int64_t gather_loop_trip_count,
     const GatherDimensionNumbers& dim_numbers) {
   std::vector<int64_t> accumulator_state_shape_dims;
   accumulator_state_shape_dims.reserve(1 + slice_sizes.size());
   accumulator_state_shape_dims.push_back(gather_loop_trip_count);
   for (int64_t i = 0; i < slice_sizes.size(); i++) {
-    if (!absl::c_binary_search(dim_numbers.collapsed_slice_dims(), i)) {
+    if (!abslx::c_binary_search(dim_numbers.collapsed_slice_dims(), i)) {
       accumulator_state_shape_dims.push_back(slice_sizes[i]);
     }
   }
@@ -252,7 +252,7 @@ HloInstruction* CreateGatherLoopAccumulatorInitValue(
 // are the major dimensions and the offset dimensions are the minor dimensions.
 // Fix this up with a transpose.
 StatusOr<HloInstruction*> PermuteBatchAndOffsetDims(
-    HloInstruction* accumulator, absl::Span<const int64_t> offset_dims,
+    HloInstruction* accumulator, abslx::Span<const int64_t> offset_dims,
     int64_t output_rank) {
   std::vector<int64_t> permutation;
   permutation.reserve(output_rank);
@@ -260,7 +260,7 @@ StatusOr<HloInstruction*> PermuteBatchAndOffsetDims(
   int64_t batch_idx_counter = 0;
   int64_t offset_idx_counter = output_rank - offset_dims.size();
   for (int64_t i = 0; i < output_rank; i++) {
-    bool is_offset_dim = absl::c_binary_search(offset_dims, i);
+    bool is_offset_dim = abslx::c_binary_search(offset_dims, i);
     if (is_offset_dim) {
       permutation.push_back(offset_idx_counter++);
     } else {
@@ -288,7 +288,7 @@ int64_t GatherLoopTripCount(HloInstruction* gather_instr) {
 }
 
 int64_t GatherIsBroadcast(HloInstruction* gather_instr) {
-  return absl::c_equal(gather_instr->gather_slice_sizes(),
+  return abslx::c_equal(gather_instr->gather_slice_sizes(),
                        gather_instr->operand(0)->shape().dimensions());
 }
 }  // namespace
@@ -412,7 +412,7 @@ bool GatherExpander::InstructionMatchesPattern(HloInstruction* inst) {
          // which can be represented without a loop -- i.e. we only simplify
          // gathers which have a trip count of 1.
          (mode_ == kEliminateAllGathers || GatherLoopTripCount(inst) == 1 ||
-          absl::c_equal(inst->gather_slice_sizes(),
+          abslx::c_equal(inst->gather_slice_sizes(),
                         inst->operand(0)->shape().dimensions()));
 }
 

@@ -37,23 +37,23 @@ class CountCalculator : public CalculatorBase {
   CountCalculator() { ++num_constructed_; }
   ~CountCalculator() override { ++num_destroyed_; }
 
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     ++num_fill_expectations_;
     cc->Inputs().Get(cc->Inputs().BeginId()).Set<int>();
     cc->Outputs().Get(cc->Outputs().BeginId()).Set<int>();
     cc->InputSidePackets().Get(cc->InputSidePackets().BeginId()).Set<int>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     ++num_open_;
     // Simulate doing nontrivial work to ensure that the time spent in the
     // method will register on streamz each time it is called.
     usleep(100);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     ++num_process_;
     int input_stream_int = cc->Inputs().Get(cc->Inputs().BeginId()).Get<int>();
     int side_packet_int =
@@ -65,15 +65,15 @@ class CountCalculator : public CalculatorBase {
     // Simulate doing nontrivial work to ensure that the time spent in the
     // method will register on streamz each time it is called.
     usleep(100);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Close(CalculatorContext* cc) override {
+  abslx::Status Close(CalculatorContext* cc) override {
     ++num_close_;
     // Simulate doing nontrivial work to ensure that the time spent in the
     // method will register on streamz each time it is called.
     usleep(100);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   static int num_constructed_;
@@ -94,7 +94,7 @@ int CountCalculator::num_destroyed_ = 0;
 
 void SourceNodeOpenedNoOp() {}
 
-void CheckFail(const absl::Status& status) {
+void CheckFail(const abslx::Status& status) {
   LOG(FATAL) << "The test triggered the error callback with status: " << status;
 }
 
@@ -158,14 +158,14 @@ class CalculatorNodeTest : public ::testing::Test {
     input_side_packets_.emplace("input_a", Adopt(new int(42)));
     input_side_packets_.emplace("input_b", Adopt(new int(42)));
 
-    node_ = absl::make_unique<CalculatorNode>();
+    node_ = abslx::make_unique<CalculatorNode>();
     MP_ASSERT_OK(node_->Initialize(
         &validated_graph_, {NodeTypeInfo::NodeType::CALCULATOR, 2},
         input_stream_managers_.get(), output_stream_managers_.get(),
         output_side_packets_.get(), &buffer_size_hint_, graph_profiler_));
   }
 
-  absl::Status PrepareNodeForRun() {
+  abslx::Status PrepareNodeForRun() {
     return node_->PrepareForRun(                      //
         input_side_packets_,                          //
         service_packets_,                             //
@@ -180,11 +180,11 @@ class CalculatorNodeTest : public ::testing::Test {
         nullptr);
   }
 
-  absl::Status InitializeStreams() {
+  abslx::Status InitializeStreams() {
     // START OF: code is copied from
     // CalculatorGraph::InitializePacketGeneratorGraph.
     // Create and initialize the output side packets.
-    output_side_packets_ = absl::make_unique<OutputSidePacketImpl[]>(
+    output_side_packets_ = abslx::make_unique<OutputSidePacketImpl[]>(
         validated_graph_.OutputSidePacketInfos().size());
     for (int index = 0; index < validated_graph_.OutputSidePacketInfos().size();
          ++index) {
@@ -220,7 +220,7 @@ class CalculatorNodeTest : public ::testing::Test {
 
     stream_a_manager_ = &output_stream_managers_[1];
     stream_b_manager_ = &output_stream_managers_[2];
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   virtual void SimulateParentOpenNode() { stream_a_manager_->LockIntroData(); }
@@ -482,7 +482,7 @@ TEST_F(CalculatorNodeTest, CleanupAfterRun) {
   node_->EndScheduling();
   // The max parallelism is already reached.
   EXPECT_FALSE(node_->TryToBeginScheduling());
-  node_->CleanupAfterRun(absl::OkStatus());
+  node_->CleanupAfterRun(abslx::OkStatus());
 
   EXPECT_FALSE(node_->Prepared());
   EXPECT_FALSE(node_->Opened());
@@ -517,7 +517,7 @@ void CalculatorNodeTest::TestCleanupAfterRunTwice() {
   EXPECT_TRUE(node_->TryToBeginScheduling());
   MP_EXPECT_OK(node_->ProcessNode(cc_));
   node_->EndScheduling();
-  node_->CleanupAfterRun(absl::OkStatus());
+  node_->CleanupAfterRun(abslx::OkStatus());
 
   stream_a_manager_->PrepareForRun(nullptr);
 
@@ -543,7 +543,7 @@ void CalculatorNodeTest::TestCleanupAfterRunTwice() {
   node_->EndScheduling();
   // The max parallelism is already reached.
   EXPECT_FALSE(node_->TryToBeginScheduling());
-  node_->CleanupAfterRun(absl::OkStatus());
+  node_->CleanupAfterRun(abslx::OkStatus());
 
   EXPECT_FALSE(node_->Prepared());
   EXPECT_FALSE(node_->Opened());

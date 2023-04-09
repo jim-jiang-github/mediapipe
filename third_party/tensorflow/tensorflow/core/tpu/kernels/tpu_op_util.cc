@@ -31,9 +31,9 @@ std::string CreateShapePrefix(
   std::string shapes_prefix;
   for (const TensorShape& shape : dynamic_shapes) {
     for (int64_t size : shape.dim_sizes()) {
-      absl::StrAppend(&shapes_prefix, size, ",");
+      abslx::StrAppend(&shapes_prefix, size, ",");
     }
-    absl::StrAppend(&shapes_prefix, ";");
+    abslx::StrAppend(&shapes_prefix, ";");
   }
   return shapes_prefix;
 }
@@ -44,28 +44,28 @@ std::string CreateConfigPrefix(const TPUCompileMetadataProto& metadata) {
   std::string config_prefix;
   for (const auto& arg : metadata.args()) {
     if (arg.is_same_data_across_replicas()) {
-      absl::StrAppend(&config_prefix, ":s");
+      abslx::StrAppend(&config_prefix, ":s");
       // Same.
     } else {
       // Different.
-      absl::StrAppend(&config_prefix, ":");
+      abslx::StrAppend(&config_prefix, ":");
     }
     if (arg.enable_xla_sharding() ==
         tpu::TPUCompileMetadataProto::Arg::ALLOWED) {
       // Enabled.
-      absl::StrAppend(&config_prefix, "e");
+      abslx::StrAppend(&config_prefix, "e");
     }
     if (arg.unrestricted_layout()) {
       // Unrestricted.
-      absl::StrAppend(&config_prefix, ":u");
+      abslx::StrAppend(&config_prefix, ":u");
     }
-    absl::StrAppend(&config_prefix, ",type(", arg.dtype(), ")");
+    abslx::StrAppend(&config_prefix, ",type(", arg.dtype(), ")");
     if (arg.has_shape()) {
-      absl::StrAppend(&config_prefix, ",shape(");
+      abslx::StrAppend(&config_prefix, ",shape(");
       for (const auto& dim : arg.shape().dim()) {
-        absl::StrAppend(&config_prefix, dim.size(), ",");
+        abslx::StrAppend(&config_prefix, dim.size(), ",");
       }
-      absl::StrAppend(&config_prefix, ")");
+      abslx::StrAppend(&config_prefix, ")");
     }
   }
   return config_prefix;
@@ -78,7 +78,7 @@ uint64 CreateFingerprintWithNameAndShapes(
   VLOG(2) << "CreateFingerprintWithNameAndShapes, name: " << name
           << ", shape_prefix: " << shape_prefix;
   return TpuCompileInterface::Get()->FingerprintString(
-      absl::StrCat(name, "_", shape_prefix));
+      abslx::StrCat(name, "_", shape_prefix));
 }
 
 // Return fingerprint_in_metadata if it's not empty; otherwise read input tensor
@@ -103,7 +103,7 @@ std::string GuaranteedConstFingerprint(
 // The `guaranteed_constants` must be passed as reference due to the lazy
 // evaluation of `guaranteed_const_fingerprint()` callback.
 TpuCompilationCacheKey CreateCompilationCacheKey(
-    absl::string_view function_name, uint64 function_library_fingerprint,
+    abslx::string_view function_name, uint64 function_library_fingerprint,
     uint64 mlir_module_fingerprint, const OpInputList& guaranteed_constants,
     const std::vector<TensorShape>& dynamic_shapes,
     const TPUCompileMetadataProto& metadata,

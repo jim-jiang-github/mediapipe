@@ -20,7 +20,7 @@ class WepPerformanceTraceScope {
       : event_type_str_(event_type_str), cc_(cc) {
     const auto& calculator_name = cc->NodeName();
     std::string start_name =
-        absl::StrCat(calculator_name, "::", event_type_str_, "_start");
+        abslx::StrCat(calculator_name, "::", event_type_str_, "_start");
     std::string timestamp_str = cc->InputTimestamp().DebugString();
     EM_ASM(
         {
@@ -34,11 +34,11 @@ class WepPerformanceTraceScope {
   ~WepPerformanceTraceScope() {
     const auto& calculator_name = cc_->NodeName();
     std::string start_name =
-        absl::StrCat(calculator_name, "::", event_type_str_, "_start");
+        abslx::StrCat(calculator_name, "::", event_type_str_, "_start");
     std::string end_name =
-        absl::StrCat(calculator_name, "::", event_type_str_, "_end");
+        abslx::StrCat(calculator_name, "::", event_type_str_, "_end");
     std::string measure_name =
-        absl::StrCat(calculator_name, "::", event_type_str_);
+        abslx::StrCat(calculator_name, "::", event_type_str_);
     EM_ASM(
         {
           const startName = UTF8ToString($0);

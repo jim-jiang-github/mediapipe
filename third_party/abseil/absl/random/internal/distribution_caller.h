@@ -23,7 +23,7 @@
 #include "absl/base/internal/fast_type_id.h"
 #include "absl/utility/utility.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -40,12 +40,12 @@ struct DistributionCaller {
   template <template <class...> class Trait, class AlwaysVoid, class... Args>
   struct detector : std::false_type {};
   template <template <class...> class Trait, class... Args>
-  struct detector<Trait, absl::void_t<Trait<Args...>>, Args...>
+  struct detector<Trait, abslx::void_t<Trait<Args...>>, Args...>
       : std::true_type {};
 
   template <class T>
   using invoke_mock_t = decltype(std::declval<T*>()->InvokeMock(
-      std::declval<::absl::base_internal::FastTypeIdType>(),
+      std::declval<::abslx::base_internal::FastTypeIdType>(),
       std::declval<void*>(), std::declval<void*>()));
 
   using HasInvokeMock = typename detector<invoke_mock_t, void, URBG>::type;
@@ -64,14 +64,14 @@ struct DistributionCaller {
   static typename DistrT::result_type Impl(std::true_type, URBG* urbg,
                                            Args&&... args) {
     using ResultT = typename DistrT::result_type;
-    using ArgTupleT = std::tuple<absl::decay_t<Args>...>;
+    using ArgTupleT = std::tuple<abslx::decay_t<Args>...>;
     using KeyT = ResultT(DistrT, ArgTupleT);
 
     ArgTupleT arg_tuple(std::forward<Args>(args)...);
     ResultT result;
-    if (!urbg->InvokeMock(::absl::base_internal::FastTypeId<KeyT>(), &arg_tuple,
+    if (!urbg->InvokeMock(::abslx::base_internal::FastTypeId<KeyT>(), &arg_tuple,
                           &result)) {
-      auto dist = absl::make_from_tuple<DistrT>(arg_tuple);
+      auto dist = abslx::make_from_tuple<DistrT>(arg_tuple);
       result = dist(*urbg);
     }
     return result;
@@ -87,6 +87,6 @@ struct DistributionCaller {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_INTERNAL_DISTRIBUTION_CALLER_H_

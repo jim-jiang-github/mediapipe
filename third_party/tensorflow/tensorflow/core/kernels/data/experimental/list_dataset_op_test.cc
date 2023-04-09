@@ -50,7 +50,7 @@ class ListDatasetParams : public DatasetParams {
   Status GetInputNames(std::vector<string>* input_names) const override {
     input_names->reserve(tensors_.size());
     for (int i = 0; i < tensors_.size(); ++i) {
-      input_names->emplace_back(absl::StrCat("tensors_", i));
+      input_names->emplace_back(abslx::StrCat("tensors_", i));
     }
     return Status::OK();
   }

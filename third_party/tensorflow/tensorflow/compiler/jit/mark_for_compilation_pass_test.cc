@@ -92,10 +92,10 @@ std::set<string> GetClusterNames(const Graph& graph) {
   return names;
 }
 
-absl::flat_hash_map<string, std::vector<string>> GetClusterSets(
+abslx::flat_hash_map<string, std::vector<string>> GetClusterSets(
     const Graph& g, std::vector<string>* cluster_names = nullptr) {
   CHECK(cluster_names == nullptr || cluster_names->empty());
-  absl::flat_hash_map<string, std::vector<string>> cluster_sets;
+  abslx::flat_hash_map<string, std::vector<string>> cluster_sets;
   for (const auto& p : GetClusters(g)) {
     cluster_sets[p.second].push_back(p.first);
   }
@@ -727,7 +727,7 @@ TEST(XlaCompilationTest, ResourcesClusteringAllowed) {
   std::unique_ptr<Graph> graph(new Graph(OpRegistry::Global()));
   TF_EXPECT_OK(root.ToGraph(graph.get()));
   TF_ASSERT_OK(MarkForCompilationPassTestHelper::MarkForCompilation(&graph));
-  absl::flat_hash_map<string, std::vector<string>> cluster_sets =
+  abslx::flat_hash_map<string, std::vector<string>> cluster_sets =
       GetClusterSets(*graph);
   ASSERT_EQ(cluster_sets.size(), 1);
   std::vector<string> expected_clustered_nodes = {"AssignmentW", "ReadR",
@@ -747,7 +747,7 @@ TEST(XlaCompilationTest, ResourcesClusteringDisallowed) {
   std::unique_ptr<Graph> graph(new Graph(OpRegistry::Global()));
   TF_EXPECT_OK(root.ToGraph(graph.get()));
   TF_ASSERT_OK(MarkForCompilationPassTestHelper::MarkForCompilation(&graph));
-  absl::flat_hash_map<string, std::vector<string>> cluster_sets =
+  abslx::flat_hash_map<string, std::vector<string>> cluster_sets =
       GetClusterSets(*graph);
   ASSERT_EQ(cluster_sets.size(), 0);
 }
@@ -774,7 +774,7 @@ TEST(XlaCompilationTest, ChainOfOps) {
   TF_ASSERT_OK(MarkForCompilationPassTestHelper::MarkForCompilation(&graph));
 
   std::vector<string> cluster_names;
-  absl::flat_hash_map<string, std::vector<string>> cluster_sets =
+  abslx::flat_hash_map<string, std::vector<string>> cluster_sets =
       GetClusterSets(*graph, &cluster_names);
 
   ASSERT_EQ(cluster_sets.size(), 1);
@@ -788,7 +788,7 @@ TEST(XlaCompilationTest, IllegalCycle_UsefulErrorMessage) {
   std::unique_ptr<Graph> graph(new Graph(OpRegistry::Global()));
   Scope root = Scope::NewRootScope().ExitOnError();
   {
-    auto BuildNoopNode = [](absl::string_view name, Graph* graph) {
+    auto BuildNoopNode = [](abslx::string_view name, Graph* graph) {
       NodeDefBuilder builder(name, "NoOp");
       NodeDef def;
       TF_CHECK_OK(builder.Finalize(&def));
@@ -811,7 +811,7 @@ TEST(XlaCompilationTest, IllegalCycle_UsefulErrorMessage) {
 
   Status status = MarkForCompilationPassTestHelper::MarkForCompilation(&graph);
   EXPECT_FALSE(status.ok());
-  EXPECT_TRUE(absl::StrContains(status.ToString(),
+  EXPECT_TRUE(abslx::StrContains(status.ToString(),
                                 "Edge from c to a would create a cycle.\n"
                                 "+-> a\n"
                                 "|   b\n"
@@ -1026,7 +1026,7 @@ TEST(XlaCompilationTest, RandomShapeWithFunc) {
 }
 
 TEST(XlaCompilationTest, RandomShapeOnXlaDevice) {
-  absl::string_view xla_gpu_device =
+  abslx::string_view xla_gpu_device =
       "/job:worker/replica:0/task:0/device:XLA_GPU:0";
 
   Scope root = Scope::NewRootScope().ExitOnError();
@@ -1046,7 +1046,7 @@ TEST(XlaCompilationTest, RandomShapeOnXlaDevice) {
   TF_ASSERT_OK(root.ToGraph(graph.get()));
 
   for (Node* n : graph->nodes()) {
-    if (absl::StartsWith(n->name(), /*prefix=*/"test/")) {
+    if (abslx::StartsWith(n->name(), /*prefix=*/"test/")) {
       n->set_assigned_device_name(string(xla_gpu_device));
     }
   }
@@ -1058,7 +1058,7 @@ TEST(XlaCompilationTest, RandomShapeOnXlaDevice) {
 }
 
 TEST(XlaCompilationTest, TensorArrayShapeOnXlaDevice) {
-  absl::string_view xla_gpu_device =
+  abslx::string_view xla_gpu_device =
       "/job:worker/replica:0/task:0/device:XLA_GPU:0";
   Scope root = Scope::NewRootScope().ExitOnError();
   ops::TensorArray tensor_array(root.WithOpName("test/tensor_array"), 1,
@@ -1079,7 +1079,7 @@ TEST(XlaCompilationTest, TensorArrayShapeOnXlaDevice) {
   TF_ASSERT_OK(root.ToGraph(graph.get()));
 
   for (Node* n : graph->nodes()) {
-    if (absl::StartsWith(n->name(), /*prefix=*/"test/")) {
+    if (abslx::StartsWith(n->name(), /*prefix=*/"test/")) {
       n->set_assigned_device_name(string(xla_gpu_device));
     }
   }
@@ -1108,9 +1108,9 @@ TEST(XlaCompilationTest, DontClusterMergingNodes) {
   // Cluster1: [Const1, Const1, MatMul1]
   // Cluster2: [MatMulCombined]
   Scope root = Scope::NewRootScope().ExitOnError();
-  absl::string_view xla_gpu_dev0 =
+  abslx::string_view xla_gpu_dev0 =
       "/job:worker/replica:0/task:0/device:XLA_GPU:0";
-  absl::string_view xla_gpu_dev1 =
+  abslx::string_view xla_gpu_dev1 =
       "/job:worker/replica:0/task:0/device:XLA_GPU:1";
   std::unique_ptr<Graph> graph(new Graph(OpRegistry::Global()));
   Output a = ops::Tanh(root.WithOpName("tanh_A_dev0"),
@@ -1125,9 +1125,9 @@ TEST(XlaCompilationTest, DontClusterMergingNodes) {
   TF_ASSERT_OK(root.ToGraph(graph.get()));
 
   for (Node* n : graph->nodes()) {
-    if (absl::EndsWith(n->name(), /*suffix=*/"dev0")) {
+    if (abslx::EndsWith(n->name(), /*suffix=*/"dev0")) {
       n->set_assigned_device_name(string(xla_gpu_dev0));
-    } else if (absl::EndsWith(n->name(), /*suffix=*/"dev1")) {
+    } else if (abslx::EndsWith(n->name(), /*suffix=*/"dev1")) {
       n->set_assigned_device_name(string(xla_gpu_dev1));
     }
   }
@@ -1146,9 +1146,9 @@ TEST(XlaCompilationTest, DontClusterMergingNodesOnCPU) {
   // This is similar to the 'DontClusterMergingNodes' above, except
   // MatMulCombined is placed on the CPU.
   Scope root = Scope::NewRootScope().ExitOnError();
-  absl::string_view xla_gpu_dev0 = "/job:worker/replica:0/task:0/device:GPU:0";
-  absl::string_view xla_gpu_dev1 = "/job:worker/replica:0/task:0/device:GPU:1";
-  absl::string_view xla_cpu_dev0 = "/job:worker/replica:0/task:0/device:CPU:0";
+  abslx::string_view xla_gpu_dev0 = "/job:worker/replica:0/task:0/device:GPU:0";
+  abslx::string_view xla_gpu_dev1 = "/job:worker/replica:0/task:0/device:GPU:1";
+  abslx::string_view xla_cpu_dev0 = "/job:worker/replica:0/task:0/device:CPU:0";
   std::unique_ptr<Graph> graph(new Graph(OpRegistry::Global()));
   Output a = ops::Tanh(root.WithOpName("tanh_A_dev0"),
                        ops::Const(root.WithOpName("A_dev0"), 1.0f, {2, 2}));
@@ -1162,11 +1162,11 @@ TEST(XlaCompilationTest, DontClusterMergingNodesOnCPU) {
   TF_ASSERT_OK(root.ToGraph(graph.get()));
 
   for (Node* n : graph->nodes()) {
-    if (absl::EndsWith(n->name(), /*suffix=*/"cpu")) {
+    if (abslx::EndsWith(n->name(), /*suffix=*/"cpu")) {
       n->set_assigned_device_name(string(xla_cpu_dev0));
-    } else if (absl::EndsWith(n->name(), /*suffix=*/"dev0")) {
+    } else if (abslx::EndsWith(n->name(), /*suffix=*/"dev0")) {
       n->set_assigned_device_name(string(xla_gpu_dev0));
-    } else if (absl::EndsWith(n->name(), /*suffix=*/"dev1")) {
+    } else if (abslx::EndsWith(n->name(), /*suffix=*/"dev1")) {
       n->set_assigned_device_name(string(xla_gpu_dev1));
     }
   }
@@ -1199,9 +1199,9 @@ TEST(XlaCompilationTest, NOT_DontClusterSpreadingNodes) {
   // Cluster1: [MatMul0]
   // Cluster2: [MatMul1]
   Scope root = Scope::NewRootScope().ExitOnError();
-  absl::string_view xla_gpu_dev0 =
+  abslx::string_view xla_gpu_dev0 =
       "/job:worker/replica:0/task:0/device:XLA_GPU:0";
-  absl::string_view xla_gpu_dev1 =
+  abslx::string_view xla_gpu_dev1 =
       "/job:worker/replica:0/task:0/device:XLA_GPU:1";
   std::unique_ptr<Graph> graph(new Graph(OpRegistry::Global()));
   Output a = ops::Const(root.WithOpName("A_dev0"), 1.0f, {2, 2});
@@ -1215,9 +1215,9 @@ TEST(XlaCompilationTest, NOT_DontClusterSpreadingNodes) {
 
   TF_ASSERT_OK(root.ToGraph(graph.get()));
   for (Node* n : graph->nodes()) {
-    if (absl::EndsWith(n->name(), /*suffix=*/"dev0")) {
+    if (abslx::EndsWith(n->name(), /*suffix=*/"dev0")) {
       n->set_assigned_device_name(string(xla_gpu_dev0));
-    } else if (absl::EndsWith(n->name(), /*suffix=*/"dev1")) {
+    } else if (abslx::EndsWith(n->name(), /*suffix=*/"dev1")) {
       n->set_assigned_device_name(string(xla_gpu_dev1));
     }
   }
@@ -1233,7 +1233,7 @@ TEST(XlaCompilationTest, NOT_DontClusterSpreadingNodes) {
 }
 
 TEST(XlaCompilationTest, ClusterStatefulRandomOpOnXlaDevice) {
-  absl::string_view xla_cpu_device =
+  abslx::string_view xla_cpu_device =
       "/job:worker/replica:0/task:0/device:XLA_CPU:0";
 
   Scope root = Scope::NewRootScope().ExitOnError();
@@ -1246,7 +1246,7 @@ TEST(XlaCompilationTest, ClusterStatefulRandomOpOnXlaDevice) {
   TF_ASSERT_OK(root.ToGraph(graph.get()));
 
   for (Node* n : graph->nodes()) {
-    if (absl::StartsWith(n->name(), /*prefix=*/"test/")) {
+    if (abslx::StartsWith(n->name(), /*prefix=*/"test/")) {
       n->set_assigned_device_name(string(xla_cpu_device));
     }
   }
@@ -1276,7 +1276,7 @@ TEST(XlaCompilationTest, DontAutoClusterStatefulRandomOp) {
 }
 
 TEST(XlaCompilationTest, ClusterDummyOpsOnXlaDevice) {
-  absl::string_view xla_cpu_device =
+  abslx::string_view xla_cpu_device =
       "/job:worker/replica:0/task:0/device:XLA_CPU:0";
 
   Scope root = Scope::NewRootScope().ExitOnError();
@@ -1291,7 +1291,7 @@ TEST(XlaCompilationTest, ClusterDummyOpsOnXlaDevice) {
   TF_ASSERT_OK(root.ToGraph(graph.get()));
 
   for (Node* n : graph->nodes()) {
-    if (absl::StartsWith(n->name(), /*prefix=*/"test/")) {
+    if (abslx::StartsWith(n->name(), /*prefix=*/"test/")) {
       n->set_assigned_device_name(string(xla_cpu_device));
     }
   }
@@ -1386,7 +1386,7 @@ TEST(XlaCompilationTest, ClusterOpsProducingVariantIfOnXlaDevice) {
 
   string xla_cpu_device = "/job:worker/replica:0/task:0/device:XLA_CPU:0";
   for (Node* n : graph->nodes()) {
-    if (absl::StartsWith(n->name(), /*prefix=*/"test/")) {
+    if (abslx::StartsWith(n->name(), /*prefix=*/"test/")) {
       n->set_assigned_device_name(xla_cpu_device);
     }
   }
@@ -1763,7 +1763,7 @@ TEST(XlaCompilationTest, UnsupportedEnterExitPattern) {
 
 TEST(XlaCompilationTest, DeterministicClusterNames) {
   auto create_graph =
-      [](absl::string_view output_name) -> std::unique_ptr<Graph> {
+      [](abslx::string_view output_name) -> std::unique_ptr<Graph> {
     std::unique_ptr<Graph> graph(new Graph(OpRegistry::Global()));
     GraphDefBuilder builder(GraphDefBuilder::kFailImmediately);
     Tensor t(DT_FLOAT, TensorShape());
@@ -1780,12 +1780,12 @@ TEST(XlaCompilationTest, DeterministicClusterNames) {
 
   // Checks if two cluster names match for all parts except their sequence
   // number. Names are expected as: cluster_fp_seq#
-  auto cluster_names_match = [](absl::string_view lhs_cluster_name,
-                                absl::string_view rhs_cluster_name) {
-    std::vector<absl::string_view> lhs_cluster_name_parts =
-        absl::StrSplit(lhs_cluster_name, '_');
-    std::vector<absl::string_view> rhs_cluster_name_parts =
-        absl::StrSplit(rhs_cluster_name, '_');
+  auto cluster_names_match = [](abslx::string_view lhs_cluster_name,
+                                abslx::string_view rhs_cluster_name) {
+    std::vector<abslx::string_view> lhs_cluster_name_parts =
+        abslx::StrSplit(lhs_cluster_name, '_');
+    std::vector<abslx::string_view> rhs_cluster_name_parts =
+        abslx::StrSplit(rhs_cluster_name, '_');
 
     if (lhs_cluster_name_parts.size() != 3) {
       return errors::FailedPrecondition("unexpected lhs cluster name: ",
@@ -1856,7 +1856,7 @@ TEST(XlaCompilationTest, DeterministicClusterNames) {
 namespace {
 Node* MakeStageNode(GraphDefBuilder& builder, string name,
                     std::initializer_list<DataType> dtypes,
-                    absl::Span<const ops::NodeOut> values) {
+                    abslx::Span<const ops::NodeOut> values) {
   auto opts = builder.opts()
                   .WithName(std::move(name))
                   .WithAttr("dtypes", std::move(dtypes));
@@ -1940,9 +1940,9 @@ TEST(XlaCompilationTest, StagePipelinePreservedByClusterScopingPass) {
 }
 TEST(XlaCompilationTest, XLALiteAllowlist) {
   auto* allowlist_table = tensorflow::GetAllowlistTable();
-  absl::flat_hash_set<string> hallowlist;
+  abslx::flat_hash_set<string> hallowlist;
   std::vector<string> vall_ops = XlaOpRegistry::GetAllRegisteredOps();
-  absl::flat_hash_set<string> all_ops(vall_ops.begin(), vall_ops.end());
+  abslx::flat_hash_set<string> all_ops(vall_ops.begin(), vall_ops.end());
 
   // Check that all the operations in the table are existing TF operations
   for (auto pair : *allowlist_table) {
@@ -1955,7 +1955,7 @@ TEST(XlaCompilationTest, XLALiteAllowlist) {
   // Check that all registered XLA operation are in the allowlist
   // table or are known to not be in it.
 
-  absl::flat_hash_set<string> known_not_in_list =
+  abslx::flat_hash_set<string> known_not_in_list =
       tensorflow::testing::GetKnownXLAAllowlistOp();
   std::vector<string> unknow_op;
   for (string op : vall_ops) {
@@ -1966,7 +1966,7 @@ TEST(XlaCompilationTest, XLALiteAllowlist) {
   EXPECT_TRUE(unknow_op.empty())
       << "Someone added support for a new TF operations inside XLA. They must "
          "be included in the XLALite allowlist or denylist:\n"
-      << absl::StrJoin(unknow_op, "\n");
+      << abslx::StrJoin(unknow_op, "\n");
 }
 }  // namespace
 }  // namespace tensorflow

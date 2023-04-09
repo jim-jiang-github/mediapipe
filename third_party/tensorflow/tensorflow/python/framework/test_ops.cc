@@ -200,7 +200,7 @@ class GetDeadlineOp : public OpKernel {
     }
     Tensor* output;
     OP_REQUIRES_OK(ctx, ctx->allocate_output(0, TensorShape({}), &output));
-    output->scalar<int64_t>()() = absl::ToUnixMicros(*ctx->deadline());
+    output->scalar<int64_t>()() = abslx::ToUnixMicros(*ctx->deadline());
   }
 };
 
@@ -211,7 +211,7 @@ class SleepOp : public OpKernel {
   explicit SleepOp(OpKernelConstruction* ctx) : OpKernel(ctx) {}
 
   void Compute(OpKernelContext* ctx) override {
-    absl::SleepFor(absl::Seconds(ctx->input(0).scalar<int>()()));
+    abslx::SleepFor(abslx::Seconds(ctx->input(0).scalar<int>()()));
   }
 };
 
@@ -222,7 +222,7 @@ class SleepIdentityOp : public OpKernel {
   explicit SleepIdentityOp(OpKernelConstruction* ctx) : OpKernel(ctx) {}
 
   void Compute(OpKernelContext* ctx) override {
-    absl::SleepFor(absl::Seconds(ctx->input(0).scalar<int>()()));
+    abslx::SleepFor(abslx::Seconds(ctx->input(0).scalar<int>()()));
     ctx->set_output(0, ctx->input(1));
   }
 };

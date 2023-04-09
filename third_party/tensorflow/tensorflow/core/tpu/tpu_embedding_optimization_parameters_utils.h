@@ -93,7 +93,7 @@ static constexpr int kMaxAuxiliaryParameterCount = 7;
 // gradient of zero from one that has been cleared after its gradients have
 // already been applied to the parameters and accumulators.
 inline float GradientAccumulatorInitialValue() {
-  return absl::bit_cast<float, uint32>(1);
+  return abslx::bit_cast<float, uint32>(1);
 }
 
 // Generic shape function for per-optimization-algorithm load ops.

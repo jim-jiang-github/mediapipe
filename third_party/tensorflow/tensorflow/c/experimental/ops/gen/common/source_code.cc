@@ -24,7 +24,7 @@ namespace generator {
 string SourceCode::Render() const {
   string code;
   for (const Line& line : lines_) {
-    absl::StrAppend(&code, string(line.indent * spaces_per_indent_, ' '),
+    abslx::StrAppend(&code, string(line.indent * spaces_per_indent_, ' '),
                     line.text, "\n");
   }
   return code;
@@ -48,12 +48,12 @@ void SourceCode::ValidateAndAddLine(int indent, const string& raw_line) {
   StringPiece line(raw_line);
   bool had_trailing_newline = str_util::ConsumeSuffix(&line, "\n");
 
-  if (absl::StrContains(line, '\n')) {
+  if (abslx::StrContains(line, '\n')) {
     LOG(ERROR) << "Attempt to add multiple lines; bad formatting is likely.";
   } else if (had_trailing_newline) {
     LOG(WARNING) << "Superfluous trailing newline in '" << line << "'";
   }
-  lines_.push_back({indent, string(absl::StripTrailingAsciiWhitespace(line))});
+  lines_.push_back({indent, string(abslx::StripTrailingAsciiWhitespace(line))});
 }
 
 }  // namespace generator

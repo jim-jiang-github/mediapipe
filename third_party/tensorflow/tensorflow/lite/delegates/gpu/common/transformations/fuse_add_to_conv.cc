@@ -37,8 +37,8 @@ namespace {
 void FuseBiasWithAddAttributes(const ElementwiseAttributes& add_attr,
                                const int channels,
                                Tensor<Linear, DataType::FLOAT32>* bias) {
-  auto add = absl::get_if<Tensor<Linear, DataType::FLOAT32>>(&add_attr.param);
-  auto add_scalar = absl::get_if<float>(&add_attr.param);
+  auto add = abslx::get_if<Tensor<Linear, DataType::FLOAT32>>(&add_attr.param);
+  auto add_scalar = abslx::get_if<float>(&add_attr.param);
   if (bias->data.empty()) {
     *bias = MakeZeroTensor<Linear, DataType::FLOAT32>(Linear(channels));
   }
@@ -63,42 +63,42 @@ class MergeConvolutionWithAdd : public SequenceTransformation {
       return {TransformStatus::SKIPPED, ""};
     }
     ElementwiseAttributes add_attr =
-        absl::any_cast<ElementwiseAttributes>(add_node.operation.attributes);
-    if (!absl::holds_alternative<Tensor<Linear, DataType::FLOAT32>>(
+        abslx::any_cast<ElementwiseAttributes>(add_node.operation.attributes);
+    if (!abslx::holds_alternative<Tensor<Linear, DataType::FLOAT32>>(
             add_attr.param) &&
-        !absl::holds_alternative<float>(add_attr.param)) {
+        !abslx::holds_alternative<float>(add_attr.param)) {
       return {TransformStatus::DECLINED,
               "This fuse applicable only for broadcast or scalar addition."};
     }
 
     if (conv_node.operation.type == ToString(OperationType::CONVOLUTION_2D)) {
       Convolution2DAttributes* conv_attr =
-          absl::any_cast<Convolution2DAttributes>(
+          abslx::any_cast<Convolution2DAttributes>(
               &conv_node.operation.attributes);
       FuseConvolution2DWithAdd(add_attr, conv_attr);
     } else if (conv_node.operation.type ==
                ToString(OperationType::CONVOLUTION_TRANSPOSED)) {
       ConvolutionTransposedAttributes* conv_attr =
-          absl::any_cast<ConvolutionTransposedAttributes>(
+          abslx::any_cast<ConvolutionTransposedAttributes>(
               &conv_node.operation.attributes);
       FuseConvolutionTransposedWithAdd(add_attr, conv_attr);
     } else if (conv_node.operation.type ==
                ToString(OperationType::DEPTHWISE_CONVOLUTION)) {
       DepthwiseConvolution2DAttributes* conv_attr =
-          absl::any_cast<DepthwiseConvolution2DAttributes>(
+          abslx::any_cast<DepthwiseConvolution2DAttributes>(
               &conv_node.operation.attributes);
       FuseDepthwiseConvolution2DWithAdd(add_attr, conv_attr);
     } else if (conv_node.operation.type ==
                ToString(OperationType::FULLY_CONNECTED)) {
       FullyConnectedAttributes* conv_attr =
-          absl::any_cast<FullyConnectedAttributes>(
+          abslx::any_cast<FullyConnectedAttributes>(
               &conv_node.operation.attributes);
       FuseFullyConnectedWithAdd(add_attr, conv_attr);
     } else {
       return {TransformStatus::SKIPPED, ""};
     }
 
-    absl::Status status = RemoveFollowingNode(graph, &add_node, &conv_node);
+    abslx::Status status = RemoveFollowingNode(graph, &add_node, &conv_node);
     if (!status.ok()) {
       return {TransformStatus::INVALID,
               "Unable to remove add node after convolution: " +
@@ -110,8 +110,8 @@ class MergeConvolutionWithAdd : public SequenceTransformation {
 
 void FuseAddWithConvolution2D(const ElementwiseAttributes& add_attr,
                               Convolution2DAttributes* attr) {
-  auto add = absl::get_if<Tensor<Linear, DataType::FLOAT32>>(&add_attr.param);
-  auto add_scalar = absl::get_if<float>(&add_attr.param);
+  auto add = abslx::get_if<Tensor<Linear, DataType::FLOAT32>>(&add_attr.param);
+  auto add_scalar = abslx::get_if<float>(&add_attr.param);
   if (attr->bias.data.empty()) {
     attr->bias = MakeZeroTensor<Linear, DataType::FLOAT32>(
         Linear(attr->weights.shape.o));
@@ -147,17 +147,17 @@ class MergeAddWithConvolution : public SequenceTransformation {
       return {TransformStatus::SKIPPED, ""};
     }
     ElementwiseAttributes add_attr =
-        absl::any_cast<ElementwiseAttributes>(add_node.operation.attributes);
-    if (!absl::holds_alternative<Tensor<Linear, DataType::FLOAT32>>(
+        abslx::any_cast<ElementwiseAttributes>(add_node.operation.attributes);
+    if (!abslx::holds_alternative<Tensor<Linear, DataType::FLOAT32>>(
             add_attr.param) &&
-        !absl::holds_alternative<float>(add_attr.param)) {
+        !abslx::holds_alternative<float>(add_attr.param)) {
       return {TransformStatus::DECLINED,
               "This fuse applicable only for broadcast or scalar addition."};
     }
 
     if (conv_node.operation.type == ToString(OperationType::CONVOLUTION_2D)) {
       Convolution2DAttributes* conv_attr =
-          absl::any_cast<Convolution2DAttributes>(
+          abslx::any_cast<Convolution2DAttributes>(
               &conv_node.operation.attributes);
       if (conv_attr->groups != 1) {
         return {TransformStatus::DECLINED,
@@ -176,7 +176,7 @@ class MergeAddWithConvolution : public SequenceTransformation {
       return {TransformStatus::SKIPPED, ""};
     }
 
-    absl::Status status = RemovePrecedingNode(graph, &add_node, &conv_node);
+    abslx::Status status = RemovePrecedingNode(graph, &add_node, &conv_node);
     if (!status.ok()) {
       return {TransformStatus::INVALID,
               "Unable to remove mul node after convolution: " +
@@ -189,11 +189,11 @@ class MergeAddWithConvolution : public SequenceTransformation {
 }  // namespace
 
 std::unique_ptr<SequenceTransformation> NewMergeConvolutionWithAdd() {
-  return absl::make_unique<MergeConvolutionWithAdd>();
+  return abslx::make_unique<MergeConvolutionWithAdd>();
 }
 
 std::unique_ptr<SequenceTransformation> NewMergeAddWithConvolution() {
-  return absl::make_unique<MergeAddWithConvolution>();
+  return abslx::make_unique<MergeAddWithConvolution>();
 }
 
 void FuseConvolution2DWithAdd(const ElementwiseAttributes& add_attr,

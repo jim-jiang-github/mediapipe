@@ -18,18 +18,18 @@
 // -----------------------------------------------------------------------------
 //
 // This file contains simple utilities for performing string matching checks.
-// All of these function parameters are specified as `absl::string_view`,
-// meaning that these functions can accept `std::string`, `absl::string_view` or
+// All of these function parameters are specified as `abslx::string_view`,
+// meaning that these functions can accept `std::string`, `abslx::string_view` or
 // NUL-terminated C-style strings.
 //
 // Examples:
 //   std::string s = "foo";
-//   absl::string_view sv = "f";
-//   assert(absl::StrContains(s, sv));
+//   abslx::string_view sv = "f";
+//   assert(abslx::StrContains(s, sv));
 //
 // Note: The order of parameters in these functions is designed to mimic the
 // order an equivalent member function would exhibit;
-// e.g. `s.Contains(x)` ==> `absl::StrContains(s, x).
+// e.g. `s.Contains(x)` ==> `abslx::StrContains(s, x).
 #ifndef ABSL_STRINGS_MATCH_H_
 #define ABSL_STRINGS_MATCH_H_
 
@@ -37,26 +37,26 @@
 
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // StrContains()
 //
 // Returns whether a given string `haystack` contains the substring `needle`.
-inline bool StrContains(absl::string_view haystack,
-                        absl::string_view needle) noexcept {
+inline bool StrContains(abslx::string_view haystack,
+                        abslx::string_view needle) noexcept {
   return haystack.find(needle, 0) != haystack.npos;
 }
 
-inline bool StrContains(absl::string_view haystack, char needle) noexcept {
+inline bool StrContains(abslx::string_view haystack, char needle) noexcept {
   return haystack.find(needle) != haystack.npos;
 }
 
 // StartsWith()
 //
 // Returns whether a given string `text` begins with `prefix`.
-inline bool StartsWith(absl::string_view text,
-                       absl::string_view prefix) noexcept {
+inline bool StartsWith(abslx::string_view text,
+                       abslx::string_view prefix) noexcept {
   return prefix.empty() ||
          (text.size() >= prefix.size() &&
           memcmp(text.data(), prefix.data(), prefix.size()) == 0);
@@ -65,8 +65,8 @@ inline bool StartsWith(absl::string_view text,
 // EndsWith()
 //
 // Returns whether a given string `text` ends with `suffix`.
-inline bool EndsWith(absl::string_view text,
-                     absl::string_view suffix) noexcept {
+inline bool EndsWith(abslx::string_view text,
+                     abslx::string_view suffix) noexcept {
   return suffix.empty() ||
          (text.size() >= suffix.size() &&
           memcmp(text.data() + (text.size() - suffix.size()), suffix.data(),
@@ -77,24 +77,24 @@ inline bool EndsWith(absl::string_view text,
 //
 // Returns whether given ASCII strings `piece1` and `piece2` are equal, ignoring
 // case in the comparison.
-bool EqualsIgnoreCase(absl::string_view piece1,
-                      absl::string_view piece2) noexcept;
+bool EqualsIgnoreCase(abslx::string_view piece1,
+                      abslx::string_view piece2) noexcept;
 
 // StartsWithIgnoreCase()
 //
 // Returns whether a given ASCII string `text` starts with `prefix`,
 // ignoring case in the comparison.
-bool StartsWithIgnoreCase(absl::string_view text,
-                          absl::string_view prefix) noexcept;
+bool StartsWithIgnoreCase(abslx::string_view text,
+                          abslx::string_view prefix) noexcept;
 
 // EndsWithIgnoreCase()
 //
 // Returns whether a given ASCII string `text` ends with `suffix`, ignoring
 // case in the comparison.
-bool EndsWithIgnoreCase(absl::string_view text,
-                        absl::string_view suffix) noexcept;
+bool EndsWithIgnoreCase(abslx::string_view text,
+                        abslx::string_view suffix) noexcept;
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_MATCH_H_

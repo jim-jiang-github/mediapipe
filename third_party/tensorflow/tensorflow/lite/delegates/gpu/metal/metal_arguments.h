@@ -35,10 +35,10 @@ class MetalArguments : public ArgumentsBinder {
  public:
   MetalArguments() = default;
 
-  absl::Status Init(bool use_arguments_buffer, MetalDevice* device,
+  abslx::Status Init(bool use_arguments_buffer, MetalDevice* device,
                     Arguments* args, std::string* code);
 
-  absl::Status Init(bool use_arguments_buffer, MetalDevice* device,
+  abslx::Status Init(bool use_arguments_buffer, MetalDevice* device,
                     Arguments* args);
 
   // Move only
@@ -47,10 +47,10 @@ class MetalArguments : public ArgumentsBinder {
   MetalArguments(const MetalArguments&) = delete;
   MetalArguments& operator=(const MetalArguments&) = delete;
 
-  absl::Status SetInt(const std::string& name, int value) override;
-  absl::Status SetFloat(const std::string& name, float value) override;
-  absl::Status SetHalf(const std::string& name, half value) override;
-  absl::Status SetObjectRef(const std::string& name, const GPUObject& object);
+  abslx::Status SetInt(const std::string& name, int value) override;
+  abslx::Status SetFloat(const std::string& name, float value) override;
+  abslx::Status SetHalf(const std::string& name, half value) override;
+  abslx::Status SetObjectRef(const std::string& name, const GPUObject& object);
 
   void Encode(id<MTLComputeCommandEncoder> encoder, int buffer_offset,
               int texture_offset = 0) const;
@@ -82,8 +82,8 @@ class MetalArguments : public ArgumentsBinder {
       const Arguments& args, const std::string& call_prefix = "",
       std::string* code = nullptr);
 
-  absl::Status AllocateObjects(const Arguments& args, id<MTLDevice> device);
-  absl::Status AddObjectArgs(const GpuInfo& gpu_info, const Arguments& args);
+  abslx::Status AllocateObjects(const Arguments& args, id<MTLDevice> device);
+  abslx::Status AddObjectArgs(const GpuInfo& gpu_info, const Arguments& args);
 
   void AddGPUResources(const std::string& name, const GPUResources& resources);
 
@@ -91,7 +91,7 @@ class MetalArguments : public ArgumentsBinder {
 
   std::string GetArgumentBufferStructDefinition(bool add_constants_struct);
 
-  absl::Status SetGPUResources(const std::string& name,
+  abslx::Status SetGPUResources(const std::string& name,
                                const GPUResourcesWithValue& resources);
 
   void AddBuffer(const std::string& name, const GPUBufferDescriptor& desc);
@@ -102,14 +102,14 @@ class MetalArguments : public ArgumentsBinder {
   void AddImageBuffer(const std::string& name,
                       const GPUImageBufferDescriptor& desc);
 
-  absl::Status SetBuffer(const std::string& name, id<MTLBuffer> handle,
+  abslx::Status SetBuffer(const std::string& name, id<MTLBuffer> handle,
                          uint64_t offset);
-  absl::Status SetImage2D(const std::string& name, id<MTLTexture> handle);
-  absl::Status SetImage2DArray(const std::string& name, id<MTLTexture> handle);
-  absl::Status SetImage3D(const std::string& name, id<MTLTexture> handle);
-  absl::Status SetImageBuffer(const std::string& name, id<MTLTexture> handle);
+  abslx::Status SetImage2D(const std::string& name, id<MTLTexture> handle);
+  abslx::Status SetImage2DArray(const std::string& name, id<MTLTexture> handle);
+  abslx::Status SetImage3D(const std::string& name, id<MTLTexture> handle);
+  abslx::Status SetImageBuffer(const std::string& name, id<MTLTexture> handle);
 
-  absl::Status SetObjectsResources(const Arguments& args);
+  abslx::Status SetObjectsResources(const Arguments& args);
 
   static constexpr char kArgsPrefix[] = "args.";
   struct IntValue {

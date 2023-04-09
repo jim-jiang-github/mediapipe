@@ -44,7 +44,7 @@ class MetalExecutionEnvironment : public TestExecutionEnvironment {
 
   const GpuInfo& GetGpuInfo() const override { return device_.GetInfo(); }
 
-  absl::Status ExecuteGpuOperationInternal(
+  abslx::Status ExecuteGpuOperationInternal(
       const std::vector<TensorDescriptor*>& src_cpu,
       const std::vector<TensorDescriptor*>& dst_cpu,
       std::unique_ptr<GPUOperation>&& operation) override;

@@ -279,7 +279,7 @@ void LatencyBenchmark::PerformBatchCpuWork() const {
 
 string LatencyBenchmark::ReportLatencyBatchSz() {
   mutex_lock l(mu_);
-  return absl::StrCat(
+  return abslx::StrCat(
       "lat_p99.9=", task_latency_millis_histogram_.Percentile(99.9),
       "ms,batchsz_p99=", batch_size_histogram_.Percentile(99));
 }

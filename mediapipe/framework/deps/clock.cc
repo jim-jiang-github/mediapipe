@@ -31,13 +31,13 @@ class RealTimeClock : public Clock {
     LOG(FATAL) << "RealTimeClock should never be destroyed";
   }
 
-  absl::Time TimeNow() override { return absl::Now(); }
+  abslx::Time TimeNow() override { return abslx::Now(); }
 
-  void Sleep(absl::Duration d) override { absl::SleepFor(d); }
+  void Sleep(abslx::Duration d) override { abslx::SleepFor(d); }
 
-  void SleepUntil(absl::Time wakeup_time) override {
-    absl::Duration d = wakeup_time - TimeNow();
-    if (d > absl::ZeroDuration()) {
+  void SleepUntil(abslx::Time wakeup_time) override {
+    abslx::Duration d = wakeup_time - TimeNow();
+    if (d > abslx::ZeroDuration()) {
       Sleep(d);
     }
   }

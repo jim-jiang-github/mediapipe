@@ -86,7 +86,7 @@ void CombineMemoryAccessedBreakdown(
     const protobuf::RepeatedPtrField<OpMetrics_MemoryAccessed>& src,
     protobuf::RepeatedPtrField<OpMetrics_MemoryAccessed>* dst) {
   if (src.empty()) return;
-  absl::flat_hash_map<std::pair<uint64 /*memory_space*/, OperationType>,
+  abslx::flat_hash_map<std::pair<uint64 /*memory_space*/, OperationType>,
                       OpMetrics_MemoryAccessed*>
       dst_memory_accessed_map;
   for (auto& dst_memory_accessed : *dst) {

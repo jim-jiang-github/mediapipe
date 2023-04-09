@@ -787,7 +787,7 @@ StatusOr<std::unique_ptr<HloModule>> GpuCompiler::RunHloPasses(
   XLA_SCOPED_LOGGING_TIMER("GpuCompiler::RunHloPasses");
   uint64_t start_usecs = tensorflow::Env::Default()->NowMicros();
   tensorflow::profiler::TraceMe activity(
-      [&] { return absl::StrCat("HLO Transforms:", module->name()); },
+      [&] { return abslx::StrCat("HLO Transforms:", module->name()); },
       tensorflow::profiler::TraceMeLevel::kInfo);
   TF_RETURN_IF_ERROR(
       OptimizeHloModule(module.get(), stream_exec, options.device_allocator));
@@ -869,7 +869,7 @@ static StatusOr<OwnedJitRtProgram> LowerToJitRt(
 #endif  // XLA_ENABLE_XLIR
 
 using OutputInfoMap =
-    absl::flat_hash_map<ShapeIndex, GpuExecutable::OutputInfo>;
+    abslx::flat_hash_map<ShapeIndex, GpuExecutable::OutputInfo>;
 static Status GetMlirAllocationInfo(mlir::func::FuncOp func,
                                     std::vector<BufferAllocation>* allocations,
                                     OutputInfoMap* output_info,
@@ -950,7 +950,7 @@ static Status CompileModuleToLlvmIrImpl(
   VLOG(1) << "Buffer Assignment Stats for " << hlo_module->name() << "\n"
           << results->buffer_assignment->GetStats().ToString();
   DumpHloModuleIfEnabled(*hlo_module, *results->buffer_assignment,
-                         absl::StrCat("sm_", cuda_compute_capability.ToString(),
+                         abslx::StrCat("sm_", cuda_compute_capability.ToString(),
                                       "_gpu_after_optimizations"));
 
   uint64_t start_usecs = tensorflow::Env::Default()->NowMicros();
@@ -1076,7 +1076,7 @@ GpuCompiler::CompileToTargetBinary(const HloModuleConfig& module_config,
           << "\nThis probably indicates a bug in the HLO -> LLVM IR "
              "lowering. Rerun with --xla_dump_to to get the IR"
           << (debug_module
-                  ? absl::StrCat(" and looks for files with name containing: *",
+                  ? abslx::StrCat(" and looks for files with name containing: *",
                                  FilenameFor(*debug_module, "", ""), "*")
                   : ".");
     }
@@ -1117,7 +1117,7 @@ GpuCompiler::CompileToTargetBinary(const HloModuleConfig& module_config,
 
     // Write PTX to IR dump directory, if IR dumping was requested.
     if (should_dump) {
-      absl::string_view ptx = result->first;
+      abslx::string_view ptx = result->first;
       if (debug_module) {
         if (shard_number.has_value()) {
           DumpToFileInDirOrStdout(*debug_module, "",
@@ -1253,7 +1253,7 @@ StatusOr<std::unique_ptr<Executable>> GpuCompiler::RunBackend(
   VLOG(1) << "Starting to compile HLO module " << module->name();
   XLA_SCOPED_LOGGING_TIMER("GpuCompiler::RunBackend");
   std::string slow_compilation_msg =
-      absl::StrCat("Compiling module ", module->name());
+      abslx::StrCat("Compiling module ", module->name());
   auto slow_compile_alarm = SlowCompilationAlarm(slow_compilation_msg);
 
   TF_RET_CHECK(stream_exec != nullptr);
@@ -1482,7 +1482,7 @@ StatusOr<std::unique_ptr<Executable>> CompileLmhloToExecutable(
     GpuCompiler* compiler, mlir::ModuleOp module, std::string module_name,
     const HloModuleConfig& module_config,
     const Compiler::CompileOptions& options,
-    absl::string_view entry_function_name, se::StreamExecutor* stream_exec,
+    abslx::string_view entry_function_name, se::StreamExecutor* stream_exec,
     std::unique_ptr<llvm::Module> llvm_module,
     IrEmitterContext* ir_emitter_context) {
   mlir::func::FuncOp entry_function =

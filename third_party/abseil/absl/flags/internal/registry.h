@@ -26,7 +26,7 @@
 // --------------------------------------------------------------------
 // Global flags registry API.
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace flags_internal {
 
@@ -92,6 +92,6 @@ class RetiredFlag {
 
 }  // namespace flags_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_FLAGS_INTERNAL_REGISTRY_H_

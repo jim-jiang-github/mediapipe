@@ -160,7 +160,7 @@ class NodeParallelismParameters {
   }
 
  private:
-  absl::flat_hash_map<const Node*, Parameter*> node_parallelism_;
+  abslx::flat_hash_map<const Node*, Parameter*> node_parallelism_;
 };
 
 // Returns true if all parameters have reached their max values.
@@ -1142,8 +1142,8 @@ class UnknownRatio : public Node {
   // The processing time is the sum of the self processing time and the product
   // of the ratio estimate and the sum of processing times of inputs.
   void TotalProcessingTimeLocked(
-      absl::flat_hash_map<string, double>* processing_times,
-      absl::flat_hash_map<string, double>* total_processing_times) override
+      abslx::flat_hash_map<string, double>* processing_times,
+      abslx::flat_hash_map<string, double>* total_processing_times) override
       TF_SHARED_LOCKS_REQUIRED(mu_) {
     double self_processing_time = SelfProcessingTimeLocked();
     if (processing_times) {
@@ -1315,7 +1315,7 @@ std::shared_ptr<Parameter> MakeNonTunableParameter(const string& name,
 
 std::shared_ptr<Node> MakeInterleaveManyNode(
     Node::Args args, std::vector<std::shared_ptr<Parameter>> parameters) {
-  DCHECK(absl::c_any_of(parameters,
+  DCHECK(abslx::c_any_of(parameters,
                         [](const std::shared_ptr<Parameter>& parameter) {
                           return parameter->name == kCycleLength;
                         }));
@@ -1325,7 +1325,7 @@ std::shared_ptr<Node> MakeInterleaveManyNode(
 
 std::shared_ptr<Node> MakeAsyncInterleaveManyNode(
     Node::Args args, std::vector<std::shared_ptr<Parameter>> parameters) {
-  DCHECK(absl::c_any_of(parameters,
+  DCHECK(abslx::c_any_of(parameters,
                         [](const std::shared_ptr<Parameter>& parameter) {
                           return parameter->name == kCycleLength;
                         }));
@@ -1534,7 +1534,7 @@ Node::ModelParameters Node::CollectNodeTunableParameters() const {
 }
 
 string Node::DebugString() const {
-  absl::flat_hash_map<string, string> debug_strings;
+  abslx::flat_hash_map<string, string> debug_strings;
   tf_shared_lock l(mu_);
   // Build up the debug string from the leaves of the nodes tree to the root.
   for (const auto& node :
@@ -1830,7 +1830,7 @@ bool Node::TryDownsizeBuffer() {
 }
 
 void Node::CollectBufferParametersToUpsize(
-    absl::flat_hash_map<Node*, Parameter*>& node_parameters) {
+    abslx::flat_hash_map<Node*, Parameter*>& node_parameters) {
   {
     tf_shared_lock l(mu_);
     for (auto& [node_name, parameter] : parameters_) {
@@ -1896,7 +1896,7 @@ void Node::CollectTunableParametersHelper(
   }
 }
 
-void Node::DebugStringHelper(absl::flat_hash_map<string, string>* debug_strings)
+void Node::DebugStringHelper(abslx::flat_hash_map<string, string>* debug_strings)
     const TF_SHARED_LOCKS_REQUIRED(mu_) {
   string result;
   strings::StrAppend(&result, long_name(), ":\n");
@@ -2235,11 +2235,11 @@ bool Model::DownsizeBuffers(std::shared_ptr<Node> snapshot) {
   return downsized;
 }
 
-absl::flat_hash_map<Node*, Parameter*> Model::CollectBufferParametersToUpsize(
+abslx::flat_hash_map<Node*, Parameter*> Model::CollectBufferParametersToUpsize(
     std::shared_ptr<Node> snapshot) {
   Node::NodeVector nodes =
       snapshot->CollectNodes(TraversalOrder::BFS, IsAsyncNode);
-  absl::flat_hash_map<Node*, Parameter*> node_parameters;
+  abslx::flat_hash_map<Node*, Parameter*> node_parameters;
   if (snapshot->IsAsync()) {
     snapshot->CollectBufferParametersToUpsize(node_parameters);
   }
@@ -2599,7 +2599,7 @@ void Model::OptimizeBuffers(std::shared_ptr<Node> snapshot,
 
 bool Model::UpsizeBuffers(std::shared_ptr<Node> snapshot, int64_t ram_budget) {
   // Find buffers that should be up-sized.
-  absl::flat_hash_map<Node*, Parameter*> node_parameters =
+  abslx::flat_hash_map<Node*, Parameter*> node_parameters =
       CollectBufferParametersToUpsize(snapshot);
 
   // Compute available memory.
@@ -2779,7 +2779,7 @@ Status Model::Load(const string& fname, std::unique_ptr<Model>* model,
 
 std::string Model::DebugString() {
   constexpr int64_t kMinSecondsBetweenCalls = 30;
-  if (absl::Now() < cache_until_) return cached_debug_string_;
+  if (abslx::Now() < cache_until_) return cached_debug_string_;
   std::shared_ptr<Node> snapshot;
   {
     tf_shared_lock l(mu_);
@@ -2794,7 +2794,7 @@ std::string Model::DebugString() {
   } else {
     LOG(WARNING) << s.error_message();
   }
-  cache_until_ = absl::Now() + absl::Seconds(kMinSecondsBetweenCalls);
+  cache_until_ = abslx::Now() + abslx::Seconds(kMinSecondsBetweenCalls);
   return cached_debug_string_;
 }
 

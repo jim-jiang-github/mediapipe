@@ -94,10 +94,10 @@ XRTGenericDeviceAccessor::GetOrCreateCompilationCache(
 /* static */ tensorflow::mutex
     XRTGenericDeviceAccessor::ScopedRef::cuda_allocator_mutex_(
         tensorflow::LINKER_INITIALIZED);
-/* static */ absl::flat_hash_map<stream_executor::Stream*,
+/* static */ abslx::flat_hash_map<stream_executor::Stream*,
                                  std::unique_ptr<se::TfAllocatorAdapter>>*
     XRTGenericDeviceAccessor::ScopedRef::cuda_allocators_ =
-        new absl::flat_hash_map<stream_executor::Stream*,
+        new abslx::flat_hash_map<stream_executor::Stream*,
                                 std::unique_ptr<se::TfAllocatorAdapter>>;
 
 void XRTGenericDeviceAccessor::ScopedRef::Acquire(

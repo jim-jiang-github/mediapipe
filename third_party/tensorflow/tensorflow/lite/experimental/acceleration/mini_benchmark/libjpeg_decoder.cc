@@ -120,7 +120,7 @@ std::unique_ptr<LibjpegDecoder> LibjpegDecoder::Create(Status& status) {
         sizeof(jpeg_decompress_struct);
     return decoder;
   }
-  if (!absl::StrContains(status.error_message, kSizeMismatchError)) {
+  if (!abslx::StrContains(status.error_message, kSizeMismatchError)) {
     return nullptr;
   }
   status = ExtractSizeFromErrorMessage(

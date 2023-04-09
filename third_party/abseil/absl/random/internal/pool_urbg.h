@@ -21,7 +21,7 @@
 #include "absl/random/internal/traits.h"
 #include "absl/types/span.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -51,7 +51,7 @@ class RandenPool {
   inline result_type operator()() { return Generate(); }
 
   // Fill data with random values.
-  static void Fill(absl::Span<result_type> data);
+  static void Fill(abslx::Span<result_type> data);
 
  protected:
   // Generate returns a single value.
@@ -71,7 +71,7 @@ class PoolURBG {
   // Inheritance to access the protected static members of RandenPool.
   using unsigned_type = typename make_unsigned_bits<T>::type;
   using PoolType = RandenPool<unsigned_type>;
-  using SpanType = absl::Span<unsigned_type>;
+  using SpanType = abslx::Span<unsigned_type>;
 
   static constexpr size_t kInitialBuffer = kBufferSize + 1;
   static constexpr size_t kHalfBuffer = kBufferSize / 2;
@@ -126,6 +126,6 @@ class PoolURBG {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_INTERNAL_POOL_URBG_H_

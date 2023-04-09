@@ -173,8 +173,8 @@ class OpKernelRunnerCache {
   OpKernelRunnerCache() = default;
 
   StatusOr<OpKernelRunner*> GetOrCreate(
-      tfrt::Location loc, absl::string_view op_name,
-      absl::string_view device_name, int num_args,
+      tfrt::Location loc, abslx::string_view op_name,
+      abslx::string_view device_name, int num_args,
       const std::function<Status(tensorflow::AttrValueMap*)>& attr_builder,
       const tensorflow::DeviceMgr& device_manager,
       const tensorflow::ProcessFunctionLibraryRuntime&
@@ -182,13 +182,13 @@ class OpKernelRunnerCache {
 
  private:
   mutable mutex mu_;
-  absl::flat_hash_map<OpLocationKey, std::unique_ptr<OpKernelRunner>> map_
+  abslx::flat_hash_map<OpLocationKey, std::unique_ptr<OpKernelRunner>> map_
       TF_GUARDED_BY(mu_);
 };
 
 StatusOr<OpKernelRunner*> OpKernelRunnerCache::GetOrCreate(
-    tfrt::Location loc, absl::string_view op_name,
-    absl::string_view device_name, int num_args,
+    tfrt::Location loc, abslx::string_view op_name,
+    abslx::string_view device_name, int num_args,
     const std::function<Status(tensorflow::AttrValueMap*)>& attr_builder,
     const tensorflow::DeviceMgr& device_manager,
     const tensorflow::ProcessFunctionLibraryRuntime&

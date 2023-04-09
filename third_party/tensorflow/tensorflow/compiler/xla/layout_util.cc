@@ -53,7 +53,7 @@ void SetDefaultLayoutToContainer(T* minor_to_major) {
 }  // namespace
 
 /* static */ Layout LayoutUtil::MakeLayout(
-    absl::Span<const int64_t> minor_to_major, absl::Span<const Tile> tiles,
+    abslx::Span<const int64_t> minor_to_major, abslx::Span<const Tile> tiles,
     int64_t element_size_in_bits, int64_t memory_space) {
   Layout layout;
   layout.set_format(DENSE);
@@ -89,7 +89,7 @@ void SetDefaultLayoutToContainer(T* minor_to_major) {
 }
 
 /* static */ Layout LayoutUtil::MakeLayoutFromMajorToMinor(
-    absl::Span<const int64_t> major_to_minor) {
+    abslx::Span<const int64_t> major_to_minor) {
   Layout layout;
   layout.set_format(DENSE);
   for (int i = major_to_minor.size() - 1; i >= 0; i--) {
@@ -228,7 +228,7 @@ Layout CreateDefaultLayoutForRank(int64_t rank) {
           "layout minor_to_major field contains %d elements, "
           "but shape is rank %d: {%s}; shape: %s",
           layout.minor_to_major_size(), shape.rank(),
-          absl::StrJoin(layout.minor_to_major(), ", "),
+          abslx::StrJoin(layout.minor_to_major(), ", "),
           shape.ShortDebugString());
     }
 
@@ -293,7 +293,7 @@ Layout CreateDefaultLayoutForRank(int64_t rank) {
 /* static */ bool LayoutUtil::HasLayout(const Shape& shape) {
   if (shape.IsTuple()) {
     // Tuple shape: all subshapes must have a layout.
-    return absl::c_all_of(shape.tuple_shapes(),
+    return abslx::c_all_of(shape.tuple_shapes(),
                           [](const Shape& s) { return HasLayout(s); });
   } else if (!shape.IsArray()) {
     // Opaque, token types etc. ignore layout.
@@ -315,13 +315,13 @@ Layout CreateDefaultLayoutForRank(int64_t rank) {
   return lhs == rhs;
 }
 
-/* static */ absl::Span<const int64_t> LayoutUtil::MinorToMajor(
+/* static */ abslx::Span<const int64_t> LayoutUtil::MinorToMajor(
     const Shape& shape) {
   CHECK(IsDenseArray(shape));
   return shape.layout().minor_to_major();
 }
 
-/* static */ absl::Span<const int64_t> LayoutUtil::MinorToMajor(
+/* static */ abslx::Span<const int64_t> LayoutUtil::MinorToMajor(
     const Layout& layout) {
   CHECK(layout.format() == DENSE);
   return layout.minor_to_major();
@@ -421,14 +421,14 @@ Status LayoutUtil::CopyLayoutBetweenShapes(const Shape& src, Shape* dst) {
 }
 
 /* static */ bool LayoutUtil::AreDimensionsConsecutive(
-    const Layout& layout, absl::Span<const int64_t> dims) {
+    const Layout& layout, abslx::Span<const int64_t> dims) {
   CHECK(IsDense(layout));
-  absl::InlinedVector<int64_t, 8> positions_in_layout;
+  abslx::InlinedVector<int64_t, 8> positions_in_layout;
   for (int64_t dim : dims) {
     positions_in_layout.push_back(
         PositionInContainer(layout.minor_to_major(), dim));
   }
-  absl::c_sort(positions_in_layout);
+  abslx::c_sort(positions_in_layout);
   for (size_t i = 1; i < positions_in_layout.size(); ++i) {
     if (1 != positions_in_layout[i] - positions_in_layout[i - 1]) {
       return false;
@@ -452,7 +452,7 @@ Status LayoutUtil::CopyLayoutBetweenShapes(const Shape& src, Shape* dst) {
 }
 
 /*static*/ int64_t LayoutUtil::LinearIndex(const Shape& shape,
-                                           absl::Span<const int64_t> indices) {
+                                           abslx::Span<const int64_t> indices) {
   CHECK(shape.IsArray());
   CHECK(shape.has_layout());
   const int rank = shape.rank();

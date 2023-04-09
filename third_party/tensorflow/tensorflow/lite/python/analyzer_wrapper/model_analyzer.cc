@@ -422,7 +422,7 @@ std::string model_analyzer(const std::string& model_file_or_buffer,
       model_is_gpu_compatibile = false;
       out_stream << "\nGPU COMPATIBILITY WARNING: Subgraph#" << i
                  << " has GPU delegate compatibility issues at nodes "
-                 << absl::StrJoin(gpu_incompatibile_nodes, ", ")
+                 << abslx::StrJoin(gpu_incompatibile_nodes, ", ")
                  << " with TFLite runtime version " << TF_VERSION_STRING
                  << "\n";
     }

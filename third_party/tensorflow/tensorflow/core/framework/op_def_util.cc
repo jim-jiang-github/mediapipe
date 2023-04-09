@@ -269,7 +269,7 @@ bool IsValidOpName(StringPiece sp) {
 }
 
 Status ValidateOpDef(const OpDef& op_def) {
-  if (!absl::StartsWith(op_def.name(), "_")) {
+  if (!abslx::StartsWith(op_def.name(), "_")) {
     VALIDATE(IsValidOpName(op_def.name()), "Invalid name: ", op_def.name(),
              " (Did you use CamelCase?)");
   }
@@ -285,11 +285,11 @@ Status ValidateOpDef(const OpDef& op_def) {
 
     // Validate type
     StringPiece type(attr.type());
-    bool is_list = absl::ConsumePrefix(&type, "list(");
+    bool is_list = abslx::ConsumePrefix(&type, "list(");
     bool found = false;
     for (StringPiece valid : {"string", "int", "float", "bool", "type", "shape",
                               "tensor", "func"}) {
-      if (absl::ConsumePrefix(&type, valid)) {
+      if (abslx::ConsumePrefix(&type, valid)) {
         found = true;
         break;
       }
@@ -297,7 +297,7 @@ Status ValidateOpDef(const OpDef& op_def) {
     VALIDATE(found, "Unrecognized type '", type, "' in attr '", attr.name(),
              "'");
     if (is_list) {
-      VALIDATE(absl::ConsumePrefix(&type, ")"),
+      VALIDATE(abslx::ConsumePrefix(&type, ")"),
                "'list(' is missing ')' in attr ", attr.name(), "'s type ",
                attr.type());
     }

@@ -233,7 +233,7 @@ bool safe_strto64(StringPiece str, int64_t* value) {
 
   int64_t vlimit = kint64max;
   int sign = 1;
-  if (absl::ConsumePrefix(&str, "-")) {
+  if (abslx::ConsumePrefix(&str, "-")) {
     sign = -1;
     // Different limit for positive and negative integers.
     vlimit = kint64min;
@@ -295,7 +295,7 @@ bool safe_strto32(StringPiece str, int32* value) {
 
   int64_t vmax = kint32max;
   int sign = 1;
-  if (absl::ConsumePrefix(&str, "-")) {
+  if (abslx::ConsumePrefix(&str, "-")) {
     sign = -1;
     // Different max for positive and negative integers.
     ++vmax;

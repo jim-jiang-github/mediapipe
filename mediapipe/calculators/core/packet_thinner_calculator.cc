@@ -90,7 +90,7 @@ class PacketThinnerCalculator : public CalculatorBase {
   PacketThinnerCalculator() {}
   ~PacketThinnerCalculator() override {}
 
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     if (cc->InputSidePackets().HasTag(kOptionsTag)) {
       cc->InputSidePackets().Tag(kOptionsTag).Set<CalculatorOptions>();
     }
@@ -99,21 +99,21 @@ class PacketThinnerCalculator : public CalculatorBase {
     if (cc->InputSidePackets().HasTag(kPeriodTag)) {
       cc->InputSidePackets().Tag(kPeriodTag).Set<int64>();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override {
     if (cc->InputTimestamp() < start_time_) {
-      return absl::OkStatus();  // Drop packets before start_time_.
+      return abslx::OkStatus();  // Drop packets before start_time_.
     } else if (cc->InputTimestamp() >= end_time_) {
       if (!cc->Outputs().Index(0).IsClosed()) {
         cc->Outputs()
             .Index(0)
             .Close();  // No more Packets will be output after end_time_.
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     } else {
       return thinner_type_ == PacketThinnerCalculatorOptions::ASYNC
                  ? AsyncThinnerProcess(cc)
@@ -123,8 +123,8 @@ class PacketThinnerCalculator : public CalculatorBase {
 
  private:
   // Implementation of ASYNC and SYNC versions of thinner algorithm.
-  absl::Status AsyncThinnerProcess(CalculatorContext* cc);
-  absl::Status SyncThinnerProcess(CalculatorContext* cc);
+  abslx::Status AsyncThinnerProcess(CalculatorContext* cc);
+  abslx::Status SyncThinnerProcess(CalculatorContext* cc);
 
   // Cached option.
   PacketThinnerCalculatorOptions::ThinnerType thinner_type_;
@@ -153,7 +153,7 @@ namespace {
 TimestampDiff abs(TimestampDiff t) { return t < 0 ? -t : t; }
 }  // namespace
 
-absl::Status PacketThinnerCalculator::Open(CalculatorContext* cc) {
+abslx::Status PacketThinnerCalculator::Open(CalculatorContext* cc) {
   PacketThinnerCalculatorOptions options = mediapipe::tool::RetrieveOptions(
       cc->Options<PacketThinnerCalculatorOptions>(), cc->InputSidePackets(),
       kOptionsTag);
@@ -225,10 +225,10 @@ absl::Status PacketThinnerCalculator::Open(CalculatorContext* cc) {
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PacketThinnerCalculator::Close(CalculatorContext* cc) {
+abslx::Status PacketThinnerCalculator::Close(CalculatorContext* cc) {
   // Emit any saved packets before quitting.
   if (!saved_packet_.IsEmpty()) {
     // Only sync thinner should have saved packets.
@@ -240,10 +240,10 @@ absl::Status PacketThinnerCalculator::Close(CalculatorContext* cc) {
       cc->Outputs().Index(0).AddPacket(saved_packet_);
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PacketThinnerCalculator::AsyncThinnerProcess(
+abslx::Status PacketThinnerCalculator::AsyncThinnerProcess(
     CalculatorContext* cc) {
   if (cc->InputTimestamp() >= next_valid_timestamp_) {
     cc->Outputs().Index(0).AddPacket(
@@ -252,10 +252,10 @@ absl::Status PacketThinnerCalculator::AsyncThinnerProcess(
     // Guaranteed not to emit packets seen during refractory period.
     cc->Outputs().Index(0).SetNextTimestampBound(next_valid_timestamp_);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PacketThinnerCalculator::SyncThinnerProcess(
+abslx::Status PacketThinnerCalculator::SyncThinnerProcess(
     CalculatorContext* cc) {
   if (saved_packet_.IsEmpty()) {
     // If no packet has been saved, store the current packet.
@@ -291,7 +291,7 @@ absl::Status PacketThinnerCalculator::SyncThinnerProcess(
       saved_packet_ = cc->Inputs().Index(0).Value();
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 Timestamp PacketThinnerCalculator::NearestSyncTimestamp(Timestamp now) const {

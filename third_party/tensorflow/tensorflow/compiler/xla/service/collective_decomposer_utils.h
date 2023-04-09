@@ -26,7 +26,7 @@ namespace xla {
 StatusOr<std::vector<HloInstruction *>>
 CreateStartIndicesForCollectiveDecomposition(
     CollectiveOpGroupMode group_mode,
-    absl::Span<const ReplicaGroup> replica_groups, const Shape &shard_shape,
+    abslx::Span<const ReplicaGroup> replica_groups, const Shape &shard_shape,
     int64_t shard_dimension, HloComputation *computation,
     std::function<void(Shape &)> update_layout = nullptr);
 

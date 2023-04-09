@@ -36,7 +36,7 @@ class MemorySpacePropagationTest : public HloTestBase {
 };
 
 TEST_F(MemorySpacePropagationTest, NoMemorySpace) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule NoMemorySpace
 
   %fused_computation {
@@ -66,11 +66,11 @@ TEST_F(MemorySpacePropagationTest, NoMemorySpace) {
   MemorySpacePropagation memory_space_propagation;
   EXPECT_FALSE(memory_space_propagation.Run(module.get()).ValueOrDie());
   TF_ASSERT_OK_AND_ASSIGN(auto ref, ParseAndReturnVerifiedModule(hlo_string));
-  EXPECT_EQ(absl::HashOf(*module), absl::HashOf(*ref));
+  EXPECT_EQ(abslx::HashOf(*module), abslx::HashOf(*ref));
 }
 
 TEST_F(MemorySpacePropagationTest, NonTupleOutput) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule NonTupleOutput
 
   %fused_computation {
@@ -95,7 +95,7 @@ TEST_F(MemorySpacePropagationTest, NonTupleOutput) {
     ROOT %root = s32[6]{0:T(128)} copy(%fusion)
   }
   )";
-  absl::string_view expected_hlo_string = R"(
+  abslx::string_view expected_hlo_string = R"(
   HloModule NonTupleOutput
 
   %fused_computation {
@@ -127,11 +127,11 @@ TEST_F(MemorySpacePropagationTest, NonTupleOutput) {
   TF_EXPECT_OK(Verify(module.get()));
   TF_ASSERT_OK_AND_ASSIGN(auto ref,
                           ParseAndReturnVerifiedModule(expected_hlo_string));
-  EXPECT_EQ(absl::HashOf(*module), absl::HashOf(*ref));
+  EXPECT_EQ(abslx::HashOf(*module), abslx::HashOf(*ref));
 }
 
 TEST_F(MemorySpacePropagationTest, TupleOutput) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule TupleOutput
 
   %fused_computation {
@@ -160,7 +160,7 @@ TEST_F(MemorySpacePropagationTest, TupleOutput) {
     ROOT %root = s32[6]{0:T(128)} add(%gte0, %gte1)
   }
   )";
-  absl::string_view expected_hlo_string = R"(
+  abslx::string_view expected_hlo_string = R"(
   HloModule TupleOutput
 
   %fused_computation {
@@ -196,12 +196,12 @@ TEST_F(MemorySpacePropagationTest, TupleOutput) {
   TF_EXPECT_OK(Verify(module.get()));
   TF_ASSERT_OK_AND_ASSIGN(auto ref,
                           ParseAndReturnVerifiedModule(expected_hlo_string));
-  EXPECT_EQ(absl::HashOf(*module), absl::HashOf(*ref));
+  EXPECT_EQ(abslx::HashOf(*module), abslx::HashOf(*ref));
 }
 
 TEST_F(MemorySpacePropagationTest, NestedInputFusion) {
   // Tests propagating the memory space to nested fusions on the input side.
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule NestedFusion
 
   %bitcast_fusion {
@@ -232,7 +232,7 @@ TEST_F(MemorySpacePropagationTest, NestedInputFusion) {
     ROOT %root = s32[6]{0:T(128)} copy(%fusion)
   }
   )";
-  absl::string_view expected_hlo_string = R"(
+  abslx::string_view expected_hlo_string = R"(
   HloModule NestedFusion
 
   %bitcast_fusion {
@@ -270,12 +270,12 @@ TEST_F(MemorySpacePropagationTest, NestedInputFusion) {
   TF_EXPECT_OK(Verify(module.get()));
   TF_ASSERT_OK_AND_ASSIGN(auto ref,
                           ParseAndReturnVerifiedModule(expected_hlo_string));
-  EXPECT_EQ(absl::HashOf(*module), absl::HashOf(*ref));
+  EXPECT_EQ(abslx::HashOf(*module), abslx::HashOf(*ref));
 }
 
 TEST_F(MemorySpacePropagationTest, NestedOutputFusion) {
   // Tests propagating the memory space to nested fusions on the output side.
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule NestedFusion
 
   %bitcast_fusion {
@@ -306,7 +306,7 @@ TEST_F(MemorySpacePropagationTest, NestedOutputFusion) {
     ROOT %root = s32[3,2]{0,1:T(128)} copy(%fusion)
   }
   )";
-  absl::string_view expected_hlo_string = R"(
+  abslx::string_view expected_hlo_string = R"(
   HloModule NestedFusion
 
   %bitcast_fusion {
@@ -344,11 +344,11 @@ TEST_F(MemorySpacePropagationTest, NestedOutputFusion) {
   TF_EXPECT_OK(Verify(module.get()));
   TF_ASSERT_OK_AND_ASSIGN(auto ref,
                           ParseAndReturnVerifiedModule(expected_hlo_string));
-  EXPECT_EQ(absl::HashOf(*module), absl::HashOf(*ref));
+  EXPECT_EQ(abslx::HashOf(*module), abslx::HashOf(*ref));
 }
 
 TEST_F(MemorySpacePropagationTest, BitcastInFusion) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
   HloModule TupleOutput
 
   %fused_computation {
@@ -374,7 +374,7 @@ TEST_F(MemorySpacePropagationTest, BitcastInFusion) {
     ROOT %fusion = (s32[6]{0:T(128)}, s32[6]{0:T(128)}) fusion(s32[6]{0:T(128)S(1)} %arg0, s32[1]{0:T(128)} %arg1, s32[5]{0:T(128)S(1)} %arg2), kind=kLoop, calls=%fused_computation
   }
   )";
-  absl::string_view expected_hlo_string = R"(
+  abslx::string_view expected_hlo_string = R"(
   HloModule TupleOutput
 
   %fused_computation {
@@ -407,7 +407,7 @@ TEST_F(MemorySpacePropagationTest, BitcastInFusion) {
   TF_EXPECT_OK(Verify(module.get()));
   TF_ASSERT_OK_AND_ASSIGN(auto ref,
                           ParseAndReturnVerifiedModule(expected_hlo_string));
-  EXPECT_EQ(absl::HashOf(*module), absl::HashOf(*ref));
+  EXPECT_EQ(abslx::HashOf(*module), abslx::HashOf(*ref));
 }
 
 }  // namespace

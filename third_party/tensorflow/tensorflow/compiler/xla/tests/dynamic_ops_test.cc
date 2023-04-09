@@ -114,10 +114,10 @@ class DynamicSliceTest : public ClientLibraryTestBase {
   }
 
   template <typename IndexT, typename DataT>
-  void RunR1(absl::Span<const int> input_values_int,
+  void RunR1(abslx::Span<const int> input_values_int,
              const std::vector<IndexT> slice_starts,
              const std::vector<int64_t>& slice_sizes,
-             absl::Span<const int> expected_values_int) {
+             abslx::Span<const int> expected_values_int) {
     // bfloat16 has explicit constructors, so it does not implicitly convert the
     // way built-in types do, which is why we can't take the parameter as an
     // Span<DataT>. We also can't convert it to a vector, because
@@ -139,7 +139,7 @@ class DynamicSliceTest : public ClientLibraryTestBase {
         slice_starts[0], 0, "slice_starts", &builder, &starts);
     // Build dynamic slice computation.
     auto input = ConstantLiteral(&builder, input_values);
-    DynamicSlice(input, absl::Span<const XlaOp>({starts}), slice_sizes);
+    DynamicSlice(input, abslx::Span<const XlaOp>({starts}), slice_sizes);
     // Run computation and compare against expected values.
     ComputeAndCompareLiteral(&builder, expected_values, {start_data.get()});
   }
@@ -172,7 +172,7 @@ class DynamicSliceTest : public ClientLibraryTestBase {
     DynamicSlice(input, starts, slice_sizes);
     // Run computation and compare against expected values.
     std::vector<GlobalData*> argument_ptrs;
-    absl::c_transform(start_data, std::back_inserter(argument_ptrs),
+    abslx::c_transform(start_data, std::back_inserter(argument_ptrs),
                       [](const std::unique_ptr<GlobalData>& argument) {
                         return argument.get();
                       });
@@ -206,7 +206,7 @@ class DynamicSliceTest : public ClientLibraryTestBase {
     DynamicSlice(input, starts, slice_sizes);
     // Run computation and compare against expected values.
     std::vector<GlobalData*> argument_ptrs;
-    absl::c_transform(start_data, std::back_inserter(argument_ptrs),
+    abslx::c_transform(start_data, std::back_inserter(argument_ptrs),
                       [](const std::unique_ptr<GlobalData>& argument) {
                         return argument.get();
                       });
@@ -392,16 +392,16 @@ class DynamicUpdateSliceTest : public ClientLibraryTestBase {
     // Build dynamic slice computation.
     auto input = ConstantLiteral(&builder, input_value);
     auto update = ConstantLiteral(&builder, update_value);
-    DynamicUpdateSlice(input, update, absl::Span<const XlaOp>({}));
+    DynamicUpdateSlice(input, update, abslx::Span<const XlaOp>({}));
     // Run computation and compare against expected values.
     ComputeAndCompareLiteral(&builder, expected_value, {});
   }
 
   template <typename IndexT, typename DataT>
-  void RunR1(absl::Span<const int> input_values_int,
-             absl::Span<const int> update_values_int,
+  void RunR1(abslx::Span<const int> input_values_int,
+             abslx::Span<const int> update_values_int,
              const std::vector<IndexT> slice_starts,
-             absl::Span<const int> expected_values_int) {
+             abslx::Span<const int> expected_values_int) {
     Literal input_values =
         std::move(LiteralUtil::CreateR1(input_values_int)
                       .Convert(primitive_util::NativeToPrimitiveType<DataT>())
@@ -423,7 +423,7 @@ class DynamicUpdateSliceTest : public ClientLibraryTestBase {
     // Build dynamic slice computation.
     auto input = ConstantLiteral(&builder, input_values);
     auto update = ConstantLiteral(&builder, update_values);
-    DynamicUpdateSlice(input, update, absl::Span<const XlaOp>({starts}));
+    DynamicUpdateSlice(input, update, abslx::Span<const XlaOp>({starts}));
     // Run computation and compare against expected values.
     ComputeAndCompareLiteral(&builder, expected_values, {start_data.get()});
   }
@@ -460,7 +460,7 @@ class DynamicUpdateSliceTest : public ClientLibraryTestBase {
     DynamicUpdateSlice(input, update, starts);
     // Run computation and compare against expected values.
     std::vector<GlobalData*> argument_ptrs;
-    absl::c_transform(start_data, std::back_inserter(argument_ptrs),
+    abslx::c_transform(start_data, std::back_inserter(argument_ptrs),
                       [](const std::unique_ptr<GlobalData>& argument) {
                         return argument.get();
                       });
@@ -500,7 +500,7 @@ class DynamicUpdateSliceTest : public ClientLibraryTestBase {
     DynamicUpdateSlice(input, update, starts);
     // Run computation and compare against expected values.
     std::vector<GlobalData*> argument_ptrs;
-    absl::c_transform(start_data, std::back_inserter(argument_ptrs),
+    abslx::c_transform(start_data, std::back_inserter(argument_ptrs),
                       [](const std::unique_ptr<GlobalData>& argument) {
                         return argument.get();
                       });
@@ -809,7 +809,7 @@ void BM_DynamicSlice(::testing::benchmark::State& state) {
   options.set_allocator(&allocator);
   const int kWarmups = 2;
   std::vector<const ShapedBuffer*> shaped_buffer_ptrs;
-  absl::c_transform(shaped_buffers, std::back_inserter(shaped_buffer_ptrs),
+  abslx::c_transform(shaped_buffers, std::back_inserter(shaped_buffer_ptrs),
                     [](const ScopedShapedBuffer& buffer) { return &buffer; });
 
   for (int i = 0; i < kWarmups; ++i) {

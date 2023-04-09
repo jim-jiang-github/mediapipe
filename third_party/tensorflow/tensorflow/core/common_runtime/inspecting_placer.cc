@@ -49,13 +49,13 @@ string IOColocationGroups::DebugString() const {
     const std::vector<string>& members = it.second;
     const PossibleDevices& devices = group_devices[group_id];
     group_strings.push_back(strings::StrCat(
-        "Group(", group_id, " members = [", absl::StrJoin(members, ", "),
+        "Group(", group_id, " members = [", abslx::StrJoin(members, ", "),
         "] requested_device_name = \"",
         DeviceNameUtils::ParsedNameToString(devices.requested_device_name),
         "\" resource_device_name = \"",
         DeviceNameUtils::ParsedNameToString(devices.resource_device_name),
         "\" device_types = [",
-        absl::StrJoin(
+        abslx::StrJoin(
             devices.device_types, ", ",
             [](string* out, const std::pair<DeviceType, int32>& type_and_pref) {
               out->append(DeviceTypeString(type_and_pref.first));
@@ -63,7 +63,7 @@ string IOColocationGroups::DebugString() const {
         "])"));
   }
 
-  return absl::StrJoin(group_strings, "\n\t");
+  return abslx::StrJoin(group_strings, "\n\t");
 }
 
 // Utility class for constructing IOColocationGroups from a ColocationGraph.

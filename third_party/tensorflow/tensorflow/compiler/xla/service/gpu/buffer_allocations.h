@@ -35,7 +35,7 @@ namespace gpu {
 // allocated device buffers.
 class BufferAllocations {
  public:
-  BufferAllocations(absl::Span<se::DeviceMemoryBase const> buffers,
+  BufferAllocations(abslx::Span<se::DeviceMemoryBase const> buffers,
                     int device_ordinal,
                     se::DeviceMemoryAllocator* memory_allocator)
       : buffers_(buffers.begin(), buffers.end()),
@@ -70,13 +70,13 @@ class BufferAllocations {
   // Tears down all buffers allocated by this object that are not in
   // `live_addresses`.
   Status TearDown(const std::set<se::DeviceMemoryBase>& live_addresses,
-                  absl::Span<const BufferAllocation> allocations);
+                  abslx::Span<const BufferAllocation> allocations);
 
   std::string ToString() {
     std::string out;
     for (BufferAllocation::Index i = 0; i < buffers_.size(); ++i) {
       const auto& buf = buffers_[i];
-      absl::StrAppendFormat(&out, "Buffer %d -> %p (%d B)", i, buf.opaque(),
+      abslx::StrAppendFormat(&out, "Buffer %d -> %p (%d B)", i, buf.opaque(),
                             buf.size());
     }
     return out;

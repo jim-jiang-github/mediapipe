@@ -110,8 +110,8 @@ TEST(GraphValidationTest, InitializeGraphFromProtos) {
 TEST(GraphValidationTest, InitializeGraphFromLinker) {
   EXPECT_FALSE(SubgraphRegistry::IsRegistered("DubQuadTestSubgraph"));
   ValidatedGraphConfig builder_1;
-  absl::Status status_1 = builder_1.Initialize({}, {}, "DubQuadTestSubgraph");
-  EXPECT_EQ(status_1.code(), absl::StatusCode::kNotFound);
+  abslx::Status status_1 = builder_1.Initialize({}, {}, "DubQuadTestSubgraph");
+  EXPECT_EQ(status_1.code(), abslx::StatusCode::kNotFound);
   EXPECT_THAT(status_1.message(),
               testing::HasSubstr(
                   R"(No registered object with name: DubQuadTestSubgraph)"));
@@ -316,8 +316,8 @@ TEST(GraphValidationTest, OptionalSubgraphStreamsMismatched) {
   )pb");
 
   GraphValidation validation_1;
-  absl::Status status = validation_1.Validate({config_1, config_2}, {});
-  ASSERT_EQ(status.code(), absl::StatusCode::kInvalidArgument);
+  abslx::Status status = validation_1.Validate({config_1, config_2}, {});
+  ASSERT_EQ(status.code(), abslx::StatusCode::kInvalidArgument);
   ASSERT_THAT(status.ToString(),
               testing::HasSubstr(
                   "PassThroughCalculator must use matching tags and indexes"));
@@ -326,15 +326,15 @@ TEST(GraphValidationTest, OptionalSubgraphStreamsMismatched) {
 // A calculator that optionally accepts an input-side-packet.
 class OptionalSideInputTestCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->InputSidePackets().Tag(kSideinputTag).Set<std::string>().Optional();
     cc->Inputs().Tag(kSelectTag).Set<int>().Optional();
     cc->Inputs().Tag(kEnableTag).Set<bool>().Optional();
     cc->Outputs().Tag(kOutputTag).Set<std::string>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     std::string value("default");
     if (cc->InputSidePackets().HasTag(kSideinputTag)) {
       value = cc->InputSidePackets().Tag(kSideinputTag).Get<std::string>();
@@ -342,7 +342,7 @@ class OptionalSideInputTestCalculator : public CalculatorBase {
     cc->Outputs()
         .Tag(kOutputTag)
         .Add(new std::string(value), cc->InputTimestamp());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(OptionalSideInputTestCalculator);

@@ -1374,7 +1374,7 @@ mlir::func::FuncOp TFRTWhileOpConversion::GetWhileBodyFunction(
       enable_while_parallel_iterations_ ? op.parallel_iterations() : 1;
 
   std::string body_fn_name = original_body_fn.getValue().str() + "/tfrt_body_" +
-                             absl::StrCat(parallel_iterations);
+                             abslx::StrCat(parallel_iterations);
 
   if (auto body_fn = symbol_table_.lookup<mlir::func::FuncOp>(body_fn_name)) {
     return body_fn;

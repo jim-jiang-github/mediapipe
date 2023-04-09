@@ -73,7 +73,7 @@ StatusOr<std::pair<XlaOp, XlaOp>> CholeskyExpander::CholeskyUnblocked(
   XlaOp l = ZerosLike(a);
 
   // Construct the for loop body to iterate over rows.
-  auto body_fn = [&](XlaOp i, absl::Span<const XlaOp> loop_vars,
+  auto body_fn = [&](XlaOp i, abslx::Span<const XlaOp> loop_vars,
                      XlaBuilder* body_builder) -> StatusOr<std::vector<XlaOp>> {
     std::vector<int64_t> row_shape_dims(major_dims.begin(), major_dims.end());
     std::vector<int64_t> col_shape_dims(major_dims.begin(), major_dims.end());
@@ -151,7 +151,7 @@ XlaOp CholeskyExpander::BuildCholesky(XlaOp a, int64_t block_size,
                                     a_shape.dimensions().end());
     error_dims.back() = error_dims.at(ndims - 2) = 1;
     std::vector<int64_t> error_dim_indices(ndims);
-    absl::c_iota(error_dim_indices, 0);
+    abslx::c_iota(error_dim_indices, 0);
 
     // Blocked left-looking Cholesky factorization.
     // Algorithm 1 from
@@ -220,7 +220,7 @@ bool CholeskyExpander::InstructionMatchesPattern(HloInstruction* instruction) {
 StatusOr<HloInstruction*> CholeskyExpander::ExpandInstruction(
     HloInstruction* instruction) {
   const CholeskyOptions& options = instruction->cholesky_options();
-  const std::string name = absl::StrFormat(
+  const std::string name = abslx::StrFormat(
       "xla.cholesky_%s_%s", instruction->operand(0)->shape().ToString(),
       options.lower() ? "lower" : "upper");
 

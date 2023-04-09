@@ -96,7 +96,7 @@ Status ParseCppClass(const string& cpp_class, string* class_name,
 
 // ValidateCppIdent returns OK iff ident is a valid C++ identifier.  The msg is
 // appended to error messages.
-Status ValidateCppIdent(absl::string_view ident, absl::string_view msg);
+Status ValidateCppIdent(abslx::string_view ident, abslx::string_view msg);
 
 }  // namespace tfcompile
 }  // namespace tensorflow

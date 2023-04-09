@@ -39,7 +39,7 @@ limitations under the License.
 #include "tensorflow/compiler/mlir/tools/kernel_gen/tf_gpu_runtime_wrappers.h"
 #endif
 
-static constexpr absl::string_view kTFJitCacheDirEnvVar = "TF_JIT_CACHE_DIR";
+static constexpr abslx::string_view kTFJitCacheDirEnvVar = "TF_JIT_CACHE_DIR";
 
 namespace mlir {
 namespace kernel_gen {
@@ -267,7 +267,7 @@ extern "C" void* _mlir_ciface_tf_jit_compile(
 #if defined(GOOGLE_CUDA)
   stream_executor::CudaComputeCapability cc =
       ctx->op_device_context()->stream()->GetCudaComputeCapability();
-  architectures.push_back(absl::StrCat("sm_", cc.major, cc.minor));
+  architectures.push_back(abslx::StrCat("sm_", cc.major, cc.minor));
 #elif defined(TENSORFLOW_USE_ROCM)
   stream_executor::RocmComputeCapability cc =
       ctx->op_device_context()->stream()->GetRocmComputeCapability();

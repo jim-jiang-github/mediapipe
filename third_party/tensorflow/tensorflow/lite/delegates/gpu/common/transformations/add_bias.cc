@@ -59,12 +59,12 @@ class AddBias : public NodeTransformation {
                 "runtime input."};
       }
       auto& attr =
-          absl::any_cast<Convolution2DAttributes&>(node->operation.attributes);
+          abslx::any_cast<Convolution2DAttributes&>(node->operation.attributes);
       return FillBias(attr.weights.shape.o, &attr.bias);
     }
     if (node->operation.type ==
         ToString(OperationType::CONVOLUTION_TRANSPOSED)) {
-      auto& attr = absl::any_cast<ConvolutionTransposedAttributes&>(
+      auto& attr = abslx::any_cast<ConvolutionTransposedAttributes&>(
           node->operation.attributes);
       return FillBias(attr.weights.shape.o, &attr.bias);
     }
@@ -76,17 +76,17 @@ class AddBias : public NodeTransformation {
                 "with one "
                 "runtime input."};
       }
-      auto& attr = absl::any_cast<DepthwiseConvolution2DAttributes&>(
+      auto& attr = abslx::any_cast<DepthwiseConvolution2DAttributes&>(
           node->operation.attributes);
       return FillBias(attr.weights.shape.o * attr.weights.shape.i, &attr.bias);
     }
     if (node->operation.type == ToString(OperationType::FULLY_CONNECTED)) {
       auto& attr =
-          absl::any_cast<FullyConnectedAttributes&>(node->operation.attributes);
+          abslx::any_cast<FullyConnectedAttributes&>(node->operation.attributes);
       return FillBias(attr.weights.shape.o, &attr.bias);
     }
     if (node->operation.type == ToString(OperationType::FULLY_CONNECTED_INT8)) {
-      auto& attr = absl::any_cast<FullyConnectedInt8Attributes&>(
+      auto& attr = abslx::any_cast<FullyConnectedInt8Attributes&>(
           node->operation.attributes);
       return FillBias(attr.weights.shape.o, &attr.bias);
     }
@@ -97,7 +97,7 @@ class AddBias : public NodeTransformation {
 }  // namespace
 
 std::unique_ptr<NodeTransformation> NewAddBias() {
-  return absl::make_unique<AddBias>();
+  return abslx::make_unique<AddBias>();
 }
 
 }  // namespace gpu

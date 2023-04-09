@@ -17,16 +17,16 @@
 namespace tflite {
 namespace gpu {
 
-absl::Status TransformLandmarksOperationParser::IsSupported(
+abslx::Status TransformLandmarksOperationParser::IsSupported(
     const TfLiteContext* context, const TfLiteNode* tflite_node,
     const TfLiteRegistration* registration) {
   RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 2));
   RETURN_IF_ERROR(CheckInputsOutputs(context, tflite_node,
                                      /*runtime_inputs=*/2, /*outputs=*/1));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TransformLandmarksOperationParser::Parse(
+abslx::Status TransformLandmarksOperationParser::Parse(
     const TfLiteNode* tflite_node, const TfLiteRegistration* registration,
     GraphFloat32* graph, ObjectReader* reader) {
   Node* node = graph->NewNode();
@@ -48,17 +48,17 @@ absl::Status TransformLandmarksOperationParser::Parse(
         &attr, &output_shape));
     node->operation.attributes = attr;
   } else {
-    return absl::UnimplementedError(
+    return abslx::UnimplementedError(
         "Transform Landmarks operation can be of version 1 or 2 only.");
   }
 
   auto output_value = graph->FindOutputs(node->id)[0];
 
   output_value->tensor.shape = graph->FindInputs(node->id)[0]->tensor.shape;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ParseTransformLandmarksV1Attributes(
+abslx::Status ParseTransformLandmarksV1Attributes(
     const void* data, uint32_t data_size, TransformLandmarksAttributes* attr,
     BHWC* output_shape) {
   attr->version = 1;
@@ -78,17 +78,17 @@ absl::Status ParseTransformLandmarksV1Attributes(
       attr->scale = value.AsFloat();
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ParseTransformLandmarksV2Attributes(
+abslx::Status ParseTransformLandmarksV2Attributes(
     const void* data, uint32_t data_size, TransformLandmarksAttributes* attr,
     BHWC* output_shape) {
   attr->version = 2;
   attr->dimensions = output_shape->c;
   attr->scale = 1.0;
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 TransformResult TransformLandmarksV2ToV1::ApplyToNode(Node* node,
@@ -98,7 +98,7 @@ TransformResult TransformLandmarksV2ToV1::ApplyToNode(Node* node,
     return {TransformStatus::SKIPPED, ""};
   }
   TransformLandmarksAttributes transform_landmarks_attr =
-      absl::any_cast<TransformLandmarksAttributes>(node->operation.attributes);
+      abslx::any_cast<TransformLandmarksAttributes>(node->operation.attributes);
   if (transform_landmarks_attr.version != 2) {
     return {TransformStatus::SKIPPED,
             "Transform Landmarks operation should be of version 2."};
@@ -143,14 +143,14 @@ TransformResult TransformLandmarksV2ToV1::ApplyToNode(Node* node,
   }
 
   // Delete preceding and succeding Reshape operations.
-  absl::Status removed_preceding =
+  abslx::Status removed_preceding =
       RemoveSimpleNodeKeepInput(graph, preceding_reshape);
   if (!removed_preceding.ok()) {
     return {TransformStatus::INVALID,
             "Unable to remove a preceding Reshape node: " +
                 std::string(removed_preceding.message())};
   }
-  absl::Status removed_succeeding =
+  abslx::Status removed_succeeding =
       RemoveSimpleNodeKeepOutput(graph, succeeding_reshape);
   if (!removed_succeeding.ok()) {
     return {TransformStatus::INVALID,

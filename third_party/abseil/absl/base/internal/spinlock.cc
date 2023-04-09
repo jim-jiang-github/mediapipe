@@ -53,7 +53,7 @@
 //          Otherwise, bits [31..3] represent the time spent by the current lock
 //          holder to acquire the lock.  There may be outstanding waiter(s).
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -85,7 +85,7 @@ SpinLock::SpinLock(base_internal::SchedulingMode mode)
 uint32_t SpinLock::SpinLoop() {
   // We are already in the slow path of SpinLock, initialize the
   // adaptive_spin_count here.
-  ABSL_CONST_INIT static absl::once_flag init_adaptive_spin_count;
+  ABSL_CONST_INIT static abslx::once_flag init_adaptive_spin_count;
   ABSL_CONST_INIT static int adaptive_spin_count = 0;
   base_internal::LowLevelCallOnce(&init_adaptive_spin_count, []() {
     adaptive_spin_count = base_internal::NumCPUs() > 1 ? 1000 : 1;
@@ -226,4 +226,4 @@ uint64_t SpinLock::DecodeWaitCycles(uint32_t lock_value) {
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

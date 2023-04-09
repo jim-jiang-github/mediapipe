@@ -31,7 +31,7 @@
 #include "absl/strings/string_view.h"
 #include "absl/synchronization/mutex.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace flags_internal {
 
@@ -57,7 +57,7 @@ class FlagRegistry {
 
   // Returns the flag object for the specified name, or nullptr if not found.
   // Will emit a warning if a 'retired' flag is specified.
-  CommandLineFlag* FindFlag(absl::string_view name);
+  CommandLineFlag* FindFlag(abslx::string_view name);
 
   static FlagRegistry& GlobalRegistry();  // returns a singleton registry
 
@@ -68,14 +68,14 @@ class FlagRegistry {
   friend void FinalizeRegistry();
 
   // The map from name to flag, for FindFlag().
-  using FlagMap = std::map<absl::string_view, CommandLineFlag*>;
+  using FlagMap = std::map<abslx::string_view, CommandLineFlag*>;
   using FlagIterator = FlagMap::iterator;
   using FlagConstIterator = FlagMap::const_iterator;
   FlagMap flags_;
   std::vector<CommandLineFlag*> flat_flags_;
   std::atomic<bool> finalized_flags_{false};
 
-  absl::Mutex lock_;
+  abslx::Mutex lock_;
 
   // Disallow
   FlagRegistry(const FlagRegistry&);
@@ -95,7 +95,7 @@ class FlagRegistryLock {
 
 }  // namespace
 
-CommandLineFlag* FlagRegistry::FindFlag(absl::string_view name) {
+CommandLineFlag* FlagRegistry::FindFlag(abslx::string_view name) {
   if (finalized_flags_.load(std::memory_order_acquire)) {
     // We could save some gcus here if we make `Name()` be non-virtual.
     // We could move the `const char*` name to the base class.
@@ -114,7 +114,7 @@ void FlagRegistry::RegisterFlag(CommandLineFlag& flag, const char* filename) {
   if (filename != nullptr &&
       flag.Filename() != GetUsageConfig().normalize_filename(filename)) {
     flags_internal::ReportUsageError(
-        absl::StrCat(
+        abslx::StrCat(
             "Inconsistency between flag object and registration for flag '",
             flag.Name(),
             "', likely due to duplicate flags or an ODR violation. Relevant "
@@ -133,14 +133,14 @@ void FlagRegistry::RegisterFlag(CommandLineFlag& flag, const char* filename) {
     if (flag.IsRetired() != old_flag.IsRetired()) {
       // All registrations must agree on the 'retired' flag.
       flags_internal::ReportUsageError(
-          absl::StrCat(
+          abslx::StrCat(
               "Retired flag '", flag.Name(), "' was defined normally in file '",
               (flag.IsRetired() ? old_flag.Filename() : flag.Filename()), "'."),
           true);
     } else if (flags_internal::PrivateHandleAccessor::TypeId(flag) !=
                flags_internal::PrivateHandleAccessor::TypeId(old_flag)) {
       flags_internal::ReportUsageError(
-          absl::StrCat("Flag '", flag.Name(),
+          abslx::StrCat("Flag '", flag.Name(),
                        "' was defined more than once but with "
                        "differing types. Defined in files '",
                        old_flag.Filename(), "' and '", flag.Filename(), "'."),
@@ -149,13 +149,13 @@ void FlagRegistry::RegisterFlag(CommandLineFlag& flag, const char* filename) {
       return;
     } else if (old_flag.Filename() != flag.Filename()) {
       flags_internal::ReportUsageError(
-          absl::StrCat("Flag '", flag.Name(),
+          abslx::StrCat("Flag '", flag.Name(),
                        "' was defined more than once (in files '",
                        old_flag.Filename(), "' and '", flag.Filename(), "')."),
           true);
     } else {
       flags_internal::ReportUsageError(
-          absl::StrCat(
+          abslx::StrCat(
               "Something is wrong with flag '", flag.Name(), "' in file '",
               flag.Filename(), "'. One possibility: file '", flag.Filename(),
               "' is being linked both statically and dynamically into this "
@@ -218,7 +218,7 @@ class RetiredFlagObj final : public CommandLineFlag {
       : name_(name), type_id_(type_id) {}
 
  private:
-  absl::string_view Name() const override { return name_; }
+  abslx::string_view Name() const override { return name_; }
   std::string Filename() const override {
     OnAccess();
     return "RETIRED";
@@ -243,7 +243,7 @@ class RetiredFlagObj final : public CommandLineFlag {
   }
 
   // Any input is valid
-  bool ValidateInputValue(absl::string_view) const override {
+  bool ValidateInputValue(abslx::string_view) const override {
     OnAccess();
     return true;
   }
@@ -252,7 +252,7 @@ class RetiredFlagObj final : public CommandLineFlag {
     return nullptr;
   }
 
-  bool ParseFrom(absl::string_view, flags_internal::FlagSettingMode,
+  bool ParseFrom(abslx::string_view, flags_internal::FlagSettingMode,
                  flags_internal::ValueSource, std::string&) override {
     OnAccess();
     return false;
@@ -264,7 +264,7 @@ class RetiredFlagObj final : public CommandLineFlag {
 
   void OnAccess() const {
     flags_internal::ReportUsageError(
-        absl::StrCat("Accessing retired flag '", name_, "'"), false);
+        abslx::StrCat("Accessing retired flag '", name_, "'"), false);
   }
 
   // Data members
@@ -329,7 +329,7 @@ FlagSaver::~FlagSaver() {
 
 // --------------------------------------------------------------------
 
-CommandLineFlag* FindCommandLineFlag(absl::string_view name) {
+CommandLineFlag* FindCommandLineFlag(abslx::string_view name) {
   if (name.empty()) return nullptr;
   flags_internal::FlagRegistry& registry =
       flags_internal::FlagRegistry::GlobalRegistry();
@@ -338,8 +338,8 @@ CommandLineFlag* FindCommandLineFlag(absl::string_view name) {
 
 // --------------------------------------------------------------------
 
-absl::flat_hash_map<absl::string_view, absl::CommandLineFlag*> GetAllFlags() {
-  absl::flat_hash_map<absl::string_view, absl::CommandLineFlag*> res;
+abslx::flat_hash_map<abslx::string_view, abslx::CommandLineFlag*> GetAllFlags() {
+  abslx::flat_hash_map<abslx::string_view, abslx::CommandLineFlag*> res;
   flags_internal::ForEachFlag([&](CommandLineFlag& flag) {
     if (!flag.IsRetired()) res.insert({flag.Name(), &flag});
   });
@@ -347,4 +347,4 @@ absl::flat_hash_map<absl::string_view, absl::CommandLineFlag*> GetAllFlags() {
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

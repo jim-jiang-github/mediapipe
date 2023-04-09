@@ -25,7 +25,7 @@ namespace tensorflow {
 string RaggedTensorVariant::TypeName() const { return "RaggedTensorVariant"; }
 
 string RaggedTensorVariant::DebugString() const {
-  return absl::StrCat(
+  return abslx::StrCat(
       "RaggedTensorVariant(dtype=", DataTypeString(values_.dtype()),
       ", ragged_rank=", nested_splits_.size(), ", splits_dtype=",
       DataTypeString(nested_splits_.empty() ? DT_INVALID

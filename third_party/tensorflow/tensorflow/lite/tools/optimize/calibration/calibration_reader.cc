@@ -23,7 +23,7 @@ namespace tflite {
 namespace optimize {
 namespace calibration {
 TfLiteStatus CalibrationReader::GetTensorStatsAsMap(
-    absl::flat_hash_map<std::tuple<int, int>, CalibrationStats>*
+    abslx::flat_hash_map<std::tuple<int, int>, CalibrationStats>*
         tensor_id_to_stats_map) const {
   tensor_id_to_stats_map->clear();
   for (const auto& tensorid_stat : logger_->GetCalibrationValues()) {

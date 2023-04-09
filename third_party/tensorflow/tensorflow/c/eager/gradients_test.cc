@@ -104,7 +104,7 @@ TEST_P(CppGradients, TestSetAttrString) {
   s = RegisterGradients(&registry);
   ASSERT_EQ(errors::OK, s.code()) << s.error_message();
   auto tape = std::make_unique<Tape>(/*persistent=*/false);
-  s = Execute(check_numerics_op.get(), ctx.get(), absl::MakeSpan(outputs),
+  s = Execute(check_numerics_op.get(), ctx.get(), abslx::MakeSpan(outputs),
               &num_retvals, &forward_op, tape.get(), registry);
   ASSERT_EQ(errors::OK, s.code()) << s.error_message();
 
@@ -115,8 +115,8 @@ TEST_P(CppGradients, TestSetAttrString) {
 }
 
 Status RecordOperationWithNullGradientFunctionModel(
-    AbstractContext* ctx, absl::Span<AbstractTensorHandle* const> inputs,
-    absl::Span<AbstractTensorHandle*> outputs) {
+    AbstractContext* ctx, abslx::Span<AbstractTensorHandle* const> inputs,
+    abslx::Span<AbstractTensorHandle*> outputs) {
   Tape tape(/*persistent=*/false);
   tape.Watch(inputs[0]);
   AbstractTensorHandle* neg_output;
@@ -150,7 +150,7 @@ TEST_P(CppGradients, TestRecordOperationWithNullGradientFunctionRaises) {
 
   std::vector<AbstractTensorHandle*> outputs(1);
   Status s = RunModel(RecordOperationWithNullGradientFunctionModel, ctx.get(),
-                      {x.get()}, absl::MakeSpan(outputs),
+                      {x.get()}, abslx::MakeSpan(outputs),
                       /*use_function=*/!std::get<2>(GetParam()));
   ASSERT_EQ(error::INVALID_ARGUMENT, s.code());
   ASSERT_EQ(

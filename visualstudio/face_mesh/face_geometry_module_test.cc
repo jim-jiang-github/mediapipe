@@ -99,7 +99,7 @@ class FaceGeometryModuleCheckCalculator : public CalculatorBase {
   bool on_idle_ {};
 
 public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->InputSidePackets().Tag(kEnvironmentTag).Set<face_geometry::Environment>();
 
     auto& inputs = cc->Inputs();
@@ -109,10 +109,10 @@ public:
     inputs.Tag(kMultiFaceGeometryTag).Set<std::vector<face_geometry::FaceGeometry>>();
     cc->Outputs().Tag(kDummyOutputTag).Set<int>();
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(mediapipe::TimestampDiff(0));
     {
       face_geometry::GeometryPipelineMetadata metadata;
@@ -145,10 +145,10 @@ public:
 
     on_idle_ = false;
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     auto const& inputs = cc->Inputs();
 
     if (on_idle_) {
@@ -321,7 +321,7 @@ public:
     }
 
     //cc->Outputs().Tag(kDummyOutputTag).AddPacket(mediapipe::MakePacket<int>(result).At(cc->InputTimestamp()));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

@@ -163,7 +163,7 @@ Status Client::ResetDevice() {
 }
 
 StatusOr<Literal> Client::ExecuteAndTransfer(
-    const XlaComputation& computation, absl::Span<GlobalData* const> arguments,
+    const XlaComputation& computation, abslx::Span<GlobalData* const> arguments,
     const ExecutionOptions* execution_options,
     ExecutionProfile* execution_profile) {
   TF_ASSIGN_OR_RETURN(
@@ -214,7 +214,7 @@ StatusOr<XlaComputation> Client::LoadSnapshot(const HloSnapshot& module) {
 }
 
 StatusOr<ExecutionHandle> Client::Compile(
-    const XlaComputation& computation, absl::Span<const Shape> argument_shapes,
+    const XlaComputation& computation, abslx::Span<const Shape> argument_shapes,
     const ExecutionOptions* execution_options) {
   CompileRequest request;
   *request.mutable_computation() = computation.proto();
@@ -248,7 +248,7 @@ StatusOr<ExecutionHandle> Client::Compile(
 }
 
 StatusOr<std::unique_ptr<GlobalData>> Client::Execute(
-    const ExecutionHandle& handle, absl::Span<GlobalData* const> arguments,
+    const ExecutionHandle& handle, abslx::Span<GlobalData* const> arguments,
     ExecutionProfile* execution_profile) {
   ExecuteRequest request;
   *request.mutable_handle() = handle;
@@ -274,7 +274,7 @@ StatusOr<std::unique_ptr<GlobalData>> Client::Execute(
 }
 
 StatusOr<std::unique_ptr<GlobalData>> Client::Execute(
-    const XlaComputation& computation, absl::Span<GlobalData* const> arguments,
+    const XlaComputation& computation, abslx::Span<GlobalData* const> arguments,
     const ExecutionOptions* execution_options,
     ExecutionProfile* execution_profile) {
   // Create an ExecutionOptions if necessary, or set its DeviceHandles.
@@ -325,7 +325,7 @@ StatusOr<std::unique_ptr<GlobalData>> Client::Execute(
 }
 
 StatusOr<std::vector<std::unique_ptr<GlobalData>>> Client::ExecuteParallel(
-    absl::Span<const XlaComputationInstance> computations) {
+    abslx::Span<const XlaComputationInstance> computations) {
   ExecuteGraphParallelRequest request;
 
   for (const XlaComputationInstance& computation : computations) {
@@ -475,7 +475,7 @@ StatusOr<std::string> Client::ExecutionStatsAsString(
     int64_t nanoseconds = profile.compute_time_ns();
     int64_t cycle_count = profile.compute_cycle_count();
     double gflops = total_flops / nanoseconds;
-    return absl::StrCat(
+    return abslx::StrCat(
         "[Execution Statistics] flop count: ", computation_stats.flop_count(),
         ", transcendental count: ", computation_stats.transcendental_count(),
         ", compute execution time: ", nanoseconds, " nsec",

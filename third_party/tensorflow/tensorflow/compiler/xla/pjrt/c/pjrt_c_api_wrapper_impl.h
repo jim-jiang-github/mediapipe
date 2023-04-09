@@ -39,7 +39,7 @@ struct PJRT_Client {
   std::vector<PJRT_Device*> addressable_devices;
   // Map from wrapped C++ devices to C devices. The values are the same as
   // `owned_devices`.
-  absl::flat_hash_map<xla::PjRtDevice*, PJRT_Device*> c_device_from_cpp_device;
+  abslx::flat_hash_map<xla::PjRtDevice*, PJRT_Device*> c_device_from_cpp_device;
 };
 
 // PJRT_Devices are owned by their corresponding PJRT_Client.
@@ -157,11 +157,11 @@ PJRT_Error* PJRT_Buffer_IsOnCpu(PJRT_Buffer_IsOnCpu_Args* args);
 // Helper function for checking C API argument struct sizes. Returns a non-OK
 // status if the expected and actual sizes aren't equal (i.e. no ABI
 // compatibility guarantees).
-xla::Status CheckMatchingStructSizes(absl::string_view struct_name,
+xla::Status CheckMatchingStructSizes(abslx::string_view struct_name,
                                      size_t expected_size, size_t actual_size);
 
 // Helper function
-std::string StructSizeErrorMsg(absl::string_view struct_name,
+std::string StructSizeErrorMsg(abslx::string_view struct_name,
                                size_t expected_size, size_t actual_size);
 
 }  // namespace pjrt

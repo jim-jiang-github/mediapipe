@@ -24,9 +24,9 @@
 
 TEST(Barrier, SanityTest) {
   constexpr int kNumThreads = 10;
-  absl::Barrier* barrier = new absl::Barrier(kNumThreads);
+  abslx::Barrier* barrier = new abslx::Barrier(kNumThreads);
 
-  absl::Mutex mutex;
+  abslx::Mutex mutex;
   int counter = 0;  // Guarded by mutex.
 
   auto thread_func = [&] {
@@ -37,7 +37,7 @@ TEST(Barrier, SanityTest) {
     }
 
     // Increment the counter.
-    absl::MutexLock lock(&mutex);
+    abslx::MutexLock lock(&mutex);
     ++counter;
   };
 
@@ -52,12 +52,12 @@ TEST(Barrier, SanityTest) {
   // sleep has elapsed. Sleeping in a test is usually bad form, but we
   // need to make sure that we are testing the barrier instead of some
   // other synchronization method.
-  absl::SleepFor(absl::Seconds(1));
+  abslx::SleepFor(abslx::Seconds(1));
 
   // The counter should still be zero since no thread should have
   // been able to pass the barrier yet.
   {
-    absl::MutexLock lock(&mutex);
+    abslx::MutexLock lock(&mutex);
     EXPECT_EQ(counter, 0);
   }
 
@@ -70,6 +70,6 @@ TEST(Barrier, SanityTest) {
   }
 
   // All threads should now have incremented the counter.
-  absl::MutexLock lock(&mutex);
+  abslx::MutexLock lock(&mutex);
   EXPECT_EQ(counter, kNumThreads);
 }

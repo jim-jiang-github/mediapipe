@@ -116,7 +116,7 @@ TEST(TypesTest, DerefIfPointer) {
     TypesMatch<const int&, decltype(DerefIfPointer(z))>();
   }
   {
-    auto x = absl::make_unique<std::vector<int>>();
+    auto x = abslx::make_unique<std::vector<int>>();
     const std::vector<int>* y = x.get();
     x->assign({1, 2, 3});
     // Arg: unique_ptr<vector<int>>.

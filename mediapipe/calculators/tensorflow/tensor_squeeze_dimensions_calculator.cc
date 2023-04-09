@@ -27,7 +27,7 @@ namespace tf = ::tensorflow;
 // containing identical data (example output dimensions [1024, 5]).
 class TensorSqueezeDimensionsCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     RET_CHECK_EQ(cc->Inputs().NumEntries(), 1) << "Need one input";
     cc->Inputs().Index(0).Set<tf::Tensor>(
         // Input Tensor
@@ -36,10 +36,10 @@ class TensorSqueezeDimensionsCalculator : public CalculatorBase {
     cc->Outputs().Index(0).Set<tf::Tensor>(
         // Output Tensor Reduced Dimensions
     );
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     options_ = cc->Options<TensorSqueezeDimensionsCalculatorOptions>();
     RET_CHECK(options_.squeeze_all_single_dims() ^ (options_.dim_size() > 0))
         << "Must specify dimensions to remove, or set squeeze_all_single_dims, "
@@ -52,10 +52,10 @@ class TensorSqueezeDimensionsCalculator : public CalculatorBase {
       remove_dims_initialized_ = true;
     }
     cc->SetOffset(0);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     const tf::Tensor& input_tensor = cc->Inputs().Index(0).Get<tf::Tensor>();
     tf::TensorShape tensor_shape = input_tensor.shape();
     if (!remove_dims_initialized_) {
@@ -78,11 +78,11 @@ class TensorSqueezeDimensionsCalculator : public CalculatorBase {
     std::unique_ptr<tf::Tensor> output_tensor(new tf::Tensor);
     RET_CHECK(output_tensor->CopyFrom(input_tensor, tensor_shape));
     cc->Outputs().Index(0).Add(output_tensor.release(), cc->InputTimestamp());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Close(CalculatorContext* cc) override {
-    return absl::OkStatus();
+  abslx::Status Close(CalculatorContext* cc) override {
+    return abslx::OkStatus();
   }
 
  private:

@@ -260,7 +260,7 @@ string ConstantFolding::AddControlDependency(const string& input_name,
 // Forward inputs at the given indices to outputs and add a control dependency
 // on node.
 bool ConstantFolding::ForwardInputs(NodeDef* node,
-                                    absl::Span<const int> inputs_to_forward) {
+                                    abslx::Span<const int> inputs_to_forward) {
   for (int input_idx : inputs_to_forward) {
     if (input_idx < 0 || input_idx >= node->input_size()) {
       return false;
@@ -1088,7 +1088,7 @@ bool ConstantFolding::MaybeFoldable(const NodeDef& node,
       op.find("Reader") != string::npos) {
     return false;
   }
-  if (op.find("Quantized") != string::npos || absl::StartsWith(op, "Sparse")) {
+  if (op.find("Quantized") != string::npos || abslx::StartsWith(op, "Sparse")) {
     return false;
   }
 
@@ -1529,7 +1529,7 @@ Status ConstantFolding::FoldNode(NodeDef* node, GraphDef* output_graph,
 
     // Returns `true` iff `const_node` already has control input named `input`.
     const auto is_duplicate_control_input = [&](const string& input) -> bool {
-      auto it = absl::c_find(const_node->input(), input);
+      auto it = abslx::c_find(const_node->input(), input);
       return it != const_node->input().end();
     };
 
@@ -1631,10 +1631,10 @@ Status ConstantFolding::FoldNode(NodeDef* node, GraphDef* output_graph,
 
 Status ConstantFolding::FoldGraph(
     const GraphProperties& properties, GraphDef* optimized_graph,
-    absl::flat_hash_set<string>* nodes_to_not_simplify) {
+    abslx::flat_hash_set<string>* nodes_to_not_simplify) {
   // We build a new optimized_graph by inserting the folded nodes into it, then
   // copy other nodes that might be needed at the end of this function.
-  absl::flat_hash_set<string> processed_nodes;
+  abslx::flat_hash_set<string> processed_nodes;
   std::deque<NodeDef*> queue;
   for (int i = 0; i < graph_->node_size(); i++) {
     const NodeDef& node = graph_->node(i);
@@ -2080,7 +2080,7 @@ Status ConstantFolding::ReplaceOperationWithConstant(
 
 Status ConstantFolding::SimplifyGraph(
     GraphDef* optimized_graph, GraphProperties* properties,
-    absl::flat_hash_set<string>* nodes_to_not_simplify) {
+    abslx::flat_hash_set<string>* nodes_to_not_simplify) {
   for (int i = 0; i < optimized_graph->node_size(); ++i) {
     NodeDef* node = optimized_graph->mutable_node(i);
     // TODO(lyandy): Move nodes to not simplify check into SimplifyNode and
@@ -2595,8 +2595,8 @@ bool ConstantFolding::SimplifySelect(const GraphProperties& properties,
 
 void ConstantFolding::RemoveRedundantVariableUpdates(
     GraphProperties* properties, GraphDef* optimized_graph, NodeDef* node) {
-  static const absl::flat_hash_set<string>* kVariableReadOps =
-      new absl::flat_hash_set<string>{"AssignAddVariableOp",
+  static const abslx::flat_hash_set<string>* kVariableReadOps =
+      new abslx::flat_hash_set<string>{"AssignAddVariableOp",
                                       "AssignSubVariableOp",
                                       "AssignAdd",
                                       "AssignSub",
@@ -2619,16 +2619,16 @@ void ConstantFolding::RemoveRedundantVariableUpdates(
   if (kVariableReadOps == nullptr ||
       kVariableReadOps->find(node->op()) == kVariableReadOps->end())
     return;
-  const int value_index = absl::StrContains(node->op(), "Scatter") ? 2 : 1;
+  const int value_index = abslx::StrContains(node->op(), "Scatter") ? 2 : 1;
   const NodeDef* delta_node = node_map_->GetNode(node->input(value_index));
   if (delta_node == nullptr) return;
-  const bool is_add_or_sub = absl::StrContains(node->op(), "Add") ||
-                             absl::StrContains(node->op(), "Sub");
+  const bool is_add_or_sub = abslx::StrContains(node->op(), "Add") ||
+                             abslx::StrContains(node->op(), "Sub");
   if ((is_add_or_sub && IsZeros(*delta_node)) ||
       (!is_add_or_sub && IsOnes(*delta_node))) {
     VLOG(1) << "Removing redundant variable update: " << node->DebugString();
-    if (absl::StrContains(node->op(), "Variable") ||
-        absl::StrContains(node->op(), "Resource")) {
+    if (abslx::StrContains(node->op(), "Variable") ||
+        abslx::StrContains(node->op(), "Resource")) {
       ReplaceOperationWithNoOp(node, properties, optimized_graph);
     } else {
       ReplaceOperationWithIdentity(0 /* input_to_forward */, *properties, node,
@@ -3873,7 +3873,7 @@ bool ConstantFolding::MergeConcat(bool use_shape_info,
   // so, this concat of concats may have been carefully constructed to be a
   // two-stage concat, and we don't want to undo that here.
   string task, device;
-  absl::flat_hash_set<string> unique_input_tasks;
+  abslx::flat_hash_set<string> unique_input_tasks;
   const int n_parent_inputs = NumNonControlInputs(*parent);
   // Iterate over the real inputs to concatenate [0..n_parent_inputs - 1).  The
   // input at n_parent_inputs - 1 is the concat axis argument for a ConcatV2
@@ -3945,7 +3945,7 @@ Status ConstantFolding::AddQuantizedMatMulMinMaxOutConstNodes(
     }
 
     // Update output nodes consuming node:index to new const node.
-    string old_input = absl::StrCat(node->name(), ":", index);
+    string old_input = abslx::StrCat(node->name(), ":", index);
     int old_node_count = 0;
     // We make a copy since the set might change.
     auto outputs = node_map_->GetOutputs(node->name());
@@ -3974,7 +3974,7 @@ Status ConstantFolding::AddQuantizedMatMulMinMaxOutConstNodes(
     TF_RETURN_IF_ERROR(add_quantized_out(min_out_const_name, 1));
     TF_RETURN_IF_ERROR(add_quantized_out(max_out_const_name, 2));
   } else {
-    return errors::Internal(absl::Substitute(
+    return errors::Internal(abslx::Substitute(
         "Can't create Const for QuantizedMatMul min_out/max_out of "
         "node '$0' because of node name conflict",
         node->name()));
@@ -4004,7 +4004,7 @@ Status ConstantFolding::RunOptimizationPass(Cluster* cluster,
     }
   }
 
-  absl::flat_hash_set<string> nodes_to_not_simplify;
+  abslx::flat_hash_set<string> nodes_to_not_simplify;
   if (properties->has_properties()) {
     TF_RETURN_IF_ERROR(MaterializeShapes(*properties));
     TF_RETURN_IF_ERROR(MaterializeConstants(*properties));

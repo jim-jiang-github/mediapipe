@@ -20,7 +20,7 @@
 #include "absl/container/internal/hash_generator_testing.h"
 #include "absl/container/internal/hash_policy_testing.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 
@@ -185,6 +185,6 @@ REGISTER_TYPED_TEST_CASE_P(ModifiersTest, Clear, Insert, InsertHint,
 
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_CONTAINER_INTERNAL_UNORDERED_SET_MODIFIERS_TEST_H_

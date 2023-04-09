@@ -63,13 +63,13 @@ class SpectralProcessor {
   // Power of two block lengths will be fastest, though block_length may be any
   // positive integer.
   SpectralProcessor(int num_in_channels, int num_out_channels,
-                    int chunk_length, absl::Span<const float> window,
+                    int chunk_length, abslx::Span<const float> window,
                     int block_length, int hop_size, Callback* block_processor);
 
   // Supports variable input chunk sizes.
   SpectralProcessor(int num_in_channels, int num_out_channels,
                     const std::vector<int>& possible_chunk_lengths,
-                    absl::Span<const float> window, int block_length,
+                    abslx::Span<const float> window, int block_length,
                     int hop_size, Callback* block_processor);
 
   ~SpectralProcessor() {}

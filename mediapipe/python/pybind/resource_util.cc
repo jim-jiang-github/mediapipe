@@ -31,7 +31,7 @@ void ResourceUtilSubmodule(pybind11::module* module) {
   m.def(
       "set_resource_dir",
       [](const std::string& str) {
-        absl::SetFlag(&FLAGS_resource_root_dir, str);
+        abslx::SetFlag(&FLAGS_resource_root_dir, str);
       },
       R"doc(Set resource root directory where can find necessary graph resources such as model files and label maps.
 

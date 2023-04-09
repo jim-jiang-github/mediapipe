@@ -30,7 +30,7 @@ TEST_F(ScatterSimplifierTest, InsertsIndexVectorAndWindowDims) {
   // Verifies that ScatterSimplifier
   // - Makes the index_vector_dim dimensions explicit
   // - Inserts inserted_window_dims into updates.
-  constexpr absl::string_view kModuleStr = R"(
+  constexpr abslx::string_view kModuleStr = R"(
     HloModule scatter_simplifier
 
     scatter_computation {
@@ -74,7 +74,7 @@ TEST_F(ScatterSimplifierTest, InsertsIndexVectorAndWindowDims) {
 TEST_F(ScatterSimplifierTest, CollapsesScatterDims) {
   // Verifies that ScatterSimplifier collapses multiple scatter dimensions into
   // one.
-  constexpr absl::string_view kModuleStr = R"(
+  constexpr abslx::string_view kModuleStr = R"(
     HloModule scatter_simplifier
 
     scatter_computation {
@@ -106,7 +106,7 @@ TEST_F(ScatterSimplifierTest, CollapsesScatterDims) {
 TEST_F(ScatterSimplifierTest, NoOpForSimpleScatter) {
   // Verifies that ScatterSimplifier does nothing if the scatter is already
   // simple.
-  constexpr absl::string_view kModuleStr = R"(
+  constexpr abslx::string_view kModuleStr = R"(
     HloModule scatter_simplifier
 
     scatter_computation {
@@ -131,7 +131,7 @@ TEST_F(ScatterSimplifierTest, NoOpForSimpleScatter) {
 
 TEST_F(ScatterSimplifierTest, MovesIndexVectorDim) {
   // Verifies that ScatterSimplifier makes index_vector_dim trailing.
-  constexpr absl::string_view kModuleStr = R"(
+  constexpr abslx::string_view kModuleStr = R"(
     HloModule scatter_simplifier
 
     scatter_computation {
@@ -162,7 +162,7 @@ TEST_F(ScatterSimplifierTest, MovesIndexVectorDim) {
 TEST_F(ScatterSimplifierTest, TransformsUpdatesAndOperandUsingScatterDims) {
   // Verifies that ScatterSimplifier transposes updates and operands to conform
   // to scatter_dims_to_operand_dims.
-  constexpr absl::string_view kModuleStr = R"(
+  constexpr abslx::string_view kModuleStr = R"(
     HloModule scatter_simplifier
 
     scatter_computation {
@@ -197,7 +197,7 @@ TEST_F(ScatterSimplifierTest, TransformsUpdatesAndOperandUsingScatterDims) {
 
 TEST_F(ScatterSimplifierTest, MakesScatterDimensionsLeadingInUpdates) {
   // Verifies that ScatterSimplifier moves the scatter dimensions in updates.
-  constexpr absl::string_view kModuleStr = R"(
+  constexpr abslx::string_view kModuleStr = R"(
     HloModule scatter_simplifier
 
     scatter_computation {
@@ -228,7 +228,7 @@ TEST_F(ScatterSimplifierTest, MakesScatterDimensionsLeadingInUpdates) {
 
 TEST_F(ScatterSimplifierTest, ZeroDimScatterIndices) {
   // Verifies that zero-dimensional scatter indices are transformed correctly.
-  constexpr absl::string_view kModuleStr = R"(
+  constexpr abslx::string_view kModuleStr = R"(
     HloModule scatter_simplifier
 
     scatter_computation {

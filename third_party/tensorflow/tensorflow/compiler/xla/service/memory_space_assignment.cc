@@ -112,7 +112,7 @@ bool IsCrossProgramPrefetchCandidate(const HloValue& value,
          value.index().size() <= 1 && value.shape().IsArray() &&
          !value.GetUses().empty() &&
          options.size_fn(value) <= options.max_size_in_bytes &&
-         absl::c_all_of(value.GetUses(), [&](const HloUse& use) {
+         abslx::c_all_of(value.GetUses(), [&](const HloUse& use) {
            const HloInstruction* inst =
                use.instruction->operand(use.operand_number);
 
@@ -177,7 +177,7 @@ FindCrossProgramPrefetchCandidate(const HloAliasAnalysis& alias_analysis,
                       ? *options.buffer_interval_compare
                       : size_compare;
 
-  auto best_candidate = absl::c_min_element(candidates, compare);
+  auto best_candidate = abslx::c_min_element(candidates, compare);
   if (best_candidate == candidates.end()) {
     return std::nullopt;
   }
@@ -188,14 +188,14 @@ FindCrossProgramPrefetchCandidate(const HloAliasAnalysis& alias_analysis,
 
 Status InsertInstructionAndEnsureOperandsInserted(
     HloInstruction* new_instruction, HloInstructionSequence* new_sequence,
-    absl::flat_hash_set<HloInstruction*>* inserted_instructions);
+    abslx::flat_hash_set<HloInstruction*>* inserted_instructions);
 
 // Insert an instruction to the schedule, and make sure its dependencies
 // (operands) are already in the schedule. If not, insert these operands
 // before the instruction.
 Status EnsureInstructionAndOperandsInserted(
     HloInstruction* new_instruction, HloInstructionSequence* new_sequence,
-    absl::flat_hash_set<HloInstruction*>* inserted_instructions) {
+    abslx::flat_hash_set<HloInstruction*>* inserted_instructions) {
   if (inserted_instructions->contains(new_instruction)) {
     return OkStatus();
   }
@@ -208,7 +208,7 @@ Status EnsureInstructionAndOperandsInserted(
 // speed up compilation.
 Status InsertInstructionAndEnsureOperandsInserted(
     HloInstruction* new_instruction, HloInstructionSequence* new_sequence,
-    absl::flat_hash_set<HloInstruction*>* inserted_instructions) {
+    abslx::flat_hash_set<HloInstruction*>* inserted_instructions) {
   for (HloInstruction* operand : new_instruction->operands()) {
     // CopyStart/CopyDone dependencies should always be already inserted; it is
     // a red flag when they haven't already been inserted.
@@ -237,7 +237,7 @@ std::string UsesToString(const std::vector<HloUse>& uses) {
   for (const auto& use : uses) {
     uses_str.push_back(use.ToString());
   }
-  return absl::StrJoin(uses_str, ",");
+  return abslx::StrJoin(uses_str, ",");
 }
 
 }  // namespace
@@ -251,7 +251,7 @@ MemorySpaceAssignmentCostAnalysis::Create(const HloCostAnalysis& cost_analysis,
                       HloLiveRange::Run(module.schedule(), *alias_analysis,
                                         module.entry_computation()));
   auto call_graph = CallGraph::Build(&module);
-  return absl::WrapUnique(new MemorySpaceAssignmentCostAnalysis(
+  return abslx::WrapUnique(new MemorySpaceAssignmentCostAnalysis(
       cost_analysis, options, std::move(alias_analysis),
       std::move(hlo_live_range), std::move(call_graph)));
 }
@@ -381,8 +381,8 @@ float MemorySpaceAssignmentCostAnalysis::GetInstructionElapsedDueToCompute(
 
 float MemorySpaceAssignmentCostAnalysis::GetInstructionElapsedDueToMemory(
     const HloInstruction& instruction,
-    absl::Span<const std::pair<int64_t, ShapeIndex>> operands_in_alternate_mem,
-    absl::Span<const ShapeIndex> outputs_in_alternate_mem) const {
+    abslx::Span<const std::pair<int64_t, ShapeIndex>> operands_in_alternate_mem,
+    abslx::Span<const ShapeIndex> outputs_in_alternate_mem) const {
   float total_bytes_accessed = cost_analysis_.bytes_accessed(instruction);
   float bytes_accessed_from_alternate_mem = 0.0;
   for (auto& operand : operands_in_alternate_mem) {
@@ -452,8 +452,8 @@ float MemorySpaceAssignmentCostAnalysis::GetInstructionElapsed(
 
 float MemorySpaceAssignmentCostAnalysis::GetInstructionElapsedInAlternateMemory(
     const HloInstruction& instruction,
-    absl::Span<const std::pair<int64_t, ShapeIndex>> operands_in_alternate_mem,
-    absl::Span<const ShapeIndex> outputs_in_alternate_mem) const {
+    abslx::Span<const std::pair<int64_t, ShapeIndex>> operands_in_alternate_mem,
+    abslx::Span<const ShapeIndex> outputs_in_alternate_mem) const {
   return std::max(
       GetInstructionElapsedDueToCompute(instruction),
       GetInstructionElapsedDueToMemory(instruction, operands_in_alternate_mem,
@@ -539,12 +539,12 @@ int64_t InstructionCountPrefetchIntervalPicker::latest_time() const {
 }
 
 std::string InstructionCountPrefetchIntervalPicker::ToDebugString() const {
-  return absl::StrCat("Overlapped HLOs = ", end_time_ - current_prefetch_time_);
+  return abslx::StrCat("Overlapped HLOs = ", end_time_ - current_prefetch_time_);
 }
 
 std::string InstructionCountPrefetchIntervalPicker::ToNoCopyDebugString(
     const Shape& shape, int64_t start_time, int64_t end_time) const {
-  return absl::StrCat("Overlapped HLOs = ", end_time - start_time);
+  return abslx::StrCat("Overlapped HLOs = ", end_time - start_time);
 }
 
 CostAnalysisPrefetchIntervalPicker::CostAnalysisPrefetchIntervalPicker(
@@ -904,7 +904,7 @@ std::string CostAnalysisPrefetchIntervalPicker::ToDebugString() const {
                                           : decreasing_prefetch_time_iterator_;
   float logical_interval_elapsed = GetLogicalIntervalElapsed(
       current_logical_prefetch_time, end_logical_time_);
-  return absl::StrCat(
+  return abslx::StrCat(
       "Async copy elapsed (s) = ", async_copy_elapsed_,
       ", inst elapsed reduction (s) = ", inst_elapsed_reduction_,
       ", logical interval elapsed (s) = ", logical_interval_elapsed,
@@ -917,7 +917,7 @@ std::string CostAnalysisPrefetchIntervalPicker::ToNoCopyDebugString(
   float async_copy_elapsed = cost_analysis_.GetAsyncCopyElapsed(shape);
   float logical_interval_elapsed =
       GetLogicalIntervalElapsed(start_time, end_time);
-  return absl::StrCat(
+  return abslx::StrCat(
       "Async copy elapsed (s) = ", async_copy_elapsed,
       ", logical interval elapsed (s) = ", logical_interval_elapsed);
 }
@@ -950,20 +950,20 @@ bool MemorySpaceAssignment::CopyAllocation::operator==(
 }
 
 std::string MemorySpaceAssignment::AllocationValue::ToString() const {
-  std::string out = absl::StrCat("computation = ", computation()->name());
-  absl::StrAppend(&out,
+  std::string out = abslx::StrCat("computation = ", computation()->name());
+  abslx::StrAppend(&out,
                   (requires_contiguous_allocation_ ? " (cont alloc)" : ""));
-  absl::StrAppend(&out, "\n position:\n");
-  absl::StrAppend(&out, "  ", defining_position_.ToString(), "\n");
-  absl::StrAppend(&out, " uses:\n");
+  abslx::StrAppend(&out, "\n position:\n");
+  abslx::StrAppend(&out, "  ", defining_position_.ToString(), "\n");
+  abslx::StrAppend(&out, " uses:\n");
   for (const Use& use : uses_) {
-    absl::StrAppend(&out, "  ", use.hlo_use.ToString(), "\n");
+    abslx::StrAppend(&out, "  ", use.hlo_use.ToString(), "\n");
   }
   return out;
 }
 
 std::string MemorySpaceAssignment::AllocationValue::ToShortString() const {
-  return absl::StrCat("computation = ", computation()->name(),
+  return abslx::StrCat("computation = ", computation()->name(),
                       ", position = ", defining_position_.ToString(),
                       ", value = ", value_->ToShortString(),
                       (requires_contiguous_allocation_ ? " (cont alloc)" : ""));
@@ -1017,7 +1017,7 @@ void AlternateMemoryBestFitHeap::CreateAllocationValues(
   // AllocationSequence consisting of one or more Allocation objects.The reason
   // why we exclude the trivial positions from AllocationValue is because
   // Allocation objects have special support for tuples and bitcasts.
-  const absl::flat_hash_map<const HloInstruction*, int64_t>&
+  const abslx::flat_hash_map<const HloInstruction*, int64_t>&
       instruction_schedule = hlo_live_range_.instruction_schedule();
   std::vector<HloPosition> positions;
   for (const HloPosition& position : value->positions()) {
@@ -1028,14 +1028,14 @@ void AlternateMemoryBestFitHeap::CreateAllocationValues(
       positions.push_back(position);
     }
   }
-  absl::c_stable_sort(positions,
+  abslx::c_stable_sort(positions,
                       [&](const HloPosition& pos1, const HloPosition& pos2) {
                         return instruction_schedule.at(pos1.instruction) <
                                instruction_schedule.at(pos2.instruction);
                       });
 
   // Create an AllocationValue for each non-trivial position.
-  absl::flat_hash_set<const HloComputation*> computations;
+  abslx::flat_hash_set<const HloComputation*> computations;
   int beginning_idx = allocation_values.size();
   for (int i = 0; i < positions.size(); ++i) {
     const HloPosition& position = positions.at(i);
@@ -1043,7 +1043,7 @@ void AlternateMemoryBestFitHeap::CreateAllocationValues(
   }
 
   std::vector<HloUse> uses(value->GetUses().begin(), value->GetUses().end());
-  absl::c_stable_sort(uses, [&](const HloUse& use1, const HloUse& use2) {
+  abslx::c_stable_sort(uses, [&](const HloUse& use1, const HloUse& use2) {
     return instruction_schedule.at(use1.instruction) <
            instruction_schedule.at(use2.instruction);
   });
@@ -1099,7 +1099,7 @@ void AlternateMemoryBestFitHeap::CreateAllocationValues(
 
 void AlternateMemoryBestFitHeap::FindAliases(
     std::vector<AllocationValue>* allocation_values) const {
-  absl::flat_hash_map<const HloInstruction*,
+  abslx::flat_hash_map<const HloInstruction*,
                       std::vector<const AllocationValue*>>
       values_by_defining_inst;
   for (AllocationValue& value : *allocation_values) {
@@ -1160,7 +1160,7 @@ AlternateMemoryBestFitHeap::GetSortedColocatedIntervals(
     }
   }
 
-  absl::c_stable_sort(colocated_intervals, [&](const BufferInterval* x,
+  abslx::c_stable_sort(colocated_intervals, [&](const BufferInterval* x,
                                                const BufferInterval* y) {
     return std::make_pair(x->start, x->end) < std::make_pair(y->start, y->end);
   });
@@ -1291,7 +1291,7 @@ namespace {
 // representation of uses.
 // is_scoped: int. A value of 1 indicates that the buffer is a scoped
 // allocation.
-constexpr absl::string_view kBufferInfoColumnNames =
+constexpr abslx::string_view kBufferInfoColumnNames =
     "buffer_id,buffer_name,alt_mem_benefit,size,definition_time,use_times,use_"
     "names,is_scoped";
 }  // namespace
@@ -1301,7 +1301,7 @@ void AlternateMemoryBestFitHeap::AppendBufferInfoDebugString(
     std::string* debug_str) const {
   if (debug_str->empty()) {
     // Append the column names.
-    absl::StrAppend(debug_str, kBufferInfoColumnNames, "\n");
+    abslx::StrAppend(debug_str, kBufferInfoColumnNames, "\n");
   }
   const HloBuffer& buffer =
       alias_analysis_.GetBufferContainingValue(*interval.buffer);
@@ -1315,7 +1315,7 @@ void AlternateMemoryBestFitHeap::AppendBufferInfoDebugString(
           {instruction_schedule.at(use.instruction), use.ToString()});
     }
   }
-  absl::c_sort(uses);
+  abslx::c_sort(uses);
   std::vector<int64_t> use_times;
   std::vector<std::string> use_names;
   use_times.reserve(uses.size());
@@ -1325,19 +1325,19 @@ void AlternateMemoryBestFitHeap::AppendBufferInfoDebugString(
     use_names.push_back(use.second);
   }
 
-  absl::StrAppend(debug_str, buffer.id(), ",");
-  absl::StrAppend(debug_str, "\"", interval.buffer->ToShortString(), "\",");
+  abslx::StrAppend(debug_str, buffer.id(), ",");
+  abslx::StrAppend(debug_str, "\"", interval.buffer->ToShortString(), "\",");
   auto alternate_memory_benefit =
       options_.prefetch_interval_picker->BufferIntervalAlternateMemoryBenefit(
           interval);
-  absl::StrAppend(
+  abslx::StrAppend(
       debug_str, alternate_memory_benefit ? *alternate_memory_benefit : 0, ",");
-  absl::StrAppend(debug_str, interval.size, ",");
-  absl::StrAppend(debug_str, definition_time, ",");
-  absl::StrAppend(debug_str, "\"", absl::StrJoin(use_times, ";"), "\",");
-  absl::StrAppend(debug_str, "\"", absl::StrJoin(use_names, ";"), "\",");
-  absl::StrAppend(debug_str, "0");  // is_scoped
-  absl::StrAppend(debug_str, "\n");
+  abslx::StrAppend(debug_str, interval.size, ",");
+  abslx::StrAppend(debug_str, definition_time, ",");
+  abslx::StrAppend(debug_str, "\"", abslx::StrJoin(use_times, ";"), "\",");
+  abslx::StrAppend(debug_str, "\"", abslx::StrJoin(use_names, ";"), "\",");
+  abslx::StrAppend(debug_str, "0");  // is_scoped
+  abslx::StrAppend(debug_str, "\n");
 }
 
 void AlternateMemoryBestFitHeap::AppendScopedAllocationBufferInfoDebugString(
@@ -1345,21 +1345,21 @@ void AlternateMemoryBestFitHeap::AppendScopedAllocationBufferInfoDebugString(
     std::string& debug_str) const {
   if (debug_str.empty()) {
     // Append the column names.
-    absl::StrAppend(&debug_str, kBufferInfoColumnNames, "\n");
+    abslx::StrAppend(&debug_str, kBufferInfoColumnNames, "\n");
   }
   const HloBuffer& buffer = alias_analysis_.GetUniqueBufferAt(instruction);
 
   // As a convention, we use negative values for scoped allocations.
-  absl::StrAppend(&debug_str, -buffer.id(), ",");
-  absl::StrAppend(&debug_str, "\"scoped allocation for ", instruction->name(),
+  abslx::StrAppend(&debug_str, -buffer.id(), ",");
+  abslx::StrAppend(&debug_str, "\"scoped allocation for ", instruction->name(),
                   "\",");
-  absl::StrAppend(&debug_str, 0, ",");  // alt_mem_benefit
-  absl::StrAppend(&debug_str, size, ",");
-  absl::StrAppend(&debug_str, time, ",");
-  absl::StrAppend(&debug_str, "\"\",");  // use_times
-  absl::StrAppend(&debug_str, "\"\",");  // use_names
-  absl::StrAppend(&debug_str, "1");      // is_scoped
-  absl::StrAppend(&debug_str, "\n");
+  abslx::StrAppend(&debug_str, 0, ",");  // alt_mem_benefit
+  abslx::StrAppend(&debug_str, size, ",");
+  abslx::StrAppend(&debug_str, time, ",");
+  abslx::StrAppend(&debug_str, "\"\",");  // use_times
+  abslx::StrAppend(&debug_str, "\"\",");  // use_names
+  abslx::StrAppend(&debug_str, "1");      // is_scoped
+  abslx::StrAppend(&debug_str, "\n");
 }
 
 void AlternateMemoryBestFitHeap::AppendAllocationInfoDebugString(
@@ -1373,20 +1373,20 @@ void AlternateMemoryBestFitHeap::AppendAllocationInfoDebugString(
   // end_time: int. Logical end time of the allocation.
   if (debug_str.empty()) {
     // Append the column names.
-    absl::StrAppend(&debug_str, "buffer_id,size,offset,start_time,end_time\n");
+    abslx::StrAppend(&debug_str, "buffer_id,size,offset,start_time,end_time\n");
   }
   if (allocation.memory_space() == MemorySpace::kAlternate) {
     const HloPosition& position = allocation.defining_position();
     const HloBuffer& buffer =
         alias_analysis_.GetUniqueBufferAt(position.instruction, position.index);
     // As a convention, we use negative values for scoped allocations.
-    absl::StrAppend(
+    abslx::StrAppend(
         &debug_str,
         allocation.is_scoped_allocation() ? -buffer.id() : buffer.id(), ",");
-    absl::StrAppend(&debug_str, allocation.chunk().size, ",");
-    absl::StrAppend(&debug_str, allocation.chunk().offset, ",");
-    absl::StrAppend(&debug_str, allocation.start_time(), ",");
-    absl::StrAppend(&debug_str, allocation.end_time(), "\n");
+    abslx::StrAppend(&debug_str, allocation.chunk().size, ",");
+    abslx::StrAppend(&debug_str, allocation.chunk().offset, ",");
+    abslx::StrAppend(&debug_str, allocation.start_time(), ",");
+    abslx::StrAppend(&debug_str, allocation.end_time(), "\n");
   }
 }
 
@@ -1474,7 +1474,7 @@ HeapSimulator::Result<HloValue> AlternateMemoryBestFitHeap::Finish() {
 
     // Don't intra-program prefetch a cross program prefetch
     if (inst->opcode() == HloOpcode::kParameter &&
-        absl::c_count(module->CrossProgramPrefetches(),
+        abslx::c_count(module->CrossProgramPrefetches(),
                       std::make_pair(inst->parameter_number(),
                                      interval.buffer->index())) > 0) {
       VLOG(3) << "Skip " << interval.buffer->ToShortString()
@@ -1520,7 +1520,7 @@ HeapSimulator::Result<HloValue> AlternateMemoryBestFitHeap::Finish() {
     }
 
     if (!ConsumeFuel("memory_space_assignment", [&] {
-          return absl::StrCat("Ran out of fuel at buffer: ",
+          return abslx::StrCat("Ran out of fuel at buffer: ",
                               colocated_intervals[0]->buffer->ToShortString());
         })) {
       continue;
@@ -1542,16 +1542,16 @@ HeapSimulator::Result<HloValue> AlternateMemoryBestFitHeap::Finish() {
       AddRequiredAssignmentsForColocatedIntervals(colocated_intervals);
       options_.prefetch_interval_picker->SetRetryNumber(retry_number);
       Result result =
-          AllocateAllocationValues(absl::MakeSpan(allocation_values));
+          AllocateAllocationValues(abslx::MakeSpan(allocation_values));
       VLOG(2) << "Allocation result = "
-              << absl::StrFormat("%x", static_cast<int>(result));
+              << abslx::StrFormat("%x", static_cast<int>(result));
       if (result_requires_uncommit(result)) {
-        UncommitPendingChunks(absl::MakeSpan(allocation_values));
+        UncommitPendingChunks(abslx::MakeSpan(allocation_values));
         VLOG(2) << "Couldn't allocate. Retry number " << retry_number;
       } else if ((result_is(result, Result::kFailOutOfMemory) ||
                   options_.repack_after_every_allocation) &&
                  num_repacks_ < options_.max_repacks && !repacked) {
-        UncommitPendingChunks(absl::MakeSpan(allocation_values));
+        UncommitPendingChunks(abslx::MakeSpan(allocation_values));
         ++num_repacks_;
         repacked = true;
         CHECK_NE(options_.repacker, nullptr);
@@ -1560,7 +1560,7 @@ HeapSimulator::Result<HloValue> AlternateMemoryBestFitHeap::Finish() {
         ExportAllocationsForRepacking(repack_allocation_blocks);
         VLOG(2) << "Repacking.";
         auto repack_status =
-            options_.repacker->Repack(absl::MakeSpan(repack_allocation_blocks));
+            options_.repacker->Repack(abslx::MakeSpan(repack_allocation_blocks));
         CHECK_EQ(repack_status.status(), OkStatus());
         VLOG(2) << "Repack complete. Modified = " << *repack_status;
         if (*repack_status) {
@@ -1568,7 +1568,7 @@ HeapSimulator::Result<HloValue> AlternateMemoryBestFitHeap::Finish() {
           --retry_number;
         }
       } else {
-        FinalizeAllocations(absl::MakeSpan(allocation_values));
+        FinalizeAllocations(abslx::MakeSpan(allocation_values));
         break;
       }
     }
@@ -1594,7 +1594,7 @@ HeapSimulator::Result<HloValue> AlternateMemoryBestFitHeap::Finish() {
 }
 
 void AlternateMemoryBestFitHeap::AddRequiredAssignmentsForColocatedIntervals(
-    absl::Span<const AlternateMemoryBestFitHeap::BufferInterval* const>
+    abslx::Span<const AlternateMemoryBestFitHeap::BufferInterval* const>
         colocated_intervals) {
   // TODO(berkin): For now, place the phi values due to conditionals in
   // default memory.
@@ -1617,7 +1617,7 @@ void AlternateMemoryBestFitHeap::AddRequiredAssignmentsForColocatedIntervals(
 }
 
 void AlternateMemoryBestFitHeap::CreateAllocationValuesFromColocatedIntervals(
-    absl::Span<const AlternateMemoryBestFitHeap::BufferInterval* const>
+    abslx::Span<const AlternateMemoryBestFitHeap::BufferInterval* const>
         colocated_intervals,
     std::vector<MemorySpaceAssignment::AllocationValue>& allocation_values) {
   // Create AllocationValues for all the colocated intervals.
@@ -1660,7 +1660,7 @@ void AlternateMemoryBestFitHeap::CreateAllocationValuesFromColocatedIntervals(
 
 AlternateMemoryBestFitHeap::Result
 AlternateMemoryBestFitHeap::AllocateAllocationValues(
-    absl::Span<MemorySpaceAssignment::AllocationValue> allocation_values) {
+    abslx::Span<MemorySpaceAssignment::AllocationValue> allocation_values) {
   const auto& instruction_schedule = hlo_live_range_.instruction_schedule();
 
   // Find the use times across all of the related AllocationValues and sort
@@ -1668,16 +1668,16 @@ AlternateMemoryBestFitHeap::AllocateAllocationValues(
   // entire live range of all the AllocationValues.
   std::vector<int64_t> all_use_times;
   for (const AllocationValue& allocation_value : allocation_values) {
-    absl::c_transform(allocation_value.uses(),
+    abslx::c_transform(allocation_value.uses(),
                       std::back_inserter(all_use_times),
                       [](const AllocationValue::Use& use) { return use.time; });
   }
-  absl::c_sort(all_use_times);
+  abslx::c_sort(all_use_times);
 
   // Data structure to contain the preferred offset for a given computation.
   // We ensure that the same offset will be allocated outside the while loop
   // as well as inside the while loop.
-  absl::flat_hash_map<const HloComputation*, AliasedOffset*>
+  abslx::flat_hash_map<const HloComputation*, AliasedOffset*>
       preferred_offset_for_computation;
 
   Result result = Result::kSuccess;
@@ -1842,7 +1842,7 @@ AlternateMemoryBestFitHeap::AllocateAllocationValues(
         // (latest to earliest in execution time) for a suitable allocation in
         // order to find the most recent one.
         if (options_.enable_while_redundant_eviction_elimination &&
-            absl::c_find_if(allocation_value.value()->positions(),
+            abslx::c_find_if(allocation_value.value()->positions(),
                             [&hlo_use](const HloPosition& position) {
                               return position.instruction ==
                                          hlo_use.instruction &&
@@ -1860,7 +1860,7 @@ AlternateMemoryBestFitHeap::AllocateAllocationValues(
               allocation_sequence->rend()) {
             VLOG(3) << "Found a prev allocation in default mem for while use: "
                     << (*prev_allocation_in_default_mem_it)->ToString();
-            auto body_allocation_value_it = absl::c_find_if(
+            auto body_allocation_value_it = abslx::c_find_if(
                 allocation_values, [&](const AllocationValue& value) {
                   return value.computation() ==
                              hlo_use.instruction->while_body() &&
@@ -1882,7 +1882,7 @@ AlternateMemoryBestFitHeap::AllocateAllocationValues(
                            ->back()
                            ->ToString();
 
-            auto after_while_allocation_value_it = absl::c_find_if(
+            auto after_while_allocation_value_it = abslx::c_find_if(
                 allocation_values, [&](const AllocationValue& value) {
                   return value.defining_instruction() == hlo_use.instruction;
                 });
@@ -2129,20 +2129,20 @@ void AlternateMemoryBestFitHeap::AllocateCrossProgramPrefetchBuffer(
     return instruction_schedule.at(lhs.instruction) <
            instruction_schedule.at(rhs.instruction);
   };
-  auto first_use = absl::c_min_element(uses, use_schedule_compare);
+  auto first_use = abslx::c_min_element(uses, use_schedule_compare);
   int64_t latest_prefetch_time =
       instruction_schedule.at(first_use->instruction);
 
   // Find the latest use time.
   int64_t last_use_time = instruction_schedule.at(
-      absl::c_max_element(uses, use_schedule_compare)->instruction);
+      abslx::c_max_element(uses, use_schedule_compare)->instruction);
   for (const HloValue* colocation : prefetch_candidate->colocations) {
     auto colocation_uses = colocation->GetUses();
     if (!colocation_uses.empty()) {
       last_use_time = std::max(
           last_use_time,
           instruction_schedule.at(
-              absl::c_max_element(colocation_uses, use_schedule_compare)
+              abslx::c_max_element(colocation_uses, use_schedule_compare)
                   ->instruction));
     }
   }
@@ -2192,7 +2192,7 @@ void AlternateMemoryBestFitHeap::AllocateCrossProgramPrefetchBuffer(
 
   HloInstruction* root_instruction =
       module->entry_computation()->root_instruction();
-  absl::c_for_each(uses, [&](auto& use) {
+  abslx::c_for_each(uses, [&](auto& use) {
     if (use.instruction != root_instruction) {
       allocations.back()->AddUse(use);
     }
@@ -2490,7 +2490,7 @@ void AlternateMemoryBestFitHeap::AddInputAndOutputRequiredAssignments() {
       // Check if there is an existing matching required assignment (e.g.
       // inserted by the logic above) and if so ensure it requires a default
       // memory allocation.
-      auto matching_assignment = absl::c_find_if(
+      auto matching_assignment = abslx::c_find_if(
           required_assignments,
           [&](const RequiredMemoryAssignment& required_assignment) {
             return required_assignment.time == instruction_time;
@@ -2508,7 +2508,7 @@ void AlternateMemoryBestFitHeap::AddInputAndOutputRequiredAssignments() {
 }
 
 bool AlternateMemoryBestFitHeap::AreIntervalsReservedInAlternateMemory(
-    absl::Span<const BufferInterval* const> colocated_intervals) const {
+    abslx::Span<const BufferInterval* const> colocated_intervals) const {
   auto is_position_in_alternate_memory = [&](const HloPosition& position) {
     const Shape& shape = position.shape();
     return shape.has_layout() &&
@@ -2563,7 +2563,7 @@ void AlternateMemoryBestFitHeap::ImportRepackedAllocations() {
 }
 
 void AlternateMemoryBestFitHeap::UncommitPendingChunks(
-    absl::Span<AllocationValue> allocation_values) {
+    abslx::Span<AllocationValue> allocation_values) {
   // Clear the allocation sequence of the allocation values so that in case we
   // retry allocation after uncommitting.
   for (AllocationValue& allocation_value : allocation_values) {
@@ -2620,8 +2620,8 @@ void AlternateMemoryBestFitHeap::UncommitPendingChunks(
 }
 
 void AlternateMemoryBestFitHeap::FinalizeAllocations(
-    absl::Span<AllocationValue> allocation_values) {
-  absl::flat_hash_map<const AliasedOffset*,
+    abslx::Span<AllocationValue> allocation_values) {
+  abslx::flat_hash_map<const AliasedOffset*,
                       std::vector<MemorySpaceAssignment::Allocation*>>
       colocation_map;
   for (AllocationValue& allocation_value : allocation_values) {
@@ -3338,7 +3338,7 @@ AlternateMemoryBestFitHeap::FindBestChunkCandidate(
   if (!preferred_offset) {
     // First find the earliest use that is the same or later than the end time.
     const auto& use_times = request.all_use_times;
-    auto use_time_it = absl::c_lower_bound(use_times, end_time);
+    auto use_time_it = abslx::c_lower_bound(use_times, end_time);
     CHECK(use_time_it != use_times.end());
     int64_t earliest_use = *use_time_it;
     auto earliest_use_it = use_time_it;
@@ -3543,9 +3543,9 @@ void MemorySpaceAssignment::Allocation::AddUse(HloUse use) {
 
 float MemorySpaceAssignment::ComputeEstimatedElapsedTime(
     const HloLiveRange& hlo_live_range, const AllocationSequence& allocations) {
-  absl::flat_hash_map<const HloInstruction*, std::vector<ShapeIndex>>
+  abslx::flat_hash_map<const HloInstruction*, std::vector<ShapeIndex>>
       outputs_in_alternate_memory_map;
-  absl::flat_hash_map<const HloInstruction*,
+  abslx::flat_hash_map<const HloInstruction*,
                       std::vector<std::pair<int64_t, ShapeIndex>>>
       operands_in_alternate_memory_map;
 
@@ -3636,9 +3636,9 @@ HloInstruction* MemorySpaceAssignment::Allocation::AddGetTupleElements() const {
 std::string MemorySpaceAssignment::Allocation::ToString() const {
   std::string memory_space_str = "def";
   if (memory_space_ == MemorySpace::kAlternate) {
-    memory_space_str = absl::StrCat("alt (off: ", chunk_->offset, ")");
+    memory_space_str = abslx::StrCat("alt (off: ", chunk_->offset, ")");
   }
-  return absl::StrCat((is_scoped_allocation() ? "Scoped " : ""),
+  return abslx::StrCat((is_scoped_allocation() ? "Scoped " : ""),
                       "Allocation in ", memory_space_str, " defined at ",
                       defining_position_.ToString(),
                       ", start_time:", start_time(), ", end_time:", end_time(),
@@ -3648,9 +3648,9 @@ std::string MemorySpaceAssignment::Allocation::ToString() const {
 std::string MemorySpaceAssignment::CopyAllocation::ToString() const {
   std::string memory_space_str = "def";
   if (memory_space_ == MemorySpace::kAlternate) {
-    memory_space_str = absl::StrCat("alt (off: ", chunk_->offset, ")");
+    memory_space_str = abslx::StrCat("alt (off: ", chunk_->offset, ")");
   }
-  return absl::StrCat("Copy Allocation in ", memory_space_str,
+  return abslx::StrCat("Copy Allocation in ", memory_space_str,
                       ", start_time:", start_time(), ", end_time:", end_time(),
                       ", copy_start_after_time: ", copy_start_schedule_after(),
                       ", copy_done_before_time: ", copy_done_schedule_before(),
@@ -3659,12 +3659,12 @@ std::string MemorySpaceAssignment::CopyAllocation::ToString() const {
 }
 
 std::string MemorySpaceAssignment::MirroredAllocation::ToString() const {
-  return absl::StrCat("Mirrored Allocation for ",
+  return abslx::StrCat("Mirrored Allocation for ",
                       original_allocation_.ToString());
 }
 
 std::string MemorySpaceAssignment::ParentAllocation::ToString() const {
-  return absl::StrCat("Parent Allocation mirrored at ",
+  return abslx::StrCat("Parent Allocation mirrored at ",
                       defining_position_.ToString(), ", originally ",
                       original_allocation_.ToString());
 }
@@ -3768,23 +3768,23 @@ Status MemorySpaceAssignment::ParentAllocation::PostProcess() {
 }
 
 void MemorySpaceAssignment::Allocation::MarkIfNeeded(
-    absl::flat_hash_set<const Allocation*>& needed_allocations) const {
+    abslx::flat_hash_set<const Allocation*>& needed_allocations) const {
   MarkNeeded(needed_allocations);
 }
 
 void MemorySpaceAssignment::Allocation::MarkNeeded(
-    absl::flat_hash_set<const Allocation*>& needed_allocations) const {
+    abslx::flat_hash_set<const Allocation*>& needed_allocations) const {
   needed_allocations.insert(this);
 }
 
 void MemorySpaceAssignment::CopyAllocation::MarkNeeded(
-    absl::flat_hash_set<const Allocation*>& needed_allocations) const {
+    abslx::flat_hash_set<const Allocation*>& needed_allocations) const {
   needed_allocations.insert(this);
   prev_allocation_.MarkNeeded(needed_allocations);
 }
 
 void MemorySpaceAssignment::ParentAllocation::MarkIfNeeded(
-    absl::flat_hash_set<const Allocation*>& needed_allocations) const {
+    abslx::flat_hash_set<const Allocation*>& needed_allocations) const {
   // Parent allocations are only needed if they have any uses or if there is a
   // copy allocation that copies this value (in that case, the copy allocation
   // will call this allocation's MarkNeeded function).
@@ -3794,13 +3794,13 @@ void MemorySpaceAssignment::ParentAllocation::MarkIfNeeded(
 }
 
 void MemorySpaceAssignment::ParentAllocation::MarkNeeded(
-    absl::flat_hash_set<const Allocation*>& needed_allocations) const {
+    abslx::flat_hash_set<const Allocation*>& needed_allocations) const {
   needed_allocations.insert(this);
   original_allocation_.MarkNeeded(needed_allocations);
 }
 
 void MemorySpaceAssignment::MirroredAllocation::MarkNeeded(
-    absl::flat_hash_set<const Allocation*>& needed_allocations) const {
+    abslx::flat_hash_set<const Allocation*>& needed_allocations) const {
   needed_allocations.insert(this);
   original_allocation_.MarkNeeded(needed_allocations);
 }
@@ -3811,7 +3811,7 @@ Status MemorySpaceAssignment::Process() {
   // any uses and if there is no other (non-parent) allocation that depends on
   // it, before we process the allocations, mark all allocations that are
   // needed.
-  absl::flat_hash_set<const Allocation*> needed_allocations;
+  abslx::flat_hash_set<const Allocation*> needed_allocations;
   for (auto& allocation : allocations_) {
     allocation->MarkIfNeeded(needed_allocations);
   }
@@ -3853,7 +3853,7 @@ Status MemorySpaceAssignment::Process() {
 Status MemorySpaceAssignment::ExportAndColorBuffers() {
   VLOG(1) << "Exporting buffers...";
   TF_ASSIGN_OR_RETURN(auto alias_analysis, HloAliasAnalysis::Run(module_));
-  absl::flat_hash_map<int64_t, int64_t> seen_buffer_offsets;
+  abslx::flat_hash_map<int64_t, int64_t> seen_buffer_offsets;
   VLOG(3) << "Exported alternate memory allocations:";
   for (const auto& position_and_chunk : alternate_memory_assignments_) {
     const HloPosition& defining_position = position_and_chunk.first;
@@ -3984,7 +3984,7 @@ Status MemorySpaceAssignment::SimplifyGraph() {
           // logical time that is the index into flattened_instructions_ for
           // scheduling asynchronous copies.
           auto instruction_it =
-              absl::c_find(flattened_instructions_, instruction);
+              abslx::c_find(flattened_instructions_, instruction);
           if (instruction_it != flattened_instructions_.end()) {
             *instruction_it = nullptr;
           }
@@ -4055,7 +4055,7 @@ void MemorySpaceAssignment::ScheduleAsynchronousCopies() {
       }
     }
 
-    absl::c_stable_sort(
+    abslx::c_stable_sort(
         copy_allocations, [](CopyAllocation* first, CopyAllocation* second) {
           return std::forward_as_tuple(first->copy_done_schedule_before(),
                                        first->copy_start_schedule_after()) <
@@ -4103,7 +4103,7 @@ Status MemorySpaceAssignment::FixSchedule() {
     TF_RET_CHECK(schedule.is_computation_scheduled(computation));
     HloInstructionSequence new_sequence;
 
-    absl::flat_hash_set<HloInstruction*> inserted_instructions;
+    abslx::flat_hash_set<HloInstruction*> inserted_instructions;
 
     VLOG(4) << "Scheduling: " << computation->ToString();
 
@@ -4174,7 +4174,7 @@ Status MemorySpaceAssignment::VerifyAndExportHeapSimulatorTrace() {
                                         module_->entry_computation()));
 
   BufferIntervalTree interval_tree;
-  absl::flat_hash_set<int64_t> seen_buffers;
+  abslx::flat_hash_set<int64_t> seen_buffers;
   // The key for events is: time, is_free, value_id. This is so that the events
   // are sorted first by time, then within the same time, allocations are sorted
   // earlier than frees, and finally the value id as a tie breaker.
@@ -4257,11 +4257,11 @@ Status MemorySpaceAssignment::VerifyAndExportHeapSimulatorTrace() {
       }
 
       std::function<Status(const HloInstruction*, int64_t, int64_t,
-                           absl::string_view)>
+                           abslx::string_view)>
           split_conditional_buffer;
       split_conditional_buffer = [&](const HloInstruction* use_instruction,
                                      int64_t start_time, int64_t end_time,
-                                     absl::string_view indent_string) {
+                                     abslx::string_view indent_string) {
         // Special case when verifying conditional: we internally split the use
         // of alternate memory in conditionals, so fish them out from the
         // conditionals.
@@ -4300,7 +4300,7 @@ Status MemorySpaceAssignment::VerifyAndExportHeapSimulatorTrace() {
               // function recursively.
               TF_RETURN_IF_ERROR(split_conditional_buffer(
                   last_use_instruction, computation_start_time, last_use_time,
-                  absl::StrCat(indent_string, "  ")));
+                  abslx::StrCat(indent_string, "  ")));
             } else {
               last_use_time = std::min(last_use_time, end_time);
               TF_RETURN_IF_ERROR(add_allocation_and_verify(

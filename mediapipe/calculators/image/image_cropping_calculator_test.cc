@@ -56,9 +56,9 @@ TEST(ImageCroppingCalculatorTest, GetCroppingDimensionsNormal) {
             }
           )pb");
 
-  auto calculator_state = absl::make_unique<CalculatorState>(
+  auto calculator_state = abslx::make_unique<CalculatorState>(
       "Node", 0, "Calculator", calculator_node, nullptr);
-  auto cc = absl::make_unique<CalculatorContext>(
+  auto cc = abslx::make_unique<CalculatorContext>(
       calculator_state.get(), tool::CreateTagMap({}).value(),
       tool::CreateTagMap({}).value());
 
@@ -96,9 +96,9 @@ TEST(ImageCroppingCalculatorTest, RedundantSpecInOptions) {
             }
           )pb");
 
-  auto calculator_state = absl::make_unique<CalculatorState>(
+  auto calculator_state = abslx::make_unique<CalculatorState>(
       "Node", 0, "Calculator", calculator_node, nullptr);
-  auto cc = absl::make_unique<CalculatorContext>(
+  auto cc = abslx::make_unique<CalculatorContext>(
       calculator_state.get(), tool::CreateTagMap({}).value(),
       tool::CreateTagMap({}).value());
   RectSpec expectRect = {
@@ -138,14 +138,14 @@ TEST(ImageCroppingCalculatorTest, RedundantSpectWithInputStream) {
             }
           )pb");
 
-  auto calculator_state = absl::make_unique<CalculatorState>(
+  auto calculator_state = abslx::make_unique<CalculatorState>(
       "Node", 0, "Calculator", calculator_node, nullptr);
   auto inputTags = tool::CreateTagMap({
                                           "HEIGHT:0:crop_height",
                                           "WIDTH:0:crop_width",
                                       })
                        .value();
-  auto cc = absl::make_unique<CalculatorContext>(
+  auto cc = abslx::make_unique<CalculatorContext>(
       calculator_state.get(), inputTags, tool::CreateTagMap({}).value());
   auto& inputs = cc->Inputs();
   inputs.Tag(kHeightTag).Value() = MakePacket<int>(1);
@@ -186,13 +186,13 @@ TEST(ImageCroppingCalculatorTest, RedundantSpecWithInputStream) {
             }
           )pb");
 
-  auto calculator_state = absl::make_unique<CalculatorState>(
+  auto calculator_state = abslx::make_unique<CalculatorState>(
       "Node", 0, "Calculator", calculator_node, nullptr);
   auto inputTags = tool::CreateTagMap({
                                           "RECT:0:rect",
                                       })
                        .value();
-  auto cc = absl::make_unique<CalculatorContext>(
+  auto cc = abslx::make_unique<CalculatorContext>(
       calculator_state.get(), inputTags, tool::CreateTagMap({}).value());
   auto& inputs = cc->Inputs();
   Rect rect = ParseTextProtoOrDie<Rect>(

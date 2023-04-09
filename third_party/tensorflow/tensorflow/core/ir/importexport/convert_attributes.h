@@ -41,7 +41,7 @@ tensorflow::Status ConvertAttributes(ArrayRef<NamedAttribute> attrs,
 // Convert the MLIR attribute `attr` and return a `tensorflow::AttrValue`.
 tensorflow::StatusOr<tensorflow::AttrValue> ConvertAttribute(Attribute attr);
 
-tensorflow::Status SetShapeAttribute(absl::string_view name,
+tensorflow::Status SetShapeAttribute(abslx::string_view name,
                                      ShapedType shaped_type,
                                      tensorflow::AttrValueMap* values);
 

@@ -36,7 +36,7 @@ enum class BottleneckType {
   kOther,
 };
 
-BottleneckType GetBottleneckType(absl::string_view bottleneck_iterator_name);
+BottleneckType GetBottleneckType(abslx::string_view bottleneck_iterator_name);
 
 class CombinedTfDataStatsBuilder {
  public:
@@ -46,7 +46,7 @@ class CombinedTfDataStatsBuilder {
       : combined_tf_data_stats_(combined_tf_data_stats),
         generate_suggestion_(generate_suggestion) {}
 
-  void Add(absl::string_view host_name, XPlane* host_plane);
+  void Add(abslx::string_view host_name, XPlane* host_plane);
 
   // Finalizes by populating TfDataBottleneckAnalysis.
   void Finalize();

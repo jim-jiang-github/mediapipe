@@ -45,11 +45,11 @@ class PjRtCApiDevice : public PjRtDevice {
 
   int local_hardware_id() const override;
 
-  absl::string_view device_kind() const override;
+  abslx::string_view device_kind() const override;
 
-  absl::string_view DebugString() const override;
+  abslx::string_view DebugString() const override;
 
-  absl::string_view ToString() const override;
+  abslx::string_view ToString() const override;
 
   Status TransferToInfeed(const LiteralSlice& literal) override {
 #ifdef PJRT_C_API_BYPASS
@@ -66,7 +66,7 @@ class PjRtCApiDevice : public PjRtDevice {
   }
 
   std::unique_ptr<ScopedAsyncTrackingEvent> CreateAsyncTrackingEvent(
-      absl::string_view description) const override {
+      abslx::string_view description) const override {
 #ifdef PJRT_C_API_BYPASS
     return wrapped_->CreateAsyncTrackingEvent(description);
 #endif  // PJRT_C_API_BYPASS
@@ -74,7 +74,7 @@ class PjRtCApiDevice : public PjRtDevice {
     return nullptr;
   }
 
-  const absl::flat_hash_map<std::string, PjRtDeviceAttribute>& Attributes()
+  const abslx::flat_hash_map<std::string, PjRtDeviceAttribute>& Attributes()
       const override;
 
   PJRT_Device* c_device() const { return device_; }
@@ -94,7 +94,7 @@ class PjRtCApiDevice : public PjRtDevice {
   // usage is reduced to zero.
   PjRtDevice* wrapped_;
   // Device specific attributes with corresponding values.
-  absl::flat_hash_map<std::string, xla::PjRtDeviceAttribute> attributes_;
+  abslx::flat_hash_map<std::string, xla::PjRtDeviceAttribute> attributes_;
 
   // Initializes device specific attributes.
   void InitAttributes();
@@ -109,8 +109,8 @@ class PjRtCApiClient : public PjRtClient {
   int device_count() const override;
   int addressable_device_count() const override;
 
-  absl::Span<PjRtDevice* const> devices() const override;
-  absl::Span<PjRtDevice* const> addressable_devices() const override;
+  abslx::Span<PjRtDevice* const> devices() const override;
+  abslx::Span<PjRtDevice* const> addressable_devices() const override;
 
   StatusOr<PjRtDevice*> LookupDevice(int device_id) const override;
 
@@ -131,9 +131,9 @@ class PjRtCApiClient : public PjRtClient {
     CHECK(false) << "PJRT C API does not support platform_id.";
   }
 
-  absl::string_view platform_name() const override;
+  abslx::string_view platform_name() const override;
 
-  absl::string_view platform_version() const override;
+  abslx::string_view platform_version() const override;
 
   PjRtRuntimeType runtime_type() const override {
 #ifdef PJRT_C_API_BYPASS
@@ -177,7 +177,7 @@ class PjRtCApiClient : public PjRtClient {
       const PjRtLoadedExecutable& executable) const override;
 
   StatusOr<std::unique_ptr<PjRtLoadedExecutable>> DeserializeExecutable(
-      absl::string_view serialized, CompileOptions options) override;
+      abslx::string_view serialized, CompileOptions options) override;
 
   StatusOr<std::unique_ptr<PjRtBuffer>> CreateUninitializedBuffer(
       const Shape& shape, PjRtDevice* device) override {
@@ -186,15 +186,15 @@ class PjRtCApiClient : public PjRtClient {
   }
 
   StatusOr<std::unique_ptr<AsyncBufferTransferManager>>
-  CreateBuffersForAsyncTransfer(absl::Span<const Shape> shapes,
+  CreateBuffersForAsyncTransfer(abslx::Span<const Shape> shapes,
                                 PjRtDevice* device) override {
     return Unimplemented(
         "PJRT C API does not support CreateBuffersForAsyncTransfer");
   }
 
   StatusOr<std::unique_ptr<PjRtBuffer>> BufferFromHostBuffer(
-      const void* data, PrimitiveType type, absl::Span<int64_t const> dims,
-      std::optional<absl::Span<int64_t const>> byte_strides,
+      const void* data, PrimitiveType type, abslx::Span<int64_t const> dims,
+      std::optional<abslx::Span<int64_t const>> byte_strides,
       HostBufferSemantics host_buffer_semantics,
       std::function<void()> on_done_with_host_buffer,
       PjRtDevice* device) override {
@@ -230,7 +230,7 @@ class PjRtCApiClient : public PjRtClient {
   StatusOr<std::uintptr_t> UnsafeBufferPointer(PjRtBuffer* buffer) override;
 
   StatusOr<std::vector<std::unique_ptr<PjRtBuffer>>>
-  MakeCrossHostReceiveBuffers(absl::Span<const Shape> shapes,
+  MakeCrossHostReceiveBuffers(abslx::Span<const Shape> shapes,
                               PjRtDevice* device,
                               PjRtCrossHostRecvNotifier notifier) override {
     return Unimplemented(
@@ -239,7 +239,7 @@ class PjRtCApiClient : public PjRtClient {
 
   StatusOr<std::vector<std::unique_ptr<PjRtBuffer>>>
   MakeCrossHostReceiveBuffersForGather(
-      absl::Span<const Shape> shapes, std::vector<GatherDetails> gather_details,
+      abslx::Span<const Shape> shapes, std::vector<GatherDetails> gather_details,
       PjRtDevice* device, PjRtCrossHostRecvNotifier notifier) override {
     return Unimplemented(
         "PJRT C API does not support MakeCrossHostReceiveBuffers");
@@ -290,14 +290,14 @@ class PjRtCApiClient : public PjRtClient {
   std::vector<std::unique_ptr<PjRtCApiDevice>> owned_devices_;
   std::vector<PjRtDevice*> devices_;
   std::vector<PjRtDevice*> addressable_devices_;
-  absl::flat_hash_map<PJRT_Device*, PjRtCApiDevice*> c_to_cpp_device_map_;
+  abslx::flat_hash_map<PJRT_Device*, PjRtCApiDevice*> c_to_cpp_device_map_;
 
   // TODO(skyewm): this is a shim so we can run PjRtCApiClient code without the
   // C API being fully implemented. All methods using wrapped_ should either be
   // marked unimplemented or implemented in terms of the C API, at which point
   // wrapped_ and related functionality should be removed.
   PjRtClient* wrapped_;
-  absl::flat_hash_map<PjRtDevice*, PjRtCApiDevice*> wrapped_device_map_;
+  abslx::flat_hash_map<PjRtDevice*, PjRtCApiDevice*> wrapped_device_map_;
 
   void InitDevices();
 };
@@ -364,13 +364,13 @@ class PjRtCApiBuffer : public PjRtBuffer {
   StatusOr<std::unique_ptr<PjRtBuffer>> CopyToDevice(
       PjRtDevice* dst_device) override;
 
-  void CopyToRemoteDevice(absl::string_view serialized_descriptor,
+  void CopyToRemoteDevice(abslx::string_view serialized_descriptor,
                           RemoteSendCallback on_done) override {
     LOG(ERROR) << "PJRT C API does not support CopyToRemoteDevice";
   }
 
   void CopyToRemoteDeviceScattered(
-      absl::Span<const std::pair<std::string, RemoteSendCallback>>
+      abslx::Span<const std::pair<std::string, RemoteSendCallback>>
           serialized_descriptors_and_callbacks,
       const ScatterDetails& scatter_details) override {
     LOG(ERROR) << "PJRT C API does not support CopyToRemoteDeviceScattered";
@@ -395,7 +395,7 @@ class PjRtCApiBuffer : public PjRtBuffer {
   }
 
   static std::vector<PjRtBuffer*> GetWrappedVector(
-      absl::Span<PjRtBuffer* const> c_api_buffers) {
+      abslx::Span<PjRtBuffer* const> c_api_buffers) {
     std::vector<PjRtBuffer*> wrapped;
     wrapped.reserve(c_api_buffers.size());
     for (PjRtBuffer* c_api_buf : c_api_buffers) {
@@ -429,7 +429,7 @@ class PjRtCApiExecutable : public PjRtLoadedExecutable {
   ~PjRtCApiExecutable() override;
 
   PjRtClient* client() const override { return client_; }
-  absl::string_view name() const override;
+  abslx::string_view name() const override;
   int num_replicas() const override { return wrapped()->num_replicas(); }
   int num_partitions() const override { return wrapped()->num_partitions(); }
 
@@ -447,7 +447,7 @@ class PjRtCApiExecutable : public PjRtLoadedExecutable {
     CHECK(false) << "PJRT C API does not support device_assignment";
   }
 
-  absl::Span<const LogicalDeviceIds> addressable_device_logical_ids()
+  abslx::Span<const LogicalDeviceIds> addressable_device_logical_ids()
       const override {
 #ifdef PJRT_C_API_BYPASS
     return wrapped()->addressable_device_logical_ids();
@@ -456,7 +456,7 @@ class PjRtCApiExecutable : public PjRtLoadedExecutable {
         << "PJRT C API does not support addressable_device_logical_ids";
   }
 
-  absl::Span<PjRtDevice* const> addressable_devices() const override {
+  abslx::Span<PjRtDevice* const> addressable_devices() const override {
     return addressable_devices_;
   }
 
@@ -469,19 +469,19 @@ class PjRtCApiExecutable : public PjRtLoadedExecutable {
   }
 
   StatusOr<std::vector<std::vector<std::unique_ptr<PjRtBuffer>>>> Execute(
-      absl::Span<const std::vector<PjRtBuffer*>> argument_handles,
+      abslx::Span<const std::vector<PjRtBuffer*>> argument_handles,
       const ExecuteOptions& options,
       std::optional<std::vector<PjRtFuture<Status>>>& returned_futures)
       override;
 
   StatusOr<std::vector<std::unique_ptr<PjRtBuffer>>> ExecuteSharded(
-      absl::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
+      abslx::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
       const ExecuteOptions& options,
       std::optional<PjRtFuture<Status>>& returned_future,
       bool fill_future) override;
 
   StatusOr<std::vector<std::unique_ptr<PjRtBuffer>>> ExecutePortable(
-      absl::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
+      abslx::Span<PjRtBuffer* const> argument_handles, PjRtDevice* device,
       const ExecuteOptions& options,
       std::optional<PjRtFuture<Status>>& returned_future,
       bool fill_future) override;

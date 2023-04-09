@@ -50,13 +50,13 @@ namespace {
 constexpr char kProtoTraceFileName[] = "trace";
 constexpr char kTfStatsHelperSuffix[] = "tf_stats_helper_result";
 
-Status DumpToolData(absl::string_view run_dir, absl::string_view host,
+Status DumpToolData(abslx::string_view run_dir, abslx::string_view host,
                     const ProfileToolData& tool, std::ostream* os) {
   // Don't save the intermediate results for combining the per host tool data.
-  if (absl::EndsWith(tool.name(), kTfStatsHelperSuffix)) return OkStatus();
-  std::string host_prefix = host.empty() ? "" : absl::StrCat(host, ".");
+  if (abslx::EndsWith(tool.name(), kTfStatsHelperSuffix)) return OkStatus();
+  std::string host_prefix = host.empty() ? "" : abslx::StrCat(host, ".");
   std::string path =
-      ProfilerJoinPath(run_dir, absl::StrCat(host_prefix, tool.name()));
+      ProfilerJoinPath(run_dir, abslx::StrCat(host_prefix, tool.name()));
   TF_RETURN_IF_ERROR(WriteStringToFile(Env::Default(), path, tool.data()));
   if (os) {
     *os << "Dumped tool data for " << tool.name() << " to " << path << '\n';
@@ -104,7 +104,7 @@ Status MaybeCreateEmptyEventFile(const std::string& logdir) {
   std::vector<std::string> children;
   TF_RETURN_IF_ERROR(Env::Default()->GetChildren(logdir, &children));
   for (const std::string& child : children) {
-    if (absl::EndsWith(child, kProfileEmptySuffix)) {
+    if (abslx::EndsWith(child, kProfileEmptySuffix)) {
       return OkStatus();
     }
   }
@@ -119,7 +119,7 @@ Status SaveProfile(const std::string& repository_root, const std::string& run,
   std::string run_dir;
   TF_RETURN_IF_ERROR(GetOrCreateRunDir(repository_root, run, &run_dir, os));
   // Windows file names do not support colons.
-  std::string hostname = absl::StrReplaceAll(host, {{":", "_"}});
+  std::string hostname = abslx::StrReplaceAll(host, {{":", "_"}});
   for (const auto& tool_data : response.tool_data()) {
     TF_RETURN_IF_ERROR(DumpToolData(run_dir, hostname, tool_data, os));
   }
@@ -135,17 +135,17 @@ Status SaveGzippedToolData(const std::string& repository_root,
   Status status = GetOrCreateRunDir(repository_root, run, &run_dir, &ss);
   LOG(INFO) << ss.str();
   TF_RETURN_IF_ERROR(status);
-  std::string host_prefix = host.empty() ? "" : absl::StrCat(host, ".");
+  std::string host_prefix = host.empty() ? "" : abslx::StrCat(host, ".");
   std::string path =
-      ProfilerJoinPath(run_dir, absl::StrCat(host_prefix, tool_name));
+      ProfilerJoinPath(run_dir, abslx::StrCat(host_prefix, tool_name));
   TF_RETURN_IF_ERROR(WriteGzippedDataToFile(path, data));
   LOG(INFO) << "Dumped gzipped tool data for " << tool_name << " to " << path;
   return OkStatus();
 }
 
 std::string GetCurrentTimeStampAsString() {
-  return absl::FormatTime("%E4Y_%m_%d_%H_%M_%S", absl::Now(),
-                          absl::LocalTimeZone());
+  return abslx::FormatTime("%E4Y_%m_%d_%H_%M_%S", abslx::Now(),
+                          abslx::LocalTimeZone());
 }
 
 }  // namespace profiler

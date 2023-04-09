@@ -31,7 +31,7 @@ limitations under the License.
 
 namespace tflite {
 namespace gpu {
-absl::Status GPUSubgraphFromGraph(
+abslx::Status GPUSubgraphFromGraph(
     const GpuInfo& gpu_info, CalculationsPrecision precision,
     const GraphFloat32& graph, NodeId first_node_id,
     const std::map<ValueId, TensorDescriptor>& tensor_descriptors,
@@ -40,27 +40,27 @@ absl::Status GPUSubgraphFromGraph(
                                   tensor_descriptors, consumed_nodes,
                                   gpu_subgraph)
           .ok()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   if (TryFCFCAdd(gpu_info, precision, graph, first_node_id, tensor_descriptors,
                  consumed_nodes, gpu_subgraph)
           .ok()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   if (TryFusedPointwiseConv(graph, first_node_id, precision, tensor_descriptors,
                             consumed_nodes, gpu_subgraph)
           .ok()) {
     gpu_subgraph->operations[0].name = "slice_mul_mean_concat";
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   if (TryMeanStdDevNormalization(gpu_info, precision, graph, first_node_id,
                                  tensor_descriptors, consumed_nodes,
                                  gpu_subgraph)
           .ok()) {
     gpu_subgraph->operations[0].name = "mean_stddev_normalization";
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  return absl::NotFoundError("No special combination.");
+  return abslx::NotFoundError("No special combination.");
 }
 
 }  // namespace gpu

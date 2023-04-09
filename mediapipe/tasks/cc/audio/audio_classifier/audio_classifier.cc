@@ -94,8 +94,8 @@ ConvertAudioClassifierOptionsToProto(AudioClassifierOptions* options) {
   return options_proto;
 }
 
-absl::StatusOr<std::vector<AudioClassifierResult>> ConvertOutputPackets(
-    absl::StatusOr<tasks::core::PacketMap> status_or_packets) {
+abslx::StatusOr<std::vector<AudioClassifierResult>> ConvertOutputPackets(
+    abslx::StatusOr<tasks::core::PacketMap> status_or_packets) {
   if (!status_or_packets.ok()) {
     return status_or_packets.status();
   }
@@ -110,8 +110,8 @@ absl::StatusOr<std::vector<AudioClassifierResult>> ConvertOutputPackets(
   return results;
 }
 
-absl::StatusOr<AudioClassifierResult> ConvertAsyncOutputPackets(
-    absl::StatusOr<tasks::core::PacketMap> status_or_packets) {
+abslx::StatusOr<AudioClassifierResult> ConvertAsyncOutputPackets(
+    abslx::StatusOr<tasks::core::PacketMap> status_or_packets) {
   if (!status_or_packets.ok()) {
     return status_or_packets.status();
   }
@@ -122,14 +122,14 @@ absl::StatusOr<AudioClassifierResult> ConvertAsyncOutputPackets(
 }  // namespace
 
 /* static */
-absl::StatusOr<std::unique_ptr<AudioClassifier>> AudioClassifier::Create(
+abslx::StatusOr<std::unique_ptr<AudioClassifier>> AudioClassifier::Create(
     std::unique_ptr<AudioClassifierOptions> options) {
   auto options_proto = ConvertAudioClassifierOptionsToProto(options.get());
   tasks::core::PacketsCallback packets_callback = nullptr;
   if (options->result_callback) {
     auto result_callback = options->result_callback;
     packets_callback =
-        [=](absl::StatusOr<tasks::core::PacketMap> status_or_packets) {
+        [=](abslx::StatusOr<tasks::core::PacketMap> status_or_packets) {
           result_callback(ConvertAsyncOutputPackets(status_or_packets));
         };
   }
@@ -140,14 +140,14 @@ absl::StatusOr<std::unique_ptr<AudioClassifier>> AudioClassifier::Create(
       std::move(packets_callback));
 }
 
-absl::StatusOr<std::vector<AudioClassifierResult>> AudioClassifier::Classify(
+abslx::StatusOr<std::vector<AudioClassifierResult>> AudioClassifier::Classify(
     Matrix audio_clip, double audio_sample_rate) {
   return ConvertOutputPackets(ProcessAudioClip(
       {{kAudioStreamName, MakePacket<Matrix>(std::move(audio_clip))},
        {kSampleRateName, MakePacket<double>(audio_sample_rate)}}));
 }
 
-absl::Status AudioClassifier::ClassifyAsync(Matrix audio_block,
+abslx::Status AudioClassifier::ClassifyAsync(Matrix audio_block,
                                             double audio_sample_rate,
                                             int64 timestamp_ms) {
   MP_RETURN_IF_ERROR(CheckOrSetSampleRate(kSampleRateName, audio_sample_rate));

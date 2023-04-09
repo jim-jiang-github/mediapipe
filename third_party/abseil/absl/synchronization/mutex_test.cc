@@ -43,23 +43,23 @@ namespace {
 // TODO(dmauro): Replace with a commandline flag.
 static constexpr bool kExtendedTest = false;
 
-std::unique_ptr<absl::synchronization_internal::ThreadPool> CreatePool(
+std::unique_ptr<abslx::synchronization_internal::ThreadPool> CreatePool(
     int threads) {
-  return absl::make_unique<absl::synchronization_internal::ThreadPool>(threads);
+  return abslx::make_unique<abslx::synchronization_internal::ThreadPool>(threads);
 }
 
-std::unique_ptr<absl::synchronization_internal::ThreadPool>
+std::unique_ptr<abslx::synchronization_internal::ThreadPool>
 CreateDefaultPool() {
   return CreatePool(kExtendedTest ? 32 : 10);
 }
 
 // Hack to schedule a function to run on a thread pool thread after a
 // duration has elapsed.
-static void ScheduleAfter(absl::synchronization_internal::ThreadPool *tp,
-                          absl::Duration after,
+static void ScheduleAfter(abslx::synchronization_internal::ThreadPool *tp,
+                          abslx::Duration after,
                           const std::function<void()> &func) {
   tp->Schedule([func, after] {
-    absl::SleepFor(after);
+    abslx::SleepFor(after);
     func();
   });
 }
@@ -69,8 +69,8 @@ struct TestContext {
   int threads;
   int g0;  // global 0
   int g1;  // global 1
-  absl::Mutex mu;
-  absl::CondVar cv;
+  abslx::Mutex mu;
+  abslx::CondVar cv;
 };
 
 // To test whether the invariant check call occurs
@@ -92,7 +92,7 @@ static void CheckSumG0G1(void *v) {
 
 static void TestMu(TestContext *cxt, int c) {
   for (int i = 0; i != cxt->iterations; i++) {
-    absl::MutexLock l(&cxt->mu);
+    abslx::MutexLock l(&cxt->mu);
     int a = cxt->g0 + 1;
     cxt->g0 = a;
     cxt->g1--;
@@ -113,8 +113,8 @@ static void TestTry(TestContext *cxt, int c) {
 
 static void TestR20ms(TestContext *cxt, int c) {
   for (int i = 0; i != cxt->iterations; i++) {
-    absl::ReaderMutexLock l(&cxt->mu);
-    absl::SleepFor(absl::Milliseconds(20));
+    abslx::ReaderMutexLock l(&cxt->mu);
+    abslx::SleepFor(abslx::Milliseconds(20));
     cxt->mu.AssertReaderHeld();
   }
 }
@@ -122,7 +122,7 @@ static void TestR20ms(TestContext *cxt, int c) {
 static void TestRW(TestContext *cxt, int c) {
   if ((c & 1) == 0) {
     for (int i = 0; i != cxt->iterations; i++) {
-      absl::WriterMutexLock l(&cxt->mu);
+      abslx::WriterMutexLock l(&cxt->mu);
       cxt->g0++;
       cxt->g1--;
       cxt->mu.AssertHeld();
@@ -130,7 +130,7 @@ static void TestRW(TestContext *cxt, int c) {
     }
   } else {
     for (int i = 0; i != cxt->iterations; i++) {
-      absl::ReaderMutexLock l(&cxt->mu);
+      abslx::ReaderMutexLock l(&cxt->mu);
       ABSL_RAW_CHECK(cxt->g0 == -cxt->g1, "Error in TestRW");
       cxt->mu.AssertReaderHeld();
     }
@@ -152,10 +152,10 @@ static void TestAwait(TestContext *cxt, int c) {
   MyContext mc;
   mc.target = c;
   mc.cxt = cxt;
-  absl::MutexLock l(&cxt->mu);
+  abslx::MutexLock l(&cxt->mu);
   cxt->mu.AssertHeld();
   while (cxt->g0 < cxt->iterations) {
-    cxt->mu.Await(absl::Condition(&mc, &MyContext::MyTurn));
+    cxt->mu.Await(abslx::Condition(&mc, &MyContext::MyTurn));
     ABSL_RAW_CHECK(mc.MyTurn(), "Error in TestAwait");
     cxt->mu.AssertHeld();
     if (cxt->g0 < cxt->iterations) {
@@ -168,7 +168,7 @@ static void TestAwait(TestContext *cxt, int c) {
 
 static void TestSignalAll(TestContext *cxt, int c) {
   int target = c;
-  absl::MutexLock l(&cxt->mu);
+  abslx::MutexLock l(&cxt->mu);
   cxt->mu.AssertHeld();
   while (cxt->g0 < cxt->iterations) {
     while (cxt->g0 != target && cxt->g0 != cxt->iterations) {
@@ -186,7 +186,7 @@ static void TestSignalAll(TestContext *cxt, int c) {
 static void TestSignal(TestContext *cxt, int c) {
   ABSL_RAW_CHECK(cxt->threads == 2, "TestSignal should use 2 threads");
   int target = c;
-  absl::MutexLock l(&cxt->mu);
+  abslx::MutexLock l(&cxt->mu);
   cxt->mu.AssertHeld();
   while (cxt->g0 < cxt->iterations) {
     while (cxt->g0 != target && cxt->g0 != cxt->iterations) {
@@ -203,11 +203,11 @@ static void TestSignal(TestContext *cxt, int c) {
 
 static void TestCVTimeout(TestContext *cxt, int c) {
   int target = c;
-  absl::MutexLock l(&cxt->mu);
+  abslx::MutexLock l(&cxt->mu);
   cxt->mu.AssertHeld();
   while (cxt->g0 < cxt->iterations) {
     while (cxt->g0 != target && cxt->g0 != cxt->iterations) {
-      cxt->cv.WaitWithTimeout(&cxt->mu, absl::Seconds(100));
+      cxt->cv.WaitWithTimeout(&cxt->mu, abslx::Seconds(100));
     }
     if (cxt->g0 < cxt->iterations) {
       int a = cxt->g0 + 1;
@@ -224,108 +224,108 @@ static void TestTime(TestContext *cxt, int c, bool use_cv) {
   ABSL_RAW_CHECK(cxt->iterations == 1, "TestTime should only use 1 iteration");
   ABSL_RAW_CHECK(cxt->threads > 2, "TestTime should use more than 2 threads");
   const bool kFalse = false;
-  absl::Condition false_cond(&kFalse);
-  absl::Condition g0ge2(G0GE2, cxt);
+  abslx::Condition false_cond(&kFalse);
+  abslx::Condition g0ge2(G0GE2, cxt);
   if (c == 0) {
-    absl::MutexLock l(&cxt->mu);
+    abslx::MutexLock l(&cxt->mu);
 
-    absl::Time start = absl::Now();
+    abslx::Time start = abslx::Now();
     if (use_cv) {
-      cxt->cv.WaitWithTimeout(&cxt->mu, absl::Seconds(1));
+      cxt->cv.WaitWithTimeout(&cxt->mu, abslx::Seconds(1));
     } else {
-      ABSL_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, absl::Seconds(1)),
+      ABSL_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, abslx::Seconds(1)),
                      "TestTime failed");
     }
-    absl::Duration elapsed = absl::Now() - start;
+    abslx::Duration elapsed = abslx::Now() - start;
     ABSL_RAW_CHECK(
-        absl::Seconds(0.9) <= elapsed && elapsed <= absl::Seconds(2.0),
+        abslx::Seconds(0.9) <= elapsed && elapsed <= abslx::Seconds(2.0),
         "TestTime failed");
     ABSL_RAW_CHECK(cxt->g0 == 1, "TestTime failed");
 
-    start = absl::Now();
+    start = abslx::Now();
     if (use_cv) {
-      cxt->cv.WaitWithTimeout(&cxt->mu, absl::Seconds(1));
+      cxt->cv.WaitWithTimeout(&cxt->mu, abslx::Seconds(1));
     } else {
-      ABSL_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, absl::Seconds(1)),
+      ABSL_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, abslx::Seconds(1)),
                      "TestTime failed");
     }
-    elapsed = absl::Now() - start;
+    elapsed = abslx::Now() - start;
     ABSL_RAW_CHECK(
-        absl::Seconds(0.9) <= elapsed && elapsed <= absl::Seconds(2.0),
+        abslx::Seconds(0.9) <= elapsed && elapsed <= abslx::Seconds(2.0),
         "TestTime failed");
     cxt->g0++;
     if (use_cv) {
       cxt->cv.Signal();
     }
 
-    start = absl::Now();
+    start = abslx::Now();
     if (use_cv) {
-      cxt->cv.WaitWithTimeout(&cxt->mu, absl::Seconds(4));
+      cxt->cv.WaitWithTimeout(&cxt->mu, abslx::Seconds(4));
     } else {
-      ABSL_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, absl::Seconds(4)),
+      ABSL_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, abslx::Seconds(4)),
                      "TestTime failed");
     }
-    elapsed = absl::Now() - start;
+    elapsed = abslx::Now() - start;
     ABSL_RAW_CHECK(
-        absl::Seconds(3.9) <= elapsed && elapsed <= absl::Seconds(6.0),
+        abslx::Seconds(3.9) <= elapsed && elapsed <= abslx::Seconds(6.0),
         "TestTime failed");
     ABSL_RAW_CHECK(cxt->g0 >= 3, "TestTime failed");
 
-    start = absl::Now();
+    start = abslx::Now();
     if (use_cv) {
-      cxt->cv.WaitWithTimeout(&cxt->mu, absl::Seconds(1));
+      cxt->cv.WaitWithTimeout(&cxt->mu, abslx::Seconds(1));
     } else {
-      ABSL_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, absl::Seconds(1)),
+      ABSL_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, abslx::Seconds(1)),
                      "TestTime failed");
     }
-    elapsed = absl::Now() - start;
+    elapsed = abslx::Now() - start;
     ABSL_RAW_CHECK(
-        absl::Seconds(0.9) <= elapsed && elapsed <= absl::Seconds(2.0),
+        abslx::Seconds(0.9) <= elapsed && elapsed <= abslx::Seconds(2.0),
         "TestTime failed");
     if (use_cv) {
       cxt->cv.SignalAll();
     }
 
-    start = absl::Now();
+    start = abslx::Now();
     if (use_cv) {
-      cxt->cv.WaitWithTimeout(&cxt->mu, absl::Seconds(1));
+      cxt->cv.WaitWithTimeout(&cxt->mu, abslx::Seconds(1));
     } else {
-      ABSL_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, absl::Seconds(1)),
+      ABSL_RAW_CHECK(!cxt->mu.AwaitWithTimeout(false_cond, abslx::Seconds(1)),
                      "TestTime failed");
     }
-    elapsed = absl::Now() - start;
-    ABSL_RAW_CHECK(absl::Seconds(0.9) <= elapsed &&
-                   elapsed <= absl::Seconds(2.0), "TestTime failed");
+    elapsed = abslx::Now() - start;
+    ABSL_RAW_CHECK(abslx::Seconds(0.9) <= elapsed &&
+                   elapsed <= abslx::Seconds(2.0), "TestTime failed");
     ABSL_RAW_CHECK(cxt->g0 == cxt->threads, "TestTime failed");
 
   } else if (c == 1) {
-    absl::MutexLock l(&cxt->mu);
-    const absl::Time start = absl::Now();
+    abslx::MutexLock l(&cxt->mu);
+    const abslx::Time start = abslx::Now();
     if (use_cv) {
-      cxt->cv.WaitWithTimeout(&cxt->mu, absl::Milliseconds(500));
+      cxt->cv.WaitWithTimeout(&cxt->mu, abslx::Milliseconds(500));
     } else {
       ABSL_RAW_CHECK(
-          !cxt->mu.AwaitWithTimeout(false_cond, absl::Milliseconds(500)),
+          !cxt->mu.AwaitWithTimeout(false_cond, abslx::Milliseconds(500)),
           "TestTime failed");
     }
-    const absl::Duration elapsed = absl::Now() - start;
+    const abslx::Duration elapsed = abslx::Now() - start;
     ABSL_RAW_CHECK(
-        absl::Seconds(0.4) <= elapsed && elapsed <= absl::Seconds(0.9),
+        abslx::Seconds(0.4) <= elapsed && elapsed <= abslx::Seconds(0.9),
         "TestTime failed");
     cxt->g0++;
   } else if (c == 2) {
-    absl::MutexLock l(&cxt->mu);
+    abslx::MutexLock l(&cxt->mu);
     if (use_cv) {
       while (cxt->g0 < 2) {
-        cxt->cv.WaitWithTimeout(&cxt->mu, absl::Seconds(100));
+        cxt->cv.WaitWithTimeout(&cxt->mu, abslx::Seconds(100));
       }
     } else {
-      ABSL_RAW_CHECK(cxt->mu.AwaitWithTimeout(g0ge2, absl::Seconds(100)),
+      ABSL_RAW_CHECK(cxt->mu.AwaitWithTimeout(g0ge2, abslx::Seconds(100)),
                      "TestTime failed");
     }
     cxt->g0++;
   } else {
-    absl::MutexLock l(&cxt->mu);
+    abslx::MutexLock l(&cxt->mu);
     if (use_cv) {
       while (cxt->g0 < 2) {
         cxt->cv.Wait(&cxt->mu);
@@ -341,13 +341,13 @@ static void TestMuTime(TestContext *cxt, int c) { TestTime(cxt, c, false); }
 
 static void TestCVTime(TestContext *cxt, int c) { TestTime(cxt, c, true); }
 
-static void EndTest(int *c0, int *c1, absl::Mutex *mu, absl::CondVar *cv,
+static void EndTest(int *c0, int *c1, abslx::Mutex *mu, abslx::CondVar *cv,
                     const std::function<void(int)>& cb) {
   mu->Lock();
   int c = (*c0)++;
   mu->Unlock();
   cb(c);
-  absl::MutexLock l(mu);
+  abslx::MutexLock l(mu);
   (*c1)++;
   cv->Signal();
 }
@@ -355,15 +355,15 @@ static void EndTest(int *c0, int *c1, absl::Mutex *mu, absl::CondVar *cv,
 // Code common to RunTest() and RunTestWithInvariantDebugging().
 static int RunTestCommon(TestContext *cxt, void (*test)(TestContext *cxt, int),
                          int threads, int iterations, int operations) {
-  absl::Mutex mu2;
-  absl::CondVar cv2;
+  abslx::Mutex mu2;
+  abslx::CondVar cv2;
   int c0 = 0;
   int c1 = 0;
   cxt->g0 = 0;
   cxt->g1 = 0;
   cxt->iterations = iterations;
   cxt->threads = threads;
-  absl::synchronization_internal::ThreadPool tp(threads);
+  abslx::synchronization_internal::ThreadPool tp(threads);
   for (int i = 0; i != threads; i++) {
     tp.Schedule(std::bind(&EndTest, &c0, &c1, &mu2, &cv2,
                           std::function<void(int)>(
@@ -393,13 +393,13 @@ static int RunTestWithInvariantDebugging(void (*test)(TestContext *cxt, int),
                                          int threads, int iterations,
                                          int operations,
                                          void (*invariant)(void *)) {
-  absl::EnableMutexInvariantDebugging(true);
+  abslx::EnableMutexInvariantDebugging(true);
   SetInvariantChecked(false);
   TestContext cxt;
   cxt.mu.EnableInvariantDebugging(invariant, &cxt);
   int ret = RunTestCommon(&cxt, test, threads, iterations, operations);
   ABSL_RAW_CHECK(GetInvariantChecked(), "Invariant not checked");
-  absl::EnableMutexInvariantDebugging(false);  // Restore.
+  abslx::EnableMutexInvariantDebugging(false);  // Restore.
   return ret;
 }
 #endif
@@ -407,13 +407,13 @@ static int RunTestWithInvariantDebugging(void (*test)(TestContext *cxt, int),
 // --------------------------------------------------------
 // Test for fix of bug in TryRemove()
 struct TimeoutBugStruct {
-  absl::Mutex mu;
+  abslx::Mutex mu;
   bool a;
   int a_waiter_count;
 };
 
 static void WaitForA(TimeoutBugStruct *x) {
-  x->mu.LockWhen(absl::Condition(&x->a));
+  x->mu.LockWhen(abslx::Condition(&x->a));
   x->a_waiter_count--;
   x->mu.Unlock();
 }
@@ -425,12 +425,12 @@ static bool NoAWaiters(TimeoutBugStruct *x) { return x->a_waiter_count == 0; }
 TEST(Mutex, CondVarWaitSignalsAwait) {
   // Use a struct so the lock annotations apply.
   struct {
-    absl::Mutex barrier_mu;
+    abslx::Mutex barrier_mu;
     bool barrier ABSL_GUARDED_BY(barrier_mu) = false;
 
-    absl::Mutex release_mu;
+    abslx::Mutex release_mu;
     bool release ABSL_GUARDED_BY(release_mu) = false;
-    absl::CondVar released_cv;
+    abslx::CondVar released_cv;
   } state;
 
   auto pool = CreateDefaultPool();
@@ -444,12 +444,12 @@ TEST(Mutex, CondVarWaitSignalsAwait) {
     state.barrier = true;
     state.barrier_mu.Unlock();
 
-    state.release_mu.Await(absl::Condition(&state.release));
+    state.release_mu.Await(abslx::Condition(&state.release));
     state.released_cv.Signal();
     state.release_mu.Unlock();
   });
 
-  state.barrier_mu.LockWhen(absl::Condition(&state.barrier));
+  state.barrier_mu.LockWhen(abslx::Condition(&state.barrier));
   state.barrier_mu.Unlock();
   state.release_mu.Lock();
   // Thread A is now blocked on release by way of Mutex::Await().
@@ -466,12 +466,12 @@ TEST(Mutex, CondVarWaitSignalsAwait) {
 TEST(Mutex, CondVarWaitWithTimeoutSignalsAwait) {
   // Use a struct so the lock annotations apply.
   struct {
-    absl::Mutex barrier_mu;
+    abslx::Mutex barrier_mu;
     bool barrier ABSL_GUARDED_BY(barrier_mu) = false;
 
-    absl::Mutex release_mu;
+    abslx::Mutex release_mu;
     bool release ABSL_GUARDED_BY(release_mu) = false;
-    absl::CondVar released_cv;
+    abslx::CondVar released_cv;
   } state;
 
   auto pool = CreateDefaultPool();
@@ -485,12 +485,12 @@ TEST(Mutex, CondVarWaitWithTimeoutSignalsAwait) {
     state.barrier = true;
     state.barrier_mu.Unlock();
 
-    state.release_mu.Await(absl::Condition(&state.release));
+    state.release_mu.Await(abslx::Condition(&state.release));
     state.released_cv.Signal();
     state.release_mu.Unlock();
   });
 
-  state.barrier_mu.LockWhen(absl::Condition(&state.barrier));
+  state.barrier_mu.LockWhen(abslx::Condition(&state.barrier));
   state.barrier_mu.Unlock();
   state.release_mu.Lock();
   // Thread A is now blocked on release by way of Mutex::Await().
@@ -499,9 +499,9 @@ TEST(Mutex, CondVarWaitWithTimeoutSignalsAwait) {
   // which will signal released_cv.  If not, the test will hang.
   state.release = true;
   EXPECT_TRUE(
-      !state.released_cv.WaitWithTimeout(&state.release_mu, absl::Seconds(10)))
+      !state.released_cv.WaitWithTimeout(&state.release_mu, abslx::Seconds(10)))
       << "; Unrecoverable test failure: CondVar::WaitWithTimeout did not "
-         "unblock the absl::Mutex::Await call in another thread.";
+         "unblock the abslx::Mutex::Await call in another thread.";
 
   state.release_mu.Unlock();
 }
@@ -515,26 +515,26 @@ TEST(Mutex, MutexTimeoutBug) {
   x.a_waiter_count = 2;
   tp->Schedule(std::bind(&WaitForA, &x));
   tp->Schedule(std::bind(&WaitForA, &x));
-  absl::SleepFor(absl::Seconds(1));  // Allow first two threads to hang.
+  abslx::SleepFor(abslx::Seconds(1));  // Allow first two threads to hang.
   // The skip field of the second will point to the first because there are
   // only two.
 
   // Now cause a thread waiting on an always-false to time out
   // This would deadlock when the bug was present.
   bool always_false = false;
-  x.mu.LockWhenWithTimeout(absl::Condition(&always_false),
-                           absl::Milliseconds(500));
+  x.mu.LockWhenWithTimeout(abslx::Condition(&always_false),
+                           abslx::Milliseconds(500));
 
   // if we get here, the bug is not present.   Cleanup the state.
 
   x.a = true;                                    // wakeup the two waiters on A
-  x.mu.Await(absl::Condition(&NoAWaiters, &x));  // wait for them to exit
+  x.mu.Await(abslx::Condition(&NoAWaiters, &x));  // wait for them to exit
   x.mu.Unlock();
 }
 
 struct CondVarWaitDeadlock : testing::TestWithParam<int> {
-  absl::Mutex mu;
-  absl::CondVar cv;
+  abslx::Mutex mu;
+  abslx::CondVar cv;
   bool cond1 = false;
   bool cond2 = false;
   bool read_lock1;
@@ -565,10 +565,10 @@ struct CondVarWaitDeadlock : testing::TestWithParam<int> {
 
   void Waiter2() {
     if (read_lock2) {
-      mu.ReaderLockWhen(absl::Condition(&cond2));
+      mu.ReaderLockWhen(abslx::Condition(&cond2));
       mu.ReaderUnlock();
     } else {
-      mu.LockWhen(absl::Condition(&cond2));
+      mu.LockWhen(abslx::Condition(&cond2));
       mu.Unlock();
     }
   }
@@ -590,7 +590,7 @@ TEST_P(CondVarWaitDeadlock, Test) {
   waiter2->Schedule([this] { this->Waiter2(); });
 
   // Wait while threads block (best-effort is fine).
-  absl::SleepFor(absl::Milliseconds(100));
+  abslx::SleepFor(abslx::Milliseconds(100));
 
   // Wake condwaiter.
   mu.Lock();
@@ -622,8 +622,8 @@ INSTANTIATE_TEST_SUITE_P(CondVarWaitDeadlockTest, CondVarWaitDeadlock,
 // would not be.
 
 struct DequeueAllWakeableBugStruct {
-  absl::Mutex mu;
-  absl::Mutex mu2;       // protects all fields below
+  abslx::Mutex mu;
+  abslx::Mutex mu2;       // protects all fields below
   int unfinished_count;  // count of unfinished readers; under mu2
   bool done1;            // unfinished_count == 0; under mu2
   int finished_count;    // count of finished readers, under mu2
@@ -638,7 +638,7 @@ static void AcquireAsReader(DequeueAllWakeableBugStruct *x) {
   x->done1 = (x->unfinished_count == 0);
   x->mu2.Unlock();
   // make sure that both readers acquired mu before we release it.
-  absl::SleepFor(absl::Seconds(2));
+  abslx::SleepFor(abslx::Seconds(2));
   x->mu.ReaderUnlock();
 
   x->mu2.Lock();
@@ -660,24 +660,24 @@ TEST(Mutex, MutexReaderWakeupBug) {
   // queue two thread that will block on reader locks on x.mu
   tp->Schedule(std::bind(&AcquireAsReader, &x));
   tp->Schedule(std::bind(&AcquireAsReader, &x));
-  absl::SleepFor(absl::Seconds(1));  // give time for reader threads to block
+  abslx::SleepFor(abslx::Seconds(1));  // give time for reader threads to block
   x.mu.Unlock();                     // wake them up
 
   // both readers should finish promptly
   EXPECT_TRUE(
-      x.mu2.LockWhenWithTimeout(absl::Condition(&x.done1), absl::Seconds(10)));
+      x.mu2.LockWhenWithTimeout(abslx::Condition(&x.done1), abslx::Seconds(10)));
   x.mu2.Unlock();
 
   EXPECT_TRUE(
-      x.mu2.LockWhenWithTimeout(absl::Condition(&x.done2), absl::Seconds(10)));
+      x.mu2.LockWhenWithTimeout(abslx::Condition(&x.done2), abslx::Seconds(10)));
   x.mu2.Unlock();
 }
 
 struct LockWhenTestStruct {
-  absl::Mutex mu1;
+  abslx::Mutex mu1;
   bool cond = false;
 
-  absl::Mutex mu2;
+  abslx::Mutex mu2;
   bool waiting = false;
 };
 
@@ -689,7 +689,7 @@ static bool LockWhenTestIsCond(LockWhenTestStruct* s) {
 }
 
 static void LockWhenTestWaitForIsCond(LockWhenTestStruct* s) {
-  s->mu1.LockWhen(absl::Condition(&LockWhenTestIsCond, s));
+  s->mu1.LockWhen(abslx::Condition(&LockWhenTestIsCond, s));
   s->mu1.Unlock();
 }
 
@@ -697,7 +697,7 @@ TEST(Mutex, LockWhen) {
   LockWhenTestStruct s;
 
   std::thread t(LockWhenTestWaitForIsCond, &s);
-  s.mu2.LockWhen(absl::Condition(&s.waiting));
+  s.mu2.LockWhen(abslx::Condition(&s.waiting));
   s.mu2.Unlock();
 
   s.mu1.Lock();
@@ -708,7 +708,7 @@ TEST(Mutex, LockWhen) {
 }
 
 TEST(Mutex, LockWhenGuard) {
-  absl::Mutex mu;
+  abslx::Mutex mu;
   int n = 30;
   bool done = false;
 
@@ -717,20 +717,20 @@ TEST(Mutex, LockWhenGuard) {
   bool (*cond_lt_10)(int *) = [](int *p) { return *p < 10; };
 
   std::thread t1([&mu, &n, &done, cond_eq_10]() {
-    absl::ReaderMutexLock lock(&mu, absl::Condition(cond_eq_10, &n));
+    abslx::ReaderMutexLock lock(&mu, abslx::Condition(cond_eq_10, &n));
     done = true;
   });
 
   std::thread t2[10];
   for (std::thread &t : t2) {
     t = std::thread([&mu, &n, cond_lt_10]() {
-      absl::WriterMutexLock lock(&mu, absl::Condition(cond_lt_10, &n));
+      abslx::WriterMutexLock lock(&mu, abslx::Condition(cond_lt_10, &n));
       ++n;
     });
   }
 
   {
-    absl::MutexLock lock(&mu);
+    abslx::MutexLock lock(&mu);
     n = 0;
   }
 
@@ -758,12 +758,12 @@ TEST(Mutex, LockWhenGuard) {
 struct ReaderDecrementBugStruct {
   bool cond;  // to delay first thread (under mu)
   int done;   // reference count (under mu)
-  absl::Mutex mu;
+  abslx::Mutex mu;
 
   bool waiting_on_cond;   // under mu2
   bool have_reader_lock;  // under mu2
   bool complete;          // under mu2
-  absl::Mutex mu2;        // > mu
+  abslx::Mutex mu2;        // > mu
 };
 
 // L >= mu, L < mu_waiting_on_cond
@@ -783,9 +783,9 @@ static bool AllDone(void *v) {
 
 // L={}
 static void WaitForCond(ReaderDecrementBugStruct *x) {
-  absl::Mutex dummy;
-  absl::MutexLock l(&dummy);
-  x->mu.LockWhen(absl::Condition(&IsCond, x));
+  abslx::Mutex dummy;
+  abslx::MutexLock l(&dummy);
+  x->mu.LockWhen(abslx::Condition(&IsCond, x));
   x->done--;
   x->mu.Unlock();
 }
@@ -795,7 +795,7 @@ static void GetReadLock(ReaderDecrementBugStruct *x) {
   x->mu.ReaderLock();
   x->mu2.Lock();
   x->have_reader_lock = true;
-  x->mu2.Await(absl::Condition(&x->complete));
+  x->mu2.Await(abslx::Condition(&x->complete));
   x->mu2.Unlock();
   x->mu.ReaderUnlock();
   x->mu.Lock();
@@ -815,12 +815,12 @@ TEST(Mutex, MutexReaderDecrementBug) ABSL_NO_THREAD_SAFETY_ANALYSIS {
 
   // Run WaitForCond() and wait for it to sleep
   std::thread thread1(WaitForCond, &x);
-  x.mu2.LockWhen(absl::Condition(&x.waiting_on_cond));
+  x.mu2.LockWhen(abslx::Condition(&x.waiting_on_cond));
   x.mu2.Unlock();
 
   // Run GetReadLock(), and wait for it to get the read lock
   std::thread thread2(GetReadLock, &x);
-  x.mu2.LockWhen(absl::Condition(&x.have_reader_lock));
+  x.mu2.LockWhen(abslx::Condition(&x.have_reader_lock));
   x.mu2.Unlock();
 
   // Get the reader lock ourselves, and release it.
@@ -840,7 +840,7 @@ TEST(Mutex, MutexReaderDecrementBug) ABSL_NO_THREAD_SAFETY_ANALYSIS {
   // (This call upgrades the lock from shared to exclusive.)
   x.mu.Lock();
   x.cond = true;
-  x.mu.Await(absl::Condition(&AllDone, &x));
+  x.mu.Await(abslx::Condition(&AllDone, &x));
   x.mu.Unlock();
 
   thread1.join();
@@ -859,7 +859,7 @@ TEST(Mutex, LockedMutexDestructionBug) ABSL_NO_THREAD_SAFETY_ANALYSIS {
   for (int i = 0; i != 10; i++) {
     // Create, lock and destroy 10 locks.
     const int kNumLocks = 10;
-    auto mu = absl::make_unique<absl::Mutex[]>(kNumLocks);
+    auto mu = abslx::make_unique<abslx::Mutex[]>(kNumLocks);
     for (int j = 0; j != kNumLocks; j++) {
       if ((j % 2) == 0) {
         mu[j].WriterLock();
@@ -881,15 +881,15 @@ TEST(Mutex, LockedMutexDestructionBug) ABSL_NO_THREAD_SAFETY_ANALYSIS {
 // introduced the case where Enqueue() returned with an empty queue, and this
 // case was handled incorrectly in one place.)
 
-static void ReaderForReaderOnCondVar(absl::Mutex *mu, absl::CondVar *cv,
+static void ReaderForReaderOnCondVar(abslx::Mutex *mu, abslx::CondVar *cv,
                                      int *running) {
   std::random_device dev;
   std::mt19937 gen(dev());
   std::uniform_int_distribution<int> random_millis(0, 15);
   mu->ReaderLock();
   while (*running == 3) {
-    absl::SleepFor(absl::Milliseconds(random_millis(gen)));
-    cv->WaitWithTimeout(mu, absl::Milliseconds(random_millis(gen)));
+    abslx::SleepFor(abslx::Milliseconds(random_millis(gen)));
+    cv->WaitWithTimeout(mu, abslx::Milliseconds(random_millis(gen)));
   }
   mu->ReaderUnlock();
   mu->Lock();
@@ -909,18 +909,18 @@ struct DerivedTrue : True {};
 TEST(Mutex, FunctorCondition) {
   {  // Variadic
     True f;
-    EXPECT_TRUE(absl::Condition(&f).Eval());
+    EXPECT_TRUE(abslx::Condition(&f).Eval());
   }
 
   {  // Inherited
     DerivedTrue g;
-    EXPECT_TRUE(absl::Condition(&g).Eval());
+    EXPECT_TRUE(abslx::Condition(&g).Eval());
   }
 
   {  // lambda
     int value = 3;
     auto is_zero = [&value] { return value == 0; };
-    absl::Condition c(&is_zero);
+    abslx::Condition c(&is_zero);
     EXPECT_FALSE(c.Eval());
     value = 0;
     EXPECT_TRUE(c.Eval());
@@ -929,7 +929,7 @@ TEST(Mutex, FunctorCondition) {
   {  // bind
     int value = 0;
     auto is_positive = std::bind(std::less<int>(), 0, std::cref(value));
-    absl::Condition c(&is_positive);
+    abslx::Condition c(&is_positive);
     EXPECT_FALSE(c.Eval());
     value = 1;
     EXPECT_TRUE(c.Eval());
@@ -938,7 +938,7 @@ TEST(Mutex, FunctorCondition) {
   {  // std::function
     int value = 3;
     std::function<bool()> is_zero = [&value] { return value == 0; };
-    absl::Condition c(&is_zero);
+    abslx::Condition c(&is_zero);
     EXPECT_FALSE(c.Eval());
     value = 0;
     EXPECT_TRUE(c.Eval());
@@ -951,25 +951,25 @@ static bool IntIsZero(int *x) { return *x == 0; }
 // but no waiters.
 TEST(Mutex, TestReaderOnCondVar) {
   auto tp = CreateDefaultPool();
-  absl::Mutex mu;
-  absl::CondVar cv;
+  abslx::Mutex mu;
+  abslx::CondVar cv;
   int running = 3;
   tp->Schedule(std::bind(&ReaderForReaderOnCondVar, &mu, &cv, &running));
   tp->Schedule(std::bind(&ReaderForReaderOnCondVar, &mu, &cv, &running));
-  absl::SleepFor(absl::Seconds(2));
+  abslx::SleepFor(abslx::Seconds(2));
   mu.Lock();
   running--;
-  mu.Await(absl::Condition(&IntIsZero, &running));
+  mu.Await(abslx::Condition(&IntIsZero, &running));
   mu.Unlock();
 }
 
 // --------------------------------------------------------
 struct AcquireFromConditionStruct {
-  absl::Mutex mu0;   // protects value, done
+  abslx::Mutex mu0;   // protects value, done
   int value;         // times condition function is called; under mu0,
   bool done;         // done with test?  under mu0
-  absl::Mutex mu1;   // used to attempt to mess up state of mu0
-  absl::CondVar cv;  // so the condition function can be invoked from
+  abslx::Mutex mu1;   // used to attempt to mess up state of mu0
+  abslx::CondVar cv;  // so the condition function can be invoked from
                      // CondVar::Wait().
 };
 
@@ -982,8 +982,8 @@ static bool ConditionWithAcquire(AcquireFromConditionStruct *x) {
     // than one for which this is a condition.  The spec now explicitly allows
     // this side effect; previously it did not.  it was illegal.
     bool always_false = false;
-    x->mu1.LockWhenWithTimeout(absl::Condition(&always_false),
-                               absl::Milliseconds(100));
+    x->mu1.LockWhenWithTimeout(abslx::Condition(&always_false),
+                               abslx::Milliseconds(100));
     x->mu1.Unlock();
   }
   ABSL_RAW_CHECK(x->value < 4, "should not be invoked a fourth time");
@@ -994,7 +994,7 @@ static bool ConditionWithAcquire(AcquireFromConditionStruct *x) {
 
 static void WaitForCond2(AcquireFromConditionStruct *x) {
   // wait for cond0 to become true
-  x->mu0.LockWhen(absl::Condition(&ConditionWithAcquire, x));
+  x->mu0.LockWhen(abslx::Condition(&ConditionWithAcquire, x));
   x->done = true;
   x->mu0.Unlock();
 }
@@ -1010,10 +1010,10 @@ TEST(Mutex, AcquireFromCondition) {
       std::bind(&WaitForCond2, &x));  // run WaitForCond2() in a thread T
   // T will hang because the first invocation of ConditionWithAcquire() will
   // return false.
-  absl::SleepFor(absl::Milliseconds(500));  // allow T time to hang
+  abslx::SleepFor(abslx::Milliseconds(500));  // allow T time to hang
 
   x.mu0.Lock();
-  x.cv.WaitWithTimeout(&x.mu0, absl::Milliseconds(500));  // wake T
+  x.cv.WaitWithTimeout(&x.mu0, abslx::Milliseconds(500));  // wake T
   // T will be woken because the Wait() will call ConditionWithAcquire()
   // for the second time, and it will return true.
 
@@ -1032,18 +1032,18 @@ TEST(Mutex, AcquireFromCondition) {
   // is being invoked from CondVar::Wait, and thus this thread
   // is conceptually waiting both on the condition variable, and on mu2.
 
-  x.mu0.LockWhen(absl::Condition(&x.done));
+  x.mu0.LockWhen(abslx::Condition(&x.done));
   x.mu0.Unlock();
 }
 
 TEST(Mutex, DeadlockDetector) {
-  absl::SetMutexDeadlockDetectionMode(absl::OnDeadlockCycle::kAbort);
+  abslx::SetMutexDeadlockDetectionMode(abslx::OnDeadlockCycle::kAbort);
 
   // check that we can call ForgetDeadlockInfo() on a lock with the lock held
-  absl::Mutex m1;
-  absl::Mutex m2;
-  absl::Mutex m3;
-  absl::Mutex m4;
+  abslx::Mutex m1;
+  abslx::Mutex m2;
+  abslx::Mutex m3;
+  abslx::Mutex m4;
 
   m1.Lock();  // m1 gets ID1
   m2.Lock();  // m2 gets ID2
@@ -1105,14 +1105,14 @@ TEST(Mutex, DISABLED_DeadlockDetectorBazelWarning) {
 #else
 TEST(Mutex, DeadlockDetectorBazelWarning) {
 #endif
-  absl::SetMutexDeadlockDetectionMode(absl::OnDeadlockCycle::kReport);
+  abslx::SetMutexDeadlockDetectionMode(abslx::OnDeadlockCycle::kReport);
 
   // Cause deadlock detection to detect something, if it's
   // compiled in and enabled.  But turn off the bazel warning.
   ScopedDisableBazelTestWarnings disable_bazel_test_warnings;
 
-  absl::Mutex mu0;
-  absl::Mutex mu1;
+  abslx::Mutex mu0;
+  abslx::Mutex mu1;
   bool got_mu0 = mu0.TryLock();
   mu1.Lock();  // acquire mu1 while holding mu0
   if (got_mu0) {
@@ -1126,7 +1126,7 @@ TEST(Mutex, DeadlockDetectorBazelWarning) {
   mu0.Unlock();
   mu1.Unlock();
 
-  absl::SetMutexDeadlockDetectionMode(absl::OnDeadlockCycle::kAbort);
+  abslx::SetMutexDeadlockDetectionMode(abslx::OnDeadlockCycle::kAbort);
 }
 
 // This test is tagged with NO_THREAD_SAFETY_ANALYSIS because the
@@ -1138,7 +1138,7 @@ TEST(Mutex, DeadlockDetectorStressTest) ABSL_NO_THREAD_SAFETY_ANALYSIS {
   // If a deadlock detector keeps a full graph of lock acquisition order,
   // it will likely be too slow for this test to pass.
   const int n_locks = 1 << 17;
-  auto array_of_locks = absl::make_unique<absl::Mutex[]>(n_locks);
+  auto array_of_locks = abslx::make_unique<abslx::Mutex[]>(n_locks);
   for (int i = 0; i < n_locks; i++) {
     int end = std::min(n_locks, i + 5);
     // acquire and then release locks i, i+1, ..., i+4
@@ -1160,11 +1160,11 @@ TEST(Mutex, DeadlockIdBug) ABSL_NO_THREAD_SAFETY_ANALYSIS {
   // Test a scenario where a cached deadlock graph node id in the
   // list of held locks is not invalidated when the corresponding
   // mutex is deleted.
-  absl::SetMutexDeadlockDetectionMode(absl::OnDeadlockCycle::kAbort);
+  abslx::SetMutexDeadlockDetectionMode(abslx::OnDeadlockCycle::kAbort);
   // Mutex that will be destroyed while being held
-  absl::Mutex *a = new absl::Mutex;
+  abslx::Mutex *a = new abslx::Mutex;
   // Other mutexes needed by test
-  absl::Mutex b, c;
+  abslx::Mutex b, c;
 
   // Hold mutex.
   a->Lock();
@@ -1178,9 +1178,9 @@ TEST(Mutex, DeadlockIdBug) ABSL_NO_THREAD_SAFETY_ANALYSIS {
   //   (a) Deadlock detection is currently disabled.
   //   (b) The destruction is from another thread.
   // We exploit (a) by temporarily disabling deadlock detection.
-  absl::SetMutexDeadlockDetectionMode(absl::OnDeadlockCycle::kIgnore);
+  abslx::SetMutexDeadlockDetectionMode(abslx::OnDeadlockCycle::kIgnore);
   delete a;
-  absl::SetMutexDeadlockDetectionMode(absl::OnDeadlockCycle::kAbort);
+  abslx::SetMutexDeadlockDetectionMode(abslx::OnDeadlockCycle::kAbort);
 
   // Now acquire another lock which will force a deadlock id assignment.
   // We should end up getting assigned the same deadlock id that was
@@ -1192,48 +1192,48 @@ TEST(Mutex, DeadlockIdBug) ABSL_NO_THREAD_SAFETY_ANALYSIS {
 
 // --------------------------------------------------------
 // Test for timeouts/deadlines on condition waits that are specified using
-// absl::Duration and absl::Time.  For each waiting function we test with
+// abslx::Duration and abslx::Time.  For each waiting function we test with
 // a timeout/deadline that has already expired/passed, one that is infinite
 // and so never expires/passes, and one that will expire/pass in the near
 // future.
 
-static absl::Duration TimeoutTestAllowedSchedulingDelay() {
+static abslx::Duration TimeoutTestAllowedSchedulingDelay() {
   // Note: we use a function here because Microsoft Visual Studio fails to
-  // properly initialize constexpr static absl::Duration variables.
-  return absl::Milliseconds(150);
+  // properly initialize constexpr static abslx::Duration variables.
+  return abslx::Milliseconds(150);
 }
 
 // Returns true if `actual_delay` is close enough to `expected_delay` to pass
 // the timeouts/deadlines test.  Otherwise, logs warnings and returns false.
 ABSL_MUST_USE_RESULT
-static bool DelayIsWithinBounds(absl::Duration expected_delay,
-                                absl::Duration actual_delay) {
+static bool DelayIsWithinBounds(abslx::Duration expected_delay,
+                                abslx::Duration actual_delay) {
   bool pass = true;
   // Do not allow the observed delay to be less than expected.  This may occur
   // in practice due to clock skew or when the synchronization primitives use a
-  // different clock than absl::Now(), but these cases should be handled by the
+  // different clock than abslx::Now(), but these cases should be handled by the
   // the retry mechanism in each TimeoutTest.
   if (actual_delay < expected_delay) {
     ABSL_RAW_LOG(WARNING,
                  "Actual delay %s was too short, expected %s (difference %s)",
-                 absl::FormatDuration(actual_delay).c_str(),
-                 absl::FormatDuration(expected_delay).c_str(),
-                 absl::FormatDuration(actual_delay - expected_delay).c_str());
+                 abslx::FormatDuration(actual_delay).c_str(),
+                 abslx::FormatDuration(expected_delay).c_str(),
+                 abslx::FormatDuration(actual_delay - expected_delay).c_str());
     pass = false;
   }
   // If the expected delay is <= zero then allow a small error tolerance, since
   // we do not expect context switches to occur during test execution.
   // Otherwise, thread scheduling delays may be substantial in rare cases, so
   // tolerate up to kTimeoutTestAllowedSchedulingDelay of error.
-  absl::Duration tolerance = expected_delay <= absl::ZeroDuration()
-                                 ? absl::Milliseconds(10)
+  abslx::Duration tolerance = expected_delay <= abslx::ZeroDuration()
+                                 ? abslx::Milliseconds(10)
                                  : TimeoutTestAllowedSchedulingDelay();
   if (actual_delay > expected_delay + tolerance) {
     ABSL_RAW_LOG(WARNING,
                  "Actual delay %s was too long, expected %s (difference %s)",
-                 absl::FormatDuration(actual_delay).c_str(),
-                 absl::FormatDuration(expected_delay).c_str(),
-                 absl::FormatDuration(actual_delay - expected_delay).c_str());
+                 abslx::FormatDuration(actual_delay).c_str(),
+                 abslx::FormatDuration(expected_delay).c_str(),
+                 abslx::FormatDuration(actual_delay - expected_delay).c_str());
     pass = false;
   }
   return pass;
@@ -1245,20 +1245,20 @@ struct TimeoutTestParam {
   const char *from_file;
   int from_line;
 
-  // Should the absolute deadline API based on absl::Time be tested?  If false,
-  // the relative deadline API based on absl::Duration is tested.
+  // Should the absolute deadline API based on abslx::Time be tested?  If false,
+  // the relative deadline API based on abslx::Duration is tested.
   bool use_absolute_deadline;
 
   // The deadline/timeout used when calling the API being tested
   // (e.g. Mutex::LockWhenWithDeadline).
-  absl::Duration wait_timeout;
+  abslx::Duration wait_timeout;
 
   // The delay before the condition will be set true by the test code.  If zero
   // or negative, the condition is set true immediately (before calling the API
   // being tested).  Otherwise, if infinite, the condition is never set true.
   // Otherwise a closure is scheduled for the future that sets the condition
   // true.
-  absl::Duration satisfy_condition_delay;
+  abslx::Duration satisfy_condition_delay;
 
   // The expected result of the condition after the call to the API being
   // tested. Generally `true` means the condition was true when the API returns,
@@ -1268,7 +1268,7 @@ struct TimeoutTestParam {
   // The expected delay before the API under test returns.  This is inherently
   // flaky, so some slop is allowed (see `DelayIsWithinBounds` above), and the
   // test keeps trying indefinitely until this constraint passes.
-  absl::Duration expected_delay;
+  abslx::Duration expected_delay;
 };
 
 // Print a `TimeoutTestParam` to a debug log.
@@ -1293,12 +1293,12 @@ std::string FormatString(const TimeoutTestParam &param) {
 // a) Delays zero or negative are executed immediately in the current thread.
 // b) Infinite delays are never scheduled.
 // c) Calls this test's `ScheduleAt` helper instead of using `pool` directly.
-static void RunAfterDelay(absl::Duration delay,
-                          absl::synchronization_internal::ThreadPool *pool,
+static void RunAfterDelay(abslx::Duration delay,
+                          abslx::synchronization_internal::ThreadPool *pool,
                           const std::function<void()> &callback) {
-  if (delay <= absl::ZeroDuration()) {
+  if (delay <= abslx::ZeroDuration()) {
     callback();  // immediate
-  } else if (delay != absl::InfiniteDuration()) {
+  } else if (delay != abslx::InfiniteDuration()) {
     ScheduleAfter(pool, delay, callback);
   }
 }
@@ -1310,10 +1310,10 @@ std::vector<TimeoutTestParam> MakeTimeoutTestParamValues() {
   // The `finite` delay is a finite, relatively short, delay.  We make it larger
   // than our allowed scheduling delay (slop factor) to avoid confusion when
   // diagnosing test failures.  The other constants here have clear meanings.
-  const absl::Duration finite = 3 * TimeoutTestAllowedSchedulingDelay();
-  const absl::Duration never = absl::InfiniteDuration();
-  const absl::Duration negative = -absl::InfiniteDuration();
-  const absl::Duration immediate = absl::ZeroDuration();
+  const abslx::Duration finite = 3 * TimeoutTestAllowedSchedulingDelay();
+  const abslx::Duration never = abslx::InfiniteDuration();
+  const abslx::Duration negative = -abslx::InfiniteDuration();
+  const abslx::Duration immediate = abslx::ZeroDuration();
 
   // Every test case is run twice; once using the absolute deadline API and once
   // using the relative timeout API.
@@ -1426,24 +1426,24 @@ TEST_P(TimeoutTest, Await) {
   for (int attempt = 1;; ++attempt) {
     ABSL_RAW_LOG(INFO, "Attempt %d", attempt);
 
-    absl::Mutex mu;
+    abslx::Mutex mu;
     bool value = false;  // condition value (under mu)
 
-    std::unique_ptr<absl::synchronization_internal::ThreadPool> pool =
+    std::unique_ptr<abslx::synchronization_internal::ThreadPool> pool =
         CreateDefaultPool();
     RunAfterDelay(params.satisfy_condition_delay, pool.get(), [&] {
-      absl::MutexLock l(&mu);
+      abslx::MutexLock l(&mu);
       value = true;
     });
 
-    absl::MutexLock lock(&mu);
-    absl::Time start_time = absl::Now();
-    absl::Condition cond(&value);
+    abslx::MutexLock lock(&mu);
+    abslx::Time start_time = abslx::Now();
+    abslx::Condition cond(&value);
     bool result =
         params.use_absolute_deadline
             ? mu.AwaitWithDeadline(cond, start_time + params.wait_timeout)
             : mu.AwaitWithTimeout(cond, params.wait_timeout);
-    if (DelayIsWithinBounds(params.expected_delay, absl::Now() - start_time)) {
+    if (DelayIsWithinBounds(params.expected_delay, abslx::Now() - start_time)) {
       EXPECT_EQ(params.expected_result, result);
       break;
     }
@@ -1460,25 +1460,25 @@ TEST_P(TimeoutTest, LockWhen) {
   for (int attempt = 1;; ++attempt) {
     ABSL_RAW_LOG(INFO, "Attempt %d", attempt);
 
-    absl::Mutex mu;
+    abslx::Mutex mu;
     bool value = false;  // condition value (under mu)
 
-    std::unique_ptr<absl::synchronization_internal::ThreadPool> pool =
+    std::unique_ptr<abslx::synchronization_internal::ThreadPool> pool =
         CreateDefaultPool();
     RunAfterDelay(params.satisfy_condition_delay, pool.get(), [&] {
-      absl::MutexLock l(&mu);
+      abslx::MutexLock l(&mu);
       value = true;
     });
 
-    absl::Time start_time = absl::Now();
-    absl::Condition cond(&value);
+    abslx::Time start_time = abslx::Now();
+    abslx::Condition cond(&value);
     bool result =
         params.use_absolute_deadline
             ? mu.LockWhenWithDeadline(cond, start_time + params.wait_timeout)
             : mu.LockWhenWithTimeout(cond, params.wait_timeout);
     mu.Unlock();
 
-    if (DelayIsWithinBounds(params.expected_delay, absl::Now() - start_time)) {
+    if (DelayIsWithinBounds(params.expected_delay, abslx::Now() - start_time)) {
       EXPECT_EQ(params.expected_result, result);
       break;
     }
@@ -1495,26 +1495,26 @@ TEST_P(TimeoutTest, ReaderLockWhen) {
   for (int attempt = 0;; ++attempt) {
     ABSL_RAW_LOG(INFO, "Attempt %d", attempt);
 
-    absl::Mutex mu;
+    abslx::Mutex mu;
     bool value = false;  // condition value (under mu)
 
-    std::unique_ptr<absl::synchronization_internal::ThreadPool> pool =
+    std::unique_ptr<abslx::synchronization_internal::ThreadPool> pool =
         CreateDefaultPool();
     RunAfterDelay(params.satisfy_condition_delay, pool.get(), [&] {
-      absl::MutexLock l(&mu);
+      abslx::MutexLock l(&mu);
       value = true;
     });
 
-    absl::Time start_time = absl::Now();
+    abslx::Time start_time = abslx::Now();
     bool result =
         params.use_absolute_deadline
-            ? mu.ReaderLockWhenWithDeadline(absl::Condition(&value),
+            ? mu.ReaderLockWhenWithDeadline(abslx::Condition(&value),
                                             start_time + params.wait_timeout)
-            : mu.ReaderLockWhenWithTimeout(absl::Condition(&value),
+            : mu.ReaderLockWhenWithTimeout(abslx::Condition(&value),
                                            params.wait_timeout);
     mu.ReaderUnlock();
 
-    if (DelayIsWithinBounds(params.expected_delay, absl::Now() - start_time)) {
+    if (DelayIsWithinBounds(params.expected_delay, abslx::Now() - start_time)) {
       EXPECT_EQ(params.expected_result, result);
       break;
     }
@@ -1531,32 +1531,32 @@ TEST_P(TimeoutTest, Wait) {
   for (int attempt = 0;; ++attempt) {
     ABSL_RAW_LOG(INFO, "Attempt %d", attempt);
 
-    absl::Mutex mu;
+    abslx::Mutex mu;
     bool value = false;  // condition value (under mu)
-    absl::CondVar cv;    // signals a change of `value`
+    abslx::CondVar cv;    // signals a change of `value`
 
-    std::unique_ptr<absl::synchronization_internal::ThreadPool> pool =
+    std::unique_ptr<abslx::synchronization_internal::ThreadPool> pool =
         CreateDefaultPool();
     RunAfterDelay(params.satisfy_condition_delay, pool.get(), [&] {
-      absl::MutexLock l(&mu);
+      abslx::MutexLock l(&mu);
       value = true;
       cv.Signal();
     });
 
-    absl::MutexLock lock(&mu);
-    absl::Time start_time = absl::Now();
-    absl::Duration timeout = params.wait_timeout;
-    absl::Time deadline = start_time + timeout;
+    abslx::MutexLock lock(&mu);
+    abslx::Time start_time = abslx::Now();
+    abslx::Duration timeout = params.wait_timeout;
+    abslx::Time deadline = start_time + timeout;
     while (!value) {
       if (params.use_absolute_deadline ? cv.WaitWithDeadline(&mu, deadline)
                                        : cv.WaitWithTimeout(&mu, timeout)) {
         break;  // deadline/timeout exceeded
       }
-      timeout = deadline - absl::Now();  // recompute
+      timeout = deadline - abslx::Now();  // recompute
     }
     bool result = value;  // note: `mu` is still held
 
-    if (DelayIsWithinBounds(params.expected_delay, absl::Now() - start_time)) {
+    if (DelayIsWithinBounds(params.expected_delay, abslx::Now() - start_time)) {
       EXPECT_EQ(params.expected_result, result);
       break;
     }
@@ -1565,12 +1565,12 @@ TEST_P(TimeoutTest, Wait) {
 
 TEST(Mutex, Logging) {
   // Allow user to look at logging output
-  absl::Mutex logged_mutex;
+  abslx::Mutex logged_mutex;
   logged_mutex.EnableDebugLog("fido_mutex");
-  absl::CondVar logged_cv;
+  abslx::CondVar logged_cv;
   logged_cv.EnableDebugLog("rover_cv");
   logged_mutex.Lock();
-  logged_cv.WaitWithTimeout(&logged_mutex, absl::Milliseconds(20));
+  logged_cv.WaitWithTimeout(&logged_mutex, abslx::Milliseconds(20));
   logged_mutex.Unlock();
   logged_mutex.ReaderLock();
   logged_mutex.ReaderUnlock();

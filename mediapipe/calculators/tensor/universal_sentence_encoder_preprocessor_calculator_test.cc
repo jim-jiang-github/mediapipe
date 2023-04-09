@@ -40,12 +40,12 @@ using ::testing::ElementsAreArray;
 
 constexpr int kNumInputTensorsForUniversalSentenceEncoder = 3;
 
-constexpr absl::string_view kTestModelPath =
+constexpr abslx::string_view kTestModelPath =
     "mediapipe/tasks/testdata/text/"
     "universal_sentence_encoder_qa_with_metadata.tflite";
 
-absl::StatusOr<std::vector<std::string>>
-RunUniversalSentenceEncoderPreprocessorCalculator(absl::string_view text) {
+abslx::StatusOr<std::vector<std::string>>
+RunUniversalSentenceEncoderPreprocessorCalculator(abslx::string_view text) {
   auto graph_config = ParseTextProtoOrDie<CalculatorGraphConfig>(R"pb(
     input_stream: "text"
     output_stream: "tensors"
@@ -76,19 +76,19 @@ RunUniversalSentenceEncoderPreprocessorCalculator(absl::string_view text) {
   MP_RETURN_IF_ERROR(graph.WaitUntilIdle());
 
   if (output_packets.size() != 1) {
-    return absl::InvalidArgumentError(absl::Substitute(
+    return abslx::InvalidArgumentError(abslx::Substitute(
         "output_packets has size $0, expected 1", output_packets.size()));
   }
 
   const std::vector<Tensor>& tensor_vec =
       output_packets[0].Get<std::vector<Tensor>>();
   if (tensor_vec.size() != kNumInputTensorsForUniversalSentenceEncoder) {
-    return absl::InvalidArgumentError(absl::Substitute(
+    return abslx::InvalidArgumentError(abslx::Substitute(
         "tensor_vec has size $0, expected $1", tensor_vec.size(),
         kNumInputTensorsForUniversalSentenceEncoder));
   }
   if (tensor_vec[0].element_type() != Tensor::ElementType::kChar) {
-    return absl::InvalidArgumentError("Expected tensor element type kChar");
+    return abslx::InvalidArgumentError("Expected tensor element type kChar");
   }
   std::vector<std::string> results;
   for (int i = 0; i < kNumInputTensorsForUniversalSentenceEncoder; ++i) {

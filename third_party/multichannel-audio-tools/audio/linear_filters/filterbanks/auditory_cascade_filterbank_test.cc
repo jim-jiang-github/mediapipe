@@ -26,7 +26,7 @@
 namespace linear_filters {
 namespace {
 
-using absl::StrFormat;
+using abslx::StrFormat;
 
 class AuditoryFilterbankBuilderTestWithParam
     : public ::testing::TestWithParam<bool> {

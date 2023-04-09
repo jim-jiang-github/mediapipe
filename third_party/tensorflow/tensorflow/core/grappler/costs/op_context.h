@@ -33,7 +33,7 @@ struct OpContext {
   // This map is used to stash meta attributes so that they may be
   // communicated, for instance, from the scheduler that creates them to the
   // CostEstimator or EventCostManager that uses them.
-  absl::flat_hash_map<std::string, absl::variant<int64_t, std::string>>
+  abslx::flat_hash_map<std::string, abslx::variant<int64_t, std::string>>
       op_meta_attributes;
   OpContext() { function_library = nullptr; }
 };

@@ -384,7 +384,7 @@ TEST_P(GetParticipatingDevicesTest, Test) {
   }
 
   std::vector<ReplicaGroup> replica_groups;
-  absl::c_transform(tc.replica_groups, std::back_inserter(replica_groups),
+  abslx::c_transform(tc.replica_groups, std::back_inserter(replica_groups),
                     [](const std::vector<int> &ids) {
                       ReplicaGroup group;
                       for (int id : ids) {
@@ -412,7 +412,7 @@ TEST_P(GetParticipatingDevicesTest, Test) {
     }
     std::vector<GlobalDeviceId> expected;
     expected.reserve(subtest.expected_output.size());
-    absl::c_transform(subtest.expected_output, std::back_inserter(expected),
+    abslx::c_transform(subtest.expected_output, std::back_inserter(expected),
                       [](int id) { return GlobalDeviceId(id); });
     EXPECT_EQ(*actual, expected);
   }
@@ -432,7 +432,7 @@ TEST_P(GetParticipatingDevicesTest, Test) {
   for (auto subgroup : tc.participating_device_groups) {
     std::vector<GlobalDeviceId> subgroup_device_ids;
     subgroup_device_ids.reserve(subgroup.size());
-    absl::c_transform(subgroup, std::back_inserter(subgroup_device_ids),
+    abslx::c_transform(subgroup, std::back_inserter(subgroup_device_ids),
                       [](int id) { return GlobalDeviceId(id); });
 
     expect_device_groups.push_back(subgroup_device_ids);

@@ -70,7 +70,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Android")
   endif()  # _TFLITE_ENABLE_NNAPI
   list(APPEND TFLITE_BENCHMARK_LIBS
     ${ANDROID_LOG_LIB}
-    absl::strings
+    abslx::strings
   )
 endif()  # Android
 

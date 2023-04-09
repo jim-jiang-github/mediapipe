@@ -79,7 +79,7 @@ StatusOr<ShapedBuffer> ExecutionInput::ToShapedBuffer(
 
 StatusOr<ScopedShapedBuffer> Executable::ExecuteOnStream(
     const ServiceExecutableRunOptions* run_options,
-    absl::Span<const ShapedBuffer* const> arguments,
+    abslx::Span<const ShapedBuffer* const> arguments,
     HloExecutionProfile* hlo_execution_profile) {
   StatusOr<ScopedShapedBuffer> result =
       ExecuteAsyncOnStream(run_options, arguments, hlo_execution_profile);
@@ -101,7 +101,7 @@ static ExecutionInput MakeMaybeOwningDeviceMemoryTree(
 
 StatusOr<ScopedShapedBuffer> Executable::ExecuteAsyncOnStream(
     const ServiceExecutableRunOptions* run_options,
-    absl::Span<const ShapedBuffer* const> arguments,
+    abslx::Span<const ShapedBuffer* const> arguments,
     HloExecutionProfile* hlo_execution_profile) {
   std::vector<ExecutionInput> args;
   args.reserve(arguments.size());
@@ -127,8 +127,8 @@ StatusOr<ExecutionOutput> Executable::ExecuteOnStream(
 }
 
 StatusOr<std::vector<ScopedShapedBuffer>> Executable::ExecuteOnStreams(
-    absl::Span<const ServiceExecutableRunOptions> run_options,
-    absl::Span<const absl::Span<const ShapedBuffer* const>> arguments) {
+    abslx::Span<const ServiceExecutableRunOptions> run_options,
+    abslx::Span<const abslx::Span<const ShapedBuffer* const>> arguments) {
   TF_RET_CHECK(run_options.size() == arguments.size());
 
   std::vector<ScopedShapedBuffer> return_values;
@@ -160,7 +160,7 @@ StatusOr<std::vector<ScopedShapedBuffer>> Executable::ExecuteOnStreams(
 
 StatusOr<ScopedShapedBuffer> Executable::ExecuteOnStreamWrapper(
     const ServiceExecutableRunOptions* run_options,
-    absl::Span<const ShapedBuffer* const> arguments) {
+    abslx::Span<const ShapedBuffer* const> arguments) {
   StatusOr<ScopedShapedBuffer> result =
       ExecuteAsyncOnStreamWrapper(run_options, arguments);
   Status block_status = run_options->stream()->BlockHostUntilDone();
@@ -277,7 +277,7 @@ Status ExecuteWrapperAfterExecution(
 
 StatusOr<ScopedShapedBuffer> Executable::ExecuteAsyncOnStreamWrapper(
     const ServiceExecutableRunOptions* run_options,
-    absl::Span<const ShapedBuffer* const> arguments) {
+    abslx::Span<const ShapedBuffer* const> arguments) {
   auto state = ExecuteWrapperBeforeExecution(*this, run_options);
   StatusOr<ScopedShapedBuffer> return_value =
       ExecuteAsyncOnStream(run_options, arguments, state.profile_ptr.get());
@@ -299,7 +299,7 @@ StatusOr<ExecutionOutput> Executable::ExecuteAsyncOnStreamWrapper(
 
 int64_t Executable::SizeOfGeneratedCodeInBytes() const { return -1; }
 
-void Executable::MarkToBeReleasedArguments(absl::Span<ExecutionInput> arguments,
+void Executable::MarkToBeReleasedArguments(abslx::Span<ExecutionInput> arguments,
                                            ExecutionOutput& result) {
   for (ExecutionInput& argument : arguments) {
     for (auto& index_buffer : *argument.MutableBuffers()) {

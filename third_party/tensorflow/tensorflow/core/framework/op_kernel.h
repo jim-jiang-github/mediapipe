@@ -157,9 +157,9 @@ class OpKernel {
   // Accessors.
   const NodeDef& def() const { return props_->node_def; }
   const std::string& name() const { return props_->node_def.name(); }
-  absl::string_view name_view() const { return name_view_; }
+  abslx::string_view name_view() const { return name_view_; }
   const std::string& type_string() const { return props_->node_def.op(); }
-  absl::string_view type_string_view() const { return type_string_view_; }
+  abslx::string_view type_string_view() const { return type_string_view_; }
   const std::string& requested_input(int i) const {
     return props_->node_def.input(i);
   }
@@ -202,8 +202,8 @@ class OpKernel {
   const MemoryTypeVector output_memory_types_;
   NameRangeMap input_name_map_;
   NameRangeMap output_name_map_;
-  const absl::string_view name_view_;
-  const absl::string_view type_string_view_;
+  const abslx::string_view name_view_;
+  const abslx::string_view type_string_view_;
   const int graph_def_version_;
   const bool is_deferred_;
   bool expensive_;
@@ -569,7 +569,7 @@ class OpKernelContext {
     int64_t start_time_usecs = 0;
 
     // The deadline for the session to complete by. Empty if unspecified.
-    absl::optional<absl::Time> deadline;
+    abslx::optional<abslx::Time> deadline;
 
     // The op kernel being computed.
     OpKernel* op_kernel = nullptr;
@@ -641,10 +641,10 @@ class OpKernelContext {
     CancellationManager* cancellation_manager = nullptr;
 
     // Inputs to this op kernel.
-    absl::Span<const TensorValue> inputs;
+    abslx::Span<const TensorValue> inputs;
     bool is_input_dead = false;
 
-    absl::Span<const AllocatorAttributes> input_alloc_attrs;
+    abslx::Span<const AllocatorAttributes> input_alloc_attrs;
 
     // Device context.
     DeviceContext* op_device_context = nullptr;
@@ -674,7 +674,7 @@ class OpKernelContext {
     std::function<void()> inc_num_deferred_ops_function;
     std::function<void()> dec_num_deferred_ops_function;
 
-    absl::optional<ManagedStackTrace> stack_trace = {};
+    abslx::optional<ManagedStackTrace> stack_trace = {};
 
     // For implementing `OpKernelContext::output_required()`. If null, all
     // outputs are required.
@@ -697,12 +697,12 @@ class OpKernelContext {
 
   // The deadline for the session to complete by. Empty if unspecified in
   // RunOptions.
-  absl::optional<absl::Time> deadline() const { return params_->deadline; }
+  abslx::optional<abslx::Time> deadline() const { return params_->deadline; }
 
   const OpKernel& op_kernel() const { return *params_->op_kernel; }
 
   // Stack trace of where the op was defined (if defined in eager mode).
-  const absl::optional<ManagedStackTrace>& stack_trace() const {
+  const abslx::optional<ManagedStackTrace>& stack_trace() const {
     return params_->stack_trace;
   }
 
@@ -1270,7 +1270,7 @@ class OpKernelContext {
   gtl::InlinedVector<TensorValue, 4> outputs_;
 
   // Keep track of calls to ScopedAllocator.
-  // TODO(ayushd): change to absl::flat_hash_set.
+  // TODO(ayushd): change to abslx::flat_hash_set.
   std::unique_ptr<std::unordered_set<int32>> allocated_scope_ids_;
 
   // The following data members are only used when allocation tracking is
@@ -1513,7 +1513,7 @@ class OpKernelRegistrar {
   OpKernelRegistrar(const KernelDef* kernel_def, StringPiece kernel_class_name,
                     OpKernel* (*create_fn)(OpKernelConstruction*)) {
     InitInternal(kernel_def, kernel_class_name,
-                 absl::make_unique<PtrOpKernelFactory>(create_fn));
+                 abslx::make_unique<PtrOpKernelFactory>(create_fn));
   }
 
  private:

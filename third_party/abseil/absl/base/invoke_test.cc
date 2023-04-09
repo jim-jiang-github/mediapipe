@@ -24,7 +24,7 @@
 #include "absl/memory/memory.h"
 #include "absl/strings/str_cat.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 namespace {
@@ -226,4 +226,4 @@ TEST(InvokeTest, SfinaeFriendly) {
 }  // namespace
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

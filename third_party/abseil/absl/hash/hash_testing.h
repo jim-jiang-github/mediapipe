@@ -27,10 +27,10 @@
 #include "absl/strings/str_cat.h"
 #include "absl/types/variant.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
-// Run the absl::Hash algorithm over all the elements passed in and verify that
+// Run the abslx::Hash algorithm over all the elements passed in and verify that
 // their hash expansion is congruent with their `==` operator.
 //
 // It is used in conjunction with EXPECT_TRUE. Failures will output information
@@ -39,17 +39,17 @@ ABSL_NAMESPACE_BEGIN
 // Users should pass a collection of types as either an initializer list or a
 // container of cases.
 //
-//   EXPECT_TRUE(absl::VerifyTypeImplementsAbslHashCorrectly(
+//   EXPECT_TRUE(abslx::VerifyTypeImplementsAbslHashCorrectly(
 //       {v1, v2, ..., vN}));
 //
 //   std::vector<MyType> cases;
 //   // Fill cases...
-//   EXPECT_TRUE(absl::VerifyTypeImplementsAbslHashCorrectly(cases));
+//   EXPECT_TRUE(abslx::VerifyTypeImplementsAbslHashCorrectly(cases));
 //
 // Users can pass a variety of types for testing heterogeneous lookup with
 // `std::make_tuple`:
 //
-//   EXPECT_TRUE(absl::VerifyTypeImplementsAbslHashCorrectly(
+//   EXPECT_TRUE(abslx::VerifyTypeImplementsAbslHashCorrectly(
 //       std::make_tuple(v1, v2, ..., vN)));
 //
 //
@@ -63,7 +63,7 @@ ABSL_NAMESPACE_BEGIN
 //
 // Usage:
 //
-//   EXPECT_TRUE(absl::VerifyTypeImplementsAbslHashCorrectly(
+//   EXPECT_TRUE(abslx::VerifyTypeImplementsAbslHashCorrectly(
 //       std::make_tuple(v1, v2, ..., vN), MyCustomEq{}));
 //
 // It checks the following requirements:
@@ -128,7 +128,7 @@ ABSL_NAMESPACE_BEGIN
 //   }
 //   friend bool operator==(Bad4 x, Bad4 y) {
 //    // Compare two ranges for equality. C++14 code can instead use std::equal.
-//     return absl::equal(x.p, x.p + x.size, y.p, y.p + y.size);
+//     return abslx::equal(x.p, x.p + x.size, y.p, y.p + y.size);
 //   }
 // };
 //
@@ -163,7 +163,7 @@ struct PrintVisitor {
   size_t index;
   template <typename T>
   std::string operator()(const T* value) const {
-    return absl::StrCat("#", index, "(", testing::PrintToString(*value), ")");
+    return abslx::StrCat("#", index, "(", testing::PrintToString(*value), ")");
   }
 };
 
@@ -192,9 +192,9 @@ VerifyTypeImplementsAbslHashCorrectly(const Container& values, Eq equals) {
     const V& value;
     size_t index;
     std::string ToString() const {
-      return absl::visit(PrintVisitor{index}, value);
+      return abslx::visit(PrintVisitor{index}, value);
     }
-    SpyHashState expand() const { return absl::visit(ExpandVisitor{}, value); }
+    SpyHashState expand() const { return abslx::visit(ExpandVisitor{}, value); }
   };
 
   using EqClass = std::vector<Info>;
@@ -205,7 +205,7 @@ VerifyTypeImplementsAbslHashCorrectly(const Container& values, Eq equals) {
   for (const auto& value : values) {
     EqClass* c = nullptr;
     for (auto& eqclass : classes) {
-      if (absl::visit(EqVisitor<Eq>{equals}, value, eqclass[0].value)) {
+      if (abslx::visit(EqVisitor<Eq>{equals}, value, eqclass[0].value)) {
         c = &eqclass;
         break;
       }
@@ -297,11 +297,11 @@ struct MakeTypeSet<T, Ts...> : MakeTypeSet<Ts...>::template Insert<T>::type {};
 
 template <typename... T>
 using VariantForTypes = typename MakeTypeSet<
-    const typename std::decay<T>::type*...>::template apply<absl::variant>;
+    const typename std::decay<T>::type*...>::template apply<abslx::variant>;
 
 template <typename Container>
 struct ContainerAsVector {
-  using V = absl::variant<const typename Container::value_type*>;
+  using V = abslx::variant<const typename Container::value_type*>;
   using Out = std::vector<V>;
 
   static Out Do(const Container& values) {
@@ -317,12 +317,12 @@ struct ContainerAsVector<std::tuple<T...>> {
   using Out = std::vector<V>;
 
   template <size_t... I>
-  static Out DoImpl(const std::tuple<T...>& tuple, absl::index_sequence<I...>) {
+  static Out DoImpl(const std::tuple<T...>& tuple, abslx::index_sequence<I...>) {
     return Out{&std::get<I>(tuple)...};
   }
 
   static Out Do(const std::tuple<T...>& values) {
-    return DoImpl(values, absl::index_sequence_for<T...>());
+    return DoImpl(values, abslx::index_sequence_for<T...>());
   }
 };
 
@@ -373,6 +373,6 @@ VerifyTypeImplementsAbslHashCorrectly(std::initializer_list<T> values,
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_HASH_HASH_TESTING_H_

@@ -56,30 +56,30 @@ TEST(CEscape, EscapeAndUnescape) {
       std::string escaped;
       switch (kind) {
         case 0:
-          escaped = absl::CEscape(original);
+          escaped = abslx::CEscape(original);
           break;
         case 1:
-          escaped = absl::CHexEscape(original);
+          escaped = abslx::CHexEscape(original);
           break;
         case 2:
-          escaped = absl::Utf8SafeCEscape(original);
+          escaped = abslx::Utf8SafeCEscape(original);
           break;
         case 3:
-          escaped = absl::Utf8SafeCHexEscape(original);
+          escaped = abslx::Utf8SafeCHexEscape(original);
           break;
       }
       std::string unescaped_str;
-      EXPECT_TRUE(absl::CUnescape(escaped, &unescaped_str));
+      EXPECT_TRUE(abslx::CUnescape(escaped, &unescaped_str));
       EXPECT_EQ(unescaped_str, original);
 
       unescaped_str.erase();
       std::string error;
-      EXPECT_TRUE(absl::CUnescape(escaped, &unescaped_str, &error));
+      EXPECT_TRUE(abslx::CUnescape(escaped, &unescaped_str, &error));
       EXPECT_EQ(error, "");
 
       // Check in-place unescaping
       std::string s = escaped;
-      EXPECT_TRUE(absl::CUnescape(s, &s));
+      EXPECT_TRUE(abslx::CUnescape(s, &s));
       ASSERT_EQ(s, original);
     }
   }
@@ -91,9 +91,9 @@ TEST(CEscape, EscapeAndUnescape) {
       chars[0] = char0;
       chars[1] = char1;
       std::string s(chars, 2);
-      std::string escaped = absl::CHexEscape(s);
+      std::string escaped = abslx::CHexEscape(s);
       std::string unescaped;
-      EXPECT_TRUE(absl::CUnescape(escaped, &unescaped));
+      EXPECT_TRUE(abslx::CUnescape(escaped, &unescaped));
       EXPECT_EQ(s, unescaped);
     }
   }
@@ -136,19 +136,19 @@ TEST(CEscape, BasicEscaping) {
   };
 
   for (const epair& val : oct_values) {
-    std::string escaped = absl::CEscape(val.unescaped);
+    std::string escaped = abslx::CEscape(val.unescaped);
     EXPECT_EQ(escaped, val.escaped);
   }
   for (const epair& val : hex_values) {
-    std::string escaped = absl::CHexEscape(val.unescaped);
+    std::string escaped = abslx::CHexEscape(val.unescaped);
     EXPECT_EQ(escaped, val.escaped);
   }
   for (const epair& val : utf8_oct_values) {
-    std::string escaped = absl::Utf8SafeCEscape(val.unescaped);
+    std::string escaped = abslx::Utf8SafeCEscape(val.unescaped);
     EXPECT_EQ(escaped, val.escaped);
   }
   for (const epair& val : utf8_hex_values) {
-    std::string escaped = absl::Utf8SafeCHexEscape(val.unescaped);
+    std::string escaped = abslx::Utf8SafeCHexEscape(val.unescaped);
     EXPECT_EQ(escaped, val.escaped);
   }
 }
@@ -163,7 +163,7 @@ TEST(Unescape, BasicFunction) {
      {"\\U0010FFFD", "\xF4\x8F\xBF\xBD"}};
   for (const epair& val : tests) {
     std::string out;
-    EXPECT_TRUE(absl::CUnescape(val.escaped, &out));
+    EXPECT_TRUE(abslx::CUnescape(val.escaped, &out));
     EXPECT_EQ(out, val.unescaped);
   }
   std::string bad[] = {"\\u1",         // too short
@@ -177,11 +177,11 @@ TEST(Unescape, BasicFunction) {
   for (const std::string& e : bad) {
     std::string error;
     std::string out;
-    EXPECT_FALSE(absl::CUnescape(e, &out, &error));
+    EXPECT_FALSE(abslx::CUnescape(e, &out, &error));
     EXPECT_FALSE(error.empty());
 
     out.erase();
-    EXPECT_FALSE(absl::CUnescape(e, &out));
+    EXPECT_FALSE(abslx::CUnescape(e, &out));
   }
 }
 
@@ -215,55 +215,55 @@ const char CUnescapeTest::kStringWithMultipleUnicodeNulls[] =
 
 TEST_F(CUnescapeTest, Unescapes1CharOctalNull) {
   std::string original_string = "\\0";
-  EXPECT_TRUE(absl::CUnescape(original_string, &result_string_));
+  EXPECT_TRUE(abslx::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0", 1), result_string_);
 }
 
 TEST_F(CUnescapeTest, Unescapes2CharOctalNull) {
   std::string original_string = "\\00";
-  EXPECT_TRUE(absl::CUnescape(original_string, &result_string_));
+  EXPECT_TRUE(abslx::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0", 1), result_string_);
 }
 
 TEST_F(CUnescapeTest, Unescapes3CharOctalNull) {
   std::string original_string = "\\000";
-  EXPECT_TRUE(absl::CUnescape(original_string, &result_string_));
+  EXPECT_TRUE(abslx::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0", 1), result_string_);
 }
 
 TEST_F(CUnescapeTest, Unescapes1CharHexNull) {
   std::string original_string = "\\x0";
-  EXPECT_TRUE(absl::CUnescape(original_string, &result_string_));
+  EXPECT_TRUE(abslx::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0", 1), result_string_);
 }
 
 TEST_F(CUnescapeTest, Unescapes2CharHexNull) {
   std::string original_string = "\\x00";
-  EXPECT_TRUE(absl::CUnescape(original_string, &result_string_));
+  EXPECT_TRUE(abslx::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0", 1), result_string_);
 }
 
 TEST_F(CUnescapeTest, Unescapes3CharHexNull) {
   std::string original_string = "\\x000";
-  EXPECT_TRUE(absl::CUnescape(original_string, &result_string_));
+  EXPECT_TRUE(abslx::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0", 1), result_string_);
 }
 
 TEST_F(CUnescapeTest, Unescapes4CharUnicodeNull) {
   std::string original_string = "\\u0000";
-  EXPECT_TRUE(absl::CUnescape(original_string, &result_string_));
+  EXPECT_TRUE(abslx::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0", 1), result_string_);
 }
 
 TEST_F(CUnescapeTest, Unescapes8CharUnicodeNull) {
   std::string original_string = "\\U00000000";
-  EXPECT_TRUE(absl::CUnescape(original_string, &result_string_));
+  EXPECT_TRUE(abslx::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0", 1), result_string_);
 }
 
 TEST_F(CUnescapeTest, UnescapesMultipleOctalNulls) {
   std::string original_string(kStringWithMultipleOctalNulls);
-  EXPECT_TRUE(absl::CUnescape(original_string, &result_string_));
+  EXPECT_TRUE(abslx::CUnescape(original_string, &result_string_));
   // All escapes, including newlines and null escapes, should have been
   // converted to the equivalent characters.
   EXPECT_EQ(std::string("\0\n"
@@ -277,7 +277,7 @@ TEST_F(CUnescapeTest, UnescapesMultipleOctalNulls) {
 
 TEST_F(CUnescapeTest, UnescapesMultipleHexNulls) {
   std::string original_string(kStringWithMultipleHexNulls);
-  EXPECT_TRUE(absl::CUnescape(original_string, &result_string_));
+  EXPECT_TRUE(abslx::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0\n"
                         "0\n"
                         "\0\n"
@@ -288,7 +288,7 @@ TEST_F(CUnescapeTest, UnescapesMultipleHexNulls) {
 
 TEST_F(CUnescapeTest, UnescapesMultipleUnicodeNulls) {
   std::string original_string(kStringWithMultipleUnicodeNulls);
-  EXPECT_TRUE(absl::CUnescape(original_string, &result_string_));
+  EXPECT_TRUE(abslx::CUnescape(original_string, &result_string_));
   EXPECT_EQ(std::string("\0\n"
                         "0\n"
                         "\0",
@@ -297,8 +297,8 @@ TEST_F(CUnescapeTest, UnescapesMultipleUnicodeNulls) {
 }
 
 static struct {
-  absl::string_view plaintext;
-  absl::string_view cyphertext;
+  abslx::string_view plaintext;
+  abslx::string_view cyphertext;
 } const base64_tests[] = {
     // Empty string.
     {{"", 0}, {"", 0}},
@@ -563,12 +563,12 @@ void TestEscapeAndUnescape() {
   // Check the short strings; this tests the math (and boundaries)
   for (const auto& tc : base64_tests) {
     StringType encoded("this junk should be ignored");
-    absl::Base64Escape(tc.plaintext, &encoded);
+    abslx::Base64Escape(tc.plaintext, &encoded);
     EXPECT_EQ(encoded, tc.cyphertext);
-    EXPECT_EQ(absl::Base64Escape(tc.plaintext), tc.cyphertext);
+    EXPECT_EQ(abslx::Base64Escape(tc.plaintext), tc.cyphertext);
 
     StringType decoded("this junk should be ignored");
-    EXPECT_TRUE(absl::Base64Unescape(encoded, &decoded));
+    EXPECT_TRUE(abslx::Base64Unescape(encoded, &decoded));
     EXPECT_EQ(decoded, tc.plaintext);
 
     StringType websafe(tc.cyphertext);
@@ -582,32 +582,32 @@ void TestEscapeAndUnescape() {
     }
 
     encoded = "this junk should be ignored";
-    absl::WebSafeBase64Escape(tc.plaintext, &encoded);
+    abslx::WebSafeBase64Escape(tc.plaintext, &encoded);
     EXPECT_EQ(encoded, websafe);
-    EXPECT_EQ(absl::WebSafeBase64Escape(tc.plaintext), websafe);
+    EXPECT_EQ(abslx::WebSafeBase64Escape(tc.plaintext), websafe);
 
     // Let's try the string version of the decoder
     decoded = "this junk should be ignored";
-    EXPECT_TRUE(absl::WebSafeBase64Unescape(websafe, &decoded));
+    EXPECT_TRUE(abslx::WebSafeBase64Unescape(websafe, &decoded));
     EXPECT_EQ(decoded, tc.plaintext);
   }
 
   // Now try the long strings, this tests the streaming
-  for (const auto& tc : absl::strings_internal::base64_strings()) {
+  for (const auto& tc : abslx::strings_internal::base64_strings()) {
     StringType buffer;
-    absl::WebSafeBase64Escape(tc.plaintext, &buffer);
+    abslx::WebSafeBase64Escape(tc.plaintext, &buffer);
     EXPECT_EQ(tc.cyphertext, buffer);
-    EXPECT_EQ(absl::WebSafeBase64Escape(tc.plaintext), tc.cyphertext);
+    EXPECT_EQ(abslx::WebSafeBase64Escape(tc.plaintext), tc.cyphertext);
   }
 
   // Verify the behavior when decoding bad data
   {
-    absl::string_view data_set[] = {"ab-/", absl::string_view("\0bcd", 4),
-                                    absl::string_view("abc.\0", 5)};
-    for (absl::string_view bad_data : data_set) {
+    abslx::string_view data_set[] = {"ab-/", abslx::string_view("\0bcd", 4),
+                                    abslx::string_view("abc.\0", 5)};
+    for (abslx::string_view bad_data : data_set) {
       StringType buf;
-      EXPECT_FALSE(absl::Base64Unescape(bad_data, &buf));
-      EXPECT_FALSE(absl::WebSafeBase64Unescape(bad_data, &buf));
+      EXPECT_FALSE(abslx::Base64Unescape(bad_data, &buf));
+      EXPECT_FALSE(abslx::WebSafeBase64Unescape(bad_data, &buf));
       EXPECT_TRUE(buf.empty());
     }
   }
@@ -623,7 +623,7 @@ TEST(Base64, DISABLED_HugeData) {
   const std::string huge(kSize, 'x');
 
   std::string escaped;
-  absl::Base64Escape(huge, &escaped);
+  abslx::Base64Escape(huge, &escaped);
 
   // Generates the string that should match a base64 encoded "xxx..." string.
   // "xxx" in base64 is "eHh4".
@@ -635,7 +635,7 @@ TEST(Base64, DISABLED_HugeData) {
   EXPECT_EQ(expected_encoding, escaped);
 
   std::string unescaped;
-  EXPECT_TRUE(absl::Base64Unescape(escaped, &unescaped));
+  EXPECT_TRUE(abslx::Base64Unescape(escaped, &unescaped));
   EXPECT_EQ(huge, unescaped);
 }
 
@@ -644,20 +644,20 @@ TEST(HexAndBack, HexStringToBytes_and_BytesToHexString) {
   std::string bytes_expected = "\x01\x23\x45\x67\x89\xab\xcd\xef\xAB\xCD\xEF";
   std::string hex_only_lower = "0123456789abcdefabcdef";
 
-  std::string bytes_result = absl::HexStringToBytes(hex_mixed);
+  std::string bytes_result = abslx::HexStringToBytes(hex_mixed);
   EXPECT_EQ(bytes_expected, bytes_result);
 
   std::string prefix_valid = hex_mixed + "?";
-  std::string prefix_valid_result = absl::HexStringToBytes(
-      absl::string_view(prefix_valid.data(), prefix_valid.size() - 1));
+  std::string prefix_valid_result = abslx::HexStringToBytes(
+      abslx::string_view(prefix_valid.data(), prefix_valid.size() - 1));
   EXPECT_EQ(bytes_expected, prefix_valid_result);
 
   std::string infix_valid = "?" + hex_mixed + "???";
-  std::string infix_valid_result = absl::HexStringToBytes(
-      absl::string_view(infix_valid.data() + 1, hex_mixed.size()));
+  std::string infix_valid_result = abslx::HexStringToBytes(
+      abslx::string_view(infix_valid.data() + 1, hex_mixed.size()));
   EXPECT_EQ(bytes_expected, infix_valid_result);
 
-  std::string hex_result = absl::BytesToHexString(bytes_expected);
+  std::string hex_result = abslx::BytesToHexString(bytes_expected);
   EXPECT_EQ(hex_only_lower, hex_result);
 }
 

@@ -83,8 +83,8 @@ struct ProtobufToEmbed {
 // is stored in the object_file_data field in the returned
 // EmbeddedProtocolBuffers instance.
 StatusOr<EmbeddedProtocolBuffers> CreateEmbeddedProtocolBuffers(
-    absl::string_view target_triple,
-    absl::Span<const ProtobufToEmbed> protobufs_to_embed);
+    abslx::string_view target_triple,
+    abslx::Span<const ProtobufToEmbed> protobufs_to_embed);
 
 }  // namespace tfcompile
 }  // namespace tensorflow

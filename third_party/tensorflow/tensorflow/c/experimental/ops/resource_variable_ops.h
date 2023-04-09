@@ -28,7 +28,7 @@ namespace ops {
 Status VarHandleOp(AbstractContext* ctx, AbstractTensorHandle** resource,
                    DataType dtype, const PartialTensorShape shape,
                    const char* container = "", const char* shared_name = "",
-                   absl::Span<string const> allowed_devices = {},
+                   abslx::Span<string const> allowed_devices = {},
                    const char* name = nullptr,
                    const char* raw_device_name = nullptr);
 

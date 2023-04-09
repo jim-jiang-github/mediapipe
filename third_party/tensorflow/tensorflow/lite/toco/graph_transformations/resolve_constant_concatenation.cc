@@ -176,7 +176,7 @@ void SetMinMaxForConcatenedArray(GraphTransformation* transformation,
   }
 
   AddMessageF("Performing constant concat of %s into %s",
-              absl::StrJoin(concat_op->inputs, ", "), concatenated_array_name);
+              abslx::StrJoin(concat_op->inputs, ", "), concatenated_array_name);
 
   switch (concatenated_array.data_type) {
     case ArrayDataType::kFloat:

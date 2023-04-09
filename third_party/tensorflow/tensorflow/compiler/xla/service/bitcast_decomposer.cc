@@ -25,8 +25,8 @@ limitations under the License.
 namespace xla {
 
 namespace {
-absl::InlinedVector<int64_t, 8> ReverseIota(int64_t n) {
-  absl::InlinedVector<int64_t, 8> ret;
+abslx::InlinedVector<int64_t, 8> ReverseIota(int64_t n) {
+  abslx::InlinedVector<int64_t, 8> ret;
   for (int64_t i = n - 1; i >= 0; --i) {
     ret.push_back(i);
   }
@@ -38,10 +38,10 @@ int64_t Rank(const Shape& s) {
 }
 int64_t Rank(const HloInstruction* instr) { return Rank(instr->shape()); }
 
-absl::Span<const int64_t> LayoutPerm(const Shape& s) {
+abslx::Span<const int64_t> LayoutPerm(const Shape& s) {
   return s.layout().minor_to_major();
 }
-absl::Span<const int64_t> LayoutPerm(const HloInstruction* instr) {
+abslx::Span<const int64_t> LayoutPerm(const HloInstruction* instr) {
   return LayoutPerm(instr->shape());
 }
 
@@ -76,7 +76,7 @@ absl::Span<const int64_t> LayoutPerm(const HloInstruction* instr) {
 //    permuted by the tib we chose, we get the desired output logical dims.
 StatusOr<bool> BitcastDecomposer::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   for (HloComputation* comp : module->computations(execution_threads)) {
     if (!comp->IsFusionComputation()) {
@@ -98,7 +98,7 @@ StatusOr<bool> BitcastDecomposer::Run(
       }
 
       if (!ConsumeFuel("bitcast_decomposer", [&] {
-            return absl::StrCat("Not decomposing ", instr->ToString());
+            return abslx::StrCat("Not decomposing ", instr->ToString());
           })) {
         continue;
       }
@@ -109,10 +109,10 @@ StatusOr<bool> BitcastDecomposer::Run(
       //   in_layout = perm . out_layout =>
       //   perm = in_layout . out_layout'
       auto create_tib = [&](const Shape& shape, HloInstruction* input,
-                            absl::Span<const int64_t> perm) {
+                            abslx::Span<const int64_t> perm) {
         CHECK(ShapeUtil::TransposeIsBitcast(input->shape(), shape, perm))
             << "from=" << input->shape() << " to=" << shape
-            << " perm=" << absl::StrJoin(perm, ",");
+            << " perm=" << abslx::StrJoin(perm, ",");
         HloInstruction* ret = comp->AddInstruction(
             HloInstruction::CreateTranspose(shape, input, perm));
         VLOG(3) << "Transposed " << input->ToString()
@@ -149,7 +149,7 @@ StatusOr<bool> BitcastDecomposer::Run(
                                 InversePermutation(LayoutPerm(instr)));
         std::vector<int64_t> new_dims =
             ComposePermutations(operand->shape().dimensions(), transpose_perm);
-        if (absl::c_equal(instr->shape().dimensions(), new_dims)) {
+        if (abslx::c_equal(instr->shape().dimensions(), new_dims)) {
           TF_RETURN_IF_ERROR(instr->parent()->ReplaceInstruction(
               instr, create_tib(instr->shape(), operand, transpose_perm)));
           changed = true;
@@ -159,7 +159,7 @@ StatusOr<bool> BitcastDecomposer::Run(
 
       // Use a tib to convert to descending layout if operand doesn't already
       // have a descending layout.
-      if (!absl::c_equal(LayoutPerm(operand), ReverseIota(Rank(operand)))) {
+      if (!abslx::c_equal(LayoutPerm(operand), ReverseIota(Rank(operand)))) {
         Shape new_shape =
             ShapeUtil::MakeShapeWithDescendingLayoutAndSamePhysicalLayout(
                 operand->shape());

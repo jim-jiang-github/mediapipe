@@ -97,7 +97,7 @@ HloComputation* MakeReduction(const HloOpcode type, HloModule* module) {
 // Creates replica groups for AllReduce. groups[i] represents replica ids
 // for group 'i'.
 std::vector<ReplicaGroup> CreateReplicaGroups(
-    absl::Span<const std::vector<int64_t>> groups) {
+    abslx::Span<const std::vector<int64_t>> groups) {
   std::vector<ReplicaGroup> replica_groups(groups.size());
   for (int64_t i = 0; i < groups.size(); ++i) {
     *replica_groups[i].mutable_replica_ids() = {groups[i].begin(),

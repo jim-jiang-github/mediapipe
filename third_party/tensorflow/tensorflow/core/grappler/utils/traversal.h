@@ -86,7 +86,7 @@ struct DfsPredicates {
 // applied to the `from` nodes. Call corresponding callbacks for each visited
 // node.
 void DfsTraversal(const GraphTopologyView& graph_view,
-                  absl::Span<const NodeDef* const> from,
+                  abslx::Span<const NodeDef* const> from,
                   TraversalDirection direction, const DfsPredicates& predicates,
                   const DfsCallbacks& callbacks);
 
@@ -94,7 +94,7 @@ void DfsTraversal(const GraphTopologyView& graph_view,
 // list of nodes specified in the `from` argument. Call corresponding callbacks
 // for each visited node.
 void DfsTraversal(const GraphTopologyView& graph_view,
-                  absl::Span<const NodeDef* const> from,
+                  abslx::Span<const NodeDef* const> from,
                   TraversalDirection direction, const DfsCallbacks& callbacks);
 
 }  // namespace grappler

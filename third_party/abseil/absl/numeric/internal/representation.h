@@ -19,7 +19,7 @@
 
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace numeric_internal {
 
@@ -50,6 +50,6 @@ inline constexpr bool IsDoubleDouble() {
 
 }  // namespace numeric_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_NUMERIC_INTERNAL_REPRESENTATION_H_

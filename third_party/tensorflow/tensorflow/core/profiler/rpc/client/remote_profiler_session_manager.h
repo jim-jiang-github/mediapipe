@@ -31,7 +31,7 @@ limitations under the License.
 namespace tensorflow {
 namespace profiler {
 
-using AddressResolver = std::function<std::string(absl::string_view)>;
+using AddressResolver = std::function<std::string(abslx::string_view)>;
 
 // Manages one or more remote profiling sessions.
 class RemoteProfilerSessionManager {

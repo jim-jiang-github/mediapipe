@@ -25,34 +25,34 @@ namespace {
 
 TEST(OStringStream, IsOStream) {
   static_assert(
-      std::is_base_of<std::ostream, absl::strings_internal::OStringStream>(),
+      std::is_base_of<std::ostream, abslx::strings_internal::OStringStream>(),
       "");
 }
 
 TEST(OStringStream, ConstructDestroy) {
   {
-    absl::strings_internal::OStringStream strm(nullptr);
+    abslx::strings_internal::OStringStream strm(nullptr);
     EXPECT_EQ(nullptr, strm.str());
   }
   {
     std::string s = "abc";
     {
-      absl::strings_internal::OStringStream strm(&s);
+      abslx::strings_internal::OStringStream strm(&s);
       EXPECT_EQ(&s, strm.str());
     }
     EXPECT_EQ("abc", s);
   }
   {
     std::unique_ptr<std::string> s(new std::string);
-    absl::strings_internal::OStringStream strm(s.get());
+    abslx::strings_internal::OStringStream strm(s.get());
     s.reset();
   }
 }
 
 TEST(OStringStream, Str) {
   std::string s1;
-  absl::strings_internal::OStringStream strm(&s1);
-  const absl::strings_internal::OStringStream& c_strm(strm);
+  abslx::strings_internal::OStringStream strm(&s1);
+  const abslx::strings_internal::OStringStream& c_strm(strm);
 
   static_assert(std::is_same<decltype(strm.str()), std::string*>(), "");
   static_assert(std::is_same<decltype(c_strm.str()), const std::string*>(), "");
@@ -77,7 +77,7 @@ TEST(OStringStream, Str) {
 TEST(OStreamStream, WriteToLValue) {
   std::string s = "abc";
   {
-    absl::strings_internal::OStringStream strm(&s);
+    abslx::strings_internal::OStringStream strm(&s);
     EXPECT_EQ("abc", s);
     strm << "";
     EXPECT_EQ("abc", s);
@@ -91,11 +91,11 @@ TEST(OStreamStream, WriteToLValue) {
 
 TEST(OStreamStream, WriteToRValue) {
   std::string s = "abc";
-  absl::strings_internal::OStringStream(&s) << "";
+  abslx::strings_internal::OStringStream(&s) << "";
   EXPECT_EQ("abc", s);
-  absl::strings_internal::OStringStream(&s) << 42;
+  abslx::strings_internal::OStringStream(&s) << 42;
   EXPECT_EQ("abc42", s);
-  absl::strings_internal::OStringStream(&s) << 'x' << 'y';
+  abslx::strings_internal::OStringStream(&s) << 'x' << 'y';
   EXPECT_EQ("abc42xy", s);
 }
 

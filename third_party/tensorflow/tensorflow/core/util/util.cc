@@ -131,11 +131,11 @@ bool IsMKLEnabled() {
 #ifndef INTEL_MKL
   return false;
 #endif  // !INTEL_MKL
-  static absl::once_flag once;
+  static abslx::once_flag once;
 #ifdef ENABLE_MKL
   // Keeping TF_DISABLE_MKL env variable for legacy reasons.
   static bool oneDNN_disabled = false;
-  absl::call_once(once, [&] {
+  abslx::call_once(once, [&] {
     TF_CHECK_OK(ReadBoolFromEnvVar("TF_DISABLE_MKL", false, &oneDNN_disabled));
     if (oneDNN_disabled) VLOG(2) << "TF-MKL: Disabling oneDNN";
   });
@@ -156,7 +156,7 @@ bool IsMKLEnabled() {
 #else
       false;
 #endif  // __linux__
-  absl::call_once(once, [&] {
+  abslx::call_once(once, [&] {
     auto status = ReadBoolFromEnvVar("TF_ENABLE_ONEDNN_OPTS", oneDNN_enabled,
                                      &oneDNN_enabled);
     if (!status.ok()) {

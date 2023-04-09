@@ -34,35 +34,35 @@ namespace gl {
 namespace object_accessor_internal {
 
 // Splits name[index1, index2...] into 'name' and {'index1', 'index2'...}.
-IndexedElement ParseElement(absl::string_view input) {
+IndexedElement ParseElement(abslx::string_view input) {
   auto i = input.find('[');
   if (i == std::string::npos || input.back() != ']') {
     return {};
   }
   return {input.substr(0, i),
-          absl::StrSplit(input.substr(i + 1, input.size() - i - 2), ',',
-                         absl::SkipWhitespace())};
+          abslx::StrSplit(input.substr(i + 1, input.size() - i - 2), ',',
+                         abslx::SkipWhitespace())};
 }
 
 }  // namespace object_accessor_internal
 
 namespace {
 
-void MaybeConvertToHalf(DataType data_type, absl::string_view value,
+void MaybeConvertToHalf(DataType data_type, abslx::string_view value,
                         std::string* output) {
   if (data_type == DataType::FLOAT16) {
-    absl::StrAppend(output, "Vec4ToHalf(", value, ")");
+    abslx::StrAppend(output, "Vec4ToHalf(", value, ")");
   } else {
-    absl::StrAppend(output, value);
+    abslx::StrAppend(output, value);
   }
 }
 
-void MaybeConvertFromHalf(DataType data_type, absl::string_view value,
+void MaybeConvertFromHalf(DataType data_type, abslx::string_view value,
                           std::string* output) {
   if (data_type == DataType::FLOAT16) {
-    absl::StrAppend(output, "Vec4FromHalf(", value, ")");
+    abslx::StrAppend(output, "Vec4FromHalf(", value, ")");
   } else {
-    absl::StrAppend(output, value);
+    abslx::StrAppend(output, value);
   }
 }
 
@@ -74,10 +74,10 @@ struct ReadFromTextureGenerator {
     }
     // 1D textures are emulated as 2D textures
     if (sampler_textures) {
-      absl::StrAppend(result, "texelFetch(", element.object_name, ", ivec2(",
+      abslx::StrAppend(result, "texelFetch(", element.object_name, ", ivec2(",
                       element.indices[0], ", 0), 0)");
     } else {
-      absl::StrAppend(result, "imageLoad(", element.object_name, ", ivec2(",
+      abslx::StrAppend(result, "imageLoad(", element.object_name, ", ivec2(",
                       element.indices[0], ", 0))");
     }
     return RewriteStatus::SUCCESS;
@@ -90,12 +90,12 @@ struct ReadFromTextureGenerator {
       return RewriteStatus::ERROR;
     }
     if (sampler_textures) {
-      absl::StrAppend(result, "texelFetch(", element.object_name, ", ivec",
-                      Shape::size(), "(", absl::StrJoin(element.indices, ", "),
+      abslx::StrAppend(result, "texelFetch(", element.object_name, ", ivec",
+                      Shape::size(), "(", abslx::StrJoin(element.indices, ", "),
                       "), 0)");
     } else {
-      absl::StrAppend(result, "imageLoad(", element.object_name, ", ivec",
-                      Shape::size(), "(", absl::StrJoin(element.indices, ", "),
+      abslx::StrAppend(result, "imageLoad(", element.object_name, ", ivec",
+                      Shape::size(), "(", abslx::StrJoin(element.indices, ", "),
                       "))");
     }
     return RewriteStatus::SUCCESS;
@@ -114,7 +114,7 @@ struct ReadFromBufferGenerator {
     }
     MaybeConvertFromHalf(
         data_type,
-        absl::StrCat(element.object_name, ".data[", element.indices[0], "]"),
+        abslx::StrCat(element.object_name, ".data[", element.indices[0], "]"),
         result);
     return RewriteStatus::SUCCESS;
   }
@@ -130,7 +130,7 @@ struct ReadFromBufferGenerator {
     }
     MaybeConvertFromHalf(
         data_type,
-        absl::StrCat(element.object_name, ".data[", element.indices[0], " + $",
+        abslx::StrCat(element.object_name, ".data[", element.indices[0], " + $",
                      element.object_name, "_w$ * (", element.indices[1], ")]"),
         result);
     *requires_sizes = true;
@@ -148,7 +148,7 @@ struct ReadFromBufferGenerator {
     }
     MaybeConvertFromHalf(
         data_type,
-        absl::StrCat(element.object_name, ".data[", element.indices[0], " + $",
+        abslx::StrCat(element.object_name, ".data[", element.indices[0], " + $",
                      element.object_name, "_w$ * (", element.indices[1], " + $",
                      element.object_name, "_h$ * (", element.indices[2], "))]"),
         result);
@@ -189,7 +189,7 @@ struct WriteToBufferGenerator {
       result->append("WRONG_NUMBER_OF_INDICES");
       return RewriteStatus::ERROR;
     }
-    absl::StrAppend(result, element.object_name, ".data[", element.indices[0],
+    abslx::StrAppend(result, element.object_name, ".data[", element.indices[0],
                     "] = ");
     MaybeConvertToHalf(data_type, value, result);
     return RewriteStatus::SUCCESS;
@@ -204,7 +204,7 @@ struct WriteToBufferGenerator {
       result->append("WRONG_NUMBER_OF_INDICES");
       return RewriteStatus::ERROR;
     }
-    absl::StrAppend(result, element.object_name, ".data[", element.indices[0],
+    abslx::StrAppend(result, element.object_name, ".data[", element.indices[0],
                     " + $", element.object_name, "_w$ * (", element.indices[1],
                     ")] = ");
     MaybeConvertToHalf(data_type, value, result);
@@ -221,7 +221,7 @@ struct WriteToBufferGenerator {
       result->append("WRONG_NUMBER_OF_INDICES");
       return RewriteStatus::ERROR;
     }
-    absl::StrAppend(result, element.object_name, ".data[", element.indices[0],
+    abslx::StrAppend(result, element.object_name, ".data[", element.indices[0],
                     " + $", element.object_name, "_w$ * (", element.indices[1],
                     " + $", element.object_name, "_h$ * (", element.indices[2],
                     "))] = ");
@@ -232,7 +232,7 @@ struct WriteToBufferGenerator {
 
   DataType data_type;
   const object_accessor_internal::IndexedElement& element;
-  absl::string_view value;
+  abslx::string_view value;
   std::string* result;
 
   // indicates that generated code accessed _w and/or _h index variables.
@@ -246,7 +246,7 @@ struct WriteToTextureGenerator {
       return RewriteStatus::ERROR;
     }
     // 1D textures are emulated as 2D textures
-    absl::StrAppend(result, "imageStore(", element.object_name, ", ivec2(",
+    abslx::StrAppend(result, "imageStore(", element.object_name, ", ivec2(",
                     element.indices[0], ", 0), ", value, ")");
     return RewriteStatus::SUCCESS;
   }
@@ -257,14 +257,14 @@ struct WriteToTextureGenerator {
       result->append("WRONG_NUMBER_OF_INDICES");
       return RewriteStatus::ERROR;
     }
-    absl::StrAppend(result, "imageStore(", element.object_name, ", ivec",
-                    Shape::size(), "(", absl::StrJoin(element.indices, ", "),
+    abslx::StrAppend(result, "imageStore(", element.object_name, ", ivec",
+                    Shape::size(), "(", abslx::StrJoin(element.indices, ", "),
                     "), ", value, ")");
     return RewriteStatus::SUCCESS;
   }
 
   const object_accessor_internal::IndexedElement& element;
-  absl::string_view value;
+  abslx::string_view value;
   std::string* result;
 };
 
@@ -272,7 +272,7 @@ struct WriteToTextureGenerator {
 RewriteStatus GenerateWriteAccessor(
     const Object& object,
     const object_accessor_internal::IndexedElement& element,
-    absl::string_view value, std::string* result, bool* requires_sizes) {
+    abslx::string_view value, std::string* result, bool* requires_sizes) {
   switch (object.object_type) {
     case ObjectType::BUFFER:
       return std::visit(WriteToBufferGenerator{object.data_type, element, value,
@@ -454,19 +454,19 @@ struct SizeParametersAdder {
 
   void operator()(const uint2& size) const {
     variable_accessor->AddUniformParameter(
-        {absl::StrCat(object_name, "_w"), static_cast<int32_t>(size.x)});
+        {abslx::StrCat(object_name, "_w"), static_cast<int32_t>(size.x)});
   }
 
   // p1 and p2 are padding. For some reason buffer does not map correctly
   // without it.
   void operator()(const uint3& size) const {
     variable_accessor->AddUniformParameter(
-        {absl::StrCat(object_name, "_w"), static_cast<int32_t>(size.x)});
+        {abslx::StrCat(object_name, "_w"), static_cast<int32_t>(size.x)});
     variable_accessor->AddUniformParameter(
-        {absl::StrCat(object_name, "_h"), static_cast<int32_t>(size.y)});
+        {abslx::StrCat(object_name, "_h"), static_cast<int32_t>(size.y)});
   }
 
-  absl::string_view object_name;
+  abslx::string_view object_name;
   VariableAccessor* variable_accessor;
 };
 
@@ -475,31 +475,31 @@ struct SizeParametersAdder {
 //  - 1D : empty
 //  - 2D : 'int object_name_w'
 //  - 3D : 'int object_name_w' + 'int object_name_h'
-void AddSizeParameters(absl::string_view object_name, const Object& object,
+void AddSizeParameters(abslx::string_view object_name, const Object& object,
                        VariableAccessor* parameters) {
   std::visit(SizeParametersAdder{object_name, parameters}, object.size);
 }
 
-void GenerateObjectDeclaration(absl::string_view name, const Object& object,
+void GenerateObjectDeclaration(abslx::string_view name, const Object& object,
                                std::string* declaration, bool is_mali,
                                bool sampler_textures) {
   switch (object.object_type) {
     case ObjectType::BUFFER:
       // readonly modifier used to fix shader compilation for Mali on Android 8,
       // see b/111601761
-      absl::StrAppend(declaration, "layout(binding = ", object.binding, ")",
+      abslx::StrAppend(declaration, "layout(binding = ", object.binding, ")",
                       ToAccessModifier(object.access, !is_mali), " buffer B",
                       object.binding, " { ", ToBufferType(object.data_type),
                       " data[]; } ", name, ";\n");
       break;
     case ObjectType::TEXTURE:
       if (sampler_textures && (object.access == AccessType::READ)) {
-        absl::StrAppend(declaration, "layout(binding = ", object.binding,
+        abslx::StrAppend(declaration, "layout(binding = ", object.binding,
                         ") uniform ", ToImagePrecision(object.data_type), " ",
                         ToImageType(object, sampler_textures), " ", name,
                         ";\n");
       } else {
-        absl::StrAppend(
+        abslx::StrAppend(
             declaration, "layout(", ToImageLayoutQualifier(object.data_type),
             ", binding = ", object.binding, ")",
             ToAccessModifier(object.access, true), " uniform ",
@@ -515,22 +515,22 @@ void GenerateObjectDeclaration(absl::string_view name, const Object& object,
 
 }  // namespace
 
-RewriteStatus ObjectAccessor::Rewrite(absl::string_view input,
+RewriteStatus ObjectAccessor::Rewrite(abslx::string_view input,
                                       std::string* output) {
   // Splits 'a  =b' into {'a','b'}.
-  std::pair<absl::string_view, absl::string_view> n =
-      absl::StrSplit(input, absl::MaxSplits('=', 1), absl::SkipWhitespace());
+  std::pair<abslx::string_view, abslx::string_view> n =
+      abslx::StrSplit(input, abslx::MaxSplits('=', 1), abslx::SkipWhitespace());
   if (n.first.empty()) {
     return RewriteStatus::NOT_RECOGNIZED;
   }
   if (n.second.empty()) {
-    return RewriteRead(absl::StripAsciiWhitespace(n.first), output);
+    return RewriteRead(abslx::StripAsciiWhitespace(n.first), output);
   }
-  return RewriteWrite(absl::StripAsciiWhitespace(n.first),
-                      absl::StripAsciiWhitespace(n.second), output);
+  return RewriteWrite(abslx::StripAsciiWhitespace(n.first),
+                      abslx::StripAsciiWhitespace(n.second), output);
 }
 
-RewriteStatus ObjectAccessor::RewriteRead(absl::string_view location,
+RewriteStatus ObjectAccessor::RewriteRead(abslx::string_view location,
                                           std::string* output) {
   auto element = object_accessor_internal::ParseElement(location);
   if (element.object_name.empty()) {
@@ -550,8 +550,8 @@ RewriteStatus ObjectAccessor::RewriteRead(absl::string_view location,
   return status;
 }
 
-RewriteStatus ObjectAccessor::RewriteWrite(absl::string_view location,
-                                           absl::string_view value,
+RewriteStatus ObjectAccessor::RewriteWrite(abslx::string_view location,
+                                           abslx::string_view value,
                                            std::string* output) {
   // name[index1, index2...] = value
   auto element = object_accessor_internal::ParseElement(location);
@@ -594,7 +594,7 @@ std::string ObjectAccessor::GetFunctionsDeclarations() const {
   for (const auto& o : name_to_object_) {
     if (o.second.data_type == DataType::FLOAT16 &&
         o.second.object_type == ObjectType::BUFFER) {
-      return absl::StrCat(
+      return abslx::StrCat(
           "#define Vec4FromHalf(v) vec4(unpackHalf2x16(v.x), "
           "unpackHalf2x16(v.y))\n",
           "#define Vec4ToHalf(v) uvec2(packHalf2x16(v.xy), "

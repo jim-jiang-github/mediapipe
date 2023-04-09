@@ -45,16 +45,16 @@ namespace tensorflow {
 namespace {
 
 using ValueCase = AttrValue::ValueCase;
-using TableNameToIntegerMap = absl::flat_hash_map<std::string, int>;
+using TableNameToIntegerMap = abslx::flat_hash_map<std::string, int>;
 
 // Returns names of the load and retrieve node of all optimizers supported
 // by TPUEmbedding.
-absl::flat_hash_set<std::string> GetLoadRetrieveNodeNames() {
+abslx::flat_hash_set<std::string> GetLoadRetrieveNodeNames() {
   std::vector<std::string> load_names =
       GetPerTableLoadOptimizationParametersOps();
   std::vector<std::string> retrieve_names =
       GetPerTableRetrieveOptimizationParametersOps();
-  absl::flat_hash_set<std::string> nodes(load_names.begin(), load_names.end());
+  abslx::flat_hash_set<std::string> nodes(load_names.begin(), load_names.end());
   nodes.insert(retrieve_names.begin(), retrieve_names.end());
   return nodes;
 }
@@ -65,7 +65,7 @@ Status GetTPUEmbeddingConfiguration(
     tensorflow::tpu::TPUEmbeddingConfiguration* tpu_embedding_config,
     std::string* tpu_embedding_config_str) {
   bool have_config = false;
-  const absl::flat_hash_set<std::string> load_retrieve_nodes =
+  const abslx::flat_hash_set<std::string> load_retrieve_nodes =
       GetLoadRetrieveNodeNames();
   for (Node* n : graph->nodes()) {
     const auto& node_name = n->op_def().name();
@@ -112,12 +112,12 @@ Status ValidateEmbeddingTableNames(
     const std::string& name = table.name();
     if (name.empty()) {
       return errors::InvalidArgument(
-          absl::StrFormat("Table %d has empty name string.", table_id));
+          abslx::StrFormat("Table %d has empty name string.", table_id));
     }
     bool inserted = gtl::InsertIfNotPresent(&table_name_map, name, table_id);
     if (!inserted) {
       return errors::InvalidArgument(
-          absl::StrFormat("Tables %d and %d have the same name '%s'.",
+          abslx::StrFormat("Tables %d and %d have the same name '%s'.",
                           table_name_map[name], table_id, name.c_str()));
     }
   }
@@ -125,14 +125,14 @@ Status ValidateEmbeddingTableNames(
 }
 
 // Gets single-table load-TPUEmbedding-parameter nodes in the graph.
-absl::flat_hash_set<Node*> GetLoadNodes(Graph* graph) {
+abslx::flat_hash_set<Node*> GetLoadNodes(Graph* graph) {
   const auto load_op_names = GetPerTableLoadOptimizationParametersOps();
   // Determines whether this node is a per-table load-parameters op.
   auto is_load_op = [&load_op_names](Node* n) {
     return n->IsOp() && std::find(load_op_names.begin(), load_op_names.end(),
                                   n->op_def().name()) != load_op_names.end();
   };
-  absl::flat_hash_set<Node*> result;
+  abslx::flat_hash_set<Node*> result;
   for (Node* n : graph->nodes()) {
     if (is_load_op(n)) {
       result.insert(n);
@@ -142,7 +142,7 @@ absl::flat_hash_set<Node*> GetLoadNodes(Graph* graph) {
 }
 
 // Gets single-table retrieve-TPUEmbedding-parameter nodes in the graph.
-absl::flat_hash_set<Node*> GetRetrieveNodes(Graph* graph) {
+abslx::flat_hash_set<Node*> GetRetrieveNodes(Graph* graph) {
   const auto retrieve_op_names = GetPerTableRetrieveOptimizationParametersOps();
   // Determines whether this node is a per-table retrieve-parameters op.
   auto is_retrieve_op = [&retrieve_op_names](Node* n) {
@@ -150,7 +150,7 @@ absl::flat_hash_set<Node*> GetRetrieveNodes(Graph* graph) {
            std::find(retrieve_op_names.begin(), retrieve_op_names.end(),
                      n->op_def().name()) != retrieve_op_names.end();
   };
-  absl::flat_hash_set<Node*> result;
+  abslx::flat_hash_set<Node*> result;
   for (Node* n : graph->nodes()) {
     if (is_retrieve_op(n)) {
       result.insert(n);
@@ -182,7 +182,7 @@ absl::flat_hash_set<Node*> GetRetrieveNodes(Graph* graph) {
 // Returns: Status (OK if successful; otherwise, an error status).
 //
 Status GetLoadOrRetrieveNodesByTable(
-    const absl::flat_hash_set<Node*>& candidate_nodes,
+    const abslx::flat_hash_set<Node*>& candidate_nodes,
     const tensorflow::tpu::TPUEmbeddingConfiguration& tpu_embedding_config,
     const TableNameToIntegerMap& table_name_to_id_map,
     const std::string& operation_str, std::vector<Node*>* nodes_per_table,
@@ -237,13 +237,13 @@ Status GetLoadOrRetrieveNodesByTable(
                          .parameters_case();
     const std::string alg_name = tpu::GetOptimizationAlgorithmName(alg);
     const std::string expected_op_name =
-        absl::StrCat(operation_str, "TPUEmbedding", alg_name, "Parameters");
+        abslx::StrCat(operation_str, "TPUEmbedding", alg_name, "Parameters");
     const std::string expected_op_name_debug =
-        absl::StrCat(expected_op_name, "GradAccumDebug");
+        abslx::StrCat(expected_op_name, "GradAccumDebug");
     if (n->op_def().name() != expected_op_name &&
         n->op_def().name() != expected_op_name_debug) {
       return errors::InvalidArgument(
-          absl::StrFormat("Node %s has op type %s instead of the name %s or %s "
+          abslx::StrFormat("Node %s has op type %s instead of the name %s or %s "
                           "expected from the embedding layer configuration",
                           n->name(), n->op_def().name(), expected_op_name,
                           expected_op_name_debug));
@@ -254,7 +254,7 @@ Status GetLoadOrRetrieveNodesByTable(
   }
   for (int table_id = 0; table_id < num_tables; ++table_id) {
     if ((*nodes_per_table)[table_id] == nullptr) {
-      return errors::NotFound(absl::StrFormat(
+      return errors::NotFound(abslx::StrFormat(
           "Did not find per-table load or retrieve op for table '%s' ID(%d)",
           tpu_embedding_config.table_descriptor(table_id).name(), table_id));
     }
@@ -274,7 +274,7 @@ using LoadCombinedParametersType =
 // Computes an array of ports containing the source of each table/parameter
 // combination. Fills in any unused ports with {nullptr, 0}.
 Status CombinePerTableParametersForLoad(
-    const absl::flat_hash_set<Node*>& load_nodes,
+    const abslx::flat_hash_set<Node*>& load_nodes,
     std::vector<Node*>* nodes_per_table,
     std::vector<bool>* is_debug_load_retrieve_node,
     const tensorflow::tpu::TPUEmbeddingConfiguration& tpu_embedding_config,
@@ -330,13 +330,13 @@ Status CombinePerTableParametersForLoad(
           (state_variable_specs[parameter_num].has_user_defined() ||
            (*is_debug_load_retrieve_node)[table_id])) {
         if (node == nullptr) {
-          return errors::InvalidArgument(absl::StrFormat(
+          return errors::InvalidArgument(abslx::StrFormat(
               "Found missing parameter in slot %d of table %s.", parameter_num,
               tpu_embedding_config.table_descriptor(table_id).name()));
         }
       } else {
         if (node != nullptr) {
-          return errors::InvalidArgument(absl::StrFormat(
+          return errors::InvalidArgument(abslx::StrFormat(
               "Found extra parameter in slot %d of table %s.", parameter_num,
               tpu_embedding_config.table_descriptor(table_id).name()));
         }
@@ -350,8 +350,8 @@ Status CombinePerTableParametersForLoad(
 // tf.function.
 void RemoveEdgesBetweenIndividualNodes(
     Graph* graph, const std::vector<std::string>& ops,
-    const absl::flat_hash_set<Node*>& nodes) {
-  const absl::flat_hash_set<std::string> ops_names(ops.begin(), ops.end());
+    const abslx::flat_hash_set<Node*>& nodes) {
+  const abslx::flat_hash_set<std::string> ops_names(ops.begin(), ops.end());
   std::vector<const Edge*> edges_to_remove;
   for (const auto* node : nodes) {
     for (const Edge* edge : node->out_edges()) {
@@ -393,8 +393,8 @@ Status CombineTPUEmbeddingLoadRetrievePass::Run(
         gtl::InsertIfNotPresent(&table_name_to_id_map, name, table_id));
   }
 
-  absl::flat_hash_set<Node*> load_nodes = GetLoadNodes(graph);
-  absl::flat_hash_set<Node*> retrieve_nodes = GetRetrieveNodes(graph);
+  abslx::flat_hash_set<Node*> load_nodes = GetLoadNodes(graph);
+  abslx::flat_hash_set<Node*> retrieve_nodes = GetRetrieveNodes(graph);
   // Remove control edges between individual load/retrieve ops that are
   // added by tf.function. tf.function auto-inserts dependencies between these
   // nodes. These edges would create cycles in the graph once the edges
@@ -404,8 +404,8 @@ Status CombineTPUEmbeddingLoadRetrievePass::Run(
   RemoveEdgesBetweenIndividualNodes(
       graph, GetPerTableRetrieveOptimizationParametersOps(), retrieve_nodes);
 
-  absl::flat_hash_map<int, std::string> load_devices;
-  absl::flat_hash_map<int, std::string> retrieve_devices;
+  abslx::flat_hash_map<int, std::string> load_devices;
+  abslx::flat_hash_map<int, std::string> retrieve_devices;
   if (!load_nodes.empty() || !retrieve_nodes.empty()) {
     // Only check for a config if there are load or retrieve nodes.
     TF_RETURN_IF_ERROR(tpu_embedding_config_error);
@@ -416,7 +416,7 @@ Status CombineTPUEmbeddingLoadRetrievePass::Run(
     auto it = load_devices.find(shard_id);
     if (it != load_devices.end()) {
       if (n->def().device() != it->second) {
-        return errors::InvalidArgument(absl::StrFormat(
+        return errors::InvalidArgument(abslx::StrFormat(
             "Mismatched device name in load parameter op for shard %d: found "
             "%s and conflicting %s in node %s",
             shard_id, it->second, n->def().device(), n->name()));
@@ -432,7 +432,7 @@ Status CombineTPUEmbeddingLoadRetrievePass::Run(
     auto it = retrieve_devices.find(shard_id);
     if (it != retrieve_devices.end()) {
       if (n->def().device() != it->second) {
-        return errors::InvalidArgument(absl::StrFormat(
+        return errors::InvalidArgument(abslx::StrFormat(
             "Mismatched device name in retrieve parameter op for shard %d: "
             "found %s and conflicting %s in node %s",
             shard_id, it->second, n->def().device(), n->name()));
@@ -460,7 +460,7 @@ Status CombineTPUEmbeddingLoadRetrievePass::Run(
     const std::string& device = shard_and_device.second;
     VLOG(2) << "Doing transformation for load device " << device << " shard "
             << shard_id;
-    absl::flat_hash_set<Node*> load_nodes_for_shard;
+    abslx::flat_hash_set<Node*> load_nodes_for_shard;
     for (Node* n : load_nodes) {
       TF_RET_CHECK(n->IsOp());
       int shard_id_to_filter;
@@ -496,7 +496,7 @@ Status CombineTPUEmbeddingLoadRetrievePass::Run(
            ++table_id) {
         const Port& output_of_input_node =
             combined_parameters[parameter_num][table_id];
-        auto make_const_node = [&](absl::string_view name,
+        auto make_const_node = [&](abslx::string_view name,
                                    TensorProto const_tensor,
                                    Node** constant_node) {
           return NodeBuilder(name, "Const")
@@ -563,7 +563,7 @@ Status CombineTPUEmbeddingLoadRetrievePass::Run(
         } else {
           TF_RET_CHECK(output_of_input_node.node != nullptr);
           const std::string new_input_str =
-              absl::StrFormat("%s:%d", output_of_input_node.node->name(),
+              abslx::StrFormat("%s:%d", output_of_input_node.node->name(),
                               output_of_input_node.port_index);
           VLOG(2) << "Using input " << new_input_str;
           *new_load_node_def.add_input() = new_input_str;
@@ -631,7 +631,7 @@ Status CombineTPUEmbeddingLoadRetrievePass::Run(
     const std::string& device = shard_and_device.second;
     VLOG(2) << "Doing transformation for retrieve device " << device
             << " shard " << shard_id;
-    absl::flat_hash_set<Node*> retrieve_nodes_for_shard;
+    abslx::flat_hash_set<Node*> retrieve_nodes_for_shard;
     for (Node* n : retrieve_nodes) {
       TF_RET_CHECK(n->IsOp());
       int shard_id_to_filter;
@@ -666,7 +666,7 @@ Status CombineTPUEmbeddingLoadRetrievePass::Run(
     // the control dependencies from the per-table retrieve ops to the
     // corresponding IdentityN ops).
     {
-      absl::flat_hash_set<Node*> control_edge_sources;
+      abslx::flat_hash_set<Node*> control_edge_sources;
       for (Node* n : retrieve_nodes_for_shard) {
         for (const Edge* e : n->in_edges()) {
           if (e->IsControlEdge()) {
@@ -706,7 +706,7 @@ Status CombineTPUEmbeddingLoadRetrievePass::Run(
         if (state_variable_specs_by_table[output_table_id][parameter_num]
                 .has_user_defined() ||
             is_debug_load_retrieve_node[output_table_id]) {
-          const std::string new_input_str = absl::StrFormat(
+          const std::string new_input_str = abslx::StrFormat(
               "%s:%d", new_retrieve_node->name(),
               parameter_num * tpu_embedding_config.table_descriptor_size() +
                   output_table_id);

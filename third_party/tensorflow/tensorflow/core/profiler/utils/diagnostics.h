@@ -25,15 +25,15 @@ namespace tensorflow {
 namespace profiler {
 
 // Error message that the visualization is based on incomplete step.
-TF_CONST_INIT extern const absl::string_view kErrorIncompleteStep;
+TF_CONST_INIT extern const abslx::string_view kErrorIncompleteStep;
 
 // Error message that no step marker is seen and visualization contains no
 // step info.
-TF_CONST_INIT extern const absl::string_view kErrorNoStepMarker;
+TF_CONST_INIT extern const abslx::string_view kErrorNoStepMarker;
 
-TF_CONST_INIT extern const absl::string_view kNoDeviceTraceCollected;
+TF_CONST_INIT extern const abslx::string_view kNoDeviceTraceCollected;
 
-TF_CONST_INIT extern const absl::string_view kStepsDropped;
+TF_CONST_INIT extern const abslx::string_view kStepsDropped;
 
 void PopulateStepDiagnostics(const OpStats& op_stats, Diagnostics* diag);
 

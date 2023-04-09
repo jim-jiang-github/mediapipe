@@ -22,18 +22,18 @@ namespace xla {
 namespace cpu {
 namespace orc_jit_memory_mapper {
 
-static absl::Mutex mapper_instance_mutex(absl::kConstInit);
+static abslx::Mutex mapper_instance_mutex(abslx::kConstInit);
 static llvm::SectionMemoryManager::MemoryMapper* mapper_instance
     ABSL_GUARDED_BY(mapper_instance_mutex) = nullptr;
 
 llvm::SectionMemoryManager::MemoryMapper* GetInstance() {
-  absl::MutexLock lock(&mapper_instance_mutex);
+  abslx::MutexLock lock(&mapper_instance_mutex);
   return mapper_instance;
 }
 
 Registrar::Registrar(
     std::unique_ptr<llvm::SectionMemoryManager::MemoryMapper> mapper) {
-  absl::MutexLock lock(&mapper_instance_mutex);
+  abslx::MutexLock lock(&mapper_instance_mutex);
   mapper_instance = mapper.release();
 }
 }  // namespace orc_jit_memory_mapper

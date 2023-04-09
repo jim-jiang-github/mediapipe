@@ -27,7 +27,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status Winograd4x4To36TileX6Test(TestExecutionEnvironment* env) {
+abslx::Status Winograd4x4To36TileX6Test(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 4, 4, 1);
   src_tensor.data.resize(16);
@@ -90,10 +90,10 @@ absl::Status Winograd4x4To36TileX6Test(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear(dst_ref.data, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Winograd36To4x4Tile4x1Test(TestExecutionEnvironment* env) {
+abslx::Status Winograd36To4x4Tile4x1Test(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 36, 1, 1);
   src_tensor.data.resize(36);
@@ -159,10 +159,10 @@ absl::Status Winograd36To4x4Tile4x1Test(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear(dst_ref.data, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Winograd4x4To36Test(TestExecutionEnvironment* env) {
+abslx::Status Winograd4x4To36Test(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 4, 4, 1);
   src_tensor.data.resize(16);
@@ -224,10 +224,10 @@ absl::Status Winograd4x4To36Test(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear(dst_ref.data, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status Winograd36To4x4Test(TestExecutionEnvironment* env) {
+abslx::Status Winograd36To4x4Test(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 36, 1, 1);
   src_tensor.data.resize(36);
@@ -291,7 +291,7 @@ absl::Status Winograd36To4x4Test(TestExecutionEnvironment* env) {
       RETURN_IF_ERROR(PointWiseNear(dst_ref.data, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

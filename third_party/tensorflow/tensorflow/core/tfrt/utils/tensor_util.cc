@@ -91,7 +91,7 @@ StatusOr<DType> ConvertTFDTypeToTFRTDType(tensorflow::DataType dtype) {
     return DType(DType::TFRT_DTYPE);
 #include "tensorflow/core/tfrt/utils/dtype.def"
     default:
-      return tensorflow::errors::Internal(absl::StrCat(
+      return tensorflow::errors::Internal(abslx::StrCat(
           "unsupported tensorflow dtype: ", tensorflow::DataType_Name(dtype)));
   }
 }

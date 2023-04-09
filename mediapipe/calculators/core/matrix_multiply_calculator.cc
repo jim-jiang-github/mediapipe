@@ -38,13 +38,13 @@ class MatrixMultiplyCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kIn, kOut, kSide);
 
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 };
 MEDIAPIPE_REGISTER_NODE(MatrixMultiplyCalculator);
 
-absl::Status MatrixMultiplyCalculator::Process(CalculatorContext* cc) {
+abslx::Status MatrixMultiplyCalculator::Process(CalculatorContext* cc) {
   kOut(cc).Send(*kSide(cc) * *kIn(cc));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace api2

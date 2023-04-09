@@ -43,7 +43,7 @@ TEST(PortTest, DeletedCopyConstructorInput) {
 class AbstractBase {
  public:
   virtual ~AbstractBase() = default;
-  virtual absl::string_view name() const = 0;
+  virtual abslx::string_view name() const = 0;
 };
 
 TEST(PortTest, Abstract) {

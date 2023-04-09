@@ -48,7 +48,7 @@ TEST(GPUDebugAllocatorTest, OverwriteDetection_None) {
   const PlatformDeviceId platform_device_id(0);
   auto stream_exec = ExecutorForPlatformDeviceId(platform_device_id);
   GPUDebugAllocator a(
-      new GPUBFCAllocator(absl::WrapUnique(new DeviceMemAllocator(
+      new GPUBFCAllocator(abslx::WrapUnique(new DeviceMemAllocator(
                               stream_exec, platform_device_id,
                               false /*use_unified_memory*/, {}, {})),
                           1 << 30, "", {}),
@@ -77,7 +77,7 @@ TEST(GPUDebugAllocatorTest, OverwriteDetection_Header) {
           const PlatformDeviceId platform_device_id(0);
           auto stream_exec = ExecutorForPlatformDeviceId(platform_device_id);
           GPUDebugAllocator a(
-              new GPUBFCAllocator(absl::WrapUnique(new DeviceMemAllocator(
+              new GPUBFCAllocator(abslx::WrapUnique(new DeviceMemAllocator(
                                       stream_exec, platform_device_id,
                                       false /*use_unified_memory*/, {}, {})),
                                   1 << 30, "", {}),
@@ -115,7 +115,7 @@ TEST(GPUDebugAllocatorTest, OverwriteDetection_Footer) {
           const PlatformDeviceId platform_device_id(0);
           auto stream_exec = ExecutorForPlatformDeviceId(platform_device_id);
           GPUDebugAllocator a(
-              new GPUBFCAllocator(absl::WrapUnique(new DeviceMemAllocator(
+              new GPUBFCAllocator(abslx::WrapUnique(new DeviceMemAllocator(
                                       stream_exec, platform_device_id,
                                       false /*use_unified_memory*/, {}, {})),
                                   1 << 30, "", {}),
@@ -150,7 +150,7 @@ TEST(GPUDebugAllocatorTest, ResetToNan) {
   const PlatformDeviceId platform_device_id(0);
   auto stream_exec = ExecutorForPlatformDeviceId(platform_device_id);
   GPUNanResetAllocator a(
-      new GPUBFCAllocator(absl::WrapUnique(new DeviceMemAllocator(
+      new GPUBFCAllocator(abslx::WrapUnique(new DeviceMemAllocator(
                               stream_exec, platform_device_id,
                               false /*use_unified_memory*/, {}, {})),
                           1 << 30, "", {}),
@@ -195,7 +195,7 @@ TEST(GPUDebugAllocatorTest, ResetToNanWithHeaderFooter) {
   auto stream_exec = ExecutorForPlatformDeviceId(platform_device_id);
   // NaN reset must be the outer-most allocator.
   GPUNanResetAllocator a(
-      new GPUBFCAllocator(absl::WrapUnique(new DeviceMemAllocator(
+      new GPUBFCAllocator(abslx::WrapUnique(new DeviceMemAllocator(
                               stream_exec, platform_device_id,
                               false /*use_unified_memory*/, {}, {})),
                           1 << 30, "", {}),
@@ -239,7 +239,7 @@ TEST(GPUDebugAllocatorTest, TracksSizes) {
   const PlatformDeviceId platform_device_id(0);
   auto stream_exec = ExecutorForPlatformDeviceId(platform_device_id);
   GPUDebugAllocator a(
-      new GPUBFCAllocator(absl::WrapUnique(new DeviceMemAllocator(
+      new GPUBFCAllocator(abslx::WrapUnique(new DeviceMemAllocator(
                               stream_exec, platform_device_id,
                               false /*use_unified_memory*/, {}, {})),
                           1 << 30, "", {}),
@@ -251,7 +251,7 @@ TEST(GPUDebugAllocatorTest, AllocatedVsRequested) {
   const PlatformDeviceId platform_device_id(0);
   auto stream_exec = ExecutorForPlatformDeviceId(platform_device_id);
   GPUDebugAllocator a(
-      new GPUBFCAllocator(absl::WrapUnique(new DeviceMemAllocator(
+      new GPUBFCAllocator(abslx::WrapUnique(new DeviceMemAllocator(
                               stream_exec, platform_device_id,
                               false /*use_unified_memory*/, {}, {})),
                           1 << 30, "", {}),

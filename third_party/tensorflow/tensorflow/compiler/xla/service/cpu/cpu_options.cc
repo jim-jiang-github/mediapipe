@@ -50,7 +50,7 @@ std::optional<int64_t> LlvmIrGemvTilingFactor(const HloModuleConfig& config) {
   auto it = extra_options_map.find(kLlvmIrDotTilingFactor);
   int64_t tiling_factor;
   if (it != extra_options_map.end() &&
-      absl::SimpleAtoi(it->second, &tiling_factor)) {
+      abslx::SimpleAtoi(it->second, &tiling_factor)) {
     return tiling_factor;
   }
   return std::nullopt;
@@ -62,8 +62,8 @@ bool ForceEnableExperimentalLlvmIrGemm(const HloModuleConfig& config) {
   return extra_options_map.count(kXlaForceEnableExperimentalLlvmIrGemm) > 0;
 }
 
-static absl::string_view RemoveSuffix(absl::string_view str,
-                                      absl::string_view suffix) {
+static abslx::string_view RemoveSuffix(abslx::string_view str,
+                                      abslx::string_view suffix) {
   CHECK_GE(str.size(), suffix.size());
   CHECK_EQ(str.substr(str.size() - suffix.size()), suffix);
   return str.substr(0, str.size() - suffix.size());
@@ -78,20 +78,20 @@ std::optional<std::tuple<int64_t, int64_t, int64_t>> LlvmIrGemmTileSize(
     return std::nullopt;
   }
 
-  std::vector<std::string> tile_components = absl::StrSplit(it->second, ':');
+  std::vector<std::string> tile_components = abslx::StrSplit(it->second, ':');
   CHECK_EQ(tile_components.size(), 3);
 
   int64_t tile_size_m;
   int64_t tile_size_k;
   int64_t tile_size_n_in_vector_width;
 
-  CHECK(absl::SimpleAtoi(tile_components[0], &tile_size_m));
-  CHECK(absl::SimpleAtoi(tile_components[1], &tile_size_k));
+  CHECK(abslx::SimpleAtoi(tile_components[0], &tile_size_m));
+  CHECK(abslx::SimpleAtoi(tile_components[1], &tile_size_k));
 
-  absl::string_view tile_size_n_in_vector_width_str =
+  abslx::string_view tile_size_n_in_vector_width_str =
       RemoveSuffix(tile_components[2], "*vectwidth");
 
-  CHECK(absl::SimpleAtoi(tile_size_n_in_vector_width_str,
+  CHECK(abslx::SimpleAtoi(tile_size_n_in_vector_width_str,
                          &tile_size_n_in_vector_width));
 
   return std::tuple<int64_t, int64_t, int64_t>(tile_size_m, tile_size_k,

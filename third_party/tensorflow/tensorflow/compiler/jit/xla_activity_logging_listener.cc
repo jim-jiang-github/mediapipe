@@ -90,7 +90,7 @@ class XlaActivityLoggingListener final : public XlaActivityListener {
       return enabled_by_default;
     }
 
-    return absl::string_view(log_xla_activity) == "1";
+    return abslx::string_view(log_xla_activity) == "1";
   }
 };
 

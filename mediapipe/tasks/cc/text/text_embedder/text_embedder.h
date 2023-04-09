@@ -71,14 +71,14 @@ class TextEmbedder : core::BaseTaskApi {
   // Creates a TextEmbedder from the provided `options`. A non-default
   // OpResolver can be specified in the BaseOptions in order to support custom
   // Ops or specify a subset of built-in Ops.
-  static absl::StatusOr<std::unique_ptr<TextEmbedder>> Create(
+  static abslx::StatusOr<std::unique_ptr<TextEmbedder>> Create(
       std::unique_ptr<TextEmbedderOptions> options);
 
   // Performs embedding extraction on the input `text`.
-  absl::StatusOr<TextEmbedderResult> Embed(absl::string_view text);
+  abslx::StatusOr<TextEmbedderResult> Embed(abslx::string_view text);
 
   // Shuts down the TextEmbedder when all the work is done.
-  absl::Status Close() { return runner_->Close(); }
+  abslx::Status Close() { return runner_->Close(); }
 
   // Utility function to compute cosine similarity [1] between two embeddings.
   // May return an InvalidArgumentError if e.g. the embeddings are of different
@@ -86,7 +86,7 @@ class TextEmbedder : core::BaseTaskApi {
   // 0.
   //
   // [1]: https://en.wikipedia.org/wiki/Cosine_similarity
-  static absl::StatusOr<double> CosineSimilarity(
+  static abslx::StatusOr<double> CosineSimilarity(
       const components::containers::Embedding& u,
       const components::containers::Embedding& v);
 };

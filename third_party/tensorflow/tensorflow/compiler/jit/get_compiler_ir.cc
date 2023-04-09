@@ -77,8 +77,8 @@ static StatusOr<std::unique_ptr<xla::LocalExecutable>> BuildExecutable(
 
 StatusOr<std::string> GetCompilerIr(
     IrExportStage stage, ProcessFunctionLibraryRuntime* pflr,
-    absl::string_view func_name, Device* dev, EagerContext* context,
-    absl::Span<const TensorHandle* const> inputs_handles) {
+    abslx::string_view func_name, Device* dev, EagerContext* context,
+    abslx::Span<const TensorHandle* const> inputs_handles) {
   // TODO(b/238830423): support GetCompilerIr on TFRT TPU device.
   if (dev->device_type() != DEVICE_CPU &&
       dev->tensorflow_accelerator_device_info()->stream == nullptr) {
@@ -108,7 +108,7 @@ StatusOr<std::string> GetCompilerIr(
     const Tensor* t;
     // Handle owns the tensor.
     TF_RETURN_IF_ERROR(th->Tensor(&t));
-    if (absl::c_binary_search(constant_arg_indices, i)) {
+    if (abslx::c_binary_search(constant_arg_indices, i)) {
       // Need to make sure it's on the host.
       inputs_storage.emplace_back(t->dtype(), t->shape());
       TF_RETURN_IF_ERROR(
@@ -122,7 +122,7 @@ StatusOr<std::string> GetCompilerIr(
   std::vector<VariableInfo> variable_infos;
   TF_RETURN_IF_ERROR(GetVariableInfosFromInputs(
       rmgr, dev, inputs, resource_arg_indices, &variable_infos));
-  TF_RETURN_IF_ERROR(LockVariables(absl::MakeSpan(variable_infos)));
+  TF_RETURN_IF_ERROR(LockVariables(abslx::MakeSpan(variable_infos)));
 
   XlaPlatformInfo platform_info = XlaPlatformInfoFromDevice(dev);
 

@@ -51,7 +51,7 @@ class Resampler {
   }
 
   // In-place processing is not supported.
-  void ProcessSamples(absl::Span<const ValueType> input,
+  void ProcessSamples(abslx::Span<const ValueType> input,
                       std::vector<ValueType>* output) {
     DCHECK(Valid());
     DCHECK(output != nullptr);
@@ -77,7 +77,7 @@ class Resampler {
  protected:
   virtual void ResetImpl() = 0;
   virtual bool ValidImpl() const = 0;
-  virtual void ProcessSamplesImpl(absl::Span<const ValueType> input,
+  virtual void ProcessSamplesImpl(abslx::Span<const ValueType> input,
                                   std::vector<ValueType>* output) = 0;
   virtual void FlushImpl(std::vector<ValueType>* output) = 0;
 };

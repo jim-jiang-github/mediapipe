@@ -27,9 +27,9 @@ namespace mediapipe {
 // both expected to contain one label per line.
 // Returns an error e.g. if there's a mismatch between the number of labels and
 // display names.
-absl::StatusOr<proto_ns::Map<int64, ::mediapipe::LabelMapItem>>
-BuildLabelMapFromFiles(absl::string_view labels_file_contents,
-                       absl::string_view display_names_file);
+abslx::StatusOr<proto_ns::Map<int64, ::mediapipe::LabelMapItem>>
+BuildLabelMapFromFiles(abslx::string_view labels_file_contents,
+                       abslx::string_view display_names_file);
 
 }  // namespace mediapipe
 

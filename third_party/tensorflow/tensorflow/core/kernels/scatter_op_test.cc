@@ -182,7 +182,7 @@ TEST_F(ScatterUpdateOpTest, Error_IndexOutOfRange) {
                            {100, 101, 102, 777, 778, 779, 10000, 10001, 10002});
   Status s = RunOpKernel();
   EXPECT_TRUE(
-      absl::StrContains(s.ToString(), "indices[2] = 99 is not in [0, 5)"))
+      abslx::StrContains(s.ToString(), "indices[2] = 99 is not in [0, 5)"))
       << s;
 }
 
@@ -195,7 +195,7 @@ TEST_F(ScatterSubOpTest, Error_IndexOutOfRange) {
   AddInputFromArray<float>(TensorShape({3}), {100, 101, 102});
   Status s = RunOpKernel();
   EXPECT_TRUE(
-      absl::StrContains(s.ToString(), "indices[2] = 99 is not in [0, 14)"))
+      abslx::StrContains(s.ToString(), "indices[2] = 99 is not in [0, 14)"))
       << s;
 }
 
@@ -226,7 +226,7 @@ TEST_F(ScatterUpdateOpTest, Error_WrongDimsIndices) {
   AddInputFromArray<float>(TensorShape({3, 3}),
                            {100, 101, 102, 777, 778, 779, 10000, 10001, 10002});
   Status s = RunOpKernel();
-  EXPECT_TRUE(absl::StrContains(s.ToString(),
+  EXPECT_TRUE(abslx::StrContains(s.ToString(),
                                 "Must have updates.shape = indices.shape + "
                                 "params.shape[1:] or updates.shape = [], got "))
       << s;
@@ -243,7 +243,7 @@ TEST_F(ScatterUpdateOpTest, Error_MismatchedParamsAndUpdateDimensions) {
       TensorShape({3, 4}),
       {100, 101, 102, 103, 777, 778, 779, 780, 10000, 10001, 10002, 10004});
   Status s = RunOpKernel();
-  EXPECT_TRUE(absl::StrContains(s.ToString(),
+  EXPECT_TRUE(abslx::StrContains(s.ToString(),
                                 "Must have updates.shape = indices.shape + "
                                 "params.shape[1:] or updates.shape = [], got "))
 
@@ -260,7 +260,7 @@ TEST_F(ScatterUpdateOpTest, Error_MismatchedIndicesAndUpdateDimensions) {
   AddInputFromArray<float>(TensorShape({2, 3}),
                            {100, 101, 102, 10000, 10001, 10002});
   Status s = RunOpKernel();
-  EXPECT_TRUE(absl::StrContains(s.ToString(),
+  EXPECT_TRUE(abslx::StrContains(s.ToString(),
                                 "Must have updates.shape = indices.shape + "
                                 "params.shape[1:] or updates.shape = [], got "))
       << s;

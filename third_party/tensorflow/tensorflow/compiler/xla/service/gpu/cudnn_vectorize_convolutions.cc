@@ -120,7 +120,7 @@ static XlaOp MoveDim(XlaOp instr, int64_t src, int64_t dst) {
   int64_t rank = b.GetShape(instr)->dimensions_size();
 
   DimensionVector idxs(rank);
-  absl::c_iota(idxs, 0);
+  abslx::c_iota(idxs, 0);
   if (src < dst) {
     idxs.insert(idxs.begin() + dst, src);
     idxs.erase(idxs.begin() + src);
@@ -308,8 +308,8 @@ static StatusOr<bool> TryRevectorizeConv(
 
   // We use XlaBuilder because it's a lot easier to get these tricky
   // reshape/transposes correct using that API.
-  XlaBuilder b(absl::StrCat(conv->name(), ".revectorized"));
-  absl::InlinedVector<XlaOp, 4> new_operands = {
+  XlaBuilder b(abslx::StrCat(conv->name(), ".revectorized"));
+  abslx::InlinedVector<XlaOp, 4> new_operands = {
       RevectorizeInstr(Parameter(&b, 0, conv->operand(0)->shape(), "input"),
                        dnums.input_feature_dimension(), *input_vect_dim,
                        vect_size),
@@ -368,7 +368,7 @@ static StatusOr<bool> TryRevectorizeConv(
   // preserve e.g. "cudnn-conv.42" instead of "custom-call.42".
   auto new_conv_comp_instrs = new_conv_comp->instructions();
   auto new_conv_it =
-      absl::c_find_if(new_conv_comp_instrs, [](HloInstruction* instr) {
+      abslx::c_find_if(new_conv_comp_instrs, [](HloInstruction* instr) {
         return instr->opcode() == HloOpcode::kCustomCall;
       });
   if (new_conv_it != new_conv_comp_instrs.end()) {
@@ -432,9 +432,9 @@ static StatusOr<bool> TryVectorizeConv(
 
   // We use XlaBuilder because it's a lot easier to get these tricky
   // reshape/transposes correct using that API.
-  XlaBuilder b(absl::StrCat(conv->name(), ".revectorized"));
+  XlaBuilder b(abslx::StrCat(conv->name(), ".revectorized"));
 
-  absl::InlinedVector<XlaOp, 4> new_operands = {
+  abslx::InlinedVector<XlaOp, 4> new_operands = {
       SplitAtDim(Parameter(&b, 0, conv->operand(0)->shape(), "input"),
                  dnums.input_feature_dimension(), vect_size),
       SplitAtDim(Parameter(&b, 1, conv->operand(1)->shape(), "filter"),
@@ -494,7 +494,7 @@ static StatusOr<bool> TryVectorizeConv(
 
 StatusOr<bool> CudnnVectorizeConvolutions::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   for (HloComputation* comp :
        module->MakeNonfusionComputations(execution_threads)) {

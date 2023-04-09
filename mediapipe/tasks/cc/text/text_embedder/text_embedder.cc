@@ -76,7 +76,7 @@ ConvertTextEmbedderOptionsToProto(TextEmbedderOptions* options) {
 
 }  // namespace
 
-absl::StatusOr<std::unique_ptr<TextEmbedder>> TextEmbedder::Create(
+abslx::StatusOr<std::unique_ptr<TextEmbedder>> TextEmbedder::Create(
     std::unique_ptr<TextEmbedderOptions> options) {
   std::unique_ptr<proto::TextEmbedderGraphOptions> options_proto =
       ConvertTextEmbedderOptionsToProto(options.get());
@@ -86,7 +86,7 @@ absl::StatusOr<std::unique_ptr<TextEmbedder>> TextEmbedder::Create(
       std::move(options->base_options.op_resolver));
 }
 
-absl::StatusOr<TextEmbedderResult> TextEmbedder::Embed(absl::string_view text) {
+abslx::StatusOr<TextEmbedderResult> TextEmbedder::Embed(abslx::string_view text) {
   ASSIGN_OR_RETURN(
       auto output_packets,
       runner_->Process(
@@ -95,7 +95,7 @@ absl::StatusOr<TextEmbedderResult> TextEmbedder::Embed(absl::string_view text) {
       output_packets[kEmbeddingsStreamName].Get<EmbeddingResult>());
 }
 
-absl::StatusOr<double> TextEmbedder::CosineSimilarity(
+abslx::StatusOr<double> TextEmbedder::CosineSimilarity(
     const components::containers::Embedding& u,
     const components::containers::Embedding& v) {
   return components::utils::CosineSimilarity(u, v);

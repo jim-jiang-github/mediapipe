@@ -67,7 +67,7 @@ DTensorMlirPassRunner::DTensorMlirPassRunner()
 Status DTensorMlirPassRunner::RunOnGraph(
     const DeviceSet& device_set, bool is_func,
     FunctionLibraryDefinition* flib_def, std::unique_ptr<Graph>* graph,
-    absl::flat_hash_set<Node*>& control_ret_nodes, Fprint128 cache_key) {
+    abslx::flat_hash_set<Node*>& control_ret_nodes, Fprint128 cache_key) {
   Graph* input_graph = graph->get();
   GraphDebugInfo debug_info;
   GraphImportConfig import_config;
@@ -89,7 +89,7 @@ Status DTensorMlirPassRunner::RunOnGraph(
                                       import_config, &context_);
   if (!module_ref.ok())
     return errors::InvalidArgument(
-        absl::StrCat(
+        abslx::StrCat(
             "Can not convert the graph to MLIR, errors from MLIR converter : ",
             module_ref.status().error_message())
             .c_str());
@@ -107,7 +107,7 @@ Status DTensorMlirPassRunner::RunOnGraph(
   // cache key) so they have unique names.
   module->setAttr(
       dtensor::kCacheKey,
-      mlir::StringAttr::get(&context_, absl::StrCat("_", cache_key.low64, "_",
+      mlir::StringAttr::get(&context_, abslx::StrCat("_", cache_key.low64, "_",
                                                     cache_key.high64)));
 
   // Executes and collects results from the passes.

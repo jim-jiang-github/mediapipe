@@ -34,7 +34,7 @@ namespace tensorflow {
 namespace {
 
 static void ExpectHasSubstr(StringPiece s, StringPiece expected) {
-  EXPECT_TRUE(absl::StrContains(s, expected))
+  EXPECT_TRUE(abslx::StrContains(s, expected))
       << "'" << s << "' does not contain '" << expected << "'";
 }
 

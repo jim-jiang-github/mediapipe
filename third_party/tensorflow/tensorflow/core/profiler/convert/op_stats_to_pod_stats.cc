@@ -29,7 +29,7 @@ namespace profiler {
 
 namespace {
 
-PodStatsRecord CreatePodStatsRecord(absl::string_view host_name,
+PodStatsRecord CreatePodStatsRecord(abslx::string_view host_name,
                                     const StepInfoResult& step_info) {
   PodStatsRecord record;
   GenericStepBreakdown generic;
@@ -39,7 +39,7 @@ PodStatsRecord CreatePodStatsRecord(absl::string_view host_name,
   record.set_step_num(step_info.step_num());
   record.set_total_duration_us(PicoToMicro(step_info.duration_ps()));
   auto& step_breakdown_map = *record.mutable_step_breakdown_us();
-  std::vector<std::pair<uint64, absl::string_view>> metrics;
+  std::vector<std::pair<uint64, abslx::string_view>> metrics;
 
   auto add_event = [&](GenericEventType type,
                        std::initializer_list<EventType> event_list) {
@@ -76,7 +76,7 @@ PodStatsDatabase ConvertOpStatsToPodStats(const OpStats& op_stats) {
        i <= GenericEventType::kLastGenericEventType; i++) {
     auto& event = *pod_stats_db.add_step_breakdown_events();
     event.set_id(i);
-    absl::string_view type_str =
+    abslx::string_view type_str =
         GetGenericEventTypeStr(static_cast<GenericEventType>(i));
     event.set_name(type_str.data(), type_str.size());
   }

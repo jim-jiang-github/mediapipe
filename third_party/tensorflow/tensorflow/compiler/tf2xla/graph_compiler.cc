@@ -149,7 +149,7 @@ Status GraphCompiler::Compile() {
     TF_RET_CHECK(!n->IsRecv() && !n->IsSend() && !n->IsSwitch())
         << "Not supported node: " << n->DebugString();
     params.op_kernel = op_kernel.get();
-    absl::InlinedVector<AllocatorAttributes, 4> output_attr(n->num_outputs());
+    abslx::InlinedVector<AllocatorAttributes, 4> output_attr(n->num_outputs());
     params.output_attr_array = output_attr.data();
 
     // tensor_inputs_ is a buffer reused across graph traversal. We clean up and

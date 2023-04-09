@@ -80,8 +80,8 @@ GraphDef CreateGraphDef() {
       "/job:localhost/replica:0/task:0/device:CPU:0");
   Output a = ops::Placeholder(root.WithOpName("A"), DT_FLOAT);
   for (int i = 0; i < 5; i++) {
-    a = ops::MatMul(root.WithOpName(absl::StrCat("matmul_", i)), a, a);
-    a = ops::Add(root.WithOpName(absl::StrCat("add_", i)), a, a);
+    a = ops::MatMul(root.WithOpName(abslx::StrCat("matmul_", i)), a, a);
+    a = ops::Add(root.WithOpName(abslx::StrCat("add_", i)), a, a);
   }
 
   GraphDef graph_def;

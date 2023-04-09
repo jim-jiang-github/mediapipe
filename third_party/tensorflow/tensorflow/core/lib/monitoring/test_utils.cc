@@ -47,12 +47,12 @@ StatusOr<Histogram> Histogram::Subtract(const Histogram& other) const {
     return Histogram(histogram_proto);
   }
 
-  if (!absl::c_equal(histogram_proto.bucket_limit(),
+  if (!abslx::c_equal(histogram_proto.bucket_limit(),
                      other.histogram_proto_.bucket_limit())) {
     return errors::InvalidArgument(
         "Subtracting a histogram with different buckets. Left: [",
-        absl::StrJoin(histogram_proto.bucket_limit(), ", "), "], right: [",
-        absl::StrJoin(other.histogram_proto_.bucket_limit(), ", "), "].");
+        abslx::StrJoin(histogram_proto.bucket_limit(), ", "), "], right: [",
+        abslx::StrJoin(other.histogram_proto_.bucket_limit(), ", "), "].");
   }
 
   histogram_proto.set_num(histogram_proto.num() - other.histogram_proto_.num());
@@ -66,7 +66,7 @@ StatusOr<Histogram> Histogram::Subtract(const Histogram& other) const {
 
   const bool histogram_is_valid =
       histogram_proto.num() >= 0 &&
-      absl::c_all_of(histogram_proto.bucket(),
+      abslx::c_all_of(histogram_proto.bucket(),
                      [](const double num) { return num >= 0; });
   if (!histogram_is_valid) {
     return errors::InvalidArgument(

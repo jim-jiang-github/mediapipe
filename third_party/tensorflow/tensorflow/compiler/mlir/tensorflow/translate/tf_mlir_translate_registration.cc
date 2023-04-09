@@ -38,7 +38,7 @@ using stream_executor::port::Status;
 using stream_executor::port::StatusOr;
 
 namespace {
-inline absl::string_view StringRefToView(llvm::StringRef ref) {
+inline abslx::string_view StringRefToView(llvm::StringRef ref) {
   return {ref.data(), ref.size()};
 }
 }  // namespace

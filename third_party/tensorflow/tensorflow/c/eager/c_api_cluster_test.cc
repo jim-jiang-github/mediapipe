@@ -440,7 +440,7 @@ void TestConnectToCluster(bool keep_localhost_for_first_connect) {
   EXPECT_EQ(TF_OK, TF_GetCode(status)) << TF_Message(status);
 
   const string dev1_name =
-      absl::StrCat("/job:", first_name, "/replica:0/task:0/device:CPU:0");
+      abslx::StrCat("/job:", first_name, "/replica:0/task:0/device:CPU:0");
   TFE_TensorHandle* var_handle1 = TestVariable(ctx, 2.0, dev1_name);
   EXPECT_NE(var_handle1, nullptr);
   EXPECT_EQ(tensorflow::unwrap(var_handle1)->DeviceName(&status2), dev1_name);
@@ -450,7 +450,7 @@ void TestConnectToCluster(bool keep_localhost_for_first_connect) {
   server_def.set_job_name(second_name);
   server_def.mutable_cluster()->mutable_job(0)->set_name(second_name);
   (*server_def.mutable_cluster()->mutable_job(0)->mutable_tasks())[0] =
-      absl::StrCat(second_name, ":",
+      abslx::StrCat(second_name, ":",
                    tensorflow::testing::PickUnusedPortOrDie());
 
   serialized = server_def.SerializeAsString();

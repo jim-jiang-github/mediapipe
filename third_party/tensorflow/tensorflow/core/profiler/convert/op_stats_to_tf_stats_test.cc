@@ -35,9 +35,9 @@ namespace {
 XEventBuilder AddTensorFlowOpEvent(std::string&& tf_op_fullname,
                                    int64_t start_timestamp_ns,
                                    int64_t duration_ns, bool on_device,
-                                   absl::string_view kernel_name,
+                                   abslx::string_view kernel_name,
                                    XPlaneBuilder* plane, XLineBuilder* line) {
-  absl::string_view name = on_device ? kernel_name : tf_op_fullname;
+  abslx::string_view name = on_device ? kernel_name : tf_op_fullname;
   XEventBuilder event = line->AddEvent(*plane->GetOrCreateEventMetadata(name));
   event.SetTimestampNs(start_timestamp_ns);
   event.SetDurationNs(duration_ns);
@@ -51,8 +51,8 @@ XEventBuilder AddTensorFlowOpEvent(std::string&& tf_op_fullname,
 void AddTensorFlowOpEventWithKernelDetails(std::string&& tf_op_fullname,
                                            int64_t start_timestamp_ns,
                                            int64_t duration_ns, bool on_device,
-                                           absl::string_view kernel_name,
-                                           absl::string_view kernel_details,
+                                           abslx::string_view kernel_name,
+                                           abslx::string_view kernel_details,
                                            XPlaneBuilder* plane,
                                            XLineBuilder* line) {
   XEventBuilder event =
@@ -98,27 +98,27 @@ occ_pct:100)MULTI";
   XPlaneBuilder device_plane(
       GetOrCreateGpuXPlane(&space, /*device_ordinal=*/0));
   XLineBuilder stream1 = device_plane.GetOrCreateLine(/*line_id=*/10);
-  AddTensorFlowOpEvent(absl::StrCat(kTfOp1, ":", kTfOp1), kKernel1StartNs,
+  AddTensorFlowOpEvent(abslx::StrCat(kTfOp1, ":", kTfOp1), kKernel1StartNs,
                        kKernel1DurationNs, /*on_device=*/true, kKernel1,
                        &device_plane, &stream1);
-  AddTensorFlowOpEvent(absl::StrCat(kTfOp1, ":", kTfOp1), kKernel2StartNs,
+  AddTensorFlowOpEvent(abslx::StrCat(kTfOp1, ":", kTfOp1), kKernel2StartNs,
                        kKernel2DurationNs, /*on_device=*/true, kKernel2,
                        &device_plane, &stream1);
   XLineBuilder stream2 = device_plane.GetOrCreateLine(/*line_id=*/20);
-  AddTensorFlowOpEvent(absl::StrCat(kTfOp1, ":", kTfOp1), kKernel1StartNs,
+  AddTensorFlowOpEvent(abslx::StrCat(kTfOp1, ":", kTfOp1), kKernel1StartNs,
                        kKernel1DurationNs, /*on_device=*/true, kKernel1,
                        &device_plane, &stream2);
-  AddTensorFlowOpEvent(absl::StrCat(kTfOp1, ":", kTfOp1), kKernel2StartNs,
+  AddTensorFlowOpEvent(abslx::StrCat(kTfOp1, ":", kTfOp1), kKernel2StartNs,
                        kKernel2DurationNs, /*on_device=*/true, kKernel2,
                        &device_plane, &stream2);
-  AddTensorFlowOpEvent(absl::StrCat(kTfOp2, ":", kTfOp2), kKernel3StartNs,
+  AddTensorFlowOpEvent(abslx::StrCat(kTfOp2, ":", kTfOp2), kKernel3StartNs,
                        kKernel3DurationNs, /*on_device=*/true, kKernel3,
                        &device_plane, &stream2);
   AddTensorFlowOpEventWithKernelDetails(
-      absl::StrCat(kTfOp3, ":", kTfOp3), kKernel4StartNs, kKernel4DurationNs,
+      abslx::StrCat(kTfOp3, ":", kTfOp3), kKernel4StartNs, kKernel4DurationNs,
       /*on_device=*/true, kKernel4, kKernelDetails, &device_plane, &stream2);
   AddTensorFlowOpEventWithKernelDetails(
-      absl::StrCat(kTfOp3, ":", kTfOp3), kKernel5StartNs, kKernel5DurationNs,
+      abslx::StrCat(kTfOp3, ":", kTfOp3), kKernel5StartNs, kKernel5DurationNs,
       /*on_device=*/true, kKernel5, kKernelDetails, &device_plane, &stream2);
 
   OpStatsOptions options;

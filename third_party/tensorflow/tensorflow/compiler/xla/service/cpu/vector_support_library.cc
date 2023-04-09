@@ -438,12 +438,12 @@ TileVariable::TileVariable(VectorSupportLibrary* vector_support,
 
 std::vector<llvm::Value*> TileVariable::Get() const {
   std::vector<llvm::Value*> result;
-  absl::c_transform(storage_, std::back_inserter(result),
+  abslx::c_transform(storage_, std::back_inserter(result),
                     [&](VectorVariable vect_var) { return vect_var.Get(); });
   return result;
 }
 
-void TileVariable::Set(absl::Span<llvm::Value* const> value) {
+void TileVariable::Set(abslx::Span<llvm::Value* const> value) {
   CHECK_EQ(value.size(), storage_.size());
   for (int64_t i = 0, e = value.size(); i < e; i++) {
     storage_[i].Set(value[i]);

@@ -270,7 +270,7 @@ std::string GetArrayLabel(const Model& model, const std::string& array_id) {
   html += R"CODE(<TR><TD COLSPAN="2" ALIGN="CENTER">)CODE";
   html += R"CODE(<FONT POINT-SIZE="16" FACE="Helvetica"><I>)CODE";
   AppendF(&html, R"CODE(%s)CODE",
-          std::vector<std::string>(absl::StrSplit(array_id, '/')).back());
+          std::vector<std::string>(abslx::StrSplit(array_id, '/')).back());
   html += R"CODE(</I></FONT>)CODE";
   html += "</TD></TR>";
 
@@ -468,7 +468,7 @@ std::string GetOpLabel(const Model& model, const Operator& op) {
     html += static_cast<const TensorFlowUnsupportedOperator&>(op).tensorflow_op;
   } else {
     html +=
-        std::string(absl::StripPrefix(OperatorTypeName(op.type), "TensorFlow"));
+        std::string(abslx::StripPrefix(OperatorTypeName(op.type), "TensorFlow"));
   }
   html += R"CODE(</B></FONT>)CODE";
   html += "</TD></TR>";
@@ -707,7 +707,7 @@ void InsertNode(const Model& model, const std::string& array_id, Node* node,
 void BuildArrayTree(const Model& model, Node* tree) {
   // Delimit array names by path "/", then place into a tree based on this path.
   for (const auto& array_id : model.GetArrayMap()) {
-    std::vector<std::string> prefixes = absl::StrSplit(array_id.first, '/');
+    std::vector<std::string> prefixes = abslx::StrSplit(array_id.first, '/');
     std::reverse(prefixes.begin(), prefixes.end());
     int64_t math_ops;  // Temporary storage for math ops used during recursion.
     InsertNode(model, array_id.first, tree, prefixes, &math_ops);

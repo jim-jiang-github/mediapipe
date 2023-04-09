@@ -35,9 +35,9 @@ namespace api2 {
 using ::mediapipe::tasks::core::FindTensorIndexByMetadataName;
 using ::mediapipe::tasks::metadata::ModelMetadataExtractor;
 
-constexpr absl::string_view kQueryTextMetadataName = "inp_text";
-constexpr absl::string_view kResponseContextMetadataName = "res_context";
-constexpr absl::string_view kResponseTextMetadataName = "res_text";
+constexpr abslx::string_view kQueryTextMetadataName = "inp_text";
+constexpr abslx::string_view kResponseContextMetadataName = "res_context";
+constexpr abslx::string_view kResponseTextMetadataName = "res_text";
 
 constexpr int kNumInputTensorsForUniversalSentenceEncoder = 3;
 
@@ -90,8 +90,8 @@ class UniversalSentenceEncoderPreprocessorCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kTextIn, kMetadataExtractorSideIn, kTensorsOut);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   // Indices of the three input tensors for the USE model. They should form the
@@ -109,7 +109,7 @@ class UniversalSentenceEncoderPreprocessorCalculator : public Node {
   std::array<int, kNumInputTensorsForUniversalSentenceEncoder> tensor_shapes_;
 };
 
-absl::Status UniversalSentenceEncoderPreprocessorCalculator::Open(
+abslx::Status UniversalSentenceEncoderPreprocessorCalculator::Open(
     CalculatorContext* cc) {
   const ModelMetadataExtractor* metadata_extractor =
       &kMetadataExtractorSideIn(cc).Get();
@@ -121,21 +121,21 @@ absl::Status UniversalSentenceEncoderPreprocessorCalculator::Open(
   response_text_tensor_index_ = FindTensorIndexByMetadataName(
       input_tensors_metadata, kResponseTextMetadataName);
 
-  absl::flat_hash_set<int> tensor_indices = absl::flat_hash_set<int>(
+  abslx::flat_hash_set<int> tensor_indices = abslx::flat_hash_set<int>(
       {query_text_tensor_index_, response_context_tensor_index_,
        response_text_tensor_index_});
-  if (tensor_indices != absl::flat_hash_set<int>({0, 1, 2})) {
-    return absl::InvalidArgumentError(absl::Substitute(
+  if (tensor_indices != abslx::flat_hash_set<int>({0, 1, 2})) {
+    return abslx::InvalidArgumentError(abslx::Substitute(
         "Input tensor indices form the set {$0, $1, $2} rather than {0, 1, 2}",
         query_text_tensor_index_, response_context_tensor_index_,
         response_text_tensor_index_));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status UniversalSentenceEncoderPreprocessorCalculator::Process(
+abslx::Status UniversalSentenceEncoderPreprocessorCalculator::Process(
     CalculatorContext* cc) {
-  absl::string_view text = kTextIn(cc).Get();
+  abslx::string_view text = kTextIn(cc).Get();
   const int text_len = static_cast<int>(text.length());
   tensor_shapes_[response_text_tensor_index_] = text_len;
 
@@ -158,7 +158,7 @@ absl::Status UniversalSentenceEncoderPreprocessorCalculator::Process(
                   .buffer<char>(),
               text.data(), text_len * sizeof(char));
   kTensorsOut(cc).Send(std::move(input_tensors));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 MEDIAPIPE_REGISTER_NODE(UniversalSentenceEncoderPreprocessorCalculator);

@@ -164,11 +164,11 @@ class GlTextureBuffer
   const GLenum target_ = GL_TEXTURE_2D;
   // Token tracking changes to this texture. Used by WaitUntilComplete.
   std::shared_ptr<GlSyncPoint> producer_sync_;
-  mutable absl::Mutex consumer_sync_mutex_;
+  mutable abslx::Mutex consumer_sync_mutex_;
   // Tokens tracking the point when consumers finished using this texture.
   mutable std::unique_ptr<GlMultiSyncPoint> consumer_multi_sync_
       ABSL_GUARDED_BY(consumer_sync_mutex_) =
-          absl::make_unique<GlMultiSyncPoint>();
+          abslx::make_unique<GlMultiSyncPoint>();
   DeletionCallback deletion_callback_;
   std::shared_ptr<GlContext> producer_context_;
 };

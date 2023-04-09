@@ -148,7 +148,7 @@ class CustomWriter : public Writer {
   Status WriteRecord(const StringPiece& data);
 
 #if defined(TF_CORD_SUPPORT)
-  Status WriteRecord(const absl::Cord& data);
+  Status WriteRecord(const abslx::Cord& data);
 #endif  // TF_CORD_SUPPORT
 
   std::unique_ptr<WritableFile> dest_;
@@ -297,7 +297,7 @@ class CustomReader : public Reader {
   Status ReadRecord(tstring* record);
 
 #if defined(TF_CORD_SUPPORT)
-  Status ReadRecord(absl::Cord* record);
+  Status ReadRecord(abslx::Cord* record);
 #endif
 
   std::string filename_;

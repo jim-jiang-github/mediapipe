@@ -61,7 +61,7 @@ static const char* kOutputStream = "counter";
   success = [graph waitUntilDoneWithError:&error];
   XCTAssertTrue(success, @"%@", error.localizedDescription);
 
-  absl::StatusOr<string> getTraceLogDir = mediapipe::GetDefaultTraceLogDirectory();
+  abslx::StatusOr<string> getTraceLogDir = mediapipe::GetDefaultTraceLogDirectory();
   XCTAssertTrue(getTraceLogDir.ok(), "GetDefaultTraceLogDirectory failed.");
 
   NSString* directoryPath = [NSString stringWithCString:(*getTraceLogDir).c_str()

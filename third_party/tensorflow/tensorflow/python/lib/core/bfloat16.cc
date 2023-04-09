@@ -364,7 +364,7 @@ PyObject* PyCustomFloat_RichCompare(PyObject* a, PyObject* b, int op) {
 template <typename T>
 PyObject* PyCustomFloat_Repr(PyObject* self) {
   T x = reinterpret_cast<PyCustomFloat<T>*>(self)->value;
-  std::string v = absl::StrCat(static_cast<float>(x));
+  std::string v = abslx::StrCat(static_cast<float>(x));
   return PyUnicode_FromString(v.c_str());
 }
 
@@ -372,7 +372,7 @@ PyObject* PyCustomFloat_Repr(PyObject* self) {
 template <typename T>
 PyObject* PyCustomFloat_Str(PyObject* self) {
   T x = reinterpret_cast<PyCustomFloat<T>*>(self)->value;
-  std::string v = absl::StrCat(static_cast<float>(x));
+  std::string v = abslx::StrCat(static_cast<float>(x));
   return PyUnicode_FromString(v.c_str());
 }
 

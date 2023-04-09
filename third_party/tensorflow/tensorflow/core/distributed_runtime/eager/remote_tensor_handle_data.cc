@@ -72,7 +72,7 @@ void DestroyRemoteTensorHandle(EagerContext* ctx, const string& remote_task,
     auto* released_node = node.release();
     (*ctx->runner())([ctx, released_node] {
       Status status =
-          ctx->Executor().AddOrExecute(absl::WrapUnique(released_node));
+          ctx->Executor().AddOrExecute(abslx::WrapUnique(released_node));
       if (!status.ok()) {
         LOG_EVERY_N_SEC(WARNING, 60)
             << "Unable to destroy remote tensor handles. If you are "
@@ -200,7 +200,7 @@ Status RemoteTensorHandleData::SetShapeAndRemoteTask(
 }
 
 string RemoteTensorHandleData::DebugString() const {
-  return absl::StrCat("RemoteTensorHandleData:", " op_id: ", op_id_,
+  return abslx::StrCat("RemoteTensorHandleData:", " op_id: ", op_id_,
                       " output_num: ", output_num_);
 }
 
@@ -219,7 +219,7 @@ Status RemoteTensorHandleData::WaitReady(const char* caller) const {
   tf_shared_lock l(mu_);
   if (!is_ready_) {
     profiler::TraceMe activity(
-        [caller] { return absl::StrCat(caller, " WaitReady"); },
+        [caller] { return abslx::StrCat(caller, " WaitReady"); },
         profiler::TraceMeLevel::kInfo);
     DVLOG(3) << "WaitReady: " << caller << " " << this;
     mu_.Await(Condition(&is_ready_));

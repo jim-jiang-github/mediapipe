@@ -101,7 +101,7 @@ class MasterSession::ReffedClientGraph : public core::RefCounted {
           n->name(),
           NodeDetails(n->type_string(),
                       strings::StrCat(
-                          "(", absl::StrJoin(n->requested_inputs(), ", "))));
+                          "(", abslx::StrJoin(n->requested_inputs(), ", "))));
     }
   }
 

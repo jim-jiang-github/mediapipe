@@ -20,11 +20,11 @@
 
 namespace {
 
-using absl::strings_internal::MakeStringConstant;
+using abslx::strings_internal::MakeStringConstant;
 
 struct Callable {
-  constexpr absl::string_view operator()() const {
-    return absl::string_view("Callable", 8);
+  constexpr abslx::string_view operator()() const {
+    return abslx::string_view("Callable", 8);
   }
 };
 
@@ -34,10 +34,10 @@ TEST(StringConstant, Traits) {
 
   EXPECT_TRUE(std::is_empty<T>::value);
   EXPECT_TRUE(std::is_trivial<T>::value);
-  EXPECT_TRUE(absl::is_trivially_default_constructible<T>::value);
-  EXPECT_TRUE(absl::is_trivially_copy_constructible<T>::value);
-  EXPECT_TRUE(absl::is_trivially_move_constructible<T>::value);
-  EXPECT_TRUE(absl::is_trivially_destructible<T>::value);
+  EXPECT_TRUE(abslx::is_trivially_default_constructible<T>::value);
+  EXPECT_TRUE(abslx::is_trivially_copy_constructible<T>::value);
+  EXPECT_TRUE(abslx::is_trivially_move_constructible<T>::value);
+  EXPECT_TRUE(abslx::is_trivially_destructible<T>::value);
 }
 
 TEST(StringConstant, MakeFromCallable) {

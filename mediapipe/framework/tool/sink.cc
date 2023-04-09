@@ -46,20 +46,20 @@ namespace {
 class MediaPipeInternalSidePacketToPacketStreamCalculator
     : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->InputSidePackets().Index(0).SetAny();
     cc->Outputs().Index(0).SetSameAs(&cc->InputSidePackets().Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     cc->Outputs().Index(0).AddPacket(
         cc->InputSidePackets().Index(0).At(Timestamp::PostStream()));
     cc->Outputs().Index(0).Close();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     // The framework treats this calculator as a source calculator.
     return mediapipe::tool::StatusStop();
   }
@@ -79,7 +79,7 @@ void AddVectorSink(const std::string& stream_name,  //
 
   auto* node = config->add_node();
   node->set_name(GetUnusedNodeName(
-      *config, absl::StrCat("callback_packet_calculator_that_generators_",
+      *config, abslx::StrCat("callback_packet_calculator_that_generators_",
                             input_side_packet_name)));
   node->set_calculator("CallbackPacketCalculator");
   node->add_output_side_packet(input_side_packet_name);
@@ -105,7 +105,7 @@ void AddPostStreamPacketSink(const std::string& stream_name,
                               /*use_std_function=*/true);
   auto* node = config->add_node();
   node->set_name(GetUnusedNodeName(
-      *config, absl::StrCat("callback_packet_calculator_that_generators_",
+      *config, abslx::StrCat("callback_packet_calculator_that_generators_",
                             input_side_packet_name)));
   node->set_calculator("CallbackPacketCalculator");
   node->add_output_side_packet(input_side_packet_name);
@@ -128,7 +128,7 @@ void AddSidePacketSink(const std::string& side_packet_name,
   CalculatorGraphConfig::Node* conversion_node = config->add_node();
   const std::string node_name = GetUnusedNodeName(
       *config,
-      absl::StrCat("calculator_converts_side_packet_", side_packet_name));
+      abslx::StrCat("calculator_converts_side_packet_", side_packet_name));
   conversion_node->set_name(node_name);
   conversion_node->set_calculator(
       "MediaPipeInternalSidePacketToPacketStreamCalculator");
@@ -136,7 +136,7 @@ void AddSidePacketSink(const std::string& side_packet_name,
       GetUnusedSidePacketName(*config, side_packet_name));
 
   const std::string output_stream_name =
-      absl::StrCat(node_name, "_output_stream");
+      abslx::StrCat(node_name, "_output_stream");
   conversion_node->add_output_stream(output_stream_name);
   AddPostStreamPacketSink(output_stream_name, config, dumped_packet);
 }
@@ -150,17 +150,17 @@ void AddCallbackCalculator(const std::string& stream_name,
   CalculatorGraphConfig::Node* sink_node = config->add_node();
   sink_node->set_name(GetUnusedNodeName(
       *config,
-      absl::StrCat("callback_calculator_that_collects_stream_", stream_name)));
+      abslx::StrCat("callback_calculator_that_collects_stream_", stream_name)));
   sink_node->set_calculator("CallbackCalculator");
   sink_node->add_input_stream(stream_name);
 
   const std::string input_side_packet_name =
-      GetUnusedSidePacketName(*config, absl::StrCat(stream_name, "_callback"));
+      GetUnusedSidePacketName(*config, abslx::StrCat(stream_name, "_callback"));
   *callback_side_packet_name = input_side_packet_name;
   if (use_std_function) {
     // Uses tag "CALLBACK" if the input side packet contains a std::function.
     sink_node->add_input_side_packet(
-        absl::StrCat("CALLBACK:", input_side_packet_name));
+        abslx::StrCat("CALLBACK:", input_side_packet_name));
   } else {
     LOG(FATAL) << "AddCallbackCalculator must use std::function";
   }
@@ -186,7 +186,7 @@ void AddMultiStreamCallback(
   CHECK(side_packets);
   CalculatorGraphConfig::Node* sink_node = config->add_node();
   const std::string name = GetUnusedNodeName(
-      *config, absl::StrCat("multi_callback_", absl::StrJoin(streams, "_")));
+      *config, abslx::StrCat("multi_callback_", abslx::StrJoin(streams, "_")));
   sink_node->set_name(name);
   sink_node->set_calculator("CallbackCalculator");
   for (const auto& stream_name : streams) {
@@ -195,16 +195,16 @@ void AddMultiStreamCallback(
 
   if (observe_timestamp_bounds) {
     const std::string observe_ts_bounds_packet_name = GetUnusedSidePacketName(
-        *config, absl::StrCat(name, "_observe_ts_bounds"));
-    sink_node->add_input_side_packet(absl::StrCat(
+        *config, abslx::StrCat(name, "_observe_ts_bounds"));
+    sink_node->add_input_side_packet(abslx::StrCat(
         "OBSERVE_TIMESTAMP_BOUNDS:", observe_ts_bounds_packet_name));
     InsertIfNotPresent(side_packets, observe_ts_bounds_packet_name,
                        MakePacket<bool>(true));
   }
   const std::string input_side_packet_name =
-      GetUnusedSidePacketName(*config, absl::StrCat(name, "_callback"));
+      GetUnusedSidePacketName(*config, abslx::StrCat(name, "_callback"));
   sink_node->add_input_side_packet(
-      absl::StrCat("VECTOR_CALLBACK:", input_side_packet_name));
+      abslx::StrCat("VECTOR_CALLBACK:", input_side_packet_name));
 
   InsertIfNotPresent(
       side_packets, input_side_packet_name,
@@ -222,20 +222,20 @@ void AddCallbackWithHeaderCalculator(const std::string& stream_name,
   CalculatorGraphConfig::Node* sink_node = config->add_node();
   sink_node->set_name(GetUnusedNodeName(
       *config,
-      absl::StrCat("callback_calculator_that_collects_stream_and_header_",
+      abslx::StrCat("callback_calculator_that_collects_stream_and_header_",
                    stream_name, "_", stream_header)));
   sink_node->set_calculator("CallbackWithHeaderCalculator");
-  sink_node->add_input_stream(absl::StrCat("INPUT:", stream_name));
-  sink_node->add_input_stream(absl::StrCat("HEADER:", stream_header));
+  sink_node->add_input_stream(abslx::StrCat("INPUT:", stream_name));
+  sink_node->add_input_stream(abslx::StrCat("HEADER:", stream_header));
 
   const std::string input_side_packet_name = GetUnusedSidePacketName(
-      *config, absl::StrCat(stream_name, "_", stream_header, "_callback"));
+      *config, abslx::StrCat(stream_name, "_", stream_header, "_callback"));
   *callback_side_packet_name = input_side_packet_name;
 
   if (use_std_function) {
     // Uses tag "CALLBACK" if the input side packet contains a std::function.
     sink_node->add_input_side_packet(
-        absl::StrCat("CALLBACK:", input_side_packet_name));
+        abslx::StrCat("CALLBACK:", input_side_packet_name));
   } else {
     LOG(FATAL) << "AddCallbackWithHeaderCalculator must use std::function";
   }
@@ -244,7 +244,7 @@ void AddCallbackWithHeaderCalculator(const std::string& stream_name,
 // CallbackCalculator
 
 // static
-absl::Status CallbackCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status CallbackCalculator::GetContract(CalculatorContract* cc) {
   bool allow_multiple_streams = false;
   // If the input side packet is specified using tag "CALLBACK" it must contain
   // a std::function, which may be generated by CallbackPacketCalculator.
@@ -272,10 +272,10 @@ absl::Status CallbackCalculator::GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(i).SetAny();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CallbackCalculator::Open(CalculatorContext* cc) {
+abslx::Status CallbackCalculator::Open(CalculatorContext* cc) {
   if (cc->InputSidePackets().HasTag("CALLBACK")) {
     callback_ = cc->InputSidePackets()
                     .Tag("CALLBACK")
@@ -298,10 +298,10 @@ absl::Status CallbackCalculator::Open(CalculatorContext* cc) {
            << "The value of the OBSERVE_TIMESTAMP_BOUNDS input side packet "
               "must be set to true";
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CallbackCalculator::Process(CalculatorContext* cc) {
+abslx::Status CallbackCalculator::Process(CalculatorContext* cc) {
   if (callback_) {
     callback_(cc->Inputs().Index(0).Value());
   } else if (vector_callback_) {
@@ -313,7 +313,7 @@ absl::Status CallbackCalculator::Process(CalculatorContext* cc) {
     }
     vector_callback_(packets);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 REGISTER_CALCULATOR(CallbackCalculator);
@@ -321,7 +321,7 @@ REGISTER_CALCULATOR(CallbackCalculator);
 // CallbackWithHeaderCalculator
 
 // static
-absl::Status CallbackWithHeaderCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status CallbackWithHeaderCalculator::GetContract(CalculatorContract* cc) {
   cc->Inputs().Tag("INPUT").SetAny();
   cc->Inputs().Tag("HEADER").SetAny();
 
@@ -334,10 +334,10 @@ absl::Status CallbackWithHeaderCalculator::GetContract(CalculatorContract* cc) {
     return mediapipe::InvalidArgumentErrorBuilder(MEDIAPIPE_LOC)
            << "InputSidePackets must use tags.";
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CallbackWithHeaderCalculator::Open(CalculatorContext* cc) {
+abslx::Status CallbackWithHeaderCalculator::Open(CalculatorContext* cc) {
   if (cc->InputSidePackets().UsesTags()) {
     callback_ = cc->InputSidePackets()
                     .Tag("CALLBACK")
@@ -364,10 +364,10 @@ absl::Status CallbackWithHeaderCalculator::Open(CalculatorContext* cc) {
   if (!cc->Inputs().Tag("INPUT").Header().IsEmpty()) {
     header_packet_ = cc->Inputs().Tag("INPUT").Header();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CallbackWithHeaderCalculator::Process(CalculatorContext* cc) {
+abslx::Status CallbackWithHeaderCalculator::Process(CalculatorContext* cc) {
   if (!cc->Inputs().Tag("INPUT").Value().IsEmpty() &&
       header_packet_.IsEmpty()) {
     // Header packet should be available before we receive any normal input
@@ -382,7 +382,7 @@ absl::Status CallbackWithHeaderCalculator::Process(CalculatorContext* cc) {
   if (!cc->Inputs().Tag("INPUT").Value().IsEmpty()) {
     callback_(cc->Inputs().Tag("INPUT").Value(), header_packet_);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 REGISTER_CALCULATOR(CallbackWithHeaderCalculator);

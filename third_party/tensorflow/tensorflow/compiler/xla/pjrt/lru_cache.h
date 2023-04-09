@@ -27,8 +27,8 @@ namespace xla {
 // Value must be copyable and moveable. The intent is that Value is typically
 // a smart-pointer type.
 template <typename Key, typename Value,
-          typename Hash = typename absl::node_hash_map<Key, Value>::hasher,
-          typename Eq = typename absl::node_hash_map<Key, Value>::key_equal>
+          typename Hash = typename abslx::node_hash_map<Key, Value>::hasher,
+          typename Eq = typename abslx::node_hash_map<Key, Value>::key_equal>
 class LRUCache {
  private:
   struct LRUListEntry {
@@ -98,7 +98,7 @@ class LRUCache {
   struct Entry : public LRUListEntry {
     Entry() = default;
 
-    // Pointer to the key in `entries_`. absl::node_hash_map<> promises
+    // Pointer to the key in `entries_`. abslx::node_hash_map<> promises
     // pointer stability for keys.
     const Key* key;
     LRUCache* container;
@@ -107,7 +107,7 @@ class LRUCache {
 
   // We use `node_hash_map` because we want to guarantee pointer stability for
   // keys and values.
-  absl::node_hash_map<Key, Entry, Hash, Eq> entries_;
+  abslx::node_hash_map<Key, Entry, Hash, Eq> entries_;
 };
 
 template <typename Key, typename Value, typename Hash, typename Eq>
@@ -137,7 +137,7 @@ LRUCache<Key, Value, Hash, Eq>::~LRUCache() {
 template <typename Key, typename Value, typename Hash, typename Eq>
 Value LRUCache<Key, Value, Hash, Eq>::GetOrCreateIfAbsent(
     const Key& key, const std::function<Value(const Key&)>& factory) {
-  typename absl::node_hash_map<Key, Entry, Hash, Eq>::iterator it;
+  typename abslx::node_hash_map<Key, Entry, Hash, Eq>::iterator it;
   bool inserted;
   std::tie(it, inserted) = entries_.try_emplace(key);
   Entry& entry = it->second;

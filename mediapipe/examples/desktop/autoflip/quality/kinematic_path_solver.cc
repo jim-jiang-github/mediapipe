@@ -30,12 +30,12 @@ bool KinematicPathSolver::IsMotionTooSmall(double delta_degs) {
 
 void KinematicPathSolver::ClearHistory() { raw_positions_at_time_.clear(); }
 
-absl::Status KinematicPathSolver::PredictMotionState(int position,
+abslx::Status KinematicPathSolver::PredictMotionState(int position,
                                                      const uint64 time_us,
                                                      bool* state) {
   if (!initialized_) {
     *state = false;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   auto raw_positions_at_time_copy = raw_positions_at_time_;
@@ -74,10 +74,10 @@ absl::Status KinematicPathSolver::PredictMotionState(int position,
     *state = true;
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status KinematicPathSolver::AddObservation(int position,
+abslx::Status KinematicPathSolver::AddObservation(int position,
                                                  const uint64 time_us) {
   if (!initialized_) {
     if (position < min_location_) {
@@ -125,7 +125,7 @@ absl::Status KinematicPathSolver::AddObservation(int position,
                options_.has_max_velocity_shift()))
         << "Must either set max_velocity or set both max_velocity_scale and "
            "max_velocity_shift.";
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   RET_CHECK(current_time_ < time_us)
@@ -220,7 +220,7 @@ absl::Status KinematicPathSolver::AddObservation(int position,
   return UpdatePrediction(time_us);
 }
 
-absl::Status KinematicPathSolver::UpdatePrediction(const int64 time_us) {
+abslx::Status KinematicPathSolver::UpdatePrediction(const int64 time_us) {
   RET_CHECK(current_time_ < time_us)
       << "Prediction time added before a prior observation or prediction.";
 
@@ -245,35 +245,35 @@ absl::Status KinematicPathSolver::UpdatePrediction(const int64 time_us) {
   }
   current_time_ = time_us;
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status KinematicPathSolver::GetState(int* position) {
+abslx::Status KinematicPathSolver::GetState(int* position) {
   RET_CHECK(initialized_) << "GetState called before first observation added.";
   *position = round(current_position_px_);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status KinematicPathSolver::GetState(float* position) {
+abslx::Status KinematicPathSolver::GetState(float* position) {
   RET_CHECK(initialized_) << "GetState called before first observation added.";
   *position = current_position_px_;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status KinematicPathSolver::GetDeltaState(float* delta_position) {
+abslx::Status KinematicPathSolver::GetDeltaState(float* delta_position) {
   RET_CHECK(initialized_) << "GetState called before first observation added.";
   *delta_position = current_position_px_ - prior_position_px_;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status KinematicPathSolver::SetState(const float position) {
+abslx::Status KinematicPathSolver::SetState(const float position) {
   RET_CHECK(initialized_) << "SetState called before first observation added.";
   current_position_px_ = std::clamp(position, static_cast<float>(min_location_),
                                     static_cast<float>(max_location_));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status KinematicPathSolver::GetTargetPosition(int* target_position) {
+abslx::Status KinematicPathSolver::GetTargetPosition(int* target_position) {
   RET_CHECK(initialized_)
       << "GetTargetPosition called before first observation added.";
 
@@ -285,23 +285,23 @@ absl::Status KinematicPathSolver::GetTargetPosition(int* target_position) {
   } else {
     *target_position = round(target_position_px_);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status KinematicPathSolver::UpdatePixelsPerDegree(
+abslx::Status KinematicPathSolver::UpdatePixelsPerDegree(
     const float pixels_per_degree) {
   RET_CHECK_GT(pixels_per_degree, 0)
       << "pixels_per_degree must be larger than 0.";
   pixels_per_degree_ = pixels_per_degree;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status KinematicPathSolver::UpdateMinMaxLocation(const int min_location,
+abslx::Status KinematicPathSolver::UpdateMinMaxLocation(const int min_location,
                                                        const int max_location) {
   if (!initialized_) {
     max_location_ = max_location;
     min_location_ = min_location;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   double prior_distance = max_location_ - min_location_;
@@ -318,7 +318,7 @@ absl::Status KinematicPathSolver::UpdateMinMaxLocation(const int min_location,
     position_at_time.second = position_at_time.second * scale_change;
     raw_positions_at_time_.push_front(position_at_time);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace autoflip

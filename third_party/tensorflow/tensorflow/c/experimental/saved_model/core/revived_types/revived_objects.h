@@ -64,7 +64,7 @@ class RevivedObjectContainer {
 
  private:
   std::vector<std::unique_ptr<T>> objects_;
-  absl::flat_hash_map<int, T*> objects_by_id_;
+  abslx::flat_hash_map<int, T*> objects_by_id_;
 };
 
 // RevivedObjects is mainly used as a container for all the "state" owned by

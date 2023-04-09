@@ -149,9 +149,9 @@ bool IntroducesAsynchrony(const std::string& op) {
 }
 
 // Returns map from node name to NodeDef in a function.
-absl::flat_hash_map<absl::string_view, const NodeDef*> NameToNode(
+abslx::flat_hash_map<abslx::string_view, const NodeDef*> NameToNode(
     const FunctionDef& function) {
-  absl::flat_hash_map<absl::string_view, const NodeDef*> name_to_node;
+  abslx::flat_hash_map<abslx::string_view, const NodeDef*> name_to_node;
   for (const NodeDef& node : function.node_def()) {
     name_to_node.insert({node.name(), &node});
   }
@@ -197,7 +197,7 @@ Status ConvertMapOrInterleave(const string& node_name,
       continue;
     }
     if (inputs_processed >= num_inputs_after_rewrite) {
-      node->set_input(i, absl::StrCat("^", input));
+      node->set_input(i, abslx::StrCat("^", input));
     }
     inputs_processed++;
   }
@@ -215,17 +215,17 @@ Status ConvertMapOrInterleave(const string& node_name,
 
 // Returns all transitive dependencies of a set of nodes, including the nodes
 // themselves.
-absl::flat_hash_set<absl::string_view> GetAllTransitiveDependencies(
+abslx::flat_hash_set<abslx::string_view> GetAllTransitiveDependencies(
     const FunctionDef& function_def,
-    const absl::flat_hash_set<absl::string_view>& nodes) {
-  std::vector<absl::string_view> nodes_to_process;
+    const abslx::flat_hash_set<abslx::string_view>& nodes) {
+  std::vector<abslx::string_view> nodes_to_process;
   std::copy(nodes.begin(), nodes.end(), std::back_inserter(nodes_to_process));
 
-  absl::flat_hash_map<absl::string_view, const NodeDef*> name_to_node =
+  abslx::flat_hash_map<abslx::string_view, const NodeDef*> name_to_node =
       NameToNode(function_def);
-  absl::flat_hash_set<absl::string_view> dependencies;
+  abslx::flat_hash_set<abslx::string_view> dependencies;
   while (!nodes_to_process.empty()) {
-    absl::string_view node_name = nodes_to_process.back();
+    abslx::string_view node_name = nodes_to_process.back();
     nodes_to_process.pop_back();
     if (dependencies.contains(node_name)) {
       continue;
@@ -237,8 +237,8 @@ absl::flat_hash_set<absl::string_view> GetAllTransitiveDependencies(
       // the node for now.
       continue;
     }
-    for (absl::string_view inp : iter->second->input()) {
-      absl::string_view inp_node = inp.substr(0, inp.find(':'));
+    for (abslx::string_view inp : iter->second->input()) {
+      abslx::string_view inp_node = inp.substr(0, inp.find(':'));
       if (inp_node.at(0) == '^') {
         inp_node = inp_node.substr(1);
       }
@@ -259,7 +259,7 @@ absl::flat_hash_set<absl::string_view> GetAllTransitiveDependencies(
 Status SplitMap(
     const FunctionLibraryDefinition& library, const string& map_node_name,
     MutableGraphView* graph,
-    const absl::flat_hash_set<absl::string_view>& nondeterministic_nodes) {
+    const abslx::flat_hash_set<abslx::string_view>& nondeterministic_nodes) {
   NodeDef* map_node = GetMutableNode(map_node_name, graph);
   NameAttrList func = map_node->attr().at("f").func();
   const FunctionDef* function_def = library.Find(func.name());
@@ -268,11 +268,11 @@ Status SplitMap(
                             " in FunctionLibraryDefinition");
   }
 
-  absl::flat_hash_set<absl::string_view> nodes_to_move =
+  abslx::flat_hash_set<abslx::string_view> nodes_to_move =
       GetAllTransitiveDependencies(*function_def, nondeterministic_nodes);
 
   VLOG(2) << "Will move nodes to nonparallel function: "
-          << absl::StrJoin(nodes_to_move, ", ");
+          << abslx::StrJoin(nodes_to_move, ", ");
 
   int64_t num_captured_arguments =
       map_node->attr().find("Targuments")->second.list().type_size();
@@ -312,7 +312,7 @@ Status SplitMap(
     for (int i = extra_inputs_index; i < control_deps_index; i++) {
       // Copy the extra inputs, converting them to control dependencies
       DCHECK(!IsControlInput(map_node->input(i)));
-      first_map_node.add_input(absl::StrCat("^", map_node->input(i)));
+      first_map_node.add_input(abslx::StrCat("^", map_node->input(i)));
     }
     for (int i = control_deps_index; i < map_node->input_size(); i++) {
       // Copy the control dependencies
@@ -389,7 +389,7 @@ Status ConvertBatch(const string& node_name, MutableGraphView* graph) {
   node->set_op(kBatchV2Op);
   std::string num_parallel_calls_input = node->input(2);
   node->set_input(2, node->input(3));
-  node->set_input(3, absl::StrCat("^", num_parallel_calls_input));
+  node->set_input(3, abslx::StrCat("^", num_parallel_calls_input));
   node->mutable_attr()->erase("deterministic");
   return OkStatus();
 }
@@ -422,7 +422,7 @@ Status ConvertMapAndBatch(const string& node_name, MutableGraphView* graph) {
     if (IsControlInput(orig_node.input(i))) {
       new_map_node.add_input(orig_node.input(i));
     } else {
-      new_map_node.add_input(absl::StrCat("^", orig_node.input(i)));
+      new_map_node.add_input(abslx::StrCat("^", orig_node.input(i)));
     }
   }
   for (auto key : {"f", "Targuments", "output_types"}) {
@@ -481,7 +481,7 @@ Status ConvertMapAndBatch(const string& node_name, MutableGraphView* graph) {
 Status ConvertPrefetch(const string& node_name, MutableGraphView* graph) {
   NodeDef* node = GetMutableNode(node_name, graph);
   constexpr int buffer_size_index = 1;
-  node->add_input(absl::StrCat("^", node->input(buffer_size_index)));
+  node->add_input(abslx::StrCat("^", node->input(buffer_size_index)));
   NodeDef* tmp = graph_utils::AddScalarConstNode<int64_t>(0, graph);
   node->set_input(buffer_size_index, tmp->name());
   return OkStatus();
@@ -504,7 +504,7 @@ bool IsDeterministicStatefulOp(NondeterminismType type,
 bool FunctionNodeMayIntroduceNondeterminism(
     const FunctionLibraryDefinition& library, const NodeDef& node_def,
     NondeterminismType nondeterminism_type,
-    absl::flat_hash_set<std::string>* functions_processed);
+    abslx::flat_hash_set<std::string>* functions_processed);
 
 // Returns true if the function may introduce nondeterminism. Depending on
 // 'nondeterminism_type', either checks if nondeterminism can occur when the
@@ -516,8 +516,8 @@ bool FunctionNodeMayIntroduceNondeterminism(
 bool FunctionMayIntroduceNondeterminism(
     const FunctionLibraryDefinition& library, const std::string& function_name,
     NondeterminismType nondeterminism_type,
-    absl::flat_hash_set<std::string>* functions_processed,
-    absl::flat_hash_set<absl::string_view>* nondeterministic_nodes) {
+    abslx::flat_hash_set<std::string>* functions_processed,
+    abslx::flat_hash_set<abslx::string_view>* nondeterministic_nodes) {
   if (functions_processed->contains(function_name)) {
     return false;
   }
@@ -547,7 +547,7 @@ bool FunctionMayIntroduceNondeterminism(
 bool FunctionMayIntroduceNondeterminism(
     const FunctionLibraryDefinition& library, const std::string& function_name,
     NondeterminismType nondeterminism_type) {
-  absl::flat_hash_set<string> functions_processed;
+  abslx::flat_hash_set<string> functions_processed;
   return FunctionMayIntroduceNondeterminism(library, function_name,
                                             nondeterminism_type,
                                             &functions_processed, nullptr);
@@ -557,7 +557,7 @@ bool FunctionMayIntroduceNondeterminism(
 bool FunctionNodeMayIntroduceNondeterminism(
     const FunctionLibraryDefinition& library, const NodeDef& node_def,
     NondeterminismType nondeterminism_type,
-    absl::flat_hash_set<std::string>* functions_processed) {
+    abslx::flat_hash_set<std::string>* functions_processed) {
   const OpRegistrationData* op_reg_data = nullptr;
   Status s = library.LookUp(node_def.op(), &op_reg_data);
   if (!s.ok()) {
@@ -673,7 +673,7 @@ Status MakeDeterministic::OptimizeAndCollectStats(Cluster* cluster,
   MutableGraphView graph(output);
   FunctionLibraryDefinition function_library(OpRegistry::Global(),
                                              item.graph.library());
-  absl::flat_hash_set<string> nodes_to_delete;
+  abslx::flat_hash_set<string> nodes_to_delete;
   bool remove_async_nodes =
       GraphMayHaveAsyncNondeterminism(function_library, item.graph);
 
@@ -691,8 +691,8 @@ Status MakeDeterministic::OptimizeAndCollectStats(Cluster* cluster,
 
     bool rewrite_due_to_async =
         IntroducesAsynchrony(node.op()) && remove_async_nodes;
-    absl::flat_hash_set<std::string> functions_processed;
-    absl::flat_hash_set<absl::string_view> nondeterministic_nodes;
+    abslx::flat_hash_set<std::string> functions_processed;
+    abslx::flat_hash_set<abslx::string_view> nondeterministic_nodes;
     bool rewrite_due_to_parallelism =
         IntroducesFunctionParallelism(node.op()) &&
         FunctionMayIntroduceNondeterminism(

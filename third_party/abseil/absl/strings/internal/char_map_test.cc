@@ -23,12 +23,12 @@
 
 namespace {
 
-constexpr absl::strings_internal::Charmap everything_map =
-    ~absl::strings_internal::Charmap();
-constexpr absl::strings_internal::Charmap nothing_map{};
+constexpr abslx::strings_internal::Charmap everything_map =
+    ~abslx::strings_internal::Charmap();
+constexpr abslx::strings_internal::Charmap nothing_map{};
 
 TEST(Charmap, AllTests) {
-  const absl::strings_internal::Charmap also_nothing_map("", 0);
+  const abslx::strings_internal::Charmap also_nothing_map("", 0);
   ASSERT_TRUE(everything_map.contains('\0'));
   ASSERT_TRUE(!nothing_map.contains('\0'));
   ASSERT_TRUE(!also_nothing_map.contains('\0'));
@@ -38,7 +38,7 @@ TEST(Charmap, AllTests) {
     ASSERT_TRUE(!also_nothing_map.contains(ch));
   }
 
-  const absl::strings_internal::Charmap symbols("&@#@^!@?", 5);
+  const abslx::strings_internal::Charmap symbols("&@#@^!@?", 5);
   ASSERT_TRUE(symbols.contains('&'));
   ASSERT_TRUE(symbols.contains('@'));
   ASSERT_TRUE(symbols.contains('#'));
@@ -50,9 +50,9 @@ TEST(Charmap, AllTests) {
     cnt += symbols.contains(ch);
   ASSERT_EQ(cnt, 4);
 
-  const absl::strings_internal::Charmap lets("^abcde", 3);
-  const absl::strings_internal::Charmap lets2("fghij\0klmnop", 10);
-  const absl::strings_internal::Charmap lets3("fghij\0klmnop");
+  const abslx::strings_internal::Charmap lets("^abcde", 3);
+  const abslx::strings_internal::Charmap lets2("fghij\0klmnop", 10);
+  const abslx::strings_internal::Charmap lets3("fghij\0klmnop");
   ASSERT_TRUE(lets2.contains('k'));
   ASSERT_TRUE(!lets3.contains('k'));
 
@@ -66,7 +66,7 @@ TEST(Charmap, AllTests) {
 }
 
 namespace {
-std::string Members(const absl::strings_internal::Charmap& m) {
+std::string Members(const abslx::strings_internal::Charmap& m) {
   std::string r;
   for (size_t i = 0; i < 256; ++i)
     if (m.contains(i)) r.push_back(i);
@@ -87,36 +87,36 @@ std::string ClosedRangeString(unsigned char lo, unsigned char hi) {
 }  // namespace
 
 TEST(Charmap, Constexpr) {
-  constexpr absl::strings_internal::Charmap kEmpty = nothing_map;
+  constexpr abslx::strings_internal::Charmap kEmpty = nothing_map;
   EXPECT_THAT(Members(kEmpty), "");
-  constexpr absl::strings_internal::Charmap kA =
-      absl::strings_internal::Charmap::Char('A');
+  constexpr abslx::strings_internal::Charmap kA =
+      abslx::strings_internal::Charmap::Char('A');
   EXPECT_THAT(Members(kA), "A");
-  constexpr absl::strings_internal::Charmap kAZ =
-      absl::strings_internal::Charmap::Range('A', 'Z');
+  constexpr abslx::strings_internal::Charmap kAZ =
+      abslx::strings_internal::Charmap::Range('A', 'Z');
   EXPECT_THAT(Members(kAZ), "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-  constexpr absl::strings_internal::Charmap kIdentifier =
-      absl::strings_internal::Charmap::Range('0', '9') |
-      absl::strings_internal::Charmap::Range('A', 'Z') |
-      absl::strings_internal::Charmap::Range('a', 'z') |
-      absl::strings_internal::Charmap::Char('_');
+  constexpr abslx::strings_internal::Charmap kIdentifier =
+      abslx::strings_internal::Charmap::Range('0', '9') |
+      abslx::strings_internal::Charmap::Range('A', 'Z') |
+      abslx::strings_internal::Charmap::Range('a', 'z') |
+      abslx::strings_internal::Charmap::Char('_');
   EXPECT_THAT(Members(kIdentifier),
               "0123456789"
               "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
               "_"
               "abcdefghijklmnopqrstuvwxyz");
-  constexpr absl::strings_internal::Charmap kAll = everything_map;
+  constexpr abslx::strings_internal::Charmap kAll = everything_map;
   for (size_t i = 0; i < 256; ++i) {
     EXPECT_TRUE(kAll.contains(i)) << i;
   }
-  constexpr absl::strings_internal::Charmap kHello =
-      absl::strings_internal::Charmap::FromString("Hello, world!");
+  constexpr abslx::strings_internal::Charmap kHello =
+      abslx::strings_internal::Charmap::FromString("Hello, world!");
   EXPECT_THAT(Members(kHello), " !,Hdelorw");
 
   // test negation and intersection
-  constexpr absl::strings_internal::Charmap kABC =
-      absl::strings_internal::Charmap::Range('A', 'Z') &
-      ~absl::strings_internal::Charmap::Range('D', 'Z');
+  constexpr abslx::strings_internal::Charmap kABC =
+      abslx::strings_internal::Charmap::Range('A', 'Z') &
+      ~abslx::strings_internal::Charmap::Range('D', 'Z');
   EXPECT_THAT(Members(kABC), "ABC");
 }
 
@@ -130,7 +130,7 @@ TEST(Charmap, Range) {
     SCOPED_TRACE(*lo);
     for (auto hi = lo; hi != poi.end(); ++hi) {
       SCOPED_TRACE(*hi);
-      EXPECT_THAT(Members(absl::strings_internal::Charmap::Range(*lo, *hi)),
+      EXPECT_THAT(Members(abslx::strings_internal::Charmap::Range(*lo, *hi)),
                   ClosedRangeString(*lo, *hi));
     }
   }
@@ -143,29 +143,29 @@ TEST(CharmapCtype, Match) {
     SCOPED_TRACE(c);
     SCOPED_TRACE(static_cast<char>(c));
     EXPECT_EQ(AsBool(std::isupper(c)),
-              absl::strings_internal::UpperCharmap().contains(c));
+              abslx::strings_internal::UpperCharmap().contains(c));
     EXPECT_EQ(AsBool(std::islower(c)),
-              absl::strings_internal::LowerCharmap().contains(c));
+              abslx::strings_internal::LowerCharmap().contains(c));
     EXPECT_EQ(AsBool(std::isdigit(c)),
-              absl::strings_internal::DigitCharmap().contains(c));
+              abslx::strings_internal::DigitCharmap().contains(c));
     EXPECT_EQ(AsBool(std::isalpha(c)),
-              absl::strings_internal::AlphaCharmap().contains(c));
+              abslx::strings_internal::AlphaCharmap().contains(c));
     EXPECT_EQ(AsBool(std::isalnum(c)),
-              absl::strings_internal::AlnumCharmap().contains(c));
+              abslx::strings_internal::AlnumCharmap().contains(c));
     EXPECT_EQ(AsBool(std::isxdigit(c)),
-              absl::strings_internal::XDigitCharmap().contains(c));
+              abslx::strings_internal::XDigitCharmap().contains(c));
     EXPECT_EQ(AsBool(std::isprint(c)),
-              absl::strings_internal::PrintCharmap().contains(c));
+              abslx::strings_internal::PrintCharmap().contains(c));
     EXPECT_EQ(AsBool(std::isspace(c)),
-              absl::strings_internal::SpaceCharmap().contains(c));
+              abslx::strings_internal::SpaceCharmap().contains(c));
     EXPECT_EQ(AsBool(std::iscntrl(c)),
-              absl::strings_internal::CntrlCharmap().contains(c));
+              abslx::strings_internal::CntrlCharmap().contains(c));
     EXPECT_EQ(AsBool(std::isblank(c)),
-              absl::strings_internal::BlankCharmap().contains(c));
+              abslx::strings_internal::BlankCharmap().contains(c));
     EXPECT_EQ(AsBool(std::isgraph(c)),
-              absl::strings_internal::GraphCharmap().contains(c));
+              abslx::strings_internal::GraphCharmap().contains(c));
     EXPECT_EQ(AsBool(std::ispunct(c)),
-              absl::strings_internal::PunctCharmap().contains(c));
+              abslx::strings_internal::PunctCharmap().contains(c));
   }
 }
 

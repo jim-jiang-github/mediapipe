@@ -26,18 +26,18 @@ limitations under the License.
 namespace tensorflow {
 namespace profiler {
 
-using XStatValue = absl::variant<int64_t, uint64, absl::string_view>;
+using XStatValue = abslx::variant<int64_t, uint64, abslx::string_view>;
 
 XPlane* GetOrCreateHostXPlane(XSpace* space);
 
 XPlane* GetOrCreateGpuXPlane(XSpace* space, int32_t device_ordinal);
 
 XPlane* GetOrCreateTpuXPlane(XSpace* space, int32_t device_ordinal,
-                             absl::string_view device_type);
+                             abslx::string_view device_type);
 
 void CreateXEvent(
     XPlaneBuilder* plane_builder, XLineBuilder* line_builder,
-    absl::string_view event_name, int64_t offset_ps, int64_t duration_ps,
+    abslx::string_view event_name, int64_t offset_ps, int64_t duration_ps,
     std::initializer_list<std::pair<StatType, XStatValue>> stats = {});
 
 void CreateXEvent(
@@ -47,9 +47,9 @@ void CreateXEvent(
 
 void CreateTfFunctionCallEvent(XPlaneBuilder* plane_builder,
                                XLineBuilder* line_builder,
-                               absl::string_view function_name,
+                               abslx::string_view function_name,
                                int64_t offset_ps, int64_t duration_ps,
-                               absl::string_view execution_mode,
+                               abslx::string_view execution_mode,
                                int64_t tracing_count = -1);
 }  // namespace profiler
 }  // namespace tensorflow

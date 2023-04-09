@@ -58,10 +58,10 @@ constexpr char kTensor[] = "TENSOR";
 // }
 class TensorToImageFrameCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   float scale_factor_;
@@ -69,7 +69,7 @@ class TensorToImageFrameCalculator : public CalculatorBase {
 
 REGISTER_CALCULATOR(TensorToImageFrameCalculator);
 
-absl::Status TensorToImageFrameCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status TensorToImageFrameCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK_EQ(cc->Outputs().NumEntries(), 1)
       << "Only one output stream is supported.";
   RET_CHECK_EQ(cc->Inputs().NumEntries(), 1)
@@ -82,17 +82,17 @@ absl::Status TensorToImageFrameCalculator::GetContract(CalculatorContract* cc) {
   cc->Outputs().Tag(kImage).Set<ImageFrame>(
       // Output ImageFrame.
   );
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorToImageFrameCalculator::Open(CalculatorContext* cc) {
+abslx::Status TensorToImageFrameCalculator::Open(CalculatorContext* cc) {
   scale_factor_ =
       cc->Options<TensorToImageFrameCalculatorOptions>().scale_factor();
   cc->SetOffset(TimestampDiff(0));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TensorToImageFrameCalculator::Process(CalculatorContext* cc) {
+abslx::Status TensorToImageFrameCalculator::Process(CalculatorContext* cc) {
   const tf::Tensor& input_tensor = cc->Inputs().Tag(kTensor).Get<tf::Tensor>();
   int32 depth = 1;
   if (input_tensor.dims() != 2) {  // Depth is 1 for 2D tensors.
@@ -121,7 +121,7 @@ absl::Status TensorToImageFrameCalculator::Process(CalculatorContext* cc) {
       if (d > 255) d = 255;
       buffer[i] = d;
     }
-    output = ::absl::make_unique<ImageFrame>(
+    output = ::abslx::make_unique<ImageFrame>(
         format, width, height, width * depth, buffer.release(),
         [total_size](uint8* ptr) {
           ::operator delete[](ptr, total_size,
@@ -129,7 +129,7 @@ absl::Status TensorToImageFrameCalculator::Process(CalculatorContext* cc) {
         });
   } else if (input_tensor.dtype() == tensorflow::DT_UINT8) {
     if (scale_factor_ != 1.0) {
-      return absl::InvalidArgumentError("scale_factor_ given for uint8 tensor");
+      return abslx::InvalidArgumentError("scale_factor_ given for uint8 tensor");
     }
     // tf::Tensor has internally ref-counted buffer. The following code make the
     // ImageFrame own the copied Tensor through the deleter, which increases
@@ -137,18 +137,18 @@ absl::Status TensorToImageFrameCalculator::Process(CalculatorContext* cc) {
     // image. This allows us to create an ImageFrame object without copying
     // buffer. const ImageFrame prevents the buffer from being modified later.
     auto copy = new tf::Tensor(input_tensor);
-    output = ::absl::make_unique<const ImageFrame>(
+    output = ::abslx::make_unique<const ImageFrame>(
         format, width, height, width * depth, copy->flat<uint8_t>().data(),
         [copy](uint8*) { delete copy; });
   } else {
-    return absl::InvalidArgumentError(
-        absl::StrCat("Expected float or uint8 tensor, received ",
+    return abslx::InvalidArgumentError(
+        abslx::StrCat("Expected float or uint8 tensor, received ",
                      DataTypeString(input_tensor.dtype())));
   }
 
   cc->Outputs().Tag(kImage).Add(output.release(), cc->InputTimestamp());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

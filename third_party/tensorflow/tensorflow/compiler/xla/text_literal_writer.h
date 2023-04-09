@@ -36,7 +36,7 @@ namespace xla {
 // This should be readable by xla::TextLiteralReader.
 class TextLiteralWriter {
  public:
-  static Status WriteToPath(const Literal& literal, absl::string_view path);
+  static Status WriteToPath(const Literal& literal, abslx::string_view path);
 
  private:
   TextLiteralWriter(const TextLiteralWriter&) = delete;

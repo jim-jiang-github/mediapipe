@@ -33,21 +33,21 @@ namespace tflite {
 namespace gpu {
 namespace testing {
 
-absl::Status InterpreterInvokeWithOpResolver(
+abslx::Status InterpreterInvokeWithOpResolver(
     const ::tflite::Model* model, TfLiteDelegate* delegate,
     const OpResolver& op_resolver, const std::vector<TensorFloat32>& inputs,
     std::vector<TensorFloat32>* outputs) {
   auto interpreter = std::make_unique<Interpreter>();
   if (InterpreterBuilder(model, op_resolver)(&interpreter) != kTfLiteOk) {
-    return absl::InternalError("Unable to create TfLite InterpreterBuilder");
+    return abslx::InternalError("Unable to create TfLite InterpreterBuilder");
   }
   if (delegate && interpreter->ModifyGraphWithDelegate(delegate) != kTfLiteOk) {
-    return absl::InternalError(
+    return abslx::InternalError(
         "Unable to modify TfLite graph with the delegate");
   }
   interpreter->SetNumThreads(1);
   if (interpreter->AllocateTensors() != kTfLiteOk) {
-    return absl::InternalError("Unable to allocate TfLite tensors");
+    return abslx::InternalError("Unable to allocate TfLite tensors");
   }
   for (int i = 0; i < inputs.size(); ++i) {
     DCHECK_EQ(interpreter->tensor(interpreter->inputs()[i])->type,
@@ -60,10 +60,10 @@ absl::Status InterpreterInvokeWithOpResolver(
                 inputs[i].data.size() * sizeof(float));
   }
   if (interpreter->Invoke() != kTfLiteOk) {
-    return absl::InternalError("Unable to invoke TfLite interpreter");
+    return abslx::InternalError("Unable to invoke TfLite interpreter");
   }
   if (!outputs || !outputs->empty()) {
-    return absl::InternalError("Invalid outputs pointer");
+    return abslx::InternalError("Invalid outputs pointer");
   }
   outputs->reserve(interpreter->outputs().size());
   for (auto t : interpreter->outputs()) {
@@ -72,7 +72,7 @@ absl::Status InterpreterInvokeWithOpResolver(
     bhwc.id = t;
     // TODO(impjdi) Relax this condition to arbitrary batch size.
     if (out_tensor->dims->data[0] != 1) {
-      return absl::InternalError("Batch dimension is expected to be 1");
+      return abslx::InternalError("Batch dimension is expected to be 1");
     }
     bhwc.shape.b = out_tensor->dims->data[0];
     switch (out_tensor->dims->size) {
@@ -92,7 +92,7 @@ absl::Status InterpreterInvokeWithOpResolver(
         bhwc.shape.c = out_tensor->dims->data[3];
         break;
       default:
-        return absl::InternalError("Unsupported dimensions size " +
+        return abslx::InternalError("Unsupported dimensions size " +
                                    std::to_string(out_tensor->dims->size));
     }
     bhwc.data = std::vector<float>(
@@ -100,10 +100,10 @@ absl::Status InterpreterInvokeWithOpResolver(
         out_tensor->data.f + out_tensor->bytes / sizeof(float));
     outputs->push_back(bhwc);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status InterpreterInvoke(const ::tflite::Model* model,
+abslx::Status InterpreterInvoke(const ::tflite::Model* model,
                                TfLiteDelegate* delegate,
                                const std::vector<TensorFloat32>& inputs,
                                std::vector<TensorFloat32>* outputs) {

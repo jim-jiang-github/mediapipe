@@ -155,7 +155,7 @@ struct CpuMemory {
 };
 
 template <typename T>
-inline CpuMemory MakeCpuMemory(absl::Span<T> t) {
+inline CpuMemory MakeCpuMemory(abslx::Span<T> t) {
   CpuMemory m;
   m.data = t.data();
   m.size_bytes = t.size() * sizeof(T);
@@ -163,7 +163,7 @@ inline CpuMemory MakeCpuMemory(absl::Span<T> t) {
 }
 
 template <typename T>
-inline CpuMemory MakeReadableCpuMemory(absl::Span<const T> t) {
+inline CpuMemory MakeReadableCpuMemory(abslx::Span<const T> t) {
   CpuMemory m;
   m.data = const_cast<T*>(t.data());
   m.size_bytes = t.size() * sizeof(T);
@@ -259,7 +259,7 @@ class InferenceBuilder {
 
   // Sets new shape for the input if underlying implementation and graph
   // structure allows dynamic tensors.
-  virtual absl::Status SetInputShape(int index,
+  virtual abslx::Status SetInputShape(int index,
                                      const Dimensions& dimensions) = 0;
 
   // Updates object definitions for the given index. Implementation may allow
@@ -269,21 +269,21 @@ class InferenceBuilder {
   //   A user, however, has an input in DataType::FLOAT16, DataLayout::PHWC4.
   //   An implementation may allow this transformation to happen automatically
   //   under the hood.
-  virtual absl::Status SetInputObjectDef(int index, ObjectDef def) = 0;
-  virtual absl::Status SetOutputObjectDef(int index, ObjectDef def) = 0;
-  virtual absl::Status SetAllInputObjectDefsTo(ObjectDef def) {
+  virtual abslx::Status SetInputObjectDef(int index, ObjectDef def) = 0;
+  virtual abslx::Status SetOutputObjectDef(int index, ObjectDef def) = 0;
+  virtual abslx::Status SetAllInputObjectDefsTo(ObjectDef def) {
     auto input_defs = inputs();
     for (int i = 0; i < input_defs.size(); ++i) {
       RETURN_IF_ERROR(SetInputObjectDef(i, def));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  virtual absl::Status SetAllOutputObjectDefsTo(ObjectDef def) {
+  virtual abslx::Status SetAllOutputObjectDefsTo(ObjectDef def) {
     auto output_defs = outputs();
     for (int i = 0; i < output_defs.size(); ++i) {
       RETURN_IF_ERROR(SetOutputObjectDef(i, def));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Creates new instance of the inference runner. InferenceBuilder stays valid
@@ -291,7 +291,7 @@ class InferenceBuilder {
   //
   // This method may take significant time to prepare new inference runner. For
   // example, it may require to compile OpenGL shaders.
-  virtual absl::Status Build(std::unique_ptr<InferenceRunner>* runner) = 0;
+  virtual abslx::Status Build(std::unique_ptr<InferenceRunner>* runner) = 0;
 };
 
 // Runs prepared inference. Every object marked as external needs to be set
@@ -308,12 +308,12 @@ class InferenceRunner {
   // Setters allow to set or change external object for the given index. Note,
   // object need to match object definition set before in InferenceBuilder.
 
-  virtual absl::Status GetInputObject(int index, TensorObject* object) = 0;
-  virtual absl::Status GetOutputObject(int index, TensorObject* object) = 0;
-  virtual absl::Status SetInputObject(int index, TensorObject object) = 0;
-  virtual absl::Status SetOutputObject(int index, TensorObject object) = 0;
+  virtual abslx::Status GetInputObject(int index, TensorObject* object) = 0;
+  virtual abslx::Status GetOutputObject(int index, TensorObject* object) = 0;
+  virtual abslx::Status SetInputObject(int index, TensorObject object) = 0;
+  virtual abslx::Status SetOutputObject(int index, TensorObject object) = 0;
 
-  virtual absl::Status Run() = 0;
+  virtual abslx::Status Run() = 0;
 };
 
 // Encapsulated compilation/runtime tradeoffs.

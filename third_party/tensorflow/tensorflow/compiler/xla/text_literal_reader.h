@@ -40,7 +40,7 @@ class TextLiteralReader {
  public:
   // See class comment -- reads a file in its entirety (there must be only one
   // literal in the text file path provided).
-  static StatusOr<Literal> ReadPath(absl::string_view path);
+  static StatusOr<Literal> ReadPath(abslx::string_view path);
 
  private:
   // Ownership of file is transferred.

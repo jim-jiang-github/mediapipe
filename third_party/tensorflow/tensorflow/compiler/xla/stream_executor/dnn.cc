@@ -82,19 +82,19 @@ std::string AlgorithmDesc::ToString() const {
   if (is_cudnn_frontend()) {
     // Format similarly to cudnn_frontend::ExecutionPlan::getTag(), e.g.
     // "eng2{k1=2,k3=4}".
-    return absl::StrFormat(
+    return abslx::StrFormat(
         "eng%d{%s}", proto_.algo_id(),
-        absl::StrJoin(
+        abslx::StrJoin(
             proto_.tuning_knobs(), ",",
             [](std::string* out,
                const google::protobuf::Map<int64_t, int64_t>::value_type& pair) {
-              absl::StrAppendFormat(out, "k%d=%d", pair.first, pair.second);
+              abslx::StrAppendFormat(out, "k%d=%d", pair.first, pair.second);
             }));
   }
   if (tensor_ops_enabled()) {
-    return absl::StrCat(algo_id(), "#TC");
+    return abslx::StrCat(algo_id(), "#TC");
   } else {
-    return absl::StrCat(algo_id());
+    return abslx::StrCat(algo_id());
   }
 }
 
@@ -207,7 +207,7 @@ std::string QuantizedActivationModeString(QuantizedActivationMode mode) {
     case dnn::QuantizedActivationMode::k32Bit:
       return "int32";
     default:
-      return absl::StrCat("unknown: ", static_cast<int32_t>(mode));
+      return abslx::StrCat("unknown: ", static_cast<int32_t>(mode));
   }
 }
 
@@ -228,7 +228,7 @@ std::string ActivationModeString(ActivationMode mode) {
     case ActivationMode::kBandPass:
       return "bandpass";
     default:
-      return absl::StrCat("unknown: ", static_cast<int32_t>(mode));
+      return abslx::StrCat("unknown: ", static_cast<int32_t>(mode));
   }
 }
 
@@ -239,7 +239,7 @@ std::string ElementwiseOperationString(ElementwiseOperation op) {
     case ElementwiseOperation::kMultiply:
       return "multiply";
     default:
-      return absl::StrCat("unknown: ", static_cast<int32_t>(op));
+      return abslx::StrCat("unknown: ", static_cast<int32_t>(op));
   }
 }
 
@@ -258,7 +258,7 @@ std::string DataLayoutString(DataLayout layout) {
     case DataLayout::kBatchDepthYX32:
       return "BatchDepthYX32";
     default:
-      return absl::StrCat("unknown: ", static_cast<int32_t>(layout));
+      return abslx::StrCat("unknown: ", static_cast<int32_t>(layout));
   }
 }
 
@@ -277,7 +277,7 @@ std::string FilterLayoutString(FilterLayout layout) {
     case FilterLayout::kYXInputOutput:
       return "YXInputOutput";
     default:
-      return absl::StrCat("unknown: ", static_cast<int32_t>(layout));
+      return abslx::StrCat("unknown: ", static_cast<int32_t>(layout));
   }
 }
 
@@ -290,7 +290,7 @@ std::string PadAlignmentString(PadAlignment alignment) {
     case PadAlignment::kTensorFlowPadding:
       return "TensorFlow padding";
     default:
-      return absl::StrCat("unknown: ", static_cast<int32_t>(alignment));
+      return abslx::StrCat("unknown: ", static_cast<int32_t>(alignment));
   }
 }
 
@@ -305,7 +305,7 @@ std::string ShortPoolingModeString(PoolingMode mode) {
     case PoolingMode::kAverage:
       return "Avg";
     default:
-      return absl::StrCat("unknown: ", static_cast<int32_t>(mode));
+      return abslx::StrCat("unknown: ", static_cast<int32_t>(mode));
   }
 }
 
@@ -451,7 +451,7 @@ std::string AlgorithmConfig::ToString() const {
   if (algorithm_no_scratch().has_value()) {
     algo_no_scratch = algorithm_no_scratch()->ToString();
   }
-  return absl::StrCat(algo, ", ", algo_no_scratch);
+  return abslx::StrCat(algo, ", ", algo_no_scratch);
 }
 
 // -- BatchDescriptor
@@ -519,9 +519,9 @@ void BatchDescriptor::CloneFrom(const BatchDescriptor& other) {
 std::string BatchDescriptor::ToString() const {
   std::string spatial;
   for (int i = 0; i < ndims(); i++) {
-    absl::StrAppendFormat(&spatial, "%d ", spatial_size()[i]);
+    abslx::StrAppendFormat(&spatial, "%d ", spatial_size()[i]);
   }
-  return absl::StrFormat(
+  return abslx::StrFormat(
       "{count: %d feature_map_count: %d spatial: %s "
       "value_min: %f value_max: %f layout: %s}",
       count(), feature_map_count(), spatial, value_min_, value_max_,
@@ -532,17 +532,17 @@ std::string BatchDescriptor::ToShortString() const {
   // All the constituent strings are less than 15 characters, so the
   // small string optimization ensures that there will be at most one
   // heap memory allocation.
-  std::string depth = absl::StrCat("d", feature_map_count());
-  std::string batch = absl::StrCat("b", count());
+  std::string depth = abslx::StrCat("d", feature_map_count());
+  std::string batch = abslx::StrCat("b", count());
 
   std::string spatial = "s";
   for (int i = 0; i < ndims(); i++) {
-    absl::StrAppendFormat(&spatial, "%d ", spatial_size()[i]);
+    abslx::StrAppendFormat(&spatial, "%d ", spatial_size()[i]);
   }
 
   std::string suffix;
   if (value_min() != value_max()) {
-    absl::StrAppend(&suffix, "[", value_min(), ";", value_max(), "]");
+    abslx::StrAppend(&suffix, "[", value_min(), ";", value_max(), "]");
   }
   if (quantized_activation_mode() == QuantizedActivationMode::k16Bit) {
     suffix += "_16bit";
@@ -550,16 +550,16 @@ std::string BatchDescriptor::ToShortString() const {
 
   switch (layout()) {
     case DataLayout::kYXDepthBatch:
-      return absl::StrCat(spatial, depth, batch, suffix);
+      return abslx::StrCat(spatial, depth, batch, suffix);
     case DataLayout::kYXBatchDepth:
-      return absl::StrCat(spatial, batch, depth, suffix);
+      return abslx::StrCat(spatial, batch, depth, suffix);
     case DataLayout::kBatchYXDepth:
-      return absl::StrCat(batch, spatial, depth, suffix);
+      return abslx::StrCat(batch, spatial, depth, suffix);
     case DataLayout::kBatchDepthYX:
-      return absl::StrCat(batch, depth, spatial, suffix);
+      return abslx::StrCat(batch, depth, spatial, suffix);
     case DataLayout::kBatchDepthYX4:
     case DataLayout::kBatchDepthYX32:
-      return absl::StrCat(batch, depth, spatial, suffix, "(VECT_C)");
+      return abslx::StrCat(batch, depth, spatial, suffix, "(VECT_C)");
     default:
       LOG(FATAL) << "Unknown layout " << static_cast<int32>(layout());
       return "";  // Avoid return warning (unreachable)
@@ -632,15 +632,15 @@ void FilterDescriptor::CloneFrom(const FilterDescriptor& other) {
 }
 
 std::string FilterDescriptor::ToString() const {
-  std::string desc = absl::StrFormat(
+  std::string desc = abslx::StrFormat(
       "{output_feature_map_count: %d input_feature_map_count: %d "
       "layout: %s shape: ",
       output_feature_map_count(), input_feature_map_count(),
       FilterLayoutString(layout()));
   for (int i = 0; i < ndims(); i++) {
-    absl::StrAppendFormat(&desc, "%d ", input_filter_dims()[i]);
+    abslx::StrAppendFormat(&desc, "%d ", input_filter_dims()[i]);
   }
-  absl::StrAppend(&desc, "}");
+  abslx::StrAppend(&desc, "}");
 
   return desc;
 }
@@ -649,26 +649,26 @@ std::string FilterDescriptor::ToShortString() const {
   // All the constituent strings are less than 15 characters, so the
   // small string optimization ensures that there will be at most one
   // heap memory allocation.
-  std::string od = absl::StrCat("od", output_feature_map_count());
-  std::string id = absl::StrCat("id", input_feature_map_count());
+  std::string od = abslx::StrCat("od", output_feature_map_count());
+  std::string id = abslx::StrCat("id", input_feature_map_count());
 
   std::string spatial = "s";
   for (int i = 0; i < ndims(); i++) {
-    absl::StrAppendFormat(&spatial, "%d ", input_filter_dims()[i]);
+    abslx::StrAppendFormat(&spatial, "%d ", input_filter_dims()[i]);
   }
 
   switch (layout()) {
     case FilterLayout::kOutputInputYX:
-      return absl::StrCat(od, id, spatial);
+      return abslx::StrCat(od, id, spatial);
     case FilterLayout::kOutputYXInput:
-      return absl::StrCat(od, spatial, id);
+      return abslx::StrCat(od, spatial, id);
     case FilterLayout::kOutputInputYX4:
     case FilterLayout::kOutputInputYX32:
-      return absl::StrCat(od, id, spatial, "(VECT_C)");
+      return abslx::StrCat(od, id, spatial, "(VECT_C)");
     case FilterLayout::kInputYXOutput:
-      return absl::StrCat(id, spatial, od);
+      return abslx::StrCat(id, spatial, od);
     case FilterLayout::kYXInputOutput:
-      return absl::StrCat(spatial, id, od);
+      return abslx::StrCat(spatial, id, od);
     default:
       LOG(FATAL) << "Unknown layout " << static_cast<int32>(layout());
       return "";  // Avoid return warning (unreachable)
@@ -751,12 +751,12 @@ std::string ConvolutionDescriptor::ToString() const {
   std::string strides;
   std::string dilations;
   for (int i = 0; i < ndims(); i++) {
-    absl::StrAppendFormat(&padding, "%d ", this->padding()[i]);
-    absl::StrAppendFormat(&strides, "%d ", this->strides()[i]);
-    absl::StrAppendFormat(&dilations, "%d ", this->dilations()[i]);
+    abslx::StrAppendFormat(&padding, "%d ", this->padding()[i]);
+    abslx::StrAppendFormat(&strides, "%d ", this->strides()[i]);
+    abslx::StrAppendFormat(&dilations, "%d ", this->dilations()[i]);
   }
 
-  return absl::StrFormat(
+  return abslx::StrFormat(
       "{zero_padding: %s pad_alignment: %s filter_strides: %s dilation_rates: "
       "%s}",
       padding, PadAlignmentString(pad_alignment()), strides, dilations);
@@ -765,14 +765,14 @@ std::string ConvolutionDescriptor::ToString() const {
 std::string ConvolutionDescriptor::ToShortString() const {
   std::string desc;
   for (int i = 0; i < ndims(); i++) {
-    if (i > 0) absl::StrAppend(&desc, "_");
-    absl::StrAppendFormat(&desc, "p%d:%d", i, padding()[i]);
+    if (i > 0) abslx::StrAppend(&desc, "_");
+    abslx::StrAppendFormat(&desc, "p%d:%d", i, padding()[i]);
   }
   for (int i = 0; i < ndims(); i++) {
-    absl::StrAppendFormat(&desc, "_s%d:%d", i, strides()[i]);
+    abslx::StrAppendFormat(&desc, "_s%d:%d", i, strides()[i]);
   }
   for (int i = 0; i < ndims(); i++) {
-    absl::StrAppendFormat(&desc, "_d%d:%d", i, dilations()[i]);
+    abslx::StrAppendFormat(&desc, "_d%d:%d", i, dilations()[i]);
   }
   return desc;
 }
@@ -804,14 +804,14 @@ std::string PoolingDescriptor::ToString() const {
 
   std::string window, strides, padding;
   for (int i = 0; i < ndims_; i++) {
-    absl::StrAppendFormat(&window, "%d ", window_[i]);
-    absl::StrAppendFormat(&strides, "%d ", strides_[i]);
-    absl::StrAppendFormat(&padding, "%d", padding_[i]);
+    abslx::StrAppendFormat(&window, "%d ", window_[i]);
+    abslx::StrAppendFormat(&strides, "%d ", strides_[i]);
+    abslx::StrAppendFormat(&padding, "%d", padding_[i]);
   }
 
   const char* propagate_string = propagate_nans_ ? "Yes" : "No";
 
-  return absl::StrFormat(
+  return abslx::StrFormat(
       "{mode: %s window: %s strides: %s padding: %s propagate NaNs: %s}",
       mode_string, window, strides, padding, propagate_string);
 }
@@ -819,11 +819,11 @@ std::string PoolingDescriptor::ToString() const {
 std::string PoolingDescriptor::ToShortString() const {
   std::string window, strides, padding;
   for (int i = 0; i < ndims_; i++) {
-    absl::StrAppendFormat(&window, "_w%d:%d", i, window_[i]);
-    absl::StrAppendFormat(&strides, "_s%d:%d", i, strides_[i]);
-    absl::StrAppendFormat(&padding, "_p%d:%d", i, padding_[i]);
+    abslx::StrAppendFormat(&window, "_w%d:%d", i, window_[i]);
+    abslx::StrAppendFormat(&strides, "_s%d:%d", i, strides_[i]);
+    abslx::StrAppendFormat(&padding, "_p%d:%d", i, padding_[i]);
   }
-  return absl::StrCat(mode_ == dnn::PoolingMode::kMaximum ? "max" : "avg",
+  return abslx::StrCat(mode_ == dnn::PoolingMode::kMaximum ? "max" : "avg",
                       window, strides, padding,
                       propagate_nans_ ? "propagate_nans" : "ignore_nans");
 }
@@ -848,14 +848,14 @@ void NormalizeDescriptor::CloneFrom(const NormalizeDescriptor& other) {
 }
 
 std::string NormalizeDescriptor::ToString() const {
-  return absl::StrFormat(
+  return abslx::StrFormat(
       "{bias: %f range: %d alpha: %f beta: %f wrap_around: %d "
       "segment_size: %d}",
       bias_, range_, alpha_, beta_, wrap_around_, segment_size_);
 }
 
 std::string NormalizeDescriptor::ToShortString() const {
-  return absl::StrCat("bias:", bias_, "_range:", range_, "_alpha:", alpha_,
+  return abslx::StrCat("bias:", bias_, "_range:", range_, "_alpha:", alpha_,
                       "_beta:", beta_, "_wrap:", wrap_around_,
                       "_size:", segment_size_);
 }
@@ -873,9 +873,9 @@ bool DnnSupport::IsStatusOk(const port::Status& status, bool report_error) {
 port::Status DnnSupport::DoCtcLoss(
     Stream* stream, dnn::DataType element_type,
     const RnnStateTensorDescriptor& probs_desc,
-    const DeviceMemoryBase probs_data, absl::Span<const int> labels_data,
-    absl::Span<const int> labels_lengths_data,
-    absl::Span<const int> input_lengths_data, DeviceMemoryBase costs_data,
+    const DeviceMemoryBase probs_data, abslx::Span<const int> labels_data,
+    abslx::Span<const int> labels_lengths_data,
+    abslx::Span<const int> input_lengths_data, DeviceMemoryBase costs_data,
     const RnnStateTensorDescriptor& grads_desc, DeviceMemoryBase grads_data,
     DeviceMemory<uint8> scratch_memory, int ctc_loss_algo_id) {
   return port::UnimplementedError("CtcLoss not implemented");

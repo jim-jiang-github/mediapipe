@@ -30,8 +30,8 @@ class FunctionParameterCanonicalizer {
  public:
   // `arg_names` is a list of argument names, and `defaults` is default PyObject
   // instances for arguments. `default` is aligned to the end.
-  FunctionParameterCanonicalizer(absl::Span<const char*> arg_names,
-                                 absl::Span<PyObject*> defaults);
+  FunctionParameterCanonicalizer(abslx::Span<const char*> arg_names,
+                                 abslx::Span<PyObject*> defaults);
 
   // Returns the total number of arguments.
   ABSL_MUST_USE_RESULT
@@ -48,7 +48,7 @@ class FunctionParameterCanonicalizer {
   ABSL_MUST_USE_RESULT
   ABSL_ATTRIBUTE_HOT
   bool Canonicalize(PyObject* args, PyObject* kwargs,
-                    absl::Span<PyObject*> result);
+                    abslx::Span<PyObject*> result);
 
  private:
   // Simple linear search of `name` in `interned_arg_names`. If found, returns

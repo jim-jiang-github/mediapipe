@@ -83,7 +83,7 @@ TEST_F(TFProfAdvisorTest, OperationChecker) {
   AdviceProto advice = advisor_->Advise(options);
   EXPECT_EQ(advice.checkers().at(kCheckers[1]).reports_size(), 1);
   EXPECT_TRUE(
-      absl::StrContains(advice.checkers().at(kCheckers[1]).reports(0), "NCHW"));
+      abslx::StrContains(advice.checkers().at(kCheckers[1]).reports(0), "NCHW"));
 }
 
 TEST_F(TFProfAdvisorTest, UtilizationChecker) {
@@ -91,7 +91,7 @@ TEST_F(TFProfAdvisorTest, UtilizationChecker) {
   (*options.mutable_checkers())[kCheckers[0]];
   AdviceProto advice = advisor_->Advise(options);
   EXPECT_EQ(advice.checkers().at(kCheckers[0]).reports_size(), 1);
-  EXPECT_TRUE(absl::StrContains(advice.checkers().at(kCheckers[0]).reports(0),
+  EXPECT_TRUE(abslx::StrContains(advice.checkers().at(kCheckers[0]).reports(0),
                                 "low utilization"));
 }
 
@@ -99,7 +99,7 @@ TEST_F(TFProfAdvisorTest, ExpensiveOperationChecker) {
   AdvisorOptionsProto options;
   (*options.mutable_checkers())[kCheckers[2]];
   AdviceProto advice = advisor_->Advise(options);
-  EXPECT_TRUE(absl::StrContains(advice.checkers().at(kCheckers[2]).reports(0),
+  EXPECT_TRUE(abslx::StrContains(advice.checkers().at(kCheckers[2]).reports(0),
                                 "top 1 operation type: Conv2D"));
 }
 

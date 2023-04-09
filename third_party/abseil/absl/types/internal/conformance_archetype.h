@@ -42,7 +42,7 @@
 #include "absl/meta/type_traits.h"
 #include "absl/types/internal/conformance_profile.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace types_internal {
 
@@ -847,13 +847,13 @@ class Archetype<Prof, typename std::enable_if<
 // It is important to delete it rather than simply leave it out so that the
 // "using std::swap;" idiom will result in this deleted overload being picked.
 template <class Prof,
-          absl::enable_if_t<!PropertiesOfT<Prof>::is_swappable, int> = 0>
+          abslx::enable_if_t<!PropertiesOfT<Prof>::is_swappable, int> = 0>
 void swap(Archetype<Prof>&, Archetype<Prof>&) = delete;  // NOLINT
 
 // A conditionally-noexcept swap implementation for Archetype when the profile
 // supports swap.
 template <class Prof,
-          absl::enable_if_t<PropertiesOfT<Prof>::is_swappable, int> = 0>
+          abslx::enable_if_t<PropertiesOfT<Prof>::is_swappable, int> = 0>
 void swap(Archetype<Prof>& lhs, Archetype<Prof>& rhs)  // NOLINT
     noexcept(PropertiesOfT<Prof>::swappable_support != swappable::yes) {
   std::swap(lhs.archetype_state, rhs.archetype_state);
@@ -917,18 +917,18 @@ struct ExceptionalBool {
 // though the operation itself is noexcept.
 #define ABSL_TYPES_INTERNAL_OP(enum_name, op)                                \
   template <class Prof>                                                      \
-  absl::enable_if_t<!PropertiesOfT<Prof>::is_##enum_name, bool> operator op( \
+  abslx::enable_if_t<!PropertiesOfT<Prof>::is_##enum_name, bool> operator op( \
       const Archetype<Prof>&, const Archetype<Prof>&) = delete;              \
                                                                              \
   template <class Prof>                                                      \
-  typename absl::enable_if_t<                                                \
+  typename abslx::enable_if_t<                                                \
       PropertiesOfT<Prof>::is_##enum_name,                                   \
       std::conditional<PropertiesOfT<Prof>::enum_name##_support ==           \
                            enum_name::nothrow,                               \
                        NothrowBool, ExceptionalBool>>::type                  \
   operator op(const Archetype<Prof>& lhs,                                    \
               const Archetype<Prof>& rhs) noexcept {                         \
-    return absl::conditional_t<                                              \
+    return abslx::conditional_t<                                              \
         PropertiesOfT<Prof>::enum_name##_support == enum_name::nothrow,      \
         NothrowBool, ExceptionalBool>::make(lhs.archetype_state op           \
                                                 rhs.archetype_state);        \
@@ -963,15 +963,15 @@ struct EnabledHash {
 
 }  // namespace types_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 namespace std {
 
 template <class Prof>  // NOLINT
-struct hash<::absl::types_internal::Archetype<Prof>>
-    : conditional<::absl::types_internal::PropertiesOfT<Prof>::is_hashable,
-                  ::absl::types_internal::EnabledHash<Prof>,
-                  ::absl::types_internal::PoisonedHash>::type {};
+struct hash<::abslx::types_internal::Archetype<Prof>>
+    : conditional<::abslx::types_internal::PropertiesOfT<Prof>::is_hashable,
+                  ::abslx::types_internal::EnabledHash<Prof>,
+                  ::abslx::types_internal::PoisonedHash>::type {};
 
 }  // namespace std
 

@@ -32,7 +32,7 @@ using ::testing::AllOf;
 using SimplifyFPConversionsTest = HloTestBase;
 
 TEST_F(SimplifyFPConversionsTest, DoesNotChangeSingleConvert) {
-  const absl::string_view kModuleStr = R"(
+  const abslx::string_view kModuleStr = R"(
     HloModule test
 
     ENTRY entry {
@@ -49,7 +49,7 @@ TEST_F(SimplifyFPConversionsTest, DoesNotChangeSingleConvert) {
 }
 
 TEST_F(SimplifyFPConversionsTest, SimplifiesF32ToBF16ToF32) {
-  const absl::string_view kModuleStr = R"(
+  const abslx::string_view kModuleStr = R"(
     HloModule test
 
     ENTRY entry {
@@ -69,7 +69,7 @@ TEST_F(SimplifyFPConversionsTest, SimplifiesF32ToBF16ToF32) {
 }
 
 TEST_F(SimplifyFPConversionsTest, SimplifiesF64ToF16ToF32ToBF16) {
-  const absl::string_view kModuleStr = R"(
+  const abslx::string_view kModuleStr = R"(
     HloModule test
 
     ENTRY entry {

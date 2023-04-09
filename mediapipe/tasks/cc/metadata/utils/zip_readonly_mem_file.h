@@ -28,7 +28,7 @@ namespace metadata {
 // In-memory read-only zip file implementation.
 //
 // Adapted from [1], with a few key differences:
-// * backed by an `absl::string_view` instead of malloc-ed C buffers,
+// * backed by an `abslx::string_view` instead of malloc-ed C buffers,
 // * supports opening the file for reading through `unzOpen2_64`.
 //
 // This class is NOT thread-safe.
@@ -47,7 +47,7 @@ class ZipReadOnlyMemFile {
 
  private:
   // The string view backing the in-memory file.
-  absl::string_view data_;
+  abslx::string_view data_;
   // The current offset in the file.
   ZPOS64_T offset_;
   // The `zlib_filefunc64_def` implementation for this in-memory zip file.

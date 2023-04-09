@@ -208,7 +208,7 @@ class TransferManager {
 
   // Resets the devices associated with this transfer manager.
   virtual Status ResetDevices(
-      absl::Span<se::StreamExecutor* const> executor) = 0;
+      abslx::Span<se::StreamExecutor* const> executor) = 0;
 
   // Given an allocated ShapedBuffer, constructs the tuple index table(s) in
   // each buffer of the given ShapedBuffer corresponding to tuple shapes. If the
@@ -305,7 +305,7 @@ class TransferManager {
   // to construct a tuple index table in the platform-specific tuple
   // representation.
   virtual Status WriteSingleTupleIndexTable(
-      se::Stream* stream, absl::Span<const se::DeviceMemoryBase> elements,
+      se::Stream* stream, abslx::Span<const se::DeviceMemoryBase> elements,
       const Shape& shape, se::DeviceMemoryBase* region) = 0;
 
  protected:
@@ -327,7 +327,7 @@ class TransferManager {
 
  private:
   // The mutex that guards the platform-to-transfer manager map.
-  static absl::Mutex platform_transfer_manager_mutex_;
+  static abslx::Mutex platform_transfer_manager_mutex_;
 
   // State kept for each kind of TransferManager.  Registration functions
   // set up creation_function, and then we use that to lazily create
@@ -338,7 +338,7 @@ class TransferManager {
   };
 
   // Map from platform kind to transfer manager singleton.
-  static absl::flat_hash_map<se::Platform::Id, State>*
+  static abslx::flat_hash_map<se::Platform::Id, State>*
   GetPlatformTransferManagers();
 };
 

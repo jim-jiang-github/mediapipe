@@ -154,13 +154,13 @@ class NodeMatcherProperties {
 };
 
 ::testing::Matcher<const Node*> NodeWith(
-    absl::Span<const NodeMatcherProperties> props);
+    abslx::Span<const NodeMatcherProperties> props);
 
 impl::NodeMatcherProperties Inputs(
-    absl::Span<const ::testing::Matcher<OutEdge>> inputs);
+    abslx::Span<const ::testing::Matcher<OutEdge>> inputs);
 
 impl::NodeMatcherProperties CtrlDeps(
-    absl::Span<const ::testing::Matcher<const Node*>> control_deps);
+    abslx::Span<const ::testing::Matcher<const Node*>> control_deps);
 
 impl::NodeMatcherProperties Attr(std::pair<string, AttrValue> attrs);
 impl::NodeMatcherProperties Attr(string name);
@@ -169,10 +169,10 @@ std::pair<string, AttrValue> AttrLiteralHelper(
     const std::pair<string, bool>& bool_attr);
 
 std::pair<string, AttrValue> AttrLiteralHelper(
-    const std::pair<string, absl::Span<const int>>& int_list_attr);
+    const std::pair<string, abslx::Span<const int>>& int_list_attr);
 
 std::pair<string, AttrValue> AttrLiteralHelper(
-    const std::pair<string, absl::Span<const string>>& string_list_attr);
+    const std::pair<string, abslx::Span<const string>>& string_list_attr);
 }  // namespace impl
 
 // -----------------------------------------------------------------------------
@@ -241,7 +241,7 @@ template <typename... Ts>
 }  // namespace matchers
 
 // If `g` has a node named `name` returns it, otherwise returns null.
-Node* FindNodeByName(Graph* g, absl::string_view name);
+Node* FindNodeByName(Graph* g, abslx::string_view name);
 }  // namespace testing
 
 void PrintTo(const Node* n, ::std::ostream* os);

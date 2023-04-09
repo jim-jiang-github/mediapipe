@@ -106,7 +106,7 @@ class AttrBuilder : public AbstractOpAttrs {
     encoded_attrs_.clear();
     node_def_initialized_ = false;
     node_def_finalized_ = false;
-    cached_cache_key_ = absl::nullopt;
+    cached_cache_key_ = abslx::nullopt;
     device_for_cached_cache_key_.clear();
   }
 
@@ -119,7 +119,7 @@ class AttrBuilder : public AbstractOpAttrs {
   AttrBuilder& Set(StringPiece attr_name, T&& value) {
     SetAttrValue(value, &attr_tmp_);
     AddAttrIfNotPresent(attr_name, attr_tmp_);
-    cached_cache_key_ = absl::nullopt;
+    cached_cache_key_ = abslx::nullopt;
     return *this;
   }
 
@@ -127,7 +127,7 @@ class AttrBuilder : public AbstractOpAttrs {
 
   AttrBuilder& Set(StringPiece attr_name, const AttrValue& value) {
     AddAttrIfNotPresent(attr_name, value);
-    cached_cache_key_ = absl::nullopt;
+    cached_cache_key_ = abslx::nullopt;
     return *this;
   }
 
@@ -170,14 +170,14 @@ class AttrBuilder : public AbstractOpAttrs {
 
   void GetNameAttrList(tensorflow::NameAttrList* name_and_attrs) const override;
 
-  bool GetInt(absl::string_view attr_name, int64_t* result) const override;
-  bool GetFloat(absl::string_view attr_name, float* result) const override;
-  bool GetBool(absl::string_view attr_name, bool* result) const override;
-  bool GetType(absl::string_view attr_name,
+  bool GetInt(abslx::string_view attr_name, int64_t* result) const override;
+  bool GetFloat(abslx::string_view attr_name, float* result) const override;
+  bool GetBool(abslx::string_view attr_name, bool* result) const override;
+  bool GetType(abslx::string_view attr_name,
                tensorflow::DataType* result) const override;
   Status GetTypeList(
-      absl::string_view attr_name,
-      absl::InlinedVector<DataType, 4>* type_list) const override;
+      abslx::string_view attr_name,
+      abslx::InlinedVector<DataType, 4>* type_list) const override;
 
  private:
   tensorflow::Fprint128 BuildCacheKeyForDevice(const StringPiece device) const;
@@ -206,7 +206,7 @@ class AttrBuilder : public AbstractOpAttrs {
   bool node_def_initialized_;
   bool node_def_finalized_;
 
-  absl::optional<tensorflow::Fprint128> cached_cache_key_;
+  abslx::optional<tensorflow::Fprint128> cached_cache_key_;
   string device_for_cached_cache_key_;
 };
 

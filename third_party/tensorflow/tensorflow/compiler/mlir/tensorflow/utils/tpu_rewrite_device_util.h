@@ -35,11 +35,11 @@ limitations under the License.
 namespace tensorflow {
 using stream_executor::port::StatusOr;
 
-inline constexpr absl::string_view kTPUReplicatedHost = "TPU_REPLICATED_HOST";
-inline constexpr absl::string_view kNumCoresPerReplicaAttr =
+inline constexpr abslx::string_view kTPUReplicatedHost = "TPU_REPLICATED_HOST";
+inline constexpr abslx::string_view kNumCoresPerReplicaAttr =
     "num_cores_per_replica";
-inline constexpr absl::string_view kTopologyAttr = "topology";
-inline constexpr absl::string_view kDeviceAssignmentAttr = "device_assignment";
+inline constexpr abslx::string_view kTopologyAttr = "topology";
+inline constexpr abslx::string_view kDeviceAssignmentAttr = "device_assignment";
 
 // A TPU device for execution alongside its associated host CPU device.
 struct TPUDeviceAndHost {

@@ -57,7 +57,7 @@
 #define ABSL_WAITER_MODE ABSL_WAITER_MODE_CONDVAR
 #endif
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace synchronization_internal {
 
@@ -150,6 +150,6 @@ class Waiter {
 
 }  // namespace synchronization_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_SYNCHRONIZATION_INTERNAL_WAITER_H_

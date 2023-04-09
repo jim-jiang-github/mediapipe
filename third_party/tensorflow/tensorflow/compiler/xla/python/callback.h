@@ -32,19 +32,19 @@ class CpuCallback {
   struct Arg {
     xla::PrimitiveType type;               // XLA type
     pybind11::dtype dtype;                 // NumPy type, for array types.
-    absl::InlinedVector<int64_t, 4> dims;  // Dimensions, for array types.
+    abslx::InlinedVector<int64_t, 4> dims;  // Dimensions, for array types.
     std::vector<ssize_t> strides;          // Byte strides, for array types.
     size_t size_in_bytes;                  // Size of the array in bytes.
   };
   struct Result {
     xla::PrimitiveType type;  // XLA type
     // Expected output shape, for array types
-    absl::InlinedVector<int64_t, 4> expected_dims;
+    abslx::InlinedVector<int64_t, 4> expected_dims;
     // Expected output byte strides, for array types. If the strides do not
     // match the output will be transposed into the expected layout.
     std::vector<int64_t> expected_strides;
     // The desired order of output dimensions in major-to-minor order.
-    absl::InlinedVector<int64_t, 4> reversed_layout;
+    abslx::InlinedVector<int64_t, 4> reversed_layout;
     // Size of the array in bytes.
     size_t size_in_bytes;
   };

@@ -39,7 +39,7 @@ class HloPassFix : public Pass {
   explicit HloPassFix(Args&&... args) : Pass(args...) {}
 
   Status RunOnChangedComputations(HloModule* module, RunState* outer_run_state,
-                                  const absl::flat_hash_set<absl::string_view>&
+                                  const abslx::flat_hash_set<abslx::string_view>&
                                       execution_threads) override {
     RunState run_state;
     run_state.changed_last_iteration = outer_run_state->changed_last_iteration;
@@ -51,7 +51,7 @@ class HloPassFix : public Pass {
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(HloModule* module,
-                     const absl::flat_hash_set<absl::string_view>&
+                     const abslx::flat_hash_set<abslx::string_view>&
                          execution_threads) override {
     RunState run_state(module);
     TF_RETURN_IF_ERROR(RunToFixPoint(module, &run_state, execution_threads));
@@ -60,7 +60,7 @@ class HloPassFix : public Pass {
 
   using HloPassInterface::RunOnModuleGroup;
   StatusOr<bool> RunOnModuleGroup(HloModuleGroup* module_group,
-                                  const absl::flat_hash_set<absl::string_view>&
+                                  const abslx::flat_hash_set<abslx::string_view>&
                                       execution_threads) override {
     bool changed = false;
     bool changed_this_iteration = true;
@@ -86,7 +86,7 @@ class HloPassFix : public Pass {
  private:
   Status RunToFixPoint(
       HloModule* module, RunState* run_state,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) {
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
     VLOG(3) << "Running HloPassFix on " << Pass::name();
     while (!run_state->changed_last_iteration.empty()) {
       TF_RETURN_IF_ERROR(
@@ -109,7 +109,7 @@ class HloPassFix : public Pass {
 
   Status RunOnChangedComputationsOnce(
       HloModule* module, RunState* run_state,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) {
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
     // If Pass overrides RunOnChangedComputations, just forward to it.
     if (!std::is_same<decltype(&HloPassInterface::RunOnChangedComputations),
                       decltype(&Pass::RunOnChangedComputations)>::value) {

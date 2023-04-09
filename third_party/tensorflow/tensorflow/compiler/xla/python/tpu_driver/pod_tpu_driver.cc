@@ -51,7 +51,7 @@ class PodEvent : public Event {
 
   xla::Status Await() override;
 
-  std::optional<xla::Status> AwaitWithTimeout(absl::Duration duration) override;
+  std::optional<xla::Status> AwaitWithTimeout(abslx::Duration duration) override;
 
   void AddCallback(std::function<void(Status)> callback) override;
 
@@ -69,7 +69,7 @@ class ErrorEvent : public PodEvent {
 
   xla::Status Await() override { return status_; }
   std::optional<xla::Status> AwaitWithTimeout(
-      absl::Duration duration) override {
+      abslx::Duration duration) override {
     return status_;
   }
   void AddCallback(std::function<void(Status)> callback) override {
@@ -98,11 +98,11 @@ class CombinedEvent : public PodEvent {
   }
 
   std::optional<xla::Status> AwaitWithTimeout(
-      absl::Duration duration) override {
+      abslx::Duration duration) override {
     for (auto& event : events_) {
-      auto start_time = absl::Now();
+      auto start_time = abslx::Now();
       auto status = event->AwaitWithTimeout(duration);
-      duration -= absl::Now() - start_time;
+      duration -= abslx::Now() - start_time;
       if (status == std::nullopt) {
         return std::nullopt;
       } else {
@@ -116,13 +116,13 @@ class CombinedEvent : public PodEvent {
       ABSL_LOCKS_EXCLUDED(mu_) override {
     bool all_events_completed = false;
     {
-      absl::MutexLock l(&mu_);
+      abslx::MutexLock l(&mu_);
       all_events_completed = events_completed_ == events_.size();
     }
     if (all_events_completed) {
       callback(event_status_);
     } else {
-      absl::MutexLock l(&mu_);
+      abslx::MutexLock l(&mu_);
       callbacks_.push_back(std::move(callback));
     }
   }
@@ -131,7 +131,7 @@ class CombinedEvent : public PodEvent {
   void IncrementAndCheckComplete(Status s) ABSL_LOCKS_EXCLUDED(mu_) {
     std::vector<std::function<void(Status)>> callbacks;
     {
-      absl::MutexLock l(&mu_);
+      abslx::MutexLock l(&mu_);
 
       event_status_ = s;
       events_completed_++;
@@ -149,7 +149,7 @@ class CombinedEvent : public PodEvent {
     }
   }
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   std::vector<std::shared_ptr<Event>> events_;
   std::vector<std::function<void(Status)>> callbacks_ ABSL_GUARDED_BY(mu_);
   int64_t events_completed_ ABSL_GUARDED_BY(mu_) = 0;
@@ -235,7 +235,7 @@ struct EventInFlight {
   std::shared_ptr<Event> underlying_event;
   std::function<std::shared_ptr<Event>(void)> create_fn;
 
-  absl::flat_hash_set<int64_t> incomplete_deps;
+  abslx::flat_hash_set<int64_t> incomplete_deps;
   std::vector<std::function<void(Status)>> callbacks;
 };
 
@@ -246,8 +246,8 @@ class PodTpuDriver : public TpuDriver {
       : config_(config),
         creds_(creds),
         event_thread_(tensorflow::Env::Default(), "grpc_pod_event_thread") {
-    std::vector<std::string> workers = absl::StrSplit(
-        absl::StripPrefix(config.worker(), kPodTpuDriverPrefix), ',');
+    std::vector<std::string> workers = abslx::StrSplit(
+        abslx::StripPrefix(config.worker(), kPodTpuDriverPrefix), ',');
 
     int worker_count = 0;
 
@@ -258,7 +258,7 @@ class PodTpuDriver : public TpuDriver {
 
     for (const auto& worker : workers) {
       TpuDriverConfig worker_config(config_);
-      *(worker_config.mutable_worker()) = absl::StrCat("grpc://", worker);
+      *(worker_config.mutable_worker()) = abslx::StrCat("grpc://", worker);
       auto tpu_driver = CreateGrpcTpuDriver(worker_config, creds_).value();
 
       SystemInfo driver_info;
@@ -274,7 +274,7 @@ class PodTpuDriver : public TpuDriver {
       worker_count++;
     }
 
-    absl::flat_hash_set<std::tuple<int, int, int>> processed_chips;
+    abslx::flat_hash_set<std::tuple<int, int, int>> processed_chips;
 
     for (int driver_num = 0; driver_num < workers.size(); ++driver_num) {
       SystemInfo driver_info;
@@ -348,7 +348,7 @@ class PodTpuDriver : public TpuDriver {
 
   std::unique_ptr<BufferHandle> Allocate(
       int32_t core_id, MemoryRegion region, int64_t num_bytes,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     int64_t operation_id = GetOperationId();
     auto deps = GetDependencyOperationIds(wait_for);
 
@@ -370,7 +370,7 @@ class PodTpuDriver : public TpuDriver {
 
   std::unique_ptr<BufferHandle> Allocate(
       int32_t core_id, MemoryRegion region, const xla::ShapeProto& shape,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     int64_t operation_id = GetOperationId();
     auto deps = GetDependencyOperationIds(wait_for);
 
@@ -392,8 +392,8 @@ class PodTpuDriver : public TpuDriver {
 
   std::unique_ptr<BufferHandle> AllocateTuple(
       int32_t core_id, MemoryRegion region,
-      absl::Span<BufferHandle* const> children,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<BufferHandle* const> children,
+      abslx::Span<Event* const> wait_for) override {
     int64_t operation_id = GetOperationId();
     auto deps = GetDependencyOperationIds(wait_for);
 
@@ -434,7 +434,7 @@ class PodTpuDriver : public TpuDriver {
 
   std::shared_ptr<Event> Deallocate(
       std::unique_ptr<BufferHandle> handle,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     int64_t operation_id = GetOperationId();
     auto deps = GetDependencyOperationIds(wait_for);
     deps.insert(static_cast<PodBufferHandle*>(handle.get())->operation_id());
@@ -462,7 +462,7 @@ class PodTpuDriver : public TpuDriver {
 
   std::shared_ptr<Event> TransferToDevice(
       const void* src, BufferHandle* dst,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     int64_t operation_id = GetOperationId();
     auto deps = GetDependencyOperationIds(wait_for);
     deps.insert(static_cast<PodBufferHandle*>(dst)->operation_id());
@@ -487,7 +487,7 @@ class PodTpuDriver : public TpuDriver {
 
   std::shared_ptr<Event> TransferFromDevice(
       const BufferHandle* src, void* dst,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     int64_t operation_id = GetOperationId();
     auto deps = GetDependencyOperationIds(wait_for);
     deps.insert(static_cast<const PodBufferHandle*>(src)->operation_id());
@@ -511,7 +511,7 @@ class PodTpuDriver : public TpuDriver {
 
   std::shared_ptr<Event> TransferFromDeviceToDevice(
       const BufferHandle* src, BufferHandle* dst,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto src_core_id = static_cast<const PodBufferHandle*>(src)->core_id();
     auto dst_core_id = static_cast<PodBufferHandle*>(dst)->core_id();
 
@@ -559,7 +559,7 @@ class PodTpuDriver : public TpuDriver {
 
   std::unique_ptr<CompiledProgramHandle> CompileProgram(
       const xla::HloProto& source, int32_t num_replicas,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     int64_t operation_id = GetOperationId();
     auto deps = GetDependencyOperationIds(wait_for);
 
@@ -591,7 +591,7 @@ class PodTpuDriver : public TpuDriver {
 
   std::unique_ptr<LoadedProgramHandle> LoadProgram(
       int32_t core_id, const CompiledProgramHandle* handle,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     int64_t operation_id = GetOperationId();
     auto deps = GetDependencyOperationIds(wait_for);
     deps.insert(
@@ -623,7 +623,7 @@ class PodTpuDriver : public TpuDriver {
 
   std::shared_ptr<Event> UnloadProgram(
       std::unique_ptr<LoadedProgramHandle> handle,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     int64_t operation_id = GetOperationId();
     auto deps = GetDependencyOperationIds(wait_for);
     deps.insert(
@@ -651,10 +651,10 @@ class PodTpuDriver : public TpuDriver {
   }
 
   std::shared_ptr<Event> ExecuteProgram(
-      LoadedProgramHandle* program, absl::Span<BufferHandle* const> inputs,
-      absl::Span<BufferHandle* const> outputs,
+      LoadedProgramHandle* program, abslx::Span<BufferHandle* const> inputs,
+      abslx::Span<BufferHandle* const> outputs,
       const xla::DeviceAssignmentProto& device_assignment,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     int64_t operation_id = GetOperationId();
 
     auto deps = GetDependencyOperationIds(wait_for);
@@ -721,12 +721,12 @@ class PodTpuDriver : public TpuDriver {
 
   // Helper methods for Event scheduling
 
-  std::optional<Status> WaitForEvent(int64_t event_id, absl::Duration duration)
+  std::optional<Status> WaitForEvent(int64_t event_id, abslx::Duration duration)
       ABSL_LOCKS_EXCLUDED(mu_) {
     std::shared_ptr<Event> underlying_event;
 
     {
-      absl::MutexLock l(&mu_);
+      abslx::MutexLock l(&mu_);
       auto event = events_.find(event_id);
 
       if (event == events_.end()) {
@@ -747,7 +747,7 @@ class PodTpuDriver : public TpuDriver {
                 events_[event_id]->underlying_event.use_count() != 0);
       };
 
-      auto status = mu_.AwaitWithTimeout(absl::Condition(&done), duration);
+      auto status = mu_.AwaitWithTimeout(abslx::Condition(&done), duration);
       if (!status) {
         return std::nullopt;
       }
@@ -764,7 +764,7 @@ class PodTpuDriver : public TpuDriver {
     if (underlying_event != nullptr) {
       return underlying_event->AwaitWithTimeout(duration);
     } else {
-      absl::MutexLock l(&mu_);
+      abslx::MutexLock l(&mu_);
       auto event_status = abnormal_event_status_.find(event_id);
       if (event_status == abnormal_event_status_.end()) {
         return OkStatus();
@@ -776,7 +776,7 @@ class PodTpuDriver : public TpuDriver {
 
   void AddCallbackForEvent(int64_t event_id, std::function<void(Status)> fn)
       ABSL_LOCKS_EXCLUDED(mu_) {
-    absl::MutexLock l(&mu_);
+    abslx::MutexLock l(&mu_);
     auto event = events_.find(event_id);
 
     if (event == events_.end()) {
@@ -799,13 +799,13 @@ class PodTpuDriver : public TpuDriver {
   xla::Status GetCompiledProgramShape(int64_t op_id,
                                       xla::ProgramShapeProto* program_shape)
       ABSL_LOCKS_EXCLUDED(mu_) {
-    absl::MutexLock l(&mu_);
+    abslx::MutexLock l(&mu_);
 
     auto done = [this, op_id]() {
       mu_.AssertHeld();
       return underlying_cph_.contains(op_id);
     };
-    mu_.Await(absl::Condition(&done));
+    mu_.Await(abslx::Condition(&done));
 
     return underlying_cph_[op_id][0]->program_shape(program_shape);
   }
@@ -814,25 +814,25 @@ class PodTpuDriver : public TpuDriver {
   const TpuDriverConfig& config_;
   std::shared_ptr<::grpc::ChannelCredentials> creds_;
 
-  absl::flat_hash_map<int32_t, std::unique_ptr<TpuDriver>> drivers_;
-  absl::flat_hash_map<int32_t, int32_t> core_to_driver_id_;
-  absl::flat_hash_map<int32_t, TpuDriver*> core_to_driver_;
-  absl::flat_hash_map<int32_t, int32_t> core_to_driver_core_;
+  abslx::flat_hash_map<int32_t, std::unique_ptr<TpuDriver>> drivers_;
+  abslx::flat_hash_map<int32_t, int32_t> core_to_driver_id_;
+  abslx::flat_hash_map<int32_t, TpuDriver*> core_to_driver_;
+  abslx::flat_hash_map<int32_t, int32_t> core_to_driver_core_;
   SystemInfo pod_info_;
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
 
-  absl::flat_hash_map<int64_t, std::unique_ptr<BufferHandle>>
+  abslx::flat_hash_map<int64_t, std::unique_ptr<BufferHandle>>
       underlying_buffers_ ABSL_GUARDED_BY(mu_);
-  absl::flat_hash_map<int64_t,
+  abslx::flat_hash_map<int64_t,
                       std::vector<std::unique_ptr<CompiledProgramHandle>>>
       underlying_cph_ ABSL_GUARDED_BY(mu_);
-  absl::flat_hash_map<int64_t, std::unique_ptr<LoadedProgramHandle>>
+  abslx::flat_hash_map<int64_t, std::unique_ptr<LoadedProgramHandle>>
       underlying_lph_ ABSL_GUARDED_BY(mu_);
 
-  absl::btree_map<int64_t, std::unique_ptr<EventInFlight>> events_
+  abslx::btree_map<int64_t, std::unique_ptr<EventInFlight>> events_
       ABSL_GUARDED_BY(mu_);
-  absl::flat_hash_map<int64_t, Status> abnormal_event_status_
+  abslx::flat_hash_map<int64_t, Status> abnormal_event_status_
       ABSL_GUARDED_BY(mu_);
 
   std::atomic<int64_t> operation_id_counter_{0};
@@ -841,9 +841,9 @@ class PodTpuDriver : public TpuDriver {
 
   int64_t GetOperationId() { return operation_id_counter_++; }
 
-  absl::flat_hash_set<int64_t> GetDependencyOperationIds(
-      absl::Span<Event* const> wait_for) {
-    absl::flat_hash_set<int64_t> deps;
+  abslx::flat_hash_set<int64_t> GetDependencyOperationIds(
+      abslx::Span<Event* const> wait_for) {
+    abslx::flat_hash_set<int64_t> deps;
     for (auto* event : wait_for) {
       deps.insert(static_cast<PodEvent* const>(event)->operation_id());
     }
@@ -855,9 +855,9 @@ class PodTpuDriver : public TpuDriver {
   // that might depend on this event.
   void EventCompleted(int64_t event_id, Status status)
       ABSL_LOCKS_EXCLUDED(mu_) {
-    absl::MutexLock l(&mu_);
+    abslx::MutexLock l(&mu_);
 
-    absl::btree_map<int64_t, std::unique_ptr<EventInFlight>>::iterator
+    abslx::btree_map<int64_t, std::unique_ptr<EventInFlight>>::iterator
         curr_event;
     if (!status.ok()) abnormal_event_status_.insert({event_id, status});
     curr_event = events_.find(event_id);
@@ -893,11 +893,11 @@ class PodTpuDriver : public TpuDriver {
 
   void ScheduleRequest(int64_t operation_id,
                        std::function<std::shared_ptr<Event>(void)> fn,
-                       const absl::flat_hash_set<int64_t>& deps)
+                       const abslx::flat_hash_set<int64_t>& deps)
       ABSL_LOCKS_EXCLUDED(mu_) {
-    absl::MutexLock l(&mu_);
-    absl::btree_map<int64_t, std::unique_ptr<EventInFlight>>::iterator event;
-    absl::flat_hash_set<int64_t> incomplete_deps;
+    abslx::MutexLock l(&mu_);
+    abslx::btree_map<int64_t, std::unique_ptr<EventInFlight>>::iterator event;
+    abslx::flat_hash_set<int64_t> incomplete_deps;
 
     event =
         events_.insert({operation_id, std::make_unique<EventInFlight>()}).first;
@@ -933,7 +933,7 @@ class PodTpuDriver : public TpuDriver {
 
   template <typename T>
   std::shared_ptr<Event> CheckHandleExists(
-      absl::flat_hash_map<int64_t, T>& container, int64_t target_op_id,
+      abslx::flat_hash_map<int64_t, T>& container, int64_t target_op_id,
       int64_t operation_id) {
     if (container.count(target_op_id) == 0) {
       return std::make_shared<ErrorEvent>(
@@ -946,10 +946,10 @@ class PodTpuDriver : public TpuDriver {
 };
 
 xla::Status PodEvent::Await() {
-  return driver_->WaitForEvent(operation_id_, absl::InfiniteDuration()).value();
+  return driver_->WaitForEvent(operation_id_, abslx::InfiniteDuration()).value();
 }
 
-std::optional<xla::Status> PodEvent::AwaitWithTimeout(absl::Duration duration) {
+std::optional<xla::Status> PodEvent::AwaitWithTimeout(abslx::Duration duration) {
   return driver_->WaitForEvent(operation_id_, duration);
 }
 

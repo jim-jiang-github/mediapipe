@@ -19,7 +19,7 @@
 namespace mediapipe {
 
 void CvTextureCacheManager::FlushTextureCaches() {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   for (const auto& cache : texture_caches_) {
 #if TARGET_OS_OSX
     CVOpenGLTextureCacheFlush(*cache, 0);
@@ -30,7 +30,7 @@ void CvTextureCacheManager::FlushTextureCaches() {
 }
 
 void CvTextureCacheManager::RegisterTextureCache(CVTextureCacheType cache) {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
 
   CHECK(std::find(texture_caches_.begin(), texture_caches_.end(), cache) ==
         texture_caches_.end())
@@ -39,7 +39,7 @@ void CvTextureCacheManager::RegisterTextureCache(CVTextureCacheType cache) {
 }
 
 void CvTextureCacheManager::UnregisterTextureCache(CVTextureCacheType cache) {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
 
   auto it = std::find(texture_caches_.begin(), texture_caches_.end(), cache);
   CHECK(it != texture_caches_.end())

@@ -23,7 +23,7 @@ namespace tpu_driver {
 
 namespace {
 
-typedef absl::flat_hash_map<
+typedef abslx::flat_hash_map<
     std::string, std::function<xla::StatusOr<std::unique_ptr<TpuDriver>>(
                      const TpuDriverConfig&)>>
     DriverRegistryMap;
@@ -88,7 +88,7 @@ int64_t ByteSizeOfPrimitiveType(xla::PrimitiveType primitive_type) {
 /*static*/ xla::StatusOr<std::unique_ptr<TpuDriver>> TpuDriverRegistry::Open(
     const TpuDriverConfig& config) {
   for (const auto& driver : *GetDriverRegistryMap()) {
-    if (absl::StartsWith(config.worker(), driver.first)) {
+    if (abslx::StartsWith(config.worker(), driver.first)) {
       return driver.second(config);
     }
   }

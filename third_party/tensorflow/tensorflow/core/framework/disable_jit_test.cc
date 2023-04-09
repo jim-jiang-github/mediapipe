@@ -68,10 +68,10 @@ REGISTER_KERNEL_BUILDER(
     LabeledKernel<4>);
 
 TEST_F(KernelTest, Filter) {
-  ExpectFailure("JitKernel", DEVICE_CPU, {absl::StrCat("_kernel|string|''")},
+  ExpectFailure("JitKernel", DEVICE_CPU, {abslx::StrCat("_kernel|string|''")},
                 error::NOT_FOUND);
   ExpectFailure("JitKernel", DEVICE_CPU,
-                {absl::StrCat("_kernel|string|'", kJitKernelLabel, "'")},
+                {abslx::StrCat("_kernel|string|'", kJitKernelLabel, "'")},
                 error::NOT_FOUND);
 }
 

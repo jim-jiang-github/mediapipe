@@ -19,7 +19,7 @@
 
 namespace mediapipe {
 
-absl::StatusOr<api2::Packet<TfLiteModelPtr>> TfLiteModelLoader::LoadFromPath(
+abslx::StatusOr<api2::Packet<TfLiteModelPtr>> TfLiteModelLoader::LoadFromPath(
     const std::string& path) {
   std::string model_path = path;
 

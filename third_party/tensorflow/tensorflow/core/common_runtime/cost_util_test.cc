@@ -28,8 +28,8 @@ class TestGcuCostMeasurement : public CostMeasurement {
  public:
   using CostMeasurement::CostMeasurement;
 
-  absl::Duration GetTotalCost() override { return absl::ZeroDuration(); }
-  absl::string_view GetCostType() const override { return "test_gcu"; }
+  abslx::Duration GetTotalCost() override { return abslx::ZeroDuration(); }
+  abslx::string_view GetCostType() const override { return "test_gcu"; }
 };
 REGISTER_COST_MEASUREMENT("test_gcu", TestGcuCostMeasurement);
 
@@ -37,8 +37,8 @@ class TestTpuCostMeasurement : public CostMeasurement {
  public:
   using CostMeasurement::CostMeasurement;
 
-  absl::Duration GetTotalCost() override { return absl::ZeroDuration(); }
-  absl::string_view GetCostType() const override { return "test_tpu"; }
+  abslx::Duration GetTotalCost() override { return abslx::ZeroDuration(); }
+  abslx::string_view GetCostType() const override { return "test_tpu"; }
 };
 REGISTER_COST_MEASUREMENT("test_tpu", TestTpuCostMeasurement);
 
@@ -56,9 +56,9 @@ TEST(CreateCostMeasurementsTest, Basic) {
       CreateCostMeasurements(context);
 
   EXPECT_EQ(measurements.size(), 2);
-  EXPECT_EQ(measurements[0]->GetTotalCost(), absl::ZeroDuration());
+  EXPECT_EQ(measurements[0]->GetTotalCost(), abslx::ZeroDuration());
   EXPECT_EQ(measurements[0]->GetCostType(), "test_gcu");
-  EXPECT_EQ(measurements[1]->GetTotalCost(), absl::ZeroDuration());
+  EXPECT_EQ(measurements[1]->GetTotalCost(), abslx::ZeroDuration());
   EXPECT_EQ(measurements[1]->GetCostType(), "test_tpu");
 }
 

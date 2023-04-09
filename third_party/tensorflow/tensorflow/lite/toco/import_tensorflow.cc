@@ -174,7 +174,7 @@ template <typename T1, typename T2>
 tensorflow::Status ExpectValue(const T1& v1, const T2& v2,
                                const std::string& description) {
   if (v1 == v2) return ::tensorflow::OkStatus();
-  return tensorflow::errors::InvalidArgument(absl::StrCat(
+  return tensorflow::errors::InvalidArgument(abslx::StrCat(
       "Unexpected ", description, ": got ", v1, ", expected ", v2));
 }
 
@@ -375,7 +375,7 @@ tensorflow::Status ImportTensorData(const TensorProto& input_tensor,
     std::string accessor_name = TensorTraits<T>::accessor_name();
     std::string type_name = TensorTraits<T>::type_name();
     return tensorflow::errors::InvalidArgument(
-        absl::StrCat("Neither input_content (",
+        abslx::StrCat("Neither input_content (",
                      input_tensor.tensor_content().size() / sizeof(T), ") nor ",
                      accessor_name, " (", num_elements_in_tensor,
                      ") have the right dimensions (", input_flat_size,
@@ -613,7 +613,7 @@ void GetOutputNamesFromNodeDef(const NodeDef& node,
     if (next_output == 0) {
       op->outputs.push_back(node.name());  // Implicit :0.
     } else {
-      op->outputs.push_back(absl::StrCat(node.name(), ":", next_output));
+      op->outputs.push_back(abslx::StrCat(node.name(), ":", next_output));
     }
     ++next_output;
   };
@@ -879,7 +879,7 @@ tensorflow::Status ConvertConvOperator(
     TF_RETURN_IF_ERROR(
         ExpectValue(dilations.i_size(), 4, "number of dilations"));
     if (dilations.i(0) != 1 || dilations.i(3) != 1) {
-      return tensorflow::errors::InvalidArgument(absl::StrCat(
+      return tensorflow::errors::InvalidArgument(abslx::StrCat(
           "Can only import Conv ops with dilation along the height "
           "(1st) or width (2nd) axis. TensorFlow op \"",
           node.name(), "\" had dilations:[ ", dilations.i(0), ", ",
@@ -958,7 +958,7 @@ tensorflow::Status ConvertDepthwiseConvOperator(
     TF_RETURN_IF_ERROR(
         ExpectValue(dilations.i_size(), 4, "number of dilations"));
     if (dilations.i(0) != 1 || dilations.i(3) != 1) {
-      return tensorflow::errors::InvalidArgument(absl::StrCat(
+      return tensorflow::errors::InvalidArgument(abslx::StrCat(
           "Can only import Conv ops with dilation along the height "
           "(1st) or width (2nd) axis. TensorFlow op \"",
           node.name(), "\" had dilations:[ ", dilations.i(0), ", ",
@@ -1189,7 +1189,7 @@ tensorflow::Status ConvertSplitOperator(
   const int num_split = GetIntAttr(node, "num_split");
   op->outputs.push_back(node.name());
   for (int i = 1; i < num_split; i++) {
-    op->outputs.push_back(absl::StrCat(node.name(), ":", i));
+    op->outputs.push_back(abslx::StrCat(node.name(), ":", i));
   }
   op->num_split = num_split;
   model->operators.emplace_back(op);
@@ -1208,7 +1208,7 @@ tensorflow::Status ConvertSplitVOperator(
   const int num_split = GetIntAttr(node, "num_split");
   op->outputs.push_back(node.name());
   for (int i = 1; i < num_split; i++) {
-    op->outputs.push_back(absl::StrCat(node.name(), ":", i));
+    op->outputs.push_back(abslx::StrCat(node.name(), ":", i));
   }
   op->num_split = num_split;
   model->operators.emplace_back(op);
@@ -2184,14 +2184,14 @@ tensorflow::Status ConvertReverseSequenceOperator(
 void StripCaretFromArrayNames(Model* model) {
   for (auto& op : model->operators) {
     for (auto& input : op->inputs) {
-      input = std::string(absl::StripPrefix(input, "^"));
+      input = std::string(abslx::StripPrefix(input, "^"));
     }
     for (auto& output : op->outputs) {
-      output = std::string(absl::StripPrefix(output, "^"));
+      output = std::string(abslx::StripPrefix(output, "^"));
     }
   }
   for (auto& array : model->GetArrayMap()) {
-    if (absl::StartsWith(array.first, "^")) {
+    if (abslx::StartsWith(array.first, "^")) {
       LOG(FATAL) << "What?";
     }
   }
@@ -2199,7 +2199,7 @@ void StripCaretFromArrayNames(Model* model) {
 
 void StripZeroOutputIndexFromInputs(NodeDef* node) {
   for (auto& input : *node->mutable_input()) {
-    input = std::string(absl::StripSuffix(input, ":0"));
+    input = std::string(abslx::StripSuffix(input, ":0"));
   }
 }
 
@@ -2242,14 +2242,14 @@ void AddExtraOutputs(Model* model) {
       continue;
     }
     // Split the consumed array name into the form name:output_index.
-    const std::vector<std::string>& split = absl::StrSplit(consumed_array, ':');
+    const std::vector<std::string>& split = abslx::StrSplit(consumed_array, ':');
     // If not of the form name:output_index, then this is not an additional
     // output of a node with multiple outputs, so nothing to do here.
     if (split.size() != 2) {
       continue;
     }
     int output_index = 0;
-    if (!absl::SimpleAtoi(split[1], &output_index)) {
+    if (!abslx::SimpleAtoi(split[1], &output_index)) {
       continue;
     }
     // Each op is initially recorded as producing at least the array that
@@ -2747,13 +2747,13 @@ std::unique_ptr<Model> ImportTensorFlowGraphDef(
 
   // Check input and output specification.
   for (const auto& specified_input_array : model_flags.input_arrays()) {
-    CHECK(!absl::EndsWith(specified_input_array.name(), ":0"))
+    CHECK(!abslx::EndsWith(specified_input_array.name(), ":0"))
         << "Unsupported explicit zero output index: "
         << specified_input_array.name();
   }
   for (const std::string& specified_output_array :
        model_flags.output_arrays()) {
-    CHECK(!absl::EndsWith(specified_output_array, ":0"))
+    CHECK(!abslx::EndsWith(specified_output_array, ":0"))
         << "Unsupported explicit zero output index: " << specified_output_array;
   }
 

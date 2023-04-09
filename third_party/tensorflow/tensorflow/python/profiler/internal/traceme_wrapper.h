@@ -67,7 +67,7 @@ class TraceMeWrapper {
                              const pybind11::kwargs& kwargs) {
     name->push_back('#');
     for (const auto& kv : kwargs) {
-      absl::StrAppend(name, std::string(pybind11::str(kv.first)), "=",
+      abslx::StrAppend(name, std::string(pybind11::str(kv.first)), "=",
                       EncodePyObject(kv.second), ",");
     }
     name->back() = '#';

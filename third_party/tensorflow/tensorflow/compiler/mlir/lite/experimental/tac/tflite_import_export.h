@@ -38,7 +38,7 @@ class TfLiteImporter : public mlir::TFL::tac::TacImporter {
 
   explicit TfLiteImporter(const Options& options) : options_(options) {}
 
-  absl::StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> Import() override;
+  abslx::StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> Import() override;
 
  private:
   Options options_;
@@ -60,7 +60,7 @@ class TfLiteExporter : public mlir::TFL::tac::TacExporter {
 
   explicit TfLiteExporter(const Options& options) : options_(options) {}
 
-  absl::Status Export(mlir::ModuleOp module) override;
+  abslx::Status Export(mlir::ModuleOp module) override;
 
  private:
   Options options_;

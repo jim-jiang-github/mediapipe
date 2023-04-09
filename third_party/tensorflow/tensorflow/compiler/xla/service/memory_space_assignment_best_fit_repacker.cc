@@ -34,12 +34,12 @@ class BestFitRepacker
       : GlobalDecreasingSizeBestFitHeap<AllocationBlock>(alignment, type),
         max_size_(max_size) {}
 
-  void ImportAllocationBlocks(absl::Span<AllocationBlock*> allocations) {
+  void ImportAllocationBlocks(abslx::Span<AllocationBlock*> allocations) {
     allocation_blocks_ = allocations;
     for (AllocationBlock* allocation_block : allocations) {
       // Check if any of the colocations are already added to buffer_intervals_.
       bool need_allocation = true;
-      auto aliased_it = absl::c_find_if(
+      auto aliased_it = abslx::c_find_if(
           allocation_block->colocations, [&](AllocationBlock* search) {
             return buffer_intervals_.contains(search);
           });
@@ -72,13 +72,13 @@ class BestFitRepacker
 
  private:
   int64_t max_size_;
-  absl::Span<AllocationBlock*> allocation_blocks_;
+  abslx::Span<AllocationBlock*> allocation_blocks_;
 };
 
 }  // namespace
 
 StatusOr<bool> MemorySpaceAssignmentBestFitRepacker::Repack(
-    absl::Span<AllocationBlock*> allocations) {
+    abslx::Span<AllocationBlock*> allocations) {
   BestFitRepacker best_fit_repacker =
       BestFitRepacker(max_size_, alignment_, type_);
   best_fit_repacker.ImportAllocationBlocks(allocations);

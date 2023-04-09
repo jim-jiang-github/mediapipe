@@ -341,11 +341,11 @@ class CTCLossOpGPU : public OpKernel {
     std::unique_ptr<RnnStateTensorDescriptor> grads_desc =
         std::move(grads_desc_s).value();
 
-    absl::Span<const int32> labels_data(labels_values->flat<int32>().data(),
+    abslx::Span<const int32> labels_data(labels_values->flat<int32>().data(),
                                         num_indices);
-    absl::Span<const int32> labels_lengths_data(labels_lengths.data(),
+    abslx::Span<const int32> labels_lengths_data(labels_lengths.data(),
                                                 batch_size);
-    absl::Span<const int32> input_lengths_data(seq_len->flat<int32>().data(),
+    abslx::Span<const int32> input_lengths_data(seq_len->flat<int32>().data(),
                                                batch_size);
 
     auto probs_data = StreamExecutorUtil::AsDeviceMemory<float>(*inputs);

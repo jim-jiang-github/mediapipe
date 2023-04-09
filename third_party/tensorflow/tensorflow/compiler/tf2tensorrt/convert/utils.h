@@ -76,8 +76,8 @@ struct VectorTensorShapeHasher {
   }
 };
 
-using absl::StrAppend;
-using absl::StrCat;
+using abslx::StrAppend;
+using abslx::StrCat;
 
 // This utility template converts an arithmetic type to a string. This function
 // is necessary to allow the following function to behave recursively:
@@ -111,8 +111,8 @@ string DebugString(const std::vector<TensorShape>& shapes);
 string DebugString(const std::vector<PartialTensorShape>& shapes);
 
 template <size_t N>
-string DebugString(const absl::InlinedVector<int64, N>& data) {
-  return absl::StrCat("[", absl::StrJoin(data, ","), "]");
+string DebugString(const abslx::InlinedVector<int64, N>& data) {
+  return abslx::StrCat("[", abslx::StrJoin(data, ","), "]");
 }
 
 inline bool HasStaticShape(const nvinfer1::Dims& dims) {
@@ -125,7 +125,7 @@ inline bool HasStaticShape(const nvinfer1::Dims& dims) {
 
 template <typename T>
 bool HasStaticShape(const T& dims) {
-  return !absl::c_any_of(dims, [](int i) { return i < 0; });
+  return !abslx::c_any_of(dims, [](int i) { return i < 0; });
 }
 
 // Returns whether a shape is compatible with a TRT shape tensor.
@@ -151,7 +151,7 @@ inline bool IsTrtShapeTensorCompatible(const Tensor& tensor) {
 // storage_.size()`.
 class DimsAdapter {
  public:
-  using StorageType = absl::InlinedVector<int64_t, 4>;
+  using StorageType = abslx::InlinedVector<int64_t, 4>;
 
  private:
   template <typename T>
@@ -165,23 +165,23 @@ class DimsAdapter {
  public:
   //----- Constructors ------
 
-  // Constructs from an absl::Span.
+  // Constructs from an abslx::Span.
   template <typename T>
-  explicit DimsAdapter(absl::Span<T> shape)
+  explicit DimsAdapter(abslx::Span<T> shape)
       : num_dims_(static_cast<int32_t>(shape.size())) {
-    absl::c_copy(shape, std::back_inserter(storage_));
+    abslx::c_copy(shape, std::back_inserter(storage_));
   }
 
-  // Constructs from an absl::Span.
+  // Constructs from an abslx::Span.
   template <typename T>
   explicit DimsAdapter(const std::vector<T>& shape)
       : num_dims_(static_cast<int32_t>(shape.size())) {
-    absl::c_copy(shape, std::back_inserter(storage_));
+    abslx::c_copy(shape, std::back_inserter(storage_));
   }
 
   // Constructs from a TRT dims object.
   DimsAdapter(const nvinfer1::Dims& dims) : num_dims_(dims.nbDims) {
-    absl::c_copy(absl::MakeSpan(dims.d, dims.d + std::max(dims.nbDims, 0)),
+    abslx::c_copy(abslx::MakeSpan(dims.d, dims.d + std::max(dims.nbDims, 0)),
                  std::back_inserter(storage_));
   }
 
@@ -206,7 +206,7 @@ class DimsAdapter {
     }
     auto offt = (ignore_first_dim ? 1 : 0);
     return DimsAdapter(
-        absl::MakeSpan(shape.dim_sizes().begin() + offt, shape.dims() - offt));
+        abslx::MakeSpan(shape.dim_sizes().begin() + offt, shape.dims() - offt));
   }
 
   // Constructs from a container.
@@ -219,7 +219,7 @@ class DimsAdapter {
           "removing first dim requires explicit batch dimension");
     }
     return DimsAdapter(
-        absl::MakeSpan(shape).subspan(ignore_first_dim ? 1 : 0, shape.size()));
+        abslx::MakeSpan(shape).subspan(ignore_first_dim ? 1 : 0, shape.size()));
   }
 
   //----- Conversion Utilities ------
@@ -228,7 +228,7 @@ class DimsAdapter {
   //  in via the result pointer.
   void TrtDims(nvinfer1::Dims* result) const {
     result->nbDims = num_dims_;
-    absl::c_copy(storage_, static_cast<int32_t*>(result->d));
+    abslx::c_copy(storage_, static_cast<int32_t*>(result->d));
   }
 
   // Converts to an nvinfer1::Dims and return by value.
@@ -263,7 +263,7 @@ class DimsAdapter {
   template <typename T, typename = EnableIfInt<T>>
   Status Vector(std::vector<T>* shape) const {
     shape->clear();
-    absl::c_copy(storage_, std::back_inserter(*shape));
+    abslx::c_copy(storage_, std::back_inserter(*shape));
     return Status::OK();
   }
 
@@ -271,12 +271,12 @@ class DimsAdapter {
 
   // Returns true if the shape has no dynamic dimensions.
   bool IsStatic() const {
-    return !absl::c_any_of(storage_, [](auto i) { return i < 0; });
+    return !abslx::c_any_of(storage_, [](auto i) { return i < 0; });
   }
 
   // Returns product of all dimensions.
   int64_t Volume() const {
-    return absl::c_accumulate(storage_, static_cast<int64_t>(1),
+    return abslx::c_accumulate(storage_, static_cast<int64_t>(1),
                               std::multiplies<>());
   }
 
@@ -295,10 +295,10 @@ class DimsAdapter {
   bool IsEmpty() const { return storage_.empty(); }
 
   string DebugString() const {
-    auto vol = absl::c_accumulate(storage_, static_cast<int64_t>(1),
+    auto vol = abslx::c_accumulate(storage_, static_cast<int64_t>(1),
                                   std::multiplies<>());
-    return absl::StrCat("DimsAdapter(num_dims=", num_dims_, ",shape=[",
-                        absl::StrJoin(storage_, ","), "],", "vol=", vol, ")");
+    return abslx::StrCat("DimsAdapter(num_dims=", num_dims_, ",shape=[",
+                        abslx::StrJoin(storage_, ","), "],", "vol=", vol, ")");
   }
 
   // Returns beginning iterator for the underlying storage.
@@ -375,7 +375,7 @@ int GetNumberOfEngineInputs(const nvinfer1::ICudaEngine* engine);
 
 // Returns the string representation for the assigned device or the requested
 // device of the given node.
-absl::string_view GetDeviceName(const Node* node);
+abslx::string_view GetDeviceName(const Node* node);
 
 // Returns the ParsedName representation for the assigned device or the
 // requested device string of the given node. If the device string is invalid,
@@ -390,7 +390,7 @@ std::optional<DeviceNameUtils::ParsedName> MergeIfCompatible(
 // Similar to the above, except that the second device assignment is represented
 // by a string_view.
 std::optional<DeviceNameUtils::ParsedName> MergeIfCompatible(
-    const DeviceNameUtils::ParsedName& a, absl::string_view b);
+    const DeviceNameUtils::ParsedName& a, abslx::string_view b);
 
 bool isExperimentalFeatureActivated(string feature_name);
 

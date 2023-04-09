@@ -25,7 +25,7 @@ limitations under the License.
 namespace tensorflow {
 namespace gtl {
 
-using absl::InlinedVector;
+using abslx::InlinedVector;
 
 }  // namespace gtl
 }  // namespace tensorflow

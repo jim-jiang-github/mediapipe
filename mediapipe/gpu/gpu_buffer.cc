@@ -19,21 +19,21 @@ namespace {
 struct StorageTypeFormatter {
   void operator()(std::string* out,
                   const std::shared_ptr<internal::GpuBufferStorage>& s) const {
-    absl::StrAppend(out, s->storage_type().name());
+    abslx::StrAppend(out, s->storage_type().name());
   }
 };
 
 }  // namespace
 
 std::string GpuBuffer::DebugString() const {
-  return holder_ ? absl::StrCat("GpuBuffer[", width(), "x", height(), " ",
+  return holder_ ? abslx::StrCat("GpuBuffer[", width(), "x", height(), " ",
                                 format(), " as ", holder_->DebugString(), "]")
                  : "GpuBuffer[invalid]";
 }
 
 std::string GpuBuffer::StorageHolder::DebugString() const {
-  absl::MutexLock lock(&mutex_);
-  return absl::StrJoin(storages_, ", ", StorageTypeFormatter());
+  abslx::MutexLock lock(&mutex_);
+  return abslx::StrJoin(storages_, ", ", StorageTypeFormatter());
 }
 
 internal::GpuBufferStorage* GpuBuffer::StorageHolder::GetStorageForView(
@@ -42,7 +42,7 @@ internal::GpuBufferStorage* GpuBuffer::StorageHolder::GetStorageForView(
   std::function<std::shared_ptr<internal::GpuBufferStorage>()> conversion;
 
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     // First see if any current storage supports the view.
     for (const auto& s : storages_) {
       if (s->can_down_cast_to(view_provider_type)) {
@@ -58,7 +58,7 @@ internal::GpuBufferStorage* GpuBuffer::StorageHolder::GetStorageForView(
         if (auto converter = internal::GpuBufferStorageRegistry::Get()
                                  .StorageConverterForViewProvider(
                                      view_provider_type, s->storage_type())) {
-          conversion = absl::bind_front(converter, s);
+          conversion = abslx::bind_front(converter, s);
           break;
         }
       }
@@ -77,7 +77,7 @@ internal::GpuBufferStorage* GpuBuffer::StorageHolder::GetStorageForView(
   //    TODO: we could use Mutex::ForgetDeadlockInfo instead.
   if (conversion) {
     auto new_storage = conversion();
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     // Another reader might have already completed and inserted the same
     // conversion. TODO: prevent this?
     for (const auto& s : storages_) {
@@ -99,7 +99,7 @@ internal::GpuBufferStorage* GpuBuffer::StorageHolder::GetStorageForView(
     using std::swap;
     if (chosen_storage) {
       // Discard all other storages.
-      absl::MutexLock lock(&mutex_);
+      abslx::MutexLock lock(&mutex_);
       swap(old_storages, storages_);
       storages_ = {chosen_storage};
     } else {
@@ -108,7 +108,7 @@ internal::GpuBufferStorage* GpuBuffer::StorageHolder::GetStorageForView(
               internal::GpuBufferStorageRegistry::Get()
                   .StorageFactoryForViewProvider(view_provider_type)) {
         if (auto new_storage = factory(width_, height_, format_)) {
-          absl::MutexLock lock(&mutex_);
+          abslx::MutexLock lock(&mutex_);
           swap(old_storages, storages_);
           storages_ = {std::move(new_storage)};
           chosen_storage = storages_.back();

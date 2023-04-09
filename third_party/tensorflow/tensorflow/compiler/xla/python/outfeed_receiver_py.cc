@@ -52,7 +52,7 @@ class OutfeedReceiverForPython {
           this->Callback(device, consumer_id, std::move(literal));
         };
     std::vector<PjRtClient*> client_ptrs(clients_.size());
-    absl::c_transform(clients_, client_ptrs.begin(),
+    abslx::c_transform(clients_, client_ptrs.begin(),
                       [](const std::shared_ptr<PyClient>& client) {
                         return client->pjrt_client();
                       });
@@ -70,7 +70,7 @@ class OutfeedReceiverForPython {
     // "std::runtime_error: scoped_acquire::dec_ref(): thread state must
     // be current!"").
     {
-      absl::MutexLock lock(&mu_);
+      abslx::MutexLock lock(&mu_);
       outfeed_receiver_shutting_down_ = true;
     }
     py::gil_scoped_release gil_release;
@@ -88,14 +88,14 @@ class OutfeedReceiverForPython {
   void Callback(PjRtDevice* device, uint32_t consumer_id,
                 std::shared_ptr<Literal> literal) {
     {
-      absl::MutexLock lock(&mu_);
+      abslx::MutexLock lock(&mu_);
       if (outfeed_receiver_shutting_down_) {
         VLOG(2) << "Ignoring unsafe callback to Python during shutdown";
         return;
       }
     }
     // We expect the number of clients to be small, so an O(n) search is fine.
-    auto it = absl::c_find_if(
+    auto it = abslx::c_find_if(
         clients_, [device](const std::shared_ptr<PyClient>& client) {
           return client->pjrt_client() == device->client();
         });
@@ -111,7 +111,7 @@ class OutfeedReceiverForPython {
 
  private:
   CallbackToPython callback_python_;
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   bool outfeed_receiver_shutting_down_ ABSL_GUARDED_BY(mu_) = false;
   std::vector<std::shared_ptr<PyClient>> clients_;
   std::unique_ptr<OutfeedReceiver> outfeed_receiver_;

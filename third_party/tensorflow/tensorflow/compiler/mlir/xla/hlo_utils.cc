@@ -143,7 +143,7 @@ StatusOr<mlir::DenseElementsAttr> CreateDenseElementsAttrFromLiteral(
       return CreateDenseAttrFromLiteral<complex128>(type, literal);
     default:
       return tensorflow::errors::Internal(
-          absl::StrCat("Unsupported type: ", PrimitiveType_Name(element_type)));
+          abslx::StrCat("Unsupported type: ", PrimitiveType_Name(element_type)));
   }
 }
 
@@ -261,13 +261,13 @@ StatusOr<mlir::Type> ConvertPrimitiveTypeToMLIRType(PrimitiveType element_type,
     // TODO(b/130356985): Support unsigned primitive types.
     default:
       return tensorflow::errors::Internal(
-          absl::StrCat("Unsupported type: ", PrimitiveType_Name(element_type)));
+          abslx::StrCat("Unsupported type: ", PrimitiveType_Name(element_type)));
   }
 }
 
 mlir::mhlo::GatherDimensionNumbersAttr CreateGatherDimensionNumbers(
     const GatherDimensionNumbers& input, mlir::Builder builder) {
-  auto get_i64_array = [](absl::Span<const int64_t> container) {
+  auto get_i64_array = [](abslx::Span<const int64_t> container) {
     return llvm::ArrayRef<int64_t>{container.data(), container.size()};
   };
   return mlir::mhlo::GatherDimensionNumbersAttr::get(

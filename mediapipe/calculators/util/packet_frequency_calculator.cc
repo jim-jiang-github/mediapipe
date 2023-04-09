@@ -70,25 +70,25 @@ class PacketFrequencyCalculator : public CalculatorBase {
  public:
   PacketFrequencyCalculator() {}
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   // Outputs the given framerate on the specified output stream as a
   // PacketFrequency proto.
-  absl::Status OutputPacketFrequency(CalculatorContext* cc, int stream_id,
+  abslx::Status OutputPacketFrequency(CalculatorContext* cc, int stream_id,
                                      double framerate_hz,
                                      const std::string& label,
                                      const Timestamp& input_timestamp);
 
   // Adds the input timestamp in the particular stream's timestamp buffer.
-  absl::Status AddPacketTimestampForStream(int stream_id, int64 timestamp);
+  abslx::Status AddPacketTimestampForStream(int stream_id, int64 timestamp);
 
   // For the specified input stream, clears timestamps from buffer that are
   // older than the configured time_window_sec.
-  absl::Status ClearOldpacketTimestamps(int stream_id, int64 current_timestamp);
+  abslx::Status ClearOldpacketTimestamps(int stream_id, int64 current_timestamp);
 
   // Options for the calculator.
   PacketFrequencyCalculatorOptions options_;
@@ -104,16 +104,16 @@ class PacketFrequencyCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(PacketFrequencyCalculator);
 
-absl::Status PacketFrequencyCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status PacketFrequencyCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK_EQ(cc->Outputs().NumEntries(), cc->Inputs().NumEntries());
   for (int i = 0; i < cc->Inputs().NumEntries(); ++i) {
     cc->Inputs().Index(i).SetAny();
     cc->Outputs().Index(i).Set<PacketFrequency>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PacketFrequencyCalculator::Open(CalculatorContext* cc) {
+abslx::Status PacketFrequencyCalculator::Open(CalculatorContext* cc) {
   options_ = cc->Options<PacketFrequencyCalculatorOptions>();
   RET_CHECK_EQ(options_.label_size(), cc->Inputs().NumEntries());
   RET_CHECK_GT(options_.time_window_sec(), 0);
@@ -125,10 +125,10 @@ absl::Status PacketFrequencyCalculator::Open(CalculatorContext* cc) {
     previous_timestamps_for_stream_id_[i] = {};
     first_timestamp_for_stream_id_usec_[i] = -1;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PacketFrequencyCalculator::Process(CalculatorContext* cc) {
+abslx::Status PacketFrequencyCalculator::Process(CalculatorContext* cc) {
   for (int i = 0; i < cc->Inputs().NumEntries(); ++i) {
     if (cc->Inputs().Index(i).IsEmpty()) {
       continue;
@@ -162,26 +162,26 @@ absl::Status PacketFrequencyCalculator::Process(CalculatorContext* cc) {
                                  options_.label(i), cc->InputTimestamp());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PacketFrequencyCalculator::AddPacketTimestampForStream(
+abslx::Status PacketFrequencyCalculator::AddPacketTimestampForStream(
     int stream_id, int64 timestamp_usec) {
   if (previous_timestamps_for_stream_id_.find(stream_id) ==
       previous_timestamps_for_stream_id_.end()) {
-    return absl::InvalidArgumentError("Input stream id is invalid");
+    return abslx::InvalidArgumentError("Input stream id is invalid");
   }
 
   previous_timestamps_for_stream_id_[stream_id].push_back(timestamp_usec);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PacketFrequencyCalculator::ClearOldpacketTimestamps(
+abslx::Status PacketFrequencyCalculator::ClearOldpacketTimestamps(
     int stream_id, int64 current_timestamp_usec) {
   if (previous_timestamps_for_stream_id_.find(stream_id) ==
       previous_timestamps_for_stream_id_.end()) {
-    return absl::InvalidArgumentError("Input stream id is invalid");
+    return abslx::InvalidArgumentError("Input stream id is invalid");
   }
 
   auto& timestamps_buffer = previous_timestamps_for_stream_id_[stream_id];
@@ -196,20 +196,20 @@ absl::Status PacketFrequencyCalculator::ClearOldpacketTimestamps(
                      }),
       timestamps_buffer.end());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PacketFrequencyCalculator::OutputPacketFrequency(
+abslx::Status PacketFrequencyCalculator::OutputPacketFrequency(
     CalculatorContext* cc, int stream_id, double framerate_hz,
     const std::string& label, const Timestamp& input_timestamp) {
-  auto packet_frequency = absl::make_unique<PacketFrequency>();
+  auto packet_frequency = abslx::make_unique<PacketFrequency>();
   packet_frequency->set_packet_frequency_hz(framerate_hz);
   packet_frequency->set_label(label);
 
   cc->Outputs().Index(stream_id).Add(packet_frequency.release(),
                                      input_timestamp);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

@@ -52,7 +52,7 @@ ProfileOptions GetOptions(const ProfileOptions& opts) {
 
 /*static*/ std::unique_ptr<ProfilerSession> ProfilerSession::Create(
     const ProfileOptions& options) {
-  return absl::WrapUnique(new ProfilerSession(options));
+  return abslx::WrapUnique(new ProfilerSession(options));
 }
 
 tensorflow::Status ProfilerSession::Status() {
@@ -117,7 +117,7 @@ ProfilerSession::ProfilerSession(const ProfileOptions& options)
   start_time_ns_ = profiler::GetCurrentTimeNanos();
 
   DCHECK(profiler_lock_.Active());
-  profilers_ = absl::make_unique<profiler::ProfilerCollection>(
+  profilers_ = abslx::make_unique<profiler::ProfilerCollection>(
       profiler::CreateProfilers(options_));
   profilers_->Start().IgnoreError();
 #endif

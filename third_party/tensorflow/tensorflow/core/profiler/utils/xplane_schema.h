@@ -34,41 +34,41 @@ namespace tensorflow {
 namespace profiler {
 
 // Name of XPlane that contains TraceMe events.
-TF_CONST_INIT extern const absl::string_view kHostThreadsPlaneName;
+TF_CONST_INIT extern const abslx::string_view kHostThreadsPlaneName;
 // Name prefix of XPlane that contains GPU events.
-TF_CONST_INIT extern const absl::string_view kGpuPlanePrefix;
+TF_CONST_INIT extern const abslx::string_view kGpuPlanePrefix;
 // Name prefix of XPlane that contains TPU events.
-TF_CONST_INIT extern const absl::string_view kTpuPlanePrefix;
+TF_CONST_INIT extern const abslx::string_view kTpuPlanePrefix;
 // Regex for XPlanes that contain TensorCore planes.
 TF_CONST_INIT extern const char kTpuPlaneRegex[];
 // Name prefix of XPlane that contains custom device events.
-TF_CONST_INIT extern const absl::string_view kCustomPlanePrefix;
+TF_CONST_INIT extern const abslx::string_view kCustomPlanePrefix;
 // Name prefix of XPlane that contains TPU runtime events.
-TF_CONST_INIT extern const absl::string_view kTpuRuntimePlaneName;
+TF_CONST_INIT extern const abslx::string_view kTpuRuntimePlaneName;
 // Name of XPlane that contains CUPTI driver API generated events.
-TF_CONST_INIT extern const absl::string_view kCuptiDriverApiPlaneName;
+TF_CONST_INIT extern const abslx::string_view kCuptiDriverApiPlaneName;
 // Name of XPlane that contains Roctracer API generated events.
-TF_CONST_INIT extern const absl::string_view kRoctracerApiPlaneName;
+TF_CONST_INIT extern const abslx::string_view kRoctracerApiPlaneName;
 // Name of XPlane that contains profile metadata such as XLA debug info.
-TF_CONST_INIT extern const absl::string_view kMetadataPlaneName;
+TF_CONST_INIT extern const abslx::string_view kMetadataPlaneName;
 // Name of XPlane that contains kpi related metrics.
-TF_CONST_INIT extern const absl::string_view kTFStreamzPlaneName;
+TF_CONST_INIT extern const abslx::string_view kTFStreamzPlaneName;
 // Name of XPlane that contains events from python tracer.
-TF_CONST_INIT extern const absl::string_view kPythonTracerPlaneName;
+TF_CONST_INIT extern const abslx::string_view kPythonTracerPlaneName;
 
 // Names of XLines that contain ML-level events.
-TF_CONST_INIT extern const absl::string_view kStepLineName;
-TF_CONST_INIT extern const absl::string_view kTensorFlowNameScopeLineName;
-TF_CONST_INIT extern const absl::string_view kTensorFlowOpLineName;
-TF_CONST_INIT extern const absl::string_view kXlaModuleLineName;
-TF_CONST_INIT extern const absl::string_view kXlaOpLineName;
-TF_CONST_INIT extern const absl::string_view kXlaAsyncOpLineName;
-TF_CONST_INIT extern const absl::string_view kKernelLaunchLineName;
-TF_CONST_INIT extern const absl::string_view kSourceLineName;
+TF_CONST_INIT extern const abslx::string_view kStepLineName;
+TF_CONST_INIT extern const abslx::string_view kTensorFlowNameScopeLineName;
+TF_CONST_INIT extern const abslx::string_view kTensorFlowOpLineName;
+TF_CONST_INIT extern const abslx::string_view kXlaModuleLineName;
+TF_CONST_INIT extern const abslx::string_view kXlaOpLineName;
+TF_CONST_INIT extern const abslx::string_view kXlaAsyncOpLineName;
+TF_CONST_INIT extern const abslx::string_view kKernelLaunchLineName;
+TF_CONST_INIT extern const abslx::string_view kSourceLineName;
 
 // GPU device vendors.
-TF_CONST_INIT extern const absl::string_view kDeviceVendorNvidia;
-TF_CONST_INIT extern const absl::string_view kDeviceVendorAMD;
+TF_CONST_INIT extern const abslx::string_view kDeviceVendorNvidia;
+TF_CONST_INIT extern const abslx::string_view kDeviceVendorAMD;
 
 // Interesting event types (i.e., TraceMe names).
 enum HostEventType {
@@ -282,41 +282,41 @@ enum StatType {
 };
 
 inline std::string TpuPlaneName(int32_t device_ordinal) {
-  return absl::StrCat(kTpuPlanePrefix, device_ordinal);
+  return abslx::StrCat(kTpuPlanePrefix, device_ordinal);
 }
 
 inline std::string GpuPlaneName(int32_t device_ordinal) {
-  return absl::StrCat(kGpuPlanePrefix, device_ordinal);
+  return abslx::StrCat(kGpuPlanePrefix, device_ordinal);
 }
 
-absl::string_view GetHostEventTypeStr(HostEventType event_type);
+abslx::string_view GetHostEventTypeStr(HostEventType event_type);
 
-bool IsHostEventType(HostEventType event_type, absl::string_view event_name);
+bool IsHostEventType(HostEventType event_type, abslx::string_view event_name);
 
 inline bool IsHostEventType(HostEventType event_type,
-                            absl::string_view event_name) {
+                            abslx::string_view event_name) {
   return GetHostEventTypeStr(event_type) == event_name;
 }
 
-absl::optional<int64_t> FindHostEventType(absl::string_view event_name);
+abslx::optional<int64_t> FindHostEventType(abslx::string_view event_name);
 
-absl::optional<int64_t> FindTfOpEventType(absl::string_view event_name);
+abslx::optional<int64_t> FindTfOpEventType(abslx::string_view event_name);
 
-absl::string_view GetStatTypeStr(StatType stat_type);
+abslx::string_view GetStatTypeStr(StatType stat_type);
 
-bool IsStatType(StatType stat_type, absl::string_view stat_name);
+bool IsStatType(StatType stat_type, abslx::string_view stat_name);
 
-inline bool IsStatType(StatType stat_type, absl::string_view stat_name) {
+inline bool IsStatType(StatType stat_type, abslx::string_view stat_name) {
   return GetStatTypeStr(stat_type) == stat_name;
 }
 
-absl::optional<int64_t> FindStatType(absl::string_view stat_name);
+abslx::optional<int64_t> FindStatType(abslx::string_view stat_name);
 
 // Returns true if the given event shouldn't be shown in the trace viewer.
-bool IsInternalEvent(absl::optional<int64_t> event_type);
+bool IsInternalEvent(abslx::optional<int64_t> event_type);
 
 // Returns true if the given stat shouldn't be shown in the trace viewer.
-bool IsInternalStat(absl::optional<int64_t> stat_type);
+bool IsInternalStat(abslx::optional<int64_t> stat_type);
 
 // Support for flow events:
 // This class enables encoding/decoding the flow id and direction, stored as
@@ -344,7 +344,7 @@ class XFlow {
   // Decoding
   static XFlow FromStatValue(uint64_t encoded) { return XFlow(encoded); }
 
-  /* NOTE: absl::HashOf is not consistent across processes (some process level
+  /* NOTE: abslx::HashOf is not consistent across processes (some process level
    * salt is added), even different executions of the same program.
    * However we are not tracking cross-host flows, i.e. A single flow's
    * participating events are from the same XSpace. On the other hand,
@@ -355,7 +355,7 @@ class XFlow {
    */
   template <typename... Args>
   static uint64_t GetFlowId(Args&&... args) {
-    return absl::HashOf(std::forward<Args>(args)...) & kFlowMask;
+    return abslx::HashOf(std::forward<Args>(args)...) & kFlowMask;
   }
 
   uint64_t Id() const { return encoded_.parts.flow_id; }

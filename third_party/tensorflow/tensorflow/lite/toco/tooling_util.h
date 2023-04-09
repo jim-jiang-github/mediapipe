@@ -50,8 +50,8 @@ namespace toco {
 constexpr int kLogLevelModelChanged = 1;
 constexpr int kLogLevelModelUnchanged = 2;
 
-absl::string_view FindLongestCommonPrefix(absl::string_view a,
-                                          absl::string_view b);
+abslx::string_view FindLongestCommonPrefix(abslx::string_view a,
+                                          abslx::string_view b);
 std::string LogName(const Operator& op);
 
 std::string ArrayDataTypeName(ArrayDataType data_type);

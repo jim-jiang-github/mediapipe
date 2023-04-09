@@ -54,7 +54,7 @@ class RecordingEvent : public Event {
   xla::Status Await() override { return shared_event_->Await(); }
 
   std::optional<xla::Status> AwaitWithTimeout(
-      absl::Duration duration) override {
+      abslx::Duration duration) override {
     return shared_event_->AwaitWithTimeout(duration);
   }
 
@@ -155,7 +155,7 @@ class RecordingTpuDriver : public TpuDriver {
 
   std::unique_ptr<BufferHandle> Allocate(
       int32_t core_id, MemoryRegion region, int64_t num_bytes,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto unwrapped_wait_for = UnwrapWaitFor(wait_for);
 
     auto thread_id = GetCurrentThreadId();
@@ -179,7 +179,7 @@ class RecordingTpuDriver : public TpuDriver {
 
   std::unique_ptr<BufferHandle> Allocate(
       int32_t core_id, MemoryRegion region, const xla::ShapeProto& shape,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto unwrapped_wait_for = UnwrapWaitFor(wait_for);
 
     auto thread_id = GetCurrentThreadId();
@@ -202,8 +202,8 @@ class RecordingTpuDriver : public TpuDriver {
 
   std::unique_ptr<BufferHandle> AllocateTuple(
       int32_t core_id, MemoryRegion region,
-      absl::Span<BufferHandle* const> children,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<BufferHandle* const> children,
+      abslx::Span<Event* const> wait_for) override {
     auto unwrapped_wait_for = UnwrapWaitFor(wait_for);
 
     std::vector<BufferHandle*> unwrapped_children;
@@ -243,7 +243,7 @@ class RecordingTpuDriver : public TpuDriver {
 
   std::shared_ptr<Event> Deallocate(
       std::unique_ptr<BufferHandle> handle,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto unwrapped_wait_for = UnwrapWaitFor(wait_for);
 
     auto thread_id = GetCurrentThreadId();
@@ -265,7 +265,7 @@ class RecordingTpuDriver : public TpuDriver {
 
   std::shared_ptr<Event> TransferToDevice(
       const void* src, BufferHandle* dst,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     int64_t num_bytes = dst->size_in_bytes();
     auto unwrapped_wait_for = UnwrapWaitFor(wait_for);
 
@@ -295,7 +295,7 @@ class RecordingTpuDriver : public TpuDriver {
 
   std::shared_ptr<Event> TransferFromDevice(
       const BufferHandle* src, void* dst,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto unwrapped_wait_for = UnwrapWaitFor(wait_for);
 
     auto thread_id = GetCurrentThreadId();
@@ -317,7 +317,7 @@ class RecordingTpuDriver : public TpuDriver {
 
   std::shared_ptr<Event> TransferFromDeviceToDevice(
       const BufferHandle* src, BufferHandle* dst,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto unwrapped_wait_for = UnwrapWaitFor(wait_for);
 
     auto thread_id = GetCurrentThreadId();
@@ -342,7 +342,7 @@ class RecordingTpuDriver : public TpuDriver {
 
   std::unique_ptr<CompiledProgramHandle> CompileProgram(
       const xla::HloProto& source, int32_t num_replicas,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto unwrapped_wait_for = UnwrapWaitFor(wait_for);
 
     auto thread_id = GetCurrentThreadId();
@@ -362,7 +362,7 @@ class RecordingTpuDriver : public TpuDriver {
 
   std::unique_ptr<LoadedProgramHandle> LoadProgram(
       int32_t core_id, const CompiledProgramHandle* handle,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto unwrapped_wait_for = UnwrapWaitFor(wait_for);
 
     auto thread_id = GetCurrentThreadId();
@@ -387,7 +387,7 @@ class RecordingTpuDriver : public TpuDriver {
 
   std::shared_ptr<Event> UnloadProgram(
       std::unique_ptr<LoadedProgramHandle> handle,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto unwrapped_wait_for = UnwrapWaitFor(wait_for);
 
     auto thread_id = GetCurrentThreadId();
@@ -410,10 +410,10 @@ class RecordingTpuDriver : public TpuDriver {
   }
 
   std::shared_ptr<Event> ExecuteProgram(
-      LoadedProgramHandle* program, absl::Span<BufferHandle* const> inputs,
-      absl::Span<BufferHandle* const> outputs,
+      LoadedProgramHandle* program, abslx::Span<BufferHandle* const> inputs,
+      abslx::Span<BufferHandle* const> outputs,
       const xla::DeviceAssignmentProto& device_assignment,
-      absl::Span<Event* const> wait_for) override {
+      abslx::Span<Event* const> wait_for) override {
     auto unwrapped_wait_for = UnwrapWaitFor(wait_for);
 
     auto thread_id = GetCurrentThreadId();
@@ -482,7 +482,7 @@ class RecordingTpuDriver : public TpuDriver {
   std::unique_ptr<tensorflow::WritableFile> log_file_;
 
   void PopulateAndSaveEntry(StreamRequest::Entry* r,
-                            absl::Span<Event* const> wait_for,
+                            abslx::Span<Event* const> wait_for,
                             int64_t handle_id, int64_t thread_id) {
     for (auto event : wait_for) {
       auto recording_event = static_cast<const RecordingEvent*>(event);
@@ -504,7 +504,7 @@ class RecordingTpuDriver : public TpuDriver {
         return;
       }
 
-      absl::string_view buffer_sp(buffer.data(), buffer.size());
+      abslx::string_view buffer_sp(buffer.data(), buffer.size());
       auto data_status = log_file_->Append(buffer_sp);
       if (!data_status.ok()) {
         LOG(WARNING) << "Unable to write data to log file. File possibly "
@@ -530,7 +530,7 @@ class RecordingTpuDriver : public TpuDriver {
     }
   }
 
-  std::vector<Event*> UnwrapWaitFor(absl::Span<Event* const> wait_for) {
+  std::vector<Event*> UnwrapWaitFor(abslx::Span<Event* const> wait_for) {
     std::vector<Event*> unwrapped_events;
     for (auto event : wait_for) {
       Event* unwrapped_event =
@@ -540,12 +540,12 @@ class RecordingTpuDriver : public TpuDriver {
     return unwrapped_events;
   }
 
-  int64_t GetCurrentThreadId() { return absl::base_internal::GetTID(); }
+  int64_t GetCurrentThreadId() { return abslx::base_internal::GetTID(); }
 };
 
 xla::StatusOr<std::unique_ptr<TpuDriver>> RegisterRecordingTpuDriver(
     const TpuDriverConfig& config) {
-  std::vector<std::string> configs = absl::StrSplit(config.worker(), '|');
+  std::vector<std::string> configs = abslx::StrSplit(config.worker(), '|');
 
   std::string file;
   std::string worker;
@@ -553,7 +553,7 @@ xla::StatusOr<std::unique_ptr<TpuDriver>> RegisterRecordingTpuDriver(
 
   for (const auto& config : configs) {
     std::vector<std::string> kv =
-        absl::StrSplit(config, absl::MaxSplits('=', 1));
+        abslx::StrSplit(config, abslx::MaxSplits('=', 1));
     if (kv[0] == "file") {
       file = kv[1];
     }

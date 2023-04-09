@@ -1780,7 +1780,7 @@ class TrackFilterInvoker {
   void operator()(const BlockedRange& range) const {
     for (int f = range.begin(); f != range.end(); ++f) {
       // Gather irls weights for each track.
-      absl::node_hash_map<int, std::vector<float>> track_weights;
+      abslx::node_hash_map<int, std::vector<float>> track_weights;
       for (auto& clip_data : *clip_datas_) {
         for (const auto& feature : (*clip_data.feature_lists)[f]->feature()) {
           track_weights[feature.track_id()].push_back(feature.irls_weight());
@@ -1812,7 +1812,7 @@ class TrackFilterInvoker {
 void MotionEstimation::MinFilterIrlsWeightByTrack(
     SingleTrackClipData* clip_data) const {
   // Gather irls weights for each track.
-  absl::node_hash_map<int, std::vector<float>> track_weights;
+  abslx::node_hash_map<int, std::vector<float>> track_weights;
 
   const int num_frames = clip_data->feature_lists->size();
   for (int f = 0; f < num_frames; ++f) {
@@ -1862,7 +1862,7 @@ void MotionEstimation::EnforceTrackConsistency(
   for (auto& clip_data : *clip_datas) {
     // Bilateral 1D filter across irls weights for each track.
     // Gather irls weights across all tracks.
-    absl::node_hash_map<int, std::deque<float>> track_irls_weights;
+    abslx::node_hash_map<int, std::deque<float>> track_irls_weights;
 
     for (RegionFlowFeatureList* feature_list : *clip_data.feature_lists) {
       for (const auto& feature : feature_list->feature()) {
@@ -2133,7 +2133,7 @@ void MotionEstimation::UpdateLongFeatureBias(
   }
 
   // Tracks current ids in this frame.
-  absl::node_hash_set<int> curr_track_ids;
+  abslx::node_hash_set<int> curr_track_ids;
 
   // Scale applied to irls weight for linear interpolation between inlier and
   // outlier bias.

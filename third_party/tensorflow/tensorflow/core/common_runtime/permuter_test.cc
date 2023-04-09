@@ -132,7 +132,7 @@ class PermuterTest : public ::testing::Test {
       TF_EXPECT_OK(instances_[di]->status_);
       test::ExpectTensorEqual<T>(
           test::AsTensor<T>(
-              absl::MakeSpan(expected).subspan(di * tensor_len, tensor_len)),
+              abslx::MakeSpan(expected).subspan(di * tensor_len, tensor_len)),
           instances_[di]->output_tensor_);
     }
   }

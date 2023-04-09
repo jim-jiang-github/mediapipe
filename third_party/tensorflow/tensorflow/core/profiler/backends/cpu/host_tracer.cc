@@ -111,7 +111,7 @@ Status HostTracer::CollectData(XSpace* space) {
 std::unique_ptr<ProfilerInterface> CreateHostTracer(
     const HostTracerOptions& options) {
   if (options.trace_level == 0) return nullptr;
-  return absl::make_unique<HostTracer>(options.trace_level);
+  return abslx::make_unique<HostTracer>(options.trace_level);
 }
 
 }  // namespace profiler

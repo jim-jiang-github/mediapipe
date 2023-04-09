@@ -26,7 +26,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status SpaceToDepthTensorShape1x2x2x1BlockSize2Test(
+abslx::Status SpaceToDepthTensorShape1x2x2x1BlockSize2Test(
     TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 1);
@@ -49,10 +49,10 @@ absl::Status SpaceToDepthTensorShape1x2x2x1BlockSize2Test(
                         dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SpaceToDepthTensorShape1x2x2x2BlockSize2Test(
+abslx::Status SpaceToDepthTensorShape1x2x2x2BlockSize2Test(
     TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 2);
@@ -77,10 +77,10 @@ absl::Status SpaceToDepthTensorShape1x2x2x2BlockSize2Test(
                         dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SpaceToDepthTensorShape1x2x2x3BlockSize2Test(
+abslx::Status SpaceToDepthTensorShape1x2x2x3BlockSize2Test(
     TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 2, 3);
@@ -107,10 +107,10 @@ absl::Status SpaceToDepthTensorShape1x2x2x3BlockSize2Test(
                         dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SpaceToDepthTensorShape1x4x4x1BlockSize2Test(
+abslx::Status SpaceToDepthTensorShape1x4x4x1BlockSize2Test(
     TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 4, 4, 1);
@@ -139,7 +139,7 @@ absl::Status SpaceToDepthTensorShape1x4x4x1BlockSize2Test(
                         dst_tensor.data, 0.0f));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

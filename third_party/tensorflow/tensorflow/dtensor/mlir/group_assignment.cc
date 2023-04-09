@@ -40,7 +40,7 @@ namespace dtensor {
 GroupAssignment::ReplicaToDeviceMap
 GroupAssignment::ReplicaToDeviceMap::DefaultReplicaToDeviceMap(int num_slices,
                                                                int slice_size) {
-  absl::flat_hash_map<ReplicaId, DeviceId> map;
+  abslx::flat_hash_map<ReplicaId, DeviceId> map;
   for (int i = 0; i < num_slices; ++i) {
     for (int j = 0; j < slice_size; ++j) {
       map[ReplicaId{i * slice_size + j}] = DeviceId{i, j};
@@ -50,7 +50,7 @@ GroupAssignment::ReplicaToDeviceMap::DefaultReplicaToDeviceMap(int num_slices,
 }
 
 GroupAssignment::ReplicaToDeviceMap::ReplicaToDeviceMap(
-    absl::flat_hash_map<ReplicaId, DeviceId> map)
+    abslx::flat_hash_map<ReplicaId, DeviceId> map)
     : map_(std::move(map)) {
   std::set<int> slice_ids;
   for (const auto& entry : map_) {

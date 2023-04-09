@@ -106,7 +106,7 @@ void VisualizeRegionFlowFeaturesImpl(const RegionFlowFeatureList& feature_list,
     cv::circle(*output, p1, 2.0 * line_size, color_scaled, line_size);
 
     if (feature.has_label()) {
-      cv::putText(*output, absl::StrCat(" ", feature.label()), p1,
+      cv::putText(*output, abslx::StrCat(" ", feature.label()), p1,
                   cv::FONT_HERSHEY_SIMPLEX, text_scale, color_scaled,
                   3.0 * text_scale, cv::LINE_AA);
     }
@@ -172,7 +172,7 @@ void VisualizeLongFeatureStreamImpl(const LongFeatureStream& stream,
 
         const RegionFlowFeature& latest_feature = track.second.back();
         if (latest_feature.has_label()) {
-          cv::putText(*output, absl::StrCat(" ", latest_feature.label()), p1,
+          cv::putText(*output, abslx::StrCat(" ", latest_feature.label()), p1,
                       cv::FONT_HERSHEY_SIMPLEX, text_scale, color_scaled,
                       3 * text_scale, cv::LINE_AA);
         }

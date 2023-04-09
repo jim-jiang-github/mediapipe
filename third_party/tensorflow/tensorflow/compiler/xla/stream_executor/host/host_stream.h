@@ -56,7 +56,7 @@ class HostStream : public internal::StreamInterface {
   bool WorkAvailable() TF_EXCLUSIVE_LOCKS_REQUIRED(mu_);
   void WorkLoop();
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   std::queue<std::function<port::Status()>> work_queue_ ABSL_GUARDED_BY(mu_);
   std::unique_ptr<port::Thread> thread_;
   port::Status status_;

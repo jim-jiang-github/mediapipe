@@ -32,8 +32,8 @@ const char* const kTriple_x86_64 = "x86_64-pc-linux";
 const char* const kTriple_android_arm = "armv7-none-android";
 
 struct ProfilingTestSpec {
-  absl::string_view triple;
-  absl::string_view check_lines;
+  abslx::string_view triple;
+  abslx::string_view check_lines;
 };
 
 // Tests that profiling intrinsics get inserted.

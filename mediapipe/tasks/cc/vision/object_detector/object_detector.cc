@@ -112,14 +112,14 @@ std::unique_ptr<ObjectDetectorOptionsProto> ConvertObjectDetectorOptionsToProto(
 
 }  // namespace
 
-absl::StatusOr<std::unique_ptr<ObjectDetector>> ObjectDetector::Create(
+abslx::StatusOr<std::unique_ptr<ObjectDetector>> ObjectDetector::Create(
     std::unique_ptr<ObjectDetectorOptions> options) {
   auto options_proto = ConvertObjectDetectorOptionsToProto(options.get());
   tasks::core::PacketsCallback packets_callback = nullptr;
   if (options->result_callback) {
     auto result_callback = options->result_callback;
     packets_callback =
-        [=](absl::StatusOr<tasks::core::PacketMap> status_or_packets) {
+        [=](abslx::StatusOr<tasks::core::PacketMap> status_or_packets) {
           if (!status_or_packets.ok()) {
             Image image;
             result_callback(status_or_packets.status(), image,
@@ -148,13 +148,13 @@ absl::StatusOr<std::unique_ptr<ObjectDetector>> ObjectDetector::Create(
       std::move(packets_callback));
 }
 
-absl::StatusOr<ObjectDetectorResult> ObjectDetector::Detect(
+abslx::StatusOr<ObjectDetectorResult> ObjectDetector::Detect(
     mediapipe::Image image,
     std::optional<core::ImageProcessingOptions> image_processing_options) {
   if (image.UsesGpu()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrCat("GPU input images are currently not supported."),
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrCat("GPU input images are currently not supported."),
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }
   ASSIGN_OR_RETURN(
@@ -169,13 +169,13 @@ absl::StatusOr<ObjectDetectorResult> ObjectDetector::Detect(
       output_packets[kDetectionsOutStreamName].Get<std::vector<Detection>>());
 }
 
-absl::StatusOr<ObjectDetectorResult> ObjectDetector::DetectForVideo(
+abslx::StatusOr<ObjectDetectorResult> ObjectDetector::DetectForVideo(
     mediapipe::Image image, int64 timestamp_ms,
     std::optional<core::ImageProcessingOptions> image_processing_options) {
   if (image.UsesGpu()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrCat("GPU input images are currently not supported."),
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrCat("GPU input images are currently not supported."),
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }
   ASSIGN_OR_RETURN(
@@ -194,13 +194,13 @@ absl::StatusOr<ObjectDetectorResult> ObjectDetector::DetectForVideo(
       output_packets[kDetectionsOutStreamName].Get<std::vector<Detection>>());
 }
 
-absl::Status ObjectDetector::DetectAsync(
+abslx::Status ObjectDetector::DetectAsync(
     Image image, int64 timestamp_ms,
     std::optional<core::ImageProcessingOptions> image_processing_options) {
   if (image.UsesGpu()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrCat("GPU input images are currently not supported."),
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrCat("GPU input images are currently not supported."),
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }
   ASSIGN_OR_RETURN(

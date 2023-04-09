@@ -123,7 +123,7 @@ XlaOpRegistry::~XlaOpRegistry() = default;
 
 /* static */ void XlaOpRegistry::RegisterBackend(
     const string& compilation_device_name,
-    absl::Span<const DataType> supported_types, BackendOpFilter op_filter) {
+    abslx::Span<const DataType> supported_types, BackendOpFilter op_filter) {
   XlaOpRegistry& registry = Instance();
   mutex_lock lock(registry.mutex_);
   auto result = registry.backends_.emplace(compilation_device_name, Backend());
@@ -399,7 +399,7 @@ XlaOpRegistry::CompileTimeConstantInputArgNames(const string& op) {
 
   if (TryGetNodeAttr(node_def, kXlaCompileTimeConstantInputsAttr,
                      &compile_time_constant_inputs_vect_from_attr)) {
-    absl::c_copy(compile_time_constant_inputs_vect_from_attr,
+    abslx::c_copy(compile_time_constant_inputs_vect_from_attr,
                  std::inserter(compile_time_constant_inputs_from_attr,
                                compile_time_constant_inputs_from_attr.end()));
     compile_time_constant_inputs = &compile_time_constant_inputs_from_attr;
@@ -414,7 +414,7 @@ XlaOpRegistry::CompileTimeConstantInputArgNames(const string& op) {
   VLOG(3) << "For operation "
           << (op_def != nullptr ? op_def->name() : op_kernel->name())
           << " required constants are: "
-          << absl::StrJoin(*compile_time_constant_inputs, ", ");
+          << abslx::StrJoin(*compile_time_constant_inputs, ", ");
 
   for (const string& input : *compile_time_constant_inputs) {
     if (op_def) {
@@ -439,7 +439,7 @@ XlaOpRegistry::CompileTimeConstantInputArgNames(const string& op) {
     }
   }
 
-  absl::c_sort(*result);
+  abslx::c_sort(*result);
   return OkStatus();
 }
 
@@ -478,28 +478,28 @@ XlaOpRegistry& XlaOpRegistry::Instance() {
   return *r;
 }
 
-XlaOpRegistrationBuilder::XlaOpRegistrationBuilder(absl::string_view name) {
+XlaOpRegistrationBuilder::XlaOpRegistrationBuilder(abslx::string_view name) {
   registration_.reset(new XlaOpRegistry::OpRegistration);
   registration_->name = string(name);
 }
 
 XlaOpRegistrationBuilder XlaOpRegistrationBuilder::Name(
-    absl::string_view name) {
+    abslx::string_view name) {
   XlaOpRegistrationBuilder registration(name);
   return registration;
 }
 
 XlaOpRegistrationBuilder& XlaOpRegistrationBuilder::Device(
-    absl::Span<const absl::string_view> devices) {
+    abslx::Span<const abslx::string_view> devices) {
   registration_->has_device_allowlist = true;
-  for (absl::string_view device : devices) {
+  for (abslx::string_view device : devices) {
     registration_->device_allowlist.emplace(device);
   }
   return *this;
 }
 
 XlaOpRegistrationBuilder& XlaOpRegistrationBuilder::Device(
-    absl::string_view device) {
+    abslx::string_view device) {
   registration_->has_device_allowlist = true;
   registration_->device_allowlist.emplace(device);
   return *this;
@@ -526,7 +526,7 @@ XlaOpRegistrationBuilder& XlaOpRegistrationBuilder::AllowStringType() {
 }
 
 XlaOpRegistrationBuilder& XlaOpRegistrationBuilder::TypeConstraint(
-    absl::string_view attr_name, DataType allowed) {
+    abslx::string_view attr_name, DataType allowed) {
   std::set<DataType>& types =
       registration_->type_constraints[string(attr_name)];
   types.insert(allowed);
@@ -534,7 +534,7 @@ XlaOpRegistrationBuilder& XlaOpRegistrationBuilder::TypeConstraint(
 }
 
 XlaOpRegistrationBuilder& XlaOpRegistrationBuilder::TypeConstraint(
-    absl::string_view attr_name, absl::Span<const DataType> allowed) {
+    abslx::string_view attr_name, abslx::Span<const DataType> allowed) {
   std::set<DataType>& types =
       registration_->type_constraints[string(attr_name)];
   for (DataType t : allowed) {
@@ -544,7 +544,7 @@ XlaOpRegistrationBuilder& XlaOpRegistrationBuilder::TypeConstraint(
 }
 
 XlaOpRegistrationBuilder& XlaOpRegistrationBuilder::CompileTimeConstantInput(
-    absl::string_view input_name) {
+    abslx::string_view input_name) {
   registration_->compile_time_constant_inputs.emplace(input_name);
   return *this;
 }
@@ -581,7 +581,7 @@ XlaOpRegistrar::XlaOpRegistrar(
 }
 
 XlaBackendRegistrar::XlaBackendRegistrar(
-    absl::string_view name, absl::Span<const DataType> types,
+    abslx::string_view name, abslx::Span<const DataType> types,
     XlaOpRegistry::BackendOpFilter op_filter) {
   XlaOpRegistry& registry = XlaOpRegistry::Instance();
   registry.RegisterBackend(string(name), types, op_filter);

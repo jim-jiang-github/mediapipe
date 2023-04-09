@@ -174,8 +174,8 @@ StatusOr<DevicePutResult> HandleNumpyArray(py::handle h, PjRtDevice* to_device,
     squashed_type = type;
   }
 
-  absl::InlinedVector<int64_t, 4> dims(array.ndim());
-  absl::InlinedVector<int64_t, 4> byte_strides(array.ndim());
+  abslx::InlinedVector<int64_t, 4> dims(array.ndim());
+  abslx::InlinedVector<int64_t, 4> byte_strides(array.ndim());
   for (int i = 0; i < array.ndim(); ++i) {
     dims[i] = array.shape(i);
     byte_strides[i] = array.strides(i);
@@ -246,9 +246,9 @@ StatusOr<DevicePutResult> HandleDeviceArray(py::handle obj,
 StatusOr<DevicePutResult> DevicePut(py::handle arg, PjRtDevice* to_device,
                                     const DevicePutOptions& options) {
   tensorflow::profiler::TraceMe traceme("DevicePut");
-  static const absl::flat_hash_map<PyObject*, DevicePutFunc>* const handlers =
+  static const abslx::flat_hash_map<PyObject*, DevicePutFunc>* const handlers =
       [] {
-        auto p = new absl::flat_hash_map<PyObject*, DevicePutFunc>();
+        auto p = new abslx::flat_hash_map<PyObject*, DevicePutFunc>();
         const NumpyScalarTypes& dtypes = GetNumpyScalarTypes();
         // Python scalar types.
         static_assert(sizeof(bool) == 1,
@@ -331,7 +331,7 @@ StatusOr<DevicePutResult> DevicePut(py::handle arg, PjRtDevice* to_device,
       }
     }
     return InvalidArgument(
-        "%s", absl::StrCat(
+        "%s", abslx::StrCat(
                   "Not supported: The C++ jax jit execution path, only accepts "
                   "DeviceArray, Numpy arrays scalars of supported types "
                   "(see implementation), or Python scalars. Got type ",
@@ -351,10 +351,10 @@ bool IsFloat0(py::array arg) {
 std::string PyArgSignature::DebugString() const {
   std::string result = "";
   if (weak_type) {
-    absl::StrAppend(&result, "weak_");
+    abslx::StrAppend(&result, "weak_");
   }
-  absl::StrAppend(&result, xla::PrimitiveType_Name(dtype));
-  absl::StrAppend(&result, "[", absl::StrJoin(shape, ","), "]");
+  abslx::StrAppend(&result, xla::PrimitiveType_Name(dtype));
+  abslx::StrAppend(&result, "[", abslx::StrJoin(shape, ","), "]");
   return result;
 }
 
@@ -363,9 +363,9 @@ using ToPyArgSignatureHandler =
 
 StatusOr<PyArgSignature> PyArgSignatureOfValue(py::handle arg,
                                                bool jax_enable_x64) {
-  static const absl::flat_hash_map<PyObject*, ToPyArgSignatureHandler>* const
+  static const abslx::flat_hash_map<PyObject*, ToPyArgSignatureHandler>* const
       handlers = [] {
-        auto p = new absl::flat_hash_map<PyObject*, ToPyArgSignatureHandler>();
+        auto p = new abslx::flat_hash_map<PyObject*, ToPyArgSignatureHandler>();
 
         const NumpyScalarTypes& dtypes = GetNumpyScalarTypes();
 
@@ -462,7 +462,7 @@ StatusOr<PyArgSignature> PyArgSignatureOfValue(py::handle arg,
                         "Code assumes ssize_t is the same as int64_t");
           return PyArgSignature(
               dtype,
-              absl::MakeConstSpan(
+              abslx::MakeConstSpan(
                   reinterpret_cast<const int64_t*>(numpy_array.shape()),
                   numpy_array.ndim()),
               /*weak_type=*/false);
@@ -556,7 +556,7 @@ StatusOr<PyArgSignature> PyArgSignatureOfValue(py::handle arg,
     }
     return InvalidArgument(
         "%s",
-        absl::StrCat("Not supported: The C++ ToPyArgSignature only accepts "
+        abslx::StrCat("Not supported: The C++ ToPyArgSignature only accepts "
                      "Buffer/DeviceArray/ShardedDeviceArray, Numpy "
                      "arrays scalars of supported types "
                      "(see implementation), or Python scalars. Got type ",

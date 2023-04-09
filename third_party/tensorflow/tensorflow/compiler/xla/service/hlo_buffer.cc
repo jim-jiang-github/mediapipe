@@ -49,16 +49,16 @@ std::vector<HloPosition> HloBuffer::ComputePositions() const {
                      value->positions().end());
   }
   // Remove duplicates and sort positions.
-  absl::c_sort(positions);
+  abslx::c_sort(positions);
   positions.erase(std::unique(positions.begin(), positions.end()),
                   positions.end());
   return positions;
 }
 
 std::string HloBuffer::ToString() const {
-  return absl::StrCat(
+  return abslx::StrCat(
       "HloBuffer ", id_, ", values: ",
-      absl::StrJoin(values_, ", ",
+      abslx::StrJoin(values_, ", ",
                     [](std::string* result, const HloValue* value) {
                       result->append(value->ToShortString());
                     }));

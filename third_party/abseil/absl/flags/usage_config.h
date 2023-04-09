@@ -54,11 +54,11 @@
 // * --helpmatch
 //     Shows help on modules whose name contains the specified substring
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 namespace flags_internal {
-using FlagKindFilter = std::function<bool (absl::string_view)>;
+using FlagKindFilter = std::function<bool (abslx::string_view)>;
 }  // namespace flags_internal
 
 // FlagsUsageConfig
@@ -103,7 +103,7 @@ struct FlagsUsageConfig {
   //   normalize_filename("/my_company/some_long_path/src/project/file.cc")
   // might produce
   //   "project/file.cc".
-  std::function<std::string(absl::string_view)> normalize_filename;
+  std::function<std::string(abslx::string_view)> normalize_filename;
 };
 
 // SetFlagsUsageConfig()
@@ -117,18 +117,18 @@ namespace flags_internal {
 
 FlagsUsageConfig GetUsageConfig();
 
-void ReportUsageError(absl::string_view msg, bool is_fatal);
+void ReportUsageError(abslx::string_view msg, bool is_fatal);
 
 }  // namespace flags_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 extern "C" {
 
 // Additional report of fatal usage error message before we std::exit. Error is
 // fatal if is_fatal argument to ReportUsageError is true.
 void ABSL_INTERNAL_C_SYMBOL(AbslInternalReportFatalUsageError)(
-    absl::string_view);
+    abslx::string_view);
 
 }  // extern "C"
 

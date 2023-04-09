@@ -31,7 +31,7 @@ constexpr int64_t kMaxByteCount = 10 * 1024 * 1024;
 class ReduceScatterCombinerTest : public HloTestBase {
  public:
   StatusOr<std::unique_ptr<HloModule>> RunPass(
-      absl::string_view hlo_module, bool expect_change,
+      abslx::string_view hlo_module, bool expect_change,
       int64_t byte_threshold = kMaxByteCount,
       int64_t count_threshold = kMaxCombineCount) {
     TF_ASSIGN_OR_RETURN(auto module, ParseAndReturnVerifiedModule(hlo_module));
@@ -45,7 +45,7 @@ class ReduceScatterCombinerTest : public HloTestBase {
   }
 
   size_t ReduceScatterCount(std::unique_ptr<HloModule>& module) {
-    return absl::c_count_if(module->entry_computation()->instructions(),
+    return abslx::c_count_if(module->entry_computation()->instructions(),
                             [](const HloInstruction* inst) {
                               return inst->opcode() ==
                                      HloOpcode::kReduceScatter;
@@ -54,7 +54,7 @@ class ReduceScatterCombinerTest : public HloTestBase {
 };
 
 TEST_F(ReduceScatterCombinerTest, Simple) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -77,7 +77,7 @@ ENTRY main {
 }
 
 TEST_F(ReduceScatterCombinerTest, SimpleMultipleGroups) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -103,7 +103,7 @@ ENTRY main {
 
 // Test that dependent reduce-scatter do not get combined.
 TEST_F(ReduceScatterCombinerTest, DependentReduceScatter) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {
@@ -124,7 +124,7 @@ ENTRY main {
 }
 
 TEST_F(ReduceScatterCombinerTest, DoNotCombineMismatched) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 sum {

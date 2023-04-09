@@ -30,36 +30,36 @@ namespace gpu {
 
 namespace {
 
-absl::Status CheckIfValidNodeOfType(const Node* node,
+abslx::Status CheckIfValidNodeOfType(const Node* node,
                                     OperationType required_type) {
   if (node == nullptr) {
-    return absl::NotFoundError("Invalid node.");
+    return abslx::NotFoundError("Invalid node.");
   }
   if (OperationTypeFromString(node->operation.type) != required_type) {
-    return absl::NotFoundError("Type mismatch.");
+    return abslx::NotFoundError("Type mismatch.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GetElementwiseScalarValue(const Node* node, float* result) {
-  auto attr = absl::any_cast<ElementwiseAttributes>(node->operation.attributes);
-  const float* value = absl::get_if<float>(&attr.param);
+abslx::Status GetElementwiseScalarValue(const Node* node, float* result) {
+  auto attr = abslx::any_cast<ElementwiseAttributes>(node->operation.attributes);
+  const float* value = abslx::get_if<float>(&attr.param);
   if (!value) {
-    return absl::NotFoundError("Not a scalar value inside attributes.");
+    return abslx::NotFoundError("Not a scalar value inside attributes.");
   }
   *result = *value;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GetNextSingleNode(const GraphFloat32& graph, const Node& node,
+abslx::Status GetNextSingleNode(const GraphFloat32& graph, const Node& node,
                                OperationType next_type, Node** next_node) {
   auto consumers = graph.FindConsumers(graph.FindOutputs(node.id)[0]->id);
   if (consumers.size() != 1) {
-    return absl::NotFoundError("Not a single consumer.");
+    return abslx::NotFoundError("Not a single consumer.");
   }
   RETURN_IF_ERROR(CheckIfValidNodeOfType(consumers[0], next_type));
   *next_node = consumers[0];
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 std::string GetReduceCode(const std::string& src_value,
@@ -93,7 +93,7 @@ std::string GetReduceCode(const std::string& src_value,
     // Threads doing work: id < 2 = floor(5/2)
     // Offset to the added items: 3 = ceil(5/2)
     // Number of items still to be summed after: 3 = ceil(5/2)
-    return absl::Substitute(R"(
+    return abslx::Substitute(R"(
   {  // reduction, all threads inside workgroup must execute this code
     $3[local_id] = $1;
     LOCAL_MEM_BARRIER;
@@ -119,7 +119,7 @@ std::string GetReduceCode(const std::string& src_value,
 std::string ZeroClampVec4Code(const std::string& slice_name,
                               const std::string& channels_name,
                               const std::string& value_name) {
-  return absl::Substitute(R"(
+  return abslx::Substitute(R"(
     // no need to check first element, always valid
     if ($0 * 4 + 1 >= $1) { $2.y = 0.0f; }
     if ($0 * 4 + 2 >= $1) { $2.z = 0.0f; }
@@ -336,7 +336,7 @@ MeanStdDevNormalization CreateMeanStdDevNormalization(
                                  two_step);
 }
 
-absl::Status TryMeanStdDevNormalization(
+abslx::Status TryMeanStdDevNormalization(
     const GpuInfo& gpu_info, CalculationsPrecision precision,
     const GraphFloat32& graph, NodeId first_node_id,
     const std::map<ValueId, TensorDescriptor>& tensor_descriptors,
@@ -344,16 +344,16 @@ absl::Status TryMeanStdDevNormalization(
   Node* first_mean_node = graph.GetNode(first_node_id);
   RETURN_IF_ERROR(CheckIfValidNodeOfType(first_mean_node, OperationType::MEAN));
   auto first_mean_attr =
-      absl::any_cast<MeanAttributes>(first_mean_node->operation.attributes);
+      abslx::any_cast<MeanAttributes>(first_mean_node->operation.attributes);
   if (first_mean_attr.dims != std::set<Axis>{Axis::CHANNELS}) {
-    return absl::NotFoundError("MeanStdDevNormalization not suitable.");
+    return abslx::NotFoundError("MeanStdDevNormalization not suitable.");
   }
   Node* sub_node;
   RETURN_IF_ERROR(GetNextSingleNode(graph, *first_mean_node, OperationType::SUB,
                                     &sub_node));
   auto sub_inputs = graph.FindInputs(sub_node->id);
   if (sub_inputs.size() != 2) {
-    return absl::NotFoundError("MeanStdDevNormalization not suitable.");
+    return abslx::NotFoundError("MeanStdDevNormalization not suitable.");
   } else {
     // checking structure
     //       input
@@ -364,18 +364,18 @@ absl::Status TryMeanStdDevNormalization(
     Node* sub_first_parent = graph.FindProducer(sub_inputs[0]->id);
     Node* sub_second_parent = graph.FindProducer(sub_inputs[1]->id);
     if (sub_second_parent != first_mean_node) {
-      return absl::NotFoundError("MeanStdDevNormalization not suitable.");
+      return abslx::NotFoundError("MeanStdDevNormalization not suitable.");
     }
     auto mean_inputs = graph.FindInputs(first_mean_node->id);
     Node* mean_parent = graph.FindProducer(mean_inputs[0]->id);
     if (mean_parent != sub_first_parent) {
-      return absl::NotFoundError("MeanStdDevNormalization not suitable.");
+      return abslx::NotFoundError("MeanStdDevNormalization not suitable.");
     }
   }
   auto sub_output = graph.FindOutputs(sub_node->id)[0]->id;
   auto consumers = graph.FindConsumers(sub_output);
   if (consumers.size() != 2) {
-    return absl::NotFoundError("MeanStdDevNormalization not suitable.");
+    return abslx::NotFoundError("MeanStdDevNormalization not suitable.");
   }
   Node* square_node = consumers[0];
   Node* sub_child_mul_node = consumers[1];
@@ -390,9 +390,9 @@ absl::Status TryMeanStdDevNormalization(
   RETURN_IF_ERROR(GetNextSingleNode(graph, *square_node, OperationType::MEAN,
                                     &second_mean_node));
   auto second_mean_attr =
-      absl::any_cast<MeanAttributes>(second_mean_node->operation.attributes);
+      abslx::any_cast<MeanAttributes>(second_mean_node->operation.attributes);
   if (second_mean_attr.dims != std::set<Axis>{Axis::CHANNELS}) {
-    return absl::NotFoundError("MeanStdDevNormalization not suitable.");
+    return abslx::NotFoundError("MeanStdDevNormalization not suitable.");
   }
   Node* add_node;
   RETURN_IF_ERROR(GetNextSingleNode(graph, *second_mean_node,
@@ -406,7 +406,7 @@ absl::Status TryMeanStdDevNormalization(
   RETURN_IF_ERROR(
       GetNextSingleNode(graph, *rsqrt_node, OperationType::MUL, &mul_node));
   if (sub_child_mul_node != mul_node) {
-    return absl::NotFoundError("MeanStdDevNormalization not suitable.");
+    return abslx::NotFoundError("MeanStdDevNormalization not suitable.");
   }
 
   OperationDef op_def;
@@ -439,7 +439,7 @@ absl::Status TryMeanStdDevNormalization(
   consumed_nodes->insert(rsqrt_node->id);
   consumed_nodes->insert(mul_node->id);
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

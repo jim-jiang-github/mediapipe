@@ -30,11 +30,11 @@ limitations under the License.
 #include "mlir/IR/Value.h"  // from @llvm-project
 #include "tensorflow/compiler/mlir/utils/name_utils.h"
 
-static inline absl::string_view StringRefToView(llvm::StringRef ref) {
-  return absl::string_view(ref.data(), ref.size());
+static inline abslx::string_view StringRefToView(llvm::StringRef ref) {
+  return abslx::string_view(ref.data(), ref.size());
 }
 
-static inline llvm::StringRef StringViewToRef(absl::string_view view) {
+static inline llvm::StringRef StringViewToRef(abslx::string_view view) {
   return llvm::StringRef(view.data(), view.size());
 }
 
@@ -84,7 +84,7 @@ llvm::StringRef OpOrArgNameMapper::GetUniqueName(OpOrVal op_or_val) {
   return ref;
 }
 
-absl::string_view OpOrArgNameMapper::GetUniqueNameView(OpOrVal op_or_val) {
+abslx::string_view OpOrArgNameMapper::GetUniqueNameView(OpOrVal op_or_val) {
   auto& name = op_or_val_to_name_[op_or_val];
   if (!name.empty()) return name;
   // Update the value in the map with unique name.

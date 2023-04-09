@@ -87,7 +87,7 @@ void ShapedBuffer::clear() {
 
 std::string ShapedBuffer::ToString() const {
   std::string s =
-      absl::StrCat("ShapedBuffer(", device_ordinal(),
+      abslx::StrCat("ShapedBuffer(", device_ordinal(),
                    "), on-device shape=" +
                        ShapeUtil::HumanStringWithLayout(on_device_shape()),
                    ":\n");
@@ -101,7 +101,7 @@ std::string ShapedBuffer::ToString() const {
           shape_str = ShapeUtil::HumanStringWithLayout(subshape);
         }
         const se::DeviceMemoryBase& memory = buffer(index);
-        absl::StrAppendFormat(&s, "  %s%p (%d bytes) : %s\n",
+        abslx::StrAppendFormat(&s, "  %s%p (%d bytes) : %s\n",
                               std::string(index.size() * 2, ' '),
                               memory.opaque(), memory.size(), shape_str);
       });
@@ -162,7 +162,7 @@ void ScopedShapedBuffer::Deallocate() {
   // Deallocate all non-null buffers. A buffer may appear in more than one spot
   // in the shape (eg, a tuple with a repeated element) so keep track of what
   // has been deallocated.
-  absl::flat_hash_set<void*> deallocated_ptrs;
+  abslx::flat_hash_set<void*> deallocated_ptrs;
   for (auto& pair : buffers_) {
     se::DeviceMemoryBase& memory_base = pair.second;
     if (!memory_base.is_null() &&

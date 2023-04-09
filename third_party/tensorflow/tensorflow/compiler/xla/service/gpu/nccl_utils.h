@@ -92,12 +92,12 @@ class Lockable {
   Lockable& operator=(Lockable&&) = delete;
 
   Lock Acquire() {
-    absl::MutexLock lock(&mutex_);
-    mutex_.Await(absl::Condition(&is_unlocked_));
+    abslx::MutexLock lock(&mutex_);
+    mutex_.Await(abslx::Condition(&is_unlocked_));
     is_unlocked_ = false;
 
     return {&value_, [this](T*) {
-              absl::MutexLock lock(&mutex_);
+              abslx::MutexLock lock(&mutex_);
               CHECK(!is_unlocked_);
               is_unlocked_ = true;
             }};
@@ -105,7 +105,7 @@ class Lockable {
 
  private:
   T value_;
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
   bool is_unlocked_ ABSL_GUARDED_BY(mutex_) = true;
 };
 

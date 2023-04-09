@@ -148,7 +148,7 @@ class StreamExecutorTest : public ::testing::Test {
 
   StreamExecutor* GetExecutor(int ordinal) {
     if (!cplatform_) {
-      cplatform_ = absl::make_unique<CPlatform>(
+      cplatform_ = abslx::make_unique<CPlatform>(
           platform_, test_util::DestroyPlatform, platform_fns_,
           test_util::DestroyPlatformFns, device_fns_, se_, timer_fns_);
     }
@@ -239,7 +239,7 @@ TEST_F(StreamExecutorTest, GetAllocatorStats) {
   };
 
   StreamExecutor* executor = GetExecutor(0);
-  absl::optional<AllocatorStats> optional_stats = executor->GetAllocatorStats();
+  abslx::optional<AllocatorStats> optional_stats = executor->GetAllocatorStats();
   ASSERT_TRUE(optional_stats.has_value());
   AllocatorStats stats = optional_stats.value();
   ASSERT_EQ(stats.bytes_in_use, 123);

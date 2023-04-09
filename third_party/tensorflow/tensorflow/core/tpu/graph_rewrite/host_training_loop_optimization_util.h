@@ -31,7 +31,7 @@ namespace tpu {
 struct LoopArgInfo {
   std::string enter_node_name;
   // Exit nodes are optional for loop invariant while loop args.
-  absl::optional<std::string> exit_node_name;
+  abslx::optional<std::string> exit_node_name;
 };
 
 struct HostTrainingLoopInfo {
@@ -39,8 +39,8 @@ struct HostTrainingLoopInfo {
   // host training loop is included. If host training loop is not
   // inside a function call, then `function_name` and `function_attrs`
   // are nullopt.
-  absl::optional<std::string> encapsulating_function_name;
-  absl::optional<AttrValueMap> encapsulating_function_attrs;
+  abslx::optional<std::string> encapsulating_function_name;
+  abslx::optional<AttrValueMap> encapsulating_function_attrs;
 
   // TPU Compile node as within a host training loop.
   std::string compile_node_name;

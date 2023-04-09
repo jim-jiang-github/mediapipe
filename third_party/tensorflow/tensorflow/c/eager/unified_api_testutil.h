@@ -32,13 +32,13 @@ AbstractContext* BuildFunction(const char* fn_name);
 // Creates parameters (placeholders) in the tracing `ctx` using the shape and
 // dtype of `inputs`.
 Status CreateParamsForInputs(AbstractContext* ctx,
-                             absl::Span<AbstractTensorHandle* const> inputs,
+                             abslx::Span<AbstractTensorHandle* const> inputs,
                              std::vector<AbstractTensorHandle*>* params);
 
 // A callable that takes tensor inputs and returns zero or more tensor outputs.
 using Model = std::function<Status(AbstractContext*,
-                                   absl::Span<AbstractTensorHandle* const>,
-                                   absl::Span<AbstractTensorHandle*>)>;
+                                   abslx::Span<AbstractTensorHandle* const>,
+                                   abslx::Span<AbstractTensorHandle*>)>;
 
 // Runs `model` maybe wrapped in a function call op. This can be thought as
 // being equivalent to the following python code.
@@ -48,8 +48,8 @@ using Model = std::function<Status(AbstractContext*,
 // else:
 //   outputs = model(inputs)
 Status RunModel(Model model, AbstractContext* ctx,
-                absl::Span<AbstractTensorHandle* const> inputs,
-                absl::Span<AbstractTensorHandle*> outputs, bool use_function);
+                abslx::Span<AbstractTensorHandle* const> inputs,
+                abslx::Span<AbstractTensorHandle*> outputs, bool use_function);
 
 Status BuildImmediateExecutionContext(bool use_tfrt, AbstractContext** ctx);
 

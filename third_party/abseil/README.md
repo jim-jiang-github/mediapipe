@@ -74,7 +74,7 @@ Abseil contains the following C++ library components:
   library and container-based versions of such algorithms.
 * [`cleanup`](absl/cleanup/)
   <br /> The `cleanup` library contains the control-flow-construct-like type
-  `absl::Cleanup` which is used for executing a callback on scope exit.
+  `abslx::Cleanup` which is used for executing a callback on scope exit.
 * [`container`](absl/container/)
   <br /> The `container` library contains additional STL-style containers,
   including Abseil's unordered "Swiss table" containers.
@@ -94,14 +94,14 @@ Abseil contains the following C++ library components:
   <br /> The `numeric` library contains C++11-compatible 128-bit integers.
 * [`status`](absl/status/)
   <br /> The `status` contains abstractions for error handling, specifically
-  `absl::Status` and `absl::StatusOr<T>`.
+  `abslx::Status` and `abslx::StatusOr<T>`.
 * [`strings`](absl/strings/)
   <br /> The `strings` library contains a variety of strings routines and
   utilities, including a C++11-compatible version of the C++17
   `std::string_view` type.
 * [`synchronization`](absl/synchronization/)
   <br /> The `synchronization` library contains concurrency primitives (Abseil's
-  `absl::Mutex` class, an alternative to `std::mutex`) and a variety of
+  `abslx::Mutex` class, an alternative to `std::mutex`) and a variety of
   synchronization abstractions.
 * [`time`](absl/time/)
   <br /> The `time` library contains abstractions for computing with absolute

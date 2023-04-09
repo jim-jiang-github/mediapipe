@@ -84,18 +84,18 @@ class SegmentationSmoothingCalculator : public CalculatorBase {
  public:
   SegmentationSmoothingCalculator() = default;
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
   // From Calculator.
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
-  absl::Status RenderGpu(CalculatorContext* cc);
-  absl::Status RenderCpu(CalculatorContext* cc);
+  abslx::Status RenderGpu(CalculatorContext* cc);
+  abslx::Status RenderCpu(CalculatorContext* cc);
 
-  absl::Status GlSetup(CalculatorContext* cc);
+  abslx::Status GlSetup(CalculatorContext* cc);
   void GlRender(CalculatorContext* cc);
 
   float combine_with_previous_ratio_;
@@ -108,7 +108,7 @@ class SegmentationSmoothingCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(SegmentationSmoothingCalculator);
 
-absl::Status SegmentationSmoothingCalculator::GetContract(
+abslx::Status SegmentationSmoothingCalculator::GetContract(
     CalculatorContract* cc) {
   CHECK_GE(cc->Inputs().NumEntries(), 1);
 
@@ -120,10 +120,10 @@ absl::Status SegmentationSmoothingCalculator::GetContract(
   MP_RETURN_IF_ERROR(mediapipe::GlCalculatorHelper::UpdateContract(cc));
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SegmentationSmoothingCalculator::Open(CalculatorContext* cc) {
+abslx::Status SegmentationSmoothingCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
   auto options =
@@ -134,19 +134,19 @@ absl::Status SegmentationSmoothingCalculator::Open(CalculatorContext* cc) {
   MP_RETURN_IF_ERROR(gpu_helper_.Open(cc));
 #endif  //  !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SegmentationSmoothingCalculator::Process(CalculatorContext* cc) {
+abslx::Status SegmentationSmoothingCalculator::Process(CalculatorContext* cc) {
   if (cc->Inputs().Tag(kCurrentMaskTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   if (cc->Inputs().Tag(kPreviousMaskTag).IsEmpty()) {
     // Pass through current image if previous is not available.
     cc->Outputs()
         .Tag(kOutputMaskTag)
         .AddPacket(cc->Inputs().Tag(kCurrentMaskTag).Value());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Run on GPU if incoming data is on GPU.
@@ -154,29 +154,29 @@ absl::Status SegmentationSmoothingCalculator::Process(CalculatorContext* cc) {
 
   if (use_gpu) {
 #if !MEDIAPIPE_DISABLE_GPU
-    MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext([this, cc]() -> absl::Status {
+    MP_RETURN_IF_ERROR(gpu_helper_.RunInGlContext([this, cc]() -> abslx::Status {
       if (!gpu_initialized_) {
         MP_RETURN_IF_ERROR(GlSetup(cc));
         gpu_initialized_ = true;
       }
       MP_RETURN_IF_ERROR(RenderGpu(cc));
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }));
 #else
-    return absl::InternalError("GPU processing is disabled.");
+    return abslx::InternalError("GPU processing is disabled.");
 #endif  // !MEDIAPIPE_DISABLE_GPU
   } else {
 #if !MEDIAPIPE_DISABLE_OPENCV
     MP_RETURN_IF_ERROR(RenderCpu(cc));
 #else
-    return absl::InternalError("OpenCV processing is disabled.");
+    return abslx::InternalError("OpenCV processing is disabled.");
 #endif  // !MEDIAPIPE_DISABLE_OPENCV
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SegmentationSmoothingCalculator::Close(CalculatorContext* cc) {
+abslx::Status SegmentationSmoothingCalculator::Close(CalculatorContext* cc) {
 #if !MEDIAPIPE_DISABLE_GPU
   gpu_helper_.RunInGlContext([this] {
     if (program_) glDeleteProgram(program_);
@@ -184,10 +184,10 @@ absl::Status SegmentationSmoothingCalculator::Close(CalculatorContext* cc) {
   });
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SegmentationSmoothingCalculator::RenderCpu(CalculatorContext* cc) {
+abslx::Status SegmentationSmoothingCalculator::RenderCpu(CalculatorContext* cc) {
 #if !MEDIAPIPE_DISABLE_OPENCV
   // Setup source images.
   const auto& current_frame = cc->Inputs().Tag(kCurrentMaskTag).Get<Image>();
@@ -255,10 +255,10 @@ absl::Status SegmentationSmoothingCalculator::RenderCpu(CalculatorContext* cc) {
       .AddPacket(MakePacket<Image>(output_frame).At(cc->InputTimestamp()));
 #endif  // !MEDIAPIPE_DISABLE_OPENCV
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SegmentationSmoothingCalculator::RenderGpu(CalculatorContext* cc) {
+abslx::Status SegmentationSmoothingCalculator::RenderGpu(CalculatorContext* cc) {
 #if !MEDIAPIPE_DISABLE_GPU
   // Setup source textures.
   const auto& current_frame = cc->Inputs().Tag(kCurrentMaskTag).Get<Image>();
@@ -304,7 +304,7 @@ absl::Status SegmentationSmoothingCalculator::RenderGpu(CalculatorContext* cc) {
       .Add(output_frame.release(), cc->InputTimestamp());
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void SegmentationSmoothingCalculator::GlRender(CalculatorContext* cc) {
@@ -360,7 +360,7 @@ void SegmentationSmoothingCalculator::GlRender(CalculatorContext* cc) {
 #endif  // !MEDIAPIPE_DISABLE_GPU
 }
 
-absl::Status SegmentationSmoothingCalculator::GlSetup(CalculatorContext* cc) {
+abslx::Status SegmentationSmoothingCalculator::GlSetup(CalculatorContext* cc) {
 #if !MEDIAPIPE_DISABLE_GPU
   const GLint attr_location[NUM_ATTRIBUTES] = {
       ATTRIB_VERTEX,
@@ -373,7 +373,7 @@ absl::Status SegmentationSmoothingCalculator::GlSetup(CalculatorContext* cc) {
 
   // Shader to blend in previous mask based on computed uncertainty probability.
   const std::string frag_src =
-      absl::StrCat(std::string(mediapipe::kMediaPipeFragmentShaderPreamble),
+      abslx::StrCat(std::string(mediapipe::kMediaPipeFragmentShaderPreamble),
                    R"(
     DEFAULT_PRECISION(mediump, float)
 
@@ -432,7 +432,7 @@ absl::Status SegmentationSmoothingCalculator::GlSetup(CalculatorContext* cc) {
 
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

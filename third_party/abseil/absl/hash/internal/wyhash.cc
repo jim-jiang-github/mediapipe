@@ -17,14 +17,14 @@
 #include "absl/base/internal/unaligned_access.h"
 #include "absl/numeric/int128.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace hash_internal {
 
 static uint64_t WyhashMix(uint64_t v0, uint64_t v1) {
-  absl::uint128 p = v0;
+  abslx::uint128 p = v0;
   p *= v1;
-  return absl::Uint128Low64(p) ^ absl::Uint128High64(p);
+  return abslx::Uint128Low64(p) ^ abslx::Uint128High64(p);
 }
 
 uint64_t Wyhash(const void* data, size_t len, uint64_t seed,
@@ -40,14 +40,14 @@ uint64_t Wyhash(const void* data, size_t len, uint64_t seed,
     uint64_t duplicated_state = current_state;
 
     do {
-      uint64_t a = absl::base_internal::UnalignedLoad64(ptr);
-      uint64_t b = absl::base_internal::UnalignedLoad64(ptr + 8);
-      uint64_t c = absl::base_internal::UnalignedLoad64(ptr + 16);
-      uint64_t d = absl::base_internal::UnalignedLoad64(ptr + 24);
-      uint64_t e = absl::base_internal::UnalignedLoad64(ptr + 32);
-      uint64_t f = absl::base_internal::UnalignedLoad64(ptr + 40);
-      uint64_t g = absl::base_internal::UnalignedLoad64(ptr + 48);
-      uint64_t h = absl::base_internal::UnalignedLoad64(ptr + 56);
+      uint64_t a = abslx::base_internal::UnalignedLoad64(ptr);
+      uint64_t b = abslx::base_internal::UnalignedLoad64(ptr + 8);
+      uint64_t c = abslx::base_internal::UnalignedLoad64(ptr + 16);
+      uint64_t d = abslx::base_internal::UnalignedLoad64(ptr + 24);
+      uint64_t e = abslx::base_internal::UnalignedLoad64(ptr + 32);
+      uint64_t f = abslx::base_internal::UnalignedLoad64(ptr + 40);
+      uint64_t g = abslx::base_internal::UnalignedLoad64(ptr + 48);
+      uint64_t h = abslx::base_internal::UnalignedLoad64(ptr + 56);
 
       uint64_t cs0 = WyhashMix(a ^ salt[1], b ^ current_state);
       uint64_t cs1 = WyhashMix(c ^ salt[2], d ^ current_state);
@@ -67,8 +67,8 @@ uint64_t Wyhash(const void* data, size_t len, uint64_t seed,
   // We now have a data `ptr` with at most 64 bytes and the current state
   // of the hashing state machine stored in current_state.
   while (len > 16) {
-    uint64_t a = absl::base_internal::UnalignedLoad64(ptr);
-    uint64_t b = absl::base_internal::UnalignedLoad64(ptr + 8);
+    uint64_t a = abslx::base_internal::UnalignedLoad64(ptr);
+    uint64_t b = abslx::base_internal::UnalignedLoad64(ptr + 8);
 
     current_state = WyhashMix(a ^ salt[1], b ^ current_state);
 
@@ -84,13 +84,13 @@ uint64_t Wyhash(const void* data, size_t len, uint64_t seed,
     // bits of the input and B to the last 64 bits of the input. Yes, they will
     // overlap in the middle if we are working with less than the full 16
     // bytes.
-    a = absl::base_internal::UnalignedLoad64(ptr);
-    b = absl::base_internal::UnalignedLoad64(ptr + len - 8);
+    a = abslx::base_internal::UnalignedLoad64(ptr);
+    b = abslx::base_internal::UnalignedLoad64(ptr + len - 8);
   } else if (len > 3) {
     // If we have at least 4 and at most 8 bytes, set A to the first 32
     // bits and B to the last 32 bits.
-    a = absl::base_internal::UnalignedLoad32(ptr);
-    b = absl::base_internal::UnalignedLoad32(ptr + len - 4);
+    a = abslx::base_internal::UnalignedLoad32(ptr);
+    b = abslx::base_internal::UnalignedLoad32(ptr + len - 4);
   } else if (len > 0) {
     // If we have at least 1 and at most 3 bytes, read all of the provided
     // bits into A, with some adjustments.
@@ -108,4 +108,4 @@ uint64_t Wyhash(const void* data, size_t len, uint64_t seed,
 
 }  // namespace hash_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

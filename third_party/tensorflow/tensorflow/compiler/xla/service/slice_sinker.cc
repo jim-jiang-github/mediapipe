@@ -47,7 +47,7 @@ bool IsElementwiseOperationOnSimilarSlices(const HloInstruction* inst) {
   CHECK(inst->IsElementwise());
 
   // Check that all operands are slices.
-  if (absl::c_any_of(inst->operands(), [](const HloInstruction* operand) {
+  if (abslx::c_any_of(inst->operands(), [](const HloInstruction* operand) {
         return operand->opcode() != HloOpcode::kSlice;
       })) {
     return false;
@@ -56,7 +56,7 @@ bool IsElementwiseOperationOnSimilarSlices(const HloInstruction* inst) {
   // Check that all slices are from the same indices of slice sources with
   // compatible shapes.
   const HloInstruction* slice0 = inst->operand(0);
-  return absl::c_all_of(absl::MakeSpan(inst->operands()).subspan(1),
+  return abslx::c_all_of(abslx::MakeSpan(inst->operands()).subspan(1),
                         [slice0](const HloInstruction* slice) {
                           return ShapeUtil::CompatibleIgnoringElementType(
                                      slice0->operand(0)->shape(),
@@ -240,7 +240,7 @@ Status SinkSlices(const std::vector<HloInstruction*>& slice_sources,
 // broadcast and reduce in the future.
 StatusOr<bool> SliceSinker::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
 
   for (HloComputation* computation : module->computations(execution_threads)) {
@@ -270,7 +270,7 @@ StatusOr<bool> SliceSinker::Run(
       }
 
       std::vector<HloInstruction*> slice_sources;
-      absl::c_transform(
+      abslx::c_transform(
           instruction->operands(), std::back_inserter(slice_sources),
           [](HloInstruction* slice) { return slice->mutable_operand(0); });
 

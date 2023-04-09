@@ -158,7 +158,7 @@ class FixedSizeInputStreamHandler : public DefaultInputStreamHandler {
 
   NodeReadiness GetNodeReadiness(Timestamp* min_stream_timestamp) override {
     DCHECK(min_stream_timestamp);
-    absl::MutexLock lock(&erase_mutex_);
+    abslx::MutexLock lock(&erase_mutex_);
     // kReadyForProcess is returned only once until FillInputSet completes.
     // In late_preparation mode, GetNodeReadiness must return kReadyForProcess
     // exactly once for each input-set produced.  Here, GetNodeReadiness
@@ -185,7 +185,7 @@ class FixedSizeInputStreamHandler : public DefaultInputStreamHandler {
   void AddPackets(CollectionItemId id,
                   const std::list<Packet>& packets) override {
     InputStreamHandler::AddPackets(id, packets);
-    absl::MutexLock lock(&erase_mutex_);
+    abslx::MutexLock lock(&erase_mutex_);
     if (!pending_) {
       EraseSurplusPackets(false);
     }
@@ -193,7 +193,7 @@ class FixedSizeInputStreamHandler : public DefaultInputStreamHandler {
 
   void MovePackets(CollectionItemId id, std::list<Packet>* packets) override {
     InputStreamHandler::MovePackets(id, packets);
-    absl::MutexLock lock(&erase_mutex_);
+    abslx::MutexLock lock(&erase_mutex_);
     if (!pending_) {
       EraseSurplusPackets(false);
     }
@@ -202,7 +202,7 @@ class FixedSizeInputStreamHandler : public DefaultInputStreamHandler {
   void FillInputSet(Timestamp input_timestamp,
                     InputStreamShardSet* input_set) override {
     CHECK(input_set);
-    absl::MutexLock lock(&erase_mutex_);
+    abslx::MutexLock lock(&erase_mutex_);
     if (!pending_) {
       LOG(ERROR) << "FillInputSet called without GetNodeReadiness.";
     }
@@ -222,7 +222,7 @@ class FixedSizeInputStreamHandler : public DefaultInputStreamHandler {
   bool pending_ ABSL_GUARDED_BY(erase_mutex_);
   // The timestamp used to truncate all input streams.
   Timestamp kept_timestamp_ ABSL_GUARDED_BY(erase_mutex_);
-  absl::Mutex erase_mutex_;
+  abslx::Mutex erase_mutex_;
 };
 
 REGISTER_INPUT_STREAM_HANDLER(FixedSizeInputStreamHandler);

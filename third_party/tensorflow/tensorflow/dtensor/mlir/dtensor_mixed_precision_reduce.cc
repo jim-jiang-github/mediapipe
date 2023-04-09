@@ -116,7 +116,7 @@ mlir::LogicalResult MaybeUpcastForReduction(ReduceOpType reduce_op,
 
 template <class ReduceOpType>
 mlir::LogicalResult TryMixedPrecisionReduce(mlir::func::FuncOp function,
-                                            absl::string_view opName) {
+                                            abslx::string_view opName) {
   int32_t reduceOpsCounter = 0;
   int32_t changedReduceOpsCounter = 0;
 

@@ -40,7 +40,7 @@ JitRtFlags* jitrt_flags;
 std::vector<Flag>* jitrt_flag_list;
 
 std::vector<Flag>* flag_list;
-absl::once_flag flags_init;
+abslx::once_flag flags_init;
 
 bool SetterForXlaAutoJitFlag(const string& value) {
   int32_t opt_level;
@@ -48,7 +48,7 @@ bool SetterForXlaAutoJitFlag(const string& value) {
   // going via GetMarkForCompilationPassFlags() to avoid infinite recursion. The
   // latter will try to setup and parse flags, which would bring us back to this
   // setter.
-  if (absl::SimpleAtoi(value, &opt_level)) {
+  if (abslx::SimpleAtoi(value, &opt_level)) {
     mark_for_compilation_flags->xla_auto_jit_flag
         .optimization_level_single_gpu = opt_level;
     mark_for_compilation_flags->xla_auto_jit_flag.optimization_level_general =
@@ -65,10 +65,10 @@ bool SetterForXlaAutoJitFlag(const string& value) {
     return true;
   }
 
-  absl::string_view value_sv(value);
-  if (!absl::ConsumePrefix(&value_sv, "single-gpu(") ||
-      !absl::ConsumeSuffix(&value_sv, ")") ||
-      !absl::SimpleAtoi(value_sv, &opt_level)) {
+  abslx::string_view value_sv(value);
+  if (!abslx::ConsumePrefix(&value_sv, "single-gpu(") ||
+      !abslx::ConsumeSuffix(&value_sv, ")") ||
+      !abslx::SimpleAtoi(value_sv, &opt_level)) {
     return false;
   }
 
@@ -232,7 +232,7 @@ void AllocateAndParseFlags() {
   bool enable_mlir_merge_control_flow_pass = true;
   bool enable_mlir_convert_control_to_data_outputs_pass = false;
   auto setter_for_jitter_tensor_names = [](string sequence) {
-    jitter_flags->tensor_names = absl::StrSplit(sequence, ',');
+    jitter_flags->tensor_names = abslx::StrSplit(sequence, ',');
     return true;
   };
   // Dump graphs in TFG dialect.
@@ -353,45 +353,45 @@ void ResetFlags() {
 }  // namespace
 
 bool SetXlaAutoJitFlagFromFlagString(const string& value) {
-  absl::call_once(flags_init, &AllocateAndParseFlags);
+  abslx::call_once(flags_init, &AllocateAndParseFlags);
   return SetterForXlaAutoJitFlag(value);
 }
 
 BuildXlaOpsPassFlags* GetBuildXlaOpsPassFlags() {
-  absl::call_once(flags_init, &AllocateAndParseFlags);
+  abslx::call_once(flags_init, &AllocateAndParseFlags);
   return build_ops_flags;
 }
 
 MarkForCompilationPassFlags* GetMarkForCompilationPassFlags() {
-  absl::call_once(flags_init, &AllocateAndParseFlags);
+  abslx::call_once(flags_init, &AllocateAndParseFlags);
   return mark_for_compilation_flags;
 }
 
 XlaDeviceFlags* GetXlaDeviceFlags() {
-  absl::call_once(flags_init, &AllocateAndParseFlags);
+  abslx::call_once(flags_init, &AllocateAndParseFlags);
   return device_flags;
 }
 
 const XlaOpsCommonFlags& GetXlaOpsCommonFlags() {
-  absl::call_once(flags_init, &AllocateAndParseFlags);
+  abslx::call_once(flags_init, &AllocateAndParseFlags);
   return *ops_flags;
 }
 
 const IntroduceFloatingPointJitterPassFlags&
 GetIntroduceFloatingPointJitterPassFlags() {
-  absl::call_once(flags_init, &AllocateAndParseFlags);
+  abslx::call_once(flags_init, &AllocateAndParseFlags);
   return *jitter_flags;
 }
 
 MlirCommonFlags* GetMlirCommonFlags() {
-  absl::call_once(flags_init, &AllocateAndParseFlags);
+  abslx::call_once(flags_init, &AllocateAndParseFlags);
   return mlir_flags;
 }
 
 void ResetJitCompilerFlags() { ResetFlags(); }
 
 const JitRtFlags& GetJitRtFlags() {
-  absl::call_once(flags_init, &AllocateAndParseFlags);
+  abslx::call_once(flags_init, &AllocateAndParseFlags);
   return *jitrt_flags;
 }
 
@@ -427,7 +427,7 @@ ConfigProto::Experimental::MlirBridgeRollout GetMlirBridgeRolloutState(
 }
 
 void AppendMarkForCompilationPassFlags(std::vector<Flag>* flag_list) {
-  absl::call_once(flags_init, &AllocateAndParseFlags);
+  abslx::call_once(flags_init, &AllocateAndParseFlags);
   AppendMarkForCompilationPassFlagsInternal(flag_list);
 }
 

@@ -40,7 +40,7 @@ namespace gpu {
 TfLiteIntArray* GetOpsToReplace(
     TfLiteContext* context, bool allow_quant_ops = false,
     int max_delegated_partitions = 1,
-    const absl::flat_hash_set<TfLiteBuiltinOperator>* excluded_ops = nullptr);
+    const abslx::flat_hash_set<TfLiteBuiltinOperator>* excluded_ops = nullptr);
 
 // Extracts TFLite delegate execution plan from the input TFLite context and
 // converts it into generic graph format.
@@ -51,19 +51,19 @@ TfLiteIntArray* GetOpsToReplace(
 // allocated for them. We need to do that only for the overall GPU graph inputs
 // & outputs. This should be done by the delegate, by setting the appropriate
 // TfLiteNode->temporaries.
-absl::Status BuildModel(
+abslx::Status BuildModel(
     TfLiteContext* context, const TfLiteDelegateParams* delegate_params,
     GraphFloat32* graph,
-    absl::flat_hash_map<int, int>* quant_conversion_map = nullptr);
+    abslx::flat_hash_map<int, int>* quant_conversion_map = nullptr);
 
 // Same as BuildModel, but enforces user-provided input/output indices instead
 // of using delegate_params->inputs and delegate_params->outputs for
 // inputs/outputs preallocating.
-absl::Status BuildModelEnforceIO(
+abslx::Status BuildModelEnforceIO(
     TfLiteContext* context, const TfLiteDelegateParams* delegate_params,
     const std::vector<int>& input_ids, const std::vector<int>& output_ids,
     GraphFloat32* graph,
-    absl::flat_hash_map<int, int>* quant_conversion_map = nullptr);
+    abslx::flat_hash_map<int, int>* quant_conversion_map = nullptr);
 
 // Same as above but also apply all transformations on the final graph.
 // Prefer using this method instead of BuildModel.
@@ -74,20 +74,20 @@ absl::Status BuildModelEnforceIO(
 // allocated for them. We need to do that only for the overall GPU graph inputs
 // & outputs. This should be done by the delegate, by setting the appropriate
 // TfLiteNode->temporaries.
-absl::Status BuildFinalModel(
+abslx::Status BuildFinalModel(
     TfLiteContext* context, const TfLiteDelegateParams* delegate_params,
     GraphFloat32* graph,
-    absl::flat_hash_map<int, int>* quant_conversion_map = nullptr);
+    abslx::flat_hash_map<int, int>* quant_conversion_map = nullptr);
 
 // Convenience wrapper that builds a GraphFloat32 from the provided
 // FlatBufferModel.
-absl::Status BuildFromFlatBuffer(const FlatBufferModel& flatbuffer,
+abslx::Status BuildFromFlatBuffer(const FlatBufferModel& flatbuffer,
                                  const OpResolver& op_resolver,
                                  GraphFloat32* graph,
                                  bool allow_quant_ops = false);
 
 // Module-internal converter, exposed for unit testing purpose only.
-absl::Status ConvertTfLiteTensorToTensorRef(const TfLiteTensor& tflite_tensor,
+abslx::Status ConvertTfLiteTensorToTensorRef(const TfLiteTensor& tflite_tensor,
                                             TensorRef<BHWC>* tensor_ref);
 
 }  // namespace gpu

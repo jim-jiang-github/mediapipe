@@ -82,9 +82,9 @@ include(AbseilHelpers)
 ## Using absl targets
 ##
 ## all public absl targets are
-## exported with the absl:: prefix
+## exported with the abslx:: prefix
 ##
-## e.g absl::base absl::synchronization absl::strings ....
+## e.g abslx::base abslx::synchronization abslx::strings ....
 ##
 ## DO NOT rely on the internal targets outside of the prefix
 
@@ -163,7 +163,7 @@ if(ABSL_ENABLE_INSTALL)
 
   # install as a subdirectory only
   install(EXPORT ${PROJECT_NAME}Targets
-    NAMESPACE absl::
+    NAMESPACE abslx::
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
   )
 

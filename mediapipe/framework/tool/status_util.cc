@@ -22,47 +22,47 @@
 namespace mediapipe {
 namespace tool {
 
-absl::Status StatusInvalid(const std::string& message) {
-  return absl::Status(absl::StatusCode::kInvalidArgument, message);
+abslx::Status StatusInvalid(const std::string& message) {
+  return abslx::Status(abslx::StatusCode::kInvalidArgument, message);
 }
 
-absl::Status StatusFail(const std::string& message) {
-  return absl::Status(absl::StatusCode::kUnknown, message);
+abslx::Status StatusFail(const std::string& message) {
+  return abslx::Status(abslx::StatusCode::kUnknown, message);
 }
 
-absl::Status StatusStop() {
-  return absl::Status(absl::StatusCode::kOutOfRange,
+abslx::Status StatusStop() {
+  return abslx::Status(abslx::StatusCode::kOutOfRange,
                       "mediapipe::tool::StatusStop()");
 }
 
-absl::Status AddStatusPrefix(const std::string& prefix,
-                             const absl::Status& status) {
-  return absl::Status(status.code(), absl::StrCat(prefix, status.message()));
+abslx::Status AddStatusPrefix(const std::string& prefix,
+                             const abslx::Status& status) {
+  return abslx::Status(status.code(), abslx::StrCat(prefix, status.message()));
 }
 
-absl::Status CombinedStatus(const std::string& general_comment,
-                            const std::vector<absl::Status>& statuses) {
-  // The final error code is absl::StatusCode::kUnknown if not all
+abslx::Status CombinedStatus(const std::string& general_comment,
+                            const std::vector<abslx::Status>& statuses) {
+  // The final error code is abslx::StatusCode::kUnknown if not all
   // the error codes are the same.  Otherwise it is the same error code
   // as all of the (non-OK) statuses.  If statuses is empty or they are
-  // all OK, then absl::OkStatus() is returned.
-  absl::StatusCode error_code = absl::StatusCode::kOk;
+  // all OK, then abslx::OkStatus() is returned.
+  abslx::StatusCode error_code = abslx::StatusCode::kOk;
   std::vector<std::string> errors;
-  for (const absl::Status& status : statuses) {
+  for (const abslx::Status& status : statuses) {
     if (!status.ok()) {
       errors.emplace_back(status.message());
-      if (error_code == absl::StatusCode::kOk) {
+      if (error_code == abslx::StatusCode::kOk) {
         error_code = status.code();
       } else if (error_code != status.code()) {
-        error_code = absl::StatusCode::kUnknown;
+        error_code = abslx::StatusCode::kUnknown;
       }
     }
   }
   if (error_code == StatusCode::kOk) return OkStatus();
   Status combined;
-  combined = absl::Status(
+  combined = abslx::Status(
       error_code,
-      absl::StrCat(general_comment, "\n", absl::StrJoin(errors, "\n")));
+      abslx::StrCat(general_comment, "\n", abslx::StrJoin(errors, "\n")));
   return combined;
 }
 

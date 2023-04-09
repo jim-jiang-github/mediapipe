@@ -44,11 +44,11 @@ const double kEagerReportThresholdInPercent = 10;
 const double kOutsideCompilationThresholdInPercent = 5;
 
 void SetCommonRecommendation(
-    absl::string_view input_classification, absl::string_view input_statement,
-    absl::string_view output_statement, HardwareType hardware_type,
-    absl::string_view tf_function_statement_html,
-    absl::string_view eager_statement_html,
-    absl::string_view outside_compilation_statement_html,
+    abslx::string_view input_classification, abslx::string_view input_statement,
+    abslx::string_view output_statement, HardwareType hardware_type,
+    abslx::string_view tf_function_statement_html,
+    abslx::string_view eager_statement_html,
+    abslx::string_view outside_compilation_statement_html,
     OverviewPageRecommendation* re);
 
 OverviewPageRecommendation ComputeGenericRecommendation(

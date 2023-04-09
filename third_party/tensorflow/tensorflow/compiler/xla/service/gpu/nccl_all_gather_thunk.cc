@@ -45,7 +45,7 @@ namespace gpu {
 }
 
 /*static*/ bool NcclAllGatherThunk::CanImplement(mlir::lmhlo::AllGatherOp op) {
-  return absl::c_all_of(op.getInputs(), [&](mlir::Value operand) {
+  return abslx::c_all_of(op.getInputs(), [&](mlir::Value operand) {
     Shape shape = GetShape(operand);
     return LayoutUtil::IsDenseArray(shape) &&
            IsTypeSupportedByNccl(shape.element_type()) &&
@@ -82,7 +82,7 @@ Status RunAllGather(std::vector<DeviceBufferPair>& buffers, se::Stream& stream,
     ncclDataType_t dtype = dtype_and_multiplier.first;
     int element_count = buffer.element_count * dtype_and_multiplier.second;
 
-    VLOG(3) << absl::StreamFormat(
+    VLOG(3) << abslx::StreamFormat(
         "Calling ncclAllGather(send_buffer=%p, recv_buffer=%p, sendcount=%d, "
         "comm=%p, stream=%p)",
         send_buffer, recv_buffer, element_count, static_cast<const void*>(comm),

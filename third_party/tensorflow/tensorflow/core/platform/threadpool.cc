@@ -157,7 +157,7 @@ void ThreadPool::TransformRangeConcurrently(
     const std::function<void(int64_t, int64_t)>& fn) {
   ParallelFor(total,
               SchedulingParams(SchedulingStrategy::kFixedBlockSize,
-                               absl::nullopt /* cost_per_unit */, block_size),
+                               abslx::nullopt /* cost_per_unit */, block_size),
               fn);
 }
 

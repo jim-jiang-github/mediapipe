@@ -65,9 +65,9 @@ std::string MessageType(FieldData message) {
   }
 
 // Copy literal options from graph_options to node_options.
-absl::Status CopyLiteralOptions(CalculatorGraphConfig::Node const& parent_node,
+abslx::Status CopyLiteralOptions(CalculatorGraphConfig::Node const& parent_node,
                                 CalculatorGraphConfig* config) {
-  absl::Status status;
+  abslx::Status status;
   FieldData graph_data = options_field_util::AsFieldData(*config);
   FieldData parent_data = options_field_util::AsFieldData(parent_node);
 
@@ -76,7 +76,7 @@ absl::Status CopyLiteralOptions(CalculatorGraphConfig::Node const& parent_node,
     for (const std::string& option_def : node.option_value()) {
       FieldData node_data = options_field_util::AsFieldData(node);
 
-      std::vector<absl::string_view> tag_and_name =
+      std::vector<abslx::string_view> tag_and_name =
           syntax_util.StrSplitTags(option_def);
       std::string graph_tag = syntax_util.OptionFieldsTag(tag_and_name[1]);
       std::string graph_extension_type = ExtensionType(graph_tag);
@@ -111,10 +111,10 @@ absl::Status CopyLiteralOptions(CalculatorGraphConfig::Node const& parent_node,
 }
 
 // Makes all configuration modifications needed for graph options.
-absl::Status DefineGraphOptions(const CalculatorGraphConfig::Node& parent_node,
+abslx::Status DefineGraphOptions(const CalculatorGraphConfig::Node& parent_node,
                                 CalculatorGraphConfig* config) {
   MP_RETURN_IF_ERROR(CopyLiteralOptions(parent_node, config));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace tool

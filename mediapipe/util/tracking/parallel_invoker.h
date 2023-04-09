@@ -330,12 +330,12 @@ void ParallelFor(size_t start, size_t end, size_t grain_size,
       }
 
       struct {
-        absl::Mutex mutex;
-        absl::CondVar completed;
+        abslx::Mutex mutex;
+        abslx::CondVar completed;
         int iterations_remain ABSL_GUARDED_BY(mutex);
       } loop;
       {
-        absl::MutexLock lock(&loop.mutex);
+        abslx::MutexLock lock(&loop.mutex);
         loop.iterations_remain = iterations_remain;
       }
 
@@ -345,7 +345,7 @@ void ParallelFor(size_t start, size_t end, size_t grain_size,
           invoker(BlockedRange(x, std::min(end, x + grain_size), 1));
 
           // Decrement counter.
-          absl::MutexLock lock(&loop.mutex);
+          abslx::MutexLock lock(&loop.mutex);
           --loop.iterations_remain;
           if (loop.iterations_remain == 0) {
             loop.completed.SignalAll();
@@ -444,8 +444,8 @@ void ParallelFor2D(size_t start_row, size_t end_row, size_t start_col,
         break;
       }
 
-      absl::Mutex loop_mutex;
-      absl::CondVar loop_completed;
+      abslx::Mutex loop_mutex;
+      abslx::CondVar loop_completed;
 
       for (int y = start_row; y < end_row; ++y) {
         auto loop_func = [y, start_col, end_col, &loop_mutex, &loop_completed,
@@ -455,7 +455,7 @@ void ParallelFor2D(size_t start_row, size_t end_row, size_t start_col,
                                  BlockedRange(start_col, end_col, 1)));
 
           // Decrement counter.
-          absl::MutexLock lock(&loop_mutex);
+          abslx::MutexLock lock(&loop_mutex);
           --iterations_remain;
           if (iterations_remain == 0) {
             loop_completed.Signal();

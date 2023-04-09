@@ -22,7 +22,7 @@
 #include "absl/base/internal/invoke.h"
 #include "absl/meta/type_traits.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace functional_internal {
 
@@ -43,8 +43,8 @@ union VoidPtr {
 template <typename T>
 constexpr bool PassByValue() {
   return !std::is_lvalue_reference<T>::value &&
-         absl::is_trivially_copy_constructible<T>::value &&
-         absl::is_trivially_copy_assignable<
+         abslx::is_trivially_copy_constructible<T>::value &&
+         abslx::is_trivially_copy_assignable<
              typename std::remove_cv<T>::type>::value &&
          std::is_trivially_destructible<T>::value &&
          sizeof(T) <= 2 * sizeof(void*);
@@ -71,14 +71,14 @@ template <typename Obj, typename R, typename... Args>
 R InvokeObject(VoidPtr ptr, typename ForwardT<Args>::type... args) {
   auto o = static_cast<const Obj*>(ptr.obj);
   return static_cast<R>(
-      absl::base_internal::invoke(*o, std::forward<Args>(args)...));
+      abslx::base_internal::invoke(*o, std::forward<Args>(args)...));
 }
 
 template <typename Fun, typename R, typename... Args>
 R InvokeFunction(VoidPtr ptr, typename ForwardT<Args>::type... args) {
   auto f = reinterpret_cast<Fun>(ptr.fun);
   return static_cast<R>(
-      absl::base_internal::invoke(f, std::forward<Args>(args)...));
+      abslx::base_internal::invoke(f, std::forward<Args>(args)...));
 }
 
 template <typename Sig>
@@ -101,6 +101,6 @@ using EnableIf = typename ::std::enable_if<C, int>::type;
 
 }  // namespace functional_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_FUNCTIONAL_INTERNAL_FUNCTION_REF_H_

@@ -678,7 +678,7 @@ TFE_TensorHandle* TFE_CreatePackedTensorHandle(TFE_Context* ctx,
               unwrapped_handle);
       tensorflow::ImmediateExecutionTensorHandle* result;
       status->status = custom_device_handle->device()->Pack(
-          absl::Span<tensorflow::ImmediateExecutionTensorHandle*>(
+          abslx::Span<tensorflow::ImmediateExecutionTensorHandle*>(
               tensorflow::unwrap(handles), *num_handles),
           &result);
       return tensorflow::wrap(result);
@@ -770,7 +770,7 @@ void TFE_SetLogicalCpuDevices(TFE_Context* ctx, int num_cpus,
   // Remove the device that has the host device name since host device is alreay
   // in an initialized context.
   for (auto d = devices.begin(); d != devices.end();) {
-    if (absl::StrContains(d->get()->name(), "CPU:0")) {
+    if (abslx::StrContains(d->get()->name(), "CPU:0")) {
       d = devices.erase(d);
     } else {
       ++d;

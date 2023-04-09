@@ -24,7 +24,7 @@
 #include "absl/strings/cord_test_helpers.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
@@ -74,7 +74,7 @@ TEST(Hash, Enum) {
   }
 }
 
-using StringTypes = ::testing::Types<std::string, absl::string_view>;
+using StringTypes = ::testing::Types<std::string, abslx::string_view>;
 
 template <class T>
 struct EqString : ::testing::Test {
@@ -93,19 +93,19 @@ TYPED_TEST_SUITE(HashString, StringTypes);
 TYPED_TEST(EqString, Works) {
   auto eq = this->key_eq;
   EXPECT_TRUE(eq("a", "a"));
-  EXPECT_TRUE(eq("a", absl::string_view("a")));
+  EXPECT_TRUE(eq("a", abslx::string_view("a")));
   EXPECT_TRUE(eq("a", std::string("a")));
   EXPECT_FALSE(eq("a", "b"));
-  EXPECT_FALSE(eq("a", absl::string_view("b")));
+  EXPECT_FALSE(eq("a", abslx::string_view("b")));
   EXPECT_FALSE(eq("a", std::string("b")));
 }
 
 TYPED_TEST(HashString, Works) {
   auto hash = this->hasher;
   auto h = hash("a");
-  EXPECT_EQ(h, hash(absl::string_view("a")));
+  EXPECT_EQ(h, hash(abslx::string_view("a")));
   EXPECT_EQ(h, hash(std::string("a")));
-  EXPECT_NE(h, hash(absl::string_view("b")));
+  EXPECT_NE(h, hash(abslx::string_view("b")));
   EXPECT_NE(h, hash(std::string("b")));
 }
 
@@ -207,11 +207,11 @@ TYPED_TEST(HashPointer, Works) {
 }
 
 TEST(EqCord, Works) {
-  hash_default_eq<absl::Cord> eq;
-  const absl::string_view a_string_view = "a";
-  const absl::Cord a_cord(a_string_view);
-  const absl::string_view b_string_view = "b";
-  const absl::Cord b_cord(b_string_view);
+  hash_default_eq<abslx::Cord> eq;
+  const abslx::string_view a_string_view = "a";
+  const abslx::Cord a_cord(a_string_view);
+  const abslx::string_view b_string_view = "b";
+  const abslx::Cord b_cord(b_string_view);
 
   EXPECT_TRUE(eq(a_cord, a_cord));
   EXPECT_TRUE(eq(a_cord, a_string_view));
@@ -222,18 +222,18 @@ TEST(EqCord, Works) {
 }
 
 TEST(HashCord, Works) {
-  hash_default_hash<absl::Cord> hash;
-  const absl::string_view a_string_view = "a";
-  const absl::Cord a_cord(a_string_view);
-  const absl::string_view b_string_view = "b";
-  const absl::Cord b_cord(b_string_view);
+  hash_default_hash<abslx::Cord> hash;
+  const abslx::string_view a_string_view = "a";
+  const abslx::Cord a_cord(a_string_view);
+  const abslx::string_view b_string_view = "b";
+  const abslx::Cord b_cord(b_string_view);
 
   EXPECT_EQ(hash(a_cord), hash(a_cord));
   EXPECT_EQ(hash(b_cord), hash(b_cord));
   EXPECT_EQ(hash(a_string_view), hash(a_cord));
   EXPECT_EQ(hash(b_string_view), hash(b_cord));
-  EXPECT_EQ(hash(absl::Cord("")), hash(""));
-  EXPECT_EQ(hash(absl::Cord()), hash(absl::string_view()));
+  EXPECT_EQ(hash(abslx::Cord("")), hash(""));
+  EXPECT_EQ(hash(abslx::Cord()), hash(abslx::string_view()));
 
   EXPECT_NE(hash(a_cord), hash(b_cord));
   EXPECT_NE(hash(a_cord), hash(b_string_view));
@@ -241,60 +241,60 @@ TEST(HashCord, Works) {
   EXPECT_NE(hash(a_string_view), hash(b_string_view));
 }
 
-void NoOpReleaser(absl::string_view data, void* arg) {}
+void NoOpReleaser(abslx::string_view data, void* arg) {}
 
 TEST(HashCord, FragmentedCordWorks) {
-  hash_default_hash<absl::Cord> hash;
-  absl::Cord c = absl::MakeFragmentedCord({"a", "b", "c"});
+  hash_default_hash<abslx::Cord> hash;
+  abslx::Cord c = abslx::MakeFragmentedCord({"a", "b", "c"});
   EXPECT_FALSE(c.TryFlat().has_value());
   EXPECT_EQ(hash(c), hash("abc"));
 }
 
 TEST(HashCord, FragmentedLongCordWorks) {
-  hash_default_hash<absl::Cord> hash;
+  hash_default_hash<abslx::Cord> hash;
   // Crete some large strings which do not fit on the stack.
   std::string a(65536, 'a');
   std::string b(65536, 'b');
-  absl::Cord c = absl::MakeFragmentedCord({a, b});
+  abslx::Cord c = abslx::MakeFragmentedCord({a, b});
   EXPECT_FALSE(c.TryFlat().has_value());
   EXPECT_EQ(hash(c), hash(a + b));
 }
 
 TEST(HashCord, RandomCord) {
-  hash_default_hash<absl::Cord> hash;
-  auto bitgen = absl::BitGen();
+  hash_default_hash<abslx::Cord> hash;
+  auto bitgen = abslx::BitGen();
   for (int i = 0; i < 1000; ++i) {
-    const int number_of_segments = absl::Uniform(bitgen, 0, 10);
+    const int number_of_segments = abslx::Uniform(bitgen, 0, 10);
     std::vector<std::string> pieces;
     for (size_t s = 0; s < number_of_segments; ++s) {
       std::string str;
-      str.resize(absl::Uniform(bitgen, 0, 4096));
+      str.resize(abslx::Uniform(bitgen, 0, 4096));
       // MSVC needed the explicit return type in the lambda.
       std::generate(str.begin(), str.end(), [&]() -> char {
-        return static_cast<char>(absl::Uniform<unsigned char>(bitgen));
+        return static_cast<char>(abslx::Uniform<unsigned char>(bitgen));
       });
       pieces.push_back(str);
     }
-    absl::Cord c = absl::MakeFragmentedCord(pieces);
+    abslx::Cord c = abslx::MakeFragmentedCord(pieces);
     EXPECT_EQ(hash(c), hash(std::string(c)));
   }
 }
 
-// Cartesian product of (std::string, absl::string_view)
-// with (std::string, absl::string_view, const char*, absl::Cord).
+// Cartesian product of (std::string, abslx::string_view)
+// with (std::string, abslx::string_view, const char*, abslx::Cord).
 using StringTypesCartesianProduct = Types<
     // clang-format off
-    std::pair<absl::Cord, std::string>,
-    std::pair<absl::Cord, absl::string_view>,
-    std::pair<absl::Cord, absl::Cord>,
-    std::pair<absl::Cord, const char*>,
+    std::pair<abslx::Cord, std::string>,
+    std::pair<abslx::Cord, abslx::string_view>,
+    std::pair<abslx::Cord, abslx::Cord>,
+    std::pair<abslx::Cord, const char*>,
 
-    std::pair<std::string, absl::Cord>,
-    std::pair<absl::string_view, absl::Cord>,
+    std::pair<std::string, abslx::Cord>,
+    std::pair<abslx::string_view, abslx::Cord>,
 
-    std::pair<absl::string_view, std::string>,
-    std::pair<absl::string_view, absl::string_view>,
-    std::pair<absl::string_view, const char*>>;
+    std::pair<abslx::string_view, std::string>,
+    std::pair<abslx::string_view, abslx::string_view>,
+    std::pair<abslx::string_view, const char*>>;
 // clang-format on
 
 constexpr char kFirstString[] = "abc123";
@@ -334,7 +334,7 @@ TYPED_TEST_SUITE(StringLikeTest, StringTypesCartesianProduct);
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 enum Hash : size_t {
   kStd = 0x1,       // std::hash
@@ -363,7 +363,7 @@ struct hash<Hashable<H>> {
 };
 }  // namespace std
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
@@ -380,4 +380,4 @@ TEST(Delegate, HashDispatch) {
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

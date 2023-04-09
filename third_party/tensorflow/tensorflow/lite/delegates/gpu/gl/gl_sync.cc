@@ -28,7 +28,7 @@ namespace tflite {
 namespace gpu {
 namespace gl {
 
-absl::Status GlSyncWait() {
+abslx::Status GlSyncWait() {
   GlSync sync;
   RETURN_IF_ERROR(GlSync::NewSync(&sync));
   // Flush sync and loop afterwards without it.
@@ -40,16 +40,16 @@ absl::Status GlSyncWait() {
         break;
       case GL_CONDITION_SATISFIED:
       case GL_ALREADY_SIGNALED:
-        return absl::OkStatus();
+        return abslx::OkStatus();
       case GL_WAIT_FAILED:
         return GetOpenGlErrors();
     }
     status = glClientWaitSync(sync.sync(), 0, /* timeout ns = */ 10000000);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status GlActiveSyncWait() {
+abslx::Status GlActiveSyncWait() {
   GlSync sync;
   RETURN_IF_ERROR(GlSync::NewSync(&sync));
   // Since creating a Sync object is itself a GL command it *must* be flushed.
@@ -62,7 +62,7 @@ absl::Status GlActiveSyncWait() {
       break;
     case GL_CONDITION_SATISFIED:
     case GL_ALREADY_SIGNALED:
-      return absl::OkStatus();
+      return abslx::OkStatus();
     case GL_WAIT_FAILED:
       return GetOpenGlErrors();
   }
@@ -72,7 +72,7 @@ absl::Status GlActiveSyncWait() {
   while (true) {
     glGetSynciv(sync.sync(), GL_SYNC_STATUS, sizeof(GLint), nullptr, &result);
     if (result == GL_SIGNALED) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 #ifdef __ARM_ACLE
     // Try to save CPU power by yielding CPU to another thread.
@@ -81,7 +81,7 @@ absl::Status GlActiveSyncWait() {
   }
 }
 
-absl::Status GlShaderSync::NewSync(GlShaderSync* gl_sync) {
+abslx::Status GlShaderSync::NewSync(GlShaderSync* gl_sync) {
   GlShaderSync sync;
   RETURN_IF_ERROR(CreatePersistentBuffer(sizeof(int), &sync.flag_buffer_));
   static const std::string* kCode = new std::string(R"(#version 310 es
@@ -97,16 +97,16 @@ absl::Status GlShaderSync::NewSync(GlShaderSync* gl_sync) {
   RETURN_IF_ERROR(GlShader::CompileShader(GL_COMPUTE_SHADER, *kCode, &shader));
   RETURN_IF_ERROR(GlProgram::CreateWithShader(shader, &sync.flag_program_));
   *gl_sync = std::move(sync);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // How it works: GPU writes a buffer and CPU checks the buffer value to be
 // changed. The buffer is accessible for writing by GPU and reading by CPU
 // simultaneously - persistent buffer or buffer across shild context can be used
 // for that.
-absl::Status GlShaderSync::Wait() {
+abslx::Status GlShaderSync::Wait() {
   if (!flag_buffer_.is_valid()) {
-    return absl::UnavailableError("GlShaderSync is not initialized.");
+    return abslx::UnavailableError("GlShaderSync is not initialized.");
   }
   RETURN_IF_ERROR(flag_buffer_.BindToIndex(0));
   volatile int* flag_ptr_ = reinterpret_cast<int*>(flag_buffer_.data());
@@ -118,7 +118,7 @@ absl::Status GlShaderSync::Wait() {
   // Wait for the value is being updated by the shader.
   while (*flag_ptr_ != 1) {
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gl

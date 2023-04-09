@@ -33,11 +33,11 @@ std::vector<std::string> CandidateCudaRoots(const HloModuleConfig& config) {
 
 }  // namespace
 
-std::string CantFindCudaMessage(absl::string_view msg,
+std::string CantFindCudaMessage(abslx::string_view msg,
                                 const HloModuleConfig& hlo_module_config) {
-  return absl::StrCat(
+  return abslx::StrCat(
       msg, "\nSearched for CUDA in the following directories:\n  ",
-      absl::StrJoin(CandidateCudaRoots(hlo_module_config), "\n  "),
+      abslx::StrJoin(CandidateCudaRoots(hlo_module_config), "\n  "),
       "\nYou can choose the search directory by setting xla_gpu_cuda_data_dir "
       "in HloModule's DebugOptions.  For most apps, setting the environment "
       "variable XLA_FLAGS=--xla_gpu_cuda_data_dir=/path/to/cuda will work.");

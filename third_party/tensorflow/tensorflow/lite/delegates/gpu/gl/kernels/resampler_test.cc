@@ -30,7 +30,7 @@ namespace gpu {
 namespace gl {
 namespace {
 
-absl::Status ResamplerIdentityTest(const BHWC& shape) {
+abslx::Status ResamplerIdentityTest(const BHWC& shape) {
   TensorRef<BHWC> src_tensor;
   src_tensor.type = DataType::FLOAT32;
   src_tensor.ref = 0;
@@ -62,14 +62,14 @@ absl::Status ResamplerIdentityTest(const BHWC& shape) {
     }
   }
   if (!model.PopulateTensor(0, std::move(src_data))) {
-    return absl::InternalError("failed loading data");
+    return abslx::InternalError("failed loading data");
   }
   if (!model.PopulateTensor(1, std::move(warp_data))) {
-    return absl::InternalError("failed loading data");
+    return abslx::InternalError("failed loading data");
   }
   RETURN_IF_ERROR(model.Invoke(*NewResamplerNodeShader()));
   EXPECT_THAT(model.GetOutput(0), Pointwise(FloatNear(1e-6), dst_data));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 TEST(ResamplerTest, Identity_2_2_1) {

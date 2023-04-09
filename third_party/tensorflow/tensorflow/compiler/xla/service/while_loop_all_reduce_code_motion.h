@@ -47,15 +47,15 @@ class WhileLoopAllReduceCodeMotion : public HloModulePass {
   explicit WhileLoopAllReduceCodeMotion() {}
   ~WhileLoopAllReduceCodeMotion() override = default;
 
-  absl::string_view name() const override {
-    static constexpr absl::string_view kName =
+  abslx::string_view name() const override {
+    static constexpr abslx::string_view kName =
         "while-loop-all-reduce-code-motion";
     return kName;
   }
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 };
 }  // namespace xla
 

@@ -27,7 +27,7 @@ void XlaDebugInfoManager::RegisterModule(
     ModuleIdentifier module_id, std::shared_ptr<const HloModule> hlo_module,
     std::shared_ptr<const BufferAssignmentProto> buffer_assignment) {
   CHECK(hlo_module != nullptr && module_id == hlo_module->unique_id());
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   auto result = modules_.try_emplace(module_id);
   CHECK(result.second);
   XlaModuleEntry& m = result.first->second;
@@ -40,7 +40,7 @@ void XlaDebugInfoManager::RegisterModule(
 // module id is out of scope, we remove it from our database.
 // However during tracing, we will defer the cleanup after serialization.
 void XlaDebugInfoManager::UnregisterModule(ModuleIdentifier module_id) {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   auto it = modules_.find(module_id);
   CHECK(it != modules_.end());
   if (!tracing_active_) {
@@ -52,7 +52,7 @@ void XlaDebugInfoManager::UnregisterModule(ModuleIdentifier module_id) {
 }
 
 void XlaDebugInfoManager::StartTracing() {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
   tracing_active_ = true;
 }
 
@@ -60,7 +60,7 @@ void XlaDebugInfoManager::StopTracing(
     std::vector<std::unique_ptr<HloProto>>* module_debug_info) {
   std::vector<XlaModuleEntry> modules_to_serialize;
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     if (!tracing_active_) return;
     tracing_active_ = false;
 

@@ -257,7 +257,7 @@ Status GetNodeAttr(const AttrSlice& attrs, StringPiece attr_name,
                    std::vector<Tensor>* value);  // type: "list(tensor)"
 
 template <typename T>
-StatusOr<T> GetNodeAttr(const NodeDef& ndef, absl::string_view attr_name) {
+StatusOr<T> GetNodeAttr(const NodeDef& ndef, abslx::string_view attr_name) {
   T val;
   TF_RETURN_IF_ERROR(GetNodeAttr(ndef, attr_name, &val));
   return val;
@@ -437,7 +437,7 @@ Status MaybeAddPrefixToColocationConstraints(
 // Updates the colocation constraint name with the one provided in the map (if
 // it exists in the map) for node_def.
 Status MaybeUpdateColocationConstraintsWithMap(
-    const std::map<absl::string_view, absl::string_view>& node_name_map,
+    const std::map<abslx::string_view, abslx::string_view>& node_name_map,
     NodeDef* node_def);
 
 }  // namespace tensorflow

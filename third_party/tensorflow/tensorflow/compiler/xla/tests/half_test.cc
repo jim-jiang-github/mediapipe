@@ -129,7 +129,7 @@ INSTANTIATE_TEST_CASE_P(half, UnaryPredTest,
                             [](half x) { return isfinite(x); }, &IsFinite}));
 
 using BinaryBuildFuncTy = std::function<void(
-    const xla::XlaOp& x, const xla::XlaOp& y, absl::Span<const int64_t>)>;
+    const xla::XlaOp& x, const xla::XlaOp& y, abslx::Span<const int64_t>)>;
 
 struct BinaryOpTestParam {
   std::function<half(half, half)> compute_func;

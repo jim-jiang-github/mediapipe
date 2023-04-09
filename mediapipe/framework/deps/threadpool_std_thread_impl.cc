@@ -145,7 +145,7 @@ const ThreadOptions& ThreadPool::thread_options() const {
 namespace internal {
 
 std::string CreateThreadName(const std::string& prefix, int thread_id) {
-  std::string name = absl::StrCat(prefix, "/", thread_id);
+  std::string name = abslx::StrCat(prefix, "/", thread_id);
   constexpr size_t kMaxThreadNameLength = 15;
   name.resize(std::min(name.length(), kMaxThreadNameLength));
   return name;

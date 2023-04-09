@@ -29,7 +29,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status TryDepthwiseConvPlus1x1Conv(
+abslx::Status TryDepthwiseConvPlus1x1Conv(
     const GpuInfo& gpu_info, CalculationsPrecision precision,
     const GraphFloat32& graph, NodeId first_node_id,
     const std::map<ValueId, TensorDescriptor>& tensor_descriptors,

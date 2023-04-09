@@ -44,7 +44,7 @@ void EglSurface::Invalidate() {
   }
 }
 
-absl::Status CreatePbufferRGBSurface(EGLConfig config, EGLDisplay display,
+abslx::Status CreatePbufferRGBSurface(EGLConfig config, EGLDisplay display,
                                      uint32_t height, uint32_t width,
                                      EglSurface* egl_surface) {
   const EGLint pbuffer_attributes[] = {EGL_WIDTH,
@@ -60,11 +60,11 @@ absl::Status CreatePbufferRGBSurface(EGLConfig config, EGLDisplay display,
       eglCreatePbufferSurface(display, config, pbuffer_attributes);
   RETURN_IF_ERROR(GetOpenGlErrors());
   if (surface == EGL_NO_SURFACE) {
-    return absl::InternalError(
+    return abslx::InternalError(
         "No EGL error, but eglCreatePbufferSurface failed");
   }
   *egl_surface = EglSurface(surface, display);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gl

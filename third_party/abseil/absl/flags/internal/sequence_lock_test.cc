@@ -26,7 +26,7 @@
 
 namespace {
 
-namespace flags = absl::flags_internal;
+namespace flags = abslx::flags_internal;
 
 class ConcurrentSequenceLockTest
     : public testing::TestWithParam<std::tuple<int, int>> {
@@ -45,7 +45,7 @@ TEST_P(ConcurrentSequenceLockTest, ReadAndWrite) {
       flags::AlignUp(buf_bytes_, sizeof(uint64_t)) / sizeof(uint64_t);
 
   // The buffer that will be protected by the SequenceLock.
-  absl::FixedArray<std::atomic<uint64_t>> protected_buf(buf_words);
+  abslx::FixedArray<std::atomic<uint64_t>> protected_buf(buf_words);
   for (auto& v : protected_buf) v = -1;
 
   flags::SequenceLock seq_lock;
@@ -61,7 +61,7 @@ TEST_P(ConcurrentSequenceLockTest, ReadAndWrite) {
   std::vector<std::thread> threads;
   for (int i = 0; i < num_threads_; i++) {
     threads.emplace_back([&]() {
-      absl::FixedArray<char> local_buf(buf_bytes_);
+      abslx::FixedArray<char> local_buf(buf_bytes_);
       while (!stop.load(std::memory_order_relaxed)) {
         if (seq_lock.TryRead(local_buf.data(), protected_buf.data(),
                              buf_bytes_)) {
@@ -81,19 +81,19 @@ TEST_P(ConcurrentSequenceLockTest, ReadAndWrite) {
     });
   }
   while (unsuccessful_reads.load(std::memory_order_relaxed) < num_threads_) {
-    absl::SleepFor(absl::Milliseconds(1));
+    abslx::SleepFor(abslx::Milliseconds(1));
   }
   seq_lock.MarkInitialized();
 
   // Run a maximum of 5 seconds. On Windows, the scheduler behavior seems
   // somewhat unfair and without an explicit timeout for this loop, the tests
   // can run a long time.
-  absl::Time deadline = absl::Now() + absl::Seconds(5);
-  for (int i = 0; i < 100 && absl::Now() < deadline; i++) {
-    absl::FixedArray<char> writer_buf(buf_bytes_);
+  abslx::Time deadline = abslx::Now() + abslx::Seconds(5);
+  for (int i = 0; i < 100 && abslx::Now() < deadline; i++) {
+    abslx::FixedArray<char> writer_buf(buf_bytes_);
     for (auto& v : writer_buf) v = i;
     seq_lock.Write(protected_buf.data(), writer_buf.data(), buf_bytes_);
-    absl::SleepFor(absl::Microseconds(10));
+    abslx::SleepFor(abslx::Microseconds(10));
   }
   stop.store(true, std::memory_order_relaxed);
   for (auto& t : threads) t.join();
@@ -114,11 +114,11 @@ std::vector<int> MultiplicativeRange(int low, int high, int scale) {
 }
 
 #ifndef ABSL_HAVE_THREAD_SANITIZER
-const int kMaxThreads = absl::base_internal::NumCPUs();
+const int kMaxThreads = abslx::base_internal::NumCPUs();
 #else
 // With TSAN, a lot of threads contending for atomic access on the sequence
 // lock make this test run too slowly.
-const int kMaxThreads = std::min(absl::base_internal::NumCPUs(), 4);
+const int kMaxThreads = std::min(abslx::base_internal::NumCPUs(), 4);
 #endif
 
 // Return all of the interesting buffer sizes worth testing:
@@ -149,7 +149,7 @@ class SequenceLockTest : public testing::TestWithParam<int> {};
 
 TEST_P(SequenceLockTest, SingleThreaded) {
   const int size = GetParam();
-  absl::FixedArray<std::atomic<uint64_t>> protected_buf(
+  abslx::FixedArray<std::atomic<uint64_t>> protected_buf(
       flags::AlignUp(size, sizeof(uint64_t)) / sizeof(uint64_t));
 
   flags::SequenceLock seq_lock;

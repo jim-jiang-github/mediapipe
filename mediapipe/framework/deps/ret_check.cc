@@ -31,7 +31,7 @@ mediapipe::StatusBuilder RetCheckFailSlowPath(
 
 mediapipe::StatusBuilder RetCheckFailSlowPath(
     mediapipe::source_location location, const char* condition,
-    const absl::Status& status) {
+    const abslx::Status& status) {
   return mediapipe::RetCheckFailSlowPath(location)
          << condition << " returned " << status << " ";
 }

@@ -16,7 +16,7 @@
 
 #include "absl/base/internal/raw_logging.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 namespace debugging_internal {
@@ -37,4 +37,4 @@ void InitializeSymbolizer(const char*) {}
 bool Symbolize(const void *, char *, int) { return false; }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

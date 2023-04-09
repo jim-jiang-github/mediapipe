@@ -34,13 +34,13 @@
 #include "absl/types/optional.h"
 #include "absl/types/span.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace str_format_internal {
 
 namespace {
 
-using ::absl::numeric_internal::IsDoubleDouble;
+using ::abslx::numeric_internal::IsDoubleDouble;
 
 // The code below wants to avoid heap allocations.
 // To do so it needs to allocate memory on the stack.
@@ -50,7 +50,7 @@ using ::absl::numeric_internal::IsDoubleDouble;
 // largest needed unconditionally, but that is more than we need in most of
 // cases. This way we use less stack in the common cases.
 class StackArray {
-  using Func = absl::FunctionRef<void(absl::Span<uint32_t>)>;
+  using Func = abslx::FunctionRef<void(abslx::Span<uint32_t>)>;
   static constexpr size_t kStep = 512 / sizeof(uint32_t);
   // 5 steps is 2560 bytes, which is enough to hold a long double with the
   // largest/smallest exponents.
@@ -63,7 +63,7 @@ class StackArray {
   template <size_t steps>
   ABSL_ATTRIBUTE_NOINLINE static void RunWithCapacityImpl(Func f) {
     uint32_t values[steps * kStep]{};
-    f(absl::MakeSpan(values));
+    f(abslx::MakeSpan(values));
   }
 
  public:
@@ -94,7 +94,7 @@ class StackArray {
 // the carry.
 template <typename Int>
 inline Int MultiplyBy10WithCarry(Int *v, Int carry) {
-  using BiggerInt = absl::conditional_t<sizeof(Int) == 4, uint64_t, uint128>;
+  using BiggerInt = abslx::conditional_t<sizeof(Int) == 4, uint64_t, uint128>;
   BiggerInt tmp = 10 * static_cast<BiggerInt>(*v) + carry;
   *v = static_cast<Int>(tmp);
   return static_cast<Int>(tmp >> (sizeof(Int) * 8));
@@ -136,7 +136,7 @@ class BinaryToDecimal {
   // Run the conversion for `v * 2^exp` and call `f(binary_to_decimal)`.
   // This function will allocate enough stack space to perform the conversion.
   static void RunConversion(uint128 v, int exp,
-                            absl::FunctionRef<void(BinaryToDecimal)> f) {
+                            abslx::FunctionRef<void(BinaryToDecimal)> f) {
     assert(exp > 0);
     assert(exp <= std::numeric_limits<MaxFloatType>::max_exponent);
     static_assert(
@@ -146,7 +146,7 @@ class BinaryToDecimal {
 
     StackArray::RunWithCapacity(
         ChunksNeeded(exp),
-        [=](absl::Span<uint32_t> input) { f(BinaryToDecimal(input, v, exp)); });
+        [=](abslx::Span<uint32_t> input) { f(BinaryToDecimal(input, v, exp)); });
   }
 
   int TotalDigits() const {
@@ -155,8 +155,8 @@ class BinaryToDecimal {
   }
 
   // See the current block of digits.
-  absl::string_view CurrentDigits() const {
-    return absl::string_view(digits_ + kDigitsPerChunk - size_, size_);
+  abslx::string_view CurrentDigits() const {
+    return abslx::string_view(digits_ + kDigitsPerChunk - size_, size_);
   }
 
   // Advance the current view of digits.
@@ -172,7 +172,7 @@ class BinaryToDecimal {
   }
 
  private:
-  BinaryToDecimal(absl::Span<uint32_t> data, uint128 v, int exp) : data_(data) {
+  BinaryToDecimal(abslx::Span<uint32_t> data, uint128 v, int exp) : data_(data) {
     // We need to print the digits directly into the sink object without
     // buffering them all first. To do this we need two things:
     // - to know the total number of digits to do padding when necessary
@@ -233,7 +233,7 @@ class BinaryToDecimal {
   char digits_[kDigitsPerChunk];
   int size_ = 0;
 
-  absl::Span<uint32_t> data_;
+  abslx::Span<uint32_t> data_;
 };
 
 // Converts a value of the form `x * 2^-exp` into a sequence of decimal digits.
@@ -244,7 +244,7 @@ class FractionalDigitGenerator {
   // Run the conversion for `v * 2^exp` and call `f(generator)`.
   // This function will allocate enough stack space to perform the conversion.
   static void RunConversion(
-      uint128 v, int exp, absl::FunctionRef<void(FractionalDigitGenerator)> f) {
+      uint128 v, int exp, abslx::FunctionRef<void(FractionalDigitGenerator)> f) {
     using Limits = std::numeric_limits<MaxFloatType>;
     assert(-exp < 0);
     assert(-exp >= Limits::min_exponent - 128);
@@ -252,7 +252,7 @@ class FractionalDigitGenerator {
                       (Limits::digits + 128 - Limits::min_exponent + 31) / 32,
                   "");
     StackArray::RunWithCapacity((Limits::digits + exp + 31) / 32,
-                                [=](absl::Span<uint32_t> input) {
+                                [=](abslx::Span<uint32_t> input) {
                                   f(FractionalDigitGenerator(input, v, exp));
                                 });
   }
@@ -300,7 +300,7 @@ class FractionalDigitGenerator {
     return carry;
   }
 
-  FractionalDigitGenerator(absl::Span<uint32_t> data, uint128 v, int exp)
+  FractionalDigitGenerator(abslx::Span<uint32_t> data, uint128 v, int exp)
       : chunk_index_(exp / 32), data_(data) {
     const int offset = exp % 32;
     // Right shift `v` by `exp` bits.
@@ -317,7 +317,7 @@ class FractionalDigitGenerator {
 
   int next_digit_;
   int chunk_index_;
-  absl::Span<uint32_t> data_;
+  abslx::Span<uint32_t> data_;
 };
 
 // Count the number of leading zero bits.
@@ -475,9 +475,9 @@ Padding ExtraWidthToPadding(size_t total_size, const FormatState &state) {
   }
 }
 
-void FinalPrint(const FormatState &state, absl::string_view data,
+void FinalPrint(const FormatState &state, abslx::string_view data,
                 int padding_offset, int trailing_zeros,
-                absl::string_view data_postfix) {
+                abslx::string_view data_postfix) {
   if (state.conv.width() < 0) {
     // No width specified. Fast-path.
     if (state.sign_char != '\0') state.sink->Append(1, state.sign_char);
@@ -552,7 +552,7 @@ void FormatFFast(Int v, int exp, const FormatState &state) {
   // In `alt` mode (flag #) we keep the `.` even if there are no fractional
   // digits. In non-alt mode, we strip it.
   if (!state.ShouldPrintDot()) --size;
-  FinalPrint(state, absl::string_view(integral_digits_start, size),
+  FinalPrint(state, abslx::string_view(integral_digits_start, size),
              /*padding_offset=*/0,
              static_cast<int>(state.precision - (fractional_digits_end -
                                                  fractional_digits_start)),
@@ -932,7 +932,7 @@ void FormatA(const HexFloatTypeParams float_traits, Int mantissa, int exp,
              exp_buffer);     // exponent
 }
 
-char *CopyStringTo(absl::string_view v, char *out) {
+char *CopyStringTo(abslx::string_view v, char *out) {
   std::memcpy(out, v.data(), v.size());
   return out + v.size();
 }
@@ -956,12 +956,12 @@ bool FallbackToSnprintf(const Float v, const FormatConversionSpecImpl &conv,
     assert(fp < fmt + sizeof(fmt));
   }
   std::string space(512, '\0');
-  absl::string_view result;
+  abslx::string_view result;
   while (true) {
     int n = snprintf(&space[0], space.size(), fmt, w, p, v);
     if (n < 0) return false;
     if (static_cast<size_t>(n) < space.size()) {
-      result = absl::string_view(space.data(), n);
+      result = abslx::string_view(space.data(), n);
       break;
     }
     space.resize(n + 1);
@@ -1092,7 +1092,7 @@ constexpr bool CanFitMantissa() {
 template <typename Float>
 struct Decomposed {
   using MantissaType =
-      absl::conditional_t<std::is_same<long double, Float>::value, uint128,
+      abslx::conditional_t<std::is_same<long double, Float>::value, uint128,
                           uint64_t>;
   static_assert(std::numeric_limits<Float>::digits <= sizeof(MantissaType) * 8,
                 "");
@@ -1277,7 +1277,7 @@ bool FloatToBuffer(Decomposed<Float> decomposed, int precision, Buffer *out,
   return false;
 }
 
-void WriteBufferToSink(char sign_char, absl::string_view str,
+void WriteBufferToSink(char sign_char, abslx::string_view str,
                        const FormatConversionSpecImpl &conv,
                        FormatSinkImpl *sink) {
   int left_spaces = 0, zeros = 0, right_spaces = 0;
@@ -1389,7 +1389,7 @@ bool FloatToSink(const Float v, const FormatConversionSpecImpl &conv,
   }
 
   WriteBufferToSink(sign_char,
-                    absl::string_view(buffer.begin, buffer.end - buffer.begin),
+                    abslx::string_view(buffer.begin, buffer.end - buffer.begin),
                     conv, sink);
 
   return true;
@@ -1420,4 +1420,4 @@ bool ConvertFloatImpl(double v, const FormatConversionSpecImpl &conv,
 
 }  // namespace str_format_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

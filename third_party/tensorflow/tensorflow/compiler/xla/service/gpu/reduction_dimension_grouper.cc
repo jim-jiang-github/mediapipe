@@ -41,7 +41,7 @@ class ReduceDimensionGroupVisitor : public DfsHloRewriteVisitor {
 
     VLOG(4) << "Input: " << reduce->ToString();
 
-    absl::InlinedVector<HloInstruction *, 2> reduce_inputs_grouped;
+    abslx::InlinedVector<HloInstruction *, 2> reduce_inputs_grouped;
     std::vector<int64_t> reduced_dims_grouped;
 
     int idx = -1;
@@ -52,7 +52,7 @@ class ReduceDimensionGroupVisitor : public DfsHloRewriteVisitor {
       CHECK(shape == LayoutUtil::GetWithDefaultLayout(shape))
           << "Default layout should be enforced on reduction operand";
       auto is_reduced = [&](int dim) {
-        return absl::c_linear_search(reduce->dimensions(), dim);
+        return abslx::c_linear_search(reduce->dimensions(), dim);
       };
 
       bool changed = false;
@@ -105,7 +105,7 @@ class ReduceDimensionGroupVisitor : public DfsHloRewriteVisitor {
 
 StatusOr<bool> ReductionDimensionGrouper::Run(
     HloModule *module,
-    const absl::flat_hash_set<absl::string_view> &execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view> &execution_threads) {
   TF_ASSIGN_OR_RETURN(bool changed, ReduceDimensionGroupVisitor().RunOnModule(
                                         module, execution_threads));
   return changed;

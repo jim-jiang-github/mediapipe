@@ -167,7 +167,7 @@ Status TpuExecutor::WaitForEvent(Stream* stream,
 std::unique_ptr<::stream_executor::internal::TimerInterface>
 TpuExecutor::GetTimerImplementation() {
   SE_Timer* tpu_timer = tpu::ExecutorApiFn()->TpuTimer_NewFn(executor_);
-  auto ptr = absl::make_unique<TpuTimer>(tpu_timer);
+  auto ptr = abslx::make_unique<TpuTimer>(tpu_timer);
   timer_map_[ptr.get()] = tpu_timer;
   return ptr;
 }
@@ -176,7 +176,7 @@ TpuExecutor::GetTimerImplementation() {
 std::unique_ptr<::stream_executor::internal::StreamInterface>
 TpuExecutor::GetStreamImplementation() {
   SE_Stream* tpu_stream = tpu::ExecutorApiFn()->TpuStream_NewFn(executor_);
-  auto ptr = absl::make_unique<tpu::TpuStream>(tpu_stream);
+  auto ptr = abslx::make_unique<tpu::TpuStream>(tpu_stream);
   tpu_platform().mutex().lock();
   stream_map()[ptr.get()] = tpu_stream;
   tpu_platform().mutex().unlock();
@@ -187,7 +187,7 @@ TpuExecutor::GetStreamImplementation() {
 std::unique_ptr<::stream_executor::internal::EventInterface>
 TpuExecutor::CreateEventImplementation() {
   SE_Event* tpu_event = tpu::ExecutorApiFn()->TpuEvent_NewFn(executor_);
-  auto ptr = absl::make_unique<TpuEvent>(tpu_event);
+  auto ptr = abslx::make_unique<TpuEvent>(tpu_event);
   tpu_platform().InsertEvent(ptr.get(), tpu_event);
   return ptr;
 }
@@ -259,7 +259,7 @@ Status TpuExecutor::WaitForOutfeedReady(int32_t outfeed_queue_index) {
 }
 
 void TpuExecutor::DequeueOutfeed(int32_t outfeed_queue_index,
-                                 absl::Span<uint8> bytes, StatusCallback done) {
+                                 abslx::Span<uint8> bytes, StatusCallback done) {
   StatusHelper status;
   tpu::ExecutorApiFn()->TpuExecutor_DequeueOutfeedFn(
       executor_, outfeed_queue_index, bytes.data(), bytes.size(),
@@ -268,7 +268,7 @@ void TpuExecutor::DequeueOutfeed(int32_t outfeed_queue_index,
 }
 
 Status TpuExecutor::EnqueueInfeed(int32_t infeed_queue_index,
-                                  absl::Span<const uint8> bytes) {
+                                  abslx::Span<const uint8> bytes) {
   StatusHelper status;
   tpu::ExecutorApiFn()->TpuExecutor_EnqueueInfeedFn(
       executor_, infeed_queue_index, bytes.data(), bytes.size(),
@@ -368,7 +368,7 @@ TpuExecutor::CreateDeviceDescription() const {
   StatusHelper status;
   SE_DeviceDescription* description =
       tpu::ExecutorApiFn()->TpuDeviceDescription_NewFn();
-  absl::Cleanup cleanup = [description]() {
+  abslx::Cleanup cleanup = [description]() {
     tpu::ExecutorApiFn()->TpuDeviceDescription_FreeFn(description);
   };
   tpu::ExecutorApiFn()->TpuExecutor_CreateDeviceDescriptionFn(

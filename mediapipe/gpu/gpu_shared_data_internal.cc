@@ -116,7 +116,7 @@ GpuResources::~GpuResources() {
 #endif  // __APPLE__
 }
 
-absl::Status GpuResources::PrepareGpuNode(CalculatorNode* node) {
+abslx::Status GpuResources::PrepareGpuNode(CalculatorNode* node) {
   CHECK(ContainsKey(node->Contract().ServiceRequests(), kGpuService.key));
   std::string node_id = node->GetCalculatorState().NodeName();
   std::string node_type = node->GetCalculatorState().CalculatorType();
@@ -132,13 +132,13 @@ absl::Status GpuResources::PrepareGpuNode(CalculatorNode* node) {
   const auto& options =
       node->GetCalculatorState().Options<mediapipe::GlContextOptions>();
   if (options.has_gl_context_name() && !options.gl_context_name().empty()) {
-    context_key = absl::StrCat("user:", options.gl_context_name());
+    context_key = abslx::StrCat("user:", options.gl_context_name());
   } else if (gets_own_context) {
-    context_key = absl::StrCat("auto:", node_type);
+    context_key = abslx::StrCat("auto:", node_type);
   } else if (kGlCalculatorShareContext) {
     context_key = SharedContextKey();
   } else {
-    context_key = absl::StrCat("auto:", node_id);
+    context_key = abslx::StrCat("auto:", node_id);
   }
 #else
   // On Emscripten we currently do not support multiple contexts.
@@ -151,7 +151,7 @@ absl::Status GpuResources::PrepareGpuNode(CalculatorNode* node) {
 
   if (kGlContextUseDedicatedThread) {
     std::string executor_name =
-        absl::StrCat(kGpuExecutorName, "_", context_key);
+        abslx::StrCat(kGpuExecutorName, "_", context_key);
     node->SetExecutor(executor_name);
     if (!ContainsKey(named_executors_, executor_name)) {
       named_executors_.emplace(

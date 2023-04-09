@@ -43,44 +43,44 @@ bool LogWarningIfTimestampIsInconsistent(const Timestamp& current_timestamp,
                                          int64 cumulative_samples,
                                          double sample_rate);
 
-// Returns absl::Status::OK if the header is valid. Otherwise, returns a
+// Returns abslx::Status::OK if the header is valid. Otherwise, returns a
 // Status object with an error message.
-absl::Status IsTimeSeriesHeaderValid(const TimeSeriesHeader& header);
+abslx::Status IsTimeSeriesHeaderValid(const TimeSeriesHeader& header);
 
-// Fills header and returns absl::Status::OK if the header is non-empty and
+// Fills header and returns abslx::Status::OK if the header is non-empty and
 // valid. Otherwise, returns a Status object with an error message.
-absl::Status FillTimeSeriesHeaderIfValid(const Packet& header_packet,
+abslx::Status FillTimeSeriesHeaderIfValid(const Packet& header_packet,
                                          TimeSeriesHeader* header);
 
-// Fills header and returns absl::Status::OK if the header contains a
+// Fills header and returns abslx::Status::OK if the header contains a
 // non-empty and valid TimeSeriesHeader. Otherwise, returns a Status object with
 // an error message.
-absl::Status FillMultiStreamTimeSeriesHeaderIfValid(
+abslx::Status FillMultiStreamTimeSeriesHeaderIfValid(
     const Packet& header_packet, MultiStreamTimeSeriesHeader* header);
 
-// Returns absl::Status::OK iff options contains an extension of type
+// Returns abslx::Status::OK iff options contains an extension of type
 // OptionsClass.
 template <typename OptionsClass>
-absl::Status HasOptionsExtension(const CalculatorOptions& options) {
+abslx::Status HasOptionsExtension(const CalculatorOptions& options) {
   if (options.HasExtension(OptionsClass::ext)) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   std::string error_message = "Options proto does not contain extension ";
-  absl::StrAppend(&error_message,
+  abslx::StrAppend(&error_message,
                   MediaPipeTypeStringOrDemangled<OptionsClass>());
 #ifndef MEDIAPIPE_MOBILE
   // Avoid lite proto APIs on mobile targets.
-  absl::StrAppend(&error_message, " : ", options.DebugString());
+  abslx::StrAppend(&error_message, " : ", options.DebugString());
 #endif
-  return absl::InvalidArgumentError(error_message);
+  return abslx::InvalidArgumentError(error_message);
 }
 
-// Returns absl::Status::OK if the shape of 'matrix' is consistent
+// Returns abslx::Status::OK if the shape of 'matrix' is consistent
 // with the num_samples and num_channels fields present in 'header'.
 // The corresponding matrix dimensions of unset header fields are
 // ignored, so e.g. an empty header (which is not valid according to
 // FillTimeSeriesHeaderIfValid) is considered consistent with any matrix.
-absl::Status IsMatrixShapeConsistentWithHeader(const Matrix& matrix,
+abslx::Status IsMatrixShapeConsistentWithHeader(const Matrix& matrix,
                                                const TimeSeriesHeader& header);
 
 template <typename OptionsClass>

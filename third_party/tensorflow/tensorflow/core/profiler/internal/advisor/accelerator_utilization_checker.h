@@ -40,7 +40,7 @@ class AcceleratorUtilizationChecker : public Checker {
   AdviceProto::Checker Check(const AdvisorOptionsProto::CheckerOption& options,
                              const TFStats* stats) override {
     if (!stats) {
-      absl::FPrintF(
+      abslx::FPrintF(
           stderr, "Missing profiles (e.g. graph, run_meta). Skip %s\n", name());
       return reports_;
     }
@@ -57,13 +57,13 @@ class AcceleratorUtilizationChecker : public Checker {
       if (total_micros <= 0) continue;
       double utilization = 1.0 * stat.exec_micros / total_micros;
       if (utilization >= 0.5) {
-        reports_.add_reports(absl::StrFormat("device: %s utilization: %.2f",
+        reports_.add_reports(abslx::StrFormat("device: %s utilization: %.2f",
                                              s.first, utilization));
       } else if (utilization < 0.5 && utilization > 0.2) {
-        reports_.add_reports(absl::StrFormat("device: %s low utilization: %.2f",
+        reports_.add_reports(abslx::StrFormat("device: %s low utilization: %.2f",
                                              s.first, utilization));
       } else if (utilization <= 0.2) {
-        reports_.add_reports(absl::StrFormat("device: %s low utilization: %.2f",
+        reports_.add_reports(abslx::StrFormat("device: %s low utilization: %.2f",
                                              s.first, utilization));
       }
     }

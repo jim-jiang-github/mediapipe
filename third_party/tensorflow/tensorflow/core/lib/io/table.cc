@@ -87,7 +87,7 @@ static void DeleteBlock(void* arg, void* ignored) {
   delete reinterpret_cast<Block*>(arg);
 }
 
-static void DeleteCachedBlock(const absl::string_view&, void* value) {
+static void DeleteCachedBlock(const abslx::string_view&, void* value) {
   Block* block = reinterpret_cast<Block*>(value);
   delete block;
 }
@@ -118,7 +118,7 @@ Iterator* Table::BlockReader(void* arg, const StringPiece& index_value) {
       char cache_key_buffer[16];
       core::EncodeFixed64(cache_key_buffer, table->rep_->cache_id);
       core::EncodeFixed64(cache_key_buffer + 8, handle.offset());
-      absl::string_view key(cache_key_buffer, sizeof(cache_key_buffer));
+      abslx::string_view key(cache_key_buffer, sizeof(cache_key_buffer));
       cache_handle = block_cache->Lookup(key);
       if (cache_handle != nullptr) {
         block = reinterpret_cast<Block*>(block_cache->Value(cache_handle));

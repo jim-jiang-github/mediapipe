@@ -28,10 +28,10 @@
 #include "absl/random/internal/iostream_state_saver.h"
 #include "absl/random/uniform_int_distribution.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
-// absl::discrete_distribution
+// abslx::discrete_distribution
 //
 // A discrete distribution produces random integers i, where 0 <= i < n
 // distributed according to the discrete probability function:
@@ -42,7 +42,7 @@ ABSL_NAMESPACE_BEGIN
 // [rand.dist.samp.discrete]).
 //
 // The algorithm used is Walker's Aliasing algorithm, described in Knuth, Vol 2.
-// absl::discrete_distribution takes O(N) time to precompute the probabilities
+// abslx::discrete_distribution takes O(N) time to precompute the probabilities
 // (where N is the number of possible outcomes in the distribution) at
 // construction, and then takes O(1) time for each variate generation.  Many
 // other implementations also take O(N) time to construct an ordered sequence of
@@ -104,7 +104,7 @@ class discrete_distribution {
     std::vector<std::pair<double, size_t>> q_;  // (acceptance, alternate) pairs
 
     static_assert(std::is_integral<result_type>::value,
-                  "Class-template absl::discrete_distribution<> must be "
+                  "Class-template abslx::discrete_distribution<> must be "
                   "parameterized using an integral type.");
   };
 
@@ -196,9 +196,9 @@ typename discrete_distribution<IntType>::result_type
 discrete_distribution<IntType>::operator()(
     URBG& g,  // NOLINT(runtime/references)
     const param_type& p) {
-  const auto idx = absl::uniform_int_distribution<result_type>(0, p.n())(g);
+  const auto idx = abslx::uniform_int_distribution<result_type>(0, p.n())(g);
   const auto& q = p.q_[idx];
-  const bool selected = absl::bernoulli_distribution(q.first)(g);
+  const bool selected = abslx::bernoulli_distribution(q.first)(g);
   return selected ? idx : static_cast<result_type>(q.second);
 }
 
@@ -242,6 +242,6 @@ std::basic_istream<CharT, Traits>& operator>>(
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_DISCRETE_DISTRIBUTION_H_

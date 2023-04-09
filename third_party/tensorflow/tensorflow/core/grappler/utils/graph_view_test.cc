@@ -67,7 +67,7 @@ TYPED_TEST(TypedGraphViewTest, GraphWithDuplicateNodeNames) {
   TypeParam graph_view(&graph, &s);
   EXPECT_FALSE(s.ok());
   EXPECT_EQ(s.error_message(),
-            absl::Substitute(
+            abslx::Substitute(
                 "$0::$0 error: graph has multiple nodes with the name 'a'.",
                 GetGraphViewTypeAsString<TypeParam>()));
 }
@@ -79,7 +79,7 @@ TYPED_TEST(TypedGraphViewTest, GraphWithMissingFanins) {
   TypeParam graph_view(&graph, &s);
   EXPECT_FALSE(s.ok());
   EXPECT_EQ(s.error_message(),
-            absl::Substitute("$0::$0 error: node 'a' has missing fanin 'b:3'.",
+            abslx::Substitute("$0::$0 error: node 'a' has missing fanin 'b:3'.",
                              GetGraphViewTypeAsString<TypeParam>()));
 }
 
@@ -91,7 +91,7 @@ TYPED_TEST(TypedGraphViewTest, GraphWithSelfCycles) {
   EXPECT_FALSE(s.ok());
   EXPECT_EQ(
       s.error_message(),
-      absl::Substitute("$0::$0 error: node 'a' has self cycle fanin 'a:4'.",
+      abslx::Substitute("$0::$0 error: node 'a' has self cycle fanin 'a:4'.",
                        GetGraphViewTypeAsString<TypeParam>()));
 }
 
@@ -103,7 +103,7 @@ TYPED_TEST(TypedGraphViewTest, GraphWithMisorderedFanins) {
   TypeParam graph_view(&graph, &s);
   EXPECT_FALSE(s.ok());
   EXPECT_EQ(s.error_message(),
-            absl::Substitute("$0::$0 error: node 'a' has regular fanin 'b:4' "
+            abslx::Substitute("$0::$0 error: node 'a' has regular fanin 'b:4' "
                              "after controlling fanins.",
                              GetGraphViewTypeAsString<TypeParam>()));
 }
@@ -458,7 +458,7 @@ TYPED_TEST(TypedFanoutTest, GetRegularFanouts) {
                 FaninViewType(&graph_view, b_node->node_index(), 0));
     } else if (i == 3) {
       ASSERT_EQ(d_fanouts[i].size(), 2);
-      absl::flat_hash_set<FaninViewType> fanouts(d_fanouts[i].begin(),
+      abslx::flat_hash_set<FaninViewType> fanouts(d_fanouts[i].begin(),
                                                  d_fanouts[i].end());
       EXPECT_TRUE(fanouts.contains(
           FaninViewType(&graph_view, a_node->node_index(), 1)));
@@ -497,7 +497,7 @@ TYPED_TEST(TypedFanoutTest, GetRegularFanout) {
 
   const auto& d_fanouts_3 = d_node->GetRegularFanout(3);
   EXPECT_EQ(d_fanouts_3.size(), 2);
-  absl::flat_hash_set<FaninViewType> d_fanouts_3_set(d_fanouts_3.begin(),
+  abslx::flat_hash_set<FaninViewType> d_fanouts_3_set(d_fanouts_3.begin(),
                                                      d_fanouts_3.end());
   EXPECT_TRUE(d_fanouts_3_set.contains(
       FaninViewType(&graph_view, a_node->node_index(), 1)));
@@ -535,7 +535,7 @@ TYPED_TEST(TypedFanoutTest, GetControlledFanouts) {
 
   const auto& c_fanouts = c_node->GetControlledFanouts();
   EXPECT_EQ(c_fanouts.size(), 2);
-  absl::flat_hash_set<FaninViewType> c_fanouts_set(c_fanouts.begin(),
+  abslx::flat_hash_set<FaninViewType> c_fanouts_set(c_fanouts.begin(),
                                                    c_fanouts.end());
   EXPECT_TRUE(c_fanouts_set.contains(
       FaninViewType(&graph_view, b_node->node_index(), Graph::kControlSlot)));
@@ -2002,7 +2002,7 @@ TEST_F(MutationTest, EmptyMutationUpdateIndexPersisting) {
 class TopologicalSortTest : public CompareGraphTest {
  protected:
   void CompareGraphOrder(const MutableGraphView& graph_view,
-                         absl::Span<const string> node_names) {
+                         abslx::Span<const string> node_names) {
     const int num_nodes = graph_view.NumNodes();
     ASSERT_EQ(num_nodes, node_names.size());
     for (int i = 0; i < num_nodes; ++i) {
@@ -2012,7 +2012,7 @@ class TopologicalSortTest : public CompareGraphTest {
 
   void CompareGraphNodePrecedences(
       const MutableGraphView& graph_view,
-      absl::Span<const std::pair<string, string>> node_precedences) {
+      abslx::Span<const std::pair<string, string>> node_precedences) {
     for (const auto& node_precedence : node_precedences) {
       auto* parent_node = graph_view.GetNode(node_precedence.first);
       ASSERT_NE(parent_node, nullptr);
@@ -2706,7 +2706,7 @@ inline void BM_GraphViewTHasRegularFanin(::testing::benchmark::State& state) {
   Status s;
   GraphViewT graph_view(&graph_def, &s);
   const int index = IsLast ? num_fanouts - 1 : 0;
-  auto* node = graph_view.GetNode(absl::StrFormat("out%05d", index));
+  auto* node = graph_view.GetNode(abslx::StrFormat("out%05d", index));
   auto* fanin = graph_view.GetNode("node");
 
   for (auto i : state) {
@@ -2749,7 +2749,7 @@ inline void BM_GraphViewTHasControllingFanin(
   Status s;
   GraphViewT graph_view(&graph_def, &s);
   const int index = IsLast ? num_fanouts - 1 : 0;
-  auto* node = graph_view.GetNode(absl::StrFormat("control_out%05d", index));
+  auto* node = graph_view.GetNode(abslx::StrFormat("control_out%05d", index));
   auto* fanin = graph_view.GetNode("node");
 
   for (auto i : state) {
@@ -2791,7 +2791,7 @@ inline void BM_GraphViewTHasRegularFanout(::testing::benchmark::State& state) {
   Status s;
   GraphViewT graph_view(&graph_def, &s);
   const int index = IsLast ? num_fanins - 1 : 0;
-  auto* node = graph_view.GetNode(absl::StrFormat("in%05d", index));
+  auto* node = graph_view.GetNode(abslx::StrFormat("in%05d", index));
   auto* fanout = graph_view.GetNode("node");
 
   for (auto i : state) {
@@ -2834,7 +2834,7 @@ inline void BM_GraphViewTHasControlledFanout(
   Status s;
   GraphViewT graph_view(&graph_def, &s);
   const int index = IsLast ? num_fanins - 1 : 0;
-  auto* node = graph_view.GetNode(absl::StrFormat("control_in%05d", index));
+  auto* node = graph_view.GetNode(abslx::StrFormat("control_in%05d", index));
   auto* fanout = graph_view.GetNode("node");
 
   for (auto i : state) {

@@ -110,7 +110,7 @@ MemoryProfile GenerateMemoryProfile(const XPlane* host_trace) {
         switch (stat.Type().value()) {
           case StatType::kIndexOnHost:
           case StatType::kDeviceOrdinal:
-            memory_id = absl::StrCat(stat.IntValue());
+            memory_id = abslx::StrCat(stat.IntValue());
             break;
           case StatType::kAllocatorName:
             memory_id = std::string(stat.StrOrRefValue());
@@ -194,7 +194,7 @@ void UpdateStepId(PerAllocatorMemoryProfile* memory_profile) {
 // Update the MemoryActivityMetadata for each deallocation event by copying from
 // matching allocation.
 void UpdateDeallocation(PerAllocatorMemoryProfile* memory_profile) {
-  absl::flat_hash_map<uint64 /*address*/, const MemoryActivityMetadata*>
+  abslx::flat_hash_map<uint64 /*address*/, const MemoryActivityMetadata*>
       addr_metadata_map;
   for (auto& snapshot : *memory_profile->mutable_memory_profile_snapshots()) {
     // Match the deallocation with previous allocation based on address.
@@ -327,7 +327,7 @@ void ProcessActiveAllocations(int64_t peak_bytes_profile_step_id,
   int64_t unmapped_allocation_bytes =
       memory_profile->profile_summary().peak_stats().heap_allocated_bytes();
   int64_t unmapped_deallocation_bytes = 0;
-  absl::flat_hash_map<int64_t /*address*/, IndexMetaPair> active_alloc_map;
+  abslx::flat_hash_map<int64_t /*address*/, IndexMetaPair> active_alloc_map;
   // Only account for the memory activities in the step that includes peak
   // memory usage.
   for (int i = 0; i < memory_profile->memory_profile_snapshots_size(); i++) {
@@ -493,7 +493,7 @@ void ProcessMemoryProfileProto(int64_t max_num_snapshots,
       memory_profile->add_memory_ids(id_and_allocator_profile.first);
     }
   }
-  absl::c_sort(*memory_profile->mutable_memory_ids());
+  abslx::c_sort(*memory_profile->mutable_memory_ids());
 
   for (auto& id_and_allocator_profile :
        *memory_profile->mutable_memory_profile_per_allocator()) {
@@ -502,7 +502,7 @@ void ProcessMemoryProfileProto(int64_t max_num_snapshots,
     protobuf::RepeatedPtrField<MemoryProfileSnapshot>* snapshots =
         allocator_memory_profile->mutable_memory_profile_snapshots();
     // Sort the memory_profile_snapshots by time_offset_ps (ascending) in proto.
-    absl::c_sort(*snapshots, [](const MemoryProfileSnapshot& a,
+    abslx::c_sort(*snapshots, [](const MemoryProfileSnapshot& a,
                                 const MemoryProfileSnapshot& b) {
       return a.time_offset_ps() < b.time_offset_ps();
     });
@@ -532,12 +532,12 @@ Status ConvertProtoToJson(const Proto& proto_output, std::string* json_output) {
   auto status = protobuf::util::MessageToJsonString(proto_output, json_output,
                                                     json_options);
   if (!status.ok()) {
-    // Convert error_msg google::protobuf::StringPiece (or absl::string_view) to
+    // Convert error_msg google::protobuf::StringPiece (or abslx::string_view) to
     // tensorflow::StringPiece.
     auto error_msg = status.message();
     return errors::Internal(
         "Could not convert proto to JSON string: ",
-        absl::string_view(error_msg.data(), error_msg.length()));
+        abslx::string_view(error_msg.data(), error_msg.length()));
   }
   return OkStatus();
 }

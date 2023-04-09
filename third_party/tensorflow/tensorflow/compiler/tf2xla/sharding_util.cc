@@ -70,7 +70,7 @@ StatusOr<std::optional<xla::OpSharding>> ParseShardingFromDevice(
   if (explicit_sharding.has_value()) {
     return explicit_sharding;
   } else if (!parsed_device.has_type || !parsed_device.has_id ||
-             !absl::StrContains(parsed_device.type,
+             !abslx::StrContains(parsed_device.type,
                                 kDeviceSuffixReplicatedCore)) {
     return std::optional<xla::OpSharding>();
   } else {

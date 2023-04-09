@@ -23,7 +23,7 @@
 #include "absl/strings/internal/cord_rep_ring.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 
@@ -73,7 +73,7 @@ class CordRepRingReader {
 
   // Resets this instance to the start of `ring`. `ring` must not be null.
   // Returns a reference into the first chunk of the provided ring.
-  absl::string_view Reset(CordRepRing* ring) {
+  abslx::string_view Reset(CordRepRing* ring) {
     assert(ring);
     ring_ = ring;
     index_ = ring_->head();
@@ -83,7 +83,7 @@ class CordRepRingReader {
   // Navigates to the next chunk inside the reference ring buffer.
   // Returns a reference into the navigated-to chunk.
   // Requires remaining() to be non zero.
-  absl::string_view Next() {
+  abslx::string_view Next() {
     assert(remaining());
     index_ = ring_->advance(index_);
     return ring_->entry_data(index_);
@@ -95,7 +95,7 @@ class CordRepRingReader {
   // ring buffer containing 2 chunks of 10 and 20 bytes respectively will return
   // a string view into the second chunk starting at offset 3 with a size of 17.
   // Requires `offset` to be less than `length()`
-  absl::string_view Seek(size_t offset) {
+  abslx::string_view Seek(size_t offset) {
     assert(offset < length());
     size_t current = ring_->entry_end_offset(index_);
     CordRepRing::index_type hint = (offset >= current) ? index_ : ring_->head();
@@ -113,6 +113,6 @@ class CordRepRingReader {
 
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_INTERNAL_CORD_REP_RING_READER_H_

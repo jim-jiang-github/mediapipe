@@ -164,7 +164,7 @@ TEST_F(ShapeRefinerTest, BadShapes) {
   // an error.
   Status s = m.AddNode(mm.node());
   ASSERT_FALSE(s.ok());
-  ASSERT_TRUE(absl::StrContains(s.error_message(),
+  ASSERT_TRUE(abslx::StrContains(s.error_message(),
                                 "Dimensions must be equal, but are 1 and 2"));
 }
 
@@ -1071,7 +1071,7 @@ TEST_F(ShapeRefinerTest, ConstantValueAsShape_PackInvalidInput) {
   }
   TF_ASSERT_OK(m.AddNode(pack.node()));
   EXPECT_TRUE(
-      absl::StrContains(m.AddNode(result).error_message(), "but is rank 2"));
+      abslx::StrContains(m.AddNode(result).error_message(), "but is rank 2"));
 }
 
 TEST_F(ShapeRefinerTest, ConstantValueAsShape_Concat) {

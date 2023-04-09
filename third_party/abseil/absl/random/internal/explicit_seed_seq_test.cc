@@ -64,14 +64,14 @@ TEST(SeedSequences, CheckInterfaces) {
   EXPECT_TRUE(ConformsToInterface<std::seed_seq>());
 
   // Abseil classes
-  EXPECT_TRUE(ConformsToInterface<absl::random_internal::ExplicitSeedSeq>());
+  EXPECT_TRUE(ConformsToInterface<abslx::random_internal::ExplicitSeedSeq>());
 }
 
 TEST(ExplicitSeedSeq, DefaultConstructorGeneratesZeros) {
   const size_t kNumBlocks = 128;
 
   uint32_t outputs[kNumBlocks];
-  absl::random_internal::ExplicitSeedSeq seq;
+  abslx::random_internal::ExplicitSeedSeq seq;
   seq.generate(outputs, &outputs[kNumBlocks]);
 
   for (uint32_t& seed : outputs) {
@@ -87,7 +87,7 @@ TEST(ExplicitSeeqSeq, SeedMaterialIsForwardedIdentically) {
   for (uint32_t& seed : seed_material) {
     seed = urandom();
   }
-  absl::random_internal::ExplicitSeedSeq seq(seed_material,
+  abslx::random_internal::ExplicitSeedSeq seq(seed_material,
                                              &seed_material[kNumBlocks]);
 
   // Check that output is same as seed-material provided to constructor.
@@ -133,11 +133,11 @@ TEST(ExplicitSeedSeq, CopyAndMoveConstructors) {
   for (uint32_t& entry : entropy) {
     entry = urandom();
   }
-  absl::random_internal::ExplicitSeedSeq seq_from_entropy(std::begin(entropy),
+  abslx::random_internal::ExplicitSeedSeq seq_from_entropy(std::begin(entropy),
                                                           std::end(entropy));
   // Copy constructor.
   {
-    absl::random_internal::ExplicitSeedSeq seq_copy(seq_from_entropy);
+    abslx::random_internal::ExplicitSeedSeq seq_copy(seq_from_entropy);
     EXPECT_EQ(seq_copy.size(), seq_from_entropy.size());
 
     std::vector<uint32_t> seeds_1;
@@ -155,7 +155,7 @@ TEST(ExplicitSeedSeq, CopyAndMoveConstructors) {
     for (uint32_t& entry : entropy) {
       entry = urandom();
     }
-    absl::random_internal::ExplicitSeedSeq another_seq(std::begin(entropy),
+    abslx::random_internal::ExplicitSeedSeq another_seq(std::begin(entropy),
                                                        std::end(entropy));
 
     std::vector<uint32_t> seeds_1;
@@ -187,7 +187,7 @@ TEST(ExplicitSeedSeq, CopyAndMoveConstructors) {
     seq_from_entropy.generate(seeds_1.begin(), seeds_1.end());
 
     // Apply move-constructor move the sequence to another instance.
-    absl::random_internal::ExplicitSeedSeq moved_seq(
+    abslx::random_internal::ExplicitSeedSeq moved_seq(
         std::move(seq_from_entropy));
     std::vector<uint32_t> seeds_2;
     seeds_2.resize(1000, 1);

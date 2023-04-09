@@ -259,28 +259,28 @@ Status GraphDefBuilderWrapper::AddDataset(
     const std::vector<std::pair<StringPiece, AttrValue>>& attrs,
     bool use_dataset_name, Node** output) {
   auto& type_string = dataset->type_string();
-  auto opts = absl::make_unique<GraphDefBuilder::Options>(b_->opts());
+  auto opts = abslx::make_unique<GraphDefBuilder::Options>(b_->opts());
   // TODO(srbs|mrry): Not all datasets have output_types and output_shapes
   // attributes defined. It will be nice to have a consistent pattern.
   bool has_output_types_attr = HasAttr(type_string, "output_types");
   bool has_output_shapes_attr = HasAttr(type_string, "output_shapes");
   if (has_output_shapes_attr) {
-    opts = absl::make_unique<GraphDefBuilder::Options>(
+    opts = abslx::make_unique<GraphDefBuilder::Options>(
         opts->WithAttr("output_shapes", dataset->output_shapes()));
   }
   if (has_output_types_attr) {
-    opts = absl::make_unique<GraphDefBuilder::Options>(
+    opts = abslx::make_unique<GraphDefBuilder::Options>(
         opts->WithAttr("output_types", dataset->output_dtypes()));
   }
   bool has_metadata_attr = HasAttr(type_string, "metadata");
   if (has_metadata_attr) {
     std::string serialized_metadata;
     dataset->metadata().SerializeToString(&serialized_metadata);
-    opts = absl::make_unique<GraphDefBuilder::Options>(
+    opts = abslx::make_unique<GraphDefBuilder::Options>(
         opts->WithAttr("metadata", serialized_metadata));
   }
   for (const auto& attr : attrs) {
-    opts = absl::make_unique<GraphDefBuilder::Options>(
+    opts = abslx::make_unique<GraphDefBuilder::Options>(
         opts->WithAttr(attr.first, attr.second));
   }
   if (opts->HaveError()) {
@@ -1013,16 +1013,16 @@ string DatasetOpKernel::TraceString(const OpKernelContext& ctx,
 bool DatasetOpKernel::IsDatasetOp(const OpDef& op_def) {
   if (op_def.output_arg_size() != 1) return false;
   if (op_def.output_arg(0).type() != DT_VARIANT) return false;
-  absl::string_view op_name = op_def.name();
+  abslx::string_view op_name = op_def.name();
   if (op_name == "DatasetFromGraph") return true;
-  if (absl::EndsWith(op_name, "Dataset")) return true;
+  if (abslx::EndsWith(op_name, "Dataset")) return true;
   // Check if the suffix matches "DatasetV[0-9]+".
   size_t index = op_name.length() - 1;
   while (index >= 0 && isdigit(op_name[index])) {
     index--;
   }
-  constexpr absl::string_view kDatasetPrefix = "DatasetV";
-  constexpr absl::string_view::size_type kPrefixLength = kDatasetPrefix.size();
+  constexpr abslx::string_view kDatasetPrefix = "DatasetV";
+  constexpr abslx::string_view::size_type kPrefixLength = kDatasetPrefix.size();
   if (index < kPrefixLength - 1 || index == op_name.length() - 1) return false;
   return op_name.substr(index - kPrefixLength + 1, kPrefixLength) ==
          kDatasetPrefix;
@@ -1070,7 +1070,7 @@ void BackgroundWorker::Schedule(std::function<void()> work_item) {
   {
     mutex_lock l(mu_);
     if (!thread_) {
-      thread_ = absl::WrapUnique(env_->StartThread(
+      thread_ = abslx::WrapUnique(env_->StartThread(
           {} /* thread_options */, name_, [this]() { WorkerLoop(); }));
     }
     work_queue_.push_back(std::move(work_item));

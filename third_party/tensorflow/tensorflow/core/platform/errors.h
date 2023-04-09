@@ -42,7 +42,7 @@ namespace internal {
 //     os << foo.ToString();
 //     return os;
 //   }
-// Eventually absl::strings will have native support for this and we will be
+// Eventually abslx::strings will have native support for this and we will be
 // able to completely remove PrepareForStrCat().
 template <typename T>
 typename std::enable_if<!std::is_convertible<T, strings::AlphaNum>::value,
@@ -415,7 +415,7 @@ inline std::string FormatNodeNameForError(const std::string& name) {
 // LINT.ThenChange(//tensorflow/python/client/session.py)
 template <typename T>
 std::string FormatNodeNamesForError(const T& names) {
-  return absl::StrJoin(
+  return abslx::StrJoin(
       names, ", ", [](std::string* output, const std::string& s) {
         ::tensorflow::strings::StrAppend(output, FormatNodeNameForError(s));
       });
@@ -427,7 +427,7 @@ inline std::string FormatColocationNodeForError(const std::string& name) {
 // LINT.ThenChange(//tensorflow/python/framework/error_interpolation.py)
 template <typename T>
 std::string FormatColocationNodeForError(const T& names) {
-  return absl::StrJoin(names, ", ",
+  return abslx::StrJoin(names, ", ",
                        [](std::string* output, const std::string& s) {
                          ::tensorflow::strings::StrAppend(
                              output, FormatColocationNodeForError(s));
@@ -462,7 +462,7 @@ std::string FormatOriginalNodeLocationForError(const T& node_names,
     }
     error_message.push_back(FormatNodeNameForError(node_names[i]));
   }
-  return absl::StrJoin(error_message, "");
+  return abslx::StrJoin(error_message, "");
 }
 
 // The CanonicalCode() for non-errors.

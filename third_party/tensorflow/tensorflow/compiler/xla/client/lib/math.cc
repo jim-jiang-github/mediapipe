@@ -30,7 +30,7 @@ namespace {
 
 // Evaluate the polynomial given `x` and coefficients in decreasing order.
 template <typename FP>
-XlaOp EvaluatePolynomial(XlaOp x, absl::Span<const FP> coefficients) {
+XlaOp EvaluatePolynomial(XlaOp x, abslx::Span<const FP> coefficients) {
   static_assert(std::is_floating_point<FP>::value,
                 "Template-argument 'FP' must be a floating-point type");
   XlaOp poly = ScalarLike(x, 0.0);
@@ -43,7 +43,7 @@ XlaOp EvaluatePolynomial(XlaOp x, absl::Span<const FP> coefficients) {
 // Evaluate the chebyshev polynomial given `x` and coefficients in decreasing
 // order.
 template <typename FP>
-XlaOp EvaluateChebyshevPolynomial(XlaOp x, absl::Span<const FP> coefficients) {
+XlaOp EvaluateChebyshevPolynomial(XlaOp x, abslx::Span<const FP> coefficients) {
   static_assert(std::is_floating_point<FP>::value,
                 "Template-argument 'FP' must be a floating-point type");
   XlaOp b0 = ScalarLike(x, 0.0);
@@ -63,13 +63,13 @@ XlaOp EvaluateChebyshevPolynomial(XlaOp x, absl::Span<const FP> coefficients) {
 // upcast_types, in which case first converts it to F32, and then converts the
 // result down to the original type.
 static XlaOp DoWithUpcastToF32(XlaOp operand,
-                               absl::Span<const PrimitiveType> upcast_types,
+                               abslx::Span<const PrimitiveType> upcast_types,
                                const std::function<XlaOp(XlaOp)>& operation) {
   auto& b = *operand.builder();
   return b.ReportErrorOrReturn([&]() -> StatusOr<XlaOp> {
     TF_ASSIGN_OR_RETURN(auto shape, b.GetShape(operand));
     PrimitiveType elem_ty = shape.element_type();
-    bool needs_upcast = absl::c_linear_search(upcast_types, elem_ty);
+    bool needs_upcast = abslx::c_linear_search(upcast_types, elem_ty);
 
     if (needs_upcast) {
       operand = ConvertElementType(operand, F32);
@@ -84,7 +84,7 @@ static XlaOp DoWithUpcastToF32(XlaOp operand,
 
 // TODO(jlebar): Use this function in more places in this file to restrict the
 // domain of other functions.
-static Status EnsureOperandIsRealFp(absl::string_view op_name, XlaOp operand) {
+static Status EnsureOperandIsRealFp(abslx::string_view op_name, XlaOp operand) {
   auto& b = *operand.builder();
   TF_ASSIGN_OR_RETURN(auto shape, b.GetShape(operand));
   auto elem_ty = shape.element_type();
@@ -724,12 +724,12 @@ XlaOp IgammaSeries(XlaOp ax, XlaOp x, XlaOp a, XlaOp enabled,
   // backend. For example, on GPU, we should probably vectorize to the warp
   // size, and then run independent loops for each warp's worth of
   // data.
-  auto cond = [&](absl::Span<const XlaOp> vals,
+  auto cond = [&](abslx::Span<const XlaOp> vals,
                   XlaBuilder* builder) -> StatusOr<XlaOp> {
     XlaOp enabled = vals[0];
     return Any(enabled);
   };
-  auto body = [&](absl::Span<const XlaOp> vals,
+  auto body = [&](abslx::Span<const XlaOp> vals,
                   XlaBuilder* builder) -> StatusOr<std::vector<XlaOp>> {
     XlaOp enabled = vals[0];
     XlaOp r = vals[1];
@@ -793,13 +793,13 @@ template <kIgammaMode mode>
 XlaOp IgammacContinuedFraction(XlaOp ax, XlaOp x, XlaOp a, XlaOp enabled,
                                xla::PrimitiveType type) {
   // vals: enabled, ans, t, y, z, c, pkm1, qkm1, pkm2, qkm2
-  auto cond = [&](absl::Span<const XlaOp> vals,
+  auto cond = [&](abslx::Span<const XlaOp> vals,
                   XlaBuilder* builder) -> StatusOr<XlaOp> {
     XlaOp enabled = vals[0];
     XlaOp c = vals[5];
     return And(Lt(c, ScalarLike(c, 2000)), Any(enabled));
   };
-  auto body = [&](absl::Span<const XlaOp> vals,
+  auto body = [&](abslx::Span<const XlaOp> vals,
                   XlaBuilder* builder) -> StatusOr<std::vector<XlaOp>> {
     XlaOp enabled = vals[0];
     XlaOp ans = vals[1];
@@ -1636,7 +1636,7 @@ static XlaOp LentzThompsonBarnettAlgorithm(
     int64_t num_iterations, double small, double threshold,
     const ForEachIndexBodyFunction& nth_partial_numerator,
     const ForEachIndexBodyFunction& nth_partial_denominator,
-    absl::Span<const XlaOp> inputs, absl::string_view name) {
+    abslx::Span<const XlaOp> inputs, abslx::string_view name) {
   auto& b = *inputs.front().builder();
   return b.ReportErrorOrReturn([&]() -> StatusOr<XlaOp> {
     TF_RET_CHECK(num_iterations < INT32_MAX);
@@ -1658,7 +1658,7 @@ static XlaOp LentzThompsonBarnettAlgorithm(
       kFirstInputIdx,
     };
     auto while_cond_fn = [num_iterations](
-                             absl::Span<const XlaOp> values,
+                             abslx::Span<const XlaOp> values,
                              XlaBuilder* cond_builder) -> StatusOr<XlaOp> {
       auto iteration = values[kIterationIdx];
       auto iterations_remain_cond =
@@ -1669,7 +1669,7 @@ static XlaOp LentzThompsonBarnettAlgorithm(
 
     auto while_body_fn =
         [small, threshold, &nth_partial_numerator, &nth_partial_denominator](
-            absl::Span<const XlaOp> values,
+            abslx::Span<const XlaOp> values,
             XlaBuilder* body_builder) -> StatusOr<std::vector<XlaOp>> {
       XlaOp iteration = values[kIterationIdx];
 
@@ -1765,7 +1765,7 @@ XlaOp RegularizedIncompleteBeta(XlaOp a, XlaOp b, XlaOp x) {
     // here: http://dlmf.nist.gov/8.17.E23 Note that there is a special
     // case: the partial numerator for the first iteration is one.
     auto NthPartialBetaincNumerator =
-        [&](XlaOp iteration, absl::Span<const XlaOp> inputs,
+        [&](XlaOp iteration, abslx::Span<const XlaOp> inputs,
             XlaBuilder* builder) -> StatusOr<std::vector<XlaOp>> {
       auto a = inputs[0];
       auto b = inputs[1];
@@ -1792,7 +1792,7 @@ XlaOp RegularizedIncompleteBeta(XlaOp a, XlaOp b, XlaOp x) {
     };
 
     auto NthPartialBetaincDenominator =
-        [&shape](XlaOp iteration, absl::Span<const XlaOp> inputs,
+        [&shape](XlaOp iteration, abslx::Span<const XlaOp> inputs,
                  XlaBuilder* builder) -> StatusOr<std::vector<XlaOp>> {
       auto x = inputs[2];
       auto iteration_bcast = Broadcast(iteration, shape.dimensions());

@@ -80,7 +80,7 @@ llvm::SmallVector<Operation *> FindOpsFromArgumentsToResults(
   for (Value result : results) {
     value_queue.push(result);
   }
-  absl::flat_hash_set<mlir::detail::ValueImpl *> argument_set;
+  abslx::flat_hash_set<mlir::detail::ValueImpl *> argument_set;
   for (Value argument : arguments) {
     argument_set.insert(argument.getImpl());
   }
@@ -105,7 +105,7 @@ llvm::SmallVector<Operation *> FindOpsFromArgumentsToResults(
 
   // Remove duplicate ops from the op stack.
   llvm::SmallVector<Operation *> sorted_ops;
-  absl::flat_hash_set<Operation *> unique_ops;
+  abslx::flat_hash_set<Operation *> unique_ops;
   while (!op_stack.empty()) {
     Operation *current_op = op_stack.top();
     op_stack.pop();
@@ -162,13 +162,13 @@ LogicalResult SetAttributeMap(
     if (owner_op->hasAttr(kAttrMapAttribute)) {
       new_attr_map_str =
           owner_op->getAttrOfType<StringAttr>(kAttrMapAttribute).str();
-      absl::StrAppend(&new_attr_map_str, ",");
+      abslx::StrAppend(&new_attr_map_str, ",");
     }
 
     // Append "<identifier>:<attribute_name>". Ex) "0:transpose_a".
     const std::string identifier = std::to_string(idx);
     const mlir::StringAttr attribute_name = attribute.getName();
-    absl::StrAppend(&new_attr_map_str, identifier, ":", attribute_name.str());
+    abslx::StrAppend(&new_attr_map_str, identifier, ":", attribute_name.str());
     owner_op->setAttr(kAttrMapAttribute,
                       StringAttr::get(context, new_attr_map_str));
   }

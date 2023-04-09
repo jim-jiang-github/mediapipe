@@ -55,7 +55,7 @@ struct ExecuteNodeInfo {
 // Returns whether `node` is in `execute_nodes` or `(identity) -> execute`.
 bool IsExecuteNodeOrIdentityToExecuteNode(
     const Graph& graph, const std::unordered_set<Node*>& loop_nodes,  // NOLINT
-    const absl::flat_hash_set<Node*>& execute_nodes, Node* node) {
+    const abslx::flat_hash_set<Node*>& execute_nodes, Node* node) {
   if (execute_nodes.find(node) != execute_nodes.end()) return true;
   if (loop_nodes.find(node) == loop_nodes.end()) return false;
   if (node->IsNextIteration()) return true;
@@ -92,7 +92,7 @@ xla::StatusOr<Node*> FindEnterNodeFromTPUExecuteNodeInput(Node* input_node) {
 
 xla::StatusOr<bool> ResourceOnlyUsedForTPUExecuteInLoop(
     const Graph& graph, const std::unordered_set<Node*>& loop_nodes,  // NOLINT
-    const Node* enter_node, const absl::flat_hash_set<Node*> execute_nodes) {
+    const Node* enter_node, const abslx::flat_hash_set<Node*> execute_nodes) {
   for (const Edge* output_edge : enter_node->out_edges()) {
     Node* output_node = output_edge->dst();
     if (output_edge->IsControlEdge() || output_node->IsExit()) continue;
@@ -150,7 +150,7 @@ Status ExtractExecuteNodeInfo(const Node* compile_node, const Graph& graph,
     }
     std::vector<const Edge*> edges(execute_node_info->size());
     bool is_supported = true;
-    std::unordered_map<Node*, absl::flat_hash_set<Node*>>
+    std::unordered_map<Node*, abslx::flat_hash_set<Node*>>
         enter_to_execute_nodes;
     for (int64_t j = 0; j < edges.size(); ++j) {
       auto execute = (*execute_node_info)[j].execute_node;
@@ -377,7 +377,7 @@ Status AddNoOpAfterLastIteration(const Node& loop_cond_node, Graph* graph,
     // to be available for all types. Hence the colocation constraint.
     AddNodeAttr(kColocationAttrName,
                 std::vector<string>{
-                    absl::StrCat(kColocationGroupPrefix, switch_node->name())},
+                    abslx::StrCat(kColocationGroupPrefix, switch_node->name())},
                 &switch_exit);
 
     TF_ASSIGN_OR_RETURN(Node * after_switch_node, graph->AddNode(switch_exit));

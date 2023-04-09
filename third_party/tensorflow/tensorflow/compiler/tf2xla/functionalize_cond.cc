@@ -84,7 +84,7 @@ struct ClusterTupleLessThan {
 
 // TODO(jpienaar): Move to OutputTensor.
 string DebugString(const OutputTensor& tensor) {
-  return absl::StrCat(tensor.node->name(), ":", tensor.index);
+  return abslx::StrCat(tensor.node->name(), ":", tensor.index);
 }
 
 string Branch_Name(BranchType b) {
@@ -103,16 +103,16 @@ string Branch_Name(BranchType b) {
 string DebugString(StateMap::CondId cond_state) {
   if (cond_state == nullptr || cond_state->empty()) return "{}";
   using value_type = StateMap::CondState::value_type;
-  return absl::StrCat(
+  return abslx::StrCat(
       "{",
-      absl::StrJoin(*cond_state, ", ",
+      abslx::StrJoin(*cond_state, ", ",
                     [](string* output, const value_type& pred_branch) {
                       const OutputTensor& pred = pred_branch.first;
                       const BranchType& branch = pred_branch.second;
                       if (branch == BranchType::kNeither)
-                        absl::StrAppend(output, "d");
+                        abslx::StrAppend(output, "d");
                       else
-                        absl::StrAppend(output, "s(", DebugString(pred), ",",
+                        abslx::StrAppend(output, "s(", DebugString(pred), ",",
                                         Branch_Name(branch), ")");
                     }),
       "}");
@@ -201,7 +201,7 @@ struct CondArgNode {
       : src(src), src_output(src_output) {}
 
   string ToString() const {
-    return absl::StrCat("src=", src->name(), ":", src_output,
+    return abslx::StrCat("src=", src->name(), ":", src_output,
                         " switches=", NodesToString(switches));
   }
 
@@ -213,11 +213,11 @@ struct CondArgNode {
 using CondArgNodes = std::vector<CondArgNode>;
 
 string DebugString(const CondArgNodes& nodes) {
-  return absl::StrCat(
+  return abslx::StrCat(
       "[",
-      absl::StrJoin(nodes, ", ",
+      abslx::StrJoin(nodes, ", ",
                     [](string* output, const CondArgNode& node) {
-                      absl::StrAppend(output, node.ToString());
+                      abslx::StrAppend(output, node.ToString());
                     }),
       "]");
 }
@@ -273,11 +273,11 @@ string StateMap::CondStateToString(StateMap::CondId id) const {
 
 string StateMap::AncestorStateToString(const Node* node) const {
   if (auto id = LookupAncestorId(node)) {
-    return absl::StrCat(
+    return abslx::StrCat(
         "{",
-        absl::StrJoin(*id, ",",
+        abslx::StrJoin(*id, ",",
                       [](string* output, const AncestorNode& ancestor) {
-                        absl::StrAppend(output,
+                        abslx::StrAppend(output,
                                         ancestor.output_tensor.node->name(),
                                         ":", ancestor.output_tensor.index);
                       }),
@@ -441,7 +441,7 @@ Status Conditional::BuildArgumentNodes() {
     for (auto branch : {BranchType::kElseBranch, BranchType::kThenBranch}) {
       int branch_index = static_cast<int>(branch);
       TF_RETURN_IF_ERROR(
-          NodeBuilder(absl::StrCat("_Arg", arg_count),
+          NodeBuilder(abslx::StrCat("_Arg", arg_count),
                       FunctionLibraryDefinition::kArgOp)
               .Attr("T", dtype)
               .Attr("index", arg_count)
@@ -509,7 +509,7 @@ Status Conditional::AddSwitchNodeAlongEdge(const Edge* edge, BranchType branch,
   Node* src = edge->src();
   int src_output = edge->src_output();
   TF_RETURN_IF_ERROR(
-      NodeBuilder(graph->NewName(absl::StrCat(src->name(), "_added_switch")),
+      NodeBuilder(graph->NewName(abslx::StrCat(src->name(), "_added_switch")),
                   "Switch")
           .Input(src, src_output)
           .Input(const_cast<Node*>(predicate_.node), predicate_.index)
@@ -755,7 +755,7 @@ Status Conditional::BuildIfNode(Graph* graph,
 
     NameAttrList body_name;
     body_name.set_name(library->UniqueFunctionName(
-        absl::StrCat("_functionalize_if_", branch_name[branch_index], "_")));
+        abslx::StrCat("_functionalize_if_", branch_name[branch_index], "_")));
 
     VLOG(3) << "FunctionalizeControlFlow (" << branch_name[branch_index]
             << "): "
@@ -814,7 +814,7 @@ Status Conditional::BuildIfNode(Graph* graph,
 
   builder.Attr("Tcond", DT_BOOL);
   // Add some internal attributes which need to be propagated.
-  for (absl::string_view attr_name : kAttrsToPropagate) {
+  for (abslx::string_view attr_name : kAttrsToPropagate) {
     string attr_val;
     if (GetNodeAttr(predicate_.node->def(), attr_name, &attr_val).ok()) {
       builder.Attr(attr_name, attr_val);
@@ -949,7 +949,7 @@ Status Conditional::BuildAndReplace(
 
 string Conditional::name() const {
   CHECK(!merges_.empty());
-  return absl::StrCat((*merges_.begin())->name(), "_if");
+  return abslx::StrCat((*merges_.begin())->name(), "_if");
 }
 
 Status FunctionalizeCond::AddIdentityNode(const Node* replacee, Node* if_node,
@@ -1583,11 +1583,11 @@ void FunctionalizeCond::DumpGraphWithCondState(const string& name) {
   for (Node* n : graph_->nodes()) {
     n->ClearAttr(kCondGroupDebugAttr);
     n->AddAttr(kCondGroupDebugAttr,
-               absl::StrCat(state_map_.CondStateToString(n), "_",
+               abslx::StrCat(state_map_.CondStateToString(n), "_",
                             state_map_.AncestorStateToString(n)));
   }
   LOG(INFO) << "FunctionalizeControlFlow (" << name << "): "
-            << DumpGraphToFile(absl::StrCat("functionalize_cond_", name),
+            << DumpGraphToFile(abslx::StrCat("functionalize_cond_", name),
                                *graph_, library_);
 }
 

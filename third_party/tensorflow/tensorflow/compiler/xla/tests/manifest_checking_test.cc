@@ -32,12 +32,12 @@ namespace {
 
 // Mapping from test name; i.e. MyTest.MyTestCase to platforms on which it is
 // disabled - a sequence of regexps.
-using ManifestT = absl::flat_hash_map<std::string, std::vector<std::string>>;
+using ManifestT = abslx::flat_hash_map<std::string, std::vector<std::string>>;
 
 ManifestT ReadManifest() {
   ManifestT manifest;
 
-  absl::string_view path = absl::NullSafeStringView(*DisabledManifestPath());
+  abslx::string_view path = abslx::NullSafeStringView(*DisabledManifestPath());
   if (path.empty()) {
     return manifest;
   }
@@ -47,7 +47,7 @@ ManifestT ReadManifest() {
   std::string contents((std::istreambuf_iterator<char>(file_stream)),
                        std::istreambuf_iterator<char>());
 
-  std::vector<std::string> lines = absl::StrSplit(contents, '\n');
+  std::vector<std::string> lines = abslx::StrSplit(contents, '\n');
   for (std::string& line : lines) {
     auto comment = line.find("//");
     if (comment != std::string::npos) {
@@ -56,8 +56,8 @@ ManifestT ReadManifest() {
     if (line.empty()) {
       continue;
     }
-    absl::StripTrailingAsciiWhitespace(&line);
-    std::vector<std::string> pieces = absl::StrSplit(line, ' ');
+    abslx::StripTrailingAsciiWhitespace(&line);
+    std::vector<std::string> pieces = abslx::StrSplit(line, ' ');
     CHECK_GE(pieces.size(), 1);
     auto& platforms = manifest[pieces[0]];
     for (size_t i = 1; i < pieces.size(); ++i) {
@@ -72,8 +72,8 @@ ManifestT ReadManifest() {
 void ManifestCheckingTest::SetUp() {
   const testing::TestInfo* test_info =
       testing::UnitTest::GetInstance()->current_test_info();
-  absl::string_view test_case_name = test_info->test_suite_name();
-  absl::string_view test_name = test_info->name();
+  abslx::string_view test_case_name = test_info->test_suite_name();
+  abslx::string_view test_name = test_info->name();
   VLOG(1) << "test_case_name: " << test_case_name;
   VLOG(1) << "test_name: " << test_name;
 
@@ -105,7 +105,7 @@ void ManifestCheckingTest::SetUp() {
   // First try full match: test_case_name.test_name
   // If that fails, try to find just the test_case_name; this would disable all
   // tests in the test case.
-  auto it = manifest.find(absl::StrCat(test_case_name, ".", test_name));
+  auto it = manifest.find(abslx::StrCat(test_case_name, ".", test_name));
   if (it == manifest.end()) {
     it = manifest.find(test_case_name);
     if (it == manifest.end()) {

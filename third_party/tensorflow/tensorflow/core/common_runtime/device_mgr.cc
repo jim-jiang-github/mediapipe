@@ -117,7 +117,7 @@ Status StaticDeviceMgr::LookupDevice(StringPiece name, Device** device) const {
       device_names.push_back(itr.first);
     }
     VLOG(1) << "Unknown device: " << name
-            << " all devices: " << absl::StrJoin(device_names, ", ");
+            << " all devices: " << abslx::StrJoin(device_names, ", ");
     return errors::InvalidArgument(name, " unknown device.");
   }
   *device = iter->second;

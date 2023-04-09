@@ -198,7 +198,7 @@ Status EagerOperation::SetAttrShapeList(const char* attr_name,
 }
 
 Status EagerOperation::SetAttrFunctionList(
-    const char* attr_name, absl::Span<const AbstractOperation*> values) {
+    const char* attr_name, abslx::Span<const AbstractOperation*> values) {
   size_t num_values = values.size();
   std::unique_ptr<NameAttrList[]> funcs(new NameAttrList[num_values]);
   for (int i = 0; i < num_values; i++) {
@@ -237,10 +237,10 @@ Status EagerOperation::InputLength(const char* input_name, int* length) {
   return OkStatus();
 }
 
-absl::Span<ImmediateExecutionTensorHandle* const> EagerOperation::GetInputs()
+abslx::Span<ImmediateExecutionTensorHandle* const> EagerOperation::GetInputs()
     const {
   // TODO(b/162536003): Remove reinterpret_cast.
-  return absl::MakeSpan(
+  return abslx::MakeSpan(
       reinterpret_cast<ImmediateExecutionTensorHandle* const*>(inputs_.data()),
       inputs_.size());
 }
@@ -276,7 +276,7 @@ Status EagerOperation::AddInput(AbstractTensorHandle* input) {
 }
 
 Status EagerOperation::AddInputList(
-    absl::Span<AbstractTensorHandle* const> inputs) {
+    abslx::Span<AbstractTensorHandle* const> inputs) {
   for (auto& input : inputs) {
     // TODO(b/175427838): It would be nice to be able to use tensorflow::isa
     // here.
@@ -312,7 +312,7 @@ Status EagerOperation::SetInput(size_t index,
 Status EagerOperation::Reset(
     const char* op, const char* device_name, bool remote,
     EagerExecutor* executor,
-    const absl::optional<EagerFunctionParams> eager_func_params) {
+    const abslx::optional<EagerFunctionParams> eager_func_params) {
   DCHECK(inputs_.empty());
   ClearInferenceState();
   bool is_function = false;
@@ -427,9 +427,9 @@ Status EagerOperation::InferInputListAttrs(int num_inputs) {
 }
 
 Status EagerOperation::TensorHandleInputs(
-    const absl::InlinedVector<TensorHandle*, 4>** inputs) const {
+    const abslx::InlinedVector<TensorHandle*, 4>** inputs) const {
   if (TF_PREDICT_TRUE(!HasCustomDeviceInput())) {
-    *inputs = reinterpret_cast<const absl::InlinedVector<TensorHandle*, 4>*>(
+    *inputs = reinterpret_cast<const abslx::InlinedVector<TensorHandle*, 4>*>(
         &inputs_);
     return OkStatus();
   } else {
@@ -438,10 +438,10 @@ Status EagerOperation::TensorHandleInputs(
 }
 
 Status EagerOperation::MutableTensorHandleInputs(
-    absl::InlinedVector<TensorHandle*, 4>** inputs) {
+    abslx::InlinedVector<TensorHandle*, 4>** inputs) {
   if (TF_PREDICT_TRUE(!HasCustomDeviceInput())) {
     *inputs =
-        reinterpret_cast<absl::InlinedVector<TensorHandle*, 4>*>(&inputs_);
+        reinterpret_cast<abslx::InlinedVector<TensorHandle*, 4>*>(&inputs_);
     return OkStatus();
   } else {
     return errors::Internal("The operation unexpectedly had custom devices.");
@@ -477,10 +477,10 @@ bool EagerOperation::IsLocal() const {
 string VariantDeviceDebugString(VariantDevice device) {
   if (device == kVariantDeviceNull) {
     return "[]";
-  } else if (absl::holds_alternative<CustomDevice*>(device)) {
-    return absl::get<CustomDevice*>(device)->name();
+  } else if (abslx::holds_alternative<CustomDevice*>(device)) {
+    return abslx::get<CustomDevice*>(device)->name();
   } else {
-    return absl::get<Device*>(device)->DebugString();
+    return abslx::get<Device*>(device)->DebugString();
   }
 }
 const AbstractOpAttrs* EagerOperation::GetOpAttrs() const { return &attrs_; }

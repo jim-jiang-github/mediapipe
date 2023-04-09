@@ -53,7 +53,7 @@ Status ToStatus(ncclResult_t s, const char* file, int64_t line,
     return OkStatus();
   }
   return tensorflow::errors::Internal(
-      absl::StrFormat("%s:%d: NCCL operation %s failed: %s", file, line, expr,
+      abslx::StrFormat("%s:%d: NCCL operation %s failed: %s", file, line, expr,
                       ncclGetErrorString(s)));
 }
 
@@ -100,7 +100,7 @@ StatusOr<ncclDataType_t> ToNcclDataType(PrimitiveType element_type) {
       return ncclBfloat16;
 #endif
     default:
-      return tensorflow::errors::InvalidArgument(absl::StrFormat(
+      return tensorflow::errors::InvalidArgument(abslx::StrFormat(
           "Unsupported data type: %s", PrimitiveType_Name(element_type)));
   }
 }
@@ -111,7 +111,7 @@ StatusOr<ncclUniqueId> ToNcclUniqueId(const std::string& id_str) {
 
   TF_RET_CHECK(id_str.size() == NCCL_UNIQUE_ID_BYTES);
   ncclUniqueId id;
-  absl::c_copy(id_str, id.internal);
+  abslx::c_copy(id_str, id.internal);
   return id;
 }
 
@@ -128,10 +128,10 @@ struct NcclCliqueState {
   // mu guards ready, status, and communicators during initialization.
   // Once 'ready' has been notified, the communicators may be accessed without
   // synchronization.
-  absl::Mutex mu;
-  absl::Notification ready;
+  abslx::Mutex mu;
+  abslx::Notification ready;
   Status status;
-  absl::flat_hash_map<int, std::unique_ptr<NcclComm>> communicators;
+  abslx::flat_hash_map<int, std::unique_ptr<NcclComm>> communicators;
 };
 
 using NcclClique = Lockable<NcclCliqueState>;
@@ -165,9 +165,9 @@ std::shared_ptr<StatusOr<NcclClique::Lock>> AcquireNcclClique(
         clique->run_id = run_id.ToInt();
         return clique;
       },
-      /*warn_stuck_timeout=*/absl::Seconds(10),
-      (terminate_timeout >= 0) ? absl::Seconds(terminate_timeout)
-                               : absl::InfiniteDuration());
+      /*warn_stuck_timeout=*/abslx::Seconds(10),
+      (terminate_timeout >= 0) ? abslx::Seconds(terminate_timeout)
+                               : abslx::InfiniteDuration());
 }
 
 void CheckNcclAsyncError(NcclComm& lockable_comm) {
@@ -203,8 +203,8 @@ size_t GetNumLocalParticipants(
     const std::vector<GlobalDeviceId>* local_devices) {
   if (local_devices == nullptr) return participants.size();
 
-  return absl::c_count_if(participants, [&](const GlobalDeviceId& device_id) {
-    return absl::c_linear_search(*local_devices, device_id);
+  return abslx::c_count_if(participants, [&](const GlobalDeviceId& device_id) {
+    return abslx::c_linear_search(*local_devices, device_id);
   });
 }
 
@@ -234,7 +234,7 @@ StatusOr<NcclComm::Lock> AcquireNcclComm(
   NcclCliqueState& state = ***clique;
 
   struct AllCommunicators {
-    absl::Mutex mu;
+    abslx::Mutex mu;
     std::vector<NcclComm*> communicators ABSL_GUARDED_BY(mu);
   };
   static auto& all_communicators = *new AllCommunicators;
@@ -246,8 +246,8 @@ StatusOr<NcclComm::Lock> AcquireNcclComm(
       tensorflow::Env::Default()->StartThread(
           tensorflow::ThreadOptions(), "nccl_async_error_thread", [&] {
             while (true) {
-              absl::SleepFor(absl::Seconds(30));
-              absl::MutexLock lock(&all_communicators.mu);
+              abslx::SleepFor(abslx::Seconds(30));
+              abslx::MutexLock lock(&all_communicators.mu);
               for (NcclComm* comm : all_communicators.communicators) {
                 CheckNcclAsyncError(*comm);
               }
@@ -268,11 +268,11 @@ StatusOr<NcclComm::Lock> AcquireNcclComm(
 
     // Add the communicator to the all_communicators list.
     {
-      absl::MutexLock lock(&all_communicators.mu);
+      abslx::MutexLock lock(&all_communicators.mu);
       all_communicators.communicators.push_back(comm_ptr.get());
     }
 
-    absl::MutexLock lock(&state.mu);
+    abslx::MutexLock lock(&state.mu);
     state.status.Update(status);
     state.communicators[rank] = std::move(comm_ptr);
 
@@ -284,7 +284,7 @@ StatusOr<NcclComm::Lock> AcquireNcclComm(
     auto all_initialized = [&]() ABSL_EXCLUSIVE_LOCKS_REQUIRED(state.mu) {
       return state.communicators.size() == num_local_participants;
     };
-    state.mu.Await(absl::Condition(&all_initialized));
+    state.mu.Await(abslx::Condition(&all_initialized));
     status = state.status;
     if (!state.ready.HasBeenNotified()) {
       state.ready.Notify();

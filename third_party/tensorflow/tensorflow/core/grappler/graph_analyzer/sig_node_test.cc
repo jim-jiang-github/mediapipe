@@ -1081,7 +1081,7 @@ TEST_F(SignatureTest, OrderLinks) {
 TEST_F(SignatureTest, GraphTooBig) {
   GraphDef graph;
   for (int i = 0; i <= Signature::kMaxGraphSize; ++i) {
-    (*graph.add_node()) = MakeNodeConst(absl::StrFormat("node%d", i));
+    (*graph.add_node()) = MakeNodeConst(abslx::StrFormat("node%d", i));
   }
 
   ASSERT_THAT(GenNode::BuildGraphInMap(graph, &gen_map_), Eq(OkStatus()));

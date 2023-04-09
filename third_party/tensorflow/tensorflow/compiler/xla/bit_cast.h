@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-// BitCast is an extension of std::bit_cast/absl::bit_cast. Whereas those
+// BitCast is an extension of std::bit_cast/abslx::bit_cast. Whereas those
 // functions require trivially copyable source and destination types, the
 // present function template may be specialized for additional types that
 // do not satisfy that triviality property, but that have alternative ways
@@ -38,7 +38,7 @@ T BitCast(U src) {
   static_assert(sizeof(T) == sizeof(U), "sizes don't match");
   // We would like to check std::is_trivially_copyable here, but there's no
   // reliable implementation of that available to us.
-  return absl::bit_cast<T>(src);
+  return abslx::bit_cast<T>(src);
 }
 
 template <>

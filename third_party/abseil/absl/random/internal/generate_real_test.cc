@@ -26,10 +26,10 @@
 ABSL_FLAG(int64_t, absl_random_test_trials, 50000,
           "Number of trials for the probability tests.");
 
-using absl::random_internal::GenerateNegativeTag;
-using absl::random_internal::GeneratePositiveTag;
-using absl::random_internal::GenerateRealFromBits;
-using absl::random_internal::GenerateSignedTag;
+using abslx::random_internal::GenerateNegativeTag;
+using abslx::random_internal::GeneratePositiveTag;
+using abslx::random_internal::GenerateRealFromBits;
+using abslx::random_internal::GenerateSignedTag;
 
 namespace {
 
@@ -449,7 +449,7 @@ TEST(GenerateRealTest, ExhaustiveFloat) {
     }
   };
 
-  size_t limit = absl::GetFlag(FLAGS_absl_random_test_trials);
+  size_t limit = abslx::GetFlag(FLAGS_absl_random_test_trials);
 
   // Generate all uint64_t which have unique floating point values.
   // Counting down from 0xFFFFFFFFFFFFFFFFu ... 0x0u
@@ -463,7 +463,7 @@ TEST(GenerateRealTest, ExhaustiveFloat) {
 
     // Adjust decrement and check value based on how many leading 0
     // bits are set in the current value.
-    const int clz = absl::countl_zero(x);
+    const int clz = abslx::countl_zero(x);
     if (clz < kDig) {
       dec <<= (kDig - clz);
       chk = (~uint64_t(0)) >> (clz + 1);

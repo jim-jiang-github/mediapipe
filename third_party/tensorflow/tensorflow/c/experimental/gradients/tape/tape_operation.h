@@ -29,8 +29,8 @@ class TapeOperation : public AbstractOperation {
   const string& DeviceName() const override;
   Status SetDeviceName(const char* name) override;
   Status AddInput(AbstractTensorHandle* input) override;
-  Status AddInputList(absl::Span<AbstractTensorHandle* const> inputs) override;
-  Status Execute(absl::Span<AbstractTensorHandle*> retvals,
+  Status AddInputList(abslx::Span<AbstractTensorHandle* const> inputs) override;
+  Status Execute(abslx::Span<AbstractTensorHandle*> retvals,
                  int* num_retvals) override;
   Status SetAttrString(const char* attr_name, const char* data,
                        size_t length) override;
@@ -60,7 +60,7 @@ class TapeOperation : public AbstractOperation {
                           const int* num_dims, int num_values) override;
   Status SetAttrFunctionList(
       const char* attr_name,
-      absl::Span<const AbstractOperation*> values) override;
+      abslx::Span<const AbstractOperation*> values) override;
   AbstractOperation* GetBackingOperation();
   // For LLVM style RTTI.
   static bool classof(const AbstractOperation* ptr) {

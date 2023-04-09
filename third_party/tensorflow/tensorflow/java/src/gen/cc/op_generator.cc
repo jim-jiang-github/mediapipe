@@ -413,7 +413,7 @@ void RenderOptionsClass(const OpSpec& op, const Type& op_class,
 inline Type ClassOf(const EndpointSpec& endpoint, const string& base_package) {
   return Type::Class(
       endpoint.name(),
-      base_package + "." + absl::AsciiStrToLower(endpoint.package()));
+      base_package + "." + abslx::AsciiStrToLower(endpoint.package()));
 }
 
 void GenerateOp(const OpSpec& op, const EndpointSpec& endpoint,

@@ -71,7 +71,7 @@ class TensorFlowSessionFromSavedModelCalculatorTest : public ::testing::Test {
 
 TEST_F(TensorFlowSessionFromSavedModelCalculatorTest,
        CreatesPacketWithGraphAndBindings) {
-  CalculatorRunner runner(absl::Substitute(R"(
+  CalculatorRunner runner(abslx::Substitute(R"(
         calculator: "TensorFlowSessionFromSavedModelCalculator"
         output_side_packet: "SESSION:tf_model"
         options {
@@ -112,7 +112,7 @@ TEST_F(TensorFlowSessionFromSavedModelCalculatorTest,
 TEST_F(TensorFlowSessionFromSavedModelCalculatorTest,
        CreateSessionFromSidePacket) {
   options_->clear_saved_model_path();
-  CalculatorRunner runner(absl::Substitute(R"(
+  CalculatorRunner runner(abslx::Substitute(R"(
         calculator: "TensorFlowSessionFromSavedModelCalculator"
         input_side_packet: "STRING_SAVED_MODEL_PATH:saved_model_dir"
         output_side_packet: "SESSION:tf_model"
@@ -137,7 +137,7 @@ TEST_F(TensorFlowSessionFromSavedModelCalculatorTest,
        ProducesPacketUsableByTensorFlowInferenceCalculator) {
   CalculatorGraphConfig graph_config =
       mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(
-          absl::Substitute(R"(
+          abslx::Substitute(R"(
       node {
         calculator: "TensorFlowInferenceCalculator"
         input_side_packet: "SESSION:tf_model"
@@ -193,7 +193,7 @@ TEST_F(TensorFlowSessionFromSavedModelCalculatorTest,
       std::string(file::SplitPath(GetSavedModelDir()).first));
   options_->set_load_latest_model(true);
 
-  CalculatorRunner runner(absl::Substitute(R"(
+  CalculatorRunner runner(abslx::Substitute(R"(
         calculator: "TensorFlowSessionFromSavedModelCalculator"
         output_side_packet: "SESSION:tf_model"
         options {
@@ -216,7 +216,7 @@ TEST_F(TensorFlowSessionFromSavedModelCalculatorTest,
   options_->set_load_latest_model(true);
   options_->mutable_session_config()->mutable_device_count()->insert(
       {"CPU", 10});
-  CalculatorRunner runner(absl::Substitute(R"(
+  CalculatorRunner runner(abslx::Substitute(R"(
         calculator: "TensorFlowSessionFromSavedModelCalculator"
         output_side_packet: "SESSION:tf_model"
         options {

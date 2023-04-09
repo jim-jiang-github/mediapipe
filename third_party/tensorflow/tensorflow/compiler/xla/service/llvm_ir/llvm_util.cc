@@ -82,9 +82,9 @@ std::string DumpModuleToString(const llvm::Module& module) {
 }
 
 llvm::CallInst* EmitCallToIntrinsic(
-    llvm::Intrinsic::ID intrinsic_id, absl::Span<llvm::Value* const> operands,
-    absl::Span<llvm::Type* const> overloaded_types, llvm::IRBuilder<>* b,
-    absl::string_view name) {
+    llvm::Intrinsic::ID intrinsic_id, abslx::Span<llvm::Value* const> operands,
+    abslx::Span<llvm::Type* const> overloaded_types, llvm::IRBuilder<>* b,
+    abslx::string_view name) {
   llvm::Module* module = ModuleFromIRBuilder(b);
   llvm::Function* intrinsic = llvm::Intrinsic::getDeclaration(
       module, intrinsic_id, AsArrayRef(overloaded_types));
@@ -93,7 +93,7 @@ llvm::CallInst* EmitCallToIntrinsic(
 
 llvm::Value* EmitFloatMax(llvm::Value* lhs_value, llvm::Value* rhs_value,
                           llvm::IRBuilder<>* b, bool enable_fast_min_max,
-                          absl::string_view name) {
+                          abslx::string_view name) {
   if (b->getFastMathFlags().noNaNs() || enable_fast_min_max) {
     auto cmp = b->CreateFCmpUGE(lhs_value, rhs_value);
     return b->CreateSelect(cmp, lhs_value, rhs_value, name.data());
@@ -107,7 +107,7 @@ llvm::Value* EmitFloatMax(llvm::Value* lhs_value, llvm::Value* rhs_value,
 
 llvm::Value* EmitFloatMin(llvm::Value* lhs_value, llvm::Value* rhs_value,
                           llvm::IRBuilder<>* b, bool enable_fast_min_max,
-                          absl::string_view name) {
+                          abslx::string_view name) {
   if (b->getFastMathFlags().noNaNs() || enable_fast_min_max) {
     auto cmp = b->CreateFCmpULE(lhs_value, rhs_value);
     return b->CreateSelect(cmp, lhs_value, rhs_value, name.data());
@@ -266,7 +266,7 @@ llvm::Constant* ConvertLiteralToIrConstant(const Literal& literal,
 
 llvm::GlobalVariable* AllocateSharedMemoryTile(llvm::Module* module,
                                                llvm::Type* tile_type,
-                                               absl::string_view name) {
+                                               abslx::string_view name) {
   // Both AMDGPU and NVPTX use the same address space for shared memory.
   const int kGPUSharedMemoryAddrSpace = 3;
   return new llvm::GlobalVariable(
@@ -277,7 +277,7 @@ llvm::GlobalVariable* AllocateSharedMemoryTile(llvm::Module* module,
 }
 
 llvm::AllocaInst* EmitAllocaAtFunctionEntry(llvm::Type* type,
-                                            absl::string_view name,
+                                            abslx::string_view name,
                                             llvm::IRBuilder<>* b,
                                             int alignment) {
   return EmitAllocaAtFunctionEntryWithCount(type, nullptr, name, b, alignment);
@@ -285,7 +285,7 @@ llvm::AllocaInst* EmitAllocaAtFunctionEntry(llvm::Type* type,
 
 llvm::AllocaInst* EmitAllocaAtFunctionEntryWithCount(llvm::Type* type,
                                                      llvm::Value* element_count,
-                                                     absl::string_view name,
+                                                     abslx::string_view name,
                                                      llvm::IRBuilder<>* b,
                                                      int alignment) {
   llvm::IRBuilder<>::InsertPointGuard guard(*b);
@@ -301,7 +301,7 @@ llvm::AllocaInst* EmitAllocaAtFunctionEntryWithCount(llvm::Type* type,
 }
 
 llvm::BasicBlock* CreateBasicBlock(llvm::BasicBlock* insert_before,
-                                   absl::string_view name,
+                                   abslx::string_view name,
                                    llvm::IRBuilder<>* b) {
   return llvm::BasicBlock::Create(
       /*Context=*/b->getContext(),
@@ -310,25 +310,25 @@ llvm::BasicBlock* CreateBasicBlock(llvm::BasicBlock* insert_before,
       /*InsertBefore*/ insert_before);
 }
 
-LlvmIfData EmitIfThenElse(llvm::Value* condition, absl::string_view name,
+LlvmIfData EmitIfThenElse(llvm::Value* condition, abslx::string_view name,
                           llvm::IRBuilder<>* b, bool emit_else) {
   llvm_ir::LlvmIfData if_data;
   if_data.if_block = b->GetInsertBlock();
   if_data.true_block =
-      CreateBasicBlock(nullptr, absl::StrCat(name, "-true"), b);
+      CreateBasicBlock(nullptr, abslx::StrCat(name, "-true"), b);
   if_data.false_block =
-      emit_else ? CreateBasicBlock(nullptr, absl::StrCat(name, "-false"), b)
+      emit_else ? CreateBasicBlock(nullptr, abslx::StrCat(name, "-false"), b)
                 : nullptr;
 
   // Add a terminator to the if block, if necessary.
   if (if_data.if_block->getTerminator() == nullptr) {
     b->SetInsertPoint(if_data.if_block);
     if_data.after_block =
-        CreateBasicBlock(nullptr, absl::StrCat(name, "-after"), b);
+        CreateBasicBlock(nullptr, abslx::StrCat(name, "-after"), b);
     b->CreateBr(if_data.after_block);
   } else {
     if_data.after_block = if_data.if_block->splitBasicBlock(
-        b->GetInsertPoint(), absl::StrCat(name, "-after"));
+        b->GetInsertPoint(), abslx::StrCat(name, "-after"));
   }
 
   // Our basic block should now end with an unconditional branch.  Remove it;
@@ -355,7 +355,7 @@ LlvmIfData EmitIfThenElse(llvm::Value* condition, absl::string_view name,
 
 llvm::Value* EmitComparison(llvm::CmpInst::Predicate predicate,
                             llvm::Value* lhs_value, llvm::Value* rhs_value,
-                            llvm::IRBuilder<>* b, absl::string_view name) {
+                            llvm::IRBuilder<>* b, abslx::string_view name) {
   llvm::Value* comparison_result;
   if (lhs_value->getType()->isIntegerTy()) {
     comparison_result =
@@ -380,9 +380,9 @@ void EmitLogging(const char* tag, llvm::Value* value, llvm::IRBuilder<>* b) {
   llvm::FunctionType* log_function_type = llvm::FunctionType::get(
       b->getVoidTy(), {b->getInt64Ty(), b->getInt64Ty()}, /*isVarArg=*/false);
   b->CreateCall(log_function_type,
-                b->CreateIntToPtr(b->getInt64(absl::bit_cast<int64_t>(&LogS64)),
+                b->CreateIntToPtr(b->getInt64(abslx::bit_cast<int64_t>(&LogS64)),
                                   log_function_type->getPointerTo()),
-                {b->getInt64(absl::bit_cast<int64_t>(tag)), value});
+                {b->getInt64(abslx::bit_cast<int64_t>(tag)), value});
 }
 
 void SetAlignmentMetadataForLoad(llvm::LoadInst* load, uint64_t alignment) {
@@ -423,20 +423,20 @@ llvm::Instruction* AddRangeMetadata(int32_t lower, int32_t upper,
   return inst;
 }
 
-std::string IrName(absl::string_view a) {
+std::string IrName(abslx::string_view a) {
   std::string s(a);
   s.erase(std::remove(s.begin(), s.end(), '%'), s.end());
   return s;
 }
 
-std::string IrName(absl::string_view a, absl::string_view b) {
+std::string IrName(abslx::string_view a, abslx::string_view b) {
   if (!a.empty() && !b.empty()) {
-    return IrName(absl::StrCat(a, ".", b));
+    return IrName(abslx::StrCat(a, ".", b));
   }
-  return IrName(absl::StrCat(a, b));
+  return IrName(abslx::StrCat(a, b));
 }
 
-std::string IrName(const HloInstruction* a, absl::string_view b) {
+std::string IrName(const HloInstruction* a, abslx::string_view b) {
   return IrName(a->name(), b);
 }
 
@@ -583,7 +583,7 @@ static Status CreateAndWriteStringToFile(const std::string& directory_name,
 
 void DumpIrIfEnabled(const HloModule& hlo_module,
                      const llvm::Module& llvm_module, bool optimized,
-                     absl::string_view filename_suffix) {
+                     abslx::string_view filename_suffix) {
   const auto& debug_opts = hlo_module.config().debug_options();
   if (!DumpingEnabledForHloModule(hlo_module)) {
     return;
@@ -592,9 +592,9 @@ void DumpIrIfEnabled(const HloModule& hlo_module,
   // XlaJitCompiledCpuFunction::Compile.  Avoid overwriting IR files previously
   // dumped from the same process in such cases.
   std::string suffix =
-      absl::StrCat("ir-", optimized ? "with" : "no", "-opt",
+      abslx::StrCat("ir-", optimized ? "with" : "no", "-opt",
                    filename_suffix.empty() ? "" : ".", filename_suffix);
-  DumpToFileInDirOrStdout(hlo_module, "", absl::StrCat(suffix, ".ll"),
+  DumpToFileInDirOrStdout(hlo_module, "", abslx::StrCat(suffix, ".ll"),
                           DumpModuleToString(llvm_module));
 
   // For some models the embedded constants can be huge, so also dump the module
@@ -602,7 +602,7 @@ void DumpIrIfEnabled(const HloModule& hlo_module,
   // this if we're dumping to stdout; there's no point in duplicating everything
   // when writing to the terminal.
   if (!DumpingToStdout(debug_opts)) {
-    DumpToFileInDir(hlo_module, "", absl::StrCat(suffix, "-noconst.ll"),
+    DumpToFileInDir(hlo_module, "", abslx::StrCat(suffix, "-noconst.ll"),
                     DumpModuleToString(*DropConstantInitializers(llvm_module)));
   }
 }
@@ -610,7 +610,7 @@ void DumpIrIfEnabled(const HloModule& hlo_module,
 llvm::Function* CreateCpuFunction(llvm::FunctionType* function_type,
                                   llvm::GlobalValue::LinkageTypes linkage,
                                   const HloModuleConfig& module_config,
-                                  absl::string_view name,
+                                  abslx::string_view name,
                                   llvm::Module* module) {
   llvm::Function* function =
       llvm::Function::Create(function_type, linkage, AsStringRef(name), module);

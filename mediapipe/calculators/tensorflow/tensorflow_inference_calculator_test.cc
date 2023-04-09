@@ -101,7 +101,7 @@ class TensorflowInferenceCalculatorTest : public ::testing::Test {
   Packet CreateTensorPacket(const std::vector<int32>& input, int64 time) {
     tf::TensorShape tensor_shape;
     tensor_shape.AddDim(input.size());
-    auto tensor = absl::make_unique<tf::Tensor>(tf::DT_INT32, tensor_shape);
+    auto tensor = abslx::make_unique<tf::Tensor>(tf::DT_INT32, tensor_shape);
     for (int i = 0; i < input.size(); ++i) {
       tensor->vec<int32>()(i) = input[i];
     }
@@ -120,7 +120,7 @@ class TensorflowInferenceCalculatorTest : public ::testing::Test {
                                  const std::string& tag) {
     CHECK(!packets.empty())
         << "Please specify at least some data in the packet";
-    auto packets_ptr = absl::make_unique<std::vector<Packet>>(packets);
+    auto packets_ptr = abslx::make_unique<std::vector<Packet>>(packets);
     runner_->MutableInputs()->Tag(tag).packets.push_back(
         Adopt(packets_ptr.release()).At(packets.begin()->Timestamp()));
   }
@@ -142,7 +142,7 @@ TEST_F(TensorflowInferenceCalculatorTest, GetConstants) {
       ->set_add_batch_dim_to_tensors(false);
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
   AddVectorToInputsAsTensor({0, 0, 0}, "A", 0);
   MP_ASSERT_OK(runner_->Run());
@@ -182,7 +182,7 @@ TEST_F(TensorflowInferenceCalculatorTest, GetComputed) {
       ->set_add_batch_dim_to_tensors(false);
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
   AddVectorToInputsAsTensor({2, 2, 2}, "A", 0);
   AddVectorToInputsAsTensor({3, 4, 5}, "B", 0);
@@ -221,7 +221,7 @@ TEST_F(TensorflowInferenceCalculatorTest, GetComputed_MaxInFlight) {
       ->set_add_batch_dim_to_tensors(false);
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
   AddVectorToInputsAsTensor({2, 2, 2}, "A", 0);
   AddVectorToInputsAsTensor({3, 4, 5}, "B", 0);
@@ -256,9 +256,9 @@ TEST_F(TensorflowInferenceCalculatorTest, BadTag) {
       ->set_batch_size(1);
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
-  absl::Status status = runner_->Run();
+  abslx::Status status = runner_->Run();
   ASSERT_FALSE(status.ok());
   EXPECT_THAT(
       status.message(),
@@ -278,7 +278,7 @@ TEST_F(TensorflowInferenceCalculatorTest, GetMultiBatchComputed) {
       ->set_batch_size(1);
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
   AddVectorToInputsAsTensor({2, 2, 2}, "A", 0);
   AddVectorToInputsAsTensor({3, 4, 5}, "B", 0);
@@ -315,7 +315,7 @@ TEST_F(TensorflowInferenceCalculatorTest, GetMultiBatchComputed_MaxInFlight) {
       ->set_batch_size(1);
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
   AddVectorToInputsAsTensor({2, 2, 2}, "A", 0);
   AddVectorToInputsAsTensor({3, 4, 5}, "B", 0);
@@ -353,7 +353,7 @@ TEST_F(TensorflowInferenceCalculatorTest,
       ->set_batch_size(1);
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
   AddVectorToInputsAsTensor({2, 2, 2}, "A", 0);
   AddVectorToInputsAsTensor({3, 4, 5}, "B", 0);
@@ -396,7 +396,7 @@ TEST_F(TensorflowInferenceCalculatorTest, GetSingleBatchComputed) {
       ->set_add_batch_dim_to_tensors(true);
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
   AddVectorToInputsAsTensor({2, 2, 2}, "A", 0);
   AddVectorToInputsAsTensor({3, 4, 5}, "B", 0);
@@ -434,7 +434,7 @@ TEST_F(TensorflowInferenceCalculatorTest, GetCloseBatchComputed) {
       ->set_add_batch_dim_to_tensors(true);
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
   AddVectorToInputsAsTensor({2, 2, 2}, "A", 0);
   AddVectorToInputsAsTensor({3, 4, 5}, "B", 0);
@@ -474,7 +474,7 @@ TEST_F(TensorflowInferenceCalculatorTest, GetCloseBatchComputedNoPadding) {
       ->set_add_batch_dim_to_tensors(true);
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
   AddVectorToInputsAsTensor({2, 2, 2}, "A", 0);
   AddVectorToInputsAsTensor({3, 4, 5}, "B", 0);
@@ -515,7 +515,7 @@ TEST_F(TensorflowInferenceCalculatorTest, GetBatchComputed_MaxInFlight) {
       ->set_batched_input(true);
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
   AddVectorToInputsAsPacket(
       {CreateTensorPacket({2, 2, 2}, 0), CreateTensorPacket({3, 3, 3}, 1)},
@@ -574,7 +574,7 @@ TEST_F(TensorflowInferenceCalculatorTest, TestRecurrentStates) {
       ->add_recurrent_tag_pair("A:MULTIPLIED");
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
   AddVectorToInputsAsTensor({3, 4, 5}, "B", 0);
   AddVectorToInputsAsTensor({3, 4, 5}, "B", 1);
@@ -613,7 +613,7 @@ TEST_F(TensorflowInferenceCalculatorTest, TestRecurrentStateOverride) {
       ->add_recurrent_tag_pair("A:MULTIPLIED");
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
   AddVectorToInputsAsTensor({1, 1, 1}, "A", 0);
   AddVectorToInputsAsTensor({3, 4, 5}, "B", 0);
@@ -653,7 +653,7 @@ TEST_F(TensorflowInferenceCalculatorTest, DISABLED_CheckTiming) {
       ->set_add_batch_dim_to_tensors(false);
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
   AddVectorToInputsAsTensor({0, 0, 0}, "A", 0);
   MP_ASSERT_OK(runner_->Run());
@@ -687,7 +687,7 @@ TEST_F(TensorflowInferenceCalculatorTest, MissingInputFeature) {
       ->set_skip_on_missing_features(false);
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
   AddVectorToInputsAsTensor({2, 2, 2}, "A", 0);
   ASSERT_FALSE(runner_->Run().ok());
@@ -709,7 +709,7 @@ TEST_F(TensorflowInferenceCalculatorTest, MissingInputFeature_Skip) {
       ->set_skip_on_missing_features(true);
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
   AddVectorToInputsAsTensor({2, 2, 2}, "A", 0);
   MP_ASSERT_OK(runner_->Run());
@@ -736,7 +736,7 @@ TEST_F(TensorflowInferenceCalculatorTest,
       ->set_skip_on_missing_features(true);
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
   AddVectorToInputsAsTensor({2, 2, 2}, "A", 0);
   AddVectorToInputsAsTensor({3, 3, 3}, "A", 1);
@@ -773,7 +773,7 @@ TEST_F(TensorflowInferenceCalculatorTest, BatchedInputTooBigBatch) {
       ->set_batched_input(true);
   *config.mutable_options() = options;
 
-  runner_ = absl::make_unique<CalculatorRunner>(config);
+  runner_ = abslx::make_unique<CalculatorRunner>(config);
   AddSessionInputSidePacket();
   AddVectorToInputsAsPacket(
       {CreateTensorPacket({2, 2, 2}, 0), CreateTensorPacket({3, 3, 3}, 1),

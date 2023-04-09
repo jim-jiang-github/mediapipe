@@ -82,17 +82,17 @@ GraphDef CreateGraphDef(int num_nodes, int num_edges_per_node) {
 
   NodeDef node;
   for (int in = 0; in < kNumInNodes; ++in) {
-    node = create_node(/*name=*/absl::StrFormat("in%04d", in), /*op=*/"Input");
+    node = create_node(/*name=*/abslx::StrFormat("in%04d", in), /*op=*/"Input");
     *graph_def.add_node() = std::move(node);
   }
 
   random::PhiloxRandom philox(301, 17);
   random::SimplePhilox rnd(&philox);
   for (int op = 0; op < num_nodes; ++op) {
-    node = create_node(/*name=*/absl::StrFormat("op%05d", op),
-                       /*op=*/absl::StrFormat("In%dOut1", num_edges_per_node));
+    node = create_node(/*name=*/abslx::StrFormat("op%05d", op),
+                       /*op=*/abslx::StrFormat("In%dOut1", num_edges_per_node));
     for (int edge = 0; edge < num_edges_per_node; ++edge) {
-      node.add_input(absl::StrFormat("in%04d", rnd.Uniform(kNumInNodes)));
+      node.add_input(abslx::StrFormat("in%04d", rnd.Uniform(kNumInNodes)));
     }
     *graph_def.add_node() = std::move(node);
   }
@@ -101,7 +101,7 @@ GraphDef CreateGraphDef(int num_nodes, int num_edges_per_node) {
   // FixupSourceAndSinkEdges().
   node = create_node(/*name=*/"out", /*op=*/"Output");
   for (int op = 0; op < num_nodes; ++op) {
-    node.add_input(absl::StrFormat("op%05d", op));
+    node.add_input(abslx::StrFormat("op%05d", op));
   }
   AttrValue attr;
   attr.set_i(num_nodes);
@@ -119,14 +119,14 @@ GraphDef CreateRandomGraph(int size) {
 
   GraphDef graph;
   for (int i = 0; i < size; ++i) {
-    const string name = absl::StrCat(prefix, i);
+    const string name = abslx::StrCat(prefix, i);
     const uint32 num_inputs = rnd.Uniform(std::min(i, 5));
 
     NodeDef node;
     node.set_name(name);
     for (int n = 0; n < num_inputs; ++n) {
       const uint32 input_node = rnd.Uniform(i);
-      node.add_input(absl::StrCat(prefix, input_node));
+      node.add_input(abslx::StrCat(prefix, input_node));
     }
 
     *graph.add_node() = std::move(node);
@@ -151,31 +151,31 @@ GraphDef CreateFaninFanoutNodeGraph(int num_regular_fanins,
   NodeDef node = create_node(/*name=*/"node");
 
   for (int i = 0; i < num_regular_fanins; ++i) {
-    const string input_node_name = absl::StrFormat("in%05d", i);
+    const string input_node_name = abslx::StrFormat("in%05d", i);
     NodeDef input_node = create_node(/*name=*/input_node_name);
     *graph.add_node() = std::move(input_node);
     node.add_input(input_node_name);
   }
 
   for (int i = 0; i < num_controlling_fanins; ++i) {
-    const string input_node_name = absl::StrFormat("control_in%05d", i);
+    const string input_node_name = abslx::StrFormat("control_in%05d", i);
     NodeDef input_node = create_node(/*name=*/input_node_name);
     *graph.add_node() = std::move(input_node);
-    node.add_input(absl::StrCat("^", input_node_name));
+    node.add_input(abslx::StrCat("^", input_node_name));
   }
 
   for (int i = 0; i < num_regular_fanouts; ++i) {
-    NodeDef output_node = create_node(/*name=*/absl::StrFormat("out%05d", i));
+    NodeDef output_node = create_node(/*name=*/abslx::StrFormat("out%05d", i));
     const string input_node_index =
-        fanout_unique_index ? absl::StrCat(node.name(), ":", i) : node.name();
+        fanout_unique_index ? abslx::StrCat(node.name(), ":", i) : node.name();
     output_node.add_input(input_node_index);
     *graph.add_node() = std::move(output_node);
   }
 
-  const string controlled_fanout_input = absl::StrCat("^", node.name());
+  const string controlled_fanout_input = abslx::StrCat("^", node.name());
   for (int i = 0; i < num_controlled_fanouts; ++i) {
     NodeDef output_node =
-        create_node(/*name=*/absl::StrFormat("control_out%05d", i));
+        create_node(/*name=*/abslx::StrFormat("control_out%05d", i));
     output_node.add_input(controlled_fanout_input);
     *graph.add_node() = std::move(output_node);
   }

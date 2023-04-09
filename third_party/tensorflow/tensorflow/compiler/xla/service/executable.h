@@ -255,7 +255,7 @@ class Executable {
   // Returns a shaped buffer containing the result of the computation.
   StatusOr<ScopedShapedBuffer> ExecuteOnStream(
       const ServiceExecutableRunOptions* run_options,
-      absl::Span<const ShapedBuffer* const> arguments,
+      abslx::Span<const ShapedBuffer* const> arguments,
       HloExecutionProfile* hlo_execution_profile);
 
   // Starts the given program executing on the given stream/executor.
@@ -278,7 +278,7 @@ class Executable {
   // objects (when they exist) must out-live the task.
   virtual StatusOr<ScopedShapedBuffer> ExecuteAsyncOnStream(
       const ServiceExecutableRunOptions* run_options,
-      absl::Span<const ShapedBuffer* const> arguments,
+      abslx::Span<const ShapedBuffer* const> arguments,
       HloExecutionProfile* hlo_execution_profile);
 
   // Same as ExecuteAsyncOnStream(), but blocks waiting for the computation to
@@ -298,8 +298,8 @@ class Executable {
   // run_options[i]->stream() and the returned value is at index i of the
   // returned vector.
   virtual StatusOr<std::vector<ScopedShapedBuffer>> ExecuteOnStreams(
-      absl::Span<const ServiceExecutableRunOptions> run_options,
-      absl::Span<const absl::Span<const ShapedBuffer* const>> arguments);
+      abslx::Span<const ServiceExecutableRunOptions> run_options,
+      abslx::Span<const abslx::Span<const ShapedBuffer* const>> arguments);
 
   // Populates `hlo_execution_profile` from `executor`. This is implicit in any
   // Execute* API call that takes a hlo_execution_profile argument, but must be
@@ -316,7 +316,7 @@ class Executable {
   // given ExecutionProfile if non-null.
   StatusOr<ScopedShapedBuffer> ExecuteOnStreamWrapper(
       const ServiceExecutableRunOptions* run_options,
-      absl::Span<const ShapedBuffer* const> arguments);
+      abslx::Span<const ShapedBuffer* const> arguments);
 
   StatusOr<ExecutionOutput> ExecuteOnStreamWrapper(
       const ServiceExecutableRunOptions* run_options,
@@ -324,7 +324,7 @@ class Executable {
 
   StatusOr<ScopedShapedBuffer> ExecuteAsyncOnStreamWrapper(
       const ServiceExecutableRunOptions* run_options,
-      absl::Span<const ShapedBuffer* const> arguments);
+      abslx::Span<const ShapedBuffer* const> arguments);
 
   StatusOr<ExecutionOutput> ExecuteAsyncOnStreamWrapper(
       const ServiceExecutableRunOptions* run_options,
@@ -385,7 +385,7 @@ class Executable {
   // buffers are mostly efficiently deallocated as soon as a program has been
   // launched. However, in XRT, the buffers are expected to be deallocated after
   // the program has finished since XRT doesn't support async deallocation.
-  void MarkToBeReleasedArguments(absl::Span<ExecutionInput> arguments,
+  void MarkToBeReleasedArguments(abslx::Span<ExecutionInput> arguments,
                                  ExecutionOutput& result);
 
  protected:

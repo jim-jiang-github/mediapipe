@@ -27,7 +27,7 @@ Thunk::ExecuteParams::ExecuteParams(
       async_comms_stream(async_comms_stream),
       nccl_params(run_options, stream) {}
 
-/*static*/ absl::string_view Thunk::KindToString(Thunk::Kind kind) {
+/*static*/ abslx::string_view Thunk::KindToString(Thunk::Kind kind) {
   switch (kind) {
     case Thunk::kCholesky:
       return "kCholesky";
@@ -92,7 +92,7 @@ std::string ThunkSequence::ToString(
   const std::string indent_str(indent * 2, ' ');
   if (empty()) return indent_str + "No thunks.";
 
-  auto thunk_with_longest_kind = absl::c_max_element(
+  auto thunk_with_longest_kind = abslx::c_max_element(
       *this,
       [](const std::unique_ptr<Thunk>& a, const std::unique_ptr<Thunk>& b) {
         return Thunk::KindToString(a->kind()).length() <
@@ -103,15 +103,15 @@ std::string ThunkSequence::ToString(
   std::string result;
   for (const std::unique_ptr<Thunk>& thunk : *this) {
     // Write out the thunk kind, padded out to max_thunk_kind_len.
-    absl::string_view kind_str = Thunk::KindToString(thunk->kind());
-    absl::StrAppend(&result, indent_str, kind_str,
+    abslx::string_view kind_str = Thunk::KindToString(thunk->kind());
+    abslx::StrAppend(&result, indent_str, kind_str,
                     std::string(max_thunk_kind_len - kind_str.length(), ' '),
                     "\t");
     if (get_thunk_annotation) {
-      absl::StrAppend(&result, get_thunk_annotation(thunk.get()));
+      abslx::StrAppend(&result, get_thunk_annotation(thunk.get()));
     }
-    absl::StrAppend(&result, thunk->ToStringExtra(indent));
-    absl::StrAppend(&result, "\n");
+    abslx::StrAppend(&result, thunk->ToStringExtra(indent));
+    abslx::StrAppend(&result, "\n");
   }
   return result;
 }

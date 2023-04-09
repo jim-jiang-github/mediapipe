@@ -62,7 +62,7 @@
 #define ABSL_INTERNAL_HAS_CONSTEXPR_CTZ 0
 #endif
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace numeric_internal {
 
@@ -353,6 +353,6 @@ ABSL_ATTRIBUTE_ALWAYS_INLINE ABSL_INTERNAL_CONSTEXPR_CLZ inline
 
 }  // namespace numeric_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_NUMERIC_INTERNAL_BITS_H_

@@ -44,9 +44,9 @@ struct ReverseSpec {
   bool use_bfloat16;
 
   std::string ToTestCaseName() const {
-    return absl::StrFormat(
-        "reverse_%s_in_dims_%s_%s", absl::StrJoin(input_dims, "x"),
-        absl::StrJoin(reversal, "x"), use_bfloat16 ? "bf16" : "f32");
+    return abslx::StrFormat(
+        "reverse_%s_in_dims_%s_%s", abslx::StrJoin(input_dims, "x"),
+        abslx::StrJoin(reversal, "x"), use_bfloat16 ? "bf16" : "f32");
   }
 };
 
@@ -91,7 +91,7 @@ TEST_P(FloatReverseTest, Reverses) {
 
   Literal expected = input_literal.Clone();
   std::vector<int64_t> output_indices(spec.input_dims.size());
-  expected.EachCell<float>([&](absl::Span<const int64_t> indices, float) {
+  expected.EachCell<float>([&](abslx::Span<const int64_t> indices, float) {
     for (int64_t i = 0; i < indices.size(); ++i) {
       output_indices[i] = indices[i];
     }

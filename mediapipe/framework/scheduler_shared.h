@@ -60,20 +60,20 @@ class SchedulerTimer {
 
   // Called when starting the scheduler.
   void StartRun() {
-    start_time_ = absl::ToUnixMicros(clock_->TimeNow());
+    start_time_ = abslx::ToUnixMicros(clock_->TimeNow());
     total_node_time_ = 0;
   }
   // Called when terminating the scheduler.
   void EndRun() {
-    total_run_time_ = absl::ToUnixMicros(clock_->TimeNow()) - start_time_;
+    total_run_time_ = abslx::ToUnixMicros(clock_->TimeNow()) - start_time_;
   }
 
   // Called immediately before invoking ProcessNode or CloseNode.
-  int64 StartNode() { return absl::ToUnixMicros(clock_->TimeNow()); }
+  int64 StartNode() { return abslx::ToUnixMicros(clock_->TimeNow()); }
   // Called immediately after invoking ProcessNode or CloseNode.
   void EndNode(int64 node_start_time) {
     total_node_time_.fetch_add(
-        absl::ToUnixMicros(clock_->TimeNow()) - node_start_time,
+        abslx::ToUnixMicros(clock_->TimeNow()) - node_start_time,
         std::memory_order_relaxed);
   }
 
@@ -105,7 +105,7 @@ struct SchedulerShared {
   // flag indicates that the graph is in that mode.
   std::atomic<bool> stopping;
   std::atomic<bool> has_error;
-  std::function<void(const absl::Status& error)> error_callback;
+  std::function<void(const abslx::Status& error)> error_callback;
   // Collects timing information for measuring overhead.
   internal::SchedulerTimer timer;
 };

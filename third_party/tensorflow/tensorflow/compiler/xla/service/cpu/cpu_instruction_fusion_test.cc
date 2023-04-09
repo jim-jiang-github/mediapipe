@@ -703,7 +703,7 @@ TEST_F(OpcodeFusionTest, DotAddOutputFusion_19x50x1_multi_use) {
 
 TEST_F(InstructionFusionTest,
        DotOperationFusion_DontOutputFuseDuplicateOperands) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
 HloModule module
 
 ENTRY main {
@@ -739,7 +739,7 @@ class GatherLoopFusionTest
 
 TEST_P(GatherLoopFusionTest, GatherLoopFusion) {
   const GatherLoopFusionTestSpec& spec = GetParam();
-  std::string hlo_string = absl::StrCat("HloModule ", spec.test_name, "\n\n",
+  std::string hlo_string = abslx::StrCat("HloModule ", spec.test_name, "\n\n",
                                         spec.hlo_computation_text);
   TF_ASSERT_OK_AND_ASSIGN(auto module,
                           ParseAndReturnVerifiedModule(hlo_string));
@@ -874,7 +874,7 @@ INSTANTIATE_TEST_SUITE_P(GatherLoopFusionTestInstantiation,
                          GatherLoopFusionTestSpec::Name);
 
 TEST_F(InstructionFusionTest, NoFuseReduceMajor) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
 HloModule module
 
 add {
@@ -902,7 +902,7 @@ ENTRY main {
 }
 
 TEST_F(InstructionFusionTest, FuseReduceMinor) {
-  absl::string_view module_string = R"(
+  abslx::string_view module_string = R"(
 HloModule module
 
 add {

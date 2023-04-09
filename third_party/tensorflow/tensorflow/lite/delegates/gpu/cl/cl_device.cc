@@ -50,12 +50,12 @@ void ParseQualcommOpenClCompilerVersion(
 
   const std::string main_part =
       cl_driver_version.substr(position + start.length(), main_part_length);
-  if (!absl::ascii_isdigit(main_part[0]) ||
-      !absl::ascii_isdigit(main_part[1]) || main_part[2] != '.' ||
-      !absl::ascii_isdigit(main_part[3]) ||
-      !absl::ascii_isdigit(main_part[4]) || main_part[5] != '.' ||
-      !absl::ascii_isdigit(main_part[6]) ||
-      !absl::ascii_isdigit(main_part[7])) {
+  if (!abslx::ascii_isdigit(main_part[0]) ||
+      !abslx::ascii_isdigit(main_part[1]) || main_part[2] != '.' ||
+      !abslx::ascii_isdigit(main_part[3]) ||
+      !abslx::ascii_isdigit(main_part[4]) || main_part[5] != '.' ||
+      !abslx::ascii_isdigit(main_part[6]) ||
+      !abslx::ascii_isdigit(main_part[7])) {
     return;
   }
   result->major = (main_part[0] - '0') * 10 + (main_part[1] - '0');
@@ -172,14 +172,14 @@ GpuInfo GpuInfoFromDeviceID(cl_device_id id, cl_platform_id platform_id) {
       GetDeviceInfo<std::string>(id, CL_DEVICE_OPENCL_C_VERSION);
   info.opencl_info.driver_version =
       GetDeviceInfo<std::string>(id, CL_DRIVER_VERSION);
-  const std::string gpu_description = absl::StrCat(
+  const std::string gpu_description = abslx::StrCat(
       info.opencl_info.device_name, " ", info.opencl_info.vendor_name, " ",
       info.opencl_info.opencl_c_version);
   GetGpuInfoFromDeviceDescription(gpu_description, GpuApi::kOpenCl, &info);
   info.opencl_info.cl_version =
       ParseCLVersion(info.opencl_info.opencl_c_version);
   info.opencl_info.extensions =
-      absl::StrSplit(GetDeviceInfo<std::string>(id, CL_DEVICE_EXTENSIONS), ' ');
+      abslx::StrSplit(GetDeviceInfo<std::string>(id, CL_DEVICE_EXTENSIONS), ' ');
   info.opencl_info.supports_fp16 = false;
   info.opencl_info.supports_image3d_writes = false;
   for (const auto& ext : info.opencl_info.extensions) {
@@ -366,21 +366,21 @@ void CLDevice::DisableOneLayerTextureArray() {
   info_.adreno_info.support_one_layer_texture_array = false;
 }
 
-absl::Status CreateDefaultGPUDevice(CLDevice* result) {
+abslx::Status CreateDefaultGPUDevice(CLDevice* result) {
   cl_uint num_platforms;
   cl_int status = clGetPlatformIDs(0, nullptr, &num_platforms);
   if (status != CL_SUCCESS) {
-    return absl::UnknownError(
-        absl::StrFormat("clGetPlatformIDs returned %d", status));
+    return abslx::UnknownError(
+        abslx::StrFormat("clGetPlatformIDs returned %d", status));
   }
   if (num_platforms == 0) {
-    return absl::UnknownError("No supported OpenCL platform.");
+    return abslx::UnknownError("No supported OpenCL platform.");
   }
   std::vector<cl_platform_id> platforms(num_platforms);
   status = clGetPlatformIDs(num_platforms, platforms.data(), nullptr);
   if (status != CL_SUCCESS) {
-    return absl::UnknownError(
-        absl::StrFormat("clGetPlatformIDs returned %d", status));
+    return abslx::UnknownError(
+        abslx::StrFormat("clGetPlatformIDs returned %d", status));
   }
 
   cl_platform_id platform_id = platforms[0];
@@ -388,23 +388,23 @@ absl::Status CreateDefaultGPUDevice(CLDevice* result) {
   status =
       clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_GPU, 0, nullptr, &num_devices);
   if (status != CL_SUCCESS) {
-    return absl::UnknownError(
-        absl::StrFormat("clGetDeviceIDs returned %d", status));
+    return abslx::UnknownError(
+        abslx::StrFormat("clGetDeviceIDs returned %d", status));
   }
   if (num_devices == 0) {
-    return absl::UnknownError("No GPU on current platform.");
+    return abslx::UnknownError("No GPU on current platform.");
   }
 
   std::vector<cl_device_id> devices(num_devices);
   status = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_GPU, num_devices,
                           devices.data(), nullptr);
   if (status != CL_SUCCESS) {
-    return absl::UnknownError(
-        absl::StrFormat("clGetDeviceIDs returned %d", status));
+    return abslx::UnknownError(
+        abslx::StrFormat("clGetDeviceIDs returned %d", status));
   }
 
   *result = CLDevice(devices[0], platform_id);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace cl

@@ -80,7 +80,7 @@ class MklSmallSizeAllocator : public Allocator {
     port::AlignedFree(ptr);
   }
 
-  absl::optional<AllocatorStats> GetStats() override {
+  abslx::optional<AllocatorStats> GetStats() override {
     mutex_lock l(mutex_);
     return stats_;
   }
@@ -187,7 +187,7 @@ class MklCPUAllocator : public Allocator {
     BFCAllocator::Options large_allocator_opts;
     large_allocator_opts.allow_growth = kAllowGrowth;
     large_size_allocator_ =
-        new BFCAllocator(absl::WrapUnique(sub_allocator_), max_mem_bytes, kName,
+        new BFCAllocator(abslx::WrapUnique(sub_allocator_), max_mem_bytes, kName,
                          large_allocator_opts);
     return Status::OK();
   }
@@ -242,7 +242,7 @@ class MklCPUAllocator : public Allocator {
       large_size_allocator_->DeallocateRaw(ptr);
     }
   }
-  absl::optional<AllocatorStats> GetStats() override {
+  abslx::optional<AllocatorStats> GetStats() override {
     auto s_stats = small_size_allocator_->GetStats();
     auto l_stats = large_size_allocator_->GetStats();
 

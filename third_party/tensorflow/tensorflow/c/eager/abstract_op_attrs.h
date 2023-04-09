@@ -37,13 +37,13 @@ class AbstractOpAttrs {
   virtual void GetNameAttrList(
       tensorflow::NameAttrList* name_and_attrs) const = 0;
 
-  virtual bool GetInt(absl::string_view, int64_t* result) const = 0;
-  virtual bool GetFloat(absl::string_view attr_name, float* result) const = 0;
-  virtual bool GetBool(absl::string_view attr_name, bool* result) const = 0;
-  virtual bool GetType(absl::string_view attr_name, DataType* result) const = 0;
+  virtual bool GetInt(abslx::string_view, int64_t* result) const = 0;
+  virtual bool GetFloat(abslx::string_view attr_name, float* result) const = 0;
+  virtual bool GetBool(abslx::string_view attr_name, bool* result) const = 0;
+  virtual bool GetType(abslx::string_view attr_name, DataType* result) const = 0;
   virtual Status GetTypeList(
-      absl::string_view attr_name,
-      absl::InlinedVector<DataType, 4>* type_list) const = 0;
+      abslx::string_view attr_name,
+      abslx::InlinedVector<DataType, 4>* type_list) const = 0;
 
  private:
   const AbstractOpAttrsKind kind_;

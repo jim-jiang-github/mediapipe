@@ -48,7 +48,7 @@ std::optional<ReductionKind> MatchReductionComputation(
 // groups cannot be empty, so `total_participant_count` is an optional.
 StatusOr<std::vector<int>> GetParticipatingIDs(
     int current_id, std::optional<int> total_participant_count,
-    absl::Span<const ReplicaGroup> groups);
+    abslx::Span<const ReplicaGroup> groups);
 
 // There are broadly 4 modes that collective communication ops use to describe
 // which sets of devices are participating with a given device in the operation.
@@ -90,7 +90,7 @@ enum class CollectiveOpGroupMode {
   kFlattenedID,
 };
 
-absl::string_view CollectiveOpGroupModeToString(
+abslx::string_view CollectiveOpGroupModeToString(
     CollectiveOpGroupMode group_mode);
 
 // Returns the group formation mode implied by (a) whether the operation has
@@ -113,18 +113,18 @@ StatusOr<CollectiveOpGroupMode> GetCollectiveOpGroupMode(
 //   There are 2 subgroups of participating devices {33, 34}, {44, 45, 55, 56}.
 StatusOr<std::vector<std::vector<GlobalDeviceId>>>
 GetParticipatingDevicesGroups(const DeviceAssignment& device_assignment,
-                              absl::Span<const ReplicaGroup> replica_groups,
+                              abslx::Span<const ReplicaGroup> replica_groups,
                               CollectiveOpGroupMode group_mode);
 
 // Figures out which devices are participating in the collective subgroup.
 StatusOr<std::vector<GlobalDeviceId>> GetParticipatingDevices(
     GlobalDeviceId device_id, const DeviceAssignment& device_assignment,
-    absl::Span<const ReplicaGroup> replica_groups,
+    abslx::Span<const ReplicaGroup> replica_groups,
     CollectiveOpGroupMode group_mode);
 
 // Returns true if the two replica group are orthogonal.
-bool ReplicaGroupsOrthogonal(absl::Span<const ReplicaGroup> first,
-                             absl::Span<const ReplicaGroup> second);
+bool ReplicaGroupsOrthogonal(abslx::Span<const ReplicaGroup> first,
+                             abslx::Span<const ReplicaGroup> second);
 
 // A custom call target that can be used to create a nop that can legally
 // replace a collective op.
@@ -187,7 +187,7 @@ struct RendezvousKey {
     return !(a == b);
   }
 
-  absl::string_view CollectiveOpKindString() const {
+  abslx::string_view CollectiveOpKindString() const {
     switch (collective_op_kind) {
       case kCrossModule:
         return "cross_module";
@@ -197,7 +197,7 @@ struct RendezvousKey {
   }
 
   std::string ToString() const {
-    return absl::StrFormat(
+    return abslx::StrFormat(
         "RendezvousKey{run_id=%s, global_devices=[%s], "
         "num_local_participants=%d, collective_op_kind=%s, op_id=%d}",
         run_id.ToString(), GlobalDeviceIdsToString(global_devices),
@@ -273,12 +273,12 @@ struct AllReduceParticipantData : ParticipantData {
     std::vector<std::string> buffer_strs;
     for (const Buffer& buffer : buffers) {
       buffer_strs.push_back(
-          absl::StrFormat("{element_count=%d}", buffer.element_count));
+          abslx::StrFormat("{element_count=%d}", buffer.element_count));
     }
-    return absl::StrFormat(
+    return abslx::StrFormat(
         "AllReduceParticipantData{buffers=[%s], rendezvous_key=%s, "
         "device_ordinal=%d, stream=%p}",
-        absl::StrJoin(buffer_strs, ","), rendezvous_key.ToString(),
+        abslx::StrJoin(buffer_strs, ","), rendezvous_key.ToString(),
         device_ordinal, stream);
   }
 };
@@ -321,7 +321,7 @@ class Rendezvous {
     rendezvous.reset();
     blocking_counter->DecrementCount();
     xla::WaitAndLogIfStuck(blocking_counter.get(), [&] {
-      return absl::StrFormat(
+      return abslx::StrFormat(
           "participant waiting for all threads to drop their reference to the "
           "rendezvous: %p",
           rendezvous.get());
@@ -336,7 +336,7 @@ class Rendezvous {
   // Initialize the rendezvous by the first ("primary") thread which reaches the
   // barrier. Returns whether this thread is primary.
   bool InitializationBarrier() {
-    absl::MutexLock lock(&mu_);
+    abslx::MutexLock lock(&mu_);
     if (!initialized_) {
       initialized_ = true;
       return true;
@@ -344,7 +344,7 @@ class Rendezvous {
     return false;
   }
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
 
   bool initialized_ ABSL_GUARDED_BY(mu_) = false;
 
@@ -360,7 +360,7 @@ class Rendezvous {
   StatusOr<std::pair<O, std::shared_ptr<tensorflow::BlockingCounter>>>
   SubmitParticipant(const I& participant) {
     {
-      absl::MutexLock lock(&mu_);
+      abslx::MutexLock lock(&mu_);
       CHECK(!initialized_);
 
       // Spot check for consistent replica counts among submitting threads.
@@ -378,7 +378,7 @@ class Rendezvous {
     // Wait for all participants to arrive.
     all_participants_present_.DecrementCount();
     WaitAndLogIfStuck(&all_participants_present_, [&] {
-      return absl::StrFormat(
+      return abslx::StrFormat(
           "participant %s waiting for all participants to arrive at rendezvous "
           "%s",
           participant.ToString(), key_.ToString());

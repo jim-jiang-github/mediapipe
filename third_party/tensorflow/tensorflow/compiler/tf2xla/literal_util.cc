@@ -66,7 +66,7 @@ Status HostTensorToMutableBorrowingLiteral(
   return OkStatus();
 }
 
-Status HostTensorsToBorrowingLiteralTuple(absl::Span<const Tensor> host_tensors,
+Status HostTensorsToBorrowingLiteralTuple(abslx::Span<const Tensor> host_tensors,
                                           xla::BorrowingLiteral* literal) {
   std::vector<const char*> buf_ptrs;
   buf_ptrs.reserve(host_tensors.size());

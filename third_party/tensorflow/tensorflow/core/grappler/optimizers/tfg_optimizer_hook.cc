@@ -103,7 +103,7 @@ TFGGrapplerOptimizer::TFGGrapplerOptimizer(TFGPassPipelineBuilder builder,
 TFGGrapplerOptimizer::~TFGGrapplerOptimizer() = default;
 
 std::string TFGGrapplerOptimizer::name() const {
-  return absl::StrCat("tfg_optimizer{", impl_->GetPipelineString(), "}");
+  return abslx::StrCat("tfg_optimizer{", impl_->GetPipelineString(), "}");
 }
 
 Status TFGGrapplerOptimizer::Optimize(
@@ -112,7 +112,7 @@ Status TFGGrapplerOptimizer::Optimize(
     tensorflow::GraphDef* optimized_graph) {
   if (VLOG_IS_ON(4)) {
     tensorflow::DumpGraphDefToFile(
-        absl::StrCat("tfg_before_graph_", item.id, "_",
+        abslx::StrCat("tfg_before_graph_", item.id, "_",
                      std::hash<std::string>()(name())),
         item.graph);
   }
@@ -161,7 +161,7 @@ Status TFGGrapplerOptimizer::Optimize(
 
   if (VLOG_IS_ON(4)) {
     tensorflow::DumpGraphDefToFile(
-        absl::StrCat("tfg_after_graph_", item.id, "_",
+        abslx::StrCat("tfg_after_graph_", item.id, "_",
                      std::hash<std::string>()(name())),
         *optimized_graph);
   }

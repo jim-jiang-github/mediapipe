@@ -103,9 +103,9 @@ ABSL_ATTRIBUTE_NO_SANITIZE_MEMORY void __xla_cpu_runtime_ParallelForkJoin(
   bc.Wait();
 
   // Collect all error messages (if any).
-  std::vector<std::pair<int32_t, absl::string_view>> error_messages;
+  std::vector<std::pair<int32_t, abslx::string_view>> error_messages;
   for (int32_t i = 0; i < num_partitions; ++i) {
-    std::optional<absl::string_view> msg =
+    std::optional<abslx::string_view> msg =
         xla::CustomCallStatusGetMessage(&statuses[i]);
     if (msg) {
       error_messages.emplace_back(i, *msg);
@@ -115,13 +115,13 @@ ABSL_ATTRIBUTE_NO_SANITIZE_MEMORY void __xla_cpu_runtime_ParallelForkJoin(
   if (!error_messages.empty()) {
     // Join all error messages into a single string to serve as the message for
     // the returned status.
-    std::string error_message = absl::StrJoin(
+    std::string error_message = abslx::StrJoin(
         error_messages, "\n",
-        [](std::string* out, std::pair<int32_t, absl::string_view> p) {
+        [](std::string* out, std::pair<int32_t, abslx::string_view> p) {
           int32_t idx = p.first;
-          absl::string_view msg = p.second;
-          absl::StrAppend(out,
-                          absl::StrFormat("Partition %d error: %s", idx, msg));
+          abslx::string_view msg = p.second;
+          abslx::StrAppend(out,
+                          abslx::StrFormat("Partition %d error: %s", idx, msg));
         });
     XlaCustomCallStatusSetFailure(
         reinterpret_cast<XlaCustomCallStatus*>(status), error_message.data(),

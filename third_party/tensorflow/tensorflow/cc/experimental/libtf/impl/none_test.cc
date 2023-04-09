@@ -29,7 +29,7 @@ TEST(NoneTest, TestSingleton) {
 }
 
 TEST(NoneTest, TestSupportsAbslHash) {
-  absl::flat_hash_set<None> none_set;
+  abslx::flat_hash_set<None> none_set;
   None& a = None::GetInstance();
   None& b = None::GetInstance();
   none_set.insert(a);

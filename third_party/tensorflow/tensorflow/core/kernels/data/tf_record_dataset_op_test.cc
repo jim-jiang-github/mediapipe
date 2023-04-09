@@ -77,7 +77,7 @@ Status CreateTestFiles(const std::vector<tstring>& filenames,
     CompressionParams params;
     params.output_buffer_size = 10;
     params.compression_type = compression_type;
-    std::vector<absl::string_view> records(contents[i].begin(),
+    std::vector<abslx::string_view> records(contents[i].begin(),
                                            contents[i].end());
     TF_RETURN_IF_ERROR(WriteDataToTFRecordFile(filenames[i], records, params));
   }
@@ -87,14 +87,14 @@ Status CreateTestFiles(const std::vector<tstring>& filenames,
 // Test case 1: multiple text files with ZLIB compression.
 TFRecordDatasetParams TFRecordDatasetParams1() {
   std::vector<tstring> filenames = {
-      absl::StrCat(testing::TmpDir(), "/tf_record_ZLIB_1"),
-      absl::StrCat(testing::TmpDir(), "/tf_record_ZLIB_2")};
+      abslx::StrCat(testing::TmpDir(), "/tf_record_ZLIB_1"),
+      abslx::StrCat(testing::TmpDir(), "/tf_record_ZLIB_2")};
   std::vector<std::vector<string>> contents = {{"1", "22", "333"},
                                                {"a", "bb", "ccc"}};
   CompressionType compression_type = CompressionType::ZLIB;
   if (!CreateTestFiles(filenames, contents, compression_type).ok()) {
     VLOG(WARNING) << "Failed to create the test files: "
-                  << absl::StrJoin(filenames, ", ");
+                  << abslx::StrJoin(filenames, ", ");
   }
   return TFRecordDatasetParams(filenames,
                                /*compression_type=*/compression_type,
@@ -105,14 +105,14 @@ TFRecordDatasetParams TFRecordDatasetParams1() {
 // Test case 2: multiple text files with GZIP compression.
 TFRecordDatasetParams TFRecordDatasetParams2() {
   std::vector<tstring> filenames = {
-      absl::StrCat(testing::TmpDir(), "/tf_record_GZIP_1"),
-      absl::StrCat(testing::TmpDir(), "/tf_record_GZIP_2")};
+      abslx::StrCat(testing::TmpDir(), "/tf_record_GZIP_1"),
+      abslx::StrCat(testing::TmpDir(), "/tf_record_GZIP_2")};
   std::vector<std::vector<string>> contents = {{"1", "22", "333"},
                                                {"a", "bb", "ccc"}};
   CompressionType compression_type = CompressionType::GZIP;
   if (!CreateTestFiles(filenames, contents, compression_type).ok()) {
     VLOG(WARNING) << "Failed to create the test files: "
-                  << absl::StrJoin(filenames, ", ");
+                  << abslx::StrJoin(filenames, ", ");
   }
   return TFRecordDatasetParams(filenames,
                                /*compression_type=*/compression_type,
@@ -123,14 +123,14 @@ TFRecordDatasetParams TFRecordDatasetParams2() {
 // Test case 3: multiple text files without compression.
 TFRecordDatasetParams TFRecordDatasetParams3() {
   std::vector<tstring> filenames = {
-      absl::StrCat(testing::TmpDir(), "/tf_record_UNCOMPRESSED_1"),
-      absl::StrCat(testing::TmpDir(), "/tf_record_UNCOMPRESSED_2")};
+      abslx::StrCat(testing::TmpDir(), "/tf_record_UNCOMPRESSED_1"),
+      abslx::StrCat(testing::TmpDir(), "/tf_record_UNCOMPRESSED_2")};
   std::vector<std::vector<string>> contents = {{"1", "22", "333"},
                                                {"a", "bb", "ccc"}};
   CompressionType compression_type = CompressionType::UNCOMPRESSED;
   if (!CreateTestFiles(filenames, contents, compression_type).ok()) {
     VLOG(WARNING) << "Failed to create the test files: "
-                  << absl::StrJoin(filenames, ", ");
+                  << abslx::StrJoin(filenames, ", ");
   }
   return TFRecordDatasetParams(filenames,
                                /*compression_type=*/compression_type,

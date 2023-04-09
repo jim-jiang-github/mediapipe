@@ -43,7 +43,7 @@ class AffineTransformation {
     //   output(x, y) = input(matrix[0] * x + matrix[1] * y + matrix[3],
     //                        matrix[4] * x + matrix[5] * y + matrix[7])
     // where x and y ranges are defined by @output_size.
-    virtual absl::StatusOr<OutputT> Run(const InputT& input,
+    virtual abslx::StatusOr<OutputT> Run(const InputT& input,
                                         const std::array<float, 16>& matrix,
                                         const Size& output_size,
                                         BorderMode border_mode) = 0;

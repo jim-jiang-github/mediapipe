@@ -31,7 +31,7 @@ PythonAPIInfo::InferredAttributes Convert(
   PythonAPIInfo::InferredAttributes inferred_attrs;
 
   PyObject* args_fast = PySequence_Fast(arg_list.ptr(), "Expected a list");
-  absl::Span<PyObject*> args_raw(PySequence_Fast_ITEMS(args_fast),
+  abslx::Span<PyObject*> args_raw(PySequence_Fast_ITEMS(args_fast),
                                  PySequence_Fast_GET_SIZE(args_fast));
 
   if (!CopyPythonAPITensorLists(api_info, args_raw)) {

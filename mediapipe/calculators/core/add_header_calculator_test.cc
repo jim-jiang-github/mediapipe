@@ -157,7 +157,7 @@ TEST_F(AddHeaderCalculatorTest, UsingBothSideInputAndStream) {
   }
 
   // Run should fail because header can only be provided one way.
-  EXPECT_EQ(runner.Run().code(), absl::InvalidArgumentError("").code());
+  EXPECT_EQ(runner.Run().code(), abslx::InvalidArgumentError("").code());
 }
 
 }  // namespace mediapipe

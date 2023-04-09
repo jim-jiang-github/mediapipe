@@ -66,7 +66,7 @@ bool IsSimpleLoop(mlir::AffineForOp loop) {
 }
 
 std::vector<mlir::AffineForOp> CreateNestedSimpleLoops(
-    absl::Span<const int64_t> upper_bounds, OpBuilder builder) {
+    abslx::Span<const int64_t> upper_bounds, OpBuilder builder) {
   std::vector<mlir::AffineForOp> loops;
   loops.reserve(upper_bounds.size());
   for (int64_t dim : upper_bounds) {
@@ -94,7 +94,7 @@ mlir::AffineForOp TileLoop(mlir::AffineForOp loop, int64_t size,
   {
     llvm::SmallVector<mlir::AffineForOp, 4> all_loops;
     getPerfectlyNestedLoops(all_loops, loop);
-    CHECK(absl::c_linear_search(all_loops, target));
+    CHECK(abslx::c_linear_search(all_loops, target));
   }
 
   auto builder = OpBuilder::atBlockTerminator(target.getBody());

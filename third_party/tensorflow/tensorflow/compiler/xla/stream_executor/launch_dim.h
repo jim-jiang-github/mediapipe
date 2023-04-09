@@ -57,7 +57,7 @@ struct ThreadDim : public Dim3D {
 
   // Returns a string representation of the thread dimensionality.
   std::string ToString() const {
-    return absl::StrCat("ThreadDim{", x, ", ", y, ", ", z, "}");
+    return abslx::StrCat("ThreadDim{", x, ", ", y, ", ", z, "}");
   }
 };
 
@@ -69,7 +69,7 @@ struct BlockDim : public Dim3D {
 
   // Returns a string representation of the block dimensionality.
   std::string ToString() const {
-    return absl::StrCat("BlockDim{", x, ", ", y, ", ", z, "}");
+    return abslx::StrCat("BlockDim{", x, ", ", y, ", ", z, "}");
   }
 };
 

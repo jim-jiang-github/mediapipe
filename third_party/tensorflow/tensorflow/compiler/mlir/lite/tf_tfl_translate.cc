@@ -187,10 +187,10 @@ int main(int argc, char **argv) {
       module = tensorflow::errors::InvalidArgument(
           "Importing saved model should not have input_mlir set");
 
-    tags = absl::StrSplit(saved_model_tags, ',');
+    tags = abslx::StrSplit(saved_model_tags, ',');
     std::vector<std::string> exported_names_vector =
-        absl::StrSplit(saved_model_exported_names, ',', absl::SkipEmpty());
-    absl::Span<std::string> exported_names(exported_names_vector);
+        abslx::StrSplit(saved_model_exported_names, ',', abslx::SkipEmpty());
+    abslx::Span<std::string> exported_names(exported_names_vector);
 
     std::vector<std::string> extra_opdefs(custom_opdefs.begin(),
                                           custom_opdefs.end());

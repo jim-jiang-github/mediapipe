@@ -28,7 +28,7 @@
 namespace {
 
 using ExampleNonsecureURBG =
-    absl::random_internal::NonsecureURBGBase<std::mt19937>;
+    abslx::random_internal::NonsecureURBGBase<std::mt19937>;
 
 template <typename T>
 void Use(const T&) {}
@@ -41,13 +41,13 @@ TEST(NonsecureURBGBase, DefaultConstructorIsValid) {
 
 // Ensure that the recommended template-instantiations are valid.
 TEST(RecommendedTemplates, CanBeConstructed) {
-  absl::BitGen default_generator;
-  absl::InsecureBitGen insecure_generator;
+  abslx::BitGen default_generator;
+  abslx::InsecureBitGen insecure_generator;
 }
 
 TEST(RecommendedTemplates, CanDiscardValues) {
-  absl::BitGen default_generator;
-  absl::InsecureBitGen insecure_generator;
+  abslx::BitGen default_generator;
+  abslx::InsecureBitGen insecure_generator;
 
   default_generator.discard(5);
   insecure_generator.discard(5);
@@ -64,20 +64,20 @@ TEST(NonsecureURBGBase, StandardInterface) {
   // os is a some specialization of basic_ostream
   // is is a some specialization of basic_istream
 
-  using E = absl::random_internal::NonsecureURBGBase<std::minstd_rand>;
+  using E = abslx::random_internal::NonsecureURBGBase<std::minstd_rand>;
 
   using T = typename E::result_type;
 
   static_assert(!std::is_copy_constructible<E>::value,
                 "NonsecureURBGBase should not be copy constructible");
 
-  static_assert(!absl::is_copy_assignable<E>::value,
+  static_assert(!abslx::is_copy_assignable<E>::value,
                 "NonsecureURBGBase should not be copy assignable");
 
   static_assert(std::is_move_constructible<E>::value,
                 "NonsecureURBGBase should be move constructible");
 
-  static_assert(absl::is_move_assignable<E>::value,
+  static_assert(abslx::is_move_assignable<E>::value,
                 "NonsecureURBGBase should be move assignable");
 
   static_assert(std::is_same<decltype(std::declval<E>()()), T>::value,
@@ -145,10 +145,10 @@ TEST(NonsecureURBGBase, SeedSeqConstructorIsValid) {
 TEST(NonsecureURBGBase, CompatibleWithDistributionUtils) {
   ExampleNonsecureURBG rbg;
 
-  absl::Uniform(rbg, 0, 100);
-  absl::Uniform(rbg, 0.5, 0.7);
-  absl::Poisson<uint32_t>(rbg);
-  absl::Exponential<float>(rbg);
+  abslx::Uniform(rbg, 0, 100);
+  abslx::Uniform(rbg, 0.5, 0.7);
+  abslx::Poisson<uint32_t>(rbg);
+  abslx::Exponential<float>(rbg);
 }
 
 TEST(NonsecureURBGBase, CompatibleWithStdDistributions) {
@@ -207,7 +207,7 @@ struct SeederTestEngine {
   }
 
   template <class SeedSequence,
-            typename = typename absl::enable_if_t<
+            typename = typename abslx::enable_if_t<
                 !std::is_same<SeedSequence, SeederTestEngine>::value>>
   explicit SeederTestEngine(SeedSequence&& seq) {
     seed(seq);
@@ -231,14 +231,14 @@ struct SeederTestEngine {
 
 TEST(NonsecureURBGBase, SeederWorksForU32) {
   using U32 =
-      absl::random_internal::NonsecureURBGBase<SeederTestEngine<uint32_t>>;
+      abslx::random_internal::NonsecureURBGBase<SeederTestEngine<uint32_t>>;
   U32 x;
   EXPECT_NE(0, x());
 }
 
 TEST(NonsecureURBGBase, SeederWorksForU64) {
   using U64 =
-      absl::random_internal::NonsecureURBGBase<SeederTestEngine<uint64_t>>;
+      abslx::random_internal::NonsecureURBGBase<SeederTestEngine<uint64_t>>;
 
   U64 x;
   EXPECT_NE(0, x());

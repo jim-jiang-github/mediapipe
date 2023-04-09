@@ -26,7 +26,7 @@ namespace tflite {
 namespace gpu {
 
 template <DataType T>
-absl::Status AddTwoEqualIntTensorsTest(TestExecutionEnvironment* env) {
+abslx::Status AddTwoEqualIntTensorsTest(TestExecutionEnvironment* env) {
   tflite::gpu::Tensor<BHWC, T> src0, src1;
   src0.shape = BHWC(1, 2, 1, 2);
   src0.data = {3, 4, 5, 6};
@@ -56,21 +56,21 @@ absl::Status AddTwoEqualIntTensorsTest(TestExecutionEnvironment* env) {
     tflite::gpu::Tensor<BHWC, T> dst_tensor;
     dst.DownloadData(&dst_tensor);
     if (dst_tensor.data != ref_tensor.data) {
-      return absl::InternalError("not equal");
+      return abslx::InternalError("not equal");
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-template absl::Status AddTwoEqualIntTensorsTest<DataType::INT32>(
+template abslx::Status AddTwoEqualIntTensorsTest<DataType::INT32>(
     TestExecutionEnvironment* env);
-template absl::Status AddTwoEqualIntTensorsTest<DataType::INT16>(
+template abslx::Status AddTwoEqualIntTensorsTest<DataType::INT16>(
     TestExecutionEnvironment* env);
-template absl::Status AddTwoEqualIntTensorsTest<DataType::INT8>(
+template abslx::Status AddTwoEqualIntTensorsTest<DataType::INT8>(
     TestExecutionEnvironment* env);
 
 template <DataType T>
-absl::Status AddTwoEqualUintTensorsTest(TestExecutionEnvironment* env) {
+abslx::Status AddTwoEqualUintTensorsTest(TestExecutionEnvironment* env) {
   tflite::gpu::Tensor<BHWC, T> src0, src1;
   src0.shape = BHWC(1, 2, 1, 2);
   src0.data = {3, 4, 5, 6};
@@ -100,20 +100,20 @@ absl::Status AddTwoEqualUintTensorsTest(TestExecutionEnvironment* env) {
     tflite::gpu::Tensor<BHWC, T> dst_tensor;
     dst.DownloadData(&dst_tensor);
     if (dst_tensor.data != ref_tensor.data) {
-      return absl::InternalError("not equal");
+      return abslx::InternalError("not equal");
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-template absl::Status AddTwoEqualUintTensorsTest<DataType::UINT32>(
+template abslx::Status AddTwoEqualUintTensorsTest<DataType::UINT32>(
     TestExecutionEnvironment* env);
-template absl::Status AddTwoEqualUintTensorsTest<DataType::UINT16>(
+template abslx::Status AddTwoEqualUintTensorsTest<DataType::UINT16>(
     TestExecutionEnvironment* env);
-template absl::Status AddTwoEqualUintTensorsTest<DataType::UINT8>(
+template abslx::Status AddTwoEqualUintTensorsTest<DataType::UINT8>(
     TestExecutionEnvironment* env);
 
-absl::Status AddTwoEqualTensorsTest(TestExecutionEnvironment* env) {
+abslx::Status AddTwoEqualTensorsTest(TestExecutionEnvironment* env) {
   TensorFloat32 src0, src1;
   src0.shape = BHWC(1, 2, 1, 2);
   src0.data = {0.0f, -1.0f, -0.05f, 0.045f};
@@ -146,10 +146,10 @@ absl::Status AddTwoEqualTensorsTest(TestExecutionEnvironment* env) {
   RETURN_IF_ERROR(AddTwoEqualUintTensorsTest<DataType::UINT32>(env));
   RETURN_IF_ERROR(AddTwoEqualUintTensorsTest<DataType::UINT16>(env));
   RETURN_IF_ERROR(AddTwoEqualUintTensorsTest<DataType::UINT8>(env));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AddFirstTensorHasMoreChannelsThanSecondTest(
+abslx::Status AddFirstTensorHasMoreChannelsThanSecondTest(
     TestExecutionEnvironment* env) {
   TensorFloat32 src0, src1;
   src0.shape = BHWC(1, 2, 1, 6);
@@ -177,10 +177,10 @@ absl::Status AddFirstTensorHasMoreChannelsThanSecondTest(
                                     dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AddFirstTensorHasLessChannelsThanSecond(
+abslx::Status AddFirstTensorHasLessChannelsThanSecond(
     TestExecutionEnvironment* env) {
   TensorFloat32 src0, src1;
   src1.shape = BHWC(1, 2, 1, 6);
@@ -208,7 +208,7 @@ absl::Status AddFirstTensorHasLessChannelsThanSecond(
                                     dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

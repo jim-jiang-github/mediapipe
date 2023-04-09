@@ -53,7 +53,7 @@ std::vector<TensorStorageType> MetalExecutionEnvironment::GetSupportedStorages(
           TensorStorageType::TEXTURE_ARRAY};
 }
 
-absl::Status MetalExecutionEnvironment::ExecuteGpuOperationInternal(
+abslx::Status MetalExecutionEnvironment::ExecuteGpuOperationInternal(
     const std::vector<TensorDescriptor*>& src_cpu,
     const std::vector<TensorDescriptor*>& dst_cpu,
     std::unique_ptr<GPUOperation>&& operation) {
@@ -114,7 +114,7 @@ absl::Status MetalExecutionEnvironment::ExecuteGpuOperationInternal(
       [command_buffer commit];
       [command_buffer waitUntilCompleted];
     } else {
-      return absl::InternalError(
+      return abslx::InternalError(
           "Indirect compute command buffer available since ios 13");
     }
   } else {
@@ -131,7 +131,7 @@ absl::Status MetalExecutionEnvironment::ExecuteGpuOperationInternal(
   for (int i = 0; i < dst_cpu.size(); ++i) {
     RETURN_IF_ERROR(dst[i].ToDescriptor(dst_cpu[i], device_.device()));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace metal

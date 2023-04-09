@@ -27,7 +27,7 @@ namespace {
 class BitcastDtypesExpanderTest : public HloTestBase {};
 
 TEST_F(BitcastDtypesExpanderTest, S32toS8) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule bitcast_to_smaller
 
 ENTRY main {
@@ -70,7 +70,7 @@ ENTRY main {
 }
 
 TEST_F(BitcastDtypesExpanderTest, S8toS32) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule bitcast_to_larger
 
 ENTRY main {
@@ -110,7 +110,7 @@ ENTRY main {
 }
 
 TEST_F(BitcastDtypesExpanderTest, RewriteInsideWhileTest) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 body {

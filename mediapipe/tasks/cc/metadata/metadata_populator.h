@@ -49,7 +49,7 @@ class ModelMetadataPopulator {
   //
   // [1]:
   // mediapipe/tasks/cc/core/external_file_handler.h
-  static absl::StatusOr<std::unique_ptr<ModelMetadataPopulator>>
+  static abslx::StatusOr<std::unique_ptr<ModelMetadataPopulator>>
   CreateFromModelBuffer(const char* buffer_data, size_t buffer_size);
 
   // Writes the TFLite ModelMetadata provided as a buffer into the TFLite
@@ -68,24 +68,24 @@ class ModelMetadataPopulator {
   // Calling this method multiple time removes any associated files from
   // previous calls, so this method should usually be called only once.
   void LoadAssociatedFiles(
-      const absl::flat_hash_map<std::string, std::string>& associated_files);
+      const abslx::flat_hash_map<std::string, std::string>& associated_files);
 
   // Finalizes metadata population. Returns the TFLite FlatBuffer model with
   // metadata and associated files as a string buffer.
-  absl::StatusOr<std::string> Populate();
+  abslx::StatusOr<std::string> Populate();
 
  private:
   // Private constructor.
   explicit ModelMetadataPopulator(const tflite::Model& model);
   // Zips and appends associated files to the provided model buffer. Called
   // internally by `Populate()`.
-  absl::StatusOr<std::string> AppendAssociatedFiles(
+  abslx::StatusOr<std::string> AppendAssociatedFiles(
       const char* model_buffer_data, size_t model_buffer_size);
 
   // The unpacked model FlatBuffer.
   tflite::ModelT model_t_;
   // The associated files.
-  absl::flat_hash_map<std::string, std::string> associated_files_;
+  abslx::flat_hash_map<std::string, std::string> associated_files_;
 };
 
 }  // namespace metadata

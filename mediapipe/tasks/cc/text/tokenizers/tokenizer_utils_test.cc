@@ -110,14 +110,14 @@ TEST(TokenizerUtilsTest, TestCreateRegexTokenizer) {
 }
 
 TEST(TokenizerUtilsTest, TestCreateFailure) {
-  absl::StatusOr<std::unique_ptr<Tokenizer>> tokenizer_status =
+  abslx::StatusOr<std::unique_ptr<Tokenizer>> tokenizer_status =
       CreateTokenizerFromProcessUnit(nullptr, nullptr);
 
   EXPECT_THAT(tokenizer_status,
-              StatusIs(absl::StatusCode::kInvalidArgument,
+              StatusIs(abslx::StatusCode::kInvalidArgument,
                        HasSubstr("No metadata or input process unit found.")));
   EXPECT_THAT(tokenizer_status.status().GetPayload(kMediaPipeTasksPayload),
-              testing::Optional(absl::Cord(absl::StrCat(
+              testing::Optional(abslx::Cord(abslx::StrCat(
                   MediaPipeTasksStatus::kMetadataInvalidTokenizerError))));
 }
 

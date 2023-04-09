@@ -62,22 +62,22 @@ bool LogWarningIfTimestampIsInconsistent(const Timestamp& current_timestamp,
   }
 }
 
-absl::Status IsTimeSeriesHeaderValid(const TimeSeriesHeader& header) {
+abslx::Status IsTimeSeriesHeaderValid(const TimeSeriesHeader& header) {
   if (header.has_sample_rate() && header.sample_rate() >= 0 &&
       header.has_num_channels() && header.num_channels() >= 0) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   } else {
     std::string error_message =
         "TimeSeriesHeader is missing necessary fields: "
         "sample_rate or num_channels, or one of their values is negative. ";
 #ifndef MEDIAPIPE_MOBILE
-    absl::StrAppend(&error_message, "Got header:\n", header.ShortDebugString());
+    abslx::StrAppend(&error_message, "Got header:\n", header.ShortDebugString());
 #endif
     return tool::StatusInvalid(error_message);
   }
 }
 
-absl::Status FillTimeSeriesHeaderIfValid(const Packet& header_packet,
+abslx::Status FillTimeSeriesHeaderIfValid(const Packet& header_packet,
                                          TimeSeriesHeader* header) {
   CHECK(header);
   if (header_packet.IsEmpty()) {
@@ -90,7 +90,7 @@ absl::Status FillTimeSeriesHeaderIfValid(const Packet& header_packet,
   return IsTimeSeriesHeaderValid(*header);
 }
 
-absl::Status FillMultiStreamTimeSeriesHeaderIfValid(
+abslx::Status FillMultiStreamTimeSeriesHeaderIfValid(
     const Packet& header_packet, MultiStreamTimeSeriesHeader* header) {
   CHECK(header);
   if (header_packet.IsEmpty()) {
@@ -107,19 +107,19 @@ absl::Status FillMultiStreamTimeSeriesHeaderIfValid(
   return IsTimeSeriesHeaderValid(header->time_series_header());
 }
 
-absl::Status IsMatrixShapeConsistentWithHeader(const Matrix& matrix,
+abslx::Status IsMatrixShapeConsistentWithHeader(const Matrix& matrix,
                                                const TimeSeriesHeader& header) {
   if (header.has_num_samples() && matrix.cols() != header.num_samples()) {
-    return tool::StatusInvalid(absl::StrCat(
+    return tool::StatusInvalid(abslx::StrCat(
         "Matrix size is inconsistent with header.  Expected ",
         header.num_samples(), " columns, but found ", matrix.cols()));
   }
   if (header.has_num_channels() && matrix.rows() != header.num_channels()) {
-    return tool::StatusInvalid(absl::StrCat(
+    return tool::StatusInvalid(abslx::StrCat(
         "Matrix size is inconsistent with header.  Expected ",
         header.num_channels(), " rows, but found ", matrix.rows()));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 int64 SecondsToSamples(double time_in_seconds, double sample_rate) {

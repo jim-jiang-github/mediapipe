@@ -159,7 +159,7 @@ Status ShuffleAndRepeatFusion::OptimizeAndCollectStats(
     OptimizationStats* stats) {
   *output = item.graph;
   MutableGraphView graph(output);
-  absl::flat_hash_set<string> nodes_to_delete;
+  abslx::flat_hash_set<string> nodes_to_delete;
 
   for (const NodeDef& repeat_node : item.graph.node()) {
     if (repeat_node.op() != kRepeatDataset) {

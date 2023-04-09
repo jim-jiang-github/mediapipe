@@ -40,7 +40,7 @@ class AnnotatedTraceMe {
     if (TF_PREDICT_FALSE(annotation_enabled || traceme_enabled)) {
       string name = std::forward<NameGeneratorT>(name_generator)();
       if (annotation_enabled) {
-        scoped_annotation_.emplace(absl::string_view(name));
+        scoped_annotation_.emplace(abslx::string_view(name));
       }
       if (TF_PREDICT_TRUE(traceme_enabled)) {
         trace_me_.emplace([&name] { return std::move(name); }, level);
@@ -49,8 +49,8 @@ class AnnotatedTraceMe {
   }
 
  private:
-  absl::optional<TraceMe> trace_me_;
-  absl::optional<ScopedAnnotation> scoped_annotation_;
+  abslx::optional<TraceMe> trace_me_;
+  abslx::optional<ScopedAnnotation> scoped_annotation_;
 };
 
 }  // namespace profiler

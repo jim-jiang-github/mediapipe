@@ -252,8 +252,8 @@ NcclManager* NcclManager::instance() {
 #if TENSORFLOW_USE_ROCM
   // singleton does not count against total instances
   // see comment above in Collective constructor concerning ROCm platform
-  static absl::once_flag once;
-  absl::call_once(once, [] { --NcclManager::instance_count; });
+  static abslx::once_flag once;
+  abslx::call_once(once, [] { --NcclManager::instance_count; });
 #endif
   return instance;
 }
@@ -850,7 +850,7 @@ void NcclManager::LoopKernelLaunches(NcclStream* nccl_stream) {
 }
 
 void NcclManager::StartAbort(const Status& s) {
-  absl::flat_hash_map<string, Collective*> collectives;
+  abslx::flat_hash_map<string, Collective*> collectives;
   std::vector<std::unique_ptr<Communicator>> communicators;
   {
     mutex_lock l(mu_);

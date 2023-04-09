@@ -111,7 +111,7 @@ class TpuCompilationCacheInterface : public ResourceBase {
       std::vector<std::string>* proto_key,
       std::vector<std::string>* sharding_key,
       std::vector<bool>* may_modify_variables,
-      absl::Span<const xla::HloProto* const>* hlo_metadatas,
+      abslx::Span<const xla::HloProto* const>* hlo_metadatas,
       const std::function<Status(TpuProgramGroupInterface*)>& compile_function);
 
   // Differences between MarkEntryForEviction and Release:
@@ -166,7 +166,7 @@ class TpuCompilationCacheInterface : public ResourceBase {
     if (!key.has_guaranteed_const) {
       return key.prefix;
     }
-    return absl::StrCat(key.prefix, "|", key.session_handle, "|",
+    return abslx::StrCat(key.prefix, "|", key.session_handle, "|",
                         key.guaranteed_const_fingerprint());
   }
 
@@ -201,7 +201,7 @@ class TpuCompilationCacheInterface : public ResourceBase {
       std::vector<std::string>* sharding_key,
       std::vector<bool>* may_modify_variables,
       std::vector<CompiledSubgraph*>* removed_entries,
-      absl::Span<const xla::HloProto* const>* hlo_metadatas,
+      abslx::Span<const xla::HloProto* const>* hlo_metadatas,
       const std::function<Status(TpuProgramGroupInterface*)>& compile_function);
 
   // This is called by the cache when entry is marked for eviction; by
@@ -278,7 +278,7 @@ class TpuCompilationCacheInterface : public ResourceBase {
   const int64_t max_cache_size_;
   // Mutex to protect access to shared resources under multi-threading
   // environment.
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   // The total size of entries that are stored and not marked for eviction.
   int64_t cache_size_ ABSL_GUARDED_BY(mu_) = 0;
   // The total size of entries that are marked for eviction.
@@ -290,10 +290,10 @@ class TpuCompilationCacheInterface : public ResourceBase {
   // cache_ key matching a given subgraph key. When doing a lookup, check
   // session_key_map_ first to avoid unnecessay fingerprint computation.
   // Map from key prefix + session_handle to a cache_ key.
-  absl::node_hash_map<std::string, std::string> session_key_map_
+  abslx::node_hash_map<std::string, std::string> session_key_map_
       ABSL_GUARDED_BY(mu_);
   // Map from key prefix + fingerprint to a cache_ key.
-  absl::node_hash_map<std::string, std::string> fingerprint_key_map_
+  abslx::node_hash_map<std::string, std::string> fingerprint_key_map_
       ABSL_GUARDED_BY(mu_);
   // All the subgraph entries that can be looked up in the cache. An entry is
   // marked for eviction iff it is present in cache_ and not in
@@ -302,7 +302,7 @@ class TpuCompilationCacheInterface : public ResourceBase {
       ABSL_GUARDED_BY(mu_);
   // All the subgraph entries that can be looked up in the cache, indexed by
   // uid.
-  absl::node_hash_map<int64_t, CompiledSubgraph*> entries_by_uid_
+  abslx::node_hash_map<int64_t, CompiledSubgraph*> entries_by_uid_
       ABSL_GUARDED_BY(mu_);
   // All the protos that can be looked up in the cache, indexed by proto
   // key. The value of the map is a subgraph and the index of the proto compiled

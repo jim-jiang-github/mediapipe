@@ -33,7 +33,7 @@ namespace tensorflow {
 namespace ops {
 namespace {
 
-constexpr absl::string_view kEllipsis = "...";
+constexpr abslx::string_view kEllipsis = "...";
 
 // Returns the axis (possibly negative) corresponding to a label.
 //
@@ -42,26 +42,26 @@ constexpr absl::string_view kEllipsis = "...";
 // ellipsis. E.g. index of `b` in `ab...cd`, is `1`, but that of `c` is `-2`.
 //
 // For multiple occurrences, returns the leftmost one. If not found, returns
-// absl::nullopt.
+// abslx::nullopt.
 //
 // Parameters:
 //   subscripts: A string denoting the einsum subscript (e.g. `ab...cd`)
 //   label: The single character axis label.
-absl::optional<int> EinsumGetAxisFromLabel(absl::string_view subscripts,
+abslx::optional<int> EinsumGetAxisFromLabel(abslx::string_view subscripts,
                                            char label) {
-  std::vector<absl::string_view> splits = absl::StrSplit(subscripts, kEllipsis);
+  std::vector<abslx::string_view> splits = abslx::StrSplit(subscripts, kEllipsis);
   auto index = splits[0].find(label);
   if (index != splits[0].npos) {
     return index;
   }
   if (splits.size() < 2) {
-    return absl::nullopt;
+    return abslx::nullopt;
   }
   index = splits[1].find(label);
   if (index != splits[1].npos) {
     return index - splits[1].length();
   }
-  return absl::nullopt;
+  return abslx::nullopt;
 }
 
 // Returns a tuple denoting the slice mapping to ellipsis.
@@ -77,18 +77,18 @@ absl::optional<int> EinsumGetAxisFromLabel(absl::string_view subscripts,
 //   subscripts: A string denoting the einsum subscript.
 //   start: Output for the start index
 //   end: Output for the end index (or nullopt to go to the end).
-std::tuple<int, absl::optional<int>> EinsumGetBcastSubshape(
-    absl::string_view subscripts) {
+std::tuple<int, abslx::optional<int>> EinsumGetBcastSubshape(
+    abslx::string_view subscripts) {
   int start = subscripts.find(kEllipsis);
   if (start == subscripts.npos) {
     return std::make_tuple(0, 0);
   }
   int remaining = subscripts.length() - (start + kEllipsis.length());
-  absl::optional<int> end;
+  abslx::optional<int> end;
   if (remaining > 0) {
     end = -remaining;
   } else {
-    end = absl::nullopt;
+    end = abslx::nullopt;
   }
   return std::make_tuple(start, end);
 }
@@ -99,7 +99,7 @@ std::tuple<int, absl::optional<int>> EinsumGetBcastSubshape(
 // This attempts to give the same result as tenspr[start:end] would give in
 // Python.
 Output Slice1dHelper(const Scope& scope, Output tensor, int start,
-                     absl::optional<int> end) {
+                     abslx::optional<int> end) {
   if (end.has_value() && *end > 0) {
     return Slice(scope, tensor, Const(scope, start, TensorShape({1})),
                  Const(scope, *end - start, TensorShape({1})));
@@ -133,8 +133,8 @@ Output Slice1dHelper(const Scope& scope, Output tensor, int start,
 //     in `reduced_subs`. If there are multiple occurrences in `subscripts`,
 //     we consider only the leftmost one.
 std::tuple<std::string, Output, Output> EinsumGetReducedSubscripts(
-    const Scope& scope, const absl::btree_set<char>& reduced_label_set,
-    Output input_shape, absl::string_view subscripts) {
+    const Scope& scope, const abslx::btree_set<char>& reduced_label_set,
+    Output input_shape, abslx::string_view subscripts) {
   // Concatenate the sequence of reduced axis labels.
   const std::string reduced_subs =
       std::string(reduced_label_set.begin(), reduced_label_set.end());
@@ -147,7 +147,7 @@ std::tuple<std::string, Output, Output> EinsumGetReducedSubscripts(
     if (!axis.has_value()) {
       // Should never happen.
       scope.UpdateStatus(errors::Internal(
-          absl::StrCat("Missing axis", absl::string_view(&s, 1))));
+          abslx::StrCat("Missing axis", abslx::string_view(&s, 1))));
     } else {
       reduced_axes.push_back(*axis);
     }
@@ -182,10 +182,10 @@ std::tuple<std::string, Output, Output> EinsumGetReducedSubscripts(
 //  reduced_label_set: The set of axis labels appearing in `input_subs` but
 //    not in `output_subs`.
 Output EinsumGradReducedHelper(const Scope& scope, const Output& output_grad,
-                               absl::string_view output_subs,
-                               absl::string_view input_subs,
+                               abslx::string_view output_subs,
+                               abslx::string_view input_subs,
                                const Output& input_shape,
-                               const absl::btree_set<char>& reduced_label_set) {
+                               const abslx::btree_set<char>& reduced_label_set) {
   // Let's say the einsum operation was "aabbcd->ca", where axis labels 'b' and
   // 'd' are reduced with input_shape [2,2,5,5,3,4]. Then obtain the reduced
   // subscripts "bd", corresponding dimensions [5,4] and axes [2,5].
@@ -197,9 +197,9 @@ Output EinsumGradReducedHelper(const Scope& scope, const Output& output_grad,
   // Whether either the input or the output subscripts have a repeated label.
   // This is true for "aabbcd->ca" or "abd->cca" but false for "abcd->ca".
   const int distinct_input_labels =
-      absl::flat_hash_set<char>(input_subs.begin(), input_subs.end()).size();
+      abslx::flat_hash_set<char>(input_subs.begin(), input_subs.end()).size();
   const int distinct_output_labels =
-      absl::flat_hash_set<char>(output_subs.begin(), output_subs.end()).size();
+      abslx::flat_hash_set<char>(output_subs.begin(), output_subs.end()).size();
   const bool has_repeated_labels =
       (distinct_input_labels + distinct_output_labels) <
       input_subs.length() + output_subs.length();
@@ -207,7 +207,7 @@ Output EinsumGradReducedHelper(const Scope& scope, const Output& output_grad,
   // for the equation "aabbcd->ca".
   std::string input_subs_without_reduced_labels;
   for (const char s : input_subs) {
-    if (!absl::c_linear_search(reduced_label_set, s)) {
+    if (!abslx::c_linear_search(reduced_label_set, s)) {
       input_subs_without_reduced_labels.push_back(s);
     }
   }
@@ -262,7 +262,7 @@ Output EinsumGradReducedHelper(const Scope& scope, const Output& output_grad,
   // "bdca->aabbcd") since the output axis labels now appear in the
   // input subscripts.
   return Einsum(scope, {broadcasted_grad},
-                absl::StrCat(reduced_subs, output_subs, "->", input_subs));
+                abslx::StrCat(reduced_subs, output_subs, "->", input_subs));
 }
 
 // Returns the gradient wrt an input operand for a binary einsum.
@@ -280,8 +280,8 @@ Output EinsumGradReducedHelper(const Scope& scope, const Output& output_grad,
 //   output_subs: The output subscripts.
 Output EinsumGradWrt(const Scope& scope, Output output_grad,
                      Output other_operand, Output input_shape,
-                     absl::string_view input_subs, absl::string_view other_subs,
-                     absl::string_view output_subs) {
+                     abslx::string_view input_subs, abslx::string_view other_subs,
+                     abslx::string_view output_subs) {
   // Claim: For the einsum operation z = einsum("{eq_x},{eq_y}->{eq_z}", x, y),
   //   where the equation involves only Tensor contractions, generalized traces
   //   and transposes, the input gradients are given by the vector-jacobian
@@ -320,7 +320,7 @@ Output EinsumGradWrt(const Scope& scope, Output output_grad,
   // Compute the set of input axis labels which doesn't appear in either the
   // output subscripts or the other operand's subscript. E.g. the set {'b'} for
   // the equation "abc,cd->ad".
-  absl::btree_set<char> reduced_label_set(input_subs.begin(), input_subs.end());
+  abslx::btree_set<char> reduced_label_set(input_subs.begin(), input_subs.end());
   for (const char x : output_subs) {
     reduced_label_set.erase(x);
   }
@@ -342,7 +342,7 @@ Output EinsumGradWrt(const Scope& scope, Output output_grad,
   // "abc->ac". So, now we have the VJP of the operation "ac,cd->ad".
   Output grad_reduced =
       Einsum(scope, {output_grad, other_operand},
-             absl::StrCat(output_subs, ",", other_subs, "->", left_subs));
+             abslx::StrCat(output_subs, ",", other_subs, "->", left_subs));
 
   // If the reduced_label_set is empty, then we already have the gradient
   // wrt the input.
@@ -366,14 +366,14 @@ Status EinsumGrad(const Scope& scope, const Operation& op,
 
   std::string equation;
   TF_RETURN_IF_ERROR(GetNodeAttr(op.node()->attrs(), "equation", &equation));
-  std::vector<absl::string_view> equation_split =
-      absl::StrSplit(equation, "->");
+  std::vector<abslx::string_view> equation_split =
+      abslx::StrSplit(equation, "->");
   if (equation_split.size() != 2) {
     return errors::InvalidArgument("Equation must contain a single ->");
   }
 
-  const absl::string_view input_subs = equation_split[0];
-  const absl::string_view output_subs = equation_split[1];
+  const abslx::string_view input_subs = equation_split[0];
+  const abslx::string_view output_subs = equation_split[1];
   if (op.num_inputs() == 1) {
     // For the unary einsum z = einsum("{eq_x}->{eq_z}", x), the gradient wrt
     // the input (VJP) is given by the reversed equation:
@@ -383,7 +383,7 @@ Status EinsumGrad(const Scope& scope, const Operation& op,
     // the output subscripts.
     auto input_shape = Shape(scope, op.input(0));
     // Find the axis labels which appear only in the input.
-    absl::btree_set<char> reduced_label_set(input_subs.begin(),
+    abslx::btree_set<char> reduced_label_set(input_subs.begin(),
                                             input_subs.end());
     for (const char x : output_subs) {
       reduced_label_set.erase(x);
@@ -391,7 +391,7 @@ Status EinsumGrad(const Scope& scope, const Operation& op,
     reduced_label_set.erase('.');
     if (reduced_label_set.empty()) {
       grad_outputs->push_back(Einsum(
-          scope, grad_inputs, absl::StrCat(output_subs, "->", input_subs)));
+          scope, grad_inputs, abslx::StrCat(output_subs, "->", input_subs)));
       return scope.status();
     }
     // We do have reduced axes, so we invoke the subroutine for reduced unary
@@ -401,7 +401,7 @@ Status EinsumGrad(const Scope& scope, const Operation& op,
     return scope.status();
   }
 
-  std::vector<absl::string_view> subs = absl::StrSplit(input_subs, ',');
+  std::vector<abslx::string_view> subs = abslx::StrSplit(input_subs, ',');
   if (subs.size() != 2) {
     return errors::InvalidArgument("Only 2 inputs are supported");
   }
@@ -411,12 +411,12 @@ Status EinsumGrad(const Scope& scope, const Operation& op,
   // This is because the equation "...ij,jk->ik" may be valid if the 0th input's
   // batch shape is empty, but the VJP equation "jk,ik->...ij" is not valid
   // because only the output subscripts contain ellipsis.
-  if (absl::StrContains(output_subs, kEllipsis)) {
-    if (!absl::StrContains(x_subs, kEllipsis)) {
-      absl::StrAppend(&x_subs, kEllipsis);
+  if (abslx::StrContains(output_subs, kEllipsis)) {
+    if (!abslx::StrContains(x_subs, kEllipsis)) {
+      abslx::StrAppend(&x_subs, kEllipsis);
     }
-    if (!absl::StrContains(y_subs, kEllipsis)) {
-      absl::StrAppend(&y_subs, kEllipsis);
+    if (!abslx::StrContains(y_subs, kEllipsis)) {
+      abslx::StrAppend(&y_subs, kEllipsis);
     }
   }
 
@@ -436,7 +436,7 @@ Status EinsumGrad(const Scope& scope, const Operation& op,
   Output grad_y =
       EinsumGradWrt(scope, grad, x, y_shape, y_subs, x_subs, output_subs);
 
-  if (!absl::StrContains(output_subs, kEllipsis)) {
+  if (!abslx::StrContains(output_subs, kEllipsis)) {
     // If no ellipsis in the output; then no need to unbroadcast.
     grad_outputs->push_back(grad_x);
     grad_outputs->push_back(grad_y);
@@ -450,7 +450,7 @@ Status EinsumGrad(const Scope& scope, const Operation& op,
   // 'ab...c' and shape of rank 10; the range [3:-1] denotes the broadcasted
   // axes.
   int bx_start, by_start;
-  absl::optional<int> bx_end, by_end;
+  abslx::optional<int> bx_end, by_end;
   std::tie(bx_start, bx_end) = EinsumGetBcastSubshape(x_subs);
   std::tie(by_start, by_end) = EinsumGetBcastSubshape(y_subs);
 

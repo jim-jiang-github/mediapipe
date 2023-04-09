@@ -31,7 +31,7 @@ class ConverterToConvWeights : public GPUOperation {
   ConverterToConvWeights(const OperationDef& definition,
                          const WeightsDescription& weights_desc,
                          Layout input_layout);
-  absl::Status BindArguments(ArgumentsBinder* args) override;
+  abslx::Status BindArguments(ArgumentsBinder* args) override;
   int3 GetGridSize() const override;
 
   // Move only

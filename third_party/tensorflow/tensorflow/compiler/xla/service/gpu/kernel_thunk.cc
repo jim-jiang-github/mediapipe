@@ -34,7 +34,7 @@ namespace xla {
 namespace gpu {
 
 KernelThunk::KernelThunk(ThunkInfo thunk_info,
-                         absl::Span<const BufferAllocation* const> args,
+                         abslx::Span<const BufferAllocation* const> args,
                          const std::string& kernel_name,
                          const LaunchDimensions& launch_dimensions)
     : Thunk(Kind::kKernel, thunk_info),
@@ -43,13 +43,13 @@ KernelThunk::KernelThunk(ThunkInfo thunk_info,
       launch_dimensions_(launch_dimensions) {}
 
 std::string KernelThunk::ToStringExtra(int indent) const {
-  return absl::StrFormat(", kernel = %s, launch dimensions = %s", kernel_name_,
+  return abslx::StrFormat(", kernel = %s, launch dimensions = %s", kernel_name_,
                          launch_dimensions_.ToString());
 }
 
 Status KernelThunk::Initialize(const GpuExecutable& executable,
                                se::StreamExecutor* executor) {
-  absl::MutexLock lock(&mutex_);
+  abslx::MutexLock lock(&mutex_);
 
   // Load the kernel into the device if necessary.
   //
@@ -70,7 +70,7 @@ Status KernelThunk::Initialize(const GpuExecutable& executable,
 }
 
 static void PrintBufferContents(
-    se::Stream* stream, absl::Span<const se::DeviceMemoryBase> buffer_args) {
+    se::Stream* stream, abslx::Span<const se::DeviceMemoryBase> buffer_args) {
   int input_idx = 0;
   for (const se::DeviceMemoryBase& buf : buffer_args) {
     auto host_buffer = std::make_unique<char[]>(buf.size());
@@ -79,7 +79,7 @@ static void PrintBufferContents(
 
     std::string buffer_contents;
     for (int i = 0; i < buf.size(); i++) {
-      absl::StrAppendFormat(&buffer_contents, "%x ",
+      abslx::StrAppendFormat(&buffer_contents, "%x ",
                             static_cast<unsigned>(host_buffer[i]));
     }
     VLOG(100) << "BUF(" << input_idx++ << ") = " << buffer_contents;
@@ -93,7 +93,7 @@ Status KernelThunk::ExecuteOnStream(const ExecuteParams& params) {
   const se::KernelBase* kernel = nullptr;
 
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     auto it = kernel_cache_.find(executor);
     CHECK(it != kernel_cache_.end())
         << "Initialize() not called for StreamExecutor " << executor;
@@ -102,7 +102,7 @@ Status KernelThunk::ExecuteOnStream(const ExecuteParams& params) {
   }
 
   VLOG(3) << "Launching " << kernel->name();
-  absl::InlinedVector<se::DeviceMemoryBase, 4> buffer_args;
+  abslx::InlinedVector<se::DeviceMemoryBase, 4> buffer_args;
   for (const BufferAllocation* arg : args_) {
     se::DeviceMemoryBase buf =
         params.buffer_allocations->GetDeviceAddress(arg->index());

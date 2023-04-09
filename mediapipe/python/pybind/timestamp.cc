@@ -83,7 +83,7 @@ void TimestampSubmodule(pybind11::module* module) {
       .def("__ge__",
            [](const Timestamp& a, const Timestamp& b) { return a >= b; })
       .def("__repr__", [](const Timestamp& self) {
-        return absl::StrCat("<mediapipe.Timestamp with value: ",
+        return abslx::StrCat("<mediapipe.Timestamp with value: ",
                             TimestampValueString(self), ">");
       });
 

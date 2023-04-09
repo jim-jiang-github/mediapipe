@@ -61,9 +61,9 @@ class EglContext {
 
   // Make this EglContext the current EGL context on this thread, replacing
   // the existing current.
-  absl::Status MakeCurrent(EGLSurface read, EGLSurface write);
+  abslx::Status MakeCurrent(EGLSurface read, EGLSurface write);
 
-  absl::Status MakeCurrentSurfaceless() {
+  abslx::Status MakeCurrentSurfaceless() {
     return MakeCurrent(EGL_NO_SURFACE, EGL_NO_SURFACE);
   }
 
@@ -86,15 +86,15 @@ class EglContext {
 
 // It uses the EGL_KHR_no_config_context extension to create a no config context
 // since most modern hardware supports the extension.
-absl::Status CreateConfiglessContext(EGLDisplay display,
+abslx::Status CreateConfiglessContext(EGLDisplay display,
                                      EGLContext shared_context,
                                      EglContext* egl_context);
 
-absl::Status CreateSurfacelessContext(EGLDisplay display,
+abslx::Status CreateSurfacelessContext(EGLDisplay display,
                                       EGLContext shared_context,
                                       EglContext* egl_context);
 
-absl::Status CreatePBufferContext(EGLDisplay display, EGLContext shared_context,
+abslx::Status CreatePBufferContext(EGLDisplay display, EGLContext shared_context,
                                   EglContext* egl_context);
 
 }  // namespace gl

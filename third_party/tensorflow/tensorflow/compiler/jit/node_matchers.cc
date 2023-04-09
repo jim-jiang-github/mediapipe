@@ -35,12 +35,12 @@ namespace {
 using impl::NodeMatcherProperties;
 using impl::OutEdge;
 
-string IndentAllButFirstLine(absl::string_view text) {
-  std::vector<std::string> lines = absl::StrSplit(text, '\n');
+string IndentAllButFirstLine(abslx::string_view text) {
+  std::vector<std::string> lines = abslx::StrSplit(text, '\n');
   for (int i = 1; i < lines.size(); i++) {
     lines[i].insert(0, "  ");
   }
-  return absl::StrJoin(lines, "\n");
+  return abslx::StrJoin(lines, "\n");
 }
 
 template <typename T>
@@ -190,7 +190,7 @@ struct NodeMatcher : public ::testing::MatcherInterface<const Node*> {
       if (listener->IsInterested()) {
         string explanation = inner_listener.str();
         if (!explanation.empty()) {
-          explanation = absl::StrCat(", ", explanation, ",");
+          explanation = abslx::StrCat(", ", explanation, ",");
         }
         *listener << "ctrl_deps" << explanation << " does not match expected: ";
         control_dep_set->DescribeTo(listener->stream());
@@ -228,20 +228,20 @@ struct NodeMatcher : public ::testing::MatcherInterface<const Node*> {
     std::vector<string> predicates;
 
     if (name) {
-      predicates.push_back(absl::StrCat("name: ", *name));
+      predicates.push_back(abslx::StrCat("name: ", *name));
     }
 
     if (op) {
-      predicates.push_back(absl::StrCat("op: ", *op));
+      predicates.push_back(abslx::StrCat("op: ", *op));
     }
 
     if (assigned_device) {
-      predicates.push_back(absl::StrCat("assigned device: ", *assigned_device));
+      predicates.push_back(abslx::StrCat("assigned device: ", *assigned_device));
     }
 
     bool printed_something = !predicates.empty();
 
-    *os << absl::StrJoin(predicates, ", ");
+    *os << abslx::StrJoin(predicates, ", ");
 
     if (constant_value) {
       printed_something = true;
@@ -283,15 +283,15 @@ struct NodeMatcher : public ::testing::MatcherInterface<const Node*> {
     if (!attrs.empty()) {
       printed_something = true;
       std::vector<string> attrs_str;
-      absl::c_transform(
+      abslx::c_transform(
           attrs, std::back_inserter(attrs_str),
           [](const std::pair<string, std::optional<AttrValue>>& attr_kv_pair) {
-            return absl::StrCat(attr_kv_pair.first, "->",
+            return abslx::StrCat(attr_kv_pair.first, "->",
                                 attr_kv_pair.second
                                     ? SummarizeAttrValue(*attr_kv_pair.second)
                                     : "*");
           });
-      *os << " and attr values matching [" << absl::StrJoin(attrs_str, ", ")
+      *os << " and attr values matching [" << abslx::StrJoin(attrs_str, ", ")
           << "]";
     }
 
@@ -332,7 +332,7 @@ struct NodeMatcher : public ::testing::MatcherInterface<const Node*> {
   std::optional<string> assigned_device;
   std::optional<Tensor> constant_value;
   std::optional<std::vector<::testing::Matcher<OutEdge>>> input_matchers;
-  std::optional<::testing::Matcher<absl::Span<const Node* const>>>
+  std::optional<::testing::Matcher<abslx::Span<const Node* const>>>
       control_dep_set;
   std::map<string, std::optional<AttrValue>> attrs;
 };
@@ -389,7 +389,7 @@ class OutEdgeMatcher : public ::testing::MatcherInterface<OutEdge> {
 }  // namespace
 
 ::testing::Matcher<const Node*> impl::NodeWith(
-    absl::Span<const NodeMatcherProperties> props) {
+    abslx::Span<const NodeMatcherProperties> props) {
   NodeMatcher* matcher = new NodeMatcher();
   for (const NodeMatcherProperties& prop : props) {
     if (prop.name()) {
@@ -453,9 +453,9 @@ impl::NodeMatcherProperties AssignedDevice(string assigned_device) {
 }
 
 impl::NodeMatcherProperties impl::Inputs(
-    absl::Span<const ::testing::Matcher<OutEdge>> inputs) {
+    abslx::Span<const ::testing::Matcher<OutEdge>> inputs) {
   std::vector<::testing::Matcher<OutEdge>> inputs_vector;
-  absl::c_copy(inputs, std::back_inserter(inputs_vector));
+  abslx::c_copy(inputs, std::back_inserter(inputs_vector));
 
   impl::NodeMatcherProperties props;
   props.set_inputs(std::move(inputs_vector));
@@ -463,9 +463,9 @@ impl::NodeMatcherProperties impl::Inputs(
 }
 
 impl::NodeMatcherProperties impl::CtrlDeps(
-    absl::Span<const ::testing::Matcher<const Node*>> control_deps) {
+    abslx::Span<const ::testing::Matcher<const Node*>> control_deps) {
   std::vector<::testing::Matcher<const Node*>> control_deps_vector;
-  absl::c_copy(control_deps, std::back_inserter(control_deps_vector));
+  abslx::c_copy(control_deps, std::back_inserter(control_deps_vector));
 
   impl::NodeMatcherProperties props;
   props.set_control_deps(std::move(control_deps_vector));
@@ -480,7 +480,7 @@ std::pair<string, AttrValue> impl::AttrLiteralHelper(
 }
 
 std::pair<string, AttrValue> impl::AttrLiteralHelper(
-    const std::pair<string, absl::Span<const int>>& int_list_attr) {
+    const std::pair<string, abslx::Span<const int>>& int_list_attr) {
   AttrValue attr_value;
   AttrValue::ListValue* list = attr_value.mutable_list();
   for (int i : int_list_attr.second) {
@@ -490,7 +490,7 @@ std::pair<string, AttrValue> impl::AttrLiteralHelper(
 }
 
 std::pair<string, AttrValue> impl::AttrLiteralHelper(
-    const std::pair<string, absl::Span<const string>>& string_list_attr) {
+    const std::pair<string, abslx::Span<const string>>& string_list_attr) {
   AttrValue attr_value;
   AttrValue::ListValue* list = attr_value.mutable_list();
   for (const string& s : string_list_attr.second) {
@@ -529,7 +529,7 @@ NodeMatcherProperties ConstantValue(
 }
 }  // namespace matchers
 
-Node* FindNodeByName(Graph* g, absl::string_view name) {
+Node* FindNodeByName(Graph* g, abslx::string_view name) {
   for (Node* n : g->nodes()) {
     if (n->name() == name) {
       return n;

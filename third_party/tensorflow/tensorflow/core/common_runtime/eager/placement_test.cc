@@ -125,7 +125,7 @@ TEST_F(PlacementTest, SelectDeviceExplicitHardPlacement) {
   Status status = context()->SelectDevice(requested, invalid_op, &dev);
   LOG(ERROR) << status.ToString();
   EXPECT_TRUE(errors::IsNotFound(status));
-  EXPECT_TRUE(absl::StrContains(status.error_message(),
+  EXPECT_TRUE(abslx::StrContains(status.error_message(),
                                 "Could not find device for node"))
       << "unexpected error message " << status.error_message();
 
@@ -135,7 +135,7 @@ TEST_F(PlacementTest, SelectDeviceExplicitHardPlacement) {
   status = context()->SelectDevice(requested, node, &dev);
 
   EXPECT_TRUE(errors::IsInvalidArgument(status));
-  EXPECT_TRUE(absl::StrContains(status.error_message(),
+  EXPECT_TRUE(abslx::StrContains(status.error_message(),
                                 "Could not satisfy device specification"))
       << "unexpected error message " << status.error_message();
 
@@ -166,7 +166,7 @@ TEST_F(PlacementTest, SelectDeviceExplicitSoftPlacement) {
   Status status = context()->SelectDevice(requested, invalid_op, &dev);
   LOG(ERROR) << status.ToString();
   EXPECT_TRUE(errors::IsNotFound(status));
-  EXPECT_TRUE(absl::StrContains(status.error_message(),
+  EXPECT_TRUE(abslx::StrContains(status.error_message(),
                                 "Could not find device for node"))
       << "unexpected error message " << status.error_message();
 

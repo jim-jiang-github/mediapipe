@@ -31,7 +31,7 @@ class HloDomainRemover::RunContext {
       : module_(module), remover_(remover) {}
 
   StatusOr<bool> Run(
-      const absl::flat_hash_set<absl::string_view>& execution_threads);
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads);
 
  private:
   // Verifies the consistency of the domain, and normalizes the instructions
@@ -59,7 +59,7 @@ Status HloDomainRemover::RunContext::VerifyAndNormalizeDomain(
 }
 
 StatusOr<bool> HloDomainRemover::RunContext::Run(
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   VLOG(4) << "Processing metadata domain: '" << remover_->kind_ << "'";
   int64_t removed_domains = 0;
   for (HloComputation* computation : module_->computations(execution_threads)) {
@@ -101,7 +101,7 @@ StatusOr<bool> HloDomainRemover::RunContext::Run(
 }
 
 StatusOr<int64_t> HloDomainRemover::RemoveExitDomains(
-    HloInstruction* instruction, absl::string_view domain_kind) {
+    HloInstruction* instruction, abslx::string_view domain_kind) {
   int64_t removed_domains = 0;
   HloComputation* computation = instruction->parent();
   // Make a const copy of instruction's users to loop through later, as the
@@ -122,7 +122,7 @@ StatusOr<int64_t> HloDomainRemover::RemoveExitDomains(
 
 StatusOr<bool> HloDomainRemover::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   RunContext run_context(module, this);
   return run_context.Run(execution_threads);
 }

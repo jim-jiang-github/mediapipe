@@ -31,9 +31,9 @@ constexpr char kOutputFrameAnnotationTag[] = "FRAME_ANNOTATION";
 // A calculator that converts NormalizedLandmarkList to FrameAnnotation proto.
 class LandmarksToFrameAnnotationCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   void AddLandmarksToFrameAnnotation(const NormalizedLandmarkList& landmarks,
@@ -41,7 +41,7 @@ class LandmarksToFrameAnnotationCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(LandmarksToFrameAnnotationCalculator);
 
-absl::Status LandmarksToFrameAnnotationCalculator::GetContract(
+abslx::Status LandmarksToFrameAnnotationCalculator::GetContract(
     CalculatorContract* cc) {
   RET_CHECK(!cc->Inputs().GetTags().empty());
   RET_CHECK(!cc->Outputs().GetTags().empty());
@@ -57,17 +57,17 @@ absl::Status LandmarksToFrameAnnotationCalculator::GetContract(
   if (cc->Outputs().HasTag(kOutputFrameAnnotationTag)) {
     cc->Outputs().Tag(kOutputFrameAnnotationTag).Set<FrameAnnotation>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LandmarksToFrameAnnotationCalculator::Open(CalculatorContext* cc) {
+abslx::Status LandmarksToFrameAnnotationCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LandmarksToFrameAnnotationCalculator::Process(
+abslx::Status LandmarksToFrameAnnotationCalculator::Process(
     CalculatorContext* cc) {
-  auto frame_annotation = absl::make_unique<FrameAnnotation>();
+  auto frame_annotation = abslx::make_unique<FrameAnnotation>();
 
   // Handle the case when input has only one NormalizedLandmarkList.
   if (cc->Inputs().HasTag(kInputLandmarksTag) &&
@@ -95,7 +95,7 @@ absl::Status LandmarksToFrameAnnotationCalculator::Process(
         .Tag(kOutputFrameAnnotationTag)
         .Add(frame_annotation.release(), cc->InputTimestamp());
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void LandmarksToFrameAnnotationCalculator::AddLandmarksToFrameAnnotation(

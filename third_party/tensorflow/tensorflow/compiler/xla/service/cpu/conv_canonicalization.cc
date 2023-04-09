@@ -31,7 +31,7 @@ namespace cpu {
 
 StatusOr<bool> ConvCanonicalization::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   for (HloInstruction* hlo :
        module->entry_computation()->MakeInstructionPostOrder()) {

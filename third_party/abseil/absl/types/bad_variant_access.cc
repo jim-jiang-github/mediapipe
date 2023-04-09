@@ -22,7 +22,7 @@
 #include "absl/base/config.h"
 #include "absl/base/internal/raw_logging.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 //////////////////////////
@@ -51,7 +51,7 @@ void Rethrow() {
   throw;
 #else
   ABSL_RAW_LOG(FATAL,
-               "Internal error in absl::variant implementation. Attempted to "
+               "Internal error in abslx::variant implementation. Attempted to "
                "rethrow an exception when building with exceptions disabled.");
   abort();  // TODO(calabrese) Remove once RAW_LOG FATAL is noreturn.
 #endif
@@ -59,6 +59,6 @@ void Rethrow() {
 
 }  // namespace variant_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_USES_STD_VARIANT

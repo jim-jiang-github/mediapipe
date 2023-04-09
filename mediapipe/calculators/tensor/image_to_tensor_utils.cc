@@ -25,7 +25,7 @@
 namespace mediapipe {
 
 RotatedRect GetRoi(int input_width, int input_height,
-                   absl::optional<mediapipe::NormalizedRect> norm_rect) {
+                   abslx::optional<mediapipe::NormalizedRect> norm_rect) {
   if (norm_rect) {
     return {/*center_x=*/norm_rect->x_center() * input_width,
             /*center_y =*/norm_rect->y_center() * input_height,
@@ -40,7 +40,7 @@ RotatedRect GetRoi(int input_width, int input_height,
           /*rotation =*/0};
 }
 
-absl::StatusOr<std::array<float, 4>> PadRoi(int input_tensor_width,
+abslx::StatusOr<std::array<float, 4>> PadRoi(int input_tensor_width,
                                             int input_tensor_height,
                                             bool keep_aspect_ratio,
                                             RotatedRect* roi) {
@@ -78,7 +78,7 @@ absl::StatusOr<std::array<float, 4>> PadRoi(int input_tensor_width,
                               horizontal_padding, vertical_padding};
 }
 
-absl::StatusOr<ValueTransformation> GetValueRangeTransformation(
+abslx::StatusOr<ValueTransformation> GetValueRangeTransformation(
     float from_range_min, float from_range_max, float to_range_min,
     float to_range_max) {
   RET_CHECK_LT(from_range_min, from_range_max)
@@ -264,7 +264,7 @@ int GetNumOutputChannels(const mediapipe::Image& image) {
   return 3;
 }
 
-absl::StatusOr<std::shared_ptr<const mediapipe::Image>> GetInputImage(
+abslx::StatusOr<std::shared_ptr<const mediapipe::Image>> GetInputImage(
     const api2::Packet<api2::OneOf<Image, mediapipe::ImageFrame>>&
         image_packet) {
   return image_packet.Visit(
@@ -279,7 +279,7 @@ absl::StatusOr<std::shared_ptr<const mediapipe::Image>> GetInputImage(
 }
 
 #if !MEDIAPIPE_DISABLE_GPU
-absl::StatusOr<std::shared_ptr<const mediapipe::Image>> GetInputImage(
+abslx::StatusOr<std::shared_ptr<const mediapipe::Image>> GetInputImage(
     const api2::Packet<mediapipe::GpuBuffer>& image_gpu_packet) {
   // A shallow copy is okay since the resulting 'image' object is local in
   // Process(), and thus never outlives 'input'.

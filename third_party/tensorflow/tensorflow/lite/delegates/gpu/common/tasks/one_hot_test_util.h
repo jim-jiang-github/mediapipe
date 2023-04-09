@@ -22,9 +22,9 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status OneHotTest(TestExecutionEnvironment* env);
+abslx::Status OneHotTest(TestExecutionEnvironment* env);
 
-absl::Status OneHotBatchTest(TestExecutionEnvironment* env);
+abslx::Status OneHotBatchTest(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

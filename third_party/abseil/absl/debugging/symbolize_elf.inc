@@ -77,7 +77,7 @@
 #include "absl/debugging/internal/vdso_support.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // Value of argv[0]. Used by MaybeInitializeObjFile().
@@ -88,7 +88,7 @@ void InitializeSymbolizer(const char *argv0) {
   // We need to make sure VDSOSupport::Init() is called before any setuid or
   // chroot calls, so InitializeSymbolizer() should be called very early in the
   // life of a program.
-  absl::debugging_internal::VDSOSupport::Init();
+  abslx::debugging_internal::VDSOSupport::Init();
 #endif
   if (argv0_value != nullptr) {
     free(argv0_value);
@@ -157,15 +157,15 @@ struct FileMappingHint {
 // Moreover, we are using only TryLock(), if the decorator list
 // is being modified (is busy), we skip all decorators, and possibly
 // loose some info. Sorry, that's the best we could do.
-ABSL_CONST_INIT absl::base_internal::SpinLock g_decorators_mu(
-    absl::kConstInit, absl::base_internal::SCHEDULE_KERNEL_ONLY);
+ABSL_CONST_INIT abslx::base_internal::SpinLock g_decorators_mu(
+    abslx::kConstInit, abslx::base_internal::SCHEDULE_KERNEL_ONLY);
 
 const int kMaxFileMappingHints = 8;
 int g_num_file_mapping_hints;
 FileMappingHint g_file_mapping_hints[kMaxFileMappingHints];
 // Protects g_file_mapping_hints.
-ABSL_CONST_INIT absl::base_internal::SpinLock g_file_mapping_mu(
-    absl::kConstInit, absl::base_internal::SCHEDULE_KERNEL_ONLY);
+ABSL_CONST_INIT abslx::base_internal::SpinLock g_file_mapping_mu(
+    abslx::kConstInit, abslx::base_internal::SCHEDULE_KERNEL_ONLY);
 
 // Async-signal-safe function to zero a buffer.
 // memset() is not guaranteed to be async-signal-safe.
@@ -511,7 +511,7 @@ static ABSL_ATTRIBUTE_NOINLINE bool GetSectionHeaderByType(
 const int kMaxSectionNameLen = 64;
 
 bool ForEachSection(int fd,
-                    const std::function<bool(absl::string_view name,
+                    const std::function<bool(abslx::string_view name,
                                              const ElfW(Shdr) &)> &callback) {
   ElfW(Ehdr) elf_header;
   if (!ReadFromOffsetExact(fd, &elf_header, sizeof(elf_header), 0)) {
@@ -543,7 +543,7 @@ bool ForEachSection(int fd,
       return false;
     }
 
-    absl::string_view name(header_name, strnlen(header_name, n_read));
+    abslx::string_view name(header_name, strnlen(header_name, n_read));
     if (!callback(name, out)) {
       break;
     }
@@ -1550,11 +1550,11 @@ bool Symbolize(const void *pc, char *out, int out_size) {
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 extern "C" bool AbslInternalGetFileMappingHint(const void **start,
                                                const void **end, uint64_t *offset,
                                                const char **filename) {
-  return absl::debugging_internal::GetFileMappingHint(start, end, offset,
+  return abslx::debugging_internal::GetFileMappingHint(start, end, offset,
                                                       filename);
 }

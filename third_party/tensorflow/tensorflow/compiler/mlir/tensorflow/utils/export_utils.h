@@ -59,7 +59,7 @@ StatusOr<std::unique_ptr<NodeDef>> GetOperationNodeDef(
 // specify any other attributes that should be ignored.
 Status ConvertAttributes(
     const llvm::ArrayRef<mlir::NamedAttribute> attrs,
-    const absl::flat_hash_set<absl::string_view>& attrs_to_ignore,
+    const abslx::flat_hash_set<abslx::string_view>& attrs_to_ignore,
     bool remove_ref_type, AttrValueMap* values);
 
 // Fill in the contents of TensorShapeProto for the given shape.
@@ -80,7 +80,7 @@ void SetTensorShapeProto(ShapeContainerT shape, TensorShapeProto* proto) {
 
 // Sets shape attribute with the given name. If the attribute already exists
 // with a different value, returns an error.
-Status SetShapeAttribute(absl::string_view name, mlir::ShapedType shape,
+Status SetShapeAttribute(abslx::string_view name, mlir::ShapedType shape,
                          AttrValueMap* values);
 
 // Returns true if the given instruction is an mlir::TF::LegacyCallOp or the

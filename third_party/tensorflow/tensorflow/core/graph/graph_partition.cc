@@ -84,11 +84,11 @@ struct RecvInfo {
   int64_t start_time;
 };
 
-typedef absl::flat_hash_map<DupRecvKey, RecvInfo> DupRecvTable;
+typedef abslx::flat_hash_map<DupRecvKey, RecvInfo> DupRecvTable;
 
 // A map used to store memory types for the inputs/outputs of every node.
 // The key is a pair of ints consisting of a node id and input/output index.
-// TODO(power): migrate back to std::pair when absl::Hash is fixed for MSVC.
+// TODO(power): migrate back to std::pair when abslx::Hash is fixed for MSVC.
 struct NodePort {
   int node_id;
   int index;
@@ -103,7 +103,7 @@ struct NodePort {
   }
 };
 
-typedef absl::flat_hash_map<NodePort, MemoryType> MemoryTypeMap;
+typedef abslx::flat_hash_map<NodePort, MemoryType> MemoryTypeMap;
 
 // We collect the following information about the graph before performing
 // graph partitioning.
@@ -414,7 +414,7 @@ string ControlLoopName(const string& name) {
 
 bool IsControlLoop(const Node* node) {
   const string& name = node->name();
-  return absl::StartsWith(name, "_cloop");
+  return abslx::StartsWith(name, "_cloop");
 }
 
 // An enter node for control flow.

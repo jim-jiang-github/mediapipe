@@ -135,9 +135,9 @@ static DeviceAttributes BuildXlaDeviceAttributes(const string& name_prefix,
                                                  const string& device_name,
                                                  int device_ordinal) {
   return Device::BuildDeviceAttributes(
-      absl::StrCat(name_prefix, "/device:", device_name, ":", device_ordinal),
+      abslx::StrCat(name_prefix, "/device:", device_name, ":", device_ordinal),
       DeviceType(device_name), Bytes(16ULL << 30), DeviceLocality(),
-      absl::StrCat("device: ", device_name, " device"));
+      abslx::StrCat("device: ", device_name, " device"));
 }
 
 }  // namespace
@@ -421,11 +421,11 @@ Status XlaDevice::TryGetDeviceContext(DeviceContext** out_context) {
 
 // Warn about XLA_CPU/XLA_GPU exactly once.
 static void ShowXlaDeviceDeprecationWarning(
-    absl::string_view compilation_device_name) {
-  static absl::once_flag once;
-  if (absl::StrContains(compilation_device_name, "CPU") ||
-      absl::StrContains(compilation_device_name, "GPU")) {
-    absl::call_once(once, [] {
+    abslx::string_view compilation_device_name) {
+  static abslx::once_flag once;
+  if (abslx::StrContains(compilation_device_name, "CPU") ||
+      abslx::StrContains(compilation_device_name, "GPU")) {
+    abslx::call_once(once, [] {
       LOG(INFO) << "XLA_GPU and XLA_CPU devices are deprecated and will be "
                    "removed in subsequent releases. Instead, use either "
                    "@tf.function(jit_compile=True) for must-compile "

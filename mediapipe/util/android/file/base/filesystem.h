@@ -22,12 +22,12 @@
 namespace mediapipe {
 namespace file {
 
-absl::Status RecursivelyCreateDir(absl::string_view path,
+abslx::Status RecursivelyCreateDir(abslx::string_view path,
                                   const file::Options& options);
 
-absl::Status Exists(absl::string_view path, const file::Options& options);
+abslx::Status Exists(abslx::string_view path, const file::Options& options);
 
-absl::Status IsDirectory(absl::string_view path, const file::Options& options);
+abslx::Status IsDirectory(abslx::string_view path, const file::Options& options);
 
 }  // namespace file.
 }  // namespace mediapipe

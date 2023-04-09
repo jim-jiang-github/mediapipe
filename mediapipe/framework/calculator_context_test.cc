@@ -92,14 +92,14 @@ std::string Proto3GraphStr() {
 
 std::unique_ptr<CalculatorState> MakeCalculatorState(
     const CalculatorGraphConfig::Node& node_config, int node_id) {
-  auto result = absl::make_unique<CalculatorState>(
+  auto result = abslx::make_unique<CalculatorState>(
       "Node", node_id, "Calculator", node_config, nullptr);
   return result;
 }
 
 std::unique_ptr<CalculatorContext> MakeCalculatorContext(
     CalculatorState* calculator_state) {
-  return absl::make_unique<CalculatorContext>(calculator_state,
+  return abslx::make_unique<CalculatorContext>(calculator_state,
                                               tool::CreateTagMap({}).value(),
                                               tool::CreateTagMap({}).value());
 }

@@ -49,7 +49,7 @@ struct FirstGreaterComparator {
   }
 };
 
-absl::Status SortLabelsByDecreasingScore(const Detection& detection,
+abslx::Status SortLabelsByDecreasingScore(const Detection& detection,
                                          Detection* sorted_detection) {
   RET_CHECK(sorted_detection);
   RET_CHECK_EQ(detection.score_size(), detection.label_size());
@@ -82,7 +82,7 @@ absl::Status SortLabelsByDecreasingScore(const Detection& detection,
       sorted_detection->set_label_id(i, detection.label_id(index));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace
@@ -114,9 +114,9 @@ absl::Status SortLabelsByDecreasingScore(const Detection& detection,
 
 class FilterDetectionCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   bool IsValidLabel(const std::string& label);
@@ -129,11 +129,11 @@ class FilterDetectionCalculator : public CalculatorBase {
   // if the input side packet contains an empty vector (no labels are
   // allowed). We use limit_labels_ to distinguish between the two cases.
   bool limit_labels_ = true;
-  absl::node_hash_set<std::string> allowed_labels_;
+  abslx::node_hash_set<std::string> allowed_labels_;
 };
 REGISTER_CALCULATOR(FilterDetectionCalculator);
 
-absl::Status FilterDetectionCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status FilterDetectionCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK(!cc->Inputs().GetTags().empty());
   RET_CHECK(!cc->Outputs().GetTags().empty());
 
@@ -151,10 +151,10 @@ absl::Status FilterDetectionCalculator::GetContract(CalculatorContract* cc) {
   if (cc->InputSidePackets().HasTag(kLabelsCsvTag)) {
     cc->InputSidePackets().Tag(kLabelsCsvTag).Set<std::string>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FilterDetectionCalculator::Open(CalculatorContext* cc) {
+abslx::Status FilterDetectionCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
   options_ = cc->Options<FilterDetectionCalculatorOptions>();
   limit_labels_ = cc->InputSidePackets().HasTag(kLabelsTag) ||
@@ -162,11 +162,11 @@ absl::Status FilterDetectionCalculator::Open(CalculatorContext* cc) {
   if (limit_labels_) {
     Strings allowlist_labels;
     if (cc->InputSidePackets().HasTag(kLabelsCsvTag)) {
-      allowlist_labels = absl::StrSplit(
+      allowlist_labels = abslx::StrSplit(
           cc->InputSidePackets().Tag(kLabelsCsvTag).Get<std::string>(), ',',
-          absl::SkipWhitespace());
+          abslx::SkipWhitespace());
       for (auto& e : allowlist_labels) {
-        absl::StripAsciiWhitespace(&e);
+        abslx::StripAsciiWhitespace(&e);
       }
     } else {
       allowlist_labels = cc->InputSidePackets().Tag(kLabelsTag).Get<Strings>();
@@ -185,12 +185,12 @@ absl::Status FilterDetectionCalculator::Open(CalculatorContext* cc) {
       limit_labels_ = false;
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FilterDetectionCalculator::Process(CalculatorContext* cc) {
+abslx::Status FilterDetectionCalculator::Process(CalculatorContext* cc) {
   if (limit_labels_ && allowed_labels_.empty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   Detections detections;
   if (cc->Inputs().HasTag(kDetectionsTag)) {
@@ -232,7 +232,7 @@ absl::Status FilterDetectionCalculator::Process(CalculatorContext* cc) {
         .Tag(kDetectionTag)
         .Add(new Detection((*outputs)[0]), cc->InputTimestamp());
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 bool FilterDetectionCalculator::IsValidLabel(const std::string& label) {

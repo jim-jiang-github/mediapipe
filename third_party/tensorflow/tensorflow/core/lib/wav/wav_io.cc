@@ -178,7 +178,7 @@ Status EncodeAudioAsS16LEWav(const float* audio, size_t sample_rate,
 
   wav_string->resize(file_size);
   char* data = &(*wav_string)[0];
-  WavHeader* header = absl::bit_cast<WavHeader*>(data);
+  WavHeader* header = abslx::bit_cast<WavHeader*>(data);
 
   // Fill RIFF chunk.
   auto* riff_chunk = &header->riff_chunk;

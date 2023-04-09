@@ -42,7 +42,7 @@ namespace profiler {
 namespace {
 
 std::pair<TfFunctionExecutionMode, TfFunctionCompiler> Decode(
-    absl::string_view function_name, absl::string_view mode) {
+    abslx::string_view function_name, abslx::string_view mode) {
   // mode is one of ["eager", "concrete", "traced-xla", "traced-nonXla",
   // "notTraced-xla", "notTraced-nonXla"]
   if (mode == "eager") return {EAGER_MODE, INVALID_COMPILER};
@@ -52,7 +52,7 @@ std::pair<TfFunctionExecutionMode, TfFunctionCompiler> Decode(
   if (mode == "notTraced-xla") return {NOT_TRACED_MODE, XLA_COMPILER};
   if (mode == "notTraced-nonXla") return {NOT_TRACED_MODE, OTHER_COMPILER};
   // Shouldn't reach here.
-  LOG(ERROR) << absl::StrCat("tf-function '", function_name,
+  LOG(ERROR) << abslx::StrCat("tf-function '", function_name,
                              "' has an unexpected execution mode '", mode, "'")
              << std::endl;
   return {INVALID_MODE, INVALID_COMPILER};
@@ -90,7 +90,7 @@ struct ActivationRecord {
         compiler(INVALID_COMPILER),
         tracing_count(0),
         children_duration_ps(0) {}
-  ActivationRecord(absl::string_view name, const Timespan& timespan,
+  ActivationRecord(abslx::string_view name, const Timespan& timespan,
                    TfFunctionExecutionMode exe_mode,
                    TfFunctionCompiler compiler, int64_t tracing_cnt)
       : function_name(std::string(name)),
@@ -100,7 +100,7 @@ struct ActivationRecord {
         tracing_count(tracing_cnt),
         children_duration_ps(0) {}
   std::string DebugString() const {
-    return absl::StrCat("{", function_name, ", ",
+    return abslx::StrCat("{", function_name, ", ",
                         TfFunctionExecutionMode_Name(execution_mode), ", ",
                         TfFunctionCompiler_Name(compiler),
                         ", tracing_count:", tracing_count,
@@ -119,7 +119,7 @@ struct EntryOrExit {
       : is_entry(is_entry), index(index), timestamp_ps(timestamp_ps) {}
   std::string DebugString() const {
     std::string entry_or_exit = is_entry ? "entry, " : "exit,  ";
-    return absl::StrCat("{", entry_or_exit, "idx:", index,
+    return abslx::StrCat("{", entry_or_exit, "idx:", index,
                         ", timestamp:", timestamp_ps, "}");
   }
 };
@@ -162,7 +162,7 @@ class TfFunctionExecutions {
   explicit TfFunctionExecutions(const XLineVisitor& line) {
     // Creates points_ and activations_ from line.
     line.ForEachEvent([&](const XEventVisitor& event) {
-      absl::string_view mode;
+      abslx::string_view mode;
       int64_t tracing_count = 0;
       event.ForEachStat([&mode, &tracing_count](const XStatVisitor& stat) {
         if (!stat.Type().has_value()) return;
@@ -198,7 +198,7 @@ class TfFunctionExecutions {
                                      const EntryOrExit& b) {
       return a.timestamp_ps < b.timestamp_ps;
     };
-    absl::c_sort(points_, ascending_in_timestamp);
+    abslx::c_sort(points_, ascending_in_timestamp);
 
     // Calculates the children duration for each activation record.
     CalculateChildrenDurations();
@@ -207,12 +207,12 @@ class TfFunctionExecutions {
   std::string DebugString() const {
     std::string result = "\nActivations:\n";
     for (int i = 0, end = activations_.size(); i < end; i++) {
-      absl::StrAppend(&result, "[", i, "] ", activations_[i].DebugString(),
+      abslx::StrAppend(&result, "[", i, "] ", activations_[i].DebugString(),
                       "\n");
     }
-    absl::StrAppend(&result, "tf-function Entry/Exit Points:\n");
+    abslx::StrAppend(&result, "tf-function Entry/Exit Points:\n");
     for (const auto& pt : points_) {
-      absl::StrAppend(&result, pt.DebugString(), "\n");
+      abslx::StrAppend(&result, pt.DebugString(), "\n");
     }
     return result;
   }

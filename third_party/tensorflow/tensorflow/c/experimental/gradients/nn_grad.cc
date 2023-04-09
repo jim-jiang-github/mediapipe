@@ -45,8 +45,8 @@ class ReluGradientFunction : public GradientFunction {
   }
 
   Status Compute(AbstractContext* ctx,
-                 absl::Span<AbstractTensorHandle* const> grad_outputs,
-                 absl::Span<AbstractTensorHandle*> grad_inputs) override {
+                 abslx::Span<AbstractTensorHandle* const> grad_outputs,
+                 abslx::Span<AbstractTensorHandle*> grad_inputs) override {
     AbstractTensorHandle* upstream_grad = grad_outputs[0];
     AbstractTensorHandle* activations = forward_outputs_[0];
 
@@ -71,7 +71,7 @@ class ReluGradientFunction : public GradientFunction {
 
 Status BroadcastMul(AbstractContext* ctx, AbstractTensorHandle* vec,
                     AbstractTensorHandle* mat,
-                    absl::Span<AbstractTensorHandle*> outputs) {
+                    abslx::Span<AbstractTensorHandle*> outputs) {
   if (!isa<ImmediateExecutionContext>(ctx)) {
     // TODO(b/168850692): Fix this.
     return errors::Unimplemented(
@@ -97,8 +97,8 @@ class SparseSoftmaxCrossEntropyWithLogitsGradientFunction
       : forward_outputs_(f_outputs) {}
 
   Status Compute(AbstractContext* ctx,
-                 absl::Span<AbstractTensorHandle* const> grad_outputs,
-                 absl::Span<AbstractTensorHandle*> grad_inputs) override {
+                 abslx::Span<AbstractTensorHandle* const> grad_outputs,
+                 abslx::Span<AbstractTensorHandle*> grad_inputs) override {
     // Grad for Softmax Input
     TF_RETURN_IF_ERROR(BroadcastMul(
         ctx, grad_outputs[0], forward_outputs_[1],
@@ -121,8 +121,8 @@ class BiasAddGradientFunction : public GradientFunction {
       : forward_attrs_(f_attrs) {}
 
   Status Compute(AbstractContext* ctx,
-                 absl::Span<AbstractTensorHandle* const> grad_outputs,
-                 absl::Span<AbstractTensorHandle*> grad_inputs) override {
+                 abslx::Span<AbstractTensorHandle* const> grad_outputs,
+                 abslx::Span<AbstractTensorHandle*> grad_inputs) override {
     /* Given upstream grad U and a BiasAdd: A + bias, the gradients are:
      *
      *    dA = U

@@ -49,8 +49,8 @@ class HloDomainTest : public HloTestBase {
 
   // Checks whether there is a kDomain instruction in the edge between the
   // instruction and the operand.
-  bool HasDomainEdge(HloModule* module, absl::string_view instruction_name,
-                     absl::string_view operand_name) {
+  bool HasDomainEdge(HloModule* module, abslx::string_view instruction_name,
+                     abslx::string_view operand_name) {
     HloInstruction* instruction = FindInstruction(module, instruction_name);
     HloInstruction* operand = FindInstruction(module, operand_name);
     CHECK_NE(instruction, nullptr);
@@ -79,7 +79,7 @@ class OpNameMetadata : public DomainMetadata {
     return std::make_unique<OpNameMetadata>(opname_);
   }
 
-  absl::string_view Kind() const override { return KindName(); }
+  abslx::string_view Kind() const override { return KindName(); }
 
   bool Matches(const DomainMetadata& other) const override {
     const OpNameMetadata* other_ptr =
@@ -93,7 +93,7 @@ class OpNameMetadata : public DomainMetadata {
 
   std::string ToString() const override { return opname_; }
 
-  static absl::string_view KindName() { return "opname"; }
+  static abslx::string_view KindName() { return "opname"; }
 
   size_t Hash() const override { return std::hash<std::string>()(opname_); }
 

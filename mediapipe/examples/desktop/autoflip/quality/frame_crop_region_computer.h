@@ -43,7 +43,7 @@ class FrameCropRegionComputer {
   // consider static features, and simply tries to fit the detected features
   // within the target frame size. The score of the crop region is aggregated
   // from individual feature scores given the score aggregation type.
-  absl::Status ComputeFrameCropRegion(const KeyFrameInfo& frame_info,
+  abslx::Status ComputeFrameCropRegion(const KeyFrameInfo& frame_info,
                                       KeyFrameCropResult* crop_result) const;
 
  protected:
@@ -75,7 +75,7 @@ class FrameCropRegionComputer {
   //           fraction of the new segment exceeds the maximum length.
   //           In this case the combined segment is the base segment, and cover
   //           type is NOT_COVERED.
-  absl::Status ExpandSegmentUnderConstraint(const Segment& segment_to_add,
+  abslx::Status ExpandSegmentUnderConstraint(const Segment& segment_to_add,
                                             const Segment& base_segment,
                                             const int max_length,
                                             Segment* combined_segment,
@@ -88,7 +88,7 @@ class FrameCropRegionComputer {
   // FULLY_COVERED if the new rectangle is fully covered in both directions,
   // PARTIALLY_COVERED if it is at least partially covered in both directions,
   // and NOT_COVERED if it is not covered in either direction.
-  absl::Status ExpandRectUnderConstraints(const Rect& rect_to_add,
+  abslx::Status ExpandRectUnderConstraints(const Rect& rect_to_add,
                                           const int max_width,
                                           const int max_height, Rect* base_rect,
                                           CoverType* cover_type) const;

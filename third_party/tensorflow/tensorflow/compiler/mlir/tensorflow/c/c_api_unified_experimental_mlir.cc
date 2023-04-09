@@ -146,8 +146,8 @@ class MlirAbstractOp : public TracingOperation {
   Status SetDeviceName(const char* name) override;
 
   Status AddInput(AbstractTensorHandle* input) override;
-  Status AddInputList(absl::Span<AbstractTensorHandle* const> inputs) override;
-  Status Execute(absl::Span<AbstractTensorHandle*> retvals,
+  Status AddInputList(abslx::Span<AbstractTensorHandle* const> inputs) override;
+  Status Execute(abslx::Span<AbstractTensorHandle*> retvals,
                  int* num_retvals) override;
 
   Status SetAttrString(const char* attr_name, const char* data,
@@ -180,7 +180,7 @@ class MlirAbstractOp : public TracingOperation {
                           const int* num_dims, int num_values) override;
   Status SetAttrFunctionList(
       const char* attr_name,
-      absl::Span<const AbstractOperation*> values) override;
+      abslx::Span<const AbstractOperation*> values) override;
 
   Status SetOpName(const char* const op_name) override;
 
@@ -340,7 +340,7 @@ Status MlirAbstractOp::Create(ArrayRef<Value> operands,
   Builder builder(context_);
 
   if (current_ods_input_ != op_def_->input_arg_size())
-    return InvalidArgument(absl::StrCat("Mismatch in operands number: got ",
+    return InvalidArgument(abslx::StrCat("Mismatch in operands number: got ",
                                         current_ods_input_, " expected ",
                                         op_def_->input_arg_size(), " ; for op ",
                                         state_->name.getStringRef().str()));
@@ -513,7 +513,7 @@ Status MlirAbstractOp::SetAttrShapeList(const char* attr_name,
   return Unimplemented("SetAttrShapeList has not been implemented yet.");
 }
 Status MlirAbstractOp::SetAttrFunctionList(
-    const char* attr_name, absl::Span<const AbstractOperation*> values) {
+    const char* attr_name, abslx::Span<const AbstractOperation*> values) {
   return Unimplemented("SetAttrFunctionList has not been implemented yet.");
 }
 
@@ -543,7 +543,7 @@ Status MlirFunction::GetFunctionDef(tensorflow::FunctionDef** f) {
   return ::tensorflow::OkStatus();
 }
 
-Status MlirAbstractOp::Execute(absl::Span<AbstractTensorHandle*> retvals,
+Status MlirAbstractOp::Execute(abslx::Span<AbstractTensorHandle*> retvals,
                                int* num_retvals) {
   OperationState* state;
   TF_RETURN_IF_ERROR(Create(operands_, &state));
@@ -574,7 +574,7 @@ Status MlirFunctionContext::AddParameter(
 Status MlirAbstractOp::AddInput(AbstractTensorHandle* input) {
   if (current_ods_input_ >= op_def_->input_arg_size())
     return InvalidArgument(
-        absl::StrCat("More Input() (", current_ods_input_, ") calls than the ",
+        abslx::StrCat("More Input() (", current_ods_input_, ") calls than the ",
                      op_def_->input_arg_size(), " allowed input_args ; for op ",
                      state_->name.getStringRef().str()));
 
@@ -606,10 +606,10 @@ Status MlirAbstractOp::AddInput(AbstractTensorHandle* input) {
 }
 
 Status MlirAbstractOp::AddInputList(
-    absl::Span<AbstractTensorHandle* const> inputs) {
+    abslx::Span<AbstractTensorHandle* const> inputs) {
   if (current_ods_input_ >= op_def_->input_arg_size())
     return InvalidArgument(
-        absl::StrCat("More Input() (", current_ods_input_, ") calls than the ",
+        abslx::StrCat("More Input() (", current_ods_input_, ") calls than the ",
                      op_def_->input_arg_size(), " allowed input_args"));
 
   for (AbstractTensorHandle* input : inputs) {

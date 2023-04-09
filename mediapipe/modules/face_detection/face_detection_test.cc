@@ -145,7 +145,7 @@ TEST_F(FaceDetectionTest, ExpandFaceDetectionShortRangeCpu) {
   std::vector<Packet> output;
   MP_ASSERT_OK(graph.ObserveOutputStream("detections", [&](const Packet& p) {
     output.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(
@@ -171,7 +171,7 @@ TEST_F(FaceDetectionTest, ExpandFaceDetection) {
   std::vector<Packet> output;
   MP_ASSERT_OK(graph.ObserveOutputStream("detections", [&](const Packet& p) {
     output.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(
@@ -199,7 +199,7 @@ TEST_F(FaceDetectionTest, FaceDetectionShortRangeApi) {
   std::vector<Packet> output;
   MP_ASSERT_OK(graph.ObserveOutputStream("detections", [&](const Packet& p) {
     output.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(
@@ -227,7 +227,7 @@ TEST_F(FaceDetectionTest, FaceDetectionWrapperApi) {
   std::vector<Packet> output;
   MP_ASSERT_OK(graph.ObserveOutputStream("detections", [&](const Packet& p) {
     output.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(
@@ -255,7 +255,7 @@ TEST_F(FaceDetectionTest, FaceDetectionFullRangeApi) {
   std::vector<Packet> output;
   MP_ASSERT_OK(graph.ObserveOutputStream("detections", [&](const Packet& p) {
     output.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(
@@ -283,7 +283,7 @@ TEST_F(FaceDetectionTest, FaceDetectionShortRangeByRoiCpu) {
   std::vector<Packet> output;
   MP_ASSERT_OK(graph.ObserveOutputStream("detections", [&](const Packet& p) {
     output.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(
@@ -336,7 +336,7 @@ TEST_F(FaceDetectionGpuTest, FaceDetectionFullRangeGpu) {
   std::vector<Packet> output;
   MP_ASSERT_OK(graph.ObserveOutputStream("detections", [&](const Packet& p) {
     output.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(
@@ -367,7 +367,7 @@ TEST_F(FaceDetectionGpuTest, FaceDetectionShortRangeGpu) {
   std::vector<Packet> output;
   MP_ASSERT_OK(graph.ObserveOutputStream("detections", [&](const Packet& p) {
     output.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(

@@ -215,7 +215,7 @@ class SliceR1Test : public ClientLibraryTestBase,
   void Run(const R1Spec& spec) {
     // This can't be an std::vector, since you can't grab a Span of a
     // vector<bool>.
-    absl::InlinedVector<NativeT, 1> input(spec.input_dim0);
+    abslx::InlinedVector<NativeT, 1> input(spec.input_dim0);
     for (size_t i = 0; i < input.size(); ++i) {
       input[i] = static_cast<NativeT>(i);
     }
@@ -227,7 +227,7 @@ class SliceR1Test : public ClientLibraryTestBase,
           {spec.slice_stride});
 
     // Ditto.
-    absl::InlinedVector<NativeT, 1> expected;
+    abslx::InlinedVector<NativeT, 1> expected;
     for (int i = spec.slice_start; i < spec.slice_limit;
          i += spec.slice_stride) {
       expected.push_back(i);
@@ -245,7 +245,7 @@ class SliceR1LargeTest : public SliceR1Test {};
 std::string SliceR1TestDataToString(
     const ::testing::TestParamInfo<R1Spec>& data) {
   const R1Spec& spec = data.param;
-  return absl::StrFormat("%d_%d_%d_%d", spec.input_dim0, spec.slice_start,
+  return abslx::StrFormat("%d_%d_%d_%d", spec.input_dim0, spec.slice_start,
                          spec.slice_limit, spec.slice_stride);
 }
 
@@ -481,11 +481,11 @@ struct R4Spec {
 
 std::string R4SpecToString(const ::testing::TestParamInfo<R4Spec>& data) {
   const R4Spec& spec = data.param;
-  return absl::StrCat("input_", absl::StrJoin(spec.input_dims, "x"),
-                      "__layout_", absl::StrJoin(spec.input_layout, ""),
-                      "__starts_", absl::StrJoin(spec.slice_starts, "x"),
-                      "__limits_", absl::StrJoin(spec.slice_limits, "x"),
-                      "__strides_", absl::StrJoin(spec.slice_strides, "x"));
+  return abslx::StrCat("input_", abslx::StrJoin(spec.input_dims, "x"),
+                      "__layout_", abslx::StrJoin(spec.input_layout, ""),
+                      "__starts_", abslx::StrJoin(spec.slice_starts, "x"),
+                      "__limits_", abslx::StrJoin(spec.slice_limits, "x"),
+                      "__strides_", abslx::StrJoin(spec.slice_strides, "x"));
 }
 
 class SliceR4Test : public ClientLibraryTestBase,

@@ -386,20 +386,20 @@ static Expected<AsyncValuePtr<JitExecutable>> CompileImpl(
             return TraceMeEncode({{"src", kernel_info.serialized_operation}});
           });
 
-          auto compile_start_time = absl::Now();
+          auto compile_start_time = abslx::Now();
           LOG(INFO) << "Started JitExecutable specialization compilation for "
                     << kernel_info.name << " (" << session_name << ")";
           compile();
-          auto compile_duration = absl::Now() - compile_start_time;
+          auto compile_duration = abslx::Now() - compile_start_time;
 
           LOG(INFO) << "JitExecutable specialization compilation for "
                     << kernel_info.name << " took "
-                    << absl::ToInt64Milliseconds(compile_duration) << " ms ("
+                    << abslx::ToInt64Milliseconds(compile_duration) << " ms ("
                     << session_name << ")";
 
-          if (compile_duration > absl::Seconds(1))
+          if (compile_duration > abslx::Seconds(1))
             LOG(INFO) << "Expensive JitExecutable specialization compilation ("
-                      << absl::ToInt64Milliseconds(compile_duration)
+                      << abslx::ToInt64Milliseconds(compile_duration)
                       << " ms):\n"
                       << kernel_info.serialized_operation;
 
@@ -478,21 +478,21 @@ static Expected<AsyncValuePtr<JitExecutable>> CompileImpl(
         mlir::bufferization::BufferizeTypeConverter());
 
     // Instantiate new JitExecutable from the MLIR source.
-    auto compile_start_time = absl::Now();
+    auto compile_start_time = abslx::Now();
     LOG(INFO) << "Started JitExecutable instantiation compilation for "
               << kernel_info.name << " (" << session_name << ")";
     Expected<JitExecutable> jit_executable = JitExecutable::Instantiate(
         kernel_info.serialized_operation, kernel_info.entrypoint,
         std::move(opts), session_name, runner);
-    auto compile_duration = absl::Now() - compile_start_time;
+    auto compile_duration = abslx::Now() - compile_start_time;
 
     LOG(INFO) << "JitExecutable instantiation for " << kernel_info.name
-              << " took " << absl::ToInt64Milliseconds(compile_duration)
+              << " took " << abslx::ToInt64Milliseconds(compile_duration)
               << " ms (" << session_name << ")";
 
-    if (compile_duration > absl::Seconds(1))
+    if (compile_duration > abslx::Seconds(1))
       LOG(INFO) << "Expensive JitExecutable instantiation ("
-                << absl::ToInt64Milliseconds(compile_duration) << " ms):\n"
+                << abslx::ToInt64Milliseconds(compile_duration) << " ms):\n"
                 << kernel_info.serialized_operation;
 
     RecordCompileTime(session_name, kernel_info.name, std::nullopt,
@@ -646,7 +646,7 @@ static void ExecuteImpl(Executable& executable, ArrayRef<MemrefDesc> memrefs,
   // Bind execution trace to the request context.
   TraceMe trace_me([&] {
     int64_t id = exec_ctx.request_ctx()->id();
-    absl::string_view name(executable.name().data(), executable.name().size());
+    abslx::string_view name(executable.name().data(), executable.name().size());
     return TraceMeEncode(
         "tf_jitrt.Execute",
         {{"id", id},

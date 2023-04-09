@@ -147,7 +147,7 @@ constexpr char kTestGraphConfig4[] = R"pb(
 
 // Reports packet timestamp and string contents, or "<empty>"".
 std::string DebugString(Packet p) {
-  return absl::StrCat(p.Timestamp().DebugString(), ":",
+  return abslx::StrCat(p.Timestamp().DebugString(), ":",
                       p.IsEmpty() ? "<empty>" : p.Get<std::string>());
 }
 
@@ -165,7 +165,7 @@ TEST(BypassCalculatorTest, SubgraphChannel) {
       "analyzed_appearances",
       [&](const Packet& p) {
         analyzed_appearances.push_back(DebugString(p));
-        return absl::OkStatus();
+        return abslx::OkStatus();
       },
       true));
   std::vector<std::string> federated_gaze_output;
@@ -173,7 +173,7 @@ TEST(BypassCalculatorTest, SubgraphChannel) {
       "federated_gaze_output",
       [&](const Packet& p) {
         federated_gaze_output.push_back(DebugString(p));
-        return absl::OkStatus();
+        return abslx::OkStatus();
       },
       true));
   MP_ASSERT_OK(graph.StartRun({}));
@@ -205,7 +205,7 @@ TEST(BypassCalculatorTest, CalculatorChannel) {
       "analyzed_appearances",
       [&](const Packet& p) {
         analyzed_appearances.push_back(DebugString(p));
-        return absl::OkStatus();
+        return abslx::OkStatus();
       },
       true));
   std::vector<std::string> federated_gaze_output;
@@ -213,7 +213,7 @@ TEST(BypassCalculatorTest, CalculatorChannel) {
       "federated_gaze_output",
       [&](const Packet& p) {
         federated_gaze_output.push_back(DebugString(p));
-        return absl::OkStatus();
+        return abslx::OkStatus();
       },
       true));
   MP_ASSERT_OK(graph.StartRun({}));
@@ -245,7 +245,7 @@ TEST(BypassCalculatorTest, GatedChannel) {
       "analyzed_appearances",
       [&](const Packet& p) {
         analyzed_appearances.push_back(DebugString(p));
-        return absl::OkStatus();
+        return abslx::OkStatus();
       },
       true));
   std::vector<std::string> video_frame;
@@ -253,7 +253,7 @@ TEST(BypassCalculatorTest, GatedChannel) {
       "video_frame_out",
       [&](const Packet& p) {
         video_frame.push_back(DebugString(p));
-        return absl::OkStatus();
+        return abslx::OkStatus();
       },
       true));
   MP_ASSERT_OK(graph.StartRun({}));

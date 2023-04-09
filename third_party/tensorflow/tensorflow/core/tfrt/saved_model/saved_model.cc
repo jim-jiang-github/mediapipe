@@ -82,11 +82,11 @@ namespace tensorflow {
 namespace tfrt_stub {
 namespace {
 
-constexpr absl::string_view kSignatureJoiningDelimiter = "+";
-constexpr absl::string_view kTensorNameJoiningDelimiter = "-";
-constexpr absl::string_view kArgumentTypeJoiningDelimiter = "^";
+constexpr abslx::string_view kSignatureJoiningDelimiter = "+";
+constexpr abslx::string_view kTensorNameJoiningDelimiter = "-";
+constexpr abslx::string_view kArgumentTypeJoiningDelimiter = "^";
 
-using SignatureMap = absl::flat_hash_map<std::string, internal::Signature>;
+using SignatureMap = abslx::flat_hash_map<std::string, internal::Signature>;
 using ::tensorflow::SessionMetadata;
 using ::tensorflow::StatusOr;
 
@@ -125,7 +125,7 @@ auto* saved_model_init_time_seconds =
         "/tensorflow/tfrt/saved_model/init_time",
         "Record the initialization time for the savedmodel.", "model_name");
 
-tensorflow::Tensor CreateScalarStringTensor(absl::string_view str) {
+tensorflow::Tensor CreateScalarStringTensor(abslx::string_view str) {
   return tensorflow::Tensor(tensorflow::tstring(str));
 }
 
@@ -133,8 +133,8 @@ tensorflow::Tensor CreateScalarStringTensor(absl::string_view str) {
 //
 // TODO(chky): For V2 models, the bound input can also be a resource.
 StatusOr<tensorflow::Tensor> CreateTensorFromBoundInput(
-    mlir::Operation* bound_input, absl::string_view saved_model_dir,
-    absl::flat_hash_map<std::string, tensorflow::Tensor>* variables) {
+    mlir::Operation* bound_input, abslx::string_view saved_model_dir,
+    abslx::flat_hash_map<std::string, tensorflow::Tensor>* variables) {
   // Assets are files in the saved model directory. We pass their filenames to
   // functions so that they can be used.
   if (auto asset = llvm::dyn_cast<mlir::tf_saved_model::AssetOp>(bound_input)) {
@@ -149,8 +149,8 @@ StatusOr<tensorflow::Tensor> CreateTensorFromBoundInput(
 }
 
 StatusOr<SignatureMap> GetFunctionSignaturesFromTFSavedModelMLIR(
-    absl::string_view saved_model_dir, mlir::ModuleOp module) {
-  absl::flat_hash_map<std::string, tensorflow::Tensor> variables;
+    abslx::string_view saved_model_dir, mlir::ModuleOp module) {
+  abslx::flat_hash_map<std::string, tensorflow::Tensor> variables;
   SignatureMap signatures;
 
   tensorflow::StatusGroup status_group;
@@ -332,27 +332,27 @@ StatusOr<mlir::OwningOpRef<mlir::ModuleOp>> ImportSavedModel(
       auto module,
       tensorflow::ConvertSavedModelV1ToMlirLite(
           import_input,
-          /*exported_names=*/absl::MakeSpan(signature_names), context));
+          /*exported_names=*/abslx::MakeSpan(signature_names), context));
 
   LOG(INFO) << "TFRT ImportSavedModel: Functionalization took "
-            << absl::ToInt64Milliseconds(
+            << abslx::ToInt64Milliseconds(
                    import_input.GetFunctionalizationDuration())
             << " ms.";
   LOG(INFO) << "TFRT ImportSavedModel: Grappler took "
-            << absl::ToInt64Milliseconds(import_input.GetGrapplerDuration())
+            << abslx::ToInt64Milliseconds(import_input.GetGrapplerDuration())
             << " ms.";
 
   saved_model_functionalization_time_seconds->GetCell(saved_model_dir)
-      ->Set(absl::ToInt64Seconds(import_input.GetFunctionalizationDuration()));
+      ->Set(abslx::ToInt64Seconds(import_input.GetFunctionalizationDuration()));
 
   saved_model_grappler_time_seconds->GetCell(saved_model_dir)
-      ->Set(absl::ToInt64Seconds(import_input.GetGrapplerDuration()));
+      ->Set(abslx::ToInt64Seconds(import_input.GetGrapplerDuration()));
 
   return module;
 }
 
 StatusOr<InitializersAndSignatures> GetInitializersAndSignatures(
-    mlir::ModuleOp module, absl::string_view saved_model_dir) {
+    mlir::ModuleOp module, abslx::string_view saved_model_dir) {
   InitializersAndSignatures result;
   TF_ASSIGN_OR_RETURN(
       result.signature_map,
@@ -434,8 +434,8 @@ void UpdateCompileOptions(SavedModel::Options& options) {
   }
 }
 
-StatusOr<std::string> GetSavedModelDirFromMlaDir(absl::string_view mla_dir) {
-  auto statusor_dir = [&]() -> absl::StatusOr<std::string> {
+StatusOr<std::string> GetSavedModelDirFromMlaDir(abslx::string_view mla_dir) {
+  auto statusor_dir = [&]() -> abslx::StatusOr<std::string> {
     LOG(INFO) << "TFRT looking for saved model from MLA: " << mla_dir;
     mlarchive::Env& env = mlarchive::GetPosixEnv();
     ASSIGN_OR_RETURN(const auto mla,
@@ -457,28 +457,28 @@ StatusOr<std::string> GetSavedModelDirFromMlaDir(absl::string_view mla_dir) {
 }
 
 StatusOr<tensorflow::MetaGraphDef> ReadSavedModel(
-    absl::string_view saved_model_dir,
+    abslx::string_view saved_model_dir,
     const std::unordered_set<std::string>& tags) {
   LOG(INFO) << "TFRT reading v1 savedmodel: " << saved_model_dir;
-  auto read_start_time = absl::Now();
+  auto read_start_time = abslx::Now();
 
   tensorflow::MetaGraphDef meta_graph_def;
   TF_RETURN_IF_ERROR(tensorflow::ReadMetaGraphDefFromSavedModel(
       std::string(saved_model_dir), tags, &meta_graph_def));
 
-  auto read_meta_graph_duration = absl::Now() - read_start_time;
+  auto read_meta_graph_duration = abslx::Now() - read_start_time;
   saved_model_read_meta_graph_time_seconds
       ->GetCell(std::string(saved_model_dir))
-      ->Set(absl::ToInt64Seconds(read_meta_graph_duration));
+      ->Set(abslx::ToInt64Seconds(read_meta_graph_duration));
   LOG(INFO) << "TFRT finished reading meta graph. Took "
-            << absl::ToInt64Milliseconds(read_meta_graph_duration) << " ms.";
+            << abslx::ToInt64Milliseconds(read_meta_graph_duration) << " ms.";
   return std::move(meta_graph_def);
 }
 
 }  // namespace
 
 std::unique_ptr<SavedModel> SavedModelImpl::LoadSavedModel(
-    Options options, absl::string_view saved_model_dir,
+    Options options, abslx::string_view saved_model_dir,
     const std::unordered_set<std::string>& tags, tensorflow::Status* status) {
   std::string saved_model_dir_str = "unused";
   if (options.load_from_mla) {
@@ -514,7 +514,7 @@ std::unique_ptr<SavedModel> SavedModelImpl::LoadSavedModel(
         meta_graph_def.signature_def_size() > options.lazy_loading_threshold;
 
     // Step 1: Import saved model from a proto to an MLIR module.
-    auto import_start_time = absl::Now();
+    auto import_start_time = abslx::Now();
     auto session_options =
         CreateDefaultSessionOptions(options.graph_execution_options);
     // Set optimize_for_static_graph to true since we won't extend the graph
@@ -539,14 +539,14 @@ std::unique_ptr<SavedModel> SavedModelImpl::LoadSavedModel(
             options.graph_execution_options.run_placer_grappler_on_functions,
             options.graph_execution_options.enable_tfrt_gpu));
 
-    auto import_duration = absl::Now() - import_start_time;
+    auto import_duration = abslx::Now() - import_start_time;
     saved_model_import_time_seconds->GetCell(std::string(saved_model_dir))
-        ->Set(absl::ToInt64Seconds(import_duration));
+        ->Set(abslx::ToInt64Seconds(import_duration));
     LOG(INFO) << "TFRT finished importing savedmodel. Took "
-              << absl::ToInt64Milliseconds(import_duration) << " ms.";
+              << abslx::ToInt64Milliseconds(import_duration) << " ms.";
 
     // Step 2: Compile the MLIR module from TF dialect to TFRT dialect (in BEF).
-    auto compile_start_time = absl::Now();
+    auto compile_start_time = abslx::Now();
     ASSIGN_OR_RETURN_IN_COMPILE(
         auto initializers_and_signatures,
         GetInitializersAndSignatures(mlir_module.get(), saved_model_dir));
@@ -562,14 +562,14 @@ std::unique_ptr<SavedModel> SavedModelImpl::LoadSavedModel(
         options.graph_execution_options.compile_options, mlir_module.get(),
         &bef));
 
-    auto compile_duration = absl::Now() - compile_start_time;
+    auto compile_duration = abslx::Now() - compile_start_time;
     saved_model_compile_time_seconds->GetCell(std::string(saved_model_dir))
-        ->Set(absl::ToInt64Seconds(compile_duration));
+        ->Set(abslx::ToInt64Seconds(compile_duration));
     LOG(INFO) << "TFRT finished compiling savedmodel. Took "
-              << absl::ToInt64Milliseconds(compile_duration) << " ms.";
+              << abslx::ToInt64Milliseconds(compile_duration) << " ms.";
 
     // Step 3: Initialize runtime states using special BEF functions.
-    auto init_start_time = absl::Now();
+    auto init_start_time = abslx::Now();
     ASSIGN_OR_RETURN_IN_INIT(
         auto bef_file, tfrt::CreateBefFileFromBefBuffer(
                            *options.graph_execution_options.runtime, bef));
@@ -582,11 +582,11 @@ std::unique_ptr<SavedModel> SavedModelImpl::LoadSavedModel(
         InitSavedModel(initializers_and_signatures, bef_file.get(), options,
                        resource_context.get(), *fallback_state));
 
-    auto init_duration = absl::Now() - init_start_time;
+    auto init_duration = abslx::Now() - init_start_time;
     saved_model_init_time_seconds->GetCell(std::string(saved_model_dir))
-        ->Set(absl::ToInt64Seconds(init_duration));
+        ->Set(abslx::ToInt64Seconds(init_duration));
     LOG(INFO) << "TFRT finished initializing savedmodel. Took "
-              << absl::ToInt64Milliseconds(init_duration) << " ms.";
+              << abslx::ToInt64Milliseconds(init_duration) << " ms.";
 
     ASSIGN_OR_RETURN_WITH_STAGE_INFO(
         "graph_executor creation", auto graph_executor,
@@ -648,17 +648,17 @@ const tensorflow::MetaGraphDef& SavedModelImpl::GetMetaGraphDef() const {
   return meta_graph_def_;
 }
 
-absl::optional<FunctionMetadata> SavedModelImpl::GetFunctionMetadata(
-    absl::string_view func_name) const {
+abslx::optional<FunctionMetadata> SavedModelImpl::GetFunctionMetadata(
+    abslx::string_view func_name) const {
   auto iter = signatures_.find(func_name);
-  if (iter == signatures_.end()) return absl::nullopt;
+  if (iter == signatures_.end()) return abslx::nullopt;
   return FunctionMetadata(&iter->second);
 }
 
 namespace {
 tensorflow::Status IsInputSpecsCorrect(
-    absl::string_view name, const internal::Signature& signature,
-    absl::Span<const tensorflow::Tensor> inputs) {
+    abslx::string_view name, const internal::Signature& signature,
+    abslx::Span<const tensorflow::Tensor> inputs) {
   TF_RET_CHECK(signature.input_specs.size() == inputs.size())
       << "signature " << name
       << " input size is wrong, expected: " << signature.input_specs.size()
@@ -679,8 +679,8 @@ tensorflow::Status IsInputSpecsCorrect(
 }  // namespace
 
 tensorflow::Status SavedModelImpl::Run(
-    const RunOptions& run_options, absl::string_view name,
-    absl::Span<const tensorflow::Tensor> inputs,
+    const RunOptions& run_options, abslx::string_view name,
+    abslx::Span<const tensorflow::Tensor> inputs,
     std::vector<tensorflow::Tensor>* outputs) {
   TF_RET_CHECK(outputs) << "outputs must be provided";
   outputs->clear();
@@ -739,8 +739,8 @@ struct SavedModelImpl::JoinedSignature {
 };
 
 tensorflow::Status SavedModelImpl::RunMultipleSignatures(
-    const RunOptions& run_options, absl::Span<const std::string> names,
-    absl::Span<const std::vector<tensorflow::Tensor>> multi_inputs,
+    const RunOptions& run_options, abslx::Span<const std::string> names,
+    abslx::Span<const std::vector<tensorflow::Tensor>> multi_inputs,
     std::vector<std::vector<tensorflow::Tensor>>* multi_outputs) {
   TF_RET_CHECK(names.size() == multi_inputs.size())
       << "the sizes of names and inputs should be the same";
@@ -761,7 +761,7 @@ tensorflow::Status SavedModelImpl::RunMultipleSignatures(
   std::vector<std::pair<std::string /*tensor_name*/, tensorflow::Tensor>>
       flat_inputs;
   std::vector<std::string> flat_output_names;
-  absl::flat_hash_set<std::string> visited_feed_tensor_names;
+  abslx::flat_hash_set<std::string> visited_feed_tensor_names;
 
   const auto& signature_defs = meta_graph_def_.signature_def();
   for (int i = 0; i < names.size(); ++i) {
@@ -886,9 +886,9 @@ SavedModelImpl::ImportSubgraph(
 
 tensorflow::Status SavedModelImpl::RunByTensorNames(
     const RunOptions& run_options,
-    absl::Span<const std::pair<std::string, tensorflow::Tensor>> inputs,
-    absl::Span<const std::string> output_tensor_names,
-    absl::Span<const std::string> target_node_names,
+    abslx::Span<const std::pair<std::string, tensorflow::Tensor>> inputs,
+    abslx::Span<const std::string> output_tensor_names,
+    abslx::Span<const std::string> target_node_names,
     std::vector<tensorflow::Tensor>* outputs) {
   // TODO(b/192498110): Validate input type.
 
@@ -906,15 +906,15 @@ using JoinedSignature = SavedModelImpl::JoinedSignature;
 // original order. For outputs, overlapping is fine so we only flatten it in the
 // original order.
 StatusOr<JoinedSignature> JoinSignatures(
-    absl::Span<const std::string> names, const SignatureMap& signature_map,
+    abslx::Span<const std::string> names, const SignatureMap& signature_map,
     const tensorflow::protobuf::Map<std::string, tensorflow::SignatureDef>&
         signature_def_map) {
   // Join all the names, all the inputs, and all the outputs.
   JoinedSignature joined_signature;
-  joined_signature.name = absl::StrJoin(names, kSignatureJoiningDelimiter);
+  joined_signature.name = abslx::StrJoin(names, kSignatureJoiningDelimiter);
 
   // Keep the feed tensor names visited.
-  absl::flat_hash_set<std::string> visited_feed_tensor_names;
+  abslx::flat_hash_set<std::string> visited_feed_tensor_names;
 
   for (const auto& name : names) {
     const auto& signature_def = signature_def_map.at(name);
@@ -1018,8 +1018,8 @@ SavedModelImpl::LoadJoinedSignature(const JoinedSignature& joined_signature) {
 }
 
 StatusOr<std::reference_wrapper<const SavedModelImpl::LoadingResult>>
-SavedModelImpl::GetOrCreateLoadingResult(absl::Span<const std::string> names) {
-  const auto joined_name = absl::StrJoin(names, kSignatureJoiningDelimiter);
+SavedModelImpl::GetOrCreateLoadingResult(abslx::Span<const std::string> names) {
+  const auto joined_name = abslx::StrJoin(names, kSignatureJoiningDelimiter);
   tensorflow::mutex_lock l(loading_result_cache_mu_);
   const auto iter = loading_result_cache_.find(joined_name);
   if (iter != loading_result_cache_.end()) return {*iter->second};

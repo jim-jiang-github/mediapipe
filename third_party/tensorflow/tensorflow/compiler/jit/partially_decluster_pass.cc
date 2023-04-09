@@ -38,8 +38,8 @@ bool NotBackedge(const Edge& edge) { return !edge.src()->IsNextIteration(); }
 
 namespace reduce_device_to_host_copies {
 Status FindNodesToDecluster(const Graph& graph,
-                            absl::flat_hash_set<Node*>* result,
-                            absl::Span<Node* const> post_order) {
+                            abslx::flat_hash_set<Node*>* result,
+                            abslx::Span<Node* const> post_order) {
   // Find nodes that have at least one user outside their cluster that expects
   // hostmem output.  These nodes should be cloned to outside the cluster to
   // avoid the device-host copy we'd otherwise need.
@@ -47,7 +47,7 @@ Status FindNodesToDecluster(const Graph& graph,
   MemoryTypeVector input_mtypes, output_mtypes;
 
   for (Node* n : post_order) {
-    std::optional<absl::string_view> from_cluster = GetXlaClusterForNode(*n);
+    std::optional<abslx::string_view> from_cluster = GetXlaClusterForNode(*n);
     if (!from_cluster) {
       continue;
     }
@@ -105,7 +105,7 @@ Status FindNodesToDecluster(const Graph& graph,
       // Check if `dst` is in a different cluster, unclustered, or about to be
       // partially declustered (here we rely on the post-order traversal order).
       // If yes, decluster `n` to avoid the device-to-host memcpy.
-      std::optional<absl::string_view> dst_cluster =
+      std::optional<abslx::string_view> dst_cluster =
           result->count(dst) ? std::nullopt : GetXlaClusterForNode(*dst);
       if (from_cluster != dst_cluster) {
         CHECK(result->insert(n).second);
@@ -117,15 +117,15 @@ Status FindNodesToDecluster(const Graph& graph,
 }
 
 Status PartiallyDeclusterNode(Graph* graph, Node* n) {
-  absl::string_view cluster_name = *GetXlaClusterForNode(*n);
-  absl::InlinedVector<const Edge*, 6> out_edges_to_clone;
+  abslx::string_view cluster_name = *GetXlaClusterForNode(*n);
+  abslx::InlinedVector<const Edge*, 6> out_edges_to_clone;
   for (const Edge* out_edge : n->out_edges()) {
     if (out_edge->IsControlEdge()) {
       continue;
     }
 
     Node* dst = out_edge->dst();
-    std::optional<absl::string_view> dst_cluster_name =
+    std::optional<abslx::string_view> dst_cluster_name =
         GetXlaClusterForNode(*dst);
     if (dst_cluster_name != cluster_name) {
       out_edges_to_clone.push_back(out_edge);
@@ -135,7 +135,7 @@ Status PartiallyDeclusterNode(Graph* graph, Node* n) {
   CHECK(!out_edges_to_clone.empty()) << n->DebugString();
 
   NodeDef ndef = n->def();
-  ndef.set_name(absl::StrCat(n->name(), "/declustered"));
+  ndef.set_name(abslx::StrCat(n->name(), "/declustered"));
   MergeDebugInfo(NodeDebugInfo(n->def()), &ndef);
   RemoveFromXlaCluster(&ndef);
   TF_ASSIGN_OR_RETURN(Node * cloned_node, graph->AddNode(ndef));
@@ -194,7 +194,7 @@ Status PartiallyDeclusterGraph(Graph* graph) {
   GetPostOrder(*graph, &post_order, /*stable_comparator=*/NodeComparatorName(),
                /*edge_filter=*/NotBackedge);
 
-  absl::flat_hash_set<Node*> nodes_to_partially_decluster;
+  abslx::flat_hash_set<Node*> nodes_to_partially_decluster;
   TF_RETURN_IF_ERROR(
       FindNodesToDecluster(*graph, &nodes_to_partially_decluster, post_order));
 
@@ -227,9 +227,9 @@ Status PartiallyDeclusterGraph(Graph* graph) {
 
 namespace reduce_recompilation {
 bool IsIntraClusterEdge(const Edge& edge) {
-  std::optional<absl::string_view> src_cluster_name =
+  std::optional<abslx::string_view> src_cluster_name =
       GetXlaClusterForNode(*edge.src());
-  std::optional<absl::string_view> dst_cluster_name =
+  std::optional<abslx::string_view> dst_cluster_name =
       GetXlaClusterForNode(*edge.dst());
   return src_cluster_name.has_value() && src_cluster_name == dst_cluster_name;
 }
@@ -309,10 +309,10 @@ Status PartiallyDeclusterGraph(Graph* graph,
       continue;
     }
 
-    absl::string_view cluster_name = *GetXlaClusterForNode(*n);
+    abslx::string_view cluster_name = *GetXlaClusterForNode(*n);
     bool node_on_cluster_edge =
-        absl::c_all_of(n->in_edges(), [&](const Edge* e) {
-          std::optional<absl::string_view> incoming_cluster =
+        abslx::c_all_of(n->in_edges(), [&](const Edge* e) {
+          std::optional<abslx::string_view> incoming_cluster =
               GetXlaClusterForNode(*e->src());
           return !incoming_cluster || *incoming_cluster != cluster_name;
         });
@@ -380,7 +380,7 @@ Status PartiallyDeclusterGraph(Graph* graph) {
       continue;
     }
 
-    std::optional<absl::string_view> cluster = GetXlaClusterForNode(*n);
+    std::optional<abslx::string_view> cluster = GetXlaClusterForNode(*n);
     if (!cluster.has_value()) {
       continue;
     }
@@ -389,7 +389,7 @@ Status PartiallyDeclusterGraph(Graph* graph) {
       return cluster == GetXlaClusterForNode(*e->src());
     };
 
-    if (absl::c_any_of(n->in_edges(), input_belongs_to_same_cluster)) {
+    if (abslx::c_any_of(n->in_edges(), input_belongs_to_same_cluster)) {
       continue;
     }
 

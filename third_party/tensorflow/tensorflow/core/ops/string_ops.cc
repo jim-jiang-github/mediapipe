@@ -151,7 +151,7 @@ REGISTER_OP("StringFormat")
       TF_RETURN_IF_ERROR(c->GetAttr("placeholder", &placeholder));
 
       std::vector<std::string> split_template;
-      split_template = absl::StrSplit(template_, placeholder);
+      split_template = abslx::StrSplit(template_, placeholder);
       int64_t num_placeholders = split_template.size() - 1;
       if (c->num_inputs() != num_placeholders) {
         return errors::InvalidArgument(strings::StrCat(

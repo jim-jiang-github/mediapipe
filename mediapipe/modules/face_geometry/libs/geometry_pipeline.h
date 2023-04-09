@@ -47,7 +47,7 @@ class GeometryPipeline {
   // geometry pipeline metadata).
   //
   // Both `frame_width` and `frame_height` must be positive.
-  virtual absl::StatusOr<std::vector<FaceGeometry>> EstimateFaceGeometry(
+  virtual abslx::StatusOr<std::vector<FaceGeometry>> EstimateFaceGeometry(
       const std::vector<NormalizedLandmarkList>& multi_face_landmarks,
       int frame_width, int frame_height) const = 0;
 };
@@ -59,7 +59,7 @@ class GeometryPipeline {
 //
 // Canonical face mesh (defined as a part of `metadata`) must have the
 // `POSITION` and the `TEX_COORD` vertex components.
-absl::StatusOr<std::unique_ptr<GeometryPipeline>> CreateGeometryPipeline(
+abslx::StatusOr<std::unique_ptr<GeometryPipeline>> CreateGeometryPipeline(
     const Environment& environment, const GeometryPipelineMetadata& metadata);
 
 }  // namespace mediapipe::face_geometry

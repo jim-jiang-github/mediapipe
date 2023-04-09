@@ -34,7 +34,7 @@ struct TFE_MonitoringCounter {
   template <typename... LabelDesc>
   TFE_MonitoringCounter(const char* name, const char* description,
                         LabelDesc&&... label) {
-    counter = absl::WrapUnique(tensorflow::monitoring::Counter<NumLabels>::New(
+    counter = abslx::WrapUnique(tensorflow::monitoring::Counter<NumLabels>::New(
         name, description, label...));
   }
 
@@ -66,7 +66,7 @@ struct TFE_MonitoringGauge {
   template <typename... LabelDesc>
   TFE_MonitoringGauge(const char* name, const char* description,
                       LabelDesc&&... label) {
-    gauge = absl::WrapUnique(
+    gauge = abslx::WrapUnique(
         tensorflow::monitoring::Gauge<ValueType, NumLabels>::New(
             name, description, label...));
   }
@@ -132,7 +132,7 @@ struct TFE_MonitoringSampler {
       const char* name,
       std::unique_ptr<tensorflow::monitoring::Buckets> buckets,
       const char* description, LabelDesc&&... label) {
-    sampler = absl::WrapUnique(tensorflow::monitoring::Sampler<NumLabels>::New(
+    sampler = abslx::WrapUnique(tensorflow::monitoring::Sampler<NumLabels>::New(
         {name, description, label...}, std::move(buckets)));
   }
 

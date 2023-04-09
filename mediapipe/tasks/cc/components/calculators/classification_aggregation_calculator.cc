@@ -104,9 +104,9 @@ class ClassificationAggregationCalculator : public Node {
                           kClassificationsOut, kTimestampedClassificationsOut,
                           kClassificationResultOut);
 
-  static absl::Status UpdateContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc);
-  absl::Status Process(CalculatorContext* cc);
+  static abslx::Status UpdateContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc);
+  abslx::Status Process(CalculatorContext* cc);
 
  private:
   std::vector<std::string> head_names_;
@@ -119,7 +119,7 @@ class ClassificationAggregationCalculator : public Node {
       CalculatorContext* cc);
 };
 
-absl::Status ClassificationAggregationCalculator::UpdateContract(
+abslx::Status ClassificationAggregationCalculator::UpdateContract(
     CalculatorContract* cc) {
   RET_CHECK_GE(kClassificationListIn(cc).Count(), 1);
   const auto& options =
@@ -134,10 +134,10 @@ absl::Status ClassificationAggregationCalculator::UpdateContract(
   } else {
     RET_CHECK(kClassificationsOut(cc).IsConnected());
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ClassificationAggregationCalculator::Open(CalculatorContext* cc) {
+abslx::Status ClassificationAggregationCalculator::Open(CalculatorContext* cc) {
   time_aggregation_enabled_ = kTimestampsIn(cc).IsConnected();
   const auto& options =
       cc->Options<ClassificationAggregationCalculatorOptions>();
@@ -145,10 +145,10 @@ absl::Status ClassificationAggregationCalculator::Open(CalculatorContext* cc) {
     head_names_.assign(options.head_names().begin(),
                        options.head_names().end());
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ClassificationAggregationCalculator::Process(
+abslx::Status ClassificationAggregationCalculator::Process(
     CalculatorContext* cc) {
   std::vector<ClassificationList> classification_lists;
   classification_lists.resize(kClassificationListIn(cc).Count());
@@ -161,7 +161,7 @@ absl::Status ClassificationAggregationCalculator::Process(
   ClassificationResult classification_result;
   if (time_aggregation_enabled_) {
     if (kTimestampsIn(cc).IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     kTimestampedClassificationsOut(cc).Send(
         ConvertToTimestampedClassificationResults(cc));
@@ -170,7 +170,7 @@ absl::Status ClassificationAggregationCalculator::Process(
   }
   kClassificationResultOut(cc).Send(classification_result);
   RET_CHECK(cached_classifications_.empty());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 ClassificationResult

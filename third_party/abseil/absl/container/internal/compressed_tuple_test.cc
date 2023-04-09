@@ -47,13 +47,13 @@ struct TwoValues {
 };
 
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace {
 
-using absl::test_internal::CopyableMovableInstance;
-using absl::test_internal::InstanceTracker;
+using abslx::test_internal::CopyableMovableInstance;
+using abslx::test_internal::InstanceTracker;
 
 TEST(CompressedTupleTest, Sizeof) {
   EXPECT_EQ(sizeof(int), sizeof(CompressedTuple<int>));
@@ -300,11 +300,11 @@ TEST(CompressedTupleTest, NoElements) {
 
 TEST(CompressedTupleTest, MoveOnlyElements) {
   CompressedTuple<std::unique_ptr<std::string>> str_tup(
-      absl::make_unique<std::string>("str"));
+      abslx::make_unique<std::string>("str"));
 
   CompressedTuple<CompressedTuple<std::unique_ptr<std::string>>,
                   std::unique_ptr<int>>
-  x(std::move(str_tup), absl::make_unique<int>(5));
+  x(std::move(str_tup), abslx::make_unique<int>(5));
 
   EXPECT_EQ(*x.get<0>().get<0>(), "str");
   EXPECT_EQ(*x.get<1>(), 5);
@@ -318,7 +318,7 @@ TEST(CompressedTupleTest, MoveOnlyElements) {
 
 TEST(CompressedTupleTest, MoveConstructionMoveOnlyElements) {
   CompressedTuple<std::unique_ptr<std::string>> base(
-      absl::make_unique<std::string>("str"));
+      abslx::make_unique<std::string>("str"));
   EXPECT_EQ(*base.get<0>(), "str");
 
   CompressedTuple<std::unique_ptr<std::string>> copy(std::move(base));
@@ -328,11 +328,11 @@ TEST(CompressedTupleTest, MoveConstructionMoveOnlyElements) {
 TEST(CompressedTupleTest, AnyElements) {
   any a(std::string("str"));
   CompressedTuple<any, any&> x(any(5), a);
-  EXPECT_EQ(absl::any_cast<int>(x.get<0>()), 5);
-  EXPECT_EQ(absl::any_cast<std::string>(x.get<1>()), "str");
+  EXPECT_EQ(abslx::any_cast<int>(x.get<0>()), 5);
+  EXPECT_EQ(abslx::any_cast<std::string>(x.get<1>()), "str");
 
   a = 0.5f;
-  EXPECT_EQ(absl::any_cast<float>(x.get<1>()), 0.5);
+  EXPECT_EQ(abslx::any_cast<float>(x.get<1>()), 0.5);
 }
 
 TEST(CompressedTupleTest, Constexpr) {
@@ -369,15 +369,15 @@ TEST(CompressedTupleTest, Constexpr) {
   EXPECT_EQ(trivial2, 0);
 #endif
 
-  constexpr CompressedTuple<Empty<0>, NonTrivialStruct, absl::optional<int>>
+  constexpr CompressedTuple<Empty<0>, NonTrivialStruct, abslx::optional<int>>
       non_trivial = {};
   constexpr CallType non_trivial0 = non_trivial.get<0>().value();
   constexpr int non_trivial1 = non_trivial.get<1>().value();
-  constexpr absl::optional<int> non_trivial2 = non_trivial.get<2>();
+  constexpr abslx::optional<int> non_trivial2 = non_trivial.get<2>();
 
   EXPECT_EQ(non_trivial0, CallType::kConstRef);
   EXPECT_EQ(non_trivial1, 5);
-  EXPECT_EQ(non_trivial2, absl::nullopt);
+  EXPECT_EQ(non_trivial2, abslx::nullopt);
 
   static constexpr char data[] = "DEF";
   constexpr CompressedTuple<const char*> z(data);
@@ -386,8 +386,8 @@ TEST(CompressedTupleTest, Constexpr) {
 
 #if defined(__clang__)
   // An apparent bug in earlier versions of gcc claims these are ambiguous.
-  constexpr int x2m = absl::move(x.get<2>()).get<0>();
-  constexpr CallType x3m = absl::move(x).get<3>().value();
+  constexpr int x2m = abslx::move(x.get<2>()).get<0>();
+  constexpr CallType x3m = abslx::move(x).get<3>().value();
   EXPECT_EQ(x2m, 5);
   EXPECT_EQ(x3m, CallType::kConstMove);
 #endif
@@ -406,4 +406,4 @@ TEST(CompressedTupleTest, EmptyFinalClass) {
 }  // namespace
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

@@ -28,15 +28,15 @@ limitations under the License.
 namespace xla {
 namespace sharding_op_util {
 
-std::string EncodeAttributes(absl::Span<const int64_t> unspecified_dims) {
+std::string EncodeAttributes(abslx::Span<const int64_t> unspecified_dims) {
   if (unspecified_dims.empty()) {
     return "";
   }
-  return absl::StrCat("unspecified_dims=[",
-                      absl::StrJoin(unspecified_dims, ","), "]");
+  return abslx::StrCat("unspecified_dims=[",
+                      abslx::StrJoin(unspecified_dims, ","), "]");
 }
 
-Status ParseAttributes(absl::string_view opaque,
+Status ParseAttributes(abslx::string_view opaque,
                        std::vector<int64_t>* unspecified_dims) {
   HloLexer lexer(opaque);
   while (lexer.Lex() != TokKind::kEof) {

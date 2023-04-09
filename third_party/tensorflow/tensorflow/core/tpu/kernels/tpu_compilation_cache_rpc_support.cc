@@ -34,7 +34,7 @@ std::shared_ptr<::grpc::ChannelCredentials> CreateChannelCredentials() {
 #if defined(LIBTPU_ON_GCE)
 template <>
 Status DeserializeRpcResponseToCacheEntry<GetTpuProgramResponseExternal>(
-    absl::string_view local_proto_key, GetTpuProgramResponseExternal* response,
+    abslx::string_view local_proto_key, GetTpuProgramResponseExternal* response,
     std::shared_ptr<CacheEntry>* cache_entry) {
   CHECK_NE(response, nullptr);
   CHECK_NE(cache_entry, nullptr);
@@ -47,12 +47,12 @@ Status DeserializeRpcResponseToCacheEntry<GetTpuProgramResponseExternal>(
   } else {
     TpuSerializedProto serialized_response_proto =
         stream_executor::tpu::SerializeProto(*response);
-    auto cleanup = absl::MakeCleanup([&serialized_response_proto]() {
+    auto cleanup = abslx::MakeCleanup([&serialized_response_proto]() {
       stream_executor::tpu::SerializedProto_Free(serialized_response_proto);
     });
     // When we lookup from remote cache, we fetch a TPU program for a specific
     // core, hence we allocate TPU program group for a single program.
-    auto tpu_program_group = absl::make_unique<TpuProgramGroup>();
+    auto tpu_program_group = abslx::make_unique<TpuProgramGroup>();
 
     // TODO(b/166575150): can be optimized by sending the buffer over the gRPC
     // without an extra deserializing.
@@ -93,7 +93,7 @@ xla::StatusOr<std::vector<::grpc::Slice>> SerializeCacheEntryToBufferSlices(
   }
 
   TpuExecutableSerializedProto executable;
-  auto cleanup_executable = absl::MakeCleanup([&executable]() {
+  auto cleanup_executable = abslx::MakeCleanup([&executable]() {
     if (executable.size > 0) {
       stream_executor::tpu::SerializedProto_Free(executable);
     }
@@ -118,7 +118,7 @@ xla::StatusOr<std::vector<::grpc::Slice>> SerializeCacheEntryToBufferSlices(
   header.set_may_modify_variables(may_modify_variables);
 
   CompilerMetadataSerializedProto compiler_metadata;
-  auto cleanup_compiler_metadata = absl::MakeCleanup([&compiler_metadata]() {
+  auto cleanup_compiler_metadata = abslx::MakeCleanup([&compiler_metadata]() {
     if (compiler_metadata.size > 0) {
       stream_executor::tpu::SerializedProto_Free(compiler_metadata);
     }

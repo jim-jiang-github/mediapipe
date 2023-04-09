@@ -57,7 +57,7 @@ class GlCalculatorHelper {
   ~GlCalculatorHelper();
 
   // Call Open from the Open method of a calculator to initialize the helper.
-  absl::Status Open(CalculatorContext* cc);
+  abslx::Status Open(CalculatorContext* cc);
 
   // Can be used to initialize the helper outside of a calculator. Useful for
   // testing.
@@ -67,32 +67,32 @@ class GlCalculatorHelper {
 
   // This method can be called from GetContract to set up the needed GPU
   // resources.
-  static absl::Status UpdateContract(CalculatorContract* cc);
+  static abslx::Status UpdateContract(CalculatorContract* cc);
 
   // This method can be called from FillExpectations to set the correct types
   // for the shared GL input side packet(s).
   ABSL_DEPRECATED("Use UpdateContract")
-  static absl::Status SetupInputSidePackets(PacketTypeSet* input_side_packets);
+  static abslx::Status SetupInputSidePackets(PacketTypeSet* input_side_packets);
 
   // Execute the provided function within the helper's GL context. On some
   // platforms, this may be run on a different thread; however, this method
   // will still wait for the function to finish executing before returning.
   // The status result from the function is passed on to the caller.
-  absl::Status RunInGlContext(std::function<absl::Status(void)> gl_func);
+  abslx::Status RunInGlContext(std::function<abslx::Status(void)> gl_func);
 
   // Convenience version of RunInGlContext for arguments with a void result
-  // type. As with the absl::Status version, this also waits for the
+  // type. As with the abslx::Status version, this also waits for the
   // function to finish executing before returning.
   //
   // Implementation note: we cannot use a std::function<void(void)> argument
   // here, because that would break passing in a lambda that returns a status;
   // e.g.:
-  //   RunInGlContext([]() -> absl::Status { ... });
+  //   RunInGlContext([]() -> abslx::Status { ... });
   //
   // The reason is that std::function<void(...)> allows the implicit conversion
   // of a callable with any result type, as long as the argument types match.
   // As a result, the above lambda would be implicitly convertible to both
-  // std::function<absl::Status(void)> and std::function<void(void)>, and
+  // std::function<abslx::Status(void)> and std::function<void(void)>, and
   // the invocation would be ambiguous.
   //
   // Therefore, instead of using std::function<void(void)>, we use a template
@@ -102,7 +102,7 @@ class GlCalculatorHelper {
   void RunInGlContext(T f) {
     RunInGlContext([f] {
       f();
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }).IgnoreError();
   }
 
@@ -173,7 +173,7 @@ class GlCalculatorHelper {
  private:
   void InitializeInternal(CalculatorContext* cc, GpuResources* gpu_resources);
 
-  absl::Status RunInGlContext(std::function<absl::Status(void)> gl_func,
+  abslx::Status RunInGlContext(std::function<abslx::Status(void)> gl_func,
                               CalculatorContext* calculator_context);
 
   // Makes a GpuBuffer accessible as a texture in the GL context.

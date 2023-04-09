@@ -42,7 +42,7 @@ limitations under the License.
 #include "tensorflow/stream_executor/tpu/tpu_topology.h"
 
 // Timeout for waiting for TPU devices to appear.
-const absl::Duration dtensor_tpu_init_retry_timeout = absl::Seconds(30);
+const abslx::Duration dtensor_tpu_init_retry_timeout = abslx::Seconds(30);
 
 namespace tensorflow {
 namespace dtensor {
@@ -122,7 +122,7 @@ class ConfigureAndInitializeGlobalTPUOpKernel : public OpKernel {
       const ConfigureAndInitializeGlobalTPUOpKernel&) = delete;
 
   static Status InitializeInternal(OpKernelContext* ctx, ResourceMgr* rmgr,
-                                   absl::Duration retry_timeout,
+                                   abslx::Duration retry_timeout,
                                    std::vector<int32>* core_id_output_vec) {
     // Reset the TPU embedding engine interface if we are not the master.
     // We need to reset the interface before initializing the host because the
@@ -142,13 +142,13 @@ class ConfigureAndInitializeGlobalTPUOpKernel : public OpKernel {
       return errors::Internal("Could not find registered TPU system.");
     }
 
-    auto start = absl::Now();
+    auto start = abslx::Now();
     auto init_status = OkStatus();
 
     // Keep trying to initialize underlying TPU system until either TPU system
     // is initialized or initialization times out.
     while (!tpu_platform->Initialized() &&
-           (absl::Now() - start < retry_timeout)) {
+           (abslx::Now() - start < retry_timeout)) {
       VLOG(1) << "Initializaing global TPU system.";
       init_status = tpu_platform->Initialize({});
     }
@@ -172,7 +172,7 @@ class ConfigureAndInitializeGlobalTPUOpKernel : public OpKernel {
     TF_Status* status = TF_NewStatus();
     size_t device_id_output_size;
     int32_t* device_id_output = nullptr;
-    auto cleanup = absl::MakeCleanup([&status, &device_id_output]() {
+    auto cleanup = abslx::MakeCleanup([&status, &device_id_output]() {
       TF_DeleteStatus(status);
       tpu::OpsApiFn()->TpuConfigurationApi_FreeInt32ArrayFn(device_id_output);
     });

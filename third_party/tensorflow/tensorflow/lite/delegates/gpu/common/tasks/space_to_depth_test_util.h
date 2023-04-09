@@ -22,13 +22,13 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status SpaceToDepthTensorShape1x2x2x1BlockSize2Test(
+abslx::Status SpaceToDepthTensorShape1x2x2x1BlockSize2Test(
     TestExecutionEnvironment* env);
-absl::Status SpaceToDepthTensorShape1x2x2x2BlockSize2Test(
+abslx::Status SpaceToDepthTensorShape1x2x2x2BlockSize2Test(
     TestExecutionEnvironment* env);
-absl::Status SpaceToDepthTensorShape1x2x2x3BlockSize2Test(
+abslx::Status SpaceToDepthTensorShape1x2x2x3BlockSize2Test(
     TestExecutionEnvironment* env);
-absl::Status SpaceToDepthTensorShape1x4x4x1BlockSize2Test(
+abslx::Status SpaceToDepthTensorShape1x4x4x1BlockSize2Test(
     TestExecutionEnvironment* env);
 
 }  // namespace gpu

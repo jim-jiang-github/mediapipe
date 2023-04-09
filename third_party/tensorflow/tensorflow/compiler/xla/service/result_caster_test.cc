@@ -33,7 +33,7 @@ class ResultCasterTest
 TEST_P(ResultCasterTest, CastResultWhenNeeded) {
   PrimitiveType lhs_type, rhs_type, result_type;
   std::tie(lhs_type, rhs_type, result_type) = GetParam();
-  absl::string_view module_tmpl = R"(
+  abslx::string_view module_tmpl = R"(
   HloModule module
 
   ENTRY main {
@@ -42,7 +42,7 @@ TEST_P(ResultCasterTest, CastResultWhenNeeded) {
     ROOT dot = $2[2,2]{1,0} dot(p0, p1), lhs_contracting_dims={1},
                                          rhs_contracting_dims={0}
   })";
-  auto module_string = absl::Substitute(
+  auto module_string = abslx::Substitute(
       module_tmpl, primitive_util::LowercasePrimitiveTypeName(lhs_type),
       primitive_util::LowercasePrimitiveTypeName(rhs_type),
       primitive_util::LowercasePrimitiveTypeName(result_type));
@@ -55,9 +55,9 @@ TEST_P(ResultCasterTest, CastResultWhenNeeded) {
   EXPECT_EQ(casted, should_cast);
   auto lhs = op::Parameter(0);
   auto rhs = op::Parameter(1);
-  auto original_shape_str = absl::Substitute(
+  auto original_shape_str = abslx::Substitute(
       "$0[2,2]{1,0}", primitive_util::LowercasePrimitiveTypeName(result_type));
-  auto accumulation_shape_str = absl::Substitute(
+  auto accumulation_shape_str = abslx::Substitute(
       "$0[2,2]{1,0}",
       primitive_util::LowercasePrimitiveTypeName(accumulation_type));
   if (should_cast) {

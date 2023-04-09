@@ -145,7 +145,7 @@ BaseRemoteRendezvous::~BaseRemoteRendezvous() {
 // and device name and does no lookups in the worker->device_mgr.
 static bool IsLocalDevice(const StringPiece worker_name,
                           const StringPiece device_name) {
-  return absl::StartsWith(device_name, worker_name);
+  return abslx::StartsWith(device_name, worker_name);
 }
 
 Status BaseRemoteRendezvous::Initialize(WorkerSession* session) {
@@ -453,7 +453,7 @@ void BaseRemoteRendezvous::RegisterCall(BaseRecvTensorCall* call,
       if (!already_cancelled) {
         calls_.emplace(
             cm,
-            std::make_pair(token, absl::flat_hash_set<BaseRecvTensorCall*>{}));
+            std::make_pair(token, abslx::flat_hash_set<BaseRecvTensorCall*>{}));
       }
     }
   }

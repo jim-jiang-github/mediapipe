@@ -33,7 +33,7 @@ namespace {
 
 constexpr int kIntTestValue = 33;
 
-typedef std::function<absl::Status(CalculatorContext* cc)>
+typedef std::function<abslx::Status(CalculatorContext* cc)>
     CalculatorContextFunction;
 
 // Returns the contents of a set of Packets.
@@ -90,24 +90,24 @@ class CountingExecutor : public Executor {
 // streams and outputs the sum to the output stream.
 class IntAdderCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     for (int i = 0; i < cc->Inputs().NumEntries(); ++i) {
       cc->Inputs().Index(i).Set<int>();
     }
     cc->Outputs().Index(0).Set<int>();
     cc->SetTimestampOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final { return absl::OkStatus(); }
+  abslx::Status Open(CalculatorContext* cc) final { return abslx::OkStatus(); }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     int sum = 0;
     for (int i = 0; i < cc->Inputs().NumEntries(); ++i) {
       sum += cc->Inputs().Index(i).Get<int>();
     }
     cc->Outputs().Index(0).Add(new int(sum), cc->InputTimestamp());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(IntAdderCalculator);
@@ -115,13 +115,13 @@ REGISTER_CALCULATOR(IntAdderCalculator);
 template <typename InputType>
 class TypedSinkCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<InputType>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
-    return absl::OkStatus();
+  abslx::Status Process(CalculatorContext* cc) override {
+    return abslx::OkStatus();
   }
 };
 typedef TypedSinkCalculator<std::string> StringSinkCalculator;
@@ -133,13 +133,13 @@ REGISTER_CALCULATOR(IntSinkCalculator);
 // integer.
 class EvenIntFilterCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<int>();
     cc->Outputs().Index(0).Set<int>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     int value = cc->Inputs().Index(0).Get<int>();
     if (value % 2 == 0) {
       cc->Outputs().Index(0).AddPacket(cc->Inputs().Index(0).Value());
@@ -147,7 +147,7 @@ class EvenIntFilterCalculator : public CalculatorBase {
       cc->Outputs().Index(0).SetNextTimestampBound(
           cc->InputTimestamp().NextAllowedInStream());
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(EvenIntFilterCalculator);
@@ -157,19 +157,19 @@ REGISTER_CALCULATOR(EvenIntFilterCalculator);
 // input stream carries the value true.
 class ValveCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).SetAny();
     cc->Inputs().Index(1).Set<bool>();
     cc->Outputs().Index(0).SetSameAs(&cc->Inputs().Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     cc->Outputs().Index(0).SetHeader(cc->Inputs().Index(0).Header());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     if (cc->Inputs().Index(1).Get<bool>()) {
       cc->GetCounter("PassThrough")->Increment();
       cc->Outputs().Index(0).AddPacket(cc->Inputs().Index(0).Value());
@@ -183,7 +183,7 @@ class ValveCalculator : public CalculatorBase {
       cc->Outputs().Index(0).SetNextTimestampBound(
           cc->InputTimestamp().NextAllowedInStream());
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(ValveCalculator);
@@ -192,27 +192,27 @@ REGISTER_CALCULATOR(ValveCalculator);
 // but shifts the timestamp.
 class TimeShiftCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).SetAny();
     cc->Outputs().Index(0).SetSameAs(&cc->Inputs().Index(0));
     cc->InputSidePackets().Index(0).Set<TimestampDiff>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     // Input: arbitrary Packets.
     // Output: copy of the input.
     cc->Outputs().Index(0).SetHeader(cc->Inputs().Index(0).Header());
     shift_ = cc->InputSidePackets().Index(0).Get<TimestampDiff>();
     cc->SetOffset(shift_);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     cc->GetCounter("PassThrough")->Increment();
     cc->Outputs().Index(0).AddPacket(
         cc->Inputs().Index(0).Value().At(cc->InputTimestamp() + shift_));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -232,17 +232,17 @@ REGISTER_CALCULATOR(TimeShiftCalculator);
 //   T=2000 Output 100
 class OutputAndBoundSourceCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Outputs().Index(0).Set<int>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     counter_ = 0;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     Timestamp timestamp(counter_);
     if (counter_ % 20 == 0) {
       cc->Outputs().Index(0).AddPacket(
@@ -254,7 +254,7 @@ class OutputAndBoundSourceCalculator : public CalculatorBase {
       return tool::StatusStop();
     }
     counter_ += 10;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -267,40 +267,40 @@ REGISTER_CALCULATOR(OutputAndBoundSourceCalculator);
 // Process() method. The input stream and output stream have the integer type.
 class Delay20Calculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<int>();
     cc->Outputs().Index(0).Set<int>();
     cc->SetTimestampOffset(TimestampDiff(20));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     cc->Outputs().Index(0).AddPacket(MakePacket<int>(0).At(Timestamp(0)));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     const Packet& packet = cc->Inputs().Index(0).Value();
     Timestamp timestamp = packet.Timestamp() + 20;
     cc->Outputs().Index(0).AddPacket(packet.At(timestamp));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(Delay20Calculator);
 
 class CustomBoundCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<int>();
     cc->Outputs().Index(0).Set<int>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final { return absl::OkStatus(); }
+  abslx::Status Open(CalculatorContext* cc) final { return abslx::OkStatus(); }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     cc->Outputs().Index(0).SetNextTimestampBound(cc->InputTimestamp() + 1);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(CustomBoundCalculator);
@@ -612,7 +612,7 @@ TEST(CalculatorGraphBoundsTest, ImmediateHandlerBounds) {
   MP_ASSERT_OK(graph.Initialize(config));
   MP_ASSERT_OK(graph.ObserveOutputStream("output", [&](const Packet& p) {
     output_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(graph.WaitUntilIdle());
@@ -637,41 +637,41 @@ TEST(CalculatorGraphBoundsTest, ImmediateHandlerBounds) {
 // A Calculator that only sets timestamp bound by SetOffset().
 class OffsetBoundCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<int>();
     cc->Outputs().Index(0).Set<int>();
     cc->SetTimestampOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final { return absl::OkStatus(); }
+  abslx::Status Open(CalculatorContext* cc) final { return abslx::OkStatus(); }
 
-  absl::Status Process(CalculatorContext* cc) final { return absl::OkStatus(); }
+  abslx::Status Process(CalculatorContext* cc) final { return abslx::OkStatus(); }
 };
 REGISTER_CALCULATOR(OffsetBoundCalculator);
 
 // A Calculator that produces a packet for each call to Process.
 class BoundToPacketCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     for (int i = 0; i < cc->Inputs().NumEntries(); ++i) {
       cc->Inputs().Index(i).SetAny();
     }
     for (int i = 0; i < cc->Outputs().NumEntries(); ++i) {
       cc->Outputs().Index(i).Set<Timestamp>();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final { return absl::OkStatus(); }
+  abslx::Status Open(CalculatorContext* cc) final { return abslx::OkStatus(); }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     for (int i = 0; i < cc->Outputs().NumEntries(); ++i) {
       Timestamp t = cc->Inputs().Index(i).Value().Timestamp();
       cc->Outputs().Index(i).AddPacket(
           mediapipe::MakePacket<Timestamp>(t).At(cc->InputTimestamp()));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(BoundToPacketCalculator);
@@ -681,20 +681,20 @@ class FuturePacketCalculator : public CalculatorBase {
  public:
   static constexpr int64 kOutputFutureMicros = 3;
 
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<int>();
     cc->Outputs().Index(0).Set<int>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final { return absl::OkStatus(); }
+  abslx::Status Open(CalculatorContext* cc) final { return abslx::OkStatus(); }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     const Packet& packet = cc->Inputs().Index(0).Value();
     Timestamp timestamp =
         Timestamp(packet.Timestamp().Value() + kOutputFutureMicros);
     cc->Outputs().Index(0).AddPacket(packet.At(timestamp));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(FuturePacketCalculator);
@@ -726,7 +726,7 @@ TEST(CalculatorGraphBoundsTest, OffsetBoundPropagation) {
   MP_ASSERT_OK(graph.Initialize(config));
   MP_ASSERT_OK(graph.ObserveOutputStream("output", [&](const Packet& p) {
     output_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(graph.WaitUntilIdle());
@@ -777,7 +777,7 @@ TEST(CalculatorGraphBoundsTest, BoundWithoutInputPackets) {
   MP_ASSERT_OK(graph.Initialize(config));
   MP_ASSERT_OK(graph.ObserveOutputStream("output", [&](const Packet& p) {
     output_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(graph.WaitUntilIdle());
@@ -851,13 +851,13 @@ TEST(CalculatorGraphBoundsTest, FixedSizeHandlerBounds) {
   std::vector<Packet> outputs;
   MP_ASSERT_OK(graph.ObserveOutputStream("output", [&](const Packet& p) {
     outputs.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   std::vector<Packet> thinned_outputs;
   MP_ASSERT_OK(
       graph.ObserveOutputStream("thinned_output", [&](const Packet& p) {
         thinned_outputs.push_back(p);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
 
   // The enter_semaphore is used to wait for LambdaCalculator::Process.
@@ -866,13 +866,13 @@ TEST(CalculatorGraphBoundsTest, FixedSizeHandlerBounds) {
   AtomicSemaphore exit_semaphore(0);
   CalculatorContextFunction open_fn = [&](CalculatorContext* cc) {
     cc->SetOffset(0);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   };
   CalculatorContextFunction process_fn = [&](CalculatorContext* cc) {
     enter_semaphore.Release(1);
     exit_semaphore.Acquire(1);
     cc->Outputs().Index(0).AddPacket(cc->Inputs().Index(0).Value());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   };
   MP_ASSERT_OK(graph.StartRun({
       {"open_fn", Adopt(new auto(open_fn))},
@@ -926,20 +926,20 @@ TEST(CalculatorGraphBoundsTest, FixedSizeHandlerBounds) {
 // A Calculator that outputs only the last packet from its input stream.
 class LastPacketCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).SetAny();
     cc->Outputs().Index(0).SetAny();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Open(CalculatorContext* cc) final { return absl::OkStatus(); }
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final { return abslx::OkStatus(); }
+  abslx::Status Process(CalculatorContext* cc) final {
     cc->Outputs().Index(0).SetNextTimestampBound(cc->InputTimestamp());
     last_packet_ = cc->Inputs().Index(0).Value();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Close(CalculatorContext* cc) final {
+  abslx::Status Close(CalculatorContext* cc) final {
     cc->Outputs().Index(0).AddPacket(last_packet_);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -981,12 +981,12 @@ TEST(CalculatorGraphBoundsTest, LastPacketCheck) {
   MP_ASSERT_OK(graph.Initialize(config));
   MP_ASSERT_OK(graph.ObserveOutputStream("output", [&](const Packet& p) {
     output_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   std::vector<Packet> last_output_packets;
   MP_ASSERT_OK(graph.ObserveOutputStream("last_output", [&](const Packet& p) {
     last_output_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(graph.WaitUntilIdle());
@@ -1034,7 +1034,7 @@ void TestBoundsForEmptyInputs(std::string input_stream_handler) {
               input_stream_handler { $input_stream_handler }
             }
           )";
-  absl::StrReplaceAll({{"$input_stream_handler", input_stream_handler}},
+  abslx::StrReplaceAll({{"$input_stream_handler", input_stream_handler}},
                       &config_str);
   CalculatorGraphConfig config =
       mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(config_str);
@@ -1044,11 +1044,11 @@ void TestBoundsForEmptyInputs(std::string input_stream_handler) {
   MP_ASSERT_OK(graph.Initialize(config));
   MP_ASSERT_OK(graph.ObserveOutputStream("input_ts", [&](const Packet& p) {
     input_ts_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.ObserveOutputStream("bounds_ts", [&](const Packet& p) {
     bounds_ts_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(graph.WaitUntilIdle());
@@ -1118,7 +1118,7 @@ TEST(CalculatorGraphBoundsTest, BoundsForEmptyInputs_SyncSets) {
 // A Calculator that produces a packet for each timestamp bounds update.
 class ProcessBoundToPacketCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     for (int i = 0; i < cc->Inputs().NumEntries(); ++i) {
       cc->Inputs().Index(i).SetAny();
     }
@@ -1127,10 +1127,10 @@ class ProcessBoundToPacketCalculator : public CalculatorBase {
     }
     cc->SetInputStreamHandler("ImmediateInputStreamHandler");
     cc->SetProcessTimestampBounds(true);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     for (int i = 0; i < cc->Outputs().NumEntries(); ++i) {
       Timestamp t = cc->Inputs().Index(i).Value().Timestamp();
       // Create a new packet for each input stream with a new timestamp bound,
@@ -1140,7 +1140,7 @@ class ProcessBoundToPacketCalculator : public CalculatorBase {
         cc->Outputs().Index(i).Add(new auto(t), t);
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(ProcessBoundToPacketCalculator);
@@ -1148,7 +1148,7 @@ REGISTER_CALCULATOR(ProcessBoundToPacketCalculator);
 // A Calculator that passes through each packet and timestamp immediately.
 class ImmediatePassthroughCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     for (int i = 0; i < cc->Inputs().NumEntries(); ++i) {
       cc->Inputs().Index(i).SetAny();
     }
@@ -1157,10 +1157,10 @@ class ImmediatePassthroughCalculator : public CalculatorBase {
     }
     cc->SetInputStreamHandler("ImmediateInputStreamHandler");
     cc->SetProcessTimestampBounds(true);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     for (int i = 0; i < cc->Outputs().NumEntries(); ++i) {
       if (!cc->Inputs().Index(i).IsEmpty()) {
         cc->Outputs().Index(i).AddPacket(cc->Inputs().Index(i).Value());
@@ -1174,7 +1174,7 @@ class ImmediatePassthroughCalculator : public CalculatorBase {
         }
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(ImmediatePassthroughCalculator);
@@ -1203,7 +1203,7 @@ void TestProcessForEmptyInputs(const std::string& input_stream_handler) {
               input_stream_handler { $input_stream_handler }
             }
           )";
-  absl::StrReplaceAll({{"$input_stream_handler", input_stream_handler}},
+  abslx::StrReplaceAll({{"$input_stream_handler", input_stream_handler}},
                       &config_str);
   CalculatorGraphConfig config =
       mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(config_str);
@@ -1213,7 +1213,7 @@ void TestProcessForEmptyInputs(const std::string& input_stream_handler) {
   MP_ASSERT_OK(graph.Initialize(config));
   MP_ASSERT_OK(graph.ObserveOutputStream("bounds_ts", [&](const Packet& p) {
     bounds_ts_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(graph.WaitUntilIdle());
@@ -1313,11 +1313,11 @@ TEST(CalculatorGraphBoundsTest, ProcessTimestampBounds_Passthrough) {
   MP_ASSERT_OK(graph.Initialize(config));
   MP_ASSERT_OK(graph.ObserveOutputStream("output_0", [&](const Packet& p) {
     output_0_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.ObserveOutputStream("output_1", [&](const Packet& p) {
     output_1_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(graph.WaitUntilIdle());
@@ -1380,7 +1380,7 @@ TEST(CalculatorGraphBoundsTest, PostStreamPacketToSetProcessTimestampBound) {
   MP_ASSERT_OK(graph.Initialize(config));
   MP_ASSERT_OK(graph.ObserveOutputStream("output_0", [&](const Packet& p) {
     output_0_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(graph.WaitUntilIdle());
@@ -1399,20 +1399,20 @@ TEST(CalculatorGraphBoundsTest, PostStreamPacketToSetProcessTimestampBound) {
 // A Calculator that sends a timestamp bound for every other input.
 class OccasionalBoundCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<int>();
     cc->Outputs().Index(0).SetSameAs(&cc->Inputs().Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
-    absl::SleepFor(absl::Milliseconds(1));
+  abslx::Status Process(CalculatorContext* cc) final {
+    abslx::SleepFor(abslx::Milliseconds(1));
     if (cc->InputTimestamp().Value() % 20 == 0) {
       Timestamp bound = cc->InputTimestamp().NextAllowedInStream();
       cc->Outputs().Index(0).SetNextTimestampBound(
           std::max(bound, cc->Outputs().Index(0).NextTimestampBound()));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(OccasionalBoundCalculator);
@@ -1440,7 +1440,7 @@ TEST(CalculatorGraphBoundsTest, MaxInFlightWithOccasionalBound) {
   MP_ASSERT_OK(graph.Initialize(config));
   MP_ASSERT_OK(graph.ObserveOutputStream("output_0", [&](const Packet& p) {
     output_0_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(graph.WaitUntilIdle());
@@ -1464,18 +1464,18 @@ TEST(CalculatorGraphBoundsTest, MaxInFlightWithOccasionalBound) {
 // A Calculator that uses both SetTimestampOffset and SetNextTimestampBound.
 class OffsetAndBoundCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<int>();
     cc->Outputs().Index(0).SetSameAs(&cc->Inputs().Index(0));
     cc->SetTimestampOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Open(CalculatorContext* cc) final { return absl::OkStatus(); }
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final { return abslx::OkStatus(); }
+  abslx::Status Process(CalculatorContext* cc) final {
     if (cc->InputTimestamp().Value() % 20 == 0) {
       cc->Outputs().Index(0).SetNextTimestampBound(Timestamp(10000));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(OffsetAndBoundCalculator);
@@ -1500,7 +1500,7 @@ TEST(CalculatorGraphBoundsTest, OffsetAndBound) {
   MP_ASSERT_OK(graph.Initialize(config));
   MP_ASSERT_OK(graph.ObserveOutputStream("output_0", [&](const Packet& p) {
     output_0_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(graph.WaitUntilIdle());
@@ -1524,17 +1524,17 @@ TEST(CalculatorGraphBoundsTest, OffsetAndBound) {
 // A Calculator that sends empty output stream packets.
 class EmptyPacketCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<int>();
     cc->Outputs().Index(0).SetSameAs(&cc->Inputs().Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Open(CalculatorContext* cc) final { return absl::OkStatus(); }
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final { return abslx::OkStatus(); }
+  abslx::Status Process(CalculatorContext* cc) final {
     if (cc->InputTimestamp().Value() % 2 == 0) {
       cc->Outputs().Index(0).AddPacket(Packet().At(cc->InputTimestamp()));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(EmptyPacketCalculator);
@@ -1564,7 +1564,7 @@ TEST(CalculatorGraphBoundsTest, EmptyPacketOutput) {
   MP_ASSERT_OK(graph.Initialize(config));
   MP_ASSERT_OK(graph.ObserveOutputStream("output_0", [&](const Packet& p) {
     output_0_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(graph.WaitUntilIdle());
@@ -1606,7 +1606,7 @@ TEST(CalculatorGraphBoundsTest, SetInputStreamTimestampBound) {
   MP_ASSERT_OK(graph.Initialize(config));
   MP_ASSERT_OK(graph.ObserveOutputStream("output_0", [&](const Packet& p) {
     output_0_packets.push_back(p);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }));
   MP_ASSERT_OK(graph.StartRun({}));
   MP_ASSERT_OK(graph.WaitUntilIdle());
@@ -1656,7 +1656,7 @@ TEST(CalculatorGraphBoundsTest, TimestampBoundsForInfrequentInput) {
       "output_frame",
       [&](const Packet& p) {
         frame_packets.push_back(p);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       },
       /*observe_bound_updates=*/true));
   std::vector<Packet> config_packets;
@@ -1664,7 +1664,7 @@ TEST(CalculatorGraphBoundsTest, TimestampBoundsForInfrequentInput) {
       "output_config",
       [&](const Packet& p) {
         config_packets.push_back(p);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       },
       /*observe_bound_updates=*/true));
   MP_ASSERT_OK(graph.StartRun({}));
@@ -1674,7 +1674,7 @@ TEST(CalculatorGraphBoundsTest, TimestampBoundsForInfrequentInput) {
   auto send_fn = [&](std::string stream, std::string value, int ts) {
     MP_ASSERT_OK(graph.AddPacketToInputStream(
         stream,
-        MakePacket<std::string>(absl::StrCat(value)).At(Timestamp(ts))));
+        MakePacket<std::string>(abslx::StrCat(value)).At(Timestamp(ts))));
     MP_ASSERT_OK(graph.WaitUntilIdle());
   };
   auto bound_fn = [&](std::string stream, int ts) {

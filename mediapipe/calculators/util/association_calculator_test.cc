@@ -110,7 +110,7 @@ TEST_F(AssociationDetectionCalculatorTest, DetectionAssocTest) {
   )pb"));
 
   // Input Stream 0: det_0, det_1, det_2.
-  auto input_vec_0 = absl::make_unique<std::vector<::mediapipe::Detection>>();
+  auto input_vec_0 = abslx::make_unique<std::vector<::mediapipe::Detection>>();
   input_vec_0->push_back(det_0);
   input_vec_0->push_back(det_1);
   input_vec_0->push_back(det_2);
@@ -118,14 +118,14 @@ TEST_F(AssociationDetectionCalculatorTest, DetectionAssocTest) {
       Adopt(input_vec_0.release()).At(Timestamp(1)));
 
   // Input Stream 1: det_3, det_4.
-  auto input_vec_1 = absl::make_unique<std::vector<::mediapipe::Detection>>();
+  auto input_vec_1 = abslx::make_unique<std::vector<::mediapipe::Detection>>();
   input_vec_1->push_back(det_3);
   input_vec_1->push_back(det_4);
   runner.MutableInputs()->Index(1).packets.push_back(
       Adopt(input_vec_1.release()).At(Timestamp(1)));
 
   // Input Stream 2: det_5.
-  auto input_vec_2 = absl::make_unique<std::vector<::mediapipe::Detection>>();
+  auto input_vec_2 = abslx::make_unique<std::vector<::mediapipe::Detection>>();
   input_vec_2->push_back(det_5);
   runner.MutableInputs()->Index(2).packets.push_back(
       Adopt(input_vec_2.release()).At(Timestamp(1)));
@@ -172,7 +172,7 @@ TEST_F(AssociationDetectionCalculatorTest, DetectionAssocTestWithPrev) {
   )pb"));
 
   // Input Stream 0: det_3, det_4.
-  auto input_vec_0 = absl::make_unique<std::vector<::mediapipe::Detection>>();
+  auto input_vec_0 = abslx::make_unique<std::vector<::mediapipe::Detection>>();
   input_vec_0->push_back(det_3);
   input_vec_0->push_back(det_4);
   CollectionItemId prev_input_stream_id =
@@ -182,7 +182,7 @@ TEST_F(AssociationDetectionCalculatorTest, DetectionAssocTestWithPrev) {
       .packets.push_back(Adopt(input_vec_0.release()).At(Timestamp(1)));
 
   // Input Stream 1: det_5.
-  auto input_vec_1 = absl::make_unique<std::vector<::mediapipe::Detection>>();
+  auto input_vec_1 = abslx::make_unique<std::vector<::mediapipe::Detection>>();
   input_vec_1->push_back(det_5);
   CollectionItemId input_stream_id = runner.MutableInputs()->GetId("", 0);
   runner.MutableInputs()
@@ -222,20 +222,20 @@ TEST_F(AssociationDetectionCalculatorTest, DetectionAssocTestReverse) {
   )pb"));
 
   // Input Stream 0: det_5.
-  auto input_vec_0 = absl::make_unique<std::vector<::mediapipe::Detection>>();
+  auto input_vec_0 = abslx::make_unique<std::vector<::mediapipe::Detection>>();
   input_vec_0->push_back(det_5);
   runner.MutableInputs()->Index(0).packets.push_back(
       Adopt(input_vec_0.release()).At(Timestamp(1)));
 
   // Input Stream 1: det_3, det_4.
-  auto input_vec_1 = absl::make_unique<std::vector<::mediapipe::Detection>>();
+  auto input_vec_1 = abslx::make_unique<std::vector<::mediapipe::Detection>>();
   input_vec_1->push_back(det_3);
   input_vec_1->push_back(det_4);
   runner.MutableInputs()->Index(1).packets.push_back(
       Adopt(input_vec_1.release()).At(Timestamp(1)));
 
   // Input Stream 2: det_0, det_1, det_2.
-  auto input_vec_2 = absl::make_unique<std::vector<::mediapipe::Detection>>();
+  auto input_vec_2 = abslx::make_unique<std::vector<::mediapipe::Detection>>();
   input_vec_2->push_back(det_0);
   input_vec_2->push_back(det_1);
   input_vec_2->push_back(det_2);
@@ -346,7 +346,7 @@ TEST_F(AssociationNormRectCalculatorTest, NormRectAssocTest) {
 
   // Input Stream 0: nr_0, nr_1, nr_2.
   auto input_vec_0 =
-      absl::make_unique<std::vector<::mediapipe::NormalizedRect>>();
+      abslx::make_unique<std::vector<::mediapipe::NormalizedRect>>();
   input_vec_0->push_back(nr_0);
   input_vec_0->push_back(nr_1);
   input_vec_0->push_back(nr_2);
@@ -355,7 +355,7 @@ TEST_F(AssociationNormRectCalculatorTest, NormRectAssocTest) {
 
   // Input Stream 1: nr_3, nr_4.
   auto input_vec_1 =
-      absl::make_unique<std::vector<::mediapipe::NormalizedRect>>();
+      abslx::make_unique<std::vector<::mediapipe::NormalizedRect>>();
   input_vec_1->push_back(nr_3);
   input_vec_1->push_back(nr_4);
   runner.MutableInputs()->Index(1).packets.push_back(
@@ -363,7 +363,7 @@ TEST_F(AssociationNormRectCalculatorTest, NormRectAssocTest) {
 
   // Input Stream 2: nr_5.
   auto input_vec_2 =
-      absl::make_unique<std::vector<::mediapipe::NormalizedRect>>();
+      abslx::make_unique<std::vector<::mediapipe::NormalizedRect>>();
   input_vec_2->push_back(nr_5);
   runner.MutableInputs()->Index(2).packets.push_back(
       Adopt(input_vec_2.release()).At(Timestamp(1)));
@@ -400,14 +400,14 @@ TEST_F(AssociationNormRectCalculatorTest, NormRectAssocTestReverse) {
 
   // Input Stream 0: nr_5.
   auto input_vec_0 =
-      absl::make_unique<std::vector<::mediapipe::NormalizedRect>>();
+      abslx::make_unique<std::vector<::mediapipe::NormalizedRect>>();
   input_vec_0->push_back(nr_5);
   runner.MutableInputs()->Index(0).packets.push_back(
       Adopt(input_vec_0.release()).At(Timestamp(1)));
 
   // Input Stream 1: nr_3, nr_4.
   auto input_vec_1 =
-      absl::make_unique<std::vector<::mediapipe::NormalizedRect>>();
+      abslx::make_unique<std::vector<::mediapipe::NormalizedRect>>();
   input_vec_1->push_back(nr_3);
   input_vec_1->push_back(nr_4);
   runner.MutableInputs()->Index(1).packets.push_back(
@@ -415,7 +415,7 @@ TEST_F(AssociationNormRectCalculatorTest, NormRectAssocTestReverse) {
 
   // Input Stream 2: nr_0, nr_1, nr_2.
   auto input_vec_2 =
-      absl::make_unique<std::vector<::mediapipe::NormalizedRect>>();
+      abslx::make_unique<std::vector<::mediapipe::NormalizedRect>>();
   input_vec_2->push_back(nr_0);
   input_vec_2->push_back(nr_1);
   input_vec_2->push_back(nr_2);
@@ -453,7 +453,7 @@ TEST_F(AssociationNormRectCalculatorTest, NormRectAssocSingleInputStream) {
 
   // Input Stream : nr_3, nr_5.
   auto input_vec =
-      absl::make_unique<std::vector<::mediapipe::NormalizedRect>>();
+      abslx::make_unique<std::vector<::mediapipe::NormalizedRect>>();
   input_vec->push_back(nr_3);
   input_vec->push_back(nr_5);
   runner.MutableInputs()->Index(0).packets.push_back(

@@ -117,7 +117,7 @@ static std::unique_ptr<SubAllocator> CreateSubAllocator(
     auto* gpu_context = reinterpret_cast<stream_executor::gpu::GpuContext*>(
         executor->implementation()->GpuContextHack());
 
-    absl::flat_hash_set<PlatformDeviceId> platform_peer_gpu_ids;
+    abslx::flat_hash_set<PlatformDeviceId> platform_peer_gpu_ids;
     platform_peer_gpu_ids.reserve(peer_gpu_ids.size());
     for (const TfDeviceId tf_device_id : peer_gpu_ids) {
       PlatformDeviceId platform_device_id;
@@ -140,7 +140,7 @@ static std::unique_ptr<SubAllocator> CreateSubAllocator(
         .release();
   }
 #else
-  return absl::WrapUnique(
+  return abslx::WrapUnique(
       new DeviceMemAllocator(executor, platform_device_id,
                              (options.per_process_gpu_memory_fraction() > 1.0 ||
                               options.experimental().use_unified_memory()),
@@ -184,7 +184,7 @@ Allocator* GPUProcessState::GetGPUAllocator(
                            total_bytes, peer_gpu_ids);
     SubAllocator* sub_allocator_ptr = sub_allocator.get();
 
-    auto gpu_bfc_allocator = absl::make_unique<GPUBFCAllocator>(
+    auto gpu_bfc_allocator = abslx::make_unique<GPUBFCAllocator>(
         std::move(sub_allocator), total_bytes,
         strings::StrCat("GPU_", tf_device_id.value(), "_bfc"), [&] {
           GPUBFCAllocator::Options o;
@@ -357,7 +357,7 @@ Allocator* GPUProcessState::GetGpuHostAllocator(int numa_node) {
     BFCAllocator::Options allocator_opts;
     allocator_opts.allow_growth = true;
     Allocator* allocator =
-        new BFCAllocator(absl::WrapUnique(sub_allocator), gpu_host_mem_limit,
+        new BFCAllocator(abslx::WrapUnique(sub_allocator), gpu_host_mem_limit,
                          /*name=*/"gpu_host_bfc", allocator_opts);
 
     if (LogMemory::IsEnabled() && !allocator->TracksAllocationSizes()) {

@@ -37,9 +37,9 @@ bool ArgDefIsList(const OpDef::ArgDef& arg_def) {
 }
 
 // Returns map from node name to NodeDef in a function.
-absl::flat_hash_map<absl::string_view, const NodeDef*> NameToNode(
+abslx::flat_hash_map<abslx::string_view, const NodeDef*> NameToNode(
     const FunctionDef& function) {
-  absl::flat_hash_map<absl::string_view, const NodeDef*> name_to_node;
+  abslx::flat_hash_map<abslx::string_view, const NodeDef*> name_to_node;
   for (const NodeDef& node : function.node_def()) {
     name_to_node.insert({node.name(), &node});
   }
@@ -48,17 +48,17 @@ absl::flat_hash_map<absl::string_view, const NodeDef*> NameToNode(
 
 // Returns true if the input string in a FunctionDef node refers to a function
 // argument, as opposed to a node output.
-bool IsFunctionArgument(absl::string_view input_str) {
+bool IsFunctionArgument(abslx::string_view input_str) {
   // Arguments are in the form "fun_in" or "fun_in:number", where "fun_in" is
   // the input arg name and "number" is the output index.
   size_t pos = input_str.find(':');
-  return pos == absl::string_view::npos ||
-         absl::ascii_isdigit(input_str[pos + 1]);
+  return pos == abslx::string_view::npos ||
+         abslx::ascii_isdigit(input_str[pos + 1]);
 }
 
 size_t FindArgDefIndex(
     const protobuf::RepeatedPtrField<OpDef::ArgDef>& arg_defs,
-    absl::string_view name) {
+    abslx::string_view name) {
   for (int i = 0; i < arg_defs.size(); i++) {
     if (arg_defs[i].name() == name) {
       return i;
@@ -77,7 +77,7 @@ class InputRewriter {
   // Note `original_function` must not have any list arguments.
   InputRewriter(
       const FunctionDef& original_function,
-      const absl::flat_hash_set<absl::string_view>& nodes_in_first_func,
+      const abslx::flat_hash_set<abslx::string_view>& nodes_in_first_func,
       int64_t num_captured_inputs, const FunctionLibraryDefinition& library,
       FunctionDef* first_function, FunctionDef* second_function,
       std::vector<DataType>* first_function_output_types)
@@ -108,32 +108,32 @@ class InputRewriter {
   // *new_input_str will be set to the empty string if the input should be
   // removed, which occurs if it is a control dependency for a node in the first
   // function.
-  Status RewriteInput(absl::string_view input_str, string* new_input_str);
+  Status RewriteInput(abslx::string_view input_str, string* new_input_str);
 
  private:
-  bool IsInFirstFunction(absl::string_view node_name) {
+  bool IsInFirstFunction(abslx::string_view node_name) {
     return nodes_in_first_func_.contains(node_name);
   }
 
   // Rewrite a control input. input_str is in the form "^node_name"
-  Status RewriteControlInput(absl::string_view input_str,
+  Status RewriteControlInput(abslx::string_view input_str,
                              string* new_input_str);
 
   // Rewrite an input that is an argument to original_function_. input_str is in
   // the form "fun_in" or "fun_in:number".
-  Status RewriteArgumentInput(absl::string_view input_str,
+  Status RewriteArgumentInput(abslx::string_view input_str,
                               string* new_input_str);
 
   // Rewrite an input that is the output of a node. input_str is in the form
   // "node:out" or "node:out:number"
-  Status RewriteNodeInput(absl::string_view input_str, string* new_input_str);
+  Status RewriteNodeInput(abslx::string_view input_str, string* new_input_str);
 
   // Rewrites an input, `input_str`, where the node producing `input_str` is in
   // first_function_ and the node consuming `input_str` is in second_function_.
   // This function adds an output argument to first_function_ and an input
   // argument to second_function_. "input_arg_def" is the ArgDef corresponding
   // to input_str, and must have the type() field set.
-  Status RewriteCrossFunctionInput(absl::string_view input_str,
+  Status RewriteCrossFunctionInput(abslx::string_view input_str,
                                    const OpDef::ArgDef& input_arg_def,
                                    string* new_input_str);
 
@@ -144,7 +144,7 @@ class InputRewriter {
     }
 
     for (int64_t suffix = 0; true; suffix++) {
-      string new_name = absl::StrCat(name, "_", suffix);
+      string new_name = abslx::StrCat(name, "_", suffix);
       auto iter = used_names_.insert(new_name);
       if (iter.second) {
         return new_name;
@@ -153,12 +153,12 @@ class InputRewriter {
   }
 
   const FunctionDef& original_function_;
-  const absl::flat_hash_set<absl::string_view>& nodes_in_first_func_;
+  const abslx::flat_hash_set<abslx::string_view>& nodes_in_first_func_;
   const int64_t num_captured_inputs_;
   const FunctionLibraryDefinition& library_;
 
   // Map from node name to NodeDef in original_function_.node_def()
-  const absl::flat_hash_map<absl::string_view, const NodeDef*> name_to_node_;
+  const abslx::flat_hash_map<abslx::string_view, const NodeDef*> name_to_node_;
 
   FunctionDef* const first_function_;
   FunctionDef* const second_function_;
@@ -166,14 +166,14 @@ class InputRewriter {
 
   // Caches results of RewriteInput(), so that if the same input string is
   // passed, it is rewritten to the same string.
-  absl::flat_hash_map<absl::string_view, string> input_map_;
+  abslx::flat_hash_map<abslx::string_view, string> input_map_;
 
   // Node and argument names that are used in either function. Used to uniquify
   // argument names.
   std::unordered_set<string> used_names_;
 };
 
-Status InputRewriter::RewriteInput(absl::string_view input_str,
+Status InputRewriter::RewriteInput(abslx::string_view input_str,
                                    string* new_input_str) {
   auto iter = input_map_.find(input_str);
   if (iter != input_map_.end()) {
@@ -192,10 +192,10 @@ Status InputRewriter::RewriteInput(absl::string_view input_str,
   return OkStatus();
 }
 
-Status InputRewriter::RewriteControlInput(absl::string_view input_str,
+Status InputRewriter::RewriteControlInput(abslx::string_view input_str,
                                           string* new_input_str) {
   DCHECK_EQ(input_str.at(0), '^');
-  absl::string_view node_name = input_str.substr(1);
+  abslx::string_view node_name = input_str.substr(1);
   if (IsInFirstFunction(node_name)) {
     *new_input_str = "";
   } else {
@@ -204,9 +204,9 @@ Status InputRewriter::RewriteControlInput(absl::string_view input_str,
   return OkStatus();
 }
 
-Status InputRewriter::RewriteArgumentInput(absl::string_view input_str,
+Status InputRewriter::RewriteArgumentInput(abslx::string_view input_str,
                                            string* new_input_str) {
-  std::vector<string> components = absl::StrSplit(input_str, ':');
+  std::vector<string> components = abslx::StrSplit(input_str, ':');
   if (components.size() != 1 && components.size() != 2) {
     return errors::Internal("Found node with invalid argument input: ",
                             input_str);
@@ -254,9 +254,9 @@ Status InputRewriter::RewriteArgumentInput(absl::string_view input_str,
   return RewriteCrossFunctionInput(input_str, *found_arg_def, new_input_str);
 }
 
-Status InputRewriter::RewriteNodeInput(absl::string_view input_str,
+Status InputRewriter::RewriteNodeInput(abslx::string_view input_str,
                                        string* new_input_str) {
-  std::vector<string> components = absl::StrSplit(input_str, ':');
+  std::vector<string> components = abslx::StrSplit(input_str, ':');
   if (components.size() != 2 && components.size() != 3) {
     return errors::Internal("Found node with invalid node input: ", input_str);
   }
@@ -322,7 +322,7 @@ Status InputRewriter::RewriteNodeInput(absl::string_view input_str,
 }
 
 Status InputRewriter::RewriteCrossFunctionInput(
-    absl::string_view input_str, const OpDef::ArgDef& input_arg_def,
+    abslx::string_view input_str, const OpDef::ArgDef& input_arg_def,
     string* new_input_str) {
   DCHECK(input_arg_def.type() != DT_INVALID);
   if (input_arg_def.is_ref() || IsRefType(input_arg_def.type())) {
@@ -337,8 +337,8 @@ Status InputRewriter::RewriteCrossFunctionInput(
       first_function_->mutable_signature()->add_output_arg();
   *added_output_arg = input_arg_def;
   size_t output_index = first_function_->signature().output_arg_size() - 1;
-  added_output_arg->set_name(absl::StrCat("output_", output_index));
-  added_output_arg->set_description(absl::StrCat(
+  added_output_arg->set_name(abslx::StrCat("output_", output_index));
+  added_output_arg->set_description(abslx::StrCat(
       "Output ", output_index, ", corresponding to input ", input_str));
   first_function_->mutable_ret()->insert(
       {added_output_arg->name(), string{input_str}});
@@ -348,8 +348,8 @@ Status InputRewriter::RewriteCrossFunctionInput(
       second_function_->mutable_signature()->add_input_arg();
   *added_input_arg = input_arg_def;
   size_t input_index = second_function_->signature().input_arg_size() - 1;
-  added_input_arg->set_name(unique_name(absl::StrCat("input_", input_index)));
-  added_input_arg->set_description(absl::StrCat("Input ", input_index));
+  added_input_arg->set_name(unique_name(abslx::StrCat("input_", input_index)));
+  added_input_arg->set_description(abslx::StrCat("Input ", input_index));
 
   *new_input_str = added_input_arg->name();
   return OkStatus();
@@ -358,7 +358,7 @@ Status InputRewriter::RewriteCrossFunctionInput(
 void InitializeSignatures(
     const FunctionDef& original_function_, FunctionDef* first_function_,
     FunctionDef* second_function_,
-    const absl::flat_hash_set<absl::string_view>& nodes_in_first_function,
+    const abslx::flat_hash_set<abslx::string_view>& nodes_in_first_function,
     const FunctionDefLibrary& func_def_lib_) {
   // Initialize first_function_->signature().
   *first_function_->mutable_signature() = original_function_.signature();
@@ -367,7 +367,7 @@ void InitializeSignatures(
       first_function_);
   first_function_->mutable_signature()->clear_output_arg();
   first_function_->mutable_signature()->clear_control_output();
-  first_function_->mutable_signature()->set_description(absl::StrCat(
+  first_function_->mutable_signature()->set_description(abslx::StrCat(
       "The function \"", original_function_.signature().name(),
       "\" was split into two pieces in the make_deterministic Grappler pass. "
       "This function is the first piece."));
@@ -381,7 +381,7 @@ void InitializeSignatures(
       second_function_);
   second_function_->mutable_signature()->clear_input_arg();
   second_function_->mutable_signature()->clear_control_output();
-  second_function_->mutable_signature()->set_description(absl::StrCat(
+  second_function_->mutable_signature()->set_description(abslx::StrCat(
       "The function \"", original_function_.signature().name(),
       "\" was split into two pieces in the make_deterministic Grappler pass. "
       "This function is the second piece."));
@@ -402,7 +402,7 @@ void InitializeSignatures(
 
 StatusOr<SplitResults> SplitFunction(
     const FunctionDef& function,
-    const absl::flat_hash_set<absl::string_view>& nodes_in_first_function,
+    const abslx::flat_hash_set<abslx::string_view>& nodes_in_first_function,
     int64_t num_captured_inputs, const FunctionLibraryDefinition& library) {
   for (const auto& attr : function.attr()) {
     if (attr.first != data::kTFDataFunction &&
@@ -475,7 +475,7 @@ StatusOr<SplitResults> SplitFunction(
       // the first function.
       *results.first_function.add_node_def() = orig_node_def;
       for (const string& input_str : orig_node_def.input()) {
-        std::vector<string> components = absl::StrSplit(input_str, ':');
+        std::vector<string> components = abslx::StrSplit(input_str, ':');
         if (!IsControlInput(input_str) && !IsFunctionArgument(input_str) &&
             !nodes_in_first_function.contains(components[0])) {
           return errors::Internal("Node ", orig_node_def.name(),

@@ -46,11 +46,11 @@ using ::mediapipe::tasks::metadata::ModelMetadataExtractor;
 
 constexpr int kNumInputTensorsForBert = 3;
 constexpr int kTokenizerProcessUnitIndex = 0;
-constexpr absl::string_view kInputIdsTensorName = "ids";
-constexpr absl::string_view kInputMasksTensorName = "mask";
-constexpr absl::string_view kSegmentIdsTensorName = "segment_ids";
-constexpr absl::string_view kClassifierToken = "[CLS]";
-constexpr absl::string_view kSeparatorToken = "[SEP]";
+constexpr abslx::string_view kInputIdsTensorName = "ids";
+constexpr abslx::string_view kInputMasksTensorName = "mask";
+constexpr abslx::string_view kSegmentIdsTensorName = "segment_ids";
+constexpr abslx::string_view kClassifierToken = "[CLS]";
+constexpr abslx::string_view kSeparatorToken = "[SEP]";
 
 // Preprocesses input text into three int32 input tensors for a BERT model using
 // a tokenizer.
@@ -115,9 +115,9 @@ class BertPreprocessorCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kTextIn, kMetadataExtractorSideIn, kTensorsOut);
 
-  static absl::Status UpdateContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  static abslx::Status UpdateContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   std::unique_ptr<tasks::text::tokenizers::Tokenizer> tokenizer_;
@@ -132,24 +132,24 @@ class BertPreprocessorCalculator : public Node {
   // Applies `tokenizer_` to the `input_text` to generate a vector of tokens.
   // This util prepends "[CLS]" and appends "[SEP]" to the input tokens and
   // clips the vector of tokens to have length at most `bert_max_seq_len_`.
-  std::vector<std::string> TokenizeInputText(absl::string_view input_text);
+  std::vector<std::string> TokenizeInputText(abslx::string_view input_text);
   // Processes the `input_tokens` to generate the three input tensors for the
   // BERT model.
   std::vector<Tensor> GenerateInputTensors(
       const std::vector<std::string>& input_tokens);
 };
 
-absl::Status BertPreprocessorCalculator::UpdateContract(
+abslx::Status BertPreprocessorCalculator::UpdateContract(
     CalculatorContract* cc) {
   const auto& options =
       cc->Options<mediapipe::BertPreprocessorCalculatorOptions>();
   RET_CHECK(options.has_bert_max_seq_len()) << "bert_max_seq_len is required";
   RET_CHECK_GE(options.bert_max_seq_len(), 2)
       << "bert_max_seq_len must be at least 2";
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status BertPreprocessorCalculator::Open(CalculatorContext* cc) {
+abslx::Status BertPreprocessorCalculator::Open(CalculatorContext* cc) {
   const ModelMetadataExtractor* metadata_extractor =
       &kMetadataExtractorSideIn(cc).Get();
   const tflite::ProcessUnit* tokenizer_metadata =
@@ -165,11 +165,11 @@ absl::Status BertPreprocessorCalculator::Open(CalculatorContext* cc) {
       input_tensors_metadata, kSegmentIdsTensorName);
   input_masks_tensor_index_ = FindTensorIndexByMetadataName(
       input_tensors_metadata, kInputMasksTensorName);
-  absl::flat_hash_set<int> tensor_indices = {input_ids_tensor_index_,
+  abslx::flat_hash_set<int> tensor_indices = {input_ids_tensor_index_,
                                              segment_ids_tensor_index_,
                                              input_masks_tensor_index_};
-  if (tensor_indices != absl::flat_hash_set<int>({0, 1, 2})) {
-    return absl::InvalidArgumentError(absl::Substitute(
+  if (tensor_indices != abslx::flat_hash_set<int>({0, 1, 2})) {
+    return abslx::InvalidArgumentError(abslx::Substitute(
         "Input tensor indices form the set {$0, $1, $2} rather than {0, 1, 2}",
         input_ids_tensor_index_, segment_ids_tensor_index_,
         input_masks_tensor_index_));
@@ -178,19 +178,19 @@ absl::Status BertPreprocessorCalculator::Open(CalculatorContext* cc) {
   const auto& options =
       cc->Options<mediapipe::BertPreprocessorCalculatorOptions>();
   bert_max_seq_len_ = options.bert_max_seq_len();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status BertPreprocessorCalculator::Process(CalculatorContext* cc) {
+abslx::Status BertPreprocessorCalculator::Process(CalculatorContext* cc) {
   kTensorsOut(cc).Send(
       GenerateInputTensors(TokenizeInputText(kTextIn(cc).Get())));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 std::vector<std::string> BertPreprocessorCalculator::TokenizeInputText(
-    absl::string_view input_text) {
+    abslx::string_view input_text) {
   std::string processed_input = std::string(input_text);
-  absl::AsciiStrToLower(&processed_input);
+  abslx::AsciiStrToLower(&processed_input);
 
   tasks::text::tokenizers::TokenizerResult tokenizer_result =
       tokenizer_->Tokenize(processed_input);

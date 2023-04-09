@@ -26,7 +26,7 @@ namespace tpu {
 using stream_executor::port::StatusOr;
 
 Status TpuCompileOpKernelImpl::Compile(
-    const absl::variant<MlirToHloArgs, FunctionToHloArgs>& computation,
+    const abslx::variant<MlirToHloArgs, FunctionToHloArgs>& computation,
     const XLA_TpuMeshState* mesh_state,
     const std::vector<TensorShape>& arg_shapes,
     const TpuCompilationCacheKey* key,

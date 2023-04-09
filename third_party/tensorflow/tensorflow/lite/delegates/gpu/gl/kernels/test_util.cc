@@ -69,7 +69,7 @@ bool SingleOpModel::PopulateTensor(int index, std::vector<float>&& data) {
   return true;
 }
 
-absl::Status SingleOpModel::Invoke(const CompilationOptions& compile_options,
+abslx::Status SingleOpModel::Invoke(const CompilationOptions& compile_options,
                                    const RuntimeOptions& runtime_options,
                                    const NodeShader& shader) {
   std::unique_ptr<EglEnvironment> env;
@@ -79,7 +79,7 @@ absl::Status SingleOpModel::Invoke(const CompilationOptions& compile_options,
 
   // Create buffers for input tensors.
   {
-    absl::flat_hash_map<int, uint32_t> tensor_to_id;
+    abslx::flat_hash_map<int, uint32_t> tensor_to_id;
     for (const auto* input : graph_.inputs()) {
       tensor_to_id[input->tensor.ref] = input->id;
     }
@@ -126,10 +126,10 @@ absl::Status SingleOpModel::Invoke(const CompilationOptions& compile_options,
         CopyFromPHWC4Buffer(*objects.FindBuffer(output->id), &tensor));
     outputs_.push_back(std::move(tensor));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status SingleOpModel::Invoke(const NodeShader& shader) {
+abslx::Status SingleOpModel::Invoke(const NodeShader& shader) {
   return Invoke(CompilationOptions(), RuntimeOptions(), shader);
 }
 

@@ -343,9 +343,9 @@ LogicalResult TransferAttributes(func::FuncOp float_func,
     if (!inner_op.hasAttr(kAttrMapAttribute)) continue;
     std::string attr_map_str =
         inner_op.getAttrOfType<StringAttr>(kAttrMapAttribute).str();
-    for (absl::string_view element_str : absl::StrSplit(attr_map_str, ',')) {
-      std::vector<absl::string_view> key_and_value_pair =
-          absl::StrSplit(element_str, ':');
+    for (abslx::string_view element_str : abslx::StrSplit(attr_map_str, ',')) {
+      std::vector<abslx::string_view> key_and_value_pair =
+          abslx::StrSplit(element_str, ':');
       if (key_and_value_pair.size() != 2) {
         float_func.emitError("The attr_map attribute is malformed");
         return failure();
@@ -363,16 +363,16 @@ LogicalResult TransferAttributes(func::FuncOp float_func,
 
     std::string attr_map_str =
         inner_op.getAttrOfType<StringAttr>(kAttrMapAttribute).str();
-    for (absl::string_view element_str : absl::StrSplit(attr_map_str, ',')) {
-      std::vector<absl::string_view> key_and_value_pair =
-          absl::StrSplit(element_str, ':');
+    for (abslx::string_view element_str : abslx::StrSplit(attr_map_str, ',')) {
+      std::vector<abslx::string_view> key_and_value_pair =
+          abslx::StrSplit(element_str, ':');
       if (key_and_value_pair.size() != 2) {
         float_func.emitError("The attr_map attribute is malformed");
         return failure();
       }
       if (identifier_to_attr.count(
               llvm::StringRef(std::string(key_and_value_pair[1]))) == 0) {
-        float_func.emitWarning(absl::StrCat("Using the default value for the '",
+        float_func.emitWarning(abslx::StrCat("Using the default value for the '",
                                             key_and_value_pair[0],
                                             "' attribute"));
         continue;

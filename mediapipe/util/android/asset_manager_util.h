@@ -81,7 +81,7 @@ class AssetManager {
 
   // Reads the raw bytes referred to by the supplied content URI. Returns true
   // on success, false otherwise.
-  absl::Status ReadContentUri(const std::string& content_uri,
+  abslx::Status ReadContentUri(const std::string& content_uri,
                               std::string* output);
 
   // Returns the path to the Android cache directory. Will be empty if
@@ -93,7 +93,7 @@ class AssetManager {
   // to a filesystem file.
   // NOTE: this is _not_ thread-safe, e.g. if two threads are requesting the
   // same file
-  absl::StatusOr<std::string> CachedFileFromAsset(
+  abslx::StatusOr<std::string> CachedFileFromAsset(
       const std::string& asset_path);
 
  private:

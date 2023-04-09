@@ -116,20 +116,20 @@ xla::XlaOp BatchDot(
 // directly.
 
 StatusOr<std::array<std::vector<int64_t>, 3>> ParseEinsumString(
-    absl::string_view einsum_config, int64_t x_rank, int64_t y_rank);
+    abslx::string_view einsum_config, int64_t x_rank, int64_t y_rank);
 
 // If an einsum config does not contain an -> one will be added and the output
 // config will be the sorted characters with any ellipsis at the beginning.
 // Returns an empty string if the einsum string already has an ->.
-std::string NormalizeEinsumString(absl::string_view einsum_config);
+std::string NormalizeEinsumString(abslx::string_view einsum_config);
 
 // Supports two operand einsum notation like "ab,cb->ac".
 xla::XlaOp Einsum(
-    xla::XlaOp x, xla::XlaOp y, absl::string_view einsum_config,
+    xla::XlaOp x, xla::XlaOp y, abslx::string_view einsum_config,
     xla::PrecisionConfig::Precision precision = xla::PrecisionConfig::DEFAULT,
     std::optional<PrimitiveType> preferred_element_type = std::nullopt);
 xla::XlaOp Einsum(
-    xla::XlaOp x, absl::string_view einsum_config,
+    xla::XlaOp x, abslx::string_view einsum_config,
     xla::PrecisionConfig::Precision precision = xla::PrecisionConfig::DEFAULT);
 
 
@@ -139,8 +139,8 @@ xla::XlaOp Einsum(
 //   y_config = {2, 1}
 //   output_config = {0, 2}
 xla::XlaOp Einsum(
-    xla::XlaOp x, absl::Span<const int64_t> x_config, xla::XlaOp y,
-    absl::Span<const int64_t> y_config, absl::Span<const int64_t> output_config,
+    xla::XlaOp x, abslx::Span<const int64_t> x_config, xla::XlaOp y,
+    abslx::Span<const int64_t> y_config, abslx::Span<const int64_t> output_config,
     xla::PrecisionConfig::Precision precision = xla::PrecisionConfig::DEFAULT,
     std::optional<PrimitiveType> preferred_element_type = std::nullopt);
 

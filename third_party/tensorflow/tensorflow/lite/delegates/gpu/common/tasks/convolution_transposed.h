@@ -45,7 +45,7 @@ class ConvolutionTransposed : public GPUOperation {
       TuningType tuning_type, const GpuInfo& gpu_info,
       const KernelInfo& kernel_info,
       std::vector<int3>* work_groups) const override;
-  absl::Status BindArguments(ArgumentsBinder* args) override;
+  abslx::Status BindArguments(ArgumentsBinder* args) override;
   int3 GetGridSize() const override;
 
   // Move only
@@ -104,7 +104,7 @@ void ConvolutionTransposed::UploadWeights(
       GetTotalElementsCountForLayout(weights_desc, weights.shape);
 
   std::vector<uint8_t> weights_data(flt_count * SizeOf(weights_desc.type));
-  RearrangeWeights(weights, weights_desc, absl::MakeSpan(weights_data));
+  RearrangeWeights(weights, weights_desc, abslx::MakeSpan(weights_data));
 
   if (weights_are_buffer) {
     BufferDescriptor desc;
@@ -138,7 +138,7 @@ void ConvolutionTransposed::UploadWeights(
       GetTotalElementsCountForLayout(weights_desc, weights.shape);
 
   std::vector<uint8_t> weights_data(flt_count * SizeOf(weights_desc.type));
-  RearrangeWeights(weights, weights_desc, absl::MakeSpan(weights_data));
+  RearrangeWeights(weights, weights_desc, abslx::MakeSpan(weights_data));
 
   if (weights_are_buffer) {
     BufferDescriptor desc;

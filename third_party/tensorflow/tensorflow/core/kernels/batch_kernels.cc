@@ -66,7 +66,7 @@ auto* batch_op_split_usage = monitoring::Gauge<string, 1>::New(
     "model_name");
 
 void RecordBatchSplitUsage(
-    absl::optional<bool> maybe_enable_large_batch_splitting,
+    abslx::optional<bool> maybe_enable_large_batch_splitting,
     const string& model_name) {
   if (maybe_enable_large_batch_splitting.has_value()) {
     if (maybe_enable_large_batch_splitting.value()) {
@@ -201,7 +201,7 @@ class BatchResource : public serving::BatchResourceBase {
         flib_(flib) {}
 
   void ProcessFuncBatchImpl(
-      const BatchTask& last_task, absl::Span<const Tensor> inputs,
+      const BatchTask& last_task, abslx::Span<const Tensor> inputs,
       std::vector<Tensor>* combined_outputs,
       std::function<void(const Status&)> done) const override {
     auto* last_task_context = last_task.context;
@@ -287,8 +287,8 @@ bool BatchFunctionKernel::IsExpensive() { return false; }
 
 void BatchFunctionKernel::ComputeAsync(OpKernelContext* c, DoneCallback done) {
   RecordBatchSplitUsage(has_attribute_enable_large_batch_splitting_
-                            ? absl::make_optional(enable_large_batch_splitting_)
-                            : absl::nullopt,
+                            ? abslx::make_optional(enable_large_batch_splitting_)
+                            : abslx::nullopt,
                         GetModelName(c));
   // TODO(b/173255290): Add num_batch_threads_ parameter to TFRT batch kernel.
   RecordBatchParamNumBatchThreads(num_batch_threads_, GetModelName(c));
@@ -298,7 +298,7 @@ void BatchFunctionKernel::ComputeAsync(OpKernelContext* c, DoneCallback done) {
   FunctionLibraryRuntime::Handle handle;
   OP_REQUIRES_OK_ASYNC(c, GetOrCreateFunctionHandle(c, &handle), done);
 
-  if (adaptive_batch_scheduler_options_ != absl::nullopt) {
+  if (adaptive_batch_scheduler_options_ != abslx::nullopt) {
     creator = [this, handle](BatchResource** r) {
       serving::AdaptiveSharedBatchScheduler<
           serving::BatchResourceBase::BatchTask>::Options

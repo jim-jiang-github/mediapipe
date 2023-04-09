@@ -179,7 +179,7 @@ bool RegisterCustomOpByName(const char* registerer_name,
   // Fail in an informative way if the function was not found.
   if (registerer == nullptr) {
     *error_msg =
-        absl::StrFormat("Looking up symbol '%s' failed with error '%s'.",
+        abslx::StrFormat("Looking up symbol '%s' failed with error '%s'.",
                         registerer_name, SharedLibrary::GetError());
     return false;
   }

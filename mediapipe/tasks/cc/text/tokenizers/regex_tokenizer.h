@@ -41,9 +41,9 @@ class RegexTokenizer : public Tokenizer {
 
   TokenizerResult Tokenize(const std::string& input) override;
 
-  bool LookupId(absl::string_view key, int* result) const override;
+  bool LookupId(abslx::string_view key, int* result) const override;
 
-  bool LookupWord(int vocab_id, absl::string_view* result) const override;
+  bool LookupWord(int vocab_id, abslx::string_view* result) const override;
 
   bool GetStartToken(int* start_token);
   bool GetPadToken(int* pad_token);
@@ -51,8 +51,8 @@ class RegexTokenizer : public Tokenizer {
 
  private:
   RE2 delim_re_;
-  absl::node_hash_map<std::string, int> token_index_map_;
-  absl::node_hash_map<int, absl::string_view> index_token_map_;
+  abslx::node_hash_map<std::string, int> token_index_map_;
+  abslx::node_hash_map<int, abslx::string_view> index_token_map_;
 };
 
 }  // namespace tokenizers

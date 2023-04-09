@@ -36,7 +36,7 @@ namespace op = xla::testing::opcode_matchers;
 
 class GpuReduceScatterCreatorTest : public HloTestBase {
  public:
-  StatusOr<std::unique_ptr<HloModule>> RunPass(absl::string_view hlo_module,
+  StatusOr<std::unique_ptr<HloModule>> RunPass(abslx::string_view hlo_module,
                                                int64_t num_replicas,
                                                int64_t num_partitions,
                                                bool expect_change) {
@@ -55,7 +55,7 @@ class GpuReduceScatterCreatorTest : public HloTestBase {
   }
 
   size_t AllReduceCount(std::unique_ptr<HloModule> &module) {
-    return absl::c_count_if(module->entry_computation()->instructions(),
+    return abslx::c_count_if(module->entry_computation()->instructions(),
                             [](const HloInstruction *inst) {
                               return inst->opcode() == HloOpcode::kAllReduce;
                             });
@@ -63,7 +63,7 @@ class GpuReduceScatterCreatorTest : public HloTestBase {
 };
 
 TEST_F(GpuReduceScatterCreatorTest, AllReplicas) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule AllReduce
 
 %sum {
@@ -101,7 +101,7 @@ ENTRY %AllReduce {
 }
 
 TEST_F(GpuReduceScatterCreatorTest, AllReplicasWithReshape) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule AllReduce
 
 %sum {
@@ -137,7 +137,7 @@ ENTRY %AllReduce {
 }
 
 TEST_F(GpuReduceScatterCreatorTest, AllReplicasWithReshapeSplitDimModified) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule AllReduce
 
 %sum {
@@ -170,7 +170,7 @@ ENTRY %AllReduce {
 }
 
 TEST_F(GpuReduceScatterCreatorTest, AllReplicasDim2) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule AllReduce
 
 %sum {
@@ -207,7 +207,7 @@ ENTRY %AllReduce {
 }
 
 TEST_F(GpuReduceScatterCreatorTest, AllReplicasWrongOffsets) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule AllReduce
 
 %sum {
@@ -238,7 +238,7 @@ ENTRY %AllReduce {
 }
 
 TEST_F(GpuReduceScatterCreatorTest, AllReplicasIotaTable) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule AllReduce
 
 %sum {
@@ -272,7 +272,7 @@ ENTRY %AllReduce {
 }
 
 TEST_F(GpuReduceScatterCreatorTest, SubgroupedReplicas) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule AllReduce
 
 %sum {
@@ -307,7 +307,7 @@ ENTRY %AllReduce {
 }
 
 TEST_F(GpuReduceScatterCreatorTest, AllPartitions) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule AllReduce
 
 %sum {
@@ -341,7 +341,7 @@ ENTRY %AllReduce {
 }
 
 TEST_F(GpuReduceScatterCreatorTest, SubgroupsGlobals) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule AllReduce
 
 %sum {
@@ -380,7 +380,7 @@ ENTRY %AllReduce {
 }
 
 TEST_F(GpuReduceScatterCreatorTest, SubgroupsGlobalsOrthogonalReplicas) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule AllReduce
 
 %sum {
@@ -414,7 +414,7 @@ ENTRY %AllReduce {
 }
 
 TEST_F(GpuReduceScatterCreatorTest, SubgroupsGlobalsNonOrthogonalReplicas) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule AllReduce
 
 %sum {
@@ -445,7 +445,7 @@ ENTRY %AllReduce {
 }
 
 TEST_F(GpuReduceScatterCreatorTest, NonUniformSplit) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule AllReduce
 
 %sum {

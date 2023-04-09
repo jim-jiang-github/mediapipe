@@ -42,36 +42,36 @@ namespace {
 
 using RandomEngine = std::mt19937_64;
 
-inline void BusySleep(absl::Duration duration) {
-  absl::Time start_time = absl::Now();
-  while (absl::Now() - start_time < duration) {
+inline void BusySleep(abslx::Duration duration) {
+  abslx::Time start_time = abslx::Now();
+  while (abslx::Now() - start_time < duration) {
   }
 }
 
 class SlowPlusOneCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<int>();
     cc->Outputs().Index(0).Set<int>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(mediapipe::TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     if (cc->InputTimestamp().Value() % 4 == 0) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     RandomEngine random(testing::UnitTest::GetInstance()->random_seed());
     std::uniform_int_distribution<> uniform_dist(0, 10);
-    BusySleep(absl::Milliseconds(90 + uniform_dist(random)));
+    BusySleep(abslx::Milliseconds(90 + uniform_dist(random)));
     cc->Outputs().Index(0).Add(new int(cc->Inputs().Index(0).Get<int>() + 1),
                                cc->InputTimestamp());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
@@ -80,13 +80,13 @@ REGISTER_CALCULATOR(SlowPlusOneCalculator);
 class ParallelExecutionTest : public testing::Test {
  public:
   void AddThreadSafeVectorSink(const Packet& packet) {
-    absl::WriterMutexLock lock(&output_packets_mutex_);
+    abslx::WriterMutexLock lock(&output_packets_mutex_);
     output_packets_.push_back(packet);
   }
 
  protected:
   std::vector<Packet> output_packets_ ABSL_GUARDED_BY(output_packets_mutex_);
-  absl::Mutex output_packets_mutex_;
+  abslx::Mutex output_packets_mutex_;
 };
 
 TEST_F(ParallelExecutionTest, SlowPlusOneCalculatorsTest) {
@@ -124,7 +124,7 @@ TEST_F(ParallelExecutionTest, SlowPlusOneCalculatorsTest) {
     const int kTotalNums = 100;
     int fail_count = 0;
     for (int i = 0; i < kTotalNums; ++i) {
-      absl::Status status = graph.AddPacketToInputStream(
+      abslx::Status status = graph.AddPacketToInputStream(
           "input", Adopt(new int(i)).At(Timestamp(i)));
       if (!status.ok()) {
         ++fail_count;
@@ -138,7 +138,7 @@ TEST_F(ParallelExecutionTest, SlowPlusOneCalculatorsTest) {
     // Waits properly via the API until the graph is done.
     MP_ASSERT_OK(graph.WaitUntilDone());
 
-    absl::ReaderMutexLock lock(&output_packets_mutex_);
+    abslx::ReaderMutexLock lock(&output_packets_mutex_);
     ASSERT_EQ(kTotalNums - kTotalNums / 4, output_packets_.size());
     int index = 1;
     for (const Packet& packet : output_packets_) {

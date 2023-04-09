@@ -31,8 +31,8 @@ namespace {
 
 class ReductionDimensionGrouperTest : public HloTestBase {
  public:
-  void CheckDimensionGrouper(absl::string_view hlo,
-                             std::optional<absl::string_view> expected) {
+  void CheckDimensionGrouper(abslx::string_view hlo,
+                             std::optional<abslx::string_view> expected) {
     RunAndFilecheckHloRewrite(hlo, gpu::ReductionDimensionGrouper{}, expected);
   }
 };

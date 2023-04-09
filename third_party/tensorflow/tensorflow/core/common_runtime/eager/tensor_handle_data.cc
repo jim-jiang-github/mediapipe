@@ -88,7 +88,7 @@ Status LocalTensorHandleData::SetTensor(tensorflow::Tensor&& t) {
   // Create copy of original tensor to avoid forwarding
   forwarding_protection_tensor_ = tensor_;
 
-  auto& state = absl::get<BlockingControl>(ctrl_);
+  auto& state = abslx::get<BlockingControl>(ctrl_);
   state.SetReady();
 
   return OkStatus();
@@ -112,7 +112,7 @@ Status LocalTensorHandleData::BlockingControl::WaitReady(
   tf_shared_lock l(mu_);
   if (!is_ready_) {
     profiler::TraceMe activity(
-        [caller] { return absl::StrCat(caller, " WaitReady"); },
+        [caller] { return abslx::StrCat(caller, " WaitReady"); },
 
         profiler::TraceMeLevel::kInfo);
     DVLOG(3) << "WaitReady: " << caller << " " << this;

@@ -378,7 +378,7 @@ class StreamExecutorInfeedEnqueueOp : public TpuInfeedEnqueueOp {
  public:
   explicit StreamExecutorInfeedEnqueueOp(OpKernelConstruction* ctx)
       : TpuInfeedEnqueueOp(ctx,
-                           absl::make_unique<StreamExecutorTransferOpImpl>()) {}
+                           abslx::make_unique<StreamExecutorTransferOpImpl>()) {}
 
  private:
   StreamExecutorInfeedEnqueueOp(const StreamExecutorInfeedEnqueueOp&) = delete;
@@ -390,7 +390,7 @@ class StreamExecutorInfeedEnqueueTupleOp : public TpuInfeedEnqueueTupleOp {
  public:
   explicit StreamExecutorInfeedEnqueueTupleOp(OpKernelConstruction* ctx)
       : TpuInfeedEnqueueTupleOp(
-            ctx, absl::make_unique<StreamExecutorTransferOpImpl>()) {}
+            ctx, abslx::make_unique<StreamExecutorTransferOpImpl>()) {}
 
  private:
   StreamExecutorInfeedEnqueueTupleOp(
@@ -405,7 +405,7 @@ class StreamExecutorInfeedEnqueuePrelinearizedBufferOp
   explicit StreamExecutorInfeedEnqueuePrelinearizedBufferOp(
       OpKernelConstruction* ctx)
       : InfeedEnqueuePrelinearizedBufferOp(
-            ctx, absl::make_unique<StreamExecutorTransferOpImpl>()) {}
+            ctx, abslx::make_unique<StreamExecutorTransferOpImpl>()) {}
 
  private:
   // InfeedEnqueuePrelinearizedBufferOp is neither copyable nor movable.

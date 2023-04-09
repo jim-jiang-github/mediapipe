@@ -28,10 +28,10 @@
 #include "absl/random/internal/generate_real.h"
 #include "absl/random/internal/iostream_state_saver.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
-// absl::beta_distribution:
+// abslx::beta_distribution:
 // Generate a floating-point variate conforming to a Beta distribution:
 //   pdf(x) \propto x^(alpha-1) * (1-x)^(beta-1),
 // where the params alpha and beta are both strictly positive real values.
@@ -195,7 +195,7 @@ class beta_distribution {
     bool inverted_;
 
     static_assert(std::is_floating_point<RealType>::value,
-                  "Class-template absl::beta_distribution<> must be "
+                  "Class-template abslx::beta_distribution<> must be "
                   "parameterized using a floating-point type.");
   };
 
@@ -280,7 +280,7 @@ beta_distribution<RealType>::AlgorithmJoehnk(
   using random_internal::GeneratePositiveTag;
   using random_internal::GenerateRealFromBits;
   using real_type =
-      absl::conditional_t<std::is_same<RealType, float>::value, float, double>;
+      abslx::conditional_t<std::is_same<RealType, float>::value, float, double>;
 
   // Based on Joehnk, M. D. Erzeugung von betaverteilten und gammaverteilten
   // Zufallszahlen. Metrika 8.1 (1964): 5-15.
@@ -338,7 +338,7 @@ beta_distribution<RealType>::AlgorithmCheng(
   using random_internal::GeneratePositiveTag;
   using random_internal::GenerateRealFromBits;
   using real_type =
-      absl::conditional_t<std::is_same<RealType, float>::value, float, double>;
+      abslx::conditional_t<std::is_same<RealType, float>::value, float, double>;
 
   // Based on Cheng, Russell CH. Generating beta variates with nonintegral
   // shape parameters. Communications of the ACM 21.4 (1978): 317-322.
@@ -422,6 +422,6 @@ std::basic_istream<CharT, Traits>& operator>>(
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_BETA_DISTRIBUTION_H_

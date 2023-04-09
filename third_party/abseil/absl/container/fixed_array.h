@@ -50,7 +50,7 @@
 #include "absl/container/internal/compressed_tuple.h"
 #include "absl/memory/memory.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 constexpr static auto kFixedArrayUseDefault = static_cast<size_t>(-1);
@@ -90,19 +90,19 @@ class FixedArray {
   // std::iterator_traits isn't guaranteed to be SFINAE-friendly until C++17,
   // but this seems to be mostly pedantic.
   template <typename Iterator>
-  using EnableIfForwardIterator = absl::enable_if_t<std::is_convertible<
+  using EnableIfForwardIterator = abslx::enable_if_t<std::is_convertible<
       typename std::iterator_traits<Iterator>::iterator_category,
       std::forward_iterator_tag>::value>;
   static constexpr bool NoexceptCopyable() {
     return std::is_nothrow_copy_constructible<StorageElement>::value &&
-           absl::allocator_is_nothrow<allocator_type>::value;
+           abslx::allocator_is_nothrow<allocator_type>::value;
   }
   static constexpr bool NoexceptMovable() {
     return std::is_nothrow_move_constructible<StorageElement>::value &&
-           absl::allocator_is_nothrow<allocator_type>::value;
+           abslx::allocator_is_nothrow<allocator_type>::value;
   }
   static constexpr bool DefaultConstructorIsNonTrivial() {
-    return !absl::is_trivially_default_constructible<StorageElement>::value;
+    return !abslx::is_trivially_default_constructible<StorageElement>::value;
   }
 
  public:
@@ -348,7 +348,7 @@ class FixedArray {
   // Relational operators. Equality operators are elementwise using
   // `operator==`, while order operators order FixedArrays lexicographically.
   friend bool operator==(const FixedArray& lhs, const FixedArray& rhs) {
-    return absl::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    return abslx::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
   }
 
   friend bool operator!=(const FixedArray& lhs, const FixedArray& rhs) {
@@ -399,14 +399,14 @@ class FixedArray {
   //     error: call to int __builtin___sprintf_chk(etc...)
   //     will always overflow destination buffer [-Werror]
   //
-  template <typename OuterT, typename InnerT = absl::remove_extent_t<OuterT>,
+  template <typename OuterT, typename InnerT = abslx::remove_extent_t<OuterT>,
             size_t InnerN = std::extent<OuterT>::value>
   struct StorageElementWrapper {
     InnerT array[InnerN];
   };
 
   using StorageElement =
-      absl::conditional_t<std::is_array<value_type>::value,
+      abslx::conditional_t<std::is_array<value_type>::value,
                           StorageElementWrapper<value_type>, value_type>;
 
   static pointer AsValueType(pointer ptr) { return ptr; }
@@ -442,7 +442,7 @@ class FixedArray {
   };
 
   using InlinedStorage =
-      absl::conditional_t<inline_elements == 0, EmptyInlinedStorage,
+      abslx::conditional_t<inline_elements == 0, EmptyInlinedStorage,
                           NonEmptyInlinedStorage>;
 
   // Storage
@@ -527,6 +527,6 @@ void FixedArray<T, N, A>::NonEmptyInlinedStorage::AnnotateDestruct(
   static_cast<void>(n);  // Mark used when not in asan mode
 }
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_CONTAINER_FIXED_ARRAY_H_

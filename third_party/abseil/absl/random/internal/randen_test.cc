@@ -21,7 +21,7 @@
 
 namespace {
 
-using absl::random_internal::Randen;
+using abslx::random_internal::Randen;
 
 // Local state parameters.
 constexpr size_t kStateSizeT = Randen::kStateBytes / sizeof(uint64_t);
@@ -30,13 +30,13 @@ TEST(RandenTest, CopyAndMove) {
   static_assert(std::is_copy_constructible<Randen>::value,
                 "Randen must be copy constructible");
 
-  static_assert(absl::is_copy_assignable<Randen>::value,
+  static_assert(abslx::is_copy_assignable<Randen>::value,
                 "Randen must be copy assignable");
 
   static_assert(std::is_move_constructible<Randen>::value,
                 "Randen must be move constructible");
 
-  static_assert(absl::is_move_assignable<Randen>::value,
+  static_assert(abslx::is_move_assignable<Randen>::value,
                 "Randen must be move assignable");
 }
 

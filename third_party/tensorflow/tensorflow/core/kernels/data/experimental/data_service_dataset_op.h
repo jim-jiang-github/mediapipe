@@ -40,7 +40,7 @@ class IterationCounter : public ResourceBase {
 
   std::string DebugString() const override {
     mutex_lock l(mu_);
-    return absl::StrCat(counter_);
+    return abslx::StrCat(counter_);
   }
 
   int64_t GetAndIncrement() {

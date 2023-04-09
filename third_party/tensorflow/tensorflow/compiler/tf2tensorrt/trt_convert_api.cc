@@ -202,7 +202,7 @@ Status RunSession(Session* session, const std::vector<std::string>& input_names,
   std::vector<std::pair<std::string, tensorflow::Tensor>> input_pairs;
   std::vector<std::string> prefixed_output_names;
   auto prefixed_name = [](std::string prefix, std::string name) {
-    return prefix.size() > 0 ? absl::StrJoin({prefix, name}, "/") : name;
+    return prefix.size() > 0 ? abslx::StrJoin({prefix, name}, "/") : name;
   };
   for (int i = 0; i < input_names.size(); i++) {
     input_pairs.push_back(
@@ -270,9 +270,9 @@ Status GetEngineCacheResource(const NodeDef& node, Session* session,
   ResourceMgr* rm;
   TF_RETURN_IF_ERROR(GetResourceManager(node, session, &rm));
 
-  absl::string_view resource_name = node.name();
+  abslx::string_view resource_name = node.name();
   size_t last_slash = resource_name.find_last_of('/');
-  if (last_slash != absl::string_view::npos) {
+  if (last_slash != abslx::string_view::npos) {
     resource_name.remove_prefix(last_slash + 1);
   }
   const std::string container(kTfTrtContainerName);
@@ -465,10 +465,10 @@ std::vector<std::string> GetNodeNames(
     const google::protobuf::Map<std::string, tensorflow::TensorInfo>& signature) {
   std::vector<std::string> names;
   for (auto const& item : signature) {
-    absl::string_view name = item.second.name();
+    abslx::string_view name = item.second.name();
     // Remove tensor suffix like ":0".
     size_t last_colon = name.find_last_of(':');
-    if (last_colon != absl::string_view::npos) {
+    if (last_colon != abslx::string_view::npos) {
       name.remove_suffix(name.size() - last_colon);
     }
     names.push_back(std::string(name));

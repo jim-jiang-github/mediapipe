@@ -31,16 +31,16 @@ limitations under the License.
 namespace tensorflow {
 namespace checkpoint {
 
-ABSL_CONST_INIT extern const absl::string_view
+ABSL_CONST_INIT extern const abslx::string_view
     kCheckpointCallbackManagerResourceName;
 
-// StatusOr<std::string> save_callback(absl::string_view checkpoint_id);
-using SaveCallback = std::function<StatusOr<std::string>(absl::string_view)>;
+// StatusOr<std::string> save_callback(abslx::string_view checkpoint_id);
+using SaveCallback = std::function<StatusOr<std::string>(abslx::string_view)>;
 
-// Status restore_callback(absl::string_view checkpoint_id,
-//                         absl::string_view content_from_checkpoint);
+// Status restore_callback(abslx::string_view checkpoint_id,
+//                         abslx::string_view content_from_checkpoint);
 using RestoreCallback =
-    std::function<Status(absl::string_view, absl::string_view)>;
+    std::function<Status(abslx::string_view, abslx::string_view)>;
 
 // A class to save and restore additional information for checkpointing.
 class CheckpointCallbackManager : public ResourceBase {
@@ -59,41 +59,41 @@ class CheckpointCallbackManager : public ResourceBase {
   // Infers a checkpoint id and directory from a prefix
   // passed to SaveV2 / RestoreV2 Ops
   static StatusOr<std::pair<std::string, std::string>>
-  GetCheckpointIdAndPathFromPrefix(absl::string_view prefix);
+  GetCheckpointIdAndPathFromPrefix(abslx::string_view prefix);
 
   // Register a save callback.
   // The passed callback will be triggered with an identified checkpoint id.
   // The callback should return a string content needs to be stored
   // as a part of a checkpoint, and then the content is stored as a file
   // with the registered the file_extension.
-  Status RegisterSaveCallback(absl::string_view file_extension,
+  Status RegisterSaveCallback(abslx::string_view file_extension,
                               SaveCallback callback);
 
   // Checks if a registered save callback exists for an extension.
-  bool DoesSaveCallbackExist(absl::string_view file_extension);
+  bool DoesSaveCallbackExist(abslx::string_view file_extension);
 
   // Register a restore callback.
   // The passed file_extension is used to generate a file name together with
   // an identified checkpoint_id. If the file exists, the registered callback
   // is triggered with the content of the file.
-  Status RegisterRestoreCallback(absl::string_view file_extension,
+  Status RegisterRestoreCallback(abslx::string_view file_extension,
                                  RestoreCallback callback);
 
   // Checks if a registered restore callback exists for an extension.
-  bool DoesRestoreCallbackExist(absl::string_view file_extension);
+  bool DoesRestoreCallbackExist(abslx::string_view file_extension);
 
   // Should be triggered from SaveV2()::Compute().
-  void Save(absl::string_view prefix);
+  void Save(abslx::string_view prefix);
 
   // Should be triggered from RestoreV2()::Compute().
-  void Restore(absl::string_view prefix);
+  void Restore(abslx::string_view prefix);
 
  private:
   mutable mutex mu_;
 
-  absl::flat_hash_map<std::string, SaveCallback> save_callbacks_
+  abslx::flat_hash_map<std::string, SaveCallback> save_callbacks_
       TF_GUARDED_BY(mu_);
-  absl::flat_hash_map<std::string, RestoreCallback> restore_callbacks_
+  abslx::flat_hash_map<std::string, RestoreCallback> restore_callbacks_
       TF_GUARDED_BY(mu_);
 
   // Checkpoint save and restore could happen before save / restore callbacks

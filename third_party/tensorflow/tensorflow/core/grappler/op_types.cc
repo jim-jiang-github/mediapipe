@@ -255,8 +255,8 @@ bool IsEluGrad(const NodeDef& node) { return node.op() == "EluGrad"; }
 
 bool IsQuantizationEmulation(const NodeDef& node) {
   const auto& op = node.op();
-  return absl::StartsWith(op, "QuantizeAndDequantize") ||
-         absl::StartsWith(op, "FakeQuantWithMinMax");
+  return abslx::StartsWith(op, "QuantizeAndDequantize") ||
+         abslx::StartsWith(op, "FakeQuantWithMinMax");
 }
 
 bool IsEnter(const NodeDef& node) {
@@ -766,7 +766,7 @@ bool ModifiesInputsInPlace(const NodeDef& node) {
   string lower_op_name = op_name;
   std::transform(lower_op_name.begin(), lower_op_name.end(),
                  lower_op_name.begin(), ::tolower);
-  if (absl::StrContains(lower_op_name, "inplace")) {
+  if (abslx::StrContains(lower_op_name, "inplace")) {
     return true;
   }
   return GetBoolAttr(node, "in_place") || GetBoolAttr(node, "inplace");
@@ -988,8 +988,8 @@ bool NeverForwardsInputs(const NodeDef& node) {
                                 "Where"}));
   const string& op_name = node.op();
   return kNonForwardingOps->count(op_name) > 0 ||
-         absl::StrContains(op_name, "Segment") ||
-         absl::StartsWith(op_name, "Quantize");
+         abslx::StrContains(op_name, "Segment") ||
+         abslx::StartsWith(op_name, "Quantize");
 }
 
 bool IsXlaLaunch(const NodeDef& node) { return node.op() == "XlaLaunch"; }

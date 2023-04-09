@@ -47,13 +47,13 @@ class ModelMetadataExtractor {
   //
   // [1]:
   // mediapipe/tasks/cc/core/external_file_handler.h
-  static absl::StatusOr<std::unique_ptr<ModelMetadataExtractor>>
+  static abslx::StatusOr<std::unique_ptr<ModelMetadataExtractor>>
   CreateFromModelBuffer(const char* buffer_data, size_t buffer_size);
 
   // Returns the pointer to the *first* ProcessUnit with the provided type, or
   // nullptr if none can be found. An error is returned if multiple
   // ProcessUnit-s with the provided type are found.
-  static absl::StatusOr<const tflite::ProcessUnit*> FindFirstProcessUnit(
+  static abslx::StatusOr<const tflite::ProcessUnit*> FindFirstProcessUnit(
       const tflite::TensorMetadata& tensor_metadata,
       tflite::ProcessUnitOptions type);
 
@@ -65,7 +65,7 @@ class ModelMetadataExtractor {
   static std::string FindFirstAssociatedFileName(
       const tflite::TensorMetadata& tensor_metadata,
       tflite::AssociatedFileType type,
-      absl::string_view locale = absl::string_view());
+      abslx::string_view locale = abslx::string_view());
 
   // Returns a pointer to the extracted TFLite Model Metadata, or nullptr if no
   // metadata was present in the Model FlatBuffer provided at creation time.
@@ -76,12 +76,12 @@ class ModelMetadataExtractor {
   // Gets the contents of the associated file with the provided name packed into
   // the model metadata. An error is returned if there is no such associated
   // file.
-  absl::StatusOr<absl::string_view> GetAssociatedFile(
+  abslx::StatusOr<abslx::string_view> GetAssociatedFile(
       const std::string& filename) const;
 
   // Gets the model version from the model metadata.  An error is returned if
   // either the metadata does not exist or no model version is present in it.
-  absl::StatusOr<std::string> GetModelVersion() const;
+  abslx::StatusOr<std::string> GetModelVersion() const;
 
   // Note: all methods below retrieves metadata of the *first* subgraph as
   // default.
@@ -141,10 +141,10 @@ class ModelMetadataExtractor {
   // Private default constructor, called from CreateFromModel().
   ModelMetadataExtractor() = default;
   // Initializes the ModelMetadataExtractor from the provided Model FlatBuffer.
-  absl::Status InitFromModelBuffer(const char* buffer_data, size_t buffer_size);
+  abslx::Status InitFromModelBuffer(const char* buffer_data, size_t buffer_size);
   // Extracts and stores in associated_files_ the associated files (if present)
   // packed into the model FlatBuffer data.
-  absl::Status ExtractAssociatedFiles(const char* buffer_data,
+  abslx::Status ExtractAssociatedFiles(const char* buffer_data,
                                       size_t buffer_size);
   // Pointer to the TFLite Model object from which to read the ModelMetadata.
   const tflite::Model* model_{nullptr};
@@ -153,7 +153,7 @@ class ModelMetadataExtractor {
   // The files associated with the ModelMetadata, as a map with the filename
   // (corresponding to a basename, e.g. "labels.txt") as key and a pointer to
   // the file contents as value.
-  absl::flat_hash_map<std::string, absl::string_view> associated_files_;
+  abslx::flat_hash_map<std::string, abslx::string_view> associated_files_;
 };
 
 }  // namespace metadata

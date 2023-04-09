@@ -41,7 +41,7 @@ namespace test_ns {
 // streams and input side packets.
 class DeadEndCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     for (int i = 0; i < cc->Inputs().NumEntries(); ++i) {
       cc->Inputs().Index(i).SetAny();
     }
@@ -51,14 +51,14 @@ class DeadEndCalculator : public CalculatorBase {
     for (int i = 0; i < cc->InputSidePackets().NumEntries(); ++i) {
       cc->InputSidePackets().Index(i).SetAny();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override { return absl::OkStatus(); }
+  abslx::Status Open(CalculatorContext* cc) override { return abslx::OkStatus(); }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     if (cc->Inputs().NumEntries() > 0) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     } else {
       // This is a source calculator, but we don't produce any outputs.
       return tool::StatusStop();
@@ -71,12 +71,12 @@ namespace whitelisted_ns {
 
 class DeadCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
-    return absl::OkStatus();
+  static abslx::Status GetContract(CalculatorContract* cc) {
+    return abslx::OkStatus();
   }
-  absl::Status Open(CalculatorContext* cc) override { return absl::OkStatus(); }
-  absl::Status Process(CalculatorContext* cc) override {
-    return absl::OkStatus();
+  abslx::Status Open(CalculatorContext* cc) override { return abslx::OkStatus(); }
+  abslx::Status Process(CalculatorContext* cc) override {
+    return abslx::OkStatus();
   }
 };
 
@@ -85,12 +85,12 @@ class DeadCalculator : public CalculatorBase {
 
 class EndCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
-    return absl::OkStatus();
+  static abslx::Status GetContract(CalculatorContract* cc) {
+    return abslx::OkStatus();
   }
-  absl::Status Open(CalculatorContext* cc) override { return absl::OkStatus(); }
-  absl::Status Process(CalculatorContext* cc) override {
-    return absl::OkStatus();
+  abslx::Status Open(CalculatorContext* cc) override { return abslx::OkStatus(); }
+  abslx::Status Process(CalculatorContext* cc) override {
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(::mediapipe::EndCalculator);
@@ -161,20 +161,20 @@ TEST(CalculatorTest, CreateByName) {
                 "mediapipe", "DeadEndCalculator")
                 .status()
                 .code(),
-            absl::StatusCode::kNotFound);
+            abslx::StatusCode::kNotFound);
 
   EXPECT_EQ(CalculatorBaseRegistry::CreateByName(  //
                 "DeadEndCalculator")
                 .status()
                 .code(),
-            absl::StatusCode::kNotFound);
+            abslx::StatusCode::kNotFound);
 }
 
 // Tests registration of a calculator within a whitelisted namespace.
 TEST(CalculatorTest, CreateByNameWhitelisted) {
   // Reset the registration namespace whitelist.
-  *const_cast<absl::flat_hash_set<std::string>*>(
-      &NamespaceAllowlist::TopNamespaces()) = absl::flat_hash_set<std::string>{
+  *const_cast<abslx::flat_hash_set<std::string>*>(
+      &NamespaceAllowlist::TopNamespaces()) = abslx::flat_hash_set<std::string>{
       "mediapipe::test_ns::whitelisted_ns",
       "mediapipe",
   };
@@ -182,7 +182,7 @@ TEST(CalculatorTest, CreateByNameWhitelisted) {
   // Register a whitelisted calculator.
   CalculatorBaseRegistry::Register(
       "::mediapipe::test_ns::whitelisted_ns::DeadCalculator",
-      absl::make_unique<internal::CalculatorBaseFactoryFor<
+      abslx::make_unique<internal::CalculatorBaseFactoryFor<
           mediapipe::test_ns::whitelisted_ns::DeadCalculator>>);
 
   // A whitelisted calculator can be found in its own namespace.

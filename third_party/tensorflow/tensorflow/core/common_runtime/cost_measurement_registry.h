@@ -45,14 +45,14 @@ class CostMeasurementRegistry {
 
   // Registers a CostMeasurement type to the global map. Registering different
   // types of CostMeasurement with the same name is prohibited.
-  static void RegisterCostMeasurement(absl::string_view name, Creator creator);
+  static void RegisterCostMeasurement(abslx::string_view name, Creator creator);
 };
 
 // Registers a CostMeasurement type to the global map. Registering different
 // types of CostMeasurement with the same name is prohibited.
 class CostMeasurementRegistrar {
  public:
-  explicit CostMeasurementRegistrar(absl::string_view name,
+  explicit CostMeasurementRegistrar(abslx::string_view name,
                                     CostMeasurementRegistry::Creator creator) {
     CostMeasurementRegistry::RegisterCostMeasurement(name, std::move(creator));
   }

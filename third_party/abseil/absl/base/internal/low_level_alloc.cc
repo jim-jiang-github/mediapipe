@@ -62,7 +62,7 @@
 #endif  // !MAP_ANONYMOUS
 #endif  // __APPLE__
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -235,7 +235,7 @@ alignas(
 
 // We must use LowLevelCallOnce here to construct the global arenas, rather than
 // using function-level statics, to avoid recursively invoking the scheduler.
-absl::once_flag create_globals_once;
+abslx::once_flag create_globals_once;
 
 void CreateGlobalArenas() {
   new (&default_arena_storage)
@@ -615,6 +615,6 @@ void *LowLevelAlloc::AllocWithArena(size_t request, Arena *arena) {
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_LOW_LEVEL_ALLOC_MISSING

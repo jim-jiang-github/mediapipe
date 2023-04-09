@@ -40,7 +40,7 @@ namespace {
 // It also accepts a side packet tagged "TIMEZONE", but doesn't use it.
 class TripleIntCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<int>().Optional();
     cc->Outputs().Index(0).SetSameAs(&cc->Inputs().Index(0)).Optional();
     cc->InputSidePackets().Index(0).Set<int>().Optional();
@@ -49,22 +49,22 @@ class TripleIntCalculator : public CalculatorBase {
         .SetSameAs(&cc->InputSidePackets().Index(0))
         .Optional();
     cc->InputSidePackets().Tag("TIMEZONE").Set<int>().Optional();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     cc->SetOffset(TimestampDiff(0));
     if (cc->OutputSidePackets().HasTag("")) {
       cc->OutputSidePackets().Index(0).Set(
           MakePacket<int>(cc->InputSidePackets().Index(0).Get<int>() * 3));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     int value = cc->Inputs().Index(0).Value().Get<int>();
     cc->Outputs().Index(0).Add(new int(3 * value), cc->InputTimestamp());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(TripleIntCalculator);
@@ -99,7 +99,7 @@ CalculatorGraphConfig SubnodeContainerExample(const std::string& options = "") {
   )pb";
 
   return mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(
-      absl::StrReplaceAll(config, {{"$options", options}}));
+      abslx::StrReplaceAll(config, {{"$options", options}}));
 }
 
 // A testing example of a SwitchContainer containing two subnodes.
@@ -484,7 +484,7 @@ TEST(SwitchContainerTest, ValidateSideInputs) {
       )pb");
   auto status = tool::ExpandSubgraphs(&supergraph);
   EXPECT_EQ(std::pair(status.code(), std::string(status.message())),
-            std::pair(absl::StatusCode::kInvalidArgument,
+            std::pair(abslx::StatusCode::kInvalidArgument,
                       std::string("Only one of SwitchContainer inputs "
                                   "'ENABLE' and 'SELECT' can be specified")));
 }

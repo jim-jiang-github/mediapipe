@@ -138,7 +138,7 @@ void RunGraph(const std::string& graph_config_proto,
               const std::string& input_stream_name, int num_input_packets,
               std::function<Packet(int)> input_fn,
               const std::string& output_stream_name,
-              std::function<absl::Status(const Packet&)> output_fn) {
+              std::function<abslx::Status(const Packet&)> output_fn) {
   CalculatorGraphConfig config =
       mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(graph_config_proto);
   CalculatorGraph graph;
@@ -169,9 +169,9 @@ TEST(MuxCalculatorTest, InputStreamSelector_DefaultInputStreamHandler) {
   // Output and handling.
   std::vector<int> output;
   // This function collects the output from the packet.
-  auto output_fn = [&output](const Packet& p) -> absl::Status {
+  auto output_fn = [&output](const Packet& p) -> abslx::Status {
     output.push_back(p.Get<int>());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   };
 
   RunGraph(kTestGraphConfig1, {}, kInputName, input_packets.size(), input_fn,
@@ -195,9 +195,9 @@ TEST(MuxCalculatorTest, InputSidePacketSelector_DefaultInputStreamHandler) {
   // Output and handling.
   std::vector<int> output;
   // This function collects the output from the packet.
-  auto output_fn = [&output](const Packet& p) -> absl::Status {
+  auto output_fn = [&output](const Packet& p) -> abslx::Status {
     output.push_back(p.Get<int>());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   };
 
   RunGraph(kTestGraphConfig2, {{kInputSelector, MakePacket<int>(0)}},
@@ -229,9 +229,9 @@ TEST(MuxCalculatorTest, InputStreamSelector_MuxInputStreamHandler) {
   // Output and handling.
   std::vector<int> output;
   // This function collects the output from the packet.
-  auto output_fn = [&output](const Packet& p) -> absl::Status {
+  auto output_fn = [&output](const Packet& p) -> abslx::Status {
     output.push_back(p.Get<int>());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   };
 
   RunGraph(kTestGraphConfig3, {}, kInputName, input_packets.size(), input_fn,
@@ -264,7 +264,7 @@ TEST(MuxCalculatorTest, DiscardSkippedInputs_MuxInputStreamHandler) {
   MP_ASSERT_OK(
       graph.ObserveOutputStream("test_output", [&output](const Packet& p) {
         output = p.Get<std::shared_ptr<int>>();
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }));
 
   MP_ASSERT_OK(graph.StartRun({}));
@@ -314,11 +314,11 @@ class PassThroughAndTsBoundUpdateNode : public mediapipe::api2::Node {
       "TS_BOUND_UPDATE"};
   MEDIAPIPE_NODE_CONTRACT(kInValue, kOutValue, kOutTsBoundUpdate);
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     kOutValue(cc).Send(kInValue(cc));
     kOutTsBoundUpdate(cc).SetNextTimestampBound(
         cc->InputTimestamp().NextAllowedInStream());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 MEDIAPIPE_REGISTER_NODE(PassThroughAndTsBoundUpdateNode);
@@ -327,17 +327,17 @@ class ToOptionalNode : public mediapipe::api2::Node {
  public:
   static constexpr mediapipe::api2::Input<int> kTick{"TICK"};
   static constexpr mediapipe::api2::Input<int> kInValue{"VALUE"};
-  static constexpr mediapipe::api2::Output<absl::optional<int>> kOutValue{
+  static constexpr mediapipe::api2::Output<abslx::optional<int>> kOutValue{
       "OUTPUT"};
   MEDIAPIPE_NODE_CONTRACT(kTick, kInValue, kOutValue);
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     if (kInValue(cc).IsEmpty()) {
-      kOutValue(cc).Send(absl::nullopt);
+      kOutValue(cc).Send(abslx::nullopt);
     } else {
       kOutValue(cc).Send({kInValue(cc).Get()});
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 MEDIAPIPE_REGISTER_NODE(ToOptionalNode);
@@ -376,7 +376,7 @@ TEST(MuxCalculatorTest, HandleTimestampBoundUpdates) {
   MP_ASSERT_OK(graph.Initialize(config));
   MP_ASSERT_OK(graph.StartRun({}));
 
-  auto send_value_fn = [&](int value, Timestamp ts) -> absl::Status {
+  auto send_value_fn = [&](int value, Timestamp ts) -> abslx::Status {
     MP_RETURN_IF_ERROR(
         graph.AddPacketToInputStream("select", MakePacket<int>(value).At(ts)));
     return graph.WaitUntilIdle();
@@ -384,15 +384,15 @@ TEST(MuxCalculatorTest, HandleTimestampBoundUpdates) {
 
   MP_ASSERT_OK(send_value_fn(0, Timestamp(1)));
   ASSERT_EQ(output_packets.size(), 1);
-  EXPECT_EQ(output_packets[0].Get<absl::optional<int>>(), 0);
+  EXPECT_EQ(output_packets[0].Get<abslx::optional<int>>(), 0);
 
   MP_ASSERT_OK(send_value_fn(1, Timestamp(2)));
   ASSERT_EQ(output_packets.size(), 2);
-  EXPECT_EQ(output_packets[1].Get<absl::optional<int>>(), absl::nullopt);
+  EXPECT_EQ(output_packets[1].Get<abslx::optional<int>>(), abslx::nullopt);
 
   MP_ASSERT_OK(send_value_fn(0, Timestamp(3)));
   ASSERT_EQ(output_packets.size(), 3);
-  EXPECT_EQ(output_packets[2].Get<absl::optional<int>>(), 0);
+  EXPECT_EQ(output_packets[2].Get<abslx::optional<int>>(), 0);
 
   MP_ASSERT_OK(graph.CloseAllInputStreams());
   MP_ASSERT_OK(graph.WaitUntilDone());
@@ -420,9 +420,9 @@ TEST(MuxCalculatorTest, HandlesCloseGracefully) {
   std::vector<Packet> output_packets;
   MP_ASSERT_OK(graph.ObserveOutputStream(
       "output",
-      [&output_packets](const Packet& p) -> absl::Status {
+      [&output_packets](const Packet& p) -> abslx::Status {
         output_packets.push_back(p);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       },
       /*observe_timestamp_bounds=*/true));
 
@@ -467,9 +467,9 @@ TEST(MuxCalculatorTest, HandlesCloseGracefullyWithDeafultInputStreamHandler) {
   std::vector<Packet> output_packets;
   MP_ASSERT_OK(graph.ObserveOutputStream(
       "output",
-      [&output_packets](const Packet& p) -> absl::Status {
+      [&output_packets](const Packet& p) -> abslx::Status {
         output_packets.push_back(p);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       },
       /*observe_timestamp_bounds=*/true));
 

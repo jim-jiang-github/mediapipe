@@ -56,10 +56,10 @@ SavedModel::Options DefaultSavedModelOptions(
     tensorflow::tfrt_stub::Runtime* runtime) {
   SavedModel::Options options(runtime);
   auto& compile_options = options.graph_execution_options.compile_options;
-  compile_options.enable_optimizer = absl::GetFlag(FLAGS_enable_optimizer);
-  compile_options.enable_native_ops = absl::GetFlag(FLAGS_enable_native_ops);
-  compile_options.enable_grappler = absl::GetFlag(FLAGS_enable_grappler);
-  compile_options.force_data_format = absl::GetFlag(FLAGS_force_data_format);
+  compile_options.enable_optimizer = abslx::GetFlag(FLAGS_enable_optimizer);
+  compile_options.enable_native_ops = abslx::GetFlag(FLAGS_enable_native_ops);
+  compile_options.enable_grappler = abslx::GetFlag(FLAGS_enable_grappler);
+  compile_options.force_data_format = abslx::GetFlag(FLAGS_force_data_format);
   return options;
 }
 
@@ -141,7 +141,7 @@ void ComputeCurrentTFResult(const std::string& saved_model_dir,
 }
 
 void ExpectTensorEqual(const tensorflow::Tensor& x, const tensorflow::Tensor& y,
-                       absl::optional<double> error) {
+                       abslx::optional<double> error) {
   DCHECK_EQ(x.dtype(), y.dtype());
   VLOG(1) << "TFRT result: " << x.DebugString();
   VLOG(1) << "TF result  : " << y.DebugString();
@@ -183,16 +183,16 @@ SavedModel::Options DefaultTpuModelOptions(
 
 namespace {
 
-constexpr absl::string_view kWarmupRequestsRelativePath =
+constexpr abslx::string_view kWarmupRequestsRelativePath =
     "/assets.extra/tf_serving_warmup_requests";
 
 }
 
 tensorflow::StatusOr<std::vector<tensorflow::serving::PredictRequest>>
-GetWarmupRequests(absl::string_view saved_model_dir) {
+GetWarmupRequests(abslx::string_view saved_model_dir) {
   std::vector<tensorflow::serving::PredictRequest> requests;
   const std::string kWarmupRequestPath =
-      absl::StrCat(saved_model_dir, kWarmupRequestsRelativePath);
+      abslx::StrCat(saved_model_dir, kWarmupRequestsRelativePath);
   std::unique_ptr<tensorflow::RandomAccessFile> tf_record_file;
   TF_RETURN_IF_ERROR(tensorflow::Env::Default()->NewRandomAccessFile(
       kWarmupRequestPath, &tf_record_file));
@@ -240,7 +240,7 @@ void ProcessPredictRequestsAndMaybeProfile(
       for (int32_t step = 0; step < num_steps; ++step) {
         if (profile) {
           tensorflow::profiler::TraceMe t([i, step]() {
-            return absl::StrCat("Request_", i, "_step_", step);
+            return abslx::StrCat("Request_", i, "_step_", step);
           });
           TF_CHECK_OK(saved_model->Run({}, signature, inputs, &outputs));
         } else {

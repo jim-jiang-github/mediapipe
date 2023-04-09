@@ -22,14 +22,14 @@ limitations under the License.
 namespace mediapipe {
 namespace tasks {
 
-// Name (aka type URL key) of the `absl::Status` payload which contains a
+// Name (aka type URL key) of the `abslx::Status` payload which contains a
 // stringified `MediaPipeTasksStatus` code (see below).
-constexpr absl::string_view kMediaPipeTasksPayload = "MediaPipeTasksStatus";
+constexpr abslx::string_view kMediaPipeTasksPayload = "MediaPipeTasksStatus";
 
 // Error codes for MediaPipe Tasks C++ APIs.
 //
 // At runtime, such codes are meant to be attached (where applicable) to a
-// `absl::Status` in a key-value manner with `kMediaPipeTasksPayload` as key and
+// `abslx::Status` in a key-value manner with `kMediaPipeTasksPayload` as key and
 // stringifed error code as value (aka payload). This logic is encapsulated in
 // the `CreateStatusWithPayload` helper below for convenience.
 //
@@ -185,20 +185,20 @@ enum class MediaPipeTasksStatus {
   kInvalidTaskGraphConfigError,
 };
 
-// Convenience helper to create an `absl::Status` augmented with the
+// Convenience helper to create an `abslx::Status` augmented with the
 // fine-grained `mediapipe_tasks_code` attached as payload under the
 // `kMediaPipeTasksPayload` type URL key.
 //
 // This should only be used for non-ok codes since otherwise it does nothing
-// more than returning an object identical to an OK status. See `absl::Status`
+// more than returning an object identical to an OK status. See `abslx::Status`
 // for more details.
-absl::Status CreateStatusWithPayload(
-    absl::StatusCode canonical_code, absl::string_view message,
+abslx::Status CreateStatusWithPayload(
+    abslx::StatusCode canonical_code, abslx::string_view message,
     MediaPipeTasksStatus mediapipe_tasks_code = MediaPipeTasksStatus::kError);
 
 // Attaches a new mediapipe tasks status payload to a non-ok status.
-absl::Status AddPayload(
-    absl::Status status, absl::string_view message,
+abslx::Status AddPayload(
+    abslx::Status status, abslx::string_view message,
     MediaPipeTasksStatus mediapipe_tasks_code = MediaPipeTasksStatus::kError);
 
 }  // namespace tasks

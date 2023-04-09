@@ -75,7 +75,7 @@ inline T RetrieveOptions(const T& base, const InputStreamShardSet& stream_set,
 }
 
 // Copy literal options from enclosing graphs.
-absl::Status DefineGraphOptions(const CalculatorGraphConfig::Node& parent_node,
+abslx::Status DefineGraphOptions(const CalculatorGraphConfig::Node& parent_node,
                                 CalculatorGraphConfig* config);
 
 }  // namespace tool

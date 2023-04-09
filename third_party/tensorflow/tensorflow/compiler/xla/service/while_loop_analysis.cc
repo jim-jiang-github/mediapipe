@@ -212,7 +212,7 @@ std::vector<const HloInstruction*> GetAuxiliaryLoopInductionVars(
   std::unique_ptr<HloReachabilityMap> hrm =
       HloReachabilityMap::BuildWithRestrictions(
           while_body,
-          absl::FunctionRef<void(const HloInstruction* hlo,
+          abslx::FunctionRef<void(const HloInstruction* hlo,
                                  std::vector<HloInstruction*>* inputs)>(
               add_dependencies));
 
@@ -358,9 +358,9 @@ static optional<int64_t> LiteralAsScalarInt64(const Literal& l) {
 optional<int64_t> CheckedAdd(int64_t a, int64_t b) {
   // Overflow occurred iff `a` and `b` have the same sign and `a + b` has a
   // different sign, see Hacker's Delignt 2nd Ed. pp 28.
-  uint64_t aa = absl::bit_cast<uint64_t>(a);
-  uint64_t bb = absl::bit_cast<uint64_t>(b);
-  int64_t result = absl::bit_cast<int64_t>(aa + bb);
+  uint64_t aa = abslx::bit_cast<uint64_t>(a);
+  uint64_t bb = abslx::bit_cast<uint64_t>(b);
+  int64_t result = abslx::bit_cast<int64_t>(aa + bb);
   if (a >= 0 == b >= 0 && result >= 0 != a >= 0) {
     return nullopt;
   }
@@ -369,9 +369,9 @@ optional<int64_t> CheckedAdd(int64_t a, int64_t b) {
 
 // Computes a - b, returning nullopt if it overflows.
 optional<int64_t> CheckedSubtract(int64_t a, int64_t b) {
-  uint64_t aa = absl::bit_cast<uint64_t>(a);
-  uint64_t bb = absl::bit_cast<uint64_t>(b);
-  int64_t result = absl::bit_cast<int64_t>(aa - bb);
+  uint64_t aa = abslx::bit_cast<uint64_t>(a);
+  uint64_t bb = abslx::bit_cast<uint64_t>(b);
+  int64_t result = abslx::bit_cast<int64_t>(aa - bb);
   // Overflow occurred iff `a` and `b` have different signs and the sign of
   // `a - b` is the same as that of `b`, see Hacker's Delight 2nd Ed. pp 29.
   if (a >= 0 != b >= 0 && result >= 0 == b >= 0) {
@@ -531,7 +531,7 @@ optional<int64_t> ComputeWhileLoopTripCount(HloInstruction* while_op,
       VLOG(2) << "Couldn't evaluate while cond: " << result.status();
       return nullopt;
     }
-    if (result.ValueOrDie().data<bool>() == absl::Span<const bool>{false}) {
+    if (result.ValueOrDie().data<bool>() == abslx::Span<const bool>{false}) {
       VLOG(2) << "Loop has static trip count of " << trip_count;
       return trip_count;
     }

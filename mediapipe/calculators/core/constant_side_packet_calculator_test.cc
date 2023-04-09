@@ -26,9 +26,9 @@
 namespace mediapipe {
 
 template <typename T>
-void DoTestSingleSidePacket(absl::string_view packet_spec,
+void DoTestSingleSidePacket(abslx::string_view packet_spec,
                             const T& expected_value) {
-  static constexpr absl::string_view graph_config_template = R"(
+  static constexpr abslx::string_view graph_config_template = R"(
         node {
           calculator: "ConstantSidePacketCalculator"
           output_side_packet: "PACKET:packet"
@@ -41,7 +41,7 @@ void DoTestSingleSidePacket(absl::string_view packet_spec,
       )";
   CalculatorGraphConfig graph_config =
       mediapipe::ParseTextProtoOrDie<CalculatorGraphConfig>(
-          absl::Substitute(graph_config_template, packet_spec));
+          abslx::Substitute(graph_config_template, packet_spec));
   CalculatorGraph graph;
   MP_ASSERT_OK(graph.Initialize(graph_config));
   MP_ASSERT_OK(graph.StartRun({}));

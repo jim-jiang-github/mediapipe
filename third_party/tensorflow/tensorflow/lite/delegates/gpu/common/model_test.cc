@@ -497,13 +497,13 @@ TEST(Model, InsertNodeAfter) {
   EXPECT_THAT(graph.FindInputs(node2->id), UnorderedElementsAre(value));
 
   Node* new_node1;
-  absl::Status status = graph.InsertNodeAfter(node1->id, &new_node1);
+  abslx::Status status = graph.InsertNodeAfter(node1->id, &new_node1);
   ASSERT_TRUE(status.ok());
   EXPECT_THAT(graph.nodes(), ElementsAre(node1, new_node1, node2));
 
   Node* new_node2;
   status = graph.InsertNodeAfter(/*id=*/100, &new_node2);
-  EXPECT_EQ(status.code(), absl::StatusCode::kOutOfRange);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kOutOfRange);
 
   status = graph.InsertNodeAfter(node2->id, &new_node2);
   ASSERT_TRUE(status.ok());
@@ -531,7 +531,7 @@ TEST(BatchMatchingTest, NotAllMatch) {
   a->tensor.shape = BHWC(1, 1, 1, 1);
   b->tensor.shape = BHWC(2, 1, 1, 1);
   EXPECT_EQ(CheckBatchSizeForAllValues(graph).code(),
-            absl::StatusCode::kInvalidArgument);
+            abslx::StatusCode::kInvalidArgument);
 }
 
 }  // namespace

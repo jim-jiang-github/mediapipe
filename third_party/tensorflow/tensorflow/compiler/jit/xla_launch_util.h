@@ -37,14 +37,14 @@ namespace tensorflow {
 // Snapshot of resource variables for a TF kernel invocation, mapping from
 // parameter number to values at execution time. If the resource variable is not
 // initialized, the value will not be present.
-using ResourceVarsSnapshot = absl::flat_hash_map<int, std::optional<Tensor>>;
+using ResourceVarsSnapshot = abslx::flat_hash_map<int, std::optional<Tensor>>;
 
 // Information about the state of a variable passed as input to the _XlaCompile
 // and _XlaRun operators.  Unlocks the resource variable and decrements its
 // refcount on destruction.
 class VariableInfo {
  public:
-  explicit VariableInfo(int index, absl::string_view name, Var* var,
+  explicit VariableInfo(int index, abslx::string_view name, Var* var,
                         const std::optional<ManagedStackTrace>&
                             definition_stack_trace = std::nullopt);
   VariableInfo(VariableInfo&& other);
@@ -63,7 +63,7 @@ class VariableInfo {
   Var* var() const { return var_; }
 
   // Returns the variable name.
-  absl::string_view name() const { return name_; }
+  abslx::string_view name() const { return name_; }
 
   // Returns true if the resource variable lock was successfully acquired by
   // this thread.
@@ -104,8 +104,8 @@ StatusOr<std::vector<VariableInfo>> GatherVariableInfo(
 // This models Read->* dependencies between resource variable operations.  See
 // jit/resource_operation_safety_analysis for details.
 Status SnapshotResourceVariables(OpKernelContext* ctx,
-                                 absl::Span<const int> variable_indices,
-                                 absl::Span<VariableInfo const> variable_infos,
+                                 abslx::Span<const int> variable_indices,
+                                 abslx::Span<VariableInfo const> variable_infos,
                                  ResourceVarsSnapshot* result);
 
 // Acquires the mutexes for all the variables in `variables` using a
@@ -113,17 +113,17 @@ Status SnapshotResourceVariables(OpKernelContext* ctx,
 //
 // `variables` is allowed to contain instances that don't track a resource
 // variable (i.e. variables[i].var() can be null for some i).
-Status LockVariables(absl::Span<VariableInfo*> variables)
+Status LockVariables(abslx::Span<VariableInfo*> variables)
     TF_EXCLUSIVE_LOCK_FUNCTION();
-Status LockVariables(absl::Span<VariableInfo> variables)
+Status LockVariables(abslx::Span<VariableInfo> variables)
     TF_EXCLUSIVE_LOCK_FUNCTION();
 
 // Returns a vector of VariableInfo instances for the resource variable inputs,
 // given that *all* inputs are in `inputs`. The input indices for the resource
 // variable inputs are in `variable_indices`.
 Status GetVariableInfosFromInputs(ResourceMgr* rm, DeviceBase* dev,
-                                  absl::Span<const Tensor* const> inputs,
-                                  absl::Span<const int> variable_indices,
+                                  abslx::Span<const Tensor* const> inputs,
+                                  abslx::Span<const int> variable_indices,
                                   std::vector<VariableInfo>* result);
 
 // Returns pointers to inputs stored in `ctx`.
@@ -150,9 +150,9 @@ class XlaComputationLaunchContext {
   // op.
   // Precondition: variables in `variable_args` are locked.
   static StatusOr<std::vector<XlaCompiler::Argument>> BuildXlaCompilerArguments(
-      absl::Span<int const> must_be_constant_idxs,
-      absl::Span<const Tensor* const> inputs,
-      absl::Span<VariableInfo const> variable_args, Device* device);
+      abslx::Span<int const> must_be_constant_idxs,
+      abslx::Span<const Tensor* const> inputs,
+      abslx::Span<VariableInfo const> variable_args, Device* device);
 
   // Add all inputs within `ctx` as XLA arguments (returned by arguments()).
   // `variables` is a map from TensorFlow argument number to resource variable.
@@ -182,7 +182,7 @@ class XlaComputationLaunchContext {
       OpKernelContext* ctx,
       const XlaCompiler::CompilationResult* compilation_result,
       xla::ScopedShapedBuffer output, int missing_ctx_input_prefix,
-      absl::Span<VariableInfo> variable_infos,
+      abslx::Span<VariableInfo> variable_infos,
       const xla::HloInputOutputAliasConfig& input_output_alias,
       const std::map<int, const Tensor*>& resource_vars);
 

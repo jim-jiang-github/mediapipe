@@ -37,7 +37,7 @@ namespace {
 class StatefulRngSpmdPartitionerTest : public HloTestBase {
  public:
   StatusOr<std::unique_ptr<HloModule>> PartitionComputation(
-      absl::string_view hlo_module, int64_t num_partitions,
+      abslx::string_view hlo_module, int64_t num_partitions,
       std::function<void(HloPassPipeline &pipeline)> add_passes = nullptr) {
     TF_ASSIGN_OR_RETURN(
         auto module, ParseAndReturnVerifiedModule(
@@ -69,7 +69,7 @@ class StatefulRngSpmdPartitionerTest : public HloTestBase {
 };
 
 TEST_F(StatefulRngSpmdPartitionerTest, RngReplicatedConsumer) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY entry {
@@ -93,7 +93,7 @@ ENTRY entry {
 }
 
 TEST_F(StatefulRngSpmdPartitionerTest, RngPartitionedConsumer) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY entry {

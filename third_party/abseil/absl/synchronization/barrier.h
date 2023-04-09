@@ -22,7 +22,7 @@
 #include "absl/base/thread_annotations.h"
 #include "absl/synchronization/mutex.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // Barrier
@@ -75,5 +75,5 @@ class Barrier {
 };
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 #endif  // ABSL_SYNCHRONIZATION_BARRIER_H_

@@ -38,9 +38,9 @@ class LocalizationToRegionCalculator : public mediapipe::CalculatorBase {
   LocalizationToRegionCalculator& operator=(
       const LocalizationToRegionCalculator&) = delete;
 
-  static absl::Status GetContract(mediapipe::CalculatorContract* cc);
-  absl::Status Open(mediapipe::CalculatorContext* cc) override;
-  absl::Status Process(mediapipe::CalculatorContext* cc) override;
+  static abslx::Status GetContract(mediapipe::CalculatorContract* cc);
+  abslx::Status Open(mediapipe::CalculatorContext* cc) override;
+  abslx::Status Process(mediapipe::CalculatorContext* cc) override;
 
  private:
   // Calculator options.
@@ -87,25 +87,25 @@ void FillSalientRegion(const mediapipe::Detection& detection,
 
 }  // namespace
 
-absl::Status LocalizationToRegionCalculator::GetContract(
+abslx::Status LocalizationToRegionCalculator::GetContract(
     mediapipe::CalculatorContract* cc) {
   cc->Inputs().Tag(kDetectionsTag).Set<std::vector<mediapipe::Detection>>();
   cc->Outputs().Tag(kRegionsTag).Set<DetectionSet>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LocalizationToRegionCalculator::Open(
+abslx::Status LocalizationToRegionCalculator::Open(
     mediapipe::CalculatorContext* cc) {
   options_ = cc->Options<LocalizationToRegionCalculatorOptions>();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status LocalizationToRegionCalculator::Process(
+abslx::Status LocalizationToRegionCalculator::Process(
     mediapipe::CalculatorContext* cc) {
   const auto& annotations =
       cc->Inputs().Tag(kDetectionsTag).Get<std::vector<mediapipe::Detection>>();
-  auto regions = ::absl::make_unique<DetectionSet>();
+  auto regions = ::abslx::make_unique<DetectionSet>();
   for (const auto& detection : annotations) {
     RET_CHECK_EQ(detection.label().size(), 1)
         << "Number of labels not equal to one.";
@@ -122,7 +122,7 @@ absl::Status LocalizationToRegionCalculator::Process(
   }
 
   cc->Outputs().Tag(kRegionsTag).Add(regions.release(), cc->InputTimestamp());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace autoflip

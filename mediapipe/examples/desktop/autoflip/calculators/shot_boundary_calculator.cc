@@ -60,9 +60,9 @@ class ShotBoundaryCalculator : public mediapipe::CalculatorBase {
   ShotBoundaryCalculator(const ShotBoundaryCalculator&) = delete;
   ShotBoundaryCalculator& operator=(const ShotBoundaryCalculator&) = delete;
 
-  static absl::Status GetContract(mediapipe::CalculatorContract* cc);
-  absl::Status Open(mediapipe::CalculatorContext* cc) override;
-  absl::Status Process(mediapipe::CalculatorContext* cc) override;
+  static abslx::Status GetContract(mediapipe::CalculatorContract* cc);
+  abslx::Status Open(mediapipe::CalculatorContext* cc) override;
+  abslx::Status Process(mediapipe::CalculatorContext* cc) override;
 
  private:
   // Computes the histogram of an image.
@@ -98,11 +98,11 @@ void ShotBoundaryCalculator::ComputeHistogram(const cv::Mat& image,
                kHistogramBinNum, kHistogramRange, true, false);
 }
 
-absl::Status ShotBoundaryCalculator::Open(mediapipe::CalculatorContext* cc) {
+abslx::Status ShotBoundaryCalculator::Open(mediapipe::CalculatorContext* cc) {
   options_ = cc->Options<ShotBoundaryCalculatorOptions>();
   last_shot_timestamp_ = Timestamp(0);
   init_ = false;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void ShotBoundaryCalculator::Transmit(mediapipe::CalculatorContext* cc,
@@ -126,7 +126,7 @@ void ShotBoundaryCalculator::Transmit(mediapipe::CalculatorContext* cc,
   }
 }
 
-absl::Status ShotBoundaryCalculator::Process(mediapipe::CalculatorContext* cc) {
+abslx::Status ShotBoundaryCalculator::Process(mediapipe::CalculatorContext* cc) {
   // Connect to input frame and make a mutable copy.
   cv::Mat frame_org = mediapipe::formats::MatView(
       &cc->Inputs().Tag(kVideoInputTag).Get<ImageFrame>());
@@ -140,7 +140,7 @@ absl::Status ShotBoundaryCalculator::Process(mediapipe::CalculatorContext* cc) {
     last_histogram_ = current_histogram;
     init_ = true;
     Transmit(cc, false);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   double current_motion_estimate =
@@ -150,7 +150,7 @@ absl::Status ShotBoundaryCalculator::Process(mediapipe::CalculatorContext* cc) {
 
   if (motion_history_.size() != options_.window_size()) {
     Transmit(cc, false);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Shot detection algorithm is a mixture of adaptive (controlled with
@@ -174,14 +174,14 @@ absl::Status ShotBoundaryCalculator::Process(mediapipe::CalculatorContext* cc) {
   // Store histogram for next frame.
   last_histogram_ = current_histogram;
   motion_history_.pop_back();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ShotBoundaryCalculator::GetContract(
+abslx::Status ShotBoundaryCalculator::GetContract(
     mediapipe::CalculatorContract* cc) {
   cc->Inputs().Tag(kVideoInputTag).Set<ImageFrame>();
   cc->Outputs().Tag(kShotChangeTag).Set<bool>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace autoflip

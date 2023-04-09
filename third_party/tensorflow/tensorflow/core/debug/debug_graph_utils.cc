@@ -29,7 +29,7 @@ namespace {
 
 // TODO(cais): Switch to safe_strtob when available.
 Status ParseBoolString(const string& bool_str, bool* bool_val) {
-  const string lower_bool_str = absl::AsciiStrToLower(bool_str);
+  const string lower_bool_str = abslx::AsciiStrToLower(bool_str);
   if (lower_bool_str == "false" || lower_bool_str == "f" ||
       lower_bool_str == "0") {
     *bool_val = false;
@@ -463,7 +463,7 @@ Status DebugNodeInserter::SetDebugNodeAttributes(
     return errors::InvalidArgument(
         unfulfilled_keys.size(),
         " attribute key(s) were not valid for debug node ", debug_node->name(),
-        ": ", absl::StrJoin(unfulfilled_keys, ", "));
+        ": ", abslx::StrJoin(unfulfilled_keys, ", "));
   }
 }
 

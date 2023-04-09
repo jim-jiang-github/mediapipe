@@ -153,7 +153,7 @@ uint64 AttrValueHash(const AttrValue& a, const TensorProtoHasher& tensor_hash) {
 }
 
 string SummarizeString(const string& str) {
-  string escaped = absl::CEscape(str);
+  string escaped = abslx::CEscape(str);
 
   // If the string is long, replace the middle with ellipses.
   constexpr int kMaxStringSummarySize = 80;
@@ -184,7 +184,7 @@ string SummarizeFunc(const NameAttrList& func) {
         strings::StrCat(p.first, "=", SummarizeAttrValue(p.second)));
   }
   std::sort(entries.begin(), entries.end());
-  return strings::StrCat(func.name(), "[", absl::StrJoin(entries, ", "), "]");
+  return strings::StrCat(func.name(), "[", abslx::StrJoin(entries, ", "), "]");
 }
 
 bool ParseAttrValueHelper_TensorNestsUnderLimit(int limit, string to_parse) {
@@ -292,10 +292,10 @@ string SummarizeAttrValue(const AttrValue& attr_value) {
       constexpr int kMaxListSummarySize = 15;
       if (pieces.size() >= kMaxListSummarySize) {
         pieces[5] = strings::StrCat(Fingerprint64(
-            absl::StrJoin(pieces.begin() + 5, pieces.end() - 5, ",")));
+            abslx::StrJoin(pieces.begin() + 5, pieces.end() - 5, ",")));
         pieces.erase(pieces.begin() + 6, pieces.end() - 5);
       }
-      return strings::StrCat("[", absl::StrJoin(pieces, ", "), "]");
+      return strings::StrCat("[", abslx::StrJoin(pieces, ", "), "]");
     }
     case AttrValue::kFunc: {
       return SummarizeFunc(attr_value.func());
@@ -354,7 +354,7 @@ Status AttrValueHasType(const AttrValue& attr_value, StringPiece type) {
   // check if has_list is false and some other field in attr_value is
   // set to flag the error.  This test can be made more strict once
   // support for GraphDef versions <= 4 is dropped.
-  if (absl::StartsWith(type, "list(") && !attr_value.has_list()) {
+  if (abslx::StartsWith(type, "list(") && !attr_value.has_list()) {
     if (num_set) {
       return errors::InvalidArgument(
           "AttrValue missing value with expected type '", type, "'");
@@ -365,7 +365,7 @@ Status AttrValueHasType(const AttrValue& attr_value, StringPiece type) {
   }
 
   // Okay to have an empty list, but not to be missing a non-list value.
-  if (num_set == 0 && !absl::StartsWith(type, "list(")) {
+  if (num_set == 0 && !abslx::StartsWith(type, "list(")) {
     return errors::InvalidArgument(
         "AttrValue missing value with expected type '", type, "'");
   }
@@ -409,29 +409,29 @@ Status AttrValueHasType(const AttrValue& attr_value, StringPiece type) {
 bool ParseAttrValue(StringPiece type, StringPiece text, AttrValue* out) {
   // Parse type.
   string field_name;
-  bool is_list = absl::ConsumePrefix(&type, "list(");
-  if (absl::ConsumePrefix(&type, "string")) {
+  bool is_list = abslx::ConsumePrefix(&type, "list(");
+  if (abslx::ConsumePrefix(&type, "string")) {
     field_name = "s";
-  } else if (absl::ConsumePrefix(&type, "int")) {
+  } else if (abslx::ConsumePrefix(&type, "int")) {
     field_name = "i";
-  } else if (absl::ConsumePrefix(&type, "float")) {
+  } else if (abslx::ConsumePrefix(&type, "float")) {
     field_name = "f";
-  } else if (absl::ConsumePrefix(&type, "bool")) {
+  } else if (abslx::ConsumePrefix(&type, "bool")) {
     field_name = "b";
-  } else if (absl::ConsumePrefix(&type, "type")) {
+  } else if (abslx::ConsumePrefix(&type, "type")) {
     field_name = "type";
-  } else if (absl::ConsumePrefix(&type, "shape")) {
+  } else if (abslx::ConsumePrefix(&type, "shape")) {
     field_name = "shape";
-  } else if (absl::ConsumePrefix(&type, "tensor")) {
+  } else if (abslx::ConsumePrefix(&type, "tensor")) {
     field_name = "tensor";
-  } else if (absl::ConsumePrefix(&type, "func")) {
+  } else if (abslx::ConsumePrefix(&type, "func")) {
     field_name = "func";
-  } else if (absl::ConsumePrefix(&type, "placeholder")) {
+  } else if (abslx::ConsumePrefix(&type, "placeholder")) {
     field_name = "placeholder";
   } else {
     return false;
   }
-  if (is_list && !absl::ConsumePrefix(&type, ")")) {
+  if (is_list && !abslx::ConsumePrefix(&type, ")")) {
     return false;
   }
 

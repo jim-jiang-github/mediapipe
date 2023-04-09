@@ -22,7 +22,7 @@
 #include "absl/base/thread_annotations.h"
 #include "absl/utility/utility.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 namespace cleanup_internal {
@@ -52,7 +52,7 @@ class Storage {
   Storage(Storage&& other)
       : callback_(std::move(other.callback_)),
         is_callback_engaged_(
-            absl::exchange(other.is_callback_engaged_, false)) {}
+            abslx::exchange(other.is_callback_engaged_, false)) {}
 
   Storage(const Storage& other) = delete;
 
@@ -76,6 +76,6 @@ class Storage {
 }  // namespace cleanup_internal
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_CLEANUP_INTERNAL_CLEANUP_H_

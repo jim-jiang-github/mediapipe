@@ -42,7 +42,7 @@ class MockCoordinationServiceAgent : public CoordinationServiceAgent {
   // NOLINTBEGIN(MOCK_METHOD does not work on Windows build, using deprecated
   // MOCK_METHOD<N> instead)
   MOCK_METHOD3(WaitAtBarrier,
-               Status(const std::string& barrier_id, absl::Duration timeout,
+               Status(const std::string& barrier_id, abslx::Duration timeout,
                       const std::vector<CoordinatedTask>& tasks));
   MOCK_METHOD1(CancelBarrier, Status(const std::string& barrier_id));
 
@@ -73,7 +73,7 @@ class MockCoordinationServiceAgent : public CoordinationServiceAgent {
   MOCK_METHOD0(Reset, Status());
   MOCK_METHOD1(GetKeyValue, StatusOr<std::string>(const std::string& key));
   MOCK_METHOD2(GetKeyValue, StatusOr<std::string>(const std::string& key,
-                                                  absl::Duration timeout));
+                                                  abslx::Duration timeout));
   MOCK_METHOD2(GetKeyValueAsync,
                std::shared_ptr<CallOptions>(const std::string& key,
                                             StatusOrValueCallback done));
@@ -91,7 +91,7 @@ class MockCoordinationServiceAgent : public CoordinationServiceAgent {
                                      ChangedKeyValuesCallback on_change));
   MOCK_METHOD1(StopWatchKey, Status(const std::string& key));
   MOCK_METHOD4(WaitAtBarrierAsync,
-               void(const std::string& barrier_id, absl::Duration timeout,
+               void(const std::string& barrier_id, abslx::Duration timeout,
                     const std::vector<CoordinatedTask>& tasks,
                     StatusCallback done));
   MOCK_METHOD2(CancelBarrierAsync,
@@ -105,7 +105,7 @@ class MockCoordinationServiceAgent : public CoordinationServiceAgent {
 };
 
 constexpr auto kTestKey = "test_key";
-constexpr auto kTestTimeout = absl::Seconds(1);
+constexpr auto kTestTimeout = abslx::Seconds(1);
 const int kThreadPoolSize = 32;
 
 void TestBarrierProxyWait(
@@ -269,7 +269,7 @@ TEST(BarrierProxyManagerTest, DifferentKeysDoNotInterfereWithEachOther) {
     thread::ThreadPool pool(Env::Default(), /*name=*/"TestPool",
                             kThreadPoolSize);
     for (int i = 0; i < kNumThreads * 2; ++i) {
-      pool.Schedule([&, key = absl::StrCat("key", i % 2)]() {
+      pool.Schedule([&, key = abslx::StrCat("key", i % 2)]() {
         ASSERT_EQ(mgr.Wait(agent.get(), tasks, kNumThreads, key, kTestTimeout),
                   OkStatus());
       });

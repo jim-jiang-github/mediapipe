@@ -62,17 +62,17 @@ void AssignMatrixValue(int r, int c, int value, tf::Tensor* output_tensor) {
 // }
 class VectorIntToTensorCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   VectorIntToTensorCalculatorOptions options_;
 };
 REGISTER_CALCULATOR(VectorIntToTensorCalculator);
 
-absl::Status VectorIntToTensorCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status VectorIntToTensorCalculator::GetContract(CalculatorContract* cc) {
   const auto& options = cc->Options<VectorIntToTensorCalculatorOptions>();
   // Start with only one input packet.
   RET_CHECK_EQ(cc->Inputs().NumEntries(), 1)
@@ -91,19 +91,19 @@ absl::Status VectorIntToTensorCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK_EQ(cc->Outputs().NumEntries(), 1)
       << "Only one output stream is supported.";
   cc->Outputs().Tag(kTensorOut).Set<tf::Tensor>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status VectorIntToTensorCalculator::Open(CalculatorContext* cc) {
+abslx::Status VectorIntToTensorCalculator::Open(CalculatorContext* cc) {
   options_ = cc->Options<VectorIntToTensorCalculatorOptions>();
   RET_CHECK(options_.tensor_data_type() == tf::DT_UINT8 ||
             options_.tensor_data_type() == tf::DT_INT32 ||
             options_.tensor_data_type() == tf::DT_INT64)
       << "Output tensor data type is not supported.";
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status VectorIntToTensorCalculator::Process(CalculatorContext* cc) {
+abslx::Status VectorIntToTensorCalculator::Process(CalculatorContext* cc) {
   tf::TensorShape tensor_shape;
   if (options_.input_size() == INPUT_2D) {
     const std::vector<std::vector<int>>& input =
@@ -124,7 +124,7 @@ absl::Status VectorIntToTensorCalculator::Process(CalculatorContext* cc) {
     } else {
       tensor_shape = tf::TensorShape({rows, cols});
     }
-    auto output = ::absl::make_unique<tf::Tensor>(options_.tensor_data_type(),
+    auto output = ::abslx::make_unique<tf::Tensor>(options_.tensor_data_type(),
                                                   tensor_shape);
     if (options_.transpose()) {
       for (int r = 0; r < rows; ++r) {
@@ -174,7 +174,7 @@ absl::Status VectorIntToTensorCalculator::Process(CalculatorContext* cc) {
     CHECK_GE(input.size(), 1);
     const int32 length = input.size();
     tensor_shape = tf::TensorShape({length});
-    auto output = ::absl::make_unique<tf::Tensor>(options_.tensor_data_type(),
+    auto output = ::abslx::make_unique<tf::Tensor>(options_.tensor_data_type(),
                                                   tensor_shape);
     for (int i = 0; i < length; ++i) {
       switch (options_.tensor_data_type()) {
@@ -195,7 +195,7 @@ absl::Status VectorIntToTensorCalculator::Process(CalculatorContext* cc) {
   } else {
     LOG(FATAL) << "input size not supported";
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

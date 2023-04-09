@@ -63,9 +63,9 @@ class Advisor {
                                    stats_));
     }
     for (const auto& checker : ret.checkers()) {
-      absl::FPrintF(stdout, "\n%s:\n", checker.first);
+      abslx::FPrintF(stdout, "\n%s:\n", checker.first);
       for (const string& r : checker.second.reports()) {
-        absl::FPrintF(stdout, "%s\n", r);
+        abslx::FPrintF(stdout, "%s\n", r);
       }
     }
     fflush(stdout);

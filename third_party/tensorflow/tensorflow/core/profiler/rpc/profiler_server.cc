@@ -30,7 +30,7 @@ namespace profiler {
 
 void ProfilerServer::StartProfilerServer(int32_t port) {
   VLOG(1) << "Starting profiler server.";
-  std::string server_address = absl::StrCat("[::]:", port);
+  std::string server_address = abslx::StrCat("[::]:", port);
   service_ = CreateProfilerService();
   ::grpc::ServerBuilder builder;
 

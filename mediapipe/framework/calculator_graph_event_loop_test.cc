@@ -39,13 +39,13 @@ namespace {
 class CalculatorGraphEventLoopTest : public testing::Test {
  public:
   void AddThreadSafeVectorSink(const Packet& packet) {
-    absl::WriterMutexLock lock(&output_packets_mutex_);
+    abslx::WriterMutexLock lock(&output_packets_mutex_);
     output_packets_.push_back(packet);
   }
 
  protected:
   std::vector<Packet> output_packets_ ABSL_GUARDED_BY(output_packets_mutex_);
-  absl::Mutex output_packets_mutex_;
+  abslx::Mutex output_packets_mutex_;
 };
 
 // Allows blocking of the Process() call by locking the blocking_mutex passed to
@@ -53,29 +53,29 @@ class CalculatorGraphEventLoopTest : public testing::Test {
 // testing.
 class BlockingPassThroughCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).SetAny();
     cc->Outputs().Index(0).SetSameAs(&cc->Inputs().Index(0));
-    cc->InputSidePackets().Index(0).Set<std::unique_ptr<absl::Mutex>>();
+    cc->InputSidePackets().Index(0).Set<std::unique_ptr<abslx::Mutex>>();
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
-    mutex_ = GetFromUniquePtr<absl::Mutex>(cc->InputSidePackets().Index(0));
-    return absl::OkStatus();
+  abslx::Status Open(CalculatorContext* cc) final {
+    mutex_ = GetFromUniquePtr<abslx::Mutex>(cc->InputSidePackets().Index(0));
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     mutex_->Lock();
     cc->Outputs().Index(0).AddPacket(
         cc->Inputs().Index(0).Value().At(cc->InputTimestamp()));
     mutex_->Unlock();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
-  absl::Mutex* mutex_;
+  abslx::Mutex* mutex_;
 };
 
 REGISTER_CALCULATOR(BlockingPassThroughCalculator);
@@ -87,15 +87,15 @@ struct SimpleHeader {
 
 class UsingHeaderCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).SetAny();
     cc->Outputs().Index(0).SetSameAs(&cc->Inputs().Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     if (cc->Inputs().Index(0).Header().IsEmpty()) {
-      return absl::UnknownError("No stream header present.");
+      return abslx::UnknownError("No stream header present.");
     }
 
     const SimpleHeader& header =
@@ -105,13 +105,13 @@ class UsingHeaderCalculator : public CalculatorBase {
     output_header->height = header.height;
 
     cc->Outputs().Index(0).SetHeader(Adopt(output_header.release()));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     cc->Outputs().Index(0).AddPacket(
         cc->Inputs().Index(0).Value().At(cc->InputTimestamp()));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(UsingHeaderCalculator);
@@ -148,17 +148,17 @@ TEST_F(CalculatorGraphEventLoopTest, WellProvisionedEventLoop) {
     // Wait for all packets to be received by the sink.
     while (true) {
       {
-        absl::ReaderMutexLock lock(&output_packets_mutex_);
+        abslx::ReaderMutexLock lock(&output_packets_mutex_);
         if (output_packets_.size() > i) {
           break;
         }
       }
-      absl::SleepFor(absl::Microseconds(1));
+      abslx::SleepFor(abslx::Microseconds(1));
     }
   }
   // Check partial results.
   {
-    absl::ReaderMutexLock lock(&output_packets_mutex_);
+    abslx::ReaderMutexLock lock(&output_packets_mutex_);
     ASSERT_EQ(100, output_packets_.size());
     for (int i = 0; i < 100; ++i) {
       EXPECT_EQ(i, output_packets_[i].Get<int>());
@@ -176,7 +176,7 @@ TEST_F(CalculatorGraphEventLoopTest, WellProvisionedEventLoop) {
   MP_ASSERT_OK(graph.WaitUntilDone());
   // Check final results.
   {
-    absl::ReaderMutexLock lock(&output_packets_mutex_);
+    abslx::ReaderMutexLock lock(&output_packets_mutex_);
     ASSERT_EQ(200, output_packets_.size());
     for (int i = 0; i < 200; ++i) {
       EXPECT_EQ(i, output_packets_[i].Get<int>());
@@ -187,20 +187,20 @@ TEST_F(CalculatorGraphEventLoopTest, WellProvisionedEventLoop) {
 // Pass-Through calculator that fails upon receiving the 10th packet.
 class FailingPassThroughCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).SetAny();
     cc->Outputs().Index(0).SetSameAs(&cc->Inputs().Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     Timestamp timestamp = cc->InputTimestamp();
     if (timestamp.Value() == 9) {
-      return absl::UnknownError("Meant to fail (magicstringincludedhere).");
+      return abslx::UnknownError("Meant to fail (magicstringincludedhere).");
     }
     cc->Outputs().Index(0).AddPacket(
         cc->Inputs().Index(0).Value().At(timestamp));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(FailingPassThroughCalculator);
@@ -230,7 +230,7 @@ TEST_F(CalculatorGraphEventLoopTest, FailingEventLoop) {
                         this, std::placeholders::_1))}}));
 
   // Insert packets.
-  absl::Status status;
+  abslx::Status status;
   for (int i = 0; true; ++i) {
     status = graph.AddPacketToInputStream("input_numbers",
                                           Adopt(new int(i)).At(Timestamp(i)));
@@ -280,7 +280,7 @@ TEST_F(CalculatorGraphEventLoopTest, StepByStepSchedulerLoop) {
     MP_ASSERT_OK(graph.AddPacketToInputStream(
         "input_numbers", Adopt(new int(i)).At(Timestamp(i))));
     MP_ASSERT_OK(graph.WaitUntilIdle());
-    absl::ReaderMutexLock lock(&output_packets_mutex_);
+    abslx::ReaderMutexLock lock(&output_packets_mutex_);
     ASSERT_EQ(i + 1, output_packets_.size());
   }
   // Don't wait but just close the input stream.
@@ -314,10 +314,10 @@ TEST_F(CalculatorGraphEventLoopTest, SetStreamHeader) {
                         &CalculatorGraphEventLoopTest::AddThreadSafeVectorSink,
                         this, std::placeholders::_1))}}));
 
-  absl::Status status = graph.WaitUntilIdle();
+  abslx::Status status = graph.WaitUntilIdle();
   // Expect to fail if header not set.
   ASSERT_FALSE(status.ok());
-  EXPECT_EQ(status.code(), absl::StatusCode::kUnknown);
+  EXPECT_EQ(status.code(), abslx::StatusCode::kUnknown);
   EXPECT_THAT(status.message(),
               testing::HasSubstr("No stream header present."));
 
@@ -360,7 +360,7 @@ TEST_F(CalculatorGraphEventLoopTest, TryToAddPacketToInputStream) {
       )",
       &graph_config));
 
-  absl::Mutex* mutex = new absl::Mutex();
+  abslx::Mutex* mutex = new abslx::Mutex();
   Packet mutex_side_packet = AdoptAsUniquePtr(mutex);
 
   CalculatorGraph graph(graph_config);
@@ -386,7 +386,7 @@ TEST_F(CalculatorGraphEventLoopTest, TryToAddPacketToInputStream) {
   // mechanism could be off by 1 at most due to the order of acquisition of
   // locks.
   for (int i = 0; i < kNumInputPackets; ++i) {
-    absl::Status status = graph.AddPacketToInputStream(
+    abslx::Status status = graph.AddPacketToInputStream(
         "input_numbers", Adopt(new int(i)).At(Timestamp(i)));
     if (!status.ok()) {
       ++fail_count;
@@ -417,7 +417,7 @@ TEST_F(CalculatorGraphEventLoopTest, ThrottlingDisabled) {
       )",
       &graph_config));
 
-  absl::Mutex* mutex = new absl::Mutex();
+  abslx::Mutex* mutex = new abslx::Mutex();
   Packet mutex_side_packet = AdoptAsUniquePtr(mutex);
 
   CalculatorGraph graph(graph_config);
@@ -456,7 +456,7 @@ TEST_F(CalculatorGraphEventLoopTest, ThrottleGraphInputStreamTwice) {
       )",
       &graph_config));
 
-  absl::Mutex* mutex = new absl::Mutex();
+  abslx::Mutex* mutex = new abslx::Mutex();
   Packet mutex_side_packet = AdoptAsUniquePtr(mutex);
 
   CalculatorGraph graph(graph_config);
@@ -471,7 +471,7 @@ TEST_F(CalculatorGraphEventLoopTest, ThrottleGraphInputStreamTwice) {
     // Lock the mutex so that the BlockingPassThroughCalculator cannot read any
     // of these packets.
     mutex->Lock();
-    absl::Status status = absl::OkStatus();
+    abslx::Status status = abslx::OkStatus();
     for (int i = 0; i < 10; ++i) {
       status = graph.AddPacketToInputStream("input_numbers",
                                             Adopt(new int(i)).At(Timestamp(i)));
@@ -481,7 +481,7 @@ TEST_F(CalculatorGraphEventLoopTest, ThrottleGraphInputStreamTwice) {
     }
     mutex->Unlock();
     ASSERT_FALSE(status.ok());
-    EXPECT_EQ(status.code(), absl::StatusCode::kUnavailable);
+    EXPECT_EQ(status.code(), abslx::StatusCode::kUnavailable);
     EXPECT_THAT(status.message(), testing::HasSubstr("Graph is throttled."));
     MP_ASSERT_OK(graph.CloseInputStream("input_numbers"));
     MP_ASSERT_OK(graph.WaitUntilDone());
@@ -522,7 +522,7 @@ TEST_F(CalculatorGraphEventLoopTest, WaitToAddPacketToInputStream) {
   // All of these packets should be accepted by the graph.
   int fail_count = 0;
   for (int i = 0; i < kNumInputPackets; ++i) {
-    absl::Status status = graph.AddPacketToInputStream(
+    abslx::Status status = graph.AddPacketToInputStream(
         "input_numbers", Adopt(new int(i)).At(Timestamp(i)));
     if (!status.ok()) {
       ++fail_count;
@@ -536,7 +536,7 @@ TEST_F(CalculatorGraphEventLoopTest, WaitToAddPacketToInputStream) {
   // Wait properly via the API until the graph is done.
   MP_ASSERT_OK(graph.WaitUntilDone());
 
-  absl::ReaderMutexLock lock(&output_packets_mutex_);
+  abslx::ReaderMutexLock lock(&output_packets_mutex_);
   ASSERT_EQ(kNumInputPackets, output_packets_.size());
 }
 
@@ -600,7 +600,7 @@ TEST_F(CalculatorGraphEventLoopTest, UnthrottleSources) {
   EXPECT_FALSE(add_packet("input_numbers", kQueueSize).ok());
 
   // CalculatorGraph::UnthrottleSources should be called just one time.
-  absl::SleepFor(absl::Milliseconds(100));
+  abslx::SleepFor(abslx::Milliseconds(100));
 
   // Read all packets from the output stream queue and close the graph.
   for (int i = 0; i < kQueueSize; ++i) {

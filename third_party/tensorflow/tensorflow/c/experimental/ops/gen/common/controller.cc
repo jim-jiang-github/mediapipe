@@ -51,7 +51,7 @@ void Controller::InitializeOpApi() {
   api_def_map_ = new ApiDefMap(op_list_);
   for (const auto& op : op_list_.op()) {
     for (const auto& dir : path_config_.api_dirs) {
-      const string file_name = absl::Substitute("api_def_$0.pbtxt", op.name());
+      const string file_name = abslx::Substitute("api_def_$0.pbtxt", op.name());
       const string file_path = io::JoinPath(dir, file_name);
       if (env_->FileExists(file_path).ok()) {
         TF_CHECK_OK(api_def_map_->LoadFile(env_, file_path)) << file_path;

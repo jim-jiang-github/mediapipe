@@ -23,13 +23,13 @@
 #include "absl/base/thread_annotations.h"
 #include "absl/synchronization/mutex.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace {
 
-absl::once_flag once;
+abslx::once_flag once;
 
-ABSL_CONST_INIT Mutex counters_mu(absl::kConstInit);
+ABSL_CONST_INIT Mutex counters_mu(abslx::kConstInit);
 
 int running_thread_count ABSL_GUARDED_BY(counters_mu) = 0;
 int call_once_invoke_count ABSL_GUARDED_BY(counters_mu) = 0;
@@ -37,7 +37,7 @@ int call_once_finished_count ABSL_GUARDED_BY(counters_mu) = 0;
 int call_once_return_count ABSL_GUARDED_BY(counters_mu) = 0;
 bool done_blocking ABSL_GUARDED_BY(counters_mu) = false;
 
-// Function to be called from absl::call_once.  Waits for a notification.
+// Function to be called from abslx::call_once.  Waits for a notification.
 void WaitAndIncrement() {
   counters_mu.Lock();
   ++call_once_invoke_count;
@@ -53,7 +53,7 @@ void ThreadBody() {
   ++running_thread_count;
   counters_mu.Unlock();
 
-  absl::call_once(once, WaitAndIncrement);
+  abslx::call_once(once, WaitAndIncrement);
 
   counters_mu.Lock();
   ++call_once_return_count;
@@ -104,4 +104,4 @@ TEST(CallOnceTest, ExecutionCount) {
 
 }  // namespace
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

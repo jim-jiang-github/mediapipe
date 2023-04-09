@@ -30,7 +30,7 @@ namespace mediapipe {
 // Creates Metal image-to-tensor converter.
 // NOTE: [MPPMetalHelper updateContract:...] invocation must precede
 // converter creation.
-absl::StatusOr<std::unique_ptr<ImageToTensorConverter>> CreateMetalConverter(
+abslx::StatusOr<std::unique_ptr<ImageToTensorConverter>> CreateMetalConverter(
     CalculatorContext* cc, BorderMode border_mode);
 
 }  // namespace mediapipe

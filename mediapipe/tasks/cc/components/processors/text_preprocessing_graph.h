@@ -48,7 +48,7 @@ namespace processors {
 // Outputs:
 //   TENSORS - std::vector<Tensor>
 //     Vector containing the preprocessed input tensors for the TFLite model.
-absl::Status ConfigureTextPreprocessingGraph(
+abslx::Status ConfigureTextPreprocessingGraph(
     const core::ModelResources& model_resources,
     proto::TextPreprocessingGraphOptions& options);
 

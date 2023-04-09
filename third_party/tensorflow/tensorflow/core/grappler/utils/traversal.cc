@@ -43,7 +43,7 @@ enum class NodeState { kNotVisited, kVisiting, kDone };
 }  // namespace
 
 void DfsTraversal(const GraphTopologyView& graph_view,
-                  const absl::Span<const NodeDef* const> from,
+                  const abslx::Span<const NodeDef* const> from,
                   const TraversalDirection direction,
                   const DfsPredicates& predicates,
                   const DfsCallbacks& callbacks) {
@@ -51,14 +51,14 @@ void DfsTraversal(const GraphTopologyView& graph_view,
   stack.reserve(from.size());
 
   for (const NodeDef* node : from) {
-    const absl::optional<int> node_idx = graph_view.GetNodeIndex(*node);
+    const abslx::optional<int> node_idx = graph_view.GetNodeIndex(*node);
     DCHECK(node_idx.has_value()) << "Illegal start node: " << node->name();
     if (node_idx.has_value()) {
       stack.emplace_back(node_idx.value());
     }
   }
 
-  absl::flat_hash_map<int, NodeState> node_state;
+  abslx::flat_hash_map<int, NodeState> node_state;
   while (!stack.empty()) {
     DfsStackElem w = stack.back();
     stack.pop_back();
@@ -117,7 +117,7 @@ void DfsTraversal(const GraphTopologyView& graph_view,
 }
 
 void DfsTraversal(const GraphTopologyView& graph_view,
-                  const absl::Span<const NodeDef* const> from,
+                  const abslx::Span<const NodeDef* const> from,
                   TraversalDirection direction, const DfsCallbacks& callbacks) {
   DfsTraversal(graph_view, from, direction, {}, callbacks);
 }

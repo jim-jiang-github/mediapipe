@@ -57,7 +57,7 @@
 #include "absl/base/internal/unscaledcycleclock.h"
 #include "absl/base/thread_annotations.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -415,8 +415,8 @@ pid_t GetTID() {
 // Fallback implementation of GetTID using pthread_getspecific.
 ABSL_CONST_INIT static once_flag tid_once;
 ABSL_CONST_INIT static pthread_key_t tid_key;
-ABSL_CONST_INIT static absl::base_internal::SpinLock tid_lock(
-    absl::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
+ABSL_CONST_INIT static abslx::base_internal::SpinLock tid_lock(
+    abslx::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
 
 // We set a bit per thread in this array to indicate that an ID is in
 // use. ID 0 is unused because it is the default value returned by
@@ -430,7 +430,7 @@ static void FreeTID(void *v) {
   intptr_t tid = reinterpret_cast<intptr_t>(v);
   int word = tid / kBitsPerWord;
   uint32_t mask = ~(1u << (tid % kBitsPerWord));
-  absl::base_internal::SpinLockHolder lock(&tid_lock);
+  abslx::base_internal::SpinLockHolder lock(&tid_lock);
   assert(0 <= word && static_cast<size_t>(word) < tid_array->size());
   (*tid_array)[word] &= mask;
 }
@@ -443,14 +443,14 @@ static void InitGetTID() {
   }
 
   // Initialize tid_array.
-  absl::base_internal::SpinLockHolder lock(&tid_lock);
+  abslx::base_internal::SpinLockHolder lock(&tid_lock);
   tid_array = new std::vector<uint32_t>(1);
   (*tid_array)[0] = 1;  // ID 0 is never-allocated.
 }
 
 // Return a per-thread small integer ID from pthread's thread-specific data.
 pid_t GetTID() {
-  absl::call_once(tid_once, InitGetTID);
+  abslx::call_once(tid_once, InitGetTID);
 
   intptr_t tid = reinterpret_cast<intptr_t>(pthread_getspecific(tid_key));
   if (tid != 0) {
@@ -461,7 +461,7 @@ pid_t GetTID() {
   size_t word;
   {
     // Search for the first unused ID.
-    absl::base_internal::SpinLockHolder lock(&tid_lock);
+    abslx::base_internal::SpinLockHolder lock(&tid_lock);
     // First search for a word in the array that is not all ones.
     word = 0;
     while (word < tid_array->size() && ~(*tid_array)[word] == 0) {
@@ -503,4 +503,4 @@ pid_t GetCachedTID() {
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

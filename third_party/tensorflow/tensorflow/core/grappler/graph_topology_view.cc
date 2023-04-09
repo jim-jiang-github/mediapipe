@@ -40,7 +40,7 @@ inline void SortAndRemoveDuplicates(T* v) {
 
 Status GraphTopologyView::InitializeFromGraph(
     const GraphDef& graph,
-    const absl::Span<const GraphView::Edge> ephemeral_edges,
+    const abslx::Span<const GraphView::Edge> ephemeral_edges,
     bool ignore_control_edges) {
   if (graph_ != nullptr) {
     return errors::InvalidArgument("GraphTopologyView is already initialized.");
@@ -66,7 +66,7 @@ Status GraphTopologyView::InitializeFromGraph(
     const bool valid_src = src != node_name_to_index_.end();
     if (!valid_src) {
       const string error_message =
-          absl::StrCat("Non-existent src node: ", edge.src.node->name());
+          abslx::StrCat("Non-existent src node: ", edge.src.node->name());
       if (skip_invalid_edges_) {
         VLOG(0) << "Skip error: " << error_message;
       } else {
@@ -79,7 +79,7 @@ Status GraphTopologyView::InitializeFromGraph(
 
     if (!valid_dst) {
       const string error_message =
-          absl::StrCat("Non-existent dst node: ", edge.dst.node->name());
+          abslx::StrCat("Non-existent dst node: ", edge.dst.node->name());
       if (skip_invalid_edges_) {
         VLOG(0) << "Skip error: " << error_message;
       } else {
@@ -112,7 +112,7 @@ Status GraphTopologyView::InitializeFromGraph(
       const bool valid_input = it != node_name_to_index_.end();
 
       if (!valid_input) {
-        const string error_message = absl::StrCat("Non-existent input ", input,
+        const string error_message = abslx::StrCat("Non-existent input ", input,
                                                   " in node ", node.name());
         if (skip_invalid_edges_) {
           VLOG(3) << "Skip error: " << error_message;
@@ -142,30 +142,30 @@ Status GraphTopologyView::InitializeFromGraph(
 
 Status GraphTopologyView::InitializeFromGraph(
     const GraphDef& graph,
-    const absl::Span<const GraphView::Edge> ephemeral_edges) {
+    const abslx::Span<const GraphView::Edge> ephemeral_edges) {
   return InitializeFromGraph(graph, ephemeral_edges,
                              /*ignore_control_edges=*/false);
 }
 
 Status GraphTopologyView::InitializeFromGraph(const GraphDef& graph,
                                               bool ignore_control_edges) {
-  return InitializeFromGraph(graph, absl::Span<GraphView::Edge>(),
+  return InitializeFromGraph(graph, abslx::Span<GraphView::Edge>(),
                              ignore_control_edges);
 }
 
 Status GraphTopologyView::InitializeFromGraph(const GraphDef& graph) {
-  return InitializeFromGraph(graph, absl::Span<GraphView::Edge>(),
+  return InitializeFromGraph(graph, abslx::Span<GraphView::Edge>(),
                              /*ignore_control_edges*/ false);
 }
 
-bool GraphTopologyView::HasNode(const absl::string_view node_name) const {
+bool GraphTopologyView::HasNode(const abslx::string_view node_name) const {
   DCHECK(is_initialized()) << "GraphTopologyView is not initialized";
   const auto it = node_name_to_index_.find(node_name);
   return it != node_name_to_index_.end();
 }
 
 const NodeDef* GraphTopologyView::GetNode(
-    const absl::string_view node_name) const {
+    const abslx::string_view node_name) const {
   DCHECK(is_initialized()) << "GraphTopologyView is not initialized";
   const auto it = node_name_to_index_.find(node_name);
   return it == node_name_to_index_.end() ? nullptr : &graph_->node(it->second);
@@ -177,21 +177,21 @@ const NodeDef* GraphTopologyView::GetNode(int node_idx) const {
   return &graph_->node(node_idx);
 }
 
-const absl::optional<int> GraphTopologyView::GetNodeIndex(
-    const absl::string_view node_name) const {
+const abslx::optional<int> GraphTopologyView::GetNodeIndex(
+    const abslx::string_view node_name) const {
   DCHECK(is_initialized()) << "GraphTopologyView is not initialized";
   const auto it = node_name_to_index_.find(node_name);
   DCHECK(it != node_name_to_index_.end()) << "Node doesn't exist in a graph";
-  return it == node_name_to_index_.end() ? absl::nullopt
-                                         : absl::make_optional(it->second);
+  return it == node_name_to_index_.end() ? abslx::nullopt
+                                         : abslx::make_optional(it->second);
 }
 
-const absl::optional<int> GraphTopologyView::GetNodeIndex(
+const abslx::optional<int> GraphTopologyView::GetNodeIndex(
     const NodeDef& node) const {
   return GetNodeIndex(node.name());
 }
 
-const absl::InlinedVector<int, 4>& GraphTopologyView::GetFanin(
+const abslx::InlinedVector<int, 4>& GraphTopologyView::GetFanin(
     int node_idx) const {
   DCHECK(is_initialized()) << "GraphTopologyView is not initialized";
   const bool is_valid_node_idx = node_idx >= 0 && node_idx < num_nodes_;
@@ -199,7 +199,7 @@ const absl::InlinedVector<int, 4>& GraphTopologyView::GetFanin(
   return is_valid_node_idx ? fanins_[node_idx] : empty_fanin_;
 }
 
-const absl::InlinedVector<int, 2>& GraphTopologyView::GetFanout(
+const abslx::InlinedVector<int, 2>& GraphTopologyView::GetFanout(
     int node_idx) const {
   DCHECK(is_initialized()) << "GraphTopologyView is not initialized";
   const bool is_valid_node_idx = node_idx >= 0 && node_idx < num_nodes_;

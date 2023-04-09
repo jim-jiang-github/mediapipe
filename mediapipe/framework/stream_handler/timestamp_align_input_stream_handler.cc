@@ -55,7 +55,7 @@ class TimestampAlignInputStreamHandler : public InputStreamHandler {
   void PrepareForRun(std::function<void()> headers_ready_callback,
                      std::function<void()> notification_callback,
                      std::function<void(CalculatorContext*)> schedule_callback,
-                     std::function<void(absl::Status)> error_callback) override;
+                     std::function<void(abslx::Status)> error_callback) override;
 
  protected:
   // In TimestampAlignInputStreamHandler, a node is "ready" if:
@@ -77,7 +77,7 @@ class TimestampAlignInputStreamHandler : public InputStreamHandler {
  private:
   CollectionItemId timestamp_base_stream_id_;
 
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
   bool offsets_initialized_ ABSL_GUARDED_BY(mutex_) = false;
   std::vector<TimestampDiff> timestamp_offsets_;
 };
@@ -106,9 +106,9 @@ void TimestampAlignInputStreamHandler::PrepareForRun(
     std::function<void()> headers_ready_callback,
     std::function<void()> notification_callback,
     std::function<void(CalculatorContext*)> schedule_callback,
-    std::function<void(absl::Status)> error_callback) {
+    std::function<void(abslx::Status)> error_callback) {
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     offsets_initialized_ = (input_stream_managers_.NumEntries() == 1);
   }
 
@@ -124,7 +124,7 @@ NodeReadiness TimestampAlignInputStreamHandler::GetNodeReadiness(
   Timestamp min_bound = Timestamp::Done();
 
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     if (!offsets_initialized_) {
       bool timestamp_base_empty;
       *min_stream_timestamp =
@@ -187,7 +187,7 @@ void TimestampAlignInputStreamHandler::FillInputSet(
   CHECK(input_timestamp.IsAllowedInStream());
   CHECK(input_set);
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     if (!offsets_initialized_) {
       for (CollectionItemId id = input_stream_managers_.BeginId();
            id < input_stream_managers_.EndId(); ++id) {
@@ -198,7 +198,7 @@ void TimestampAlignInputStreamHandler::FillInputSet(
         if (id == timestamp_base_stream_id_) {
           current_packet = stream->PopPacketAtTimestamp(
               input_timestamp, &num_packets_dropped, &stream_is_done);
-          CHECK_EQ(num_packets_dropped, 0) << absl::Substitute(
+          CHECK_EQ(num_packets_dropped, 0) << abslx::Substitute(
               "Dropped $0 packet(s) on input stream \"$1\".",
               num_packets_dropped, stream->Name());
         }
@@ -222,7 +222,7 @@ void TimestampAlignInputStreamHandler::FillInputSet(
       current_packet = current_packet.At(input_timestamp);
     }
     CHECK_EQ(num_packets_dropped, 0)
-        << absl::Substitute("Dropped $0 packet(s) on input stream \"$1\".",
+        << abslx::Substitute("Dropped $0 packet(s) on input stream \"$1\".",
                             num_packets_dropped, stream->Name());
     AddPacketToShard(&input_set->Get(id), std::move(current_packet),
                      stream_is_done);

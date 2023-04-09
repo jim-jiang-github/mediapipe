@@ -197,7 +197,7 @@ int select_graph(mediapipe::CalculatorGraph& graph) {
     download_mediapipe_asset_from_GCS("../mediapipe/models/knift_index.pb");
     download_mediapipe_asset_from_GCS("../mediapipe/models/knift_labelmap.txt");
 
-    absl::Status const status = graph.Initialize(config);
+    abslx::Status const status = graph.Initialize(config);
     if (status.ok()) {
       return select_graph;
     } else {
@@ -228,7 +228,7 @@ int main(int argc, char** argv) {
     char resource_root_dir[128];
     strcpy(resource_root_dir, "--resource_root_dir=../");
     char* argv2[2] = { argv[0], resource_root_dir };
-    absl::ParseCommandLine(2, argv2);
+    abslx::ParseCommandLine(2, argv2);
   }
 
   // hello
@@ -369,7 +369,7 @@ int main(int argc, char** argv) {
     }
 
     // Wrap Mat into an ImageFrame.
-    auto input_frame = absl::make_unique<mediapipe::ImageFrame>(
+    auto input_frame = abslx::make_unique<mediapipe::ImageFrame>(
         mediapipe::ImageFormat::SRGB, camera_frame.cols, camera_frame.rows,
         mediapipe::ImageFrame::kDefaultAlignmentBoundary);
     cv::Mat input_frame_mat = mediapipe::formats::MatView(input_frame.get());

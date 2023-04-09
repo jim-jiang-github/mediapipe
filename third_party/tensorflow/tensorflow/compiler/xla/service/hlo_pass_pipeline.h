@@ -43,7 +43,7 @@ class HloPassPipeline : public HloPassInterface {
       compilation_stats_ = empty_compilation_stats_.get();
     }
   }
-  absl::string_view name() const override { return name_; }
+  abslx::string_view name() const override { return name_; }
 
   // Add a pass to the pipeline. It should be called with the arguments for the
   // pass constructor:
@@ -81,11 +81,11 @@ class HloPassPipeline : public HloPassInterface {
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
   using HloPassInterface::RunOnModuleGroup;
   StatusOr<bool> RunOnModuleGroup(
       HloModuleGroup* module_group,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
   bool IsPassPipeline() override { return true; }
 
@@ -104,30 +104,30 @@ class HloPassPipeline : public HloPassInterface {
   // contained in DebugOptions of module config. If it is dumped, saves the
   // filenames of the dumps into module metadata.
   void MaybeDumpHloAndSaveFilenames(HloModuleGroup& module_group,
-                                    absl::string_view after_pass_name,
-                                    absl::string_view before_pass_name);
+                                    abslx::string_view after_pass_name,
+                                    abslx::string_view before_pass_name);
   void MaybeDumpHloAndSaveFilenames(HloModule& module,
-                                    absl::string_view after_pass_name,
-                                    absl::string_view before_pass_name);
+                                    abslx::string_view after_pass_name,
+                                    abslx::string_view before_pass_name);
 
   // Runs the invariant checker on the given HLO for specified
   // `execution_threads`. Empty `execution_threads` means all execution threads
   // are included. HloT can be either HloModule or HloModuleGroup.
   template <typename HloT>
-  Status RunInvariantCheckers(HloT* hlo, absl::string_view after_pass_name) {
+  Status RunInvariantCheckers(HloT* hlo, abslx::string_view after_pass_name) {
     return RunInvariantCheckers(hlo, after_pass_name, /*execution_threads=*/{});
   }
   template <typename HloT>
   Status RunInvariantCheckers(
-      HloT* hlo, absl::string_view after_pass_name,
-      const absl::flat_hash_set<absl::string_view>& execution_threads);
+      HloT* hlo, abslx::string_view after_pass_name,
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads);
 
   // Helper which runs the given pass on the given HLO. HloT can be either
   // HloModule or HloModuleGroup.
   template <typename HloT>
   StatusOr<bool> RunPassesInternal(
       HloT* hlo, const DebugOptions& debug_options,
-      const absl::flat_hash_set<absl::string_view>& execution_threads);
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads);
 
   // Helpers which run the given passes on the given HLO construct. Only
   // computations with specified `execution_threads` are considered by the pass,
@@ -136,14 +136,14 @@ class HloPassPipeline : public HloPassInterface {
   // HloModule and HloModuleGroup specific methods with the same name.
   static StatusOr<bool> RunHelper(
       HloPassInterface* pass, HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) {
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
     TF_ASSIGN_OR_RETURN(bool changed, pass->Run(module, execution_threads));
     module->Cleanup();
     return changed;
   }
   static StatusOr<bool> RunHelper(
       HloPassInterface* pass, HloModuleGroup* module_group,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) {
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
     TF_ASSIGN_OR_RETURN(
         bool changed, pass->RunOnModuleGroup(module_group, execution_threads));
     module_group->Cleanup();

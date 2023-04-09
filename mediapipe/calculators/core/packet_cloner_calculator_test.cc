@@ -52,7 +52,7 @@ MATCHER_P(EmptyPacket, ts, "") {
 }
 
 template <typename T>
-absl::Status SendPacket(const std::string& input_name, T value, int ts,
+abslx::Status SendPacket(const std::string& input_name, T value, int ts,
                         CalculatorGraph& graph) {
   return graph.AddPacketToInputStream(input_name,
                                       MakePacket<T>(value).At(Timestamp(ts)));
@@ -202,7 +202,7 @@ TEST_P(PacketClonerCalculatorTest, ClonesFiveInputs) {
   constexpr int kNumToClone = 5;
   std::array<std::vector<Packet>, kNumToClone> outs;
   for (int i = 0; i < kNumToClone; ++i) {
-    tool::AddVectorSink(absl::StrCat("out", i + 1), &graph_config, &outs[i]);
+    tool::AddVectorSink(abslx::StrCat("out", i + 1), &graph_config, &outs[i]);
   }
 
   CalculatorGraph graph;
@@ -295,7 +295,7 @@ TEST_P(PacketClonerCalculatorTest,
   constexpr int kNumToClone = 2;
   std::array<std::vector<Packet>, kNumToClone> outs;
   for (int i = 0; i < kNumToClone; ++i) {
-    tool::AddVectorSink(absl::StrCat("out", i + 1), &graph_config, &outs[i]);
+    tool::AddVectorSink(abslx::StrCat("out", i + 1), &graph_config, &outs[i]);
   }
 
   CalculatorGraph graph;
@@ -383,7 +383,7 @@ class PacketClonerCalculatorGatedInputTest : public ::testing::Test {
         "output",
         [this](Packet const& packet) {
           output.push_back(packet);
-          return absl::OkStatus();
+          return abslx::OkStatus();
         },
         true));
     MP_ASSERT_OK(graph.StartRun({}));

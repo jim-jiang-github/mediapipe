@@ -98,11 +98,11 @@ enum FilterTensorFormat {
 
 // Parse tensor format from the given string.
 // Return true if the parsing succeeds, and false if it fails.
-bool FormatFromString(absl::string_view format_str, TensorFormat* format);
+bool FormatFromString(abslx::string_view format_str, TensorFormat* format);
 
 // Parse tensor format from the given string.
 // Return true if the parsing succeeds, and false if it fails.
-bool FilterFormatFromString(absl::string_view format_str,
+bool FilterFormatFromString(abslx::string_view format_str,
                             FilterTensorFormat* format);
 
 // Convert a tensor format into string.

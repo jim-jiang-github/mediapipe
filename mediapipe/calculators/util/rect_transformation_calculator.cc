@@ -60,10 +60,10 @@ inline float NormalizeRadians(float angle) {
 // }
 class RectTransformationCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   RectTransformationCalculatorOptions options_;
@@ -75,7 +75,7 @@ class RectTransformationCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(RectTransformationCalculator);
 
-absl::Status RectTransformationCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status RectTransformationCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK_EQ((cc->Inputs().HasTag(kNormRectTag) ? 1 : 0) +
                    (cc->Inputs().HasTag(kNormRectsTag) ? 1 : 0) +
                    (cc->Inputs().HasTag(kRectTag) ? 1 : 0) +
@@ -102,20 +102,20 @@ absl::Status RectTransformationCalculator::GetContract(CalculatorContract* cc) {
     cc->Outputs().Index(0).Set<std::vector<NormalizedRect>>();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RectTransformationCalculator::Open(CalculatorContext* cc) {
+abslx::Status RectTransformationCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
   options_ = cc->Options<RectTransformationCalculatorOptions>();
   RET_CHECK(!(options_.has_rotation() && options_.has_rotation_degrees()));
   RET_CHECK(!(options_.has_square_long() && options_.has_square_short()));
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RectTransformationCalculator::Process(CalculatorContext* cc) {
+abslx::Status RectTransformationCalculator::Process(CalculatorContext* cc) {
   if (cc->Inputs().HasTag(kRectTag) && !cc->Inputs().Tag(kRectTag).IsEmpty()) {
     auto rect = cc->Inputs().Tag(kRectTag).Get<Rect>();
     TransformRect(&rect);
@@ -125,7 +125,7 @@ absl::Status RectTransformationCalculator::Process(CalculatorContext* cc) {
   if (cc->Inputs().HasTag(kRectsTag) &&
       !cc->Inputs().Tag(kRectsTag).IsEmpty()) {
     auto rects = cc->Inputs().Tag(kRectsTag).Get<std::vector<Rect>>();
-    auto output_rects = absl::make_unique<std::vector<Rect>>(rects.size());
+    auto output_rects = abslx::make_unique<std::vector<Rect>>(rects.size());
     for (int i = 0; i < rects.size(); ++i) {
       output_rects->at(i) = rects[i];
       auto it = output_rects->begin() + i;
@@ -149,7 +149,7 @@ absl::Status RectTransformationCalculator::Process(CalculatorContext* cc) {
     const auto& image_size =
         cc->Inputs().Tag(kImageSizeTag).Get<std::pair<int, int>>();
     auto output_rects =
-        absl::make_unique<std::vector<NormalizedRect>>(rects.size());
+        abslx::make_unique<std::vector<NormalizedRect>>(rects.size());
     for (int i = 0; i < rects.size(); ++i) {
       output_rects->at(i) = rects[i];
       auto it = output_rects->begin() + i;
@@ -158,7 +158,7 @@ absl::Status RectTransformationCalculator::Process(CalculatorContext* cc) {
     cc->Outputs().Index(0).Add(output_rects.release(), cc->InputTimestamp());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 float RectTransformationCalculator::ComputeNewRotation(float rotation) {

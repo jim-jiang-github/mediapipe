@@ -73,8 +73,8 @@ StatusOr<std::vector<Point>> GetPoints(const CollectedMetrics& metrics,
   if (label_names.size() != labels.size()) {
     return errors::InvalidArgument(
         "Metric ", metric_name, " has ", label_names.size(), " labels: [",
-        absl::StrJoin(label_names, ", "), "]. Got label values [",
-        absl::StrJoin(labels, ", "), "].");
+        abslx::StrJoin(label_names, ", "), "]. Got label values [",
+        abslx::StrJoin(labels, ", "), "].");
   }
   auto point_set = metrics.point_set_map.find(metric_name);
   if (point_set == metrics.point_set_map.end()) {
@@ -98,7 +98,7 @@ StatusOr<Point> GetLatestPoint(const CollectedMetrics& metrics,
                       GetPoints(metrics, metric_name, labels));
   if (points.empty()) {
     return errors::Unavailable("No data collected for metric ", metric_name,
-                               " with labels [", absl::StrJoin(labels, ", "),
+                               " with labels [", abslx::StrJoin(labels, ", "),
                                "].");
   }
 

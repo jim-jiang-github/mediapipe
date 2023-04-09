@@ -23,7 +23,7 @@ limitations under the License.
 namespace tensorflow {
 namespace tensorrt {
 namespace convert {
-using SliceDims = absl::InlinedVector<int64, 4>;
+using SliceDims = abslx::InlinedVector<int64, 4>;
 
 // Creates a strided slice operation using the given information. This function
 // expects that the begin, stride, and end vectors have already been validated.

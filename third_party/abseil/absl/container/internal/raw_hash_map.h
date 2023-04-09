@@ -23,7 +23,7 @@
 #include "absl/container/internal/container_memory.h"
 #include "absl/container/internal/raw_hash_set.h"  // IWYU pragma: export
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 
@@ -143,7 +143,7 @@ class raw_hash_map : public raw_hash_set<Policy, Hash, Eq, Alloc> {
     auto it = this->find(key);
     if (it == this->end()) {
       base_internal::ThrowStdOutOfRange(
-          "absl::container_internal::raw_hash_map<>::at");
+          "abslx::container_internal::raw_hash_map<>::at");
     }
     return Policy::value(&*it);
   }
@@ -153,7 +153,7 @@ class raw_hash_map : public raw_hash_set<Policy, Hash, Eq, Alloc> {
     auto it = this->find(key);
     if (it == this->end()) {
       base_internal::ThrowStdOutOfRange(
-          "absl::container_internal::raw_hash_map<>::at");
+          "abslx::container_internal::raw_hash_map<>::at");
     }
     return Policy::value(&*it);
   }
@@ -192,6 +192,6 @@ class raw_hash_map : public raw_hash_set<Policy, Hash, Eq, Alloc> {
 
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_CONTAINER_INTERNAL_RAW_HASH_MAP_H_

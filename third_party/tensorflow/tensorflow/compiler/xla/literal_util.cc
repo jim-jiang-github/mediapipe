@@ -38,7 +38,7 @@ limitations under the License.
 namespace xla {
 namespace {
 
-using absl::StrCat;
+using abslx::StrCat;
 
 // Return a literal with all arrays of type FromNativeT converted to type
 // ToNativeT in the given literal.
@@ -221,7 +221,7 @@ template <typename NativeT>
 std::enable_if_t<IsReal<NativeT>::value, NativeT> GetMaxElementImpl(
     const LiteralBase& literal) {
   auto view = literal.data<NativeT>();
-  return *absl::c_max_element(view);
+  return *abslx::c_max_element(view);
 }
 
 template <typename NativeT>
@@ -240,21 +240,21 @@ struct MaxElementProvider {
 template <typename NativeT>
 std::enable_if_t<IsValidScalarType<NativeT>::value, NativeT>
 GetElementAtIndexImpl(const LiteralBase* literal,
-                      absl::Span<const int64_t> multi_index) {
+                      abslx::Span<const int64_t> multi_index) {
   return literal->Get<NativeT>(multi_index);
 }
 
 template <typename NativeT>
 std::enable_if_t<!IsValidScalarType<NativeT>::value, NativeT>
 GetElementAtIndexImpl(const LiteralBase* literal,
-                      absl::Span<const int64_t> multi_index) {
+                      abslx::Span<const int64_t> multi_index) {
   LOG(FATAL) << "Not a valid scalar element type.";
 }
 
 template <PrimitiveType kType>
 struct GetElementAtIndexProvider {
   NativeT<kType> operator()(const LiteralBase* literal,
-                            absl::Span<const int64_t> multi_index) const {
+                            abslx::Span<const int64_t> multi_index) const {
     DCHECK_EQ(literal->shape().element_type(), kType);
     return GetElementAtIndexImpl<NativeT<kType>>(literal, multi_index);
   }
@@ -262,7 +262,7 @@ struct GetElementAtIndexProvider {
 
 template <PrimitiveType kType>
 void SetScalarAtIndexImpl(MutableLiteralBase& literal,
-                          absl::Span<const int64_t> multi_index,
+                          abslx::Span<const int64_t> multi_index,
                           const LiteralBase& scalar) {
   DCHECK_EQ(literal.shape().element_type(), kType);
   using NativeT = typename primitive_util::PrimitiveTypeToNative<kType>::type;
@@ -272,7 +272,7 @@ void SetScalarAtIndexImpl(MutableLiteralBase& literal,
 }  // namespace
 
 /* static */ Literal LiteralUtil::CreateFromDimensions(
-    PrimitiveType primitive_type, absl::Span<const int64_t> dimensions) {
+    PrimitiveType primitive_type, abslx::Span<const int64_t> dimensions) {
   return Literal::CreateFromShape(
       ShapeUtil::MakeShape(primitive_type, dimensions));
 }
@@ -364,7 +364,7 @@ void SetScalarAtIndexImpl(MutableLiteralBase& literal,
   return literal;
 }
 
-/* static */ Literal LiteralUtil::CreateR1U8(absl::string_view value) {
+/* static */ Literal LiteralUtil::CreateR1U8(abslx::string_view value) {
   Literal literal(
       ShapeUtil::MakeShape(U8, {static_cast<int64_t>(value.size())}));
   for (int i = 0, end = value.size(); i < end; ++i) {
@@ -381,8 +381,8 @@ void SetScalarAtIndexImpl(MutableLiteralBase& literal,
 }
 
 /* static */ Literal LiteralUtil::ReshapeSlice(
-    absl::Span<const int64_t> new_dimensions,
-    absl::Span<const int64_t> minor_to_major, const LiteralSlice& literal) {
+    abslx::Span<const int64_t> new_dimensions,
+    abslx::Span<const int64_t> minor_to_major, const LiteralSlice& literal) {
   int64_t new_num_elements = 1;
   for (int64_t i = 0, end = new_dimensions.size(); i < end; ++i) {
     new_num_elements *= new_dimensions[i];
@@ -464,13 +464,13 @@ void SetScalarAtIndexImpl(MutableLiteralBase& literal,
 }
 
 /*static*/ Literal LiteralUtil::GetScalarLiteral(
-    const LiteralBase& literal, absl::Span<const int64_t> multi_index) {
+    const LiteralBase& literal, abslx::Span<const int64_t> multi_index) {
   return CreateScalar<GetElementAtIndexProvider>(literal.shape().element_type(),
                                                  &literal, multi_index);
 }
 
 /*static*/ void LiteralUtil::SetScalarLiteral(
-    MutableLiteralBase& literal, absl::Span<const int64_t> multi_index,
+    MutableLiteralBase& literal, abslx::Span<const int64_t> multi_index,
     const LiteralBase& scalar) {
   switch (literal.shape().element_type()) {
     case PRED:
@@ -532,7 +532,7 @@ void SetScalarAtIndexImpl(MutableLiteralBase& literal,
 }
 
 /* static */ Literal LiteralUtil::MakeTuple(
-    absl::Span<const Literal* const> elements) {
+    abslx::Span<const Literal* const> elements) {
   std::vector<const Shape*> element_shapes;
   element_shapes.reserve(elements.size());
   for (const auto* element : elements) {
@@ -546,7 +546,7 @@ void SetScalarAtIndexImpl(MutableLiteralBase& literal,
 }
 
 /* static */ Literal LiteralUtil::MakeTupleFromSlices(
-    absl::Span<const LiteralSlice> elements) {
+    abslx::Span<const LiteralSlice> elements) {
   std::vector<const Shape*> element_shapes;
   element_shapes.reserve(elements.size());
   for (const auto& element : elements) {
@@ -575,8 +575,8 @@ void SetScalarAtIndexImpl(MutableLiteralBase& literal,
 }
 
 /* static */ std::string LiteralUtil::MultiIndexAsString(
-    absl::Span<const int64_t> multi_index) {
-  return StrCat("{", absl::StrJoin(multi_index, ","), "}");
+    abslx::Span<const int64_t> multi_index) {
+  return StrCat("{", abslx::StrJoin(multi_index, ","), "}");
 }
 
 }  // namespace xla

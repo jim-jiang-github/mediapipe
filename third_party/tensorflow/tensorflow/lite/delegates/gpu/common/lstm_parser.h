@@ -24,10 +24,10 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status ParseLSTMAttributes(
+abslx::Status ParseLSTMAttributes(
     const TfLiteNode* tflite_node, const TfLiteRegistration* registration,
     GraphFloat32* graph, ObjectReader* reader, const TfLiteLSTMParams* params,
-    absl::flat_hash_map<int, ValueId>* new_variable_input_values);
+    abslx::flat_hash_map<int, ValueId>* new_variable_input_values);
 }  // namespace gpu
 }  // namespace tflite
 

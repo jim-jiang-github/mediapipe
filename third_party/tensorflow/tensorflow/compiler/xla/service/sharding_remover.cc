@@ -33,10 +33,10 @@ namespace xla {
 // to its operand.
 StatusOr<bool> ShardingRemover::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
 
-  const absl::flat_hash_set<absl::string_view> to_remove_sharding_ops = {
+  const abslx::flat_hash_set<abslx::string_view> to_remove_sharding_ops = {
       "Sharding", "SPMDShardToFullShape", "SPMDFullToShardShape"};
 
   for (HloComputation* computation : module->computations(execution_threads)) {

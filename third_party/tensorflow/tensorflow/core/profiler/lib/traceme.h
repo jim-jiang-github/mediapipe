@@ -96,7 +96,7 @@ class TraceMe {
   // - Can be a value in enum TraceMeLevel.
   // Users are welcome to use level > 3 in their code, if they wish to filter
   // out their host traces based on verbosity.
-  explicit TraceMe(absl::string_view name, int level = 1) {
+  explicit TraceMe(abslx::string_view name, int level = 1) {
     DCHECK_GE(level, 1);
 #if !defined(IS_MOBILE_PLATFORM)
     if (TF_PREDICT_FALSE(TraceMeRecorder::Active(level))) {
@@ -122,7 +122,7 @@ class TraceMe {
   // This overload is necessary to make TraceMe's with string literals work.
   // Otherwise, the name_generator template would be used.
   explicit TraceMe(const char* raw, int level = 1)
-      : TraceMe(absl::string_view(raw), level) {}
+      : TraceMe(abslx::string_view(raw), level) {}
 
   // This overload only generates the name (and possibly metadata) if tracing is
   // enabled. Useful for avoiding expensive operations (e.g., string
@@ -239,7 +239,7 @@ class TraceMe {
 
   // Record the start time of an activity.
   // Returns the activity ID, which is used to stop the activity.
-  static int64_t ActivityStart(absl::string_view name, int level = 1) {
+  static int64_t ActivityStart(abslx::string_view name, int level = 1) {
 #if !defined(IS_MOBILE_PLATFORM)
     if (TF_PREDICT_FALSE(TraceMeRecorder::Active(level))) {
       int64_t activity_id = TraceMeRecorder::NewActivityId();
@@ -253,12 +253,12 @@ class TraceMe {
 
   // Same as ActivityStart above, an overload for "const std::string&"
   static int64_t ActivityStart(const std::string& name, int level = 1) {
-    return ActivityStart(absl::string_view(name), level);
+    return ActivityStart(abslx::string_view(name), level);
   }
 
   // Same as ActivityStart above, an overload for "const char*"
   static int64_t ActivityStart(const char* name, int level = 1) {
-    return ActivityStart(absl::string_view(name), level);
+    return ActivityStart(abslx::string_view(name), level);
   }
 
   // Record the end time of an activity started by ActivityStart().

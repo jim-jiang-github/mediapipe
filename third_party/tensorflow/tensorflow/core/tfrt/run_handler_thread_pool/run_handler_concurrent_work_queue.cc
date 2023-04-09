@@ -66,7 +66,7 @@ RunHandlerThreadWorkQueue::InitializeRequest(
   std::unique_ptr<RunHandler> handler = handler_pool_->Get(
       request_context_builder->id(), options_.init_timeout_ms, options);
   if (!handler) {
-    return tensorflow::errors::Internal(absl::StrCat(
+    return tensorflow::errors::Internal(abslx::StrCat(
         "Could not obtain RunHandler for request after waiting for ",
         options_.init_timeout_ms, " ms."));
   }

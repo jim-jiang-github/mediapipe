@@ -57,7 +57,7 @@ bool IouRequirementsSatisfied(const NormalizedRect& prev_rect,
 
   const float intersection_threshold = union_area * min_iou;
   if (intersection_area < intersection_threshold) {
-    VLOG(1) << absl::StrFormat("Lost tracking: IoU intersection %f < %f",
+    VLOG(1) << abslx::StrFormat("Lost tracking: IoU intersection %f < %f",
                                intersection_area, intersection_threshold);
     return false;
   }
@@ -113,7 +113,7 @@ bool RectRequirementsSatisfied(const NormalizedRect& prev_rect,
   rotation_diff = abs(rotation_diff);
   if (rotation_diff > rotation_degrees) {
     satisfied = false;
-    VLOG(1) << absl::StrFormat("Lost tracking: rect rotation %f > %f",
+    VLOG(1) << abslx::StrFormat("Lost tracking: rect rotation %f > %f",
                                rotation_diff, rotation_degrees);
   }
 
@@ -121,7 +121,7 @@ bool RectRequirementsSatisfied(const NormalizedRect& prev_rect,
   const float x_threshold = recrop_rect_width * translation;
   if (x_diff > x_threshold) {
     satisfied = false;
-    VLOG(1) << absl::StrFormat("Lost tracking: rect x translation %f > %f",
+    VLOG(1) << abslx::StrFormat("Lost tracking: rect x translation %f > %f",
                                x_diff, x_threshold);
   }
 
@@ -129,7 +129,7 @@ bool RectRequirementsSatisfied(const NormalizedRect& prev_rect,
   const float y_threshold = recrop_rect_height * translation;
   if (y_diff > y_threshold) {
     satisfied = false;
-    VLOG(1) << absl::StrFormat("Lost tracking: rect y translation %f > %f",
+    VLOG(1) << abslx::StrFormat("Lost tracking: rect y translation %f > %f",
                                y_diff, y_threshold);
   }
 
@@ -137,7 +137,7 @@ bool RectRequirementsSatisfied(const NormalizedRect& prev_rect,
   const float width_threshold = recrop_rect_width * scale;
   if (width_diff > width_threshold) {
     satisfied = false;
-    VLOG(1) << absl::StrFormat("Lost tracking: rect width %f > %f", width_diff,
+    VLOG(1) << abslx::StrFormat("Lost tracking: rect width %f > %f", width_diff,
                                width_threshold);
   }
 
@@ -145,7 +145,7 @@ bool RectRequirementsSatisfied(const NormalizedRect& prev_rect,
   const float height_threshold = recrop_rect_height * scale;
   if (height_diff > height_threshold) {
     satisfied = false;
-    VLOG(1) << absl::StrFormat("Lost tracking: rect height %f > %f",
+    VLOG(1) << abslx::StrFormat("Lost tracking: rect height %f > %f",
                                height_diff, height_threshold);
   }
 
@@ -255,36 +255,36 @@ bool LandmarksRequirementsSatisfied(const NormalizedLandmarkList& landmarks,
 //   }
 class RoiTrackingCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   RoiTrackingCalculatorOptions options_;
 };
 REGISTER_CALCULATOR(RoiTrackingCalculator);
 
-absl::Status RoiTrackingCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status RoiTrackingCalculator::GetContract(CalculatorContract* cc) {
   cc->Inputs().Tag(kPrevLandmarksTag).Set<NormalizedLandmarkList>();
   cc->Inputs().Tag(kPrevLandmarksRectTag).Set<NormalizedRect>();
   cc->Inputs().Tag(kRecropRectTag).Set<NormalizedRect>();
   cc->Inputs().Tag(kImageSizeTag).Set<std::pair<int, int>>();
   cc->Outputs().Tag(kTrackingRectTag).Set<NormalizedRect>();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RoiTrackingCalculator::Open(CalculatorContext* cc) {
+abslx::Status RoiTrackingCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
   options_ = cc->Options<RoiTrackingCalculatorOptions>();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RoiTrackingCalculator::Process(CalculatorContext* cc) {
+abslx::Status RoiTrackingCalculator::Process(CalculatorContext* cc) {
   // If there is no current frame re-crop rect (i.e. object is not present on
   // the current frame) - return empty packet.
   if (cc->Inputs().Tag(kRecropRectTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // If there is no previous rect, but there is current re-crop rect - return
@@ -293,7 +293,7 @@ absl::Status RoiTrackingCalculator::Process(CalculatorContext* cc) {
     cc->Outputs()
         .Tag(kTrackingRectTag)
         .AddPacket(cc->Inputs().Tag(kRecropRectTag).Value());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // At this point we have both previous rect (which also means we have previous
@@ -354,7 +354,7 @@ absl::Status RoiTrackingCalculator::Process(CalculatorContext* cc) {
     VLOG(1) << "Lost tracking: check messages above for details";
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

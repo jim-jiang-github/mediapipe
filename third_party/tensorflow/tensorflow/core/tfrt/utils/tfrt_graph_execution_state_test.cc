@@ -143,7 +143,7 @@ TEST_F(PruneGraphDefTest, InsertIdentityForLoopExitFeed) {
 
 TEST_F(PruneGraphDefTest, EliminateRefEntersFromControlFlow) {
   GraphDef graphdef;
-  absl::flat_hash_map<std::string, NodeDef> name_to_node;
+  abslx::flat_hash_map<std::string, NodeDef> name_to_node;
   {
     auto scope = tensorflow::Scope::NewRootScope().WithDevice("/device:CPU:0");
 
@@ -205,7 +205,7 @@ TEST_F(PruneGraphDefTest, EliminateRefEntersFromControlFlow) {
 
 TEST_F(PruneGraphDefTest, EliminateRefSwitchesFromControlFlow) {
   GraphDef graphdef;
-  absl::flat_hash_map<std::string, NodeDef> name_to_node;
+  abslx::flat_hash_map<std::string, NodeDef> name_to_node;
   {
     auto scope = tensorflow::Scope::NewRootScope().WithDevice("/device:CPU:0");
 
@@ -272,7 +272,7 @@ TEST_F(PruneGraphDefTest, EliminateRefSwitchesFromControlFlow) {
 
 TEST_F(PruneGraphDefTest, EliminateRefVariablesFromV1ControlFlowFailed) {
   GraphDef graphdef;
-  absl::flat_hash_map<std::string, NodeDef> name_to_node;
+  abslx::flat_hash_map<std::string, NodeDef> name_to_node;
   {
     auto scope = tensorflow::Scope::NewRootScope().WithDevice("/device:CPU:0");
 
@@ -799,7 +799,7 @@ class InsertTransferOpsTest : public grappler::GrapplerTest {
     }
 
     // Find the corresponding function called by the PartitionedCall nodes.
-    absl::flat_hash_map<std::string, FunctionDef> func_name_to_func;
+    abslx::flat_hash_map<std::string, FunctionDef> func_name_to_func;
     for (const FunctionDef& fdef : graphdef.library().function()) {
       func_name_to_func[fdef.signature().name()] = fdef;
     }

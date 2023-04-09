@@ -39,7 +39,7 @@ struct SharedWeightsConvDesc {
     return weights_id == t.weights_id && desc == t.desc;
   }
 
-  void RemapIds(const absl::flat_hash_map<int, ValueId>& mapping) {
+  void RemapIds(const abslx::flat_hash_map<int, ValueId>& mapping) {
     for (int i = 0; i < global_const_ids.size(); ++i) {
       int local_id = -(global_const_ids[i] + 1);
       if (local_id >= 0) {
@@ -49,7 +49,7 @@ struct SharedWeightsConvDesc {
   }
 };
 
-absl::Status GPUOperationFromNode(
+abslx::Status GPUOperationFromNode(
     const GpuInfo& gpu_info, const OperationDef& op_def, ModelHints hints,
     const std::vector<Value*>& inputs, const std::vector<Value*>& outputs,
     const Node& node, std::vector<SharedWeightsConvDesc>* shared_conv_weights,

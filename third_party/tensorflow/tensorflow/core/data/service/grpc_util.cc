@@ -38,7 +38,7 @@ Status WrapError(const std::string& message, const ::grpc::Status& status) {
   } else {
     Status s = FromGrpcStatus(status);
     return Status(s.code(),
-                  absl::StrCat(message, ": ", status.error_message()));
+                  abslx::StrCat(message, ": ", status.error_message()));
   }
 }
 

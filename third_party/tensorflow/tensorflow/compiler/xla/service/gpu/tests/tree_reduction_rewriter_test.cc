@@ -35,8 +35,8 @@ namespace {
 
 class TreeReductionRewriterTest : public HloTestBase {
  public:
-  void CheckTreeRewriter(absl::string_view hlo,
-                         std::optional<absl::string_view> expected) {
+  void CheckTreeRewriter(abslx::string_view hlo,
+                         std::optional<abslx::string_view> expected) {
     RunAndFilecheckHloRewrite(
         hlo, gpu::GpuTreeReductionRewriter{se::CudaComputeCapability{8, 1}},
         expected);

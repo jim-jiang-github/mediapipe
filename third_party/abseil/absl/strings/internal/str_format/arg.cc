@@ -28,7 +28,7 @@
 #include "absl/strings/internal/str_format/float_conversion.h"
 #include "absl/strings/numbers.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace str_format_internal {
 namespace {
@@ -46,20 +46,20 @@ void ReducePadding(size_t n, size_t *capacity) {
 template <typename T>
 struct MakeUnsigned : std::make_unsigned<T> {};
 template <>
-struct MakeUnsigned<absl::int128> {
-  using type = absl::uint128;
+struct MakeUnsigned<abslx::int128> {
+  using type = abslx::uint128;
 };
 template <>
-struct MakeUnsigned<absl::uint128> {
-  using type = absl::uint128;
+struct MakeUnsigned<abslx::uint128> {
+  using type = abslx::uint128;
 };
 
 template <typename T>
 struct IsSigned : std::is_signed<T> {};
 template <>
-struct IsSigned<absl::int128> : std::true_type {};
+struct IsSigned<abslx::int128> : std::true_type {};
 template <>
-struct IsSigned<absl::uint128> : std::false_type {};
+struct IsSigned<abslx::uint128> : std::false_type {};
 
 // Integral digit printer.
 // Call one of the PrintAs* routines after construction once.
@@ -467,12 +467,12 @@ IntegralConvertResult FormatConvertImpl(unsigned long long v,  // NOLINT
                                         FormatSinkImpl *sink) {
   return {ConvertIntArg(v, conv, sink)};
 }
-IntegralConvertResult FormatConvertImpl(absl::int128 v,
+IntegralConvertResult FormatConvertImpl(abslx::int128 v,
                                         const FormatConversionSpecImpl conv,
                                         FormatSinkImpl *sink) {
   return {ConvertIntArg(v, conv, sink)};
 }
-IntegralConvertResult FormatConvertImpl(absl::uint128 v,
+IntegralConvertResult FormatConvertImpl(abslx::uint128 v,
                                         const FormatConversionSpecImpl conv,
                                         FormatSinkImpl *sink) {
   return {ConvertIntArg(v, conv, sink)};
@@ -485,4 +485,4 @@ ABSL_INTERNAL_FORMAT_DISPATCH_OVERLOADS_EXPAND_();
 }  // namespace str_format_internal
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

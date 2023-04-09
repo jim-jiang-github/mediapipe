@@ -49,21 +49,21 @@ class MatrixToVectorCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kIn, kOut);
 
-  absl::Status Open(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
 
   // Outputs a packet containing a vector for each input packet.
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 };
 MEDIAPIPE_REGISTER_NODE(MatrixToVectorCalculator);
 
-absl::Status MatrixToVectorCalculator::Open(CalculatorContext* cc) {
+abslx::Status MatrixToVectorCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(0);
   return mediapipe::OkStatus();
 }
 
-absl::Status MatrixToVectorCalculator::Process(CalculatorContext* cc) {
+abslx::Status MatrixToVectorCalculator::Process(CalculatorContext* cc) {
   const Matrix& input = *kIn(cc);
-  auto output = absl::make_unique<std::vector<float>>();
+  auto output = abslx::make_unique<std::vector<float>>();
 
   // The following lines work to convert the Matrix to a vector because Matrix
   // is an Eigen::MatrixXf and Eigen uses column-major layout by default.
@@ -73,7 +73,7 @@ absl::Status MatrixToVectorCalculator::Process(CalculatorContext* cc) {
   output_as_matrix = input;
 
   kOut(cc).Send(std::move(output));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace api2

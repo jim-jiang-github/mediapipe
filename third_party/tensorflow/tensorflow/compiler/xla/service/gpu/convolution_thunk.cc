@@ -42,7 +42,7 @@ ConvolutionThunk::ConvolutionThunk(
 
 MaybeFusedConvRunner& ConvolutionThunk::GetOrCreateRunner(
     const stream_executor::Stream* stream) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   auto it = runner_cache_.find(stream);
   if (it == runner_cache_.end()) {
     it = runner_cache_
@@ -69,7 +69,7 @@ Status ConvolutionThunk::ExecuteOnStream(const ExecuteParams& params) {
   RunConvOptions opts;
   opts.runner_cache = &GetOrCreateRunner(params.stream);
 
-  TF_RETURN_IF_ERROR(RunGpuConv(config_, absl::MakeSpan(operand_se_buffers),
+  TF_RETURN_IF_ERROR(RunGpuConv(config_, abslx::MakeSpan(operand_se_buffers),
                                 result_buffer, scratch, params.stream, opts));
 
   // Note: Convolution has a tuple buffer as an output, but we don't need to

@@ -96,7 +96,7 @@ inline llvm::raw_ostream& operator<<(llvm::raw_ostream& os,
             << pass_config.emit_builtin_tflite_ops
             << "\nlower_tensor_list_ops: " << pass_config.lower_tensor_list_ops
             << "\ntrim_functions_allowlist: "
-            << absl::StrJoin(pass_config.trim_functions_allowlist.vec(), ",")
+            << abslx::StrJoin(pass_config.trim_functions_allowlist.vec(), ",")
             << "\nform_clusters: " << pass_config.form_clusters
             << "\nunfold_batch_matmul: " << pass_config.unfold_batch_matmul
             << "\noutline_tf_while: " << pass_config.outline_tf_while

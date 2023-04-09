@@ -67,13 +67,13 @@ XLA_TEST_F(MultithreadedCompilation, EightModuleCompilation) {
     modules[i] = std::move(module);
   }
 
-  absl::Mutex mu;
+  abslx::Mutex mu;
   std::vector<std::unique_ptr<Executable>> executables;
   auto do_compilation = [&](int iteration) {
     TF_ASSIGN_OR_RETURN(
         std::unique_ptr<Executable> executable,
         test_runner_.CreateExecutable(std::move(modules[iteration]), true));
-    absl::MutexLock lock(&mu);
+    abslx::MutexLock lock(&mu);
     executables.push_back(std::move(executable));
     VLOG(2) << "Adding executable obtained from thread: " << iteration;
     return tensorflow::OkStatus();

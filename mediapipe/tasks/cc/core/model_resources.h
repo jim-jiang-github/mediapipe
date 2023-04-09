@@ -58,10 +58,10 @@ class ModelResources {
   // ModelResources from the proto and an op resolver object. A non-empty tag
   // must be set if the ModelResources will be used through
   // ModelResourcesCacheService.
-  static absl::StatusOr<std::unique_ptr<ModelResources>> Create(
+  static abslx::StatusOr<std::unique_ptr<ModelResources>> Create(
       const std::string& tag, std::unique_ptr<proto::ExternalFile> model_file,
       std::unique_ptr<tflite::OpResolver> op_resolver =
-          absl::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
+          abslx::make_unique<tflite_shims::ops::builtin::BuiltinOpResolver>());
 
   // Takes the ownership of the provided ExternalFile proto and creates
   // ModelResources from the proto and an op resolver mediapipe packet. A
@@ -69,7 +69,7 @@ class ModelResources {
   // ModelResourcesCacheService. The op resolver packet, usually prvoided by a
   // ModelResourcesCacheService object, contains the TFLite op resolvers
   // required by the model.
-  static absl::StatusOr<std::unique_ptr<ModelResources>> Create(
+  static abslx::StatusOr<std::unique_ptr<ModelResources>> Create(
       const std::string& tag, std::unique_ptr<proto::ExternalFile> model_file,
       api2::Packet<tflite::OpResolver> op_resolver_packet);
 
@@ -120,7 +120,7 @@ class ModelResources {
                  api2::Packet<tflite::OpResolver> op_resolver_packet);
 
   // Builds the TFLite model from the ExternalFile proto.
-  absl::Status BuildModelFromExternalFileProto();
+  abslx::Status BuildModelFromExternalFileProto();
 
   // The model resources tag.
   const std::string tag_;

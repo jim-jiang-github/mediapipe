@@ -44,22 +44,22 @@ enum class TypeSpec;
 enum class AllocSpec;
 
 constexpr TypeSpec operator|(TypeSpec a, TypeSpec b) {
-  using T = absl::underlying_type_t<TypeSpec>;
+  using T = abslx::underlying_type_t<TypeSpec>;
   return static_cast<TypeSpec>(static_cast<T>(a) | static_cast<T>(b));
 }
 
 constexpr TypeSpec operator&(TypeSpec a, TypeSpec b) {
-  using T = absl::underlying_type_t<TypeSpec>;
+  using T = abslx::underlying_type_t<TypeSpec>;
   return static_cast<TypeSpec>(static_cast<T>(a) & static_cast<T>(b));
 }
 
 constexpr AllocSpec operator|(AllocSpec a, AllocSpec b) {
-  using T = absl::underlying_type_t<AllocSpec>;
+  using T = abslx::underlying_type_t<AllocSpec>;
   return static_cast<AllocSpec>(static_cast<T>(a) | static_cast<T>(b));
 }
 
 constexpr AllocSpec operator&(AllocSpec a, AllocSpec b) {
-  using T = absl::underlying_type_t<AllocSpec>;
+  using T = abslx::underlying_type_t<AllocSpec>;
   return static_cast<AllocSpec>(static_cast<T>(a) & static_cast<T>(b));
 }
 
@@ -75,7 +75,7 @@ struct StrongGuaranteeTagType {};
 // exceptions specifically thrown by ThrowingValue.
 class TestException {
  public:
-  explicit TestException(absl::string_view msg) : msg_(msg) {}
+  explicit TestException(abslx::string_view msg) : msg_(msg) {}
   virtual ~TestException() {}
   virtual const char* what() const noexcept { return msg_.c_str(); }
 
@@ -90,7 +90,7 @@ class TestException {
 // bad_alloc exception in TestExceptionSafety.
 class TestBadAllocException : public std::bad_alloc, public TestException {
  public:
-  explicit TestBadAllocException(absl::string_view msg) : TestException(msg) {}
+  explicit TestBadAllocException(abslx::string_view msg) : TestException(msg) {}
   using TestException::what;
 };
 
@@ -102,7 +102,7 @@ inline void SetCountdown(int i = 0) { countdown = i; }
 // Sets the countdown to the terminal value -1
 inline void UnsetCountdown() { SetCountdown(-1); }
 
-void MaybeThrow(absl::string_view msg, bool throw_bad_alloc = false);
+void MaybeThrow(abslx::string_view msg, bool throw_bad_alloc = false);
 
 testing::AssertionResult FailureMessage(const TestException& e,
                                         int countdown) noexcept;
@@ -176,7 +176,7 @@ class ConstructorTracker {
                                   const std::string& address_description,
                                   int countdown,
                                   const std::string& error_description) {
-    return absl::Substitute(
+    return abslx::Substitute(
         "With coundtown at $0:\n"
         "  $1\n"
         "  Object originally constructed by $2\n"
@@ -584,7 +584,7 @@ class ThrowingValue : private exceptions_internal::TrackedObject {
 
  private:
   static std::string GetInstanceString(int dummy) {
-    return absl::StrCat("ThrowingValue<",
+    return abslx::StrCat("ThrowingValue<",
                         exceptions_internal::GetSpecString(Spec), ">(", dummy,
                         ")");
   }
@@ -746,7 +746,7 @@ class ThrowingAllocator : private exceptions_internal::TrackedObject {
 
  private:
   static std::string GetInstanceString(int dummy) {
-    return absl::StrCat("ThrowingAllocator<",
+    return abslx::StrCat("ThrowingAllocator<",
                         exceptions_internal::GetSpecString(Spec), ">(", dummy,
                         ")");
   }
@@ -760,10 +760,10 @@ class ThrowingAllocator : private exceptions_internal::TrackedObject {
     if (*dummy_ < 0) std::abort();
   }
 
-  void ReadStateAndMaybeThrow(absl::string_view msg) const {
+  void ReadStateAndMaybeThrow(abslx::string_view msg) const {
     if (!IsSpecified(AllocSpec::kNoThrowAllocate)) {
       exceptions_internal::MaybeThrow(
-          absl::Substitute("Allocator id $0 threw from $1", *dummy_, msg));
+          abslx::Substitute("Allocator id $0 threw from $1", *dummy_, msg));
     }
   }
 
@@ -826,7 +826,7 @@ template <typename T>
 class DefaultFactory {
  public:
   explicit DefaultFactory(const T& t) : t_(t) {}
-  std::unique_ptr<T> operator()() const { return absl::make_unique<T>(t_); }
+  std::unique_ptr<T> operator()() const { return abslx::make_unique<T>(t_); }
 
  private:
   T t_;
@@ -834,7 +834,7 @@ class DefaultFactory {
 
 template <size_t LazyContractsCount, typename LazyFactory,
           typename LazyOperation>
-using EnableIfTestable = typename absl::enable_if_t<
+using EnableIfTestable = typename abslx::enable_if_t<
     LazyContractsCount != 0 &&
     !std::is_same<LazyFactory, UninitializedT>::value &&
     !std::is_same<LazyOperation, UninitializedT>::value>;
@@ -986,7 +986,7 @@ class ExceptionSafetyTestBuilder {
    * method tester.WithInitialValue(...).
    */
   template <typename NewFactory>
-  ExceptionSafetyTestBuilder<absl::decay_t<NewFactory>, Operation, Contracts...>
+  ExceptionSafetyTestBuilder<abslx::decay_t<NewFactory>, Operation, Contracts...>
   WithFactory(const NewFactory& new_factory) const {
     return {new_factory, operation_, contracts_};
   }
@@ -997,7 +997,7 @@ class ExceptionSafetyTestBuilder {
    * newly created tester.
    */
   template <typename NewOperation>
-  ExceptionSafetyTestBuilder<Factory, absl::decay_t<NewOperation>, Contracts...>
+  ExceptionSafetyTestBuilder<Factory, abslx::decay_t<NewOperation>, Contracts...>
   WithOperation(const NewOperation& new_operation) const {
     return {factory_, new_operation, contracts_};
   }
@@ -1017,11 +1017,11 @@ class ExceptionSafetyTestBuilder {
    */
   template <typename... MoreContracts>
   ExceptionSafetyTestBuilder<Factory, Operation, Contracts...,
-                             absl::decay_t<MoreContracts>...>
+                             abslx::decay_t<MoreContracts>...>
   WithContracts(const MoreContracts&... more_contracts) const {
     return {
         factory_, operation_,
-        std::tuple_cat(contracts_, std::tuple<absl::decay_t<MoreContracts>...>(
+        std::tuple_cat(contracts_, std::tuple<abslx::decay_t<MoreContracts>...>(
                                        more_contracts...))};
   }
 
@@ -1045,7 +1045,7 @@ class ExceptionSafetyTestBuilder {
       typename NewOperation,
       typename = EnableIfTestable<sizeof...(Contracts), Factory, NewOperation>>
   testing::AssertionResult Test(const NewOperation& new_operation) const {
-    return TestImpl(new_operation, absl::index_sequence_for<Contracts...>());
+    return TestImpl(new_operation, abslx::index_sequence_for<Contracts...>());
   }
 
   /*
@@ -1081,7 +1081,7 @@ class ExceptionSafetyTestBuilder {
 
   template <typename SelectedOperation, size_t... Indices>
   testing::AssertionResult TestImpl(SelectedOperation selected_operation,
-                                    absl::index_sequence<Indices...>) const {
+                                    abslx::index_sequence<Indices...>) const {
     return ExceptionSafetyTest<FactoryElementType<Factory>>(
                factory_, selected_operation, std::get<Indices>(contracts_)...)
         .Test();

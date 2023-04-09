@@ -80,7 +80,7 @@ class RationalFactorResampleCalculatorTest
   }
 
   // Initializes and runs the test graph.
-  absl::Status Run(double output_sample_rate) {
+  abslx::Status Run(double output_sample_rate) {
     options_.set_target_sample_rate(output_sample_rate);
     InitializeGraph();
 

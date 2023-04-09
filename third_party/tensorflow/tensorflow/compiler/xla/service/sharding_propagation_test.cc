@@ -76,20 +76,20 @@ class ParameterizedMetadataTestWithOutput
     : public HloTestBase,
       public ::testing::WithParamInterface<MetadataTestParameterWithOutput> {};
 
-std::string OpMetadataListToString(absl::Span<const OpMetadata> metadata) {
+std::string OpMetadataListToString(abslx::Span<const OpMetadata> metadata) {
   std::vector<std::string> metadata_strings;
   metadata_strings.reserve(metadata.size());
   for (const OpMetadata& element : metadata) {
     metadata_strings.push_back(
-        absl::StrCat("{", OpMetadataToString(element), "}"));
+        abslx::StrCat("{", OpMetadataToString(element), "}"));
   }
-  return absl::StrCat("{", absl::StrJoin(metadata_strings, ", "), "}");
+  return abslx::StrCat("{", abslx::StrJoin(metadata_strings, ", "), "}");
 }
 
 class HloShardingMetadataMatcher
     : public ::testing::MatcherInterface<const HloSharding&> {
  public:
-  explicit HloShardingMetadataMatcher(absl::Span<const OpMetadata> metadata)
+  explicit HloShardingMetadataMatcher(abslx::Span<const OpMetadata> metadata)
       : metadata_(metadata.begin(), metadata.end()) {}
 
   bool MatchAndExplain(
@@ -124,7 +124,7 @@ class HloShardingMetadataMatcher
 };
 
 ::testing::Matcher<const HloSharding&> ShardingMetadata(
-    absl::Span<const OpMetadata> metadata) {
+    abslx::Span<const OpMetadata> metadata) {
   return ::testing::MakeMatcher(new HloShardingMetadataMatcher(metadata));
 }
 
@@ -145,7 +145,7 @@ INSTANTIATE_TEST_SUITE_P(
                       MetadataTestParameter(/*propagate_metadata=*/true,
                                             /*clear_metadata=*/true)),
     [](const ::testing::TestParamInfo<MetadataTestParameter>& info) {
-      return absl::StrCat(info.param.propagate_metadata
+      return abslx::StrCat(info.param.propagate_metadata
                               ? "MetadataPropagation"
                               : "NoMetadataPropagation",
                           "_",
@@ -188,7 +188,7 @@ INSTANTIATE_TEST_SUITE_P(
                           /*clear_metadata=*/true,
                           /*allow_root_sharding_propagation=*/true)),
     [](const ::testing::TestParamInfo<MetadataTestParameterWithOutput>& info) {
-      return absl::StrCat(
+      return abslx::StrCat(
           info.param.propagate_metadata ? "MetadataPropagation"
                                         : "NoMetadataPropagation",
           "_",
@@ -1867,7 +1867,7 @@ ENTRY %entry {
 
   auto while_is_sharded =
       [this](HloModule* module, const HloSharding& sharding,
-             absl::Span<const absl::Span<const OpMetadata>> sharding_metadata) {
+             abslx::Span<const abslx::Span<const OpMetadata>> sharding_metadata) {
         if (GetParam().clear_metadata) {
           ClearMetadata(module);
         }
@@ -5108,7 +5108,7 @@ ENTRY %module {
 }
 
 TEST_P(ParameterizedMetadataTest, GatherParallelAndPassthroughMerged) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY %module {
@@ -5162,7 +5162,7 @@ ENTRY %module {
 }
 
 TEST_P(ParameterizedMetadataTest, GatherParallelAndTrivialMerged) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY %module {
@@ -5217,7 +5217,7 @@ ENTRY %module {
 
 TEST_P(ParameterizedMetadataTest,
        GatherParallelAndPassthroughMergedBackwardPass) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY %module {
@@ -5267,7 +5267,7 @@ ENTRY %module {
 }
 
 TEST_P(ParameterizedMetadataTest, CorrectlyReplicateGatherIndex) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY %module {
@@ -5305,7 +5305,7 @@ ENTRY %module {
 }
 
 TEST_P(ParameterizedMetadataTest, GatherToOperand_ParallelDimIsNotPartitioned) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY %module {

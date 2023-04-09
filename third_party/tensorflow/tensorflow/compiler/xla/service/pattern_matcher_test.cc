@@ -731,7 +731,7 @@ TEST_F(PatternMatcherTest, ShapeDescribeToAndExplain) {
       "in ((f32[1,2]))");
 }
 
-std::unique_ptr<HloInstruction> SetName(absl::string_view name,
+std::unique_ptr<HloInstruction> SetName(abslx::string_view name,
                                         std::unique_ptr<HloInstruction> instr) {
   instr->SetAndSanitizeName(name);
   return instr;
@@ -842,10 +842,10 @@ TEST_F(PatternMatcherTest, HloInstructionDescribeToAndExplain) {
       "in c = f64[] constant(2.25)");
   EXPECT_DESC_AND_EXPLANATION(
       constant, m::Op().Is(iota.get()),
-      absl::StrCat("an HloInstruction which is 0x", absl::Hex(iota.get()),
+      abslx::StrCat("an HloInstruction which is 0x", abslx::Hex(iota.get()),
                    " (i = s32[42]{0} iota(), iota_dimension=0)"),
-      absl::StrCat("HloInstruction 0x", absl::Hex(constant.get()), " is not 0x",
-                   absl::Hex(iota.get()),
+      abslx::StrCat("HloInstruction 0x", abslx::Hex(constant.get()), " is not 0x",
+                   abslx::Hex(iota.get()),
                    " (i = s32[42]{0} iota(), iota_dimension=0)\n"
                    "in c = s32[] constant(0)"));
 

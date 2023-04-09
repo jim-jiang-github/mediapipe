@@ -33,11 +33,11 @@ namespace xla {
 class Despecializer : public HloModulePass {
  public:
   Despecializer();
-  absl::string_view name() const override { return "despecializer"; }
+  abslx::string_view name() const override { return "despecializer"; }
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   HloPassPipeline pipeline_;
@@ -47,11 +47,11 @@ class Despecializer : public HloModulePass {
 class ControlDepRemover : public HloModulePass {
  public:
   ControlDepRemover() = default;
-  absl::string_view name() const override { return "control-dep-remover"; }
+  abslx::string_view name() const override { return "control-dep-remover"; }
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(HloModule* module,
-                     const absl::flat_hash_set<absl::string_view>&
+                     const abslx::flat_hash_set<abslx::string_view>&
                          execution_threads) override {
     bool changed = false;
     for (HloComputation* computation : module->computations()) {

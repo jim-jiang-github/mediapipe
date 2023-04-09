@@ -79,7 +79,7 @@ Status CheckOpName(const DatasetBase& dataset, const NameAttrList& assertions) {
 
 // Returns a NodeDef representation of `dataset`.
 StatusOr<NodeDef> GetDatasetNode(const DatasetBase& dataset,
-                                 absl::string_view op_name) {
+                                 abslx::string_view op_name) {
   SerializationContext serialization_ctx((SerializationContext::Params()));
   GraphDefBuilder b;
   GraphDef graph_def;

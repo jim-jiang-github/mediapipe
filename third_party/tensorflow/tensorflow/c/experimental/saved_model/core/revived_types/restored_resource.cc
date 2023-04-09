@@ -36,7 +36,7 @@ Status ExecuteNoArgDummyReturnFunction(TFConcreteFunction* func) {
   AbstractTensorHandle* dummy_output = nullptr;
   int num_retvals = 1;
   TF_RETURN_IF_ERROR(function_op->Execute(
-      absl::MakeSpan(&dummy_output, num_retvals), &num_retvals));
+      abslx::MakeSpan(&dummy_output, num_retvals), &num_retvals));
   AbstractTensorHandlePtr owned_dummy_output(dummy_output);
   return Status();
 }

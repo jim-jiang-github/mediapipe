@@ -36,7 +36,7 @@ bool IsFunction(StringPiece op_name);
 // variable "TF_EAGER_ENABLE_SMALL_TENSOR_CPU_PINNING" to "0" or "false".
 Status MaybePinSmallOpsToCpu(
     bool* result, StringPiece op_name,
-    absl::Span<ImmediateExecutionTensorHandle* const> args,
+    abslx::Span<ImmediateExecutionTensorHandle* const> args,
     StringPiece cpu_device_name);
 
 // If a resource touching input is specified, all resource-touching ops run in

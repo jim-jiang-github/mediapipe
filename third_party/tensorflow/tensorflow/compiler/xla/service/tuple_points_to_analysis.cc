@@ -39,8 +39,8 @@ limitations under the License.
 namespace xla {
 
 std::string BufferAlias::ToString() const {
-  return absl::StrCat("BufferAlias(", instruction_->name(), "[",
-                      absl::StrJoin(index_, ","), "])");
+  return abslx::StrCat("BufferAlias(", instruction_->name(), "[",
+                      abslx::StrJoin(index_, ","), "])");
 }
 
 std::ostream& operator<<(std::ostream& out, const BufferAlias& buffer_alias) {
@@ -59,7 +59,7 @@ bool PointsToSet::IsAmbiguous() const {
 
 bool PointsToSet::IsDistinct() const {
   bool distinct = true;
-  absl::flat_hash_set<const LogicalBuffer*> all_points_to;
+  abslx::flat_hash_set<const LogicalBuffer*> all_points_to;
   ForEachElement([&](const ShapeIndex& /*index*/, const BufferList& points_to) {
     for (auto& buffer : points_to) {
       if (all_points_to.contains(buffer)) {
@@ -90,7 +90,7 @@ bool PointsToSet::ContainsBuffer(const LogicalBuffer& buffer) const {
   bool found = false;
   ForEachElement([&found, &buffer](const ShapeIndex& /*index*/,
                                    const BufferList& pointed_to_buffers) {
-    if (!found && absl::c_linear_search(pointed_to_buffers, &buffer)) {
+    if (!found && abslx::c_linear_search(pointed_to_buffers, &buffer)) {
       found = true;
     }
   });
@@ -100,7 +100,7 @@ bool PointsToSet::ContainsBuffer(const LogicalBuffer& buffer) const {
 bool PointsToSet::ContainsBufferAtIndex(const LogicalBuffer& buffer,
                                         const ShapeIndex& index) const {
   const auto& pointed_to_buffers = element(index);
-  return absl::c_linear_search(pointed_to_buffers, &buffer);
+  return abslx::c_linear_search(pointed_to_buffers, &buffer);
 }
 
 void PointsToSet::AddPointedToBuffer(const LogicalBuffer& buffer,
@@ -470,7 +470,7 @@ Status TuplePointsToAnalysis::HandleSend(HloInstruction* send) {
 }
 
 Status TuplePointsToAnalysis::HandleTuple(HloInstruction* tuple) {
-  absl::Span<HloInstruction* const> operands(tuple->operands());
+  abslx::Span<HloInstruction* const> operands(tuple->operands());
   PointsToSet& points_to_set = CreateEmptyPointsToSet(tuple);
   points_to_set.AddPointedToBuffer(
       logical_buffer_analysis_->GetBuffer(tuple, /*index=*/{}),
@@ -511,7 +511,7 @@ Status TuplePointsToAnalysis::HandleTuple(HloInstruction* tuple) {
 Status TuplePointsToAnalysis::HandleCustomCall(HloInstruction* custom_call) {
   auto ccall = Cast<HloCustomCallInstruction>(custom_call);
   PointsToSet& points_to_set = CreateEmptyPointsToSet(custom_call);
-  absl::flat_hash_map<ShapeIndex, std::pair<int64_t, ShapeIndex>>
+  abslx::flat_hash_map<ShapeIndex, std::pair<int64_t, ShapeIndex>>
       aliased_outputs;
   for (const auto& pair : ccall->output_to_operand_aliasing()) {
     aliased_outputs.emplace(pair.first, pair.second);
@@ -604,7 +604,7 @@ StatusOr<const LogicalBuffer*> TuplePointsToAnalysis::GetBufferDefinedAt(
   if (buffers.size() != 1 || buffers[0]->instruction() != instruction) {
     return FailedPrecondition(
         "instruction %s does not define buffer at index {%s}",
-        instruction->name(), absl::StrJoin(index, ","));
+        instruction->name(), abslx::StrJoin(index, ","));
   }
   return buffers[0];
 }
@@ -666,11 +666,11 @@ PointsToSet& TuplePointsToAnalysis::CreateCopiedPointsToSet(
 
 std::string TuplePointsToAnalysis::ToString() const {
   std::string output =
-      absl::StrFormat("TuplePointsToSet for module %s:\n", module_->name());
+      abslx::StrFormat("TuplePointsToSet for module %s:\n", module_->name());
   for (const auto* computation : module_->MakeNonfusionComputations()) {
     const char* entry =
         computation == module_->entry_computation() ? "entry " : "";
-    absl::StrAppend(&output, entry, "computation ", computation->name(), ":\n");
+    abslx::StrAppend(&output, entry, "computation ", computation->name(), ":\n");
     for (const HloInstruction* instruction :
          computation->MakeInstructionPostOrder()) {
       InstructionToString(instruction, &output);
@@ -682,11 +682,11 @@ std::string TuplePointsToAnalysis::ToString() const {
     }
   }
 
-  absl::StrAppend(&output, "LogicalBuffers:\n");
+  abslx::StrAppend(&output, "LogicalBuffers:\n");
   for (const auto& b : logical_buffer_analysis_->logical_buffers()) {
-    absl::StrAppend(&output, "  buffer ", b->ToString(), ":\n");
+    abslx::StrAppend(&output, "  buffer ", b->ToString(), ":\n");
     for (const BufferAlias& alias : logical_buffer_aliases_.at(b->id())) {
-      absl::StrAppend(&output, "    alias ", alias.ToString(), "\n");
+      abslx::StrAppend(&output, "    alias ", alias.ToString(), "\n");
     }
   }
   return output;
@@ -695,15 +695,15 @@ std::string TuplePointsToAnalysis::ToString() const {
 void TuplePointsToAnalysis::InstructionToString(
     const HloInstruction* instruction, std::string* output) const {
   const std::string prefix = instruction->IsFused() ? "    " : "";
-  absl::StrAppend(output, prefix, "  instruction ",
+  abslx::StrAppend(output, prefix, "  instruction ",
                   instruction->ToShortString(), ":\n");
   const PointsToSet& points_to_set = GetPointsToSet(instruction);
   points_to_set.ForEachElement(
       [&prefix, &output](const ShapeIndex& index,
                          const PointsToSet::BufferList& points_to) {
-        absl::StrAppend(
-            output, prefix, "    {", absl::StrJoin(index, ","), "}: ",
-            absl::StrJoin(points_to, ", ",
+        abslx::StrAppend(
+            output, prefix, "    {", abslx::StrJoin(index, ","), "}: ",
+            abslx::StrJoin(points_to, ", ",
                           [](std::string* out, const LogicalBuffer* source) {
                             out->append(source->ToString());
                           }),
@@ -722,7 +722,7 @@ bool TuplePointsToAnalysis::DoesNotUseOperandBuffer(
     return true;
   } else if (user->IsLoopFusion()) {
     // Find fusion parameter associated with 'operand'.
-    auto it = absl::c_find_if(
+    auto it = abslx::c_find_if(
         user->fused_parameters(), [&](HloInstruction* fused_param) {
           return user->operand(fused_param->parameter_number()) == operand;
         });
@@ -790,7 +790,7 @@ bool TuplePointsToAnalysis::HasUniqueFusedUseOfOperandAt(
   // Find fusion parameter associated with 'operand'.
   const auto& fused_params = fusion->fused_parameters();
   auto fused_param_it =
-      absl::c_find_if(fused_params, [&](HloInstruction* fused_param) {
+      abslx::c_find_if(fused_params, [&](HloInstruction* fused_param) {
         return fusion->operand(fused_param->parameter_number()) == operand;
       });
   if (fused_param_it == fused_params.end()) {

@@ -46,7 +46,7 @@ bool CopyImageDataToByteBuffer(JNIEnv* env, const mediapipe::ImageFrame& image,
   int64_t buffer_size = env->GetDirectBufferCapacity(byte_buffer);
   void* buffer_data = env->GetDirectBufferAddress(byte_buffer);
   if (buffer_data == nullptr || buffer_size < 0) {
-    ThrowIfError(env, absl::InvalidArgumentError(
+    ThrowIfError(env, abslx::InvalidArgumentError(
                           "input buffer does not support direct access"));
     return false;
   }
@@ -56,7 +56,7 @@ bool CopyImageDataToByteBuffer(JNIEnv* env, const mediapipe::ImageFrame& image,
                                    image.ByteDepth() * image.NumberOfChannels();
   if (buffer_size != expected_buffer_size) {
     ThrowIfError(
-        env, absl::InvalidArgumentError(absl::StrCat(
+        env, abslx::InvalidArgumentError(abslx::StrCat(
                  "Expected buffer size ", expected_buffer_size,
                  " got: ", buffer_size, ", width ", image.Width(), ", height ",
                  image.Height(), ", channels ", image.NumberOfChannels())));
@@ -202,7 +202,7 @@ JNIEXPORT void JNICALL PACKET_GETTER_METHOD(nativeGetProto)(JNIEnv* env,
                                                             jobject result) {
   mediapipe::Packet mediapipe_packet =
       mediapipe::android::Graph::GetPacketFromHandle(packet);
-  absl::Status status = mediapipe_packet.ValidateAsProtoMessageLite();
+  abslx::Status status = mediapipe_packet.ValidateAsProtoMessageLite();
   if (!ThrowIfError(env, status)) {
     // Convert type_name and value to Java data.
     const auto& proto_message = mediapipe_packet.GetProtoMessageLite();
@@ -361,7 +361,7 @@ JNIEXPORT jboolean JNICALL PACKET_GETTER_METHOD(nativeGetImageList)(
   const auto& image_list =
       GetFromNativeHandle<std::vector<mediapipe::Image>>(packet);
   if (env->GetArrayLength(byte_buffer_array) != image_list.size()) {
-    ThrowIfError(env, absl::InvalidArgumentError(absl::StrCat(
+    ThrowIfError(env, abslx::InvalidArgumentError(abslx::StrCat(
                           "Expected ByteBuffer array size: ", image_list.size(),
                           " but get ByteBuffer array size: ",
                           env->GetArrayLength(byte_buffer_array))));
@@ -371,7 +371,7 @@ JNIEXPORT jboolean JNICALL PACKET_GETTER_METHOD(nativeGetImageList)(
     auto& image = *image_list[i].GetImageFrameSharedPtr().get();
     if (!image.IsContiguous()) {
       ThrowIfError(
-          env, absl::InternalError("ImageFrame must store data contiguously to "
+          env, abslx::InternalError("ImageFrame must store data contiguously to "
                                    "be allocated as ByteBuffer."));
       return false;
     }
@@ -409,13 +409,13 @@ JNIEXPORT jboolean JNICALL PACKET_GETTER_METHOD(nativeGetRgbaFromRgb)(
       static_cast<uint8_t*>(env->GetDirectBufferAddress(byte_buffer));
   int64_t buffer_size = env->GetDirectBufferCapacity(byte_buffer);
   if (rgba_data == nullptr || buffer_size < 0) {
-    ThrowIfError(env, absl::InvalidArgumentError(
+    ThrowIfError(env, abslx::InvalidArgumentError(
                           "input buffer does not support direct access"));
     return false;
   }
   if (buffer_size != image.Width() * image.Height() * 4) {
     ThrowIfError(env,
-                 absl::InvalidArgumentError(absl::StrCat(
+                 abslx::InvalidArgumentError(abslx::StrCat(
                      "Buffer size has to be width*height*4\n"
                      "Image width: ",
                      image.Width(), ", Image height: ", image.Height(),
@@ -524,11 +524,11 @@ JNIEXPORT jlong JNICALL PACKET_GETTER_METHOD(nativeGetGpuBuffer)(
         mediapipe::android::Graph::GetContextFromHandle(packet);
     auto gl_context = mediapipe_graph->GetGpuResources()->gl_context();
     auto status =
-        gl_context->Run([gl_context, mediapipe_packet, &ptr]() -> absl::Status {
+        gl_context->Run([gl_context, mediapipe_packet, &ptr]() -> abslx::Status {
           const mediapipe::Image& buffer =
               mediapipe_packet.Get<mediapipe::Image>();
           ptr = buffer.GetGlTextureBufferSharedPtr();
-          return absl::OkStatus();
+          return abslx::OkStatus();
         });
   } else {
     const mediapipe::GpuBuffer& buffer =

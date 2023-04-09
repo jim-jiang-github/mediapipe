@@ -28,24 +28,24 @@ TEST(RequestCostTest, Basic) {
   RequestCost request_cost;
 
   request_cost.RecordCost(
-      {{"tpu_v1", absl::Milliseconds(1)}, {"tpu_v2", absl::Milliseconds(2)}});
-  request_cost.RecordCost({{"tpu_v1", absl::Milliseconds(10)},
-                           {"tpu_v2", absl::Milliseconds(20)},
-                           {"cpu_v1", absl::Milliseconds(30)},
-                           {"cpu_v2", absl::Milliseconds(40)}});
+      {{"tpu_v1", abslx::Milliseconds(1)}, {"tpu_v2", abslx::Milliseconds(2)}});
+  request_cost.RecordCost({{"tpu_v1", abslx::Milliseconds(10)},
+                           {"tpu_v2", abslx::Milliseconds(20)},
+                           {"cpu_v1", abslx::Milliseconds(30)},
+                           {"cpu_v2", abslx::Milliseconds(40)}});
   EXPECT_THAT(request_cost.GetCosts(),
-              UnorderedElementsAre(Pair("tpu_v1", absl::Milliseconds(11)),
-                                   Pair("tpu_v2", absl::Milliseconds(22)),
-                                   Pair("cpu_v1", absl::Milliseconds(30)),
-                                   Pair("cpu_v2", absl::Milliseconds(40))));
+              UnorderedElementsAre(Pair("tpu_v1", abslx::Milliseconds(11)),
+                                   Pair("tpu_v2", abslx::Milliseconds(22)),
+                                   Pair("cpu_v1", abslx::Milliseconds(30)),
+                                   Pair("cpu_v2", abslx::Milliseconds(40))));
 
   request_cost.RecordCost(
-      {{"cpu_v1", absl::Milliseconds(3)}, {"cpu_v2", absl::Milliseconds(4)}});
+      {{"cpu_v1", abslx::Milliseconds(3)}, {"cpu_v2", abslx::Milliseconds(4)}});
   EXPECT_THAT(request_cost.GetCosts(),
-              UnorderedElementsAre(Pair("tpu_v1", absl::Milliseconds(11)),
-                                   Pair("tpu_v2", absl::Milliseconds(22)),
-                                   Pair("cpu_v1", absl::Milliseconds(33)),
-                                   Pair("cpu_v2", absl::Milliseconds(44))));
+              UnorderedElementsAre(Pair("tpu_v1", abslx::Milliseconds(11)),
+                                   Pair("tpu_v2", abslx::Milliseconds(22)),
+                                   Pair("cpu_v1", abslx::Milliseconds(33)),
+                                   Pair("cpu_v2", abslx::Milliseconds(44))));
 }
 
 }  // namespace

@@ -61,17 +61,17 @@ class Accumulator {
   };
 
   void Receive(uint32_t consumer_id, std::shared_ptr<Literal> data) {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     received_.push_back(Data{consumer_id, data});
   }
 
   std::vector<Data> received() {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     return received_;
   }
 
  private:
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
   std::vector<Data> received_ ABSL_GUARDED_BY(mutex_);
 };
 

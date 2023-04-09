@@ -25,7 +25,7 @@ BatchDotSimplification::ElideDegenerateBatchDimensionFromBatchDot(
     HloInstruction* batch_dot) {
   // This pass assumes the lhs and rhs batch dimensions are equal and strictly
   // ascending.
-  const auto& is_iota = [](absl::Span<const int64_t> dims) {
+  const auto& is_iota = [](abslx::Span<const int64_t> dims) {
     for (int64_t i = 0; i < dims.size(); ++i) {
       if (dims[i] != i) {
         return false;
@@ -33,7 +33,7 @@ BatchDotSimplification::ElideDegenerateBatchDimensionFromBatchDot(
     }
     return true;
   };
-  if (!absl::c_equal(
+  if (!abslx::c_equal(
           batch_dot->dot_dimension_numbers().lhs_batch_dimensions(),
           batch_dot->dot_dimension_numbers().rhs_batch_dimensions()) ||
       !is_iota(batch_dot->dot_dimension_numbers().lhs_batch_dimensions())) {
@@ -104,18 +104,18 @@ BatchDotSimplification::ElideDegenerateBatchDimensionFromBatchDot(
   return true;
 }
 
-absl::string_view BatchDotSimplification::name() const {
+abslx::string_view BatchDotSimplification::name() const {
   return "batch-dot-simplification";
 }
 
 StatusOr<bool> BatchDotSimplification::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   std::vector<HloInstruction*> dot_instrs;
   for (HloComputation* computation :
        module->MakeNonfusionComputations(execution_threads)) {
-    absl::c_copy_if(computation->instructions(), std::back_inserter(dot_instrs),
+    abslx::c_copy_if(computation->instructions(), std::back_inserter(dot_instrs),
                     [](HloInstruction* instr) {
                       return instr->opcode() == HloOpcode::kDot;
                     });

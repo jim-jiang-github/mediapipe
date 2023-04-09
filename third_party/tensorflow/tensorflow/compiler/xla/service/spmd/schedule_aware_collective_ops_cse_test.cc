@@ -31,7 +31,7 @@ namespace {
 class CollectiveOpsCseTest : public HloTestBase {
  public:
   StatusOr<std::unique_ptr<HloModule>> RunPass(
-      absl::string_view hlo_module, int64_t distance_threshold = 100) {
+      abslx::string_view hlo_module, int64_t distance_threshold = 100) {
     TF_ASSIGN_OR_RETURN(auto module, ParseAndReturnVerifiedModule(
                                          hlo_module, GetModuleConfigForTest()));
     HloPassPipeline pipeline("all-gather-cse");
@@ -43,7 +43,7 @@ class CollectiveOpsCseTest : public HloTestBase {
 };
 
 TEST_F(CollectiveOpsCseTest, SimpleCseAllGather) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY entry {
@@ -64,7 +64,7 @@ ENTRY entry {
 }
 
 TEST_F(CollectiveOpsCseTest, SimpleCseCollectivePermute) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY entry {
@@ -85,7 +85,7 @@ ENTRY entry {
 }
 
 TEST_F(CollectiveOpsCseTest, SimpleCseReshapeLookthroughAllGather) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY entry {
@@ -108,7 +108,7 @@ ENTRY entry {
 }
 
 TEST_F(CollectiveOpsCseTest, SimpleCseReshapeLookthroughCollectivePermute) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY entry {
@@ -131,7 +131,7 @@ ENTRY entry {
 }
 
 TEST_F(CollectiveOpsCseTest, SimpleNoCseInvalidReshapes) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY entry {
@@ -154,7 +154,7 @@ ENTRY entry {
 }
 
 TEST_F(CollectiveOpsCseTest, SimpleCseDifferentDim) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY entry {
@@ -175,7 +175,7 @@ ENTRY entry {
 }
 
 TEST_F(CollectiveOpsCseTest, SimpleCseDifferentDimReshapeLookthrough) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY entry {
@@ -198,7 +198,7 @@ ENTRY entry {
 }
 
 TEST_F(CollectiveOpsCseTest, NoCseGlobalDevice) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY entry {
@@ -219,7 +219,7 @@ ENTRY entry {
 }
 
 TEST_F(CollectiveOpsCseTest, NoCseChannelIdMismatch) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule module
 
 ENTRY entry {

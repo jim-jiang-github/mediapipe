@@ -60,14 +60,14 @@ class TFSavedModelAPI : public SavedModelAPI {
 
   Status GetFunctions(
       int node_id,
-      absl::flat_hash_map<std::string, ConcreteFunction*>* functions) override;
+      abslx::flat_hash_map<std::string, ConcreteFunction*>* functions) override;
 
   Status GetSignatureDefFunction(const std::string& signature_def_key,
                                  SignatureDefFunction** function) override;
 
   static Status Load(
       const std::string& directory,
-      const absl::optional<std::unordered_set<std::string>>& tags,
+      const abslx::optional<std::unordered_set<std::string>>& tags,
       ImmediateExecutionContext* context,
       std::unique_ptr<TFSavedModelAPI>* out);
 

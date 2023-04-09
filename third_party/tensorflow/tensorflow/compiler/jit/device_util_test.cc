@@ -22,11 +22,11 @@ namespace tensorflow {
 namespace {
 
 Status PickDeviceHelper(bool allow_mixing_unknown_and_cpu,
-                        absl::Span<const absl::string_view> device_names,
+                        abslx::Span<const abslx::string_view> device_names,
                         string* result) {
   jit::DeviceInfoCache cache;
   jit::DeviceSet device_set;
-  for (absl::string_view name : device_names) {
+  for (abslx::string_view name : device_names) {
     TF_ASSIGN_OR_RETURN(jit::DeviceId device_id, cache.GetIdFor(name));
     device_set.Insert(device_id);
   }
@@ -38,19 +38,19 @@ Status PickDeviceHelper(bool allow_mixing_unknown_and_cpu,
   return OkStatus();
 }
 
-void CheckPickDeviceResult(absl::string_view expected_result,
+void CheckPickDeviceResult(abslx::string_view expected_result,
                            bool allow_mixing_unknown_and_cpu,
-                           absl::Span<const absl::string_view> inputs) {
+                           abslx::Span<const abslx::string_view> inputs) {
   string result;
   TF_ASSERT_OK(PickDeviceHelper(allow_mixing_unknown_and_cpu, inputs, &result))
-      << "inputs = [" << absl::StrJoin(inputs, ", ")
+      << "inputs = [" << abslx::StrJoin(inputs, ", ")
       << "], allow_mixing_unknown_and_cpu=" << allow_mixing_unknown_and_cpu
       << ", expected_result=" << expected_result;
   EXPECT_EQ(result, expected_result);
 }
 
 void CheckPickDeviceHasError(bool allow_mixing_unknown_and_cpu,
-                             absl::Span<const absl::string_view> inputs) {
+                             abslx::Span<const abslx::string_view> inputs) {
   string result;
   EXPECT_FALSE(
       PickDeviceHelper(allow_mixing_unknown_and_cpu, inputs, &result).ok());
@@ -114,7 +114,7 @@ void SimpleRoundTripTestForDeviceSet(int num_devices) {
 
   for (int i = 0; i < num_devices; i++) {
     string device_name =
-        absl::StrCat("/job:localhost/replica:0/task:0/device:XPU:", i);
+        abslx::StrCat("/job:localhost/replica:0/task:0/device:XPU:", i);
     TF_ASSERT_OK_AND_ASSIGN(jit::DeviceId device_id,
                             device_info_cache.GetIdFor(device_name));
     device_set.Insert(device_id);

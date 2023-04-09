@@ -259,7 +259,7 @@ void CoordinationServiceRpcHandler::BarrierAsync(const BarrierRequest* request,
                                         request->tasks().end()};
   service->BarrierAsync(
       request->barrier_id(),
-      absl::Milliseconds(request->barrier_timeout_in_ms()),
+      abslx::Milliseconds(request->barrier_timeout_in_ms()),
       request->source_task(), tasks,
       [done = std::move(done)](const Status& status) { done(status); });
 }

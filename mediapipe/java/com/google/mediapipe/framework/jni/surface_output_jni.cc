@@ -62,8 +62,8 @@ JNIEXPORT void JNICALL MEDIAPIPE_SURFACE_OUTPUT_METHOD(nativeSetSurface)(
   }
 
   auto status = gl_context->Run(
-      [gl_context, surface_holder, surface, window]() -> absl::Status {
-        absl::MutexLock lock(&surface_holder->mutex);
+      [gl_context, surface_holder, surface, window]() -> abslx::Status {
+        abslx::MutexLock lock(&surface_holder->mutex);
         // Must destroy old surface first in case we are assigning the same
         // surface.
         // TODO: keep a ref to Java object and short-circuit if same?
@@ -90,7 +90,7 @@ JNIEXPORT void JNICALL MEDIAPIPE_SURFACE_OUTPUT_METHOD(nativeSetSurface)(
         }
         surface_holder->surface = egl_surface;
         surface_holder->owned = egl_surface != EGL_NO_SURFACE;
-        return absl::OkStatus();
+        return abslx::OkStatus();
       });
   MEDIAPIPE_CHECK_OK(status);
 
@@ -112,7 +112,7 @@ JNIEXPORT void JNICALL MEDIAPIPE_SURFACE_OUTPUT_METHOD(nativeSetEglSurface)(
   EGLSurface old_surface = EGL_NO_SURFACE;
 
   {
-    absl::MutexLock lock(&surface_holder->mutex);
+    abslx::MutexLock lock(&surface_holder->mutex);
     if (surface_holder->owned) {
       old_surface = surface_holder->surface;
     }
@@ -122,10 +122,10 @@ JNIEXPORT void JNICALL MEDIAPIPE_SURFACE_OUTPUT_METHOD(nativeSetEglSurface)(
 
   if (old_surface != EGL_NO_SURFACE) {
     MEDIAPIPE_CHECK_OK(
-        gl_context->Run([gl_context, old_surface]() -> absl::Status {
+        gl_context->Run([gl_context, old_surface]() -> abslx::Status {
           RET_CHECK(eglDestroySurface(gl_context->egl_display(), old_surface))
               << "eglDestroySurface failed:" << eglGetError();
-          return absl::OkStatus();
+          return abslx::OkStatus();
         }));
   }
 }

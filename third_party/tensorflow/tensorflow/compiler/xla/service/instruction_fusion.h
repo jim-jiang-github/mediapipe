@@ -39,7 +39,7 @@ class FusionDecision {
  public:
   // Can not be fused: explain why. Implicit conversion due to optional-like
   // semantics: waiver granted in cl/419938611.
-  FusionDecision(absl::string_view explanation)  // NOLINT
+  FusionDecision(abslx::string_view explanation)  // NOLINT
       : explanation_(explanation) {}
 
   // Same constructor as string_view, to allow implicit string conversion (can't
@@ -50,7 +50,7 @@ class FusionDecision {
 
   // If condition is `true` means that we CAN fuse. In that case, explanation is
   // discarded.
-  FusionDecision(bool condition, absl::string_view explanation) {
+  FusionDecision(bool condition, abslx::string_view explanation) {
     if (!condition) {
       explanation_ = std::string(explanation);
     }
@@ -79,7 +79,7 @@ class FusionDecision {
     if (CanFuse() || decision.CanFuse()) {
       return {};
     }
-    return {absl::StrCat(explanation_.value_or(""), " ; ", decision.Explain())};
+    return {abslx::StrCat(explanation_.value_or(""), " ; ", decision.Explain())};
   }
 
   // Connects two fusion decision with a conjunction. Unlike disjunction,
@@ -97,13 +97,13 @@ class FusionDecision {
   }
 
   // Appends to explanation, or turns the decision negative.
-  FusionDecision operator<<(absl::string_view explanation) {
-    return {absl::StrCat(explanation_.value_or(""), explanation)};
+  FusionDecision operator<<(abslx::string_view explanation) {
+    return {abslx::StrCat(explanation_.value_or(""), explanation)};
   }
 
   // Appends to explanation, or turns the decision negative.
   FusionDecision operator<<(int64_t explanation) {
-    return {absl::StrCat(explanation_.value_or(""), explanation)};
+    return {abslx::StrCat(explanation_.value_or(""), explanation)};
   }
 
   // Explains why the fusion could not be performed.
@@ -151,14 +151,14 @@ class InstructionFusion : public HloModulePass {
         may_duplicate_(may_duplicate),
         config_collection_mode_(config_collection_mode) {}
   ~InstructionFusion() override = default;
-  absl::string_view name() const override { return "fusion"; }
+  abslx::string_view name() const override { return "fusion"; }
 
   // Run instruction fusion on the given computation. Returns whether the
   // computation was changed (instructions were fused).
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
   // Returns true if the computation of the given instruction is significantly
   // more expensive than just writing all the values of the instructions' result
@@ -177,7 +177,7 @@ class InstructionFusion : public HloModulePass {
   // Returns a list of computations on which Fusion is performed.
   virtual std::vector<HloComputation*> GetFusionComputations(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads);
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads);
 
   // Returns a FusionQueue that implements custom order of instructions being
   // fused. The default implementation processes consumers in reverse post
@@ -269,12 +269,12 @@ class InstructionFusion : public HloModulePass {
                              int64_t operand_index);
 
   // The set of producers whose consumers we cannot fuse into.
-  using HloInstructionSet = absl::flat_hash_set<HloInstruction*>;
+  using HloInstructionSet = abslx::flat_hash_set<HloInstruction*>;
 
   // Computes the set of nodes that we do not want to fuse into any of their
   // consumers based on a global analysis of the HLO graph.
   virtual HloInstructionSet ComputeGloballyUnfusible(
-      absl::Span<HloInstruction* const> post_order,
+      abslx::Span<HloInstruction* const> post_order,
       const HloReachabilityMap& reachability);
 
  private:
@@ -283,7 +283,7 @@ class InstructionFusion : public HloModulePass {
   // instruction.
   // The returned value has pointer stability, assuming entries are not deleted
   // from reused_fusion_operands_.
-  absl::flat_hash_set<const HloInstruction*>& ReusedOperandsOf(
+  abslx::flat_hash_set<const HloInstruction*>& ReusedOperandsOf(
       const HloInstruction* instruction);
 
   // Updates reused_fusion_operands_ for a fusion when we are about to fuse
@@ -305,7 +305,7 @@ class InstructionFusion : public HloModulePass {
       HloInstruction* producer, HloInstruction* consumer,
       const HloInstructionSet& do_not_fuse,
       const HloReachabilityMap& reachability,
-      absl::flat_hash_map<std::pair<HloInstruction*, HloInstruction*>, bool>*
+      abslx::flat_hash_map<std::pair<HloInstruction*, HloInstruction*>, bool>*
           result_cache);
 
   // Used to determine if an HLO is expensive. Expensive operations will not be
@@ -319,9 +319,9 @@ class InstructionFusion : public HloModulePass {
   FusionConfigCollection config_collection_mode_;
 
   // Caches which operands are reused inside fusion computations.
-  absl::flat_hash_map<
+  abslx::flat_hash_map<
       const HloInstruction*,
-      std::unique_ptr<absl::flat_hash_set<const HloInstruction*>>>
+      std::unique_ptr<abslx::flat_hash_set<const HloInstruction*>>>
       reused_fusion_operands_;
 
   InstructionFusion(const InstructionFusion&) = delete;

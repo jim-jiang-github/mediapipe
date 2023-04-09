@@ -255,7 +255,7 @@ Status MemmappedFileSystem::InitializeFromFile(Env* env,
 }
 
 bool MemmappedFileSystem::IsMemmappedPackageFilename(const string& filename) {
-  return absl::StartsWith(filename, kMemmappedPackagePrefix);
+  return abslx::StartsWith(filename, kMemmappedPackagePrefix);
 }
 
 namespace {

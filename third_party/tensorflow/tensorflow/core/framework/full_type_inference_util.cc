@@ -76,7 +76,7 @@ ForwardTypeInferenceFn Merge() {
       }
 
       return Status(error::INVALID_ARGUMENT,
-                    absl::StrCat("expected compatible input types, but input ",
+                    abslx::StrCat("expected compatible input types, but input ",
                                  i, ":\n", t.DebugString(),
                                  " is neither a subtype nor a supertype of the "
                                  "combined inputs preceding it:\n",
@@ -123,7 +123,7 @@ ForwardTypeInferenceFn Decode(FullTypeId t, int i) {
     const FullTypeId enc_tid = GetArgDefaultUnset(in_t, 1).type_id();
     if ((enc_tid != TFT_UNSET) && (enc_tid != t)) {
       return Status(error::INVALID_ARGUMENT,
-                    absl::StrCat("expected encoded type ", t, " for input ", i,
+                    abslx::StrCat("expected encoded type ", t, " for input ", i,
                                  ", got ", in_t.DebugString()));
     }
 
@@ -176,7 +176,7 @@ ForwardTypeInferenceFn UnaryContainerAdd(FullTypeId t, int container_idx,
       if (in_cont_t.type_id() != t) {
         return Status(
             error::INVALID_ARGUMENT,
-            absl::StrCat("expected container type ", t, " for input ",
+            abslx::StrCat("expected container type ", t, " for input ",
                          container_idx, ", got ", in_cont_t.DebugString()));
       }
       *cont_t = in_cont_t;
@@ -209,7 +209,7 @@ ForwardTypeInferenceFn UnaryContainerAdd(FullTypeId t, int container_idx,
 
     if (homogeneous) {
       return Status(error::INVALID_ARGUMENT,
-                    absl::StrCat("expected a subtype of ", el_t.DebugString(),
+                    abslx::StrCat("expected a subtype of ", el_t.DebugString(),
                                  " for input ", element_idx,
                                  " of a homogeneous container ", t, ", got ",
                                  in_el_t.DebugString()));
@@ -217,7 +217,7 @@ ForwardTypeInferenceFn UnaryContainerAdd(FullTypeId t, int container_idx,
       // TODO(mdan): Implement if needed.
       return Status(
           error::UNIMPLEMENTED,
-          absl::StrCat("need union types for heterogeneous containers.\n"
+          abslx::StrCat("need union types for heterogeneous containers.\n"
                        "A homogeneous container would expect a subtype of ",
                        el_t.DebugString(), " for input ", element_idx,
                        ", but got ", in_el_t.DebugString()));
@@ -270,7 +270,7 @@ ForwardTypeInferenceFn ContainerMap(
     }
     if (in_cont_t.type_id() != t) {
       return Status(error::INVALID_ARGUMENT,
-                    absl::StrCat("expected type ", t, " for input ", input_idx,
+                    abslx::StrCat("expected type ", t, " for input ", input_idx,
                                  ", got ", in_cont_t.DebugString()));
     }
     ret_type.set_type_id(TFT_PRODUCT);
@@ -282,7 +282,7 @@ ForwardTypeInferenceFn ContainerMap(
     }
     if (in_el_t.type_id() != TFT_PRODUCT) {
       return Status(error::INVALID_ARGUMENT,
-                    absl::StrCat("expected PRODUCT element type for input ",
+                    abslx::StrCat("expected PRODUCT element type for input ",
                                  input_idx, ", got ", in_el_t.DebugString()));
     }
     FullTypeDef* out_el_t = out_cont_t->add_args();
@@ -306,7 +306,7 @@ ForwardTypeInferenceFn MapCovariant(FullTypeId t, FullTypeId u, int input_idx) {
         }
         if (in_t.type_id() != t) {
           return Status(error::INVALID_ARGUMENT,
-                        absl::StrCat("expected type ", t, " for input ",
+                        abslx::StrCat("expected type ", t, " for input ",
                                      input_idx, ", got ", in_t.DebugString()));
         }
         ret_type.set_type_id(TFT_PRODUCT);

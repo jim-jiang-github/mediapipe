@@ -76,7 +76,7 @@ struct ImageSegmenterOptions {
   // The user-defined result callback for processing live stream data.
   // The result callback should only be specified when the running mode is set
   // to RunningMode::LIVE_STREAM.
-  std::function<void(absl::StatusOr<std::vector<mediapipe::Image>>,
+  std::function<void(abslx::StatusOr<std::vector<mediapipe::Image>>,
                      const Image&, int64)>
       result_callback = nullptr;
 };
@@ -109,7 +109,7 @@ class ImageSegmenter : tasks::vision::core::BaseVisionTaskApi {
   // Creates an ImageSegmenter from the provided options. A non-default
   // OpResolver can be specified in the BaseOptions of ImageSegmenterOptions,
   // to support custom Ops of the segmentation model.
-  static absl::StatusOr<std::unique_ptr<ImageSegmenter>> Create(
+  static abslx::StatusOr<std::unique_ptr<ImageSegmenter>> Create(
       std::unique_ptr<ImageSegmenterOptions> options);
 
   // Performs image segmentation on the provided single image.
@@ -128,7 +128,7 @@ class ImageSegmenter : tasks::vision::core::BaseVisionTaskApi {
   // per-category segmented image mask.
   // If the output_type is CONFIDENCE_MASK, the returned vector of images
   // contains only one confidence image mask.
-  absl::StatusOr<std::vector<mediapipe::Image>> Segment(
+  abslx::StatusOr<std::vector<mediapipe::Image>> Segment(
       mediapipe::Image image,
       std::optional<core::ImageProcessingOptions> image_processing_options =
           std::nullopt);
@@ -151,7 +151,7 @@ class ImageSegmenter : tasks::vision::core::BaseVisionTaskApi {
   // per-category segmented image mask.
   // If the output_type is CONFIDENCE_MASK, the returned vector of images
   // contains only one confidence image mask.
-  absl::StatusOr<std::vector<mediapipe::Image>> SegmentForVideo(
+  abslx::StatusOr<std::vector<mediapipe::Image>> SegmentForVideo(
       mediapipe::Image image, int64 timestamp_ms,
       std::optional<core::ImageProcessingOptions> image_processing_options =
           std::nullopt);
@@ -183,12 +183,12 @@ class ImageSegmenter : tasks::vision::core::BaseVisionTaskApi {
   //     no longer be valid when the callback returns. To access the image data
   //     outside of the callback, callers need to make a copy of the image.
   //   - The input timestamp in milliseconds.
-  absl::Status SegmentAsync(mediapipe::Image image, int64 timestamp_ms,
+  abslx::Status SegmentAsync(mediapipe::Image image, int64 timestamp_ms,
                             std::optional<core::ImageProcessingOptions>
                                 image_processing_options = std::nullopt);
 
   // Shuts down the ImageSegmenter when all works are done.
-  absl::Status Close() { return runner_->Close(); }
+  abslx::Status Close() { return runner_->Close(); }
 };
 
 }  // namespace image_segmenter

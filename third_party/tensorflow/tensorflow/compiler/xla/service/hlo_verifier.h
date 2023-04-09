@@ -344,18 +344,18 @@ class HloVerifier : public HloModulePass {
 
   // Uses custom target metadata
   explicit HloVerifier(std::unique_ptr<TargetVerifierMetadata> target_metadata,
-                       absl::string_view context = "Unknown")
+                       abslx::string_view context = "Unknown")
       : target_metadata_(std::move(target_metadata)), context_(context) {}
 
   ~HloVerifier() override = default;
-  absl::string_view name() const override { return "hlo-verifier"; }
+  abslx::string_view name() const override { return "hlo-verifier"; }
 
   // Never returns true; no instructions are ever modified by this pass.
   using HloPassInterface::Run;
   using HloPassInterface::RunOnModuleGroup;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   // Owns verifier config.

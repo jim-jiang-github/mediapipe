@@ -28,42 +28,42 @@ bool HasExtension(EGLDisplay display, const char* extension) {
   return extensions && std::strstr(extensions, extension);
 }
 
-absl::Status IsEglFenceSyncSupported(EGLDisplay display) {
+abslx::Status IsEglFenceSyncSupported(EGLDisplay display) {
   static bool supported = HasExtension(display, "EGL_KHR_fence_sync");
   if (supported) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  return absl::InternalError("Not supported: EGL_KHR_fence_sync");
+  return abslx::InternalError("Not supported: EGL_KHR_fence_sync");
 }
 
-absl::Status IsEglWaitSyncSupported(EGLDisplay display) {
+abslx::Status IsEglWaitSyncSupported(EGLDisplay display) {
   static bool supported = HasExtension(display, "EGL_KHR_wait_sync");
   if (supported) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  return absl::InternalError("Not supported: EGL_KHR_wait_sync");
+  return abslx::InternalError("Not supported: EGL_KHR_wait_sync");
 }
 
 }  // anonymous namespace
 
-absl::Status EglSync::NewFence(EGLDisplay display, EglSync* sync) {
+abslx::Status EglSync::NewFence(EGLDisplay display, EglSync* sync) {
   RETURN_IF_ERROR(IsEglFenceSyncSupported(display));
   static auto* egl_create_sync_khr =
       reinterpret_cast<decltype(&eglCreateSyncKHR)>(
           eglGetProcAddress("eglCreateSyncKHR"));
   if (egl_create_sync_khr == nullptr) {
     // Needs extension: EGL_KHR_fence_sync (EGL) / GL_OES_EGL_sync (OpenGL ES).
-    return absl::InternalError(
+    return abslx::InternalError(
         "Not supported / bad EGL implementation: eglCreateSyncKHR.");
   }
   EGLSyncKHR egl_sync;
   RETURN_IF_ERROR(TFLITE_GPU_CALL_EGL(*egl_create_sync_khr, &egl_sync, display,
                                       EGL_SYNC_FENCE_KHR, nullptr));
   if (egl_sync == EGL_NO_SYNC_KHR) {
-    return absl::InternalError("Returned empty KHR EGL sync");
+    return abslx::InternalError("Returned empty KHR EGL sync");
   }
   *sync = EglSync(display, egl_sync);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 EglSync& EglSync::operator=(EglSync&& sync) {
@@ -90,29 +90,29 @@ void EglSync::Invalidate() {
   }
 }
 
-absl::Status EglSync::ServerWait() {
+abslx::Status EglSync::ServerWait() {
   RETURN_IF_ERROR(IsEglWaitSyncSupported(display_));
   static auto* egl_wait_sync_khr = reinterpret_cast<decltype(&eglWaitSyncKHR)>(
       eglGetProcAddress("eglWaitSyncKHR"));
   if (egl_wait_sync_khr == nullptr) {
     // Needs extension: EGL_KHR_wait_sync
-    return absl::InternalError("Not supported: eglWaitSyncKHR.");
+    return abslx::InternalError("Not supported: eglWaitSyncKHR.");
   }
   EGLint result;
   RETURN_IF_ERROR(
       TFLITE_GPU_CALL_EGL(*egl_wait_sync_khr, &result, display_, sync_, 0));
-  return result == EGL_TRUE ? absl::OkStatus()
-                            : absl::InternalError("eglWaitSync failed");
+  return result == EGL_TRUE ? abslx::OkStatus()
+                            : abslx::InternalError("eglWaitSync failed");
 }
 
-absl::Status EglSync::ClientWait() {
+abslx::Status EglSync::ClientWait() {
   RETURN_IF_ERROR(IsEglFenceSyncSupported(display_));
   static auto* egl_client_wait_sync_khr =
       reinterpret_cast<decltype(&eglClientWaitSyncKHR)>(
           eglGetProcAddress("eglClientWaitSyncKHR"));
   if (egl_client_wait_sync_khr == nullptr) {
     // Needs extension: EGL_KHR_fence_sync (EGL) / GL_OES_EGL_sync (OpenGL ES).
-    return absl::InternalError("Not supported: eglClientWaitSyncKHR.");
+    return abslx::InternalError("Not supported: eglClientWaitSyncKHR.");
   }
   EGLint result;
   // TODO(akulik): make it active wait for better performance
@@ -120,8 +120,8 @@ absl::Status EglSync::ClientWait() {
       TFLITE_GPU_CALL_EGL(*egl_client_wait_sync_khr, &result, display_, sync_,
                           EGL_SYNC_FLUSH_COMMANDS_BIT_KHR, EGL_FOREVER_KHR));
   return result == EGL_CONDITION_SATISFIED_KHR
-             ? absl::OkStatus()
-             : absl::InternalError("eglClientWaitSync failed");
+             ? abslx::OkStatus()
+             : abslx::InternalError("eglClientWaitSync failed");
 }
 
 }  // namespace cl

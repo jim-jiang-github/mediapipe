@@ -425,7 +425,7 @@ class FunctionLibraryRuntimeImpl : public FunctionLibraryRuntime {
       delete this->overlay_flr;
     }
   };
-  std::unique_ptr<absl::flat_hash_map<Handle, std::unique_ptr<Item>>> items_
+  std::unique_ptr<abslx::flat_hash_map<Handle, std::unique_ptr<Item>>> items_
       TF_GUARDED_BY(mu_);
   std::unique_ptr<FunctionHandleCache> function_handle_cache_;
   ProcessFunctionLibraryRuntime* parent_ = nullptr;  // not owned.
@@ -484,7 +484,7 @@ FunctionLibraryRuntimeImpl::FunctionLibraryRuntimeImpl(
                        : device_->name()),
       next_handle_(0),
       items_(std::make_unique<
-             absl::flat_hash_map<Handle, std::unique_ptr<Item>>>()),
+             abslx::flat_hash_map<Handle, std::unique_ptr<Item>>>()),
       function_handle_cache_(std::make_unique<FunctionHandleCache>(this)),
       parent_(parent) {
   get_func_sig_ = [this](const string& op, const OpDef** sig) {

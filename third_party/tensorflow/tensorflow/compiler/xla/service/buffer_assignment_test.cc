@@ -149,7 +149,7 @@ class BufferAssignmentTest : public HloTestBase {
   }
 
   std::unique_ptr<BufferAssignment> RunBufferAssignmentWithInstructionSequence(
-      HloModule* module, absl::Span<HloInstruction* const> instruction_sequence,
+      HloModule* module, abslx::Span<HloInstruction* const> instruction_sequence,
       int64_t alignment = 1) {
     HloSchedule schedule(module);
     schedule.set_sequence(module->entry_computation(), instruction_sequence);
@@ -336,7 +336,7 @@ class BufferAssignmentTest : public HloTestBase {
 static bool BuffersDistinct(const std::vector<const HloInstruction*>& a,
                             const std::vector<const HloInstruction*>& b,
                             const BufferAssignment& assignment) {
-  absl::flat_hash_set<BufferAllocation::Slice> a_slices;
+  abslx::flat_hash_set<BufferAllocation::Slice> a_slices;
   for (const HloInstruction* instruction : a) {
     if (assignment.HasTopLevelAllocation(instruction)) {
       a_slices.insert(assignment.GetUniqueTopLevelSlice(instruction).value());
@@ -599,7 +599,7 @@ TEST_F(BufferAssignmentTest, BasicUniquelyColored) {
   auto module = CreateNewVerifiedModule();
   module->AddEntryComputation(builder.Build());
 
-  absl::flat_hash_map<const HloInstruction*, int> color_map;
+  abslx::flat_hash_map<const HloInstruction*, int> color_map;
   auto colorer = [&](HloAliasAnalysis* alias_analysis, const HloOrdering&) {
     int color = 0;
     for (HloValue::Id id = 0;
@@ -2659,7 +2659,7 @@ ENTRY %main (a: f32[4096], b: f32[4096]) -> f32[4096] {
 }
 
 TEST_F(BufferAssignmentTest, BufferInfoStringTest) {
-  absl::string_view module_str = R"(
+  abslx::string_view module_str = R"(
 HloModule test_module
 
 ENTRY %test_module {
@@ -2670,7 +2670,7 @@ ENTRY %test_module {
   ROOT %bcast = s32[1024,1024]{1,0} broadcast(s32[1024] %add), dimensions={0}
 })";
 
-  absl::string_view reference_str =
+  abslx::string_view reference_str =
       R"(buffer_id,buffer_name,offset,size,definition_time,end_time,num_uses,use_times,use_names
 0,"<0 param.0 @0>",0,4096,0,5,2,"2;3","mul, operand 0;add, operand 1"
 1,"<1 param.1 @0>",0,4096,1,5,1,"2","mul, operand 1"

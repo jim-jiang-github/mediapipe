@@ -34,19 +34,19 @@
 #include "absl/base/port.h"
 #include "absl/base/thread_annotations.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 Time Now() {
   // TODO(bww): Get a timespec instead so we don't have to divide.
-  int64_t n = absl::GetCurrentTimeNanos();
+  int64_t n = abslx::GetCurrentTimeNanos();
   if (n >= 0) {
     return time_internal::FromUnixDuration(
         time_internal::MakeDuration(n / 1000000000, n % 1000000000 * 4));
   }
-  return time_internal::FromUnixDuration(absl::Nanoseconds(n));
+  return time_internal::FromUnixDuration(abslx::Nanoseconds(n));
 }
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 // Decide if we should use the fast GetCurrentTimeNanos() algorithm
 // based on the cyclecounter, otherwise just get the time directly
@@ -69,24 +69,24 @@ ABSL_NAMESPACE_END
 // Allows override by test.
 #ifndef GET_CURRENT_TIME_NANOS_FROM_SYSTEM
 #define GET_CURRENT_TIME_NANOS_FROM_SYSTEM() \
-  ::absl::time_internal::GetCurrentTimeNanosFromSystem()
+  ::abslx::time_internal::GetCurrentTimeNanosFromSystem()
 #endif
 
 #if !ABSL_USE_CYCLECLOCK_FOR_GET_CURRENT_TIME_NANOS
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 int64_t GetCurrentTimeNanos() { return GET_CURRENT_TIME_NANOS_FROM_SYSTEM(); }
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 #else  // Use the cyclecounter-based implementation below.
 
 // Allows override by test.
 #ifndef GET_CURRENT_TIME_NANOS_CYCLECLOCK_NOW
 #define GET_CURRENT_TIME_NANOS_CYCLECLOCK_NOW() \
-  ::absl::time_internal::UnscaledCycleClockWrapperForGetCurrentTime::Now()
+  ::abslx::time_internal::UnscaledCycleClockWrapperForGetCurrentTime::Now()
 #endif
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace time_internal {
 // This is a friend wrapper around UnscaledCycleClock::Now()
@@ -193,7 +193,7 @@ struct ABSL_CACHELINE_ALIGNED TimeState {
 
   // A reader-writer lock protecting the static locations below.
   // See SeqAcquire() and SeqRelease() above.
-  absl::base_internal::SpinLock lock{absl::kConstInit,
+  abslx::base_internal::SpinLock lock{abslx::kConstInit,
                                      base_internal::SCHEDULE_KERNEL_ONLY};
 };
 ABSL_CONST_INIT static TimeState time_state{};
@@ -536,31 +536,31 @@ static uint64_t UpdateLastSample(uint64_t now_cycles, uint64_t now_ns,
   return estimated_base_ns;
 }
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 #endif  // ABSL_USE_CYCLECLOCK_FOR_GET_CURRENT_TIME_NANOS
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace {
 
 // Returns the maximum duration that SleepOnce() can sleep for.
-constexpr absl::Duration MaxSleep() {
+constexpr abslx::Duration MaxSleep() {
 #ifdef _WIN32
   // Windows Sleep() takes unsigned long argument in milliseconds.
-  return absl::Milliseconds(
+  return abslx::Milliseconds(
       std::numeric_limits<unsigned long>::max());  // NOLINT(runtime/int)
 #else
-  return absl::Seconds(std::numeric_limits<time_t>::max());
+  return abslx::Seconds(std::numeric_limits<time_t>::max());
 #endif
 }
 
 // Sleeps for the given duration.
 // REQUIRES: to_sleep <= MaxSleep().
-void SleepOnce(absl::Duration to_sleep) {
+void SleepOnce(abslx::Duration to_sleep) {
 #ifdef _WIN32
-  Sleep(to_sleep / absl::Milliseconds(1));
+  Sleep(to_sleep / abslx::Milliseconds(1));
 #else
-  struct timespec sleep_time = absl::ToTimespec(to_sleep);
+  struct timespec sleep_time = abslx::ToTimespec(to_sleep);
   while (nanosleep(&sleep_time, &sleep_time) != 0 && errno == EINTR) {
     // Ignore signals and wait for the full interval to elapse.
   }
@@ -569,15 +569,15 @@ void SleepOnce(absl::Duration to_sleep) {
 
 }  // namespace
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 extern "C" {
 
 ABSL_ATTRIBUTE_WEAK void ABSL_INTERNAL_C_SYMBOL(AbslInternalSleepFor)(
-    absl::Duration duration) {
-  while (duration > absl::ZeroDuration()) {
-    absl::Duration to_sleep = std::min(duration, absl::MaxSleep());
-    absl::SleepOnce(to_sleep);
+    abslx::Duration duration) {
+  while (duration > abslx::ZeroDuration()) {
+    abslx::Duration to_sleep = std::min(duration, abslx::MaxSleep());
+    abslx::SleepOnce(to_sleep);
     duration -= to_sleep;
   }
 }

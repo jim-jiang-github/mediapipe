@@ -62,10 +62,10 @@ enum FileFormat {
 
 // Classify the contents of a file based on starting bytes (the magic number).
 FileFormat ClassifyFileFormat(StringPiece data) {
-  if (absl::StartsWith(data, kJpegMagicBytes)) return kJpgFormat;
-  if (absl::StartsWith(data, kPngMagicBytes)) return kPngFormat;
-  if (absl::StartsWith(data, kGifMagicBytes)) return kGifFormat;
-  if (absl::StartsWith(data, kBmpMagicBytes)) return kBmpFormat;
+  if (abslx::StartsWith(data, kJpegMagicBytes)) return kJpgFormat;
+  if (abslx::StartsWith(data, kPngMagicBytes)) return kPngFormat;
+  if (abslx::StartsWith(data, kGifMagicBytes)) return kGifFormat;
+  if (abslx::StartsWith(data, kBmpMagicBytes)) return kBmpFormat;
   return kUnknownFormat;
 }
 

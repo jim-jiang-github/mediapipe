@@ -120,7 +120,7 @@ class CPUAllocator : public Allocator {
     port::AlignedFree(ptr);
   }
 
-  void AddTraceMe(absl::string_view traceme_name, const void* chunk_ptr,
+  void AddTraceMe(abslx::string_view traceme_name, const void* chunk_ptr,
                   std::size_t req_bytes, std::size_t alloc_bytes) {
     tensorflow::profiler::TraceMe::InstantActivity(
         [this, traceme_name, chunk_ptr, req_bytes,
@@ -144,8 +144,8 @@ class CPUAllocator : public Allocator {
         /*level=*/profiler::TraceMeLevel::kInfo);
   }
 
-  absl::optional<AllocatorStats> GetStats() override {
-    if (!cpu_allocator_collect_stats) return absl::nullopt;
+  abslx::optional<AllocatorStats> GetStats() override {
+    if (!cpu_allocator_collect_stats) return abslx::nullopt;
     mutex_lock l(mu_);
     return stats_;
   }

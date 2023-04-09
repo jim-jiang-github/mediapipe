@@ -90,11 +90,11 @@ class MathUtil {
   //   -1 if x < 0,
   //   +1 if x > 0,
   //    0 if x = 0.
-  template <typename T, absl::enable_if_t<std::is_integral<T>::value, int> = 0>
+  template <typename T, abslx::enable_if_t<std::is_integral<T>::value, int> = 0>
   static T Sign(const T x) {
     return SignHelper<T>(x);
   }
-  template <typename T, absl::enable_if_t<!std::is_integral<T>::value, int> = 0>
+  template <typename T, abslx::enable_if_t<!std::is_integral<T>::value, int> = 0>
   static T Sign(const T x) {
     return std::isnan(x) ? x : SignHelper<T>(x);
   }

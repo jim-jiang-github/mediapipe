@@ -42,7 +42,7 @@ class ExtractionVisitor : public ConstDfsHloVisitorWithDefault {
  public:
   explicit ExtractionVisitor(
       const HloModule& old_module,
-      absl::flat_hash_set<const HloInstruction*>* boundary)
+      abslx::flat_hash_set<const HloInstruction*>* boundary)
       : old_module_(old_module),
         module_(std::make_unique<HloModule>("extracted", config_)),
         clone_context_(module_.get()),
@@ -105,14 +105,14 @@ class ExtractionVisitor : public ConstDfsHloVisitorWithDefault {
   std::unique_ptr<HloModule> module_;
   HloCloneContext clone_context_;
   HloComputation::Builder builder_;
-  absl::flat_hash_set<const HloInstruction*>* boundary_;
+  abslx::flat_hash_set<const HloInstruction*>* boundary_;
   int64_t parameter_number_ = 0;
 };
 
 void ComputeBoundary(const HloInstruction* root, int64_t limit,
-                     absl::flat_hash_set<const HloInstruction*>* boundary) {
+                     abslx::flat_hash_set<const HloInstruction*>* boundary) {
   std::deque<const HloInstruction*> worklist;
-  absl::flat_hash_map<const HloInstruction*, int64_t> visited;
+  abslx::flat_hash_map<const HloInstruction*, int64_t> visited;
   worklist.push_back(root);
   visited.emplace(root, 0);
   while (!worklist.empty()) {
@@ -137,7 +137,7 @@ void ComputeBoundary(const HloInstruction* root, int64_t limit,
 
 std::unique_ptr<HloModule> ExtractModule(HloInstruction* instruction,
                                          int64_t height) {
-  absl::flat_hash_set<const HloInstruction*> boundary;
+  abslx::flat_hash_set<const HloInstruction*> boundary;
   if (height != -1) {
     ComputeBoundary(instruction, height, &boundary);
   }

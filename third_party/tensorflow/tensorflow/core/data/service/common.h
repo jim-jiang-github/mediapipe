@@ -35,7 +35,7 @@ constexpr int kDataServiceVersion = 5;
 // If the user starts a colocated tf.data worker on each TF host, the worker
 // will be applied a "COLOCATED" tag. This is used to avoid reading from tf.data
 // workers on other TF hosts when the host runs a local tf.data service worker.
-constexpr absl::string_view kColocatedWorkerTag = "COLOCATED";
+constexpr abslx::string_view kColocatedWorkerTag = "COLOCATED";
 
 // Returns true if `processing_mode` specifies no sharding policy.
 bool IsNoShard(const ProcessingModeDef& processing_mode);
@@ -56,14 +56,14 @@ StatusOr<AutoShardPolicy> ToAutoShardPolicy(
 
 // Parses a string representing a `TargetWorkers` (case-insensitive).
 // Returns InvalidArgument if the string is not recognized.
-StatusOr<TargetWorkers> ParseTargetWorkers(absl::string_view s);
+StatusOr<TargetWorkers> ParseTargetWorkers(abslx::string_view s);
 
 // Converts a `TargetWorkers` enum to string.
 std::string TargetWorkersToString(TargetWorkers target_workers);
 
 // Parses a string representing a `DeploymentMode` (case-insensitive).
 // Returns InvalidArgument if the string is not recognized.
-StatusOr<DeploymentMode> ParseDeploymentMode(absl::string_view s);
+StatusOr<DeploymentMode> ParseDeploymentMode(abslx::string_view s);
 
 // Returns true if `status` is a retriable error that indicates preemption.
 bool IsPreemptedError(const Status& status);

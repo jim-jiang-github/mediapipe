@@ -46,8 +46,8 @@ using ::testing::IsEmpty;
 using ::testing::UnorderedElementsAre;
 using ::testing::proto::IgnoringRepeatedFieldOrdering;
 
-constexpr absl::Duration kHeartbeatTimeout = absl::Seconds(2);
-constexpr absl::Duration kShutdownBarrierTimeout = absl::Milliseconds(500);
+constexpr abslx::Duration kHeartbeatTimeout = abslx::Seconds(2);
+constexpr abslx::Duration kShutdownBarrierTimeout = abslx::Milliseconds(500);
 constexpr char kCoordinationServiceType[] = "standalone";
 
 KeyValueEntry CreateKv(const std::string& key, const std::string& value) {
@@ -152,7 +152,7 @@ class CoordinationBarrierTest : public ::testing::Test {
       task.set_task_id(i);
 
       auto client = std::make_unique<TestCoordinationClient>();
-      client_cache->AddTask(absl::StrCat("/job:worker/replica:0/task:", i),
+      client_cache->AddTask(abslx::StrCat("/job:worker/replica:0/task:", i),
                             client.get());
 
       tasks_.push_back(task);
@@ -210,13 +210,13 @@ class CoordinateTwoTasksTest : public ::testing::Test {
                             ->mutable_coordination_config();
     coord_config->set_service_type(kCoordinationServiceType);
     coord_config->set_heartbeat_timeout_in_ms(kHeartbeatTimeout /
-                                              absl::Milliseconds(1));
+                                              abslx::Milliseconds(1));
     if (set_worker_job_recoverable) {
       coord_config->mutable_recoverable_jobs()->Add("worker");
     }
     if (enable_shutdown_barrier) {
       coord_config->set_shutdown_barrier_timeout_in_ms(kShutdownBarrierTimeout /
-                                                       absl::Milliseconds(1));
+                                                       abslx::Milliseconds(1));
     }
     // Init service.
     coord_service_ = CoordinationServiceInterface::EnableCoordinationService(
@@ -234,14 +234,14 @@ class CoordinateTwoTasksTest : public ::testing::Test {
 };
 
 // Construct fake device protos.
-DeviceAttributes CreateTestTfDevice(absl::string_view name) {
+DeviceAttributes CreateTestTfDevice(abslx::string_view name) {
   DeviceAttributes device;
   device.set_name(name);
   device.set_device_type("CPU");
   return device;
 }
 
-xla::DeviceProto CreateTestXlaDevice(absl::string_view name,
+xla::DeviceProto CreateTestXlaDevice(abslx::string_view name,
                                      const int local_id) {
   xla::DeviceProto device;
   device.set_name(name);
@@ -257,7 +257,7 @@ TEST_F(CoordinateTwoTasksTest, TestStandaloneService) {
   task_2.set_task_id(2);
 
   TF_ASSERT_OK(coord_service_->RegisterTask(task_0_, incarnation_0_));
-  absl::Notification wait_for_all;
+  abslx::Notification wait_for_all;
   coord_service_->WaitForAllTasks(task_0_, {}, [&](Status s) {
     TF_ASSERT_OK(s);
     wait_for_all.Notify();
@@ -331,19 +331,19 @@ TEST(CoordinationServiceTest, TestCoordinatedJobs) {
           std::move(client_cache));
 
   // Each coordinated task registers and waits for other tasks.
-  absl::Notification register_chief;
+  abslx::Notification register_chief;
   TF_ASSERT_OK(coord_service->RegisterTask(chief, /*incarnation=*/0));
   coord_service->WaitForAllTasks(chief, {}, [&](Status s) {
     TF_ASSERT_OK(s);
     register_chief.Notify();
   });
-  absl::Notification register_task0;
+  abslx::Notification register_task0;
   TF_ASSERT_OK(coord_service->RegisterTask(task_0, /*incarnation=*/0));
   coord_service->WaitForAllTasks(task_0, {}, [&](Status s) {
     TF_ASSERT_OK(s);
     register_task0.Notify();
   });
-  absl::Notification register_task1;
+  abslx::Notification register_task1;
   TF_ASSERT_OK(coord_service->RegisterTask(task_1, /*incarnation=*/0));
   coord_service->WaitForAllTasks(task_1, {}, [&](Status s) {
     TF_ASSERT_OK(s);
@@ -411,7 +411,7 @@ TEST_F(CoordinateTwoTasksTest, TestTaskHeartbeatTimeout) {
 
   // No heartbeat for a while, leader considers the task as stale.
   Env::Default()->SleepForMicroseconds(
-      absl::ToInt64Microseconds(2 * kHeartbeatTimeout));
+      abslx::ToInt64Microseconds(2 * kHeartbeatTimeout));
   EXPECT_TRUE(errors::IsUnavailable(
       coord_service_->RecordHeartbeat(task_0_, incarnation_0_)));
   EXPECT_TRUE(errors::IsUnavailable(
@@ -427,7 +427,7 @@ TEST_F(CoordinateTwoTasksTest,
   // No heartbeat for a while, leader consider the task as stale.
   // Service stops and disconnects both tasks.
   Env::Default()->SleepForMicroseconds(
-      absl::ToInt64Microseconds(2 * kHeartbeatTimeout));
+      abslx::ToInt64Microseconds(2 * kHeartbeatTimeout));
   // Unexpected heartbeat from unregistered tasks since service state has been
   // reset.
   EXPECT_TRUE(errors::IsInvalidArgument(
@@ -465,7 +465,7 @@ TEST_F(CoordinateTwoTasksTest, TestSetGetValues) {
       coord_service_->InsertKeyValue("/path/to/key1/", "value2")));
 
   // Get simple key
-  absl::Notification n1;
+  abslx::Notification n1;
   StatusOr<std::string> ret;
   coord_service_->GetKeyValueAsync(
       "key0", [&](const StatusOr<std::string>& status_or_value) {
@@ -476,7 +476,7 @@ TEST_F(CoordinateTwoTasksTest, TestSetGetValues) {
   TF_ASSERT_OK(ret.status());
   EXPECT_EQ(ret.ValueOrDie(), "value0");
   // Get key with redundant slashes
-  absl::Notification n2;
+  abslx::Notification n2;
   coord_service_->GetKeyValueAsync(
       "path//to///key1////", [&](const StatusOr<std::string>& status_or_value) {
         ret = status_or_value;
@@ -488,7 +488,7 @@ TEST_F(CoordinateTwoTasksTest, TestSetGetValues) {
   // Delete single key-value
   TF_ASSERT_OK(coord_service_->DeleteKeyValue("key0"));
   // Get key that is not available
-  absl::Notification n3;
+  abslx::Notification n3;
   coord_service_->GetKeyValueAsync(
       "key0", [&](const StatusOr<std::string>& status_or_value) {
         ret = status_or_value;
@@ -503,7 +503,7 @@ TEST_F(CoordinateTwoTasksTest, TestSetGetValues) {
   // Delete key-values recursively
   TF_ASSERT_OK(coord_service_->DeleteKeyValue("/path"));
   // Get key that is not available
-  auto n4 = std::make_shared<absl::Notification>();
+  auto n4 = std::make_shared<abslx::Notification>();
   coord_service_->GetKeyValueAsync(
       "/path/to/key1",
       // Note: this callback will remain pending until it is cleaned up during
@@ -634,7 +634,7 @@ TEST(CoordinationServiceTest, ListClusterDevices_TfDevice) {
       CoordinationServiceInterface::EnableCoordinationService(
           kCoordinationServiceType, Env::Default(), server_def,
           std::move(client_cache));
-  absl::Notification n;
+  abslx::Notification n;
   // Map fake devices to each task.
   CoordinationServiceDeviceInfo local_devices_0;
   CoordinationServiceDeviceInfo local_devices_1;
@@ -692,7 +692,7 @@ TEST(CoordinationServiceTest, ListClusterDevices_XlaDevice) {
       CoordinationServiceInterface::EnableCoordinationService(
           kCoordinationServiceType, Env::Default(), server_def,
           std::move(client_cache));
-  absl::Notification n;
+  abslx::Notification n;
   // Map fake devices to each task.
   CoordinationServiceDeviceInfo local_devices_0;
   CoordinationServiceDeviceInfo local_devices_1;
@@ -756,7 +756,7 @@ TEST(CoordinationServiceTest, ListClusterDevices_DevicesAreNotAddedTwice) {
       CoordinationServiceInterface::EnableCoordinationService(
           kCoordinationServiceType, Env::Default(), server_def,
           std::move(client_cache));
-  absl::Notification n;
+  abslx::Notification n;
   // Map fake devices to each task.
   CoordinationServiceDeviceInfo local_devices_0;
   CoordinationServiceDeviceInfo local_devices_1;
@@ -798,13 +798,13 @@ TEST(CoordinationServiceTest, ListClusterDevices_DevicesAreNotAddedTwice) {
 
 TEST_F(CoordinationBarrierTest, Barrier) {
   const std::string barrier_id = "barrier_id";
-  absl::Duration timeout = absl::Seconds(5);
+  abslx::Duration timeout = abslx::Seconds(5);
   Status barrier_status_0;
   Status barrier_status_1;
   Status barrier_status_2;
-  absl::Notification n_0;
-  absl::Notification n_1;
-  absl::Notification n_2;
+  abslx::Notification n_0;
+  abslx::Notification n_1;
+  abslx::Notification n_2;
 
   GetCoordinationService()->BarrierAsync(barrier_id, timeout, GetTask(0),
                                          /*participating_tasks=*/{},
@@ -841,11 +841,11 @@ TEST_F(CoordinationBarrierTest, Barrier) {
 
 TEST_F(CoordinationBarrierTest, BarrierWithSubsetOfTasks) {
   const std::string barrier_id = "barrier_id";
-  absl::Duration timeout = absl::Seconds(5);
+  abslx::Duration timeout = abslx::Seconds(5);
   Status barrier_status_0;
   Status barrier_status_1;
-  absl::Notification n_0;
-  absl::Notification n_1;
+  abslx::Notification n_0;
+  abslx::Notification n_1;
 
   GetCoordinationService()->BarrierAsync(
       barrier_id, timeout, GetTask(0),
@@ -871,7 +871,7 @@ TEST_F(CoordinationBarrierTest, BarrierWithSubsetOfTasks) {
 
 TEST_F(CoordinationBarrierTest, BarrierWithMismatchedTasks) {
   const std::string barrier_id = "barrier_id";
-  absl::Duration timeout = absl::Seconds(5);
+  abslx::Duration timeout = abslx::Seconds(5);
   Status barrier_status_0;
   Status barrier_status_1;
 
@@ -892,11 +892,11 @@ TEST_F(CoordinationBarrierTest, BarrierWithMismatchedTasks) {
 
 TEST_F(CoordinationBarrierTest, BarrierByNonParticipatingTask) {
   const std::string barrier_id = "barrier_id";
-  absl::Duration timeout = absl::Seconds(5);
+  abslx::Duration timeout = abslx::Seconds(5);
   Status barrier_status_0;
   Status barrier_status_1;
-  absl::Notification n_0;
-  absl::Notification n_1;
+  abslx::Notification n_0;
+  abslx::Notification n_1;
 
   GetCoordinationService()->BarrierAsync(
       barrier_id, timeout, GetTask(0),
@@ -915,9 +915,9 @@ TEST_F(CoordinationBarrierTest, BarrierByNonParticipatingTask) {
 
 TEST_F(CoordinationBarrierTest, BarrierByNonClusterTask) {
   const std::string barrier_id = "barrier_id";
-  absl::Duration timeout = absl::Seconds(5);
+  abslx::Duration timeout = abslx::Seconds(5);
   Status barrier_status_0;
-  absl::Notification n_0;
+  abslx::Notification n_0;
   CoordinatedTask unspecified_task;
   unspecified_task.set_job_name("task_from_another_cluster");
   unspecified_task.set_task_id(2);
@@ -937,9 +937,9 @@ TEST_F(CoordinationBarrierTest, BarrierByNonClusterTask) {
 
 TEST_F(CoordinationBarrierTest, BarrierTimeout) {
   const std::string barrier_id = "barrier_id";
-  absl::Duration timeout = absl::Seconds(1);
+  abslx::Duration timeout = abslx::Seconds(1);
   Status barrier_status_0;
-  absl::Notification n_0;
+  abslx::Notification n_0;
 
   GetCoordinationService()->BarrierAsync(barrier_id, timeout, GetTask(0),
                                          /*participating_tasks=*/{},
@@ -955,10 +955,10 @@ TEST_F(CoordinationBarrierTest, BarrierTimeout) {
 
 TEST_F(CoordinationBarrierTest, BarrierReturnsPreviousError) {
   const std::string barrier_id = "barrier_id";
-  absl::Duration timeout = absl::Seconds(1);
+  abslx::Duration timeout = abslx::Seconds(1);
   Status barrier_status_0;
   Status barrier_status_1;
-  absl::Notification n_0;
+  abslx::Notification n_0;
 
   GetCoordinationService()->BarrierAsync(barrier_id, timeout, GetTask(0),
                                          /*participating_tasks=*/{},
@@ -982,7 +982,7 @@ TEST_F(CoordinationBarrierTest, BarrierReturnsPreviousError) {
 
 TEST_F(CoordinationBarrierTest, BarrierCancelled) {
   const std::string barrier_id = "barrier_id";
-  absl::Duration timeout = absl::Seconds(5);
+  abslx::Duration timeout = abslx::Seconds(5);
   Status barrier_status;
 
   GetCoordinationService()->BarrierAsync(
@@ -998,7 +998,7 @@ TEST_F(CoordinationBarrierTest, BarrierCancelled) {
 
 TEST_F(CoordinationBarrierTest, CancelNonExistentBarrier_FutureBarrierFails) {
   const std::string barrier_id = "cancelled_barrier_id";
-  absl::Duration timeout = absl::Seconds(1);
+  abslx::Duration timeout = abslx::Seconds(1);
   Status barrier_status;
 
   // Cancel barrier should still succeed.
@@ -1014,7 +1014,7 @@ TEST_F(CoordinationBarrierTest, CancelNonExistentBarrier_FutureBarrierFails) {
 
 TEST_F(CoordinationBarrierTest, CancelAfterBarrierHasPassed) {
   const std::string barrier_id = "barrier_id";
-  absl::Duration timeout = absl::Seconds(5);
+  abslx::Duration timeout = abslx::Seconds(5);
   Status barrier_status_0;
   Status barrier_status_1;
   Status barrier_status_2;
@@ -1043,15 +1043,15 @@ TEST_F(CoordinationBarrierTest, CancelAfterBarrierHasPassed) {
 
 TEST_F(CoordinationBarrierTest, PassedBarrierReturnsImmediately) {
   const std::string barrier_id = "barrier_id";
-  absl::Duration timeout = absl::Seconds(5);
+  abslx::Duration timeout = abslx::Seconds(5);
   Status barrier_status_0;
   Status barrier_status_1;
   Status barrier_status_2;
   Status barrier_status_repeat;
-  absl::Notification n0;
-  absl::Notification n1;
-  absl::Notification n2;
-  absl::Notification n_repeat;
+  abslx::Notification n0;
+  abslx::Notification n1;
+  abslx::Notification n2;
+  abslx::Notification n_repeat;
 
   GetCoordinationService()->BarrierAsync(barrier_id, timeout, GetTask(0),
                                          /*participating_tasks=*/{},
@@ -1092,7 +1092,7 @@ TEST_F(CoordinationBarrierTest, PassedBarrierReturnsImmediately) {
 
 TEST_F(CoordinationBarrierTest, BarrierFailsIfTaskIsAlreadyInError) {
   const std::string barrier_id = "barrier_id";
-  absl::Duration timeout = absl::Seconds(5);
+  abslx::Duration timeout = abslx::Seconds(5);
   // Set task 0 to error state.
   TF_ASSERT_OK(GetCoordinationService()->ReportTaskError(
       GetTask(0), errors::Internal("test_error")));
@@ -1108,8 +1108,8 @@ TEST_F(CoordinationBarrierTest, BarrierFailsIfTaskIsAlreadyInError) {
 
 TEST_F(CoordinationBarrierTest, BarrierFailsUponTaskError) {
   const std::string barrier_id = "barrier_id";
-  absl::Duration timeout = absl::Seconds(5);
-  absl::Notification n0;
+  abslx::Duration timeout = abslx::Seconds(5);
+  abslx::Notification n0;
   Status barrier_status;
 
   GetCoordinationService()->BarrierAsync(barrier_id, timeout, GetTask(0),
@@ -1128,13 +1128,13 @@ TEST_F(CoordinationBarrierTest, BarrierFailsUponTaskError) {
 TEST_F(CoordinationBarrierTest,
        BarrierStillBlocksIfSameTaskCallsOngoingBarrierRepeatedly) {
   const std::string barrier_id = "barrier_id";
-  absl::Duration timeout = absl::Seconds(5);
+  abslx::Duration timeout = abslx::Seconds(5);
   Status barrier_status_0;
   Status barrier_status_1;
   Status barrier_status_2;
-  absl::Notification n_0;
-  absl::Notification n_1;
-  absl::Notification n_2;
+  abslx::Notification n_0;
+  abslx::Notification n_1;
+  abslx::Notification n_2;
 
   GetCoordinationService()->BarrierAsync(
       barrier_id, timeout, GetTask(0),
@@ -1188,7 +1188,7 @@ TEST_F(CoordinateTwoTasksTest, Reset_HeartbeatsAreAcceptedForAGracePeriod) {
   // Heartbeat failure should be triggered for disconnected task after grace
   // period.
   Env::Default()->SleepForMicroseconds(
-      absl::ToInt64Microseconds(3 * kHeartbeatTimeout));
+      abslx::ToInt64Microseconds(3 * kHeartbeatTimeout));
   EXPECT_TRUE(errors::IsInvalidArgument(
       coord_service_->RecordHeartbeat(task_0_, incarnation_0_)));
 }
@@ -1198,9 +1198,9 @@ TEST_F(CoordinateTwoTasksTest, Reset_FailsOngoingBarrier) {
                             /*enable_shutdown_barrier=*/false);
   TF_EXPECT_OK(coord_service_->RegisterTask(task_0_, incarnation_0_));
   Status barrier_status;
-  absl::Notification barrier_n;
+  abslx::Notification barrier_n;
   coord_service_->BarrierAsync(
-      "ongoing_barrier", absl::InfiniteDuration(), task_0_,
+      "ongoing_barrier", abslx::InfiniteDuration(), task_0_,
       /*participating_tasks=*/{}, [&barrier_status, &barrier_n](Status s) {
         barrier_status = s;
         barrier_n.Notify();
@@ -1218,7 +1218,7 @@ TEST_F(CoordinateTwoTasksTest, Shutdown_HeartbeatsAreAcceptedForAGracePeriod) {
                             /*enable_shutdown_barrier=*/false);
   TF_EXPECT_OK(coord_service_->RegisterTask(task_0_, incarnation_0_));
 
-  absl::Notification n;
+  abslx::Notification n;
   coord_service_->ShutdownTaskAsync(task_0_, [&n](Status s) {
     TF_EXPECT_OK(s);
     n.Notify();
@@ -1231,7 +1231,7 @@ TEST_F(CoordinateTwoTasksTest, Shutdown_HeartbeatsAreAcceptedForAGracePeriod) {
   // Heartbeat failure should be triggered for disconnected task after grace
   // period.
   Env::Default()->SleepForMicroseconds(
-      absl::ToInt64Microseconds(3 * kHeartbeatTimeout));
+      abslx::ToInt64Microseconds(3 * kHeartbeatTimeout));
   EXPECT_TRUE(errors::IsInvalidArgument(
       coord_service_->RecordHeartbeat(task_0_, incarnation_0_)));
 }
@@ -1241,15 +1241,15 @@ TEST_F(CoordinateTwoTasksTest, Shutdown_FailsOngoingBarrier) {
                             /*enable_shutdown_barrier=*/false);
   TF_EXPECT_OK(coord_service_->RegisterTask(task_0_, incarnation_0_));
   Status barrier_status;
-  absl::Notification barrier_n;
+  abslx::Notification barrier_n;
   coord_service_->BarrierAsync(
-      "ongoing_barrier", absl::InfiniteDuration(), task_0_,
+      "ongoing_barrier", abslx::InfiniteDuration(), task_0_,
       /*participating_tasks=*/{}, [&barrier_status, &barrier_n](Status s) {
         barrier_status = s;
         barrier_n.Notify();
       });
 
-  absl::Notification shutdown_n;
+  abslx::Notification shutdown_n;
   coord_service_->ShutdownTaskAsync(task_0_, [&shutdown_n](Status s) {
     TF_EXPECT_OK(s);
     shutdown_n.Notify();
@@ -1292,7 +1292,7 @@ TEST_F(CoordinateTwoTasksTest,
   TF_EXPECT_OK(coord_service_->RegisterTask(task_1_, incarnation_1_));
   Status barrier_status;
 
-  absl::Notification n;
+  abslx::Notification n;
   coord_service_->ShutdownTaskAsync(task_0_, [&n, &barrier_status](Status s) {
     barrier_status = s;
     n.Notify();
@@ -1319,7 +1319,7 @@ TEST_F(CoordinateTwoTasksTest,
   TF_EXPECT_OK(coord_service_->RegisterTask(task_1_, incarnation_1_));
   Status barrier_status;
 
-  absl::Notification n;
+  abslx::Notification n;
   coord_service_->ShutdownTaskAsync(task_0_, [&n, &barrier_status](Status s) {
     barrier_status = s;
     n.Notify();
@@ -1328,7 +1328,7 @@ TEST_F(CoordinateTwoTasksTest,
   n.WaitForNotification();
   // Provide time for coordination service to shut down after barrier timeout.
   Env::Default()->SleepForMicroseconds(
-      absl::ToInt64Microseconds(absl::Seconds(1)));
+      abslx::ToInt64Microseconds(abslx::Seconds(1)));
 
   EXPECT_TRUE(errors::IsDeadlineExceeded(barrier_status)) << barrier_status;
 

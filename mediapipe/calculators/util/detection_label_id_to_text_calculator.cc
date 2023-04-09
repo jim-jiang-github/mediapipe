@@ -49,10 +49,10 @@ namespace mediapipe {
 // }
 class DetectionLabelIdToTextCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   // Local label map built from the calculator options' `label_map_path` or
@@ -63,15 +63,15 @@ class DetectionLabelIdToTextCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(DetectionLabelIdToTextCalculator);
 
-absl::Status DetectionLabelIdToTextCalculator::GetContract(
+abslx::Status DetectionLabelIdToTextCalculator::GetContract(
     CalculatorContract* cc) {
   cc->Inputs().Index(0).Set<std::vector<Detection>>();
   cc->Outputs().Index(0).Set<std::vector<Detection>>();
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status DetectionLabelIdToTextCalculator::Open(CalculatorContext* cc) {
+abslx::Status DetectionLabelIdToTextCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
   const auto& options = cc->Options<DetectionLabelIdToTextCalculatorOptions>();
@@ -108,10 +108,10 @@ absl::Status DetectionLabelIdToTextCalculator::Open(CalculatorContext* cc) {
     }
   }
   keep_label_id_ = options.keep_label_id();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status DetectionLabelIdToTextCalculator::Process(CalculatorContext* cc) {
+abslx::Status DetectionLabelIdToTextCalculator::Process(CalculatorContext* cc) {
   std::vector<Detection> output_detections;
   for (const auto& input_detection :
        cc->Inputs().Index(0).Get<std::vector<Detection>>()) {
@@ -136,7 +136,7 @@ absl::Status DetectionLabelIdToTextCalculator::Process(CalculatorContext* cc) {
   cc->Outputs().Index(0).AddPacket(
       MakePacket<std::vector<Detection>>(output_detections)
           .At(cc->InputTimestamp()));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 const proto_ns::Map<int64, LabelMapItem>&

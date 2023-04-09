@@ -38,7 +38,7 @@ class ModelAssetBundleResources {
   // ModelAssetBundleResources from the proto. A non-empty tag
   // must be set if the ModelAssetBundleResources will be used through
   // ModelResourcesCacheService.
-  static absl::StatusOr<std::unique_ptr<ModelAssetBundleResources>> Create(
+  static abslx::StatusOr<std::unique_ptr<ModelAssetBundleResources>> Create(
       const std::string& tag,
       std::unique_ptr<proto::ExternalFile> model_asset_bundle_file);
 
@@ -53,7 +53,7 @@ class ModelAssetBundleResources {
   // Gets the contents of the model file (either tflite model file or model
   // bundle file) with the provided name. An error is returned if there is no
   // such model file.
-  absl::StatusOr<absl::string_view> GetModelFile(
+  abslx::StatusOr<abslx::string_view> GetModelFile(
       const std::string& filename) const;
 
   // Lists all the model file names in the model asset model.
@@ -67,7 +67,7 @@ class ModelAssetBundleResources {
 
   // Extracts the model files (either tflite model file or model bundle file)
   // from the external file proto.
-  absl::Status ExtractModelFilesFromExternalFileProto();
+  abslx::Status ExtractModelFilesFromExternalFileProto();
 
   // The model asset bundle resources tag.
   const std::string tag_;
@@ -82,7 +82,7 @@ class ModelAssetBundleResources {
   // (corresponding to a basename, e.g. "hand_detector.tflite") as key and
   // a pointer to the file contents as value. Each model file can be either
   // a TFLite model file or a model bundle file for sub-task.
-  absl::flat_hash_map<std::string, absl::string_view> model_files_;
+  abslx::flat_hash_map<std::string, abslx::string_view> model_files_;
 };
 
 }  // namespace core

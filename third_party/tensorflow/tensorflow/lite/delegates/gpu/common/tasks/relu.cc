@@ -43,10 +43,10 @@ ElementwiseDescriptor CreateReLU(const ReLUAttributes& attr,
     } else {
       result.args.AddHalf("clip", half(attr.clip));
     }
-    result.code = absl::StrCat("out_value = clamp(in_value, " + min_func +
+    result.code = abslx::StrCat("out_value = clamp(in_value, " + min_func +
                                ", INIT_FLT4(args.clip));");
   } else {
-    result.code = absl::StrCat("out_value = max(in_value, ", min_func, ");");
+    result.code = abslx::StrCat("out_value = max(in_value, ", min_func, ");");
   }
   return result;
 }

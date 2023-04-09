@@ -64,7 +64,7 @@ class ObjectAccessor : public InlineRewrite {
         sampler_textures_(sampler_textures),
         variable_accessor_(variable_accessor) {}
 
-  RewriteStatus Rewrite(absl::string_view input, std::string* output) final;
+  RewriteStatus Rewrite(abslx::string_view input, std::string* output) final;
 
   // Return true if object was successfully added.
   bool AddObject(const std::string& name, Object object);
@@ -80,10 +80,10 @@ class ObjectAccessor : public InlineRewrite {
   std::vector<Object> GetObjects() const;
 
  private:
-  RewriteStatus RewriteRead(absl::string_view location, std::string* output);
+  RewriteStatus RewriteRead(abslx::string_view location, std::string* output);
 
-  RewriteStatus RewriteWrite(absl::string_view location,
-                             absl::string_view value, std::string* output);
+  RewriteStatus RewriteWrite(abslx::string_view location,
+                             abslx::string_view value, std::string* output);
 
   std::map<std::string, Object> name_to_object_;
 
@@ -98,12 +98,12 @@ namespace object_accessor_internal {
 
 // Refers to an element in an object.
 struct IndexedElement {
-  absl::string_view object_name;
-  std::vector<absl::string_view> indices;
+  abslx::string_view object_name;
+  std::vector<abslx::string_view> indices;
 };
 
 // Splits name[index1, index2...] into 'name' and {'index1', 'index2'...}.
-IndexedElement ParseElement(absl::string_view input);
+IndexedElement ParseElement(abslx::string_view input);
 
 }  // namespace object_accessor_internal
 }  // namespace gl

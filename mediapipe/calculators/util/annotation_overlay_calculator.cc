@@ -124,29 +124,29 @@ class AnnotationOverlayCalculator : public CalculatorBase {
   AnnotationOverlayCalculator() = default;
   ~AnnotationOverlayCalculator() override = default;
 
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
   // From Calculator.
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
-  absl::Status CreateRenderTargetCpu(CalculatorContext* cc,
+  abslx::Status CreateRenderTargetCpu(CalculatorContext* cc,
                                      std::unique_ptr<cv::Mat>& image_mat,
                                      ImageFormat::Format* target_format);
   template <typename Type, const char* Tag>
-  absl::Status CreateRenderTargetGpu(CalculatorContext* cc,
+  abslx::Status CreateRenderTargetGpu(CalculatorContext* cc,
                                      std::unique_ptr<cv::Mat>& image_mat);
   template <typename Type, const char* Tag>
-  absl::Status RenderToGpu(CalculatorContext* cc, uchar* overlay_image);
-  absl::Status RenderToCpu(CalculatorContext* cc,
+  abslx::Status RenderToGpu(CalculatorContext* cc, uchar* overlay_image);
+  abslx::Status RenderToCpu(CalculatorContext* cc,
                            const ImageFormat::Format& target_format,
                            uchar* data_image);
 
-  absl::Status GlRender(CalculatorContext* cc);
+  abslx::Status GlRender(CalculatorContext* cc);
   template <typename Type, const char* Tag>
-  absl::Status GlSetup(CalculatorContext* cc);
+  abslx::Status GlSetup(CalculatorContext* cc);
 
   // Options for the calculator.
   AnnotationOverlayCalculatorOptions options_;
@@ -171,18 +171,18 @@ class AnnotationOverlayCalculator : public CalculatorBase {
 };
 REGISTER_CALCULATOR(AnnotationOverlayCalculator);
 
-absl::Status AnnotationOverlayCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status AnnotationOverlayCalculator::GetContract(CalculatorContract* cc) {
   CHECK_GE(cc->Inputs().NumEntries(), 1);
 
   bool use_gpu = false;
 
   if (cc->Inputs().HasTag(kImageFrameTag) &&
       cc->Inputs().HasTag(kGpuBufferTag)) {
-    return absl::InternalError("Cannot have multiple input images.");
+    return abslx::InternalError("Cannot have multiple input images.");
   }
   if (cc->Inputs().HasTag(kGpuBufferTag) !=
       cc->Outputs().HasTag(kGpuBufferTag)) {
-    return absl::InternalError("GPU output must have GPU input.");
+    return abslx::InternalError("GPU output must have GPU input.");
   }
 
   // Input image to render onto copy of. Should be same type as output.
@@ -227,10 +227,10 @@ absl::Status AnnotationOverlayCalculator::GetContract(CalculatorContract* cc) {
 #endif  // !MEDIAPIPE_DISABLE_GPU
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AnnotationOverlayCalculator::Open(CalculatorContext* cc) {
+abslx::Status AnnotationOverlayCalculator::Open(CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
   options_ = cc->Options<AnnotationOverlayCalculatorOptions>();
@@ -249,7 +249,7 @@ absl::Status AnnotationOverlayCalculator::Open(CalculatorContext* cc) {
   }
 
   // Initialize the helper renderer library.
-  renderer_ = absl::make_unique<AnnotationRenderer>();
+  renderer_ = abslx::make_unique<AnnotationRenderer>();
   renderer_->SetFlipTextVertically(options_.flip_text_vertically());
   if (use_gpu_) renderer_->SetScaleFactor(options_.gpu_scale_factor());
 
@@ -268,17 +268,17 @@ absl::Status AnnotationOverlayCalculator::Open(CalculatorContext* cc) {
 #endif  // !MEDIAPIPE_DISABLE_GPU
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AnnotationOverlayCalculator::Process(CalculatorContext* cc) {
+abslx::Status AnnotationOverlayCalculator::Process(CalculatorContext* cc) {
   if (cc->Inputs().HasTag(kGpuBufferTag) &&
       cc->Inputs().Tag(kGpuBufferTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   if (cc->Inputs().HasTag(kImageFrameTag) &&
       cc->Inputs().Tag(kImageFrameTag).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Initialize render target, drawn with OpenCV.
@@ -288,7 +288,7 @@ absl::Status AnnotationOverlayCalculator::Process(CalculatorContext* cc) {
 #if !MEDIAPIPE_DISABLE_GPU
     if (!gpu_initialized_) {
       MP_RETURN_IF_ERROR(
-          gpu_helper_.RunInGlContext([this, cc]() -> absl::Status {
+          gpu_helper_.RunInGlContext([this, cc]() -> abslx::Status {
             return GlSetup<mediapipe::GpuBuffer, kGpuBufferTag>(cc);
           }));
       gpu_initialized_ = true;
@@ -338,7 +338,7 @@ absl::Status AnnotationOverlayCalculator::Process(CalculatorContext* cc) {
     // Overlay rendered image in OpenGL, onto a copy of input.
     uchar* image_mat_ptr = image_mat->data;
     MP_RETURN_IF_ERROR(
-        gpu_helper_.RunInGlContext([this, cc, image_mat_ptr]() -> absl::Status {
+        gpu_helper_.RunInGlContext([this, cc, image_mat_ptr]() -> abslx::Status {
           return RenderToGpu<mediapipe::GpuBuffer, kGpuBufferTag>(
               cc, image_mat_ptr);
         }));
@@ -349,10 +349,10 @@ absl::Status AnnotationOverlayCalculator::Process(CalculatorContext* cc) {
     MP_RETURN_IF_ERROR(RenderToCpu(cc, target_format, image_mat_ptr));
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AnnotationOverlayCalculator::Close(CalculatorContext* cc) {
+abslx::Status AnnotationOverlayCalculator::Close(CalculatorContext* cc) {
 #if !MEDIAPIPE_DISABLE_GPU
   gpu_helper_.RunInGlContext([this] {
     if (program_) glDeleteProgram(program_);
@@ -362,13 +362,13 @@ absl::Status AnnotationOverlayCalculator::Close(CalculatorContext* cc) {
   });
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AnnotationOverlayCalculator::RenderToCpu(
+abslx::Status AnnotationOverlayCalculator::RenderToCpu(
     CalculatorContext* cc, const ImageFormat::Format& target_format,
     uchar* data_image) {
-  auto output_frame = absl::make_unique<ImageFrame>(
+  auto output_frame = abslx::make_unique<ImageFrame>(
       target_format, renderer_->GetImageWidth(), renderer_->GetImageHeight());
 
 #if !MEDIAPIPE_DISABLE_GPU
@@ -387,11 +387,11 @@ absl::Status AnnotationOverlayCalculator::RenderToCpu(
         .Add(output_frame.release(), cc->InputTimestamp());
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <typename Type, const char* Tag>
-absl::Status AnnotationOverlayCalculator::RenderToGpu(CalculatorContext* cc,
+abslx::Status AnnotationOverlayCalculator::RenderToGpu(CalculatorContext* cc,
                                                       uchar* overlay_image) {
 #if !MEDIAPIPE_DISABLE_GPU
   // Source and destination textures.
@@ -436,10 +436,10 @@ absl::Status AnnotationOverlayCalculator::RenderToGpu(CalculatorContext* cc,
   output_texture.Release();
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AnnotationOverlayCalculator::CreateRenderTargetCpu(
+abslx::Status AnnotationOverlayCalculator::CreateRenderTargetCpu(
     CalculatorContext* cc, std::unique_ptr<cv::Mat>& image_mat,
     ImageFormat::Format* target_format) {
   if (image_frame_available_) {
@@ -461,11 +461,11 @@ absl::Status AnnotationOverlayCalculator::CreateRenderTargetCpu(
         target_mat_type = CV_8UC3;
         break;
       default:
-        return absl::UnknownError("Unexpected image frame format.");
+        return abslx::UnknownError("Unexpected image frame format.");
         break;
     }
 
-    image_mat = absl::make_unique<cv::Mat>(
+    image_mat = abslx::make_unique<cv::Mat>(
         input_frame.Height(), input_frame.Width(), target_mat_type);
 
     auto input_mat = formats::MatView(&input_frame);
@@ -477,18 +477,18 @@ absl::Status AnnotationOverlayCalculator::CreateRenderTargetCpu(
       input_mat.copyTo(*image_mat);
     }
   } else {
-    image_mat = absl::make_unique<cv::Mat>(
+    image_mat = abslx::make_unique<cv::Mat>(
         options_.canvas_height_px(), options_.canvas_width_px(), CV_8UC3,
         cv::Scalar(options_.canvas_color().r(), options_.canvas_color().g(),
                    options_.canvas_color().b()));
     *target_format = ImageFormat::SRGB;
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <typename Type, const char* Tag>
-absl::Status AnnotationOverlayCalculator::CreateRenderTargetGpu(
+abslx::Status AnnotationOverlayCalculator::CreateRenderTargetGpu(
     CalculatorContext* cc, std::unique_ptr<cv::Mat>& image_mat) {
 #if !MEDIAPIPE_DISABLE_GPU
   if (image_frame_available_) {
@@ -499,21 +499,21 @@ absl::Status AnnotationOverlayCalculator::CreateRenderTargetGpu(
         format != mediapipe::ImageFormat::SRGB)
       RET_CHECK_FAIL() << "Unsupported GPU input format: " << format;
     image_mat =
-        absl::make_unique<cv::Mat>(height_canvas_, width_canvas_, CV_8UC3);
+        abslx::make_unique<cv::Mat>(height_canvas_, width_canvas_, CV_8UC3);
     memset(image_mat->data, kAnnotationBackgroundColor,
            height_canvas_ * width_canvas_ * image_mat->elemSize());
   } else {
-    image_mat = absl::make_unique<cv::Mat>(
+    image_mat = abslx::make_unique<cv::Mat>(
         height_canvas_, width_canvas_, CV_8UC3,
         cv::Scalar(options_.canvas_color().r(), options_.canvas_color().g(),
                    options_.canvas_color().b()));
   }
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AnnotationOverlayCalculator::GlRender(CalculatorContext* cc) {
+abslx::Status AnnotationOverlayCalculator::GlRender(CalculatorContext* cc) {
 #if !MEDIAPIPE_DISABLE_GPU
   static const GLfloat square_vertices[] = {
       -1.0f, -1.0f,  // bottom left
@@ -564,11 +564,11 @@ absl::Status AnnotationOverlayCalculator::GlRender(CalculatorContext* cc) {
   glDeleteBuffers(2, vbo);
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <typename Type, const char* Tag>
-absl::Status AnnotationOverlayCalculator::GlSetup(CalculatorContext* cc) {
+abslx::Status AnnotationOverlayCalculator::GlSetup(CalculatorContext* cc) {
 #if !MEDIAPIPE_DISABLE_GPU
   const GLint attr_location[NUM_ATTRIBUTES] = {
       ATTRIB_VERTEX,
@@ -622,7 +622,7 @@ absl::Status AnnotationOverlayCalculator::GlSetup(CalculatorContext* cc) {
     )";
   }
 
-  const std::string frag_src = absl::StrCat(
+  const std::string frag_src = abslx::StrCat(
       mediapipe::kMediaPipeFragmentShaderPreamble, defines, kFragSrcBody);
 
   // Create shader program and set parameters
@@ -668,7 +668,7 @@ absl::Status AnnotationOverlayCalculator::GlSetup(CalculatorContext* cc) {
   }
 #endif  // !MEDIAPIPE_DISABLE_GPU
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

@@ -32,7 +32,7 @@ namespace mediapipe {
 // calculation of rectangle or rotation for given detection. Does not include
 // static calculator options which are available via private fields.
 struct DetectionSpec {
-  absl::optional<std::pair<int, int>> image_size;
+  abslx::optional<std::pair<int, int>> image_size;
 };
 
 // A calculator that converts Detection proto to Rect proto.
@@ -83,19 +83,19 @@ struct DetectionSpec {
 // }
 class DetectionsToRectsCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  protected:
-  virtual absl::Status DetectionToRect(const ::mediapipe::Detection& detection,
+  virtual abslx::Status DetectionToRect(const ::mediapipe::Detection& detection,
                                        const DetectionSpec& detection_spec,
                                        ::mediapipe::Rect* rect);
-  virtual absl::Status DetectionToNormalizedRect(
+  virtual abslx::Status DetectionToNormalizedRect(
       const ::mediapipe::Detection& detection,
       const DetectionSpec& detection_spec, ::mediapipe::NormalizedRect* rect);
-  virtual absl::Status ComputeRotation(const ::mediapipe::Detection& detection,
+  virtual abslx::Status ComputeRotation(const ::mediapipe::Detection& detection,
                                        const DetectionSpec& detection_spec,
                                        float* rotation);
   virtual DetectionSpec GetDetectionSpec(const CalculatorContext* cc);

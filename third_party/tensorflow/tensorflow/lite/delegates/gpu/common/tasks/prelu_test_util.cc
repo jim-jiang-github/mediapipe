@@ -26,7 +26,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status PReLUAlphaTest(TestExecutionEnvironment* env) {
+abslx::Status PReLUAlphaTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {0.0f, -1.0f, -2.0f, 3.0f};
@@ -54,10 +54,10 @@ absl::Status PReLUAlphaTest(TestExecutionEnvironment* env) {
           PointWiseNear({0.0f, 2.0f, -1.0f, 3.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status PReLUHWCAlphaTest(TestExecutionEnvironment* env) {
+abslx::Status PReLUHWCAlphaTest(TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = BHWC(1, 2, 1, 2);
   src_tensor.data = {0.0f, -1.0f, -2.0f, 3.0f};
@@ -85,7 +85,7 @@ absl::Status PReLUHWCAlphaTest(TestExecutionEnvironment* env) {
           PointWiseNear({0.0f, 2.0f, -1.4f, 3.0f}, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

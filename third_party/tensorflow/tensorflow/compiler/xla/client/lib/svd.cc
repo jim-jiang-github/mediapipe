@@ -267,13 +267,13 @@ StatusOr<SVDResult> HouseHolderBidiagonalization(
   XlaOp v_init = Broadcast(
       IdentityMatrix(builder, a_shape.element_type(), n, n), batch_dims);
 
-  auto while_cond_fn = [&](absl::Span<const XlaOp> values,
+  auto while_cond_fn = [&](abslx::Span<const XlaOp> values,
                            XlaBuilder* cond_builder) -> StatusOr<XlaOp> {
     auto i = values[0];
     return Lt(i, ScalarLike(i, n - 2));
   };
   auto while_body_fn =
-      [&](absl::Span<const XlaOp> values,
+      [&](abslx::Span<const XlaOp> values,
           XlaBuilder* body_builder) -> StatusOr<std::vector<XlaOp>> {
     auto i = values[0];
     auto one = ScalarLike(i, 1);
@@ -601,12 +601,12 @@ StatusOr<XlaOp> ComputeToleranceComparison(XlaOp w, XlaOp epsilon) {
 
 // Main boby of One-sided Jacobi Method.
 StatusOr<std::vector<XlaOp>> WhileLoopFn(
-    absl::Span<const XlaOp> initial_values,  //
+    abslx::Span<const XlaOp> initial_values,  //
     int matrix_dimension,                    //
     int max_sweep_updates,                   //
-    absl::string_view name,                  //
+    abslx::string_view name,                  //
     XlaBuilder* builder) {
-  auto while_cond_fn = [&](absl::Span<const XlaOp> values,
+  auto while_cond_fn = [&](abslx::Span<const XlaOp> values,
                            XlaBuilder* cond_builder) -> StatusOr<XlaOp> {
     auto k = values[0];
     auto max_sweeps = ScalarLike(k, max_sweep_updates);
@@ -622,26 +622,26 @@ StatusOr<std::vector<XlaOp>> WhileLoopFn(
   };
 
   auto while_body_fn =
-      [&](absl::Span<const XlaOp> values,
+      [&](abslx::Span<const XlaOp> values,
           XlaBuilder* body_builder) -> StatusOr<std::vector<XlaOp>> {
     auto while_cond_fn_inner =
-        [&](absl::Span<const XlaOp> values_inner,
+        [&](abslx::Span<const XlaOp> values_inner,
             XlaBuilder* inner_cond_builder) -> StatusOr<XlaOp> {
       auto p = values_inner[0];
       return Lt(p, ScalarLike(p, matrix_dimension - 1));
     };
 
     auto while_body_fn_inner =
-        [&](absl::Span<const XlaOp> values_inner,
+        [&](abslx::Span<const XlaOp> values_inner,
             XlaBuilder* inner_body_builder) -> StatusOr<std::vector<XlaOp>> {
       auto while_cond_fn_innermost =
-          [&](absl::Span<const XlaOp> values_innermost,
+          [&](abslx::Span<const XlaOp> values_innermost,
               XlaBuilder* innermost_cond_builder) -> StatusOr<XlaOp> {
         auto q = values_innermost[1];
         return Lt(q, ScalarLike(q, matrix_dimension));
       };
       auto while_body_fn_innermost =
-          [&](absl::Span<const XlaOp> values_innermost,
+          [&](abslx::Span<const XlaOp> values_innermost,
               XlaBuilder* innermost_body_builder)
           -> StatusOr<std::vector<XlaOp>> {
         auto p = values_innermost[0];
@@ -683,7 +683,7 @@ StatusOr<std::vector<XlaOp>> WhileLoopFn(
       TF_ASSIGN_OR_RETURN(
           values_innermost,
           WhileLoopHelper(while_cond_fn_innermost, while_body_fn_innermost,
-                          values_innermost, absl::StrCat(name, "-Innermost"),
+                          values_innermost, abslx::StrCat(name, "-Innermost"),
                           inner_body_builder));
 
       std::vector<XlaOp> updated_values_inner;
@@ -708,7 +708,7 @@ StatusOr<std::vector<XlaOp>> WhileLoopFn(
     TF_ASSIGN_OR_RETURN(
         values_inner,
         WhileLoopHelper(while_cond_fn_inner, while_body_fn_inner, values_inner,
-                        absl::StrCat(name, "-Inner"), body_builder));
+                        abslx::StrCat(name, "-Inner"), body_builder));
 
     std::vector<XlaOp> updated_values;
     updated_values.reserve(values_inner.size());

@@ -64,7 +64,7 @@ class ModelResourcesCalculator : public api2::Node {
   MEDIAPIPE_NODE_INTERFACE(ModelResourcesCalculator, kModel, kOpResolver,
                            kMetadataExtractor);
 
-  static absl::Status UpdateContract(mediapipe::CalculatorContract* cc) {
+  static abslx::Status UpdateContract(mediapipe::CalculatorContract* cc) {
     const auto& options = cc->Options<proto::ModelResourcesCalculatorOptions>();
     RET_CHECK(options.has_model_resources_tag() || options.has_model_file())
         << "ModelResourcesCalculatorOptions must specify at least one of "
@@ -81,10 +81,10 @@ class ModelResourcesCalculator : public api2::Node {
           << "'model_file' must specify at least one of "
              "'file_content', 'file_descriptor_meta', or 'file_name'";
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     const auto& options = cc->Options<proto::ModelResourcesCalculatorOptions>();
     const ModelResources* model_resources = nullptr;
     if (cc->Service(kModelResourcesCacheService).IsAvailable()) {
@@ -102,7 +102,7 @@ class ModelResourcesCalculator : public api2::Node {
     // CalculatorOptions as a fallback.
     if (model_resources == nullptr) {
       if (!options.has_model_file()) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "ModelResources is not available through the MediaPipe "
             "ModelResourcesCacheService, and the CalculatorOptions has no "
             "'model_file' field to create a local ModelResources.");
@@ -116,11 +116,11 @@ class ModelResourcesCalculator : public api2::Node {
     kModel(cc).Set(model_resources->GetModelPacket());
     kOpResolver(cc).Set(model_resources->GetOpResolverPacket());
     kMetadataExtractor(cc).Set(model_resources->GetMetadataExtractorPacket());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
-    return absl::OkStatus();
+  abslx::Status Process(CalculatorContext* cc) override {
+    return abslx::OkStatus();
   }
 
  private:

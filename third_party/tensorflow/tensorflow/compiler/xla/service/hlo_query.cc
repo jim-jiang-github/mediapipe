@@ -112,7 +112,7 @@ bool IsScalarConstant(const HloInstruction* instruction) {
 }
 
 bool ContainsInstrWithOpcode(const HloComputation* comp,
-                             const absl::flat_hash_set<HloOpcode>& opcodes) {
+                             const abslx::flat_hash_set<HloOpcode>& opcodes) {
   for (const auto* instr : comp->instructions()) {
     if (opcodes.count(instr->opcode())) {
       return true;

@@ -68,7 +68,7 @@ void RunPassAndCompare(const GraphDef& original,
   RunPass(original, &rewritten);
 
   std::vector<string> errors;
-  errors.push_back(absl::StrCat("Graphs did not match.\n  Rewritten graph:\n",
+  errors.push_back(abslx::StrCat("Graphs did not match.\n  Rewritten graph:\n",
                                 SummarizeGraphDef(rewritten)));
   for (const GraphDef& alternative : expected_alternatives) {
     string diff;
@@ -76,10 +76,10 @@ void RunPassAndCompare(const GraphDef& original,
     if (graphs_equal) {
       return;
     }
-    errors.push_back(absl::StrCat("  Expected alternative:\n",
+    errors.push_back(abslx::StrCat("  Expected alternative:\n",
                                   SummarizeGraphDef(alternative)));
   }
-  EXPECT_TRUE(false) << absl::StrJoin(errors, "\n");
+  EXPECT_TRUE(false) << abslx::StrJoin(errors, "\n");
 }
 
 TEST(IsolatePlacerInspectionRequiredOpsPassTest, Basic) {

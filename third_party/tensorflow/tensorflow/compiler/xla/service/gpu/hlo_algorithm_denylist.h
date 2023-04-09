@@ -24,7 +24,7 @@ limitations under the License.
 namespace xla {
 namespace gpu {
 
-absl::Span<const stream_executor::dnn::AlgorithmDesc> GetDisabledConvAlgorithms(
+abslx::Span<const stream_executor::dnn::AlgorithmDesc> GetDisabledConvAlgorithms(
     tensorflow::ComputeCapability cc, tensorflow::CudnnVersion cudnn_version,
     const std::string& blas_version, const std::string& hlo);
 

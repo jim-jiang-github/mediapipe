@@ -103,18 +103,18 @@ class TensorMap {
   string DebugString() const { return "TensorMap"; }
 
   // Access to the underlying tensor container.
-  absl::flat_hash_map<TensorKey, Tensor>& tensors() {
+  abslx::flat_hash_map<TensorKey, Tensor>& tensors() {
     return tensors_->values_;
   }
 
-  const absl::flat_hash_map<TensorKey, Tensor>& tensors() const {
+  const abslx::flat_hash_map<TensorKey, Tensor>& tensors() const {
     return tensors_->values_;
   }
 
   // Get a new TensorMap containing a copy of the underlying tensor container.
   TensorMap Copy() const {
     TensorMap out;
-    // This performs a copy of the absl::hashmap.
+    // This performs a copy of the abslx::hashmap.
     out.tensors_->values_ = tensors_->values_;
     return out;
   }
@@ -127,7 +127,7 @@ class TensorMap {
   }
 
   // Lookup given key. Returns iterator to found key or end.
-  absl::flat_hash_map<TensorKey, Tensor>::iterator find(TensorKey key) {
+  abslx::flat_hash_map<TensorKey, Tensor>::iterator find(TensorKey key) {
     return tensors_->values_.find(key);
   }
 
@@ -149,7 +149,7 @@ class TensorMap {
   std::vector<Tensor> keys() const {
     std::vector<Tensor> keys;
     keys.reserve(tensors_->values_.size());
-    absl::flat_hash_map<TensorKey, Tensor>::iterator it =
+    abslx::flat_hash_map<TensorKey, Tensor>::iterator it =
         tensors_->values_.begin();
     while (it != tensors_->values_.end()) {
       keys.push_back(it->first);
@@ -165,7 +165,7 @@ class TensorMap {
  private:
   class Tensors : public core::RefCounted {
    public:
-    absl::flat_hash_map<TensorKey, Tensor> values_;
+    abslx::flat_hash_map<TensorKey, Tensor> values_;
   };
   Tensors* tensors_;
 };

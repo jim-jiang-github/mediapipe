@@ -59,7 +59,7 @@ class LayoutAssignmentTest : public HloTestBase {
     EXPECT_IS_OK(layout_assignment.Run(m).status());
   }
 
-  std::vector<int64_t> LayoutOf(HloModule* m, absl::string_view name) {
+  std::vector<int64_t> LayoutOf(HloModule* m, abslx::string_view name) {
     HloInstruction* instr = FindInstruction(m, name);
     CHECK(instr != nullptr) << name;
     auto minor_to_major = instr->shape().layout().minor_to_major();
@@ -67,7 +67,7 @@ class LayoutAssignmentTest : public HloTestBase {
   }
 
   void ExpectLayoutIs(const Shape& shape,
-                      absl::Span<const int64_t> minor_to_major) {
+                      abslx::Span<const int64_t> minor_to_major) {
     const Layout expected = LayoutUtil::MakeLayout(minor_to_major);
     EXPECT_TRUE(LayoutUtil::Equal(shape.layout(), expected))
         << "Expected layout " << expected << ", actual " << shape.layout();
@@ -75,9 +75,9 @@ class LayoutAssignmentTest : public HloTestBase {
 
   void ExpectTupleLayoutIs(
       const Shape& shape,
-      std::initializer_list<absl::Span<const int64_t>> minor_to_majors) {
+      std::initializer_list<abslx::Span<const int64_t>> minor_to_majors) {
     int i = 0;
-    for (const absl::Span<const int64_t> minor_to_major : minor_to_majors) {
+    for (const abslx::Span<const int64_t> minor_to_major : minor_to_majors) {
       const Layout expected = LayoutUtil::MakeLayout(minor_to_major);
       const Layout& actual = ShapeUtil::GetTupleElementShape(shape, i).layout();
       EXPECT_TRUE(LayoutUtil::Equal(actual, expected))

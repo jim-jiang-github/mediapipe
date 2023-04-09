@@ -50,7 +50,7 @@ class FlatMapDatasetParams : public DatasetParams {
     input_names->emplace_back(FlatMapDatasetOp::kInputDataset);
     for (int i = 0; i < other_arguments_.size(); ++i) {
       input_names->emplace_back(
-          absl::StrCat(FlatMapDatasetOp::kOtherArguments, "_", i));
+          abslx::StrCat(FlatMapDatasetOp::kOtherArguments, "_", i));
     }
     return OkStatus();
   }

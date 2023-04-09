@@ -80,7 +80,7 @@ class KernelFallbackCompatRequestState {
       tfrt_stub::OpKernelRunnerTable* runner_table,
       FallbackResourceArray* resource_array,
       tensorflow::thread::ThreadPoolInterface* user_intra_op_threadpool,
-      const absl::optional<SessionMetadata>& model_metadata,
+      const abslx::optional<SessionMetadata>& model_metadata,
       const tensorflow::ProcessFunctionLibraryRuntime* pflr);
 
   // NOTE: This is the constructor for inference.
@@ -90,7 +90,7 @@ class KernelFallbackCompatRequestState {
       tfrt_stub::OpKernelRunnerTable* runner_table,
       FallbackResourceArray* resource_array,
       tensorflow::thread::ThreadPoolInterface* user_intra_op_threadpool,
-      const absl::optional<SessionMetadata>& model_metadata,
+      const abslx::optional<SessionMetadata>& model_metadata,
       const tensorflow::ProcessFunctionLibraryRuntime* pflr);
 
   // Returns the user-specified custom device corresponding to the given device.
@@ -141,7 +141,7 @@ class KernelFallbackCompatRequestState {
   // Below are resources needed by current tensorflow.
   std::function<void(std::function<void()>)>* runner_ = nullptr;
   ::tfrt::OwnedOrUnownedPtr<ScopedStepContainer> step_container_;
-  absl::flat_hash_map<const tensorflow::Device*,
+  abslx::flat_hash_map<const tensorflow::Device*,
                       std::unique_ptr<tensorflow::Device>>
       custom_device_;
   std::unique_ptr<CollectiveExecutor::Handle> collective_executor_handle_;

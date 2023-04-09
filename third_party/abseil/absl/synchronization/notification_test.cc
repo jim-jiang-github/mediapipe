@@ -20,7 +20,7 @@
 #include "gtest/gtest.h"
 #include "absl/synchronization/mutex.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // A thread-safe class that holds a counter.
@@ -69,17 +69,17 @@ static void RunWorker(int i, ThreadSafeCounter* ready_counter,
 static void BasicTests(bool notify_before_waiting, Notification* notification) {
   EXPECT_FALSE(notification->HasBeenNotified());
   EXPECT_FALSE(
-      notification->WaitForNotificationWithTimeout(absl::Milliseconds(0)));
-  EXPECT_FALSE(notification->WaitForNotificationWithDeadline(absl::Now()));
+      notification->WaitForNotificationWithTimeout(abslx::Milliseconds(0)));
+  EXPECT_FALSE(notification->WaitForNotificationWithDeadline(abslx::Now()));
 
-  const absl::Duration delay = absl::Milliseconds(50);
-  const absl::Time start = absl::Now();
+  const abslx::Duration delay = abslx::Milliseconds(50);
+  const abslx::Time start = abslx::Now();
   EXPECT_FALSE(notification->WaitForNotificationWithTimeout(delay));
-  const absl::Duration elapsed = absl::Now() - start;
+  const abslx::Duration elapsed = abslx::Now() - start;
 
   // Allow for a slight early return, to account for quality of implementation
   // issues on various platforms.
-  const absl::Duration slop = absl::Microseconds(200);
+  const abslx::Duration slop = abslx::Microseconds(200);
   EXPECT_LE(delay - slop, elapsed)
       << "WaitForNotificationWithTimeout returned " << delay - elapsed
       << " early (with " << slop << " slop), start time was " << start;
@@ -114,8 +114,8 @@ static void BasicTests(bool notify_before_waiting, Notification* notification) {
   // fully incremented.
   notification->WaitForNotification();  // should exit immediately
   EXPECT_TRUE(notification->HasBeenNotified());
-  EXPECT_TRUE(notification->WaitForNotificationWithTimeout(absl::Seconds(0)));
-  EXPECT_TRUE(notification->WaitForNotificationWithDeadline(absl::Now()));
+  EXPECT_TRUE(notification->WaitForNotificationWithTimeout(abslx::Seconds(0)));
+  EXPECT_TRUE(notification->WaitForNotificationWithDeadline(abslx::Now()));
   for (std::thread& worker : workers) {
     worker.join();
   }
@@ -130,4 +130,4 @@ TEST(NotificationTest, SanityTest) {
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

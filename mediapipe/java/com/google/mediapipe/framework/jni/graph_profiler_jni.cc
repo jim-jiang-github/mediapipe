@@ -48,7 +48,7 @@ JNIEXPORT jobjectArray JNICALL GRAPH_PROFILER_METHOD(
 
   std::vector<mediapipe::CalculatorProfile> profiles_vec;
   if (profiling_context->GetCalculatorProfiles(&profiles_vec) !=
-      absl::OkStatus()) {
+      abslx::OkStatus()) {
     return nullptr;
   }
   int num_profiles = profiles_vec.size();

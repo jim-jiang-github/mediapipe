@@ -64,7 +64,7 @@ class ReduceShapeInferenceTest : public ShapeInferenceTest {
   // element type here is hard-coded to F32.
   void ExpectInferredReduceShape(
       const Shape& expected_inferred_shape, const Shape& arg,
-      absl::Span<const int64_t> dimensions_to_reduce) {
+      abslx::Span<const int64_t> dimensions_to_reduce) {
     ProgramShape to_apply = ShapeUtil::MakeProgramShape({f32_, f32_}, f32_);
     auto inferred_status = ShapeInference::InferReduceShape(
         {&arg, &f32_}, dimensions_to_reduce, to_apply);
@@ -266,7 +266,7 @@ TEST_F(ShapeInferenceTest, ClampBadShapes) {
 
 TEST_F(ShapeInferenceTest, Complex) {
   auto complex_shape = [&](const Shape& lhs, const Shape& rhs,
-                           absl::Span<const int64_t> bcast) {
+                           abslx::Span<const int64_t> bcast) {
     return ShapeInference::InferBinaryOpShape(HloOpcode::kComplex, lhs, rhs,
                                               bcast);
   };
@@ -831,7 +831,7 @@ static const char* innermost_dimension_matches =
     "innermost dimension matches fft_length/2+1";
 
 static void Pass(const Shape& shape, FftType type,
-                 absl::Span<const int64_t> length,
+                 abslx::Span<const int64_t> length,
                  const Shape& expected_shape) {
   auto inferred_status = ShapeInference::InferFftShape(shape, type, length);
   ASSERT_IS_OK(inferred_status.status());
@@ -840,7 +840,7 @@ static void Pass(const Shape& shape, FftType type,
 }
 
 static void Fail(const Shape& shape, FftType type,
-                 absl::Span<const int64_t> length, absl::string_view message) {
+                 abslx::Span<const int64_t> length, abslx::string_view message) {
   auto inferred_status = ShapeInference::InferFftShape(shape, type, length);
   ASSERT_FALSE(inferred_status.ok());
   ASSERT_THAT(inferred_status.status().error_message(),
@@ -1151,7 +1151,7 @@ TEST_F(ReduceShapeInferenceTest, ReduceWindowMultiOutput) {
       ShapeInference::InferWindowFromDimensions(
           window_dimensions, window_strides, padding_values, {}, {}));
   auto inferred_status = ShapeInference::InferReduceWindowShape(
-      absl::MakeSpan(args), absl::MakeSpan(inits), window, to_apply);
+      abslx::MakeSpan(args), abslx::MakeSpan(inits), window, to_apply);
   VLOG(2) << inferred_status.ValueOrDie().ToString() << "\n";
   EXPECT_IS_OK(inferred_status.status());
   EXPECT_TRUE(ShapeUtil::Equal(
@@ -1213,7 +1213,7 @@ TEST_F(ReduceShapeInferenceTest, ErrorBadReduceWindowInput) {
       ShapeInference::InferWindowFromDimensions(
           window_dimensions, window_strides, padding_values, {}, {}));
   auto inferred_status = ShapeInference::InferReduceWindowShape(
-      absl::MakeSpan(args), absl::MakeSpan(inits), window, to_apply);
+      abslx::MakeSpan(args), abslx::MakeSpan(inits), window, to_apply);
   EXPECT_FALSE(inferred_status.status().ok());
   EXPECT_THAT(inferred_status.status().error_message(),
               HasSubstr("f32[] vs s32[]"));
@@ -2968,10 +2968,10 @@ class ScatterShapeInferenceTest
     std::vector<Shape> shapes;
     std::vector<const Shape*> ptrs;
   };
-  static ScatterShapes CreateShapes(absl::Span<const int64_t> operand_dims,
+  static ScatterShapes CreateShapes(abslx::Span<const int64_t> operand_dims,
                                     const Shape& scatter_indices_shape,
-                                    absl::Span<const int64_t> update_dims,
-                                    absl::Span<const PrimitiveType> types) {
+                                    abslx::Span<const int64_t> update_dims,
+                                    abslx::Span<const PrimitiveType> types) {
     CHECK(!types.empty());
     size_t size = types.size() * 2 + 1;
     ScatterShapes shapes;
@@ -2986,8 +2986,8 @@ class ScatterShapeInferenceTest
     }
     return shapes;
   }
-  static Shape Collate(absl::Span<const int64_t> dims,
-                       absl::Span<const PrimitiveType> types) {
+  static Shape Collate(abslx::Span<const int64_t> dims,
+                       abslx::Span<const PrimitiveType> types) {
     CHECK(!types.empty());
     if (types.size() == 1) {
       return ShapeUtil::MakeShape(types[0], dims);
@@ -3002,10 +3002,10 @@ class ScatterShapeInferenceTest
     return ShapeUtil::MakeShape(type, {});
   }
   static Shape s64_vector(int dim) { return ShapeUtil::MakeShape(S64, {dim}); }
-  static Shape s64_tensor(absl::Span<const int64_t> dims) {
+  static Shape s64_tensor(abslx::Span<const int64_t> dims) {
     return ShapeUtil::MakeShape(S64, dims);
   }
-  static ProgramShape to_apply(absl::Span<const PrimitiveType> types) {
+  static ProgramShape to_apply(abslx::Span<const PrimitiveType> types) {
     CHECK(!types.empty());
     ProgramShape program_shape;
     Shape& result = *program_shape.mutable_result();
@@ -3454,7 +3454,7 @@ TEST_P(ScatterShapeInferenceTest, InvalidUpdateComputation) {
           /*index_vector_dim=*/4));
   ASSERT_FALSE(statusor.ok());
   EXPECT_THAT(statusor.status().error_message(),
-              HasSubstr(absl::Substitute(
+              HasSubstr(abslx::Substitute(
                   "Reduction function must take $0 parameters, but takes 1",
                   2 * types().size())))
       << statusor.status();
@@ -3643,7 +3643,7 @@ TEST_P(ScatterShapeInferenceTest,
 struct ScatterTestName {
   std::string operator()(
       const ::testing::TestParamInfo<std::vector<PrimitiveType>>& info) const {
-    return absl::StrJoin(info.param, "_", absl::StreamFormatter());
+    return abslx::StrJoin(info.param, "_", abslx::StreamFormatter());
   }
 };
 

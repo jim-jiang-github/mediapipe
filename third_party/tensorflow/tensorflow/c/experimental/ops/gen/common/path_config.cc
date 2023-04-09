@@ -42,7 +42,7 @@ PathConfig::PathConfig(const string& output_dir, const string& source_dir,
                                      source_path_components.end(), tf_root_dir);
   if (source_tfroot_pos != source_path_components.end()) {
     tf_prefix_dir =
-        absl::StrJoin(source_path_components.begin(), source_tfroot_pos, "/");
+        abslx::StrJoin(source_path_components.begin(), source_tfroot_pos, "/");
   } else {
     tf_prefix_dir = source_dir;
   }
@@ -54,7 +54,7 @@ PathConfig::PathConfig(const string& output_dir, const string& source_dir,
                                      output_path_components.end(), tf_root_dir);
   if (output_tfroot_pos != output_path_components.end()) {
     tf_output_dir =
-        absl::StrJoin(output_tfroot_pos + 1, output_path_components.end(), "/");
+        abslx::StrJoin(output_tfroot_pos + 1, output_path_components.end(), "/");
   } else {
     tf_output_dir = output_dir;
   }

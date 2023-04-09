@@ -203,7 +203,7 @@ TEST_F(MinimumMemoryForSequenceTest, SubcomputationAccounting) {
   auto size_fn = [](const BufferValue& buffer) {
     return ShapeUtil::ByteSizeOf(buffer.shape());
   };
-  absl::flat_hash_map<const HloComputation*, int64_t> memory_by_computation;
+  abslx::flat_hash_map<const HloComputation*, int64_t> memory_by_computation;
   memory_by_computation[cond_computation] = 5;
   memory_by_computation[body_computation] = 16;
 
@@ -306,7 +306,7 @@ class HeapSimulatorTracker {
 
     // Construct the module sequence grouped by computation.
     HloSchedule schedule(module_.get());
-    absl::flat_hash_map<const HloInstruction*, int> reverse_position;
+    abslx::flat_hash_map<const HloInstruction*, int> reverse_position;
     for (int i = 0; i < full_module_sequence.size(); ++i) {
       HloInstruction* instruction = full_module_sequence[i];
       schedule.GetOrCreateSequence(instruction->parent())
@@ -348,10 +348,10 @@ class HeapSimulatorTracker {
       std::string output;
       for (int64_t i = 0; i < sequence.size(); ++i) {
         auto pair = sequence.at(i);
-        absl::StrAppendFormat(&output, "%d", i);
-        absl::StrAppendFormat(&output, " :%s", pair.first);
+        abslx::StrAppendFormat(&output, "%d", i);
+        abslx::StrAppendFormat(&output, " :%s", pair.first);
         if (pair.second != nullptr) {
-          absl::StrAppendFormat(&output, " - %s{%s}\n",
+          abslx::StrAppendFormat(&output, " - %s{%s}\n",
                                 pair.second->instruction()->name(),
                                 pair.second->index().ToString());
         }

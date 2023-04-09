@@ -60,7 +60,7 @@ namespace tflite {
 namespace gpu {
 namespace {
 
-absl::Status GetFullyConnectedAttributes(int weights_tensor_id,
+abslx::Status GetFullyConnectedAttributes(int weights_tensor_id,
                                          int bias_tensor_id,
                                          ObjectReader* reader,
                                          FullyConnectedAttributes* attr) {
@@ -73,31 +73,31 @@ absl::Status GetFullyConnectedAttributes(int weights_tensor_id,
   attr->weights.shape.o = weights.shape.h;
   attr->weights.shape.i = weights.shape.w;
   reader->ReadTensor(bias_tensor_id, &attr->bias).IgnoreError();  // optional
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <typename ParamsT>
-absl::Status RetrieveBuiltinData(const TfLiteNode* tflite_node,
+abslx::Status RetrieveBuiltinData(const TfLiteNode* tflite_node,
                                  const ParamsT** tf_options) {
   *tf_options = static_cast<const ParamsT*>(tflite_node->builtin_data);
   if (!*tf_options) {
-    return absl::InternalError("Unable to retrieve builtin_data.");
+    return abslx::InternalError("Unable to retrieve builtin_data.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <typename ParamsT>
-absl::Status RetrieveCustomInitialData(const TfLiteNode* tflite_node,
+abslx::Status RetrieveCustomInitialData(const TfLiteNode* tflite_node,
                                        const ParamsT** tf_options) {
   *tf_options = static_cast<const ParamsT*>(tflite_node->custom_initial_data);
   if (!*tf_options) {
-    return absl::InternalError("Unable to retrieve custom_initial_data.");
+    return abslx::InternalError("Unable to retrieve custom_initial_data.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Creates a simple node that holds tensor value.
-absl::Status NewConstNode(TensorFloat32 t, GraphFloat32* graph, Value** value) {
+abslx::Status NewConstNode(TensorFloat32 t, GraphFloat32* graph, Value** value) {
   ConstTensorAttributes attr;
   attr.tensor = std::move(t);
   Node* node = graph->NewNode();
@@ -109,28 +109,28 @@ absl::Status NewConstNode(TensorFloat32 t, GraphFloat32* graph, Value** value) {
   (*value)->tensor.ref = attr.tensor.id;
   (*value)->tensor.type = attr.tensor.kType;
   (*value)->tensor.shape = attr.tensor.shape;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ParseInputsWithConstTensor(Node* node, ObjectReader* reader,
+abslx::Status ParseInputsWithConstTensor(Node* node, ObjectReader* reader,
                                         TensorOrScalar* tensor_or_scalar) {
   const std::string& opname = node->operation.type;
 
   // Determine runtime/constant tensors.
   const TfLiteTensor* input0 = reader->GetInputTensor(0);
   if (!input0) {
-    return absl::InvalidArgumentError("Couldn't get the 1st input tensor for " +
+    return abslx::InvalidArgumentError("Couldn't get the 1st input tensor for " +
                                       opname);
   }
   const TfLiteTensor* input1 = reader->GetInputTensor(1);
   if (!input1) {
-    return absl::InvalidArgumentError("Couldn't get the 2nd input tensor for " +
+    return abslx::InvalidArgumentError("Couldn't get the 2nd input tensor for " +
                                       opname);
   }
   const bool constant_tensor0 = IsConstantTensor(input0);
   const bool constant_tensor1 = IsConstantTensor(input1);
   if (constant_tensor0 && constant_tensor1) {
-    return absl::InvalidArgumentError("No runtime input tensors for " + opname);
+    return abslx::InvalidArgumentError("No runtime input tensors for " + opname);
   }
   const bool runtime_tensor0 = !constant_tensor0;
   const bool runtime_tensor1 = !constant_tensor1;
@@ -172,10 +172,10 @@ absl::Status ParseInputsWithConstTensor(Node* node, ObjectReader* reader,
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status MaybeFuseActivationForElementwiseNode(
+abslx::Status MaybeFuseActivationForElementwiseNode(
     OperationType operation_type, const TfLiteNode* tflite_node,
     GraphFloat32* graph, Node* node) {
   TfLiteFusedActivation activation = kTfLiteActNone;
@@ -216,7 +216,7 @@ absl::Status MaybeFuseActivationForElementwiseNode(
   if (activation) {
     return MaybeFuseActivation(activation, graph, node);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 struct TensorInfo {
@@ -224,12 +224,12 @@ struct TensorInfo {
   std::vector<std::pair<TfLiteNode*, TfLiteRegistration*>> consumers;
 };
 
-absl::Status GetTensorInfo(const TfLiteContext* context, int tensor_id,
+abslx::Status GetTensorInfo(const TfLiteContext* context, int tensor_id,
                            TensorInfo* result) {
   TfLiteIntArray* execution_plan = nullptr;
   if (context->GetExecutionPlan(const_cast<TfLiteContext*>(context),
                                 &execution_plan) != kTfLiteOk) {
-    return absl::UnavailableError("Unable to get graph execution plan.");
+    return abslx::UnavailableError("Unable to get graph execution plan.");
   }
   for (int i = 0; i < execution_plan->size; ++i) {
     const int node_index = execution_plan->data[i];
@@ -238,7 +238,7 @@ absl::Status GetTensorInfo(const TfLiteContext* context, int tensor_id,
     if (context->GetNodeAndRegistration(const_cast<TfLiteContext*>(context),
                                         node_index, &node,
                                         &registration) != kTfLiteOk) {
-      return absl::UnavailableError(
+      return abslx::UnavailableError(
           "Unable to get node and registration for node.");
     }
     for (int j = 0; j < node->inputs->size; ++j) {
@@ -252,7 +252,7 @@ absl::Status GetTensorInfo(const TfLiteContext* context, int tensor_id,
       }
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 bool IsLogicalCode(int32_t builtin_code) {
@@ -275,13 +275,13 @@ bool IsLogicalOp(tflite::gpu::OperationType op_type) {
 
 class BatchedMatMulOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     if (reader->GetNumberOfRuntimeInputs() == 2) {
@@ -290,13 +290,13 @@ class BatchedMatMulOperationParser : public TFLiteOperationParser {
       RETURN_IF_ERROR(reader->AddInput(node, 0));
       RETURN_IF_ERROR(reader->AddInput(node, 1));
       RETURN_IF_ERROR(reader->AddOutputs(node));
-      return absl::OkStatus();
+      return abslx::OkStatus();
     } else if (reader->GetNumberOfRuntimeInputs() == 1) {
       // Second input is constant, replace with Convolution2D
       const TfLiteTensor* second_input = reader->GetInputTensor(1);
       if (!IsConstantTensor(second_input) || second_input->dims->size != 2) {
         // first input must be runtime and second is 2d constant tensor
-        return absl::UnavailableError("Not supported batched mat mul case");
+        return abslx::UnavailableError("Not supported batched mat mul case");
       }
       Node* node = graph->NewNode();
       node->operation.type = ToString(OperationType::CONVOLUTION_2D);
@@ -323,17 +323,17 @@ class BatchedMatMulOperationParser : public TFLiteOperationParser {
       attr.padding.appended = HW(0, 0);
       attr.padding.prepended = HW(0, 0);
       node->operation.attributes = std::move(attr);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     } else {
-      return absl::UnavailableError("Not supported batched mat mul case");
+      return abslx::UnavailableError("Not supported batched mat mul case");
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class CastOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     TfLiteType src_type = context->tensors[tflite_node->inputs->data[0]].type;
@@ -347,31 +347,31 @@ class CastOperationParser : public TFLiteOperationParser {
                                     &input_tensor_info));
       if (input_tensor_info.producers.size() != 1 ||
           input_tensor_info.consumers.size() != 1) {
-        return absl::UnavailableError("Not supported cast case");
+        return abslx::UnavailableError("Not supported cast case");
       }
       // If the cast is an output, do the cast to float on CPU.
       TensorInfo output_tensor_info;
       RETURN_IF_ERROR(GetTensorInfo(context, tflite_node->outputs->data[0],
                                     &output_tensor_info));
       if (output_tensor_info.consumers.size() != 1) {
-        return absl::UnavailableError(
+        return abslx::UnavailableError(
             "Cast from bool not supported for outputs");
       }
       if (IsLogicalCode(input_tensor_info.producers[0].second->builtin_code)) {
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
     }
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
     node->operation.type = ToString(OperationType::CAST);
     RETURN_IF_ERROR(reader->AddInput(node, 0));
     RETURN_IF_ERROR(reader->AddOutputs(node));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
@@ -379,13 +379,13 @@ class ClampOperationsParser : public TFLiteOperationParser {
  public:
   explicit ClampOperationsParser(float clamp_a, float clamp_b)
       : clamp_a_(clamp_a), clamp_b_(clamp_b) {}
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     // clamp(v, a, b) = clamp(v - a, 0.0, b - a) + a;
@@ -431,7 +431,7 @@ class ClampOperationsParser : public TFLiteOperationParser {
     RETURN_IF_ERROR(graph->AddConsumer(node_add->id, v1->id));
 
     RETURN_IF_ERROR(reader->AddOutputs(node_add));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -440,7 +440,7 @@ class ClampOperationsParser : public TFLiteOperationParser {
 
 class ConcatenationOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 2));
@@ -453,7 +453,7 @@ class ConcatenationOperationParser : public TFLiteOperationParser {
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     ConcatAttributes attr;
@@ -523,11 +523,11 @@ class ConcatenationOperationParser : public TFLiteOperationParser {
     RETURN_IF_ERROR(RetrieveBuiltinData(tflite_node, &tf_options));
     RETURN_IF_ERROR(MaybeFuseActivation(tf_options->activation, graph, node));
     node->operation.attributes = attr;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
-  absl::Status SetAxis(const std::vector<BHWC>& input_shapes, Axis* axis) {
+  abslx::Status SetAxis(const std::vector<BHWC>& input_shapes, Axis* axis) {
     *axis = Axis::BATCH;
     for (int i = 1; i < input_shapes.size(); i++) {
       if (input_shapes[0].h != input_shapes[i].h &&
@@ -537,7 +537,7 @@ class ConcatenationOperationParser : public TFLiteOperationParser {
         break;
       }
     }
-    if (*axis == Axis::BATCH) return absl::OkStatus();
+    if (*axis == Axis::BATCH) return abslx::OkStatus();
     for (int i = 1; i < input_shapes.size(); i++) {
       if (input_shapes[0].b != input_shapes[i].b &&
           input_shapes[0].w != input_shapes[i].w &&
@@ -546,7 +546,7 @@ class ConcatenationOperationParser : public TFLiteOperationParser {
         break;
       }
     }
-    if (*axis == Axis::HEIGHT) return absl::OkStatus();
+    if (*axis == Axis::HEIGHT) return abslx::OkStatus();
     for (int i = 1; i < input_shapes.size(); i++) {
       if (input_shapes[0].b != input_shapes[i].b &&
           input_shapes[0].h != input_shapes[i].h &&
@@ -555,30 +555,30 @@ class ConcatenationOperationParser : public TFLiteOperationParser {
         break;
       }
     }
-    if (*axis == Axis::WIDTH) return absl::OkStatus();
+    if (*axis == Axis::WIDTH) return abslx::OkStatus();
     for (int i = 1; i < input_shapes.size(); i++) {
       if (input_shapes[0].b != input_shapes[i].b &&
           input_shapes[0].w != input_shapes[i].w &&
           input_shapes[0].h != input_shapes[i].h) {
-        return absl::UnimplementedError(
+        return abslx::UnimplementedError(
             "Can concatenate tensors only by batch, height, width, or "
             "channels.");
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class Conv2DOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 6));
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     const TfLiteConvParams* tf_options;
@@ -595,7 +595,7 @@ class Conv2DOperationParser : public TFLiteOperationParser {
       RETURN_IF_ERROR(ExtractTensorShape(*src_tensor, &src_shape));
       RETURN_IF_ERROR(ExtractTensorShape(*weights_tensor, &weights_shape));
       if (src_shape.c != weights_shape.c) {
-        return absl::InternalError(
+        return abslx::InternalError(
             "No support of CONVOLUTION_2D with runtime grouped weights.");
       }
 
@@ -606,7 +606,7 @@ class Conv2DOperationParser : public TFLiteOperationParser {
       RETURN_IF_ERROR(reader->AddInput(node, 1));
       RETURN_IF_ERROR(reader->AddOutputs(node));
       RETURN_IF_ERROR(MaybeFuseActivation(tf_options->activation, graph, node));
-      return absl::OkStatus();
+      return abslx::OkStatus();
     } else {
       // weights are constants
       const int src_group_size = attr.weights.shape.i;
@@ -624,13 +624,13 @@ class Conv2DOperationParser : public TFLiteOperationParser {
         RETURN_IF_ERROR(reader->AddOutputs(node));
         RETURN_IF_ERROR(
             MaybeFuseActivation(tf_options->activation, graph, node));
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
     }
   }
 
  private:
-  absl::Status ReadAttributes(const TfLiteNode* tflite_node,
+  abslx::Status ReadAttributes(const TfLiteNode* tflite_node,
                               const TfLiteConvParams* tf_options,
                               ObjectReader* reader,
                               Convolution2DAttributes* attr) {
@@ -644,7 +644,7 @@ class Conv2DOperationParser : public TFLiteOperationParser {
     } else {
       const TfLiteTensor* weights_tensor = reader->GetInputTensor(1);
       if (!weights_tensor) {
-        return absl::InternalError("Expected second runtime tensor.");
+        return abslx::InternalError("Expected second runtime tensor.");
       }
       BHWC weights_shape;
       RETURN_IF_ERROR(ExtractTensorShape(*weights_tensor, &weights_shape));
@@ -657,14 +657,14 @@ class Conv2DOperationParser : public TFLiteOperationParser {
     attr->dilations = HW(tf_options->dilation_height_factor,
                          tf_options->dilation_width_factor);
     UpdatePadding(tf_options->padding, src_shape, attr);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Replace single grouped convolution(N = groups count) with this sequence:
   //  split input to N tensors in channels dim
   //  N usual convs
   //  concat N tensors to 1 output in channels dim
-  absl::Status ResolveGroupedConvolution(const Convolution2DAttributes& attr,
+  abslx::Status ResolveGroupedConvolution(const Convolution2DAttributes& attr,
                                          const TfLiteConvParams* tf_options,
                                          ObjectReader* reader,
                                          GraphFloat32* graph) {
@@ -759,20 +759,20 @@ class Conv2DOperationParser : public TFLiteOperationParser {
     RETURN_IF_ERROR(reader->AddOutputs(concat_node));
     RETURN_IF_ERROR(
         MaybeFuseActivation(tf_options->activation, graph, concat_node));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class CumsumOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 1));
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -789,28 +789,28 @@ class CumsumOperationParser : public TFLiteOperationParser {
     node->operation.attributes = std::move(attr);
     RETURN_IF_ERROR(reader->AddInput(node, 0));
     RETURN_IF_ERROR(reader->AddOutputs(node));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 // Doesn't have a kernel implementation.
 class DensifyOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 1));
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
     node->operation.type = ToString(OperationType::DENSIFY);
     const TfLiteTensor* const_tensor = reader->GetInputTensor(0);
     if (!const_tensor->sparsity) {
-      return absl::InvalidArgumentError("Input tensor must be sparse.");
+      return abslx::InvalidArgumentError("Input tensor must be sparse.");
     }
     TensorFloat32 sparse_tensor;
     RETURN_IF_ERROR(reader->ReadTensor(0, &sparse_tensor));
@@ -823,14 +823,14 @@ class DensifyOperationParser : public TFLiteOperationParser {
 
 class DepthwiseConvolutionOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 6));
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -865,7 +865,7 @@ class DepthwiseConvolutionOperationParser : public TFLiteOperationParser {
       TransposeWeights(input, filter, output, depth_multiplier, &attr);
     }
     node->operation.attributes = std::move(attr);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -901,13 +901,13 @@ class DepthwiseConvolutionOperationParser : public TFLiteOperationParser {
 
 class DepthToSpaceOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -919,20 +919,20 @@ class DepthToSpaceOperationParser : public TFLiteOperationParser {
     SpaceToDepthAttributes attr;
     attr.block_size = tf_options->block_size;
     node->operation.attributes = attr;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class DequantizeOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 3));
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     // 'Dequantize' is rewritten as QuantizeAndDequantize since we are dealing
@@ -960,9 +960,9 @@ class DequantizeOperationParser : public TFLiteOperationParser {
         // DEQUANTIZE op is preceded by DENSIFY op and doesn't have any
         // quantization params. The DEQUANTIZE op latter will be removed from
         // the graph in `MergeDensify` graph transformation.
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Encountered Dequantize input with no quant params");
     }
     QuantizeAndDequantizeAttributes attr;
@@ -971,7 +971,7 @@ class DequantizeOperationParser : public TFLiteOperationParser {
     attr.scale = input_value->quant_params.value().scale;
 
     node->operation.attributes = attr;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
@@ -980,7 +980,7 @@ class ElementwiseOperationParser : public TFLiteOperationParser {
   explicit ElementwiseOperationParser(OperationType operation_type)
       : operation_type_(operation_type) {}
 
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     const int kMaxSupportedOpVersion =
@@ -993,22 +993,22 @@ class ElementwiseOperationParser : public TFLiteOperationParser {
                                     &output_tensor_info));
       if (output_tensor_info.producers.size() != 1 ||
           output_tensor_info.consumers.size() != 1) {
-        return absl::UnavailableError("Not supported logical op case");
+        return abslx::UnavailableError("Not supported logical op case");
       }
       const auto& next_node = output_tensor_info.consumers[0];
       TfLiteType dst_type =
           context->tensors[next_node.first->outputs->data[0]].type;
       if (next_node.second->builtin_code == kTfLiteBuiltinCast &&
           (dst_type == kTfLiteFloat16 || dst_type == kTfLiteFloat32)) {
-        return absl::OkStatus();
+        return abslx::OkStatus();
       } else {
-        return absl::UnimplementedError("Not supported logical op case.");
+        return abslx::UnimplementedError("Not supported logical op case.");
       }
     }
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -1033,7 +1033,7 @@ class ElementwiseOperationParser : public TFLiteOperationParser {
                                                /*outputs=*/1)
                    .ok()) {
       if (tflite_node->inputs->size != 2) {
-        return absl::InvalidArgumentError("Applies only two input tensors");
+        return abslx::InvalidArgumentError("Applies only two input tensors");
       }
       const TfLiteTensor* input0 = reader->GetInputTensor(0);
       const TfLiteTensor* input1 = reader->GetInputTensor(1);
@@ -1052,7 +1052,7 @@ class ElementwiseOperationParser : public TFLiteOperationParser {
           node->operation.attributes = std::move(attr);
           RETURN_IF_ERROR(reader->AddInput(node, 0));
         } else {
-          return absl::UnimplementedError(
+          return abslx::UnimplementedError(
               "No support of few identical inputs in the same operation.");
         }
       } else {
@@ -1087,7 +1087,7 @@ class ElementwiseOperationParser : public TFLiteOperationParser {
           IsConstantTensor(reader->GetInputTensor(0));
       node->operation.attributes = std::move(attr);
     } else {
-      return absl::InvalidArgumentError("Incorrect operation type passed");
+      return abslx::InvalidArgumentError("Incorrect operation type passed");
     }
 
     RETURN_IF_ERROR(reader->AddOutputs(node));
@@ -1096,25 +1096,25 @@ class ElementwiseOperationParser : public TFLiteOperationParser {
   }
 
  private:
-  absl::Status GetActivation(const TfLiteNode* tflite_node,
+  abslx::Status GetActivation(const TfLiteNode* tflite_node,
                              TfLiteFusedActivation* activation) const {
     if (operation_type_ == OperationType::DIV) {
       const TfLiteDivParams* tf_options;
       auto status = RetrieveBuiltinData(tflite_node, &tf_options);
       *activation = status.ok() ? tf_options->activation : kTfLiteActNone;
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     if (operation_type_ == OperationType::SUB) {
       const TfLiteSubParams* tf_options;
       auto status = RetrieveBuiltinData(tflite_node, &tf_options);
       *activation = status.ok() ? tf_options->activation : kTfLiteActNone;
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     // Return kTfLiteActNone as other ops either do not have TfLiteXxxParams or
     // TfLiteXxxParams.activation.
     *activation = kTfLiteActNone;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   bool IsOneArgumentOperation() const {
@@ -1192,7 +1192,7 @@ class ElementwiseOperationParser : public TFLiteOperationParser {
 
 class FullyConnectedOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 9));
@@ -1200,7 +1200,7 @@ class FullyConnectedOperationParser : public TFLiteOperationParser {
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     const TfLiteFullyConnectedParams* tf_options;
@@ -1250,14 +1250,14 @@ class FullyConnectedOperationParser : public TFLiteOperationParser {
       attr.padding.prepended = HW(0, 0);
       RETURN_IF_ERROR(MaybeFuseActivation(tf_options->activation, graph, node));
       node->operation.attributes = std::move(attr);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     Node* node = graph->NewNode();
     RETURN_IF_ERROR(reader->AddInput(node, 0));
 
     if (tf_options->weights_format !=
         kTfLiteFullyConnectedWeightsFormatDefault) {
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "Unsupported FullyConnected weights format.");
     }
 
@@ -1268,7 +1268,7 @@ class FullyConnectedOperationParser : public TFLiteOperationParser {
     auto input = graph->FindInputs(node->id)[0];
     int batch_size = input->tensor.shape.b;
     if (input->tensor.shape.DimensionsProduct() / batch_size != weights_width) {
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "Amount of input data should match weights width");
     }
 
@@ -1290,7 +1290,7 @@ class FullyConnectedOperationParser : public TFLiteOperationParser {
 
     conv->operation.type = ToString(OperationType::FULLY_CONNECTED);
     conv->operation.attributes = std::move(attr);
-    absl::Status result = reader->AddOutputs(conv);
+    abslx::Status result = reader->AddOutputs(conv);
     RETURN_IF_ERROR(MaybeFuseActivation(tf_options->activation, graph, conv));
 
     return result;
@@ -1299,13 +1299,13 @@ class FullyConnectedOperationParser : public TFLiteOperationParser {
 
 class HardSwishOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode*, const TfLiteRegistration*,
+  abslx::Status Parse(const TfLiteNode*, const TfLiteRegistration*,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
     node->operation.type = ToString(OperationType::HARD_SWISH);
@@ -1344,14 +1344,14 @@ class HardSwishOperationParser : public TFLiteOperationParser {
 // - Configurable clipping of cell state and output state.
 class LSTMOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 4));
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     const TfLiteLSTMParams* tf_options;
@@ -1364,21 +1364,21 @@ class LSTMOperationParser : public TFLiteOperationParser {
     }
   }
 
-  absl::flat_hash_map<int, ValueId> GetNewValueIdsForVariableInputNodes()
+  abslx::flat_hash_map<int, ValueId> GetNewValueIdsForVariableInputNodes()
       final {
     return new_variable_input_value_map_;
   }
 
  private:
-  absl::Status ParseBasic(const TfLiteNode* tflite_node,
+  abslx::Status ParseBasic(const TfLiteNode* tflite_node,
                           const TfLiteRegistration* registration,
                           GraphFloat32* graph, ObjectReader* reader,
                           const TfLiteLSTMParams* tf_options) {
     if (tflite_node->inputs->size != 5) {
-      return absl::InvalidArgumentError("LSTM should have 5 input tensors");
+      return abslx::InvalidArgumentError("LSTM should have 5 input tensors");
     }
     if (tflite_node->outputs->size != 4) {
-      return absl::InvalidArgumentError("LSTM should have 4 output tensors");
+      return abslx::InvalidArgumentError("LSTM should have 4 output tensors");
     }
     RETURN_IF_ERROR(CheckBasicParameters(tf_options));
 
@@ -1421,23 +1421,23 @@ class LSTMOperationParser : public TFLiteOperationParser {
     RETURN_IF_ERROR(reader->AddOutput(lstm_node, 1));  // new_state
     RETURN_IF_ERROR(reader->AddOutput(lstm_node, 0));  // activation
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status CheckBasicParameters(const TfLiteLSTMParams* tf_options) {
+  abslx::Status CheckBasicParameters(const TfLiteLSTMParams* tf_options) {
     if (tf_options->activation != kTfLiteActTanh) {
-      return absl::UnimplementedError("Only TANH activation is supported.");
+      return abslx::UnimplementedError("Only TANH activation is supported.");
     }
     if (tf_options->cell_clip != 0.0f) {
-      return absl::UnimplementedError("cell_clip is not supported.");
+      return abslx::UnimplementedError("cell_clip is not supported.");
     }
     if (tf_options->proj_clip != 0.0f) {
-      return absl::UnimplementedError("proj_clip is not supported.");
+      return abslx::UnimplementedError("proj_clip is not supported.");
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status ParseFull(const TfLiteNode* tflite_node,
+  abslx::Status ParseFull(const TfLiteNode* tflite_node,
                          const TfLiteRegistration* registration,
                          GraphFloat32* graph, ObjectReader* reader,
                          const TfLiteLSTMParams* tf_options) {
@@ -1445,32 +1445,32 @@ class LSTMOperationParser : public TFLiteOperationParser {
     RETURN_IF_ERROR(ParseLSTMAttributes(tflite_node, registration, graph,
                                         reader, tf_options,
                                         &new_variable_input_value_map_));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status CheckFullParameters(const TfLiteLSTMParams* tf_options) {
+  abslx::Status CheckFullParameters(const TfLiteLSTMParams* tf_options) {
     if (tf_options->activation != kTfLiteActSigmoid &&
         tf_options->activation != kTfLiteActTanh) {
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "Only sigmoid or tanh activation is supported.");
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::flat_hash_map<int, ValueId> new_variable_input_value_map_;
+  abslx::flat_hash_map<int, ValueId> new_variable_input_value_map_;
 };
 
 class OneHotOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 1));
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -1483,19 +1483,19 @@ class OneHotOperationParser : public TFLiteOperationParser {
     node->operation.attributes = std::move(attr);
     RETURN_IF_ERROR(reader->AddInput(node, 0));
     RETURN_IF_ERROR(reader->AddOutputs(node));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class PackOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     if (tflite_node->inputs->size == 1) {
@@ -1508,7 +1508,7 @@ class PackOperationParser : public TFLiteOperationParser {
       ReshapeAttributes attr;
       attr.new_shape = graph->FindOutputs(node->id)[0]->tensor.shape;
       node->operation.attributes = attr;
-      return absl::OkStatus();
+      return abslx::OkStatus();
     } else {
       // Pack with few inputs can be replaced with Concat
       const TfLitePackParams* tf_options;
@@ -1565,21 +1565,21 @@ class PackOperationParser : public TFLiteOperationParser {
         RETURN_IF_ERROR(graph->AddConsumer(node->id, input->id));
       }
       node->operation.attributes = attr;
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
   }
 };
 
 class PReLUOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 1));
     // TODO(eignasheva): add params check
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -1589,10 +1589,10 @@ class PReLUOperationParser : public TFLiteOperationParser {
 
     PReLUAttributes attr;
     Tensor<Linear, DataType::FLOAT32> linear_alpha;
-    absl::Status status = reader->ReadTensor(1, &linear_alpha);
+    abslx::Status status = reader->ReadTensor(1, &linear_alpha);
     if (status.ok()) {
       if (linear_alpha.shape.v != input_shape.c) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "Linear alpha shape does not match the number of input channels.");
       }
       attr.alpha = std::move(linear_alpha);
@@ -1602,7 +1602,7 @@ class PReLUOperationParser : public TFLiteOperationParser {
       if (hwc_alpha.shape.h != input_shape.h ||
           hwc_alpha.shape.w != input_shape.w ||
           hwc_alpha.shape.c != input_shape.c) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "Alpha shape does not match input shape.");
       }
       attr.alpha = std::move(hwc_alpha);
@@ -1616,14 +1616,14 @@ class PadOperationParser : public TFLiteOperationParser {
  public:
   explicit PadOperationParser(bool mirror_pad) : mirror_pad_(mirror_pad) {}
 
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 2));
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -1655,11 +1655,11 @@ class PadOperationParser : public TFLiteOperationParser {
           BHWC(1, paddings.data[1], paddings.data[3], paddings.data[5]);
     } else {
       // It shouldn't fail here since it's checked at IsSupported().
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Paddings tensor has unexpected shape.");
     }
     node->operation.attributes = attr;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -1668,7 +1668,7 @@ class PadOperationParser : public TFLiteOperationParser {
 
 class Pooling2DOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 2));
@@ -1678,7 +1678,7 @@ class Pooling2DOperationParser : public TFLiteOperationParser {
  public:
   explicit Pooling2DOperationParser(PoolingType type) : type_(type) {}
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -1715,7 +1715,7 @@ class Pooling2DOperationParser : public TFLiteOperationParser {
     }
     RETURN_IF_ERROR(ParsePoolingAttributes(tf_options, input_shape, &attr));
     node->operation.attributes = attr;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -1727,13 +1727,13 @@ class ReduceOperationParser : public TFLiteOperationParser {
   explicit ReduceOperationParser(OperationType operation_type)
       : operation_type_(operation_type) {}
 
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -1777,7 +1777,7 @@ class ReduceOperationParser : public TFLiteOperationParser {
     } else {
       RETURN_IF_ERROR(reader->AddOutputs(node));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -1786,14 +1786,14 @@ class ReduceOperationParser : public TFLiteOperationParser {
 
 class QuantizeOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 2));
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     // 'Quantize' is rewritten as QuantizeAndDequantize since we are dealing
@@ -1806,7 +1806,7 @@ class QuantizeOperationParser : public TFLiteOperationParser {
     // Quantization attributes should already be present in the output tensor.
     auto output_value = graph->FindOutputs(node->id)[0];
     if (!output_value->quant_params) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Encountered Quantize output with no quant params");
     }
     QuantizeAndDequantizeAttributes attr;
@@ -1815,7 +1815,7 @@ class QuantizeOperationParser : public TFLiteOperationParser {
     attr.scale = output_value->quant_params.value().scale;
 
     node->operation.attributes = attr;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
@@ -1823,14 +1823,14 @@ class ReLUOperationParser : public TFLiteOperationParser {
  public:
   explicit ReLUOperationParser(int clip) : clip_(clip) {}
 
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 2));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -1852,13 +1852,13 @@ class ReLUOperationParser : public TFLiteOperationParser {
 
 class ResamplerOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -1874,13 +1874,13 @@ class ResamplerOperationParser : public TFLiteOperationParser {
     auto output_value = graph->FindOutputs(node->id)[0];
     output_value->tensor.shape =
         BHWC(src_shape.b, warp_shape.h, warp_shape.w, src_shape.c);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class ReshapeOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 1));
@@ -1888,7 +1888,7 @@ class ReshapeOperationParser : public TFLiteOperationParser {
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -1903,7 +1903,7 @@ class ReshapeOperationParser : public TFLiteOperationParser {
     ReshapeAttributes attr;
     attr.new_shape = graph->FindOutputs(node->id)[0]->tensor.shape;
     node->operation.attributes = attr;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
@@ -1912,14 +1912,14 @@ class Resize2DOperationParser : public TFLiteOperationParser {
   explicit Resize2DOperationParser(SamplingType sampling_type)
       : sampling_type_(sampling_type) {}
 
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 3));
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -1937,11 +1937,11 @@ class Resize2DOperationParser : public TFLiteOperationParser {
     attr.new_shape.CopyAllDefinedAxis(
         graph->FindOutputs(node->id)[0]->tensor.shape);
     node->operation.attributes = attr;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
-  absl::Status GetAlignCornersValue(const TfLiteNode* tflite_node,
+  abslx::Status GetAlignCornersValue(const TfLiteNode* tflite_node,
                                     bool* align_corners) {
     switch (sampling_type_) {
       case SamplingType::BILINEAR:
@@ -1951,27 +1951,27 @@ class Resize2DOperationParser : public TFLiteOperationParser {
         return GetAlignCornersValueForType<TfLiteResizeNearestNeighborParams>(
             tflite_node, align_corners);
       case SamplingType::UNKNOWN:
-        return absl::InternalError("Sampling type is not specified");
+        return abslx::InternalError("Sampling type is not specified");
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   template <class T>
-  absl::Status GetAlignCornersValueForType(const TfLiteNode* tflite_node,
+  abslx::Status GetAlignCornersValueForType(const TfLiteNode* tflite_node,
                                            bool* align_corners) {
     const T* tf_options;
     RETURN_IF_ERROR(RetrieveBuiltinData(tflite_node, &tf_options));
     *align_corners = tf_options->align_corners;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status GetHalfPixelCentersValue(const TfLiteNode* tflite_node,
+  abslx::Status GetHalfPixelCentersValue(const TfLiteNode* tflite_node,
                                         bool* half_pixel_centers) {
     if (sampling_type_ == SamplingType::BILINEAR) {
       const TfLiteResizeBilinearParams* tf_options;
       RETURN_IF_ERROR(RetrieveBuiltinData(tflite_node, &tf_options));
       if (tf_options->align_corners && tf_options->half_pixel_centers) {
-        return absl::InternalError(
+        return abslx::InternalError(
             "If half_pixel_centers is True, align_corners must be False.");
       }
       *half_pixel_centers = tf_options->half_pixel_centers;
@@ -1980,7 +1980,7 @@ class Resize2DOperationParser : public TFLiteOperationParser {
       RETURN_IF_ERROR(RetrieveBuiltinData(tflite_node, &tf_options));
       *half_pixel_centers = tf_options->half_pixel_centers;
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   SamplingType sampling_type_ = SamplingType::UNKNOWN;
@@ -1988,14 +1988,14 @@ class Resize2DOperationParser : public TFLiteOperationParser {
 
 class SelectV2OperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 1));
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -2060,20 +2060,20 @@ class SelectV2OperationParser : public TFLiteOperationParser {
       RETURN_IF_ERROR(reader->AddInput(node, 2));
     }
     RETURN_IF_ERROR(reader->AddOutputs(node));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class SliceOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 2));
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -2092,7 +2092,7 @@ class SliceOperationParser : public TFLiteOperationParser {
     RETURN_IF_ERROR(reader->ReadTensor(1, &starts));
     RETURN_IF_ERROR(reader->ReadTensor(2, &sizes));
     if (starts.data.size() != sizes.data.size()) {
-      return absl::InvalidArgumentError("Starts amount != sizes amount.");
+      return abslx::InvalidArgumentError("Starts amount != sizes amount.");
     }
     BHWC bhwc_starts(0, 0, 0, 0);
     BHWC bhwc_sizes = input->tensor.shape;
@@ -2116,7 +2116,7 @@ class SliceOperationParser : public TFLiteOperationParser {
         bhwc_sizes.w = sizes.data[1];
         bhwc_sizes.c = sizes.data[2];
       } else {
-        return absl::UnimplementedError(
+        return abslx::UnimplementedError(
             "Slicing is supported for 3 or 4 dimensional tensors only.");
       }
     } else if (input_dims == 3) {
@@ -2129,11 +2129,11 @@ class SliceOperationParser : public TFLiteOperationParser {
         bhwc_sizes.w = sizes.data[1];
         bhwc_sizes.c = sizes.data[2];
       } else {
-        return absl::UnimplementedError(
+        return abslx::UnimplementedError(
             "Slicing is supported for 3 or 4 dimensional tensors only.");
       }
     } else {
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "Slicing is supported for 3 or 4 dimensional tensors only.");
     }
     const auto& in_shape = input->tensor.shape;
@@ -2157,23 +2157,23 @@ class SliceOperationParser : public TFLiteOperationParser {
 
     auto out_shape = graph->FindOutputs(node->id)[0]->tensor.shape;
     if ((attr.ends.b - attr.starts.b) != out_shape.b) {
-      return absl::UnimplementedError("Output batch don't match");
+      return abslx::UnimplementedError("Output batch don't match");
     }
     if ((attr.ends.h - attr.starts.h) != out_shape.h) {
-      return absl::UnimplementedError("Output height doesn't match");
+      return abslx::UnimplementedError("Output height doesn't match");
     }
     if ((attr.ends.w - attr.starts.w) != out_shape.w) {
-      return absl::UnimplementedError("Output width doesn't match");
+      return abslx::UnimplementedError("Output width doesn't match");
     }
     if ((attr.ends.c - attr.starts.c) != out_shape.c) {
-      return absl::UnimplementedError("Output channels don't match");
+      return abslx::UnimplementedError("Output channels don't match");
     }
     node->operation.attributes = attr;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
-  absl::Status UpdateIfNegative(const BHWC& input_shape,
+  abslx::Status UpdateIfNegative(const BHWC& input_shape,
                                 SliceAttributes* attr) {
     if (attr->ends.h < 0) {
       attr->ends.h = input_shape.h + attr->ends.h;
@@ -2187,20 +2187,20 @@ class SliceOperationParser : public TFLiteOperationParser {
     if (attr->ends.b < 0) {
       attr->ends.b = input_shape.b + attr->ends.b;
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class SoftmaxOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 2));
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -2213,20 +2213,20 @@ class SoftmaxOperationParser : public TFLiteOperationParser {
     if (tf_options->beta != 1) {
       // there is multiply by scalar operation fused in softmax. Make a layer
       // out of it before softmax.
-      return absl::UnimplementedError("Softmax.beta != 1 is not supported.");
+      return abslx::UnimplementedError("Softmax.beta != 1 is not supported.");
       // auto mul_node = reader->NewPassthroughNode(node);
       // mul_node->operation.type = ToString(OperationType::MUL);
     }
     SoftmaxAttributes attr;
     attr.axis = Axis::CHANNELS;  // always by channels
     node->operation.attributes = attr;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class SpaceToDepthOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 2));
@@ -2234,7 +2234,7 @@ class SpaceToDepthOperationParser : public TFLiteOperationParser {
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -2246,19 +2246,19 @@ class SpaceToDepthOperationParser : public TFLiteOperationParser {
     SpaceToDepthAttributes attr;
     attr.block_size = tf_options->block_size;
     node->operation.attributes = attr;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class SplitOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     const TfLiteSplitParams* split_params;
@@ -2273,7 +2273,7 @@ class SplitOperationParser : public TFLiteOperationParser {
       ReshapeAttributes attr;
       attr.new_shape = graph->FindOutputs(node->id)[0]->tensor.shape;
       node->operation.attributes = attr;
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     const TfLiteTensor* input = reader->GetInputTensor(1);
     const TfLiteTensor* axis_tensor = reader->GetInputTensor(0);
@@ -2288,19 +2288,19 @@ class SplitOperationParser : public TFLiteOperationParser {
     for (int i = 0; i < tflite_node->outputs->size; ++i) {
       RETURN_IF_ERROR(reader->AddOutput(node, i));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class SplitVOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     const TfLiteSplitVParams* split_params;
@@ -2315,7 +2315,7 @@ class SplitVOperationParser : public TFLiteOperationParser {
       ReshapeAttributes attr;
       attr.new_shape = graph->FindOutputs(node->id)[0]->tensor.shape;
       node->operation.attributes = attr;
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     const TfLiteTensor* input = reader->GetInputTensor(0);
     const TfLiteTensor* axis_tensor = reader->GetInputTensor(2);
@@ -2330,20 +2330,20 @@ class SplitVOperationParser : public TFLiteOperationParser {
     for (int i = 0; i < tflite_node->outputs->size; ++i) {
       RETURN_IF_ERROR(reader->AddOutput(node, i));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class StridedSliceOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 2));
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -2360,7 +2360,7 @@ class StridedSliceOperationParser : public TFLiteOperationParser {
     bool read_with_batch = tmp.data.size() == 4;
     if (!read_without_batch && !read_with_batch) {
       // Error: Must be catched in IsSupported()
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "Slicing is supported for 3 or 4 dimensional tensors only.");
     }
 
@@ -2381,34 +2381,34 @@ class StridedSliceOperationParser : public TFLiteOperationParser {
     }
     if (attr.strides.b == 0 || attr.strides.h == 0 || attr.strides.w == 0 ||
         attr.strides.c == 0) {
-      return absl::InvalidArgumentError("stride values must be non-zero");
+      return abslx::InvalidArgumentError("stride values must be non-zero");
     }
     if (attr.strides.b < 0 || attr.strides.h < 0 || attr.strides.w < 0 ||
         attr.strides.c < 0) {
-      return absl::UnimplementedError("Reverse slices are not supported.");
+      return abslx::UnimplementedError("Reverse slices are not supported.");
     }
     if ((attr.ends.b - attr.starts.b + attr.strides.b - 1) / attr.strides.b !=
         out_shape.b) {
-      return absl::UnimplementedError("Output batch don't match");
+      return abslx::UnimplementedError("Output batch don't match");
     }
     if ((attr.ends.h - attr.starts.h + attr.strides.h - 1) / attr.strides.h !=
         out_shape.h) {
-      return absl::UnimplementedError("Output height doesn't match");
+      return abslx::UnimplementedError("Output height doesn't match");
     }
     if ((attr.ends.w - attr.starts.w + attr.strides.w - 1) / attr.strides.w !=
         out_shape.w) {
-      return absl::UnimplementedError("Output width doesn't match");
+      return abslx::UnimplementedError("Output width doesn't match");
     }
     if ((attr.ends.c - attr.starts.c + attr.strides.c - 1) / attr.strides.c !=
         out_shape.c) {
-      return absl::UnimplementedError("Output channels don't match");
+      return abslx::UnimplementedError("Output channels don't match");
     }
     node->operation.attributes = attr;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
-  absl::Status UpdateWithMask(const TfLiteStridedSliceParams* tf_options,
+  abslx::Status UpdateWithMask(const TfLiteStridedSliceParams* tf_options,
                               const BHWC& input_shape, int ignore_b,
                               int ignore_h, int ignore_w, int ignore_c,
                               SliceAttributes* attr) {
@@ -2437,10 +2437,10 @@ class StridedSliceOperationParser : public TFLiteOperationParser {
     if (tf_options->end_mask & ignore_b) {
       attr->ends.b = input_shape.b;
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status UpdateIfNegative(const BHWC& input_shape,
+  abslx::Status UpdateIfNegative(const BHWC& input_shape,
                                 SliceAttributes* attr) {
     if (attr->ends.h < 0) {
       attr->ends.h = input_shape.h + attr->ends.h;
@@ -2468,18 +2468,18 @@ class StridedSliceOperationParser : public TFLiteOperationParser {
       attr->starts.b = input_shape.b + attr->starts.b;
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status ReadAttribsWithBatch(const ObjectReader* reader,
+  abslx::Status ReadAttribsWithBatch(const ObjectReader* reader,
                                     const TfLiteStridedSliceParams* tf_options,
                                     const BHWC& input_shape,
                                     SliceAttributes* attr) {
-    auto read_bhwc = [&](int tensor_index, BHWC* bhwc) -> absl::Status {
+    auto read_bhwc = [&](int tensor_index, BHWC* bhwc) -> abslx::Status {
       Tensor<Linear, DataType::INT32> t;
       RETURN_IF_ERROR(reader->ReadTensor(tensor_index, &t));
       *bhwc = BHWC(t.data[0], t.data[1], t.data[2], t.data[3]);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     };
 
     RETURN_IF_ERROR(read_bhwc(1, &attr->starts));
@@ -2487,17 +2487,17 @@ class StridedSliceOperationParser : public TFLiteOperationParser {
     RETURN_IF_ERROR(read_bhwc(3, &attr->strides));
     RETURN_IF_ERROR(UpdateIfNegative(input_shape, attr));
     RETURN_IF_ERROR(UpdateWithMask(tf_options, input_shape, 1, 2, 4, 8, attr));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status ReadAttribsWithoutBatch(
+  abslx::Status ReadAttribsWithoutBatch(
       const ObjectReader* reader, const TfLiteStridedSliceParams* tf_options,
       const BHWC& input_shape, SliceAttributes* attr) {
-    auto read_hwc = [&](int tensor_index, BHWC* bhwc) -> absl::Status {
+    auto read_hwc = [&](int tensor_index, BHWC* bhwc) -> abslx::Status {
       Tensor<Linear, DataType::INT32> t;
       RETURN_IF_ERROR(reader->ReadTensor(tensor_index, &t));
       *bhwc = BHWC(0, t.data[0], t.data[1], t.data[2]);
-      return absl::OkStatus();
+      return abslx::OkStatus();
     };
 
     RETURN_IF_ERROR(read_hwc(1, &attr->starts));
@@ -2508,46 +2508,46 @@ class StridedSliceOperationParser : public TFLiteOperationParser {
     attr->starts.b = 0;
     attr->ends.b = input_shape.b;
     attr->strides.b = 1;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  absl::Status CheckOptionsSupport(const TfLiteStridedSliceParams* tf_options) {
+  abslx::Status CheckOptionsSupport(const TfLiteStridedSliceParams* tf_options) {
     if (tf_options->ellipsis_mask) {
-      return absl::UnimplementedError("Slice does not support ellipsis_mask.");
+      return abslx::UnimplementedError("Slice does not support ellipsis_mask.");
     }
     if (tf_options->new_axis_mask) {
-      return absl::UnimplementedError("Slice does not support new_axis_mask.");
+      return abslx::UnimplementedError("Slice does not support new_axis_mask.");
     }
     if (tf_options->shrink_axis_mask) {
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "Slice does not support shrink_axis_mask parameter. ");
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class TileOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
     node->operation.type = ToString(OperationType::TILE);
     RETURN_IF_ERROR(reader->AddInput(node, 0));
     RETURN_IF_ERROR(reader->AddOutputs(node));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 // Builtin op version of TRANSPOSE_CONV.
 class TransposeConvBuiltinOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 3));
@@ -2557,7 +2557,7 @@ class TransposeConvBuiltinOperationParser : public TFLiteOperationParser {
   // TFLite's TRANSPOSE_CONV expects 3-4 input tensors (output shape, weights,
   // input, and an optional bias) and allows configurable padding & stride.
   // TODO(impjdi): Translate output_shape to attr.adjacent.
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     auto* node = graph->NewNode();
@@ -2588,20 +2588,20 @@ class TransposeConvBuiltinOperationParser : public TFLiteOperationParser {
     UpdatePadding(tf_options->padding,
                   graph->FindInputs(node->id)[0]->tensor.shape, &attr);
     node->operation.attributes = std::move(attr);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 // Custom op version of TRANSPOSE_CONV.
 class TransposeConvCustomOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     auto* node = graph->NewNode();
@@ -2622,20 +2622,20 @@ class TransposeConvCustomOperationParser : public TFLiteOperationParser {
     UpdatePadding(status.ok() ? tf_options->padding : kTfLitePaddingUnknown,
                   graph->FindInputs(node->id)[0]->tensor.shape, &attr);
     node->operation.attributes = std::move(attr);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class TransposeOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     RETURN_IF_ERROR(CheckMaxSupportedOpVersion(registration, 2));
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -2666,24 +2666,24 @@ class TransposeOperationParser : public TFLiteOperationParser {
       attr.perm.w = 2;
       attr.perm.c = axis_to_index[index_to_axis[perm.data[1]]];
     } else {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "Permutation for transpose is invalid.");
     }
 
     node->operation.attributes = attr;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class UnpackOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     const TfLiteUnpackParams* unpack_params;
@@ -2698,7 +2698,7 @@ class UnpackOperationParser : public TFLiteOperationParser {
       ReshapeAttributes attr;
       attr.new_shape = graph->FindOutputs(node->id)[0]->tensor.shape;
       node->operation.attributes = attr;
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     const TfLiteTensor* input = reader->GetInputTensor(0);
     BHWC input_shape;
@@ -2736,19 +2736,19 @@ class UnpackOperationParser : public TFLiteOperationParser {
         RETURN_IF_ERROR(reader->AddOutput(node, i));
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class Unpooling2DOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     Node* node = graph->NewNode();
@@ -2770,20 +2770,20 @@ class Unpooling2DOperationParser : public TFLiteOperationParser {
 
     auto output_value = graph->FindOutputs(node->id)[0];
     output_value->tensor.shape = CalculateOutputShape(input_shape, attr);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 // TODO(impjdi): BATCH_TO_SPACE/SPACE_TO_BATCH shouldn't be supported.
 class BatchToSpaceOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     auto* node = graph->NewNode();
@@ -2795,7 +2795,7 @@ class BatchToSpaceOperationParser : public TFLiteOperationParser {
     Tensor<Linear, DataType::INT32> block;
     RETURN_IF_ERROR(reader->ReadTensor(1, &block));
     if (block.shape.v != 2) {
-      return absl::InternalError("Space has to be HxW.");
+      return abslx::InternalError("Space has to be HxW.");
     }
     bs_attr.block.h = block.data[0];
     bs_attr.block.w = block.data[1];
@@ -2804,7 +2804,7 @@ class BatchToSpaceOperationParser : public TFLiteOperationParser {
     RETURN_IF_ERROR(reader->ReadTensor(2, &crop));
     auto crop_shape = crop.shape;
     if (crop_shape.h != 2 && crop_shape.w != 2) {
-      return absl::InternalError("Space has to be HxW.");
+      return abslx::InternalError("Space has to be HxW.");
     }
 
     bs_attr.crop.prepended.h = crop.data[0];
@@ -2814,19 +2814,19 @@ class BatchToSpaceOperationParser : public TFLiteOperationParser {
     bs_attr.crop.appended.w = crop.data[3];
 
     node->operation.attributes = std::move(bs_attr);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class SpaceToBatchOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     auto* node = graph->NewNode();
@@ -2837,7 +2837,7 @@ class SpaceToBatchOperationParser : public TFLiteOperationParser {
     Tensor<Linear, DataType::INT32> block;
     RETURN_IF_ERROR(reader->ReadTensor(1, &block));
     if (block.shape.v != 2) {
-      return absl::InternalError("Space has to be HxW.");
+      return abslx::InternalError("Space has to be HxW.");
     }
     sb_attr.block.h = block.data[0];
     sb_attr.block.w = block.data[1];
@@ -2847,7 +2847,7 @@ class SpaceToBatchOperationParser : public TFLiteOperationParser {
     auto padding_shape = padding.shape;
 
     if (padding_shape.h != 2 && padding_shape.w != 2) {
-      return absl::InternalError("Space has to be HxW.");
+      return abslx::InternalError("Space has to be HxW.");
     }
 
     sb_attr.padding.prepended.h = padding.data[0];
@@ -2857,19 +2857,19 @@ class SpaceToBatchOperationParser : public TFLiteOperationParser {
     sb_attr.padding.appended.w = padding.data[3];
 
     node->operation.attributes = std::move(sb_attr);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class MeanOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
     return CheckGpuDelegateCompatibility(context, tflite_node, registration);
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
     auto* node = graph->NewNode();
@@ -2886,29 +2886,29 @@ class MeanOperationParser : public TFLiteOperationParser {
       attr.dims.insert(axis);
     }
     node->operation.attributes = attr;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 
 class UnsupportedOperationParser : public TFLiteOperationParser {
  public:
-  absl::Status IsSupported(const TfLiteContext* context,
+  abslx::Status IsSupported(const TfLiteContext* context,
                            const TfLiteNode* tflite_node,
                            const TfLiteRegistration* registration) final {
-    return absl::UnimplementedError("Operation is not supported.");
+    return abslx::UnimplementedError("Operation is not supported.");
   }
 
-  absl::Status Parse(const TfLiteNode* tflite_node,
+  abslx::Status Parse(const TfLiteNode* tflite_node,
                      const TfLiteRegistration* registration,
                      GraphFloat32* graph, ObjectReader* reader) final {
-    return absl::UnimplementedError("Operation is not supported.");
+    return abslx::UnimplementedError("Operation is not supported.");
   }
 };
 
-absl::Status IsSupported(
+abslx::Status IsSupported(
     const TfLiteContext* context, TfLiteNode* node,
     const TfLiteRegistration* registration, bool allow_quant_ops = false,
-    const absl::flat_hash_set<TfLiteBuiltinOperator>* excluded_ops = nullptr) {
+    const abslx::flat_hash_set<TfLiteBuiltinOperator>* excluded_ops = nullptr) {
   return NewOperationParser(registration, allow_quant_ops, excluded_ops)
       ->IsSupported(context, node, registration);
 }
@@ -2940,7 +2940,7 @@ bool IsAllAllowedTensors(TfLiteContext* context,
 
 std::unique_ptr<TFLiteOperationParser> NewOperationParser(
     const TfLiteRegistration* registration, bool allow_quant_ops,
-    const absl::flat_hash_set<TfLiteBuiltinOperator>* excluded_ops) {
+    const abslx::flat_hash_set<TfLiteBuiltinOperator>* excluded_ops) {
   const auto builtin_code = registration->builtin_code;
   if (excluded_ops != nullptr &&
       excluded_ops->contains(
@@ -3113,7 +3113,7 @@ std::unique_ptr<TFLiteOperationParser> NewOperationParser(
     case kTfLiteBuiltinUnpack:
       return std::make_unique<UnpackOperationParser>();
     case kTfLiteBuiltinCustom: {
-      const absl::string_view custom_name = registration->custom_name;
+      const abslx::string_view custom_name = registration->custom_name;
       if (custom_name == "Convolution2DTransposeBias") {
         return std::make_unique<TransposeConvCustomOperationParser>();
       }
@@ -3136,7 +3136,7 @@ std::unique_ptr<TFLiteOperationParser> NewOperationParser(
 // TODO(impjdi): Check ops' parameters.
 TfLiteIntArray* GetOpsToReplace(
     TfLiteContext* context, bool allow_quant_ops, int max_delegated_partitions,
-    const absl::flat_hash_set<TfLiteBuiltinOperator>* excluded_ops) {
+    const abslx::flat_hash_set<TfLiteBuiltinOperator>* excluded_ops) {
   delegates::IsNodeSupportedFn node_supported_fn =
       [=](TfLiteContext* context, TfLiteNode* node,
           TfLiteRegistration* registration,
@@ -3203,21 +3203,21 @@ TfLiteIntArray* GetOpsToReplace(
 
   if (!unsupported_nodes_info.empty() &&
       partition_helper.num_total_nodes() > ops_to_replace.size()) {
-    std::string unsupported = absl::StrJoin(unsupported_nodes_info, "\n");
-    std::string error_message = absl::StrCat(
+    std::string unsupported = abslx::StrJoin(unsupported_nodes_info, "\n");
+    std::string error_message = abslx::StrCat(
         "Following operations are not supported by GPU delegate:\n",
         unsupported, "\n");
     if (!ops_to_replace.empty()) {
-      absl::StrAppend(
+      abslx::StrAppend(
           &error_message, ops_to_replace.size(),
           " operations will run on the GPU, and the remaining ",
           partition_helper.num_total_nodes() - ops_to_replace.size());
     } else {
-      absl::StrAppend(&error_message,
+      abslx::StrAppend(&error_message,
                       "No operations will run on the GPU, and all ",
                       partition_helper.num_total_nodes());
     }
-    absl::StrAppend(&error_message, " operations will run on the CPU.");
+    abslx::StrAppend(&error_message, " operations will run on the CPU.");
     TF_LITE_KERNEL_LOG(context, error_message.c_str());
   }
   return ConvertVectorToTfLiteIntArray(ops_to_replace);
@@ -3228,24 +3228,24 @@ TfLiteIntArray* GetOpsToReplace(
 // inputs and outputs with the original one. When delegated model is built from
 // the tflite model representation tensors are created lazily, so there is no
 // guarantee that the order will match the source model tensors order.
-absl::Status PrecreateIOTensors(
+abslx::Status PrecreateIOTensors(
     TfLiteContext* context, GraphFloat32* graph, const std::vector<int>& io_ids,
-    absl::flat_hash_map<int, int>* quant_conversion_map,
-    absl::flat_hash_map<int, Value*>* tensor_to_value) {
+    abslx::flat_hash_map<int, int>* quant_conversion_map,
+    abslx::flat_hash_map<int, Value*>* tensor_to_value) {
   for (const auto& id : io_ids) {
     const TfLiteTensor& tflite_tensor = context->tensors[id];
     if (tflite::IsConstantTensor(&tflite_tensor)) continue;
     RETURN_IF_ERROR(ObjectReader::ReadNonConstantTensor(
         context, tensor_to_value, quant_conversion_map, graph, id));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CopyVariableTensorOutputs(
+abslx::Status CopyVariableTensorOutputs(
     TfLiteNode* tflite_node, TfLiteRegistration* registration,
     GraphFloat32* graph, ObjectReader& reader,
-    const absl::flat_hash_map<int, ValueId>& new_variable_tensor_values) {
-  absl::flat_hash_map<int, ValueId> new_variable_tensor_values_copy(
+    const abslx::flat_hash_map<int, ValueId>& new_variable_tensor_values) {
+  abslx::flat_hash_map<int, ValueId> new_variable_tensor_values_copy(
       new_variable_tensor_values);
   // Retrieve the final value id for the variable input tensors.
   for (int i = 0; i < tflite_node->inputs->size; i++) {
@@ -3255,8 +3255,8 @@ absl::Status CopyVariableTensorOutputs(
     if (value->tensor.is_variable_input) {
       if (new_variable_tensor_values_copy.find(i) ==
           new_variable_tensor_values_copy.end()) {
-        return absl::InvalidArgumentError(
-            absl::StrCat(GetOpNameByRegistration(*registration),
+        return abslx::InvalidArgumentError(
+            abslx::StrCat(GetOpNameByRegistration(*registration),
                          " did not provide a new value for the variable input "
                          "tensor with index ",
                          tensor_idx));
@@ -3272,17 +3272,17 @@ absl::Status CopyVariableTensorOutputs(
     }
   }
   if (!new_variable_tensor_values_copy.empty()) {
-    return absl::InvalidArgumentError(
+    return abslx::InvalidArgumentError(
         "More input variable tensors asked to be copied than present on the "
         "node");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status BuildModel(TfLiteContext* context,
+abslx::Status BuildModel(TfLiteContext* context,
                         const TfLiteDelegateParams* delegate_params,
                         GraphFloat32* graph,
-                        absl::flat_hash_map<int, int>* quant_conversion_map) {
+                        abslx::flat_hash_map<int, int>* quant_conversion_map) {
   std::vector<int> inputs(delegate_params->input_tensors->size);
   std::vector<int> outputs(delegate_params->output_tensors->size);
   for (int i = 0; i < delegate_params->input_tensors->size; i++) {
@@ -3295,10 +3295,10 @@ absl::Status BuildModel(TfLiteContext* context,
                              quant_conversion_map);
 }
 
-absl::Status BuildModelEnforceIO(
+abslx::Status BuildModelEnforceIO(
     TfLiteContext* context, const TfLiteDelegateParams* delegate_params,
     const std::vector<int>& input_ids, const std::vector<int>& output_ids,
-    GraphFloat32* graph, absl::flat_hash_map<int, int>* quant_conversion_map) {
+    GraphFloat32* graph, abslx::flat_hash_map<int, int>* quant_conversion_map) {
   std::vector<std::unique_ptr<TFLiteOperationParser>> operations;
   std::vector<int> tflite_nodes;
   for (int i = 0; i < delegate_params->nodes_to_replace->size; ++i) {
@@ -3319,15 +3319,15 @@ absl::Status BuildModelEnforceIO(
     auto op_parser = NewOperationParser(
         registration, /*allow_quant_ops=*/quant_conversion_map != nullptr);
     if (!op_parser) {
-      return absl::UnimplementedError(
-          absl::StrCat("Operation ", registration->builtin_code, "(",
+      return abslx::UnimplementedError(
+          abslx::StrCat("Operation ", registration->builtin_code, "(",
                        registration->custom_name,
                        ") is not supported by TFLite GPU Delegate."));
     }
     operations.push_back(std::move(op_parser));
     tflite_nodes.push_back(i);
   }
-  absl::flat_hash_map<int, Value*> tensor_to_value;
+  abslx::flat_hash_map<int, Value*> tensor_to_value;
   std::vector<ValueId> variable_inputs_to_value_id;
 
   RETURN_IF_ERROR(PrecreateIOTensors(context, graph, input_ids,
@@ -3345,11 +3345,11 @@ absl::Status BuildModelEnforceIO(
     const auto status =
         operations[i]->Parse(tflite_node, registration, graph, &reader);
     if (!status.ok()) {
-      return absl::InternalError(absl::StrCat(
+      return abslx::InternalError(abslx::StrCat(
           GetOpNameByRegistration(*registration), ": ", status.message()));
     }
 
-    absl::flat_hash_map<int, ValueId> new_value_for_variable_input_tensors =
+    abslx::flat_hash_map<int, ValueId> new_value_for_variable_input_tensors =
         operations[i]->GetNewValueIdsForVariableInputNodes();
 
     RETURN_IF_ERROR(
@@ -3361,26 +3361,26 @@ absl::Status BuildModelEnforceIO(
   // They need to be an output of the graph in order to have them unchanged.
   for (auto value_id : variable_inputs_to_value_id) {
     if (!graph->IsGraphOutput(value_id)) {
-      return absl::InvalidArgumentError(
-          absl::StrCat("Variable input tensors must be a graph output. Value ",
+      return abslx::InvalidArgumentError(
+          abslx::StrCat("Variable input tensors must be a graph output. Value ",
                        value_id, " is not a graph output"));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status BuildFinalModel(
+abslx::Status BuildFinalModel(
     TfLiteContext* context, const TfLiteDelegateParams* delegate_params,
-    GraphFloat32* graph, absl::flat_hash_map<int, int>* quant_conversion_map) {
+    GraphFloat32* graph, abslx::flat_hash_map<int, int>* quant_conversion_map) {
   RETURN_IF_ERROR(
       BuildModel(context, delegate_params, graph, quant_conversion_map));
 
   // Apply general transformations on the graph.
   ModelTransformer transformer(graph);
   if (!ApplyModelTransformations(&transformer)) {
-    return absl::InternalError("Graph transformations failed");
+    return abslx::InternalError("Graph transformations failed");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 namespace {
@@ -3391,7 +3391,7 @@ class DelegateContext {
     std::vector<int> input_ids;
     std::vector<int> output_ids;
     GraphFloat32* graph;
-    std::unique_ptr<absl::flat_hash_map<int, int>> quant_conversion_map;
+    std::unique_ptr<abslx::flat_hash_map<int, int>> quant_conversion_map;
   };
   bool Init(TfLiteContext* context,
             const TfLiteDelegateParams* delegate_params) {
@@ -3438,13 +3438,13 @@ TfLiteStatus DelegatePrepare(TfLiteContext* context, TfLiteDelegate* delegate) {
 
 }  // namespace
 
-absl::Status BuildFromFlatBuffer(const tflite::FlatBufferModel& flatbuffer,
+abslx::Status BuildFromFlatBuffer(const tflite::FlatBufferModel& flatbuffer,
                                  const tflite::OpResolver& op_resolver,
                                  GraphFloat32* graph, bool allow_quant_ops) {
   std::unique_ptr<tflite::Interpreter> interpreter;
   tflite::InterpreterBuilder interpreter_builder(flatbuffer, op_resolver);
   if (interpreter_builder(&interpreter) != kTfLiteOk || !interpreter) {
-    return absl::InternalError("Unable to prepare TfLite interpreter.");
+    return abslx::InternalError("Unable to prepare TfLite interpreter.");
   }
   TfLiteDelegate delegate;
 
@@ -3452,7 +3452,7 @@ absl::Status BuildFromFlatBuffer(const tflite::FlatBufferModel& flatbuffer,
                                               interpreter->outputs(), graph};
   if (allow_quant_ops) {
     delegate_data.quant_conversion_map =
-        std::make_unique<absl::flat_hash_map<int, int>>();
+        std::make_unique<abslx::flat_hash_map<int, int>>();
   }
 
   delegate.data_ = &delegate_data;
@@ -3463,15 +3463,15 @@ absl::Status BuildFromFlatBuffer(const tflite::FlatBufferModel& flatbuffer,
   delegate.FreeBufferHandle = nullptr;
 
   if (interpreter->ModifyGraphWithDelegate(&delegate) != kTfLiteOk) {
-    return absl::InternalError("Conversion from TfLite model failed.");
+    return abslx::InternalError("Conversion from TfLite model failed.");
   }
 
   ModelTransformer transformer(graph);
   if (!ApplyModelTransformations(&transformer)) {
-    return absl::InternalError("Graph transformations failed");
+    return abslx::InternalError("Graph transformations failed");
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

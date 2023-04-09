@@ -39,7 +39,7 @@ class TupleUtil {
   // `input_tuple`.
   static HloInstruction* AppendSuffix(
       HloInstruction* input_tuple,
-      absl::Span<HloInstruction* const> trailing_values);
+      abslx::Span<HloInstruction* const> trailing_values);
 
   // Generates HLO instructions that duplicates the tuple by inserting
   // get-tuple-elements and a new tuple instruction. Returns the root of the

@@ -29,7 +29,7 @@ namespace xla {
 // the is_stable field.
 class StableSortExpander : public OpExpanderPass {
  public:
-  absl::string_view name() const override { return "stable-sort-expander"; }
+  abslx::string_view name() const override { return "stable-sort-expander"; }
 
  private:
   bool InstructionMatchesPattern(HloInstruction* instruction) override;

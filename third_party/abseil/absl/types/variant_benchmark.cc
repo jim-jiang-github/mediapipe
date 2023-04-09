@@ -27,7 +27,7 @@
 #include "benchmark/benchmark.h"
 #include "absl/utility/utility.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace {
 
@@ -40,13 +40,13 @@ template <class Indices>
 struct VariantOfAlternativesImpl;
 
 template <std::size_t... Indices>
-struct VariantOfAlternativesImpl<absl::index_sequence<Indices...>> {
-  using type = absl::variant<VariantAlternative<Indices>...>;
+struct VariantOfAlternativesImpl<abslx::index_sequence<Indices...>> {
+  using type = abslx::variant<VariantAlternative<Indices>...>;
 };
 
 template <std::size_t NumAlternatives>
 using VariantOfAlternatives = typename VariantOfAlternativesImpl<
-    absl::make_index_sequence<NumAlternatives>>::type;
+    abslx::make_index_sequence<NumAlternatives>>::type;
 
 struct Empty {};
 
@@ -69,7 +69,7 @@ struct VisitorApplier {
 
   template <class... Vars>
   void operator()(const Vars&... vars) const noexcept {
-    absl::visit(Visitor(), vars...);
+    abslx::visit(Visitor(), vars...);
   }
 };
 
@@ -79,7 +79,7 @@ struct MakeWithIndex {
 
   static Variant Run(std::size_t index) {
     return index == CurrIndex
-               ? Variant(absl::in_place_index_t<CurrIndex>())
+               ? Variant(abslx::in_place_index_t<CurrIndex>())
                : MakeWithIndex<NumIndices, CurrIndex - 1>::Run(index);
   }
 };
@@ -106,7 +106,7 @@ VariantOfAlternatives<NumIndices> MakeVariant(std::size_t dimension,
 }
 
 template <std::size_t NumIndices, std::size_t... Dimensions>
-struct MakeVariantTuple<NumIndices, absl::index_sequence<Dimensions...>> {
+struct MakeVariantTuple<NumIndices, abslx::index_sequence<Dimensions...>> {
   using VariantTuple =
       std::tuple<always_t<VariantOfAlternatives<NumIndices>, Dimensions>...>;
 
@@ -124,7 +124,7 @@ struct VisitTestBody {
   template <class Vars, class State>
   static bool Run(Vars& vars, State& state) {
     if (state.KeepRunning()) {
-      absl::apply(VisitorApplier(), vars[I]);
+      abslx::apply(VisitorApplier(), vars[I]);
       return VisitTestBody<End, I + 1>::Run(vars, state);
     }
     return false;
@@ -143,12 +143,12 @@ struct VisitTestBody<End, End> {
 template <std::size_t NumIndices, std::size_t NumDimensions = 1>
 void BM_RedundantVisit(benchmark::State& state) {
   auto vars =
-      MakeVariantTuple<NumIndices, absl::make_index_sequence<NumDimensions>>::
+      MakeVariantTuple<NumIndices, abslx::make_index_sequence<NumDimensions>>::
           Run(static_cast<std::size_t>(state.range(0)));
 
   for (auto _ : state) {  // NOLINT
     benchmark::DoNotOptimize(vars);
-    absl::apply(VisitorApplier(), vars);
+    abslx::apply(VisitorApplier(), vars);
   }
 }
 
@@ -159,7 +159,7 @@ void BM_Visit(benchmark::State& state) {
       integral_pow(NumIndices, NumDimensions);
 
   using VariantTupleMaker =
-      MakeVariantTuple<NumIndices, absl::make_index_sequence<NumDimensions>>;
+      MakeVariantTuple<NumIndices, abslx::make_index_sequence<NumDimensions>>;
   using Tuple = typename VariantTupleMaker::VariantTuple;
 
   Tuple vars[num_possibilities];
@@ -219,4 +219,4 @@ BENCHMARK_TEMPLATE(BM_RedundantVisit, 4, 2)
 
 }  // namespace
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

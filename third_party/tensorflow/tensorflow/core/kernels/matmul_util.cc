@@ -53,14 +53,14 @@ bool BlasLtMatmulPlanParams::operator==(
 
 const PlanAndAlgorithms* BlasLtMatmulPlanMap::Find(
     const BlasLtMatmulPlanParams& params) const {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   auto it = params_plan_map_.find(params);
   return (it != params_plan_map_.end()) ? &it->second : nullptr;
 }
 
 const PlanAndAlgorithms* BlasLtMatmulPlanMap::Insert(
     const BlasLtMatmulPlanParams& params, PlanAndAlgorithms value) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   return &params_plan_map_.emplace(params, std::move(value)).first->second;
 }
 

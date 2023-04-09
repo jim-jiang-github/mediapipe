@@ -114,14 +114,14 @@ ConvertImageSegmenterOptionsToProto(ImageSegmenterOptions* options) {
 
 }  // namespace
 
-absl::StatusOr<std::unique_ptr<ImageSegmenter>> ImageSegmenter::Create(
+abslx::StatusOr<std::unique_ptr<ImageSegmenter>> ImageSegmenter::Create(
     std::unique_ptr<ImageSegmenterOptions> options) {
   auto options_proto = ConvertImageSegmenterOptionsToProto(options.get());
   tasks::core::PacketsCallback packets_callback = nullptr;
   if (options->result_callback) {
     auto result_callback = options->result_callback;
     packets_callback =
-        [=](absl::StatusOr<tasks::core::PacketMap> status_or_packets) {
+        [=](abslx::StatusOr<tasks::core::PacketMap> status_or_packets) {
           if (!status_or_packets.ok()) {
             Image image;
             result_callback(status_or_packets.status(), image,
@@ -149,13 +149,13 @@ absl::StatusOr<std::unique_ptr<ImageSegmenter>> ImageSegmenter::Create(
       std::move(packets_callback));
 }
 
-absl::StatusOr<std::vector<Image>> ImageSegmenter::Segment(
+abslx::StatusOr<std::vector<Image>> ImageSegmenter::Segment(
     mediapipe::Image image,
     std::optional<core::ImageProcessingOptions> image_processing_options) {
   if (image.UsesGpu()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrCat("GPU input images are currently not supported."),
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrCat("GPU input images are currently not supported."),
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }
   ASSIGN_OR_RETURN(
@@ -170,13 +170,13 @@ absl::StatusOr<std::vector<Image>> ImageSegmenter::Segment(
   return output_packets[kSegmentationStreamName].Get<std::vector<Image>>();
 }
 
-absl::StatusOr<std::vector<Image>> ImageSegmenter::SegmentForVideo(
+abslx::StatusOr<std::vector<Image>> ImageSegmenter::SegmentForVideo(
     mediapipe::Image image, int64 timestamp_ms,
     std::optional<core::ImageProcessingOptions> image_processing_options) {
   if (image.UsesGpu()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrCat("GPU input images are currently not supported."),
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrCat("GPU input images are currently not supported."),
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }
   ASSIGN_OR_RETURN(
@@ -194,13 +194,13 @@ absl::StatusOr<std::vector<Image>> ImageSegmenter::SegmentForVideo(
   return output_packets[kSegmentationStreamName].Get<std::vector<Image>>();
 }
 
-absl::Status ImageSegmenter::SegmentAsync(
+abslx::Status ImageSegmenter::SegmentAsync(
     Image image, int64 timestamp_ms,
     std::optional<core::ImageProcessingOptions> image_processing_options) {
   if (image.UsesGpu()) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrCat("GPU input images are currently not supported."),
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrCat("GPU input images are currently not supported."),
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }
   ASSIGN_OR_RETURN(

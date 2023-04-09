@@ -111,7 +111,7 @@ To build an API object,you must provide the following information by extending
                                   const std::string&, const std::string& // InputTypes
                                   > {
       // Convert API input into tensors
-      absl::Status BertQuestionAnswerer::Preprocess(
+      abslx::Status BertQuestionAnswerer::Preprocess(
         const std::vector<TfLiteTensor*>& input_tensors, // input tensors of the model
         const std::string& context, const std::string& query // InputType of the API
       ) {
@@ -121,7 +121,7 @@ To build an API object,you must provide the following information by extending
         PopulateTensor(input_ids, input_tensors[0]);
         PopulateTensor(input_mask, input_tensors[1]);
         PopulateTensor(segment_ids, input_tensors[2]);
-        return absl::OkStatus();
+        return abslx::OkStatus();
       }
 
       // Convert output tensors into API output
@@ -181,7 +181,7 @@ To build an API object,you must provide the following information by extending
             api_to_init,
             core::TaskAPIFactory::CreateFromFile<BertQuestionAnswerer>(
                 path_to_model,
-                absl::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
+                abslx::make_unique<tflite::ops::builtin::BuiltinOpResolver>(),
                 kNumLiteThreads));
 
         // Perform additional model specific initializations
@@ -309,11 +309,11 @@ which provides JNI handlings for all Java Task APIs.
       Java_org_tensorflow_lite_task_text_qa_BertQuestionAnswerer_initJniWithBertByteBuffers(
           JNIEnv* env, jclass thiz, jobjectArray model_buffers) {
         // Convert Java ByteBuffer object into a buffer that can be read by native factory functions
-        absl::string_view model =
+        abslx::string_view model =
             GetMappedFileBuffer(env, env->GetObjectArrayElement(model_buffers, 0));
 
         // Creates the native API object
-        absl::StatusOr<std::unique_ptr<QuestionAnswerer>> status =
+        abslx::StatusOr<std::unique_ptr<QuestionAnswerer>> status =
             BertQuestionAnswerer::CreateFromBuffer(
                 model.data(), model.size());
         if (status.ok()) {
@@ -430,7 +430,7 @@ following the steps below:
       // Initialize the native API object
       + (instancetype)mobilebertQuestionAnswererWithModelPath:(NSString *)modelPath
                                               vocabPath:(NSString *)vocabPath {
-        absl::StatusOr<std::unique_ptr<QuestionAnswererCPP>> cQuestionAnswerer =
+        abslx::StatusOr<std::unique_ptr<QuestionAnswererCPP>> cQuestionAnswerer =
             BertQuestionAnswererCPP::CreateBertQuestionAnswerer(MakeString(modelPath),
                                                                 MakeString(vocabPath));
         _GTMDevAssert(cQuestionAnswerer.ok(), @"Failed to create BertQuestionAnswerer");

@@ -60,21 +60,21 @@ namespace mediapipe {
 // }
 class TfLiteTensorsToClassificationCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
   ::mediapipe::TfLiteTensorsToClassificationCalculatorOptions options_;
   int top_k_ = 0;
-  absl::node_hash_map<int, std::string> label_map_;
+  abslx::node_hash_map<int, std::string> label_map_;
   bool label_map_loaded_ = false;
 };
 REGISTER_CALCULATOR(TfLiteTensorsToClassificationCalculator);
 
-absl::Status TfLiteTensorsToClassificationCalculator::GetContract(
+abslx::Status TfLiteTensorsToClassificationCalculator::GetContract(
     CalculatorContract* cc) {
   RET_CHECK(!cc->Inputs().GetTags().empty());
   RET_CHECK(!cc->Outputs().GetTags().empty());
@@ -87,10 +87,10 @@ absl::Status TfLiteTensorsToClassificationCalculator::GetContract(
     cc->Outputs().Tag("CLASSIFICATIONS").Set<ClassificationList>();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteTensorsToClassificationCalculator::Open(
+abslx::Status TfLiteTensorsToClassificationCalculator::Open(
     CalculatorContext* cc) {
   cc->SetOffset(TimestampDiff(0));
 
@@ -114,10 +114,10 @@ absl::Status TfLiteTensorsToClassificationCalculator::Open(
     label_map_loaded_ = true;
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteTensorsToClassificationCalculator::Process(
+abslx::Status TfLiteTensorsToClassificationCalculator::Process(
     CalculatorContext* cc) {
   const auto& input_tensors =
       cc->Inputs().Tag("TENSORS").Get<std::vector<TfLiteTensor>>();
@@ -140,7 +140,7 @@ absl::Status TfLiteTensorsToClassificationCalculator::Process(
   }
   const float* raw_scores = raw_score_tensor->data.f;
 
-  auto classification_list = absl::make_unique<ClassificationList>();
+  auto classification_list = abslx::make_unique<ClassificationList>();
   if (options_.binary_classification()) {
     Classification* class_first = classification_list->add_classification();
     Classification* class_second = classification_list->add_classification();
@@ -190,12 +190,12 @@ absl::Status TfLiteTensorsToClassificationCalculator::Process(
       .Tag("CLASSIFICATIONS")
       .Add(classification_list.release(), cc->InputTimestamp());
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status TfLiteTensorsToClassificationCalculator::Close(
+abslx::Status TfLiteTensorsToClassificationCalculator::Close(
     CalculatorContext* cc) {
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

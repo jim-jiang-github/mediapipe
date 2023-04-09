@@ -56,7 +56,7 @@ class MergePaddingWith2DOperation : public SequenceTransformation {
     Node* op_node = sequence.back();
 
     PadAttributes pad_attr =
-        absl::any_cast<PadAttributes>(pad_node->operation.attributes);
+        abslx::any_cast<PadAttributes>(pad_node->operation.attributes);
 
     if (pad_attr.type != PaddingContentType::ZEROS) {
       return {TransformStatus::DECLINED, "Only Zero padding is supported."};
@@ -67,8 +67,8 @@ class MergePaddingWith2DOperation : public SequenceTransformation {
               "Pad has non-zero padding on non HW axis."};
     }
 
-    Attr* node_attr = absl::any_cast<Attr>(&op_node->operation.attributes);
-    absl::Status status = RemovePrecedingNode(graph, pad_node, op_node);
+    Attr* node_attr = abslx::any_cast<Attr>(&op_node->operation.attributes);
+    abslx::Status status = RemovePrecedingNode(graph, pad_node, op_node);
     if (!status.ok()) {
       return {TransformStatus::INVALID,
               "Unable to remove Pad node with Operation node: " +
@@ -81,7 +81,7 @@ class MergePaddingWith2DOperation : public SequenceTransformation {
     node_attr->padding.prepended.w += pad_attr.prepended.w;
     return {
         TransformStatus::APPLIED,
-        absl::StrCat("Added padding: prepended = {h = ", pad_attr.prepended.h,
+        abslx::StrCat("Added padding: prepended = {h = ", pad_attr.prepended.h,
                      ", w = ", pad_attr.prepended.w, "}, appended = { h = ",
                      pad_attr.appended.h, ", w = ", pad_attr.appended.w, "}")};
   }
@@ -93,19 +93,19 @@ class MergePaddingWith2DOperation : public SequenceTransformation {
 }  // namespace
 
 std::unique_ptr<SequenceTransformation> NewMergePaddingWithPooling() {
-  return absl::make_unique<MergePaddingWith2DOperation<Pooling2DAttributes>>(
+  return abslx::make_unique<MergePaddingWith2DOperation<Pooling2DAttributes>>(
       OperationType::POOLING_2D);
 }
 
 std::unique_ptr<SequenceTransformation> NewMergePaddingWithConvolution2D() {
-  return absl::make_unique<
+  return abslx::make_unique<
       MergePaddingWith2DOperation<Convolution2DAttributes>>(
       OperationType::CONVOLUTION_2D);
 }
 
 std::unique_ptr<SequenceTransformation>
 NewMergePaddingWithDepthwiseConvolution() {
-  return absl::make_unique<
+  return abslx::make_unique<
       MergePaddingWith2DOperation<DepthwiseConvolution2DAttributes>>(
       OperationType::DEPTHWISE_CONVOLUTION);
 }
@@ -128,7 +128,7 @@ class MergePaddingWithAddOperation : public NodeTransformation {
     }
 
     PadAttributes pad_attr =
-        absl::any_cast<PadAttributes>(node->operation.attributes);
+        abslx::any_cast<PadAttributes>(node->operation.attributes);
 
     if (pad_attr.type != PaddingContentType::ZEROS) {
       return {TransformStatus::DECLINED, "Only Zero padding is supported."};
@@ -151,19 +151,19 @@ class MergePaddingWithAddOperation : public NodeTransformation {
     }
 
     ElementwiseAttributes add_attr =
-        absl::any_cast<ElementwiseAttributes>(add_node->operation.attributes);
+        abslx::any_cast<ElementwiseAttributes>(add_node->operation.attributes);
     const bool is_add_hwc =
-        absl::holds_alternative<Tensor<HWC, DataType::FLOAT32>>(add_attr.param);
+        abslx::holds_alternative<Tensor<HWC, DataType::FLOAT32>>(add_attr.param);
     const bool is_add_linear =
-        absl::holds_alternative<Tensor<Linear, DataType::FLOAT32>>(
+        abslx::holds_alternative<Tensor<Linear, DataType::FLOAT32>>(
             add_attr.param);
-    const bool is_add_scalar = absl::holds_alternative<float>(add_attr.param);
+    const bool is_add_scalar = abslx::holds_alternative<float>(add_attr.param);
     if (is_add_hwc || is_add_linear || is_add_scalar) {
       return {TransformStatus::SKIPPED,
               "Cannot remove padding when ADD has constant argument."};
     }
 
-    absl::Status status = RemovePrecedingNode(graph, node, add_node);
+    abslx::Status status = RemovePrecedingNode(graph, node, add_node);
     if (!status.ok()) {
       return {TransformStatus::INVALID,
               "Unable to remove Pad node " + std::string(status.message())};
@@ -175,7 +175,7 @@ class MergePaddingWithAddOperation : public NodeTransformation {
 };
 
 std::unique_ptr<NodeTransformation> NewMergePaddingWithAdd() {
-  return absl::make_unique<MergePaddingWithAddOperation>();
+  return abslx::make_unique<MergePaddingWithAddOperation>();
 }
 
 }  // namespace gpu

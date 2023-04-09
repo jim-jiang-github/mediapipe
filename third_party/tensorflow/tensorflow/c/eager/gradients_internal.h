@@ -33,7 +33,7 @@ Status Reset(AbstractOperation*, const char* op, const char* raw_device_name,
 // Records the inputs in the `ForwardOperation`.
 Status AddInput(AbstractOperation*, AbstractTensorHandle*, ForwardOperation*);
 Status AddInputList(AbstractOperation*,
-                    absl::Span<AbstractTensorHandle* const> inputs,
+                    abslx::Span<AbstractTensorHandle* const> inputs,
                     ForwardOperation*);
 
 // Sets the attrs in the `ForwardOperation`.
@@ -72,12 +72,12 @@ Status SetAttrShapeList(AbstractOperation*, const char* attr_name,
                         const int64_t** dims, const int* num_dims,
                         int num_values, ForwardOperation*);
 Status SetAttrFunctionList(AbstractOperation*, const char* attr_name,
-                           absl::Span<const AbstractOperation*> values,
+                           abslx::Span<const AbstractOperation*> values,
                            ForwardOperation*);
 
 // Make the call to `Tape::RecordOperation`.
 Status Execute(AbstractOperation*, AbstractContext*,
-               absl::Span<AbstractTensorHandle*> retvals, int* num_retvals,
+               abslx::Span<AbstractTensorHandle*> retvals, int* num_retvals,
                ForwardOperation*, Tape*, const GradientRegistry&);
 
 }  // namespace internal

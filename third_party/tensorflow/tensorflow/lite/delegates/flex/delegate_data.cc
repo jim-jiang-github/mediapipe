@@ -60,12 +60,12 @@ void BuildFunctionDefProto(const std::string& function_name,
   inputs.reserve(subgraph.inputs().size());
   outputs.reserve(subgraph.outputs().size());
   for (int i = 0; i < subgraph.inputs().size(); ++i) {
-    inputs.push_back(absl::StrCat(
+    inputs.push_back(abslx::StrCat(
         "args_", i, ": ",
         TfLiteTypeToTfTypeName(subgraph.tensor(subgraph.inputs()[i])->type)));
   }
   for (int i = 0; i < subgraph.outputs().size(); ++i) {
-    outputs.push_back(absl::StrCat(
+    outputs.push_back(abslx::StrCat(
         "res_", i, ": ",
         TfLiteTypeToTfTypeName(subgraph.tensor(subgraph.outputs()[i])->type)));
   }
@@ -80,15 +80,15 @@ void BuildFunctionDefProto(const std::string& function_name,
   execute_node.op = "TfLiteSubgraphExecute";
   execute_node.arg.push_back("SubgraphResourceKey:output:0");
   for (int i = 0; i < subgraph.inputs().size(); ++i) {
-    execute_node.arg.push_back(absl::StrCat("args_", i));
+    execute_node.arg.push_back(abslx::StrCat("args_", i));
   }
   nodes.push_back(execute_node);
 
   std::vector<std::pair<std::string, std::string>> ret_def;
   ret_def.reserve(subgraph.outputs().size());
   for (int i = 0; i < subgraph.outputs().size(); ++i) {
-    ret_def.emplace_back(absl::StrCat("res_", i),
-                         absl::StrCat("InvokeTfLite:output:", i));
+    ret_def.emplace_back(abslx::StrCat("res_", i),
+                         abslx::StrCat("InvokeTfLite:output:", i));
   }
   fdef = tensorflow::FunctionDefHelper::Create(function_name, inputs, outputs,
                                                /*attr_def=*/{}, nodes, ret_def);

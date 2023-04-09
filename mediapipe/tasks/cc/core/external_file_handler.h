@@ -43,14 +43,14 @@ class ExternalFileHandler {
   //
   // Warning: Does not take ownership of `external_file`, which must refer to a
   // valid proto that outlives this object.
-  static absl::StatusOr<std::unique_ptr<ExternalFileHandler>>
+  static abslx::StatusOr<std::unique_ptr<ExternalFileHandler>>
   CreateFromExternalFile(const proto::ExternalFile* external_file);
 
   ~ExternalFileHandler();
 
   // Returns the content of the ExternalFile as a string_view guaranteed to be
   // valid as long as the ExternalFileHandler is alive.
-  absl::string_view GetFileContent();
+  abslx::string_view GetFileContent();
 
  private:
   // Private constructor, called from CreateFromExternalFile().
@@ -60,7 +60,7 @@ class ExternalFileHandler {
   // Opens (if provided by path) and maps (if provided by path or file
   // descriptor) the external file in memory. Does nothing otherwise, as file
   // contents are already loaded in memory.
-  absl::Status MapExternalFile();
+  abslx::Status MapExternalFile();
 
   // Reference to the input ExternalFile.
   const proto::ExternalFile& external_file_;

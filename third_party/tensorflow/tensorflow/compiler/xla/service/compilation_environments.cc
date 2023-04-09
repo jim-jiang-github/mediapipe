@@ -28,7 +28,7 @@ CompilationEnvironments& CompilationEnvironments::operator=(
     const CompilationEnvironments& rhs) {
   Clear();
   for (const auto& descriptor_message_pair : rhs.environments_) {
-    auto env = absl::WrapUnique(descriptor_message_pair.second->New());
+    auto env = abslx::WrapUnique(descriptor_message_pair.second->New());
     env->CopyFrom(*descriptor_message_pair.second);
     environments_.insert({descriptor_message_pair.first, std::move(env)});
   }

@@ -60,7 +60,7 @@ mlir::LogicalResult AttachRetvalLayouts(
   if (!func)
     return sp_call_op.emitOpError() << "found no FuncOp for symbol " << sym;
 
-  llvm::SmallVector<absl::optional<Layout>, 8> retvals_layouts;
+  llvm::SmallVector<abslx::optional<Layout>, 8> retvals_layouts;
   retvals_layouts.reserve(func.getNumResults());
   for (auto operand : func.front().getTerminator()->getOperands()) {
     auto result_layout_or_status = ExtractLayoutFromOperand(operand);
@@ -99,7 +99,7 @@ mlir::LogicalResult AttachRetvalLayouts(
   // all we need is a placeholder layout so that no special case is needed in
   // dtensor_device.
   SetLayoutOnOp(sp_call_op,
-                absl::Span<const absl::optional<Layout>>(
+                abslx::Span<const abslx::optional<Layout>>(
                     retvals_layouts.data(), retvals_layouts.size()));
 
   return mlir::success();

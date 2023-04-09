@@ -39,8 +39,8 @@ limitations under the License.
 
 namespace xla {
 
-StatusOr<Literal> TextLiteralReader::ReadPath(absl::string_view path) {
-  CHECK(!absl::EndsWith(path, ".gz"))
+StatusOr<Literal> TextLiteralReader::ReadPath(abslx::string_view path) {
+  CHECK(!abslx::EndsWith(path, ".gz"))
       << "TextLiteralReader no longer supports reading .gz files";
   std::unique_ptr<tensorflow::RandomAccessFile> file;
   Status s =
@@ -65,7 +65,7 @@ StatusOr<Literal> TextLiteralReader::ReadAllLines() {
     return s;
   }
 
-  absl::StripAsciiWhitespace(&shape_string);
+  abslx::StripAsciiWhitespace(&shape_string);
   TF_ASSIGN_OR_RETURN(Shape shape, ParseShape(shape_string));
   if (shape.element_type() != F32) {
     return Unimplemented(
@@ -76,33 +76,33 @@ StatusOr<Literal> TextLiteralReader::ReadAllLines() {
   Literal result(shape);
   const float fill = std::numeric_limits<float>::quiet_NaN();
   result.PopulateWithValue<float>(fill);
-  std::vector<absl::string_view> pieces;
-  std::vector<absl::string_view> coordinates;
+  std::vector<abslx::string_view> pieces;
+  std::vector<abslx::string_view> coordinates;
   std::vector<int64_t> coordinate_values;
   std::string line;
   while (buf.ReadLine(&line).ok()) {
-    pieces = absl::StrSplit(line, ':');
-    absl::string_view coordinates_string =
-        absl::StripAsciiWhitespace(pieces[0]);
-    absl::string_view value_string = absl::StripAsciiWhitespace(pieces[1]);
-    if (!absl::ConsumePrefix(&coordinates_string, "(")) {
+    pieces = abslx::StrSplit(line, ':');
+    abslx::string_view coordinates_string =
+        abslx::StripAsciiWhitespace(pieces[0]);
+    abslx::string_view value_string = abslx::StripAsciiWhitespace(pieces[1]);
+    if (!abslx::ConsumePrefix(&coordinates_string, "(")) {
       return InvalidArgument(
           "expected '(' at the beginning of coordinates: \"%s\"", line);
     }
-    if (!absl::ConsumeSuffix(&coordinates_string, ")")) {
+    if (!abslx::ConsumeSuffix(&coordinates_string, ")")) {
       return InvalidArgument("expected ')' at the end of coordinates: \"%s\"",
                              line);
     }
     float value;
-    if (!absl::SimpleAtof(value_string, &value)) {
+    if (!abslx::SimpleAtof(value_string, &value)) {
       return InvalidArgument("could not parse value as float: \"%s\"",
                              value_string);
     }
-    coordinates = absl::StrSplit(coordinates_string, ',');
+    coordinates = abslx::StrSplit(coordinates_string, ',');
     coordinate_values.clear();
-    for (absl::string_view piece : coordinates) {
+    for (abslx::string_view piece : coordinates) {
       int64_t coordinate_value;
-      if (!absl::SimpleAtoi(piece, &coordinate_value)) {
+      if (!abslx::SimpleAtoi(piece, &coordinate_value)) {
         return InvalidArgument(
             "could not parse coordinate member as int64_t: \"%s\"",
             std::string(piece));

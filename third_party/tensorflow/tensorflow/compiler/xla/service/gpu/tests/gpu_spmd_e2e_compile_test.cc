@@ -76,7 +76,7 @@ ENTRY main {
 
   // Validate that no collective communication operations are generated in this
   // module.
-  const bool has_collective_ops = absl::c_any_of(
+  const bool has_collective_ops = abslx::c_any_of(
       optimized_module->entry_computation()->instructions(),
       [](const HloInstruction *inst) {
         return hlo_query::IsCollectiveCommunicationOp(inst->opcode());

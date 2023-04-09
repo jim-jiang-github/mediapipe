@@ -22,8 +22,8 @@ class NoOp : public mediapipe::api2::Node {
   static constexpr mediapipe::api2::Output<int>::Optional kOutputNotNeeded{
       "NN"};
   MEDIAPIPE_NODE_CONTRACT(kInputNotNeeded, kOutputNotNeeded);
-  absl::Status Process(CalculatorContext* cc) override {
-    return absl::OkStatus();
+  abslx::Status Process(CalculatorContext* cc) override {
+    return abslx::OkStatus();
   }
 };
 
@@ -47,13 +47,13 @@ CalculatorGraphConfig ExpectedConfigExpandedFromGraph(
   auto* node = config.add_node();
   node->set_calculator(node_name);
   node->set_name(
-      absl::StrCat(absl::AsciiStrToLower(graph_name), "__", node_name));
+      abslx::StrCat(abslx::AsciiStrToLower(graph_name), "__", node_name));
   config.add_executor();
   return config;
 }
 
 class AlwaysCalculatorALegacySubgraph : public Subgraph {
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       const SubgraphOptions& options) override {
     return ExpectedConfig("CalculatorA");
   }
@@ -85,7 +85,7 @@ TEST(ValidatedGraphConfigTest, InitializeLegacySubgraphHardcoded) {
 }
 
 class AlwaysCalculatorASubgraph : public Subgraph {
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     return ExpectedConfig("CalculatorA");
   }
@@ -120,7 +120,7 @@ const mediapipe::GraphService<std::string> kStringTestService{
     "mediapipe::StringTestService"};
 
 class TestServiceSubgraph : public Subgraph {
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       SubgraphContext* sc) override {
     return ExpectedConfig(sc->Service(kStringTestService).GetObject());
   }

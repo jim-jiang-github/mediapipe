@@ -40,7 +40,7 @@ const int kMaxNumOfKernels = 1000;
 // A list of patterns to help determine if a kernel uses Tensor Core.
 // A kernel uses Tensor Core if its kernel name contains any of these patterns.
 // Some examples of kernel names: volta_h884gemm, turing_fp16_s1688cudnn_fp16
-constexpr absl::string_view kTensorCoreKernelNamePatterns[] = {
+constexpr abslx::string_view kTensorCoreKernelNamePatterns[] = {
     "16816",
     "c1688",
     "conv1x1",
@@ -63,10 +63,10 @@ constexpr absl::string_view kTensorCoreKernelNamePatterns[] = {
 
 }  // namespace
 
-void ParseKernelLaunchParams(absl::string_view xstat_kernel_details,
+void ParseKernelLaunchParams(abslx::string_view xstat_kernel_details,
                              KernelReport* kernel) {
-  const std::vector<absl::string_view> params =
-      absl::StrSplit(xstat_kernel_details, absl::ByAnyChar(" \n"));
+  const std::vector<abslx::string_view> params =
+      abslx::StrSplit(xstat_kernel_details, abslx::ByAnyChar(" \n"));
 
   constexpr uint32 kNumDimensions = 3;
   for (uint32 dim = 0; dim < kNumDimensions; ++dim) {
@@ -76,50 +76,50 @@ void ParseKernelLaunchParams(absl::string_view xstat_kernel_details,
 
   // Process tokens.
   for (const auto& param : params) {
-    const std::vector<absl::string_view> key_value = absl::StrSplit(param, ':');
+    const std::vector<abslx::string_view> key_value = abslx::StrSplit(param, ':');
     if (key_value.size() != 2) {
       // Unrecognized token.
       continue;
     }
-    absl::string_view key = key_value[0];
-    absl::string_view value_str = key_value[1];
+    abslx::string_view key = key_value[0];
+    abslx::string_view value_str = key_value[1];
     uint32 value = 0;
     double pct = 0.0;
     // Cases that consume a pair of tokens "key:value".
-    if (key == "regs" && absl::SimpleAtoi(value_str, &value)) {
+    if (key == "regs" && abslx::SimpleAtoi(value_str, &value)) {
       kernel->set_registers_per_thread(value);
-    } else if (key == "static_shared" && absl::SimpleAtoi(value_str, &value)) {
+    } else if (key == "static_shared" && abslx::SimpleAtoi(value_str, &value)) {
       kernel->set_static_shmem_bytes(value);
-    } else if (key == "dynamic_shared" && absl::SimpleAtoi(value_str, &value)) {
+    } else if (key == "dynamic_shared" && abslx::SimpleAtoi(value_str, &value)) {
       kernel->set_dynamic_shmem_bytes(value);
     } else if (key == "block") {
-      const std::vector<absl::string_view>& block =
-          absl::StrSplit(value_str, ',');
+      const std::vector<abslx::string_view>& block =
+          abslx::StrSplit(value_str, ',');
       uint32 tmp[3];
-      if (block.size() == 3 && absl::SimpleAtoi(block[0], &tmp[0]) &&
-          absl::SimpleAtoi(block[1], &tmp[1]) &&
-          absl::SimpleAtoi(block[2], &tmp[2])) {
+      if (block.size() == 3 && abslx::SimpleAtoi(block[0], &tmp[0]) &&
+          abslx::SimpleAtoi(block[1], &tmp[1]) &&
+          abslx::SimpleAtoi(block[2], &tmp[2])) {
         std::copy_n(tmp, 3, kernel->mutable_block_dim()->begin());
       }
     } else if (key == "grid") {
-      const std::vector<absl::string_view>& grid =
-          absl::StrSplit(value_str, ',');
+      const std::vector<abslx::string_view>& grid =
+          abslx::StrSplit(value_str, ',');
       uint32 tmp[3];
-      if (grid.size() == 3 && absl::SimpleAtoi(grid[0], &tmp[0]) &&
-          absl::SimpleAtoi(grid[1], &tmp[1]) &&
-          absl::SimpleAtoi(grid[2], &tmp[2])) {
+      if (grid.size() == 3 && abslx::SimpleAtoi(grid[0], &tmp[0]) &&
+          abslx::SimpleAtoi(grid[1], &tmp[1]) &&
+          abslx::SimpleAtoi(grid[2], &tmp[2])) {
         std::copy_n(tmp, 3, kernel->mutable_grid_dim()->begin());
       }
-    } else if (key == "occ_pct" && absl::SimpleAtod(value_str, &pct)) {
+    } else if (key == "occ_pct" && abslx::SimpleAtod(value_str, &pct)) {
       kernel->set_occupancy_pct(pct);
     }
   }
 }
 
-bool IsKernelUsingTensorCore(absl::string_view kernel_name) {
+bool IsKernelUsingTensorCore(abslx::string_view kernel_name) {
   VLOG(1) << "kernel name: " << kernel_name;
-  for (absl::string_view pattern : kTensorCoreKernelNamePatterns) {
-    if (absl::StrContains(kernel_name, pattern)) {
+  for (abslx::string_view pattern : kTensorCoreKernelNamePatterns) {
+    if (abslx::StrContains(kernel_name, pattern)) {
       return true;
     }
   }
@@ -127,45 +127,45 @@ bool IsKernelUsingTensorCore(absl::string_view kernel_name) {
 }
 
 // This list is not exhaustive.
-bool IsOpTensorCoreEligible(absl::string_view tf_op_name) {
+bool IsOpTensorCoreEligible(abslx::string_view tf_op_name) {
   // Disable formatting to keep inline comments vertically aligned.
   // clang-format off
   return false
       // Using EndsWith to match Fused operations.
-      || absl::EndsWith(tf_op_name, "Conv2D")
-      || absl::EndsWith(tf_op_name, "Conv2DBackpropFilter")
-      || absl::EndsWith(tf_op_name, "Conv2DBackpropInput")
-      || absl::EndsWith(tf_op_name, "Conv3D")
-      || absl::EndsWith(tf_op_name, "DepthwiseConv2dNative")
-      || absl::EndsWith(tf_op_name, "DepthwiseConv2dNativeBackpropFilter")
-      || absl::EndsWith(tf_op_name, "DepthwiseConv2dNativeBackpropInput")
+      || abslx::EndsWith(tf_op_name, "Conv2D")
+      || abslx::EndsWith(tf_op_name, "Conv2DBackpropFilter")
+      || abslx::EndsWith(tf_op_name, "Conv2DBackpropInput")
+      || abslx::EndsWith(tf_op_name, "Conv3D")
+      || abslx::EndsWith(tf_op_name, "DepthwiseConv2dNative")
+      || abslx::EndsWith(tf_op_name, "DepthwiseConv2dNativeBackpropFilter")
+      || abslx::EndsWith(tf_op_name, "DepthwiseConv2dNativeBackpropInput")
       // Using Contains to match V2/V3 suffixes.
-      || absl::StrContains(tf_op_name, "BatchMatMul")
+      || abslx::StrContains(tf_op_name, "BatchMatMul")
       // MatMul requires exact matching.
-      || absl::EndsWith(tf_op_name, "/MatMul")
-      || absl::EndsWith(tf_op_name, "FusedMatMul")
+      || abslx::EndsWith(tf_op_name, "/MatMul")
+      || abslx::EndsWith(tf_op_name, "FusedMatMul")
       // cuDNN operations.
-      || absl::EndsWith(tf_op_name, "/CudnnRNN")
-      || absl::StrContains(tf_op_name, "CudnnRNNV")
-      || absl::StrContains(tf_op_name, "CudnnRNNForward")
-      || absl::StrContains(tf_op_name, "CudnnRNNBackprop")
+      || abslx::EndsWith(tf_op_name, "/CudnnRNN")
+      || abslx::StrContains(tf_op_name, "CudnnRNNV")
+      || abslx::StrContains(tf_op_name, "CudnnRNNForward")
+      || abslx::StrContains(tf_op_name, "CudnnRNNBackprop")
       // Special cases.
-      || absl::EndsWith(tf_op_name, "XlaDot")
-      || absl::EndsWith(tf_op_name, "XlaDotV2");
+      || abslx::EndsWith(tf_op_name, "XlaDot")
+      || abslx::EndsWith(tf_op_name, "XlaDotV2");
   // clang-format on
 }
 
-bool IsEinsumTensorCoreEligible(absl::string_view equation) {
+bool IsEinsumTensorCoreEligible(abslx::string_view equation) {
   if (equation.empty()) {
     return false;
   }
-  const std::vector<absl::string_view> input_output =
-      absl::StrSplit(equation, "->");
+  const std::vector<abslx::string_view> input_output =
+      abslx::StrSplit(equation, "->");
   if (input_output.size() != 2) {
     return false;
   }
-  const std::vector<absl::string_view> lhs_rhs =
-      absl::StrSplit(input_output[0], ',');
+  const std::vector<abslx::string_view> lhs_rhs =
+      abslx::StrSplit(input_output[0], ',');
   return lhs_rhs.size() == 2;
 }
 
@@ -273,10 +273,10 @@ void CopyTopKDurationKernelReportsToDb(const KernelReportMap& reports,
 
   // Sort and copy at most <kMaxNumOfKernels> kernels to <dst>.
   if (kernels_to_sort.size() > kMaxNumOfKernels) {
-    absl::c_partial_sort(kernels_to_sort,
+    abslx::c_partial_sort(kernels_to_sort,
                          kernels_to_sort.begin() + kMaxNumOfKernels, comp);
   } else {
-    absl::c_sort(kernels_to_sort, comp);
+    abslx::c_sort(kernels_to_sort, comp);
   }
 
   int copy_size =

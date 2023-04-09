@@ -80,7 +80,7 @@ namespace dtensor {
 // TODO(b/189332820): Replace this with a Partitioner stub swapped in by the
 // Copybara workflow.
 StatusOr<ExecutionFunctions> ABSL_ATTRIBUTE_WEAK PipeliningPartitionerRun(
-    const absl::flat_hash_map<std::string, const MeshWithParallelDevice*>*
+    const abslx::flat_hash_map<std::string, const MeshWithParallelDevice*>*
         device_name_to_mesh_device,
     FunctionLibraryDefinition* flib_def, DTensorMlirPassRunner* pass_runner,
     const FunctionDef& fdef, const NameAttrList& eager_attributes,
@@ -92,7 +92,7 @@ StatusOr<ExecutionFunctions> ABSL_ATTRIBUTE_WEAK PipeliningPartitionerRun(
 
 class DTensorDevice {
  public:
-  explicit DTensorDevice(absl::string_view name)
+  explicit DTensorDevice(abslx::string_view name)
       : name_(name),
         same_shape_policy_enabled_(false),
         cancellation_manager_(std::make_unique<CancellationManager>()) {}
@@ -123,9 +123,9 @@ class DTensorDevice {
 
   // Returns sub meshes of pipelining.
   // Key is the name of a composite device.
-  StatusOr<absl::flat_hash_map<std::string, const MeshWithParallelDevice*>>
+  StatusOr<abslx::flat_hash_map<std::string, const MeshWithParallelDevice*>>
   PipelineSubMeshes(TFE_Context* context) {
-    absl::flat_hash_map<std::string, const MeshWithParallelDevice*>
+    abslx::flat_hash_map<std::string, const MeshWithParallelDevice*>
         device_to_mesh;
     for (const auto& pair : mesh_to_device_map_) {
       TF_ASSIGN_OR_RETURN(CompositeDevice * device,
@@ -329,7 +329,7 @@ class DTensorDevice {
   // Update output layouts for eager ops based on same shape policy.
   void UpdateOutputLayoutsWithSameShapePolicy(
       const std::vector<PartialTensorShape>& global_output_shapes,
-      const absl::flat_hash_set<Mesh>& input_meshes, absl::string_view op_name,
+      const abslx::flat_hash_set<Mesh>& input_meshes, abslx::string_view op_name,
       tensorflow::Graph* graph, std::vector<const Layout*>* output_layouts,
       TF_Status* status);
 
@@ -376,7 +376,7 @@ class DTensorDevice {
   //
   // For now we just consider the first entry added to dtensor_device as the
   // default mesh. Before we reach an agreement on this, we'll leave it as is.
-  absl::flat_hash_map<Mesh, std::unique_ptr<MeshWithParallelDevice>>
+  abslx::flat_hash_map<Mesh, std::unique_ptr<MeshWithParallelDevice>>
       mesh_to_device_map_;
   // TODO(hthu): Consider whether we want to preserve the default_mesh semantic.
   // Current default mesh consistent to default_layout_. If default_layout_ is
@@ -386,7 +386,7 @@ class DTensorDevice {
   // set.
   const MeshWithParallelDevice* global_default_mesh_ = nullptr;
   // If the user has specified a default output layout.
-  absl::optional<Layout> default_layout_;
+  abslx::optional<Layout> default_layout_;
 
   // Determines whether tensors with a shape previously associated with only one
   // layout use that layout if nothing else can be inferred.
@@ -400,7 +400,7 @@ class DTensorDevice {
     // Whether the layout is unique for this shape
     bool is_unique;
   };
-  absl::flat_hash_map<int64_t, CachedLayout> shape_layout_cache_;
+  abslx::flat_hash_map<int64_t, CachedLayout> shape_layout_cache_;
 
   FunctionManager function_manager_;
 
@@ -415,10 +415,10 @@ class DTensorDevice {
   // to the number of times of the function execution. The
   // function_mesh_fingerprint and the counter together are used for generating
   // the step id, which is used for rendezvous creation.
-  absl::flat_hash_map<uint64, uint64> func_mesh_fingerprint_to_step_counter_;
+  abslx::flat_hash_map<uint64, uint64> func_mesh_fingerprint_to_step_counter_;
 };
 
-int64_t FingerprintShape(const absl::Span<const int64_t> shape) {
+int64_t FingerprintShape(const abslx::Span<const int64_t> shape) {
   int64_t fprint = 0;
   for (int64_t dim : shape) {
     fprint = FingerprintCat64(fprint, dim);
@@ -466,8 +466,8 @@ parallel_device::ParallelTensor* MeshWithParallelDevice::DeviceIDs(
           mesh_config_.global_device_ids()[0]) {
         TF_SetStatus(
             status, TF_INTERNAL,
-            absl::StrCat("Global device IDs should be consecutive: ",
-                         absl::StrJoin(mesh_config_.global_device_ids(), ", "))
+            abslx::StrCat("Global device IDs should be consecutive: ",
+                         abslx::StrJoin(mesh_config_.global_device_ids(), ", "))
                 .c_str());
         return nullptr;
       }
@@ -480,7 +480,7 @@ parallel_device::ParallelTensor* MeshWithParallelDevice::DeviceIDs(
     for (int64_t id : mesh_config_.local_device_ids()) {
       ids.push_back(id);
     }
-    VLOG(1) << "Parallel device IDs: " << absl::StrJoin(ids, ", ");
+    VLOG(1) << "Parallel device IDs: " << abslx::StrJoin(ids, ", ");
     device_ids_tensor_ =
         parallel_device_->ScalarsFromSequence<int32_t>(ids, context, status);
     if (TF_GetCode(status) != TF_OK) return nullptr;
@@ -569,12 +569,12 @@ StatusOr<NameAttrList> FetchAttributes(const TFE_OpAttrs* attributes) {
 }
 
 StatusOr<Layout> FetchLayoutFromAttributes(const TFE_OpAttrs* attributes,
-                                           absl::string_view attribute_name) {
+                                           abslx::string_view attribute_name) {
   // Get attributes.
   TF_ASSIGN_OR_RETURN(NameAttrList name_and_attrs, FetchAttributes(attributes));
 
   // Get layout string from attributes.
-  absl::string_view layout_str =
+  abslx::string_view layout_str =
       name_and_attrs.attr().find(std::string(attribute_name))->second.s();
 
   // This would probably be slow at the moment without caching.
@@ -608,7 +608,7 @@ std::vector<TFE_TensorHandle*> DTensorDevice::Unpack(TFE_Context* context,
   if (input_device != name_) {
     TF_SetStatus(
         status, TF_INVALID_ARGUMENT,
-        absl::StrCat(
+        abslx::StrCat(
             "DTensorUnpack expects a tensor placed on the DTensor device: ",
             name_, ", but input was placed on device: ", input_device)
             .c_str());
@@ -823,7 +823,7 @@ TFE_TensorHandle* DTensorDevice::Pack(TFE_Context* context, int num_inputs,
       mesh_to_device_map_[target_mesh].get();
   if (target_parallel_device == nullptr) {
     TF_SetStatus(status, TF_INVALID_ARGUMENT,
-                 absl::StrCat("Required mesh : ", target_mesh.ToString(),
+                 abslx::StrCat("Required mesh : ", target_mesh.ToString(),
                               "is not registered with DTensor ")
                      .c_str());
     return nullptr;
@@ -850,7 +850,7 @@ TFE_TensorHandle* DTensorDevice::Pack(TFE_Context* context, int num_inputs,
     if (num_inputs !=
         target_parallel_device->parallel_device().num_underlying_devices()) {
       TF_SetStatus(status, TF_INVALID_ARGUMENT,
-                   absl::StrCat("The dtensor device ", name_, " expected ",
+                   abslx::StrCat("The dtensor device ", name_, " expected ",
                                 local_devices.size(),
                                 " inputs to DTensorPack, but got ", num_inputs)
                        .c_str());
@@ -889,7 +889,7 @@ TFE_TensorHandle* DTensorDevice::Pack(TFE_Context* context, int num_inputs,
     if (target_layout->rank() != component_shape.size()) {
       TF_SetStatus(
           status, TF_INVALID_ARGUMENT,
-          absl::StrCat(
+          abslx::StrCat(
               "Packed layout should have the same rank as the rank for each "
               "component. The rank of each component is: ",
               component_shape.size(),
@@ -927,7 +927,7 @@ TFE_TensorHandle* DTensorDevice::SparsePack(
       mesh_to_device_map_[target_mesh].get();
   if (target_parallel_device == nullptr) {
     TF_SetStatus(status, TF_INVALID_ARGUMENT,
-                 absl::StrCat("Required mesh : ", target_mesh.ToString(),
+                 abslx::StrCat("Required mesh : ", target_mesh.ToString(),
                               "is not registered with DTensor ")
                      .c_str());
     return nullptr;
@@ -955,7 +955,7 @@ TFE_TensorHandle* DTensorDevice::SparsePack(
   if (TF_GetCode(status) != TF_OK) {
     TF_SetStatus(
         status, TF_GetCode(status),
-        absl::StrCat("Error resolving the tensor handle of shape tensor"
+        abslx::StrCat("Error resolving the tensor handle of shape tensor"
                      ". Original message: ",
                      TF_Message(status))
             .c_str());
@@ -964,7 +964,7 @@ TFE_TensorHandle* DTensorDevice::SparsePack(
   int shape_tensor_size = TFE_TensorHandleDim(shapes[0], 0, status);
   if (TF_GetCode(status) != TF_OK || shape_tensor_size <= 0) {
     TF_SetStatus(status, TF_GetCode(status),
-                 absl::StrCat("Error computing the num dims of shape tensor",
+                 abslx::StrCat("Error computing the num dims of shape tensor",
                               TF_Message(status))
                      .c_str());
     return nullptr;
@@ -976,7 +976,7 @@ TFE_TensorHandle* DTensorDevice::SparsePack(
   if (local_shape.size() != target_layout->rank()) {
     TF_SetStatus(
         status, TF_INVALID_ARGUMENT,
-        absl::StrCat(
+        abslx::StrCat(
             "Packed layout should have the same rank as the rank for each "
             "component. The rank of each component is: ",
             local_shape.size(),
@@ -1076,7 +1076,7 @@ bool DTensorDevice::IsSparseDTensor(TFE_Context* context,
 
 void DTensorDevice::UpdateOutputLayoutsWithSameShapePolicy(
     const std::vector<PartialTensorShape>& global_output_shapes,
-    const absl::flat_hash_set<Mesh>& input_meshes, absl::string_view op_name,
+    const abslx::flat_hash_set<Mesh>& input_meshes, abslx::string_view op_name,
     tensorflow::Graph* graph, std::vector<const Layout*>* output_layouts,
     TF_Status* status) {
   if (!same_shape_policy_enabled_) return;
@@ -1255,11 +1255,11 @@ StatusOr<std::unique_ptr<Graph>> SelectGraphToExecute(
 // Adds processed graph to run for each mesh computation in
 // `execution_functions` to function definition library.
 Status AddExecutionFunctionDefsToFunctionDefLibrary(
-    const absl::flat_hash_set<Node*>& control_ret_nodes, TFE_Context* context,
+    const abslx::flat_hash_set<Node*>& control_ret_nodes, TFE_Context* context,
     const Graph& graph, ExecutionFunctions* execution_functions) {
   // Note: We use node name instead of node pointer for comparison because
   // node address in the new graph is different with the original graph.
-  absl::flat_hash_set<std::string> control_ret_names;
+  abslx::flat_hash_set<std::string> control_ret_names;
   for (auto* n : control_ret_nodes) {
     control_ret_names.emplace(n->name());
   }
@@ -1281,17 +1281,17 @@ Status AddExecutionFunctionDefsToFunctionDefLibrary(
 
     static std::atomic<int64_t> unique_function_number(0);
     function.translated_function_name =
-        absl::StrCat(func.name(), "_", unique_function_number.fetch_add(1));
+        abslx::StrCat(func.name(), "_", unique_function_number.fetch_add(1));
     auto control_ret_node_names =
         [&control_ret_names, &selected_call_node_name](
-            const Node* node) -> absl::optional<std::string> {
+            const Node* node) -> abslx::optional<std::string> {
       // Add the stateful partitioned call node as a control return as we need
       // to process any control deps inside the inner function.
       if (control_ret_names.contains(node->name()) ||
           node->name() == selected_call_node_name) {
         return node->name();
       }
-      return absl::nullopt;
+      return abslx::nullopt;
     };
 
     tensorflow::FunctionDef to_run;
@@ -1338,7 +1338,7 @@ void DTensorDevice::LowerToSPMDFunction(
     RETURN_C_STATUS_IF_NOT_OK(s, status);
 
     // Finds all meshes the inputs are lied on.
-    absl::flat_hash_set<Mesh> input_meshes;
+    abslx::flat_hash_set<Mesh> input_meshes;
     for (const TensorWithLayout* tensor : inputs) {
       if (!tensor->layout().mesh().IsEmpty()) {
         input_meshes.insert(tensor->layout().mesh());
@@ -1399,7 +1399,7 @@ void DTensorDevice::LowerToSPMDFunction(
     RETURN_C_STATUS_IF_NOT_OK(s, status);
   }
 
-  absl::flat_hash_set<Node*> control_ret_nodes;
+  abslx::flat_hash_set<Node*> control_ret_nodes;
   // Run DTensor MLIR passes that convert input graph to SPMD version.
   {
     profiler::TraceMe activity([&] { return "DTensorDevice::RunMLIRPasses"; },
@@ -1509,7 +1509,7 @@ void DTensorDevice::ExecuteRegularOperation(
       inputs[resource_index_to_update]->UpdateLayout(entry.second, status);
       if (TF_GetCode(status) != TF_OK) {
         RETURN_STATUS(status, TF_GetCode(status),
-                      absl::StrCat("Attempt to update layout input arg: ",
+                      abslx::StrCat("Attempt to update layout input arg: ",
                                    resource_index_to_update,
                                    ". Original message: ", TF_Message(status))
                           .c_str());
@@ -1524,7 +1524,7 @@ void DTensorDevice::ExecuteRegularOperation(
   // identifier for a mesh.
   std::map<std::string, const MeshWithParallelDevice*>
       function_name_and_mesh_mapping;
-  absl::flat_hash_set<std::string> excluded_fn_names;
+  abslx::flat_hash_set<std::string> excluded_fn_names;
   std::unique_ptr<const TranslatedFunction> epu_fn_ptr, load_embedding_ptr;
   for (const TranslatedFunction& function :
        execution_functions->function_list) {
@@ -1535,7 +1535,7 @@ void DTensorDevice::ExecuteRegularOperation(
 
     if (!maybe_converted_mesh.ok()) {
       RETURN_STATUS(status, TF_INVALID_ARGUMENT,
-                    absl::StrCat("Failed to convert mesh, get error: ",
+                    abslx::StrCat("Failed to convert mesh, get error: ",
                                  maybe_converted_mesh.status().error_message())
                         .c_str());
     }
@@ -1561,7 +1561,7 @@ void DTensorDevice::ExecuteRegularOperation(
       epu_fn_ptr = std::make_unique<const TranslatedFunction>(function);
       excluded_fn_names.insert(function.translated_function_name);
     }
-    if (absl::StartsWith(function.translated_function_name, kLoadEmbeddingFn)) {
+    if (abslx::StartsWith(function.translated_function_name, kLoadEmbeddingFn)) {
       if (load_embedding_ptr != nullptr) {
         RETURN_STATUS(status, TF_INTERNAL,
                       "There are more than one function defined on EPU mesh.");
@@ -1618,7 +1618,7 @@ void DTensorDevice::ExecuteRegularOperation(
   // into the three component tensors.
   std::vector<parallel_device::ParallelTensor*> global_parallel_inputs;
   std::vector<parallel_device::ParallelTensor*> global_parallel_sparse_inputs;
-  absl::flat_hash_set<int> global_sparse_input_indices;
+  abslx::flat_hash_set<int> global_sparse_input_indices;
   for (auto input : inputs) {
     if (input->tensor_type() == TensorType::kSparse) {
       SparseTensorWithLayout* sparse_input =
@@ -1867,7 +1867,7 @@ void DTensorDevice::Execute(const TFE_Op* original_op, int* num_outputs,
   // Record a unique mesh identified through all inputs that's already on
   // DTensor device. If we can identify a single mesh, the same mesh is used as
   // the mesh to broadcast non-dtensor inputs.
-  absl::flat_hash_set<Mesh> input_meshes;
+  abslx::flat_hash_set<Mesh> input_meshes;
   std::vector<int> not_on_device_input_indices;
 
   typed_inputs.resize(num_inputs);
@@ -1928,7 +1928,7 @@ void DTensorDevice::Execute(const TFE_Op* original_op, int* num_outputs,
       if (TF_GetCode(status) != TF_OK) return;
       RETURN_STATUS(
           status, TF_UNIMPLEMENTED,
-          absl::StrCat(
+          abslx::StrCat(
               "The op/function ", operation_name,
               " got a regular tensor for input ", not_on_device_input_index,
               " (shape ", ShapeToDebugString(tensor_shape),
@@ -2010,7 +2010,7 @@ TFE_TensorHandle* CopyFromDTensorDevice(TFE_Context* context,
   return TFE_TensorHandleCopySharingTensor(typed_input->get_tensor(0), status);
 }
 
-void AllocateDTensorDevice(absl::string_view device_name,
+void AllocateDTensorDevice(abslx::string_view device_name,
                            TFE_CustomDevice* device, void** device_info) {
   device->copy_tensor_to_device = &CopyToDTensorDevice;
   device->copy_tensor_from_device = &CopyFromDTensorDevice;
@@ -2024,7 +2024,7 @@ void AddMesh(const std::string& serialized_mesh, void* device_info,
   auto mesh_config_or_status = Mesh::FromString(serialized_mesh);
   if (!mesh_config_or_status.ok()) {
     TF_SetStatus(status, TF_INTERNAL,
-                 absl::StrCat("Failed to parse mesh config. ",
+                 abslx::StrCat("Failed to parse mesh config. ",
                               mesh_config_or_status.status().error_message())
                      .c_str());
     return;
@@ -2041,9 +2041,9 @@ void AddMesh(const std::string& serialized_mesh, void* device_info,
                                                       is_async));
 
   std::string composite_device_name;
-  if (absl::StartsWith(mesh_config.name(), kPipelineMeshNamePrefix)) {
+  if (abslx::StartsWith(mesh_config.name(), kPipelineMeshNamePrefix)) {
     composite_device_name = std::string(
-        absl::StripPrefix(mesh_config.name(), kPipelineMeshNamePrefix));
+        abslx::StripPrefix(mesh_config.name(), kPipelineMeshNamePrefix));
   }
 
   auto mesh = std::make_unique<MeshWithParallelDevice>(

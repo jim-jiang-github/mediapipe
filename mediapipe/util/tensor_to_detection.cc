@@ -25,23 +25,23 @@
 
 namespace mediapipe {
 
-using ::absl::StrFormat;
+using ::abslx::StrFormat;
 
 namespace tf = ::tensorflow;
 
 Detection TensorToDetection(
     float box_ymin, float box_xmin, float box_ymax, float box_xmax,
-    const float score, const absl::variant<int, std::string>& class_label) {
+    const float score, const abslx::variant<int, std::string>& class_label) {
   Detection detection;
   detection.add_score(score);
 
   // According to mediapipe/framework/formats/detection.proto
   // "Either string or integer labels must be used but not both at the
   // same time."
-  if (absl::holds_alternative<int>(class_label)) {
-    detection.add_label_id(absl::get<int>(class_label));
+  if (abslx::holds_alternative<int>(class_label)) {
+    detection.add_label_id(abslx::get<int>(class_label));
   } else {
-    detection.add_label(absl::get<std::string>(class_label));
+    detection.add_label(abslx::get<std::string>(class_label));
   }
 
   LocationData* location_data = detection.mutable_location_data();
@@ -202,7 +202,7 @@ Status TensorsToDetections(const ::tensorflow::Tensor& num_detections,
     }
     detections->emplace_back(detection);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

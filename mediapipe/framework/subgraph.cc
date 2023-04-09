@@ -32,7 +32,7 @@ ProtoSubgraph::ProtoSubgraph(const CalculatorGraphConfig& config)
 
 ProtoSubgraph::~ProtoSubgraph() {}
 
-absl::StatusOr<CalculatorGraphConfig> ProtoSubgraph::GetConfig(
+abslx::StatusOr<CalculatorGraphConfig> ProtoSubgraph::GetConfig(
     const Subgraph::SubgraphOptions& options) {
   return config_;
 }
@@ -42,7 +42,7 @@ TemplateSubgraph::TemplateSubgraph(const CalculatorGraphTemplate& templ)
 
 TemplateSubgraph::~TemplateSubgraph() {}
 
-absl::StatusOr<CalculatorGraphConfig> TemplateSubgraph::GetConfig(
+abslx::StatusOr<CalculatorGraphConfig> TemplateSubgraph::GetConfig(
     const Subgraph::SubgraphOptions& options) {
   TemplateDict arguments =
       Subgraph::GetOptions<mediapipe::TemplateSubgraphOptions>(options).dict();
@@ -71,7 +71,7 @@ void GraphRegistry::Register(
 void GraphRegistry::Register(const std::string& type_name,
                              const CalculatorGraphConfig& config) {
   local_factories_.Register(type_name, [config] {
-    auto result = absl::make_unique<ProtoSubgraph>(config);
+    auto result = abslx::make_unique<ProtoSubgraph>(config);
     return std::unique_ptr<Subgraph>(result.release());
   });
 }
@@ -80,7 +80,7 @@ void GraphRegistry::Register(const std::string& type_name,
 void GraphRegistry::Register(const std::string& type_name,
                              const CalculatorGraphTemplate& templ) {
   local_factories_.Register(type_name, [templ] {
-    auto result = absl::make_unique<TemplateSubgraph>(templ);
+    auto result = abslx::make_unique<TemplateSubgraph>(templ);
     return std::unique_ptr<Subgraph>(result.release());
   });
 }
@@ -91,10 +91,10 @@ bool GraphRegistry::IsRegistered(const std::string& ns,
          global_factories_->IsRegistered(ns, type_name);
 }
 
-absl::StatusOr<CalculatorGraphConfig> GraphRegistry::CreateByName(
-    absl::string_view ns, absl::string_view type_name,
+abslx::StatusOr<CalculatorGraphConfig> GraphRegistry::CreateByName(
+    abslx::string_view ns, abslx::string_view type_name,
     SubgraphContext* context) const {
-  absl::StatusOr<std::unique_ptr<Subgraph>> maker =
+  abslx::StatusOr<std::unique_ptr<Subgraph>> maker =
       local_factories_.IsRegistered(ns, type_name)
           ? local_factories_.Invoke(ns, type_name)
           : global_factories_->Invoke(ns, type_name);

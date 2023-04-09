@@ -94,7 +94,7 @@ class AssertNextDatasetOp::Dataset : public DatasetBase {
 
     Status Initialize(IteratorContext* ctx) override {
       std::vector<string> tokens =
-          absl::StrSplit(prefix(), ':', absl::SkipEmpty());
+          abslx::StrSplit(prefix(), ':', abslx::SkipEmpty());
       if (dataset()->transformations_.size() > tokens.size() - 2) {
         return errors::InvalidArgument(
             "Asserted next ", dataset()->transformations_.size(),

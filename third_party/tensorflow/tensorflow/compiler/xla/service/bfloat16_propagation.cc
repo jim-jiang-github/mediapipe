@@ -84,7 +84,7 @@ void BFloat16Propagation::RevertIfFusionInternalBF16Changes(
   };
 
   auto root = fusion->fused_instructions_computation()->root_instruction();
-  absl::flat_hash_set<const HloValue*> changed_root_buffers;
+  abslx::flat_hash_set<const HloValue*> changed_root_buffers;
 
   auto root_changes_it = changes_to_bf16_.find(root);
   if (root_changes_it != changes_to_bf16_.end()) {
@@ -111,7 +111,7 @@ void BFloat16Propagation::RevertIfFusionInternalBF16Changes(
         return;
       }
 
-      aliasing = absl::c_any_of(dataflow_->GetValueSet(inst, index).values(),
+      aliasing = abslx::c_any_of(dataflow_->GetValueSet(inst, index).values(),
                                 IsValueIn(changed_root_buffers));
     });
     return aliasing;
@@ -364,7 +364,7 @@ void BFloat16Propagation::DetermineInstructionPrecision(HloInstruction* hlo,
   // output shape of a fusion or while before propagating inside its
   // computations.
   bool postpone_processing_called_computations = false;
-  absl::Cleanup cleaner = [this, hlo,
+  abslx::Cleanup cleaner = [this, hlo,
                            &postpone_processing_called_computations] {
     if (!postpone_processing_called_computations) {
       if (hlo->opcode() == HloOpcode::kFusion) {
@@ -386,7 +386,7 @@ void BFloat16Propagation::DetermineInstructionPrecision(HloInstruction* hlo,
   }
 
   if (hlo->opcode() == HloOpcode::kConditional &&
-      absl::c_any_of(hlo->branch_computations(), [&](const HloComputation* c) {
+      abslx::c_any_of(hlo->branch_computations(), [&](const HloComputation* c) {
         return caller_counts_[c] > 1;
       })) {
     postpone_processing_called_computations = true;
@@ -461,7 +461,7 @@ void BFloat16Propagation::AdjustCalledComputationParameters(
     HloInstruction* hlo) {
   auto adjust_computation = [this, hlo](
                                 HloComputation* computation,
-                                absl::Span<HloInstruction* const> operands) {
+                                abslx::Span<HloInstruction* const> operands) {
     // Adjust parameters.
     CHECK_EQ(operands.size(), computation->num_parameters());
     for (int64_t i = 0; i < operands.size(); ++i) {
@@ -564,7 +564,7 @@ void BFloat16Propagation::AdjustCalledComputationRoot(HloInstruction* hlo) {
 
 bool BFloat16Propagation::ResolveInconsistencyOfAliasingBuffersHelper(
     HloComputation* computation,
-    absl::flat_hash_set<const HloComputation*>* visited_computations) {
+    abslx::flat_hash_set<const HloComputation*>* visited_computations) {
   bool parameter_changed = false;
   auto insts = computation->MakeInstructionPostOrder();
   // Do the adjustment on each instruction in the computation in reverse
@@ -660,7 +660,7 @@ bool BFloat16Propagation::ResolveInconsistencyOfAliasingBuffersHelper(
         // require changing another input parameter. A fixed point will be
         // reached because the parameters can only be changed from BF16 to F32,
         // not the other way around.
-        absl::flat_hash_set<const HloComputation*> visited_in_while;
+        abslx::flat_hash_set<const HloComputation*> visited_in_while;
         while (ResolveInconsistencyOfAliasingBuffersHelper(
                    hlo->while_condition(), &visited_in_while) ||
                ResolveInconsistencyOfAliasingBuffersHelper(hlo->while_body(),
@@ -694,10 +694,10 @@ bool BFloat16Propagation::ResolveInconsistencyOfAliasingBuffersHelper(
 
 void BFloat16Propagation::ResolveInconsistencyOfAliasingBuffers(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   const auto& computations_topological_order =
       module->MakeComputationPostOrder(execution_threads);
-  absl::flat_hash_set<const HloComputation*> resolved;
+  abslx::flat_hash_set<const HloComputation*> resolved;
   for (auto comp_it = computations_topological_order.rbegin();
        comp_it != computations_topological_order.rend(); ++comp_it) {
     if (ContainsKey(resolved, *comp_it)) {
@@ -709,7 +709,7 @@ void BFloat16Propagation::ResolveInconsistencyOfAliasingBuffers(
 
 Status BFloat16Propagation::ResolveInconsistentFusions(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   // We could have changed a fusion computation's root shape to have a different
   // precision than the fusion node's output, if the fusion root does not
   // define a buffer (e.g., a tuple). Now we add conversions after such fusion
@@ -772,7 +772,7 @@ Status BFloat16Propagation::ResolveInconsistentFusions(
 
 Status BFloat16Propagation::ResolveConvertedConstants(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   // We may have converted some constants from F32 to BF16, so adjust the
   // constant literals in such cases. We do this here instead of when the
   // constant node's is changed because 1) the HloInstruction interface does not
@@ -804,7 +804,7 @@ Status BFloat16Propagation::ResolveConvertedConstants(
 
 Status BFloat16Propagation::SkipNoopConversions(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   for (auto computation : module->computations(execution_threads)) {
     for (auto hlo : computation->MakeInstructionPostOrder()) {
       if (hlo->opcode() != HloOpcode::kConvert) {
@@ -832,7 +832,7 @@ Status BFloat16Propagation::SkipNoopConversions(
 // HLOs.
 StatusOr<bool> BFloat16Propagation::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   consider_using_bfloat16_.clear();
   instructions_visited_in_backward_pass_.clear();
   computations_visited_in_backward_pass_.clear();

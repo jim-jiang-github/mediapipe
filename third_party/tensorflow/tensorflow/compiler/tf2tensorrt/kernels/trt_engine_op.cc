@@ -58,8 +58,8 @@ namespace tensorflow {
 namespace tensorrt {
 namespace {
 Logger& logger = *Logger::GetLogger();
-using absl::StrAppend;
-using absl::StrCat;
+using abslx::StrAppend;
+using abslx::StrCat;
 using ::nvinfer1::IRuntime;
 
 #define LOG_FIRST_FEW_WARNING_WITH_PREFIX \
@@ -302,7 +302,7 @@ static Status FunctionDefToGraphDef(FunctionLibraryRuntime::Handle handle,
   CopyGraph(*fbody->graph, graph.get());
 
   auto replace_name = [](const char* const prefix, string* name) {
-    if (absl::StartsWith(*name, absl::AsciiStrToLower(prefix))) {
+    if (abslx::StartsWith(*name, abslx::AsciiStrToLower(prefix))) {
       name->replace(0, strlen(prefix), prefix);
       return true;
     }
@@ -316,7 +316,7 @@ static Status FunctionDefToGraphDef(FunctionLibraryRuntime::Handle handle,
         // Instantiation of the function will append _RetVal to the node name,
         // need to remove it for backward compatibility.
         const char* const suffix_to_remove = "_RetVal";
-        if (absl::EndsWith(node.name(), suffix_to_remove)) {
+        if (abslx::EndsWith(node.name(), suffix_to_remove)) {
           node.mutable_name()->erase(node.name().size() -
                                      strlen(suffix_to_remove));
         }
@@ -503,7 +503,7 @@ TRTEngineOp::TRTEngineOp(OpKernelConstruction* context)
                                                       &profile_strategy_));
     }
   }
-  has_dynamic_shape_input_ = absl::c_any_of(
+  has_dynamic_shape_input_ = abslx::c_any_of(
       input_partial_shapes_,
       [](PartialTensorShape shape) { return !shape.IsFullyDefined(); });
   VLOG(2) << "TRTEngineOp has_dynamic_shape_input_: "
@@ -994,9 +994,9 @@ Status TRTEngineOp::GetEngineCacheResource(OpKernelContext* ctx,
   // in many different engine caches if we use the instantiated op name
   // directly, but we still want all of them share the same cache (if they were
   // representing the same subgraph).
-  absl::string_view resource_name = name();
+  abslx::string_view resource_name = name();
   size_t last_slash = resource_name.find_last_of('/');
-  if (last_slash != absl::string_view::npos) {
+  if (last_slash != abslx::string_view::npos) {
     resource_name.remove_prefix(last_slash + 1);
   }
 

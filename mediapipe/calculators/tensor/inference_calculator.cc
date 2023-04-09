@@ -33,12 +33,12 @@ class InferenceCalculatorSelectorImpl
     : public SubgraphImpl<InferenceCalculatorSelector,
                           InferenceCalculatorSelectorImpl> {
  public:
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(
+  abslx::StatusOr<CalculatorGraphConfig> GetConfig(
       const CalculatorGraphConfig::Node& subgraph_node) {
     const auto& options =
         Subgraph::GetOptions<mediapipe::InferenceCalculatorOptions>(
             subgraph_node);
-    std::vector<absl::string_view> impls;
+    std::vector<abslx::string_view> impls;
 
     const bool should_use_gpu =
         !options.has_delegate() ||  // Use GPU delegate if not specified
@@ -61,7 +61,7 @@ class InferenceCalculatorSelectorImpl
     impls.emplace_back("Cpu");
     impls.emplace_back("Xnnpack");
     for (const auto& suffix : impls) {
-      const auto impl = absl::StrCat("InferenceCalculator", suffix);
+      const auto impl = abslx::StrCat("InferenceCalculator", suffix);
       if (!mediapipe::CalculatorBaseRegistry::IsRegistered(impl)) continue;
       VLOG(1) << "Using " << suffix << " for InferenceCalculator with "
               << (options.has_model_path()
@@ -71,22 +71,22 @@ class InferenceCalculatorSelectorImpl
       impl_node.set_calculator(impl);
       return tool::MakeSingleNodeGraph(std::move(impl_node));
     }
-    return absl::UnimplementedError("no implementation available");
+    return abslx::UnimplementedError("no implementation available");
   }
 };
 
-absl::StatusOr<Packet<TfLiteModelPtr>> InferenceCalculator::GetModelAsPacket(
+abslx::StatusOr<Packet<TfLiteModelPtr>> InferenceCalculator::GetModelAsPacket(
     CalculatorContext* cc) {
   const auto& options = cc->Options<mediapipe::InferenceCalculatorOptions>();
   if (!options.model_path().empty()) {
     return TfLiteModelLoader::LoadFromPath(options.model_path());
   }
   if (!kSideInModel(cc).IsEmpty()) return kSideInModel(cc);
-  return absl::Status(mediapipe::StatusCode::kNotFound,
+  return abslx::Status(mediapipe::StatusCode::kNotFound,
                       "Must specify TFLite model as path or loaded model.");
 }
 
-absl::StatusOr<Packet<tflite::OpResolver>>
+abslx::StatusOr<Packet<tflite::OpResolver>>
 InferenceCalculator::GetOpResolverAsPacket(CalculatorContext* cc) {
   if (kSideInOpResolver(cc).IsConnected()) {
     return kSideInOpResolver(cc).As<tflite::OpResolver>();

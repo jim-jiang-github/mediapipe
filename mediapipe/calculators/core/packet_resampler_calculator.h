@@ -110,11 +110,11 @@ class PacketReservoir {
 //   packet_downsampler_calculator.cc: skips packets regardless of timestamps.
 class PacketResamplerCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
   // Given the current count of periods that have passed, this returns
   // the next valid timestamp of the middle point of the next period:
@@ -208,13 +208,13 @@ class PacketResamplerStrategy {
 
   // Delegate for CalculatorBase::Open.  See CalculatorBase for relevant
   // implementation considerations.
-  virtual absl::Status Open(CalculatorContext* cc) = 0;
+  virtual abslx::Status Open(CalculatorContext* cc) = 0;
   // Delegate for CalculatorBase::Close.  See CalculatorBase for relevant
   // implementation considerations.
-  virtual absl::Status Close(CalculatorContext* cc) = 0;
+  virtual abslx::Status Close(CalculatorContext* cc) = 0;
   // Delegate for CalculatorBase::Process.  See CalculatorBase for relevant
   // implementation considerations.
-  virtual absl::Status Process(CalculatorContext* cc) = 0;
+  virtual abslx::Status Process(CalculatorContext* cc) = 0;
 
  protected:
   // Calculator running strategy.
@@ -234,9 +234,9 @@ class LegacyJitterWithReflectionStrategy : public PacketResamplerStrategy {
   LegacyJitterWithReflectionStrategy(PacketResamplerCalculator* calculator)
       : PacketResamplerStrategy(calculator) {}
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   void InitializeNextOutputTimestampWithJitter();
@@ -277,9 +277,9 @@ class ReproducibleJitterWithReflectionStrategy
       PacketResamplerCalculator* calculator)
       : PacketResamplerStrategy(calculator) {}
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  protected:
   // Returns next random in range (0,n].
@@ -335,9 +335,9 @@ class JitterWithoutReflectionStrategy : public PacketResamplerStrategy {
   JitterWithoutReflectionStrategy(PacketResamplerCalculator* calculator)
       : PacketResamplerStrategy(calculator) {}
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   // Calculates the first sampled timestamp that incorporates a jittering
@@ -375,9 +375,9 @@ class NoJitterStrategy : public PacketResamplerStrategy {
   NoJitterStrategy(PacketResamplerCalculator* calculator)
       : PacketResamplerStrategy(calculator) {}
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   // Number of periods that have passed (= #packets sent to the output).

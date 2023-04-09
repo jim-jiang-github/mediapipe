@@ -49,7 +49,7 @@ namespace gpu {
 namespace gl {
 namespace {
 
-using ObjectsSizes = absl::flat_hash_map<ValueId, size_t>;
+using ObjectsSizes = abslx::flat_hash_map<ValueId, size_t>;
 
 enum class InferenceContextState {
   NOT_STARTED,
@@ -61,20 +61,20 @@ class InferenceContextImpl : public InferenceContext {
   explicit InferenceContextImpl(std::unique_ptr<Runtime> runtime)
       : runtime_(std::move(runtime)) {}
 
-  absl::Status Execute() final {
+  abslx::Status Execute() final {
     std::lock_guard<std::mutex> lock(guard_);
     if (state_ != InferenceContextState::NOT_STARTED) {
-      return absl::FailedPreconditionError("InferenceContext is not reset");
+      return abslx::FailedPreconditionError("InferenceContext is not reset");
     }
     state_ = InferenceContextState::IN_PROGRESS;
     return runtime_->Execute();
   }
 
-  absl::Status Reset() final {
+  abslx::Status Reset() final {
     std::lock_guard<std::mutex> lock(guard_);
     // TODO(akulik): should Reset not return Status?
     state_ = InferenceContextState::NOT_STARTED;
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   RuntimeStats stats() const final { return runtime_->stats(); }
@@ -97,10 +97,10 @@ class InferenceContextWithBatchImpl : public InferenceContext {
         refs_(std::move(refs)),
         runtime_(std::move(runtime)) {}
 
-  absl::Status Execute() final {
+  abslx::Status Execute() final {
     std::lock_guard<std::mutex> lock(guard_);
     if (state_ != InferenceContextState::NOT_STARTED) {
-      return absl::FailedPreconditionError("InferenceContext is not reset");
+      return abslx::FailedPreconditionError("InferenceContext is not reset");
     }
     state_ = InferenceContextState::IN_PROGRESS;
 
@@ -115,7 +115,7 @@ class InferenceContextWithBatchImpl : public InferenceContext {
       if (!buffer) continue;
 
       if (buffer->bytes_size() % byte_size) {
-        return absl::InvalidArgumentError(absl::StrCat(
+        return abslx::InvalidArgumentError(abslx::StrCat(
             "Object ", id, " does not match expected byte size: ", byte_size));
       }
 
@@ -123,7 +123,7 @@ class InferenceContextWithBatchImpl : public InferenceContext {
       if (num_batches == 0) {
         num_batches = b;
       } else if (num_batches != b) {
-        return absl::InvalidArgumentError(absl::StrCat(
+        return abslx::InvalidArgumentError(abslx::StrCat(
             "Object ", id, " size does not match expected batch size: ", b,
             " vs ", num_batches));
       }
@@ -138,22 +138,22 @@ class InferenceContextWithBatchImpl : public InferenceContext {
         if (buffer) {
           auto ref = refs_->FindBuffer(id);
           if (!ref) {
-            return absl::InvalidArgumentError(
-                absl::StrCat("Reference to ", id, " is not found"));
+            return abslx::InvalidArgumentError(
+                abslx::StrCat("Reference to ", id, " is not found"));
           }
           RETURN_IF_ERROR(buffer->MakeView(b * byte_size, byte_size, ref));
         }
       }
       RETURN_IF_ERROR(runtime_->Execute());
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Reset() final {
+  abslx::Status Reset() final {
     std::lock_guard<std::mutex> lock(guard_);
     state_ = InferenceContextState::NOT_STARTED;
     // TODO(akulik): should Reset not return Status?
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   RuntimeStats stats() const final { return runtime_->stats(); }
@@ -184,7 +184,7 @@ struct ProgramParameters {
 };
 
 std::string GetShaderHeader(uint3 localsize) {
-  return absl::StrCat("#version 310 es\nlayout(local_size_x = ", localsize.x,
+  return abslx::StrCat("#version 310 es\nlayout(local_size_x = ", localsize.x,
                       ", local_size_y = ", localsize.y,
                       ", local_size_z = ", localsize.z, ") in;\n");
 }
@@ -200,7 +200,7 @@ class CompiledModelImpl
   explicit CompiledModelImpl(const GpuInfo& gpu_info) : gpu_info_(gpu_info) {}
 
   // Called while compiling shaders from scratch
-  absl::Status Add(const WorkgroupsCalculator& workgroup_calculator,
+  abslx::Status Add(const WorkgroupsCalculator& workgroup_calculator,
                    ShaderCode code) {
     // Calculate workgroup size.
     uint3 workgroup_size = workgroup_calculator.Calculate(code);
@@ -223,12 +223,12 @@ class CompiledModelImpl
         num_workgroups,
         shader_idx,
     });
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   // Store full shader and compile it if necessary.
   // Returns full_shader_index
-  absl::Status AddFullShader(const std::string& partial_shader,
+  abslx::Status AddFullShader(const std::string& partial_shader,
                              const uint3& workgroup_size, size_t* size) {
     std::string shader_src = GetShaderHeader(workgroup_size) + partial_shader;
     auto it = shader_to_index_.find(shader_src);
@@ -242,10 +242,10 @@ class CompiledModelImpl
     } else {
       *size = it->second;
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status NewRun(
+  abslx::Status NewRun(
       const RuntimeOptions& options, const ObjectManager* objects,
       CommandQueue* command_queue,
       std::unique_ptr<InferenceContext>* inference_context) const final {
@@ -277,12 +277,12 @@ class CompiledModelImpl
       *inference_context =
           std::make_unique<InferenceContextImpl>(std::move(runtime));
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
 #ifndef TFLITE_GPU_BINARY_RELEASE
   // Called on deserialization
-  absl::Status OnProgram(const std::vector<Variable>& parameters,
+  abslx::Status OnProgram(const std::vector<Variable>& parameters,
                          const std::vector<Object>& objects,
                          const uint3& workgroup_size,
                          const uint3& num_workgroups,
@@ -303,10 +303,10 @@ class CompiledModelImpl
         num_workgroups,
         shader_idx,
     });
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Serialize(
+  abslx::Status Serialize(
       std::vector<uint8_t>* serialized_compiled_model) const final {
     SerializedCompiledModelBuilder builder;
 
@@ -316,7 +316,7 @@ class CompiledModelImpl
       full_shaders[shader.second] = shader.first;
     }
 
-    absl::flat_hash_map<std::string, size_t> partial_shader_to_index;
+    abslx::flat_hash_map<std::string, size_t> partial_shader_to_index;
     std::vector<std::string> partial_shaders;
     for (const auto& program : programs_) {
       // Remove a header from a shader.
@@ -343,13 +343,13 @@ class CompiledModelImpl
     auto data = builder.Finalize(options);
     serialized_compiled_model->insert(serialized_compiled_model->end(),
                                       data.begin(), data.end());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status OnShader(absl::Span<const char> shader_src) final {
+  abslx::Status OnShader(abslx::Span<const char> shader_src) final {
     std::string source(shader_src.data(), shader_src.size());
     partial_shaders_.push_back(source);
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   void OnOptions(const CompiledModelOptions& options) final {
@@ -369,14 +369,14 @@ class CompiledModelImpl
   std::vector<GlShader> shaders_;
 
   // Shaders are serialized in order of their indices.
-  absl::flat_hash_map<std::string, size_t> shader_to_index_;
+  abslx::flat_hash_map<std::string, size_t> shader_to_index_;
   std::deque<ProgramParameters> programs_;
-  absl::flat_hash_map<ValueId, size_t> object_sizes_;
+  abslx::flat_hash_map<ValueId, size_t> object_sizes_;
   CompilerStats stats_;
 };
 }  // namespace
 
-absl::Status Compile(const CompilationOptions& options,
+abslx::Status Compile(const CompilationOptions& options,
                      const GraphFloat32& model,
                      const std::unordered_set<int>& tflite_graph_io,  // NOLINT
                      const NodeShader& node_shader,
@@ -386,35 +386,35 @@ absl::Status Compile(const CompilationOptions& options,
   GpuInfo gpu_info;
   RETURN_IF_ERROR(RequestGpuInfo(&gpu_info));
   if (!gpu_info.IsApiOpenGl31OrAbove()) {
-    return absl::InternalError(
+    return abslx::InternalError(
         "OpenGL ES 3.1 or above is required to use OpenGL inference.");
   }
   auto compiled_model_impl = std::make_unique<CompiledModelImpl>(gpu_info);
   compiled_model_impl->set_dynamic_batch(options.dynamic_batch);
   auto compiler = NewCompiler(&node_shader, &gpu_info, options);
   RETURN_IF_ERROR(compiler->Compile(
-      model, tflite_graph_io, [&](ShaderCode code) -> absl::Status {
+      model, tflite_graph_io, [&](ShaderCode code) -> abslx::Status {
         return compiled_model_impl->Add(workgroup_calculator, std::move(code));
       }));
   *compiled_model = std::move(compiled_model_impl);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 #ifndef TFLITE_GPU_BINARY_RELEASE
-absl::Status ReadSerializedModel(
+abslx::Status ReadSerializedModel(
     const std::vector<uint8_t>& serialized_model,
     std::unique_ptr<CompiledModel>* compiled_model) {
   GpuInfo gpu_info;
   RETURN_IF_ERROR(RequestGpuInfo(&gpu_info));
   if (!gpu_info.IsApiOpenGl31OrAbove()) {
-    return absl::InternalError(
+    return abslx::InternalError(
         "OpenGL ES 3.1 or above is required to use OpenGL inference.");
   }
   auto compiled_model_impl = std::make_unique<CompiledModelImpl>(gpu_info);
   RETURN_IF_ERROR(DeserializeCompiledModel(
-      absl::MakeConstSpan(serialized_model), compiled_model_impl.get()));
+      abslx::MakeConstSpan(serialized_model), compiled_model_impl.get()));
   *compiled_model = std::move(compiled_model_impl);
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 #endif  // TFLITE_GPU_BINARY_RELEASE
 

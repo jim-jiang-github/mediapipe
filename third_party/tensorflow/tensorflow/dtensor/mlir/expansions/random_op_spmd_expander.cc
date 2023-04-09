@@ -347,7 +347,7 @@ StatusOr<mlir::Operation*> RandomOpSPMDExpander::ExpandOp(mlir::Operation* op) {
     return CreatedShardedLocalRandomOpV2Range<
         mlir::TF::StatelessRandomUniformIntV2Op>(*layout, op);
   }
-  return errors::Unimplemented(absl::StrCat(
+  return errors::Unimplemented(abslx::StrCat(
       "SPMD expansion for op : ", OpName(op), " is not implemented"));
 }
 

@@ -56,7 +56,7 @@ static bool IsOrContainsIllegalInstr(const HloInstruction* instr) {
     return true;
   }
   for (const HloComputation* c : instr->called_computations()) {
-    if (absl::c_any_of(c->instructions(), IsOrContainsIllegalInstr)) {
+    if (abslx::c_any_of(c->instructions(), IsOrContainsIllegalInstr)) {
       return true;
     }
   }
@@ -67,7 +67,7 @@ static bool IsOrContainsIllegalInstr(const HloInstruction* instr) {
 
 StatusOr<bool> HloConstantFolding::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   // Limit the constant folding to 0 iterations to skip folding loops. This
   // retains the behavior from before while loop support in HloEvaluator and may
   // be revised.
@@ -104,11 +104,11 @@ StatusOr<bool> HloConstantFolding::Run(
       //  - So the only remaining case is where some but not all operands are
       //    broadcasts of constants, e.g. op(constant, broadcast(constant)).
       //
-      if (!absl::c_any_of(instruction->operands(),
+      if (!abslx::c_any_of(instruction->operands(),
                           [](const HloInstruction* operand) {
                             return operand->opcode() == HloOpcode::kConstant;
                           }) ||
-          !absl::c_all_of(
+          !abslx::c_all_of(
               instruction->operands(), [](const HloInstruction* operand) {
                 return operand->opcode() == HloOpcode::kConstant ||
                        (operand->opcode() == HloOpcode::kBroadcast &&
@@ -175,8 +175,8 @@ StatusOr<bool> HloConstantFolding::Run(
 
       VLOG(5) << "Constant folding: " << instruction->ToString();
 
-      absl::Duration slow_timeout =
-          absl::Seconds(uint64_t{1} << slow_op_counter_.load());
+      abslx::Duration slow_timeout =
+          abslx::Seconds(uint64_t{1} << slow_op_counter_.load());
       // We cannot call `instruction->ToString() within the callback, because
       // the instruction may be modified and invalidated in place, and ToString
       // will fail if the compilation is slow. We probably do not want to
@@ -187,7 +187,7 @@ StatusOr<bool> HloConstantFolding::Run(
         instruction_msg = instruction->ToString();
       } else {
         instruction_msg =
-            absl::StrCat(instruction->name(),
+            abslx::StrCat(instruction->name(),
                          " (displaying the full instruction incurs a runtime "
                          "overhead. Raise your logging level to 4 or above).");
       }
@@ -200,7 +200,7 @@ StatusOr<bool> HloConstantFolding::Run(
 #else
             false;
 #endif
-        absl::string_view explanation_msg =
+        abslx::string_view explanation_msg =
             ndebug
                 ? "This isn't necessarily a bug; constant-folding is "
                   "inherently a trade-off between compilation time and speed "
@@ -212,11 +212,11 @@ StatusOr<bool> HloConstantFolding::Run(
                   "XLA_FLAGS=--xla_dump_to=/tmp/foo and attach the results."
                 : "XLA was built without compiler optimizations, which can be "
                   "slow.  Try rebuilding with -c opt.";
-        return absl::StrFormat(
+        return abslx::StrFormat(
             "Constant folding an instruction is taking > %s:\n\n"
             "  %s\n\n"  // instruction->name() or instruction->ToString()
             "%s",       // explanation_msg
-            absl::FormatDuration(slow_timeout), instruction_msg,
+            abslx::FormatDuration(slow_timeout), instruction_msg,
             explanation_msg);
       });
 

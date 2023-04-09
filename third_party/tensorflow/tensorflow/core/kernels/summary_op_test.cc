@@ -152,7 +152,7 @@ TEST_F(SummaryHistoOpTest, Error_WrongDimsTags) {
   AddInputFromArray<tstring>(TensorShape({2, 1}), {"tag1", "tag2"});
   AddInputFromArray<float>(TensorShape({2}), {1.0f, -0.73f});
   Status s = RunOpKernel();
-  EXPECT_TRUE(absl::StrContains(s.ToString(), "tags must be scalar")) << s;
+  EXPECT_TRUE(abslx::StrContains(s.ToString(), "tags must be scalar")) << s;
 }
 
 TEST_F(SummaryHistoOpTest, Error_TooManyTagValues) {
@@ -162,7 +162,7 @@ TEST_F(SummaryHistoOpTest, Error_TooManyTagValues) {
   AddInputFromArray<tstring>(TensorShape({2}), {"tag1", "tag2"});
   AddInputFromArray<float>(TensorShape({2, 1}), {1.0f, -0.73f});
   Status s = RunOpKernel();
-  EXPECT_TRUE(absl::StrContains(s.ToString(), "tags must be scalar")) << s;
+  EXPECT_TRUE(abslx::StrContains(s.ToString(), "tags must be scalar")) << s;
 }
 
 // --------------------------------------------------------------------------
@@ -261,7 +261,7 @@ TEST_F(SummaryMergeOpTest, Error_MismatchedSize) {
   AddInputFromArray<tstring>(TensorShape({2}),
                              {s1.SerializeAsString(), s2.SerializeAsString()});
   Status s = RunOpKernel();
-  EXPECT_TRUE(absl::StrContains(s.ToString(), "Duplicate tag")) << s;
+  EXPECT_TRUE(abslx::StrContains(s.ToString(), "Duplicate tag")) << s;
 }
 
 }  // namespace

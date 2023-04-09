@@ -179,19 +179,19 @@ class GPUObjectDescriptor {
     state_vars_[key] = value;
   }
 
-  virtual absl::Status PerformConstExpr(const tflite::gpu::GpuInfo& gpu_info,
+  virtual abslx::Status PerformConstExpr(const tflite::gpu::GpuInfo& gpu_info,
                                         const std::string& const_expr,
                                         std::string* result) const {
-    return absl::UnimplementedError(
+    return abslx::UnimplementedError(
         "No implementation of perform const expression");
   }
 
-  virtual absl::Status PerformSelector(
+  virtual abslx::Status PerformSelector(
       const GpuInfo& gpu_info, const std::string& selector,
       const std::vector<std::string>& args,
       const std::vector<std::string>& template_args,
       std::string* result) const {
-    return absl::UnimplementedError("No implementation of perform selector");
+    return abslx::UnimplementedError("No implementation of perform selector");
   }
   virtual GPUResources GetGPUResources(const GpuInfo& gpu_info) const {
     return GPUResources();

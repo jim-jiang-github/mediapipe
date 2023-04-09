@@ -98,8 +98,8 @@ constexpr float kPalmDetectionBboxMaxDiff = 0.01;
 constexpr float kHandRectMaxDiff = 0.02;
 
 // Helper function to get ModelResources.
-absl::StatusOr<std::unique_ptr<ModelResources>> CreateModelResourcesForModel(
-    absl::string_view model_name) {
+abslx::StatusOr<std::unique_ptr<ModelResources>> CreateModelResourcesForModel(
+    abslx::string_view model_name) {
   auto external_file = std::make_unique<ExternalFile>();
   external_file->set_file_name(JoinPath("./", kTestDataDirectory, model_name));
   return ModelResources::Create(kTestModelResourcesTag,
@@ -107,8 +107,8 @@ absl::StatusOr<std::unique_ptr<ModelResources>> CreateModelResourcesForModel(
 }
 
 // Helper function to create a TaskRunner from ModelResources.
-absl::StatusOr<std::unique_ptr<TaskRunner>> CreateTaskRunner(
-    const ModelResources& model_resources, absl::string_view model_name,
+abslx::StatusOr<std::unique_ptr<TaskRunner>> CreateTaskRunner(
+    const ModelResources& model_resources, abslx::string_view model_name,
     int num_hands) {
   Graph graph;
 
@@ -136,7 +136,7 @@ absl::StatusOr<std::unique_ptr<TaskRunner>> CreateTaskRunner(
       graph.GetConfig(), std::make_unique<core::MediaPipeBuiltinOpResolver>());
 }
 
-HandDetectorResult GetExpectedHandDetectorResult(absl::string_view file_name) {
+HandDetectorResult GetExpectedHandDetectorResult(abslx::string_view file_name) {
   HandDetectorResult result;
   CHECK_OK(GetTextProto(file::JoinPath("./", kTestDataDirectory, file_name),
                         &result, Defaults()))

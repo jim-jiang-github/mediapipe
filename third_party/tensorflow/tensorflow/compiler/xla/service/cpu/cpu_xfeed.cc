@@ -113,7 +113,7 @@ Status TransferBufferToInfeed(int device_ordinal, int64_t size,
 }
 
 StatusOr<Shape> TransferBuffersFromOutfeedInternal(
-    int device_ordinal, absl::Span<const std::pair<void*, int64_t>> buffer_data,
+    int device_ordinal, abslx::Span<const std::pair<void*, int64_t>> buffer_data,
     bool is_tuple) {
   std::vector<std::unique_ptr<CpuOutfeedBuffer>> buffers;
   for (auto b : buffer_data) {
@@ -167,7 +167,7 @@ StatusOr<Shape> TransferArrayBufferFromOutfeed(int device_ordinal,
 
 StatusOr<Shape> TransferTupleBuffersFromOutfeed(
     int device_ordinal,
-    absl::Span<const std::pair<void*, int64_t>> buffer_data) {
+    abslx::Span<const std::pair<void*, int64_t>> buffer_data) {
   return TransferBuffersFromOutfeedInternal(device_ordinal, buffer_data,
                                             /*is_tuple=*/true);
 }
@@ -195,7 +195,7 @@ Status TransferLiteralToInfeedOnCpu(int device_ordinal,
   // infeed manager.
   std::vector<cpu::runtime::XfeedBuffer*> buffers;
   buffers.reserve(ShapeUtil::TupleElementCount(shape));
-  absl::Cleanup cleanup = [&buffers]() {
+  abslx::Cleanup cleanup = [&buffers]() {
     for (cpu::runtime::XfeedBuffer* b : buffers) {
       b->Done(Cancelled("Failed to infeed buffer to device."));
     }
@@ -226,8 +226,8 @@ Status TransferLiteralFromOutfeedOnCpu(int device_ordinal,
         cpu::runtime::GetByteSizeRequirement(literal.shape(), sizeof(void*));
     // Note: OSS build didn't like implicit conversion from
     // literal.shape().dimensions() to the array slice on 2017-07-10.
-    absl::Span<const int64_t> dimensions(
-        absl::bit_cast<const int64_t*>(literal.shape().dimensions().data()),
+    abslx::Span<const int64_t> dimensions(
+        abslx::bit_cast<const int64_t*>(literal.shape().dimensions().data()),
         literal.shape().dimensions().size());
     TF_ASSIGN_OR_RETURN(Shape received_shape,
                         TransferArrayBufferFromOutfeed(

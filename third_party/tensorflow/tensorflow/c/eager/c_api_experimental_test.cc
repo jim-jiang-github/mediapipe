@@ -31,8 +31,8 @@ using tensorflow::string;
 namespace tensorflow {
 namespace {
 
-static bool HasSubstr(absl::string_view base, absl::string_view substr) {
-  bool ok = absl::StrContains(base, substr);
+static bool HasSubstr(abslx::string_view base, abslx::string_view substr) {
+  bool ok = abslx::StrContains(base, substr);
   EXPECT_TRUE(ok) << base << ", expected substring " << substr;
   return ok;
 }
@@ -443,7 +443,7 @@ TEST(CAPI, TensorHandleDevices) {
   TFE_TensorHandle* hcpu = TestMatrixTensorHandle(ctx);
   const char* device_type = TFE_TensorHandleDeviceType(hcpu, status.get());
   ASSERT_EQ(TF_OK, TF_GetCode(status.get())) << TF_Message(status.get());
-  ASSERT_TRUE(absl::StrContains(device_type, "CPU")) << device_type;
+  ASSERT_TRUE(abslx::StrContains(device_type, "CPU")) << device_type;
   int device_id = TFE_TensorHandleDeviceID(hcpu, status.get());
   ASSERT_EQ(TF_OK, TF_GetCode(status.get())) << TF_Message(status.get());
   ASSERT_EQ(0, device_id) << device_id;
@@ -465,7 +465,7 @@ TEST(CAPI, TensorHandleDevices) {
 
     device_type = TFE_TensorHandleDeviceType(retvals[0], status.get());
     ASSERT_EQ(TF_OK, TF_GetCode(status.get())) << TF_Message(status.get());
-    ASSERT_TRUE(absl::StrContains(device_type, "GPU")) << device_type;
+    ASSERT_TRUE(abslx::StrContains(device_type, "GPU")) << device_type;
 
     device_id = TFE_TensorHandleDeviceID(retvals[0], status.get());
     ASSERT_EQ(TF_OK, TF_GetCode(status.get())) << TF_Message(status.get());
@@ -495,7 +495,7 @@ TEST(CAPI, TensorHandleDefaults) {
   TFE_TensorHandle* h_default = TestMatrixTensorHandle(ctx);
   const char* device_type = TFE_TensorHandleDeviceType(h_default, status.get());
   ASSERT_EQ(TF_OK, TF_GetCode(status.get())) << TF_Message(status.get());
-  ASSERT_TRUE(absl::StrContains(device_type, "CPU")) << device_type;
+  ASSERT_TRUE(abslx::StrContains(device_type, "CPU")) << device_type;
   int device_id = TFE_TensorHandleDeviceID(h_default, status.get());
   ASSERT_EQ(TF_OK, TF_GetCode(status.get())) << TF_Message(status.get());
   ASSERT_EQ(0, device_id) << device_id;
@@ -504,7 +504,7 @@ TEST(CAPI, TensorHandleDefaults) {
       h_default, ctx, "/device:CPU:0", status.get());
   const char* device_type_cpu = TFE_TensorHandleDeviceType(h_cpu, status.get());
   ASSERT_EQ(TF_OK, TF_GetCode(status.get())) << TF_Message(status.get());
-  ASSERT_TRUE(absl::StrContains(device_type_cpu, "CPU")) << device_type_cpu;
+  ASSERT_TRUE(abslx::StrContains(device_type_cpu, "CPU")) << device_type_cpu;
   int device_id_cpu = TFE_TensorHandleDeviceID(h_cpu, status.get());
   ASSERT_EQ(TF_OK, TF_GetCode(status.get())) << TF_Message(status.get());
   ASSERT_EQ(0, device_id_cpu) << device_id_cpu;

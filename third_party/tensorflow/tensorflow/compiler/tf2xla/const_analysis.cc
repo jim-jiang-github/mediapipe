@@ -61,7 +61,7 @@ Status GetFunctionBodies(FunctionLibraryRuntime* flib_runtime,
 }
 
 Status CondConstInputIndices(
-    absl::Span<const FunctionBody* const> branch_bodies,
+    abslx::Span<const FunctionBody* const> branch_bodies,
     std::vector<int>* const_input_idxs, FunctionLibraryRuntime* flib_runtime) {
   TF_RET_CHECK(!branch_bodies.empty());
   TF_RET_CHECK(branch_bodies[0] != nullptr);
@@ -261,7 +261,7 @@ Status BackwardsConstAnalysis(
     VLOG(3) << "marking consts for must-be-const inputs of " << node->name();
     for (Edge const* edge : node->in_edges()) {
       if (!edge->IsControlEdge() &&
-          absl::c_binary_search(const_input_idxs, edge->dst_input()) &&
+          abslx::c_binary_search(const_input_idxs, edge->dst_input()) &&
           edge_filter(*edge)) {
         // Do not mark IdentityN / While nodes as compile-time const.
         // If the src node of the `pred` is an IdentityN do not mark it as a

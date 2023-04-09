@@ -52,7 +52,7 @@ class CounterSet {
   template <typename CounterType, typename... Args>
   Counter* Emplace(const std::string& name, Args&&... args)
       ABSL_LOCKS_EXCLUDED(mu_) {
-    absl::WriterMutexLock lock(&mu_);
+    abslx::WriterMutexLock lock(&mu_);
     std::unique_ptr<Counter>* existing_counter = FindOrNull(counters_, name);
     if (existing_counter) {
       return existing_counter->get();
@@ -69,7 +69,7 @@ class CounterSet {
   std::map<std::string, int64> GetCountersValues() ABSL_LOCKS_EXCLUDED(mu_);
 
  private:
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   std::map<std::string, std::unique_ptr<Counter>> counters_
       ABSL_GUARDED_BY(mu_);
 };

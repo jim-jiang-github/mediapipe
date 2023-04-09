@@ -16,14 +16,14 @@
 
 #include "absl/base/config.h"
 
-// This test is a no-op when absl::optional is an alias for std::optional and
+// This test is a no-op when abslx::optional is an alias for std::optional and
 // when exceptions are not enabled.
 #if !defined(ABSL_USES_STD_OPTIONAL) && defined(ABSL_HAVE_EXCEPTIONS)
 
 #include "gtest/gtest.h"
 #include "absl/base/internal/exception_safety_testing.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 namespace {
@@ -34,10 +34,10 @@ using ::testing::AssertionSuccess;
 using ::testing::MakeExceptionSafetyTester;
 
 using Thrower = testing::ThrowingValue<testing::TypeSpec::kEverythingThrows>;
-using Optional = absl::optional<Thrower>;
+using Optional = abslx::optional<Thrower>;
 
 using MoveThrower = testing::ThrowingValue<testing::TypeSpec::kNoThrowMove>;
-using MoveOptional = absl::optional<MoveThrower>;
+using MoveOptional = abslx::optional<MoveThrower>;
 
 constexpr int kInitialInteger = 5;
 constexpr int kUpdatedInteger = 10;
@@ -45,7 +45,7 @@ constexpr int kUpdatedInteger = 10;
 template <typename OptionalT>
 bool ValueThrowsBadOptionalAccess(const OptionalT& optional) try {
   return (static_cast<void>(optional.value()), false);
-} catch (const absl::bad_optional_access&) {
+} catch (const abslx::bad_optional_access&) {
   return true;
 }
 
@@ -109,14 +109,14 @@ TEST(OptionalExceptionSafety, ThrowingConstructors) {
   auto thrower_nonempty = Optional(Thrower(kInitialInteger));
   testing::TestThrowingCtor<Optional>(thrower_nonempty);
 
-  auto integer_nonempty = absl::optional<int>(kInitialInteger);
+  auto integer_nonempty = abslx::optional<int>(kInitialInteger);
   testing::TestThrowingCtor<Optional>(integer_nonempty);
   testing::TestThrowingCtor<Optional>(std::move(integer_nonempty));  // NOLINT
 
   testing::TestThrowingCtor<Optional>(kInitialInteger);
   using ThrowerVec = std::vector<Thrower, testing::ThrowingAllocator<Thrower>>;
-  testing::TestThrowingCtor<absl::optional<ThrowerVec>>(
-      absl::in_place,
+  testing::TestThrowingCtor<abslx::optional<ThrowerVec>>(
+      abslx::in_place,
       std::initializer_list<Thrower>{Thrower(), Thrower(), Thrower()},
       testing::ThrowingAllocator<Thrower>());
 }
@@ -168,7 +168,7 @@ TEST(OptionalExceptionSafety, EverythingThrowsSwap) {
 
   auto swap_nonempty = [](Optional* optional_ptr) {
     auto nonempty =
-        Optional(absl::in_place, kUpdatedInteger, testing::nothrow_ctor);
+        Optional(abslx::in_place, kUpdatedInteger, testing::nothrow_ctor);
     optional_ptr->swap(nonempty);
   };
   EXPECT_TRUE(disengaged_test_empty.Test(swap_nonempty));
@@ -207,7 +207,7 @@ TEST(OptionalExceptionSafety, CopyAssign) {
 
   auto copyassign_nonempty = [](Optional* optional_ptr) {
     auto nonempty =
-        Optional(absl::in_place, kUpdatedInteger, testing::nothrow_ctor);
+        Optional(abslx::in_place, kUpdatedInteger, testing::nothrow_ctor);
     *optional_ptr = nonempty;
   };
   EXPECT_TRUE(disengaged_test_empty.Test(copyassign_nonempty));
@@ -239,7 +239,7 @@ TEST(OptionalExceptionSafety, MoveAssign) {
 
   auto moveassign_nonempty = [](Optional* optional_ptr) {
     auto nonempty =
-        Optional(absl::in_place, kUpdatedInteger, testing::nothrow_ctor);
+        Optional(abslx::in_place, kUpdatedInteger, testing::nothrow_ctor);
     *optional_ptr = std::move(nonempty);
   };
   EXPECT_TRUE(disengaged_test_empty.Test(moveassign_nonempty));
@@ -287,6 +287,6 @@ TEST(OptionalExceptionSafety, NothrowMoveAssign) {
 }  // namespace
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // #if !defined(ABSL_USES_STD_OPTIONAL) && defined(ABSL_HAVE_EXCEPTIONS)

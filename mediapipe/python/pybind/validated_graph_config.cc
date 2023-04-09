@@ -53,7 +53,7 @@ void ValidatedGraphConfigSubmodule(pybind11::module* module) {
                         &graph_config_proto)) {
                   throw RaisePyError(
                       PyExc_RuntimeError,
-                      absl::StrCat(
+                      abslx::StrCat(
                           "Failed to parse: ",
                           std::string(kw.second.cast<py::object>().str()))
                           .c_str());
@@ -61,7 +61,7 @@ void ValidatedGraphConfigSubmodule(pybind11::module* module) {
               } else {
                 throw RaisePyError(
                     PyExc_RuntimeError,
-                    absl::StrCat("Unknown kwargs input argument: ", key)
+                    abslx::StrCat("Unknown kwargs input argument: ", key)
                         .c_str());
               }
             }

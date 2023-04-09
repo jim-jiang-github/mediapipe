@@ -39,10 +39,10 @@ std::vector<const OpMetrics*> SortedOpMetricsDb(const OpMetricsDb& metrics_db,
   };
   int result_size = result.size();
   if (max_records != -1 && result_size > max_records) {
-    absl::c_partial_sort(result, result.begin() + max_records, comp);
+    abslx::c_partial_sort(result, result.begin() + max_records, comp);
     result.resize(max_records);
   } else {
-    absl::c_sort(result, comp);
+    abslx::c_sort(result, comp);
   }
   return result;
 }

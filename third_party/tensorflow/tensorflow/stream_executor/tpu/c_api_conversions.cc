@@ -159,7 +159,7 @@ stream_executor::DeviceMemoryBase FromC(const SE_DeviceMemoryBase& se_base) {
 // memory-identical types, e.g. int64_t and int64_t. This should not be used
 // with types that require a static_cast.
 template <typename Src, typename Dst, typename DstList>
-static void CreateVectorBase(const absl::Span<Src> src, DstList* dst) {
+static void CreateVectorBase(const abslx::Span<Src> src, DstList* dst) {
   static_assert(sizeof(Src) == sizeof(Dst), "Mismatched types");
   dst->size = src.size();
   if (dst->size > TPU_C_API_MAX_INLINED) {
@@ -170,17 +170,17 @@ static void CreateVectorBase(const absl::Span<Src> src, DstList* dst) {
   }
 }
 
-void CreateVector(const absl::Span<const int64_t> src, Int64List* dst) {
+void CreateVector(const abslx::Span<const int64_t> src, Int64List* dst) {
   return CreateVectorBase<const int64_t, int64_t, Int64List>(src, dst);
 }
-void CreateVector(const absl::Span<const float> src, FloatList* dst) {
+void CreateVector(const abslx::Span<const float> src, FloatList* dst) {
   return CreateVectorBase<const float, float, FloatList>(src, dst);
 }
-void CreateVector(const absl::Span<const bool> src, BoolList* dst) {
+void CreateVector(const abslx::Span<const bool> src, BoolList* dst) {
   return CreateVectorBase<const bool, bool, BoolList>(src, dst);
 }
 
-static void CreateVector(const absl::Span<const xla::Tile> src, TileList* dst) {
+static void CreateVector(const abslx::Span<const xla::Tile> src, TileList* dst) {
   dst->size = src.size();
   XLA_Tile* c_tiles;
   if (dst->size > TPU_C_API_MAX_INLINED) {
@@ -200,22 +200,22 @@ static void CreateVector(const absl::Span<const xla::Tile> src, TileList* dst) {
 // memory-identical types, e.g. int64_t and int64_t. This should not be used
 // with types that require a static_cast.
 template <typename Dst, typename Src, typename SrcList>
-static absl::Span<const Dst> MakeSpanBase(const SrcList& src_list) {
+static abslx::Span<const Dst> MakeSpanBase(const SrcList& src_list) {
   static_assert(sizeof(Src) == sizeof(Dst), "Mismatched types");
   const Src* src = src_list.size > TPU_C_API_MAX_INLINED ? src_list.heap
                                                          : &src_list.inlined[0];
-  return absl::Span<const Dst>(reinterpret_cast<const Dst*>(src),
+  return abslx::Span<const Dst>(reinterpret_cast<const Dst*>(src),
                                src_list.size);
 }
 
-absl::Span<const int64_t> MakeSpan(const Int64List& src_list) {
+abslx::Span<const int64_t> MakeSpan(const Int64List& src_list) {
   return MakeSpanBase<int64_t, int64_t, Int64List>(src_list);
 }
 
-absl::Span<const float> MakeSpan(const FloatList& src_list) {
+abslx::Span<const float> MakeSpan(const FloatList& src_list) {
   return MakeSpanBase<float, float, FloatList>(src_list);
 }
-absl::Span<const bool> MakeSpan(const BoolList& src_list) {
+abslx::Span<const bool> MakeSpan(const BoolList& src_list) {
   return MakeSpanBase<bool, bool, BoolList>(src_list);
 }
 
@@ -241,8 +241,8 @@ void ToC(const xla::Shape& xla_shape, XLA_Shape* c_shape) {
 }
 
 xla::Shape FromC(const XLA_Shape* c_shape) {
-  absl::Span<const int64_t> dims = MakeSpan(c_shape->dimensions);
-  absl::Span<const bool> dynamic_dims = MakeSpan(c_shape->dynamic_dimensions);
+  abslx::Span<const int64_t> dims = MakeSpan(c_shape->dimensions);
+  abslx::Span<const bool> dynamic_dims = MakeSpan(c_shape->dynamic_dimensions);
 
   std::vector<xla::Shape> tuple_shapes;
   tuple_shapes.reserve(c_shape->ntuple_shapes);
@@ -285,8 +285,8 @@ void ToC(const xla::Layout& layout, XLA_Layout* c_layout) {
 }
 
 xla::Layout FromC(const XLA_Layout* c_layout) {
-  absl::Span<const int64_t> minor_to_major = MakeSpan(c_layout->minor_to_major);
-  absl::InlinedVector<xla::Tile, 1> tiles;
+  abslx::Span<const int64_t> minor_to_major = MakeSpan(c_layout->minor_to_major);
+  abslx::InlinedVector<xla::Tile, 1> tiles;
   const XLA_Tile* c_tiles = c_layout->tiles.size > TPU_C_API_MAX_INLINED
                                 ? c_layout->tiles.heap
                                 : c_layout->tiles.inlined;
@@ -311,7 +311,7 @@ void ToC(const xla::Tile& tile, XLA_Tile* c_tile) {
 }
 
 xla::Tile FromC(const XLA_Tile* c_tile) {
-  absl::Span<const int64_t> dims = MakeSpan(c_tile->dimensions);
+  abslx::Span<const int64_t> dims = MakeSpan(c_tile->dimensions);
   return xla::Tile(dims);
 }
 
@@ -352,14 +352,14 @@ void ToC(const xla::LiteralSlice& literal, XLA_Literal* c_literal) {
 xla::MutableBorrowingLiteral FromC(XLA_Literal* c_literal) {
   xla::Shape shape = ApiConverter::FromC(&c_literal->shape);
   return xla::MutableBorrowingLiteral(
-      absl::MakeSpan(c_literal->buffers, c_literal->count), shape);
+      abslx::MakeSpan(c_literal->buffers, c_literal->count), shape);
 }
 
 void ToC(const xla::ShapedBuffer& buffer, XLA_ShapedBuffer* c_device_buffer) {
   ApiConverter::ToC(buffer.on_device_shape(),
                     &c_device_buffer->on_device_shape);
   c_device_buffer->device_ordinal = buffer.device_ordinal();
-  absl::InlinedVector<SE_DeviceMemoryBase, 2> bases;
+  abslx::InlinedVector<SE_DeviceMemoryBase, 2> bases;
   for (auto& pair : buffer.buffers()) {
     bases.push_back(ApiConverter::ToC(pair.second));
   }
@@ -482,12 +482,12 @@ xla::HloModuleConfig FromC(const XLA_HloModuleConfig& c_config) {
   config.set_num_partitions(c_config.num_partitions);
   config.set_use_spmd_partitioning(c_config.use_spmd_partitioning);
   config.set_use_auto_spmd_partitioning(c_config.use_auto_spmd_partitioning);
-  absl::Span<const int64_t> mesh_shape_span =
+  abslx::Span<const int64_t> mesh_shape_span =
       MakeSpan(c_config.auto_spmd_partitioning_mesh_shape);
   std::vector<int64_t> mesh_shape(mesh_shape_span.begin(),
                                   mesh_shape_span.end());
   config.set_auto_spmd_partitioning_mesh_shape(mesh_shape);
-  absl::Span<const int64_t> mesh_ids_span =
+  abslx::Span<const int64_t> mesh_ids_span =
       MakeSpan(c_config.auto_spmd_partitioning_mesh_ids);
   std::vector<int64_t> mesh_ids(mesh_ids_span.begin(), mesh_ids_span.end());
   config.set_auto_spmd_partitioning_mesh_ids(mesh_ids);

@@ -138,27 +138,27 @@ TEST(PreviousLoopbackCalculator, CorrectTimestamps) {
 // A Calculator that outputs a summary packet in CalculatorBase::Close().
 class PacketOnCloseCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).Set<int>();
     cc->Outputs().Index(0).Set<int>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) final {
+  abslx::Status Open(CalculatorContext* cc) final {
     cc->SetOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     sum_ += cc->Inputs().Index(0).Value().Get<int>();
     cc->Outputs().Index(0).AddPacket(cc->Inputs().Index(0).Value());
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Close(CalculatorContext* cc) final {
+  abslx::Status Close(CalculatorContext* cc) final {
     cc->Outputs().Index(0).AddPacket(
         MakePacket<int>(sum_).At(Timestamp::Max()));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -702,19 +702,19 @@ TEST_F(PreviousLoopbackCalculatorProcessingTimestampsTest,
 // Similar to GateCalculator, but it doesn't propagate timestamp bound updates.
 class DroppingGateCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->Inputs().Index(0).SetAny();
     cc->Inputs().Tag(kDisallowTag).Set<bool>();
     cc->Outputs().Index(0).SetSameAs(&cc->Inputs().Index(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     if (!cc->Inputs().Index(0).IsEmpty() &&
         !cc->Inputs().Tag(kDisallowTag).Get<bool>()) {
       cc->Outputs().Index(0).AddPacket(cc->Inputs().Index(0).Value());
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 REGISTER_CALCULATOR(DroppingGateCalculator);

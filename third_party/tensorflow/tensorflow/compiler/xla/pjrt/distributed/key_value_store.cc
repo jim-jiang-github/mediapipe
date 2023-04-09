@@ -20,15 +20,15 @@ namespace xla {
 KeyValueStore::KeyValueStore() = default;
 
 ::grpc::Status KeyValueStore::Get(const std::string& key,
-                                  absl::Duration timeout, std::string* value) {
+                                  abslx::Duration timeout, std::string* value) {
   auto key_is_present = [&]() {
     mu_.AssertHeld();
     return entries_.find(key) != entries_.end();
   };
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   // TODO(phawkins): the synchronization here is very coarse, but probably
   // sufficient for its current application.
-  if (!mu_.AwaitWithTimeout(absl::Condition(&key_is_present), timeout)) {
+  if (!mu_.AwaitWithTimeout(abslx::Condition(&key_is_present), timeout)) {
     return ::grpc::Status(::grpc::StatusCode::NOT_FOUND, key);
   }
   *value = entries_.find(key)->second;
@@ -36,7 +36,7 @@ KeyValueStore::KeyValueStore() = default;
 }
 
 ::grpc::Status KeyValueStore::Set(const std::string& key, std::string value) {
-  absl::MutexLock lock(&mu_);
+  abslx::MutexLock lock(&mu_);
   entries_[key] = std::move(value);
   return ::grpc::Status::OK;
 }

@@ -37,7 +37,7 @@ StatusOr<ChannelHandle> ChannelTracker::NewChannel(
       type != ChannelHandle::DEVICE_TO_HOST) {
     return InvalidArgument("Invalid channel type: %d", type);
   }
-  absl::MutexLock lock(&channel_mutex_);
+  abslx::MutexLock lock(&channel_mutex_);
 
   // Create a new channel handle with a unique value.
   ChannelHandle new_handle = AllocateHandle(type);
@@ -53,12 +53,12 @@ StatusOr<ChannelHandle> ChannelTracker::NewChannel(
 }
 
 Status ChannelTracker::RegisterSend(const ChannelHandle& handle) {
-  absl::MutexLock lock(&channel_mutex_);
+  abslx::MutexLock lock(&channel_mutex_);
   return RegisterSendInternal(handle);
 }
 
 Status ChannelTracker::RegisterRecv(const ChannelHandle& handle) {
-  absl::MutexLock lock(&channel_mutex_);
+  abslx::MutexLock lock(&channel_mutex_);
   return RegisterRecvInternal(handle);
 }
 

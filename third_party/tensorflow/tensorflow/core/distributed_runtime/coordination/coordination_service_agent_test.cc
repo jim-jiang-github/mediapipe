@@ -179,7 +179,7 @@ TEST_F(CoordinationServiceAgentTest, GetKeyValue_WithTimeout_Success) {
   // Initialize coordination agent.
   InitializeAgent();
 
-  auto result = agent_->GetKeyValue(test_key, /*timeout=*/absl::Seconds(10));
+  auto result = agent_->GetKeyValue(test_key, /*timeout=*/abslx::Seconds(10));
 
   TF_ASSERT_OK(result.status());
   EXPECT_EQ(*result, test_value);
@@ -195,7 +195,7 @@ TEST_F(CoordinationServiceAgentTest, GetKeyValue_Timeout_ReturnError) {
       }));
   InitializeAgent();
 
-  auto result = agent_->GetKeyValue(test_key, /*timeout=*/absl::Seconds(1));
+  auto result = agent_->GetKeyValue(test_key, /*timeout=*/abslx::Seconds(1));
 
   EXPECT_EQ(result.status().code(), error::DEADLINE_EXCEEDED);
   // Needed to tear down test safely since agent dtor would cancel pending
@@ -221,7 +221,7 @@ TEST_F(CoordinationServiceAgentTest,
   // Initialize coordination service agent.
   InitializeAgent();
 
-  auto result = agent_->GetKeyValue(test_key, /*timeout=*/absl::Seconds(1));
+  auto result = agent_->GetKeyValue(test_key, /*timeout=*/abslx::Seconds(1));
   EXPECT_EQ(result.status().code(), error::DEADLINE_EXCEEDED);
 
   // Delayed server response: set key-value response, and invoke done callback.
@@ -252,10 +252,10 @@ TEST_F(CoordinationServiceAgentTest,
             //  triggering this async callback.
             owned_response = response;
             owned_done = done;
-            async_thread = absl::WrapUnique(Env::Default()->StartThread(
+            async_thread = abslx::WrapUnique(Env::Default()->StartThread(
                 ThreadOptions(), "async_thread", [&]() {
                   // Set brief delay.
-                  absl::SleepFor(absl::Seconds(5));
+                  abslx::SleepFor(abslx::Seconds(5));
                   // Set key-value response, and invoke done callback.
                   auto kv = owned_response->mutable_kv();
                   kv->set_key(test_key);
@@ -265,7 +265,7 @@ TEST_F(CoordinationServiceAgentTest,
           }));
   InitializeAgent();
 
-  auto result = agent_->GetKeyValue(test_key, /*timeout=*/absl::Seconds(10));
+  auto result = agent_->GetKeyValue(test_key, /*timeout=*/abslx::Seconds(10));
 
   TF_ASSERT_OK(result.status());
   EXPECT_EQ(*result, test_value);
@@ -429,11 +429,11 @@ TEST_F(CoordinationServiceAgentTest, WaitAtBarrier_SameIdUsedTwice_Fails) {
   TF_ASSERT_OK(agent_->Connect());
   // Wait at barrier for the first time should succeed.
   TF_ASSERT_OK(
-      agent_->WaitAtBarrier(barrier_id, absl::Seconds(1), /*tasks=*/{}));
+      agent_->WaitAtBarrier(barrier_id, abslx::Seconds(1), /*tasks=*/{}));
 
   // Subsequent calls should fail.
   auto result =
-      agent_->WaitAtBarrier(barrier_id, absl::Seconds(1), /*tasks=*/{});
+      agent_->WaitAtBarrier(barrier_id, abslx::Seconds(1), /*tasks=*/{});
 
   EXPECT_TRUE(errors::IsFailedPrecondition(result));
 }

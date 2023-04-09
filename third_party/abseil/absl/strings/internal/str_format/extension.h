@@ -28,7 +28,7 @@
 #include "absl/strings/internal/str_format/output.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 enum class FormatConversionChar : uint8_t;
@@ -159,7 +159,7 @@ struct Flags {
 // internally that match the values declared in FormatConversionChar in
 // str_format.h. This is meant to allow internal libraries to use the same
 // declared interface type as the public interface
-// (absl::StrFormatConversionChar) while keeping the definition in a public
+// (abslx::StrFormatConversionChar) while keeping the definition in a public
 // header.
 // Internal libraries should use the form
 // `FormatConversionCharInternal::c`, `FormatConversionCharInternal::kNone` for
@@ -380,7 +380,7 @@ constexpr FormatConversionCharSet operator|(FormatConversionCharSet a,
   return FormatConversionCharSetUnion(a, b);
 }
 
-// Overloaded conversion functions to support absl::ParsedFormat.
+// Overloaded conversion functions to support abslx::ParsedFormat.
 // Get a conversion with a single character in it.
 constexpr FormatConversionCharSet ToFormatConversionCharSet(char c) {
   return static_cast<FormatConversionCharSet>(
@@ -422,6 +422,6 @@ inline size_t Excess(size_t used, size_t capacity) {
 }  // namespace str_format_internal
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_INTERNAL_STR_FORMAT_EXTENSION_H_

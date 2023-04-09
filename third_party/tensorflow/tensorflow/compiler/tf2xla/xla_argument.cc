@@ -27,19 +27,19 @@ bool XlaArgument::operator==(const XlaArgument& other) const {
                other.tensor_array_gradients)) {
     return false;
   }
-  if (absl::holds_alternative<xla::Shape>(shape)) {
-    if (!absl::holds_alternative<xla::Shape>(other.shape)) {
+  if (abslx::holds_alternative<xla::Shape>(shape)) {
+    if (!abslx::holds_alternative<xla::Shape>(other.shape)) {
       return false;
     }
-    if (!xla::Shape::Equal()(absl::get<xla::Shape>(shape),
-                             absl::get<xla::Shape>(other.shape))) {
+    if (!xla::Shape::Equal()(abslx::get<xla::Shape>(shape),
+                             abslx::get<xla::Shape>(other.shape))) {
       return false;
     }
   } else {
-    if (!absl::holds_alternative<TensorShape>(other.shape)) {
+    if (!abslx::holds_alternative<TensorShape>(other.shape)) {
       return false;
     }
-    if (absl::get<TensorShape>(shape) != absl::get<TensorShape>(other.shape)) {
+    if (abslx::get<TensorShape>(shape) != abslx::get<TensorShape>(other.shape)) {
       return false;
     }
   }
@@ -52,7 +52,7 @@ bool XlaArgument::operator==(const XlaArgument& other) const {
   return constant_value.tensor_data() == other.constant_value.tensor_data();
 }
 
-bool AnyUninitializedResourceArg(absl::Span<const XlaArgument> args) {
+bool AnyUninitializedResourceArg(abslx::Span<const XlaArgument> args) {
   return llvm::any_of(args, [](const XlaArgument& arg) {
     return arg.kind == XlaArgument::kResource && arg.type == DT_INVALID;
   });

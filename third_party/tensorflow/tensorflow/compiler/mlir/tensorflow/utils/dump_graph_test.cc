@@ -27,12 +27,12 @@ namespace tensorflow {
 namespace {
 
 void ExpectHasSubstr(const string& s, const string& expected) {
-  EXPECT_TRUE(absl::StrContains(s, expected))
+  EXPECT_TRUE(abslx::StrContains(s, expected))
       << "'" << s << "' does not contain '" << expected << "'";
 }
 
 void ExpectHasNoSubstr(const string& s, const string& expected) {
-  EXPECT_FALSE(absl::StrContains(s, expected))
+  EXPECT_FALSE(abslx::StrContains(s, expected))
       << "'" << s << "' should not contain '" << expected << "'";
 }
 
@@ -42,7 +42,7 @@ class StringWritableFile : public WritableFile {
   explicit StringWritableFile(string* str) : str_(*str) {}
 
   Status Append(StringPiece data) override {
-    absl::StrAppend(&str_, data);
+    abslx::StrAppend(&str_, data);
     return OkStatus();
   }
 

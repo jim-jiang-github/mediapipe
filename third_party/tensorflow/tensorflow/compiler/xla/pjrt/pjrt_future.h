@@ -226,7 +226,7 @@ class PjRtFuture {
   // The client should avoid any potentially re-entrant API calls within the
   // callback, for example by using the callback to enqueue work on a
   // client-owned threadpool.
-  void OnReady(absl::AnyInvocable<void(T) &&> callback) {
+  void OnReady(abslx::AnyInvocable<void(T) &&> callback) {
     CHECK(IsValid());
     promise_ref_.AndThen([promise = promise_ref_.AsPtr(),
                           callback = std::move(callback)]() mutable {

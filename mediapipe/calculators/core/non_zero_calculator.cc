@@ -28,13 +28,13 @@ class NonZeroCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kIn, kOut, kBooleanOut);
 
-  absl::Status UpdateContract(CalculatorContract* cc) {
+  abslx::Status UpdateContract(CalculatorContract* cc) {
     RET_CHECK(kOut(cc).IsConnected() || kBooleanOut(cc).IsConnected())
         << "At least one output stream is expected.";
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) final {
+  abslx::Status Process(CalculatorContext* cc) final {
     if (!kIn(cc).IsEmpty()) {
       bool isNonZero = *kIn(cc) != 0;
       if (kOut(cc).IsConnected()) {
@@ -44,7 +44,7 @@ class NonZeroCalculator : public Node {
         kBooleanOut(cc).Send(std::make_unique<bool>(isNonZero));
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 };
 

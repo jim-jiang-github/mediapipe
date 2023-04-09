@@ -371,7 +371,7 @@ Status DebugIO::PublishDebugMetadata(
 
   Status status;
   for (const string& url : debug_urls) {
-    if (absl::StartsWith(absl::AsciiStrToLower(url), kGrpcURLScheme)) {
+    if (abslx::StartsWith(abslx::AsciiStrToLower(url), kGrpcURLScheme)) {
 #ifndef PLATFORM_WINDOWS
       Event grpc_event;
 
@@ -392,7 +392,7 @@ Status DebugIO::PublishDebugMetadata(
 #else
       GRPC_OSS_WINDOWS_UNIMPLEMENTED_ERROR;
 #endif
-    } else if (absl::StartsWith(absl::AsciiStrToLower(url), kFileURLScheme)) {
+    } else if (abslx::StartsWith(abslx::AsciiStrToLower(url), kFileURLScheme)) {
       const string dump_root_dir = url.substr(strlen(kFileURLScheme));
       const string core_metadata_path = AppendTimestampToFilePath(
           io::JoinPath(dump_root_dir,
@@ -419,7 +419,7 @@ Status DebugIO::PublishDebugTensor(const DebugNodeKey& debug_node_key,
   int32_t num_failed_urls = 0;
   std::vector<Status> fail_statuses;
   for (const string& url : debug_urls) {
-    if (absl::StartsWith(absl::AsciiStrToLower(url), kFileURLScheme)) {
+    if (abslx::StartsWith(abslx::AsciiStrToLower(url), kFileURLScheme)) {
       const string dump_root_dir = url.substr(strlen(kFileURLScheme));
 
       const int64_t tensorBytes =
@@ -441,7 +441,7 @@ Status DebugIO::PublishDebugTensor(const DebugNodeKey& debug_node_key,
         num_failed_urls++;
         fail_statuses.push_back(s);
       }
-    } else if (absl::StartsWith(absl::AsciiStrToLower(url), kGrpcURLScheme)) {
+    } else if (abslx::StartsWith(abslx::AsciiStrToLower(url), kGrpcURLScheme)) {
 #ifndef PLATFORM_WINDOWS
       Status s = DebugGrpcIO::SendTensorThroughGrpcStream(
           debug_node_key, tensor, wall_time_us, url, gated_grpc);
@@ -453,7 +453,7 @@ Status DebugIO::PublishDebugTensor(const DebugNodeKey& debug_node_key,
 #else
       GRPC_OSS_WINDOWS_UNIMPLEMENTED_ERROR;
 #endif
-    } else if (absl::StartsWith(absl::AsciiStrToLower(url), kMemoryURLScheme)) {
+    } else if (abslx::StartsWith(abslx::AsciiStrToLower(url), kMemoryURLScheme)) {
       const string dump_root_dir = url.substr(strlen(kMemoryURLScheme));
       auto* callback_registry = DebugCallbackRegistry::singleton();
       auto* callback = callback_registry->GetCallback(dump_root_dir);
@@ -503,7 +503,7 @@ Status DebugIO::PublishGraph(const Graph& graph, const string& device_name,
 
   Status status = OkStatus();
   for (const string& debug_url : debug_urls) {
-    if (absl::StartsWith(debug_url, kFileURLScheme)) {
+    if (abslx::StartsWith(debug_url, kFileURLScheme)) {
       const string dump_root_dir =
           io::JoinPath(debug_url.substr(strlen(kFileURLScheme)),
                        DebugNodeKey::DeviceNameToDevicePath(device_name));
@@ -514,7 +514,7 @@ Status DebugIO::PublishGraph(const Graph& graph, const string& device_name,
 
       status.Update(
           DebugFileIO::DumpEventProtoToFile(event, dump_root_dir, file_name));
-    } else if (absl::StartsWith(debug_url, kGrpcURLScheme)) {
+    } else if (abslx::StartsWith(debug_url, kGrpcURLScheme)) {
 #ifndef PLATFORM_WINDOWS
       status.Update(PublishEncodedGraphDefInChunks(buf, device_name, now_micros,
                                                    debug_url));
@@ -579,7 +579,7 @@ bool DebugIO::IsDebugURLGateOpen(const string& watch_key,
 }
 
 Status DebugIO::CloseDebugURL(const string& debug_url) {
-  if (absl::StartsWith(debug_url, DebugIO::kGrpcURLScheme)) {
+  if (abslx::StartsWith(debug_url, DebugIO::kGrpcURLScheme)) {
 #ifndef PLATFORM_WINDOWS
     return DebugGrpcIO::CloseGrpcStream(debug_url);
 #else
@@ -847,7 +847,7 @@ Status DebugGrpcIO::ReceiveEventReplyProtoThroughGrpcStream(
 Status DebugGrpcIO::GetOrCreateDebugGrpcChannel(
     const string& grpc_stream_url, DebugGrpcChannel** debug_grpc_channel) {
   const string addr_with_path =
-      absl::StartsWith(grpc_stream_url, DebugIO::kGrpcURLScheme)
+      abslx::StartsWith(grpc_stream_url, DebugIO::kGrpcURLScheme)
           ? grpc_stream_url.substr(strlen(DebugIO::kGrpcURLScheme))
           : grpc_stream_url;
   const string server_stream_addr =

@@ -34,8 +34,8 @@ namespace {
 
 class ReductionDegenerateDimRemoverTest : public HloTestBase {
  public:
-  void CheckDegenerateDimRemover(absl::string_view hlo,
-                                 std::optional<absl::string_view> expected) {
+  void CheckDegenerateDimRemover(abslx::string_view hlo,
+                                 std::optional<abslx::string_view> expected) {
     RunAndFilecheckHloRewrite(hlo, gpu::ReductionDegenerateDimRemover{},
                               expected);
   }

@@ -17,8 +17,8 @@ limitations under the License.
 namespace tensorflow {
 namespace gradients {
 Status NotDifferentiableGradientFunction::Compute(
-    AbstractContext* ctx, absl::Span<AbstractTensorHandle* const> grad_outputs,
-    absl::Span<AbstractTensorHandle*> grad_inputs) {
+    AbstractContext* ctx, abslx::Span<AbstractTensorHandle* const> grad_outputs,
+    abslx::Span<AbstractTensorHandle*> grad_inputs) {
   for (int i = 0; i < grad_inputs.size(); i++) {
     grad_inputs[i] = nullptr;
   }

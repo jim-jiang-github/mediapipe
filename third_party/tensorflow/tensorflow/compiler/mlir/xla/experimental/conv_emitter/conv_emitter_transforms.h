@@ -37,7 +37,7 @@ mlir::Operation* CloneWithNewAffineMap(mlir::Operation* op,
 
 bool IsSimpleLoop(mlir::AffineForOp loop);
 std::vector<mlir::AffineForOp> CreateNestedSimpleLoops(
-    absl::Span<const int64_t> upper_bounds, mlir::OpBuilder builder);
+    abslx::Span<const int64_t> upper_bounds, mlir::OpBuilder builder);
 void SetBoundForSimpleLoop(mlir::AffineForOp loop, mlir::AffineExpr new_bound,
                            mlir::OpBuilder builder);
 

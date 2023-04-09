@@ -65,7 +65,7 @@ class Traceback {
   };
   std::vector<Frame> Frames() const;
 
-  const absl::InlinedVector<std::pair<PyCodeObject*, int>, 32>& raw_frames()
+  const abslx::InlinedVector<std::pair<PyCodeObject*, int>, 32>& raw_frames()
       const {
     return frames_;
   }
@@ -82,7 +82,7 @@ class Traceback {
   }
 
  private:
-  absl::InlinedVector<std::pair<PyCodeObject*, int>, 32> frames_;
+  abslx::InlinedVector<std::pair<PyCodeObject*, int>, 32> frames_;
 
   // Protected by GIL.
   static bool enabled_;

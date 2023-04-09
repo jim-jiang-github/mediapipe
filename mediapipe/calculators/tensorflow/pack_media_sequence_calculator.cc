@@ -97,7 +97,7 @@ uint8 ConvertFloatToByte(const float float_value) {
 
 class PackMediaSequenceCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     RET_CHECK(cc->InputSidePackets().HasTag(kSequenceExampleTag));
     cc->InputSidePackets().Tag(kSequenceExampleTag).Set<tf::SequenceExample>();
 
@@ -111,7 +111,7 @@ class PackMediaSequenceCalculator : public CalculatorBase {
     }
 
     for (const auto& tag : cc->Inputs().GetTags()) {
-      if (absl::StartsWith(tag, kImageTag)) {
+      if (abslx::StartsWith(tag, kImageTag)) {
         std::string key = "";
         if (tag != kImageTag) {
           int tag_length = sizeof(kImageTag) / sizeof(*kImageTag) - 1;
@@ -123,7 +123,7 @@ class PackMediaSequenceCalculator : public CalculatorBase {
         }
         cc->Inputs().Tag(tag).Set<OpenCvImageEncoderCalculatorResults>();
       }
-      if (absl::StartsWith(tag, kKeypointsTag)) {
+      if (abslx::StartsWith(tag, kKeypointsTag)) {
         std::string key = "";
         if (tag != kKeypointsTag) {
           int tag_length = sizeof(kKeypointsTag) / sizeof(*kKeypointsTag) - 1;
@@ -135,10 +135,10 @@ class PackMediaSequenceCalculator : public CalculatorBase {
         }
         cc->Inputs()
             .Tag(tag)
-            .Set<absl::flat_hash_map<std::string,
+            .Set<abslx::flat_hash_map<std::string,
                                      std::vector<std::pair<float, float>>>>();
       }
-      if (absl::StartsWith(tag, kBBoxTag)) {
+      if (abslx::StartsWith(tag, kBBoxTag)) {
         std::string key = "";
         if (tag != kBBoxTag) {
           int tag_length = sizeof(kBBoxTag) / sizeof(*kBBoxTag) - 1;
@@ -150,16 +150,16 @@ class PackMediaSequenceCalculator : public CalculatorBase {
         }
         cc->Inputs().Tag(tag).Set<std::vector<Detection>>();
       }
-      if (absl::StartsWith(tag, kFloatContextFeaturePrefixTag)) {
+      if (abslx::StartsWith(tag, kFloatContextFeaturePrefixTag)) {
         cc->Inputs().Tag(tag).Set<std::vector<float>>();
       }
-      if (absl::StartsWith(tag, kFloatFeaturePrefixTag)) {
+      if (abslx::StartsWith(tag, kFloatFeaturePrefixTag)) {
         cc->Inputs().Tag(tag).Set<std::vector<float>>();
       }
-      if (absl::StartsWith(tag, kIntFeaturePrefixTag)) {
+      if (abslx::StartsWith(tag, kIntFeaturePrefixTag)) {
         cc->Inputs().Tag(tag).Set<std::vector<int64>>();
       }
-      if (absl::StartsWith(tag, kBytesFeaturePrefixTag)) {
+      if (abslx::StartsWith(tag, kBytesFeaturePrefixTag)) {
         cc->Inputs().Tag(tag).Set<std::vector<std::string>>();
       }
     }
@@ -176,11 +176,11 @@ class PackMediaSequenceCalculator : public CalculatorBase {
           .Tag(kSequenceExampleTag)
           .Set<tf::SequenceExample>();
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
-    sequence_ = ::absl::make_unique<tf::SequenceExample>(
+  abslx::Status Open(CalculatorContext* cc) override {
+    sequence_ = ::abslx::make_unique<tf::SequenceExample>(
         cc->InputSidePackets()
             .Tag(kSequenceExampleTag)
             .Get<tf::SequenceExample>());
@@ -198,7 +198,7 @@ class PackMediaSequenceCalculator : public CalculatorBase {
     if (cc->Options<PackMediaSequenceCalculatorOptions>()
             .replace_data_instead_of_append()) {
       for (const auto& tag : cc->Inputs().GetTags()) {
-        if (absl::StartsWith(tag, kImageTag)) {
+        if (abslx::StartsWith(tag, kImageTag)) {
           std::string key = "";
           if (tag != kImageTag) {
             int tag_length = sizeof(kImageTag) / sizeof(*kImageTag) - 1;
@@ -211,7 +211,7 @@ class PackMediaSequenceCalculator : public CalculatorBase {
           mpms::ClearImageEncoded(key, sequence_.get());
           mpms::ClearImageTimestamp(key, sequence_.get());
         }
-        if (absl::StartsWith(tag, kBBoxTag)) {
+        if (abslx::StartsWith(tag, kBBoxTag)) {
           std::string key = "";
           if (tag != kBBoxTag) {
             int tag_length = sizeof(kBBoxTag) / sizeof(*kBBoxTag) - 1;
@@ -233,27 +233,27 @@ class PackMediaSequenceCalculator : public CalculatorBase {
           mpms::ClearBBoxTrackIndex(key, sequence_.get());
           mpms::ClearUnmodifiedBBoxTimestamp(key, sequence_.get());
         }
-        if (absl::StartsWith(tag, kFloatFeaturePrefixTag)) {
+        if (abslx::StartsWith(tag, kFloatFeaturePrefixTag)) {
           std::string key = tag.substr(sizeof(kFloatFeaturePrefixTag) /
                                            sizeof(*kFloatFeaturePrefixTag) -
                                        1);
           mpms::ClearFeatureFloats(key, sequence_.get());
           mpms::ClearFeatureTimestamp(key, sequence_.get());
         }
-        if (absl::StartsWith(tag, kIntFeaturePrefixTag)) {
+        if (abslx::StartsWith(tag, kIntFeaturePrefixTag)) {
           std::string key = tag.substr(
               sizeof(kIntFeaturePrefixTag) / sizeof(*kIntFeaturePrefixTag) - 1);
           mpms::ClearFeatureInts(key, sequence_.get());
           mpms::ClearFeatureTimestamp(key, sequence_.get());
         }
-        if (absl::StartsWith(tag, kBytesFeaturePrefixTag)) {
+        if (abslx::StartsWith(tag, kBytesFeaturePrefixTag)) {
           std::string key = tag.substr(sizeof(kBytesFeaturePrefixTag) /
                                            sizeof(*kBytesFeaturePrefixTag) -
                                        1);
           mpms::ClearFeatureBytes(key, sequence_.get());
           mpms::ClearFeatureTimestamp(key, sequence_.get());
         }
-        if (absl::StartsWith(tag, kKeypointsTag)) {
+        if (abslx::StartsWith(tag, kKeypointsTag)) {
           std::string key =
               tag.substr(sizeof(kKeypointsTag) / sizeof(*kKeypointsTag) - 1);
           replace_keypoints_ = true;
@@ -265,26 +265,26 @@ class PackMediaSequenceCalculator : public CalculatorBase {
       }
     }
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status VerifySequence() {
+  abslx::Status VerifySequence() {
     std::string error_msg = "Missing features - ";
     bool all_present = true;
     for (const auto& iter : features_present_) {
       if (!iter.second) {
         all_present = false;
-        absl::StrAppend(&error_msg, iter.first, ", ");
+        abslx::StrAppend(&error_msg, iter.first, ", ");
       }
     }
     if (all_present) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     } else {
       return ::mediapipe::NotFoundErrorBuilder(MEDIAPIPE_LOC) << error_msg;
     }
   }
 
-  absl::Status VerifySize() {
+  abslx::Status VerifySize() {
     const int64 MAX_PROTO_BYTES = 1073741823;
     std::string id = mpms::HasExampleId(*sequence_)
                          ? mpms::GetExampleId(*sequence_)
@@ -292,10 +292,10 @@ class PackMediaSequenceCalculator : public CalculatorBase {
     RET_CHECK_LT(sequence_->ByteSizeLong(), MAX_PROTO_BYTES)
         << "sequence '" << id
         << "' would be too many bytes to serialize after adding features.";
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Close(CalculatorContext* cc) override {
+  abslx::Status Close(CalculatorContext* cc) override {
     auto& options = cc->Options<PackMediaSequenceCalculatorOptions>();
     if (options.reconcile_metadata()) {
       RET_CHECK_OK(mpms::ReconcileMetadata(
@@ -307,7 +307,7 @@ class PackMediaSequenceCalculator : public CalculatorBase {
       RET_CHECK_OK(VerifySize());
     }
     if (options.output_only_if_all_present()) {
-      absl::Status status = VerifySequence();
+      abslx::Status status = VerifySequence();
       if (!status.ok()) {
         cc->GetCounter(status.ToString())->Increment();
         return status;
@@ -328,10 +328,10 @@ class PackMediaSequenceCalculator : public CalculatorBase {
     }
     sequence_.reset();
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
+  abslx::Status Process(CalculatorContext* cc) override {
     int image_height = -1;
     int image_width = -1;
     // Because the tag order may vary, we need to loop through tags to get
@@ -340,7 +340,7 @@ class PackMediaSequenceCalculator : public CalculatorBase {
       if (!cc->Inputs().Tag(tag).IsEmpty()) {
         features_present_[tag] = true;
       }
-      if (absl::StartsWith(tag, kImageTag) &&
+      if (abslx::StartsWith(tag, kImageTag) &&
           !cc->Inputs().Tag(tag).IsEmpty()) {
         std::string key = "";
         if (tag != kImageTag) {
@@ -368,7 +368,7 @@ class PackMediaSequenceCalculator : public CalculatorBase {
       if (!cc->Inputs().Tag(tag).IsEmpty()) {
         features_present_[tag] = true;
       }
-      if (absl::StartsWith(tag, kKeypointsTag) &&
+      if (abslx::StartsWith(tag, kKeypointsTag) &&
           !cc->Inputs().Tag(tag).IsEmpty()) {
         std::string key = "";
         if (tag != kKeypointsTag) {
@@ -382,7 +382,7 @@ class PackMediaSequenceCalculator : public CalculatorBase {
         const auto& keypoints =
             cc->Inputs()
                 .Tag(tag)
-                .Get<absl::flat_hash_map<
+                .Get<abslx::flat_hash_map<
                     std::string, std::vector<std::pair<float, float>>>>();
         for (const auto& pair : keypoints) {
           std::string prefix = mpms::merge_prefix(key, pair.first);
@@ -405,7 +405,7 @@ class PackMediaSequenceCalculator : public CalculatorBase {
         }
         replace_keypoints_ = false;
       }
-      if (absl::StartsWith(tag, kFloatContextFeaturePrefixTag) &&
+      if (abslx::StartsWith(tag, kFloatContextFeaturePrefixTag) &&
           !cc->Inputs().Tag(tag).IsEmpty()) {
         std::string key =
             tag.substr(sizeof(kFloatContextFeaturePrefixTag) /
@@ -416,7 +416,7 @@ class PackMediaSequenceCalculator : public CalculatorBase {
             key, cc->Inputs().Tag(tag).Get<std::vector<float>>(),
             sequence_.get());
       }
-      if (absl::StartsWith(tag, kFloatFeaturePrefixTag) &&
+      if (abslx::StartsWith(tag, kFloatFeaturePrefixTag) &&
           !cc->Inputs().Tag(tag).IsEmpty()) {
         std::string key = tag.substr(sizeof(kFloatFeaturePrefixTag) /
                                          sizeof(*kFloatFeaturePrefixTag) -
@@ -427,7 +427,7 @@ class PackMediaSequenceCalculator : public CalculatorBase {
                                cc->Inputs().Tag(tag).Get<std::vector<float>>(),
                                sequence_.get());
       }
-      if (absl::StartsWith(tag, kIntFeaturePrefixTag) &&
+      if (abslx::StartsWith(tag, kIntFeaturePrefixTag) &&
           !cc->Inputs().Tag(tag).IsEmpty()) {
         std::string key = tag.substr(
             sizeof(kIntFeaturePrefixTag) / sizeof(*kIntFeaturePrefixTag) - 1);
@@ -437,7 +437,7 @@ class PackMediaSequenceCalculator : public CalculatorBase {
                              cc->Inputs().Tag(tag).Get<std::vector<int64>>(),
                              sequence_.get());
       }
-      if (absl::StartsWith(tag, kBytesFeaturePrefixTag) &&
+      if (abslx::StartsWith(tag, kBytesFeaturePrefixTag) &&
           !cc->Inputs().Tag(tag).IsEmpty()) {
         std::string key = tag.substr(sizeof(kBytesFeaturePrefixTag) /
                                          sizeof(*kBytesFeaturePrefixTag) -
@@ -448,7 +448,7 @@ class PackMediaSequenceCalculator : public CalculatorBase {
             key, cc->Inputs().Tag(tag).Get<std::vector<std::string>>(),
             sequence_.get());
       }
-      if (absl::StartsWith(tag, kBBoxTag) && !cc->Inputs().Tag(tag).IsEmpty()) {
+      if (abslx::StartsWith(tag, kBBoxTag) && !cc->Inputs().Tag(tag).IsEmpty()) {
         std::string key = "";
         if (tag != kBBoxTag) {
           int tag_length = sizeof(kBBoxTag) / sizeof(*kBBoxTag) - 1;
@@ -543,12 +543,12 @@ class PackMediaSequenceCalculator : public CalculatorBase {
                                                      sequence_.get());
           already_has_mask = true;
         } else {
-          return absl::UnimplementedError(
+          return abslx::UnimplementedError(
               "Global detections and empty detections are not supported.");
         }
       }
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   std::unique_ptr<tf::SequenceExample> sequence_;

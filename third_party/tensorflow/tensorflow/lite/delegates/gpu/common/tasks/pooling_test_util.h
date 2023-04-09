@@ -22,10 +22,10 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status AveragePoolingTest(TestExecutionEnvironment* env);
-absl::Status AveragePoolingNonEmptyPaddingTest(TestExecutionEnvironment* env);
-absl::Status MaxPoolingTest(TestExecutionEnvironment* env);
-absl::Status MaxPoolingIndicesTest(TestExecutionEnvironment* env);
+abslx::Status AveragePoolingTest(TestExecutionEnvironment* env);
+abslx::Status AveragePoolingNonEmptyPaddingTest(TestExecutionEnvironment* env);
+abslx::Status MaxPoolingTest(TestExecutionEnvironment* env);
+abslx::Status MaxPoolingIndicesTest(TestExecutionEnvironment* env);
 
 }  // namespace gpu
 }  // namespace tflite

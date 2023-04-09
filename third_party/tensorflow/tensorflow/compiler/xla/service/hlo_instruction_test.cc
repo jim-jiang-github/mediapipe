@@ -132,7 +132,7 @@ class OpAndUserCollectingVisitor : public DfsHloVisitorWithDefault {
   }
 
   // Counters for HLOs. Maps HLO to a NumOpsAndUsers.
-  absl::flat_hash_map<const HloInstruction*, NumOpsAndUsers> count_;
+  abslx::flat_hash_map<const HloInstruction*, NumOpsAndUsers> count_;
 };
 
 TEST_F(HloInstructionTest, BasicProperties) {
@@ -1141,7 +1141,7 @@ TEST_F(HloInstructionTest, FunctionVisitor) {
   module->AddEntryComputation(builder.Build());
 
   int visit_num = 0;
-  absl::flat_hash_map<HloInstruction*, int> visit_order;
+  abslx::flat_hash_map<HloInstruction*, int> visit_order;
   FunctionVisitor visitor([&visit_num, &visit_order](HloInstruction* inst) {
     EXPECT_FALSE(visit_order.contains(inst));
     visit_order[inst] = visit_num;

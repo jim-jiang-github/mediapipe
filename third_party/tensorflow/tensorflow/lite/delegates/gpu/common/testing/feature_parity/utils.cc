@@ -46,16 +46,16 @@ std::optional<std::string> ShapeToString(TfLiteIntArray* shape) {
   int* data = shape->data;
   switch (shape->size) {
     case 1:
-      result = absl::Substitute("Linear=[$0]", data[0]);
+      result = abslx::Substitute("Linear=[$0]", data[0]);
       break;
     case 2:
-      result = absl::Substitute("HW=[$0, $1]", data[0], data[1]);
+      result = abslx::Substitute("HW=[$0, $1]", data[0], data[1]);
       break;
     case 3:
-      result = absl::Substitute("HWC=[$0, $1, $2]", data[0], data[1], data[2]);
+      result = abslx::Substitute("HWC=[$0, $1, $2]", data[0], data[1], data[2]);
       break;
     case 4:
-      result = absl::Substitute("BHWC=[$0, $1, $2, $3]", data[0], data[1],
+      result = abslx::Substitute("BHWC=[$0, $1, $2, $3]", data[0], data[1],
                                 data[2], data[3]);
       break;
     default:
@@ -70,14 +70,14 @@ std::optional<std::string> CoordinateToString(TfLiteIntArray* shape,
   std::string result;
   switch (shape->size) {
     case 1: {
-      result = absl::Substitute("[$0]", linear);
+      result = abslx::Substitute("[$0]", linear);
       break;
     } break;
     case 2: {
       const int tensor_width = shape->data[1];
       const int h_coord = linear / tensor_width;
       const int w_coord = linear % tensor_width;
-      result = absl::Substitute("[$0, $1]", h_coord, w_coord);
+      result = abslx::Substitute("[$0, $1]", h_coord, w_coord);
       break;
     } break;
     case 3: {
@@ -88,7 +88,7 @@ std::optional<std::string> CoordinateToString(TfLiteIntArray* shape,
           (linear % (tensor_width * tensor_channels)) / tensor_channels;
       const int c_coord =
           (linear % (tensor_width * tensor_channels)) % tensor_channels;
-      result = absl::Substitute("[$0, $1, $2]", h_coord, w_coord, c_coord);
+      result = abslx::Substitute("[$0, $1, $2]", h_coord, w_coord, c_coord);
       break;
     } break;
     case 4: {
@@ -108,7 +108,7 @@ std::optional<std::string> CoordinateToString(TfLiteIntArray* shape,
           ((linear % (tensor_height * tensor_width * tensor_channels)) %
            (tensor_width * tensor_channels)) %
           tensor_channels;
-      result = absl::Substitute("[$0, $1, $2, $3]", b_coord, h_coord, w_coord,
+      result = abslx::Substitute("[$0, $1, $2, $3]", b_coord, h_coord, w_coord,
                                 c_coord);
       break;
     }
@@ -120,30 +120,30 @@ std::optional<std::string> CoordinateToString(TfLiteIntArray* shape,
 }
 
 // Builds interpreter for a model, allocates tensors.
-absl::Status BuildInterpreter(const Model* model,
+abslx::Status BuildInterpreter(const Model* model,
                               std::unique_ptr<Interpreter>* interpreter) {
   TfLiteStatus status =
       InterpreterBuilder(model, ops::builtin::BuiltinOpResolver())(interpreter);
   if (status != kTfLiteOk || !*interpreter) {
-    return absl::InternalError(
+    return abslx::InternalError(
         "Failed to initialize interpreter with model binary.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status AllocateTensors(std::unique_ptr<Interpreter>* interpreter) {
+abslx::Status AllocateTensors(std::unique_ptr<Interpreter>* interpreter) {
   if ((*interpreter)->AllocateTensors() != kTfLiteOk) {
-    return absl::InternalError("Failed to allocate tensors.");
+    return abslx::InternalError("Failed to allocate tensors.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ModifyGraphWithDelegate(std::unique_ptr<Interpreter>* interpreter,
+abslx::Status ModifyGraphWithDelegate(std::unique_ptr<Interpreter>* interpreter,
                                      TfLiteDelegate* delegate) {
   if ((*interpreter)->ModifyGraphWithDelegate(delegate) != kTfLiteOk) {
-    return absl::InternalError("Failed to modify graph with delegate.");
+    return abslx::InternalError("Failed to modify graph with delegate.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 void InitializeInputs(int left, int right,
@@ -157,11 +157,11 @@ void InitializeInputs(int left, int right,
   }
 }
 
-absl::Status Invoke(std::unique_ptr<Interpreter>* interpreter) {
+abslx::Status Invoke(std::unique_ptr<Interpreter>* interpreter) {
   if ((*interpreter)->Invoke() != kTfLiteOk) {
-    return absl::InternalError("Failed during inference.");
+    return abslx::InternalError("Failed during inference.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 std::ostream& operator<<(std::ostream& os, const TestParams& param) {

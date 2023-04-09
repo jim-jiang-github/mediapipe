@@ -91,10 +91,10 @@ Status GetComputationCacheEntry(
 struct VariableUpdateMap {
   // Maps input index to the updated output index. If the variable doesn't have
   // an updated output, the corresponding output is set to -1.
-  absl::flat_hash_map<int, int> input_to_output;
+  abslx::flat_hash_map<int, int> input_to_output;
   // Maps output index to (the input index, whether the update is generated from
   // compilation).
-  absl::flat_hash_map<int, std::pair<int, bool>> output_to_input;
+  abslx::flat_hash_map<int, std::pair<int, bool>> output_to_input;
   // Part of the input indices that are from the compilation, in the compiled
   // order.
   std::vector<int> input_in_compiled_update_order;
@@ -103,9 +103,9 @@ struct VariableUpdateMap {
 // Creates a VariableUpdateMap from both the compilation and the fused variable
 // reads/updates.
 xla::StatusOr<VariableUpdateMap> BuildVariableUpdateMap(
-    absl::Span<const TPUExecutableInfoProto::UpdateIndexPair* const>
+    abslx::Span<const TPUExecutableInfoProto::UpdateIndexPair* const>
         compiled_variable_updates,
-    absl::Span<int const> fused_device_var_reads_in_computation_inputs,
+    abslx::Span<int const> fused_device_var_reads_in_computation_inputs,
     const std::vector<int>& fused_device_var_updates_in_computation_outputs,
     int64_t computation_output_count) {
   VariableUpdateMap map;
@@ -268,7 +268,7 @@ xla::StatusOr<std::unique_ptr<InputBuffers>> BuildComputationInputs(
   // object holds, and we would never be able to reuse variable buffers.
   // TODO(phawkins): add a 'reuse_buffers' attribute to TPUExecute that allows
   // the user to elect to copy the buffers and permit concurrent access instead.
-  TF_RETURN_IF_ERROR(LockVariables(absl::MakeSpan(variables)));
+  TF_RETURN_IF_ERROR(LockVariables(abslx::MakeSpan(variables)));
   for (int i = 0; i < variables.size(); ++i) {
     TF_RETURN_IF_ERROR(
         validate_shape(variables[i].index(), *variables[i].var()->tensor()));
@@ -277,7 +277,7 @@ xla::StatusOr<std::unique_ptr<InputBuffers>> BuildComputationInputs(
   se::DeviceMemoryAllocator* const allocator = backend->memory_allocator();
   xla::TransferManager* const transfer_manager = backend->transfer_manager();
 
-  auto input_buffers = absl::make_unique<InputBuffers>(
+  auto input_buffers = abslx::make_unique<InputBuffers>(
       transfer_manager->HostShapeToDeviceShape(input_host_shape));
 
   // Allocates a buffer for the root tuple.
@@ -392,7 +392,7 @@ struct OutputBuffers {
 // require a tuple buffer but do not have a corresponding XlaTensor.
 xla::StatusOr<std::unique_ptr<OutputBuffers>> AllocateOutputTensors(
     OpKernelContext* context, xla::ScopedShapedBuffer scoped_buffers,
-    absl::Span<const TensorShapeProto* const> output_tensor_shape_protos,
+    abslx::Span<const TensorShapeProto* const> output_tensor_shape_protos,
     const VariableUpdateMap& variable_updates, TpuNodeContext* node_context,
     se::Stream* stream, int device_ordinal, InputBuffers* input_buffers,
     const std::shared_ptr<se::Event>& definition_event) {
@@ -436,7 +436,7 @@ xla::StatusOr<std::unique_ptr<OutputBuffers>> AllocateOutputTensors(
       node_context->backend()->memory_allocator();
 
   auto output_buffers =
-      absl::make_unique<OutputBuffers>(std::move(scoped_buffers), allocator);
+      abslx::make_unique<OutputBuffers>(std::move(scoped_buffers), allocator);
 
   xla::Shape output_device_shape = output_buffers->buffers.on_device_shape();
 

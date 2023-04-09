@@ -29,7 +29,7 @@ class OptionsRegistry {
   static const Descriptor* GetProtobufDescriptor(const std::string& type_name);
 
   // Returns all known google::protobufx extensions to a type.
-  static void FindAllExtensions(absl::string_view extendee,
+  static void FindAllExtensions(abslx::string_view extendee,
                                 std::vector<const FieldDescriptor*>* result);
 
  private:
@@ -37,10 +37,10 @@ class OptionsRegistry {
   static void Register(const FieldData& message_type,
                        const std::string& parent_name);
 
-  static absl::flat_hash_map<std::string, Descriptor>& descriptors();
-  static absl::flat_hash_map<std::string, std::vector<FieldDescriptor>>&
+  static abslx::flat_hash_map<std::string, Descriptor>& descriptors();
+  static abslx::flat_hash_map<std::string, std::vector<FieldDescriptor>>&
   extensions();
-  static absl::Mutex& mutex();
+  static abslx::Mutex& mutex();
 
   // Registers the descriptors for each options protobuf type.
   template <class MessageT>
@@ -60,7 +60,7 @@ class Descriptor {
 
  private:
   std::string full_name_;
-  absl::flat_hash_map<std::string, FieldDescriptor> fields_;
+  abslx::flat_hash_map<std::string, FieldDescriptor> fields_;
 };
 
 // A custom implementation proto_ns::FieldDescriptor.  This implementation

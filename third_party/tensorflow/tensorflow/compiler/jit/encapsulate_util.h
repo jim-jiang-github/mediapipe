@@ -118,7 +118,7 @@ struct XlaClusterInfo {
 // outside compilation cluster to a set of names of outside compilation clusters
 // that it depends on.
 stream_executor::port::StatusOr<
-    std::unique_ptr<absl::flat_hash_map<string, std::vector<string>>>>
+    std::unique_ptr<abslx::flat_hash_map<string, std::vector<string>>>>
 OutsideCompilationClusterDependencies(
     const Graph* g, const string& outside_compilation_attr_name);
 

@@ -226,15 +226,15 @@ TEST_F(PacketLatencyCalculatorTest, OutputsCorrectLatencyForSingleStream) {
   dynamic_cast<SimulationClock*>(&*simulation_clock_)->ThreadStart();
 
   // Send a reference packet with timestamp 10 usec at time 12 usec.
-  simulation_clock_->Sleep(absl::Microseconds(12));
+  simulation_clock_->Sleep(abslx::Microseconds(12));
   MP_ASSERT_OK(graph_.AddPacketToInputStream(
       "camera_frames", Adopt(new double()).At(Timestamp(10))));
 
   // Add two delayed packets with timestamp 1 and 8 resp.
-  simulation_clock_->Sleep(absl::Microseconds(1));
+  simulation_clock_->Sleep(abslx::Microseconds(1));
   MP_ASSERT_OK(graph_.AddPacketToInputStream(
       "delayed_packet_0", Adopt(new double()).At(Timestamp(1))));
-  simulation_clock_->Sleep(absl::Microseconds(1));
+  simulation_clock_->Sleep(abslx::Microseconds(1));
   MP_ASSERT_OK(graph_.AddPacketToInputStream(
       "delayed_packet_0", Adopt(new double()).At(Timestamp(8))));
 
@@ -275,17 +275,17 @@ TEST_F(PacketLatencyCalculatorTest, DoesNotOutputUntilReferencePacketReceived) {
       "delayed_packet_0", Adopt(new double()).At(Timestamp(2))));
 
   // Send a reference packet with timestamp 10 usec.
-  simulation_clock_->Sleep(absl::Microseconds(1));
+  simulation_clock_->Sleep(abslx::Microseconds(1));
   MP_ASSERT_OK(graph_.AddPacketToInputStream(
       "camera_frames", Adopt(new double()).At(Timestamp(10))));
-  simulation_clock_->Sleep(absl::Microseconds(1));
+  simulation_clock_->Sleep(abslx::Microseconds(1));
 
   // Add two delayed packets with timestamp 7 and 9 resp.
   MP_ASSERT_OK(graph_.AddPacketToInputStream(
       "delayed_packet_0", Adopt(new double()).At(Timestamp(7))));
   MP_ASSERT_OK(graph_.AddPacketToInputStream(
       "delayed_packet_0", Adopt(new double()).At(Timestamp(9))));
-  simulation_clock_->Sleep(absl::Microseconds(1));
+  simulation_clock_->Sleep(abslx::Microseconds(1));
 
   dynamic_cast<SimulationClock*>(&*simulation_clock_)->ThreadFinish();
   MP_ASSERT_OK(graph_.CloseAllInputStreams());
@@ -391,12 +391,12 @@ TEST_F(PacketLatencyCalculatorTest, ResetsHistogramAndAverageCorrectly) {
       "camera_frames", Adopt(new double()).At(Timestamp(0))));
 
   // Add a delayed packet with timestamp 0 usec at time 20 usec.
-  simulation_clock_->Sleep(absl::Microseconds(20));
+  simulation_clock_->Sleep(abslx::Microseconds(20));
   MP_ASSERT_OK(graph_.AddPacketToInputStream(
       "delayed_packet_0", Adopt(new double()).At(Timestamp(0))));
 
   // Do a long sleep so that histogram and average are reset.
-  simulation_clock_->Sleep(absl::Microseconds(100));
+  simulation_clock_->Sleep(abslx::Microseconds(100));
 
   // Add a delayed packet with timestamp 115 usec at time 120 usec.
   MP_ASSERT_OK(graph_.AddPacketToInputStream(

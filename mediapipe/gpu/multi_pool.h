@@ -76,7 +76,7 @@ class MultiPool {
   // pool, in which case the caller should invoke CreateBufferWithoutPool.
   std::shared_ptr<SimplePool> RequestPool(const Spec& spec);
 
-  absl::Mutex mutex_;
+  abslx::Mutex mutex_;
   mediapipe::ResourceCache<Spec, std::shared_ptr<SimplePool>> cache_
       ABSL_GUARDED_BY(mutex_);
   SimplePoolFactory create_simple_pool_ = DefaultMakeSimplePool;
@@ -89,7 +89,7 @@ std::shared_ptr<SimplePool> MultiPool<SimplePool, Spec, Item>::RequestPool(
   std::shared_ptr<SimplePool> pool;
   std::vector<std::shared_ptr<SimplePool>> evicted;
   {
-    absl::MutexLock lock(&mutex_);
+    abslx::MutexLock lock(&mutex_);
     pool = cache_.Lookup(spec, [this](const Spec& spec, int request_count) {
       return (request_count >= options_.min_requests_before_pool)
                  ? create_simple_pool_(spec, options_)

@@ -40,13 +40,13 @@ class OpConverterRegistry::Impl {
     if (item != registry_.end()) {
       const int existing_priority = item->second.priority;
       if (priority <= existing_priority) {
-        LOG(WARNING) << absl::StrCat(
+        LOG(WARNING) << abslx::StrCat(
             "Ignoring TF->TRT ", name, " op converter with priority ",
             existing_priority, " due to another converter with priority ",
             priority);
         return {};
       } else {
-        LOG(WARNING) << absl::StrCat(
+        LOG(WARNING) << abslx::StrCat(
             "Overwriting TF->TRT ", name, " op converter with priority ",
             existing_priority, " using another converter with priority ",
             priority);

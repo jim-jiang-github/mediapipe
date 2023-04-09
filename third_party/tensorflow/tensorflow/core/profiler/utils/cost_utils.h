@@ -47,7 +47,7 @@ class TfOpRoofLineCostEstimator
   OpRoofLineStats Predict(const XEventVisitor& event);
 
  private:
-  absl::flat_hash_set<std::string>
+  abslx::flat_hash_set<std::string>
       unsupported_ops_;  // summary for unsupported ops.
 
   TF_DISALLOW_COPY_AND_ASSIGN(TfOpRoofLineCostEstimator);

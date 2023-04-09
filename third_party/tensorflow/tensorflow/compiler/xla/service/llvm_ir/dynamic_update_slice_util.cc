@@ -96,7 +96,7 @@ static Status EmitDynamicUpdateSliceInPlaceImpl(
     const Shape& update_shape, const IndexGenerator& start_indices_generator,
     bool is_signed, ElementGenerator update_array_generator,
     const IrArray& output_array, const gpu::LaunchDimensions* launch_dimensions,
-    absl::string_view name, llvm::IRBuilder<>* b) {
+    abslx::string_view name, llvm::IRBuilder<>* b) {
   const Shape& output_shape = output_array.GetShape();
 
   // Read start indices from start_indices_generator.
@@ -157,9 +157,9 @@ static Status EmitDynamicUpdateSliceInPlaceImpl(
   return LoopEmitter(loop_body_emitter, update_shape, b).EmitLoop(name);
 }
 
-Status EmitDynamicUpdateSliceInPlace(absl::Span<const IrArray> operand_arrays,
+Status EmitDynamicUpdateSliceInPlace(abslx::Span<const IrArray> operand_arrays,
                                      const IrArray& output_array,
-                                     absl::string_view name,
+                                     abslx::string_view name,
                                      llvm::IRBuilder<>* b) {
   VLOG(2) << "EmitDynamicUpdateSliceInPlace for " << name;
 

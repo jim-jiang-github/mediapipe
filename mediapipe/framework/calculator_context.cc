@@ -72,7 +72,7 @@ void CalculatorContext::SetOffset(TimestampDiff offset) {
 
 const InputStreamSet& CalculatorContext::InputStreams() const {
   if (!input_streams_) {
-    input_streams_ = absl::make_unique<InputStreamSet>(inputs_.TagMap());
+    input_streams_ = abslx::make_unique<InputStreamSet>(inputs_.TagMap());
     for (CollectionItemId id = input_streams_->BeginId();
          id < input_streams_->EndId(); ++id) {
       input_streams_->Get(id) = const_cast<InputStreamShard*>(&inputs_.Get(id));
@@ -83,7 +83,7 @@ const InputStreamSet& CalculatorContext::InputStreams() const {
 
 const OutputStreamSet& CalculatorContext::OutputStreams() const {
   if (!output_streams_) {
-    output_streams_ = absl::make_unique<OutputStreamSet>(outputs_.TagMap());
+    output_streams_ = abslx::make_unique<OutputStreamSet>(outputs_.TagMap());
     for (CollectionItemId id = output_streams_->BeginId();
          id < output_streams_->EndId(); ++id) {
       output_streams_->Get(id) =

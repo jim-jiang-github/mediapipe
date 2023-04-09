@@ -96,16 +96,16 @@ Status MatchSignatureHelper(const DataTypeSlice expected_inputs,
   return OkStatus();
 }
 
-const absl::flat_hash_set<std::string>* GetOpNodeDefsToLogFromEnv() {
-  auto* result = new absl::flat_hash_set<std::string>;
+const abslx::flat_hash_set<std::string>* GetOpNodeDefsToLogFromEnv() {
+  auto* result = new abslx::flat_hash_set<std::string>;
   const char* env = getenv("TF_DEBUG_OPS_TO_LOG_NODEDEFS");
   if (!env) {
     return result;
   }
 
-  std::vector<absl::string_view> ops = absl::StrSplit(env, ',');
+  std::vector<abslx::string_view> ops = abslx::StrSplit(env, ',');
   LOG(INFO) << "Will log NodeDefs from the following ops: ";
-  for (absl::string_view op : ops) {
+  for (abslx::string_view op : ops) {
     result->insert(std::string(op));
     LOG(INFO) << "  |" << op << "|";
   }
@@ -118,7 +118,7 @@ const absl::flat_hash_set<std::string>* GetOpNodeDefsToLogFromEnv() {
 // comma-separated list of op types. The NodeDef for each is printed, which is
 // useful for debugging purposes.
 bool ShouldLogNodeDef(OpKernel* op_kernel) {
-  static const absl::flat_hash_set<std::string>& ops_to_log_nodedefs =
+  static const abslx::flat_hash_set<std::string>& ops_to_log_nodedefs =
       *GetOpNodeDefsToLogFromEnv();
   return ops_to_log_nodedefs.count(op_kernel->type_string());
 }
@@ -231,7 +231,7 @@ string OpKernel::ShapeTraceString(const OpKernelContext& ctx) const {
     tensor_shapes.emplace_back(strings::StrCat(
         DataTypeString(input_dtype), ctx.input(i).shape().DebugString()));
   }
-  return strings::StrCat("(", absl::StrJoin(tensor_shapes, ";"), ")");
+  return strings::StrCat("(", abslx::StrJoin(tensor_shapes, ";"), ")");
 }
 
 string OpKernel::TraceString(const OpKernelContext& ctx, bool verbose) const {
@@ -342,7 +342,7 @@ OpKernelContext::OpKernelContext(Params* params)
 OpKernelContext::OpKernelContext(Params* params, int num_outputs)
     : params_(params), outputs_(num_outputs) {
   if (params_->track_allocations) {
-    tracking_state_ = absl::make_unique<TrackingState>();
+    tracking_state_ = abslx::make_unique<TrackingState>();
   }
 
   params_->ensure_eigen_gpu_device();
@@ -660,7 +660,7 @@ Status OpKernelContext::output_list(StringPiece name, OpOutputList* list) {
 
 void OpKernelContext::maybe_initialize_scope_id_set() {
   if (allocated_scope_ids_ == nullptr) {
-    allocated_scope_ids_ = absl::make_unique<std::unordered_set<int32>>();
+    allocated_scope_ids_ = abslx::make_unique<std::unordered_set<int32>>();
   }
 }
 
@@ -1069,7 +1069,7 @@ void OpKernelContext::clear_recorded_memory() {
 void OpKernelContext::set_record_memory_consumption(bool v) {
   record_memory_consumption_ = v;
   if (v && !tracking_state_) {
-    tracking_state_ = absl::make_unique<TrackingState>();
+    tracking_state_ = abslx::make_unique<TrackingState>();
   }
 }
 
@@ -1143,7 +1143,7 @@ static Status IsProbablySafeToLoad(const string& path) {
   }
   if (!missing_features.empty()) {
     string errmsg = "Missing CPU features: ";
-    errmsg.append(absl::StrJoin(missing_features, ", "));
+    errmsg.append(abslx::StrJoin(missing_features, ", "));
     return errors::FailedPrecondition(errmsg);
   }
   return OkStatus();
@@ -1193,8 +1193,8 @@ void LoadDynamicKernelsInternal() {
 void LoadDynamicKernels() {
   // TODO(gunan): As more features are available, add intelligent kernel
   // selection, and dropping unsuitable kernel logic here.
-  static absl::once_flag dll_loader_flag;
-  absl::call_once(dll_loader_flag, LoadDynamicKernelsInternal);
+  static abslx::once_flag dll_loader_flag;
+  abslx::call_once(dll_loader_flag, LoadDynamicKernelsInternal);
 }
 
 static string Key(StringPiece op_type, const DeviceType& device_type,
@@ -1209,15 +1209,15 @@ static string Key(StringPiece op_type, const DeviceType& device_type,
 // during lookup as normal kernels.
 void SetupOrDisableJit(KernelRegistry* registry) {
   std::unordered_multimap<string, KernelRegistration> jit_kernels;
-  bool remove_jit_kernels = absl::StrContains(
-      absl::NullSafeStringView(getenv(kDisableJitKernelsEnvVar)), "1");
+  bool remove_jit_kernels = abslx::StrContains(
+      abslx::NullSafeStringView(getenv(kDisableJitKernelsEnvVar)), "1");
 
   mutex_lock l(registry->mu);
   std::unordered_multimap<string, KernelRegistration>& all_kernels =
       registry->registry;
   auto it = all_kernels.begin();
   while (it != all_kernels.end()) {
-    if (absl::StrContains(it->second.def.label(), kJitKernelLabel)) {
+    if (abslx::StrContains(it->second.def.label(), kJitKernelLabel)) {
       // Remove all kernels that have the jit label. They will be added back
       // without the label if they are not to be disabled.
       KernelDef def_without_label = it->second.def;
@@ -1261,8 +1261,8 @@ static KernelRegistry* GlobalKernelRegistryTyped() {
   auto* registry = reinterpret_cast<KernelRegistry*>(GlobalKernelRegistry());
   // Update or disable JIT kernels based on user configuration. This is a
   // temporary fallback as part of the initial release of JIT kernels.
-  static absl::once_flag setup_or_disable_jit;
-  absl::call_once(setup_or_disable_jit, SetupOrDisableJit, registry);
+  static abslx::once_flag setup_or_disable_jit;
+  abslx::call_once(setup_or_disable_jit, SetupOrDisableJit, registry);
   return registry;
 }
 
@@ -1445,7 +1445,7 @@ Status FindKernelDef(
 
     // Do not print kernel registrations for other devices when using _JIT
     // devices for compilation.
-    if (!absl::StrContains(device_str, "JIT")) {
+    if (!abslx::StrContains(device_str, "JIT")) {
       errors::AppendToMessage(
           &s, ".  Registered:", KernelsRegisteredForOp(node_op));
     }

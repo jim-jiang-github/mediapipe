@@ -40,7 +40,7 @@ namespace xla {
 
 /*static*/ HloInstruction* TupleUtil::AppendSuffix(
     HloInstruction* input_tuple,
-    absl::Span<HloInstruction* const> trailing_values) {
+    abslx::Span<HloInstruction* const> trailing_values) {
   CHECK(input_tuple->shape().IsTuple());
 
   HloComputation* computation = input_tuple->parent();
@@ -152,7 +152,7 @@ namespace xla {
   for (int64_t index : position.index) {
     // We first search if there already is a get-tuple-element with the correct
     // index. If there is no such get-tuple-element, we create one.
-    auto gte_it = absl::c_find_if(
+    auto gte_it = abslx::c_find_if(
         instruction->users(), [index](const HloInstruction* use) {
           return use != use->parent()->root_instruction() &&
                  use->opcode() == HloOpcode::kGetTupleElement &&

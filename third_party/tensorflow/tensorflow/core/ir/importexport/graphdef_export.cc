@@ -500,7 +500,7 @@ static StatusOr<std::string> GetValueName(
     name.append(name_attr.data(), name_attr.size());
     if (result.getResultNumber()) {
       name.push_back(':');
-      absl::StrAppend(&name, result.getResultNumber());
+      abslx::StrAppend(&name, result.getResultNumber());
     }
     return name;
   }
@@ -511,7 +511,7 @@ static StatusOr<std::string> GetValueName(
   name.push_back(':');
   name.append(segment.first.data(), segment.first.size());
   name.push_back(':');
-  absl::StrAppend(&name, segment.second);
+  abslx::StrAppend(&name, segment.second);
   return name;
 }
 

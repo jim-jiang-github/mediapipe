@@ -59,19 +59,19 @@ class FallbackTensor {
       : tensor_(immutable_tensor) {}
 
   bool is_immutable() const {
-    return absl::holds_alternative<ImmutableTensor*>(tensor_);
+    return abslx::holds_alternative<ImmutableTensor*>(tensor_);
   }
 
   tensorflow::Tensor& tensor() {
-    if (is_immutable()) return absl::get<ImmutableTensor*>(tensor_)->tensor();
-    return absl::get<tensorflow::Tensor>(tensor_);
+    if (is_immutable()) return abslx::get<ImmutableTensor*>(tensor_)->tensor();
+    return abslx::get<tensorflow::Tensor>(tensor_);
   }
   const tensorflow::Tensor& tensor() const {
     return const_cast<FallbackTensor*>(this)->tensor();
   }
 
  private:
-  absl::variant<absl::monostate, tensorflow::Tensor, ImmutableTensor*> tensor_;
+  abslx::variant<abslx::monostate, tensorflow::Tensor, ImmutableTensor*> tensor_;
 };
 
 }  // namespace tfrt_stub

@@ -90,7 +90,7 @@ class TrackedDetection {
   // Gets corners of the bounding box of the object in normalized coordinates.
   std::array<Vector2_f, 4> GetCorners() const { return GetCorners(1.0f, 1.0f); }
 
-  const absl::node_hash_map<std::string, float>& label_to_score_map() const {
+  const abslx::node_hash_map<std::string, float>& label_to_score_map() const {
     return label_to_score_map_;
   }
 
@@ -120,7 +120,7 @@ class TrackedDetection {
 
   // Each detection could have multiple labels, each with a corresponding
   // detection score.
-  absl::node_hash_map<std::string, float> label_to_score_map_;
+  abslx::node_hash_map<std::string, float> label_to_score_map_;
 };
 
 }  // namespace mediapipe

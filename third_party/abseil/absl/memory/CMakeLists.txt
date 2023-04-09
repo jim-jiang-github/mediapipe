@@ -22,8 +22,8 @@ absl_cc_library(
   COPTS
     ${ABSL_DEFAULT_COPTS}
   DEPS
-    absl::core_headers
-    absl::meta
+    abslx::core_headers
+    abslx::meta
   PUBLIC
 )
 
@@ -35,8 +35,8 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::memory
-    absl::core_headers
+    abslx::memory
+    abslx::core_headers
     gmock_main
 )
 
@@ -48,8 +48,8 @@ absl_cc_test(
   COPTS
     ${ABSL_TEST_COPTS}
   DEPS
-    absl::memory
-    absl::config
-    absl::exception_safety_testing
+    abslx::memory
+    abslx::config
+    abslx::exception_safety_testing
     gmock_main
 )

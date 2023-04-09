@@ -66,7 +66,7 @@ class XlaDeviceContext : public DeviceContext {
                              Tensor* device_tensor, StatusCallback done,
                              bool sync_dst_compute) const override;
   void CopyDeviceTensorToCPU(const Tensor* device_tensor,
-                             absl::string_view tensor_name, Device* device,
+                             abslx::string_view tensor_name, Device* device,
                              Tensor* cpu_tensor, StatusCallback done) override;
   void CopyTensorInSameDevice(const Tensor* input_tensor, Device* device,
                               Tensor* output_tensor,
@@ -119,7 +119,7 @@ class XlaDeviceContext : public DeviceContext {
   // Thread pool used for running closures
   thread::ThreadPool* thread_pool_;
 
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
   int next_stream_ TF_GUARDED_BY(mu_) = 0;
 };
 

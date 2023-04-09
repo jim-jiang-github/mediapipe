@@ -17,7 +17,7 @@
 // -----------------------------------------------------------------------------
 //
 // This file contains mock distribution functions for use alongside an
-// `absl::MockingBitGen` object within the Googletest testing framework. Such
+// `abslx::MockingBitGen` object within the Googletest testing framework. Such
 // mocks are useful to provide deterministic values as return values within
 // (otherwise random) Abseil distribution functions.
 //
@@ -28,20 +28,20 @@
 // https://github.com/google/googletest
 //
 // EXPECT_CALL and ON_CALL need to be made within the same DLL component as
-// the call to absl::Uniform and related methods, otherwise mocking will fail
+// the call to abslx::Uniform and related methods, otherwise mocking will fail
 // since the  underlying implementation creates a type-specific pointer which
 // will be distinct across different DLL boundaries.
 //
 // Example:
 //
-//   absl::MockingBitGen mock;
-//   EXPECT_CALL(absl::MockUniform<int>(), Call(mock, 1, 1000))
+//   abslx::MockingBitGen mock;
+//   EXPECT_CALL(abslx::MockUniform<int>(), Call(mock, 1, 1000))
 //     .WillRepeatedly(testing::ReturnRoundRobin({20, 40}));
 //
-//   EXPECT_EQ(absl::Uniform<int>(gen, 1, 1000), 20);
-//   EXPECT_EQ(absl::Uniform<int>(gen, 1, 1000), 40);
-//   EXPECT_EQ(absl::Uniform<int>(gen, 1, 1000), 20);
-//   EXPECT_EQ(absl::Uniform<int>(gen, 1, 1000), 40);
+//   EXPECT_EQ(abslx::Uniform<int>(gen, 1, 1000), 20);
+//   EXPECT_EQ(abslx::Uniform<int>(gen, 1, 1000), 40);
+//   EXPECT_EQ(abslx::Uniform<int>(gen, 1, 1000), 20);
+//   EXPECT_EQ(abslx::Uniform<int>(gen, 1, 1000), 40);
 
 #ifndef ABSL_RANDOM_MOCK_DISTRIBUTIONS_H_
 #define ABSL_RANDOM_MOCK_DISTRIBUTIONS_H_
@@ -57,26 +57,26 @@
 #include "absl/random/internal/mock_overload_set.h"
 #include "absl/random/mocking_bit_gen.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 // -----------------------------------------------------------------------------
-// absl::MockUniform
+// abslx::MockUniform
 // -----------------------------------------------------------------------------
 //
-// Matches calls to absl::Uniform.
+// Matches calls to abslx::Uniform.
 //
-// `absl::MockUniform` is a class template used in conjunction with Googletest's
+// `abslx::MockUniform` is a class template used in conjunction with Googletest's
 // `ON_CALL()` and `EXPECT_CALL()` macros. To use it, default-construct an
 // instance of it inside `ON_CALL()` or `EXPECT_CALL()`, and use `Call(...)` the
 // same way one would define mocks on a Googletest `MockFunction()`.
 //
 // Example:
 //
-//  absl::MockingBitGen mock;
-//  EXPECT_CALL(absl::MockUniform<uint32_t>(), Call(mock))
+//  abslx::MockingBitGen mock;
+//  EXPECT_CALL(abslx::MockUniform<uint32_t>(), Call(mock))
 //     .WillOnce(Return(123456));
-//  auto x = absl::Uniform<uint32_t>(mock);
+//  auto x = abslx::Uniform<uint32_t>(mock);
 //  assert(x == 123456)
 //
 template <typename R>
@@ -89,59 +89,59 @@ using MockUniform = random_internal::MockOverloadSet<
     R(MockingBitGen&)>;
 
 // -----------------------------------------------------------------------------
-// absl::MockBernoulli
+// abslx::MockBernoulli
 // -----------------------------------------------------------------------------
 //
-// Matches calls to absl::Bernoulli.
+// Matches calls to abslx::Bernoulli.
 //
-// `absl::MockBernoulli` is a class used in conjunction with Googletest's
+// `abslx::MockBernoulli` is a class used in conjunction with Googletest's
 // `ON_CALL()` and `EXPECT_CALL()` macros. To use it, default-construct an
 // instance of it inside `ON_CALL()` or `EXPECT_CALL()`, and use `Call(...)` the
 // same way one would define mocks on a Googletest `MockFunction()`.
 //
 // Example:
 //
-//  absl::MockingBitGen mock;
-//  EXPECT_CALL(absl::MockBernoulli(), Call(mock, testing::_))
+//  abslx::MockingBitGen mock;
+//  EXPECT_CALL(abslx::MockBernoulli(), Call(mock, testing::_))
 //     .WillOnce(Return(false));
-//  assert(absl::Bernoulli(mock, 0.5) == false);
+//  assert(abslx::Bernoulli(mock, 0.5) == false);
 //
 using MockBernoulli =
-    random_internal::MockOverloadSet<absl::bernoulli_distribution,
+    random_internal::MockOverloadSet<abslx::bernoulli_distribution,
                                      bool(MockingBitGen&, double)>;
 
 // -----------------------------------------------------------------------------
-// absl::MockBeta
+// abslx::MockBeta
 // -----------------------------------------------------------------------------
 //
-// Matches calls to absl::Beta.
+// Matches calls to abslx::Beta.
 //
-// `absl::MockBeta` is a class used in conjunction with Googletest's `ON_CALL()`
+// `abslx::MockBeta` is a class used in conjunction with Googletest's `ON_CALL()`
 // and `EXPECT_CALL()` macros. To use it, default-construct an instance of it
 // inside `ON_CALL()` or `EXPECT_CALL()`, and use `Call(...)` the same way one
 // would define mocks on a Googletest `MockFunction()`.
 //
 // Example:
 //
-//  absl::MockingBitGen mock;
-//  EXPECT_CALL(absl::MockBeta(), Call(mock, 3.0, 2.0))
+//  abslx::MockingBitGen mock;
+//  EXPECT_CALL(abslx::MockBeta(), Call(mock, 3.0, 2.0))
 //     .WillOnce(Return(0.567));
-//  auto x = absl::Beta<double>(mock, 3.0, 2.0);
+//  auto x = abslx::Beta<double>(mock, 3.0, 2.0);
 //  assert(x == 0.567);
 //
 template <typename RealType>
 using MockBeta =
-    random_internal::MockOverloadSet<absl::beta_distribution<RealType>,
+    random_internal::MockOverloadSet<abslx::beta_distribution<RealType>,
                                      RealType(MockingBitGen&, RealType,
                                               RealType)>;
 
 // -----------------------------------------------------------------------------
-// absl::MockExponential
+// abslx::MockExponential
 // -----------------------------------------------------------------------------
 //
-// Matches calls to absl::Exponential.
+// Matches calls to abslx::Exponential.
 //
-// `absl::MockExponential` is a class template used in conjunction with
+// `abslx::MockExponential` is a class template used in conjunction with
 // Googletest's `ON_CALL()` and `EXPECT_CALL()` macros. To use it,
 // default-construct an instance of it inside `ON_CALL()` or `EXPECT_CALL()`,
 // and use `Call(...)` the same way one would define mocks on a
@@ -149,24 +149,24 @@ using MockBeta =
 //
 // Example:
 //
-//  absl::MockingBitGen mock;
-//  EXPECT_CALL(absl::MockExponential<double>(), Call(mock, 0.5))
+//  abslx::MockingBitGen mock;
+//  EXPECT_CALL(abslx::MockExponential<double>(), Call(mock, 0.5))
 //     .WillOnce(Return(12.3456789));
-//  auto x = absl::Exponential<double>(mock, 0.5);
+//  auto x = abslx::Exponential<double>(mock, 0.5);
 //  assert(x == 12.3456789)
 //
 template <typename RealType>
 using MockExponential =
-    random_internal::MockOverloadSet<absl::exponential_distribution<RealType>,
+    random_internal::MockOverloadSet<abslx::exponential_distribution<RealType>,
                                      RealType(MockingBitGen&, RealType)>;
 
 // -----------------------------------------------------------------------------
-// absl::MockGaussian
+// abslx::MockGaussian
 // -----------------------------------------------------------------------------
 //
-// Matches calls to absl::Gaussian.
+// Matches calls to abslx::Gaussian.
 //
-// `absl::MockGaussian` is a class template used in conjunction with
+// `abslx::MockGaussian` is a class template used in conjunction with
 // Googletest's `ON_CALL()` and `EXPECT_CALL()` macros. To use it,
 // default-construct an instance of it inside `ON_CALL()` or `EXPECT_CALL()`,
 // and use `Call(...)` the same way one would define mocks on a
@@ -174,25 +174,25 @@ using MockExponential =
 //
 // Example:
 //
-//  absl::MockingBitGen mock;
-//  EXPECT_CALL(absl::MockGaussian<double>(), Call(mock, 16.3, 3.3))
+//  abslx::MockingBitGen mock;
+//  EXPECT_CALL(abslx::MockGaussian<double>(), Call(mock, 16.3, 3.3))
 //     .WillOnce(Return(12.3456789));
-//  auto x = absl::Gaussian<double>(mock, 16.3, 3.3);
+//  auto x = abslx::Gaussian<double>(mock, 16.3, 3.3);
 //  assert(x == 12.3456789)
 //
 template <typename RealType>
 using MockGaussian =
-    random_internal::MockOverloadSet<absl::gaussian_distribution<RealType>,
+    random_internal::MockOverloadSet<abslx::gaussian_distribution<RealType>,
                                      RealType(MockingBitGen&, RealType,
                                               RealType)>;
 
 // -----------------------------------------------------------------------------
-// absl::MockLogUniform
+// abslx::MockLogUniform
 // -----------------------------------------------------------------------------
 //
-// Matches calls to absl::LogUniform.
+// Matches calls to abslx::LogUniform.
 //
-// `absl::MockLogUniform` is a class template used in conjunction with
+// `abslx::MockLogUniform` is a class template used in conjunction with
 // Googletest's `ON_CALL()` and `EXPECT_CALL()` macros. To use it,
 // default-construct an instance of it inside `ON_CALL()` or `EXPECT_CALL()`,
 // and use `Call(...)` the same way one would define mocks on a
@@ -200,67 +200,67 @@ using MockGaussian =
 //
 // Example:
 //
-//  absl::MockingBitGen mock;
-//  EXPECT_CALL(absl::MockLogUniform<int>(), Call(mock, 10, 10000, 10))
+//  abslx::MockingBitGen mock;
+//  EXPECT_CALL(abslx::MockLogUniform<int>(), Call(mock, 10, 10000, 10))
 //     .WillOnce(Return(1221));
-//  auto x = absl::LogUniform<int>(mock, 10, 10000, 10);
+//  auto x = abslx::LogUniform<int>(mock, 10, 10000, 10);
 //  assert(x == 1221)
 //
 template <typename IntType>
 using MockLogUniform = random_internal::MockOverloadSet<
-    absl::log_uniform_int_distribution<IntType>,
+    abslx::log_uniform_int_distribution<IntType>,
     IntType(MockingBitGen&, IntType, IntType, IntType)>;
 
 // -----------------------------------------------------------------------------
-// absl::MockPoisson
+// abslx::MockPoisson
 // -----------------------------------------------------------------------------
 //
-// Matches calls to absl::Poisson.
+// Matches calls to abslx::Poisson.
 //
-// `absl::MockPoisson` is a class template used in conjunction with Googletest's
+// `abslx::MockPoisson` is a class template used in conjunction with Googletest's
 // `ON_CALL()` and `EXPECT_CALL()` macros. To use it, default-construct an
 // instance of it inside `ON_CALL()` or `EXPECT_CALL()`, and use `Call(...)` the
 // same way one would define mocks on a Googletest `MockFunction()`.
 //
 // Example:
 //
-//  absl::MockingBitGen mock;
-//  EXPECT_CALL(absl::MockPoisson<int>(), Call(mock, 2.0))
+//  abslx::MockingBitGen mock;
+//  EXPECT_CALL(abslx::MockPoisson<int>(), Call(mock, 2.0))
 //     .WillOnce(Return(1221));
-//  auto x = absl::Poisson<int>(mock, 2.0);
+//  auto x = abslx::Poisson<int>(mock, 2.0);
 //  assert(x == 1221)
 //
 template <typename IntType>
 using MockPoisson =
-    random_internal::MockOverloadSet<absl::poisson_distribution<IntType>,
+    random_internal::MockOverloadSet<abslx::poisson_distribution<IntType>,
                                      IntType(MockingBitGen&, double)>;
 
 // -----------------------------------------------------------------------------
-// absl::MockZipf
+// abslx::MockZipf
 // -----------------------------------------------------------------------------
 //
-// Matches calls to absl::Zipf.
+// Matches calls to abslx::Zipf.
 //
-// `absl::MockZipf` is a class template used in conjunction with Googletest's
+// `abslx::MockZipf` is a class template used in conjunction with Googletest's
 // `ON_CALL()` and `EXPECT_CALL()` macros. To use it, default-construct an
 // instance of it inside `ON_CALL()` or `EXPECT_CALL()`, and use `Call(...)` the
 // same way one would define mocks on a Googletest `MockFunction()`.
 //
 // Example:
 //
-//  absl::MockingBitGen mock;
-//  EXPECT_CALL(absl::MockZipf<int>(), Call(mock, 1000000, 2.0, 1.0))
+//  abslx::MockingBitGen mock;
+//  EXPECT_CALL(abslx::MockZipf<int>(), Call(mock, 1000000, 2.0, 1.0))
 //     .WillOnce(Return(1221));
-//  auto x = absl::Zipf<int>(mock, 1000000, 2.0, 1.0);
+//  auto x = abslx::Zipf<int>(mock, 1000000, 2.0, 1.0);
 //  assert(x == 1221)
 //
 template <typename IntType>
 using MockZipf =
-    random_internal::MockOverloadSet<absl::zipf_distribution<IntType>,
+    random_internal::MockOverloadSet<abslx::zipf_distribution<IntType>,
                                      IntType(MockingBitGen&, IntType, double,
                                              double)>;
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_MOCK_DISTRIBUTIONS_H_

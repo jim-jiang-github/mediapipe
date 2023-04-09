@@ -139,8 +139,8 @@ void BM_KernelAndDeviceRun(::testing::benchmark::State& state) {
   TF_CHECK_OK(k.Init({}, ndef, nullptr));
   const EagerKernelArgs args(std::move(inputs));
   for (auto s : state) {
-    TF_CHECK_OK(k.Run(nullptr, args, &outputs, nullptr, absl::nullopt,
-                      absl::nullopt, nullptr));
+    TF_CHECK_OK(k.Run(nullptr, args, &outputs, nullptr, abslx::nullopt,
+                      abslx::nullopt, nullptr));
   }
 }
 BENCHMARK(BM_KernelAndDeviceRun);

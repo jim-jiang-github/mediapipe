@@ -69,7 +69,7 @@ bool IsCompatibleType(FieldDescriptor::Type field_type, DataType dtype) {
   }
 }
 
-Status ParseTextFormatFromString(absl::string_view input,
+Status ParseTextFormatFromString(abslx::string_view input,
                                  protobuf::Message* output) {
   DCHECK(output != nullptr) << "output must be non NULL";
   // When checks are disabled, instead log the error and return an error status.
@@ -103,7 +103,7 @@ StringErrorCollector::StringErrorCollector(string* error_text,
 void StringErrorCollector::AddError(int line, int column,
                                     const string& message) {
   if (error_text_ != nullptr) {
-    absl::SubstituteAndAppend(error_text_, "$0($1): $2\n", line + index_offset_,
+    abslx::SubstituteAndAppend(error_text_, "$0($1): $2\n", line + index_offset_,
                               column + index_offset_, message);
   }
 }

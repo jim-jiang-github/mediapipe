@@ -27,7 +27,7 @@ namespace dtensor {
 StatusOr<std::map<DeviceLocation, std::vector<int32>>>
 GetAllReducePartitionsFromReducedDims(
     const dtensor::Layout& output_layout,
-    const absl::flat_hash_set<std::string>& reduced_dims);
+    const abslx::flat_hash_set<std::string>& reduced_dims);
 
 // Use the first device in the mesh to extract the device name.
 StatusOr<std::string> DeviceTypeFromMesh(const Mesh& mesh);

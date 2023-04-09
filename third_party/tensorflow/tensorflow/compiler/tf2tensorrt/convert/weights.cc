@@ -75,7 +75,7 @@ size_t TRT_ShapedWeights::size_bytes() const {
 }
 
 string TRT_ShapedWeights::DebugString() const {
-  return absl::StrCat(
+  return abslx::StrCat(
       "TRT_ShapedWeights(shape=", shape_.DebugString(),
       ", type=", tensorflow::tensorrt::DebugString(type_),
       ", values=", reinterpret_cast<uintptr_t>(GetPointer<int8>()), ")");
@@ -150,13 +150,13 @@ Status TRT_TensorOrWeights::GetTfType(DataType* tf_type) const {
 string TRT_TensorOrWeights::DebugString() const {
   string output = "TRT_TensorOrWeights(type=";
   if (is_tensor()) {
-    absl::StrAppend(&output,
+    abslx::StrAppend(&output,
                     "tensor=", tensorflow::tensorrt::DebugString(tensor()),
                     ", batch_size=", batch_size_);
   } else {
-    absl::StrAppend(&output, "weights=", weights_.DebugString());
+    abslx::StrAppend(&output, "weights=", weights_.DebugString());
   }
-  absl::StrAppend(&output, ")");
+  abslx::StrAppend(&output, ")");
   return output;
 }
 

@@ -365,8 +365,8 @@ if(TFLITE_ENABLE_GPU)
 endif()
   list(APPEND TFLITE_TARGET_PUBLIC_OPTIONS "-DCL_DELEGATE_NO_GL" "-DEGL_NO_X11")
   list(APPEND TFLITE_TARGET_DEPENDENCIES
-    absl::any
-    absl::flat_hash_map
+    abslx::any
+    abslx::flat_hash_map
   )
 endif()
 if(_TFLITE_ENABLE_NNAPI)
@@ -507,12 +507,12 @@ target_link_libraries(tensorflow-lite
   PUBLIC
     Eigen3::Eigen
     NEON_2_SSE::NEON_2_SSE
-    absl::flags
-    absl::hash
-    absl::status
-    absl::strings
-    absl::synchronization
-    absl::variant
+    abslx::flags
+    abslx::hash
+    abslx::status
+    abslx::strings
+    abslx::synchronization
+    abslx::variant
     farmhash
     fft2d_fftsg2d
     flatbuffers::flatbuffers

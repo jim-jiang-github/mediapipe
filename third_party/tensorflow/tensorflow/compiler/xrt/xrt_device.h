@@ -67,7 +67,7 @@ class XRTGenericDeviceAccessor {
     int ordinal_ = 0;
     se::DeviceMemoryAllocator* allocator_ = nullptr;
     static tensorflow::mutex cuda_allocator_mutex_;
-    static absl::flat_hash_map<stream_executor::Stream*,
+    static abslx::flat_hash_map<stream_executor::Stream*,
                                std::unique_ptr<se::TfAllocatorAdapter>>*
         cuda_allocators_;
   };

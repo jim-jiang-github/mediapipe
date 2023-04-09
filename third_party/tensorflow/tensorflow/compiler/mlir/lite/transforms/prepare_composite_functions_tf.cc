@@ -375,7 +375,7 @@ void PrepareCompositeFunctionsPass::ConvertTFImplementsWithAttributes(
     if (!tfl_fusable_op) return;
 
     if (failed(ConvertTflFusableOp(func, api_name, attributes))) {
-      func->emitError(absl::StrCat("failed to fuse for op: ", api_name.str()));
+      func->emitError(abslx::StrCat("failed to fuse for op: ", api_name.str()));
       return signalPassFailure();
     }
   }

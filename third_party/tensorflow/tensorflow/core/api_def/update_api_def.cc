@@ -180,7 +180,7 @@ string RemoveDoc(const OpDef& op, const string& file_contents,
   }
   // Remove .Doc call.
   auto before_doc = file_contents.substr(0, doc_start_location);
-  absl::StripTrailingAsciiWhitespace(&before_doc);
+  abslx::StripTrailingAsciiWhitespace(&before_doc);
   return before_doc +
          file_contents.substr(doc_end_location + sizeof(kDocEnd) - 1);
 }

@@ -32,7 +32,7 @@
 #include "absl/meta/type_traits.h"
 #include "absl/strings/string_view.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 namespace hash_internal {
@@ -42,7 +42,7 @@ template <class Container, class = void>
 struct IsMap : std::false_type {};
 
 template <class Map>
-struct IsMap<Map, absl::void_t<typename Map::mapped_type>> : std::true_type {};
+struct IsMap<Map, abslx::void_t<typename Map::mapped_type>> : std::true_type {};
 
 }  // namespace generator_internal
 
@@ -106,8 +106,8 @@ struct Generator<std::string> {
 };
 
 template <>
-struct Generator<absl::string_view> {
-  absl::string_view operator()() const;
+struct Generator<abslx::string_view> {
+  abslx::string_view operator()() const;
 };
 
 template <>
@@ -135,12 +135,12 @@ struct Generator<std::tuple<Ts...>> {
 template <class T>
 struct Generator<std::unique_ptr<T>> {
   std::unique_ptr<T> operator()() const {
-    return absl::make_unique<T>(Generator<T>()());
+    return abslx::make_unique<T>(Generator<T>()());
   }
 };
 
 template <class U>
-struct Generator<U, absl::void_t<decltype(std::declval<U&>().key()),
+struct Generator<U, abslx::void_t<decltype(std::declval<U&>().key()),
                                 decltype(std::declval<U&>().value())>>
     : Generator<std::pair<
           typename std::decay<decltype(std::declval<U&>().key())>::type,
@@ -156,6 +156,6 @@ using GeneratedType = decltype(
 }  // namespace hash_internal
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_CONTAINER_INTERNAL_HASH_GENERATOR_TESTING_H_

@@ -95,12 +95,12 @@ class BoundaryVisitor {
  private:
   // worklist is the deque that contains instructions to be visited.
   std::deque<Boundary> worklist_;
-  absl::flat_hash_set<Boundary> visited_;
+  abslx::flat_hash_set<Boundary> visited_;
 };
 
 template <class OpCollection>
 int64_t CountNonLeafOps(const OpCollection& ops) {
-  absl::flat_hash_set<HloInstruction*> op_set;
+  abslx::flat_hash_set<HloInstruction*> op_set;
   for (auto op : ops) {
     if (!op_set.contains(op) && op->opcode() != HloOpcode::kConstant) {
       op_set.insert(op);
@@ -249,9 +249,9 @@ bool InstructionWithinBranchIdentical(
 // Copy the boundary out of the conditional and update hoisted_boundaries.
 void CopyOutOfConditional(
     Boundary& boundary, HloInstruction* conditional,
-    absl::flat_hash_map<Boundary, Boundary>& hoisted_boundaries) {
+    abslx::flat_hash_map<Boundary, Boundary>& hoisted_boundaries) {
   CHECK(boundary.IsInsideBranch());
-  absl::InlinedVector<HloInstruction*, 4> new_operands;
+  abslx::InlinedVector<HloInstruction*, 4> new_operands;
   // All of the branch operands should have the same opcode and shape, so just
   // use branch 0.
   const HloInstruction* branch0_inst = boundary.operands()[0];
@@ -281,11 +281,11 @@ void CopyOutOfConditional(
 // Copy the boundary into the conditional and update hoisted_boundaries.
 void CopyIntoConditional(
     Boundary& boundary, HloInstruction* conditional,
-    absl::flat_hash_map<Boundary, Boundary>& hoisted_boundaries) {
+    abslx::flat_hash_map<Boundary, Boundary>& hoisted_boundaries) {
   CHECK(boundary.IsOutsideBranch());
   CHECK_EQ(boundary.operands().size(), 1);
   int num_branches = conditional->branch_count();
-  std::vector<absl::InlinedVector<HloInstruction*, 4>> new_operands(
+  std::vector<abslx::InlinedVector<HloInstruction*, 4>> new_operands(
       num_branches);
   HloInstruction* op = boundary.operands()[0];
   for (HloInstruction* operand : op->operands()) {
@@ -345,11 +345,11 @@ void CopyIntoConditional(
 
 // Identify converts to be hoisted/rematerialized out of the branch
 // computations.
-absl::flat_hash_set<int64_t> FindSpecialConverts(HloInstruction* old_root,
+abslx::flat_hash_set<int64_t> FindSpecialConverts(HloInstruction* old_root,
                                                  int branch_count,
                                                  HloInstruction* conditional,
                                                  bool is_layout_sensitive) {
-  absl::flat_hash_set<int64_t> special_convert;
+  abslx::flat_hash_set<int64_t> special_convert;
 
   // TODO(b/216487727): Allow hoisting converts that feed or fed by other
   // converts by addressing possible duplicates left behind in the tuple output.
@@ -357,12 +357,12 @@ absl::flat_hash_set<int64_t> FindSpecialConverts(HloInstruction* old_root,
   // merging these snippets of code would be one alternative.
   auto convert_invalid =
       [](const HloInstruction* convert_set_candidate) -> bool {
-    bool invalid_user = absl::c_any_of(
+    bool invalid_user = abslx::c_any_of(
         convert_set_candidate->users(), [](const HloInstruction* user) -> bool {
           return (user->opcode() == HloOpcode::kConvert);
         });
     bool invalid_producer =
-        absl::c_any_of(convert_set_candidate->operands(),
+        abslx::c_any_of(convert_set_candidate->operands(),
                        [](const HloInstruction* operand) -> bool {
                          return (operand->opcode() == HloOpcode::kConvert);
                        });
@@ -379,7 +379,7 @@ absl::flat_hash_set<int64_t> FindSpecialConverts(HloInstruction* old_root,
         old_root->mutable_operand(operand_num);
     // TODO(b/216487727): Remove duplicates in tuple outputs while hoisting.
     auto repeated =
-        absl::c_count_if(old_root->operands(),
+        abslx::c_count_if(old_root->operands(),
                          [&](const HloInstruction* operand) -> bool {
                            return (special_convert_candidate == operand);
                          }) > 1;
@@ -415,7 +415,7 @@ absl::flat_hash_set<int64_t> FindSpecialConverts(HloInstruction* old_root,
         break;
       }
       auto repeated =
-          absl::c_count_if(others_root->operands(),
+          abslx::c_count_if(others_root->operands(),
                            [&](const HloInstruction* operand) -> bool {
                              return (special_convert_candidate == operand);
                            }) > 1;
@@ -457,7 +457,7 @@ Status RestructureConditionalInstruction(HloComputation* computation,
   } else {
     std::vector<HloInstruction*> new_tuple_users;
     for (auto conditional_user : conditional->users()) {
-      auto is_new_gte = absl::c_find_if(
+      auto is_new_gte = abslx::c_find_if(
           new_operands,
           [&](HloInstruction* instr) { return instr == conditional_user; });
       if (is_new_gte == new_operands.end()) {
@@ -507,7 +507,7 @@ StatusOr<bool> ConvertSpecialMove(HloInstruction* conditional,
   };
 
   // Captures tuple indices refering to converts to be rematerialized/hoisted.
-  absl::flat_hash_set<int64_t> special_convert = FindSpecialConverts(
+  abslx::flat_hash_set<int64_t> special_convert = FindSpecialConverts(
       old_root, branch_count, conditional, is_layout_sensitive);
 
   // Exit if we cannot find any converts to be hoisted.
@@ -520,9 +520,9 @@ StatusOr<bool> ConvertSpecialMove(HloInstruction* conditional,
 
   for (int branch = 0; branch < branch_count; branch++) {
     old_root = conditional->branch_computation(branch)->root_instruction();
-    absl::flat_hash_map<HloInstruction*, int64_t> map_inst_to_tuple_index;
+    abslx::flat_hash_map<HloInstruction*, int64_t> map_inst_to_tuple_index;
     std::vector<HloInstruction*> new_operands(old_root->operand_count());
-    absl::flat_hash_set<HloInstruction*> to_hoist_set;
+    abslx::flat_hash_set<HloInstruction*> to_hoist_set;
 
     for (int64_t operand_num = 0; operand_num < old_root->operand_count();
          ++operand_num) {
@@ -575,8 +575,8 @@ StatusOr<bool> ConvertSpecialMove(HloInstruction* conditional,
         conditional_parent->AddInstruction(HloInstruction::CreateConditional(
             cur_branch->root_instruction()->shape(),
             conditional->mutable_operand(0),
-            absl::MakeSpan(conditional->branch_computations()),
-            absl::MakeSpan(conditional->operands()).subspan(1)));
+            abslx::MakeSpan(conditional->branch_computations()),
+            abslx::MakeSpan(conditional->operands()).subspan(1)));
     // Ensure that all the users of conditional refer to the new one.
     TF_RETURN_IF_ERROR(
         conditional->ReplaceAllUsesWithDifferentShape(newconditional));
@@ -626,7 +626,7 @@ StatusOr<bool> ConditionalCodeMotion::MoveInstructionOut(
   std::vector<HloInstruction*> old_conditional_users = conditional->users();
   // Maps boundaries in the conditional body to boundaries hoisted outside
   // the conditional that compute the same value.
-  absl::flat_hash_map<Boundary, Boundary> hoisted_boundaries;
+  abslx::flat_hash_map<Boundary, Boundary> hoisted_boundaries;
   // Insert GetTupleElement before the instructions whose operands might still
   // be within the conditional.
   VLOG(1) << "before opt:"
@@ -732,7 +732,7 @@ StatusOr<bool> ConditionalCodeMotion::MoveInstructionIn(
           << conditional->parent()->ToString(HloPrintOptions::Fingerprint())
           << "\n";
   // Mapping boundaries to be moved to their new representations.
-  absl::flat_hash_map<Boundary, Boundary> hoisted_boundaries;
+  abslx::flat_hash_map<Boundary, Boundary> hoisted_boundaries;
   int64_t to_move_in_size = to_move_in.size();
   int64_t branch_count = conditional->branch_count();
   HloGetTupleElementInstruction* tuple_use =
@@ -903,7 +903,7 @@ class GroupConnectedBoundaries {
   HloComputation* conditional_parent_;
   bool is_layout_sensitive_;
   // Instructions that have been visited but are not going to be moved.
-  absl::flat_hash_map<HloInstruction*, int>& visited_count_;
+  abslx::flat_hash_map<HloInstruction*, int>& visited_count_;
   // The following four lines are configurations of the cost model, which will
   // be used to determine whether to move an instruction (move_config_) and how
   // strongly preferred it is to keep a pair of ops together (reuse_config_).
@@ -913,10 +913,10 @@ class GroupConnectedBoundaries {
   // search/tuning process.
   std::vector<std::vector<int64_t>>& move_config_;
   std::vector<std::vector<int64_t>>& reuse_config_;
-  absl::Span<int64_t> search_config_vec_;
+  abslx::Span<int64_t> search_config_vec_;
   int64_t& search_config_;
   int64_t search_subscript_;
-  absl::flat_hash_map<const int64_t*, int64_t> flipped_;
+  abslx::flat_hash_map<const int64_t*, int64_t> flipped_;
 
   // The FlipMutation function serves to implement the search of alternative
   // cost models by deciding whether to flip a given configuration, saved in
@@ -984,7 +984,7 @@ class GroupConnectedBoundaries {
  public:
   explicit GroupConnectedBoundaries(
       HloInstruction* conditional, bool is_layout_sensitive,
-      absl::flat_hash_map<HloInstruction*, int>& visited_count,
+      abslx::flat_hash_map<HloInstruction*, int>& visited_count,
       std::vector<std::vector<int64_t>>* move_config,
       std::vector<std::vector<int64_t>>* reuse_config,
       std::vector<int64_t>& search_config)
@@ -1357,7 +1357,7 @@ class GroupConnectedBoundaries {
 ConditionalCodeMotion::Decision ConditionalCodeMotion::ConsiderCodeMotion(
     HloInstruction* conditional, const Boundary& cur_boundary,
     std::vector<Boundary>& to_move, std::vector<Boundary>& new_boundaries,
-    absl::flat_hash_map<HloInstruction*, int>& visited_count) {
+    abslx::flat_hash_map<HloInstruction*, int>& visited_count) {
   GroupConnectedBoundaries connect(conditional, is_layout_sensitive_,
                                    visited_count, &move_config_, &reuse_config_,
                                    search_config_);
@@ -1391,7 +1391,7 @@ ConditionalCodeMotion::Decision ConditionalCodeMotion::ConsiderCodeMotion(
 
 StatusOr<bool> ConditionalCodeMotion::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   VLOG(2) << "Begin a new pass of conditional code motion optimization.\n";
   // Use to support debugging of optimization, by disabling the opt after it has
   // been applied a pre-determined times (to isolate impact of transformations).
@@ -1414,7 +1414,7 @@ StatusOr<bool> ConditionalCodeMotion::Run(
   // potential complications of modifying the code that affecting traversal.
   std::vector<HloInstruction*> conditional_ops;
   // Track how many times each branch computation is shared.
-  absl::flat_hash_map<HloComputation*, int> conditional_computations;
+  abslx::flat_hash_map<HloComputation*, int> conditional_computations;
   for (auto* comp : module->MakeComputationPostOrder(execution_threads)) {
     for (auto* instr : comp->MakeInstructionPostOrder()) {
       if (instr->opcode() == HloOpcode::kConditional) {
@@ -1478,7 +1478,7 @@ StatusOr<bool> ConditionalCodeMotion::Run(
     std::vector<std::vector<Boundary>> new_boundaries_for_moveout;
     std::vector<std::vector<Boundary>> new_boundaries_for_movein;
     // Number of times each instruction has been visited for moving.
-    absl::flat_hash_map<HloInstruction*, int> visited_count;
+    abslx::flat_hash_map<HloInstruction*, int> visited_count;
     int benefit_move_out = 0, benefit_move_in = 0;
     Decision::Direction final_d = Decision::Direction::kNoChange;
     // The conditional is moved into a worklist as the seed (starting point).
@@ -1716,17 +1716,17 @@ void ConditionalCodeMotion::ParseSearchConfiguration(
     return;
   }
   search_config_index_ = 0;
-  std::vector<std::string> configs = absl::StrSplit(search_config, ';');
+  std::vector<std::string> configs = abslx::StrSplit(search_config, ';');
   for (const std::string& config : configs) {
-    std::vector<std::string> specs = absl::StrSplit(config, ',');
+    std::vector<std::string> specs = abslx::StrSplit(config, ',');
     CHECK_EQ(specs.size(), 4);
     int64_t condition_index;
-    CHECK(absl::SimpleAtoi(specs[0], &condition_index));
+    CHECK(abslx::SimpleAtoi(specs[0], &condition_index));
     auto& cur_config_entry = search_config_map_[condition_index];
     int64_t flip_start, max_flip, flip_stride;
-    CHECK(absl::SimpleAtoi(specs[1], &flip_start));
-    CHECK(absl::SimpleAtoi(specs[2], &max_flip));
-    CHECK(absl::SimpleAtoi(specs[3], &flip_stride));
+    CHECK(abslx::SimpleAtoi(specs[1], &flip_start));
+    CHECK(abslx::SimpleAtoi(specs[2], &max_flip));
+    CHECK(abslx::SimpleAtoi(specs[3], &flip_stride));
     int64_t cur_config = MakeSearchConfig(flip_start, max_flip, flip_stride);
     cur_config_entry.push_back(cur_config);
     VLOG(2) << "Setting search config " << condition_index << "->" << cur_config

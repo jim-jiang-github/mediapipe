@@ -41,7 +41,7 @@ class JITCache : public tensorflow::ResourceBase {
 
  private:
   tensorflow::mutex mu_;
-  absl::flat_hash_map<std::string, std::unique_ptr<ExecutionEngine>>
+  abslx::flat_hash_map<std::string, std::unique_ptr<ExecutionEngine>>
       execution_engine_by_key_ TF_GUARDED_BY(mu_);
 };
 

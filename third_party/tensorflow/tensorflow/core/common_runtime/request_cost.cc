@@ -24,15 +24,15 @@ limitations under the License.
 namespace tensorflow {
 
 void RequestCost::RecordCost(
-    const std::vector<std::pair<absl::string_view, absl::Duration>>& costs) {
-  absl::MutexLock lock(&mutex_);
+    const std::vector<std::pair<abslx::string_view, abslx::Duration>>& costs) {
+  abslx::MutexLock lock(&mutex_);
   for (const auto& cost : costs) {
     cost_map_[cost.first] += cost.second;
   }
 }
 
-absl::flat_hash_map<std::string, absl::Duration> RequestCost::GetCosts() const {
-  absl::MutexLock lock(&mutex_);
+abslx::flat_hash_map<std::string, abslx::Duration> RequestCost::GetCosts() const {
+  abslx::MutexLock lock(&mutex_);
   return cost_map_;
 }
 

@@ -47,7 +47,7 @@ TEST(RunHandlerUtilTest, TestBasicScheduling) {
       new RunHandlerPool(num_threads, num_threads));
 
   // RunHandler should always be able to run num_threads inter closures
-  absl::Barrier barrier(num_threads);
+  abslx::Barrier barrier(num_threads);
 
   BlockingCounter counter(2 * num_handlers * num_threads);
 

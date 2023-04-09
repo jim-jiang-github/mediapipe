@@ -33,15 +33,15 @@ class TraceBuilder {
 
   // Returns the earliest packet timestamp appearing only after begin_time.
   static Timestamp TimestampAfter(const TraceBuffer& buffer,
-                                  absl::Time begin_time);
+                                  abslx::Time begin_time);
 
   // Returns the graph of traces between begin_time and end_time exclusive.
-  void CreateTrace(const TraceBuffer& buffer, absl::Time begin_time,
-                   absl::Time end_time, GraphTrace* result);
+  void CreateTrace(const TraceBuffer& buffer, abslx::Time begin_time,
+                   abslx::Time end_time, GraphTrace* result);
 
   // Returns trace events between begin_time and end_time exclusive.
-  void CreateLog(const TraceBuffer& buffer, absl::Time begin_time,
-                 absl::Time end_time, GraphTrace* result);
+  void CreateLog(const TraceBuffer& buffer, abslx::Time begin_time,
+                 abslx::Time end_time, GraphTrace* result);
 
   // Resets the TraceBuilder to begin building a new trace.
   void Clear();

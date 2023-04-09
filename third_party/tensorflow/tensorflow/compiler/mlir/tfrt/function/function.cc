@@ -62,7 +62,7 @@ Status CompileTFMLIRToBEF(const TfrtFunctionCompileOptions& options,
   // TODO(tfrt-devs): Current MaxPoolingOp only supports NHWC on device type
   // CPU. Enable this layout optimization after we introduce TFRT native ops
   // for training.
-  if (absl::StrContains(pass_options.default_device, "CPU")) {
+  if (abslx::StrContains(pass_options.default_device, "CPU")) {
     pass_options.skip_fold_transpose_in_ops = true;
   }
   pass_options.enable_optimizer = options.enable_optimizer;

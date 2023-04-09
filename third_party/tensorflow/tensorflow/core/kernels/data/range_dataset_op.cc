@@ -327,7 +327,7 @@ class RangeDatasetOp::Dataset : public DatasetBase {
     }
 
     std::string SplitProviderKeyNameFn(const std::string& key) {
-      return full_name(absl::StrCat(kSplitProvider, kSlash, key));
+      return full_name(abslx::StrCat(kSplitProvider, kSlash, key));
     }
 
    private:

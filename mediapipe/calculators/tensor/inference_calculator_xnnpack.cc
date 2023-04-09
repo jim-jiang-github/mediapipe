@@ -34,37 +34,37 @@ class InferenceCalculatorXnnpackImpl
     : public NodeImpl<InferenceCalculatorXnnpack,
                       InferenceCalculatorXnnpackImpl> {
  public:
-  static absl::Status UpdateContract(CalculatorContract* cc);
+  static abslx::Status UpdateContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 
  private:
-  absl::StatusOr<std::unique_ptr<InferenceRunner>> CreateInferenceRunner(
+  abslx::StatusOr<std::unique_ptr<InferenceRunner>> CreateInferenceRunner(
       CalculatorContext* cc);
-  absl::StatusOr<TfLiteDelegatePtr> CreateDelegate(CalculatorContext* cc);
+  abslx::StatusOr<TfLiteDelegatePtr> CreateDelegate(CalculatorContext* cc);
 
   std::unique_ptr<InferenceRunner> inference_runner_;
 };
 
-absl::Status InferenceCalculatorXnnpackImpl::UpdateContract(
+abslx::Status InferenceCalculatorXnnpackImpl::UpdateContract(
     CalculatorContract* cc) {
   const auto& options = cc->Options<mediapipe::InferenceCalculatorOptions>();
   RET_CHECK(!options.model_path().empty() ^ kSideInModel(cc).IsConnected())
       << "Either model as side packet or model path in options is required.";
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status InferenceCalculatorXnnpackImpl::Open(CalculatorContext* cc) {
+abslx::Status InferenceCalculatorXnnpackImpl::Open(CalculatorContext* cc) {
   ASSIGN_OR_RETURN(inference_runner_, CreateInferenceRunner(cc));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status InferenceCalculatorXnnpackImpl::Process(CalculatorContext* cc) {
+abslx::Status InferenceCalculatorXnnpackImpl::Process(CalculatorContext* cc) {
   if (kInTensors(cc).IsEmpty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   const auto& input_tensors = *kInTensors(cc);
   RET_CHECK(!input_tensors.empty());
@@ -72,15 +72,15 @@ absl::Status InferenceCalculatorXnnpackImpl::Process(CalculatorContext* cc) {
   ASSIGN_OR_RETURN(std::vector<Tensor> output_tensors,
                    inference_runner_->Run(cc, input_tensors));
   kOutTensors(cc).Send(std::move(output_tensors));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status InferenceCalculatorXnnpackImpl::Close(CalculatorContext* cc) {
+abslx::Status InferenceCalculatorXnnpackImpl::Close(CalculatorContext* cc) {
   inference_runner_ = nullptr;
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::StatusOr<std::unique_ptr<InferenceRunner>>
+abslx::StatusOr<std::unique_ptr<InferenceRunner>>
 InferenceCalculatorXnnpackImpl::CreateInferenceRunner(CalculatorContext* cc) {
   ASSIGN_OR_RETURN(auto model_packet, GetModelAsPacket(cc));
   ASSIGN_OR_RETURN(auto op_resolver_packet, GetOpResolverAsPacket(cc));
@@ -92,7 +92,7 @@ InferenceCalculatorXnnpackImpl::CreateInferenceRunner(CalculatorContext* cc) {
       std::move(delegate), interpreter_num_threads);
 }
 
-absl::StatusOr<TfLiteDelegatePtr>
+abslx::StatusOr<TfLiteDelegatePtr>
 InferenceCalculatorXnnpackImpl::CreateDelegate(CalculatorContext* cc) {
   const auto& calculator_opts =
       cc->Options<mediapipe::InferenceCalculatorOptions>();

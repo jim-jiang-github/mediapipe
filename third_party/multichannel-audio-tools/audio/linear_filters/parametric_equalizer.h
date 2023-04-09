@@ -183,8 +183,8 @@ struct NelderMeadFitParams {
 // magnitude_target_db before running the fit. Nelder-Mead is not always
 // terribly robust in the presence of noise, and we don't want to
 // accidentally fit peak filters to narrow peaks or dips caused by noise.
-float FitParametricEqualizer(absl::Span<const float> frequencies_hz,
-                             absl::Span<const float> magnitude_target_db,
+float FitParametricEqualizer(abslx::Span<const float> frequencies_hz,
+                             abslx::Span<const float> magnitude_target_db,
                              float sample_rate_hz,
                              const NelderMeadFitParams& fit_params,
                              ParametricEqualizerParams* eq_params);
@@ -204,15 +204,15 @@ float FitParametricEqualizer(absl::Span<const float> frequencies_hz,
 // O(k^2*(n + k)) = O(k^3), where n is the number filters in eq_params and k is
 // the number of points in magnitude_target_db.
 void SetParametricEqualizerGainsToMatchMagnitudeResponse(
-    absl::Span<const float> frequencies_hz,
-    absl::Span<const float> magnitude_target_db, float sample_rate_hz,
+    abslx::Span<const float> frequencies_hz,
+    abslx::Span<const float> magnitude_target_db, float sample_rate_hz,
     ParametricEqualizerParams* eq_params);
 
 // Same as above, but allows for control over the amount of computation
 // performed.
 void SetParametricEqualizerGainsToMatchMagnitudeResponse(
-    absl::Span<const float> frequencies_hz,
-    absl::Span<const float> magnitude_target_db,
+    abslx::Span<const float> frequencies_hz,
+    abslx::Span<const float> magnitude_target_db,
     ConvergenceParams convergence_params, float sample_rate_hz,
     ParametricEqualizerParams* eq_params);
 

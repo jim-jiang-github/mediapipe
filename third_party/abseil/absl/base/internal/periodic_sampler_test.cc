@@ -21,7 +21,7 @@
 #include "absl/base/attributes.h"
 #include "absl/base/macros.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 namespace {
@@ -174,4 +174,4 @@ TEST(PeriodicSamplerTest, SetGlobalPeriod) {
 }  // namespace
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

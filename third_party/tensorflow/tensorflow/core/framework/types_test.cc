@@ -141,7 +141,7 @@ TEST(TypesTest, IntegerTypes) {
   for (auto dt : AllTypes()) {
     const string name = DataTypeString(dt);
     EXPECT_EQ(DataTypeIsInteger(dt),
-              absl::StartsWith(name, "int") || absl::StartsWith(name, "uint"))
+              abslx::StartsWith(name, "int") || abslx::StartsWith(name, "uint"))
         << "DataTypeInteger failed for " << name;
   }
 }

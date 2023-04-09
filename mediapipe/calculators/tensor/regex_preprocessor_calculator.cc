@@ -79,9 +79,9 @@ class RegexPreprocessorCalculator : public Node {
 
   MEDIAPIPE_NODE_CONTRACT(kTextIn, kMetadataExtractorSideIn, kTensorsOut);
 
-  static absl::Status UpdateContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
+  static abslx::Status UpdateContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
 
  private:
   std::unique_ptr<tasks::text::tokenizers::RegexTokenizer> tokenizer_;
@@ -89,22 +89,22 @@ class RegexPreprocessorCalculator : public Node {
   int max_seq_len_ = 0;
 };
 
-absl::Status RegexPreprocessorCalculator::UpdateContract(
+abslx::Status RegexPreprocessorCalculator::UpdateContract(
     CalculatorContract* cc) {
   const auto& options =
       cc->Options<mediapipe::RegexPreprocessorCalculatorOptions>();
   RET_CHECK(options.has_max_seq_len()) << "max_seq_len is required";
   RET_CHECK_GT(options.max_seq_len(), 0) << "max_seq_len must be positive";
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RegexPreprocessorCalculator::Open(CalculatorContext* cc) {
+abslx::Status RegexPreprocessorCalculator::Open(CalculatorContext* cc) {
   const ModelMetadataExtractor* metadata_extractor =
       &kMetadataExtractorSideIn(cc).Get();
   const tflite::TensorMetadata* tensor_metadata =
       metadata_extractor->GetInputTensorMetadata(0);
   if (tensor_metadata == nullptr) {
-    return absl::InvalidArgumentError("No tensor metadata found");
+    return abslx::InvalidArgumentError("No tensor metadata found");
   }
 
   ASSIGN_OR_RETURN(
@@ -112,7 +112,7 @@ absl::Status RegexPreprocessorCalculator::Open(CalculatorContext* cc) {
       metadata_extractor->FindFirstProcessUnit(
           *tensor_metadata, tflite::ProcessUnitOptions_RegexTokenizerOptions));
   if (tokenizer_metadata == nullptr) {
-    return absl::InvalidArgumentError("No tokenizer metadata found");
+    return abslx::InvalidArgumentError("No tokenizer metadata found");
   }
   const tflite::RegexTokenizerOptions* regex_tokenizer_options =
       tokenizer_metadata->options_as<tflite::RegexTokenizerOptions>();
@@ -123,10 +123,10 @@ absl::Status RegexPreprocessorCalculator::Open(CalculatorContext* cc) {
   const auto& options =
       cc->Options<mediapipe::RegexPreprocessorCalculatorOptions>();
   max_seq_len_ = options.max_seq_len();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status RegexPreprocessorCalculator::Process(CalculatorContext* cc) {
+abslx::Status RegexPreprocessorCalculator::Process(CalculatorContext* cc) {
   tasks::text::tokenizers::TokenizerResult tokenizer_result =
       tokenizer_->Tokenize(kTextIn(cc).Get());
 
@@ -165,7 +165,7 @@ absl::Status RegexPreprocessorCalculator::Process(CalculatorContext* cc) {
   std::memcpy(result[0].GetCpuWriteView().buffer<int32_t>(),
               input_tokens.data(), input_tokens.size() * sizeof(int32_t));
   kTensorsOut(cc).Send(std::move(result));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 MEDIAPIPE_REGISTER_NODE(RegexPreprocessorCalculator);

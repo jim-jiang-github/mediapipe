@@ -264,7 +264,7 @@ void CollectiveRemoteAccessDistributed::CheckPeerHealth(
           s = dev_resolver_->GetAllDeviceAttributes(peer_task, &cached_attrs);
         }
         if (s.ok()) {
-          absl::flat_hash_set<uint64> remote_incarnations;
+          abslx::flat_hash_set<uint64> remote_incarnations;
           for (const DeviceAttributes& da : resp->device_attributes()) {
             remote_incarnations.insert(da.incarnation());
           }

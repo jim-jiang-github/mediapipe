@@ -3,7 +3,7 @@
 
 #include "absl/random/gaussian_distribution.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -98,7 +98,7 @@ const gaussian_distribution_base::Tables
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 // clang-format on
 // END GENERATED CODE

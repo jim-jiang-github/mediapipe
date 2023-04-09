@@ -116,11 +116,11 @@ bool ConsumeAttrNumber(StringPiece* sp, int64_t* out) {
 bool ConsumeCompoundAttrType(StringPiece* sp, StringPiece* out) {
   auto capture_data = sp->data();
   auto capture_begin = sp->begin();
-  if (absl::ConsumePrefix(sp, "numbertype") ||
-      absl::ConsumePrefix(sp, "numerictype") ||
-      absl::ConsumePrefix(sp, "quantizedtype") ||
-      absl::ConsumePrefix(sp, "realnumbertype") ||
-      absl::ConsumePrefix(sp, "realnumberictype")) {
+  if (abslx::ConsumePrefix(sp, "numbertype") ||
+      abslx::ConsumePrefix(sp, "numerictype") ||
+      abslx::ConsumePrefix(sp, "quantizedtype") ||
+      abslx::ConsumePrefix(sp, "realnumbertype") ||
+      abslx::ConsumePrefix(sp, "realnumberictype")) {
     *out = StringPiece(capture_data, sp->begin() - capture_begin);
     return true;
   }
@@ -161,34 +161,34 @@ void FinalizeAttr(StringPiece spec, bool allow_attr_type_any, OpDef* op_def,
   bool is_list = ConsumeListPrefix(&spec);
   string type;
   StringPiece type_string;  // Used if type == "type"
-  if (absl::ConsumePrefix(&spec, "string")) {
+  if (abslx::ConsumePrefix(&spec, "string")) {
     type = "string";
-  } else if (absl::ConsumePrefix(&spec, "int")) {
+  } else if (abslx::ConsumePrefix(&spec, "int")) {
     type = "int";
-  } else if (absl::ConsumePrefix(&spec, "float")) {
+  } else if (abslx::ConsumePrefix(&spec, "float")) {
     type = "float";
-  } else if (absl::ConsumePrefix(&spec, "bool")) {
+  } else if (abslx::ConsumePrefix(&spec, "bool")) {
     type = "bool";
-  } else if (absl::ConsumePrefix(&spec, "type")) {
+  } else if (abslx::ConsumePrefix(&spec, "type")) {
     type = "type";
-  } else if (absl::ConsumePrefix(&spec, "shape")) {
+  } else if (abslx::ConsumePrefix(&spec, "shape")) {
     type = "shape";
-  } else if (absl::ConsumePrefix(&spec, "tensor")) {
+  } else if (abslx::ConsumePrefix(&spec, "tensor")) {
     type = "tensor";
-  } else if (absl::ConsumePrefix(&spec, "func")) {
+  } else if (abslx::ConsumePrefix(&spec, "func")) {
     type = "func";
-  } else if (absl::ConsumePrefix(&spec, "any") && allow_attr_type_any) {
+  } else if (abslx::ConsumePrefix(&spec, "any") && allow_attr_type_any) {
     type = "any";
   } else if (ConsumeCompoundAttrType(&spec, &type_string)) {
     type = "type";
     AttrValue* allowed = attr->mutable_allowed_values();
     VERIFY(ProcessCompoundType(type_string, allowed),
            "Expected to see a compound type, saw: ", type_string);
-  } else if (absl::ConsumePrefix(&spec, "{")) {
+  } else if (abslx::ConsumePrefix(&spec, "{")) {
     // e.g. "{ int32, float, bool }" or "{ \"foo\", \"bar\" }"
     AttrValue* allowed = attr->mutable_allowed_values();
     str_util::RemoveLeadingWhitespace(&spec);
-    if (absl::StartsWith(spec, "\"") || absl::StartsWith(spec, "'")) {
+    if (abslx::StartsWith(spec, "\"") || abslx::StartsWith(spec, "'")) {
       type = "string";  // "{ \"foo\", \"bar\" }" or "{ 'foo', 'bar' }"
       while (true) {
         StringPiece escaped_string;
@@ -197,16 +197,16 @@ void FinalizeAttr(StringPiece spec, bool allow_attr_type_any, OpDef* op_def,
                "Trouble parsing allowed string at '", spec, "'");
         string unescaped;
         string error;
-        VERIFY(absl::CUnescape(escaped_string, &unescaped, &error),
+        VERIFY(abslx::CUnescape(escaped_string, &unescaped, &error),
                "Trouble unescaping \"", escaped_string,
                "\", got error: ", error);
         allowed->mutable_list()->add_s(unescaped);
-        if (absl::ConsumePrefix(&spec, ",")) {
+        if (abslx::ConsumePrefix(&spec, ",")) {
           str_util::RemoveLeadingWhitespace(&spec);
-          if (absl::ConsumePrefix(&spec, "}"))
+          if (abslx::ConsumePrefix(&spec, "}"))
             break;  // Allow ending with ", }".
         } else {
-          VERIFY(absl::ConsumePrefix(&spec, "}"),
+          VERIFY(abslx::ConsumePrefix(&spec, "}"),
                  "Expected , or } after strings in list, not: '", spec, "'");
           break;
         }
@@ -224,12 +224,12 @@ void FinalizeAttr(StringPiece spec, bool allow_attr_type_any, OpDef* op_def,
                  "Unrecognized type string '", type_string, "'");
           allowed->mutable_list()->add_type(dt);
         }
-        if (absl::ConsumePrefix(&spec, ",")) {
+        if (abslx::ConsumePrefix(&spec, ",")) {
           str_util::RemoveLeadingWhitespace(&spec);
-          if (absl::ConsumePrefix(&spec, "}"))
+          if (abslx::ConsumePrefix(&spec, "}"))
             break;  // Allow ending with ", }".
         } else {
-          VERIFY(absl::ConsumePrefix(&spec, "}"),
+          VERIFY(abslx::ConsumePrefix(&spec, "}"),
                  "Expected , or } after types in list, not: '", spec, "'");
           break;
         }
@@ -242,7 +242,7 @@ void FinalizeAttr(StringPiece spec, bool allow_attr_type_any, OpDef* op_def,
 
   // Write the type into *attr.
   if (is_list) {
-    VERIFY(absl::ConsumePrefix(&spec, ")"),
+    VERIFY(abslx::ConsumePrefix(&spec, ")"),
            "Expected ) to close 'list(', not: '", spec, "'");
     str_util::RemoveLeadingWhitespace(&spec);
     attr->set_type(strings::StrCat("list(", type, ")"));
@@ -251,7 +251,7 @@ void FinalizeAttr(StringPiece spec, bool allow_attr_type_any, OpDef* op_def,
   }
 
   // Read optional minimum constraint at the end.
-  if ((is_list || type == "int") && absl::ConsumePrefix(&spec, ">=")) {
+  if ((is_list || type == "int") && abslx::ConsumePrefix(&spec, ">=")) {
     int64_t min_limit = -999;
     VERIFY(ConsumeAttrNumber(&spec, &min_limit),
            "Could not parse integer lower limit after '>=', found '", spec,
@@ -261,7 +261,7 @@ void FinalizeAttr(StringPiece spec, bool allow_attr_type_any, OpDef* op_def,
   }
 
   // Parse default value, if present.
-  if (absl::ConsumePrefix(&spec, "=")) {
+  if (abslx::ConsumePrefix(&spec, "=")) {
     str_util::RemoveLeadingWhitespace(&spec);
     VERIFY(ParseAttrValue(attr->type(), spec, attr->mutable_default_value()),
            "Could not parse default value '", spec, "'");
@@ -471,7 +471,7 @@ void FinalizeDoc(const string& text, OpDef* op_def,
 
   // Remove trailing spaces.
   for (string& line : lines) {
-    absl::StripTrailingAsciiWhitespace(&line);
+    abslx::StripTrailingAsciiWhitespace(&line);
   }
 
   // First non-blank line -> summary.
@@ -491,7 +491,7 @@ void FinalizeDoc(const string& text, OpDef* op_def,
   int end_l = l;
   // Trim trailing blank lines from the description.
   while (start_l < end_l && lines[end_l - 1].empty()) --end_l;
-  string desc = absl::StrJoin(
+  string desc = abslx::StrJoin(
       gtl::ArraySlice<string>(lines.data() + start_l, end_l - start_l), "\n");
   if (!desc.empty()) op_def->set_description(desc);
 
@@ -526,7 +526,7 @@ void FinalizeDoc(const string& text, OpDef* op_def,
       if (!description[i].empty()) description[i].remove_prefix(min_indent);
     }
     // Concatenate lines into a single string.
-    const string complete(absl::StrJoin(description, "\n"));
+    const string complete(abslx::StrJoin(description, "\n"));
 
     // Find name.
     bool found = false;
@@ -688,7 +688,7 @@ Status OpDefBuilder::Finalize(OpRegistrationData* op_reg_data) const {
   }
 
   if (errors.empty()) return OkStatus();
-  return errors::InvalidArgument(absl::StrJoin(errors, "\n"));
+  return errors::InvalidArgument(abslx::StrJoin(errors, "\n"));
 }
 
 }  // namespace tensorflow

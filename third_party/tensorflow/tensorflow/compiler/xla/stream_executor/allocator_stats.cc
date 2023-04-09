@@ -20,7 +20,7 @@ limitations under the License.
 namespace stream_executor {
 
 std::string AllocatorStats::DebugString() const {
-  return absl::StrFormat(
+  return abslx::StrFormat(
       "Limit:            %20lld\n"
       "InUse:            %20lld\n"
       "MaxInUse:         %20lld\n"

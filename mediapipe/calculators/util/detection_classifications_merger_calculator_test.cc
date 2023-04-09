@@ -213,7 +213,7 @@ TEST(DetectionClassificationsMergerCalculator, FailsWithMissingIndex) {
       graph.AddPacketToInputStream("input_detection", input_detection_packet));
   MP_ASSERT_OK(graph.AddPacketToInputStream("classification_list",
                                             classification_list_packet));
-  ASSERT_EQ(graph.WaitUntilIdle().code(), absl::StatusCode::kInvalidArgument);
+  ASSERT_EQ(graph.WaitUntilIdle().code(), abslx::StatusCode::kInvalidArgument);
 }
 
 // Checks that merging fails if the input ClassificationList misses mandatory
@@ -245,7 +245,7 @@ TEST(DetectionClassificationsMergerCalculator, FailsWithMissingScore) {
       graph.AddPacketToInputStream("input_detection", input_detection_packet));
   MP_ASSERT_OK(graph.AddPacketToInputStream("classification_list",
                                             classification_list_packet));
-  ASSERT_EQ(graph.WaitUntilIdle().code(), absl::StatusCode::kInvalidArgument);
+  ASSERT_EQ(graph.WaitUntilIdle().code(), abslx::StatusCode::kInvalidArgument);
 }
 
 // Checks that merging fails if the input ClassificationList has an
@@ -279,7 +279,7 @@ TEST(DetectionClassificationsMergerCalculator,
       graph.AddPacketToInputStream("input_detection", input_detection_packet));
   MP_ASSERT_OK(graph.AddPacketToInputStream("classification_list",
                                             classification_list_packet));
-  ASSERT_EQ(graph.WaitUntilIdle().code(), absl::StatusCode::kInvalidArgument);
+  ASSERT_EQ(graph.WaitUntilIdle().code(), abslx::StatusCode::kInvalidArgument);
 }
 
 // Checks that merging fails if the input ClassificationList has an
@@ -313,7 +313,7 @@ TEST(DetectionClassificationsMergerCalculator,
       graph.AddPacketToInputStream("input_detection", input_detection_packet));
   MP_ASSERT_OK(graph.AddPacketToInputStream("classification_list",
                                             classification_list_packet));
-  ASSERT_EQ(graph.WaitUntilIdle().code(), absl::StatusCode::kInvalidArgument);
+  ASSERT_EQ(graph.WaitUntilIdle().code(), abslx::StatusCode::kInvalidArgument);
 }
 
 }  // namespace

@@ -19,7 +19,7 @@
 
 namespace mediapipe {
 
-absl::Status CopyInputHeadersToOutputs(const InputStreamSet& inputs,
+abslx::Status CopyInputHeadersToOutputs(const InputStreamSet& inputs,
                                        const OutputStreamSet& outputs) {
   for (auto id = inputs.BeginId(); id < inputs.EndId(); ++id) {
     std::pair<std::string, int> tag_index = inputs.TagAndIndexFromId(id);
@@ -29,10 +29,10 @@ absl::Status CopyInputHeadersToOutputs(const InputStreamSet& inputs,
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CopyInputHeadersToOutputs(const InputStreamShardSet& inputs,
+abslx::Status CopyInputHeadersToOutputs(const InputStreamShardSet& inputs,
                                        OutputStreamShardSet* outputs) {
   for (auto id = inputs.BeginId(); id < inputs.EndId(); ++id) {
     std::pair<std::string, int> tag_index = inputs.TagAndIndexFromId(id);
@@ -42,7 +42,7 @@ absl::Status CopyInputHeadersToOutputs(const InputStreamShardSet& inputs,
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

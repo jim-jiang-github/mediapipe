@@ -24,12 +24,12 @@
 
 namespace {
 
-using absl::random_internal::make_istream_state_saver;
-using absl::random_internal::make_ostream_state_saver;
-using absl::random_internal::stream_precision_helper;
+using abslx::random_internal::make_istream_state_saver;
+using abslx::random_internal::make_ostream_state_saver;
+using abslx::random_internal::stream_precision_helper;
 
 template <typename T>
-typename absl::enable_if_t<std::is_integral<T>::value, T>  //
+typename abslx::enable_if_t<std::is_integral<T>::value, T>  //
 StreamRoundTrip(T t) {
   std::stringstream ss;
   {
@@ -53,7 +53,7 @@ StreamRoundTrip(T t) {
 }
 
 template <typename T>
-typename absl::enable_if_t<std::is_floating_point<T>::value, T>  //
+typename abslx::enable_if_t<std::is_floating_point<T>::value, T>  //
 StreamRoundTrip(T t) {
   std::stringstream ss;
   {
@@ -64,7 +64,7 @@ StreamRoundTrip(T t) {
   T result = 0;
   {
     auto saver = make_istream_state_saver(ss);
-    result = absl::random_internal::read_floating_point<T>(ss);
+    result = abslx::random_internal::read_floating_point<T>(ss);
   }
   EXPECT_FALSE(ss.fail())            //
       << ss.str() << " "             //

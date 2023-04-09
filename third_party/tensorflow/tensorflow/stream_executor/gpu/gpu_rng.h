@@ -83,7 +83,7 @@ class GpuRng : public rng::RngSupport {
   bool SetStream(Stream* stream) ABSL_EXCLUSIVE_LOCKS_REQUIRED(mu_);
 
   // Guards the gpu rng library handle for this device.
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
 
   // GpuExecutor which instantiated this GpuRng.
   // Immutable post-initialization.

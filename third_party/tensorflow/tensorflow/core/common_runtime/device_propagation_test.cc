@@ -40,17 +40,17 @@ const char kTpu2[] = "/job:localhost/replica:0/task:0/device:TPU:2";
 const char kGpu0[] = "/job:localhost/replica:0/task:0/device:GPU:0";
 
 bool IsTPUDevice(StringPiece device_name) {
-  return absl::StrContains(device_name, "device:TPU:");
+  return abslx::StrContains(device_name, "device:TPU:");
 }
 
 device_propagation::NodeFilter TargetOps(
-    const absl::flat_hash_set<std::string>& ops) {
+    const abslx::flat_hash_set<std::string>& ops) {
   return [&ops](const Node& n) { return ops.contains(n.type_string()); };
 }
 
-absl::flat_hash_map<std::string, std::string> GetNodeNameDevices(
+abslx::flat_hash_map<std::string, std::string> GetNodeNameDevices(
     const Graph& graph) {
-  absl::flat_hash_map<std::string, std::string> node_name_devices;
+  abslx::flat_hash_map<std::string, std::string> node_name_devices;
   for (const Node* node : graph.nodes()) {
     if (node->IsSource() || node->IsSink()) {
       continue;

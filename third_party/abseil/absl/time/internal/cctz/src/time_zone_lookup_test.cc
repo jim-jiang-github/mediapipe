@@ -28,7 +28,7 @@
 
 namespace chrono = std::chrono;
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace time_internal {
 namespace cctz {
@@ -737,7 +737,7 @@ TEST(TimeZone, NamedTimeZones) {
   const time_zone syd = LoadZone("Australia/Sydney");
   EXPECT_EQ("Australia/Sydney", syd.name());
   const time_zone fixed0 =
-      fixed_time_zone(absl::time_internal::cctz::seconds::zero());
+      fixed_time_zone(abslx::time_internal::cctz::seconds::zero());
   EXPECT_EQ("UTC", fixed0.name());
   const time_zone fixed_pos = fixed_time_zone(
       chrono::hours(3) + chrono::minutes(25) + chrono::seconds(45));
@@ -781,7 +781,7 @@ TEST(TimeZone, Equality) {
   EXPECT_EQ(implicit_utc.name(), explicit_utc.name());
 
   const time_zone fixed_zero =
-      fixed_time_zone(absl::time_internal::cctz::seconds::zero());
+      fixed_time_zone(abslx::time_internal::cctz::seconds::zero());
   EXPECT_EQ(fixed_zero, LoadZone(fixed_zero.name()));
   EXPECT_EQ(fixed_zero, explicit_utc);
 
@@ -838,7 +838,7 @@ TEST(BreakTime, TimePointResolution) {
              0, 0, 0, 0, false, "UTC");
   ExpectTime(chrono::time_point_cast<chrono::seconds>(t0), utc, 1970, 1, 1, 0,
              0, 0, 0, false, "UTC");
-  ExpectTime(chrono::time_point_cast<absl::time_internal::cctz::seconds>(t0),
+  ExpectTime(chrono::time_point_cast<abslx::time_internal::cctz::seconds>(t0),
              utc, 1970, 1, 1, 0, 0, 0, 0, false, "UTC");
   ExpectTime(chrono::time_point_cast<chrono::minutes>(t0), utc, 1970, 1, 1, 0,
              0, 0, 0, false, "UTC");
@@ -870,7 +870,7 @@ TEST(BreakTime, LocalTimePosix) {
 }
 
 TEST(TimeZoneImpl, LocalTimeInFixed) {
-  const absl::time_internal::cctz::seconds offset =
+  const abslx::time_internal::cctz::seconds offset =
       -(chrono::hours(8) + chrono::minutes(33) + chrono::seconds(47));
   const time_zone tz = fixed_time_zone(offset);
   const auto tp = chrono::system_clock::from_time_t(0);
@@ -914,7 +914,7 @@ TEST(MakeTime, TimePointResolution) {
   const time_point<chrono::seconds> tp_s =
       convert(civil_second(2015, 1, 2, 3, 4, 5), utc);
   EXPECT_EQ("04:05", format("%M:%E*S", tp_s, utc));
-  const time_point<absl::time_internal::cctz::seconds> tp_s64 =
+  const time_point<abslx::time_internal::cctz::seconds> tp_s64 =
       convert(civil_second(2015, 1, 2, 3, 4, 5), utc);
   EXPECT_EQ("04:05", format("%M:%E*S", tp_s64, utc));
 
@@ -949,65 +949,65 @@ TEST(MakeTime, SysSecondsLimits) {
   const time_zone utc = utc_time_zone();
   const time_zone east = fixed_time_zone(chrono::hours(14));
   const time_zone west = fixed_time_zone(-chrono::hours(14));
-  time_point<absl::time_internal::cctz::seconds> tp;
+  time_point<abslx::time_internal::cctz::seconds> tp;
 
   // Approach the maximal time_point<cctz::seconds> value from below.
   tp = convert(civil_second(292277026596, 12, 4, 15, 30, 6), utc);
   EXPECT_EQ("292277026596-12-04T15:30:06+00:00", format(RFC3339, tp, utc));
   tp = convert(civil_second(292277026596, 12, 4, 15, 30, 7), utc);
   EXPECT_EQ("292277026596-12-04T15:30:07+00:00", format(RFC3339, tp, utc));
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::max(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::max(), tp);
   tp = convert(civil_second(292277026596, 12, 4, 15, 30, 8), utc);
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::max(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::max(), tp);
   tp = convert(civil_second::max(), utc);
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::max(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::max(), tp);
 
   // Checks that we can also get the maximal value for a far-east zone.
   tp = convert(civil_second(292277026596, 12, 5, 5, 30, 7), east);
   EXPECT_EQ("292277026596-12-05T05:30:07+14:00", format(RFC3339, tp, east));
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::max(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::max(), tp);
   tp = convert(civil_second(292277026596, 12, 5, 5, 30, 8), east);
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::max(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::max(), tp);
   tp = convert(civil_second::max(), east);
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::max(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::max(), tp);
 
   // Checks that we can also get the maximal value for a far-west zone.
   tp = convert(civil_second(292277026596, 12, 4, 1, 30, 7), west);
   EXPECT_EQ("292277026596-12-04T01:30:07-14:00", format(RFC3339, tp, west));
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::max(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::max(), tp);
   tp = convert(civil_second(292277026596, 12, 4, 7, 30, 8), west);
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::max(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::max(), tp);
   tp = convert(civil_second::max(), west);
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::max(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::max(), tp);
 
   // Approach the minimal time_point<cctz::seconds> value from above.
   tp = convert(civil_second(-292277022657, 1, 27, 8, 29, 53), utc);
   EXPECT_EQ("-292277022657-01-27T08:29:53+00:00", format(RFC3339, tp, utc));
   tp = convert(civil_second(-292277022657, 1, 27, 8, 29, 52), utc);
   EXPECT_EQ("-292277022657-01-27T08:29:52+00:00", format(RFC3339, tp, utc));
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::min(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::min(), tp);
   tp = convert(civil_second(-292277022657, 1, 27, 8, 29, 51), utc);
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::min(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::min(), tp);
   tp = convert(civil_second::min(), utc);
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::min(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::min(), tp);
 
   // Checks that we can also get the minimal value for a far-east zone.
   tp = convert(civil_second(-292277022657, 1, 27, 22, 29, 52), east);
   EXPECT_EQ("-292277022657-01-27T22:29:52+14:00", format(RFC3339, tp, east));
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::min(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::min(), tp);
   tp = convert(civil_second(-292277022657, 1, 27, 22, 29, 51), east);
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::min(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::min(), tp);
   tp = convert(civil_second::min(), east);
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::min(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::min(), tp);
 
   // Checks that we can also get the minimal value for a far-west zone.
   tp = convert(civil_second(-292277022657, 1, 26, 18, 29, 52), west);
   EXPECT_EQ("-292277022657-01-26T18:29:52-14:00", format(RFC3339, tp, west));
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::min(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::min(), tp);
   tp = convert(civil_second(-292277022657, 1, 26, 18, 29, 51), west);
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::min(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::min(), tp);
   tp = convert(civil_second::min(), west);
-  EXPECT_EQ(time_point<absl::time_internal::cctz::seconds>::min(), tp);
+  EXPECT_EQ(time_point<abslx::time_internal::cctz::seconds>::min(), tp);
 
   // Some similar checks for the "libc" time-zone implementation.
   if (sizeof(std::time_t) >= 8) {
@@ -1058,7 +1058,7 @@ TEST(MakeTime, LocalTimeLibC) {
           ASSERT_EQ(transition.from, transition.to);
           const auto trans = fcl.trans;
           const auto tal = zi.lookup(trans);
-          const auto tprev = trans - absl::time_internal::cctz::seconds(1);
+          const auto tprev = trans - abslx::time_internal::cctz::seconds(1);
           const auto pal = zi.lookup(tprev);
           if (pal.is_dst == tal.is_dst) {
             ASSERT_STRNE(pal.abbr, tal.abbr);
@@ -1118,10 +1118,10 @@ TEST(NextTransition, UTC) {
   const auto tz = utc_time_zone();
   time_zone::civil_transition trans;
 
-  auto tp = time_point<absl::time_internal::cctz::seconds>::min();
+  auto tp = time_point<abslx::time_internal::cctz::seconds>::min();
   EXPECT_FALSE(tz.next_transition(tp, &trans));
 
-  tp = time_point<absl::time_internal::cctz::seconds>::max();
+  tp = time_point<abslx::time_internal::cctz::seconds>::max();
   EXPECT_FALSE(tz.next_transition(tp, &trans));
 }
 
@@ -1129,10 +1129,10 @@ TEST(PrevTransition, UTC) {
   const auto tz = utc_time_zone();
   time_zone::civil_transition trans;
 
-  auto tp = time_point<absl::time_internal::cctz::seconds>::max();
+  auto tp = time_point<abslx::time_internal::cctz::seconds>::max();
   EXPECT_FALSE(tz.prev_transition(tp, &trans));
 
-  tp = time_point<absl::time_internal::cctz::seconds>::min();
+  tp = time_point<abslx::time_internal::cctz::seconds>::min();
   EXPECT_FALSE(tz.prev_transition(tp, &trans));
 }
 
@@ -1145,10 +1145,10 @@ TEST(NextTransition, AmericaNewYork) {
   EXPECT_EQ(civil_second(2018, 11, 4, 2, 0, 0), trans.from);
   EXPECT_EQ(civil_second(2018, 11, 4, 1, 0, 0), trans.to);
 
-  tp = time_point<absl::time_internal::cctz::seconds>::max();
+  tp = time_point<abslx::time_internal::cctz::seconds>::max();
   EXPECT_FALSE(tz.next_transition(tp, &trans));
 
-  tp = time_point<absl::time_internal::cctz::seconds>::min();
+  tp = time_point<abslx::time_internal::cctz::seconds>::min();
   EXPECT_TRUE(tz.next_transition(tp, &trans));
   if (trans.from == civil_second(1918, 3, 31, 2, 0, 0)) {
     // It looks like the tzdata is only 32 bit (probably macOS),
@@ -1169,10 +1169,10 @@ TEST(PrevTransition, AmericaNewYork) {
   EXPECT_EQ(civil_second(2018, 3, 11, 2, 0, 0), trans.from);
   EXPECT_EQ(civil_second(2018, 3, 11, 3, 0, 0), trans.to);
 
-  tp = time_point<absl::time_internal::cctz::seconds>::min();
+  tp = time_point<abslx::time_internal::cctz::seconds>::min();
   EXPECT_FALSE(tz.prev_transition(tp, &trans));
 
-  tp = time_point<absl::time_internal::cctz::seconds>::max();
+  tp = time_point<abslx::time_internal::cctz::seconds>::max();
   EXPECT_TRUE(tz.prev_transition(tp, &trans));
   // We have a transition but we don't know which one.
 }
@@ -1183,13 +1183,13 @@ TEST(TimeZoneEdgeCase, AmericaNewYork) {
   // Spring 1:59:59 -> 3:00:00
   auto tp = convert(civil_second(2013, 3, 10, 1, 59, 59), tz);
   ExpectTime(tp, tz, 2013, 3, 10, 1, 59, 59, -5 * 3600, false, "EST");
-  tp += absl::time_internal::cctz::seconds(1);
+  tp += abslx::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, 2013, 3, 10, 3, 0, 0, -4 * 3600, true, "EDT");
 
   // Fall 1:59:59 -> 1:00:00
   tp = convert(civil_second(2013, 11, 3, 1, 59, 59), tz);
   ExpectTime(tp, tz, 2013, 11, 3, 1, 59, 59, -4 * 3600, true, "EDT");
-  tp += absl::time_internal::cctz::seconds(1);
+  tp += abslx::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, 2013, 11, 3, 1, 0, 0, -5 * 3600, false, "EST");
 }
 
@@ -1199,13 +1199,13 @@ TEST(TimeZoneEdgeCase, AmericaLosAngeles) {
   // Spring 1:59:59 -> 3:00:00
   auto tp = convert(civil_second(2013, 3, 10, 1, 59, 59), tz);
   ExpectTime(tp, tz, 2013, 3, 10, 1, 59, 59, -8 * 3600, false, "PST");
-  tp += absl::time_internal::cctz::seconds(1);
+  tp += abslx::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, 2013, 3, 10, 3, 0, 0, -7 * 3600, true, "PDT");
 
   // Fall 1:59:59 -> 1:00:00
   tp = convert(civil_second(2013, 11, 3, 1, 59, 59), tz);
   ExpectTime(tp, tz, 2013, 11, 3, 1, 59, 59, -7 * 3600, true, "PDT");
-  tp += absl::time_internal::cctz::seconds(1);
+  tp += abslx::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, 2013, 11, 3, 1, 0, 0, -8 * 3600, false, "PST");
 }
 
@@ -1215,13 +1215,13 @@ TEST(TimeZoneEdgeCase, ArizonaNoTransition) {
   // No transition in Spring.
   auto tp = convert(civil_second(2013, 3, 10, 1, 59, 59), tz);
   ExpectTime(tp, tz, 2013, 3, 10, 1, 59, 59, -7 * 3600, false, "MST");
-  tp += absl::time_internal::cctz::seconds(1);
+  tp += abslx::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, 2013, 3, 10, 2, 0, 0, -7 * 3600, false, "MST");
 
   // No transition in Fall.
   tp = convert(civil_second(2013, 11, 3, 1, 59, 59), tz);
   ExpectTime(tp, tz, 2013, 11, 3, 1, 59, 59, -7 * 3600, false, "MST");
-  tp += absl::time_internal::cctz::seconds(1);
+  tp += abslx::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, 2013, 11, 3, 2, 0, 0, -7 * 3600, false, "MST");
 }
 
@@ -1234,7 +1234,7 @@ TEST(TimeZoneEdgeCase, AsiaKathmandu) {
   //   504901800 == Wed,  1 Jan 1986 00:15:00 +0545 (+0545)
   auto tp = convert(civil_second(1985, 12, 31, 23, 59, 59), tz);
   ExpectTime(tp, tz, 1985, 12, 31, 23, 59, 59, 5.5 * 3600, false, "+0530");
-  tp += absl::time_internal::cctz::seconds(1);
+  tp += abslx::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, 1986, 1, 1, 0, 15, 0, 5.75 * 3600, false, "+0545");
 }
 
@@ -1247,14 +1247,14 @@ TEST(TimeZoneEdgeCase, PacificChatham) {
   //   1365256800 == Sun,  7 Apr 2013 02:45:00 +1245 (+1245)
   auto tp = convert(civil_second(2013, 4, 7, 3, 44, 59), tz);
   ExpectTime(tp, tz, 2013, 4, 7, 3, 44, 59, 13.75 * 3600, true, "+1345");
-  tp += absl::time_internal::cctz::seconds(1);
+  tp += abslx::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, 2013, 4, 7, 2, 45, 0, 12.75 * 3600, false, "+1245");
 
   //   1380376799 == Sun, 29 Sep 2013 02:44:59 +1245 (+1245)
   //   1380376800 == Sun, 29 Sep 2013 03:45:00 +1345 (+1345)
   tp = convert(civil_second(2013, 9, 29, 2, 44, 59), tz);
   ExpectTime(tp, tz, 2013, 9, 29, 2, 44, 59, 12.75 * 3600, false, "+1245");
-  tp += absl::time_internal::cctz::seconds(1);
+  tp += abslx::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, 2013, 9, 29, 3, 45, 0, 13.75 * 3600, true, "+1345");
 }
 
@@ -1267,14 +1267,14 @@ TEST(TimeZoneEdgeCase, AustraliaLordHowe) {
   //   1365260400 == Sun,  7 Apr 2013 01:30:00 +1030 (+1030)
   auto tp = convert(civil_second(2013, 4, 7, 1, 59, 59), tz);
   ExpectTime(tp, tz, 2013, 4, 7, 1, 59, 59, 11 * 3600, true, "+11");
-  tp += absl::time_internal::cctz::seconds(1);
+  tp += abslx::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, 2013, 4, 7, 1, 30, 0, 10.5 * 3600, false, "+1030");
 
   //   1380986999 == Sun,  6 Oct 2013 01:59:59 +1030 (+1030)
   //   1380987000 == Sun,  6 Oct 2013 02:30:00 +1100 (+11)
   tp = convert(civil_second(2013, 10, 6, 1, 59, 59), tz);
   ExpectTime(tp, tz, 2013, 10, 6, 1, 59, 59, 10.5 * 3600, false, "+1030");
-  tp += absl::time_internal::cctz::seconds(1);
+  tp += abslx::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, 2013, 10, 6, 2, 30, 0, 11 * 3600, true, "+11");
 }
 
@@ -1292,7 +1292,7 @@ TEST(TimeZoneEdgeCase, PacificApia) {
   auto tp = convert(civil_second(2011, 12, 29, 23, 59, 59), tz);
   ExpectTime(tp, tz, 2011, 12, 29, 23, 59, 59, -10 * 3600, true, "-10");
   EXPECT_EQ(363, get_yearday(convert(tp, tz)));
-  tp += absl::time_internal::cctz::seconds(1);
+  tp += abslx::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, 2011, 12, 31, 0, 0, 0, 14 * 3600, true, "+14");
   EXPECT_EQ(365, get_yearday(convert(tp, tz)));
 }
@@ -1307,7 +1307,7 @@ TEST(TimeZoneEdgeCase, AfricaCairo) {
     //   1400191200 == Fri, 16 May 2014 01:00:00 +0300 (EEST)
     auto tp = convert(civil_second(2014, 5, 15, 23, 59, 59), tz);
     ExpectTime(tp, tz, 2014, 5, 15, 23, 59, 59, 2 * 3600, false, "EET");
-    tp += absl::time_internal::cctz::seconds(1);
+    tp += abslx::time_internal::cctz::seconds(1);
     ExpectTime(tp, tz, 2014, 5, 16, 1, 0, 0, 3 * 3600, true, "EEST");
   }
 }
@@ -1322,7 +1322,7 @@ TEST(TimeZoneEdgeCase, AfricaMonrovia) {
     //   63593070 == Fri,  7 Jan 1972 00:44:30 +0000 (GMT)
     auto tp = convert(civil_second(1972, 1, 6, 23, 59, 59), tz);
     ExpectTime(tp, tz, 1972, 1, 6, 23, 59, 59, -44.5 * 60, false, "MMT");
-    tp += absl::time_internal::cctz::seconds(1);
+    tp += abslx::time_internal::cctz::seconds(1);
     ExpectTime(tp, tz, 1972, 1, 7, 0, 44, 30, 0 * 60, false, "GMT");
   }
 }
@@ -1351,7 +1351,7 @@ TEST(TimeZoneEdgeCase, AmericaJamaica) {
     tp = convert(civil_second(1889, 12, 31, 23, 59, 59), tz);
     ExpectTime(tp, tz, 1889, 12, 31, 23, 59, 59, -18430, false,
                tz.lookup(tp).abbr);
-    tp += absl::time_internal::cctz::seconds(1);
+    tp += abslx::time_internal::cctz::seconds(1);
     ExpectTime(tp, tz, 1890, 1, 1, 0, 0, 0, -18430, false, "KMT");
   }
 
@@ -1360,7 +1360,7 @@ TEST(TimeZoneEdgeCase, AmericaJamaica) {
   //     436341600 == Sun, 30 Oct 1983 01:00:00 -0500 (EST)
   auto tp = convert(civil_second(1983, 10, 30, 1, 59, 59), tz);
   ExpectTime(tp, tz, 1983, 10, 30, 1, 59, 59, -4 * 3600, true, "EDT");
-  tp += absl::time_internal::cctz::seconds(1);
+  tp += abslx::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, 1983, 10, 30, 1, 0, 0, -5 * 3600, false, "EST");
 
   // After the last transition.
@@ -1381,7 +1381,7 @@ TEST(TimeZoneEdgeCase, WET) {
   //     228877200 == Sun,  3 Apr 1977 02:00:00 +0100 (WEST)
   tp = convert(civil_second(1977, 4, 3, 0, 59, 59), tz);
   ExpectTime(tp, tz, 1977, 4, 3, 0, 59, 59, 0, false, "WET");
-  tp += absl::time_internal::cctz::seconds(1);
+  tp += abslx::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, 1977, 4, 3, 2, 0, 0, 1 * 3600, true, "WEST");
 
   // A non-existent time within the first transition.
@@ -1417,7 +1417,7 @@ TEST(TimeZoneEdgeCase, NegativeYear) {
   auto tp = convert(civil_second(0, 1, 1, 0, 0, 0), tz);
   ExpectTime(tp, tz, 0, 1, 1, 0, 0, 0, 0 * 3600, false, "UTC");
   EXPECT_EQ(weekday::saturday, get_weekday(convert(tp, tz)));
-  tp -= absl::time_internal::cctz::seconds(1);
+  tp -= abslx::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, -1, 12, 31, 23, 59, 59, 0 * 3600, false, "UTC");
   EXPECT_EQ(weekday::friday, get_weekday(convert(tp, tz)));
 }
@@ -1431,7 +1431,7 @@ TEST(TimeZoneEdgeCase, UTC32bitLimit) {
   //   2147483648 == Tue, 19 Jan 2038 03:14:08 +0000 (UTC)
   auto tp = convert(civil_second(2038, 1, 19, 3, 14, 7), tz);
   ExpectTime(tp, tz, 2038, 1, 19, 3, 14, 7, 0 * 3600, false, "UTC");
-  tp += absl::time_internal::cctz::seconds(1);
+  tp += abslx::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, 2038, 1, 19, 3, 14, 8, 0 * 3600, false, "UTC");
 }
 
@@ -1444,11 +1444,11 @@ TEST(TimeZoneEdgeCase, UTC5DigitYear) {
   //   253402300800 == Sat,  1 Jan 1000 00:00:00 +0000 (UTC)
   auto tp = convert(civil_second(9999, 12, 31, 23, 59, 59), tz);
   ExpectTime(tp, tz, 9999, 12, 31, 23, 59, 59, 0 * 3600, false, "UTC");
-  tp += absl::time_internal::cctz::seconds(1);
+  tp += abslx::time_internal::cctz::seconds(1);
   ExpectTime(tp, tz, 10000, 1, 1, 0, 0, 0, 0 * 3600, false, "UTC");
 }
 
 }  // namespace cctz
 }  // namespace time_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

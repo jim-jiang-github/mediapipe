@@ -175,7 +175,7 @@ XLA_TEST_F(ArrayElementwiseOpTest, IntPowLarge) {
 }
 
 // A non-canonical quiet NaN value.
-static const float kNonCanonicalNaN = absl::bit_cast<float>(0x7FD01234);
+static const float kNonCanonicalNaN = abslx::bit_cast<float>(0x7FD01234);
 
 XLA_TEST_F(ArrayElementwiseOpTest, IsFiniteScalarF32) {
   XlaBuilder builder(TestName());
@@ -528,9 +528,9 @@ XLA_TEST_F(ArrayElementwiseOpTest, DivTwoConstantF64s) {
 class IntegerDivideOpTest : public ArrayElementwiseOpTest {
  protected:
   template <typename T>
-  void TestDivRem(absl::Span<const T> dividends, absl::Span<const T> divisors,
-                  absl::Span<const T> quotients,
-                  absl::Span<const T> remainders) {
+  void TestDivRem(abslx::Span<const T> dividends, abslx::Span<const T> divisors,
+                  abslx::Span<const T> quotients,
+                  abslx::Span<const T> remainders) {
     {
       XlaBuilder builder(TestName());
       XlaOp dividend;

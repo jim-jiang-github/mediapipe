@@ -24,7 +24,7 @@
 // --------------------------------------------------------------------
 // Program name
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace flags_internal {
 
@@ -41,10 +41,10 @@ std::string ShortProgramInvocationName();
 
 // Sets program invocation name to a new value. Should only be called once
 // during program initialization, before any threads are spawned.
-void SetProgramInvocationName(absl::string_view prog_name_str);
+void SetProgramInvocationName(abslx::string_view prog_name_str);
 
 }  // namespace flags_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_FLAGS_INTERNAL_PROGRAM_NAME_H_

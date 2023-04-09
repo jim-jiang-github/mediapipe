@@ -93,35 +93,35 @@ auto* checkpoint_size = monitoring::Counter<2>::New(
 
 }  // namespace
 
-monitoring::CounterCell& SavedModelWrite(absl::string_view write_version) {
+monitoring::CounterCell& SavedModelWrite(abslx::string_view write_version) {
   return *saved_model_write_counter->GetCell(std::string(write_version));
 }
 
-monitoring::CounterCell& SavedModelRead(absl::string_view write_version) {
+monitoring::CounterCell& SavedModelRead(abslx::string_view write_version) {
   return *saved_model_read_counter->GetCell(std::string(write_version));
 }
 
-monitoring::CounterCell& SavedModelWriteApi(absl::string_view api_label) {
+monitoring::CounterCell& SavedModelWriteApi(abslx::string_view api_label) {
   return *saved_model_write_api->GetCell(std::string(api_label));
 }
 
-monitoring::CounterCell& SavedModelReadApi(absl::string_view api_label) {
+monitoring::CounterCell& SavedModelReadApi(abslx::string_view api_label) {
   return *saved_model_read_api->GetCell(std::string(api_label));
 }
 
-monitoring::SamplerCell& CheckpointReadDuration(absl::string_view api_label) {
+monitoring::SamplerCell& CheckpointReadDuration(abslx::string_view api_label) {
   return *checkpoint_read_durations->GetCell(std::string(api_label));
 }
 
-monitoring::SamplerCell& CheckpointWriteDuration(absl::string_view api_label) {
+monitoring::SamplerCell& CheckpointWriteDuration(abslx::string_view api_label) {
   return *checkpoint_write_durations->GetCell(std::string(api_label));
 }
 
-monitoring::CounterCell& TrainingTimeSaved(absl::string_view api_label) {
+monitoring::CounterCell& TrainingTimeSaved(abslx::string_view api_label) {
   return *checkpoint_training_time_saved->GetCell(std::string(api_label));
 }
 
-monitoring::CounterCell& CheckpointSize(absl::string_view api_label,
+monitoring::CounterCell& CheckpointSize(abslx::string_view api_label,
                                         int64_t filesize) {
   return *checkpoint_size->GetCell(std::string(api_label),
                                    std::to_string(filesize));

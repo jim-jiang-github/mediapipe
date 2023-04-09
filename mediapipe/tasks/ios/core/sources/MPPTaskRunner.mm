@@ -39,7 +39,7 @@ using TaskRunnerCpp = ::mediapipe::tasks::core::TaskRunner;
   self = [super init];
   if (self) {
     auto taskRunnerResult = TaskRunnerCpp::Create(std::move(graphConfig),
-                                                  absl::make_unique<MediaPipeBuiltinOpResolver>(),
+                                                  abslx::make_unique<MediaPipeBuiltinOpResolver>(),
                                                   std::move(packetsCallback));
 
     if (![MPPCommonUtils checkCppError:taskRunnerResult.status() toError:error]) {
@@ -50,11 +50,11 @@ using TaskRunnerCpp = ::mediapipe::tasks::core::TaskRunner;
   return self;
 }
 
-- (absl::StatusOr<PacketMap>)process:(const PacketMap &)packetMap {
+- (abslx::StatusOr<PacketMap>)process:(const PacketMap &)packetMap {
   return _cppTaskRunner->Process(packetMap);
 }
 
-- (absl::Status)close {
+- (abslx::Status)close {
   return _cppTaskRunner->Close();
 }
 

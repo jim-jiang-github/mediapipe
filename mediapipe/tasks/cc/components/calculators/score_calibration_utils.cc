@@ -44,27 +44,27 @@ ConvertScoreTransformationType(tflite::ScoreTransformationType type) {
 }
 
 // Parses a single line of the score calibration file into the provided sigmoid.
-absl::Status FillSigmoidFromLine(
-    absl::string_view line,
+abslx::Status FillSigmoidFromLine(
+    abslx::string_view line,
     ScoreCalibrationCalculatorOptions::Sigmoid* sigmoid) {
   if (line.empty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
-  std::vector<absl::string_view> str_params = absl::StrSplit(line, ',');
+  std::vector<abslx::string_view> str_params = abslx::StrSplit(line, ',');
   if (str_params.size() != 3 && str_params.size() != 4) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat("Expected 3 or 4 parameters per line in score "
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrFormat("Expected 3 or 4 parameters per line in score "
                         "calibration file, got %d.",
                         str_params.size()),
         MediaPipeTasksStatus::kMetadataMalformedScoreCalibrationError);
   }
   std::vector<float> params(str_params.size());
   for (int i = 0; i < str_params.size(); ++i) {
-    if (!absl::SimpleAtof(str_params[i], &params[i])) {
+    if (!abslx::SimpleAtof(str_params[i], &params[i])) {
       return CreateStatusWithPayload(
-          absl::StatusCode::kInvalidArgument,
-          absl::StrFormat(
+          abslx::StatusCode::kInvalidArgument,
+          abslx::StrFormat(
               "Could not parse score calibration parameter as float: %s.",
               str_params[i]),
           MediaPipeTasksStatus::kMetadataMalformedScoreCalibrationError);
@@ -72,8 +72,8 @@ absl::Status FillSigmoidFromLine(
   }
   if (params[0] < 0) {
     return CreateStatusWithPayload(
-        absl::StatusCode::kInvalidArgument,
-        absl::StrFormat(
+        abslx::StatusCode::kInvalidArgument,
+        abslx::StrFormat(
             "The scale parameter of the sigmoids must be positive, found %f.",
             params[0]),
         MediaPipeTasksStatus::kMetadataMalformedScoreCalibrationError);
@@ -84,31 +84,31 @@ absl::Status FillSigmoidFromLine(
   if (params.size() == 4) {
     sigmoid->set_min_score(params[3]);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 }  // namespace
 
-absl::Status ConfigureScoreCalibration(
+abslx::Status ConfigureScoreCalibration(
     tflite::ScoreTransformationType score_transformation, float default_score,
-    absl::string_view score_calibration_file,
+    abslx::string_view score_calibration_file,
     ScoreCalibrationCalculatorOptions* calculator_options) {
   calculator_options->set_score_transformation(
       ConvertScoreTransformationType(score_transformation));
   calculator_options->set_default_score(default_score);
 
   if (score_calibration_file.empty()) {
-    return CreateStatusWithPayload(absl::StatusCode::kInvalidArgument,
+    return CreateStatusWithPayload(abslx::StatusCode::kInvalidArgument,
                                    "Expected non-empty score calibration file.",
                                    MediaPipeTasksStatus::kInvalidArgumentError);
   }
-  std::vector<absl::string_view> lines =
-      absl::StrSplit(score_calibration_file, '\n');
+  std::vector<abslx::string_view> lines =
+      abslx::StrSplit(score_calibration_file, '\n');
   for (const auto& line : lines) {
     auto* sigmoid = calculator_options->add_sigmoids();
     MP_RETURN_IF_ERROR(FillSigmoidFromLine(line, sigmoid));
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace tasks

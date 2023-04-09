@@ -160,7 +160,7 @@ std::string CLErrorCodeToString(cl_int error_code) {
       return "Incompatible command queue KHR";
 
     default:
-      return absl::StrCat("Unknown OpenCL error code - ", error_code);
+      return abslx::StrCat("Unknown OpenCL error code - ", error_code);
   }
 }
 
@@ -177,7 +177,7 @@ int ChannelTypeToSizeInBytes(cl_channel_type type) {
 
 bool OpenCLSupported() { return LoadOpenCL().ok(); }
 
-absl::Status CreateCLBuffer(cl_context context, int size_in_bytes,
+abslx::Status CreateCLBuffer(cl_context context, int size_in_bytes,
                             bool read_only, void* data, cl_mem* result) {
   cl_mem_flags flags = read_only ? CL_MEM_READ_ONLY : CL_MEM_READ_WRITE;
   if (data) {
@@ -186,14 +186,14 @@ absl::Status CreateCLBuffer(cl_context context, int size_in_bytes,
   cl_int error_code;
   *result = clCreateBuffer(context, flags, size_in_bytes, data, &error_code);
   if (!*result) {
-    return absl::UnknownError(
-        absl::StrCat("Failed to allocate device memory (clCreateBuffer): ",
+    return abslx::UnknownError(
+        abslx::StrCat("Failed to allocate device memory (clCreateBuffer): ",
                      CLErrorCodeToString(error_code)));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CreateCLSubBuffer(cl_context context, cl_mem parent,
+abslx::Status CreateCLSubBuffer(cl_context context, cl_mem parent,
                                size_t origin_in_bytes, size_t size_in_bytes,
                                bool read_only, cl_mem* result) {
   cl_mem_flags flags = read_only ? CL_MEM_READ_ONLY : CL_MEM_READ_WRITE;
@@ -204,20 +204,20 @@ absl::Status CreateCLSubBuffer(cl_context context, cl_mem parent,
 
   cl_int error_code;
   if (!clCreateSubBuffer) {
-    return absl::InternalError("clCreateSubBuffer is not supported.");
+    return abslx::InternalError("clCreateSubBuffer is not supported.");
   }
   *result = clCreateSubBuffer(parent, flags, CL_BUFFER_CREATE_TYPE_REGION,
                               &region, &error_code);
 
   if (!*result) {
-    return absl::UnknownError(
-        absl::StrCat("Failed to allocate device memory (clCreateSubBuffer): ",
+    return abslx::UnknownError(
+        abslx::StrCat("Failed to allocate device memory (clCreateSubBuffer): ",
                      CLErrorCodeToString(error_code)));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CreateRGBAImage2D(cl_context context, int width, int height,
+abslx::Status CreateRGBAImage2D(cl_context context, int width, int height,
                                cl_channel_type channel_type, void* data,
                                cl_mem* result) {
   cl_image_desc desc;
@@ -244,11 +244,11 @@ absl::Status CreateRGBAImage2D(cl_context context, int width, int height,
   *result =
       CreateImage2DLegacy(context, flags, &format, &desc, data, &error_code);
   if (error_code != CL_SUCCESS) {
-    return absl::UnknownError(
-        absl::StrCat("Failed to create 2D texture (clCreateImage): ",
+    return abslx::UnknownError(
+        abslx::StrCat("Failed to create 2D texture (clCreateImage): ",
                      CLErrorCodeToString(error_code)));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace cl

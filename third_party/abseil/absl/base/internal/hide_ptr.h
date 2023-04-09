@@ -19,7 +19,7 @@
 
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -30,7 +30,7 @@ constexpr uintptr_t HideMask() {
 }
 
 // Hide a pointer from the leak checker. For internal use only.
-// Differs from absl::IgnoreLeak(ptr) in that absl::IgnoreLeak(ptr) causes ptr
+// Differs from abslx::IgnoreLeak(ptr) in that abslx::IgnoreLeak(ptr) causes ptr
 // and all objects reachable from ptr to be ignored by the leak checker.
 template <class T>
 inline uintptr_t HidePtr(T* ptr) {
@@ -46,6 +46,6 @@ inline T* UnhidePtr(uintptr_t hidden) {
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_BASE_INTERNAL_HIDE_PTR_H_

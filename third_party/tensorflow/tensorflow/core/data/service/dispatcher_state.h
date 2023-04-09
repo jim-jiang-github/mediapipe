@@ -104,7 +104,7 @@ class DispatcherState {
   // as well as a repetition number describing which repetition of the job
   // we are on.
   struct IterationKey {
-    explicit IterationKey(absl::string_view name, int64_t repetition)
+    explicit IterationKey(abslx::string_view name, int64_t repetition)
         : name(name), repetition(repetition) {}
 
     friend bool operator==(const IterationKey& lhs, const IterationKey& rhs) {
@@ -117,7 +117,7 @@ class DispatcherState {
     }
 
     std::string DebugString() const {
-      return absl::StrCat(name, "/", repetition);
+      return abslx::StrCat(name, "/", repetition);
     }
 
     const std::string name;
@@ -145,7 +145,7 @@ class DispatcherState {
     int64_t target_round;
     // Which consumers have responded that they have successfully blocked
     // before the target round.
-    absl::flat_hash_set<int64_t> ready_consumers;
+    abslx::flat_hash_set<int64_t> ready_consumers;
     // How many times we have failed to add the task.
     int64_t failures = 0;
   };
@@ -185,7 +185,7 @@ class DispatcherState {
     bool IsRoundRobin() const { return job->num_consumers.has_value(); }
 
     std::string DebugString() const {
-      return absl::StrCat(iteration_key.name, "_", iteration_key.repetition);
+      return abslx::StrCat(iteration_key.name, "_", iteration_key.repetition);
     }
 
     const int64_t iteration_id;
@@ -223,7 +223,7 @@ class DispatcherState {
     bool removed = false;
   };
 
-  using TasksById = absl::flat_hash_map<int64_t, std::shared_ptr<Task>>;
+  using TasksById = abslx::flat_hash_map<int64_t, std::shared_ptr<Task>>;
 
   // Returns the next available dataset ID.
   std::string NextAvailableDatasetId() const;
@@ -282,17 +282,17 @@ class DispatcherState {
       std::vector<std::shared_ptr<const Task>>& tasks) const;
   // Stores a list of all tasks for the given worker to `tasks`. Returns
   // NOT_FOUND if there is no such worker.
-  Status TasksForWorker(const absl::string_view worker_address,
+  Status TasksForWorker(const abslx::string_view worker_address,
                         std::vector<std::shared_ptr<const Task>>& tasks) const;
 
   // If the dispatcher config explicitly specifies a list of workers, validates
   // `worker_address` is in the list.
-  Status ValidateWorker(absl::string_view worker_address) const;
+  Status ValidateWorker(abslx::string_view worker_address) const;
 
   // If the dispatcher config specifies worker addresses, `GetWorkerIndex`
   // returns the worker index according to the list. This is useful for
   // deterministically sharding a dataset among a fixed set of workers.
-  StatusOr<int64_t> GetWorkerIndex(absl::string_view worker_address) const;
+  StatusOr<int64_t> GetWorkerIndex(abslx::string_view worker_address) const;
 
  private:
   void RegisterDataset(const RegisterDatasetUpdate& register_dataset);
@@ -316,13 +316,13 @@ class DispatcherState {
 
   int64_t next_available_dataset_id_ = 1000;
   // Registered datasets, keyed by dataset ids.
-  absl::flat_hash_map<std::string, std::shared_ptr<Dataset>> datasets_by_id_;
+  abslx::flat_hash_map<std::string, std::shared_ptr<Dataset>> datasets_by_id_;
   // Registered datasets, keyed by dataset fingerprints.
-  absl::flat_hash_map<uint64, std::shared_ptr<Dataset>>
+  abslx::flat_hash_map<uint64, std::shared_ptr<Dataset>>
       datasets_by_fingerprint_;
 
   // Registered workers, keyed by address.
-  absl::flat_hash_map<std::string, std::shared_ptr<Worker>> workers_;
+  abslx::flat_hash_map<std::string, std::shared_ptr<Worker>> workers_;
 
   // Assigns an index to each worker according to worker addresses list
   // specified in the dispatcher config.
@@ -330,31 +330,31 @@ class DispatcherState {
 
   int64_t next_available_job_id_ = 5000;
   // Jobs, keyed by job ids.
-  absl::flat_hash_map<int64_t, std::shared_ptr<Job>> jobs_by_id_;
+  abslx::flat_hash_map<int64_t, std::shared_ptr<Job>> jobs_by_id_;
   // Jobs, keyed by job names.
-  absl::flat_hash_map<std::string, std::shared_ptr<Job>> jobs_by_name_;
+  abslx::flat_hash_map<std::string, std::shared_ptr<Job>> jobs_by_name_;
 
   int64_t next_available_iteration_id_ = 2000;
   // Iterations, keyed by iteration ids.
-  absl::flat_hash_map<int64_t, std::shared_ptr<Iteration>> iterations_;
+  abslx::flat_hash_map<int64_t, std::shared_ptr<Iteration>> iterations_;
   // Iterations, keyed by their iteration keys.
-  absl::flat_hash_map<IterationKey, std::shared_ptr<Iteration>>
+  abslx::flat_hash_map<IterationKey, std::shared_ptr<Iteration>>
       iterations_by_key_;
 
   int64_t next_available_iteration_client_id_ = 3000;
   // Mapping from client ids to the iterations they are associated with.
-  absl::flat_hash_map<int64_t, std::shared_ptr<Iteration>>
+  abslx::flat_hash_map<int64_t, std::shared_ptr<Iteration>>
       iterations_for_client_ids_;
 
   int64_t next_available_task_id_ = 4000;
   // Tasks, keyed by task ids.
   TasksById tasks_;
   // List of tasks associated with each iteration.
-  absl::flat_hash_map<int64_t, std::vector<std::shared_ptr<Task>>>
+  abslx::flat_hash_map<int64_t, std::vector<std::shared_ptr<Task>>>
       tasks_by_iteration_;
   // Tasks, keyed by worker addresses. The values are a map from task id to
   // task.
-  absl::flat_hash_map<std::string, TasksById> tasks_by_worker_;
+  abslx::flat_hash_map<std::string, TasksById> tasks_by_worker_;
 };
 
 }  // namespace data

@@ -79,7 +79,7 @@ void BuildOpsSubmodule(py::module* m) {
   ops.def(
       "AllReduce",
       static_cast<XlaOp (*)(
-          XlaOp, const XlaComputation&, absl::Span<const ReplicaGroup>,
+          XlaOp, const XlaComputation&, abslx::Span<const ReplicaGroup>,
           const std::optional<ChannelHandle>&, const std::optional<Shape>&)>(
           &AllReduce),
       py::arg("operand"), py::arg("computation"),
@@ -125,8 +125,8 @@ void BuildOpsSubmodule(py::module* m) {
   ops.def("ConcatInDim", &ConcatInDim, py::arg("builder"), py::arg("operands"),
           py::arg("dimension"));
   ops.def("Conditional",
-          static_cast<XlaOp (*)(XlaOp, absl::Span<const XlaComputation* const>,
-                                absl::Span<const XlaOp>)>(&Conditional),
+          static_cast<XlaOp (*)(XlaOp, abslx::Span<const XlaComputation* const>,
+                                abslx::Span<const XlaOp>)>(&Conditional),
           py::arg("branch_index"), py::arg("branch_computations"),
           py::arg("branch_operands"));
   ops.def("Conditional",
@@ -150,13 +150,13 @@ void BuildOpsSubmodule(py::module* m) {
           py::arg("new_element_type"));
   ops.def("CreateToken", &CreateToken, py::arg("builder"));
   ops.def("CrossReplicaSum",
-          static_cast<XlaOp (*)(XlaOp, absl::Span<const ReplicaGroup>)>(
+          static_cast<XlaOp (*)(XlaOp, abslx::Span<const ReplicaGroup>)>(
               &CrossReplicaSum),
           py::arg("operand"), py::arg("replica_groups") = py::list());
   ops.def(
       "CustomCall",
       [](XlaBuilder* builder, const py::bytes& call_target_name,
-         absl::Span<const XlaOp> operands, const Shape& shape,
+         abslx::Span<const XlaOp> operands, const Shape& shape,
          const py::bytes& opaque, bool has_side_effect,
          CustomCallSchedule schedule,
          CustomCallApiVersion api_version) -> XlaOp {
@@ -172,8 +172,8 @@ void BuildOpsSubmodule(py::module* m) {
   ops.def(
       "CustomCallWithLayout",
       [](XlaBuilder* builder, const py::bytes& call_target_name,
-         absl::Span<const XlaOp> operands, const Shape& shape_with_layout,
-         absl::Span<const Shape> operand_shapes_with_layout,
+         abslx::Span<const XlaOp> operands, const Shape& shape_with_layout,
+         abslx::Span<const Shape> operand_shapes_with_layout,
          const py::bytes& opaque, bool has_side_effect,
          CustomCallSchedule schedule,
          CustomCallApiVersion api_version) -> XlaOp {
@@ -191,10 +191,10 @@ void BuildOpsSubmodule(py::module* m) {
   ops.def(
       "CustomCallWithAliasing",
       [](XlaBuilder* builder, const py::bytes& call_target_name,
-         absl::Span<const XlaOp> operands, const Shape& shape_with_layout,
-         absl::Span<const Shape> operand_shapes_with_layout,
+         abslx::Span<const XlaOp> operands, const Shape& shape_with_layout,
+         abslx::Span<const Shape> operand_shapes_with_layout,
          const py::bytes& opaque, bool has_side_effect,
-         absl::Span<const std::pair<ShapeIndex, std::pair<int64_t, ShapeIndex>>>
+         abslx::Span<const std::pair<ShapeIndex, std::pair<int64_t, ShapeIndex>>>
              output_operand_aliasing,
          const Literal* literal, CustomCallSchedule schedule,
          CustomCallApiVersion api_version) -> XlaOp {
@@ -216,17 +216,17 @@ void BuildOpsSubmodule(py::module* m) {
           py::arg("dimension_numbers"), py::arg("precision_config") = nullptr,
           py::arg("preferred_element_type") = std::nullopt);
   ops.def("DynamicReshape",
-          static_cast<XlaOp (*)(XlaOp, absl::Span<const XlaOp>,
-                                absl::Span<const int64_t>,
+          static_cast<XlaOp (*)(XlaOp, abslx::Span<const XlaOp>,
+                                abslx::Span<const int64_t>,
                                 const std::vector<bool>&)>(&DynamicReshape),
           py::arg("operand"), py::arg("dim_sizes"), py::arg("new_size_bounds"),
           py::arg("dims_are_dynamic"));
   ops.def("DynamicSlice",
-          static_cast<XlaOp (*)(XlaOp, absl::Span<const XlaOp>,
-                                absl::Span<const int64_t>)>(&DynamicSlice),
+          static_cast<XlaOp (*)(XlaOp, abslx::Span<const XlaOp>,
+                                abslx::Span<const int64_t>)>(&DynamicSlice),
           py::arg("operand"), py::arg("start_indices"), py::arg("slice_sizes"));
   ops.def("DynamicUpdateSlice",
-          static_cast<XlaOp (*)(XlaOp, XlaOp, absl::Span<const XlaOp>)>(
+          static_cast<XlaOp (*)(XlaOp, XlaOp, abslx::Span<const XlaOp>)>(
               &DynamicUpdateSlice),
           py::arg("operand"), py::arg("update"), py::arg("start_indices"));
   ops.def(
@@ -300,19 +300,19 @@ void BuildOpsSubmodule(py::module* m) {
   ops.def("RecvFromHost", &RecvFromHost, py::arg("token"), py::arg("shape"),
           py::arg("handle"));
   ops.def("Reduce",
-          static_cast<XlaOp (*)(XlaBuilder*, absl::Span<const XlaOp>,
-                                absl::Span<const XlaOp>, const XlaComputation&,
-                                absl::Span<const int64_t>)>(&Reduce),
+          static_cast<XlaOp (*)(XlaBuilder*, abslx::Span<const XlaOp>,
+                                abslx::Span<const XlaOp>, const XlaComputation&,
+                                abslx::Span<const int64_t>)>(&Reduce),
           py::arg("builder"), py::arg("operands"), py::arg("init_values"),
           py::arg("computation"), py::arg("dimensions_to_reduce"));
   ops.def("ReducePrecision", &ReducePrecision, py::arg("operand"),
           py::arg("exponent_bits"), py::arg("mantissa_bits"));
   ops.def("ReduceWindowWithGeneralPadding",
           static_cast<XlaOp (*)(
-              XlaOp, XlaOp, const XlaComputation&, absl::Span<const int64_t>,
-              absl::Span<const int64_t>, absl::Span<const int64_t>,
-              absl::Span<const int64_t>,
-              absl::Span<const std::pair<int64_t, int64_t>>)>(
+              XlaOp, XlaOp, const XlaComputation&, abslx::Span<const int64_t>,
+              abslx::Span<const int64_t>, abslx::Span<const int64_t>,
+              abslx::Span<const int64_t>,
+              abslx::Span<const std::pair<int64_t, int64_t>>)>(
               &ReduceWindowWithGeneralPadding),
           py::arg("operand"), py::arg("init_value"), py::arg("computation"),
           py::arg("window_dimensions"), py::arg("window_strides"),
@@ -320,11 +320,11 @@ void BuildOpsSubmodule(py::module* m) {
           py::arg("padding"));
   ops.def("ReduceWindowWithGeneralPadding",
           static_cast<XlaOp (*)(
-              absl::Span<const XlaOp>, absl::Span<const XlaOp>,
-              const XlaComputation&, absl::Span<const int64_t>,
-              absl::Span<const int64_t>, absl::Span<const int64_t>,
-              absl::Span<const int64_t>,
-              absl::Span<const std::pair<int64_t, int64_t>>)>(
+              abslx::Span<const XlaOp>, abslx::Span<const XlaOp>,
+              const XlaComputation&, abslx::Span<const int64_t>,
+              abslx::Span<const int64_t>, abslx::Span<const int64_t>,
+              abslx::Span<const int64_t>,
+              abslx::Span<const std::pair<int64_t, int64_t>>)>(
               &ReduceWindowWithGeneralPadding),
           py::arg("operands"), py::arg("init_values"), py::arg("computation"),
           py::arg("window_dimensions"), py::arg("window_strides"),
@@ -334,11 +334,11 @@ void BuildOpsSubmodule(py::module* m) {
           py::arg("dimension"));
   ops.def("ReplicaId", &ReplicaId, py::arg("builder"));
   ops.def("Reshape",
-          static_cast<XlaOp (*)(XlaOp, absl::Span<const int64_t>,
-                                absl::Span<const int64_t>)>(&Reshape),
+          static_cast<XlaOp (*)(XlaOp, abslx::Span<const int64_t>,
+                                abslx::Span<const int64_t>)>(&Reshape),
           py::arg("operand"), py::arg("dimensions"), py::arg("new_sizes"));
   ops.def("Reshape",
-          static_cast<XlaOp (*)(XlaOp, absl::Span<const int64_t>)>(&Reshape),
+          static_cast<XlaOp (*)(XlaOp, abslx::Span<const int64_t>)>(&Reshape),
           py::arg("operand"), py::arg("new_sizes"));
   ops.def("Rev", &Rev, py::arg("operand"), py::arg("dimensions"));
   ops.def("RngBitGenerator", &RngBitGenerator, py::arg("algorithm"),
@@ -356,8 +356,8 @@ void BuildOpsSubmodule(py::module* m) {
           py::arg("indices_are_sorted") = false,
           py::arg("unique_indices") = false);
   ops.def("Scatter",
-          static_cast<XlaOp (*)(absl::Span<const XlaOp>, XlaOp,
-                                absl::Span<const XlaOp>, const XlaComputation&,
+          static_cast<XlaOp (*)(abslx::Span<const XlaOp>, XlaOp,
+                                abslx::Span<const XlaOp>, const XlaComputation&,
                                 const ScatterDimensionNumbers&, bool, bool)>(
               &Scatter),
           py::arg("inputs"), py::arg("scatter_indices"), py::arg("updates"),
@@ -381,7 +381,7 @@ void BuildOpsSubmodule(py::module* m) {
           py::arg("limit_index"), py::arg("stride"), py::arg("dimno"));
   ops.def(
       "Sort",
-      [](XlaBuilder* builder, absl::Span<const XlaOp> operands,
+      [](XlaBuilder* builder, abslx::Span<const XlaOp> operands,
          std::optional<const XlaComputation*> comparator, int64_t dimension,
          bool is_stable) -> XlaOp {
         return builder->ReportErrorOrReturn([&]() -> StatusOr<XlaOp> {

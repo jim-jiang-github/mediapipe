@@ -41,8 +41,8 @@ using ::tensorflow::test::function::GDef;
 using ::tensorflow::test::function::NDef;
 using ::testing::ElementsAre;
 
-NodeDef GetMapNode(absl::string_view name, absl::string_view input_node_name,
-                   absl::string_view function_name) {
+NodeDef GetMapNode(abslx::string_view name, abslx::string_view input_node_name,
+                   abslx::string_view function_name) {
   return NDef(
       name, /*op=*/"MapDataset", {std::string(input_node_name)},
       {{"f", FunctionDefHelper::FunctionRef(std::string(function_name))},
@@ -96,10 +96,10 @@ TEST(GraphUtilTest, GetFetchNodeDef) {
 }
 
 struct SelectOptimizationsTestCase {
-  absl::flat_hash_set<string> experiments;
-  absl::flat_hash_set<tstring> optimizations_enabled;
-  absl::flat_hash_set<tstring> optimizations_disabled;
-  absl::flat_hash_set<tstring> optimizations_default;
+  abslx::flat_hash_set<string> experiments;
+  abslx::flat_hash_set<tstring> optimizations_enabled;
+  abslx::flat_hash_set<tstring> optimizations_disabled;
+  abslx::flat_hash_set<tstring> optimizations_default;
   std::vector<string> expected;
 };
 

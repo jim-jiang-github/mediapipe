@@ -98,7 +98,7 @@ class TRTEngineResourceOpsTest
                                      ITensorProxyPtr input) {
     nvinfer1::Dims dims2{1, {2}};
     ITensorProxyPtr input2 =
-        network->addInput(absl::StrCat(IONamePrefixes::kInputPHName, 1).c_str(),
+        network->addInput(abslx::StrCat(IONamePrefixes::kInputPHName, 1).c_str(),
                           nvinfer1::DataType::kINT32, dims2);
     EXPECT_NE(nullptr, input2->trt_tensor());
 

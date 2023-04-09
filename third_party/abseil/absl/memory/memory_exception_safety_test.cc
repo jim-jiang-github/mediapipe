@@ -21,7 +21,7 @@
 #include "gtest/gtest.h"
 #include "absl/base/internal/exception_safety_testing.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace {
 
@@ -37,21 +37,21 @@ TEST(MakeUnique, CheckForLeaks) {
                     .WithContracts(testing::strong_guarantee);
 
   EXPECT_TRUE(tester.Test([](Thrower* thrower) {
-    static_cast<void>(absl::make_unique<Thrower>(*thrower));
+    static_cast<void>(abslx::make_unique<Thrower>(*thrower));
   }));
 
   EXPECT_TRUE(tester.Test([](Thrower* thrower) {
-    static_cast<void>(absl::make_unique<Thrower>(std::move(*thrower)));
+    static_cast<void>(abslx::make_unique<Thrower>(std::move(*thrower)));
   }));
 
   // Test T[n] overload
   EXPECT_TRUE(tester.Test([&](Thrower*) {
-    static_cast<void>(absl::make_unique<Thrower[]>(kLength));
+    static_cast<void>(abslx::make_unique<Thrower[]>(kLength));
   }));
 }
 
 }  // namespace
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_HAVE_EXCEPTIONS

@@ -43,7 +43,7 @@
 #include "absl/base/port.h"
 #include "absl/base/thread_annotations.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -58,7 +58,7 @@ class ABSL_LOCKABLE SpinLock {
   explicit SpinLock(base_internal::SchedulingMode mode);
 
   // Constructor for global SpinLock instances.  See absl/base/const_init.h.
-  constexpr SpinLock(absl::ConstInitType, base_internal::SchedulingMode mode)
+  constexpr SpinLock(abslx::ConstInitType, base_internal::SchedulingMode mode)
       : lockword_(IsCooperative(mode) ? kSpinLockCooperative : 0) {}
 
   // For global SpinLock instances prefer trivial destructor when possible.
@@ -241,6 +241,6 @@ inline uint32_t SpinLock::TryLockInternal(uint32_t lock_value,
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_BASE_INTERNAL_SPINLOCK_H_

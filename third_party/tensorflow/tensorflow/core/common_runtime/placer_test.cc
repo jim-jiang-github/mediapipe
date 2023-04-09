@@ -409,7 +409,7 @@ INSTANTIATE_TEST_SUITE_P(All, SoftPlacementPlacerTest,
                 .device_type())
 
 #define EXPECT_DEVICE_CONTAINS(g, name, device_substr) \
-  EXPECT_TRUE(absl::StrContains(                       \
+  EXPECT_TRUE(abslx::StrContains(                       \
       GetNodeByName((g), (name))->assigned_device_name(), device_substr))
 
 // Test that a graph with no constraints will successfully assign nodes to the
@@ -921,7 +921,7 @@ TEST_F(PlacerTest, TestAssignedGpuDeviceToCpuDevice) {
 
   Status s = Place(&g);
   EXPECT_EQ(error::INTERNAL, s.code()) << s.ToString();
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.error_message(),
       "Assigned device '/job:a/replica:0/task:0/device:FakeGPU:0' "
       "does not have registered OpKernel support for TestInput"))
@@ -974,14 +974,14 @@ TEST_F(PlacerTest, TestReferenceConnection) {
   {
     Status s = ReferenceTestHelper("VariableCPU", "AssignGPU", "FakeCPU");
     EXPECT_EQ(error::INVALID_ARGUMENT, s.code());
-    EXPECT_TRUE(absl::StrContains(
+    EXPECT_TRUE(abslx::StrContains(
         s.error_message(), "no device type supports both of those nodes"));
   }
   TF_EXPECT_OK(ReferenceTestHelper("VariableGPU", "TestAssign", "FakeGPU"));
   {
     Status s = ReferenceTestHelper("VariableGPU", "AssignCPU", "FakeCPU");
     EXPECT_EQ(error::INVALID_ARGUMENT, s.code());
-    EXPECT_TRUE(absl::StrContains(
+    EXPECT_TRUE(abslx::StrContains(
         s.error_message(), "no device type supports both of those nodes"));
   }
   TF_EXPECT_OK(ReferenceTestHelper("VariableGPU", "AssignGPU", "FakeGPU"));
@@ -1077,7 +1077,7 @@ TEST_F(PlacerTest, TestResourceHandlesOnDifferentDevicesFails) {
     Status s = Place(&g, allow_soft_placement, true);
     EXPECT_EQ(error::INVALID_ARGUMENT, s.code()) << s.ToString();
     if (set_assigned) {
-      EXPECT_TRUE(absl::StrContains(
+      EXPECT_TRUE(abslx::StrContains(
           s.error_message(),
           "Cannot place the graph because a reference or resource edge "
           "connects "
@@ -1086,7 +1086,7 @@ TEST_F(PlacerTest, TestResourceHandlesOnDifferentDevicesFails) {
           "/job:a/replica:0/task:0/device:FakeCPU:0"))
           << s.ToString();
     } else {
-      EXPECT_TRUE(absl::StrContains(
+      EXPECT_TRUE(abslx::StrContains(
           s.error_message(),
           "Cannot place the graph because a reference or resource edge "
           "connects "
@@ -1315,7 +1315,7 @@ TEST_P(SoftPlacementPlacerTest, TestInvalidMultipleColocationGroups) {
     EXPECT_DEVICE_TYPE(g, "colocated_1", "FakeCPU");
     EXPECT_DEVICE_TYPE(g, "foo", "FakeGPU");
   } else {
-    EXPECT_TRUE(absl::StrContains(
+    EXPECT_TRUE(abslx::StrContains(
         s.error_message(),
         "Cannot colocate nodes {{colocation_node foo}} and "
         "{{colocation_node in}} because no device type supports both of those "
@@ -1397,7 +1397,7 @@ TEST_P(SoftPlacementPlacerTest,
     EXPECT_EQ(error::OK, s.code()) << s.ToString();
   } else {
     EXPECT_EQ(error::INVALID_ARGUMENT, s.code()) << s.ToString();
-    EXPECT_TRUE(absl::StrContains(
+    EXPECT_TRUE(abslx::StrContains(
         s.error_message(),
         "Cannot colocate nodes {{colocation_node assign3}} and "
         "{{colocation_node var2}} because no device type supports both of "
@@ -1463,7 +1463,7 @@ TEST_F(PlacerTest, TestEmptyDeviceSet) {
 
   Status s = Place(&g, &empty);
   EXPECT_TRUE(
-      absl::StrContains(s.error_message(), "No devices are registered"));
+      abslx::StrContains(s.error_message(), "No devices are registered"));
 }
 
 // Test that placement fails when the requested device forces an
@@ -1488,16 +1488,16 @@ TEST_F(PlacerTest, TestHeterogeneousDeviceSetFailure) {
   heterogeneous.AddDevice(cpu.get());
   Status s = Place(&g, &heterogeneous);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code());
-  EXPECT_TRUE(absl::StrContains(s.error_message(),
+  EXPECT_TRUE(abslx::StrContains(s.error_message(),
                                 "colocated with a group of nodes that required "
                                 "incompatible device"));
 
   // The error message should contain information that indicates which
   // op types have which registered device types.
-  EXPECT_TRUE(absl::StrContains(s.error_message(), "VariableGPU: FakeGPU"))
+  EXPECT_TRUE(abslx::StrContains(s.error_message(), "VariableGPU: FakeGPU"))
       << s;
   EXPECT_TRUE(
-      absl::StrContains(s.error_message(), "TestAssign: FakeGPU FakeCPU"))
+      abslx::StrContains(s.error_message(), "TestAssign: FakeGPU FakeCPU"))
       << s;
 }
 
@@ -1512,7 +1512,7 @@ TEST_F(PlacerTest, TestUnknownDevice) {
 
   Status s = Place(&g);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code());
-  EXPECT_TRUE(absl::StrContains(s.error_message(), "/job:foo"));
+  EXPECT_TRUE(abslx::StrContains(s.error_message(), "/job:foo"));
 }
 
 // Test that placement fails when the combination of partial
@@ -1527,7 +1527,7 @@ TEST_F(PlacerTest, TestUnknownMergedDevice) {
 
   Status s = Place(&g);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code());
-  EXPECT_TRUE(absl::StrContains(s.error_message(), "/job:foo"));
+  EXPECT_TRUE(abslx::StrContains(s.error_message(), "/job:foo"));
 }
 
 // Test that placement fails when the previously-assigned device for a
@@ -1544,7 +1544,7 @@ TEST_F(PlacerTest, TestUnknownAssignedDevice) {
 
   Status s = Place(&g);
   EXPECT_EQ(error::INTERNAL, s.code());
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.error_message(),
       "Assigned device '/job:foo' does not match any device"));
 }
@@ -1561,10 +1561,10 @@ TEST_F(PlacerTest, TestNoKernelsRegisteredWithNoRequestedDevice) {
 
   Status s = Place(&g);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code());
-  EXPECT_TRUE(absl::StrContains(s.error_message(),
+  EXPECT_TRUE(abslx::StrContains(s.error_message(),
                                 "No OpKernel was registered to support Op "
                                 "'VariableNoKernels' used by {{node var}}"));
-  EXPECT_TRUE(absl::StrContains(s.error_message(), "<no registered kernels>"));
+  EXPECT_TRUE(abslx::StrContains(s.error_message(), "<no registered kernels>"));
 }
 
 // Test that placement fails when an op does not have registered kernel
@@ -1589,10 +1589,10 @@ TEST_F(PlacerTest, TestNoKernelsRegisteredWithRequestedDeviceLocal) {
   devices.AddDevice(cpu.get());
   Status s = Place(&g, &devices, cpu.get(), false, false);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code());
-  EXPECT_TRUE(absl::StrContains(s.error_message(),
+  EXPECT_TRUE(abslx::StrContains(s.error_message(),
                                 "No OpKernel was registered to support Op "
                                 "'VariableNoKernels' used by {{node var}}"));
-  EXPECT_TRUE(absl::StrContains(s.error_message(), "<no registered kernels>"));
+  EXPECT_TRUE(abslx::StrContains(s.error_message(), "<no registered kernels>"));
 }
 
 // Test that placement succeeds when an op does not have registered kernel
@@ -1636,10 +1636,10 @@ TEST_F(PlacerTest, TestNoDevicesRegistered) {
 
   Status s = Place(&g, &cpu_only);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code());
-  EXPECT_TRUE(absl::StrContains(s.error_message(),
+  EXPECT_TRUE(abslx::StrContains(s.error_message(),
                                 "No OpKernel was registered to support Op "
                                 "'VariableGPU' used by {{node var}}"));
-  EXPECT_TRUE(absl::StrContains(s.error_message(), "device='FakeGPU'"));
+  EXPECT_TRUE(abslx::StrContains(s.error_message(), "device='FakeGPU'"));
 }
 
 // Test that placement fails when a requested device is malformed.
@@ -1653,7 +1653,7 @@ TEST_F(PlacerTest, TestMalformedDeviceSpecification) {
 
   Status s = Place(&g);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code());
-  EXPECT_TRUE(absl::StrContains(s.error_message(),
+  EXPECT_TRUE(abslx::StrContains(s.error_message(),
                                 "Malformed device specification '/foo:bar'"));
 }
 
@@ -1670,7 +1670,7 @@ TEST_F(PlacerTest, TestMalformedAssignedDevice) {
 
   Status s = Place(&g);
   EXPECT_EQ(error::INTERNAL, s.code());
-  EXPECT_TRUE(absl::StrContains(s.error_message(),
+  EXPECT_TRUE(abslx::StrContains(s.error_message(),
                                 "Malformed assigned device '/foo:bar'"));
 }
 
@@ -1688,7 +1688,7 @@ TEST_F(PlacerTest, TestNonUniqueAssignedDevice) {
 
   Status s = Place(&g);
   EXPECT_EQ(error::INTERNAL, s.code());
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.error_message(), "Assigned device '/job:a' does not match any device"));
 }
 
@@ -1720,7 +1720,7 @@ TEST_F(PlacerTest, TestNonexistentGpuNoAllowSoftPlacement) {
 
   Status s = Place(&g, false, false);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code());
-  EXPECT_TRUE(absl::StrContains(s.error_message(), "/device:FakeGPU:11"));
+  EXPECT_TRUE(abslx::StrContains(s.error_message(), "/device:FakeGPU:11"));
 }
 
 // Test that the "Cannot assign a device" error message contains a format tag
@@ -1737,9 +1737,9 @@ TEST_F(PlacerTest, TestNonexistentGpuNoAllowSoftPlacementFormatTag) {
   Status s = Place(&g, false, false);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code());
   LOG(WARNING) << s.error_message();
-  EXPECT_TRUE(absl::StrContains(s.error_message(),
+  EXPECT_TRUE(abslx::StrContains(s.error_message(),
                                 "Cannot assign a device for operation in"));
-  EXPECT_TRUE(absl::StrContains(s.error_message(), "{{node in}}"));
+  EXPECT_TRUE(abslx::StrContains(s.error_message(), "{{node in}}"));
 }
 
 // Test that placement fails when a node requests an explicit device that is not
@@ -1755,10 +1755,10 @@ TEST_F(PlacerTest, TestUnsupportedDeviceNoAllowSoftPlacement) {
 
   Status s = Place(&g, false, false);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code()) << s.ToString();
-  EXPECT_TRUE(absl::StrContains(s.error_message(), "/device:FakeCPU:0"))
+  EXPECT_TRUE(abslx::StrContains(s.error_message(), "/device:FakeCPU:0"))
       << s.ToString();
   EXPECT_TRUE(
-      absl::StrContains(s.error_message(),
+      abslx::StrContains(s.error_message(),
                         "no supported kernel for FakeCPU devices is available"))
       << s.ToString();
 }
@@ -1777,9 +1777,9 @@ TEST_F(PlacerTest, TestNonExistentDevice) {
   Status s = Place(&g, false, false);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code());
   LOG(WARNING) << s.error_message();
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.error_message(), "was explicitly assigned to /job:foo/replica:17"));
-  EXPECT_TRUE(absl::StrContains(s.error_message(), "but available devices"));
+  EXPECT_TRUE(abslx::StrContains(s.error_message(), "but available devices"));
 }
 
 #if !(GOOGLE_CUDA || TENSORFLOW_USE_ROCM)
@@ -1797,7 +1797,7 @@ TEST_F(PlacerTest, TestUseGpuWithNoCuda) {
   Status s = Place(&g, false, false);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code());
   LOG(WARNING) << s.error_message();
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.error_message(),
       "The requested device appears to be a GPU, but CUDA is not enabled."));
 }
@@ -1862,7 +1862,7 @@ TEST_F(PlacerTest, TestUnsatisfiableConstraintWithReferenceConnections) {
 
   Status s = Place(&g);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code());
-  EXPECT_TRUE(absl::StrContains(s.error_message(),
+  EXPECT_TRUE(abslx::StrContains(s.error_message(),
                                 "Cannot colocate nodes {{colocation_node "
                                 "var}} and {{colocation_node assign}}"));
 }
@@ -1989,7 +1989,7 @@ TEST_P(SoftPlacementPlacerTest,
     EXPECT_DEVICE_TYPE(g, "id2", "FakeCPU");
   } else {
     EXPECT_EQ(error::INVALID_ARGUMENT, s.code());
-    EXPECT_TRUE(absl::StrContains(
+    EXPECT_TRUE(abslx::StrContains(
         s.error_message(),
         "Cannot colocate nodes {{colocation_node id2}} and {{colocation_node "
         "id1}}: Cannot merge devices with incompatible types: "
@@ -2053,7 +2053,7 @@ TEST_F(PlacerTest, AssignedDeviceOfColocatedNodeIsRespected) {
   Status s = Place(&g);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code()) << s.ToString();
   EXPECT_TRUE(
-      absl::StrContains(s.error_message(),
+      abslx::StrContains(s.error_message(),
                         "{{colocation_node iter}} was colocated with a "
                         "group of nodes that required incompatible device "
                         "'/job:a/replica:0/task:0/device:FakeCPU:0'"))
@@ -2104,7 +2104,7 @@ TEST_P(SoftPlacementPlacerTest,
     EXPECT_DEVICE_TYPE(g, "id2", "FakeCPU");
   } else {
     EXPECT_EQ(error::INVALID_ARGUMENT, s.code());
-    EXPECT_TRUE(absl::StrContains(
+    EXPECT_TRUE(abslx::StrContains(
         s.error_message(),
         "Cannot colocate nodes {{colocation_node id2}} and {{colocation_node "
         "id1}}: Cannot merge devices with incompatible types: "
@@ -2689,7 +2689,7 @@ TEST_F(NestedPlacerTest, ResourceConflictInvolvingPCO) {
   TF_EXPECT_OK(BuildGraph(graph, &g));
   Status s = CallOptPassesAndPlace(&g);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code()) << s.ToString();
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.error_message(),
       "Cannot place the graph because a reference or resource edge connects "
       "colocation groups with incompatible resource devices: /device:FakeCPU:0 "
@@ -2737,7 +2737,7 @@ TEST_F(NestedPlacerTest, ResourceConflictInvolvingTwoPCOs) {
 
   Status s = CallOptPassesAndPlace(&g);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code()) << s.ToString();
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.error_message(),
       "Cannot place the graph because a reference or resource edge connects "
       "colocation groups with incompatible resource devices: /device:FakeCPU:0 "
@@ -2800,7 +2800,7 @@ TEST_F(NestedPlacerTest, DeepDeviceConstraintsPropagated) {
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code()) << s.ToString();
   // TODO(b/129057603): When better error messages are implemented, this should
   // change.
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.error_message(), "Could not satisfy explicit device specification"))
       << s.ToString();
 }
@@ -2863,7 +2863,7 @@ TEST_F(NestedPlacerTest, NestedDeepDeviceConstraintsPropagated) {
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code()) << s.ToString();
   // TODO(b/129057603): When better error messages are implemented, this should
   // change.
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.error_message(), "Could not satisfy explicit device specification"))
       << s.ToString();
 }
@@ -2915,7 +2915,7 @@ TEST_F(NestedPlacerTest, TwoFunctionsBackToBack) {
 
   Status s = CallOptPassesAndPlace(&g);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code()) << s.ToString();
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.error_message(),
       "Cannot place the graph because a reference or resource edge connects "
       "colocation groups with incompatible resource devices: /device:FakeCPU:0 "
@@ -2982,7 +2982,7 @@ TEST_F(NestedPlacerTest, NestedTwoFunctionsBackToBack) {
 
   Status s = CallOptPassesAndPlace(&g);
   EXPECT_EQ(error::INVALID_ARGUMENT, s.code()) << s.ToString();
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.error_message(),
       "Nodes were connected by a reference or resource connection (requiring "
       "them to be on the same device), but the two nodes were assigned two "
@@ -3031,7 +3031,7 @@ TEST_F(NestedPlacerTest, DirectRecursion) {
 
   Status s = CallOptPassesAndPlace(&g);
   EXPECT_EQ(error::UNIMPLEMENTED, s.code()) << s.ToString();
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.error_message(),
       "Recursive function calls are not supported. Node {{node out}} inside "
       "the body of {{function_node RecursiveResourceIdentity}} calls function "
@@ -3103,7 +3103,7 @@ TEST_F(NestedPlacerTest, IndirectRecursion) {
 
   Status s = CallOptPassesAndPlace(&g);
   EXPECT_EQ(error::UNIMPLEMENTED, s.code()) << s.ToString();
-  EXPECT_TRUE(absl::StrContains(
+  EXPECT_TRUE(abslx::StrContains(
       s.error_message(),
       "Recursive function calls are not supported. Node {{node out}} inside "
       "the body of {{function_node RecursiveF2}} calls function "

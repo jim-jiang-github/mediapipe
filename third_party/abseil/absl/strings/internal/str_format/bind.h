@@ -26,7 +26,7 @@
 #include "absl/strings/internal/str_format/parser.h"
 #include "absl/types/span.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 class UntypedFormatSpec;
@@ -145,13 +145,13 @@ class FormatSpecTemplate
 class Streamable {
  public:
   Streamable(const UntypedFormatSpecImpl& format,
-             absl::Span<const FormatArgImpl> args)
+             abslx::Span<const FormatArgImpl> args)
       : format_(format) {
     if (args.size() <= ABSL_ARRAYSIZE(few_args_)) {
       for (size_t i = 0; i < args.size(); ++i) {
         few_args_[i] = args[i];
       }
-      args_ = absl::MakeSpan(few_args_, args.size());
+      args_ = abslx::MakeSpan(few_args_, args.size());
     } else {
       many_args_.assign(args.begin(), args.end());
       args_ = many_args_;
@@ -166,7 +166,7 @@ class Streamable {
 
  private:
   const UntypedFormatSpecImpl& format_;
-  absl::Span<const FormatArgImpl> args_;
+  abslx::Span<const FormatArgImpl> args_;
   // if args_.size() is 4 or less:
   FormatArgImpl few_args_[4] = {FormatArgImpl(0), FormatArgImpl(0),
                                 FormatArgImpl(0), FormatArgImpl(0)};
@@ -176,24 +176,24 @@ class Streamable {
 
 // for testing
 std::string Summarize(UntypedFormatSpecImpl format,
-                      absl::Span<const FormatArgImpl> args);
+                      abslx::Span<const FormatArgImpl> args);
 bool BindWithPack(const UnboundConversion* props,
-                  absl::Span<const FormatArgImpl> pack, BoundConversion* bound);
+                  abslx::Span<const FormatArgImpl> pack, BoundConversion* bound);
 
 bool FormatUntyped(FormatRawSinkImpl raw_sink,
                    UntypedFormatSpecImpl format,
-                   absl::Span<const FormatArgImpl> args);
+                   abslx::Span<const FormatArgImpl> args);
 
 std::string& AppendPack(std::string* out, UntypedFormatSpecImpl format,
-                        absl::Span<const FormatArgImpl> args);
+                        abslx::Span<const FormatArgImpl> args);
 
 std::string FormatPack(const UntypedFormatSpecImpl format,
-                       absl::Span<const FormatArgImpl> args);
+                       abslx::Span<const FormatArgImpl> args);
 
 int FprintF(std::FILE* output, UntypedFormatSpecImpl format,
-            absl::Span<const FormatArgImpl> args);
+            abslx::Span<const FormatArgImpl> args);
 int SnprintF(char* output, size_t size, UntypedFormatSpecImpl format,
-             absl::Span<const FormatArgImpl> args);
+             abslx::Span<const FormatArgImpl> args);
 
 // Returned by Streamed(v). Converts via '%s' to the std::string created
 // by std::ostream << v.
@@ -212,6 +212,6 @@ class StreamedWrapper {
 
 }  // namespace str_format_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_INTERNAL_STR_FORMAT_BIND_H_

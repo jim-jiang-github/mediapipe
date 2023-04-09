@@ -82,7 +82,7 @@ Status FlattenNode(const CallGraphNode& node) {
   // same async group id call the same computation but async ops that have
   // different async group ids call a different computation. This map maps from
   // the async group id to the associated computation.
-  absl::flat_hash_map<int64_t, HloComputation*> async_computations;
+  abslx::flat_hash_map<int64_t, HloComputation*> async_computations;
   HloModule* module = computation->parent();
   // Clone callee for all call-sites except the first one.
   for (int i = 0; i < node.caller_callsites().size(); ++i) {
@@ -153,7 +153,7 @@ Status FlattenNode(const CallGraphNode& node) {
 
 StatusOr<bool> FlattenCallGraph::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   XLA_VLOG_LINES(3, "Before flatten call graph:\n" + module->ToString());
 
   std::unique_ptr<CallGraph> call_graph = CallGraph::Build(module);

@@ -46,7 +46,7 @@ class ScalarComputationsTest : public ClientLibraryTestBase {
   template <typename NativeT>
   void TestCompare(NativeT lhs, NativeT rhs, bool expected,
                    const std::function<XlaOp(const XlaOp&, const XlaOp&,
-                                             absl::Span<const int64_t>)>& op) {
+                                             abslx::Span<const int64_t>)>& op) {
     XlaBuilder builder(TestName());
     XlaOp lhs_op = ConstantR0<NativeT>(&builder, lhs);
     XlaOp rhs_op = ConstantR0<NativeT>(&builder, rhs);
@@ -57,7 +57,7 @@ class ScalarComputationsTest : public ClientLibraryTestBase {
   template <typename NativeT>
   void TestMinMax(NativeT lhs, NativeT rhs, NativeT expected,
                   const std::function<XlaOp(const XlaOp&, const XlaOp&,
-                                            absl::Span<const int64_t>)>& op) {
+                                            abslx::Span<const int64_t>)>& op) {
     XlaBuilder builder(TestName());
     XlaOp lhs_op = ConstantR0<NativeT>(&builder, lhs);
     XlaOp rhs_op = ConstantR0<NativeT>(&builder, rhs);

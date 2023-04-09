@@ -115,10 +115,10 @@ std::string Timestamp::DebugString() const {
       LOG(FATAL) << "Unknown special type.";
     }
   }
-  return absl::StrCat(timestamp_.value());
+  return abslx::StrCat(timestamp_.value());
 }
 std::string TimestampDiff::DebugString() const {
-  return absl::StrCat(timestamp_.value());
+  return abslx::StrCat(timestamp_.value());
 }
 
 Timestamp Timestamp::NextAllowedInStream() const {

@@ -42,7 +42,7 @@ std::string SendFunction(const std::string& send_device,
                          const tensorflow::int64 send_device_incarnation) {
   tensorflow::FunctionDef def;
   CHECK(tensorflow::protobuf::TextFormat::ParseFromString(
-      absl::StrCat("    signature {"
+      abslx::StrCat("    signature {"
                    "      name: 'SendFunction'"
                    "      input_arg {"
                    "        name: 'in'"
@@ -86,7 +86,7 @@ std::string SendFunction(const std::string& send_device,
                    "        key: 'send_device_incarnation'"
                    "        value {"
                    "          i: ",
-                   absl::StrCat(send_device_incarnation),
+                   abslx::StrCat(send_device_incarnation),
                    "        }"
                    "      }"
                    "    }"
@@ -103,7 +103,7 @@ std::string RecvFunction(const std::string& send_device,
                          const tensorflow::int64 send_device_incarnation) {
   tensorflow::FunctionDef def;
   CHECK(tensorflow::protobuf::TextFormat::ParseFromString(
-      absl::StrCat("    signature {"
+      abslx::StrCat("    signature {"
                    "      name: 'RecvFunction'"
                    "      output_arg {"
                    "        name: 'out'"
@@ -145,7 +145,7 @@ std::string RecvFunction(const std::string& send_device,
                    "        key: 'send_device_incarnation'"
                    "        value {"
                    "          i: ",
-                   absl::StrCat(send_device_incarnation),
+                   abslx::StrCat(send_device_incarnation),
                    "        }"
                    "      }"
                    "    }"

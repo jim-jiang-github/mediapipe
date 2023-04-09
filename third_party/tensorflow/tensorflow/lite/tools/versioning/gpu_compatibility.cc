@@ -51,26 +51,26 @@ int NumElements(const std::vector<int32_t>& dims) {
   }
 
 template <typename ParamsT>
-absl::Status RetrieveBuiltinData(const OpSignature& op_sig,
+abslx::Status RetrieveBuiltinData(const OpSignature& op_sig,
                                  const ParamsT** tf_options) {
   *tf_options = static_cast<const ParamsT*>(op_sig.builtin_data);
   if (!*tf_options) {
-    return absl::InternalError("Unable to retrieve builtin_data.");
+    return abslx::InternalError("Unable to retrieve builtin_data.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 template <typename ParamsT>
-absl::Status RetrieveCustomInitialData(const OpSignature& op_sig,
+abslx::Status RetrieveCustomInitialData(const OpSignature& op_sig,
                                        const ParamsT** tf_options) {
   *tf_options = static_cast<const ParamsT*>(op_sig.custom_initial_data);
   if (!*tf_options) {
-    return absl::InternalError("Unable to retrieve custom_initial_data.");
+    return abslx::InternalError("Unable to retrieve custom_initial_data.");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status IsActivationSupported(TfLiteFusedActivation fused_activation) {
+abslx::Status IsActivationSupported(TfLiteFusedActivation fused_activation) {
   switch (fused_activation) {
     case kTfLiteActNone:
     case kTfLiteActRelu:
@@ -78,9 +78,9 @@ absl::Status IsActivationSupported(TfLiteFusedActivation fused_activation) {
     case kTfLiteActRelu6:
     case kTfLiteActTanh:
     case kTfLiteActSigmoid:
-      return absl::OkStatus();
+      return abslx::OkStatus();
     case kTfLiteActSignBit:
-      return absl::UnimplementedError(
+      return abslx::UnimplementedError(
           "TfLiteFusedActivation.kTfLiteActSignBit");
 
       // Do not add default; we want compilation error rather than run-time
@@ -103,30 +103,30 @@ int GetNumberOfRuntimeInputs(const OpSignature& op_sig) {
 // Checks if the given OpSignature has required number of inputs and outputs.
 // - required_runtime_inputs: number of inputs which are not constants.
 // - required_outputs: number of outputs
-absl::Status CheckInputsOutputs(const OpSignature& op_sig,
+abslx::Status CheckInputsOutputs(const OpSignature& op_sig,
                                 const int required_runtime_inputs,
                                 const int required_outputs) {
   const int runtime_inputs_from_model = GetNumberOfRuntimeInputs(op_sig);
   if (runtime_inputs_from_model != required_runtime_inputs) {
-    return absl::InternalError(
-        absl::StrCat("Expected ", required_runtime_inputs,
+    return abslx::InternalError(
+        abslx::StrCat("Expected ", required_runtime_inputs,
                      " runtime input tensor(s), but node has ",
                      runtime_inputs_from_model, " runtime input(s)."));
   }
   const int outputs_from_model = op_sig.outputs.size();
   if (outputs_from_model != required_outputs) {
-    return absl::InternalError(absl::StrCat("Expected ", required_outputs,
+    return abslx::InternalError(abslx::StrCat("Expected ", required_outputs,
                                             " output tensor(s), but node has ",
                                             outputs_from_model, " output(s)."));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Checks if the given OpSignature has required number of inputs and outputs.
 // - required_runtime_inputs: number of inputs which are not constants.
 // - required_const_inputs: number of inputs which are constants.
 // - required_outputs: number of outputs
-absl::Status CheckInputsConstsOutputs(const OpSignature& op_sig,
+abslx::Status CheckInputsConstsOutputs(const OpSignature& op_sig,
                                       int required_runtime_inputs,
                                       int required_const_inputs,
                                       int required_outputs) {
@@ -137,103 +137,103 @@ absl::Status CheckInputsConstsOutputs(const OpSignature& op_sig,
     }
   }
   if (const_inputs_from_model != required_const_inputs) {
-    return absl::InternalError(
-        absl::StrCat("Expected ", required_const_inputs,
+    return abslx::InternalError(
+        abslx::StrCat("Expected ", required_const_inputs,
                      " const input tensor(s), but node has ",
                      const_inputs_from_model, " const input(s)."));
   }
   return CheckInputsOutputs(op_sig, required_runtime_inputs, required_outputs);
 }
 
-absl::Status CheckTensorIsAvailable(const OpSignature& op_sig, int idx) {
+abslx::Status CheckTensorIsAvailable(const OpSignature& op_sig, int idx) {
   // If tensor id is in range, it's guaranteed that it'll be available.
   if (idx >= op_sig.inputs.size()) {
-    return absl::OutOfRangeError(
-        absl::StrCat("Requested index goes beyond array size: ", idx, " vs ",
+    return abslx::OutOfRangeError(
+        abslx::StrCat("Requested index goes beyond array size: ", idx, " vs ",
                      op_sig.inputs.size()));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Checks if the given OpSignature has required number of inputs and outputs for
 // convolution operators. The number of input should be either 2 runtime inputs
 // or 1 runtime and 1 constant input. The number of output should be one.
-absl::Status CheckConvoultionInputOutput(const OpSignature& op_sig) {
+abslx::Status CheckConvoultionInputOutput(const OpSignature& op_sig) {
   const int runtime_inputs = GetNumberOfRuntimeInputs(op_sig);
   if (runtime_inputs > 2) {
-    return absl::InternalError(
-        absl::StrCat("Expected 1 or 2 input tensor(s), but node has ",
+    return abslx::InternalError(
+        abslx::StrCat("Expected 1 or 2 input tensor(s), but node has ",
                      runtime_inputs, " runtime inputs."));
   }
   const int runtime_outputs = op_sig.outputs.size();
   if (runtime_outputs != 1) {
-    return absl::InternalError(
-        absl::StrCat("Expected 1 output tensor(s), but node has ",
+    return abslx::InternalError(
+        abslx::StrCat("Expected 1 output tensor(s), but node has ",
                      runtime_outputs, " runtime outputs."));
   }
   if (runtime_inputs == 1) {
     RETURN_IF_ERROR(CheckTensorIsAvailable(op_sig, 1));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CheckStrides(int strides_h, int strides_w) {
+abslx::Status CheckStrides(int strides_h, int strides_w) {
   if (strides_h <= 0 || strides_w <= 0) {
-    return absl::InvalidArgumentError(
-        absl::StrCat("Incorrect stride values: stride_height = ", strides_h,
+    return abslx::InvalidArgumentError(
+        abslx::StrCat("Incorrect stride values: stride_height = ", strides_h,
                      ", stride_width = ", strides_w));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CheckDilation(int dilation_h, int dilation_w) {
+abslx::Status CheckDilation(int dilation_h, int dilation_w) {
   if (dilation_h <= 0 || dilation_w <= 0) {
-    return absl::InvalidArgumentError(absl::StrCat(
+    return abslx::InvalidArgumentError(abslx::StrCat(
         "Incorrect dilation values: dilation_height = ", dilation_h,
         ", dilation_width = ", dilation_w));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CheckStridesAndDilation(int strides_h, int strides_w,
+abslx::Status CheckStridesAndDilation(int strides_h, int strides_w,
                                      int dilation_h, int dilation_w) {
   RETURN_IF_ERROR(CheckStrides(strides_h, strides_w));
   RETURN_IF_ERROR(CheckDilation(dilation_h, dilation_w));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CheckKernels(int kernel_h, int kernel_w) {
+abslx::Status CheckKernels(int kernel_h, int kernel_w) {
   if (kernel_h <= 0 || kernel_w <= 0) {
-    return absl::InvalidArgumentError(
-        absl::StrCat("Incorrect kernel values: kernel_height = ", kernel_h,
+    return abslx::InvalidArgumentError(
+        abslx::StrCat("Incorrect kernel values: kernel_height = ", kernel_h,
                      ", kernel_width = ", kernel_w));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CheckKernelsAndStrides(int kernel_h, int kernel_w, int strides_h,
+abslx::Status CheckKernelsAndStrides(int kernel_h, int kernel_w, int strides_h,
                                     int strides_w) {
   RETURN_IF_ERROR(CheckKernels(kernel_h, kernel_w));
   RETURN_IF_ERROR(CheckStrides(strides_h, strides_w));
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 // Checks if the axes tensor at the given index is a integer32 constant tensor.
-absl::Status CheckAxesAreInt32Const(const OpSignature& op_sig, int idx) {
+abslx::Status CheckAxesAreInt32Const(const OpSignature& op_sig, int idx) {
   auto axes = op_sig.inputs.at(idx);
   if (!axes.is_const) {
-    return absl::UnimplementedError(GetOpName(op_sig) +
+    return abslx::UnimplementedError(GetOpName(op_sig) +
                                     " is only supported with constant axes.");
   }
   if (axes.type != kTfLiteInt32) {
-    return absl::UnimplementedError(absl::StrCat(
+    return abslx::UnimplementedError(abslx::StrCat(
         GetOpName(op_sig) + " supports int32 tensor for axes. But node has ",
         TfLiteTypeGetName(axes.type)));
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CheckPooling2DGpuDelegateCompatibility(const OpSignature& op_sig) {
+abslx::Status CheckPooling2DGpuDelegateCompatibility(const OpSignature& op_sig) {
   const TfLitePoolParams* tf_options;
   if (op_sig.custom_initial_data) {  // custom case with indices as a second
                                      // output
@@ -253,7 +253,7 @@ absl::Status CheckPooling2DGpuDelegateCompatibility(const OpSignature& op_sig) {
   return IsActivationSupported(tf_options->activation);
 }
 
-absl::Status CheckDepthwiseConvGpuDelegateCompatibility(
+abslx::Status CheckDepthwiseConvGpuDelegateCompatibility(
     const OpSignature& op_sig) {
   RETURN_IF_ERROR(CheckConvoultionInputOutput(op_sig));
   const TfLiteDepthwiseConvParams* tf_options;
@@ -269,39 +269,39 @@ absl::Status CheckDepthwiseConvGpuDelegateCompatibility(
   const auto* bias = op_sig.inputs.size() > 2 ? &op_sig.inputs[2] : nullptr;
   const auto* output = &op_sig.outputs[0];
   if (input->dims.size() != 4) {
-    return absl::InvalidArgumentError("input.dims.size != 4");
+    return abslx::InvalidArgumentError("input.dims.size != 4");
   }
   if (filter->dims.size() != 4) {
-    return absl::InvalidArgumentError("filter.dims.size != 4");
+    return abslx::InvalidArgumentError("filter.dims.size != 4");
   }
   if (output->dims.size() != 4) {
-    return absl::InvalidArgumentError("output.dims.size != 4");
+    return abslx::InvalidArgumentError("output.dims.size != 4");
   }
   if (input->dims[0] != output->dims[0]) {
-    return absl::InvalidArgumentError("input.b != output.b");
+    return abslx::InvalidArgumentError("input.b != output.b");
   }
   const int input_depth = input->dims[3];
   const int output_depth = output->dims[3];
   if (filter->dims[3] != output_depth) {
-    return absl::InvalidArgumentError("filter.i != output.c");
+    return abslx::InvalidArgumentError("filter.i != output.c");
   }
   if (output_depth != input_depth * depth_multiplier) {
-    return absl::InvalidArgumentError("output.c != input.c * depth_multiplier");
+    return abslx::InvalidArgumentError("output.c != input.c * depth_multiplier");
   }
   if (bias && NumElements(bias->dims) != output_depth) {
-    return absl::InvalidArgumentError("bias.size != output.c");
+    return abslx::InvalidArgumentError("bias.size != output.c");
   }
   if (depth_multiplier != 1 && input_depth != 1) {
-    return absl::UnimplementedError("depth_multiplier != 1 && input.c != 1");
+    return abslx::UnimplementedError("depth_multiplier != 1 && input.c != 1");
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CheckCumsumGpuDelegateCompatibility(const OpSignature& op_sig) {
+abslx::Status CheckCumsumGpuDelegateCompatibility(const OpSignature& op_sig) {
   if (op_sig.inputs.size() != 2) {
-    return absl::InvalidArgumentError("Expects 2 inputs and 1 output");
+    return abslx::InvalidArgumentError("Expects 2 inputs and 1 output");
   }
-  auto error = absl::InvalidArgumentError(
+  auto error = abslx::InvalidArgumentError(
       "Input/output must be float type and indices must be constant int32 "
       "type");
   if ((op_sig.inputs.at(0).type != kTfLiteFloat16 &&
@@ -311,16 +311,16 @@ absl::Status CheckCumsumGpuDelegateCompatibility(const OpSignature& op_sig) {
        !op_sig.inputs.at(1).is_const)) {
     return error;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CheckOneHotGpuDelegateCompatibility(const OpSignature& op_sig) {
+abslx::Status CheckOneHotGpuDelegateCompatibility(const OpSignature& op_sig) {
   if (op_sig.inputs.size() != 4 && op_sig.outputs.size() != 1) {
-    return absl::InvalidArgumentError("Expects 4 inputs and 1 output");
+    return abslx::InvalidArgumentError("Expects 4 inputs and 1 output");
   }
   // Supports int32 indices with float scalar on/off values.
   // Axis value must be -1 or last dimension.
-  absl::Status error = absl::InvalidArgumentError(
+  abslx::Status error = abslx::InvalidArgumentError(
       "Indices must be int32 type, on/off tensors must be constant, scalar, "
       "float type, axis must be -1 or last dim");
   if (op_sig.inputs[0].type != kTfLiteInt32) {
@@ -339,8 +339,8 @@ absl::Status CheckOneHotGpuDelegateCompatibility(const OpSignature& op_sig) {
       continue;
     }
     if (op_sig.inputs.at(0).dims[i] != 1) {
-      return absl::InvalidArgumentError(
-          absl::StrCat("Unspported non-singleton dim at ", i));
+      return abslx::InvalidArgumentError(
+          abslx::StrCat("Unspported non-singleton dim at ", i));
     }
   }
   // On and off value must be float, constant and scalar.
@@ -357,15 +357,15 @@ absl::Status CheckOneHotGpuDelegateCompatibility(const OpSignature& op_sig) {
       (!op_sig.inputs.at(3).dims.empty() && op_sig.inputs.at(3).dims[0] > 1)) {
     return error;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CheckSelectV2GpuDelegateCompatibility(const OpSignature& op_sig) {
+abslx::Status CheckSelectV2GpuDelegateCompatibility(const OpSignature& op_sig) {
   if (op_sig.inputs.size() != 3 || op_sig.outputs.size() != 1) {
-    return absl::InvalidArgumentError("Expected 3 inputs and 1 output");
+    return abslx::InvalidArgumentError("Expected 3 inputs and 1 output");
   }
   // Only supports float inputs with non-broadcastable or scalar if/else.
-  absl::Status error = absl::InvalidArgumentError(
+  abslx::Status error = abslx::InvalidArgumentError(
       "Cond must be float or bool type, if, else tensors must be float and "
       "either be same the shape as output or constant, scalar.");
   if ((op_sig.inputs.at(0).type != kTfLiteBool &&
@@ -390,17 +390,17 @@ absl::Status CheckSelectV2GpuDelegateCompatibility(const OpSignature& op_sig) {
        op_sig.inputs.at(2).dims[0] > 1)) {
     return error;
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status CheckCustomOpsGpuDelegateCompatibility(const OpSignature& op_sig) {
+abslx::Status CheckCustomOpsGpuDelegateCompatibility(const OpSignature& op_sig) {
   if (op_sig.custom_name == "Convolution2DTransposeBias") {
     RETURN_IF_ERROR(CheckTensorIsAvailable(op_sig, 1));
     const TfLiteTransposeConvParams* tf_options;
     RETURN_IF_ERROR(RetrieveCustomInitialData(op_sig, &tf_options));
     RETURN_IF_ERROR(
         CheckStrides(tf_options->stride_height, tf_options->stride_width));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   if (op_sig.custom_name == "MaxPoolingWithArgmax2D") {
     return CheckPooling2DGpuDelegateCompatibility(op_sig);
@@ -414,15 +414,15 @@ absl::Status CheckCustomOpsGpuDelegateCompatibility(const OpSignature& op_sig) {
     RETURN_IF_ERROR(CheckKernelsAndStrides(
         tf_options->filter_height, tf_options->filter_width,
         tf_options->stride_height, tf_options->stride_width));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
   if (op_sig.custom_name == "Resampler") {
     return CheckInputsOutputs(op_sig,
                               /*required_runtime_inputs=*/2,
                               /*required_outputs=*/1);
   }
-  return absl::InvalidArgumentError(
-      absl::StrCat("Not supported custom op ", op_sig.custom_name));
+  return abslx::InvalidArgumentError(
+      abslx::StrCat("Not supported custom op ", op_sig.custom_name));
 }
 
 }  // namespace
@@ -430,12 +430,12 @@ absl::Status CheckCustomOpsGpuDelegateCompatibility(const OpSignature& op_sig) {
 // Logics here used to be in TFLiteOperationParser:IsSupported()
 // of tensorflow/lite/delegates/gpu/common/model_builder.cc but they're all
 // migrated into here.
-absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
+abslx::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
   TfLiteBuiltinOperator opcode = static_cast<TfLiteBuiltinOperator>(op_sig.op);
   switch (opcode) {
     case kTfLiteBuiltinAdd: {
       if (op_sig.inputs.size() != 2) {
-        return absl::UnimplementedError("ADD requires two input tensors.");
+        return abslx::UnimplementedError("ADD requires two input tensors.");
       }
       const TfLiteAddParams* tf_options;
       return RetrieveBuiltinData(op_sig, &tf_options);
@@ -448,11 +448,11 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
       const int num_inputs = op_sig.inputs.size();
       const int num_outputs = op_sig.outputs.size();
       if (!(num_inputs == 2 && num_outputs == 1)) {
-        return absl::InternalError(
-            absl::StrCat("Expected 2 inputs and 1 output, got: ", num_inputs,
+        return abslx::InternalError(
+            abslx::StrCat("Expected 2 inputs and 1 output, got: ", num_inputs,
                          " inputs and ", num_outputs, " outputs"));
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     case kTfLiteBuiltinCast:
@@ -462,18 +462,18 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
       if (op_sig.inputs.at(0).type == kTfLiteBool &&
           (op_sig.outputs.at(0).type == kTfLiteFloat16 ||
            op_sig.outputs.at(0).type == kTfLiteFloat32)) {
-        return absl::OkStatus();
+        return abslx::OkStatus();
       } else if ((op_sig.inputs.at(0).type == kTfLiteFloat16 ||
                   op_sig.inputs.at(0).type == kTfLiteFloat32) &&
                  op_sig.outputs.at(0).type == kTfLiteBool) {
-        return absl::OkStatus();
+        return abslx::OkStatus();
       } else if ((op_sig.inputs.at(0).type == kTfLiteFloat32 ||
                   op_sig.inputs.at(0).type == kTfLiteInt32) &&
                  (op_sig.outputs.at(0).type == kTfLiteFloat32 ||
                   op_sig.outputs.at(0).type == kTfLiteInt32)) {
-        return absl::OkStatus();
+        return abslx::OkStatus();
       } else {
-        return absl::UnimplementedError(absl::StrCat(
+        return abslx::UnimplementedError(abslx::StrCat(
             "Not supported Cast case. Input type: ",
             TfLiteTypeGetName(op_sig.inputs.at(0).type), " and output type: ",
             TfLiteTypeGetName(op_sig.outputs.at(0).type)));
@@ -482,7 +482,7 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
     case kTfLiteBuiltinConcatenation: {
       const TfLiteConcatenationParams* tf_options;
       RETURN_IF_ERROR(RetrieveBuiltinData(op_sig, &tf_options));
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     case kTfLiteBuiltinConv2d: {
@@ -513,28 +513,28 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
       const TfLiteDepthToSpaceParams* d2s_params;
       RETURN_IF_ERROR(RetrieveBuiltinData(op_sig, &d2s_params));
       if (d2s_params->block_size == 1) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "DEPTH_TO_SPACE block_size = 1 is a no-op.");
       }
       if (d2s_params->block_size < 1) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "DEPTH_TO_SPACE block_size must be > 1.");
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     case kTfLiteBuiltinDequantize: {
       const int num_inputs = op_sig.inputs.size();
       const int num_outputs = op_sig.outputs.size();
       if (num_inputs != 1 || num_outputs != 1) {
-        return absl::InternalError(absl::StrCat(
+        return abslx::InternalError(abslx::StrCat(
             "Expected 1 input & output each from Dequantize, got: %d, %d",
             num_inputs, num_outputs));
       }
       if (op_sig.inputs[0].type == kTfLiteInt16) {
-        return absl::UnimplementedError("Unsupported dequantization type.");
+        return abslx::UnimplementedError("Unsupported dequantization type.");
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     case kTfLiteBuiltinFullyConnected: {
@@ -542,25 +542,25 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
       RETURN_IF_ERROR(RetrieveBuiltinData(op_sig, &tf_options));
       if (tf_options->weights_format !=
           kTfLiteFullyConnectedWeightsFormatDefault) {
-        return absl::UnimplementedError(
-            absl::StrCat("Unsupported FullyConnected weights format: ",
+        return abslx::UnimplementedError(
+            abslx::StrCat("Unsupported FullyConnected weights format: ",
                          tf_options->weights_format));
       }
       if (GetNumberOfRuntimeInputs(op_sig) > 2) {
-        return absl::UnimplementedError(
+        return abslx::UnimplementedError(
             "FullyConnected doesn't support more than 2 runtime inputs.");
       }
       if (tf_options->keep_num_dims == true) {
         const auto& input = op_sig.inputs.at(0);
         const auto& output = op_sig.outputs.at(0);
         if (input.dims.size() != output.dims.size()) {
-          return absl::UnimplementedError(
+          return abslx::UnimplementedError(
               "Input and output dimensions different and FullyConnected "
               "doesn't "
               "support keep_num_dims.");
         }
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     case kTfLiteBuiltinHardSwish:
@@ -574,23 +574,23 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
         case kTfLiteLSTMFullKernel: {
           const int inputs = op_sig.inputs.size();
           if (inputs != 20 && inputs != 24) {
-            return absl::InternalError(
-                absl::StrCat("Expected 20 or 24 input tensors, but node has ",
+            return abslx::InternalError(
+                abslx::StrCat("Expected 20 or 24 input tensors, but node has ",
                              inputs, " input(s)."));
           }
           const int runtime_outputs = op_sig.outputs.size();
           if (runtime_outputs != 1) {
-            return absl::InternalError(
-                absl::StrCat("Expected 1 output tensor, but node has ",
+            return abslx::InternalError(
+                abslx::StrCat("Expected 1 output tensor, but node has ",
                              runtime_outputs, " output(s)."));
           }
           if (tf_options->activation != kTfLiteActSigmoid &&
               tf_options->activation != kTfLiteActTanh) {
-            return absl::UnimplementedError(absl::StrCat(
+            return abslx::UnimplementedError(abslx::StrCat(
                 "Only sigmoid or tanh activation is supported, but node has ",
                 tf_options->activation));
           }
-          return absl::OkStatus();
+          return abslx::OkStatus();
         }
         case kTfLiteLSTMBasicKernel:
           RETURN_IF_ERROR(
@@ -598,17 +598,17 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
                                        /*required_const_inputs=*/2,
                                        /*required_outputs=*/4));
           if (tf_options->activation != kTfLiteActTanh) {
-            return absl::UnimplementedError(
-                absl::StrCat("Only TANH activation is supported. but node has ",
+            return abslx::UnimplementedError(
+                abslx::StrCat("Only TANH activation is supported. but node has ",
                              tf_options->activation));
           }
           if (tf_options->cell_clip != 0.0f) {
-            return absl::UnimplementedError("cell_clip is not supported.");
+            return abslx::UnimplementedError("cell_clip is not supported.");
           }
           if (tf_options->proj_clip != 0.0f) {
-            return absl::UnimplementedError("proj_clip is not supported.");
+            return abslx::UnimplementedError("proj_clip is not supported.");
           }
-          return absl::OkStatus();
+          return abslx::OkStatus();
       }
     }
 
@@ -625,7 +625,7 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
 
     case kTfLiteBuiltinMul: {
       if (op_sig.inputs.size() != 2) {
-        return absl::UnimplementedError("MUL requires two input tensors.");
+        return abslx::UnimplementedError("MUL requires two input tensors.");
       }
       const auto& input0 = op_sig.inputs.at(0);
       const auto& input1 = op_sig.inputs.at(1);
@@ -646,7 +646,7 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
           }
         }
         if (first_has_smaller_dim && second_has_smaller_dim) {
-          return absl::UnimplementedError(
+          return abslx::UnimplementedError(
               "MUL requires one tensor that not less than second in all "
               "dimensions.");
         }
@@ -657,7 +657,7 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
     }
 
     case kTfLiteBuiltinPack:
-      return absl::OkStatus();
+      return abslx::OkStatus();
 
     case kTfLiteBuiltinOneHot:
       return CheckOneHotGpuDelegateCompatibility(op_sig);
@@ -666,45 +666,45 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
       RETURN_IF_ERROR(CheckInputsOutputs(op_sig,
                                          /*required_runtime_inputs=*/1,
                                          /*required_outputs=*/1));
-      return absl::OkStatus();
+      return abslx::OkStatus();
 
     case kTfLiteBuiltinReluN1To1:
-      return absl::OkStatus();
+      return abslx::OkStatus();
 
     case kTfLiteBuiltinPrelu:
-      return absl::OkStatus();
+      return abslx::OkStatus();
 
     case kTfLiteBuiltinReshape:
       RETURN_IF_ERROR(CheckInputsOutputs(op_sig,
                                          /*required_runtime_inputs=*/1,
                                          /*required_outputs=*/1));
-      return absl::OkStatus();
+      return abslx::OkStatus();
 
     case kTfLiteBuiltinSelectV2:
       return CheckSelectV2GpuDelegateCompatibility(op_sig);
 
     case kTfLiteBuiltinSlice: {
       if (op_sig.inputs.size() < 3) {
-        return absl::UnimplementedError(
-            absl::StrCat("SLICE requires 3 inputs, but node has ",
+        return abslx::UnimplementedError(
+            abslx::StrCat("SLICE requires 3 inputs, but node has ",
                          op_sig.inputs.size(), " inputs."));
       }
       const auto& input = op_sig.inputs.at(0);
       if (input.dims.size() != 3 && input.dims.size() != 4) {
-        return absl::UnimplementedError(absl::StrCat(
+        return abslx::UnimplementedError(abslx::StrCat(
             "SLICE supports for 3 or 4 dimensional tensors only, but node has ",
             input.dims.size(), " dimensional tensors."));
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     case kTfLiteBuiltinSoftmax: {
       const TfLiteSoftmaxParams* tf_options;
       RETURN_IF_ERROR(RetrieveBuiltinData(op_sig, &tf_options));
       if (tf_options->beta != 1) {
-        return absl::UnimplementedError("Softmax.beta != 1 is not supported.");
+        return abslx::UnimplementedError("Softmax.beta != 1 is not supported.");
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     case kTfLiteBuiltinSpaceToDepth: {
@@ -714,60 +714,60 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
       const TfLiteSpaceToDepthParams* s2d_params;
       RETURN_IF_ERROR(RetrieveBuiltinData(op_sig, &s2d_params));
       if (s2d_params->block_size == 1) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "SPACE_TO_DEPTH block_size = 1 is a no-op.");
       }
       if (s2d_params->block_size < 1) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "SPACE_TO_DEPTH block_size must be > 1.");
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     case kTfLiteBuiltinSplit:
-      return absl::OkStatus();
+      return abslx::OkStatus();
 
     case kTfLiteBuiltinSplitV:
-      return absl::OkStatus();
+      return abslx::OkStatus();
 
     case kTfLiteBuiltinStridedSlice: {
       const TfLiteStridedSliceParams* tf_options;
       RETURN_IF_ERROR(RetrieveBuiltinData(op_sig, &tf_options));
       if (tf_options->ellipsis_mask) {
-        return absl::UnimplementedError(
+        return abslx::UnimplementedError(
             "Slice does not support ellipsis_mask.");
       }
       if (tf_options->new_axis_mask) {
-        return absl::UnimplementedError(
+        return abslx::UnimplementedError(
             "Slice does not support new_axis_mask.");
       }
       if (tf_options->shrink_axis_mask) {
-        return absl::UnimplementedError(
+        return abslx::UnimplementedError(
             "Slice does not support shrink_axis_mask parameter. ");
       }
 
       if (op_sig.inputs.size() < 4) {
-        return absl::UnimplementedError("STRIDED_SLICE requires 4 inputs.");
+        return abslx::UnimplementedError("STRIDED_SLICE requires 4 inputs.");
       }
       const auto& input = op_sig.inputs.at(0);
       if (input.dims.size() != 3 && input.dims.size() != 4) {
-        return absl::UnimplementedError(
+        return abslx::UnimplementedError(
             "STRIDED_SLICE supports for 3 or 4 dimensional tensors only.");
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     case kTfLiteBuiltinTile:
       RETURN_IF_ERROR(CheckInputsOutputs(op_sig,
                                          /*required_runtime_inputs=*/1,
                                          /*required_outputs=*/1));
-      return absl::OkStatus();
+      return abslx::OkStatus();
 
     case kTfLiteBuiltinTranspose:
       RETURN_IF_ERROR(CheckInputsOutputs(op_sig,
                                          /*required_runtime_inputs=*/1,
                                          /*required_outputs=*/1));
-      return absl::OkStatus();
+      return abslx::OkStatus();
 
     case kTfLiteBuiltinTransposeConv: {
       RETURN_IF_ERROR(CheckConvoultionInputOutput(op_sig));
@@ -775,7 +775,7 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
       RETURN_IF_ERROR(RetrieveBuiltinData(op_sig, &tf_options));
       RETURN_IF_ERROR(
           CheckStrides(tf_options->stride_height, tf_options->stride_width));
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     case kTfLiteBuiltinResizeBilinear: {
@@ -785,10 +785,10 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
       const TfLiteResizeBilinearParams* tf_options;
       RETURN_IF_ERROR(RetrieveBuiltinData(op_sig, &tf_options));
       if (tf_options->align_corners && tf_options->half_pixel_centers) {
-        return absl::InternalError(
+        return abslx::InternalError(
             "If half_pixel_centers is True, align_corners must be False.");
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     case kTfLiteBuiltinResizeNearestNeighbor: {
@@ -797,13 +797,13 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
                                          /*required_outputs=*/1));
       const TfLiteResizeNearestNeighborParams* tf_options;
       RETURN_IF_ERROR(RetrieveBuiltinData(op_sig, &tf_options));
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     case kTfLiteBuiltinRelu:
     case kTfLiteBuiltinRelu6:
     case kTfLiteBuiltinLeakyRelu:
-      return absl::OkStatus();
+      return abslx::OkStatus();
 
     case kTfLiteBuiltinReduceMax:
     case kTfLiteBuiltinReduceMin:
@@ -822,8 +822,8 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
         RETURN_IF_ERROR(RetrieveBuiltinData(op_sig, &tf_options));
         if (tf_options->mode !=
             TfLiteMirrorPaddingMode::kTfLiteMirrorPaddingReflect) {
-          return absl::InvalidArgumentError(
-              absl::StrCat("Only Reflective padding is supported for Mirror "
+          return abslx::InvalidArgumentError(
+              abslx::StrCat("Only Reflective padding is supported for Mirror "
                            "Pad operation. But node has ",
                            tf_options->mode));
         }
@@ -834,17 +834,17 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
       RETURN_IF_ERROR(CheckTensorIsAvailable(op_sig, 1));
       auto& pad_tensor = op_sig.inputs.at(1);
       if (pad_tensor.dims.size() != 2) {
-        return absl::InvalidArgumentError(absl::StrCat(
+        return abslx::InvalidArgumentError(abslx::StrCat(
             "Invalid paddings tensor dimension: expected 2 dim, got ",
             pad_tensor.dims.size(), " dim"));
       }
       bool supported = pad_tensor.dims[0] == 3 || pad_tensor.dims[0] == 4;
       if (!supported || pad_tensor.dims[1] != 2) {
-        return absl::InvalidArgumentError(absl::StrCat(
+        return abslx::InvalidArgumentError(abslx::StrCat(
             "Invalid paddings tensor shape: expected 4x2 or 3x2, got ",
             pad_tensor.dims[0], "x", pad_tensor.dims[1]));
       }
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
 
     // One argument elemenetwise operations
@@ -888,7 +888,7 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
                                     /*required_const_inputs=*/1,
                                     /*required_outputs=*/1)
                .ok()) {
-        return absl::InvalidArgumentError(
+        return abslx::InvalidArgumentError(
             "Op can only handle 1 or 2 operand(s).");
       }
       TfLiteFusedActivation activation = kTfLiteActNone;
@@ -911,11 +911,11 @@ absl::Status CheckGpuDelegateCompatibility(const OpSignature& op_sig) {
       break;
   }
 
-  return absl::InvalidArgumentError(absl::StrCat(
+  return abslx::InvalidArgumentError(abslx::StrCat(
       "Not supported op ", tflite::EnumNamesBuiltinOperator()[op_sig.op]));
 }
 
-absl::Status CheckGpuDelegateCompatibility(const OperatorCode* op_code,
+abslx::Status CheckGpuDelegateCompatibility(const OperatorCode* op_code,
                                            const Operator* op,
                                            const SubGraph* subgraph,
                                            const Model* model) {
@@ -927,7 +927,7 @@ absl::Status CheckGpuDelegateCompatibility(const OperatorCode* op_code,
   return status;
 }
 
-absl::Status CheckGpuDelegateCompatibility(
+abslx::Status CheckGpuDelegateCompatibility(
     const TfLiteContext* context, const TfLiteNode* node,
     const TfLiteRegistration* registration) {
   return CheckGpuDelegateCompatibility(

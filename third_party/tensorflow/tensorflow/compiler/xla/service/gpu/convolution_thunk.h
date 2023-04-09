@@ -62,8 +62,8 @@ class ConvolutionThunk : public Thunk {
 
   // Convolution config
   const GpuConvConfig config_;
-  absl::Mutex mu_;
-  absl::flat_hash_map<const stream_executor::Stream*,
+  abslx::Mutex mu_;
+  abslx::flat_hash_map<const stream_executor::Stream*,
                       std::unique_ptr<MaybeFusedConvRunner>>
       runner_cache_ ABSL_GUARDED_BY(mu_);
 };

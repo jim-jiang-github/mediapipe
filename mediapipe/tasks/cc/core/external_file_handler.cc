@@ -53,7 +53,7 @@ namespace tasks {
 namespace core {
 namespace {
 
-using ::absl::StatusCode;
+using ::abslx::StatusCode;
 
 #ifndef O_BINARY
 #ifdef _O_BINARY
@@ -83,24 +83,24 @@ int64 GetPageSizeAlignedOffset(int64 offset) {
 }  // namespace
 
 /* static */
-absl::StatusOr<std::unique_ptr<ExternalFileHandler>>
+abslx::StatusOr<std::unique_ptr<ExternalFileHandler>>
 ExternalFileHandler::CreateFromExternalFile(
     const proto::ExternalFile* external_file) {
-  // Use absl::WrapUnique() to call private constructor:
+  // Use abslx::WrapUnique() to call private constructor:
   // https://abseil.io/tips/126.
   std::unique_ptr<ExternalFileHandler> handler =
-      absl::WrapUnique(new ExternalFileHandler(external_file));
+      abslx::WrapUnique(new ExternalFileHandler(external_file));
 
   MP_RETURN_IF_ERROR(handler->MapExternalFile());
 
   return handler;
 }
 
-absl::StatusOr<std::string> PathToResourceAsFile(std::string path) {
+abslx::StatusOr<std::string> PathToResourceAsFile(std::string path) {
 #ifndef _WIN32
   return path;
 #else
-  if (absl::StartsWith(path, "./")) {
+  if (abslx::StartsWith(path, "./")) {
     path = "mediapipe" + path.substr(1);
   }
 
@@ -108,15 +108,15 @@ absl::StatusOr<std::string> PathToResourceAsFile(std::string path) {
   std::unique_ptr<::bazel::tools::cpp::runfiles::Runfiles> runfiles(
       ::bazel::tools::cpp::runfiles::Runfiles::Create("", &error));
   if (!runfiles) {
-    return absl::InternalError("Unable to initialize runfiles: " + error);
+    return abslx::InternalError("Unable to initialize runfiles: " + error);
   }
   return runfiles->Rlocation(path);
 #endif  // _WIN32
 }
 
-absl::Status ExternalFileHandler::MapExternalFile() {
+abslx::Status ExternalFileHandler::MapExternalFile() {
   if (!external_file_.file_content().empty()) {
-    return absl::OkStatus();
+    return abslx::OkStatus();
   } else if (external_file_.has_file_pointer_meta()) {
     if (external_file_.file_pointer_meta().pointer() == 0) {
       return CreateStatusWithPayload(
@@ -129,7 +129,7 @@ absl::Status ExternalFileHandler::MapExternalFile() {
           "The length of the file in external_file.file_pointer_meta should be "
           "positive.");
     }
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   if (external_file_.file_name().empty() &&
@@ -147,7 +147,7 @@ absl::Status ExternalFileHandler::MapExternalFile() {
                      PathToResourceAsFile(external_file_.file_name()));
     owned_fd_ = open(file_name.c_str(), O_RDONLY | O_BINARY);
     if (owned_fd_ < 0) {
-      const std::string error_message = absl::StrFormat(
+      const std::string error_message = abslx::StrFormat(
           "Unable to open file at %s", external_file_.file_name());
       switch (errno) {
         case ENOENT:
@@ -170,7 +170,7 @@ absl::Status ExternalFileHandler::MapExternalFile() {
         default:
           return CreateStatusWithPayload(
               StatusCode::kUnknown,
-              absl::StrFormat("%s, errno=%d", error_message, errno),
+              abslx::StrFormat("%s, errno=%d", error_message, errno),
               MediaPipeTasksStatus::kFileReadError);
       }
     }
@@ -186,7 +186,7 @@ absl::Status ExternalFileHandler::MapExternalFile() {
     if (fd < 0) {
       return CreateStatusWithPayload(
           StatusCode::kInvalidArgument,
-          absl::StrFormat("Provided file descriptor is invalid: %d < 0", fd),
+          abslx::StrFormat("Provided file descriptor is invalid: %d < 0", fd),
           MediaPipeTasksStatus::kInvalidArgumentError);
     }
     buffer_offset_ = external_file_.file_descriptor_meta().offset();
@@ -199,7 +199,7 @@ absl::Status ExternalFileHandler::MapExternalFile() {
   if (file_size <= 0) {
     return CreateStatusWithPayload(
         StatusCode::kUnknown,
-        absl::StrFormat("Unable to get file size, errno=%d", errno),
+        abslx::StrFormat("Unable to get file size, errno=%d", errno),
         MediaPipeTasksStatus::kFileReadError);
   }
   // Deduce buffer size if not explicitly provided through file descriptor.
@@ -210,7 +210,7 @@ absl::Status ExternalFileHandler::MapExternalFile() {
   if (file_size <= buffer_offset_) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        absl::StrFormat("Provided file offset (%d) exceeds or matches actual "
+        abslx::StrFormat("Provided file offset (%d) exceeds or matches actual "
                         "file length (%d)",
                         buffer_offset_, file_size),
         MediaPipeTasksStatus::kInvalidArgumentError);
@@ -218,7 +218,7 @@ absl::Status ExternalFileHandler::MapExternalFile() {
   if (file_size < buffer_size_ + buffer_offset_) {
     return CreateStatusWithPayload(
         StatusCode::kInvalidArgument,
-        absl::StrFormat("Provided file length + offset (%d) exceeds actual "
+        abslx::StrFormat("Provided file length + offset (%d) exceeds actual "
                         "file length (%d)",
                         buffer_size_ + buffer_offset_, file_size),
         MediaPipeTasksStatus::kInvalidArgumentError);
@@ -250,22 +250,22 @@ absl::Status ExternalFileHandler::MapExternalFile() {
   if (!buffer_) {
     return CreateStatusWithPayload(
         StatusCode::kUnknown,
-        absl::StrFormat("Unable to map file to memory buffer, errno=%d", errno),
+        abslx::StrFormat("Unable to map file to memory buffer, errno=%d", errno),
         MediaPipeTasksStatus::kFileMmapError);
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::string_view ExternalFileHandler::GetFileContent() {
+abslx::string_view ExternalFileHandler::GetFileContent() {
   if (!external_file_.file_content().empty()) {
     return external_file_.file_content();
   } else if (external_file_.has_file_pointer_meta()) {
     void* ptr =
         reinterpret_cast<void*>(external_file_.file_pointer_meta().pointer());
-    return absl::string_view(static_cast<const char*>(ptr),
+    return abslx::string_view(static_cast<const char*>(ptr),
                              external_file_.file_pointer_meta().length());
   } else {
-    return absl::string_view(static_cast<const char*>(buffer_) +
+    return abslx::string_view(static_cast<const char*>(buffer_) +
                                  buffer_offset_ - buffer_aligned_offset_,
                              buffer_size_);
   }

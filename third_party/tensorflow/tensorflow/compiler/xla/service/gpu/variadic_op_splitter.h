@@ -27,12 +27,12 @@ namespace gpu {
 // the parameter space on the GPU. Currently only concatenate ops are split up.
 class VariadicOpSplitter : public HloModulePass {
  public:
-  absl::string_view name() const override { return "variadic-op-splitter"; }
+  abslx::string_view name() const override { return "variadic-op-splitter"; }
 
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 };
 
 }  // namespace gpu

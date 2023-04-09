@@ -43,7 +43,7 @@ struct NcclUniqueIdFactory {
   virtual ~NcclUniqueIdFactory() {}
 
   // Generates the NCCL unique ID for the given set of replica IDs.
-  virtual std::string GetUniqueId(absl::Span<const int64_t> replicas) = 0;
+  virtual std::string GetUniqueId(abslx::Span<const int64_t> replicas) = 0;
 };
 
 void SetNcclUniqueIdFactory(std::shared_ptr<NcclUniqueIdFactory> factory);
@@ -83,12 +83,12 @@ xla::StatusOr<std::vector<RefPtr<XRTTupleAllocation>>> GetInputTupleAllocations(
 
 Status RebuildOutputAliases(
     const RefPtr<XRTTupleAllocation>& output_tuple,
-    absl::Span<const RefPtr<XRTTupleAllocation>> input_tuples,
+    abslx::Span<const RefPtr<XRTTupleAllocation>> input_tuples,
     const xla::HloInputOutputAliasConfig& input_output_alias);
 
 xla::StatusOr<std::vector<xla::ExecutionInput>> GetArgumentsBuffers(
     const xla::HloInputOutputAliasConfig& input_output_alias,
-    absl::Span<const RefPtr<XRTTupleAllocation>> input_tuples,
+    abslx::Span<const RefPtr<XRTTupleAllocation>> input_tuples,
     const std::vector<bool>& input_is_dynamic, bool release_inputs);
 
 // Create the XRT execute output tensor given the computation result
@@ -104,7 +104,7 @@ Status CreateExecuteOutput(OpKernelContext* context,
 using ChainedExecuteFn =
     std::function<xla::StatusOr<RefPtr<XRTTupleAllocation>>(
         const xrt::XRTChainedExecuteOp&,
-        absl::Span<const RefPtr<XRTTupleAllocation>>)>;
+        abslx::Span<const RefPtr<XRTTupleAllocation>>)>;
 Status ExecuteChained(OpKernelContext* context,
                       const RefPtr<XRTMemoryManager>& memory_manager,
                       xla::Backend* backend, int device_ordinal,

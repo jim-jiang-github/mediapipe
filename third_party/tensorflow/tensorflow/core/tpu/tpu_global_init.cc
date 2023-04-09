@@ -47,7 +47,7 @@ namespace tensorflow {
 
 namespace {
 
-ABSL_CONST_INIT static absl::Mutex global_init_tpu_mutex(absl::kConstInit);
+ABSL_CONST_INIT static abslx::Mutex global_init_tpu_mutex(abslx::kConstInit);
 static tpu::TopologyProto* global_tpu_topology
     ABSL_GUARDED_BY(global_init_tpu_mutex) = nullptr;
 
@@ -79,15 +79,15 @@ void DeviceSetFromDeviceMgr(const DeviceMgr& device_mgr,
   }
 }
 
-const std::string GetTPUSystemDevice(absl::string_view job_name) {
+const std::string GetTPUSystemDevice(abslx::string_view job_name) {
   if (job_name.empty()) {
     return DeviceNameUtils::LocalName(DEVICE_TPU_SYSTEM, 0);
   } else {
-    return absl::StrCat("/job:", job_name, "/device:TPU_SYSTEM:0");
+    return abslx::StrCat("/job:", job_name, "/device:TPU_SYSTEM:0");
   }
 }
 
-Status ConstructDistributedInitializationGraph(absl::string_view job_name,
+Status ConstructDistributedInitializationGraph(abslx::string_view job_name,
                                                const DeviceSet& device_set,
                                                Graph* graph_to_run) {
   std::unique_ptr<Graph> graph(new Graph(OpRegistry::Global()));
@@ -114,7 +114,7 @@ Status ConstructDistributedInitializationGraph(absl::string_view job_name,
   return OkStatus();
 }
 
-Status InitializeFromSession(absl::string_view session_target,
+Status InitializeFromSession(abslx::string_view session_target,
                              const Graph* graph_to_run,
                              std::vector<Tensor>* outputs) {
   tensorflow::SessionOptions s_opts;
@@ -134,13 +134,13 @@ Status InitializeFromSession(absl::string_view session_target,
 
 }  // namespace
 
-Status InitializeTPUSystemGlobally(absl::string_view job_name,
-                                   absl::string_view session_target,
+Status InitializeTPUSystemGlobally(abslx::string_view job_name,
+                                   abslx::string_view session_target,
                                    const DeviceSet& device_set, Env* env,
                                    tpu::TopologyProto* tpu_topology) {
   VLOG(1) << "InitializeTpuSystemGlobally";
 
-  absl::MutexLock lock(&global_init_tpu_mutex);
+  abslx::MutexLock lock(&global_init_tpu_mutex);
   if (global_tpu_topology != nullptr) {
     *tpu_topology = *global_tpu_topology;
     return OkStatus();
@@ -153,7 +153,7 @@ Status InitializeTPUSystemGlobally(absl::string_view job_name,
 
   std::string task_spec =
       job_name.empty() ? kTaskSpec
-                       : absl::StrCat("/job:", job_name, "/replica:0/task:0");
+                       : abslx::StrCat("/job:", job_name, "/replica:0/task:0");
   // Placed here, much before usage, to get a sane error if TPU_SYSTEM_DEVICE
   // hasn't been linked in. Otherwise we may get a cryptic error down the line.
   TF_RETURN_IF_ERROR(DistributedTPURewriteHelpers::GetSystemDevice(
@@ -205,8 +205,8 @@ Status InitializeTPUSystemGlobally(Env* env, tpu::TopologyProto* tpu_topology) {
   DeviceSet device_set;
   DeviceSetFromDeviceMgr(*device_mgr, &device_set);
 
-  return InitializeTPUSystemGlobally(/*job_name=*/absl::string_view(),
-                                     /*session_target=*/absl::string_view(),
+  return InitializeTPUSystemGlobally(/*job_name=*/abslx::string_view(),
+                                     /*session_target=*/abslx::string_view(),
                                      device_set, env, tpu_topology);
 }
 

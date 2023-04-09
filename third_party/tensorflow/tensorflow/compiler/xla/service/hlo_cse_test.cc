@@ -793,14 +793,14 @@ TEST_P(HloCseCustomCallTest, DoIt) {
       ROOT root = tuple(op0, op1, op2)
     }
   )";
-  std::string hlo_string = absl::Substitute(hlo_string_tmpl, op1, op2);
-  SCOPED_TRACE(absl::StrCat("Module before CSE:\n", hlo_string));
+  std::string hlo_string = abslx::Substitute(hlo_string_tmpl, op1, op2);
+  SCOPED_TRACE(abslx::StrCat("Module before CSE:\n", hlo_string));
 
   TF_ASSERT_OK_AND_ASSIGN(auto m, ParseAndReturnVerifiedModule(hlo_string));
   HloCSE cse(/*is_layout_sensitive=*/false);
   TF_ASSERT_OK_AND_ASSIGN(bool changed, RunHloPass(&cse, m.get()));
 
-  SCOPED_TRACE(absl::StrCat("Module after CSE:\n", m->ToString()));
+  SCOPED_TRACE(abslx::StrCat("Module after CSE:\n", m->ToString()));
   EXPECT_EQ(changed, true);  // we always CSE op0 and op1, which are identical.
   HloInstruction* root = m->entry_computation()->root_instruction();
   EXPECT_EQ(root->operand(0), root->operand(1))
@@ -815,11 +815,11 @@ TEST_P(HloCseCustomCallTest, DoIt) {
 static std::vector<
     std::tuple<std::string /*op1*/, std::string /*op2*/, bool /*should_cse*/>>
 CustomCallTests() {
-  auto build = [](absl::string_view args1, absl::string_view args2) {
-    absl::string_view prefix =
+  auto build = [](abslx::string_view args1, abslx::string_view args2) {
+    abslx::string_view prefix =
         "f32[] custom-call(p0), custom_call_target=\"foo\", ";
-    return std::make_tuple(absl::StrCat(prefix, args1),
-                           absl::StrCat(prefix, args2), false);
+    return std::make_tuple(abslx::StrCat(prefix, args1),
+                           abslx::StrCat(prefix, args2), false);
   };
   return {
       {
@@ -884,7 +884,7 @@ TEST_F(HloCseTest, CustomCallCalledComputations) {
   HloCSE cse(/*is_layout_sensitive=*/false);
   TF_ASSERT_OK_AND_ASSIGN(bool changed, RunHloPass(&cse, m.get()));
 
-  SCOPED_TRACE(absl::StrCat("Module after CSE:\n", m->ToString()));
+  SCOPED_TRACE(abslx::StrCat("Module after CSE:\n", m->ToString()));
   EXPECT_EQ(changed, false);
 }
 
@@ -905,7 +905,7 @@ TEST_F(HloCseTest, CustomCallSideEffects) {
   HloCSE cse(/*is_layout_sensitive=*/false);
   TF_ASSERT_OK_AND_ASSIGN(bool changed, RunHloPass(&cse, m.get()));
 
-  SCOPED_TRACE(absl::StrCat("Module after CSE:\n", m->ToString()));
+  SCOPED_TRACE(abslx::StrCat("Module after CSE:\n", m->ToString()));
   EXPECT_EQ(changed, false);
 }
 
@@ -927,7 +927,7 @@ TEST_P(HloCseCommutativeOpTest, DoIt) {
     }
   )";
   TF_ASSERT_OK_AND_ASSIGN(auto module, ParseAndReturnVerifiedModule(
-                                           absl::Substitute(kModuleStr, op)));
+                                           abslx::Substitute(kModuleStr, op)));
   ASSERT_TRUE(
       HloCSE(/*is_layout_sensitive=*/false).Run(module.get()).ValueOrDie());
   SCOPED_TRACE(module->ToString());

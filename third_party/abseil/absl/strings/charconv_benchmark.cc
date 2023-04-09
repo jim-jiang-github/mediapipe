@@ -37,7 +37,7 @@ void BM_Absl_Pi(benchmark::State& state) {
   for (auto s : state) {
     benchmark::DoNotOptimize(pi);
     double v;
-    absl::from_chars(pi, pi_end, v);
+    abslx::from_chars(pi, pi_end, v);
     benchmark::DoNotOptimize(v);
   }
 }
@@ -58,7 +58,7 @@ void BM_Absl_Pi_float(benchmark::State& state) {
   for (auto s : state) {
     benchmark::DoNotOptimize(pi);
     float v;
-    absl::from_chars(pi, pi_end, v);
+    abslx::from_chars(pi, pi_end, v);
     benchmark::DoNotOptimize(v);
   }
 }
@@ -79,7 +79,7 @@ void BM_Absl_HardLarge(benchmark::State& state) {
   for (auto s : state) {
     benchmark::DoNotOptimize(numstr);
     double v;
-    absl::from_chars(numstr, numstr_end, v);
+    abslx::from_chars(numstr, numstr_end, v);
     benchmark::DoNotOptimize(v);
   }
 }
@@ -100,7 +100,7 @@ void BM_Absl_HardSmall(benchmark::State& state) {
   for (auto s : state) {
     benchmark::DoNotOptimize(numstr);
     double v;
-    absl::from_chars(numstr, numstr_end, v);
+    abslx::from_chars(numstr, numstr_end, v);
     benchmark::DoNotOptimize(v);
   }
 }
@@ -123,7 +123,7 @@ void BM_Absl_HugeMantissa(benchmark::State& state) {
   for (auto s : state) {
     benchmark::DoNotOptimize(num);
     double v;
-    absl::from_chars(num, num_end, v);
+    abslx::from_chars(num, num_end, v);
     benchmark::DoNotOptimize(v);
   }
 }
@@ -169,7 +169,7 @@ void BM_Absl_Big_And_Difficult(benchmark::State& state) {
   for (auto s : state) {
     benchmark::DoNotOptimize(begin);
     double v;
-    absl::from_chars(begin, end, v);
+    abslx::from_chars(begin, end, v);
     benchmark::DoNotOptimize(v);
   }
 }

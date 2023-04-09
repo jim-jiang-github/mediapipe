@@ -62,7 +62,7 @@ namespace {
 const StringPiece kColocationAttrNameStringPiece(kColocationAttrName);
 const StringPiece kColocationGroupPrefixStringPiece(kColocationGroupPrefix);
 
-// Using absl::StrJoin with lambda does not work in tf-lite builds.
+// Using abslx::StrJoin with lambda does not work in tf-lite builds.
 std::vector<string> DevicesToString(const std::vector<Device*> devices) {
   std::vector<string> v;
   v.reserve(devices.size());
@@ -72,7 +72,7 @@ std::vector<string> DevicesToString(const std::vector<Device*> devices) {
   return v;
 }
 
-// Using absl::StrJoin with lambda does not work in tf-lite builds.
+// Using abslx::StrJoin with lambda does not work in tf-lite builds.
 std::vector<string> DeviceTypeAndPriorityToString(
     const PrioritizedDeviceTypeVector& devices) {
   std::vector<string> v;
@@ -127,7 +127,7 @@ bool ArePrioritiesSame(const PrioritizedDeviceTypeVector& a_types,
   return true;
 }
 
-bool IsXlaDevice(absl::string_view device_type) {
+bool IsXlaDevice(abslx::string_view device_type) {
   if (device_type == "XLA_CPU_JIT" || device_type == "XLA_GPU_JIT" ||
       device_type == "XLA_TPU_JIT") {
     // Symbolic XLA device.
@@ -138,7 +138,7 @@ bool IsXlaDevice(absl::string_view device_type) {
           device_type == "TPU");
 }
 
-bool IsCompositeDevice(absl::string_view device_type) {
+bool IsCompositeDevice(abslx::string_view device_type) {
   return device_type == kCompositeDeviceType;
 }
 
@@ -540,7 +540,7 @@ void Member::MaybeExcludeXlaDevices() {
   }
 
   PrioritizedDeviceTypeVector non_xla_types;
-  absl::c_copy_if(supported_device_types_, std::back_inserter(non_xla_types),
+  abslx::c_copy_if(supported_device_types_, std::back_inserter(non_xla_types),
                   [&](const std::pair<DeviceType, int32>& entry) {
                     return !IsXlaDevice(entry.first.type_string());
                   });
@@ -565,7 +565,7 @@ Status Member::LimitToPossibleDevices(const PossibleDevices& devices,
 }
 
 string Member::DebugString() const {
-  return absl::StrCat(
+  return abslx::StrCat(
       "Member(assigned_device_name_index_=", assigned_device_name_index_,
       " requested_device_name_='",
       DeviceNameUtils::ParsedNameToString(requested_device_name_),
@@ -574,10 +574,10 @@ string Member::DebugString() const {
       "' resource_device_name_='",
       DeviceNameUtils::ParsedNameToString(resource_device_name_),
       "' supported_device_types_=[",
-      absl::StrJoin(DeviceTypeAndPriorityToString(supported_device_types_),
+      abslx::StrJoin(DeviceTypeAndPriorityToString(supported_device_types_),
                     ", "),
       "] possible_devices_=[",
-      absl::StrJoin(DevicesToString(possible_devices_), ", "), "]");
+      abslx::StrJoin(DevicesToString(possible_devices_), ", "), "]");
 }
 
 DeviceNameUtils::ParsedName Member::GetSoftDeviceName() const {
@@ -684,7 +684,7 @@ Status ColocationGraph::ColocateAllNodes() {
       if (attr_value->has_list()) {
         for (const string& class_spec : attr_value->list().s()) {
           StringPiece spec(class_spec);
-          if (absl::ConsumePrefix(&spec, kColocationGroupPrefixStringPiece)) {
+          if (abslx::ConsumePrefix(&spec, kColocationGroupPrefixStringPiece)) {
             TF_RETURN_IF_ERROR(
                 ColocateNodeToGroup(&colocation_group_root, node, spec));
           }
@@ -789,8 +789,8 @@ namespace {
 // operate with TensorLists. Otherwise returns DT_INVALID.
 // TODO(b/199443424): Don't use op names, use FullType here.
 DataType GetElementDataType(const Node& node) {
-  static absl::flat_hash_set<std::string>* tensor_list_ops =
-      new absl::flat_hash_set<std::string>(
+  static abslx::flat_hash_set<std::string>* tensor_list_ops =
+      new abslx::flat_hash_set<std::string>(
           {"TensorListReserve", "TensorListFromTensor", "EmptyTensorList",
            "TensorListSplit", "TensorListScatter", "TensorListScatterV2",
            "TensorListScatterIntoExistingList", "TensorListPushBack",
@@ -818,17 +818,17 @@ Status ColocationGraph::AddHostOnlyDataTypesConstraints() {
 
   for (Node* node : graph_.nodes()) {
     // Skip nodes that do not have DT_VARIANT inputs.
-    if (absl::c_none_of(node->input_types(), is_variant)) {
+    if (abslx::c_none_of(node->input_types(), is_variant)) {
       continue;
     }
 
     // Skip nodes that can't be placed on GPU anyway.
     Member& root = members_[FindAndUpdateRoot(node->id())];
-    if (absl::c_all_of(root.supported_device_types(), is_cpu_device)) {
+    if (abslx::c_all_of(root.supported_device_types(), is_cpu_device)) {
       continue;
     }
 
-    absl::optional<bool> constrain_to_host;
+    abslx::optional<bool> constrain_to_host;
 
     // This is a list of special nodes that we know to have no HostMemory
     // inputs, so if they receive a host-only data type, they must necessarily
@@ -901,7 +901,7 @@ Status ColocationGraph::AddHostOnlyDataTypesConstraints() {
 
       // Restrict possible device types to CPU only.
       PossibleDevices possible_devices;
-      absl::c_copy_if(root.supported_device_types(),
+      abslx::c_copy_if(root.supported_device_types(),
                       std::back_inserter(possible_devices.device_types),
                       is_cpu_device);
 
@@ -991,7 +991,7 @@ Status GetGroupNodes(const IOColocationGroups& groups, const Node& node,
   if (VLOG_IS_ON(2)) {
     VLOG(2) << "Colocated inputs/outputs of node: " << node.DebugString();
     for (const std::vector<NodeAndBool>& nodes : *group_nodes) {
-      VLOG(2) << "\t[" << absl::StrJoin(NodeAndBoolToString(nodes), "\t\n")
+      VLOG(2) << "\t[" << abslx::StrJoin(NodeAndBoolToString(nodes), "\t\n")
               << "]";
     }
   }
@@ -1216,7 +1216,7 @@ void ColocationGraph::GetSoftDeviceCandidates(
            "resources. Some of the operations (that had to be colocated with "
            "resource generating operations) are not supported on the "
            "resources' devices. Current candidate devices are [\n  "
-        << absl::StrJoin(DevicesToString(*possible_devices), "\n  ")
+        << abslx::StrJoin(DevicesToString(*possible_devices), "\n  ")
         << "].\nSee below for details of this colocation group:"
         << DebugInfo(root_id);
   }
@@ -1296,7 +1296,7 @@ Status ColocationGraph::GetDevicesForNode(
 
           string gpu_msg = "";
           if (!IsGoogleCudaEnabled() &&
-              absl::AsciiStrToLower(specified_device_name.type) == "gpu") {
+              abslx::AsciiStrToLower(specified_device_name.type) == "gpu") {
             gpu_msg =
                 " The requested device appears to be a GPU, but CUDA is not "
                 "enabled.";
@@ -1306,7 +1306,7 @@ Status ColocationGraph::GetDevicesForNode(
               errors::FormatNodeNameForError(node->name()),
               " was explicitly assigned to ", node->requested_device(),
               " but available devices are [ ",
-              absl::StrJoin(device_names, ", "), " ]. Make sure ",
+              abslx::StrJoin(device_names, ", "), " ]. Make sure ",
               "the device specification refers to a valid device.", gpu_msg);
         } else if (specified_device_name.has_type) {
           return errors::InvalidArgument(
@@ -1336,7 +1336,7 @@ Status ColocationGraph::GetDevicesForNode(
             DeviceNameUtils::ParsedNameToString(
                 root_member.requested_device_name()),
             "'. All available devices [",
-            absl::StrJoin(DevicesToString(device_set_.devices()), ", "), "]. ",
+            abslx::StrJoin(DevicesToString(device_set_.devices()), ", "), "]. ",
             debug_info);
       }
     }
@@ -1388,7 +1388,7 @@ string ColocationGraph::DebugString() const {
       roots.insert(node_root);
     }
   }
-  return absl::StrJoin(root_strings, "\n");
+  return abslx::StrJoin(root_strings, "\n");
 }
 
 // Returns debugging info for the node referred to by 'node_root'.
@@ -1475,7 +1475,7 @@ Status ColocationGraph::InitializeMemberWithAssignedDevice(
         "to run a tf.function with resource inputs residing on remote devices. "
         "This use case is currently not supported. Here are the devices "
         "available on this machine: [",
-        absl::StrJoin(DevicesToString(device_set_.devices()), ", "), "].",
+        abslx::StrJoin(DevicesToString(device_set_.devices()), ", "), "].",
         "If you are seeing this error when running using a tf.Session, set "
         "share_cluster_devices_in_session to true in the tf.ConfigProto.");
   }
@@ -1517,7 +1517,7 @@ Status ColocationGraph::InitializeMember(const Node& node, Member* member) {
           " with these attrs: [", node.attrs().DebugString(),
           "]\n"
           "Registered devices: [",
-          absl::StrJoin(registered_device_types, ", "), "]\n",
+          abslx::StrJoin(registered_device_types, ", "), "]\n",
           "Registered kernels:\n", KernelsRegisteredForOp(node.type_string()));
     }
 

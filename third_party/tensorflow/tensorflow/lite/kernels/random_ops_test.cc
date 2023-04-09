@@ -168,7 +168,7 @@ INSTANTIATE_TEST_SUITE_P(
                         BuiltinOperator_RANDOM_STANDARD_NORMAL),
         testing::Values(InputType::kConst, InputType::kDynamic)),
      [](const testing::TestParamInfo<TestSuite::ParamType>& info) {
-      std::string name = absl::StrCat(
+      std::string name = abslx::StrCat(
           std::get<0>(info.param) == BuiltinOperator_RANDOM_UNIFORM ?
             "_RandomUniformOp" : "_RandomStandardNormalOp",
           std::get<1>(info.param) == InputType::kConst ?
@@ -315,7 +315,7 @@ INSTANTIATE_TEST_SUITE_P(
     RandomOpTest2, MultinomialOpTestSuite,
     testing::Values(InputType::kConst, InputType::kDynamic),
     [](const testing::TestParamInfo<MultinomialOpTestSuite::ParamType>& info) {
-      std::string name = absl::StrCat(
+      std::string name = abslx::StrCat(
           "_MultinomialOp",
           info.param == InputType::kConst ? "_ConstInput" : "_DynamicInput");
       return name;

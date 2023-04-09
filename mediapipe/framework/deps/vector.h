@@ -51,7 +51,7 @@ class BasicVector {
   typedef typename std::conditional<std::is_integral<T>::value, double, T>::type
       FloatType;
 
-  using IdxSeqN = typename absl::make_index_sequence<N>;
+  using IdxSeqN = typename abslx::make_index_sequence<N>;
 
   template <std::size_t I, typename F, typename... As>
   static auto Reduce(F f, As*... as) -> decltype(f(as[I]...)) {
@@ -59,7 +59,7 @@ class BasicVector {
   }
 
   template <typename R = D, std::size_t... Is, typename F, typename... As>
-  static R GenerateEach(absl::index_sequence<Is...>, F f, As*... as) {
+  static R GenerateEach(abslx::index_sequence<Is...>, F f, As*... as) {
     return R(Reduce<Is>(f, as...)...);
   }
 
@@ -267,28 +267,28 @@ class BasicVector {
   static void Ignore(std::initializer_list<bool>) {}
 
   template <std::size_t... Is>
-  static T Dot(T sum, const T* a, const T* b, absl::index_sequence<Is...>) {
+  static T Dot(T sum, const T* a, const T* b, abslx::index_sequence<Is...>) {
     Ignore({(sum += a[Is] * b[Is], true)...});
     return sum;
   }
 
   template <std::size_t... Is>
-  static void PlusEq(T* a, const T* b, absl::index_sequence<Is...>) {
+  static void PlusEq(T* a, const T* b, abslx::index_sequence<Is...>) {
     Ignore({(a[Is] += b[Is], true)...});
   }
 
   template <std::size_t... Is>
-  static void MinusEq(T* a, const T* b, absl::index_sequence<Is...>) {
+  static void MinusEq(T* a, const T* b, abslx::index_sequence<Is...>) {
     Ignore({(a[Is] -= b[Is], true)...});
   }
 
   template <std::size_t... Is>
-  static void MulEq(T* a, T b, absl::index_sequence<Is...>) {
+  static void MulEq(T* a, T b, abslx::index_sequence<Is...>) {
     Ignore({(a[Is] *= b, true)...});
   }
 
   template <std::size_t... Is>
-  static void DivEq(T* a, T b, absl::index_sequence<Is...>) {
+  static void DivEq(T* a, T b, abslx::index_sequence<Is...>) {
     Ignore({(a[Is] /= b, true)...});
   }
 };

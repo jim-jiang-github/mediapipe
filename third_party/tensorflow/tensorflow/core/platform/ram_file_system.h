@@ -80,7 +80,7 @@ class RamRandomAccessFile : public RandomAccessFile, public WritableFile {
   }
 
 #if defined(TF_CORD_SUPPORT)
-  Status Append(const absl::Cord& cord) override {
+  Status Append(const abslx::Cord& cord) override {
     data_->append(cord.char_begin(), cord.char_end());
     return OkStatus();
   }

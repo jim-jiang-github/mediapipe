@@ -28,7 +28,7 @@
 #include "absl/strings/internal/cord_internal.h"
 #include "absl/strings/internal/cord_rep_flat.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 
@@ -135,7 +135,7 @@ void Consume(Direction direction, CordRep* rep, F&& fn) {
     size_t offset;
     size_t length;
   };
-  absl::InlinedVector<Entry, 40> stack;
+  abslx::InlinedVector<Entry, 40> stack;
 
   for (;;) {
     if (rep->tag >= FLAT || rep->tag == EXTERNAL || rep->tag == RING) {
@@ -625,7 +625,7 @@ CordRepRing* CordRepRing::Prepend(CordRepRing* rep, CordRep* child) {
   return PrependSlow(rep, child);
 }
 
-CordRepRing* CordRepRing::Append(CordRepRing* rep, absl::string_view data,
+CordRepRing* CordRepRing::Append(CordRepRing* rep, abslx::string_view data,
                                  size_t extra) {
   if (rep->refcount.IsOne()) {
     Span<char> avail = rep->GetAppendBuffer(data.length());
@@ -659,7 +659,7 @@ CordRepRing* CordRepRing::Append(CordRepRing* rep, absl::string_view data,
   return Validate(rep);
 }
 
-CordRepRing* CordRepRing::Prepend(CordRepRing* rep, absl::string_view data,
+CordRepRing* CordRepRing::Prepend(CordRepRing* rep, abslx::string_view data,
                                   size_t extra) {
   if (rep->refcount.IsOne()) {
     Span<char> avail = rep->GetPrependBuffer(data.length());
@@ -895,4 +895,4 @@ CordRepRing* CordRepRing::RemoveSuffix(CordRepRing* rep, size_t len,
 
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

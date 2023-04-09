@@ -19,7 +19,7 @@
 #ifndef ABSL_STRINGS_CORDZ_SAMPLE_TOKEN_H_
 #define ABSL_STRINGS_CORDZ_SAMPLE_TOKEN_H_
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace cord_internal {
 
@@ -92,6 +92,6 @@ class CordzSampleToken : public CordzSnapshot {
 
 }  // namespace cord_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_STRINGS_CORDZ_SAMPLE_TOKEN_H_

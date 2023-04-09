@@ -129,7 +129,7 @@ Status NodeBuilder::Finalize(Graph* graph, Node** created_node, bool consume) {
     *created_node = nullptr;
   }
   if (!errors_.empty()) {
-    return errors::InvalidArgument(absl::StrJoin(errors_, "\n"));
+    return errors::InvalidArgument(abslx::StrJoin(errors_, "\n"));
   }
 
   NodeDef node_def;

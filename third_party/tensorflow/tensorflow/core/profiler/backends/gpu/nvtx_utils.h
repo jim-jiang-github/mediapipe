@@ -40,7 +40,7 @@ class NVTXRangeTracker {
     auto& range_stack = GetRangeStack();
     if (!range_stack.empty()) range_stack.pop();
   }
-  static const absl::string_view CurrentRange() {
+  static const abslx::string_view CurrentRange() {
     auto& range_stack = GetRangeStack();
     if (!range_stack.empty()) return range_stack.top();
     return "";

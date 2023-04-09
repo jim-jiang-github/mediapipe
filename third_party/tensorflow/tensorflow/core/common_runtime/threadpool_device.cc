@@ -77,23 +77,23 @@ ThreadPoolDevice::ThreadPoolDevice(const SessionOptions& options,
   if (!IsMKLEnabled()) return;
 #ifdef _OPENMP
   const char* user_omp_threads = getenv("OMP_NUM_THREADS");
-  static absl::once_flag num_threads_setting_flag;
+  static abslx::once_flag num_threads_setting_flag;
   if (user_omp_threads == nullptr) {
     // OMP_NUM_THREADS controls MKL's intra-op parallelization
     // Default to available physical cores
     const int mkl_intra_op = port::NumSchedulableCPUs();
     const int ht = port::NumHyperthreadsPerCore();
-    absl::call_once(num_threads_setting_flag, omp_set_num_threads,
+    abslx::call_once(num_threads_setting_flag, omp_set_num_threads,
                     (mkl_intra_op + ht - 1) / ht);
   }
 
 #ifndef DNNL_AARCH64_USE_ACL
   const char* user_kmp_blocktime = getenv("KMP_BLOCKTIME");
-  static absl::once_flag blocktime_setting_flag;
+  static abslx::once_flag blocktime_setting_flag;
   if (user_kmp_blocktime == nullptr) {
     // Sets the time, in milliseconds, that a thread should wait,
     // after completing the execution of a parallel region, before sleeping.
-    absl::call_once(blocktime_setting_flag, kmp_set_blocktime, 1);
+    abslx::call_once(blocktime_setting_flag, kmp_set_blocktime, 1);
   }
 #endif
 
@@ -146,16 +146,16 @@ void ThreadPoolDevice::CopyTensorInSameDevice(
 }
 
 namespace {
-const absl::flat_hash_set<std::string>* GetOpsToLogFromEnv() {
-  auto* result = new absl::flat_hash_set<std::string>;
+const abslx::flat_hash_set<std::string>* GetOpsToLogFromEnv() {
+  auto* result = new abslx::flat_hash_set<std::string>;
   const char* env = getenv("TF_CPU_DEBUG_OPS_TO_LOG");
   if (!env) {
     return result;
   }
 
-  std::vector<absl::string_view> ops = absl::StrSplit(env, ',');
+  std::vector<abslx::string_view> ops = abslx::StrSplit(env, ',');
   LOG(INFO) << "Will log inputs & outputs from the following ops: ";
-  for (absl::string_view op : ops) {
+  for (abslx::string_view op : ops) {
     result->insert(std::string(op));
     LOG(INFO) << "  |" << op << "|";
   }
@@ -164,7 +164,7 @@ const absl::flat_hash_set<std::string>* GetOpsToLogFromEnv() {
 }
 
 bool ShouldLogInputsAndOutputs(OpKernel* op_kernel) {
-  static const absl::flat_hash_set<std::string>& ops_to_log =
+  static const abslx::flat_hash_set<std::string>& ops_to_log =
       *GetOpsToLogFromEnv();
   static const bool is_empty = ops_to_log.empty();
   if (is_empty) {

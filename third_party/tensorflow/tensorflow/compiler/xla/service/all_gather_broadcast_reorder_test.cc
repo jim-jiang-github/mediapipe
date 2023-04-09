@@ -27,7 +27,7 @@ namespace m = xla::testing::opcode_matchers;
 class AllGatherBroadcastReorderTest : public HloTestBase {
  public:
   enum class PassOutput { NoChange, NonUniformAGPattern, UniformAGPattern };
-  void RunPass(absl::string_view hlo_module, PassOutput expected_output) {
+  void RunPass(abslx::string_view hlo_module, PassOutput expected_output) {
     TF_ASSERT_OK_AND_ASSIGN(auto module,
                             ParseAndReturnVerifiedModule(hlo_module));
     auto changed = AllGatherBroadcastReorder().Run(module.get());
@@ -50,7 +50,7 @@ class AllGatherBroadcastReorderTest : public HloTestBase {
 };
 
 TEST_F(AllGatherBroadcastReorderTest, Simple_GatherAlongNonUniformDim) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 ENTRY main {
@@ -63,7 +63,7 @@ ENTRY main {
 }
 
 TEST_F(AllGatherBroadcastReorderTest, Simple_GatherAlongUniformDim) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 ENTRY main {
@@ -76,7 +76,7 @@ ENTRY main {
 }
 
 TEST_F(AllGatherBroadcastReorderTest, Simple_GatherBroadcastScalar) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 ENTRY main {
@@ -89,7 +89,7 @@ ENTRY main {
 }
 
 TEST_F(AllGatherBroadcastReorderTest, T5Test) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 ENTRY main {
@@ -103,7 +103,7 @@ ENTRY main {
 }
 
 TEST_F(AllGatherBroadcastReorderTest, FailedMatch) {
-  absl::string_view hlo_string = R"(
+  abslx::string_view hlo_string = R"(
 HloModule m
 
 ENTRY main {

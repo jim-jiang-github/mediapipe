@@ -30,7 +30,7 @@
 
 #include "absl/base/internal/raw_logging.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 
 static HANDLE process = NULL;
@@ -78,4 +78,4 @@ bool Symbolize(const void* pc, char* out, int out_size) {
 }
 
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

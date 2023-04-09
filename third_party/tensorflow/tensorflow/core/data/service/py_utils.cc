@@ -27,8 +27,8 @@ std::string DefaultProtocol() {
   if (CredentialsFactory::Exists("grpc+loas")) {
     return "grpc+loas";
   }
-  static absl::once_flag log_once;
-  absl::call_once(log_once, [] {
+  static abslx::once_flag log_once;
+  abslx::call_once(log_once, [] {
     LOG(WARNING)
         << "loas credentials factory is not available, falling back to "
            "using insecure credentials.";

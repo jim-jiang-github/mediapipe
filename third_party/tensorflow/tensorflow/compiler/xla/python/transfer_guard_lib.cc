@@ -102,7 +102,7 @@ TransferGuardAction GetTransferGuardActionForDeviceToHost() {
 }  // namespace
 
 xla::Status ApplyTransferGuardToHostToDevice(
-    absl::FunctionRef<std::string()> formatter) {
+    abslx::FunctionRef<std::string()> formatter) {
   switch (GetTransferGuardActionForHostToDevice()) {
     case TransferGuardAction::kAllow:
       break;
@@ -117,7 +117,7 @@ xla::Status ApplyTransferGuardToHostToDevice(
 }
 
 xla::Status ApplyTransferGuardToDeviceToDevice(
-    absl::FunctionRef<std::string()> formatter) {
+    abslx::FunctionRef<std::string()> formatter) {
   switch (GetTransferGuardActionForDeviceToDevice()) {
     case TransferGuardAction::kAllow:
       break;
@@ -132,7 +132,7 @@ xla::Status ApplyTransferGuardToDeviceToDevice(
 }
 
 xla::Status ApplyTransferGuardToDeviceToHost(
-    absl::FunctionRef<std::string()> formatter) {
+    abslx::FunctionRef<std::string()> formatter) {
   switch (GetTransferGuardActionForDeviceToHost()) {
     case TransferGuardAction::kAllow:
       break;

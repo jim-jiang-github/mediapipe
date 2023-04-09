@@ -96,13 +96,13 @@ constexpr auto filter_tuple(Tuple&& t) {
 // TODO: ensure only one of these is enabled?
 template <class F, class T, class I>
 constexpr auto call_with_optional_index(F&& f, T&& t, I i)
-    -> absl::void_t<decltype(f(std::forward<T>(t), i))> {
+    -> abslx::void_t<decltype(f(std::forward<T>(t), i))> {
   return f(std::forward<T>(t), i);
 }
 
 template <class F, class T, class I>
 constexpr auto call_with_optional_index(F&& f, T&& t, I i)
-    -> absl::void_t<decltype(f(std::forward<T>(t)))> {
+    -> abslx::void_t<decltype(f(std::forward<T>(t)))> {
   return f(std::forward<T>(t));
 }
 

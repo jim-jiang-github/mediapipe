@@ -19,7 +19,7 @@
 
 namespace {
 
-namespace flags = absl::flags_internal;
+namespace flags = abslx::flags_internal;
 
 TEST(FlagsPathUtilTest, TestBasename) {
   EXPECT_EQ(flags::Basename(""), "");

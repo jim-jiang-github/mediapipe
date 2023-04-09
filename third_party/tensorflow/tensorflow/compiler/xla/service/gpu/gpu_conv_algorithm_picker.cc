@@ -91,7 +91,7 @@ StatusOr<se::DeviceMemory<uint8_t>> ScratchAllocator::AllocateBytes(
   if (byte_size > GetMemoryLimitInBytes()) {
     return se::port::Status(
         se::port::error::RESOURCE_EXHAUSTED,
-        absl::StrFormat(
+        abslx::StrFormat(
             "Allocating %d bytes exceeds the memory limit of %d bytes.",
             byte_size, GetMemoryLimitInBytes()));
   }
@@ -183,7 +183,7 @@ StatusOr<std::vector<MaybeFusedConvRunner>> GetAlgorithms(
 
 StatusOr<std::vector<std::unique_ptr<const se::dnn::ConvRunner>>>
 GetMIOpenAlgorithms(const HloCustomCallInstruction* instr,
-                    absl::Span<se::DeviceMemoryBase> operand_buffers,
+                    abslx::Span<se::DeviceMemoryBase> operand_buffers,
                     se::DeviceMemoryBase result_buffer,
                     se::StreamExecutor* stream_exec,
                     ScratchAllocator* scratch_allocator, se::Stream* stream) {
@@ -211,7 +211,7 @@ GetMIOpenAlgorithms(const HloCustomCallInstruction* instr,
 }
 
 std::string NumBytesToString(int64_t bytes) {
-  return absl::StrCat(tensorflow::strings::HumanReadableNumBytes(bytes), " (",
+  return abslx::StrCat(tensorflow::strings::HumanReadableNumBytes(bytes), " (",
                       bytes, "B)");
 }
 
@@ -270,7 +270,7 @@ void PrintPlatformInfo(const se::Stream* stream) {
 // `name` is a user-friendly name for the set of redzones being checked, e.g.
 // "input/output" or "scratch".
 StatusOr<bool> CheckRedzones(const se::RedzoneAllocator& allocator,
-                             se::Stream* stream, absl::string_view name,
+                             se::Stream* stream, abslx::string_view name,
                              const HloInstruction* instr,
                              AutotuneResult* result) {
   XLA_SCOPED_LOGGING_TIMER_LEVEL("CudnnConvAlgorithmPicker checking redzones",
@@ -288,7 +288,7 @@ StatusOr<bool> CheckRedzones(const se::RedzoneAllocator& allocator,
   fail->set_buffer_address(
       reinterpret_cast<uint64_t>(redzone_check.user_buffer_address));
 
-  LOG(ERROR) << absl::StreamFormat(
+  LOG(ERROR) << abslx::StreamFormat(
       "Detected cudnn out-of-bounds write in conv %s buffer! This is likely a "
       "cudnn bug. We will skip this algorithm in the future, but your GPU "
       "state may already be corrupted, leading to incorrect results. Within "
@@ -325,9 +325,9 @@ ConvCacheKey AutotuneCacheKeyfromInstruction(
   return std::make_tuple(se, conv->ToString(options));
 }
 
-absl::Mutex autotune_cache_lock(absl::kConstInit);
+abslx::Mutex autotune_cache_lock(abslx::kConstInit);
 auto& autotune_cache ABSL_GUARDED_BY(autotune_cache_lock) =
-    *new absl::flat_hash_map<ConvCacheKey, AutotuneResult>();
+    *new abslx::flat_hash_map<ConvCacheKey, AutotuneResult>();
 auto& autotune_cache_stats ABSL_GUARDED_BY(autotune_cache_lock) =
     *new ConvCacheStats();
 }  // anonymous namespace
@@ -343,7 +343,7 @@ StatusOr<AutotuneResult> GpuConvAlgorithmPicker::PickBestAlgorithm(
   // Putting the lock in here rather than in PickBestAlgorithmNoCache lets us
   // avoid ever doing duplicate work.  If we have a cache miss, only one thread
   // will run PickBestAlgorithmImpl for a particular device.
-  absl::MutexLock lock(&GetGpuMutex(stream_exec_));
+  abslx::MutexLock lock(&GetGpuMutex(stream_exec_));
 
   // We cache the autotuning results to avoid doing the duplicate work,
   // which can greatly improve both stability (deterministic numeric results
@@ -351,7 +351,7 @@ StatusOr<AutotuneResult> GpuConvAlgorithmPicker::PickBestAlgorithm(
   // models).
   ConvCacheKey key = AutotuneCacheKeyfromInstruction(instr, stream_exec_);
   {
-    absl::MutexLock lock(&autotune_cache_lock);
+    abslx::MutexLock lock(&autotune_cache_lock);
     auto it = autotune_cache.find(key);
     if (it != autotune_cache.end()) {
       autotune_cache_stats.cache_hits++;
@@ -394,7 +394,7 @@ StatusOr<AutotuneResult> GpuConvAlgorithmPicker::PickBestAlgorithm(
   }
 
   if (result_or.ok()) {
-    absl::MutexLock lock(&autotune_cache_lock);
+    abslx::MutexLock lock(&autotune_cache_lock);
     CHECK(autotune_cache.insert({key, result_or.ValueOrDie()}).second);
   }
   return result_or;
@@ -429,14 +429,14 @@ GpuConvAlgorithmPicker::AutotuneOneConvRunner(
     se::DeviceMemoryAllocator* allocator,
     se::RedzoneAllocator* input_output_allocator, se::Stream* stream,
     MaybeFusedConvRunner* const runner,
-    absl::Span<const DeviceMemoryBase> operand_buffers,
+    abslx::Span<const DeviceMemoryBase> operand_buffers,
     DeviceMemoryBase result_buffer,
     std::optional<ReferenceResult>* reference_result,
-    absl::Span<const AlgorithmDesc> disabled_algos) {
+    abslx::Span<const AlgorithmDesc> disabled_algos) {
   auto alg = runner->ToAlgorithmDesc();
 
   XLA_SCOPED_LOGGING_TIMER_LEVEL(
-      absl::StrCat("CudnnConvAlgorithmPicker::PickBestAlgorithm algo ",
+      abslx::StrCat("CudnnConvAlgorithmPicker::PickBestAlgorithm algo ",
                    alg.ToString()),
       2);
 
@@ -444,7 +444,7 @@ GpuConvAlgorithmPicker::AutotuneOneConvRunner(
   const Shape& result_shape = instr->shape().tuple_shapes(0);
 
   auto make_failure = [&alg](AutotuneResult::FailureKind kind,
-                             absl::string_view msg) {
+                             abslx::string_view msg) {
     tensorflow::AutotuneResult result;
     *result.mutable_algorithm() = alg.ToProto();
     result.mutable_failure()->set_kind(kind);
@@ -454,7 +454,7 @@ GpuConvAlgorithmPicker::AutotuneOneConvRunner(
 
   AlgorithmDesc alg_key(alg.algo_id(), alg.tensor_ops_enabled(), std::nullopt);
 
-  if (absl::c_linear_search(disabled_algos, alg_key)) {
+  if (abslx::c_linear_search(disabled_algos, alg_key)) {
     LOG(INFO) << "Omitted potentially buggy algorithm " << alg.ToString()
               << " for conv " << instr->ToString();
     return make_failure(AutotuneResult::DISQUALIFIED,
@@ -504,7 +504,7 @@ GpuConvAlgorithmPicker::AutotuneOneConvRunner(
   auto scratch_or = scratch_allocator.AllocateBytes(*workspace_size);
   if (!scratch_or.ok()) {
     return make_failure(AutotuneResult::DISQUALIFIED,
-                        absl::StrCat("Scratch allocation failed: ",
+                        abslx::StrCat("Scratch allocation failed: ",
                                      scratch_or.status().ToString()));
   }
   se::DeviceMemoryBase scratch_memory = scratch_or.ValueOrDie();
@@ -520,7 +520,7 @@ GpuConvAlgorithmPicker::AutotuneOneConvRunner(
     VLOG(4) << "Launch failed: " << launch_status;
     return make_failure(
         AutotuneResult::DISQUALIFIED,
-        absl::StrCat("Profiling failure on cuDNN engine ", alg.ToString(), ": ",
+        abslx::StrCat("Profiling failure on cuDNN engine ", alg.ToString(), ": ",
                      launch_status.ToString()));
   }
 
@@ -529,7 +529,7 @@ GpuConvAlgorithmPicker::AutotuneOneConvRunner(
     // Not DISQUALIFIED: this means something went wrong internally.
     return make_failure(
         AutotuneResult::UNKNOWN,
-        absl::StrCat("Launch succeeded but profile result is invalid, "
+        abslx::StrCat("Launch succeeded but profile result is invalid, "
                      "with cuDNN engine ",
                      alg.ToString(), ": ", launch_status.ToString()));
   }
@@ -541,7 +541,7 @@ GpuConvAlgorithmPicker::AutotuneOneConvRunner(
   *result.mutable_algorithm() = alg.ToProto();
   result.set_scratch_bytes(scratch_bytes_used);
   *result.mutable_run_time() = tensorflow::proto_utils::ToDurationProto(
-      absl::Milliseconds(profile_result.elapsed_time_in_ms()));
+      abslx::Milliseconds(profile_result.elapsed_time_in_ms()));
 
   if (!ShouldCheckConv(instr)) {
     if (!reference_result->has_value()) {
@@ -642,7 +642,7 @@ GpuConvAlgorithmPicker::PickBestAlgorithmNoCacheCuda(
     const HloCustomCallInstruction* instr, se::DeviceMemoryAllocator* allocator,
     se::Stream* stream) {
   // Right now Redzone allocator is available in Cuda target only
-  XLA_SCOPED_LOGGING_TIMER(absl::StrCat(
+  XLA_SCOPED_LOGGING_TIMER(abslx::StrCat(
       "GpuConvAlgorithmPicker::PickBestAlgorithmImpl for ", instr->ToString()));
 
   const Shape& result_shape = instr->shape().tuple_shapes(0);
@@ -693,7 +693,7 @@ GpuConvAlgorithmPicker::PickBestAlgorithmNoCacheCuda(
     (void)blas->GetVersion(&blas_version);
   }
 
-  absl::Span<const AlgorithmDesc> disabled_algos = GetDisabledConvAlgorithms(
+  abslx::Span<const AlgorithmDesc> disabled_algos = GetDisabledConvAlgorithms(
       GetComputeCapability(stream_exec_), GetCudnnVersion(stream_exec_),
       blas_version, canonical_hlo);
 
@@ -792,7 +792,7 @@ StatusOr<tensorflow::AutotuneResult>
 GpuConvAlgorithmPicker::PickBestAlgorithmNoCacheRocm(
     const HloCustomCallInstruction* instr, se::DeviceMemoryAllocator* allocator,
     se::Stream* stream) {
-  XLA_SCOPED_LOGGING_TIMER(absl::StrCat(
+  XLA_SCOPED_LOGGING_TIMER(abslx::StrCat(
       "GpuConvAlgorithmPicker::PickBestAlgorithmImpl for ", instr->ToString()));
 
   const auto device_ordinal = stream_exec_->device_ordinal();
@@ -828,7 +828,7 @@ GpuConvAlgorithmPicker::PickBestAlgorithmNoCacheRocm(
 
   TF_ASSIGN_OR_RETURN(
       std::vector<std::unique_ptr<const se::dnn::ConvRunner>> runners,
-      GetMIOpenAlgorithms(instr, absl::MakeSpan(operand_buffers), result_buffer,
+      GetMIOpenAlgorithms(instr, abslx::MakeSpan(operand_buffers), result_buffer,
                           stream_exec_, &scratch_allocator, stream));
 
   std::vector<AutotuneResult> profile_results;
@@ -846,13 +846,13 @@ GpuConvAlgorithmPicker::PickBestAlgorithmNoCacheRocm(
     // needed, plumb it via OpRunner; we'll need to do this to let TF ops avoid
     // re-profiling ROCm algorithms anyway.
     *result.mutable_run_time() =
-        tensorflow::proto_utils::ToDurationProto(absl::Milliseconds(-1));
+        tensorflow::proto_utils::ToDurationProto(abslx::Milliseconds(-1));
   } else {
     TF_ASSIGN_OR_RETURN(GpuConvConfig config, GetGpuConvConfig(instr));
     for (auto& runner : runners) {
       TF_ASSIGN_OR_RETURN(auto alg, runner->ToAlgorithmDesc());
       XLA_SCOPED_LOGGING_TIMER_LEVEL(
-          absl::StrCat("CudnnConvAlgorithmPicker::PickBestAlgorithm algo ",
+          abslx::StrCat("CudnnConvAlgorithmPicker::PickBestAlgorithm algo ",
                        alg.ToString()),
           2);
 
@@ -875,7 +875,7 @@ GpuConvAlgorithmPicker::PickBestAlgorithmNoCacheRocm(
       options.profile_result = &profile_result;
       options.runner_cache = &runner_cache;
       Status launch_status =
-          RunGpuConv(config, absl::MakeSpan(operand_buffers), result_buffer,
+          RunGpuConv(config, abslx::MakeSpan(operand_buffers), result_buffer,
                      scratch_memory, stream, options);
 
       if (!launch_status.ok()) {
@@ -893,7 +893,7 @@ GpuConvAlgorithmPicker::PickBestAlgorithmNoCacheRocm(
       int64_t scratch_bytes_used = scratch_allocator.TotalAllocatedBytes();
       result.set_scratch_bytes(scratch_bytes_used);
       *result.mutable_run_time() = tensorflow::proto_utils::ToDurationProto(
-          absl::Milliseconds(profile_result.elapsed_time_in_ms()));
+          abslx::Milliseconds(profile_result.elapsed_time_in_ms()));
     }
   }
 
@@ -914,7 +914,7 @@ StatusOr<bool> GpuConvAlgorithmPicker::RunOnInstruction(HloInstruction* instr) {
   StatusOr<AutotuneResult> best_algo_or =
       PickBestAlgorithm(Cast<HloCustomCallInstruction>(instr));
   if (!best_algo_or.ok()) {
-    auto msg = absl::StrFormat(
+    auto msg = abslx::StrFormat(
         "Failed to determine best cudnn convolution algorithm for:\n%s\n\n"
         "Original error: %s",
         instr->ToString(), best_algo_or.status().ToString());
@@ -997,7 +997,7 @@ StatusOr<bool> GpuConvAlgorithmPicker::RunOnComputation(
 
 StatusOr<bool> GpuConvAlgorithmPicker::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   XLA_SCOPED_LOGGING_TIMER("GpuConvAlgorithmPicker");
 
   if (module->config().debug_options().xla_gpu_autotune_level() == 0) {
@@ -1014,7 +1014,7 @@ StatusOr<bool> GpuConvAlgorithmPicker::Run(
   }
 
   {
-    absl::MutexLock lock(&autotune_cache_lock);
+    abslx::MutexLock lock(&autotune_cache_lock);
     autotune_cache_stats.LogStats();
   }
 

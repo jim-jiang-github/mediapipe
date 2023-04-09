@@ -26,7 +26,7 @@ limitations under the License.
 namespace tflite {
 namespace gpu {
 
-absl::Status ResamplerIdentityTest(const BHWC& shape,
+abslx::Status ResamplerIdentityTest(const BHWC& shape,
                                    TestExecutionEnvironment* env) {
   TensorFloat32 src_tensor;
   src_tensor.shape = shape;
@@ -62,7 +62,7 @@ absl::Status ResamplerIdentityTest(const BHWC& shape,
       RETURN_IF_ERROR(PointWiseNear(src_tensor.data, dst_tensor.data, eps));
     }
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace gpu

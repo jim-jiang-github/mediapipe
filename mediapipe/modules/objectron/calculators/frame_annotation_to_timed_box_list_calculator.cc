@@ -47,15 +47,15 @@ namespace mediapipe {
 // }
 class FrameAnnotationToTimedBoxListCalculator : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc);
+  static abslx::Status GetContract(CalculatorContract* cc);
 
-  absl::Status Open(CalculatorContext* cc) override;
-  absl::Status Process(CalculatorContext* cc) override;
-  absl::Status Close(CalculatorContext* cc) override;
+  abslx::Status Open(CalculatorContext* cc) override;
+  abslx::Status Process(CalculatorContext* cc) override;
+  abslx::Status Close(CalculatorContext* cc) override;
 };
 REGISTER_CALCULATOR(FrameAnnotationToTimedBoxListCalculator);
 
-absl::Status FrameAnnotationToTimedBoxListCalculator::GetContract(
+abslx::Status FrameAnnotationToTimedBoxListCalculator::GetContract(
     CalculatorContract* cc) {
   RET_CHECK(!cc->Inputs().GetTags().empty());
   RET_CHECK(!cc->Outputs().GetTags().empty());
@@ -67,21 +67,21 @@ absl::Status FrameAnnotationToTimedBoxListCalculator::GetContract(
   if (cc->Outputs().HasTag(kOutputStreamTag)) {
     cc->Outputs().Tag(kOutputStreamTag).Set<TimedBoxProtoList>();
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FrameAnnotationToTimedBoxListCalculator::Open(
+abslx::Status FrameAnnotationToTimedBoxListCalculator::Open(
     CalculatorContext* cc) {
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FrameAnnotationToTimedBoxListCalculator::Process(
+abslx::Status FrameAnnotationToTimedBoxListCalculator::Process(
     CalculatorContext* cc) {
   if (cc->Inputs().HasTag(kInputStreamTag) &&
       !cc->Inputs().Tag(kInputStreamTag).IsEmpty()) {
     const auto& frame_annotation =
         cc->Inputs().Tag(kInputStreamTag).Get<FrameAnnotation>();
-    auto output_objects = absl::make_unique<TimedBoxProtoList>();
+    auto output_objects = abslx::make_unique<TimedBoxProtoList>();
     for (const auto& annotation : frame_annotation.annotations()) {
       std::vector<cv::Point2f> key_points;
       for (const auto& keypoint : annotation.keypoints()) {
@@ -104,12 +104,12 @@ absl::Status FrameAnnotationToTimedBoxListCalculator::Process(
     }
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status FrameAnnotationToTimedBoxListCalculator::Close(
+abslx::Status FrameAnnotationToTimedBoxListCalculator::Close(
     CalculatorContext* cc) {
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 }  // namespace mediapipe

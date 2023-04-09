@@ -26,7 +26,7 @@
 
 #include "absl/base/macros.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 namespace {
@@ -111,7 +111,7 @@ void TableGenerator::Print(std::ostream* os) {
          "\n"
          "#include \"absl/random/gaussian_distribution.h\"\n"
          "\n"
-         "namespace absl {\n"
+         "namespace abslx {\n"
          "ABSL_NAMESPACE_BEGIN\n"
          "namespace random_internal {\n"
          "\n"
@@ -124,7 +124,7 @@ void TableGenerator::Print(std::ostream* os) {
          "\n"
          "}  // namespace random_internal\n"
          "ABSL_NAMESPACE_END\n"
-         "}  // namespace absl\n"
+         "}  // namespace abslx\n"
          "\n"
          "// clang-format on\n"
          "// END GENERATED CODE";
@@ -133,11 +133,11 @@ void TableGenerator::Print(std::ostream* os) {
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 int main(int, char**) {
   std::cerr << "\nCopy the output to gaussian_distribution.cc" << std::endl;
-  absl::random_internal::TableGenerator generator;
+  abslx::random_internal::TableGenerator generator;
   generator.Print(&std::cout);
   return 0;
 }

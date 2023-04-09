@@ -79,7 +79,7 @@ class TraceMeProducer {
   template <typename NameT>
   explicit TraceMeProducer(NameT&& name,
                            ContextType context_type = ContextType::kGeneric,
-                           absl::optional<uint64> context_id = absl::nullopt,
+                           abslx::optional<uint64> context_id = abslx::nullopt,
                            int level = 2)
       : context_id_(context_id.has_value() ? context_id.value()
                                            : TraceMe::NewActivityId()),

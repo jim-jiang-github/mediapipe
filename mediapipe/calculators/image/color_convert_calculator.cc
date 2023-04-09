@@ -81,12 +81,12 @@ constexpr char kGrayOutTag[] = "GRAY_OUT";
 class ColorConvertCalculator : public CalculatorBase {
  public:
   ~ColorConvertCalculator() override = default;
-  static absl::Status GetContract(CalculatorContract* cc);
-  absl::Status Process(CalculatorContext* cc) override;
+  static abslx::Status GetContract(CalculatorContract* cc);
+  abslx::Status Process(CalculatorContext* cc) override;
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(TimestampDiff(0));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
  private:
@@ -94,7 +94,7 @@ class ColorConvertCalculator : public CalculatorBase {
   // conversion. The ImageFrame on input_tag is converted using the
   // open_cv_convert_code provided and then output on the output_tag stream.
   // Note that the output_format must match the destination conversion code.
-  absl::Status ConvertAndOutput(const std::string& input_tag,
+  abslx::Status ConvertAndOutput(const std::string& input_tag,
                                 const std::string& output_tag,
                                 ImageFormat::Format output_format,
                                 int open_cv_convert_code,
@@ -103,7 +103,7 @@ class ColorConvertCalculator : public CalculatorBase {
 
 REGISTER_CALCULATOR(ColorConvertCalculator);
 
-absl::Status ColorConvertCalculator::GetContract(CalculatorContract* cc) {
+abslx::Status ColorConvertCalculator::GetContract(CalculatorContract* cc) {
   RET_CHECK_EQ(cc->Inputs().NumEntries(), 1)
       << "Only one input stream is allowed.";
   RET_CHECK_EQ(cc->Outputs().NumEntries(), 1)
@@ -145,10 +145,10 @@ absl::Status ColorConvertCalculator::GetContract(CalculatorContract* cc) {
     cc->Outputs().Tag(kBgraOutTag).Set<ImageFrame>();
   }
 
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ColorConvertCalculator::ConvertAndOutput(
+abslx::Status ColorConvertCalculator::ConvertAndOutput(
     const std::string& input_tag, const std::string& output_tag,
     ImageFormat::Format output_format, int open_cv_convert_code,
     CalculatorContext* cc) {
@@ -167,10 +167,10 @@ absl::Status ColorConvertCalculator::ConvertAndOutput(
   cc->Outputs()
       .Tag(output_tag)
       .Add(output_frame.release(), cc->InputTimestamp());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status ColorConvertCalculator::Process(CalculatorContext* cc) {
+abslx::Status ColorConvertCalculator::Process(CalculatorContext* cc) {
   // RGBA -> RGB
   if (cc->Inputs().HasTag(kRgbaInTag) && cc->Outputs().HasTag(kRgbOutTag)) {
     return ConvertAndOutput(kRgbaInTag, kRgbOutTag, ImageFormat::SRGB,

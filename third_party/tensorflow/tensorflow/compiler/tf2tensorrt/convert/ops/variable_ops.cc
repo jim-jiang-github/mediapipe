@@ -131,7 +131,7 @@ class ConvertVariableV2 : public OpConverterBase<ConvertVariableV2> {
     FunctionDef fdef = FunctionDefHelper::Define(
         func_name,                                              // Name
         {},                                                     // Args
-        {absl::StrCat("out: ", DataTypeString(attrs_.dtype))},  // Returns
+        {abslx::StrCat("out: ", DataTypeString(attrs_.dtype))},  // Returns
         {},                                                     // Attr def
         // Nodes
         {{{attrs_.name},

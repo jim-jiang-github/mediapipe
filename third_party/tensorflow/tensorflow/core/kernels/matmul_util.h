@@ -71,8 +71,8 @@ class BlasLtMatmulPlanMap {
                                   PlanAndAlgorithms value);
 
  private:
-  mutable absl::Mutex mu_;
-  absl::flat_hash_map<BlasLtMatmulPlanParams, PlanAndAlgorithms>
+  mutable abslx::Mutex mu_;
+  abslx::flat_hash_map<BlasLtMatmulPlanParams, PlanAndAlgorithms>
       params_plan_map_ ABSL_GUARDED_BY(mu_);
 };
 

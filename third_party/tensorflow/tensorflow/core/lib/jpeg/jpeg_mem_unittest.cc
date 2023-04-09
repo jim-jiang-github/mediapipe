@@ -59,7 +59,7 @@ void TestJPEG(Env* env, const string& jpegfile) {
   string jpeg;
   ReadFileToStringOrDie(env, jpegfile, &jpeg);
   const int fsize = jpeg.size();
-  const uint8* const temp = absl::bit_cast<const uint8*>(jpeg.data());
+  const uint8* const temp = abslx::bit_cast<const uint8*>(jpeg.data());
 
   // Try partial decoding (half of the data)
   int w, h, c;
@@ -101,7 +101,7 @@ void TestCropAndDecodeJpeg(Env* env, const string& jpegfile,
   string jpeg;
   ReadFileToStringOrDie(env, jpegfile, &jpeg);
   const int fsize = jpeg.size();
-  const auto* temp = absl::bit_cast<const uint8*>(jpeg.data());
+  const auto* temp = abslx::bit_cast<const uint8*>(jpeg.data());
 
   // Decode the whole image.
   std::unique_ptr<uint8[]> imgdata1;
@@ -224,7 +224,7 @@ TEST(JpegMemTest, CropAndDecodeJpegWithStride) {
   string jpeg;
   ReadFileToStringOrDie(env, data_path + "jpeg_merge_test1.jpg", &jpeg);
   const int fsize = jpeg.size();
-  const auto* temp = absl::bit_cast<const uint8*>(jpeg.data());
+  const auto* temp = abslx::bit_cast<const uint8*>(jpeg.data());
 
   int w, h, c;
   ASSERT_TRUE(GetImageInfo(temp, fsize, &w, &h, &c));
@@ -262,7 +262,7 @@ TEST(JpegMemTest, CropAndDecodeJpegWithInvalidCropWindow) {
   string jpeg;
   ReadFileToStringOrDie(env, data_path + "jpeg_merge_test1.jpg", &jpeg);
   const int fsize = jpeg.size();
-  const auto* temp = absl::bit_cast<const uint8*>(jpeg.data());
+  const auto* temp = abslx::bit_cast<const uint8*>(jpeg.data());
 
   int w, h, c;
   ASSERT_TRUE(GetImageInfo(temp, fsize, &w, &h, &c));

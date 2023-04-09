@@ -191,7 +191,7 @@ class ROCMBlas : public blas::BlasSupport {
                                    blas::ProfileResult *output_profile_result);
 
   // mutex that guards the rocBLAS handle for this device.
-  absl::Mutex mu_;
+  abslx::Mutex mu_;
 
   // GpuExecutor which instantiated this ROCMBlas.
   // Immutable post-initialization.

@@ -28,7 +28,7 @@
 
 #include "absl/base/config.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace hash_internal {
 
@@ -43,6 +43,6 @@ uint64_t Wyhash(const void* data, size_t len, uint64_t seed,
 
 }  // namespace hash_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_HASH_INTERNAL_WYHASH_H_

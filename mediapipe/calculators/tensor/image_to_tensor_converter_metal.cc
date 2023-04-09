@@ -150,14 +150,14 @@ int GetBytesPerRaw(OutputFormat output_format, const tflite::gpu::HW& size) {
 
 class SubRectExtractorMetal {
  public:
-  static absl::StatusOr<std::unique_ptr<SubRectExtractorMetal>> Make(
+  static abslx::StatusOr<std::unique_ptr<SubRectExtractorMetal>> Make(
       id<MTLDevice> device, OutputFormat output_format,
       BorderMode border_mode) {
     id<MTLRenderPipelineState> pipeline_state;
     MP_RETURN_IF_ERROR(SubRectExtractorMetal::MakePipelineState(
         device, output_format, border_mode, &pipeline_state));
 
-    return absl::make_unique<SubRectExtractorMetal>(device, pipeline_state,
+    return abslx::make_unique<SubRectExtractorMetal>(device, pipeline_state,
                                                     output_format);
   }
 
@@ -178,7 +178,7 @@ class SubRectExtractorMetal {
                             options:MTLResourceOptionCPUCacheModeDefault];
   }
 
-  absl::Status Execute(id<MTLTexture> input_texture,
+  abslx::Status Execute(id<MTLTexture> input_texture,
                        const RotatedRect& sub_rect, bool flip_horizontaly,
                        float alpha, float beta,
                        const tflite::gpu::HW& destination_size,
@@ -209,7 +209,7 @@ class SubRectExtractorMetal {
     return texture;
   }
 
-  absl::Status InternalExecute(id<MTLTexture> input_texture,
+  abslx::Status InternalExecute(id<MTLTexture> input_texture,
                                const RotatedRect& sub_rect,
                                bool flip_horizontaly, float alpha, float beta,
                                const tflite::gpu::HW& destination_size,
@@ -257,10 +257,10 @@ class SubRectExtractorMetal {
                         vertexCount:6];
     [command_encoder endEncoding];
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  static absl::Status MakePipelineState(
+  static abslx::Status MakePipelineState(
       id<MTLDevice> device, OutputFormat output_format, BorderMode border_mode,
       id<MTLRenderPipelineState>* pipeline_state) {
     RET_CHECK(pipeline_state != nil);
@@ -296,7 +296,7 @@ class SubRectExtractorMetal {
     }
 
     std::string shader_lib =
-        absl::StrCat(kShaderLibHeader, output_type_def, clamp_def,
+        abslx::StrCat(kShaderLibHeader, output_type_def, clamp_def,
                      kVertexShader, kFragmentShader);
     NSError* error = nil;
     NSString* library_source =
@@ -330,7 +330,7 @@ class SubRectExtractorMetal {
     RET_CHECK(error == nil) << "Couldn't create a pipeline state"
                             << [[error localizedDescription] UTF8String];
 
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   id<MTLBuffer> positions_buffer_;
@@ -342,23 +342,23 @@ class SubRectExtractorMetal {
 
 class MetalProcessor : public ImageToTensorConverter {
  public:
-  absl::Status Init(CalculatorContext* cc, BorderMode border_mode) {
+  abslx::Status Init(CalculatorContext* cc, BorderMode border_mode) {
     metal_helper_ = [[MPPMetalHelper alloc] initWithCalculatorContext:cc];
     RET_CHECK(metal_helper_);
     ASSIGN_OR_RETURN(extractor_, SubRectExtractorMetal::Make(
                                      metal_helper_.mtlDevice,
                                      OutputFormat::kF32C4, border_mode));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Convert(const mediapipe::Image& input, const RotatedRect& roi,
+  abslx::Status Convert(const mediapipe::Image& input, const RotatedRect& roi,
                        float range_min, float range_max,
                        int tensor_buffer_offset,
                        Tensor& output_tensor) override {
     if (input.format() != mediapipe::GpuBufferFormat::kBGRA32 &&
         input.format() != mediapipe::GpuBufferFormat::kRGBAHalf64 &&
         input.format() != mediapipe::GpuBufferFormat::kRGBAFloat128) {
-      return InvalidArgumentError(absl::StrCat(
+      return InvalidArgumentError(abslx::StrCat(
           "Only 4-channel texture input formats are supported, passed format: ",
           static_cast<uint32_t>(input.format())));
     }
@@ -387,12 +387,12 @@ class MetalProcessor : public ImageToTensorConverter {
           tflite::gpu::HW(output_shape.dims[1], output_shape.dims[2]),
           command_buffer, buffer_view.buffer()));
       [command_buffer commit];
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
   }
 
  private:
-  absl::Status ValidateTensorShape(const Tensor::Shape& output_shape) {
+  abslx::Status ValidateTensorShape(const Tensor::Shape& output_shape) {
     RET_CHECK_EQ(output_shape.dims.size(), 4)
         << "Wrong output dims size: " << output_shape.dims.size();
     RET_CHECK_EQ(output_shape.dims[0], 1)
@@ -400,7 +400,7 @@ class MetalProcessor : public ImageToTensorConverter {
            "converter.";
     RET_CHECK_EQ(output_shape.dims[3], 4)
         << "Wrong output channel: " << output_shape.dims[3];
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
   MPPMetalHelper* metal_helper_ = nil;
@@ -409,9 +409,9 @@ class MetalProcessor : public ImageToTensorConverter {
 
 }  // namespace
 
-absl::StatusOr<std::unique_ptr<ImageToTensorConverter>> CreateMetalConverter(
+abslx::StatusOr<std::unique_ptr<ImageToTensorConverter>> CreateMetalConverter(
     CalculatorContext* cc, BorderMode border_mode) {
-  auto result = absl::make_unique<MetalProcessor>();
+  auto result = abslx::make_unique<MetalProcessor>();
   MP_RETURN_IF_ERROR(result->Init(cc, border_mode));
 
   return result;

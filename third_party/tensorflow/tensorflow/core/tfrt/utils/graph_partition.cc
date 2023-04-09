@@ -60,8 +60,8 @@ struct CallNodeInputInfo {
 };
 
 struct OutputNodeInfo {
-  absl::flat_hash_map<std::string, NodeInfo> output_nodes;
-  absl::optional<std::pair<std::string, NodeInfo>> auxiliary_output_node;
+  abslx::flat_hash_map<std::string, NodeInfo> output_nodes;
+  abslx::optional<std::pair<std::string, NodeInfo>> auxiliary_output_node;
 };
 
 // Prepares the `subgraph` for the conversion to a function by adding
@@ -73,9 +73,9 @@ Status PrepareSubgraphForFunctionConversion(
     const std::vector<std::string>& inputs,
     const std::vector<std::string>& outputs, const Device* host_device,
     const std::string& func_name,
-    absl::flat_hash_map<std::string, NodeInfo>& input_nodes,
-    absl::flat_hash_map<std::string, NodeInfo>& output_nodes,
-    absl::optional<std::pair<std::string, NodeInfo>>& auxiliary_output_node,
+    abslx::flat_hash_map<std::string, NodeInfo>& input_nodes,
+    abslx::flat_hash_map<std::string, NodeInfo>& output_nodes,
+    abslx::optional<std::pair<std::string, NodeInfo>>& auxiliary_output_node,
     Graph* subgraph, Graph* graph) {
   std::unordered_map<std::string, Node*> name_to_node_map =
       subgraph->BuildNodeNameIndex();
@@ -107,7 +107,7 @@ Status PrepareSubgraphForFunctionConversion(
     // Create an _Arg node to replace the input node.
     TF_ASSIGN_OR_RETURN(
         Node * arg_node,
-        NodeBuilder(absl::StrCat("arg_", node_info.index, "/", node->name()),
+        NodeBuilder(abslx::StrCat("arg_", node_info.index, "/", node->name()),
                     "_Arg")
             .Attr("index", node_info.index)
             .Attr("T", node_info.data_type)
@@ -149,7 +149,7 @@ Status PrepareSubgraphForFunctionConversion(
     // Create a _RetArg node, and append it to the original output node.
     TF_ASSIGN_OR_RETURN(
         Node * ret_node,
-        NodeBuilder(absl::StrCat("ret_", node_info.index, "/", node->name()),
+        NodeBuilder(abslx::StrCat("ret_", node_info.index, "/", node->name()),
                     "_Retval")
             .Attr("index", node_info.index)
             .Attr("T", node_info.data_type)
@@ -180,7 +180,7 @@ Status PrepareSubgraphForFunctionConversion(
     const_tensor.flat<int>()(0) = 0;
     TF_ASSIGN_OR_RETURN(
         Node * const_node,
-        NodeBuilder(absl::StrCat("const/unused/", func_name), "Const")
+        NodeBuilder(abslx::StrCat("const/unused/", func_name), "Const")
             .AssignedDevice(host_device->name())
             .Attr("dtype", data_type)
             .Attr("value", const_tensor)
@@ -196,7 +196,7 @@ Status PrepareSubgraphForFunctionConversion(
     TF_ASSIGN_OR_RETURN(
         Node * ret_node,
         NodeBuilder(
-            absl::StrCat("ret_", node_info.index, "/", const_node->name()),
+            abslx::StrCat("ret_", node_info.index, "/", const_node->name()),
             "_Retval")
             .Attr("index", node_info.index)
             .Attr("T", data_type)
@@ -213,14 +213,14 @@ Status PrepareSubgraphForFunctionConversion(
 StatusOr<Node*> BuildPartitionedCallOp(
     const std::string& func_name, const Device* host_device,
     const std::string& device,
-    const absl::flat_hash_map<std::string, NodeInfo>& input_nodes,
-    const absl::flat_hash_map<std::string, NodeInfo>& output_nodes,
-    const absl::optional<std::pair<std::string, NodeInfo>>&
+    const abslx::flat_hash_map<std::string, NodeInfo>& input_nodes,
+    const abslx::flat_hash_map<std::string, NodeInfo>& output_nodes,
+    const abslx::optional<std::pair<std::string, NodeInfo>>&
         auxiliary_output_node,
     const std::vector<std::string>& control_outputs, Graph* subgraph,
     Graph* graph) {
   // Build the call node.
-  std::string call_node_name = absl::StrCat("partitioned_call/", func_name);
+  std::string call_node_name = abslx::StrCat("partitioned_call/", func_name);
   NodeBuilder call_builder(call_node_name, "PartitionedCall");
   call_builder.AssignedDevice(host_device->name());
   call_builder.Attr(tensorflow::kNoInlineAttr, true);
@@ -258,7 +258,7 @@ StatusOr<Node*> BuildPartitionedCallOp(
   TF_ASSIGN_OR_RETURN(Node * call_node, call_builder.Finalize(graph));
 
   // Convert the subgraph to a function.
-  absl::flat_hash_set<std::string> control_ret_names(control_outputs.begin(),
+  abslx::flat_hash_set<std::string> control_ret_names(control_outputs.begin(),
                                                      control_outputs.end());
   // After graph partition, there are send ops added as new end nodes.
   // The completion of the graph requires the send ops to be executed.
@@ -268,11 +268,11 @@ StatusOr<Node*> BuildPartitionedCallOp(
     }
   }
   auto control_ret_node_names =
-      [&control_ret_names](const Node* node) -> absl::optional<std::string> {
+      [&control_ret_names](const Node* node) -> abslx::optional<std::string> {
     if (control_ret_names.contains(node->name())) {
       return node->name();
     }
-    return absl::nullopt;
+    return abslx::nullopt;
   };
 
   FunctionDef new_fdef;
@@ -291,12 +291,12 @@ StatusOr<Node*> BuildPartitionedCallOp(
 // Builds a StatefulPartitionedCallOp, and connects all PartitionedCallOps to
 // it. This StatefulPartitionedCallOp behaves as a stateful IdentityN.
 StatusOr<Node*> BuildStatefulPartitionedCallOp(
-    absl::flat_hash_map<std::string, CallNodeInputInfo>& call_node_input_info,
-    const absl::flat_hash_map<std::string, Node*>& all_partitioned_call_ops,
+    abslx::flat_hash_map<std::string, CallNodeInputInfo>& call_node_input_info,
+    const abslx::flat_hash_map<std::string, Node*>& all_partitioned_call_ops,
     const std::string& stateful_call_func_name, const Device* host_device,
     Graph* graph) {
   std::string call_node_name =
-      absl::StrCat("stateful_partitioned_call/", stateful_call_func_name);
+      abslx::StrCat("stateful_partitioned_call/", stateful_call_func_name);
   NodeBuilder call_builder(call_node_name, "StatefulPartitionedCall");
   call_builder.Attr(tensorflow::kNoInlineAttr, true);
   call_builder.AssignedDevice(host_device->name());
@@ -332,7 +332,7 @@ StatusOr<Node*> BuildStatefulPartitionedCallOp(
   // Create an _Arg node for each input.
   for (auto& node_info : call_node_input_info) {
     TF_ASSIGN_OR_RETURN(node_info.second.arg_node,
-                        NodeBuilder(absl::StrCat("arg_", node_info.second.index,
+                        NodeBuilder(abslx::StrCat("arg_", node_info.second.index,
                                                  "/", stateful_call_func_name),
                                     "_Arg")
                             .Attr("index", node_info.second.index)
@@ -346,7 +346,7 @@ StatusOr<Node*> BuildStatefulPartitionedCallOp(
   // Create the Identity Node.
   TF_ASSIGN_OR_RETURN(
       Node * identity_node,
-      NodeBuilder(absl::StrCat("identityN", "/", stateful_call_func_name),
+      NodeBuilder(abslx::StrCat("identityN", "/", stateful_call_func_name),
                   "IdentityN")
           .AssignedDevice(host_device->name())
           .Input(output_tensors)
@@ -356,7 +356,7 @@ StatusOr<Node*> BuildStatefulPartitionedCallOp(
   for (auto& node_info : call_node_input_info) {
     TF_ASSIGN_OR_RETURN(
         node_info.second.ret_node,
-        NodeBuilder(absl::StrCat("ret_", node_info.second.index, "/",
+        NodeBuilder(abslx::StrCat("ret_", node_info.second.index, "/",
                                  stateful_call_func_name),
                     "_Retval")
             .Attr("index", node_info.second.index)
@@ -381,7 +381,7 @@ StatusOr<Node*> BuildStatefulPartitionedCallOp(
 // Returns true if nodes in the `graph` are assigned to multiple devices.
 bool HasMultipleDevices(const Graph* graph) {
   bool has_multiple_devices = false;
-  absl::optional<std::string> location;
+  abslx::optional<std::string> location;
   for (const Node* node : graph->op_nodes()) {
     if (location) {
       if (*location != node->assigned_device_name()) {
@@ -440,7 +440,7 @@ StatusOr<std::unique_ptr<Graph>> InsertTransferOps(
   // Step 2: For each partition, convert the subgraph to a function and invoke
   // the function by PartitionedCallOp from the top-level graph.
 
-  absl::flat_hash_map<std::string, Node*> all_partitioned_call_ops;
+  abslx::flat_hash_map<std::string, Node*> all_partitioned_call_ops;
   std::map<std::string, OutputNodeInfo> device_to_output_info_map;
 
   for (auto& partition : partitions) {
@@ -451,16 +451,16 @@ StatusOr<std::unique_ptr<Graph>> InsertTransferOps(
     TF_RETURN_IF_ERROR(subgraph->AddFunctionLibrary(flib));
 
     FunctionNameGenerator name_generator(
-        &new_graph->flib_def(), absl::StrCat(graph_func_name, "-partition-",
+        &new_graph->flib_def(), abslx::StrCat(graph_func_name, "-partition-",
                                              GetNameFromDevice(device)));
     std::string func_name = name_generator.GetName();
 
-    absl::flat_hash_map<std::string, NodeInfo> input_nodes;
+    abslx::flat_hash_map<std::string, NodeInfo> input_nodes;
 
     OutputNodeInfo& output_node_info = device_to_output_info_map[device];
-    absl::flat_hash_map<std::string, NodeInfo>& output_nodes =
+    abslx::flat_hash_map<std::string, NodeInfo>& output_nodes =
         output_node_info.output_nodes;
-    absl::optional<std::pair<std::string, NodeInfo>>& auxiliary_output_node =
+    abslx::optional<std::pair<std::string, NodeInfo>>& auxiliary_output_node =
         output_node_info.auxiliary_output_node;
 
     // Add _Arg and _Retval nodes to the subgraph to prepare for converting it
@@ -490,7 +490,7 @@ StatusOr<std::unique_ptr<Graph>> InsertTransferOps(
   // Collect all outputs from all partitions, and update their indices to be
   // used for constructing StatefulPartitionedCallOp.
   int input_index = 0;
-  absl::flat_hash_map<std::string, CallNodeInputInfo> call_node_input_info;
+  abslx::flat_hash_map<std::string, CallNodeInputInfo> call_node_input_info;
   auto get_call_node_input_info = [&](const std::string& device,
                                       const std::string& node_name,
                                       const NodeInfo& node_info) {
@@ -515,7 +515,7 @@ StatusOr<std::unique_ptr<Graph>> InsertTransferOps(
 
   FunctionNameGenerator name_generator(
       &new_graph->flib_def(),
-      absl::StrCat(graph_func_name, "/output_aggregator"));
+      abslx::StrCat(graph_func_name, "/output_aggregator"));
   std::string stateful_call_func_name = name_generator.GetName();
   TF_ASSIGN_OR_RETURN(
       Node * stateful_call_node,

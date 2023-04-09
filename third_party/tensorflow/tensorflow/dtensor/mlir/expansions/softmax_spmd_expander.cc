@@ -38,8 +38,8 @@ namespace {
 // Assumes builder's insertion point is after input.
 StatusOr<mlir::Value> ComputeGlobalReduce(
     mlir::OpBuilder& builder, const mlir::Value& input,
-    const Layout& input_layout, const absl::flat_hash_set<int>& reduced_dims,
-    absl::string_view reduce_op, bool keep_dims) {
+    const Layout& input_layout, const abslx::flat_hash_set<int>& reduced_dims,
+    abslx::string_view reduce_op, bool keep_dims) {
   const Layout reduction_layout =
       input_layout.GetLayoutWithReducedDims(reduced_dims,
                                             /*keep_dims=*/true);
@@ -62,7 +62,7 @@ StatusOr<mlir::Value> ComputeGlobalReduce(
   }
 
   // Then an all reduce.
-  absl::flat_hash_set<std::string> reduced_sharding_specs;
+  abslx::flat_hash_set<std::string> reduced_sharding_specs;
   for (const int dim : reduced_dims)
     if (Layout::IsShardedSpec(input_layout.dim(dim)))
       reduced_sharding_specs.emplace(input_layout.sharding_spec(dim));
@@ -630,10 +630,10 @@ SoftmaxLossOpSPMDExpander::ComputeLayoutForward(
   // if one is replicated.
   // backprop is softmax(features) - labels
 
-  absl::optional<Layout> features_layout;
+  abslx::optional<Layout> features_layout;
   if (input_layouts.find(0) != input_layouts.end())
     features_layout.emplace(input_layouts.lookup(0));
-  absl::optional<Layout> labels_layout;
+  abslx::optional<Layout> labels_layout;
   if (input_layouts.find(1) != input_layouts.end())
     labels_layout.emplace(input_layouts.lookup(1));
 
@@ -678,10 +678,10 @@ SoftmaxLossOpSPMDExpander::ComputeLayoutBackward(
   const bool is_sparse =
       mlir::isa<mlir::TF::SparseSoftmaxCrossEntropyWithLogitsOp>(op);
 
-  absl::optional<Layout> loss_layout;
+  abslx::optional<Layout> loss_layout;
   if (output_layouts.find(0) != output_layouts.end())
     loss_layout.emplace(output_layouts.lookup(0));
-  absl::optional<Layout> backprop_layout;
+  abslx::optional<Layout> backprop_layout;
   if (output_layouts.find(1) != output_layouts.end())
     backprop_layout.emplace(output_layouts.lookup(1));
 

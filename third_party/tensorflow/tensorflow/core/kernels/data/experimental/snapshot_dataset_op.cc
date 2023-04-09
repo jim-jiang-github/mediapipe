@@ -139,7 +139,7 @@ class SnapshotDatasetV2Op::Dataset : public DatasetBase {
   std::unique_ptr<IteratorBase> MakeIteratorInternal(
       const string& prefix) const override {
     return std::make_unique<Iterator>(
-        Iterator::Params{this, absl::StrCat(prefix, "::Snapshot")});
+        Iterator::Params{this, abslx::StrCat(prefix, "::Snapshot")});
   }
 
   Status MakeSplitProviders(std::vector<std::unique_ptr<SplitProvider>>*
@@ -544,7 +544,7 @@ class SnapshotDatasetV2Op::Dataset : public DatasetBase {
     mutex writer_status_mu_;
     std::unique_ptr<IteratorBase> input_impl_ TF_GUARDED_BY(mu_);
 
-    absl::flat_hash_map<int64_t, std::unique_ptr<snapshot_util::AsyncWriter>>
+    abslx::flat_hash_map<int64_t, std::unique_ptr<snapshot_util::AsyncWriter>>
         writers_ TF_GUARDED_BY(mu_);
     Status writer_status_ TF_GUARDED_BY(writer_status_mu_);
     bool writers_closed_ TF_GUARDED_BY(mu_);
@@ -704,16 +704,16 @@ class SnapshotDatasetV2Op::Dataset : public DatasetBase {
         case snapshot_util::READER:
           iterator_ = std::make_unique<Reader>(
               Reader::Params{dataset(),
-                             absl::StrCat(prefix(), Reader::kIteratorName)},
+                             abslx::StrCat(prefix(), Reader::kIteratorName)},
               index_);
           break;
         case snapshot_util::WRITER:
           iterator_ = std::make_unique<Writer>(Writer::Params{
-              dataset(), absl::StrCat(prefix(), Writer::kIteratorName)});
+              dataset(), abslx::StrCat(prefix(), Writer::kIteratorName)});
           break;
         case snapshot_util::PASSTHROUGH:
           iterator_ = std::make_unique<Passthrough>(Passthrough::Params{
-              dataset(), absl::StrCat(prefix(), Passthrough::kIteratorName)});
+              dataset(), abslx::StrCat(prefix(), Passthrough::kIteratorName)});
           break;
       }
       TF_RETURN_IF_ERROR(iterator_->InitializeBase(ctx, this));
@@ -990,7 +990,7 @@ class SnapshotDatasetOp : public UnaryDatasetOpKernel {
     std::unique_ptr<IteratorBase> MakeIteratorInternal(
         const string& prefix) const override {
       return std::make_unique<Iterator>(
-          Iterator::Params{this, absl::StrCat(prefix, "::Snapshot")});
+          Iterator::Params{this, abslx::StrCat(prefix, "::Snapshot")});
     }
 
     Status MakeSplitProviders(std::vector<std::unique_ptr<SplitProvider>>*
@@ -1198,7 +1198,7 @@ class SnapshotDatasetOp : public UnaryDatasetOpKernel {
           case snapshot_util::WRITER:
             iterator_ = std::make_unique<SnapshotWriterIterator>(
                 SnapshotWriterIterator::Params{
-                    dataset(), absl::StrCat(prefix(), "WriterImpl")},
+                    dataset(), abslx::StrCat(prefix(), "WriterImpl")},
                 hash_dir_, run_id);
             break;
           case snapshot_util::READER:
@@ -1226,13 +1226,13 @@ class SnapshotDatasetOp : public UnaryDatasetOpKernel {
             }
             iterator_ = std::make_unique<SnapshotReaderIterator>(
                 SnapshotReaderIterator::Params{
-                    dataset(), absl::StrCat(prefix(), "ReaderImpl")},
+                    dataset(), abslx::StrCat(prefix(), "ReaderImpl")},
                 hash_dir_, run_id, metadata.version());
             break;
           case snapshot_util::PASSTHROUGH:
             iterator_ = std::make_unique<SnapshotPassthroughIterator>(
                 SnapshotPassthroughIterator::Params{
-                    dataset(), absl::StrCat(prefix(), "PassthroughImpl")});
+                    dataset(), abslx::StrCat(prefix(), "PassthroughImpl")});
             break;
         }
         TF_RETURN_IF_ERROR(iterator_->InitializeBase(ctx, this));
@@ -1269,7 +1269,7 @@ class SnapshotDatasetOp : public UnaryDatasetOpKernel {
           // Get all the files in the run_dir.
           std::vector<std::string> filenames_str;
           TF_RETURN_IF_ERROR(ctx->env()->GetMatchingPaths(
-              absl::StrCat(absl::string_view(run_dir_), "/*"), &filenames_str));
+              abslx::StrCat(abslx::string_view(run_dir_), "/*"), &filenames_str));
           filenames_.resize(filenames_str.size());
           std::copy(filenames_str.begin(), filenames_str.end(),
                     filenames_.begin());
@@ -1299,7 +1299,7 @@ class SnapshotDatasetOp : public UnaryDatasetOpKernel {
         Status GetNextInternal(IteratorContext* ctx,
                                std::vector<Tensor>* out_tensors,
                                bool* end_of_sequence) override {
-          absl::Time start = absl::Now();
+          abslx::Time start = abslx::Now();
           mutex_lock l(mu_);
           if (!background_threads_started_) {
             for (int i = 0; i < dataset()->num_reader_threads_; ++i) {
@@ -1324,11 +1324,11 @@ class SnapshotDatasetOp : public UnaryDatasetOpKernel {
           const auto& stats_aggregator = ctx->stats_aggregator();
           if (stats_aggregator) {
             stats_aggregator->AddScalar(
-                absl::StrCat(dataset()->node_name(), kSeparator,
+                abslx::StrCat(dataset()->node_name(), kSeparator,
                              kSnapshotReadElements),
                 static_cast<float>(num_elements_read_), elements_produced_);
             stats_aggregator->AddScalar(
-                absl::StrCat(dataset()->node_name(), kSeparator,
+                abslx::StrCat(dataset()->node_name(), kSeparator,
                              "snapshot_reader_buffer_size"),
                 static_cast<float>(buffer_.size()), elements_produced_);
           }
@@ -1342,7 +1342,7 @@ class SnapshotDatasetOp : public UnaryDatasetOpKernel {
               {
                 profiler::TraceMe activity(
                     [&]() {
-                      return absl::StrCat(prefix(), kSeparator, kBookkeeping);
+                      return abslx::StrCat(prefix(), kSeparator, kBookkeeping);
                     },
                     profiler::TraceMeLevel::kInfo);
                 // Printing some statistics along the way.
@@ -1350,15 +1350,15 @@ class SnapshotDatasetOp : public UnaryDatasetOpKernel {
                 for (int i = 0; i < out_tensors->size(); ++i) {
                   num_bytes += (*out_tensors)[i].TotalBytes();
                 }
-                absl::Time end = absl::Now();
-                absl::Duration d = end - start;
-                time_spent_micros_ += absl::ToInt64Microseconds(d);
+                abslx::Time end = abslx::Now();
+                abslx::Duration d = end - start;
+                time_spent_micros_ += abslx::ToInt64Microseconds(d);
                 kbytes_read_ += static_cast<double>(num_bytes) / 1024.0;
                 float read_throughput =
                     (kbytes_read_ / 1024.0) / (time_spent_micros_ / 1000000.0);
                 if (stats_aggregator) {
                   stats_aggregator->AddScalar(
-                      absl::StrCat(dataset()->node_name(), kSeparator,
+                      abslx::StrCat(dataset()->node_name(), kSeparator,
                                    kSnapshotReadThroughput),
                       read_throughput, elements_produced_);
                 }
@@ -1511,7 +1511,7 @@ class SnapshotDatasetOp : public UnaryDatasetOpKernel {
             Status s = reader->ReadTensors(&read_tensors);
             if (s.ok()) {
               profiler::TraceMe activity(
-                  [&]() { return absl::StrCat(prefix(), kSeparator, kParse); },
+                  [&]() { return abslx::StrCat(prefix(), kSeparator, kParse); },
                   profiler::TraceMeLevel::kInfo);
               BufferElement elem;
               elem.value = std::move(read_tensors);
@@ -1691,7 +1691,7 @@ class SnapshotDatasetOp : public UnaryDatasetOpKernel {
         Status GetNextInternal(IteratorContext* ctx,
                                std::vector<Tensor>* out_tensors,
                                bool* end_of_sequence) override {
-          absl::Time start = absl::Now();
+          abslx::Time start = abslx::Now();
 
           bool first_call;
           bool is_restored;
@@ -1749,7 +1749,7 @@ class SnapshotDatasetOp : public UnaryDatasetOpKernel {
           {
             profiler::TraceMe activity(
                 [&]() {
-                  return absl::StrCat(prefix(), kSeparator, kBookkeeping);
+                  return abslx::StrCat(prefix(), kSeparator, kBookkeeping);
                 },
                 profiler::TraceMeLevel::kInfo);
 
@@ -1763,25 +1763,25 @@ class SnapshotDatasetOp : public UnaryDatasetOpKernel {
             const auto& stats_aggregator = ctx->stats_aggregator();
             if (stats_aggregator) {
               stats_aggregator->AddScalar(
-                  absl::StrCat(dataset()->node_name(), kSeparator,
+                  abslx::StrCat(dataset()->node_name(), kSeparator,
                                kSnapshotWrittenElements),
                   static_cast<float>(num_elements_written_),
                   elements_produced_);
               stats_aggregator->AddScalar(
-                  absl::StrCat(dataset()->node_name(), kSeparator,
+                  abslx::StrCat(dataset()->node_name(), kSeparator,
                                "snapshot_writer_buffer_size"),
                   static_cast<float>(buffer_.size()), elements_produced_);
             }
 
-            absl::Time end = absl::Now();
-            absl::Duration d = end - start;
-            time_spent_micros_ += absl::ToInt64Microseconds(d);
+            abslx::Time end = abslx::Now();
+            abslx::Duration d = end - start;
+            time_spent_micros_ += abslx::ToInt64Microseconds(d);
             bytes_produced_ += num_bytes;
             float write_throughput = (bytes_produced_ * 1000000.0) /
                                      (time_spent_micros_ * 1024.0 * 1024.0);
             if (stats_aggregator) {
               stats_aggregator->AddScalar(
-                  absl::StrCat(dataset()->node_name(), kSeparator,
+                  abslx::StrCat(dataset()->node_name(), kSeparator,
                                kSnapshotWriteThroughput),
                   write_throughput, elements_produced_);
             }
@@ -1917,13 +1917,13 @@ class SnapshotDatasetOp : public UnaryDatasetOpKernel {
           // next_file_index_;
           std::vector<std::string> filenames;
           TF_RETURN_IF_ERROR(ctx->env()->GetMatchingPaths(
-              absl::StrCat(absl::string_view(run_dir_), "/*"), &filenames));
+              abslx::StrCat(abslx::string_view(run_dir_), "/*"), &filenames));
           std::sort(filenames.begin(), filenames.end());
           std::string final_filename = filenames.back();
           std::vector<std::string> split_filename =
-              absl::StrSplit(final_filename, '/');
+              abslx::StrSplit(final_filename, '/');
           std::vector<std::string> split_snapshot_filename =
-              absl::StrSplit(split_filename.back(), '.');
+              abslx::StrSplit(split_filename.back(), '.');
           std::string max_num_str = split_snapshot_filename[0];
           uint64 max_num;
           if (!strings::safe_strtou64(max_num_str, &max_num)) {
@@ -2016,7 +2016,7 @@ class SnapshotDatasetOp : public UnaryDatasetOpKernel {
                                  bool* end_of_processing) {
           profiler::TraceMe activity(
               [&]() {
-                return absl::StrCat(prefix(), kSeparator, kProcessOneElement);
+                return abslx::StrCat(prefix(), kSeparator, kProcessOneElement);
               },
               profiler::TraceMeLevel::kInfo);
           bool cancelled = false;

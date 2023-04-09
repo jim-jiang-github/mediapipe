@@ -39,7 +39,7 @@ class MatMulBCast {
     const Vec y_resized(y.begin(), y.end() - 2);
 
     batch_bcast_ =
-        absl::make_unique<BCast>(std::move(x_resized), std::move(y_resized));
+        abslx::make_unique<BCast>(std::move(x_resized), std::move(y_resized));
     if (!batch_bcast_->IsValid()) {
       // Set broadcasting_required_ to true to make IsValid() return false;
       broadcasting_required_ = true;

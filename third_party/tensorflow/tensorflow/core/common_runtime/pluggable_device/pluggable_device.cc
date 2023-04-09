@@ -207,7 +207,7 @@ Status PluggableDevice::Init(const SessionOptions& options) {
   string device_thread_mode;
   TF_RETURN_IF_ERROR(ReadStringFromEnvVar("TF_GPU_THREAD_MODE", "global",
                                           &device_thread_mode));
-  device_thread_mode = absl::AsciiStrToLower(device_thread_mode);
+  device_thread_mode = abslx::AsciiStrToLower(device_thread_mode);
   if (device_thread_mode != "global") {
     int64_t device_thread_count = -1;
     // Default to two threads. One for device compute and another for memory

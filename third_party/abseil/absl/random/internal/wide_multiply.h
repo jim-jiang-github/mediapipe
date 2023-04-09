@@ -30,7 +30,7 @@
 #include "absl/numeric/int128.h"
 #include "absl/random/internal/traits.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace random_internal {
 
@@ -38,14 +38,14 @@ namespace random_internal {
 // MultiplyU64ToU128 multiplies two 64-bit values to a 128-bit value.
 // If an intrinsic is available, it is used, otherwise use native 32-bit
 // multiplies to construct the result.
-inline absl::uint128 MultiplyU64ToU128(uint64_t a, uint64_t b) {
+inline abslx::uint128 MultiplyU64ToU128(uint64_t a, uint64_t b) {
 #if defined(ABSL_HAVE_INTRINSIC_INT128)
-  return absl::uint128(static_cast<__uint128_t>(a) * b);
+  return abslx::uint128(static_cast<__uint128_t>(a) * b);
 #elif defined(ABSL_INTERNAL_USE_UMUL128)
   // uint64_t * uint64_t => uint128 multiply using imul intrinsic on MSVC.
   uint64_t high = 0;
   const uint64_t low = _umul128(a, b, &high);
-  return absl::MakeUint128(high, low);
+  return abslx::MakeUint128(high, low);
 #else
   // uint128(a) * uint128(b) in emulated mode computes a full 128-bit x 128-bit
   // multiply.  However there are many cases where that is not necessary, and it
@@ -66,7 +66,7 @@ inline absl::uint128 MultiplyU64ToU128(uint64_t a, uint64_t b) {
                              static_cast<uint32_t>(c32b)) >>
                             32);
 
-  return absl::MakeUint128(c64 + (c32a >> 32) + (c32b >> 32) + carry,
+  return abslx::MakeUint128(c64 + (c32a >> 32) + (c32b >> 32) + carry,
                            c00 + (c32a << 32) + (c32b << 32));
 #endif
 }
@@ -93,19 +93,19 @@ struct wide_multiply {
 template <>
 struct wide_multiply<uint64_t> {
   using input_type = uint64_t;
-  using result_type = absl::uint128;
+  using result_type = abslx::uint128;
 
   static result_type multiply(uint64_t a, uint64_t b) {
     return MultiplyU64ToU128(a, b);
   }
 
-  static uint64_t hi(result_type r) { return absl::Uint128High64(r); }
-  static uint64_t lo(result_type r) { return absl::Uint128Low64(r); }
+  static uint64_t hi(result_type r) { return abslx::Uint128High64(r); }
+  static uint64_t lo(result_type r) { return abslx::Uint128Low64(r); }
 };
 #endif
 
 }  // namespace random_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_RANDOM_INTERNAL_WIDE_MULTIPLY_H_

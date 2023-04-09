@@ -75,7 +75,7 @@ std::unique_ptr<WorkQueueInterface> WrapDefaultWorkQueue(
 
 // A helper function that wraps tasks with traceme events.
 template <typename Callable>
-tfrt::TaskFunction WrapWork(int64_t id, absl::string_view name,
+tfrt::TaskFunction WrapWork(int64_t id, abslx::string_view name,
                             Callable&& work) {
   tensorflow::Context context(tensorflow::ContextKind::kThread);
   return tfrt::TaskFunction([id, name = std::string(name),

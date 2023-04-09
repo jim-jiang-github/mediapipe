@@ -15,14 +15,14 @@ DEFINE_SUBGRAPH(ObjectTrackingSubgraphCpu, "../../mediapipe/graphs/tracking/subg
 DEFINE_SUBGRAPH(RendererSubgraphCpu, "../../mediapipe/graphs/tracking/subgraphs/renderer_cpu.pbtxt");
 }
 
-absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
+abslx::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
   mediapipe::CalculatorGraphConfig config;
   if (read_config_from_pbtxt(config, calculator_graph_config_file)) {
     download_mediapipe_asset_from_GCS("../mediapipe/models/ssdlite_object_detection.tflite");
     download_mediapipe_asset_from_GCS("../mediapipe/models/ssdlite_object_detection_labelmap.txt");
     return graph.Initialize(config);
   }
-  return absl::NotFoundError(calculator_graph_config_file);
+  return abslx::NotFoundError(calculator_graph_config_file);
 }
 
 // the program entrance point, the main().

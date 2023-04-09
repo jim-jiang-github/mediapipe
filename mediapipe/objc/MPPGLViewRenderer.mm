@@ -84,7 +84,7 @@
   _GTMDevAssert(err == kCVReturnSuccess,
                 @"CVOpenGLESTextureCacheCreate failed: %d", err);
 
-  renderer_ = absl::make_unique<mediapipe::QuadRenderer>();
+  renderer_ = abslx::make_unique<mediapipe::QuadRenderer>();
   auto status = renderer_->GlSetup();
   _GTMDevAssert(status.ok(),
                 @"renderer setup failed: %@", [NSError gus_errorWithStatus:status]);

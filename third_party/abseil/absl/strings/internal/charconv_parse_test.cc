@@ -22,10 +22,10 @@
 #include "absl/base/internal/raw_logging.h"
 #include "absl/strings/str_cat.h"
 
-using absl::chars_format;
-using absl::strings_internal::FloatType;
-using absl::strings_internal::ParsedFloat;
-using absl::strings_internal::ParseFloat;
+using abslx::chars_format;
+using abslx::strings_internal::FloatType;
+using abslx::strings_internal::ParsedFloat;
+using abslx::strings_internal::ParseFloat;
 
 namespace {
 
@@ -41,7 +41,7 @@ namespace {
 // the location of the extended NaN string.  For numbers, this is the location
 // of the full, over-large mantissa.
 template <int base>
-void ExpectParsedFloat(std::string s, absl::chars_format format_flags,
+void ExpectParsedFloat(std::string s, abslx::chars_format format_flags,
                        FloatType expected_type, uint64_t expected_mantissa,
                        int expected_exponent,
                        int expected_literal_exponent = -999) {
@@ -56,7 +56,7 @@ void ExpectParsedFloat(std::string s, absl::chars_format format_flags,
     begin_subrange = static_cast<int>(open_bracket_pos);
     s.replace(open_bracket_pos, 1, "");
     std::string::size_type close_bracket_pos = s.find(']');
-    ABSL_RAW_CHECK(close_bracket_pos != absl::string_view::npos,
+    ABSL_RAW_CHECK(close_bracket_pos != abslx::string_view::npos,
                    "Test input contains [ without matching ]");
     end_subrange = static_cast<int>(close_bracket_pos);
     s.replace(close_bracket_pos, 1, "");
@@ -98,7 +98,7 @@ void ExpectParsedFloat(std::string s, absl::chars_format format_flags,
 // Input string `s` must contain a '$' character.  It marks the end of the
 // characters that were consumed by the match.
 template <int base>
-void ExpectNumber(std::string s, absl::chars_format format_flags,
+void ExpectNumber(std::string s, abslx::chars_format format_flags,
                   uint64_t expected_mantissa, int expected_exponent,
                   int expected_literal_exponent = -999) {
   ExpectParsedFloat<base>(std::move(s), format_flags, FloatType::kNumber,
@@ -110,7 +110,7 @@ void ExpectNumber(std::string s, absl::chars_format format_flags,
 //
 // This tests against both number bases, since infinities and NaNs have
 // identical representations in both modes.
-void ExpectSpecial(const std::string& s, absl::chars_format format_flags,
+void ExpectSpecial(const std::string& s, abslx::chars_format format_flags,
                    FloatType type) {
   ExpectParsedFloat<10>(s, format_flags, type, 0, 0);
   ExpectParsedFloat<16>(s, format_flags, type, 0, 0);
@@ -118,7 +118,7 @@ void ExpectSpecial(const std::string& s, absl::chars_format format_flags,
 
 // Check that a given input string is not matched by Float.
 template <int base>
-void ExpectFailedParse(absl::string_view s, absl::chars_format format_flags) {
+void ExpectFailedParse(abslx::string_view s, abslx::chars_format format_flags) {
   ParsedFloat parsed =
       ParseFloat<base>(s.data(), s.data() + s.size(), format_flags);
   EXPECT_EQ(parsed.end, nullptr);

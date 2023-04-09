@@ -64,7 +64,7 @@ class HloModuleTest : public HloTestBase {
 
   // Creates a computation which calls the given zero-parameter computations.
   std::unique_ptr<HloComputation> CreateCallComputation(
-      absl::Span<HloComputation* const> computations) {
+      abslx::Span<HloComputation* const> computations) {
     auto builder = HloComputation::Builder("Call");
     for (auto computation : computations) {
       builder.AddInstruction(
@@ -442,7 +442,7 @@ ENTRY ReduceR3ToR2.v3 {
   for (const HloComputation* computation_orig : module->computations()) {
     const HloComputation* computation_copy = *computation_copy_it++;
     EXPECT_EQ(computation_orig->unique_id(), computation_copy->unique_id())
-        << absl::StrFormat(
+        << abslx::StrFormat(
                "ID of original computation %s != ID of deserialized "
                "computation %s: %d != %d",
                computation_orig->name(), computation_copy->name(),
@@ -453,7 +453,7 @@ ENTRY ReduceR3ToR2.v3 {
          computation_orig->instructions()) {
       const HloInstruction* instruction_copy = *instruction_copy_it++;
       EXPECT_EQ(instruction_orig->unique_id(), instruction_copy->unique_id())
-          << absl::StrFormat(
+          << abslx::StrFormat(
                  "ID of original instruction %s != ID of deserialized "
                  "instruction %s: %d != %d",
                  instruction_orig->name(), instruction_copy->name(),
@@ -514,7 +514,7 @@ TEST_F(HloModuleTest, VerifyReplaceComputationsWithSortOp) {
   EXPECT_EQ(root->to_apply()->root_instruction()->comparison_direction(),
             ComparisonDirection::kLt);
 
-  absl::flat_hash_map<HloComputation*, HloComputation*> replacement;
+  abslx::flat_hash_map<HloComputation*, HloComputation*> replacement;
   replacement[root->to_apply()] = new_comp;
   module->ReplaceComputations(replacement);
 
@@ -527,7 +527,7 @@ TEST_F(HloModuleTest, OneComputationAllAllowed) {
   auto module = CreateNewVerifiedModule();
   auto computation = module->AddEntryComputation(CreateConstantComputation());
 
-  absl::flat_hash_set<HloComputation*> allowList = {computation};
+  abslx::flat_hash_set<HloComputation*> allowList = {computation};
   EXPECT_THAT(
       module->MakeComputationPostOrder(/*execution_threads=*/{}, allowList),
       ::testing::ElementsAre(computation));
@@ -538,7 +538,7 @@ TEST_F(HloModuleTest, OneComputationAllFiltered) {
   auto module = CreateNewVerifiedModule();
   module->AddEntryComputation(CreateConstantComputation());
 
-  absl::flat_hash_set<HloComputation*> allowList = {};
+  abslx::flat_hash_set<HloComputation*> allowList = {};
   module->MakeComputationPostOrder(/*execution_threads=*/{}, allowList);
   EXPECT_THAT(
       module->MakeComputationPostOrder(/*execution_threads=*/{}, allowList),
@@ -557,7 +557,7 @@ TEST_F(HloModuleTest, DiamondComputationsPostOrderAllAllowed) {
   auto computation4 = module->AddEntryComputation(
       CreateCallComputation({computation2, computation3}));
 
-  absl::flat_hash_set<HloComputation*> allowList = {computation1, computation2,
+  abslx::flat_hash_set<HloComputation*> allowList = {computation1, computation2,
                                                     computation3, computation4};
   auto post_order =
       module->MakeComputationPostOrder(/*execution_threads=*/{}, allowList);
@@ -580,7 +580,7 @@ TEST_F(HloModuleTest, DiamondComputationsPostOrderMiddleFiltered) {
   auto computation4 = module->AddEntryComputation(
       CreateCallComputation({computation2, computation3}));
 
-  absl::flat_hash_set<HloComputation*> allowList = {computation1, computation4};
+  abslx::flat_hash_set<HloComputation*> allowList = {computation1, computation4};
   auto post_order =
       module->MakeComputationPostOrder(/*execution_threads=*/{}, allowList);
   EXPECT_THAT(post_order,
@@ -599,7 +599,7 @@ TEST_F(HloModuleTest, DiamondComputationsPostOrderAllFiltered) {
   module->AddEntryComputation(
       CreateCallComputation({computation2, computation3}));
 
-  absl::flat_hash_set<HloComputation*> allowList = {};
+  abslx::flat_hash_set<HloComputation*> allowList = {};
   auto post_order =
       module->MakeComputationPostOrder(/*execution_threads=*/{}, allowList);
   EXPECT_THAT(

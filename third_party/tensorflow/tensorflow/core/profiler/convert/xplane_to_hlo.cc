@@ -52,12 +52,12 @@ Status GetHloProtoFromMultiXSpaceAndSaveToFile(
     hlo_proto_map.AddHloProtosFromXSpace(xspace);
   }
 
-  absl::string_view dir_name = tensorflow::io::Dirname(xspace_file_names[0]);
-  std::vector<absl::string_view> module_list = hlo_proto_map.GetModuleList();
+  abslx::string_view dir_name = tensorflow::io::Dirname(xspace_file_names[0]);
+  std::vector<abslx::string_view> module_list = hlo_proto_map.GetModuleList();
   // Write an empty identifier if there is no HLO module.
   if (module_list.empty()) {
     std::string file_name = ProfilerJoinPath(
-        dir_name, absl::StrCat(kNoModuleIdentifier, kHloProtoSuffix));
+        dir_name, abslx::StrCat(kNoModuleIdentifier, kHloProtoSuffix));
     xla::HloProto empty_hlo;
     TF_RETURN_IF_ERROR(tensorflow::WriteBinaryProto(tensorflow::Env::Default(),
                                                     file_name, empty_hlo));
@@ -65,14 +65,14 @@ Status GetHloProtoFromMultiXSpaceAndSaveToFile(
   }
 
   // Save HLO protos to the same directory as XSpaces.
-  for (const absl::string_view module_name : module_list) {
+  for (const abslx::string_view module_name : module_list) {
     auto hlo_proto_or = hlo_proto_map.GetHloProtoByModuleName(module_name);
     if (!hlo_proto_or.ok()) {
       return Status(tensorflow::error::INTERNAL,
                     hlo_proto_or.status().message());
     }
     std::string file_name =
-        ProfilerJoinPath(dir_name, absl::StrCat(module_name, kHloProtoSuffix));
+        ProfilerJoinPath(dir_name, abslx::StrCat(module_name, kHloProtoSuffix));
     TF_RETURN_IF_ERROR(tensorflow::WriteBinaryProto(
         tensorflow::Env::Default(), file_name, *hlo_proto_or.value()));
   }

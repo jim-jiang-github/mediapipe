@@ -238,7 +238,7 @@ Status NodeDefBuilder::Finalize(NodeDef* node_def, bool consume) {
       return errors::InvalidArgument(
           errors_ptr->size(), " errors while building NodeDef '",
           node_def_.name(), "' using ", SummarizeOpDef(*op_def_), ":\n",
-          absl::StrJoin(*errors_ptr, "\n"));
+          abslx::StrJoin(*errors_ptr, "\n"));
     }
   } else {
     NodeDef node_def_backup;

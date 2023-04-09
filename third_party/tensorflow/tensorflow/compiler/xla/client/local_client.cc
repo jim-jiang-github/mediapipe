@@ -117,7 +117,7 @@ Status LocalExecutable::ValidateExecutionOptions(
 }
 
 StatusOr<std::pair<ServiceExecutableRunOptions, StreamPool::Ptr>>
-LocalExecutable::RunHelper(const absl::Span<const Shape* const> argument_shapes,
+LocalExecutable::RunHelper(const abslx::Span<const Shape* const> argument_shapes,
                            ExecutableRunOptions run_options) {
   const ComputationLayout& computation_layout =
       executable_->module_config().entry_computation_layout();
@@ -173,7 +173,7 @@ LocalExecutable::RunHelper(const absl::Span<const Shape* const> argument_shapes,
 }
 
 StatusOr<ScopedShapedBuffer> LocalExecutable::Run(
-    const absl::Span<const ShapedBuffer* const> arguments,
+    const abslx::Span<const ShapedBuffer* const> arguments,
     ExecutableRunOptions run_options) {
   std::vector<const Shape*> argument_shapes;
   argument_shapes.reserve(arguments.size());
@@ -201,7 +201,7 @@ StatusOr<ExecutionOutput> LocalExecutable::Run(
 
 static std::shared_ptr<HloSnapshot> DumpArguments(
     const Backend* backend, const Executable* executable,
-    const absl::Span<const ShapedBuffer* const> arguments, se::Stream* stream) {
+    const abslx::Span<const ShapedBuffer* const> arguments, se::Stream* stream) {
   auto snapshot = std::make_shared<HloSnapshot>();
   snapshot->set_execution_platform(backend->platform()->Name());
   *snapshot->mutable_hlo() = *executable->hlo_proto();
@@ -241,7 +241,7 @@ static void DumpOutputsAndSaveSnapshot(const Backend* backend,
 }
 
 StatusOr<ScopedShapedBuffer> LocalExecutable::RunAsync(
-    const absl::Span<const ShapedBuffer* const> arguments,
+    const abslx::Span<const ShapedBuffer* const> arguments,
     ExecutableRunOptions run_options) {
   std::vector<const Shape*> argument_shapes;
   argument_shapes.reserve(arguments.size());
@@ -281,7 +281,7 @@ static ShapedBuffer MaybeOwningShapeTreeToShapedBuffer(
 }
 
 StatusOr<ExecutionOutput> LocalExecutable::RunAsync(
-    absl::Span<Shape const* const> argument_host_shapes,
+    abslx::Span<Shape const* const> argument_host_shapes,
     std::vector<ExecutionInput> arguments, ExecutableRunOptions run_options) {
   if (argument_host_shapes.size() != arguments.size()) {
     return InvalidArgument(
@@ -386,7 +386,7 @@ static StatusOr<ExecutableBuildOptions> UpdateBuildOptions(
 
 StatusOr<std::vector<std::unique_ptr<LocalExecutable>>> LocalClient::Compile(
     const XlaComputation& computation,
-    const absl::Span<const Shape* const> argument_layouts,
+    const abslx::Span<const Shape* const> argument_layouts,
     const ExecutableBuildOptions& options) {
   TF_ASSIGN_OR_RETURN(ExecutableBuildOptions updated_options,
                       UpdateBuildOptions(options, default_device_ordinal()));
@@ -409,7 +409,7 @@ StatusOr<std::vector<std::unique_ptr<LocalExecutable>>> LocalClient::Compile(
 StatusOr<std::vector<std::unique_ptr<AotCompilationResult>>>
 LocalClient::CompileAheadOfTime(
     const XlaComputation& computation,
-    const absl::Span<const Shape* const> argument_layouts,
+    const abslx::Span<const Shape* const> argument_layouts,
     const ExecutableBuildOptions& options) {
   TF_ASSIGN_OR_RETURN(ExecutableBuildOptions updated_options,
                       UpdateBuildOptions(options, default_device_ordinal()));
@@ -509,7 +509,7 @@ StatusOr<TransferToServerResponse> LocalClient::TransferToLocalServer(
   TF_ASSIGN_OR_RETURN(*result.mutable_data(),
                       local_service_->RegisterReplicatedBuffers(
                           std::move(replicated_buffer),
-                          absl::StrCat("TransferToServer literal of shape ",
+                          abslx::StrCat("TransferToServer literal of shape ",
                                        ::xla::ShapeUtil::HumanString(shape))));
 
   return result;

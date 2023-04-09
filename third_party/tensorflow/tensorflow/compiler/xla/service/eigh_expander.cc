@@ -148,7 +148,7 @@ void ApplyJacobiRotationOverRows(Eigh2x2 rotation, XlaOp& tl, XlaOp& tr,
                                  XlaOp& bl, XlaOp& br) {
   Shape shape = tl.builder()->GetShape(tl).ValueOrDie();
   std::vector<int64_t> broadcast_dims(shape.dimensions().size() - 1);
-  absl::c_iota(broadcast_dims, 0);
+  abslx::c_iota(broadcast_dims, 0);
   auto c = BroadcastInDim(rotation.c, shape.dimensions(), broadcast_dims);
   auto s = BroadcastInDim(rotation.s, shape.dimensions(), broadcast_dims);
 
@@ -168,7 +168,7 @@ void ApplyJacobiRotationOverCols(Eigh2x2 rotation, XlaOp& tl, XlaOp& tr,
                                  XlaOp& bl, XlaOp& br) {
   Shape shape = tl.builder()->GetShape(tl).ValueOrDie();
   std::vector<int64_t> broadcast_dims(shape.dimensions().size() - 1);
-  absl::c_iota(broadcast_dims, 0);
+  abslx::c_iota(broadcast_dims, 0);
   broadcast_dims.back() = shape.dimensions().size() - 1;
   auto c = BroadcastInDim(rotation.c, shape.dimensions(), broadcast_dims);
   auto s = BroadcastInDim(rotation.s, shape.dimensions(), broadcast_dims);
@@ -298,11 +298,11 @@ StatusOr<FrobeniusNorms> ComputeFrobeniusNorms(XlaOp w_tl, XlaOp w_tr,
   return norms;
 }
 
-StatusOr<std::vector<XlaOp>> Sweeps(absl::Span<const XlaOp> initial_values,
+StatusOr<std::vector<XlaOp>> Sweeps(abslx::Span<const XlaOp> initial_values,
                                     int64_t n, int max_iters,
                                     PrimitiveType index_type,
                                     XlaBuilder* builder) {
-  auto while_cond_fn = [&](absl::Span<const XlaOp> values,
+  auto while_cond_fn = [&](abslx::Span<const XlaOp> values,
                            XlaBuilder* cond_builder) -> StatusOr<XlaOp> {
     auto iter_cond = Lt(values[0], ScalarLike(values[0], max_iters));
 
@@ -320,14 +320,14 @@ StatusOr<std::vector<XlaOp>> Sweeps(absl::Span<const XlaOp> initial_values,
   };
 
   auto while_body_fn =
-      [&](absl::Span<const XlaOp> values,
+      [&](abslx::Span<const XlaOp> values,
           XlaBuilder* body_builder) -> StatusOr<std::vector<XlaOp>> {
     std::vector<XlaOp> sweep_values(values.begin() + 1, values.end());
     TF_ASSIGN_OR_RETURN(
         sweep_values,
         ForEachIndex(
             n - 1, S32,
-            [&](XlaOp iter, absl::Span<const XlaOp> values,
+            [&](XlaOp iter, abslx::Span<const XlaOp> values,
                 XlaBuilder* builder) -> StatusOr<std::vector<XlaOp>> {
               XlaOp tol, w_tl, w_tr, w_bl, w_br, v_tl, v_tr, v_bl, v_br;
               std::tie(tol, w_tl, w_tr, w_bl, w_br, v_tl, v_tr, v_bl, v_br) =
@@ -545,7 +545,7 @@ bool EighExpander::InstructionMatchesPattern(HloInstruction* instruction) {
 StatusOr<HloInstruction*> EighExpander::ExpandInstruction(
     HloInstruction* instruction) {
   const std::string name =
-      absl::StrFormat("xla.%s_%s", instruction->custom_call_target(),
+      abslx::StrFormat("xla.%s_%s", instruction->custom_call_target(),
                       instruction->operand(0)->shape().ToString());
 
   HloModule* module = instruction->parent()->parent();
@@ -568,15 +568,15 @@ StatusOr<HloInstruction*> EighExpander::ExpandInstruction(
     XlaOp a = Parameter(&builder, 0, instruction->operand(0)->shape(), "a");
 
     std::vector<std::string> config_strs =
-        absl::StrSplit(instruction->raw_backend_config_string(), ',');
+        abslx::StrSplit(instruction->raw_backend_config_string(), ',');
     int lower;
     int64_t max_iter;
     int sort_eigenvalues;
     float tol;
-    if (config_strs.size() != 4 || !absl::SimpleAtoi(config_strs[0], &lower) ||
-        !absl::SimpleAtoi(config_strs[1], &sort_eigenvalues) ||
-        !absl::SimpleAtoi(config_strs[2], &max_iter) ||
-        !absl::SimpleAtof(config_strs[3], &tol)) {
+    if (config_strs.size() != 4 || !abslx::SimpleAtoi(config_strs[0], &lower) ||
+        !abslx::SimpleAtoi(config_strs[1], &sort_eigenvalues) ||
+        !abslx::SimpleAtoi(config_strs[2], &max_iter) ||
+        !abslx::SimpleAtof(config_strs[3], &tol)) {
       return Internal("Unable to parse arguments to Eigh custom call, got: %s",
                       instruction->raw_backend_config_string());
     }

@@ -20,7 +20,7 @@
 #include "absl/base/config.h"
 #include "absl/base/macros.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
@@ -125,6 +125,6 @@ inline uint64_t ExponentialBiased::NextRandom(uint64_t rnd) {
 
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_BASE_INTERNAL_EXPONENTIAL_BIASED_H_

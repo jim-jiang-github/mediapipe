@@ -20,9 +20,9 @@ limitations under the License.
 
 namespace tensorflow {
 
-absl::Duration NoOpCostMeasurement::GetTotalCost() { return absl::Duration(); }
+abslx::Duration NoOpCostMeasurement::GetTotalCost() { return abslx::Duration(); }
 
-absl::string_view NoOpCostMeasurement::GetCostType() const {
+abslx::string_view NoOpCostMeasurement::GetCostType() const {
   return kNoOpCostName;
 }
 

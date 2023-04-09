@@ -177,7 +177,7 @@ void OpRegistry::Export(bool include_internal, OpList* ops) const {
   out->Reserve(sorted.size());
 
   for (const auto& item : sorted) {
-    if (include_internal || !absl::StartsWith(item.first, "_")) {
+    if (include_internal || !abslx::StartsWith(item.first, "_")) {
       *out->Add() = item.second->op_def;
     }
   }

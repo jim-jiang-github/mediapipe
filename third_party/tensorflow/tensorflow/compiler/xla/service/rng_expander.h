@@ -22,7 +22,7 @@ namespace xla {
 
 class RngExpander : public OpExpanderPass {
  public:
-  absl::string_view name() const override { return "rng-expander"; }
+  abslx::string_view name() const override { return "rng-expander"; }
 
  protected:
   bool InstructionMatchesPattern(HloInstruction* instruction) override;
@@ -32,7 +32,7 @@ class RngExpander : public OpExpanderPass {
  private:
   // Cache RNG computations based on the distribution, output shape and shapes
   // of the first and second operand.
-  absl::flat_hash_map<std::tuple<RandomDistribution, Shape, Shape, Shape>,
+  abslx::flat_hash_map<std::tuple<RandomDistribution, Shape, Shape, Shape>,
                       HloComputation*>
       expanded_rng_instructions_;
 };

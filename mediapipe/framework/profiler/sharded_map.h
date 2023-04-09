@@ -61,7 +61,7 @@ class ShardedMap {
   // Returns 1 if the container includes a certain key.
   inline size_t count(const Key& key) const {
     size_t shard = Index(key);
-    absl::MutexLock lock(&mutexes_[shard]);
+    abslx::MutexLock lock(&mutexes_[shard]);
     return maps_[shard].count(key);
   }
 
@@ -191,7 +191,7 @@ class ShardedMap {
   std::vector<Map> maps_;
 
   // One mutex for each key shard.
-  mutable std::vector<absl::Mutex> mutexes_;
+  mutable std::vector<abslx::Mutex> mutexes_;
 
   // The total count of entries.
   std::atomic<int> size_;

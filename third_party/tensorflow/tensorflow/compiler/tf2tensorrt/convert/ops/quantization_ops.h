@@ -58,9 +58,9 @@ using PerChannelQuantizationScales = QuantizationScales<float, ChannelDimSize>;
 template <typename T, size_t N>
 std::ostream& operator<<(std::ostream& os,
                          const QuantizationScales<T, N>& scales) {
-  os << absl::StrFormat("QuantizationScales[quantize={%s},dequantize={%s}]",
-                        absl::StrJoin(scales.quantize_scale, ","),
-                        absl::StrJoin(scales.dequantize_scale, ","));
+  os << abslx::StrFormat("QuantizationScales[quantize={%s},dequantize={%s}]",
+                        abslx::StrJoin(scales.quantize_scale, ","),
+                        abslx::StrJoin(scales.dequantize_scale, ","));
   return os;
 }
 

@@ -58,13 +58,13 @@ void WriteLiteralToTempFile(const LiteralSlice& literal,
   std::string outdir;
   if (tensorflow::io::GetTestUndeclaredOutputsDir(&outdir)) {
     std::string filename = tensorflow::io::JoinPath(
-        outdir, absl::StrFormat("tempfile-%d-%s", env->NowMicros(), name));
-    binary_filename = absl::StrCat(filename, ".pb");
-    text_filename = absl::StrCat(filename, ".txt");
+        outdir, abslx::StrFormat("tempfile-%d-%s", env->NowMicros(), name));
+    binary_filename = abslx::StrCat(filename, ".pb");
+    text_filename = abslx::StrCat(filename, ".txt");
   } else {
     binary_filename =
-        tensorflow::io::GetTempFilename(absl::StrCat(name, ".pb"));
-    text_filename = tensorflow::io::GetTempFilename(absl::StrCat(name, ".txt"));
+        tensorflow::io::GetTempFilename(abslx::StrCat(name, ".pb"));
+    text_filename = tensorflow::io::GetTempFilename(abslx::StrCat(name, ".txt"));
   }
 
   TF_CHECK_OK(
@@ -92,7 +92,7 @@ void OnMiscompare(const LiteralSlice& expected, const LiteralSlice& actual,
 }
 
 Literal ExecuteWithRunner(std::unique_ptr<HloModule> module,
-                          absl::Span<const Literal> args,
+                          abslx::Span<const Literal> args,
                           HloRunnerInterface* runner, bool run_hlo_passes) {
   TF_QCHECK_OK(VerifyHloModule(module.get(), /*layout_sensitive=*/false,
                                /*allow_mixed_precision=*/true))

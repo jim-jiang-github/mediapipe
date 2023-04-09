@@ -36,25 +36,25 @@ namespace mediapipe {
 template <typename IntType>
 class StringToIntCalculatorTemplate : public CalculatorBase {
  public:
-  static absl::Status GetContract(CalculatorContract* cc) {
+  static abslx::Status GetContract(CalculatorContract* cc) {
     cc->InputSidePackets().Index(0).Set<std::string>();
     cc->OutputSidePackets().Index(0).Set<IntType>();
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Open(CalculatorContext* cc) override {
+  abslx::Status Open(CalculatorContext* cc) override {
     IntType number;
-    if (!absl::SimpleAtoi(cc->InputSidePackets().Index(0).Get<std::string>(),
+    if (!abslx::SimpleAtoi(cc->InputSidePackets().Index(0).Get<std::string>(),
                           &number)) {
-      return absl::InvalidArgumentError(
+      return abslx::InvalidArgumentError(
           "The string could not be parsed as an integer.");
     }
     cc->OutputSidePackets().Index(0).Set(MakePacket<IntType>(number));
-    return absl::OkStatus();
+    return abslx::OkStatus();
   }
 
-  absl::Status Process(CalculatorContext* cc) override {
-    return absl::OkStatus();
+  abslx::Status Process(CalculatorContext* cc) override {
+    return abslx::OkStatus();
   }
 };
 

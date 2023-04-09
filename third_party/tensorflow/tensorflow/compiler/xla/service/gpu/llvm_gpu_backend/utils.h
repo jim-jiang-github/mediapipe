@@ -42,8 +42,8 @@ std::unique_ptr<llvm::Module> LoadIRModule(const std::string& filename,
 //
 // For example:
 //   ReplaceFilenameExtension("/foo/baz.txt", "cc") --> "/foo/baz.cc"
-std::string ReplaceFilenameExtension(absl::string_view filename,
-                                     absl::string_view new_extension);
+std::string ReplaceFilenameExtension(abslx::string_view filename,
+                                     abslx::string_view new_extension);
 
 }  // namespace gpu
 }  // namespace xla

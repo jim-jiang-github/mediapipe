@@ -22,7 +22,7 @@
 #include "absl/container/internal/hash_generator_testing.h"
 #include "absl/container/internal/hash_policy_testing.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace container_internal {
 
@@ -313,6 +313,6 @@ REGISTER_TYPED_TEST_SUITE_P(UniquePtrModifiersTest, TryEmplace);
 
 }  // namespace container_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx
 
 #endif  // ABSL_CONTAINER_INTERNAL_UNORDERED_MAP_MODIFIERS_TEST_H_

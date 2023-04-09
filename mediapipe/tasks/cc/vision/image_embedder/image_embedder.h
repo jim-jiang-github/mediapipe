@@ -59,7 +59,7 @@ struct ImageEmbedderOptions {
   // The user-defined result callback for processing live stream data.
   // The result callback should only be specified when the running mode is set
   // to RunningMode::LIVE_STREAM.
-  std::function<void(absl::StatusOr<ImageEmbedderResult>, const Image&, int64)>
+  std::function<void(abslx::StatusOr<ImageEmbedderResult>, const Image&, int64)>
       result_callback = nullptr;
 };
 
@@ -87,7 +87,7 @@ class ImageEmbedder : core::BaseVisionTaskApi {
   // Creates an ImageEmbedder from the provided options. A non-default
   // OpResolver can be specified in the BaseOptions in order to support custom
   // Ops or specify a subset of built-in Ops.
-  static absl::StatusOr<std::unique_ptr<ImageEmbedder>> Create(
+  static abslx::StatusOr<std::unique_ptr<ImageEmbedder>> Create(
       std::unique_ptr<ImageEmbedderOptions> options);
 
   // Performs embedding extraction on the provided single image.
@@ -106,7 +106,7 @@ class ImageEmbedder : core::BaseVisionTaskApi {
   // running mode.
   //
   // The image can be of any size with format RGB or RGBA.
-  absl::StatusOr<ImageEmbedderResult> Embed(
+  abslx::StatusOr<ImageEmbedderResult> Embed(
       mediapipe::Image image,
       std::optional<core::ImageProcessingOptions> image_processing_options =
           std::nullopt);
@@ -129,7 +129,7 @@ class ImageEmbedder : core::BaseVisionTaskApi {
   // The image can be of any size with format RGB or RGBA. It's required to
   // provide the video frame's timestamp (in milliseconds). The input timestamps
   // must be monotonically increasing.
-  absl::StatusOr<ImageEmbedderResult> EmbedForVideo(
+  abslx::StatusOr<ImageEmbedderResult> EmbedForVideo(
       mediapipe::Image image, int64 timestamp_ms,
       std::optional<core::ImageProcessingOptions> image_processing_options =
           std::nullopt);
@@ -163,12 +163,12 @@ class ImageEmbedder : core::BaseVisionTaskApi {
   //     longer be valid when the callback returns. To access the image data
   //     outside of the callback, callers need to make a copy of the image.
   //   - The input timestamp in milliseconds.
-  absl::Status EmbedAsync(mediapipe::Image image, int64 timestamp_ms,
+  abslx::Status EmbedAsync(mediapipe::Image image, int64 timestamp_ms,
                           std::optional<core::ImageProcessingOptions>
                               image_processing_options = std::nullopt);
 
   // Shuts down the ImageEmbedder when all works are done.
-  absl::Status Close() { return runner_->Close(); }
+  abslx::Status Close() { return runner_->Close(); }
 
   // Utility function to compute cosine similarity [1] between two embeddings.
   // May return an InvalidArgumentError if e.g. the embeddings are of different
@@ -176,7 +176,7 @@ class ImageEmbedder : core::BaseVisionTaskApi {
   // 0.
   //
   // [1]: https://en.wikipedia.org/wiki/Cosine_similarity
-  static absl::StatusOr<double> CosineSimilarity(
+  static abslx::StatusOr<double> CosineSimilarity(
       const components::containers::Embedding& u,
       const components::containers::Embedding& v);
 };

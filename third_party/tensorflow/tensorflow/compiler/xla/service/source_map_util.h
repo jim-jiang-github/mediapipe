@@ -26,11 +26,11 @@ namespace source_map_util {
 // Creates an INVALID_ARGUMENT status with the given format string.
 template <typename... Args>
 Status InvalidParameterArgument(const OpMetadata& op_metadata,
-                                const absl::FormatSpec<Args...>& format,
+                                const abslx::FormatSpec<Args...>& format,
                                 const Args&... args) {
-  std::string message = absl::StrFormat(format, args...);
+  std::string message = abslx::StrFormat(format, args...);
   if (!op_metadata.source_file().empty()) {
-    absl::StrAppendFormat(&message, " (%s:%d)", op_metadata.source_file(),
+    abslx::StrAppendFormat(&message, " (%s:%d)", op_metadata.source_file(),
                           op_metadata.source_line());
   }
   return InvalidArgument("%s", message);
@@ -45,7 +45,7 @@ Status InvalidParameterArgument(const OpMetadata& op_metadata,
 // or a CHECK-failure may occur.
 template <typename... Args>
 Status InvalidParameterArgument(Executable* executable, int parameter_number,
-                                const absl::FormatSpec<Args...>& format,
+                                const abslx::FormatSpec<Args...>& format,
                                 const Args&... args) {
   if (executable != nullptr && executable->has_module()) {
     const HloModule& module = executable->module();

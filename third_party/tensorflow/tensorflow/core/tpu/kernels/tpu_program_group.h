@@ -102,7 +102,7 @@ class TpuProgramGroup : public TpuProgramGroupInterface {
       TpuProgramGroupInterface* tpu_program_group_interface);
 
   // Initializes `TpuProgramGroup` object with `xla_tpu_programs`.
-  void Initialize(absl::Span<XLA_TpuProgram* const> xla_tpu_programs);
+  void Initialize(abslx::Span<XLA_TpuProgram* const> xla_tpu_programs);
 
   TpuProgramGroup() = default;
   TpuProgramGroup(TpuProgramGroup&& other);
@@ -130,14 +130,14 @@ class TpuProgramGroup : public TpuProgramGroupInterface {
   const std::vector<XLA_TpuProgram*>& tpu_programs() const;
   std::vector<XLA_TpuProgram*> tpu_programs(TpuProgramShardingType type) const;
   const XLA_TpuProgram* tpu_program(int index) const override;
-  void set_tpu_programs(absl::Span<XLA_TpuProgram* const> tpu_programs);
+  void set_tpu_programs(abslx::Span<XLA_TpuProgram* const> tpu_programs);
 
   const TPUExecutableInfoProto& executable_info(int index) const override;
 
   const TPUHostTransferInfoProto& host_transfer_info(int index) const override;
-  void set_hlo_metadatas(absl::Span<const xla::HloProto> hlo_metadatas);
+  void set_hlo_metadatas(abslx::Span<const xla::HloProto> hlo_metadatas);
   const xla::HloProto* hlo_metadata(int index) const;
-  absl::Span<const xla::HloProto* const> hlo_metadatas() const override;
+  abslx::Span<const xla::HloProto* const> hlo_metadatas() const override;
 
   // Deserializes `GetTpuProgramResponse` protos from remote cache.
   Status DeserializeFromRpcResponseProtos(

@@ -36,7 +36,7 @@ constexpr char kPredictionTag[] = "PREDICTION";
 std::unique_ptr<CalculatorRunner> BuildNodeRunnerWithOptions(
     float drama_thresh, float llama_thresh, float bazinga_thresh,
     float joy_thresh, float peace_thresh) {
-  constexpr absl::string_view kCalculatorProto = R"pb(
+  constexpr abslx::string_view kCalculatorProto = R"pb(
     calculator: "CombinedPredictionCalculator"
     input_stream: "custom_softmax_scores"
     input_stream: "canned_softmax_scores"
@@ -53,7 +53,7 @@ std::unique_ptr<CalculatorRunner> BuildNodeRunnerWithOptions(
     }
   )pb";
   auto runner = std::make_unique<CalculatorRunner>(
-      absl::Substitute(kCalculatorProto, drama_thresh, llama_thresh,
+      abslx::Substitute(kCalculatorProto, drama_thresh, llama_thresh,
                        bazinga_thresh, joy_thresh, peace_thresh));
   return runner;
 }

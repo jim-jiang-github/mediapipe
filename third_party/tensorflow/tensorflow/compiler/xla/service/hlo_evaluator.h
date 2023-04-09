@@ -100,12 +100,12 @@ class HloEvaluator : public DfsHloVisitorWithDefault {
   // (Dummy template arg is to reduce the overloading priority of one overload
   // so that Evaluate(module, {}) resolves unambiguously.)
   StatusOr<Literal> Evaluate(const HloModule& module,
-                             absl::Span<const Literal* const> arg_literals) {
+                             abslx::Span<const Literal* const> arg_literals) {
     return Evaluate(*module.entry_computation(), arg_literals);
   }
   template <typename Dummy = void>
   StatusOr<Literal> Evaluate(const HloModule& module,
-                             absl::Span<const Literal> arg_literals) {
+                             abslx::Span<const Literal> arg_literals) {
     return Evaluate(*module.entry_computation(), arg_literals);
   }
 
@@ -129,10 +129,10 @@ class HloEvaluator : public DfsHloVisitorWithDefault {
   // (Dummy template arg is to reduce the overloading priority of one overload
   // so that Evaluate(module, {}) resolves unambiguously.)
   StatusOr<Literal> Evaluate(const HloComputation& computation,
-                             absl::Span<const Literal* const> arg_literals);
+                             abslx::Span<const Literal* const> arg_literals);
   template <typename Dummy = void>
   StatusOr<Literal> Evaluate(const HloComputation& computation,
-                             absl::Span<const Literal> arg_literals) {
+                             abslx::Span<const Literal> arg_literals) {
     std::vector<const Literal*> arg_literal_ptrs;
     for (const auto& l : arg_literals) {
       arg_literal_ptrs.push_back(&l);
@@ -162,7 +162,7 @@ class HloEvaluator : public DfsHloVisitorWithDefault {
   // {A = x, C = y}, this evaluates op(x, B, y).
   StatusOr<Literal> EvaluateWithSubstitutions(
       const HloInstruction* instruction,
-      const absl::flat_hash_map<const HloInstruction*, const Literal*>&
+      const abslx::flat_hash_map<const HloInstruction*, const Literal*>&
           substitutions);
 
   StatusOr<Literal> EvaluateElementwiseBinaryOp(HloOpcode opcode,
@@ -201,7 +201,7 @@ class HloEvaluator : public DfsHloVisitorWithDefault {
   // Operand literals are provided in |operands| and implementations must
   // populate |output| before returning.
   using CustomCallHandler = std::function<StatusOr<Literal>(
-      HloInstruction* custom_call, absl::Span<const Literal*> operands)>;
+      HloInstruction* custom_call, abslx::Span<const Literal*> operands)>;
 
   // Sets a handler that is called during evaluation for custom-call ops.
   // If no handler is defined the default error behavior will occur. The handler
@@ -209,7 +209,7 @@ class HloEvaluator : public DfsHloVisitorWithDefault {
   // return an output literal of the appropriate shape.
   void set_custom_call_handler(
       std::function<StatusOr<Literal>(HloInstruction* custom_call,
-                                      absl::Span<const Literal*> operands)>
+                                      abslx::Span<const Literal*> operands)>
           handler) {
     custom_call_handler_ = std::move(handler);
   }
@@ -418,7 +418,7 @@ class HloEvaluator : public DfsHloVisitorWithDefault {
   //
   // Storing Literal in place requires the container to have pointer stability
   // so we cannot use flat_hash_map any more.
-  absl::node_hash_map<const HloInstruction*, Literal> evaluated_;
+  abslx::node_hash_map<const HloInstruction*, Literal> evaluated_;
   // Set by EvaluateInternal and opportunitiscally used by the HandleXXX
   // functions. When non-empty, the HandleXXX function may evaluate the
   // instruction at only the given shape index.
@@ -440,7 +440,7 @@ class HloEvaluator : public DfsHloVisitorWithDefault {
 
     Literal result(shape);
     TF_RETURN_IF_ERROR(
-        result.Populate<ReturnT>([&](absl::Span<const int64_t> multi_index) {
+        result.Populate<ReturnT>([&](abslx::Span<const int64_t> multi_index) {
           return unary_op(operand_literal.Get<NativeT>(multi_index));
         }));
     return std::move(result);
@@ -469,7 +469,7 @@ class HloEvaluator : public DfsHloVisitorWithDefault {
 
   // Optional handler for custom_call ops.
   std::function<StatusOr<Literal>(HloInstruction* custom_call,
-                                  absl::Span<const Literal*> operands)>
+                                  abslx::Span<const Literal*> operands)>
       custom_call_handler_;
 
   HloEvaluator(const HloEvaluator&) = delete;

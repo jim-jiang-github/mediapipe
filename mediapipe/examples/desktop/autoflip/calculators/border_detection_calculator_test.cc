@@ -77,10 +77,10 @@ const int kTestFrameWidthTall = 1200;
 const int kTestFrameHeightTall = 2001;
 
 TEST(BorderDetectionCalculatorTest, NoBorderTest) {
-  auto runner = ::absl::make_unique<CalculatorRunner>(
+  auto runner = ::abslx::make_unique<CalculatorRunner>(
       ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfig));
 
-  auto input_frame = ::absl::make_unique<ImageFrame>(
+  auto input_frame = ::abslx::make_unique<ImageFrame>(
       ImageFormat::SRGB, kTestFrameWidth, kTestFrameHeight);
   cv::Mat input_mat = mediapipe::formats::MatView(input_frame.get());
   input_mat.setTo(cv::Scalar(0, 0, 0));
@@ -106,12 +106,12 @@ TEST(BorderDetectionCalculatorTest, NoBorderTest) {
 }
 
 TEST(BorderDetectionCalculatorTest, TopBorderTest) {
-  auto runner = ::absl::make_unique<CalculatorRunner>(
+  auto runner = ::abslx::make_unique<CalculatorRunner>(
       ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfig));
 
   const int kTopBorderHeight = 50;
 
-  auto input_frame = ::absl::make_unique<ImageFrame>(
+  auto input_frame = ::abslx::make_unique<ImageFrame>(
       ImageFormat::SRGB, kTestFrameWidth, kTestFrameHeight);
   cv::Mat input_mat = mediapipe::formats::MatView(input_frame.get());
   input_mat.setTo(cv::Scalar(0, 0, 0));
@@ -146,12 +146,12 @@ TEST(BorderDetectionCalculatorTest, TopBorderTest) {
 }
 
 TEST(BorderDetectionCalculatorTest, TopBorderPadTest) {
-  auto runner = ::absl::make_unique<CalculatorRunner>(
+  auto runner = ::abslx::make_unique<CalculatorRunner>(
       ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfigPad));
 
   const int kTopBorderHeight = 50;
 
-  auto input_frame = ::absl::make_unique<ImageFrame>(
+  auto input_frame = ::abslx::make_unique<ImageFrame>(
       ImageFormat::SRGB, kTestFrameWidth, kTestFrameHeight);
   cv::Mat input_mat = mediapipe::formats::MatView(input_frame.get());
   input_mat.setTo(cv::Scalar(0, 0, 0));
@@ -187,12 +187,12 @@ TEST(BorderDetectionCalculatorTest, TopBorderPadTest) {
 }
 
 TEST(BorderDetectionCalculatorTest, BottomBorderTest) {
-  auto runner = ::absl::make_unique<CalculatorRunner>(
+  auto runner = ::abslx::make_unique<CalculatorRunner>(
       ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfig));
 
   const int kBottomBorderHeight = 50;
 
-  auto input_frame = ::absl::make_unique<ImageFrame>(
+  auto input_frame = ::abslx::make_unique<ImageFrame>(
       ImageFormat::SRGB, kTestFrameWidth, kTestFrameHeight);
   cv::Mat input_mat = mediapipe::formats::MatView(input_frame.get());
   input_mat.setTo(cv::Scalar(0, 0, 0));
@@ -224,13 +224,13 @@ TEST(BorderDetectionCalculatorTest, BottomBorderTest) {
 }
 
 TEST(BorderDetectionCalculatorTest, TopBottomBorderTest) {
-  auto runner = ::absl::make_unique<CalculatorRunner>(
+  auto runner = ::abslx::make_unique<CalculatorRunner>(
       ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfig));
 
   const int kBottomBorderHeight = 50;
   const int kTopBorderHeight = 25;
 
-  auto input_frame = ::absl::make_unique<ImageFrame>(
+  auto input_frame = ::abslx::make_unique<ImageFrame>(
       ImageFormat::SRGB, kTestFrameWidth, kTestFrameHeight);
   cv::Mat input_mat = mediapipe::formats::MatView(input_frame.get());
   input_mat.setTo(cv::Scalar(0, 0, 0));
@@ -277,13 +277,13 @@ TEST(BorderDetectionCalculatorTest, TopBottomBorderTest) {
 }
 
 TEST(BorderDetectionCalculatorTest, TopBottomBorderTestAspect2) {
-  auto runner = ::absl::make_unique<CalculatorRunner>(
+  auto runner = ::abslx::make_unique<CalculatorRunner>(
       ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfig));
 
   const int kBottomBorderHeight = 50;
   const int kTopBorderHeight = 25;
 
-  auto input_frame = ::absl::make_unique<ImageFrame>(
+  auto input_frame = ::abslx::make_unique<ImageFrame>(
       ImageFormat::SRGB, kTestFrameWidthTall, kTestFrameHeightTall);
   cv::Mat input_mat = mediapipe::formats::MatView(input_frame.get());
   input_mat.setTo(cv::Scalar(0, 0, 0));
@@ -336,9 +336,9 @@ TEST(BorderDetectionCalculatorTest, DominantColor) {
       ->MutableExtension(BorderDetectionCalculatorOptions::ext)
       ->set_solid_background_tol_perc(.25);
 
-  auto runner = ::absl::make_unique<CalculatorRunner>(node);
+  auto runner = ::abslx::make_unique<CalculatorRunner>(node);
 
-  auto input_frame = ::absl::make_unique<ImageFrame>(
+  auto input_frame = ::abslx::make_unique<ImageFrame>(
       ImageFormat::SRGB, kTestFrameWidth, kTestFrameHeight);
   cv::Mat input_mat = mediapipe::formats::MatView(input_frame.get());
   input_mat.setTo(cv::Scalar(0, 0, 0));
@@ -374,12 +374,12 @@ TEST(BorderDetectionCalculatorTest, DominantColor) {
 
 void BM_Large(benchmark::State& state) {
   for (auto _ : state) {
-    auto runner = ::absl::make_unique<CalculatorRunner>(
+    auto runner = ::abslx::make_unique<CalculatorRunner>(
         ParseTextProtoOrDie<CalculatorGraphConfig::Node>(kConfig));
 
     const int kTopBorderHeight = 50;
 
-    auto input_frame = ::absl::make_unique<ImageFrame>(
+    auto input_frame = ::abslx::make_unique<ImageFrame>(
         ImageFormat::SRGB, kTestFrameLargeWidth, kTestFrameLargeHeight);
     cv::Mat input_mat = mediapipe::formats::MatView(input_frame.get());
     input_mat.setTo(cv::Scalar(0, 0, 0));

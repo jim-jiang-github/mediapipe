@@ -24,14 +24,14 @@ namespace generator {
 namespace cpp {
 
 string OpArgumentView::Declaration() const {
-  return absl::Substitute("$0 $1", type_name_, variable_name_);
+  return abslx::Substitute("$0 $1", type_name_, variable_name_);
 }
 
 string OpArgumentView::Initializer() const {
   if (default_value_.empty()) {
     return "";
   }
-  return absl::Substitute(" = $0", default_value_);
+  return abslx::Substitute(" = $0", default_value_);
 }
 
 bool OpArgumentView::HasDefaultValue() const { return !default_value_.empty(); }

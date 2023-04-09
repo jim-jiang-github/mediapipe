@@ -31,7 +31,7 @@ class BoundNonLinearCompilerAnalysis {
   // allowed to complete. Each analysis is allowed at least a constant number of
   // abstract cost units, before it is considered for early termination.
   explicit BoundNonLinearCompilerAnalysis(HloModule* m,
-                                          absl::string_view pass_name,
+                                          abslx::string_view pass_name,
                                           std::optional<int64_t> sampling_rate)
       : analysis_allowance_(
             (!sampling_rate.has_value() || sampling_rate.value() <= 0 ||

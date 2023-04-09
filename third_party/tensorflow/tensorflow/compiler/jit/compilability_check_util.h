@@ -191,8 +191,8 @@ class RecursiveCompilabilityChecker {
 
  private:
   struct StackFrameView {
-    absl::string_view name;
-    absl::string_view function_name;
+    abslx::string_view name;
+    abslx::string_view function_name;
     std::shared_ptr<AbstractStackTrace> stack_trace;
   };
 
@@ -245,11 +245,11 @@ class RecursiveCompilabilityChecker {
     return op_info && op_info->resource_kind() == XlaResourceKind::kTensorArray;
   }
 
-  bool IsAssertOrCheckNumerics(absl::string_view op_name) const {
+  bool IsAssertOrCheckNumerics(abslx::string_view op_name) const {
     return op_name == "Assert" || op_name == "CheckNumerics";
   }
 
-  bool IsStatefulRandomOp(absl::string_view op_name) const {
+  bool IsStatefulRandomOp(abslx::string_view op_name) const {
     return op_name == "RandomUniform" || op_name == "RandomShuffle" ||
            op_name == "RandomUniformInt" || op_name == "RandomStandardNormal" ||
            op_name == "TruncatedNormal" || op_name == "Multinomial";
@@ -257,15 +257,15 @@ class RecursiveCompilabilityChecker {
 
   bool OpProducesOrConsumesVariant(const Node& node) const {
     auto is_variant = [](DataType dtype) { return dtype == DT_VARIANT; };
-    return absl::c_any_of(node.input_types(), is_variant) ||
-           absl::c_any_of(node.output_types(), is_variant);
+    return abslx::c_any_of(node.input_types(), is_variant) ||
+           abslx::c_any_of(node.output_types(), is_variant);
   }
 
   bool HasXLAKernel(const Node& node,
                     string* uncompilable_reason = nullptr) const;
 
   static void MaybeMarkUncompilableNode(
-      const absl::string_view reason,
+      const abslx::string_view reason,
       const std::vector<StackFrameView>& stack_trace,
       NameAttrList* encapsulating_function,
       UncompilableNodesMap* uncompilable_nodes_map);
@@ -320,8 +320,8 @@ bool CanCreateXlaKernel(const NodeDef& node_def);
 // device memory.
 tensorflow::MemoryTypeVector GetInputMemoryTypes(
     const tensorflow::FunctionBody* fbody,
-    absl::Span<int const> constant_arg_indices,
-    absl::Span<int const> resource_arg_indices);
+    abslx::Span<int const> constant_arg_indices,
+    abslx::Span<int const> resource_arg_indices);
 
 // Returns output memory types.
 //

@@ -77,36 +77,36 @@ class EmbeddingAggregationCalculator : public Node {
   MEDIAPIPE_NODE_CONTRACT(kEmbeddingsIn, kTimestampsIn, kEmbeddingsOut,
                           kTimestampedEmbeddingsOut);
 
-  static absl::Status UpdateContract(CalculatorContract* cc);
-  absl::Status Open(CalculatorContext* cc);
-  absl::Status Process(CalculatorContext* cc);
+  static abslx::Status UpdateContract(CalculatorContract* cc);
+  abslx::Status Open(CalculatorContext* cc);
+  abslx::Status Process(CalculatorContext* cc);
 
  private:
   bool time_aggregation_enabled_;
   std::unordered_map<int64, EmbeddingResult> cached_embeddings_;
 };
 
-absl::Status EmbeddingAggregationCalculator::UpdateContract(
+abslx::Status EmbeddingAggregationCalculator::UpdateContract(
     CalculatorContract* cc) {
   if (kTimestampsIn(cc).IsConnected()) {
     RET_CHECK(kTimestampedEmbeddingsOut(cc).IsConnected());
   } else {
     RET_CHECK(kEmbeddingsOut(cc).IsConnected());
   }
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status EmbeddingAggregationCalculator::Open(CalculatorContext* cc) {
+abslx::Status EmbeddingAggregationCalculator::Open(CalculatorContext* cc) {
   time_aggregation_enabled_ = kTimestampsIn(cc).IsConnected();
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
-absl::Status EmbeddingAggregationCalculator::Process(CalculatorContext* cc) {
+abslx::Status EmbeddingAggregationCalculator::Process(CalculatorContext* cc) {
   if (time_aggregation_enabled_) {
     cached_embeddings_[cc->InputTimestamp().Value()] =
         std::move(*kEmbeddingsIn(cc));
     if (kTimestampsIn(cc).IsEmpty()) {
-      return absl::OkStatus();
+      return abslx::OkStatus();
     }
     auto timestamps = kTimestampsIn(cc).Get();
     std::vector<EmbeddingResult> results;
@@ -125,7 +125,7 @@ absl::Status EmbeddingAggregationCalculator::Process(CalculatorContext* cc) {
     kEmbeddingsOut(cc).Send(result);
   }
   RET_CHECK(cached_embeddings_.empty());
-  return absl::OkStatus();
+  return abslx::OkStatus();
 }
 
 MEDIAPIPE_REGISTER_NODE(EmbeddingAggregationCalculator);

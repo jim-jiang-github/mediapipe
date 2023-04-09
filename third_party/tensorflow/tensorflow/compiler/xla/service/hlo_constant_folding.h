@@ -25,14 +25,14 @@ namespace xla {
 // computation on constants.
 class HloConstantFolding : public HloModulePass {
  public:
-  absl::string_view name() const override { return "constant_folding"; }
+  abslx::string_view name() const override { return "constant_folding"; }
 
   // Run constant folding operations on the given module. Returns whether the
   // module was changed (constant expressions folded).
   using HloPassInterface::Run;
   StatusOr<bool> Run(
       HloModule* module,
-      const absl::flat_hash_set<absl::string_view>& execution_threads) override;
+      const abslx::flat_hash_set<abslx::string_view>& execution_threads) override;
 
  private:
   // Number of slow constant-folds we've encountered.  Used for firing

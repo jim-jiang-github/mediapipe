@@ -31,7 +31,7 @@ Despecializer::Despecializer() : pipeline_("despecializer") {
 
 StatusOr<bool> Despecializer::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   return pipeline_.Run(module, execution_threads);
 }
 

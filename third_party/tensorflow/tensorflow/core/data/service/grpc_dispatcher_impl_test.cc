@@ -81,7 +81,7 @@ class GrpcDispatcherImplTest : public ::testing::Test {
   }
 
   std::string GetDispatcherAddress() const {
-    return absl::StrCat(kHostAddress, ":", dispatcher_server_->BoundPort());
+    return abslx::StrCat(kHostAddress, ":", dispatcher_server_->BoundPort());
   }
 
   std::unique_ptr<DispatchGrpcDataServer> dispatcher_server_;

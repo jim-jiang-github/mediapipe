@@ -61,14 +61,14 @@ namespace tfrt_stub {
 namespace {
 
 // Finds the names of functions that are safe to optimize.
-absl::flat_hash_set<std::string> FindFunctionsToOptimize(
+abslx::flat_hash_set<std::string> FindFunctionsToOptimize(
     const GraphDef& graph_def) {
   // TODO(b/203689805): Add more functional ops.
-  static const auto* const kOpWhitelist = new absl::flat_hash_set<std::string>{
+  static const auto* const kOpWhitelist = new abslx::flat_hash_set<std::string>{
       "PartitionedCall", "StatefulPartitionedCall"};
-  absl::flat_hash_map<
+  abslx::flat_hash_map<
       std::string /*function_name*/,
-      absl::flat_hash_set<std::string> /*ops_using_the_function*/>
+      abslx::flat_hash_set<std::string> /*ops_using_the_function*/>
       function_to_ops;
 
   auto build_map = [&](const auto& node_defs) {
@@ -86,10 +86,10 @@ absl::flat_hash_set<std::string> FindFunctionsToOptimize(
     build_map(function_def.node_def());
   }
 
-  absl::flat_hash_set<std::string> functions_to_optimize;
+  abslx::flat_hash_set<std::string> functions_to_optimize;
   for (const auto& p : function_to_ops) {
     const std::string& function_name = p.first;
-    const absl::flat_hash_set<std::string>& ops = p.second;
+    const abslx::flat_hash_set<std::string>& ops = p.second;
     // Optimize a function iff all the ops that use it are whitelisted.
     if (std::all_of(ops.begin(), ops.end(), [](const auto& op) {
           return kOpWhitelist->contains(op);
@@ -103,7 +103,7 @@ absl::flat_hash_set<std::string> FindFunctionsToOptimize(
 
 // Preprocesses `graph_def`, returns the functions to optimize if
 // `run_placer_grappler_on_functions` is true.
-StatusOr<absl::flat_hash_set<std::string>> PreprocessGraph(
+StatusOr<abslx::flat_hash_set<std::string>> PreprocessGraph(
     tensorflow::GraphDef& graph_def, bool run_placer_grappler_on_functions) {
   if (VLOG_IS_ON(1)) {
     DumpGraphDefToFile("before_generate_resource_shared_name_graph_def",
@@ -121,7 +121,7 @@ StatusOr<absl::flat_hash_set<std::string>> PreprocessGraph(
   if (run_placer_grappler_on_functions) {
     return FindFunctionsToOptimize(graph_def);
   }
-  return absl::flat_hash_set<std::string>();
+  return abslx::flat_hash_set<std::string>();
 }
 
 }  // namespace
@@ -149,9 +149,9 @@ namespace {
 
 CallableOptions PopulateCallableOptions(
     CallableOptions& callable_options,
-    absl::Span<const std::string> feed_tensor_names,
-    absl::Span<const std::string> fetch_tensor_names,
-    absl::Span<const std::string> target_tensor_names) {
+    abslx::Span<const std::string> feed_tensor_names,
+    abslx::Span<const std::string> fetch_tensor_names,
+    abslx::Span<const std::string> target_tensor_names) {
   // Configure pruning with the feed/fetch/target tensor names.
   callable_options.mutable_feed()->Reserve(feed_tensor_names.size());
   for (const auto& feed : feed_tensor_names) {
@@ -263,7 +263,7 @@ Status PlaceInputOutputNodesOnHost(const std::vector<std::string>& inputs,
   }
 
   // Collect all output nodes.
-  absl::flat_hash_set<Node*> output_nodes;
+  abslx::flat_hash_set<Node*> output_nodes;
   for (const auto& output : outputs) {
     output_nodes.insert(name_to_node_map.at(grappler::NodeName(output)));
   }
@@ -315,7 +315,7 @@ Status AdjustDeviceAssignment(const std::vector<std::string>& inputs,
 }
 
 bool IsTpuGraph(const Graph* graph) {
-  static const auto* const kTpuOps = new absl::flat_hash_set<std::string>{
+  static const auto* const kTpuOps = new abslx::flat_hash_set<std::string>{
       "TPUPartitionedCall", "TPUCompile", "TPUReplicateMetadata"};
   for (const Node* node : graph->nodes()) {
     if (kTpuOps->contains(node->type_string())) {
@@ -431,7 +431,7 @@ TfrtGraphExecutionState::CreateOptimizedGraph(
     DumpGraphToFile("after_pruning", *result.graph);
   }
 
-  const auto functionalization_start_time = absl::Now();
+  const auto functionalization_start_time = abslx::Now();
 
   // Perform functionalization to convert v1 control flow to v2 control flow. It
   // should be applied to the unoptimized graph, because Grappler may cause
@@ -446,7 +446,7 @@ TfrtGraphExecutionState::CreateOptimizedGraph(
     DumpGraphToFile("after_functionalization", *result.graph);
   }
 
-  auto grappler_start_time = absl::Now();
+  auto grappler_start_time = abslx::Now();
   result.functionalization_duration =
       grappler_start_time - functionalization_start_time;
 
@@ -463,7 +463,7 @@ TfrtGraphExecutionState::CreateOptimizedGraph(
     DumpGraphToFile("after_grappler", *result.graph);
   }
 
-  result.grappler_duration = absl::Now() - grappler_start_time;
+  result.grappler_duration = abslx::Now() - grappler_start_time;
 
   if (options_.enable_tfrt_gpu) {
     TF_ASSIGN_OR_RETURN(
@@ -486,7 +486,7 @@ TfrtGraphExecutionState::CreateOptimizedGraph(
 
 Status TfrtGraphExecutionState::Extend(const GraphDef& graph) {
   std::unique_ptr<GraphExecutionState> new_state;
-  absl::MutexLock lock(&graph_execution_state_mu_);
+  abslx::MutexLock lock(&graph_execution_state_mu_);
   TF_RETURN_IF_ERROR(graph_execution_state_->Extend(graph, &new_state));
   graph_execution_state_.swap(new_state);
 
@@ -504,7 +504,7 @@ namespace {
 // Given an "Exit" node, finds its corresponding "LoopCond" node.
 StatusOr<const NodeDef*> FindLoopCondFromExitNode(
     const NodeDef& exit_node,
-    const absl::flat_hash_map<std::string, NodeDef*>& name_to_node) {
+    const abslx::flat_hash_map<std::string, NodeDef*>& name_to_node) {
   const NodeDef* switch_node = nullptr;
   for (const std::string& tensor_name : exit_node.input()) {
     const std::string node_name = grappler::NodeName(tensor_name);
@@ -546,9 +546,9 @@ StatusOr<const NodeDef*> FindLoopCondFromExitNode(
 Status PruneGraphDef(GraphDef& graph_def,
                      const CallableOptions& callable_options) {
   // Gather node names and create a map from names to NodeDefs.
-  absl::flat_hash_map<std::string, NodeDef*> name_to_node;
+  abslx::flat_hash_map<std::string, NodeDef*> name_to_node;
   // All exit nodes in order to track all while loops.
-  absl::flat_hash_set<const NodeDef*> exit_nodes;
+  abslx::flat_hash_set<const NodeDef*> exit_nodes;
   for (auto& node : *graph_def.mutable_node()) {
     name_to_node[node.name()] = &node;
     if (node.op() == "Exit") {
@@ -566,7 +566,7 @@ Status PruneGraphDef(GraphDef& graph_def,
   // Find all LoopCond -> Exit nodes mapping. So when we traverse to a LoopCond
   // node, we can add corresponding Exit nodes to the traversal queue in order
   // to maintain complete structure of a while loop.
-  absl::flat_hash_map<const NodeDef*, absl::flat_hash_set<const NodeDef*>>
+  abslx::flat_hash_map<const NodeDef*, abslx::flat_hash_set<const NodeDef*>>
       loop_cond_to_exit_nodes;
   for (const NodeDef* exit_node : exit_nodes) {
     TF_ASSIGN_OR_RETURN(const NodeDef* loop_cond_node,
@@ -578,7 +578,7 @@ Status PruneGraphDef(GraphDef& graph_def,
   std::vector<const NodeDef*> queue;
 
   // Add fetch nodes to the queue.
-  absl::flat_hash_set<std::string> fetch_node_names;
+  abslx::flat_hash_set<std::string> fetch_node_names;
   for (const std::string& tensor_name : callable_options.fetch()) {
     const NodeDef* node = name_to_node[grappler::NodeName(tensor_name)];
     if (!node) {
@@ -600,7 +600,7 @@ Status PruneGraphDef(GraphDef& graph_def,
     fetch_node_names.insert(node->name());
   }
 
-  absl::flat_hash_set<NodeDef*> feed_node_defs;
+  abslx::flat_hash_set<NodeDef*> feed_node_defs;
 
   // Add feed nodes to the queue. In addition, perform necessary rewrites to
   // remove unnecessary input edges.
@@ -623,7 +623,7 @@ Status PruneGraphDef(GraphDef& graph_def,
     feed_node_defs.insert(node);
   }
 
-  absl::flat_hash_set<const NodeDef*> visited;
+  abslx::flat_hash_set<const NodeDef*> visited;
   std::vector<NodeDef> keep;
 
   // Perform graph traversal to find out connected nodes from fetches.
@@ -662,7 +662,7 @@ Status PruneGraphDef(GraphDef& graph_def,
       if (node.op() == "Exit") {
         auto renamed_exit_node = node;
         renamed_exit_node.set_name(
-            absl::StrCat(renamed_exit_node.name(), "/tfrt_renamed"));
+            abslx::StrCat(renamed_exit_node.name(), "/tfrt_renamed"));
         node.set_op("Identity");
         *node.mutable_input(0) = renamed_exit_node.name();
         *graph_def.add_node() = std::move(renamed_exit_node);
@@ -678,7 +678,7 @@ Status PruneGraphDef(GraphDef& graph_def,
 Status EliminateRefVariablesFromV1ControlFlow(tensorflow::GraphDef& graph_def) {
   auto* op_factory = OpRegistry::Global();
 
-  absl::flat_hash_set<std::string> ref_nodes;
+  abslx::flat_hash_set<std::string> ref_nodes;
   for (const auto& node : graph_def.node()) {
     if (node.op() == "RefEnter" || node.op() == "RefSwitch") {
       ref_nodes.insert(node.name());
@@ -686,7 +686,7 @@ Status EliminateRefVariablesFromV1ControlFlow(tensorflow::GraphDef& graph_def) {
   }
 
   tensorflow::GraphDef updated_graph_def;
-  absl::flat_hash_set<std::string> new_identities;
+  abslx::flat_hash_set<std::string> new_identities;
   // Insert an identity node between each "RefEnter" or "RefSwitch" node and its
   // ref input. Then modify each "RefEnter"/"RefSwitch" node in-place to an
   // "Enter"/"Switch" node.
@@ -736,7 +736,7 @@ Status EliminateRefVariablesFromV1ControlFlow(tensorflow::GraphDef& graph_def) {
 
     if (ref_input_name != nullptr) {
       std::string identity_name =
-          absl::StrCat(grappler::NodeName(*ref_input_name), "/identity");
+          abslx::StrCat(grappler::NodeName(*ref_input_name), "/identity");
       if (!new_identities.contains(identity_name)) {
         *updated_graph_def.add_node() =
             CreateNewIdentityNode(node, *ref_input_name, identity_name);
@@ -768,7 +768,7 @@ namespace {
 Status OptimizeFunctions(
     FunctionDefLibrary& flib_proto, const FunctionLibraryDefinition& flib,
     const FallbackState& fallback_state,
-    const absl::flat_hash_set<std::string>& functions_to_optimize) {
+    const abslx::flat_hash_set<std::string>& functions_to_optimize) {
   for (FunctionDef& fdef : *flib_proto.mutable_function()) {
     if (!functions_to_optimize.contains(fdef.signature().name())) {
       continue;
@@ -844,7 +844,7 @@ TfrtGraphExecutionState::OptimizeGraph(
   std::unique_ptr<tensorflow::FunctionLibraryDefinition> optimized_flib;
 
   {
-    absl::MutexLock lock(&graph_execution_state_mu_);
+    abslx::MutexLock lock(&graph_execution_state_mu_);
     // Invoke Grappler to optimize the graph.
     TF_RETURN_IF_ERROR(graph_execution_state_->OptimizeGraph(
         build_graph_options, graph, &graph.flib_def(), &optimized_graph,

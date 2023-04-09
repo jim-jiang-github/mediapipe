@@ -169,11 +169,11 @@ Status TransformGraphFunction(const std::string& func_name,
   // We must preserve control returns in each of the function components,
   // otherwise after function inlining we might prune side-effectful nodes.
   const auto control_ret =
-      [&node_name_to_control_ret](const Node* n) -> absl::optional<string> {
+      [&node_name_to_control_ret](const Node* n) -> abslx::optional<string> {
     const auto it = node_name_to_control_ret.find(n->name());
     if (it != node_name_to_control_ret.end())
-      return absl::make_optional<string>(it->second);
-    return absl::nullopt;
+      return abslx::make_optional<string>(it->second);
+    return abslx::nullopt;
   };
   FunctionDef new_func;
   TF_RETURN_IF_ERROR(

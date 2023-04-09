@@ -112,13 +112,13 @@ static std::string GetSmName(se::CudaComputeCapability compute_capability) {
                  << ". Defaulting to telling LLVM that we're compiling for sm_"
                  << sm_version;
   }
-  return absl::StrCat("sm_", sm_version);
+  return abslx::StrCat("sm_", sm_version);
 }
 
 // Convenience function for producing a name of a temporary compilation product
 // from the input filename.
-std::string MakeNameForTempProduct(absl::string_view input_filename,
-                                   absl::string_view extension) {
+std::string MakeNameForTempProduct(abslx::string_view input_filename,
+                                   abslx::string_view extension) {
   return ReplaceFilenameExtension(tensorflow::io::Basename(input_filename),
                                   extension);
 }
@@ -141,8 +141,8 @@ void InitializePasses(llvm::PassRegistry* pass_registry) {
 
 // Returns the TargetMachine, given a triple.
 std::unique_ptr<llvm::TargetMachine> GetTargetMachine(
-    llvm::Triple triple, absl::string_view cpu_name,
-    const HloModuleConfig& hlo_module_config, absl::string_view feature_str) {
+    llvm::Triple triple, abslx::string_view cpu_name,
+    const HloModuleConfig& hlo_module_config, abslx::string_view feature_str) {
   std::string error;
   const llvm::Target* target =
       llvm::TargetRegistry::lookupTarget("", triple, error);
@@ -174,7 +174,7 @@ std::unique_ptr<llvm::TargetMachine> GetTargetMachine(
     default:
       codegen_opt_level = llvm::CodeGenOpt::None;
   }
-  return absl::WrapUnique(target->createTargetMachine(
+  return abslx::WrapUnique(target->createTargetMachine(
       triple.str(), llvm_ir::AsStringRef(cpu_name),
       llvm_ir::AsStringRef(feature_str), target_options,
       llvm::codegen::getExplicitRelocModel(),
@@ -213,7 +213,7 @@ void AddOptimizationPasses(unsigned opt_level, unsigned size_level,
 }
 
 // Emits the given module to a bit code file.
-void EmitBitcodeToFile(const llvm::Module& module, absl::string_view filename) {
+void EmitBitcodeToFile(const llvm::Module& module, abslx::string_view filename) {
   std::error_code error_code;
   llvm::ToolOutputFile outfile(std::string(filename).c_str(), error_code,
                                llvm::sys::fs::OF_None);
@@ -513,14 +513,14 @@ StatusOr<std::string> CompileToPtx(
     const HloModuleConfig& hlo_module_config,
     const std::string& libdevice_dir_path,
     std::function<void(llvm::TargetMachine*)> configure_target) {
-  static absl::once_flag backend_init_flag;
-  absl::call_once(backend_init_flag, NVPTXBackendInit, hlo_module_config);
+  static abslx::once_flag backend_init_flag;
+  abslx::call_once(backend_init_flag, NVPTXBackendInit, hlo_module_config);
 
   std::string ptx;
   std::unique_ptr<llvm::TargetMachine> target_machine;
   {
     tensorflow::profiler::TraceMe activity(
-        [&] { return absl::StrCat("Compiling IR:", module->getName().str()); },
+        [&] { return abslx::StrCat("Compiling IR:", module->getName().str()); },
         tensorflow::profiler::TraceMeLevel::kInfo);
     XLA_SCOPED_LOGGING_TIMER("Compile module " + module->getName().str());
 
@@ -593,14 +593,14 @@ std::vector<std::string> GetROCDLPaths(std::string gcn_arch_name,
   }
 
   // Add AMDGPU version-specific bitcodes.
-  std::vector<std::string> tokens = absl::StrSplit(gcn_arch_name, ':');
+  std::vector<std::string> tokens = abslx::StrSplit(gcn_arch_name, ':');
   std::string amdgpu_version = gcn_arch_name;
   if (!tokens.empty() && tokens[0].size() >= 3) {
     amdgpu_version = tokens[0].substr(3);
   }
   result.push_back(tensorflow::io::JoinPath(
       rocdl_dir_path,
-      absl::StrCat("oclc_isa_version_", amdgpu_version, ".bc")));
+      abslx::StrCat("oclc_isa_version_", amdgpu_version, ".bc")));
   return result;
 }
 
@@ -681,21 +681,21 @@ StatusOr<std::vector<uint8_t>> EmitModuleToHsaco(
   // IR, binary ISA, and HSACO.
   std::string random_number = std::to_string(tensorflow::random::New64());
   std::string ir_filename =
-      absl::StrCat(module->getModuleIdentifier(), random_number + ".ll");
+      abslx::StrCat(module->getModuleIdentifier(), random_number + ".ll");
   std::string ir_path = tensorflow::io::JoinPath(tempdir_name, ir_filename);
 
   std::string ir_opt_filename =
-      absl::StrCat(module->getModuleIdentifier(), random_number + "_opt.ll");
+      abslx::StrCat(module->getModuleIdentifier(), random_number + "_opt.ll");
   std::string ir_opt_path =
       tensorflow::io::JoinPath(tempdir_name, ir_opt_filename);
 
   std::string isabin_filename =
-      absl::StrCat(module->getModuleIdentifier(), random_number + ".o");
+      abslx::StrCat(module->getModuleIdentifier(), random_number + ".o");
   std::string isabin_path =
       tensorflow::io::JoinPath(tempdir_name, isabin_filename);
 
   std::string hsaco_filename =
-      absl::StrCat(module->getModuleIdentifier(), random_number + ".hsaco");
+      abslx::StrCat(module->getModuleIdentifier(), random_number + ".hsaco");
   std::string hsaco_path =
       tensorflow::io::JoinPath(tempdir_name, hsaco_filename);
 
@@ -840,7 +840,7 @@ std::pair<std::string, std::string> GetFeatureStrFromGCNArchName(
   std::string gfx = gcn_arch_name;
   // For ROCm versions 4.0 and greater, we need to specify the correct
   // feature str, based on the underlying GPU HW to get max performance.
-  std::vector<std::string> tokens = absl::StrSplit(gcn_arch_name, ':');
+  std::vector<std::string> tokens = abslx::StrSplit(gcn_arch_name, ':');
   std::vector<std::string> mapped_tokens;
   if (tokens.size() > 0) gfx = tokens[0];
   for (auto it = tokens.begin(); it != tokens.end(); it++) {
@@ -852,7 +852,7 @@ std::pair<std::string, std::string> GetFeatureStrFromGCNArchName(
       mapped_tokens.push_back(mapped_token);
     }
   }
-  feature_str = absl::StrJoin(mapped_tokens, ",");
+  feature_str = abslx::StrJoin(mapped_tokens, ",");
 
   return std::make_pair(gfx, feature_str);
 }
@@ -895,8 +895,8 @@ StatusOr<std::vector<uint8_t>> CompileToHsaco(
     llvm::Module* module, GpuVersion gpu_version,
     const HloModuleConfig& hlo_module_config,
     const std::string& rocdl_dir_path) {
-  static absl::once_flag backend_init_flag;
-  absl::call_once(backend_init_flag, AMDGPUBackendInit, hlo_module_config);
+  static abslx::once_flag backend_init_flag;
+  abslx::call_once(backend_init_flag, AMDGPUBackendInit, hlo_module_config);
 
   std::vector<uint8_t> hsaco;
   std::unique_ptr<llvm::TargetMachine> target_machine;
@@ -916,7 +916,7 @@ StatusOr<std::vector<uint8_t>> CompileToHsaco(
   str += hlo_module_config.compilation_cache_key();
   {
     tensorflow::profiler::TraceMe activity(
-        [&] { return absl::StrCat("Compiling IR", module->getName().str()); },
+        [&] { return abslx::StrCat("Compiling IR", module->getName().str()); },
         tensorflow::profiler::TraceMeLevel::kInfo);
     XLA_SCOPED_LOGGING_TIMER("Compile module " + module->getName().str());
 

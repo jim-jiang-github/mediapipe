@@ -79,7 +79,7 @@ inline void LoadImageJpeg(std::string* filename, ImageData* image_data) {
   std::string image_str((std::istreambuf_iterator<char>(t)),
                         std::istreambuf_iterator<char>());
   const int fsize = image_str.size();
-  auto temp = absl::bit_cast<const uint8_t*>(image_str.data());
+  auto temp = abslx::bit_cast<const uint8_t*>(image_str.data());
   std::unique_ptr<uint8_t[]> original_image;
   int original_width, original_height, original_channels;
   tensorflow::jpeg::UncompressFlags flags;
@@ -275,7 +275,7 @@ TfLiteStatus ImagePreprocessingStage::Run() {
   int64_t start_us = profiling::time::NowMicros();
   // Loads the image from file.
   string image_ext = image_path_->substr(image_path_->find_last_of("."));
-  absl::AsciiStrToLower(&image_ext);
+  abslx::AsciiStrToLower(&image_ext);
   bool is_raw_image = (image_ext == ".rgb8");
   if (image_ext == ".rgb8") {
     LoadImageRaw(image_path_, &image_data);

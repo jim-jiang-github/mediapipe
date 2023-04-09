@@ -84,7 +84,7 @@ class NodeDefBuilderTest : public ::testing::Test {
     EXPECT_FALSE(status.ok()) << SummarizeNodeDef(node_def);
     if (status.ok()) return;
     for (const string& message : messages) {
-      EXPECT_TRUE(absl::StrContains(status.error_message(), message))
+      EXPECT_TRUE(abslx::StrContains(status.error_message(), message))
           << status << ", " << message;
     }
   }
@@ -107,7 +107,7 @@ class NodeDefBuilderTest : public ::testing::Test {
     }
     EXPECT_FALSE(status.ok()) << SummarizeNodeDef(node_def);
     if (status.ok()) return;
-    EXPECT_TRUE(absl::StrContains(status.error_message(), message))
+    EXPECT_TRUE(abslx::StrContains(status.error_message(), message))
         << "Actual error: " << status.error_message()
         << "\nDoes not contain: " << message;
   }

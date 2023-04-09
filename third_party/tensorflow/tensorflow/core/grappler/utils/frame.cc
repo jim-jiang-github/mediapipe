@@ -48,10 +48,10 @@ inline Status FrameView::InferFromGraphViewT(const GraphViewT& graph_view) {
 
   // We assign unique int id to each frame, and use this map to track what
   // frames we've already seen in the graph.
-  absl::flat_hash_map<string, int> frame_name_to_id;
+  abslx::flat_hash_map<string, int> frame_name_to_id;
 
   auto process_fanout = [this, graph](
-                            absl::flat_hash_map<string, int>* frame_name_to_id,
+                            abslx::flat_hash_map<string, int>* frame_name_to_id,
                             std::deque<int>* ready_node_indices,
                             const NodeDef* ready_node, int fanout_node_index) {
     const NodeDef* fanout_node = &graph->node(fanout_node_index);

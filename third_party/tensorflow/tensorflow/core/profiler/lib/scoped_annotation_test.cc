@@ -96,7 +96,7 @@ void BM_ScopedAnnotationEnabled_Adhoc(::testing::benchmark::State& state) {
   int i = 0;
   for (auto s : state) {
     // generate the annotation on the fly.
-    ScopedAnnotation trace(absl::StrCat(i, "-", i * i));
+    ScopedAnnotation trace(abslx::StrCat(i, "-", i * i));
     ++i;
   }
   AnnotationStack::Enable(false);
@@ -107,7 +107,7 @@ BENCHMARK(BM_ScopedAnnotationEnabled_Adhoc);
 void BM_ScopedAnnotationDisabled_Lambda(::testing::benchmark::State& state) {
   int i = 0;
   for (auto s : state) {
-    ScopedAnnotation trace([&]() { return absl::StrCat(i, "-", i * i); });
+    ScopedAnnotation trace([&]() { return abslx::StrCat(i, "-", i * i); });
     ++i;
   }
 }
@@ -119,7 +119,7 @@ void BM_ScopedAnnotationEnabled_Adhoc_Lambda(
   AnnotationStack::Enable(true);
   int i = 0;
   for (auto s : state) {
-    ScopedAnnotation trace([&]() { return absl::StrCat(i, "-", i * i); });
+    ScopedAnnotation trace([&]() { return abslx::StrCat(i, "-", i * i); });
     ++i;
   }
   AnnotationStack::Enable(false);

@@ -54,9 +54,9 @@ class XlaCompilationCache : public ResourceBase {
  public:
   struct Config {
     Config() {}
-    explicit Config(absl::string_view persistent_cache_directory,
+    explicit Config(abslx::string_view persistent_cache_directory,
                     bool disable_strict_signature_checks,
-                    absl::string_view persistance_prefix)
+                    abslx::string_view persistance_prefix)
         : persistent_cache_directory(persistent_cache_directory),
           disable_strict_signature_checks(disable_strict_signature_checks),
           persistance_prefix(persistance_prefix) {}
@@ -141,8 +141,8 @@ class XlaCompilationCache : public ResourceBase {
     // for compile-time constant arguments to the compilation, ordered by
     // argument number. Tensors must be in host memory.
     using TensorTypeAndShape =
-        std::pair<DataType, absl::InlinedVector<int64_t, 4>>;
-    absl::InlinedVector<absl::variant<Tensor, TensorTypeAndShape>, 8> args;
+        std::pair<DataType, abslx::InlinedVector<int64_t, 4>>;
+    abslx::InlinedVector<abslx::variant<Tensor, TensorTypeAndShape>, 8> args;
 
     bool operator==(const Signature& other) const;
 
@@ -157,7 +157,7 @@ class XlaCompilationCache : public ResourceBase {
   // Builds the signature for a compilation.
   static StatusOr<Signature> BuildSignature(
       const NameAttrList& function,
-      absl::Span<const XlaCompiler::Argument> args);
+      abslx::Span<const XlaCompiler::Argument> args);
 
  private:
   // Common implementation of Compile and CompileSingleOp. The `OpKernelContext`
@@ -262,7 +262,7 @@ class XlaCompilationCache : public ResourceBase {
       const XlaSerializedCacheKey& key);
 
   mutex compile_cache_mu_;
-  absl::flat_hash_map<Signature, std::unique_ptr<Entry>, Signature::Hash> cache_
+  abslx::flat_hash_map<Signature, std::unique_ptr<Entry>, Signature::Hash> cache_
       TF_GUARDED_BY(compile_cache_mu_);
 
   struct ClusterCompileStats {
@@ -284,7 +284,7 @@ class XlaCompilationCache : public ResourceBase {
   mutex cluster_compile_stats_mu_;
 
   // Maps cluster names to compilation statistics for said cluster.
-  absl::flat_hash_map<string, ClusterCompileStats> cluster_compile_stats_
+  abslx::flat_hash_map<string, ClusterCompileStats> cluster_compile_stats_
       TF_GUARDED_BY(cluster_compile_stats_mu_);
 
   struct AsyncCompilationState {
@@ -325,8 +325,8 @@ class XlaCompilationCache : public ResourceBase {
 // Creates a single-node graph using the specified node_def as the only op apart
 // from the arg and retval nodes.
 StatusOr<std::unique_ptr<Graph>> CreateGraph(
-    const NodeDef& node_def, absl::Span<const XlaCompiler::Argument> args,
-    absl::Span<const DataType> result_types);
+    const NodeDef& node_def, abslx::Span<const XlaCompiler::Argument> args,
+    abslx::Span<const DataType> result_types);
 
 // Use XlaCompiler to compile a single op into HLO.
 Status XlaSingleOpToHlo(

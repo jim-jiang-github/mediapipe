@@ -44,11 +44,11 @@ auto* compile_counter = monitoring::Counter<2>::New(
 
 void RecordCompileTime(const std::string& model_name, const std::string& kernel,
                        std::optional<size_t> specialization,
-                       absl::Duration compile_time) {
+                       abslx::Duration compile_time) {
   auto* compile_time_cell = compile_time_us->GetCell(
       model_name, kernel,
       specialization.has_value() ? "specialized" : "default");
-  compile_time_cell->Add(absl::ToInt64Microseconds(compile_time));
+  compile_time_cell->Add(abslx::ToInt64Microseconds(compile_time));
 
   auto* compile_counter_cell = compile_counter->GetCell(model_name, kernel);
   compile_counter_cell->IncrementBy(1);

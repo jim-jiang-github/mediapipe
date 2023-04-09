@@ -82,7 +82,7 @@ Status DecomposeAllGather(HloAllGatherInstruction* ag, HloComputation* comp) {
 
 StatusOr<bool> AllGatherDecomposer::Run(
     HloModule* module,
-    const absl::flat_hash_set<absl::string_view>& execution_threads) {
+    const abslx::flat_hash_set<abslx::string_view>& execution_threads) {
   bool changed = false;
   for (auto comp : module->MakeNonfusionComputations(execution_threads)) {
     for (auto hlo : comp->MakeInstructionPostOrder()) {

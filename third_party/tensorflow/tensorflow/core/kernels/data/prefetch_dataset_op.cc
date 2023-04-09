@@ -252,12 +252,12 @@ class PrefetchDatasetOp::Dataset : public DatasetBase {
         TF_RETURN_IF_ERROR(WriteStatus(writer, i, buffer_element.status));
         if (buffer_element.status.ok()) {
           TF_RETURN_IF_ERROR(writer->WriteScalar(
-              absl::StrCat(prefix(), "::", i),
-              absl::StrCat(kBuffer, kSizeSuffix), buffer_element.value.size()));
+              abslx::StrCat(prefix(), "::", i),
+              abslx::StrCat(kBuffer, kSizeSuffix), buffer_element.value.size()));
           for (size_t j = 0; j < buffer_element.value.size(); j++) {
             TF_RETURN_IF_ERROR(writer->WriteTensor(
-                absl::StrCat(prefix(), "::", i),
-                absl::StrCat(kBuffer, "[", j, "]"), buffer_element.value[j]));
+                abslx::StrCat(prefix(), "::", i),
+                abslx::StrCat(kBuffer, "[", j, "]"), buffer_element.value[j]));
           }
         }
       }
@@ -285,16 +285,16 @@ class PrefetchDatasetOp::Dataset : public DatasetBase {
           {
             int64_t temp;
             TF_RETURN_IF_ERROR(
-                reader->ReadScalar(absl::StrCat(prefix(), "::", i),
-                                   absl::StrCat(kBuffer, kSizeSuffix), &temp));
+                reader->ReadScalar(abslx::StrCat(prefix(), "::", i),
+                                   abslx::StrCat(kBuffer, kSizeSuffix), &temp));
             value_size = static_cast<size_t>(temp);
           }
           buffer_element.value.reserve(value_size);
           for (size_t j = 0; j < value_size; j++) {
             buffer_element.value.emplace_back();
             TF_RETURN_IF_ERROR(
-                reader->ReadTensor(ctx->flr(), absl::StrCat(prefix(), "::", i),
-                                   absl::StrCat(kBuffer, "[", j, "]"),
+                reader->ReadTensor(ctx->flr(), abslx::StrCat(prefix(), "::", i),
+                                   abslx::StrCat(kBuffer, "[", j, "]"),
                                    &buffer_element.value.back()));
           }
         }
@@ -317,7 +317,7 @@ class PrefetchDatasetOp::Dataset : public DatasetBase {
             shapes.push_back(component.shape().DebugString());
           }
           result.push_back(std::make_pair("next_element_shapes",
-                                          absl::StrJoin(shapes, ",")));
+                                          abslx::StrJoin(shapes, ",")));
         }
         mu_->unlock();
       }
@@ -523,11 +523,11 @@ class PrefetchDatasetOp::Dataset : public DatasetBase {
     Status WriteStatus(IteratorStateWriter* writer, size_t index,
                        const Status& status) TF_EXCLUSIVE_LOCKS_REQUIRED(*mu_) {
       TF_RETURN_IF_ERROR(
-          writer->WriteScalar(absl::StrCat(prefix(), "::", index), CodeKey(),
+          writer->WriteScalar(abslx::StrCat(prefix(), "::", index), CodeKey(),
                               static_cast<int64_t>(status.code())));
       if (!status.ok()) {
         TF_RETURN_IF_ERROR(
-            writer->WriteScalar(absl::StrCat(prefix(), "::", index),
+            writer->WriteScalar(abslx::StrCat(prefix(), "::", index),
                                 ErrorMessageKey(), status.error_message()));
       }
       return OkStatus();
@@ -536,14 +536,14 @@ class PrefetchDatasetOp::Dataset : public DatasetBase {
     Status ReadStatus(IteratorStateReader* reader, size_t index, Status* status)
         TF_EXCLUSIVE_LOCKS_REQUIRED(*mu_) {
       int64_t code_int;
-      TF_RETURN_IF_ERROR(reader->ReadScalar(absl::StrCat(prefix(), "::", index),
+      TF_RETURN_IF_ERROR(reader->ReadScalar(abslx::StrCat(prefix(), "::", index),
                                             CodeKey(), &code_int));
       error::Code code = static_cast<error::Code>(code_int);
 
       if (code != error::Code::OK) {
         tstring error_message;
         TF_RETURN_IF_ERROR(
-            reader->ReadScalar(absl::StrCat(prefix(), "::", index),
+            reader->ReadScalar(abslx::StrCat(prefix(), "::", index),
                                ErrorMessageKey(), &error_message));
         *status = Status(code, error_message);
       } else {
@@ -552,10 +552,10 @@ class PrefetchDatasetOp::Dataset : public DatasetBase {
       return OkStatus();
     }
 
-    string CodeKey() { return absl::StrCat(kStatus, kCodeSuffix); }
+    string CodeKey() { return abslx::StrCat(kStatus, kCodeSuffix); }
 
     string ErrorMessageKey() {
-      return absl::StrCat(kStatus, kErrorMessageSuffix);
+      return abslx::StrCat(kStatus, kErrorMessageSuffix);
     }
 
     // This mutex is used to ensure exclusivity between multiple threads

@@ -74,8 +74,8 @@ string GetNewFunctionName(
   return (
       func_type ==
               AssociatedFunctionInfo::AssociatedFunctionType::kSymbolicGradient
-          ? fld->UniqueFunctionName(absl::StrCat(n->name(), "_f15n_"))
-          : fld->UniqueFunctionName(absl::StrCat(func_name, "_f15n_")));
+          ? fld->UniqueFunctionName(abslx::StrCat(n->name(), "_f15n_"))
+          : fld->UniqueFunctionName(abslx::StrCat(func_name, "_f15n_")));
 }
 
 // Returns name to which a modified function has been mapped.
@@ -90,7 +90,7 @@ void UpdateFunctionMap(FuncMap* func_map, const string& canonicalized_name,
   // If function was modified store its new name, otherwise add empty entry to
   // record that function has been processed and does not need to be rewritten.
   (*func_map)[canonicalized_name] =
-      function_modified ? absl::make_optional(new_func_name) : std::nullopt;
+      function_modified ? abslx::make_optional(new_func_name) : std::nullopt;
 }
 
 // Adds new function def to graph's function library if necessary.
@@ -241,13 +241,13 @@ Status FunctionalizeControlFlowForFunction(
     // Functionalize the function body.
     if (VLOG_IS_ON(4)) {
       DumpGraphToFile(
-          absl::StrCat("functionalize_control_flow_before_fdef_", func_name),
+          abslx::StrCat("functionalize_control_flow_before_fdef_", func_name),
           *g, fld);
     }
     TF_RETURN_IF_ERROR(FunctionalizeControlFlow(g, fld, node_filter));
     if (VLOG_IS_ON(4)) {
       DumpGraphToFile(
-          absl::StrCat("functionalize_control_flow_after_fdef_", func_name), *g,
+          abslx::StrCat("functionalize_control_flow_after_fdef_", func_name), *g,
           fld);
     }
   }
@@ -361,7 +361,7 @@ Status FunctionalizeControlFlowForXlaPass::Run(
     VLOG(2) << "Graph has node " << n->type_string()
             << ". Corresponding function: " << func.name();
     string new_func_name = options.flib_def->UniqueFunctionName(
-        absl::StrCat(func.name(), "_f15n_"));
+        abslx::StrCat(func.name(), "_f15n_"));
     bool modified;
     TF_RETURN_IF_ERROR(FunctionalizeControlFlowForFunction(
         func.name(), new_func_name, func.attr(), options.flib_def, flr,

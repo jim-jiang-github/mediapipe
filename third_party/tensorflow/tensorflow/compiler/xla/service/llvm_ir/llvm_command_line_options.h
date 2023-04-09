@@ -35,7 +35,7 @@ void InitializeLLVMCommandLineOptions(const T& options) {
     fake_argv_storage.push_back("");
     for (const auto& it : options) {
       // Skip options the XLA backend itself consumes.
-      if (!absl::StartsWith(it.first, "xla_")) {
+      if (!abslx::StartsWith(it.first, "xla_")) {
         if (it.second.empty()) {
           fake_argv_storage.push_back(it.first);
         } else {

@@ -37,40 +37,40 @@ namespace profiler {
 namespace test {
 
 inline std::unique_ptr<ProfilerServer> StartServer(
-    absl::Duration duration, std::string* service_address,
+    abslx::Duration duration, std::string* service_address,
     ProfileRequest* request = nullptr) {
-  auto profiler_server = absl::make_unique<ProfilerServer>();
+  auto profiler_server = abslx::make_unique<ProfilerServer>();
   int port = testing::PickUnusedPortOrDie();
   profiler_server->StartProfilerServer(port);
 
   DCHECK(service_address);
-  *service_address = absl::StrCat("localhost:", port);
+  *service_address = abslx::StrCat("localhost:", port);
 
   if (request) {
-    request->set_duration_ms(absl::ToInt64Milliseconds(duration));
+    request->set_duration_ms(abslx::ToInt64Milliseconds(duration));
     request->set_max_events(10000);
     *request->mutable_opts() = ProfilerSession::DefaultOptions();
     request->mutable_opts()->set_duration_ms(
-        absl::ToInt64Milliseconds(duration));
+        abslx::ToInt64Milliseconds(duration));
     request->set_session_id("test_session");
     request->set_host_name(*service_address);
     request->set_repository_root(testing::TmpDir());
   }
 
-  LOG(INFO) << "Started " << *service_address << " at " << absl::Now();
+  LOG(INFO) << "Started " << *service_address << " at " << abslx::Now();
   LOG(INFO) << "Duration: " << duration;
 
   return profiler_server;
 }
 
-inline ::testing::Matcher<absl::Duration> DurationNear(
-    const absl::Duration duration, absl::Duration epsilon = absl::Seconds(1)) {
+inline ::testing::Matcher<abslx::Duration> DurationNear(
+    const abslx::Duration duration, abslx::Duration epsilon = abslx::Seconds(1)) {
   return ::testing::AllOf(::testing::Ge(duration - epsilon),
                           ::testing::Le(duration + epsilon));
 }
 
-inline ::testing::Matcher<absl::Duration> DurationApproxLess(
-    const absl::Duration duration, absl::Duration epsilon = absl::Seconds(1)) {
+inline ::testing::Matcher<abslx::Duration> DurationApproxLess(
+    const abslx::Duration duration, abslx::Duration epsilon = abslx::Seconds(1)) {
   return ::testing::Le(duration + epsilon);
 }
 

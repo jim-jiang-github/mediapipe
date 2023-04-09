@@ -66,7 +66,7 @@ class Decoder {
   // Output:
   //   estimated_box: annotation with point_3d field populated with
   //     3d vertices.
-  absl::Status Lift2DTo3D(
+  abslx::Status Lift2DTo3D(
       const Eigen::Matrix<float, 4, 4, Eigen::RowMajor>& projection_matrix,
       bool portrait, FrameAnnotation* estimated_box) const;
 

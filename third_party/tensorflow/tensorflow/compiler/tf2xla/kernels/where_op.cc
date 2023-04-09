@@ -144,7 +144,7 @@ StatusOr<XlaOp> PrefixSum(XlaOp arr) {
 
 // prefix-sum works better on CPU/GPU, whereas sort works better on TPU.
 bool ShouldUsePrefixSumImpl(const DeviceType& dt) {
-  absl::string_view t = dt.type_string();
+  abslx::string_view t = dt.type_string();
   return t == DEVICE_CPU_XLA_JIT || t == DEVICE_GPU_XLA_JIT ||
          t == DEVICE_XLA_CPU || t == DEVICE_XLA_GPU;
 }

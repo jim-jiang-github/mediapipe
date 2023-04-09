@@ -25,13 +25,13 @@
 #include "absl/synchronization/internal/per_thread_sem.h"
 #include "absl/synchronization/mutex.h"
 
-namespace absl {
+namespace abslx {
 ABSL_NAMESPACE_BEGIN
 namespace base_internal {
 namespace {
 
-ABSL_CONST_INIT static absl::base_internal::SpinLock map_lock(
-    absl::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
+ABSL_CONST_INIT static abslx::base_internal::SpinLock map_lock(
+    abslx::kConstInit, base_internal::SCHEDULE_KERNEL_ONLY);
 ABSL_CONST_INIT static int num_identities_reused ABSL_GUARDED_BY(map_lock);
 
 static const void* const kCheckNoIdentity = reinterpret_cast<void*>(1);
@@ -58,7 +58,7 @@ static void TestThreadIdentityCurrent(const void* assert_no_identity) {
                    PerThreadSynch::kAlignment);
   EXPECT_EQ(identity, identity->per_thread_synch.thread_identity());
 
-  absl::base_internal::SpinLockHolder l(&map_lock);
+  abslx::base_internal::SpinLockHolder l(&map_lock);
   num_identities_reused++;
 }
 
@@ -90,7 +90,7 @@ TEST(ThreadIdentityTest, BasicIdentityWorksThreaded) {
   // We should have recycled ThreadIdentity objects above; while (external)
   // library threads allocating their own identities may preclude some
   // reuse, we should have sufficient repetitions to exclude this.
-  absl::base_internal::SpinLockHolder l(&map_lock);
+  abslx::base_internal::SpinLockHolder l(&map_lock);
   EXPECT_LT(kNumThreads, num_identities_reused);
 }
 
@@ -126,4 +126,4 @@ TEST(ThreadIdentityTest, ReusedThreadIdentityMutexTest) {
 }  // namespace
 }  // namespace base_internal
 ABSL_NAMESPACE_END
-}  // namespace absl
+}  // namespace abslx

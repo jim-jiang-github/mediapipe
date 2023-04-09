@@ -82,8 +82,8 @@ class AbstractOperation {
 
   virtual Status AddInput(AbstractTensorHandle* input) = 0;
   virtual Status AddInputList(
-      absl::Span<AbstractTensorHandle* const> inputs) = 0;
-  virtual Status Execute(absl::Span<AbstractTensorHandle*> retvals,
+      abslx::Span<AbstractTensorHandle* const> inputs) = 0;
+  virtual Status Execute(abslx::Span<AbstractTensorHandle*> retvals,
                          int* num_retvals) = 0;
 
   virtual Status SetAttrString(const char* attr_name, const char* data,
@@ -106,7 +106,7 @@ class AbstractOperation {
                                    const void* const* values,
                                    const size_t* lengths, int num_values) = 0;
   virtual Status SetAttrStringList(const char* attr_name,
-                                   absl::Span<string const> values);
+                                   abslx::Span<string const> values);
   virtual Status SetAttrFloatList(const char* attr_name, const float* values,
                                   int num_values) = 0;
   virtual Status SetAttrIntList(const char* attr_name, const int64_t* values,
@@ -119,7 +119,7 @@ class AbstractOperation {
   virtual Status SetAttrShapeList(const char* attr_name, const int64_t** dims,
                                   const int* num_dims, int num_values) = 0;
   virtual Status SetAttrFunctionList(
-      const char* attr_name, absl::Span<const AbstractOperation*> values) = 0;
+      const char* attr_name, abslx::Span<const AbstractOperation*> values) = 0;
 
  private:
   const AbstractOperationKind kind_;
@@ -133,7 +133,7 @@ inline Status AbstractOperation::SetAttrShape(const char* attr_name,
 }
 
 inline Status AbstractOperation::SetAttrStringList(
-    const char* attr_name, absl::Span<string const> values) {
+    const char* attr_name, abslx::Span<string const> values) {
   std::vector<const char*> raw_strs;
   std::vector<size_t> lengths;
   raw_strs.reserve(values.size());

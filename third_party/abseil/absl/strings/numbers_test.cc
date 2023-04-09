@@ -46,16 +46,16 @@
 
 namespace {
 
-using absl::SimpleAtoi;
-using absl::numbers_internal::kSixDigitsToBufferSize;
-using absl::numbers_internal::safe_strto32_base;
-using absl::numbers_internal::safe_strto64_base;
-using absl::numbers_internal::safe_strtou32_base;
-using absl::numbers_internal::safe_strtou64_base;
-using absl::numbers_internal::SixDigitsToBuffer;
-using absl::strings_internal::Itoa;
-using absl::strings_internal::strtouint32_test_cases;
-using absl::strings_internal::strtouint64_test_cases;
+using abslx::SimpleAtoi;
+using abslx::numbers_internal::kSixDigitsToBufferSize;
+using abslx::numbers_internal::safe_strto32_base;
+using abslx::numbers_internal::safe_strto64_base;
+using abslx::numbers_internal::safe_strtou32_base;
+using abslx::numbers_internal::safe_strtou64_base;
+using abslx::numbers_internal::SixDigitsToBuffer;
+using abslx::strings_internal::Itoa;
+using abslx::strings_internal::strtouint32_test_cases;
+using abslx::strings_internal::strtouint64_test_cases;
 using testing::Eq;
 using testing::MatchesRegex;
 
@@ -151,21 +151,21 @@ typedef MyInteger<int64_t> MyInt64;
 typedef MyInteger<uint64_t> MyUInt64;
 
 void CheckInt32(int32_t x) {
-  char buffer[absl::numbers_internal::kFastToBufferSize];
-  char* actual = absl::numbers_internal::FastIntToBuffer(x, buffer);
+  char buffer[abslx::numbers_internal::kFastToBufferSize];
+  char* actual = abslx::numbers_internal::FastIntToBuffer(x, buffer);
   std::string expected = std::to_string(x);
   EXPECT_EQ(expected, std::string(buffer, actual)) << " Input " << x;
 
-  char* generic_actual = absl::numbers_internal::FastIntToBuffer(x, buffer);
+  char* generic_actual = abslx::numbers_internal::FastIntToBuffer(x, buffer);
   EXPECT_EQ(expected, std::string(buffer, generic_actual)) << " Input " << x;
 }
 
 void CheckInt64(int64_t x) {
-  char buffer[absl::numbers_internal::kFastToBufferSize + 3];
+  char buffer[abslx::numbers_internal::kFastToBufferSize + 3];
   buffer[0] = '*';
   buffer[23] = '*';
   buffer[24] = '*';
-  char* actual = absl::numbers_internal::FastIntToBuffer(x, &buffer[1]);
+  char* actual = abslx::numbers_internal::FastIntToBuffer(x, &buffer[1]);
   std::string expected = std::to_string(x);
   EXPECT_EQ(expected, std::string(&buffer[1], actual)) << " Input " << x;
   EXPECT_EQ(buffer[0], '*');
@@ -173,41 +173,41 @@ void CheckInt64(int64_t x) {
   EXPECT_EQ(buffer[24], '*');
 
   char* my_actual =
-      absl::numbers_internal::FastIntToBuffer(MyInt64(x), &buffer[1]);
+      abslx::numbers_internal::FastIntToBuffer(MyInt64(x), &buffer[1]);
   EXPECT_EQ(expected, std::string(&buffer[1], my_actual)) << " Input " << x;
 }
 
 void CheckUInt32(uint32_t x) {
-  char buffer[absl::numbers_internal::kFastToBufferSize];
-  char* actual = absl::numbers_internal::FastIntToBuffer(x, buffer);
+  char buffer[abslx::numbers_internal::kFastToBufferSize];
+  char* actual = abslx::numbers_internal::FastIntToBuffer(x, buffer);
   std::string expected = std::to_string(x);
   EXPECT_EQ(expected, std::string(buffer, actual)) << " Input " << x;
 
-  char* generic_actual = absl::numbers_internal::FastIntToBuffer(x, buffer);
+  char* generic_actual = abslx::numbers_internal::FastIntToBuffer(x, buffer);
   EXPECT_EQ(expected, std::string(buffer, generic_actual)) << " Input " << x;
 }
 
 void CheckUInt64(uint64_t x) {
-  char buffer[absl::numbers_internal::kFastToBufferSize + 1];
-  char* actual = absl::numbers_internal::FastIntToBuffer(x, &buffer[1]);
+  char buffer[abslx::numbers_internal::kFastToBufferSize + 1];
+  char* actual = abslx::numbers_internal::FastIntToBuffer(x, &buffer[1]);
   std::string expected = std::to_string(x);
   EXPECT_EQ(expected, std::string(&buffer[1], actual)) << " Input " << x;
 
-  char* generic_actual = absl::numbers_internal::FastIntToBuffer(x, &buffer[1]);
+  char* generic_actual = abslx::numbers_internal::FastIntToBuffer(x, &buffer[1]);
   EXPECT_EQ(expected, std::string(&buffer[1], generic_actual))
       << " Input " << x;
 
   char* my_actual =
-      absl::numbers_internal::FastIntToBuffer(MyUInt64(x), &buffer[1]);
+      abslx::numbers_internal::FastIntToBuffer(MyUInt64(x), &buffer[1]);
   EXPECT_EQ(expected, std::string(&buffer[1], my_actual)) << " Input " << x;
 }
 
 void CheckHex64(uint64_t v) {
   char expected[16 + 1];
-  std::string actual = absl::StrCat(absl::Hex(v, absl::kZeroPad16));
+  std::string actual = abslx::StrCat(abslx::Hex(v, abslx::kZeroPad16));
   snprintf(expected, sizeof(expected), "%016" PRIx64, static_cast<uint64_t>(v));
   EXPECT_EQ(expected, actual) << " Input " << v;
-  actual = absl::StrCat(absl::Hex(v, absl::kSpacePad16));
+  actual = abslx::StrCat(abslx::Hex(v, abslx::kSpacePad16));
   snprintf(expected, sizeof(expected), "%16" PRIx64, static_cast<uint64_t>(v));
   EXPECT_EQ(expected, actual) << " Input " << v;
 }
@@ -252,7 +252,7 @@ template <typename int_type, typename in_val_type>
 void VerifySimpleAtoiGood(in_val_type in_value, int_type exp_value) {
   std::string s;
   // (u)int128 can be streamed but not StrCat'd.
-  absl::strings_internal::OStringStream(&s) << in_value;
+  abslx::strings_internal::OStringStream(&s) << in_value;
   int_type x = static_cast<int_type>(~exp_value);
   EXPECT_TRUE(SimpleAtoi(s, &x))
       << "in_value=" << in_value << " s=" << s << " x=" << x;
@@ -266,14 +266,14 @@ template <typename int_type, typename in_val_type>
 void VerifySimpleAtoiBad(in_val_type in_value) {
   std::string s;
   // (u)int128 can be streamed but not StrCat'd.
-  absl::strings_internal::OStringStream(&s) << in_value;
+  abslx::strings_internal::OStringStream(&s) << in_value;
   int_type x;
   EXPECT_FALSE(SimpleAtoi(s, &x));
   EXPECT_FALSE(SimpleAtoi(s.c_str(), &x));
 }
 
 TEST(NumbersTest, Atoi) {
-  // SimpleAtoi(absl::string_view, int32_t)
+  // SimpleAtoi(abslx::string_view, int32_t)
   VerifySimpleAtoiGood<int32_t>(0, 0);
   VerifySimpleAtoiGood<int32_t>(42, 42);
   VerifySimpleAtoiGood<int32_t>(-42, -42);
@@ -283,7 +283,7 @@ TEST(NumbersTest, Atoi) {
   VerifySimpleAtoiGood<int32_t>(std::numeric_limits<int32_t>::max(),
                                 std::numeric_limits<int32_t>::max());
 
-  // SimpleAtoi(absl::string_view, uint32_t)
+  // SimpleAtoi(abslx::string_view, uint32_t)
   VerifySimpleAtoiGood<uint32_t>(0, 0);
   VerifySimpleAtoiGood<uint32_t>(42, 42);
   VerifySimpleAtoiBad<uint32_t>(-42);
@@ -297,7 +297,7 @@ TEST(NumbersTest, Atoi) {
   VerifySimpleAtoiBad<uint32_t>(std::numeric_limits<int64_t>::max());
   VerifySimpleAtoiBad<uint32_t>(std::numeric_limits<uint64_t>::max());
 
-  // SimpleAtoi(absl::string_view, int64_t)
+  // SimpleAtoi(abslx::string_view, int64_t)
   VerifySimpleAtoiGood<int64_t>(0, 0);
   VerifySimpleAtoiGood<int64_t>(42, 42);
   VerifySimpleAtoiGood<int64_t>(-42, -42);
@@ -314,7 +314,7 @@ TEST(NumbersTest, Atoi) {
                                 std::numeric_limits<int64_t>::max());
   VerifySimpleAtoiBad<int64_t>(std::numeric_limits<uint64_t>::max());
 
-  // SimpleAtoi(absl::string_view, uint64_t)
+  // SimpleAtoi(abslx::string_view, uint64_t)
   VerifySimpleAtoiGood<uint64_t>(0, 0);
   VerifySimpleAtoiGood<uint64_t>(42, 42);
   VerifySimpleAtoiBad<uint64_t>(-42);
@@ -330,49 +330,49 @@ TEST(NumbersTest, Atoi) {
   VerifySimpleAtoiGood<uint64_t>(std::numeric_limits<uint64_t>::max(),
                                  std::numeric_limits<uint64_t>::max());
 
-  // SimpleAtoi(absl::string_view, absl::uint128)
-  VerifySimpleAtoiGood<absl::uint128>(0, 0);
-  VerifySimpleAtoiGood<absl::uint128>(42, 42);
-  VerifySimpleAtoiBad<absl::uint128>(-42);
+  // SimpleAtoi(abslx::string_view, abslx::uint128)
+  VerifySimpleAtoiGood<abslx::uint128>(0, 0);
+  VerifySimpleAtoiGood<abslx::uint128>(42, 42);
+  VerifySimpleAtoiBad<abslx::uint128>(-42);
 
-  VerifySimpleAtoiBad<absl::uint128>(std::numeric_limits<int32_t>::min());
-  VerifySimpleAtoiGood<absl::uint128>(std::numeric_limits<int32_t>::max(),
+  VerifySimpleAtoiBad<abslx::uint128>(std::numeric_limits<int32_t>::min());
+  VerifySimpleAtoiGood<abslx::uint128>(std::numeric_limits<int32_t>::max(),
                                       std::numeric_limits<int32_t>::max());
-  VerifySimpleAtoiGood<absl::uint128>(std::numeric_limits<uint32_t>::max(),
+  VerifySimpleAtoiGood<abslx::uint128>(std::numeric_limits<uint32_t>::max(),
                                       std::numeric_limits<uint32_t>::max());
-  VerifySimpleAtoiBad<absl::uint128>(std::numeric_limits<int64_t>::min());
-  VerifySimpleAtoiGood<absl::uint128>(std::numeric_limits<int64_t>::max(),
+  VerifySimpleAtoiBad<abslx::uint128>(std::numeric_limits<int64_t>::min());
+  VerifySimpleAtoiGood<abslx::uint128>(std::numeric_limits<int64_t>::max(),
                                       std::numeric_limits<int64_t>::max());
-  VerifySimpleAtoiGood<absl::uint128>(std::numeric_limits<uint64_t>::max(),
+  VerifySimpleAtoiGood<abslx::uint128>(std::numeric_limits<uint64_t>::max(),
                                       std::numeric_limits<uint64_t>::max());
-  VerifySimpleAtoiGood<absl::uint128>(
-      std::numeric_limits<absl::uint128>::max(),
-      std::numeric_limits<absl::uint128>::max());
+  VerifySimpleAtoiGood<abslx::uint128>(
+      std::numeric_limits<abslx::uint128>::max(),
+      std::numeric_limits<abslx::uint128>::max());
 
-  // SimpleAtoi(absl::string_view, absl::int128)
-  VerifySimpleAtoiGood<absl::int128>(0, 0);
-  VerifySimpleAtoiGood<absl::int128>(42, 42);
-  VerifySimpleAtoiGood<absl::int128>(-42, -42);
+  // SimpleAtoi(abslx::string_view, abslx::int128)
+  VerifySimpleAtoiGood<abslx::int128>(0, 0);
+  VerifySimpleAtoiGood<abslx::int128>(42, 42);
+  VerifySimpleAtoiGood<abslx::int128>(-42, -42);
 
-  VerifySimpleAtoiGood<absl::int128>(std::numeric_limits<int32_t>::min(),
+  VerifySimpleAtoiGood<abslx::int128>(std::numeric_limits<int32_t>::min(),
                                       std::numeric_limits<int32_t>::min());
-  VerifySimpleAtoiGood<absl::int128>(std::numeric_limits<int32_t>::max(),
+  VerifySimpleAtoiGood<abslx::int128>(std::numeric_limits<int32_t>::max(),
                                       std::numeric_limits<int32_t>::max());
-  VerifySimpleAtoiGood<absl::int128>(std::numeric_limits<uint32_t>::max(),
+  VerifySimpleAtoiGood<abslx::int128>(std::numeric_limits<uint32_t>::max(),
                                       std::numeric_limits<uint32_t>::max());
-  VerifySimpleAtoiGood<absl::int128>(std::numeric_limits<int64_t>::min(),
+  VerifySimpleAtoiGood<abslx::int128>(std::numeric_limits<int64_t>::min(),
                                       std::numeric_limits<int64_t>::min());
-  VerifySimpleAtoiGood<absl::int128>(std::numeric_limits<int64_t>::max(),
+  VerifySimpleAtoiGood<abslx::int128>(std::numeric_limits<int64_t>::max(),
                                       std::numeric_limits<int64_t>::max());
-  VerifySimpleAtoiGood<absl::int128>(std::numeric_limits<uint64_t>::max(),
+  VerifySimpleAtoiGood<abslx::int128>(std::numeric_limits<uint64_t>::max(),
                                       std::numeric_limits<uint64_t>::max());
-  VerifySimpleAtoiGood<absl::int128>(
-      std::numeric_limits<absl::int128>::min(),
-      std::numeric_limits<absl::int128>::min());
-  VerifySimpleAtoiGood<absl::int128>(
-      std::numeric_limits<absl::int128>::max(),
-      std::numeric_limits<absl::int128>::max());
-  VerifySimpleAtoiBad<absl::int128>(std::numeric_limits<absl::uint128>::max());
+  VerifySimpleAtoiGood<abslx::int128>(
+      std::numeric_limits<abslx::int128>::min(),
+      std::numeric_limits<abslx::int128>::min());
+  VerifySimpleAtoiGood<abslx::int128>(
+      std::numeric_limits<abslx::int128>::max(),
+      std::numeric_limits<abslx::int128>::max());
+  VerifySimpleAtoiBad<abslx::int128>(std::numeric_limits<abslx::uint128>::max());
 
   // Some other types
   VerifySimpleAtoiGood<int>(-42, -42);
@@ -388,29 +388,29 @@ TEST(NumbersTest, Atoi) {
 
 TEST(NumbersTest, Atod) {
   double d;
-  EXPECT_TRUE(absl::SimpleAtod("nan", &d));
+  EXPECT_TRUE(abslx::SimpleAtod("nan", &d));
   EXPECT_TRUE(std::isnan(d));
 }
 
 TEST(NumbersTest, Prefixes) {
   double d;
-  EXPECT_FALSE(absl::SimpleAtod("++1", &d));
-  EXPECT_FALSE(absl::SimpleAtod("+-1", &d));
-  EXPECT_FALSE(absl::SimpleAtod("-+1", &d));
-  EXPECT_FALSE(absl::SimpleAtod("--1", &d));
-  EXPECT_TRUE(absl::SimpleAtod("-1", &d));
+  EXPECT_FALSE(abslx::SimpleAtod("++1", &d));
+  EXPECT_FALSE(abslx::SimpleAtod("+-1", &d));
+  EXPECT_FALSE(abslx::SimpleAtod("-+1", &d));
+  EXPECT_FALSE(abslx::SimpleAtod("--1", &d));
+  EXPECT_TRUE(abslx::SimpleAtod("-1", &d));
   EXPECT_EQ(d, -1.);
-  EXPECT_TRUE(absl::SimpleAtod("+1", &d));
+  EXPECT_TRUE(abslx::SimpleAtod("+1", &d));
   EXPECT_EQ(d, +1.);
 
   float f;
-  EXPECT_FALSE(absl::SimpleAtof("++1", &f));
-  EXPECT_FALSE(absl::SimpleAtof("+-1", &f));
-  EXPECT_FALSE(absl::SimpleAtof("-+1", &f));
-  EXPECT_FALSE(absl::SimpleAtof("--1", &f));
-  EXPECT_TRUE(absl::SimpleAtof("-1", &f));
+  EXPECT_FALSE(abslx::SimpleAtof("++1", &f));
+  EXPECT_FALSE(abslx::SimpleAtof("+-1", &f));
+  EXPECT_FALSE(abslx::SimpleAtof("-+1", &f));
+  EXPECT_FALSE(abslx::SimpleAtof("--1", &f));
+  EXPECT_TRUE(abslx::SimpleAtof("-1", &f));
   EXPECT_EQ(f, -1.f);
-  EXPECT_TRUE(absl::SimpleAtof("+1", &f));
+  EXPECT_TRUE(abslx::SimpleAtof("+1", &f));
   EXPECT_EQ(f, +1.f);
 }
 
@@ -686,7 +686,7 @@ TEST(stringtest, safe_strto64_base) {
 const size_t kNumRandomTests = 10000;
 
 template <typename IntType>
-void test_random_integer_parse_base(bool (*parse_func)(absl::string_view,
+void test_random_integer_parse_base(bool (*parse_func)(abslx::string_view,
                                                        IntType* value,
                                                        int base)) {
   using RandomEngine = std::minstd_rand0;
@@ -708,16 +708,16 @@ void test_random_integer_parse_base(bool (*parse_func)(absl::string_view,
 
     // Test overflow
     EXPECT_FALSE(
-        parse_func(absl::StrCat(std::numeric_limits<IntType>::max(), value),
+        parse_func(abslx::StrCat(std::numeric_limits<IntType>::max(), value),
                    &parsed_value, base));
 
     // Test underflow
     if (std::numeric_limits<IntType>::min() < 0) {
       EXPECT_FALSE(
-          parse_func(absl::StrCat(std::numeric_limits<IntType>::min(), value),
+          parse_func(abslx::StrCat(std::numeric_limits<IntType>::min(), value),
                      &parsed_value, base));
     } else {
-      EXPECT_FALSE(parse_func(absl::StrCat("-", value), &parsed_value, base));
+      EXPECT_FALSE(parse_func(abslx::StrCat("-", value), &parsed_value, base));
     }
   }
 }
@@ -738,11 +738,11 @@ TEST(stringtest, safe_strtou128_random) {
   // random number generators don't work for uint128, and
   // uint128 can be streamed but not StrCat'd, so this code must be custom
   // implemented for uint128, but is generally the same as what's above.
-  // test_random_integer_parse_base<absl::uint128>(
-  //     &absl::numbers_internal::safe_strtou128_base);
+  // test_random_integer_parse_base<abslx::uint128>(
+  //     &abslx::numbers_internal::safe_strtou128_base);
   using RandomEngine = std::minstd_rand0;
-  using IntType = absl::uint128;
-  constexpr auto parse_func = &absl::numbers_internal::safe_strtou128_base;
+  using IntType = abslx::uint128;
+  constexpr auto parse_func = &abslx::numbers_internal::safe_strtou128_base;
 
   std::random_device rd;
   RandomEngine rng(rd());
@@ -764,13 +764,13 @@ TEST(stringtest, safe_strtou128_random) {
 
     // Test overflow
     std::string s;
-    absl::strings_internal::OStringStream(&s)
+    abslx::strings_internal::OStringStream(&s)
         << std::numeric_limits<IntType>::max() << value;
     EXPECT_FALSE(parse_func(s, &parsed_value, base));
 
     // Test underflow
     s.clear();
-    absl::strings_internal::OStringStream(&s) << "-" << value;
+    abslx::strings_internal::OStringStream(&s) << "-" << value;
     EXPECT_FALSE(parse_func(s, &parsed_value, base));
   }
 }
@@ -778,11 +778,11 @@ TEST(stringtest, safe_strto128_random) {
   // random number generators don't work for int128, and
   // int128 can be streamed but not StrCat'd, so this code must be custom
   // implemented for int128, but is generally the same as what's above.
-  // test_random_integer_parse_base<absl::int128>(
-  //     &absl::numbers_internal::safe_strto128_base);
+  // test_random_integer_parse_base<abslx::int128>(
+  //     &abslx::numbers_internal::safe_strto128_base);
   using RandomEngine = std::minstd_rand0;
-  using IntType = absl::int128;
-  constexpr auto parse_func = &absl::numbers_internal::safe_strto128_base;
+  using IntType = abslx::int128;
+  constexpr auto parse_func = &abslx::numbers_internal::safe_strto128_base;
 
   std::random_device rd;
   RandomEngine rng(rd());
@@ -795,7 +795,7 @@ TEST(stringtest, safe_strto128_random) {
   for (size_t i = 0; i < kNumRandomTests; ++i) {
     int64_t high = random_int64(rng);
     uint64_t low = random_uint64(rng);
-    IntType value = absl::MakeInt128(high, low);
+    IntType value = abslx::MakeInt128(high, low);
 
     int base = random_base(rng);
     std::string str_value;
@@ -808,13 +808,13 @@ TEST(stringtest, safe_strto128_random) {
 
     // Test overflow
     std::string s;
-    absl::strings_internal::OStringStream(&s)
+    abslx::strings_internal::OStringStream(&s)
         << std::numeric_limits<IntType>::max() << value;
     EXPECT_FALSE(parse_func(s, &parsed_value, base));
 
     // Test underflow
     s.clear();
-    absl::strings_internal::OStringStream(&s)
+    abslx::strings_internal::OStringStream(&s)
         << std::numeric_limits<IntType>::min() << value;
     EXPECT_FALSE(parse_func(s, &parsed_value, base));
   }
@@ -841,7 +841,7 @@ TEST(stringtest, safe_strtou32_base_length_delimited) {
 
     uint32_t value;
     EXPECT_EQ(e.expect_ok,
-              safe_strtou32_base(absl::string_view(tmp.data(), strlen(e.str)),
+              safe_strtou32_base(abslx::string_view(tmp.data(), strlen(e.str)),
                                  &value, e.base))
         << "str=\"" << e.str << "\" base=" << e.base;
     if (e.expect_ok) {
@@ -871,7 +871,7 @@ TEST(stringtest, safe_strtou64_base_length_delimited) {
 
     uint64_t value;
     EXPECT_EQ(e.expect_ok,
-              safe_strtou64_base(absl::string_view(tmp.data(), strlen(e.str)),
+              safe_strtou64_base(abslx::string_view(tmp.data(), strlen(e.str)),
                                  &value, e.base))
         << "str=\"" << e.str << "\" base=" << e.base;
     if (e.expect_ok) {
@@ -994,7 +994,7 @@ TEST_F(SimpleDtoaTest, ExhaustiveDoubleToSixDigits) {
       mismatches.push_back(d);
       if (mismatches.size() < 10) {
         ABSL_RAW_LOG(ERROR, "%s",
-                     absl::StrCat("Six-digit failure with double.  ", "d=", d,
+                     abslx::StrCat("Six-digit failure with double.  ", "d=", d,
                                   "=", d, " sixdigits=", sixdigitsbuf,
                                   " printf(%g)=", snprintfbuf)
                          .c_str());
@@ -1040,14 +1040,14 @@ TEST_F(SimpleDtoaTest, ExhaustiveDoubleToSixDigits) {
     }
 
     for (int exponent = -324; exponent <= 308; ++exponent) {
-      double powten = absl::strings_internal::Pow10(exponent);
+      double powten = abslx::strings_internal::Pow10(exponent);
       if (powten == 0) powten = 5e-324;
       if (kFloatNumCases >= 1e9) {
         // The exhaustive test takes a very long time, so log progress.
         char buf[kSixDigitsToBufferSize];
         ABSL_RAW_LOG(
             INFO, "%s",
-            absl::StrCat("Exp ", exponent, " powten=", powten, "(", powten,
+            abslx::StrCat("Exp ", exponent, " powten=", powten, "(", powten,
                          ") (",
                          std::string(buf, SixDigitsToBuffer(powten, buf)), ")")
                 .c_str());
@@ -1077,7 +1077,7 @@ TEST_F(SimpleDtoaTest, ExhaustiveDoubleToSixDigits) {
       char b1[32], b2[kSixDigitsToBufferSize];
       ABSL_RAW_LOG(
           ERROR, "%s",
-          absl::StrCat(
+          abslx::StrCat(
               "Mismatch #", i, "  d=", d, " (", ToNineDigits(d), ")",
               " sixdigits='", sixdigitsbuf, "'", " snprintf='", snprintfbuf,
               "'", " Before.=", PerfectDtoa(before), " ",
@@ -1106,8 +1106,8 @@ TEST(StrToInt32, Partial) {
       {" ", false, 0},
       {"-", false, 0},
       {"123@@@", false, 123},
-      {absl::StrCat(int32_min, int32_max), false, int32_min},
-      {absl::StrCat(int32_max, int32_max), false, int32_max},
+      {abslx::StrCat(int32_min, int32_max), false, int32_min},
+      {abslx::StrCat(int32_max, int32_max), false, int32_max},
   };
 
   for (const Int32TestLine& test_line : int32_test_line) {
@@ -1120,7 +1120,7 @@ TEST(StrToInt32, Partial) {
     EXPECT_EQ(test_line.status, status) << test_line.input;
     EXPECT_EQ(test_line.value, value) << test_line.input;
     value = -2;
-    status = safe_strto32_base(absl::string_view(test_line.input), &value, 10);
+    status = safe_strto32_base(abslx::string_view(test_line.input), &value, 10);
     EXPECT_EQ(test_line.status, status) << test_line.input;
     EXPECT_EQ(test_line.value, value) << test_line.input;
   }
@@ -1138,7 +1138,7 @@ TEST(StrToUint32, Partial) {
       {" ", false, 0},
       {"-", false, 0},
       {"123@@@", false, 123},
-      {absl::StrCat(uint32_max, uint32_max), false, uint32_max},
+      {abslx::StrCat(uint32_max, uint32_max), false, uint32_max},
   };
 
   for (const Uint32TestLine& test_line : uint32_test_line) {
@@ -1151,7 +1151,7 @@ TEST(StrToUint32, Partial) {
     EXPECT_EQ(test_line.status, status) << test_line.input;
     EXPECT_EQ(test_line.value, value) << test_line.input;
     value = 2;
-    status = safe_strtou32_base(absl::string_view(test_line.input), &value, 10);
+    status = safe_strtou32_base(abslx::string_view(test_line.input), &value, 10);
     EXPECT_EQ(test_line.status, status) << test_line.input;
     EXPECT_EQ(test_line.value, value) << test_line.input;
   }
@@ -1170,8 +1170,8 @@ TEST(StrToInt64, Partial) {
       {" ", false, 0},
       {"-", false, 0},
       {"123@@@", false, 123},
-      {absl::StrCat(int64_min, int64_max), false, int64_min},
-      {absl::StrCat(int64_max, int64_max), false, int64_max},
+      {abslx::StrCat(int64_min, int64_max), false, int64_min},
+      {abslx::StrCat(int64_max, int64_max), false, int64_max},
   };
 
   for (const Int64TestLine& test_line : int64_test_line) {
@@ -1184,7 +1184,7 @@ TEST(StrToInt64, Partial) {
     EXPECT_EQ(test_line.status, status) << test_line.input;
     EXPECT_EQ(test_line.value, value) << test_line.input;
     value = -2;
-    status = safe_strto64_base(absl::string_view(test_line.input), &value, 10);
+    status = safe_strto64_base(abslx::string_view(test_line.input), &value, 10);
     EXPECT_EQ(test_line.status, status) << test_line.input;
     EXPECT_EQ(test_line.value, value) << test_line.input;
   }
@@ -1202,7 +1202,7 @@ TEST(StrToUint64, Partial) {
       {" ", false, 0},
       {"-", false, 0},
       {"123@@@", false, 123},
-      {absl::StrCat(uint64_max, uint64_max), false, uint64_max},
+      {abslx::StrCat(uint64_max, uint64_max), false, uint64_max},
   };
 
   for (const Uint64TestLine& test_line : uint64_test_line) {
@@ -1215,7 +1215,7 @@ TEST(StrToUint64, Partial) {
     EXPECT_EQ(test_line.status, status) << test_line.input;
     EXPECT_EQ(test_line.value, value) << test_line.input;
     value = 2;
-    status = safe_strtou64_base(absl::string_view(test_line.input), &value, 10);
+    status = safe_strtou64_base(abslx::string_view(test_line.input), &value, 10);
     EXPECT_EQ(test_line.status, status) << test_line.input;
     EXPECT_EQ(test_line.value, value) << test_line.input;
   }
@@ -1248,7 +1248,7 @@ TEST(StrToInt32Base, PrefixOnly) {
       EXPECT_EQ(line.status, status) << line.input << " " << base;
       EXPECT_EQ(line.value, value) << line.input << " " << base;
       value = 2;
-      status = safe_strto32_base(absl::string_view(line.input), &value, base);
+      status = safe_strto32_base(abslx::string_view(line.input), &value, base);
       EXPECT_EQ(line.status, status) << line.input << " " << base;
       EXPECT_EQ(line.value, value) << line.input << " " << base;
     }
@@ -1279,7 +1279,7 @@ TEST(StrToUint32Base, PrefixOnly) {
       EXPECT_EQ(line.status, status) << line.input << " " << base;
       EXPECT_EQ(line.value, value) << line.input << " " << base;
       value = 2;
-      status = safe_strtou32_base(absl::string_view(line.input), &value, base);
+      status = safe_strtou32_base(abslx::string_view(line.input), &value, base);
       EXPECT_EQ(line.status, status) << line.input << " " << base;
       EXPECT_EQ(line.value, value) << line.input << " " << base;
     }
@@ -1313,7 +1313,7 @@ TEST(StrToInt64Base, PrefixOnly) {
       EXPECT_EQ(line.status, status) << line.input << " " << base;
       EXPECT_EQ(line.value, value) << line.input << " " << base;
       value = 2;
-      status = safe_strto64_base(absl::string_view(line.input), &value, base);
+      status = safe_strto64_base(abslx::string_view(line.input), &value, base);
       EXPECT_EQ(line.status, status) << line.input << " " << base;
       EXPECT_EQ(line.value, value) << line.input << " " << base;
     }
@@ -1344,7 +1344,7 @@ TEST(StrToUint64Base, PrefixOnly) {
       EXPECT_EQ(line.status, status) << line.input << " " << base;
       EXPECT_EQ(line.value, value) << line.input << " " << base;
       value = 2;
-      status = safe_strtou64_base(absl::string_view(line.input), &value, base);
+      status = safe_strtou64_base(abslx::string_view(line.input), &value, base);
       EXPECT_EQ(line.status, status) << line.input << " " << base;
       EXPECT_EQ(line.value, value) << line.input << " " << base;
     }
@@ -1353,8 +1353,8 @@ TEST(StrToUint64Base, PrefixOnly) {
 
 void TestFastHexToBufferZeroPad16(uint64_t v) {
   char buf[16];
-  auto digits = absl::numbers_internal::FastHexToBufferZeroPad16(v, buf);
-  absl::string_view res(buf, 16);
+  auto digits = abslx::numbers_internal::FastHexToBufferZeroPad16(v, buf);
+  abslx::string_view res(buf, 16);
   char buf2[17];
   snprintf(buf2, sizeof(buf2), "%016" PRIx64, v);
   EXPECT_EQ(res, buf2) << v;
@@ -1367,10 +1367,10 @@ TEST(FastHexToBufferZeroPad16, Smoke) {
   TestFastHexToBufferZeroPad16(std::numeric_limits<uint64_t>::max());
   TestFastHexToBufferZeroPad16(std::numeric_limits<int64_t>::min());
   TestFastHexToBufferZeroPad16(std::numeric_limits<int64_t>::max());
-  absl::BitGen rng;
+  abslx::BitGen rng;
   for (int i = 0; i < 100000; ++i) {
     TestFastHexToBufferZeroPad16(
-        absl::LogUniform(rng, std::numeric_limits<uint64_t>::min(),
+        abslx::LogUniform(rng, std::numeric_limits<uint64_t>::min(),
                          std::numeric_limits<uint64_t>::max()));
   }
 }

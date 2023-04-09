@@ -36,7 +36,7 @@ class ScatterExpanderTest : public HloTestBase {
  protected:
   // The HLO parser changes all no layout shapes from the input to have a
   // default layout. Clear the layout of the scatter operand for testing.
-  void ClearInstructionLayout(HloModule* module, absl::string_view inst_name) {
+  void ClearInstructionLayout(HloModule* module, abslx::string_view inst_name) {
     HloInstruction* inst = FindInstruction(module, inst_name);
     inst->mutable_shape()->clear_layout();
   }

@@ -245,12 +245,12 @@ class NcclManager {
   mutex mu_;
 
   // Maps key to collectives currently being assembled or run.
-  absl::flat_hash_map<string, Collective*> collectives_ TF_GUARDED_BY(mu_);
+  abslx::flat_hash_map<string, Collective*> collectives_ TF_GUARDED_BY(mu_);
 
   // Maps a device to the communication streams that make up its collective.
   // This is used to share the stream across different communicators that
   // include the same device.
-  absl::flat_hash_map<se::StreamExecutor*, std::vector<NcclStream*>>
+  abslx::flat_hash_map<se::StreamExecutor*, std::vector<NcclStream*>>
       device_to_comm_streams_ TF_GUARDED_BY(mu_);
 
   std::vector<std::unique_ptr<Communicator>> communicators_ TF_GUARDED_BY(mu_);

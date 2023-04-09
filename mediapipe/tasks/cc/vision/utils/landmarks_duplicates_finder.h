@@ -30,7 +30,7 @@ class DuplicatesFinder {
   // Returns indices of landmark lists to remove to make @multi_landmarks
   // contain different enough (depending on the implementation) landmark lists
   // only.
-  virtual absl::StatusOr<absl::flat_hash_set<int>> FindDuplicates(
+  virtual abslx::StatusOr<abslx::flat_hash_set<int>> FindDuplicates(
       const std::vector<mediapipe::NormalizedLandmarkList>& multi_landmarks,
       int input_width, int input_height) = 0;
 };
